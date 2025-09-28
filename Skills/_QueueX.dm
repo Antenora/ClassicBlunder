@@ -108,6 +108,7 @@ obj
 			var/HitSparkSize//it
 			var/HitSparkTurns//do
 			var/HitSparkDispersion=8
+			var/NeedsHealth
 
 
 			var/RipplePower=1//used to make ripple go higher
@@ -1861,6 +1862,10 @@ mob
 					return
 				if(src.GatesActive<Q.GateNeeded)
 					src << "You have to open at least Gate [Q.GateNeeded] to use this skill!"
+					return
+			if(Q.NeedsHealth)
+				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
+					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Q.MagicNeeded&&!src.HasLimitlessMagic())
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)

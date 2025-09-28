@@ -1,7 +1,7 @@
 sagaTierUpMessages/Rebirth
 	messages = list("You embark on the path of a Hero... but which Hero you become remains to be seen. Will you simply choose to be the strongest or defy everything for victory?", \
 	"Now you can choose: Are you the hero spoken of in legend, or are you one who has not yet written their story?", \
-	"Your celestial guardian blesses you with revelations of more advanced techniques and an even stronger cloth!", \
+	"Your legend shifts ever-closer to completion. Your name is starting to be recognized.", \
 	"You are experiencing the first glimmers of Seventh Sense when in a pinch along with the ability to call upon your zodiac!", \
 	"You reach the level of a Golden Saint, standing at the summit as a champion of Gods!", \
 	"Your Cosmos burns with the power of a god!", \
@@ -28,10 +28,13 @@ sagaTierUpMessages/Rebirth
 				src<<"Unwavering courage wells up within you! You have unlocked the ACT meter!"
 				switch(choice)
 					if("Unsung Hero")
+						src.RebirthHeroPath="Unsung"
 					//	src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Fearless)
-					//	if(src.RebirthHeroType="Blue")
+						if(src.RebirthHeroType=="Blue")
+							src.AddSkill(new/obj/Skills/Queue/NeverKnowsBest)
 					//	if(src.RebirthHeroType="Red")
 					if("Prophesized Hero")
+						src.RebirthHeroPath="Prophesized"
 						if(src.RebirthHeroType=="Blue")
 							src.RebirthHeroType="Cyan"
 							src<< "You are now the Cyan Hero of Soul, a cage for a human SOUL. Your ACT meter slows, but as it builds, a certain power wells up within you..."
@@ -44,10 +47,14 @@ sagaTierUpMessages/Rebirth
 							src<< "You are now the Purple Hero of Hope, who attacks with dark energy."
 							src.AddSkill(new/obj/Skills/Projectile/Rude_Buster)
 							src.AddSkill(new/obj/Skills/Buffs/Rebirth/Devilsknife)
-						/*if(prob(10))
+						if(src.RebirthHeroType=="Rainbow")
+							src.RebirthHeroType="Purple"
+							src<< "You are now the Purple Hero of Hope, who attacks with dark energy."
+							src.AddSkill(new/obj/Skills/Projectile/Rude_Buster)
+							src.AddSkill(new/obj/Skills/Buffs/Rebirth/Devilsknife)
 							src<< "..but you could still choose to become the Yellow Hero of Tragedy. After all, this wasn't supposed to be your story."
 							src.AddSkill(new/obj/Skills/Buffs/Rebirth/ThornRing)
-							src.AddSkill(new/obj/Skills/AutoHit/Snowgrave)*/
+							src.AddSkill(new/obj/Skills/AutoHit/Snowgrave)
 			if(3)
 			if(4)
 			if(5)

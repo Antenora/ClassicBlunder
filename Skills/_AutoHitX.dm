@@ -4897,6 +4897,17 @@ mob
 					if(get_dist(src, Target) > Z.Distance)
 						src << "They're not in range!"
 						return FALSE
+				if(Z.IsSnowgrave)
+					var/savefilefound=file("Saves/Players/[src.Target.ckey]")
+					fcopy(savefilefound,"Frozen/Players/[src.Target.ckey]")
+					Log("Admin","<font color=blue>[ExtractInfo(src)] put [ExtractInfo(src.Target)] into Stasis with Snowgrave.")
+					OMsg(10,"[src.Target] is frozen solid, severing their connection with the world.","<font color=red>[src]([src.key]) faded from existence.")
+					fdel("Saves/Players/[src.Target.ckey]")
+					del src.Target
+					src.RebirthHeroType="Yellow"
+					src<<"You have been set along the Path of Tragedy."
+					for(var/obj/Skills/AutoHit/Snowgrave/SG in src)
+						del SG
 				if(Target && Target.passive_handler.Get("CounterSpell"))
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Counterspell/s in Target)
 						if(s.Using)

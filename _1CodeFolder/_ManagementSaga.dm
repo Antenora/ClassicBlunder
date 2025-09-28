@@ -79,6 +79,10 @@ mob/var
 	LimitCounter=0//Add one each form use; used to determine when antiform happens.
 	//REBIRTH
 	RebirthHeroType
+	RebirthHeroPath
+	tmp/AwakeningSkillUsed
+	Snowgrave=5
+	TranceLevel=0
 
 	//SAINT SEIYA
 	SenseUnlocked=5
@@ -359,9 +363,12 @@ mob/Admin3/verb
 						choice=input(P, "What legacy will you take upon yourself?", "Rebirth Hero") in Choices
 						switch(choice)
 							if("Blue")
-								confirm=alert(P, "You won't give them the chance to strike. You begin your journey to forge a Legend...", "The Hero of Glory, one who will engrave their name into history.", "Yes", "No")
+								confirm=alert(P, "You won't give them the chance to strike. You begin your journey to forge a Legend...", "The Unsung Hero of Glory, the one who will engrave their name into history.", "Yes", "No")
 							if("Red")
-								confirm=alert(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Hero of Perseverance, the one who will never bend.", "Yes", "No")
+								confirm=alert(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Unsung Hero of Perseverance, the one who will never bend.", "Yes", "No")
+							if("Rainbow")
+								confirm=alert(P, "You will forever change the world around you, bringing beauty wherever you walk. And maybe look a little silly while doing it. (Commit to the silly or don't pick this path, cowards.)", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
+
 					P.SagaLevel=1
 					switch(choice)
 						if("Blue")
@@ -370,6 +377,9 @@ mob/Admin3/verb
 						if("Red")
 							P.RebirthHeroType="Red"
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Heart)
+						if("Rainbow")
+							P.RebirthHeroType="Rainbow"
+							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero)
 				//	tierUpSaga("Rebirth")
 
 				if("Keyblade")
