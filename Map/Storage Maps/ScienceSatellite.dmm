@@ -1,0 +1,119 @@
+"aa" = (/turf/Special/EventStars,/area)
+"ab" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Special/EventStars,/area)
+"ac" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Special/EventStars,/area)
+"ad" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech1,/area)
+"ae" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Tech1,/area)
+"af" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech1,/area)
+"ag" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Special/EventStars,/area)
+"ah" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech1,/area)
+"ai" = (/turf/Tech1,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/MidgarTiles/MidgarGrate3,/area)
+"aj" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area)
+"ak" = (/turf/Tech1,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/MidgarTiles/MidgarGrate3,/area)
+"al" = (/turf/Tech1,/area)
+"am" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Tech1,/area)
+"an" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech2,/area)
+"ao" = (/turf/Tech13,/area)
+"ap" = (/turf/Tech2,/area)
+"aq" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Tech2,/area)
+"ar" = (/turf/Wall57,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/MidgarTiles/MidgarGrate3,/area)
+"as" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Tech2,/area)
+"at" = (/turf/Wall57,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/MidgarTiles/MidgarGrate3,/area)
+"au" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Special/EventStars,/area)
+"av" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area)
+"aw" = (/turf/Wall57,/area)
+"ax" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Special/EventStars,/area)
+"ay" = (/turf/MidgarTiles/MidgarRoofSE,/area)
+"az" = (/turf/MidgarTiles/MidgarRoofSouth,/area)
+"aA" = (/turf/MidgarTiles/MidgarRoofSW,/area)
+"aB" = (/turf/MidgarTiles/MidgarRoofEast,/area)
+"aC" = (/turf/Special/Blank,/area)
+"aD" = (/turf/MidgarTiles/MidgarRoofWest,/area)
+"aE" = (/turf/MidgarTiles/MidgarRoofNE,/area)
+"aF" = (/turf/MidgarTiles/MidgarRoofNorth,/area)
+"aG" = (/turf/MidgarTiles/MidgarRoofNW,/area)
+"aH" = (/turf/MidgarTiles/MidgarLightWall3,/area)
+"aI" = (/obj/Special/Teleporter2{gotoX = 223; gotoY = 295; gotoZ = 11},/turf/Special/CaveEntrance,/area)
+"aJ" = (/turf/MidgarTiles/MidgarWall1,/area)
+"aK" = (/turf/MidgarTiles/MidgarWall3,/area)
+"aL" = (/turf/MidgarTiles/MidgarWall2,/area)
+"aM" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs2,/area)
+"aN" = (/turf/Stairs2,/area)
+"aO" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area)
+"aP" = (/turf/MidgarTiles/MidgarWall4,/area)
+"aQ" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech1,/area)
+"aR" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Tech1,/area)
+"aS" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech1,/area)
+"aT" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall6,/area)
+"aU" = (/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall6,/area)
+"aV" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall6,/area)
+"aW" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall6,/area)
+"aX" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall6,/area)
+"aY" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area)
+"aZ" = (/turf/Wall6,/area)
+"ba" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/MetalEdgeE,/turf/Wall6,/area)
+"bb" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/MetalEdgeW,/turf/Wall6,/area)
+"bc" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaabababababababababababababababababaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacadaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeafagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacahaiajajajakalalalalalaiajajajakamagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacahanaoapaoaqalalalalalanaoapaoaqamagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacahanaoaoaoaqalalalalalanaoaoaoaqamagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacahanaoapaoaqalalalalalanaoapaoaqamagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaacaharapasapatalalalalalarapasapatamagaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaabababauahalavawavalalalalalalalavawavalamaxabababaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaacadaeaeaealalalalalalalalalalalalalalalalalaeaeaeafagaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaacahalalalalalalalalalalalalalalalalalalalalalalalamagaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaacahalalalalalalalalalalalalalalalalalalalalalalalamagaaaaaaaaaaaaaaaaaa
+aaaaaaababababababauahalalalalalalalalalalalalalalalalalalalalalalalamaxababababababaaaaaa
+aaaaacadaeaeaeaeaeaealalalalalalalalalalalalalalalalalalalalalalalalalaeaeaeaeaeaeafagaaaa
+aaaaacahaiajajajakalalalalalalalalalalalalalalalalalalalalalalalalalalalaiajajajakamagaaaa
+aaaaacahanaoapaoaqalalalalalalalalalalalalalalalalalalalalalalalalalalalanaoapaoaqamagaaaa
+aaaaacahanaoaoaoaqalalalalalayazazazazazazazazazazazazazazazaAalalalalalanaoaoaoaqamagaaaa
+aaaaacahanaoapaoaqalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalanaoapaoaqamagaaaa
+aaaaacaharapasapatalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalarapasapatamagaaaa
+aaaaacahalavawavalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalavawavalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahalalalalalalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalalalalalalamagaaaa
+aaaaacahaiajajajakalalalalalaBaCaCaCaCaCaCaCaCaCaCaCaCaCaCaCaDalalalalalaiajajajakamagaaaa
+aaaaacahanaoapaoaqalalalalalaEaFaFaFaFaFaFaFaFaFaFaFaFaFaFaFaGalalalalalanaoapaoaqamagaaaa
+aaaaacahanaoaoaoaqalalalalalaHaHaHaHaHaHaHaIaIaIaHaHaHaHaHaHaHalalalalalanaoaoaoaqamagaaaa
+aaaaacahanaoapaoaqalalalalalaJaKaKaKaKaKaLaMaNaOaJaKaKaKaKaKaLalalalalalanaoapaoaqamagaaaa
+aaaaacaharapasapatalalalalalaPaPaPaPaPaPaPaMaNaOaPaPaPaPaPaPaPalalalalalarapasapatamagaaaa
+aaaaacahalavawavalalalalalalalalalalalalalalalalalalalalalalalalalalalalalavawavalamagaaaa
+aaaaacahalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalalamagaaaa
+aaaaacaQaRaRaRaRaRaRalalalalalalalalalalalalalalalalalalalalalalalalalaRaRaRaRaRaRaSagaaaa
+aaaaaaaTaUaUaUaUaUaVahalalalalalalalalalalalalalalalalalalalalalalalamaWaUaUaUaUaUaXaaaaaa
+aaaaaaaYaZaZaZaZaZbaahalalalalalalalalalalalalalalalalalalalalalalalambbaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbaahalalalalalalalalalalalalalalalalalalalalalalalambbaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbaaQaRaRaRalalalalalalalalalalalalalalalalalaRaRaRaSbbaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaTaUaUaVahalalalalalalalalalalalalalalalamaWaUaUaXaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaahalalalalalalalalalalalalalalalambbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaahalalalalalalalalalalalalalalalambbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaahalalalalalalalalalalalalalalalambbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaahalalalalalalalalalalalalalalalambbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaahalalalalalalalalalalalalalalalambbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaYaZaZaZaZaZbcaYaZaZbaaQaRaRaRaRaRaRaRaRaRaRaRaRaRaRaRaSbbaZaZbcaYaZaZaZaZaZbcaaaaaa
+aaaaaaaaaaaaaaaaaaaaaYaZaZbcaTaUaUaUaUaUaUaUaUaUaUaUaUaUaUaUaXaYaZaZbcaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaYaZaZbcaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaYaZaZbcaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaYaZaZbcaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaYaZaZbcaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaYaZaZbcaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaYaZaZbcaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaYaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZbcaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

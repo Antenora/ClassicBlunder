@@ -1,0 +1,58 @@
+"a" = (/turf/Roof7,/area)
+"b" = (/turf/Stairs1,/area)
+"c" = (/turf/Wall1,/area)
+"d" = (/turf/Wood7,/area)
+"e" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Wood7,/area)
+"f" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Wood7,/area)
+"g" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall1,/area)
+"h" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Wall1,/area)
+"i" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall1,/area)
+"j" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Wood7,/area)
+"k" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Wood7,/area)
+"l" = (/turf/Sand3,/area)
+"m" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Wood7,/area)
+"n" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Sand3,/area)
+"o" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Sand3,/area)
+"p" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/MetalEdgeW,/turf/Stairs1,/area)
+"q" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/MetalEdgeE,/turf/Stairs1,/area)
+"r" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Sand3,/area)
+"s" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Sand3,/area)
+"t" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Sand3,/area)
+"u" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Wood7,/area)
+"v" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wood7,/area)
+"w" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Wood7,/area)
+"x" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall17,/area)
+"y" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall17,/area)
+"z" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall17,/area)
+"A" = (/turf/Wall17,/area)
+
+(1,1,1) = {"
+aaaaaabbaaaaaaaaaaabbbbaaaaaaaaaaabbaaaaa
+aaccccbbcccccccccccbbbbcccccccccccbbcccca
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aadddddddddddddddddddddddddddddddddddddda
+aaddddddddddddddeeeeeeeeeedddddddddddddda
+aadddddddddddddfghhhhhhhhijddddddddddddda
+aaddddddddddddkgllllllllllimdddddddddddda
+aaddddddddddddknllllllllllomdddddddddddda
+aaaaaddddaaaadkpllllllllllqmdaaaaddddaaaa
+aacccddddcccadkpllllllllllqmdacccddddccca
+aaddddddddddaddkrssllllsstmddadddddddddda
+aaddddddddddaddduuvrssswuudddadddddddddda
+aaddddddddddadddddduuuuddddddadddddddddda
+aaddddddddddaddddddddddddddddadddddddddda
+aaddddddddddaddddddddddddddddadddddddddda
+aaddddddddddaddddddddddddddddadddddddddda
+aaddddddddddaddddddddddddddddadddddddddda
+aaddddddddddaddddddddddddddddadddddddddda
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+xyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy
+zAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+"}

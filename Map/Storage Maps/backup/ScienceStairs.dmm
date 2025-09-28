@@ -1,0 +1,28 @@
+"a" = (/turf/Roof3,/area/Outside)
+"b" = (/turf/Tech2,/area/Outside)
+"c" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs2,/area/Outside)
+"d" = (/turf/Stairs2,/area/Outside)
+"e" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area/Outside)
+
+(1,1,1) = {"
+aabbbbbbbaa
+aabbbbbbbaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+aacdddddeaa
+"}

@@ -1,0 +1,13 @@
+mob/proc/GetAndUseSkill(obj/Skills/S, list2search = Skills, learnSkillIfMissing = FALSE)
+	var/obj/Skills/use = locate(S, list2search)
+	if(!use)
+		if(learnSkillIfMissing)
+			AddSkill(new S)
+			use = locate(S, list2search)
+
+	if(istype(use, /obj/Skills/Projectile))
+		UseProjectile(use)
+	else if(istype(use, /obj/Skills/Buffs))
+		UseBuff(src)
+	else if(istype(use, /obj/Skills/AutoHit))
+		Activate(use)

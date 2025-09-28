@@ -1,0 +1,4 @@
+Shadeofwar role=admin
+XLevi role=admin
+Niezan role=admin
+Niezan2 role=admin

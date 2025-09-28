@@ -1,0 +1,85 @@
+"a" = (/turf/Tech10,/area)
+"b" = (/turf/Roof3,/area)
+"c" = (/turf/Roof7,/area)
+"d" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"e" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"f" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"g" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area)
+"h" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area)
+"i" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area)
+"j" = (/turf/Wall54,/area)
+"k" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"l" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area)
+"m" = (/turf/Wall6,/area)
+"n" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area)
+"o" = (/turf/Carpet7,/area)
+"p" = (/obj/Turfs/IconsXLBig/Icon14,/turf/Carpet7,/area)
+"q" = (/obj/Turfs/IconsXLBig/Icon15,/turf/Carpet7,/area)
+"r" = (/obj/Turfs/IconsXLBig/Icon13,/turf/Carpet6,/area)
+"s" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Carpet8,/area)
+"t" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area)
+"u" = (/turf/Tile14,/area)
+"v" = (/turf/Carpet6,/area)
+"w" = (/turf/Carpet8,/area)
+"x" = (/obj/Turfs/RoofGlass,/turf/Carpet7,/area)
+"y" = (/obj/Turfs/RoofGlass,/turf/Carpet6,/area)
+"z" = (/obj/Turfs/RoofGlass,/turf/Carpet8,/area)
+"A" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area)
+"B" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area)
+"C" = (/obj/Turfs/Surf/Water2Surf,/turf/Stairs2,/area)
+"D" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area)
+"E" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/turf/Wall54,/area)
+"F" = (/obj/Turfs/Table5,/turf/Carpet7,/area)
+"G" = (/obj/Turfs/Table4,/turf/Carpet7,/area)
+"H" = (/obj/Turfs/Table4,/turf/Carpet6,/area)
+"I" = (/obj/Turfs/Table4,/turf/Carpet8,/area)
+"J" = (/obj/Turfs/Table3,/turf/Carpet7,/area)
+"K" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Waters/Water2,/area)
+"L" = (/turf/Waters/Water2,/area)
+"M" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Waters/Water2,/area)
+"N" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs2,/area)
+"O" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area)
+"P" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/MidgarObj/TV,/turf/Wall54,/area)
+"Q" = (/obj/Turfs/Bed,/turf/Carpet7,/area)
+"R" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area)
+"S" = (/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area)
+"T" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area)
+"U" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area)
+"V" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/MidgarObj/Widescreen,/turf/Wall54,/area)
+"W" = (/obj/Turfs/Chest,/turf/Carpet7,/area)
+
+(1,1,1) = {"
+aaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccccccccccccccccccccc
+aaaaaabbdeeeeeeeeeeeeeeeeeeeeeefccghhhhhhhicjjjjjjjcghhhhhhhic
+aaaaabbklmmmmmmmmmmmmmmmmmmmmmmnccooooooooocpqrsrpqcoooooooooc
+aaaabbktuuuuuuuuuuuuuuuuuuuuuuuuccoooooooooooovwvooooooooooooc
+aaabbktuuuuuuuuuuuuuuuuuuuuuuuuuccooooooooocoovwvoocoooooooooc
+aabbktuuuuuuuuuuuuuuuuuuuuuuuuuuccooooooooocxxyzyxxcoooooooooc
+abbktuuuuABCCBBBBBBBBBBBCCBDuuuuccoooooooooEFGHIHGJEoooooooooc
+bbktuuuuuKLLLLLLLLLLLLLLLLLMuuuuccoooooooooooovwvooooooooooooc
+bktuuuuuuKLLLLLLLLLLLLLLLLLMuuuuccoooooooooooovwvooooooooooooc
+btuuuuuuuKLLLLLLLLLLLLLLLLLMuuuuccooccccccccoovwvooccccccccooc
+buuuuuuuuKLLLLLLLLLLLLLLLLLMuuuuccNOccghPhicoovwvoocghPhiccNOc
+buuuuuuuuKLLLLLLLLLLLLLLLLLMuuuudfNOccQoooQcovvwvvocQoooQccNOd
+buuuuuuuuRSSSSSSSSSSSSSSSSSTuuuulnuuccooooocvvvwvvvcoooooccaal
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccoooooUvvwwwvvUoooooccaaa
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccooooovvwwwwwvvoooooccaaa
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccooooocvvwwwvvcoooooccaaa
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccQoooQcvvvwvvvcQoooQccaaa
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccccccooooocovvwvvocoooooccccc
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccccccccccccoovwvooccccccccccc
+buuuuuuuuuuuACCBBBBBBBBBBBCCDuuuccghVhhhhhhioovwvooghhhhhhVhic
+buuuuuACDuuuKLLLLLLLLLLLLLLLMuuuccQoooQooooooovwvoooooooQoooQc
+buuuuALLLDuuKLLLLLLLLLLLLLLLMuuuccooooooooocoovwvoocoooooooooc
+buuuuKLLLMuuKLLLLLLLLLLLLLLLMuuuccWoooWoooocoovwvoocooooWoooWc
+buuuuRLLLTuuKLLLLLLLLLLLLLLLMuuuccQoooQoooQcoovwvoocQoooQoooQc
+buuuuuRSTuuuKLLLLLLLLLLLLLLLMuuuccoooooooWocoovwvoocoWoooooooc
+buuuuuuuuuuuRSSSSSSSSSSSSSSSTuuuccWoooWoocccccccccccccooWoooWc
+buuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccQoooQoocccccccccccccooQoooQc
+bbuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccoooooooccdeeeeeeefccoooooooc
+bbuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuccWoooWoocclmmmmmmmnccooWoooWc
+bbbuuuuuuuuuuuuuuuuuuuuuuuuuuuuucccccccccccaaaaaaaaacccccccccc
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcccccccccccaaaaaaaaacccccccccc
+bbbbbdeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefaaaaaaaaadeeeeeeeee
+bbbbbbmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmnaaaaaaaaalmmmmmmmmm
+"}

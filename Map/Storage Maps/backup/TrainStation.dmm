@@ -1,0 +1,77 @@
+"a" = (/turf/Roof3,/area/Outside/Planet/Earth)
+"b" = (/turf/Roof3,/area/Inside)
+"c" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"d" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"e" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"f" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area/Inside)
+"g" = (/turf/Wall6,/area/Inside)
+"h" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Inside)
+"i" = (/turf/Tech1,/area/Inside)
+"j" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/bridgeE,/turf/Tech1,/area/Inside)
+"k" = (/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/bridgeE,/turf/Tech1,/area/Inside)
+"l" = (/turf/Tech1,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/bridgeE,/turf/Special/BigTrainEngineL,/area/Inside)
+"m" = (/turf/Tech1,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/bridgeE,/turf/Special/BigTrainCarrageL,/area/Inside)
+"n" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area/Inside)
+"o" = (/obj/Special/Teleporter2{gotoX = 346; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"p" = (/obj/Special/Teleporter2{gotoX = 371; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"q" = (/obj/Special/Teleporter2{gotoX = 397; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"r" = (/obj/Special/Teleporter2{gotoX = 423; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"s" = (/obj/Special/Teleporter2{gotoX = 449; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"t" = (/obj/Special/Teleporter2{gotoX = 475; gotoY = 456; gotoZ = 12},/turf/MidgarTiles/MidgarTile2,/area/Inside)
+"u" = (/turf/Tech2,/area/Inside)
+"v" = (/obj/Turfs/MidgarObj/SmallChairE,/turf/Tech2,/area/Inside)
+"w" = (/obj/Turfs/MidgarObj/SmallChairW,/turf/Tech2,/area/Inside)
+"x" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6R,/area/Inside)
+"y" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6R,/area/Inside)
+"z" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6R,/area/Inside)
+"A" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6R,/area/Inside)
+"B" = (/turf/Stairs2,/area/Outside/Planet/Earth)
+"C" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"D" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"E" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+
+(1,1,1) = {"
+abbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+abcdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddeb
+abfggggggggggggggggggggggggggggggggggggggggggggggggggggggggggghb
+abfggggggggggggggggggggggggggggggggggggggggggggggggggggggggggghb
+abfggggggggggggggggggggggggggggggggggggggggggggggggggggggggggghb
+abiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiib
+abjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjb
+abkkklkkkkkkkmkkkkkkkmkkkkkkkmkkkkkkkmkkkkkkkmkkkkkkkmkkkkkkkkkb
+abnnnnnnnnnnnnnnooonnnnnpppnnnnnqqqnnnnnrrrnnnnnsssnnnnntttnnnnb
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuuxyuvuuwuuuuuuvuuwuxyuuuuuxyuvuuwuuuuuuvuuwuxyuuuuxyuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuuxyuvuuwuuuuuuvuuwuxyuuuuuxyuvuuwuuuuuuvuuwuxyuuuuxyuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuubbuvuuwuuuuuuvuuwubbuuuuubbuvuuwuuuuuuvuuwubbuuuubbuub
+abuuuuuuuuxyuvuuwuuuuuuvuuwuxyuuuuuxyuvuuwuuuuuuvuuwuxyuuuuxyuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuzAuvuuwuuuuuuvuuwuzAuuuuuzAuvuuwuuuuuuvuuwuzAuuuuzAuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuub
+abbbbbuuuubbbbbbbbbbbbbbbbbbbbuuuuubbbbbbbbbbbbbbbbbbbbuuuubbbbb
+aaaaaaBBBBaaaaaaaaaaaaaaaaaaaaBBBBBaaaaaaaaaaaaaaaaaaaaBBBBaaaaa
+CDDDDEBBBBCDDDDDDDDDDDDDDDDDDEBBBBBCDDDDDDDDDDDDDDDDDDEBBBBCDDDD
+"}

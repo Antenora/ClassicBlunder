@@ -1,0 +1,35 @@
+#Files and folders specified here will never be tracked.
+Data/
+.svn/
+test_server/
+
+*.ban
+*.bdb
+*.log
+*.sav
+
+#Files from hosting the game
+Map1
+Login Menu
+Saves
+
+
+#Compiled files and other files generated during compilation.
+*.dmb
+*.rsc
+*.int
+*.lk
+*.int
+*.dyn.rsc
+*.dme.r*
+
+#other stuff
+.dropbox
+desktop.ini
+
+SaveBackups/Players/fushichou
+SaveBackups/Players/galionknight
+Map/backup/GameMap.dmm
+debug_log.txt
+DragonballRebirth.zip
+.vscode/settings.json

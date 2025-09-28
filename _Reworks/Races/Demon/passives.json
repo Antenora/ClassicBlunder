@@ -1,0 +1,153 @@
+{
+
+
+    "SWORD_PASSIVES_I": {
+        "Extend": [1, 2],
+        "MagicSword": [1, 1],
+        "SpiritSword": [0.25, 1]
+    },
+    "SWORD_PASSIVES_II": {
+        "LifeSteal": [2, 10],
+        "DoubleStrike": [1, 3]
+    },
+    "SWORD_PASSIVES_III": { "TripleStrike": [1, 2] },
+    "SWORD_PASSIVES_IV": {},
+    "UNARMED_PASSIVES_I": {
+        "SpiritHand": [1, 4],
+        "CallousedHands": [0.15, 1],
+        "BlurringStrikes": [0.5, 4],
+        "Momentum": [0.5, 4]
+    },
+    "UNARMED_PASSIVES_II": {
+        "LifeSteal": [5, 25],
+        "HardenedFrame": [1, 1],
+        "ComboMaster": [1, 1]
+    },
+    "UNARMED_PASSIVES_III": {
+        "SpiritStrike": [1, 1]
+    },
+    "STAFF_PASSIVES_I": {
+        "QuickCast": [1, 3]
+    },
+    "STAFF_PASSIVES_II": {
+        "MovingCharge": [1, 1],
+        "Soulfire": [0.5, 4],
+        "Siphon": [1, 5],
+        "ManaSteal": [5, 25]
+    },
+    "STAFF_PASSIVES_III": {
+        "ManaStats": [0.25, 1],
+        "ManaGeneration": [1, 5],
+        "SpiritFlow": [0.5, 2]
+    },
+    "STAFF_PASSIVES_IV": {
+        "DualCast": [1, 2]
+    },
+    "ARMOR_PASSIVES_I": {
+        "Juggernaut": [0.25, 4],
+        "DebuffResistance": [0.25, 2],
+        "Hardening": [0.5, 5],
+        "CallousedHands": [0.15, 1]
+    },
+    "ARMOR_PASSIVES_II": {
+        "GiantForm": [1, 1],
+        "Reversal": [0.1, 1],
+        "CounterMaster": [2, 10],
+        "Flow": [1, 5],
+        "Deflection": [1, 5],
+        "DebuffReversal": [1, 1]
+    },
+    "ARMOR_PASSIVES_III": {
+        "BlockChance": [10, 100],
+        "Blubber": [0.25, 1],
+        "LikeWater": [1, 4],
+        "DemonicDurability": [0.25, 5],
+        "LifeGeneration": [0.25, 5],
+        "DeathField": [1, 10],
+        "VoidField": [1, 10]
+    },
+    "ARMOR_PASSIVES_IV": {
+        "Unstoppable": [1, 1],
+        "VenomImmune": [1, 1],
+        "InjuryImmune": [1, 1],
+        "FatigueImmune": [1, 1]
+    },
+    "GENERIC_PASSIVES_I": {
+        "Steady": [1, 10],
+        "Godspeed": [1, 5],
+        "Flicker": [1, 3],
+        "Pursuer": [1, 3],
+        "Adrenaline": [1, 3],
+        "Tenacity": [1, 6],
+        "Persistence": [1,6],
+        "UnderDog": [1,6]
+    },
+    "GENERIC_PASSIVES_II": {
+        "Duelist": [0.5, 2],
+        "SweepingStrike": [1, 1],
+        "TechniqueMastery": [1, 5],
+        "Pressure": [1, 5],
+        "HybridStrike": [1, 4],
+        "WeaponBreaker": [1, 5],
+        "HardStyle": [1, 2],
+        "SoftStyle": [1, 2],
+        "CashCow": [1, 5],
+        "EnergySteal": [10, 50],
+        "HeavyHitter": [0.5, 2]
+    },
+    "GENERIC_PASSIVES_III": {
+        "BuffMastery": [1, 5],
+        "StunningStrike": [1, 2],
+        "BulletKill": [1, 1],
+        "EnergyGeneration": [0.1, 4],
+        "Adaptation": [1, 1],
+        "CriticalChance": [10, 100],
+        "FluidForm": [0.5, 2],
+        "Brutalize": [0.25, 5]
+
+    },
+    "GENERIC_PASSIVES_IV": {
+        "Deicide": [1, 5],
+        "KillerInstinct": [0.1, 1],
+        "BurningShot": [1, 1]
+    },
+    "CORRUPTION_PASSIVES_I": {
+        "Instinct": [1, 10],
+        "Burning": [5, 15],
+        "Chilling": [5, 15],
+        "Crushing": [5, 15],
+        "Shocking": [5, 15],
+        "Poisoning": [5, 15],
+        "Crippling": [5, 15],
+        "DoubleStrike": [1, 1]
+    },
+    "CORRUPTION_PASSIVES_II": {
+        "Scorching": [2, 15],
+        "Freezing": [2, 15],
+        "Shattering": [2, 15],
+        "Toxic": [2, 15],
+        "Shearing": [2, 15],
+        "HeavyHitter": [1, 4]
+    },
+    "CORRUPTION_PASSIVES_III": {
+        "DarknessFlame": [3, 15],
+        "SoulFire": [0.25, 1],
+        "Brutalize": [1, 5],
+        "Tenacity": [1, 5],
+        "MovementMastery": [1, 5]
+    },
+    "CORRUPTION_PASSIVES_IV": {
+
+    },
+    "CORRUPTION_DEBUFFS_I": {
+        "Poison": [1, 3],
+        "Def": [1, 3],
+        "End": [1, 3],
+        "Str": [1, 3],
+        "Burn": [1, 3],
+        "Slow": [1, 3],
+        "Energy": [1, 3],
+        "Mana": [1, 3]
+    }
+
+}

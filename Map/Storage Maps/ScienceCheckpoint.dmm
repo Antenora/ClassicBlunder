@@ -1,0 +1,31 @@
+"a" = (/turf/Roof3,/area)
+"b" = (/turf/Tech2,/area)
+"c" = (/turf/Special/EventStars,/area)
+"d" = (/obj/Items/Tech/Door{Password = "Coconut"},/turf/Tech2,/area)
+"e" = (/obj/Turfs/MidgarObj/MidgarLaser,/turf/Tech2,/area)
+"f" = (/turf/Tech9,/area)
+"g" = (/obj/Turfs/MidgarObj/MidgarLaser3,/turf/Tech2,/area)
+
+(1,1,1) = {"
+aabbbbbbbaa
+cabbbbbbbac
+cadddddddac
+caefffffgac
+cabfffffbac
+cabfffffbac
+caefffffgac
+cabfffffbac
+cabfffffbac
+caefffffgac
+cabfffffbac
+cabfffffbac
+caefffffgac
+cabfffffbac
+cabfffffbac
+caefffffgac
+cabfffffbac
+cabfffffbac
+caefffffgac
+cabfffffbac
+aadddddddaa
+"}

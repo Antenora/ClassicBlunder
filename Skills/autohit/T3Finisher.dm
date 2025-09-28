@@ -1,0 +1,23 @@
+/obj/Skills/AutoHit
+    True_One_Inch_Punch
+        UnarmedOnly=1
+        FlickAttack=1
+        Area="Strike"
+        StrOffense=2
+        DamageMult=3
+        Stunner=3
+        Rush=3
+        RushDelay=0.1
+        ControlledRush=1
+        Knockback=0
+        Quaking=4
+        PreShockwave=1
+        PreShockwaveDelay=1
+        PostShockwave=0
+        Shockwaves=2
+        Shockwave=0.5
+        ShockIcon='KenShockwaveFocus.dmi'
+        ShockBlend=2
+        ShockDiminish=1.15
+        ShockTime=4
+        ActiveMessage="curls up their fingers into a fist and delivers a crushing blow!!!"

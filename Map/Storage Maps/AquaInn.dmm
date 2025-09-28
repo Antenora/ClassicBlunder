@@ -1,0 +1,93 @@
+"a" = (/turf/Roof7,/area)
+"b" = (/turf/Special/Blank,/area)
+"c" = (/turf/Wall2,/area)
+"d" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall26,/area)
+"e" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall26,/area)
+"f" = (/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/MidgarObj/Widescreen,/turf/Wall26,/area)
+"g" = (/obj/Turfs/Clock,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall26,/area)
+"h" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall26,/area)
+"i" = (/turf/Tile19,/area)
+"j" = (/obj/Turfs/Bed,/turf/Carpet1,/area)
+"k" = (/turf/Carpet1,/area)
+"l" = (/obj/Items/Tech/Door,/turf/Carpet1,/area)
+"m" = (/obj/Turfs/Drawer,/turf/Carpet1,/area)
+"n" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall26,/area)
+"o" = (/obj/Turfs/FishTank2,/turf/Carpet1,/area)
+"p" = (/obj/Turfs/Table7,/turf/Carpet1,/area)
+"q" = (/obj/Turfs/Table8,/turf/Carpet1,/area)
+"r" = (/turf/Stairs2,/area)
+"s" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/turf/Wall26,/area)
+"t" = (/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/MidgarObj/TV,/turf/Wall26,/area)
+"u" = (/turf/Roof7,/turf/Carpet1,/area)
+"v" = (/turf/Tile19,/turf/Carpet1,/area)
+"w" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall2,/area)
+"x" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall2,/area)
+"y" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall2,/area)
+"z" = (/obj/Items/Tech/Door,/turf/Tile19,/area)
+"A" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Carpet1,/area)
+"B" = (/obj/Turfs/IconsXLBig/Icon20,/turf/Carpet1,/area)
+"C" = (/obj/Turfs/IconsXLBig/Icon21,/turf/Carpet1,/area)
+"D" = (/obj/Turfs/Table5,/turf/Carpet1,/area)
+"E" = (/obj/Turfs/Table4,/turf/Carpet1,/area)
+"F" = (/obj/Turfs/Table3,/turf/Carpet1,/area)
+"G" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall2,/area)
+"H" = (/obj/Turfs/RoofGlass,/turf/Carpet1,/area)
+"I" = (/obj/Turfs/Table5,/turf/Tile19,/area)
+"J" = (/obj/Turfs/Table4,/turf/Tile19,/area)
+"K" = (/obj/Turfs/Table3,/turf/Tile19,/area)
+"L" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall26,/area)
+"M" = (/turf/Wall26,/area)
+"N" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall26,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbb
+aaaaaaaaacccccccccccccccccaaaaaaaaabbbbbbbbbb
+aadefgehaiiiiiiiiiiiiiiiiiadegfehaabbbbbbbbbb
+aajjkkkkaiiiiiiiiiiiiiiiiiakkkkjjaabbbbbbbbbb
+aakkkkalaiiiiiiiiiiiiiiiiialakkkkaabbbbbbbbbb
+aakkkmainiiiiiiiiiiiiiiiiiniamkkkaabbbbbbbbbb
+aaokpqaiiiiiiiiiiiiiiiiiiiiiapqokaabbbbbbbbbb
+aaaaaaaaaiiiiiiiiiiiiiiiiiaaaaaaaaabbbbbbbbbb
+aadeeeeehiiiiiiiiiiiiiiiiideeeeehaabbbbbbbbbb
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiaaaaaaaaaaaa
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiaaaaaaaaaaaa
+aacccccccccccccccrrrrrrccccccccccccccccccccca
+aaaaaaaaaccccccccrrrrrrccccccccccccccaaaaaaaa
+aadefgehaiiiiiiiiiiiiiiiiiiiiiiiiiiiiadegfeha
+aajmkkkkaiiiiiiiiiiiiiiiiiiiiiiiiiiiiakkkkmja
+aakkkkalaiiiiiiiiiiiiiiiiiiiiiiiiiiiialakkkka
+aakkkkainiiiiiiiiiiiiiiiiiiiiiiiiiiiisiakkkka
+aakkpqaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiapqkka
+aaaaaaaaaiiiiiiiiiiiiiiiiiiiiiiiiiiiiaaaaaaaa
+aadeeeeehiiiiiiiiiiiiiiiiiiiiiiiiiiiideeeeeha
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiia
+aacccccccrrrrrrccccccccccccrrrrrrcccccccccccc
+aacccccccrrrrrrccccccccccccrrrrrrcccccccccccc
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+aaaaaaaaaiiiiiiaaaaaaaaiiiiiiiiiiiiiiaaaaaaaa
+aadetgehaiiiiiiadegtehaiiiiiiiiiiiiiiadetgeha
+aajmkkkkaiiiiiiakkkkmjaiiiiiiiiiiiiiiajmkkkka
+aakkkkalaiiiiiialakkkkaiiiiiiiiiiiiiiakkkkuka
+aakkkkainiiiiiiniakkkkaiiiiiiiiiiiiiiakkkkuva
+aakkpqaiiiiiiiiiiapqkkaiiiiiiiiiiiiiiakkpquva
+aaaaaaaaaiiiiiiaaaaaaaaiiaaaaaaaaaaiiaaaaaala
+aadeeeeehiiiiiideeeeeehiiawxxxxxxyaiideeeehin
+aaiiiiiiiiiiiiiiiiiiiiiiizkkABCAkkziiiiiiiiii
+aaaaaaaaaiiiiiiaaaaaaaaiiakkkkkkkkaiiaaaaaaaa
+aadetgehaiiiiiiadegtehaiiakDEEEEFkaiiadetgeha
+aajmkkkkaiiiiiiakkkkmjaiiakkkkkkkkaiiajmkkkka
+aakkkkalaiiiiiialakkkkaiiaakkkkkkaaiiakkkkuka
+aakkkkainiiiiiiniakkkkaiiGaaHHHHaaGiiakkkkuva
+aakkpqaiiiiiiiiiiapqkkaiiiwyIJJKwyiiiakkpquva
+aaaaaaaaaiiiiiiaaaaaaaaiiiiiiiiiiiiiiaaaaaala
+aadeeeeehiiiiiideeeeeehiiiiiiiiiiiiiideeeehin
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+aaiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii
+aaaaaaaaaaaaaaaaaaaaaaaaaaaiiiiiiaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaiiiiiiaaaaaaaaaaaa
+deeeeeeeeeeeeeeeeeeeeeeeeehiiiiiideeeeeeeeeee
+LMMMMMMMMMMMMMMMMMMMMMMMMMNiiiiiiLMMMMMMMMMMM
+LMMMMMMMMMMMMMMMMMMMMMMMMMNrrrrrrLMMMMMMMMMMM
+LMMMMMMMMMMMMMMMMMMMMMMMMMNrrrrrrLMMMMMMMMMMM
+LMMMMMMMMMMMMMMMMMMMMMMMMMNiiiiiiLMMMMMMMMMMM
+"}

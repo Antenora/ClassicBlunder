@@ -1,0 +1,186 @@
+{
+    "Supporters": {
+        "1": ["Gogeto25"],
+        "2": [],
+        "3": ["Hoboman11"],
+        "4": [],
+        "5": ["Taco938", "Chronobreaker", "KidNamedLat", "Jeonsa", "Wizby", "Sandman7x", "Wizio", "POD0JUAN", "Digi-Daisuke", "Shikai no Negro", "Quotaa", "Malitovan", "DeathGuardSTER", "CryoExile", "GFlash"],
+        "6": [
+            "Starmonger"
+        ]
+    },
+    "Donators": {
+        "1": ["POD0JUAN", "Wizio", "Shikai no Negro", "Quotaa", "GFlash"],
+        "2": ["PHDOWN", "DeathGuardSTER", "CryoExile"],
+        "3": ["Digi-Daisuke", "Jeonsa"],
+        "4": ["Gogeto25", "Malitovan"],
+        "5": ["Starmonger", "Wizby", "Sandman7x"],
+        "6": [
+            "Taco938", "Chronobreaker", "KidNamedLat"
+        ]
+    },
+    "Information": {
+        "Malitovan": {
+            "name": "Mal",
+            "key": "Malitovan",
+            "displayKey": "lamovo jones",
+            "supportTier": "5",
+            "donatorTier": "4",
+            "loginMessage": "malitovan penguin walks into the server and waves hello"
+        },
+        "GFlash": {
+            "name": "Alucard",
+            "key": "GFlash",
+            "displayKey": "GFlash",
+            "supportTier": "5",
+            "donatorTier": "1",
+            "loginMessage": "<font face='Verdana'><font color='#d5b207'>WE'RE IN THE PIPE; FIVE BY FIVE</font>"
+        },
+        "CryoExile": {
+            "name": "Cryo",
+            "key": "CryoExile",
+            "displayKey": "CryoExile",
+            "supportTier": "5",
+            "donatorTier": "2",
+            "loginMessage": "<font face='monospace'>Cryo is listening (Jobbing)</font>"
+        },
+        "Hoboman11": {
+            "name": "Hobo",
+            "key": "Hoboman11",
+            "displayKey": "Hoboman11",
+            "supportTier": "3",
+            "donatorTier": "0",
+            "loginMessage": "name is going to talk about mechs until we learn to love them..."
+        },
+
+        "Quotaa": {
+            "name": "Quotaa",
+            "key": "Quotaa",
+            "displayKey": "Quotaa",
+            "supportTier": "5",
+            "donatorTier": "1",
+            "loginMessage": "name has slept and had a nice day :)"
+        },
+
+        "Shikai no Negro": {
+            "name": "Dante",
+            "key": "Shikai no Negro",
+            "displayKey": "The Honored One",
+            "supportTier": "5",
+            "donatorTier": "1",
+            "loginMessage": "<font color=white><i>Throughout Heaven and Earth, I alone am the divided one.</i></font>"
+        },
+
+        "Wizby": {
+            "name": "Hated",
+            "key": "Wizby",
+            "displayKey": "WiZby",
+            "supportTier": "5",
+            "donatorTier": "5",
+            "loginMessage": "Were so back"
+        },
+
+        "Wizio": {
+            "name": "the kid",
+            "key": "Wizio",
+            "displayKey": "wizio idk",
+            "supportTier": "5",
+            "donatorTier": "1",
+            "loginMessage": "uhh <b>wizio?</b>"
+        },
+
+        "Sandman7x": {
+            "name": "Gravity",
+            "key": "Sandman7x",
+            "displayKey": "Sandman7x",
+            "supportTier": "5",
+            "donatorTier": "5",
+            "loginMessage": "We simply ball, nuff said."
+        },
+
+        "POD0JUAN": {
+            "name": "JCbal",
+            "key": " POD0JUAN",
+            "displayKey": "<font color=green><b>REAL</font></b> Hero of the Wipe",
+            "supportTier": "5",
+            "donatorTier": "1",
+            "loginMessage": "<font color=red><i><b>THE REAL HERO OF THE WIPE HAS ARRIVED!!</i></b></font>"
+        },
+
+        "Jeonsa": {
+            "name": "Jeonsa",
+            "key": "Jeonsa",
+            "displayKey": "Scam Priest",
+            "supportTier": "5",
+            "donatorTier": "3",
+            "loginMessage": "Scam Priest Has Appeared! Watch your wallets..."
+        },
+        "KidNamedLat": {
+            "name": "Lat",
+            "key": "KidNamedLat",
+            "displayKey": "<font color=white>Just</font><font color=red>Lat</font>",
+            "supportTier": "5",
+            "donatorTier": "6",
+            "loginMessage": "something devilish is brewing"
+        },
+        "Chronobreaker": {
+            "name": "Maya",
+            "key": "Chronobreaker",
+            "displayKey": "<font color=purple>loverboy♥</font>",
+            "supportTier": "5",
+            "donatorTier": "6",
+            "loginMessage": "♥"
+        },
+        "Taco938": {
+            "name": "Taco",
+            "key": "Taco938",
+            "displayKey": "Giga Taco",
+            "supportTier": "5",
+            "donatorTier": "6",
+            "loginMessage": "<font color=red>name is enabling people again</font>"
+        },
+        "Starmonger": {
+            "name": "Star",
+            "key": "Starmonger",
+            "displayKey": "Star",
+            "supportTier": "6",
+            "donatorTier": "5",
+            "loginMessage": "name appearifies."
+        },
+        "Gogeto25": {
+            "name": "Jordan",
+            "key": "Gogeto25",
+            "displayKey": "bober jones",
+            "supportTier": "1",
+            "donatorTier": "6",
+            "loginMessage": "<font color=purple><b>name wants to sleep.</b></font>"
+        },
+        "PHDOWN": {
+            "name": "Tre",
+            "key": "PHDOWN",
+            "displayKey": "Figure",
+            "supportTier": "5",
+            "donatorTier": "2",
+            "loginMessage": "<font color=red><b>A DEVIL FRUIT HAS SPAWNED!</font></b>"
+        },
+
+        "DeathGuardSTER": {
+            "name": "DeathGuard",
+            "key": "DeathGuardSTER",
+            "displayKey": "<font color='#DDDDDD'>DeathGuard</font><font color='#FFD700'>STER</font>",
+            "supportTier": "5",
+            "donatorTier": "2",
+            "loginMessage": "he is mesmerized by the beauty of the world"
+        },
+        "Digi-Daisuke": {
+            "name": "Yasa",
+            "key": "Digi-Daisuke",
+            "displayKey": "Yasa",
+            "supportTier": "5",
+            "donatorTier": "3",
+            "loginMessage": "name edges their way into server!"
+        }
+
+
+    }
+}

@@ -1,0 +1,166 @@
+"aa" = (/turf/MidgarTiles/MidgarRoofSouth,/area)
+"ab" = (/turf/MidgarTiles/MidgarRoofSW,/area)
+"ac" = (/turf/Roof4C,/area)
+"ad" = (/turf/MidgarTiles/MidgarRoofSE,/area)
+"ae" = (/turf/MidgarTiles/MidgarRoofNorth,/area)
+"af" = (/turf/MidgarTiles/MidgarRoofNW,/area)
+"ag" = (/turf/MidgarTiles/MidgarRoofNE,/area)
+"ah" = (/turf/MidgarTiles/MidgarRoofEast,/area)
+"ai" = (/turf/MidgarTiles/MidgarRoofWest,/area)
+"aj" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4N,/turf/Wall56,/area)
+"ak" = (/obj/Turfs/Edges/Edge4N,/turf/Wall56,/area)
+"al" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/Edge4N,/turf/Wall56,/area)
+"am" = (/turf/Tech6,/area)
+"an" = (/obj/Turfs/Edges/Edge4N,/obj/Turfs/Surf/Water10Surf,/turf/Special/CaveEntrance,/area)
+"ao" = (/obj/Turfs/Edges/Edge4W,/turf/Wall56,/area)
+"ap" = (/turf/Wall56,/area)
+"aq" = (/obj/Turfs/Edges/Edge4E,/turf/Wall56,/area)
+"ar" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/DarkEdgeS,/turf/Wall56,/area)
+"as" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/DarkEdgeS,/turf/Wall56,/area)
+"at" = (/turf/Waters/WaterFall,/area)
+"au" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Edges/GrayEdgeWest,/obj/Turfs/Edges/GrayEdgeN,/turf/Wall13,/area)
+"av" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Tech6,/area)
+"aw" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Tech6,/area)
+"ax" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4N,/turf/Dirt13,/area)
+"ay" = (/obj/Turfs/Edges/Edge4N,/turf/Dirt13,/area)
+"az" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/Edge4N,/turf/Dirt13,/area)
+"aA" = (/obj/Turfs/Surf/Water5Surf,/turf/Wall56,/area)
+"aB" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Surf/Water5Surf,/turf/Wall56,/area)
+"aC" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Edges/GrayEdgeWest,/turf/Wall13,/area)
+"aD" = (/obj/Turfs/Edges/GrayEdgeWest,/obj/Turfs/Edges/GrayEdgeN,/turf/Wall13,/area)
+"aE" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Edges/GrayEdgeN,/turf/Wall13,/area)
+"aF" = (/obj/Turfs/Edges/Edge4W,/turf/Dirt13,/area)
+"aG" = (/turf/Dirt13,/area)
+"aH" = (/turf/Waters/Water6,/area)
+"aI" = (/obj/Turfs/Edges/GrayEdgeWest,/turf/Wall13,/area)
+"aJ" = (/obj/Turfs/Edges/GrayEdgeE,/turf/Wall13,/area)
+"aK" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Dirt13,/area)
+"aL" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Surf/Water5Surf,/turf/Wall56,/area)
+"aM" = (/obj/Turfs/Surf/Water5Surf,/turf/Waters/WaterFall,/area)
+"aN" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4N,/turf/Dirt12,/area)
+"aO" = (/obj/Turfs/Edges/Edge4N,/turf/Dirt12,/area)
+"aP" = (/obj/Turfs/Edges/Edge4N,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"aQ" = (/obj/Turfs/Edges/Edge4N,/obj/Turfs/Plant15,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"aR" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/Edge4N,/turf/Dirt12,/area)
+"aS" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Dirt13,/area)
+"aT" = (/obj/Turfs/Edges/Edge4W,/turf/Dirt12,/area)
+"aU" = (/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"aV" = (/obj/Turfs/Plant15,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"aW" = (/obj/Turfs/Edges/Edge4E,/turf/Dirt12,/area)
+"aX" = (/turf/Roof7,/area)
+"aY" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Edges/GrayEdgeWest,/obj/Turfs/Surf/Water5Surf,/turf/Wall13,/area)
+"aZ" = (/turf/Dirt12,/area)
+"ba" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Plant15,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"bb" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall19,/area)
+"bc" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall19,/area)
+"bd" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall19,/area)
+"be" = (/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/IconsXLBig/Icon53,/turf/Wall19,/area)
+"bf" = (/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/IconsX/Icon79,/turf/Wall19,/area)
+"bg" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"bh" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall19,/area)
+"bi" = (/turf/Wall19,/area)
+"bj" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/IconsX/Icon80,/turf/Wall19,/area)
+"bk" = (/turf/Wood7,/area)
+"bl" = (/obj/Turfs/IconsX/Icon78,/turf/Wood7,/area)
+"bm" = (/obj/Turfs/IconsXLBig/Icon14,/turf/Wood7,/area)
+"bn" = (/obj/Turfs/IconsXLBig/Icon15,/turf/Wood7,/area)
+"bo" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4N,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"bp" = (/obj/Turfs/IconsXLBig/Icon25,/turf/Wall19,/area)
+"bq" = (/obj/Turfs/IconsXLBig/Icon32,/turf/Wall19,/area)
+"br" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall19,/area)
+"bs" = (/turf/Stairs1,/area)
+"bt" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wood7,/area)
+"bu" = (/turf/Carpet3,/area)
+"bv" = (/obj/Turfs/IconsXLBig/Icon4,/turf/Wood7,/area)
+"bw" = (/obj/Turfs/Edges/Edge4E,/turf/Dirt13,/area)
+"bx" = (/obj/Turfs/IconsX/Icon13,/turf/Wood7,/area)
+"by" = (/obj/Turfs/IconsX/Icon12,/turf/Wood7,/area)
+"bz" = (/obj/Turfs/IconsX/Icon11,/turf/Wood7,/area)
+"bA" = (/obj/Turfs/IconsX/Icon14,/turf/Wood7,/area)
+"bB" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/Edge4S,/turf/Dirt13,/area)
+"bC" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4S,/turf/Dirt12,/area)
+"bD" = (/obj/Turfs/Edges/Edge4S,/turf/Dirt12,/area)
+"bE" = (/obj/Turfs/Edges/Edge4S,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"bF" = (/obj/Turfs/Edges/Edge4E,/obj/Turfs/Edges/Edge4S,/turf/Dirt12,/area)
+"bG" = (/obj/Turfs/IconsX/Icon53,/turf/Carpet3,/area)
+"bH" = (/obj/Turfs/Edges/GrayEdgeN,/turf/Wall13,/area)
+"bI" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wood4,/area)
+"bJ" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wood4,/area)
+"bK" = (/obj/Turfs/Table5,/turf/Carpet3,/area)
+"bL" = (/obj/Turfs/Table4,/obj/Turfs/IconsX/Icon65,/turf/Carpet3,/area)
+"bM" = (/obj/Turfs/Table3,/turf/Carpet3,/area)
+"bN" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Surf/Water5Surf,/turf/Wall13,/area)
+"bO" = (/turf/Wall13,/area)
+"bP" = (/obj/Turfs/Edges/GrayEdgeWest,/obj/Turfs/Surf/Water5Surf,/turf/Wall13,/area)
+"bQ" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall19,/area)
+"bR" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Wood7,/area)
+"bS" = (/obj/Turfs/Surf/Water5Surf,/turf/Wall13,/area)
+"bT" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/turf/Wall19,/area)
+"bU" = (/obj/Turfs/Plant15,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Edges/MetalEdgeW,/turf/Dirt12,/area)
+"bV" = (/obj/Turfs/Plant15,/obj/Turfs/Plant15,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Edges/MetalEdgeE,/turf/Dirt12,/area)
+"bW" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall51,/area)
+"bX" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/turf/Wall51,/area)
+"bY" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"bZ" = (/obj/Turfs/IconsX/Icon102,/turf/Dirt13,/area)
+"ca" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs4,/area)
+"cb" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs4,/area)
+"cc" = (/obj/Turfs/Edges/Edge4S,/obj/Turfs/Edges/Edge4W,/turf/Dirt13,/area)
+"cd" = (/obj/Turfs/Edges/Edge4S,/turf/Dirt13,/area)
+"ce" = (/turf/Stairs4,/area)
+"cf" = (/obj/Turfs/Edges/Edge4W,/obj/Turfs/Edges/Edge4S,/turf/Dirt13,/area)
+"cg" = (/obj/Turfs/Edges/GrayEdgeE,/obj/Turfs/Edges/GrayEdgeN,/obj/Turfs/Edges/GrayEdgeWest,/turf/Wall13,/area)
+"ch" = (/obj/Turfs/Plant15,/obj/Turfs/Plant15,/obj/Turfs/Plant15,/turf/Dirt12,/area)
+"ci" = (/turf/Roof3,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacacacacacacacadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeafacacacacacacacagaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae
+ahaiajakakakakakakakakakakakakakalajalacacacacacacamajalajananakakakakakakakakakakakalahai
+ahaiaoapapapapapapapapapapapapapaqarasamacacamacacamarasaoatatapapapapapapapapapapapaqahai
+ahaiaoapapapapapapapapapapapapapaqauauavamamamamamawauauaoatatapapapapapapapapapapapaqahai
+ahaiaxayayayayayayazapaAaAaAaAaAaBaCaCaDaEavamawaDaEaCaCaoatatapapapapapapapapapapapaqahai
+ahaiaFaGaGaGaGaGaGaGazaHaHaHaHaHaHaCaCaIaJaKamawaIaJaCaCaLaMaMapaNaOaPaQaPaPaQaQaPaPaRahai
+ahaiaFaGaGaGaGaGaGaGaGayayayazaHaHaCaCaIaJaKamaSaIaJaCaCaHaHaHaTaUaUaVaVaUaUaUaUaUaVaWahai
+ahaiaFaXaXaXaXaXaXaXaXaXaXaXaXaXaXaXaXaXaXaKaGaSaIaJaCaYaHaHaNaUaVaUaUaZaZaZaZaZaZaUbaahai
+ahaiaFaXbbbcbcbcbcbcbdbbbcbebcbfbcbcbcbdaXaKaGaSaIaJaYaHaHaNaZaZaZaZaZaZaZaZaZaZaZaUbgahai
+ahaiaFaXbhbibibibibibjbkbkbkbkbkblbmbnbkaXaKaGaSaxazaHaHboaUaUaZaZaZaZaZaZaZaZaZaUaUbgahai
+ahaiaFaXbhbibpbqbpbibrbsbsbtbubububububvaXaGaGaGaGbwaHaHaTaVaVaZaZaZaZaZaZaZaZaZaUaVaWahai
+ahaiaFaXbxbybxbzbxbAbxbsbsbtbubububububkaXaGaGaGaGbBaHaHbCbDaUaUaUaUaZaZaZaZaZaUaUbEbFahai
+ahaiaFaXbkbkbkbkbkbkbkbkbkbtbubububububkaXaGaGaGbwaJaHaHaDaEbCbDbDaUaUaZaZaUaUbDbFaDaEahai
+ahaiaFaXbkbubububububkbkbkbtbububGbububkaXaGaGaGbwaJaHaHaIaJaDbHaEbCbDbIbJbDbFaDaEaIaJahai
+ahaiaFaXbkbubKbLbMbubkbkbkbtbubububububkaXaGaGaGbwbNaHaHaIaJaIbOaJaDbHbIbJbHaEaIaJaIaJahai
+ahaiaFaXbkbubububububkbkbkbtbubububububkaXaGaGaGbwaHaHaHaIaJaIbOaJaIbObIbJbOaJaIaJaIaJahai
+ahaiaFaXbkbkbkbkbkbkbkbkbkbtbubububububkaXaGaGaGbwaHaHaHaIaJaIbOaJaIbObIbJbOaJaIaJaIaJahai
+ahaiaFaXaXbkbkbkbkbkbkbkbkbtbubububububkaXaGaGaGbwaHaHaHbPbNaIbOaJaIbObIbJbOaJaIaJaIaJahai
+ahaiaFbQaXaXaXaXaXaXaXbkbkaXaXbRbRaXaXaXbQaGaGaGaGazaHaHaHaHbPbSaJaNaObIbJaOaOaOaOaOaRahai
+ahaiaFbTbbbcbcbcbcbdaXbkbkaXbQbUbVbbbcbdbTaGaGaGaGbwaHaHaHaHaHaHaNaVaVaZaZaUaVaUaUaZaWahai
+ahaiaFbTbhbibibibibrbWbkbkbWbTbbbdbhbibrbTaGaGaGaGaGazaHaHaHaNaPaVaVaZaZaZaZaUaUaVaUaWahai
+ahaiaFaGbhbibpbibpbrbXbkbkbXbTbhbrbhbpbraGaGaGaGaGaGaGayayaybYaUaVaZaZaZaZaZaUaUaVaUaWahai
+ahaiaFaGaGaGaGaGaGbZbXbkbkbXaGbhbraGaGaGaGaGaGaGaGaGaGaGaGaNaUaUaUaZaZaZaZaZaZaZaUaVaWahai
+ahaiaFaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGcacbaNaUaUaUaZaZaZaZaZaZaZaZaZaVbgahai
+ahaiaFaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGcacbaTaUaUaZaZaZaZaUaUaUaZaZaZaUbgahai
+ahaicccdcdaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaNceceaZaZaZaZaZaZaUaUaVaZaZaZaZaUbgahai
+ahaiaDbHaEcfcdcdcdcdaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaTaZaZaZaZaZaZaZaZaUaUaVaZaZaZaZaVbgahai
+ahaiaIbOaJaDbHbHbHaEcfcdcdcdaGaGaGaGaGaGaGaGaGaGaGbCaZaZaZaZaZaZaZaZaZaZaZaZaZaZaZaVbgahai
+ahaiaIbOaJaIbObObOaJaDbHbHaEaGaGaGaGaGaGaGcdcdcdcdcgbYaUaZaZaZaZaZaZaZaZaZaZaZaZaZaVaWahai
+ahaiaIbOaJaIbObObOaJaIbObOaJcfcdcdcdcdcdbBaDbHbHaEaCbYaUaZaZaZaZaZaZaZaZaZaZaZaZaUaUaWahai
+ahaiaIbOaJaIbObObOaJaIbObOaJaDbHbHbHbHbHaEaIbObOaJaCbYaVaUaZaZaZaZaZaZaZaZaZaZaZaUaUaWahai
+ahaiaIbOaJaIbObObOaJaIbObOaJaIbObObObObOaJaIbObOaJaCbYaVaUaUaUaUaUaZaZaZaZaUaUaUchaVaWahai
+ahaibPbSbNaIbObObOaJaIbObOaJaIbObObObObOaJaIbObOaJaCbCbEbEbEbEaUaVaUaZaUaUaVaUaUaVaUaWahai
+ahaiaHaHaHbPbSbSbSbNaIbObOaJaIbObObObObOaJaIbObOaJaYaDbHbHbHaEaTaUaVaUaVaUbEbDbDbDbDbFahai
+ahaiaHaHaHaHaHaHaHaHbPbSbSbNaIbObObObObOaJbPbSbSaJaHaIbObObOaJbCbDbDbDbDbFaDbHbHbHbHaEahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHbPbSbSbSbSbSbNaHaHaHaHaHaIbObObOaJaDbHbHbHbHaEaIbObObObOaJahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaIbObObOaJaIbObObObOaJaIbObObObOaJahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaIbObObOaJaIbObObObOaJaIbObObObOaJahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaIbObObOaJaIbObObObOaJaIbObObObOaJahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHbPbSbSbSbNaIbObObObOaJaIbObObObOaJahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaIbObObObOaJbPbSbSbSbSbNahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHbPbSbSbSbSbNaHaHaHaHaHaHahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHahai
+ahaiaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHaHahai
+ahaiciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciahai
+ahaiciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciciahai
+"}
