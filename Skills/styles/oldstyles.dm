@@ -160,12 +160,12 @@
 						NoStaff=0
 						StyleStr=1.5
 						StyleFor=1.5
-						passives = list("Flow" = 2, "Instinct" = 2, "SwordPunching" = 1)
+						passives = list("Flow" = 2, "Instinct" = 2, "BladeFisting" = 1)
 						Flow=2
 						Instinct=2
 						//adaptation passive
 						//champloo's sord punching
-						SwordPunching=1
+						BladeFisting=1
 						StyleActive="Shaolin"
 						ElementalOffense="Mirror"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/FreeStyle/Metta_Sutra_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/West_Star_Style")
@@ -181,7 +181,7 @@
 						NoStaff=0
 						StyleEnd=1.5
 						StyleSpd=1.5
-						passives = list("WeaponBreaker" = 4, "Flow" = 3, "Instinct" = 3, "Flicker" = 2, "Pursuer" = 2, "SwordPunching" = 1)
+						passives = list("WeaponBreaker" = 4, "Flow" = 3, "Instinct" = 3, "Flicker" = 2, "Pursuer" = 2, "BladeFisting" = 1)
 						WeaponBreaker=4
 						Flow=3
 						Instinct=3
@@ -189,7 +189,7 @@
 						Pursuer=2
 						//adaptation
 						//Champloo's sword punching
-						SwordPunching=1
+						BladeFisting=1
 						ElementalOffense="Mirror"
 						ElementalDefense="Mirror"
 						ElementalClass="Water"
@@ -204,13 +204,13 @@
 						StyleStr=1.25
 						StyleFor=1.25
 						StyleSpd=1.5
-						passives = list("IdealStrike" = 1, "WeaponBreaker" = 2, "Flicker" = 2, "Pursuer" = 3, "SuperDash" = 2, "SwordPunching" = 1, "TechniqueMastery" = 2, "MovementMastery" = 6, "MartialMagic" = 1, "MovingCharge" = 1)
+						passives = list("IdealStrike" = 1, "WeaponBreaker" = 2, "Flicker" = 2, "Pursuer" = 3, "SuperDash" = 2, "BladeFisting" = 1, "TechniqueMastery" = 2, "MovementMastery" = 6, "MartialMagic" = 1, "MovingCharge" = 1)
 						HybridStrike=1
 						WeaponBreaker=3
 						Flicker=3
 						Pursuer=3
 						SuperDash=2
-						SwordPunching=1
+						BladeFisting=1
 						TechniqueMastery=10
 						MovementMastery=8
 						MartialMagic=1

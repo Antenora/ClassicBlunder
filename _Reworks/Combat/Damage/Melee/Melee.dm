@@ -560,7 +560,7 @@
 										var/hitsparkSword = swordAtk
 										disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 										disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-										if(swordAtk && HasSwordPunching())
+										if(swordAtk && HasBladeFisting())
 											hitsparkSword = 0
 										HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
 									if(enemy.CheckSpecial("Ultra Instinct"))
@@ -586,7 +586,7 @@
 									disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 									disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 									var/hitsparkSword = swordAtk
-									if(swordAtk && HasSwordPunching())
+									if(swordAtk && HasBladeFisting())
 										hitsparkSword = 0
 									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
 								StunClear(enemy)
@@ -616,7 +616,7 @@
 										disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 										disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 										var/hitsparkSword = swordAtk
-										if(swordAtk && HasSwordPunching())
+										if(swordAtk && HasBladeFisting())
 											hitsparkSword = 0
 										HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
 									enemy.dir = get_dir(enemy,src)
@@ -822,7 +822,7 @@
 									disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 									disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 									var/hitsparkSword = swordAtk
-									if(swordAtk && HasSwordPunching())
+									if(swordAtk && HasBladeFisting())
 										hitsparkSword = 0
 									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
 								if(AttackQueue?.PushOut)
@@ -854,7 +854,7 @@
 									QueuedHitMessage(enemy)
 									src.doQueueEffects(enemy)
 							var/hitsparkSword = swordAtk
-							if(swordAtk && HasSwordPunching())
+							if(swordAtk && HasBladeFisting())
 								hitsparkSword = 0
 							HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
 

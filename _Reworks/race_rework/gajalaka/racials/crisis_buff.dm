@@ -54,9 +54,9 @@
         adjust(mob/p)
             passives["Rebel Heart"] = 1+p.AscensionsAcquired
             passives["ShonenPower"] = (1+p.AscensionsAcquired)/4
-            passives["SwordPunching"] = 1
+            passives["BladeFisting"] = 1
             FatigueDrain = 0.0008 * (1+p.AscensionsAcquired)
-    
+
 
     Heart_of_The_Noble
         TextColor=rgb(75, 195, 255)
@@ -91,4 +91,4 @@
             passives = list("KillerInstinct" = 0.05 * asc, "CursedWounds" = 1, "HellPower" = 0.1 * asc )
 
 
-    
+

@@ -1515,7 +1515,7 @@ mob
 			if(CheckSlotless("Satsui no Hado") && SagaLevel>=6)
 				hellpower++
 			return hellpower
-		
+
 		HasPowerReplacement()
 			if(src.passive_handler.Get("PowerReplacement"))
 				return 1
@@ -1613,7 +1613,7 @@ mob
 				return 1
 			return 0
 		GetGodKi()
-			
+
 			var/Total=passive_handler.Get("GodKi")
 			if(glob.T3_STYLES_GODKI_VALUE>0 && StyleBuff?.SignatureTechnique==3)
 				Total+=glob.T3_STYLES_GODKI_VALUE
@@ -2511,7 +2511,7 @@ mob
 		UsingMysticStyle()
 			if(!StyleBuff)
 				return list(FALSE, FALSE)
-				
+
 			if(istype(StyleBuff, /obj/Skills/Buffs/NuStyle/MysticStyle))
 				return list(TRUE, StyleBuff.SignatureTechnique)
 			return list(FALSE, FALSE)
@@ -2533,7 +2533,7 @@ mob
 			Found += passive_handler.Get("Iaijutsu")
 
 			if(S.Class=="Light")
-				var/asc = 0 
+				var/asc = 0
 				if(S.InnatelyAscended)
 					asc=S.InnatelyAscended
 				else
@@ -2569,8 +2569,8 @@ mob
 					return 1
 			return 0
 
-		HasSwordPunching()
-			if(passive_handler.Get("SwordPunching"))
+		HasBladeFisting()
+			if(passive_handler.Get("BladeFisting"))
 				return 1
 			if(isRace(DEMON)|| (CheckSlotless("Satsui no Hado") && SagaLevel>=6))
 				return 1

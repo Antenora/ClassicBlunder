@@ -4,10 +4,10 @@
         StyleActive = "Heavenly Demon's Chaotic Way of Shattered Realms"
         SignatureTechnique=3
         Copyable=0
-        passives = list("Conductor" = 90, "Antsy" = 10, "CounterMaster" = 5, "SwordPunching" = 1, "NeedsSword" = 0, "NoSword" = 1)
+        passives = list("Conductor" = 90, "Antsy" = 10, "CounterMaster" = 5, "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1)
         NeedsSword=0
         NoSword=1
-        SwordPunching=1
+        BladeFisting=1
         StyleStr=1
         StyleEnd=1
         StyleOff=1
@@ -44,11 +44,11 @@
         verb/All_Star_Wrestling()
             set hidden=1
             src.Trigger(usr)
-    
+
     Flying_Thunder_God
         SignatureTechnique=3
         passives = list("Flying Thunder God" = 1, "BlurringStrike" = 1, "Fury" = 1.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
-        "SwordPunching" = 1, "NeedsSword" = 0, "NoSword" = 1)
+        "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1)
         // make it so every cooldown like iaido, also make the tracker appear on hud
         // make an animation for the tp
         StyleSpd = 1.5

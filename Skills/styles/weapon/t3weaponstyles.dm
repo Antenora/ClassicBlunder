@@ -33,11 +33,10 @@
         StyleEnd=1.25
         StyleActive="Fierce Diety"
         passives = list("DisableGodKi" = 1, "Deicide" = 4, "Rage" = 2, "Half-Sword" = 2.5, "Zornhau" = 2.5, "FavoredPrey" = "Secrets", "SlayerMod" = 4 , "Shearing" = 8, \
-                        "SwordPunching" = 1, "Secret Knives" = "Stake", "Tossing" = 3, "Half-Sword" = 3, "Zornhau" = 2.5, "Parry" = 3,"Disarm" = 3,\
+                        "BladeFisting" = 1, "Secret Knives" = "Stake", "Tossing" = 3, "Half-Sword" = 3, "Zornhau" = 2.5, "Parry" = 3,"Disarm" = 3,\
                         "Hardening" = 2, "Deflection" = 1)
         verb/Fierce_Deity()
             set hidden=1
             src.Trigger(usr)
 
 //MAKE CONFIG TO GIVE PEOPLE GODKI IF THEY HAVE T3 STYLES
-    

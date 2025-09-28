@@ -34,7 +34,7 @@ obj/Skills/AutoHit
 		Area="Circle"
 		verb/Snowgrave()
 			set category="Skills"
-			src.RebirthHeroType="Yellow"
+			usr.RebirthHeroType="Yellow"
 			if(!altered)
 				DamageMult = 600
 			usr.Activate(src)

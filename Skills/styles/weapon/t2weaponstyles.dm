@@ -35,9 +35,9 @@
 	Witch_Hunter
 		SignatureTechnique = 2
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk"="/obj/Skills/Buffs/NuStyle/SwordStyle/Fierce_Deity")
-		passives = list("FavoredPrey" = "Secrets", "SlayerMod" = 2 , "Shearing" = 6, "SwordPunching" = 1, "Secret Knives" = "Stake", \
+		passives = list("FavoredPrey" = "Secrets", "SlayerMod" = 2 , "Shearing" = 6, "BladeFisting" = 1, "Secret Knives" = "Stake", \
 						"Tossing" = 2, "Half-Sword" = 2, "Zornhau" = 1.5, "Extend" = 1)
-		SwordPunching=1
+		BladeFisting=1
 		NeedsSword=0
 		StyleOff=1.15
 		StyleStr=1.3
@@ -55,10 +55,9 @@
 		StyleEnd=1.3
 		StyleActive="Phalanx Style"
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu"="/obj/Skills/Buffs/NuStyle/SwordStyle/Acrobat")
-		passives = list("Reversal" = 0.25, "Deflection" = 1, "Hardening" = 1.5, "Parry" = 2, "Disarm" = 2, "SwordPunching" = 1,\
+		passives = list("Reversal" = 0.25, "Deflection" = 1, "Hardening" = 1.5, "Parry" = 2, "Disarm" = 2, "BladeFisting" = 1,\
 				 "Unnerve" = 1, "Secret Knives" = "Atlatl", "Tossing" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Shield_Vault"
 		verb/Phalanx_Style()
 			set hidden=1
 			src.Trigger(usr)
-	

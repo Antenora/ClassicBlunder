@@ -309,7 +309,7 @@ mob/Admin3/verb
 
 					else if(P.KamuiType=="Junketsu")
 						P.contents += new/obj/Items/Sword/Heavy/Secret_Sword_Bakuzan
-						P.passive_handler.Increase("SwordPunching")
+						P.passive_handler.Increase("BladeFisting")
 						P.passive_handler.Increase("CriticalHit", 0.1)
 						P.passive_handler.Increase("CriticalChance", 10)
 						P.passive_handler.Increase("CriticalBlock", 0.1)

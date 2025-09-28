@@ -149,7 +149,7 @@ obj/Skills/Grapple
 		EffectMult=3
 		HarderTheyFall = 4
 		Effect="PotemkinBuster"
-	
+
 	Tombstone_Piledriver
 		DamageMult = 8
 		HarderTheyFall = 6
@@ -167,7 +167,7 @@ obj/Skills/Grapple
 		OneAndDone = 1
 		EndRate=0.75
 		StrRate=0.75
-		
+
 
 	Lotus_Drop
 		DamageMult=5
@@ -504,14 +504,14 @@ obj/Skills/Grapple
 				else
 					return
 			if(src.UnarmedOnly)
-				if(User.EquippedSword() && !User.HasSwordPunching())
+				if(User.EquippedSword() && !User.HasBladeFisting())
 					User << "You cannot use a sword and use [src]!"
 					return
 				if(User.EquippedStaff() && User.UsingBattleMage())
 					User << "You cannot use Battle Mage style and use [src]!"
 					return
 			if(src.NeedsSword)
-				if(!User.EquippedSword() && !User.HasSwordPunching() && !(User.EquippedStaff() && User.UsingBattleMage()))
+				if(!User.EquippedSword() && !User.HasBladeFisting() && !(User.EquippedStaff() && User.UsingBattleMage()))
 					User << "You have to have a sword to use [src]!"
 					return
 
@@ -617,7 +617,7 @@ obj/Skills/Grapple
 				User.log2text("Grapple Whiff Reduc", Damage, "damageDebugs.txt", User.ckey)
 				#endif
 				var/Hits=src.MultiHit
-				
+
 				while(Hits)
 					if(!src.EnergyDamage)
 						#if DEBUG_GRAPPLE

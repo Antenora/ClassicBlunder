@@ -44,10 +44,10 @@ sagaTierUpMessages/Rebirth
 							src<< "You are now the Purple Hero of Hope, who attacks with dark energy."
 							src.AddSkill(new/obj/Skills/Projectile/Rude_Buster)
 							src.AddSkill(new/obj/Skills/Buffs/Rebirth/Devilsknife)
-							if(prob(10))
-								src<< "..but you could still choose to become the Yellow Hero of Tragedy. After all, this wasn't supposed to be your story."
-								src.AddSkill(new/obj/Skills/Buffs/Rebirth/ThornRing)
-								src.AddSkill(new/obj/Skills/AutoHit/Snowgrave)
+						/*if(prob(10))
+							src<< "..but you could still choose to become the Yellow Hero of Tragedy. After all, this wasn't supposed to be your story."
+							src.AddSkill(new/obj/Skills/Buffs/Rebirth/ThornRing)
+							src.AddSkill(new/obj/Skills/AutoHit/Snowgrave)*/
 			if(3)
 			if(4)
 			if(5)

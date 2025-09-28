@@ -22,7 +22,7 @@ globalTracker
 		if(!p.updateVersion)
 			var/updateversion = "/update/version[UPDATE_VERSION]"
 			p.updateVersion = new updateversion
-			p.updateVersion.updateMob(p)	
+			p.updateVersion.updateMob(p)
 		if(UPDATE_VERSION == p.updateVersion.version)
 			return
 		if(p.updateVersion.version + 1 == UPDATE_VERSION)
@@ -60,10 +60,10 @@ update
 						p.Imagination = 2
 						p.Intelligence = 1
 					if("Feather Knife")
-						p.passive_handler.passives["SwordPunching"] = 1
+						p.passive_handler.passives["BladeFisting"] = 1
 					if("Feather Cowl")
-						p.passive_handler.passives["SwordPunching"] = 1
-		
+						p.passive_handler.passives["BladeFisting"] = 1
+
 	version3
 		version = 3
 		updateMob(mob/p)
@@ -72,9 +72,9 @@ update
 				if(istype(ms, /obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker))
 					ms.BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Magmic_Shield")
 				if(istype(ms, /obj/Skills/Buffs/NuStyle/SwordStyle/Sword_Savant))
-					ms.passives = list("SwordPunching" = 1, "SwordDamage" = 1, "NeedsSword" = 0, "Sword Master" = 1)
-				
-				
+					ms.passives = list("BladeFisting" = 1, "SwordDamage" = 1, "NeedsSword" = 0, "Sword Master" = 1)
+
+
 			if(p.isRace(HUMAN))
 				p.RPPMult = 1.25
 	version4
@@ -89,17 +89,17 @@ update
 						p.Imagination = 2
 						p.Intelligence = 1
 					if("Feather Knife")
-						p.passive_handler.passives["SwordPunching"] = 1
+						p.passive_handler.passives["BladeFisting"] = 1
 					if("Feather Cowl")
-						p.passive_handler.passives["SwordPunching"] = 1
+						p.passive_handler.passives["BladeFisting"] = 1
 			for(var/obj/Skills/Buffs/NuStyle/ms in src)
 				if(istype(ms, /obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker))
 					ms.BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Magmic_Shield")
 				if(istype(ms, /obj/Skills/Buffs/NuStyle/SwordStyle/Sword_Savant))
-					ms.passives = list("SwordPunching" = 1, "SwordDamage" = 1, "NeedsSword" = 0, "Sword Master" = 1)
-				
-		
-				
+					ms.passives = list("BladeFisting" = 1, "SwordDamage" = 1, "NeedsSword" = 0, "Sword Master" = 1)
+
+
+
 			if(p.isRace(HUMAN))
 				p.RPPMult = 1.25
 	version5
@@ -210,7 +210,7 @@ update
 			. = ..()
 			if(p.isRace(GAJALAKA))
 				if(p.Class == "Rebel")
-					p.passive_handler.Set("SwordPunching", 1)
+					p.passive_handler.Set("BladeFisting", 1)
 			p.stat_redo()
 			var/list/statMods = list("Str", "Spd", "End", "For", "Off","Def")
 			switch(p.Saga)
@@ -238,7 +238,7 @@ update
 				if("Weapon Soul")
 					if(p.BoundLegend == "Green Dragon Crescent Blade")
 						p.passive_handler.Increase("Extend")
-						
+
 			for(var/x in statMods)
 				p.vars["[x]Ascension"] = 0
 	version11
@@ -256,7 +256,7 @@ update
 				del s
 				p.RPPSpendable += TIER_2_COST
 				p.RPPSpent -= TIER_2_COST
-	
+
 	version12
 		version = 12
 		updateMob(mob/p)
@@ -339,7 +339,7 @@ update
 				if(ki)
 					ki.AngerStorage=0
 				o.AngerMax = 1.5
-			
+
 			if(o.isRace(HUMAN))
 				o.passive_handler.Decrease("TechniqueMastery", 1.5)
 			if(o.isRace(HALFSAIYAN))

@@ -156,7 +156,7 @@ obj
 				p.prioritize_players=1
 				p.ai_wander=1
 				p.ai_hostility=1
-				p.passive_handler.Increase("SwordPunching")
+				p.passive_handler.Increase("BladeFisting")
 				p.passive_handler.Increase("WaterWalk")
 				if(mi.seek_destroy)
 					p.ai_hostility=2

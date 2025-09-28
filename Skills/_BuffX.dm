@@ -557,7 +557,7 @@ NEW VARIABLES
 	var/Deicide = 0 // Do more damage vs gods, goes up to 10
 	var/Blubber = 0 // reverse knockbacks at 25% of total per tick
 	var/DemonicDurability
-	var/SwordPunching = 0 // Punch with sword
+	var/BladeFisting = 0 // Punch with sword
 	var/LikeWater = 0 // give flow if they have more off than your def, and instinct if they have more def than your off
 	var/list/passives = list()
 	var/list/current_passives
@@ -2786,8 +2786,8 @@ NEW VARIABLES
 					SpdMult=1.1
 					OffMult=1.2
 					DefMult=1.3
-					SwordPunching = 1
-					passives = list("SwordPunching" = 1)
+					BladeFisting = 1
+					passives = list("BladeFisting" = 1)
 					BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Andromeda_Chain")
 					ArmorIcon='saintandromeda_armor.dmi'
 					TopOverlayLock='saintandromeda_helmet.dmi'
@@ -2799,7 +2799,7 @@ NEW VARIABLES
 						SpdMult = 1 + (player.SagaLevel * 0.1)
 						OffMult = 1 + (player.SagaLevel * 0.1)
 						DefMult = 1.1 + (player.SagaLevel * 0.1)
-						passives = list("MovementMastery" =  player.SagaLevel * 1.25, "ArmorAscension" = 1, "SwordPunching" = 1)
+						passives = list("MovementMastery" =  player.SagaLevel * 1.25, "ArmorAscension" = 1, "BladeFisting" = 1)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -2932,7 +2932,7 @@ NEW VARIABLES
 					SpdMult=1.1
 					OffMult=1.2
 					DefMult=1.3
-					SwordPunching = 1
+					BladeFisting = 1
 					BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Andromeda_Chain", "/obj/Skills/Buffs/SlotlessBuffs/Andromeda/Rolling_Defense")
 					ArmorIcon='saintandromedav3_armor.dmi'
 					TopOverlayLock='saintandromedav3_helmet.dmi'
@@ -2941,7 +2941,7 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						var/newLevel = clamp(player.SagaLevel - 2, 1,4)
-						passives = list("MovementMastery" = player.SagaLevel * 2, "ArmorAscension" = 2, "SwordPunching" = 1)
+						passives = list("MovementMastery" = player.SagaLevel * 2, "ArmorAscension" = 2, "BladeFisting" = 1)
 						SpdMult = 1.2 + (newLevel * 0.1)
 						EndMult = 1.1 + (newLevel * 0.1)
 						StrMult = 1.1 + (newLevel * 0.1)
@@ -3234,7 +3234,7 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1, "MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, \
-						"Godspeed" = 1+(player.SagaLevel*0.25), "SwordAscension" = player.SagaLevel, "SwordPunching" = 1)
+						"Godspeed" = 1+(player.SagaLevel*0.25), "SwordAscension" = player.SagaLevel, "BladeFisting" = 1)
 						StrMult = 1.3 + ((player.SagaLevel-2) * 0.1)
 						ForMult = 1.3 + ((player.SagaLevel-2) * 0.1)
 						OffMult = 1.3 + ((player.SagaLevel-2) * 0.1)
@@ -6404,7 +6404,7 @@ NEW VARIABLES
 			IconLock = 'Necromorph.dmi'
 			LockX = -16
 			LockY = -16
-			passives = list("SwordPunching" = 1, "PureDamage" = -1, "PureReduction" = 10, "NoDodge" = 1, "Instinct" = 1)
+			passives = list("BladeFisting" = 1, "PureDamage" = -1, "PureReduction" = 10, "NoDodge" = 1, "Instinct" = 1)
 			ActiveMessage = "is taken over by sprawling masses of flesh and necrotization!"
 			OffMessage = "'s fleshy overgrowth recedes..."
 			var/forceZombie = 1
@@ -8296,10 +8296,10 @@ NEW VARIABLES
 			adjust(mob/p)
 				if(p.usingStyle("UnarmedStyle"))
 					MakesSword = 0
-					passives = list("UnarmedDamage" = clamp(usr.SagaLevel/2, 1,6), "SpiritHand" = 0.8 * (usr.SagaLevel), "SwordPunching" = 1)
+					passives = list("UnarmedDamage" = clamp(usr.SagaLevel/2, 1,6), "SpiritHand" = 0.8 * (usr.SagaLevel), "BladeFisting" = 1)
 					IconLock = saved_icon
 				else
-					passives = list("SwordAscension" = clamp(usr.SagaLevel - 1,1,6), "SpiritSword" = 0.2 * (usr.SagaLevel), "SwordPunching" = 1)
+					passives = list("SwordAscension" = clamp(usr.SagaLevel - 1,1,6), "SpiritSword" = 0.2 * (usr.SagaLevel), "BladeFisting" = 1)
 					MakesSword = 1
 					IconLock = null
 			verb/Audacious_Bravery_Armament()
@@ -10430,7 +10430,7 @@ NEW VARIABLES
 				EndMult = 1.5
 				SpdMult=1.5
 				RecovMult=1.5
-				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1, "Curse" = 1, "ManaLeak" = 2, "MartialMagic" = 1, "SwordPunching" = 1)
+				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1, "Curse" = 1, "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
 				Intimidation=2
 				AutoAnger=1
 				TooLittleMana=1
@@ -10933,7 +10933,7 @@ mob
 				if(B.NeedsSword)
 					var/obj/Items/Sword/s=src.EquippedSword()
 					if(!s)
-						if(!HasSwordPunching())
+						if(!HasBladeFisting())
 							src << "You must be using a sword to use [B]."
 							return
 					if(B.HeavyOnly)
@@ -11327,7 +11327,7 @@ mob
 							src <<"You cannot create a blade while holding a staff!"
 							return
 					if(src.HasNoSword())
-						if(!HasSwordPunching()|| !B.Piloting)
+						if(!HasBladeFisting()|| !B.Piloting)
 							src << "You cannot create a sword while using something that requires you to have no sword!"
 							return
 				if(B.MakesStaff)
@@ -11347,7 +11347,7 @@ mob
 				if(B.NoSword)
 					var/obj/Items/Sword/S=src.EquippedSword()
 					if(S)
-						// if(!HasSwordPunching())
+						// if(!HasBladeFisting())
 						if(src.HasNeedsSword())
 							src << "You cannot use [B] while using something that requires you to have a sword!"
 							return

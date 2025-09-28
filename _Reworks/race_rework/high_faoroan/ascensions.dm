@@ -72,7 +72,7 @@ ascension
 			distort
 				onAscension(mob/owner)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/The_Crown/tc in owner.contents)
-						tc.passives["SwordPunching"] = 1
+						tc.passives["BladeFisting"] = 1
 						tc.passives["TechniqueMastery"] = 1
 						tc.passives["Adrenaline"] = 1
 					..()

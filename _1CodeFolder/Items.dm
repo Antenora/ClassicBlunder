@@ -122,10 +122,10 @@ obj/Items
 	var/DemonicDurability
 	var/CursedWounds
 	var/MaimStrike
-	var/SwordPunching
+	var/BladeFisting
 	var/list/passives = list()
 	var/list/current_passives
-	
+
 	proc/onBroken()
 
 
@@ -1650,21 +1650,21 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				if(User.StyleBuff.NeedsSword||User.StyleBuff.MakesSword)
 					User << "You can't remove your sword with [User.StyleBuff] active!"
 					return
-				if(User.StyleBuff.NoSword&&!User.HasSwordPunching())
+				if(User.StyleBuff.NoSword&&!User.HasBladeFisting())
 					User << "You can't use a sword with [User.StyleBuff] active!"
 					return
 			if(User.ActiveBuff)
 				if(User.ActiveBuff.NeedsSword||User.ActiveBuff.MakesSword)
 					User << "You can't remove your sword with [User.ActiveBuff] active!"
 					return
-				if(User.ActiveBuff.NoSword&&!User.HasSwordPunching())
+				if(User.ActiveBuff.NoSword&&!User.HasBladeFisting())
 					User << "You can't use a sword with [User.ActiveBuff] active!"
 					return
 			if(User.SpecialBuff)
 				if(User.SpecialBuff.NeedsSword||User.SpecialBuff.MakesSword)
 					User << "You can't remove your sword with [User.SpecialBuff] active!"
 					return
-				if(User.SpecialBuff.NoSword&&!User.HasSwordPunching())
+				if(User.SpecialBuff.NoSword&&!User.HasBladeFisting())
 					User << "You can't use a sword with [User.SpecialBuff] active!"
 					return
 			if(User.SlotlessBuffs.len>0)
@@ -1674,7 +1674,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 						if(b.NeedsSword||b.MakesSword)
 							User << "You can't remove your sword with [b] active!"
 							return
-						if(b.NoSword&&!User.HasSwordPunching())
+						if(b.NoSword&&!User.HasBladeFisting())
 							User << "You can't use a sword with [b] active!"
 							return
 			var/obj/Items/W=src

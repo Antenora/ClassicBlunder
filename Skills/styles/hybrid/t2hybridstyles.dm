@@ -2,11 +2,11 @@
 	Divine_Arts_of_The_Heavenly_Demon // unarmed+armed
 		SignatureTechnique=2
 		Copyable=0
-		passives = list("HybridStyle" = "SwordStyle", "Hardening" = 2, "Deflection" = 1, "Momentum" = 2, "Pressure" = 2, "SwordPunching" = 1,\
+		passives = list("HybridStyle" = "SwordStyle", "Hardening" = 2, "Deflection" = 1, "Momentum" = 2, "Pressure" = 2, "BladeFisting" = 1,\
 					"NeedsSword" = 0, "NoSword" = 1)
 		NeedsSword=0
 		NoSword=1
-		SwordPunching=1
+		BladeFisting=1
 		StyleStr=1.3
 		StyleEnd=1.3
 		StyleActive="Divine Arts of The Heavenly Demon"
@@ -47,10 +47,10 @@
 				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "NeedsSword" = 0, "NoSword" = 1)
 		adjust(mob/p)
 			passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.25, "Interception" = 1.5, \
-				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "SwordPunching" = 1,  "NeedsSword" = 0, "NoSword" = 1)
+				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1)
 		NeedsSword=0
 		NoSword=1
-		SwordPunching=1
+		BladeFisting=1
 		StyleStr = 1.15
 		StyleOff = 1.15
 		StyleSpd = 1.15

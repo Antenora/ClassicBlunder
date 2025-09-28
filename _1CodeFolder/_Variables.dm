@@ -599,7 +599,7 @@ mob/var
 	AllowObservers//Allows people to observe you fighting!
 	list/GlobalCooldowns = list()
 
-	SwordPunching = 0 // can punch with swords
+	BladeFisting = 0 // can punch with swords
 
 	AriaCount = 0
 	UBWPath

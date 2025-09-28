@@ -170,7 +170,7 @@ proc/removeDuplicates(list/list1)
             . += "TechniqueMastery"
             . += "Flow"
             . += "Unstoppable"
-            . += "SwordPunching"
+            . += "BladeFisting"
         if(SAIYAN)
             . += "Intimidation"
             . += "MovementMastery"

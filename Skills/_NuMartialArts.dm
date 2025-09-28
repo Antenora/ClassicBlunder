@@ -30,7 +30,7 @@ obj
 			NuStyle
 				var/tensionStorage = 0
 				var/last_storage = 0
-				var/tmp/triggerTension 
+				var/tmp/triggerTension
 				proc/turnOff(mob/p)
 					tensionStorage = p.Tension
 					last_storage = world.time
@@ -109,16 +109,16 @@ obj
 					NoStaff=1
 
 					//Signature Styles T1
-						
+
 					Heavenly_Demon_T3
 						name = "Heavenly Demon's Chaotic Way of Shattered Realms"
 						StyleActive = "Heavenly Demon's Chaotic Way of Shattered Realms"
 						SignatureTechnique=3
 						Copyable=0
-						passives = list("Conductor" = 90, "Antsy" = 10, "CounterMaster" = 5, "SwordPunching" = 1, "NeedsSword" = 0, "NoSword" = 1)
+						passives = list("Conductor" = 90, "Antsy" = 10, "CounterMaster" = 5, "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1)
 						NeedsSword=0
 						NoSword=1
-						SwordPunching=1
+						BladeFisting=1
 						StyleStr=1
 						StyleEnd=1
 						StyleOff=1
@@ -142,7 +142,7 @@ obj
 							set name="Drunken Fist Style"
 							set hidden=1
 							src.Trigger(usr)
-					
+
 					//Unarmed Saga Styles
 					Ansatsuken_Style
 						Copyable=0
@@ -189,8 +189,8 @@ obj
 						SignatureTechnique=2
 						Copyable=0
 						NeedsSword=0
-						passives = list("SwordPunching" = 1, "WeaponBreaker" = 3, "Pursuer" = 2, "Flicker" = 2)
-						SwordPunching=1
+						passives = list("BladeFisting" = 1, "WeaponBreaker" = 3, "Pursuer" = 2, "Flicker" = 2)
+						BladeFisting=1
 						StyleSpd=2
 						StyleOff=1.25
 						StyleStr=1.25

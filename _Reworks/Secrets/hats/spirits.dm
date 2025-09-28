@@ -40,7 +40,7 @@ SecretInfomation/Spirits_Of_The_World // when given make them make a choice, thi
 	Goetic_Virtue
 		applyPassives(mob/p)
 			var/pot = p.Potential
-			. = list("Hellpower" = currentTier/4, "SpiritSword" = 0.15 * currentTier + (pot/125), "SwordPunching" = 1, "MartialMagic" = 1, "Gravity" = 1)
+			. = list("Hellpower" = currentTier/4, "SpiritSword" = 0.15 * currentTier + (pot/125), "BladeFisting" = 1, "MartialMagic" = 1, "Gravity" = 1)
 
 		applySecret(mob/p)
 			switch(currentTier)
@@ -58,7 +58,7 @@ SecretInfomation/Spirits_Of_The_World // when given make them make a choice, thi
 	Stellar_Constellation
 		applyPassives(mob/p)
 			var/pot = p.Potential
-			. = list("HolyMod" = currentTier, "SpiritPower" = 0.25 + (currentTier * 0.25 + (pot/250)), "HybridStrike" = currentTier/4 + pot/100, "SwordPunching" = 1, "MartialMagic" = 1, "Gravity" = 1)
+			. = list("HolyMod" = currentTier, "SpiritPower" = 0.25 + (currentTier * 0.25 + (pot/250)), "HybridStrike" = currentTier/4 + pot/100, "BladeFisting" = 1, "MartialMagic" = 1, "Gravity" = 1)
 		applySecret(mob/p)
 			switch(currentTier)
 				if(1)

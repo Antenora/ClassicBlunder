@@ -293,7 +293,7 @@ obj
 					HitMessage="unleashes their wrath on the opponent, engulfing them in an explosive wave of dark flame!"
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Devil_Luck"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Devil_Fire"
-				
+
 				Morbid_Angel
 					DamageMult=3
 					Launcher=3
@@ -633,7 +633,7 @@ obj
 					KBAdd=5
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Hado_Kakusei"
 					FollowUp="/obj/Skills/Projectile/Hadoken_Effect"
-				
+
 				Shin_Shoryuken
 					StyleNeeded="Ansatsuken"
 					HitMessage="shouts '<b>SHIN...</b>' as they strike their opponent with a rising blow!!!"
@@ -898,7 +898,7 @@ obj
 									FollowUp = "/obj/Skills/AutoHit/Hyper_Inferno"
 								if("HellfireInferno")
 									FollowUp = "/obj/Skills/AutoHit/HellfireInferno"
-									
+
 						else
 							// reset all
 							Grapple = 0
@@ -1883,14 +1883,14 @@ mob
 					if(passive_handler.Get("Disarmed"))
 						src << "You are disarmed you can't use [Q]."
 						return
-					if(passive_handler.Get("Disarmed") && HasSwordPunching())
+					if(passive_handler.Get("Disarmed") && HasBladeFisting())
 						src << "You are disarmed you can't use [Q]."
 						return
-					if((!s && !HasSwordPunching()) && !src.UsingBattleMage())
+					if((!s && !HasBladeFisting()) && !src.UsingBattleMage())
 						src << "You must have a sword equipped to use this technique."
 						return
 				if(Q.UnarmedOnly)//Has Sword AND UnarmedOnly.
-					if(!HasSwordPunching() && s)
+					if(!HasBladeFisting() && s)
 						src << "You can't have a sword equipped to use this technique."
 						return
 					if(src.UsingBattleMage())
@@ -2263,7 +2263,7 @@ mob
 				src.LoseForce(src.AttackQueue.ForceCost)
 			if(src.AttackQueue.FatigueCost)
 				src.GainFatigue(src.AttackQueue.FatigueCost)
-				
+
 			if(src.AttackQueue.ManaGain)
 				src.HealMana(AttackQueue.ManaGain)
 			if(src.AttackQueue.ManaCost)
