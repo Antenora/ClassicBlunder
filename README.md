@@ -1,1 +1,1 @@
-Go go DimiDBR
+Reports of my burnout have been greatly exaggerated.
