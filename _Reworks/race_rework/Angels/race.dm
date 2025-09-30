@@ -11,6 +11,7 @@ race
 		offense = 1.5
 		defense = 1.5
 		force = 1.5
+		recovery = 1.25
 		regeneration = 1
 		imagination = 3
 
@@ -28,3 +29,4 @@ race
 					if("Mentor")
 						Confirm=alert(user, "Do you wish to mentor humanity and ensure the spiritual arts remain unforgotten?", "Angel  Ascension", "Yes", "No")
 				user.AngelAscension = Choice
+				//t1 style/armor unlocked
