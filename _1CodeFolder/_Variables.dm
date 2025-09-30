@@ -619,6 +619,8 @@ mob/var
 
 	ShinjinAscension
 
+	AngelAscension
+
 	moneyGrindedDaily = 0
 
 /proc/reduceGodKi(mob/player, num)

@@ -417,6 +417,8 @@
 #include "_Reworks\race_rework\transformations.dm"
 #include "_Reworks\race_rework\Android\ascensions.dm"
 #include "_Reworks\race_rework\Android\race.dm"
+#include "_Reworks\race_rework\Angels\AngelRacials.dm"
+#include "_Reworks\race_rework\Angels\race.dm"
 #include "_Reworks\race_rework\beastman\ascensions.dm"
 #include "_Reworks\race_rework\beastman\race.dm"
 #include "_Reworks\race_rework\beastman\racial\beastmanracials.dm"
