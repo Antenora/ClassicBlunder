@@ -54,8 +54,7 @@ ascension
 				owner.Class = "Dominion"
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			passives = list("SpiritPower" = 0.25)
-			intimidation = 250
+			passives = list("SpiritPower" = 0.25)//not sure what to give here. i'll think about it
 			on_ascension_message = "When closing your eyes, you bear witness to His heavenly throne."
 			postAscension(mob/owner)
 				..()

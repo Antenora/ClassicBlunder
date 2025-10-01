@@ -64,6 +64,11 @@ proc/log_func(x, a, b)
 #define CHANGELING /race/changeling
 #define ANDROID /race/android
 #define SHINJIN /race/shinjin
+#define MAKAIOSHIN /race/makaioshin
+#define ANGEL /race/angel
+#define POPO /race/popo
+#define CELESTIAL /race/celestial
+
 
 #define DEBUG_DAMAGE 0
 #define DEBUG_ITEM_DAMAGE 0
