@@ -51,7 +51,7 @@ These will be considered Sagas for Angels but lack 6 tiers.
 		SignatureTechnique=3
 		NoSword=1
 		StyleActive="Ultra Instinct (Complete)"
-		verb/Incomplete_Ultra_Instinct()
+		verb/Ultra_Instinct()
 			set hidden=1
 			src.Trigger(usr)
 	Perfected_Ultra_Instinct //I hope this is as gorked as I intend it on being.
