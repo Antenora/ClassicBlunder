@@ -28,5 +28,11 @@ race
 						Confirm=alert(user, "Do you wish to guard the gates to the world beyond?", "Angel Ascension", "Yes", "No")
 					if("Mentor")
 						Confirm=alert(user, "Do you wish to mentor humanity and ensure the spiritual arts remain unforgotten?", "Angel  Ascension", "Yes", "No")
+						if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, user))
+							var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State
+							user.AddSkill(s)
+							user << "You have embarked upon the path of true martial arts mastery: Ultra Instinct."
+							user.Saga="Ultra Instinct"
+							user.SagaLevel=1
 				user.AngelAscension = Choice
 				//t1 style/armor unlocked

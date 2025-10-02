@@ -23,6 +23,12 @@ ascension
 			on_ascension_message = "You grow ever-closer to God."
 			postAscension(mob/owner)
 				//t2 style
+				if(owner.AngelAscension=="Mentor")
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Incomplete_Ultra_Instinct
+						owner.AddSkill(s)
+						owner << "Your game-designer wants to get this over with so she can feel like she did something substantial today but can't think of cool flavor text. Contact her about this later."
+						owner.SagaLevel=2
 				..()
 				owner.Class = "Power"
 		three
@@ -35,6 +41,12 @@ ascension
 			on_ascension_message = "You shall not abide evil."
 			postAscension(mob/owner)
 				//t3 style/armor, can now teach style
+				if(owner.AngelAscension=="Mentor")
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Ultra_Instinct
+						owner.AddSkill(s)
+						owner << "Jesse is gay and forgot to fill this out before the wipe launched. Everyone laugh at her (lovingly, or she'll get sad and AFK for the rest of the day)."
+						owner.SagaLevel=3
 				..()
 				owner.Class = "Virtue"
 		four
@@ -50,6 +62,12 @@ ascension
 			on_ascension_message = "You shall not abide evil."
 			postAscension(mob/owner)
 				//t4 style
+				if(owner.AngelAscension=="Mentor")
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Perfected_Ultra_Instinct
+						owner.AddSkill(s)
+						owner << "Fourth flavor text is the charm, right?."
+						owner.SagaLevel=4
 				..()
 				owner.Class = "Dominion"
 		five
