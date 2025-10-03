@@ -24,7 +24,7 @@ ascension
 			postAscension(mob/owner)
 				//t2 style
 				if(owner.AngelAscension=="Mentor")
-					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Incomplete_Ultra_Instinct, owner))
 						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Incomplete_Ultra_Instinct
 						owner.AddSkill(s)
 						owner << "Your game-designer wants to get this over with so she can feel like she did something substantial today but can't think of cool flavor text. Contact her about this later."
@@ -42,7 +42,7 @@ ascension
 			postAscension(mob/owner)
 				//t3 style/armor, can now teach style
 				if(owner.AngelAscension=="Mentor")
-					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Ultra_Instinct, owner))
 						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Ultra_Instinct
 						owner.AddSkill(s)
 						owner << "Jesse is gay and forgot to fill this out before the wipe launched. Everyone laugh at her (lovingly, or she'll get sad and AFK for the rest of the day)."
@@ -63,7 +63,7 @@ ascension
 			postAscension(mob/owner)
 				//t4 style
 				if(owner.AngelAscension=="Mentor")
-					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Selfless_State, owner))
+					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Perfected_Ultra_Instinct, owner))
 						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles/Perfected_Ultra_Instinct
 						owner.AddSkill(s)
 						owner << "Fourth flavor text is the charm, right?."

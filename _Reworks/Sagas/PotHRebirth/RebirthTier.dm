@@ -29,10 +29,12 @@ sagaTierUpMessages/Rebirth
 				switch(choice)
 					if("Unsung Hero")
 						src.RebirthHeroPath="Unsung"
-					//	src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Fearless)
 						if(src.RebirthHeroType=="Blue")
 							src.AddSkill(new/obj/Skills/Queue/NeverKnowsBest)
-					//	if(src.RebirthHeroType="Red")
+						if(src.RebirthHeroType=="Red")
+							src.AddSkill(new/obj/Skills/Utility/NeverTooLate)
+				//		if(src.RebirthHeroType="Rainbow")
+						src.AddSkill(new/obj/Skills/Utility/NeverTooEarly)
 					if("Prophesized Hero")
 						src.RebirthHeroPath="Prophesized"
 						if(src.RebirthHeroType=="Blue")

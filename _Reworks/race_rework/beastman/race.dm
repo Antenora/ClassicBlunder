@@ -15,7 +15,7 @@ race
 		intellect = 0.5
 		recovery = 2
 		classes = list("Heart of The Beastman", "Monkey King", "Unseen Predator", "Undying Rage", \
-						"Feather Cowl", "Feather Knife", "Spirit Walker", "Shapeshifter", "Trickster", \
+						"Feather Cowl", "Feather Knife", "Spirit Walker", "Trickster", \
 						"Fox Fire")
 		class_info = list("SETT", "WUKONG", "RENGAR", "TRYNDAMERE", "RAKAN", "XAYAH", "UDYR", "NIDALEE", "???", "AHRI")
 		// attaching this here cause lol

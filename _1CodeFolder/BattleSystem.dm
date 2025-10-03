@@ -84,7 +84,7 @@ mob/proc/Anger(var/Enraged=0)
 		Anger=AngerMax
 		if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
 			Anger *= 1+(secretDatum?:getBoon(src, "Anger")/10)
-		
+
 		race.onAnger(src)
 		if(src.AngerMessage)
 			if(!src.AngerColor)
@@ -119,6 +119,8 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(text)
 		if(!istype(src,/mob/Player/FevaSplits))
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
+	if(src.AwakeningSkillUsed)
+		src.AwakeningSkillUsed=0
 	if(src.GatesActive==8 && src.Gate8Getups<2)
 		src.KO=0
 		src.OMessage(15,"...but [src]'s youth is burning too bright to be stopped!","<font color=red>[src]([src.key]) remains standing in their celebration of youth!")
@@ -391,8 +393,8 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 						P.moneyGrindedDaily += totalValue
 						money.Level = totalValue
 						money.name = "[Commas(round(money.Level))] Mana Bits"
-						P << "You've gained [totalValue*1+(P.passive_handler.Get("CashCow")/10)] Cash!"		
-			
+						P << "You've gained [totalValue*1+(P.passive_handler.Get("CashCow")/10)] Cash!"
+
 	if(text)
 		src.OMessage(20,"[src] was just killed by [text]!","<font color=red>[src] was just killed by [text]!")
 	if(P)
@@ -917,7 +919,7 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 	if(self == "No")
 		p1 = input(src, "who") in players
 		Target = input(src, "who") in players
-	if(!Target) 
+	if(!Target)
 		src<< "get an enemy"
 		return
 	var/looplength = input(src, "How many attempts") as num
@@ -927,7 +929,7 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 	var/dmgrolls = list(glob.min_damage_roll, glob.upper_damage_roll)
 	var/_range = input(src, "Do you want to do a range?") in list(1,0)
 	var/min_range
-	var/max_range 
+	var/max_range
 	var/per_change
 	if(_range)
 		min_range = input(src, "min_range") as num
@@ -979,7 +981,7 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 			msg += {"
 [p1] did a total of [sum] damage to [Target].
 The average damage was [average] over [looplength] times.
-[p1] has [GetStr()] Str, and [GetFor()] For. 
+[p1] has [GetStr()] Str, and [GetFor()] For.
 [Target] has [Target.GetEnd()] End."}
 			src << msg
 			damageMatrix = list()
@@ -1002,7 +1004,7 @@ The average damage was [average] over [looplength] times.
 			Target.TotalInjury=0
 			Target.BPPoison=1
 			Target.BPPoisonTimer=0
-		
+
 
 		var/average
 		var/sum
@@ -1016,15 +1018,15 @@ The average damage was [average] over [looplength] times.
 		msg += {"\n
 [p1] did a total of [sum] damage to [Target].
 The average damage was [average] over [looplength] times.
-[p1] has [GetStr()] Str, and [GetFor()] For. 
+[p1] has [GetStr()] Str, and [GetFor()] For.
 [Target] has [Target.GetEnd()] End."}
-	
+
 		src << msg
 	if(forcedmgrolls)
-		glob.min_damage_roll = orgdmgrolls[1] 
+		glob.min_damage_roll = orgdmgrolls[1]
 		glob.upper_damage_roll = orgdmgrolls[2]
 		StrReplace = 0
-		Target.EndReplace = 0 
+		Target.EndReplace = 0
 /mob/Admin3/verb/SimulateAccuracyNOSTATCHANGE()
 	set category = "Debug"
 	var/self = input(src, "Use on self?") in list("Yes", "No")
@@ -1032,13 +1034,13 @@ The average damage was [average] over [looplength] times.
 	if(self == "No")
 		p1 = input(src, "who") in players
 		Target = input(src, "who") in players
-	if(!Target) 
+	if(!Target)
 		src<< "get an enemy"
 		return
 	var/accmult = input(src, "What accmult do u want") as num
 	var/looplength = input(src, "How many attempts") as num
-	var/hits = 0 
-	var/misses = 0 
+	var/hits = 0
+	var/misses = 0
 	var/whiffs = 0
 	var/flowdodge = 0
 	var/obj/Items/Sword/s = p1.EquippedSword()
@@ -1081,8 +1083,8 @@ The average damage was [average] over [looplength] times.
 				misses++
 	src <<"\nsimulated [p1] vs [Target]  [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%)\nmissed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
 	src <<"simulating target vs src"
-	hits = 0 
-	misses = 0 
+	hits = 0
+	misses = 0
 	whiffs = 0
 	flowdodge = 0
 	s = Target.EquippedSword()
@@ -1124,7 +1126,7 @@ The average damage was [average] over [looplength] times.
 mob/var/minhitroll = 0
 /mob/Admin3/verb/SimulateAccuracy()
 	set category = "Debug"
-	if(!Target) 
+	if(!Target)
 		src<< "get an enemy"
 		return
 	var/off = input(src, "What off do u want") as num
@@ -1132,7 +1134,7 @@ mob/var/minhitroll = 0
 	var/spd = input(src, "What spd do u want") as num
 	SpdMod = spd
 	var/def = input(src, "What def do u want") as num
-	DefMod = def 
+	DefMod = def
 	var/flow = input(src, "What flow do u want") as num
 	var/instinct = input(src, "What instinct do u want") as num
 	passive_handler.Set("Flow", flow)
@@ -1150,8 +1152,8 @@ mob/var/minhitroll = 0
 	Target.passive_handler.Set("Instinct",enemyinstinct)
 	var/looplength = input(src, "How many attempts") as num
 	var/randomizeAccMult = input(src, "randomize acc mult between 1 and accmult?") in list(TRUE, FALSE)
-	var/hits = 0 
-	var/misses = 0 
+	var/hits = 0
+	var/misses = 0
 	var/whiffs = 0
 	var/flowdodge = 0
 	var/obj/Items/Sword/s = EquippedSword()
@@ -1195,8 +1197,8 @@ mob/var/minhitroll = 0
 				misses++
 	src <<"\nsimulated [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%)\nminhitsrolles:[minhitroll]\nmissed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
 	src <<"simulating target vs src"
-	hits = 0 
-	misses = 0 
+	hits = 0
+	misses = 0
 	whiffs = 0
 	flowdodge = 0
 	s = Target.EquippedSword()
@@ -1335,20 +1337,20 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 		var/DefenseModifier
 		var/OffenseAdvantage = Offender.Power / Defender.Power
 		var/DefenseAdvantage = Defender.Power / Offender.Power
-		var/Offense 
+		var/Offense
 		var/Defense
-		var/TotalAccuracy 
+		var/TotalAccuracy
 		if(glob.CLAMP_POWER)
 			if(!Offender.ignoresPowerClamp())
 				OffenseAdvantage = clamp(OffenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
 			if(!Defender.ignoresPowerClamp())
 				DefenseAdvantage = clamp(DefenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		
+
 		if(glob.JORDAN_ACCURACY)
 			// trying to make it less complex for the very roughly same result
 			Offense = Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD)
 			Defense = Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD)
-			
+
 			var/mod = clamp(((Offense/Defense) * AccMult) * OffenseAdvantage, glob.MIN_JORDAN_ACC_MOD, glob.MAX_JORDAN_ACC_MOD)
 
 
@@ -1357,12 +1359,12 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 				Offense=(Offender.Power*(Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD)))*(1+Offender.GetGodKi())
 				Defense=(Defender.Power*(Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD)))*(1+Defender.GetGodKi())
 				mod = clamp(((Offense*AccMult)/max(Defense,0.01)), 0.5, 2)
-			
+
 			var/roll = randValue((100-BaseChance) * mod, 100)
 			if(glob.MOD_AFTER_ROLL)
 				roll = randValue((100-BaseChance), 100)
 				roll*=mod
-			
+
 			if(roll >= BaseChance)
 				return HIT
 			else
@@ -1371,7 +1373,7 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 					roll*=mod
 				else
 					roll = randValue((100-BaseChance) * mod, 100)
-				
+
 				if(roll <= glob.WorldWhiffRate)
 					return MISS
 				else if(roll > glob.WorldWhiffRate)
@@ -1802,7 +1804,7 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 mob/proc/Grab_Release()
 	src.Grab.grabbed = null
 	sleep(1)
-	
+
 	src.Grab=null
 
 
@@ -1851,7 +1853,7 @@ mob/proc/Grab_Effects(var/mob/P)
 				if(istype(P, /mob/Player/AI))
 					src << "[P] is an AI!"
 					return
-				//TODO VAMPIRE LETHAL				
+				//TODO VAMPIRE LETHAL
 				var/Choice=alert(src, "Do you wish to convert [P] to a vampire?", "Vampire Grab", "Yes", "No")
 				if(P in range(1, src))
 					if(Choice=="Yes")

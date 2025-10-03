@@ -1863,6 +1863,8 @@ mob
 				if(src.GatesActive<Q.GateNeeded)
 					src << "You have to open at least Gate [Q.GateNeeded] to use this skill!"
 					return
+			if(Q.AwakeningSkill)
+				Q.RebirthLastUse=world.realtime
 			if(Q.NeedsHealth)
 				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"

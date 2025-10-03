@@ -23,11 +23,6 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero
 	RecovMult=1.75
 	Cooldown = 1
 	passives = list("FluidForm" = 1)
-mob/proc/TriggerAwakeningSkill(ActNumber)
-	if(ActNumber==1)
-		src<< "act 1 placeholder msg lol"
-		src.AwakeningSkillUsed=1
-	return
 obj/Skills/AutoHit
 	var/IsSnowgrave
 	Snowgrave
@@ -52,15 +47,21 @@ obj/Skills/AutoHit
 			if(!altered)
 				DamageMult = 600
 			usr.Activate(src)
+mob/proc/TriggerAwakeningSkill(ActNumber)
+	if(ActNumber==1)
+		src<< "act 1 placeholder msg lol"
+		src.AwakeningSkillUsed=1
 obj/Skills
 	var/AwakeningSkill
+	var/ActNumber
+	var/RebirthLastUse
 obj/Skills/Queue
 	var/RandomMult
-	var/ActNumber
 	NeverKnowsBest
 		NeedsHealth=75
 		Copyable=0
 		ActNumber=1
+		AwakeningSkill=1
 		HitMessage="asks for the strength to shatter fate..."
 		DamageMult=0.1
 		AccuracyMult =10000
@@ -76,10 +77,45 @@ obj/Skills/Queue
 		verb/NeverKnowsBest()
 			set category="Skills"
 			set name="Never Knows Best (Act 1)"
+			if(world.realtime < src.RebirthLastUse+(600*60*24))
+				usr << "You can only use this technique once every 24 hours."
+				return
 			RandomMult=rand(0.1,7)
 			DamageMult=RandomMult
-			usr.TriggerAwakeningSkill(ActNumber)
 			usr.SetQueue(src)
+			usr.TriggerAwakeningSkill(ActNumber)
+obj/Skills/Utility
+	var/RandomMult
+	NeverTooEarly
+		Copyable=0
+		desc="End your awakening."
+		verb/NeverTooEarly()
+			set category="Utility"
+			set name="Never Too Early"
+			if(!usr.AwakeningSkillUsed)
+				usr<<"No need."
+				return
+			if(usr.AwakeningSkillUsed)
+				usr.AwakeningSkillUsed=0
+				usr.Health=0
+	NeverTooLate
+		Copyable=0
+		ActNumber=1
+		icon_state="Heal"
+		desc="You ask for a little more time."
+		verb/NeverTooLate()
+			set category="Utility"
+			set name="Never Too Late (Act 1)"
+			if(world.realtime < src.RebirthLastUse+(600*60*24))
+				src << "You can only use this technique once every 24 hours."
+				return
+			if(usr.Health>75)
+				usr<<"Can't use yet!"
+				return
+			src.RebirthLastUse=world.realtime
+			RandomMult=rand(1,25)
+			usr.HealHealth(RandomMult)
+			usr.TriggerAwakeningSkill(ActNumber)
 obj/Skills/Projectile
 	Rude_Buster
 		Distance=40
