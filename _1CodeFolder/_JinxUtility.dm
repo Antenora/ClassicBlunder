@@ -861,6 +861,8 @@ mob
 			if(passive_handler["Staked"])
 				val = 0
 			// SURELY NO PROBLEMS HERE
+			if(src.AwakeningSkillUsed==1)
+				val = 0
 			src.Health+=val
 			src.MaxHealth()
 		HealEnergy(var/val, var/StableHeal=0)
@@ -2766,7 +2768,7 @@ mob
 					var/path=styles_available[x]
 					if(isnull(path))
 						continue
-				
+
 					var/obj/Skills/s=new path
 					if(s.SignatureTechnique==tier)
 						return 1
@@ -2849,7 +2851,7 @@ mob
 				Mult*=clamp(1+(flick/glob.ZANZO_FLICKER_DIVISOR),glob.ZANZO_FLICKER_LOWEST_CLAMP, glob.ZANZO_FLICKER_HIGHEST_CLAMP)
 			if(src.AfterImageStrike)
 				return
-			var/add = (glob.ZANZO_FLICKER_BASE_GAIN-(max(0.01,MovementCharges)/3)/10)*Mult 
+			var/add = (glob.ZANZO_FLICKER_BASE_GAIN-(max(0.01,MovementCharges)/3)/10)*Mult
 			src.MovementCharges+=add
 			if(src.MovementCharges>GetMaxMovementCharges())
 				src.MovementCharges=GetMaxMovementCharges()

@@ -58,6 +58,13 @@ sagaTierUpMessages/Rebirth
 							src.AddSkill(new/obj/Skills/Buffs/Rebirth/ThornRing)
 							src.AddSkill(new/obj/Skills/AutoHit/Snowgrave)
 			if(3)
+				src.SagaLevel=3
+				if(src.RebirthHeroType=="Cyan")
+					src<< "You have unlocked the Yellow SOUL color."
+					src.AddSkill(new/obj/Skills/Utility/SoulShift)
+				if(src.RebirthHeroType=="Purple")
+					src<< "You can attempt to heal people now. You're doing your best, and I'm sure people will be proud of you for it."
+					src.AddSkill(new/obj/Skills/Utility/UltimateHeal)
 			if(4)
 			if(5)
 			if(6)

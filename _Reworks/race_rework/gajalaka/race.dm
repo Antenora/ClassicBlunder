@@ -5,7 +5,7 @@ race
 		desc = {"Chakardi AKA (■■■■■■■■) are native to Mt. Red. Descendants of the illustrious Shiny-Rock tribe. Their former name is considered an insult, aimed to ground them as the monsters they once were decades ago. Chakardi is from the legend of Don Don Chaka, the sound of a heart thumping and Kardia (Heart). Often affluent and insanely resilient, their power is based on pulling from their emotions and heart to summon forth special power. (They’re the ill■■■■■■■.)"}
 		visual = 'Gajalaka.png'
 		passives = list("Tenacity" = 1,"CashCow" = 1, "Blubber" = 0.25)
-
+		locked = TRUE
 		classes = list("Acolyte", "Rebel", "Nobility", "Heart")
 		class_info = list("Faith driven Chakardi that harmonize with their once monsterious nature to manifest the power of Mt. Red. They follow the legends left behind by Kiwi the Greedy.", \
 					"Chakardi who Rebel against the system, constantly lashing out and acting out. They forgo the need for money and attempt to tackle their problems with their own powers instead of the power derived from coin. Followers of ??? the Fang", \
@@ -13,6 +13,7 @@ race
 					"Chakardi that will lay down their lives for their fellow Chakardi. Despite all odds they stand tall against opression, discrimination and any attempt to put them down. Their powers are most closely attuned to Don Don Chakra, which often causes them to be accused of being 'demons' also known as Shatter-Spawn.")
 		stats_per_class = list("Acolyte" = list(1.25, 1.25, 1.25, 0.75, 1.25, 0.75), "Rebel" = list(1.5, 0.75, 1.25, 1.25, 0.75, 1) , \
 							"Nobility" = list(0.75, 0.75, 2, 1.25, 1, 1.25), "Heart" = list(1.5, 1.5, 0.75, 1.25, 0.75, 1))
+		removed = TRUE
 		power = 1
 		strength = 0.75
 		endurance = 0.75

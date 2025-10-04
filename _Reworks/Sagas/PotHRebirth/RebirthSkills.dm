@@ -25,6 +25,8 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero
 	passives = list("FluidForm" = 1)
 obj/Skills/AutoHit
 	var/IsSnowgrave
+	var/HahaWhoops
+	var/RandomMult
 	Snowgrave
 		ElementalClass="Water"
 		ForOffense=1.5
@@ -47,6 +49,26 @@ obj/Skills/AutoHit
 			if(!altered)
 				DamageMult = 600
 			usr.Activate(src)
+	NeverSeeItComing
+		SpecialAttack=1
+		GuardBreak=1
+		DamageMult=0
+		TurfShift='IceGround.dmi'
+		Distance=15
+		WindUp=0.5
+		WindupMessage="casts a spell they don't know.."
+		HahaWhoops=1
+	//	Area="Target"
+		verb/Never_See_It_Coming()
+			set category="Skills"
+			set name="Never See It Coming (Act 1)"
+			if(world.realtime < src.RebirthLastUse+(600*60*24))
+				usr << "You can only use this technique once every 24 hours."
+				return
+			RandomMult=rand(1,10)
+			DamageMult=RandomMult
+			usr.Activate(src)
+			usr.TriggerAwakeningSkill(ActNumber)
 mob/proc/TriggerAwakeningSkill(ActNumber)
 	if(ActNumber==1)
 		src<< "act 1 placeholder msg lol"
@@ -116,6 +138,29 @@ obj/Skills/Utility
 			RandomMult=rand(1,25)
 			usr.HealHealth(RandomMult)
 			usr.TriggerAwakeningSkill(ActNumber)
+	SoulShift
+		Copyable=0
+	//	var/list/SOULUnlocked("Determination(Red)","Determination(Yellow)")
+		verb/SoulRed()
+			set category="Utility"
+			set name="SOUL Shift (Red)"
+			usr.passive_handler.Set("Determination(Red)", 1)
+			usr.passive_handler.Set("Determination(Yellow)", 0)
+			usr.passive_handler.Set("Determination(Green)", 0)
+		verb/SoulYellow()
+			set category="Utility"
+			set name="SOUL Shift (Yellow)"
+			usr.passive_handler.Set("Determination(Red)", 0)
+			usr.passive_handler.Set("Determination(Yellow)", 1)
+			usr.passive_handler.Set("Determination(Green)", 0)
+	UltimateHeal
+		ManaCost=100
+		Cooldown=-1
+		icon_state="Heal"
+		desc="This allows you to attempt to heal people you are facing. At least it clears their fatigue, right?"
+		verb/Ultimate_Heal()
+			set category="Utility"
+			usr.SkillX("UltimateHeal",src)
 obj/Skills/Projectile
 	Rude_Buster
 		Distance=40
@@ -186,6 +231,8 @@ obj/Skills/Buffs
 			verb/Devilsknife()
 				set category="Skills"
 				adjust(usr)
+		//		if(usr.SagaLevel>=3)
+		//			BuffTechniques
 				src.Trigger(usr)
 				if(prob(2))
 					OMsg(usr, "<b>MY HEARTS GO OUT TO ALL YOU SINNERS!</b>")

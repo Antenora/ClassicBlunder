@@ -93,8 +93,8 @@ mob/Players
 		for(var/obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2/da in src)
 			if(src.isRace(DEMON))
 				da.name="Devil Arm ([src.TrueName])"
-			if(src.isRace(MAKAIOSHIN))
-				da.name="Devil Arm (Fallen)" //customizable name later
+			if(src.isRace(MAKAIOSHIN)||src.isRace(CELESTIAL))
+				da.name="Devil Arm ([src.TrueName])"
 
 		checkVerbs()
 

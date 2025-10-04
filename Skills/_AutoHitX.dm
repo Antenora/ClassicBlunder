@@ -4908,6 +4908,17 @@ mob
 					src<<"You have been set along the Path of Tragedy."
 					for(var/obj/Skills/AutoHit/Snowgrave/SG in src)
 						del SG
+				if(Z.HahaWhoops)
+					Z.RebirthLastUse=world.realtime
+					if(prob(50))
+						src.Target.HealHealth(Z.DamageMult)
+						for(var/mob/E in hearers(12,src))
+							E<<"<font color=[src.Text_Color]>[src] says: haha whoops."
+					else
+						src.Target.DoDamage(src.Target,Z.DamageMult)
+						for(var/mob/E in hearers(12,src))
+							E<<"<font color=[src.Text_Color]>[src] says: Nailed it."
+					return
 				if(Target && Target.passive_handler.Get("CounterSpell"))
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Counterspell/s in Target)
 						if(s.Using)

@@ -599,6 +599,25 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							P.SenseRobbed=0
 							view(src)<<"[src] restores [P]'s robbed senses!"
 						break
+			if("UltimateHeal")
+				if(src.ManaAmount<100)
+					return
+				if(src.KO)
+					return
+				for(var/mob/Players/P in oview(7,usr))
+					if(P)
+						Z.Cooldown()
+						src.ManaAmount=0
+						view(src)<<"[src] does their best trying to heal [P]! Please be nice to them."
+						if(P.KO)
+							P.Conscious()
+						P.Sheared=0
+						P.HealWounds(1*src.Imagination)
+						P.HealHealth(1*src.Imagination)
+						P.TotalFatigue=0
+						if(P.BPPoison<1)
+							P.BPPoisonTimer=1
+						break
 			if("Regrowth")
 				if(Z.Using)
 					return

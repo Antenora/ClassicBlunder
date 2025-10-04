@@ -40,9 +40,6 @@ world
 		BuildGeneralWeaponryDatabase()
 		GeneratePlayActionDatabase()
 		//initRitualDatabase()
-		world.SetConfig("APP/admin", "XLevi", "role=admin")
-		world.SetConfig("APP/admin", "Niezan", "role=admin")
-		world.SetConfig("APP/admin", "Niezan2", "role=admin")
 
 		generateSwapMaps()
 	Del()
@@ -70,6 +67,7 @@ var/WorldLoading
 var/list/LockedRaces=list()
 
 mob/proc/CheckUnlock(race/_race)
+	if(_race.removed) return 0
 	if(src.Admin) return 1
 	if(_race.locked)
 		for(var/i in glob.LockedRaces)

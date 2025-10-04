@@ -1,1 +1,1 @@
-#define DEBUGGING 0
+#define DEBUGGING 1

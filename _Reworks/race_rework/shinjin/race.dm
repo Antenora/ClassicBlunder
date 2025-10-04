@@ -3,7 +3,7 @@ race
 		name = "Shinjin"
 		desc = "shinjin things man lol"
 		visual = 'Humans.png'
-
+		removed = TRUE
 		locked = TRUE
 		power = 1
 		strength = 1

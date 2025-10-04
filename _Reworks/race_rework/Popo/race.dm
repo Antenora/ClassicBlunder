@@ -6,6 +6,7 @@ race
 		passives = list("Tenacity" = 1, "Adrenaline" = 1, "Innovation" = 1)
 		statPoints = 12
 		locked = TRUE
+		removed = TRUE
 		power = 0.1
 		strength = 5
 		endurance = 5

@@ -125,6 +125,9 @@ race
 		//this determines if the race is a 'rare' and is only unlocked via someone's key being in the LockedRaces list.
 		locked = FALSE
 
+		//races that have been removed or i haven't decided on adding yet. this determines if a race won't show up on the list even for admins, because cycling through a dozen races has always been really annoying.
+		removed = FALSE
+
 		//a text description for the race; displayed to the user.
 		desc
 		//a picture used for the racial menu.
@@ -146,7 +149,7 @@ race
 		offense = 1
 		defense = 1
 		speed = 1
-		stats_per_class = list() //NIEZAAAAANNNNN 
+		stats_per_class = list() //NIEZAAAAANNNNN
 		anger_message = "becomes angry!"
 		anger_point = 50
 

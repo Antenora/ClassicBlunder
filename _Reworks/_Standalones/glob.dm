@@ -219,7 +219,7 @@ globalTracker
 		WorldDefaultAcc = 50
 		WorldWhiffRate = 25
 		celestialObjectTicks
-		NoSagaRaces = list(DEMON, DRAGON, ELF, SAIYAN)
+		NoSagaRaces = list(DEMON, DRAGON, ELF, SAIYAN, ANGEL)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
 		T3_STYLES_GODKI_VALUE = 0.25
 		DOUBLESTRIKECHANCE = 10
@@ -244,7 +244,7 @@ globalTracker
 
 		HALF_SWORD_ARMOR_REDUCTION = 1
 		HALF_SWORD_UNARMOURED_DIVISOR = 10
-		IAI_CHANCE = 100 
+		IAI_CHANCE = 100
 		IAI_BASE_DAMAGE = 0.15
 		PARRY_CHANCE = 100 //TODO: come back here
 		PARRY_REDUCTION_MULT = 2
@@ -269,7 +269,7 @@ globalTracker
 		UNDERDOG_RED_MULTIPLER = 1
 
 		KOB_GETS_STATS_LOW_LIFE = 0
-		
+
 		MAX_CRIPPLE_MULT = 2
 		CRIPPLE_DIVISOR = 100
 		RUPTURED_MOVE_DMG = 0.05
@@ -425,7 +425,7 @@ globalTracker
 		CONSTANT_DAMAGE_EXPONENT = 4
 		STYLE_EFFECT_CD = 400
 		BLINDINGVENOM_CD = 400
-		SPIRIT_FLOW_DIVISOR = 4 
+		SPIRIT_FLOW_DIVISOR = 4
 		AUTOHIT_HYBRID_AS_MULT = FALSE
 		LINGERCHANCE = 5
 		GRAPPLE_WHIFF_DAMAGE = 3
@@ -568,7 +568,7 @@ globalTracker
 		DainsleifDrainAmount = 0.005
 		DainsleifDrain = FALSE
 
-		
+
 		infWeaponSoul = TRUE
 		WeaponSoulNames = WSNAMES
 		prayerTargetNames = GODS

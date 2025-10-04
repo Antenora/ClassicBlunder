@@ -972,9 +972,11 @@
 				if(P.Health<=TurfDamage)
 					Destroy(P)
 			return
-		if(src.HasSpecialStrike()||EquippedStaff())
+		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"])
 			flick("Attack",src)
 			NextAttack=world.time
+			if(src.passive_handler["Determination(Yellow)"])
+				GetAndUseSkill(/obj/Skills/Projectile/SmallLemonThing, Projectiles, TRUE)
 			if(src.CheckSpecial("Ray Gear"))
 				if(src.AttackQueue)
 					if(src.AttackQueue.Warp)
