@@ -1,4 +1,4 @@
-
+//t1 path buffs
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Heart
 	AlwaysOn=1
 	PowerMult=1.25
@@ -23,6 +23,19 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero
 	RecovMult=1.75
 	Cooldown = 1
 	passives = list("FluidForm" = 1)
+//t3 path buffs
+obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shining_Star
+	AlwaysOn=1
+	StrMult=1.25
+	SpdMult=1.15
+	Cooldown = 1
+	passives = list("Pursuer" = 1,"KiControlMaster" =1)
+obj/Skills/Buffs/SlotlessBuffs/Autonomous/Unwavering_Soul
+	AlwaysOn=1
+	StrMult=1.1
+	EndMult = 1.5
+	Cooldown = 1
+	passives = list("BioArmor" = 1, "Unstoppable" =1)
 obj/Skills/AutoHit
 	var/IsSnowgrave
 	var/HahaWhoops
@@ -140,7 +153,6 @@ obj/Skills/Utility
 			usr.TriggerAwakeningSkill(ActNumber)
 	SoulShift
 		Copyable=0
-	//	var/list/SOULUnlocked("Determination(Red)","Determination(Yellow)")
 		verb/SoulRed()
 			set category="Utility"
 			set name="SOUL Shift (Red)"
@@ -153,6 +165,14 @@ obj/Skills/Utility
 			usr.passive_handler.Set("Determination(Red)", 0)
 			usr.passive_handler.Set("Determination(Yellow)", 1)
 			usr.passive_handler.Set("Determination(Green)", 0)
+	SoulShiftGreen
+		Copyable=0
+		verb/SoulGreen()
+			set category="Utility"
+			set name="SOUL Shift (Green)"
+			usr.passive_handler.Set("Determination(Red)", 0)
+			usr.passive_handler.Set("Determination(Yellow)", 0)
+			usr.passive_handler.Set("Determination(Green)", 1)
 	UltimateHeal
 		ManaCost=100
 		Cooldown=-1
@@ -172,6 +192,7 @@ obj/Skills/Projectile
 		HyperHoming=1
 		Dodgeable=-1
 		Deflectable=-1
+		IconLock='RudeBuster.dmi'
 		Knockback=1
 		IconSize=3
 		Radius=3
@@ -185,8 +206,6 @@ obj/Skills/Projectile
 		verb/Rude_Buster()
 			set category="Skills"
 			set name="Rude Buster"
-			if(usr.AnsatsukenAscension=="Satsui" && src.IconLock=='Hadoken.dmi')
-				IconLock='Hadoken - Satsui.dmi'
 			usr.UseProjectile(src)
 	Devilsbuster
 		Distance=40
@@ -198,6 +217,7 @@ obj/Skills/Projectile
 		HyperHoming=1
 		Dodgeable=1
 		Deflectable=-1
+		IconLock='RudeBuster.dmi'
 		Knockback=1
 		IconSize=3
 		Radius=3
@@ -211,8 +231,6 @@ obj/Skills/Projectile
 		verb/Devilsbuster()
 			set category="Skills"
 			set name="Devilsbuster"
-			if(usr.AnsatsukenAscension=="Satsui" && src.IconLock=='Hadoken.dmi')
-				IconLock='Hadoken - Satsui.dmi'
 			usr.UseProjectile(src)
 obj/Skills/Buffs
 	Rebirth
@@ -240,7 +258,6 @@ obj/Skills/Buffs
 			MakesSword=1
 			SwordName="Spookysword"
 			SwordIcon='PlaceholderBlackScythe.dmi'
-			BuffTechniques=list("/obj/Skills/Projectile/Rebirth/Devilsbuster")
 			SwordX=-32
 			SwordY=-32
 			SwordClass="Medium"

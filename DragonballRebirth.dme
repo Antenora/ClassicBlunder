@@ -425,6 +425,7 @@
 #include "_Reworks\race_rework\beastman\racial\beastmanracials.dm"
 #include "_Reworks\race_rework\beastman\racial\heartofthebeastman.dm"
 #include "_Reworks\race_rework\beastman\racial\neverfall.dm"
+#include "_Reworks\race_rework\Celestials\ascensions.dm"
 #include "_Reworks\race_rework\Celestials\race.dm"
 #include "_Reworks\race_rework\changeling\ascensions.dm"
 #include "_Reworks\race_rework\changeling\race.dm"

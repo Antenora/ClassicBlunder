@@ -31,9 +31,16 @@ sagaTierUpMessages/Rebirth
 						src.RebirthHeroPath="Unsung"
 						if(src.RebirthHeroType=="Blue")
 							src.AddSkill(new/obj/Skills/Queue/NeverKnowsBest)
+							src.AddSkill(new/obj/Skills/Projectile/Rude_Buster)
 						if(src.RebirthHeroType=="Red")
 							src.AddSkill(new/obj/Skills/Utility/NeverTooLate)
-				//		if(src.RebirthHeroType="Rainbow")
+							src.passive_handler.Increase("Determination")
+							src.passive_handler.Increase("Determination(Red)")
+							src<< "Your ACT meter slows, but as it builds, a certain power wells up within you..."
+							src<< "You unlock the Red SOUL color, boosting your crit rate as you gain ACT!"
+						if(src.RebirthHeroType=="Rainbow")
+							src.AddSkill(new/obj/Skills/AutoHit/NeverSeeItComing)
+							src<< "nyoro~n :3c"
 						src.AddSkill(new/obj/Skills/Utility/NeverTooEarly)
 					if("Prophesized Hero")
 						src.RebirthHeroPath="Prophesized"
@@ -41,8 +48,9 @@ sagaTierUpMessages/Rebirth
 							src.RebirthHeroType="Cyan"
 							src<< "You are now the Cyan Hero of Soul, a cage for a human SOUL. Your ACT meter slows, but as it builds, a certain power wells up within you..."
 							src.passive_handler.Increase("Determination")
-							src.passive_handler.Increase("Determination(Red)")
+							src.AddSkill(new/obj/Skills/Utility/SoulShift)
 							src<<"You unlock the Red SOUL color, boosting your crit rate as you gain ACT!"
+							src<<"You unlock the Yellow SOUL color, granting your melee attacks projectiles!!"
 							src.AddSkill(new/obj/Skills/Buffs/Rebirth/Spookysword)
 						if(src.RebirthHeroType=="Red")
 							src.RebirthHeroType="Purple"
@@ -60,11 +68,15 @@ sagaTierUpMessages/Rebirth
 			if(3)
 				src.SagaLevel=3
 				if(src.RebirthHeroType=="Cyan")
-					src<< "You have unlocked the Yellow SOUL color."
-					src.AddSkill(new/obj/Skills/Utility/SoulShift)
+					src.AddSkill(new/obj/Skills/Utility/SoulShiftGreen)
 				if(src.RebirthHeroType=="Purple")
 					src<< "You can attempt to heal people now. You're doing your best, and I'm sure people will be proud of you for it."
 					src.AddSkill(new/obj/Skills/Utility/UltimateHeal)
+				if(src.RebirthHeroType=="Blue")
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shining_Star)
+				if(src.RebirthHeroType=="Red")
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Unwavering_Soul)
+		//		if(src.RebirthHeroType=="Rainbow")
 			if(4)
 			if(5)
 			if(6)

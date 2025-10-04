@@ -32,3 +32,4 @@ race
 						Confirm=alert(user, "An inert demon has been forcibly implanted in your soul, allowing you to brandish its power as a weapon.", "Demon", "Yes", "No")
 						user.TrueName=input(user, "What is the name of the Demon within?", "Get True Name") as text
 						user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2)
+				user.CelestialAscension = Choice
