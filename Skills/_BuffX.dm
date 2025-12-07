@@ -12835,10 +12835,11 @@ mob
 				src.VanishPersonal=B.VanishImage
 
 			if(B.ManaGlow)
-				filters = null
-				filters += filter(type="drop_shadow",x=0,y=0,size=B.ManaGlowSize, offset=B.ManaGlowSize/2, color=B.ManaGlow)
-				GlowFilter = filters[filters.len]
-				filters += filter(type="motion_blur", x=0,y=0)
+				if(B.ManaGlow!="Rainbow")
+					filters = null
+					filters += filter(type="drop_shadow",x=0,y=0,size=B.ManaGlowSize, offset=B.ManaGlowSize/2, color=B.ManaGlow)
+					GlowFilter = filters[filters.len]
+					filters += filter(type="motion_blur", x=0,y=0)
 
 			if(B.ArmamentGlow)
 				src.ArmamentGlow = filter(type="drop_shadow",x=0,y=0,size=B.ArmamentGlowSize, offset=B.ArmamentGlowSize/2, color=B.ArmamentGlow)
