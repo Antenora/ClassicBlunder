@@ -670,6 +670,25 @@ mob/proc/Recover(var/blah,Amount=1)
 				if(PS.CurrentCapacity>PS.MaxCapacity)
 					PS.CurrentCapacity=PS.MaxCapacity
 
+var/RainbowColor
+var/HoldOn=0
+mob/proc/RainbowGlowStuff()
+	if (HoldOn==0)
+		HoldOn=1
+		for(var/loop=0, loop<=100, loop++)
+			if(src.passive_handler.Get("Prismatic"))
+				if (RainbowColor<359)
+					RainbowColor+=1
+				else
+					RainbowColor=0
+				if (RainbowColor>359)
+					RainbowColor=359
+				filters = null
+				filters += filter(type="drop_shadow",x=0,y=0,size=src.passive_handler.Get("Prismatic"), offset=1, color=HSVtoRGB(hsv(AngleToHue(RainbowColor), 255, 255)))
+				GlowFilter = filters[filters.len]
+				filters += filter(type="motion_blur", x=0,y=0)
+				sleep(0.01)
+		HoldOn=0
 mob/proc/
 	Available_Power()
 //Kaiokek
@@ -719,6 +738,11 @@ mob/proc/
 //EPM modifications
 		if(src.passive_handler.Get("ChaosQueen"))
 			src.PowerControl=rand(101, 300)
+		if(src.passive_handler.Get("Prismatic"))
+			for(var/loopstuff=0, loopstuff<=10, loopstuff++)
+				if (HoldOn==0)
+					RainbowGlowStuff()
+				sleep(0.01)
 		var/EPM=src.Power_Multiplier
 		if(src.HasMovementMastery())
 			if(src.ActiveBuff && src.ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
