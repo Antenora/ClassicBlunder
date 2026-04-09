@@ -1812,6 +1812,26 @@ NEW VARIABLES
 				adjust(usr)
 				src.Trigger(usr)
 //General
+		Mark_of_the_Slayer
+			SignatureTechnique=3
+			BuffName = "Mark of the Slayer"
+			ActiveSlot=1
+			PowerMult= 1.5
+			StrMult=1.8
+			SpdMult=1.2
+			ForMult=1.2
+			RecovMult=1.2
+			passives = list("SlayerMod" = 3.5, "FatigueImmune" = 1, "LifeSteal" = 20, "FavoredPrey" = "Depths", "Holymod" = 3, "MovementMastery" = 1, "TechniqueMastery" = 2.5, "BuffMastery" = 1,"Deicide"= 1.5 )
+			ManaGlowSize=3
+			ManaGlow="C03434"
+			TextColor=rgb(192, 52, 52)
+			ActiveMessage="manifests a demonic symbol on their chest, striking terror into the hearts of the wicked..."
+			OffMessage="discards the mark of the Slayer, returning to normal."
+			adjust(mob/p)
+			verb/Mark_of_the_Slayer()
+				set category="Skills"
+				adjust(usr)
+				src.Trigger(usr)
 		Zone
 			SignatureTechnique=3
 			SpdMult=1.4
