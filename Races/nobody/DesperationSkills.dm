@@ -1,36 +1,31 @@
-obj/Skills/AutoHit/Desperation
+/obj/Skills/AutoHit/Desperation
 	Deathscythe
-		FixedDamage=6.5
+		Area="Target"
 		Distance=60
+		WindUp=3
+		WindupMessage="summons a massive scythe of dripping petals, slowly descending towards their target..."
+		WindupIcon='SparkleRed.dmi'
+		WindupIconY=32
+		WindupColor=rgb(255, 100, 180)
+		FixedDamage=6.5
 		NeedsHealth=20
 		Cooldown=300
 		EnergyCost=20
+		Instinct=1
+		MortalBlow=1
+		HitSparkIcon='SparkleRed.dmi'
+		HitSparkX=-16
+		HitSparkY=-16
+		HitSparkSize=2
+		HitSparkTurns=1
+		ActiveMessage="commands the scythe to strike, reaping the life from their target in a flurry of pink petals!"
 		verb/Deathscythe()
 			set category="Skills"
 			var/asc = usr.AscensionsAcquired
-			if(src.Using)
-				return
-			if(!usr.HasTarget())
-				usr << "You need a target to use [src]!"
-				return
-			if(usr.Health >= 20*(1-usr.HealthCut))
-				usr << "You need to be under 20% HP to use your Desperation Move!"
-				return
-			var/mob/marked_target = usr.Target
-			var/scaled_damage = 6.5 + (1*asc)
-			var/delay_ticks = (30 - (2.5*asc)) * 10
-			src.Cooldown(1, null, usr)
-			OMsg(usr, "[usr] summons a massive scythe of dripping petals, slowly descending towards [marked_target]!")
-			spawn()
-				LeaveImage(User=marked_target, Image='SparkleRed.dmi', PY=32, Under=0, Time=delay_ticks)
-
-
-			spawn(delay_ticks)
-				if(!usr) return
-				if(!marked_target) return
-				if(marked_target.KO) return
-				OMsg(usr, "[usr] commands the scythe to strike, reaping the life from [marked_target] in a flurry of pink petals!")
-				marked_target.LoseHealth(scaled_damage)
+			FixedDamage = 6.5 + (1 * asc)
+			WindUp = max(1, 3 - (0.25 * asc))
+			Cooldown = 300 - (10 * asc)
+			usr.Activate(src)
 obj/Skills/AutoHit/Desperation
 	FatalEnding
 		NeedsSword=1
