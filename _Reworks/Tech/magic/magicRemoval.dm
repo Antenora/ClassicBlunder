@@ -42,6 +42,14 @@
 	p.refundOldMagicShit()
 	p.removeAllTomes()
 
+/mob/Admin3/verb/RefundNewMagicTree(mob/p in players)
+	set name = "Refund Magic Tree"
+	if(!p) return
+	var/confirm = alert(src, "Fully refund [p]'s new magic tree? This removes all mage passives, spell passives, spell slots, Gestalt Style/Buff, and refunds RPP.", "Refund Magic Tree", "Yes", "No")
+	if(confirm != "Yes") return
+	p.refundNewMagicTree()
+	src << "[p]'s magic tree has been fully refunded."
+
 
 
 // is they have summoning it is OKAY! 

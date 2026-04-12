@@ -309,8 +309,10 @@ proc
 mob
 	proc
 		AddBurn(var/Value, var/mob/Attacker=null)
-			if(src.Stasis)
+			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/fire/BurnMastery))
+				Value *= 2
 			if(Attacker && (Attacker == src ? !src.passive_handler.Get("BurningShot") : 1))
 				if(Attacker.Attunement=="Fire")
 					Value*=1.5
@@ -329,6 +331,7 @@ mob
 				Value/=2
 			if(src.HasDebuffResistance() && !src.passive_handler.Get("BurningShot"))
 				Value/=1+src.GetDebuffResistance()
+			Value *= getBurnResistValue()
 			Value = Value // this makes 100 impossible ?
 			src.Burn+=Value
 			if(Value >=1 && !src.passive_handler.Get("BurningShot"))
@@ -348,6 +351,13 @@ mob
 							implodeDebuff(Attacker.passive_handler["Combustion"], "Burn")
 
 
+			if(Attacker)
+				if(Attacker.passive_handler["FireHerald"] && src.Burn >= 100)
+					implodeDebuff(100, "Burn")
+					for(var/mob/Players/P in range(2, src))
+						if(P != src && P != Attacker)
+							P.AddBurn(25)
+
 			if(src.Burn>100)
 				src.Burn=100
 			if(src.Burn<0)
@@ -361,8 +371,10 @@ mob
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Cooled+=100
 		AddSlow(var/Value, var/mob/Attacker=null)
-			if(src.Stasis)
+			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
+				Value *= 2
 			if(Attacker && Attacker.Attunement == "Water")
 				Value*=1.5
 			if(Attunement=="Fire")
@@ -376,7 +388,7 @@ mob
 			if(src.HasDebuffResistance())
 				Value/=1+src.GetDebuffResistance()
 			Value = Value*(1-(src.Slow/glob.DEBUFF_STACK_RESISTANCE))
-			Value -= (Value * getChillResistValue())
+			Value *= getChillResistValue()
 			src.Slow+=Value
 
 			if(Value >=1)
@@ -392,6 +404,8 @@ mob
 			if(Attacker)
 				if(Attacker.passive_handler["IceAge"] && Slow >= Attacker.passive_handler["IceAge"])
 					implodeDebuff(Attacker.passive_handler["IceAge"], "Chill")
+				if(Attacker.passive_handler["IceHerald"] && src.Slow >= 100)
+					implodeDebuff(100, "Chill")
 			if(src.Slow>100)
 				src.Slow=100
 			if(src.Slow<0)
@@ -405,8 +419,10 @@ mob
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Cooled+=100
 		AddShatter(var/Value, var/mob/Attacker=null)
-			if(src.Stasis)
+			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/earth/ShatterMastery))
+				Value *= 2
 			if(Attacker && Attacker.Attunement=="Earth")
 				Value*=1.5
 			if(Attunement=="Water")
@@ -419,6 +435,7 @@ mob
 				Value/=2
 			if(src.HasDebuffResistance())
 				Value/=1+src.GetDebuffResistance()
+			Value *= getShatterResistValue()
 			Value = Value*(1-(src.Shatter/glob.DEBUFF_STACK_RESISTANCE))
 			src.Shatter+=Value
 
@@ -426,6 +443,10 @@ mob
 				src.color = "#8f7946"
 				animate(src, color = src.MobColor, time=5)
 
+
+			if(Attacker)
+				if(Attacker.passive_handler["EarthHerald"] && src.Shatter >= 100)
+					implodeDebuff(100, "Shatter")
 
 			if(src.Shatter>100)
 				src.Shatter=100
@@ -440,8 +461,10 @@ mob
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Sprayed+=100
 		AddShock(var/Value, var/mob/Attacker=null)
-			if(src.Stasis)
+			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/air/ShockMastery))
+				Value *= 2
 			if(Attacker && Attacker.Attunement=="Wind")
 				Value*=1.5
 			if(src.Attunement=="Earth")
@@ -455,6 +478,7 @@ mob
 
 			if(src.HasDebuffResistance())
 				Value/=1+src.GetDebuffResistance()
+			Value *= getShockResistValue()
 			Value = Value*(1-(src.Shock/glob.DEBUFF_STACK_RESISTANCE))
 			src.Shock+=Value
 
@@ -475,7 +499,7 @@ mob
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Stabilized+=100
 		AddPoison(var/Value, var/mob/Attacker=null)
-			if(src.Stasis)
+			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			// Devil Summoner Vile racial
 			if(Attacker && Attacker.demon_racial_vile_active)
@@ -529,6 +553,7 @@ mob
 				return
 			if(src.Stasis)
 				return
+			Value *= getShearResistValue()
 			Value = Value*(1-(src.GetEffectiveShearForStackingEffects()/glob.DEBUFF_STACK_RESISTANCE))
 			src.Sheared+=Value
 			if(src.Sheared>100)
@@ -547,6 +572,7 @@ mob
 
 			if(isRace(DRAGON) && Class == "Wind") Value /= 2
 			if(src.HasMythical() > 0.75) Value = Value*(1-(src.Crippled/glob.DEBUFF_STACK_RESISTANCE))
+			Value *= getCrippleResistValue()
 
 			src.Crippled+=Value
 

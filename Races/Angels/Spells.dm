@@ -171,8 +171,8 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
-		return aaa
+		User.Activate(src)
+		return TRUE
 	verb/Chains_of_Purity()
 		set category = "Skills"
 		usr.Activate(src)

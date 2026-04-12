@@ -259,8 +259,8 @@ globalTracker/var
     elementTree |= glob.vars["[magicTreeDisplayed]TreeNodes"];
     for(var/nodeName in elementTree)
         var/magic_node/mn = elementTree[nodeName];
-        if(mn.nodeType == "Pinnacle") elementTree.Remove(nodeName);
-        else if(!hasUnlockedMagicNode(mn)) return 0;
+        if(mn.nodeType == "Pinnacle") continue
+        if(!hasUnlockedMagicNode(mn)) return 0;
     return 1;
 
     
@@ -339,6 +339,11 @@ globalTracker/var
 /mob/proc/obtainNode(magic_node/mn)
     switch(mn.nodeType)
         if("Spell Passive") unlockSpellPassive(mn);
+        if("Mage Passive") unlockMagePassive(mn);
+    //a Pinnacle node may also carry a mage passive payload (e.g. Fire crown grants Alight),
+    //so always grant if grantsMagePassives is populated, even outside the switch.
+    if(mn.nodeType != "Mage Passive" && mn.grantsMagePassives.len)
+        unlockMagePassive(mn);
     if(mn.isSpellSlot()) unlockSpellSlot(mn);
     unlockMagicKnowledge(mn);
 

@@ -83,6 +83,11 @@
                 Distance = 4 + asc
                 Rounds = 1
                 DamageMult = 0.25 + (asc * 1)
+            if("Gold")
+                TurfErupt=1
+                Distance = 4 + asc
+                Rounds = 1
+                DamageMult = 4 + (asc * 1)
     verb/Dragon_Roar()
         set category="Skills"
         adjust(usr)

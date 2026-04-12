@@ -24,6 +24,7 @@ magic_node/space_tree
         xLoc = SPACE_NODE_21_X;
         yLoc = SPACE_NODE_21_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/space/Relativity)
         unlocksNodes = list(SPACE_NODE_31, SPACE_NODE_32);
     
     space_node_22
@@ -54,6 +55,7 @@ magic_node/space_tree
         xLoc = SPACE_NODE_33_X
         yLoc = SPACE_NODE_33_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/space/Relativity)
         unlocksNodes = list(SPACE_NODE_43, SPACE_NODE_44, SPACE_NODE_22);
     
     space_node_41
@@ -77,6 +79,7 @@ magic_node/space_tree
         xLoc = SPACE_NODE_43_X
         yLoc = SPACE_NODE_43_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/space/Linearity)
         unlocksNodes = list(SPACE_NODE_5, SPACE_NODE_32, SPACE_NODE_44);
     
     space_node_44
@@ -84,6 +87,7 @@ magic_node/space_tree
         xLoc = SPACE_NODE_44_X
         yLoc = SPACE_NODE_44_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/space/Linearity)
         unlocksNodes = list(SPACE_NODE_43, SPACE_NODE_33);
     
     space_node_5
@@ -98,4 +102,5 @@ magic_node/space_tree
         xLoc = SPACE_NODE_CROWN_X
         yLoc = SPACE_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/space/Kinematics)
         unlocksNodes = list(SPACE_NODE_5);

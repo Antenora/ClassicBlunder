@@ -40,6 +40,7 @@
 
 	proc/_unbreakable_release(mob/user, obj/Effects/BloodShieldAura/shield)
 		if(!user) return
+		if(!SlotlessOn) return
 
 		if(shield && shield.loc)
 			user.vis_contents -= shield
@@ -49,13 +50,17 @@
 		user.unbreakable_tracking = 0
 		user.unbroken_absorbed    = 0
 
-		var/ampBonus = min(stored / 2, 20)
+		var/ampBonus = max(min(stored / 2, 20), 1)
 
 		var/obj/Skills/AutoHit/Unbreakable_Release/atk = new()
 		atk.DamageMult = ampBonus
 		user.Activate(atk)
 
 		KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=1, Time=8)
+
+		// Deactivate the buff after the release fires
+		if(SlotlessOn)
+			Trigger(user)
 
 	verb/Unbreakable()
 		set category="Skills"

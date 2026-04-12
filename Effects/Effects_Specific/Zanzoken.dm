@@ -337,6 +337,8 @@ mob/Player
 proc
 	AfterImageStrike(mob/A,mob/Target,var/Striking=1)
 		set waitfor=0
+		if(!A || !Target)
+			return
 		if(!A.Dodging&&!Target.Dodging)
 			A.Dodging=1
 			Target.Dodging=1
@@ -345,8 +347,12 @@ proc
 			var/StartT=Target.loc
 			if(Target.AfterImageStrike||(locate(/obj/Skills/Zanzoken, Target))&&prob(20))
 				if(glob.AISCLASHLOCKSMOVEMENT && Target.client)
-					Target?:move_disabled = TRUE
-					A?:move_disabled = TRUE
+					if(istype(Target, /mob/Players))
+						var/mob/Players/PT = Target
+						PT.move_disabled = TRUE
+					if(istype(A, /mob/Players))
+						var/mob/Players/PA = A
+						PA.move_disabled = TRUE
 				animate(A,alpha=0,time=2, flags=ANIMATION_END_NOW )
 				animate(Target,alpha=0,time=2, flags=ANIMATION_END_NOW )
 				sleep(1)
@@ -355,6 +361,8 @@ proc
 				sleep(1)
 				while(Zanzes)
 					Zanzes--
+					if(!A || !Target)
+						break
 					if(Zanzes<=0)
 						A.loc=StartA
 						Target.loc=StartT
@@ -373,14 +381,18 @@ proc
 						KenShockwave(Target,icon='KenShockwave.dmi',Size=max(A.GetIntimidation()+Target.GetIntimidation()*GoCrand(0.04,0.4),0.2),PixelX=((Target.x-A.x)*(-16)+pick(-12,-8,8,12)),PixelY=((Target.y-A.y)*(-16)+pick(-12,-8,8,12)), Time=6)
 						sleep(5)
 				if(glob.AISCLASHLOCKSMOVEMENT)
-					if(Target)
-						Target?:move_disabled = FALSE
-					A?:move_disabled = FALSE
-				A.loc = StartA
+					if(Target && istype(Target, /mob/Players))
+						var/mob/Players/PT = Target
+						PT.move_disabled = FALSE
+					if(A && istype(A, /mob/Players))
+						var/mob/Players/PA = A
+						PA.move_disabled = FALSE
+				if(A)
+					A.loc = StartA
+					A.alpha = 255
 				if(Target)
 					Target.loc = StartT
-				animate(A,alpha=255, time=1, flags=ANIMATION_END_NOW | ANIMATION_PARALLEL)
-				animate(Target,alpha=255, time=1, flags=ANIMATION_END_NOW | ANIMATION_PARALLEL)
+					Target.alpha = 255
 			else
 				AfterImage(A)
 				A.Comboz(Target)
@@ -388,8 +400,13 @@ proc
 				if(Striking)
 					A.NextAttack=0
 					A.Melee1(1, 5, SureKB=1)
-			A.Dodging=0
-			Target.Dodging=0
+				if(A)
+					A.alpha = 255
+					A.AfterImageStrike = 0
+			if(A)
+				A.Dodging=0
+			if(Target)
+				Target.Dodging=0
 
 	WildSense(mob/A,mob/Target,var/Striking=1)
 		A.Comboz(Target)

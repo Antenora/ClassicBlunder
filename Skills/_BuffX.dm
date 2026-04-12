@@ -12340,7 +12340,6 @@ mob
 				if(src.StyleBuff)
 					if(src.BuffOn(B))
 						src.RemoveStyleBuff()
-						passive_handler.decreaseList(B.current_passives)
 						return
 					else
 						src.StyleBuff.Trigger(src, Override=1)
@@ -12541,7 +12540,9 @@ mob
 				OMsg(src, "[src] takes up the [src.StyleBuff]!")
 
 		RemoveStyleBuff()
-
+			if(src.StyleBuff.current_passives && src.StyleBuff.current_passives.len)
+				passive_handler.decreaseList(src.StyleBuff.current_passives)
+				src.StyleBuff.current_passives = null
 			src.Power_Multiplier-=(src.StyleBuff.PowerMult-1)
 			src.StrMultTotal-=(src.StyleBuff.StrMult-1)
 			src.EndMultTotal-=(src.StyleBuff.EndMult-1)
@@ -12593,7 +12594,7 @@ mob
 				if(src.isRace(MAKYO))
 					src.ActiveBuff.IconReplace=1
 					src.ActiveBuff.icon=src.ExpandBase
-					src.ActiveBuff.passives["EnergyLeak"] = max(6-AscensionsAcquired,1)
+					src.ActiveBuff.passives["EnergyLeak"] = max(2-(AscensionsAcquired*0.25),0.5)
 					src.ActiveBuff.passives["GiantForm"] = round(AscensionsAcquired/2)
 					src.ActiveBuff.passives["Godspeed"] = AscensionsAcquired
 					src.ActiveBuff.AutoAnger=0

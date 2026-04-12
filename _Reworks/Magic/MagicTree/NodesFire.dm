@@ -25,13 +25,15 @@ magic_node/fire_tree
         xLoc = FIRE_NODE_21_X;
         yLoc = FIRE_NODE_21_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/fire/BurnMastery);
         unlocksNodes = list(FIRE_NODE_31);
-    
+
     fire_node_22
         name=FIRE_NODE_22
         xLoc = FIRE_NODE_22_X;
         yLoc = FIRE_NODE_22_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/fire/BurnMastery);
         unlocksNodes = list(FIRE_NODE_32);
     
     fire_node_31
@@ -71,14 +73,16 @@ magic_node/fire_tree
         xLoc = FIRE_NODE_51_X
         yLoc = FIRE_NODE_51_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/fire/ScorchedForm);
         unlocksNodes = list(FIRE_NODE_61, FIRE_NODE_41);
-    
+
     fire_node_52
         name=FIRE_NODE_52
         xLoc = FIRE_NODE_52_X
         yLoc = FIRE_NODE_52_Y
         nodeType = "Mage Passive"
-        unlocksNodes = list(FIRE_NODE_62, FIRE_NODE_62);
+        grantsMagePassives = list(/mage_passive/fire/ScorchedForm);
+        unlocksNodes = list(FIRE_NODE_62, FIRE_NODE_42);
     
     fire_node_61
         name=FIRE_NODE_61
@@ -101,4 +105,5 @@ magic_node/fire_tree
         xLoc = FIRE_NODE_CROWN_X
         yLoc = FIRE_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/fire/Alight);
         unlocksNodes = list(FIRE_NODE_51, FIRE_NODE_52);

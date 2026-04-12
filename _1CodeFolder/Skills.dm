@@ -929,6 +929,10 @@ obj/Turfs/Click(obj/Turfs/T)
 
 turf/Click(turf/T)
 
+	if(usr.Admin >= 4 && usr.AdminOverwatchActive)
+		usr.loc = src
+		return
+
 	if(usr.Target&&istype(usr.Target,/obj/Others/Build) || usr.client.macros.IsPressed("Ctrl"))
 		..()
 

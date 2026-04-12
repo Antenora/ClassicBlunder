@@ -17,6 +17,3 @@ mob/proc/OMessage(View=10,Msg,Log)
 				E.client.outputToChat("[Msg]", ALL_NOT_IC_OUTPUT)
 		if(Log)
 			Log(E.ChatLog(),Log)
-	// Overwatch Listen Mode — copy to admins regardless of distance.
-	if(Msg)
-		AdminListenBroadcast(src, "[Msg]")

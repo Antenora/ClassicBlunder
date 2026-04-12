@@ -22,6 +22,6 @@ mob/proc/
         . += passive_handler.Get("ChillResist");
         . = clamp(., glob.CHILL_RESIST_MIN, glob.CHILL_RESIST_MAX);
     getMinChillResistValue()
-        . = (glob.CHILL_RESIST_MIN * glob.CHILL_RESIST_EPT)
+        . = FULL_CHILL_AMT - (glob.CHILL_RESIST_MIN * glob.CHILL_RESIST_EPT)
     getMaxChillResistValue()
         . = FULL_CHILL_AMT - (glob.CHILL_RESIST_MAX * glob.CHILL_RESIST_EPT)

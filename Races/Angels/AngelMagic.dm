@@ -40,7 +40,7 @@
 		if("[am.type]" == "[t]")
 			for(var/x in am.possible_skills)
 				if(am.possible_skills[x])
-					if(am.possible_skills[x].cooldown_remaining && !(am in src.possible_skills))
+					if(am.possible_skills[x].cooldown_remaining)
 						continue
 					am.possible_skills[x].Using = 0
 					am.possible_skills[x].Cooldown(modify, Time, p)

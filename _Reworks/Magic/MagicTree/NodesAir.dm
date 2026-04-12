@@ -30,12 +30,14 @@ magic_node/air_tree
         xLoc = AIR_NODE_SOUTH3_X
         yLoc = AIR_NODE_SOUTH3_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/air/ShockMastery);
         unlocksNodes = list(AIR_NODE_EAST3, AIR_NODE_WEST3, AIR_NODE_SOUTH2);
     air_node_east
         name=AIR_NODE_EAST
         xLoc = AIR_NODE_EAST_X
         yLoc = AIR_NODE_EAST_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/air/ShockMastery);
         unlocksNodes = list(AIR_NODE_CROWN, AIR_NODE_EAST2);
     air_node_east2
         name=AIR_NODE_EAST2
@@ -62,6 +64,7 @@ magic_node/air_tree
         xLoc = AIR_NODE_WEST2_X
         yLoc = AIR_NODE_WEST2_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/air/FleetFooted);
         unlocksNodes = list(AIR_NODE_WEST, AIR_NODE_WEST3, AIR_NODE_NORTH2, AIR_NODE_SOUTH2);
     air_node_west3
         name=AIR_NODE_WEST3
@@ -74,6 +77,7 @@ magic_node/air_tree
         xLoc = AIR_NODE_CROWN_X
         yLoc = AIR_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/air/Aloft);
         unlocksNodes = list(AIR_NODE_NORTH2, AIR_NODE_WEST3, AIR_NODE_EAST3);
     air_node_north2
         name=AIR_NODE_NORTH2
@@ -87,4 +91,5 @@ magic_node/air_tree
         xLoc = AIR_NODE_NORTH3_X
         yLoc = AIR_NODE_NORTH3_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/air/FleetFooted);
         unlocksNodes = list(AIR_NODE_EAST3, AIR_NODE_WEST3, AIR_NODE_NORTH2);

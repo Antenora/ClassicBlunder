@@ -5237,7 +5237,7 @@ mob
 				if(s.Class!=Z.ClassNeeded && (istype(Z.ClassNeeded, /list) && !(s.Class in Z.ClassNeeded)))
 					src << "You need a [istype(Z.ClassNeeded, /list) ? Z.ClassNeeded[1] : Z.ClassNeeded]-class weapon to use this technique."
 					return
-			if(!Z.StrOffense&&!Z.ForOffense && !Z.AdaptRate)
+			if(!Z.StrOffense&&!Z.ForOffense && !Z.AdaptRate && !Z.FixedDamage)
 				src << "[Z] is bugged and doesn't know how to calculate damage."
 				return
 			if(Z.HealthCost)
@@ -5253,6 +5253,10 @@ mob
 						return
 			if(Z.ManaCost && !src.HasDrainlessMana() && !Z.AllOutAttack)
 				var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				if(Z.SpellElement)
+					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
+					if(elem_mana_red)
+						drain *= (1 - elem_mana_red)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -5766,6 +5770,10 @@ mob
 				src.GainFatigue(Z.FatigueCost*CostMultiplier)
 			if(Z.ManaCost)
 				var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				if(Z.SpellElement)
+					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
+					if(elem_mana_red)
+						drain *= (1 - elem_mana_red)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -5929,6 +5937,8 @@ obj
 			ForDmg//Does it factor in force?
 			//Mark both for hybrid.
 			EndRes//Does endurance make it do less damage?
+			SpellElement//If set, this autohitter is a magic spell of that element. Used to gate magic-only damage hooks like Casting passives.
+			SpellManaCostPaid//Time Future mage passive: holds the actual post-reduction mana cost paid for this autohit cast. Captured at constructor time, consumed once on first land in Damage(m) to refund 50% to Owner. Zero when owner has no Future or the spell has no ManaCost.
 
 			Knockback//Number of KB tiles.
 			ChargeTech//Is this a charge move?  Does it carry the enemy with it?  This only affects KB, it doesn't trigger any other charging behavior.
@@ -6089,6 +6099,48 @@ obj
 				src.ForDmg=Z.TempForOff
 			else
 				src.ForDmg=Z.ForOffense
+			src.SpellElement=Z.SpellElement
+			// Time Future mage passive: 50% spell cost refund on land. Captures the
+			// would-be drain value at construction time so Damage(m) can refund half
+			// on first hit. We replicate the deduction formula from ClearTech (line
+			// 5771-5782) inline here because ClearTech runs AFTER the AH spawn loop,
+			// so by the time the actual LoseMana call fires the AH already exists
+			// and there is no clean back-channel to push the value onto it. Computed
+			// once per cast, only when Owner holds Future at cast time, and only on
+			// spells (Z.SpellElement set + Z.ManaCost > 0). The CostMultiplier block
+			// further down mirrors ClearTech 5722-5734 to handle equipment-based mana
+			// discounts (staff/sword/armor) — without it, mages with discount staffs
+			// would refund more mana than they actually paid. Element-agnostic, same
+			// mage-body convention as Sessions 26/28b. Limitation: only autohit spells
+			// are covered. Projectile spells go through a different (much messier) set
+			// of mana drain sites in _ProjectileX.dm and were left out of sub-slice
+			// (b.2) for the same reason — adding Future refund to projectiles would
+			// need to track 4-5 distinct deduction sites, deferred for later.
+			if(Z.ManaCost && Z.SpellElement && owner && owner.hasMagePassive(/mage_passive/time/Future))
+				var/computed_drain = owner.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (owner.passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				var/elem_mana_red = owner.getSpellElementManaCostReduction(Z.SpellElement)
+				if(elem_mana_red)
+					computed_drain *= (1 - elem_mana_red)
+				if(computed_drain <= 0)
+					computed_drain = 0.5
+				if(owner.TomeSpell(Z))
+					computed_drain *= (1 - (0.45 * owner.TomeSpell(Z)))
+				// CostMultiplier block — mirrors ClearTech equipment math at line 5722-5734.
+				var/cost_mult = 1
+				var/obj/Items/Sword/sord = owner.EquippedSword()
+				var/obj/Items/Enchantment/Staff/staf = owner.EquippedStaff()
+				var/obj/Items/Armor/wear = owner.EquippedArmor()
+				if(Z.NeedsSword && sord)
+					cost_mult /= owner.GetSwordDelay(sord)
+				if(Z.SpecialAttack && staf)
+					cost_mult /= owner.GetStaffDrain(staf)
+				if(owner.UsingBattleMage() && Z.NeedsSword)
+					cost_mult /= owner.GetStaffDrain(staf)
+				if(wear)
+					cost_mult /= owner.GetArmorDelay(wear)
+				else if(Z.SpecialAttack && sord && sord.MagicSword)
+					cost_mult *= owner.GetSwordDelay(sord)
+				src.SpellManaCostPaid = computed_drain * cost_mult
 			if(Z.TempEndDef && !Z.EndDefense)
 				src.EndRes=Z.TempEndDef
 			else
@@ -6101,6 +6153,22 @@ obj
 			SnaringOverlay=Z.SnaringOverlay
 			src.Executor = Z.Executor
 			src.Primordial = Z.Primordial
+			// Dark Shadowbringer mage passive: grants Primordial 1 baseline on every
+			// spell autohit the mage casts. Uses max() so it acts as a floor —
+			// spells whose source skill already specifies a higher Z.Primordial
+			// keep that higher value. Element-agnostic, matching the Session
+			// 25/26/27 mage-body passive convention. The "doubled if target +5
+			// potential" sub-clause from the doc is deferred — it fires at consume
+			// time (line ~6603, the if(Primordial) block) against a known target,
+			// and the doc grammar is ambiguous whether the doubling applies to the
+			// WHOLE Primordial value or only to Shadowbringer's contribution. Pair
+			// it with the design discussion for Iconoclast Power-steal in Session 28.
+			// Note: Primordial only exists on /obj/AutoHitter, not /obj/Skills/Projectile,
+			// so this hook only covers autohit-style Dark spells, not projectile spells.
+			// Arc/Wave/Cross offshoot autohitters do not propagate Primordial from
+			// their parent — that is a pre-existing limitation, not introduced here.
+			if(owner && owner.hasMagePassive(/mage_passive/dark/Shadowbringer))
+				src.Primordial = max(src.Primordial, 1)
 			src.RagingDemonAnimation = Z.RagingDemonAnimation
 			src.GoldScatter = Z.GoldScatter
 			src.AngelMagicCompatible = Z.AngelMagicCompatible
@@ -6314,6 +6382,18 @@ obj
 					if(m.passive_handler.Get("CounterSpell"))
 						OMsg(m, "[m]'s counterspell negates the spells damage!")
 						return
+				// Time Future mage passive: 50% spell cost refund on land. SpellManaCostPaid
+				// was captured at the AH constructor (see New() above) only when Owner held
+				// Future + Z.SpellElement + Z.ManaCost > 0 at cast time, so a non-zero value
+				// here means this is a Future mage's spell that has just survived all the
+				// "didn't land" early returns (friendly fire, duplicate target, counterspell).
+				// Refund half the actually-paid drain to the Owner's mana pool, then zero out
+				// the captured value so multi-target AOEs and multi-tick beams refund only
+				// once per cast. Direct HealMana matches the Mender refund pattern from
+				// Session 28b — no PotionCD divider, just ManaAmount += val + MaxMana clamp.
+				if(SpellManaCostPaid > 0 && Owner)
+					Owner.HealMana(SpellManaCostPaid * 0.5)
+					SpellManaCostPaid = 0
 				// grabNerf = Owner.Grab && ! ? 1 : 0
 				//world<<"GrabNerf: [grabNerf]"
 				var/FinalDmg
@@ -6341,6 +6421,17 @@ obj
 						atk = Owner.GetStr(StrDmg) + (Owner.GetFor(ForDmg))
 				else
 					Owner << "Your auto hit could not calculate the damage it just did!! Report this !!"
+				if(SpellElement)
+					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).
+					atk += Owner.getPowerfulCastingBonus()
+					atk += Owner.getForcefulCastingBonus()
+					atk += Owner.getAgileCastingBonus()
+					atk += Owner.getStalwartCastingBonus()
+					//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
+					//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
+					var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
+					if(elem_dmg_bonus)
+						atk *= (1 + elem_dmg_bonus)
 				if(m.passive_handler.Get("Field of Destruction")||m.passive_handler.Get("The Immovable Object"))
 					if(Owner.HasHybridStrike())
 						atk/=clamp(sqrt(1+Owner.GetFor(Owner.GetHybridStrike())/15),1,3)
@@ -6581,6 +6672,19 @@ obj
 						FinalDmg *= 1 + additonal
 				if(Primordial)
 					var/additonal = Primordial
+					// Dark Shadowbringer mage passive: the Primordial floor doubles from
+					// 1 to 2 when the target has at least 5 more Potential than the
+					// attacker. Doc reads "Primordial 1 (doubled if target +5 potential)"
+					// as the value 1 becoming 2 under condition — applied as a max() floor
+					// so it only takes effect when nothing else has already pushed
+					// Primordial higher (other sources like Z.Primordial from the source
+					// skill stay authoritative when they exceed 2). The +5 Potential
+					// gate uses the mob var declared at _1CodeFolder/_Variables.dm:189.
+					// Hook lives at consume time, not constructor (line 6128), because
+					// the constructor doesn't know the eventual target — the same AH can
+					// hit multiple targets and the doubling is per-target.
+					if(Owner && Owner.hasMagePassive(/mage_passive/dark/Shadowbringer) && m.Potential >= Owner.Potential + 5)
+						additonal = max(additonal, 2)
 					var/missingHealth = 100-m.Health
 					FinalDmg *= 1 + ((additonal * missingHealth)/100)
 				if(ApplySlow)
@@ -6619,7 +6723,15 @@ obj
 							else
 								m.HealMana(m.SagaLevel*5)
 						if(m.CanAttack())
-							m.Melee1(Damage,2,0,0,null,null,0,0,2,1)
+							var/counter_mult = Damage
+							// Time Present: a successful counter's damage is doubled.
+							// hasMagePassive is count-blind, so this is a flat 2x regardless of
+							// how many times Present was selected on the tree. This path covers
+							// the AH-hits-countering-target case; the melee-vs-melee counter
+							// path lives in _Reworks/Combat/Damage/Melee/counters.dm.
+							if(m.hasMagePassive(/mage_passive/time/Present))
+								counter_mult *= 2
+							m.Melee1(counter_mult,2,0,0,null,null,0,0,2,1)
 					if(m.HasFlow())
 						if(prob(getFlowCalc(Owner, m)))
 							if(!src.TurfStrike)
@@ -7255,6 +7367,8 @@ obj
 				src.Damage=AH.Damage
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
+				src.AdaptDmg=AH.AdaptDmg
+				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
 				src.ChargeTech=AH.ChargeTech
@@ -7325,6 +7439,8 @@ obj
 				src.Damage= AH.Damage / glob.AUTOHIT_WAVE_OFFSHOOT_DAMAGE_DIVISOR
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
+				src.AdaptDmg=AH.AdaptDmg
+				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
 				src.ChargeTech=AH.ChargeTech
@@ -7395,6 +7511,8 @@ obj
 				src.StepsDamage=AH.StepsDamage
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
+				src.AdaptDmg=AH.AdaptDmg
+				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
 				src.ChargeTech=AH.ChargeTech

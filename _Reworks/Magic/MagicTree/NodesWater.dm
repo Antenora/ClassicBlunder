@@ -40,6 +40,7 @@
         xLoc = WATER_NODE_31_X;
         yLoc = WATER_NODE_31_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/water/ChillMastery);
         unlocksNodes = list(WATER_NODE_41, WATER_NODE_21);
 
     water_node_32
@@ -47,6 +48,7 @@
         xLoc = WATER_NODE_32_X;
         yLoc = WATER_NODE_32_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/water/ChillMastery);
         unlocksNodes = list(WATER_NODE_42, WATER_NODE_22);
 
     water_node_41
@@ -68,6 +70,7 @@
         xLoc = WATER_NODE_CENTER_X;
         yLoc = WATER_NODE_CENTER_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/water/FluidTechnique);
         unlocksNodes = list(WATER_NODE_21, WATER_NODE_22, WATER_NODE_41, WATER_NODE_42);
 
     water_node_61
@@ -91,6 +94,7 @@
         xLoc = WATER_NODE_TOP_X;
         yLoc = WATER_NODE_TOP_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/water/FluidTechnique);
         unlocksNodes = list(WATER_NODE_61, WATER_NODE_62, WATER_NODE_CROWN);
 
     water_node_crown
@@ -98,4 +102,5 @@
         xLoc = WATER_NODE_CROWN_X;
         yLoc = WATER_NODE_CROWN_Y;
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/water/Awash);
         unlocksNodes = list(WATER_NODE_TOP);

@@ -1,5 +1,6 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle
     CyberSignature=1
+    NeedsSword=1
     Ittoryu_Style
         passives = list("Musoken" = 1)
         StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Fencing_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style",\

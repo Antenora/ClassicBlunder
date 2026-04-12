@@ -50,6 +50,19 @@ mob/Players
 	//	This will initiate movement whenever a client logs into a /mob/player.
 	Login()
 		..()
+		if(!ChrysalisActive)
+			Frozen = 0
+		// Re-apply chrysalis state on reconnect (timer loop and shell obj are lost on restart)
+		if(ChrysalisActive)
+			if(world.realtime >= ChrysalisExpiry)
+				exitChrysalis()
+			else
+				Frozen = 2
+				move_disabled = 1
+				var/obj/ChrysalisShell/shell = new(src.loc)
+				shell.occupant = src
+				spawn()
+					chrysalisTimerCheck()
 		spawn()
 			MovementLoop()
 

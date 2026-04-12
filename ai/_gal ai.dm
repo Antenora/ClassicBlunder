@@ -1760,6 +1760,24 @@ mob/Player/AI
 
 
 		for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/A in src)
+			//Drain procs for active Autonomous slotless buffs.
+			//These were previously skipped because the non-Autonomous loop above
+			//does `continue` for Autonomous types, leaving any Autonomous buff
+			//with a drain value silently dead (e.g. Lunar Wrath's ManaDrain=1).
+			if(A.SlotlessOn)
+				if(A.ManaDrain)
+					src.LoseMana(A.ManaDrain)
+				if(A.EnergyDrain)
+					src.LoseEnergy(A.EnergyDrain)
+				if(A.FatigueDrain)
+					src.GainFatigue(A.FatigueDrain)
+				if(A.HealthDrain)
+					if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
+						src.DoDamage(src, TrueDamage(A.HealthDrain))
+				if(A.WoundDrain)
+					src.WoundSelf(A.WoundDrain)
+				if(A.CapacityDrain)
+					src.LoseCapacity(A.CapacityDrain)
 			//Activations
 			if(!A.SlotlessOn)
 				if(A.ABuffNeeded)

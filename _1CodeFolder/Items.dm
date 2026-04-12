@@ -164,6 +164,11 @@ obj/Items
 		decreaseShatterCounter(breakVal, owner, attacker, type)
 
 	proc/decreaseShatterCounter(val, mob/owner, mob/attacker, type)
+		// Entropic: equipment interacting against the Entropic player breaks faster
+		if(type == "armor" && owner && owner.passive_handler.Get("Entropic"))
+			val *= (1 + owner.passive_handler.Get("Entropic"))
+		else if((type == "sword" || type == "staff") && owner && owner.passive_handler.Get("Entropic"))
+			val *= (1 + owner.passive_handler.Get("Entropic"))
 		if(ShatterCounter > 0)
 			ShatterCounter -= val
 			if(ShatterCounter == 100 || ShatterCounter == 25)
@@ -309,6 +314,9 @@ obj/Items
 								del ItemMade
 					if(ItemMade)
 						if(ItemMade.Grabbable)
+							if(!usr.CanPickupItem(ItemMade))
+								del ItemMade
+								return
 							ItemMade.loc=usr
 						else
 							ItemMade.loc=usr.loc
@@ -357,6 +365,9 @@ obj/Items
 				if(istype(src, /obj/Items/Enchantment/Tome))
 					ItemMade:init(1, usr)
 				if(ItemMade.Grabbable)
+					if(!usr.CanPickupItem(ItemMade))
+						del ItemMade
+						return
 					ItemMade.loc=usr
 				else
 					ItemMade.loc=usr.loc
@@ -399,7 +410,10 @@ obj/Items
 				var/icon/newIcon = new(icon)
 				newIcon+=Color
 				usr.IconClicked=0
-				var/obj/A=new type
+				var/obj/Items/A=new type
+				if(!usr.CanPickupItem(A))
+					del A
+					return
 				A.blend_mode = BLEND_OVERLAY
 				A.icon=newIcon
 				usr.contents+=A
@@ -630,6 +644,8 @@ obj
 
 		Click()
 			..()
+			if(usr.CheckInventoryFull())
+				return
 			var/obj/Items/Wearables/w = new wearable_path
 			var/Color=input(usr,"Choose color") as color|null
 			if(Color && Color != "#000000")
@@ -2243,6 +2259,8 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 
 		Steal
 		if(Looted)
+			if(!usr.CanPickupItem(src))
+				return
 			var/mob/Players/OldLoc=src.loc
 			OMsg(usr, "[usr] steals [src] from [OldLoc]!")
 			usr.contents+=src

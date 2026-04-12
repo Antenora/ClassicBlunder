@@ -22,7 +22,8 @@
 
 var/list/allSpellPassives=list();
 /proc/getAllSpellPassives()
-    for(var/type in typesof(/spell_passive))
+    for(var/type in subtypesof(/spell_passive))
+        if(!ispath(type)) continue
         var/spell_passive/sp = new type;
         allSpellPassives |= sp.passives;
         allSpellPassives |= sp.autohitOnlyPassives;
@@ -33,34 +34,39 @@ var/list/allSpellPassives=list();
 #define MULT_EXCEPTIONS list("DamageMult")//list of variables that are not added to the spell, and instead are multiplied
 /obj/Skills/proc/SpellSlotModification()
     if(!SpellSlot) return;
-    for(var/spell_passive/sp in SpellPassives)//this loops through the bundle of passives
+    // Reset all spell-passive-affected vars to their initial values before accumulating
+    for(var/p in allSpellPassives)
+        if(p in vars) vars["[p]"] = initial(vars["[p]"])
+    // Apply modifications from all enchanted passives — these now stack correctly
+    for(var/spell_passive/sp in SpellPassives)
         for(var/pass in sp.passives)
             if(pass in MULT_EXCEPTIONS)
-                vars["[pass]"] = initial(vars["[pass]"]) * sp.passives["[pass]"];
-            if(pass in SET_EXCEPTIONS)
-                vars["[pass]"] = sp.passives["[pass]"];
-            vars["[pass]"] = initial(vars["[pass]"]) + sp.passives["[pass]"];
+                vars["[pass]"] *= sp.passives["[pass]"]
+            else if(pass in SET_EXCEPTIONS)
+                vars["[pass]"] = sp.passives["[pass]"]
+            else
+                vars["[pass]"] += sp.passives["[pass]"]
         for(var/autoPass in sp.autohitOnlyPassives)
             if(autoPass in MULT_EXCEPTIONS)
-                vars["[autoPass]"] = initial(vars["[autoPass]"]) * sp.autohitOnlyPassives["[autoPass]"];
-            if(autoPass in SET_EXCEPTIONS)
-                vars["[autoPass]"] = sp.autohitOnlyPassives["[autoPass]"];
+                vars["[autoPass]"] *= sp.autohitOnlyPassives["[autoPass]"]
+            else if(autoPass in SET_EXCEPTIONS)
+                vars["[autoPass]"] = sp.autohitOnlyPassives["[autoPass]"]
             else
-                vars["[autoPass]"] = initial(vars["[autoPass]"]) + sp.autohitOnlyPassives["[autoPass]"];
+                vars["[autoPass]"] += sp.autohitOnlyPassives["[autoPass]"]
         for(var/projPass in sp.projectileOnlyPassives)
             if(projPass in MULT_EXCEPTIONS)
-                vars["[projPass]"] = initial(vars["[projPass]"]) * sp.projectileOnlyPassives["[projPass]"];
-            if(projPass in SET_EXCEPTIONS)
-                vars["[projPass]"] = sp.projectileOnlyPassives["[projPass]"];
+                vars["[projPass]"] *= sp.projectileOnlyPassives["[projPass]"]
+            else if(projPass in SET_EXCEPTIONS)
+                vars["[projPass]"] = sp.projectileOnlyPassives["[projPass]"]
             else
-                vars["[projPass]"] = initial(vars["[projPass]"]) + sp.projectileOnlyPassives["[projPass]"];
+                vars["[projPass]"] += sp.projectileOnlyPassives["[projPass]"]
         for(var/buffPass in sp.buffOnlyPassives)
             if(buffPass in MULT_EXCEPTIONS)
-                vars["[buffPass]"] = initial(vars["[buffPass]"]) * sp.projectileOnlyPassives["[buffPass]"];
-            if(buffPass in SET_EXCEPTIONS)
-                vars["[buffPass]"] = sp.projectileOnlyPassives["[buffPass]"];
+                vars["[buffPass]"] *= sp.buffOnlyPassives["[buffPass]"]
+            else if(buffPass in SET_EXCEPTIONS)
+                vars["[buffPass]"] = sp.buffOnlyPassives["[buffPass]"]
             else
-                vars["[buffPass]"] = initial(vars["[buffPass]"]) + sp.projectileOnlyPassives["[buffPass]"];
+                vars["[buffPass]"] += sp.buffOnlyPassives["[buffPass]"]
         
 
     

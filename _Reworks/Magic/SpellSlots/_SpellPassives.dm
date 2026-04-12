@@ -59,7 +59,7 @@
     return 1;
 
 /mob/proc/enchantSpellWithPassive(obj/Skills/slot, spell_passive/sp)
-    if(!isValidEnchantment()) return 0;
+    if(!isValidEnchantment(slot, sp)) return 0;
     slot.SpellPassives.Add(sp);
     sp.enchantedIn=slot;
     src << "You've enchanted [slot] with [sp], increasing its magickal power!";

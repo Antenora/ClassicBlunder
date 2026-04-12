@@ -18,8 +18,30 @@
 /mob/proc/newDoDamage(mob/defender, val, unarmed, sword, secondhit, thirdhit, trueMult, spiritAtk, destructive, autohit)
 	if(inStasis() || defender.inStasis())
 		return 0;
+	if(defender.AdminOverwatchActive)
+		return 0;
 	if(defender == src)
 		DEBUGMSG("Defender was src, and so newDoDamage stopped early")
+		// Dark Survivor mage passive: self-damage refunds 20% of the incoming value
+		// as mana and energy. Raw incoming val is used (pre-mitigation) so the refund
+		// matches the doc literal "refunds 20% value". Direct assignment + cap clamp
+		// is intentional over HealMana/HealEnergy to skip the potion-heal divider chain.
+		if(src.hasMagePassive(/mage_passive/dark/Survivor))
+			var/refund = val * 0.20
+			if(refund > 0)
+				src.ManaAmount += refund
+				src.MaxMana()
+				src.Energy += refund
+				src.MaxEnergy()
+		// Dark Shadowbringer mage passive: self-damage grants LifeSteal 10 for 10
+		// seconds. Stacks if further self-damage lands within the window — each
+		// event schedules its own decrease, so two hits 5s apart give 20 LifeSteal
+		// for the first 5s, 10 for the next 5s, then back to baseline.
+		if(src.hasMagePassive(/mage_passive/dark/Shadowbringer))
+			src.passive_handler.Increase("LifeSteal", 10)
+			spawn(100)
+				if(src && src.passive_handler)
+					src.passive_handler.Decrease("LifeSteal", 10)
 		DamageSelf(val)
 		return 0;
 	else if(defender == null)
@@ -115,6 +137,34 @@
 	if(lifeFiberRending)
 		if(defender.KamuiType == "Senketsu" || defender.Secret == "Vampire" || defender.GetSlotless("Life Fiber Hybrid"))
 			trueMult += lifeFiberRending
+	// Space Relativity mage passive (attacker side): the mage gains 0.5
+	// effective PureDamage for every point of PureReduction the defender carries.
+	// Reads HasPureReduction() so the bonus tracks the canonical defender value
+	// (passive_handler PureReduction plus Mythical, Determination, Honor, Majin,
+	// Tarot, etc). Pairs with the defender-side Relativity hook in the purered
+	// section below. PURE_MODIFIER pre-calc scaling matches the base puredmg path.
+	if(src.hasMagePassive(/mage_passive/space/Relativity))
+		var/relativity_pd = defender.HasPureReduction() * 0.5
+		if(relativity_pd > 0)
+			if(!glob.PURE_MOD_POST_CALC)
+				relativity_pd *= glob.PURE_MODIFIER
+			trueMult += relativity_pd
+	// Dark Iconoclast mage passive (attacker side): the mage gains 1 effective
+	// PureDamage for every 5% Health gap between attacker and defender. Health is
+	// already a 0-100 scale value (see _BinaryChecks.dm:1119 missingHealth =
+	// 100-Health), so abs(src.Health - defender.Health) IS the HP% gap directly.
+	// Absolute value is intentional — the doc literal "per 5% HP diff" doesn't
+	// specify direction, so the mage benefits regardless of who is ahead, which
+	// fits Iconoclast's "break the work of others" theme either as press-advantage
+	// or comeback. Floor via round() matches the per-N-stacks idiom used at
+	// _Move.dm:116 and the Past per-10-Cripple block above. PURE_MODIFIER pre-calc
+	// scaling matches the base puredmg path.
+	if(src.hasMagePassive(/mage_passive/dark/Iconoclast))
+		var/icon_pd = round(abs(src.Health - defender.Health) / 5)
+		if(icon_pd > 0)
+			if(!glob.PURE_MOD_POST_CALC)
+				icon_pd *= glob.PURE_MODIFIER
+			trueMult += icon_pd
 	#if DEBUG_DAMAGE
 	log2text("trueMult", "After Puredmg", "damageDebugs.txt", "[src.ckey]/[src.name]")
 	log2text("trueMult", trueMult,"damageDebugs.txt", "[src.ckey]/[src.name]")
@@ -125,6 +175,30 @@
 	if(passive_handler.Get("Aspect of Death"))
 		purered*=0.75
 	trueMult -= purered
+	// Time Past mage passive (defender-side follow-up to Cripple-on-hit): per 10
+	// Cripple stacks on the attacker, the Past mage gains 1 effective PureReduction
+	// against this hit. Pairs with the Cripple-on-hit accumulation at the end of
+	// newDoDamage — the mage builds Cripple on attackers via hits taken, then those
+	// stacks translate to damage reduction on subsequent incoming hits from the same
+	// attacker. Scaled by PURE_MODIFIER when pre-calc, matching the base purered path.
+	if(defender.hasMagePassive(/mage_passive/time/Past))
+		var/past_pr = round(src.Crippled / 10)
+		if(past_pr > 0)
+			if(!glob.PURE_MOD_POST_CALC)
+				past_pr *= glob.PURE_MODIFIER
+			trueMult -= past_pr
+	// Space Relativity mage passive (defender side): the mage gains 0.5
+	// effective PureReduction for every point of PureDamage the attacker brings.
+	// Reads HasPureDamage() so the bonus tracks the same value the puredmg block
+	// above used (passive_handler PureDamage plus Rage, CursedSheath, MangLevel,
+	// Tarot, etc). Pairs with the attacker-side Relativity hook in the puredmg
+	// section above. PURE_MODIFIER pre-calc scaling matches the base purered path.
+	if(defender.hasMagePassive(/mage_passive/space/Relativity))
+		var/relativity_pr = src.HasPureDamage() * 0.5
+		if(relativity_pr > 0)
+			if(!glob.PURE_MOD_POST_CALC)
+				relativity_pr *= glob.PURE_MODIFIER
+			trueMult -= relativity_pr
 	// Unbroken for Makyos
 	var/unbrokenVal = defender.passive_handler.Get("Unbroken")
 	if(unbrokenVal)
@@ -244,6 +318,53 @@
 	log2text("Damage", "After TrueMult", "damageDebugs.txt", "[src.ckey]/[src.name]")
 	log2text("Damage", val,"damageDebugs.txt", "[src.ckey]/[src.name]")
 	#endif
+	// Alignment-conditional damage resistance (EvilResist vs Evil attackers, GoodResist vs Good)
+	if(src.IsEvil() && defender.passive_handler.Get("EvilResist"))
+		val *= defender.getEvilResistValue()
+	if(src.IsGood() && defender.passive_handler.Get("GoodResist"))
+		val *= defender.getGoodResistValue()
+	// Time Past mage passive: 25% chance to inflict 1 Cripple on the attacker when
+	// the mage takes a hit. Fires only on non-zero post-mitigation damage so fully
+	// blocked hits do not trigger. The doc line "per 10 Cripple on target →
+	// PureReduction 1" feeds off this — the Past mage accumulates Cripples on their
+	// attackers, which then translates to their own reduction against those targets.
+	if(val > 0 && defender.hasMagePassive(/mage_passive/time/Past) && prob(25))
+		src.AddCrippling(1, defender)
+	// Dark Iconoclast mage passive: on a successful hit, the attacker gains 10%
+	// of the defender's current Power as a temporary 30s buff. Doc literal "gain
+	// 10% of target's current Power" reads as pure gain (defender unaffected),
+	// not transfer — Iconoclast's theme is "break the work of others", not
+	// drain. Per-attacker cooldown of 5s (50 deciseconds) prevents multi-hit
+	// projectile spam from siphoning a target instantly: a fast caster can
+	// realistically land 6 steals over the 30s buff window for ~60% of target
+	// Power at peak, which scales with target strength as intended (weak
+	// against weak targets, strong against strong ones). The stolen amount is
+	// captured at hit time in a local var so the paired spawn-decrement removes
+	// the EXACT same value regardless of any concurrent Power changes — pattern
+	// matches the Session 26 Shadowbringer LifeSteal increase/decrease pair.
+	// Self-damage never reaches this hook because the defender == src branch
+	// returns at line 44 before any of this code runs. Power is the BP/PowerLevel
+	// mob var declared at _1CodeFolder/_Variables.dm:4.
+	if(val > 0 && src.hasMagePassive(/mage_passive/dark/Iconoclast) && world.time >= src.IconoclastNextSteal)
+		var/stolen = round(defender.Power * 0.10)
+		if(stolen > 0)
+			src.Power += stolen
+			src.IconoclastNextSteal = world.time + 50
+			spawn(300)
+				if(src)
+					src.Power -= stolen
+	// Vortex: percentage chance to teleport defender away on hit
+	// Range scales 1:1 with chance (5 Vortex = 5% chance, 5 tiles)
+	if(val > 0)
+		var/vortex_val = defender.passive_handler.Get("Vortex")
+		if(vortex_val && prob(vortex_val))
+			var/dir = pick(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
+			for(var/i = 1 to vortex_val)
+				var/turf/nextT = get_step(defender, dir)
+				if(nextT && !nextT.density)
+					defender.loc = nextT
+				else
+					break
 	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit at the end of newdodamage");
 		#if DEBUG_DAMAGE

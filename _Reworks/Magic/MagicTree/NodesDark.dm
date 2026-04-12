@@ -23,6 +23,7 @@ magic_node/dark_tree
         xLoc = DARK_NODE_11_X
         yLoc = DARK_NODE_11_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/dark/Shadowbringer)
         unlocksNodes = list(DARK_NODE_21);
     dark_node_12
         name=DARK_NODE_12
@@ -49,6 +50,7 @@ magic_node/dark_tree
         xLoc = DARK_NODE_23_X
         yLoc = DARK_NODE_23_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/dark/Shadowbringer)
         unlocksNodes = list(DARK_NODE_22, DARK_NODE_24);
     dark_node_24
         name=DARK_NODE_24
@@ -68,6 +70,7 @@ magic_node/dark_tree
         xLoc = DARK_NODE_41_X
         yLoc = DARK_NODE_41_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/dark/Iconoclast)
         unlocksNodes = list(DARK_NODE_51, DARK_NODE_21);
     dark_node_42
         name=DARK_NODE_42
@@ -81,6 +84,7 @@ magic_node/dark_tree
         xLoc = DARK_NODE_51_X
         yLoc = DARK_NODE_51_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/dark/Iconoclast)
         unlocksNodes = list(DARK_NODE_CROWN, DARK_NODE_41);
     dark_node_52
         name=DARK_NODE_52
@@ -94,4 +98,5 @@ magic_node/dark_tree
         xLoc = DARK_NODE_CROWN_X
         yLoc = DARK_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/dark/Survivor)
         unlocksNodes = list(DARK_NODE_51, DARK_NODE_52);

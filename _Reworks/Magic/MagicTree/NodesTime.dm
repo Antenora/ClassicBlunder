@@ -32,6 +32,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_12_X;
         yLoc = TIME_NODE_12_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/time/Past)
         unlocksNodes = list(TIME_NODE_11, TIME_NODE_33);
     
     time_node_13
@@ -47,6 +48,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_14_X;
         yLoc = TIME_NODE_14_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/time/Past)
         unlocksNodes = list(TIME_NODE_13, TIME_NODE_22);
     
     time_node_21
@@ -68,6 +70,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_31_X
         yLoc = TIME_NODE_31_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/time/Present)
         unlocksNodes = list(TIME_NODE_21, TIME_NODE_32);
     
     time_node_32
@@ -83,6 +86,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_33_X
         yLoc = TIME_NODE_33_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/time/Present)
         unlocksNodes = list(TIME_NODE_12, TIME_NODE_CROWN, TIME_NODE_34);
     
     time_node_34
@@ -98,4 +102,5 @@ magic_node/time_tree
         xLoc = TIME_NODE_CROWN_X
         yLoc = TIME_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/time/Future)
         unlocksNodes = list(TIME_NODE_32, TIME_NODE_33);

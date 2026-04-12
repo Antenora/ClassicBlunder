@@ -21,6 +21,7 @@ mob/var
 	tmp/mob/AdminTrackTarget    // Overwatch: mob currently being auto-followed
 	tmp/AdminFullStealth=0      // Overwatch: hard stealth flag (alpha 0, untargetable)
 	tmp/AdminListenMode=0       // Overwatch: receive all chat broadcasts globally
+	tmp/AdminOverwatchActive=0  // Overwatch: protection mode — immortal, no density, click-teleport
 	list/AdminWatchList         // Overwatch: persistent list of player keys to alert on login/logout
 	tmp/list/AdminSnapshotData  // Overwatch: saved snapshot for compare
 	tmp/list/CombatLog          // Overwatch: per-mob combat event ring buffer (max 30)
@@ -561,7 +562,10 @@ mob/proc/RecordCombatEvent(text)
 		src.CombatLog.Cut(1, 2)
 
 // Listen Mode: send a copy of a chat line to every admin with listen on.
-// Hooked into OMessage and MSay in _Reworks/Chat_Rework/helper_procs.dm.
+// Hooked into: MSay (helper_procs.dm), sayProc/OOC/Whisper/Think
+// (Chat_Rework/communication_rework.dm), SkinPM2 + AdminHelp
+// (AdminHelp_System.dm). OMessage (combat narration) is deliberately NOT
+// hooked — combat spam drowns real chat.
 proc/AdminListenBroadcast(mob/source, text)
 	if(!source) return
 	for(var/mob/Players/A in admins)
@@ -1090,7 +1094,7 @@ mob/Admin2/verb
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Jump to target")
-				var/atom/M = input(usr, "Jump to whom/what?", "Teleport") as mob|obj in world
+				var/atom/M = AdminPickTarget("Jump to whom/what?", "Jump To", 1)
 				if(!M) return
 				usr.PrevX = usr.x
 				usr.PrevY = usr.y
@@ -1098,7 +1102,7 @@ mob/Admin2/verb
 				usr.loc = M.loc
 				Log("Admin", "[ExtractInfo(usr)] teleported to [M].")
 			if("Summon target to me")
-				var/atom/movable/M = input(usr, "Summon whom/what?", "Teleport") as mob|obj in world
+				var/atom/movable/M = AdminPickTarget("Summon whom/what?", "Summon", 1)
 				if(!M) return
 				if(istype(M, /mob))
 					var/mob/Mm = M
@@ -1108,7 +1112,7 @@ mob/Admin2/verb
 				M.loc = usr.loc
 				Log("Admin", "[ExtractInfo(usr)] summoned [ExtractInfo(M)].")
 			if("Send target back (Unteleport)")
-				var/mob/M = input(usr, "Return whom/what?", "Teleport") as mob|obj in world
+				var/mob/M = AdminPickTarget("Return whom?", "Send Back", 0)
 				if(!M) return
 				if(!M.PrevX)
 					usr << "This mob/obj has not been teleported or summoned, and thus has no previous XYZ data."
@@ -1122,7 +1126,7 @@ mob/Admin2/verb
 				usr << "Returned [M] to previous coordinates."
 				M << "You have been returned to your previous coordinates by admins."
 			if("Teleport target to XYZ")
-				var/mob/M = input(usr, "Teleport whom?", "Teleport") as mob in world
+				var/mob/M = AdminPickTarget("Teleport whom?", "Teleport to XYZ", 0)
 				if(!M) return
 				var/x = input(usr, "x", "[M]") as num|null
 				if(isnull(x)) return
@@ -1833,11 +1837,18 @@ mob/Admin4/verb
 			"Inspection",
 			"Watch & Listen",
 			"Combat Log",
+			"Give Resources",
+			"Give All Skills",
 			"Restore all defaults",
 			"Cancel"
 		)
 		var/category = input(usr, "Overwatch category:", "Overwatch") as null|anything in categories
 		if(!category || category == "Cancel") return
+		if(!usr.AdminOverwatchActive && category != "Restore all defaults")
+			usr.AdminOverwatchActive = 1
+			usr.density = 0
+			usr.NoDeath = 1
+			usr << "<font color=green><b>Overwatch:</b> Protection ON — immortal, no-clip, click-teleport."
 		switch(category)
 			if("Stealth & Movement")
 				var/list/actions = list(
@@ -1999,6 +2010,63 @@ mob/Admin4/verb
 						M.CombatLog = list()
 						usr << "<font color=green><b>Overwatch:</b> Cleared combat log of [M]."
 
+			if("Give Resources")
+				var/mob/M = input(usr, "Give resources to whom?", "Overwatch — Give") as null|mob in players
+				if(!M) return
+				var/list/resources = list(
+					"RPP (Spendable)",
+					"Money (Zenni)",
+					"Potential",
+					"Power Level",
+					"Health",
+					"Energy (Current)",
+					"Energy (Max)",
+					"Mana (Current)",
+					"Mana (Max)",
+					"Saga Level",
+					"Cancel"
+				)
+				var/res = input(usr, "What resource to give to [M]?", "Overwatch — Give") as null|anything in resources
+				if(!res || res == "Cancel") return
+				var/amount = input(usr, "How much [res]?", "Overwatch — Give") as null|num
+				if(!amount) return
+				switch(res)
+					if("RPP (Spendable)")
+						M.RPPSpendable += amount
+						M.RPPCurrent += amount
+					if("Money (Zenni)")
+						M.GiveMoney(amount)
+					if("Potential")
+						M.Potential += amount
+					if("Power Level")
+						M.Power += amount
+					if("Health")
+						M.Health += amount
+					if("Energy (Current)")
+						M.Energy += amount
+					if("Energy (Max)")
+						M.EnergyMax += amount
+					if("Mana (Current)")
+						M.ManaAmount += amount
+					if("Mana (Max)")
+						M.ManaMax += amount
+					if("Saga Level")
+						M.SagaLevel += amount
+				usr << "<font color=green><b>Overwatch:</b> Gave [amount] [res] to [M]."
+
+			if("Give All Skills")
+				var/mob/M = input(usr, "Give all skills to whom?", "Overwatch — Give All Skills") as null|mob in players
+				if(!M) return
+				var/count = 0
+				for(var/T in subtypesof(/obj/Skills))
+					if(!ispath(T)) continue
+					if(locate(T) in M) continue
+					var/obj/Skills/S = new T
+					if(S)
+						M.AddSkill(S)
+						count++
+				usr << "<font color=green><b>Overwatch:</b> Gave [count] skills to [M]."
+
 			if("Restore all defaults")
 				if(usr.AdminFullStealth)
 					usr.AdminFullStealthDisable()
@@ -2006,9 +2074,13 @@ mob/Admin4/verb
 					usr.AdminTrackTarget = null
 				if(usr.AdminListenMode)
 					usr.AdminListenMode = 0
+				if(usr.AdminOverwatchActive)
+					usr.AdminOverwatchActive = 0
+					usr.density = initial(usr.density)
+					usr.NoDeath = 0
 				usr.client.perspective = MOB_PERSPECTIVE
 				usr.client.eye = usr
-				usr << "<font color=green><b>Overwatch:</b> All defaults restored. Stealth/track/listen off, camera on self. Watchlist preserved."
+				usr << "<font color=green><b>Overwatch:</b> All defaults restored. Stealth/track/listen/protection off, camera on self. Watchlist preserved."
 
 	Wipe()
 		set category="Admin"
@@ -2077,6 +2149,37 @@ mob/Admin4/verb
 				if(Confirm=="Yes")
 					glob.CustomCommons.Remove(Choice)
 					Log("Admin", "[ExtractInfo(usr)] made [Choice] rare again!")
+	Give_Rare_Race(mob/Players/P in players)
+		set category="Admin"
+		set name="Give Rare Race"
+		if(!P || !P.ckey)
+			usr << "<font color=red>Invalid target."
+			return
+		var/list/rares = list()
+		for(var/race/r in races)
+			if(!r) continue
+			if(r.removed) continue
+			if(!r.locked) continue
+			rares += r.name
+		if(!rares.len)
+			usr << "<font color=red>No rare races are currently marked as locked."
+			return
+		var/Choice = input(usr, "Which rare race do you want to give [P]?", "Give Rare Race") as null|anything in rares
+		if(!Choice) return
+		var/race/selected
+		for(var/race/r in races)
+			if(r.name == Choice)
+				selected = r
+				break
+		if(!selected)
+			usr << "<font color=red>Could not resolve race [Choice]."
+			return
+		var/Confirm = alert(usr, "Change [P]'s race to [Choice] and unlock it for their key?", "Give Rare Race", "Yes", "No")
+		if(Confirm != "Yes") return
+		glob.LockedRaces[P.ckey] = Choice
+		P.setRace(selected.type, FALSE)
+		P << "<font color=yellow>An admin has changed your race to [Choice]."
+		Log("Admin", "[ExtractInfo(usr)] changed [ExtractInfo(P)]'s race to [Choice].")
 mob/Admin3/verb
 
 	SetGlobalDamage()
@@ -2657,3 +2760,97 @@ proc/DetermineVarType(variable)
 	if(istype(variable,/datum)) return "Type (or datum)"
 	if(isnull(variable)) return "(Null)"
 	return "(Unknown)"
+
+// Old-style right-click admin teleport verbs
+// These appear on right-click menus for mobs and objects in view
+
+atom/verb/Admin_Jump_To()
+	set src in oview()
+	set name = "Admin: Jump To"
+	set category = null
+	var/mob/Players/admin = usr
+	if(!istype(admin)) return
+	if(!admin.Admin) return
+	admin.PrevX = admin.x
+	admin.PrevY = admin.y
+	admin.PrevZ = admin.z
+	admin.loc = src.loc
+	admin << "Jumped to [src]."
+	Log("Admin", "[ExtractInfo(admin)] jumped to [src].")
+
+mob/verb/Admin_Summon_Here()
+	set src in oview()
+	set name = "Admin: Summon"
+	set category = null
+	var/mob/Players/admin = usr
+	if(!istype(admin)) return
+	if(!admin.Admin) return
+	var/mob/target = src
+	target.PrevX = target.x
+	target.PrevY = target.y
+	target.PrevZ = target.z
+	target.loc = admin.loc
+	admin << "Summoned [target] to you."
+	Log("Admin", "[ExtractInfo(admin)] summoned [ExtractInfo(target)].")
+
+mob/verb/Admin_Send_Back()
+	set src in oview()
+	set name = "Admin: Send Back"
+	set category = null
+	var/mob/Players/admin = usr
+	if(!istype(admin)) return
+	if(!admin.Admin) return
+	var/mob/target = src
+	if(!target.PrevX)
+		admin << "[target] has no previous location stored."
+		return
+	target.x = target.PrevX
+	target.y = target.PrevY
+	target.z = target.PrevZ
+	target.PrevX = null
+	target.PrevY = null
+	target.PrevZ = null
+	admin << "Sent [target] back to their previous location."
+	target << "You have been returned to your previous location."
+	Log("Admin", "[ExtractInfo(admin)] sent [ExtractInfo(target)] back.")
+
+mob/verb/Admin_Send_To_Spawn()
+	set src in oview()
+	set name = "Admin: Send to Spawn"
+	set category = null
+	var/mob/Players/admin = usr
+	if(!istype(admin)) return
+	if(!admin.Admin) return
+	var/mob/target = src
+	MoveToSpawn(target)
+	admin << "Sent [target] to spawn."
+	Log("Admin", "[ExtractInfo(admin)] sent [ExtractInfo(target)] to spawn.")
+
+// Admin teleport category picker — builds a filtered target list
+// include_objects: if 1, shows the Objects category option
+mob/proc/AdminPickTarget(var/prompt, var/title, var/include_objects = 0)
+	var/list/categories = list("Players", "NPCs")
+	if(include_objects)
+		categories += "Objects"
+	categories += "Cancel"
+	var/category = input(src, "Category:", title) as null|anything in categories
+	if(!category || category == "Cancel") return null
+	var/list/targets = list()
+	switch(category)
+		if("Players")
+			for(var/mob/Players/P in world)
+				if(P.client)
+					targets += P
+		if("NPCs")
+			for(var/mob/M in world)
+				if(!M.client && M.name)
+					targets += M
+		if("Objects")
+			for(var/obj/O in world)
+				if(isturf(O.loc) && O.name)
+					targets += O
+	if(!targets.len)
+		src << "No targets found in that category."
+		return null
+	var/atom/target = input(src, prompt, title) as null|anything in targets
+	return target

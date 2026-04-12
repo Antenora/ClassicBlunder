@@ -40,7 +40,14 @@
 				#if DEBUG_DAMAGE
 				log2text("Counter damage", "[CounterDamage(.)]", "damageDebugs.txt", "[ckey]/[name] :: enemy: [enemy.ckey]/[enemy.name]")
 				#endif
-				enemy.Melee1(CounterDamage(.), 2, 0,0, null, null, 0,0,2,1,0,1)
+				var/counter_mult = CounterDamage(.)
+				// Time Present: a successful counter's damage is doubled.
+				// hasMagePassive is count-blind, so this is a flat 2x regardless of how many
+				// times Present was selected on the tree. Applied AFTER CounterDamage's clamp
+				// so the doubled value can exceed the 0.25..5 range (doc spec permits this).
+				if(enemy.hasMagePassive(/mage_passive/time/Present))
+					counter_mult *= 2
+				enemy.Melee1(counter_mult, 2, 0,0, null, null, 0,0,2,1,0,1)
 
 
 

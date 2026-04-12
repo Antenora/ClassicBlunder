@@ -35,4 +35,3 @@ race
 			user.secretDatum.nextTierUp = 999
 			if(eldType == "Reflected")
 				user.AddSkill(new /obj/Skills/Utility/Offer_Pact)
-				user.AddSkill(new /obj/Skills/Utility/Revoke_Pact)

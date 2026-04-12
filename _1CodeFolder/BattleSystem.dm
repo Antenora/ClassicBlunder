@@ -589,6 +589,11 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 			else
 				src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
 
+	// Reflected Eldritch Chrysalis — intercepts death if body remains
+	if(src.hasSecret("Eldritch (Reflected)") && !src.ChrysalisActive && !NoRemains)
+		src.enterChrysalis()
+		return
+
 	if(hasDeathEvolution())
 		var/obj/Skills/Buffs/SlotlessBuffs/Death_Evolution/de = locate(/obj/Skills/Buffs/SlotlessBuffs/Death_Evolution, src);
 		if(locate(/obj/Skills/Buffs/SlotlessBuffs/X_Evolution, src))
@@ -2010,17 +2015,18 @@ mob/proc/Grab()
 						del(buh)
 						return
 				if(buh.Pickable==1)
-					src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 					if(buh.Stackable)
-						var/found=0
-						for(var/obj/Items/i in usr)
+						for(var/obj/Items/i in src)
 							if(i.type == P.type)
 								i.TotalStack+=buh.TotalStack
 								i.suffix="[Commas(i.TotalStack)]"
+								src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 								del(P)
 								return
-						if(!found)
-							buh.suffix="[Commas(buh:TotalStack)]"
+						buh.suffix="[Commas(buh:TotalStack)]"
+					if(src.CheckInventoryFull())
+						return
+					src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 					P.Move(src)
 					if(istype(P, /obj/Items/Enchantment/PhilosopherStone/Magicite))
 						var/obj/Items/Enchantment/PhilosopherStone/Magicite/Prime

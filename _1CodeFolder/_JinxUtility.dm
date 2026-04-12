@@ -888,6 +888,19 @@ mob
 				val*=PrideDrain
 				if(src.Health>=85&&!passive_handler.Get("PowerStressed"))
 					val*=0
+			// Light Mender mage passive: 50% of energy spent is converted to mana on
+			// every spend. Hook fires HERE — after all the reduction multipliers
+			// (KiControlMastery, PowerUpPercent, PotionCD, PrideDrain) so the refund
+			// tracks what ACTUALLY gets paid, not the raw caller request. Otherwise
+			// a mage with KiControlMastery would refund more mana than they actually
+			// paid in energy, which is a free-resource exploit. Element-agnostic
+			// (mage-body passive, not Light-only) matching the Session 25/26/27/28
+			// mage-body convention. HealMana is safe — no PotionCD divider, just
+			// ManaAmount += val with MaxMana() clamp at _JinxUtility.dm:1014. The
+			// `val > 0` guard prevents the PrideDrain val*=0 path or any other
+			// zero-out from triggering a no-op HealMana call.
+			if(val > 0 && src.hasMagePassive(/mage_passive/light/Mender))
+				src.HealMana(val * 0.5)
 			src.Energy-=val
 			if(src.Energy<0)
 				src.Energy=0
@@ -901,6 +914,16 @@ mob
 		GainFatigue(var/val)
 			if(src.FusionPowered)
 				return
+			// Space Linearity mage passive: incoming Fatigue gain is reduced to 50%.
+			// Doc literal: "Fatigue gain / Capacity loss at 50% rate (each additional
+			// selection: 33%, 25%, ...)". Currently bound to flat 0.5 because
+			// hasMagePassive is count-blind — same single-tier limitation as Session
+			// 25/26 hooks. Halving the input val before the rest of the pipeline is
+			// mathematically equivalent to halving at the end (every downstream
+			// mutator is multiplicative), but reads cleaner as "Linearity halves the
+			// fatigue you would have taken".
+			if(src.hasMagePassive(/mage_passive/space/Linearity))
+				val *= 0.5
 			val/=1+src.GetKiControlMastery()
 			val*=src.EnergyExpenditure//*src.Power_Multiplier
 			if(src.GetPowerUpRatio()>1 && !src.GatesActive)
@@ -937,13 +960,20 @@ mob
 			if(src.ManaAmount<=0)
 				src.ManaAmount=0
 		LoseCapacity(var/val)
+			// Space Linearity mage passive: Capacity loss is reduced to 50%. Pairs
+			// with the GainFatigue hook above — both halves of the doc line "Fatigue
+			// gain / Capacity loss at 50% rate" are now wired. Single-tier flat 0.5
+			// for the same reason as the Fatigue hook. Halving before the
+			// GetManaCapMult divider is order-equivalent to halving after.
+			if(src.hasMagePassive(/mage_passive/space/Linearity))
+				val *= 0.5
 			val/=src.GetManaCapMult()
 			if(src.PotionCD)
 				val*=1.25
 			src.TotalCapacity+=val
 			if(src.TotalCapacity>=100)
 				src.TotalCapacity=100
-		HealHealth(var/val)
+		HealHealth(var/val, var/_isEcho=0)
 			if(src.GetEffectiveShearForStackingEffects())
 				if(src.HasShearImmunity())
 					val=val
@@ -982,8 +1012,30 @@ mob
 			if(src.CelestialAscension=="Demon" && src.transActive>=5)
 				if(src.transUnlocked<6)
 					val = 0
+			if(val > 0 && src.passive_handler.Get("AngelicInfusion"))
+				val += val * (src.passive_handler.Get("AngelicInfusion") * 0.2)
 			src.Health+=val
 			src.MaxHealth()
+			// Light Warden: delayed heal retrigger. Each selection of the Warden mage
+			// passive schedules three echo heals at 50% / 25% / 12.5% of the final
+			// post-processed val. The echoes are fresh HealHealth calls gated on
+			// _isEcho so the retrigger chain terminates after one pass — no recursion
+			// on the echo side. Seed is post-Shear / post-PotionCD / post-Staked /
+			// post-Awakening / post-Vaizard val so zero-heal paths correctly produce
+			// zero echoes, and shear-reduced heals echo off the reduced amount. Delays
+			// (1s / 2s / 3s) are a design choice — the doc does not specify a window,
+			// but short delays keep the echo legible as a payoff on the original heal.
+			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
+				var/echo_seed = val
+				spawn(10)
+					if(src)
+						src.HealHealth(echo_seed * 0.5, 1)
+				spawn(20)
+					if(src)
+						src.HealHealth(echo_seed * 0.25, 1)
+				spawn(30)
+					if(src)
+						src.HealHealth(echo_seed * 0.125, 1)
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
 				val/=src.GetPowerUpRatio()
@@ -2435,11 +2487,10 @@ mob
 		AngerDiv(var/num)
 			src.AngerMax=1+((src.AngerMax-1)/num)
 		LunarWrathAnger()
-			if(src.ManaAmount>=50)
-				if(src.passive_handler.Get("LunarWrath")&&!src.passive_handler.Get("Unrelenting Wrath"))
-					src.AngerMax=1+(src.ManaAmount/100)
-			else if(src.passive_handler.Get("Unrelenting Wrath"))
+			if(src.passive_handler.Get("Unrelenting Wrath"))
 				src.AngerMax=5
+			else if(src.ManaAmount>=50 && src.passive_handler.Get("LunarWrath"))
+				src.AngerMax=1+(src.ManaAmount/100)
 			else
 				src.AngerMax=1
 		WeirdAngerStuff() //additive anger that won't be affected by mult

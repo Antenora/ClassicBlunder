@@ -55,7 +55,7 @@ obj
 						Duration=5
 						Instinct=1
 						Warp=2
-						WarpAway=2
+						WarpAway=null
 						Grapple=1
 						Cooldown=150 + (10 * asc)
 						CooldownStatic=1

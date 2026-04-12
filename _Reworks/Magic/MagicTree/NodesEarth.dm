@@ -23,6 +23,7 @@ magic_node/earth_tree
         xLoc = EARTH_NODE_12_X
         yLoc = EARTH_NODE_12_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/earth/ShatterMastery);
         unlocksNodes = list(EARTH_NODE_22);
     earth_node_13
         name=EARTH_NODE_13
@@ -43,6 +44,7 @@ magic_node/earth_tree
         xLoc = EARTH_NODE_22_X
         yLoc = EARTH_NODE_22_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/earth/ShatterMastery);
         unlocksNodes = list(EARTH_NODE_21, EARTH_NODE_32, EARTH_NODE_12);
     earth_node_23
         name=EARTH_NODE_23
@@ -63,6 +65,7 @@ magic_node/earth_tree
         xLoc = EARTH_NODE_32_X
         yLoc = EARTH_NODE_32_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/earth/FirmGuard);
         unlocksNodes = list(EARTH_NODE_42, EARTH_NODE_22, EARTH_NODE_31);
     earth_node_33
         name=EARTH_NODE_33
@@ -77,12 +80,14 @@ magic_node/earth_tree
         xLoc = EARTH_NODE_CROWN_X
         yLoc = EARTH_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/earth/Aerde);
         unlocksNodes = list(EARTH_NODE_42, EARTH_NODE_43, EARTH_NODE_31);
     earth_node_42
         name=EARTH_NODE_42
         xLoc = EARTH_NODE_42_X
         yLoc = EARTH_NODE_42_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/earth/FirmGuard);
         unlocksNodes = list(EARTH_NODE_CROWN, EARTH_NODE_32);
     earth_node_43
         name=EARTH_NODE_43

@@ -141,7 +141,19 @@ mob/proc/implodeDebuff(n, type)
 				vis_contents += b
 				Stun(src, 4)
 			//	passive_handler.Set("Shellshocked", 1)
+				Health -= Health * (n/glob.IMPLODE_DIVISOR)
 				Slow = 0
+			if("Shatter")
+				var/obj/Effects/Bang/b = new()
+				b.Target = src
+				vis_contents += b
+				Health -= Health * (n/glob.IMPLODE_DIVISOR)
+				Shatter = 0
+				var/def_penalty = DefMultTotal * 0.1
+				DefMultTotal -= def_penalty
+				spawn(100)
+					if(src)
+						src.DefMultTotal += def_penalty
 
 
 		last_implode = world.time

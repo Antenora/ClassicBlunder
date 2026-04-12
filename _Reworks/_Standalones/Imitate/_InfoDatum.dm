@@ -1,4 +1,4 @@
-#define DO_NOT_SAVE list( "vars", "tag","type","parent_type",)
+#define DO_NOT_SAVE list( "vars", "tag","type","parent_type","profileBase")
 #define PROFILE_SAVING_PATH "Saves/Profiles/"
 characterInformation/var/presetName = ""
 characterInformation/var/profileName = ""
@@ -59,7 +59,7 @@ characterInformation/proc/loadProfile(mob/p, file_name, infoDump)
     Emote_Color = information.profileEmoteColor
     if(isOld)
         appearance = information.oldAppearance
-    else  
+    else if(information.profileBase)
         icon = information.profileBase
     Profile = information.profileProfile
     var/ogName = name

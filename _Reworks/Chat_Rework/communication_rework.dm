@@ -88,6 +88,9 @@ client/verb/OOC(T as text)
 				P << output("[OOCHeader][P.Controlz(usr)][finalMessage]", "output")
 			P << output("[OOCHeader][P.Controlz(usr)][finalMessage]", "oocchat")
 
+	// Overwatch Listen Mode — copy OOC to admins regardless of pref/distance.
+	AdminListenBroadcast(usr, "OOC: [keyjack]: [html_encode(T)]")
+
 client/verb/Say(T as text)
 	set category="Roleplay"
 	if(usr.CutsceneMode) return
@@ -152,6 +155,9 @@ client/proc/sayProc(T, mode = null)
 	for(var/obj/Items/Tech/Security_Camera/F in view(11,usr)) //This for loop detects Security Cameras around those that use the say verb.
 		F.broadcastToListeners(broadcastMessage)
 
+	// Overwatch Listen Mode — copy say/LOOC/yell to admins regardless of distance.
+	AdminListenBroadcast(usr, "[usr.name] [sayNoun] [html_encode(T)]")
+
 	usr.Say_Spark()
 	usr.CheckAFK()
 
@@ -202,6 +208,9 @@ client/verb/Whisper(T as text)
 						if(m in transmitTo) continue
 						m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] whispers...", IC_OUTPUT)
 
+	// Overwatch Listen Mode — copy whispers to admins regardless of distance / EnhancedHearing.
+	AdminListenBroadcast(usr, "[usr.name] whispers: [html_encode(T)]")
+
 	usr.CheckAFK()
 
 
@@ -230,6 +239,9 @@ client/verb/Think(T as text)
 				m?.client.outputToChat("[header][m.Controlz(usr)] thinks: [message]", IC_OUTPUT)
 			Log(m.ChatLog(),"<font color=green>[usr.name]([usr.key]) THOUGHT: [message]")
 			Log(m.sanitizedChatLog(),"<font color=green>[usr.name] THOUGHT: [message]")
+
+	// Overwatch Listen Mode — copy thoughts to admins regardless of telepathy/distance.
+	AdminListenBroadcast(usr, "[usr.name] thinks: [html_encode(T)]")
 
 	usr.CheckAFK()
 /*

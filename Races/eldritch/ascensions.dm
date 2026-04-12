@@ -40,6 +40,9 @@ ascension
 						owner.race.ascensions[3].choices.Remove("Writhing");
 
 				owner.race.ascensions[3].choices.Remove(owner.race.ascensions[1].choiceSelected)//remove subasc from future pick
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/Refresh)
+					owner.AddSkill(new /obj/Skills/Utility/Eldritch_Domain)
 				..()
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
@@ -61,6 +64,9 @@ ascension
 				
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(3, owner)
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/Bared_Souls)
+					owner.AddSkill(new /obj/Skills/Utility/Altered_Nature)
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
@@ -87,6 +93,9 @@ ascension
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(4, owner)
 				//there aren't future picks, but if there were, the remove code would have to go here
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/Dream_Realization)
+					owner.AddSkill(new /obj/Skills/Utility/Glimpse_Inside)
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
@@ -121,6 +130,9 @@ ascension
 				..();
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(5, owner)
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/Observe)
+					owner.AddSkill(new /obj/Skills/Utility/With_You_In_Darkness)
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
@@ -155,8 +167,11 @@ ascension
 				..();
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(6, owner)
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/Reclamation)
+					owner.AddSkill(new /obj/Skills/Utility/Shared_Dreaming)
 				..()
-		six 
+		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			strength = 0.25
 			endurance = 0.75
@@ -168,4 +183,7 @@ ascension
 			on_ascension_message = "...unfortunately. ᚾᛁᛖᛊ   ᚾᛜ   ᛖᚣⲔᛊ   ᚾᚺᚣᚾ   ᚣ   ᚹᚱᛜᛒᚳᛊᛖ   ᚪᛜᚱ   ᛊꓦᛊᚱᛉᛜᚢᛊ   ᛊᚳᛢᛊ ᛫"
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(7, owner)
+				if(owner.hasSecret("Eldritch (Reflected)"))
+					owner.AddSkill(new /obj/Skills/Utility/True_Reflection)
+					owner.AddSkill(new /obj/Skills/Utility/Eldritch_Covenant)
 				..()

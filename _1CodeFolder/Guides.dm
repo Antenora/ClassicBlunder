@@ -146,7 +146,8 @@ Click on the guide(s) pertaining to your curiousity.<br><br>
 <a href=?src=\ref[usr];action=Ranks>Ranks</a><br><hr>
 <a href=?src=\ref[usr];action=Guide>Guide</a><br><hr>
 <a href=?src=\ref[usr];action=Credits>Credits</a><br><hr>
-<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr><br>"})
+<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr>
+<a href=?src=\ref[usr];action=magic;page=main>Magic Guide</a><br><hr><br>"})
 		if("Story")
 			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Story]<br><br>")
 		if("Rules")
@@ -163,7 +164,7 @@ Click on the guide(s) pertaining to your curiousity.<br><br>
 			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[TransTiers]<br><br>")
 
 mob/Topic(A,B[])
-	if(B["action"]!="edit"&&B["action"]!="magic")
+	if(B["action"]!="edit")
 		switch(B["action"])
 			if("Index")
 				usr.Index("Index")
@@ -181,6 +182,9 @@ mob/Topic(A,B[])
 				usr.Index("Credits")
 			if("TransformationTiers")
 				usr.Index("TransformationTiers")
+			if("magic")
+				if(B["page"])
+					usr.MagicGuide(B["page"])
 	.=..()
 
 

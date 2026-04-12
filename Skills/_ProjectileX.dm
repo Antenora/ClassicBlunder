@@ -1734,7 +1734,7 @@ obj
 				Distance=15
 				AccMult=2
 				DamageMult=0.5
-				EnergyCost=15
+				EnergyCost=8
 				Cooldown=120
 				Explode=1
 				Homing=1
@@ -5418,6 +5418,11 @@ obj
 						src.KillDelay=Z.BeamTimeUsed
 					if(Z.DistanceVariance)
 						src.Distance=round(Z.Distance*GoCrand(0.8,1.2))
+					// SpellRange passive: flat tile bonus to range when projectile is a spell
+					if(Z.SpellElement && src.Owner && src.Owner.passive_handler.Get("SpellRange"))
+						var/spellRangeBonus = src.Owner.getSpellRangeBonus()
+						src.DistanceMax += spellRangeBonus
+						src.Distance += spellRangeBonus
 					src.Radius=Z.Radius
 					if(Z.TempRadius)
 						src.Radius=Z.TempRadius
@@ -5453,6 +5458,7 @@ obj
 					src.StrRate=Z.StrRate
 					src.ForRate=Z.ForRate
 					src.EndRate=Z.EndRate
+					src.SpellElement=Z.SpellElement
 					src.MaxMultiHit=Z.MultiHit
 					src.MultiHit=Z.MultiHit
 					if(Z.TempHits)
@@ -5945,6 +5951,17 @@ obj
 							atk += force
 						if(str)
 							atk += str
+						if(SpellElement)
+							//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the projectile is a spell (SpellElement is set).
+							atk += Owner.getPowerfulCastingBonus()
+							atk += Owner.getForcefulCastingBonus()
+							atk += Owner.getAgileCastingBonus()
+							atk += Owner.getStalwartCastingBonus()
+							//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
+							//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
+							var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
+							if(elem_dmg_bonus)
+								atk *= (1 + elem_dmg_bonus)
 						if(atk<1)
 							atk=1
 						if(glob.DMG_CALC_2)

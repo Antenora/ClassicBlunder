@@ -2237,6 +2237,85 @@ window "rpane"
 		saved-params = "is-checked"
 		text = "Verbs"
 		command = ".winset \"rpanewindow.left=infowindow\""
+	elem "butt_inv"
+		type = BUTTON
+		pos = 176,0
+		size = 90x20
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Calibri"
+		text-color = #ffff80
+		background-color = #000000
+		saved-params = "is-checked"
+		text = "Inventory"
+		command = ".Open_Inventory"
+
+window "InventoryWindow"
+	elem "InventoryWindow"
+		type = MAIN
+		pos = 300,100
+		size = 320x560
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = #0a0a15
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+		title = "Inventory"
+		statusbar = false
+		can-minimize = false
+		can-resize = false
+	elem "InvPage1Btn"
+		type = BUTTON
+		pos = 5,5
+		size = 90x25
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Calibri"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #2a2a4a
+		saved-params = "is-checked"
+		text = "Page 1"
+		command = ".InvPage \"1\""
+	elem "InvPage2Btn"
+		type = BUTTON
+		pos = 100,5
+		size = 90x25
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Calibri"
+		font-size = 9
+		text-color = #ffffff
+		background-color = #1c1c1c
+		saved-params = "is-checked"
+		text = "Page 2"
+		command = ".InvPage \"2\""
+	elem "InvCount"
+		type = LABEL
+		pos = 200,5
+		size = 110x25
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		font-family = "Calibri"
+		font-size = 9
+		text-color = #cccccc
+		background-color = #0a0a15
+		saved-params = ""
+		text = "0 / 60"
+	elem "InvGrid"
+		type = GRID
+		pos = 5,35
+		size = 308x515
+		anchor1 = 1,6
+		anchor2 = 98,98
+		font-size = 9
+		text-color = #ffffff
+		background-color = #1c1c1c
+		border = line
+		saved-params = ""
+		cells = 2x0
+		show-lines = horizontal
+		highlight-color = #2a2a4a
 
 window "infowindow"
 	elem "infowindow"

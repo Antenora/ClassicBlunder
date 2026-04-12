@@ -40,6 +40,6 @@ race
 				passives = list("SpiritSword" = 0.25, "TechniqueMastery" = 1, "SpiritFlow" = 0.25)
 			for(var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r in user)
 				r.RegenerateLimbs=1
-		//	user.passive_handler.increaseList(passives)
+			user.passive_handler.increaseList(passives)
 			for(var/s in skills)
 				user.AddSkill(new s)

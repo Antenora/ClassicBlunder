@@ -32,6 +32,7 @@ magic_node/light_tree
         xLoc = LIGHT_NODE_13_X;
         yLoc = LIGHT_NODE_13_Y;
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/light/Warden);
         unlocksNodes = list(LIGHT_NODE_23, LIGHT_NODE_33, LIGHT_NODE_43);
     
     light_node_21
@@ -54,6 +55,7 @@ magic_node/light_tree
         xLoc = LIGHT_NODE_23_X
         yLoc = LIGHT_NODE_23_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/light/Warden);
         unlocksNodes = list(LIGHT_NODE_43, LIGHT_NODE_13, LIGHT_NODE_22);
     
     light_node_31
@@ -76,6 +78,7 @@ magic_node/light_tree
         xLoc = LIGHT_NODE_33_X
         yLoc = LIGHT_NODE_33_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/light/Seeker);
         unlocksNodes = list(LIGHT_NODE_43, LIGHT_NODE_13, LIGHT_NODE_32);
 
     light_node_crown
@@ -83,6 +86,7 @@ magic_node/light_tree
         xLoc = LIGHT_NODE_CROWN_X
         yLoc = LIGHT_NODE_CROWN_Y
         nodeType = "Pinnacle"
+        grantsMagePassives = list(/mage_passive/light/Mender);
         unlocksNodes = list(LIGHT_NODE_42);
     
     light_node_42
@@ -98,4 +102,5 @@ magic_node/light_tree
         xLoc = LIGHT_NODE_43_X
         yLoc = LIGHT_NODE_43_Y
         nodeType = "Mage Passive"
+        grantsMagePassives = list(/mage_passive/light/Seeker);
         unlocksNodes = list(LIGHT_NODE_23, LIGHT_NODE_33, LIGHT_NODE_42, LIGHT_NODE_13);

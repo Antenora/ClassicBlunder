@@ -27,6 +27,8 @@ mob/verb/SkinPM2()
 		if(target)
 			Log("AdminPM","(Admin PM from [src.key] to [target.key]): [UserInput]")
 			src<<"<font color=#00FF99><b>(Admin PM)</b></font>- To  <a href=?src=\ref[target];action=MasterControl;do=PM2;>[target.key]</a href> :[UserInput]"
+			// Overwatch Listen Mode — copy Admin PM to admins regardless.
+			AdminListenBroadcast(src, "(Admin PM) [src.key] to [target.key]: [html_encode(UserInput)]")
 
 
 
@@ -96,6 +98,8 @@ mob/verb/AdminHelp(var/txt as message)
 			if(M.client.getPref("AdminAlerts"))
 				winset(M, "mainwindow", "flash=-1")
 	Log("AdminPM","(Admin Help from [usr.key]): [txt]")
+	// Overwatch Listen Mode — copy PHELP broadcasts to admins with listen on.
+	AdminListenBroadcast(usr, "(PLAYER HELP) [usr.key]: [txt]")
 	usr<<"Your message:\n\n[txt]\n\nhas been sent to the admin!"
 	if(glob.discordAdminHelpWebhookURL)
 		world.Export("[glob.discordAdminHelpWebhookURL]", list("content" = "**[usr.key]'s AHelp:** ```"+txt+"```"), 0, null, "POST")
