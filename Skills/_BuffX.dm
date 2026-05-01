@@ -4114,31 +4114,38 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		Symbiote_Evolution
+			Slotless=1
+			NeedsHealth=75
+			NeedsVary=1
+			TooMuchHealth=99
 			EnergyMult=1.5
 			RegenMult=1.25
 			RecovMult=1.25
-			passives = list("Flow" = 2)
+			passives = list("Flow" = 2, "Unstoppable" = 1, "Harden" = 1, "LifeSteal" = 1.5, "Godspeed" = 1, "SweepingStrike" = 1)
 			BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Regeneration")
-			ActiveMessage="forces their symbiote out!"
-			OffMessage="restrains their symbiotic companion..."
-			verb/Total_Symbiosis()
-				set category="Skills"
-				src.Trigger(usr)
-				if(usr.BuffOn(src))
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Symbiote_Infection/s in usr)
-						s.NeedsHealth=101
-						s.NeedsVary=0
-						s.TooMuchHealth=0
-						s.VaizardShatter=0
-						s.Curse=0
-				else
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Symbiote_Infection/s in usr)
-						s.NeedsHealth=25
-						s.NeedsVary=1
-						s.TooMuchHealth=75
-						s.VaizardShatter=1
-						if(usr.AscensionsAcquired>=2)
-							s.Curse=1
+			ActiveMessage="is coated by a frenzied symbiotic organism!!"
+			IconLock='RaginPart.dmi'
+			IconApart=1
+			IconTint=list(0.15,0.11,0.3, 0.15,0.11,0.3, 0.15,0.11,0.3, 0,0,0)
+			DarkChange=1
+			HitSpark='Slash - Hellfire.dmi'
+			HitX=-32
+			HitY=-32
+			HitSize=1
+			HitTurn=1
+			adjust(mob/p)
+				if(altered) return
+				var/asc = p.AscensionsAcquired
+				passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 1.5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Flow" = 2 + (0.5 * asc), "Gum Gum" = asc / 2)
+				if(asc>=1)
+					if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
+						p.AddSkill(new/obj/Skills/AutoHit/Symbiote_Tendril_Wave)
+					if(!locate(/obj/Skills/Queue/Symbiote_Hammer, p.Queues))
+						p.AddSkill(new/obj/Skills/Queue/Symbiote_Hammer)
+			Trigger(mob/User, Override = FALSE)
+				if(!User.BuffOn(src))
+					adjust(User)
+				..() 
 
 	SlotlessBuffs
 		Slotless=1
