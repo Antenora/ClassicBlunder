@@ -69,7 +69,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 	ChargeWaveBlend=2
 
 	adjust(mob/p)
-		DamageMult = 7 + p.SagaLevel
+		DamageMult = 10 + p.SagaLevel
 
 	OnHeldRelease(mob/p, var/benefit)
 		adjust(p)
@@ -179,12 +179,14 @@ obj/Skills/AutoHit/Dark_Reconquista
 		HE.Target = target
 		target.vis_contents += HE
 
+// Automatic followup AutoHit triggered when Triumph's sweet spot is hit.
 /obj/Skills/AutoHit/Reconquista_Triumph_Strike
 	Area = "Circle"
+	AdaptRate = 1
 	StrOffense = 1
-	DamageMult = 4
+	DamageMult = 2.5
 	ComboMaster = 1
-	Rounds = 5
+	Rounds = 10
 	ChargeTech = 1
 	ChargeFlight = 1
 	ChargeTime = 0.75
@@ -193,6 +195,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 	Stunner = 1
 	Launcher = 1
 	Cooldown = 1
+	Size = 1
 	EnergyCost = 5
 	Instinct = 1
 	Icon='DarkPortal.dmi'

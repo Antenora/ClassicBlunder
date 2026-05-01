@@ -139,13 +139,13 @@ mob/proc/Auraz(var/Z)
 
 		else if(passive_handler.Get("BurningShot"))
 			if(transActive&&src.isRace(CELESTIAL))
-				//race.transformations[transActive].apply_visuals(src,1,0,0)
+				race.transformations[transActive].apply_visuals(src,1,0,0)
 				src.overlays+=flameaura
 			else
 				src.overlays+=flameaura
 
-		//else if(transActive)
-		//	race.transformations[transActive].apply_visuals(src,1,0,0)
+		else if(transActive)
+			race.transformations[transActive].apply_visuals(src,1,0,0)
 		else
 			for(var/obj/Skills/Power_Control/M in src.contents)
 				if(src.AuraLockedUnder==1)

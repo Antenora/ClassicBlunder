@@ -1736,7 +1736,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 		FadeIntoShadows
 			IconTint=list(0,0,0, 0,0,0, 0,0,0, 0,0,0)
-			passives = list("Nightmare" = 1, "PULock" = 1, "Skimming"=2)
+			passives = list("Nightmare" = 1, "PULock" = 1, "Skimming"=3, "Godspeed"=4)
 			AllowedPower=0.5
 		//	DarkChange=1
 			Invisible=20

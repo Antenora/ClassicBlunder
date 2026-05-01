@@ -445,10 +445,12 @@ mob/Players/Stat()
 	if(Target.BioArmor > 10 && Target.BioArmor < 99) return "??"
 	if(Target.BioArmor < 10) return "?"
 
+/mob/var/SpawnDisplay;
+
 /mob/proc/outputVitals()
 	var/vaiHealth = hasClearSight()&&Target.VaizardHealth ? " ([Target.VaizardHealth])" : ""
 	var/healthDisplay = "[Target.Health][vaiHealth]%"
-	var/SpawnDisplay="[Target.SpawnArea]"
+	SpawnDisplay="[Target.SpawnArea]"
 	if(src.Target.passive_handler.Get("Obfuscated Origin"))
 		SpawnDisplay = "<font color='red'><b>Unknowable</b></font color>"
 	if(Target.BioArmor) healthDisplay = getBioArmorDisplay()

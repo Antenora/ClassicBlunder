@@ -22,6 +22,8 @@
 /obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 	// Override in individual skills to execute the charged attack.
 
+/client/var/tmp/SweetSpotHeldSkillDebug = FALSE
+
 // Charge state
 
 /mob
@@ -320,7 +322,7 @@
 	held_skill_last_release = world.time
 	if(sweet_spot_hit)
 		for(var/mob/m in admins)
-			if(m && m.client && m.Admin)
+			if(m && m.client && m.Admin && m.client.SweetSpotHeldSkillDebug)
 				m << "<font color='#66ff99'>(SweetSpot Debug) [src] hit [Z.name]'s sweet spot at [round(hold_ticks / 10, 0.1)]s.</font>"
 	Z.OnHeldRelease(src, benefit, sweet_spot_hit)
 
@@ -362,6 +364,13 @@
 	set instant = 1
 	if(usr.held_skill)
 		usr.ReleaseHeldSkill()
+
+/mob/Admin2/verb/Toggle_SweetSpot_Held_Skill_Debug()
+	set category = "Admin"
+	set name = "Toggle SweetSpot Held Skill Debug"
+	if(!client) return
+	client.SweetSpotHeldSkillDebug = !client.SweetSpotHeldSkillDebug
+	src << "<font color='#888888'>SweetSpot held skill debug: [client.SweetSpotHeldSkillDebug ? "ON" : "OFF"]</font>"
 
 // Exampleskill
 
