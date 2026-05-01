@@ -10037,7 +10037,7 @@ NEW VARIABLES
 				Autonomous=1
 				Slotless=1
 				NeedsHealth=75
-				NeedsVary=1
+				NeedsVary=0
 				TooMuchHealth=99
 				EnergyMult=1.5
 				RegenMult=1.25
