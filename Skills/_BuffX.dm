@@ -10033,40 +10033,7 @@ NEW VARIABLES
 			UnrestrictedBuff=1
 			AllOutAttack=1
 
-			Symbiote_Evolution
-				Autonomous=1
-				Slotless=1
-				NeedsHealth=75
-				NeedsVary=0
-				TooMuchHealth=99
-				EnergyMult=1.5
-				RegenMult=1.25
-				RecovMult=1.25
-				passives = list("Flow" = 2, "Unstoppable" = 1, "Harden" = 1, "LifeSteal" = 1.5, "Godspeed" = 1, "SweepingStrike" = 1)
-				BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Regeneration")
-				ActiveMessage="is coated by a frenzied symbiotic organism!!"
-				IconLock='RaginPart.dmi'
-				IconApart=1
-				IconTint=list(0.15,0.11,0.3, 0.15,0.11,0.3, 0.15,0.11,0.3, 0,0,0)
-				DarkChange=1
-				HitSpark='Slash - Hellfire.dmi'
-				HitX=-32
-				HitY=-32
-				HitSize=1
-				HitTurn=1
-				adjust(mob/p)
-					if(altered) return
-					var/asc = p.AscensionsAcquired
-					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 1.5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Flow" = 2 + (0.5 * asc), "Gum Gum" = asc / 2)
-					if(asc>=1)
-						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
-							p.AddSkill(new/obj/Skills/AutoHit/Symbiote_Tendril_Wave)
-						if(!locate(/obj/Skills/Queue/Symbiote_Hammer, p.Queues))
-							p.AddSkill(new/obj/Skills/Queue/Symbiote_Hammer)
-				Trigger(mob/User, Override = FALSE)
-					if(!User.BuffOn(src))
-						adjust(User)
-					..()
+
 
 //General (?)
 			Two
@@ -11341,15 +11308,16 @@ NEW VARIABLES
 				OffMessage="calms the rage of the eons..."
 				Cooldown=10800
 				//doubles god ki values
-			Symbiote_Infection
-				NeedsHealth=25
-				NeedsVary=1
-				TooMuchHealth=75
-				VaizardHealth=2
-				VaizardShatter=1
-				Unstoppable=1
-				Possessive=1
-				TextColor=rgb(75, 0, 85)
+
+			Symbiote_Evolution
+				NeedsHealth=75
+				TooMuchHealth=99
+				EnergyMult=1.5
+				RegenMult=1.25
+				RecovMult=1.25
+				passives = list("Flow" = 2, "Unstoppable" = 1, "Harden" = 1, "LifeSteal" = 1.5, "Godspeed" = 1, "SweepingStrike" = 1)
+				BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Regeneration")
+				ActiveMessage="is coated by a frenzied symbiotic organism!!"
 				IconLock='RaginPart.dmi'
 				IconApart=1
 				IconTint=list(0.15,0.11,0.3, 0.15,0.11,0.3, 0.15,0.11,0.3, 0,0,0)
@@ -11359,20 +11327,15 @@ NEW VARIABLES
 				HitY=-32
 				HitSize=1
 				HitTurn=1
-				Cooldown=-1
-				ActiveMessage="is coated by a frenzied symbiotic organism!!"
 				adjust(mob/p)
 					if(altered) return
 					var/asc = p.AscensionsAcquired
-					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 1.5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1)
-					VaizardHealth = 1.5 + p.GetEnd() + (p.TotalInjury/25) + (asc)
-					// this was 17.5% guys lol
+					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 1.5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Flow" = 2 + (0.5 * asc), "Gum Gum" = asc / 2)
 					if(asc>=1)
 						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
 							p.AddSkill(new/obj/Skills/AutoHit/Symbiote_Tendril_Wave)
 						if(!locate(/obj/Skills/Queue/Symbiote_Hammer, p.Queues))
 							p.AddSkill(new/obj/Skills/Queue/Symbiote_Hammer)
-
 				Trigger(mob/User, Override = FALSE)
 					if(!User.BuffOn(src))
 						adjust(User)
