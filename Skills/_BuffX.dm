@@ -1439,13 +1439,13 @@ NEW VARIABLES
 			ForMult=1.1
 			EnergyThreshold = 1
 			passives = list("HellRisen" = 0.25, "Hellpower" = 0.1, "Flicker" = 1)
-			ActiveMessage="unleashes the herectical power of the Demon clan!"
-			OffMessage="discards the Demon clan's abominal power..."
+			ActiveMessage="unleashes the heretical power of the Demon clan!"
+			OffMessage="discards the Demon clan's dreadful power..."
 			Cooldown=-1
 			KenWave=2
 			KenWaveIcon="LightningRed.dmi"
 			adjust(mob/p)
-				passives = list("HellRisen" = 0.25 * (p.AscensionsAcquired-1), "Godspeed" = p.AscensionsAcquired/2, "AfterImages" = 2, "Hellpower" = p.AscensionsAcquired/6, "Flicker" = round(p.AscensionsAcquired/2, 1), "Enrage" = p.AscensionsAcquired,  "EnergyLeak" = 1)
+				passives = list("HellRisen" = 0.25 * (p.AscensionsAcquired-1), "Godspeed" = p.AscensionsAcquired/2, "CoolerAfterImages" = 3, "Hellpower" = p.AscensionsAcquired/6, "Flicker" = round(p.AscensionsAcquired/2, 1), "Enrage" = p.AscensionsAcquired,  "EnergyLeak" = 1)
 				StrMult = 1.15 + (p.Potential/250)
 				ForMult = 1.1 + (p.Potential/250)
 				EndMult = 1.1 + (p.Potential/250)
@@ -1818,7 +1818,7 @@ NEW VARIABLES
 			SignatureTechnique=3
 			EnergyMult=2
 			UnrestrictedBuff=1
-			passives = list("Erosion" = 0.5, "SoulFire" = 1, "SoulFire" = 1, "WeaponBreaker" = 2, "DeathField" = 5, "VoidField" = 5)
+			passives = list("Erosion" = 0.5, "SoulFire" = 1, "WeaponBreaker" = 2, "DeathField" = 5, "VoidField" = 5)
 			SpdMult = 1.25
 			DefMult = 1.25
 			ActiveMessage="gently erodes everything..."
