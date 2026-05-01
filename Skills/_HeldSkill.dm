@@ -19,7 +19,7 @@
 	var/HeldVerbName     = null   // Optional override for macro detection;
 	                              // defaults to Z.name if null
 
-/obj/Skills/proc/OnHeldRelease(mob/p, var/benefit)
+/obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 	// Override in individual skills to execute the charged attack.
 
 // Charge state
@@ -91,6 +91,12 @@
 		src << "<font color='red'>[Z.name] is on cooldown.</font>"
 		return
 
+	if(Z.NeedsSword)
+		var/obj/Items/Sword/s = EquippedSword()
+		if(!s && !HasBladeFisting() && !UsingBattleMage())
+			src << "<font color='red'>You need a sword equipped to use [Z.name]!</font>"
+			return
+
 	// Close the re-entry window immediately so a second verb fire
 	// during the slow winget/winset calls below can't spawn a second charge.
 	held_skill        = Z
@@ -110,11 +116,7 @@
 	// Find which key the player has bound this skill to
 	var/key = findHeldSkillKey(C, Z)
 	if(!key)
-		if(held_charge_overlay_ref)
-			overlays -= held_charge_overlay_ref
-			held_charge_overlay_ref = null
-		held_skill        = null
-		held_charge_start = 0
+		ClearHeldChargeState()
 		src << "<font color='red'>Bind [Z.name] to a key first.</font>"
 		return
 
@@ -320,7 +322,7 @@
 		for(var/mob/m in admins)
 			if(m && m.client && m.Admin)
 				m << "<font color='#66ff99'>(SweetSpot Debug) [src] hit [Z.name]'s sweet spot at [round(hold_ticks / 10, 0.1)]s.</font>"
-	Z.OnHeldRelease(src, benefit)
+	Z.OnHeldRelease(src, benefit, sweet_spot_hit)
 
 // FizzleHeldSkill for skill being overheld, interrupted, or cancelled
 

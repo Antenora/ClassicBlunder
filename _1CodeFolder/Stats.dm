@@ -330,6 +330,9 @@ mob/Players/Stat()
 			for(var/obj/Money/M in usr)
 				M.name="[Commas(round(M.Level))] [glob.progress.MoneyName]"
 				stat(M)
+			for(var/obj/Stars/S in usr)
+				S.name="[Commas(round(S.Level))] Stars"
+				stat(S)
 			for(var/obj/Items/A in usr)
 				if(!(A.PermEquip&&A.suffix&&!A.Stealable))
 					if(istype(A, /obj/Items/Armor) || istype(A, /obj/Items/Sword))
@@ -1458,6 +1461,11 @@ mob/proc/Get_Sense_Reading(mob/A)
 		. +=" (Fading)"
 
 mob/proc/Get_Scouter_Reading(mob/B)
+	if(B.Imitating)
+		for(var/obj/Skills/Utility/Imitate/i in B.Skills)
+			if(i.imitating_info) 
+				return i.imitating_info.powerToCopy
+
 	var/Ratio=B.EnergyUniqueness
 
 	var/EPM=B.Power_Multiplier//effective power multiplier

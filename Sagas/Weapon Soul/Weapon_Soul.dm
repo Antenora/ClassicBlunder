@@ -167,6 +167,8 @@ mob/tierUpSaga(Path)
 					if("Soul Edge")
 						src << "An eye opens up on Soul Edge's hilt, peering out..."
 						AddSkill(new/obj/Skills/AutoHit/Gaze_of_Despair)
+						src << "Soul Edge trembles with an eager, dark hunger. Dark Reconquista beckons."
+						AddSkill(new/obj/Skills/AutoHit/Dark_Reconquista)
 
 					if("Soul Calibur")
 						src << "The manipulation of Soul Calibur's crystals becomes second nature..."
@@ -284,8 +286,11 @@ mob/tierUpSaga(Path)
 							SE.passives["HellPower"] = 1
 							SE.passives["Burning"] = 2
 							SE.passives["BurningShot"] = 1
+							SE.passives["BurnHit"] = 15
 							SE.passives["AngerAdaptiveForce"] = 0.15
 							SE.passives["GodKi"] = 0.25
+						src << "Soul Edge's conquering chaos takes form as a wave of ruin, Dark Reconquista: Triumph."
+						AddSkill(new/obj/Skills/AutoHit/Dark_Reconquista_Triumph)
 
 					if("Soul Calibur")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur/SC in src.Buffs)

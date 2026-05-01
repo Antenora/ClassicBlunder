@@ -321,6 +321,8 @@ mob
 				src.WoundSelf(src.GetBleedHit()*0.15*leakVal)
 			if(src.HasBurnHit())
 				src.AddBurn(src.GetBurnHit()*0.15*leakVal, src)
+			if(src.passive_handler.Get("Ashen One"))
+				src.AddBurn(passive_handler.Get("Kindling"), src)
 
 			//If you are burned and have debuff reversal, smack fire into the other fighter
 			var/debuffRev = src.GetDebuffReversal();

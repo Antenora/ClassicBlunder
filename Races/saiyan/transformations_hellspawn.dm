@@ -9,7 +9,7 @@ transformation
 			form_glow_x = -32
 			form_glow_y = -32
 			unlock_potential = 45
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "SaiyanPower"=1, "SaiyanPower1"=0.5)
+			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = -4, "SaiyanPower"=1, "SaiyanPower1"=0.5)
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
 			offenseadd = 0.3
@@ -17,6 +17,8 @@ transformation
 			strengthadd = 0.3
 			forceadd = 0.3
 			mastery_boons(mob/user)
+				var/MasteryBoost=round(mastery/4, 25)
+				passives = list("Instinct" = 1+(MasteryBoost/4), "Flow" = 1+(MasteryBoost/4), "Flicker" = 1+(MasteryBoost/4), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -4+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=0.5)
 				if(mastery >= 50)
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2, user)&&user.isRace(SAIYAN))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
@@ -25,6 +27,9 @@ transformation
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3, user)&&user.isRace(SAIYAN))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
+			if(mastery >= 100)
+				passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -4+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=0.5)
+				
 			class_boons(mob/user) //pride stats as a baseline no matter what
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
 					class_passives = list("EnergyGeneration" = 3, "Instinct" = 2, "Flow" = 2)

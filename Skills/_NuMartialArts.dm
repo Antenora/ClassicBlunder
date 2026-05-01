@@ -504,7 +504,7 @@ obj
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
 							IconUnder=1
-							passives = list("Momentum" = 1, "CallousedHands " = 0.3)
+							passives = list("Momentum" = 1, "CallousedHands" = 0.3)
 							LockX=-32
 							LockY=-32
 							StyleActive="Dark Impulse"
@@ -571,7 +571,7 @@ obj
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
 							IconUnder=1
-							passives = list("Momentum" = 1, "CallousedHands " = 0.5, "Tossing" = 3, "Secret Knives" = "FTG","HellPower"=0.5,"AbyssMod"=3)
+							passives = list("Momentum" = 1, "CallousedHands" = 0.5, "Tossing" = 3, "Secret Knives" = "FTG","HellPower"=0.5,"AbyssMod"=3)
 							LockX=-32
 							LockY=-32
 							StyleActive="Forces of Darkness"

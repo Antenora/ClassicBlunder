@@ -103,7 +103,7 @@ proc
 					DamageMod+=2
 					if("HellFire" in defenseElements)
 						DamageMod-=1
-					if("FelFire" in defenseElements)
+					if("Felfire" in defenseElements)
 						DamageMod-=1
 				if("Ultima")
 					DamageMod+=2

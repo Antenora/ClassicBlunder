@@ -970,6 +970,10 @@ mob/proc
 				Row++
 				src << output(m, "GridX:1,[Row]")
 				src << output(m.Level, "GridX:2,[Row]")
+			for(var/obj/Stars/s in Lootee)
+				Row++
+				src << output(s, "GridX:1,[Row]")
+				src << output(s.Level, "GridX:2,[Row]")
 			for(var/obj/Items/O in Lootee)
 				if(O.Stealable)
 					Row++
