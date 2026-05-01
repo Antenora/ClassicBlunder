@@ -1259,7 +1259,7 @@ obj
 
 			Symbiote_Hammer
 				DamageMult=6
-				Knockback=5
+				KBAdd=5
 				AccuracyMult = 1.2
 				Duration=10
 				Cooldown=120
