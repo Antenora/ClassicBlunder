@@ -31,7 +31,7 @@
     Enten
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives= list("Technique Mastery" = -6)
+        passives= list("TechniqueMastery" = -6)
         ActiveMessage="has the core of their Techniques disrupted by the Peerless Blade's passing..."
         OffMessage="finds themselves again..."
 
