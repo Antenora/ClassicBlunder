@@ -95,7 +95,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Cooled)
 				base = 1.5
 			if(Burn>0)
-				Burn -= base + ((GetEnd(0.15)+GetStr(0.15)) * (1+ (GetDebuffResistance() / 4))  )
+				Burn -= base * (1+ (GetDebuffResistance() / 4))
 			if(Burn<0)
 				Burn = 0
 		if("Poison")
@@ -103,7 +103,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Antivenomed)
 				base = 1.25
 			if(Poison>0)
-				Poison -= base + (GetEnd(0.15) * (1 + (GetDebuffResistance() / 4)+boon))
+				Poison -= base * ((1 + (GetDebuffResistance() / 4)+boon))
 				if(BlindingVenom && client)
 					if(!client.client_plane_master) // 3 checks lol ! maybe move this to new noob!
 						client.client_plane_master = new()
