@@ -774,6 +774,15 @@ mob
 									for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
 										fmf.Trigger(src, Override=1)
 
+			// Automatic activation for Symbiote Evolution
+			var/SE = CheckSpecial("Symbiote Evolution")
+			if(SE)
+				if(!BuffOn(SE) && Health <= SE.NeedsHealth * (1 - HealthCut))
+					SE.adjust(src)
+					SE.Trigger(src, Override=1)
+				else if(BuffOn(SE) && Health > SE.TooMuchHealth * (1 - HealthCut))
+					SE.Trigger(src, Override=1)
+
 
 			if(src.ManaDeath)
 				src.WoundSelf(0.2*(src.ManaAmount/ManaMax))
