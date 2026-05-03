@@ -3895,7 +3895,7 @@ obj
 							adjust(usr)
 							usr.UseProjectile(src)
 					Sunlight_Nova
-						ElementalClass="Fire"
+						ElementalClass="Light"
 						SignatureTechnique=2
 						SignatureName="Sunlight Nova"
 						Distance=50
