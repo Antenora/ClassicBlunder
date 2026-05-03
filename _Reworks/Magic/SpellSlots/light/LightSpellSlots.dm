@@ -26,6 +26,7 @@
 		ElementalClass="Light"
 		DamageMult=3
 		Speed=0.1
+		AccMult=1.1
 		Distance=15
 		ManaCost=5
 		Cooldown=35
@@ -39,6 +40,7 @@
 		ElementalClass="Light"
 		DamageMult=5
 		Speed=1
+		AccMult=1.1
 		Homing=1
 		Explode=2
 		Knockback=2

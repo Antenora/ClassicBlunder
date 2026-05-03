@@ -361,6 +361,7 @@ majinAbsorb/proc/releaseVictim(mob/absorber, theCkey, reason = "")
         victim.absorbedAtTimestamp = 0
         victim.RevokeObserveMajinVerb()
         victim.KO = 1
+        victim.ClearFrenzyOnKO()
         if(victim.client)
             victim << "You are violently expelled from [absorber]!"
     else
@@ -522,6 +523,7 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
         src.absorbedAtTimestamp = 0
         src.RevokeObserveMajinVerb()
         src.KO = 1
+        src.ClearFrenzyOnKO()
         var/absorberName = (pending.len >= 4) ? pending[4] : "your captor"
         src << "<font color='red'>You are violently expelled from [absorberName]'s corpse!</font>"
         MAJIN_PENDING_EJECTIONS -= "[ckey]"

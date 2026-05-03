@@ -3,15 +3,14 @@
 // usr.Activate(src). Override OnHeldRelease(mob/p, benefit) to
 // execute the skill.
 
-// ChargeBenefit is 0-1 (progress through ChargePeriod)
-// During the SweetSpot window it is multiplied by SweetSpotBenefit,
-// which can push it above 1.0.
+// ChargeBenefit on release is 0-1 from progress through ChargePeriod.
+// Hitting the SweetSpot window sets benefit to SweetSpotBenefit instead
 
 /obj/Skills
 	var/HeldSkill        = FALSE  // Enable held-charge behavior for this skill
 	var/ChargePeriod     = 3      // Max hold time in seconds, hold too long = fizzle
 	var/SweetSpot        = 0      // Seconds from charge start when sweet spot opens (0 = disabled)
-	var/SweetSpotBenefit = 1.5    // ChargeBenefit multiplier inside the sweet spot window
+	var/SweetSpotBenefit = 1.5    // ChargeBenefit value when the sweet spot window is hit
 	var/ChargeOverlay    = null   // Icon displayed on mob while charging
 	var/ChargeWaveIcon   = 'Icons/Effects/KenShockwave.dmi'  // Icon for periodic charge shockwave
 	var/ChargeWaveBlend  = 1      // Blend mode for the periodic charge shockwave
@@ -371,13 +370,12 @@
 		FizzleHeldSkill(Z)
 		return
 
-	// ChargeBenefit is 0-1 based on progress through ChargePeriod
 	var/benefit = clamp(hold_ticks / (Z.ChargePeriod * 10), 0.0, 1.0)
 	var/sweet_spot_hit = FALSE
 
-	// Sweet spot window is SweetSpot to SweetSpot + 0.25s
+	// Sweet spot window is SweetSpot to SweetSpot + 0.3s
 	if(Z.SweetSpot && hold_ticks >= Z.SweetSpot * 10 && hold_ticks <= Z.SweetSpot * 10 + 3)
-		benefit *= Z.SweetSpotBenefit
+		benefit = Z.SweetSpotBenefit
 		sweet_spot_hit = TRUE
 
 	Z.ChargeBenefit = benefit

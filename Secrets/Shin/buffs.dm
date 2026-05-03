@@ -194,6 +194,7 @@ mob/proc/endMangBuff() // Turns Mang off (Oops)
         if(BuffOn(mr)) mr.Trigger(src, Override=1);
 
 /mob/proc/canMangPU()
+    if(!ActiveBuff) return 0;
     return ((GetMangMastery() >= GetMangLevel()) && ((usingShinBuff() && !MangOnCD()) || usingMangBuff()));
 
 //tbh i think we could probably make a proc that handles both CD expiration and turning mang rings off but... i'm just gonna leave well enough alone

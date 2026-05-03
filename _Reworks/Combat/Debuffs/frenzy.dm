@@ -48,6 +48,9 @@ globalTracker/var/FrenzyNerf = 1
 		return
 	src.Frenzy = 0
 
+/mob/proc/ClearFrenzyOnKO()
+	src.Frenzy = 0
+
 /mob/proc/ApplyFrenzyCombatHooks(mob/defender, var/damage, var/UnarmedAttack, var/SwordAttack, var/SpiritAttack)
 	if(!defender)
 		return
