@@ -1763,7 +1763,7 @@ mob
 									src.Death(null,"oxygen deprivation!")
 			else if(loc:Deluged||istype(loc,/turf/Waters)||istype(loc,/turf/Special/Ichor_Water)||istype(loc,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
-				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON))
+				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON,ELDRITCH))
 					BreathingMaskOn=1
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)

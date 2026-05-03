@@ -1741,26 +1741,20 @@ NEW VARIABLES
 			IconTint=list(0,0,0, 0,0,0, 0,0,0, 0,0,0)
 			passives = list("Nightmare" = 1, "PULock" = 1, "Skimming"=3, "Godspeed"=4)
 			AllowedPower=0.5
-		//	DarkChange=1
+			DarkChange=1
 			Invisible=20
 			IconTransform = 'mist.dmi'
 			verb/Fade_Into_Shadows()
 				set category="Roleplay"
+				if(usr.secretDatum.currentTier >= 4) usr.Incorporeal = !usr.BuffOn(src);
 				src.Trigger(usr)
 			verb/All_Seeing_Eyes()
 				set category="Roleplay"
 				var/list/who=list("Cancel")
-				for(var/mob/Players/M in view(50, usr))
-					who.Add(M)
-				for(var/mob/W in view(50, usr))
-					if(W.AdminInviso)
-						who.Remove(W)
-					if(usr.HasJagan()&&W.z==usr.z)
-						continue
-					if(W.z == ArcaneRealmZ)
-						who.Remove(W)
-					if(W.invisibility)
-						who.Remove(W)
+				
+				if(usr.secretDatum.currentTier < 5) who += usr.getShadowEyeTargets();
+				else who += usr.getAdvancedShadowEyeTargets();
+
 				var/mob/Players/selector=input("Who do you want to observe?","Observe")in who||null
 				if(selector=="Cancel")
 					Observify(usr,usr)
@@ -1821,7 +1815,7 @@ NEW VARIABLES
 			SignatureTechnique=3
 			EnergyMult=2
 			UnrestrictedBuff=1
-			passives = list("Erosion" = 0.5, "SoulFire" = 1, "WeaponBreaker" = 2, "DeathField" = 5, "VoidField" = 5)
+			passives = list("Erosion" = 0.5, "SoulFire" = 1, "SoulFire" = 1, "WeaponBreaker" = 2, "DeathField" = 5, "VoidField" = 5)
 			SpdMult = 1.25
 			DefMult = 1.25
 			ActiveMessage="gently erodes everything..."
@@ -4129,17 +4123,17 @@ NEW VARIABLES
 				src.Trigger(usr)
 				if(usr.BuffOn(src))
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Symbiote_Infection/s in usr)
-						s.NeedsHealth=101
+						s.NeedsHealth=50
 						s.NeedsVary=0
-						s.TooMuchHealth=0
+						s.TooMuchHealth=99
 						s.VaizardShatter=0
 						s.Curse=0
 				else
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Symbiote_Infection/s in usr)
-						s.NeedsHealth=25
-						s.NeedsVary=1
-						s.TooMuchHealth=75
-						s.VaizardShatter=1
+						s.NeedsHealth=50
+						s.NeedsVary=0
+						s.TooMuchHealth=99
+						s.VaizardShatter=0
 						if(usr.AscensionsAcquired>=2)
 							s.Curse=1
 
@@ -4716,7 +4710,7 @@ NEW VARIABLES
 			adjust(mob/user)
 				var/zenkaiLevel = user.AscensionsAcquired
 				EnergyThreshold = 25-(5*zenkaiLevel)
-				TimerLimit = 60 + (10 * zenkaiLevel)
+				TimerLimit = 50 + (5 * zenkaiLevel)
 				var/healthDiff = 0
 				//scales off how bad your losing
 				if(user.Target && ismob(user.Target))
@@ -4725,15 +4719,15 @@ NEW VARIABLES
 					if(-100 to 2)
 						PowerMult = 1
 					if(3 to 15)
-						PowerMult = 1.1
+						PowerMult = 1.05
 					if(16 to 25)
-						PowerMult = 1.25
+						PowerMult = 1.1
 					if(26 to 50)
-						PowerMult = 1.35
+						PowerMult = 1.15
 					if(51 to 75)
-						PowerMult = 1.5
+						PowerMult = 1.2
 					if(76 to 100)
-						PowerMult = 2
+						PowerMult = 1.3
 			verb/Saiyan_Dominance()
 				set category="Skills"
 				if(!usr.BuffOn(src))
@@ -4764,7 +4758,7 @@ NEW VARIABLES
 						usr << "Your rage hasn't spiked high enough yet!"
 						return
 					else
-						src.VaizardHealth=(usr.DefianceCounter*2)
+						src.VaizardHealth=(usr.DefianceCounter)
 						src.VaizardShatter=1
 						src.FINISHINGMOVE=1
 						src.DefianceRetaliate=1
@@ -4783,8 +4777,8 @@ NEW VARIABLES
 			adjust(mob/user)
 				var/zenkaiLevel = user.AscensionsAcquired
 				passives = list()
-				passives["TechniqueMastery"] = 0.75*zenkaiLevel
-				passives["MovementMastery"] = 2.5*zenkaiLevel
+				passives["TechniqueMastery"] = 0.5*zenkaiLevel
+				passives["MovementMastery"] = 2*zenkaiLevel
 				var/passiveLimit = zenkaiLevel
 				var/passiveNumber = 0
 				for(var/x in user.Target.StyleBuff.passives)
@@ -9783,37 +9777,14 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(!altered)
 						var/secretLevel = p.secretDatum.currentTier
-						var/Tyrant=0
-						var/TyrantBonus=1
-						var/healthDiff=0
+						if(p.Health<50)
+							secretLevel+=1
+						if(p.Health<25)
+							secretLevel+=2
 						if(secretLevel>7)
 							secretLevel=7
-						if(p.Target && ismob(p.Target))
-							healthDiff = p.Target.Health-p.Health
-						switch(healthDiff)
-							if(-100 to 2)
-								secretLevel += 0
-								if(p.passive_handler.Get("SpiralTyrant"))
-									secretLevel += 2
-									Tyrant=1
-									TyrantBonus=4
-							if(3 to 15)
-								secretLevel += 0
-							if(16 to 25)
-								secretLevel += 1
-							if(26 to 50)
-								secretLevel += 2
-							if(51 to 75)
-								secretLevel += 3
-							if(76 to 100)
-								secretLevel += 4
-						if(secretLevel>7)
-							secretLevel=7
-						if(Tyrant&&secretLevel>5)
-							secretLevel=5
 						PowerMult=1+(0.02*secretLevel*secretLevel)
 						var/SpiralPower=1
-						var/SpiralPotential=1
 						switch(secretLevel)
 							if(1 to 2)
 								SpiralPower=1
@@ -9827,14 +9798,11 @@ NEW VARIABLES
 								SpiralPower=5
 							if(7)
 								SpiralPower=7
-						SpiralPotential=SpiralPower
-						if(Tyrant)
-							SpiralPotential=1
 						StrMult=1.25 + (0.03*secretLevel*secretLevel)
 						ForMult=1.25 + (0.03*secretLevel*secretLevel)
 						EndMult=1.25 + (0.035*secretLevel*secretLevel)
-						passives = list("SpiralPowerUnlocked" = SpiralPotential, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower)
-						TimerLimit= (10 * (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired)*secretLevel)*TyrantBonus
+						passives = list("SpiralPowerUnlocked" = SpiralPower, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower)
+						TimerLimit= (10 * (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired)*secretLevel)
 						Cooldown = 61 - ((5 * p.AscensionsAcquired) + (5 * secretLevel))
 				KenWave = 2
 				KenWaveIcon='SparkleGreen.dmi'
@@ -11329,11 +11297,11 @@ NEW VARIABLES
 				Cooldown=10800
 				//doubles god ki values
 			Symbiote_Infection
-				NeedsHealth=25
-				NeedsVary=1
-				TooMuchHealth=75
+				NeedsHealth=50
+				NeedsVary=0
+				TooMuchHealth=99
 				VaizardHealth=2
-				VaizardShatter=1
+				VaizardShatter=0
 				Unstoppable=1
 				Possessive=1
 				TextColor=rgb(75, 0, 85)
@@ -11351,8 +11319,8 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/asc = p.AscensionsAcquired
-					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 1.5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1)
-					VaizardHealth = 1.5 + p.GetEnd() + (p.TotalInjury/25) + (asc)
+					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 2*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Gum Gum" = 1 + (0.5 * asc), "Blubber" = 1 + (0.5 * asc), "KillerInstinct" = 0.1 + (0.1 * asc),)
+					VaizardHealth = 5 + p.GetEnd() + (p.TotalInjury/25) + (asc)
 					// this was 17.5% guys lol
 					if(asc>=1)
 						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
@@ -11360,7 +11328,7 @@ NEW VARIABLES
 						if(!locate(/obj/Skills/Queue/Symbiote_Hammer, p.Queues))
 							p.AddSkill(new/obj/Skills/Queue/Symbiote_Hammer)
 
-				Trigger(mob/User, Override = FALSE)
+				Trigger(mob/User, Override = TRUE)
 					if(!User.BuffOn(src))
 						adjust(User)
 					..()

@@ -1258,11 +1258,12 @@ obj
 
 
 			Symbiote_Hammer
-				DamageMult=6
-				AccuracyMult = 1.1
+				DamageMult=7
+				AccuracyMult = 1.2
 				Duration=10
-				Cooldown=120
+				Cooldown=90
 				Instinct=2
+				KBAdd=3
 				Stunner=1
 				Shearing = 5
 				Crippling = 5

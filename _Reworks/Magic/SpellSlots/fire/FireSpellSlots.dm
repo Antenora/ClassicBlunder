@@ -47,6 +47,7 @@
 		Knockback=2
 		Speed=0
 		Stream=2
+		AccMult=1.1
 		MultiTrail = 1
 		Distance=12
 		ManaCost=4
@@ -70,6 +71,7 @@
 		DamageMult=5
 		Scorching=2
 		Homing=1
+		AccMult=1.1
 		Explode=2
 		Knockback=1
 		ManaCost=6

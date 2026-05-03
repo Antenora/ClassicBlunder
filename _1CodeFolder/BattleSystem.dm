@@ -318,6 +318,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.Health=1
 	src.Energy=1
 	src.PowerControl=100
+	src.ClearFrenzyOnKO()
 	src.Burn=0
 	src.AfterImageStrike=0
 	src.VaizardHealth=0
@@ -683,6 +684,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		if(src.NoDeath)
 			if(src.HealthCut<0.5&&!SuperDead)
 				src.KO=1
+				src.ClearFrenzyOnKO()
 				src.Stasis=2000
 				src.icon_state="KO"
 				if(passive_handler.Get("VenomBlood"))
@@ -2153,7 +2155,6 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(HasGiantForm()) return 0;
 	if(HasMythical()>=1) return 0;
 	if(passive_handler.Get("Fishman")) return 0;
-	if(hasEldritchRacial()) return 0;
 	return 1;
 
 

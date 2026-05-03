@@ -157,6 +157,7 @@
 			if(pd.demon_name == demon_active_name)
 				pd.current_hp = d.demon_hp
 				break
+		d.RemoveDemonPassives()
 		d.ai_owner = null
 		animate(d, alpha=0, time=8)
 		spawn(8)

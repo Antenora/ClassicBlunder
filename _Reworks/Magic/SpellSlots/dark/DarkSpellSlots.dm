@@ -35,6 +35,7 @@
 		ElementalClass="Dark"
 		DamageMult=4
 		Speed=0.5
+		AccMult=1.2
 		Distance=12
 		ManaCost=5
 		Cooldown=40
@@ -50,6 +51,7 @@
 		Speed=1
 		Homing=1
 		Explode=2
+		AccMult=1.1
 		Knockback=2
 		ManaCost=6
 		Cooldown=45

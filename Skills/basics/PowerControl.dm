@@ -7,7 +7,7 @@
         if(goingUp) CanTransform()
         return 0;
     if(goingUp)
-        if(CheckActive("Ki Control") && !canMangPU()) return 0;
+        if(ActiveBuff && !hasPUException()) return 0;
     return 1;
 
 /mob/proc/canDoATransform()
@@ -29,20 +29,51 @@
                 if(transActive() < transUnlocked)
                     return 1;
     return 0;
+//T
+/mob/proc/hasPUException()
+    if(canMangPU()) return 1;//In Secrets > Shin > skills.dm
+    if(canKaiokenPU()) return 1;//Below
+    if(canDoATransform()) return 1;//above
+    return 0;
 
+/*/mob/var
+    PowerUpOptions = list("Transformation");
+    PowerUpPriority="Transformation";
+/mob/verb/PowerUpPrio()
+    set category="Other"
+    set name="Customize: Power Up Priority"
+    var/options = list("Nevermind");
+    if(race.transformations.len > 0) options |= "Transformation";
+    if(hasSecret("Shin")) options |= "Mang";
+    if(getKaiokenMastery()) options |= "Kaioken";
+    if(options < 2)
+        src << "Don't worry about it, babygirl. Nothing replaces your Power Up."
+        return;
+    var/choice = input(src, "What do you want to prioritize when powering up first?", "Power Up Prioritization") in options;
+    if(choice=="Nevermind") return;
+    PowerUpPriority=choice;
+    src << "You prioritize <b>[PowerUpPriority]</b> first. Hit the max level to begin doing other things with your power up.";
 
+/mob/proc/PickAlternatePU()
+    switch(PowerUpPriority)
+        if("Transform")
+            if(canDoATransform()) Transform();
+        if("Mang")
+            if(canMangPU()) MangPowerUp();
+        if("Kaioken")
+            if(canKaiokenPU()) KaiokenPowerUp();*/
 
 mob/proc/PowerUp() // Handles Normal (read: Not Kaioken/Shin) power up related code
+    if(passive_handler.Get("Kaioken") && canKaiokenPU())
+        if(!KO) KaiokenPowerUp()
+        return
+    if(hasSecret("Shin") && canMangPU())
+        if(!KO) MangPowerUp()
+        return
     if(canDoATransform())
         Transform();
         return;
-    if(!canPC(goingUp=1)) return 0;
-    if(hasSecret("Shin") && ActiveBuff && canMangPU())
-        if(!KO) MangPowerUp()
-        return
-    if(passive_handler.Get("Kaioken"))
-        if(!KO) KaiokenPowerUp()
-        return
+    if(!canPC(goingUp=1)) return 0; 
     if(HasPULock()) return
     if(!PoweringUp)
         PoweringUp=1
@@ -113,33 +144,41 @@ mob/proc/PowerDown()
                 Auraz("Remove")
                 return
 
+/mob/proc/getKaiokenMastery()
+    . = 0;
+    for(var/obj/Skills/Buffs/SpecialBuffs/Kaioken/kk in src)
+        . = kk.Mastery;
+/mob/proc/canKaiokenPU()
+    if(!ActiveBuff) return 0;
+    if(Kaioken==6) return 0;
+    if(Kaioken+1 <= getKaiokenMastery()+2) return 1;
+    return 0;
+
 // Handles Kaioken Power Up related code
 mob/proc/KaiokenPowerUp()
-    if(src.passive_handler.Get("Kaioken"))
-        var/Mastery
-        for(var/obj/Skills/Buffs/SpecialBuffs/Kaioken/KK in src)
-            Mastery=KK.Mastery
-        if(src.Kaioken<2+Mastery)
-            if(src.passive_handler.Get("Super Kaioken"))
-                switch(src.Kaioken)
+    if(passive_handler.Get("Kaioken"))
+        var/Mastery=getKaiokenMastery();
+        if(Kaioken<2+Mastery)
+            if(passive_handler.Get("Super Kaioken"))
+                switch(Kaioken)
                     if(0)
-                        src.Kaioken=1
+                        Kaioken=1
                         src <<"<b>Super Kaioken!</b>"
                     if(1)
-                        src.Kaioken=2
+                        Kaioken=2
                         src <<"<b>Super Kaioken Times Three!</b>"
                     if(2)
-                        src.Kaioken=3
+                        Kaioken=3
                         src <<"<b>Super Kaioken Times Four!</b>"
                     if(3)
-                        src.Kaioken=4
+                        Kaioken=4
                         src <<"<b>Super Kaioken Times Ten!</b>"
                     if(4)
-                        src.Kaioken=5
+                        Kaioken=5
                         src <<"<b>Super Kaioken Times Twenty!</b>"
                     if(5)
-                        if(src.passive_handler.Get("Kaioken Blue"))
-                            src.Kaioken=6
+                        if(passive_handler.Get("Kaioken Blue"))
+                            Kaioken=6
                             src <<"<b>Maximum Kaioken Blue!!!!!!</b>"
                         else
                             src << "You're at your maximum level of Kaioken."
@@ -147,21 +186,21 @@ mob/proc/KaiokenPowerUp()
                         src<<"You cannot push your power any further."
 
             else
-                switch(src.Kaioken)
+                switch(Kaioken)
                     if(0)
-                        src.Kaioken=1
+                        Kaioken=1
                         src <<"<b>Kaioken!</b>"
                     if(1)
-                        src.Kaioken=2
+                        Kaioken=2
                         src <<"<b>Kaioken Times Three!</b>"
                     if(2)
-                        src.Kaioken=3
+                        Kaioken=3
                         src <<"<b>Kaioken Times Four!</b>"
                     if(3)
-                        src.Kaioken=4
+                        Kaioken=4
                         src <<"<b>Kaioken Times Ten!</b>"
                     if(4)
-                        src.Kaioken=5
+                        Kaioken=5
                         src <<"<b>Kaioken Times Twenty!</b>"
                     if(5)
                         src << "You're at your maximum level of Kaioken."
@@ -170,35 +209,27 @@ mob/proc/KaiokenPowerUp()
 
 // Handles Kaioken Power Down related code
 mob/proc/KaiokenPowerDown()
-    if(src.passive_handler.Get("Kaioken"))
-        switch(src.Kaioken)
+    if(passive_handler.Get("Kaioken"))
+        switch(Kaioken)
             if(1)
-                src.Kaioken=0
+                Kaioken=0
                 src <<"<b>You fully relax your Kaioken!</b>"
             if(2)
-                src.Kaioken=1
+                Kaioken=1
                 src <<"<b>You relax your Kaioken to its minimum!</b>"
             if(3)
-                src.Kaioken=2
+                Kaioken=2
                 src <<"<b>You relax your Kaioken to three times!</b>"
             if(4)
-                src.Kaioken=3
+                Kaioken=3
                 src <<"<b>You relax your Kaioken to four times!</b>"
             if(5)
-                src.Kaioken=4
+                Kaioken=4
                 src << "<b>You relax your Kaioken to ten times!</b>"
             if(6)
-                src.Kaioken=5
+                Kaioken=5
                 src << "<b>You relax your Kaioken to twenty times!</b>"
         return
-    /*src << "You douse your Kaioken..."
-    src.SpecialBuff.Trigger(src)
-    sleep()
-    if(src.CheckActive("Ki Control"))
-        for(var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC in src)
-            src.UseBuff(KC)
-    return*/
-
 
 // Handles Mang Power Up related code
 mob/proc/MangPowerUp()

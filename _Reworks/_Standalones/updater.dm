@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 10
+	var/UPDATE_VERSION = 11
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -206,6 +206,17 @@ update
 				if(p.Class=="Feather Cowl"&&p.AscensionsAcquired>=1)
 					if(p.StrAscension<0)
 						p.StrAscension=0
+	version11
+		version = 11;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				p.passive_handler.Increase("Fishman", 1);
+				p << "You have been blessed by the space squids of old."
+				p << "Which is to say, you have the Fishman passive now."
+
+
+
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

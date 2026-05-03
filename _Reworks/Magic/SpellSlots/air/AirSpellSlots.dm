@@ -68,6 +68,8 @@
 		DamageMult=4
 		Paralyzing=4
 		Speed=0.5
+		Homing=1
+		AccMult=1.1
 		Distance=12
 		ManaCost=5
 		Cooldown=40
