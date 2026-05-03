@@ -2386,6 +2386,9 @@ mob
 			var/slayer = passive_handler.Get("SlayerMod");
 			var/prey = passive_handler.Get("FavoredPrey");
 			if(!enemy) return 0;
+			// value applies even without passive SlayerMod.
+			if(forced && !slayer)
+				return clamp(forced, glob.SLAYER_DAMAGE_MIN, glob.SLAYER_DAMAGE_MAX);
 			if(!slayer) return 0;
 			if(!prey)
 				liveDebugMsg("[src]([src.key]) has SlayerMod marked with no FavoredPrey.");

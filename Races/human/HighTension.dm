@@ -19,6 +19,8 @@
         var/ants = passive_handler.Get("Antsy")/10;
 
         var/tensionGain = val * glob.TENSION_MULTIPLIER;
+        if(isRace(HUMAN) && Class=="Underdog")
+            tensionGain *= glob.UNDERDOG_HUMAN_TENSION_MULT
         if(hasHighTensionMult())
             var/mult = getHighTensionMult();
             DEBUGMSG("tension mult triggered! increased by [mult]x");

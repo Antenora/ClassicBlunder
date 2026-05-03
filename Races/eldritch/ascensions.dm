@@ -29,7 +29,7 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(2, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
@@ -53,7 +53,7 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(3, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
@@ -80,7 +80,7 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(4, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
@@ -106,7 +106,7 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(5, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
@@ -133,7 +133,7 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(6, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()
 		six 
 			unlock_potential = ASCENSION_SIX_POTENTIAL
@@ -158,5 +158,5 @@ ascension
 				..()
 				
 			postAscension(mob/owner)
-				owner.secretDatum.tierUp(7, owner)
+				owner.secretDatum.tierUp(1, owner)
 				..()

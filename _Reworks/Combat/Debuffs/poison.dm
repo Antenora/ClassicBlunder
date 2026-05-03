@@ -77,6 +77,8 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			Unconscious(null, "succumbing to Poison!")
 		if(typeOfDebuff == "Burn")
 			Unconscious(null, "burning up!")
+		if(typeOfDebuff == "Frenzy")
+			Unconscious(null, "succumbing to Frenzy!")
 	if(typeOfDebuff == "Frenzy")
 		if(src.IsDarkDragonPlayer())
 			reduceDebuffStacks(typeOfDebuff)

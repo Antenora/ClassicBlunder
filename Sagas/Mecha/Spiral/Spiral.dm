@@ -79,7 +79,7 @@ mob/tierUpSaga(path)
 	IconX = -8
 	IconY = -8
 	ChargeTech = 1
-	ActiveMessage="yells: GIGA DRILL BREAKEEEEEERRRRR!!!!"
+	ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
 	adjust(mob/p)
 		if(p.Saga == "King of Braves" || p.Secret == "Spiral")
 			var/sl = p.SagaLevel
@@ -92,7 +92,7 @@ mob/tierUpSaga(path)
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
 			DamageMult = (2 + (round(dr/3)))
 			Rounds = 25
-			PullIn = max(0, dr - 4)
+			PullIn = dr
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)
 			EnergyCost = 1 + (3 * dr)

@@ -46,10 +46,14 @@ globalTracker/var/
     if(passive_handler.Get("Enraged") && Anger)
         if(!defender.Anger || Anger > defender.Anger)
             . += passive_handler.Get("Enraged") / glob.ENRAGED_DAMAGE_DIVISOR
-    if(HasHolyMod())
-        . += HolyDamage(defender) / glob.HOLY_DAMAGE_DIVISOR
-    if(HasAbyssMod())
-        . += AbyssDamage(defender) / glob.ABYSS_DAMAGE_DIVISOR
+    var/forcedHoly = getForcedDamageType("Holy", forcedDmgList)
+    if(HasHolyMod() || forcedHoly)
+        var/holyMag = max(HasHolyMod() ? GetHolyMod() : 0, forcedHoly)
+        . += HolyDamage(defender, holyMag) / glob.HOLY_DAMAGE_DIVISOR
+    var/forcedAbyss = getForcedDamageType("Abyss", forcedDmgList)
+    if(HasAbyssMod() || forcedAbyss)
+        var/abyssMag = max(HasAbyssMod() ? GetAbyssMod() : 0, forcedAbyss)
+        . += AbyssDamage(defender, abyssMag) / glob.ABYSS_DAMAGE_DIVISOR
     . += GetSlayerMod(defender, getForcedDamageType("Slayer", forcedDmgList)) / glob.SLAYER_DAMAGE_DIVISOR; //validates within the GetSlayerMod proc, which does still need to be moved out of _binaryChecks
     if(passive_handler.Get("Deicide")) . += DeicideDamage(defender) / glob.DEICIDE_DAMAGE_DIVISOR
     else . /= max(NO_GOD_KI_REDUCTION, godKiNerf);
@@ -61,3 +65,29 @@ globalTracker/var/
     var/val = forcedDmgList[typeToFind];
     . = 0;
     . += isnum(val) ? val : 0;
+
+/// For Holy/Abyss autohits
+/mob/proc/autohitSpecDmgTypeList(obj/Skills/Z)
+    if(!Z) return list()
+    . = list()
+    if(Z.HolyMod) .["Holy"] = Z.HolyMod
+    if(Z.AbyssMod) .["Abyss"] = Z.AbyssMod
+    if(Z.SlayerMod) .["Slayer"] = Z.SlayerMod
+
+/mob/proc/autohitPurityDamageBlocked(mob/defender, obj/Skills/Z)
+    if(!defender || !Z) return FALSE
+    if(!HasPurity() && !Z.Purity) return FALSE
+    var/found = 0
+    if(HasBeyondPurity() || Z.BeyondPurity)
+        if(HasHolyMod() || Z.HolyMod)
+            if(defender.IsGood())
+                found = 1
+        if(found)
+            return TRUE
+    else
+        if(HasHolyMod() || Z.HolyMod)
+            if(defender.IsEvil())
+                found = 1
+        if(!found)
+            return TRUE
+    return FALSE
