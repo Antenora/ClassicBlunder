@@ -65,6 +65,7 @@ var/list/Tier2 = list(
 	"Final Shine" = "/obj/Skills/Queue/Final_Shine",
 	"Super Dodompa" = "/obj/Skills/Projectile/Beams/Big/Super_Dodompa",
 	"Sunlight Spear" = "/obj/Skills/Projectile/Magic/Uber_Shots/Sunlight_Spear",
+	"Sunlight Nova" = "/obj/Skills/Projectile/Magic/Uber_Shots/Sunlight_Nova",
 	"Shin Kikoho" = "/obj/Skills/AutoHit/Shin_Kikoho",
 	"Zantetsuken" = "/obj/Skills/AutoHit/Zantetsuken",
 	"Thousand Man Slayer" = "/obj/Skills/AutoHit/Thousand_Man_Slayer",
