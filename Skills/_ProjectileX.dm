@@ -3899,14 +3899,14 @@ obj
 						SignatureTechnique=2
 						SignatureName="Sunlight Nova"
 						Distance=50
-						DamageMult=3
+						DamageMult=4
 						MultiHit=5
 						Instinct=2
 						Radius=1
 						Knockback=10
 						Explode=2
-						Paralyzing=1
-						Scorching=1
+						Paralyzing=3
+						Scorching=3
 						HolyMod=5
 						ComboMaster=1
 						ManaCost=20
