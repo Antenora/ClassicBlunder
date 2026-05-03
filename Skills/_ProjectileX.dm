@@ -3908,6 +3908,8 @@ obj
 						Paralyzing=1
 						Scorching=1
 						HolyMod=5
+						ComboMaster=1
+						ManaCost=20
 						Cooldown=180
 						IconLock='sunlightnova.dmi'
 						LockX=-158
