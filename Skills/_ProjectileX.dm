@@ -3897,7 +3897,7 @@ obj
 					Sunlight_Nova
 						ElementalClass="Fire"
 						SignatureTechnique=2
-						SignatureName="Sunlight_Nova"
+						SignatureName="Sunlight Nova"
 						Distance=50
 						DamageMult=3
 						MultiHit=5
