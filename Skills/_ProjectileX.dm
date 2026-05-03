@@ -3894,6 +3894,34 @@ obj
 							set category="Skills"
 							adjust(usr)
 							usr.UseProjectile(src)
+					Sunlight_Nova
+						ElementalClass="Fire"
+						SignatureTechnique=2
+						SignatureName="Sunlight_Nova"
+						Distance=50
+						DamageMult=3
+						MultiHit=5
+						Instinct=2
+						Radius=1
+						Knockback=10
+						Explode=2
+						Paralyzing=1
+						Scorching=1
+						HolyMod=5
+						Cooldown=180
+						IconLock='sunlightnova.dmi'
+						LockX=-158
+						LockY=-169
+						IconChargeOverhead=2
+						IconSize=0.01
+						IconSizeGrowTo=0.2
+						Variation=0
+						adjust(mob/p)
+							DamageMult = initial(DamageMult)
+						verb/Sunlight_Nova()
+							set category="Skills"
+							adjust(usr)
+							usr.UseProjectile(src)
 
 
 			Sword
