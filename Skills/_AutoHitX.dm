@@ -354,8 +354,8 @@ obj
 				NoAttackLock=1
 				StrOffense=1
 				DamageMult = T2_DMG_MULT / 2 / 10;
-				AbyssMod=3
-				HolyMod=3
+				AbyssMod=5
+				HolyMod=5
 				Distance=5
 				DistanceAround=4
 				Rounds=10
@@ -3549,7 +3549,7 @@ obj
 				Area="Around Target"
 				AdaptRate=1.5
 				DamageMult=0.5
-				HolyMod=2.5
+				HolyMod=5
 				Distance=5
 				DistanceAround=3
 				EnergyCost=10
@@ -3580,7 +3580,7 @@ obj
 				Area="Around Target"
 				AdaptRate=1.5
 				DamageMult=0.5
-				AbyssMod=2.5
+				AbyssMod=5
 				Distance=5
 				DistanceAround=3
 				EnergyCost=10
@@ -4069,7 +4069,7 @@ obj
 				Area="Circle"
 				GuardBreak=1
 				DamageMult=11
-				HolyMod=20
+				HolyMod=5
 				Distance=6
 				Knockback=10
 				DelayTime=5
@@ -4619,7 +4619,7 @@ obj
 				SpecialAttack=1
 				StrOffense=1
 				DamageMult=7.5
-				HolyMod=10
+				HolyMod=5
 				Distance=5
 				Rush=5
 				RushDelay=2
@@ -4733,7 +4733,7 @@ obj
 				TurfShift='IceGround.dmi'
 				TurfShiftDuration=500
 				DamageMult=10
-				HolyMod=10
+				HolyMod=5
 				Purity=1
 				StrOffense=1
 				ActiveMessage="encases their target in a tomb of soul-infused crystal!  They are forced into perfect stasis!"
@@ -6820,10 +6820,30 @@ obj
 					spawn()
 						LaunchEnd(m)
 				DEBUGMSG("FINAL TOTAL DAMAGE DEALT before do damage! [FinalDmg]")
+				var/skipPureDamage = 0
+				if(Owner && FromSkill)
+					if(Owner.HasPurity()||FromSkill.Purity)
+						var/found=0
+						if(Owner.HasBeyondPurity()||FromSkill.BeyondPurity)
+							if(Owner.HasHolyMod()||FromSkill.HolyMod)
+								if(m.IsGood())
+									found=1
+							if(found)
+								skipPureDamage = 1
+						else
+							if(Owner.HasHolyMod()||FromSkill.HolyMod)
+								if(m.IsEvil())
+									found=1
+							if(!found)
+								skipPureDamage = 1
+				var/list/specDmgTypes = list()
+				if(!skipPureDamage && Owner && FromSkill)
+					if(FromSkill.HolyMod) specDmgTypes["Holy"] = FromSkill.HolyMod
+					if(FromSkill.AbyssMod) specDmgTypes["Abyss"] = FromSkill.AbyssMod
+					if(FromSkill.SlayerMod) specDmgTypes["Slayer"] = FromSkill.SlayerMod
+					if(specDmgTypes.len) FinalDmg *= Owner.attackModifiers(m, specDmgTypes)
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
-				// Auto-reversal after FinalDmg is fully scaled. Per-hit reflect is scaled by the
-				// source skill's Rounds
 				var/reversalChance = m.GetAutoReversal()
 				if(prob(min(reversalChance * 100, 100)))
 					if(m.HasAutoReversal())
@@ -6853,21 +6873,17 @@ obj
 				if(src.DirectWounds)
 					src.Owner.DealWounds(m, src.DirectWounds);
 				var/damageDealt
-				var/purityBlocked = Owner && FromSkill && Owner.autohitPurityDamageBlocked(m, FromSkill)
-				var/list/autohitSpecMods = Owner ? Owner.autohitSpecDmgTypeList(FromSkill) : list()
-				if(purityBlocked)
+				if(skipPureDamage)
 					damageDealt = 0
 				else if(src.FixedDamage)
 					var/fixedAmt = src.FixedDamage
-					if(autohitSpecMods.len)
-						fixedAmt *= Owner.attackModifiers(m, autohitSpecMods)
+					if(specDmgTypes.len)
+						fixedAmt *= Owner.attackModifiers(m, specDmgTypes)
 					m.LoseHealth(fixedAmt)
 					damageDealt = fixedAmt
 					if(m.Health <= 0 && !m.KO)
 						m.Unconscious(src.Owner)
 				else
-					if(autohitSpecMods.len)
-						FinalDmg *= Owner.attackModifiers(m, autohitSpecMods)
 					var/_skillCritDmg = src.CriticalChance * 0.01
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Increase("CriticalChance", src.CriticalChance)
@@ -6892,7 +6908,7 @@ obj
 					m.LoseMana(ManaDrain)
 					src.Owner.HealMana(ManaDrain)
 
-				if(CorruptionGain)
+				if(CorruptionGain && !skipPureDamage)
 					Owner.gainCorruption((FinalDmg * 2) * glob.CORRUPTION_GAIN)
 				if(src.ApplyJudged)
 					m.applyJudged(120)
