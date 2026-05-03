@@ -3909,6 +3909,7 @@ obj
 						Scorching=3
 						HolyMod=10
 						ComboMaster=1
+						IgnoreStun=1
 						ManaCost=20
 						Cooldown=180
 						IconLock='sunlightnova.dmi'
