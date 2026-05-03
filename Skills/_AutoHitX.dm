@@ -6602,30 +6602,6 @@ obj
 
 				if(WearingArmor)//Reduced delay and accuracy
 					Precision*=src.Owner.GetArmorAccuracy(WearingArmor)
-				var/reversalChance = m.GetAutoReversal()
-				if(prob(reversalChance * 100) && currentRounds == 1)
-					if(m.HasAutoReversal())
-						if(!src.SpecialAttack||m.passive_handler.Get("TotalReversal"))
-							if(Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=1) == (HIT || WHIFF))
-								if(m.hasMagmicShield())
-									Stun(Owner, 3, FALSE);
-									m.MagmicShieldOff();
-								if(src.Damage>0.1)
-									KenShockwave(m, icon='KenShockwave.dmi', Size=dmgRoll, Time=3)
-									m.Knockback(src.Knockback+(reversalChance*2.5) , src.Owner, Direction=get_dir(m, src.Owner))
-								m.DoDamage(src.Owner, (FinalDmg/5), UnarmedAttack=src.UnarmedTech, SwordAttack=src.SwordTech, SpiritAttack=src.SpecialAttack, Autohit = TRUE)
-								if(src.Bang)
-									Bang(src.Owner.loc, src.Bang)
-								if(src.Scratch)
-									Scratch(src.Owner)
-								if(src.Bolt)
-									LightningBolt(src.Owner, src.Bolt, src.BoltOffset)
-								if(src.Punt)
-									Hit_Effect(src.Owner, Size=src.Punt)
-								src.Owner.HitEffect(src.Owner, src.UnarmedTech, src.SwordTech)
-								OMsg(m, "[m] redirected the force of the attack back at [src.Owner]!")
-								m << "You redirected the force of the attack back at [src.Owner]!"
-								return
 
 				if(src.CanBeBlocked||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("The Crownless King"))
 					if(Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=0) == WHIFF)
@@ -6846,15 +6822,52 @@ obj
 				DEBUGMSG("FINAL TOTAL DAMAGE DEALT before do damage! [FinalDmg]")
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
+				// Auto-reversal after FinalDmg is fully scaled. Per-hit reflect is scaled by the
+				// source skill's Rounds
+				var/reversalChance = m.GetAutoReversal()
+				if(prob(min(reversalChance * 100, 100)))
+					if(m.HasAutoReversal())
+						if(!src.SpecialAttack||m.passive_handler.Get("TotalReversal"))
+							var/reversalAcc = Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=1)
+							if(reversalAcc == HIT || reversalAcc == WHIFF)
+								if(m.hasMagmicShield())
+									Stun(Owner, 3, FALSE);
+									m.MagmicShieldOff();
+								if(src.Damage>0.1)
+									KenShockwave(m, icon='KenShockwave.dmi', Size=dmgRoll, Time=3)
+									m.Knockback(src.Knockback+(reversalChance*2.5) , src.Owner, Direction=get_dir(m, src.Owner))
+								var/reversalDmg = FinalDmg * glob.AUTOHIT_REVERSAL_DAMAGE_FRAC / max(1, src.parentRounds)
+								m.DoDamage(src.Owner, reversalDmg, UnarmedAttack=src.UnarmedTech, SwordAttack=src.SwordTech, SpiritAttack=src.SpecialAttack, Autohit = TRUE)
+								if(src.Bang)
+									Bang(src.Owner.loc, src.Bang)
+								if(src.Scratch)
+									Scratch(src.Owner)
+								if(src.Bolt)
+									LightningBolt(src.Owner, src.Bolt, src.BoltOffset)
+								if(src.Punt)
+									Hit_Effect(src.Owner, Size=src.Punt)
+								src.Owner.HitEffect(src.Owner, src.UnarmedTech, src.SwordTech)
+								OMsg(m, "[m] redirected the force of the attack back at [src.Owner]!")
+								m << "You redirected the force of the attack back at [src.Owner]!"
+								return
 				if(src.DirectWounds)
 					src.Owner.DealWounds(m, src.DirectWounds);
 				var/damageDealt
-				if(src.FixedDamage)
-					m.LoseHealth(src.FixedDamage)
-					damageDealt = src.FixedDamage
+				var/purityBlocked = Owner && FromSkill && Owner.autohitPurityDamageBlocked(m, FromSkill)
+				var/list/autohitSpecMods = Owner ? Owner.autohitSpecDmgTypeList(FromSkill) : list()
+				if(purityBlocked)
+					damageDealt = 0
+				else if(src.FixedDamage)
+					var/fixedAmt = src.FixedDamage
+					if(autohitSpecMods.len)
+						fixedAmt *= Owner.attackModifiers(m, autohitSpecMods)
+					m.LoseHealth(fixedAmt)
+					damageDealt = fixedAmt
 					if(m.Health <= 0 && !m.KO)
 						m.Unconscious(src.Owner)
 				else
+					if(autohitSpecMods.len)
+						FinalDmg *= Owner.attackModifiers(m, autohitSpecMods)
 					var/_skillCritDmg = src.CriticalChance * 0.01
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Increase("CriticalChance", src.CriticalChance)

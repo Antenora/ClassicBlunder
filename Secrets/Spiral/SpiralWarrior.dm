@@ -32,7 +32,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	TopOverlayLock = 'SpiralAura.dmi'
 	TopOverlayX = -32
 	TimerLimit=20
-	ActiveMessage="screams WHO THE HELL DO YOU THINK WE ARE?"
+	ActiveMessage="screams <b>WHO THE HELL DO YOU THINK WE ARE?</b>"
 	OffMessage="limits themselves once again."
 	TextColor="green"
 	MagicNeeded=0

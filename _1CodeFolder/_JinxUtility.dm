@@ -2905,7 +2905,8 @@ mob
 
 		HolyDamage(var/mob/P, var/Forced=0)//Stick this in the DoDamage proc.
 			//To get to this proc, you have to already have holy damage
-			var/HolyDamageValue=src.GetHolyMod()
+			// holy strength when the attacker has no HolyMod passive.
+			var/HolyDamageValue = Forced ? Forced : src.GetHolyMod()
 			if(P.CheckSlotless("Devil Arm") && !P.isRace(DEMON) && !P.isRace(MAKAIOSHIN))
 				if(!Forced)
 					return HolyDamageValue
@@ -2931,21 +2932,18 @@ mob
 				return 1
 		AbyssDamage(mob/P, Forced=0)//Stick this in the DoDamage proc.
 			//yadda yadda gotta have abyss
+			// abyss strength when the attacker has no AbyssMod passive.
+			var/AbyssDamageValue = Forced ? Forced : src.GetAbyssMod()
 			if(P.UsingMuken())
-				if(!Forced)
-					return (-1)*src.GetAbyssMod()
-				else
-					return (-1)*Forced
+				return (-1)*AbyssDamageValue
 			if(HasMaouKi())
 				return 2*src.GetAbyssMod()
 			else if(P.IsGood())
-				if(!Forced)
-					return GetAbyssMod()
-				else
-					return Forced
+				return AbyssDamageValue
 			else if(GetSpiritPower()>=0.25)
 				var/spiritPower = (GetSpiritPower() / 2)
-				return clamp(src.GetAbyssMod()*spiritPower, 0.001, 10)
+				return clamp(AbyssDamageValue*spiritPower, 0.001, 10)
+			return 0.001
 
 		SpiritShift()
 			var/SFStr=src.BaseFor()+(glob.SPIRIT_FORM_BASE_RATE*src.AscensionsAcquired*(src.BaseStr()-src.BaseFor()))
