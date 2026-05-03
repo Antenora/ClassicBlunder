@@ -3279,7 +3279,7 @@ obj
 					SignatureName="Holy Magic"
 					Area="Target"
 					Distance=7
-					HolyMod=20
+					HolyMod=5
 					Purity=1
 					DamageMult=18
 					WindUp=1

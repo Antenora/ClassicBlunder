@@ -3907,7 +3907,7 @@ obj
 						Explode=2
 						Paralyzing=3
 						Scorching=3
-						HolyMod=10
+						HolyMod=3
 						ComboMaster=1
 						IgnoreStun=1
 						ManaCost=20
