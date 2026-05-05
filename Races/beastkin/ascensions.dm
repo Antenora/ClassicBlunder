@@ -6,7 +6,7 @@ ascension
 	beastkin
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			anger = 0.05
+			anger = 0.1
 			choices = ASC_1_CHOICES;
 			on_ascension_message = {"In the distant past, there were 3 Makers of Rift Artifacts. Who designed the equipment that infects your blood today?
 Was it Edge, with the brand of the sword, bloodthirsty and determined?
@@ -26,15 +26,16 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							passives["Nimbus"] = 1
 							passives["HybridStrike"] = 1
 							owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Monkey_Gourd)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							passives["Steady"] = 1
 							passives["Brutalize"] = 0.5
+							endurance = 0.25
 							strength = 0.25
 							offense = 0.25
 							speed = 0.25
@@ -45,9 +46,10 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							strength = 0.5
 							speed = 0.5
 							offense = 0.25
+							force = 0.5
 							defense = -0.25
 							endurance = -0.25
-							anger = 0.25
+							anger = 0.75
 						if("Feather Cowl")
 							passives["BlockChance"] = 25
 							passives["CriticalBlock"] = 0.15
@@ -89,7 +91,7 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 						s.c_buff.adjust_custom_buff(owner, s)
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			anger = 0.25
+			anger = 0.15
 			choices = ASC_2_CHOICES;
 			on_ascension_message = {"Each of the 3 great Makers cast their Artifacts in a particular material. What is your equipment made from?
 Is it made of Ira, quick to lash out?
@@ -111,12 +113,12 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
 							owner.passive_handler.Increase("Brutalize", 0.5)
@@ -132,7 +134,8 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							offense = 0.25
 							defense = -0.25
 							endurance = -0.25
-							anger = 0.25
+							force = 0.5
+							anger = 0.5
 						if("Feather Cowl")
 							owner.passive_handler.Increase("BlockChance", 10)
 							owner.passive_handler.Increase("CriticalBlock", 0.1)
@@ -172,7 +175,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			anger=0.2
+			anger=0.25
 			on_ascension_message = ASC_UPPER_TEXT;
 			choices = ASC_UPPER_CHOICES;
 			onAscension(mob/owner)
@@ -189,15 +192,15 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
+							owner.passive_handler.Increase("Brutalize", 1.5)
 							strength = 0.25
 							offense = 0.25
 							speed = 0.25
@@ -208,6 +211,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							strength = 0.5
 							speed = 0.25
 							offense = 0.25
+							force = 0.5
 							defense = -0.25
 							endurance = -0.25
 							anger = 0.5
@@ -250,7 +254,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			anger = 0.5
+			anger = 0.25
 			on_ascension_message = ASC_UPPER_TEXT;
 			choices = ASC_UPPER_CHOICES;
 			onAscension(mob/owner)
@@ -267,15 +271,15 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
+							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.25
 							offense = 0.25
 							speed = 0.25
@@ -286,7 +290,8 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							strength = 0.5
 							speed = 0.25
 							offense = 0.25
-							anger = 1.5
+							force = 0.5
+							anger = 1
 						if("Feather Cowl")
 							owner.passive_handler.Increase("BlockChance", 10)
 							owner.passive_handler.Increase("CriticalBlock", 0.1)
@@ -342,15 +347,15 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
+							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.25
 							offense = 0.25
 							speed = 0.25
@@ -361,6 +366,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							strength = 0.25
 							speed = 0.25
 							offense = 0.25
+							force = 0.5
 							anger = 1
 						if("Feather Cowl")
 							owner.passive_handler.Increase("BlockChance", 25)
@@ -418,15 +424,15 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.25
+							strength = 0.25
+							offense = 0.25
+							defense = 0.25
+							speed = 0.25
+							force = 0.25
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
+							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.25
 							offense = 0.25
 							speed = 0.25
@@ -437,6 +443,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							strength = 0.25
 							speed = 0.25
 							offense = 0.25
+							force = 0.5
 							anger = 1
 						if("Feather Cowl")
 							owner.passive_handler.Increase("BlockChance", 25)
