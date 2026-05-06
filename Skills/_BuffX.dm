@@ -4049,7 +4049,7 @@ NEW VARIABLES
 		King_of_Braves
 			Cooldown = 1
 			PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
-			passives = list("Tenacity" = 1, "UnderDog" = 0.5, "Persistence" = 1)
+			passives = list("Tenacity" = 1, "UnderDog" = 0.5, "Persistence" = 1, "Shonen" = 1, "ShonenPower" = 0.15)
 			ActiveMessage="surrounds their body in a faint green aura!"
 			OffMessage="deactivates the green energy..."
 			var/list/pu_stats = list()
