@@ -165,6 +165,9 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		if(Secret == "Eldritch")
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
+		if(Secret == "Werewolf")
+			var/SecretInformation/Werewolf/s = secretDatum
+			s.releaseHunger(src)
 
 		if(Health>=75*(1-HealthCut) && Anger!=0)
 			calmcounter--
@@ -240,7 +243,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		if(CheckSpecial("Jinchuuriki") || CheckSpecial("Vaizard Mask"))
 			if(SpecialBuff.Mastery <= 1)
 				SpecialBuff.Trigger(src, Override=1)
-		if(MeditateTime >= 10 && equippedFlask.Charges != GetMaxFlaskCharges()) // Wait 10 seconds, have a flask equipped. 
+		if(MeditateTime >= 10 && equippedFlask.Charges != GetMaxFlaskCharges()) // Wait 10 seconds, have a flask equipped.
 			equippedFlask.Charges = GetMaxFlaskCharges() // Your charges are back to max!
 			src << "Equipped Flask Charges set to [equippedFlask.Charges]"
 	else
@@ -720,12 +723,12 @@ mob
 				if(prob(passive_handler.Get("ContinuallyStun")))
 					Stun(src, rand(1,3), TRUE)
 
-				if(movementSealed)
-					for(var/obj/Seal/S in src)
-						if(S.ZPlaneBind)
-							if(src.z!=S.ZPlaneBind || abs(src.x - S.XBind) > S.DistAllowed || abs(src.y - S.YBind) > S.DistAllowed)
-								OMsg(src, "[src] has triggered their location binding!")
-								src.loc=locate(S.XBind, S.YBind, S.ZPlaneBind)
+			if(movementSealed)
+				for(var/obj/Seal/S in src)
+					if(S.ZPlaneBind)
+						if(src.z!=S.ZPlaneBind || abs(src.x - S.XBind) > S.DistAllowed || abs(src.y - S.YBind) > S.DistAllowed)
+							OMsg(src, "[src] has triggered their location binding!")
+							src.loc=locate(S.XBind, S.YBind, S.ZPlaneBind)
 
 				/*var/obj/Skills/Devils_Deal/dd = findDevilsDeal(src)
 				if(dd)
@@ -738,69 +741,69 @@ mob
 								if(Grabee.Grab==src)
 									Grabee.Grab_Release()
 							dd.returnToOrg(src)*/
-				if(src.passive_handler.Get("The Roaring"))//The Roaring
-					for(var/mob/M in range(100,src))
-						if(!M.passive_handler.Get("Determination"))
-							M.ManaAmount=0
-				if(src.ManaSealed)
-					if(!src.HasMechanized())
-						if(src.TotalCapacity<=99)
-							src.TotalCapacity=99
-					else
-						if(src.TotalCapacity>0)
-							src.TotalCapacity=0
+			if(src.passive_handler.Get("The Roaring"))//The Roaring
+				for(var/mob/M in range(100,src))
+					if(!M.passive_handler.Get("Determination"))
+						M.ManaAmount=0
+			if(src.ManaSealed)
+				if(!src.HasMechanized())
+					if(src.TotalCapacity<=99)
+						src.TotalCapacity=99
+				else
+					if(src.TotalCapacity>0)
+						src.TotalCapacity=0
 
-				if(Secret)
-					if(Secret=="Vampire")
-						var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/vampireBuff
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/v in src)
-							vampireBuff = v
-						if(!BuffOn(vampireBuff))
-							vampireBuff.Trigger(src, Override=1)
-						if(BuffOn(vampireBuff))
-							vampireBuff.adjust(src)
-						var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
-							Wassail = W
-						if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
-							if(!CheckSlotless("Rotschreck"))
-								Wassail.adjust(src)
-								Wassail.Trigger(src, Override=1)
-						if(BuffOn(Wassail))
+			if(Secret)
+				if(Secret=="Vampire")
+					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/vampireBuff
+					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/v in src)
+						vampireBuff = v
+					if(!BuffOn(vampireBuff))
+						vampireBuff.Trigger(src, Override=1)
+					if(BuffOn(vampireBuff))
+						vampireBuff.adjust(src)
+					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
+					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
+						Wassail = W
+					if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
+						if(!CheckSlotless("Rotschreck"))
 							Wassail.adjust(src)
-						var/obj/Skills/Buffs/SlotlessBuffs/R
-						if(CheckSlotless("Rotschreck"))
-							R = GetSlotless("Rotschreck")
-							R:adjust(src)
-						var/SecretInformation/Vampire/vampire = secretDatum
-						if(vampire.secretVariable["LastBloodGain"] + 450 < world.time && vampire.secretVariable["BloodPower"] > 0)
-							if(!PureRPMode)
-								vampire.drainBlood()
-								vampireBlood.fillGauge(clamp(secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
-						if(src.icon_state=="Train"&&!src.PoseEnhancement)
-							src.PoseTime += 1
-							if(src.PoseTime==5)
-								src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
+							Wassail.Trigger(src, Override=1)
+					if(BuffOn(Wassail))
+						Wassail.adjust(src)
+					var/obj/Skills/Buffs/SlotlessBuffs/R
+					if(CheckSlotless("Rotschreck"))
+						R = GetSlotless("Rotschreck")
+						R:adjust(src)
+					var/SecretInformation/Vampire/vampire = secretDatum
+					if(vampire.secretVariable["LastBloodGain"] + 450 < world.time && vampire.secretVariable["BloodPower"] > 0)
+						if(!PureRPMode)
+							vampire.drainBlood()
+							vampireBlood.fillGauge(clamp(secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
+					if(src.icon_state=="Train"&&!src.PoseEnhancement)
+						src.PoseTime += 1
+						if(src.PoseTime==5)
+							src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
 
-					if(Secret=="Werewolf")
-						if(secretDatum.secretVariable["Hunger Active"] == 1)
-							var/SecretInformation/Werewolf/s = secretDatum
-							if(!PureRPMode)
-								s.releaseHunger()
-								if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
-									src << "You have exhausted all the flesh you consumed and have reverted from your war form."
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-										fmf.Trigger(src, Override=1)
+				if(Secret=="Werewolf")
+					if(secretDatum.secretVariable["Hunger Active"] == 1)
+						var/SecretInformation/Werewolf/s = secretDatum
+						if(!PureRPMode)
+							s.releaseHunger(src)
+							if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
+								src << "You have exhausted all the flesh you consumed and have reverted from your war form."
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
+									fmf.Trigger(src, Override=1)
 
-					if(Secret=="Eldritch")
-						if(secretDatum.secretVariable["Madness Active"] == 1)
-							var/SecretInformation/Eldritch/s = secretDatum
-							if(!PureRPMode)
-								s.releaseMadness(src)
-								if(secretDatum.secretVariable["Madness"] <=0 && CheckSlotless("True Form"))
-									src << "You have exhausted all the madness and have reverted to your sane form."
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
-										fmf.Trigger(src, Override=1)
+				if(Secret=="Eldritch")
+					if(secretDatum.secretVariable["Madness Active"] == 1)
+						var/SecretInformation/Eldritch/s = secretDatum
+						if(!PureRPMode)
+							s.releaseMadness(src)
+							if(secretDatum.secretVariable["Madness"] <=0 && CheckSlotless("True Form"))
+								src << "You have exhausted all the madness and have reverted to your sane form."
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+									fmf.Trigger(src, Override=1)
 
 
 			if(src.ManaDeath)

@@ -498,10 +498,11 @@ SecretInformation
 			else
 				secretVariable["Hunger Satiation"] += amount
 
-		proc/releaseHunger()
-			if(secretVariable["Hunger Active"] == 0) return
-			var/tierEffectiveness = 8 - currentTier
+		proc/releaseHunger(mob/user)
+			var/tierEffectiveness = 8
 			// LESS = MORE
+			if(user.CheckSlotless("Full Moon Form"))
+				tierEffectiveness -= currentTier
 			secretVariable["Hunger Satiation"] -= tierEffectiveness
 			if(secretVariable["Hunger Satiation"] <= 0)
 				secretVariable["Hunger Satiation"] = 0
