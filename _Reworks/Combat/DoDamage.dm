@@ -213,6 +213,12 @@
 		var/inevVal = passive_handler.Get("Inevitable")
 		if(inevVal)
 			trueMult += 5 * inevVal
+	if(passive_handler.Get("Speed Force"))
+		var/EffectiveSF=1
+		if(Secret=="Heavenly Restriction" && secretDatum?:hasImprovement("Speed"))
+			EffectiveSF=2
+		var/SF=passive_handler.Get("Speed Force")
+		trueMult -= glob.SPEED_FORCE_TRUEMULT * (SF/EffectiveSF)
 	#if DEBUG_DAMAGE
 	log2text("trueMult", "After Purered", "damageDebugs.txt", "[src.ckey]/[src.name]")
 	log2text("trueMult", trueMult,"damageDebugs.txt", "[src.ckey]/[src.name]")

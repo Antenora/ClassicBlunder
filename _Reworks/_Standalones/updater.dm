@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 15
+	var/UPDATE_VERSION = 20
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -40,6 +40,33 @@ globalTracker
 
 
 mob/var/update/updateVersion
+
+// fix for disarm
+/mob/proc/RestoreSkillDamageMultsAfterDisarmFix()
+	if(!Skills || !Skills.len)
+		return 0
+	var/skills_reset = 0
+	for(var/obj/Skills/Queue/q in Skills)
+		var/defq = initial(q.DamageMult)
+		if(q.DamageMult != defq)
+			q.DamageMult = defq
+			skills_reset++
+	for(var/obj/Skills/AutoHit/a in Skills)
+		var/defa = initial(a.DamageMult)
+		if(a.DamageMult != defa)
+			a.DamageMult = defa
+			skills_reset++
+	for(var/obj/Skills/Projectile/pr in Skills)
+		var/defp = initial(pr.DamageMult)
+		if(pr.DamageMult != defp)
+			pr.DamageMult = defp
+			skills_reset++
+	for(var/obj/Skills/Grapple/g in Skills)
+		var/defg = initial(g.DamageMult)
+		if(g.DamageMult != defg)
+			g.DamageMult = defg
+			skills_reset++
+	return skills_reset
 
 update
 	var/version = 1
@@ -330,6 +357,128 @@ update
 					p << "A stray Mazoku Devil Trigger has been removed from your transformations. You're a regular Demon. Dummy."
 
 
+	version16
+		version = 16;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(DRAGON))
+				switch(p.Class)
+					if("Metal")
+						if(p.AscensionsAcquired >= 1)
+							p.StrAscension += 0.25
+							p.EndAscension += 1.25
+							p.OffAscension -= 0.5
+							p.ForAscension += 0.5
+							p.passive_handler.Decrease("DeathField", 1)
+							p.passive_handler.Increase("PureReduction", 1)
+						if(p.AscensionsAcquired >= 2)
+							p.StrAscension += 0.75
+							p.EndAscension += 0.75
+							p.DefAscension -= 0.25
+							p.ForAscension += 0.5
+							p.passive_handler.Decrease("DeathField", 1)
+							p.passive_handler.Increase("PureReduction", 1)
+					if("Fire")
+						if(p.AscensionsAcquired >= 1)
+							p.StrAscension += 0.5
+							p.ForAscension += 0.5
+							p.OffAscension += 0.25
+							p.passive_handler.Increase("SpiritHand", 1.5)
+						if(p.AscensionsAcquired >= 2)
+							p.StrAscension += 0.75
+							p.ForAscension += 0.75
+							p.OffAscension -= 0.25
+							p.passive_handler.Increase("SpiritHand", 1.5)
+					if("Water")
+						if(p.AscensionsAcquired >= 1)
+							p.StrAscension -= 0.25
+							p.ForAscension += 0.25
+							p.DefAscension += 0.5
+							p.SpdAscension += 1
+						if(p.AscensionsAcquired >= 2)
+							p.StrAscension -= 0.25
+							p.ForAscension += 0.25
+							p.DefAscension += 1
+							p.SpdAscension += 0.5
+					if("Wind")
+						if(p.AscensionsAcquired >= 1)
+							p.ForAscension += 0.25
+							p.SpdAscension += 1
+							p.OffAscension -= 0.25
+							p.DefAscension += 0.5
+						if(p.AscensionsAcquired >= 2)
+							p.ForAscension += 0.25
+							p.SpdAscension += 1.25
+							p.OffAscension += 0.25
+					if("Gold")
+						if(p.AscensionsAcquired >= 1)
+							p.EndAscension += 0.5
+							p.SpdAscension += 0.75
+						if(p.AscensionsAcquired >= 2)
+							p.EndAscension += 0.75
+							p.SpdAscension += 1
+					if("Dark")
+						if(p.AscensionsAcquired >= 1)
+							p.StrAscension += 0.65
+							p.SpdAscension += 0.15
+							p.OffAscension += 0.15
+						if(p.AscensionsAcquired >= 2)
+							p.StrAscension += 0.75
+							p.SpdAscension += 0.75
+							p.OffAscension += 0.25
+	version17
+		version = 17;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(HUMAN)&&p.Class=="Heroic")
+				if(p.AscensionsAcquired >= 2)
+					p.passive_handler.Increase("PureReduction", 3)
+					p.passive_handler.Increase("PureDamage", 3)
+				if(p.AscensionsAcquired >= 3)
+					p.passive_handler.Increase("PureReduction", 2)
+					p.passive_handler.Increase("PureDamage", 2)
+	version18
+		version = 18;
+		updateMob(mob/p)
+			. = ..()
+			var/fixed = p.RestoreSkillDamageMultsAfterDisarmFix()
+			if(fixed)
+				p << "Your skill DamageMults have been restored. Rejoice."
+			if(p.isRace(BEASTKIN))
+				for(var/a=p.AscensionsAcquired, a > 0, a--)
+					var/ascension/asc = p.race.ascensions[a];
+					asc.revertAscension(p);
+					p.AscensionsAcquired--;
+					p << "Reverted Beastkin ascension [a]"
+				p.race.ascensions = list();
+				p.race.fixAscensions();
+				p << "Gave new Beastkin ascension types."
+	version19
+		version = 19;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(BEASTKIN))
+				p.race.ascensions = list();
+				if(p.race.ascensions.len <= 0)
+					p.race.ascensions |= new/ascension/beastkin/one
+					p.race.ascensions |= new/ascension/beastkin/two
+					p.race.ascensions |= new/ascension/beastkin/three
+					p.race.ascensions |= new/ascension/beastkin/four
+					p.race.ascensions |= new/ascension/beastkin/five
+					p.race.ascensions |= new/ascension/beastkin/six
+					p << "You have <b>actually</b> been given new ascensions as a Beastkin now.";
+	version20
+		version = 20;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(NOBODY)&&Class=="Imaginary")
+				p.passive_handler.Increase("DrainlessPUSpike", 1)
+				if(p.AscensionsAcquired>=1)
+					p.passive_handler.Increase("EnergyGeneration", 2)
+					p.passive_handler.Increase("ManaGeneration", 1)
+				if(p.AscensionsAcquired>=2)
+					p.passive_handler.Increase("EnergyGeneration", 2)
+					p.passive_handler.Increase("ManaGeneration", 1)
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

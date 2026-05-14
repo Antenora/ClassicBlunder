@@ -49,8 +49,9 @@
    // IconApart = 1
 
      /* All of Mang's passives and stats are scattered across passive procs. This is so that they can scale based off of how many Mang you have
-     The passives are as follows: Steady, Godspeed, Brutalize, BlurringStrikes, BuffMastery, PureDamage
-     They scale off of how many mang you have active. They do NOT show up in the passive handler rn
+     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage
+     They scale off of how many mang you have active. They do NOT show up in the passive handler rn 
+     and if you want to know their values check the passive files
      Please do not go screaming about how "Mang does nothing" I will gut you myself - Hadoje */
      
     

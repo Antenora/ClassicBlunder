@@ -20,24 +20,25 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							passives["Adrenaline"] = 1
 							passives["Harden"] = 1
 							passives["CallousedHands"] = 0.1
-							endurance = 0.25
+							endurance = 1
 							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							passives["Nimbus"] = 1
 							passives["HybridStrike"] = 1
 							owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Monkey_Gourd)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							passives["Steady"] = 1
-							passives["Brutalize"] = 0.5
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							passives["Brutalize"] = 1
+							strength = 0.75
+							offense = 0.75
+							speed = 0.5
 						if("Undying Rage")
 							passives["Momentum"] = 1
 							passives["KillerInstinct"] = 0.05
@@ -45,43 +46,49 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							strength = 0.5
 							speed = 0.5
 							offense = 0.25
-							defense = -0.25
-							endurance = -0.25
+							defense = -0.1
+							endurance = -0.1
 							anger = 1
 						if("Feather Cowl")
 							passives["BlockChance"] = 25
-							passives["CriticalBlock"] = 0.15
-							endurance = 0.5
-							defense = 0.5
+							passives["CriticalBlock"] = 0.25
+							passives["CriticalChance"] = 10
+							passives["CriticalDamage"] = 0.1
+							speed = 1
+							offense = 1
 						if("Feather Knife")
 							passives["CriticalChance"] = 25
-							passives["CriticalDamage"] = 0.15
+							passives["CriticalDamage"] = 0.25
+							passives["Musoken"] = 1;
+							passives["AttackSpeed"] = 1;
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
 							offense = 0.5
-							speed = 0.25
 						if("Spirit Walker")
 							passives["Flow"] = 1
 							passives["Instinct"] = 1
-							endurance = 0.25
-							strength = 0.1
-							offense = 0.2
-							defense = 0.2
+							strength = 0.5
+							endurance = 0.5
+							offense = 0.5
+							defense = 0.5
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							strength = 0.25
+							strength = 0.5
 							force = 0.5
-							offense = 0.75
+							offense = 0.5
+							defense = 0.5
 							passives["TechniqueMastery"] = 1
 							passives["Touch of Death"] = 1
 							passives["QuickCast"] = 1
 							passives["ManaGeneration"] = 2
 							passives["ManaStats"] = 0.25
-
 						if("Fox Fire")
 							passives["SoftStyle"] = 1
 							passives["SoulFire"] = 1
-							offense = 0.25
-							force = 0.5
+							offense = 1
+							force = 1
 				..()
 				if(!applied)
 					if(owner.Class == "Shapeshifter")
@@ -104,25 +111,25 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("CallousedHands", 0.1)
-							endurance = 0.25
-							strength = 0.25
-							speed = 0.25
+							endurance = 1
+							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Brutalize", 1)
+							strength = 0.5
+							offense = 0.75
+							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
 							owner.passive_handler.Increase("KillerInstinct", 0.1)
@@ -134,47 +141,51 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = -0.25
 							anger = 1
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 10)
-							owner.passive_handler.Increase("CriticalBlock", 0.1)
-							speed = 0.5
-							offense = 0.25
+							owner.passive_handler.Increase("BlockChance", 10);
+							owner.passive_handler.Increase("CriticalBlock", 0.1);
+							owner.passive_handler.Increase("CriticalChance", 5);
+							owner.passive_handler.Increase("CriticalDamage", 0.05);
+							speed = 1
+							offense = 1
 						if("Feather Knife")
 							owner.passive_handler.Increase("CriticalChance", 10)
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
-							strength = 0.25
-							speed = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("Musoken", 1)
+							owner.passive_handler.Increase("AttackSpeed", 1)
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
+							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 2)
-							owner.passive_handler.Increase("Instinct", 2)
-							force = 0.25
-							strength = 0.25
-							endurance = 0.25
-
+							owner.passive_handler.Increase("Flow", 1)
+							owner.passive_handler.Increase("Instinct", 1)
+							strength=0.5;
+							force=0.5;
+							offense=0.5;
+							defense=0.5;
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							strength = 0.25
-							force = 0.25
-							offense = 0.25
+							strength = 0.5
+							force = 0.5
+							offense = 0.5
+							defense = 0.5
 							owner.passive_handler.Increase("Touch of Death", 1);
 							owner.passive_handler.Increase("ManaGeneration", 1);
 							owner.passive_handler.Increase("QuickCast", 2);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("ManaStats", 0.5);
 							owner.passive_handler.Increase("MovementMastery", 1);
-
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							offense = 0.25
-							force = 0.5
+							offense = 1
+							force = 1
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			anger=0.2
-			on_ascension_message = ASC_UPPER_TEXT;
-			choices = ASC_UPPER_CHOICES;
+			on_ascension_message = "ouughhh ascension 3"
 			onAscension(mob/owner)
 				if(!applied)
 					var/choice = owner.race?:Racial
@@ -183,24 +194,24 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("CallousedHands", 0.1)
-							endurance = 0.25
-							strength = 0.25
-							speed = 0.25
+							endurance = 1
+							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Brutalize", 1)
+							strength = 0.75
+							offense = 0.5
+							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
 							owner.passive_handler.Increase("KillerInstinct", 0.1)
@@ -212,47 +223,51 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = -0.25
 							anger = 1
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 10)
-							owner.passive_handler.Increase("CriticalBlock", 0.1)
-							speed = 0.5
-							offense = 0.25
+							owner.passive_handler.Increase("BlockChance", 10);
+							owner.passive_handler.Increase("CriticalBlock", 0.1);
+							owner.passive_handler.Increase("CriticalChance", 5);
+							owner.passive_handler.Increase("CriticalDamage", 0.05);
+							speed = 1
+							strength = 1
 						if("Feather Knife")
 							owner.passive_handler.Increase("CriticalChance", 10)
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
-							strength = 0.25
-							speed = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("Musoken", 1)
+							owner.passive_handler.Increase("AttackSpeed", 1)
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
+							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 2)
-							owner.passive_handler.Increase("Instinct", 2)
-							force = 0.25
-							strength = 0.25
-							endurance = 0.25
-
+							owner.passive_handler.Increase("Flow", 1)
+							owner.passive_handler.Increase("Instinct", 1)
+							strength=0.5;
+							force=0.5;
+							offense=0.5;
+							defense=0.5;
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							strength = 0.25
-							force = 0.25
-							offense = 0.25
+							strength = 0.5
+							force = 0.5
+							offense = 0.5
+							defense = 0.5
 							owner.passive_handler.Increase("ManaGeneration", 1);
 							owner.passive_handler.Increase("QuickCast", 1);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("SpiritStrike", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.25);
-
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							offense = 0.25
-							force = 0.5
+							offense = 1
+							force = 1
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
 			anger = 0.5
-			on_ascension_message = ASC_UPPER_TEXT;
-			choices = ASC_UPPER_CHOICES;
+			on_ascension_message = "ouughhh ascension 4"
 			onAscension(mob/owner)
 				if(!applied)
 					var/choice = owner.race?:Racial
@@ -261,24 +276,24 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("CallousedHands", 0.1)
-							endurance = 0.25
-							strength = 0.25
-							speed = 0.25
+							endurance = 1
+							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Brutalize", 1)
+							strength = 0.75
+							offense = 0.75
+							speed = 0.5
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
 							owner.passive_handler.Increase("KillerInstinct", 0.1)
@@ -288,72 +303,76 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							offense = 0.25
 							anger = 1.5
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 10)
-							owner.passive_handler.Increase("CriticalBlock", 0.1)
-							speed = 0.5
-							offense = 0.25
+							owner.passive_handler.Increase("BlockChance", 10);
+							owner.passive_handler.Increase("CriticalBlock", 0.1);
+							owner.passive_handler.Increase("CriticalChance", 5);
+							owner.passive_handler.Increase("CriticalDamage", 0.05);
+							speed = 1
+							defense = 1
 						if("Feather Knife")
 							owner.passive_handler.Increase("CriticalChance", 10)
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
-							strength = 0.25
-							speed = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("Musoken", 1)
+							owner.passive_handler.Increase("AttackSpeed", 1)
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
+							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 2)
-							owner.passive_handler.Increase("Instinct", 2)
-							force = 0.25
-							strength = 0.25
-							endurance = 0.25
-
+							owner.passive_handler.Increase("Flow", 1)
+							owner.passive_handler.Increase("Instinct", 1)
+							strength=0.5;
+							force=0.5;
+							offense=0.5;
+							defense=0.5;
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							strength = 0.25
-							force = 0.25
-							endurance = 0.25
+							strength = 0.5
+							force = 0.5
+							offense = 0.5
+							defense = 0.5
 							owner.passive_handler.Increase("SpiritStrike", 0.25);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.25);
-
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
 							owner.passive_handler.Increase("SpiritStrike", 1)
-							offense = 0.25
-							force = 0.5
+							offense = 1
+							force = 1
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			anger = 0.5
-			on_ascension_message = ASC_UPPER_TEXT;
-			choices = ASC_UPPER_CHOICES;
+			on_ascension_message = "ouughhh ascension 5"
 			onAscension(mob/owner)
 				if(!applied)
 					var/choice = owner.race?:Racial
 					switch(choice)
 						if("Heart of The Beastkin")
-							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
 							owner.passive_handler.Increase("CallousedHands", 0.1)
-							endurance = 0.25
-							strength = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Deflection", 2)
+							endurance = 1
+							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Brutalize", 1)
+							strength = 0.5
+							offense = 0.75
+							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
 							owner.passive_handler.Increase("KillerInstinct", 0.1)
@@ -363,73 +382,77 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							offense = 0.25
 							anger = 1
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 25)
-							owner.passive_handler.Increase("CriticalBlock", 0.5)
-							speed = 0.5
-							offense = 0.25
+							owner.passive_handler.Increase("BlockChance", 10);
+							owner.passive_handler.Increase("CriticalBlock", 0.1);
+							owner.passive_handler.Increase("CriticalChance", 5);
+							owner.passive_handler.Increase("CriticalDamage", 0.05);
+							speed = 1
+							offense = 1
 						if("Feather Knife")
-							owner.passive_handler.Increase("CriticalChance", 25)
-							owner.passive_handler.Increase("CriticalDamage", 0.5)
-							strength = 0.25
-							speed = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("CriticalChance", 10)
+							owner.passive_handler.Increase("CriticalDamage", 0.1)
+							owner.passive_handler.Increase("Musoken", 1)
+							owner.passive_handler.Increase("AttackSpeed", 1)
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
+							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 2)
-							owner.passive_handler.Increase("Instinct", 2)
-							force = 0.25
-							strength = 0.25
-							endurance = 0.25
-
+							owner.passive_handler.Increase("Flow", 1)
+							owner.passive_handler.Increase("Instinct", 1)
+							strength=0.5;
+							force=0.5;
+							offense=0.5;
+							defense=0.5;
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							strength = 0.25
-							force = 0.25
-							endurance = 0.25
+							strength = 0.5
+							force = 0.5
+							offense = 0.5
+							defense = 0.5
 							owner.passive_handler.Increase("SpiritStrike", 0.75);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.5);
-
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
 							owner.passive_handler.Increase("SpiritStrike", 1)
-							offense = 0.25
-							force = 0.5
-							endurance = 0.25
+							offense = 0.5
+							force = 1
+							endurance = 0.5
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			anger = 1;
-			on_ascension_message = ASC_UPPER_TEXT;
-			choices = ASC_UPPER_CHOICES;
+			on_ascension_message = "ouughhh ascension 6"
 			onAscension(mob/owner)
 				if(!applied)
 					var/choice = owner.race?:Racial
 					switch(choice)
 						if("Heart of The Beastkin")
-							owner.passive_handler.Increase("Blubber", 0.25)
-							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("CallousedHands", 0.1)
-							endurance = 0.25
-							strength = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("CallousedHands", 0.2)
+							owner.passive_handler.Increase("Deflection", 2)
+							owner.passive_handler.Increase("DemonicDurability", 1);
+							endurance = 1
+							strength = 0.5
+							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("HybridStrike", 1)
-							endurance = 0.15
-							strength = 0.15
-							offense = 0.15
-							defense = 0.15
-							speed = 0.15
-							force = 0.15
+							endurance = 0.3
+							strength = 0.35
+							offense = 0.35
+							defense = 0.35
+							speed = 0.3
+							force = 0.35
 						if("Unseen Predator")
 							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 0.5)
-							strength = 0.25
-							offense = 0.25
-							speed = 0.25
+							owner.passive_handler.Increase("Brutalize", 1)
+							strength = 0.75
+							offense = 0.5
+							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
 							owner.passive_handler.Increase("KillerInstinct", 0.1)
@@ -439,38 +462,44 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							offense = 0.25
 							anger = 1
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 25)
-							owner.passive_handler.Increase("CriticalBlock", 0.5)
-							speed = 0.5
-							offense = 0.25
+							owner.passive_handler.Increase("BlockChance", 25);
+							owner.passive_handler.Increase("CriticalBlock", 0.25);
+							owner.passive_handler.Increase("CriticalChance", 20);
+							owner.passive_handler.Increase("CriticalDamage", 0.2);
+							speed = 1
+							defense = 1
 						if("Feather Knife")
 							owner.passive_handler.Increase("CriticalChance", 25)
-							owner.passive_handler.Increase("CriticalDamage", 0.5)
-							strength = 0.25
-							speed = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("CriticalDamage", 0.25)
+							owner.passive_handler.Increase("BlockChance", 25);
+							owner.passive_handler.Increase("CriticalBlock", 0.25);
+							strength = 0.5
+							speed = 0.5
+							endurance = 0.5
+							offense = 0.5
 						if("Spirit Walker")
 							owner.passive_handler.Increase("Flow", 2)
 							owner.passive_handler.Increase("Instinct", 2)
-							force = 0.25
-							strength = 0.25
-							endurance = 0.25
+							owner.passive_handler.Increase("LikeWater", 3)
+							strength=0.5;
+							force=0.5;
+							offense=0.5;
+							defense=0.5;
 
 						if("Trickster")
 							ecoAdd = 1
 							imaginationAdd = 0.5
-							endurance = 0.1
-							strength = 0.1
-							offense = 0.1
-							defense = 0.1
-							speed = 0.1
-							force = 0.1
+							strength = 0.5
+							force = 0.5
+							offense = 0.5
+							defense = 0.5
 
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
 							owner.passive_handler.Increase("SpiritStrike", 1)
-							offense = 0.25
-							force = 0.5
-							endurance = 0.25
+							offense = 0.5
+							force = 1
+							endurance = 0.5
 				..()
+

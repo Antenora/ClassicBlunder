@@ -132,6 +132,9 @@ progressTracker
 
 		SAGA_T2_POT = 15
 		SAGA_T3_POT = 25
+		SAGA_T4_POT = 45
+		SAGA_T5_POT = 60
+		SAGA_T6_POT = 75
 
 		//unfortunately these must be set through a very dumb proc in _world.dm
 		T1_STYLES = list(10, 20, 25, 35)
@@ -406,6 +409,8 @@ globalTracker
 		ATTACK_DELAY_DIVISOR=12
 		ATTACK_DELAY_MAX = 20
 		ATTACK_DELAY_MIN = 2
+		SPEED_FORCE_TRUEMULT = 2
+		SPEED_FORCE_DELAYMULT = 4
 		CYBERIZESAGAS = list("King of Braves")
 		ENERGY_GEN_DIVISOR = 10
 		LIFE_GEN_DIVISOR = 10
@@ -426,12 +431,12 @@ globalTracker
 		FA_JIN_COOLDOWN_REDUCTION = 25
 		BASE_WUJUDAMAGE = 0.015
 		GLOBAL_BEAM_DAMAGE_DIVISOR = 35
-		GLOBAL_QUEUE_DAMAGE = 0.85
+		GLOBAL_QUEUE_DAMAGE = 0.8
 		GLOBAL_MELEE_MULT = 0.9
 		GLOBAL_POWER_MULT = 1
 		GLOBAL_ITEM_DAMAGE_MULT = 1
 		EXPONENTIAL_PROJ_DAMAGE = FALSE
-		PROJ_DAMAGE_MULT = 1
+		PROJ_DAMAGE_MULT = 0.8
 		AUTOHIT_GLOBAL_DAMAGE = 0.8
 		SOFT_STYLE_RATIO = 0.2
 		SOFT_STYLE_DMG_BOON_DIVISOR = 2
@@ -446,7 +451,7 @@ globalTracker
 		GRIPPY_MOD = 0.25
 		CLAMP_POWER = TRUE
 		MIN_POWER_DIFF = 0.5
-		MAX_POWER_DIFF = 1.5
+		MAX_POWER_DIFF = 2
 		AUTOHIT_GRAB_NERF = 0.5
 		PARTY_DAMAGE_NERF = 0.8
 		MOD_AFTER_ACC = TRUE
@@ -484,9 +489,9 @@ globalTracker
 // effectiveness (dmg calc  shit)
 		MELEE_EFFECTIVENESS = 1
 		PROJECTILE_EFFECTIVNESS = 1
-		GRAPPLE_EFFECTIVNESS = 2
-		AUTOHIT_EFFECTIVNESS = 2
-		GRAPPLE_DAMAGE_MULT = 1
+		GRAPPLE_EFFECTIVNESS = 1
+		AUTOHIT_EFFECTIVNESS = 1
+		GRAPPLE_DAMAGE_MULT = 0.8
 		MUSCLE_POWER_DIVISOR = 4
 		MAX_PURSUER_BOON = 10
 		DMG_END_EXPONENT = 0.4
@@ -508,11 +513,13 @@ globalTracker
 		ROYAL_GUARD_CHARGE_MULT=1.0
 		ROYAL_GUARD_DMG_MULT=1.0
 
+		TILE_DURATION_DIVISOR=2
+
 		HARDER_THEY_FALL_BIO_DIVISOR = 100 // if u use this when changie first start it will do big damage
 		HARDER_THEY_FALL_VAI_DIVISOR = 25 // more often no1 has this much vai, in hindsight deus ex machima will give kob more tha nthis, but they will suffer 2x damage ig
 
 // dmg rolls
-		min_damage_roll = 0.2
+		min_damage_roll = 0.4
 		max_damage_roll = 0.8
 
 //SPEED COOLDOWN SHIT

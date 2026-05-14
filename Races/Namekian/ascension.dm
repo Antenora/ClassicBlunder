@@ -1,6 +1,4 @@
 ascension
-
-
 	namekian
 		one
 			unlock_potential	=	ASCENSION_ONE_POTENTIAL
@@ -65,10 +63,11 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Class) // super namek era
 					if("Demon")
-						strength = 1.5
-						force = 1.5
+						strength = 1.75
+						force = 1.75
+						endurance = 1.5
 						offense = 0.75
-						anger = 0.25
+						anger = 0.5
 						passives = list("DemonicDurability" = 1, "MovementMastery" = 2)
 					if("Dragon")
 						//power = 1.5
@@ -92,7 +91,8 @@ ascension
 						//power = 2
 						strength = 1.75
 						force = 1.75
-						anger = 0.25
+						endurance = 1.5
+						anger = 0.5
 						passives = list("DemonicDurability" = 1, "MovementMastery" = 4, "Extend" = 1, "Gum Gum" = 1)
 					if("Warrior")
 						//power = 3

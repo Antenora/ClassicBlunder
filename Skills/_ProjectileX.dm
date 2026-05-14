@@ -209,6 +209,8 @@ obj
 				AngelMagicCompatible
 				CriticalChance
 				LingeringTornado//spawn obj/leftOver/LingeringTornado on hit
+				BypassTempHP=0//if 1, damage bypasses VaizardHealth and BioArmor, hitting Health directly
+				SkillDeicide=0//temporarily adds this much Deicide on hit
 			skillDescription()
 				..()
 				if(MaimCost)
@@ -2474,7 +2476,7 @@ obj
 				StrRate=1
 				ForRate=0
 				EndRate=0.75
-				Knockback=1
+				Knockback=2
 				MultiHit=8
 				DamageMult=2
 				AccMult = 1.25
@@ -3488,13 +3490,15 @@ obj
 					Charge=2
 					DamageMult=0.6
 					Instinct=1
-					AccMult=2
+					AccMult=1
 					Explode=1
 					Distance=100
 					ZoneAttackX=10
 					ZoneAttackY=10
 					Hover=10
 					Variation=0
+					Homing=3
+					HyperHoming=1
 					Cooldown=180
 					verb/Homing_Finisher()
 						set category="Skills"
@@ -3632,6 +3636,7 @@ obj
 				MagicNeeded=1
 				Fire
 					ElementalClass="Fire"
+					SpellElement="Fire"
 					SkillCost=TIER_2_COST
 					Copyable=2
 					DamageMult=1
@@ -3651,6 +3656,7 @@ obj
 
 				Fira
 					ElementalClass="Fire"
+					SpellElement="Fire"
 					SkillCost=TIER_2_COST
 					Copyable=3
 					PreRequisite=list("/obj/Skills/Projectile/Magic/Fire")
@@ -3674,6 +3680,7 @@ obj
 						usr.UseProjectile(src)
 				Firaga
 					ElementalClass="Fire"
+					SpellElement="Fire"
 					SkillCost=TIER_2_COST
 					Copyable=4
 					PreRequisite=list("/obj/Skills/Projectile/Magic/Fira")
@@ -3701,6 +3708,7 @@ obj
 
 				Disintegrate
 					ElementalClass="Fire"
+					SpellElement="Fire"
 					SkillCost=TIER_4_COST
 					Copyable=5
 					Distance=50
@@ -3753,9 +3761,9 @@ obj
 						usr.UseProjectile(src)
 				Meteor
 					ElementalClass="Fire"
+					SpellElement="Earth"
 					SkillCost=TIER_4_COST
 					Copyable=5
-					PreRequisite=list("/obj/Skills/Projectile/Magic/Disintegrate")
 					Distance=50
 					DamageMult=12
 					Dodgeable=-1
@@ -3851,7 +3859,8 @@ obj
 							adjust(usr)
 							usr.UseProjectile(src)
 					Sunlight_Spear//Holy
-						ElementalClass="Wind"
+						ElementalClass="Light"
+						SpellElement="Light"
 						SignatureTechnique=2
 						HolyMod=5
 						DamageMult=15
@@ -3876,6 +3885,7 @@ obj
 							usr.UseProjectile(src)
 					Hellfire_Nova
 						ElementalClass="Fire"
+						SpellElement="Fire"
 						SignatureTechnique=1
 						SignatureName="Advanced Fire Magic"
 						Distance=50
@@ -4867,7 +4877,6 @@ mob
 				if(!HeroPresent)
 					src<<"You lack the required party member to use this."
 					return
-			var/disarmed_cut = FALSE
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
 				// find people in a zone, if the person in the zone has counterspell up and is not in the party, then return and go on cooldown
 				for(var/mob/x in orange(5, src))
@@ -4886,8 +4895,6 @@ mob
 					src << "Your mana circuits are too damaged to use magic! (until [time2text(src.MagicTaken, "DDD MMM DD hh:mm:ss")])"
 					return;
 				if(Z.Copyable>=3||!Z.Copyable)
-					if(passive_handler.Get("Disarmed") && !src.HasLimitlessMagic() && !src.HasBladeFisting())
-						disarmed_cut = TRUE
 					if(!src.HasSpellFocus(Z))
 						src << "You need a spell focus to use [Z]."
 						return 0
@@ -4906,8 +4913,6 @@ mob
 							usr << "Your [Z] is out of power!"
 							return 0
 			Z.SpellSlotModification();
-			if(disarmed_cut)
-				Z.DamageMult = (Z.DamageMult / 2)
 			if(!Z.Charging)//Only beams get this exception
 				if(!src.CanAttack(3)&&!Z.AttackReplace)
 					return 0
@@ -4967,8 +4972,6 @@ mob
 					src << "You can't use [Z] before you're below [Z.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Z.NeedsSword)
-				if(passive_handler.Get("Disarmed")&& !src.HasBladeFisting())
-					Z.DamageMult = (Z.DamageMult / 2)
 				if(!src.EquippedSword())
 					if(!src.HasBladeFisting()&& !src.UsingBattleMage())
 						src << "You need a sword to use this technique!"
@@ -4990,8 +4993,6 @@ mob
 				if(s)
 					if(s.MagicSword)
 						Pass=1
-				if(passive_handler.Get("Disarmed")&& !src.HasLimitlessMagic())
-					Z.DamageMult = (Z.DamageMult / 2)
 				if(!Pass)
 					src << "You need a staff to use this technique!"
 					return
@@ -5564,6 +5565,8 @@ obj
 					src.DamageMult=Z.DamageMult
 					if(Z.TempDamage)
 						src.DamageMult=Z.TempDamage
+					if(Owner)
+						src.DamageMult *= Owner.GetDisarmedProjectileDamageFactor(Z)
 					if(Z.while_warping)
 						DamageMult /= glob.WHILEWARPINGNERF
 						Z.while_warping = FALSE
@@ -5798,6 +5801,10 @@ obj
 								Owner.WarpStrikeHidingWeapon = 0
 								Owner.AppearanceOff()
 								Owner.AppearanceOn()
+							if(SkillPath)
+								var/obj/Skills/Projectile/source = locate(SkillPath) in Owner
+								if(source && source.HeldSkill)
+									source.ResetHeldConfig()
 							Owner.active_projectiles -= src
 							Owner = null
 						loc = null
@@ -6339,7 +6346,21 @@ obj
 									_beamAbsorb = 1
 									m.HealHealth((EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR) * (0.1 * m.passive_handler.Get("WindAbsorb")))
 								if(!_beamAbsorb)
+									var/savedVH_b = 0
+									var/savedBA_b = 0
+									if(src.BypassTempHP)
+										savedVH_b = m.VaizardHealth
+										savedBA_b = m.BioArmor
+										m.VaizardHealth = 0
+										m.BioArmor = 0
+									if(src.SkillDeicide)
+										src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive)
+									if(src.SkillDeicide)
+										src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
+									if(src.BypassTempHP)
+										m.VaizardHealth = savedVH_b
+										m.BioArmor = savedBA_b
 								if(src.CriticalChance)
 									src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 									src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmgB)
@@ -6389,7 +6410,21 @@ obj
 										_stdAbsorb = 1
 										m.HealHealth(EffectiveDamage * (0.1 * m.passive_handler.Get("WindAbsorb")))
 									if(!_stdAbsorb)
+										var/savedVH = 0
+										var/savedBA = 0
+										if(src.BypassTempHP)
+											savedVH = m.VaizardHealth
+											savedBA = m.BioArmor
+											m.VaizardHealth = 0
+											m.BioArmor = 0
+										if(src.SkillDeicide)
+											src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive)
+										if(src.SkillDeicide)
+											src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
+										if(src.BypassTempHP)
+											m.VaizardHealth = savedVH
+											m.BioArmor = savedBA
 									if(src.CriticalChance)
 										src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 										src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmgS)

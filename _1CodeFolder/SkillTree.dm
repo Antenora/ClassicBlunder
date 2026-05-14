@@ -245,7 +245,9 @@ var/list/SkillTree=list(
 ),
 
 "SwordT5"=list(
-			"/obj/Skills/AutoHit/Jest_of_the_Dead"=200
+			"/obj/Skills/AutoHit/Jest_of_the_Dead"=200,
+			"/obj/Skills/Queue/Judgment_Cut_End"=200,
+			"/obj/Skills/AutoHit/Judgement_Cut"=200
 ),
 
 "UnarmedStyles"=list(

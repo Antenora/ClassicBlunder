@@ -86,12 +86,12 @@ mob/tierUpSaga(path)
 			var/sp = p.secretDatum.currentTier
 			var/dr = sl + sp
 			ControlledRush = 5 + dr
-			AdaptRate = 1.1 + (0.15 * sl) + (0.2 * sp)
+			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 			Size = 1 + dr
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = (2 + (round(dr/3)))
-			Rounds = 25
+			DamageMult = (1 + (round(dr/3)))
+			Rounds = 20
 			PullIn = dr
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)

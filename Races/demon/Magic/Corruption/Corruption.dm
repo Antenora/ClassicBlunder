@@ -1,6 +1,7 @@
 /obj/Skills/AutoHit/Magic/Corruption/Corrupt_Reality
 	scalingValues = list("Primordial" = list(0.3,0.6,1,1.25,1.5,2), "DamageMult" = list(0.01,0.05,0.075,0.1,0.1,0.12))
 	Area= "Target"
+	SpellElement = "Dark"
 	SpecialAttack=1
 	AdaptRate = 1
 	Distance = 10

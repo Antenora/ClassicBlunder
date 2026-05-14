@@ -1405,16 +1405,12 @@ mob
 						var/obj/Items/Enchantment/Staff/st=src.EquippedStaff()
 						//var/obj/Items/Enchantment/Magic_Crest/mc=src.EquippedCrest()
 						var/obj/Items/Sword/sord=src.EquippedSword()
-						if(passive_handler.Get("Disarmed") && !src.HasLimitlessMagic() && !src.HasBladeFisting())
-							Q.DamageMult = (Q.DamageMult / 2)
 						if(!st&&!(CrestSpell(Q))&&(!sord||sord&&!sord.MagicSword))
 							src << "You need a spell focus to use [Q]."
 							return
 			if(Q.NeedsSword||Q.UnarmedOnly)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(Q.NeedsSword)
-					if(passive_handler.Get("Disarmed") && !src.HasBladeFisting())
-						Q.DamageMult = (Q.DamageMult / 2)
 					if((!s && !HasBladeFisting()) && !src.UsingBattleMage())
 						src << "You must have a sword equipped to use this technique."
 						return
@@ -1629,7 +1625,7 @@ mob
 			if(Damage<1)
 				Damage = 1
 			if(src.AttackQueue.DamageMult>=0)
-				var/dmgMult = src.AttackQueue.DamageMult
+				var/dmgMult = src.AttackQueue.DamageMult * GetDisarmedQueueDamageFactor(src.AttackQueue)
 				if(passive_handler["Fa Jin"] && canFaJin())
 					dmgMult+= passive_handler["Fa Jin"] * glob.FA_JIN_BASE_DMG_ADD
 				DEBUGMSG("NEW DAMAGE AFTER FA JIN (FINAL DAMAGE): [Damage]")
@@ -1676,6 +1672,22 @@ mob
 			src.AttackQueue.Hit=1
 			src.AttackQueue.Missed=0
 			src.AttackQueue.RanOut=0
+			if(istype(src.AttackQueue, /obj/Skills/Queue/Judgment_Cut_End) && P && !P.Suspended)
+				P.Suspended = src
+				src.Suspended = src
+				var/mob/who = P
+				var/mob/U = src
+				// Heh
+				spawn(10)
+					if(U && who)
+						U.dir = turn(get_dir(U, who), 180)
+				var/obj/Skills/AutoHit/Judgment_Cut_End/AH = locate() in src
+				var/release_delay = AH ? (AH.WindUp * 10 + 10) : 40
+				spawn(release_delay)
+					if(who && who.Suspended == U)
+						who.Suspended = null
+					if(U && U.Suspended == U)
+						U.Suspended = null
 			if(canFaJin())
 				last_fa_jin = world.time
 				fa_jin_effect()

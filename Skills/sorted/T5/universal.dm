@@ -6,7 +6,7 @@
 	Distance=20
 	Blasts=30
 	Charge=1
-	DamageMult=0.8
+	DamageMult=3
 	ComboMaster=1
 	Stunner= 3
 	Instinct=1

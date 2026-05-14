@@ -38,7 +38,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanTypeY)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
-					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -4+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=0.8)
+					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=1.75)
 				if(user.Potential>=35)
 					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))

@@ -4,6 +4,7 @@
 /obj/Skills/Buffs/NuStyle/MysticStyle
 	StyleFor = 1.15
 	passives = list("SpiritFlow" = 	1)
+	CyberSignature=1
 	Fire_Weaving
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Earth_Moving"="/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker", \
 				"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Turtle_Style"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Black_Leg_Style")

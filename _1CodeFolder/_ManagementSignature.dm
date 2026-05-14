@@ -67,6 +67,7 @@ var/list/Tier2 = list(
 	"Sunlight Spear" = "/obj/Skills/Projectile/Magic/Uber_Shots/Sunlight_Spear",
 	"Shin Kikoho" = "/obj/Skills/AutoHit/Shin_Kikoho",
 	"Zantetsuken" = "/obj/Skills/AutoHit/Zantetsuken",
+	"Shadow Cut" = "/obj/Skills/AutoHit/Shadow_Cut",
 	"Thousand Man Slayer" = "/obj/Skills/AutoHit/Thousand_Man_Slayer",
 	"Omnislash" = "/obj/Skills/Queue/Omnislash",
 	"Royal Guard & Release" = list("/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard", "/obj/Skills/AutoHit/RoyalRelease"),

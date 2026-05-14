@@ -13,7 +13,7 @@
 	else
 		GestaltTier = 3
 	if(Saga&&!isRace(DEMIFIEND)&&!isRace(NOBODY) || CyberCancel || Secret&&!isRace(ELDRITCH))
-		if(!isRace(HUMAN))
+		if(!isRace(HUMAN)&&!isRace(FAE))
 			GestaltTier -=1
 	if(GestaltTier<1) GestaltTier=1
 	return GestaltTier
@@ -48,7 +48,7 @@
 			OffMult = 1
 			passives = list("Scorching" = 1, "Momentum" = 1)
 	verb/Fire_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Water_Gestalt_Buff
@@ -77,7 +77,7 @@
 			DefMult = 1
 			passives = list("Chilling" = 1, "FluidForm" = 1)
 	verb/Water_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Earth_Gestalt_Buff
@@ -106,7 +106,7 @@
 			DefMult = 1
 			passives = list("Shattering" = 1, "Harden" = 1)
 	verb/Earth_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Wind_Gestalt_Buff
@@ -135,7 +135,7 @@
 			OffMult = 1
 			passives = list("Shocking" = 1, "Afterimages" = 1)
 	verb/Wind_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Light_Gestalt_Buff
@@ -164,7 +164,7 @@
 			DefMult = 1
 			passives = list("LifeGeneration" = 1, "BuffMastery" = 1)
 	verb/Light_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Dark_Gestalt_Buff
@@ -181,19 +181,19 @@
 			StrMult = 1.4
 			ForMult = 1.35
 			OffMult = 1.3
-			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.2, "LifeSteal" = 20, "DemonicInfusion" = 1)
+			passives = list("KillerInstinct" = 0.15, "Pressure" = 1, "LifeSteal" = 20, "AngerAdaptiveForce" = 0.3)
 		else if(tier >= 2)
 			StrMult = 1.25
 			ForMult = 1.15
 			OffMult = 1
-			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "CriticalChance" = 10, "CriticalDamage" = 0.05, "LifeSteal" = 10, "DemonicInfusion" = 1)
+			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "LifeSteal" = 10, "AngerAdaptiveForce" = 0.2)
 		else
 			StrMult = 1.1
 			ForMult = 1
 			OffMult = 1
-			passives = list("KillerInstinct" = 0.1, "Pressure" = 1)
+			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "AngerAdaptiveForce" = 0.1)
 	verb/Dark_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Time_Gestalt_Buff
@@ -222,7 +222,7 @@
 			DefMult = 1
 			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1)
 	verb/Time_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Space_Gestalt_Buff
@@ -251,5 +251,5 @@
 			OffMult = 1
 			passives = list("Warping" = 1, "Flicker" = 1)
 	verb/Space_Gestalt_Buff()
-		set hidden = 1
+		set category="Skills"
 		src.Trigger(usr)

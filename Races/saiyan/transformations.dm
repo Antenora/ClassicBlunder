@@ -53,6 +53,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
+					passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower"=1, "SaiyanPower1"=0.5)
 					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor)
@@ -158,14 +159,14 @@ transformation
 			//Autounlocked at 55, intended to be unlocked around 35
 			unlock_potential = 55
 			autoAnger = TRUE
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2, "PureDamage" = 1, "PureReduction" = 1, "SaiyanPower2"=0.4)
+			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower2"=0.5)
 			PUSpeedModifier = 1.5
-			speedadd = 0.2
-			enduranceadd = 0.2
-			offenseadd = 0.2
-			defenseadd = 0.2
-			strengthadd = 0.2
-			forceadd = 0.2
+			speedadd = 0.35
+			enduranceadd = 0.35
+			offenseadd = 0.35
+			defenseadd = 0.35
+			strengthadd = 0.35
+			forceadd = 0.35
 			mastery_boons(mob/user)
 				if(user.Potential>=37&&mastery<25)
 					mastery=25

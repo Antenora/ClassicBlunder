@@ -8,7 +8,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.15
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 1, "Godspeed" = 1, "Momentum" = 1, "DoubleStrike" = 1, "Instinct" = 2, "Iaido" = 1, "Iaijutsu" = 1,\
+		passives = list("BlurringStrikes" = 1, "Godspeed" = 1, "Momentum" = 1, "DoubleStrike" = 1, "Instinct" = 2, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1)
 		StyleActive="Legacy of Ashes"
 		Finisher="/obj/Skills/Queue/Finisher/Session"
@@ -24,7 +24,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.3
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 1, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 2, "Instinct" = 3, "Flow" = 2, "Iaido" = 1, "Iaijutsu" = 1,\
+		passives = list("BlurringStrikes" = 1, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 2, "Instinct" = 3, "Flow" = 2, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 1)
 		StyleActive="Legacy of the Sunslammer"
 		Finisher="/obj/Skills/Queue/Finisher/Session"
@@ -40,7 +40,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.5
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 2, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 3, "Instinct" = 4, "Flow" = 3, "Iaido" = 1, "Iaijutsu" = 1,\
+		passives = list("BlurringStrikes" = 2, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 3, "Instinct" = 4, "Flow" = 3, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 2)
 		StyleActive="Heir of Grief"
 		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"

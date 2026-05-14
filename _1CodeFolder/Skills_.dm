@@ -73,7 +73,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 				if(src.SpellElement)
 					var/elem_cd_red = m.getSpellElementCooldownReduction(src.SpellElement)
 					if(elem_cd_red)
-						modify *= (1 - elem_cd_red)
+						modify *= (1 - min(elem_cd_red, 0.80))
 			else
 				if(m.Hustling())
 					modify*=0.75
@@ -170,8 +170,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 	if(Z)
 		if(!locate(Z) in src)
 			return  FALSE
-	if(src.KO||src.Stunned||src.AutoHitting||src.Frozen>=2)
+	if(src.KO||src.Stunned||src.AutoHitting||src.Frozen>=2||src.Suspended)
 		return  FALSE
+	if(src.judgement_cut_chain_active && !istype(Z, /obj/Skills/AutoHit/Judgement_Cut))
+		return FALSE
 	if(src.Stasis)
 		return  FALSE
 	if(Z.Using && Wut!="Zanzoken")

@@ -12,8 +12,6 @@
 // T2 and T3 basics bind the same key so unlocking both ScorchedForm and Alight
 // on a Fire mage stacks to 0.20 (-20% cd on Fire spells), matching the doc
 // spec of "-10% to -20% cd" for a full basic-element vertical. Clamped at
-// 0.90 inside the lookup to prevent any future combination from producing
-// instant or negative cooldowns.
 
 passiveInfo/FireSpellCooldown
     setLines()
@@ -60,12 +58,23 @@ mob/proc/
         // Returns the cumulative decimal cooldown reduction for spells of the
         // given element. 0 means no reduction. Callers should apply this as
         // modify *= (1 - reduction). Safe to call with a null/empty element.
-        // Clamped at 0.90 to prevent any future stacking from producing a
-        // zero or negative cooldown on element spells.
+        // Clamped at 0.80 so total reduction from these passives never exceeds
+        // 80% (no zero cooldown from stacking alone).
         . = 0
         if(!element) return 0
-        var/value = passive_handler.Get("[element]SpellCooldown")
-        if(!value) return 0
-        if(value > 0.90)
-            value = 0.90
-        . = value
+        if(!passive_handler) return 0
+        var/prefix = "[element]"
+        if(element == "Wind")
+            prefix = "Air"
+        var/key = "[prefix]SpellCooldown"
+        var/cumulative = 0
+        var/pval = passive_handler.passives[key]
+        if(isnum(pval))
+            cumulative += pval
+        var/tval = passive_handler.tmp_passives[key]
+        if(isnum(tval))
+            cumulative += tval
+        if(cumulative <= 0)
+            return 0
+        cumulative = min(cumulative, 0.80)
+        . = cumulative

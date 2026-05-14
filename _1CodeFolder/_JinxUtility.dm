@@ -1294,7 +1294,7 @@ mob
 		SubDefTax(Val, Forced=0)
 			if(src.Satiated&&!Drunk||Forced)
 				Val*=4
-			DefTax=clamp(DefTax+Val, 0, 1);
+			DefTax=clamp(DefTax-Val, 0, 1);
 		AddDefCut(Val)
 			DefCut=clamp(DefCut+Val, 0, 1);
 		AddRecovTax(Val)
@@ -1377,10 +1377,17 @@ mob
 			return TRUE
 
 		// now require 50+ mastery
+		// no longer requires 50+ mastery with limited rank up magic :evil emoji:
 		demonDevilTriggerSinMastery()
 			if(!isInDemonDevilTrigger()) return FALSE
+			var/MasteryValue=50
+			if(passive_handler.Get("Limited Rank-Up"))
+				if(Secret)
+					MasteryValue=25
+				else if(!Secret)
+					return TRUE
 			var/transformation/current = race.transformations[transActive]
-			return current.mastery >= 50
+			return current.mastery >= MasteryValue
 
 		// Used by the Devil Arm icon-swap path. Demon-only sins / disguise stay
 		// gated by isInDemonDevilTrigger; this one also covers makaioshin forms.
@@ -2366,6 +2373,8 @@ mob
 				Off = getMechStat(findMecha(), Off)
 			Off+=OffAdded
 			Off+=src.GetEquippedWeaponStatAdd("Off")
+			if(src.HasManaStats())
+				Off += getManaStatsBoon()
 			var/Mod=1
 			Mod+=(src.OffMultTotal-1)
 			// if(src.isRace(HUMAN))
@@ -2490,6 +2499,8 @@ mob
 
 			Def+=DefAdded
 			Def+=src.GetEquippedWeaponStatAdd("Def")
+			if(src.HasManaStats())
+				Def += getManaStatsBoon()
 			var/Mod=1
 			Mod+=(src.DefMultTotal-1)
 			// if(src.isRace(HUMAN))
@@ -3567,7 +3578,13 @@ mob
 					return
 				if(src.Potential<glob.progress.SAGA_T3_POT && src.SagaLevel>=2) // t3
 					return
-				if(src.SagaLevel>=3&&!src.SagaAdminPermission)
+				if(src.Potential<glob.progress.SAGA_T4_POT && src.SagaLevel>=3) // t4
+					return
+				if(src.Potential<glob.progress.SAGA_T5_POT && src.SagaLevel>=4) // t5
+					return
+				if(src.Potential<glob.progress.SAGA_T6_POT && src.SagaLevel>=5) // t6
+					return
+				if(src.SagaLevel>=5&&!src.SagaAdminPermission)
 					return
 				src.saga_up_self()
 				return

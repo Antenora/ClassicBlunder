@@ -291,3 +291,8 @@
         HitSparkTurns=1
         HitSparkSize=1
         HitMessage="smashes into the wall standing in their way!";
+        adjust(mob/p)
+            if(p.passive_handler.Get("SpiralPowerUnlocked")>=6)
+                FollowUp="/obj/Skills/AutoHit/Spiral/Giga_Drill_Maximum"
+            else
+                FollowUp=null

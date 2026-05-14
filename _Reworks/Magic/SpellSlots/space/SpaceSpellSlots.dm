@@ -7,7 +7,7 @@
 		ElementalClass="Space"
 		Area="Circle"
 		Distance=5
-		DamageMult=4
+		DamageMult=8
 		Knockback=3
 		SpecialAttack=1
 		ForOffense=1
@@ -33,7 +33,7 @@
 		ElementalClass="Space"
 		Area="Target"
 		Distance=6
-		DamageMult=5
+		DamageMult=10
 		SpecialAttack=1
 		ForOffense=1
 		CanBeDodged=1
@@ -61,6 +61,7 @@
 		Cooldown=60
 		ManaCost=8
 		SlowAffected=4
+		EnergyDrain=0.25
 		//SpdTaxDrain=0.03 replace this with something else
 		ActiveMessage="distorts the space around their target!"
 		OffMessage="releases the spatial distortion!"

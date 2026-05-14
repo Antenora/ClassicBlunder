@@ -7,11 +7,11 @@
 		TimerLimit=20
 		Cooldown=90
 		ManaCost=10
-		ManaDrain=0.01
+		ManaDrain=0.1
 		StableHeal=1
-		HealthHeal=2
+		HealthHeal=0.05
 		WoundHeal=1
-		passives=list("HolyMod" = 1, "LifeGeneration" = 2)
+		passives=list("HolyMod" = 1, "LifeGeneration" = 2, "PureReduction" = 5)
 		ActiveMessage="channels the light to mend their wounds!"
 		OffMessage="lets the blessing fade..."
 		verb/Bless()
@@ -24,7 +24,7 @@
 	SpellSlot=1
 	Lightspeed
 		ElementalClass="Light"
-		DamageMult=3
+		DamageMult=6
 		Speed=0.1
 		AccMult=1.1
 		Distance=15
@@ -38,7 +38,7 @@
 
 	Solar_Burst
 		ElementalClass="Light"
-		DamageMult=5
+		DamageMult=7.5
 		Speed=1
 		AccMult=1.1
 		Homing=1

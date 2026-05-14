@@ -24,5 +24,45 @@ mob/proc/DisarmTarget(mob/target)
         if(src.passive_handler["Disarmed"])
             src.passive_handler.Set("Disarmed", 0)
             src << "You regain control of your weapon."
-            
+
+/mob/proc/GetDisarmedQueueDamageFactor(var/obj/Skills/Queue/Q)
+    if(!passive_handler.Get("Disarmed"))
+        return 1
+    var/f = 1
+    if(Q.MagicNeeded && !HasLimitlessMagic())
+        if(Q.Copyable >= 3 || !Q.Copyable)
+            if(!HasBladeFisting())
+                f *= 0.5
+    if(Q.NeedsSword && !HasBladeFisting())
+        f *= 0.5
+    return f
+
+/mob/proc/GetDisarmedAutoHitDamageFactor(var/obj/Skills/AutoHit/Z)
+    if(!passive_handler.Get("Disarmed"))
+        return 1
+    var/f = 1
+    if(Z.MagicNeeded && !HasLimitlessMagic())
+        if(Z.Copyable >= 3 || !Z.Copyable)
+            if(!HasBladeFisting())
+                f *= 0.5
+    if(Z.NeedsSword)
+        var/obj/Items/Sword/s = EquippedSword()
+        if(s && !HasBladeFisting())
+            f *= 0.5
+    return f
+
+/mob/proc/GetDisarmedProjectileDamageFactor(var/obj/Skills/Projectile/Z)
+    if(!passive_handler.Get("Disarmed"))
+        return 1
+    var/f = 1
+    if(Z.MagicNeeded && !HasLimitlessMagic())
+        if(Z.Copyable >= 3 || !Z.Copyable)
+            if(!HasBladeFisting())
+                f *= 0.5
+    if(Z.NeedsSword && !HasBladeFisting())
+        f *= 0.5
+    if(Z.StaffOnly && !HasLimitlessMagic())
+        f *= 0.5
+    return f
+
 

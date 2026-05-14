@@ -1,10 +1,10 @@
 obj/Skills/Projectile/Getsuga_Tenshou
 	name = "Getsuga Tenshou"
-	Cooldown = 120
-
+	Cooldown = 30
+	NeedsSword=1
 	StrRate = 1
 	ForRate = 1
-	DamageMult = 15
+	DamageMult = 10
 	AccMult = 1.2
 	Distance = 20
 	Homing = 1
@@ -17,7 +17,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	HeldSkill = TRUE
 	ChargePeriod = 3
 	SweetSpot = 1.5
-	SweetSpotBenefit = 4.0
+	SweetSpotBenefit = 2
 	ChargeOverlay='DarkShock.dmi'
 	ChargeWaveIcon='KenShockwaveBloodlust.dmi'
 
@@ -25,29 +25,40 @@ obj/Skills/Projectile/Getsuga_Tenshou
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		var/icon_used
+		var/baseDmg = initial(DamageMult)
+		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? 5 : 0
+		DamageMult = (baseDmg + bonus) * benefit
+		var/inBankai = p.CheckSlotless("Tensa Zangetsu")
 		if(sweet_spot_hit)
-			DamageMult *= benefit
-			icon_used = 'Big Getsuga.dmi'
+			icon_used = inBankai ? 'Big Getsuga.dmi' : 'Big Getsuga Shikai.dmi'
 			LockX = -65
 			LockY = -65
 		else
-			DamageMult *= benefit
-			icon_used = 'Small Getsuga.dmi'
-			LockX = -16
-			LockY = -16
+			icon_used = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
 		p.Blast(src, p, 1, icon_used)
+		src.Cooldown(1, null, p)
+		ResetHeldConfig()
 
 	verb/Getsuga_Tenshou()
 		set category = "Skills"
+		if(!usr.InShikai() && !usr.InBankai())
+			usr << "Getsuga Tenshou can only be used in Shikai or Bankai."
+			return
+		if(usr.InBankai())
+			ChargeWaveIcon = 'KenShockwaveBloodlust.dmi'
+			ChargeOverlay = 'DarkShock.dmi'
+		else
+			ChargeWaveIcon = 'KenShockwaveGold.dmi'
+			ChargeOverlay = 'Dimension Aura.dmi'
 		usr.BeginHeldSkill(src)
 
 obj/Skills/Projectile/Getsuga_Jujisho
 	name = "Getsuga Jujisho"
-	Cooldown = 180
-
+	Cooldown = 120
+	NeedsSword=1
 	StrRate = 1
 	ForRate = 1
-	DamageMult = 30
+	DamageMult = 25
 	AccMult = 1.3
 	Distance = 20
 	Homing = 1
@@ -113,7 +124,7 @@ obj/Skills/Projectile/Getsuga_Jujisho
 		img1.layer = MOB_LAYER + 0.5
 		C.images += img1
 
-		sleep(4) 
+		sleep(4)
 
 		img1.icon_state = "slash1" // freeze on the static end-frame
 
@@ -150,10 +161,13 @@ obj/Skills/Projectile/Getsuga_Jujisho
 				break
 
 		if(proj)
-			proj.icon_state = "slash3" 
+			proj.icon_state = "slash3"
 			proj.transform = matrix()
 			animate(proj, transform = matrix() * IconSizeGrowTo, time = 5, easing = CUBIC_EASING)
 
 	verb/Getsuga_Jujisho()
 		set category = "Skills"
+		if(!usr.InShikai() && !usr.InBankai())
+			usr << "Getsuga Jujisho can only be used in Shikai or Bankai."
+			return
 		FireJujisho(usr)

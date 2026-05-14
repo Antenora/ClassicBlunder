@@ -895,7 +895,7 @@ NEW VARIABLES
 									 "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
 									 "Godspeed" = mecha.Level, "SuperDash" = 1, "Pursuer" = mecha.Level, "Flicker" = mecha.Level, \
 									 "Flow" = (mecha.Level * 0.25) + 1, "NoDodge" = 1)
-						if(player.PilotingProwess >= 7)
+						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						Afterimages = 1
 						..()
@@ -908,7 +908,7 @@ NEW VARIABLES
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
 						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
 						"Juggernaut" = mecha.Level, "Reversal" = 0.5, "BlockChance" = mecha.Level*3, "CriticalBlock" = mecha.Level*0.5, "NoDodge" = 1)
-						if(player.PilotingProwess >= 7)
+						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						VaizardHealth = mecha.Level * 2
 						..()
@@ -921,7 +921,19 @@ NEW VARIABLES
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
 						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
 						"CriticalChance" = mecha.Level*7, "CriticalDamage" = mecha.Level*0.15, "Steady" = mecha.Level, "Duelist" = mecha.Level, "NoDodge" = 1)
-						if(player.PilotingProwess >= 7)
+						if(player.PilotingProwess >= 5)
+							passives["NoDodge"] = 0
+						..()
+				MobileFighter
+					BuffName = "Mobile Fighter"
+					BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Skim", \
+				"/obj/Skills/Projectile/Gear/Installed/Installed_Plasma_Gatling", \
+				"/obj/Skills/Projectile/Gear/Installed/Installed_Missile_Launcher", \
+				"/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Beam_Saber")
+					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
+						passives = list("GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
+						"Steady" = mecha.Level/2, "Duelist" = mecha.Level/2, "NoDodge" = 1, "Juggernaut" = mecha.Level/2, "Reversal" = 0.25)
+						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						..()
 /*			Sentai_Uniform_Engage
@@ -1407,9 +1419,9 @@ NEW VARIABLES
 							src.ForMult=1.2+ImaginaryBonus
 							src.OffMult=1.2+ImaginaryBonus
 							src.DefMult=1.2+ImaginaryBonus
-							// passives["ManaCapMult"] = 0.1 * usr.SagaLevel
-							// passives["SpiritFlow"] = 0.15 * usr.SagaLevel
 					passives["SpiritSword"] = 0.2 * usr.SagaLevel
+					if(usr.Class=="Imaginary")
+						passives["KiControl"] = 1
 					passives["PULock"] = 1
 					passives["SwordDamage"] = GetKeychainDamage(usr.KeychainAttached) + usr.SagaLevel
 					passives["SwordAccuracy"] = GetKeychainAccuracy(usr.KeychainAttached) + usr.SagaLevel
@@ -1797,8 +1809,8 @@ NEW VARIABLES
 			ActiveMessage="erupts with immense intensity!!"
 			AllOutPU=1
 			adjust(mob/p)
-				if(p.isRace(SAIYAN)&&p.transActive==1||p.isRace(HALFSAIYAN)&&p.transActive==1)
-					if(p.race.transformations[p.transActive].mastery==100)
+				if(p.isRace(SAIYAN)&&p.transActive==1||p.isRace(HALFSAIYAN)&&p.transActive==1||p.NobodyOriginType=="Pride")
+					if(p.race.transformations[p.transActive].mastery==100||p.NobodyOriginType=="Pride")
 						src.ActiveMessage="erupts with immense intensity, their golden aura overcome with a furious red!!"
 						p.passive_handler.Set("Super Kaioken", 1)
 				if(p.isRace(SAIYAN)&&p.transActive>=2||p.isRace(HALFSAIYAN)&&p.transActive>=2)
@@ -2055,6 +2067,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Vaizard_Mask
 				SignatureTechnique=3
+				SagaSignature=1
 				ManaThreshold=1
 				CooldownStatic = 1
 				Cooldown=60
@@ -2125,10 +2138,9 @@ NEW VARIABLES
 			StrMult=1.5
 			OffMult=1.5
 			SpdMult=1.3
-			EndMult=0.9
+			EndMult=0.8
 			DefMult=0.8
-			RecovMult=1.2
-			passives = list("SlayerMod" = 3, "LifeSteal" = 35, "FavoredPrey" = "Depths", "Holymod" = 3, "MovementMastery" = 5, "TechniqueMastery" = 3,"Deicide"= 10)
+			passives = list("SlayerMod" = 3, "LifeSteal" = 10, "FavoredPrey" = "Depths", "MovementMastery" = 3, "TechniqueMastery" = 3, "Deicide"= 5)
 			ManaGlowSize=3
 			ManaGlow="C03434"
 			TextColor=rgb(192, 52, 52)
@@ -2240,13 +2252,13 @@ NEW VARIABLES
 		Spirit_Burst
 			SignatureTechnique=3
 			EnergyThreshold=25
-			passives = list("SweepingStrikes"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 3, "PUSpike"=100)
+			passives = list("SweepingStrikes"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100)
 			ActiveMessage="spikes their energy in sudden bursts!"
 			OffMessage="quells their energy..."
 			verb/Spirit_Burst()
 				set category="Skills"
 				if(!altered)
-					passives = list("SweepingStrikes"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 3, "PUSpike"=100)
+					passives = list("SweepingStrikes"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100)
 				src.Trigger(usr)
 		Unbound_Mode
 			SignatureTechnique=3
@@ -2257,7 +2269,7 @@ NEW VARIABLES
 			SpdMult=1.2
 			ForMult=1.2
 			RecovMult=1.2
-			passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10)
+			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1)
 			FlashChange=1
 			KenWaveIcon='Unbound.dmi'
 			KenWave=1
@@ -2277,30 +2289,30 @@ NEW VARIABLES
 					SpdMult=1.2
 					ForMult=1.2
 					RecovMult=1.2
-					passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10)
+					passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10,"SuperSaiyanSignature"=1)
+							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
 				if(src.Mastery==2)
 					StrMult=1.25
 					EndMult=1.25
 					SpdMult=1.25
 					ForMult=1.25
 					RecovMult=1.25
-					passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10)
+					passives = list("MovementMastery" = 3, "TechniqueMastery" = 3, "BuffMastery" = 3)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10,"SuperSaiyanSignature"=1)
+							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
 				if(src.Mastery==3)
 					StrMult=1.35
 					EndMult=1.35
 					SpdMult=1.35
 					ForMult=1.35
 					RecovMult=1.35
-					passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10)
+					passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 10,"SuperSaiyanSignature"=1)
+							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
 
 			verb/Unbound_Mode()
 				set category="Skills"
@@ -2860,6 +2872,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Getsuga_Tenshou_Clad
 				SignatureTechnique=3
+				SagaSignature=1
 				TimerLimit=30
 				Cooldown=30
 				passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1, "SpiritFlow" = 4)
@@ -2868,25 +2881,14 @@ NEW VARIABLES
 				ForMult=1.3
 				ActiveMessage="coats their blade with the power of Getsuga!"
 				OffMessage="relinquishes Getsuga from their weapon."
-				var/granted_getsuga = FALSE
-				var/granted_jujisho = FALSE
-				proc/CheckMasteryGrants(mob/p)
-					if(Mastery >= 2 && !granted_getsuga)
-						if(!locate(/obj/Skills/Projectile/Getsuga_Tenshou, p))
-							p.AddSkill(new/obj/Skills/Projectile/Getsuga_Tenshou)
-							p << "<font color='#4488ff'><b>Your mastery of Getsuga Tenshou Clad allows you to fire the raw wave — you have learned Getsuga Tenshou!</b></font>"
-						granted_getsuga = TRUE
-					if(Mastery >= 3 && !granted_jujisho)
-						if(!locate(/obj/Skills/Projectile/Getsuga_Jujisho, p))
-							p.AddSkill(new/obj/Skills/Projectile/Getsuga_Jujisho)
-							p << "<font color='#ffcc00'><b>The cross-shaped Getsuga manifests from your mastery, you have learned Getsuga Jujisho!</b></font>"
-						granted_jujisho = TRUE
 				verb/Getsuga_Clad()
 					set name="Getsuga Clad"
 					set category="Skills"
+					if(!usr.InBankai())
+						usr << "Getsuga Clad can only be used in Bankai."
+						return
 					if(!altered)
 						passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1)
-					CheckMasteryGrants(usr)
 					src.Trigger(usr)
 			Final_Getsuga_Tenshou
 				SignatureTechnique=4
@@ -2912,12 +2914,29 @@ NEW VARIABLES
 				KenWaveIcon='DarkKiai.dmi'
 				ActiveMessage="dedicates their entire existence to their blade!"
 				OffMessage="sacrifices their potential completely..."
+				Trigger(mob/User, Override=0)
+					var/wasOn = (User.SpecialBuff == src)
+					..()
+					if(wasOn && User.SpecialBuff != src)
+						if(User.Saga == "Shinigami" && User.ShinigamiRelease == "Zangetsu")
+							User.UsedFinalGetsuga = TRUE
+							var/obj/Skills/Buffs/SlotlessBuffs/Mugetsu_Aftermath/MA = locate(/obj/Skills/Buffs/SlotlessBuffs/Mugetsu_Aftermath, User)
+							if(!MA)
+								MA = new/obj/Skills/Buffs/SlotlessBuffs/Mugetsu_Aftermath()
+								User.AddSkill(MA)
+							if(!MA.SlotlessOn)
+								MA.adjust(User)
+								MA.Trigger(User)
 				verb/Final_Getsuga_Tenshou()
 					set category="Skills"
+					if(!usr.InBankai())
+						usr << "Final Getsuga Tenshou can only be used in Bankai."
+						return
+					var/wasOn = usr.BuffOn(src)
 					src.Trigger(usr)
 					if(usr.BuffOn(src))
 						usr.AddSkill(new/obj/Skills/AutoHit/Mugetsu)
-					if(!usr.BuffOn(src))//once you turn it off
+					if(wasOn && !usr.BuffOn(src))//once you turn it off
 						for(var/obj/Skills/AutoHit/Mugetsu/MGS in usr.contents)
 							del MGS
 						for(var/obj/Skills/Buffs/SpecialBuffs/Sword/Final_Getsuga_Tenshou/FGT in usr.contents)
@@ -4193,6 +4212,8 @@ NEW VARIABLES
 
 	SlotlessBuffs
 		Slotless=1
+		var/IsShikaiForm = 0  // set to 1 on any buff that represents an active Shikai state
+		var/IsBankaiForm = 0  // set to 1 on any buff that represents an active Bankai state
 //Racials
 		blobBuff
 			Cooldown = 150
@@ -7226,7 +7247,7 @@ NEW VARIABLES
 			verb/Posture_4()
 				set category="Skills"
 				src.Trigger(usr)
-		Unbound_Mode
+/*		Unbound_Mode
 			SignatureTechnique=3
 			SpecialSlot=1
 			passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 5, "ManaLeak" = 1)
@@ -7289,7 +7310,7 @@ NEW VARIABLES
 						usr.Activate(new/obj/Skills/AutoHit/Knockoff_Wave)
 				adjust(usr)
 				src.Trigger(usr)
-
+*/
 		Mark_of_the_Crone
 			SignatureTechnique=3
 			SpecialSlot=1
@@ -9868,6 +9889,8 @@ NEW VARIABLES
 						SpiralPotential=SpiralPower
 						if(Tyrant)
 							SpiralPotential=2
+						if(p.PilotingProwess<SpiralPotential)
+							p.PilotingProwess=SpiralPotential
 						if(SpiralPotential>=7)
 							OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
 						PowerMult = 1+(0.015*secretLevel*secretLevel)
@@ -12137,6 +12160,9 @@ mob
 									s.pixel_y=make_another.SwordYSecond
 							if(make_another.SwordNameSecond)
 								s.name=make_another.SwordNameSecond
+							if(make_another.type == /obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2)
+								s.name = "[make_another.SwordName] (Second)";
+								s.icon='BLANK.dmi'
 							src.contents+=s
 							if(make_another.SwordAscension)
 								s.InnatelyAscended=make_another.SwordAscensionSecond ? make_another.SwordAscensionSecond : make_another.SwordAscension
@@ -12222,11 +12248,14 @@ mob
 										s.pixel_y=make_another.SwordYSecond
 								if(make_another.SwordNameSecond)
 									s.name=make_another.SwordNameSecond
+								if(make_another.type == /obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2)
+									s.name = "[make_another.SwordName] (Third)";
+									s.icon='BLANK.dmi'
 								src.contents+=s
 								if(make_another.SwordAscension)
-									s.InnatelyAscended=make_another.SwordAscensionSecond ? make_another.SwordAscensionSecond : make_another.SwordAscension
+									s.InnatelyAscended=make_another.SwordAscensionThird ? make_another.SwordAscensionThird : make_another.SwordAscension
 								if(make_another.MagicSword)
-									s.MagicSword+=make_another.MagicSwordSecond ? make_another.MagicSwordSecond : make_another.MagicSword
+									s.MagicSword+=make_another.MagicSwordThird ? make_another.MagicSwordThird : make_another.MagicSword
 								if(make_another.SpiritSword)
 									s.SpiritSword+=make_another.SpiritSword
 								if(make_another.Extend)
@@ -12268,6 +12297,9 @@ mob
 									s.pixel_y=make_another.SwordYThird
 							if(make_another.SwordNameThird)
 								s.name=make_another.SwordNameThird
+							if(make_another.type == /obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2)
+								s.name = "[make_another.SwordName] (Third)";
+								s.icon='BLANK.dmi'
 							src.contents+=s
 							if(make_another.SwordAscension)
 								s.InnatelyAscended=make_another.SwordAscensionThird ? make_another.SwordAscensionThird : make_another.SwordAscension
@@ -12870,6 +12902,7 @@ mob
 					src.ActiveBuff.OffMessage="calms their Cosmo..."
 					src.ActiveBuff.OverlayTransLock=1
 					src.ActiveBuff.AuraLock=1
+					src.ActiveBuff.passives["SpiritPower"] = 0.2*src.SagaLevel
 					// src.ActiveBuff.SenseUnlocked=1
 					if(src.SagaLevel==4)
 						switch(src.ClothGold)
@@ -14219,7 +14252,7 @@ mob
 			if(B.FlashChange)
 				animate(src, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
 			if(B.SuccessfulParry)
-				if(B.SuccessfulParry == 2)
+				if(B.SuccessfulParry >= 2)
 					src << "Guard ended with a successful parry, setting CD to 5."
 					B.Cooldown = 5
 					B.SuccessfulParry = 0

@@ -1435,11 +1435,6 @@ mob/Player/AI
 					src.SureDodge=1
 					src.SureDodgeTimer=src.SureDodgeTimerLimit
 
-		if(src.UsingKendo())
-			src.IaidoCounter++
-		if(src.UsingSpeedRave())
-			src.IaidoCounter++
-
 		DRAINS_ACTIVE//Label
 		if(src.ActiveBuff)
 			if(src.ActiveBuff.HealthDrain)

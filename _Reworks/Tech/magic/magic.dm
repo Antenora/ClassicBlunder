@@ -27,24 +27,7 @@ ArmamentEnchantment -> tome creation (articact manufactioning + ArmamentEnchantm
 #define MAX_MAGIC_LEVEL 20
 #define MAX_ELDRITCH_MAGIC 10
 /mob/proc/getTotalMagicLevel()
-    var/actualMax = MAX_MAGIC_LEVEL + (hasEldritchPower() ? MAX_ELDRITCH_MAGIC : 0);
-    var/total = 0.1
-    total += SpaceMagicUnlocked
-    total += TimeMagicUnlocked
-    total += SealingMagicUnlocked
-    total += GeneralMagicKnowledgeUnlocked
-    if(passive_handler.Get("Crimson Grimoire"))
-        total = 20
-    if(total >= actualMax)
-        total = actualMax;
-    if(src.isLunaticMode())
-        var/lunaTome = (MAX_MAGIC_LEVEL+MAX_ELDRITCH_MAGIC) / 100 * src.get_potential();
-        if(!src.isRace(ELDRITCH)) lunaTome /= 2;
-        total = max(total, lunaTome);
-    if(src.Secret == "Eldritch")
-        var/SecretInformation/Eldritch/s = src.secretDatum
-        total += s.secretVariable["Power From Blood"];
-    TotalMagicLevel = 20
+    var/total = 20
     return total
 
 

@@ -5,13 +5,16 @@
 
 /obj/Skills/Projectile/Magic/AngelMagic/Radiant_Lance
 	name = "Radiant Lance"
+	SpellElement="Light"
 	Cooldown = 60
 	AngelMagicCompatible = 1
 	EndRate = 0.8
 	Distance = 20
-	DamageMult = 2.5
+	DamageMult = 12
 	ManaCost = 5
-	IconLock = 'HolyBeam.dmi'
+	IconLock = 'LightImpulse.dmi'
+	Shattering = 25
+	Scorching = 20
 	AccMult = 4
 	Speed = 1
 	Homing = 1
@@ -26,13 +29,20 @@
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Consecration
 	name = "Consecration"
+	SpellElement = "Light"
 	Cooldown = 60
 	AngelMagicCompatible = 1
 	ApplyJudged = 1
 	Area = "Cone"
 	Distance = 15
-	DamageMult = 1.5
+	DamageMult = 10
+	Scorching = 30
 	AdaptRate = 1
+	HitSparkIcon = 'LightImpulseTrail.dmi'
+	HitSparkTurns=1
+	HitSparkSize=1.5
+	HitSparkDispersion=1
+	TurfStrike=1
 	HolyMod = 1.5
 	ManaCost = 6
 	EnergyCost = 8
@@ -50,19 +60,20 @@
 /obj/Skills/AutoHit/Magic/AngelMagic/Divine_Verdict
 	name = "Divine Verdict"
 	Area = "Around Target"
+	SpellElement = "Light"
 	AdaptRate = 1.5
 	DamageMult = 0.5
 	HolyMod = 2.5
 	Distance = 5
 	DistanceAround = 3
-	EnergyCost = 10
-	Rounds = 20
+	EnergyCost = 5
+	Rounds = 30
 	TurfErupt = 1.25
 	TurfEruptOffset = 6
 	DelayTime = 1
 	Stunner = 3
 	ComboMaster = 1
-	Icon = 'SwordHugeHolyJustice.dmi'
+	Icon = 'SwordHugeDoomofDamocles_gold.dmi'
 	Size = 0.5
 	IconX = -159
 	IconY = 0
@@ -75,7 +86,6 @@
 	alpha = 150
 	Cooldown = 75
 	AngelMagicCompatible = 1
-	NeedsSword = 1
 	Trigger(mob/User, Override = 0)
 		if(!altered)
 			adjust(User)
@@ -92,6 +102,7 @@
 
 /obj/Skills/Buffs/SlotlessBuffs/Magic/AngelMagic/Revelation
 	name = "Revelation"
+	SpellElement = "Light"
 	Cooldown = 60
 	TimerLimit = 60
 	OffMult = 1.2
@@ -110,7 +121,7 @@
 	TimerLimit = 60
 	StrMult = 1.2
 	ForMult = 1.2
-	passives = list("HybridStrike" = 1, "SpiritSword" = 1, "SpiritHand" = 1)
+	passives = list("HybridStrike" = 1, "SpiritSword" = 1, "SpiritHand" = 4)
 	ActiveMessage = "is filled with holy zeal!"
 	OffMessage = "feels their zeal subside."
 	Trigger(mob/User, Override = 0)
@@ -134,6 +145,7 @@
 /obj/Skills/AutoHit/Magic/AngelMagic/Dazzle
 	name = "Dazzle"
 	Area = "Circle"
+	SpellElement = "Light"
 	AdaptRate = 1
 	DamageMult = 0
 	Flash = 18
@@ -157,6 +169,7 @@
 /obj/Skills/AutoHit/Magic/AngelMagic/Chains_of_Purity
 	name = "Chains of Purity"
 	Area = "Target"
+	SpellElement = "Light"
 	Distance = 12
 	AdaptRate = 1
 	Snaring = 5
@@ -179,6 +192,7 @@
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Divine_Sentence
 	name = "Divine Sentence"
+	SpellElement = "Light"
 	Area = "Target"
 	Distance = 12
 	AdaptRate = 1

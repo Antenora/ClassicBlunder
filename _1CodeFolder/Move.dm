@@ -157,6 +157,8 @@ mob/proc/MovementSpeed()
 	return Delay
 
 mob/Move()
+	if(src.Suspended)
+		return
 	var/turf/Former_Location = loc
 	if(src.Incorporeal)
 		src.density=0

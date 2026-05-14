@@ -1632,7 +1632,7 @@ mob
 			if(scalingEldritchPower()) return 1;
 			return 0
 		GetFlow()
-			var/Extra=0
+			var/Extra=BaseDef()/4
 			var/Base = passive_handler.Get("Flow")
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasRestriction("Senses"))
 				return 0
@@ -3238,6 +3238,12 @@ mob
 			return 0
 
 		HasBladeFisting()
+			var/obj/Items/Sword/s2=src.EquippedSecondSword()
+			var/obj/Items/Sword/s3=src.EquippedThirdSword()
+			if(CelestialAscension=="Demon")
+				return 1
+			if(s2||s3)
+				return 0
 			if(passive_handler.Get("BladeFisting"))
 				return 1
 			if(isRace(DEMON)|| (CheckSlotless("Satsui no Hado") && SagaLevel>=6)||isRace(MAKAIOSHIN)||isRace(CELESTIAL))

@@ -3,6 +3,7 @@
     scalingValues = list("Blasts" = list(4,5,6,6,8,10), "DamageMult" = list(4,6,8,10,12,15), \
     "Delay" = list(8,4,3,2,1,1))
     ElementalClass="Fire"
+    SpellElement = "Dark"
     DamageMult = 3
     AdaptRate = 1
     IconLock='Fire Blessing.dmi'
@@ -43,6 +44,7 @@
 
 /obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm
     ElementalClass="Fire"
+    SpellElement = "Dark"
     scalingValues = list("Damage" = list(0.2,0.25,0.3,0.35,0.4,0.45), "Distance" = list(4,6,6,6,8,10), \
     "DarknessFlame" = list(6,12,15,20,25,25), "Slow" = list(0,0,0,0,0,0), "Burning" = list(10,15,20,25,25,30), "Duration" = list(100,150,150,175,200,300), \
     "Adapt" = list(1,1,1,1,1,1), "CorruptionGain" = list(1,1,1,1,1,1) )
@@ -81,7 +83,7 @@
     proc/applyEffects(mob/target, mob/owner, static_damage)
         if(!owner||!target) return
         var/asc = owner.AscensionsAcquired ? owner.AscensionsAcquired + 1 : 1
-        var/DefReduction=sqrt(target.GetDef())
+        var/DefReduction=target.GetDef()
         for(var/x in scalingValues)
             switch(x)
                 if("Damage")
@@ -176,7 +178,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Inkstorm
     ElementalClass="Water"
     scalingValues = list("Damage" = list(0.2,0.25,0.3,0.35,0.4,0.45), "Distance" = list(4,6,6,6,8,10), \
-    "AbsoluteZero = " = list(6,12,15,20,25,25), "Slow" = list(2,2,3,4,5,5), "Freezing" = list(10,15,20,25,25,30), "Duration" = list(100,150,150,175,200,300), \
+    "AbsoluteZero" = list(6,12,15,20,25,25), "Slow" = list(2,2,3,4,5,5), "Freezing" = list(10,15,20,25,25,30), "Duration" = list(100,150,150,175,200,300), \
     "Adapt" = list(1,1,1,1,1,1), "CorruptionGain" = list(0,0,0,0,0,0) )
     makSpace = new/spaceMaker/HellFire
     var/icon_to_use = 'Icons/New/inkwater2.dmi'
@@ -228,7 +230,7 @@
                     target.AddShatter(0.5 * scalingValues["Freezing"][asc] * 1 + (scalingValues[x][asc] * 0.33), Attacker=owner)
                 if("Slow")
                     target.AddCrippling(scalingValues[x][asc]/DefReduction) // THIS IS SO FUCKING STUPID WHO DECIDED THIS SHIT???I HATE YOU ALL
-        if(!target:move_disabled) 
+        if(!target:move_disabled)
             if(prob(glob.HELLSTORM_SNARERATE*asc))
                 target:move_disabled = TRUE
                 spawn(glob.HELLSTORM_SNAREDURATION*asc)

@@ -773,7 +773,7 @@ mob/proc
 				src<<output(BT,"GridX:1,[Row]")
 				var/basicEnchPrice = BT.Cost * (glob.progress.EconomyMana / 100)
 				if(istype(BT, /obj/Items/Enchantment/Limited_Rank_Up_Magic))
-					basicEnchPrice = BT.Cost * glob.progress.EconomyCost
+					basicEnchPrice = 100
 				src<<output("[Commas(basicEnchPrice)]","GridX:2,[Row]")
 
 			if(usr.AlchemyUnlocked)

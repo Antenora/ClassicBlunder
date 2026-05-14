@@ -1546,12 +1546,12 @@ obj
 			Cast_Fist
 				SignatureTechnique=1
 				UnarmedOnly=1
-				Area="Cone"
+				Area="Circle"
 				StrOffense=1
-				DamageMult=6
+				DamageMult=12
 				TurfDirt=1
-				Distance=5
-				Size=3
+				Distance=8
+				//Size=3
 				Knockback=10
 				ShockIcon='KenShockwave.dmi'
 				Shockwave=5
@@ -1560,9 +1560,9 @@ obj
 				Launcher=5
 				PostShockwave=1
 				PreShockwave=0
-				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Muscle_Expand"
-				FollowUp="/obj/Skills/Queue/Warping_Fist"
-				FollowUpDelay=2
+				//BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Muscle_Expand"
+				//FollowUp="/obj/Skills/Queue/Warping_Fist"
+				//FollowUpDelay=2
 				Cooldown=150
 				WindUp=1
 				Earthshaking=20
@@ -1930,10 +1930,9 @@ obj
 				Area="Circle"
 				Distance=2
 				Size=2
-				StrOffense=1
-				CanBeDodged = 0
-				CanBeBlocked = 0
-				DamageMult=8
+				StrOffense=0.75
+				ForOffense=0.25
+				DamageMult=12
 				DelayTime=0.25
 				PreShockwave=1
 				PreShockwaveDelay=1
@@ -1945,6 +1944,7 @@ obj
 				ShockDiminish=1.15
 				ShockTime=4
 				GuardBreak=1
+				ComboMaster=1
 				Rush=5
 				ControlledRush=1
 				HitSparkIcon='Slash - Future.dmi'
@@ -1956,7 +1956,7 @@ obj
 				Launcher=4
 				DelayedLauncher=1
 				Cooldown=150
-				EnergyCost=5
+				EnergyCost=2.5
 				Instinct=1
 				ActiveMessage="delivers swift justice with a flurry of slashes!"
 				verb/Shining_Sword_Slash()
@@ -1968,11 +1968,13 @@ obj
 				Area="Circle"
 				StrOffense=1
 				Distance=5
-				DamageMult=6
+				DamageMult=12
 				Knockback=15
 				WindUp=0.5
 				Slow=1
 				Stunner=2
+				ComboMaster=1;
+				GuardBreak=1;
 				WindupMessage="sheathes their blade..."
 				ActiveMessage="cuts through any and all around them in the flash of an eye!"
 				HitSparkIcon='JudgmentCut.dmi'
@@ -1994,14 +1996,15 @@ obj
 				SignatureTechnique=1
 				NeedsSword=1
 				Area="Wider Wave"
-				StrOffense=1
-				DamageMult=10
+				StrOffense=1.25
+				DamageMult=16
 				TurfDirt=1
 				Distance=12
 				Jump=1
 				Knockback=10
 				FlickAttack=2
 				GuardBreak=1
+				ComboMaster=1;
 				ShockIcon='KenShockwave.dmi'
 				Shockwave=1
 				Shockwaves=1
@@ -2010,7 +2013,7 @@ obj
 				Cooldown=150
 				EnergyCost=5
 				Earthshaking=1
-				Speed=1.5
+				Speed=1
 				WindUp=0
 				Instinct=1
 				ActiveMessage="leaps in the air before falling back down, weapon-first!"
@@ -2025,11 +2028,13 @@ obj
 				Gravity=5
 				WindUp=1
 				WindupMessage="prepares to deliver a peerless slash..."
-				DamageMult=10
+				DamageMult=18
 				StrOffense=1
+				EndDefense=0.5
 				ActiveMessage="slashes through their enemy in the blink of an eye, aiming to mortally wound them!"
 				Area="Target"
 				GuardBreak=1
+				ComboMaster=1;
 				PassThrough=1
 				MortalBlow=1
 				HitSparkIcon='Slash - Zan.dmi'
@@ -2037,7 +2042,7 @@ obj
 				HitSparkY=-16
 				HitSparkTurns=1
 				HitSparkSize=3
-				Cooldown=-1
+				Cooldown=180
 				EnergyCost=15
 				Instinct=1
 				verb/Zantetsuken()
@@ -2052,11 +2057,12 @@ obj
 				DelayTime=2
 				Rounds=7
 				IgnoreAlreadyHit = 1
-				DamageMult=2
+				DamageMult=5
 				Knockback=10
-				SpeedStrike = 1
+				SpeedStrike = 2
 				PassThrough=1
 				GuardBreak=1
+				ComboMaster=1;
 				WindUp=0.1
 				WindupMessage="sheathes their blade..."
 				ActiveMessage="begins to step through the battlefield like a passing shadow!"
@@ -2081,16 +2087,18 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrOffense=1
+				SpeedStrike=2;
 				Distance=7
 				PassTo=1
-				DamageMult=16.5
+				DamageMult=18
 				WindUp=1
 				GuardBreak=1
+				ComboMaster=1;
 				Knockback=25
 				WindupMessage="lays a hand on their sheathed blade, concentrating for a moment..."
 				ActiveMessage="blasts through surrounding foes with what appears to be a single strike!!"
 				Cooldown=180
-				EnergyCost=15
+				EnergyCost=10
 				verb/Thousand_Man_Slayer()
 					set category="Skills"
 					usr.Activate(src)
@@ -2625,13 +2633,10 @@ obj
 				Distance=20
 				Area="Arc"
 				ObjIcon=1
-				Icon='fevExplosion - Hellfire.dmi'
-				IconX=-16
-				IconY=-16
 				Size=1.5
 				Rounds=1
 				DelayTime=2
-				HitSparkIcon='Slash.dmi'
+				HitSparkIcon='fevExplosion - Hellfire.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
 				HitSparkTurns=1
@@ -2738,6 +2743,7 @@ obj
 				MagicNeeded=1
 				Blizzard
 					ElementalClass="Water"
+					SpellElement="Water"
 					SkillCost=TIER_2_COST
 					Copyable=2
 					Area="Wave"
@@ -2787,9 +2793,9 @@ obj
 						usr.Activate(src)
 				Blizzara
 					ElementalClass="Water"
+					SpellElement="Water"
 					SkillCost=TIER_2_COST
 					Copyable=3
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Blizzard")
 					Area="Wide Wave"
 					Distance=6
 					Freezing=4
@@ -2844,9 +2850,9 @@ obj
 						usr.Activate(src)
 				Blizzaga
 					ElementalClass="Water"
+					SpellElement="Water"
 					SkillCost=TIER_2_COST
 					Copyable=4
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Blizzara")
 					Area="Circle"
 					Distance=6
 					Freezing=6
@@ -2896,6 +2902,7 @@ obj
 
 				Thunder
 					ElementalClass="Wind"
+					SpellElement="Air"
 					FlickAttack=1
 					SkillCost=TIER_2_COST
 					Copyable=2
@@ -2948,10 +2955,10 @@ obj
 						usr.Activate(src)
 				Thundara
 					ElementalClass="Wind"
+					SpellElement="Air"
 					FlickAttack=1
 					SkillCost=TIER_2_COST
 					Copyable=3
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Thunder")
 					Area="Circle"
 					Distance=8
 					Paralyzing=8
@@ -2991,10 +2998,10 @@ obj
 						usr.Activate(src)
 				Thundaga
 					ElementalClass="Wind"
+					SpellElement="Air"
 					FlickAttack=1
 					SkillCost=TIER_2_COST
 					Copyable=4
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Thundara")
 					Area="Around Target"
 					Distance=10
 					DistanceAround=7
@@ -3046,7 +3053,8 @@ obj
 						usr.Activate(src)
 
 				Magnet
-					ElementalClass="Earth"
+					ElementalClass="Dark"
+					SpellElement="Space"
 					FlickAttack=1
 					SkillCost=TIER_4_COST
 					Copyable=4
@@ -3078,10 +3086,10 @@ obj
 						adjust(usr)
 						usr.Activate(src)
 				Gravity
-					ElementalClass="Earth"
+					ElementalClass="Dark"
+					SpellElement="Space"
 					SkillCost=TIER_4_COST
 					Copyable=5
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Magnet")
 					Area="Around Target"
 					Distance=15
 					DistanceAround=4
@@ -3113,9 +3121,9 @@ obj
 						usr.Activate(src)
 				Stop
 					ElementalClass="Earth"
+					SpellElement="Time"
 					SkillCost=TIER_4_COST
 					Copyable=6
-					PreRequisite=list("/obj/Skills/AutoHit/Magic/Gravity")
 					Area="Around Target"
 					Distance=15
 					DistanceAround=5
@@ -3151,9 +3159,9 @@ obj
 
 				Flare
 					ElementalClass="Fire"
+					SpellElement="Fire"
 					SkillCost=TIER_4_COST
 					Copyable=6
-					PreRequisite=list("/obj/Skills/Projectile/Magic/Meteor")
 					Area="Around Target"
 					Distance=15
 					DistanceAround=7
@@ -3188,7 +3196,8 @@ obj
 
 
 				Magnetga
-					ElementalClass="Earth"
+					ElementalClass="Dark"
+					SpellElement="Space"
 					SagaSignature=1
 					SignatureTechnique=1
 					SignatureName="Advanced Space Magic"
@@ -3222,7 +3231,8 @@ obj
 						adjust(usr)
 						usr.Activate(src)
 				Graviga
-					ElementalClass="Earth"
+					ElementalClass="Dark"
+					SpellElement="Space"
 					SagaSignature=1
 					SignatureTechnique=1
 					SignatureName="Advanced Space Magic"
@@ -3253,7 +3263,8 @@ obj
 						adjust(usr)
 						usr.Activate(src)
 				Stopga
-					ElementalClass="Earth"
+					ElementalClass="Dark"
+					SpellElement="Time"
 					SagaSignature=1
 					SignatureTechnique=1
 					SignatureName="Advanced Space Magic"
@@ -3280,7 +3291,8 @@ obj
 						usr.Activate(src)
 
 				Holy
-					ElementalClass="Water"
+					ElementalClass="Light"
+					SpellElement="Light"
 					SagaSignature=1
 					SignatureTechnique=2
 					SignatureName="Holy Magic"
@@ -3323,6 +3335,7 @@ obj
 				Burning_Circle
 
 					Area="Around Target"
+					SpellElement="Fire"
 					SignatureTechnique=1
 					ForOffense=1
 					Distance = 10
@@ -3554,7 +3567,7 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1.5
+				AdaptRate=1
 				DamageMult=0.5
 				HolyMod=5
 				Distance=5
@@ -3585,7 +3598,7 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1.5
+				AdaptRate=1
 				DamageMult=0.5
 				AbyssMod=5
 				Distance=5
@@ -4272,6 +4285,7 @@ obj
 				SpecialAttack=1
 				Hurricane="/obj/Skills/Projectile/King_of_Braves/Brave_Tornado"
 				GuardBreak=1
+				ComboMaster=1
 				Grapple=1
 				GrabTrigger="/obj/Skills/Grapple/Erupting_Burning_Finger/Removeable"
 				Knockback=1
@@ -5109,7 +5123,6 @@ mob
 						if(Z.AssociatedGear.Uses<=0)
 							src << "[Z] doesn't have enough power to function!"
 							return FALSE
-			var/disarmed_cut = FALSE
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
 					src << "You lack the ability to use magic!"
@@ -5118,15 +5131,11 @@ mob
 					src << "Your mana circuits are too damaged to use magic! (until [time2text(src.MagicTaken, "DDD MMM DD hh:mm:ss")])"
 					return;
 				if(Z.Copyable>=3||!Z.Copyable)
-					if(passive_handler.Get("Disarmed") && !src.HasLimitlessMagic() && !src.HasBladeFisting())
-						disarmed_cut = TRUE
 					if(!src.HasSpellFocus(Z))
 						src << "You need a spell focus to use [Z]."
 						return
 			Z.adjust(src)
 			Z.SpellSlotModification();
-			if(disarmed_cut)
-				Z.DamageMult = (Z.DamageMult / 2)
 			if(Z.GuardBreak)
 				Z.CanBeBlocked=0
 				Z.CanBeDodged=0
@@ -5164,12 +5173,13 @@ mob
 					for(var/obj/Skills/AutoHit/Snowgrave/SG in src)
 						del SG
 				if(Z.HahaWhoops)
+					var/disarm_f = GetDisarmedAutoHitDamageFactor(Z)
 					if(prob(50))
-						src.Target.HealHealth(Z.DamageMult)
+						src.Target.HealHealth(Z.DamageMult * disarm_f)
 						for(var/mob/E in hearers(12,src))
 							E<<"<font color=[src.Text_Color]>[src] says: haha whoops."
 					else
-						src.Target.DoDamage(src.Target,Z.DamageMult)
+						src.Target.DoDamage(src.Target, Z.DamageMult * disarm_f)
 						for(var/mob/E in hearers(12,src))
 							E<<"<font color=[src.Text_Color]>[src] says: Nailed it."
 					return
@@ -5203,8 +5213,6 @@ mob
 					return
 			if(Z.NeedsSword)
 				var/obj/Items/Sword/s=src.EquippedSword()
-				if(passive_handler.Get("Disarmed") && s && !src.HasBladeFisting())
-					Z.DamageMult = (Z.DamageMult / 2)
 				if(!s)
 					if(!src.HasBladeFisting() && !src.UsingBattleMage())
 						src << "You need a sword equipped to use [Z]!"
@@ -6135,7 +6143,7 @@ obj
 			FollowUp = Z.FollowUp
 			FollowUpDelay = Z.FollowUpDelay
 			BuffSelf = Z.BuffSelf
-			src.Damage=Z.DamageMult
+			src.Damage=Z.DamageMult * owner.GetDisarmedAutoHitDamageFactor(Z)
 			src.StepsDamage=Z.StepsDamage
 			src.MagicNeeded=Z.MagicNeeded
 			if(Z.while_warping)
@@ -6613,7 +6621,7 @@ obj
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(src.SpeedStrike/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				if(Owner.UsingFencing())
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(Owner.UsingFencing()/glob.SPEEDSTRIKEDIVISOR))),1,3)
-				if((m.Launched||m.Stunned))
+				if((m.Launched||m.Stunned||m.Suspended))
 					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer))
 						FinalDmg *= glob.CCDamageModifier
 						Owner.log2text("FinalDmg - Auto Hit", "After ComboMaster", "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
@@ -7794,3 +7802,190 @@ obj
 				src.loc=AH.loc
 
 				src.Life()
+
+/mob
+	var
+		tmp/Suspended = null
+		tmp/judgement_cut_chain_active = FALSE
+		tmp/judgement_cut_bonus_value = 1
+		tmp/judgement_cut_bonus_chain_count = 0
+		tmp/judgement_cut_bonus_end_time = 0
+
+/obj/Skills/AutoHit/Judgement_Cut
+	SkillCost=TIER_5_COST
+	name = "Judgement Cut"
+	Area = "Target"
+	NeedsSword=1
+	Distance = 8
+	DamageMult = 5
+	StrOffense = 1
+	EndDefense = 1
+	Copyable=6
+	Cooldown = 75
+	ComboMaster = 1
+	GuardBreak = 1
+	NoLock = 1
+	NoAttackLock = 1
+	IconTime = 4
+	ActiveMessage = "tears through space with a Judgement Cut!"
+
+	HeldSkill = TRUE
+	ChargePeriod = 3
+	SweetSpot = 1.5
+	SweetSpotBenefit = 1.5
+
+	var/tmp/chain_active = FALSE
+	var/tmp/chain_count = 0
+	var/tmp/mob/chain_user = null
+	var/tmp/mob/chain_target = null
+	var/tmp/initial_charge_period = 3
+	var/tmp/saved_cooldown = 75
+	var/tmp/reengage_deadline = 0
+	var/tmp/window_loop_running = FALSE
+	var/tmp/overlay_loop_running = FALSE
+
+	proc/RollSweetSpot()
+		var/min_ss = 3
+		var/period_ticks = round(ChargePeriod * 10)
+		var/window_ticks = max(1, round(SweetSpotWindow * 10))
+		var/max_ss = max(min_ss, period_ticks - window_ticks)
+		return rand(min_ss, max_ss) / 10
+
+	proc/StartChain(mob/user, mob/target)
+		chain_active = TRUE
+		chain_user = user
+		chain_target = target
+		chain_count = 0
+		DamageMult = 10
+		ChargePeriod = initial_charge_period
+		SweetSpotWindow = 0.3
+		SweetSpot = RollSweetSpot()
+		user.judgement_cut_chain_active = TRUE
+		saved_cooldown = Cooldown > 0 ? Cooldown : initial(Cooldown)
+		Cooldown = 0
+		if(!overlay_loop_running)
+			overlay_loop_running = TRUE
+			spawn() SlashOverlayLoop()
+
+	proc/EndChain()
+		if(!chain_active) return
+		var/mob/user = chain_user
+		var/mob/target = chain_target
+		chain_active = FALSE
+		window_loop_running = FALSE
+		if(user)
+			user.judgement_cut_chain_active = FALSE
+		chain_user = null
+		chain_target = null
+		chain_count = 0
+		DamageMult = 10
+		ChargePeriod = initial_charge_period
+		SweetSpotWindow = 0.3
+		SweetSpot = initial_charge_period / 2
+		Cooldown = saved_cooldown > 0 ? saved_cooldown : initial(Cooldown)
+		if(user)
+			Using = 0
+			cooldown_remaining = 0
+			cooldown_start = 0
+			src.Cooldown(1, null, user)
+
+	proc/SlashOverlayLoop()
+		while(chain_active)
+			if(!chain_target || chain_target.KO || chain_target.Stasis > 0 || chain_target.Health <= 0)
+				if(chain_user && chain_user.held_skill == src)
+					chain_user.FizzleHeldSkill(src)
+				else
+					EndChain()
+				break
+			if(chain_user && chain_user.held_skill == src)
+				var/obj/Effects/HE = new(null, 'Slash - Future.dmi', -32, -32, 0, 1, 6)
+				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
+				HE.transform = matrix().Turn(rand(0, 359))
+				HE.Target = chain_target
+				chain_target.vis_contents += HE
+			sleep(1)
+		overlay_loop_running = FALSE
+
+	proc/ScheduleReengageWindow(mob/user)
+		if(window_loop_running) return
+		window_loop_running = TRUE
+		reengage_deadline = world.time + 10
+		while(world.time < reengage_deadline)
+			if(!chain_active)
+				window_loop_running = FALSE
+				return
+			if(user.Stunned || user.Launched || user.Stasis > 0 || user.KO)
+				window_loop_running = FALSE
+				EndChain()
+				return
+			if(!chain_target || chain_target.KO || chain_target.Stasis > 0 || chain_target.Health <= 0)
+				window_loop_running = FALSE
+				EndChain()
+				return
+			// hold has started again.
+			if(user.held_skill == src)
+				window_loop_running = FALSE
+				reengage_deadline = world.time + 10
+				return
+			sleep(1)
+		// Window expired
+		if(chain_active && (!user.held_skill || user.held_skill != src))
+			window_loop_running = FALSE
+			EndChain()
+
+	OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
+		if(!chain_active) return
+		if(!sweet_spot_hit)
+			EndChain()
+			return
+		if(!chain_target || chain_target.KO || chain_target.Stasis > 0 || chain_target.Health <= 0)
+			EndChain()
+			return
+		chain_count++
+		DamageMult = 10 * (1.2 ** (chain_count - 1))
+		p.Target = chain_target
+		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
+		p.judgement_cut_bonus_value = 1.2 ** (chain_count - 1)
+		p.judgement_cut_bonus_chain_count = chain_count
+		p.judgement_cut_bonus_end_time = world.time + 30
+		ChargePeriod = max(0.6, initial_charge_period - (chain_count * 0.3))
+		SweetSpotWindow = max(0.1, ChargePeriod * 0.1)
+		SweetSpot = RollSweetSpot()
+		p.held_skill_last_release = 0
+		spawn() ScheduleReengageWindow(p)
+
+	OnHeldFizzle(mob/p)
+		if(chain_active)
+			EndChain()
+		// Safety net
+		if(p)
+			p.judgement_cut_chain_active = FALSE
+
+	verb/Judgement_Cut()
+		set category = "Skills"
+		var/mob/p = usr
+		if(!chain_active && cooldown_remaining)
+			p << "<font color='red'>[name] is on cooldown.</font>"
+			return
+		if(!chain_active)
+			if(!p.Target || p.Target == p || !ismob(p.Target))
+				p << "<font color='red'>You need a target.</font>"
+				return
+			var/mob/T = p.Target
+			if(T.KO || T.Stasis > 0 || T.Health <= 0)
+				p << "<font color='red'>Invalid target.</font>"
+				return
+			if(get_dist(p, T) > Distance)
+				p << "<font color='red'>Target is out of range.</font>"
+				return
+			if(T.Suspended)
+				p << "<font color='red'>That target is already suspended.</font>"
+				return
+			StartChain(p, T)
+		else
+			if(world.time > reengage_deadline)
+				EndChain()
+				return
+		p.BeginHeldSkill(src)
+		if(p.held_skill != src && chain_active && chain_user == p)
+			EndChain()

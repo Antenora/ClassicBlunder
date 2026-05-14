@@ -3976,7 +3976,7 @@ obj/Items/Gear
 				if(answer == "Yes")
 					MechType = input(player, "What type?") in list("Speed","Tank","Assault")
 			else
-				MechType = input(player, "What type of mech do you want to use?", "Mech Type") in list("Speed","Tank","Assault")
+				MechType = input(player, "What type of mech do you want to use?", "Mech Type") in list("Speed","Tank","Assault", "MobileFighter")
 		proc/setup(mob/player)
 			var/level2 = Level>=2 ? 1 : 0
 			var/level4 = Level>=4 ? 1 : 0
@@ -4020,10 +4020,10 @@ obj/Items/Gear
 			setup(usr)
 			Techniques = list()
 			if(MechType == "None")
-				var/result = input(usr, "What type?") in list("Speed","Tank","Assault")
+				var/result = input(usr, "What type?") in list("Speed","Tank","Assault", "MobileFighter")
 				MechType = result
 			Techniques = list("/obj/Skills/Buffs/ActiveBuffs/Gear/Mobile_Suit/[MechType]")
-			if(Augment != "None")
+			if(Augment != "None"&&MechType!="Fighter")
 				Techniques += "/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/[Augment]"
 				if(Drive == "Fortress")
 					Techniques += list("/obj/Skills/Projectile/Gear/Installed/Giga_Laser", \

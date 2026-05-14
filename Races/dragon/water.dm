@@ -58,7 +58,7 @@
 		t.effects+=i
 		animate(i, alpha = 255, time = 2)
 		t.Deluged=1
-		t.timeToDeath = 150 + (100 * p.AscensionsAcquired)
+		t.timeToDeath = 150
 		t.ownerOfEffect=p
 		ticking_turfs+=t
 

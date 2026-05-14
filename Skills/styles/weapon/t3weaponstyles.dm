@@ -6,8 +6,8 @@
         StyleStr=1.25
         StyleEnd=1.25
         StyleDef=1.25
-        passives = list("Iaido" = 4, "The Way" = 1, "Sword Master" = 1, "LikeWater" = 4, "SweepingStrike" = 1, "DoubleStrike" = 2, "BlurringStrikes" = 1, \
-                        "Zornhau" = 2, "Half-Sword" = 2, "Rage" = 1, "TripleStrike" = 0.5, "Iaijutsu" = 2, "Musoken" = 1, "Fury" = 2.5, \
+        passives = list("The Way" = 1, "Sword Master" = 1, "LikeWater" = 4, "SweepingStrike" = 1, "DoubleStrike" = 2, "BlurringStrikes" = 1, \
+                        "Zornhau" = 2, "Half-Sword" = 2, "Rage" = 1, "TripleStrike" = 0.5, "Iaijutsu" = 3, "Musoken" = 1, "Fury" = 2.5, \
                         "Parry" = 2.5, "Disarm" = 2, "Deflection" = 1)
         Finisher="/obj/Skills/Queue/Finisher/Clear_Water"
         verb/Two_Heaven_As_One()
@@ -15,8 +15,8 @@
             src.Trigger(usr)
     Acrobat
         SignatureTechnique = 3
-        passives = list("Iaido" = 4, "DoubleStrike" = 2.5, "TripleStrike" = 1, "BlurringStrikes" = 1.5, "SweepingStrike" = 1,\
-                        "Deflection" = 1, "NeedsSecondSword" = 1, "NeedsThirdSword" = 1,  "Parry" = 2.5, "Iaijutsu" = 2.5, "Disarm" = 3,\
+        passives = list("DoubleStrike" = 2.5, "TripleStrike" = 1, "BlurringStrikes" = 1.5, "SweepingStrike" = 1,\
+                        "Deflection" = 1, "NeedsSecondSword" = 1, "NeedsThirdSword" = 1,  "Parry" = 2.5, "Iaijutsu" = 4, "Disarm" = 3,\
                         "Unnerve" = 2, "Fury" = 4)
         NeedsSecondSword = 1
         StyleActive="Acrobat"

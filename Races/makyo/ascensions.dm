@@ -22,21 +22,21 @@ ascension
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 0.5, "Pressure" = 1, "SweepingStrike" = 1)
-			strength = 1.5
-			endurance = 1.5
-			force = 0.75
-			offense = 0.75
+			strength = 1.75
+			endurance = 1.75
+			force = 1.25
+			offense = 1.25
 			intimidation = 50
-			anger = 0.1
+			anger = 0.15
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
 			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 1, "Pressure" = 1, "Adrenaline" = 2)
-			strength = 1.5
-			endurance = 1.5
+			strength = 2
+			endurance = 2
 			force = 1
 			offense = 1
 			intimidation = 25
-			anger = 0.1
+			anger = 0.15
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 2, "Pressure" = 1)

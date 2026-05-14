@@ -318,7 +318,15 @@ mob/proc/mazokuActivateHighestHT()
 		race.transformations[i].transform(src, TRUE)
 
 /mob/proc/MazokuEffects()
-
+/*	transform_animation(mob/user)
+		spawn(30)
+			KenShockwave(src, icon='GojoShockwave.dmi', PixelY=24, Size=1, Blend=2)
+		spawn(30)
+			KenShockwave(src, icon='GojoShockwave.dmi', PixelY=24, Size=3, Blend=2)
+		spawn(30)
+			KenShockwave(src, icon='GojoShockwave.dmi', PixelY=24, Size=5, Blend=2)
+		spawn(30)
+			KenShockwave(src, icon='GojoShockwave.dmi', PixelY=24, Size=10, Blend=2)*/
 
 /transformation/human/revert(mob/user)
 	..()

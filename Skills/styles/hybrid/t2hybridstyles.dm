@@ -24,8 +24,11 @@
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Twin_Dragon_Fire")
 		StyleActive="Ifrit Jambe"
 		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 1.5, "Instinct" = 2, \
-						"Flow" = 2, "SpiritFlow" = 1.5, "Combustion" = 40, "Scorching" = 5, "Shattering" = 5)
+						"Flow" = 2, "SpiritFlow" = 1.5, "Combustion" = 40, "Scorching" = 5, "Shattering" = 7, "CallousedHands" = 0.15, "SweepingStrike" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
+		adjust(mob/p)
+			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 1.5, "Instinct" = 2, \
+				"Flow" = 2, "SpiritFlow" = 1.5, "Combustion" = 40, "Scorching" = 5, "Shattering" = 7, "CallousedHands" = 0.15, "SweepingStrike" = 1)
 		verb/Ifrit_Jambe()
 			set hidden=1
 			src.Trigger(usr)
@@ -72,10 +75,14 @@
 	StyleStr = 1.15
 	StyleFor = 1.15
 	StyleOff = 1.15
+	StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Bloodmancer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodwhetter")
+
 	StyleActive="Bloodseeker"
 	Finisher="/obj/Skills/Queue/Finisher/Blood_Rite"
 	BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Poison"
 	adjust(mob/p)
+		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Bloodmancer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodwhetter")
+
 		passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
 		"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
 		"SpiritSword" = 0.25, "Crippling" = 3, "Poisoning" = 3, "Pursuer" = 1, )
@@ -94,10 +101,12 @@
 	StyleActive="Art of Order"
 	Finisher="/obj/Skills/Queue/Finisher/Alpha_Strike"
 	StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Tsui_no_Hiken_Kaguzuchi")
+	"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi",\
+	"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade")
 	adjust(mob/p)
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
-		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Tsui_no_Hiken_Kaguzuchi")
+		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi",\
+		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade")
 		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "ThunderHerald" = 1, \
 					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 2, "Rain" = 3)
 

@@ -92,6 +92,6 @@
         if(!(icon_state in list("Meditate", "KO"))) return 0;
         return 1;
     isHumanInTransform()
-        if(!isRace(HUMAN) || !isRace(CELESTIAL)) return 0;
+        if(!isRace(HUMAN) && !isRace(CELESTIAL)) return 0;
         if(transActive <= 0) return 0;
         return 1;

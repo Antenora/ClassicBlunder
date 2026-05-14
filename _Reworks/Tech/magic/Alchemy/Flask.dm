@@ -33,7 +33,12 @@
 
     verb/Imbibe_Flask() // We cosnume a charge from the flask!
         set category = "Skills"
-        if(usr.equippedFlask.Charges == 0) return
+        if(usr.hasSecret("Heavenly Restriction") && usr.secretDatum?:hasRestriction("Magic")) 
+            usr << "Your body cannot possibly accept this."
+            return
+        if(usr.equippedFlask.Charges == 0) 
+            usr << "You have no Flask Charges left!"
+            return
         usr.reduceCharge() // mob proc that reduces charges
         if(!usr.CheckSlotless("Flask Charge")) // If no buff, 
             for(var/typesFromTechniques in src.Techniques) // We want to go fishing 
@@ -74,42 +79,42 @@
         */
         if(P.equippedFlask.Mana == 1) //  ONLY THE VALUE OF 1 SHOULD BE HERE 
             StableHeal=1
-            src.ManaHeal = ((glob.POTIONHEAL*(P.equippedFlask.Tier+2))/2) // 5, 10, 15 mana regen a tick based on tier provided potion heal is the same 
+            src.ManaHeal = (glob.POTIONHEAL*(P.equippedFlask.Tier+1)) // 5, 10, 15 mana regen a tick based on tier provided potion heal is the same 
 
         if(P.equippedFlask.Energy == 1) // Same as above
             StableHeal=1
-            src.EnergyHeal = ((glob.POTIONHEAL*(P.equippedFlask.Tier+2))/2) // 5, 10, 15 energy regen a tick
+            src.EnergyHeal = (glob.POTIONHEAL*(P.equippedFlask.Tier+1)) // 5, 10, 15 energy regen a tick
 
         if(P.equippedFlask.Hallucinogen == 1) // This gives you immediate anger and anger buffs at expense of defense
             AutoAnger=1 // Makes you angry instantly
             // Please note: the comments will tell you what the math does   
-            AngerMult = 1 + ((P.equippedFlask.Tier+1)/3) // T0 = +33%, T1 = +66%  T2 = +100% anger multiplier
-            EndMult = 0.5 + ((P.equippedFlask.Tier+1)/10) // T0 = 0.8, T1 = 0.9, T3 = 1 endurance mult (DOWNSIDE)
-            DefMult = 0.7 + ((P.equippedFlask.Tier+1)/10) // T0 = 0.8, T1 = 0.9, T3 = 1 endurance mult (DOWNSIDE)
+            AngerMult = 1 + (P.equippedFlask.Tier+1)/3 // T0 = +33%, T1 = +66%  T2 = +100% anger multiplier
+            EndMult = 0.5 + (P.equippedFlask.Tier+1)/10 // T0 = 0.6, T1 = 0.7, T3 = 0.8 endurance mult (DOWNSIDE)
+            DefMult = 0.7 + (P.equippedFlask.Tier+1)/10 // T0 = 0.8, T1 = 0.9, T3 = 1 Defense mult (DOWNSIDE)
             passives["PureReduction"] = -4 + (P.equippedFlask.Tier+1) // T0 = 3, T1 = -2 T2 = -1, PS: -1 PureReduction = 5% extra damage taken,
             passives["AngerAdaptiveForce"] = ((P.equippedFlask.Tier+1)/10) // T0 0.1 AAF, T1 0.2, T2 0.3 PS: 0.1 AAF = 10% increase of strongest dmg stat
         if(P.equippedFlask.Searing == 1) // Damage 
-            StrMult = 1.1 + (P.equippedFlask.Tier) // T0 = 1.1, T1 = 1.2, T2 = 1.3
-            ForMult = 1.1 + (P.equippedFlask.Tier) // Same as above
+            StrMult = 1 + (P.equippedFlask.Tier+1)/10 // T0 = 1.1, T1 = 1.2, T2 = 1.3
+            ForMult = 1 + (P.equippedFlask.Tier+1)/10 // Same as above
             passives["PureDamage"] = (P.equippedFlask.Tier+1)/2 // T0 = 0.5, T1 = 1, T2 = 1.5 // 5% to 15% dmg boost 
-            passives["Steady"] = (P.equippedFlask.Tier+1) // Same as above 
+            passives["Steady"] = (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["PureReduction"] -= 2 - (P.equippedFlask.Tier) // T0 = -2, T 1= -1 T2 = 0 // 10% to 5% extra damage taken (DOWNSIDE)
         if(P.equippedFlask.Flowy == 1) // Dodging
-            DefMult = 1 + ((P.equippedFlask.Tier+1)/4) // T0 = 1.25, T1 = 1.5, T2 = 1.75 // This makes you dodge more
-            StrMult = 0.85 + (P.equippedFlask.Tier+1/20)  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
-            ForMult = 0.85 + (P.equippedFlask.Tier+1/20) // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
+            DefMult = 1 + (P.equippedFlask.Tier+1)/4 // T0 = 1.25, T1 = 1.5, T2 = 1.75 // This makes you dodge more
+            StrMult = 0.85 + (P.equippedFlask.Tier+1)/20  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
+            ForMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             passives["Flow"] = (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["LikeWater"] = (P.equippedFlask.Tier+1) // Same as Above
         if(P.equippedFlask.Hard == 1) // Defense
-            EndMult = 1 + (P.equippedFlask.Tier+1/10) //T0 = 1.1, T1 = 1.2, T3 = 1.3 endurance mult
-            SpdMult = 0.85 + (P.equippedFlask.Tier+1/20) // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
+            EndMult = 1 + (P.equippedFlask.Tier+1)/10 //T0 = 1.1, T1 = 1.2, T3 = 1.3 endurance mult
+            SpdMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             passives["Harden"] = (P.equippedFlask.Tier+1)/2 // T0 = 0.5, T1 = 1, T2 = 1.5
-            passives["Unnerve"] = (P.equippedFlask.Tier+1) // T0 = 0.5, T1 = 1, T2 = 1.5
+            passives["Unnerve"] = (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["Godspeed"] = -4 + (P.equippedFlask.Tier+1) // T0 = -3, T1 = -2, T2 = -1 (DOWNSIDE)
         if(P.equippedFlask.Quicksilver == 1) // Speed, you must be feeling pretty stupid restricting magic now huh Jess?
-            SpdMult = 1 + (P.equippedFlask.Tier+1/10) //T0 = 1.1, T1 = 1.2, T3 = 1.3 speed mult
-            StrMult = 0.85 + (P.equippedFlask.Tier+1/20)  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
-            ForMult = 0.85 + (P.equippedFlask.Tier+1/20) // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
+            SpdMult = 1 + (P.equippedFlask.Tier+1)/10 //T0 = 1.1, T1 = 1.2, T3 = 1.3 speed mult
+            StrMult = 0.85 + (P.equippedFlask.Tier+1)/20  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
+            ForMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             passives["Godspeed"] = (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["Skimming"] = (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
 

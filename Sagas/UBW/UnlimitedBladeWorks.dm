@@ -3,6 +3,7 @@ mob/var/usingUBW = FALSE
 mob/var/tmp/domainExpansionActive = 0
 mob/var/tmp/list/domainExpansionFloors = null
 mob/var/tmp/list/domainExpansionBarriers = null
+mob/var/tmp/domainBeingBreached = FALSE
 turf/var/tmp/mob/domain_expansion_owner = null
 
 obj/DomainExpansionBarrier
@@ -14,8 +15,32 @@ obj/DomainExpansionBarrier
 	opacity = 1
 	mouse_opacity = 0
 	Savable = 0
+	Attackable = 1
+	Destructable = 0
+	var/domain_hp = 3000
 	Enter(atom/A)
 		return 0
+	onBumped(atom/Obstacle)
+		if(istype(Obstacle, /obj/Skills/Projectile/_Projectile))
+			var/obj/Skills/Projectile/_Projectile/proj = Obstacle
+			var/mob/shooter = proj.Owner
+			if(shooter)
+				var/turf/bTurf = isturf(src.loc) ? src.loc : null
+				var/mob/domainOwner = bTurf ? bTurf.domain_expansion_owner : null
+				if(domainOwner && domainOwner.domainExpansionActive)
+					var/turf/aTurf = isturf(shooter.loc) ? shooter.loc : null
+					if(!aTurf || aTurf.domain_expansion_owner != domainOwner)
+						var/projDamage = shooter.potential_power_mult * shooter.PowerBoost * shooter.Power_Multiplier * shooter.AngerMax * (shooter.GetStr() + shooter.GetFor())
+						domain_hp -= projDamage
+						if(domain_hp <= 0)
+							domainOwner.domainExpansionBarriers -= src
+							var/mob/capOwner = domainOwner
+							spawn()
+								del(src)
+								capOwner.BreachDomain()
+							return
+		..()
+
 
 obj/DomainExpansionRoof
 	name = "Domain Shroud"
@@ -149,6 +174,7 @@ mob
 			src.domainExpansionFloors = null
 			src.domainExpansionBarriers = null
 			src.domainExpansionActive = 0
+			src.domainBeingBreached = FALSE
 			spawn()
 				var/processed = 0
 				if(oldBarriers)
@@ -173,6 +199,31 @@ mob
 						if(processed >= 200)
 							processed = 0
 							sleep(1)
+
+
+		BreachDomain()
+			if(!src.domainExpansionActive || src.domainBeingBreached)
+				return
+			src.domainBeingBreached = TRUE
+			for(var/turf/t in src.domainExpansionFloors)
+				for(var/mob/m in t)
+					m << "<b><font color='red'>The Domain boundary has been breached! The Domain will collapse in 60 seconds!</font></b>"
+			src << "<b><font color='red'>Your Domain's boundary has been broken through! It will collapse in 60 seconds.</font></b>"
+			spawn()
+				var/steps = 12
+				for(var/i = 1 to steps)
+					sleep(50)
+					if(!src.domainExpansionActive)
+						return
+					var/newAlpha = round(255 * (1 - (i / steps)))
+					if(src.domainExpansionBarriers)
+						for(var/obj/b in src.domainExpansionBarriers)
+							if(b) b.alpha = newAlpha
+				if(src.domainExpansionActive)
+					stopDomainExapansion()
+					var/obj/Skills/Buffs/SlotlessBuffs/Domain_Expansion/dex = locate() in src
+					if(dex && dex.SlotlessOn)
+						dex.Trigger(src, Override=1)
 
 
 		UnlimitedBladeWorks()

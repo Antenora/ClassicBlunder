@@ -39,7 +39,7 @@ transformation
 
 			mastery_boons(mob/user)
 				if(mastery >= 25)
-					passives = list("GodKi" = 0.25, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 4, "PureDamage" = 3, "PureReduction" = 3)
+					passives = list("GodKi" = 0.15, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 1, "PureDamage" = 3, "PureReduction" = 3)
 					strength = 1.15
 					speed = 1.25
 					offense = 1.25
@@ -47,7 +47,7 @@ transformation
 					force = 1.15
 					endurance = 1.25
 				if(mastery >= 50)
-					passives = list("GodKi" = 0.75, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 5, "PureDamage" = 5, "PureReduction" = 5, "MovementMastery" = 3, "BuffMastery"=3)
+					passives = list("GodKi" = 0.35, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 2, "PureDamage" = 4, "PureReduction" = 4, "MovementMastery" = 3, "BuffMastery"=3)
 					strength = 1.2
 					speed = 1.3
 					offense = 1.3
@@ -55,7 +55,7 @@ transformation
 					force = 1.2
 					endurance = 1.3
 				if(mastery >= 75)
-					passives = list("GodKi" = 1, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3, "BuffMastery"=6)
+					passives = list("GodKi" = 0.5, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 4, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3, "BuffMastery"=6)
 					strength = 1.25
 					speed = 1.35
 					offense = 1.35
@@ -63,7 +63,7 @@ transformation
 					force = 1.25
 					endurance = 1.35
 				if(mastery >= 100)
-					passives = list("GodKi" = 1.5, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6, "BuffMastery"=6)
+					passives = list("GodKi" = 1, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6, "BuffMastery"=6)
 					strength = 1.3
 					speed = 1.4
 					offense = 1.4

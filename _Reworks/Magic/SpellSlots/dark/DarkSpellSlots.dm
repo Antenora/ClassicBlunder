@@ -7,7 +7,7 @@
 		ElementalClass="Dark"
 		Area="Arc"
 		Distance=3
-		DamageMult=6
+		DamageMult=8
 		SpecialAttack=1
 		StrOffense=1
 		CanBeDodged=1
@@ -33,7 +33,7 @@
 	SpellSlot=1
 	Arachnae_Touch
 		ElementalClass="Dark"
-		DamageMult=4
+		DamageMult=6
 		Speed=0.5
 		AccMult=1.2
 		Distance=12
@@ -47,7 +47,7 @@
 
 	Void_Blast
 		ElementalClass="Dark"
-		DamageMult=5
+		DamageMult=7.5
 		Speed=1
 		Homing=1
 		Explode=2

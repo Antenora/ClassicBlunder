@@ -392,7 +392,7 @@ obj/Items
 				if(usr.getTotalMagicLevel() < 20)
 					usr << "Your total magic level is not high enough to craft Limited Rank-Up Magic. (Requires 20 or higher.)"
 					return
-				manaCost = src.Cost * glob.progress.EconomyCost
+				manaCost = 100
 			if(istype(src, /obj/Items/Enchantment/PocketDimensionGenerator))
 				if(!usr.HasFragments(src.Cost*glob.progress.EconomyCost))
 					usr << "You don't have enough fragments to buy [src]."
@@ -1402,7 +1402,6 @@ obj/Items/proc/UnEquip(mob/A)
 					A << "You can't remove [src] while you have [x.BuffName] active!"
 					return
 		if(A.equippedFlask) // Checks if you have a flask equipped, which is necessary to... unequip flasks. I'm tired fuck off
-			liveDebugMsg("Flask Unequipped, check if equippedFlask is set to null")
 			A.equippedFlask = null
 		suffix = null
 

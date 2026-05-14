@@ -18,6 +18,7 @@
 			src.Trigger(usr)
 /obj/Skills/AutoHit
 	RoyalRelease
+		SignatureTechnique=2
 		Distance=12
 		WindUp=0.75
 		IgnoreWindUpReduction=1
@@ -42,7 +43,7 @@
 			var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in p.contents
 			if(RG)
 				usr << "Using [RG.RoyalMeter] for Royal Release."
-				if(RG.SuccessfulParry == 2)
+				if(RG.SuccessfulParry >= 2)
 					WindupMessage="reverse the momentum of the opponent's strike, and-!!"
 					ActiveMessage="lands a Perfect Release!!!!!!"
 					Knockback=10

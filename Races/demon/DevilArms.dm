@@ -414,6 +414,7 @@
             select = selection
         if(select != "Unarmed")
             vars["Makes[select]"] = 1
+            if(select=="Sword") MakesSword = 3;
         vars["[select]Name"] = input(p, "Change name to what?") as text
         var/class
         if(select != "Unarmed")

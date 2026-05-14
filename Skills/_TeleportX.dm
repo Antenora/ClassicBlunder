@@ -313,6 +313,8 @@ obj/Skills
 
 		proc
 			Activate(var/mob/User)
+				if(User.Suspended)
+					return
 				if(glob.DISABLE_ALL_TELEPORTS&&!User.passive_handler.Get("FreeTeleport"))
 					User<<"The ability to teleport has been sealed off!"
 					return

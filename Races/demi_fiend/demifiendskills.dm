@@ -184,7 +184,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Rakunda
 // Healing skills
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/DiaApply
 	StableHeal=1
-	HealthHeal=10
+	HealthHeal=0.6
 	TimerLimit=10
 	ActiveMessage="is healed by restorative energy!"
 	OffMessage="releases the healing energy."
@@ -215,7 +215,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Dia
 
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/MediaApply
 	StableHeal=1
-	HealthHeal=10
+	HealthHeal=0.3
 	TimerLimit=10
 	ActiveMessage="is healed by powerful restorative energy!"
 	OffMessage="the healing energy fades..."
@@ -721,7 +721,7 @@ obj/Skills/Projectile/DemiFiend/Divine_Shot
 
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/DiaramaApply
 	StableHeal=1
-	HealthHeal=25
+	HealthHeal=1.5
 	TimerLimit=10
 	ActiveMessage="is bathed in potent restorative energy!"
 	OffMessage="releases the restorative energy."
@@ -752,7 +752,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Diarama
 
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/MediaramaApply
 	StableHeal=1
-	HealthHeal=30
+	HealthHeal=1
 	TimerLimit=10
 	ActiveMessage="is bathed in powerful restorative energy!"
 	OffMessage="the healing energy fades..."
@@ -793,7 +793,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarama
 
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/DiarahanApply
 	StableHeal=1
-	HealthHeal=200
+	HealthHeal=3
 	TimerLimit=3
 	ActiveMessage="is enveloped in an overwhelming wave of restorative light!"
 	OffMessage="the flood of healing recedes."
@@ -1466,7 +1466,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 obj/Skills/Buffs/SlotlessBuffs/DemiFiend/MediarahanApply
 	StableHeal=1
-	HealthHeal=30
+	HealthHeal=1.5
 	TimerLimit=10
 	ActiveMessage="is bathed in radiant healing light!"
 	OffMessage="the radiant healing fades..."
@@ -1494,7 +1494,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 		for(var/mob/m in User.party.members)
 			if(!m || !ismob(m)) continue
 			var/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/MediarahanApply/applyBuff = new
-			applyBuff.HealthHeal = 30
+			applyBuff.HealthHeal = 1.5
 			applyBuff.StableHeal = 1
 			applyBuff.TimerLimit = 10
 			applyBuff.Trigger(m, 1)

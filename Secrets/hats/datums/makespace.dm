@@ -97,7 +97,7 @@ spaceMaker
 /turf/var/tmp/mob/ownerOfEffect
 /turf/var/tmp/list/effects = list()
 /turf/proc/applyEffect(option, timer, mob/p)
-	timeToDeath = timer
+	timeToDeath = timer/glob.TILE_DURATION_DIVISOR
 	effectApplied = option
 	ticking_turfs += src
 	ownerOfEffect = p

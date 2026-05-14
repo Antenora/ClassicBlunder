@@ -382,7 +382,7 @@ obj/Skills/Grapple
 		SignatureTechnique=1
 		DamageMult=12
 		StrRate=1
-		ForRate=2
+		ForRate=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
 		Effect="Bang"
 		EffectMult=5
@@ -398,9 +398,9 @@ obj/Skills/Grapple
 		UnarmedOnly=0
 		NeedsSword=0
 		SignatureTechnique=1
-		DamageMult=8
+		DamageMult=12
 		ForRate=1
-		StrRate=0
+		StrRate=0.5
 		TriggerMessage="fills their grasp with lightning and takes hold of"
 		Effect="Lightning"
 		EffectMult=5

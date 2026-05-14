@@ -646,15 +646,24 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 	if(hasMazokuRevival())
 		RPModeSwitch()
 		sleep(30)
+		MazokuEffects() //unused currently
+		KenShockwave(src, icon='KenShockwavePurple.dmi', Size=1, Blend=2)
+		src.Quake(20)
 		world<<"<font color=red><b>As a descendant of a Great Demon Lord who has become powerful enough...</b></font>"
 		sleep(30)
+		KenShockwave(src, icon='KenShockwavePurple.dmi', Size=2, Blend=2)
+		src.Quake(20)
 		world<<"<font color=red><b>[src] has become a vessel for that Demon's soul.</b></font>"
 		sleep(30)
+		KenShockwave(src, icon='KenShockwavePurple.dmi', Size=3, Blend=2)
+		src.Quake(20)
 		world<<"<font color=red><b>Atavism of the Mazoku.</b></font>"
 		HealAllCutTax()
 		src.FullRestore()
+		src.name=src.TrueName
 		sleep(30)
-		MazokuEffects()
+		KenShockwave(src, icon='KenShockwavePurple.dmi', Size=5, Blend=2)
+		src.Quake(20)
 		src.passive_handler.Increase("DeathDefied", 1)
 		if(src.race && src.race.transformations)
 			// Mazoku humans don't unlock transformations until this point
@@ -1916,7 +1925,7 @@ mob/proc/SpeedDelay(var/Modifier=1)
 	var/Spd=src.GetSpd()**glob.ATTACK_DELAY_EXPONENT
 	var/Delay=glob.ATTACK_DELAY_DIVISOR/Spd
 	if(passive_handler["Speed Force"])
-		Delay = glob.ATTACK_DELAY_DIVISOR/(GetSpd()*2)
+		Delay = glob.ATTACK_DELAY_DIVISOR/(GetSpd()*glob.SPEED_FORCE_DELAYMULT)
 	// Inevitable (Makyo)
 	Delay += passive_handler.Get("Inevitable")
 	if(Delay>=glob.ATTACK_DELAY_MAX)

@@ -1,7 +1,7 @@
 transformation
 	celestial
 		Master_of_Arms
-			passives = list("Heavy Strike" = "Warp Strike", "Parry" = 2, "ManaGeneration" = 5, "Iaijutsu" = 2, "Iaido" = 4, "Deflection" = 5, "MovingCharge" = 1)
+			passives = list("Heavy Strike" = "Warp Strike", "Parry" = 2, "ManaGeneration" = 5, "Iaijutsu" = 4, "Deflection" = 5, "MovingCharge" = 1)
 			unlock_potential = 55
 			speedadd = 0.1
 			enduranceadd = 0.1

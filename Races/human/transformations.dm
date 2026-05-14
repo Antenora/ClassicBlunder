@@ -7,7 +7,7 @@ transformation
 			detrans_message = "usrName lowers their tension to normal..."
 			mastery_boons(mob/user)
 				if(mastery >= 0)
-					passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.25,"TechniqueMastery"=1, "BuffMastery" = 2, "PureReduction"=2, "PureDamage"=2,"UnderDog"=0.3,"Tenacity"=2)
+					passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.375,"TechniqueMastery"=1, "BuffMastery" = 2, "PureReduction"=2, "PureDamage"=2,"UnderDog"=0.3,"Tenacity"=2)
 					pot_trans = 2
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)

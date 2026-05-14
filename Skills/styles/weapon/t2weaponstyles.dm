@@ -9,8 +9,8 @@
 		StyleActive="Santoryu"
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk"="/obj/Skills/Buffs/NuStyle/SwordStyle/Two_Heaven_As_One",
 							"/obj/Skills/Buffs/NuStyle/SwordStyle/Phalanx_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Acrobat")
-		passives = list("Iaido" = 2, "Fury" = 2, "BlurringStrikes" = 1, "SweepingStrike" = 1, "DoubleStrike" = 2, "TripleStrike" = 0.5,\
-					"NeedsSecondSword" = 1, "NeedsThirdSword" = 1, "Iaijutsu" = 1.5, "Musoken" = 1)
+		passives = list("Fury" = 2, "BlurringStrikes" = 1, "SweepingStrike" = 1, "DoubleStrike" = 2, "TripleStrike" = 0.5,\
+					"NeedsSecondSword" = 1, "NeedsThirdSword" = 1, "Iaijutsu" = 2, "Musoken" = 1)
 		NeedsSecondSword = 1
 		NeedsThirdSword = 1
 		Finisher="/obj/Skills/Queue/Finisher/King_of_Hell"

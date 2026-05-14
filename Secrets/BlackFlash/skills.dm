@@ -55,6 +55,9 @@
 	JJKNarrate("A phenomenon known as a Black Flash. Following this, the user enters a state of awakening to their own energies-");
 	sleep(30)
 	JJKNarrate("Not too dissimilar to athletes entering 'The Zone', manipulating their power becomes as easy and natural as breathing.");
+	if(prob(15))
+		sleep(30)
+		JJKNarrate("...displaying control over their power matched only by Satoru Gojo.");
 	sleep(30)
 	JJKNarrate("In other words... For one minute and thirty seconds...");
 	sleep(30)

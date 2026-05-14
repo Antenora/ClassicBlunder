@@ -1,3 +1,5 @@
+//TODO: This passive is actually not being used. Lmao. Lol.
+//Most instances of this should be replaced with Iaijutsu except for Flying Thunder God
 globalTracker/var
     IAIDO_EPT = 1;//Accumulates 1 extra IaidoGauge per tick
     IAIDO_MIN = 0;

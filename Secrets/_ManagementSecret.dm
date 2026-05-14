@@ -6,6 +6,7 @@
 
 #define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Werewolf", "Heavenly Restriction", "Senjutsu", "Shin",\
 "Ultra Instinct", "Zombie", "Necromancy", "Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral")
+#define RACIAL_SECRETS list("Eldritch (Shrouded)", "Eldritch (Reflected)")
 
 //thank you hadoje
 /mob/var/SecretInformation/secretDatum = new()
@@ -107,9 +108,9 @@ SecretInformation
 	proc/applySecret()
 
 
-	Jagan
+	JaganEye
 		name = "Jagan Eye"
-		givenSkills = list("/obj/Skills/Buffs/SpecialBuffs/Cursed/Jagan_Eye", "/obj/Skills/Utility/Telepathy", "obj/Skills/Telekinisis" )
+		givenSkills = list("/obj/Skills/Buffs/SpecialBuffs/Cursed/Jagan_Eye", "/obj/Skills/Utility/Telepathy", "/obj/Skills/Telekinesis" )
 		givenVariables = list("EnhancedHearing", "EnhancedSmell")
 
 		applySecret(mob/p)
@@ -118,10 +119,11 @@ SecretInformation
 					p << "You have awakened the power of the Jagan Eye!"
 					giveSkills(p)
 					giveVariables(p)
-					p.JaganPowerNerf = 0.3
+					p.JaganPowerNerf = 0.5
+					nextTierUp = 3;
 				if(2)
 					p << "Your Jagan Eye has grown stronger!"
-					p.JaganPowerNerf = 0.5
+					p.JaganPowerNerf = 0.7
 					nextTierUp = 7
 					// add expert here
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Jagan_Expert, p.Buffs))
@@ -133,7 +135,7 @@ SecretInformation
 						p << "It is a reckless attack and will sacrifice the limb used to perform it."
 				if(3)
 					p << "Your Jagan Eye has grown stronger!"
-					p.JaganPowerNerf = 0.75
+					p.JaganPowerNerf = 0.85
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/SwordOfDarknessFlame, p.Buffs))
 						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/SwordOfDarknessFlame)
 					for(var/obj/Skills/Projectile/Beams/Big/Jagan/Dragon_of_the_Darkness_Flame/DF in p.Projectiles)
@@ -312,8 +314,9 @@ SecretInformation
 	EldritchShrouded
 		name = "Eldritch (Shrouded)"
 		var/list/ShroudedPassives=list();
-		var/ShroudedOrigin;
-		var/ShroudedSubtype;
+		var/ShroudedOrigin;//assigned at t1
+		var/ShroudedSubtype;//assigned at t2
+		var/ShroudedMastery;//assigned at t6
 		applySecret(mob/p)
 			p << "Your Shrouded origin bubbles to the surface; [currentTier] Steps towards the road to Assimilation have been taken..."
 			//1, 2, and 6 upgrade your "Origin" style enhancements
@@ -756,8 +759,9 @@ mob/Admin3/verb
 	SecretManagement(var/mob/P in players)
 		set category="Admin"
 		if(!P.client) return
-		var/list/Secrets=list("Spirits of The World","Jagan Eye", "Hamon of the Sun", "Werewolf", "Vampire", "Sage Arts", "Haki", "Eldritch", "Heavenly Restriction", "Shin", "Black Flash", "Spiral")
-		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in Secrets
+		var/list/validSecrets = VALID_SECRET_LIST;
+		validSecrets.Remove(RACIAL_SECRETS);
+		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in validSecrets;
 		if(P.Secret)
 			src << "They already have a secret."
 			return
@@ -773,9 +777,9 @@ mob/Admin3/verb
 				if("Heavenly Restriction")
 					P.Secret = "Heavenly Restriction"
 					P.giveSecret("HeavenlyRestriction")
-				if("Jagan")
+				if("Jagan Eye")
 					P.Secret = "Jagan Eye"
-					P.giveSecret("Jagan")
+					P.giveSecret("JaganEye")
 				if("Hamon of the Sun")
 					P.ModifyPrime+=1
 					P.Secret="Hamon"

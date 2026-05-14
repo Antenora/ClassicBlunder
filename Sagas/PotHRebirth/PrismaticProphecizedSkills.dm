@@ -13,7 +13,7 @@ obj
 			Cooldown = 1
 			SwordAscension=3
 			ActiveMessage="readies CHAOS SABER."
-			OffMessage="dispels the Chaos Saber."
+			OffMessage="dispels the CHAOS SABER!"
 			adjust(mob/p)
 				passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1)
 				PowerMult=1.25
@@ -39,7 +39,7 @@ obj
 			StaffName="Chaos Buster"
 			StaffIcon='Aether Bow.dmi'
 			ActiveMessage="readies CHAOS BUSTER."
-			OffMessage="dispels their Chaos Buster!"
+			OffMessage="dispels their CHAOS BUSTER!"
 			passives = list("SpecialStrike" = 1, "StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"SpiritStrike"=1)
 			SpecialStrike=1
 			StaffAscension=3

@@ -14,6 +14,7 @@ ascension
 						if(owner.SagaLevel < 2)
 							owner.SagaLevel = 2
 							owner.ChooseMartialSkill(1)
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -49,7 +50,7 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("Tenacity" = 1, "Persistence" = 1)
+							passives = list("Tenacity" = 1, "Persistence" = 1, "EnergyGeneration" = 2, "ManaGeneration" = 1)
 						if("Reaper")
 							strength=0.75 * SMod
 							force=0.25 * SMod
@@ -67,6 +68,7 @@ ascension
 							owner.SagaLevel = 3
 							owner.ChooseKeychain()
 							owner.ChooseMartialSkill(2)
+							owner.saga_up_self()
 				if(owner.NobodyOriginType!="Simple")
 					if(owner.transUnlocked<1)
 						owner.transUnlocked=1
@@ -105,14 +107,14 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("Tenacity" = 1, "Persistence" = 1)
+							passives = list("Tenacity" = 1, "Persistence" = 1, "EnergyGeneration" = 2, "ManaGeneration" = 1)
 						if("Reaper")
 							strength=0.75 * SMod
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.15, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			onAscension(mob/owner)
@@ -121,6 +123,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 4)
 							owner.SagaLevel = 4
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -161,7 +164,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.15, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
 			onAscension(mob/owner)
@@ -170,6 +173,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 5)
 							owner.SagaLevel = 5
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -210,7 +214,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.15, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			onAscension(mob/owner)
@@ -219,6 +223,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 6)
 							owner.SagaLevel = 6
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -259,7 +264,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.15, "Instinct" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1, "Deicide" = 5)
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			onAscension(mob/owner)
@@ -304,4 +309,4 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.2, "Instinct" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1, "Deicide" = 5)

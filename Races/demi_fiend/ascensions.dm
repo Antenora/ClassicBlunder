@@ -84,12 +84,12 @@ ascension
 					owner.SagaLevel = 6
 				..()
 			passives = list("HellPower" = 0.25, "KiControlMastery" = 1, "PureDamage" = 1, "PureReduction" = 1, "MovingCharge" = 1)
-			strength = 1.5
-			endurance = 1.5
-			speed = 1.5
-			force = 1.5
-			offense = 1.5
-			defense = 1.5
+			strength = 2
+			endurance = 2
+			speed = 2
+			force = 2
+			offense = 2
+			defense = 2
 			anger = 0.1
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL

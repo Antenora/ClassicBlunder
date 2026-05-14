@@ -98,14 +98,30 @@ mob/var
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
 
+	//SHINIGAMI
+	ShinigamiRelease
+	AsauchiName
+	ShikaiCall
+	BankaiPrefix
+	ZanpakutoClass
+	ShihakushoClass
+	ShikaiIcon
+	ShikaiIconX = 0
+	ShikaiIconY = 0
+	BankaiIcon
+	BankaiIconX = 0
+	BankaiIconY = 0
+	InShinigamiForm = FALSE
+	UsedFinalGetsuga = FALSE
+
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","King of Courage", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","King of Courage", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
 		if(P.Saga)
-			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu")
+			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
 				Level7=2  // Devil Summoner has 8 tiers
@@ -117,6 +133,11 @@ mob/Admin3/verb
 					switch(input("This character has a Crystal of Bilocation setup right now. Are you sure you would like to tier them up?") in list("Yes","No"))
 						if("No")
 							return
+
+			// Zangetsu-specific, they must use Final Getsuga Tenshou before reaching Tier 7
+			if(P.Saga == "Shinigami" && P.ShinigamiRelease == "Zangetsu" && P.SagaLevel >= 6 && !P.UsedFinalGetsuga)
+				src << "[P] has not yet used Final Getsuga Tenshou. They must sacrifice their Shinigami powers before they can transcend to the final tier."
+				return
 
 			var/list/choices=list("Cancel")
 			var/math=(7-P.SagaLevel+Level7)
@@ -295,6 +316,9 @@ mob/Admin3/verb
 					P.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Sharingan)
 					P.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/Move_Duplication)
 					P<<"The curse of hatred blooms in you..."
+
+				if("Shinigami")
+					P.gainShinigami()
 
 				if("Kamui")
 					P.SagaLevel=1
@@ -1013,6 +1037,9 @@ mob
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
 				if("Cosmo")
 					tierUpSaga("Cosmo")
+				if("Shinigami")
+					tierUpSaga("Shinigami")
+
 				if("Weapon Soul")
 					tierUpSaga("Weapon Soul")
 
