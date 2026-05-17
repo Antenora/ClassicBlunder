@@ -291,7 +291,11 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			TimeMagicUnlocked++
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds, src))
 				src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds)
-
+		// CREST END // 
+		// INKWORKS START //
+		if("Inkworks")
+			InkworksTier = 1
+			src.contents += new /obj/Skills/Utility/Bestow_Inkwork
 		// TECH SHIT //
 		if("CyberEngineering")
 			CyberEngineeringUnlocked=1

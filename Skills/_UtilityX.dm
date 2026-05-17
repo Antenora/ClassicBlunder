@@ -1597,7 +1597,12 @@ obj/Skills/Utility
 			++Option.Tier
 			P << "You have upgraded your flask. It is now a Tier [Option.Tier] Flask."
 			//
-
+	Bestow_Inkwork //Inkworks Related Interactions go here
+		// This gives us an Inkwork
+		verb/Bestow_Inkwork()
+			set category = "Utility"
+			var/choice = input(usr, "Choose an Option", "Bestow Inkwork") in list("Cancel")
+			if(choice == "Cancel") return
 
 // 	Summon_Spirit
 // 		desc="Summon a spirit!  Doesn't work on those with contracts already established."
