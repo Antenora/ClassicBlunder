@@ -123,6 +123,12 @@ var/list/MiscTree = list()
 		p.RPPSpent -= theCost
 		p.knowledgeTracker.learnedMagic -= tech.name
 		p << "You have refunded [tech.name] for [theCost]!"
+		if((tech.name in list("Basic Alchemy", "Flask Accumen", "Flask Mastery")))
+			if(p.AlchemyUnlocked >= 1) // Refund AlchemyUnlocked improving techs IN ORDER. If you do not know which these are, check line 134 onward in knowledgeUnlock.dm
+				p.ReduceAlchemyUnlocked()
+		if((tech.name in list("Inkworks", "Advanced Inkworks", "Mastered Inkworks")))
+			if(p.InkworksDatum.Tier >= 1)
+				p.InkworksDatum.Tier = 0
 	RemoveTech(tech, "Magic")
 
 mob/Admin3/verb/RefundMagic(mob/p in players)

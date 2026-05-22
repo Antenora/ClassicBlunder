@@ -67,3 +67,27 @@
 /knowledgePaths/magic/misc/Temporal_Rewinding // A HEAL
     name = "Temporal Rewinding"
     requires = list("Temporal Acceleration")
+
+
+// Inkworks
+
+//INKWORKS KNOWLEDGE
+/knowledgePaths/magic/misc/Inkworks
+    name = "Inkworks"
+    description = "Inkworks is the art of seizing the Ink from stories to empower ones ability to move between the lines. In simple words: It empowers you and your body directly."
+    requires = list()
+
+/knowledgePaths/magic/misc/Advanced_Inkworks
+    name = "Advanced Inkworks"
+    description = "Inkworks is the art of storytelling upon the canvas of yourself. You understand this intimately now, and as such you can access more advanced inkworks and bestow yourself more Inkworks."
+    requires = list("Inkworks", "Folktales")
+
+/knowledgePaths/magic/misc/Mastered_Inkworks
+    name = "Mastered Inkworks"
+    description = "Inkworks is the art of bonding with the world and those within it. You see the lines between this story intimately now, and while you cannot change it entirely you can nudge your role in it. You can bestow yourself more Inkworks."
+    requires = list("Advanced Inkworks")
+
+/knowledgePaths/magic/misc/Folktales
+    name = "Folktales"
+    description = "The Stories spread by word of mouth, eventually recorded and kept across stories themselves. This is the knowledge of those folktales and how to engrave them into Ink."
+    requires = list("Inkworks")

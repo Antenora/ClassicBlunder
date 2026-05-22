@@ -92,11 +92,3 @@
     description = "Buying this will allow you to put another spell into a crest. It can be purchased an infinite number of times."
     // make this go up to 10 or something
 */
-//INKWORKS KNOWLEDGE
-/knowledgePaths/magic/enchanting/Inkworks
-    name = "Inkworks"
-    breakthrough = TRUE
-    description = "Inkworks is the art of seizing the Ink from stories to empower ones ability to move between the lines. In simple words: It empowers you and your body directly."
-    requires = list()
-
-/knowledgePaths/magic/enchanting/

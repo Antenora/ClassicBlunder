@@ -294,8 +294,16 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		// CREST END // 
 		// INKWORKS START //
 		if("Inkworks")
-			InkworksTier = 1
+			InkworksDatum.Tier = 1 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 			src.contents += new /obj/Skills/Utility/Bestow_Inkwork
+		if("Advanced Inkworks")
+			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Master Inkworks")
+			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		// INKWORKS END //
 		// TECH SHIT //
 		if("CyberEngineering")
 			CyberEngineeringUnlocked=1
