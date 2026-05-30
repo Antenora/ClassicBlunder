@@ -300,7 +300,6 @@ obj/Skills/AutoHit
 			else
 				usr.Activate(src)
 	Hakusen // Given at T4, Bankai Exclusive
-		ElementalClass="Water"
 		name="Hakusen"
 		ForOffense=1
 		StrOffense=0
