@@ -4385,7 +4385,7 @@ NEW VARIABLES
 						ActiveMessage="is filled with blinding hatred as their eyes turn red and three tomoe appear in their iris!"
 				src.Trigger(usr)
 
-		/*Symbiote_Evolution
+		Symbiote_Evolution
 			EnergyMult=1.5
 			RegenMult=1.25
 			RecovMult=1.25
@@ -4413,7 +4413,7 @@ NEW VARIABLES
 						s.TooMuchHealth=99
 						s.VaizardShatter=0
 						if(usr.AscensionsAcquired>=2)
-							s.Curse=1 */
+							s.Curse=1
 
 	SlotlessBuffs
 		Slotless=1
