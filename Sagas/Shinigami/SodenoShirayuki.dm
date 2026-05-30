@@ -236,7 +236,7 @@ obj/Skills/AutoHit
 		Rounds=10
 		DamageMult=0.5
 		Area="Around Target"
-		ElementClass="Water"
+		ElementalClass="Water"
 		FlickAttack=1
 		Distance=5
 		Freezing=5
@@ -270,7 +270,7 @@ obj/Skills/AutoHit
 		ForOffense=1
 		DamageMult=10
 		Area="Wave"
-		ElementClass="Water"
+		ElementalClass="Water"
 		FlickAttack=1
 		Distance=10
 		Freezing=20
@@ -305,7 +305,7 @@ obj/Skills/AutoHit
 		ForOffense=1
 		StrOffense=0
 		Area="Circle"
-		ElementClass="Water"
+		ElementalClass="Water"
 		TurfShift='SnowFloor.dmi'
 		TurfShiftDuration=60
 		Distance=12
