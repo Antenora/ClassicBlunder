@@ -12012,7 +12012,7 @@ NEW VARIABLES
 				ActiveMessage="has fallen victim to their demonic impulse to win at any cost!"
 				OffMessage="manages to repress their demonic powers..."
 				adjust(mob/p)
-					passives = list("SpecialBuffLock" = 1,"KillerInstinct" = 0.1 * p.SagaLevel, "Curse" = 1, "Enraged" = p.SagaLevel, \
+					passives = list("SpecialBuffLock" = 1,"KillerInstinct" = 0.1 * p.SagaLevel, "Curse" = 1, "Enrage" = p.SagaLevel, \
 					"SlayerMod" = p.SagaLevel*0.25, "HardStyle" = 0.25 + (p.SagaLevel*0.25), "TechniqueMastery" = p.SagaLevel*0.75)
 					NeedsHealth = 15 + (2.5 * p.SagaLevel)
 					TooMuchHealth = NeedsHealth + p.SagaLevel

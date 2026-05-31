@@ -469,7 +469,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 			"PridefulRage" = 1,
 			"PureDamage"   = 1 + SL,
 			"Zornhau"      = 1 + SL,
-			"SpiriSword"   = 2
+			"SpiritSword"   = 2
 		)
 		OffMult = 1.1 + (0.1 * SL)
 		SpdMult = 1.1 + (0.1 * SL)
@@ -570,7 +570,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	DamageMult = 15
 	AccuracyMult = 1.2
 	Ashing   = 1
-	Explosive = 2
+	Explosive = 10
 	PushOut  = 3
 	PushOutWaves = 2
 	Finisher = 1
