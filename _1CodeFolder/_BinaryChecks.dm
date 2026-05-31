@@ -1829,6 +1829,10 @@ mob
 			if(passive_handler.Get("ShockImmunity"))
 				return 1
 			return 0
+		HasChillImmune()
+			if(passive_handler.Get("ChillImmune"))
+				return 1
+			return 0
 		HasTaxThreshold()
 			if(passive_handler.Get("TaxThreshold"))
 				return 1
@@ -1912,24 +1916,6 @@ mob
 			var/HealthLost = abs(src.Health-100)
 			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
 			return Return
-		GetSaiyanPower()
-			var/MasteryDivisor1=(src.race.transformations[1].mastery/100)
-			var/SaiyanPower1=passive_handler.Get("SaiyanPower1")*MasteryDivisor1
-			if(passive_handler.Get("MagnifiedSSJ1"))
-				SaiyanPower1+=passive_handler.Get("MagnifiedSSJ1")
-			var/SaiyanPower2=passive_handler.Get("SaiyanPower2") //it's always at full power
-			if(passive_handler.Get("MagnifiedSSJ2"))
-				SaiyanPower2+=passive_handler.Get("MagnifiedSSJ2")
-			var/SaiyanPower3= passive_handler.Get("SaiyanPower3")
-			var/SaiyanPower4= passive_handler.Get("SaiyanPower4")
-			var/SaiyanPowerGod= passive_handler.Get("SaiyanPowerGod")
-			var/SaiyanPowerZenkai= passive_handler.Get("TrueZenkaiPower")
-			var/SaiyanPowerVoid= passive_handler.Get("SaiyanPowerVoid")
-			var/SEBoost=1+(passive_handler.Get("SpiralPowerUnlocked")/10)
-			if(passive_handler.Get("SpiralPowerUnlocked")&&NobodyOriginType=="Pride")
-				SaiyanPowerVoid*=SEBoost
-			var/SaiyanPower=1+(SaiyanPower1+SaiyanPower2+SaiyanPower3+SaiyanPower4+SaiyanPowerZenkai+SaiyanPowerGod+SaiyanPowerVoid)//It's like this because I intend on having Saiyan Unique buffs interact with this specifically. you'll see what i mean when i get to the grades
-			return SaiyanPower
 
 		HasPowerReplacement()
 			if(src.passive_handler.Get("PowerReplacement"))

@@ -11717,6 +11717,13 @@ NEW VARIABLES
 				TooMuchHealth=99
 				VaizardHealth=2
 				VaizardShatter=0
+				PowerMult=1.1
+				StrMult=1.2
+				EndMult=1.2
+				SpdMult=1.2
+				RegenMult=1.25
+				RecovMult=1.25
+				EnergyMult=1.5
 				Unstoppable=1
 				Possessive=1
 				TextColor=rgb(75, 0, 85)
@@ -11735,8 +11742,8 @@ NEW VARIABLES
 					if(altered) return
 					var/asc = p.AscensionsAcquired
 					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Gum Gum" = 1 + (0.5 * asc), "Blubber" = 1 + (0.5 * asc), "KillerInstinct" = 0.1 + (0.15 * asc), \
-						"Brutalize" = 1 + asc, "AttackSpeed" = asc/2)
-					VaizardHealth = 10 + p.GetEnd() + (p.TotalInjury/25) + (asc)
+						"Brutalize" = 1 + asc, "AttackSpeed" = asc/2, "Curse" = 1, "Flow" = asc/2)
+					VaizardHealth = 10 + p.GetEnd() + (p.TotalInjury/20) + (asc)
 					if(asc>=1)
 						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
 							p.AddSkill(new/obj/Skills/AutoHit/Symbiote_Tendril_Wave)

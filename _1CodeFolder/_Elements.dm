@@ -416,6 +416,8 @@ mob
 				src.Bleed = 0
 
 		AddSlow(var/Value, var/mob/Attacker=null)
+			if(src.HasChillImmune())
+				return
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
