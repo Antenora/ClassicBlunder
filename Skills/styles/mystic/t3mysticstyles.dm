@@ -41,6 +41,7 @@
 				var/inp = input(User, "What demon skill do you want?") in list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat")
 				BuffTechniques = list(inp)
 				demonSkill = inp
+			. = ..()
 		proc/swap_stance(o)
 			switch(o)
 				if("blizzard")
