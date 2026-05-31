@@ -3,7 +3,7 @@ mob/proc/gainShinigami()
 	src.Saga = "Shinigami"
 	src.SagaLevel = 1
 
-	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze")
+	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka")
 	src.ShinigamiRelease = input("Which Release does [src] receive?", "Zanpakutō Release") in Releases
 
 	src.ZanpakutoClass = input(src, "What form does your Zanpakutō take?", "Zanpakutō Class") in list("Light", "Medium", "Heavy")
@@ -73,6 +73,10 @@ mob/tierUpSaga(Path)
 							if("Tachikaze")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Tachikaze)
 								src.AddSkill(new/obj/Skills/Projectile/Air_Blades)
+							if("Ryujin Jakka")
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Ryujin_Jakka)
+								src.AddSkill(new/obj/Skills/AutoHit/Taimatsu)
+								src.AddSkill(new/obj/Skills/Jokaku_Enjo)
 				updateShinigamiAscended()
 
 			if(3)
@@ -99,6 +103,10 @@ mob/tierUpSaga(Path)
 								if(!locate(/obj/Skills/Projectile/Bakudantsuki, src))
 									src.AddSkill(new/obj/Skills/Projectile/Bakudantsuki)
 									src << "Your blade learns to detonate the air itself. You can now use <b>Bakudantsuki</b>."
+							if("Ryujin Jakka")
+								if(!locate(/obj/Skills/Ennetsu_Jigoku, src))
+									src.AddSkill(new/obj/Skills/Ennetsu_Jigoku)
+									src << "The flames of your blade descend into a converging hell. You can now use <b>Ennetsu Jigoku</b>."
 				updateShinigamiAscended()
 
 			if(4)
@@ -140,6 +148,10 @@ mob/tierUpSaga(Path)
 							if("Tachikaze")
 								src.BankaiPrefix = input(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix") as text
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Tekken_Tachikaze)
+							if("Ryujin Jakka")
+								src.BankaiPrefix = input(src, "Your Bankai's true name reveals itself. What is it?", "Bankai Prefix") as text
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanka_no_Tachi)
+								src << "All the flames of your [src.AsauchiName] condense into your blade. Entering Bankai awakens <b>Higashi: Kyokujitsujin</b>."
 				updateShinigamiAscended()
 
 			if(5)
@@ -166,6 +178,10 @@ mob/tierUpSaga(Path)
 						if(!locate(/obj/Skills/Queue/Enhanced_Sandbag_Beat, src))
 							src.AddSkill(new/obj/Skills/Queue/Enhanced_Sandbag_Beat)
 							src << "Your fists rage like a relentless storm. You can now use <b>Enhanced Sandbag Beat</b>."
+					if("Ryujin Jakka")
+						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui, src))
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui)
+							src << "Your blade shrouds you in an inferno of searing heat. You can now use <b>Nishi: Zanjitsu Gokui</b>."
 				updateShinigamiAscended()
 
 			if(6)
@@ -190,6 +206,10 @@ mob/tierUpSaga(Path)
 								if(!locate(/obj/Skills/Butou_Renjin, src))
 									src.AddSkill(new/obj/Skills/Butou_Renjin)
 									src << "Your thrusts compound into a relentless barrage. You can now use <b>Butou: Renjin</b>."
+							if("Ryujin Jakka")
+								if(!locate(/obj/Skills/Queue/Tenchi_Kaijin, src))
+									src.AddSkill(new/obj/Skills/Queue/Tenchi_Kaijin)
+									src << "Your strikes reduce all they touch to ash. You can now use <b>Kita: Tenchi Kaijin</b>."
 				updateShinigamiAscended()
 
 			if(7)
@@ -221,6 +241,10 @@ mob/tierUpSaga(Path)
 						if(!locate(/obj/Skills/Korose, src))
 							src.AddSkill(new/obj/Skills/Korose)
 							src << "Your blade now carries a deadly poison. You can now use <b>Korose</b>."
+					if("Ryujin Jakka")
+						if(!locate(/obj/Skills/Kaka_Jumanokushi_Daisojin, src))
+							src.AddSkill(new/obj/Skills/Kaka_Jumanokushi_Daisojin)
+							src << "The ashes of all you have burned rise as a blazing army. You can now use <b>Minami: Kaka Jūmanokushi Daisōjin</b>."
 				updateShinigamiAscended()
 
 mob/proc/InShikai()

@@ -6467,6 +6467,8 @@ obj
 								if(!(Piercing && m && (AlreadyHit["[m.ckey]"] >= MultiHit + 1)) || Bounce)
 									if(!AlreadyHit["[m.ckey]"]) AlreadyHit["[m.ckey]"] = 0
 									//EffectiveDamage *= clamp((1 - (0.1 *AlreadyHit["[m.ckey]"])), 0.1, 1)
+									if(src.SpellElement == "Water")
+										EffectiveDamage *= m.getWaterResistValue()
 
 									// Skill-level CriticalChance/Combustion: temporary attacker bump.
 									var/_skillCritDmgS = src.CriticalChance * 0.01

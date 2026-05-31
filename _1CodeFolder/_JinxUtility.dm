@@ -1052,6 +1052,8 @@ mob
 				src.Tension=max(0, Tension-(val*1.5))
 			if(passive_handler["Staked"])
 				val = 0
+			if(passive_handler["AshChoked"])
+				val = 0
 			if(src.AwakeningSkillUsed==1)
 				val = 0
 			if(src.VaizardHealth&&!src.passive_handler.Get("HealThroughTempHP"))

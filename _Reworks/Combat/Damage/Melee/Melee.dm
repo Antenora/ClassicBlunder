@@ -724,6 +724,8 @@
 									enemy.AddCrippling(AttackQueue.Crippling, src)
 								if(AttackQueue.Doom)
 									enemy.AddDoom(AttackQueue.Doom, src)
+								if(AttackQueue.Ashing)
+									applyAshChoked(enemy, src)
 
 								if(AttackQueue.Dunker)
 									if(enemy.Launched)

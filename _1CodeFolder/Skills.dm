@@ -123,6 +123,7 @@ obj/Skills
 	var/Shearing //Debuffs regen
 	var/Crippling //Cripples movement
 	var/Doom=0
+	var/Ashing //Applies the AshChoked debuff which negates healing
 	var/Combustion=0 //Flat Combustion threshold bonus the attacker gains while this skill resolves damage. Implementation subject to change
 	var/IceAge=0 //Flat IceAge threshold bonus the attacker gains while this skill resolves damage.
 	var/Disarm=0 //If set, this skill will attempt to disarm the target on hit

@@ -5973,6 +5973,7 @@ obj
 			AngelMagicCompatible
 			ApplyJudged
 			ApplySentenced
+			ElementalClass
 			FixedDamage=0
 
 			Arcing//Triggers offshoots on every step that expand outwards.  Higher than 1 means that every X steps the range will widen.
@@ -6180,6 +6181,7 @@ obj
 			else
 				src.ForDmg=Z.ForOffense
 			src.SpellElement=Z.SpellElement
+			src.ElementalClass=Z.ElementalClass
 			// Time Future mage passive: 50% spell cost refund on land. Captures the
 			// would-be drain value at construction time so Damage(m) can refund half
 			// on first hit. We replicate the deduction formula from ClearTech (line
@@ -6990,6 +6992,8 @@ obj
 						flick("Attack", Owner)
 						Owner.DoDamage(Owner, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, Autohit=TRUE)
 						return
+					if(src.SpellElement == "Water" || src.ElementalClass == "Water")
+						FinalDmg *= m.getWaterResistValue()
 					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)

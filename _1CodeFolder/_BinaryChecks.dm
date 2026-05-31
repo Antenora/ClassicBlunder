@@ -1825,6 +1825,10 @@ mob
 			if(passive_handler.Get("ShockImmunity"))
 				return 1
 			return 0
+		HasChillImmune()
+			if(passive_handler.Get("ChillImmune"))
+				return 1
+			return 0
 		HasTaxThreshold()
 			if(passive_handler.Get("TaxThreshold"))
 				return 1
