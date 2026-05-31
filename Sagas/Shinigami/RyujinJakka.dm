@@ -570,7 +570,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	DamageMult = 15
 	AccuracyMult = 1.2
 	Ashing   = 1
-	Explosive = 2
+	Explosive = 10
 	PushOut  = 3
 	PushOutWaves = 2
 	Finisher = 1
