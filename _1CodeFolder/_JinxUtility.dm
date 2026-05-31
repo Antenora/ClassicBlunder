@@ -100,7 +100,7 @@ mob
 					src.Unconscious(null, "succumbing to poison!")
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
-		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE)
+		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0)
 			#if DEBUG_DAMAGE
 			log2text("Damage", "Start DoDamage", "damageDebugs.txt", src.ckey)
 			log2text("Damage", val, "damageDebugs.txt", src.ckey)
@@ -141,6 +141,16 @@ mob
 			if(val==0)
 				DEBUGMSG("val is 0 so we're ending dodamage now")
 				return 0;
+
+			if(src != defender)
+				var/reflectMakarakarn = defender.demon_makarakarn_until > world.time && (atkSpecialFlag || atkSpellElem)
+				var/reflectTetrakarn  = defender.demon_tetrakarn_until > world.time && atkMeleePipe
+				if(reflectMakarakarn || reflectTetrakarn)
+					var/reflected = val
+					var/barrier = reflectTetrakarn ? "Tetrakarn" : "Makarakarn"
+					OMsg(defender, "<font color='#88ddff'>[defender]'s [barrier] reflects the attack back at [src]!</font>")
+					src.LoseHealth(reflected)
+					return 0
 
 			if(src.isLunaticMode())
 				src.InflictLunacy(val, defender);
