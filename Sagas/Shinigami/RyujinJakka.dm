@@ -58,6 +58,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 				. += m
 
 	on_tick()
+		if(owner && owner.PureRPMode) return
 		for(var/mob/m in covered_mobs())
 			deal_field_damage(m)
 
@@ -510,6 +511,9 @@ proc/applyAshChoked(mob/target, mob/caster)
 		spawn()
 			var/field_counter = 0
 			while(self.aura_active && user && user.loc && user.InBankai())
+				if(user.PureRPMode)
+					sleep(10)
+					continue
 				for(var/mob/m in range(self.aura_range, user))
 					if(m == user || !m.client) continue
 					m.AddBurn(2, user)
@@ -587,6 +591,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 /mob/MonkeySoldier/FlameSoldier
 	attackDelay = 12
+	density = 1
+	var/lastUpdate = 0
 
 	New(mob/p, dmg, timer)
 		..()
@@ -597,10 +603,16 @@ proc/applyAshChoked(mob/target, mob/caster)
 		src.color = null
 		src.alpha = 255
 		src.glide_size = 8
+		src.lastUpdate = world.time
 
 	Update()
 		if(!src.owner)
 			src.EndMonkey()
+			return
+		var/delta = world.time - src.lastUpdate
+		src.lastUpdate = world.time
+		if(src.owner.PureRPMode)
+			src.spawnTime += delta
 			return
 		src.setTargetToOwners()
 		if(src.InstantKillCriteria())
@@ -611,22 +623,23 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(src && src.TimeToAttack() && src.target && get_dist(src, src.target) <= 1)
 			src.FlickAttack()
 
+	proc/turfFree(turf/T)
+		if(!T || T.density) return FALSE
+		for(var/atom/movable/A in T)
+			if(A == src) continue
+			if(A.density) return FALSE
+		return TRUE
+
 	proc/chaseTarget()
 		if(!src.target || !src.target.loc) return
 		if(get_dist(src, src.target) <= 1) return
 		var/d = get_dir(src, src.target)
-		src.dir = d
-		var/turf/before = get_turf(src)
-		step(src, d)
-		if(get_turf(src) != before) return
-		var/turf/dest = get_step(src, d)
-		if(!dest || dest.density)
-			if(src.x != src.target.x)
-				dest = get_step(src, src.target.x > src.x ? EAST : WEST)
-			if((!dest || dest.density) && src.y != src.target.y)
-				dest = get_step(src, src.target.y > src.y ? NORTH : SOUTH)
-		if(dest && !dest.density)
-			src.loc = dest
+		for(var/dd in list(d, turn(d, 45), turn(d, -45), turn(d, 90), turn(d, -90)))
+			var/turf/dest = get_step(src, dd)
+			if(src.turfFree(dest))
+				src.dir = dd
+				src.loc = dest
+				return
 
 	FlickAttack()
 		src.lastAttack = world.time
