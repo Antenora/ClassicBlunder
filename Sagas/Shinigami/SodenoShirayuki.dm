@@ -324,7 +324,7 @@ obj/Skills/AutoHit
 		ActiveMessage="drops their surroundings to Absolute Zero!"
 		Slow=1
 		NoLock=1
-		Cooldown=-1
+		Cooldown=240
 		adjust(mob/p)
 			DamageMult = 10 + (3 * p.SagaLevel)
 			Distance = 12 + (1 * p.SagaLevel)
