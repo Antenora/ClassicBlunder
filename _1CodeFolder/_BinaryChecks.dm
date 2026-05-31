@@ -1233,7 +1233,9 @@ mob
 					Return += 5*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
-					if(Target.GetGodKi() > GetGodKi())
+					if(passive_handler.Get("Longing"))
+						Return += 20*(Target.GetGodKi())
+					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=1.25
@@ -1269,7 +1271,9 @@ mob
 					Return += 3*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
-					if(Target.GetGodKi() > GetGodKi())
+					if(passive_handler.Get("Longing"))
+						Return += 20*(Target.GetGodKi())
+					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(DownToEarth>0)
 				Return*=1*((100-DownToEarth)/100)
@@ -2063,7 +2067,7 @@ mob
 				Total*=1*((100-src.DownToEarth)/100)
 			return Total
 		HasGodKi()
-			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")) return 0;
+			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")||passive_handler.Get("Longing")) return 0;
 			if(passive_handler["CreateTheHeavens"])
 				return 1
 			if(passive_handler["Hidden Potential"]||passive_handler["Orange Namekian"])
