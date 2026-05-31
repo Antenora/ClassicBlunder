@@ -3139,10 +3139,9 @@ NEW VARIABLES
 					SpdMult = 1.3 + (0.1*p.AscensionsAcquired)
 					StrMult = 1.3 + (0.1*p.AscensionsAcquired)
 					EndMult = 0.6 + (0.05*p.AscensionsAcquired)
-					DefMult = 0.6 + (0.05*p.AscensionsAcquired)
 					var/reducedPot = totalPot/10
 					ManaDrain = 0.008 - (0.001 * reducedPot)
-					passives = list("ManaLeak" = 1 - totalPot/200, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
+					passives = list("ManaLeak" = 1 - totalPot/100, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
 
 
 				verb/Overdrive()
