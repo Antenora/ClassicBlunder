@@ -32,7 +32,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 			set hidden=1
 			adjust(usr)
 			src.Trigger(usr)
-	Heir_of_Grief // well this got way more accurate :(
+	Heir_of_Grief // TUPAC BACK
 		SignatureTechnique=3
 		NeedsSword = 1
 		Copyable=0
@@ -45,6 +45,22 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleActive="Heir of Grief"
 		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"
 		verb/Heir_of_Grief()
+			set hidden=1
+			adjust(usr)
+			src.Trigger(usr)
+	Overture
+		SignatureTechnique=4
+		NeedsSword = 1
+		Copyable=0
+		StyleSpd=1.7
+		StyleStr=1.7
+		ElementalOffense="Fire"
+		ElementalDefense="Fire"
+		passives = list("BlurringStrikes" = 3, "Godspeed" = 3, "Momentum" = 2, "DoubleStrike" = 3, "TripleStrike" = 0.5, "Instinct" = 5, "Flow" = 4, "Iaijutsu" = 3,\
+						"Musoken" = 1, "Kindling" = 1.5, "Combustion" = 30, "Parry" = 3,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 3)
+		StyleActive="Overture"
+		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"
+		verb/Overture()
 			set hidden=1
 			adjust(usr)
 			src.Trigger(usr)

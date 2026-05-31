@@ -75,6 +75,8 @@ proc
 
 		if(attackElements["Ultima"]||attackElements["Death"])
 			ForcedDebuff+=1
+		if(Attacker.passive_handler.Get("Forever After"))
+			attackElements |= "Love"
 		var/DamageMod=0
 		for(var/element in attackElements)
 			var/DebuffRate=GetDebuffRate(element, defenseElements, ForcedDebuff)
@@ -225,7 +227,7 @@ proc
 					DamageMod-=2
 				if("Void")
 					DamageMod-=2
-		return DamageMod/10
+		return DamageMod/glob.ELEMENTAL_DIVIDER
 
 	GetDebuffRate(var/A, list/D, var/Forced=0)
 		var/Return=0
