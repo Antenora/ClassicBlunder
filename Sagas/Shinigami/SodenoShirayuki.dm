@@ -24,7 +24,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		var/SL = p.SagaLevel
 		passives = list(
 			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
-			"ChillResist"    = 1 * SL, // This should make it so that Chill hurts you less.
+			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"SpiritSword"    = 0.25 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 5 * SL,
@@ -85,7 +85,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		var/SL = p.SagaLevel
 		passives = list(
 			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
-			"ChillResist"    = 2 * SL, // This should make it so that Chill hurts you less.
+			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"SpiritSword"    = 0.5 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 10 * SL,
@@ -326,8 +326,8 @@ obj/Skills/AutoHit
 		NoLock=1
 		Cooldown=-1
 		adjust(mob/p)
-			DamageMult = 10 + (1.5 * p.SagaLevel)
-			Distance = 12 + (2 * p.SagaLevel)
+			DamageMult = 10 + (3 * p.SagaLevel)
+			Distance = 12 + (1 * p.SagaLevel)
 		verb/Hakusen()
 			set category="Skills"
 			if(!usr.InBankai())
