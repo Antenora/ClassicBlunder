@@ -344,7 +344,7 @@ mob/proc/Allow_Move(D)
 		return
 	return 1
 mob/proc/Move_Requirements()
-	if(!Stasis&&!TimeFrozen&&!Frozen&&!Stunned&&!Moving&&!Launched&&!Knockbacked&&!KO&&!WindingUp)
+	if(!Stasis&&!TimeFrozen&&!Frozen&&!Stunned&&!Suspended&&!Moving&&!Launched&&!Knockbacked&&!KO&&!WindingUp)
 		if(src.icon_state=="Meditate"||src.icon_state=="Train")
 			if(src.Flying)
 				return 1

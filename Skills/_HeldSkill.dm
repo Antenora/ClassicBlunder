@@ -413,7 +413,7 @@
 	while(held_skill == Z)
 		// Interrupt conditions
 		var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed/charm_skill = locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed) in src
-		if(Stunned || Launched || Stasis > 0 || (charm_skill && BuffOn(charm_skill)))
+		if(Stunned || Suspended || Launched || Stasis > 0 || (charm_skill && BuffOn(charm_skill)))
 			FizzleHeldSkill(Z)
 			return
 

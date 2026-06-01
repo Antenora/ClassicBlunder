@@ -7964,7 +7964,7 @@ obj
 			if(!chain_active)
 				window_loop_running = FALSE
 				return
-			if(user.Stunned || user.Launched || user.Stasis > 0 || user.KO)
+			if(user.Stunned || user.Suspended || user.Launched || user.Stasis > 0 || user.KO)
 				window_loop_running = FALSE
 				EndChain()
 				return

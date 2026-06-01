@@ -776,7 +776,7 @@ mob
 				if(src.Crippled<0)
 					src.Crippled=0
 
-			if(src.Confused&&!src.Stunned)
+			if(src.Confused&&!src.Stunned&&!src.Suspended)
 				if(src.Confused > glob.DEBUFF_STACK_MAX)
 					src.Confused = glob.DEBUFF_STACK_MAX;
 
@@ -812,7 +812,7 @@ mob
 				if(src.DownToEarth<0)
 					src.DownToEarth=0
 
-			if(src.Attracted&&!src.Confused&&!src.Stunned)
+			if(src.Attracted&&!src.Confused&&!src.Stunned&&!src.Suspended)
 				src.Attracted--
 			if(src.Attracted<=0)
 				src.Attracted=0
