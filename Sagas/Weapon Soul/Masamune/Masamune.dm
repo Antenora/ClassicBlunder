@@ -59,15 +59,22 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Forgemaster_Lifeblood
 		StyleActive="Forgemaster"
-		passives = list("Steady" = 1, "EvilResist" = 1)
+		passives = list("Steady" = 1, "EvilResist" = 1, "Fury" = 1, "PureDamage" = 1, "PureReduction" = 1)
 		StyleOff=1
 		StyleDef=1
 		Finisher="/obj/Skills/Queue/Finisher/Snowfall"
 		adjust(mob/p)
-			StyleOff = 1.10 + (0.05 * p.SagaLevel)
-			StyleDef = 1 + (0.05 * p.SagaLevel)
+			StyleOff = 1.10 + (0.10 * p.SagaLevel)
+			StyleDef = 1 + (0.10 * p.SagaLevel)
 			passives["Steady"] = 1 + (0.5* p.SagaLevel)
 			passives["EvilResist"] = 1 + (0.25* p.SagaLevel)
+			passives["Fury"] = 1 + (0.5* p.SagaLevel)
+			passives["PureDamage"] = 1 + (1* p.SagaLevel)
+			passives["PureReduction"] = 1 + (1* p.SagaLevel)
+			if(p.SagaLevel>3)
+				passives["SpiritSword"] = 0.5 + (0.25* p.SagaLevel)
+				passives["BlurringStrikes"] = 1 + (0.5* p.SagaLevel)
+				passives["DoubleStrike"] = 1 + (0.5* p.SagaLevel)
 		verb/Forgemaster_Lifeblood()
 			set hidden=1
 			adjust(usr)
