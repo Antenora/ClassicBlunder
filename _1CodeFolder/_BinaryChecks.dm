@@ -1234,7 +1234,7 @@ mob
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
 					if(passive_handler.Get("Longing"))
-						Return += 20*(Target.GetGodKi())
+						Return += 20*Target.GetGodKi()* glob.GODKI_DIFF_MULT
 					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(Class=="Heroic"&&ActiveBuff)
@@ -1272,7 +1272,7 @@ mob
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
 					if(passive_handler.Get("Longing"))
-						Return += 20*(Target.GetGodKi())
+						Return += 20*Target.GetGodKi()* glob.GODKI_DIFF_MULT
 					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(DownToEarth>0)

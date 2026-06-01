@@ -3324,12 +3324,12 @@ obj
 							FireFromEnemy=0
 							usr.UseProjectile(src)
 				Hadoken
-					Cooldown=40
+					Cooldown=15
 					ActiveMessage = "HADOKEN!"
 					activate(mob/player)
 						var/cooldown = 15
 						var/sagaLevel = player.SagaLevel
-						var/damage = 1 + (0.25 * sagaLevel)
+						var/damage = 0.5 + (0.25 * sagaLevel)
 						var/ansatsukenPath = player.AnsatsukenPath == "Hadoken" ? 1 : 0
 						var/distance = 30
 						var/charge = 0.25
@@ -3338,7 +3338,7 @@ obj
 						Knockback = 2
 						if(ansatsukenPath)
 							cooldown -= 5
-							damage = 2 + (0.5 * sagaLevel)
+							damage = 1 + (0.25 * sagaLevel)
 							Knockback = 3
 						if(player.AnsatsukenAscension == "Satsui" && src.IconLock == 'Hadoken.dmi')
 							src.IconLock = 'Hadoken - Satsui.dmi'
@@ -3398,8 +3398,8 @@ obj
 					AccMult=50
 					MultiHit=15
 					HyperHoming=1
-					Dodgeable=-1
-					Deflectable=-1
+					Dodgeable=0
+					Deflectable=0
 					Knockback=1
 					Cooldown=180
 					IconSize=3

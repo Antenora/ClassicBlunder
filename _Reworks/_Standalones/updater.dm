@@ -643,7 +643,7 @@ update
 					p.passive_handler.Increase("Instinct", 2);
 					p.passive_handler.Increase("Flow", 2);
 	version29
-		version = 20;
+		version = 29;
 		updateMob(mob/p)
 			. = ..()
 			if(p.isRace(HUMAN)&&p.Class=="Heroic")
