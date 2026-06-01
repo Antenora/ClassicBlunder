@@ -6354,7 +6354,7 @@ obj
 						if(HolyMod) specDmgTypes["Holy"] = HolyMod;
 						if(AbyssMod) specDmgTypes["Abyss"] = AbyssMod;
 						if(SlayerMod) specDmgTypes["Slayer"] = SlayerMod;
-						if(specDmgTypes.len) EffectiveDamage *= 1 + Owner.attackModifiers(m, specDmgTypes);
+						if(specDmgTypes.len) EffectiveDamage *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
 						//Technically these are going to get doubletapped for projectiles
 						//because attackModifiers is called here as well as in dodamage
 						//which will be run further below
