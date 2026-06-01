@@ -44,7 +44,7 @@ globalTracker/var/
     var/godKiNerf = NO_GOD_KI_REDUCTION;
     if(defender.HasGodKi() && !HasGodKi() && !HasNull() && !isRace(DEMIFIEND) && !defender.isRace(DEMIFIEND) && !istype(src, /mob/Player/AI/Demon) && !istype(defender, /mob/Player/AI/Demon)) godKiNerf += max(0, (glob.MORTAL_VS_GOD_SPEC_DMG_REDUCTION * defender.GetGodKi()));
     if(passive_handler.Get("Enrage") && Anger)
-        if(!defender.Anger || Anger > defender.Anger)
+        if(!defender.Anger || Anger > defender.Anger||passive_handler.Get("Justice"))
             . += passive_handler.Get("Enrage") / glob.ENRAGED_DAMAGE_DIVISOR
     var/forcedHoly = getForcedDamageType("Holy", forcedDmgList)
     if(HasHolyMod() || forcedHoly)

@@ -180,7 +180,7 @@ transformation
 				if(user.Potential>=43&&mastery<100)
 					mastery=100
 				if(mastery >= 100)
-					passives = list("Instinct" = 2, "Flow" = 2, "Flicker" = 1, "Pursuer" = 2, "PureDamage" = 3, "PureReduction" = 3, "SaiyanPower2"=0.75)
+					passives = list("Instinct" = 2, "Flow" = 2, "Flicker" = 1, "Pursuer" = 2, "PureDamage" = 3, "PureReduction" = 3, "SaiyanPower2"=0.5)
 				if(user.Potential>=65&&user.transUnlocked<3)
 					if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN)&&user.Class=="Justice"&&(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/half_saiyan/dominating))
 						user.transUnlocked=3
@@ -244,7 +244,7 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
-			passives = list("Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower3"=1)
+			passives = list("Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower3"=0.5)
 			//Autounlocked at 65, intended to be unlocked at 45
 			unlock_potential = 65
 			speedadd = 0.5 //these are additive. base is 1, so 0.3=1.3x
@@ -254,6 +254,7 @@ transformation
 			strengthadd = 0.5
 			forceadd = 0.5
 			mastery_boons(mob/user)
+				passives = list("Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower3"=0.5)
 				if(user.Potential>=52&&mastery<25)
 					mastery=25
 				if(user.Potential>=54&&mastery<50)
@@ -694,8 +695,8 @@ transformation
 					form_hair_icon=x
 				..()
 			transform_animation(mob/user)
-				if(mastery < 20)
-					mastery=20
+				if(mastery < 25)
+					mastery=25
 					sleep(10)
 				//src.Transforming=1
 					user.Frozen=2

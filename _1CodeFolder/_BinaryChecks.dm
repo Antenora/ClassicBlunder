@@ -1238,7 +1238,7 @@ mob
 					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasPureReduction()
 			var/Return=0
@@ -1278,7 +1278,7 @@ mob
 			if(DownToEarth>0)
 				Return*=1*((100-DownToEarth)/100)
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		Hustling()
 			if(passive_handler.Get("Hustle") || HasMythical() > 0.25 || (passive_handler["Rage"] && Health <= 25))
@@ -1456,6 +1456,9 @@ mob
 			if(src.InfinityModule)
 				return 1
 			return 0
+		GetHeroicBoost()
+			var/Return=1.05+(0.1*AscensionsAcquired)
+			return Return
 		HasInjuryImmune()
 			if(passive_handler.Get("InjuryImmune"))
 				return 1
@@ -1696,7 +1699,7 @@ mob
 			if(Target&&Target.passive_handler.Get("Instinct") >= Base+Extra)
 				Extra += (passive_handler.Get("LikeWater")) / 2
 			if(Class=="Heroic"&&ActiveBuff)
-				Base*=1.25
+				Base*=GetHeroicBoost()
 			return (Base+Extra)
 		HasInstinct()
 			var/Return=BaseOff()/4
@@ -1725,7 +1728,7 @@ mob
 			if(Return < 0)
 				Return = 0
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasSoulSteal()
 			if(passive_handler.Get("SoulSteal"))
@@ -2606,7 +2609,7 @@ mob
 		GetSpiritHand()//Str*(For**1/2)
 			var/Return=passive_handler.Get("SpiritHand")
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 
 
@@ -2629,7 +2632,7 @@ mob
 			if(InfinityModule)
 				Return += AscensionsAcquired/2
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
@@ -2640,7 +2643,7 @@ mob
 			if(src.Saga=="Keyblade")
 				Return += src.SagaLevel*0.25
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasHybridStrike()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("HybridStrike"))
@@ -2653,7 +2656,7 @@ mob
 			if(InfinityModule)
 				Return += AscensionsAcquired/2//round(glob.progress.totalPotentialToDate,5) / 50
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasPhysPleroma()
 			if(passive_handler.Get("PhysPleroma"))

@@ -206,11 +206,11 @@ ascension
 							endurance = 0.25
 							speed = 0.25
 						if("Heroic")
-							offense = 1.5
-							strength = 1.5
-							force = 1.5
-							defense = 1.5
-							endurance = 1.5
+							offense = 2
+							strength = 2
+							force = 2
+							defense = 2
+							endurance = 2
 							speed = 0.4
 							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this three times
@@ -223,8 +223,6 @@ ascension
 							speed = 0.4
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
-				if(owner.Class=="Underdog" && owner.transUnlocked<4)
-					owner.transUnlocked=4
 				applyDormantDemonPassives(owner)
 				..()
 
@@ -245,11 +243,11 @@ ascension
 							endurance = 0.25
 							speed = 0.25
 						if("Heroic")
-							offense = 1.5
-							strength = 1.5
-							force = 1.5
-							defense = 1.5
-							endurance = 1.5
+							offense = 2.5
+							strength = 2.5
+							force = 2.5
+							defense = 2.5
+							endurance = 2.5
 							speed = 0.4
 							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this four times

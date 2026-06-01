@@ -3336,9 +3336,7 @@ obj
 				Light_Eater
 				Cage_of_Time
 
-				Ultima
-					SignatureTechnique=4
-					Destructive=1
+
 
 
 /// MAGIC AUTO HIT SIGS T1
