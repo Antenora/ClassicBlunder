@@ -7856,6 +7856,7 @@ obj
 /mob
 	var
 		tmp/Suspended = null
+		tmp/ActionLocked = null
 		tmp/judgement_cut_chain_active = FALSE
 		tmp/judgement_cut_bonus_value = 1
 		tmp/judgement_cut_bonus_chain_count = 0
@@ -8027,9 +8028,6 @@ obj
 				return
 			if(get_dist(p, T) > Distance)
 				p << "<font color='red'>Target is out of range.</font>"
-				return
-			if(T.Suspended)
-				p << "<font color='red'>That target is already suspended.</font>"
 				return
 			StartChain(p, T)
 		else

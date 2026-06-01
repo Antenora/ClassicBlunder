@@ -1675,9 +1675,9 @@ mob
 			src.AttackQueue.Hit=1
 			src.AttackQueue.Missed=0
 			src.AttackQueue.RanOut=0
-			if(istype(src.AttackQueue, /obj/Skills/Queue/Judgment_Cut_End) && P && !P.Suspended)
-				P.Suspended = src
-				src.Suspended = src
+			if(istype(src.AttackQueue, /obj/Skills/Queue/Judgment_Cut_End) && P && !P.ActionLocked)
+				P.ActionLocked = 1
+				src.ActionLocked = 1
 				var/mob/who = P
 				var/mob/U = src
 				// Heh
@@ -1687,10 +1687,10 @@ mob
 				var/obj/Skills/AutoHit/Judgment_Cut_End/AH = locate() in src
 				var/release_delay = AH ? (AH.WindUp * 10 + 10) : 40
 				spawn(release_delay)
-					if(who && who.Suspended == U)
-						who.Suspended = null
-					if(U && U.Suspended == U)
-						U.Suspended = null
+					if(who && who.ActionLocked)
+						who.ActionLocked = null
+					if(U && U.ActionLocked)
+						U.ActionLocked = null
 			if(canFaJin())
 				last_fa_jin = world.time
 				fa_jin_effect()
