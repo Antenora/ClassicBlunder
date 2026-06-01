@@ -1,6 +1,6 @@
 // Frenzy debuff: Dark Dragon players gain offensive stats, others get DoT, wounds, and shear
 globalTracker/var/maxFrenzyDamage = 0.015
-globalTracker/var/FrenzyStackDivisor = 25
+globalTracker/var/FrenzyStackDivisor = 5
 globalTracker/var/FrenzyNerf = 1
 
 /mob/proc/IsDarkDragonPlayer()
@@ -28,7 +28,7 @@ globalTracker/var/FrenzyNerf = 1
 /mob/proc/AddFrenzyFromCombatDamage(var/amount)
 	if(amount <= 0)
 		return
-	src.AddFrenzy(amount)
+	src.AddFrenzy(amount*10/glob.FrenzyStackDivisor)
 
 /mob/proc/ReduceHostileFrenzyAttackTick()
 	if(src.IsDarkDragonPlayer())
