@@ -98,7 +98,8 @@ proc/applyNearSighted(mob/target, mob/caster)
 			"Flow"      = 3 + SL,
 			"FluidForm" = 2.5 + (SL * 0.5),
 			"Flicker"   = 3 + SL,
-			"Pressure"  = 3 + SL
+			"Pressure"  = 3 + SL,
+			"LikeWater" = 1 + SL
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4

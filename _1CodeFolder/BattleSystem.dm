@@ -2062,7 +2062,7 @@ mob
 
 
 mob/proc/Grab()
-	if(src.Stunned||src.icon_state=="KB")
+	if(src.Stunned||src.Suspended||src.icon_state=="KB")
 		return
 	if(!Grab)
 		if(lastZanzoUsage+3 > world.time)
