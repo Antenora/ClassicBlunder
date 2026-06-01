@@ -1,0 +1,21 @@
+race
+	agorothian
+		name = "Agorothian"
+		desc = "Warriors with innate aether manipulation that are shaped by their beliefs and vows."
+		visual = 'Human.png'
+
+		power = 1.5
+		strength = 1.5
+		endurance = 1
+		force = 1.5
+		offense = 1
+		defense = 1
+		speed = 1
+		regneration = 1.5
+		imagination = 2.5
+		intellect = 1.5
+		skills = list
+		passives = list("ManaGen" = 2, "Innovation" = 1)
+
+unlock_potential = ASCENSION_ONE_POTENTIAL
+			choices = list("Aethirian" = /ascension/sub_ascension/agorothian/aethirian, "Isroth" =  /ascension/sub_ascension/agorothian/isorth, "Eserthen" = /ascension/sub_ascension/agorothian/eserthen)
