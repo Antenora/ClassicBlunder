@@ -47,6 +47,8 @@
 	InfiniteHold = TRUE
 	FireRate = 1
 
+	ignoreBetterAim = TRUE
+
 	var/tmp/spin_dir = 0
 
 	OnHeldStart(mob/p)

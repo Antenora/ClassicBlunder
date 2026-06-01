@@ -211,6 +211,9 @@ obj
 				LingeringTornado//spawn obj/leftOver/LingeringTornado on hit
 				BypassTempHP=0//if 1, damage bypasses VaizardHealth and BioArmor, hitting Health directly
 				SkillDeicide=0//temporarily adds this much Deicide on hit
+
+				ignoreBetterAim = FALSE
+
 			skillDescription()
 				..()
 				if(MaimCost)
@@ -5733,7 +5736,7 @@ obj
 						if(src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 					else
-						if(src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
+						if(!Z.ignoreBetterAim&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 							src.LosesHoming=src.Owner.GetBetterAim()
 					src.HyperHoming=Z.HyperHoming
