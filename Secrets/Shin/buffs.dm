@@ -3,7 +3,7 @@
 #define MANG_MANA_COST 10 // Determines the cost of activating a Mang Ring/Level
 
 /obj/Skills/Buffs/SlotlessBuffs/Shin_Radiance
-    passives = list("Harden" = 1, "PureReduction" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Skimming" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
+    passives = list("Harden" = 1, "PureReduction" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Skimming" = 1, "DeathField" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
     ActiveMessage="radiates a soft, warding glow of Light."
     OffMessage="suppresses the glow of the Light, letting their emotions flow on."
     TextColor=rgb(203, 198, 47)
@@ -25,7 +25,8 @@
         passives["Godspeed"] = secretLevel
         passives["Deflection"] = (0.5 * secretLevel) //Goes from 1 to 3
         passives["ManaGeneration"] = secretLevel
-        passives["Skimming"] = clamp(secretLevel / 2, 1, 2)
+        passives["Skimming"] = clamp(secretLevel / 2, 1, 2) // t1 / t2 = 1, t3 = 1.5 t4 = 2, t5 = 2, T6 = 2
+        passives["Deathfield"] = secretLevel
         // It also replaces your mana name to Shin but REPLACEMANA IS A STUPID FUCKING PASSIVE SO I DID IT IN THE UPDATE_STAT_LABELS PROC FUCK FUCK FUCK
 
 
@@ -53,18 +54,19 @@
         var/secretLevel = p.secretDatum.currentTier
         var/mod = (secretLevel-5)
         // Tier Adjusted Mults
-        StrMult = 1.2 + (0.05 * p.GetMangLevel()) 
-        ForMult = 1.2 + (0.05 * p.GetMangLevel()) 
-        OffMult = 1.2 + (0.05 * p.GetMangLevel())
-        // Tier Adjusted Passives
-        passives["Harden"] = clamp(secretLevel*2, 1, 5)/2 // starts at 1, adds 2 per tier, caps at 5 (tier 3)
-        passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5)/2; //Scales from tier 3 (1) to tier 5 (5)
-        passives["Deflection"] = (0.5 * secretLevel)/2 //Goes from 1 to 3
-        passives["Skimming"] = 1
+        StrMult = 1.2 + (0.1 * p.GetMangLevel()) 
+        ForMult = 1.2 + (0.1 * p.GetMangLevel()) 
+        OffMult = 1.2 + (0.1 * p.GetMangLevel())
+        SpdMult = 1.2 + (0.1 * p.GetMangLevel())
+        // Shin Tier Adjusted Passives - These are your shin passives but divided by 2
+        passives["Harden"] = clamp(secretLevel*2, 1, 5)/2 
+        passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5)/2; 
+        passives["Deflection"] = (0.5 * secretLevel)/2 
+        passives["Skimming"] = clamp(secretLevel, 1, 3) // This Operates independent of mang level for now
    // IconApart = 1
 
      /* All of Mang's passives and stats are scattered across passive procs. This is so that they can scale based off of how many Mang you have
-     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage
+     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Brutalize, Blurring Strikes, Hard Style
      They scale off of how many mang you have active. They do NOT show up in the passive handler rn 
      and if you want to know their values check the passive files
      Please do not go screaming about how "Mang does nothing" I will gut you myself - Hadoje */
