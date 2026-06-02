@@ -1072,7 +1072,7 @@ mob
 				return 1
 			return 0
 		GetHardStyle()
-			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4) + (GetMangLevel()*1.5)
+			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4) + ((GetMangLevel()*1)+4)
 		GetDebuffCrash()
 			var/list/Debuffs=list()
 			for(var/sb in SlotlessBuffs)

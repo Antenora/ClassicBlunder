@@ -205,7 +205,7 @@
         spellElement="Light"
         sanctify
             name="Sanctify"
-            passives = list("Sanctify" = 10);
+            passives = list("Sanctify" = 5);
         enshrine
             name="Enshrine"
             passives = list("Enshrine" = 5);
@@ -225,10 +225,10 @@
             projectileOnlyPassives = list("Explode" = 1)
         chargeflux
             name="Charge Flux"
-            passives = list("ChargeDelay" = 3);
+            passives = list("ChargeDelay" = 1.5);
         stasis
             name="Stasis"
-            passives = list("CooldownDrag" = 20);
+            passives = list("CooldownDrag" = 7);
         passage
             name="Passage"
             passives = list("FlashDOT" = 1);
@@ -237,19 +237,19 @@
         spellElement="Dark"
         disaster//primordial
             name="Disaster"
-            passives = list("PrimordialInvocation" = 30);
+            passives = list("Primordial" = 2.5);
         ravenous//cost hp, refund hp if hit
             name="Ravenous"
-            passives = list("LifeSteal" = 100, "WoundCost" = 5);
+            passives = list("LifeSteal" = 100, "HealthCost" = 1.5);
         vampyric
             name="Vampyric"
             passives = list("SkillLeech" = 5);
         hemomantic//more like homo amirite
             name="Hemomantic"
-            passives = list("HealReverse" = 30);
+            passives = list("HealingReverse" = 1);
         anima
             name="Anima"
-            passives = list("PainSplit" = 15);
+            passives = list("PainShare" = 25);
 
     space
         spellElement="Space"
@@ -264,4 +264,7 @@
             passives = list("Deport" = 30);//TP them away and shred defense
         constellation
             name="Constellation"
-            passives = list("StarCrossed" = 10);//countdown to warp + random buffs for you
+            passives = list("StarCrossed" = 1);//countdown to warp + random buffs for you
+        kinematics
+            name="Kinematics"
+            passives = list("Crippling" = 40, "Shearing"=20);

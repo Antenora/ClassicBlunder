@@ -525,6 +525,10 @@ globalTracker
 		HARDER_THEY_FALL_BIO_DIVISOR = 100 // if u use this when changie first start it will do big damage
 		HARDER_THEY_FALL_VAI_DIVISOR = 25 // more often no1 has this much vai, in hindsight deus ex machima will give kob more tha nthis, but they will suffer 2x damage ig
 
+
+		PRIMORDIAL_EFFECTIVENESS = 1
+
+		SANCTIFY_EFFECTIVENESS = 1
 // dmg rolls
 		min_damage_roll = 0.4
 		max_damage_roll = 0.8

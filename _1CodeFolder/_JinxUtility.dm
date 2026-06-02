@@ -412,6 +412,8 @@ mob
 
 			if(defender.CheckSlotless("Protega"))
 				src.LoseHealth(val/10)
+			if(painShared)
+				applyPainSharedDamage(val)
 			if(defender.passive_handler.Get("MeltyBlood"))
 				if(defender.Health<50*(1-src.HealthCut))
 					if(FightingSeriously(src,0))
@@ -1072,6 +1074,9 @@ mob
 				if(src.transUnlocked<6)
 					val = 0
 			val *= getAngelicInfusionMult();//returns 1 if no angelicinfusion
+			if(passive_handler["InverseHealing"])
+				DoDamage(src, val)
+				return
 			src.Health+=val
 			src.MaxHealth()
 			// Light Warden: delayed heal retrigger. Each selection of the Warden mage

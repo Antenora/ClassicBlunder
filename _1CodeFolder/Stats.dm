@@ -1104,6 +1104,9 @@ mob/proc/
 
 			var/PUGain=src.PUSpeedModifier
 
+			if(ChargeDelay)
+				PUGain *= max(0.1,1-ChargeDelay)
+
 			if(src.HasPULock())
 				PUGain=0
 

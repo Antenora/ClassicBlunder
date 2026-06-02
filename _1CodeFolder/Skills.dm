@@ -192,6 +192,21 @@ obj/Skills
 
 	var/heavenlyRestrictionIgnore = FALSE
 
+	var/CooldownDrag
+	var/Sanctify
+	var/StarCrossed
+
+	var/PainShare
+
+	var/ChargeDelay
+
+	var/Deport
+
+	var/Enshrine
+	var/HealingReverse
+
+	var/ForceField
+
 	proc
 		skillDescription()
 			description = "[src.name]\n"
