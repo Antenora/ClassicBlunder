@@ -10216,9 +10216,9 @@ NEW VARIABLES
 					var/TyrantBonus=1
 					var/SpiralPotential=1
 					if(!altered)
-			/*			if(insert certain condition here)
-							OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
-							//BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Tengen_Toppa_Evolution")*/
+						//if(insert certain condition here)
+							//OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
+							//BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Tengen_Toppa_Evolution")
 						PowerMult = 1+(0.05*secretLevel*secretLevel) + (0.05*asc*asc)
 						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)

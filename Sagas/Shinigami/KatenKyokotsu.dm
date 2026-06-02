@@ -44,9 +44,12 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 			"Duelist"          = 1 + SL,
 			"Shadowbringer"    = 1
 		)
+		if(SL < 3)
+			passives["ManaLeak"] = 2
 		StrMult = 1.1 + (0.15 * SL)
 		SpdMult = 1.1 + (0.15 * SL)
 		ForMult = 1.1 + (0.15 * SL)
+
 
 	Trigger(mob/user)
 		var/wasOn = src.SlotlessOn
@@ -590,7 +593,6 @@ var/global/list/BG_CONTRAST_HIGH = list(
 	adjust(mob/p)
 		if(altered) return
 		var/SL = p.SagaLevel
-		// Same passives as the Shikai, plus Tragedy.
 		passives = list(
 			"DoubleStrike"     = 3 + SL,
 			"CriticalChance"   = 5 + (5 * SL),
@@ -602,6 +604,8 @@ var/global/list/BG_CONTRAST_HIGH = list(
 			"Shadowbringer"    = 1,
 			"Tragedy"          = 1
 		)
+		if(SL < 5)
+			passives["ManaLeak"] = 4
 		StrMult = 1.4 + (0.1 * SL)
 		SpdMult = 1.4 + (0.1 * SL)
 		ForMult = 1.4 + (0.1 * SL)
