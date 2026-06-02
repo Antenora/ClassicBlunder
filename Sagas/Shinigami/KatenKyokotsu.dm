@@ -933,10 +933,9 @@ mob/proc/ShimeNoDan(mob/target)
 	OMsg(src, "<b>The world drains to white as [src] closes upon [target]...</b>")
 	spawn(50)
 		if(!src) return
-		KatenClearWhiteScreen(src)
-		if(target) KatenClearWhiteScreen(target)
 		if(src.Suspended == "Shime") src.Suspended = null
 		if(target && target.Suspended == "Shime") target.Suspended = null
+		// Strike lands while the screen is still white
 		if(target && target.loc)
 			src.Target = target
 			src.ItokiribasamiAttacking = 1
@@ -947,6 +946,17 @@ mob/proc/ShimeNoDan(mob/target)
 			ah.Using = 0
 			src.Activate(ah, TRUE, TRUE)
 			src.ItokiribasamiAttacking = 0
+		// Better timing for visuals
+		sleep(20)
+		if(src.KatenWhiteImages)
+			for(var/image/wi in src.KatenWhiteImages)
+				animate(wi, alpha = 0, time = 5)
+		if(target && target.KatenWhiteImages)
+			for(var/image/wi in target.KatenWhiteImages)
+				animate(wi, alpha = 0, time = 5)
+		sleep(5)
+		KatenClearWhiteScreen(src)
+		if(target) KatenClearWhiteScreen(target)
 		// Force the Bankai to end
 		var/obj/Skills/Buffs/SlotlessBuffs/Karamatsu_Shinju/b = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Karamatsu_Shinju)
 		if(b && b.SlotlessOn)
