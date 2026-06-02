@@ -135,7 +135,7 @@
 // Makaioshins with Limited Rank-Up use individual per-skill cooldowns instead.
 /mob/proc/cooldownChaosSkillSingle(obj/Skills/s)
 	if(s)
-		s.Cooldown(1, 300, src)
+		s.Cooldown(1, 3000, src)
 
 /mob/proc/cooldownAllChaosSkills()
 	var/list/chaosTypes = list(
@@ -146,7 +146,7 @@
 	for(var/t in chaosTypes)
 		var/obj/Skills/s = locate(t) in src
 		if(s)
-			s.Cooldown(1, 300, src)
+			s.Cooldown(1, 3000, src)
 
 /obj/Skills/Buffs/SlotlessBuffs/Chaos_Control
 	BuffName = "Chaos Control"
