@@ -164,7 +164,7 @@ proc/applyNearSighted(mob/target, mob/caster)
 		var/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi/self = src
 		spawn()
 			while(self.domain_active && user && user.loc)
-				for(var/mob/m in world)
+				for(var/mob/m in players)
 					if(!m.client || m == user) continue
 					var/in_range = (get_dist(user, m) <= domain_range)
 					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns = m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
