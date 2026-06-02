@@ -5523,12 +5523,12 @@ mob
 					if(Z.PreQuake)
 						spawn()
 							src.Quake(Second(Z.WindUp/src.GetQuickCast()))
-					sleep(Second(Z.WindUp/src.GetQuickCast()))
+					sleep(Second((Z.WindUp+ChargeDelay)/src.GetQuickCast()))
 				else
 					if(Z.PreQuake)
 						spawn()
 							src.Quake(Second(Z.WindUp))
-					sleep(Second(Z.WindUp))
+					sleep(Second(Z.WindUp+ChargeDelay))
 				src.WindingUp=0
 
 				if(Z.Area=="Target"||Z.Area=="Around Target")
@@ -6098,6 +6098,7 @@ obj
 			Combustion
 			IceAge
 			Doom
+			CooldownDrag
 
 			grabNerf = 0
 			BuffAffected = 0
@@ -6122,6 +6123,15 @@ obj
 			FollowUpDelay
 
 			DirectWounds
+
+			Sanctify
+			StarCrossed
+			PainShare
+			ChargeDelay
+			Deport
+			HealingReverse
+			Enshrine
+			ForceField
 			/// Set for all autohits built from a skill, used for on-hit hooks (currently just Enuma Elish).
 			var/obj/Skills/AutoHit/FromSkill
 
@@ -6273,6 +6283,13 @@ obj
 			src.Scratch=Z.Scratch
 			src.Punt=Z.Punt
 			src.Divide=Z.Divide
+			src.PainShare=Z.PainShare
+			Sanctify = Z.Sanctify
+			StarCrossed = Z.StarCrossed
+			ChargeDelay = Z.ChargeDelay
+			Deport = Z.Deport
+			ForceField = Z.ForceField
+			CooldownDrag = Z.CooldownDrag
 			src.TurfErupt=Z.TurfErupt
 			src.TurfEruptOffset=Z.TurfEruptOffset
 			src.TurfIce=Z.TurfIce
@@ -6335,6 +6352,8 @@ obj
 			src.buffAffectedCompare = Z.buffAffectedCompare
 			src.buffAffectedBoon = Z.buffAffectedBoon
 			src.CorruptionDebuff = Z.CorruptionDebuff
+			HealingReverse = Z.HealingReverse
+			Enshrine = Z.Enshrine
 			PullIn = Z.PullIn
 			if(Z.Burning)
 				src.Burning+=Z.Burning
@@ -6779,13 +6798,15 @@ obj
 					if(Owner && Owner.hasMagePassive(/mage_passive/dark/Shadowbringer) && m.Potential >= Owner.Potential + 5)
 						additonal = max(additonal, 2)
 					var/missingHealth = 100-m.Health
-					FinalDmg *= 1 + ((additonal * missingHealth)/100)
+					FinalDmg *= 1 + (((additonal*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 				if(ApplySlow)
 					m.AddSlow(ApplySlow, Owner)
 				if(NerveOverload)
 					m.AddShock(NerveOverload, Owner)
 				if(CriticalParalyze && prob(CriticalParalyze))
 					Stun(m, 2)
+				if(CooldownDrag)
+					m.addCooldownDrag(CooldownDrag, Owner)
 				if(CriticalSpark && prob(CriticalSpark))
 					FinalDmg *= 1.5
 					animate(m, color = "#fff757")
@@ -6914,7 +6935,12 @@ obj
 								skipPureDamage = 1
 				var/list/specDmgTypes = list()
 				if(!skipPureDamage && Owner && FromSkill)
-					if(FromSkill.HolyMod) specDmgTypes["Holy"] = FromSkill.HolyMod
+					var/holy = 0
+					if(FromSkill.HolyMod) 
+						holy += FromSkill.HolyMod
+					if(FromSkill.Sanctify)
+						holy += FromSkill.Sanctify * glob.SANCTIFY_EFFECTIVENESS
+					if(holy > 0) specDmgTypes["Holy"] = holy
 					if(FromSkill.AbyssMod) specDmgTypes["Abyss"] = FromSkill.AbyssMod
 					if(FromSkill.SlayerMod) specDmgTypes["Slayer"] = FromSkill.SlayerMod
 					if(specDmgTypes.len) FinalDmg *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
@@ -7032,6 +7058,25 @@ obj
 					m.applyJudged(120)
 				if(src.ApplySentenced)
 					m.applySentenced(60)
+				if(PainShare)
+					m.applyPainShare(src.Owner, PainShare)
+				if(ChargeDelay)
+					m.applyChargeDelay(ChargeDelay)
+				if(Enshrine)
+					m.applyEnshrine(Enshrine)
+				if(SpellElement=="Space"&&m.StarCrossed)
+					m.applyStarCrossed()
+				if(Deport)
+					m.applyDeport(Deport)
+				if(HealingReverse)
+					m.applyHealReverse()
+				if(ForceField&&Owner)
+					m.applyForceField(Owner)
+				if(FromSkill.StarCrossed)
+					m.StarCrossed=TRUE
+					m.StarCrossedX=m.x
+					m.StarCrossedY=m.y
+					m.StarCrossedZ=m.z
 				if(src.Owner.UsingAnsatsuken())
 					src.Owner.HealMana(src.Owner.SagaLevel)
 				if(src.Owner.SagaLevel>1&&src.Owner.Saga=="Path of a Hero: Rebirth")

@@ -504,6 +504,11 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.IsGrabbed().Grab_Release()
 	if(src.Grab)
 		src.Grab_Release()
+	if(StarCrossed)
+		StarCrossed = FALSE
+	if(painShared)
+		turnOffPainShared()
+
 
 	if(istype(src, /mob/Player/AI))
 		if(P)

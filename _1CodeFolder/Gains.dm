@@ -866,7 +866,7 @@ mob
 
 			if(src.BusterTech && src.BusterCharging<100)
 
-				src.BusterCharging+=(100/RawSeconds(5)) * src.BusterTech.Buster * src.GetRecov()
+				src.BusterCharging+=((100/RawSeconds(5)) - ChargeDelay) * src.BusterTech.Buster * src.GetRecov()
 				if(src.BusterCharging>100)
 					src.BusterCharging=100
 					src << "Your buster technique is fully charged!"
@@ -1128,6 +1128,8 @@ mob
 					src.OverClockTime+=RawHours(1)
 			if(src.Kaioken>=6)
 				src.AddEndTax(0.001)
+			if(ChargeDelay)
+				decreaseChargeDelay()
 
 			var/safety=0
 			while(src.ActiveBuff)

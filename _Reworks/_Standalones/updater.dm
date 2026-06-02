@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 29
+	var/UPDATE_VERSION = 30
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -653,6 +653,23 @@ update
 					p.EndAscension += 0.5
 					p.OffAscension += 0.5
 					p.DefAscension += 0.5
+	version30
+		version = 30
+		updateMob(mob/p)
+			. = ..()
+			var/list/giveBack = list()
+			for(var/spell_passive/sp in p.acquiredSpellPassives)
+				if(sp.enchantedIn)
+					p.disenchantSpellWithPassive(sp.enchantedIn, sp)
+				giveBack += sp.type
+				del sp
+			if(length(giveBack))
+				p.acquiredSpellPassives = list()
+				for(var/type in giveBack)
+					var/spell_passive/sp = new type;
+					p.acquiredSpellPassives |= sp;
+				p << "You'll need to reapply your spell passives."
+			
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

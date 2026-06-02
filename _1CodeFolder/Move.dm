@@ -173,6 +173,12 @@ mob/Move()
 				return
 	..()
 
+	if(passive_handler.Get("ForceFielded"))
+		for(var/mob/m in oview(glob.FORCEFIELD_RANGE, src))
+			if(passive_handler.Get("ForceFielded") == m.ckey)
+				loc = Former_Location
+				break
+
 	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
 			if(!(A.dir in list(dir,turn(dir,90),turn(dir,-90),turn(dir,45),turn(dir,-45))))

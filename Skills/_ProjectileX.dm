@@ -213,6 +213,7 @@ obj
 				SkillDeicide=0//temporarily adds this much Deicide on hit
 
 				ignoreBetterAim = FALSE
+				Primordial=0
 
 			skillDescription()
 				..()
@@ -5177,9 +5178,9 @@ mob
 					if(!Z.ChargeIcon)
 						src.Chargez("Add")
 						if(src.HasQuickCast())
-							sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+							sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 						else
-							sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
+							sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
 						src.Chargez("Remove")
 					else
 						if(Z.ChargeIcon!=1)
@@ -5188,9 +5189,9 @@ mob
 							else
 								src.Chargez("Add", image(icon=Z.ChargeIcon, pixel_x=Z.ChargeIconX, pixel_y=Z.ChargeIconY), 0)
 							if(src.HasQuickCast())
-								sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+								sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 							else
-								sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
+								sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
 							src.Chargez("Remove", image(icon=Z.ChargeIcon, pixel_x=Z.ChargeIconX, pixel_y=Z.ChargeIconY))
 						else
 							if(!src.AuraLocked&&!src.HasKiControl())
@@ -5198,9 +5199,9 @@ mob
 							else
 								KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
 							if(src.HasQuickCast())
-								sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+								sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 							else
-								sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
+								sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
 
 							if(!src.AuraLocked&&!src.HasKiControl())
 								src.Auraz("Remove")
@@ -5714,6 +5715,16 @@ obj
 					src.Backfire=0
 					src.FadeOut=Z.FadeOut
 					src.GoldScatter = Z.GoldScatter
+					src.Primordial = Z.Primordial
+					Sanctify = Z.Sanctify
+					StarCrossed = Z.StarCrossed
+					CooldownDrag = Z.CooldownDrag
+					PainShare = Z.PainShare
+					ChargeDelay = Z.ChargeDelay
+					Deport = Z.Deport
+					HealingReverse = Z.HealingReverse
+					Enshrine = Z.Enshrine
+					ForceField = Z.ForceField
 					BeamCharge = BeamCharging
 					var/OldVary=Z.Variation
 					if(Z.TempStream)
@@ -6211,6 +6222,9 @@ obj
 							Damage *= 1 + (Owner.GetMagicSwordAscension()/glob.UNARMED_DAMAGE_DIVISOR)
 						if(Bounce)
 							Damage *= max(1-glob.BOUNCE_REDUCTION * CurrentBounce, 0.25)
+						if(Primordial)
+							var/missingHealth = 100-a:Health
+							Damage *= 1 + (((Primordial*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 						if(src.Owner.RippleActive())
 							if(src.Owner.Oxygen>=BreathCost)
 								var/RipplePower=(1+(0.25*src.Owner.GetRipple()*max(1,src.Owner.PoseEnhancement*2)))
@@ -6354,7 +6368,12 @@ obj
 								if(!found)//If you don't find what you're supposed to hunt
 									goto SkipDamage
 						var/list/specDmgTypes = list();
-						if(HolyMod) specDmgTypes["Holy"] = HolyMod;
+						var/holy = 0
+						if(HolyMod)
+							holy += HolyMod
+						if(Sanctify)
+							holy += Sanctify * glob.SANCTIFY_EFFECTIVENESS
+						if(holy > 0) specDmgTypes["Holy"] = holy
 						if(AbyssMod) specDmgTypes["Abyss"] = AbyssMod;
 						if(SlayerMod) specDmgTypes["Slayer"] = SlayerMod;
 						if(specDmgTypes.len) EffectiveDamage *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
@@ -6569,6 +6588,34 @@ obj
 						SkipDamage
 						if(Snaring)
 							m.applySnare(Snaring, 'root.dmi')
+						if(PainShare)
+							m:applyPainShare(src.Owner, PainShare)
+						if(ChargeDelay)
+							m:applyChargeDelay(ChargeDelay)
+						if(CooldownDrag)
+							m:addCooldownDrag(CooldownDrag, src.Owner)
+						
+						if(HealingReverse)
+							m:applyHealReverse()
+
+						if(SpellElement=="Space"&&m.StarCrossed)
+							m:applyStarCrossed()
+						
+						if(Deport)
+							m:applyDeport(Deport)
+
+						if(Enshrine)
+							m:applyEnshrine(Enshrine)
+
+						if(ForceField&&Owner)
+							m.applyForceField(Owner)
+
+						if(StarCrossed)
+							m.StarCrossed=TRUE
+							m.StarCrossedX=m.x
+							m.StarCrossedY=m.y
+							m.StarCrossedZ=m.z
+
 						if(src.OnMobHit)
 							call(text2path(src.OnMobHit))(m, src)
 						if(src.Stunner)
