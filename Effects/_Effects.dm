@@ -342,6 +342,19 @@ obj/Effects
 					KenShockwave(src,Size=1)
 				spawn(3.5)
 					EffectFinish()
+	fevLightningStrikeHyperDeath
+		icon='LightningHyperdeath.dmi'
+		pixel_x=-64
+		proc
+			Strike()
+				src.icon_state="Strike"
+				src.blend_mode=2
+				spawn(2)
+					KenShockwave(src,Size=0.5)
+				spawn(3)
+					KenShockwave(src,Size=1)
+				spawn(3.5)
+					EffectFinish()
 	fevPriestErupt
 		icon='Priest VFX2.dmi'
 		pixel_x=-16

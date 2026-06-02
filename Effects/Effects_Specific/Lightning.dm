@@ -25,6 +25,12 @@ proc
 		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.y+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.z)
 		sleep(1)
 		S.Strike()
+	LightningStrikeHyperdeath(atom/m, var/Offset=0)
+		m.Quake(5)
+		var/obj/Effects/fevLightningStrikeHyperDeath/S = new
+		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.y+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.z)
+		sleep(1)
+		S.Strike()
 	PriestErupt(atom/m, var/Offset=0)
 		set waitfor=0
 		var/obj/Effects/fevPriestErupt/S = new

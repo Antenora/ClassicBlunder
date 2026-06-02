@@ -161,6 +161,55 @@ proc
 			else
 				I.color=rgb(30, 18, 167)
 
+	rainbowFlashImage(mob/m, amt)
+		var/baseAmount = amt
+		for(var/x in 1 to baseAmount)
+			var/obj/coolImage/I = new
+			I.appearance_flags=32
+			I.icon=m.icon
+			I.alpha=135
+			I.overlays=m.overlays
+			I.icon_state=m.icon_state
+			I.color=m.color
+			I.transform=m.transform
+
+			var/turf/t = m.loc
+			t.vis_contents += I
+
+			I.dir=m.dir
+			switch(I.dir)
+				if(NORTH)
+					I.pixel_x=m.pixel_x + (rand(-8,8))
+					I.pixel_y=m.pixel_y - (x * 16)
+				if(NORTHWEST)
+					I.pixel_x= m.pixel_x + (x * 16)
+					I.pixel_y=m.pixel_y - (x * 16)
+				if(NORTHEAST)
+					I.pixel_x=m.pixel_x - (x * 16)
+					I.pixel_y=m.pixel_y - (x * 16)
+				if(SOUTH)
+					I.pixel_x=m.pixel_x + (rand(-8,8))
+					I.pixel_y=m.pixel_y + (x * 16)
+				if(EAST)
+					I.pixel_x=m.pixel_x - (x * 16)
+					I.pixel_y=m.pixel_y + (rand(-8,8))
+				if(SOUTHEAST)
+					I.pixel_x=m.pixel_x - (x * 16)
+					I.pixel_y=m.pixel_y + (x * 16)
+				if(SOUTHWEST)
+					I.pixel_x=m.pixel_x + (x * 16)
+					I.pixel_y=m.pixel_y + (x * 16)
+				if(WEST)
+					I.pixel_x=m.pixel_x + (x * 16)
+					I.pixel_y=m.pixel_y + (rand(-8,8))
+			I.pixel_z=m.pixel_z
+			I.name=m.name
+			I.Owner=m
+			var/r = rand(80, 255)
+			var/g = rand(80, 255)
+			var/b = rand(80, 255)
+			I.color=rgb(r,g,b)
+
 	FlashImage(mob/m)
 		var/AMT=1
 		while(AMT)
