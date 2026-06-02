@@ -161,6 +161,7 @@
 	Distance = 10
 	Cooldown = 300
 	FixedDamage = 10
+	DamageMult = 25
 	StrOffense = 1
 	EndDefense = 1
 	GuardBreak = 1
