@@ -10138,13 +10138,10 @@ NEW VARIABLES
 					var/healthDiff = 0
 					var/Tyrant
 					var/TyrantBonus=1
-					var/SpiralPotential
+					var/SpiralPotential=1
 					if(!altered)
 						var/secretLevel = p.secretDatum.currentTier
 						var/asc = p.AscensionsAcquired
-						var/TrueUnderdog=1
-						if(p.race.locked||p.isMazokuPathHuman())
-							TrueUnderdog=0
 						if(p.Target && ismob(p.Target))
 							healthDiff = (p.Target.Health+p.Target.VaizardHealth)-p.Health
 						switch(healthDiff)
@@ -10164,35 +10161,29 @@ NEW VARIABLES
 								secretLevel += 3
 							if(76 to 100)
 								secretLevel += 4
-						if(secretLevel>7)
-							secretLevel=7
+						if(secretLevel>6)
+							secretLevel=6
 						switch(secretLevel)
 							if(1 to 2)
 								SpiralPower=1
-							if(3)
+							if(3 to 4)
 								SpiralPower=2
-							if(4)
+							if(5 to 6)
 								SpiralPower=3
-							if(5)
-								SpiralPower=4
-							if(6)
-								SpiralPower=5
 							if(7)
 								SpiralPower=7
-						SpiralPotential=SpiralPower
-						if(Tyrant||healthDiff<25&&!TrueUnderdog)
-							SpiralPotential=1
 						if(p.PilotingProwess<SpiralPower)
 							p.PilotingProwess=SpiralPower
-						if(SpiralPotential>=7)
-							OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
+
 						PowerMult = 1+(0.015*secretLevel*secretLevel) + (0.005*asc*asc)
-						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						EndMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						passives = list("SpiralPowerUnlocked" = SpiralPotential, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower, "EnergyGeneration" = SpiralPower)
-						TimerLimit= (30 * (SpiralPotential)) * TyrantBonus
-						Cooldown = 90 - (SpiralPotential*5)
+						StrMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
+						ForMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
+						EndMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
+						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = secretLevel, "PureReduction" = secretLevel, "EnergyGeneration" = SpiralPower)
+						TimerLimit= 60
+						Cooldown = 90 - (SpiralPower*5)
+						if(secretLevel>=5)
+							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution")
 				KenWave = 2
 				KenWaveIcon='SparkleGreen.dmi'
 				HitSpark='Spiral_Hitspark.dmi'
@@ -10201,7 +10192,36 @@ NEW VARIABLES
 				ActiveMessage="glows with raw willpower, driving forward no matter what!"
 				OffMessage="lives to see another day."
 				TextColor="green"
-
+			Super_Galaxy_Evolution
+				KenWave=5
+				KenWaveSize=2
+				NeedsHealth=50
+				HealthThreshold=75
+				UBuffNeeded="Evolution Power"
+				KenWaveIcon='KenShockwaveLegend.dmi'
+				HitSpark='Spiral_Hitspark.dmi'
+				TopOverlayLock = 'SpiralAura.dmi'
+				TopOverlayX = -32
+				ActiveMessage="transforms infinite darkness into light, becoming equal to the Gods!"
+				OffMessage="lives to see another day."
+				TextColor="green"
+				adjust(mob/p)
+					var/secretLevel = p.secretDatum.currentTier
+					var/asc = p.AscensionsAcquired
+					var/SpiralPower=1
+					var/healthDiff = 0
+					var/Tyrant
+					var/TyrantBonus=1
+					var/SpiralPotential=1
+					if(!altered)
+			/*			if(insert certain condition here)
+							OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
+							//BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Tengen_Toppa_Evolution")*/
+						PowerMult = 1+(0.05*secretLevel*secretLevel) + (0.05*asc*asc)
+						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
+						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
+						EndMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
+						//passives = list("CoolNewSpiralPassiveThatDoesSomething" = 1)
 		Eldritch
 			True_Form
 				adjust(mob/p)
