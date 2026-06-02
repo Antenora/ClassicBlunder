@@ -1072,7 +1072,7 @@ mob
 				return 1
 			return 0
 		GetHardStyle()
-			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4)
+			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4) + ((GetMangLevel()*1)+4)
 		GetDebuffCrash()
 			var/list/Debuffs=list()
 			for(var/sb in SlotlessBuffs)
@@ -1233,10 +1233,12 @@ mob
 					Return += 5*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
-					if(Target.GetGodKi() > GetGodKi())
+					if(passive_handler.Get("Longing"))
+						Return += 20*Target.GetGodKi()* glob.GODKI_DIFF_MULT
+					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasPureReduction()
 			var/Return=0
@@ -1269,12 +1271,14 @@ mob
 					Return += 3*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
-					if(Target.GetGodKi() > GetGodKi())
+					if(passive_handler.Get("Longing"))
+						Return += 20*Target.GetGodKi()* glob.GODKI_DIFF_MULT
+					else if(Target.GetGodKi() > GetGodKi())
 						Return += 2*((1+Target.GetGodKi())/(1+GetGodKi()))
 			if(DownToEarth>0)
 				Return*=1*((100-DownToEarth)/100)
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		Hustling()
 			if(passive_handler.Get("Hustle") || HasMythical() > 0.25 || (passive_handler["Rage"] && Health <= 25))
@@ -1452,6 +1456,9 @@ mob
 			if(src.InfinityModule)
 				return 1
 			return 0
+		GetHeroicBoost()
+			var/Return=1.05+(0.1*AscensionsAcquired)
+			return Return
 		HasInjuryImmune()
 			if(passive_handler.Get("InjuryImmune"))
 				return 1
@@ -1692,7 +1699,7 @@ mob
 			if(Target&&Target.passive_handler.Get("Instinct") >= Base+Extra)
 				Extra += (passive_handler.Get("LikeWater")) / 2
 			if(Class=="Heroic"&&ActiveBuff)
-				Base*=1.25
+				Base*=GetHeroicBoost()
 			return (Base+Extra)
 		HasInstinct()
 			var/Return=BaseOff()/4
@@ -1721,7 +1728,7 @@ mob
 			if(Return < 0)
 				Return = 0
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasSoulSteal()
 			if(passive_handler.Get("SoulSteal"))
@@ -1825,6 +1832,10 @@ mob
 			if(passive_handler.Get("ShockImmunity"))
 				return 1
 			return 0
+		HasChillImmune()
+			if(passive_handler.Get("ChillImmune"))
+				return 1
+			return 0
 		HasTaxThreshold()
 			if(passive_handler.Get("TaxThreshold"))
 				return 1
@@ -1908,24 +1919,6 @@ mob
 			var/HealthLost = abs(src.Health-100)
 			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
 			return Return
-		GetSaiyanPower()
-			var/MasteryDivisor1=(src.race.transformations[1].mastery/100)
-			var/SaiyanPower1=passive_handler.Get("SaiyanPower1")*MasteryDivisor1
-			if(passive_handler.Get("MagnifiedSSJ1"))
-				SaiyanPower1+=passive_handler.Get("MagnifiedSSJ1")
-			var/SaiyanPower2=passive_handler.Get("SaiyanPower2") //it's always at full power
-			if(passive_handler.Get("MagnifiedSSJ2"))
-				SaiyanPower2+=passive_handler.Get("MagnifiedSSJ2")
-			var/SaiyanPower3= passive_handler.Get("SaiyanPower3")
-			var/SaiyanPower4= passive_handler.Get("SaiyanPower4")
-			var/SaiyanPowerGod= passive_handler.Get("SaiyanPowerGod")
-			var/SaiyanPowerZenkai= passive_handler.Get("TrueZenkaiPower")
-			var/SaiyanPowerVoid= passive_handler.Get("SaiyanPowerVoid")
-			var/SEBoost=1+(passive_handler.Get("SpiralPowerUnlocked")/10)
-			if(passive_handler.Get("SpiralPowerUnlocked")&&NobodyOriginType=="Pride")
-				SaiyanPowerVoid*=SEBoost
-			var/SaiyanPower=1+(SaiyanPower1+SaiyanPower2+SaiyanPower3+SaiyanPower4+SaiyanPowerZenkai+SaiyanPowerGod+SaiyanPowerVoid)//It's like this because I intend on having Saiyan Unique buffs interact with this specifically. you'll see what i mean when i get to the grades
-			return SaiyanPower
 
 		HasPowerReplacement()
 			if(src.passive_handler.Get("PowerReplacement"))
@@ -2063,7 +2056,7 @@ mob
 				Total*=1*((100-src.DownToEarth)/100)
 			return Total
 		HasGodKi()
-			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")) return 0;
+			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")||passive_handler.Get("Longing")) return 0;
 			if(passive_handler["CreateTheHeavens"])
 				return 1
 			if(passive_handler["Hidden Potential"]||passive_handler["Orange Namekian"])
@@ -2616,7 +2609,7 @@ mob
 		GetSpiritHand()//Str*(For**1/2)
 			var/Return=passive_handler.Get("SpiritHand")
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 
 
@@ -2639,7 +2632,7 @@ mob
 			if(InfinityModule)
 				Return += AscensionsAcquired/2
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
@@ -2650,7 +2643,7 @@ mob
 			if(src.Saga=="Keyblade")
 				Return += src.SagaLevel*0.25
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasHybridStrike()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("HybridStrike"))
@@ -2663,7 +2656,7 @@ mob
 			if(InfinityModule)
 				Return += AscensionsAcquired/2//round(glob.progress.totalPotentialToDate,5) / 50
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=1.25
+				Return*=GetHeroicBoost()
 			return Return
 		HasPhysPleroma()
 			if(passive_handler.Get("PhysPleroma"))
@@ -3626,6 +3619,8 @@ mob
 			if(src.Frozen)
 				return 0
 			if(src.Stunned)
+				return 0
+			if(src.Suspended)
 				return 0
 			if(src.Stasis)
 				return 0

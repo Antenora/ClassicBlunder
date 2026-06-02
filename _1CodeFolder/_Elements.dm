@@ -75,6 +75,8 @@ proc
 
 		if(attackElements["Ultima"]||attackElements["Death"])
 			ForcedDebuff+=1
+		if(Attacker.passive_handler.Get("Forever After"))
+			attackElements |= "Love"
 		var/DamageMod=0
 		for(var/element in attackElements)
 			var/DebuffRate=GetDebuffRate(element, defenseElements, ForcedDebuff)
@@ -225,7 +227,7 @@ proc
 					DamageMod-=2
 				if("Void")
 					DamageMod-=2
-		return DamageMod/10
+		return DamageMod/glob.ELEMENTAL_DIVIDER
 
 	GetDebuffRate(var/A, list/D, var/Forced=0)
 		var/Return=0
@@ -416,6 +418,8 @@ mob
 				src.Bleed = 0
 
 		AddSlow(var/Value, var/mob/Attacker=null)
+			if(src.HasChillImmune())
+				return
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
@@ -772,7 +776,7 @@ mob
 				if(src.Crippled<0)
 					src.Crippled=0
 
-			if(src.Confused&&!src.Stunned)
+			if(src.Confused&&!src.Stunned&&!src.Suspended)
 				if(src.Confused > glob.DEBUFF_STACK_MAX)
 					src.Confused = glob.DEBUFF_STACK_MAX;
 
@@ -808,7 +812,7 @@ mob
 				if(src.DownToEarth<0)
 					src.DownToEarth=0
 
-			if(src.Attracted&&!src.Confused&&!src.Stunned)
+			if(src.Attracted&&!src.Confused&&!src.Stunned&&!src.Suspended)
 				src.Attracted--
 			if(src.Attracted<=0)
 				src.Attracted=0

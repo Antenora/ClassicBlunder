@@ -98,7 +98,7 @@
 	Final_Session
 		passives = list("AfterImages" = 4, "Speed Force" = 2, "Iaijutsu" = 1, "Relentlessness" = 1, \
 		                "Fury" = 4, "TripleStrike" = 0.5, "DoubleStrike" = 2, "Warping" = 2, "Momentum" = 1.5, \
-		                "TensionLock" = 1)
+		                "TensionLock" = 1, "Forever After" = 1)
 		SpdMult=1.5
 		StrMult=1.5
 		IconLock='SweatDrop.dmi'

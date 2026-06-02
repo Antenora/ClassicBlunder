@@ -90,7 +90,7 @@ scaling with potential as well
 	BuffName = "Herald of the Depths"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("CalmAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1),"PureReduction" = 4, "HellPower" = 0.65, \
+		passives = list("CalmAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1), "HellPower" = 0.65, \
 						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 5, "Flicker" = 3, "Pursuer" = 3, "PureDamage" = 3, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
 		StrMult = 1.25 + (p.Potential/50)
 		ForMult = 1.25 + (p.Potential/50)

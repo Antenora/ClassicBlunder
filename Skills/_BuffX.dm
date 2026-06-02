@@ -3061,6 +3061,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Final_Getsuga_Tenshou
 				SignatureTechnique=4
+				SagaSignature=1
 				TimerLimit=600
 				EnergyCut=0.99
 				ManaCut=0.99
@@ -3138,10 +3139,9 @@ NEW VARIABLES
 					SpdMult = 1.3 + (0.1*p.AscensionsAcquired)
 					StrMult = 1.3 + (0.1*p.AscensionsAcquired)
 					EndMult = 0.6 + (0.05*p.AscensionsAcquired)
-					DefMult = 0.6 + (0.05*p.AscensionsAcquired)
 					var/reducedPot = totalPot/10
 					ManaDrain = 0.008 - (0.001 * reducedPot)
-					passives = list("ManaLeak" = 1 - totalPot/200, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
+					passives = list("ManaLeak" = 1 - totalPot/100, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
 
 
 				verb/Overdrive()
@@ -10056,13 +10056,13 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(!altered)
 						if(p.Secret == "Werewolf")
-							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier, "TechniqueMastery" = 1, "MovementMastery" = p.secretDatum.currentTier * 1.25,"Skimming" = 2)
+							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier, "TechniqueMastery" = 1,"Skimming" = 2, "MovementMastery" = p.secretDatum.currentTier)
 							MovementMastery = p.secretDatum.currentTier * 1.5
 							Godspeed = p.secretDatum.currentTier
-							StrMult = 1 + (p.secretDatum.currentTier * 0.25)
-							EndMult = 1
-							SpdMult = 1 + (p.secretDatum.currentTier * 0.25)
-							OffMult = 1 + (p.secretDatum.currentTier * 0.25)
+							StrMult = 1 + (p.secretDatum.currentTier * 0.05)
+							EndMult = 0.75
+							SpdMult = 1 + (p.secretDatum.currentTier * 0.05)
+							OffMult = 1 + (p.secretDatum.currentTier * 0.05)
 				Trigger(mob/p, Override = 0 )
 					adjust(p)
 					..()
@@ -10071,15 +10071,15 @@ NEW VARIABLES
 					TimerLimit=180
 					if(!altered)
 						if(p.Secret == "Werewolf")
-							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier*2,\
-							 "Pursuer" = 2, "BlurringStrikes" = p.secretDatum.currentTier, "Skimming" = 2, p.secretDatum.currentTier * 1.5)
+							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier,\
+							 "Pursuer" = 2, "BlurringStrikes" = p.secretDatum.currentTier, "Skimming" = 2, "MovementMastery" = p.secretDatum.currentTier * 1.25)
 							MovementMastery = p.secretDatum.currentTier * 2
 							Godspeed = p.secretDatum.currentTier * 2
-							StrMult = 1.25 + (p.secretDatum.currentTier * 0.25)
+							StrMult = 1.05 + (p.secretDatum.currentTier * 0.15)
 							EndMult = 0.75
-							SpdMult = 1.25 + (p.secretDatum.currentTier * 0.25)
-							OffMult = 1.25 + (p.secretDatum.currentTier * 0.25)
-							DefMult = 0.75
+							SpdMult = 1.05 + (p.secretDatum.currentTier * 0.15)
+							OffMult = 1.05 + (p.secretDatum.currentTier * 0.15)
+							DefMult = 0.25
 
 				HealthThreshold=0.1
 				RegenMult=2
@@ -11716,6 +11716,13 @@ NEW VARIABLES
 				TooMuchHealth=99
 				VaizardHealth=2
 				VaizardShatter=0
+				PowerMult=1.1
+				StrMult=1.2
+				EndMult=1.2
+				SpdMult=1.2
+				RegenMult=1.25
+				RecovMult=1.25
+				EnergyMult=1.5
 				Unstoppable=1
 				Possessive=1
 				TextColor=rgb(75, 0, 85)
@@ -11734,8 +11741,8 @@ NEW VARIABLES
 					if(altered) return
 					var/asc = p.AscensionsAcquired
 					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Gum Gum" = 1 + (0.5 * asc), "Blubber" = 1 + (0.5 * asc), "KillerInstinct" = 0.1 + (0.15 * asc), \
-						"Brutalize" = 1 + asc, "AttackSpeed" = asc/2)
-					VaizardHealth = 10 + p.GetEnd() + (p.TotalInjury/25) + (asc)
+						"Brutalize" = 1 + asc, "AttackSpeed" = asc/2, "Curse" = 1, "Flow" = asc/2)
+					VaizardHealth = 10 + p.GetEnd() + (p.TotalInjury/20) + (asc)
 					if(asc>=1)
 						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
 							p.AddSkill(new/obj/Skills/AutoHit/Symbiote_Tendril_Wave)
@@ -12005,7 +12012,7 @@ NEW VARIABLES
 				ActiveMessage="has fallen victim to their demonic impulse to win at any cost!"
 				OffMessage="manages to repress their demonic powers..."
 				adjust(mob/p)
-					passives = list("SpecialBuffLock" = 1,"KillerInstinct" = 0.1 * p.SagaLevel, "Curse" = 1, "Enraged" = p.SagaLevel, \
+					passives = list("SpecialBuffLock" = 1,"KillerInstinct" = 0.1 * p.SagaLevel, "Curse" = 1, "Enrage" = p.SagaLevel, \
 					"SlayerMod" = p.SagaLevel*0.25, "HardStyle" = 0.25 + (p.SagaLevel*0.25), "TechniqueMastery" = p.SagaLevel*0.75)
 					NeedsHealth = 15 + (2.5 * p.SagaLevel)
 					TooMuchHealth = NeedsHealth + p.SagaLevel

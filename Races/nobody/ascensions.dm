@@ -182,10 +182,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "If you wanna make it happen, nothing is impossible! Don't think twice!"
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "You need true emotions... Your sanctuary..."
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Nothing is like before... Simple and clean..."
 					switch(owner.Class)
 						if("Samurai")
@@ -232,10 +234,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "You're only crying because you never dreamed it'd take this long... Don't. Think. Twice."
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "Your fears, your lies, all melt away... Into your sanctuary!"
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Maybe some things are that simple..."
 					switch(owner.Class)
 						if("Samurai")
@@ -277,10 +281,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "Lose, don't have nothing to... Let me face my fears."
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "Faith, should I take a leap... Let me face my fears."
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Space, this is what I choose... Let me face my fears."
 					switch(owner.Class)
 						if("Samurai")

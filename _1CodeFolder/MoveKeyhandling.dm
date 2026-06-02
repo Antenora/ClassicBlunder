@@ -218,7 +218,7 @@ mob
 			MovementLoop()
 				var/loop_delay=glob.BASE_LOOP_DELAY
 				while(src)
-					if(src.pixel_z&&(key1||key2||key3||key4)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.PoweringUp)
+					if(src.pixel_z&&(key1||key2||key3||key4)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 						if(!src.EquippedFlyingDevice())
 							flick("Flight",src)
 					if(key1||key2||key3||key4)
@@ -322,7 +322,7 @@ mob
 
 						//	If you don't want diagonal steps broken in two use this line.
 						var/step_d=dir_x+dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.PoweringUp)
+						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -343,7 +343,7 @@ mob
 						if(prob(src.Confused) || passive_handler.Get("Manic") ? prob(passive_handler.Get("Manic") * 5) : 0)
 							dir_x = pick(DIRSX)
 						var/step_d=dir_x
-						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.PoweringUp)
+						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -362,7 +362,7 @@ mob
 						if(prob(src.Confused) || passive_handler.Get("Manic") ? prob(passive_handler.Get("Manic") * 5) : 0)
 							dir_y = pick(DIRSY)
 						var/step_d=dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.PoweringUp)
+						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)

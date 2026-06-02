@@ -296,7 +296,35 @@ obj
 				Shockwave=4
 				ShockIcon='KenShockwave.dmi'
 				ActiveMessage="releases the explosive energy within their Keyblade!"
-
+			Magic
+				Ultima
+					ElementalClass="Ultima"
+					SpellElement="Ultima"
+					SignatureName="Ultima"
+					Area="Target"
+					Distance=7
+					DamageMult=30
+					ComboMaster=1
+					WindUp=3
+					ManaCost=30
+					Cooldown=360
+					HitSparkIcon='Hit Effect Satsui.dmi'
+					HitSparkX=-32
+					HitSparkY=-32
+					HitSparkTurns=1
+					HitSparkSize=5
+					HitSparkCount=10
+					HitSparkDispersion=1
+					ForOffense=1
+					AdaptRate=1
+					SpecialAttack=1
+					WindupMessage="invokes: <font size=+1>ULTIMA!!!</font size>"
+					adjust(mob/p)
+						DamageMult = initial(DamageMult)
+					verb/Ultima()
+						set category="Skills"
+						adjust(usr)
+						usr.Activate(src)
 		Queue
 			var/UpgradedKeybladeSkill=0
 			Stun_Impact

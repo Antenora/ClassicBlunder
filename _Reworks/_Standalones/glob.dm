@@ -226,6 +226,8 @@ globalTracker
 
 		DISABLE_ALL_TELEPORTS = FALSE
 
+		MOB_POTENTIAL_MODIFIER = 99
+
 // - races
 		list/LockedRaces = list()
 		list/CustomCommons = list("Majin","Half-Saiyan", "Android")
@@ -306,6 +308,7 @@ globalTracker
 		TENACITY_VAI_MIN = 2
 		TENACITY_VAI_MAX = 14
 
+		ELEMENTAL_DIVIDER = 1
 
 		UNDERDOG_DMG_MULTIPLER = 1
 		UNDERDOG_RED_MULTIPLER = 1

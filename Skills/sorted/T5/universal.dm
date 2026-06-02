@@ -47,6 +47,8 @@
 	InfiniteHold = TRUE
 	FireRate = 1
 
+	ignoreBetterAim = TRUE
+
 	var/tmp/spin_dir = 0
 
 	OnHeldStart(mob/p)
@@ -140,7 +142,7 @@
 		if(ChantNumber==6)
 			src.ActiveMessage="chants: <b>UNITE!</b>"
 			src.DamageMult=40
-			p.Suspended=1
+			p.ActionLocked=1
 		if(ChantNumber==7)
 			src.ActiveMessage="chants: <b>REPULSE!</b>"
 			src.DamageMult=45
@@ -161,12 +163,12 @@
 		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
 		src.Cooldown(1, null, p)
 		ActiveMessage = "starts chanting..."
-		p.Suspended=0
+		p.ActionLocked=0
 
 	OnHeldFizzle(mob/p)
 		src.ChantNumber=0
 		ActiveMessage = "starts chanting..."
-		p.Suspended=0
+		p.ActionLocked=0
 
 	verb/Kurohitsugi()
 		set category = "Skills"

@@ -589,12 +589,27 @@ obj/Skills/Utility
 				usr << "You toggle anonymous telepathy <font color='green'>ON</font color>."
 		verb/Telepathic_Link()
 			set category="Utility"
+			if(MasteryCheck==0)
+				usr << "Applying race-based increase on your Mastery!"
+				MasteryCheck=1
+				if(usr.RaceInRareList())
+					Mastery=2
+					usr << "Mastery set to 2. You can telepathy across Z-Planes!"
+				else
+					Mastery=1
+					usr << "Mastery kept to 1. You can only telepathy on the same Z-Plane."
 			if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasRestriction("Senses"))
 				return
 			var/list/who=list("Cancel")
-			for(var/mob/Players/A in players)
-				if(A == usr) continue
-				who.Add(A)
+			if(Mastery <= 1) // Only check current Zplane
+				for(var/mob/Players/A in players)
+					if(A == usr) continue
+					if(A.z != usr.z) continue
+					who.Add(A)
+			else /// mastery above 1 let you telepath through z planes
+				for(var/mob/Players/A in players)
+					if(A == usr) continue
+					who.Add(A)
 			for(var/mob/Players/W in who)
 				if(!usr.isRace(SHINJIN))
 					if(!usr.passive_handler.Get("SpiritPower"))

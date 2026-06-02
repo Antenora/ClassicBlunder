@@ -1,3 +1,6 @@
+/mob/var/tmp/demon_makarakarn_until = 0
+/mob/var/tmp/demon_tetrakarn_until = 0
+
 /mob/Player/AI/Demon
 	var/datum/demon_data/demon_data = null
 	var/demon_owner_key = ""
@@ -10,7 +13,6 @@
 	var/demon_hp = 100
 	var/next_attack_multiplier = 1
 	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, DoDamage uses parent convention (src=attacker)
-	var/demon_reflect_until = 0
 	var/image/reflect_overlay_self = null
 	var/image/reflect_overlay_owner = null
 
@@ -192,7 +194,7 @@
 					DemonPassiveAddAilments(m)
 
 	proc/DemonDespawn()
-		DemonRemoveReflectOverlays()
+		DemonClearReflect()
 		RemoveDemonPassives()
 		RemoveSummonerPassiveGrants()
 		if(ai_owner)

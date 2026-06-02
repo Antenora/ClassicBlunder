@@ -161,7 +161,9 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 9, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=1.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			mastery_boons(mob/user)
+				passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -211,7 +213,6 @@ transformation
 			defense = 1.5
 			strength = 1.3
 			force = 1.3
-			revertToTrans = 0
 			var/previousTailIcon
 			var/previousTailUnderlayIcon
 			var/previousTailWrappedIcon

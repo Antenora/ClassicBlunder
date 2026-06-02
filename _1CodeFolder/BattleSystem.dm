@@ -3,7 +3,7 @@
 #define HIT 1 // WHEN YOU B HITTIN
 #define GLANCING 3 // ONLY FOR WHEN SURE HIT / SURE DODGE INTERACT
 #define WHIFF 2 // WHEN YOU HIT ON THE 2ND ROLL
-#define STATIC_RPP_GAIN 40
+#define STATIC_RPP_GAIN 999
 var/global/EXPERIMENTAL_ACCURACY = TRUE
 var/global/CLAMP_POWER = TRUE
 
@@ -525,7 +525,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 					if(P.HealthCut > 0)
 						P.HealthCut-=(0.001*src.Potential)
 						P.HealthCut = max(0, P.HealthCut)
-				var/potential_gain=a.Potential/2
+				var/potential_gain=(a.Potential/2)*glob.MOB_POTENTIAL_MODIFIER
 				if(P.party)
 					if(P.party.members.len>0)
 						potential_gain /= 2
@@ -2062,7 +2062,7 @@ mob
 
 
 mob/proc/Grab()
-	if(src.Stunned||src.icon_state=="KB")
+	if(src.Stunned||src.Suspended||src.icon_state=="KB")
 		return
 	if(!Grab)
 		if(lastZanzoUsage+3 > world.time)

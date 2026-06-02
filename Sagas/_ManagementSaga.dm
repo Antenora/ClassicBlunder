@@ -1685,7 +1685,17 @@ mob
 					if(src.SagaLevel==6)
 						//Final Form
 						//More Majjyk
-
+						if(src.KeybladeType=="Shield")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(2)
+						else if(src.KeybladeType=="Staff")
+							src.AddSkill(new/obj/Skills/AutoHit/Magic/Ultima)
+						else if(src.KeybladeType=="Sword")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(3)
 
 						if(src.KeybladeColor=="Light")
 							src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Final_Form)

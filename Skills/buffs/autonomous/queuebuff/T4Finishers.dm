@@ -60,7 +60,7 @@
 		TimerLimit = 40
 		passives = list("SpiritFlow"=1, "SpiritSword"=1, "ManaStats" = 1, "CallousedHands"=0.5, "PureReduction"=4, "TensionLock" = 1)
 	The_Ultimate_Fist
-		passives = list("CallousedHands"=0.25, "BlurringStrikes" = 4, "Hardeng" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1)
+		passives = list("CallousedHands"=0.25, "BlurringStrikes" = 4, "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1)
 		SpdMult=1.5
 		StrMult=1.5
 	Jackpot

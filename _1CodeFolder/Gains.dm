@@ -575,16 +575,16 @@ mob
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
 				if(Health>=50&&Health<=69)
 					if(passive_handler.Get("TrueZenkaiPower")<0.6)
-						passive_handler.Increase("TrueZenkaiPower", 0.03)
+						passive_handler.Increase("TrueZenkaiPower", 0.003)
 				if(Health>=30&&Health<=49)
 					if(passive_handler.Get("TrueZenkaiPower")<1)
-						passive_handler.Increase("TrueZenkaiPower", 0.05)
+						passive_handler.Increase("TrueZenkaiPower", 0.005)
 				if(Health>=15&&Health<=29)
-					if(passive_handler.Get("TrueZenkaiPower")<3)
-						passive_handler.Increase("TrueZenkaiPower", 0.08)
+					if(passive_handler.Get("TrueZenkaiPower")<2)
+						passive_handler.Increase("TrueZenkaiPower", 0.008)
 				if(Health<=14)
-					if(passive_handler.Get("TrueZenkaiPower")<5)
-						passive_handler.Increase("TrueZenkaiPower", 0.1)
+					if(passive_handler.Get("TrueZenkaiPower")<3)
+						passive_handler.Increase("TrueZenkaiPower", 0.01)
 			if(passive_handler.Get("Full Manifestation"))
 				src.HandleEldritchTax()
 			if(passive_handler.Get("TrueZenkaiPower")&&src.icon_state=="Meditate")
@@ -597,7 +597,7 @@ mob
 						src.Tension=100
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
 				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
-					if(!src.Stunned)
+					if(!src.Stunned&&!src.Suspended)
 						src.DoDamage(src, (rand(1,5)/30))
 			if(passive_handler["Grit"])
 				AdjustGrit("sub", glob.racials.GRITSUBTRACT)
@@ -925,7 +925,7 @@ mob
 				if(src.CheckActive("Ki Control")) //Power Control effects this.
 					if(src.Slow < src.SagaLevel * 5)
 						src.Slow=src.SagaLevel * 5
-					AddSlow(0.2*glob.SLOW_INTENSITY) // Increases how much slow/chill you gain per tick.
+					AddSlow((0.5 + (0.1*src.SagaLevel))*glob.SLOW_INTENSITY) // Increases how much slow/chill you gain per tick.
 					if(src.Slow > SagaLevel * 10) // When you Power Up and get too cold, you start injurying yourself.
 						src.TotalInjury += 0.001 * (src.Slow-(SagaLevel * 10))
 			if(passive_handler["Grit"])

@@ -211,6 +211,9 @@ obj
 				LingeringTornado//spawn obj/leftOver/LingeringTornado on hit
 				BypassTempHP=0//if 1, damage bypasses VaizardHealth and BioArmor, hitting Health directly
 				SkillDeicide=0//temporarily adds this much Deicide on hit
+
+				ignoreBetterAim = FALSE
+
 			skillDescription()
 				..()
 				if(MaimCost)
@@ -3324,12 +3327,12 @@ obj
 							FireFromEnemy=0
 							usr.UseProjectile(src)
 				Hadoken
-					Cooldown=40
+					Cooldown=15
 					ActiveMessage = "HADOKEN!"
 					activate(mob/player)
-						var/cooldown = 60
+						var/cooldown = 15
 						var/sagaLevel = player.SagaLevel
-						var/damage = 1 + (0.5 * sagaLevel)
+						var/damage = 0.5 + (0.25 * sagaLevel)
 						var/ansatsukenPath = player.AnsatsukenPath == "Hadoken" ? 1 : 0
 						var/distance = 30
 						var/charge = 0.25
@@ -3338,14 +3341,14 @@ obj
 						Knockback = 2
 						if(ansatsukenPath)
 							cooldown -= 5
-							damage = 2 + (1.5 * sagaLevel)
+							damage = 1 + (0.25 * sagaLevel)
 							Knockback = 3
 						if(player.AnsatsukenAscension == "Satsui" && src.IconLock == 'Hadoken.dmi')
 							src.IconLock = 'Hadoken - Satsui.dmi'
 						DamageMult = damage
 						Distance = distance
 						Charge = charge
-						MultiHit = 5
+						MultiHit = 3
 						IconSize = iconSize
 						Radius = 1
 						Stunner = stunner
@@ -3398,8 +3401,8 @@ obj
 					AccMult=50
 					MultiHit=15
 					HyperHoming=1
-					Dodgeable=-1
-					Deflectable=-1
+					Dodgeable=0
+					Deflectable=0
 					Knockback=1
 					Cooldown=180
 					IconSize=3
@@ -5733,7 +5736,7 @@ obj
 						if(src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 					else
-						if(src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
+						if(!Z.ignoreBetterAim&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 							src.LosesHoming=src.Owner.GetBetterAim()
 					src.HyperHoming=Z.HyperHoming
@@ -6354,7 +6357,7 @@ obj
 						if(HolyMod) specDmgTypes["Holy"] = HolyMod;
 						if(AbyssMod) specDmgTypes["Abyss"] = AbyssMod;
 						if(SlayerMod) specDmgTypes["Slayer"] = SlayerMod;
-						if(specDmgTypes.len) EffectiveDamage *= 1 + Owner.attackModifiers(m, specDmgTypes);
+						if(specDmgTypes.len) EffectiveDamage *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
 						//Technically these are going to get doubletapped for projectiles
 						//because attackModifiers is called here as well as in dodamage
 						//which will be run further below
@@ -6422,7 +6425,7 @@ obj
 										m.BioArmor = 0
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
-									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive)
+									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 									if(src.BypassTempHP)
@@ -6467,6 +6470,8 @@ obj
 								if(!(Piercing && m && (AlreadyHit["[m.ckey]"] >= MultiHit + 1)) || Bounce)
 									if(!AlreadyHit["[m.ckey]"]) AlreadyHit["[m.ckey]"] = 0
 									//EffectiveDamage *= clamp((1 - (0.1 *AlreadyHit["[m.ckey]"])), 0.1, 1)
+									if(src.SpellElement == "Water")
+										EffectiveDamage *= m.getWaterResistValue()
 
 									// Skill-level CriticalChance/Combustion: temporary attacker bump.
 									var/_skillCritDmgS = src.CriticalChance * 0.01
@@ -6496,7 +6501,7 @@ obj
 											m.BioArmor = 0
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
-										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive)
+										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 										if(src.BypassTempHP)

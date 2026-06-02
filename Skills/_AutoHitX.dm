@@ -3336,9 +3336,7 @@ obj
 				Light_Eater
 				Cage_of_Time
 
-				Ultima
-					SignatureTechnique=4
-					Destructive=1
+
 
 
 /// MAGIC AUTO HIT SIGS T1
@@ -5973,6 +5971,7 @@ obj
 			AngelMagicCompatible
 			ApplyJudged
 			ApplySentenced
+			ElementalClass
 			FixedDamage=0
 
 			Arcing//Triggers offshoots on every step that expand outwards.  Higher than 1 means that every X steps the range will widen.
@@ -6180,6 +6179,7 @@ obj
 			else
 				src.ForDmg=Z.ForOffense
 			src.SpellElement=Z.SpellElement
+			src.ElementalClass=Z.ElementalClass
 			// Time Future mage passive: 50% spell cost refund on land. Captures the
 			// would-be drain value at construction time so Damage(m) can refund half
 			// on first hit. We replicate the deduction formula from ClearTech (line
@@ -6917,7 +6917,7 @@ obj
 					if(FromSkill.HolyMod) specDmgTypes["Holy"] = FromSkill.HolyMod
 					if(FromSkill.AbyssMod) specDmgTypes["Abyss"] = FromSkill.AbyssMod
 					if(FromSkill.SlayerMod) specDmgTypes["Slayer"] = FromSkill.SlayerMod
-					if(specDmgTypes.len) FinalDmg *= 1 + Owner.attackModifiers(m, specDmgTypes)
+					if(specDmgTypes.len) FinalDmg *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
 				var/reversalChance = m.GetAutoReversal()
@@ -6990,7 +6990,9 @@ obj
 						flick("Attack", Owner)
 						Owner.DoDamage(Owner, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, Autohit=TRUE)
 						return
-					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE)
+					if(src.SpellElement == "Water" || src.ElementalClass == "Water")
+						FinalDmg *= m.getWaterResistValue()
+					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmg)
@@ -7854,6 +7856,7 @@ obj
 /mob
 	var
 		tmp/Suspended = null
+		tmp/ActionLocked = null
 		tmp/judgement_cut_chain_active = FALSE
 		tmp/judgement_cut_bonus_value = 1
 		tmp/judgement_cut_bonus_chain_count = 0
@@ -7962,7 +7965,7 @@ obj
 			if(!chain_active)
 				window_loop_running = FALSE
 				return
-			if(user.Stunned || user.Launched || user.Stasis > 0 || user.KO)
+			if(user.Stunned || user.Suspended || user.Launched || user.Stasis > 0 || user.KO)
 				window_loop_running = FALSE
 				EndChain()
 				return
@@ -8025,9 +8028,6 @@ obj
 				return
 			if(get_dist(p, T) > Distance)
 				p << "<font color='red'>Target is out of range.</font>"
-				return
-			if(T.Suspended)
-				p << "<font color='red'>That target is already suspended.</font>"
 				return
 			StartChain(p, T)
 		else

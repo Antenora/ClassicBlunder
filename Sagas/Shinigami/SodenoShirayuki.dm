@@ -24,7 +24,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		var/SL = p.SagaLevel
 		passives = list(
 			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
-			"ChillResist"    = 1 * SL, // This should make it so that Chill hurts you less.
+			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"SpiritSword"    = 0.25 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 5 * SL,
@@ -85,7 +85,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		var/SL = p.SagaLevel
 		passives = list(
 			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
-			"ChillResist"    = 2 * SL, // This should make it so that Chill hurts you less.
+			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"SpiritSword"    = 0.5 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 10 * SL,
@@ -236,6 +236,7 @@ obj/Skills/AutoHit
 		Rounds=10
 		DamageMult=0.5
 		Area="Around Target"
+		ElementalClass="Water"
 		FlickAttack=1
 		Distance=5
 		Freezing=5
@@ -257,7 +258,7 @@ obj/Skills/AutoHit
 			Chilling = 5 + p.SagaLevel
 		verb/Tsukishiro()
 			set category="Skills"
-			if(!usr.CheckSlotless("Sode-no-Shirayuki") && !usr.CheckSlotless("Hakka-no-Togame"))
+			if(!usr.InShikai() && !usr.InBankai())
 				usr << "You can only use this technique in Shikai or Bankai!"
 				return
 			else
@@ -269,6 +270,7 @@ obj/Skills/AutoHit
 		ForOffense=1
 		DamageMult=10
 		Area="Wave"
+		ElementalClass="Water"
 		FlickAttack=1
 		Distance=10
 		Freezing=20
@@ -292,17 +294,17 @@ obj/Skills/AutoHit
 				Area="Wide Wave"
 		verb/Hakuren()
 			set category="Skills"
-			if(!usr.CheckSlotless("Sode-no-Shirayuki") && !usr.CheckSlotless("Hakka-no-Togame"))
+			if(!usr.InShikai() && !usr.InBankai())
 				usr << "You can only use this technique in Shikai or Bankai!"
 				return
 			else
 				usr.Activate(src)
 	Hakusen // Given at T4, Bankai Exclusive
-		ElementalClass="Water"
 		name="Hakusen"
 		ForOffense=1
 		StrOffense=0
 		Area="Circle"
+		ElementalClass="Water"
 		TurfShift='SnowFloor.dmi'
 		TurfShiftDuration=60
 		Distance=12
@@ -322,13 +324,13 @@ obj/Skills/AutoHit
 		ActiveMessage="drops their surroundings to Absolute Zero!"
 		Slow=1
 		NoLock=1
-		Cooldown=-1
+		Cooldown=240
 		adjust(mob/p)
-			DamageMult = 10 + (1.5 * p.SagaLevel)
-			Distance = 12 + (2 * p.SagaLevel)
-		verb/hakusen()
+			DamageMult = 10 + (3 * p.SagaLevel)
+			Distance = 12 + (1 * p.SagaLevel)
+		verb/Hakusen()
 			set category="Skills"
-			if(!usr.CheckSlotless("Hakka-no-Togame"))
+			if(!usr.InBankai())
 				usr << "You can only use this technique in Bankai!"
 				return
 			else
@@ -380,7 +382,11 @@ obj/Skills/Buffs/SlotlessBuffs
 		verb/Shirafune()
 			set category="Skills"
 			adjust(usr)
-			src.Trigger(usr)
+			if(!usr.InShikai() && !usr.InBankai())
+				usr << "You can only use this technique in Shikai or Bankai!"
+				return
+			else
+				src.Trigger(usr)
 
 
 /* Placeholdering this for now, for when I design the skills. Keeping this here for scaling purposes.

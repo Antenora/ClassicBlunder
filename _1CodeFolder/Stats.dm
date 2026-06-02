@@ -873,13 +873,6 @@ mob/proc/
 		if(src.NanoBoost&&src.Health<25)
 			EPM+=0.25
 
-		// if(src.DemonicPower())
-		// 	var/pot=src.get_potential()
-		// 	EPM+=pot/100
-
-		// if(isRace(MAKYO)&&src.ActiveBuff&&!src.HasMechanized())
-		// 	EPM+=0.1*src.AscensionsAcquired
-
 		if(EPM<=0)
 			EPM=0.1
 		//Ratio
@@ -962,7 +955,7 @@ mob/proc/
 							if(steps > 0)
 								var/wrathAnger = 0.2 * steps * src.passive_handler.Get("WrathFactor")
 								if(src.passive_handler.Get("Limited Rank-Up"))
-									wrathAnger *= 2
+									wrathAnger *= 3
 								a += wrathAnger
 					if(src.CyberCancel>0 && !isRace(ANDROID))
 						var/ang=a-1//Usable anger.
@@ -983,26 +976,8 @@ mob/proc/
 				Ratio*=src.PowerInvisible
 			if(src.PowerBoost)
 				Ratio*=src.PowerBoost
-		//	var/SSJBoost=1//i see you, unused-as-of-yet variable. don't think i don't
 			if(passive_handler.Get("SaiyanPower"))
 				Ratio*=src.GetSaiyanPower()
-			if(isRace(SAIYAN)&&passive_handler.Get("SpiralPowerUnlocked")||isRace(HALFSAIYAN)&&passive_handler.Get("SpiralPowerUnlocked"))
-				switch(transUnlocked)
-					if(0)
-						Ratio*=1.4
-					if(1)
-						Ratio*=1.2
-					if(2)
-						Ratio*=1.5
-					if(3)
-						Ratio*=2
-					if(4)
-						Ratio*=1.5
-					if(5)
-						if(HasGodKi())
-							Ratio*=1.15
-						else
-							Ratio*=1.25
 			if(passive_handler.Get("Undeterred"))
 				Ratio*=1+((StrTax+ForTax)/2)
 			if(passive_handler.Get("SSJRose"))
@@ -1032,6 +1007,14 @@ mob/proc/
 		Ratio += (scalingEldritchPower() * 2 / 10);
 		if(passive_handler.Get("NameCurse")=="Black Ant")
 			Ratio*=0.01
+		
+		if(src.Dead&&!src.KeepBody)
+			Ratio*=0.5
+		else if(src.z==glob.DEATH_LOCATION[3]&&!src.CheckSpecial("Cancer Cloth")&&src.SenseUnlocked<8&&!src.passive_handler.Get("SpiritPower"))
+			Ratio*=0.5
+		if(src.KO)
+			Power*=0.05
+		
 		Power=Ratio*GetPowerUpRatio()
 
 		if(Power < 1)
@@ -1054,14 +1037,6 @@ mob/proc/
 			if(majinAbsorb.absorbed && majinAbsorb.absorbed.len)
 				Power += majinAbsorb.SumAbsorbedPeakPower(src)
 			Power += majinAbsorb.permanentAbsorbPower
-
-		if(src.Dead&&!src.KeepBody)
-			Ratio*=0.5
-		else if(src.z==glob.DEATH_LOCATION[3]&&!src.CheckSpecial("Cancer Cloth")&&src.SenseUnlocked<8&&!src.passive_handler.Get("SpiritPower"))
-			Ratio*=0.5
-
-		if(src.KO)
-			Power*=0.05
 
 		if(GetPowerUpRatio()<=1)
 			if(icon_state=="Meditate")

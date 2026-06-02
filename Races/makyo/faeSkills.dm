@@ -52,7 +52,7 @@
 				passives["Godspeed"] = p.AscensionsAcquired
 				AutoAnger=0
 				AngerStorage=0
-				if(p.passive_handler.Get("StarPower"))
+				if(p.passive_handler.Get("StarPower")||p.AscensionsAcquired>=4)
 					AutoAnger=1
 					AngerMult=2
 					passives["Pursuer"] = 2 * p.AscensionsAcquired

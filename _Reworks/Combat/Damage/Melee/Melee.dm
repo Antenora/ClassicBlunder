@@ -724,6 +724,8 @@
 									enemy.AddCrippling(AttackQueue.Crippling, src)
 								if(AttackQueue.Doom)
 									enemy.AddDoom(AttackQueue.Doom, src)
+								if(AttackQueue.Ashing)
+									applyAshChoked(enemy, src)
 
 								if(AttackQueue.Dunker)
 									if(enemy.Launched)
@@ -803,7 +805,8 @@
 								var/dist = get_dist(src, enemy)
 								if(dist > 0)
 									damage *= 1 + (sniper * dist * 0.01)
-							var/dmgValue = DoDamage(enemy, damage, unarmedAtk, swordAtk, SecondStrike, ThirdStrike, AsuraStrike)
+							// For Tetrakarn reflect
+							var/dmgValue = DoDamage(enemy, damage, unarmedAtk, swordAtk, SecondStrike, ThirdStrike, AsuraStrike, atkMeleePipe=1, atkSpellElem=(AttackQueue ? AttackQueue.SpellElement : null))
 							. = dmgValue
 							if(!glob.MOMENTUM_PROCS_OFF_DAMAGE)
 								handlePostDamage(enemy) // it already proc'd
