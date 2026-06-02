@@ -100,7 +100,7 @@
 			target.vis_contents += GE
 
 			// Snare target for 4 seconds
-			target.applySnare(40)
+			target.applySnare(4)
 
 			// Record where the target is standing
 			var/turf/start_loc = target.loc
