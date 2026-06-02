@@ -340,10 +340,13 @@ obj/Skills/Queue/Kibou_ou_Hope
 	verb/Kibou_ou_Hope()
 		set category = "Skills"
 		if(!usr.isInHighTension())
-			usr << "You cannot use this power right now."
+			usr << "You are not a Mazoku Human."
 			return
 		if(!usr.passive_handler || !usr.passive_handler.Get("HopeFactor"))
-			usr << "You cannot use this power right now."
+			usr << "You aren't hopeful enough to use this power."
+			return
+		if(!usr.isInMazokuDT())
+			usr << "You cannot use this in Mazoku DT."
 			return
 		var/healthDiff = 0
 		if(usr.Target && istype(usr.Target, /mob/Players) && usr.Target != usr)
