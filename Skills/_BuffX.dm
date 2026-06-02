@@ -10136,9 +10136,6 @@ NEW VARIABLES
 				adjust(mob/p)
 					var/SpiralPower=1
 					var/healthDiff = 0
-					var/Tyrant
-					var/TyrantBonus=1
-					var/SpiralPotential=1
 					if(!altered)
 						var/secretLevel = p.secretDatum.currentTier
 						var/asc = p.AscensionsAcquired
@@ -10147,10 +10144,6 @@ NEW VARIABLES
 						switch(healthDiff)
 							if(-100 to 5)
 								secretLevel += 0
-								if(p.passive_handler.Get("SpiralTyrant"))
-									secretLevel += 2
-									Tyrant=1
-									TyrantBonus=4
 							if(5 to 15)
 								secretLevel += 0
 							if(16 to 25)
@@ -10179,7 +10172,7 @@ NEW VARIABLES
 						StrMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
-						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = secretLevel, "PureReduction" = secretLevel, "EnergyGeneration" = SpiralPower)
+						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = secretLevel, "PureReduction" = secretLevel, "EnergyGeneration" = SpiralPower, "Motivation" = 1)
 						TimerLimit= 60
 						Cooldown = 90 - (SpiralPower*5)
 						if(secretLevel>=5)
@@ -10210,11 +10203,6 @@ NEW VARIABLES
 				adjust(mob/p)
 					var/secretLevel = p.secretDatum.currentTier
 					var/asc = p.AscensionsAcquired
-					var/SpiralPower=1
-					var/healthDiff = 0
-					var/Tyrant
-					var/TyrantBonus=1
-					var/SpiralPotential=1
 					if(!altered)
 						//if(insert certain condition here)
 							//OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
