@@ -10,11 +10,13 @@
         Level = lvl
         ..()
     Trigger(mob/User, Override)
+        var/DefReduction=sqrt(User.GetDef())
         if(User.BuffOn(src))
             // we r calling an end to it
             var/damage2do = User.passive_handler["Dim Mak"]
             User.passive_handler.Set("Dim Mak", 1)
             damage2do *= clamp((15*Level)/100, 0.1, 1)// applier's style tier
+            damage2do /= DefReduction
             OMsg(User, "[User]'s Death Mark implodes!")
             User.LoseHealth(damage2do)
         ..()
