@@ -173,7 +173,7 @@ mob
 					defender.LoseMana(val*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
 
 			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", val)
+				defender.passive_handler.Increase("Dim Mak", val/10)
 			handlePostDamage(defender)
 			if(defender.VaizardHealth)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
