@@ -15,23 +15,44 @@
 			"HolyMod"        = 2,
 			"EvilResist"     = 2
 		)
+		if(p.ShinigamiRelease == "Katen Kyokotsu")
+			passives["NeedsSecondSword"] = 1
 
 	proc/applyForm(mob/p)
 		if(p.equippedSword)
 			p.equippedSword.UnEquip(p)
 		if(p.equippedArmor)
 			p.equippedArmor.UnEquip(p)
+		if(p.ShinigamiRelease == "Katen Kyokotsu")
+			var/hasDual = FALSE
+			var/obj/Items/primaryZ
+			for(var/obj/Items/i in p)
+				if(istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
+					hasDual = TRUE
+				else if(i.IsZanpakuto)
+					primaryZ = i
+			if(!hasDual)
+				var/obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual/z2 = new(p)
+				z2.Class = p.ZanpakutoClass
+				z2.setStatLine()
+				z2.name = primaryZ ? primaryZ.name : "Zanpakutō ([p.AsauchiName])"
+				z2.Ascended = min(1 + p.SagaLevel, 6)
 		for(var/obj/Items/i in p)
-			if(i.IsZanpakuto)
+			if(i.IsZanpakuto && !istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
 				i.Equip(p)
-				break
+		for(var/obj/Items/i in p)
+			if(istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
+				i.Equip(p)
 		for(var/obj/Items/i in p)
 			if(i.IsShihakusho)
 				i.Equip(p)
 				break
 		p.InShinigamiForm = TRUE
+		p.AppearanceOff()
+		p.AppearanceOn()
 
 	proc/revertForm(mob/p)
+		p.InShinigamiForm = FALSE
 		for(var/obj/Items/i in p)
 			if(i.IsZanpakuto && i.suffix)
 				i.UnEquip(p)
@@ -40,18 +61,26 @@
 				i.UnEquip(p)
 		revertZanpakutoIcon(p)
 		revertShihakushoIcon(p)
-		p.InShinigamiForm = FALSE
+		p.AppearanceOff()
+		p.AppearanceOn()
 
 	proc/applyShikaiIcon(mob/user)
-		if(!user.ShikaiIcon) return
 		for(var/obj/Items/i in user)
 			if(i.IsZanpakuto && i.suffix)
-				user.AppearanceOff()
-				i.icon = user.ShikaiIcon
-				i.pixel_x = user.ShikaiIconX
-				i.pixel_y = user.ShikaiIconY
-				user.AppearanceOn()
-				break
+				if(istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
+					if(!user.ShikaiIconDual) continue
+					user.AppearanceOff()
+					i.icon = user.ShikaiIconDual
+					i.pixel_x = user.ShikaiIconDualX
+					i.pixel_y = user.ShikaiIconDualY
+					user.AppearanceOn()
+				else
+					if(!user.ShikaiIcon) continue
+					user.AppearanceOff()
+					i.icon = user.ShikaiIcon
+					i.pixel_x = user.ShikaiIconX
+					i.pixel_y = user.ShikaiIconY
+					user.AppearanceOn()
 
 	proc/applyBankaiIcon(mob/user)
 		if(!user.BankaiIcon) return
@@ -68,11 +97,15 @@
 		for(var/obj/Items/i in user)
 			if(i.IsZanpakuto && i.suffix)
 				user.AppearanceOff()
-				i.icon = 'Goemon Katana Unsheathed.dmi'
-				i.pixel_x = -16
-				i.pixel_y = -16
+				if(istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
+					i.icon = 'Goemon Katana Unsheathed 2.dmi'
+					i.pixel_x = -16
+					i.pixel_y = -16
+				else
+					i.icon = 'Goemon Katana Unsheathed.dmi'
+					i.pixel_x = -16
+					i.pixel_y = -16
 				user.AppearanceOn()
-				break
 
 	proc/applyBankaiShihakushoIcon(mob/user)
 		if(!user.BankaiShihakushoIcon) return
@@ -131,6 +164,18 @@
 		usr.ShikaiIcon = newIcon
 		usr.ShikaiIconX = newX
 		usr.ShikaiIconY = newY
+		var/hasDual = FALSE
+		for(var/obj/Items/i in usr)
+			if(istype(i, /obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual))
+				hasDual = TRUE
+				break
+		if(hasDual)
+			if(alert(usr, "Change your second Zanpakutō's Shikai appearance too?", "Second Zanpakutō", "Yes", "No") == "Yes")
+				var/icon/dualIcon = input(usr, "Set second Zanpakutō Shikai icon to what?") as icon|null
+				if(!isnull(dualIcon))
+					usr.ShikaiIconDual = dualIcon
+					usr.ShikaiIconDualX = input(usr, "Pixel X offset?") as num
+					usr.ShikaiIconDualY = input(usr, "Pixel Y offset?") as num
 		if(usr.InShikai())
 			applyShikaiIcon(usr)
 

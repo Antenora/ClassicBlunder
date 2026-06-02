@@ -6425,7 +6425,9 @@ obj
 										m.BioArmor = 0
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
+									src.Owner.ProjectileAttacking = TRUE
 									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+									src.Owner.ProjectileAttacking = FALSE
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 									if(src.BypassTempHP)
@@ -6501,7 +6503,9 @@ obj
 											m.BioArmor = 0
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
+										src.Owner.ProjectileAttacking = TRUE
 										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+										src.Owner.ProjectileAttacking = FALSE
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 										if(src.BypassTempHP)

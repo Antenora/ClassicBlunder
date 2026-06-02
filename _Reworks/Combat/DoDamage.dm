@@ -22,6 +22,8 @@
 		return 0
 	if(defender.AdminOverwatchActive)
 		return 0;
+	if(defender.HiddenInShadow)
+		return 0
 	if(defender == src)
 		DEBUGMSG("Defender was src, and so newDoDamage stopped early")
 		// Dark Survivor mage passive: self-damage refunds 20% of the incoming value
@@ -371,6 +373,30 @@
 					defender.loc = nextT
 				else
 					break
+	// For Irooni, debuff's current color rewards the matching attack type and punishes a wrong
+	// one. Red=Autohit, Blue=Queue, Green=Projectile. Match x1.5 damage, mismatch x0.5.
+	// Normal attacks and grapples and other forms of damage are exempt from this
+	if(val > 0 && defender.IroniActive && defender.IroniCaster == src)
+		var/IroniType = null
+		if(src.AutoHitting)
+			IroniType = "red"
+		else if(AttackQueue)
+			IroniType = "blue"
+		else if(ProjectileAttacking)
+			IroniType = "green"
+		if(IroniType)
+			var/IroniNewBurst = (world.time - src.IroniLastResonateTime > 10)
+			if(IroniType == defender.IroniColor)
+				val *= 1.5
+				if(src.client && IroniNewBurst)
+					src << "<font color='#ffd24d'><b>Irooni resonates, your strike hits harder!</b></font>"
+			else
+				val *= 0.5
+			src.IroniLastResonateTime = world.time
+	// Ichidanme: Tameraikizu no Wakachiai makes it so whoever deals damage to the other also takes that damage 
+	// to themselves as Injury. Excludes Itokiribasami
+	if(val > 0 && src.TameraikizuActive && src.TameraikizuPartner == defender && !src.ItokiribasamiAttacking)
+		src.WoundSelf(val)
 	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit at the end of newdodamage");
 		#if DEBUG_DAMAGE

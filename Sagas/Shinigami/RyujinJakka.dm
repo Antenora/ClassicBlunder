@@ -634,7 +634,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(!src.target || !src.target.loc) return
 		if(get_dist(src, src.target) <= 1) return
 		var/d = get_dir(src, src.target)
-		for(var/dd in list(d, turn(d, 45), turn(d, -45), turn(d, 90), turn(d, -90)))
+		for(var/dd in list(d, turn(d, 45), turn(d, -45)))
 			var/turf/dest = get_step(src, dd)
 			if(src.turfFree(dest))
 				src.dir = dd

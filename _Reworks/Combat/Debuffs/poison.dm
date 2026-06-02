@@ -162,6 +162,8 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 				Bleed -= base * (1 + (GetDebuffResistance() / 4))
 			if(Bleed<0)
 				Bleed = 0
+			if(KatenBleedLock && Bleed < KatenBleedLock)
+				Bleed = KatenBleedLock
 
 /mob/var/tmp/last_implode
 mob/proc/implodeDebuff(n, type)

@@ -487,6 +487,9 @@ mob/Players
 		DevilSummonerRestoreVerbs()
 		initShortcuts();
 		MajinAbsorbOnLogin()
+		if(istype(src, /mob/Players))
+			var/mob/Players/SBP = src
+			SBP.Shadowbringer_ClearShadow()
 		return
 	Logout()
 		if(src.Airborne)
@@ -496,6 +499,13 @@ mob/Players
 			src.alpha = 255
 			src.pixel_z = 0
 			animate(src)
+		// Kageoni safeguard
+		if(istype(src, /mob/Players))
+			var/mob/Players/P = src
+			if(P.HiddenInShadow || P.HideInShadowsActive)
+				P.KageoniForceReset()
+			P.Shadowbringer_ClearShadow()
+			P.KatenCleanseBankaiState()
 		ForceClearHeldChargeState()
 		MajinAbsorbOnLogout()
 		DevilSummonerLogout()

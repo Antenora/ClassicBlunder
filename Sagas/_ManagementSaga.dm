@@ -117,6 +117,23 @@ mob/var
 	InShinigamiForm = FALSE
 	UsedFinalGetsuga = FALSE
 
+	ShikaiIconDual
+	ShikaiIconDualX = 0
+	ShikaiIconDualY = 0
+	tmp/HideInShadowsActive = 0
+	tmp/HiddenInShadow = 0
+	tmp/KageoniEndTime = 0
+	tmp/KageoniMidTransition = 0
+	tmp/obj/Effects/Shadowbringer_Shadow/CurrentShadow
+	tmp/obj/Effects/Shadowbringer_Shadow/ShadowbringerShadowObj
+	tmp/IroniActive = 0
+	tmp/IroniColor
+	tmp/mob/IroniCaster
+	tmp/DarumaActive = 0
+	tmp/mob/DarumaTarget
+	tmp/DarumaEndTime = 0
+	tmp/ProjectileAttacking = 0
+
 	// Kido pick tracking, shared across all four trees (Hado, Bakudo, Hoho, Hakuda)
 	KidoSL1Picks = 0   // max 2; tier cap <=1
 	KidoSL3Picks = 0   // max 2; tier cap <=2

@@ -156,6 +156,11 @@ mob/proc/MovementSpeed()
 		Delay*=4
 	if(src.SenseRobbed>=1&&(src.SenseUnlocked<=src.SenseRobbed&&src.SenseUnlocked>5))
 		Delay*=(2*src.SenseRobbed)
+	// Daruma-san ga Koronda is 2x move speed only when moving towards the target
+	if(src.DarumaActive)
+		var/turf/dahead = get_step(src, src.dir)
+		if(dahead && src.DarumaMovingToward(dahead))
+			Delay /= 2
 	return Delay
 
 mob/Move()

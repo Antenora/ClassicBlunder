@@ -1155,11 +1155,20 @@ mob
 				return 1
 			return 0
 		HasUnstoppable()
+			// Tragedy (Katen Kyokotsu Bankai) negates Unstoppable on the Bankai user and their current target.
+			if(HasTragedyNullify())
+				return 0
 			if(Secret == "Zombie")
 				return 1
 			if(passive_handler.Get("Unstoppable")>=1||passive_handler.Get("The Immovable Object"))
 				return 1
 			if(passive_handler.Get("You Thought"))
+				return 1
+			return 0
+		HasTragedyNullify()
+			if(passive_handler.Get("Tragedy"))
+				return 1
+			if(TragedyAfflicted && (world.time - TragedyAfflicted) < 10)
 				return 1
 			return 0
 		HasUnbreakable()
@@ -1460,6 +1469,9 @@ mob
 			var/Return=1.05+(0.1*AscensionsAcquired)
 			return Return
 		HasInjuryImmune()
+			// Tragedy (Katen Kyokotsu Bankai) negates InjuryImmune on the Bankai user and their current target.
+			if(HasTragedyNullify())
+				return 0
 			if(passive_handler.Get("InjuryImmune"))
 				return 1
 			return 0

@@ -66,6 +66,9 @@ obj
 				HealthRecoveryValue
 				//Cooldown
 
+				// Executing: when 1, this autohit deals +1% damage per 1 Injury on the target
+				Executing = 0
+
 				//These four can be used in any combination.
 				StrOffense//Uses STR for damage.
 				ForOffense//Uses FOR for damage.
@@ -6078,6 +6081,7 @@ obj
 			ChargeTime
 			RagingDemonAnimation = FALSE
 			Executor
+			Executing
 			Primordial
 			SpeedStrike
 			AdaptDmg
@@ -6259,6 +6263,7 @@ obj
 			src.ChargeTech=Z.ChargeTech
 			src.UnarmedTech=Z.UnarmedOnly
 			src.SwordTech=Z.NeedsSword
+			src.Executing=Z.Executing
 			src.SpecialAttack=Z.SpecialAttack
 			src.Deluge=Z.Deluge
 			src.Stunner=Z.Stunner
@@ -6992,6 +6997,9 @@ obj
 						return
 					if(src.SpellElement == "Water" || src.ElementalClass == "Water")
 						FinalDmg *= m.getWaterResistValue()
+					// Executing is +1% damage per 1 Injury on the target
+					if(src.Executing && m)
+						FinalDmg *= 1 + (0.01 * m.TotalInjury)
 					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)

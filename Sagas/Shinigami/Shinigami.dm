@@ -3,7 +3,7 @@ mob/proc/gainShinigami()
 	src.Saga = "Shinigami"
 	src.SagaLevel = 1
 
-	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka")
+	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka", "Katen Kyokotsu")
 	src.ShinigamiRelease = input("Which Release does [src] receive?", "Zanpakutō Release") in Releases
 
 	src.ZanpakutoClass = input(src, "What form does your Zanpakutō take?", "Zanpakutō Class") in list("Light", "Medium", "Heavy")
@@ -22,6 +22,13 @@ mob/proc/gainShinigami()
 	z.name = "Zanpakutō ([src.AsauchiName])"
 	z.Ascended = min(1 + src.SagaLevel, 6)
 
+	if(src.ShinigamiRelease == "Katen Kyokotsu")
+		var/obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual/z2 = new(src)
+		z2.Class = src.ZanpakutoClass
+		z2.setStatLine()
+		z2.name = "Zanpakutō ([src.AsauchiName])"
+		z2.Ascended = min(1 + src.SagaLevel, 6)
+
 	var/obj/Items/Armor/sh
 	switch(src.ShihakushoClass)
 		if("Light")
@@ -38,6 +45,8 @@ mob/proc/gainShinigami()
 
 	if(src.ShinigamiRelease == "Nozarashi")
 		src << "A <b>[src.ZanpakutoClass]</b> Zanpakutō and <b>[src.ShihakushoClass]</b> Shihakushō have found their way into your possession, somehow."
+	else if(src.ShinigamiRelease == "Katen Kyokotsu")
+		src << "A matched pair of <b>[src.ZanpakutoClass]</b> Zanpakutō and a <b>[src.ShihakushoClass]</b> Shihakushō have formed for you, twin extensions of your soul."
 	else
 		src << "A <b>[src.ZanpakutoClass]</b> Zanpakutō and <b>[src.ShihakushoClass]</b> Shihakushō have formed for you, serving as an extension of your soul."
 	src << "Use <b>Shinigami Form</b> to don your Zanpakutō and Shihakushō."
@@ -77,6 +86,11 @@ mob/tierUpSaga(Path)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Ryujin_Jakka)
 								src.AddSkill(new/obj/Skills/AutoHit/Taimatsu)
 								src.AddSkill(new/obj/Skills/Jokaku_Enjo)
+							if("Katen Kyokotsu")
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Katen_Kyokotsu)
+								src.AddSkill(new/obj/Skills/Projectile/Bushogoma)
+								src.AddSkill(new/obj/Skills/Takaoni)
+								src.AddSkill(new/obj/Skills/Kageoni)
 				updateShinigamiAscended()
 
 			if(3)
@@ -107,6 +121,14 @@ mob/tierUpSaga(Path)
 								if(!locate(/obj/Skills/Ennetsu_Jigoku, src))
 									src.AddSkill(new/obj/Skills/Ennetsu_Jigoku)
 									src << "The flames of your blade descend into a converging hell. You can now use <b>Ennetsu Jigoku</b>."
+							if("Katen Kyokotsu")
+								if(!locate(/obj/Skills/Irooni, src))
+									src.AddSkill(new/obj/Skills/Irooni)
+								if(!locate(/obj/Skills/Daruma_san_ga_Koronda, src))
+									src.AddSkill(new/obj/Skills/Daruma_san_ga_Koronda)
+								if(!locate(/obj/Skills/Kageokuri, src))
+									src.AddSkill(new/obj/Skills/Kageokuri)
+								src << "You learn new games. You can now use <b>Irooni</b>, <b>Daruma-san ga Koronda</b>, and <b>Kageokuri</b>."
 				updateShinigamiAscended()
 
 			if(4)
@@ -152,6 +174,14 @@ mob/tierUpSaga(Path)
 								src.BankaiPrefix = input(src, "Your Bankai's true name reveals itself. What is it?", "Bankai Prefix") as text
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanka_no_Tachi)
 								src << "All the flames of your [src.AsauchiName] condense into your blade. Entering Bankai awakens <b>Higashi: Kyokujitsujin</b>."
+							if("Katen Kyokotsu")
+								src.BankaiPrefix = input(src, "Your Bankai manifests. What suffix comes after your Zanpakutō's name?", "Bankai Suffix") as text
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Karamatsu_Shinju)
+								src.AddSkill(new/obj/Skills/Ichidanme)
+								src.AddSkill(new/obj/Skills/Nidanme)
+								src.AddSkill(new/obj/Skills/Sandanme)
+								src.AddSkill(new/obj/Skills/Shime_no_Dan)
+								src << "Your soul's despair takes the stage in the form of a four-act tragedy played out upon your foe."
 				updateShinigamiAscended()
 
 			if(5)

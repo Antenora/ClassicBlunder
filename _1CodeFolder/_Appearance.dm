@@ -127,6 +127,14 @@ mob/proc/AppearanceOn()
 			I.suffix = null
 			I.AlignEquip(src)
 
+	if(InShinigamiForm && Saga == "Shinigami" && ShinigamiRelease == "Katen Kyokotsu")
+		for(var/obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual/zdual in src)
+			var/dplacement = FLOAT_LAYER-3
+			if(zdual.LayerPriority)
+				dplacement -= zdual.LayerPriority
+			overlays += image(icon=zdual.icon, pixel_x=zdual.pixel_x, pixel_y=zdual.pixel_y, layer=dplacement)
+			break
+
 	if(Imitating)
 		for(var/obj/Skills/Utility/Imitate/Imitation in Skills)
 			if(Imitation.imitating_info && Imitation.imitating_info.clothes.len > 0)

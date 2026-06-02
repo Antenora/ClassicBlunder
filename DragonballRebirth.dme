@@ -783,6 +783,7 @@
 #include "Sagas\Shinigami\Hado.dm"
 #include "Sagas\Shinigami\Hoho.dm"
 #include "Sagas\Shinigami\Hozukimaru.dm"
+#include "Sagas\Shinigami\KatenKyokotsu.dm"
 #include "Sagas\Shinigami\Kido.dm"
 #include "Sagas\Shinigami\Nozarashi.dm"
 #include "Sagas\Shinigami\Petals.dm"
