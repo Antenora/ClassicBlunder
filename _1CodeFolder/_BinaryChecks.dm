@@ -3620,6 +3620,8 @@ mob
 				return 0
 			if(src.Stunned)
 				return 0
+			if(src.Suspended)
+				return 0
 			if(src.Stasis)
 				return 0
 			if(src.WindingUp)

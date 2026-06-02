@@ -597,7 +597,7 @@ mob
 						src.Tension=100
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
 				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
-					if(!src.Stunned)
+					if(!src.Stunned&&!src.Suspended)
 						src.DoDamage(src, (rand(1,5)/30))
 			if(passive_handler["Grit"])
 				AdjustGrit("sub", glob.racials.GRITSUBTRACT)
