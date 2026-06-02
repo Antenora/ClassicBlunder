@@ -66,7 +66,7 @@ obj
 				HealthRecoveryValue
 				//Cooldown
 
-				// Executing: when 1, this autohit deals +1% damage per 1 Injury on the target
+				// Executing: scaling % damage increase per 1 Injury on the target
 				Executing = 0
 
 				//These four can be used in any combination.
@@ -7027,7 +7027,7 @@ obj
 						FinalDmg *= m.getWaterResistValue()
 					// Executing is +1% damage per 1 Injury on the target
 					if(src.Executing && m)
-						FinalDmg *= 1 + (0.01 * m.TotalInjury)
+						FinalDmg *= 1 + (0.01 * src.Executing * m.TotalInjury)
 					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)

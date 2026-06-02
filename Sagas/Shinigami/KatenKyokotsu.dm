@@ -180,6 +180,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	name = "Kageoni"
 	Area = "Target"
 	DamageMult = 20
+	Executing = 0.5
 	HitSparkIcon='Slash.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
@@ -862,6 +863,7 @@ mob/proc/KatenClearWater()
 	name = "Itokiribasami Chizome no Nodobue"
 	Area = "Target"
 	DamageMult = 25
+	ComboMaster = 1
 	StrOffense = 1
 	Executing = 1
 	Distance = 10
