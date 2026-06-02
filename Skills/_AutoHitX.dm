@@ -7003,6 +7003,8 @@ obj
 					var/fixedAmt = src.FixedDamage
 					if(specDmgTypes.len)
 						fixedAmt *= 1 + Owner.attackModifiers(m, specDmgTypes)
+					var/DefReduction=sqrt(m.BaseDef())
+					fixedAmt/=DefReduction
 					m.LoseHealth(fixedAmt)
 					damageDealt = fixedAmt
 					if(m.Health <= 0 && !m.KO)
