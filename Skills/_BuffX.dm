@@ -10193,6 +10193,8 @@ NEW VARIABLES
 				OffMessage="lives to see another day."
 				TextColor="green"
 			Super_Galaxy_Evolution
+				TimerLimit= 30
+				Cooldown= 60
 				KenWave=5
 				KenWaveSize=2
 				NeedsHealth=50
