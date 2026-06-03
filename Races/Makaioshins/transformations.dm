@@ -56,6 +56,14 @@ transformation
 				strengthadd = 0.25
 				forceadd = 0.25
 				speedadd = 0.25
+				if(user.Potential>=40&&mastery<25)
+					mastery=25
+				if(user.Potential>=50&&mastery<50)
+					mastery=50
+				if(user.Potential>=65&&mastery<75)
+					mastery=75
+				if(user.Potential>=80&&mastery<100)
+					mastery=100
 				if(mastery >= 25)
 					passives = list("GodKi" = 0.15, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "Juggernaut" = 1, "HellRisen" = 0.25)
 					enduranceadd = 0.35
