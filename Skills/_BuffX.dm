@@ -10173,8 +10173,8 @@ NEW VARIABLES
 						ForMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
 						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = secretLevel, "PureReduction" = secretLevel, "EnergyGeneration" = SpiralPower, "Motivation" = 1)
-						TimerLimit= 60
-						Cooldown = 90 - (SpiralPower*5)
+						TimerLimit= 600
+						Cooldown = 90 - (secretLevel*5)
 						if(secretLevel>=5)
 							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution")
 				KenWave = 2
@@ -10186,18 +10186,18 @@ NEW VARIABLES
 				OffMessage="lives to see another day."
 				TextColor="green"
 			Super_Galaxy_Evolution
-				TimerLimit= 30
-				Cooldown= 60
+				TimerLimit= 60
+				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
+				Cooldown= 1
 				KenWave=5
 				KenWaveSize=2
 				NeedsHealth=50
-				HealthThreshold=75
+				TooMuchHealth=75
+				HealthThreshold=0.01
 				UBuffNeeded="Evolution Power"
 				KenWaveIcon='KenShockwaveLegend.dmi'
 				HitSpark='Spiral_Hitspark.dmi'
-				TopOverlayLock = 'SpiralAura.dmi'
-				TopOverlayX = -32
-				ActiveMessage="transforms infinite darkness into light, becoming equal to the Gods!"
+				CustomActive="<b><font size=+2><center>Infinite darkness transforms into light! A Spiral Warrior!</center></b></font size>"
 				OffMessage="lives to see another day."
 				TextColor="green"
 				adjust(mob/p)
@@ -10211,6 +10211,8 @@ NEW VARIABLES
 						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
+						CustomActive="<font size=+2><center><b>Transforming infinite darkness into light, [p] becomes equal to the Gods!!!!</center></b></font size>"
+						passives = list("SpiralPowerUnlocked" = 3)
 						//passives = list("CoolNewSpiralPassiveThatDoesSomething" = 1)
 		Eldritch
 			True_Form

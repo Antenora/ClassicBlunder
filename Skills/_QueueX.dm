@@ -870,6 +870,9 @@ obj
 						if(usr.AttackQueue)
 							return
 						usr.Tension=0
+						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
+								sge.Trigger(usr)
 						usr.tryIncreaseTension();//2026.01.13 - reverting "only max HT lvl gets unique finisher"
 						if(usr.StyleBuff.Finisher)//there's probably a less clunky version way of ensuring finishers are only used once
 							var/path = usr.StyleBuff.Finisher
