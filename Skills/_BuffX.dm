@@ -10168,15 +10168,17 @@ NEW VARIABLES
 						if(p.PilotingProwess<SpiralPower)
 							p.PilotingProwess=SpiralPower
 
-						PowerMult = 1+(0.015*secretLevel*secretLevel) + (0.005*asc*asc)
-						StrMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
-						ForMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
-						EndMult = 1.15 + (0.02*secretLevel*secretLevel) + (0.015*asc*asc)
-						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = secretLevel, "PureReduction" = secretLevel, "EnergyGeneration" = SpiralPower, "Motivation" = 1)
+						PowerMult = 1+(0.015*secretLevel) + (0.005*asc*asc)
+						StrMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
+						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
+						EndMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
+						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower, "EnergyGeneration" = SpiralPower, "Motivation" = 0.25)
 						TimerLimit= 600
 						Cooldown = 90 - (secretLevel*5)
+						if(secretLevel>=4)
+							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution")
 						if(secretLevel>=5)
-							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution")
+							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution", "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution")
 				KenWave = 2
 				KenWaveIcon='SparkleGreen.dmi'
 				HitSpark='Spiral_Hitspark.dmi'
@@ -10185,6 +10187,25 @@ NEW VARIABLES
 				ActiveMessage="glows with raw willpower, driving forward no matter what!"
 				OffMessage="lives to see another day."
 				TextColor="green"
+			Arc_Evolution
+				TimerLimit= 180
+				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
+				Cooldown= 1
+				KenWave=5
+				KenWaveSize=2
+				TooMuchHealth=95
+				HealthThreshold=0.01
+				UBuffNeeded="Evolution Power"
+				KenWaveIcon='KenShockwaveLegend.dmi'
+				HitSpark='Spiral_Hitspark.dmi'
+				ActiveMessage="smashes through karma and fate!"
+				OffMessage="lives to see another day."
+				TextColor="green"
+				adjust(mob/p)
+					var/secretLevel = p.secretDatum.currentTier
+					var/asc = p.AscensionsAcquired
+					if(!altered)
+						passives = list("SpiralPowerUnlocked" = 2, "PureDamage" = 2, "PureReduction" = 2, "Motivation" = 0.25)
 			Super_Galaxy_Evolution
 				TimerLimit= 60
 				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
@@ -10211,8 +10232,8 @@ NEW VARIABLES
 						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						CustomActive="<font size=+2><center><b>Transforming infinite darkness into light, [p] becomes equal to the Gods!!!!</center></b></font size>"
-						passives = list("SpiralPowerUnlocked" = 3)
+						CustomActive="<font size=+1><center><b>Transforming infinite darkness into light, [p] becomes equal to the Gods!!!!</center></b></font size>"
+						passives = list("SpiralPowerUnlocked" = 3, "PureDamage" = 4, "PureReduction" = 4)
 						//passives = list("CoolNewSpiralPassiveThatDoesSomething" = 1)
 		Eldritch
 			True_Form
