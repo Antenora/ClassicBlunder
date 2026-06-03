@@ -311,6 +311,33 @@ obj/Skills/AutoHit/Spiral
 		FollowUp="/obj/Skills/AutoHit/Spiral/Giga_Drill_Maximum"
 		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply"
 		FollowUpDelay=1
+/obj/Skills/Projectile
+	Spiral
+		Probability_Negation_Missiles
+			Cooldown=180
+			ZoneAttack=1
+			ZoneAttackX=8
+			ZoneAttackY=8
+			FireFromEnemy=0
+			FireFromSelf=1
+			RandomPath=1
+			Speed = 0.75
+			Distance=30
+			DamageMult=0.5
+			AdaptRate=1
+			Explode=1
+			Dodgeable=0
+			Deflectable=0
+			EndRate=0.75
+			Blasts=50
+			Delay=0
+			LosesHoming=3
+			HomingCharge=10
+			IconLock='Missile Small.dmi'
+			IconSize=0.5
+			verb/Probability_Negation_Missiles()
+				set category="Skills"
+				usr.UseProjectile(src)
 /mob/proc/HandleSpiralUnlock(var/Stat, SL)
 	var/CA=AscensionsAcquired
 	var/TA=CA+SL
