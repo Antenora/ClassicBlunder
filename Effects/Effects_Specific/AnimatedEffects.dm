@@ -667,6 +667,20 @@ mob/proc
 		if(Z=="Off")
 			User.underlays-=User.MirrorIcon
 			User.MirrorIcon=null
+	SuperSpiralMode(var/Z)
+		var/image/MI
+		var/mob/User=src
+		var/Size=1+(src.passive_handler.Get("SpiralPowerUnlocked")/5)
+		if(Z=="On")
+			SuperSpiralMode("Off")
+			MI=image(src.appearance, pixel_x=src.pixel_x, pixel_y=src.pixel_x)
+			MI.alpha=100
+			MI.transform*=Size
+			User.MirrorIcon=MI
+			User.underlays+=User.MirrorIcon
+		if(Z=="Off")
+			User.underlays-=User.MirrorIcon
+			User.MirrorIcon=null
 
 	StasisEffect(var/Z)
 		var/image/i=image('ice aura.dmi', pixel_x=-8, pixel_y=-2, layer=EFFECTS_LAYER, loc=src)
