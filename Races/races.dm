@@ -280,8 +280,17 @@ race
 			transformations += new i
 
 	proc
+		revertAndFixAllAscensions(mob/p)
+			if(!p)
+				liveDebugMsg("revertAndFixAllAscensions() was called without a mob passed in.");
+				return;
+			for(var/ascension/a in p.race.ascensions)
+				a.revertAscension(p)
+				p.race.ascensions.Remove(a);
+			p.race.fixAscensions();
+
 		fixAscensions()
-			var/name_typed = replacetext(type, "/race/", "")
+			var/name_typed = replacetext("[type]", "/race/", "")
 			var/list/ascpaths = subtypesof(text2path(replacetext("/ascension/[name_typed]"," ", "_")))
 
 			for(var/i in ascpaths)
