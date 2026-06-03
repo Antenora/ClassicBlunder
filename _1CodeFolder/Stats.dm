@@ -956,12 +956,12 @@ mob/proc/
 					Ratio*=a
 
 			//sneaky
-			if(src.PowerInvisible)
-				Ratio*=src.PowerInvisible
-			if(src.PowerBoost)
-				Ratio*=src.PowerBoost
-			if(passive_handler.Get("SaiyanPower"))
-				Ratio*=src.GetSaiyanPower()
+			if(PowerInvisible)
+				Ratio*=PowerInvisible
+			if(PowerBoost)
+				Ratio*=PowerBoost
+			Ratio *= GetAscensionPower();//returns 1 or higher
+			Ratio *= GetSaiyanPower();//returns 1 or higher but for saiyan power users
 			if(passive_handler.Get("Undeterred"))
 				Ratio*=1+((StrTax+ForTax)/2)
 			if(passive_handler.Get("SSJRose"))
