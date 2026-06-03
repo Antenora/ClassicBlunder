@@ -2399,13 +2399,13 @@ NEW VARIABLES
 			EnergyThreshold=25
 			StrMult=1.5
 			ForMult=1.5
-			passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100)
+			passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
 			ActiveMessage="spikes their energy in sudden bursts!"
 			OffMessage="quells their energy..."
 			verb/Spirit_Burst()
 				set category="Skills"
 				if(!altered)
-					passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100)
+					passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
 				src.Trigger(usr)
 		Power_of_Destruction
 			BuffName = "Power of Destruction - Omen"
