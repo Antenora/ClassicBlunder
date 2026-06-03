@@ -24,7 +24,7 @@
         passives["PureReduction"] = secretLevel // scales up to 6
         passives["Godspeed"] = secretLevel // scales up to 6
         passives["Deflection"] = max(secretLevel, 3) //Scales until t3
-        passives["ManaGeneration"] = 5
+        passives["ManaGeneration"] = 4
         passives["Skimming"] = max(secretLevel, 3) // Scales until t3
         passives["CursedWounds"] = 1
         // It also replaces your mana name to Shin but REPLACEMANA IS A STUPID FUCKING PASSIVE SO I DID IT IN THE UPDATE_STAT_LABELS PROC FUCK FUCK FUCK
