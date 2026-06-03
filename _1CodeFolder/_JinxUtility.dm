@@ -329,7 +329,8 @@ mob
 				if(defender && defender.StyleBuff && defender.canGainTension())
 					if(!SecondStrike)
 						defender.gainTension((val*Motivation)*glob.DEFENDER_TENSION_REDUCER);
-
+			//			if(defender.Health<src.Health && defender.passive_handler.Get("SpiralPowerUnlocked"))
+			//				passive_handler.Increase("AdvanceFurther", val*Motivation)
 			var/leakVal = val/GLOBAL_LEAK_REDUCTION
 			if(passive_handler.Get("Corruption"))
 				gainCorruption(val * 1.5 * glob.CORRUPTION_GAIN)
