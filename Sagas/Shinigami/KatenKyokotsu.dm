@@ -451,6 +451,10 @@ mob/Players/proc/KageoniEnterShadow(obj/Effects/Shadowbringer_Shadow/shadow)
 	invisibility = 101
 	HiddenInShadow = 1
 	Suspended = "Kageoni"
+	if(islist(BeingTargetted))
+		for(var/mob/tm in BeingTargetted.Copy())
+			if(tm.Target == src)
+				tm.RemoveTarget()
 	KageoniMidTransition = 0
 
 mob/Players/proc/KageoniSinkAnimation()

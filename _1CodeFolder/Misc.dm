@@ -10,6 +10,8 @@ mob/Click()
 	if(glob.CANT_CLICK_INVS && !usr.Admin)
 		if((!glob.ADMIN_INVIS_ONLY && (src.invisibility >= usr)) || src.AdminInviso)
 			return
+	if(src.HiddenInShadow && usr != src && !usr.Admin)
+		return
 	if(usr.Target!=src)
 		for(var/sb in usr.SlotlessBuffs)
 			var/obj/Skills/Buffs/b = usr.SlotlessBuffs[sb]
@@ -113,6 +115,10 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 					m<<output("<font color=#99FF99><b>(Telepath)</b></font>- <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> To <a href=?src=\ref[who];action=MasterControl;do=TPM>[who]</a href> :[blah]", "icchat")
 
 mob/proc/SetTarget(atom/target)
+	if(ismob(target))
+		var/mob/_kt = target
+		if(_kt.HiddenInShadow)
+			return
 	if(ismob(Target))
 		var/mob/m = Target
 		m.BeingTargetted -= src
