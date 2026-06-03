@@ -519,6 +519,7 @@
 #include "_Reworks\Passives\KillerInstinct.dm"
 #include "_Reworks\Passives\MeleeResist.dm"
 #include "_Reworks\Passives\Momentum.dm"
+#include "_Reworks\Passives\MovementMastery.dm"
 #include "_Reworks\Passives\PowerfulCasting.dm"
 #include "_Reworks\Passives\PUSpike.dm"
 #include "_Reworks\Passives\ShatterResist.dm"

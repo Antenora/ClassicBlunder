@@ -508,31 +508,21 @@ atom/proc/CheckDirection(var/mob/M)
 		if(SOUTHWEST)
 			. = "South West"
 
-globalTracker/var/MOVEMENT_MASTERY_DIVISOR = 10
+globalTracker/var/MOVEMENT_MASTERY_DIVISOR = 5//TODO between wipes: move this to MovementMastery.dm
+//actually more of a mult than a divisor nowadays but whatever we don't rename things mid wipe
 
 
 mob/proc/GetPowerUpRatio()
 	var/Ratio=1
 	var/PowerUp=max(((PowerControl-100)/100),-0.5)
-	PowerUp += GetPUSpike()
-	if(passive_handler.Get("RedPUSpike"))
-		PowerUp+=passive_handler.Get("RedPUSpike")/100
+	PowerUp += GetPUSpike();
+	
 	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Power Control"))
 		PowerUp += secretDatum?:getBoon(src, "Power Control")/12
-	if(src.CheckSpecial("Overdrive"))
-		PowerUp+=2
-/*	if(src.CyberCancel)
-		if(!isRace(ANDROID))
-			PowerUp-=PowerUp*src.CyberCancel*/
-	if(src.HasMovementMastery()&&PowerUp>0)
-		var/mmBonus = src.GetMovementMastery() / glob.MOVEMENT_MASTERY_DIVISOR
-		// max is around 20, maybe 22 or 23
-		if(src.passive_handler.Get("Kaioken")&&(src.passive_handler.Get("DoubleHelix")))
-			mmBonus += src.DoubleHelix
 
-		Ratio=1+(PowerUp*(1+(mmBonus)))
-	else
-		Ratio=1+PowerUp
+	Ratio += PowerUp 
+	if(PowerUp>0)
+		Ratio += GetMovementMastery()
 
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
@@ -553,15 +543,10 @@ mob/proc/GetPowerUpRatioVisble()
 	var/Ratio=1
 	var/PowerUp=(PowerControl-100)/100
 	PowerUp += GetPUSpike()
-	if(src.CheckSpecial("Overdrive"))
-		PowerUp+=1
-	/*if(src.CyberCancel)
-		if(!isRace(ANDROID))
-			PowerUp-=PowerUp*src.CyberCancel*/
-	if(HasMovementMastery()&&PowerUp>0)
-		Ratio=1+(PowerUp*(1+(GetMovementMastery()/glob.MOVEMENT_MASTERY_DIVISOR)))
-	else
-		Ratio=1+PowerUp
+	if(CheckSpecial("Overdrive")) PowerUp+=1
+	Ratio += PowerUp
+	if(PowerUp)
+		Ratio += GetMovementMastery()
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
 			Ratio=1
@@ -863,10 +848,9 @@ mob/proc/
 				if (HoldOn==0)
 					RainbowGlowStuff()
 				sleep(0.01)
-		var/EPM=src.Power_Multiplier
-		if(src.HasMovementMastery())
-			if(src.ActiveBuff && src.ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
-				EPM+=((src.ActiveBuff.PowerMult-1) * (1+(src.GetMovementMastery()/glob.MOVEMENT_MASTERY_DIVISOR)))-(src.ActiveBuff.PowerMult-1)
+		var/EPM=Power_Multiplier;
+		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
+			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
 
 		if(src.PowerEroded)
 			EPM-=src.PowerEroded
