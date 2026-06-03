@@ -63,7 +63,7 @@ mob/proc/setUpScent()
             custom_scent="Death"
         if(usr.Target.HasMechanized())
             custom_scent="Metal"
-        if(usr.Target.Secret=="Ripple"||usr.Target.Secret=="Senjutsu")
+        if(usr.Target.Secret=="Hamon"||usr.Target.Secret=="Senjutsu")
             custom_scent="Grass"
         if(usr.Target.Secret=="Vampire"||usr.Target.Secret=="Werewolf")
             custom_scent="Blood"

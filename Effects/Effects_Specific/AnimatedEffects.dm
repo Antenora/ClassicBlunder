@@ -670,7 +670,7 @@ mob/proc
 	SuperSpiralMode(var/Z)
 		var/image/MI
 		var/mob/User=src
-		var/Size=1+(src.passive_handler.Get("SpiralPowerUnlocked")/5)
+		var/Size=1.25+((src.passive_handler.Get("SpiralPowerUnlocked")/5)**1.25)
 		if(Z=="On")
 			SuperSpiralMode("Off")
 			MI=image(src.appearance, pixel_x=src.pixel_x, pixel_y=src.pixel_x)

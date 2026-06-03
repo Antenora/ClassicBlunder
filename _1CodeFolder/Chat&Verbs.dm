@@ -1054,7 +1054,7 @@ mob/Players/verb
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.CheckSlotless("Half Moon Form")||src.CheckSlotless("Full Moon Form"))
 				OMsg(src, "[src] radiates animalistic bloodlust as they prepare to pounce!")
-			else if(src.Secret=="Ripple")
+			else if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")
 			else if(src.Secret=="Vampire")
 				OMsg(src, "[src] begins posing ominously!")

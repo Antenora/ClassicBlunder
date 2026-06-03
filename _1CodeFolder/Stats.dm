@@ -516,11 +516,11 @@ mob/proc/GetPowerUpRatio()
 	var/Ratio=1
 	var/PowerUp=max(((PowerControl-100)/100),-0.5)
 	PowerUp += GetPUSpike();
-	
+
 	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Power Control"))
 		PowerUp += secretDatum?:getBoon(src, "Power Control")/12
 
-	Ratio += PowerUp 
+	Ratio += PowerUp
 	if(PowerUp>0)
 		Ratio += GetMovementMastery()
 
@@ -687,7 +687,7 @@ mob/proc/Recover(var/blah,Amount=1)
 			var/KiControl=src.GetKiControlMastery()
 			if(KiControl>0)
 				Amount*=1+KiControl
-			if(src.Secret=="Ripple")
+			if(src.Secret=="Hamon")
 				Amount*=2
 			Amount*=sqrt(max(1,GetRecov()))
 			src.HealEnergy(Amount*(100/max(Health,1)))
@@ -705,7 +705,7 @@ mob/proc/Recover(var/blah,Amount=1)
 					return
 			if(Swim&&passive_handler.Get("Fishman"))
 				Amount*=2
-			if(src.Secret=="Ripple")
+			if(src.Secret=="Hamon")
 				Amount*=2
 			if(TotalFatigue>0)
 				var/FatigueRecov=0.01*Amount
@@ -991,14 +991,14 @@ mob/proc/
 		Ratio += (scalingEldritchPower() * 2 / 10);
 		if(passive_handler.Get("NameCurse")=="Black Ant")
 			Ratio*=0.01
-		
+
 		if(src.Dead&&!src.KeepBody)
 			Ratio*=0.5
 		else if(src.z==glob.DEATH_LOCATION[3]&&!src.CheckSpecial("Cancer Cloth")&&src.SenseUnlocked<8&&!src.passive_handler.Get("SpiritPower"))
 			Ratio*=0.5
 		if(src.KO)
 			Power*=0.05
-		
+
 		Power=Ratio*GetPowerUpRatio()
 
 		if(Power < 1)

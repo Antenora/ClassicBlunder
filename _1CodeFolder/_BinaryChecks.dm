@@ -1484,7 +1484,7 @@ mob
 				return 1
 			return 0
 		HasWaterWalk()
-			if(passive_handler.Get("WaterWalk") || passive_handler.Get("Gravity")||src.Secret=="Ripple")
+			if(passive_handler.Get("WaterWalk") || passive_handler.Get("Gravity")||src.Secret=="Hamon")
 				return 1
 			return 0
 		HasSuperDash()
@@ -1647,7 +1647,7 @@ mob
 						return 0
 			if(passive_handler.Get("Flow"))
 				return 1
-			if(src.Secret=="Ripple"&&src.StyleActive)
+			if(src.Secret=="Hamon"&&src.StyleActive)
 				return 1
 			// if(src.Secret=="Vampire"&&src.StyleActive)
 			// 	return 1
@@ -1669,7 +1669,7 @@ mob
 				return 0
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Senses"))
 				Extra += secretDatum?:getBoon(src, "Senses")
-			if(src.Secret=="Ripple"&&src.StyleActive)
+			if(src.Secret=="Hamon"&&src.StyleActive)
 				Extra+=1
 			if(passive_handler.Get("Shameful Display"))
 				var/viewCount = getSenketsuViewers()
