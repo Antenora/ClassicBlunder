@@ -254,6 +254,14 @@ transformation
 					form_icon_2_icon = x
 				..()
 			mastery_boons(mob/user)
+				if(user.Potential>=40&&mastery<25)
+					mastery=25
+				if(user.Potential>=50&&mastery<50)
+					mastery=50
+				if(user.Potential>=65&&mastery<75)
+					mastery=75
+				if(user.Potential>=80&&mastery<100)
+					mastery=100
 				if(mastery >= 25)
 					passives = list("GodKi" = 0.15, "HellPower" = 0.25, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 1, "PureDamage" = 3, "PureReduction" = 3, "Smokin'!" = 1)
 				if(mastery >= 50)

@@ -827,9 +827,6 @@ mob
 							if(!src.CheckSlotless("Evolution Power"))
 								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
 									fmf.Trigger(src)
-							else
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in src)
-									sge.Trigger(src)
 						if(Secret=="Eldritch")
 							icon_state = ""
 							PoseTime = 0
