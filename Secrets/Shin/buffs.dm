@@ -15,18 +15,18 @@
     CantHaveTheseBuffs = list("Mang Resonance")
     adjust(mob/p)
         var/secretLevel = p.secretDatum.currentTier
-        var/mod = (secretLevel-5)
+        // var/mod = (secretLevel-5) - Defunct, used to give purereduction at higher tier mang
         // Tier Adjusted Mults
         EndMult = 1.2 + (0.05 * secretLevel) 
         DefMult = 1.2 + (0.05 * secretLevel)
         // Tier Adjusted Passives
         passives["Harden"] = clamp(secretLevel*2, 1, 5) // starts at 1, adds 2 per tier, caps at 5 (tier 3)
-        passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5); //Scales from tier 3 (1) to tier 5 (5)
-        passives["Godspeed"] = secretLevel
-        passives["Deflection"] = (0.5 * secretLevel) //Goes from 1 to 3
-        passives["ManaGeneration"] = secretLevel
-        passives["Skimming"] = clamp(secretLevel / 2, 1, 2) // t1 / t2 = 1, t3 = 1.5 t4 = 2, t5 = 2, T6 = 2
-        passives["Deathfield"] = secretLevel
+        passives["PureReduction"] = secretLevel // scales up to 6
+        passives["Godspeed"] = secretLevel // scales up to 6
+        passives["Deflection"] = max(secretLevel, 3) //Scales until t3
+        passives["ManaGeneration"] = 5
+        passives["Skimming"] = max(secretLevel, 3) // Scales until t3
+        passives["CursedWounds"] = 1
         // It also replaces your mana name to Shin but REPLACEMANA IS A STUPID FUCKING PASSIVE SO I DID IT IN THE UPDATE_STAT_LABELS PROC FUCK FUCK FUCK
 
 
@@ -63,10 +63,11 @@
         passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5)/2; 
         passives["Deflection"] = (0.5 * secretLevel)/2 
         passives["Skimming"] = clamp(secretLevel, 1, 3) // This Operates independent of mang level for now
+        passives["CheapShot"] = 5 // This is backend buffed by GetMangLevel() in Modifiers.dm up to 10
    // IconApart = 1
 
      /* All of Mang's passives and stats are scattered across passive procs. This is so that they can scale based off of how many Mang you have
-     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Brutalize, Blurring Strikes, Hard Style
+     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Brutalize, Blurring Strikes, Cheap Shot
      They scale off of how many mang you have active. They do NOT show up in the passive handler rn 
      and if you want to know their values check the passive files
      Please do not go screaming about how "Mang does nothing" I will gut you myself - Hadoje */
