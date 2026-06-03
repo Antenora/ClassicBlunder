@@ -14581,6 +14581,8 @@ mob
 			if(B.BuffName=="Kyoukaken")
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players))
 					src.Kyoukaken("On")
+			if(B.passives["SpiralPowerUnlocked"])
+				src.SuperSpiralMode("On")
 			if(B.EndYourself)
 				src.RemoveSlotlessBuff(B)
 
@@ -15143,6 +15145,8 @@ mob
 				B.InstantAffected=0
 			if(B.BuffName=="Kyoukaken")
 				src.Kyoukaken("Off")
+			if(B.BuffName=="Evolution Power")
+				src.SuperSpiralMode("Off")
 			if(B.PostBuffEff)
 				buffSelf(B.PostBuffEff)
 			if(B.KillSword&&src.EquippedSword())
