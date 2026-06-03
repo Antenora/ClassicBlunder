@@ -127,6 +127,8 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
+//	if(src.passive_handler.Get("AdvanceFurther"))
+	//	src.passive_handler.Set("AdvanceFurther", 0)
 	if(src.passive_handler.Get("Herald of the End")&&src.transUnlocked<2)
 		src.passive_handler.Increase("The Clock Is Ticking", 1)
 		src<<"<font color=red><b>You really let someone get the better of you like that...? The clock is ticking.</font></b>"
