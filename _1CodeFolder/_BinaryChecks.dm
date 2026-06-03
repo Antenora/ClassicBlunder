@@ -1389,30 +1389,6 @@ mob
 			return 0
 		GetVanish()
 			return passive_handler.Get("Vanishing")
-		HasMovementMastery()
-			if(passive_handler.Get("Zeal"))
-				return 1
-			if(passive_handler.Get("MovementMastery"))
-				return 1
-			if(InfinityModule)
-				return 1
-			if(Saga=="Cosmo")
-				return 1
-			if(passive_handler.Get("Hopes and Dreams")) return 1;
-			return 0
-		GetMovementMastery()
-			var/Total=0
-			Total+=passive_handler.Get("MovementMastery")
-			if(passive_handler.Get("Zeal"))
-				Total += transActive
-			if(Saga=="Cosmo" && !SpecialBuff)
-				Total += SagaLevel * 2.5
-			if(InfinityModule)
-				Total += (2 * AscensionsAcquired)
-			if(Secret=="Shin")
-				Total += secretDatum.currentTier
-			if(passive_handler.Get("Hopes and Dreams")) Total += (5 * AscensionsAcquired)
-			return Total
 		HasPhysicalHitsLimit()
 			if(passive_handler.Get("PhysicalHitsLimit"))
 				return 1

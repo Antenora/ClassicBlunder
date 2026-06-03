@@ -1,13 +1,23 @@
+globalTracker/var
+	PU_SPIKE_MANG_MULTIPLIER = 30;
+	PU_SPIKE_SHIRAYUKI_MULT = 1;
+	PU_SPIKE_IMAGINARY_ACTIVE_ADD = 50;
+	PU_SPIKE_IMAGINARY_SPECIAL_ADD = 50;
+	PU_SPIKE_REDPUSPIKE_MULT = 1;
+	PU_SPIKE_OVERDRIVE_ADD = 200;
+
 /mob/proc/GetPUSpike()
-	var/b = passive_handler.Get("PUSpike") //This stores stuff from sources of PUSpike... yay.
-	b += GetMangLevel()*30 // if I have to nerf this, I am sorry. 
-	if(passive_handler["Shirayuki"] && src.Slow > 0)
-		if(src.CheckActive("Ki Control"))
-			b += src.Slow
+	. = passive_handler.Get("PUSpike") //This stores stuff from sources of PUSpike... yay.
+	. += (GetMangLevel() * glob.PU_SPIKE_MANG_MULTIPLIER) // if I have to nerf this, I am sorry. 
+	if(passive_handler["Shirayuki"] && Slow > 0)
+		if(CheckActive("Ki Control"))
+			. += (Slow * glob.PU_SPIKE_SHIRAYUKI_MULT)
 	if(Class=="Imaginary")
 		if(ActiveBuff)
-			b += 50
+			. += glob.PU_SPIKE_IMAGINARY_ACTIVE_ADD;
 		if(SpecialBuff)
-			b += 50
-	if(b) return max(0, b / 100)
-	return 0
+			. += glob.PU_SPIKE_IMAGINARY_SPECIAL_ADD;
+	if(passive_handler.Get("RedPUSpike")) . += (passive_handler.Get("RedPUSpike") * glob.PU_SPIKE_OVERDRIVE_ADD);
+	if(CheckSpecial("Overdrive")) . += glob.PU_SPIKE_OVERDRIVE_ADD;
+
+	if(.) . = max(0, . / 100)
