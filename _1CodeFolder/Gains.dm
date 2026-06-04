@@ -928,7 +928,7 @@ mob
 						src.Slow=src.SagaLevel * 5
 					AddSlow((0.5 + (0.1*src.SagaLevel))*glob.SLOW_INTENSITY) // Increases how much slow/chill you gain per tick.
 					if(src.Slow > SagaLevel * 10) // When you Power Up and get too cold, you start injurying yourself.
-						src.TotalInjury += 0.001 * (src.Slow-(SagaLevel * 10))
+						src.TotalInjury += 0.00025 * (src.Slow-(SagaLevel * 10))
 			if(passive_handler["Grit"])
 				if(client&&hudIsLive("Grit", /obj/bar))
 					client.hud_ids["Grit"]?:Update()
