@@ -106,7 +106,7 @@
 	Trigger(source, Override=1)
 
 /obj/Skills/Buffs/proc/HandleHealing(mob/source)
-	var/mob/target = source 
+	var/mob/target = source
 	if(AffectTarget && source.Target)
 		target = source.Target
 	if (WoundHeal)
@@ -253,7 +253,7 @@ mob/proc/loseOxygen(mult = 1)
 	else if(BreathingMaskOn)
 		if(src.Oxygen<(src.OxygenMax/max(src.SenseRobbed,1)))
 			src.Oxygen+=rand(1,3)
-		if(src.icon_state=="Train"&&src.Secret=="Ripple")
+		if(src.icon_state=="Train"&&src.Secret=="Hamon")
 			src.Oxygen+=(src.OxygenMax/max(src.SenseRobbed,1))*0.2
 			if(src.Oxygen>=(src.OxygenMax/max(src.SenseRobbed,1))*2)
 				src.Oxygen=(src.OxygenMax/max(src.SenseRobbed,1))*2
@@ -284,9 +284,9 @@ mob/proc/Swim()
 			if(isplayer(src))
 				src:move_speed = MovementSpeed()
 			//do easiest conditions first
-			if((src.PoseEnhancement&&src.Secret=="Ripple"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
+			if((src.PoseEnhancement&&src.Secret=="Hamon"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
 				src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-		else if(src.Secret=="Ripple")
+		else if(src.Secret=="Hamon")
 			src.RemoveWaterOverlay()
 			if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 				src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
@@ -326,7 +326,7 @@ mob/proc/Swim()
 
 						src.AddSlow(1 + (0.5 * p.AscensionsAcquired))
 						src.AddShock(1 + (0.5 * p.AscensionsAcquired))
-				else if(src.PoseEnhancement&&src.Secret=="Ripple")
+				else if(src.PoseEnhancement&&src.Secret=="Hamon")
 					src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 				else if(loc.type==/turf/Waters/Water7/LavaTile)
 					src.overlays+=image('LavaTileOverlay.dmi')
@@ -340,7 +340,7 @@ mob/proc/Swim()
 			var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
 			if(loc:Shallow==1)
 				amounttaken=0
-			if(src.PoseEnhancement&&src.Secret=="Ripple")
+			if(src.PoseEnhancement&&src.Secret=="Hamon")
 				amounttaken=0
 			if(BreathingMaskOn)
 				amounttaken=0

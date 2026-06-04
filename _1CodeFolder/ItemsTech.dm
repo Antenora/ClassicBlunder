@@ -2346,7 +2346,7 @@ obj/Items/Tech
 									var/bloodPower = m.secretDatum.currentTier
 									m.BPPoison=min(0.2*bloodPower,0.9)
 									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Ripple")
+								if("Hamon")
 									if(m.RippleActive()&&!m.PoseEnhancement)
 										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 	Portable_Projector
@@ -2428,7 +2428,7 @@ obj/Items/Tech
 									var/bloodPower = m.secretDatum.currentTier
 									m.BPPoison=min(0.2*bloodPower,0.9)
 									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Ripple")
+								if("Hamon")
 									if(m.RippleActive()&&!m.PoseEnhancement)
 										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 

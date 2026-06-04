@@ -10173,8 +10173,8 @@ NEW VARIABLES
 						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower, "EnergyGeneration" = SpiralPower, "Motivation" = 0.25)
-						TimerLimit= 600
-						Cooldown = 90 - (secretLevel*5)
+						TimerLimit= 60
+						Cooldown = 60 - (secretLevel*5)
 						if(secretLevel>=4)
 							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution")
 						if(secretLevel>=5)
@@ -10188,12 +10188,12 @@ NEW VARIABLES
 				OffMessage="lives to see another day."
 				TextColor="green"
 			Arc_Evolution
-				TimerLimit= 180
+				TimerLimit= 60
 				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 				Cooldown= 1
 				KenWave=5
 				KenWaveSize=2
-				TooMuchHealth=95
+				TooMuchHealth=99
 				HealthThreshold=0.01
 				UBuffNeeded="Evolution Power"
 				KenWaveIcon='KenShockwaveLegend.dmi'
@@ -10206,6 +10206,10 @@ NEW VARIABLES
 					var/asc = p.AscensionsAcquired
 					if(!altered)
 						passives = list("SpiralPowerUnlocked" = 2, "PureDamage" = 2, "PureReduction" = 2, "Motivation" = 0.25)
+						PowerMult = 1+(0.015*secretLevel) + (0.005*asc*asc)
+						StrMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
+						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
+						EndMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 			Super_Galaxy_Evolution
 				TimerLimit= 60
 				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
@@ -10229,10 +10233,7 @@ NEW VARIABLES
 							//OMsg(p, "<b>In response to impossible odds, [p] shatters their limits, evolving beyond their absolute potential!</b>")
 							//BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Tengen_Toppa_Evolution")
 						PowerMult = 1+(0.05*secretLevel*secretLevel) + (0.05*asc*asc)
-						StrMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						ForMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						EndMult = 1.25 + (0.035*secretLevel*secretLevel) + (0.015*asc*asc)
-						CustomActive="<font size=+1><center><b>Transforming infinite darkness into light, [p] becomes equal to the Gods!!!!</center></b></font size>"
+						CustomActive="<font color = 'green'><font size=+1><center><b>Transforming infinite darkness into light, [p] becomes equal to the Gods!!!!</center></b></font size></font color>"
 						passives = list("SpiralPowerUnlocked" = 3, "PureDamage" = 4, "PureReduction" = 4)
 						//passives = list("CoolNewSpiralPassiveThatDoesSomething" = 1)
 		Eldritch
@@ -13027,7 +13028,7 @@ mob
 								SC.ObservedTechniques["[B.type]"]=B.Copyable
 
 				src.StyleBuff=B
-				if(src.Secret=="Ripple")
+				if(src.Secret=="Hamon")
 					src << "You channel the graceful motions of the Ripple through your style!"
 				if(src.Secret=="Senjutsu")
 					src << "You surround your body with a nimbus of natural energy, becoming able to strike targets without physical contact!"

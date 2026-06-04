@@ -1788,7 +1788,7 @@ mob
 				else if(BreathingMaskOn==1)
 					if(src.Oxygen<(src.OxygenMax/max(src.SenseRobbed,1)))
 						src.Oxygen+=rand(1,3)
-					if(src.icon_state=="Train"&&src.Secret=="Ripple")
+					if(src.icon_state=="Train"&&src.Secret=="Hamon")
 						src.Oxygen+=(src.OxygenMax/max(src.SenseRobbed,1))*0.2
 						if(src.Oxygen>=(src.OxygenMax/max(src.SenseRobbed,1))*2)
 							src.Oxygen=(src.OxygenMax/max(src.SenseRobbed,1))*2
@@ -1817,9 +1817,9 @@ mob
 						if(isplayer(src))
 							src:move_speed = MovementSpeed()
 						//do easiest conditions first
-						if((src.PoseEnhancement&&src.Secret=="Ripple"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
+						if((src.PoseEnhancement&&src.Secret=="Hamon"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-					else if(src.Secret=="Ripple")
+					else if(src.Secret=="Hamon")
 						src.RemoveWaterOverlay()
 						if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
@@ -1858,7 +1858,7 @@ mob
 								if(p!= src && p)
 									src.AddSlow(10 + (5 * p.AscensionsAcquired))
 									src.AddShock(10 + (5 * p.AscensionsAcquired))
-							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Ripple")
+							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 							else if(loc.type==/turf/Waters/Water7/LavaTile)
 								src.overlays+=image('LavaTileOverlay.dmi')
@@ -1872,7 +1872,7 @@ mob
 						var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
 						if(loc:Shallow==1)
 							amounttaken=0
-						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Ripple")
+						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 							amounttaken=0
 						if(BreathingMaskOn)
 							amounttaken=0
@@ -1918,7 +1918,7 @@ mob
 						src:move_speed = MovementSpeed()
 				if(src.Oxygen<(src.OxygenMax/max(src.SenseRobbed,1)))
 					src.Oxygen=min(src.Oxygen+(rand(1,3)),(src.OxygenMax/max(src.SenseRobbed,1)))
-				if(src.icon_state=="Train"&&src.Secret=="Ripple")
+				if(src.icon_state=="Train"&&src.Secret=="Hamon")
 					src.Oxygen+=(src.OxygenMax/max(src.SenseRobbed,1))*0.2
 					if(src.Oxygen>=(src.OxygenMax/max(src.SenseRobbed,1))*2)
 						src.Oxygen=(src.OxygenMax/max(src.SenseRobbed,1))*2

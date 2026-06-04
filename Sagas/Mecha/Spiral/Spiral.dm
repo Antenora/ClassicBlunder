@@ -86,7 +86,7 @@ mob/tierUpSaga(path)
 			var/sp = p.secretDatum.currentTier
 			var/dr = sl + sp
 			var/se = p.passive_handler.Get("SpiralPowerUnlocked")
-			ControlledRush = 5 + dr + se
+			ControlledRush = 5 + dr
 			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 			Size = 1 + dr + se
 			TurfStrike = Size
@@ -97,8 +97,6 @@ mob/tierUpSaga(path)
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)
 			EnergyCost = 1 + (3 * dr)
-			if(sp>=5&&se>=1)
-				BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution"
 			switch(se)
 				if(0 to 2)
 					ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"

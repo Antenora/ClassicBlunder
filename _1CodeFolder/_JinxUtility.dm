@@ -620,7 +620,7 @@ mob
 					CursedBlood=1
 					Effectiveness+= defender.passive_handler.Get("VenomBlood")
 					src.AddPoison(val*Effectiveness,defender)
-				if(defender.Secret=="Ripple")
+				if(defender.Secret=="Hamon")
 					src.AddBurn(val*Effectiveness*defender.secretDatum.currentTier)
 					val/=defender.secretDatum.currentTier
 				if(!CursedBlood)
@@ -922,7 +922,7 @@ mob
 
 					var/PowerUpPercent=GetPowerUpRatio()-1
 					PowerUpPercent -= GetMovementMastery();
-					
+
 					if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 						PowerUpPercent=0
 					val*=(1+(PowerUpPercent/PUDrainReduction))
@@ -2944,7 +2944,7 @@ mob
 				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
-			if(src.Secret=="Ripple")
+			if(src.Secret=="Hamon")
 				good = 1
 			if(src.GetSpiritPower()>=1)
 				good = 1
