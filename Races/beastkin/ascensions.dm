@@ -267,7 +267,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("ManaGeneration", 1);
 							owner.passive_handler.Increase("QuickCast", 1);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("SpiritStrike", 0.25);
+							owner.passive_handler.Increase("HybridStrike", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.25);
 						if("Fox Fire")
@@ -351,7 +351,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
-							owner.passive_handler.Increase("SpiritStrike", 0.25);
+							owner.passive_handler.Increase("HybridStrike", 0.25);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.25);
@@ -435,7 +435,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
-							owner.passive_handler.Increase("SpiritStrike", 0.75);
+							owner.passive_handler.Increase("HybridStrike", 0.75);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
 							owner.passive_handler.Increase("MovementMastery", 2);
 							owner.passive_handler.Increase("ManaStats", 0.5);
@@ -521,6 +521,10 @@ Today, another God of the Rifts is born."}
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
+							owner.passive_handler.Increase("HybridStrike", 0.75);
+							owner.passive_handler.Increase("ManaCapMult", 0.25);
+							owner.passive_handler.Increase("MovementMastery", 2);
+							owner.passive_handler.Increase("ManaStats", 0.5);
 
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
