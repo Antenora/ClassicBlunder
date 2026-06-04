@@ -4369,7 +4369,7 @@ obj
 				Dodompa//Penetrate, high charge and low distance
 					SignatureTechnique=1
 					DamageMult=10
-					ChargeRate=0.25
+					ChargeRate=3
 					EndRate=0.75
 					Dodgeable=0
 					Distance=10
@@ -4496,7 +4496,7 @@ obj
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 						SignatureTechnique=2
 						DamageMult=15
-						ChargeRate=0.5
+						ChargeRate=4
 						Distance=15
 						IconLock='BeamDodon.dmi'
 						IconSize=1.5

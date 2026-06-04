@@ -824,6 +824,9 @@ mob
 						if(Secret=="Spiral")
 							icon_state = ""
 							PoseTime = 0
+							if(src.CheckSlotless("Evolution Power"))
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
+									AE.Trigger(src)
 							if(!src.CheckSlotless("Evolution Power"))
 								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
 									fmf.Trigger(src)
