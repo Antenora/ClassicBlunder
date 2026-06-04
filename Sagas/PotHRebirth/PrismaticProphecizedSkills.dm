@@ -1,3 +1,21 @@
+//Style
+/obj/Skills/Buffs/NuStyle/SwordStyle
+	From_Now_On
+		NeedsSword=1
+		StyleStr = 1.20
+		StyleSpd = 1.10
+		StyleFor = 1.20
+		StyleActive = "From Now On"
+		passives = list("HybridStyle" = "MysticStyle", "SoulTug" = 1.5, \
+		"SpiritFlow" = 1, "SpiritHand" = 1, "Fury" = 1, "DoubleStrike" = 1, "Flow" = 3, "Instinct" = 1)
+		adjust(mob/p)
+			var/pLv = p.SagaLevel
+			passives = list("HybridStyle" = "MysticStyle", "SoulTug" = 1.5, \
+			"SpiritFlow" = pLv, "SpiritHand" = 1, "Fury" = 1, "DoubleStrike" = 1, "Flow" = 3, "Instinct" = 1)
+		verb/From_Now_On()
+			set hidden=1
+			src.Trigger(usr)
+// Skills
 obj
 	Skills/Buffs/SpecialBuffs
 		Hyperdeath_Mode
@@ -17,7 +35,7 @@ obj
 			KenWaveY=72
 			KenWaveBlend=2
 			KenWaveTime=5
-			ActiveMessage="unleashes their complete self!"
+			ActiveMessage="awakens their Hyperdeath state!"
 			OffMessage="returns to their old self..."
 			adjust(mob/p)
 			verb/Hyperdeath_Mode()
@@ -37,22 +55,22 @@ obj
 			ForMult=1.25
 			Cooldown = 1
 			SwordAscension=3
-			ActiveMessage="readies CHAOS SABER."
-			OffMessage="dispels the CHAOS SABER!"
+			ActiveMessage="readies CHAOS SABER!"
+			OffMessage="dispels the CHAOS SABER."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1)
+				passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 0.5,"KiControl" = 1, "SpiritSword" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
 					SwordAscension=p.SagaLevel
 					StrMult=1.75
 					ForMult=1.5
-					passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1, "Chaos Buster" = 1)
+					passives = list("Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 0.5,"KiControl" = 1, "Chaos Buster" = 1, "SpiritSword" = 1)
 				if(p.SagaLevel>=4)
 					MakesSword=2
 					ActiveMessage="manifests their Chaos Sabers in a burst of prismatic light."
 					OffMessage="dispels the Chaos Sabers."
-					passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1, "Chaos Buster" = 1, "DoubleStrike" = 1)
+					passives = list("Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1, "Chaos Buster" = 1, "SpiritSword" = 2, "DoubleStrike" = 1)
 			verb/Chaos_Saber()
 				set category="Skills"
 				if(usr.CheckSlotless("Chaos Buster"))
@@ -67,14 +85,14 @@ obj
 			ForMult=1.50
 			StaffName="Chaos Buster"
 			StaffIcon='Aether Bow.dmi'
-			ActiveMessage="readies CHAOS BUSTER."
-			OffMessage="dispels their CHAOS BUSTER!"
-			passives = list("StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"Chaos Buster"=1, "SpiritStrike"=1)
+			ActiveMessage="readies CHAOS BUSTER!"
+			OffMessage="dispels their CHAOS BUSTER."
+			passives = list("StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"Chaos Buster"=1, "SpiritStrike"=1, "MovingCharge"=1, "SpiritFlow"=1.5)
 			StaffAscension=2
 			adjust(mob/p)
-				passives = list("StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"Chaos Buster"=1, "SpiritStrike"=1)
+				passives = list("StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"Chaos Buster"=1, "SpiritStrike"=1, "MovingCharge"=1, "SpiritFlow"=1.5)
 				if(p.SagaLevel>=3)
-					passives = list("StaffAscension" = 2, "Godspeed"=3, "Skimming"=1,"Chaos Buster"=2, "SpiritStrike"=1)
+					passives = list("StaffAscension" = max(p.SagaLevel, 3), "Godspeed"=3, "Skimming"=1,"Chaos Buster"=2, "SpiritStrike"=1, "MovingCharge"=1, "SpiritFlow"=2.5)
 					StrMult=1.50
 					ForMult=1.75
 			verb/Transfigure_Chaos_Buster()
@@ -103,7 +121,6 @@ obj
 					var/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber/cb = locate(/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber) in usr.contents
 					cb.Trigger(usr)
 				src.Trigger(usr)
-
 
 	Skills/Projectile
 		ChaosBusterShot
@@ -148,6 +165,7 @@ obj
 			SpellElement="Air"
 			FlickAttack=1
 			Distance=6
+			AdaptRate=1
 			Area="Target"
 			ForOffense=1
 			DamageMult=6

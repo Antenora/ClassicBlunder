@@ -281,6 +281,30 @@
 		FlickBlast=0
 		Cooldown=4
 		adjust(mob/p)
+	ChaosKnife
+		AdaptRate=1
+		Blasts=4
+		DamageMult=2
+		AccMult=1.5
+		AttackReplace=1
+		ZoneAttack=1
+		Distance=30
+		Homing=1
+		HomingCharge=2
+		HyperHoming=1
+		Striking=1
+		Instinct=2
+		ZoneAttackX=8
+		ZoneAttackY=8
+		FireFromEnemy=0
+		FireFromSelf=1
+		Hover=3
+		IconLock='UltimaLaser.dmi'
+		Explode=1
+		Variation=8
+		FlickBlast=0
+		Cooldown=4
+		adjust(mob/p)
 
 	Murder_Music
 		AttackReplace=1
