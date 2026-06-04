@@ -173,7 +173,7 @@ mob
 					defender.LoseMana(val*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
 
 			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", val)
+				defender.passive_handler.Increase("Dim Mak", val/2)
 			handlePostDamage(defender)
 			if(defender.VaizardHealth)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
@@ -329,7 +329,8 @@ mob
 				if(defender && defender.StyleBuff && defender.canGainTension())
 					if(!SecondStrike)
 						defender.gainTension((val*Motivation)*glob.DEFENDER_TENSION_REDUCER);
-
+						if(defender.Health<src.Health && defender.passive_handler.Get("SpiralPowerUnlocked"))
+							defender.gainTension((val*Motivation*2)*glob.DEFENDER_TENSION_REDUCER);
 			var/leakVal = val/GLOBAL_LEAK_REDUCTION
 			if(passive_handler.Get("Corruption"))
 				gainCorruption(val * 1.5 * glob.CORRUPTION_GAIN)
@@ -619,7 +620,7 @@ mob
 					CursedBlood=1
 					Effectiveness+= defender.passive_handler.Get("VenomBlood")
 					src.AddPoison(val*Effectiveness,defender)
-				if(defender.Secret=="Ripple")
+				if(defender.Secret=="Hamon")
 					src.AddBurn(val*Effectiveness*defender.secretDatum.currentTier)
 					val/=defender.secretDatum.currentTier
 				if(!CursedBlood)
@@ -918,18 +919,13 @@ mob
 				val/=1+src.GetKiControlMastery()
 		//		val*=(src.Power_Multiplier
 				if(src.GetPowerUpRatio()>1)
-					var/PUSpike=1
-					if(passive_handler.Get("PUSpike"))
-						PUSpike=max(1, passive_handler.Get("PUSpike")/100)
 
 					var/PowerUpPercent=GetPowerUpRatio()-1
-					if(src.HasMovementMastery()>=1) // this run timed a 0 somehow
-						PowerUpPercent/=1+(src.GetMovementMastery()/8)
+					PowerUpPercent -= GetMovementMastery();
 
-					PowerUpPercent/=PUSpike
 					if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 						PowerUpPercent=0
-					val*=(1+(PowerUpPercent/src.PUDrainReduction))
+					val*=(1+(PowerUpPercent/PUDrainReduction))
 
 			//	if(src.Kaioken)
 			//		if(src.Anger)
@@ -985,18 +981,13 @@ mob
 				val *= 0.5
 			val/=1+src.GetKiControlMastery()
 			val*=src.EnergyExpenditure//*src.Power_Multiplier
-			if(src.GetPowerUpRatio()>1 && !src.GatesActive)
+			if(GetPowerUpRatio()>1 && !GatesActive)
 				var/PowerUpPercent=GetPowerUpRatio()-1
-				if(src.HasMovementMastery())
-					PowerUpPercent/=1+(src.GetMovementMastery()/8)
-				var/PUSpike=1
-				if(passive_handler.Get("PUSpike"))
-					PUSpike=max(1, passive_handler.Get("PUSpike")/100)
+				PowerUpPercent -= GetMovementMastery();
 				if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 					PowerUpPercent=0
 
-				val*=(1+(PowerUpPercent/src.PUDrainReduction))
-				val/=PUSpike
+				val*=(1+(PowerUpPercent/PUDrainReduction))
 	//		if(src.Kaioken)
 	//			if(src.Anger)
 	//				val*=src.Anger
@@ -2953,7 +2944,7 @@ mob
 				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
-			if(src.Secret=="Ripple")
+			if(src.Secret=="Hamon")
 				good = 1
 			if(src.GetSpiritPower()>=1)
 				good = 1

@@ -127,6 +127,8 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
+//	if(src.passive_handler.Get("AdvanceFurther"))
+	//	src.passive_handler.Set("AdvanceFurther", 0)
 	if(src.passive_handler.Get("Herald of the End")&&src.transUnlocked<2)
 		src.passive_handler.Increase("The Clock Is Ticking", 1)
 		src<<"<font color=red><b>You really let someone get the better of you like that...? The clock is ticking.</font></b>"
@@ -333,7 +335,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src << "Your Royal Meter went back to 0."
 		src.client.updateRGMeter()
 
-	if(Secret == "Zombie")
+	if(Secret == "Zombie"&&P.Secret!="Hamon")
 		if(HealthCut + 0.1 < 1 && zombieGetUps + 1 <= AscensionsAcquired)
 			Conscious()
 			var/healthcutClose = clamp(0.9-(zombieGetUps/10),0,0.9)
@@ -620,7 +622,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		if(P.HasPurity()&&IsEvil())
 			SuperDead=2
 			NoRemains=1
-			if(P.Secret=="Ripple")
+			if(P.Secret=="Hamon")
 				src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 			else
 				src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
@@ -700,7 +702,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 			if(s||st)
 				if((s && s.Element=="Silver")||(st && st.Element=="Silver"))
 					src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
-				else if(P.Secret=="Ripple"&&P.HasPurity())
+				else if(P.Secret=="Hamon"&&P.HasPurity())
 					src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 
 		if(src.Phylactery)

@@ -119,7 +119,11 @@ scaling with potential as well
 		ForMult = 1.25 + (p.Potential/50)
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
+		BioArmor=0
 		AutoAnger=1
+		Enlarge = 3
+		DarkChange=1
+		IconTint=list(0.15,0,0, 0.05,0.25,0.15, 0.05,0.05,0.35, 0,0,0)
 		if(p.transUnlocked<2)
 			passives = list("Unstoppable"=1, "EndlessAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1),\
 							"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 5, "Flicker" = 5, "Pursuer" = 5, "PureDamage" = 5,"PureReduction" = 4, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")

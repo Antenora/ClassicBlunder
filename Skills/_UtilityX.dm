@@ -612,7 +612,7 @@ obj/Skills/Utility
 					who.Add(A)
 			for(var/mob/Players/W in who)
 				if(!usr.isRace(SHINJIN))
-					if(!usr.passive_handler.Get("SpiritPower"))
+					if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
 						if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
 							if(!(W in hearers(50,usr)))
 								who.Remove(W)

@@ -85,17 +85,25 @@ mob/tierUpSaga(path)
 			var/sl = p.SagaLevel
 			var/sp = p.secretDatum.currentTier
 			var/dr = sl + sp
+			var/se = p.passive_handler.Get("SpiralPowerUnlocked")
 			ControlledRush = 5 + dr
 			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
-			Size = 1 + dr
+			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = (1 + (round(dr/3)))
+			DamageMult = (1 + (round((dr+(se/2))/3)))
 			Rounds = 20
-			PullIn = dr
+			PullIn = dr + (se/2)
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)
 			EnergyCost = 1 + (3 * dr)
+			switch(se)
+				if(0 to 2)
+					ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
+				if(3 to 5)
+					ActiveMessage="yells: <b>ARC GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
+				if(6)
+					ActiveMessage="yells: <b>SUPER GALAXY GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
 	verb/Giga_Drill_Break()
 		set category="Skills"
 		adjust(usr)

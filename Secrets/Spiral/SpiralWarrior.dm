@@ -35,7 +35,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 4, "EnergyGeneration" = 3, "PUSpike" = 20, "DrainlessPUSpike" = 1, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2)
+		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -48,7 +48,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 4, "EnergyGeneration" = 3, "PUSpike" = 20, "DrainlessPUSpike" = 1, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2)
+		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -311,6 +311,33 @@ obj/Skills/AutoHit/Spiral
 		FollowUp="/obj/Skills/AutoHit/Spiral/Giga_Drill_Maximum"
 		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply"
 		FollowUpDelay=1
+/obj/Skills/Projectile
+	Spiral
+		Probability_Negation_Missiles
+			Cooldown=180
+			ZoneAttack=1
+			ZoneAttackX=8
+			ZoneAttackY=8
+			FireFromEnemy=0
+			FireFromSelf=1
+			RandomPath=1
+			Speed = 0.75
+			Distance=30
+			DamageMult=0.5
+			AdaptRate=1
+			Explode=1
+			Dodgeable=0
+			Deflectable=0
+			EndRate=0.75
+			Blasts=50
+			Delay=0
+			LosesHoming=3
+			HomingCharge=10
+			IconLock='Missile Small.dmi'
+			IconSize=0.5
+			verb/Probability_Negation_Missiles()
+				set category="Skills"
+				usr.UseProjectile(src)
 /mob/proc/HandleSpiralUnlock(var/Stat, SL)
 	var/CA=AscensionsAcquired
 	var/TA=CA+SL

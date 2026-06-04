@@ -93,11 +93,13 @@
 /obj/Skills/Buffs/SpecialBuffs/Nobody
 	CyberSignature=1
 	SagaSignature=1
-	SignatureTechnique=3
+	SignatureTechnique=4
+	SpecialSlot=0
+	Slotless=1
 	Darkness_of_the_Unknown
 		ForMult=1.35
 		DefMult=1.35
-		passives = list()
+		passives = list("Godspeed" = 2, "Skimming" = 2,"SweepingStrike"=1)
 		ActiveMessage="draws from the darkness of the unknown, calling forth power that never was!"
 		OffMessage="contains their superiority."
 		verb/Darkness_of_the_Unknown()
@@ -115,7 +117,7 @@
 	The_Other_Promise
 		OffMult=1.35
 		SpdMult=1.35
-		passives = list()
+		passives = list("SwordAscension" = 1, "Flicker" = 3, "Brutalize" = 1, "Instinct" = 2)
 		verb/The_Other_Promise()
 			set category="Skills"
 			src.Trigger(usr)

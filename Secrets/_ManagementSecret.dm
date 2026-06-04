@@ -665,6 +665,7 @@ SecretInformation
 				if(5)
 					p << "Your very DNA resonates with Spiral Power. You climb upwards toward the ceiling of your cage."
 					nextTierUp = 4
+					p.AddSkill(new/obj/Skills/Projectile/Spiral/Probability_Negation_Missiles)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.2
 						p.EndAscension+= 0.2

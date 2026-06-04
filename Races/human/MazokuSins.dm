@@ -345,8 +345,11 @@ obj/Skills/Queue/Kibou_ou_Hope
 		if(!usr.passive_handler || !usr.passive_handler.Get("HopeFactor"))
 			usr << "You aren't hopeful enough to use this power."
 			return
-		if(!usr.isInMazokuDT())
+		if(usr.isInMazokuDT())
 			usr << "You cannot use this in Mazoku DT."
+			return
+		if(usr.Health >= 40)
+			usr << "You cannot use this until your health is low."
 			return
 		var/healthDiff = 0
 		if(usr.Target && istype(usr.Target, /mob/Players) && usr.Target != usr)

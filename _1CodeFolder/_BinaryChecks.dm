@@ -1072,7 +1072,7 @@ mob
 				return 1
 			return 0
 		GetHardStyle()
-			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4) + ((GetMangLevel()*1)+4)
+			return passive_handler.Get("HardStyle") + (KamuiBuffLock * 4)
 		GetDebuffCrash()
 			var/list/Debuffs=list()
 			for(var/sb in SlotlessBuffs)
@@ -1389,30 +1389,6 @@ mob
 			return 0
 		GetVanish()
 			return passive_handler.Get("Vanishing")
-		HasMovementMastery()
-			if(passive_handler.Get("Zeal"))
-				return 1
-			if(passive_handler.Get("MovementMastery"))
-				return 1
-			if(InfinityModule)
-				return 1
-			if(Saga=="Cosmo")
-				return 1
-			if(passive_handler.Get("Hopes and Dreams")) return 1;
-			return 0
-		GetMovementMastery()
-			var/Total=0
-			Total+=passive_handler.Get("MovementMastery")
-			if(passive_handler.Get("Zeal"))
-				Total += transActive
-			if(Saga=="Cosmo" && !SpecialBuff)
-				Total += SagaLevel * 2.5
-			if(InfinityModule)
-				Total += (2 * AscensionsAcquired)
-			if(Secret=="Shin")
-				Total += secretDatum.currentTier
-			if(passive_handler.Get("Hopes and Dreams")) Total += (5 * AscensionsAcquired)
-			return Total
 		HasPhysicalHitsLimit()
 			if(passive_handler.Get("PhysicalHitsLimit"))
 				return 1
@@ -1508,7 +1484,7 @@ mob
 				return 1
 			return 0
 		HasWaterWalk()
-			if(passive_handler.Get("WaterWalk") || passive_handler.Get("Gravity")||src.Secret=="Ripple")
+			if(passive_handler.Get("WaterWalk") || passive_handler.Get("Gravity")||src.Secret=="Hamon")
 				return 1
 			return 0
 		HasSuperDash()
@@ -1671,7 +1647,7 @@ mob
 						return 0
 			if(passive_handler.Get("Flow"))
 				return 1
-			if(src.Secret=="Ripple"&&src.StyleActive)
+			if(src.Secret=="Hamon"&&src.StyleActive)
 				return 1
 			// if(src.Secret=="Vampire"&&src.StyleActive)
 			// 	return 1
@@ -1693,7 +1669,7 @@ mob
 				return 0
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Senses"))
 				Extra += secretDatum?:getBoon(src, "Senses")
-			if(src.Secret=="Ripple"&&src.StyleActive)
+			if(src.Secret=="Hamon"&&src.StyleActive)
 				Extra+=1
 			if(passive_handler.Get("Shameful Display"))
 				var/viewCount = getSenketsuViewers()

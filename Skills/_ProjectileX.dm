@@ -4315,7 +4315,7 @@ obj
 					SignatureTechnique=1
 					AdaptRate=1
 					DamageMult=12
-					ChargeRate=2
+					ChargeRate=1
 					Dodgeable=0
 					IconLock='BeamKHH.dmi'
 					Cooldown=150
@@ -4342,8 +4342,8 @@ obj
 				Galic_Gun
 					SignatureTechnique=1
 					AdaptRate=1
-					DamageMult=5
-					ChargeRate=1.5
+					DamageMult=10
+					ChargeRate=0.5
 					Dodgeable=0
 					IconLock='BeamGG.dmi'
 					Cooldown=150
@@ -4368,8 +4368,8 @@ obj
 
 				Dodompa//Penetrate, high charge and low distance
 					SignatureTechnique=1
-					DamageMult=5
-					ChargeRate=4
+					DamageMult=10
+					ChargeRate=3
 					EndRate=0.75
 					Dodgeable=0
 					Distance=10
@@ -4495,8 +4495,8 @@ obj
 					Super_Dodompa//Penetrate, high charge and low distance
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 						SignatureTechnique=2
-						DamageMult=8
-						ChargeRate=5
+						DamageMult=15
+						ChargeRate=4
 						Distance=15
 						IconLock='BeamDodon.dmi'
 						IconSize=1.5
@@ -4511,8 +4511,8 @@ obj
 						StrRate = 0
 						ForRate = 1
 						SignatureTechnique=2
-						DamageMult=8
-						ChargeRate=3
+						DamageMult=15
+						ChargeRate=2
 						Distance=60
 						IconLock='BeamKHH.dmi'
 						IconSize=2
@@ -4536,8 +4536,8 @@ obj
 
 					Final_Flash
 						SignatureTechnique=2
-						DamageMult=8
-						ChargeRate=2
+						DamageMult=20
+						ChargeRate=5
 						Distance=60
 						IconLock='BeamDodon.dmi'
 						IconSize=2
@@ -6598,13 +6598,13 @@ obj
 							m:applyChargeDelay(ChargeDelay)
 						if(CooldownDrag)
 							m:addCooldownDrag(CooldownDrag, src.Owner)
-						
+
 						if(HealingReverse)
 							m:applyHealReverse()
 
 						if(SpellElement=="Space"&&m.StarCrossed)
 							m:applyStarCrossed()
-						
+
 						if(Deport)
 							m:applyDeport(Deport)
 

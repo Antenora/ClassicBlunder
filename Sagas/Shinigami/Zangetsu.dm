@@ -78,9 +78,14 @@
 			passives["ManaLeak"] = 2
 		if(SL >= 7)
 			passives["DoubleStrike"] = 5
-		StrMult = 1.1 + (0.1 * SL)
-		ForMult = 1.1 + (0.1 * SL)
-		OffMult = 1.1 + (0.1 * SL)
+		if(SL >= 7)
+			StrMult = 1.15 + (0.15 * SL)
+			ForMult = 1.15 + (0.15 * SL)
+			SpdMult = 1.15 + (0.15 * SL)
+		else
+			StrMult = 1.1 + (0.1 * SL)
+			ForMult = 1.1 + (0.1 * SL)
+			OffMult = 1.1 + (0.1 * SL)
 
 	Trigger(mob/user)
 		var/wasOn = src.SlotlessOn
@@ -142,9 +147,15 @@
 		if(SL >= 7)
 			passives["Deicide"]  = 15
 			passives["EndlessNine"]  = 0.5
-		StrMult = 1.3 + (0.1 * SL)
-		ForMult = 1.3 + (0.1 * SL)
-		SpdMult = 1.3 + (0.1 * SL)
+		if(SL >= 7)
+			StrMult = 1.4 + (0.15 * SL)
+			ForMult = 1.4 + (0.15 * SL)
+			SpdMult = 1.15 + (0.15 * SL)
+			OffMult = 1.15 + (0.15 * SL)
+		else
+			StrMult = 1.3 + (0.1 * SL)
+			ForMult = 1.3 + (0.1 * SL)
+			SpdMult = 1.3 + (0.1 * SL)
 
 	Trigger(mob/user)
 		var/wasOn = src.SlotlessOn
