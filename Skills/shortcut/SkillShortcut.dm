@@ -82,6 +82,7 @@ What shortcut do you want to set?"}
     //god i hate that this proc is necessary atm = _ =
     fireShortcut(obj/Skills/s)
         if(s.HeldSkill)
+            held_skill_from_macro = world.time
             BeginHeldSkill(s);
             return;
         if(istype(s, /obj/Skills/Queue))
