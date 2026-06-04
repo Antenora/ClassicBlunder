@@ -31,7 +31,7 @@ ascension
 					if("Eldritch (Reflected)")
 						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
-						passives["Soulfire"] = 0.25;
+						passives["SoulFire"] = 0.25;
 				..()
 
 			postAscension(mob/owner)
@@ -54,7 +54,7 @@ ascension
 					if("Eldritch (Reflected)")
 						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
-						passives["Soulfire"] = 0.25;
+						passives["SoulFire"] = 0.25;
 				..()
 
 			postAscension(mob/owner)
@@ -80,7 +80,7 @@ ascension
 					if("Eldritch (Reflected)")
 						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
-						passives["Soulfire"] = 0.5;
+						passives["SoulFire"] = 0.5;
 				..()
 
 			postAscension(mob/owner)
@@ -105,7 +105,7 @@ ascension
 					if("Eldritch (Reflected)")
 						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
-						passives["Soulfire"] = 0.5;
+						passives["SoulFire"] = 0.5;
 				..()
 
 			postAscension(mob/owner)
@@ -128,7 +128,7 @@ ascension
 					if("Eldritch (Reflected)")
 						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
-						passives["Soulfire"] = 1;
+						passives["SoulFire"] = 1;
 				..()
 
 			postAscension(mob/owner)
@@ -151,14 +151,9 @@ ascension
 					if("Eldritch (Shrouded)")
 						passives["Unnerve"] = 3;
 					if("Eldritch (Reflected)")
-						passives["Soulfire"] = 1.5;
+						passives["SoulFire"] = 1.5;
 				..()
 
 			postAscension(mob/owner)
 				owner.secretDatum.tierUp(7, owner)
 				..()
-
-mob/verb/DebugFixAscensions()
-	set name = "DEBUG: Fix Ascensions"
-	set category = "DEBUG"
-	usr.race.revertAndFixAllAscensions(usr);
