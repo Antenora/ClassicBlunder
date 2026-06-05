@@ -52,6 +52,9 @@
 			passives = list("Scorching" = 1, "Momentum" = 1)
 	verb/Fire_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Water_Gestalt_Buff
@@ -84,6 +87,9 @@
 			passives = list("Chilling" = 1, "FluidForm" = 1)
 	verb/Water_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Earth_Gestalt_Buff
@@ -116,6 +122,9 @@
 			passives = list("Shattering" = 1, "Harden" = 1)
 	verb/Earth_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Wind_Gestalt_Buff
@@ -148,6 +157,9 @@
 			passives = list("Shocking" = 1, "Afterimages" = 1)
 	verb/Wind_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Light_Gestalt_Buff
@@ -180,6 +192,9 @@
 			passives = list("LifeGeneration" = 1, "BuffMastery" = 1)
 	verb/Light_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Dark_Gestalt_Buff
@@ -212,6 +227,9 @@
 			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "AngerAdaptiveForce" = 0.1)
 	verb/Dark_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Time_Gestalt_Buff
@@ -244,6 +262,9 @@
 			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1)
 	verb/Time_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/SpecialBuffs/Space_Gestalt_Buff
@@ -276,4 +297,7 @@
 			passives = list("Warping" = 1, "Flicker" = 1)
 	verb/Space_Gestalt_Buff()
 		set category="Skills"
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Buff."
+			return
 		src.Trigger(usr)

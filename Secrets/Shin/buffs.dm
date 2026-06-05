@@ -52,7 +52,6 @@
     passives = list("Harden" = 1, "PureReduction" = 1, "Deflection" = 1, "Skimming" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
     adjust(mob/p)
         var/secretLevel = p.secretDatum.currentTier
-        var/mod = (secretLevel-5)
         // Tier Adjusted Mults
         StrMult = 1.2 + (0.1 * p.GetMangLevel()) 
         ForMult = 1.2 + (0.1 * p.GetMangLevel()) 
@@ -60,7 +59,7 @@
         SpdMult = 1.2 + (0.1 * p.GetMangLevel())
         // Shin Tier Adjusted Passives - These are your shin passives but divided by 2
         passives["Harden"] = clamp(secretLevel*2, 1, 5)/2 
-        passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5)/2; 
+        passives["PureReduction"] = secretLevel / 2
         passives["Deflection"] = (0.5 * secretLevel)/2 
         passives["Skimming"] = clamp(secretLevel, 1, 3) // This Operates independent of mang level for now
         passives["CheapShot"] = 5 // This is backend buffed by GetMangLevel() in Modifiers.dm up to 10

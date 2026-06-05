@@ -1436,8 +1436,6 @@ mob
 		HasSpecialBuffLock()
 			if(passive_handler.Get("SpecialBuffLock"))
 				return 1
-			if(InShikai() || InBankai())
-				return 1
 			if(src.InfinityModule)
 				return 1
 			return 0
@@ -1769,6 +1767,7 @@ mob
 		GetSoulFire()
 			if(!FightingSeriously(src, 0)) return 0;
 			. = passive_handler.Get("SoulFire");
+			. += passive_handler.Get("Soulfire");//we add this in just in case...
 			. += scalingEldritchPower();
 
 		HasLifeStealTrue()
@@ -2610,6 +2609,7 @@ mob
 				return 1
 			if(src.Saga=="Keyblade")
 				return 1
+			if(hasSecret("Eldritch (Reflected)") && scalingEldritchPower()) return 1;
 			return 0
 		GetSpiritFlow()
 			var/Return = passive_handler.Get("SpiritFlow")
@@ -2619,8 +2619,10 @@ mob
 				Return += src.SagaLevel
 			if(InfinityModule)
 				Return += AscensionsAcquired/2
+			if(hasSecret("Eldritch (Reflected)")) Return += (scalingEldritchPower()/2);
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
+			
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
