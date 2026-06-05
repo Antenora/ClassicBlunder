@@ -28,6 +28,9 @@
 			passives = list("HeavyHitter" = 1, "Scorching" = 1)
 	verb/Fire_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Water_Gestalt
@@ -55,6 +58,9 @@
 			passives = list("FluidForm" = 1, "Blubber" = 1)
 	verb/Water_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Earth_Gestalt
@@ -82,6 +88,9 @@
 			passives = list("Harden" = 1, "Steady" = 1)
 	verb/Earth_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Wind_Gestalt
@@ -109,6 +118,9 @@
 			passives = list("BlurringStrikes" = 1, "AttackSpeed" = 1)
 	verb/Wind_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Light_Gestalt
@@ -136,6 +148,9 @@
 			passives = list("Steady" = 1, "HolyMod" = 1, "ManaGeneration" = 1, "EnergyGeneration" = 1)
 	verb/Light_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Dark_Gestalt
@@ -163,6 +178,9 @@
 			passives = list("KillerInstinct" = 0.1, "CriticalChance" = 20, "CriticalDamage" = 0.2)
 	verb/Dark_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Time_Gestalt
@@ -190,6 +208,9 @@
 			passives = list("TechniqueMastery" = 1, "CounterMaster" = 1)
 	verb/Time_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Space_Gestalt
@@ -217,4 +238,7 @@
 			passives = list("Warping" = 1, "SuperDash" = 1)
 	verb/Space_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)

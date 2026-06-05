@@ -2217,9 +2217,6 @@ NEW VARIABLES
 				OffMessage="violently rips off their mask as it shatters into fragments..."
 				proc/changeVariables(mob/p)
 					if(altered) return
-					if(p.Saga=="Shinigami")
-						Slotless=1
-						SpecialSlot=0
 					var/SuperSaiyanBuff=1
 					if((p.isRace(SAIYAN) && p.transActive >= 1) || (p.isRace(HALFSAIYAN) && p.transActive >= 1) || p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race && p.race.transformations && p.race.transformations.len >= 1)
@@ -2267,9 +2264,6 @@ NEW VARIABLES
 					Cooldown=60
 				verb/Don_Mask()
 					set category="Skills"
-					if(usr.CheckSlotless("Final Getsuga Tenshou")||usr.CheckSlotless("Getsuga Tenshou Clad")) //might make a skill var for this later)
-						usr<< "You can only use one augmentation technique (Final Getsuga Tenshou, Getsuga Clad, Vaizard) at a time!"
-						return
 					if(!usr.BuffOn(src))
 						if(!usr.VaizardType)
 							usr.VaizardType = input(usr, "What type?") in list("Berserker", "Manipulator", "Hellion", "Phantasm")
@@ -3037,8 +3031,6 @@ NEW VARIABLES
 				SagaSignature=1
 				TimerLimit=30
 				Cooldown=30
-				Slotless=1
-				SpecialSlot=0
 				passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1, "SpiritFlow" = 4)
 				StrMult=1.3
 				OffMult=1.3
@@ -3051,12 +3043,7 @@ NEW VARIABLES
 					if(!usr.InBankai())
 						usr << "Getsuga Clad can only be used in Bankai."
 						return
-					if(usr.CheckSlotless("Final Getsuga Tenshou")||usr.CheckSlotless("Vaizard Mask")) //might make a skill var for this later)
-						usr<< "You can only use one augmentation technique (Final Getsuga Tenshou, Getsuga Clad, Vaizard) at a time!"
-						return
 					if(!altered)
-						Slotless=1
-						SpecialSlot=0
 						passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1)
 					src.Trigger(usr)
 			Final_Getsuga_Tenshou
@@ -3065,8 +3052,6 @@ NEW VARIABLES
 				TimerLimit=600
 				EnergyCut=0.99
 				ManaCut=0.99
-				Slotless=1
-				SpecialSlot=0
 				StrCut=0.5
 				EndCut=0.5
 				ForCut=0.5
@@ -3103,9 +3088,6 @@ NEW VARIABLES
 					set category="Skills"
 					if(!usr.InBankai())
 						usr << "Final Getsuga Tenshou can only be used in Bankai."
-						return
-					if(usr.CheckSlotless("Getsuga Tenshou Clad")||usr.CheckSlotless("Vaizard Mask"))
-						usr<< "You can only use one augmentation technique (Final Getsuga Tenshou, Getsuga Clad, Vaizard) at a time!"
 						return
 					var/wasOn = usr.BuffOn(src)
 					src.Trigger(usr)
