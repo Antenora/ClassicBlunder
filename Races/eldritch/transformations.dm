@@ -57,7 +57,7 @@ transformation
 					strengthadd = 0.1*user.AscensionsAcquired
 					forceadd = 0.1*user.AscensionsAcquired
 					passives = list("Unreality" = 0.9, "Full Manifestation" = 1)
-					passives += user.PullAscensionPassives(user.AscensionsAcquired, 6);
+					passives += user.PullAscensionPassives(min(user.AscensionsAcquired+1, 6), 6);
 			transform_animation(mob/user)
 				if(user.hasSecret("Eldritch (Shrouded)"))
 					user.MobColor=null;
