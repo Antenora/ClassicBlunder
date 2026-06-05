@@ -1769,6 +1769,7 @@ mob
 		GetSoulFire()
 			if(!FightingSeriously(src, 0)) return 0;
 			. = passive_handler.Get("SoulFire");
+			. += passive_handler.Get("Soulfire");//we add this in just in case...
 			. += scalingEldritchPower();
 
 		HasLifeStealTrue()
