@@ -4735,6 +4735,9 @@ obj
 							LockX=-16
 							LockY=-16
 							Cooldown=10800
+							adjust(mob/p)
+								DamageMult = 4 + (p.SagaLevel * 1)
+								Cooldown = 240 - (p.SagaLevel * 15)
 							verb/Daytime_Tiger()
 								set category="Skills"
 								usr.UseProjectile(src)
