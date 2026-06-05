@@ -274,4 +274,4 @@ obj/Skills/Utility
             //aesthetics
             usr.loc = choice.loc;
             OMsg(usr, "<font color='purple'>...<b>[usr]'s Shroud</b> drags their body through space to a fellow Tether!!</font color>");
-            Cooldown();
+            Using=0;

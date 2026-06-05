@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 30
+	var/UPDATE_VERSION = 31
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -669,6 +669,16 @@ update
 					var/spell_passive/sp = new type;
 					p.acquiredSpellPassives |= sp;
 				p << "You'll need to reapply your spell passives."
+	version31
+		version = 31
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				p << "You're going to have to redo your ascension choices..."
+				p.race.revertAndFixAllAscensions(p);
+				p << "It is done. Remeditate to have your ascensions granted again!"
+				if(p.passive_handler["Soulfire"] != 0)//this is a typo. we do not use this.
+					p.passive_handler["Soulfire"] = 0;
 			
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25

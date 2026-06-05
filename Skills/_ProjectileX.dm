@@ -4369,7 +4369,7 @@ obj
 				Dodompa//Penetrate, high charge and low distance
 					SignatureTechnique=1
 					DamageMult=10
-					ChargeRate=0.25
+					ChargeRate=3
 					EndRate=0.75
 					Dodgeable=0
 					Distance=10
@@ -4496,7 +4496,7 @@ obj
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 						SignatureTechnique=2
 						DamageMult=15
-						ChargeRate=0.5
+						ChargeRate=4
 						Distance=15
 						IconLock='BeamDodon.dmi'
 						IconSize=1.5
@@ -4735,6 +4735,9 @@ obj
 							LockX=-16
 							LockY=-16
 							Cooldown=10800
+							adjust(mob/p)
+								DamageMult = 4 + (p.SagaLevel * 1)
+								Cooldown = 240 - (p.SagaLevel * 15)
 							verb/Daytime_Tiger()
 								set category="Skills"
 								usr.UseProjectile(src)

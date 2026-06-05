@@ -381,6 +381,7 @@
 #include "_Reworks\Chat_Rework\RPBox.dm"
 #include "_Reworks\Chat_Rework\tech_frequencies.dm"
 #include "_Reworks\Combat\_defines.dm"
+#include "_Reworks\Combat\AscensionPower.dm"
 #include "_Reworks\Combat\DamageRolls.dm"
 #include "_Reworks\Combat\DoDamage.dm"
 #include "_Reworks\Combat\GetandUseSkill.dm"

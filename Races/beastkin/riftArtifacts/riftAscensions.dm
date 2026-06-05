@@ -91,6 +91,8 @@
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)
 /mob/proc/getRiftAscensionOptions()
+    liveDebugMsg("picking ascension choice for [race.ascensions[AscensionsAcquired]]")
+    race.ascensions[AscensionsAcquired].pickingChoice=TRUE;
     var/list/availableOptions = subtypesof(/ascension/sub_ascension/beastkin);
     var/list/removeOptions = list();
     removeOptions |= ASC1_SUBASCENSIONS

@@ -10172,13 +10172,15 @@ NEW VARIABLES
 						StrMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
-						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower, "EnergyGeneration" = SpiralPower, "Motivation" = 0.25)
+						passives = list("SpiralPowerUnlocked" = 1, "PureDamage" = SpiralPower, "PureReduction" = SpiralPower, "EnergyGeneration" = SpiralPower, "Motivation" = 0.5)
 						TimerLimit= 60
 						Cooldown = 60 - (secretLevel*5)
 						if(secretLevel>=4)
-							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution, p))
+								p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution)
 						if(secretLevel>=5)
-							BuffTechniques=list("/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution", "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution, p))
+								p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution)
 				KenWave = 2
 				KenWaveIcon='SparkleGreen.dmi'
 				HitSpark='Spiral_Hitspark.dmi'
@@ -10205,7 +10207,7 @@ NEW VARIABLES
 					var/secretLevel = p.secretDatum.currentTier
 					var/asc = p.AscensionsAcquired
 					if(!altered)
-						passives = list("SpiralPowerUnlocked" = 2, "PureDamage" = 2, "PureReduction" = 2, "Motivation" = 0.25)
+						passives = list("SpiralPowerUnlocked" = 2, "PureDamage" = 2, "PureReduction" = 2, "Motivation" = 0.5)
 						PowerMult = 1+(0.015*secretLevel) + (0.005*asc*asc)
 						StrMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)

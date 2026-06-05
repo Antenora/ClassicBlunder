@@ -89,8 +89,9 @@ SecretInformation
 			p.passive_handler.Set(variable,1)
 			p.vars[variable] += 1
 
-	proc/applySecret()
-
+	proc/applySecret(mob/p)
+		if(!p) return;
+		admins << "[p] has been given T[currentTier] [p.secretDatum.name]."
 
 	JaganEye
 		name = "Jagan Eye"
@@ -105,12 +106,10 @@ SecretInformation
 					giveVariables(p)
 					p.JaganPowerNerf = 0.5
 					nextTierUp = 3;
-					admins << "[p] has been given T1 Jagan Eye."
 				if(2)
 					p << "Your Jagan Eye has grown stronger!"
 					p.JaganPowerNerf = 0.7
 					nextTierUp = 7
-					admins << "[p] has been given T2 Jagan Eye."
 					// add expert here
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Jagan_Expert, p.Buffs))
 						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Jagan_Expert)
@@ -129,7 +128,6 @@ SecretInformation
 							DF.MaimCost=0
 							p << "Through refining the Jagan Eye, your control over darkness flame grows!"
 					nextTierUp = 7
-					admins << "[p] has been given T3 Jagan Eye."
 				if(4)
 					p << "Your Jagan Eye has grown stronger!"
 					p.JaganPowerNerf = 0
@@ -142,7 +140,7 @@ SecretInformation
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Jagan_Expert/je in usr)
 						del je
 					nextTierUp = 999
-					admins << "[p] has been given T4 Jagan Eye."
+			..(p);
 
 
 	Haki
@@ -180,7 +178,6 @@ SecretInformation
 					giveSkills(p)
 					giveVariables(p)
 					conQHaki(p)
-					admins << "[p] has been given T1 Haki."
 				if(2)
 					p << "Your Haki has grown stronger!"
 					conQHaki(p)
@@ -189,25 +186,22 @@ SecretInformation
 						var/path = input(p, "Which path of Haki do you wish to follow?", "Haki") in list("Armament", "Observation")
 						secretVariable["HakiSpecialization"] = path
 					nextTierUp = 2
-					admins << "[p] has been given T2 Haki."
 				if(3)
 					p << "Your Haki has grown stronger!"
 					conQHaki(p)
 					conqPaths(p)
 					nextTierUp = 2
-					admins << "[p] has been given T3 Haki."
 				if(4)
 					p << "Your Haki has grown stronger!"
 					conQHaki(p)
 					conqPaths(p)
 					nextTierUp = 4
-					admins << "[p] has been given T4 Haki."
 				if(5)
 					p << "Your Haki has grown stronger!"
 					conQHaki(p)
 					conqPaths(p)
 					nextTierUp = 999
-					admins << "[p] has been given T5 Haki."
+			..(p);
 
 
 
@@ -224,27 +218,23 @@ SecretInformation
 					giveSkills(p)
 					giveVariables(p)
 					p.OxygenMax+=50
-					admins << "[p] has been given T1 Hamon."
 				if(2)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 2
 					p.OxygenMax+=50
-					admins << "[p] has been given T2 Hamon."
 				if(3)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 2
 					p.OxygenMax+=50
-					admins << "[p] has been given T3 Hamon."
 				if(4)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 4
 					p.OxygenMax+=50
-					admins << "[p] has been given T4 Hamon."
 				if(5)
 					p << "Your mastery of the Ripple has reached its peak."
 					nextTierUp = 999
 					p.OxygenMax+=50
-					admins << "[p] has been given T5 Hamon."
+			..(p);
 
 
 	Vampire
@@ -293,7 +283,6 @@ SecretInformation
 					p << "You have willingly consumed blood, forsaking your humanity...You've awakened the power of a Vampire!"
 					giveSkills(p)
 					giveVariables(p)
-					admins << "[p] has been given T1 Vampire."
 				if(2)
 					p << "Your bloodlust is growing...You've become a more powerful Vampire!"
 					nextTierUp = 4
@@ -302,43 +291,37 @@ SecretInformation
 					if(!r)
 						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Regeneration)
 						p << "Your ability to regeneration can restore lost limbs."
-					admins << "[p] has been given T2 Vampire."
 				if(3)
 					p << "Your mastery of the blood curse is coming close to its peak..."
 					nextTierUp = 3
 					if(p.RecovMod < 3)
 						p.RecovMod = 3
 						p<<"Your innate regeneration has increased!"
-					admins << "[p] has been given T3 Vampire."
 				if(4)
 					p << "Your prowess as a Vampire knows no limits"
 					nextTierUp = 4
-					admins << "[p] has been given T4 Vampire."
 				if(5)
 					p << "You have forgotten what it means to be mortal..."
 					nextTierUp = 999
-					admins << "[p] has been given T5 Vampire."
+			..(p);
 
 	EldritchShrouded
 		name = "Eldritch (Shrouded)"
 		var/list/ShroudedPassives=list();
 		var/ShroudedOrigin;//assigned at t1
 		var/ShroudedSubtype;//assigned at t2
-		var/ShroudedMastery;//assigned at t6
+		var/ShroudedMastery;//assigned at t5
 		applySecret(mob/p)
-			p << "Your Shrouded origin bubbles to the surface; [currentTier] Step\s towards the road to Assimilation have been taken..."
-			//1, 2, and 6 upgrade your "Origin" style enhancements
+			p << "Your Shrouded origin bubbles to the surface; [currentTier] Step\s towards the road to Assimilation [currentTier == 1 ? "has" : "have"] been taken..."
+			//1, 2, and 5 upgrade your "Origin" style enhancements
 			//I'm not being lazy, I'm being ~efficient~
 			if(currentTier==3)
 				p.findOrAddSkill(/obj/Skills/Utility/Tether)
 				p << "Your Shroud learns to link itself with another body for ease of existence! (Tether)"
-				admins << "[p] has been given T3 Shrouded Eldritch."
 			if(currentTier==4)
 				p << "When you Fade into Shadow, your existence is further nullified (Upgrades to Fade into Shadow movement)"
-				admins << "[p] has been given T4 Shrouded Eldritch."
-			if(currentTier==5)
 				p << "Your All Seeing Eyes can pierce any veils within this reality! (Restrictions on All Seeing Eyes removed)"
-				admins << "[p] has been given T5 Shrouded Eldritch."
+			..(p);
 
 	EldritchReflected
 		name = "Eldritch (Reflected)"
@@ -351,29 +334,25 @@ SecretInformation
 					p << "You remember how to Refresh someone and ignore the time their body is taxed! (Refresh)"
 					p.findOrAddSkill(/obj/Skills/Utility/Eldritch_Domain);
 					p << "You remember how to expand your Eldritch Domain and empower yourself and your Coven! (Eldritch Domain)";
-					admins << "[p] has been given T2 Reflected Eldritch."
 				if(3)
 					p.findOrAddSkill(/obj/Skills/Utility/Altered_Nature);
 					p << "You remember how to weave the threads of Fate between your Coven! (Altered Nature)"
 					p.findOrAddSkill(/obj/Skills/Utility/Bared_Souls);
 					p << "You remember how to bare your true nature to a Coven member! (Bared Souls)"
-					admins << "[p] has been given T3 Reflected Eldritch."
 				if(4)
 					p.findOrAddSkill(/obj/Skills/Utility/Glimpse_Inside);
 					p << "You remember how to reach inside a Coven member and bestow Eldritch secrets upon them! (Glimpse Inside)"
 					p.findOrAddSkill(/obj/Skills/Utility/Shared_Dreaming);
 					p << "You remember how to instantly teleport to a member of your Coven! (Shared Dreaming)";
-					admins << "[p] has been given T4 Reflected Eldritch."
 				if(5)
 					p.findOrAddSkill(/obj/Skills/Utility/With_You_In_Darkness);
 					p << "You remember how to bestow your dark protection upon a Coven member! (With You in Darkness)"
 					p.findOrAddSkill(/obj/Skills/Utility/Observe);
 					p << "...you can observe."
-					admins << "[p] has been given T5 Reflected Eldritch."
 				if(6)
 					p.findOrAddSkill(/obj/Skills/Utility/Reclamation)
 					p << "You remember how to take it all away, stealing your threads back to yourself for your own gain! (Reclamation)"
-					admins << "[p] has been given T6 Reflected Eldritch."
+			..(p);
 
 	Eldritch
 		name = "Eldritch"
@@ -384,6 +363,7 @@ SecretInformation
 			switch(currentTier)
 				if(1)
 					giveSkills(p)
+			..(p);
 		proc/noMobCheck(mob/p, procName)
 			if(!p)
 				DEBUGMSG("Eldritch (Secret) [procName] does not have a mob argument.");
@@ -540,7 +520,6 @@ SecretInformation
 					if(!r)
 						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Regeneration)
 						p << "The Moon's energy has granted you the ability to regenerate"
-					admins << "[p] has been given T1 Werewolf."
 				if(2)
 					var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r = new()
 					r = locate() in p
@@ -548,18 +527,15 @@ SecretInformation
 						r.RegenerateLimbs = 1
 					p << "You can now restore lost limbs with ease!"
 					nextTierUp = 4
-					admins << "[p] has been given T2 Werewolf."
 				if(3)
 					p << "Your mastery of the lunar curse is coming close to its peak..."
 					nextTierUp = 3
-					admins << "[p] has been given T3 Werewolf."
 				if(4)
 					p << "Your prowess as a Werewolf knows no limits"
 					nextTierUp = 4
-					admins << "[p] has been given T4 Werewolf."
 				if(5)
 					p << "Your mastery of the lunar curse is godly..."
-					admins << "[p] has been given T5 Werewolf."
+			..(p);
 
 	HeavenlyRestriction
 		name = "Heavenly Restriction"
@@ -580,7 +556,6 @@ SecretInformation
 					p << "Enlightened to the natural order of things, you become capable of drawing on the power of the world!"
 					giveSkills(p)
 					giveVariables(p)
-					admins << "[p] has been given T1 Sage Arts."
 				if(2)
 					p << "Handling natrual energy becomes easier..."
 					var/obj/Skills/Queue/Rasengan/r = new()
@@ -589,7 +564,6 @@ SecretInformation
 						p.AddSkill(new/obj/Skills/Queue/Rasengan)
 						p << "You have learned the Rasengan!"
 					nextTierUp = 4
-					admins << "[p] has been given T2 Sage Arts."
 				if(3)
 					p << "Your mastery of natural energy is coming close to its peak..."
 					nextTierUp = 3
@@ -598,7 +572,6 @@ SecretInformation
 					if(!r)
 						p.AddSkill(new/obj/Skills/Queue/Oodama_Rasengan)
 						p << "You have learned the Oodama Rasengan!"
-					admins << "[p] has been given T3 Sage Arts."
 				if(4)
 					p << "You have climbed the mountain of natural energy, and have become a Sage!"
 					var/obj/Skills/Projectile/Rasenshuriken/r = new()
@@ -607,11 +580,10 @@ SecretInformation
 						p.AddSkill(new/obj/Skills/Projectile/Rasenshuriken)
 						p << "You have learned the Rasenshuriken!"
 					nextTierUp = 4
-					admins << "[p] has been given T4 Sage Arts."
 				if(5)
 					nextTierUp=999
 					p << "You have mastered the art of Senjutsu!"
-					admins << "[p] has been given T5 Sage Arts."
+			..(p);
 
 	Spiral
 		name = "Spiral"
@@ -623,7 +595,6 @@ SecretInformation
 					p << "Your fighting spirit soars throughout you. Unknown to you, this is the beginning of Spiral Energy."
 					giveSkills(p)
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/Clobber)
-					admins << "[p] has been given T1 Spiral Energy."
 				if(2) // Get your main attack
 					p << "You hone your fighting spirit, fueled by the urge to make your dreams real."
 					p.AddSkill(new/obj/Skills/AutoHit/Giga_Drill_Breaker)
@@ -636,7 +607,6 @@ SecretInformation
 						p.OffAscension+= 0.1
 						p.DefAscension+= 0.1
 						p << "Your synthetic body evolved!"
-					admins << "[p] has been given T2 Spiral Energy."
 				if(3) // Gives you your second buff
 					p << "Your body surges with Spiral Energy, the power of evolution driving you forward."
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo)
@@ -649,7 +619,6 @@ SecretInformation
 						p.OffAscension+= 0.15
 						p.DefAscension+= 0.15
 						p << "Your synthetic body evolved!"
-					admins << "[p] has been given T3 Spiral Energy."
 				if(4)
 					p << "Your soul burns with Spiral Hope. You refuse to be oppressed by the limitations of others."
 					nextTierUp = 4
@@ -661,7 +630,6 @@ SecretInformation
 						p.OffAscension+= 0.15
 						p.DefAscension+= 0.15
 						p << "Your synthetic body evolved!"
-					admins << "[p] has been given T4 Spiral Energy."
 				if(5)
 					p << "Your very DNA resonates with Spiral Power. You climb upwards toward the ceiling of your cage."
 					nextTierUp = 4
@@ -674,7 +642,6 @@ SecretInformation
 						p.OffAscension+= 0.2
 						p.DefAscension+= 0.2
 						p << "Your synthetic body evolved!"
-					admins << "[p] has been given T5 Spiral Energy."
 				if(6)
 					p << "You have gone beyond your full potential. You have evolved beyond the person you were before. You are free."
 					if(p.passive_handler.Get("SpiralEngine"))
@@ -685,7 +652,7 @@ SecretInformation
 						p.OffAscension+= 0.3
 						p.DefAscension+= 0.3
 						p << "Your synthetic body evolved!"
-					admins << "[p] has been given T6 Spiral Energy."
+			..(p);
 
 	Shin
 		name = "Shin"
@@ -705,27 +672,22 @@ SecretInformation
 					p << "You let go of all things... except for your most intense memories. You have awakened the power of Shin."
 					giveSkills(p) // This only adds Shin_Radiance, Mang is on the next tier
 					giveVariables(p)
-					admins << "[p] has been given T1 Shin."
 				if(2) //Unlocks 1 Mang Ring
 					p << "You fill your empty self with the emotions born from intense of Memories. You have awakened the power of Mang."
 					nextTierUp = 2
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Mang_Resonance)
-					admins << "[p] has been given T2 Shin."
 				if(3) // 2 Mang Rings
 					p << "Your mastery over Shin and Mang improves."
 					nextTierUp = 2
-					admins << "[p] has been given T3 Shin."
 				if(4) // 3 Mang Rings
 					p << "You further refine your mastery over Shin and Mang"
 					nextTierUp = 4
-					admins << "[p] has been given T4 Shin."
 				if(5) // 4 Mang Rings
 					p << "You're at the cusp of perfecting the arts of Shin and Mang, your very presence begins to weigh upon others."
 					nextTierUp = 4
-					admins << "[p] has been given T5 Shin."
 				if(6) // 5 Mang Rings
 					p << "You have refined both Shin and Mang to perfection, leveraging perfect control over your sense of self to invoke that intense emotion."
-					admins << "[p] has been given T6 Shin."
+			..(p);
 
 
 	BlackFlash
@@ -745,27 +707,22 @@ SecretInformation
 					giveSkills(p)
 					giveVariables(p)
 					BlackFlashBaseChance = 5;
-					admins << "[p] has been given T1 Black Flash."
 				if(2)
 					BlackFlashBaseChance = 15;
-					admins << "[p] has been given T2 Black Flash."
 				if(3)
 					BlackFlashBaseChance = 25;
 					p << "You now have a chance to keep your focus when landing a Black Flash! (Your Chance to land a Black Flash has a 50% chance to not reset when landing one.)"
 					p.passive_handler.Set("Sparks of Black",1)
-					admins << "[p] has been given T3 Black Flash."
 				if(4)
 					BlackFlashBaseChance = 35;
-					admins << "[p] has been given T4 Black Flash."
 				if(5)
 					BlackFlashBaseChance = 50;
 					p << "The Blessing of the Sparks of Black allow you to force a Black Flash out no matter what!"
 					p << "(Black Flash SureStrike: A 5 second Slotless Buff that forces your chance to land a Black Flash to 100%.)"
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/BlackFlash_SureStrike)
-					admins << "[p] has been given T5 Black Flash."
 				if(6) // are you out of your motherfucking miiiiiiiiiind
 					BlackFlashBaseChance = 60;
-					admins << "[p] has been given T6 Black Flash."
+			..(p);
 
 
 mob
