@@ -19,6 +19,27 @@ var/global/list/MAJIN_PENDING_DIGESTIONS = list()
 // actively receive the permanent power/skill credit when they next log in.
 var/global/list/MAJIN_PENDING_DIGEST_CREDITS = list()
 
+// Persistence for the Majin global registries and room ownership
+/proc/SaveMajinGlobals()
+    var/savefile/F = new("Saves/MajinGlobals")
+    F["ejections"] << MAJIN_PENDING_EJECTIONS
+    F["digestions"] << MAJIN_PENDING_DIGESTIONS
+    F["credits"] << MAJIN_PENDING_DIGEST_CREDITS
+    F["roomOwners"] << MAJIN_ROOM_OWNERS
+
+/proc/LoadMajinGlobals()
+    if(fexists("Saves/MajinGlobals"))
+        var/savefile/F = new("Saves/MajinGlobals")
+        F["ejections"] >> MAJIN_PENDING_EJECTIONS
+        F["digestions"] >> MAJIN_PENDING_DIGESTIONS
+        F["credits"] >> MAJIN_PENDING_DIGEST_CREDITS
+        F["roomOwners"] >> MAJIN_ROOM_OWNERS
+    if(!islist(MAJIN_PENDING_EJECTIONS)) MAJIN_PENDING_EJECTIONS = list()
+    if(!islist(MAJIN_PENDING_DIGESTIONS)) MAJIN_PENDING_DIGESTIONS = list()
+    if(!islist(MAJIN_PENDING_DIGEST_CREDITS)) MAJIN_PENDING_DIGEST_CREDITS = list()
+    if(!islist(MAJIN_ROOM_OWNERS) || MAJIN_ROOM_OWNERS.len != MAJIN_ROOM_COUNT)
+        MAJIN_ROOM_OWNERS = new/list(MAJIN_ROOM_COUNT)
+
 /mob/proc/GrantObserveMajinVerb()
     if(!verbs) return
     if(!(/mob/verb/Observe_Majin in verbs))
@@ -204,24 +225,12 @@ majinAbsorb/proc/updateVariables(mob/p)
 majinAbsorb/proc/SumAbsorbedPeakPower(mob/absorber)
     . = 0
     if(!absorbed || !absorbed.len) return
-    var/list/stale = null
     for(var/key in absorbed)
         var/list/entry = absorbed[key]
         if(!islist(entry)) continue
-        var/mob/victim = entry["mob"]
-        var/valid = 0
-        if(victim && victim.z == MAJIN_ABSORB_Z)
-            valid = 1
-        else if(!victim && entry["was_logged_in"] == FALSE)
-            valid = 1
-        if(valid)
-            . += entry["peak"]
-        else
-            if(!stale) stale = list()
-            stale += key
-    if(stale)
-        for(var/k in stale)
-            releaseVictim(absorber, k, "left_zone")
+        var/mob/victim = GetOnlineMobByCkey(key)
+        if(victim && victim.z != MAJIN_ABSORB_Z) continue
+        . += entry["peak"]
 
 // Skill stealing
 
@@ -329,11 +338,10 @@ majinAbsorb/proc/doAbsorb(mob/absorber, mob/absorbee)
     absorbee.loc = dest
 
     absorbed["[absorbee.ckey]"] = list(
-        "mob" = absorbee,
+        "name" = "[absorbee.name]",
         "skills" = stolen["types"],
         "skill_refs" = stolen["refs"],
         "peak" = peak,
-        "was_logged_in" = (absorbee.client ? TRUE : FALSE),
         "absorbedAt" = world.realtime,
         "digestRollsCompleted" = 0
     )
@@ -352,7 +360,7 @@ majinAbsorb/proc/releaseVictim(mob/absorber, theCkey, reason = "")
         for(var/obj/Skills/s in entry["skill_refs"])
             if(s) absorber.DeleteSkill(s)
 
-    var/mob/victim = entry["mob"]
+    var/mob/victim = GetOnlineMobByCkey(theCkey)
     if(victim)
         if(victim.z == MAJIN_ABSORB_Z)
             victim.loc = locate(absorber.x, absorber.y, absorber.z)
@@ -389,7 +397,10 @@ majinAbsorb/proc/CheckDigestion(mob/absorber, theCkey)
     var/list/entry = absorbed["[theCkey]"]
     if(!islist(entry)) return
     var/absorbedAt = entry["absorbedAt"]
-    if(!absorbedAt) return // legacy entry from before digestion; treat as start-of-now
+    if(!absorbedAt)
+        var/mob/legacyVictim = GetOnlineMobByCkey(theCkey)
+        absorbedAt = (legacyVictim && legacyVictim.absorbedAtTimestamp) ? legacyVictim.absorbedAtTimestamp : world.realtime
+        entry["absorbedAt"] = absorbedAt
     var/elapsed = world.realtime - absorbedAt
     var/rolls_done = entry["digestRollsCompleted"]
     if(!rolls_done) rolls_done = 0
@@ -445,7 +456,7 @@ majinAbsorb/proc/DigestVictim(mob/absorber, theCkey, alreadyReleased = FALSE)
 
     // Release the victim from the absorb zone / stash for offline pickup.
     if(!alreadyReleased)
-        var/mob/victim = entry["mob"]
+        var/mob/victim = GetOnlineMobByCkey(theCkey)
         if(victim)
             victim.absorbedBy = null
             victim.majinRoomIndex = 0
@@ -465,7 +476,8 @@ majinAbsorb/proc/DigestVictim(mob/absorber, theCkey, alreadyReleased = FALSE)
         absorber.ReleaseMajinRoom()
 
     if(absorber.client)
-        absorber << "<font color='purple'>Your stomach finishes breaking down [theCkey]. Their power is yours forever, and their skills are now permanently part of you.</font>"
+        var/victimName = entry["name"] ? entry["name"] : theCkey
+        absorber << "<font color='purple'>Your stomach finishes breaking down [victimName]. Their power is yours forever, and their skills are now permanently part of you.</font>"
         OMsg(absorber, "[absorber]'s body finishes digesting one of their absorbed victims!")
 
 majinAbsorb/proc/StartDigestionLoop(mob/absorber)
@@ -488,13 +500,7 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
     return null
 
 /mob/proc/MajinAbsorbOnLogout()
-    if(!ckey) return
-    var/mob/Players/M = FindMajinAbsorbingCkey(ckey)
-    if(!M) return
-    var/list/entry = M.majinAbsorb.absorbed["[ckey]"]
-    if(!islist(entry)) return
-    entry["was_logged_in"] = FALSE
-    entry["mob"] = null
+    return
 
 /mob/proc/MajinAbsorbOnLogin()
     if(!ckey) return
@@ -530,6 +536,9 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
         return
 
     if(isRace(MAJIN) && majinAbsorb)
+        if(majinOwnedRoom >= 1 && majinOwnedRoom <= MAJIN_ROOM_COUNT)
+            if(!MAJIN_ROOM_OWNERS[majinOwnedRoom])
+                MAJIN_ROOM_OWNERS[majinOwnedRoom] = ckey
         var/list/credits = MAJIN_PENDING_DIGEST_CREDITS["[ckey]"]
         if(islist(credits) && credits.len)
             for(var/victimCkey in credits)
@@ -540,25 +549,10 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
 
     var/mob/Players/M = FindMajinAbsorbingCkey(ckey)
     if(!M)
-        if(absorbedBy && absorbedAtTimestamp)
-            var/elapsed = world.realtime - absorbedAtTimestamp
-            if(elapsed >= MAJIN_DIGEST_TOTAL_ROLLS * MAJIN_DIGEST_INTERVAL_HOURS HOURS)
-                var/absorberCkey = absorbedBy
-                absorbedBy = null
-                majinRoomIndex = 0
-                absorbedAtTimestamp = 0
-                RevokeObserveMajinVerb()
-                MoveToSpawn(src)
-                KO = 0
-                src << "<font color='purple'>You have been trapped inside [absorberCkey] for so long that your essence has finally broken down. You are spat out at spawn — drained, but free.</font>"
-                if(!MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"])
-                    MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] = list()
-                MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] += "[ckey]"
+        MajinTrySelfRelease()
         return
     var/list/entry = M.majinAbsorb.absorbed["[ckey]"]
     if(!islist(entry)) return
-    entry["mob"] = src
-    entry["was_logged_in"] = TRUE
     src.absorbedBy = M.ckey
     src.majinRoomIndex = M.majinOwnedRoom
     src.GrantObserveMajinVerb()
@@ -585,6 +579,34 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
         majinRoomIndex = 0
         RevokeObserveMajinVerb()
 
+/mob/proc/MajinTrySelfRelease()
+    if(!absorbedBy || !absorbedAtTimestamp) return 0
+    var/elapsed = world.realtime - absorbedAtTimestamp
+    if(elapsed < MAJIN_DIGEST_TOTAL_ROLLS * MAJIN_DIGEST_INTERVAL_HOURS HOURS) return 0
+    var/absorberCkey = absorbedBy
+    absorbedBy = null
+    majinRoomIndex = 0
+    absorbedAtTimestamp = 0
+    RevokeObserveMajinVerb()
+    MoveToSpawn(src)
+    KO = 0
+    src << "<font color='purple'>You have been trapped inside [absorberCkey] for so long that your essence has finally broken down, drained, but free.</font>"
+    if(!MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"])
+        MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] = list()
+    MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] += "[ckey]"
+    return 1
+
+/mob/proc/MajinAbsorbVictimTick()
+    if(!ckey || !absorbedBy) return
+    if(z != MAJIN_ABSORB_Z) return // out-of-zone case is handled by the zone safeguard
+    if(world.time < majinNextDigestCheck) return
+    majinNextDigestCheck = world.time + MAJIN_DIGEST_CHECK_CADENCE
+    var/mob/Players/M = GetMajinByCkey(absorbedBy)
+    if(M && M.majinAbsorb && M.majinAbsorb.absorbed && islist(M.majinAbsorb.absorbed["[ckey]"]))
+        M.majinAbsorb.CheckDigestion(M, "[ckey]")
+    else
+        MajinTrySelfRelease()
+
 // Manual release
 /mob/proc/releaseAbsorbedPrompt()
     if(!isRace(MAJIN) || !majinAbsorb)
@@ -598,8 +620,9 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
     for(var/key in majinAbsorb.absorbed)
         var/list/entry = majinAbsorb.absorbed[key]
         if(!islist(entry)) continue
-        var/mob/victim = entry["mob"]
-        var/label = victim ? "[victim.name] ([key])" : "[key] (offline)"
+        var/mob/victim = GetOnlineMobByCkey(key)
+        var/displayName = entry["name"] ? entry["name"] : key
+        var/label = victim ? "[displayName] ([key])" : "[displayName] ([key]) (offline)"
         menu += label
         menu_lookup[label] = key
     var/choice = input(src, "Who do you want to spit out?", "Release Absorb") in menu
@@ -631,8 +654,10 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
     if(!src.majinAbsorb)
         return
     if(target.client && src.client)
-        if(target.client.address == src.client.address || target.client.computer_id == src.client.computer_id)
-            if(!soIgnore && target.client.computer_id != src.client.computer_id)
-                src << "Nice try, bucko."
-                return
+        if(src.client.computer_id && target.client.computer_id == src.client.computer_id)
+            src << "Nice try, bucko."
+            return
+        if(src.client.address && target.client.address == src.client.address && !(soIgnore && target.soIgnore))
+            src << "Nice try, bucko."
+            return
     majinAbsorb.doAbsorb(src, target)

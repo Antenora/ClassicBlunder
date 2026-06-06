@@ -377,6 +377,7 @@ mob
 			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
 				Target = null
 		MajinAbsorbZoneSafeguard()
+		MajinAbsorbVictimTick()
 		checkHealthAlert()
 
 		if(src.Grab) src.Grab_Update()
