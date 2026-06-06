@@ -134,8 +134,9 @@ mob
 				if(RG)
 					defender << "<font color= 'green'>ATTACK PARRIED!</font>"
 					RG.SuccessfulParry = 2
-					var/meterGain = max(val * glob.ROYAL_GUARD_CHARGE_MULT, 1)
-					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100)
+					var/masteryMult = 1 + ((RG.Mastery - 1) / 100)
+					var/meterGain = max((val * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
+					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100+(RG.Mastery-1))
 					val = 0
 					defender.client.updateRGMeter()
 			if(val==0)
