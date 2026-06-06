@@ -172,7 +172,7 @@
         Present
             name="Present"
             desc="The mage moves with the now. Each selection sharpens the agility behind their casting and the rhythm of their counters."
-            passives = list("ForcefulCasting" = 1)
+            passives = list("AgileCasting" = 1)
 
         Future
             name="Future"
