@@ -673,15 +673,6 @@ update
 		version = 31
 		updateMob(mob/p)
 			. = ..()
-			if(p.isRace(BEASTKIN))
-				if(p.Class == "Trickster")
-					if(p.AscensionsAcquired>=3)
-						p.passive_handler.Decrease("SpiritStrike",.25);
-						p.passive_handler.Increase("HybridStrike",.25);
-					if(p.AscensionsAcquired>=4)
-						p.passive_handler.Decrease("SpiritStrike",.25);
-						p.passive_handler.Increase("HybridStrike",.25);
-
 			if(p.isRace(ELDRITCH))
 				p << "You're going to have to redo your ascension choices..."
 				p.race.revertAndFixAllAscensions(p);
