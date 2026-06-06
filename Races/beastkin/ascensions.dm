@@ -521,10 +521,6 @@ Today, another God of the Rifts is born."}
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
-							owner.passive_handler.Increase("HybridStrike", 0.75);
-							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("MovementMastery", 2);
-							owner.passive_handler.Increase("ManaStats", 0.5);
 
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
