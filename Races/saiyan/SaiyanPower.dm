@@ -1,5 +1,5 @@
 /mob/proc/GetSaiyanPower()
-    if(!(isRace(SAIYAN) || isRace(HALFSAIYAN))) return 1
+    if(!(isRace(SAIYAN) || isRace(HALFSAIYAN) || NobodyOriginType=="Pride")) return 1
     . = 1;
 
     . += getSSJ1Power();
