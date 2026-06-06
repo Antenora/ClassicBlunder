@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 31
+	var/UPDATE_VERSION = 32
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -689,6 +689,30 @@ update
 				if(p.passive_handler["Soulfire"] != 0)//this is a typo. we do not use this.
 					p.passive_handler["Soulfire"] = 0;
 			
+	version32
+		version = 32
+		updateMob(mob/p)
+			. = ..()
+			// digest anyone still trapped under the old absorb
+			if(!p.absorbedBy)
+				return
+			var/absorberCkey = p.absorbedBy
+			var/mob/Players/M = GetMajinByCkey(absorberCkey)
+			if(M && M.majinAbsorb && M.majinAbsorb.absorbed && islist(M.majinAbsorb.absorbed["[p.ckey]"]))
+				M.majinAbsorb.DigestVictim(M, "[p.ckey]")
+				return
+			if(!MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"])
+				MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] = list()
+			if(!("[p.ckey]" in MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"]))
+				MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] += "[p.ckey]"
+			p.absorbedBy = null
+			p.majinRoomIndex = 0
+			p.absorbedAtTimestamp = 0
+			p.RevokeObserveMajinVerb()
+			MoveToSpawn(p)
+			p.KO = 0
+			p << "<font color='purple'>You've been digested and sent back to spawn.</font>"
+
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

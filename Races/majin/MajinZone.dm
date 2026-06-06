@@ -39,6 +39,9 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     return locate(coords[1], coords[2], coords[3])
 
 /proc/GetMajinByCkey(theCkey)
+    return GetOnlineMobByCkey(theCkey)
+
+/proc/GetOnlineMobByCkey(theCkey)
     if(!theCkey) return null
     for(var/mob/Players/p in players)
         if(p.ckey == theCkey)

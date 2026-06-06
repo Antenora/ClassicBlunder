@@ -233,15 +233,22 @@ proc/BootFile(var/file,var/op)
 						var/savefile/S=new("Saves/Punishment")
 						S["Punishments"]>>Punishments
 					LoadPermaCompsExtra()
+		if("MajinGlobals")
+			if(op=="Save")
+				SaveMajinGlobals()
+			if(op=="Load")
+				LoadMajinGlobals()
 		if("All")
 			if(op=="Save")
 				BootFile("Admins","Save")
 				BootFile("Misc","Save")
 				BootFile("Bans","Save")
+				BootFile("MajinGlobals","Save")
 			if(op=="Load")
 				BootFile("Admins","Load")
 				BootFile("Misc","Load")
 				BootFile("Bans","Load")
+				BootFile("MajinGlobals","Load")
 	world<<"<small>Server: [file] ([op])ed"
 
 client
