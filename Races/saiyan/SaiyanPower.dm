@@ -1,4 +1,5 @@
 /mob/proc/GetSaiyanPower()
+    if(!(isRace(SAIYAN) || isRace(HALFSAIYAN))) return 1
     . = 1;
 
     . += getSSJ1Power();
