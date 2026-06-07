@@ -1754,6 +1754,7 @@ NEW VARIABLES
 			ActiveMessage="manifests the superiority of their birthright!"
 			OffMessage="lets their contempt for mortal life regress."
 			adjust(mob/p)
+				PowerMult = 1.05 + (p.Potential/75)
 				var/transformation/saiyan/super_saiyan_rose/rose = locate(/transformation/saiyan/super_saiyan_rose) in p.race.transformations
 				if(rose)
 					if(rose.mastery >= 25)
