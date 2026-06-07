@@ -1706,6 +1706,7 @@ mob
 							src.ChooseMartialSkill(4)
 							src.ChooseMartialSkill(3)
 							src.ChooseMartialSkill(2)
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga)
 						else if(src.KeybladeType=="Staff")
 							src.AddSkill(new/obj/Skills/AutoHit/Magic/Ultima)
 						else if(src.KeybladeType=="Sword")

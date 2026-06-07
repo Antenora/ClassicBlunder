@@ -455,7 +455,7 @@ proc/
 			if("Rainfell")
 				return 'Rainfell.dmi'
 			if("Oathkeeper")
-				return 'Oathkeeper.dmi'
+				return 'OathkeeperRevamp.dmi'
 			if("Way To Dawn")
 				return 'WayToTheDawn.dmi'
 			if("Bond of Flame")
@@ -468,7 +468,7 @@ proc/
 				return 'Blind Justice.dmi'
 //medium
 			if("Oblivion")
-				return 'Oblivion.dmi'
+				return 'OblivionRevamped.dmi'
 			if("Fenrir")
 				return 'Fenrir.dmi'
 			if("No Name")
@@ -512,7 +512,7 @@ proc/
 			if("Rainfell")
 				return 'RainfellSync.dmi'
 			if("Oathkeeper")
-				return 'OathkeeperSync.dmi'
+				return 'OathkeeperRevampSync.dmi'
 			if("Way To Dawn")
 				return 'WayToTheDawnSync.dmi'
 			if("Bond of Flame")
@@ -525,7 +525,7 @@ proc/
 				return 'Blind Justice - Sync.dmi'
 //medium
 			if("Oblivion")
-				return 'OblivionSync.dmi'
+				return 'OblivionRevampedSync.dmi'
 			if("Fenrir")
 				return 'FenrirSync.dmi'
 			if("No Name")
