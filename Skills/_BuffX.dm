@@ -1750,7 +1750,7 @@ NEW VARIABLES
 			KenWave=5
 			KenWaveSize=0.5
 			KenWaveIcon='KenShockwaveDivine.dmi'
-			passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.25, "GodKi" = 0.1, "EnergyGeneration" = 3, "SlayerMod" = 1.5, "FavoredPrey" = "Mortal")
+			passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.25, "GodKi" = 0.2, "EnergyGeneration" = 3, "SlayerMod" = 1.5, "FavoredPrey" = "Mortal")
 			ActiveMessage="manifests the superiority of their birthright!"
 			OffMessage="lets their contempt for mortal life regress."
 			adjust(mob/p)
@@ -1758,28 +1758,28 @@ NEW VARIABLES
 				if(rose)
 					if(rose.mastery >= 25)
 						ActiveMessage="anger at their Lessers manifests into sparks of godhood!"
-						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.35, "GodKi" = 0.2, "EnergyGeneration" = 3, "SlayerMod" = 2, "FavoredPrey" = "Mortal", "Heavensent" = 1)
+						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.35, "GodKi" = 0.3, "EnergyGeneration" = 3, "SlayerMod" = 2, "FavoredPrey" = "Mortal", "Heavensent" = 1)
 						AngerMult=1.1
 						StrMult=1.4
 						ForMult=1.4
 						OffMult=1.35
 					if(rose.mastery >= 50)
-						ActiveMessage="manifests true animosity towards mortalss!"
-						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.50, "GodKi" = 0.3, "EnergyGeneration" = 4, "SlayerMod" = 3, "FavoredPrey" = "Mortal", "Heavensent" = 2)
+						ActiveMessage="manifests true animosity towards mortals!"
+						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.50, "GodKi" = 0.45, "EnergyGeneration" = 4, "SlayerMod" = 3, "FavoredPrey" = "Mortal", "Heavensent" = 2)
 						AngerMult=1.3
 						StrMult=1.5
 						ForMult=1.5
 						OffMult=1.45
 					if(rose.mastery >= 75)
 						ActiveMessage="'s animosity manifests them as close to perfection as they can get!"
-						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 0.75, "GodKi" = 0.4, "EnergyGeneration" = 5, "SlayerMod" = 4, "FavoredPrey" = "Mortal", "Heavensent" = 3)
+						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 0.75, "GodKi" = 0.7, "EnergyGeneration" = 5, "SlayerMod" = 4, "FavoredPrey" = "Mortal", "Heavensent" = 3)
 						AngerMult=1.4
 						StrMult=1.6
 						ForMult=1.6
 						OffMult=1.55
 					if(rose.mastery >= 100)
 						ActiveMessage="becomes the perfect image of Godhood!"
-						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 1, "GodKi" = 0.5, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "All", "Heavensent" = 4)
+						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 1, "GodKi" = 1, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "All", "Heavensent" = 4)
 						AngerMult=1.5
 						StrMult=1.7
 						ForMult=1.7
