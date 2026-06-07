@@ -4304,10 +4304,7 @@ NEW VARIABLES
 				else
 					OffMessage="seals the blade once again..."
 				if(!usr.BuffOn(src) && !src.Using)
-					usr.WeaponSoul()
 					usr.Stasis=7
-				else if(usr.BuffOn(src))
-					usr.RevertWS()
 				src.Trigger(usr)
 
 		Sharingan
@@ -13620,6 +13617,8 @@ mob
 					src.Intimidation*=1.5
 				else if(B.Transform=="Weak")
 					src.PowerBoost*=0.25
+				else if(B.Transform=="Weapon")
+					WeaponSoul()
 				else
 					src.Transform(B.Transform)
 
@@ -15211,6 +15210,8 @@ mob
 				else if(B.Transform=="Force")
 					transUnlocked=max(transUnlocked-1,0)
 					src.Revert()
+				else if(B.Transform=="Weapon")
+					src.RevertWS()
 				else
 					src.Revert(B.Transform)
 
