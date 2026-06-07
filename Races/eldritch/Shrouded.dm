@@ -120,7 +120,7 @@
                     es.ShroudedPassives["MovementMastery"] = 5;
                     es.ShroudedPassives["Extend"] = 1;
                     es.ShroudedPassives["Gum Gum"] = 1;
-        if(es.currentTier >= 6)
+        if(es.currentTier >= 5)
             if(!es.ShroudedMastery)
                 if(es.ShroudedOrigin=="Beastkin") es.ShroudedMastery = "Rifts"
                 if(es.ShroudedOrigin=="Human") es.ShroudedMastery = "Duplicity"
