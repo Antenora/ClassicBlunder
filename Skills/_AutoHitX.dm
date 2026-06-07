@@ -7977,7 +7977,7 @@ obj
 			overlay_loop_running = TRUE
 			spawn() SlashOverlayLoop()
 
-	proc/EndChain()
+	proc/EndChain(var/apply_cooldown = TRUE)
 		if(!chain_active) return
 		var/mob/user = chain_user
 		chain_active = FALSE
@@ -7996,7 +7996,8 @@ obj
 			Using = 0
 			cooldown_remaining = 0
 			cooldown_start = 0
-			src.Cooldown(1, null, user)
+			if(apply_cooldown)
+				src.Cooldown(1, null, user)
 
 	proc/SlashOverlayLoop()
 		while(chain_active)
@@ -8094,4 +8095,4 @@ obj
 				return
 		p.BeginHeldSkill(src)
 		if(p.held_skill != src && chain_active && chain_user == p)
-			EndChain()
+			EndChain(apply_cooldown = FALSE)
