@@ -29,9 +29,6 @@ race
 				user.majinPassive = new(user)
 			if(!user.majinAbsorb)
 				user.majinAbsorb = new(user)
-			// Claim this Majin's personal absorb room. ClaimMajinRoom()
-			if(!user.majinOwnedRoom)
-				user.ClaimMajinRoom()
 
 		// ChangeRace hook: free the absorb room (releasing any victims), drop the
 		// majin-only racial datums, and clear the once-per-ascension cheat-death

@@ -129,6 +129,9 @@
 	var/client/C = client
 	if(!C) return
 	if(src.Airborne) return
+	if(src.OnMagicalVehicle())
+		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+		return
 
 	// All guards run before touching any charge state.
 

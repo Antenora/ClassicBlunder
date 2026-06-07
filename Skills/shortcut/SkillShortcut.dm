@@ -83,7 +83,12 @@ What shortcut do you want to set?"}
     fireShortcut(obj/Skills/s)
         if(s.HeldSkill)
             held_skill_from_macro = world.time
-            BeginHeldSkill(s);
+            var/raw = s.HeldVerbName ? s.HeldVerbName : s.name
+            var/ident = raw ? replacetext(replacetext(raw, " ", "_"), "-", "_") : null
+            if(ident && hascall(s, ident))
+                call(s, ident)()
+            else
+                BeginHeldSkill(s)
             return;
         if(istype(s, /obj/Skills/Queue))
             SetQueue(s);

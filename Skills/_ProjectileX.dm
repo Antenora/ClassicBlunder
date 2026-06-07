@@ -4889,6 +4889,9 @@ mob
 				return FALSE
 			if(src.Airborne)
 				return FALSE
+			if(src.OnMagicalVehicle())
+				src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+				return FALSE
 			if(!Z.heavenlyRestrictionIgnore&&Secret=="Heavenly Restriction" && secretDatum?:hasRestriction("Projectiles"))
 				return FALSE
 			if(!Z.heavenlyRestrictionIgnore&&Secret=="Heavenly Restriction" && secretDatum?:hasRestriction("All Skills"))

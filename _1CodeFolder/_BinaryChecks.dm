@@ -631,6 +631,10 @@ mob
 					SD=Surf
 					return SD
 			return 0
+		OnMagicalVehicle()
+			if(EquippedFlyingDevice()) return 1
+			if(EquippedSurfingDevice()) return 1
+			return 0
 		EquippedCrest()
 			var/obj/Items/Enchantment/Magic_Crest/MC
 			for(var/obj/Items/Enchantment/Magic_Crest/Crest in src)

@@ -5103,6 +5103,9 @@ mob
 				return 0
 			if(src.Airborne)
 				return FALSE
+			if(src.OnMagicalVehicle())
+				src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+				return FALSE
 			if(src.passive_handler.Get("HotHundred") || src.passive_handler.Get("Warping") || (src.AttackQueue && src.AttackQueue.Combo))
 				Z.while_warping = TRUE
 			else

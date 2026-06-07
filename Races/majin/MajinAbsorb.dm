@@ -314,22 +314,13 @@ majinAbsorb/proc/doAbsorb(mob/absorber, mob/absorbee)
         absorber << "You cannot contain any more bodies in your stomach. Release one first."
         return
 
-    // Ensure a room is claimed
-    if(!absorber.majinOwnedRoom)
-        absorber.ClaimMajinRoom()
-    if(!absorber.majinOwnedRoom)
-        return // error already shown
+    var/turf/dest = absorber.GetMajinRoomTurf()
+    if(!dest)
+        absorber << "<font color='red'>Every absorb room is currently occupied by another Majin. Please alert an Admin.</font>"
+        return
 
     // Steal skills
     var/list/stolen = StealSkills(absorber, absorbee)
-
-    // Move victim into the Majin's room
-    var/turf/dest = absorber.GetMajinRoomTurf()
-    if(!dest)
-        absorber << "Your stomach is nowhere to be found. Report this to an Admin."
-        for(var/obj/Skills/s in stolen["refs"])
-            absorber.DeleteSkill(s)
-        return
 
     absorbee.absorbedBy = absorber.ckey
     absorbee.majinRoomIndex = absorber.majinOwnedRoom
@@ -389,6 +380,15 @@ majinAbsorb/proc/releaseAll(mob/absorber, reason = "")
         releaseVictim(absorber, k, reason)
     absorbed = list()
     absorber.ReleaseMajinRoom()
+
+majinAbsorb/proc/AdminForceDigestAll(mob/absorber)
+    if(!absorber || !absorbed || !absorbed.len) return 0
+    var/count = 0
+    var/list/keys = absorbed.Copy()
+    for(var/k in keys)
+        DigestVictim(absorber, k)
+        count++
+    return count
 
 
 majinAbsorb/proc/CheckDigestion(mob/absorber, theCkey)
@@ -536,9 +536,8 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
         return
 
     if(isRace(MAJIN) && majinAbsorb)
-        if(majinOwnedRoom >= 1 && majinOwnedRoom <= MAJIN_ROOM_COUNT)
-            if(!MAJIN_ROOM_OWNERS[majinOwnedRoom])
-                MAJIN_ROOM_OWNERS[majinOwnedRoom] = ckey
+        if(majinOwnedRoom || (majinAbsorb.absorbed && majinAbsorb.absorbed.len))
+            ClaimMajinRoom()
         var/list/credits = MAJIN_PENDING_DIGEST_CREDITS["[ckey]"]
         if(islist(credits) && credits.len)
             for(var/victimCkey in credits)
@@ -604,6 +603,11 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
     var/mob/Players/M = GetMajinByCkey(absorbedBy)
     if(M && M.majinAbsorb && M.majinAbsorb.absorbed && islist(M.majinAbsorb.absorbed["[ckey]"]))
         M.majinAbsorb.CheckDigestion(M, "[ckey]")
+        if(absorbedBy)
+            var/turf/correctRoom = M.GetMajinRoomTurf()
+            if(correctRoom && loc != correctRoom)
+                loc = correctRoom
+                majinRoomIndex = M.majinOwnedRoom
     else
         MajinTrySelfRelease()
 
