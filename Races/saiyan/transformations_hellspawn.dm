@@ -40,23 +40,23 @@ transformation
 				if(mastery >= 100)
 					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=1.75)
 				if(user.Potential>=35)
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
+					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor)
-							user << "You have unlocked a new Signature buff! (Saiyan Fervor)"
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Saiyan Fervor)"
+					if(user.Class == "Pride")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/RoyalLineage, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/RoyalLineage)
-							user << "You have unlocked a new Signature buff! (Royal Lineage)"
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Royal Lineage)"
+					if(user.Class == "Honor")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanRoar, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanRoar)
-							user << "You have unlocked a new Signature buff! (Saiyan Roar)"
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Saiyan Roar)"
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanCarnage, user))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanCarnage)
 						user << "You have unlocked a new Signature buff! (Saiyan Carnage)"
 			class_boons(mob/user) //pride stats as a baseline no matter what
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
+				if(user.Class == "Zeal")
 					class_passives = list("EnergyGeneration" = 3, "Instinct" = 2, "Flow" = 2)
 					speedadd = 0.3
 					enduranceadd = 0.1
@@ -64,7 +64,7 @@ transformation
 					defenseadd = 0.15
 					strengthadd = 0.4
 					forceadd = 0.4
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
+				if(user.Class == "Pride")
 					class_passives = list("PureDamage" = 1.5, "Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.3
 					enduranceadd = 0.1
@@ -72,7 +72,7 @@ transformation
 					defenseadd = 0.15
 					strengthadd = 0.4
 					forceadd = 0.4
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
+				if(user.Class == "Honor")
 					class_passives = list("PureReduction" = 1.5, "Flow" = 2, "EnergyGeneration" = 3)
 					speedadd = 0.3
 					enduranceadd = 0.1

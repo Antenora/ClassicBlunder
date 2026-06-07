@@ -1690,7 +1690,14 @@ mob
 				Extra += (passive_handler.Get("LikeWater")) / 2
 			if(Class=="Heroic"&&ActiveBuff)
 				Base*=GetHeroicBoost()
-			return (Base+Extra)
+			var/Raw=Base+Extra
+			var/soft_cap = 5
+			if(Raw<=soft_cap)
+				return Raw
+			var/flow_scale = 3
+			var/Overcap=Raw-soft_cap
+			var/Total=soft_cap + (Overcap/(Overcap+flow_scale))
+			return Total
 		HasInstinct()
 			var/Return=BaseOff()/4
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasRestriction("Senses"))
@@ -1719,7 +1726,13 @@ mob
 				Return = 0
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
-			return Return
+			var/soft_cap = 5
+			if(Return<=soft_cap)
+				return Return
+			var/flow_scale = 3
+			var/Overcap=Return-soft_cap
+			var/Result=soft_cap + (Overcap/(Overcap+flow_scale))
+			return Result
 		HasSoulSteal()
 			if(passive_handler.Get("SoulSteal"))
 				return 1
@@ -2626,7 +2639,7 @@ mob
 			if(hasSecret("Eldritch (Reflected)")) Return += (scalingEldritchPower()/2);
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
-			
+
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))

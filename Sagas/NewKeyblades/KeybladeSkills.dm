@@ -415,12 +415,12 @@ obj
 					SwordName="Keyblade"
 					PULock=1
 					swordHasHistory=1
-					passives = list("MagicSword" = 1)
+					passives = list("MagicSword" = 1, "DoubleStrike" = 3)
 					Cooldown=30
 					verb/SyncBlade()
 						set category="Skills"
 						if(!usr.BuffOn(src))
-							passives = list()
+							passives = list("MagicSword" = 1, "DoubleStrike" = 3)
 							src.SwordXSecond=-32
 							src.SwordYSecond=-32
 							if(usr.SyncAttached=="Ultima Weapon")

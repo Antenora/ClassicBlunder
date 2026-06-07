@@ -25,11 +25,11 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(choice == /ascension/sub_ascension/saiyan/zeal)
+				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
 					passives += list("Adaptation" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/honor)
+				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list("AngerAdaptiveForce" = 0.2, "Adrenaline" = 1, "PureReduction" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/pride)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
 					passives += list("Steady" = 1, "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
@@ -50,11 +50,11 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(choice == /ascension/sub_ascension/saiyan/zeal)
+				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
 					passives += list("Adaptation" = 0.5, "LikeWater" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/honor)
+				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list("AngerAdaptiveForce" = 0.2, "Juggernaut" = 1, "PureReduction" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/pride)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
 					passives += list("Steady" = 1, "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
@@ -70,11 +70,11 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(choice == /ascension/sub_ascension/saiyan/zeal)
+				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
 					passives += list("Adaptation" = 0.5, "LikeWater" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/honor)
+				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list("AngerAdaptiveForce" = 0.2, "Adrenaline" = 1, "PureReduction" = 1)
-				if(choice == /ascension/sub_ascension/saiyan/pride)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
 					passives += list("Steady" = 1, "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
@@ -89,11 +89,11 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(choice == /ascension/sub_ascension/saiyan/zeal)
+				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
 					passives += list("Adaptation" = 0.5, "LikeWater" = 1)
-				if(choice == /ascension/sub_ascension/saiyan/honor)
+				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list("AngerAdaptiveForce" = 0.2, "Adrenaline" = 1, "PureReduction" = 1)
-				if(choice == /ascension/sub_ascension/saiyan/pride)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
 					passives += list("Steady" = 1, "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
@@ -109,11 +109,11 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(choice == /ascension/sub_ascension/saiyan/zeal)
+				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
 					passives += list("Adaptation" = 0.5, "LikeWater" = 0.5)
-				if(choice == /ascension/sub_ascension/saiyan/honor)
+				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list("AngerAdaptiveForce" = 0.2, "Adrenaline" = 1, "PureReduction" = 1)
-				if(choice == /ascension/sub_ascension/saiyan/pride)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
 					passives += list("Steady" = 1, "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)

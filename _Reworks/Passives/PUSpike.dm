@@ -8,7 +8,7 @@ globalTracker/var
 
 /mob/proc/GetPUSpike()
 	. = passive_handler.Get("PUSpike") //This stores stuff from sources of PUSpike... yay.
-	. += (GetMangLevel() * glob.PU_SPIKE_MANG_MULTIPLIER) // if I have to nerf this, I am sorry. 
+	. += (GetMangLevel() * glob.PU_SPIKE_MANG_MULTIPLIER) // if I have to nerf this, I am sorry.
 	if(passive_handler["Shirayuki"] && Slow > 0)
 		if(CheckActive("Ki Control"))
 			. += (Slow * glob.PU_SPIKE_SHIRAYUKI_MULT)
@@ -17,7 +17,7 @@ globalTracker/var
 			. += glob.PU_SPIKE_IMAGINARY_ACTIVE_ADD;
 		if(SpecialBuff)
 			. += glob.PU_SPIKE_IMAGINARY_SPECIAL_ADD;
-	if(passive_handler.Get("RedPUSpike")) . += (passive_handler.Get("RedPUSpike") * glob.PU_SPIKE_OVERDRIVE_ADD);
+	if(passive_handler.Get("RedPUSpike")) . += ((passive_handler.Get("RedPUSpike") + GetMovementMastery()) * glob.PU_SPIKE_OVERDRIVE_ADD);
 	if(CheckSpecial("Overdrive")) . += glob.PU_SPIKE_OVERDRIVE_ADD;
 
 	if(.) . = max(0, . / 100)
