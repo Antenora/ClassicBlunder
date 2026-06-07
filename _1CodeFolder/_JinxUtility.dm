@@ -2923,6 +2923,8 @@ mob
 			var/evil = 0
 			if(src.passive_handler.Get("Emptiness"))
 				return FALSE
+			if(src.Race=="Fae") //Fae cannot be Good, they do not believe in Mortal Moral codes.
+				return FALSE
 			if(src.HasMaki())
 				evil = 1
 			if(!HasHolyMod())
@@ -2973,6 +2975,8 @@ mob
 			var/good = 0
 			var/evil = 0
 			if(src.passive_handler.Get("Emptiness"))
+				return FALSE
+			if(src.Race=="Fae") //Fae cannot be Evil, they do not believe in Mortal Moral codes.
 				return FALSE
 			//these are all good.
 			if(src.ShinjinAscension=="Kai")
