@@ -120,7 +120,7 @@ transformation
 			defenseadd = 3.5
 			strengthadd = 4.5
 			forceadd = 3.5
-			passives = list("Purity" = 1, "BeyondPurity" = 1, "GodKi" = 0.2, "SweepingStrike" = 1, "Brutalize" = 3, "PureDamage" = 9, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=1.5, "TrueZenkai" = 1, "HolyMod" = 5)
+			passives = list("Purity" = 1, "BeyondPurity" = 1, "GodKi" = 0.5, "SweepingStrike" = 1, "Brutalize" = 3, "PureDamage" = 9, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=1.5, "TrueZenkai" = 1, "HolyMod" = 5)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
