@@ -4303,7 +4303,10 @@ NEW VARIABLES
 				else
 					OffMessage="seals the blade once again..."
 				if(!usr.BuffOn(src) && !src.Using)
+					usr.WeaponSoul()
 					usr.Stasis=7
+				else if(usr.BuffOn(src))
+					usr.RevertWS()
 				src.Trigger(usr)
 
 		Sharingan
