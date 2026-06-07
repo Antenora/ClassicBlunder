@@ -4167,7 +4167,12 @@ NEW VARIABLES
 
 			Cooldown=60
 			adjust(mob/p)
-				if(p.passive_handler.Get("Controlled Darkness"))
+				if(p.passive_handler.Get("Dreamless Sleep") && p.passive_handler.Get("Two Become One")||p.passive_handler.Get("Dreamless Sleep") && p.passive_handler.Get("Controlled Darkness"))
+					passives = list("Godspeed" = 2, "Pursuer" = 5, "Flicker" = 3, "Instinct" = 4, "Flow" = 4, "TechniqueMastery" = 7, "QuickCast" = 2)
+					ForMult=2
+					StrMult=2
+					SpdMult=2.5
+				else if(p.passive_handler.Get("Controlled Darkness"))
 					passives = list("ManaLeak"= 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "Instinct" = 3, "TechniqueMastery" = 5, "QuickCast" = 2, "HolyMod" = 3, "AbyssMod" = 3, "SpiritPower" = 0.25)
 					if(p.SagaLevel>=5)
 						ForMult=1.5

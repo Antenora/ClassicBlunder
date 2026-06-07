@@ -679,7 +679,7 @@ update
 				p << "It is done. Remeditate to have your ascensions granted again!"
 				if(p.passive_handler["Soulfire"] != 0)//this is a typo. we do not use this.
 					p.passive_handler["Soulfire"] = 0;
-			
+
 	version32
 		version = 32
 		updateMob(mob/p)
@@ -703,7 +703,43 @@ update
 			MoveToSpawn(p)
 			p.KO = 0
 			p << "<font color='purple'>You've been digested and sent back to spawn.</font>"
-
+	version33
+		version = 33
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(SAIYAN))
+				if(p.AscensionsAcquired>=2)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 0.5)
+						p.passive_handler.Increase("Adrenaline", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+				if(p.AscensionsAcquired>=3)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+						p.passive_handler.Increase("LikeWater", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 0.5)
+						p.passive_handler.Increase("Juggernaut", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+				if(p.AscensionsAcquired>=4)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+						p.passive_handler.Increase("LikeWater", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 1)
+						p.passive_handler.Increase("Adrenaline", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

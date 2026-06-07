@@ -6781,9 +6781,9 @@ obj
 				if(Cleansing && src.Owner.shouldCleanse(m))
 					m.CleanseDebuff(Cleansing*10);
 
-				// if(src.CosmoPowered)
-				//  	if(!src.Owner.SpecialBuff)
-				//  		FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
+				if(src.CosmoPowered)
+					if(!src.Owner.SpecialBuff)
+						FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
 				if(src.Executor)
 					var/additonal = src.Executor * 0.1
 					if(m.Health<=5)
@@ -6944,7 +6944,7 @@ obj
 				var/list/specDmgTypes = list()
 				if(!skipPureDamage && Owner && FromSkill)
 					var/holy = 0
-					if(FromSkill.HolyMod) 
+					if(FromSkill.HolyMod)
 						holy += FromSkill.HolyMod
 					if(FromSkill.Sanctify)
 						holy += FromSkill.Sanctify * glob.SANCTIFY_EFFECTIVENESS
