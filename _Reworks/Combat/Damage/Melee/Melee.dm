@@ -1048,7 +1048,7 @@
 					NextAttack+=15
 			else if(src.CheckSpecial("Wisdom Form"))
 				GetAndUseSkill(/obj/Skills/Projectile/Wisdom_Form_Blast, Projectiles, TRUE)
-			else if(src.CheckSlotless("OverSoul"))
+			else if(src.CheckSlotless("OverSoul")&&BoundLegend=="Durendal")
 				GetAndUseSkill(/obj/Skills/AutoHit/DurendalPressure, AutoHits, TRUE)
 			else if(src.CheckSlotless("Heavenly Ring Dance"))
 				if(src.Target&&src.Target!=src)

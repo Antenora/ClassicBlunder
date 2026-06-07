@@ -289,7 +289,7 @@ mob/proc/HighTension(var/x)
 		T.current_tension = 0
 	src.Hairz("Add")
 	src.Auraz("Remove")*/
-	
+
 mob/proc/ChooseSuperAlien()
 	var/Choice
 	var/Confirm
@@ -545,7 +545,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("Momentum", 4)
 				passive_handler.Increase("Steady", 5)
 				passive_handler.Increase("PureDamage",6)
-				passive_handler.Increase("HellPower")
+				passive_handler.Increase("HellPower", 1)
 				var/i='LavaTile.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				animate(w, alpha=0, color=list(0,0,0, 0,0,0, 0,0,0, 0,0,0))
@@ -711,7 +711,7 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("Momentum", 4)
 			passive_handler.Decrease("Steady", 5)
 			passive_handler.Decrease("PureDamage",6)
-			passive_handler.Decrease("HellPower")
+			passive_handler.Decrease("HellPower", 1)
 		if("Muramasa")
 			src.ElementalOffense=null
 			passive_handler.Decrease("LifeSteal", 100)
