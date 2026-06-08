@@ -1230,7 +1230,7 @@ mob
 
 				if(src.ActiveBuff.WoundHeal)
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-						src.HealWounds(src.GetRecov(src.ActiveBuff.WoundHeal))
+						src.HealWounds(src.ActiveBuff.WoundHeal)
 				if(src.ActiveBuff.FatigueHeal)
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 						if(src.ActiveBuff.StableHeal)
@@ -1243,10 +1243,10 @@ mob
 				if(src.ActiveBuff.HealthHeal)
 					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-							src.HealWounds(src.GetRecov(src.ActiveBuff.HealthHeal))
+							src.HealWounds(src.ActiveBuff.HealthHeal)
 					else
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-							src.HealHealth(src.GetRecov(src.ActiveBuff.HealthHeal))
+							src.HealHealth(src.ActiveBuff.HealthHeal)
 				if(src.ActiveBuff.EnergyHeal)
 					if((src.Energy+src.TotalFatigue)>=100||(src.TotalFatigue&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
@@ -1384,22 +1384,16 @@ mob
 							src.SpecialBuff.WaveringAnger=0
 
 				if(src.SpecialBuff.WoundHeal)
-					src.HealWounds(src.GetRecov(src.SpecialBuff.WoundHeal))
+					src.HealWounds(src.SpecialBuff.WoundHeal)
 				if(src.SpecialBuff.FatigueHeal)
 					src.HealFatigue(src.GetRecov(src.SpecialBuff.FatigueHeal))
 				if(src.SpecialBuff.CapacityHeal)
 					src.HealCapacity(src.SpecialBuff.CapacityHeal)
 				if(src.SpecialBuff.HealthHeal)
 					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
-						if(src.SpecialBuff.StableHeal)
-							src.HealWounds(src.SpecialBuff.HealthHeal)
-						else
-							src.HealWounds(src.GetRecov(src.SpecialBuff.HealthHeal))
+						src.HealWounds(src.SpecialBuff.HealthHeal)
 					else
-						if(src.SpecialBuff.StableHeal)
-							src.HealHealth(src.SpecialBuff.HealthHeal)
-						else
-							src.HealHealth(src.GetRecov(src.SpecialBuff.HealthHeal))
+						src.HealHealth(src.SpecialBuff.HealthHeal)
 				if(src.SpecialBuff.EnergyHeal)
 					if((src.Energy+src.TotalFatigue)>=100||(src.TotalFatigue&&src.icon_state=="Meditate"))
 						if(src.SpecialBuff.StableHeal)
