@@ -254,6 +254,9 @@ obj/ProjectionMoon
 			for(var/mob/Players/P in view(10))
 				P.triggerOozaru()
 				if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, P))
+					if(P.passive_handler.Get("SunStricken"))
+						P << "You are afflicted by The Sun, you cannot shift into your cursed form."
+						return
 					if(!P.CheckSlotless("FullMoonForm"))
 						if(P.SpecialBuff)
 							P.SpecialBuff.Trigger(P)
@@ -266,4 +269,86 @@ obj/ProjectionMoon
 							F.Trigger(P)
 
 
+obj/ProjectionSun
+	icon='SunP.dmi'
+	layer=EFFECTS_LAYER
+	New()
+		spawn() src.Project()
+	proc/Project()
+		spawn(100)if(src)del(src)
+		src.icon_state="Other On"
+		animate(src,pixel_z=80,flags=ANIMATION_RELATIVE,time=20)
+		sleep(20)
+		src.icon_state="On"
+		sleep(10)
+		view(15,src)<<"<font color=#ffcc00>The sun's rays glow brightly!</font>"
+		if(src)
+			for(var/mob/Players/P in view(15))
+				if(P.passive_handler.Get("Rank-Down Protection") || P.passive_handler.Get("Heavensent") || P.isRace(ANGEL))
+					var/obj/Skills/Buffs/SlotlessBuffs/Sun_Seared/applyBuff1 = new
+					applyBuff1.Trigger(P, 1)
+					P.AddBurn(100)
+				else if(P.IsEvil() || P.isRace(MAKAIOSHIN) || P.isRace(ELDRITCH) || P.Secret=="Vampire" || P.Secret=="Werewolf" || P.Secret=="Eldritch")
+					var/obj/Skills/Buffs/SlotlessBuffs/Sun_Stricken/applyBuff2 = new
+					applyBuff2.Trigger(P, 1)
+					P.AddBurn(50)
+					if(P.Secret=="Vampire")
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Vampire/Rotshreck/v in src)
+							if(!P.BuffOn(v))
+								v.adjust(P, 1)
+						var/bloodPower = P.secretDatum.currentTier
+						P.BPPoison=min(0.2*bloodPower,0.9)
+						P.BPPoisonTimer=RawHours(6)/bloodPower
+						P << "<font color=#ffcc00>You have been burned by the light of The Sun!</font>"
+				else
+					var/obj/Skills/Buffs/SlotlessBuffs/Sun_Blessed/applyBuff3 = new
+					applyBuff3.Trigger(P, 1)
+					if(P.Secret=="Hamon")
+						if(P.RippleActive()&&!P.PoseEnhancement)
+							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 
+obj/Skills/Buffs/SlotlessBuffs/Sun_Seared
+	KenWave = 4
+	KenWaveIcon='KenShockwaveGold.dmi'
+	IconLock='FlameGlowHades.dmi'
+	LockX=-16
+	LockY=-4
+	TimerLimit=60
+	ActiveMessage="becomes fully mortal beneath the light of The Sun!"
+	OffMessage="ascends once again into a divine being."
+	TextColor="#ffcc00"
+	MagicNeeded=0
+	Cooldown=120
+	adjust(mob/p)
+		passives = list("DisableGodKi" = 1, "Silenced" = 1)
+
+obj/Skills/Buffs/SlotlessBuffs/Sun_Stricken
+	KenWave = 4
+	KenWaveIcon='KenShockwaveGold.dmi'
+	IconLock='FlameGlowHerc.dmi'
+	LockX=-16
+	LockY=-4
+	TimerLimit=60
+	ActiveMessage="experiences freedom from their curses beneath the light of The Sun!"
+	OffMessage="descends back into their cursed existence."
+	TextColor="#ffcc00"
+	MagicNeeded=0
+	Cooldown=120
+	adjust(mob/p)
+		passives = list("SunStricken" = 1)
+
+obj/Skills/Buffs/SlotlessBuffs/Sun_Blessed
+	KenWave = 4
+	KenWaveIcon='KenShockwaveGold.dmi'
+	HitSpark='Star.dmi'
+	IconLock='FlameGlowZeus.dmi'
+	LockX=-16
+	LockY=-4
+	TimerLimit=60
+	ActiveMessage="shatters the chains of oppression, basking in the light of The Sun!"
+	OffMessage="carries on with the truth of the light in their heart."
+	TextColor="#ffcc00"
+	MagicNeeded=0
+	Cooldown=120
+	adjust(mob/p)
+		passives = list("LifeGeneration" = 3, "EnergyGeneration" = 3, "Antsy" = 10, "Conductor" = 20)

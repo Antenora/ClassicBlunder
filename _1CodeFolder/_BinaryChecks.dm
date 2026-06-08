@@ -1891,6 +1891,8 @@ mob
 				if(isRace(DEMON)||oozaru_type=="Demonic"||(passive_handler.Get("UnlimitedHighTension")&&isRace(CELESTIAL)))
 					return 2
 				return 1
+			if(passive_handler.Get("SunStricken"))
+				return 0
 			return 0
 		GetHellPower()
 			var/hellpower = passive_handler.Get("HellPower")
@@ -1900,6 +1902,8 @@ mob
 				hellpower=0
 			if(hellpower>2)
 				hellpower=2
+			if(passive_handler.Get("SunStricken"))
+				hellpower=0
 			return hellpower
 		HasZenkaiPower()
 			if(passive_handler.Get("ZenkaiPower"))
