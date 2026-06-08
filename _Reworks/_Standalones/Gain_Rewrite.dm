@@ -110,7 +110,7 @@
 	if(AffectTarget && source.Target)
 		target = source.Target
 	if (WoundHeal)
-		target.HealWounds(target.GetRecov(WoundHeal) / 10)
+		target.HealWounds(WoundHeal / 10)
 	if (FatigueHeal)
 		target.HealFatigue((StableHeal ? FatigueHeal : target.GetRecov(FatigueHeal)) / 10, 1)
 	if (CapacityHeal)
@@ -118,9 +118,9 @@
 	if (HealthHeal)
 		var/healTarget = (target.Health + target.TotalInjury >= 100 || (target.TotalInjury && target.icon_state == "Meditate"))
 		if (healTarget)
-			target.HealWounds(target.GetRecov(HealthHeal) / 10)
+			target.HealWounds(HealthHeal / 10)
 		else
-			target.HealHealth(target.GetRecov(HealthHeal) / 10)
+			target.HealHealth(HealthHeal / 10)
 	if (EnergyHeal)
 		var/energyTarget = (target.Energy + target.TotalFatigue >= 100 || (target.TotalFatigue && target.icon_state == "Meditate"))
 		if (energyTarget)
