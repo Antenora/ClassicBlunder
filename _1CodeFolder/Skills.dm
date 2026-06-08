@@ -789,6 +789,14 @@ obj/Skills
 			set category="Skills"
 			usr.SkillX("FalseMoon",src)
 
+	True_Sun
+		Cooldown=-1
+		desc="Reveal the true sun."
+		verb/TrueSun()
+			set name="True Sun"
+			set category="Skills"
+			usr.SkillX("TrueSun",src)
+
 	Celestial_Invocation
 		Cooldown=86400
 		CooldownStatic=1

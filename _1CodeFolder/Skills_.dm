@@ -978,6 +978,15 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				src.OMessage(10,"[src] conjures up a ball of energy into their palm and chucks it into the sky!.","[src]([src.key]) made a false moon!")
 				new/obj/ProjectionMoon(src.loc)
 
+			if("TrueSun")
+				if(Z.Using)
+					return
+				if(src.KO)
+					return
+				Z.Cooldown()
+				src.OMessage(10,"[src] manifests an orb of light into their palm and releases it into the sky!.","[src]([src.key]) released the true sun!")
+				new/obj/ProjectionSun(src.loc)
+
 			if("Zanzoken")
 				if(!src.Move_Requirements())
 					return

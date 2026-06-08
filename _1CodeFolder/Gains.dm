@@ -787,6 +787,10 @@ mob
 							src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
 
 				if(Secret=="Werewolf")
+					if(passive_handler.Get("SunStricken") && CheckSlotless("Full Moon Form") && !PureRPMode)
+						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
+							fmf.Trigger(src, Override=1)
 					if(secretDatum.secretVariable["Hunger Active"] == 1)
 						var/SecretInformation/Werewolf/s = secretDatum
 						if(!PureRPMode)
@@ -797,6 +801,10 @@ mob
 									fmf.Trigger(src, Override=1)
 
 				if(Secret=="Eldritch")
+					if(passive_handler.Get("SunStricken") && CheckSlotless("True Form") && !PureRPMode)
+						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+							fmf.Trigger(src, Override=1)
 					if(secretDatum.secretVariable["Madness Active"] == 1)
 						var/SecretInformation/Eldritch/s = secretDatum
 						if(!PureRPMode)
