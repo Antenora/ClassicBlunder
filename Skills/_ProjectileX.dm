@@ -6257,7 +6257,7 @@ obj
 
 						var/EffectiveDamage=Damage
 						if(a:Launched||a:Stunned)
-							if(!(src.ComboMaster || Owner.HasComboMaster()))
+							if(!(src.ComboMaster || Owner.HasComboMaster() || m.passive_handler.Get("Staggered!")))
 								EffectiveDamage *= glob.CCDamageModifier
 
 						if(GoldScatter||Owner.CheckSlotless("Hoarders Riches"))

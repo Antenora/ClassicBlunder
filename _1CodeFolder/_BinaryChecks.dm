@@ -1292,6 +1292,8 @@ mob
 				Return*=1*((100-DownToEarth)/100)
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
+			if(passive_handler.Get("Staggered!"))
+				Return=0
 			return Return
 		Hustling()
 			if(passive_handler.Get("Hustle") || HasMythical() > 0.25 || (passive_handler["Rage"] && Health <= 25))

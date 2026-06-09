@@ -849,6 +849,16 @@ mob
 			if(defender.passive_handler.Get("Ultimate Defense"))
 				if(prob(95))
 					val=0.05
+
+			if(defender.passive_handler.Get("BossStagger") && !defender.passive_handler.Get("Staggered!"))
+				defender.StaggerMeter+=min(max(val, 0.1), 1.5)
+				if(prob(2))
+					defender.StaggerMeter+=2
+				if(defender.StaggerMeter>=100)
+					defender.StaggerMeter=0
+					Stun(defender, 15, TRUE)
+					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
+					defender.passive_handler.Set("Staggered!", 1)
 			return val
 
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)

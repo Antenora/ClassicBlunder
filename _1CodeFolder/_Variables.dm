@@ -133,6 +133,7 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
+	tmp/StaggerMeter=0 // Boss Stun
 	EndReplace=0
 	EndTax=0
 	EndCut=0

@@ -480,7 +480,7 @@
 						sleep(3)
 						spawn()
 							LaunchEnd(enemy)
-				else if(!AttackQueue && (enemy.Launched || enemy.Stunned))
+				else if(!AttackQueue && (enemy.Launched || enemy.Stunned) && !enemy.passive_handler.Get("Staggered!"))
 					damage *= glob.CCDamageModifier
 					#if DEBUG_MELEE
 					log2text("Damage", "After Stun", "damageDebugs.txt", "[ckey]/[name]")
