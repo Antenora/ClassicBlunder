@@ -4468,8 +4468,8 @@ NEW VARIABLES
 
 			proc/getRegenRate(mob/p)
 				var/baseHeal = 5
-				var/perMissing = 0.05
-				var/missingPerAsc = 0.03
+				var/perMissing = 0.45
+				var/missingPerAsc = 0.18
 				var/raceDivisor = 30
 				StableHeal=1
 
