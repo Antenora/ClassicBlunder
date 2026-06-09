@@ -1080,6 +1080,7 @@ mob
 			// zero echoes, and shear-reduced heals echo off the reduced amount. Delays
 			// (1s / 2s / 3s) are a design choice — the doc does not specify a window,
 			// but short delays keep the echo legible as a payoff on the original heal.
+			/* This shit is disabled for now because wtf
 			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
 				var/echo_seed = val
 				spawn(10)
@@ -1091,6 +1092,7 @@ mob
 				spawn(30)
 					if(src)
 						src.HealHealth(echo_seed * 0.125, 1)
+			*/
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
 				val/=src.GetPowerUpRatio()
