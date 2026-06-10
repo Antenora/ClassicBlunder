@@ -859,6 +859,7 @@ mob
 					defender.HideBossStaggerBar()
 					defender.StaggerMeter=0
 					Stun(defender, 15, TRUE)
+					KKTShockwave(defender, icon='KenShockwaveGold.dmi', Size=4, Time=16)
 					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
 					defender.passive_handler.Set("Staggered!", 1)
 			return val
