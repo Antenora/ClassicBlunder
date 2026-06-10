@@ -851,9 +851,9 @@ mob
 					val=0.05
 
 			if(defender.passive_handler.Get("BossStagger") && !defender.passive_handler.Get("Staggered!"))
-				defender.StaggerMeter+=min(max(val, 0.1), 1.5)
+				defender.StaggerMeter+=min(max(val, 0.1), 1.5)*defender.StaggerMult
 				if(prob(2))
-					defender.StaggerMeter+=2
+					defender.StaggerMeter+=2*defender.StaggerMult
 				defender.UpdateBossStaggerBar()
 				if(defender.StaggerMeter>=100)
 					defender.HideBossStaggerBar()
