@@ -854,7 +854,9 @@ mob
 				defender.StaggerMeter+=min(max(val, 0.1), 1.5)
 				if(prob(2))
 					defender.StaggerMeter+=2
+				defender.UpdateBossStaggerBar()
 				if(defender.StaggerMeter>=100)
+					defender.HideBossStaggerBar()
 					defender.StaggerMeter=0
 					Stun(defender, 15, TRUE)
 					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
