@@ -849,6 +849,19 @@ mob
 			if(defender.passive_handler.Get("Ultimate Defense"))
 				if(prob(95))
 					val=0.05
+
+			if(defender.passive_handler.Get("BossStagger") && !defender.passive_handler.Get("Staggered!"))
+				defender.StaggerMeter+=min(max(val, 0.1), 1.5)*defender.StaggerMult
+				if(prob(2))
+					defender.StaggerMeter+=2*defender.StaggerMult
+				defender.UpdateBossStaggerBar()
+				if(defender.StaggerMeter>=100)
+					defender.HideBossStaggerBar()
+					defender.StaggerMeter=0
+					Stun(defender, 15, TRUE)
+					KKTShockwave(defender, icon='KenShockwaveGold.dmi', Size=4, Time=16)
+					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
+					defender.passive_handler.Set("Staggered!", 1)
 			return val
 
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
@@ -1080,6 +1093,7 @@ mob
 			// zero echoes, and shear-reduced heals echo off the reduced amount. Delays
 			// (1s / 2s / 3s) are a design choice — the doc does not specify a window,
 			// but short delays keep the echo legible as a payoff on the original heal.
+			/* This shit is disabled for now because wtf
 			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
 				var/echo_seed = val
 				spawn(10)
@@ -1091,6 +1105,7 @@ mob
 				spawn(30)
 					if(src)
 						src.HealHealth(echo_seed * 0.125, 1)
+			*/
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
 				val/=src.GetPowerUpRatio()

@@ -6685,7 +6685,7 @@ obj
 				if(Owner.UsingFencing())
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(Owner.UsingFencing()/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				if((m.Launched||m.Stunned||m.Suspended))
-					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer))
+					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer || m.passive_handler.Get("Staggered!")))
 						FinalDmg *= glob.CCDamageModifier
 						Owner.log2text("FinalDmg - Auto Hit", "After ComboMaster", "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 						Owner.log2text("FinalDmg - Auto Hit", FinalDmg, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
