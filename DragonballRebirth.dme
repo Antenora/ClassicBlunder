@@ -392,6 +392,7 @@
 #include "_Reworks\Combat\leaveBehind.dm"
 #include "_Reworks\Combat\Ooze.dm"
 #include "_Reworks\Combat\PotentialRework.dm"
+#include "_Reworks\Combat\StaggerVisualMechanic.dm"
 #include "_Reworks\Combat\Voiding.dm"
 #include "_Reworks\Combat\Damage\Calculations.dm"
 #include "_Reworks\Combat\Damage\CritInfatuation.dm"

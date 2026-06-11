@@ -7,6 +7,9 @@ mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE
 			if("After Image Strike")
 				if(src.KO)return
 				if(Z.Using) return
+				if(src.passive_handler.Get("Staggered!"))
+					src << "You can't clear Stagger with AIS!!"
+					return
 				if(src.TimeFrozen)return
 				if(!src.AfterImageStrike)
 					KenShockwave(src, icon='KenShockwaveLegend.dmi', Size=0.5, Blend=2, Time=4)
