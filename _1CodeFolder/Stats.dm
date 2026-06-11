@@ -850,8 +850,8 @@ mob/proc/
 		if(EPM<=0)
 			EPM=0.1
 		//Ratio
-		var/Ratio=getRacialPowerMod();
-		Ratio*=EPM
+		var/Ratio = getRacialPowerMod();
+		Ratio *= EPM
 		var/ShonenPower = ShonenPowerCheck(src)
 		if(ShonenPower)
 			Ratio*=GetSPScaling(ShonenPower)
