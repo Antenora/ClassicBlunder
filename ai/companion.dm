@@ -132,7 +132,7 @@ obj/Skills/Companion
 				a.ko_death = companion_ko_death
 				a.Timeless = 1
 				a.ai_team_fire=companion_team_fire
-				a.potential_power_mult = companion_bpm == -1 ? ((usr.potential_power_mult*usr.RPPower*usr.PowerBoost) * 0.5*(1+(src.Mastery/4))) : companion_bpm
+				a.potential_power_mult = companion_bpm == -1 ? ((usr.potential_power_mult*usr.RPPower*usr.PowerBoost) * 0.5*(1+(Mastery/4))) : companion_bpm
 				a.Potential = (companion_potential == -1) ? (usr.Potential * 0.5*(1+(src.Mastery/4))) : companion_potential
 				usr.ai_followers +=a
 				a.ai_alliances = list()

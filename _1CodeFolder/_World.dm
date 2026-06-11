@@ -52,6 +52,7 @@ world
 			updatePassiveInfo()
 			generateSwapMaps()
 			glob.resetSignaturePotentials();
+			glob.resetPotentialPowerVals();
 	Del()
 		..()
 

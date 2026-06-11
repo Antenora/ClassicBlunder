@@ -13,6 +13,7 @@ race
 		force = 1
 		economy = 3
 		regeneration = 1.5
+		power = 3;
 		statPoints = 20
 		learning = 1.25
 		anger = 1

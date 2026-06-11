@@ -6,7 +6,7 @@ race
 		passives = list("CalmAnger" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 2, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = 10, "MovementMastery" = 4)
 		statPoints = 10
 		locked = TRUE
-		power = 1
+		power = 0.5;
 		strength = 5
 		endurance = 5
 		force = 5

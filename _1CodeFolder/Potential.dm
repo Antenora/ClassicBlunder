@@ -76,14 +76,8 @@ mob
 				if(src.Potential>src.PotentialCap && src.PotentialRate>0)
 					src.Potential=src.PotentialCap
 
-			src.potential_max()
-
-			if(src.Potential>=10)
-				if(passive_handler.Get("KiControlMastery")<1)
-					passive_handler.Set("KiControlMastery", 1)
-
-
-			src.potential_ascend()
+			potential_max()
+			potential_ascend()
 
 		potential_max()
 			if(ECCHARACTER) return
@@ -133,14 +127,13 @@ mob
 					src << "You don't have enough RPP! ([TotalSpend] / [val])"
 				return 0
 		CheckAscensions()
-			if(src.AscensionsAcquired<=0||src.AscensionsAcquired==null||!src.AscensionsAcquired)
-				src.AscensionsAcquired=0
-			src.potential_max()
-			src.AscAvailable(src.race)
+			if(AscensionsAcquired == null||AscensionsAcquired <= 0||!AscensionsAcquired) AscensionsAcquired = 0;
+			potential_max();
+			AscAvailable(race);
 
 
 
-		potential_ascend(var/Silent=0)
+		potential_ascend()
 		//	if(secretDatum.nextTierUp != 999 && Secret)
 		//		secretDatum.checkTierUp(src)
 			/*if(isRace(DEMON))
@@ -157,6 +150,9 @@ mob
 					if(d.current_charges < AscensionsAcquired)
 						d.last_charge_gain = world.realtime
 						d.current_charges++*/
+			if(Potential>=10)
+				if(passive_handler.Get("KiControlMastery") < 1)
+					passive_handler.Set("KiControlMastery", 1);
 			if(locate(/obj/Skills/Buffs/SlotlessBuffs/Death_Evolution, src))
 				var/obj/Skills/Buffs/SlotlessBuffs/d = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Death_Evolution)
 				if(d.last_evo_gain == 0) d.last_evo_gain = world.realtime
@@ -171,58 +167,64 @@ mob
 			if(Potential >= 35 && SagaLevel < 3 && Saga)
 				saga_up_self()
 
-proc
-	potential_power(var/mob/m)
-		if(m.get_potential()==m.potential_last_checked)
-			return//don't keep getting potential power if the potential hasn't changed
+globalTracker
+	var/list/POTENTIAL_POWER_VALS = list(10,//10 potential
+		20,//20 potential
+		30,//30 potential
+		50,//40 potential
+		100,//50 potential
+		150,//60 potential
+		300,//70 potential
+		500,//80 potential
+		900,//90 potential
+		1500,//100 potential
+		2500,//110 potential
+		4750,//120 potential
+		8250,//130 potential
+		14500,//140 potential. oh gosh it's over nine thousand, and this isn't even the last tier
+		25000);//150 potential
 
-		var/tier_rem=min(10, (m.get_potential()/10))
-		var/max_tier = min(10,round((glob.progress.totalPotentialToDate*1.25)/10))
-		var/prev_tier= min(max_tier, round(m.get_potential()/10))
-		var/list/power_vals=list(5,10,25,50,100,150,200,300,400,500)
-		//100 potential = 500 bpm
-		//90 potential = 400 bpm
-		//80 potential = 300 bpm
-		//70 potential = 200 bpm
-		//60 potential = 150 bpm
-		//50 potential = 100 bpm
-		//40 potential = 50 bpm
-		//30 potential = 25 bpm
-		//20 potential = 10 bpm
-		//10 potential = 5 bpm
-		if(prev_tier==0)
-			m.potential_power_mult=1
-		else
-			m.potential_power_mult=power_vals[prev_tier]
+	proc/resetPotentialPowerVals()//dumb workaround for assigning lists to global variables
+		var/list/defaultPowerVals = list(10,//10 potential
+		20,//20 potential
+		30,//30 potential
+		50,//40 potential
+		100,//50 potential
+		150,//60 potential
+		300,//70 potential
+		500,//80 potential
+		900,//90 potential
+		1500,//100 potential
+		2500,//110 potential
+		4750,//120 potential
+		8250,//130 potential
+		14500,//140 potential. oh gosh it's over nine thousand, and this isn't even the last tier
+		25000);//150 potential
+		POTENTIAL_POWER_VALS = defaultPowerVals;
 
-		if(prev_tier!=10)
-			m.potential_power_mult+=potential_fraction(tier_rem-prev_tier, prev_tier)
 
-		if(m.get_potential()>100)
-			m.potential_power_mult+=((m.get_potential()-100)*25)//potential > 100 gives you an extra 25 bp every % of potential
+proc/potential_power(mob/m)
+	if(m.get_potential()==m.potential_last_checked) return//don't keep getting potential power if the potential hasn't changed
+	
+	var/maxThreshold = glob.POTENTIAL_POWER_VALS.len;//what is the maximum value defined for powervals?
+	var/currentThreshold = min(maxThreshold, round(m.get_potential()/10));//find out what is the highest Tens threshold we can satisfy
+	var/powerFraction = min(10, (m.get_potential() % 10));//get the remainder that is left over towards the next Tens threshold
+	
+	if(currentThreshold == 0) m.potential_power_mult = 0;
+	else m.potential_power_mult=glob.POTENTIAL_POWER_VALS[currentThreshold];
 
-		m.potential_last_checked=m.get_potential()
+	if(currentThreshold != maxThreshold) m.potential_power_mult += potential_fraction(powerFraction, currentThreshold);
 
-	potential_fraction(var/val, var/last_tier)
-		switch(last_tier)
-			if(0)
-				return val*4//5
-			if(1)
-				return val*5//10
-			if(2)
-				return val*15//25
-			if(3)
-				return val*25//50
-			if(4)
-				return val*50//100
-			if(5)
-				return val*50//150
-			if(6)
-				return val*50//200
-			if(7)
-				return val*100//300
-			if(8)
-				return val*100//400
-			if(9)
-				return val*100//500
-			//10 doesnt get fractions
+	m.potential_power_mult = round(m.potential_power_mult, 0.05);
+
+	m.potential_last_checked=m.get_potential()
+
+proc/potential_fraction(sparePotential, potentialBracket)
+	if(potentialBracket == glob.POTENTIAL_POWER_VALS.len) return 0;//this proc should only be called if you are not at the max threshold, but we'll state it again anyway
+	var/lastThresholdValue = 0;
+	var/currentlySatisfiedThreshold = potentialBracket;
+	if(currentlySatisfiedThreshold) lastThresholdValue = glob.POTENTIAL_POWER_VALS[currentlySatisfiedThreshold];//only set this if it is above 0
+	var/nextThresholdValue = glob.POTENTIAL_POWER_VALS[potentialBracket+1];
+	var/gap = nextThresholdValue - lastThresholdValue;//the difference between the next potential threshold value and this one
+	gap /= 10;//there are 10 potentials between each threshold
+	return (sparePotential * gap); //return the appropriate value for your progress towards the next threshold

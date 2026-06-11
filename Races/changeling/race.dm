@@ -9,6 +9,7 @@ race
 
 		passives = list("Xenobiology" = 1, "Juggernaut" = 1, "CriticalBlock" = 0.25, "BlockChance" = 25, "PureReduction" = 3, "PureDamage" = -2, "AllOutAttack" = 1, "MovementMastery" = -8)
 		statPoints 	= 8
+		power = 3;
 		strength	=	0.25
 		endurance	=	2
 		force	=	0.25

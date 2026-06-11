@@ -9,11 +9,11 @@ mob/proc/GetEffectivePower()
 		. *= MAJIN_UNHINGED_POWER_MULT
 
 mob/proc/GetAssess()
-	var/PowerDisplay
 	var/PotentialPowerDisplay
+	var/ReplacementPowerDisplay
 	var/PowerMultiplierDisplay
 	var/IntimDisplay
-	var/BaseDisplay
+	var/BaseDisplay = race.power;
 	var/GodKiDisplay
 	var/MaouKiDisplay
 	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef())/6, 0.05)
@@ -39,15 +39,10 @@ mob/proc/GetAssess()
 		if(src.PhylacteryNerf)
 			EffectiveAnger-=(EffectiveAnger*src.PhylacteryNerf)
 
-	PowerDisplay=Get_Scouter_Reading(src)
 
-	if(src.HasPowerReplacement())
-		BaseDisplay=src.GetPowerReplacement()*src.PowerBoost*src.RPPower
-	else
-		BaseDisplay=src.potential_power_mult*src.PowerBoost*src.RPPower
+	PotentialPowerDisplay = potential_power_mult;
 
-	PotentialPowerDisplay = src.GetPowerReplacement() ? src.GetPowerReplacement() : src.potential_power_mult;
-	PotentialPowerDisplay = round(PotentialPowerDisplay, 0.05);
+	if(HasPowerReplacement()) ReplacementPowerDisplay = GetPowerReplacement();
 
 	PowerMultiplierDisplay=src.Power_Multiplier;
 
@@ -75,7 +70,6 @@ mob/proc/GetAssess()
 	if(passive_handler.Get("Utterly Powerless"))
 		PotentialDisplay=1
 		BaseDisplay=1
-		PowerDisplay=1
 		PowerMultiplierDisplay=1
 		GodKiDisplay=0
 		MaouKiDisplay=0
@@ -100,16 +94,15 @@ mob/proc/GetAssess()
 	Current Anger:	[(EffectiveAnger+src.AngerAdd)*100]%<br>
 	<table cellspacing="6%" cellpadding="1%">
 	<tr><td>Current Power:</td><td>[Power]</td></tr>
+	<tr><td>Base Power:</td><td>[BaseDisplay*PowerBoost*RPPower*potential_power_mult]]/([BaseDisplay])</td></tr>
 	<tr><td>Power From Potential:</td><td>[PotentialPowerDisplay]</td></tr>
+	[HasPowerReplacement() ? "<tr><td>Power Replacement Value:</td><td>[ReplacementPowerDisplay]</td></tr>" : ""]
 	<tr><td>Power From Buffs:</td> <td>x[PowerMultiplierDisplay]</td></tr>
-	<tr><td>Base:</td><td>[BaseDisplay]/([src.PowerBoost*src.RPPower*round(src.potential_power_mult, 0.05)])</td></tr>
 	<tr><td>Intimidation:</td><td>x[IntimDisplay]</td></tr>
 	<tr><td>Damage Boost:</td><td>x[PDam] ([PDam*100]%)</td></tr>
 	<tr><td>Damage Reduction:</td><td>x[PRed] ([PRed*100]%)</td></tr>
 	<tr><td>God Ki:</td><td>x[GodKiDisplay]</td></tr>
 	<tr><td>Maou Ki:</td><td>x[MaouKiDisplay]</td></tr>
-	<tr><td>Current BP:</td><td>[Commas(PowerDisplay)]</td></tr>
-	<tr><td>Real BP:</td><td>[Commas(src.potential_power_mult)]</td></tr>
 	<tr><td>Energy:</td><td>[Commas(round(src.EnergyMax))] (1)</td></tr>
 	<tr><td>Buffed Stat/True Stat (Mod)</td></tr>
 	<tr><td>Strength:</td><td> [round(src.GetStr(), 0.01)] ([round(src.BaseStr() + src.GetEquippedWeaponStrAdd(), 0.01)])</td></tr>
@@ -120,15 +113,12 @@ mob/proc/GetAssess()
 	<tr><td>Defense:</td><td> [round(src.GetDef(), 0.01)] ([round(src.BaseDef() + src.GetEquippedWeaponDefAdd(), 0.01)])</td></tr>
 	<tr><td>Recovery:</td><td> [round(src.GetRecov(), 0.01)] ([src.BaseRecov()])</td></tr>
 	<tr><td>Anger:</td><td>[(src.AngerMax+src.AngerAdd)*100]%</td></tr>
-	<tr><td>Power Mult:</td><td>[round(src.potential_power_mult, 0.05) + src.PowerBoost]%</td></tr>
 	<tr><td>Potential:</td><td>[PotentialDisplay]/150</td></tr>
-	<tr><td>Transformation Potential:</td><td>[src.potential_trans]/100</td></tr>
+	<tr><td>Transformation Potential:</td><td>[potential_trans]/150</td></tr>
 	<tr><td>Average Stats: [StatAverage]</td></tr>
 	<tr><td>Magic Level: [src.getTotalMagicLevel()]</td></tr>
 	<tr><td>Stat Enhancement Chips Installed(Max): [src.EnhanceChips]([src.EnhanceChipsMax])</td></tr>
 			</table></html>"}
-/*	<tr><td>True Tier:</td><td>[POWER_TIERS[potential_power_tier]]</td></tr>
-	<tr><td>Display Tier:</td><td>[POWER_TIERS[power_display]]</td></tr>*/
 	if(src.passive_handler.Get("Utterly Powerless"))
 		blahh={"
 
@@ -860,7 +850,7 @@ mob/proc/
 		if(EPM<=0)
 			EPM=0.1
 		//Ratio
-		var/Ratio=1
+		var/Ratio=getRacialPowerMod();
 		Ratio*=EPM
 		var/ShonenPower = ShonenPowerCheck(src)
 		if(ShonenPower)

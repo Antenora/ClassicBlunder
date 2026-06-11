@@ -1955,7 +1955,7 @@ mob/Player/AI
 		potential_last_checked=-1
 		Ratio*=src.Base()
 		potential_power(src)//get them potential powers
-		Ratio*=src.potential_power_mult
+		Ratio*=potential_power_mult
 
 
 		//BODY CONDITION INFLUENCES
