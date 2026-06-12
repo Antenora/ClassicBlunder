@@ -312,7 +312,7 @@ mob
 				src.RecordCombatEvent("Hit [defender] for [round(val,0.1)]")
 				defender.RecordCombatEvent("Hit by [src] for [round(val,0.1)]")
 
-			src.ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
+			ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
 
 			if(defender.Flying)
 				var/obj/Items/check = defender.EquippedFlyingDevice()
@@ -1052,9 +1052,9 @@ mob
 							val+=(-1)*src.Sheared
 							src.Sheared=0
 						else
-							val=val*0.5
-					else if(!src.IsDarkDragonPlayer() && src.Frenzy > 0)
-						val=val*0.5
+							val *= 0.5
+					else if(!IsDarkDragonPlayer() && Frenzy > 0)
+						val *= 0.5
 				else
 					if(src.Sheared > 0)
 						src.Sheared-=val
@@ -1062,9 +1062,9 @@ mob
 							val=(-1)*src.Sheared
 							src.Sheared=0
 						else
-							val=val/4
-					else if(!src.IsDarkDragonPlayer() && src.Frenzy > 0)
-						val=val/4
+							val /= 4
+					else if(!IsDarkDragonPlayer() && Frenzy > 0)
+						val /= 4
 			if(icon_state == "Meditate")
 				src.Tension=max(0, Tension-(val*1.5))
 			if(passive_handler["Staked"])
