@@ -2091,9 +2091,10 @@ mob
 					return 1
 			if(src.KamuiBuffLock)
 				return 1
+			if(isRace(DRAGON) && AscensionsAcquired) return 1;
 			return 0
 		GetGodKi()
-			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")) return 0;
+			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null") || passive_handler.Get("Longing")) return 0;
 			var/Total=passive_handler.Get("GodKi")
 			if(src.HasSpiritPower()>=1 && FightingSeriously(src, 0))
 				if(src.Health<=(30+src.TotalInjury)*src.GetSpiritPower())
@@ -2112,20 +2113,16 @@ mob
 					Total += glob.SENSE9GODKI
 					if(SagaLevel>=7)
 						Total+=glob.SENSE9GODKI
-	/*		if(src.CheckSlotless("Saiyan Soul")&&!src.HasGodKiBuff())
-				if(passive_handler.Get("DisableGodKi") && src.Target&&!src.Target.CheckSlotless("Saiyan Soul")&&src.Target.HasGodKi()&&!src.Target.passive_handler.Get("CreateTheHeavens")&&!src.Target.passive_handler.Get("Hidden Potential")&&!src.Target.passive_handler.Get("Orange Namekian"))
-					Total+=src.Target.GetGodKi()/4
-				else if(src.Target&&!src.Target.CheckSlotless("Saiyan Soul")&&src.Target.HasGodKi()&&!src.Target.passive_handler.Get("CreateTheHeavens")&&!src.Target.passive_handler.Get("Hidden Potential")&&!src.Target.passive_handler.Get("Orange Namekian"))
-					Total+=src.Target.GetGodKi()/3*/
 
 			if(passive_handler.Get("GodCloth"))
 				if(src.Target&&(Health+VaizardHealth)<(Target.Health+Target.VaizardHealth))
 					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 3)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(src.isRace(DRAGON))
-				if(src.AscensionsAcquired==6 && Total<0.5)
-					Total=0.25//fully ascended dragon
+			if(isRace(DRAGON))
+				if(!Total) Total = AscensionsAcquired*0.05;
+				if(Anger || HasCalmAnger())
+					Total *= 2;
 			if(passive_handler.Get("CreateTheHeavens") && src.DoubleHelix>=5&&isRace(HUMAN))
 				Total += 0.25
 			var/OSGK=CheckSpecial("OverSoul") ? 0.1 : 0
