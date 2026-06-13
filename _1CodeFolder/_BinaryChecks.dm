@@ -750,6 +750,7 @@ mob
 				if(src.HasSpiritPower()>=1)
 					return 1
 				if(scalingEldritchPower()) return 1
+				if(KeepBody) return 1;
 			return 0
 		HasTransMimic()
 			return passive_handler.Get("TransMimic")
