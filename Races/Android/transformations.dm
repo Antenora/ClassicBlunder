@@ -17,12 +17,11 @@ transformation
 				var/ChipOff=usr.EnhancedAggression
 				var/ChipDef=usr.EnhancedReflexes
 				var/asc=user.AscensionsAcquired
-				var/list/chippassives = list("ManaStats" = asc,  "UnarmedDamage" = round(ChipFor/3, 1), "SpiritFlow" = round(ChipFor/3, 1), "Tenacity" = round(ChipEnd/3, 1),\
+				var/list/chippassives = list("ManaStats" = asc,  "UnarmedDamage" = round(ChipStr/3, 1), "SwordDamage" = round(ChipStr/3, 1), "SpiritFlow" = round(ChipFor/3, 1), "Tenacity" = round(ChipEnd/3, 1),\
 				"Instinct"= round(ChipOff/3, 1), "Flow" = round(ChipDef/3, 1), "Godspeed" = round(ChipSpd/3, 1))
-				//Broke PureDamage scaling off 1/3rd chips of Str/Force combined to UnarmedDamage and SpiritFlow Respectively. They get enough PureDamage on Ascension Anyway.
+				//Broke PureDamage scaling off 1/3rd chips of Str/Force combined to UnarmedDamage/SwordDamage and SpiritFlow Respectively. They get enough PureDamage on Ascension Anyway.
 				//Changed End's PureReduction to Tenacity. They get enough PureReduction on Ascension Anyway.
 				//Added ManaStats, scaling with ascension. A good android takes care of their battery.
-				//UnarmedDamage is a Placeholder.
 				var/list/basepassives
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Ripper_Mode, user.contents))
 					basepassives += list("LifeSteal" = 10 * asc)
