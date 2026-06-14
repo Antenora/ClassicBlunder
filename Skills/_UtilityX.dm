@@ -3775,7 +3775,7 @@ obj/Skills/Utility
 					M.ManaPU=1
 
 				if("Biological Cybernetics")
-					if(M.BioAndroid||M.Saga||M.HasMilitaryFrame()&&!M.isRace(ANDROID))
+					if(M.BioAndroid||M.Saga&&!M.isRace(ANDROID)||M.HasMilitaryFrame()&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have Biological Cybernetics.")
 						src.Using=0
 						return

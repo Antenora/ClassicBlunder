@@ -962,6 +962,8 @@ mob/proc/
 				Ratio*=PowerBoost
 			Ratio *= GetAscensionPower();//returns 1 or higher
 			Ratio *= GetSaiyanPower();//returns 1 or higher but for saiyan power users
+			if(isRace(ANDROID)) //Androids get more power based off CyberCancel
+				Ratio *= 1 + round(src.CyberCancel/10, 0.1)//Trust me when I say CyberCancel can get to insane numbers for Androids.
 			if(passive_handler.Get("Undeterred"))
 				Ratio*=1+((StrTax+ForTax)/2)
 			if(passive_handler.Get("SSJRose"))
