@@ -3419,9 +3419,9 @@ obj/Skills/Utility
 					ModChoices.Add("Repair")
 				if("Singularity" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
 					ModChoices.Add("Biological Cybernetics")
-			if(M.BioAndroid||||M.SuperAndroid&&M.Potential<45)//Added a potential check for Super + Bio synergy.
+			if(M.BioAndroid||M.SuperAndroid&&M.Potential<45)//Added a potential check for Super + Bio synergy.
 				ModChoices.Remove("Biological Cybernetics")
-			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30||||M.BioAndroid&&M.Potential<45)// You could get Bio then go back and get Super. Fixed it with this check.
+			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30||M.BioAndroid&&M.Potential<45)// You could get Bio then go back and get Super. Fixed it with this check.
 				ModChoices.Remove("Cybernetic Mainframe")
 
 			ModChoice=input(usr, "What modification would you like to install?", "Cybernetic Augmentation") in ModChoices
