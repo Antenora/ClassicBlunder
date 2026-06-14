@@ -86,6 +86,8 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 	if(!src.GetDebuffReversal())
 		if(typeOfDebuff == "Frenzy" && Health <= 0)
 			dmg = 0
+		if(isRace(ANDROID) && typeOfDebuff == "Poison" || isRace(ANDROID) && typeOfDebuff == "Bleed")//Androids lack blood/organs to bleed/have poison run through them.
+			dmg = 0
 		Health-=dmg
 		if(typeOfDebuff == "Frenzy" && !IsDarkDragonPlayer() && dmg > 0)
 			WoundSelf(dmg * 0.5)

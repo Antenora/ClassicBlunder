@@ -13,9 +13,10 @@ race
 		force = 1
 		economy = 3
 		regeneration = 1.5
-		statPoints = 20
+		statPoints = 20//Diminishing Returns for stat points makes this kind of dumb. But Rumor has it we're removing diminishing returns next wipe so I won't touch anything else.
 		learning = 1.25
 		anger = 1
+		intellect = 2//Why were Androids stupid before???
 		imagination = 0.05
 		anger_message = "calculates the ideal path to victory."
 		skills = list(/obj/Skills/Utility/Cybernetic_Augmentation, /obj/Skills/Utility/Android_Integration)

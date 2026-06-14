@@ -3161,7 +3161,7 @@ obj/Skills/Utility
 			set category="Utility"
 			if(src.Using)
 				return
-			if(usr.GetAndroidIntegrated()<3+usr.AscensionsAcquired)
+			if(usr.GetAndroidIntegrated()<3+(usr.AscensionsAcquired*2))
 				src.Using=1
 				var/obj/Items/Gear/Choice
 				var/list/obj/Items/Gear/IG=list("Cancel")
@@ -3345,6 +3345,22 @@ obj/Skills/Utility
 					if(6)
 						if(M.EnhanceChipsMax<34)
 							M.EnhanceChipsMax=34
+			if(M.isRace(ANDROID))
+				switch(M.AscensionsAcquired)//Androids get 0 stats on ascension. This is how they get their stats via ascension.
+					if(0)
+						M.EnhanceChipsMax = 8
+					if(1)
+						M.EnhanceChipsMax = 16
+					if(2)
+						M.EnhanceChipsMax = 24
+					if(3)
+						M.EnhanceChipsMax = 32
+					if(4)
+						M.EnhanceChipsMax = 40
+					if(5)
+						M.EnhanceChipsMax = 48
+					if(6)
+						M.EnhanceChipsMax = 56
 
 
 			if(M.EnhanceChips>=M.EnhanceChipsMax)
@@ -3403,9 +3419,9 @@ obj/Skills/Utility
 					ModChoices.Add("Repair")
 				if("Singularity" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
 					ModChoices.Add("Biological Cybernetics")
-			if(M.BioAndroid||M.SuperAndroid)
+			if(M.BioAndroid||||M.SuperAndroid&&M.Potential<45)//Added a potential check for Super + Bio synergy.
 				ModChoices.Remove("Biological Cybernetics")
-			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30)
+			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30||||M.BioAndroid&&M.Potential<45)// You could get Bio then go back and get Super. Fixed it with this check.
 				ModChoices.Remove("Cybernetic Mainframe")
 
 			ModChoice=input(usr, "What modification would you like to install?", "Cybernetic Augmentation") in ModChoices
@@ -3710,7 +3726,7 @@ obj/Skills/Utility
 						A.Password=input("Input activation code.") as text|null
 
 				if("Ripper Mode")
-					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3718,7 +3734,7 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 				if("Armstrong Augmentation")
-					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3726,7 +3742,7 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 				if("Ray Gear")
-					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3734,7 +3750,7 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 				if("Hilbert Effect")
-					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3742,7 +3758,7 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 				if("Overdrive")
-					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3750,7 +3766,7 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 				if("Infinity Drive")
-					if((M.HasMilitaryFrame())||M.Saga)
+					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but their operating memory is already occupied.")
 						src.Using=0
 						return
@@ -3759,7 +3775,7 @@ obj/Skills/Utility
 					M.ManaPU=1
 
 				if("Biological Cybernetics")
-					if(M.BioAndroid||M.Saga||M.HasMilitaryFrame())
+					if(M.BioAndroid||M.Saga||M.HasMilitaryFrame()&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have Biological Cybernetics.")
 						src.Using=0
 						return

@@ -1442,7 +1442,7 @@ mob
 		HasSpecialBuffLock()
 			if(passive_handler.Get("SpecialBuffLock"))
 				return 1
-			if(src.InfinityModule)
+			if(src.InfinityModule&&!isRace(ANDROID))// personally do not think this is necessary for anyone but most-definitely not androids.
 				return 1
 			return 0
 		GetHeroicBoost()

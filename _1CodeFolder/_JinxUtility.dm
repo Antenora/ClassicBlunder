@@ -164,9 +164,9 @@ mob
 					defender.passive_handler.Set("Determination(Green)", 1)
 					defender.passive_handler.Set("Determination(Purple)", 0)
 					defender<<"Your SOUL color shifts to green!"
-			if(src.HasSoftStyle())
+			if(src.HasSoftStyle() &&!defender.HasFatigueImmune())
 				defender.GainFatigue(val*clamp(glob.SOFT_STYLE_RATIO*src.GetSoftStyle(), 0.0001, 0.5))
-			if(src.HasHardStyle())
+			if(src.HasHardStyle()&&!defender.HasInjuryImmune())
 				if(!src.CursedWounds())
 					src.DealWounds(defender, val*clamp(glob.HARD_STYLE_RATIO*src.GetHardStyle(), 0.0001, 0.75))
 			if(src.HasCyberStigma())
@@ -1378,8 +1378,10 @@ mob
 		// forgive the sin below, im not replacing basestat() in all the codebase
 		getEnhanced(statName)
 			var/enhance = vars["Enhanced[statName]"] * 0.3
-			if(isRace(ANDROID)||CyberneticMainframe&&src.Class=="Resourceful")
+			if(CyberneticMainframe&&src.Class=="Resourceful")
 				enhance = vars["Enhanced[statName]"] * 0.6
+			if(isRace(ANDROID))
+				enhance = vars["Enhanced[statName]"] * 0.75
 			if(Target && ismob(Target))
 				// Rusting: when target carries the Rusting passive (mystic/hybrid styles)
 				// and the player is poisoned, debuff the player's enhance-chip stat by an
