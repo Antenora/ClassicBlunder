@@ -334,10 +334,6 @@ window "ICChatTab"
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		outer-size = 654x494
-		outer-pos = 291,0
-		inner-pos = 7,7
-		screen-size = 2560x1392
 	elem "icchat"
 		type = OUTPUT
 		pos = 0,0
@@ -528,7 +524,7 @@ window "OOCChatTab"
 window "RPWindow"
 	elem "RPWindow"
 		type = MAIN
-		pos = 291,0
+		pos = 637,106
 		size = 640x479
 		anchor1 = -1,-1
 		anchor2 = -1,-1
@@ -538,6 +534,108 @@ window "RPWindow"
 		statusbar = false
 		can-close = false
 		can-minimize = false
+		outer-size = 656x518
+		outer-pos = 637,106
+		inner-size = 640x479
+		inner-pos = 8,31
+		screen-size = 2560x1400
+	elem "label9"
+		type = LABEL
+		pos = 256,48
+		size = 128x24
+		anchor1 = 40,10
+		anchor2 = 60,15
+		background-color = #343434
+		saved-params = ""
+		text = ""
+	elem "button16"
+		type = BUTTON
+		pos = 512,48
+		size = 64x24
+		anchor1 = 80,10
+		anchor2 = 90,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Massive Text"
+		command = "MassiveEmote"
+	elem "button15"
+		type = BUTTON
+		pos = 448,48
+		size = 64x24
+		anchor1 = 70,10
+		anchor2 = 80,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Large Text"
+		command = "LargeEmote"
+	elem "button14"
+		type = BUTTON
+		pos = 192,48
+		size = 64x24
+		anchor1 = 30,10
+		anchor2 = 40,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Strikethrght"
+		command = "StrikeEmote"
+	elem "colorB"
+		type = BUTTON
+		pos = 576,48
+		size = 64x24
+		anchor1 = 90,10
+		anchor2 = 100,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Color Picker"
+		command = "EmoteColorPicker"
+	elem "centerB"
+		type = BUTTON
+		pos = 384,48
+		size = 64x24
+		anchor1 = 60,10
+		anchor2 = 70,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Center"
+		command = "CenterEmote"
+	elem "underB"
+		type = BUTTON
+		pos = 128,48
+		size = 64x24
+		anchor1 = 20,10
+		anchor2 = 30,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Underline"
+		command = "UnderEmote"
+	elem "itaB"
+		type = BUTTON
+		pos = 64,48
+		size = 64x24
+		anchor1 = 10,10
+		anchor2 = 20,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Italics"
+		command = "ItaEmote"
+	elem "boldB"
+		type = BUTTON
+		pos = 0,48
+		size = 64x24
+		anchor1 = 0,10
+		anchor2 = 10,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Bold"
+		command = "BoldEmote"
 	elem "button8"
 		type = BUTTON
 		pos = 392,447
@@ -554,7 +652,7 @@ window "RPWindow"
 	elem "label6"
 		type = LABEL
 		pos = 0,0
-		size = 640x47
+		size = 640x48
 		anchor1 = 0,0
 		anchor2 = 100,10
 		font-family = "@Malgun Gothic Semilight"
@@ -565,10 +663,10 @@ window "RPWindow"
 		text = "Roleplay"
 	elem "button9"
 		type = BUTTON
-		pos = 240,448
-		size = 160x32
-		anchor1 = 38,94
-		anchor2 = 63,100
+		pos = 240,447
+		size = 152x32
+		anchor1 = 38,93
+		anchor2 = 61,100
 		font-family = "Malgun Gothic Semilight"
 		font-size = 16
 		text-color = #ffffff
@@ -578,9 +676,9 @@ window "RPWindow"
 		command = "RPPreview"
 	elem "rpbox"
 		type = INPUT
-		pos = 0,47
-		size = 640x400
-		anchor1 = 0,10
+		pos = 0,72
+		size = 640x375
+		anchor1 = 0,15
 		anchor2 = 100,93
 		text-color = #ffffff
 		background-color = #1b1a18
@@ -2226,13 +2324,8 @@ window "previewrp"
 		size = 640x480
 		anchor1 = -1,-1
 		anchor2 = -1,-1
-		background-color = none
 		is-visible = false
 		saved-params = "pos;size;is-minimized;is-maximized"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 2560x1392
 	elem "rp-preview"
 		type = OUTPUT
 		pos = 0,0

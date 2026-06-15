@@ -9,6 +9,66 @@ mob/proc
 mob/var/tmp/lastRPTime = 0
 
 mob/verb/
+	EmoteColorPicker()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		var/color = input(src, "Choose a text color.", "Text Color") as color|null
+		if(!color)
+			return
+		msg += "<font color=[color]></color>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	BoldEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<b></b>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	ItaEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<i></i>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	UnderEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<u></u>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	CenterEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<center></center>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	StrikeEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<s></s>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	LargeEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<h2></h2>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+	MassiveEmote()
+		set hidden = 1
+		var/msg = winget(usr, "RPWindow.rpbox", "text")
+		msg += "<h1></h1>"
+		winset(src, "RPWindow.rpbox", list2params(list(
+			"text" = msg
+		)))
+
 	SubmitRP()
 		set hidden = 1
 		set instant = 1
@@ -84,7 +144,7 @@ mob/proc/FixCenterLeak(t as text)
 mob
 	proc
 		applyRoleplayParsing(msg)
-			
+
 			var/format = "default"
 
 			if(findtext(msg, "//",1,3) || findtext(msg,"||", 1,3))
