@@ -67,7 +67,7 @@ mob/proc/UsingHotnCold()
         return TRUE
     return FALSE
 
-/mob/proc/applyCharmed(mob/charmer, limit = 10)
+/mob/proc/applyCharmed(mob/charmer, limit = 5)
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed/s = findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed)
 	if(!BuffOn(s))
 		s.charmer = charmer

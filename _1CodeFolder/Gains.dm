@@ -241,7 +241,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			if(SpecialBuff.Mastery <= 1)
 				SpecialBuff.Trigger(src, Override=1)
 		if(equippedFlask)
-			if(MeditateTime >= 10 && equippedFlask?.Charges != GetMaxFlaskCharges()) // Wait 10 seconds, have a flask equipped.
+			if(MeditateTime >= 40 && equippedFlask?.Charges != GetMaxFlaskCharges()) // Wait 10 seconds, have a flask equipped.
 				equippedFlask.Charges = GetMaxFlaskCharges() // Your charges are back to max!
 				src << "Equipped Flask Charges set to [equippedFlask.Charges]"
 	else
@@ -377,6 +377,7 @@ mob
 			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
 				Target = null
 		MajinAbsorbZoneSafeguard()
+		MajinAbsorbVictimTick()
 		checkHealthAlert()
 
 		if(src.Grab) src.Grab_Update()
@@ -571,20 +572,20 @@ mob
 					src.race.transformations[2].transform(src, TRUE)
 			if(passive_handler.Get("TrueZenkai")&&src.transActive>=4)
 				if(Health>=70&&Health<=90)
-					if(passive_handler.Get("TrueZenkaiPower")<0.2)
+					if(passive_handler.Get("TrueZenkaiPower")<0.5)
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
 				if(Health>=50&&Health<=69)
-					if(passive_handler.Get("TrueZenkaiPower")<0.4)
-						passive_handler.Increase("TrueZenkaiPower", 0.01)
-				if(Health>=30&&Health<=49)
 					if(passive_handler.Get("TrueZenkaiPower")<0.6)
-						passive_handler.Increase("TrueZenkaiPower", 0.02)
+						passive_handler.Increase("TrueZenkaiPower", 0.003)
+				if(Health>=30&&Health<=49)
+					if(passive_handler.Get("TrueZenkaiPower")<1)
+						passive_handler.Increase("TrueZenkaiPower", 0.005)
 				if(Health>=15&&Health<=29)
 					if(passive_handler.Get("TrueZenkaiPower")<2)
-						passive_handler.Increase("TrueZenkaiPower", 0.02)
+						passive_handler.Increase("TrueZenkaiPower", 0.008)
 				if(Health<=14)
 					if(passive_handler.Get("TrueZenkaiPower")<3)
-						passive_handler.Increase("TrueZenkaiPower", 0.05)
+						passive_handler.Increase("TrueZenkaiPower", 0.01)
 			if(passive_handler.Get("Full Manifestation"))
 				src.HandleEldritchTax()
 			if(passive_handler.Get("TrueZenkaiPower")&&src.icon_state=="Meditate")
@@ -597,7 +598,7 @@ mob
 						src.Tension=100
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
 				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
-					if(!src.Stunned)
+					if(!src.Stunned&&!src.Suspended)
 						src.DoDamage(src, (rand(1,5)/30))
 			if(passive_handler["Grit"])
 				AdjustGrit("sub", glob.racials.GRITSUBTRACT)
@@ -608,32 +609,32 @@ mob
 			if(isMazokuHuman() && src.icon_state != "Meditate")
 				var/ht_trigger_threshold = isMazokuAscension6() ? 40 : 25
 				// ≤75% HP from base form → activate Devil Trigger (slot 6)
-				if(transActive == 0 && Health <= 75 * (1 - HealthCut))
+				if(transActive == 0 && Health <= 75 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// DT to HT drop below threshold
-				if(isInMazokuDT() && Health <= ht_trigger_threshold * (1 - HealthCut))
+				if(isInMazokuDT() && Health <= ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// ≤25% HP in HT (Ascension 6 only): revert all HT forms, activate Sacred Energy Aura
-				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && Health <= 25 * (1 - HealthCut))
+				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && Health <= 25 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 7)
 						mazokuRevertAllHT()
 						transActive = 6
 						race.transformations[7].transform(src, TRUE)
 				// HP rising SEA to HT (Ascension 6 only)
-				if(isMazokuAscension6() && isInMazokuSEA() && Health > 25 * (1 - HealthCut))
+				if(isMazokuAscension6() && isInMazokuSEA() && Health > 25 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// HP rising HT to DT (revert all HT, re-enter Devil Trigger)
-				if(transActive >= 1 && transActive <= 5 && Health > ht_trigger_threshold * (1 - HealthCut))
+				if(transActive >= 1 && transActive <= 5 && Health > ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					mazokuRevertAllHT()
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// HP rising DT to base form
-				if(isInMazokuDT() && Health > 75 * (1 - HealthCut))
+				if(isInMazokuDT() && Health > 75 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 			if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive>0)
 				if(HellspawnBerserk)
@@ -723,87 +724,95 @@ mob
 				if(prob(passive_handler.Get("ContinuallyStun")))
 					Stun(src, rand(1,3), TRUE)
 
-				if(movementSealed)
-					for(var/obj/Seal/S in src)
-						if(S.ZPlaneBind)
-							if(src.z!=S.ZPlaneBind || abs(src.x - S.XBind) > S.DistAllowed || abs(src.y - S.YBind) > S.DistAllowed)
-								OMsg(src, "[src] has triggered their location binding!")
-								src.loc=locate(S.XBind, S.YBind, S.ZPlaneBind)
+			if(movementSealed)
+				for(var/obj/Seal/S in src)
+					if(S.ZPlaneBind)
+						if(src.z!=S.ZPlaneBind || abs(src.x - S.XBind) > S.DistAllowed || abs(src.y - S.YBind) > S.DistAllowed)
+							OMsg(src, "[src] has triggered their location binding!")
+							src.loc=locate(S.XBind, S.YBind, S.ZPlaneBind)
 
-				/*var/obj/Skills/Devils_Deal/dd = findDevilsDeal(src)
-				if(dd)
-					if(CurrentlySummoned)
-						dd.incrementSummonReturnTime(0.1)
-						if(dd.getSummonReturnTime() >= dd.getHomeTime())
-							if(src.Grab)
-								src.Grab_Release()
-							for(var/mob/Grabee in range(1,src))
-								if(Grabee.Grab==src)
-									Grabee.Grab_Release()
-							dd.returnToOrg(src)*/
-				if(src.passive_handler.Get("The Roaring"))//The Roaring
-					for(var/mob/M in range(100,src))
-						if(!M.passive_handler.Get("Determination"))
-							M.ManaAmount=0
-				if(src.ManaSealed)
-					if(!src.HasMechanized())
-						if(src.TotalCapacity<=99)
-							src.TotalCapacity=99
-					else
-						if(src.TotalCapacity>0)
-							src.TotalCapacity=0
+			/*var/obj/Skills/Devils_Deal/dd = findDevilsDeal(src)
+			if(dd)
+				if(CurrentlySummoned)
+					dd.incrementSummonReturnTime(0.1)
+					if(dd.getSummonReturnTime() >= dd.getHomeTime())
+						if(src.Grab)
+							src.Grab_Release()
+						for(var/mob/Grabee in range(1,src))
+							if(Grabee.Grab==src)
+								Grabee.Grab_Release()
+						dd.returnToOrg(src)*/
+			if(src.passive_handler.Get("The Roaring"))//The Roaring
+				for(var/mob/M in range(100,src))
+					if(!M.passive_handler.Get("Determination"))
+						M.ManaAmount=0
+			if(src.ManaSealed)
+				if(!src.HasMechanized())
+					if(src.TotalCapacity<=99)
+						src.TotalCapacity=99
+				else
+					if(src.TotalCapacity>0)
+						src.TotalCapacity=0
 
-				if(Secret)
-					if(Secret=="Vampire")
-						var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/vampireBuff
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/v in src)
-							vampireBuff = v
-						if(!BuffOn(vampireBuff))
-							vampireBuff.Trigger(src, Override=1)
-						if(BuffOn(vampireBuff))
-							vampireBuff.adjust(src)
-						var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
-							Wassail = W
-						if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
-							if(!CheckSlotless("Rotschreck"))
-								Wassail.adjust(src)
-								Wassail.Trigger(src, Override=1)
-						if(BuffOn(Wassail))
+			if(Secret)
+				if(Secret=="Vampire")
+					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/vampireBuff
+					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Vampire/v in src)
+						vampireBuff = v
+					if(!BuffOn(vampireBuff))
+						vampireBuff.Trigger(src, Override=1)
+					if(BuffOn(vampireBuff))
+						vampireBuff.adjust(src)
+					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
+					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
+						Wassail = W
+					if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
+						if(!CheckSlotless("Rotschreck"))
 							Wassail.adjust(src)
-						var/obj/Skills/Buffs/SlotlessBuffs/R
-						if(CheckSlotless("Rotschreck"))
-							R = GetSlotless("Rotschreck")
-							R:adjust(src)
-						var/SecretInformation/Vampire/vampire = secretDatum
-						if(vampire.secretVariable["LastBloodGain"] + 450 < world.time && vampire.secretVariable["BloodPower"] > 0)
-							if(!PureRPMode)
-								vampire.drainBlood()
-								vampireBlood.fillGauge(clamp(secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
-						if(src.icon_state=="Train"&&!src.PoseEnhancement)
-							src.PoseTime += 1
-							if(src.PoseTime==5)
-								src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
+							Wassail.Trigger(src, Override=1)
+					if(BuffOn(Wassail))
+						Wassail.adjust(src)
+					var/obj/Skills/Buffs/SlotlessBuffs/R
+					if(CheckSlotless("Rotschreck"))
+						R = GetSlotless("Rotschreck")
+						R:adjust(src)
+					var/SecretInformation/Vampire/vampire = secretDatum
+					if(vampire.secretVariable["LastBloodGain"] + 450 < world.time && vampire.secretVariable["BloodPower"] > 0)
+						if(!PureRPMode)
+							vampire.drainBlood()
+							vampireBlood.fillGauge(clamp(secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
+					if(src.icon_state=="Train"&&!src.PoseEnhancement)
+						src.PoseTime += 1
+						if(src.PoseTime==5)
+							src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
 
-					if(Secret=="Werewolf")
-						if(secretDatum.secretVariable["Hunger Active"] == 1)
-							var/SecretInformation/Werewolf/s = secretDatum
-							if(!PureRPMode)
-								s.releaseHunger()
-								if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
-									src << "You have exhausted all the flesh you consumed and have reverted from your war form."
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-										fmf.Trigger(src, Override=1)
+				if(Secret=="Werewolf")
+					if(passive_handler.Get("SunStricken") && CheckSlotless("Full Moon Form") && !PureRPMode)
+						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
+							fmf.Trigger(src, Override=1)
+					if(secretDatum.secretVariable["Hunger Active"] == 1)
+						var/SecretInformation/Werewolf/s = secretDatum
+						if(!PureRPMode)
+							s.releaseHunger()
+							if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
+								src << "You have exhausted all the flesh you consumed and have reverted from your war form."
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
+									fmf.Trigger(src, Override=1)
 
-					if(Secret=="Eldritch")
-						if(secretDatum.secretVariable["Madness Active"] == 1)
-							var/SecretInformation/Eldritch/s = secretDatum
-							if(!PureRPMode)
-								s.releaseMadness(src)
-								if(secretDatum.secretVariable["Madness"] <=0 && CheckSlotless("True Form"))
-									src << "You have exhausted all the madness and have reverted to your sane form."
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
-										fmf.Trigger(src, Override=1)
+				if(Secret=="Eldritch")
+					if(passive_handler.Get("SunStricken") && CheckSlotless("True Form") && !PureRPMode)
+						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+							fmf.Trigger(src, Override=1)
+					if(secretDatum.secretVariable["Madness Active"] == 1)
+						var/SecretInformation/Eldritch/s = secretDatum
+						if(!PureRPMode)
+							s.releaseMadness(src)
+							if(secretDatum.secretVariable["Madness"] <=0 && CheckSlotless("True Form"))
+								src << "You have exhausted all the madness and have reverted to your sane form."
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+									fmf.Trigger(src, Override=1)
 
 
 			if(src.ManaDeath)
@@ -824,8 +833,12 @@ mob
 						if(Secret=="Spiral")
 							icon_state = ""
 							PoseTime = 0
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
-								fmf.Trigger(src)
+							if(src.CheckSlotless("Evolution Power"))
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
+									AE.Trigger(src)
+							if(!src.CheckSlotless("Evolution Power"))
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
+									fmf.Trigger(src)
 						if(Secret=="Eldritch")
 							icon_state = ""
 							PoseTime = 0
@@ -866,15 +879,15 @@ mob
 
 			if(src.BusterTech && src.BusterCharging<100)
 
-				src.BusterCharging+=(100/RawSeconds(5)) * src.BusterTech.Buster * src.GetRecov()
+				src.BusterCharging+=((100/RawSeconds(5)) - ChargeDelay) * src.BusterTech.Buster * src.GetRecov()
 				if(src.BusterCharging>100)
 					src.BusterCharging=100
 					src << "Your buster technique is fully charged!"
 
 
 			if(src.Beaming || src.HasMovingCharge())
-				for(var/obj/Skills/Projectile/Beams/Z in Skills)
-					if(Z.Charging&&Z.ChargeRate)
+				for(var/obj/Skills/Projectile/Z in Skills)
+					if(Z.Area=="Beam"&&Z.Charging&&Z.ChargeRate)
 						var/beamChargeCap = Z.ChargeRate * BEAM_CHARGE_CAP_MULT
 						if(src.BeamCharging>=0.5&&src.BeamCharging<=beamChargeCap)
 							src.BeamCharging+=src.GetRecov(0.2)*src.GetBeamChargeSpeedMult()
@@ -921,6 +934,13 @@ mob
 					AddCrippling(abs(val)/(glob.HOTNCOLD_DEBUFF_DIVISOR*4))
 				else
 					AddBurn(abs(val)/(glob.HOTNCOLD_DEBUFF_DIVISOR))
+			if(passive_handler["Shirayuki"]) //Rukia Zanpakuto Shenanigans. This passive procks when the user's Shikai or Bankai is active.
+				if(src.CheckActive("Ki Control")) //Power Control effects this.
+					if(src.Slow < src.SagaLevel * 5)
+						src.Slow=src.SagaLevel * 5
+					AddSlow((0.5 + (0.1*src.SagaLevel))*glob.SLOW_INTENSITY) // Increases how much slow/chill you gain per tick.
+					if(src.Slow > SagaLevel * 10) // When you Power Up and get too cold, you start injurying yourself.
+						src.TotalInjury += 0.00025 * (src.Slow-(SagaLevel * 10))
 			if(passive_handler["Grit"])
 				if(client&&hudIsLive("Grit", /obj/bar))
 					client.hud_ids["Grit"]?:Update()
@@ -1121,6 +1141,8 @@ mob
 					src.OverClockTime+=RawHours(1)
 			if(src.Kaioken>=6)
 				src.AddEndTax(0.001)
+			if(ChargeDelay)
+				decreaseChargeDelay()
 
 			var/safety=0
 			while(src.ActiveBuff)
@@ -1216,7 +1238,7 @@ mob
 
 				if(src.ActiveBuff.WoundHeal)
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-						src.HealWounds(src.GetRecov(src.ActiveBuff.WoundHeal))
+						src.HealWounds(src.ActiveBuff.WoundHeal)
 				if(src.ActiveBuff.FatigueHeal)
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 						if(src.ActiveBuff.StableHeal)
@@ -1229,10 +1251,10 @@ mob
 				if(src.ActiveBuff.HealthHeal)
 					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-							src.HealWounds(src.GetRecov(src.ActiveBuff.HealthHeal))
+							src.HealWounds(src.ActiveBuff.HealthHeal)
 					else
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
-							src.HealHealth(src.GetRecov(src.ActiveBuff.HealthHeal))
+							src.HealHealth(src.ActiveBuff.HealthHeal)
 				if(src.ActiveBuff.EnergyHeal)
 					if((src.Energy+src.TotalFatigue)>=100||(src.TotalFatigue&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
@@ -1370,22 +1392,16 @@ mob
 							src.SpecialBuff.WaveringAnger=0
 
 				if(src.SpecialBuff.WoundHeal)
-					src.HealWounds(src.GetRecov(src.SpecialBuff.WoundHeal))
+					src.HealWounds(src.SpecialBuff.WoundHeal)
 				if(src.SpecialBuff.FatigueHeal)
 					src.HealFatigue(src.GetRecov(src.SpecialBuff.FatigueHeal))
 				if(src.SpecialBuff.CapacityHeal)
 					src.HealCapacity(src.SpecialBuff.CapacityHeal)
 				if(src.SpecialBuff.HealthHeal)
 					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
-						if(src.SpecialBuff.StableHeal)
-							src.HealWounds(src.SpecialBuff.HealthHeal)
-						else
-							src.HealWounds(src.GetRecov(src.SpecialBuff.HealthHeal))
+						src.HealWounds(src.SpecialBuff.HealthHeal)
 					else
-						if(src.SpecialBuff.StableHeal)
-							src.HealHealth(src.SpecialBuff.HealthHeal)
-						else
-							src.HealHealth(src.GetRecov(src.SpecialBuff.HealthHeal))
+						src.HealHealth(src.SpecialBuff.HealthHeal)
 				if(src.SpecialBuff.EnergyHeal)
 					if((src.Energy+src.TotalFatigue)>=100||(src.TotalFatigue&&src.icon_state=="Meditate"))
 						if(src.SpecialBuff.StableHeal)
@@ -1554,7 +1570,8 @@ mob
 								A.NeedsInjury=rand(10,A.TooMuchInjury-5)
 
 					if(A.ManaThreshold&&!A.Using&&!src.KO&&!AGLock)//TODO: Align the requirements and variables more sensibly in this area
-						if(src.ManaAmount>=A.ManaThreshold)
+						if(src.ManaAmount>max(ManaMax, A.ManaThreshold))//this basically only applies to senjutsu so
+							if(A.BuffName=="Sage Mode") A.adjust(src);
 							A.Trigger(src,Override=1)
 					if(A.NeedsAnger&&!A.Using&&!src.KO&&!AGLock)
 						if(src.Anger)
@@ -1763,7 +1780,7 @@ mob
 					if(SM.suffix)
 						BreathingMaskOn=1
 				if(BreathingMaskOn==0)
-					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN,DRAGON)))
+					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN,DRAGON, ELDRITCH)))
 						src.Oxygen-=rand(2,4)
 						if(src.Oxygen<0)
 							src.Oxygen=0
@@ -1777,7 +1794,7 @@ mob
 				else if(BreathingMaskOn==1)
 					if(src.Oxygen<(src.OxygenMax/max(src.SenseRobbed,1)))
 						src.Oxygen+=rand(1,3)
-					if(src.icon_state=="Train"&&src.Secret=="Ripple")
+					if(src.icon_state=="Train"&&src.Secret=="Hamon")
 						src.Oxygen+=(src.OxygenMax/max(src.SenseRobbed,1))*0.2
 						if(src.Oxygen>=(src.OxygenMax/max(src.SenseRobbed,1))*2)
 							src.Oxygen=(src.OxygenMax/max(src.SenseRobbed,1))*2
@@ -1806,9 +1823,9 @@ mob
 						if(isplayer(src))
 							src:move_speed = MovementSpeed()
 						//do easiest conditions first
-						if((src.PoseEnhancement&&src.Secret=="Ripple"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
+						if((src.PoseEnhancement&&src.Secret=="Hamon"&&!(src.Flying&&!passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-					else if(src.Secret=="Ripple")
+					else if(src.Secret=="Hamon")
 						src.RemoveWaterOverlay()
 						if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
@@ -1847,7 +1864,7 @@ mob
 								if(p!= src && p)
 									src.AddSlow(10 + (5 * p.AscensionsAcquired))
 									src.AddShock(10 + (5 * p.AscensionsAcquired))
-							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Ripple")
+							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 							else if(loc.type==/turf/Waters/Water7/LavaTile)
 								src.overlays+=image('LavaTileOverlay.dmi')
@@ -1861,7 +1878,7 @@ mob
 						var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
 						if(loc:Shallow==1)
 							amounttaken=0
-						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Ripple")
+						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 							amounttaken=0
 						if(BreathingMaskOn)
 							amounttaken=0
@@ -1907,7 +1924,7 @@ mob
 						src:move_speed = MovementSpeed()
 				if(src.Oxygen<(src.OxygenMax/max(src.SenseRobbed,1)))
 					src.Oxygen=min(src.Oxygen+(rand(1,3)),(src.OxygenMax/max(src.SenseRobbed,1)))
-				if(src.icon_state=="Train"&&src.Secret=="Ripple")
+				if(src.icon_state=="Train"&&src.Secret=="Hamon")
 					src.Oxygen+=(src.OxygenMax/max(src.SenseRobbed,1))*0.2
 					if(src.Oxygen>=(src.OxygenMax/max(src.SenseRobbed,1))*2)
 						src.Oxygen=(src.OxygenMax/max(src.SenseRobbed,1))*2
@@ -1939,3 +1956,4 @@ mob
 
 /mob/verb/HardSave()
 	client.SaveChar()
+

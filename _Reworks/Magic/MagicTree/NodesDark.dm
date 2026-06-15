@@ -66,7 +66,7 @@ magic_node/dark_tree
         xLoc = DARK_NODE_3_X
         yLoc = DARK_NODE_3_Y
         nodeType = "Line"
-        grantsSkills = list(/obj/Skills/Projectile/Magic/Dark/Arachnae_Touch)
+        grantsSkills = list(/obj/Skills/AutoHit/Magic/Dark/Arachnae_Touch)
         unlocksNodes = list(DARK_NODE_42, DARK_NODE_22);
     dark_node_41
         name=DARK_NODE_41

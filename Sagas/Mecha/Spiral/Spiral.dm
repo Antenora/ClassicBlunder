@@ -85,19 +85,71 @@ mob/tierUpSaga(path)
 			var/sl = p.SagaLevel
 			var/sp = p.secretDatum.currentTier
 			var/dr = sl + sp
+			var/se = p.passive_handler.Get("SpiralPowerUnlocked")
 			ControlledRush = 5 + dr
-			AdaptRate = 1.1 + (0.15 * sl) + (0.2 * sp)
-			Size = 1 + dr
+			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
+			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = (2 + (round(dr/3)))
-			Rounds = 25
-			PullIn = dr
+			DamageMult = (1 + (round((dr+(se/2))/3)))
+			Rounds = 20
+			PullIn = dr + (se/2)
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)
 			EnergyCost = 1 + (3 * dr)
+			switch(se)
+				if(0 to 2)
+					ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
+				if(3 to 5)
+					ActiveMessage="yells: <b>ARC GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
+				if(6)
+					ActiveMessage="yells: <b>SUPER GALAXY GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
 	verb/Giga_Drill_Break()
 		set category="Skills"
 		adjust(usr)
 		usr.Activate(src)
 
+/obj/Skills/AutoHit/Anti_Spiral_Giga_Drill_Breaker
+	Area="Circle"
+	DamageMult=2
+	Rounds=10
+	Knockback = 1
+	ComboMaster=1
+	Cooldown=180
+	Size=1
+	EnergyCost=7
+	GuardBreak=1
+	SpecialAttack=1
+	Rush=5
+	WindUp = 0.75
+	ControlledRush=1
+	Instinct=1
+	TurfStrike=1
+	TurfShift='StarPixel.dmi'
+	TurfShiftDuration=2
+	ObjIcon = 1
+	Icon='antidrill.dmi'
+	IconX = -8
+	IconY = -8
+	ChargeTech = 1
+	WindupMessage= "yells: <b>HOW INTERESTING! ANTI-SPIRAL...</b>"
+	ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
+	adjust(mob/p)
+		var/sl = p.AscensionsAcquired
+		var/sp = p.AscensionsAcquired
+		var/dr = sl + sp
+		ControlledRush = 5 + dr
+		AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
+		Size = 1 + dr
+		TurfStrike = Size
+		WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
+		DamageMult = (1 + (round(dr/3)))
+		Rounds = 20
+		PullIn = dr
+		Primordial = round(dr/4)
+		Executor = max(dr, 3)
+		EnergyCost = 1 + (3 * dr)
+	verb/Anti_Spiral_Giga_Drill_Break()
+		set category="Skills"
+		adjust(usr)
+		usr.Activate(src)

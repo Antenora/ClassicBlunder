@@ -84,6 +84,12 @@
         if(!owner||!target) return
         var/asc = owner.AscensionsAcquired ? owner.AscensionsAcquired + 1 : 1
         var/DefReduction=target.GetDef()
+        if(DefReduction<1)
+            DefReduction=1
+        if(target.IsGrabbed())
+            static_damage *= glob.AUTOHIT_GRAB_NERF
+        if(target.Stunned||target.Launched)
+            static_damage *= glob.CCDamageModifier
         for(var/x in scalingValues)
             switch(x)
                 if("Damage")

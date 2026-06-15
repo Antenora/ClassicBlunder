@@ -1,5 +1,5 @@
 
-globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Wrathful", "LimitBroken", "Star Surge", "Heart of Darkness", "The Almighty", "The Flame of Youth","Shatter Fate","Determination(Black)", "Death-X-Evolution", "MaouKi","Undying Rage")
+globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge", "The Flame of Youth")
 
 
 /mob/proc/ignoresPowerClamp(mob/defender)
@@ -23,12 +23,11 @@ globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Wrathful", "LimitBrok
         return TRUE
     if(isRace(POPO) || defender.isRace(POPO))
         return TRUE
-    if(isRace(DEMON))
+    if(isRace(MAKAIOSHIN))
         if(CheckSlotless("Corrupt Self"))
             return TRUE
         if(Health <= 15 + (AscensionsAcquired*5))
-            if(CheckSlotless("True Form"))
-                return TRUE
+            return TRUE
     var/godKi = !HasNullTarget() ? GetGodKi() : 0;
     var/defenderGodKi = !defender.HasNullTarget() ? defender.GetGodKi() : 0;
     if(!defenderGodKi && godKi)

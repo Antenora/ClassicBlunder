@@ -26,7 +26,7 @@ proc
 	ElementalCheck(var/mob/Attacker, var/mob/Defender, var/ForcedDebuff=0, var/DebuffIntensity=glob.DEBUFF_INTENSITY, list/bonusElements,damageOnly = FALSE, list/onlyTheseElements)
 		var/list/attackElements = list()
 		var/list/defenseElements = list()
-		var/list/forcedDebuffs = list("Scorching", "Freezing", "Shattering", "Paralyzing", "Toxic")
+		var/list/forcedDebuffs = list("Scorching", "Freezing", "Shattering", "Paralyzing", "Toxic", "Bloodletting")
 		var/burningBonus = max(0, Attacker.passive_handler.Get("Burning"))
 		var/scorchingBonus = max(0, Attacker.passive_handler.Get("Scorching"))
 		var/chillingBonus = max(0, Attacker.passive_handler.Get("Chilling"))
@@ -37,6 +37,7 @@ proc
 		var/paralyzingBonus = max(0, Attacker.passive_handler.Get("Paralyzing"))
 		var/poisoningBonus = max(0, Attacker.passive_handler.Get("Poisoning"))
 		var/toxicBonus = max(0, Attacker.passive_handler.Get("Toxic"))
+		var/bloodlettingBonus = max(0, Attacker.passive_handler.Get("Bloodletting"))
 		attackElements = Attacker.getElementalOffense()
 		for(var/debuff in debuffVars)
 			if(Attacker.passive_handler.Get("[debuff]"))
@@ -74,6 +75,8 @@ proc
 
 		if(attackElements["Ultima"]||attackElements["Death"])
 			ForcedDebuff+=1
+		if(Attacker.passive_handler.Get("Forever After"))
+			attackElements |= "Love"
 		var/DamageMod=0
 		for(var/element in attackElements)
 			var/DebuffRate=GetDebuffRate(element, defenseElements, ForcedDebuff)
@@ -211,6 +214,9 @@ proc
 						Defender.AddShatter((4*DebuffIntensity*glob.SHATTER_INTENSITY) + crushingBonus + shatteringBonus, Attacker)
 					if("Wind")
 						Defender.AddShock((4*DebuffIntensity*glob.SHOCK_INTENSITY) + shockingBonus + paralyzingBonus, Attacker)
+					if("Blade")
+						if(bloodlettingBonus > 0)
+							Defender.AddBleed(bloodlettingBonus, Attacker)
 		for(var/element in defenseElements)
 			switch(element)
 				if("Ultima")
@@ -221,7 +227,7 @@ proc
 					DamageMod-=2
 				if("Void")
 					DamageMod-=2
-		return DamageMod/10
+		return DamageMod/glob.ELEMENTAL_DIVIDER
 
 	GetDebuffRate(var/A, list/D, var/Forced=0)
 		var/Return=0
@@ -350,6 +356,11 @@ mob
 			Value *= getBurnResistValue()
 			Value = Value // this makes 100 impossible ?
 			src.Burn+=Value
+
+			// Track stacks from Erupting Blows sources separately
+			if(Attacker && Attacker.passive_handler.Get("EruptingBlows"))
+				src.SilentBurnAmount += Value
+
 			if(Value >=1 && !src.passive_handler.Get("BurningShot"))
 				animate(src, color = "#ff2643")
 				animate(src, color = src.MobColor, time=5)
@@ -359,12 +370,14 @@ mob
 					src.AddPoison(Value * 1 + (darkFlame * 0.125), Attacker=Attacker)
 			if(Attacker)
 				if(Attacker.passive_handler["Combustion"])
-					if(Attacker.passive_handler["Combustion"] <= 80)
-						if(Attacker.passive_handler["Combustion"] && Burn >= Attacker.passive_handler["Combustion"])
-							implodeDebuff(Attacker.passive_handler["Combustion"], "Burn")
+					var/combThresh = Attacker.passive_handler["Combustion"]
+					var/combMult = Attacker.passive_handler.Get("EruptingBlows") ? 1.5 : 1
+					if(combThresh <= 80)
+						if(Burn >= combThresh)
+							implodeDebuff(combThresh * combMult, "Burn")
 					else
-						if(Attacker.passive_handler["Combustion"] && Burn >= 80)
-							implodeDebuff(Attacker.passive_handler["Combustion"], "Burn")
+						if(Burn >= 80)
+							implodeDebuff(combThresh * combMult, "Burn")
 
 
 			if(Attacker)
@@ -376,8 +389,11 @@ mob
 
 			if(src.Burn>100)
 				src.Burn=100
+			if(src.SilentBurnAmount > src.Burn)
+				src.SilentBurnAmount = src.Burn
 			if(src.Burn<0)
 				src.Burn=0
+				src.SilentBurnAmount=0
 			for(var/obj/Items/Gear/Automated_Aid_Dispenser/AD in src)
 				if(AD.suffix&&AD.Uses)
 					AD.Uses--
@@ -386,7 +402,24 @@ mob
 					if(!src.Cooled)
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Cooled+=100
+		AddBleed(var/Value, var/mob/Attacker=null)
+			if(src.Stasis || src.AdminOverwatchActive)
+				return
+			if(src.HasDebuffResistance())
+				Value /= 1 + src.GetDebuffResistance()
+			Value = Value * (1 - (src.Bleed / glob.DEBUFF_STACK_RESISTANCE))
+			src.Bleed += Value
+			if(Value >= 1)
+				animate(src, color = "#cc0000")
+				animate(src, color = src.MobColor, time=5)
+			if(src.Bleed > 100)
+				src.Bleed = 100
+			if(src.Bleed < 0)
+				src.Bleed = 0
+
 		AddSlow(var/Value, var/mob/Attacker=null)
+			if(src.HasChillImmune())
+				return
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
@@ -530,6 +563,10 @@ mob
 			Value = Value*(1-(src.Poison/glob.DEBUFF_STACK_RESISTANCE))
 			src.Poison+=Value
 
+			// Track stacks from Silent Poison sources separately
+			if(Attacker && Attacker.passive_handler.Get("SilentPoison"))
+				src.SilentPoisonAmount += Value
+
 			if(Value >=1)
 				animate(src, color = "#ff1cff")
 				animate(src, color = src.MobColor, time=5)
@@ -543,8 +580,11 @@ mob
 				AddCrippling(Value/3)
 			if(src.Poison>100)
 				src.Poison=100
+			if(src.SilentPoisonAmount > src.Poison)
+				src.SilentPoisonAmount = src.Poison
 			if(src.Poison<0)
 				src.Poison=0
+				src.SilentPoisonAmount=0
 			for(var/obj/Items/Gear/Automated_Aid_Dispenser/AD in src)
 				if(AD.suffix&&AD.Uses)
 					AD.Uses--
@@ -682,6 +722,9 @@ mob
 			if(src.Burn)
 				doDebuffDamage("Burn")
 
+			if(src.Bleed)
+				doDebuffDamage("Bleed")
+
 			if(src.Frenzy)
 				doDebuffDamage("Frenzy")
 
@@ -702,7 +745,11 @@ mob
 
 				var/slowReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetDebuffResistance()))
 				if(src.Cooled) slowReduction *= 2;
-				src.Slow -= slowReduction;
+				if(passive_handler["Shirayuki"]) //Rukia Zanpakuto Shenanigans.
+					if(!src.CheckActive("Ki Control")) // Shirayuki Passive + Ki Control Active = Slow does not decay.
+						src.Slow -= slowReduction * 2.5; //This should make it to where if you have the passive but aren't Powered-Up, it decays quicker.
+				else
+					src.Slow -= slowReduction;
 
 				if(src.Slow<0)
 					src.Slow=0
@@ -729,7 +776,7 @@ mob
 				if(src.Crippled<0)
 					src.Crippled=0
 
-			if(src.Confused&&!src.Stunned)
+			if(src.Confused&&!src.Stunned&&!src.Suspended)
 				if(src.Confused > glob.DEBUFF_STACK_MAX)
 					src.Confused = glob.DEBUFF_STACK_MAX;
 
@@ -765,7 +812,7 @@ mob
 				if(src.DownToEarth<0)
 					src.DownToEarth=0
 
-			if(src.Attracted&&!src.Confused&&!src.Stunned)
+			if(src.Attracted&&!src.Confused&&!src.Stunned&&!src.Suspended)
 				src.Attracted--
 			if(src.Attracted<=0)
 				src.Attracted=0

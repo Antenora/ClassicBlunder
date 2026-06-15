@@ -6,6 +6,8 @@
 		ActiveMessage = "channels their inner humanity... and manifests a miracle!"
 		FlashChange = 1
 		Trigger(mob/User, Override)
+			if(Using) return;
+			TimerLimit=(30*User.AscensionsAcquired);
 			if(User.BuffOn(src))
 				User.ShonenAnnounce=0
 				User.ShonenCounter=0

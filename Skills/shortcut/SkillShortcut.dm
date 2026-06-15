@@ -81,6 +81,15 @@ What shortcut do you want to set?"}
             else src << "You don't have a skill assigned to <b>Shortcut [num]</b>!";
     //god i hate that this proc is necessary atm = _ =
     fireShortcut(obj/Skills/s)
+        if(s.HeldSkill)
+            held_skill_from_macro = world.time
+            var/raw = s.HeldVerbName ? s.HeldVerbName : s.name
+            var/ident = raw ? replacetext(replacetext(raw, " ", "_"), "-", "_") : null
+            if(ident && hascall(s, ident))
+                call(s, ident)()
+            else
+                BeginHeldSkill(s)
+            return;
         if(istype(s, /obj/Skills/Queue))
             SetQueue(s);
         else if(istype(s, /obj/Skills/Projectile))

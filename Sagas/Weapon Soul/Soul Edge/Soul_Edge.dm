@@ -90,11 +90,11 @@ obj/Skills/AutoHit/Dark_Reconquista
 	layer = EFFECTS_LAYER
 	var/max_size = 4.0
 	var/wave_lifetime = 30
-	var/mob/Players/owner
+	var/tmp/mob/Players/owner
 	var/DamageMult = 1
 	var/StrOffense = 1
 	var/EndRes = 1
-	var/list/hitList = list()
+	var/tmp/list/hitList = list()
 
 	New()
 		animate(src)
@@ -143,9 +143,9 @@ obj/Skills/AutoHit/Dark_Reconquista
 				else
 					if(P in outsideSet)
 						outsideSet -= P
-						if(!(P in hitList))
+						if(!(P.ckey in hitList))
 							if(dist > prev_radius_tiles)
-								hitList += P
+								hitList += P.ckey
 								dealWaveDamage(P)
 
 			prev_radius_tiles = curr_radius_tiles
@@ -248,7 +248,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Stained_Memories
 		StyleActive="Stained Memories"
-		passives = list("CallousedHands" = 0.1, "Shearing" = 2)
+		passives = list("CallousedHands" = 0.1, "Shearing" = 2,"Zornhau" = 1)
 		StyleEnd=1.25
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
@@ -257,6 +257,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 			passives["CallousedHands"] = 0.1 + (0.05* p.SagaLevel)
 			passives["Shearing"] = 2+p.SagaLevel
+			passives["Zornhau"] = 1+(0.25*p.SagaLevel)
 		verb/Stained_Memories()
 			set hidden=1
 			adjust(usr)

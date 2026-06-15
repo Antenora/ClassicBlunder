@@ -117,9 +117,9 @@ td{padding:3px 6px;border-bottom:1px solid #1a1a2e;font-size:9pt}
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Blazing Whip</td><td>AOE</td></tr>
-<tr><td>Dragon Arc</td><td>Line</td></tr>
-<tr><td>Fireball</td><td>Projectile</td></tr>
+<tr><td>Blazing Whip</td><td>AArc AutoHit</td></tr>
+<tr><td>Dragon Arc</td><td>Wave AutoHit</td></tr>
+<tr><td>Fireball</td><td>Homing Projectile</td></tr>
 </table>
 
 <h2>Mage Passives</h2>
@@ -157,9 +157,9 @@ Passives: Scorching, Momentum, Fire Herald, Brutalize, Critical Chance + Damage,
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Riptide</td><td>Autohit</td></tr>
+<tr><td>Riptide</td><td>On-Target AutoHit</td></tr>
 <tr><td>Wetten Socks</td><td>Debuff</td></tr>
-<tr><td>Frost Shamshir</td><td>Projectile</td></tr>
+<tr><td>Frost Shamshir</td><td>Homing Projectile</td></tr>
 </table>
 
 <h2>Mage Passives</h2>
@@ -197,9 +197,9 @@ Passives: Chilling, Fluid Form, Ice Herald, Control Resist, Blubber, Melee Resis
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Breaking Twister</td><td>Autohit</td></tr>
+<tr><td>Breaking Twister</td><td>Circle AutoHit</td></tr>
 <tr><td>Evading Zephyr</td><td>Buff</td></tr>
-<tr><td>Mentis Imperium</td><td>Line</td></tr>
+<tr><td>Mentis Imperium</td><td>Wave AutoHit</td></tr>
 </table>
 
 <h2>Mage Passives</h2>
@@ -237,7 +237,7 @@ Passives: Shocking, Afterimages, Thunder Herald, Blurring Strikes, Attack Speed,
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Seismic Entry</td><td>AOE</td></tr>
+<tr><td>Seismic Entry</td><td>Circle AutoHit</td></tr>
 <tr><td>Ward of Stone</td><td>Buff</td></tr>
 <tr><td>Prickly Ballet</td><td>Debuff</td></tr>
 </table>
@@ -277,9 +277,9 @@ Passives: Shattering, Harden, Earth Herald, Grit, Juggernaut, Block Chance + Cri
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Lightspeed</td><td>Line</td></tr>
+<tr><td>Lightspeed</td><td>Wave Auto-Hit</td></tr>
 <tr><td>Bless</td><td>Buff</td></tr>
-<tr><td>Solar Burst</td><td>Projectile</td></tr>
+<tr><td>Solar Burst</td><td>Homing Projectile</td></tr>
 </table>
 
 <h2>Mage Passives</h2>
@@ -317,9 +317,9 @@ Passives: Life Generation, Buff Mastery, Restoration, Debuff Resistance, Angelic
 <h2>Spells</h2>
 <table>
 <tr><th>Spell</th><th>Type</th></tr>
-<tr><td>Shadow Cleave</td><td>Autohit</td></tr>
-<tr><td>Arachnae Touch</td><td>Line</td></tr>
-<tr><td>Void Blast</td><td>Projectile</td></tr>
+<tr><td>Shadow Cleave</td><td>Arc AutoHit</td></tr>
+<tr><td>Arachnae Touch</td><td>Wave AutoHit</td></tr>
+<tr><td>Void Blast</td><td>Homing Projectile</td></tr>
 </table>
 
 <h2>Mage Passives</h2>

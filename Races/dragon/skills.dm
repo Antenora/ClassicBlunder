@@ -10,6 +10,13 @@
     SpdMult = 0.3
     passives = list("PureReduction" =  -1, "Godspeed" = -3)
     TimerLimit = 20
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/DragonDebuff/WeakenedByRadiance
+    CrippleAffected = 3
+    StrMult = 0.6
+    ForMult = 0.6
+    OffMult = 0.6
+    passives = list("FatigueLeak" = 1, "PureDamage" = -1)
+    TimerLimit = 20;
 
 /obj/Skills/AutoHit/Dragon_Roar
     Area="Circle"
@@ -88,6 +95,13 @@
                 Distance = 4 + asc
                 Rounds = 1
                 DamageMult = 4 + (asc * 1)
+            if("Light")
+                TurfErupt=1
+                ElementalClass="Light"
+                Distance = 6 + asc
+                BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/DragonDebuff/WeakenedByRadiance"
+                Rounds = 1
+                DamageMult = 1 + (asc * 1.5)
     verb/Dragon_Roar()
         set category="Skills"
         adjust(usr)

@@ -264,12 +264,11 @@
 /obj/Skills/Buffs/SlotlessBuffs/
     Dance_Of_The_Full_Moon//T4
         StyleNeeded="Hiten Mitsurugi"
-        SpecialBuffLock=1
         NeedsSecondSword=1
         StrMult = 1.2
         SpdMult = 1.3
         OffMult = 1.3
-        passives = list("SpecialBuffLock" = 1,"DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3, "Flow" = 4)
+        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3, "Flow" = 4)
         ActiveMessage="draws a second blade in display of mastery of their style!"
         OffMessage="sheathes their second blade..."
         verb/Dance_Of_The_Full_Moon()
@@ -283,7 +282,7 @@
             TooMuchHealth=75
             StrMult = 1.5
             SpdMult = 1.5
-            passives = list("SpecialBuffLock" = 1, "TripleStrike" = 0.25, "MovementMastery"=5, "Instinct" = 1, "AutoAnger"=1, "EndlessAnger"=1, "Curse" = 1)
+            passives = list("TripleStrike" = 0.25, "MovementMastery"=5, "Instinct" = 1, "AutoAnger"=1, "EndlessAnger"=1, "Curse" = 1)
             IconLock='SlayerEyes.dmi'
             LockX=0
             LockY=0
@@ -301,5 +300,4 @@
                     if(Mastery>=4) passives["TechniqueMastery"]=5;
                     NeedsHealth = min(90, 50 + ((Mastery-1) * 12.5));
                     TooMuchHealth = min(100, 75 + ((Mastery-1) * 6.25));
-                ..()        
-   
+                ..()

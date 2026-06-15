@@ -254,14 +254,22 @@ transformation
 					form_icon_2_icon = x
 				..()
 			mastery_boons(mob/user)
+				if(user.Potential>=40&&mastery<25)
+					mastery=25
+				if(user.Potential>=50&&mastery<50)
+					mastery=50
+				if(user.Potential>=65&&mastery<75)
+					mastery=75
+				if(user.Potential>=80&&mastery<100)
+					mastery=100
 				if(mastery >= 25)
-					passives = list("GodKi" = 0.25, "HellPower" = 0.25, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 4, "PureDamage" = 3, "PureReduction" = 3, "Smokin'!" = 1)
+					passives = list("GodKi" = 0.15, "HellPower" = 0.25, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 1, "PureDamage" = 3, "PureReduction" = 3, "Smokin'!" = 1)
 				if(mastery >= 50)
-					passives = list("GodKi" = 0.75, "HellPower" = 0.5, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 5, "PureDamage" = 5, "PureReduction" = 5, "MovementMastery" = 3, "BuffMastery"= 3, "Smokin'!" = 1)
+					passives = list("GodKi" = 0.35, "HellPower" = 0.5, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 2, "PureDamage" = 5, "PureReduction" = 5, "MovementMastery" = 3, "BuffMastery"= 3, "Smokin'!" = 1)
 				if(mastery >= 75)
-					passives = list("GodKi" = 1, "HellPower" = 0.75, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3, "BuffMastery"= 6, "Smokin'!" = 1)
+					passives = list("GodKi" = 0.5, "HellPower" = 0.75, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 3, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3, "BuffMastery"= 6, "Smokin'!" = 1)
 				if(mastery >= 100)
-					passives = list("GodKi" = 1.5, "HellPower" = 1, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6, "BuffMastery"= 6, "Smokin'!" = 1)
+					passives = list("GodKi" = 1, "HellPower" = 1, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6, "BuffMastery"= 6, "Smokin'!" = 1)
 			transform_animation(mob/user)
 				var/ShockSize=5
 				for(var/wav=5, wav>0, wav--)

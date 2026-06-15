@@ -150,14 +150,21 @@ mob/proc/MovementSpeed()
 			Delay/=2
 		else
 			Delay*=4
+	if(src.mirror_hold_slowing)
+		Delay *= 4  
 	if(src.Attracted)
 		Delay*=4
 	if(src.SenseRobbed>=1&&(src.SenseUnlocked<=src.SenseRobbed&&src.SenseUnlocked>5))
 		Delay*=(2*src.SenseRobbed)
+	// Daruma-san ga Koronda is 2x move speed only when moving towards the target
+	if(src.DarumaActive)
+		var/turf/dahead = get_step(src, src.dir)
+		if(dahead && src.DarumaMovingToward(dahead))
+			Delay /= 2
 	return Delay
 
 mob/Move()
-	if(src.Suspended)
+	if(src.Suspended || src.ActionLocked)
 		return
 	var/turf/Former_Location = loc
 	if(src.Incorporeal)
@@ -170,6 +177,12 @@ mob/Move()
 			if(customObject.edge && (customObject.dir in list(dir,turn(dir,45),turn(dir,-45))))
 				return
 	..()
+
+	if(passive_handler.Get("ForceFielded"))
+		for(var/mob/m in oview(glob.FORCEFIELD_RANGE, src))
+			if(passive_handler.Get("ForceFielded") == m.ckey)
+				loc = Former_Location
+				break
 
 	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
@@ -185,6 +198,9 @@ mob/Move()
 		for(var/mob/M in oview(range, src))
 			if(M != src && M.density)
 				src.Melee1(dmgmulti =(0.15), forcedTarget = M)*/
+	if(Bleed > 0 && !Knockback && !is_dashing && client)
+		WoundSelf(0.01)
+
 	if(src.Grab)
 		src.Grab_Update()
 

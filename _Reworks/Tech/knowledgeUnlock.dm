@@ -155,7 +155,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		if("Refreshment Herbs")
 			PotionTypes.Add("Refreshment Herb")
 		if("Quicksilver Herbs")
-			PotionTypes.Add("Refreshment Herb")
+			PotionTypes.Add("Quicksilver Herb")
 		if("Flask Accumen")
 			AlchemyUnlocked = 2
 		if("Flask Mastery")

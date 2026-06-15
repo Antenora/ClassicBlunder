@@ -1,6 +1,8 @@
 /obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2
     passives = list()
     SignatureTechnique=3
+    SpecialSlot=1
+    Slotless=0
     Mastery=0
     Copyable=0
     MakesSword=0
@@ -341,6 +343,9 @@
             return TRUE
         return FALSE
     adjust(mob/p)
+        if(!altered)
+            SpecialSlot=1
+            Slotless=0
         if(passives["CriticalChance"]>30)
             passives["CriticalChance"]=30
             passives["CriticalDamage"]=0.15
@@ -459,6 +464,14 @@
                 correct = TRUE
             attempts++
 
+    proc/getSelectionTypeKey(sel)
+        switch(sel)
+            if("Sword")   return "SWORD_PASSIVES"
+            if("Staff")   return "STAFF_PASSIVES"
+            if("Unarmed") return "UNARMED_PASSIVES"
+            if("Armor")   return "ARMOR_PASSIVES"
+        return null
+
     proc/evolve(mob/p)
         if(evolving) return
         evolving=1;
@@ -470,13 +483,19 @@
         if(!p.BuffOn(src))
             if(totalEvolvesMain < p.race?:devil_arm_upgrades)
                 p << "Evolving Main Branch for the [totalEvolvesMain+1]\th step..."
+                var/mainType = getSelectionTypeKey(selection)
+                if(!mainType)
+                    evolving=0;
+                    p << "Invalid devil arm selection '[selection]'"
+                    return
                 var/list/data = getJSONInfo(getPassiveTier(p, totalEvolvesMain), "GENERIC_PASSIVES")
-                var/list/selectionData = getJSONInfo(getPassiveTier(p, totalEvolvesMain), "[uppertext(selection)]_PASSIVES")
+                var/list/selectionData = getJSONInfo(getPassiveTier(p, totalEvolvesMain), mainType)
                 for(var/k in selectionData)
                     data[k] = selectionData[k]
                 var/list/choices = list()
                 for(var/a in data)
-                    choices += "[a]"
+                    if(islist(data[a]))
+                        choices += "[a]"
                 if(choices.len < 1)
                     evolving=0;
                     p << "The list of passives could not generate for your Main Branch ([selection])"
@@ -485,11 +504,16 @@
                 totalEvolvesMain++
             if(secondDevilArmPick && totalEvolvesSecondary < p.race?:sub_devil_arm_upgrades)
                 p << "Evolving Side Branch for the [totalEvolvesSecondary+1]\th step..."
-                var/list/secondaryData
-                secondaryData = getJSONInfo(getPassiveTier(p, totalEvolvesSecondary, TRUE), "[uppertext(secondDevilArmPick)]_PASSIVES")
+                var/secondType = getSelectionTypeKey(secondDevilArmPick)
+                if(!secondType)
+                    evolving=0;
+                    p << "Invalid secondary devil arm selection '[secondDevilArmPick]'"
+                    return
+                var/list/secondaryData = getJSONInfo(getPassiveTier(p, totalEvolvesSecondary, TRUE), secondType)
                 var/list/secondChoices = list()
                 for(var/a in secondaryData)
-                    secondChoices += "[a]"
+                    if(islist(secondaryData[a]))
+                        secondChoices += "[a]"
                 if(secondChoices.len < 1)
                     evolving=0;
                     p << "The list of passives could not generate for your Side Branch ([secondDevilArmPick])"

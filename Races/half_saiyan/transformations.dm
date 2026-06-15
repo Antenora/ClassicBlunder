@@ -11,13 +11,8 @@
 	form_aura_x = -28
 	form_icon_2_icon = 'ultimate_elec.dmi'
 	unlock_potential = 65
-	pot_trans = 5
 	passives = list("Mystic" = 1, "PUSpike" = 65, "Godspeed" = 1.5, "Adaptation" = 4, \
 						"Brutalize" = 2, "LikeWater" = 6, "BuffMastery" = 2)
-	strength = 1.15
-	speed = 1.2
-	force = 1.15
-	offense = 1.2
 	proc/shockwaves(mob/p)
 		set waitfor = 0
 		for(var/wav=25, wav>0, wav--)
@@ -52,10 +47,14 @@
 	// one of these was holding it up
 	mastery_boons(mob/user)
 		// apply scaling passives here
-		passives = list("Mystic" = 1,"PUSpike" = user.Potential + round(mastery/2, 10), "Godspeed" = 1.5, "Adaptation" = 4, \
-						"Brutalize" = 1.5, "LikeWater" = 6 + round(user.Potential/25, 1), "BuffMastery" = 2,"DrainlessPUSpike"=1)
-		unlock_potential = 65// max(65, 65 + ((glob.progress.PotentialDaily * 10)- user.Potential))
-		pot_trans = 0
+		passives = list("Mystic" = 1,"MovementMastery" = (user.AscensionsAcquired*1.5), "Godspeed" = 1.5, "Adaptation" = 4, \
+						"Brutalize" = 1.5, "LikeWater" = 6 + round(user.Potential/25, 1), "SaiyanPower3"=0.35)
+		speedadd = 1 //these are additive. base is 1, so 0.3=1.3x
+		enduranceadd = 1
+		offenseadd = 1
+		defenseadd = 1
+		strengthadd = 1
+		forceadd = 1
 	adjust_transformation_visuals(mob/user)
 		if(user.Hair_Base && !form_hair_icon)
 			var/icon/x=new(user.Hair_Base)

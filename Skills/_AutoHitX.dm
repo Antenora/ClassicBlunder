@@ -66,6 +66,9 @@ obj
 				HealthRecoveryValue
 				//Cooldown
 
+				// Executing: scaling % damage increase per 1 Injury on the target
+				Executing = 0
+
 				//These four can be used in any combination.
 				StrOffense//Uses STR for damage.
 				ForOffense//Uses FOR for damage.
@@ -238,6 +241,8 @@ obj
 
 				DirectWounds//Deals (this value) of wound % per hit.
 				FrenzyDebuff
+
+				KeepQueue = FALSE
 
 			skillDescription()
 				..()
@@ -1024,12 +1029,12 @@ obj
 			Symbiote_Tendril_Wave
 				Distance=10
 				Knockback=5
-				Slow=5
+				Slow=10
 				Area="Wave"
 				ActiveMessage="bursts out with tendrils of symbiotic matter!"
 				StrOffense = 1
 				Cooldown = 60
-				DamageMult= 5
+				DamageMult= 7
 				GuardBreak=1
 				TurfStrike=3
 				HitSparkIcon='Slash - Vampire.dmi'
@@ -1884,7 +1889,7 @@ obj
 					set category="Skills"
 					usr.Activate(src)
 			Power_Pillar
-				SkillCost=160
+				SkillCost=TIER_4_COST
 				Copyable=5
 				EnergyCost=10
 				Area="Circle"
@@ -1930,10 +1935,9 @@ obj
 				Area="Circle"
 				Distance=2
 				Size=2
-				StrOffense=1
-				CanBeDodged = 0
-				CanBeBlocked = 0
-				DamageMult=8
+				StrOffense=0.75
+				ForOffense=0.25
+				DamageMult=12
 				DelayTime=0.25
 				PreShockwave=1
 				PreShockwaveDelay=1
@@ -1945,6 +1949,7 @@ obj
 				ShockDiminish=1.15
 				ShockTime=4
 				GuardBreak=1
+				ComboMaster=1
 				Rush=5
 				ControlledRush=1
 				HitSparkIcon='Slash - Future.dmi'
@@ -1956,7 +1961,7 @@ obj
 				Launcher=4
 				DelayedLauncher=1
 				Cooldown=150
-				EnergyCost=5
+				EnergyCost=2.5
 				Instinct=1
 				ActiveMessage="delivers swift justice with a flurry of slashes!"
 				verb/Shining_Sword_Slash()
@@ -1968,11 +1973,13 @@ obj
 				Area="Circle"
 				StrOffense=1
 				Distance=5
-				DamageMult=6
+				DamageMult=12
 				Knockback=15
 				WindUp=0.5
 				Slow=1
 				Stunner=2
+				ComboMaster=1;
+				GuardBreak=1;
 				WindupMessage="sheathes their blade..."
 				ActiveMessage="cuts through any and all around them in the flash of an eye!"
 				HitSparkIcon='JudgmentCut.dmi'
@@ -1994,14 +2001,15 @@ obj
 				SignatureTechnique=1
 				NeedsSword=1
 				Area="Wider Wave"
-				StrOffense=1
-				DamageMult=10
+				StrOffense=1.25
+				DamageMult=16
 				TurfDirt=1
 				Distance=12
 				Jump=1
 				Knockback=10
 				FlickAttack=2
 				GuardBreak=1
+				ComboMaster=1;
 				ShockIcon='KenShockwave.dmi'
 				Shockwave=1
 				Shockwaves=1
@@ -2010,7 +2018,7 @@ obj
 				Cooldown=150
 				EnergyCost=5
 				Earthshaking=1
-				Speed=1.5
+				Speed=1
 				WindUp=0
 				Instinct=1
 				ActiveMessage="leaps in the air before falling back down, weapon-first!"
@@ -2025,11 +2033,13 @@ obj
 				Gravity=5
 				WindUp=1
 				WindupMessage="prepares to deliver a peerless slash..."
-				DamageMult=10
+				DamageMult=18
 				StrOffense=1
+				EndDefense=0.5
 				ActiveMessage="slashes through their enemy in the blink of an eye, aiming to mortally wound them!"
 				Area="Target"
 				GuardBreak=1
+				ComboMaster=1;
 				PassThrough=1
 				MortalBlow=1
 				HitSparkIcon='Slash - Zan.dmi'
@@ -2037,7 +2047,7 @@ obj
 				HitSparkY=-16
 				HitSparkTurns=1
 				HitSparkSize=3
-				Cooldown=-1
+				Cooldown=180
 				EnergyCost=15
 				Instinct=1
 				verb/Zantetsuken()
@@ -2052,11 +2062,12 @@ obj
 				DelayTime=2
 				Rounds=7
 				IgnoreAlreadyHit = 1
-				DamageMult=2
+				DamageMult=5
 				Knockback=10
-				SpeedStrike = 1
+				SpeedStrike = 2
 				PassThrough=1
 				GuardBreak=1
+				ComboMaster=1;
 				WindUp=0.1
 				WindupMessage="sheathes their blade..."
 				ActiveMessage="begins to step through the battlefield like a passing shadow!"
@@ -2081,16 +2092,18 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrOffense=1
+				SpeedStrike=2;
 				Distance=7
 				PassTo=1
-				DamageMult=16.5
+				DamageMult=18
 				WindUp=1
 				GuardBreak=1
+				ComboMaster=1;
 				Knockback=25
 				WindupMessage="lays a hand on their sheathed blade, concentrating for a moment..."
 				ActiveMessage="blasts through surrounding foes with what appears to be a single strike!!"
 				Cooldown=180
-				EnergyCost=15
+				EnergyCost=10
 				verb/Thousand_Man_Slayer()
 					set category="Skills"
 					usr.Activate(src)
@@ -2759,7 +2772,7 @@ obj
 					ActiveMessage="invokes: <font size=+1>BLIZZARD!</font size>"
 					adjust(mob/p)
 						if(!altered)
-							if(p.isInnovative(ELF, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
 								Rounds=round(p.getTotalMagicLevel()/5)
 								Knockback=1
 								Distance= 6 + round(p.getTotalMagicLevel()/5)
@@ -2769,6 +2782,7 @@ obj
 								Freezing = 2 + p.Potential/10
 								ManaCost = round(p.getTotalMagicLevel()/3) + 3
 								Slow=0.25
+								ActiveMessage="invokes a powerful: <font size=+1>BLIZZARD!</font size>"
 							else
 								Rounds=initial(Rounds)
 								Knockback=0
@@ -2811,7 +2825,7 @@ obj
 					adjust(mob/p)
 						// make it cast a projectile that is like hell zone grenade
 						if(!altered)
-							if(!isInnovationDisable(p) && p.isInnovative(ELF, "Any"))
+							if(!isInnovationDisable(p) && p.isInnovative(FAE, "Any") || p.KeybladeType=="Staff" && !isInnovationDisable(p))
 								if(!Using && usr.ManaAmount >= 11)
 									if(!locate(/obj/Skills/Projectile/Blizzara, usr))
 										usr.AddSkill(new/obj/Skills/Projectile/Blizzara)
@@ -2827,6 +2841,7 @@ obj
 									Rounds = clamp(p.getTotalMagicLevel()/5, 1, 4)
 									DamageMult = 1 + p.Potential/25 + p.getTotalMagicLevel()/10
 									DamageMult= clamp(DamageMult/Rounds, 0.001, 15)
+									ActiveMessage="invokes a powerful: <font size=+1>BLIZZARA!</font size>"
 
 								else
 									return
@@ -2867,7 +2882,7 @@ obj
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
-							if(p.isInnovative(ELF, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
 							//	Rounds = 3 + p.Potential/25
 								Distance = 7
 								Freezing = 6 + p.getTotalMagicLevel()
@@ -2878,6 +2893,7 @@ obj
 							//	NoAttackLock=1
 							//	DamageMult/=Rounds
 								ManaCost = 10
+								ActiveMessage="invokes a powerful: <font size=+1>BLIZZAGA!</font size>"
 							else
 								Rounds=initial(Rounds)
 								Knockback=0
@@ -2920,7 +2936,7 @@ obj
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
-							if(p.isInnovative(ELF, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
 								var/asc = p.AscensionsAcquired
 								var/magicLevel = p.getTotalMagicLevel()
 								Rush=5
@@ -2930,8 +2946,10 @@ obj
 								Size=0.5
 								WindUp=0.25
 								Rounds= max(1, round(magicLevel/5) + asc)
-								DamageMult = clamp(magicLevel/3 + asc * 2, 4, 12)/(Rounds)
-								ManaCost = 3*(DamageMult/4)
+								DamageMult = clamp(magicLevel/3 + asc * 2, 4, 12)/(Rounds/2)
+								ManaCost = 5
+								NoAttackLock=1
+								ActiveMessage="invokes a powerful: <font size=+1>THUNDER!</font size>"
 							else
 								Rush=0
 								ControlledRush=0
@@ -2972,15 +2990,17 @@ obj
 						// make it cast a projectile that is like hell zone grenade
 						ManaCost = 5
 						if(!altered)
-							if(p.isInnovative(ELF, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
 								if(!Using && usr.ManaAmount >= 10)
 									if(!locate(/obj/Skills/Projectile/Thundara, usr))
 										usr.AddSkill(new/obj/Skills/Projectile/Thundara)
 									var/obj/Skills/Projectile/Thundara/th = usr.FindSkill(/obj/Skills/Projectile/Thundara)
 									th.adjust(usr)
 									usr.UseProjectile(th)
-									DamageMult=4
-									usr.ManaAmount-=5
+									DamageMult=5
+									Rounds=2
+									NoAttackLock=1
+									ActiveMessage="invokes a powerful: <font size=+1>THUNDARA!</font size>"
 								else
 									return
 
@@ -3015,9 +3035,9 @@ obj
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
-							if(p.isInnovative(ELF, "Any") && !isInnovationDisable(p))
-								Rounds = 200
-								DamageMult = 0.05
+							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
+								Rounds = 20
+								DamageMult = 0.375
 								Icon='VR Cloud.png'
 								IconX=-13
 								Size = 8
@@ -3027,8 +3047,9 @@ obj
 								WindUp=2
 								Thunderstorm=7
 								ManaCost = 7.5
+								ActiveMessage="invokes a powerful: <font size=+1>THUNDAGA!</font size>"
 							else
-								DamageMult=2
+								DamageMult=1.5
 								Rounds=5
 								Icon=null
 								IconX=0
@@ -3318,9 +3339,7 @@ obj
 				Light_Eater
 				Cage_of_Time
 
-				Ultima
-					SignatureTechnique=4
-					Destructive=1
+
 
 
 /// MAGIC AUTO HIT SIGS T1
@@ -3559,9 +3578,9 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1.5
+				AdaptRate=1
 				DamageMult=0.5
-				HolyMod=5
+				HolyMod=1.15
 				Distance=5
 				DistanceAround=3
 				EnergyCost=10
@@ -3582,6 +3601,8 @@ obj
 				HitSparkY=0
 				Cooldown=75
 				Instinct=1
+				adjust(mob/p)
+					HolyMod=1.15
 				verb/Holy_Justice()
 					set category="Skills"
 					usr.Activate(src)
@@ -3590,9 +3611,9 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1.5
+				AdaptRate=1
 				DamageMult=0.5
-				AbyssMod=5
+				AbyssMod=1.15
 				Distance=5
 				DistanceAround=3
 				EnergyCost=10
@@ -3613,6 +3634,8 @@ obj
 				HitSparkY=0
 				Cooldown=75
 				Instinct=1
+				adjust(mob/p)
+					AbyssMod=1.15
 				verb/Doom_of_Damocles()
 					set category="Skills"
 					usr.Activate(src)
@@ -4482,15 +4505,17 @@ obj
 				StyleNeeded="Ansatsuken"
 				proc/alter(mob/player)
 					ManaCost = 0
-					var/damage = 1 + (0.5 * player.SagaLevel)
+					var/damage = 1 + (2 * player.SagaLevel)
 					var/path = player.AnsatsukenPath == "Tatsumaki" ? 1 : 0
 					var/rounds = 3
 					var/cooldown = 40
 					var/launch = 0
+					Size = 2
 					if(path)
 						cooldown = 30
-						damage = 2 + (1.5 * player.SagaLevel)
+						damage = 2 + (2.5 * player.SagaLevel)
 						rounds = 3
+						Size = 3
 					DamageMult = damage
 					Cooldown = cooldown
 					Rounds = rounds
@@ -4510,7 +4535,7 @@ obj
 				IconY=-32
 				Cooldown=150
 				ManaCost = 25
-				Size=2
+				Size=4
 				Rush=3
 				ControlledRush=3
 				IgnoreAlreadyHit=1
@@ -4549,7 +4574,7 @@ obj
 				IconY=-32
 				Rounds=20
 				Cooldown=200
-				Size=3
+				Size=4
 				Distance=3
 				ManaCost=75
 				Rush=5
@@ -4982,13 +5007,14 @@ obj
 ////Nox
 			FrostBite
 				NoTransplant=1
-				Area="Strike"
+				Area="Arc"
 				ControlledRush=1
-				Rush=3
+				Rush=7
 				Distance=1
-				StrOffense=1
+				StrOffense=0.5
 				ForOffense=0.5
-				DamageMult=4.5
+				AdaptRate=1
+				DamageMult=5
 				HitSparkIcon='Hit Effect Pearl.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -4997,10 +5023,11 @@ obj
 				HitSparkCount=5
 				HitSparkDispersion=1
 				HitSparkDelay=1
-				Cooldown=60
+				Cooldown=30
 				ActiveMessage="thrusts their hand forward to freeze all within their grasp!"
 				Freezing=20
-				Stasis=10
+				Stasis=2
+				ManaCost=5
 				verb/Frost_Bite()
 					set category="Skills"
 					usr.Activate(src)
@@ -5010,7 +5037,7 @@ obj
 				Distance=5
 				Cooldown=20
 				ForOffense=1
-				DamageMult=2
+				DamageMult=3
 				HitSparkIcon='Hit Effect Ripple.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -5020,6 +5047,7 @@ obj
 				HitSparkDispersion=1
 				HitSparkDelay=1
 				ActiveMessage="yells: OPTIC BARREL!"
+				ManaCost=5;
 				verb/Optic_Barrel()
 					set category="Skills"
 					usr.Activate(src)
@@ -5073,6 +5101,11 @@ mob
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Z] you are silenced!"
 				return 0
+			if(src.Airborne)
+				return FALSE
+			if(src.OnMagicalVehicle())
+				src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+				return FALSE
 			if(src.passive_handler.Get("HotHundred") || src.passive_handler.Get("Warping") || (src.AttackQueue && src.AttackQueue.Combo))
 				Z.while_warping = TRUE
 			else
@@ -5115,7 +5148,6 @@ mob
 						if(Z.AssociatedGear.Uses<=0)
 							src << "[Z] doesn't have enough power to function!"
 							return FALSE
-			var/disarmed_cut = FALSE
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
 					src << "You lack the ability to use magic!"
@@ -5124,15 +5156,11 @@ mob
 					src << "Your mana circuits are too damaged to use magic! (until [time2text(src.MagicTaken, "DDD MMM DD hh:mm:ss")])"
 					return;
 				if(Z.Copyable>=3||!Z.Copyable)
-					if(passive_handler.Get("Disarmed") && !src.HasLimitlessMagic() && !src.HasBladeFisting())
-						disarmed_cut = TRUE
 					if(!src.HasSpellFocus(Z))
 						src << "You need a spell focus to use [Z]."
 						return
 			Z.adjust(src)
 			Z.SpellSlotModification();
-			if(disarmed_cut)
-				Z.DamageMult = (Z.DamageMult / 2)
 			if(Z.GuardBreak)
 				Z.CanBeBlocked=0
 				Z.CanBeDodged=0
@@ -5170,12 +5198,13 @@ mob
 					for(var/obj/Skills/AutoHit/Snowgrave/SG in src)
 						del SG
 				if(Z.HahaWhoops)
+					var/disarm_f = GetDisarmedAutoHitDamageFactor(Z)
 					if(prob(50))
-						src.Target.HealHealth(Z.DamageMult)
+						src.Target.HealHealth(Z.DamageMult * disarm_f)
 						for(var/mob/E in hearers(12,src))
 							E<<"<font color=[src.Text_Color]>[src] says: haha whoops."
 					else
-						src.Target.DoDamage(src.Target,Z.DamageMult)
+						src.Target.DoDamage(src.Target, Z.DamageMult * disarm_f)
 						for(var/mob/E in hearers(12,src))
 							E<<"<font color=[src.Text_Color]>[src] says: Nailed it."
 					return
@@ -5209,8 +5238,6 @@ mob
 					return
 			if(Z.NeedsSword)
 				var/obj/Items/Sword/s=src.EquippedSword()
-				if(passive_handler.Get("Disarmed") && s && !src.HasBladeFisting())
-					Z.DamageMult = (Z.DamageMult / 2)
 				if(!s)
 					if(!src.HasBladeFisting() && !src.UsingBattleMage())
 						src << "You need a sword equipped to use [Z]!"
@@ -5374,7 +5401,7 @@ mob
 			if(Z.Copyable)
 				var/copy = Z.Copyable
 				spawn() for(var/mob/m in view(40, src))
-					if(m.passive_handler.Get("The Almighty"))
+					if(m.CheckSpecial("A - The Almighty"))
 						var/insightLevel = m.AscensionsAcquired+25 || 1
 						var/techTier = Z.Copyable
 						if(insightLevel < techTier)
@@ -5502,12 +5529,12 @@ mob
 					if(Z.PreQuake)
 						spawn()
 							src.Quake(Second(Z.WindUp/src.GetQuickCast()))
-					sleep(Second(Z.WindUp/src.GetQuickCast()))
+					sleep(Second((Z.WindUp+ChargeDelay)/src.GetQuickCast()))
 				else
 					if(Z.PreQuake)
 						spawn()
 							src.Quake(Second(Z.WindUp))
-					sleep(Second(Z.WindUp))
+					sleep(Second(Z.WindUp+ChargeDelay))
 				src.WindingUp=0
 
 				if(Z.Area=="Target"||Z.Area=="Around Target")
@@ -5552,7 +5579,7 @@ mob
 				else
 					Z.TempStrOff=1
 					Z.TempForOff=0
-			if(src.AttackQueue && !src.AttackQueue.FollowUp)
+			if(src.AttackQueue && !src.AttackQueue.FollowUp && !Z.KeepQueue)
 				src << "<b>You drop [src.AttackQueue.name] from your queue.</b>"
 				src.QueueOverlayRemove()
 				src.ClearQueue()
@@ -5942,6 +5969,7 @@ obj
 			CorruptionGain
 			Snaring
 			SnaringOverlay
+			Disarm=0
 			Cleansing = 0
 			ManaDrain
 			FoxFire
@@ -5949,6 +5977,7 @@ obj
 			AngelMagicCompatible
 			ApplyJudged
 			ApplySentenced
+			ElementalClass
 			FixedDamage=0
 
 			Arcing//Triggers offshoots on every step that expand outwards.  Higher than 1 means that every X steps the range will widen.
@@ -6055,6 +6084,7 @@ obj
 			ChargeTime
 			RagingDemonAnimation = FALSE
 			Executor
+			Executing
 			Primordial
 			SpeedStrike
 			AdaptDmg
@@ -6075,6 +6105,7 @@ obj
 			Combustion
 			IceAge
 			Doom
+			CooldownDrag
 
 			grabNerf = 0
 			BuffAffected = 0
@@ -6099,6 +6130,15 @@ obj
 			FollowUpDelay
 
 			DirectWounds
+
+			Sanctify
+			StarCrossed
+			PainShare
+			ChargeDelay
+			Deport
+			HealingReverse
+			Enshrine
+			ForceField
 			/// Set for all autohits built from a skill, used for on-hit hooks (currently just Enuma Elish).
 			var/obj/Skills/AutoHit/FromSkill
 
@@ -6141,7 +6181,7 @@ obj
 			FollowUp = Z.FollowUp
 			FollowUpDelay = Z.FollowUpDelay
 			BuffSelf = Z.BuffSelf
-			src.Damage=Z.DamageMult
+			src.Damage=Z.DamageMult * owner.GetDisarmedAutoHitDamageFactor(Z)
 			src.StepsDamage=Z.StepsDamage
 			src.MagicNeeded=Z.MagicNeeded
 			if(Z.while_warping)
@@ -6156,6 +6196,7 @@ obj
 			else
 				src.ForDmg=Z.ForOffense
 			src.SpellElement=Z.SpellElement
+			src.ElementalClass=Z.ElementalClass
 			// Time Future mage passive: 50% spell cost refund on land. Captures the
 			// would-be drain value at construction time so Damage(m) can refund half
 			// on first hit. We replicate the deduction formula from ClearTech (line
@@ -6235,6 +6276,7 @@ obj
 			src.ChargeTech=Z.ChargeTech
 			src.UnarmedTech=Z.UnarmedOnly
 			src.SwordTech=Z.NeedsSword
+			src.Executing=Z.Executing
 			src.SpecialAttack=Z.SpecialAttack
 			src.Deluge=Z.Deluge
 			src.Stunner=Z.Stunner
@@ -6249,6 +6291,13 @@ obj
 			src.Scratch=Z.Scratch
 			src.Punt=Z.Punt
 			src.Divide=Z.Divide
+			src.PainShare=Z.PainShare
+			Sanctify = Z.Sanctify
+			StarCrossed = Z.StarCrossed
+			ChargeDelay = Z.ChargeDelay
+			Deport = Z.Deport
+			ForceField = Z.ForceField
+			CooldownDrag = Z.CooldownDrag
 			src.TurfErupt=Z.TurfErupt
 			src.TurfEruptOffset=Z.TurfEruptOffset
 			src.TurfIce=Z.TurfIce
@@ -6311,6 +6360,8 @@ obj
 			src.buffAffectedCompare = Z.buffAffectedCompare
 			src.buffAffectedBoon = Z.buffAffectedBoon
 			src.CorruptionDebuff = Z.CorruptionDebuff
+			HealingReverse = Z.HealingReverse
+			Enshrine = Z.Enshrine
 			PullIn = Z.PullIn
 			if(Z.Burning)
 				src.Burning+=Z.Burning
@@ -6336,6 +6387,8 @@ obj
 				src.Combustion = Z.Combustion
 			if(Z.IceAge)
 				src.IceAge = Z.IceAge
+			if(Z.Disarm)
+				src.Disarm = Z.Disarm
 			if(Z.Toxic)
 				src.Toxic+=Z.Toxic
 			if(Z.Crippling)
@@ -6460,6 +6513,15 @@ obj
 				AlreadyHit |= m
 				for(var/obj/AutoHitter/ah in autohitChildren)
 					ah.AlreadyHit |= m
+				// Mirror Reflection from Kusanagi
+				var/mirror_reflect = FALSE
+				if(m.mirror_parry_active)
+					m.mirror_parry_active = FALSE
+					KenShockwave(m, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
+					return
+				if(m.mirror_reflect_active)
+					m.mirror_reflect_active = FALSE
+					mirror_reflect = TRUE
 				if(istype(Owner, /mob/Player/AI) && m != Owner)
 					var/mob/Player/AI/a = Owner
 					if(!a.ai_team_fire && a.AllianceCheck(m))
@@ -6526,7 +6588,7 @@ obj
 						atk *= (1 + elem_dmg_bonus)
 				if(m.passive_handler.Get("Field of Destruction")||m.passive_handler.Get("The Immovable Object"))
 					if(Owner.HasHybridStrike())
-						atk/=clamp(sqrt(1+Owner.GetFor(Owner.GetHybridStrike())/15),1,3)
+						atk/=clamp(sqrt(1+Owner.GetFor(Owner.GetHybridStrike())/30),1,3)
 				DEBUGMSG("atk final is: [atk]")
 				var/dmgMulti = Damage
 				if(Owner.HasSpiritFlow())
@@ -6536,6 +6598,9 @@ obj
 				#if DEBUG_AUTOHIT
 				Owner.log2text("atk - Auto Hit", atk, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 				#endif
+				if(Owner.HasCallousedFeet())
+					var/ef = Owner.GetCallousedFeet() / glob.SPIRIT_FLOW_DIVISOR
+					atk += Owner.GetEnd(ef)
 				var/dmgRoll = Owner.GetDamageMod()
 				DEBUGMSG("dmgRoll is: [dmgRoll]")
 				#if DEBUG_AUTOHIT
@@ -6620,7 +6685,7 @@ obj
 				if(Owner.UsingFencing())
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(Owner.UsingFencing()/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				if((m.Launched||m.Stunned||m.Suspended))
-					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer))
+					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer || m.passive_handler.Get("Staggered!")))
 						FinalDmg *= glob.CCDamageModifier
 						Owner.log2text("FinalDmg - Auto Hit", "After ComboMaster", "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 						Owner.log2text("FinalDmg - Auto Hit", FinalDmg, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
@@ -6644,7 +6709,7 @@ obj
 				if(WearingArmor)//Reduced delay and accuracy
 					Precision*=src.Owner.GetArmorAccuracy(WearingArmor)
 
-				if(src.CanBeBlocked||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("The Crownless King"))
+				if(src.CanBeBlocked||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("The Crownless King")||m.passive_handler.Get("IgnoreNoWhiff"))
 					if(Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=0) == WHIFF)
 						if(!src.Owner.NoWhiff())
 							var/obj/Items/Sword/s = Owner.EquippedSword()
@@ -6664,10 +6729,7 @@ obj
 					if(m in src.Owner.party.members)
 						FinalDmg *= 1+src.Owner.passive_handler.Get("TeamHater")
 
-				if(!src.CanBeBlocked&&!src.CanBeDodged)
-					FinalDmg *= glob.AUTOHIT_GLOBAL_DAMAGE
-				else
-					FinalDmg*=1.5
+				FinalDmg*= glob.AUTOHIT_GLOBAL_DAMAGE
 				DEBUGMSG("after glob mod: [FinalDmg]")
 
 				if(m.passive_handler.Get("Siphon")&&src.ForDmg)
@@ -6690,12 +6752,8 @@ obj
 							m.Shielding=1
 							spawn()
 								m.ForceField()
-					FinalDmg*=max(1-(0.25*m.GetDeflection()),0.3)
+					FinalDmg*=max(1-(glob.DEFLECTION_DAMAGE_MULT*m.GetDeflection()),0.3)
 					DEBUGMSG("after Deflection: [FinalDmg]")
-
-				if(m.HasBlastShielding()&&!src.CanBeDodged)
-					FinalDmg/=2**3
-					DEBUGMSG("after BlastShielding: [FinalDmg]")
 
 				var/list/Elements = list()
 				if(Scorching||Burning)
@@ -6723,9 +6781,9 @@ obj
 				if(Cleansing && src.Owner.shouldCleanse(m))
 					m.CleanseDebuff(Cleansing*10);
 
-				// if(src.CosmoPowered)
-				//  	if(!src.Owner.SpecialBuff)
-				//  		FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
+				if(src.CosmoPowered)
+					if(!src.Owner.SpecialBuff)
+						FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
 				if(src.Executor)
 					var/additonal = src.Executor * 0.1
 					if(m.Health<=5)
@@ -6748,13 +6806,15 @@ obj
 					if(Owner && Owner.hasMagePassive(/mage_passive/dark/Shadowbringer) && m.Potential >= Owner.Potential + 5)
 						additonal = max(additonal, 2)
 					var/missingHealth = 100-m.Health
-					FinalDmg *= 1 + ((additonal * missingHealth)/100)
+					FinalDmg *= 1 + (((additonal*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 				if(ApplySlow)
 					m.AddSlow(ApplySlow, Owner)
 				if(NerveOverload)
 					m.AddShock(NerveOverload, Owner)
 				if(CriticalParalyze && prob(CriticalParalyze))
 					Stun(m, 2)
+				if(CooldownDrag)
+					m.addCooldownDrag(CooldownDrag, Owner)
 				if(CriticalSpark && prob(CriticalSpark))
 					FinalDmg *= 1.5
 					animate(m, color = "#fff757")
@@ -6768,7 +6828,7 @@ obj
 				if(TurfMud)
 					m.AddSlow(TurfMud, Owner)
 				if(Reinforcement && Owner)
-					Owner.HealHealth(Reinforcement)
+					Owner.HealHealth(Reinforcement/20)
 				if(TurfBurn)
 					m.AddBurn(TurfBurn, Owner)
 				if(grabNerf)
@@ -6789,7 +6849,7 @@ obj
 					m.applySnare(Snaring, SnaringOverlay)
 				//EFFECTS HERE
 
-				if(src.CanBeDodged||m.passive_handler.Get("YataNoKagami"))
+				if(src.CanBeDodged||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("IgnoreNoWhiff"))
 					var/loc=m.loc
 					if(m.AttackQueue&&(m.AttackQueue.Counter||m.AttackQueue.CounterTemp))
 						m.dir=get_dir(m, src.Owner)
@@ -6883,10 +6943,15 @@ obj
 								skipPureDamage = 1
 				var/list/specDmgTypes = list()
 				if(!skipPureDamage && Owner && FromSkill)
-					if(FromSkill.HolyMod) specDmgTypes["Holy"] = FromSkill.HolyMod
+					var/holy = 0
+					if(FromSkill.HolyMod)
+						holy += FromSkill.HolyMod
+					if(FromSkill.Sanctify)
+						holy += FromSkill.Sanctify * glob.SANCTIFY_EFFECTIVENESS
+					if(holy > 0) specDmgTypes["Holy"] = holy
 					if(FromSkill.AbyssMod) specDmgTypes["Abyss"] = FromSkill.AbyssMod
 					if(FromSkill.SlayerMod) specDmgTypes["Slayer"] = FromSkill.SlayerMod
-					if(specDmgTypes.len) FinalDmg *= 1 + Owner.attackModifiers(m, specDmgTypes)
+					if(specDmgTypes.len) FinalDmg *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
 				var/reversalChance = m.GetAutoReversal()
@@ -6941,6 +7006,8 @@ obj
 					var/fixedAmt = src.FixedDamage
 					if(specDmgTypes.len)
 						fixedAmt *= 1 + Owner.attackModifiers(m, specDmgTypes)
+					var/DefReduction=sqrt(m.BaseDef())
+					fixedAmt/=DefReduction
 					m.LoseHealth(fixedAmt)
 					damageDealt = fixedAmt
 					if(m.Health <= 0 && !m.KO)
@@ -6954,14 +7021,38 @@ obj
 						src.Owner.passive_handler.Increase("Combustion", src.Combustion)
 					if(src.IceAge)
 						src.Owner.passive_handler.Increase("IceAge", src.IceAge)
-					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE)
+					if(mirror_reflect && Owner)
+						KenShockwave(m, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
+						flick("Attack", Owner)
+						Owner.DoDamage(Owner, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, Autohit=TRUE)
+						return
+					if(src.SpellElement == "Water" || src.ElementalClass == "Water")
+						FinalDmg *= m.getWaterResistValue()
+					// Executing is +1% damage per 1 Injury on the target
+					if(src.Executing && m)
+						FinalDmg *= 1 + (0.01 * src.Executing * m.TotalInjury)
+					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmg)
+					if(src.Combustion && m)
+						var/combThresh = src.Owner.passive_handler["Combustion"]
+						if(combThresh <= 80)
+							if(m.Burn >= combThresh)
+								m.implodeDebuff(combThresh, "Burn")
+						else
+							if(m.Burn >= 80)
+								m.implodeDebuff(combThresh, "Burn")
+					if(src.IceAge && m)
+						var/iceThresh = src.Owner.passive_handler["IceAge"]
+						if(m.Slow >= iceThresh)
+							m.implodeDebuff(iceThresh, "Chill")
 					if(src.Combustion)
 						src.Owner.passive_handler.Decrease("Combustion", src.Combustion)
 					if(src.IceAge)
 						src.Owner.passive_handler.Decrease("IceAge", src.IceAge)
+					if(src.Disarm && m)
+						src.Owner.DisarmTarget(m)
 				DEBUGMSG("FINAL TOTAL DAMAGE DEALT! [damageDealt]")
 				if(!damageDealt)
 					damageDealt = 0
@@ -6980,6 +7071,25 @@ obj
 					m.applyJudged(120)
 				if(src.ApplySentenced)
 					m.applySentenced(60)
+				if(PainShare)
+					m.applyPainShare(src.Owner, PainShare)
+				if(ChargeDelay)
+					m.applyChargeDelay(ChargeDelay)
+				if(Enshrine)
+					m.applyEnshrine(Enshrine)
+				if(SpellElement=="Space"&&m.StarCrossed)
+					m.applyStarCrossed()
+				if(Deport)
+					m.applyDeport(Deport)
+				if(HealingReverse)
+					m.applyHealReverse()
+				if(ForceField&&Owner)
+					m.applyForceField(Owner)
+				if(FromSkill.StarCrossed)
+					m.StarCrossed=TRUE
+					m.StarCrossedX=m.x
+					m.StarCrossedY=m.y
+					m.StarCrossedZ=m.z
 				if(src.Owner.UsingAnsatsuken())
 					src.Owner.HealMana(src.Owner.SagaLevel)
 				if(src.Owner.SagaLevel>1&&src.Owner.Saga=="Path of a Hero: Rebirth")
@@ -7804,6 +7914,7 @@ obj
 /mob
 	var
 		tmp/Suspended = null
+		tmp/ActionLocked = null
 		tmp/judgement_cut_chain_active = FALSE
 		tmp/judgement_cut_bonus_value = 1
 		tmp/judgement_cut_bonus_chain_count = 0
@@ -7818,11 +7929,13 @@ obj
 	DamageMult = 5
 	StrOffense = 1
 	EndDefense = 1
+	Copyable=6
 	Cooldown = 75
 	ComboMaster = 1
 	GuardBreak = 1
 	NoLock = 1
 	NoAttackLock = 1
+	ChargeWaveIcon   = 'BLANK.dmi'
 	IconTime = 4
 	ActiveMessage = "tears through space with a Judgement Cut!"
 
@@ -7858,16 +7971,15 @@ obj
 		SweetSpotWindow = 0.3
 		SweetSpot = RollSweetSpot()
 		user.judgement_cut_chain_active = TRUE
-		saved_cooldown = Cooldown
+		saved_cooldown = Cooldown > 0 ? Cooldown : initial(Cooldown)
 		Cooldown = 0
 		if(!overlay_loop_running)
 			overlay_loop_running = TRUE
 			spawn() SlashOverlayLoop()
 
-	proc/EndChain()
+	proc/EndChain(var/apply_cooldown = TRUE)
 		if(!chain_active) return
 		var/mob/user = chain_user
-		var/mob/target = chain_target
 		chain_active = FALSE
 		window_loop_running = FALSE
 		if(user)
@@ -7879,12 +7991,13 @@ obj
 		ChargePeriod = initial_charge_period
 		SweetSpotWindow = 0.3
 		SweetSpot = initial_charge_period / 2
-		Cooldown = saved_cooldown
+		Cooldown = saved_cooldown > 0 ? saved_cooldown : initial(Cooldown)
 		if(user)
 			Using = 0
 			cooldown_remaining = 0
 			cooldown_start = 0
-			src.Cooldown(1, null, user)
+			if(apply_cooldown)
+				src.Cooldown(1, null, user)
 
 	proc/SlashOverlayLoop()
 		while(chain_active)
@@ -7911,7 +8024,7 @@ obj
 			if(!chain_active)
 				window_loop_running = FALSE
 				return
-			if(user.Stunned || user.Launched || user.Stasis > 0 || user.KO)
+			if(user.Stunned || user.Suspended || user.Launched || user.Stasis > 0 || user.KO)
 				window_loop_running = FALSE
 				EndChain()
 				return
@@ -7922,6 +8035,7 @@ obj
 			// hold has started again.
 			if(user.held_skill == src)
 				window_loop_running = FALSE
+				reengage_deadline = world.time + 10
 				return
 			sleep(1)
 		// Window expired
@@ -7953,6 +8067,9 @@ obj
 	OnHeldFizzle(mob/p)
 		if(chain_active)
 			EndChain()
+		// Safety net
+		if(p)
+			p.judgement_cut_chain_active = FALSE
 
 	verb/Judgement_Cut()
 		set category = "Skills"
@@ -7971,10 +8088,11 @@ obj
 			if(get_dist(p, T) > Distance)
 				p << "<font color='red'>Target is out of range.</font>"
 				return
-			if(T.Suspended)
-				p << "<font color='red'>That target is already suspended.</font>"
-				return
 			StartChain(p, T)
 		else
-			if(world.time > reengage_deadline) return
+			if(world.time > reengage_deadline)
+				EndChain()
+				return
 		p.BeginHeldSkill(src)
+		if(p.held_skill != src && chain_active && chain_user == p)
+			EndChain(apply_cooldown = FALSE)

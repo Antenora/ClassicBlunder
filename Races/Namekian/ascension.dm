@@ -1,6 +1,4 @@
 ascension
-
-
 	namekian
 		one
 			unlock_potential	=	ASCENSION_ONE_POTENTIAL
@@ -91,9 +89,9 @@ ascension
 				switch(owner.Class)
 					if("Demon")
 						//power = 2
-						strength = 1.75
-						force = 1.75
-						endurance = 1.5
+						strength = 2.75
+						force = 2.75
+						endurance = 2.5
 						anger = 0.5
 						passives = list("DemonicDurability" = 1, "MovementMastery" = 4, "Extend" = 1, "Gum Gum" = 1)
 					if("Warrior")
@@ -116,8 +114,8 @@ ascension
 					owner.transUnlocked = 2
 				switch(owner.Class) ///orange namek should be unlocked here
 					if("Demon")
-						strength = 1.75
-						force = 1.75
+						strength = 2.75
+						force = 2.75
 						anger = 0.3
 						passives = list("DemonicDurability" = 1, "MovementMastery" = 4)
 					if("Warrior")
@@ -136,8 +134,8 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Class)
 					if("Demon")
-						strength = 1.75
-						force = 1.75
+						strength = 2.75
+						force = 2.75
 						anger = 0.3
 						passives = list("DemonicDurability" = 2, "MovementMastery" = 5)
 					if("Warrior")

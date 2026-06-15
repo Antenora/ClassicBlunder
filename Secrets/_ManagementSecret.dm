@@ -5,8 +5,9 @@
 #define MADNESS_ADD_PER_TIER 25
 
 #define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Werewolf", "Heavenly Restriction", "Senjutsu", "Shin",\
-"Ultra Instinct", "Zombie", "Necromancy", "Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral")
+"Ultra Instinct", "Zombie", "Necromancy", "Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Heavenborn")
 #define RACIAL_SECRETS list("Eldritch (Shrouded)", "Eldritch (Reflected)")
+#define RARE_LIST list(MAKAIOSHIN, MAJIN, DEMON, ANGEL, ELDRITCH, DEMIFIEND)
 
 //thank you hadoje
 /mob/var/SecretInformation/secretDatum = new()
@@ -46,7 +47,7 @@
 	if(p.secretDatum)
 		var/confirm = alert(usr, "Are you sure you want to tier up [p]'s [p.secretDatum.name]?",,"Yes","No")
 		if(confirm == "No") return
-		p.secretDatum.tierUp(1, p)
+		p.secretDatum.tierUp(p.secretDatum.currentTier+1, p)
 
 /mob/proc/getSecretLevel()
 	if(secretDatum)
@@ -70,30 +71,13 @@ SecretInformation
 		potentialRecieved = glob.progress.DaysOfWipe*glob.progress.PotentialDaily
 		nextTierUp = 3
 		applySecret(p)
-/*
-	proc/checkTierUp(mob/p)
-		if(currentTier < maxTier)
-	/*		if(p.Potential >= potentialRecieved + (glob.progress.PotentialDaily*nextTierUp))
-				potentialRecieved = glob.progress.DaysOfWipe
-				if(currentTier + 1 <= tierUnlocked)
-					tierUp(1, p)*/
-			if(currentTier > lastCheckedTier)
-				tierUp(currentTier-lastCheckedTier, p)
-*/
 
 
 	proc/tierUp(num, mob/p)
+		while(currentTier < num)
+			currentTier++;
+			applySecret(p);
 		lastCheckedTier = currentTier
-		if(currentTier < maxTier)
-			var/difference = maxTier - currentTier
-			for(var/x in 1 to num)
-				if(difference > 0)
-					currentTier++
-					applySecret(p)
-					difference--
-					lastCheckedTier = currentTier
-				else
-					break
 	proc/tierDown(num)
 		if(currentTier > 1)
 			currentTier -= num
@@ -105,8 +89,9 @@ SecretInformation
 			p.passive_handler.Set(variable,1)
 			p.vars[variable] += 1
 
-	proc/applySecret()
-
+	proc/applySecret(mob/p)
+		if(!p) return;
+		admins << "[p] has been given T[currentTier] [p.secretDatum.name]."
 
 	JaganEye
 		name = "Jagan Eye"
@@ -155,6 +140,7 @@ SecretInformation
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Jagan_Expert/je in usr)
 						del je
 					nextTierUp = 999
+			..(p);
 
 
 	Haki
@@ -169,7 +155,7 @@ SecretInformation
 				return 0*/
 			if(prob((currentTier**glob.CONQ_HAKI_CHANCE)+4) && secretVariable["ConquerorsHaki"] != 1)
 				unlockConquerorsHaki(p)
-		proc/unlockConquerorsHaki(mob/p)
+		proc/unlockConquerorsHaki(mob/p)//god i want to stick this shit in a blender
 			p << "You have the qualities of a King..."
 			p << "You have awakened the power of Conqueror's Haki!"
 			secretVariable["ConquerorsHaki"] = 1
@@ -215,6 +201,7 @@ SecretInformation
 					conQHaki(p)
 					conqPaths(p)
 					nextTierUp = 999
+			..(p);
 
 
 
@@ -230,18 +217,24 @@ SecretInformation
 					p << "Your blood's beat is razor sharp...You've awakened the power of the Ripple!"
 					giveSkills(p)
 					giveVariables(p)
+					p.OxygenMax+=50
 				if(2)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 2
+					p.OxygenMax+=50
 				if(3)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 2
+					p.OxygenMax+=50
 				if(4)
 					p << "Your mastery of the Ripple improves!"
 					nextTierUp = 4
+					p.OxygenMax+=50
 				if(5)
 					p << "Your mastery of the Ripple has reached its peak."
 					nextTierUp = 999
+					p.OxygenMax+=50
+			..(p);
 
 
 	Vampire
@@ -310,23 +303,25 @@ SecretInformation
 				if(5)
 					p << "You have forgotten what it means to be mortal..."
 					nextTierUp = 999
+			..(p);
 
 	EldritchShrouded
 		name = "Eldritch (Shrouded)"
 		var/list/ShroudedPassives=list();
-		var/ShroudedOrigin;
-		var/ShroudedSubtype;
+		var/ShroudedOrigin;//assigned at t1
+		var/ShroudedSubtype;//assigned at t2
+		var/ShroudedMastery;//assigned at t5
 		applySecret(mob/p)
-			p << "Your Shrouded origin bubbles to the surface; [currentTier] Steps towards the road to Assimilation have been taken..."
-			//1, 2, and 6 upgrade your "Origin" style enhancements
+			p << "Your Shrouded origin bubbles to the surface; [currentTier] Step\s towards the road to Assimilation [currentTier == 1 ? "has" : "have"] been taken..."
+			//1, 2, and 5 upgrade your "Origin" style enhancements
 			//I'm not being lazy, I'm being ~efficient~
 			if(currentTier==3)
 				p.findOrAddSkill(/obj/Skills/Utility/Tether)
 				p << "Your Shroud learns to link itself with another body for ease of existence! (Tether)"
 			if(currentTier==4)
 				p << "When you Fade into Shadow, your existence is further nullified (Upgrades to Fade into Shadow movement)"
-			if(currentTier==5)
 				p << "Your All Seeing Eyes can pierce any veils within this reality! (Restrictions on All Seeing Eyes removed)"
+			..(p);
 
 	EldritchReflected
 		name = "Eldritch (Reflected)"
@@ -357,6 +352,7 @@ SecretInformation
 				if(6)
 					p.findOrAddSkill(/obj/Skills/Utility/Reclamation)
 					p << "You remember how to take it all away, stealing your threads back to yourself for your own gain! (Reclamation)"
+			..(p);
 
 	Eldritch
 		name = "Eldritch"
@@ -367,6 +363,7 @@ SecretInformation
 			switch(currentTier)
 				if(1)
 					giveSkills(p)
+			..(p);
 		proc/noMobCheck(mob/p, procName)
 			if(!p)
 				DEBUGMSG("Eldritch (Secret) [procName] does not have a mob argument.");
@@ -538,6 +535,7 @@ SecretInformation
 					nextTierUp = 4
 				if(5)
 					p << "Your mastery of the lunar curse is godly..."
+			..(p);
 
 	HeavenlyRestriction
 		name = "Heavenly Restriction"
@@ -546,9 +544,10 @@ SecretInformation
 		applySecret(mob/p)
 			var/list/restriction = pickRestriction(p)
 			applySecretVariable(p, restriction, pickImprove(p, restriction))
+			admins << "[p] has had their Heavenly Restriction increased."
 
 
-	SageArts
+	SageArts//TODO BETWEEN WIPES: Make this Senjutsu jesus fucking christ
 		name = "Senjutsu"
 		givenSkills = list("/obj/Skills/Buffs/SlotlessBuffs/Senjutsu/Senjutsu_Focus", "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Sennin_Mode")
 		applySecret(mob/p)
@@ -559,17 +558,11 @@ SecretInformation
 					giveVariables(p)
 				if(2)
 					p << "Handling natrual energy becomes easier..."
-					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Sennin_Mode/focus = new()
-					focus = locate() in p
-					if(!focus)
-						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Sennin_Mode)
-						focus = locate() in p
 					var/obj/Skills/Queue/Rasengan/r = new()
 					r = locate() in p
 					if(!r)
 						p.AddSkill(new/obj/Skills/Queue/Rasengan)
 						p << "You have learned the Rasengan!"
-					focus.passives["ManaStats"] = 2
 					nextTierUp = 4
 				if(3)
 					p << "Your mastery of natural energy is coming close to its peak..."
@@ -581,21 +574,16 @@ SecretInformation
 						p << "You have learned the Oodama Rasengan!"
 				if(4)
 					p << "You have climbed the mountain of natural energy, and have become a Sage!"
-					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Sennin_Mode/focus = new()
-					focus = locate() in p
-					if(!focus)
-						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Sennin_Mode)
-						focus = locate() in p
 					var/obj/Skills/Projectile/Rasenshuriken/r = new()
 					r = locate() in p
 					if(!r)
 						p.AddSkill(new/obj/Skills/Projectile/Rasenshuriken)
 						p << "You have learned the Rasenshuriken!"
-					focus.passives["ManaStats"] = 3
 					nextTierUp = 4
 				if(5)
 					nextTierUp=999
 					p << "You have mastered the art of Senjutsu!"
+			..(p);
 
 	Spiral
 		name = "Spiral"
@@ -645,6 +633,7 @@ SecretInformation
 				if(5)
 					p << "Your very DNA resonates with Spiral Power. You climb upwards toward the ceiling of your cage."
 					nextTierUp = 4
+					p.AddSkill(new/obj/Skills/Projectile/Spiral/Probability_Negation_Missiles)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.2
 						p.EndAscension+= 0.2
@@ -663,6 +652,7 @@ SecretInformation
 						p.OffAscension+= 0.3
 						p.DefAscension+= 0.3
 						p << "Your synthetic body evolved!"
+			..(p);
 
 	Shin
 		name = "Shin"
@@ -697,6 +687,7 @@ SecretInformation
 					nextTierUp = 4
 				if(6) // 5 Mang Rings
 					p << "You have refined both Shin and Mang to perfection, leveraging perfect control over your sense of self to invoke that intense emotion."
+			..(p);
 
 
 	BlackFlash
@@ -731,6 +722,7 @@ SecretInformation
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/BlackFlash_SureStrike)
 				if(6) // are you out of your motherfucking miiiiiiiiiind
 					BlackFlashBaseChance = 60;
+			..(p);
 
 
 mob
@@ -757,68 +749,72 @@ mob/Admin3/verb
 	SecretManagement(var/mob/P in players)
 		set category="Admin"
 		if(!P.client) return
-		var/list/validSecrets = VALID_SECRET_LIST;
-		validSecrets.Remove(RACIAL_SECRETS);
-		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in validSecrets;
 		if(P.Secret)
 			src << "They already have a secret."
 			return
-		else
-			switch(Selection)
-				if("Spirits of The World")
-					var/path = input(src, "Which path of Spirits of The World do you wish to follow?", "Spirits of The World") in list("Goetic Virtue", "Stellar Constellation", "Elven Sanctuary")
-					// for now, admins pick it, as there
-					P.Secret = path
-					var/newpath = replacetext(path, " ", "_")
-					newpath = "Spirits_Of_The_World/[newpath]"
-					P.giveSecret(newpath)
-				if("Heavenly Restriction")
-					P.Secret = "Heavenly Restriction"
-					P.giveSecret("HeavenlyRestriction")
-				if("Jagan Eye")
-					P.Secret = "Jagan Eye"
-					P.giveSecret("JaganEye")
-				if("Hamon of the Sun")
-					P.ModifyPrime+=1
-					P.Secret="Hamon"
-					P.giveSecret("Hamon")
-				if("Sage Arts")
-					P.ModifyPrime+=1
-					P.Secret="Senjutsu"
-					P.giveSecret("SageArts")
-				if("Haki")
-					// P.ModifyPrime+=1
-					P.Secret="Haki"
-					P.giveSecret("Haki")
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armament)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Observation)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor_Lite)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield_Lite)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax_Lite)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash_Lite)
-					// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash)
-					P << "Possessing such an overwhelming amount of willpower, you learn to chart destiny through your own ambition!"
-				if("Werewolf")
-					P.Secret="Werewolf"
-					P.giveSecret("Werewolf")
-				if("Eldritch")
-					P.Secret = "Eldritch"
-					P.giveSecret("Eldritch")
-				if("Vampire")
-					P.Secret="Vampire"
-					P.giveSecret("Vampire")
-				if("Shin")
-					P.Secret="Shin"
-					P.giveSecret("Shin")
-				if("Black Flash")
-					P.Secret="Black Flash"
-					P.giveSecret("BlackFlash")
-				if("Spiral")
-					P.Secret="Spiral"
-					P.giveSecret("Spiral")
+		if(P.RaceInRareList())
+			src << "No."
+			return
+		var/list/validSecrets = list("Cancel");
+		validSecrets |= VALID_SECRET_LIST;
+		validSecrets.Remove(RACIAL_SECRETS);
+		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in validSecrets;
+		if(Selection=="Cancel") return;
+		switch(Selection)
+			if("Spirits of The World")
+				var/path = input(src, "Which path of Spirits of The World do you wish to follow?", "Spirits of The World") in list("Goetic Virtue", "Stellar Constellation", "Elven Sanctuary")
+				// for now, admins pick it, as there
+				P.Secret = path
+				var/newpath = replacetext(path, " ", "_")
+				newpath = "Spirits_Of_The_World/[newpath]"
+				P.giveSecret(newpath)
+			if("Heavenly Restriction")
+				P.Secret = "Heavenly Restriction"
+				P.giveSecret("HeavenlyRestriction")
+			if("Jagan Eye")
+				P.Secret = "Jagan Eye"
+				P.giveSecret("JaganEye")
+			if("Hamon")
+				P.ModifyPrime+=1
+				P.Secret="Hamon"
+				P.giveSecret("Hamon")
+			if("Senjutsu")
+				P.ModifyPrime+=1
+				P.Secret="Senjutsu"//i want to krill myself.
+				P.giveSecret("SageArts")//better yet i want to krill whoever made it this way
+			if("Haki")
+				// P.ModifyPrime+=1
+				P.Secret="Haki"
+				P.giveSecret("Haki")
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armament)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Observation)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor_Lite)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield_Lite)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax_Lite)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash_Lite)
+				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash)
+				P << "Possessing such an overwhelming amount of willpower, you learn to chart destiny through your own ambition!"
+			if("Werewolf")
+				P.Secret="Werewolf"
+				P.giveSecret("Werewolf")
+			if("Eldritch")
+				P.Secret = "Eldritch"
+				P.giveSecret("Eldritch")
+			if("Vampire")
+				P.Secret="Vampire"
+				P.giveSecret("Vampire")
+			if("Shin")
+				P.Secret="Shin"
+				P.giveSecret("Shin")
+			if("Black Flash")
+				P.Secret="Black Flash"
+				P.giveSecret("BlackFlash")
+			if("Spiral")
+				P.Secret="Spiral"
+				P.giveSecret("Spiral")
 mob
 	proc
 		AddHaki(var/Type)
@@ -826,3 +822,8 @@ mob
 			if(src.secretDatum.secretVariable["HakiCounter[Type]"]>=100&&!src.secretDatum.secretVariable["HakiSpecialization"])
 				src.secretDatum.secretVariable["HakiSpecialization"]="[Type]"
 				src << "Your Haki becomes centered around the Color of [Type]!"
+
+/mob/proc/RaceInRareList()
+	for(var/x in RARE_LIST)
+		if(isRace(x)) return 1;
+	return 0;

@@ -392,7 +392,11 @@ obj/Items
 				if(usr.getTotalMagicLevel() < 20)
 					usr << "Your total magic level is not high enough to craft Limited Rank-Up Magic. (Requires 20 or higher.)"
 					return
-				manaCost = src.Cost * glob.progress.EconomyCost
+				if(!usr.HasMoney(src.Cost * glob.progress.EconomyCost))
+					usr << "You don't have enough money to buy [src]."
+					return
+				usr.TakeMoney(src.Cost * glob.progress.EconomyCost)
+				manaCost=0
 			if(istype(src, /obj/Items/Enchantment/PocketDimensionGenerator))
 				if(!usr.HasFragments(src.Cost*glob.progress.EconomyCost))
 					usr << "You don't have enough fragments to buy [src]."
@@ -788,6 +792,7 @@ obj/Items/Armor
 	//InnatelyAscended//just in case
 	//Element
 	var/Conjured=0
+	var/MagicArmor=1
 	Unobtainable=1
 	UpdatesDescription=1
 	Repairable=1
@@ -890,6 +895,13 @@ obj/Items/Sword
 	TechType="Forge"
 	UpdatesDescription=1
 	Repairable=1
+	verb/Toggle_Hat()
+		if(IsHat)
+			usr << "Your sword will lay <font color='red'>beneath</font color> your hair now."
+			IsHat=0;
+		else
+			usr << "Your sword wil lay <font color='green'>atop</font color> your hair now."
+			IsHat=1;
 	Wooden
 		name="Training Sword"
 		Unobtainable=0
@@ -953,6 +965,7 @@ obj/Items/Sword
 		HighFrequency=1
 		TechType="MilitaryTechnology"
 		SubType="Melee Weaponry"
+		desc="A specialized form of a light sword that is most effective in the hands of those with cybernetic implants. Responds particularly well to alloys. (Quicksilver Alloy, Resistant Coating, and Fiber Bonding Agents)."
 		unsheatheIcon = 'KATANA SILVER.dmi'
 		unsheatheOffsetX = -16
 		unsheatheOffsetY = -16
@@ -975,9 +988,7 @@ obj/Items/Sword
 		Legendary
 			LegendaryItem=1
 			Unobtainable=1
-			Ascended=3
-			ShatterCounter=700
-			ShatterMax=700
+			Ascended=6
 			Yukianesa
 				name="Yukianesa"
 				icon='Yukianesa.dmi'
@@ -988,10 +999,9 @@ obj/Items/Sword
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
-				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 3, "AngerThreshold" = 1.5)
+				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15, "IceHerald"=1, "Freezing"=5, "SpiritFlow"=2, "WaveDancer"=2, "RenameMana"="HEAT")
 				Destructable=0
 				ShatterTier=0
-				ManaGeneration=3
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Frost_End", "/obj/Skills/AutoHit/FrostBite", "/obj/Skills/Projectile/Sword/TougaHyoujin", "/obj/Skills/Queue/KokujinYukikaze")
 
 
@@ -1124,7 +1134,7 @@ obj/Items/Sword
 		Legendary
 			LegendaryItem=1
 			Unobtainable=1
-			Ascended=3
+			Ascended=6
 			ShatterCounter=1000
 			ShatterMax=1000
 
@@ -1134,7 +1144,7 @@ obj/Items/Sword
 				pixel_x=-32
 				pixel_y=-32
 				NoSaga=1
-				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 3, "AngerThreshold" = 1.5)
+				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5, "RenameMana"="HEAT", "BlockChance"=20, "CriticalBlock"=0.15, "Brutalize"=2, "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
 				CalmAnger=1
@@ -1339,7 +1349,7 @@ obj/Items/proc/UnEquip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src, /obj/Items/Enchantment/Staff))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(istype(src, /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
@@ -1412,7 +1422,7 @@ obj/Items/proc/Equip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(A==src.loc)
@@ -1489,7 +1499,7 @@ obj/Items/proc/Equip(mob/A)
 		A.overlays+=im
 	else if(!istype(src, /obj/Items/Flask)) // Hijacks ur code lol lmao
 		var/image/im=image(icon=src.icon, pixel_x=src.pixel_x, pixel_y=src.pixel_y, layer=placement)
-			
+
 		if(istype(src, /obj/Items/Sword) || istype(src, /obj/Items/Enchantment/Staff))
 			if(A.ArmamentGlow)
 				im.filters += A.ArmamentGlow
@@ -2318,14 +2328,14 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 			OMsg(usr, "[usr] steals [src] from [OldLoc]!")
 			usr.contents+=src
 			usr.Grid("Loot", Lootee=OldLoc)
-			
-	if(istype(src, /obj/Items/Flask)) // we pass the equipped flask proc stored in User (a mob), 
+
+	if(istype(src, /obj/Items/Flask)) // we pass the equipped flask proc stored in User (a mob),
 		if(User.equippedFlask && User.equippedFlask != src) // we check if they have a flask equipped and if it's not the source of this
 			User << "You already have a Flask Equipped" // Dimwit
 			return
 		User.equippedFlask = null
 		src.AlignEquip(User)
-			
+
 
 
 

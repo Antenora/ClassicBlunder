@@ -72,12 +72,13 @@
                         es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Honor", "Zeal", "Pride")
                     if("Namekian")
                         es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Warrior", "Dragon", "Demon")
+            es.ShroudedPassives = list();
             switch(es.ShroudedSubtype)
                 if("Feathers")
-                    es.ShroudedPassives["CriticalChance"] = 10;
-                    es.ShroudedPassives["CriticalDamage"] = 0.2;
-                    es.ShroudedPassives["CriticalBlock"] = 10;
-                    es.ShroudedPassives["BlockDamage"] = 0.2;
+                    es.ShroudedPassives["CriticalChance"] = 15;
+                    es.ShroudedPassives["CriticalDamage"] = 0.15;
+                    es.ShroudedPassives["CriticalBlock"] = 15;
+                    es.ShroudedPassives["BlockDamage"] = 0.15;
                 if("Heart")
                     es.ShroudedPassives["Harden"] = 2;
                     es.ShroudedPassives["CallousedHands"] = 0.2;
@@ -87,22 +88,67 @@
                     es.ShroudedPassives["Brutalize"] = 2;
                     es.ShroudedPassives["Unnerve"] = 1;
                 if("Heroism")
-                    es.ShroudedPassives["BuffMastery"] = 10;
+                    es.ShroudedPassives["BuffMastery"] = 5;
                     es.ShroudedPassives["ShonenPower"] = 0.5;
                     es.ShroudedPassives["Persistence"] = 3;
                 if("Resourceful")
                     es.ShroudedPassives["GodSpeed"] = 4;
                 if("Dogged")
                     es.ShroudedPassives["Motivation"] = 0.25;
-                if("Honor") src << "oops"
-                if("Zeal") src << "oops"
-                if("Pride") src << "oops"
-                if("Warrior") src << "oops"
-                if("Dragon") src << "oops"
-                if("Demon") src << "oops"
-
-        //t6 later (something unique)
-                
+                if("Honor")
+                    es.ShroudedPassives["AngerAdaptiveForce"] = 0.3;
+                    es.ShroudedPassives["PureReduction"] = 2;
+                    es.ShroudedPassives["Juggernaut"] = 2;
+                if("Zeal")
+                    es.ShroudedPassives["LikeWater"] = 2;
+                    es.ShroudedPassives["Adaptation"] = 2;
+                    es.ShroudedPassives["MovementMastery"] = 5;
+                if("Pride")
+                    es.ShroudedPassives["PureDamage"] = 2;
+                    es.ShroudedPassives["Steady"] = 2;
+                    es.ShroudedPassives["Brutalize"] = 2;
+                if("Warrior")
+                    es.ShroudedPassives["TechniqueMastery"] = 2;
+                    es.ShroudedPassives["Duelist"] = 2;
+                    es.ShroudedPassives["Tenacity"] = 2;
+                if("Dragon")
+                    es.ShroudedPassives["QuickCast"] = 2;
+                    es.ShroudedPassives["SpiritFlow"] = 1;
+                    es.ShroudedPassives["HybridStrike"] = 1;
+                if("Demon")
+                    es.ShroudedPassives["AngerAdaptiveForce"] = 0.3;
+                    es.ShroudedPassives["MovementMastery"] = 5;
+                    es.ShroudedPassives["Extend"] = 1;
+                    es.ShroudedPassives["Gum Gum"] = 1;
+        if(es.currentTier >= 5)
+            if(!es.ShroudedMastery)
+                if(es.ShroudedOrigin=="Beastkin") es.ShroudedMastery = "Rifts"
+                if(es.ShroudedOrigin=="Human") es.ShroudedMastery = "Duplicity"
+                if(es.ShroudedOrigin=="Saiyan") es.ShroudedMastery = "Despair"
+                if(es.ShroudedOrigin=="Namekian") es.ShroudedMastery = "Eternity"
+                src << "After being coated in the ichor of the Sea of Darkness, you are the master of <b>[es.ShroudedMastery]</b>."
+            src << "You exhibit perfect mastery over your Shrouded Origin!"
+            switch(es.ShroudedMastery)
+                if("Rifts")
+                    es.ShroudedPassives["TripleStrike"] = 0.5;
+                    es.ShroudedPassives["SoulSteal"] = 0.05;
+                    es.ShroudedPassives["AttackSpeed"] = 2;
+                    es.ShroudedPassives["Iaijutsu"] = 2;
+                if("Duplicity")
+                    es.ShroudedPassives["ShonenPower"] = 0.5;
+                    es.ShroudedPassives["Conductor"] = 20;
+                    es.ShroudedPassives["UnderDog"] = 2;
+                    es.ShroudedPassives["Tenacity"] = 2;
+                if("Despair")
+                    es.ShroudedPassives["SaiyanPower"] = 0.5;
+                    es.ShroudedPassives["PureDamage"] = 2;
+                    es.ShroudedPassives["PureReduction"] = 2;
+                    es.ShroudedPassives["Flicker"] = 2;
+                if("Eternity")
+                    es.ShroudedPassives["Instinct"] = 3;
+                    es.ShroudedPassives["Flow"] = 3;
+                    es.ShroudedPassives["BuffMastery"] = 5;
+                    es.ShroudedPassives["Pursuer"] = 3;
 
 /mob/var
     TetherPacted=0;
@@ -163,7 +209,7 @@
         return 0;
     var/Cost = GetTetherWarpCost();
     if(GetMineral() < Cost)//always costs mana bits for Shrouded to warp
-        src << "You don't have enough mana bits to warp (You needs [Commas(Cost)])"
+        src << "You don't have enough mana bits to warp (You need [Commas(Cost)])"
         return 0;
     var/list/tetherOptions = findTetherPacts();
     if(!tetherOptions)
@@ -173,7 +219,7 @@
 
 /mob/proc/findTetherPacts()
     var/list/l = list();
-    for(var/mob/Players/p in world)
+    for(var/mob/Players/p in players)
         if(p.TetherPactOwner == key)
             l.Add(p);
     if(l.len > 0) return l;
@@ -228,3 +274,4 @@ obj/Skills/Utility
             //aesthetics
             usr.loc = choice.loc;
             OMsg(usr, "<font color='purple'>...<b>[usr]'s Shroud</b> drags their body through space to a fellow Tether!!</font color>");
+            Using=0;

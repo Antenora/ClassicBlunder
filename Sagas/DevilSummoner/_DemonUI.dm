@@ -518,8 +518,8 @@
 	demon_withdraw_open = TRUE
 	SendDemonPortraitResources(list(demon_name))
 
-	var/base_cost     = cd.base_level * 500
-	var/recorded_cost = cd.recorded_level * 500
+	var/base_cost     = cd.base_level * 250
+	var/recorded_cost = cd.recorded_level * 250
 	var/has_recorded = (cd.recorded_skills && cd.recorded_skills.len)
 
 	var/html = "<html><head><style>body{[DS_STYLE]margin:8px;}</style></head><body data-src='\ref[world]' onunload=\"var s=document.body.getAttribute('data-src');window.location='byond://?src='+s+';demon_window_close=withdraw';\">"

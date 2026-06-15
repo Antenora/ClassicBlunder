@@ -212,8 +212,6 @@ transformation
 				if(user.transUnlocked < user.transActive+1)
 					if(!(user.bypassTransAutomation >= user.transActive+1) && glob.lockTransAutomation && (type in glob.transLocked)) return
 					if(unlock_potential >= user.Potential) return
-			if(glob.racials.AUTO_SSJ_MASTERY)
-				gainMastery()
 			mastery_boons(user)
 			class_boons(user)
 
@@ -387,7 +385,7 @@ transformation
 					user.LoseEnergy(30)
 					user << "The strain of [src] is too much for you to handle!"
 
-		gainMastery(mob/user)
+/*		gainMastery(mob/user)
 			if(mastery >= 100) return
 			if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN))
 				if(user.transActive==1&&user.oozaru_type!="Demonic")
@@ -409,4 +407,4 @@ transformation
 					if(user.Potential>=43&&mastery<100)
 						mastery=100
 			if(mastery > 100)
-				mastery=100
+				mastery=100*/

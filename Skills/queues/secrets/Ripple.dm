@@ -11,6 +11,8 @@ obj
 				Duration=2
 				Counter=1
 				ActiveMessage="rushes in with an elbow counter assault: <b>Rebuff Overdrive!!</b>"
+				adjust(mob/p)
+					DamageMult=2.5
 				//set manually so no verb
 			Zoom_Punch
 				DamageMult=2.5
@@ -22,6 +24,7 @@ obj
 				IconLock='Ultima Arm.dmi'
 				HitMessage="dislocates their arm to deliver a surprise strike: <b>Zoom Punch!</b>"
 				adjust(mob/p)
+					DamageMult=2.5
 					var/secretlevel= p.getSecretLevel()
 					Warp=3 * secretlevel
 				//set manually so no verb

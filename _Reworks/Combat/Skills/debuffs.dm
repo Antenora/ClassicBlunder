@@ -41,8 +41,9 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare
 	AlwaysOn = 0
 	NeedsPassword = 0
+	IconLock = 'root.dmi'
 	passives = list("Snared" = 1)
-	adjust(mob/p, limit = 3, _icon = 'root.dmi')
+	adjust(mob/p, limit = null, _icon = null)
 		if(limit)
 			TimerLimit = limit
 		if(_icon)
@@ -178,7 +179,7 @@
 		endAdd = -glob.OVERHWELMING_BASE_END_NERF * total_stacks
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed
-	TimerLimit = 10
+	TimerLimit = 5
 	AlwaysOn = 0
 	NeedsPassword = 0
 	PauseInRP = 1

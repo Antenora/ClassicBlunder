@@ -36,8 +36,7 @@
 /mob/proc/DemonIsElemental(dname)
 	var/datum/demon_data/dd = DEMON_DB[dname]
 	if(!dd) return FALSE
-	var/r = dd.demon_race
-	return (r == "Erthys" || r == "Aeros" || r == "Aquans" || r == "Flaemis")
+	return (dd.demon_race == "Element")
 
 /mob/proc/IsTrueDemonOnly(demon_name)
 	if(!demon_name) return FALSE
@@ -385,6 +384,7 @@
 					break
 			// Revert owner-targeted passive
 			old.RemoveDemonPassives()
+			old.RemoveSummonerPassiveGrants()
 			old.ai_owner = null // Stop AI loop immediately
 			animate(old, alpha=0, time=8)
 			spawn(8) del(old)
@@ -412,7 +412,7 @@
 	demon_active_name = demon_name
 
 	src << "You summon <b>[demon_name]</b>!"
-	demon_summon_cooldown = world.time + 600  // 60s
+	demon_summon_cooldown = world.time + 300  // 30s
 
 	// Tier 4+ racial passive
 	if(SagaLevel >= 4 && dd.demon_race)
@@ -441,7 +441,7 @@
 	demon_active      = null
 	demon_active_name = ""
 	src << "You unsummon your demon."
-	demon_summon_cooldown = world.time + 600  // 60s
+	demon_summon_cooldown = world.time + 300  // 30s
 
 
 /mob/proc/ExecuteFusion(name_a, name_b)
@@ -728,11 +728,11 @@
 		return
 
 	var/chosen_level = cd.base_level
-	var/cost = cd.base_level * 500
+	var/cost = cd.base_level * 250
 
 	if(level_choice == "recorded")
 		chosen_level = cd.demon_potential
-		cost = cd.demon_potential * 500
+		cost = cd.demon_potential * 250
 
 	if(!HasFragments(cost))
 		src << "Insufficient Mana Bits. You need [cost] to withdraw [demon_name]."

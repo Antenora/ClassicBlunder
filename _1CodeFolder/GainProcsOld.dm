@@ -13,6 +13,7 @@ mob/proc/Meditation()
 			src.VaizardHealth=0
 		if(passive_handler.Get("AbsorbingDamage"))
 			AbsorbingDamage = 0
+		WarmingUpBonus = 0
 		if(passive_handler["Shellshocked"])
 			passive_handler.Set("Shellshocked", 0)
 		if(isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin")

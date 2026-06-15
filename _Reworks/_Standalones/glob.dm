@@ -132,6 +132,9 @@ progressTracker
 
 		SAGA_T2_POT = 15
 		SAGA_T3_POT = 25
+		SAGA_T4_POT = 45
+		SAGA_T5_POT = 60
+		SAGA_T6_POT = 75
 
 		//unfortunately these must be set through a very dumb proc in _world.dm
 		T1_STYLES = list(10, 20, 25, 35)
@@ -223,6 +226,8 @@ globalTracker
 
 		DISABLE_ALL_TELEPORTS = FALSE
 
+		MOB_POTENTIAL_MODIFIER = 99
+
 // - races
 		list/LockedRaces = list()
 		list/CustomCommons = list("Majin","Half-Saiyan", "Android")
@@ -251,10 +256,10 @@ globalTracker
 		celestialObjectTicks
 		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, DRAGON, ELF, SAIYAN, ANGEL, MAKAIOSHIN)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
-		T3_STYLES_GODKI_VALUE = 0.15
-		T3_SAGA_STLYE_GODKI = 0
-		T4_STYLES_GODKI_VALUE = 0.1
-		T4_SAGA_STLYE_GODKI = 0
+		T3_STYLES_GODKI_VALUE = 0.15//Would recommend moving this to 0.25
+		T3_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
+		T4_STYLES_GODKI_VALUE = 0.15//Would recommend this also be 0.25 for a cumulative 0.5
+		T4_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
 		SENSE7GODKI=0.25
 		SENSE8GODKI=0.25
 		SENSE9GODKI=0.25
@@ -303,6 +308,7 @@ globalTracker
 		TENACITY_VAI_MIN = 2
 		TENACITY_VAI_MAX = 14
 
+		ELEMENTAL_DIVIDER = 1
 
 		UNDERDOG_DMG_MULTIPLER = 1
 		UNDERDOG_RED_MULTIPLER = 1
@@ -415,6 +421,7 @@ globalTracker
 		DevilSummonerDemonDamageMod = 1
 		DevilSummonerDemonSkillMod = 1
 		DevilSummonerDemonDamageTakenMod = 1
+		DEMON_SUMMONER_GRANT_FACTOR = 0.5
 		WOUND_RECOVERY_REDUCTION = 0.5
 
 		OXYGEN_DRAIN = 3
@@ -447,8 +454,8 @@ globalTracker
 		GRAPPLE_MELEE_BOON = 1.25
 		GRIPPY_MOD = 0.25
 		CLAMP_POWER = TRUE
-		MIN_POWER_DIFF = 0.5
-		MAX_POWER_DIFF = 2
+		MIN_POWER_DIFF = 0.1
+		MAX_POWER_DIFF = 5
 		AUTOHIT_GRAB_NERF = 0.5
 		PARTY_DAMAGE_NERF = 0.8
 		MOD_AFTER_ACC = TRUE
@@ -494,6 +501,7 @@ globalTracker
 		DMG_END_EXPONENT = 0.4
 		DMG_STR_EXPONENT = 0.4
 		DMG_POWER_EXPONENT = 0.3
+		DMG_ACC_EXPONENT = 0.4
 		PURE_MODIFIER = 0.5
 		PURE_MOD_POST_CALC = TRUE
 		TENSION_MULTIPLIER = 1
@@ -510,11 +518,17 @@ globalTracker
 		ROYAL_GUARD_CHARGE_MULT=1.0
 		ROYAL_GUARD_DMG_MULT=1.0
 
+		CASTING_PASSIVE_DIVISOR = 4
+
 		TILE_DURATION_DIVISOR=2
 
 		HARDER_THEY_FALL_BIO_DIVISOR = 100 // if u use this when changie first start it will do big damage
 		HARDER_THEY_FALL_VAI_DIVISOR = 25 // more often no1 has this much vai, in hindsight deus ex machima will give kob more tha nthis, but they will suffer 2x damage ig
 
+
+		PRIMORDIAL_EFFECTIVENESS = 1
+
+		SANCTIFY_EFFECTIVENESS = 1
 // dmg rolls
 		min_damage_roll = 0.4
 		max_damage_roll = 0.8
@@ -538,7 +552,7 @@ globalTracker
 		SWORD_GLOBAL_ACCURACY_NERF = 0.1
 		STAFF_GLOBAL_ACCURACY_NERF = 0.1
 		ARMOR_GLOBAL_ACCURACY_NERF = 0.2
-		MAX_SWORD_ASCENSION = 5
+		MAX_SWORD_ASCENSION = 6
 
 		AUTOHIT_WHIFF_DAMAGE = 2
 		AUTOHIT_MISS_DAMAGE = 5
@@ -600,13 +614,16 @@ globalTracker
 
 
 		DEICIDE_DAMAGE_DIVISOR = 2
-		HOLY_DAMAGE_DIVISOR = 2
-		ABYSS_DAMAGE_DIVISOR = 2
+		HOLY_DAMAGE_DIVISOR = 10
+		ABYSS_DAMAGE_DIVISOR = 10
 		SLAYER_DAMAGE_DIVISOR = 2
 		ENRAGED_DAMAGE_DIVISOR = 2
 		SLAYER_DAMAGE_CLAMP = 10
 		SPIRIT_FORM_BASE_RATE = 0.15
 		SPIRIT_FORM_LEAK_VAL = 3
+		BEYOND_PURITY_AUTOHIT = 0
+
+		DEFLECTION_DAMAGE_MULT = 0.075
 // -- items -- //
 
 		JSON_PASSIVES = list()

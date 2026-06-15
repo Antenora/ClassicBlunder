@@ -69,7 +69,7 @@ ascension
 							defense = 0.5
 							endurance = 0.5
 							speed = 0.4
-							passives += list("KiControlMastery"= 1)
+							passives += list("KiControlMastery"= 1, "Flow" = 2, "Instinct" = 2)
 						if("Resourceful")
 							offense = 0.1
 							strength = 0.1
@@ -105,7 +105,7 @@ ascension
 							defense = 1
 							endurance = 1
 							speed = 0.4
-							passives  += list("PureDamage" = 2, "PureReduction" = 2)
+							passives  += list("PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
 							if(!owner.passive_handler.Get("FavoredPrey"))
 								passives  += list("FavoredPrey" = "Transformations")
 						if("Resourceful")
@@ -152,7 +152,7 @@ ascension
 							defense = 1
 							endurance = 1
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 3, "PureReduction" = 3)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 3, "PureReduction" = 3, "Flow" = 2, "Instinct" = 2)
 							//TO DO - Something that makes them scale with SSj2. Passives? Inherent buff? hm.
 						if("Resourceful")
 							offense = 0.1
@@ -206,13 +206,13 @@ ascension
 							endurance = 0.25
 							speed = 0.25
 						if("Heroic")
-							offense = 1.5
-							strength = 1.5
-							force = 1.5
-							defense = 1.5
-							endurance = 1.5
+							offense = 2
+							strength = 2
+							force = 2
+							defense = 2
+							endurance = 2
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this three times
 						if("Resourceful")
 							offense = 0.1
@@ -223,8 +223,6 @@ ascension
 							speed = 0.4
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
-				if(owner.Class=="Underdog" && owner.transUnlocked<4)
-					owner.transUnlocked=4
 				applyDormantDemonPassives(owner)
 				..()
 
@@ -245,13 +243,13 @@ ascension
 							endurance = 0.25
 							speed = 0.25
 						if("Heroic")
-							offense = 1.5
-							strength = 1.5
-							force = 1.5
-							defense = 1.5
-							endurance = 1.5
+							offense = 2.5
+							strength = 2.5
+							force = 2.5
+							defense = 2.5
+							endurance = 2.5
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this four times
 						if("Resourceful")
 							offense = 0.1
@@ -288,7 +286,7 @@ ascension
 							defense = 2
 							endurance = 2
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 3, "Instinct" = 3)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this five times
 						if("Resourceful")
 							offense = 0.1

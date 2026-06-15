@@ -1,4 +1,6 @@
 /mob/proc/godKiModifiers(mob/defender, destructive)
+	if(istype(src, /mob/Player/AI/Demon) || istype(defender, /mob/Player/AI/Demon) || src.isRace(DEMIFIEND) || defender.isRace(DEMIFIEND))
+		return
 	if(HasGodKi())
 		. += (GetGodKi() * 10) * glob.GODKI_DIFF_MULT
 	if(defender.HasGodKi() && destructive < 2 )

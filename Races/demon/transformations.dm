@@ -6,12 +6,12 @@ transformation
 			unlock_potential = 80
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
-			strength = 1.1
-			speed = 1.2
-			offense = 1.2
-			defense = 1.2
-			force = 1.1
-			endurance = 1.2
+			strength = 1
+			speed = 1
+			offense = 1
+			defense = 1
+			force = 1
+			endurance = 1
 			transformation_message = "usrName pulls their Devil Trigger."
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -38,38 +38,58 @@ transformation
 						da.applyDTIcons(user)
 
 			mastery_boons(mob/user)
+				strength = 1
+				speed = 1
+				offense = 1
+				defense = 1
+				force = 1
+				endurance = 1
+				enduranceadd = 0.5
+				offenseadd = 0.5
+				defenseadd = 0.5
+				strengthadd = 0.5
+				forceadd = 0.5
+				speedadd = 0.5
+				if(user.Potential>=40&&mastery<25)
+					mastery=25
+				if(user.Potential>=55&&mastery<50)
+					mastery=50
+				if(user.Potential>=70&&mastery<75)
+					mastery=75
+				if(user.Potential>=85&&mastery<100)
+					mastery=100
 				if(mastery >= 25)
-					passives = list("GodKi" = 0.15, "HellRisen" = 0.5, "DemonicDurability" = 4, "Brutalize" = 1, "PureDamage" = 3, "PureReduction" = 3)
-					strength = 1.15
-					speed = 1.25
-					offense = 1.25
-					defense = 1.25
-					force = 1.15
-					endurance = 1.25
+					passives = list("HellRisen" = 0.5, "DemonicDurability" = 2, "Brutalize" = 2, "PureDamage" = 3, "PureReduction" = 3)
+					enduranceadd = 0.5
+					offenseadd = 0.5
+					defenseadd = 0.5
+					strengthadd = 0.5
+					forceadd = 0.5
+					speedadd = 0.5
 				if(mastery >= 50)
-					passives = list("GodKi" = 0.35, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 2, "PureDamage" = 4, "PureReduction" = 4, "MovementMastery" = 3, "BuffMastery"=3)
-					strength = 1.2
-					speed = 1.3
-					offense = 1.3
-					defense = 1.3
-					force = 1.2
-					endurance = 1.3
+					passives = list("HellRisen" = 0.75, "DemonicDurability" = 3, "Brutalize" = 2, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6)
+					enduranceadd = 0.75
+					offenseadd = 0.75
+					defenseadd = 0.75
+					strengthadd = 0.75
+					forceadd = 0.75
+					speedadd = 0.75
 				if(mastery >= 75)
-					passives = list("GodKi" = 0.5, "HellRisen" = 0.75, "DemonicDurability" = 6, "Brutalize" = 4, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3, "BuffMastery"=6)
-					strength = 1.25
-					speed = 1.35
-					offense = 1.35
-					defense = 1.35
-					force = 1.25
-					endurance = 1.35
+					passives = list("GodKi" = 0.5, "HellRisen" = 0.75, "DemonicDurability" = 4, "Brutalize" = 2, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 3, "Steady" = 3)
+					enduranceadd = 1
+					offenseadd = 1
+					defenseadd = 1
+					strengthadd = 1
+					forceadd = 1
+					speedadd = 1
 				if(mastery >= 100)
-					passives = list("GodKi" = 1, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6, "BuffMastery"=6)
-					strength = 1.3
-					speed = 1.4
-					offense = 1.4
-					defense = 1.4
-					force = 1.3
-					endurance = 1.4
+					passives = list("GodKi" = 0.75, "HellRisen" = 1, "DemonicDurability" = 6, "Brutalize" = 6, "PureDamage" = 6, "PureReduction" = 6, "MovementMastery" = 6, "TechniqueMastery" = 6, "Steady" = 6, "ManaStats" = 6)
+					enduranceadd = 2
+					offenseadd = 2
+					defenseadd = 2
+					strengthadd = 2
+					forceadd = 2
+					speedadd = 2
 			transform_animation(mob/user)
 				var/ShockSize=5
 				for(var/wav=5, wav>0, wav--)

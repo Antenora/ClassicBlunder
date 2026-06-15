@@ -15,12 +15,12 @@
 			StyleStr = 1.9
 			StyleFor = 1.75
 			StyleOff = 1.6
-			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2, "Brutalize" = 2, "MartialMagic" = 1, "PureDamage" = 3)
+			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2, "Brutalize" = 1, "MartialMagic" = 1, "PureDamage" = 3, "CriticalChance" = 20, "CriticalDamage" = 0.2)
 		else if(tier >= 2)
 			StyleStr = 1.4
 			StyleFor = 1.35
 			StyleOff = 1.3
-			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2, "Brutalize" = 1)
+			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2, "Brutalize" = 0.5, "CriticalChance" = 10, "CriticalDamage" = 0.1)
 		else
 			StyleStr = 1.2
 			StyleFor = 1.15
@@ -28,6 +28,9 @@
 			passives = list("HeavyHitter" = 1, "Scorching" = 1)
 	verb/Fire_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Water_Gestalt
@@ -55,6 +58,9 @@
 			passives = list("FluidForm" = 1, "Blubber" = 1)
 	verb/Water_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Earth_Gestalt
@@ -69,12 +75,12 @@
 			StyleEnd = 1.9
 			StyleFor = 1.75
 			StyleDef = 1.6
-			passives = list("Harden" = 1, "Steady" = 1, "Grit" = 2, "MeleeResist" = 1, "Tenacity" = 2, "PureReduction" = 3)
+			passives = list("Harden" = 1, "Steady" = 1, "MeleeResist" = 1, "Tenacity" = 2, "PureReduction" = 3)
 		else if(tier >= 2)
 			StyleEnd = 1.4
 			StyleFor = 1.35
 			StyleDef = 1.3
-			passives = list("Harden" = 1, "Steady" = 1, "Grit" = 2, "MeleeResist" = 1)
+			passives = list("Harden" = 1, "Steady" = 1, "MeleeResist" = 1, "PureReduction" = 2)
 		else
 			StyleEnd = 1.2
 			StyleFor = 1.15
@@ -82,6 +88,9 @@
 			passives = list("Harden" = 1, "Steady" = 1)
 	verb/Earth_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Wind_Gestalt
@@ -109,6 +118,9 @@
 			passives = list("BlurringStrikes" = 1, "AttackSpeed" = 1)
 	verb/Wind_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Light_Gestalt
@@ -123,19 +135,22 @@
 			StyleEnd = 1.9
 			StyleSpd = 1.75
 			StyleDef = 1.6
-			passives = list("Steady" = 1, "HolyMod" = 5, "BuffMastery" = 2, "Grit" = 1, "Fury" = 2)
+			passives = list("Steady" = 1, "HolyMod" = 5, "BuffMastery" = 2, "Fury" = 2, "ManaGeneration" = 3, "EnergyGeneration" = 3)
 		else if(tier >= 2)
 			StyleEnd = 1.4
 			StyleSpd = 1.35
 			StyleDef = 1.3
-			passives = list("Steady" = 1, "HolyMod" = 3, "BuffMastery" = 2, "Grit" = 1)
+			passives = list("Steady" = 1, "HolyMod" = 3, "BuffMastery" = 2, "Fury" = 2, "ManaGeneration" = 2, "EnergyGeneration" = 2)
 		else
 			StyleEnd = 1.2
 			StyleSpd = 1.15
 			StyleDef = 1.1
-			passives = list("Steady" = 1, "HolyMod" = 1)
+			passives = list("Steady" = 1, "HolyMod" = 1, "ManaGeneration" = 1, "EnergyGeneration" = 1)
 	verb/Light_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Dark_Gestalt
@@ -150,10 +165,6 @@
 			StyleFor = 1.9
 			StyleStr = 1.75
 			StyleOff = 1.6
-			// Brutalize replaces Sadist here: Sadist's damage bonus only fires inside
-			// applySinBonusFromDealtDamage which is gated by demonDevilTriggerSinMastery() (DT + 50+ mastery),
-			// so non-Mazoku Dark mages saw nothing. Brutalize is a universal damage
-			// passive that fits Dark's offensive identity.
 			passives = list("KillerInstinct" = 0.1, "CriticalChance" = 20, "CriticalDamage" = 0.2, "LifeSteal" = 20, "Pressure" = 2, "Momentum" = 2, "Brutalize" = 2)
 		else if(tier >= 2)
 			StyleFor = 1.4
@@ -167,6 +178,9 @@
 			passives = list("KillerInstinct" = 0.1, "CriticalChance" = 20, "CriticalDamage" = 0.2)
 	verb/Dark_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Time_Gestalt
@@ -194,6 +208,9 @@
 			passives = list("TechniqueMastery" = 1, "CounterMaster" = 1)
 	verb/Time_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)
 
 /obj/Skills/Buffs/NuStyle/Magus_Style/Space_Gestalt
@@ -221,4 +238,7 @@
 			passives = list("Warping" = 1, "SuperDash" = 1)
 	verb/Space_Gestalt()
 		set hidden = 1
+		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
+			usr << "Your Saga prevents you from using a Gestalt Style."
+			return
 		src.Trigger(usr)

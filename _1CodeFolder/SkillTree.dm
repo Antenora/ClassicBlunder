@@ -91,7 +91,8 @@ var/list/SkillTree=list(
 ),
 "UnarmedT5"=list(
 			"/obj/Skills/Grapple/The_Show_Stopper"=200,
-			"/obj/Skills/Queue/GET_DUNKED"=200
+			"/obj/Skills/Queue/GET_DUNKED"=200,
+			"/obj/Skills/AutoHit/Meteor_Strike"=200
 
 ),
 
@@ -139,7 +140,8 @@ var/list/SkillTree=list(
 ),
 
 "BlastT5"=list(
-			"/obj/Skills/Projectile/Cataclysmic_Orb"=200
+			"/obj/Skills/Projectile/Cataclysmic_Orb"=200,
+			"/obj/Skills/Projectile/Desperado_Blaster"=200
 ),
 "MagicT1"=list(
 			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Object"=40,

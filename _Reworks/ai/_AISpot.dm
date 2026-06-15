@@ -18,7 +18,7 @@ mob/Admin3/verb/MakeAISpawner()
 	var/boss = input(src, "Is this a boss?") in list("Yes", "No", "Giga?")
 	var/power = 0
 	var/potential = input(src, "What level should the monster be?") as num
-	var/scaling = input(src, "Does the mosnter scale with potenial?") in list("Yes", "No")
+	var/scaling = input(src, "Does the monster scale with potenial?") in list("Yes", "No")
 	var/icon/i = input(src, "What icon do you want it to be?") as icon
 	var/mins = input(src, "How gorked should the mineral mod be?") as num
 	var/goon = input(src, "Is this a goon?") in list("Yes", "No")

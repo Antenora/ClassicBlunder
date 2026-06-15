@@ -73,7 +73,7 @@ magic_node/air_tree
         xLoc = AIR_NODE_WEST3_X
         yLoc = AIR_NODE_WEST3_Y
         nodeType = "Line"
-        grantsSkills = list(/obj/Skills/Projectile/Magic/Air/Mentis_Imperium)
+        grantsSkills = list(/obj/Skills/AutoHit/Magic/Air/Mentis_Imperium)
         unlocksNodes = list(AIR_NODE_NORTH3, AIR_NODE_SOUTH3, AIR_NODE_WEST2);
     air_node_north
         name=AIR_NODE_CROWN

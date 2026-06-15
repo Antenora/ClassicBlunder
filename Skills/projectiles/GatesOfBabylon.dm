@@ -132,37 +132,37 @@ proc/ApplyGoBElement(obj/Skills/Projectile/_Projectile/proj, element, forced)
 	if(!element || element == 0) return
 	switch(element)
 		if("Fire")
-			if(forced) proj.Scorching  = 1
-			else       proj.Burning    = 1
+			if(forced) proj.Scorching  = 15
+			else       proj.Burning    = 15
 		if("Water")
-			if(forced) proj.Freezing   = 1
-			else       proj.Chilling   = 1
+			if(forced) proj.Freezing   = 15
+			else       proj.Chilling   = 15
 		if("Earth")
-			if(forced) proj.Shattering = 1
-			else       proj.Crushing   = 1
+			if(forced) proj.Shattering = 15
+			else       proj.Crushing   = 15
 		if("Wind")
-			if(forced) proj.Paralyzing = 1
-			else       proj.Shocking   = 1
+			if(forced) proj.Paralyzing = 15
+			else       proj.Shocking   = 15
 		if("Poison")
-			if(forced) proj.Toxic      = 1
-			else       proj.Poisoning  = 1
+			if(forced) proj.Toxic      = 15
+			else       proj.Poisoning  = 15
 		if("HellFire")
-			proj.Scorching = 1
-			proj.Toxic     = 1
+			proj.Scorching = 15
+			proj.Toxic     = 15
 		if("Ultima")
-			proj.Scorching = 1
-			proj.Freezing  = 1
-			proj.Shattering = 1
-			proj.Paralyzing = 1
-			proj.Toxic     = 1
+			proj.Scorching = 15
+			proj.Freezing  = 15
+			proj.Shattering = 15
+			proj.Paralyzing = 15
+			proj.Toxic     = 15
 		if("Truth")
 			if(prob(50))
-				proj.Scorching  = 1
-				proj.Toxic      = 1
+				proj.Scorching  = 15
+				proj.Toxic      = 15
 			else
-				proj.Freezing   = 1
-				proj.Shattering = 1
-				proj.Paralyzing = 1
+				proj.Freezing   = 15
+				proj.Shattering = 15
+				proj.Paralyzing = 15
 		// Dark, Light, Void, Love, Death stuff later
 
 
@@ -170,12 +170,12 @@ proc/ApplyGoBElement(obj/Skills/Projectile/_Projectile/proj, element, forced)
 obj/Skills/Projectile/Gates_of_Babylon
 	SignatureTechnique = 3
 	name = "Gates of Babylon"
-	Cooldown = 200
+	Cooldown = 90
 	CooldownStatic = 1
 
-	Speed       = 0.25
+	Speed       = 0.5
 	Distance    = 25
-	DamageMult  = 0.5
+	DamageMult  = 2
 	AccMult     = 1.5
 	Homing      = 3
 	HyperHoming = 1
@@ -429,7 +429,7 @@ obj/Skills/Projectile/Enkidu_Chains
 
 	Speed      = 0.4
 	Distance   = 20
-	DamageMult = 1.0
+	DamageMult = 10
 	AccMult    = 1.3
 	Homing     = 3
 	HyperHoming = 1
@@ -442,8 +442,8 @@ obj/Skills/Projectile/Enkidu_Chains
 	adjust(mob/p)
 		var/obj/Skills/Projectile/Gates_of_Babylon/gob = locate(/obj/Skills/Projectile/Gates_of_Babylon, p)
 		if(gob)
-			Snaring    = 6 + (gob.Mastery * 2)     // M4=14, M5=16 ticks
-			DamageMult = 0.8 + (gob.Mastery * 0.1)  // M4=1.2, M5=1.3
+			Snaring    = 6 + (gob.Mastery * 2)
+			DamageMult = 10 + (gob.Mastery * 1)
 
 	verb/Enkidu_Chains()
 		set category = "Skills"
@@ -519,7 +519,7 @@ obj/Skills/AutoHit/Enuma_Elish
 	Area = "Around Target"
 	Distance = 35
 	DistanceAround = 3
-	DamageMult = 40
+	DamageMult = 50
 	StrOffense = 1
 	ForOffense = 1
 	EndDefense = 1

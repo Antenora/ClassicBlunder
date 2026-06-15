@@ -65,7 +65,7 @@
     strength = 0.75;
     offense = 0.75;
     endurance = 0.5;
-    passives = list("PureDamage" = 2, "Fury" = 2, "Brutalize"=2, "Extend"=2, "SwordDamage"=6)
+    passives = list("PureDamage" = 2, "Fury" = 2, "Brutalize"=2, "Extend"=2, "SwordDamage"=2)
 /ascension/sub_ascension/beastkin/phantomflicker
     strength = 1.25;
     offense = 0.375;
@@ -77,7 +77,7 @@
 /ascension/sub_ascension/beastkin/demonsong
     strength = 1.5;
     speed = 0.5;
-    passives = list("SpiritHand" = 1, "SpiritFlow" = 1, "GiantSwings" = 1, "LifeSteal" = 10)
+    passives = list("SpiritHand" = 2, "SpiritFlow" = 2, "GiantSwings" = 1, "LifeSteal" = 10)
 /ascension/sub_ascension/beastkin/worldwhisper
     endurance = 1;
     defense = 1;
@@ -86,11 +86,13 @@
     force = 0.5;
     offense = 0.5;
     defense = 1;
-    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Siphon" = 2)
+    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Siphon" = 2, "Harden" = 2, "Persistence" = 1)
 
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)
 /mob/proc/getRiftAscensionOptions()
+    liveDebugMsg("picking ascension choice for [race.ascensions[AscensionsAcquired]]")
+    race.ascensions[AscensionsAcquired].pickingChoice=TRUE;
     var/list/availableOptions = subtypesof(/ascension/sub_ascension/beastkin);
     var/list/removeOptions = list();
     removeOptions |= ASC1_SUBASCENSIONS
@@ -101,8 +103,39 @@
         if(availableOptions.Find(a.choiceSelected)) availableOptions.Remove(a.choiceSelected);
     . = list();
     var/list/Return = list()
+    src << "<b>Which of the Masterwork Rift Artifacts stains your bloodline's history?</b>"
     for(var/o in availableOptions)
         var/optionName = copytext("[o]", findLastSlash("[o]"))
         optionName = "[uppertext(copytext(optionName, 1, 2))][copytext(optionName, 2)]"
         Return["[optionName]"] = o;
+        outputRiftArtifactInfo(optionName)
     return Return;
+/mob/proc/outputRiftArtifactInfo(artifact)
+    switch(artifact)
+        if("Frostchain")
+            src << "Is it the freezing FROSTCHAIN, quick, far reaching, and mighty?"
+        if("Kingsblood")
+            src << "Is it the enduring KINGSBLOOD, callous, protective and enraged?"
+        if("Overreach")
+            src << "Is it the steady OVERREACH, unnerving and resistant?"
+        if("Matchless")
+            src << "Is it the technical MATCHLESS, bladeless but deadly?"
+        if("Wargob")
+            src << "Is it GOB GOB GOB GOB GOB GOB GOB GOB GOB GOB GOB GOB???"
+            src << "(Wargob is high a high regen / high durability pick)"
+        if("Triad")
+            src << "Is it the hybrid TRIAD, uniting all sources of power for supremacy?"
+        if("Firstlight")
+            src << "Is it the lucky FIRSTLIGHT, critical in all the right ways?"
+        if("Felglass")
+            src << "Is it the devastating FELGLASS, putting all focus on offensive bladework?"
+        if("Phantomflicker")
+            src << "Is it the quick PHANTOMFLICKER, dextrous and soulstealing?"
+        if("Deadlight")
+            src << "Is it the voided DEADLIGHT, stealthy and harsh?"
+        if("Demonsong")
+            src << "Is it the ravenous DEMONSONG, hybrid and far reaching?"
+        if("Worldwhisper")
+            src << "Is it the natural WORLDWHISPER, with mastery over water and wind?"
+        if("Godword")
+            src << "Is it the stoic GODWORD, unfaltering and imbued with earth's resilience?"

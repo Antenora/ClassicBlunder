@@ -17,6 +17,114 @@
 
 
 
+/obj/Skills/AutoHit/Meteor_Strike
+	UnarmedOnly = 1
+	SkillCost = TIER_5_COST
+	Copyable = 6
+	Area = "Around Target"
+	StrOffense = 2
+	DamageMult = 20
+	Distance = 12
+	DistanceAround = 7
+	Cooldown = 75
+	verb/Meteor_Strike()
+		set category = "Skills"
+		MeteorStrike(usr, src)
+
+proc/MeteorStrike(mob/attacker, obj/Skills/AutoHit/Meteor_Strike/Z)
+	set waitfor = 0
+	if(!attacker || !attacker.client) return
+	if(attacker.HeldSkillBlocksAction(Z)) return
+	if(Z.Using) return
+	if(!attacker.CanAttack(1.5)) return
+	if(Z.UnarmedOnly)
+		var/obj/Items/Sword/s = attacker.EquippedSword()
+		if(s && !attacker.HasBladeFisting())
+			attacker << "You can't have a sword equipped and use Meteor Strike!"
+			return
+	if(!attacker.Target || attacker.Target == attacker)
+		attacker << "You need a target to use Meteor Strike!"
+		return
+	if(attacker.Target.z != attacker.z)
+		attacker << "Your target is on a different z-level!"
+		return
+	if(get_dist(attacker, attacker.Target) > Z.Distance)
+		attacker << "Your target is not in range!"
+		return
+	Z.adjust(attacker)
+	Z.SpellSlotModification()
+	Z.Cooldown(1, null, attacker)
+
+	var/savedColor = attacker.color
+	var/savedPixelZ = attacker.pixel_z
+
+	OMsg(attacker, "<b>[attacker] launches themselves sky high!</b>")
+
+	// Rise animation
+	animate(attacker, pixel_z = savedPixelZ + 300, time = 2, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_PARALLEL)
+	animate(attacker, color = "#FF6600", alpha = 200, time = 2)
+	sleep(2)
+	animate(attacker, alpha = 0, time = 1)
+	sleep(1)
+
+	// Set actual values after fade
+	attacker.alpha = 0
+	attacker.pixel_z = savedPixelZ + 300
+	attacker.color = "#FF6600"
+	animate(attacker)
+
+	// Force all mobs currently targeting the attacker to drop their target
+	var/list/targetters = attacker.BeingTargetted.Copy()
+	for(var/mob/m in targetters)
+		m.RemoveTarget()
+
+	// Airborne state  (untargetable, blocks all outgoing actions, blocks incoming damage, density=0)
+	attacker.Airborne = 1
+	attacker.AirborneInterrupted = 1
+	attacker.density = 0
+
+	sleep(50)
+
+	if(!attacker) return
+	attacker.Airborne = 0
+	attacker.AirborneInterrupted = 0
+	attacker.density = 1
+
+	// Crash at target if still valid, otherwise land at current position
+	var/mob/crashTarget = attacker.Target
+	var/turf/crashLoc
+	if(crashTarget && crashTarget != attacker && crashTarget.z == attacker.z)
+		crashLoc = get_turf(crashTarget)
+	else
+		crashLoc = get_turf(attacker)
+
+	// Teleport to crash site while still invisible
+	attacker.loc = crashLoc
+
+	// descent
+	attacker.pixel_z = savedPixelZ + 300
+	attacker.color = "#FF6600"
+	attacker.alpha = 200
+	animate(attacker, pixel_z = savedPixelZ, time = 2, easing = QUAD_EASING|EASE_IN, flags = ANIMATION_PARALLEL)
+	animate(attacker, color = savedColor, alpha = 255, time = 2)
+	sleep(2)
+
+	// Restore visuals
+	attacker.pixel_z = savedPixelZ
+	attacker.color = savedColor
+	attacker.alpha = 255
+	animate(attacker)
+
+	OMsg(attacker, "<b>[attacker] comes crashing down like a meteor!</b>")
+
+	// Impact effects
+	attacker.Quake(50)
+	var/turf/T = get_turf(attacker)
+	Bang(T, Size = 3, Offset = 6, Vanish = 4)
+	KenShockwave(attacker, icon = 'fevKiai.dmi', Size = 5, Blend = 1, Time = 12)
+
+	attacker.AroundTarget(null, Z, crashLoc)
+
 /mob/var/tmp/last_jump_animation = 0
 
 

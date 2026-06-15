@@ -10,13 +10,12 @@ transformation
 			form_glow_x = -32
 			form_glow_y = -32
 			unlock_potential = 30
-			pot_trans = 20
-			speed = 1.0
-			endurance = 1.0
-			offense = 1.0
-			defense = 1.0
-			strength = 1.0
-			force = 1.0
+			speedadd = 0.25
+			enduranceadd = 0.25
+			offenseadd = 0.25
+			defenseadd = 0.25
+			strengthadd = 0.25
+			forceadd = 0.25
 			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "BuffMastery" = 3, "PureDamage" = 1, "PureReduction" = 1, "SaiyanPower" = 1, "SaiyanPowerVoid" = 1, "ZenkaiPower" = 0.5)
 			angerPoint = 75
 
@@ -37,16 +36,21 @@ transformation
 
 			mastery_boons(mob/user)
 				var/asc = usr.AscensionsAcquired
-				var/mdivS = mastery/200
 				var/mdivP = mastery/100
+				speed=1
+				endurance=1
+				offense=1
+				defense=1
+				strength=1
+				force=1
 				if(mastery >= 25 && asc > 2)
-					speed = 1.0 + (mdivS)
-					endurance = 1.0 + (mdivS)
-					offense = 1.0 + (mdivS)
-					defense = 1.0 + (mdivS)
-					strength = 1.0 + (mdivS)
-					force = 1.0 + (mdivS)
-					passives = list("Instinct" = 1+(mdivP*12), "Flow" = 1+(mdivP*10), "Flicker" = 1+(mdivP*10), "Pursuer" = 2+(mdivP*10), "BuffMastery" = 3+(mdivP*12), "PureDamage" = 1+(mdivP*12), "PureReduction" = 1+(mdivP*12), "SaiyanPower" = 1, "SaiyanPowerVoid" = 1+(0.06*mastery), "ZenkaiPower" = 0.5+(0.025*mastery))
+					speedadd = 0.35 * asc
+					enduranceadd = 0.35 * asc
+					offenseadd = 0.35 * asc
+					defenseadd = 0.35 * asc
+					strengthadd = 0.35 * asc
+					forceadd = 0.35 * asc
+					passives = list("Instinct" = 1+(mdivP*12), "Flow" = 1+(mdivP*10), "Flicker" = 1+(mdivP*10), "Pursuer" = 2+(mdivP*10), "PureDamage" = 1+(2*asc), "PureReduction" = 1+(2*asc), "SaiyanPower" = 1, "SaiyanPowerVoid" = 1+(1.5*asc), "ZenkaiPower" = 0.5+(0.25*asc))
 
 			transform_animation(mob/user)
 				if(first_time && mastery<25)
@@ -93,12 +97,12 @@ transformation
 
 		spectral_tension // temp
 			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "BuffMastery" = 3, "PureDamage" = 1, "PureReduction" = 1)
-			speed = 1.2
-			endurance = 1.2
-			offense = 1.2
-			defense = 1.2
-			strength = 1.2
-			force = 1.2
+			speedadd = 0.35
+			enduranceadd = 0.35
+			offenseadd = 0.35
+			defenseadd = 0.35
+			strengthadd = 0.35
+			forceadd = 0.35
 			pot_trans = 20
 			transformation_message = "usrName manifests the true nature of their body!"
 			adjust_transformation_visuals(mob/user)
@@ -109,17 +113,22 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
+				speed=1
+				endurance=1
+				offense=1
+				defense=1
+				strength=1
+				force=1
 				var/asc = usr.AscensionsAcquired
-				var/mdivS = mastery/200
 				var/mdivP = mastery/100
 				if(mastery >= 25 && asc > 2)
-					speed = 1.2 + (mdivS)
-					endurance = 1.2 + (mdivS)
-					offense = 1.2 + (mdivS)
-					defense = 1.2 + (mdivS)
-					strength = 1.2 + (mdivS)
-					force = 1.2 + (mdivS)
-					passives = list("Instinct" = 1+(mdivP*14), "Flow" = 1+(mdivP*11), "Flicker" = 1+(mdivP*11), "Pursuer" = 2+(mdivP*12), "BuffMastery" = 3+(mdivP*14), "PureDamage" = 1+(mdivP*14), "PureReduction" = 1+(mdivP*14))
+					speedadd = 0.45 + (0.35 * asc)
+					enduranceadd = 0.45 + (0.35 * asc)
+					offenseadd = 0.45 + (0.35 * asc)
+					defenseadd = 0.45 + (0.35 * asc)
+					strengthadd = 0.45 + (0.35 * asc)
+					forceadd = 0.45 + (0.35 * asc)
+					passives = list("Instinct" = 1+(mdivP*14), "Flow" = 1+(mdivP*11), "Flicker" = 1+(mdivP*11), "Pursuer" = 2+(mdivP*12), "PureDamage" = 1+(2.5*asc), "PureReduction" = 1+(2.5*asc))
 
 			transform_animation(mob/user)
 				var/ShockSize=5

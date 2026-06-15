@@ -124,7 +124,7 @@
 	StyleEnd = 0.85
 	StyleDef = 0.85
 	StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Tsui_no_Hiken_Kaguzuchi")
+	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi")
 	ElementalOffense = "HellFire"
 	ElementalDefense = "Fire"
 	ElementalClass = "Fire"
@@ -134,7 +134,7 @@
 	var/obj/Skills/demonSkill = FALSE
 	adjust(mob/p)
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
-		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Tsui_no_Hiken_Kaguzuchi")
+		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi")
 		passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
 					"Heavy Strike" = "Inferno", "Instinct" = 1, "Persistence" = 0.5, "BurnHit" = 0.5)
 	Trigger(mob/User, Override)

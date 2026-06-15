@@ -1,10 +1,11 @@
 obj/Skills/Projectile/Getsuga_Tenshou
 	name = "Getsuga Tenshou"
-	Cooldown = 60
+	ManaCost=5
+	Cooldown = 3
 	NeedsSword=1
 	StrRate = 1
 	ForRate = 1
-	DamageMult = 10
+	DamageMult = 5
 	AccMult = 1.2
 	Distance = 20
 	Homing = 1
@@ -17,7 +18,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	HeldSkill = TRUE
 	ChargePeriod = 3
 	SweetSpot = 1.5
-	SweetSpotBenefit = 2.5
+	SweetSpotBenefit = 2
 	ChargeOverlay='DarkShock.dmi'
 	ChargeWaveIcon='KenShockwaveBloodlust.dmi'
 
@@ -36,6 +37,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 		else
 			icon_used = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
 		p.Blast(src, p, 1, icon_used)
+		src.Cooldown(1, null, p)
 		ResetHeldConfig()
 
 	verb/Getsuga_Tenshou()
@@ -54,6 +56,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 obj/Skills/Projectile/Getsuga_Jujisho
 	name = "Getsuga Jujisho"
 	Cooldown = 120
+	ManaCost=20
 	NeedsSword=1
 	StrRate = 1
 	ForRate = 1

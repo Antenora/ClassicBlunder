@@ -41,14 +41,13 @@ scaling with potential as well
 				StrMult = 1.2
 				ForMult = 1.2
 				EndMult = 1.2
-		EndMult += (p.Potential/200)
-		StrMult += (p.Potential/200)
-		ForMult += (p.Potential/200)
-		DefMult = clamp(0.75 + (p.Potential/200),0.75,1)
-		SpdMult = clamp(0.75 + (p.Potential/200),0.75,1)
-		OffMult = 1.2 + p.Potential/200
-		HealthDrain = 0.007 - (p.Potential * 0.00005)
-		PowerMult = 1 + (p.Potential/200)
+		EndMult += (p.Potential/250)
+		StrMult += (p.Potential/250)
+		ForMult += (p.Potential/250)
+		DefMult = clamp(0.75 + (p.Potential/250),0.75,1)
+		SpdMult = clamp(0.75 + (p.Potential/250),0.75,1)
+		OffMult = 1.2 + p.Potential/250
+		HealthDrain = 0.007 - (p.Potential * 0.000025)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -66,7 +65,7 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/25,1), "DemonicDurability" = round(p.Potential/30,1), \
-						"LikeWater" = 2 + round(p.Potential/25,1), "Flicker" = 1, "Pursuer" = 1,  "BuffMastery" = 1.5, "PureDamage" = 0.5, "PureReduction" = 0.5, \
+						"LikeWater" = 2 + round(p.Potential/25,1), "Flicker" = 1, "Pursuer" = 1, "PureDamage" = 0.5, "PureReduction" = 0.5, \
 						"Meaty Paws" = round(p.Potential/20,1), "Instinct" = 2, "Flow" = 2 )
 		switch(p.oozaru_type)
 			if("Wrathful")
@@ -85,7 +84,7 @@ scaling with potential as well
 		StrMult += (p.Potential/150)
 		ForMult += (p.Potential/150)
 		PowerMult = 1 + (p.Potential/200)
-		HealthDrain = 0.009 - (p.Potential * 0.00005)
+		HealthDrain = 0.009 - (p.Potential * 0.000025)
 		AngerMult = 1 + (p.Potential/150)
 		if(p.Potential>=100)
 			passives["Wrathful"] = 1
@@ -104,15 +103,14 @@ scaling with potential as well
 	BuffName = "Chou Wrathful"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/10,1), "DemonicDurability" = round(p.Potential/15,1), "AngerAdaptiveForce" = round(p.Potential/100), \
-						"Powerhouse" = 1 + (p.Potential/75), "Instinct" = 3, "Flow" = 3, "Flicker" = 2, "Pursuer" = 2, "BuffMastery" = 2, "PureDamage" = 1, "PureReduction" = 1)
-		EndMult = 1 + (p.Potential/75)
-		StrMult = 1 + (p.Potential/75)
-		ForMult = 1 + (p.Potential/75)
-		PowerMult = 1 + (p.Potential/150)
+		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/10,1), "DemonicDurability" = round(p.Potential/50,1), "AngerAdaptiveForce" = round(p.Potential/200), \
+						"Powerhouse" = 1 + (p.Potential/75), "Instinct" = 3, "Flow" = 3, "Flicker" = 2, "Pursuer" = 2, "PureDamage" = 1, "PureReduction" = 1)
+		EndMult = 1 + (p.Potential/125)
+		StrMult = 1 + (p.Potential/125)
+		ForMult = 1 + (p.Potential/125)
 		AngerMult = 1 + (p.Potential/100)
 		EnergyHeal = 0.005 * p.Potential
-		HealthDrain = 0.011 - (p.Potential * 0.00005)
+		HealthDrain = 0.018 - (p.Potential * 0.00005)
 		VaizardHealth = (10 * (p.Potential/100))
 		if(p.Potential>=75)
 			passives["Wrathful"] = 1
@@ -130,15 +128,14 @@ scaling with potential as well
 	BuffName = "Full Power Chou Wrathful"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/5,1), "DemonicDurability" = round(p.Potential/10,1), "AngerAdaptiveForce" = round(p.Potential/100), \
+		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/5,1), "DemonicDurability" = round(p.Potential/25,1), "AngerAdaptiveForce" = round(p.Potential/200), \
 						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 4, "Flow" = 4, "Flicker" = 3, "Pursuer" = 3, "BuffMastery" = 3, "PureDamage" = 1.5, "PureReduction" = 1.5)
-		EndMult = 1 + (p.Potential/50)
-		StrMult = 1 + (p.Potential/50)
-		ForMult = 1 + (p.Potential/50)
-		PowerMult = 1 + (p.Potential/75)
-		HealthDrain = 0.015 - (p.Potential * 0.00008)
+		EndMult = 1 + (p.Potential/100)
+		StrMult = 1 + (p.Potential/100)
+		ForMult = 1 + (p.Potential/100)
+		HealthDrain = 0.015 - (p.Potential * 0.000016)
 		EnergyHeal = 0.01 * p.Potential
-		AngerMult = 1 + (p.Potential/50)
+		AngerMult = 1 + (p.Potential/100)
 		VaizardHealth = (10 * (p.Potential/100))
 		if(p.Potential>=50)
 			passives["Wrathful"] = 1
@@ -152,7 +149,7 @@ scaling with potential as well
 	set name = "Give Rare Saiyan"
 	var/mob/p = input(src, "Who?", "Give Rare Saiyan") in players
 	if(!p) return
-	var/choice = input(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan") as null|anything in list("Hellspawn", "Legendary", "Wrathful", "Cancel")
+	var/choice = input(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan") as null|anything in list("Hellspawn", "Heavenborn", "Legendary", "Wrathful", "Cancel")
 	if(!choice || choice == "Cancel") return
 	switch(choice)
 		if("Hellspawn")
@@ -172,6 +169,14 @@ scaling with potential as well
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_saiyan()
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_saiyan_2()
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_full_power_saiyan_2_limit_breaker()
+		if("Heavenborn")
+			p << "You are now a Heavenborn Saiyan."
+			for(var/transformation/saiyan/ssj in p.race.transformations)
+				p.race.transformations -= ssj
+				del ssj
+			p.race.transformations += new /transformation/saiyan/heavenborn_super_saiyan()
+			p.race.transformations += new /transformation/saiyan/super_saiyan_rose()
+			p.Secret="Heavenborn"
 		if("Legendary")
 			p << "You have become a Legendary Super Saiyan."
 			p.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Legendary_Stance)

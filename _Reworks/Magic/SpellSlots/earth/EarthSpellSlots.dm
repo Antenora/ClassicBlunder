@@ -7,7 +7,8 @@
 		ElementalClass="Earth"
 		Area="Circle"
 		Distance=4
-		DamageMult=5
+		DamageMult=7.5
+		Instinct=1
 		Crushing=3
 		SpecialAttack=1
 		StrOffense=1
@@ -26,8 +27,9 @@
 		ActiveMessage="invokes: <font size=+1>SEISMIC ENTRY!</font size>"
 		adjust(mob/p)
 			if(!altered)
+				DamageMult=7.5
 				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
-					DamageMult=7.5
+					DamageMult=11
 					Distance=6
 					ActiveMessage="invokes a powerful: <font size=+1>SEISMIC ENTRY!</font size>"
 		verb/Seismic_Entry()
@@ -45,29 +47,19 @@
 		ManaDrain=0.01
 		EndMult=1.15
 		PureReduction=2
-		passives=list("Harden" = 1, "Grit" = 1, "MeleeResist" = 1)
+		passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 5)
 		ActiveMessage="wraps themselves in a ward of living stone!"
 		OffMessage="lets the stone crumble away..."
 		adjust(mob/p)
 			if(!altered)
+				passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 5)
 				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
 					TimerLimit=40
 					Cooldown=70
 					EndMult=1.25
 					PureReduction=3
+					passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 7)
 					ActiveMessage="wraps themselves in a barrier of living stone!"
-		// Combat damage grows passive_handler["Grit"] beyond the buff's listed
-		// value of 1 via AdjustGrit. The stock decreaseList call only knocks
-		// off that listed +1 on toggle-off, so the combat-accumulated portion
-		// would otherwise leak past the buff and keep Grit visibly active for
-		// the player long after the buff itself has expired. Clear it here if
-		// no other Grit source is still up.
-		Trigger(mob/User, Override = 0)
-			var/was_on = User.BuffOn(src)
-			..()
-			if(was_on && !User.BuffOn(src))
-				if(!User.hasActiveGritSource())
-					User.passive_handler.Set("Grit", 0)
 		verb/Ward_of_Stone()
 			set category="Skills"
 			adjust(usr)

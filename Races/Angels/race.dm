@@ -29,23 +29,25 @@ race
 				switch(Choice)
 					if("Guardian")
 						Confirm=alert(user, "Do you wish to guard the gates to the world beyond?", "Angel Ascension", "Yes", "No")
-						user.Class = "Guardian"
-						user.AddSkill(/obj/Skills/Utility/Recall_Armaments)
-						user.GrantGuardianItem(/obj/Items/Sword/Guardian/Sword_of_the_Saint)
-						user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Light)
-						user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Divinity)
-						user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Order)
-						user << "Please set macros for (Light), (Divinity), and (Order), your 3 angel magics."
+						if(Confirm=="Yes")
+							user.Class = "Guardian"
+							user.AddSkill(/obj/Skills/Utility/Recall_Armaments)
+							user.GrantGuardianItem(/obj/Items/Sword/Guardian/Sword_of_the_Saint)
+							user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Light)
+							user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Divinity)
+							user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Order)
+							user << "Please set macros for (Light), (Divinity), and (Order), your 3 angel magics."
 					if("Mentor")
 						Confirm=alert(user, "Do you wish to mentor humanity and ensure the spiritual arts remain unforgotten?", "Angel  Ascension", "Yes", "No")
-						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Divine_Instinct, user))
-							user.Class = "Mentor"
-							user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Divine_Instinct)
-							user.AddSkill(/obj/Skills/Utility/Mentor_System)
-							user << "You have embarked upon the path of true martial arts mastery: Ultra Instinct."
-							user.Secret="Ultra Instinct"
-							user.UILevel=1
-							passives["StyleMastery"]=7
+						if(Confirm=="Yes")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Divine_Instinct, user))
+								user.Class = "Mentor"
+								user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Divine_Instinct)
+								user.AddSkill(/obj/Skills/Utility/Mentor_System)
+								user << "You have embarked upon the path of true martial arts mastery: Ultra Instinct."
+								user.Secret="Ultra Instinct"
+								user.UILevel=1
+								passives["StyleMastery"]=7
 				user.AngelAscension = Choice
 				//t1 style/armor unlocked
 

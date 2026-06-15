@@ -90,3 +90,48 @@
 			set category="Skills"
 			adjust(usr)
 			src.Trigger(usr)
+/obj/Skills/Buffs/SpecialBuffs/Nobody
+	CyberSignature=1
+	SagaSignature=1
+	SignatureTechnique=4
+	SpecialSlot=0
+	Slotless=1
+	Darkness_of_the_Unknown
+		ForMult=1.35
+		DefMult=1.35
+		passives = list("Godspeed" = 2, "Skimming" = 2,"SweepingStrike"=1)
+		ActiveMessage="draws from the darkness of the unknown, calling forth power that never was!"
+		OffMessage="contains their superiority."
+		verb/Darkness_of_the_Unknown()
+			set category="Skills"
+			src.Trigger(usr)
+	Lord_of_the_Castle
+		OffMult=1.35
+		SpdMult=1.35
+		passives = list()
+		ActiveMessage="draws from their authority over oblivion, calling forth power over mortality!"
+		OffMessage="contains their superiority."
+		verb/Lord_of_the_Castle()
+			set category="Skills"
+			src.Trigger(usr)
+	The_Other_Promise
+		OffMult=1.35
+		SpdMult=1.35
+		passives = list("SwordAscension" = 1, "Flicker" = 3, "Brutalize" = 1, "Instinct" = 2)
+		verb/The_Other_Promise()
+			set category="Skills"
+			src.Trigger(usr)
+	The_13th_Dilemma
+		EndMult=1.35
+		StrMult=1.35
+		passives = list()
+		verb/The_13th_Dilemma()
+			set category="Skills"
+			src.Trigger(usr)
+	Vector_to_the_Heavens
+		StrMult=1.35
+		ForMult=1.35
+		passives = list()
+		verb/Vector_to_the_Heavens()
+			set category="Skills"
+			src.Trigger(usr)

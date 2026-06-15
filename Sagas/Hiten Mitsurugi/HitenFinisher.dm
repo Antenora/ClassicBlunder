@@ -37,7 +37,7 @@
     HitSparkLife=10
     IconTime=10
     Cooldown=4
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff
     Godspeed_Assaulted//debuff
         IconLock='SweatDrop.dmi'
         IconApart=1
@@ -49,15 +49,16 @@
         ActiveMessage="fears for their life against a hyperspeed opponent!"
         OffMessage="regains courage!"
     //hiten
-    Shunshin//buff
-        SpdMult=1.25
-        passives = list("TensionLock" = 1,"Warping" = 2, "HotHundred" = 1, "Godspeed" = 2, "BlurringStrikes" = 1)
-        TimerLimit=10
-        ActiveMessage="moves at godspeed for a rapid attack!"
-        OffMessage="restrains their godspeed..."
-    Shunshin_Shin//more buff
-        SpdMult=1.5
-        passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2, "PureDamage" = 2, "Steady" = 4, "BlurringStrikes" = 2, "CoolerAfterimages"=2)
-        TimerLimit=15
-        ActiveMessage="unleashes their godspeed for a short burst!"
-        OffMessage="falls back in step..."
+    Finisher
+        Shunshin//buff
+            SpdMult=1.25
+            passives = list("TensionLock" = 1,"Warping" = 2, "HotHundred" = 1, "Godspeed" = 2, "BlurringStrikes" = 1)
+            TimerLimit=10
+            ActiveMessage="moves at godspeed for a rapid attack!"
+            OffMessage="restrains their godspeed..."
+        Shunshin_Shin//more buff
+            SpdMult=1.5
+            passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2, "PureDamage" = 2, "Steady" = 4, "BlurringStrikes" = 2, "CoolerAfterimages"=2)
+            TimerLimit=15
+            ActiveMessage="unleashes their godspeed for a short burst!"
+            OffMessage="falls back in step..."

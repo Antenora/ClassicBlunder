@@ -22,16 +22,16 @@
 		if("Avatar")
 			passive_handler.Increase("DebuffResistance", 1)
 		if("Avian")
-			SpdMod *= 1.15
+			SpdMultTotal *= 1.15
 		if("Beast")
-			StrMod *= 1.15
+			StrMultTotal *= 1.15
 		if("Deity")
 			PowerBoost *= 1.15
 		if("Divine")
 			passive_handler.Increase("LifeGeneration", 2)
 		if("Dragon")
-			EndMod *= 1.10
-			DefMod *= 1.10
+			EndMultTotal *= 1.10
+			DefMultTotal *= 1.10
 		if("Element")
 			passive_handler.Increase("DebuffDurationReduction", 0.30)
 		if("Fairy")
@@ -52,17 +52,15 @@
 			passive_handler.Increase("FluidForm", 1)
 			passive_handler.Increase("Flow", 3)
 		if("Hero")
-			StrMod *= 1.08
-			EndMod *= 1.08
-			ForMod *= 1.08
-			SpdMod *= 1.08
-			OffMod *= 1.08
-			DefMod *= 1.08
+			StrMultTotal *= 1.08
+			EndMultTotal *= 1.08
+			ForMultTotal *= 1.08
+			SpdMultTotal *= 1.08
+			OffMultTotal *= 1.08
+			DefMultTotal *= 1.08
 		if("Jaki")
-			StrMod *= 1.20
-			var/def_penalty = DefMod * 0.05
-			DefMod -= def_penalty
-			demon_racial_jaki_def_penalty = def_penalty
+			StrMultTotal *= 1.20
+			DefMultTotal *= 0.95
 		if("Kishin")
 			passive_handler.Increase("TechniqueMastery", 1)
 		if("Megami")
@@ -100,16 +98,16 @@
 		if("Avatar")
 			passive_handler.Decrease("DebuffResistance", 1)
 		if("Avian")
-			SpdMod /= 1.15
+			SpdMultTotal /= 1.15
 		if("Beast")
-			StrMod /= 1.15
+			StrMultTotal /= 1.15
 		if("Deity")
 			PowerBoost /= 1.15
 		if("Divine")
 			passive_handler.Decrease("LifeGeneration", 2)
 		if("Dragon")
-			EndMod /= 1.10
-			DefMod /= 1.10
+			EndMultTotal /= 1.10
+			DefMultTotal /= 1.10
 		if("Element")
 			passive_handler.Decrease("DebuffDurationReduction", 0.30)
 		if("Fairy")
@@ -129,16 +127,15 @@
 			passive_handler.Decrease("FluidForm", 1)
 			passive_handler.Decrease("Flow", 3)
 		if("Hero")
-			StrMod /= 1.08
-			EndMod /= 1.08
-			ForMod /= 1.08
-			SpdMod /= 1.08
-			OffMod /= 1.08
-			DefMod /= 1.08
+			StrMultTotal /= 1.08
+			EndMultTotal /= 1.08
+			ForMultTotal /= 1.08
+			SpdMultTotal /= 1.08
+			OffMultTotal /= 1.08
+			DefMultTotal /= 1.08
 		if("Jaki")
-			StrMod /= 1.20
-			DefMod += demon_racial_jaki_def_penalty
-			demon_racial_jaki_def_penalty = 0
+			StrMultTotal /= 1.20
+			DefMultTotal /= 0.95
 		if("Kishin")
 			passive_handler.Decrease("TechniqueMastery", 1)
 		if("Megami")
@@ -186,7 +183,7 @@
 	if(!demon_racial_femme_active) return
 	if(!defender || !defender.client) return
 	if(prob(8))
-		defender.applyCharmed(src, 30)
+		defender.applyCharmed(src, 5)
 
 
 /mob/proc/DemonSnakePoisonCheck(mob/defender)
@@ -205,8 +202,6 @@
 	set waitfor = FALSE
 	var/my_gen = ++demon_tyrant_loop_gen
 	if(!demon_tyrant_debuffed) demon_tyrant_debuffed = list()
-	var/debuff_str = 0.10
-
 	while(src && client && demon_racial_tyrant_active && my_gen == demon_tyrant_loop_gen)
 		var/list/in_range = list()
 
@@ -220,12 +215,12 @@
 
 		for(var/mob/M in in_range)
 			if(!(M in demon_tyrant_debuffed))
-				M.StrMod *= (1 - debuff_str)
-				M.EndMod *= (1 - debuff_str)
-				M.ForMod *= (1 - debuff_str)
-				M.SpdMod *= (1 - debuff_str)
-				M.OffMod *= (1 - debuff_str)
-				M.DefMod *= (1 - debuff_str)
+				M.StrMultTotal *= 0.9
+				M.EndMultTotal *= 0.9
+				M.ForMultTotal *= 0.9
+				M.SpdMultTotal *= 0.9
+				M.OffMultTotal *= 0.9
+				M.DefMultTotal *= 0.9
 				demon_tyrant_debuffed += M
 
 		var/list/to_remove = list()
@@ -233,12 +228,12 @@
 			if(!(M in in_range))
 				to_remove += M
 		for(var/mob/M in to_remove)
-			M.StrMod /= (1 - debuff_str)
-			M.EndMod /= (1 - debuff_str)
-			M.ForMod /= (1 - debuff_str)
-			M.SpdMod /= (1 - debuff_str)
-			M.OffMod /= (1 - debuff_str)
-			M.DefMod /= (1 - debuff_str)
+			M.StrMultTotal /= 0.9
+			M.EndMultTotal /= 0.9
+			M.ForMultTotal /= 0.9
+			M.SpdMultTotal /= 0.9
+			M.OffMultTotal /= 0.9
+			M.DefMultTotal /= 0.9
 			demon_tyrant_debuffed -= M
 
 		sleep(5)
@@ -246,10 +241,10 @@
 	// Only cleanup if we are still the active loop
 	if(my_gen == demon_tyrant_loop_gen && demon_tyrant_debuffed)
 		for(var/mob/M in demon_tyrant_debuffed)
-			M.StrMod /= (1 - debuff_str)
-			M.EndMod /= (1 - debuff_str)
-			M.ForMod /= (1 - debuff_str)
-			M.SpdMod /= (1 - debuff_str)
-			M.OffMod /= (1 - debuff_str)
-			M.DefMod /= (1 - debuff_str)
+			M.StrMultTotal /= 0.9
+			M.EndMultTotal /= 0.9
+			M.ForMultTotal /= 0.9
+			M.SpdMultTotal /= 0.9
+			M.OffMultTotal /= 0.9
+			M.DefMultTotal /= 0.9
 		demon_tyrant_debuffed.Cut()

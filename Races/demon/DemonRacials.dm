@@ -139,7 +139,7 @@
 		if(!User || !User.Target) return
 		if(!User.demonDevilTriggerSinMastery()) return
 		var/mob/target = User.Target
-		if(!target.applyCharmed(User, 10))
+		if(!target.applyCharmed(User, 5))
 			User << "[target] is already Charmed."
 			return
 		OMsg(target, "[User] ensnares [target] with an irresistible desire!")

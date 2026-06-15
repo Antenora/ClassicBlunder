@@ -15,6 +15,10 @@ obj
 				Grapple=1
 				GrabTrigger="/obj/Skills/Grapple/Lotus_Drop"
 				HitMessage="kicks the opponent in the air before initiating a suicidal drop!"
+				adjust(mob/p)
+					DamageMult = 4 + (p.SagaLevel * 1)
+					Cooldown= 150 - (p.SagaLevel * 10)
+
 				verb/Front_Lotus()
 					set category="Skills"
 					usr.SetQueue(src)
@@ -30,6 +34,9 @@ obj
 				Cooldown=180
 				Warp=10
 				HitMessage="stuns the opponent with a precise blow; an opening!"
+				adjust(mob/p)
+					DamageMult = 7 + (p.SagaLevel * 0.75)
+					Cooldown= 180 - (p.SagaLevel * 12.5)
 				verb/Reverse_Lotus()
 					set category="Skills"
 					usr.SetQueue(src)
@@ -47,6 +54,8 @@ obj
 				Quaking=2
 				Warp=10
 				HitMessage="tosses the opponent around with a flurry of crushing strikes!"
+				adjust(mob/p)
+					DamageMult = 3 + (p.SagaLevel * 0.5)
 			Reverse_Lotus3
 				GateNeeded=5
 				UnarmedOnly=1
@@ -59,6 +68,8 @@ obj
 				Warp=10
 				SpecialEffect="Smash"
 				HitMessage="finishes the opponent with a shattering punch!!!"
+				adjust(mob/p)
+					DamageMult = 3 + (p.SagaLevel * 0.5)
 			Morning_Peacock
 				UnarmedOnly=1
 				ActiveMessage="radiates burning vigor!"
@@ -82,6 +93,9 @@ obj
 				HitSparkX=-32
 				HitSparkY=-32
 				HitSparkSize=0.3
+				adjust(mob/p)
+					DamageMult = 0.6 + (p.SagaLevel * 0.1)
+					Cooldown = 240 - (p.SagaLevel * 15)
 				verb/Morning_Peacock()
 					set category="Skills"
 					usr.SetQueue(src)

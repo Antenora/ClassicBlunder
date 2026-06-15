@@ -6,6 +6,8 @@
 		Area="Arc"
 		StrOffense=1
 		DamageMult=2.5
+		ControlledRush=1
+		Rush=10
 		LifeSteal=50
 		WindUp=1
 		WindupIcon='StormArmor.dmi'
@@ -27,8 +29,9 @@
 		AdaptRate=1
 		NeedsSword=1
 		DamageMult=16
-		Area="Circle"
+		Area="Around Target"
 		Distance=12
+		DistanceAround=12
 		TurfStrike=1
 		CanBeDodged=0
 		CanBeBlocked=0

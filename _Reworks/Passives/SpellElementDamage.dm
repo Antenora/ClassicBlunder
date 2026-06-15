@@ -59,7 +59,7 @@ mob/proc/
         // producing extreme damage multipliers on element spells.
         . = 0
         if(!element) return 0
-        var/value = passive_handler.Get("[element]SpellDamage")
+        var/value = passive_handler.Get("[element]SpellDamage")/glob.CASTING_PASSIVE_DIVISOR
         if(!value) return 0
         if(value > 1.0)
             value = 1.0

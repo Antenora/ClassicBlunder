@@ -111,15 +111,42 @@ mob/var
 	BankaiIcon
 	BankaiIconX = 0
 	BankaiIconY = 0
+	BankaiShihakushoIcon
+	BankaiShihakushoIconX = 0
+	BankaiShihakushoIconY = 0
 	InShinigamiForm = FALSE
 	UsedFinalGetsuga = FALSE
+
+	ShikaiIconDual
+	ShikaiIconDualX = 0
+	ShikaiIconDualY = 0
+	tmp/HideInShadowsActive = 0
+	tmp/HiddenInShadow = 0
+	tmp/KageoniEndTime = 0
+	tmp/KageoniMidTransition = 0
+	tmp/obj/Effects/Shadowbringer_Shadow/CurrentShadow
+	tmp/obj/Effects/Shadowbringer_Shadow/ShadowbringerShadowObj
+	tmp/IroniActive = 0
+	tmp/IroniColor
+	tmp/mob/IroniCaster
+	tmp/DarumaActive = 0
+	tmp/mob/DarumaTarget
+	tmp/DarumaEndTime = 0
+	tmp/ProjectileAttacking = 0
+
+	// Kido pick tracking, shared across all four trees (Hado, Bakudo, Hoho, Hakuda)
+	KidoSL1Picks = 0   // max 2; tier cap <=1
+	KidoSL3Picks = 0   // max 2; tier cap <=2
+	KidoSL5Picks = 0   // max 1; tier cap <=3
+	KidoSL6Picks = 0   // max 1; tier cap <=4
+	KidoSL7Picks = 0   // max 1; tier cap <=5
 
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","King of Courage", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
 		if(P.Saga)
 			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami")
 				Level7=1
@@ -865,12 +892,12 @@ mob
 	proc
 		saga_up_self()
 			if(!src.SagaAdminPermission)
-				if(src.SagaLevel>=3)
+				if(src.SagaLevel>=6)
 					return
 				if(!src.SignatureCheck)
 					return
 			else
-				if(src.SagaLevel>=3)
+				if(src.SagaLevel>=6)
 					src << "You've been bestowed an additional tier of your Saga purposefully; enjoy your new powers, this is not a bug!"
 
 			src.SagaLevel++
@@ -1218,31 +1245,21 @@ mob
 									src.AddSkill(new/obj/Skills/AutoHit/ShinkuTatsumaki)
 					if(src.SagaLevel==4)
 						if(!src.AnsatsukenAscension)
-							if(glob.CHIKARA_WHITELIST&&chikaraWhitelist)
-								src.AnsatsukenAscension=alert(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", "Satsui", "Chikara")
-								src <<"Your Ansatsuken stance is refined to suit your beliefs..."
-								var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
-								SI = locate() in src
-								if(src.AnsatsukenAscension=="Satsui")
-									if(!SI)
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
-									else
-										del SI
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
-								else
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/S in src.contents)
-										del S
-										src << "You learn to harness your raging desire to dominate in battle."
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Kyoi_no_Hado)
-							else
-								src <<"Your Ansatsuken stance is consumed by the raging thrill of battle..."
-								var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
-								SI = locate() in src
+							src.AnsatsukenAscension=alert(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", "Satsui", "Chikara")
+							src <<"Your Ansatsuken stance is refined to suit your beliefs..."
+							var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
+							SI = locate() in src
+							if(src.AnsatsukenAscension=="Satsui")
 								if(!SI)
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
 								else
 									del SI
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
+							else
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/S in src.contents)
+									del S
+									src << "You learn to harness your raging desire to dominate in battle."
+									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Kyoi_no_Hado)
 					if(src.SagaLevel==5)
 						switch(src.AnsatsukenAscension)
 							// if("Satsui")
@@ -1588,11 +1605,11 @@ mob
 						//Keychain
 						var/Style
 						if(src.KeybladeType=="Sword")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Wingblade", "Cyclone"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Wingblade", "Cyclone"))
 						if(src.KeybladeType=="Shield")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Rock Breaker", "Dark Impulse"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Rock Breaker", "Dark Impulse"))
 						if(src.KeybladeType=="Staff")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Ghost Drive", "Blade Charge"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Ghost Drive", "Blade Charge"))
 						switch(Style)
 							if("Wingblade")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Wing_Blade_Style)
@@ -1665,43 +1682,16 @@ mob
 								AddSkill(new/obj/Skills/AutoHit/Magic/Thundaga)
 
 					if(src.SagaLevel==5)
-						//Master Form
-						//T3 Magic
-						passive_handler.Increase("ManaCapMult",0.25)
-						var/Path
-						switch(src.KeybladeType)
-							if("Sword")
-								Path="Courage"
-							if("Staff")
-								Path="Spirit"
-							if("Shield")
-								Path="Kindness"
 						if(src.KeybladeColor=="Light")
 							src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Master_Form)
-							src << "Merging Wisdom and Valor on the path of [Path], you develop the Master Form!"
+							src << "Merging Wisdom and Valor on the path of light, you develop the Master Form!"
+							src.Keychains.Add("Prismatic Dreams")
+							src << "You have unlocked the Prismatic Dreams keychain, granting you perfect control over your own darkness!"
 						else
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Rage_Form/rf in src)
-								rf.DefMult=1.5
-								rf.RegenMult=1.5
-								rf.RecovMult=1.5
-								rf.passives["TechniqueMastery"] = 5
-								rf.passives["MovementMastery"] = 5
-								rf.passives["Godspeed"] = 2
-								rf.passives["Pursuer"] = 2
-								rf.passives["Flicker"] = 2
-								rf.passives["QuickCast"] = 2
-								rf.passives["PureDamage"] = 2
-								rf.passives["PureReduction"] = 2
-								rf.passives["Juggernaut"] = 1
-								rf.NeedsHealth=80
-								rf.TooMuchHealth=99
-								src << "Your Rage develops to allow for more primally powerful blows!"
-
-
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Cure)
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Esuna)
-						src << "You've mastered the white magical arts of Cure and Esuna!"
-						var/Choice
+							src.Keychains.Add("Ebony Slumber")
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/SyncBlade)
+							src << "You have unlocked the Ebony Slumber keychain, granting you perfect control over your own darkness!"
+/*						var/Choice
 						var/Confirm
 						while(Confirm!="Yes")
 							Choice=alert(src, "Every powerful heart stands in opposition to something greater than themselves.  What do you stand against?", "Keychain Ascension", "Destruction", "Emptiness", "Duality")
@@ -1719,34 +1709,30 @@ mob
 								src.Keychains.Add("No Name")
 							if("Duality")
 								src.Keychains.Add("Way To Dawn")
-						src << "You've obtained your antagonism keychain!"
+						src << "You've obtained your antagonism keychain!"*/
 
 
 					if(src.SagaLevel==6)
 						//Final Form
 						//More Majjyk
-
+						if(src.KeybladeType=="Shield")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(2)
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga)
+						else if(src.KeybladeType=="Staff")
+							src.AddSkill(new/obj/Skills/AutoHit/Magic/Ultima)
+						else if(src.KeybladeType=="Sword")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(3)
 
 						if(src.KeybladeColor=="Light")
 							src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Final_Form)
 							src << "The completion of your heart is fulfilled; you can now access your Final and most powerful Form!"
-						else
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Rage_Form/rf in src)
-								rf.PowerMult=2
-								rf.EndMult=1.5
-								rf.passives["PureDamage"] = 5
-								rf.passives["PureReduction"] = 5
-								rf.passives["GodKi"] = 0.5
-								rf.passives["Flicker"] = 3
-								rf.passives["DualCast"] = 1
-								rf.passives["TripleStrike"] = 1
-								src << "Your Rage develops to allow double casting and triple attacks!"
-						passive_handler.Increase("ManaCapMult",0.5)
-						src << "Your mastery of the Keyblade grants you unrivalled magical prowess!"
-						src << "You develop ultimate white magicks: Curaga, Esunaga and Holy!"
-						src.AddSkill(new/obj/Skills/AutoHit/Magic/Holy)
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga)
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Esunaga)
+						else if(src.KeybladeColor=="Dark")
+							src <<"I'll add something later"
 					if(src.SagaLevel==7)
 						var/Choice
 						var/Confirm

@@ -870,6 +870,13 @@ obj
 						if(usr.AttackQueue)
 							return
 						usr.Tension=0
+						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
+								if(!ae.SlotlessOn)
+									ae.Trigger(usr)
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
+								if(!sge.SlotlessOn)
+									sge.Trigger(usr)
 						usr.tryIncreaseTension();//2026.01.13 - reverting "only max HT lvl gets unique finisher"
 						if(usr.StyleBuff.Finisher)//there's probably a less clunky version way of ensuring finishers are only used once
 							var/path = usr.StyleBuff.Finisher
@@ -1258,15 +1265,15 @@ obj
 
 
 			Symbiote_Hammer
-				DamageMult=7
+				DamageMult=8
 				AccuracyMult = 1.2
 				Duration=10
 				Cooldown=90
 				Instinct=2
 				KBAdd=3
 				Stunner=1
-				Shearing = 5
-				Crippling = 5
+				Shearing = 10
+				Crippling = 10
 				HitMessage="'s symbiotic hammer swings dead center into their enemy!"
 				ActiveMessage="'s symbiotic mass takes the shape of a hammer!"
 				verb/Symbiote_Hammer()
@@ -1321,9 +1328,12 @@ obj
 mob
 	proc
 		SetQueue(var/obj/Skills/Queue/Q)
+			if(src.HeldSkillBlocksAction(Q)) return
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Q] you are silenced!"
 				return 0
+			if(src.Airborne)
+				return
 			if(Q.Using)
 				return//Can't use if on cooldown
 			if(istype(Q, /obj/Skills/Queue/Heavy_Strike) && src.passive_handler["Heavy Strike"] == "Warp Strike")
@@ -1405,16 +1415,12 @@ mob
 						var/obj/Items/Enchantment/Staff/st=src.EquippedStaff()
 						//var/obj/Items/Enchantment/Magic_Crest/mc=src.EquippedCrest()
 						var/obj/Items/Sword/sord=src.EquippedSword()
-						if(passive_handler.Get("Disarmed") && !src.HasLimitlessMagic() && !src.HasBladeFisting())
-							Q.DamageMult = (Q.DamageMult / 2)
 						if(!st&&!(CrestSpell(Q))&&(!sord||sord&&!sord.MagicSword))
 							src << "You need a spell focus to use [Q]."
 							return
 			if(Q.NeedsSword||Q.UnarmedOnly)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(Q.NeedsSword)
-					if(passive_handler.Get("Disarmed") && !src.HasBladeFisting())
-						Q.DamageMult = (Q.DamageMult / 2)
 					if((!s && !HasBladeFisting()) && !src.UsingBattleMage())
 						src << "You must have a sword equipped to use this technique."
 						return
@@ -1500,7 +1506,7 @@ mob
 					src.Oxygen=0
 			if(Q.Copyable)
 				spawn() for(var/mob/m in view(40, src))
-					if(m.passive_handler.Get("The Almighty"))
+					if(m.CheckSpecial("A - The Almighty"))
 						var/insightLevel = m.AscensionsAcquired+25 || 1
 						var/techTier = Q.Copyable
 						if(insightLevel < techTier)
@@ -1543,7 +1549,7 @@ mob
 			if(Q.Counter)
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.4, Blend=2, Time=2)
 			if(!Q.Combo && src.HasCounterMaster() && CounterMasterTimer <= 0)
-				Q.CounterTemp = 0.25 * src.GetCounterMaster()
+				Q.CounterTemp = 0.1 * src.HasCounterMaster()
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.3, Blend=2, Time=2)
 				CounterMasterTimer = max(1, 25 - (src.HasCounterMaster()*5))
 			src.AttackQueue=Q
@@ -1629,7 +1635,7 @@ mob
 			if(Damage<1)
 				Damage = 1
 			if(src.AttackQueue.DamageMult>=0)
-				var/dmgMult = src.AttackQueue.DamageMult
+				var/dmgMult = src.AttackQueue.DamageMult * GetDisarmedQueueDamageFactor(src.AttackQueue)
 				if(passive_handler["Fa Jin"] && canFaJin())
 					dmgMult+= passive_handler["Fa Jin"] * glob.FA_JIN_BASE_DMG_ADD
 				DEBUGMSG("NEW DAMAGE AFTER FA JIN (FINAL DAMAGE): [Damage]")
@@ -1676,9 +1682,9 @@ mob
 			src.AttackQueue.Hit=1
 			src.AttackQueue.Missed=0
 			src.AttackQueue.RanOut=0
-			if(istype(src.AttackQueue, /obj/Skills/Queue/Judgment_Cut_End) && P && !P.Suspended)
-				P.Suspended = src
-				src.Suspended = src
+			if(istype(src.AttackQueue, /obj/Skills/Queue/Judgment_Cut_End) && P && !P.ActionLocked)
+				P.ActionLocked = 1
+				src.ActionLocked = 1
 				var/mob/who = P
 				var/mob/U = src
 				// Heh
@@ -1688,10 +1694,10 @@ mob
 				var/obj/Skills/AutoHit/Judgment_Cut_End/AH = locate() in src
 				var/release_delay = AH ? (AH.WindUp * 10 + 10) : 40
 				spawn(release_delay)
-					if(who && who.Suspended == U)
-						who.Suspended = null
-					if(U && U.Suspended == U)
-						U.Suspended = null
+					if(who && who.ActionLocked)
+						who.ActionLocked = null
+					if(U && U.ActionLocked)
+						U.ActionLocked = null
 			if(canFaJin())
 				last_fa_jin = world.time
 				fa_jin_effect()
@@ -1743,7 +1749,7 @@ mob
 				var/obj/Skills/Buffs/S = P.findOrAddSkill(path)
 				S.Password=P.name
 				if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Death_Mark))
-					S.adjust(StyleBuff.SignatureTechnique * 15, StyleBuff.SignatureTechnique)
+					S.adjust(StyleBuff.SignatureTechnique * 15, StyleBuff.SignatureTechnique/2)
 
 			if(src.AttackQueue.Projectile)
 				var/path=text2path(src.AttackQueue.Projectile)

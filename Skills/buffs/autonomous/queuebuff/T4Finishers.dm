@@ -9,8 +9,8 @@
 		VaizardHealth=3
 	Lightning_Strikes_Twice
 		passives = list("Relentlessness" = 1, "Fury" = 2, "Speed Force" = 3, \
-		                "StyleMastery" = 4, "Brutalize" = 2, "Interception" = 4, "CounterMaster" = 10,\
-		                "BlurringStrikes" = 3,  "TensionLock" = 1, "Flicker" = 5)
+		                "StyleMastery" = 4, "Interception" = 4, "CounterMaster" = 10,\
+		                "TensionLock" = 1, "Flicker" = 5)
 		SpdMult=1.5
 		StrMult=1.25
 		EndMult=1.25
@@ -60,7 +60,7 @@
 		TimerLimit = 40
 		passives = list("SpiritFlow"=1, "SpiritSword"=1, "ManaStats" = 1, "CallousedHands"=0.5, "PureReduction"=4, "TensionLock" = 1)
 	The_Ultimate_Fist
-		passives = list("CallousedHands"=0.25, "BlurringStrikes" = 4, "Hardeng" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1)
+		passives = list("CallousedHands"=0.5, "BlurringStrikes" = 4, "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1, "PureReduction"=4)
 		SpdMult=1.5
 		StrMult=1.5
 	Jackpot

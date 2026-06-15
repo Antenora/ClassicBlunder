@@ -316,6 +316,19 @@ obj/Effects
 					KenShockwave(src,Size=1)
 				spawn(3.5)
 					EffectFinish()
+	fevLightningStrikeBlackPurple
+		icon='LightningBlackPurple.dmi'
+		pixel_x=-16
+		proc
+			Strike()
+				src.icon_state="Strike"
+				src.blend_mode=2
+				spawn(2)
+					KenShockwave(M=src,Size=0.5)
+				spawn(3)
+					KenShockwave(M=src,Size=1)
+				spawn(3.5)
+					EffectFinish()
 	fevLightningStrikeRed
 		icon='LightningRed.dmi'
 		pixel_x=-16

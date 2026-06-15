@@ -1,3 +1,6 @@
+/mob/var/tmp/demon_makarakarn_until = 0
+/mob/var/tmp/demon_tetrakarn_until = 0
+
 /mob/Player/AI/Demon
 	var/datum/demon_data/demon_data = null
 	var/demon_owner_key = ""
@@ -10,12 +13,40 @@
 	var/demon_hp = 100
 	var/next_attack_multiplier = 1
 	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, DoDamage uses parent convention (src=attacker)
-	var/demon_reflect_until = 0
 	var/image/reflect_overlay_self = null
 	var/image/reflect_overlay_owner = null
 
+	// Summoner passive inheritance
+	var/demon_summoner_pure_grant      = 0
+	var/demon_summoner_brutalize_grant = 0   
+	var/demon_summoner_blurring_grant  = 0   
+	var/demon_summoner_hybrid_grant    = 0   
+	var/demon_summoner_spirit_sword    = 0   
+	var/demon_summoner_spirit_hand     = 0   
+	var/demon_summoner_calloused_grant = 0   
+
 	New()
 		..()
+
+	proc/ApplySummonerPassiveGrants()
+		if(!ai_owner) return
+		var/f = glob.DEMON_SUMMONER_GRANT_FACTOR
+		demon_summoner_pure_grant      = ai_owner.HasPureDamage()      * f
+		demon_summoner_brutalize_grant = ai_owner.GetBrutalize()       * f
+		demon_summoner_blurring_grant  = ai_owner.GetBlurringStrikes() * f
+		demon_summoner_hybrid_grant    = ai_owner.GetHybridStrike()    * f
+		demon_summoner_spirit_sword    = ai_owner.GetSpiritSword()     * f
+		demon_summoner_spirit_hand     = ai_owner.GetSpiritHand()      * f
+		demon_summoner_calloused_grant = ai_owner.GetCallousedHands()  * f
+
+	proc/RemoveSummonerPassiveGrants()
+		demon_summoner_pure_grant      = 0
+		demon_summoner_brutalize_grant = 0.0
+		demon_summoner_blurring_grant  = 0.0
+		demon_summoner_hybrid_grant    = 0.0
+		demon_summoner_spirit_sword    = 0.0
+		demon_summoner_spirit_hand     = 0.0
+		demon_summoner_calloused_grant = 0.0
 
 	proc/DemonInit(datum/demon_data/dd, mob/owner, datum/party_demon/pd)
 		demon_data = dd
@@ -53,8 +84,15 @@
 		else if(dd.demon_skills && dd.demon_skills.len)
 			active_skills = dd.demon_skills.Copy()
 
+		demon_base_str = StrMod
+		demon_base_for = ForMod
+		demon_base_end = EndMod
+		demon_base_spd = SpdMod
+		demon_base_def = DefMod
+
 		// Apply DS2 passives
 		ApplyDemonPassives()
+		ApplySummonerPassiveGrants()
 
 		aiGain()
 		spawn() DemonLoop()
@@ -122,7 +160,7 @@
 		if(target == src) return
 		if(istype(target, /mob/Player) && "[ai_owner.ckey]" in target.ai_alliances) return
 		if(ai_owner.party && ai_owner.party.members && (target in ai_owner.party.members)) return
-		var/dmg = DemonComputeKernelDamage(target, StrMod) * next_attack_multiplier * glob.DevilSummonerDemonDamageMod
+		var/dmg = DemonComputeKernelDamage(target, StrMod * StrMultTotal) * next_attack_multiplier * glob.DevilSummonerDemonDamageMod
 		if(next_attack_multiplier > 1)
 			if(ai_owner) ai_owner << "<font color='#ffaa00'>[name]'s charged attack connects!</font>"
 			next_attack_multiplier = 1
@@ -156,8 +194,9 @@
 					DemonPassiveAddAilments(m)
 
 	proc/DemonDespawn()
-		DemonRemoveReflectOverlays()
+		DemonClearReflect()
 		RemoveDemonPassives()
+		RemoveSummonerPassiveGrants()
 		if(ai_owner)
 			if(ai_owner.SagaLevel >= 4)
 				ai_owner.RemoveDemonRacialPassive()
@@ -181,6 +220,10 @@
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
 		var/atk = max(0.01, atk_val)
 		var/def = max(0.01, target.getEndStat(1))
+		if(demon_summoner_spirit_sword > 0)    atk += ForMod * ForMultTotal * demon_summoner_spirit_sword
+		if(demon_summoner_spirit_hand > 0)     atk += ForMod * ForMultTotal * demon_summoner_spirit_hand / 4
+		if(demon_summoner_calloused_grant > 0) atk += EndMod * EndMultTotal * demon_summoner_calloused_grant
+		if(demon_summoner_brutalize_grant > 0) def = max(0.01, def * (1 - demon_summoner_brutalize_grant))
 		return (powerDif ** glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT + glob.MELEE_EFFECTIVENESS) ** -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
 
 	// Visual feedback for demon attacks
@@ -191,7 +234,12 @@
 
 	// Outgoing damage wrapper
 	proc/DemonDealDamage(mob/target, val)
-		if(!isnum(val) || val <= 0) return 
+		if(!isnum(val) || val <= 0) return
+		if(demon_summoner_blurring_grant > 0)
+			val *= clamp(sqrt(1 + SpdMod * demon_summoner_blurring_grant / 15), 1, 3)
+		if(demon_summoner_hybrid_grant > 0)
+			val *= clamp(sqrt(1 + ForMod * demon_summoner_hybrid_grant / 15), 1, 3)
+		val += demon_summoner_pure_grant
 		// Killing blow: finish off a KO'd NPC
 		if(target && target.KO && istype(target, /mob/Player/AI) && !istype(target, /mob/Player/AI/Demon) && !target.client)
 			var/mob/Player/AI/ai_target = target

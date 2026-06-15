@@ -48,8 +48,9 @@ ascension
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
 			postAscension(mob/owner)
-				if(owner.SagaLevel < 2)
-					owner.SagaLevel = 2
+				while(owner.SagaLevel < 2)
+					owner.SagaLevel++
+					owner.tierUpSaga("Devil Summoner")
 				..()
 			choices = list("Reason of Musubi" = /ascension/sub_ascension/demi_fiend/musubi, "Reason of Shijima" = /ascension/sub_ascension/demi_fiend/shijima, "Reason of Yosuga" = /ascension/sub_ascension/demi_fiend/yosuga)
 			choiceTitle = "Choose Your Reason"
@@ -66,8 +67,9 @@ ascension
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
 			postAscension(mob/owner)
-				if(owner.SagaLevel < 4)
-					owner.SagaLevel = 4
+				while(owner.SagaLevel < 4)
+					owner.SagaLevel++
+					owner.tierUpSaga("Devil Summoner")
 				..()
 			passives = list("HellPower" = 0.25, "KiControlMastery" = 1, "PureDamage" = 1, "PureReduction" = 1)
 			strength = 1
@@ -80,8 +82,9 @@ ascension
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			postAscension(mob/owner)
-				if(owner.SagaLevel < 6)
-					owner.SagaLevel = 6
+				while(owner.SagaLevel < 6)
+					owner.SagaLevel++
+					owner.tierUpSaga("Devil Summoner")
 				..()
 			passives = list("HellPower" = 0.25, "KiControlMastery" = 1, "PureDamage" = 1, "PureReduction" = 1, "MovingCharge" = 1)
 			strength = 2

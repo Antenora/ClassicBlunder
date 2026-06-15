@@ -42,7 +42,7 @@
 				if(usr.isRace(DEMON)||usr.isRace(ELDRITCH))
 					usr<<"Races native to the Depths cannot claim ownership over the Ars Goetia."
 					return
-				for(var/mob/M in world)
+				for(var/mob/M in players)
 					if(AGPass==M.TrueName)
 						M.Death(src, "the Ars Goetia claiming their soul.")
 						src.BloodSacrifice++
@@ -115,7 +115,7 @@
 		var/Invocation=input(usr, "What True Name do you attempt to invoke?", "Summon Demon") as text
 		if(Invocation in glob.trueNames)
 			var/Found=0
-			for(var/mob/Players/m in world)
+			for(var/mob/Players/m in players)
 				if(m.TrueName==Invocation)
 					if(m.isRace(MAKAIOSHIN))
 						usr<<"They are outside of your authority."
@@ -210,7 +210,7 @@
 		var/Invocation=input(usr, "What True Name do you attempt to contact?", "Contact Demon") as text
 		if(Invocation in glob.trueNames)
 			var/Found=0
-			for(var/mob/Players/m in world)
+			for(var/mob/Players/m in players)
 				if(m.TrueName==Invocation)
 					if(m.isRace(MAKAIOSHIN))
 						usr<<"They are outside of your authority."

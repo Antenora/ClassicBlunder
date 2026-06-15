@@ -88,8 +88,10 @@ ascension
 	choices = list("Sadism" = /ascension/sub_ascension/demon/lust/sadism, "Masochism" = /ascension/sub_ascension/demon/lust/masochism)
 	passives = list("LustFactor" = 1)
 	sadism
+		choices = list()
 		passives = list("Sadist" = 1)
 	masochism
+		choices = list()
 		passives = list("Masochist" = 1)
 
 /ascension/sub_ascension/demon/greed

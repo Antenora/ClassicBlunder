@@ -191,6 +191,8 @@ mob/proc/StartFresh()
 	corpse.Savable=1
 	var/list/lootTable = list()
 	for(var/obj/Items/I in src)
+		if(istype(I, /obj/Items/Magatama))
+			continue
 		if(I.suffix == "*Equipped*")
 			I.ObjectUse(src)
 		if(I.Stealable)

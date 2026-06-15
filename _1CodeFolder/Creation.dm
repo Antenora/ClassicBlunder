@@ -14,7 +14,7 @@
 	/obj/Skills/Grab, /obj/Skills/Grapple/Toss, /obj/Skills/Dragon_Dash, /obj/Skills/Target_Clear, /obj/Skills/Target_Switch, \
 	/obj/Skills/Reverse_Dash, /obj/Skills/Aerial_Payback, /obj/Skills/Aerial_Recovery, \
 	/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive, \
-	/obj/Skills/Buffs/Styles/Style_Selector)
+	/obj/Skills/Buffs/Styles/Style_Selector, /obj/Skills/Transformation)
 	for(var/S in missingSkills)
 		if(!locate(S, usr.contents))
 			usr.AddSkill(new S)
@@ -346,6 +346,13 @@ mob/Players
 					src.Reincarnate()
 
 		src.SetCyberCancel()
+		if(src.AirborneInterrupted)
+			src.AirborneInterrupted = 0
+			src.Airborne = 0
+			src.density = 1
+			src.alpha = 255
+			src.pixel_z = 0
+			animate(src)
 		src.AppearanceOn()
 
 		if(src.EnergyMax!=100)
@@ -480,8 +487,25 @@ mob/Players
 		DevilSummonerRestoreVerbs()
 		initShortcuts();
 		MajinAbsorbOnLogin()
+		if(istype(src, /mob/Players))
+			var/mob/Players/SBP = src
+			SBP.Shadowbringer_ClearShadow()
 		return
 	Logout()
+		if(src.Airborne)
+			src.Airborne = 0
+			src.AirborneInterrupted = 0
+			src.density = 1
+			src.alpha = 255
+			src.pixel_z = 0
+			animate(src)
+		// Kageoni safeguard
+		if(istype(src, /mob/Players))
+			var/mob/Players/P = src
+			if(P.HiddenInShadow || P.HideInShadowsActive)
+				P.KageoniForceReset()
+			P.Shadowbringer_ClearShadow()
+			P.KatenCleanseBankaiState()
 		ForceClearHeldChargeState()
 		MajinAbsorbOnLogout()
 		DevilSummonerLogout()

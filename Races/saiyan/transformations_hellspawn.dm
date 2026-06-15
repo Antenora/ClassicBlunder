@@ -40,23 +40,23 @@ transformation
 				if(mastery >= 100)
 					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=1.75)
 				if(user.Potential>=35)
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
+					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor)
-							user << "You have unlocked a new Signature buff! (Saiyan Fervor)"
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Saiyan Fervor)"
+					if(user.Class == "Pride")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/RoyalLineage, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/RoyalLineage)
-							user << "You have unlocked a new Signature buff! (Royal Lineage)"
-					if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Royal Lineage)"
+					if(user.Class == "Honor")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanRoar, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanRoar)
-							user << "You have unlocked a new Signature buff! (Saiyan Roar)"
+							user << "You have fully mastered Super Saiyan, rendering the Grades obsolete and unlocking a new Signature buff! (Saiyan Roar)"
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanCarnage, user))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanCarnage)
 						user << "You have unlocked a new Signature buff! (Saiyan Carnage)"
 			class_boons(mob/user) //pride stats as a baseline no matter what
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
+				if(user.Class == "Zeal")
 					class_passives = list("EnergyGeneration" = 3, "Instinct" = 2, "Flow" = 2)
 					speedadd = 0.3
 					enduranceadd = 0.1
@@ -64,7 +64,7 @@ transformation
 					defenseadd = 0.15
 					strengthadd = 0.4
 					forceadd = 0.4
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
+				if(user.Class == "Pride")
 					class_passives = list("PureDamage" = 1.5, "Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.3
 					enduranceadd = 0.1
@@ -72,7 +72,7 @@ transformation
 					defenseadd = 0.15
 					strengthadd = 0.4
 					forceadd = 0.4
-				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
+				if(user.Class == "Honor")
 					class_passives = list("PureReduction" = 1.5, "Flow" = 2, "EnergyGeneration" = 3)
 					speedadd = 0.3
 					enduranceadd = 0.1
@@ -161,7 +161,9 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 9, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=1.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			mastery_boons(mob/user)
+				passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -192,17 +194,13 @@ transformation
 			transform_animation(mob/user)
 				if(first_time) // store the pre-form appearance and then the post-form appearance before calling the animation. also remove the hair set on overlay afterwards since it's not supposed to be an overlay
 					var/appearance1 = user.appearance
-					world << "app1 is [appearance1]"
 					user.overlays += form_icon_1
 					user.overlays += form_icon_2
 					user.overlays += form_glow
 					user.overlays += form_aura
 					user.underlays += form_aura_underlay
-					world << "[form_hair_icon]"
 					user.overlays += form_hair
-					world << "[user.Hair]"
 					var/appearance2 = user.appearance
-					world << "app2 is [appearance2]"
 					user.HellSSJ4Animation1(appearance1, appearance2)
 					user.overlays -= form_hair
 		hellspawn_super_full_power_saiyan_2_limit_breaker //it's super saiyan 5
@@ -215,7 +213,6 @@ transformation
 			defense = 1.5
 			strength = 1.3
 			force = 1.3
-			revertToTrans = 0
 			var/previousTailIcon
 			var/previousTailUnderlayIcon
 			var/previousTailWrappedIcon

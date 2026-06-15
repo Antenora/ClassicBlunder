@@ -1,5 +1,6 @@
 
 /mob/var/tmp/list/lasts_list = list("overwhelm" = -999, "rupture" = -999, "serrated" = -999)
+/mob/var/tmp/petal_attacking = FALSE
 /proc/getDeciderDamage(playerHealth, sourceHealth)
 	var/healthDifference = abs(playerHealth - sourceHealth)
 	var/damageMultiplier = 2 * (2.7** (-healthDifference/10))
@@ -22,6 +23,7 @@
 
 
 /mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0)
+	if(HeldSkillBlocksAction(null)) return
 	if(glob.AURASPELLONATTACK && !AttackQueue)
 		for(var/a in SlotlessBuffs)
 			var/obj/Skills/Buffs/b = SlotlessBuffs[a]
@@ -47,6 +49,8 @@
 	if(Stasis)
 		return
 	if(Suspended)
+		return
+	if(Airborne)
 		return
 	if(judgement_cut_chain_active)
 		return
@@ -210,10 +214,10 @@
 						nr.passives = /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Nimbus_Rider::passives
 						nr.Trigger(src)
 				// TODO: make hud later if we feel like it chat
-	if(warpingStrike)
+	if(warpingStrike && !petal_attacking)
 		if(Target && Target.loc && Target != src && Target && get_dist(Target, src) < warpingStrike)
 			forcewarp = Target
-	if((forcewarp && Target.z == z))
+	if((forcewarp && Target.z == z && !petal_attacking))
 		if(passive_handler["Flying Thunder God"] && IaidoCounter>=iaidoGaugeMax)
 			new/obj/tracker/FTG_seeker(locate(x,y,z), Target, src) //TODO: make this a normal projectile maybe? does no damage, but throws this, idk that way it can be used as a follow up
 			if(IaidoCounter)
@@ -263,7 +267,7 @@
 		var/refresh = passive_handler.Get("RefreshingBlows");
 		if(refresh) src.RefreshBlow(refresh);
 
-		NextAttack += delay
+		if(!petal_attacking) NextAttack += delay
 		var/Disarm = 0
 		if(src.UsingGladiator())
 			if(src.GladiatorCounter >= glob.GLADIATOR_DISARM_MAX / src.UsingGladiator())
@@ -295,7 +299,7 @@
 				var/atk = getStatDmg2()
 				if(enemy.passive_handler.Get("Field of Destruction")||enemy.passive_handler.Get("The Immovable Object"))
 					if(HasHybridStrike())
-						atk/=clamp(sqrt(1+GetFor(GetHybridStrike())/15),1,3)
+						atk/=clamp(sqrt(1+GetFor(GetHybridStrike())/30),1,3)
 				var/def = enemy.getEndStat(1)
 				var/brutalize = GetBrutalize()
 				if(brutalize)
@@ -463,7 +467,7 @@
 		// 				ACCURACY END			//
 
 		// 				STATUS 					//
-				flick("Attack",src)
+				if(!src.petal_attacking) flick("Attack",src)
 				if(passive_handler["Hit Scan"]) // this is troublesome
 					new/obj/tracker(locate(x,y,z),enemy, src, HitScanIcon, HitScanHitSpark,HitScanHitSparkX, HitScanHitSparkY)
 				//TODO: come back to this
@@ -476,7 +480,7 @@
 						sleep(3)
 						spawn()
 							LaunchEnd(enemy)
-				else if(!AttackQueue && (enemy.Launched || enemy.Stunned))
+				else if(!AttackQueue && (enemy.Launched || enemy.Stunned) && !enemy.passive_handler.Get("Staggered!"))
 					damage *= glob.CCDamageModifier
 					#if DEBUG_MELEE
 					log2text("Damage", "After Stun", "damageDebugs.txt", "[ckey]/[name]")
@@ -720,6 +724,8 @@
 									enemy.AddCrippling(AttackQueue.Crippling, src)
 								if(AttackQueue.Doom)
 									enemy.AddDoom(AttackQueue.Doom, src)
+								if(AttackQueue.Ashing)
+									applyAshChoked(enemy, src)
 
 								if(AttackQueue.Dunker)
 									if(enemy.Launched)
@@ -794,7 +800,13 @@
 								Stun(src, 3, FALSE)
 								enemy.MagmicShieldOff();*/
 							damage *= enemy.getMeleeResistValue();//this is 1 if there is no melee resistance passive on the enemy
-							var/dmgValue = DoDamage(enemy, damage, unarmedAtk, swordAtk, SecondStrike, ThirdStrike, AsuraStrike)
+							var/sniper = passive_handler.Get("Sniper")
+							if(sniper > 0 && enemy.loc)
+								var/dist = get_dist(src, enemy)
+								if(dist > 0)
+									damage *= 1 + (sniper * dist * 0.01)
+							// For Tetrakarn reflect
+							var/dmgValue = DoDamage(enemy, damage, unarmedAtk, swordAtk, SecondStrike, ThirdStrike, AsuraStrike, atkMeleePipe=1, atkSpellElem=(AttackQueue ? AttackQueue.SpellElement : null))
 							. = dmgValue
 							if(!glob.MOMENTUM_PROCS_OFF_DAMAGE)
 								handlePostDamage(enemy) // it already proc'd
@@ -857,7 +869,7 @@
 							var/hitsparkSword = swordAtk
 						//	if(swordAtk && HasBladeFisting())
 						//		hitsparkSword = 0
-							HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
+							if(!src.petal_attacking) HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
 
 
 							if(passive_handler.Get("MonkeyKing"))
@@ -1002,7 +1014,7 @@
 				if(P.Health<=TurfDamage)
 					Destroy(P)
 			return
-		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||src.passive_handler["Chaos Buster"])
+		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)"))
 			flick("Attack",src)
 			NextAttack=world.time
 			if(src.passive_handler.Get("Gun Kata"))
@@ -1015,6 +1027,14 @@
 						GetAndUseSkill(/obj/Skills/Projectile/BIG_SHOT, Projectiles, TRUE)
 					else
 						GetAndUseSkill(/obj/Skills/Projectile/SmallLemonThing, Projectiles, TRUE)
+			if(hasSecret("Eldritch (Reflected)"))
+				if(src.AttackQueue)
+					if(src.AttackQueue.Warp)
+						GetAndUseSkill(/obj/Skills/Projectile/Convergence, Projectiles, TRUE)
+					else
+						GetAndUseSkill(/obj/Skills/AutoHit/The_Other_Side, AutoHits, TRUE)
+				else
+					GetAndUseSkill(/obj/Skills/Projectile/Realitys_Fickle_Shards, Projectiles, TRUE)
 			if(src.CheckSpecial("Ray Gear"))
 				if(src.AttackQueue)
 					if(src.AttackQueue.Warp)
@@ -1028,7 +1048,7 @@
 					NextAttack+=15
 			else if(src.CheckSpecial("Wisdom Form"))
 				GetAndUseSkill(/obj/Skills/Projectile/Wisdom_Form_Blast, Projectiles, TRUE)
-			else if(src.CheckSlotless("OverSoul"))
+			else if(src.CheckSlotless("OverSoul")&&BoundLegend=="Durendal")
 				GetAndUseSkill(/obj/Skills/AutoHit/DurendalPressure, AutoHits, TRUE)
 			else if(src.CheckSlotless("Heavenly Ring Dance"))
 				if(src.Target&&src.Target!=src)
@@ -1069,12 +1089,6 @@
 				src.ClearQueue()
 			else if(src.CheckSlotless("Spirit Bow"))
 				GetAndUseSkill(/obj/Skills/Projectile/Aether_Arrow, Projectiles, TRUE)
-			else if(src.passive_handler.Get("Chaos Buster"))
-				var/level = src.passive_handler.Get("Chaos Buster")
-				if(level == 1)
-					GetAndUseSkill(/obj/Skills/Projectile/ChaosBusterShot, Projectiles, TRUE)
-				if(level == 2)
-					GetAndUseSkill(/obj/Skills/Projectile/SuperChaosBusterShot, Projectiles, TRUE)
 			else if(src.CheckSlotless("Sagittarius Bow")&&!AttackQueue&&!passive_handler.Get("HotHundred"))
 				GetAndUseSkill(/obj/Skills/Projectile/Sagittarius_Arrow, Projectiles, TRUE)
 			else if(st&&st.modifiedAttack)

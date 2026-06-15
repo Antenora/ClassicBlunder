@@ -55,6 +55,7 @@
 
 /obj/Skills/AutoHit/DemiFiend/Flame_Breath
 	ElementalClass="Fire"
+	SpellElement="Fire"
 	StrOffense=1
 	ForOffense=1
 	SpecialAttack=1
@@ -79,6 +80,7 @@
 		usr.Activate(src)
 
 /obj/Skills/AutoHit/DemiFiend/Fog_Breath
+	SpellElement="Water"
 	StrOffense=0
 	ForOffense=1
 	DamageMult=0.5
@@ -255,6 +257,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Media
 		src.Cooldown(1, null, User)
 
 obj/Skills/Projectile/DemiFiend/Tornado
+	SpellElement="Air"
 	name = "Tornado"
 	IconLock = 'Tornado.dmi'
 	IconSize = 2
@@ -388,8 +391,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Focus
 		src.Trigger(usr)
 
 /obj/Skills/AutoHit/DemiFiend/Heat_Wave
-	ElementalClass="Fire"
-	SpellElement="Fire"
 	StrOffense=2
 	Cooldown=90
 
@@ -434,37 +435,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Focus
 			Rush = 6 + (2 * usr.AscensionsAcquired)
 			StrOffense = 2 + (0.5 * usr.AscensionsAcquired)
 			ForOffense = 1 + (0.25 * usr.AscensionsAcquired)
-		usr.Activate(src)
-
-/obj/Skills/AutoHit/DemiFiend/Thunder_Breath
-	ElementalClass="Wind"
-	StrOffense=0
-	ForOffense=2
-	SpecialAttack=1
-	GuardBreak=0
-	DamageMult=2
-	Shocking=50
-	Paralyzing=10
-	ObjIcon=1
-	Icon='LightningBreath.dmi'
-	IconX=-16
-	IconY=-16
-	Size=1.5
-	Rounds=8
-	DelayTime=2
-	WindUp=0.5
-	WindupMessage="crackles with electricity..."
-	ActiveMessage="lets loose an enormous breath infused with lightning!"
-	Cooldown=60
-	Distance=30
-	Slow=1
-	Area="Arc"
-	verb/Thunder_Breath()
-		set category="Skills"
-		if(!altered)
-			DamageMult = 2 + (0.25 * usr.AscensionsAcquired)
-			Distance = 6 + (3 * usr.AscensionsAcquired)
-			ForOffense = 2 + (0.25 * usr.AscensionsAcquired)
 		usr.Activate(src)
 
 /obj/Skills/AutoHit/DemiFiend/Shock
@@ -1286,7 +1256,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/AutoHit/DemiFiend/Bolt_Storm
 	ElementalClass="Wind"
-	SpellElement="Wind"
+	SpellElement="Air"
 	Area="Around Target"
 	Distance=12
 	DistanceAround=10
@@ -1319,7 +1289,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/AutoHit/DemiFiend/Tempest
 	ElementalClass="Wind"
-	SpellElement="Wind"
+	SpellElement="Air"
 	Area="Wide Wave"
 	Distance=6
 	DamageMult=12
@@ -1346,8 +1316,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 		usr.Activate(src)
 
 /obj/Skills/AutoHit/DemiFiend/Javelin_Rain
-	ElementalClass="Wind"
-	SpellElement="Wind"
 	Area="Circle"
 	Distance=1
 	Wander=10
@@ -1384,7 +1352,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/Projectile/DemiFiend/Wind_Cutter
 	ElementalClass="Wind"
-	SpellElement="Wind"
+	SpellElement="Air"
 	IconLock='SparkleGreen.dmi'
 	IconSize=1
 	LockX=-16
@@ -1733,6 +1701,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 
 /obj/Skills/Projectile/DemiFiend/Spiral_Viper_Beam
 	name = "Spiral Viper"
+	SpellElement = "Air"
 	Area = "Beam"
 	IconLock = 'BeamFS.dmi'
 	Distance = 50
@@ -1785,7 +1754,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 /obj/Skills/AutoHit/DemiFiend/Wind_Cutter_Gust
 	name = "Wind Cutter"
 	ElementalClass = "Wind"
-	SpellElement = "Wind"
+	SpellElement = "Air"
 	Area = "Around Target"
 	Distance = 10
 	DistanceAround = 8
@@ -1873,7 +1842,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 /obj/Skills/AutoHit/DemiFiend/Thunderclap_Storm
 	name = "Thunderclap"
 	ElementalClass = "Wind"
-	SpellElement = "Wind"
+	SpellElement = "Air"
 	Area = "Circle"
 	Distance = 8
 	Bolt = 4

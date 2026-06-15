@@ -123,8 +123,10 @@ obj/Skills
 	var/Shearing //Debuffs regen
 	var/Crippling //Cripples movement
 	var/Doom=0
+	var/Ashing //Applies the AshChoked debuff which negates healing
 	var/Combustion=0 //Flat Combustion threshold bonus the attacker gains while this skill resolves damage. Implementation subject to change
 	var/IceAge=0 //Flat IceAge threshold bonus the attacker gains while this skill resolves damage.
+	var/Disarm=0 //If set, this skill will attempt to disarm the target on hit
 	//Spell passive vars (populated by SpellSlotModification on enchanted spells)
 	var/NerveOverload=0 //Air Paralyzer: adds Shock per hit
 	var/CriticalParalyze=0 //Air Synapse: % chance to stun on hit
@@ -153,10 +155,11 @@ obj/Skills
 	var/DoubleStrike
 	var/TripleStrike
 
-
+	var/MasteryCheck=0
 	 //only projectiles have this function rn
 	var/FollowUp = null //holds a text path of a skill that will be triggered...
 	var/FollowUpDelay = 0  //after waiting this amt of time
+	var/OnMobHit = null
 	var/ThrowOnCounter
 	var/Controlling //Love potion effects TODO: Remove/discontinue for...
 	var/BuffSelf
@@ -188,6 +191,21 @@ obj/Skills
 	var/copiedBy
 
 	var/heavenlyRestrictionIgnore = FALSE
+
+	var/CooldownDrag
+	var/Sanctify
+	var/StarCrossed
+
+	var/PainShare
+
+	var/ChargeDelay
+
+	var/Deport
+
+	var/Enshrine
+	var/HealingReverse
+
+	var/ForceField
 
 	proc
 		skillDescription()
@@ -325,7 +343,36 @@ obj/Skills
 						usr.SkillX("Aerial Payback",x)
 			else
 				usr.SkillX("DragonDash",src)
-
+	Transformation
+		Cooldown=1
+		desc="Transform!"
+		verb/Transform()
+			set name="Transform!"
+			set category="Utility"
+			if(usr.StandardTransformRequirements()&&!usr.isRace(HUMAN))
+				usr.Transform()
+		verb/Revert()
+			set name="Revert!"
+			set category="Utility"
+			if(usr.transActive&&!usr.HasNoRevert()&&!usr.isMazokuHuman())
+				for(var/obj/Skills/Buffs/B in usr)
+					if(usr.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
+						B.Trigger(usr)
+						return
+				usr.Revert()
+				usr << "You revert from your transformed state."
+				return
+		verb/TogglePCTrans()
+			set name="Toggle PC Transformations"
+			set category="Utility"
+			if(usr.PCTransToggle)
+				usr.PCTransToggle=0
+				usr<< "You will now transform through use of Power Control."
+				return
+			if(!usr.PCTransToggle)
+				usr.PCTransToggle=1
+				usr<< "You will no longer transform through use of Power Control."
+				return
 	Reverse_Dash
 		Cooldown=30
 		CooldownStatic=1
@@ -677,13 +724,21 @@ obj/Skills
 					spawn(2)RecoverImage(Target)
 					spawn(4)RecoverImage(Target)
 					if(usr.Power*((!usr.HasNullTarget() ? usr.GetGodKi()**3 : 0))>Target.Power*min((!Target.HasNullTarget() ? Target.GetGodKi()**3 : 0),1)||Target.KO)
+						OMsg(usr, "[usr] destroys the existence of [Target]!", "[usr] DESTROYED [Target].")
+						if(Target.passive_handler.Get("Emptiness")||Target.isRace(ELDRITCH))
+							sleep(30)
+							OMsg(usr, "...but there is no existence for [usr] to destroy.", "[usr] FAILED TO DESTROY [Target].")
+							return
+						if(Target.passive_handler.Get("EndlessNine"))
+							sleep(30)
+							OMsg(usr, "...but [Target] rejects the legitimacy of the divine, rendering [usr]'s attempts fruitless.", "[usr] FAILED TO DESTROY [Target].")
+							return
 						Target.Savable=0
 						if(istype(Target, /mob/Players))
 							fdel("Saves/Players/[Target.ckey]")
 						animate(Target,alpha=0,time=30)
 						spawn(30)
 							del(Target)
-						OMsg(usr, "[usr] destroys the existence of [Target]!", "[usr] DESTROYED [Target].")
 					else
 						OMsg(usr, "[Target] resists the destructive energies of [usr]!", "[usr] failed to DESTROY [Target].")
 
@@ -733,6 +788,14 @@ obj/Skills
 			set name="False Moon"
 			set category="Skills"
 			usr.SkillX("FalseMoon",src)
+
+	True_Sun
+		Cooldown=-1
+		desc="Reveal the true sun."
+		verb/TrueSun()
+			set name="True Sun"
+			set category="Skills"
+			usr.SkillX("TrueSun",src)
 
 	Celestial_Invocation
 		Cooldown=86400
@@ -982,6 +1045,35 @@ turf/Click(turf/T)
 					usr.dir=formerdir
 					if(usr.Energy<1)
 						usr.Energy=1
+
+		else if(locate(/obj/Skills/Hoho/Shunpo,usr.contents))
+			var/obj/Skills/Hoho/Shunpo/s = locate(/obj/Skills/Hoho/Shunpo, usr.contents)
+			if(s.ShunpoToggle)
+				if(T) if(T.icon)
+					for(var/turf/A in view(0,usr))
+						if(A==src)
+							return
+					if(!T.density&&usr.icon_state!="Meditate"&&!usr.Observing&&(usr.Beaming!=2))
+						if(s.Charges <= 0) return
+						var/upgrades = 0
+						if(locate(/obj/Skills/Hoho/Shunpo_Upgrade1,usr.contents)) upgrades++
+						if(locate(/obj/Skills/Hoho/Shunpo_Upgrade2,usr.contents)) upgrades++
+						if(locate(/obj/Skills/Hoho/Shunpo_Upgrade3,usr.contents)) upgrades++
+						if(locate(/obj/Skills/Hoho/Shunpo_Upgrade4,usr.contents)) upgrades++
+						var/mana_cost = max(0.2, 1.0 - 0.2*upgrades)
+						if(usr.ManaAmount < mana_cost) return
+						VanishImage(usr)
+						var/formerdir = usr.dir
+						usr.Move(src)
+						usr.dir = formerdir
+						if(usr.Energy < 1)
+							usr.Energy = 1
+						usr.LoseMana(mana_cost)
+						var/recharge_ticks = max(20, (10 - 2*upgrades) * 10)
+						s.Charges--
+						if(s.Charges <= 0)
+							s.Using = 1
+						s.Recharge(recharge_ticks, usr)
 
 		else if(locate(/obj/Skills/Blink,usr.contents))
 			for(var/obj/Skills/Blink/W in usr.contents)

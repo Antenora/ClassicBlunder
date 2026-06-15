@@ -292,7 +292,13 @@
         HitSparkSize=1
         HitMessage="smashes into the wall standing in their way!";
         adjust(mob/p)
-            if(p.passive_handler.Get("SpiralPowerUnlocked")>=6)
-                FollowUp="/obj/Skills/AutoHit/Spiral/Giga_Drill_Maximum"
+            if(p.secretDatum.currentTier>=5)
+                BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution"
+            if(p.passive_handler.Get("SpiralPowerUnlocked")>=2||p.Health<=50)
+                KBMult=3
+                KBAdd=25
+                FollowUp="/obj/Skills/AutoHit/Spiral/Lagann_Impact2"
             else
-                FollowUp=null
+                KBMult=3
+                KBAdd=25
+                FollowUp="/obj/Skills/AutoHit/Spiral/Lagann_Impact"

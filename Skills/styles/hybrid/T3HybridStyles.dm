@@ -31,7 +31,7 @@
 		StyleActive = "School of the Undefeated Of The East"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
-				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25)
+				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25, "Grippy" = 4)
 		verb/School_of_the_Undefeated_of_the_East()
 			set hidden=1
 			adjust(usr)
@@ -97,8 +97,12 @@
 		ElementalOffense = "Wind"
 		StyleActive="Plasma Blade"
 		Finisher="/obj/Skills/Queue/Finisher/Plasma_Formation"
+		adjust(mob/p)
+			passives = list( "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
+			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 3, "BlurringStrikes" = 1.5, "Rain" = 3, "SpiritSword" = 1, "SpiritFlow"=4);
 		verb/Plasma_Blade()
 			set hidden=1
+			if(!usr.BuffOn(src)) adjust(usr);
 			Trigger(usr)
 	Bloodwhetter
 		SignatureTechnique=3
@@ -115,7 +119,7 @@
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
 			"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
-			"SpiritSword" = 0.5, "Crippling" = 5, "Poisoning" = 5, "Pursuer" = 1, )
+			"SpiritSword" = 0.5, "Crippling" = 5, "Poisoning" = 5, "Pursuer" = 1)
 		verb/Bloodwhetter()
 			set hidden=1
 			Trigger(usr)

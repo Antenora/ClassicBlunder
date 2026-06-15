@@ -491,6 +491,9 @@ mob/Admin2/verb
 				m << "You have been maimed!"
 	EditPassiveHandler(mob/m in world)
 		set category = "Admin"
+		if(m.passive_handler.Get("Rank-Down Protection") && !usr.passive_handler.Get("True Edit"))
+			m.OMessage(15, "<b><font color=[m.Text_Color]><font size=+1>[m] was protected from the effects of Rank Magic!</b></font color></font size>", "<font color=blue>[m]([m.key]) cannot be Edited.")
+			return
 		src.Edit(m.passive_handler)
 
 	ViewPassives(mob/m in world)
@@ -553,7 +556,7 @@ mob/Admin3/verb
 		if(AdminContentsView) usr << "You will now view the contents of any mob you have selected."
 		else usr << "You will no longer view the contents of any mob you have selected."
 
-	Potential_Boost(var/mob/m in players, var/val as num|null)
+	Potential_Boost(mob/m in players, val as num)
 		set category="Admin"
 		if(val&&m)
 			m.Potential+=val
@@ -798,6 +801,12 @@ mob/proc/AdminDoKO(mob/A)
 				A.Conscious()
 				world << "<font color=red><b>Death-X-Evolution...</b></font>"
 				de.Trigger(A)
+			return
+		if(A.passive_handler.Get("Rank-Down Protection"))
+			A.OMessage(20, "[A] was just knocked out by ADMIN!", "<font color=red>[A] was just knocked out by ADMIN!")
+			sleep(20)
+			src << "<b><font color='green'>...but [A]'s fate is not for you to shepherd!</b></font color>"
+			A.OMessage(15, "<b><font color=[A.Text_Color]><font size=+1>...but [A] was protected by the Lord's Grace!</b></font color></font size>", "<font color=blue>[A]([A.key]) denies death.")
 			return
 		A.Unconscious(null, "ADMIN")
 		Log("Admin", "<font color=red>[ExtractInfo(src)] admin-KOed [ExtractInfo(A)].")
@@ -1366,13 +1375,13 @@ mob/Admin2/verb
 		if(!M.passive_handler)
 			M.passive_handler = new
 		if(M.HasTestMode())
-			M.passive_handler.Set("TestMode", 0)
+			M.passive_handler.Set("TestMode", 0, TRUE)
 			Log("Admin", "[ExtractInfo(usr)] disabled Test Mode on [ExtractInfo(M)].")
 			usr << "Test Mode is now OFF for [M]."
 			if(M.client)
 				M << "Admin Test Mode is now OFF. Skill cooldowns are normal."
 		else
-			M.passive_handler.Set("TestMode", 1)
+			M.passive_handler.Set("TestMode", 1, TRUE)
 			Log("Admin", "[ExtractInfo(usr)] enabled Test Mode on [ExtractInfo(M)].")
 			usr << "Test Mode is now ON for [M]."
 			if(M.client)
@@ -1390,6 +1399,19 @@ mob/Admin2/verb
 	Observe_(atom/A as mob|obj in world)
 		set category="Admin"
 		set name="AObserve"
+		/*if(istype(A, /mob))
+			var/mob/M = A
+			if(M.passive_handler.Get("Anti-Scrying") && M.passive_handler.Get("Rank-Down Protection"))
+				var/antiscry = 1
+				if(usr.passive_handler.Get("God's Gaze"))
+					antiscry = 0
+				else if(usr.HasGodKi())
+					if(usr.passive_handler.Get("GodKi") > M.passive_handler.Get("GodKi"))
+						antiscry = 0
+				if(antiscry)
+					usr << "<b><font color=[M.Text_Color]><font size=+1>[M] reflects your attempt at Scrying!</b></font color></font size>"
+					M << "<b>A metaphysical entity has attempted to observe you!</b>"
+					return*/
 		Observify(usr,A)
 		if(A!=src)
 			src.Observing=2
@@ -1749,6 +1771,12 @@ mob/Admin2/verb
 	Edit(atom/A in world)
 		set category = "Admin"
 		A = src.AdminResolveTargetedContent(A)
+		if(istype(A, /mob))
+			var/mob/M = A
+			if(M.passive_handler.Get("Rank-Down Protection") && !usr.passive_handler.Get("True Edit"))
+				M.OMessage(15, "<b><font color=[M.Text_Color]><font size=+1>[M] was protected from the effects of Rank Magic!</b></font color></font size>", "<font color=blue>[M]([M.key]) cannot be Edited.")
+				return
+
 		var/list/browserOptions = list()
 		browserOptions.Add("+find");
 		winset(usr, null, list2params(browserOptions));

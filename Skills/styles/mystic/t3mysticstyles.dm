@@ -41,6 +41,7 @@
 				var/inp = input(User, "What demon skill do you want?") in list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat")
 				BuffTechniques = list(inp)
 				demonSkill = inp
+			. = ..()
 		proc/swap_stance(o)
 			switch(o)
 				if("blizzard")
@@ -202,8 +203,11 @@
 				return
 			if(lastSlide + (30 SECONDS) > world.time)
 				var/remaining = round((lastSlide + (30 SECONDS) - world.time) / 10, 0.1)
-				owner << "Slide Evolution is on cooldown: [remaining]s remaining."
-				return
+				if(remaining>30)
+					remaining=0
+				else
+					owner << "Slide Evolution is on cooldown: [remaining]s remaining."
+					return
 			var/next_stance
 			switch(StyleActive)
 				if("Betel")

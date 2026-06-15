@@ -20,18 +20,18 @@ proc/getPassiveTier(mob/p, passivesObtained="NotSet", secondary=FALSE)//passives
         return 0;
     . = list()
     var/asc = p.AscensionsAcquired
-    if(asc in 0 to 5)
+    if(asc in 0 to 6)
         . += "I"
-    if(asc in 2 to 5)
+    if(asc in 2 to 6)
         if(passivesObtained >= getPassiveThreshold(2, secondary))
             . += "II"
-    if(asc in 3 to 5)
+    if(asc in 3 to 6)
         if(passivesObtained >= getPassiveThreshold(3, secondary))
             . += "III"
-    if(asc in 4 to 5)
+    if(asc in 4 to 6)
         if(passivesObtained >= getPassiveThreshold(4, secondary))
             . += "IV"
-    if(asc == 5)
+    if(asc in 5 to 6)
         if(passivesObtained >= getPassiveThreshold(5, secondary))
             . += "V"
 
@@ -58,4 +58,3 @@ proc/getPassiveTier(mob/p, passivesObtained="NotSet", secondary=FALSE)//passives
             return 5;
         if(tier==5)
             return 7;
-            

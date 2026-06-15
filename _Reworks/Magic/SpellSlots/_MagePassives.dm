@@ -1,5 +1,14 @@
 /mob/var/list/acquiredMagePassives=list();
 
+/mob/var/list/acquiredFirePassives=list();
+/mob/var/list/acquiredAirPassives=list();
+/mob/var/list/acquiredEarthPassives=list();
+/mob/var/list/acquiredWaterPassives=list();
+/mob/var/list/acquiredLightPassives=list();
+/mob/var/list/acquiredDarkPassives=list();
+/mob/var/list/acquiredSpacePassives=list();
+/mob/var/list/acquiredTimePassives=list();
+
 // Per-attacker cooldown gate for Dark Iconoclast's Power-steal on hit. Stores
 // the next world.time at which an Iconoclast steal is allowed to fire on this
 // mob. Tmp because cooldown state never needs to survive logout/save — combat
@@ -33,6 +42,7 @@
             src << "You have internalized the [mp.name] mage passive."
         if(mp.element && !(mp.element in elements_touched))
             elements_touched += mp.element
+            src.vars["acquired[mp.element]Passives"] +=mp.passives
     for(var/elem in elements_touched)
         updateGestalt(elem)
 
@@ -267,11 +277,6 @@
     // active dump (consume Grit for a Vai Health shield) only existed as a Beastheart
     // racial skill. Grant the same skill to mages so the listed passive actually does
     // something for them.
-    if((element == "Earth" || element == "Light") && new_tier >= 2)
-        var/obj/Skills/grit_skill = FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit)
-        if(!grit_skill)
-            findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit)
-            src << "Your Gestalt-honed grit can now be channeled into a Vai Health shield."
 
 /mob/proc/removeGestaltForElement(element)
     var/style_path = getGestaltStylePath(element)
@@ -315,6 +320,41 @@
     var/node_count = acquiredMagicNodes.len
     if(node_count > 0)
         var/refund = node_count * glob.MagicNodeRPPCost
+        RPPSpendable += refund
+        RPPSpent -= refund
+        if(RPPSpendable > RPPCurrent)
+            RPPSpendable = RPPCurrent
+    // 7. Clear magic knowledge from nodes
+    magicKnowledge.Cut()
+    // 8. Clear tree progress
+    acquiredMagicNodes.Cut()
+    availableMagicNodes.Cut()
+    accessedMagicTrees.Cut()
+    src << "Your magic tree has been fully refunded."
+/mob/proc/refundNewMagicTreeOld()
+    // 1. Remove mage passive contributions from passive_handler, then clear the list
+    for(var/mage_passive/mp in acquiredMagePassives)
+        if(mp.passives && mp.passives.len)
+            passive_handler.Decrease(mp.passives)
+    acquiredMagePassives.Cut()
+    // 2. Remove all Gestalt Style and Buff objects
+    removeAllGestalts()
+    // 3. Remove spell passives (disenchant any that are slotted, then clear)
+    for(var/spell_passive/sp in acquiredSpellPassives)
+        if(sp.enchantedIn)
+            disenchantSpellWithPassive(sp.enchantedIn, sp)
+    acquiredSpellPassives.Cut()
+    // 4. Remove spell slot skills granted by magic nodes
+    for(var/obj/Skills/S in src)
+        if(S.SpellSlot)
+            del S
+    // 5. Remove the Enchant_Spell utility if it exists
+    var/obj/Skills/enc = FindSkill(/obj/Skills/Utility/Enchant_Spell)
+    if(enc) del enc
+    // 6. Refund RPP for each acquired node
+    var/node_count = acquiredMagicNodes.len
+    if(node_count > 0)
+        var/refund = node_count * glob.OldMagicNodeRPPCost
         RPPSpendable += refund
         RPPSpent -= refund
         if(RPPSpendable > RPPCurrent)

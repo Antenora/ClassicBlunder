@@ -18,8 +18,12 @@
 /mob/proc/newDoDamage(mob/defender, val, unarmed, sword, secondhit, thirdhit, trueMult, spiritAtk, destructive, autohit)
 	if(inStasis() || defender.inStasis())
 		return 0;
+	if(defender.Airborne)
+		return 0
 	if(defender.AdminOverwatchActive)
 		return 0;
+	if(defender.HiddenInShadow)
+		return 0
 	if(defender == src)
 		DEBUGMSG("Defender was src, and so newDoDamage stopped early")
 		// Dark Survivor mage passive: self-damage refunds 20% of the incoming value
@@ -38,10 +42,8 @@
 		// event schedules its own decrease, so two hits 5s apart give 20 LifeSteal
 		// for the first 5s, 10 for the next 5s, then back to baseline.
 		if(src.hasMagePassive(/mage_passive/dark/Shadowbringer))
-			src.passive_handler.Increase("LifeSteal", 10)
-			spawn(100)
-				if(src && src.passive_handler)
-					src.passive_handler.Decrease("LifeSteal", 10)
+			if(CheckSlotless("Shadow Infusion")) SlotlessBuffs["Shadow Infusion"].Timer = 0;
+			else findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shadow_Infusion);
 		DamageSelf(val)
 		return 0;
 	else if(defender == null)
@@ -160,7 +162,7 @@
 	// _Move.dm:116 and the Past per-10-Cripple block above. PURE_MODIFIER pre-calc
 	// scaling matches the base puredmg path.
 	if(src.hasMagePassive(/mage_passive/dark/Iconoclast))
-		var/icon_pd = round(abs(src.Health - defender.Health) / 5)
+		var/icon_pd = round(abs(defender.Health - src.Health) / 20)
 		if(icon_pd > 0)
 			if(!glob.PURE_MOD_POST_CALC)
 				icon_pd *= glob.PURE_MODIFIER
@@ -371,6 +373,30 @@
 					defender.loc = nextT
 				else
 					break
+	// For Irooni, debuff's current color rewards the matching attack type and punishes a wrong
+	// one. Red=Autohit, Blue=Queue, Green=Projectile. Match x1.5 damage, mismatch x0.5.
+	// Normal attacks and grapples and other forms of damage are exempt from this
+	if(val > 0 && defender.IroniActive && defender.IroniCaster == src)
+		var/IroniType = null
+		if(src.AutoHitting)
+			IroniType = "red"
+		else if(AttackQueue)
+			IroniType = "blue"
+		else if(ProjectileAttacking)
+			IroniType = "green"
+		if(IroniType)
+			var/IroniNewBurst = (world.time - src.IroniLastResonateTime > 10)
+			if(IroniType == defender.IroniColor)
+				val *= 1.5
+				if(src.client && IroniNewBurst)
+					src << "<font color='#ffd24d'><b>Irooni resonates, your strike hits harder!</b></font>"
+			else
+				val *= 0.5
+			src.IroniLastResonateTime = world.time
+	// Ichidanme: Tameraikizu no Wakachiai makes it so whoever deals damage to the other also takes that damage 
+	// to themselves as Injury. Excludes Itokiribasami
+	if(val > 0 && src.TameraikizuActive && src.TameraikizuPartner == defender && !src.ItokiribasamiAttacking)
+		src.WoundSelf(val)
 	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit at the end of newdodamage");
 		#if DEBUG_DAMAGE

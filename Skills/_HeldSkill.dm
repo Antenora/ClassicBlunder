@@ -6,9 +6,13 @@
 // ChargeBenefit on release is 0-1 from progress through ChargePeriod.
 // Hitting the SweetSpot window sets benefit to SweetSpotBenefit instead
 
+#define HELD_MACRO_PREFIX "HeldKeyDown "
+#define HELD_MACRO_FLAG_WINDOW 2
+
 /obj/Skills
 	var/HeldSkill        = FALSE  // Enable held-charge behavior for this skill
-	var/ChargePeriod     = 3      // Max hold time in seconds, hold too long = fizzle
+	var/NoFizzle         = FALSE  // If TRUE, exceeding ChargePeriod auto-releases
+	var/ChargePeriod     = 3      // Max hold time in seconds
 	var/SweetSpot        = 0      // Seconds from charge start when sweet spot opens (0 = disabled)
 	var/SweetSpotWindow  = 0.3    // Width of the sweet spot window in seconds (default 0.3s = 3 ticks)
 	var/SweetSpotBenefit = 1.5    // ChargeBenefit value when the sweet spot window is hit
@@ -18,11 +22,20 @@
 	var/ChargeBenefit    = 0      // Set on release
 	var/HeldVerbName     = null   // Optional override for macro detection;
 	                              // defaults to Z.name if null
+	var/InfiniteHold     = FALSE  // If TRUE, hold continues indefinitely
+	var/FireRate         = 0      // Smaller number = faster
 
 /obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 	// Override in individual skills to execute the charged attack.
 
 /obj/Skills/proc/OnHeldFizzle(mob/p)
+
+/obj/Skills/proc/OnHeldStart(mob/p)
+	// Called once when BeginHeldSkill successfully begins charging
+	// Override to apply effects that last for the duration of the hold
+
+/obj/Skills/proc/OnHeldTick(mob/p)
+	// Called by ChargeLoop, tick based on FireRate, smaller = faster
 
 // This avoids stat changes to skills persisting across use (mostly for projectiles)
 
@@ -62,6 +75,7 @@
 	var/tmp/list/held_charge_bar_fill_refs = null
 	var/tmp/held_skill_macro_key          = null
 	var/tmp/held_skill_last_release       = 0
+	var/tmp/held_skill_from_macro         = 0
 
 
 /proc/_normalizeHeldName(s)
@@ -69,6 +83,11 @@
 	s = replacetext(s, "_", " ")
 	s = replacetext(s, "-", " ")
 	return lowertext(s)
+
+/proc/_dequoteMacroCmd(s)
+	if(s && length(s) >= 2 && copytext(s, 1, 2) == "\"" && copytext(s, length(s)) == "\"")
+		return copytext(s, 2, length(s))
+	return s
 
 // Candidate keys to probe when finding which key the player has the
 // skill bound to.
@@ -100,13 +119,19 @@
 	if(!isnum(h) || h <= 0) return 32
 	return h
 
-// BeginHeldSkill is called by the skill's verb instead of Activate
 
 /mob/proc/BeginHeldSkill(var/obj/Skills/Z)
+	var/from_macro = held_skill_from_macro && (world.time - held_skill_from_macro) <= HELD_MACRO_FLAG_WINDOW
+	held_skill_from_macro = 0
+
 	if(held_skill) return  // Already charging something
 	if(!Z || !Z.HeldSkill) return
 	var/client/C = client
 	if(!C) return
+	if(src.Airborne) return
+	if(src.OnMagicalVehicle())
+		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+		return
 
 	// All guards run before touching any charge state.
 
@@ -116,10 +141,20 @@
 		src << "<font color='red'>Macro bindings are still loading. Try again in [remaining_s] seconds.</font>"
 		return
 
-	// Key binding check also gates verb-list clicks on unbound skills (maybe?)
-	var/key = findHeldSkillKey(C, Z)
-	if(!key)
-		src << "<font color='red'>Bind [Z.name] to a key first. (Relogging should fix this. If you cannot relog, wait a few minutes and try again.)</font>"
+	// Every key this skill is bound to, for supporting the same skill on 2+ keys
+	var/list/keys = findHeldSkillKeys(C, Z)
+
+	// Clicked from the verb panel / command line instead of pressed on a key
+	if(!from_macro)
+		if(keys && keys.len)
+			src << "<font color='red'>Use [Z.name] from the key you bound it to, not by clicking it. (If you just changed the bind, relog.)</font>"
+		else
+			src << "<font color='red'>Bind [Z.name] to a key and use it from that key, not by clicking it. (If you just bound it, relog.)</font>"
+		return
+
+	// No key bound
+	if(!keys || !keys.len)
+		src << "<font color='red'>Bind [Z.name] to a key first. (Relogging should fix this.)</font>"
 		return
 
 	// re-entry guard
@@ -137,8 +172,8 @@
 			src << "<font color='red'>You need a sword equipped to use [Z.name]!</font>"
 			return
 
-	// reinstalls the +UP macro for this exact key right now.
-	winset(C, "heldskill_up_[key]", "type=macro;parent=[C.held_skill_macro_set];name=[key]+UP;command=Release-Held-Skill")
+	for(var/k in keys)
+		winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
 
 	held_skill        = Z
 	held_charge_start = world.time
@@ -150,14 +185,48 @@
 		held_charge_overlay_ref = I
 		overlays += I
 	ShowHeldChargeBar(Z)
+	if(Z.InfiniteHold)
+		UpdateHeldChargeBar(1)
 	KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5, Blend=Z.ChargeWaveBlend, Time=8)
 
-	held_skill_macro_key = key
+	held_skill_macro_key = keys
 
+	Z.OnHeldStart(src)
 	spawn() ChargeLoop(Z)
 
 
-/mob/proc/findHeldSkillKey(client/C, obj/Skills/Z)
+/mob/verb/HeldKeyDown(cmd as text)
+	set name = "HeldKeyDown"
+	set hidden = 1
+	set instant = 1
+	if(!cmd) return
+	var/obj/Skills/Z = _resolveHeldSkill(cmd)
+	if(!Z) return
+	held_skill_from_macro = world.time
+	var/ident = replacetext(replacetext(cmd, " ", "_"), "-", "_")
+	if(hascall(Z, ident))
+		call(Z, ident)()
+	else
+		BeginHeldSkill(Z)
+
+
+/mob/proc/_resolveHeldSkill(cmd)
+	var/norm = _normalizeHeldName(cmd)
+	if(!norm) return null
+	for(var/obj/Skills/Z in src.contents)
+		if(!Z.HeldSkill) continue
+		var/raw = Z.HeldVerbName ? Z.HeldVerbName : Z.name
+		if(raw && _normalizeHeldName(raw) == norm) return Z
+	for(var/obj/Skills/Z in src.contents)
+		if(!Z.HeldSkill) continue
+		var/raw = Z.HeldVerbName ? Z.HeldVerbName : Z.name
+		if(!raw) continue
+		var/rn = _normalizeHeldName(raw)
+		if(findtext(norm, rn) || findtext(rn, norm)) return Z
+	return null
+
+
+/mob/proc/findHeldSkillKeys(client/C, obj/Skills/Z)
 	var/raw_search = Z.HeldVerbName ? Z.HeldVerbName : Z.name
 	if(!raw_search) return null
 	var/search = _normalizeHeldName(raw_search)
@@ -167,14 +236,11 @@
 	var/list/cache = C.held_skill_key_cache
 	for(var/cmd_key in cache)
 		if(findtext(cmd_key, search))
-			return cache[cmd_key]
+			return cache[cmd_key]   // list of every key this skill is bound to
 
 	return null
 
-// Builds (or rebuilds) the client's macro key cache and schedules a refresh
-// every 5 minutes so macro changes mid-session are picked up automatically.
-// On first login this fires once from client/New(), after which it reschedules
-// itself. The old cache remains valid during background refreshes.
+// Builds the client's held-skill macro key cache only on login now, should help with lag/dcs, players will just need to relog if they change key for their hold skill
 /client/proc/RebuildHeldSkillKeyCache()
 	if(!src) return
 	held_skill_cache_build_start = world.time
@@ -187,7 +253,8 @@
 		var/raw = initial(T:HeldVerbName) ? initial(T:HeldVerbName) : initial(T:name)
 		if(raw) held_names += _normalizeHeldName(raw)
 
-	var/list/new_cache = list()
+	var/list/new_cache = list()         
+	var/list/shortcut_key_map = list()  
 
 	var/macro_set_str = winget(src, null, "macro")
 	var/macro_params = params2list(macro_set_str)
@@ -208,36 +275,77 @@
 			var/key_name = winget(src, child_id, "name")
 			if(!key_name || findtext(key_name, "+UP")) continue
 
-			var/cmd = winget(src, child_id, "command")
+			var/cmd = _dequoteMacroCmd(winget(src, child_id, "command"))
 			if(!cmd) continue
 
-			var/norm_cmd = _normalizeHeldName(cmd)
+			var/original_cmd = cmd
+			if(copytext(cmd, 1, length(HELD_MACRO_PREFIX) + 1) == HELD_MACRO_PREFIX)
+				original_cmd = copytext(cmd, length(HELD_MACRO_PREFIX) + 1)
+
+			var/norm_cmd = _normalizeHeldName(original_cmd)
+
+			var/matched_shortcut = FALSE
+			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+				if(norm_cmd == "skill shortcut [sc_n]")
+					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
+					shortcut_key_map["[sc_n]"] |= key_name
+					matched_shortcut = TRUE
+					break
+			if(matched_shortcut) continue
+
 			for(var/held_name in held_names)
 				if(findtext(norm_cmd, held_name))
-					new_cache[norm_cmd] = key_name
+					if(!new_cache[norm_cmd]) new_cache[norm_cmd] = list()
+					new_cache[norm_cmd] |= key_name
+					winset(src, child_id, "command=\"[HELD_MACRO_PREFIX][original_cmd]\"")
 					break
 	else
-		// Fallback, probe candidate keys by name (children unavailable)
 		for(var/k in _heldSkillCandidateKeys())
-			var/cmd = winget(src, k, "command")
+			var/cmd = _dequoteMacroCmd(winget(src, k, "command"))
 			if(!cmd) continue
-			var/norm_cmd = _normalizeHeldName(cmd)
+			var/original_cmd = cmd
+			if(copytext(cmd, 1, length(HELD_MACRO_PREFIX) + 1) == HELD_MACRO_PREFIX)
+				original_cmd = copytext(cmd, length(HELD_MACRO_PREFIX) + 1)
+			var/norm_cmd = _normalizeHeldName(original_cmd)
+			var/matched_shortcut = FALSE
+			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+				if(norm_cmd == "skill shortcut [sc_n]")
+					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
+					shortcut_key_map["[sc_n]"] |= k
+					matched_shortcut = TRUE
+					break
+			if(matched_shortcut) continue
 			for(var/held_name in held_names)
 				if(findtext(norm_cmd, held_name))
-					new_cache[norm_cmd] = k
+					if(!new_cache[norm_cmd]) new_cache[norm_cmd] = list()
+					new_cache[norm_cmd] |= k
+					winset(src, k, "command=\"[HELD_MACRO_PREFIX][original_cmd]\"")
 					break
+
+	var/mob/sc_mob = src.mob
+	if(sc_mob && sc_mob.shortcuts)
+		for(var/sc_n = 1, sc_n <= 10, sc_n++)
+			var/list/sc_keys = shortcut_key_map["[sc_n]"]
+			if(!sc_keys || !sc_keys.len) continue
+			var/obj/Skills/sc_skill = sc_mob.shortcuts.vars["shortcut[sc_n]"]
+			if(!sc_skill || !sc_skill.HeldSkill) continue
+			var/sc_raw = sc_skill.HeldVerbName ? sc_skill.HeldVerbName : sc_skill.name
+			if(!sc_raw) continue
+			var/sc_norm = _normalizeHeldName(sc_raw)
+			if(!new_cache[sc_norm]) new_cache[sc_norm] = list()
+			for(var/sk in sc_keys)
+				new_cache[sc_norm] |= sk
 
 	// Because new_cache is filtered to held skills only, this loop never touches
 	// movement keys, hotbar slots, or any other binding.
 	for(var/cmd_key in new_cache)
-		var/bound_key = new_cache[cmd_key]
-		winset(src, "heldskill_up_[bound_key]", "type=macro;parent=[set_name];name=[bound_key]+UP;command=Release-Held-Skill")
+		var/list/bound_keys = new_cache[cmd_key]
+		for(var/bound_key in bound_keys)
+			winset(src, "heldskill_up_[bound_key]", "type=macro;parent=[set_name];name=[bound_key]+UP;command=Release-Held-Skill")
 
 	// both vars become visible together, after all +UP macros are set.
 	held_skill_macro_set = set_name
 	held_skill_key_cache = new_cache
-
-	spawn(3000) RebuildHeldSkillKeyCache()
 
 
 /mob/proc/ShowHeldChargeBar(var/obj/Skills/Z)
@@ -377,23 +485,33 @@
 // ChargeLoop runs for the duration of the hold
 
 /mob/proc/ChargeLoop(var/obj/Skills/Z)
+	var/last_tick_fire = 0
 	while(held_skill == Z)
 		// Interrupt conditions
 		var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed/charm_skill = locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed) in src
-		if(Stunned || Launched || Stasis > 0 || (charm_skill && BuffOn(charm_skill)))
+		if(Stunned || Suspended || Launched || Stasis > 0 || (charm_skill && BuffOn(charm_skill)))
 			FizzleHeldSkill(Z)
 			return
 
-		// Overheld fizzle
-		if(world.time - held_charge_start > Z.ChargePeriod * 10)
-			FizzleHeldSkill(Z)
-			return
+		if(Z.InfiniteHold)
+			if(Z.FireRate > 0 && world.time - last_tick_fire >= Z.FireRate)
+				Z.OnHeldTick(src)
+				last_tick_fire = world.time
+		else
+			// Overheld, fizzle normally, or auto-release if the skill opts out
+			if(world.time - held_charge_start > Z.ChargePeriod * 10)
+				if(Z.NoFizzle)
+					ReleaseHeldSkill()
+				else
+					FizzleHeldSkill(Z)
+				return
+
+			var/hold_ticks = world.time - held_charge_start
+			var/progress = clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1)
+			UpdateHeldChargeBar(progress)
 
 		// closing the visual gap after BeginHeldSkill's initial pulse.
 		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5, Blend=Z.ChargeWaveBlend, Time=8)
-		var/hold_ticks = world.time - held_charge_start
-		var/progress = clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1)
-		UpdateHeldChargeBar(progress)
 
 		sleep(2)
 
@@ -403,13 +521,23 @@
 	var/obj/Skills/Z = held_skill
 	if(!Z) return
 
+	if(Z.InfiniteHold)
+		Z.ChargeBenefit = 1
+		ClearHeldChargeState()
+		held_skill_last_release = world.time
+		Z.OnHeldRelease(src, 1, FALSE)
+		return
+
 	var/hold_ticks = world.time - held_charge_start
 	UpdateHeldChargeBar(clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1))
 
 	// Overheld
 	if(hold_ticks > Z.ChargePeriod * 10)
-		FizzleHeldSkill(Z)
-		return
+		if(Z.NoFizzle)
+			hold_ticks = Z.ChargePeriod * 10 
+		else
+			FizzleHeldSkill(Z)
+			return
 
 	var/benefit = clamp(hold_ticks / (Z.ChargePeriod * 10), 0.0, 1.0)
 	var/sweet_spot_hit = FALSE

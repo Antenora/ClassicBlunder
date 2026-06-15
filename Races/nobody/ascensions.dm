@@ -14,6 +14,7 @@ ascension
 						if(owner.SagaLevel < 2)
 							owner.SagaLevel = 2
 							owner.ChooseMartialSkill(1)
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -49,7 +50,7 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("Tenacity" = 1, "Persistence" = 1)
+							passives = list("Tenacity" = 1, "Persistence" = 1, "EnergyGeneration" = 2, "ManaGeneration" = 1)
 						if("Reaper")
 							strength=0.75 * SMod
 							force=0.25 * SMod
@@ -67,6 +68,7 @@ ascension
 							owner.SagaLevel = 3
 							owner.ChooseKeychain()
 							owner.ChooseMartialSkill(2)
+							owner.saga_up_self()
 				if(owner.NobodyOriginType!="Simple")
 					if(owner.transUnlocked<1)
 						owner.transUnlocked=1
@@ -105,7 +107,7 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("Tenacity" = 1, "Persistence" = 1)
+							passives = list("Tenacity" = 1, "Persistence" = 1, "EnergyGeneration" = 2, "ManaGeneration" = 1)
 						if("Reaper")
 							strength=0.75 * SMod
 							force=0.25 * SMod
@@ -121,6 +123,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 4)
 							owner.SagaLevel = 4
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -170,6 +173,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 5)
 							owner.SagaLevel = 5
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -178,10 +182,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "If you wanna make it happen, nothing is impossible! Don't think twice!"
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "You need true emotions... Your sanctuary..."
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Nothing is like before... Simple and clean..."
 					switch(owner.Class)
 						if("Samurai")
@@ -210,7 +216,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5, "Instinct" = 2, "PureDamage" = 1)
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			onAscension(mob/owner)
@@ -219,6 +225,7 @@ ascension
 					if(owner.Class == "Imaginary")
 						if(owner.SagaLevel < 6)
 							owner.SagaLevel = 6
+							owner.saga_up_self()
 				..()
 			simulateChoiceMutation(mob/owner)
 				var/type = owner.NobodyOriginType
@@ -227,10 +234,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "You're only crying because you never dreamed it'd take this long... Don't. Think. Twice."
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "Your fears, your lies, all melt away... Into your sanctuary!"
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Maybe some things are that simple..."
 					switch(owner.Class)
 						if("Samurai")
@@ -259,7 +268,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5,  "Instinct" = 2, "PureDamage" = 1, "Deicide" = 5)
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			onAscension(mob/owner)
@@ -272,10 +281,12 @@ ascension
 					switch(type)
 						if("Pride")
 							on_ascension_message = "Lose, don't have nothing to... Let me face my fears."
+							SMod = 1.5
 						if("Spirit")
 							on_ascension_message = "Faith, should I take a leap... Let me face my fears."
+							SMod = 1.5
 						if("Simple")
-							SMod = 2.5
+							SMod = 3
 							on_ascension_message = "Space, this is what I choose... Let me face my fears."
 					switch(owner.Class)
 						if("Samurai")
@@ -304,4 +315,4 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5,  "Instinct" = 2, "PureDamage" = 1, "Deicide" = 5)

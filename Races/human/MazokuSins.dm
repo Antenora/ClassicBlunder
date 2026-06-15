@@ -27,7 +27,9 @@ mob
 
 			if(mult < 0)
 				mult = 0
-			// HopeFactor is not capped here.
+			if(mult>1.5)
+				mult = 1.5
+			// HopeFactor is now capped here.
 
 			return mult
 
@@ -35,7 +37,7 @@ mob
 			if(amount <= 0) return
 			if(!isInHighTension()) return
 			if(!passive_handler || !passive_handler.Get("ApathyFactor")) return
-			ApathyDamageBonus = min(3, ApathyDamageBonus + amount * 0.01)
+			ApathyDamageBonus = min(1.5, ApathyDamageBonus + amount * 0.01)
 
 		resetApathyBonus()
 			ApathyDamageBonus = 0
@@ -47,26 +49,26 @@ mob
 	form_aura_icon = 'Amazing Super Demon Aura.dmi'
 	form_aura_x = -32
 	autoAnger = 1
-	strength = 1.3
-	force = 1.3
-	speed = 1.4
-	offense = 1.4
-	defense = 1.4
-	endurance = 1.4
-	passives = list(\
-		"TechniqueMastery" = 6,\
-		"BuffMastery" = 6,\
-		"PureReduction" = 6,\
-		"PureDamage" = 6,\
-		"GodKi" = 1.5,\
-		"HellRisen" = 1,\
-		"DemonicDurability" = 6,\
-		"Brutalize" = 6,\
-		"MovementMastery" = 6,\
-		"Steady" = 6,\
-		"ManaStats" = 6\
-	)
+	strength = 1
+	force = 1
+	speed = 1
+	offense = 1
+	defense = 1
+	endurance = 1
 	transformation_message = "usrName becomes a Devil!"
+	mastery_boons(mob/user)
+		passives = list("GodKi" = 0.25+((user.AscensionsAcquired-3)/10), "HellRisen" = user.AscensionsAcquired/10, "DemonicDurability" = user.AscensionsAcquired/4, "Brutalize" = user.AscensionsAcquired/6, "PureDamage" = user.AscensionsAcquired, "PureReduction" = user.AscensionsAcquired, "MovementMastery" = user.AscensionsAcquired, "BuffMastery"=user.AscensionsAcquired/2)
+		strength = 1 // to clear out people who already have it
+		force = 1
+		speed = 1
+		offense = 1
+		defense = 1
+		endurance = 1
+		enduranceadd = 0.5
+		offenseadd = 0.5
+		defenseadd = 0.5
+		strengthadd = 0.5
+		forceadd = 0.5
 	transform_animation(mob/user)
 		var/ShockSize = 5
 		for(var/wav = 5, wav > 0, wav--)
@@ -74,7 +76,6 @@ mob
 			ShockSize /= 2
 
 /transformation/human/high_tension/mazoku
-	revertToTrans = 0
 	pot_trans = 2
 	passives = list(\
 		"Conductor" = 10,\
@@ -101,7 +102,6 @@ mob
 			ShockSize/=2
 
 /transformation/human/high_tension_MAX/mazoku
-	revertToTrans = 0
 	pot_trans = 3
 	form_aura_icon = 'AurasBig.dmi'
 	form_aura_icon_state = "HT2"
@@ -131,7 +131,6 @@ mob
 			ShockSize/=2
 
 /transformation/human/super_high_tension/mazoku
-	revertToTrans = 0
 	pot_trans = 3
 	form_aura_icon = 'SpiralAura.dmi'
 	form_aura_x = -32
@@ -164,7 +163,6 @@ mob
 			ShockSize/=2
 
 /transformation/human/super_high_tension_MAX/mazoku
-	revertToTrans = 0
 	pot_trans = 5
 	passives = list(\
 		"Conductor" = 10,\
@@ -195,7 +193,6 @@ mob
 			ShockSize/=2
 
 /transformation/human/unlimited_high_tension/mazoku
-	revertToTrans = 0
 	pot_trans = 15
 	passives = list(\
 		"Conductor" = 10,\
@@ -227,12 +224,11 @@ mob
 	form_glow_y = -32
 	autoAnger = 1
 	pot_trans = 15
-	strength = 1.3
-	force = 1.3
-	speed = 1.4
-	offense = 1.4
-	defense = 1.4
-	endurance = 1.4
+	enduranceadd = 2
+	offenseadd = 2
+	defenseadd = 2
+	strengthadd = 2
+	forceadd = 2
 	passives = list(\
 		"Conductor" = 50,\
 		"HighTension" = 0.75,\
@@ -244,17 +240,15 @@ mob
 		"UnderDog" = 2,\
 		"Tenacity" = 17,\
 		"StyleMastery" = 6,\
-		"SuperHighTension" = 2,\
+		"SuperHighTension" = 1,\
 		"DoubleHelix" = 1,\
 		"UnlimitedHighTension" = 1,\
 		"CreateTheHeavens" = 1,\
-		"GodKi" = 1.5,\
+		"GodKi" = 1,\
 		"HellRisen" = 1,\
 		"DemonicDurability" = 6,\
 		"Brutalize" = 6,\
 		"MovementMastery" = 6,\
-		"Steady" = 6,\
-		"ManaStats" = 6\
 	)
 	transformation_message = "usrName awakens their Sacred Energy Aura!"
 	transform_animation(mob/user)
@@ -264,9 +258,6 @@ mob
 		for(var/wav = 5, wav > 0, wav--)
 			KenShockwave(user, icon='KenShockwaveDivine.dmi', Size=ShockSize, Blend=2, Time=8)
 			ShockSize /= 2
-		for(var/mob/M in view(user))
-			if(M.client)
-				ScreenShatter(M)
 		if(user.client)
 			ScreenShatter(user)
 
@@ -349,10 +340,16 @@ obj/Skills/Queue/Kibou_ou_Hope
 	verb/Kibou_ou_Hope()
 		set category = "Skills"
 		if(!usr.isInHighTension())
-			usr << "You cannot use this power right now."
+			usr << "You are not a Mazoku Human."
 			return
 		if(!usr.passive_handler || !usr.passive_handler.Get("HopeFactor"))
-			usr << "You cannot use this power right now."
+			usr << "You aren't hopeful enough to use this power."
+			return
+		if(usr.isInMazokuDT())
+			usr << "You cannot use this in Mazoku DT."
+			return
+		if(usr.Health >= 40)
+			usr << "You cannot use this until your health is low."
 			return
 		var/healthDiff = 0
 		if(usr.Target && istype(usr.Target, /mob/Players) && usr.Target != usr)

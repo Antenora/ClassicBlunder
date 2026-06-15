@@ -23,7 +23,32 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Clobber
 			adjust(usr)
 			applyToTarget?:adjust(usr)
 		src.Trigger(usr)
-
+obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul
+	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
+	KenWave = 4
+	KenWaveIcon='SparkleGreen.dmi'
+	HitSpark='Spiral_Hitspark.dmi'
+	TimerLimit=30
+	ActiveMessage="<b>erupts with a blazing spirit!!!</b>"
+	OffMessage="quells the flames."
+	TextColor="green"
+	MagicNeeded=0
+	Cooldown=60
+	adjust(mob/p)
+		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
+	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
+	KenWave = 4
+	KenWaveIcon='SparkleGreen.dmi'
+	HitSpark='Spiral_Hitspark.dmi'
+	TimerLimit=30
+	ActiveMessage="<b>evolves just a bit more!!!</b>"
+	OffMessage="limits themselves once again."
+	TextColor="green"
+	MagicNeeded=0
+	Cooldown=60
+	adjust(mob/p)
+		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -36,7 +61,9 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	OffMessage="limits themselves once again."
 	TextColor="green"
 	MagicNeeded=0
-	passives = list("SpiralPowerUnlocked" = 1)
+	adjust(mob/p)
+		if(p.Secret=="Spiral")
+			passives["SpiralPowerUnlocked"] = 0
 obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	BuffName="Desperate Evolution"
@@ -138,11 +165,11 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 				if(1 to 2)//this will never happen unless the skill is given unnaturally
 					SpiralPower=1//which, i guess, given the subject matter, is more likely than you'd think
 				if(3)
-					SpiralPower=2
+					SpiralPower=1
 				if(4)
-					SpiralPower=3
+					SpiralPower=1
 				if(5)
-					SpiralPower=7
+					SpiralPower=2
 			applyBuff.PowerMult=1+(0.05*secretLevel*secretLevel)
 			applyBuff.StrMult=1.25
 			applyBuff.ForMult=1.25
@@ -169,7 +196,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Impose_Evolution
 		set name="Force Evolution"
 		var/mob/User = usr
 		if(!User.party || !User.party.members || User.party.members.len == 0)
-			User << "You need to be in a party to apply Inspired Evolution."
+			User << "You need to be in a party to apply Imposed Evolution."
 			return
 		if(src.cooldown_remaining > 0)
 			User << "[src] is on cooldown."
@@ -215,15 +242,102 @@ obj/Skills/AutoHit/Spiral
 		Slow=1
 		Divide=1
 		Knockback=30
-		ActiveMessage="yells: <b>GIGA DRILL MAXIMUM!!!</b>"
+		WindUp = 1.25
+		WindupMessage="yells: <b>GIGA DRILL...</b>"
+		ActiveMessage="yells: <font size =+1><b>...MAXIMUM!!!</b></font size>"
 		HitSparkIcon='drill.dmi'
 		HitSparkX=-8
 		HitSparkY=-8
 		HitSparkTurns=1
 		HitSparkSize=1
 		HitSparkDispersion=1
+		Earthshaking=15
 		ComboMaster=1
 		Cooldown=180
+	Lagann_Impact
+		AlwaysAnnounceCooldown = 1
+		Area="Arc"
+		AdaptRate=1
+		DamageMult=6
+		Rush=20
+		ControlledRush=1
+		WindUp = 0.5
+		Rounds=1
+		Knockback=15
+		ComboMaster=1
+		RoundMovement=0
+		NoAttackLock=1
+		NoLock=1
+		Cooldown=2
+		Size=2
+		Distance=2
+		Instinct=10
+		ComboMaster=1
+		ShockIcon='KenShockwave.dmi'
+		Shockwave=5
+		Shockwaves=1
+		TurfStrike=1
+		TurfShift='Dirt1.dmi'
+		TurfShiftDuration=3
+		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply"
+		WindupMessage="yells: <b>LAGANN...</b>"
+		ActiveMessage="yells: <b>...IMPAAAAAAAAAAAAACT!!</b>"
+	Lagann_Impact2
+		AlwaysAnnounceCooldown = 1
+		Area="Arc"
+		AdaptRate=1
+		DamageMult=6
+		Rush=20
+		ControlledRush=1
+		WindUp = 0.5
+		Rounds=1
+		ComboMaster=1
+		RoundMovement=0
+		NoAttackLock=1
+		NoLock=1
+		Cooldown=3
+		Size=2
+		Distance=2
+		Instinct=10
+		ComboMaster=1
+		ShockIcon='KenShockwave.dmi'
+		Shockwave=5
+		Shockwaves=1
+		TurfStrike=1
+		TurfShift='Dirt1.dmi'
+		TurfShiftDuration=3
+		WindupMessage="yells: <b>LAGANN...</b>"
+		ActiveMessage="yells: <b>...IMPAAAAAAAAAAAAACT!!</b>"
+		FollowUp="/obj/Skills/AutoHit/Spiral/Giga_Drill_Maximum"
+		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply"
+		FollowUpDelay=1
+/obj/Skills/Projectile
+	Spiral
+		Probability_Negation_Missiles
+			Cooldown=180
+			ZoneAttack=1
+			ZoneAttackX=8
+			ZoneAttackY=8
+			FireFromEnemy=0
+			FireFromSelf=1
+			RandomPath=1
+			Speed = 0.75
+			Distance=30
+			DamageMult=0.5
+			AdaptRate=1
+			Explode=1
+			Dodgeable=0
+			Deflectable=0
+			EndRate=0.75
+			Blasts=50
+			Delay=0
+			LosesHoming=3
+			HomingCharge=10
+			IconLock='Missile Small.dmi'
+			IconSize=0.5
+			verb/Probability_Negation_Missiles()
+				set category="Skills"
+				usr.UseProjectile(src)
 /mob/proc/HandleSpiralUnlock(var/Stat, SL)
 	var/CA=AscensionsAcquired
 	var/TA=CA+SL
@@ -250,5 +364,5 @@ obj/Skills/AutoHit/Spiral
 			else
 				Total*=1
 	if((isRace(HUMAN) && Class=="Underdog") || NobodyOriginType=="Spirit")
-		Total*=1+((SL)/5)
+		Total*=1+((SL)*0.35)
 	return Total

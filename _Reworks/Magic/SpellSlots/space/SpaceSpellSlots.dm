@@ -7,8 +7,9 @@
 		ElementalClass="Space"
 		Area="Circle"
 		Distance=5
-		DamageMult=4
+		DamageMult=10
 		Knockback=3
+		Instinct=1
 		SpecialAttack=1
 		ForOffense=1
 		CanBeDodged=1
@@ -24,6 +25,9 @@
 		TurfShift='Gravity.dmi'
 		TurfShiftDuration=3
 		ActiveMessage="invokes: <font size=+1>FLUX!</font size>"
+		adjust(mob/p)
+			if(!altered)
+				DamageMult=10
 		verb/Flux()
 			set category="Skills"
 			adjust(usr)
@@ -33,7 +37,8 @@
 		ElementalClass="Space"
 		Area="Target"
 		Distance=6
-		DamageMult=5
+		DamageMult=10
+		Instinct=1
 		SpecialAttack=1
 		ForOffense=1
 		CanBeDodged=1
@@ -61,7 +66,7 @@
 		Cooldown=60
 		ManaCost=8
 		SlowAffected=4
-		FatigueDrain=0.25
+		EnergyDrain=0.25
 		//SpdTaxDrain=0.03 replace this with something else
 		ActiveMessage="distorts the space around their target!"
 		OffMessage="releases the spatial distortion!"
@@ -69,3 +74,12 @@
 			set category="Skills"
 			adjust(usr)
 			src.Trigger(usr)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/
+	Distorted_Space
+		BuffName="Distorted Space"
+		passives = list("SuperDash" = 1)
+		TimerLimit=10;
+		AlwaysOn=1;
+		ActiveMessage="closes the gap between them and their opponent with space magic!"
+		OffMessage="collapses the distance to normal."

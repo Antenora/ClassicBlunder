@@ -1,7 +1,7 @@
 #define MAGATAMA_SWAP_COOLDOWN 36000 // 1 hour in deciseconds
 #define MAGATAMA_COST_ESCALATION 0.25 // +25% base cost per magatama crafted
 #define MAGATAMA_IMPRINT_FRACTION 1 // True Demon, base value fraction applied on imprint
-#define MAGATAMA_IMPRINT_SCALE   0.5 // True Demon, fraction of normal scaling rate applied on imprint
+#define MAGATAMA_IMPRINT_SCALE   1 // True Demon, fraction of normal scaling rate applied on imprint
 
 mob/var
 	magatama_last_swap = 0
@@ -162,8 +162,9 @@ obj/Items/Magatama
 
 		equipMagatama(mob/user)
 			suffix = "*Equipped*"
-			scaled_passives = getScaledPassives(user)
-			user.passive_handler.increaseList(scaled_passives)
+			if(!user.HasTrueDemonPath() || !user.magatama_imprinted || !user.magatama_imprinted[type])
+				scaled_passives = getScaledPassives(user)
+				user.passive_handler.increaseList(scaled_passives)
 			if(!user.passive_handler?.Get("Musubi"))
 				grantSkills(user)
 			if(!user.passive_handler?.Get("Shijima"))
@@ -189,6 +190,11 @@ obj/Items/Magatama
 
 		refreshPassives(mob/user)
 			if(suffix != "*Equipped*") return
+			if(user.HasTrueDemonPath() && user.magatama_imprinted && user.magatama_imprinted[type])
+				if(!user.passive_handler?.Get("Musubi"))
+					revokeSkills(user)
+					grantSkills(user)
+				return
 			if(scaled_passives)
 				user.passive_handler.decreaseList(scaled_passives)
 			scaled_passives = getScaledPassives(user)
@@ -272,30 +278,32 @@ mob/proc/refreshMagatama()
 			M.refreshPassives(src)
 	refreshImprintedPassives()
 
-mob/proc/refreshImprintedPassives()
-	if(!HasTrueDemonPath()) return
-	if(!magatama_imprinted || !magatama_imprinted.len) return
-	if(!magatama_imprint_active) magatama_imprint_active = list()
+mob/proc/buildImprintSnapshot()
+	var/list/merged = list()
 	for(var/T in magatama_imprinted)
 		var/obj/Items/Magatama/M = locate(T) in src
 		if(!M) continue
-		var/list/old_snap = magatama_imprint_active[T]
-		if(old_snap) passive_handler?.decreaseList(old_snap)
-		var/list/new_snap = M.getImprintPassives(src)
-		magatama_imprint_active[T] = new_snap
-		passive_handler?.increaseList(new_snap)
+		var/list/passives = M.getImprintPassives(src)
+		for(var/p in passives)
+			if(!(p in merged) || passives[p] > merged[p])
+				merged[p] = passives[p]
+	return merged
+
+mob/proc/refreshImprintedPassives()
+	if(!HasTrueDemonPath()) return
+	if(!magatama_imprinted || !magatama_imprinted.len) return
+	if(magatama_imprint_active && magatama_imprint_active.len)
+		passive_handler?.decreaseList(magatama_imprint_active)
+	magatama_imprint_active = buildImprintSnapshot()
+	passive_handler?.increaseList(magatama_imprint_active)
 
 mob/proc/imprintMagatama(obj/Items/Magatama/mag)
 	if(!mag) return
 	if(!HasTrueDemonPath()) return
 	if(!magatama_imprinted) magatama_imprinted = list()
-	if(!magatama_imprint_active) magatama_imprint_active = list()
 	if(magatama_imprinted[mag.type]) return // already imprinted; idempotent
-	var/list/snapshot = mag.getImprintPassives(src)
-	if(!snapshot || !snapshot.len) return
 	magatama_imprinted[mag.type] = TRUE
-	magatama_imprint_active[mag.type] = snapshot
-	passive_handler?.increaseList(snapshot)
+	refreshImprintedPassives()
 	src << "<font color='#FFD700'>The essence of [mag.name] imprints upon your soul, never to fade...</font>"
 
 mob/proc/onTrueDemonAscended()
@@ -305,11 +313,8 @@ mob/proc/onTrueDemonAscended()
 			imprintMagatama(M)
 
 mob/proc/revertTrueDemonImprints()
-	if(magatama_imprint_active)
-		for(var/T in magatama_imprint_active)
-			var/list/snapshot = magatama_imprint_active[T]
-			if(snapshot && snapshot.len)
-				passive_handler?.decreaseList(snapshot)
+	if(magatama_imprint_active && magatama_imprint_active.len)
+		passive_handler?.decreaseList(magatama_imprint_active)
 	magatama_imprinted = list()
 	magatama_imprint_active = list()
 

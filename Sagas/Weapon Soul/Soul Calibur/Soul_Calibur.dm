@@ -58,7 +58,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 	name = "Heavenly Regalia: Frozen Crystal"
 	DefMult=1.5
 	EndMult=1.5
-	passives = list("Flow" = 2, "VoidField" = 5, "DeathField" = 5, "Void" = 1, "SoftStyle" = 3)
+	passives = list("Flow" = 3, "VoidField" = 5, "DeathField" = 5, "Void" = 1, "SoftStyle" = 3, "TrueAbsorb"=1)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s orderly treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their orderly luster..."

@@ -52,15 +52,21 @@
 				if(target.Class != "Warrior")
 					M << "<font color=#ff7777><b>The dragon’s power rejects the unworthy. Only Warrior caste Namekians may be blessed.</b></font>"
 					return
-				if(target.AscensionsAcquired >= 3)
+				if(target.AscensionsAcquired >= 3 && M.Potential<=45)
 					M << "<font color=#ff7777><b>The dragon senses that [target]'s spirit cannot ascend further through this wish.</b></font>"
 					return
-
+				if(target.AscensionsAcquired >= 4 && M.Potential<=55)
+					M << "<font color=#ff7777><b>The dragon senses that [target]'s spirit cannot ascend further through this wish.</b></font>"
+					return
 				var/ascension/next
 				switch(target.AscensionsAcquired + 1)
 					if(1) next = new /ascension/namekian/one
 					if(2) next = new /ascension/namekian/two
 					if(3) next = new /ascension/namekian/three
+					if(4) next = new /ascension/namekian/four
+					if(5) next = new /ascension/namekian/five
+					if(6) next = new /ascension/namekian/six
+
 				if(next)
 					next.onAscension(target)
 					M << "<font color=#77ffff><b>The dragon’s light flows into [target], awakening their next ascension!</b></font>"
@@ -94,32 +100,35 @@
 				M.Class = "Warrior"
 				M << "<font color=#77ff77><b>Your body surges with power, transforming you into a Namekian of the Warrior caste!</b></font>"
 
-				switch(M.AscensionsAcquired)
-					if(1)
-						M.StrAscension += 0.35
-						M.EndAscension += 0.35
-					if(2)
-						M.Intimidation += 10
-						M.StrAscension += 0.7
-						M.EndAscension += 0.7
-					if(3)
-						M.Intimidation += 10
-						M.StrAscension += 1.35
-						M.EndAscension += 1.35
-						M.OffAscension += 0.65
-						M.RecovAscension += 0.65
-					if(4)
-						M.Intimidation += 40
-						M.StrAscension += 2.35
-						M.EndAscension += 1.7
-						M.OffAscension += 0.65
-						M.RecovAscension += 1.15
-					if(5)
-						M.Intimidation += 110
-						M.StrAscension += 3.35
-						M.EndAscension += 2.7
-						M.OffAscension += 0.65
-						M.RecovAscension += 1.15
+				if(M.AscensionsAcquired>=1)
+					M.StrAscension += 0.35
+					M.EndAscension += 0.35
+					var/passives1 = list("Duelist" = 0.5, "TechniqueMastery" = 0.25, "Tenacity" = 0.5)
+					M.passive_handler.increaseList(passives1)
+				if(M.AscensionsAcquired>=2)
+					M.StrAscension += 0.35
+					M.EndAscension += 0.35
+					var/passives2 = list("Duelist" = 1, "TechniqueMastery" = 0.5, "Tenacity" = 0.5)
+					M.passive_handler.increaseList(passives2)
+				if(M.AscensionsAcquired>=3)
+					M.StrAscension += 0.65
+					M.EndAscension += 0.65
+					M.OffAscension += 0.65
+					M.RecovAscension+= 0.65
+					var/passives3 = list ("Duelist" = 2, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+					M.passive_handler.increaseList(passives3)
+				if(M.AscensionsAcquired>=4)
+					var/passives4 = list("Duelist" = 2.5, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+					M.passive_handler.increaseList(passives4)
+					M.StrAscension += 1
+					M.EndAscension += 0.35
+					M.RecovAscension += 0.5
+				if(M.AscensionsAcquired>=5)
+					M.StrAscension += 1
+					M.EndAscension += 1
+				if(M.AscensionsAcquired>=6)
+					M.StrAscension += 1
+					M.EndAscension += 1
 
 				if(M.AscensionsAcquired >= 4)
 					M.transUnlocked = 1
