@@ -318,6 +318,41 @@ window "Baby"
 		show-lines = horizontal
 		highlight-color = #000000
 
+window "EmoteEditor"
+	elem "EmoteEditor"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+		on-close = "EmoteEditorClosed"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 2560x1400
+	elem "label10"
+		type = LABEL
+		pos = 0,0
+		size = 640x48
+		anchor1 = 0,0
+		anchor2 = 100,10
+		text-color = #ffffff
+		background-color = #000000
+		saved-params = ""
+		text = "RP BOX"
+	elem "EditorBrowser"
+		type = BROWSER
+		pos = 0,48
+		size = 640x432
+		anchor1 = 0,10
+		anchor2 = 100,100
+		background-color = none
+		saved-params = ""
+		inner-background-color = none
+
 window "ICChatTab"
 	elem "ICChatTab"
 		type = MAIN
@@ -534,11 +569,6 @@ window "RPWindow"
 		statusbar = false
 		can-close = false
 		can-minimize = false
-		outer-size = 656x518
-		outer-pos = 637,106
-		inner-size = 640x479
-		inner-pos = 8,31
-		screen-size = 2560x1400
 	elem "label9"
 		type = LABEL
 		pos = 256,48

@@ -278,7 +278,7 @@ mob/var
 	Text_Color="#45fa3f"
 	OOC_Color="#666666"
 	Emote_Color="#f0fa33"
-
+	tmp/current_emote_text = ""
 	Trait_Color//i guess it will be used for furries?!
 
 

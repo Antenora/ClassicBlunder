@@ -378,6 +378,7 @@
 #include "_Reworks\Chat_Rework\chat_settings.dm"
 #include "_Reworks\Chat_Rework\communication_rework.dm"
 #include "_Reworks\Chat_Rework\helper_procs.dm"
+#include "_Reworks\Chat_Rework\HTMLEmoteBox.dm"
 #include "_Reworks\Chat_Rework\RPBox.dm"
 #include "_Reworks\Chat_Rework\tech_frequencies.dm"
 #include "_Reworks\Combat\_defines.dm"
