@@ -211,6 +211,31 @@ mob/proc/OpenEmoteEditor()
 
 						syncDraft();
 					}
+					if(e.ctrlKey && e.key.toLowerCase() =='b'){
+						e.preventDefault();
+						wrapSelection('<b>','</b>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='i'){
+						e.preventDefault();
+						wrapSelection('<i>','</i>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='u'){
+						e.preventDefault();
+						wrapSelection('<u>','</u>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='s'){
+						e.preventDefault();
+						wrapSelection('<s>','</s>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='l'){
+						e.preventDefault();
+						addLink();
+						return;
+					}
 				});
 			}
 		</script>
