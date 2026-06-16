@@ -49,7 +49,11 @@ obj
 				HomingDelay=3
 				LosesHoming
 				Static
+				SpawnPosition
+				XSpawnOffset
+				YSpawnOffset
 				ComboMaster
+				DirOverride
 				IgnoreStun
 
 				UnarmedOnly
@@ -5218,7 +5222,17 @@ mob
 				else
 					if(Z.ActiveMessage)
 						OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+
 			var/atom/Origin=src//This is the mob or turf that an attack will come from.
+			if(Z.SpawnPosition)
+				Origin = Z.SpawnPosition
+			if(Z.YSpawnOffset)
+				var/turf/T = get_turf(Origin)
+				if(T)
+					var/turf/OffsetTurf = locate(T.x, T.y + Z.YSpawnOffset, T.z)
+					if(OffsetTurf)
+						Origin = OffsetTurf
+
 			var/obj/Items/Enchantment/Staff/staf=src.EquippedStaff()
 			var/obj/Items/Sword/sord=src.EquippedSword()
 			var/obj/Items/Armor/armr = src.EquippedArmor()
@@ -5553,7 +5567,6 @@ obj
 					list/AlreadyHit
 					BeamCharge
 					BreathCost
-					DirOverride
 					LingeringTornadoSpawned=0
 					SkillPath//type path of the skill that created this projectile (for Warp Strike weapon hide)
 				Savable=0
@@ -5570,15 +5583,17 @@ obj
 						BeamCharging=0.5
 					src.Owner=m
 					src.SkillPath=Z.type
-					src.DirOverride=DirOverride
+					src.DirOverride=Z.DirOverride
 					if(Owner)
 						Owner.active_projectiles |= src
 					if(istype(Origin, /turf))
-						if(!Z.IconChargeOverhead&&!Z.HyperHoming&&!Z.Continuous&&!Z.ClusterBit)
-							src.loc=src.Owner.loc
-							walk_to(src,Origin,0,0,32)
+						if(Z.SpawnPosition)
+							src.loc = Origin
+						else if(!Z.IconChargeOverhead && !Z.HyperHoming && !Z.Continuous && !Z.ClusterBit)
+							src.loc = src.Owner.loc
+							walk_to(src, Origin, 0, 0, 32)
 						else
-							src.loc=Origin
+							src.loc = Origin
 					else
 						if(DirOverride)
 							src.loc=get_step(Origin, DirOverride)

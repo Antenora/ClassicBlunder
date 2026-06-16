@@ -19,8 +19,7 @@
 obj
 	Skills/Buffs/SpecialBuffs
 		Hyperdeath_Mode
-			EnergyThreshold=10
-			EnergyLeak=1
+			BuffName="Hyperdeath Mode"
 			StrMult=1.2
 			EndMult=1.2
 			SpdMult=1.2
@@ -36,12 +35,18 @@ obj
 			KenWaveBlend=2
 			KenWaveTime=5
 			ActiveMessage="awakens their Hyperdeath state!"
-			OffMessage="returns to their old self..."
+			OffMessage="returns to their normal self..."
 			adjust(mob/p)
+				var/pLv = p.SagaLevel
+				passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1, "RainbowAfterImages" = 1)
 			verb/Hyperdeath_Mode()
 				set category="Skills"
 				adjust(usr)
-				src.Trigger(usr)
+				if((usr.HyperdeathMeterCurrent < usr.HyperdeathThreshold)&&(!usr.CheckSpecial("Hyperdeath Mode")))
+					usr << "You haven't accumulated enough power yet! <Requires [usr.HyperdeathThreshold]% power.>"
+				else
+					src.Trigger(usr)
+					usr.HyperMeterUpdate()
 	Skills/Buffs/SlotlessBuffs
 		ChaosSaber
 			MakesSword=1
@@ -132,7 +137,7 @@ obj
 			EndRate=1
 			Distance=30
 			Homing=1
-			ManaCost=0.5
+			ManaCost=2
 			Piercing=1
 			AttackReplace=1
 			Striking=1
@@ -151,7 +156,7 @@ obj
 			IconSize=2
 			Distance=30
 			Homing=1
-			ManaCost=1.5
+			ManaCost=4
 			AttackReplace=1
 			Striking=1
 			Blasts=5
@@ -172,7 +177,7 @@ obj
 			Paralyzing=5
 			Size=1
 			Bolt=5
-			BoltOffset=1
+			BoltOffset=0
 			HitSparkIcon='BLANK.dmi'
 			HitSparkX=0
 			HitSparkY=0
@@ -187,3 +192,172 @@ obj
 				set category="Skills"
 				adjust(usr)
 				usr.Activate(src)
+
+	Skills/Projectile
+		ProjectileDownTestNormal
+			ElementalClass="Fire"
+			SpellElement="Fire"
+			SkillCost=TIER_2_COST
+			Copyable=3
+			DamageMult=4
+			AccMult=2
+			IconSize=2
+			Homing=1
+			Scorching=1
+			Knockback=3
+			Explode=2
+			ManaCost=5
+			Cooldown=0
+			IconLock='Fireball.dmi'
+			adjust(mob/p)
+				DamageMult = initial(DamageMult)
+			verb/NonAOEFireball()
+				set category="Skills"
+				set hidden=0
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					usr.SpawnAttackMarker(/obj/Skills/Projectile/ProjectileDownTestAOE, usr.Target)
+				else
+					adjust(usr)
+					usr.UseProjectile(src)
+
+		ProjectileDownTestAOE
+			ElementalClass="Fire"
+			SpellElement="Fire"
+			SkillCost=TIER_2_COST
+			Copyable=3
+			YSpawnOffset=4
+			DamageMult=20
+			AccMult=2
+			IconSize=2
+			Scorching=1
+			Knockback=3
+			Explode=2
+			DirOverride=2
+			ManaCost=5
+			Cooldown=0
+			IconLock='Fireball.dmi'
+			adjust(mob/p)
+				DamageMult = initial(DamageMult)
+			verb/AOEFireball()
+				set category="Skills"
+				set hidden=1
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					adjust(usr)
+					usr.UseProjectile(src)
+
+//Meter
+obj/HyperdeathMeterBarBG
+	icon = 'HyperdeathMeter.dmi'
+	icon_state = "Background"
+	screen_loc = "CENTER-2.5,BOTTOM+3"
+	layer = FLOAT_LAYER
+	plane = FLOAT_PLANE
+	mouse_opacity = 0
+
+obj/HyperdeathMeterBarFill
+	icon = 'HyperdeathMeter.dmi'
+	icon_state = "FillActive"
+	screen_loc = "CENTER-2.5,BOTTOM+3"
+	layer = FLOAT_LAYER + 50
+	plane = FLOAT_PLANE
+	mouse_opacity = 0
+
+mob/var/tmp/obj/HyperdeathMeterBarBG/HyperBar
+mob/var/tmp/obj/HyperdeathMeterBarFill/HyperBarFill
+
+mob/proc/HyperMeterCreate()
+	if(src.client && !src.HyperBar)
+		src.HyperBar = new
+		src.client.screen += src.HyperBar
+
+	if(src.client && !src.HyperBarFill)
+		src.HyperBarFill = new
+		src.client.screen += src.HyperBarFill
+
+mob/proc/HyperMeterUpdate()
+	if(!client)
+		return
+
+	if(!HyperBar || !HyperBarFill)
+		HyperMeterCreate()
+
+	var/max_width = 186
+	var/bar_height = 9
+
+	var/percent = HyperdeathMeterCurrent / 100
+	percent = min(max(percent, 0), 1)
+
+	var/fill_width = round(max_width * percent)
+
+	if(fill_width<=0)
+		HyperBarFill.invisibility=101
+		return
+
+	HyperBarFill.invisibility = 0
+	var/iconToUse = "FillInactive"
+	if(CheckSpecial("Hyperdeath Mode")||HyperdeathMeterCurrent >= HyperdeathThreshold)
+		iconToUse = "FillActive"
+
+	var/icon/I = icon('HyperdeathMeter.dmi', iconToUse)
+	I.Crop(1, 1, fill_width, bar_height)
+
+	HyperBarFill.icon = I
+	HyperBarFill.icon_state = ""
+
+obj/AttackMarker
+	icon = 'MMOAttackMarker.dmi'
+	icon_state = "WarningBox"
+	layer = EFFECTS_LAYER
+	mouse_opacity = 0
+
+	var/mob/owner
+	var/delay = 20
+	var/projectile_type = /obj/Skills/Projectile/ProjectileDownTestAOE
+
+	New(loc, mob/O, projectile_path = null)
+		..()
+
+		owner = O
+
+		if(ispath(projectile_path, /obj/Skills/Projectile))
+			projectile_type = projectile_path
+
+		spawn(delay)
+			FireMMOAttack(owner, projectile_type)
+
+	proc/FireMMOAttack(mob/O, path)
+		if(!src || !loc)
+			return
+
+		if(!O)
+			del(src)
+			return
+
+		if(!ispath(path, /obj/Skills/Projectile))
+			path = /obj/Skills/Projectile/ProjectileDownTestAOE
+
+		var/obj/Skills/Projectile/p = O.FindSkill(path)
+
+		if(!p)
+			p = new path
+			O.AddSkill(p)
+
+		p.adjust(O)
+		p.SpawnPosition = src
+		O.UseProjectile(p)
+		p.SpawnPosition = null
+
+		world << "attack fired"
+		del(src)
+
+mob/proc/SpawnAttackMarker(path, Target)
+	var/turf/T = get_turf(Target)
+
+	if(!T)
+		return
+
+	new /obj/AttackMarker(T, src, path)
+
+mob/verb/Test_Marker()
+	set category = "Debug"
+

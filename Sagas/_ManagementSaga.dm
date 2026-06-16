@@ -98,6 +98,10 @@ mob/var
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
 
+	//Path of a Hero
+	HyperdeathMeterCurrent=0
+	HyperdeathThreshold=100
+
 	//SHINIGAMI
 	ShinigamiRelease
 	AsauchiName
@@ -995,6 +999,8 @@ mob
 							if(src.RebirthHeroType=="Prismatic")
 								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
 								src<< "Your Chaos Buster has been upgraded!"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
 							if(src.RebirthHeroType=="Cyan")
@@ -1023,7 +1029,9 @@ mob
 							if(src.RebirthHeroType=="Red")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Burning_Soul)
 							if(src.RebirthHeroType=="Prismatic")
+								src.HyperdeathThreshold=50
 								src<<"You now wield two Chaos Sabers at once!"
+								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
 							if(src.RebirthHeroType=="Blue")
@@ -1056,7 +1064,9 @@ mob
 							if(src.RebirthHeroType=="Prismatic")
 								src<< "Your happy ending... Your hopes, your dreams..."
 								src<< "It's not just those you're carrying on your back, are they?"
-								src<< "<buff goes here>"
+								src<< "buff goes here"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
 							if(src.RebirthHeroType=="Cyan")
@@ -1075,6 +1085,8 @@ mob
 							if(src.RebirthHeroType=="Prismatic")
 								src<< "The Hearts of the World resonate with Yours."
 								src<< "final buff goes here wooo"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=10
 				if("Cosmo")
 					tierUpSaga("Cosmo")
 				if("Shinigami")
