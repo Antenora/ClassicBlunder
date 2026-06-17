@@ -47,10 +47,10 @@
 
 	Phoenix_Eye_Fist // unarmed + armed
 		SignatureTechnique=2
-		passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.25, "Interception" = 1.5, \
+		passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.1, "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "NeedsSword" = 0, "NoSword" = 1)
 		adjust(mob/p)
-			passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.25, "Interception" = 1.5, \
+			passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.1, "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1)
 		NeedsSword=0
 		NoSword=1
@@ -94,7 +94,7 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle/Art_of_Order// mystic+armed
 	SignatureTechnique=2
 	passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "ThunderHerald" = 1, \
-					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 2, "Rain" = 3)
+					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 0.2, "Rain" = 3)
 	// crits deal an extra amount based on the enemy's max health
 	StyleSpd = 1.3
 	StyleOff = 1.15
@@ -108,7 +108,7 @@
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi",\
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade")
 		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "ThunderHerald" = 1, \
-					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 2, "Rain" = 3)
+					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 0.2, "Rain" = 3)
 
 	verb/Art_of_Order()
 		set hidden=1

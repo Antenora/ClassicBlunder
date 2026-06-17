@@ -2,7 +2,7 @@
 	Intercepting_Fist
 		passives = list("Relentlessness" = 1, "Fury" = 6, "Momentum" = 4, "BuffMastery" = 3,\
 		                "StyleMastery" = 4, "Brutalize" = 2, "Interception" = 4, "CounterMaster" = 10,\
-		                "BlurringStrikes" = 1,  "TensionLock" = 1)
+		                "BlurringStrikes" = 0.1,  "TensionLock" = 1)
 		OffMult=1.5
 		DefMult=1.5
 

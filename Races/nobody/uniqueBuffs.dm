@@ -8,7 +8,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.15
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 1, "Godspeed" = 1, "Momentum" = 1, "DoubleStrike" = 1, "Instinct" = 2, "Iaijutsu" = 2,\
+		passives = list("BlurringStrikes" = 0.1, "Godspeed" = 1, "Momentum" = 1, "DoubleStrike" = 1, "Instinct" = 2, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1)
 		StyleActive="Legacy of Ashes"
 		Finisher="/obj/Skills/Queue/Finisher/Session"
@@ -24,7 +24,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.3
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 1, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 2, "Instinct" = 3, "Flow" = 2, "Iaijutsu" = 2,\
+		passives = list("BlurringStrikes" = 0.1, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 2, "Instinct" = 3, "Flow" = 2, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 1)
 		StyleActive="Legacy of the Sunslammer"
 		Finisher="/obj/Skills/Queue/Finisher/Session"
@@ -40,7 +40,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.5
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 2, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 3, "Instinct" = 4, "Flow" = 3, "Iaijutsu" = 2,\
+		passives = list("BlurringStrikes" = 0.2, "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 3, "Instinct" = 4, "Flow" = 3, "Iaijutsu" = 2,\
 						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 2)
 		StyleActive="Heir of Grief"
 		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"
@@ -56,7 +56,7 @@ obj/Skills/Buffs/NuStyle/NobodyLegendary
 		StyleStr=1.7
 		ElementalOffense="Fire"
 		ElementalDefense="Fire"
-		passives = list("BlurringStrikes" = 3, "Godspeed" = 3, "Momentum" = 2, "DoubleStrike" = 3, "TripleStrike" = 0.5, "Instinct" = 5, "Flow" = 4, "Iaijutsu" = 3,\
+		passives = list("BlurringStrikes" = 0.3, "Godspeed" = 3, "Momentum" = 2, "DoubleStrike" = 3, "TripleStrike" = 0.5, "Instinct" = 5, "Flow" = 4, "Iaijutsu" = 3,\
 						"Musoken" = 1, "Kindling" = 1.5, "Combustion" = 30, "Parry" = 3,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 3)
 		StyleActive="Overture"
 		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"

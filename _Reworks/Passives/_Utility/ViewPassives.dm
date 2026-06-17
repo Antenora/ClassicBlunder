@@ -32,7 +32,7 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "ComboMaster"= "ignores increased damage reduction on stunned targets",
 "Momentum"= "increases str based on damage you deal up to a cap",
 "Fury"= "increases speed based on damage you deal up to a cap",
-"BlurringStrikes"= "adds a portion of your speed to your damage",
+"BlurringStrikes"= "adds % Speed to your Damage. 0.1 is 10%, etc.",
 "SpiritStrike"= "uses force in place of str for damage",
 "QuickCast"= "Cast and Charge Faster",
 "MovingCharge"= "you can move and charge",

@@ -151,14 +151,14 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			desc = "A sword so light that its blade is almost impossible to keep up with."
 			icon = 'Lol_Sword_reg.dmi'
 			Class = "Light"
-			passives = list("Warping" = 1, "BlurringStrikes" = 1)
+			passives = list("Warping" = 1, "BlurringStrikes" = 0.1)
 			spdAdd=1
 			strAdd=1
 			DamageEffectiveness = 1.025
 			AccuracyEffectiveness = 0.9
 			SpeedEffectiveness = 1.25
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Warping" = (User.Potential / 25), "BlurringStrikes" = 1 + (User.Potential / 25))
+				src.passives = list("Warping" = (User.Potential / 25), "BlurringStrikes" = 0.1 + (User.Potential / 250))
 				..()
 		Light_Celestial_Blade_II
 			name = "Aurelius"

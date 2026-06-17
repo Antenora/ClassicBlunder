@@ -43,7 +43,7 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Demon"        = list("t1_passives"=list("PureDamage" = 2, "AbyssMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureDamage" = 3, "AbyssMod" = 5), "t2_skills"=list()),
 	"Angel"        = list("t1_passives"=list("PureReduction" = 2, "HolyMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureReduction" = 3, "HolyMod" = 5), "t2_skills"=list()),
 	"Celestial"    = list("t1_passives"=list("MartialMagic" = 1), "t1_skills"=list(), "t2_passives"=list("BladeFisting" = 1), "t2_skills"=list()),
-	"Dragon"       = list("t1_passives"=list("AngerAdaptiveForce" = 0.25, "BlurringStrikes" = 0.5, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1), "t1_skills"=list(), "t2_passives"=list("AngerAdaptiveForce" = 0.5, "BlurringStrikes" = 2 , "LikeWater" = 2, "Flow" = 2, "Instinct" = 2), "t2_skills"=list()),
+	"Dragon"       = list("t1_passives"=list("AngerAdaptiveForce" = 0.25, "BlurringStrikes" = 0.1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1), "t1_skills"=list(), "t2_passives"=list("AngerAdaptiveForce" = 0.5, "BlurringStrikes" = 0.2 , "LikeWater" = 2, "Flow" = 2, "Instinct" = 2), "t2_skills"=list()),
 	"Beastkin"     = list("t1_passives"=list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5), "t1_skills"=list(), "t2_passives"=list("Fury" = 2, "Harden" = 2, "Momentum" = 2), "t2_skills"=list()),
 	"Eldritch"     = list("t1_passives"=list("DebuffResistance"=0.1,"BuffMastery"=1), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list("DebuffResistance"=0.3,"BuffMastery"=3), "t2_skills"=list()),
 	"Changeling"   = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),

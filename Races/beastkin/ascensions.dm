@@ -60,7 +60,7 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							passives["PureReduction"] = 0.125;
 							passives["Musoken"] = 1;
 							passives["AttackSpeed"] = 1;
-							passives["BlurringStrikes"] = 1;
+							passives["BlurringStrikes"] = 0.1;
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -156,7 +156,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureDamage", 0.25)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
+							owner.passive_handler.Increase("BlurringStrikes", 0.1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -245,7 +245,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
+							owner.passive_handler.Increase("BlurringStrikes", 0.1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -332,7 +332,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureDamage", 0.25)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
+							owner.passive_handler.Increase("BlurringStrikes", 0.1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -416,7 +416,7 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureReduction", 0.125);
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
+							owner.passive_handler.Increase("BlurringStrikes", 0.1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -500,7 +500,7 @@ Today, another God of the Rifts is born."}
 						if("Feather Knife")
 							owner.passive_handler.Increase("PureReduction", 0.125);
 							owner.passive_handler.Increase("PureDamage", 0.25);
-							owner.passive_handler.Increase("BlurringStrikes", 1);
+							owner.passive_handler.Increase("BlurringStrikes", 0.1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5

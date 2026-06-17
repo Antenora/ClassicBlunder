@@ -28,7 +28,7 @@ mob/proc/applyPactBonuses()
 			SpdAscension += 1
 			DefAscension += 0.5
 			EndAscension += 0.25
-			passive_handler.Increase("BlurringStrikes", 1)
+			passive_handler.Increase("BlurringStrikes", 0.1)
 			passive_handler.Increase("Fury", 2)
 		if("Survival")
 			EndAscension += 1
@@ -65,7 +65,7 @@ mob/proc/removePactBonuses()
 			SpdAscension -= 1
 			DefAscension -= 0.5
 			EndAscension -= 0.25
-			passive_handler.Decrease("BlurringStrikes", 1)
+			passive_handler.Decrease("BlurringStrikes", 0.1)
 			passive_handler.Decrease("Fury", 2)
 		if("Survival")
 			EndAscension -= 1

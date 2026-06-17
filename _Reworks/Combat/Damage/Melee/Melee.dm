@@ -297,9 +297,9 @@
 				log2text("powerDif", powerDif, "damageDebugs.txt", "[ckey]/[name]")
 				#endif
 				var/atk = getStatDmg2()
-				if(enemy.passive_handler.Get("Field of Destruction")||enemy.passive_handler.Get("The Immovable Object"))
+				/*if(enemy.passive_handler.Get("Field of Destruction")||enemy.passive_handler.Get("The Immovable Object"))
 					if(HasHybridStrike())
-						atk/=clamp(sqrt(1+GetFor(GetHybridStrike())/30),1,3)
+						atk/=clamp(sqrt(1+GetFor(GetHybridStrike())/30),1,3)*/
 				var/def = enemy.getEndStat(1)
 				var/brutalize = GetBrutalize()
 				if(brutalize)
@@ -395,7 +395,7 @@
 
 		// 				QUEUE	 				//
 				var/knockDistance = 0
-				var/speedStrike = GetBlurringStrikes() //This is in the _Reworks/Passives folder
+				/*var/speedStrike = GetBlurringStrikes() //This is in the _Reworks/Passives folder
 				var/fenceBonus = UsingFencing()
 				if(fenceBonus || speedStrike)
 					var/totalStrike = speedStrike + fenceBonus
@@ -405,7 +405,7 @@
 						enemy.applyApathyBonus(damage * (bsMult - fenceMult))
 						damage *= fenceMult
 					else
-						damage *= bsMult
+						damage *= bsMult*/
 				if(AttackQueue)
 					damage *= QueuedDamage(enemy)
 					if(Secret=="Heavenly Restriction" && secretDatum?:hasImprovement("Queues"))

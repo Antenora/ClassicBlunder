@@ -45,7 +45,7 @@
 		StyleSpd=1.15
 		StyleOff=1.15
 		StyleDef=1.15
-		passives = list("Fa Jin" = 2, "Momentum" = 1, "BlurringStrikes" = 0.25, "Interception" = 1)
+		passives = list("Fa Jin" = 2, "Momentum" = 1, "BlurringStrikes" = 0.1, "Interception" = 1)
 		StyleActive="Wing Chun"
 		Finisher="/obj/Skills/Queue/Finisher/Dark_Dragon_Commandment"
 		verb/Wing_Chun_Style()

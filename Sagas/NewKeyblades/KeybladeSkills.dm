@@ -378,7 +378,7 @@ obj
 					ArmorIcon='LancelotArmor.dmi'
 					ArmorClass="Light"
 					passives = list()
-					var/list/SwordPassives = list("BlurringStrikes" = 1, "Brutalize" = 2, "TechniqueMastery" = 3)
+					var/list/SwordPassives = list("BlurringStrikes" = 0.1, "Brutalize" = 2, "TechniqueMastery" = 3)
 					var/list/ShieldPassives = list("CallousedHands" = 0.15, "Juggernaut" = 1)
 					var/list/StaffPassives = list("ManaGeneration" = 1, "QuickCast" = 1)
 					adjust(mob/p)

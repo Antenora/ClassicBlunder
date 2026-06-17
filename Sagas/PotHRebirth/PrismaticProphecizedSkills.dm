@@ -15,7 +15,7 @@ obj
 			ActiveMessage="readies CHAOS SABER."
 			OffMessage="dispels the CHAOS SABER!"
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1)
+				passives = list("PUSpike"=50, "BlurringStrikes"=0.3,"HybridStrike" = 1,"KiControl" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
@@ -25,7 +25,7 @@ obj
 				if(p.SagaLevel>=4)
 					ActiveMessage="manifests their Chaos Sabers in a burst of prismatic light."
 					OffMessage="dispels the Chaos Sabers."
-					passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 1,"KiControl" = 1, "DoubleStrike" = 1)
+					passives = list("PUSpike"=50, "BlurringStrikes"=0.3,"HybridStrike" = 1,"KiControl" = 1, "DoubleStrike" = 1)
 			verb/Chaos_Saber()
 				set category="Skills"
 				if(usr.CheckSlotless("Chaos Buster"))

@@ -1028,11 +1028,11 @@ obj/Skills/Buffs
 			PowerMult=1.25
 			Cooldown = 1
 			SwordAscension=6
-			passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=3, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+			passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=0.3, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 			ActiveMessage="materializes the Black Knife."
 			OffMessage="puts the black knife away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=5, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+				passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=0.5, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1060,7 +1060,7 @@ obj/Skills/Buffs
 			ActiveMessage="pulls out a small shard of glass that seems barely usable as a weapon."
 			OffMessage="puts the black shard away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "HolyMod" = 3, "BlurringStrikes"=5, "KiControl"=1)
+				passives = list("PUSpike"=50, "HolyMod" = 3, "BlurringStrikes"=0.5, "KiControl"=1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1088,7 +1088,7 @@ obj/Skills/Buffs
 			ActiveMessage="manifests their will to change fate, every determination color melding into one: White!"
 			OffMessage="puts the pen away."
 			adjust(mob/p)
-				passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 0.5,"EndlessNine"=0.15)
+				passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=0.5, "KiControl"=1, "SpiritSword" = 0.5,"EndlessNine"=0.15)
 				PowerMult=1.25
 				StrMult=1.5
 				ForMult=1.5
@@ -1096,7 +1096,7 @@ obj/Skills/Buffs
 				EnergyHeal=1
 				SwordUnbreakable=1
 				if(p.SagaLevel>=6)
-					passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 1,"EndlessNine"=0.5,"MovementMastery"=6)
+					passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=0.5, "KiControl"=1, "SpiritSword" = 1,"EndlessNine"=0.5,"MovementMastery"=6)
 			verb/White_Pen_of_Hope()
 				set category="Skills"
 				adjust(usr)
@@ -1166,7 +1166,7 @@ obj/Skills/Buffs
 			ActiveMessage="draws forth a black and orange sword!"
 			OffMessage="sheathes their spooky blade!"
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"KiControl" = 1)
+				passives = list("PUSpike"=50, "BlurringStrikes"=0.3,"KiControl" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
@@ -1211,7 +1211,7 @@ obj/Skills/Grapple
 /obj/Skills/Buffs/NuStyle/SwordStyle //t3 scaled styles
 	The_Roaring_Knight //cyan t5 evil path
 		StyleActive="The Roaring Knight"
-		passives = list("BlurringStrikes"=2, "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2)
+		passives = list("BlurringStrikes"=0.2, "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2)
 		StyleEnd=1.5
 		StyleStr=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Twisted_Heartbeat"
@@ -1302,4 +1302,4 @@ obj/Skills/Grapple
 	Blackened_Knife
 		StrMult=1.3
 		SpdMult=1.3
-		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1, "BlurringStrikes" = 3, "Relentlessness" = 1, "Fury" = 3)
+		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1, "BlurringStrikes" = 0.3, "Relentlessness" = 1, "Fury" = 3)

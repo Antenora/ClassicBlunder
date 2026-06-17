@@ -105,17 +105,17 @@
 			StyleSpd = 1.9
 			StyleFor = 1.75
 			StyleOff = 1.6
-			passives = list("BlurringStrikes" = 3, "AttackSpeed" = 1, "Fury" = 2, "Afterimages" = 1, "Flicker" = 3)
+			passives = list("BlurringStrikes" = 0.3, "AttackSpeed" = 1, "Fury" = 2, "Afterimages" = 1, "Flicker" = 3)
 		else if(tier >= 2)
 			StyleSpd = 1.4
 			StyleFor = 1.35
 			StyleOff = 1.3
-			passives = list("BlurringStrikes" = 1, "AttackSpeed" = 1, "Fury" = 2, "Afterimages" = 1)
+			passives = list("BlurringStrikes" = 0.1, "AttackSpeed" = 1, "Fury" = 2, "Afterimages" = 1)
 		else
 			StyleSpd = 1.2
 			StyleFor = 1.15
 			StyleOff = 1.1
-			passives = list("BlurringStrikes" = 1, "AttackSpeed" = 1)
+			passives = list("BlurringStrikes" = 0.1, "AttackSpeed" = 1)
 	verb/Wind_Gestalt()
 		set hidden = 1
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))

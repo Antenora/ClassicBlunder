@@ -358,7 +358,7 @@ obj
 							StyleOff = 1.1
 							StyleDef = 1.1
 							StyleActive="Speed Rave"
-							passives = list("AttackSpeed" = 3, "BlurringStrikes" = 2, "AfterImages" = 1, "Steady" = 1)
+							passives = list("AttackSpeed" = 3, "BlurringStrikes" = 0.2, "AfterImages" = 1, "Steady" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Fever_Pitch"
 							adjust(mob/p)
 								StyleStr = 1.2 + (0.05 * p.SagaLevel)
@@ -449,7 +449,7 @@ obj
 							StyleFor=1.25
 							StyleSpd=1.5
 							StyleActive="Wing Blade"
-							passives = list("SweepingStrike" = 1, "DoubleStrike" = 3, "BlurringStrikes" = 1.5)
+							passives = list("SweepingStrike" = 1, "DoubleStrike" = 3, "BlurringStrikes" = 0.15)
 							SweepingStrike=1
 							SwordIcon='BLANK.dmi'
 							SwordIconSecond='BLANK.dmi'
@@ -474,7 +474,7 @@ obj
 							StyleActive="Cyclone"
 							ElementalOffense="Wind"
 							ElementalDefense="Wind"
-							passives = list("TechniqueMastery" = 3, "BlurringStrikes" = 2, "Paralyzing" = 1, "SpiritFlow" = 2)
+							passives = list("TechniqueMastery" = 3, "BlurringStrikes" = 0.2, "Paralyzing" = 1, "SpiritFlow" = 2)
 							Shocking=1
 							Paralyzing=0.2
 							Finisher="/obj/Skills/Queue/Finisher/Cyclone"
@@ -558,7 +558,7 @@ obj
 							StyleEnd = 1.75
 							StyleActive="Ultimate Form"
 							ElementalOffense = "Love"
-							passives = list("Extend" = 2, "SpiritSword" = 0.75, "SpiritHand" = 1, "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1, "BlurringStrikes" = 5)
+							passives = list("Extend" = 2, "SpiritSword" = 0.75, "SpiritHand" = 1, "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1, "BlurringStrikes" = 0.5)
 							Extend=1
 							Finisher="/obj/Skills/Queue/Finisher/Radiant_Brands"
 							adjust(mob/p)
@@ -594,7 +594,7 @@ obj
 							StyleFor=1.25
 							StyleSpd=1.5
 							StyleActive="Vector to the Heavens"
-							passives = list("BlurringStrikes" = 4, "HolyMod" = 5,"Tossing" = 3, "Secret Knives" = "GodSlayer")
+							passives = list("BlurringStrikes" = 0.4, "HolyMod" = 5,"Tossing" = 3, "Secret Knives" = "GodSlayer")
 							SweepingStrike=1
 							ElementalOffense = "Light"
 							ElementalDefense = "Light"

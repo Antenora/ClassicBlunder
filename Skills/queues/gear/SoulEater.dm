@@ -101,7 +101,7 @@ obj
 			if(!SE) return
 			if(SE.SEType=="Sword")
 				passives = list("HybridStyle" = "MysticStyle", "SweepingStrike" = 1, "BladeFisting" = 1, "MagicSword" = 1, "LifeSteal" = 25, "AbyssMod" = 2,\
-				 "Iaijutsu" = 1, "BlurringStrikes"=2.5, "CriticalChance" = 15, "CriticalDamage"= 0.1,"Fury" = 3 )
+				 "Iaijutsu" = 1, "BlurringStrikes"=0.25, "CriticalChance" = 15, "CriticalDamage"= 0.1,"Fury" = 3 )
 				StyleSpd = 1.3
 				StyleStr = 1.3
 				StyleFor = 1
@@ -147,7 +147,7 @@ obj
 			if(!SE) return
 			if(SE.SEType=="Sword")
 				passives = list("HybridStyle" = "MysticStyle", "SweepingStrike" = 1, "BladeFisting" = 1, "MagicSword" = 1, "AbyssMod" = 2,\
-				 "Iaijutsu" = 1, "BlurringStrikes"=2.5, "DoubleStrike" = 3, "NeedsSecondSword" = 1,"Fury" = 3 )
+				 "Iaijutsu" = 1, "BlurringStrikes"=0.25, "DoubleStrike" = 3, "NeedsSecondSword" = 1,"Fury" = 3 )
 				StyleSpd = 1.3
 				StyleStr = 1.3
 				StyleFor = 1

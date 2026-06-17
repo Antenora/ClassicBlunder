@@ -2665,7 +2665,7 @@ mob
 		GetHybridStrike()//Str(0.75)+For(0.75)
 			var/Return = passive_handler.Get("HybridStrike")
 			if(InfinityModule)
-				Return += AscensionsAcquired/2//round(glob.progress.totalPotentialToDate,5) / 50
+				Return += AscensionsAcquired/20//round(glob.progress.totalPotentialToDate,5) / 50
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
 			return Return

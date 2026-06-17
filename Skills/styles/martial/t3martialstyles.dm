@@ -47,7 +47,7 @@
 
     Flying_Thunder_God
         SignatureTechnique=3
-        passives = list("Iaido" = 8, "Flying Thunder God" = 1, "BlurringStrikes" = 2, "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
+        passives = list("Iaido" = 8, "Flying Thunder God" = 1, "BlurringStrikes" = 0.2, "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
         "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1,"Flow" = 3, "LikeWater"=3, "Godspeed" = 2, "Skimming" = 2)
         // make it so every cooldown like iaido, also make the tracker appear on hud
         // make an animation for the tp
@@ -56,7 +56,7 @@
         StyleActive="Flying Thunder God"
         Finisher="/obj/Skills/Queue/Finisher/Be_Water" //TODO: make a finisher here
         adjust(mob/p)
-            passives = list("Iaido" = 8, "Flying Thunder God" = 1, "BlurringStrikes" = 2, "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
+            passives = list("Iaido" = 8, "Flying Thunder God" = 1, "BlurringStrikes" = 0.2, "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
             "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1,"Flow" = 3, "LikeWater"=3, "Godspeed" = 2, "Skimming" = 2)
         verb/Flying_Thunder_God()
             set hidden=1

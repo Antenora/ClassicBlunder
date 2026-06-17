@@ -2663,7 +2663,7 @@ obj/Items/Enchantment/Staff
 					pixel_x=-32
 					pixel_y=-32
 					Ascended = 6;
-					passives = list("ManaGeneration" = 5, "CalmAnger" = 1, "MovingCharge"=1, "Adrenaline"=1, "Flicker"=2, "Flow"=2, "BlurringStrikes"=2, "HybridStrike"=1)
+					passives = list("ManaGeneration" = 5, "CalmAnger" = 1, "MovingCharge"=1, "Adrenaline"=1, "Flicker"=2, "Flow"=2, "BlurringStrikes"=0.2, "HybridStrike"=0.1)
 					Destructable=0
 					ShatterTier=0
 					NoSaga=1

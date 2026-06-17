@@ -23,7 +23,7 @@ race
 
 			user.race.transformations.Cut()
 			if(user.Class=="Samurai")
-				passives = list("BlurringStrikes" = 1, "SwordAscension" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1, "Flicker"=1, "EmptyFlashStep" = 1)
+				passives = list("BlurringStrikes" = 0.1, "SwordAscension" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1, "Flicker"=1, "EmptyFlashStep" = 1)
 				user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Racial/Void_Blade)
 				user.AddSkill(new /obj/Skills/AutoHit/Desperation/FatalEnding)
 				user.NobodyOrigin()

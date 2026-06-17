@@ -65,6 +65,7 @@
 		statDamage = GetEnd(1)
 	if(!glob.EXTRASTATSONAUTOHIT && autohit && !passive_handler["Divine Technique"])
 		return statDamage
+	//CallousedHands Damage Calc
 	var/endExtra = GetCallousedHands();
 	var/greenExtra=0
 	if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
@@ -78,6 +79,24 @@
 			src.Target.applyApathyBonus(endBonus)
 		else
 			statDamage += endBonus
+	// there should only b one use case for this
+	//BlurringStrikes DamageCalc NEW, STANDARDIZED! All BlurringStrikes will do 0.1 = 10% Speed Damage, just like Calloused Hands!
+	var/spdExtra = GetBlurringStrikes();
+	if(spdExtra>0)
+		var/spdBonus = GetSpd(spdExtra)
+		if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
+			src.Target.applyApathyBonus(spdBonus)
+		else
+			statDamage += spdBonus
+	// there should only b one use case for this
+	//HYBRIDSTRIKE DamageCalc NEW, STANDARDIZED!  All HybridStrikes will do 0.1 = 10% Force Damage, just like Calloused Hands!
+	var/forExtra = GetHybridStrike();
+	if(forExtra>0)
+		var/forBonus = GetFor(forExtra)
+		if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
+			src.Target.applyApathyBonus(forBonus)
+		else
+			statDamage += forBonus
 	// there should only b one use case for this
 	var/full_effeciency = passive_handler.Get("FullyEffecient")
 	if(full_effeciency)
@@ -96,13 +115,13 @@
 					src.Target.applyApathyBonus(ssBonus_fe)
 				else
 					statDamage += ssBonus_fe
-		if(HasHybridStrike())
+		/*if(HasHybridStrike()) Commenting this out due to hybrid strike rework.
 			var/hsMult_fe = clamp(1+sqrt(GetStr(GetHybridStrike())/15),1,3)
 			if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
 				src.Target.applyApathyBonus(statDamage * (hsMult_fe - 1))
 			else
-				statDamage *= hsMult_fe
-		if(HasPhysPleroma())
+				statDamage *= hsMult_fe*/
+		if(HasPhysPleroma()) // I am going to standardize this too but rn I cannot be fucking bothered!!!
 			var/ppMult_fe = clamp(1+sqrt(GetStr(GetPhysPleroma())/15),1,3)
 			if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
 				src.Target.applyApathyBonus(statDamage * (ppMult_fe - 1))

@@ -52,13 +52,13 @@
     Finisher
         Shunshin//buff
             SpdMult=1.25
-            passives = list("TensionLock" = 1,"Warping" = 2, "HotHundred" = 1, "Godspeed" = 2, "BlurringStrikes" = 1)
+            passives = list("TensionLock" = 1,"Warping" = 2, "HotHundred" = 1, "Godspeed" = 2, "BlurringStrikes" = 0.1)
             TimerLimit=10
             ActiveMessage="moves at godspeed for a rapid attack!"
             OffMessage="restrains their godspeed..."
         Shunshin_Shin//more buff
             SpdMult=1.5
-            passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2, "PureDamage" = 2, "Steady" = 4, "BlurringStrikes" = 2, "CoolerAfterimages"=2)
+            passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2, "PureDamage" = 2, "Steady" = 4, "BlurringStrikes" = 0.2, "CoolerAfterimages"=2)
             TimerLimit=15
             ActiveMessage="unleashes their godspeed for a short burst!"
             OffMessage="falls back in step..."

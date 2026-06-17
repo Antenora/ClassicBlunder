@@ -28,7 +28,7 @@ ascension
 						defense = 1
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "VenomBlood" = 1, "Adrenaline" = 2)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed" = 1, "VenomBlood" = 1, "Adrenaline" = 2)
 						passives+= newpassives
 						strength = 0.25
 						force = 0.25
@@ -80,7 +80,7 @@ ascension
 						defense = 1.5
 						speed = 0.5
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed" = 1)
 						passives+= newpassives
 						strength = 0.25
 						force = 0.25
@@ -132,7 +132,7 @@ ascension
 						speed = 1
 						defense = 2
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -185,7 +185,7 @@ ascension
 						defense = 2
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -237,7 +237,7 @@ ascension
 						defense = 3
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -289,7 +289,7 @@ ascension
 						force = 2
 						defense = 3
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed"=1, "DenkoSekka" = 1)
+						var/newpassives = list("BlurringStrikes" = 0.1, "Flicker" = 1, "Godspeed"=1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 1
 						force = 1

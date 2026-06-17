@@ -6,7 +6,7 @@
 		StyleStr=1.25
 		StyleEnd=1.25
 		StyleDef=1.25
-		passives = list("The Way" = 1, "Sword Master" = 1, "LikeWater" = 4, "SweepingStrike" = 1, "DoubleStrike" = 2, "BlurringStrikes" = 1, \
+		passives = list("The Way" = 1, "Sword Master" = 1, "LikeWater" = 4, "SweepingStrike" = 1, "DoubleStrike" = 2, "BlurringStrikes" = 0.1, \
 		            "Zornhau" = 2, "Half-Sword" = 2, "Rage" = 1, "TripleStrike" = 0.5, "Iaijutsu" = 3, "Musoken" = 1, "Fury" = 2.5, \
 		            "Parry" = 2.5, "Disarm" = 2, "Deflection" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Clear_Water"
@@ -15,7 +15,7 @@
 			src.Trigger(usr)
 	Acrobat
 		SignatureTechnique = 3
-		passives = list("DoubleStrike" = 2.5, "TripleStrike" = 1, "BlurringStrikes" = 1.5, "SweepingStrike" = 1,\
+		passives = list("DoubleStrike" = 2.5, "TripleStrike" = 1, "BlurringStrikes" = 0.15, "SweepingStrike" = 1,\
 			"Deflection" = 1, "NeedsSecondSword" = 1, "NeedsThirdSword" = 1,  "Parry" = 2.5, "Iaijutsu" = 4, "Disarm" = 3,\
 			"Unnerve" = 2, "Fury" = 4)
 		NeedsSecondSword = 1
@@ -34,7 +34,7 @@
 		StyleSpd=1.65
 		StyleOff=1.35
 		StyleActive="Tenken"
-		passives = list("HybridStyle" = "UnarmedStyle", "Fury" = 2, "BlurringStrikes" = 2, "SweepingStrike" = 1, "BladeFisting" = 1, \
+		passives = list("HybridStyle" = "UnarmedStyle", "Fury" = 2, "BlurringStrikes" = 0.2, "SweepingStrike" = 1, "BladeFisting" = 1, \
 				"Iaijutsu" = 3, "Musoken" = 1, "CriticalChance" = 30, "CriticalDamage"= 0.1, "Extend" = 1, "Instinct" = 2, "Godspeed" = 3)
 		Finisher="/obj/Skills/Queue/Finisher/Gatotsu_Rokujin"
 		verb/Tenken()
