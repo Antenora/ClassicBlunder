@@ -53,7 +53,6 @@ ascension
 					if("Warrior")
 						//power = 1.5
 						passives = list("Duelist" = 1, "TechniqueMastery" = 0.5, "Tenacity" = 0.5)
-						intimidation = 10
 						strength = 0.35
 						endurance = 0.35
 						skills = list(/obj/Skills/Buffs/SpecialBuffs/Giant_Form)
@@ -100,7 +99,6 @@ ascension
 						strength = 1
 						endurance = 0.35
 						recovery = 0.5
-						intimidation = 30
 					if("Dragon")
 						//power = 2.5
 						force = 0.75
@@ -122,7 +120,6 @@ ascension
 						//power = 4
 						strength = 1
 						endurance = 1
-						intimidation = 70
 					if("Dragon")
 						//power = 3.5
 						force = 1
@@ -142,7 +139,6 @@ ascension
 						//power = 4
 						strength = 1
 						endurance = 1
-						intimidation = 70
 					if("Dragon")
 						//power = 3.5
 						force = 1

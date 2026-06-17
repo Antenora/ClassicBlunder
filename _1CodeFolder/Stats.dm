@@ -12,7 +12,6 @@ mob/proc/GetAssess()
 	var/PotentialPowerDisplay
 	var/ReplacementPowerDisplay
 	var/PowerMultiplierDisplay
-	var/IntimDisplay
 	var/BaseDisplay = race.power;
 	var/GodKiDisplay
 	var/MaouKiDisplay
@@ -46,10 +45,6 @@ mob/proc/GetAssess()
 
 	PowerMultiplierDisplay=src.Power_Multiplier;
 
-	if(src.HasIntimidation())
-		IntimDisplay=src.GetIntimidation()
-	else
-		IntimDisplay=1
 	if(src.HasGodKi()&&!src.passive_handler.Get("Utterly Powerless"))
 		GodKiDisplay=src.GetGodKi()
 		if(src.passive_handler.Get("God"))
@@ -98,7 +93,6 @@ mob/proc/GetAssess()
 	<tr><td>Power From Potential:</td><td>[PotentialPowerDisplay]</td></tr>
 	[HasPowerReplacement() ? "<tr><td>Power Replacement Value:</td><td>[ReplacementPowerDisplay]</td></tr>" : ""]
 	<tr><td>Power From Buffs:</td> <td>x[PowerMultiplierDisplay]</td></tr>
-	<tr><td>Intimidation:</td><td>x[IntimDisplay]</td></tr>
 	<tr><td>Damage Boost:</td><td>x[PDam] ([PDam*100]%)</td></tr>
 	<tr><td>Damage Reduction:</td><td>x[PRed] ([PRed*100]%)</td></tr>
 	<tr><td>God Ki:</td><td>x[GodKiDisplay]</td></tr>
@@ -1554,8 +1548,6 @@ mob/proc/Get_Scouter_Reading(mob/B)
 					a+=B.AngerAdd
 				Ratio*=a
 
-		if(B.HasIntimidation()&&B.PowerControl>25)
-			Ratio*=B.GetIntimidation()
 		if(B.PowerBoost)
 			Ratio*=B.PowerBoost
 		if(B.TarotFate=="The Sun")

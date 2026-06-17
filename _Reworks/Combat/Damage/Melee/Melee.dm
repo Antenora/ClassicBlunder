@@ -981,7 +981,7 @@
 					delay = 0.5
 
 	else
-		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+GetIntimidation()+(10*GetWeaponBreaker()))
+		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))
 		for(var/turf/T in get_step(src,src.dir))
 			flick("Attack",src)
 			T.Health-=TurfDamage

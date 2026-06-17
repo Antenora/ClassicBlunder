@@ -681,7 +681,6 @@ mob/Player/AI
 					appearance_flags+=512
 
 
-				Intimidation = rand(1,15)
 				AngerMax+=rand(1,150)/100
 
 				HealthCut = rand(25,50)/100
@@ -694,7 +693,6 @@ mob/Player/AI
 				WoundIntent=1 //Fuck you
 
 				difficulty = 1.5 * 1+(Potential/50)
-				difficulty += Intimidation/20
 				if(Lethal) difficulty+=2
 
 				if(HealthCut) difficulty *= 1 - (HealthCut/2)

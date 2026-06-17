@@ -22,7 +22,6 @@ race
 
 		onFinalization(mob/user)
 			. = ..()
-			user.Intimidation = 50
 			user.BioArmorMax = 100
 			user.BioArmor = user.BioArmorMax
 

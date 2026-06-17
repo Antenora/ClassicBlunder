@@ -54,7 +54,6 @@ prob wont do atoggle
 		newGiga.OffMod = 3 + focusStat
 		newGiga.DefMod = 2.5 + focusStat
 		newGiga.RecovMod = 2 + normalStat
-		newGiga.Intimidation = 1 + p.Potential / 10 // P sure these values r meant to be higher
 		newGiga.Godspeed = 4
 		newGiga.Timeless = 1
 		newGiga.TechniqueMastery = 3

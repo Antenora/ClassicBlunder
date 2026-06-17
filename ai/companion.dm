@@ -33,7 +33,6 @@ obj/Skills/Companion
 
 		companion_team_fire = 1
 		//Common Passives
-		companion_intimidation = 1
 		companion_godspeed = 0
 		companion_sweeping_strike = 0
 		companion_evil = 0
@@ -127,7 +126,6 @@ obj/Skills/Companion
 				a.RecovMod = (companion_recovmod == -1) ? usr.RecovMod : companion_recovmod
 				a.AngerMax = (companion_angermax == -1) ? usr.AngerMax : companion_angermax
 				a.AngerPoint = (companion_angerpoint == -1) ? usr.AngerPoint : companion_angerpoint
-				a.Intimidation = (companion_intimidation == -1) ? usr.Intimidation : companion_intimidation
 				a.ai_spammer = companion_skill_aggression
 				a.ko_death = companion_ko_death
 				a.Timeless = 1
@@ -554,7 +552,6 @@ obj/Skills/Companion/Pet
 			a.OffMod = 1
 			a.DefMod = 1
 			a.RecovMod = 1
-			a.Intimidation = 1
 			a.Timeless = 1
 			a.Potential = usr.Potential
 			a.Text_Color = text_color

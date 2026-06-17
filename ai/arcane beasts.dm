@@ -1063,7 +1063,6 @@ obj/Skills/Companion/arcane_follower
 			a.OffMod = 3 + Mastery/2
 			a.DefMod = 3 + Mastery/2
 			a.RecovMod = 2 + Mastery
-			a.Intimidation = 10 + (Mastery*20)
 			a.Timeless = 1
 			a.ai_spammer = 10
 			a.Potential = usr.Potential + 10
