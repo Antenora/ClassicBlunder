@@ -30,26 +30,26 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 			passives = list("Instinct" = 1, "Flow" = 1.5, "Parry" = 1, "Deflection" = 1, "Like Water" = 1.5, "Momentum" = 1, "PUSpike" = 10, "BladeFisting" = 1)
 			if(p.AscensionsAcquired==2)
 				if(p.isRace(ANGEL))
-					passives = list("Instinct" = 1.5, "Flow" = 1.5, "Parry" = 1.5, "Deflection" = 1, "Like Water" = 1.5, "Momentum" = 1, "PUSpike" = 10, "BlurringStrikes"=0.15, "Iaijutsu" = 1,)
+					passives = list("Instinct" = 1.5, "Flow" = 1.5, "Parry" = 1.5, "Deflection" = 1, "Like Water" = 1.5, "Momentum" = 1, "PUSpike" = 10, "BlurringStrikes"=1.5, "Iaijutsu" = 1,)
 					StyleStr = 1.35
 					StyleOff = 1.35
 					StyleDef = 1.45
 					StyleSpd = 1.45
 				else
-					passives = list("Deflection" = 1, "SoftStyle" = 1, "Flow" = 3, "Instinct" = 1, "CounterMaster" = 1, "BlurringStrikes"=0.15, "Iaijutsu" = 1)
+					passives = list("Deflection" = 1, "SoftStyle" = 1, "Flow" = 3, "Instinct" = 1, "CounterMaster" = 1, "BlurringStrikes"=1.5, "Iaijutsu" = 1)
 					StyleStr = 1.45
 					StyleSpd = 1.45
 					StyleOff = 1.35
 					StyleDef = 1.35
 			if(p.AscensionsAcquired>=3)
 				if(p.isRace(ANGEL)||p.isRace(MAKAIOSHIN))
-					passives = list("Instinct" = 2, "Flow" = 2.5, "Parry" = 1.5, "Deflection" = 1, "Like Water" = 2.5, "Momentum" = 1, "PUSpike" = 10, "BlurringStrikes"=0.2, "Iaijutsu" = 1.5,)
+					passives = list("Instinct" = 2, "Flow" = 2.5, "Parry" = 1.5, "Deflection" = 1, "Like Water" = 2.5, "Momentum" = 1, "PUSpike" = 10, "BlurringStrikes"=2, "Iaijutsu" = 1.5,)
 					StyleStr = 1.45
 					StyleOff = 1.45
 					StyleDef = 1.45
 					StyleSpd = 1.65
 				else
-					passives = list("Deflection" = 1, "SoftStyle" = 1, "Flow" = 3, "Instinct" = 1, "CounterMaster" = 1, "BlurringStrikes"=0.2, "Iaijutsu" = 1.5)
+					passives = list("Deflection" = 1, "SoftStyle" = 1, "Flow" = 3, "Instinct" = 1, "CounterMaster" = 1, "BlurringStrikes"=2, "Iaijutsu" = 1.5)
 					StyleStr = 1.45
 					StyleSpd = 1.65
 					StyleOff = 1.35

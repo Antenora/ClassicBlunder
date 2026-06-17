@@ -1,4 +1,4 @@
-#define TRUTH_PASSIVES_ASC_1 list("Extend" = 1, "BlurringStrikes" = 0.1, "QuickCast" = 1, "MovingCharge" = 1)
+#define TRUTH_PASSIVES_ASC_1 list("Extend" = 1, "BlurringStrikes" = 0.5, "QuickCast" = 1, "MovingCharge" = 1)
 #define TRUTH_PASSIVES_ASC_2 list("Duelist" = 1, "Deflection" = 1, "HybridStrike" = 1.5, "ManaSteal" = 25)
 #define TRUTH_PASSIVES_ASC_3 list("ManaStats" = 0.25, "Steady" = 2)
 
@@ -75,7 +75,7 @@
             usr << "God Slicer class set as [Choice]!"
         else
             usr << "You can't set this while using God Slicer."
-
+    
     proc/checkTruth(mob/p)
         if(truthApplied >= p.AscensionsAcquired + 1)
             return TRUE
@@ -86,7 +86,7 @@
             // apply it here
             for(var/x in 1 to p.AscensionsAcquired)
                 switch(p.AscensionsAcquired) // ghetto application
-                    if(0)
+                    if(0) 
                         if(truthApplied != 0) break
                         var/passive = input(p, "what passive") in TRUTH_PASSIVES_ASC_1
                         truthPassives += TRUTH_PASSIVES_ASC_1[passive]
@@ -112,9 +112,9 @@
         passives = list("SpiritSword" = (1 + (asc/2)) / 4, "MagicSword" = 1)
         for(var/x in truthPassives)
             passives[x] = truthPassives[x]
-        SwordAscension = asc
-        SwordAscensionSecond = asc
-        SwordAscensionThird = asc
+        SwordAscension = asc 
+        SwordAscensionSecond = asc 
+        SwordAscensionThird = asc 
         ElementalOffense = "Truth"
     verb/God_Slicer()
         set category="Skills"
@@ -122,4 +122,4 @@
             adjust(usr)
         src.Trigger(usr)
 
-
+    

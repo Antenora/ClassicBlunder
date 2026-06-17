@@ -137,7 +137,7 @@ obj/Skills/Utility/Recall_Armaments
 //ascension 4
 /obj/Items/Sword/Guardian/Sword_of_the_Spirit
 	Techniques = list(new/obj/Skills/Buffs/SpecialBuffs/The_Ten_Commandments, new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Word_Of_God)
-	passives = list("SweepingStrike" = 1, "SpiritSword" = 1, "BlurringStrikes" = 0.3, "DoubleStrike" = 1, "TripleStrike" = 1)
+	passives = list("SweepingStrike" = 1, "SpiritSword" = 1, "BlurringStrikes" = 3, "DoubleStrike" = 1, "TripleStrike" = 1)
 	Class = "Medium"
 	SubType = "Weapons"
 	DamageEffectiveness=1.1
@@ -224,7 +224,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Ultra Instinct (Complete)"
 		adjust(mob/p)
-			passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1, "BlurringStrikes"=0.4, "UnarmedDamage"=4)
+			passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1, "BlurringStrikes"=4, "UnarmedDamage"=4)
 			StyleStr=1.35
 			StyleFor=1.35
 			StyleSpd=1.75
@@ -256,7 +256,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Perfected Ultra Instinct"
 		adjust(mob/p)
-			passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1, "BlurringStrikes"=0.4)
+			passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1, "BlurringStrikes"=4)
 			StyleStr=1.45
 			StyleFor=1.45
 			StyleSpd=2

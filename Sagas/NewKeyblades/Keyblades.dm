@@ -571,7 +571,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Combustion" = 60, "Scorching" = 2+Boost)
 				return KeybladePassives
 			if("Wayward Wind")
-				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1,"BlurringStrikes" = 0.3, "AttackSpeed" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1,"BlurringStrikes" = 3, "AttackSpeed" = 2+(Boost/2))
 				return KeybladePassives
 			if("Rainfell")
 				KeybladePassives=list("PULock" = 1, "CriticalChance" = 30+(Boost*5), "ThunderHerald" = 1, "CriticalDamage"= 0.15)
@@ -589,7 +589,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "TechniqueMastery" = Boost, "BuffMastery" = Boost)
 				return KeybladePassives
 			if("Two Become One")
-				KeybladePassives=list("PULock" = 1, "Two Become One" = 1, "BlurringStrikes" = 0.4, "ManaGeneration" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1, "Two Become One" = 1, "BlurringStrikes" = 4, "ManaGeneration" = 2+(Boost/2))
 				return KeybladePassives
 			if("Blind Justice")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 3+(Boost/2), "PureReduction" = -3+(Boost/2))

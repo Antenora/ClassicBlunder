@@ -52,7 +52,7 @@
 	Cooldown = 120
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc,"BlurringStrikes" = 0.3+(0.1*asc), "Flow" = asc, "Instinct" = asc)
+		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc,"BlurringStrikes" = 3+asc, "Flow" = asc, "Instinct" = asc)
 		TimerLimit = 30 + (glob.racials.FEATHERDUR * asc)
 		Cooldown = 120 - ((glob.racials.FEATHERDUR*2) * asc)
 		EnergyDrain = 0.05 - (asc/100)

@@ -93,4 +93,4 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi
 	Divine_Rain
 		StrMult=1.3
 		ForMult=1.3
-		passives = list("Godspeed" = 1, "BlurringStrikes" = 0.1, "DualCast" = 1)
+		passives = list("Godspeed" = 1, "BlurringStrikes" = 0.5, "DualCast" = 1)

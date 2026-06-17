@@ -18,7 +18,7 @@
 	Nine_Sword_Style
 		passives = list("Relentlessness" = 1, "Fury" = 6, "Speed Force" = 2, "BuffMastery" = 3,\
 		                "StyleMastery" = 4, "Brutalize" = 4, "AsuraStrike" = 1,"TripleStrike" = 1, \
-		                "BlurringStrikes" = 0.3,  "TensionLock" = 1)
+		                "BlurringStrikes" = 3,  "TensionLock" = 1)
 		SpdMult=1.25
 		StrMult=1.75
 		OffMult=1.25
@@ -26,7 +26,7 @@
 	Promise_of_Tomorrow
 		passives = list("Relentlessness" = 1, "Fury" = 6, "Speed Force" = 2, "BuffMastery" = 3,\
 		                "StyleMastery" = 4, "Brutalize" = 4, "AsuraStrike" = 1,"TripleStrike" = 1, \
-		                "BlurringStrikes" = 0.3,  "TensionLock" = 1,"LifeGeneration" = 8,"ManaGeneration" = 8,"EnergyGeneration" = 8  )
+		                "BlurringStrikes" = 3,  "TensionLock" = 1,"LifeGeneration" = 8,"ManaGeneration" = 8,"EnergyGeneration" = 8  )
 		SpdMult=2
 		StrMult=2
 		OffMult=2
@@ -60,7 +60,7 @@
 		TimerLimit = 40
 		passives = list("SpiritFlow"=1, "SpiritSword"=1, "ManaStats" = 1, "CallousedHands"=0.5, "PureReduction"=4, "TensionLock" = 1)
 	The_Ultimate_Fist
-		passives = list("CallousedHands"=0.5, "BlurringStrikes" = 0.4, "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1, "PureReduction"=4)
+		passives = list("CallousedHands"=0.5, "BlurringStrikes" = 4, "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1, "PureReduction"=4)
 		SpdMult=1.5
 		StrMult=1.5
 	Jackpot

@@ -7,11 +7,11 @@
 		StyleSpd=1.25
 		StyleActive="Twin Dragon Fire"
 		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 2, "Instinct" = 2, \
-							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 0.2, "SweepingStrike" = 1)
+							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 2, "SweepingStrike" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 2, "Instinct" = 2, \
-							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 0.2, "SweepingStrike" = 1)
+							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 2, "SweepingStrike" = 1)
 		verb/Twin_Dragon_Fire()
 			set hidden=1
 			adjust(usr)
@@ -19,7 +19,7 @@
 
 	School_of_the_Undefeated_of_the_East // unarmed + armed
 		SignatureTechnique=3
-		passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.3, "Interception" = 1.5, \
+		passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25)
 		NeedsSword=0
 		NoSword=1
@@ -30,7 +30,7 @@
 		Finisher="/obj/Skills/Queue/Finisher/Winds_Of_The_King"
 		StyleActive = "School of the Undefeated Of The East"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.3, "Interception" = 1.5, \
+			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25, "Grippy" = 4)
 		verb/School_of_the_Undefeated_of_the_East()
 			set hidden=1
@@ -89,7 +89,7 @@
 	Plasma_Blade
 		SignatureTechnique=3
 		passives = list("Iaido" = 4, "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
-			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 0.15, "Rain" = 3,\
+			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 1.5, "Rain" = 3,\
 			"SpiritSword" = 1, "SpiritFlow"=4)
 		StyleSpd = 1.5
 		StyleFor = 1.35
@@ -99,7 +99,7 @@
 		Finisher="/obj/Skills/Queue/Finisher/Plasma_Formation"
 		adjust(mob/p)
 			passives = list( "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
-			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 3, "BlurringStrikes" = 0.15, "Rain" = 3, "SpiritSword" = 1, "SpiritFlow"=4);
+			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 3, "BlurringStrikes" = 1.5, "Rain" = 3, "SpiritSword" = 1, "SpiritFlow"=4);
 		verb/Plasma_Blade()
 			set hidden=1
 			if(!usr.BuffOn(src)) adjust(usr);

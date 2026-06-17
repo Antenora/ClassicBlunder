@@ -32,7 +32,7 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"Instinct"        = 1 + SL,
-			"BlurringStrikes" = 0.05 + (SL * 0.05),
+			"BlurringStrikes" = 0.5 + (SL * 0.5),
 			"Flow"            = 1 + SL,
 			"BladeFisting"    = 1,
 			"Momentum"        = 0.5 + (0.5 * SL),
@@ -118,7 +118,7 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"LikeWater"       = 1 + SL,
-			"BlurringStrikes" = 0.25 + (SL * 0.05),
+			"BlurringStrikes" = 2.5 + (SL * 0.5),
 			"Fa Jin"          = 1.25 + (0.25 * SL),
 			"SpiritHand"      = 4 + (1.25 * SL),
 			"Momentum"        = 0.5 + (0.5 * SL),

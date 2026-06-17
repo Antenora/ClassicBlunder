@@ -38,7 +38,7 @@
 		Copyable=0
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu",\
 		"/obj/Skills/Buffs/NuStyle/SwordStyle/Fist_of_Khonshu"="/obj/Skills/Buffs/NuStyle/SwordStyle/Gatotsu")
-		passives = list("Iaijutsu" = 2, "Musoken" = 1, "BlurringStrikes" = 0.1)
+		passives = list("Iaijutsu" = 2, "Musoken" = 1, "BlurringStrikes" = 0.5)
 		StyleActive="Seitei Iaido"
 		StyleSpd=1.3
 		StyleOff=1.15

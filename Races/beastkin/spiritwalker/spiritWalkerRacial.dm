@@ -27,7 +27,7 @@
 	defAdd = -0.25
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/40, 0.025, 0.1), "Brutalize" = 0.5 + (asc/2))
+		passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/4, 0.25, 1), "Brutalize" = 0.5 + (asc/2))
 		Cooldown = 90 - (10 *p.AscensionsAcquired)
 		TimerLimit = 30 + (6 *p.AscensionsAcquired)
 	verb/Ram_Form()

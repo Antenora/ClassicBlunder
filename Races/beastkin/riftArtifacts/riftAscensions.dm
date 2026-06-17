@@ -55,7 +55,7 @@
     speed = 0.5;
     endurance = 0.5;
     force = 0.5;
-    passives = list("SpiritSword" = 0.5, "SpiritHand" = 1, "SpiritFlow" = 1, "BlurringStrikes" = 0.1, "CallousedHands" = 0.1)
+    passives = list("SpiritSword" = 0.5, "SpiritHand" = 1, "SpiritFlow" = 1, "BlurringStrikes" = 1, "CallousedHands" = 0.1)
 /ascension/sub_ascension/beastkin/firstlight
     strength = 0.75;
     endurance = 0.75;

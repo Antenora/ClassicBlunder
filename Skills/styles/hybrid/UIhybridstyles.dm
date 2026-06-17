@@ -14,7 +14,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SwordIcon = 'Icons/Buffs/Ki-Blade.dmi'
 		SwordClass = "Medium"
 		passives = list("HybridStyle" = "SwordStyle", "LikeWater" = 5, "Instinct" = 4, "The Way" = 1, "Sword Master" = 1, "Flow" = 2.5, "Parry" = 2, "Deflection" = 2,\
-                        "Godspeed" = 2, "BlurringStrikes" = 0.15, "Fury" = 3, "Deicide" = 1, "Pressure" = 3, "Momentum" = 1.5, "PUSpike" = 50)
+                        "Godspeed" = 2, "BlurringStrikes" = 1.5, "Fury" = 3, "Deicide" = 1, "Pressure" = 3, "Momentum" = 1.5, "PUSpike" = 50)
 		StyleActive = "Sword Without Thought"
 		StyleStr = 1.4
 		StyleOff = 1.4
@@ -161,7 +161,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
-		passives = list("HybridStyle" = "UnarmedStyle", "Instinct" = 5, "LikeWater" = 4, "Momentum" = 3, "Fa Jin" = 3, "Flow" = 3, "Pressure" = 3, "Deflection" = 1.5, "BlurringStrikes" = 0.1,\
+		passives = list("HybridStyle" = "UnarmedStyle", "Instinct" = 5, "LikeWater" = 4, "Momentum" = 3, "Fa Jin" = 3, "Flow" = 3, "Pressure" = 3, "Deflection" = 1.5, "BlurringStrikes" = 1,\
                        "CounterMaster" = 2.5, "Interception" = 3, "Harden" = 2, "Godspeed" = 2, "Fury" = 2, "Parry" = 2, \
                        "Sunyata" = 2, "Reversal" = 1, "PUSpike" = 50)//Hey, it's me, goku.
 		StyleActive = "Heavenly Palm"

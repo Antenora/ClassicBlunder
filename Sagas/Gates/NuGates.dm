@@ -32,7 +32,7 @@
 	spdAdd=0.15
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=0.1, "Momentum"=1, "Instinct"=1,"PUSpike" = 20)
+		passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1,"PUSpike" = 20)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -58,7 +58,7 @@
 	spdAdd=0.25
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=0.15, "Momentum"=1.5, "Instinct"=1,"PUSpike" = 10)
+		passives = list("BlurringStrikes"=1.5, "Momentum"=1.5, "Instinct"=1,"PUSpike" = 10)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -79,13 +79,13 @@
 	GatesNeeded=6
 	Slotless = TRUE
 	BuffName = "Sixth Gate"
-	passives = list("BlurringStrikes"=0.1, "Momentum"=1, "Instinct"=1)
+	passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1)
 	PUSpike = 20
 	strAdd=0.1
 	spdAdd=0.25
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=0.1, "Momentum"=1, "Instinct"=1, "PUSpike" = 20, "Deicide" = 5)
+		passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1, "PUSpike" = 20, "Deicide" = 5)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()

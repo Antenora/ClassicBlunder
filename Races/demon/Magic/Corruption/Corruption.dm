@@ -148,7 +148,7 @@
 		for(var/x in scalingValues)
 			passives[x] = scalingValues[x][asc]
 		if(p.GetSpd() > p.GetEnd())
-			passives["BlurringStrikes"] = 0.1*asc
+			passives["BlurringStrikes"] = asc
 			SpdMult = 1.1 + boon
 		else
 			passives["CallousedHands"] = asc/5

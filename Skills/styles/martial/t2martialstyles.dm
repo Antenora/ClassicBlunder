@@ -44,7 +44,7 @@
 				StyleEnd=0.85
 				StyleStr=1.45
 				StyleOff=1.45
-				passives = list("Fa Jin" = 3, "Momentum" = 2,"Fury" = 1, "BlurringStrikes" = 0.1, "Instinct" = 2)
+				passives = list("Fa Jin" = 3, "Momentum" = 2,"Fury" = 1, "BlurringStrikes" = 0.5, "Instinct" = 2)
 				Finisher="/obj/Skills/Queue/Finisher/Teiga" // Ryukoha grapple follow up
 			else
 				StyleActive = "Mantis Style"

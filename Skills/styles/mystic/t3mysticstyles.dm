@@ -168,7 +168,7 @@
 					ElementalClass = "Wind"
 					ElementalOffense = "Wind"
 					ElementalDefense = "Wind"
-					passives = list("Adaptation" = 5, "BlurringStrikes" = 0.3, "Shocking" = 3, "Flicker" = 4, "Flow" = 4, "Speed Force" = 1, "AttackSpeed" = 2, "Fury" = 4, "Skimming" = 2)
+					passives = list("Adaptation" = 5, "BlurringStrikes" = 3, "Shocking" = 3, "Flicker" = 4, "Flow" = 4, "Speed Force" = 1, "AttackSpeed" = 2, "Fury" = 4, "Skimming" = 2)
 					Finisher = "/obj/Skills/Queue/Finisher/Urda_Impulse"
 				if("wezen")
 					StyleActive = "Wezen"

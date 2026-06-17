@@ -132,7 +132,7 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"Flicker"         = 1 + SL,
-			"BlurringStrikes" = 0.1 + (0.1 * SL),
+			"BlurringStrikes" = 1 + SL,
 			"Afterimages"     = 1,
 			"Godspeed"        = 1 + SL,
 			"Warping"         = 0.5 + (SL/2),
