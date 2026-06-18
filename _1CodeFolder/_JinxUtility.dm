@@ -820,6 +820,9 @@ mob
 				defender.Unconscious(src)
 				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
 					defender.client.PlaySwoon()
+					defender.Maimed+=1
+					defender.recordMaim(src, "Combat")
+					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
 			else if(defender.KO&&src.Lethal)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)

@@ -1,4 +1,5 @@
 client/proc/PlaySwoon()
+	set waitfor = 0
 	var/obj/ScreenFX/SWOON/fx = new
 
 	screen += fx
