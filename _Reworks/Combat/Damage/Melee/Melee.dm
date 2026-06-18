@@ -12,11 +12,15 @@
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
+				return TRUE
 	else if(option == "Stun")
 		if(enemy.Stunned)
 			if(passive_handler["Sajire Rush"])
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
+				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
 				return TRUE
 	return FALSE
 
@@ -499,6 +503,8 @@
 						damage *= 1+secretDatum?:getBoon(src,"Stunners")
 					if(passive_handler["Speed Force"])
 						damage *= 0 + (0.25 * passive_handler["Speed Force"])
+					if(passive_handler.Get("Bear Spirit"))
+						damage *= 1
 					else
 						damage /= max(2,4-adjust)
 					if(glob.LIGHT_ATTACK_SPEED_DMG_ENABLED)
