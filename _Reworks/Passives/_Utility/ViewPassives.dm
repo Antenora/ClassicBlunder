@@ -120,6 +120,7 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "MartialMagic"="You can cast Magic without a Magic Style or Focus,",
 "SpaceWalk"="Immune to environmental tile effects (ie space draining oxygen, lava burning you) except for static tiles.",
 "StaticWalk"="Prevents you from losing oxygen and health on static tiles.",
-"Fa Jin"="Enhances queue damage."
-
+"Fa Jin"="Enhances queue damage.",
+"Fox Spirit"="Multiplies your SpiritSword, SpiritHand and Spiritflow passives by 40%",
+"Bear Spirit"="Allows you to constantly attack and warp onto a stunned target next to you. Do not move while using this."
 );
