@@ -303,6 +303,10 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		if("Master Inkworks")
 			InkworksDatum.Tier = 3 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Tales of The Living")
+			// make this add the three tales of the living options
+		if("Tales of The Spirits")
+			// Make this add the tales of the the spirit options
 		// INKWORKS END //
 		// TECH SHIT //
 		if("CyberEngineering")
