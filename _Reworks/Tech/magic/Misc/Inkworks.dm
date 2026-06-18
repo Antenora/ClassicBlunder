@@ -17,15 +17,19 @@ Inkworks // This should be passed to InkworksDarum which should be to every indi
     var
         Slots = 1 // How many Inkworks you can have on you
         Tier = 0 // Your Inkworks tier, which increases with Inkworks Research
-        // Tales of The Living
-        MatchGirl = 0 // Scorching
-        SnowQueen = 0 // Freezing
-        IssunBoshi = 0 // Underdog 
-        YouthFountain = 0 // Lifegen
-        // Tales of The Spirit
-        Kumiho = 0 // Lifesteal
-        Gorgon = 0 // Cripple
-        Harpy = 0 // Skimming
+        // Tales of The Living - Give you a status effect.
+        MatchGirl = 0 // eruptingblows
+        IceQueen = 0 // Freezing + IceHerald/IceAge
+        Erlking = 0 // Shattering + EarthHerald
+        SnowWhite = 0 // silentpoison
+        // Tales of The Spirit - Adjust your moves
+        Fox = 0 //SpiritFlow and Spiritsword scale better
+        Wolf = 0 // + Dash Range for dash skills 
+        Dragon = 0 // Buff beams somehow?
+        Bear = 0 // If the person you normal attack is stunned, gain warping when damaging them.
+        Snake = 0 // Hide Debuffs inflicted
+        Lion = 0 // Shadow Mantle frenzy mechanics. 
+        
 
 
 
@@ -35,7 +39,7 @@ Inkworks // This should be passed to InkworksDarum which should be to every indi
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Inscribed_Ink
     MagicNeeded = 1
-    ActiveMessage = "taps into the Ink adorning their body."
+    ActiveMessage = "taps into the Ink inscribed into their their body."
     TextColor=rgb(182, 27, 148)
     adjust(mob/P)
     
@@ -45,3 +49,4 @@ Inkworks // This should be passed to InkworksDarum which should be to every indi
 
 mob/proc/ReduceInkworksUnlocked()
     --InkworksDatum.Tier
+    InkworksDatum.calculateSlots()

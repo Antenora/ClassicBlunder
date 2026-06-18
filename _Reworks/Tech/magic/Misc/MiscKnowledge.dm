@@ -80,21 +80,21 @@
 /knowledgePaths/magic/misc/Advanced_Inkworks
     name = "Advanced Inkworks"
     description = "Inkworks is the art of storytelling upon the canvas of yourself. You understand this intimately now, and as such you can access more advanced inkworks and bestow yourself more Inkworks."
-    requires = list("Inkworks", "Tales")
+    requires = list("Inkworks", "Tales of The Living")
 
 /knowledgePaths/magic/misc/Mastered_Inkworks
     name = "Mastered Inkworks"
     description = "Inkworks is the art of bonding with the world and those within it. You see the lines between this story intimately now, and while you cannot change it entirely you can nudge your role in it. You can bestow yourself more Inkworks."
-    requires = list("Advanced Inkworks")
+    requires = list("Advanced Inkworks", "Tales of The Spirits")
 
 /knowledgePaths/magic/misc/TalesOfTheLiving
-    name = "Tales of The Living" // Popular Fairytales / Folklore
+    name = "Tales of The Living" 
     description = "The Stories spread by word of mouth, eventually recorded and kept across stories themselves. This is the knowledge of those folktales and how to engrave them into Ink."
     requires = list("Inkworks")
 
 /knowledgePaths/magic/misc/TalesOfTheSpirit
-    name = "Tales of the Spirits"  // Famous mythological Creatures
+    name = "Tales of The Spirits" 
     description = "The Stories spread by the presence of spirits, engrained and festered in the mind of the living. This is the knolwedge of those stories and how to engrave them into Ink."
-    requires = list("Tales")
+    requires = list("Tales of The Living ")
 
     
