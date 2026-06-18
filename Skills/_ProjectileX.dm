@@ -5226,10 +5226,15 @@ mob
 			var/atom/Origin=src//This is the mob or turf that an attack will come from.
 			if(Z.SpawnPosition)
 				Origin = Z.SpawnPosition
-			if(Z.YSpawnOffset)
+
+			if(Z.XSpawnOffset || Z.YSpawnOffset)
 				var/turf/T = get_turf(Origin)
 				if(T)
-					var/turf/OffsetTurf = locate(T.x, T.y + Z.YSpawnOffset, T.z)
+					var/turf/OffsetTurf = locate(
+						T.x + Z.XSpawnOffset,
+						T.y + Z.YSpawnOffset,
+						T.z
+					)
 					if(OffsetTurf)
 						Origin = OffsetTurf
 

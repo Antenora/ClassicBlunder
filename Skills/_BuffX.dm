@@ -13178,8 +13178,6 @@ mob
 				src:move_speed = MovementSpeed()
 			if(src.StyleBuff.OurFuture)
 				OMsg(src, "[src] takes back what belongs to them, as they call upon [src.StyleBuff]!")
-			if(src.StyleBuff.StyleActive == "From Now On")
-				OMsg(src, "From Now On, [src] fights with all that they have.")
 			else
 				OMsg(src, "[src] takes up the [src.StyleBuff]!")
 			if(hasSecret("Eldritch (Shrouded)"))

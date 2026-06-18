@@ -1,52 +1,94 @@
 //Style
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	From_Now_On
+/obj/Skills/Buffs/NuStyle/SwordStyle //T1
+	Fight_or_Flight
 		NeedsSword=1
-		StyleStr = 1.20
+		StyleStr = 1.15
+		StyleFor = 1.15
+		StyleOff = 1.05
+		StyleDef = 1.05
+		StyleActive = "Fight or Flight"
+		passives = list("HybridStyle" = "MysticStyle", "SpiritFlow" = 1, "SpiritSword" = 0.5, "Flow" = 1, "Instinct" = 0.5)
+		verb/Fight_or_Flight()
+			set hidden=1
+			src.Trigger(usr)
+	Mountain_King //T2
+		NeedsSword=1
+		StyleStr = 1.25
+		StyleFor = 1.25
+		StyleOff = 1.15
+		StyleDef = 1.10
 		StyleSpd = 1.10
-		StyleFor = 1.20
-		StyleActive = "From Now On"
-		passives = list("HybridStyle" = "MysticStyle", "SoulTug" = 1.5, \
-		"SpiritFlow" = 1, "SpiritHand" = 1, "Fury" = 1, "DoubleStrike" = 1, "Flow" = 3, "Instinct" = 1)
-		adjust(mob/p)
-			var/pLv = p.SagaLevel
-			passives = list("HybridStyle" = "MysticStyle", "SoulTug" = 1.5, \
-			"SpiritFlow" = pLv, "SpiritHand" = 1, "Fury" = 1, "DoubleStrike" = 1, "Flow" = 3, "Instinct" = 1)
-		verb/From_Now_On()
+		StyleActive = "Mountain King"
+		passives = list("HybridStyle" = "MysticStyle", "HybridStrike" = 0.5, "SpiritFlow" = 2, "SpiritSword" = 1, "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
+		verb/Mountain_King()
+			set hidden=1
+			src.Trigger(usr)
+	 Dreamlike_Savior//T3
+		NeedsSword=1
+		StyleStr = 1.35
+		StyleFor = 1.35
+		StyleOff = 1.25
+		StyleDef = 1.20
+		StyleSpd = 1.20
+		StyleActive = "Dreamlike Savior"
+		passives = list("HybridStyle" = "MysticStyle",  "HybridStrike" = 1, "SpiritFlow" = 3, "SpiritSword" = 1.5,\
+		"Flow" = 3, "Instinct" = 2, "DoubleStrike" = 2, "Deflection" = 2,)
+		verb/Dreamlike_Savior()
+			set hidden=1
+			src.Trigger(usr)
+	 Afterlife//T4
+		NeedsSword=1
+		StyleStr = 1.50
+		StyleFor = 1.50
+		StyleOff = 1.40
+		StyleDef = 1.35
+		StyleSpd = 1.35
+		StyleActive = "Afterlife"
+		passives = list("HybridStyle" = "MysticStyle",  "HybridStrike" = 1.5, "SpiritFlow" = 4, "SpiritSword" = 2, "Flow" = 4, "Instinct" = 3,\
+		"LikeWater" = 3, "DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2, "Pressure" = 2, "PUSpike" = 50)
+		verb/Afterlife()
 			set hidden=1
 			src.Trigger(usr)
 // Skills
 obj
 	Skills/Buffs/SpecialBuffs
 		Hyperdeath_Mode
-			BuffName="Hyperdeath Mode"
-			StrMult=1.2
-			EndMult=1.2
-			SpdMult=1.2
-			ForMult=1.2
-			RecovMult=1.2
-			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1, "RainbowAfterImages" = 1)
-			FlashChange=1
-			KenWaveIcon='Unbound.dmi'
-			KenWave=1
-			KenWaveSize=1
-			KenWaveX=72
-			KenWaveY=72
-			KenWaveBlend=2
-			KenWaveTime=5
-			ActiveMessage="awakens their Hyperdeath state!"
-			OffMessage="returns to their normal self..."
+			BuffName = "Hyperdeath Mode"
+			StrMult = 1.25
+			EndMult = 1.10
+			SpdMult = 1.15
+			ForMult = 1.25
+			RecovMult = 1.10
+			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "HybridStrike" = 0.5, "SpiritFlow" = 2, "SpiritSword" = 1, "Pressure" = 2,\
+			"Instinct" = 2, "Flow" = 2, "RainbowAfterImages" = 1)
+			FlashChange = 1
+			KenWaveIcon = 'Unbound.dmi'
+			KenWave = 1
+			KenWaveSize = 1
+			KenWaveX = 72
+			KenWaveY = 72
+			KenWaveBlend = 2
+			KenWaveTime = 5
+			ActiveMessage = "awakens their Hyperdeath state!"
+			OffMessage = "returns to their normal self..."
 			adjust(mob/p)
 				var/pLv = p.SagaLevel
-				passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1, "RainbowAfterImages" = 1)
+				StrMult = 1.25 + (0.01 * pLv)
+				ForMult = 1.25 + (0.01 * pLv)
+				SpdMult = 1.15 + (0.01 * pLv)
+				EndMult = 1.10 + (0.01 * pLv)
+				RecovMult = 1.10 + (0.01 * pLv)
+				passives = list("MovementMastery" = 2,"TechniqueMastery" = 2, "HybridStrike" = 0.5, "SpiritFlow" = 1 + pLv, "SpiritSword" = max(1, round(pLv / 2, 1)), \
+				"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1)
 			verb/Hyperdeath_Mode()
-				set category="Skills"
+				set category = "Skills"
 				adjust(usr)
-				if((usr.HyperdeathMeterCurrent < usr.HyperdeathThreshold)&&(!usr.CheckSpecial("Hyperdeath Mode")))
+				if((usr.HyperdeathMeterCurrent < usr.HyperdeathThreshold) && (!usr.CheckSpecial("Hyperdeath Mode")))
 					usr << "You haven't accumulated enough power yet! <Requires [usr.HyperdeathThreshold]% power.>"
 				else
 					src.Trigger(usr)
 					usr.HyperMeterUpdate()
+
 	Skills/Buffs/SlotlessBuffs
 		ChaosSaber
 			MakesSword=1
@@ -63,7 +105,7 @@ obj
 			ActiveMessage="readies CHAOS SABER!"
 			OffMessage="dispels the CHAOS SABER."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"HybridStrike" = 0.5,"KiControl" = 1, "SpiritSword" = 1)
+				passives = list("PUSpike"=50,"HybridStrike" = 0.5,"KiControl" = 1, "SpiritSword" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
@@ -194,50 +236,57 @@ obj
 				usr.Activate(src)
 
 	Skills/Projectile
-		ProjectileDownTestNormal
-			ElementalClass="Fire"
-			SpellElement="Fire"
-			SkillCost=TIER_2_COST
-			Copyable=3
-			DamageMult=4
+		ChaosSaberToss
+			DamageMult=6
 			AccMult=2
-			IconSize=2
+			Cooldown=45
+			IconSize=1
 			Homing=1
-			Scorching=1
 			Knockback=3
-			Explode=2
 			ManaCost=5
-			Cooldown=0
-			IconLock='Fireball.dmi'
+			Trail='Trail - Flare.dmi'
+			TrailSize=1
+			IconLock='ChaosSaberProjectile.dmi'
 			adjust(mob/p)
 				DamageMult = initial(DamageMult)
-			verb/NonAOEFireball()
+			verb/ChaosSaberToss()
 				set category="Skills"
 				set hidden=0
+				if(Using || cooldown_remaining)
+					return FALSE
 				if(usr.CheckSpecial("Hyperdeath Mode"))
-					usr.SpawnAttackMarker(/obj/Skills/Projectile/ProjectileDownTestAOE, usr.Target)
-				else
+					var/hyper_mana_cost = 15
+					if(usr.ManaAmount < hyper_mana_cost)
+						usr << "You need [hyper_mana_cost] mana."
+						return FALSE
+					if(!usr.Target || usr.Target == usr)
+						usr << "You need a valid target."
+						return FALSE
 					adjust(usr)
-					usr.UseProjectile(src)
+					usr.ManaAmount -= hyper_mana_cost
+					if(usr.ManaAmount < 0)
+						usr.ManaAmount = 0
+					src.Cooldown(1, null, usr)
+					usr.SpawnMMOCrossMarkers(/obj/Skills/Projectile/ChaosSaberWave, usr.Target, 11)
+					return TRUE
+				adjust(usr)
+				usr.UseProjectile(src)
 
-		ProjectileDownTestAOE
-			ElementalClass="Fire"
-			SpellElement="Fire"
-			SkillCost=TIER_2_COST
-			Copyable=3
+		ChaosSaberWave
 			YSpawnOffset=4
 			DamageMult=20
 			AccMult=2
-			IconSize=2
-			Scorching=1
-			Knockback=3
-			Explode=2
+			IconSize=1
 			DirOverride=2
-			ManaCost=5
+			Piercing=1
+			Striking=1
+			ManaCost=0
 			Cooldown=0
-			IconLock='Fireball.dmi'
+			Trail='Trail - Flare.dmi'
+			TrailSize=1
+			IconLock='ChaosSaberProjectile.dmi'
 			adjust(mob/p)
-				DamageMult = initial(DamageMult)
+				DamageMult = initial(DamageMult) * glob.MMO_PROJ_DAMAGE_MULT
 			verb/AOEFireball()
 				set category="Skills"
 				set hidden=1
@@ -304,6 +353,7 @@ mob/proc/HyperMeterUpdate()
 	HyperBarFill.icon = I
 	HyperBarFill.icon_state = ""
 
+/*
 obj/AttackMarker
 	icon = 'MMOAttackMarker.dmi'
 	icon_state = "WarningBox"
@@ -312,9 +362,10 @@ obj/AttackMarker
 
 	var/mob/owner
 	var/delay = 20
-	var/projectile_type = /obj/Skills/Projectile/ProjectileDownTestAOE
+	var/projectile_type
+	var/fire_dir = null
 
-	New(loc, mob/O, projectile_path = null)
+	New(loc, mob/O, projectile_path = null, custom_delay = null, custom_dir = null)
 		..()
 
 		owner = O
@@ -322,32 +373,51 @@ obj/AttackMarker
 		if(ispath(projectile_path, /obj/Skills/Projectile))
 			projectile_type = projectile_path
 
-		spawn(delay)
-			FireMMOAttack(owner, projectile_type)
+		if(!isnull(custom_delay))
+			delay = custom_delay
 
-	proc/FireMMOAttack(mob/O, path)
+		if(custom_dir)
+			fire_dir = custom_dir
+
+		spawn(delay)
+			FireMMOAttack()
+
+	proc/FireMMOAttack()
 		if(!src || !loc)
 			return
 
-		if(!O)
+		if(!owner)
 			del(src)
 			return
 
+		var/path = projectile_type
+
 		if(!ispath(path, /obj/Skills/Projectile))
-			path = /obj/Skills/Projectile/ProjectileDownTestAOE
+			path = /obj/Skills/Projectile/ChaosSaberWave
 
-		var/obj/Skills/Projectile/p = O.FindSkill(path)
+		var/obj/Skills/Projectile/p = new path
 
-		if(!p)
-			p = new path
-			O.AddSkill(p)
+		p.adjust(owner)
 
-		p.adjust(O)
 		p.SpawnPosition = src
-		O.UseProjectile(p)
-		p.SpawnPosition = null
 
-		world << "attack fired"
+		if(fire_dir)
+			p.DirOverride = fire_dir
+		if(fire_dir == EAST)
+			p.YSpawnOffset=0
+			p.XSpawnOffset=-4
+		if(fire_dir == WEST)
+			p.YSpawnOffset=0
+			p.XSpawnOffset=4
+		if(fire_dir == NORTH)
+			p.YSpawnOffset=-4
+			p.XSpawnOffset=0
+		if(fire_dir == SOUTH)
+			p.YSpawnOffset=4
+			p.XSpawnOffset=0
+
+		owner.UseProjectile(p)
+
 		del(src)
 
 mob/proc/SpawnAttackMarker(path, Target)
@@ -358,6 +428,69 @@ mob/proc/SpawnAttackMarker(path, Target)
 
 	new /obj/AttackMarker(T, src, path)
 
-mob/verb/Test_Marker()
-	set category = "Debug"
+mob/proc/SpawnCheckerboardMarkers(projectile_path, Target, marker_range = 3)
+	if(!Target)
+		return
 
+	var/turf/Center = get_turf(Target)
+	if(!Center)
+		return
+
+	for(var/dx = -marker_range to marker_range)
+		for(var/dy = -marker_range to marker_range)
+			if((abs(dx) + abs(dy)) % 2 != 0)
+				continue
+
+			var/turf/T = locate(Center.x + dx, Center.y + dy, Center.z)
+			if(!T)
+				continue
+
+			new /obj/AttackMarker(T, src, projectile_path)
+
+
+mob/proc/SpawnCrossMarkers(projectile_path, Target, marker_range = 3)
+	if(!Target)
+		return
+
+	var/turf/Center = get_turf(Target)
+	if(!Center)
+		return
+
+	var/count = 0
+
+	for(var/dx = -marker_range to marker_range)
+		var/turf/T = locate(Center.x + dx, Center.y, Center.z)
+		if(!T)
+			continue
+
+		var/side_dir
+
+		if(dx > 0)
+			side_dir = NORTH
+		else
+			side_dir = SOUTH
+
+		var/marker_delay = 20 + round(count / 4)
+		new /obj/AttackMarker(T, src, projectile_path, marker_delay, side_dir)
+
+		count++
+
+	sleep(10)
+
+	for(var/dy = -marker_range to marker_range)
+
+		var/turf/T = locate(Center.x, Center.y + dy, Center.z)
+		if(!T)
+			continue
+
+		var/side_dir
+
+		if(dy > 0)
+			side_dir = EAST
+		else
+			side_dir = WEST
+
+		var/marker_delay = 20 + round(count / 4)
+		new /obj/AttackMarker(T, src, projectile_path, marker_delay, side_dir)
+
+		count++*/

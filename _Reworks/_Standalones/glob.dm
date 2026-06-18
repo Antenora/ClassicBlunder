@@ -441,6 +441,7 @@ globalTracker
 		GLOBAL_ITEM_DAMAGE_MULT = 1
 		EXPONENTIAL_PROJ_DAMAGE = FALSE
 		PROJ_DAMAGE_MULT = 0.8
+		MMO_PROJ_DAMAGE_MULT = 1 // Specifically for attacks that use a telegraphed marker.
 		AUTOHIT_GLOBAL_DAMAGE = 0.8
 		SOFT_STYLE_RATIO = 0.2
 		SOFT_STYLE_DMG_BOON_DIVISOR = 2

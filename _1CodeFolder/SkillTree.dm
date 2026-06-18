@@ -124,7 +124,8 @@ var/list/SkillTree=list(
 			"/obj/Skills/Projectile/Sudden_Storm"=80,
 			"/obj/Skills/Projectile/Tracking_Bomb"=80,
 			"/obj/Skills/Projectile/Spirit_Ball"=40,
-			"/obj/Skills/Projectile/Crash_Burst"=40
+			"/obj/Skills/Projectile/Crash_Burst"=40,
+			"/obj/Skills/Projectile/Swords_of_Revealing_Light"=120
 ),
 
 "BlastT4"=list(
