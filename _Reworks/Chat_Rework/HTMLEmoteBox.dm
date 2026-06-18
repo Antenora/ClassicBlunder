@@ -161,6 +161,20 @@ mob/proc/OpenEmoteEditor()
 			}
 			var syncTimer = null;
 
+			function addLink() {
+				var url = prompt("Enter the link URL:", "https://");
+
+				if(!url || url == "https://") {
+					return;
+				}
+
+				if(url.indexOf("http://") != 0 && url.indexOf("https://") != 0) {
+					url = "https://" + url;
+				}
+
+				wrapSelection("<a href='" + url + "'>", "</a>");
+			}
+
 			function queueSyncDraft() {
 				if(syncTimer) {
 					clearTimeout(syncTimer);
@@ -197,6 +211,31 @@ mob/proc/OpenEmoteEditor()
 
 						syncDraft();
 					}
+					if(e.ctrlKey && e.key.toLowerCase() =='b'){
+						e.preventDefault();
+						wrapSelection('<b>','</b>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='i'){
+						e.preventDefault();
+						wrapSelection('<i>','</i>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='u'){
+						e.preventDefault();
+						wrapSelection('<u>','</u>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='s'){
+						e.preventDefault();
+						wrapSelection('<s>','</s>');
+						return;
+					}
+					if(e.ctrlKey && e.key.toLowerCase() =='l'){
+						e.preventDefault();
+						addLink();
+						return;
+					}
 				});
 			}
 		</script>
@@ -214,6 +253,7 @@ mob/proc/OpenEmoteEditor()
 
 			<button onclick=\"wrapSelection('<font size=3>', '</font size>')\">Size</button>
 			<button onclick=\"wrapSelection('<center>', '</center>')\">Center</button>
+			<button onclick='addLink()'>Link</button>
 
 			<button onclick='clearText()'>Clear</button>
 			<button onclick='sendEmote()'>Send</button>
