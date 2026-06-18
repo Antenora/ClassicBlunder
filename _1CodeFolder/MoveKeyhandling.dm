@@ -229,8 +229,11 @@ mob
 								if(SlotlessBuffs.len>0)
 									// only check if there are active slotless
 									var/afterimages = passive_handler.Get("CoolerAfterImages")
+									var/rainbowimages = passive_handler.Get("RainbowAfterImages")
 									if(afterimages)
 										coolerFlashImage(src, afterimages)
+									if(rainbowimages)
+										rainbowFlashImage(src, rainbowimages)
 								loop_delay = glob.BASE_LOOP_DELAY
 								if(dir==NORTHEAST||dir==NORTHWEST||dir==SOUTHEAST||dir==SOUTHWEST)
 									loop_delay *= glob.DIAG_LOOP_DELAY

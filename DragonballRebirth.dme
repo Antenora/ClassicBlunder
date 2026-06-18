@@ -883,6 +883,7 @@
 #include "Skills\_BuffX.dm"
 #include "Skills\_GrappleX.dm"
 #include "Skills\_HeldSkill.dm"
+#include "Skills\_MMOAttacks.dm"
 #include "Skills\_NuMartialArts.dm"
 #include "Skills\_ProjectileX.dm"
 #include "Skills\_QueueX.dm"
