@@ -301,7 +301,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			InkworksDatum.Tier = 2 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 		if("Master Inkworks")
-			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.Tier = 3 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 		// INKWORKS END //
 		// TECH SHIT //
