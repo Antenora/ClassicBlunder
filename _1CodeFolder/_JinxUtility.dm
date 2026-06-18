@@ -818,6 +818,8 @@ mob
 					return
 			if(defender.Health<=0&&!defender.KO)
 				defender.Unconscious(src)
+				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
+					defender.client.PlaySwoon()
 			else if(defender.KO&&src.Lethal)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)
