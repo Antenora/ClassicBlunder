@@ -867,6 +867,17 @@ mob
 					KKTShockwave(defender, icon='KenShockwaveGold.dmi', Size=4, Time=16)
 					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
 					defender.passive_handler.Set("Staggered!", 1)
+
+			if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic"))
+				var/meterGain = min(max(val,0.1), 0.9)
+				HyperdeathMeterCurrent=min(HyperdeathMeterCurrent+meterGain, 100)
+				HyperMeterUpdate()
+
+			if((defender.Saga=="Path of a Hero: Rebirth") && (defender.RebirthHeroType=="Prismatic"))
+				var/meterGain = min(max(val,0.1), 0.2)
+				defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)
+				defender.HyperMeterUpdate()
+
 			return val
 
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)

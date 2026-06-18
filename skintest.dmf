@@ -321,7 +321,7 @@ window "Baby"
 window "EmoteEditor"
 	elem "EmoteEditor"
 		type = MAIN
-		pos = 1044,486
+		pos = 291,0
 		size = 640x480
 		anchor1 = -1,-1
 		anchor2 = -1,-1
@@ -330,7 +330,7 @@ window "EmoteEditor"
 		saved-params = "pos;size;is-minimized;is-maximized"
 		on-close = "EmoteEditorClosed"
 		outer-size = 656x538
-		outer-pos = 1044,486
+		outer-pos = 291,0
 		inner-pos = 8,31
 		screen-size = 2560x1400
 	elem "label13"
@@ -593,11 +593,6 @@ window "RPWindow"
 		statusbar = false
 		can-close = false
 		can-minimize = false
-		outer-size = 656x518
-		outer-pos = 291,0
-		inner-size = 640x479
-		inner-pos = 8,31
-		screen-size = 2560x1400
 	elem "label9"
 		type = LABEL
 		pos = 256,48
@@ -2411,10 +2406,6 @@ window "rpane"
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		outer-size = 654x494
-		outer-pos = 291,0
-		inner-pos = 7,7
-		screen-size = 2560x1400
 	elem "rpanewindow"
 		type = CHILD
 		pos = 0,0
