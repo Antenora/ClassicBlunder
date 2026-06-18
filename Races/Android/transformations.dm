@@ -51,10 +51,10 @@ transformation
 							passives["CallousedHands"] = round(0.1 * ((ChipStr + ChipEnd)/4.5), 0.01)
 					if(ChipSpd > 2) //Str + Speed = BlurringStrikes
 						if(ChipStr <= ChipSpd *2 && ChipSpd <= ChipStr *2)
-							passives["BlurringStrikes"] = round(0.1 * ((ChipStr + ChipSpd)/4.5), 0.01)//Changed in anticipation of Standardization
+							passives["BlurringStrikes"] = round(1 * ((ChipStr + ChipSpd)/4.5), 0.1)
 					if(ChipFor > 2) //Str + Force = HybridStrike
 						if(ChipStr <= ChipFor *2 && ChipFor <= ChipStr *2)
-							passives["HybridStrike"] = round(0.1 * ((ChipStr + ChipFor)/4.5), 0.01)//Changed in anticipation of Standardization
+							passives["HybridStrike"] = round(1 * ((ChipStr + ChipFor)/4.5), 0.1)
 					if(ChipOff> 2) //Str + Off = HardStyle
 						if(ChipStr <= ChipOff *2 && ChipOff <= ChipStr *2)
 							passives["HardStyle"] = round(1 * ((ChipStr + ChipOff)/4.5), 0.1)

@@ -3257,7 +3257,34 @@ obj/Skills/Utility
 				return
 			src.Using=1
 
-			if("Cyber Augmentations" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
+			var/list/Who=list("Cancel")
+			/*if(usr.isRace(ANDROID))
+				M = usr
+			else*/
+			for(var/mob/m in view(1, usr))
+					/*if(m.isRace(ANDROID)&&!("Android Creation" in usr.knowledgeTracker.learnedKnowledge))
+						continue*/
+				if(m.Secret=="Heavenly Restriction" && (m.secretDatum?:hasRestriction("Science") || m.secretDatum?:hasRestriction("Cybernetics")))
+					continue
+				if(m==usr&&!(("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge)||usr.isRace(ANDROID)))
+					continue
+				if(m.Saga && !(m.Saga in glob.CYBERIZESAGAS))
+					continue
+				Who+=m
+				Who+=usr
+			if(Who.len<1)
+				usr << "You don't have any viable targets!"
+				src.Using=0
+				return
+
+			if(!M)
+				M=input(usr, "Who do you want to install cybernetics in?", "Cybernetic Augmentation") in Who
+			if(M=="Cancel")
+				OMsg(usr, "[usr] decides not to tinker.")
+				src.Using=0
+				return
+
+			if("Cyber Augmentations" in usr.knowledgeTracker.learnedKnowledge)
 				ModChoices.Add("Enhanced Strength")
 				ModChoices.Add("Enhanced Force")
 				ModChoices.Add("Enhanced Endurance")
@@ -3271,7 +3298,7 @@ obj/Skills/Utility
 				ModChoices.Add("3x Enhanced Reflexes")
 				ModChoices.Add("3x Enhanced Speed")
 
-			if("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
+			if("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge)
 				ModChoices.Add("Internal Comms Suite")//talky in your heady
 				ModChoices.Add("Blade Mode")//Cyberrush
 				ModChoices.Add("Taser Strike")
@@ -3284,13 +3311,13 @@ obj/Skills/Utility
 				ModChoices.Add("Internal Life Support")
 				ModChoices.Add("Energy Assimilators")
 
-			if("War Crimes" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
+			if("War Crimes" in usr.knowledgeTracker.learnedKnowledge || usr.isRace(ANDROID))
 				ModChoices.Add("Punishment Chip")
 				ModChoices.Add("Failsafe Circuit")
 				ModChoices.Add("Explosive Implantation")
 
 			//These are unlocked by default
-			if("Singularity" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
+			if("Singularity" in usr.knowledgeTracker.learnedKnowledge)
 				ModChoices.Add("Ripper Mode")
 				ModChoices.Add("Armstrong Augmentation")
 				ModChoices.Add("Ray Gear")
@@ -3300,31 +3327,43 @@ obj/Skills/Utility
 				ModChoices.Add("Biological Cybernetics")
 				ModChoices.Add("Cybernetic Mainframe")
 
-			var/list/Who=list("Cancel")
-			if(usr.isRace(ANDROID))
-				M = usr
-			else
-				for(var/mob/m in view(1, usr))
-					/*if(m.isRace(ANDROID)&&!("Android Creation" in usr.knowledgeTracker.learnedKnowledge))
-						continue*/
-					if(m.Secret=="Heavenly Restriction" && (m.secretDatum?:hasRestriction("Science") || m.secretDatum?:hasRestriction("Cybernetics")))
-						continue
-					if(m==usr&&!(("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge)||usr.isRace(ANDROID)))
-						continue
-					if(m.Saga && !(m.Saga in glob.CYBERIZESAGAS))
-						continue
-					Who+=m
-				if(Who.len<1)
-					usr << "You don't have any viable targets!"
-					src.Using=0
-					return
+			if(usr.isRace(ANDROID))//For whatever reason I had to seperate these to make these work. it wasn't working when it was set the other way.
+				if(M == usr)
+					ModChoices.Add("Enhanced Strength")
+					ModChoices.Add("Enhanced Force")
+					ModChoices.Add("Enhanced Endurance")
+					ModChoices.Add("Enhanced Aggression")
+					ModChoices.Add("Enhanced Reflexes")
+					ModChoices.Add("Enhanced Speed")
+					ModChoices.Add("3x Enhanced Strength")
+					ModChoices.Add("3x Enhanced Force")
+					ModChoices.Add("3x Enhanced Endurance")
+					ModChoices.Add("3x Enhanced Aggression")
+					ModChoices.Add("3x Enhanced Reflexes")
+					ModChoices.Add("3x Enhanced Speed")
+					if(usr.AscensionsAcquired >= 1)
+						ModChoices.Add("Internal Comms Suite")//talky in your heady
+						ModChoices.Add("Blade Mode")//Cyberrush
+						ModChoices.Add("Taser Strike")
+						ModChoices.Add("Machine Gun Flurry")
+						ModChoices.Add("Rocket Punch")
+						ModChoices.Add("Stealth Systems")
+						ModChoices.Add("Nano Boost")
+						ModChoices.Add("Combat CPU")//autodoj
+						ModChoices.Add("Reconstructive Nanobots")//autoheel
+						ModChoices.Add("Internal Life Support")
+						ModChoices.Add("Energy Assimilators")
+					if(usr.AscensionsAcquired >= 2)
+						ModChoices.Add("Ripper Mode")
+						ModChoices.Add("Armstrong Augmentation")
+						ModChoices.Add("Ray Gear")
+						ModChoices.Add("Hilbert Effect")
+						ModChoices.Add("Overdrive")
+						ModChoices.Add("Infinity Drive")
+						ModChoices.Add("Biological Cybernetics")
+						ModChoices.Add("Cybernetic Mainframe")
 
-			if(!M)
-				M=input(usr, "Who do you want to install cybernetics in?", "Cybernetic Augmentation") in Who
-			if(M=="Cancel")
-				OMsg(usr, "[usr] decides not to tinker.")
-				src.Using=0
-				return
+
 			if(M.CyberneticMainframe)
 				switch(M.AscensionsAcquired)
 					if(0 to 1)
@@ -3779,13 +3818,21 @@ obj/Skills/Utility
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have Biological Cybernetics.")
 						src.Using=0
 						return
+					if(M.SuperAndroid)//Bio Android and Super Android are supposed to be mutually exclusive.  Unless Androids just suck without both. KEKW
+						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already are a Super Android!")
+						src.Using=0
+						return
 					M.BioAndroid=1
 					M.AddSkill(new/obj/Skills/Utility/Collect_Sample)
 					M.AddSkill(new/obj/Skills/Utility/Force_Extract)
 					M.AddSkill(new/obj/Skills/Utility/Bio_Augmentation)
 				if("Cybernetic Mainframe")
-					if(M.CyberneticMainframe||M.Saga)
+					if(M.CyberneticMainframe||M.Saga&&!M.isRace(ANDROID))
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have a Cybernetic Mainframe.")
+						src.Using=0
+						return
+					if(M.BioAndroid)//Bio Android and Super Android are supposed to be mutually exclusive. Unless Androids just suck without both. KEKW
+						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have Biological Cybernetics!")
 						src.Using=0
 						return
 					if(!M.isRace(ANDROID))

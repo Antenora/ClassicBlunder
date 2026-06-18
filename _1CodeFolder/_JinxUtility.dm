@@ -1382,6 +1382,8 @@ mob
 				enhance = vars["Enhanced[statName]"] * 0.6
 			if(isRace(ANDROID))
 				enhance = vars["Enhanced[statName]"] * 0.75
+				if(AscensionsAcquired>3)
+					enhance = vars["Enhanced[statName]"] * 1
 			if(Target && ismob(Target))
 				// Rusting: when target carries the Rusting passive (mystic/hybrid styles)
 				// and the player is poisoned, debuff the player's enhance-chip stat by an

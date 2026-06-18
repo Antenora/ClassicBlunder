@@ -10,7 +10,7 @@
 /mob/proc/getRacialAscensionPower()
     if(isRace(SAIYAN) || isRace(HALFSAIYAN)) return 0;//saiyans have their own stuff going on
     if(isRace(HUMAN)) return 0;//sorry humans, power is not for you
-    if(isRace(ANDROID)) return 0;//Androids get bonus Power from their CyberCancel var. I may remove this.
+    if(isRace(ANDROID)) return 0;//Androids get CyberPower. I may remove this if my math autism doesn't work out.
     if(NobodyOriginType=="Pride") return 0;//knockoff saiyans
     //we could break this into multiple procs if we want different power scaling for different races
     //which i do think is a good idea
