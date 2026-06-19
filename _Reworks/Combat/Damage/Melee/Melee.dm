@@ -1087,7 +1087,7 @@
 			else if(src.CheckSlotless("Libra Armory")&&src.AttackQueue)
 				GetAndUseSkill(/obj/Skills/Projectile/Libra_Slash, Projectiles, TRUE)
 				src.ClearQueue()
-			else if(src.CheckSlotless("Spirit Bow"))
+			else if(src.CheckSlotless("Spirit Bow")||src.CheckSlotless("Heilig Bogen"))
 				GetAndUseSkill(/obj/Skills/Projectile/Aether_Arrow, Projectiles, TRUE)
 			else if(src.passive_handler.Get("Chaos Buster"))
 				var/level = src.passive_handler.Get("Chaos Buster")

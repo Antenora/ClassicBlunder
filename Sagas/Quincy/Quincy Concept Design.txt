@@ -1,0 +1,29 @@
+This is Vi's concept design for Quincy, you are welcome to give your opinions here. But I figured I'd work on a baseline for these guys.
+Anyone else who comes up with a better design for them is welcome to do so, I just wanted to give them something.
+
+Quincy should probably also get something that makes them weak to Evil/Hollows specifically sicne thats a canon thing they have.
+
+Progression
+
+Quincy
+
+t1) Choice between Holy Spirit Bow, Holy Spirit Sword--- and when Perdition finishes coding them, Holy Spirit Guns
+--- Holy Spirit Weapons are basically like the signature variants, but they have Saga-Level scaling. They also get Holymod on them. Quincy spirit weapons were designed to nuke Hollows off the face off the planet.
+t2)Ginto Techniques + Hirenhyaku
+--- Hirenhyaku is your funny movement speed buff, you go FUCKING FAST with this. 
+--- Ginto Techniques will use Mana and give you access to a variety of abilitie shown in Canon.
+
+t3) Ransotengai, Sanrei + Letz Stil
+-- At this point, Quincy get access to Ransotengai. This will be a buff that gives them passives like Adrenaline, Tenacity, Persistence and Maim Mastery-- probably some other stuff that makes you immune to being stunned/slowed. It will be a once-per-battle buff that a Quincy can use to help them keep fighting even when their body is broken. This will probably be a special slotter.
+
+-- Sanrei will either be a buff or a specialized AG-like item that significantly bolsters a Quincy's power when activated--- but it cannot be taken off through normal means. If a Quincy actives this, they become significantly stronger, keeping up with most Sagas a tier above them.
+
+-- Letz Stil; the precursor to Volstandig. Letz Still will be an incredibly powerful buff on the level of most Shinigami Bankai at Level 5. It will have FatigueImmune, A large amount of ManaGeneration, SoulFire and ManaSteal, Movement Mastery, EnergyHeal, FatigueHeal and large stat increases across the board. Fighting a Quincy who chooses to use their Letz Stil should be a difficult fight for anyone, but it comes at a cost.
+Letz Stil can only be used once, and it has a time limit. Letz Stil breaks your Sanrei Glove, removing it's benefits as well.
+Once deactivated, Letz Still will leave a lingering debuff upon your person. This debuff makes it borderline impossible to fight, completely deactivating your ability to use Quincy powers.
+
+t4) Seele Schneider, Blut, Schrift Manifestation
+
+T5) Volstandig
+
+T6) Full-Powered Volstandig, Sklaverei
