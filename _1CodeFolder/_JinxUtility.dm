@@ -823,6 +823,17 @@ mob
 					defender.Maimed+=1
 					defender.recordMaim(src, "Combat")
 					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
+				if(passive_handler.Get("MaimKOStrike") && defender.client)
+					var/maim = defender.Maimed
+					defender.Maimed+=1
+					defender.recordMaim(src, "Combat")
+					OMsg(defender, "<font color='red'><font size=+1><b>[defender] got maimed and knocked out by [src]...</b></font size></font color>")
+					if (maim < 3)
+						OMsg(defender, "<font color='green'><font size=+1><b>... but [defender] can still fight! ([defender] can get back into the fight once they get back up!)</b></font size></font color>")
+					if (maim >= 3)
+						OMsg(defender, "<font color='red'><font size=+1><b>[defender] cannot fight any longer.</b></font size></font color>")
+						defender.RPModeSwitch()
+						defender << "<b>You've been set to RP Mode as you cannot fight any longer for this encounter.</b>"
 			else if(defender.KO&&src.Lethal)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)
