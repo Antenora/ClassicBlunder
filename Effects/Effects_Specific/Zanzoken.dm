@@ -389,6 +389,8 @@ proc
 		if(!A || !Target)
 			return
 		if(!A.Dodging&&!Target.Dodging)
+			A.SuppressPowerGlow = 1
+			Target.SuppressPowerGlow = 1
 			A.Dodging=1
 			Target.Dodging=1
 			var/Zanzes=4
@@ -439,11 +441,11 @@ proc
 				if(A)
 					A.loc = StartA
 					A.alpha = 255
-					A.color = A.MobColor
+					A.SuppressPowerGlow = 0
 				if(Target)
 					Target.loc = StartT
 					Target.alpha = 255
-					Target.color = Target.MobColor
+					Target.SuppressPowerGlow = 0
 			else
 				AfterImage(A)
 				A.Comboz(Target)

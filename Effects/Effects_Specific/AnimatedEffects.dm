@@ -636,20 +636,21 @@ mob/proc
 			return
 		m.FlickeringGlow = 1
 		while(m.FlickeringGlow)
-			if(m.AfterImageStrike)
+			while(m.SuppressPowerGlow && m.FlickeringGlow)
 				sleep(1)
-				continue
+			if(!m.FlickeringGlow)
+				break
 			animate(m, color = Glow, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
-			if(m.AfterImageStrike)
-				continue
-			animate(m, color = src.MobColor, time = 10, flags = ANIMATION_PARALLEL)
+			while(m.SuppressPowerGlow && m.FlickeringGlow)
+				sleep(1)
+			if(!m.FlickeringGlow)
+				break
+			animate(m, color = m.MobColor, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
 
-		animate(m, color = src.MobColor, time = 1, flags = ANIMATION_PARALLEL)
-
+		m.color = m.MobColor
 		m.FlickeringGlow = 0
-		return
 
 	WindupGlow(var/mob/m) //Handles shiny transes
 		if(m.WindingUp<1) return
