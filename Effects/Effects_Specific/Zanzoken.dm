@@ -439,9 +439,11 @@ proc
 				if(A)
 					A.loc = StartA
 					A.alpha = 255
+					A.color = A.MobColor
 				if(Target)
 					Target.loc = StartT
 					Target.alpha = 255
+					Target.color = Target.MobColor
 			else
 				AfterImage(A)
 				A.Comboz(Target)

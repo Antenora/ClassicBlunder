@@ -75,6 +75,7 @@ mob/var
 	tmp/GlowFilter
 	tmp/ArmamentGlow
 	tmp/FlickeringGlow
+	tmp/FlickeringGlowFilter
 	tmp/MeditateTime
 	tmp/Party/party//party party party
 	tmp/StunImmune

@@ -631,16 +631,24 @@ mob/proc
 		del FF
 		src.Shielding=0
 
-	FlickeringGlow(var/mob/m, var/list/Glow=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)) //Handles shiny transes
-		if(m.FlickeringGlow) return
-		m.FlickeringGlow=1
+	FlickeringGlow(var/mob/m, var/list/Glow = list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0))
+		if(m.FlickeringGlow)
+			return
+		m.FlickeringGlow = 1
 		while(m.FlickeringGlow)
-			animate(m, color=Glow, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			if(m.AfterImageStrike)
+				sleep(1)
+				continue
+			animate(m, color = Glow, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
-			animate(m, color=src.MobColor, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			if(m.AfterImageStrike)
+				continue
+			animate(m, color = src.MobColor, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
-		animate(m, color=src.MobColor, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
-		m.FlickeringGlow=0
+
+		animate(m, color = src.MobColor, time = 1, flags = ANIMATION_PARALLEL)
+
+		m.FlickeringGlow = 0
 		return
 
 	WindupGlow(var/mob/m) //Handles shiny transes
