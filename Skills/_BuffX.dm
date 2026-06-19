@@ -4248,6 +4248,22 @@ NEW VARIABLES
 				DesperateMessage = " calls upon the of bravery for one final push!"
 				Trigger(usr, TRUE)
 
+			verb/Bravery_PowerGlowEdit()
+				set name = "Edit Bravery's PowerGlow"
+				set category = "Utility"
+				if(!usr || src.loc != usr)
+					return
+				var/chosen_color = input(usr,"Choose this skill's glow color.","Edit Bravery's PowerGlow") as color
+				if(!chosen_color)
+					return
+				var/brightness = input(usr,"Set glow brightness.\n1 = normal tint\n1.5 = bright\n2 = very bright","Power Glow Brightness",1.5) as num
+				brightness = min(max(brightness, 0), 3)
+				var/r = text2num("0x[copytext(chosen_color, 2, 4)]") / 255
+				var/g = text2num("0x[copytext(chosen_color, 4, 6)]") / 255
+				var/b = text2num("0x[copytext(chosen_color, 6, 8)]") / 255
+				PowerGlows = list(r * brightness, 0, 0, 0, g * brightness, 0, 0, 0, b * brightness, 0, 0, 0)
+
+				usr << "Power glow for [src] changed to [chosen_color] at [brightness]x brightness."
 
 			// verb/Broken_Brave()
 			// 	set category="Skills"
