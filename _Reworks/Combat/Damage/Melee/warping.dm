@@ -8,5 +8,7 @@
 				. = AttackQueue.Warp
 				if(AttackQueue.InstantStrikesDelay<2)
 					AttackQueue.NoWarp=1
+	if(passive_handler["Bear Spirit"] == 1)
+		return 2
 	if(passive_handler["Speed Force"] >= 3)
 		return  passive_handler["Speed Force"] * 1.5

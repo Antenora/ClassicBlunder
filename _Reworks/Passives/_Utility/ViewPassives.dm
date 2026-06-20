@@ -40,8 +40,7 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "SoulFire"= "dealing damage to someone also deals damage to their mana, mana capacity, and fatigues them at a rate based on passive value.",
 "Siphon"= "restores energy (and reduces the damage) when hit by a Projectile, spiritsword/spirithand, hybridstrike, spiritstrike",
 "ManaStats"= "increases your Stats based on your Mana.",
-"SpiritFlow"= "increases autohit and projectile damage based on your force",
-"CallousedFeet"= "increases autohit damage based on your endurance",
+"SpiritFlow"= "increases autohit damage based on your force",
 "ManaGeneration"= "increases mana regen, also allows you regain mana on being hit",
 "DualCast"= "spells hit again if you have the mana necessary to cast it again",
 "Juggernaut"= "increased knockbacks/launch resistance",
@@ -74,8 +73,6 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "TechniqueMastery"= "reduces skill cds",
 "SoftStyle"= "increases damage based on target's fatigue",
 "HardStyle"= "increases damage based on target's wounds",
-"Sniper"= "increases normal attack damage by 1% per passive level per tile of distance to the target.",
-"Bloodletting"= "forces Bleed stacks onto targets struck with a Blade-element attack.",
 "EnergySteal"= "restores energy on hit",
 "Duelist"= "increase damage and lower damage taken against a Single Target, taking extra damage from enemies you don't have targeted.",
 "SweepingStrike"= "turns your Normal Attack, and Queue range from directly in front of you, to an arc around you.",
@@ -101,7 +98,6 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "Deicide"= "bonus damage to people with god ki",
 "KillerInstinct"= "increases force when below 75% hp, increases str when below 50%",
 "BurningShot"= "burn yourself, the amount of burn stacks you have gives you Boons",
-"Shirayuki"= "Gives your Chill stacks, Self-harms, but Chill Functions like PU-Spike",
 "Piloting"="Replaces your effective stats with the stats of your mech.",
 "EndlessNine"=" Defensive version of Deicide, negate a percentage of the damage buff having higher God ki grants someone",
 "SpiralPowerUnlocked"="Through the power of Spiral Energy, unlocks a number of early ascensions equal to the value. And then, at 7...",
@@ -124,13 +120,8 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "MartialMagic"="You can cast Magic without a Magic Style or Focus,",
 "SpaceWalk"="Immune to environmental tile effects (ie space draining oxygen, lava burning you) except for static tiles.",
 "StaticWalk"="Prevents you from losing oxygen and health on static tiles.",
-<<<<<<< HEAD
 "Fa Jin"="Enhances queue damage.",
 "Fox Spirit"="Multiplies your SpiritSword, SpiritHand and Spiritflow passives by 40%",
-"Bear Spirit"="Allows you to constantly attack and warp onto a stunned target next to you. Do not move while using this."
+"Bear Spirit"="Allows you to constantly attack and warp onto a stunned target next to you. Do not move while using this.",
+"Wolf Spirit"="Adds extra range to your dash attacks"
 );
-=======
-"Fa Jin"="Enhances queue damage."
-
-);
->>>>>>> fbcc3e479e2f44b4d15d267bfbe51d60bdf3e5b2

@@ -2645,6 +2645,8 @@ mob
 			if(hasSecret("Eldritch (Reflected)")) Return += (scalingEldritchPower()/2);
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
@@ -2656,6 +2658,8 @@ mob
 				Return += src.SagaLevel*0.25
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasHybridStrike()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("HybridStrike"))
