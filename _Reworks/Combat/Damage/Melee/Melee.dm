@@ -501,14 +501,14 @@
 					if(passive_handler.Get("HotHundred"))
 						lightAtk=0
 						adjust = hh-1
+					if(passive_handler.Get("Bear Spirit"))
+						damage *= 1
 					if(enemy.Launched && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 						damage *= 1+secretDatum?:getBoon(src,"Launchers")
 					if(enemy.Stunned && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
 						damage *= 1+secretDatum?:getBoon(src,"Stunners")
 					if(passive_handler["Speed Force"])
 						damage *= 0 + (0.25 * passive_handler["Speed Force"])
-					if(passive_handler.Get("Bear Spirit"))
-						damage *= 1
 					else
 						damage /= max(2,4-adjust)
 					if(glob.LIGHT_ATTACK_SPEED_DMG_ENABLED)
