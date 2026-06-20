@@ -503,6 +503,7 @@
 						adjust = hh-1
 					if(passive_handler.Get("Bear Spirit"))
 						damage *= 1
+						adjust = 3
 					if(enemy.Launched && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 						damage *= 1+secretDatum?:getBoon(src,"Launchers")
 					if(enemy.Stunned && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
