@@ -25,22 +25,36 @@ mob/proc/UpdateBossStaggerBar()
         return
 
     if(!boss_stagger_back)
-        boss_stagger_back = new /obj/BossStaggerBack
-        vis_contents += boss_stagger_back
+        for(var/obj/BossStaggerBack/B in vis_contents)
+            if(!boss_stagger_back)
+                boss_stagger_back = B
+            else
+                vis_contents -= B
+                del(B)
 
-   	if(!boss_stagger_fill)
-   	    boss_stagger_fill = new /obj/BossStaggerFill
-   	    vis_contents += boss_stagger_fill
+        if(!boss_stagger_back)
+            boss_stagger_back = new /obj/BossStaggerBack
+            vis_contents += boss_stagger_back
+
+    if(!boss_stagger_fill)
+        for(var/obj/BossStaggerFill/F in vis_contents)
+            if(!boss_stagger_fill)
+                boss_stagger_fill = F
+            else
+                vis_contents -= F
+                del(F)
+
+        if(!boss_stagger_fill)
+            boss_stagger_fill = new /obj/BossStaggerFill
+            vis_contents += boss_stagger_fill
 
     var/max_stagger = 100
-    if(!max_stagger)
-        max_stagger = 100
 
     var/percent = StaggerMeter / max_stagger
     percent = min(max(percent, 0), 1)
 
     var/matrix/M = matrix()
-    M.Scale(percent,1)
+    M.Scale(percent, 1)
 
     boss_stagger_fill.transform = M
 

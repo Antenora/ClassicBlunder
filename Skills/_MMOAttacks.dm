@@ -64,9 +64,15 @@ obj/AttackMarker
 		p.XSpawnOffset = x_spawn_offset
 		p.YSpawnOffset = y_spawn_offset
 
-		owner.UseProjectile(p)
+		var/mob/O = owner
+		var/obj/AttackMarker/M = src
 
-		del(src)
+		spawn(1)
+			if(O && M && M.loc && p)
+				O.UseProjectile(p)
+
+			if(M)
+				del(M)
 
 
 
@@ -115,7 +121,7 @@ mob/proc/SpawnMMOMarkers(projectile_path, Target, list/points, base_delay = 20, 
 		if(!T)
 			continue
 
-		var/marker_delay = base_delay + round(count * delay_step)
+		var/marker_delay = base_delay + round(count / 2)
 
 		var/list/offsets = GetMMOProjectileOffset(fire_dir, offset_amount)
 

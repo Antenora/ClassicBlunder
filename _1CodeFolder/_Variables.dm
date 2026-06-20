@@ -134,7 +134,7 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
-	tmp/StaggerMeter=0 // Boss Stun
+	StaggerMeter=0 // Boss Stun
 	StaggerMult=1
 	MaimKOGetups=0
 	EndReplace=0
