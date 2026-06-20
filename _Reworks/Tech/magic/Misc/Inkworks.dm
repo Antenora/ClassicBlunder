@@ -38,22 +38,22 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
     TextColor=rgb(182, 27, 148)
     adjust(mob/P)
         passives = list("Scorching" = 0, "Combustion" = 0, "Freezing" = 0, "IceAge" = 0, "Shattering" = 0, "EarthHerald" = 0)
-        if(P.InkworksDatum.MatchGirl == 1)
+        if(P.InkworksDatum.MatchGirl == 1) // Implodes Scorching at 80, dealing massive damage
             passives["Scorching"] += 5
             passives["Combustion"] += 100
-        if(P.InkworksDatum.IceQueen == 1)
+        if(P.InkworksDatum.IceQueen == 1) // Implodes Slow at 30, dealing a bit of damage and stunning
             passives["Freezing"] += 5
             passives["IceAge"] += 30
-        if(P.InkworksDatum.Erlking == 1)
+        if(P.InkworksDatum.Erlking == 1) // Implodes Shattering at 100, making you take more damage(?)
             passives["Shattering"] +=5
             passives["EarthHerald"] += 1 // this is as if it was combustion 100, i don't think there's an Ice Age or Combustion version of this herald passive
-        if(P.InkworksDatum.Fox == 1)
+        if(P.InkworksDatum.Fox == 1) // Increases spiritsword scaling by 40%
             passives["Fox Spirit"] += 1
-        if(P.InkworksDatum.Bear == 1)
+        if(P.InkworksDatum.Bear == 1) // HOPEFULLY, and I do mean HOPEFULLY, counts you as having hot hundred and warping 2 when attacking a stunned/launched target
             passives["Bear Spirit"] += 1
-        if(P.InkworksDatum.Wolf == 1)  
+        if(P.InkworksDatum.Wolf == 1)  // Doubles the effect of the Rush variable. If lightning kicks moves you 5 tiles, it now moves you 10.
             passives["Wolf Spirit"] += 1
-        if(P.InkworksDatum.Dragon == 1)
+        if(P.InkworksDatum.Dragon == 1) // Decreases the amount of time you need to charge to get a beam's damage WITHOUt affecting its final damage.
             passives["Dragon Spirit"] += 1
         if(P.InkworksDatum.Lion)
             passives["Lion Spirit"] += 1
