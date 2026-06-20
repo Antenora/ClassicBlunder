@@ -136,6 +136,7 @@ mob/var
 	EndAscension=0
 	tmp/StaggerMeter=0 // Boss Stun
 	StaggerMult=1
+	MaimKOGetups=0
 	EndReplace=0
 	EndTax=0
 	EndCut=0
