@@ -2,10 +2,12 @@
 
 /obj/Skills/Projectile/Magic/AngelMagic
 	MagicNeeded = 0
+	CooldownStatic=1
 
 /obj/Skills/Projectile/Magic/AngelMagic/Radiant_Lance
 	name = "Radiant Lance"
 	SpellElement="Light"
+	CooldownStatic = 1
 	Cooldown = 60
 	AngelMagicCompatible = 1
 	EndRate = 0.8
@@ -30,6 +32,7 @@
 /obj/Skills/AutoHit/Magic/AngelMagic/Consecration
 	name = "Consecration"
 	SpellElement = "Light"
+	CooldownStatic = 1
 	Cooldown = 60
 	AngelMagicCompatible = 1
 	ApplyJudged = 1
@@ -84,7 +87,8 @@
 	HitSparkY = 0
 	color = rgb(255,241,135)
 	alpha = 150
-	Cooldown = 75
+	CooldownStatic = 1
+	Cooldown = 60
 	AngelMagicCompatible = 1
 	Trigger(mob/User, Override = 0)
 		if(!altered)
@@ -103,6 +107,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Magic/AngelMagic/Revelation
 	name = "Revelation"
 	SpellElement = "Light"
+	CooldownStatic = 1
 	Cooldown = 60
 	TimerLimit = 60
 	OffMult = 1.2
@@ -117,6 +122,7 @@
 
 /obj/Skills/Buffs/SlotlessBuffs/Magic/AngelMagic/Zeal
 	name = "Zeal"
+	CooldownStatic = 1
 	Cooldown = 60
 	TimerLimit = 60
 	StrMult = 1.2
@@ -131,6 +137,7 @@
 
 /obj/Skills/Buffs/SlotlessBuffs/Magic/AngelMagic/Aegis
 	name = "Aegis"
+	CooldownStatic = 1
 	Cooldown = 60
 	TimerLimit = 60
 	EndMult = 1.25
@@ -146,11 +153,13 @@
 	name = "Dazzle"
 	Area = "Circle"
 	SpellElement = "Light"
+	Distance = 3
 	AdaptRate = 1
 	DamageMult = 0
 	Flash = 18
 	BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded"
 	ActiveMessage = "releases a blinding burst of light!"
+	CooldownStatic = 1
 	Cooldown = 60
 	ManaCost = 5
 	EnergyCost = 5
@@ -177,6 +186,7 @@
 	ApplyJudged = 1
 	DamageMult = 0.3
 	ActiveMessage = "binds the target in chains of purity!"
+	CooldownStatic = 1
 	Cooldown = 60
 	ManaCost = 6
 	Trigger(mob/User, Override = 0)
@@ -199,6 +209,7 @@
 	ApplySentenced = 1
 	DamageMult = 0.2
 	ActiveMessage = "passes divine sentence upon the target!"
+	CooldownStatic = 1
 	Cooldown = 60
 	ManaCost = 8
 	Trigger(mob/User, Override = 0)

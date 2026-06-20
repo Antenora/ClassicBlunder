@@ -89,11 +89,24 @@
 					src << "One or more of your skills will be made available to you again when you stop meditating."
 				break
 
+			if(painShared)
+				turnOffPainShared()
+			if(ChargeDelay)
+				ChargeDelay = 0
+
 		if(MeditateTime == 40 SECONDS)
 			if(SpecialBuff)
 				if(SpecialBuff.BuffName == "Ripper Mode")
 					SpecialBuff?:sandevistanUsages = 0
 					src << "Your Sandevistan Usages has been reset."
+
+			if(CooldownDrag)
+				CooldownDrag = 0
+				src << "Cooldown Drag is no longer effecting you."
+
+			if(StarCrossed)
+				StarCrossed = FALSE
+
 		if(Secret == "Zombie" && MeditateTime == 70 SECONDS)
 			zombieGetUps = 0
 			src << "Your get ups have been reset"

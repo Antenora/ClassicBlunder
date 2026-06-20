@@ -31,7 +31,7 @@
 		StyleActive = "School of the Undefeated Of The East"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
-				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25)
+				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25, "Grippy" = 4)
 		verb/School_of_the_Undefeated_of_the_East()
 			set hidden=1
 			adjust(usr)

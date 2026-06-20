@@ -66,6 +66,8 @@ mob/var
 	tmp/obj/Skills/Projectile/BusterTech//holds a buster technique, holy fuqq
 	tmp/list/mob/BeingObserved=list()//this holds the observer, and sends them messages
 	tmp/list/BeingTargetted=list() //list of mobs currently targetting
+	tmp/Airborne = 0
+	var/AirborneInterrupted = 0
 	tmp/is_dashing = 0
 	tmp/verb_delay = 0
 	tmp/last_autohit
@@ -73,6 +75,7 @@ mob/var
 	tmp/GlowFilter
 	tmp/ArmamentGlow
 	tmp/FlickeringGlow
+	tmp/SuppressPowerGlow
 	tmp/MeditateTime
 	tmp/Party/party//party party party
 	tmp/StunImmune
@@ -131,6 +134,9 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
+	tmp/StaggerMeter=0 // Boss Stun
+	StaggerMult=1
+	MaimKOGetups=0
 	EndReplace=0
 	EndTax=0
 	EndCut=0
@@ -274,7 +280,7 @@ mob/var
 	Text_Color="#45fa3f"
 	OOC_Color="#666666"
 	Emote_Color="#f0fa33"
-
+	tmp/current_emote_text = ""
 	Trait_Color//i guess it will be used for furries?!
 
 
@@ -408,6 +414,7 @@ mob/var
 	PureRPMode=0
 	CutsceneWatch=0
 	ForceHeavyStrike=0
+	PCTransToggle=0 //0=on, 1=off
 	SpawnArea = "None" //different from Spawn for Reasons
 
 	CyberizeMod = 0
@@ -484,6 +491,7 @@ mob/var
 	EnergyAssimilators=0
 	EnhancedSmell=0
 	BioAndroid=0
+	PerfectForm=0
 	SuperAndroid=0
 	CyberneticMainframe
 	SampleCollected=0
@@ -514,9 +522,12 @@ mob/var
 	ElementalOffense
 	ElementalDefense
 	Poison=0
+	SilentPoisonAmount=0
 	BlindingVenom = 0
 	Burn=0
+	SilentBurnAmount=0
 	Frenzy=0
+	Bleed=0
 	Slow=0
 	Shatter=0
 	Harden=0

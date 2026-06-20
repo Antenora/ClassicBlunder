@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 23
+	var/UPDATE_VERSION = 34
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -532,6 +532,222 @@ update
 					p.passive_handler.Set("Grit", 0)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit/TG in p)
 						del TG
+	version24
+		version = 24;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(DRAGON)&&p.Class=="Gold")
+				if(p.AscensionsAcquired>=1)
+					p.StrAscension += 0.5
+				if(p.AscensionsAcquired>=2)
+					p.StrAscension += 0.5
+				if(p.AscensionsAcquired>=3)
+					p.StrAscension += 0.75
+	version25
+		version = 25;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				if(p.AscensionsAcquired>=1)
+					p.passive_handler.Decrease("BuffMastery", 2)
+				if(p.AscensionsAcquired>=2)
+					p.passive_handler.Decrease("BuffMastery", 2)
+				if(p.AscensionsAcquired>=3)
+					p.passive_handler.Decrease("BuffMastery", 2)
+			if(p.isRace(BEASTKIN))
+				if(p.Class == "Feather Cowl")
+					if(p.AscensionsAcquired>=1)
+						p.passive_handler.Increase("PureReduction", 2);
+						p.passive_handler.Increase("PureDamage", 1);
+						p.passive_handler.Increase("Juggernaut", 1);
+						p.passive_handler.Decrease("BlockChance", 10);
+						p.passive_handler.Decrease("CriticalBlock", 0.1);
+						p.passive_handler.Decrease("CriticalChance", 5);
+						p.passive_handler.Decrease("CriticalDamage", 0.05);
+					if(p.AscensionsAcquired>=2)
+						p.passive_handler.Increase("PureReduction", 2);
+						p.passive_handler.Increase("PureDamage", 1);
+						p.passive_handler.Increase("Juggernaut", 1);
+						p.passive_handler.Decrease("BlockChance", 10);
+						p.passive_handler.Decrease("CriticalBlock", 0.1);
+						p.passive_handler.Decrease("CriticalChance", 5);
+						p.passive_handler.Decrease("CriticalDamage", 0.05);
+				if(p.Class == "Feather Knife")
+					if(p.AscensionsAcquired>=1)
+						p.passive_handler.Increase("PureDamage", 2);
+						p.passive_handler.Increase("PureReduction", 1);
+						p.passive_handler.Increase("BlurringStrikes", 1);
+						p.passive_handler.Decrease("CriticalChance", 25);
+						p.passive_handler.Decrease("CriticalDamage", 0.25);
+					if(p.AscensionsAcquired>=2)
+						p.passive_handler.Increase("PureDamage", 2);
+						p.passive_handler.Increase("PureReduction", 1);
+						p.passive_handler.Increase("BlurringStrikes", 1);
+						p.passive_handler.Decrease("CriticalChance", 10);
+						p.passive_handler.Decrease("CriticalDamage", 0.1);
+	version26
+		version = 26;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				p.passive_handler.Increase("SpaceWalk", 1);
+				p.passive_handler.Increase("StaticWalk", 1);
+				p << "The Space Squids of old look upon you kindly."
+				p << "WHY THE FRIGGLE FRACK DID THEY TAKE SPACEWALK AND STATIC WALK OFF YOU?!"
+				p << "How can you space squid if you can't even go to space...!"
+			if(p.isRace(BEASTKIN))
+				if(p.Class == "Feather Cowl")
+					if(p.AscensionsAcquired>=1)
+						p.passive_handler.Decrease("PureReduction", 2);
+						p.passive_handler.Decrease("PureDamage", 1);
+						p.passive_handler.Increase("PureReduction", 0.25);
+						p.passive_handler.Increase("PureDamage", 0.125);
+					if(p.AscensionsAcquired>=2)
+						p.passive_handler.Decrease("PureReduction", 2);
+						p.passive_handler.Decrease("PureDamage", 1);
+						p.passive_handler.Increase("PureReduction", 0.25);
+						p.passive_handler.Increase("PureDamage", 0.125);
+					p << "Your pure damage and pure reduction have been reduced."
+					p << "bird down..."
+				if(p.Class == "Feather Knife")
+					if(p.AscensionsAcquired>=1)
+						p.passive_handler.Decrease("PureReduction", 1);
+						p.passive_handler.Decrease("PureDamage", 2);
+						p.passive_handler.Increase("PureReduction", 0.125);
+						p.passive_handler.Increase("PureDamage", 0.25);
+					if(p.AscensionsAcquired>=2)
+						p.passive_handler.Decrease("PureReduction", 1);
+						p.passive_handler.Decrease("PureDamage", 2);
+						p.passive_handler.Increase("PureReduction", 0.125);
+						p.passive_handler.Increase("PureDamage", 0.25);
+					p << "Your pure damage and pure reduction have been reduced."
+					p << "bird down..."
+	version27
+		version = 27;
+		updateMob(mob/p)
+			. = ..()
+			if(p.passive_handler.Get("SpiralPowerUnlocked"))
+				p.passive_handler.Set("SpiralPowerUnlocked", 0)
+	version28
+		version = 28;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(HUMAN)&&p.Class=="Heroic")
+				if(p.AscensionsAcquired>=1)
+					p.passive_handler.Increase("Instinct", 2);
+					p.passive_handler.Increase("Flow", 2);
+				if(p.AscensionsAcquired>=2)
+					p.passive_handler.Increase("Instinct", 2);
+					p.passive_handler.Increase("Flow", 2);
+				if(p.AscensionsAcquired>=3)
+					p.passive_handler.Increase("Instinct", 2);
+					p.passive_handler.Increase("Flow", 2);
+	version29
+		version = 29;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(HUMAN)&&p.Class=="Heroic")
+				if(p.AscensionsAcquired>=4)
+					p.StrAscension += 0.5
+					p.ForAscension += 0.5
+					p.EndAscension += 0.5
+					p.OffAscension += 0.5
+					p.DefAscension += 0.5
+	version30
+		version = 30
+		updateMob(mob/p)
+			. = ..()
+			var/list/giveBack = list()
+			for(var/spell_passive/sp in p.acquiredSpellPassives)
+				if(sp.enchantedIn)
+					p.disenchantSpellWithPassive(sp.enchantedIn, sp)
+				giveBack += sp.type
+				del sp
+			if(length(giveBack))
+				p.acquiredSpellPassives = list()
+				for(var/type in giveBack)
+					var/spell_passive/sp = new type;
+					p.acquiredSpellPassives |= sp;
+				p << "You'll need to reapply your spell passives."
+	version31
+		version = 31
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				p << "You're going to have to redo your ascension choices..."
+				p.race.revertAndFixAllAscensions(p);
+				p << "It is done. Remeditate to have your ascensions granted again!"
+				if(p.passive_handler["Soulfire"] != 0)//this is a typo. we do not use this.
+					p.passive_handler["Soulfire"] = 0;
+
+	version32
+		version = 32
+		updateMob(mob/p)
+			. = ..()
+			// digest anyone still trapped under the old absorb
+			if(!p.absorbedBy)
+				return
+			var/absorberCkey = p.absorbedBy
+			var/mob/Players/M = GetMajinByCkey(absorberCkey)
+			if(M && M.majinAbsorb && M.majinAbsorb.absorbed && islist(M.majinAbsorb.absorbed["[p.ckey]"]))
+				M.majinAbsorb.DigestVictim(M, "[p.ckey]")
+				return
+			if(!MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"])
+				MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] = list()
+			if(!("[p.ckey]" in MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"]))
+				MAJIN_PENDING_DIGEST_CREDITS["[absorberCkey]"] += "[p.ckey]"
+			p.absorbedBy = null
+			p.majinRoomIndex = 0
+			p.absorbedAtTimestamp = 0
+			p.RevokeObserveMajinVerb()
+			MoveToSpawn(p)
+			p.KO = 0
+			p << "<font color='purple'>You've been digested and sent back to spawn.</font>"
+	version33
+		version = 33
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(SAIYAN))
+				if(p.AscensionsAcquired>=2)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 0.5)
+						p.passive_handler.Increase("Adrenaline", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+				if(p.AscensionsAcquired>=3)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+						p.passive_handler.Increase("LikeWater", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 0.5)
+						p.passive_handler.Increase("Juggernaut", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+				if(p.AscensionsAcquired>=4)
+					if(p.Class=="Pride")
+						p.passive_handler.Increase("PureDamage", 1)
+						p.passive_handler.Increase("Steady", 1)
+					if(p.Class=="Zeal")
+						p.passive_handler.Increase("Adaptation", 0.5)
+						p.passive_handler.Increase("LikeWater", 0.5)
+					if(p.Class=="Honor")
+						p.passive_handler.Increase("PureReduction", 1)
+						p.passive_handler.Increase("Adrenaline", 1)
+						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+	version34
+		version = 34
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(DRAGON))
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/dr in p.contents)
+					dr.adjust(p);
+					p << "Your Dragon Rage has been adjusted to scale with health!"
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

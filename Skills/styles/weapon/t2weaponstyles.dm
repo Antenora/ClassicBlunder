@@ -24,7 +24,7 @@
 		StyleOff=1.15
 		StyleActive="Gatotsu"
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk"="/obj/Skills/Buffs/NuStyle/SwordStyle/Two_Heaven_As_One",
-							"/obj/Skills/Buffs/NuStyle/SwordStyle/Phalanx_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Acrobat")
+							"/obj/Skills/Buffs/NuStyle/SwordStyle/Iaido_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tenken")
 		passives = list("HybridStyle" = "UnarmedStyle", "Fury" = 2, "BlurringStrikes" = 1.5, "SweepingStrike" = 1, "BladeFisting" = 1, \
 				"Iaijutsu" = 2.5, "Musoken" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "Extend" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Gatotsu_Rokujin"

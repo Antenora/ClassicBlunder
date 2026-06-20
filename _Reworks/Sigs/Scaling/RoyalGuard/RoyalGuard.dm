@@ -5,6 +5,7 @@
 		SuccessfulParry = 1
 		PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 		KenWave=1
+		Mastery=1
 		KenWaveBlend=2
 		ActiveMessage="puts up their guard!!!"
 		OffMessage="drops their guard."
@@ -48,6 +49,9 @@
 					ActiveMessage="lands a Perfect Release!!!!!!"
 					Knockback=10
 					Earthshaking=15
+					if(RG.Mastery < 101)
+						RG.Mastery+=1
+						usr << "Your Mastery of Royal Guard increased to [RG.Mastery]!"
 					DamageMult=((RG.RoyalMeter*1.5)*glob.ROYAL_GUARD_DMG_MULT)
 					RG.RoyalMeter = 0
 					usr.client.updateRGMeter()
@@ -79,7 +83,7 @@
 				screen += rgMeterHolderOutlines
 				rgMeterHolderOutlines.screen_loc = "RIGHT-0.70,BOTTOM+1.38"
 
-			rgMeterHolderNorm.maptext = "<font color= 'red'>[round(RG.RoyalMeter,0.01)]/[100]</font>"
-			rgMeterHolderOutlines.maptext = "<font color= 'white'>[round(RG.RoyalMeter,0.01)]/[100]</font>"
+			rgMeterHolderNorm.maptext = "<font color= 'red'>[round(RG.RoyalMeter,0.01)]/[100+RG.Mastery-1]</font>"
+			rgMeterHolderOutlines.maptext = "<font color= 'white'>[round(RG.RoyalMeter,0.01)]/[100+RG.Mastery-1]</font>"
 			rgMeterHolderNorm.maptext_width = 400
 			rgMeterHolderOutlines.maptext_width = 400

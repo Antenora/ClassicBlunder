@@ -136,9 +136,10 @@
 		. = ..()
 	adjust(mob/p)
 		passives = list("Godspeed" = 3, "AfterImages" = 3, "Flicker" = 3, "Flow" = 1)
-		VaizardHealth = pick(3,5,10)
+		var/darwin = p.AscensionsAcquired ? p.AscensionsAcquired : 1
+		VaizardHealth = (2 * darwin)
 		VaizardShatter = 1
-		SpdMult = 1 + (0.05 * pick(3,5,10))
+		SpdMult = 1 + (0.1 * darwin)
 
 	verb/Soul_Surge()
 		set category = "Skills"

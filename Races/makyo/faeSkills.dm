@@ -18,7 +18,13 @@
 		OffMessage="shrivels up as the power of the star leaves them."
 		adjust(mob/p)
 			var/TaxSub
-			TaxSub=p.AscensionsAcquired*0.05
+			var/VaiHealthSub=p.AscensionsAcquired*10
+			if(VaiHealthSub<0)
+				VaiHealthSub=0
+			TaxSub=p.AscensionsAcquired*0.075
+			VaizardHealth=50-VaiHealthSub
+			if(p.AscensionsAcquired>=5)
+				VaizardShatter=0
 			if(TaxSub>0.35)
 				TaxSub=0.35
 			StrTax=0.45-TaxSub
@@ -46,13 +52,13 @@
 				passives["Godspeed"] = p.AscensionsAcquired
 				AutoAnger=0
 				AngerStorage=0
-				if(p.passive_handler.Get("StarPower"))
+				if(p.passive_handler.Get("StarPower")||p.AscensionsAcquired>=4)
 					AutoAnger=1
 					AngerMult=2
 					passives["Pursuer"] = 2 * p.AscensionsAcquired
 				else
 					if(p.AscensionsAcquired)
-						AngerPoint = 50+ (5 * p.AscensionsAcquired)
+						AngerPoint = 5+ (2 * p.AscensionsAcquired)
 						passives["Pursuer"] = 0.5 * p.AscensionsAcquired
 					AngerMult=1
 			..()

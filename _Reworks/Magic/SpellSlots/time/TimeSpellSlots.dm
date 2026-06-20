@@ -70,3 +70,12 @@
 			set category="Skills"
 			adjust(usr)
 			src.Trigger(usr)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/
+	Outrunning_the_Past
+		BuffName="Outrunning the Past"
+		passives = list("Godspeed" = 2)
+		TimerLimit=10;
+		AlwaysOn=1;
+		ActiveMessage="'s usage of time magic allows them to outpace the them of a second ago!"
+		OffMessage="falls back into sync with the timeline."

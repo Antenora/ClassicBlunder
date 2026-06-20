@@ -10,6 +10,8 @@ mob/Click()
 	if(glob.CANT_CLICK_INVS && !usr.Admin)
 		if((!glob.ADMIN_INVIS_ONLY && (src.invisibility >= usr)) || src.AdminInviso)
 			return
+	if(src.HiddenInShadow && usr != src && !usr.Admin)
+		return
 	if(usr.Target!=src)
 		for(var/sb in usr.SlotlessBuffs)
 			var/obj/Skills/Buffs/b = usr.SlotlessBuffs[sb]
@@ -27,6 +29,14 @@ mob/Click()
 		if(src.passive_handler.Get("Nightmare")&&usr!=src)
 			usr<<"<font color=red>You must be seeing things..."
 			return
+		if(src.Airborne)
+			return
+		// NearSighted blocks targeting anything more than 1 tile away
+		if(usr != src)
+			var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns_click = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
+			if(ns_click && usr.BuffOn(ns_click) && get_dist(usr, src) > 1)
+				usr << "<font color=red>Your limited vision prevents you from targeting anything more than 1 tile away.</font>"
+				return
 		usr.SetTarget(src)
 		for(var/sb in usr.SlotlessBuffs)
 			var/obj/Skills/Buffs/b = usr.SlotlessBuffs[sb]
@@ -105,6 +115,10 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 					m<<output("<font color=#99FF99><b>(Telepath)</b></font>- <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> To <a href=?src=\ref[who];action=MasterControl;do=TPM>[who]</a href> :[blah]", "icchat")
 
 mob/proc/SetTarget(atom/target)
+	if(ismob(target))
+		var/mob/_kt = target
+		if(_kt.HiddenInShadow)
+			return
 	if(ismob(Target))
 		var/mob/m = Target
 		m.BeingTargetted -= src

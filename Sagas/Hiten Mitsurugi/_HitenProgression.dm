@@ -2,9 +2,9 @@
 #define HITEN_PASSIVES_TIER_2 list("Godspeed"=1, "AttackSpeed"=2, "Pursuer"=1, "Flow" = 1, "Instinct" = 1)
 #define HITEN_PASSIVES_TIER_3 list("Godspeed"=1, "TechniqueMastery"=2, "Flow" = 1, "Instinct" = 1)
 #define HITEN_PASSIVES_TIER_4 list("SlayerMod"=1, "Godspeed"=1, "MovementMastery"=4, "FavoredPrey"="All")
-#define HITEN_PASSIVES_TIER_5 list("Godspeed"=1, "AttackSpeed"=3, "Pursuer"=1)
-#define HITEN_PASSIVES_TIER_6 list("Godspeed"=1, "TechniqueMastery"=3)
-#define HITEN_PASSIVES_TIER_7 list("SlayerMod"=1, "Godspeed"=2, "Deicide"=10, "EndlessNine"=0.5, "AsuraStrike"=1)
+#define HITEN_PASSIVES_TIER_5 list("Godspeed"=1, "AttackSpeed"=3, "Pursuer"=1, "Deicide"=5, "EndlessNine"=0.1)
+#define HITEN_PASSIVES_TIER_6 list("Godspeed"=1, "TechniqueMastery"=3, "Deicide"=5, "EndlessNine"=0.1)
+#define HITEN_PASSIVES_TIER_7 list("SlayerMod"=1, "Godspeed"=2, "Deicide"=10, "EndlessNine"=0.2, "AsuraStrike"=1)
 
 /mob/proc/gainHitenMitsurugi()
     src<<"You embark down the path of slaying men... <b>Hiten Mitsurugi Style</b>!"
@@ -28,7 +28,7 @@
                 findOrAddSkill(/obj/Skills/AutoHit/CoiledSlash);
                 src<< "You learn how to strike countless times with incredible speed!"
                 findOrAddSkill(/obj/Skills/AutoHit/NestedSlash);
-                
+
             if(3)
                 passiveGain=HITEN_PASSIVES_TIER_3
                 findOrAddSkill(/obj/Skills/Projectile/Sword/Hiten_Mitsurugi/Earth_Dragon_Flash)

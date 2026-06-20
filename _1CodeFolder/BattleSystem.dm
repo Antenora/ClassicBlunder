@@ -3,7 +3,7 @@
 #define HIT 1 // WHEN YOU B HITTIN
 #define GLANCING 3 // ONLY FOR WHEN SURE HIT / SURE DODGE INTERACT
 #define WHIFF 2 // WHEN YOU HIT ON THE 2ND ROLL
-#define STATIC_RPP_GAIN 40
+#define STATIC_RPP_GAIN 999
 var/global/EXPERIMENTAL_ACCURACY = TRUE
 var/global/CLAMP_POWER = TRUE
 
@@ -127,6 +127,8 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
+//	if(src.passive_handler.Get("AdvanceFurther"))
+	//	src.passive_handler.Set("AdvanceFurther", 0)
 	if(src.passive_handler.Get("Herald of the End")&&src.transUnlocked<2)
 		src.passive_handler.Increase("The Clock Is Ticking", 1)
 		src<<"<font color=red><b>You really let someone get the better of you like that...? The clock is ticking.</font></b>"
@@ -134,7 +136,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	var/CalamityOdds=src.passive_handler.Get("The Clock Is Ticking")*(src.Potential/55)
 	if(CalamityOdds<0)
 		CalamityOdds=0
-	if(src.Potential<=60)
+	if(src.Potential<50)
 		CalamityOdds=0
 	if((src.oozaru_type=="Demonic" && src.TotalInjury>=40&&prob(HellspawnOdds)&&src.transUnlocked<1&&!src.HellspawnBerserk&&!src.HellspawnBerserking)||(src.ForcedHellspawn&&!src.HellspawnBerserk&&!src.HellspawnBerserking))
 		src.RPModeSwitch()
@@ -167,9 +169,9 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.Health=100
 		src.TotalInjury=0
 		world<<"<font color=red><b>Here, on this one fateful day...</b></font>"
+		src.race.transformations[1].transform(src, TRUE)
 		sleep(30)
 		world<<"<font color=red><b>...The Calamity...</b></font>"
-		src.transActive = 1
 		src.race.transformations[2].transform(src, TRUE)
 		src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Five)
 		sleep(30)
@@ -320,6 +322,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.PowerControl=100
 	src.ClearFrenzyOnKO()
 	src.Burn=0
+	src.Bleed=0
 	src.AfterImageStrike=0
 	src.VaizardHealth=0
 	src.ForceCancelBeam()
@@ -332,7 +335,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src << "Your Royal Meter went back to 0."
 		src.client.updateRGMeter()
 
-	if(Secret == "Zombie")
+	if(Secret == "Zombie"&&P.Secret!="Hamon")
 		if(HealthCut + 0.1 < 1 && zombieGetUps + 1 <= AscensionsAcquired)
 			Conscious()
 			var/healthcutClose = clamp(0.9-(zombieGetUps/10),0,0.9)
@@ -401,10 +404,15 @@ mob/proc/Unconscious(mob/P,var/text)
 			src<<"Being knocked out forced you to revert!"
 		if(src.isRace(SAIYAN))
 			src.Oozaru(0)
+		var/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi/ek = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi)
+		if(ek && ek.SlotlessOn)
+			ek.Trigger(src)
+			src << "Being knocked out collapsed your bankai!"
 	if(src.Grab)
 		src.Grab_Release()
 	Poison = 0
 	Burn = 0
+	Bleed = 0
 	Shatter = 0
 	Slow = 0
 	Shock = 0
@@ -470,7 +478,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		return
 	if(isRace(MAJIN) && majinAbsorb && majinAbsorb.absorbed && majinAbsorb.absorbed.len)
 		majinAbsorb.releaseAll(src, "majin_died")
-	BreakViewers() //STOP LOOKING AT ME THE SHAME OF DEATH TOO MUCH
+//	BreakViewers() //STOP LOOKING AT ME THE SHAME OF DEATH TOO MUCH
 	if(src.passive_handler.Get("The Legend of REBIRTH"))
 		src.OMessage(20,"[src] was just killed by [text]!","<font color=red>[src] was just killed by [text]!")
 		sleep(20)
@@ -498,6 +506,11 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.IsGrabbed().Grab_Release()
 	if(src.Grab)
 		src.Grab_Release()
+	if(StarCrossed)
+		StarCrossed = FALSE
+	if(painShared)
+		turnOffPainShared()
+
 
 	if(istype(src, /mob/Player/AI))
 		if(P)
@@ -519,7 +532,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 					if(P.HealthCut > 0)
 						P.HealthCut-=(0.001*src.Potential)
 						P.HealthCut = max(0, P.HealthCut)
-				var/potential_gain=a.Potential/2
+				var/potential_gain=(a.Potential/2)*glob.MOB_POTENTIAL_MODIFIER
 				if(P.party)
 					if(P.party.members.len>0)
 						potential_gain /= 2
@@ -609,7 +622,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		if(P.HasPurity()&&IsEvil())
 			SuperDead=2
 			NoRemains=1
-			if(P.Secret=="Ripple")
+			if(P.Secret=="Hamon")
 				src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 			else
 				src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
@@ -689,7 +702,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 			if(s||st)
 				if((s && s.Element=="Silver")||(st && st.Element=="Silver"))
 					src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
-				else if(P.Secret=="Ripple"&&P.HasPurity())
+				else if(P.Secret=="Hamon"&&P.HasPurity())
 					src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 
 		if(src.Phylactery)
@@ -808,7 +821,10 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.Dead=1
 		src.Conscious()
 		src.Poison=0
+		src.SilentPoisonAmount=0
 		src.Burn=0
+		src.SilentBurnAmount=0
+		src.Bleed=0
 		src.Slow=0
 		src.Shatter=0
 		src.HardenAccumulated=0
@@ -1089,7 +1105,10 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 			src << "Your fate has been sealed by an overwhelming force; you move on immediately to the realm of the dead..."
 			src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
 	src.Burn=0
+	src.SilentBurnAmount=0
+	src.Bleed=0
 	src.Poison=0
+	src.SilentPoisonAmount=0
 	src.Slow=0
 	src.Shatter=0
 	src.Shock=0
@@ -1303,7 +1322,9 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 				Target.Health=100
 				Target.Energy=Target.EnergyMax
 				Target.Burn=0
+				Target.SilentBurnAmount=0
 				Target.Poison=0
+				Target.SilentPoisonAmount=0
 				Target.Slow=0
 				Target.Shock=0
 				Target.Shatter=0
@@ -1339,7 +1360,9 @@ The average damage was [average] over [looplength] times.
 			Target.Health=100
 			Target.Energy=Target.EnergyMax
 			Target.Burn=0
+			Target.SilentBurnAmount=0
 			Target.Poison=0
+			Target.SilentPoisonAmount=0
 			Target.Slow=0
 			Target.Shock=0
 			Target.Shatter=0
@@ -1680,16 +1703,17 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 				if(AccMult<1)
 					AccMult=1
 		var/GodKiDif = 1
-		if(Offender.GetGodKi() && !Offender.HasNullTarget())
-			GodKiDif = 1 + Offender.GetGodKi()
-		if(Defender.GetGodKi() && !Defender.HasNullTarget())
-			GodKiDif /= (1 + Defender.GetGodKi())
-		if(Defender.passive_handler.Get("Justice"))
-			if(Offender.GetGodKi()>Defender.GetGodKi())
-				GodKiDif=1
-		if(Offender.passive_handler.Get("Justice"))
-			if(Defender.GetGodKi()>Offender.GetGodKi())
-				GodKiDif=1
+		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
+			if(Offender.GetGodKi() && !Offender.HasNullTarget())
+				GodKiDif = 1 + Offender.GetGodKi()
+			if(Defender.GetGodKi() && !Defender.HasNullTarget())
+				GodKiDif /= (1 + Defender.GetGodKi())
+			if(Defender.passive_handler.Get("Justice"))
+				if(Offender.GetGodKi()>Defender.GetGodKi())
+					GodKiDif=1
+			if(Offender.passive_handler.Get("Justice"))
+				if(Defender.GetGodKi()>Offender.GetGodKi())
+					GodKiDif=1
 		AccMult *= GodKiDif
 
 		// START OF REAL FUNCTION
@@ -1834,10 +1858,11 @@ proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/Base
 
 
 		var/GodKiDif = 1
-		if(Offender.GetGodKi() && !Offender.HasNullTarget())
-			GodKiDif = 1 + Offender.GetGodKi()
-		if(Defender.GetGodKi() && !Defender.HasNullTarget())
-			GodKiDif /= (1 + Defender.GetGodKi())
+		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
+			if(Offender.GetGodKi() && !Offender.HasNullTarget())
+				GodKiDif = 1 + Offender.GetGodKi()
+			if(Defender.GetGodKi() && !Defender.HasNullTarget())
+				GodKiDif /= (1 + Defender.GetGodKi())
 		AccMult *= GodKiDif
 
 		var/OffenseModifier
@@ -2044,7 +2069,7 @@ mob
 
 
 mob/proc/Grab()
-	if(src.Stunned||src.icon_state=="KB")
+	if(src.Stunned||src.Suspended||src.icon_state=="KB")
 		return
 	if(!Grab)
 		if(lastZanzoUsage+3 > world.time)
@@ -2160,6 +2185,13 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 			src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 			src.Grab_Update()
 			src.Grab_Effects(P)
+			var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
+			if(ns && src.BuffOn(ns) && ns.source == P)
+				ns.stopNearSighted(src)
+				ns.Trigger(src, 1)
+				var/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi/ek = P.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi)
+				if(ek && ek.domain_active)
+					ek.ns_exempt |= src
 			return
 		if(!P.canBeGrabbed())
 			src.OMessage(10,"[src] fails to get a firm hold on [P]!","[src]([src.key]) fails to grab [ExtractInfo(P)]")
@@ -2170,6 +2202,13 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 	src.Grab_Update()
 	src.Grab_Effects(P)
+	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
+	if(ns && src.BuffOn(ns) && ns.source == P)
+		ns.stopNearSighted(src)
+		ns.Trigger(src, 1)
+		var/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi/ek = P.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi)
+		if(ek && ek.domain_active)
+			ek.ns_exempt |= src
 
 /mob/proc/canBeGrabbed()
 	if(KO) return 1;

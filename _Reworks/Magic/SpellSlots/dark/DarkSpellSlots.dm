@@ -107,3 +107,12 @@
 		verb/Void_Blast()
 			set category="Skills"
 			usr.UseProjectile(src)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/
+	Shadow_Infusion
+		BuffName="Shadow Infusion"
+		passives = list("LifeSteal" = 10)
+		TimerLimit=10;
+		AlwaysOn=1;
+		ActiveMessage="drinks the essence of their opponent with shadow magic!"
+		OffMessage="quenches their bloody appetite..."

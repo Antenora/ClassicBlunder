@@ -1,5 +1,5 @@
 
-globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Wrathful", "LimitBroken", "Star Surge", "Heart of Darkness", "The Almighty", "The Flame of Youth","Shatter Fate","Determination(Black)", "Death-X-Evolution", "MaouKi","Undying Rage")
+globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge", "The Flame of Youth")
 
 
 /mob/proc/ignoresPowerClamp(mob/defender)

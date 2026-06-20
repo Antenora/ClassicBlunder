@@ -1,6 +1,8 @@
 /obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2
     passives = list()
     SignatureTechnique=3
+    SpecialSlot=1
+    Slotless=0
     Mastery=0
     Copyable=0
     MakesSword=0
@@ -341,6 +343,9 @@
             return TRUE
         return FALSE
     adjust(mob/p)
+        if(!altered)
+            SpecialSlot=1
+            Slotless=0
         if(passives["CriticalChance"]>30)
             passives["CriticalChance"]=30
             passives["CriticalDamage"]=0.15

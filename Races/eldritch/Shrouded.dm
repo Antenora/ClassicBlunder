@@ -120,13 +120,14 @@
                     es.ShroudedPassives["MovementMastery"] = 5;
                     es.ShroudedPassives["Extend"] = 1;
                     es.ShroudedPassives["Gum Gum"] = 1;
-        if(es.currentTier >= 6)
+        if(es.currentTier >= 5)
             if(!es.ShroudedMastery)
                 if(es.ShroudedOrigin=="Beastkin") es.ShroudedMastery = "Rifts"
                 if(es.ShroudedOrigin=="Human") es.ShroudedMastery = "Duplicity"
                 if(es.ShroudedOrigin=="Saiyan") es.ShroudedMastery = "Despair"
                 if(es.ShroudedOrigin=="Namekian") es.ShroudedMastery = "Eternity"
                 src << "After being coated in the ichor of the Sea of Darkness, you are the master of <b>[es.ShroudedMastery]</b>."
+            src << "You exhibit perfect mastery over your Shrouded Origin!"
             switch(es.ShroudedMastery)
                 if("Rifts")
                     es.ShroudedPassives["TripleStrike"] = 0.5;
@@ -208,7 +209,7 @@
         return 0;
     var/Cost = GetTetherWarpCost();
     if(GetMineral() < Cost)//always costs mana bits for Shrouded to warp
-        src << "You don't have enough mana bits to warp (You needs [Commas(Cost)])"
+        src << "You don't have enough mana bits to warp (You need [Commas(Cost)])"
         return 0;
     var/list/tetherOptions = findTetherPacts();
     if(!tetherOptions)
@@ -218,7 +219,7 @@
 
 /mob/proc/findTetherPacts()
     var/list/l = list();
-    for(var/mob/Players/p in world)
+    for(var/mob/Players/p in players)
         if(p.TetherPactOwner == key)
             l.Add(p);
     if(l.len > 0) return l;
@@ -273,3 +274,4 @@ obj/Skills/Utility
             //aesthetics
             usr.loc = choice.loc;
             OMsg(usr, "<font color='purple'>...<b>[usr]'s Shroud</b> drags their body through space to a fellow Tether!!</font color>");
+            Using=0;

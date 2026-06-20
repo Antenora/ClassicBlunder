@@ -895,6 +895,13 @@ obj/Items/Sword
 	TechType="Forge"
 	UpdatesDescription=1
 	Repairable=1
+	verb/Toggle_Hat()
+		if(IsHat)
+			usr << "Your sword will lay <font color='red'>beneath</font color> your hair now."
+			IsHat=0;
+		else
+			usr << "Your sword wil lay <font color='green'>atop</font color> your hair now."
+			IsHat=1;
 	Wooden
 		name="Training Sword"
 		Unobtainable=0
@@ -981,9 +988,7 @@ obj/Items/Sword
 		Legendary
 			LegendaryItem=1
 			Unobtainable=1
-			Ascended=3
-			ShatterCounter=700
-			ShatterMax=700
+			Ascended=6
 			Yukianesa
 				name="Yukianesa"
 				icon='Yukianesa.dmi'
@@ -994,10 +999,9 @@ obj/Items/Sword
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
-				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 3, "AngerThreshold" = 1.5)
+				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15, "IceHerald"=1, "Freezing"=5, "SpiritFlow"=2, "WaveDancer"=2, "RenameMana"="HEAT")
 				Destructable=0
 				ShatterTier=0
-				ManaGeneration=3
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Frost_End", "/obj/Skills/AutoHit/FrostBite", "/obj/Skills/Projectile/Sword/TougaHyoujin", "/obj/Skills/Queue/KokujinYukikaze")
 
 
@@ -1130,7 +1134,7 @@ obj/Items/Sword
 		Legendary
 			LegendaryItem=1
 			Unobtainable=1
-			Ascended=3
+			Ascended=6
 			ShatterCounter=1000
 			ShatterMax=1000
 
@@ -1140,7 +1144,7 @@ obj/Items/Sword
 				pixel_x=-32
 				pixel_y=-32
 				NoSaga=1
-				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 3, "AngerThreshold" = 1.5)
+				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5, "RenameMana"="HEAT", "BlockChance"=20, "CriticalBlock"=0.15, "Brutalize"=2, "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
 				CalmAnger=1
@@ -1345,7 +1349,7 @@ obj/Items/proc/UnEquip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src, /obj/Items/Enchantment/Staff))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(istype(src, /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
@@ -1418,7 +1422,7 @@ obj/Items/proc/Equip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(A==src.loc)

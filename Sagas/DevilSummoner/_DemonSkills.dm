@@ -466,9 +466,9 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 			if("Taunt")
 				return DemonTaunt()
 			if("Makarakarn")
-				return DemonReflect()
+				return DemonMakarakarn()
 			if("Tetrakarn")
-				return DemonReflect()
+				return DemonTetrakarn()
 			if("Extra Cancel")
 				return DemonExtraCancel()
 			if("Marin Karin")
@@ -945,28 +945,54 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 				sleep(5)
 		return TRUE
 
-	proc/DemonReflect()
+	var/const/DEMON_REFLECT_DURATION = 50
+
+	proc/DemonMakarakarn()
 		if(!ai_owner || !ai_owner.Target) return FALSE
-		demon_reflect_until = world.time + 100
-		reflect_overlay_self = image('Icons/Buffs/Shield.dmi')
-		src.overlays += reflect_overlay_self
-		reflect_overlay_owner = image('Icons/Buffs/Shield.dmi')
-		ai_owner.overlays += reflect_overlay_owner
-		ai_owner.VaizardHealth = min(100, ai_owner.VaizardHealth + 30)
+		var/until = world.time + DEMON_REFLECT_DURATION
+		demon_makarakarn_until = until
+		ai_owner.demon_makarakarn_until = until
+		DemonApplyReflectOverlays()
 		DemonSpawnVFX(src)
-		if(ai_owner) ai_owner << "<font color='#88ddff'>[name] raises a reflective barrier!</font>"
-		spawn(100)
-			if(src) DemonRemoveReflectOverlays()
+		if(ai_owner) ai_owner << "<font color='#cc88ff'>[name] raises Makarakarn, a barrier that reflects magic!</font>"
+		spawn(DEMON_REFLECT_DURATION)
+			if(src) DemonClearReflect(TRUE, FALSE)
 		return TRUE
 
-	proc/DemonRemoveReflectOverlays()
-		demon_reflect_until = 0
-		if(reflect_overlay_self)
-			src.overlays -= reflect_overlay_self
-			reflect_overlay_self = null
-		if(reflect_overlay_owner && ai_owner)
-			ai_owner.overlays -= reflect_overlay_owner
-			reflect_overlay_owner = null
+	proc/DemonTetrakarn()
+		if(!ai_owner || !ai_owner.Target) return FALSE
+		var/until = world.time + DEMON_REFLECT_DURATION
+		demon_tetrakarn_until = until
+		ai_owner.demon_tetrakarn_until = until
+		DemonApplyReflectOverlays()
+		DemonSpawnVFX(src)
+		if(ai_owner) ai_owner << "<font color='#88ddff'>[name] raises Tetrakarn, a barrier that reflects physical attacks!</font>"
+		spawn(DEMON_REFLECT_DURATION)
+			if(src) DemonClearReflect(FALSE, TRUE)
+		return TRUE
+
+	proc/DemonApplyReflectOverlays()
+		if(!reflect_overlay_self)
+			reflect_overlay_self = image('Icons/Buffs/Shield.dmi')
+			src.overlays += reflect_overlay_self
+		if(ai_owner && !reflect_overlay_owner)
+			reflect_overlay_owner = image('Icons/Buffs/Shield.dmi')
+			ai_owner.overlays += reflect_overlay_owner
+
+	proc/DemonClearReflect(clear_makarakarn = TRUE, clear_tetrakarn = TRUE)
+		if(clear_makarakarn)
+			demon_makarakarn_until = 0
+			if(ai_owner) ai_owner.demon_makarakarn_until = 0
+		if(clear_tetrakarn)
+			demon_tetrakarn_until = 0
+			if(ai_owner) ai_owner.demon_tetrakarn_until = 0
+		if(demon_makarakarn_until <= world.time && demon_tetrakarn_until <= world.time)
+			if(reflect_overlay_self)
+				src.overlays -= reflect_overlay_self
+				reflect_overlay_self = null
+			if(reflect_overlay_owner && ai_owner)
+				ai_owner.overlays -= reflect_overlay_owner
+				reflect_overlay_owner = null
 
 	proc/DemonExtraCancel()
 		if(!ai_owner) return FALSE

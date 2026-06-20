@@ -3,7 +3,7 @@
 #define MANG_MANA_COST 10 // Determines the cost of activating a Mang Ring/Level
 
 /obj/Skills/Buffs/SlotlessBuffs/Shin_Radiance
-    passives = list("GiantForm" = 1, "Harden" = 1, "PureReduction" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Unnerve" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
+    passives = list("Harden" = 1, "PureReduction" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Skimming" = 1, "DeathField" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
     ActiveMessage="radiates a soft, warding glow of Light."
     OffMessage="suppresses the glow of the Light, letting their emotions flow on."
     TextColor=rgb(203, 198, 47)
@@ -12,19 +12,21 @@
     DefMult = 1.2
     ManaGlow = "#c7b921"
     ManaGlowSize = 2
+    CantHaveTheseBuffs = list("Mang Resonance")
     adjust(mob/p)
         var/secretLevel = p.secretDatum.currentTier
-        var/mod = (secretLevel-5)
+        // var/mod = (secretLevel-5) - Defunct, used to give purereduction at higher tier mang
         // Tier Adjusted Mults
         EndMult = 1.2 + (0.05 * secretLevel) 
         DefMult = 1.2 + (0.05 * secretLevel)
         // Tier Adjusted Passives
         passives["Harden"] = clamp(secretLevel*2, 1, 5) // starts at 1, adds 2 per tier, caps at 5 (tier 3)
-        passives["PureReduction"] = clamp(secretLevel >= 3 ? (secretLevel+mod) : 0, 0, 5); //Scales from tier 3 (1) to tier 5 (5)
-        passives["Godspeed"] = secretLevel
-        passives["Deflection"] = (0.5 * secretLevel) //Goes from 1 to 3
-        passives["ManaGeneration"] = secretLevel
-        passives["Unnerve"] = secretLevel // Aura Farming as a passive.
+        passives["PureReduction"] = secretLevel // scales up to 6
+        passives["Godspeed"] = secretLevel // scales up to 6
+        passives["Deflection"] = max(secretLevel, 3) //Scales until t3
+        passives["ManaGeneration"] = 4
+        passives["Skimming"] = max(secretLevel, 3) // Scales until t3
+        passives["CursedWounds"] = 1
         // It also replaces your mana name to Shin but REPLACEMANA IS A STUPID FUCKING PASSIVE SO I DID IT IN THE UPDATE_STAT_LABELS PROC FUCK FUCK FUCK
 
 
@@ -46,10 +48,25 @@
     Cooldown = 30
     IconLock = 'Icons/Buffs/SecretBuffs/Mang/MangRing1.dmi'
     var/image/currentImage;
+    // THESE GET CHANGED IN THE ADJUST
+    passives = list("Harden" = 1, "PureReduction" = 1, "Deflection" = 1, "Skimming" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
+    adjust(mob/p)
+        var/secretLevel = p.secretDatum.currentTier
+        // Tier Adjusted Mults
+        StrMult = 1.2 + (0.1 * p.GetMangLevel()) 
+        ForMult = 1.2 + (0.1 * p.GetMangLevel()) 
+        OffMult = 1.2 + (0.1 * p.GetMangLevel())
+        SpdMult = 1.2 + (0.1 * p.GetMangLevel())
+        // Shin Tier Adjusted Passives - These are your shin passives but divided by 2
+        passives["Harden"] = clamp(secretLevel*2, 1, 5)/2 
+        passives["PureReduction"] = secretLevel / 2
+        passives["Deflection"] = (0.5 * secretLevel)/2 
+        passives["Skimming"] = clamp(secretLevel, 1, 3) // This Operates independent of mang level for now
+        passives["CheapShot"] = 5 // This is backend buffed by GetMangLevel() in Modifiers.dm up to 10
    // IconApart = 1
 
      /* All of Mang's passives and stats are scattered across passive procs. This is so that they can scale based off of how many Mang you have
-     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage
+     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Brutalize, Blurring Strikes, Cheap Shot
      They scale off of how many mang you have active. They do NOT show up in the passive handler rn 
      and if you want to know their values check the passive files
      Please do not go screaming about how "Mang does nothing" I will gut you myself - Hadoje */

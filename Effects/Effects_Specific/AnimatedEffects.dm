@@ -631,17 +631,26 @@ mob/proc
 		del FF
 		src.Shielding=0
 
-	FlickeringGlow(var/mob/m, var/list/Glow=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)) //Handles shiny transes
-		if(m.FlickeringGlow) return
-		m.FlickeringGlow=1
+	FlickeringGlow(var/mob/m, var/list/Glow = list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0))
+		if(m.FlickeringGlow)
+			return
+		m.FlickeringGlow = 1
 		while(m.FlickeringGlow)
-			animate(m, color=Glow, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			while(m.SuppressPowerGlow && m.FlickeringGlow)
+				sleep(1)
+			if(!m.FlickeringGlow)
+				break
+			animate(m, color = Glow, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
-			animate(m, color=src.MobColor, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			while(m.SuppressPowerGlow && m.FlickeringGlow)
+				sleep(1)
+			if(!m.FlickeringGlow)
+				break
+			animate(m, color = m.MobColor, time = 10, flags = ANIMATION_PARALLEL)
 			sleep(10)
-		animate(m, color=src.MobColor, time=10, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
-		m.FlickeringGlow=0
-		return
+
+		m.color = m.MobColor
+		m.FlickeringGlow = 0
 
 	WindupGlow(var/mob/m) //Handles shiny transes
 		if(m.WindingUp<1) return
@@ -662,6 +671,20 @@ mob/proc
 			MI=image(Target.appearance, pixel_x=Target.pixel_x, pixel_y=Target.pixel_x)
 			MI.alpha=100
 			MI.transform*=1.6
+			User.MirrorIcon=MI
+			User.underlays+=User.MirrorIcon
+		if(Z=="Off")
+			User.underlays-=User.MirrorIcon
+			User.MirrorIcon=null
+	SuperSpiralMode(var/Z)
+		var/image/MI
+		var/mob/User=src
+		var/Size=1.25+((src.passive_handler.Get("SpiralPowerUnlocked")/5)**1.25)
+		if(Z=="On")
+			SuperSpiralMode("Off")
+			MI=image(src.appearance, pixel_x=src.pixel_x, pixel_y=src.pixel_x)
+			MI.alpha=100
+			MI.transform*=Size
 			User.MirrorIcon=MI
 			User.underlays+=User.MirrorIcon
 		if(Z=="Off")

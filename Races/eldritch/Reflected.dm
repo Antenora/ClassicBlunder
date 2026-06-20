@@ -370,7 +370,7 @@ obj/Skills/Utility
 				src.Using=0
 				return
 			var/list/mob/Players/Pacted=list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key)
 					Pacted.Add(P)
 			if(Pacted.len < 1)
@@ -492,7 +492,7 @@ obj/Skills/Utility
 				return
 			// Gather all pacted PCs in the world
 			var/list/mob/Players/Pacted = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == usr)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key)
@@ -557,7 +557,7 @@ obj/Skills/Utility
 				src.Using=0
 				return
 			var/list/mob/Players/Pacted = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == usr)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key)
@@ -594,7 +594,7 @@ obj/Skills/Utility
 				src.Using = 0
 				return
 			var/list/mob/Players/Options = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == usr)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key && !P.BaredSoul)
@@ -651,7 +651,7 @@ obj/Skills/Utility
 				src.Using = 0
 				return
 			var/list/mob/Players/Pacted = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == usr)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key)
@@ -785,7 +785,7 @@ obj/Skills/Utility
 				src.Using = 0
 				return
 			var/list/mob/Players/Pacted = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P.EldritchPacted && P.ReflectedPactOwner == usr.key)
 					Pacted.Add(P)
 			if(Pacted.len < 1)
@@ -837,7 +837,7 @@ obj/Skills/Utility
 				return
 			var/mob/caster = usr
 			var/list/mob/Players/affected = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == caster)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == caster.key && P.passive_handler)
@@ -882,7 +882,7 @@ obj/Skills/Utility
 				return
 			var/mob/caster = usr
 			var/list/types_applied = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P.EldritchPacted && P.ReflectedPactOwner == caster.key)
 					if(!(P.ReflectedPactType in types_applied))
 						types_applied.Add(P.ReflectedPactType)
@@ -921,7 +921,7 @@ obj/Skills/Utility
 				return
 			var/mob/caster = usr
 			var/list/mob/Players/affected = list()
-			for(var/mob/Players/P in world)
+			for(var/mob/Players/P in players)
 				if(P == caster)
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == caster.key && P.passive_handler)
@@ -971,3 +971,60 @@ obj/Skills/Utility
 					caster << "The Covenant ends. The bonds settle."
 			spawn(3000)
 				src.Using = 0
+
+
+
+
+
+obj/Skills/Projectile
+	Realitys_Fickle_Shards
+		DamageMult=0.55
+		Radius=1
+		AttackReplace=1
+		AdaptRate = 1
+		AccMult=1
+		Blasts=10
+		Cooldown = 15
+		IconLock='shards.dmi'
+		Variation = 16
+		IconVariance = 3
+		Piercing = 1
+	Convergence
+		AttackReplace=1
+		Variation=8
+		AdaptRate = 1
+		RandomPath=1
+		Delay=0
+		Distance=60
+		DamageMult=0.2
+		AccMult=1
+		Blasts=25
+		LosesHoming=3
+		HomingCharge=1
+		IconLock='shards.dmi'
+		Variation = 16
+		Cooldown = 20
+		IconVariance = 3
+		Piercing = 1
+
+obj/Skills/AutoHit
+	The_Other_Side
+		Area="Circle"
+		Distance=13
+		AdaptRate = 1
+		DamageMult=6
+		PullIn=7
+		Cooldown=40
+		ComboMaster=1
+		SpecialAttack=1
+		HitSparkIcon='BLANK.dmi'
+		HitSparkX=0
+		HitSparkY=0
+		TurfStrike=1
+		TurfShiftLayer=EFFECTS_LAYER
+		TurfShiftDuration=-10
+		TurfShiftDurationSpawn=0
+		TurfShiftDurationDespawn=5
+		KeepQueue = TRUE
+		TurfShift='Yata_no_Kagami Mirror.dmi'
+		Crippling = 15

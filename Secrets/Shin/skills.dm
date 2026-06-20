@@ -56,4 +56,6 @@ obj/Skills/Queue/Heavy_Strike/proc/MangHeavyStrike(mob/m) // This is also called
     Launcher = 0
     PushOutWaves = 0
     PushOut = 0
+    NoWhiff = 1
+    NoDodge = 1
     return

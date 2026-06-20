@@ -11,7 +11,7 @@
     return 1;
 
 /mob/proc/canDoATransform()
-    if(!canPC()) return 0;//doesn't check for ki control
+//    if(!canPC()) return 0;//doesn't check for ki control
     if(isRace(HUMAN)) return 0;//humans do not transform like this!
     if(ChangelingTransformRequirements()) return 1;//changelings transform weird
     if(StandardTransformRequirements()) return 1;
@@ -70,7 +70,7 @@ mob/proc/PowerUp() // Handles Normal (read: Not Kaioken/Shin) power up related c
     if(hasSecret("Shin") && canMangPU())
         if(!KO) MangPowerUp()
         return
-    if(canDoATransform())
+    if(canDoATransform()&&!PCTransToggle)
         Transform();
         return;
     if(!canPC(goingUp=1)) return 0;
@@ -130,7 +130,7 @@ mob/proc/PowerDown()
             src << "You return to normal power."
             return
         // Mazoku humans are gated out here because of their racial gimmick
-        if(transActive&&!HasNoRevert()&&!isMazokuHuman())
+        if(transActive&&!HasNoRevert()&&!isMazokuHuman()&&!PCTransToggle)
             for(var/obj/Skills/Buffs/B in src)
                 if(BuffOn(B)&&B.Transform&&!B.AlwaysOn)
                     B.Trigger(src)

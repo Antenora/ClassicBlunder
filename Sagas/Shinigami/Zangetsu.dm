@@ -18,6 +18,7 @@
 /obj/Skills/Projectile/True_Getsuga_Tenshou
 	name = "True Getsuga Tenshou"
 	Cooldown = 180
+	ManaCost=25
 	NeedsSword = 1
 	StrRate = 1
 	ForRate = 1
@@ -67,20 +68,24 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"Zornhau"        = 1 + SL,
-			"PhysPleroma"    = 0.5 + (SL/2),
+			"HybridStrike"   = 0.5 + (SL/2),
 			"Half-Sword"     = 1 + SL,
-			"Extend"         = 0.5 * SL,
-			"GiantSwings"    = 1,
-			"SweepingStrike" = 1 + (0.25 * SL),
+			"Instinct"       = 1 + SL,
+			"HeavyHitter" 	 = 1 + (0.25 * SL),
 			"PureDamage"     = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
 		if(SL >= 7)
 			passives["DoubleStrike"] = 5
-		StrMult = 1.1 + (0.1 * SL)
-		ForMult = 1.1 + (0.1 * SL)
-		OffMult = 1.1 + (0.1 * SL)
+		if(SL >= 7)
+			StrMult = 1.15 + (0.15 * SL)
+			ForMult = 1.15 + (0.15 * SL)
+			SpdMult = 1.15 + (0.15 * SL)
+		else
+			StrMult = 1.1 + (0.1 * SL)
+			ForMult = 1.1 + (0.1 * SL)
+			OffMult = 1.1 + (0.1 * SL)
 
 	Trigger(mob/user)
 		var/wasOn = src.SlotlessOn
@@ -131,15 +136,26 @@
 			"Afterimages"     = 1,
 			"Godspeed"        = 1 + SL,
 			"Warping"         = 0.5 + (SL/2),
-			"HybridStrike"    = 0.5 + (SL/2),
-			"EmptyFlashStep"  = 1 + SL,
-			"PureDamage"      = 1 + SL
+			"HybridStrike"    = 1.5 + (SL/2),
+			"EmptyFlashStep"  = 1,
+			"PureDamage"      = 1 + SL,
+			"SwordAscension"  = SL,
+			"Steady"          = 1 + SL
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
-		StrMult = 1.3 + (0.1 * SL)
-		ForMult = 1.3 + (0.1 * SL)
-		SpdMult = 1.3 + (0.1 * SL)
+		if(SL >= 7)
+			passives["Deicide"]  = 15
+			passives["EndlessNine"]  = 0.5
+		if(SL >= 7)
+			StrMult = 1.4 + (0.15 * SL)
+			ForMult = 1.4 + (0.15 * SL)
+			SpdMult = 1.15 + (0.15 * SL)
+			OffMult = 1.15 + (0.15 * SL)
+		else
+			StrMult = 1.3 + (0.1 * SL)
+			ForMult = 1.3 + (0.1 * SL)
+			SpdMult = 1.3 + (0.1 * SL)
 
 	Trigger(mob/user)
 		var/wasOn = src.SlotlessOn
@@ -147,6 +163,7 @@
 		if(wasOn && !src.SlotlessOn)
 			var/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form/sf = user.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
 			if(sf) sf.revertZanpakutoIcon(user)
+			if(sf) sf.revertShihakushoIcon(user)
 			if(istype(user.SpecialBuff, /obj/Skills/Buffs/SpecialBuffs/Sword/Getsuga_Tenshou_Clad))
 				user.SpecialBuff.Trigger(user)
 			if(istype(user.SpecialBuff, /obj/Skills/Buffs/SpecialBuffs/Sword/Final_Getsuga_Tenshou))
@@ -174,6 +191,7 @@
 			src.Trigger(usr)
 			var/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form/sf = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
 			if(sf) sf.applyBankaiIcon(usr)
+			if(sf) sf.applyBankaiShihakushoIcon(usr)
 			// Visual activation sequence
 			var/mob/M = usr
 			spawn()

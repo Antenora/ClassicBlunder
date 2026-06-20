@@ -13,6 +13,12 @@ proc
 		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset, 0, Offset, 2*Offset), m.y+pick((-2)*Offset,(-1)*Offset, 0, Offset, 2*Offset), m.z)
 		sleep(1)
 		S.Strike()
+	LightningStrikeBlackPurple(atom/m, var/Offset=0)
+		m.Quake(5)
+		var/obj/Effects/fevLightningStrikeBlackPurple/S = new
+		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset, 0, Offset, 2*Offset), m.y+pick((-2)*Offset,(-1)*Offset, 0, Offset, 2*Offset), m.z)
+		sleep(1)
+		S.Strike()
 	LightningStrikeRed(atom/m, var/Offset=0)
 		m.Quake(5)
 		var/obj/Effects/fevLightningStrikeRed/S = new
@@ -22,6 +28,12 @@ proc
 	LightningStrikeVFX5(atom/m, var/Offset=0)
 		m.Quake(5)
 		var/obj/Effects/fevLightningStrikeVFX5/S = new
+		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.y+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.z)
+		sleep(1)
+		S.Strike()
+	LightningStrikeHyperdeath(atom/m, var/Offset=0)
+		m.Quake(5)
+		var/obj/Effects/fevLightningStrikeHyperDeath/S = new
 		S.loc=locate(m.x+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.y+pick((-2)*Offset,(-1)*Offset,0,Offset,2*Offset), m.z)
 		sleep(1)
 		S.Strike()

@@ -98,6 +98,10 @@ mob/var
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
 
+	//Path of a Hero
+	HyperdeathMeterCurrent=0
+	HyperdeathThreshold=100
+
 	//SHINIGAMI
 	ShinigamiRelease
 	AsauchiName
@@ -111,15 +115,42 @@ mob/var
 	BankaiIcon
 	BankaiIconX = 0
 	BankaiIconY = 0
+	BankaiShihakushoIcon
+	BankaiShihakushoIconX = 0
+	BankaiShihakushoIconY = 0
 	InShinigamiForm = FALSE
 	UsedFinalGetsuga = FALSE
+
+	ShikaiIconDual
+	ShikaiIconDualX = 0
+	ShikaiIconDualY = 0
+	tmp/HideInShadowsActive = 0
+	tmp/HiddenInShadow = 0
+	tmp/KageoniEndTime = 0
+	tmp/KageoniMidTransition = 0
+	tmp/obj/Effects/Shadowbringer_Shadow/CurrentShadow
+	tmp/obj/Effects/Shadowbringer_Shadow/ShadowbringerShadowObj
+	tmp/IroniActive = 0
+	tmp/IroniColor
+	tmp/mob/IroniCaster
+	tmp/DarumaActive = 0
+	tmp/mob/DarumaTarget
+	tmp/DarumaEndTime = 0
+	tmp/ProjectileAttacking = 0
+
+	// Kido pick tracking, shared across all four trees (Hado, Bakudo, Hoho, Hakuda)
+	KidoSL1Picks = 0   // max 2; tier cap <=1
+	KidoSL3Picks = 0   // max 2; tier cap <=2
+	KidoSL5Picks = 0   // max 1; tier cap <=3
+	KidoSL6Picks = 0   // max 1; tier cap <=4
+	KidoSL7Picks = 0   // max 1; tier cap <=5
 
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","King of Courage", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
 		if(P.Saga)
 			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami")
 				Level7=1
@@ -400,7 +431,7 @@ mob/Admin3/verb
 							if("Red")
 								confirm=alert(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Unsung Hero of Perseverance, the one who will never bend.", "Yes", "No")
 							if("Rainbow")
-								confirm=alert(P, "You will forever change the world around you, bringing beauty wherever you walk. And maybe look a little silly while doing it. (Commit to the silly or don't pick this path, cowards.)", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
+								confirm=alert(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
 
 					P.SagaLevel=1
 					switch(choice)
@@ -865,12 +896,12 @@ mob
 	proc
 		saga_up_self()
 			if(!src.SagaAdminPermission)
-				if(src.SagaLevel>=3)
+				if(src.SagaLevel>=6)
 					return
 				if(!src.SignatureCheck)
 					return
 			else
-				if(src.SagaLevel>=3)
+				if(src.SagaLevel>=6)
 					src << "You've been bestowed an additional tier of your Saga purposefully; enjoy your new powers, this is not a bug!"
 
 			src.SagaLevel++
@@ -935,11 +966,13 @@ mob
 										src.AddSkill(new/obj/Skills/Utility/UltimateHeal)
 										src<<"You can also attempt to heal people, but the keyword is attempt."
 									if(src.RebirthHeroType=="Rainbow")
+										src.RebirthHeroType="Prismatic"
 										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One. (WIP)"
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
-										//src.AddSkill(new/obj/Skills/Buffs/Rebirth/Hyperdeath_Mode)
+										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
+										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
@@ -959,11 +992,15 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Unwavering_Soul)
 								src.AddSkill(new/obj/Skills/Queue/FistOfTheRedStar)
 								src.AddSkill(new/obj/Skills/Projectile/Beams/Unbelievable_Rage)
-
 							if(src.RebirthHeroType=="Rainbow")
 								src.AddSkill(new/obj/Skills/AutoHit/PowerWordGenderDysphoria)
 								src.AddSkill(new/obj/Skills/Grapple/CHAOS_DUNK)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Of_Chaos)
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
+								src<< "Your Chaos Buster has been upgraded!"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
 							if(src.RebirthHeroType=="Cyan")
@@ -991,6 +1028,10 @@ mob
 								src.AddSkill(new/obj/Skills/AutoHit/MakeItCount)
 							if(src.RebirthHeroType=="Red")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Burning_Soul)
+							if(src.RebirthHeroType=="Prismatic")
+								src.HyperdeathThreshold=50
+								src<<"You now wield two Chaos Sabers at once!"
+								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
 							if(src.RebirthHeroType=="Blue")
@@ -1020,6 +1061,12 @@ mob
 									src.AddSkill(new/obj/Skills/Buffs/Rebirth/White_Pen_of_Hope)
 							if(src.RebirthHeroType=="Purple")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Justice_Incarnate)
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "Your happy ending... Your hopes, your dreams..."
+								src<< "It's not just those you're carrying on your back, are they?"
+								src<< "buff goes here"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
 							if(src.RebirthHeroType=="Cyan")
@@ -1035,6 +1082,11 @@ mob
 							if(src.RebirthHeroType=="Blue")
 								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/All_Hail_The_Crownless_King)
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "The Hearts of the World resonate with Yours."
+								src<< "final buff goes here wooo"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=10
 				if("Cosmo")
 					tierUpSaga("Cosmo")
 				if("Shinigami")
@@ -1205,31 +1257,21 @@ mob
 									src.AddSkill(new/obj/Skills/AutoHit/ShinkuTatsumaki)
 					if(src.SagaLevel==4)
 						if(!src.AnsatsukenAscension)
-							if(glob.CHIKARA_WHITELIST&&chikaraWhitelist)
-								src.AnsatsukenAscension=alert(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", "Satsui", "Chikara")
-								src <<"Your Ansatsuken stance is refined to suit your beliefs..."
-								var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
-								SI = locate() in src
-								if(src.AnsatsukenAscension=="Satsui")
-									if(!SI)
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
-									else
-										del SI
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
-								else
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/S in src.contents)
-										del S
-										src << "You learn to harness your raging desire to dominate in battle."
-										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Kyoi_no_Hado)
-							else
-								src <<"Your Ansatsuken stance is consumed by the raging thrill of battle..."
-								var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
-								SI = locate() in src
+							src.AnsatsukenAscension=alert(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", "Satsui", "Chikara")
+							src <<"Your Ansatsuken stance is refined to suit your beliefs..."
+							var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
+							SI = locate() in src
+							if(src.AnsatsukenAscension=="Satsui")
 								if(!SI)
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
 								else
 									del SI
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_no_Hado)
+							else
+								for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/S in src.contents)
+									del S
+									src << "You learn to harness your raging desire to dominate in battle."
+									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Kyoi_no_Hado)
 					if(src.SagaLevel==5)
 						switch(src.AnsatsukenAscension)
 							// if("Satsui")
@@ -1575,11 +1617,11 @@ mob
 						//Keychain
 						var/Style
 						if(src.KeybladeType=="Sword")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Wingblade", "Cyclone"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Wingblade", "Cyclone"))
 						if(src.KeybladeType=="Shield")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Rock Breaker", "Dark Impulse"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Rock Breaker", "Dark Impulse"))
 						if(src.KeybladeType=="Staff")
-							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Command Style", "Ghost Drive", "Blade Charge"))
+							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Ghost Drive", "Blade Charge"))
 						switch(Style)
 							if("Wingblade")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Wing_Blade_Style)
@@ -1659,6 +1701,7 @@ mob
 							src << "You have unlocked the Prismatic Dreams keychain, granting you perfect control over your own darkness!"
 						else
 							src.Keychains.Add("Ebony Slumber")
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/SyncBlade)
 							src << "You have unlocked the Ebony Slumber keychain, granting you perfect control over your own darkness!"
 /*						var/Choice
 						var/Confirm
@@ -1684,7 +1727,18 @@ mob
 					if(src.SagaLevel==6)
 						//Final Form
 						//More Majjyk
-
+						if(src.KeybladeType=="Shield")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(2)
+							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga)
+						else if(src.KeybladeType=="Staff")
+							src.AddSkill(new/obj/Skills/AutoHit/Magic/Ultima)
+						else if(src.KeybladeType=="Sword")
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(4)
+							src.ChooseMartialSkill(3)
+							src.ChooseMartialSkill(3)
 
 						if(src.KeybladeColor=="Light")
 							src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Final_Form)

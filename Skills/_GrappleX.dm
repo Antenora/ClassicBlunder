@@ -120,6 +120,7 @@ obj/Skills/Grapple
 					ThrowMult = 2
 					ThrowSpeed = 2
 					TriggerMessage = "launches"
+					BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul"
 				else
 					resetValues()
 				src.Activate(usr)
@@ -548,6 +549,10 @@ obj/Skills/Grapple
 		Activate(var/mob/User)
 			src.ThrowDir=User.dir
 			if(src.Using)
+				return
+			if(User.HeldSkillBlocksAction(src))
+				return
+			if(User.Airborne)
 				return
 			if(!heavenlyRestrictionIgnore&&User.Secret=="Heavenly Restriction" && User.secretDatum?:hasRestriction("Grapples"))
 				return

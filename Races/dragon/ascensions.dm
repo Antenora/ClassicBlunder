@@ -40,11 +40,17 @@ ascension
 						ecoAdd = 2
 						endurance = 1
 						speed = 1
+						strength = 0.5
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1)
 						strength = 1
 						speed = 0.5
 						offense = 0.5
+					if("Light")
+						passives += list("SoulFire" = 1.5, "DemonicDurability" = 1)
+						defense = 1.0
+						endurance = 1.0
+						strength = 0.5
 				..()
 
 		two
@@ -85,11 +91,17 @@ ascension
 						ecoAdd = 1
 						endurance = 1.25
 						speed = 1.25
+						strength = 0.5
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1, "DoubleStrike" = 1)
 						strength = 1
 						speed = 1
 						offense = 0.5
+					if("Light")
+						passives += list("VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
+						defense = 1.0
+						endurance = 1.0
+						strength = 0.5
 				..()
 
 		three
@@ -132,11 +144,19 @@ ascension
 						ecoAdd = 1
 						endurance = 2
 						speed = 2
+						strength = 0.75
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1, "TripleStrike" = 1)
 						strength = 1.5
 						speed = 1.5
 						offense = 1.5
+					if("Light")
+						passives += list("CallousedHands" = 0.2, "DemonicDurability" = 1, "SoulFire" = 1.5, "BeyondPurity" = 1)
+						defense = 1.0
+						endurance = 1.5
+						strength = 1
+						offense = 0.5
+						speed = 0.5
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
@@ -177,11 +197,18 @@ ascension
 						ecoAdd = 1
 						endurance = 2.5
 						speed = 2.5
+						strength = 1
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1, "AsuraStrike" = 1)
 						strength = 2
 						speed = 2
 						offense = 1
+					if("Light")
+						passives += list("CallousedHands" = 0.2, "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
+						defense = 1.5
+						endurance = 2
+						strength = 1
+						offense = 0.5
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
@@ -222,11 +249,18 @@ ascension
 						ecoAdd = 1
 						endurance = 2.5
 						speed = 2.5
+						strength = 1
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1, "DoubleStrike" = 1, "TripleStrike" = 1)
 						strength = 2
 						speed = 1
 						offense = 2
+					if("Light")
+						passives += list("DebuffReversal" = 1, "DemonicDurability" = 1, "SoulFire" = 1.5)
+						defense = 1.5
+						endurance = 2.0
+						strength = 1
+						speed = 0.5
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
@@ -266,9 +300,16 @@ ascension
 						ecoAdd = 1
 						endurance = 3
 						speed = 3
+						strength = 1.5
 					if("Dark")
 						passives += list("Fury" = 1, "Momentum" = 1, "AsuraStrike" = 1)
 						strength = 2
 						speed = 2
 						offense = 2
+					if("Light")
+						passives += list("CallousedHands" = 0.2, "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
+						defense = 1.5
+						endurance = 2
+						strength = 1
+						offense = 0.5
 				..()

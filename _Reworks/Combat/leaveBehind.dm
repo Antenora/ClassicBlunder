@@ -10,7 +10,7 @@
     var/proc_to_call
     var/proc_params
     var/inflicts_owner = FALSE
-    
+
 /obj/leftOver/proc/on_tick()
     for(var/mob/m in tick_on)
         if(proc_to_call)
@@ -53,12 +53,13 @@
     icon_state="puddle"
     bound_height = 32
     bound_width = 32
-    alpha= 0 
+    alpha= 0
     New(turf/T, mob/p, style_value)
+        if(!T) del src
         loc = locate(T.x, T.y, T.z)
         alpha = 0
         lifetime = (5 SECONDS) * style_value
-        init(p)        
+        init(p)
         animate(src, alpha = 255, time = 5)
     Cross(atom/movable/O)
         if(ismob(O) && O != owner)
@@ -75,17 +76,17 @@
                 p.Swim = 0
                 tick_on -= O
         . = ..()
-    
+
     on_death()
         for(var/mob/p in tick_on)
             if(p.Swim)
                 p.Swim = 0
         ..()
-    
+
     on_tick()
         // do nothing
 
-        
+
 /obj/leftOver/poisonCloud
     icon = 'PoisonGas.dmi'
     power = 1
@@ -96,6 +97,7 @@
     bound_width = 64
     alpha = 0
     New(turf/_loc, mob/p, style_value)
+        if(!_loc) del src
         loc = locate(_loc.x,_loc.y,_loc.z)
         alpha = 0
         animate(src, transform=matrix().Scale(2))
@@ -192,7 +194,7 @@
                             loc = T
                     next_move_time = world.time + move_interval
 
-        
+
 
 
 

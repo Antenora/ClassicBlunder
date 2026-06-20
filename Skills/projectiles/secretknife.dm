@@ -1,3 +1,4 @@
+#define BASE_FEATHER_COUNT 6
 /obj/Skills/Projectile
 	var/takeAppearance = FALSE
 	var/Bounce = FALSE
@@ -5,7 +6,7 @@
 	var/CurrentBounce = 0
 	Feathers
 		AdaptRate=1
-		Blasts=4
+		Blasts=6;
 		DamageMult=0.25
 		AccMult=1
 		AttackReplace=1
@@ -30,21 +31,19 @@
 		Cooldown=3
 		adjust(mob/p)
 			var/asc = p.AscensionsAcquired
-			var/dmgMult = 1.5 + (asc/2)
-			var/maxBlasts = 6 + p.AscensionsAcquired
-			var/lowestCD = 6 - p.AscensionsAcquired
+			var/dmgMult = ((1.5 + (asc/2)) / BASE_FEATHER_COUNT)
+			var/maxBlasts = BASE_FEATHER_COUNT + p.AscensionsAcquired
+			var/lowestCD = 12 - p.AscensionsAcquired
+			Blasts = maxBlasts;
+			Cooldown = lowestCD;
 			if(p.SlotlessBuffs["Clean Cuts"])
-				Blasts = maxBlasts + 1
-				Cooldown = lowestCD
-				DamageMult = (dmgMult + 1 ) / Blasts
-				EndRate = 1 - (asc*0.05)
+				DamageMult = dmgMult + (0.1 * p.AscensionsAcquired);
+				EndRate = max(0.5, 1 - (asc*0.05))
 				Distance = 90
 			else
-				Blasts = rand(maxBlasts-3,maxBlasts)
-				DamageMult = dmgMult / Blasts
-				Cooldown = rand(lowestCD,lowestCD+3)
+				DamageMult = dmgMult;
 				EndRate = 1
-				Distance = 30
+				Distance = 30 + (p.AscensionsAcquired * 10);
 	GodSlayer
 		AttackReplace=1
 		Distance=30
@@ -234,8 +233,8 @@
 				Cooldown = rand(6,10) - p.SagaLevel
 	FTG
 		AdaptRate=1
-		Blasts=8
-		DamageMult=0.25
+		Blasts=4
+		DamageMult=0.5
 		AccMult=1.5
 		AttackReplace=1
 		ZoneAttack=1
@@ -243,6 +242,7 @@
 		Homing=1
 		HomingCharge=2
 		HomingDelay=0.5
+		Knockback=0.05
 		HyperHoming=1
 		Striking=1
 		Instinct=2
@@ -254,10 +254,34 @@
 		IconLock='CheckmateKnives.dmi'
 		Variation=8
 		FlickBlast=0
-		Cooldown=3
+		Cooldown=5
 		takeAppearance = TRUE
 		adjust(mob/p)
 	UltimaLaser
+		AdaptRate=1
+		Blasts=4
+		DamageMult=2
+		AccMult=1.5
+		AttackReplace=1
+		ZoneAttack=1
+		Distance=30
+		Homing=1
+		HomingCharge=2
+		HyperHoming=1
+		Striking=1
+		Instinct=2
+		ZoneAttackX=8
+		ZoneAttackY=8
+		FireFromEnemy=0
+		FireFromSelf=1
+		Hover=3
+		IconLock='UltimaLaser.dmi'
+		Explode=1
+		Variation=8
+		FlickBlast=0
+		Cooldown=4
+		adjust(mob/p)
+	ChaosKnife
 		AdaptRate=1
 		Blasts=4
 		DamageMult=2

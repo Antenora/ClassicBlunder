@@ -5,6 +5,11 @@ mob
 		TargetSkillX(var/wut, var/obj/Skills/Z)
 			switch(wut)
 				if("TargetSwitch")
+					// NearSighted makes target switch disabled while active
+					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns_ts = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
+					if(ns_ts && usr.BuffOn(ns_ts))
+						usr << "<font color=red>Your limited vision prevents you from switching targets.</font>"
+						return
 					var/NewTarget
 					var/NewTgtDist=25
 					for(var/mob/m in oview(15,usr))

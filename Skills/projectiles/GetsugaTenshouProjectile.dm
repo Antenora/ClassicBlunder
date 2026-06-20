@@ -1,5 +1,6 @@
 obj/Skills/Projectile/Getsuga_Tenshou
 	name = "Getsuga Tenshou"
+	ManaCost=5
 	Cooldown = 3
 	NeedsSword=1
 	StrRate = 1
@@ -55,6 +56,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 obj/Skills/Projectile/Getsuga_Jujisho
 	name = "Getsuga Jujisho"
 	Cooldown = 120
+	ManaCost=20
 	NeedsSword=1
 	StrRate = 1
 	ForRate = 1

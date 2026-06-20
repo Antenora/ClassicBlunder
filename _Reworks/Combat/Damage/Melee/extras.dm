@@ -17,9 +17,9 @@ mob/proc/InterceptionStrike(stacks)
     pixel_y = 12
     mouse_opacity = 0
 
-/mob/var/tmp/last_fa_jin = 0 
+/mob/var/tmp/last_fa_jin = 0
 /mob/var/tmp/obj/fa_jin/fa_jin_effect
-/mob/var/icon/fa_jin_icon // prob make it admin only ye 
+/mob/var/icon/fa_jin_icon // prob make it admin only ye
 
 /mob/proc/generate_fa_jin()
     if(!fa_jin_effect)
@@ -35,8 +35,8 @@ mob/proc/InterceptionStrike(stacks)
         animate(fa_jin_effect, alpha = 0, time=2)
     else
         animate(fa_jin_effect, alpha = 255, time=2)
-    
-    
+
+
 /mob/var/HitScanIcon = null
 /mob/var/HitScanHitSpark = null
 /mob/var/HitScanHitSparkX = -32
@@ -77,12 +77,13 @@ mob/proc/InterceptionStrike(stacks)
             var/distance = get_dist(src, target)
             if(distance >= 6)
                 distance*=2
-            step_towards(src, target, 32 * (1.5 + distance/10))  
+            step_towards(src, target, 32 * (1.5 + distance/10))
         life+=world.tick_lag
-    FTG_seeker 
+    FTG_seeker
         icon = 'kunai.dmi' // make this changable w/ the style
         end_effect()
-            owner.Comboz(target, 0, TRUE)
-            LightningBolt(target, 1)
+            if(owner && target)
+                owner.Comboz(target, 0, TRUE)
+                LightningBolt(target, 1)
             ticking_generic-=src
             del src

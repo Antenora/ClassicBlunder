@@ -296,14 +296,48 @@ globalTracker/var
     if(isRace(POPO) && popoEarlyUnlocks.Find(element)) return 1;
     if((isRace(ANGEL) || isRace(MAKAIOSHIN)) && angelEarlyUnlocks.Find(element)) return 1;
     if((isRace(DEMON) || isRace(MAKAIOSHIN)) && demonEarlyUnlocks.Find(element)) return 1;
-    if((accessedMagicTrees.len + getMagicalDeficiency()) >=2)
-        if(Potential >= glob.AdvancedElementPotential) return 1;
-        else return 0
-    return 0;
+    
+    if(!hasAdvancedMagicCapability()) return 0;
+    return 1;
 
 /mob/proc/hasEarlyMagicAdvancement()
     if(hasSecret("Eldritch (Reflected)")) return 1;
     return 0;
+
+/mob/var/AdvancedMagicInvestment=0;
+/mob/Admin1/verb/Give_Advanced_Magic(mob/Players/p in world|null)
+    set category="Admin"
+    set name = "Give Advanced Magic"
+    if(!p)
+        var/list/options = list("Cancel")
+        for(var/mob/Players/gal in world)
+            options |= gal;
+        var/mob/choice = input(usr, "What player do you want to grant Advanced Magic Investment to?", "Grant Advanced Magic Investment") in options;
+        if(choice=="Cancel") return;
+    var/nuMagic = input(usr, "What do you want to set [p]'s Advanced Magic Investment to?", "Advanced Magic Investment (currently [p.AdvancedMagicInvestment])") as num|null;
+    if(nuMagic && nuMagic > 0)
+        p.AdvancedMagicInvestment = nuMagic;
+        Log("Admin","[ExtractInfo(usr)] granted [ExtractInfo(p)] Advanced Magic Investment [nuMagic]!")
+
+/mob/proc/hasAdvancedMagicCapability()
+    if(Saga)
+        alert("Your head is filled with too much [Saga]. You do not have space to learn Advanced Magic too.");
+        return 0;
+    if(CountSigs(3) >= 1+AdvancedMagicInvestment)
+        alert("You must submit an app to become a proficient mage. Admins can use Give Advanced Magic to give you the capacity to advance.")
+        return 0;
+    if(Potential < glob.AdvancedElementPotential)
+        alert("You do not have the strength to handle an advanced element yet. (Needs Potential [glob.AdvancedElementPotential])");
+        return 0;
+    if(CountPinnacles() < 2)
+        alert("You have not mastered at least two prior Magic Trees.")
+        return 0;
+    return 1;
+
+/mob/proc/CountPinnacles()
+    . = 0
+    for(var/magic_node/x in acquiredMagicNodes)
+        if(x.nodeType=="Pinnacle") .++;
 
 /mob/proc/getMagicalDeficiency()
     . = 0
@@ -318,13 +352,12 @@ globalTracker/var
         if(1)
             alert("You must fully understand your first branch of arcane knowledge before diluting it with another path, and even then, it may take some time to learn new elemental principles. (Master your first Tree and then attempt to learn after potential [glob.SecondElementPotential])");
             if(Potential < glob.SecondElementPotential) return 0;
+            if(CountPinnacles() < 1) return 0;
         if(2)
-            alert("You've mastered all the magic you can without dedicating yourself as a mage (Investment of a T3).  Are you sure you want to give up other avenues of power?");
+            alert("You must fully understand your first anmd second branches of arcane knowledges before diluting them further. In addition, to advance further, you'll be dedicating yourself as a mage (Investment of a T3).  Are you sure you want to give up other avenues of power?");
+            if(Potential < glob.AdvancedElementPotential) return 0;
+            if(CountPinnacles() < 2) return 0;
         if(3)
-            alert("You've reached the peak of magical mastery! ... There's nothing beyond this point, you've learned all you can! ... Right?")
-            //alert("In order to achieve greater magical mastery, you'll have to access knowledge beyond the normal progression of a mage (Investment of a T4). Are you sure you want to dedicate that level of training?");
-            return 0;
-        if(4)
             alert("You've reached the peak of magical mastery! ... There's nothing beyond this point, you've learned all you can! ... Right?")
             return 0;
         else

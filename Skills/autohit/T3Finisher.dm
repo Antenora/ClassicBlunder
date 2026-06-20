@@ -97,3 +97,22 @@
 		EndDefense=1
 		Cooldown=4
 		BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ruptured"
+	Atomic_Dismantling
+		ElementalClass="Chaos"
+		SpellElement="Chaos"
+		Area="Target"
+		Distance=70
+		DamageMult=T3_DMG_MULT/20
+		Rounds=20
+		WindUp=1
+		HitSparkIcon='Hit Effect Satsui.dmi'
+		HitSparkX=-32
+		HitSparkY=-32
+		HitSparkTurns=1
+		HitSparkSize=5
+		HitSparkCount=2
+		HitSparkDispersion=1
+		ForOffense=1
+		SpecialAttack=1
+		ComboMaster=1
+		WindupMessage="invokes: <font size=+1>TEAR APART!</font size>"

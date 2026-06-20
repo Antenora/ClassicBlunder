@@ -45,14 +45,9 @@ obj/Skills/Buffs/NuStyle/Legendary
 						"NoDodge" = 1, "SweepingStrike" = 1, "Brutalize" = 2, "Meaty Paws" = 1.5, "KiControlMastery" = 2,"LegendarySaiyan"=1, "Pride"=1, "Zeal"=1, "Honor"=1,\
 						"Harden" = 2, "Deflection" = 1,"Gum Gum" =1)
 		adjust(mob/p)
-			if(usr.Potential<55)
-				passives = list("GiantForm" = 1, "DoubleStrike" = 3, "Fa Jin" = 2, "Momentum" = 3, "HardStyle" = 1, "Instinct"=4, "Juggernaut" = 1, "PureDamage" = 1, "PureReduction" = 2,\
-					"NoDodge" = 1, "SweepingStrike" = 1, "Brutalize" = 2, "Meaty Paws" = 1.5, "KiControlMastery" = 2,"LegendarySaiyan"=1, "Pride"=1, "Zeal"=1, "Honor"=1,\
-					"Harden" = 2, "Deflection" = 1,"Gum Gum" =1, "UnarmedDamage"=3,"DisableGodKi"=1)
-			else
-				passives = list("GiantForm" = 1, "DoubleStrike" = 3, "Fa Jin" = 2, "Momentum" = 3, "HardStyle" = 1, "Instinct"=4, "Juggernaut" = 1, "PureDamage" = 1, "PureReduction" = 2,\
-					"NoDodge" = 1, "SweepingStrike" = 1, "Brutalize" = 2, "Meaty Paws" = 1.5, "KiControlMastery" = 2,"LegendarySaiyan"=1, "Pride"=1, "Zeal"=1, "Honor"=1,\
-					"Harden" = 2, "Deflection" = 1,"Gum Gum" =1, "UnarmedDamage"=3)
+			passives = list("GiantForm" = 1, "DoubleStrike" = 3, "Fa Jin" = 2, "Momentum" = 3, "HardStyle" = 1, "Instinct"=4, "Juggernaut" = 1, "PureDamage" = 1, "PureReduction" = 2,\
+				"NoDodge" = 1, "SweepingStrike" = 1, "Brutalize" = 2, "Meaty Paws" = 1.5, "KiControlMastery" = 2,"LegendarySaiyan"=1, "Pride"=1, "Zeal"=1, "Honor"=1,\
+				"Harden" = 2, "Deflection" = 1,"Gum Gum" =1, "UnarmedDamage"=3)
 
 		StyleActive="Fist Of The Fabled King (True)"
 		Finisher="/obj/Skills/Queue/Finisher/Erupting_Mugen_Tengenkotsu"

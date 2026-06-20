@@ -41,8 +41,8 @@
 				NeedsHealth = 50 + (5 * asc)
 				TooMuchHealth = 65 + (5 * asc)
 				forAdd = 0.15 * asc
-				passives = list("ManaStats" = (1+(asc/2)), "Innovation" = 1, "DebuffResistance" = (0.1*(asc+1)), "Blubber" = (0.5*(asc+1)),\
-								"FluidForm" = (1+(0.5*asc)), "Afterimages" = 1) //Pixies are supposed to be annoying to put down once they go into Mania.
+				passives = list("ManaStats" = (1+(asc/2)), "Innovation" = 1, "DebuffResistance" = (0.2*(asc+1)), "Blubber" = (0.75*(asc+1)),\
+								"FluidForm" = (1+(0.75*asc)), "Afterimages" = 1) //Pixies are supposed to be annoying to put down once they go into Mania.
 			Trigger(mob/User, Override = FALSE)
 				if(!User.BuffOn(src))
 					adjust(User)

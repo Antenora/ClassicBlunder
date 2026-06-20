@@ -74,3 +74,12 @@
 			set category="Skills"
 			adjust(usr)
 			src.Trigger(usr)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/
+	Distorted_Space
+		BuffName="Distorted Space"
+		passives = list("SuperDash" = 1)
+		TimerLimit=10;
+		AlwaysOn=1;
+		ActiveMessage="closes the gap between them and their opponent with space magic!"
+		OffMessage="collapses the distance to normal."

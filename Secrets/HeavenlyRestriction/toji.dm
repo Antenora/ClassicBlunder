@@ -137,6 +137,7 @@ var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "L
 			p.passive_handler.Increase("SoftStyle", min(boon_value * 0.5, 2))
 		if("Power")
 			p.passive_handler.Increase("BuffMastery", min(boon_value, 4))
+			p.passive_handler.Increase("ZenkaiPower", min(boon_value * 0.5, 2))
 
 /SecretInformation/HeavenlyRestriction/proc/updateImprove(improv, value)
 	if(secretVariable["Improvements"][improv])

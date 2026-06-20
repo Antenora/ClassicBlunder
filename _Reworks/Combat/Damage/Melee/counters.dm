@@ -46,7 +46,7 @@
 				// times Present was selected on the tree. Applied AFTER CounterDamage's clamp
 				// so the doubled value can exceed the 0.25..5 range (doc spec permits this).
 				if(enemy.hasMagePassive(/mage_passive/time/Present))
-					counter_mult *= 2
+					counter_mult *= 1.25
 				enemy.Melee1(counter_mult, 2, 0,0, null, null, 0,0,2,1,0,1)
 
 

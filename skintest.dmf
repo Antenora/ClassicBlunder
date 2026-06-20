@@ -318,6 +318,65 @@ window "Baby"
 		show-lines = horizontal
 		highlight-color = #000000
 
+window "EmoteEditor"
+	elem "EmoteEditor"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		background-color = none
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+		on-close = "EmoteEditorClosed"
+		outer-size = 656x538
+		outer-pos = 291,0
+		inner-pos = 8,31
+		screen-size = 2560x1400
+	elem "label13"
+		type = LABEL
+		pos = 344,0
+		size = 296x48
+		anchor1 = 54,0
+		anchor2 = 100,10
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #666666
+		saved-params = ""
+		text = "CTRL+S = Strikethrought\nCTRL+L = Hyperlink\nTAB = ... tabbing??"
+		allow-html = true
+	elem "label12"
+		type = LABEL
+		pos = 64,0
+		size = 280x48
+		anchor1 = 10,0
+		anchor2 = 54,10
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #666666
+		saved-params = ""
+		text = "CTRL+B = Bold\nCTRL+I = Italics\nCTRL+U = Underline"
+		allow-html = true
+	elem "label10"
+		type = LABEL
+		pos = 0,0
+		size = 64x48
+		anchor1 = 0,0
+		anchor2 = 10,10
+		text-color = #ffffff
+		background-color = #000000
+		saved-params = ""
+		text = "RP BOX"
+	elem "EditorBrowser"
+		type = BROWSER
+		pos = 0,48
+		size = 640x432
+		anchor1 = 0,10
+		anchor2 = 100,100
+		background-color = none
+		saved-params = ""
+		inner-background-color = none
+
 window "ICChatTab"
 	elem "ICChatTab"
 		type = MAIN
@@ -534,11 +593,108 @@ window "RPWindow"
 		statusbar = false
 		can-close = false
 		can-minimize = false
+	elem "label9"
+		type = LABEL
+		pos = 256,48
+		size = 128x24
+		anchor1 = 40,10
+		anchor2 = 60,15
+		background-color = #343434
+		saved-params = ""
+		text = ""
+	elem "button16"
+		type = BUTTON
+		pos = 512,48
+		size = 64x24
+		anchor1 = 80,10
+		anchor2 = 90,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Massive Text"
+		command = "MassiveEmote"
+	elem "button15"
+		type = BUTTON
+		pos = 448,48
+		size = 64x24
+		anchor1 = 70,10
+		anchor2 = 80,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Large Text"
+		command = "LargeEmote"
+	elem "button14"
+		type = BUTTON
+		pos = 192,48
+		size = 64x24
+		anchor1 = 30,10
+		anchor2 = 40,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Strikethrght"
+		command = "StrikeEmote"
+	elem "colorB"
+		type = BUTTON
+		pos = 576,48
+		size = 64x24
+		anchor1 = 90,10
+		anchor2 = 100,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Color Picker"
+		command = "EmoteColorPicker"
+	elem "centerB"
+		type = BUTTON
+		pos = 384,48
+		size = 64x24
+		anchor1 = 60,10
+		anchor2 = 70,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Center"
+		command = "CenterEmote"
+	elem "underB"
+		type = BUTTON
+		pos = 128,48
+		size = 64x24
+		anchor1 = 20,10
+		anchor2 = 30,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Underline"
+		command = "UnderEmote"
+	elem "itaB"
+		type = BUTTON
+		pos = 64,48
+		size = 64x24
+		anchor1 = 10,10
+		anchor2 = 20,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Italics"
+		command = "ItaEmote"
+	elem "boldB"
+		type = BUTTON
+		pos = 0,48
+		size = 64x24
+		anchor1 = 0,10
+		anchor2 = 10,15
+		text-color = #ffffff
+		background-color = #414141
+		saved-params = "is-checked"
+		text = "Bold"
+		command = "BoldEmote"
 	elem "button8"
 		type = BUTTON
-		pos = 320,447
-		size = 320x32
-		anchor1 = 50,93
+		pos = 392,447
+		size = 248x32
+		anchor1 = 61,93
 		anchor2 = 100,100
 		font-family = "Malgun Gothic Semilight"
 		font-size = 18
@@ -550,7 +706,7 @@ window "RPWindow"
 	elem "label6"
 		type = LABEL
 		pos = 0,0
-		size = 640x47
+		size = 640x48
 		anchor1 = 0,0
 		anchor2 = 100,10
 		font-family = "@Malgun Gothic Semilight"
@@ -559,11 +715,24 @@ window "RPWindow"
 		background-color = #151413
 		saved-params = ""
 		text = "Roleplay"
+	elem "button9"
+		type = BUTTON
+		pos = 240,447
+		size = 152x32
+		anchor1 = 38,93
+		anchor2 = 61,100
+		font-family = "Malgun Gothic Semilight"
+		font-size = 16
+		text-color = #ffffff
+		background-color = #5f5f5f
+		saved-params = "is-checked"
+		text = "Preview"
+		command = "RPPreview"
 	elem "rpbox"
 		type = INPUT
-		pos = 0,47
-		size = 640x400
-		anchor1 = 0,10
+		pos = 0,72
+		size = 640x375
+		anchor1 = 0,15
 		anchor2 = 100,93
 		text-color = #ffffff
 		background-color = #1b1a18
@@ -572,9 +741,9 @@ window "RPWindow"
 	elem "button7"
 		type = BUTTON
 		pos = 0,447
-		size = 320x32
+		size = 240x32
 		anchor1 = 0,93
-		anchor2 = 50,100
+		anchor2 = 38,100
 		font-family = "Malgun Gothic Semilight"
 		font-size = 16
 		text-color = #ffffff
@@ -2093,6 +2262,21 @@ window "mapwindow"
 		border = sunken
 		saved-params = ""
 		text = "Shatter"
+	elem "BarBleed"
+		type = LABEL
+		pos = 236,436
+		size = 64x20
+		anchor1 = 50,100
+		anchor2 = -1,-1
+		font-family = "@Microsoft JhengHei Light"
+		font-size = 6
+		font-style = "bold"
+		text-color = #cc0000
+		background-color = #000000
+		is-visible = false
+		border = sunken
+		saved-params = ""
+		text = "Bleed"
 	elem "BarOxygen"
 		type = LABEL
 		pos = 410,436
@@ -2186,6 +2370,26 @@ window "outputwindow"
 		image = 'Icons\\wpLnl9g.png'
 		command = "chatSettings"
 		is-flat = true
+
+window "previewrp"
+	elem "previewrp"
+		type = MAIN
+		pos = 291,0
+		size = 640x480
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = "pos;size;is-minimized;is-maximized"
+	elem "rp-preview"
+		type = OUTPUT
+		pos = 0,0
+		size = 640x480
+		anchor1 = 0,0
+		anchor2 = 100,100
+		font-family = "Gotham Book"
+		text-color = #0080ff
+		background-color = #080808
+		saved-params = "max-lines"
 
 window "rpane"
 	elem "rpane"
@@ -4286,7 +4490,6 @@ window "DemonSummonWindow"
 		saved-params = "pos;size;is-minimized;is-maximized"
 		title = "Summon Demon"
 		statusbar = false
-		can-close = true
 		can-minimize = false
 		can-resize = false
 	elem "DemonSummonTitle"
@@ -4300,7 +4503,6 @@ window "DemonSummonWindow"
 		font-style = "bold"
 		text-color = #ffdd88
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = "CHOOSE DEMON"
 	elem "DemonSlot_1"
@@ -4323,7 +4525,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_2"
@@ -4346,7 +4547,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_3"
@@ -4369,7 +4569,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_4"
@@ -4392,7 +4591,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_5"
@@ -4415,7 +4613,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_6"
@@ -4438,7 +4635,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_7"
@@ -4461,7 +4657,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_8"
@@ -4484,7 +4679,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_9"
@@ -4507,7 +4701,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_10"
@@ -4530,7 +4723,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_11"
@@ -4553,7 +4745,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSlot_12"
@@ -4576,7 +4767,6 @@ window "DemonSummonWindow"
 		font-size = 8
 		text-color = #cccccc
 		background-color = #111111
-		border = none
 		saved-params = ""
 		text = ""
 	elem "DemonSummonClose"

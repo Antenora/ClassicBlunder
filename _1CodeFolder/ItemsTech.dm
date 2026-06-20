@@ -2346,7 +2346,7 @@ obj/Items/Tech
 									var/bloodPower = m.secretDatum.currentTier
 									m.BPPoison=min(0.2*bloodPower,0.9)
 									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Ripple")
+								if("Hamon")
 									if(m.RippleActive()&&!m.PoseEnhancement)
 										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 	Portable_Projector
@@ -2428,7 +2428,7 @@ obj/Items/Tech
 									var/bloodPower = m.secretDatum.currentTier
 									m.BPPoison=min(0.2*bloodPower,0.9)
 									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Ripple")
+								if("Hamon")
 									if(m.RippleActive()&&!m.PoseEnhancement)
 										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 
@@ -3864,6 +3864,47 @@ obj/Items/Gear
 			src.desc="A replacement limb.  A [Choice] gear has been integrated within it."
 			del Choice
 			src.Using=0
+	Hougyoku
+		TechType="CyberEngineering"
+		SubType="Blasphemy"
+		var/Partial=1
+		var/Complete=0
+		Cost=500000000000
+		InfiniteUses=1
+		var/LastUse
+		verb/Awaken_Dreams() //saga
+			set category = "Hougyoku"
+			usr<<"soon"
+			return
+			var/list/who=list("Cancel")
+			for(var/mob/Players/M in view(3, usr))
+				who.Add(M)
+			var/mob/Players/selector=input("Who do you want to unlock the next Saga tier of?","Awaken Potential")in who||null
+			if(selector=="Cancel")
+				src.Using=0
+				return
+		verb/Awaken_Potential() //ascension
+			set category = "Hougyoku"
+			var/list/who=list("Cancel")
+			for(var/mob/Players/M in view(3, usr))
+				who.Add(M)
+			var/mob/Players/selector=input("Who do you want to unlock the next ascension of?","Awaken Potential")in who||null
+			if(selector=="Cancel")
+				src.Using=0
+				return
+			for(var/a in selector.race.ascensions)
+				var/ascension/asc = a
+				if(asc.checkAscensionUnlock(src,selector.Potential+10))
+					asc.onAscension(selector)
+				src.Using=0
+		verb/Awaken_Power()//transformation
+			set category = "Hougyoku"
+			usr<<"bother an admin. this has too many consideratons to automate"
+		Complete_Hougyoku
+			Partial=0
+			Complete=1
+			Techniques=list("/obj/Skills/AutoHit/Fragor", "/obj/Skills/AutoHit/Ultra_Fragor")
+			passives = list("True Evolution" = 1)
 	Dark_Factor_Fragment
 		TechType="CyberEngineering"
 		SubType="Blasphemy"
@@ -3975,14 +4016,20 @@ obj/Items/Gear
 			if(MechType)
 				var/answer = input(player, "Do you want to change your mech's type? Each type has a different boon") in list("Yes","No")
 				if(answer == "Yes")
-					MechType = input(player, "What type?") in list("Speed","Tank","Assault")
+					if(MechType=="MobileFighter")
+						Augment = "None"
+					MechType = input(player, "What type?") in list("Speed","Tank","Assault", "MobileFighter")
+					if(MechType=="MobileFighter")
+						Augment = "Super_Mode"
 			else
 				MechType = input(player, "What type of mech do you want to use?", "Mech Type") in list("Speed","Tank","Assault", "MobileFighter")
 		proc/setup(mob/player)
 			var/level2 = Level>=2 ? 1 : 0
 			var/level4 = Level>=4 ? 1 : 0
-			if(Drive == "None")
+			if(Drive == "None"&&MechType!="MobileFighter")
 				Drive = input(player, "What type of drive do you want to use?", "Drive") in list("Supersonic","Fortress", "Destroyer")
+			if(MechType=="MobileFighter")
+				Augment= "Super_Mode"
 			if(level2)
 				if(Drive == "Supersonic")
 					Augment = "Trans_Am"
@@ -4024,12 +4071,15 @@ obj/Items/Gear
 				var/result = input(usr, "What type?") in list("Speed","Tank","Assault", "MobileFighter")
 				MechType = result
 			Techniques = list("/obj/Skills/Buffs/ActiveBuffs/Gear/Mobile_Suit/[MechType]")
-			if(Augment != "None"&&MechType!="Fighter")
+			if(Augment != "None")
 				Techniques += "/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/[Augment]"
 				if(Drive == "Fortress")
 					Techniques += list("/obj/Skills/Projectile/Gear/Installed/Giga_Laser", \
 				"/obj/Skills/Projectile/Gear/Installed/Missle_Onslaught", "/obj/Skills/Projectile/Gear/Installed/Laser_Circus")
 			src.Using=1
+			usr.Revert()
+			usr.Revert()
+			usr.Revert()
 			src.ObjectUse(usr)
 			src.Using=0
 		verb/Set_Start_Code()

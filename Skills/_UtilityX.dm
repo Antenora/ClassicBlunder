@@ -485,25 +485,19 @@ obj/Skills/Utility
 					continue
 				if(!M.AdminInviso&&M.PowerControl>25)
 					if((usr.Saga=="Unlimited Blade Works" && usr.SagaLevel >= 2)||(!M.HasVoid()&&!M.HasMechanized()&&!M.passive_handler.Get("Masquerade")))
-						if((!locate(M.EnergySignature) in usr.EnergySignaturesKnown)&&!usr.passive_handler.Get("SpiritPower"))
-							var/distancecalc=abs(M.x-usr.x)+abs(M.y-usr.y)
-							if(distancecalc<16)
-								if(usr.HasEmptyGrimoire())
-									usr << "<b>[M.name]</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)] - ([M.x], [M.y], [M.z])"
-								else
-									usr << "<b>[M.name]</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)]"
-								if(M.EnergySignature)
-									usr.EnergySignaturesKnown.Add(M.EnergySignature)
-							else
-								if(usr.HasEmptyGrimoire())
-									usr << "<b>???</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)] - ([M.x], [M.y], [M.z])"
-								else
-									usr << "<b>???</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)]"
-						else
+						var/distancecalc=abs(M.x-usr.x)+abs(M.y-usr.y)
+						if(distancecalc<16&&M.EnergySignature&&!(M.EnergySignature in usr.EnergySignaturesKnown))
+							usr.EnergySignaturesKnown.Add(M.EnergySignature)
+						if((M.EnergySignature in usr.EnergySignaturesKnown)||distancecalc<16||usr.passive_handler.Get("SpiritPower"))
 							if(usr.HasEmptyGrimoire())
 								usr << "<b>[M.name]</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)] - ([M.x], [M.y], [M.z])"
 							else
 								usr << "<b>[M.name]</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)]"
+						else
+							if(usr.HasEmptyGrimoire())
+								usr << "<b>???</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)] - ([M.x], [M.y], [M.z])"
+							else
+								usr << "<b>???</b> - [usr.Get_Sense_Reading(M)] - [usr.CheckDirection(M)]"
 
 			if(usr.HasEmptyGrimoire())
 				usr << "Location: ([usr.x], [usr.y], [usr.z])"
@@ -595,15 +589,30 @@ obj/Skills/Utility
 				usr << "You toggle anonymous telepathy <font color='green'>ON</font color>."
 		verb/Telepathic_Link()
 			set category="Utility"
+			if(MasteryCheck==0)
+				usr << "Applying race-based increase on your Mastery!"
+				MasteryCheck=1
+				if(usr.RaceInRareList())
+					Mastery=2
+					usr << "Mastery set to 2. You can telepathy across Z-Planes!"
+				else
+					Mastery=1
+					usr << "Mastery kept to 1. You can only telepathy on the same Z-Plane."
 			if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasRestriction("Senses"))
 				return
 			var/list/who=list("Cancel")
-			for(var/mob/Players/A in players)
-				if(A == usr) continue
-				who.Add(A)
+			if(Mastery <= 1) // Only check current Zplane
+				for(var/mob/Players/A in players)
+					if(A == usr) continue
+					if(A.z != usr.z) continue
+					who.Add(A)
+			else /// mastery above 1 let you telepath through z planes
+				for(var/mob/Players/A in players)
+					if(A == usr) continue
+					who.Add(A)
 			for(var/mob/Players/W in who)
 				if(!usr.isRace(SHINJIN))
-					if(!usr.passive_handler.Get("SpiritPower"))
+					if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
 						if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
 							if(!(W in hearers(50,usr)))
 								who.Remove(W)
@@ -697,6 +706,20 @@ obj/Skills/Utility
 				usr.Observing=0
 				return
 			else
+				if(selector.passive_handler.Get("Anti-Scrying"))
+					var/antiscry = 1
+					if(usr.passive_handler.Get("God's Gaze"))
+						antiscry = 0
+					else if(usr.HasGodKi())
+						if(usr.passive_handler.Get("GodKi") > selector.passive_handler.Get("GodKi"))
+							antiscry = 0
+					if(antiscry)
+						usr << "<b><font color=[selector.Text_Color]><font size=+1>[selector] reflects your attempt at Scrying-- You feel yourself struck with retribution!</b></font color></font size>"
+						selector << "<b>[usr] has attempted to observe you!</b>"
+						usr.DoDamage(usr, 25)
+						if (usr.Health <= 0)
+							usr.Unconscious(null, "scrying disruption!")
+						return
 				Observify(usr,selector)
 				if(usr.HasEmptyGrimoire())
 					usr << "[selector] - ([selector.x], [selector.y], [selector.z])"
@@ -1536,15 +1559,12 @@ obj/Skills/Utility
 				var/list/Choices = list("Cancel") + P.PotionTypes
 				var/herbchoice = input(P, "Choose an herb.", "Alter Existing Flask") in Choices
 				if(herbchoice == "Cancel")
-					P.TakeMineral(glob.POTIONCOST)
 					return
-				if(ChosenFlask.Slots <= 0)
-					P << "You have no more flask slots!"
-					return
+				P.TakeMineral(glob.POTIONCOST/5)
 				TheEvilAssIfWall(P, herbchoice, ChosenFlask)
 				--ChosenFlask.Slots
-			if(ChosenFlask.Slots == 0) // This will only happen if you complete the while loop has intended or someone bugged shit
-				P.TakeMineral(glob.POTIONCOST) // 5k if you don't edit this you dipshit
+				if(ChosenFlask.Slots <= 0)
+					P << "You have no more flask slots!"
 		// War crime Proc
 		proc/TheEvilAssIfWall(mob/P, herbchoice, obj/Items/Flask/ChosenFlask)  //You have no idea how much I loathed making this
 			if(herbchoice == "Healing Herb")

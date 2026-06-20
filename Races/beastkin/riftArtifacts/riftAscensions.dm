@@ -65,7 +65,7 @@
     strength = 0.75;
     offense = 0.75;
     endurance = 0.5;
-    passives = list("PureDamage" = 2, "Fury" = 2, "Brutalize"=2, "Extend"=2, "SwordDamage"=6)
+    passives = list("PureDamage" = 2, "Fury" = 2, "Brutalize"=2, "Extend"=2, "SwordDamage"=2)
 /ascension/sub_ascension/beastkin/phantomflicker
     strength = 1.25;
     offense = 0.375;
@@ -77,7 +77,7 @@
 /ascension/sub_ascension/beastkin/demonsong
     strength = 1.5;
     speed = 0.5;
-    passives = list("SpiritHand" = 1, "SpiritFlow" = 1, "GiantSwings" = 1, "LifeSteal" = 10)
+    passives = list("SpiritHand" = 2, "SpiritFlow" = 2, "GiantSwings" = 1, "LifeSteal" = 10)
 /ascension/sub_ascension/beastkin/worldwhisper
     endurance = 1;
     defense = 1;
@@ -86,11 +86,13 @@
     force = 0.5;
     offense = 0.5;
     defense = 1;
-    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Siphon" = 2)
+    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Siphon" = 2, "Harden" = 2, "Persistence" = 1)
 
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)
 /mob/proc/getRiftAscensionOptions()
+    liveDebugMsg("picking ascension choice for [race.ascensions[AscensionsAcquired]]")
+    race.ascensions[AscensionsAcquired].pickingChoice=TRUE;
     var/list/availableOptions = subtypesof(/ascension/sub_ascension/beastkin);
     var/list/removeOptions = list();
     removeOptions |= ASC1_SUBASCENSIONS

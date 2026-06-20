@@ -55,6 +55,8 @@ proc
 				if(mob.passive_handler["Shellshocked"])
 					mob.passive_handler.Set("Shellshocked", 0)
 					mob << "You are no longer Shellshocked..."
+				if(mob.passive_handler["Staggered!"])
+					mob.passive_handler.Set("Staggered!", 0)
 			else
 				return 1
 		if(mob.ReflectedFrozen)

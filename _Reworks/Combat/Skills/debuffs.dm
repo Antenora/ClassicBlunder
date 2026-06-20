@@ -41,8 +41,9 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare
 	AlwaysOn = 0
 	NeedsPassword = 0
+	IconLock = 'root.dmi'
 	passives = list("Snared" = 1)
-	adjust(mob/p, limit = 3, _icon = 'root.dmi')
+	adjust(mob/p, limit = null, _icon = null)
 		if(limit)
 			TimerLimit = limit
 		if(_icon)

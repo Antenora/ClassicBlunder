@@ -244,7 +244,6 @@ mob/tierUpSaga(Path)
 							kusa.passives["HybridStrike"] = 1
 							kusa.passives["SwordAscension"] = 1
 							kusa.passives["ManaGeneration"] = 15
-							kusa.passives["GodKi"] = 0.25
 
 					if("Durendal")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal/dura in src.Buffs)
@@ -252,7 +251,6 @@ mob/tierUpSaga(Path)
 							dura.passives["Adrenaline"] = 1
 							dura.passives["HolyMod"] = 2
 							dura.passives["SwordAscension"] = 1
-							dura.passives["GodKi"] = 0.25
 
 					if("Dainsleif")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif/dainsleif in src.Buffs)
@@ -260,7 +258,6 @@ mob/tierUpSaga(Path)
 							dainsleif.passives["Adrenaline"] = 1
 							dainsleif.passives["AbyssMod"] = 4
 							dainsleif.passives["SwordAscension"] = 1
-							dainsleif.passives["GodKi"] = 0.25
 
 					if("Caledfwlch")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch/caled in src.Buffs)
@@ -268,14 +265,12 @@ mob/tierUpSaga(Path)
 							caled.passives["CriticalChance"] = 10
 							caled.passives["CriticalDamage"] = 0.5
 							caled.passives["Pursuer"] = 2
-							caled.passives["GodKi"] = 0.25
 
 					if("Muramasa")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa/muramasa in src.Buffs)
 							muramasa.passives["KillerInstinct"] = 0.3
 							muramasa.passives["DemonicDurability"] = 2
 							muramasa.passives["TechniqueMastery"] = 2
-							muramasa.passives["GodKi"] = 0.25
 
 					if("Masamune")
 						src.AddSkill(new/obj/Skills/Utility/Death_Killer)
@@ -283,7 +278,6 @@ mob/tierUpSaga(Path)
 							masamune.passives["Unstoppable"] = 1
 							masamune.passives["LifeSteal"] = 10
 							masamune.passives["HolyMod"] = 2
-							masamune.passives["GodKi"] = 0.25
 
 					if("Soul Edge")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge/SE in src.Buffs)
@@ -292,7 +286,6 @@ mob/tierUpSaga(Path)
 							SE.passives["BurningShot"] = 1
 							SE.passives["BurnHit"] = 15
 							SE.passives["AngerAdaptiveForce"] = 0.15
-							SE.passives["GodKi"] = 0.25
 						src << "Soul Edge's conquering chaos takes form as a wave of ruin, Dark Reconquista: Triumph."
 						AddSkill(new/obj/Skills/AutoHit/Dark_Reconquista_Triumph)
 
@@ -300,13 +293,11 @@ mob/tierUpSaga(Path)
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur/SC in src.Buffs)
 							SC.passives["Chilling"] = 2
 							SC.passives["SpiritPower"] = 1
-							SC.passives["GodKi"] = 0.25
 
 					if("Ryui Jingu Bang")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang/Ryui in src.Buffs)
 							Ryui.passives["FluidForm"] = 1
 							Ryui.passives["StunningStrike"] = 1
-							Ryui.passives["GodKi"] = 0.25
 
 					if("Green Dragon Crescent Blade")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu/GuanYu in src.Buffs)
@@ -315,7 +306,6 @@ mob/tierUpSaga(Path)
 							GuanYu.passives["TechniqueMastery"] = 2
 							GuanYu.passives["SwordAscension"] = 1
 							GuanYu.passives["LifeGeneration"] = 1
-							GuanYu.passives["GodKi"] = 0.25
 			if(6)
 				if(!locate(/obj/Skills/Buffs/SpecialBuffs/OverSoul, src))
 					src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/OverSoul)

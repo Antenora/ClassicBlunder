@@ -59,7 +59,7 @@ Inspiration taken from Sett (League of Legends)}",\
 					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall/nf = new(p)
 					p.AddSkill(nf)
 					p.passive_handler.Increase("Instinct", 1)
-					
+
 				if("Unseen Predator")
 					p.passive_handler.passives["Heavy Strike"] = "Unseen Predator"
 					p.AddSkill(new/obj/Skills/Queue/Racial/Beastkin/Savagery)
@@ -76,7 +76,7 @@ Inspiration taken from Sett (League of Legends)}",\
 
 				if("Feather Knife")
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Clean_Cuts)
-					p.passive_handler.passives["Secret Knives"] = "Feathers"
+					p.passive_handler.passives["Extra Secret Knives"] = "Feathers"
 					p.passive_handler.Increase("Tossing", 1)
 					p.passive_handler.Increase("Momentum", 1)
 					p.passive_handler.Increase("BladeFisting", 1)
@@ -104,5 +104,6 @@ Inspiration taken from Sett (League of Legends)}",\
 				if("Fox Fire")
 					p.Attunement = "Fox Fire"
 					p.passive_handler.passives["Heavy Strike"] = "Fox Fire"
+					p.passive_handler.Increase("SpiritStrike", 1) //Allows their Basic attacks to use force INSTEAD of Strength.
 					p.AddSkill(new/obj/Skills/Projectile/Racial/Fox_Fire_Barrage)
 

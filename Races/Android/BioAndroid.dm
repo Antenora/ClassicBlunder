@@ -75,6 +75,16 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	bio_samples += key
 	ApplyBioSample(race_name, tier)
 	return TRUE
+/mob/proc/RemoveBioSample(race_name, tier)
+	// Returns TRUE if granted, FALSE if collector already had it.
+	if(!bio_samples)
+		bio_samples = list()
+	var/key = "[race_name]:[tier]"
+	if(key in bio_samples)
+		return FALSE
+	bio_samples -= key
+	ApplyBioSample(race_name, tier)
+	return TRUE
 
 /mob/proc/ApplyBioSample(race_name, tier)
 	// Looks up the registry for this race and tier, then applies passives and skills
@@ -143,6 +153,9 @@ obj/Skills/Utility
 		desc="Request a Tier 1 genetic sample from a nearby player. They must consent. They can only ever donate one Tier 1 sample in their entire life."
 		verb/Collect_Sample()
 			set category="Utility"
+			if(usr.PerfectForm)
+				usr<<"You can no longer extract samples."
+				return
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to collect samples."
 				return
@@ -207,6 +220,9 @@ obj/Skills/Utility
 		desc="Forcibly extract a Tier 2 sample from a KO'd target. Severely wounds them. Grants both the Tier 1 and Tier 2 sample of their race."
 		verb/Force_Extract()
 			set category="Utility"
+			if(usr.PerfectForm)
+				usr<<"You can no longer extract samples."
+				return
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to extract samples."
 				return
@@ -273,6 +289,9 @@ obj/Skills/Utility
 		desc="Install a Tier 2 genetic sample of any race directly. Costs a large amount of Mana Bits. No donor required."
 		verb/Bio_Augmentation()
 			set category="Utility"
+			if(usr.PerfectForm)
+				usr<<"You can no longer augment yourself."
+				return
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to install samples."
 				return
@@ -320,4 +339,32 @@ obj/Skills/Utility
 			usr.TakeMoney(Cost)
 			usr.GiveBioSample(race_choice, 2)
 			OMsg(usr, "[usr] installs a Tier 2 [race_choice] sample.")
+			usr.Using = 0
+	Become_Perfect
+		desc="Sacrifice 3 of your Tier 2 Bio Android samples to unlock your Perfect Form."
+		verb/Bio_Augmentation()
+			set category="Utility"
+			if(!usr.BioAndroid)
+				usr << "You need Biological Cybernetics installed to install samples."
+				return
+			if(usr.Using)
+				usr << "You are already running an operation."
+				return
+			usr.Using = 1
+			var/Samples
+
+			var/list/Choices = list("Cancel")
+			var/race_choice = input(usr, "Which Tier 2 sample do you want to remove?", "Bio Augmentation") in Choices
+			for(var/race_name in BIO_SAMPLE_DEFS)
+				if(usr.HasBioSample(race_name, 2))
+				//	continue
+					Choices += race_name
+					Samples++
+			if(Samples<3)
+				usr<<"You need at least 3 tier 2 samples to use this!"
+				usr.Using = 0
+				return
+
+			usr.PerfectForm=1
+			usr.RemoveBioSample(race_choice, 2)
 			usr.Using = 0

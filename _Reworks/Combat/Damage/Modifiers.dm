@@ -6,7 +6,7 @@ globalTracker/var/SYMBIOTE_DMG_TEST = 2
     if(HasHardStyle())
         . += (defender.TotalInjury/20) * (GetHardStyle() / glob.HARD_STYLE_DMG_BOON_DIVISOR)
     if(passive_handler.Get("CheapShot"))
-        . += (defender.TotalInjury/glob.CHEAP_SHOT_DIVISOR) * (passive_handler.Get("CheapShot"))
+        . += (defender.TotalInjury/glob.CHEAP_SHOT_DIVISOR) * (passive_handler.Get("CheapShot") + GetMangLevel())
     if(HasCyberStigma())
         if(defender.CyberCancel || defender.Mechanized || defender.Saga == "King of Braves")
             var/mana = defender.ManaAmount
@@ -31,7 +31,7 @@ globalTracker/var/SYMBIOTE_DMG_TEST = 2
                 . += percent
         else
             . += forced
-        if(defender.HasNull())
+        if(defender.HasNull() && !isRace(DEMIFIEND) && !defender.isRace(DEMIFIEND) && !istype(src, /mob/Player/AI/Demon) && !istype(defender, /mob/Player/AI/Demon))
             . = 0;
 
 
@@ -42,18 +42,16 @@ globalTracker/var/
 #define VALID_SPEC_DMG_TYPE list("Holy", "Abyss", "Slayer", "Deicide")//only slayer is implemented atm
 /mob/proc/attackModifiers(mob/defender, list/forcedDmgList=list())
     var/godKiNerf = NO_GOD_KI_REDUCTION;
-    if(defender.HasGodKi() && !HasGodKi() && !HasNull()) godKiNerf += max(0, (glob.MORTAL_VS_GOD_SPEC_DMG_REDUCTION * defender.GetGodKi()));
-    if(passive_handler.Get("Enraged") && Anger)
-        if(!defender.Anger || Anger > defender.Anger)
-            . += passive_handler.Get("Enraged") / glob.ENRAGED_DAMAGE_DIVISOR
+    if(defender.HasGodKi() && !HasGodKi() && !HasNull() && !isRace(DEMIFIEND) && !defender.isRace(DEMIFIEND) && !istype(src, /mob/Player/AI/Demon) && !istype(defender, /mob/Player/AI/Demon)) godKiNerf += max(0, (glob.MORTAL_VS_GOD_SPEC_DMG_REDUCTION * defender.GetGodKi()));
+    if(passive_handler.Get("Enrage") && Anger)
+        if(!defender.Anger || Anger > defender.Anger||passive_handler.Get("Justice"))
+            . += passive_handler.Get("Enrage") / glob.ENRAGED_DAMAGE_DIVISOR
     var/forcedHoly = getForcedDamageType("Holy", forcedDmgList)
     if(HasHolyMod() || forcedHoly)
-        var/holyMag = max(HasHolyMod() ? GetHolyMod() : 0, forcedHoly)
-        . += HolyDamage(defender, holyMag) / glob.HOLY_DAMAGE_DIVISOR
+        . += (HolyDamage(defender, forcedHoly) / glob.HOLY_DAMAGE_DIVISOR)
     var/forcedAbyss = getForcedDamageType("Abyss", forcedDmgList)
     if(HasAbyssMod() || forcedAbyss)
-        var/abyssMag = max(HasAbyssMod() ? GetAbyssMod() : 0, forcedAbyss)
-        . += AbyssDamage(defender, abyssMag) / glob.ABYSS_DAMAGE_DIVISOR
+        . += (AbyssDamage(defender, forcedAbyss) / glob.ABYSS_DAMAGE_DIVISOR)
     . += GetSlayerMod(defender, getForcedDamageType("Slayer", forcedDmgList)) / glob.SLAYER_DAMAGE_DIVISOR; //validates within the GetSlayerMod proc, which does still need to be moved out of _binaryChecks
     if(passive_handler.Get("Deicide")) . += DeicideDamage(defender) / glob.DEICIDE_DAMAGE_DIVISOR
     else . /= max(NO_GOD_KI_REDUCTION, godKiNerf);
@@ -80,7 +78,7 @@ globalTracker/var/
     var/found = 0
     if(HasBeyondPurity() || Z.BeyondPurity)
         if(HasHolyMod() || Z.HolyMod)
-            if(defender.IsGood())
+            if(defender.IsGood()&&glob.BEYOND_PURITY_AUTOHIT)
                 found = 1
         if(found)
             return TRUE
