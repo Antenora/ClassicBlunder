@@ -306,6 +306,7 @@ mob/var
 	//Knowledge Variables
 	list/UnlockedTechnology=list()//this will hold the types of unlocked technology AND enchantment
 	list/PotionTypes=list()//determines what herbs you can use
+	list/InkworksTypes=list() // Determines what Inkworks you can inscribe
 
 	GrimoiresMade//Holds how many Grimoire types you've made total
 
