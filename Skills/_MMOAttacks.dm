@@ -300,6 +300,7 @@ obj/Skills
 			Dodgeable=0
 			DirOverride=2
 			Crippling=10
+			ignoreBetterAim = TRUE // my fucking god tigers what did you do
 			Piercing=1
 			Striking=1
 			ManaCost=0
