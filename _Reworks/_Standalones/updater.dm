@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 33
+	var/UPDATE_VERSION = 34
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -740,6 +740,14 @@ update
 						p.passive_handler.Increase("PureReduction", 1)
 						p.passive_handler.Increase("Adrenaline", 1)
 						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
+	version34
+		version = 34
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(DRAGON))
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/dr in p.contents)
+					dr.adjust(p);
+					p << "Your Dragon Rage has been adjusted to scale with health!"
 /globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
 /globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
 /globalTracker/var/GAJA_MAX_EXCHANGE = 1

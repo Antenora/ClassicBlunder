@@ -3,6 +3,7 @@
     var/b = passive_handler.Get("Brutalize") //This stores stuff from sources of brutalize... yay.
     if(!b) return 0
     b += GetMangLevel()*0.5
+    b += (scalingEldritchPower()*0.5);
     var/raw = b / 10 //legacy scaling
     // Brutalize now ignores endurance linearly up to a soft cap of 30%
     var/soft_cap = 0.3 // fraction of endurance ignored where diminishing returns kick in.

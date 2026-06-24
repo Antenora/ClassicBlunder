@@ -312,7 +312,7 @@ mob
 				src.RecordCombatEvent("Hit [defender] for [round(val,0.1)]")
 				defender.RecordCombatEvent("Hit by [src] for [round(val,0.1)]")
 
-			src.ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
+			ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
 
 			if(defender.Flying)
 				var/obj/Items/check = defender.EquippedFlyingDevice()
@@ -818,6 +818,25 @@ mob
 					return
 			if(defender.Health<=0&&!defender.KO)
 				defender.Unconscious(src)
+				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
+					defender.client.PlaySwoon()
+					defender.Maimed+=1
+					defender.recordMaim(src, "Combat")
+					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
+				if(passive_handler.Get("MaimKOStrike") && defender.client)
+					var/getup = defender.MaimKOGetups
+					var/limit = passive_handler.Get("MaimKOStrike")
+					defender.Maimed+=1
+					defender.MaimKOGetups+=1
+					defender.recordMaim(src, "Combat")
+					OMsg(defender, "<font color='red'><font size=+1><b>[defender] got maimed and knocked down by [src]...</b></font size></font color>")
+					if (getup < limit)
+						defender.KOTimer = 30
+						OMsg(defender, "<font color='green'><font size=+1><b>... but [defender] can still fight! ([defender] can get back into the fight once they get back up!)</b></font size></font color>")
+					if (getup >= limit)
+						OMsg(defender, "<font color='red'><font size=+1><b>[defender] cannot fight any longer.</b></font size></font color>")
+						defender.RPModeSwitch()
+						defender << "<b>You've been set to RP Mode as you cannot fight any longer for this encounter.</b>"
 			else if(defender.KO&&src.Lethal)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)
@@ -851,14 +870,33 @@ mob
 					val=0.05
 
 			if(defender.passive_handler.Get("BossStagger") && !defender.passive_handler.Get("Staggered!"))
-				defender.StaggerMeter+=min(max(val, 0.1), 1.5)
+				defender.StaggerMeter+=min(max(val, 0.1), 1.5)*defender.StaggerMult
 				if(prob(2))
-					defender.StaggerMeter+=2
+					defender.StaggerMeter+=2*defender.StaggerMult
+				defender.UpdateBossStaggerBar()
 				if(defender.StaggerMeter>=100)
+					defender.HideBossStaggerBar()
 					defender.StaggerMeter=0
+					var/StunStacking = 0
+					if(defender.Stunned > 0) //Was already stunned
+						StunStacking = 1
 					Stun(defender, 15, TRUE)
+					if(StunStacking == 1)
+						defender.last_stunned = defender.last_stunned + 150
+					KKTShockwave(defender, icon='KenShockwaveGold.dmi', Size=4, Time=16)
 					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
 					defender.passive_handler.Set("Staggered!", 1)
+
+			if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic"))
+				var/meterGain = min(max(val,0.1), 0.9)
+				HyperdeathMeterCurrent=min(HyperdeathMeterCurrent+meterGain, 100)
+				HyperMeterUpdate()
+
+			if((defender.Saga=="Path of a Hero: Rebirth") && (defender.RebirthHeroType=="Prismatic"))
+				var/meterGain = min(max(val,0.1), 0.2)
+				defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)
+				defender.HyperMeterUpdate()
+
 			return val
 
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
@@ -1049,9 +1087,9 @@ mob
 							val+=(-1)*src.Sheared
 							src.Sheared=0
 						else
-							val=val*0.5
-					else if(!src.IsDarkDragonPlayer() && src.Frenzy > 0)
-						val=val*0.5
+							val *= 0.5
+					else if(!IsDarkDragonPlayer() && Frenzy > 0)
+						val *= 0.5
 				else
 					if(src.Sheared > 0)
 						src.Sheared-=val
@@ -1059,9 +1097,9 @@ mob
 							val=(-1)*src.Sheared
 							src.Sheared=0
 						else
-							val=val/4
-					else if(!src.IsDarkDragonPlayer() && src.Frenzy > 0)
-						val=val/4
+							val /= 4
+					else if(!IsDarkDragonPlayer() && Frenzy > 0)
+						val /= 4
 			if(icon_state == "Meditate")
 				src.Tension=max(0, Tension-(val*1.5))
 			if(passive_handler["Staked"])

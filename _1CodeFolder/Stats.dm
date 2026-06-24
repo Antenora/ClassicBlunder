@@ -988,11 +988,11 @@ mob/proc/
 					Ratio*=1.5
 		if(passive_handler.Get("Ashen One"))
 			Ratio*=1+(Burn/glob.ASHEN_BURN_POWER_DIVISOR)
-		Ratio += (scalingEldritchPower() * 2 / 10);
+		Ratio *= (1 + (scalingEldritchPower()*0.5))
 		if(passive_handler.Get("NameCurse")=="Black Ant")
 			Ratio*=0.01
 
-		if(src.Dead&&!src.KeepBody)
+		if(Dead&&!HasEnlightenment())
 			Ratio*=0.5
 		else if(src.z==glob.DEATH_LOCATION[3]&&!src.CheckSpecial("Cancer Cloth")&&src.SenseUnlocked<8&&!src.passive_handler.Get("SpiritPower"))
 			Ratio*=0.5

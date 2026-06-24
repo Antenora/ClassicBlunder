@@ -4249,6 +4249,22 @@ NEW VARIABLES
 				DesperateMessage = " calls upon the of bravery for one final push!"
 				Trigger(usr, TRUE)
 
+			verb/Bravery_PowerGlowEdit()
+				set name = "Edit Bravery's PowerGlow"
+				set category = "Utility"
+				if(!usr || src.loc != usr)
+					return
+				var/chosen_color = input(usr,"Choose this skill's glow color.","Edit Bravery's PowerGlow") as color
+				if(!chosen_color)
+					return
+				var/brightness = input(usr,"Set glow brightness.\n1 = normal tint\n1.5 = bright\n2 = very bright","Power Glow Brightness",1.5) as num
+				brightness = min(max(brightness, 0), 3)
+				var/r = text2num("0x[copytext(chosen_color, 2, 4)]") / 255
+				var/g = text2num("0x[copytext(chosen_color, 4, 6)]") / 255
+				var/b = text2num("0x[copytext(chosen_color, 6, 8)]") / 255
+				PowerGlows = list(r * brightness, 0, 0, 0, g * brightness, 0, 0, 0, b * brightness, 0, 0, 0)
+
+				usr << "Power glow for [src] changed to [chosen_color] at [brightness]x brightness."
 
 			// verb/Broken_Brave()
 			// 	set category="Skills"
@@ -11574,16 +11590,17 @@ NEW VARIABLES
 				ActiveMessage="is consumed by a dragon's rage!"
 				OffMessage = "calms their draconic fury..."
 				adjust(mob/p)
+					NeedsHealth = 50 + (p.AscensionsAcquired*5);
+					TooMuchHealth = min(95, 75 + (p.AscensionsAcquired*5));
 
 				Dragons_Tenacity
-					NeedsHealth = 50
-					TooMuchHealth = 75
 
 					ActiveMessage = "forms a draconic shell!!"
 					OffMessage = "loses their draconic shell..."
 					adjust(mob/p)
 						if(altered) return
 						var/asc = p.AscensionsAcquired
+						..(p);
 						ElementalOffense = "Earth"
 						ElementalDefense = "Earth"
 						endAdd = 0.15 * asc
@@ -11596,14 +11613,12 @@ NEW VARIABLES
 
 				Heat_Of_Passion
 					// Fire Dragon Racial, mimics Berserk
-					NeedsHealth = 50
-					TooMuchHealth = 75
 					ActiveMessage = "ignites themselves in a blaze of passion!"
 					OffMessage = "calms their fiery passion..."
-					Cooldown = 120
 					adjust(mob/p)
 						if(altered) return
 						var/asc = p.AscensionsAcquired
+						..(p);
 						strAdd = 0.15 * asc
 						ElementalOffense = "Fire"
 						ElementalDefense = "Fire"
@@ -11616,14 +11631,12 @@ NEW VARIABLES
 
 				Wind_Supremacy
 					// Wind Dragon Racial
-					NeedsHealth = 50
-					TooMuchHealth = 75
 					ActiveMessage = "takes to the skies as the very winds heed their call!"
 					OffMessage = "finally graces the earth once again with their presence..."
-					Cooldown = 120
 					adjust(mob/p)
 						if(altered) return
 						var/asc = p.AscensionsAcquired
+						..(p);
 						spdAdd = 0.15 * asc
 						ElementalOffense = "Wind"
 						ElementalDefense = "Wind"
@@ -11635,33 +11648,31 @@ NEW VARIABLES
 							adjust(User)
 						..()
 				Frenzy_Mantle
-					NeedsHealth = 50
-					TooMuchHealth = 75
 					ActiveMessage = "adorns themselves in a mantle of dark energy... has your shadow always been this prominent?"
 					OffMessage = "releases their mantle of darkness..."
-					Cooldown = 120
 					adjust(mob/p)
 						if(altered) return
 						var/asc = p.AscensionsAcquired
+						..(p);
 						strAdd = 0.075 * asc
 						spdAdd = 0.075 * asc
 						ElementalOffense = "Dark"
 						ElementalDefense = "Dark"
+						NeedsHealth = 50 + (5*asc);
+						TooMuchHealth = min(95, 75 + (5*asc));
 						passives = list("PhysPleroma" = asc/2, "AbyssMod" = asc/2, \
-							"HellPower" = asc/6, "HellRisen" = asc/4, "Shadowbringer" = 1, "FrenzyCarrier" = 1)
+							"HellPower" = asc/6, "HellRisen" = asc/4, "Shadowbringer" = 1, "FrenzyCarrier" = 1, "Wrathful Tenacity" = (0.1*asc))
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
 							adjust(User)
 						..()
 				Radiant_Aegis
-					NeedsHealth = 50
-					TooMuchHealth = 75
 					ActiveMessage = "adorns themselves with a shield of radiant light, you feel your ability to do harm diminished!"
 					OffMessage = "loses their shield of light..."
-					Cooldown = 120
 					adjust(mob/p)
 						if(altered) return
 						var/asc = p.AscensionsAcquired
+						..(p);
 						ElementalOffense = "Light"
 						strAdd = 0.075 * asc
 						endAdd = 0.075 * asc

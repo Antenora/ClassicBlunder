@@ -3,7 +3,7 @@ mob/proc/gainShinigami()
 	src.Saga = "Shinigami"
 	src.SagaLevel = 1
 
-	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka", "Katen Kyokotsu")
+	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka", "Katen Kyokotsu", "Engetsu")
 	src.ShinigamiRelease = input("Which Release does [src] receive?", "Zanpakutō Release") in Releases
 
 	src.ZanpakutoClass = input(src, "What form does your Zanpakutō take?", "Zanpakutō Class") in list("Light", "Medium", "Heavy")
@@ -91,6 +91,9 @@ mob/tierUpSaga(Path)
 								src.AddSkill(new/obj/Skills/Projectile/Bushogoma)
 								src.AddSkill(new/obj/Skills/Takaoni)
 								src.AddSkill(new/obj/Skills/Kageoni)
+							if("Engetsu")
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanpakuto/Shikai/Engetsu)
+								src.AddSkill(new/obj/Skills/Projectile/Blazing_Getsuga_Tenshou)
 				updateShinigamiAscended()
 
 			if(3)
@@ -129,6 +132,12 @@ mob/tierUpSaga(Path)
 								if(!locate(/obj/Skills/Kageokuri, src))
 									src.AddSkill(new/obj/Skills/Kageokuri)
 								src << "You learn new games. You can now use <b>Irooni</b>, <b>Daruma-san ga Koronda</b>, and <b>Kageokuri</b>."
+							if("Engetsu")
+								if(!locate(/obj/Skills/AutoHit/BloodFireBurst, src))
+									src.AddSkill(new/obj/Skills/AutoHit/BloodFireBurst)
+									src<<"Your flames burn more brightly, at the cost of yourself."
+
+
 				updateShinigamiAscended()
 
 			if(4)
@@ -182,6 +191,11 @@ mob/tierUpSaga(Path)
 								src.AddSkill(new/obj/Skills/Sandanme)
 								src.AddSkill(new/obj/Skills/Shime_no_Dan)
 								src << "Your soul's despair takes the stage in the form of a four-act tragedy played out upon your foe."
+							if("Engetsu")
+								src.BankaiPrefix = input(src, "Your Bankai takes shape. What is your Zanpakutō's true name?", "Bankai Prefix") as text
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanpakuto/Bankai/Hisho_Engetsu)
+								src.AddSkill(new/obj/Skills/Utility/PhoenixDown)
+								src<<"The phoenix awakens inside you, but can you truly handle it's power?"
 				updateShinigamiAscended()
 
 			if(5)
@@ -212,6 +226,10 @@ mob/tierUpSaga(Path)
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui)
 							src << "Your blade shrouds you in an inferno of searing heat. You can now use <b>Nishi: Zanjitsu Gokui</b>."
+					if("Engetsu")
+						if(!locate(/obj/Skills/Projectile/BrilliantFireworks, src))
+							src.AddSkill(new/obj/Skills/Projectile/BrilliantFireworks)
+							src<<"The true form of your Bankai reveals itself to you. Let your feathers burn brightly, incinerating your enemies!"
 				updateShinigamiAscended()
 
 			if(6)

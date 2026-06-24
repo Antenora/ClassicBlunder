@@ -98,6 +98,10 @@ mob/var
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
 
+	//Path of a Hero
+	HyperdeathMeterCurrent=0
+	HyperdeathThreshold=100
+
 	//SHINIGAMI
 	ShinigamiRelease
 	AsauchiName
@@ -443,7 +447,7 @@ mob/Admin3/verb
 							if("Red")
 								confirm=alert(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Unsung Hero of Perseverance, the one who will never bend.", "Yes", "No")
 							if("Rainbow")
-								confirm=alert(P, "You will forever change the world around you, bringing beauty wherever you walk. And maybe look a little silly while doing it. (Commit to the silly or don't pick this path, cowards.)", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
+								confirm=alert(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
 
 					P.SagaLevel=1
 					switch(choice)
@@ -978,11 +982,13 @@ mob
 										src.AddSkill(new/obj/Skills/Utility/UltimateHeal)
 										src<<"You can also attempt to heal people, but the keyword is attempt."
 									if(src.RebirthHeroType=="Rainbow")
+										src.RebirthHeroType="Prismatic"
 										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One. (WIP)"
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
-										//src.AddSkill(new/obj/Skills/Buffs/Rebirth/Hyperdeath_Mode)
+										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
+										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
@@ -1002,11 +1008,15 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Unwavering_Soul)
 								src.AddSkill(new/obj/Skills/Queue/FistOfTheRedStar)
 								src.AddSkill(new/obj/Skills/Projectile/Beams/Unbelievable_Rage)
-
 							if(src.RebirthHeroType=="Rainbow")
 								src.AddSkill(new/obj/Skills/AutoHit/PowerWordGenderDysphoria)
 								src.AddSkill(new/obj/Skills/Grapple/CHAOS_DUNK)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Of_Chaos)
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
+								src<< "Your Chaos Buster has been upgraded!"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
 							if(src.RebirthHeroType=="Cyan")
@@ -1034,6 +1044,10 @@ mob
 								src.AddSkill(new/obj/Skills/AutoHit/MakeItCount)
 							if(src.RebirthHeroType=="Red")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Burning_Soul)
+							if(src.RebirthHeroType=="Prismatic")
+								src.HyperdeathThreshold=50
+								src<<"You now wield two Chaos Sabers at once!"
+								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
 							if(src.RebirthHeroType=="Blue")
@@ -1063,6 +1077,12 @@ mob
 									src.AddSkill(new/obj/Skills/Buffs/Rebirth/White_Pen_of_Hope)
 							if(src.RebirthHeroType=="Purple")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Justice_Incarnate)
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "Your happy ending... Your hopes, your dreams..."
+								src<< "It's not just those you're carrying on your back, are they?"
+								src<< "buff goes here"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
 							if(src.RebirthHeroType=="Cyan")
@@ -1078,6 +1098,11 @@ mob
 							if(src.RebirthHeroType=="Blue")
 								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/All_Hail_The_Crownless_King)
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
+							if(src.RebirthHeroType=="Prismatic")
+								src<< "The Hearts of the World resonate with Yours."
+								src<< "final buff goes here wooo"
+								src<< "You can access your Hyperdeath State earlier!"
+								src.HyperdeathThreshold=10
 				if("Cosmo")
 					tierUpSaga("Cosmo")
 				if("Shinigami")
