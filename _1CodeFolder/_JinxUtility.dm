@@ -22,7 +22,7 @@ mob
 	proc
 
 		AscAvailable()
-			src.potential_ascend(Silent=1)
+			potential_ascend();
 			if(race.ascensions.len==0) return
 			//If a prompt is already open from a prior call (e.g. spammed Meditate),
 			//bail — otherwise race subclass onAscension overrides re-apply their passive Increase() calls

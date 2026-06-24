@@ -12,7 +12,7 @@ race
 		passives = list("Void" = 1, "DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1, "BuffMastery"=5, "Obfuscated Origin" = 1, "SpaceWalk"=1, "StaticWalk"=1, "Fishman"=1)
 		locked = TRUE
 
-		power = 3.5
+		power = 1
 		strength = 1.5
 		endurance = 2
 		speed = 2

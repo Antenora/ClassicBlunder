@@ -8,7 +8,6 @@ ascension
 			offense = 0.25
 			defense = 0.25
 			speed = 0.25
-			intimidation = 5
 			passives = list("ManaCapMult" = 0.25, "Deicide" = 1, "Xenobiology" = 1, "SpiritFlow" = 1)
 			choices = list("Distort" = /ascension/sub_ascension/high_faoroan/distort, "Define" = /ascension/sub_ascension/high_faoroan/define)
 			skills = list(/obj/Skills/Buffs/SlotlessBuffs/Elf/God_Slicer)
@@ -34,7 +33,6 @@ ascension
 			defense = 0.5
 			speed = 0.5
 			passives = list("ManaCapMult" = 0.25, "Deicide" = 1, "Xenobiology" = 1)
-			intimidation = 10
 			skills = list(/obj/Skills/AutoHit/Elf/Silence)
 			postAscension(mob/owner)
 				if(owner.race.ascensions[1].choiceSelected == /ascension/sub_ascension/high_faoroan/distort)
@@ -44,7 +42,6 @@ ascension
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 10
 			strength = 0.5
 			endurance = 0.5
 			force = 0.5
@@ -56,7 +53,6 @@ ascension
 			skills = list(/obj/Skills/AutoHit/Elf/Flee)
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 10
 			strength = 0.5
 			endurance = 0.5
 			force = 0.5

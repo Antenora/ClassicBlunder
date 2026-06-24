@@ -31,7 +31,6 @@
 		Wassail
 			Curse=1
 			Godspeed=1
-			Intimidation=1
 			LifeSteal=10
 			ActiveMessage="has entered Wassail -- the hunger frenzy!"
 			OffMessage="regains their sanity..."

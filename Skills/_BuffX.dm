@@ -480,7 +480,6 @@ NEW VARIABLES
 	var/FusionPowered
 	var/Overdrive//synergy with cyber bp, androids, fusion cores and cyber modules
 	var/OldEffortlessPU
-	var/Intimidation//showy power
 	var/Transform//triggers Transformations
 	var/ElementalOffense//changes your elemental offense
 	var/ElementalDefense//likewise
@@ -1874,7 +1873,6 @@ NEW VARIABLES
 			EndMult=1.3
 			SpdMult=1.3
 			MovementMastery=8
-			Intimidation=2
 			passives = list("MovementMastery" = 3, "PureDamage" = 2, "PureReduction" = 2, "Flicker" = 2)
 			PUSpeedModifier=2
 			PureDamage=2
@@ -1918,7 +1916,6 @@ NEW VARIABLES
 			adjust(mob/p)
 				passives = list("PureReduction" = p.Potential / 25, "GiantForm" = 1, "LifeGeneration" = p.Potential / 100)
 				PowerMult = 1.2 + p.Potential / 200
-				Intimidation = 2 + p.Potential / 200
 				StrMult = 1.2 + p.Potential / 200
 				ForMult = 1.2 + p.Potential / 200
 				EndMult = 1.3 + p.Potential / 200
@@ -2179,7 +2176,6 @@ NEW VARIABLES
 				LifeGeneration=0.5
 				Deflection=2
 				Reversal=0.1
-				Intimidation=1.25
 				AutoAnger=1
 				ActiveMessage="overflows with berserk demon chakra!"
 				OffMessage="can no longer bear the strain of channelling demon chakra..."
@@ -2232,15 +2228,12 @@ NEW VARIABLES
 								SuperSaiyanBuff = 1.3
 						ActiveMessage="is taken over by a violent rage as a mask forms on their face, tainting their golden aura!"
 					AngerMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
-					var/toTen = (10 / max(1, usr.Intimidation)) * (10 * Mastery) // give them 100 per mastery
-					Intimidation = 1 + toTen
 					passives = list("Maki" = 1, "Curse" = 1, "AutoAnger" = 1, "VaizardHealth" = 1)
 					var/pRedBoost = 0
 					var/pDmgBoost = 0
 					switch(p.VaizardType)
 						if("Berserker")
 							VaizardHealth=1
-							Intimidation *= 1.25
 							pDmgBoost = 1
 							StrMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
 							OffMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
@@ -3728,7 +3721,6 @@ NEW VARIABLES
 					ForMult=1.1
 					SpdMult=1.7
 					HairLock=1
-					Intimidation=0.25
 					ArmorIcon='goldsaintleo_armor.dmi'
 					TopOverlayLock='goldsaintleo_helmet.dmi'
 					ActiveMessage="dons the Gold Cloth of Leo, embracing its intimidating ferocity!"
@@ -3739,7 +3731,6 @@ NEW VARIABLES
 						ForMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						SpdMult = 1.5 + ((player.SagaLevel-3) * 0.2)
 						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.75), "DoubleStrike" = 1 +(player.SagaLevel/2), "TripleStrike" = 1 + (player.SagaLevel/3))
-						Intimidation = (player.SagaLevel * 0.25)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -4103,7 +4094,6 @@ NEW VARIABLES
 			SwordYSecond=-32
 			TechniqueMastery=10
 			GodKi=0.5
-			Intimidation=2
 			AngerMult=2
 			QuickCast=2
 			Godspeed=2
@@ -7995,7 +7985,6 @@ NEW VARIABLES
 		Golden_Form /// simple, sweet, just a straight fuckin boost. Could in theory be thrown at a Changeling at any point in the wipe if their deserving
 			FlashChange = 1
 			PowerMult = 2
-			Intimidation = 25
 			ActiveMessage="begins to glow with Golden power that mocks the very power of the God's.."
 			OffMessage="ceases their Golden glow; as they lower themselves once more."
 			verb/Golden_Form()
@@ -8005,7 +7994,6 @@ NEW VARIABLES
 		Black_Form /// Admins have to willingly hand this out, okay?
 			DarkChange = 1
 			PowerMult = 10
-			Intimidation = 100
 			ActiveMessage="ascends abruptly in a black void shell; cackling with dimension-warping levels of power.."
 			OffMessage ="releases the universe-shattering power, as the black void upon their flesh evaporates..."
 			verb/Black_Form()
@@ -8336,7 +8324,6 @@ NEW VARIABLES
 			proc/init(mob/p)
 				if(altered) return
 				var/secretLevel = p.secretDatum.currentTier
-		//		Intimidation = 1 + secretLevel/4
 				passives = list("PUSpike" = 5 + (5 * secretLevel), "SpiritHand" = 0.25 * secretLevel, "FatigueLeak" = 6 - secretLevel)
 
 			verb/Jagan_Expert_Mode()
@@ -10047,7 +10034,6 @@ NEW VARIABLES
 				Curse=1
 				Godspeed=1
 				TechniqueMastery = 1
-				Intimidation = 1.5
 				HairLock='BLANK.dmi'
 				HitSpark='WolfFF.dmi'
 				HitX=0
@@ -10091,7 +10077,6 @@ NEW VARIABLES
 				AutoAnger=1
 				Pursuer=2
 				Godspeed=2
-				Intimidation=1.75
 				Curse=1
 				KenWave=4
 				KenWaveIcon='DarkKiai.dmi'
@@ -10941,7 +10926,6 @@ NEW VARIABLES
 						OffMessage="finishes their form with a flourish..."
 					Overbearing_Strength
 						passives = list("TensionLock" = 1,"StunningStrike" = 2)
-						Intimidation=1.5
 						ActiveMessage="continues their adrenaline high, throwing all of their strength into each attack!"
 						OffMessage="overexerts their strength, returning to their baseline..."
 					Artificial_Sword_God
@@ -10969,7 +10953,6 @@ NEW VARIABLES
 						ActiveMessage="whips a knife in a crippling butterfly pattern!"
 						OffMessage="finishes their cuts and hides the knife again..."
 					Unhinged_Ferocity
-						Intimidation=1.5
 						StrMult=1.5
 						SpdMult=1.5
 						passives = list("TensionLock" = 1)
@@ -11795,7 +11778,6 @@ NEW VARIABLES
 				SpdMult=1.5
 				AutoAnger=1
 				passives = list("SpecialBuffLock" = 1, "Curse" = 1, "Pursuer" = 1, "Flicker" = 1, "StunningStrike" = 1, "DoubleStrike" = 3, "TechniqueMastery" = 5, "MovementMastery" = 5, "QuickCast" = 2, "Godspeed" = 1)
-				Intimidation=1.25
 				Curse=1
 				Pursuer=1
 				Flicker=1
@@ -11958,7 +11940,6 @@ NEW VARIABLES
 				SpdMult=1.5
 				RecovMult=1.5
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1, "Curse" = 1, "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
-				Intimidation=2
 				AutoAnger=1
 				TooLittleMana=1
 				AuraLock='AntiAura.dmi'
@@ -12009,7 +11990,6 @@ NEW VARIABLES
 				TooMuchHealth = 90
 				Godspeed = 1
 				PowerMult=1.25
-				Intimidation=2
 				AutoAnger=1
 				ManaLeak=0.5
 				TooLittleMana=1
@@ -13415,12 +13395,6 @@ mob
 					src.SpecialBuff.passives["LifeGeneration"] = src.SpecialBuff.Mastery*0.25
 					src.SpecialBuff.PureReduction=(src.SpecialBuff.Mastery*1.25)
 					src.SpecialBuff.LifeGeneration=(src.SpecialBuff.Mastery*0.25)
-					if(src.SpecialBuff.Mastery==2)
-						src.SpecialBuff.Intimidation=1.5
-					if(src.SpecialBuff.Mastery==3)
-						src.SpecialBuff.Intimidation=2
-					if(src.SpecialBuff.Mastery==4)
-						src.SpecialBuff.Intimidation=3
 					if(!src.JinchuuType)
 						src.JinchuuType=input(src,"Choose your Jinchuuriki type!","Jinchuuriki Type") in list("Tyrant", "Catastrophe", "Dominator", "Juggernaut")
 					switch(JinchuuType)
@@ -13631,8 +13605,6 @@ mob
 				if(B.Transform=="Force")
 					transUnlocked=min(transUnlocked+1,4)
 					src.Transform()
-				else if(B.Transform=="Strong")
-					src.Intimidation*=1.5
 				else if(B.Transform=="Weak")
 					src.PowerBoost*=0.25
 				else if(B.Transform=="Weapon")
@@ -14496,10 +14468,8 @@ mob
 				src.Warping=B.Warping
 			if(B.Siphon)
 				src.EnergySiphon+=(0.1*B.Siphon)
-			if(B.Intimidation)
-				src.Intimidation*=B.Intimidation
 			if(B.PridefulRage)
-				src.PridefulRage+=1
+				src.PridefulRage+=B.PridefulRage
 			if(B.DefianceRetaliate)
 				src.DefianceRetaliate+=B.DefianceRetaliate
 			if(B.FusionPowered)
@@ -15054,10 +15024,8 @@ mob
 				src.Warping=0
 			if(B.Siphon)
 				src.EnergySiphon-=(0.1*B.Siphon)
-			if(B.Intimidation)
-				src.Intimidation/=B.Intimidation
 			if(B.PridefulRage)
-				src.PridefulRage-=1
+				src.PridefulRage-=B.PridefulRage
 			if(B.DefianceRetaliate)
 				src.DefianceRetaliate-=B.DefianceRetaliate
 				src.DefianceCounter=0
@@ -15222,9 +15190,7 @@ mob
 				information = B.OldInformation
 				B.OldInformation = null
 			if(B.Transform)
-				if(B.Transform=="Strong")
-					src.Intimidation/=1.5
-				else if(B.Transform=="Weak")
+				if(B.Transform=="Weak")
 					src.PowerBoost/=0.25
 				else if(B.Transform=="Force")
 					transUnlocked=max(transUnlocked-1,0)

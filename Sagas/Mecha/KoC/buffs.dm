@@ -11,7 +11,6 @@
 		var/mult = clamp((0.05 * piloting) * sLevel, 0.05, 1)
 		OffMult = 1 + mult
 		DefMult = 1 + mult
-		Intimidation = 1 + sLevel/6
 		if(sagaInfo.choicesPaths["1"] == "Endless Evolution" && sLevel>=2)
 			switch(sagaInfo.pathsPicked)
 				if("Overwhelming Force")
