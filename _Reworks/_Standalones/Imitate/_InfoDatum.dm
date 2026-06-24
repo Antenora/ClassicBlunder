@@ -70,52 +70,70 @@ characterInformation/proc/loadProfile(mob/p, file_name, infoDump)
 
     
 /mob/var/Imitating = FALSE
+#define MAX_PROFILES 5
+
+mob/proc/ProfileSave(presetName)
+    if(!presetName) return 0
+    var/savefile/F = new("[PROFILE_SAVING_PATH][ckey].sav")
+    F.cd = "/profiles/[presetName]"
+    F["pname"] << name
+    F["profile"] << Profile
+    F["textColor"] << Text_Color
+    F["emoteColor"] << Emote_Color
+    F["appearance"] << appearance       // full look, icon + overlays + underlays
+    return 1
+
+mob/proc/ProfileList()
+    var/savefile/F = new("[PROFILE_SAVING_PATH][ckey].sav")
+    F.cd = "/profiles"
+    var/list/out = list()
+    for(var/n in F.dir)
+        out += n
+    return out
+
+mob/proc/ProfileLoad(presetName)
+    if(!presetName) return 0
+    var/savefile/F = new("[PROFILE_SAVING_PATH][ckey].sav")
+    F.cd = "/profiles"
+    if(!(presetName in F.dir)) return 0
+    F.cd = "/profiles/[presetName]"
+    var/app; F["appearance"] >> app
+    var/nm; F["pname"] >> nm
+    var/prof; F["profile"] >> prof
+    var/tc; F["textColor"] >> tc
+    var/ec; F["emoteColor"] >> ec
+    if(app) appearance = app             // swaps icon + overlays as one unit
+    if(nm) name = nm
+    Profile = prof
+    if(!isnull(tc)) Text_Color = tc
+    if(!isnull(ec)) Emote_Color = ec
+    return 1
+
 /mob/verb/Save_Profile()
     set category = "Roleplay"
-    var/profileName = input(src, "What is the preset name of this profile?") as text
-    if(!profileName)
+    var/pname = input(src, "Name this profile:") as null|text
+    if(!pname) return
+    pname = replacetext(pname, "/", "-")   // keep it a valid savefile key
+    var/list/existing = ProfileList()
+    var/cnt = existing.len
+    if("Default" in existing) cnt--        // the auto Default doesn't count against the limit
+    if(!(pname in existing) && cnt >= MAX_PROFILES)
+        src << "You have too many saved profiles (max [MAX_PROFILES])."
         return
-    var/list/usedSlots = list()
-    var/reuseIndex = 0
-    for(var/x in flist("[PROFILE_SAVING_PATH]/[ckey]/"))
-        if(!findtext(x,"Custom_Profile"))
-            continue
-        var/idx = text2num(copytext(x,length(x)-5, length(x)-4))
-        if(!idx)
-            continue
-        usedSlots += idx
-        var/read = file("[PROFILE_SAVING_PATH]/[ckey]/[x]")
-        var/data = json_decode(file2text(read))
-        if(data && data["presetName"] == profileName)
-            reuseIndex = idx
-    var/targetIndex = reuseIndex
-    if(!targetIndex)
-        if(usedSlots.len >= 5)
-            src << "You have too many saved profiles bro."
-            return
-        for(var/i = 1 to 5)
-            if(!(i in usedSlots))
-                targetIndex = i
-                break
-    src<<"You currently have [usedSlots.len] profiles"
-    information.takeInformation(src, null, profileName, "Custom_Profile", FALSE, targetIndex)
+    ProfileSave(pname)
+    src << "Saved profile '[pname]'."
 
 /mob/verb/Swap_Profiles()
     set category = "Roleplay"
     if(Imitating)
         src << "You can't swap profiles while imitating another person."
         return
-    var/list/presetNames = list()
-    var/list/data = list()
-    for(var/x in flist("[PROFILE_SAVING_PATH]/[ckey]/"))
-        var/read = file("[PROFILE_SAVING_PATH]/[ckey]/[x]")
-        read = json_decode(file2text(read))
-        data[read["presetName"]] += read
-        presetNames += read["presetName"]
-    var/pickedProfile = input(src, "what one?") in presetNames + "Cancel"
-    information.loadProfile(src, FALSE, data[pickedProfile])
-    sleep(1) // prob isnt needed but to make sure
-    swapToProfileVars(FALSE)
-
-// THIS COULD BE DONE BETTER / MORE EFFECIENT I KNOW
-// NO REASON TO READ UP HERE AND NOT PASS THE WHOLE THING TO THE NEXT ONE
+    var/list/existing = ProfileList()
+    if(!("Default" in existing))           // first swap
+        ProfileSave("Default")
+        existing = ProfileList()
+    if(!existing.len) return
+    var/picked = input(src, "Swap to which profile?", "Swap Profiles") as null|anything in existing
+    if(!picked) return
+    if(ProfileLoad(picked))
+        src << "Swapped to '[picked]'."

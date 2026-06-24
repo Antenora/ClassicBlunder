@@ -763,20 +763,15 @@ mob/Players/verb
 		usr.verb_delay=world.time+1
 		usr.AppearanceOff()
 		usr.AppearanceOn()
-	Screen_Size()
-		set category="Other"
-		set hidden=1
-		if(!(world.time > usr.verb_delay)) return
-		usr.verb_delay=world.time+1
-		var/screenmax = 31
-		if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasImprovement("Senses"))
-			screenmax = 71
-		var/screenx=input("Enter the width of the screen, max is [screenmax].") as num
-		screenx=min(max(1,screenx),screenmax)
-		var/screeny=input("Enter the height of the screen, max is [screenmax].") as num
-		screeny=min(max(1,screeny),screenmax)
-		client.view="[screenx]x[screeny]"
-		src.ScreenSize = "[screenx]x[screeny]"
+	Customize_PoweredState_Menu()
+		set category="Utility"
+		set name="Customize: Powered State"
+		for(var/obj/O in usr)
+			for(var/v in O.verbs)
+				if("[v:name]" == "Customize Powered State")
+					call(O, v)()
+					return
+		usr << "You need Ki Control (use Meditation first) to customize your powered state."
 	Text_Color_Say()
 		set category="Other"
 		set name="Text Color: IC"
@@ -799,50 +794,68 @@ mob/Players/verb
 		set category="Other"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		var/View={"<html><head><title>Who</title><body>
-<font size=3><font color=red>Player Panel:<hr><font size=2><font color=black>"}
 		var/list/people=new
 		for(var/mob/M in players)
 			if(M.client)
 				people.Add(M.key)
 		var/list/sortedpeople=dd_sortedTextList(people,0)
 		var/online=0
+		var/View = {"<html><head><title>Who</title>
+<style>
+body{margin:0;background:#0d1730;color:#d8f6ff;font-family:Verdana,Arial,sans-serif;font-size:12px;}
+.wrap{border:2px solid #45c7e0;margin:8px;padding:10px;background:#132447;}
+h2{margin:0 0 8px 0;color:#8be9ff;font-size:16px;letter-spacing:1px;}
+.summary{color:#55ee55;font-weight:bold;margin-top:8px;}
+table{width:100%;border-collapse:collapse;}
+th{color:#ffd76b;text-align:left;border-bottom:1px solid #45c7e0;padding:4px 6px;}
+td{border-bottom:1px solid #2e6682;padding:4px 6px;vertical-align:top;}
+.num{text-align:right;white-space:nowrap;}
+.row{border-top:1px solid #2e6682;padding:5px 0;}
+.row:first-of-type{border-top:0;}
+a{color:#8be9ff;}
+</style></head><body><div class='wrap'><h2>WHO</h2>"}
 		if(usr.Admin)
 			View+={"
-					<table border=1 cellspacing=6>
+					<table>
 					<tr>
-					<th><font size=2>Key (IC Name)</th>
-					<th><font size=2>Race (Class)</th>
-					<th><font size=2>Location</th>
-					<th><font size=2>Base (BaseMod )/ Age Category</th>
-					<th><font size=2>Reward Points: Spent, Spendable, Total (Race Excluded)</th>
+					<th>Key (IC Name)</th>
+					<th>Race</th>
+					<th>Location</th>
+					<th class='num'>Base</th>
+					<th>Age</th>
+					<th class='num'>Spent</th>
+					<th class='num'>Spendable</th>
+					<th class='num'>Total</th>
+					<th class='num'>Race Excl.</th>
 					</tr>"}
 			for(var/x in sortedpeople)
 				for(var/mob/M in players)
 					if(M.key==x)
 						online++
+						var/race_excluded = round((M.RPPSpent + M.RPPSpendable) / M.RPPMult, 1)
 						View+={"<tr>
-							<td><font size=2>[M.key] ([M.name])/(<a href=?src=\ref[M];action=MasterControl>x</a href>)</td>
-							<td><font size=2>[M.race.name]</td>
-							<td><font size=2>[M.loc] ([M.x],[M.y],[M.z])</td>
-							<td><font size=2>[M.Base]([M.potential_power_mult]) / [M.EraBody]</td>
-							<td><font size=2>[M.RPPSpent], [M.RPPSpendable], [M.RPPSpendable+M.RPPSpent] ([round((M.RPPSpent+M.RPPSpendable)/M.RPPMult,1)])</td>
+							<td>[M.key] ([M.name]) <a href=?src=\ref[M];action=MasterControl>x</a></td>
+							<td>[M.race.name]</td>
+							<td>[M.loc] ([M.x],[M.y],[M.z])</td>
+							<td class='num'>[M.Base] ([M.potential_power_mult])</td>
+							<td>[M.EraBody]</td>
+							<td class='num'>[M.RPPSpent]</td>
+							<td class='num'>[M.RPPSpendable]</td>
+							<td class='num'>[M.RPPSpendable + M.RPPSpent]</td>
+							<td class='num'>[race_excluded]</td>
 							</tr>"}
 						break
-			View+={"</table"><br>"}
+			View+={"</table>"}
 		else
 
 			for(var/x in sortedpeople)
 				online++
-				View+="[x]<br>"
-		View+="<font color=green><b>Online:</b> [online]"
+				View+="<div class='row'>[x]</div>"
+		View+="<div class='summary'>Online: [online]</div></div></body></html>"
 		if(usr.Admin)
 			usr<<browse("[View]","window=Logzk;size=900x450")
 		else
-			usr<<browse("[View]","window=Logzk;size=150x400")
-
-
-
+			usr<<browse("[View]","window=Logzk;size=240x420")
 	Character_Description()
 		set category="Roleplay"
 		if(!(world.time > usr.verb_delay)) return

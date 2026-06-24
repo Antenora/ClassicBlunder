@@ -5314,6 +5314,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Z)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -5835,6 +5836,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Z)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -6218,6 +6220,7 @@ obj
 				var/elem_mana_red = owner.getSpellElementManaCostReduction(Z.SpellElement)
 				if(elem_mana_red)
 					computed_drain *= (1 - elem_mana_red)
+				computed_drain *= owner.ChakraCostMult(Z)
 				if(computed_drain <= 0)
 					computed_drain = 0.5
 				if(owner.TomeSpell(Z))

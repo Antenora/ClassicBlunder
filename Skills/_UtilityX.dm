@@ -13,6 +13,8 @@
 	ManaAmount=ManaMax*GetManaCapMult()
 	Burn=0
 	Poison=0
+	Bleed=0
+	Frenzy=0
 	Slow=0
 	Shock=0
 	Shatter=0

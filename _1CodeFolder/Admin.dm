@@ -829,6 +829,43 @@ mob/proc/AdminResolveTargetedContent(atom/A)
 			return O
 	return firstTypeMatch ? firstTypeMatch : A
 
+mob/proc/AdminEditAtom(atom/A)
+	if(!A) return
+	if(A.type in typesof(/obj/Items))
+		if(A?:Augmented) A?:EditAll(src)
+	else if(A.type in typesof(/obj/Skills))
+		if(length(A?:possible_skills) > 1) A?:EditAll(src)
+	else if(istype(A, /obj/AI_Spot))
+		A?:EditAI(src)
+	var/list/exclude = list("Package","bound_x","bound_y","step_x","step_y","Admin","Profile","GimmickDesc","NoVoid","BaseProfile","Form1Profile","Form2Profile","Form3Profile","Form4Profile","Form5Profile","ai_owner")
+	if(src.Admin <= 3) exclude += list("passive_handler","race")
+	var/out = "<html><body bgcolor=#000000 text=#339999 link=#99FFFF>[A]<br>[A.type]<table width=10%>"
+	for(var/C in A.vars)
+		if(C in exclude) continue
+		var/value = Value(A.vars[C])
+		out += "<tr><td><a href='byond://?src=\ref[A];action=edit;var=[C]'>[C]</a></td>"
+		if(isdatum(A.vars[C]))
+			out += "<td><a href='byond://?src=\ref[A.vars[C]];action=edit;var=[C]'>[value]</a></td></tr>"
+		else
+			out += "<td>[value]</td></tr>"
+		CHECK_TICK
+	out += "</table></body></html>"
+	src << browse(out, "window=[A];size=450x600")
+
+client/proc/ShowAdminContents(mob/M)
+	if(!M || !mob || !(mob.Admin || glob.TESTER_MODE)) return
+	var/out = "<html><head><style>body{background:#0b0f17;color:#cfe7ff;font-family:Verdana;font-size:11px;margin:8px;} a{color:#8be9ff;text-decoration:none;} a:hover{text-decoration:underline;} .hd{color:#ffffff;font-size:13px;font-weight:bold;} .row{padding:3px 2px;border-bottom:1px solid #16273a;} .ty{color:#5d7a90;font-size:10px;} .del{color:#ff6b6b;}</style></head><body>"
+	out += "<div class='hd'>Contents of [M] <span class='ty'>([M.key ? M.key : "no key"])</span></div>"
+	out += "<a href='byond://?src=\ref[mob];action=ac_refresh;m=\ref[M]'>Refresh</a><hr>"
+	var/cnt = 0
+	for(var/obj/O in M.contents)
+		if(O.AdminInviso) continue
+		cnt++
+		out += "<div class='row'><a href='byond://?src=\ref[mob];action=ac_edit;it=\ref[O];m=\ref[M]'>[O.name]</a> <span class='ty'>[O.type]</span> &mdash; <a class='del' href='byond://?src=\ref[mob];action=ac_del;it=\ref[O];m=\ref[M]'>delete</a></div>"
+	if(!cnt) out += "<div class='ty'>(empty)</div>"
+	out += "</body></html>"
+	mob << browse(out, "window=admincontents;size=480x560")
+
 // Overwatch helpers — used by /mob/Admin4/verb/Overwatch dropdown.
 // Tier 4 only. Designed for an observer/balance role: silently watch
 // players, follow them, snapshot their state, all without breaking RP.
@@ -3178,6 +3215,17 @@ mob/Topic(href,href_list[])
 	if(Admin)
 		var/mob/Admin2/adminSelf = usr
 		switch(href_list["action"])
+			if("ac_edit")
+				var/atom/it = locate(href_list["it"])
+				if(it) AdminEditAtom(it)
+			if("ac_del")
+				var/atom/it = locate(href_list["it"])
+				if(it)
+					Log("Admin","[ExtractInfo(usr)] deleted [it]([it.type]) via View Contents.")
+					del it
+				if(client) client.ShowAdminContents(locate(href_list["m"]))
+			if("ac_refresh")
+				if(client) client.ShowAdminContents(locate(href_list["m"]))
 			if("listview")
 				if(!Admin) return
 				list_view(locate(href_list["list"]),href_list["title"])

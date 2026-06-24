@@ -654,6 +654,7 @@ NEW VARIABLES
 
 			verb/Customize_Powered_State()
 				set category="Utility"
+				set hidden = 1   
 				var/list/Options=list("Cancel", "Overlay", "Top Overlay", "Aura", "Hair", "Text")
 				Options.Add("Base")
 				var/Option=input("What aspect do you wish to customize?", "Ki Control Customize") in Options
@@ -12832,13 +12833,14 @@ mob
 								src << "You don't have enough energy to activate [B]."
 							return
 					if(B.ManaCost && !src.HasDrainlessMana())
+						var/drain = B.ManaCost * src.ChakraCostMult(B)
 						if(!src.TomeSpell(B))
-							if(src.ManaAmount<B.ManaCost)
+							if(src.ManaAmount<drain)
 								if(!B.Autonomous)
 									src << "You don't have enough mana to activate [B]."
 								return FALSE
 						else
-							if(src.ManaAmount<B.ManaCost*(1-(0.45*src.TomeSpell(B))))
+							if(src.ManaAmount<drain*(1-(0.45*src.TomeSpell(B))))
 								if(!B.Autonomous)
 									src << "You don't have enough mana to activate [B]."
 								return FALSE
@@ -14508,10 +14510,11 @@ mob
 				var/drain = passive_handler["Drained"] ? B.EnergyCost * (1 + passive_handler["Drained"]/10) : B.EnergyCost
 				src.LoseEnergy(drain)
 			if(B.ManaCost)
+				var/drain = B.ManaCost * src.ChakraCostMult(B)
 				if(!src.TomeSpell(B))
-					src.LoseMana(B.ManaCost)
+					src.LoseMana(drain)
 				else
-					src.LoseMana(B.ManaCost*(1-(0.45*src.TomeSpell(B))))
+					src.LoseMana(drain*(1-(0.45*src.TomeSpell(B))))
 				if(B.CorruptionGain)
 					gainCorruption((B.ManaCost / 1.5) * glob.CORRUPTION_GAIN)
 			if(B.ResourceCost)

@@ -44,6 +44,7 @@ client/proc/outputToChat(text, list/channels)
 
 client/verb/Toggle_Channels()
 	set category="Other"
+	set hidden = 1   
 	var/selection=input("Select a toggle option.")in list("Toggle OOC","Toggle All Tab OOC","Toggle IC Tab LOOC","Toggle All Tab LOOC")
 	switch(selection)
 		if("Toggle OOC")
@@ -61,6 +62,7 @@ client/verb/Toggle_Channels()
 
 client/verb/OOC(T as text)
 	set category = "Other"
+	set hidden = 1   
 	if(!T||length(T)<1) return
 	if(!OOC_Check(T)) return
 	if(!usr.Admin) T=copytext(T,1,700)

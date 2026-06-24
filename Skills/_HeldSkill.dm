@@ -60,9 +60,6 @@
 
 /client/New(topicdata)
 	..()
-	// Kick off the initial macro scan shortly after connect so it's ready before
-	// the player reaches gameplay. Runs every 5 minutes in the background after that.
-	spawn(5) RebuildHeldSkillKeyCache()
 
 // Charge state
 
@@ -76,6 +73,7 @@
 	var/tmp/held_skill_macro_key          = null
 	var/tmp/held_skill_last_release       = 0
 	var/tmp/held_skill_from_macro         = 0
+	var/tmp/held_skill_pending_key        = null   
 
 
 /proc/_normalizeHeldName(s)
@@ -123,6 +121,8 @@
 /mob/proc/BeginHeldSkill(var/obj/Skills/Z)
 	var/from_macro = held_skill_from_macro && (world.time - held_skill_from_macro) <= HELD_MACRO_FLAG_WINDOW
 	held_skill_from_macro = 0
+	var/hotbar_key = held_skill_pending_key  
+	held_skill_pending_key = null
 
 	if(held_skill) return  // Already charging something
 	if(!Z || !Z.HeldSkill) return
@@ -135,14 +135,13 @@
 
 	// All guards run before touching any charge state.
 
-	if(!C.held_skill_key_cache)
-		var/elapsed_s = C.held_skill_cache_build_start > 0 ? round((world.time - C.held_skill_cache_build_start) / 10) : 0
-		var/remaining_s = max(0, 10 - elapsed_s) + 30
-		src << "<font color='red'>Macro bindings are still loading. Try again in [remaining_s] seconds.</font>"
+	var/list/keys
+	if(hotbar_key)
+		keys = list(hotbar_key)
+		from_macro = TRUE
+	else
+		src << "<font color='red'>Put [Z.name] in a hotbar slot and hold its key from there.</font>"
 		return
-
-	// Every key this skill is bound to, for supporting the same skill on 2+ keys
-	var/list/keys = findHeldSkillKeys(C, Z)
 
 	// Clicked from the verb panel / command line instead of pressed on a key
 	if(!from_macro)
@@ -172,8 +171,9 @@
 			src << "<font color='red'>You need a sword equipped to use [Z.name]!</font>"
 			return
 
-	for(var/k in keys)
-		winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
+	if(!hotbar_key)   
+		for(var/k in keys)
+			winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
 
 	held_skill        = Z
 	held_charge_start = world.time
@@ -285,7 +285,7 @@
 			var/norm_cmd = _normalizeHeldName(original_cmd)
 
 			var/matched_shortcut = FALSE
-			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+			for(var/sc_n = 1, sc_n <= 12, sc_n++)
 				if(norm_cmd == "skill shortcut [sc_n]")
 					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
 					shortcut_key_map["[sc_n]"] |= key_name
@@ -308,7 +308,7 @@
 				original_cmd = copytext(cmd, length(HELD_MACRO_PREFIX) + 1)
 			var/norm_cmd = _normalizeHeldName(original_cmd)
 			var/matched_shortcut = FALSE
-			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+			for(var/sc_n = 1, sc_n <= 12, sc_n++)
 				if(norm_cmd == "skill shortcut [sc_n]")
 					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
 					shortcut_key_map["[sc_n]"] |= k
@@ -324,7 +324,7 @@
 
 	var/mob/sc_mob = src.mob
 	if(sc_mob && sc_mob.shortcuts)
-		for(var/sc_n = 1, sc_n <= 10, sc_n++)
+		for(var/sc_n = 1, sc_n <= 12, sc_n++)
 			var/list/sc_keys = shortcut_key_map["[sc_n]"]
 			if(!sc_keys || !sc_keys.len) continue
 			var/obj/Skills/sc_skill = sc_mob.shortcuts.vars["shortcut[sc_n]"]

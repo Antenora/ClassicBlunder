@@ -16,7 +16,7 @@ mob/var/currentPoi = 0
 	var/screeny=input("Enter the height of the screen, max is 999.") as num
 	screeny=min(max(1,screeny),999)
 	client.view="[screenx]x[screeny]"
-	src.ScreenSize = "[screenx]x[screeny]"
+	client.view_fit_enabled = FALSE
 
 /*
 /mob/Admin3/verb/trackburning()

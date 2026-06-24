@@ -286,6 +286,7 @@ obj/Skills
 	verb/Set_Cooldown_Note()
 		set src in usr
 		set category="Other"
+		set hidden = 1   // removed from the UI
 		var/Note=input(usr, "What do you want to be displayed after [src] comes off cooldown?", "Cooldown Note") as message|null
 		src.CooldownNote=Note
 		usr << "[src]'s cooldown note set to: ([src.CooldownNote])"

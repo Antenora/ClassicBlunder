@@ -30,6 +30,18 @@ obj/Money
 				src.loc:TakeMoney(Amount)
 				OMsg(usr, "[usr] steals [Commas(round(Amount))] [glob.progress.MoneyName] from [src.loc]!")
 				usr.GiveMoney(Amount)
+			else if(isturf(src.loc))
+				if(get_dist(usr, src) > 1)
+					usr << "You're too far away to pick that up."
+					return
+				if(locate(/obj/Money) in usr)
+					usr.GiveMoney(src.Level)
+					del src
+				else
+					src.loc = usr
+					src.name = "[Commas(round(src.Level))] [glob.progress.MoneyName]"
+					usr << "You pick up [src]."
+				if(usr.client) usr.client.BuildInvPage()
 
 	proc/checkDuplicate(mob/p)
 		var/counter = 0
@@ -46,6 +58,7 @@ obj/Money
 obj/Items
 	Pickable=1
 	Stealable=1
+	var/invSlot = 0 // persistent inventory grid order (0 = unassigned); set via drag-to-swap
 	// Flat additive stats while this item is equipped as a weapon
 	var/strAdd = 0
 	var/endAdd = 0
@@ -462,6 +475,9 @@ obj/Items
 				A.icon=newIcon
 				usr.contents+=A
 		else
+			if(isturf(src.loc))
+				usr.GroundPickup(src)
+				return
 			if(!usr.Saga||(usr.Saga&&!src.NoSaga)||(usr.Saga&&src.NoSaga&&src.suffix=="*Equipped*"))
 				src.ObjectUse()
 			else
@@ -1422,7 +1438,7 @@ obj/Items/proc/Equip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff) || istype(src,/obj/Items/Armor))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(A==src.loc)

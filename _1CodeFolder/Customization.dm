@@ -22,6 +22,7 @@ mob/var
 	icon/FTailU
 	image/Hair
 	Hair_Base
+	Hair_BaseRaw 
 	Hair_Color
 	Hair_SSJ1
 	Hair_FPSSJ1

@@ -1449,6 +1449,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Q.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Q)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Q))
@@ -1845,6 +1846,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(src.AttackQueue.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(src.AttackQueue)
 				if(drain <= 0)
 					drain = 0.5
 				if(src.TomeSpell(src.AttackQueue))

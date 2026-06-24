@@ -4997,6 +4997,7 @@ mob
 								return 0
 						if(Z.ManaCost && !src.HasDrainlessMana())
 							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(!src.TomeSpell(Z))
@@ -5338,6 +5339,7 @@ mob
 						src.LoseEnergy((drain)/Drain)
 					if(Z.ManaCost)
 						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5399,6 +5401,7 @@ mob
 							if(Z.ManaCost)
 								if(Z.ManaCost)
 									var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+									drain *= src.ChakraCostMult(Z)
 									if(drain <= 0)
 										drain = 0.5
 									if(src.TomeSpell(Z))
@@ -5464,6 +5467,7 @@ mob
 						src.GainFatigue(Z.FatigueCost/Drain)
 					if(Z.ManaCost)
 						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5507,6 +5511,7 @@ mob
 							src.GainFatigue(Z.FatigueCost/Drain)
 						if(Z.ManaCost)
 							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(src.TomeSpell(Z))

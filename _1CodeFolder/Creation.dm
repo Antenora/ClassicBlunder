@@ -14,7 +14,8 @@
 	/obj/Skills/Grab, /obj/Skills/Grapple/Toss, /obj/Skills/Dragon_Dash, /obj/Skills/Target_Clear, /obj/Skills/Target_Switch, \
 	/obj/Skills/Reverse_Dash, /obj/Skills/Aerial_Payback, /obj/Skills/Aerial_Recovery, \
 	/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive, \
-	/obj/Skills/Buffs/Styles/Style_Selector, /obj/Skills/Transformation)
+	/obj/Skills/Buffs/Styles/Style_Selector, /obj/Skills/Transformation, \
+	/obj/Skills/Zanzoken, /obj/Skills/Power_Control, /obj/Skills/Utility/Sense)
 	for(var/S in missingSkills)
 		if(!locate(S, usr.contents))
 			usr.AddSkill(new S)
@@ -86,7 +87,7 @@ mob/Players
 
 		winshow(usr,"StatsWindow",0)
 		winshow(usr,"StatsWindow2",0)
-		for(var/e in list("Health","Energy","Power","Mana"))
+		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=true")
 		usr.client.show_verb_panel=1
 		usr.Admin("Check")
@@ -378,10 +379,10 @@ mob/Players
 		var/list/lol=list("butt3","butt4")
 		for(var/x in lol)
 			winset(src,x,"'is-visible'=true")
-		if(ScreenSize)
-			src.client.view=ScreenSize
+		client.SetupGameDisplay()
+		client.InitSkillHUD()
 
-		client.fps=src.ChosenFPS
+		client.fps = src.ChosenFPS || world.fps   
 		client.updateRGMeter()
 		if(usr.SenseRobbed>=5)
 			animate(usr.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1))
@@ -485,11 +486,13 @@ mob/Players
 						whoToInflict = PACT_SUBJECT
 				p.breakPact(TRUE, whoToInflict)
 		DevilSummonerRestoreVerbs()
+		ShinobiRestoreVerbs()
 		initShortcuts();
 		MajinAbsorbOnLogin()
 		if(istype(src, /mob/Players))
 			var/mob/Players/SBP = src
 			SBP.Shadowbringer_ClearShadow()
+		CollectMenuVerbs() 
 		return
 	Logout()
 		if(src.Airborne)
@@ -584,6 +587,8 @@ mob/Creation
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE | EDGE_PERSPECTIVE
+		client.SetupTitleDisplay()
+		client.ClearSkillHUD()
 		usr.client.view=18
 		usr<<browse("[basehtml][Notes]")
 		winshow(usr, "HungerLabel", 0)
@@ -593,7 +598,7 @@ mob/Creation
 			sleep(10)
 			del(usr)
 
-		for(var/e in list("Health","Energy","Power","Mana"))
+		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=false")
 		usr.CheckPunishment("Ban")
 		usr.Gender="Male"

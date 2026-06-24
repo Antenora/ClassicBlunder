@@ -77,7 +77,7 @@
 		bk.setPetalsInactive(TRUE, 255)
 		if(user.client)
 			user.client.senbonzakura_dragging = FALSE
-			winset(user.client, "mapwindow.map", "right-click=0")
+			user.client.petal_drag_locked = TRUE // block drags during convergence
 		bk.convergence_target = target
 
 		src.goukei_active = TRUE
@@ -89,7 +89,7 @@
 				bk.convergence_target = null
 				bk.setPetalsInactive(FALSE, 255)
 				if(user && user.client)
-					winset(user.client, "mapwindow.map", "right-click=1")
+					user.client.petal_drag_locked = FALSE
 				return
 
 			// Hide petals now that they've converged
@@ -131,7 +131,7 @@
 					bk.updatePetalLocFromPixels(p)
 			bk.setPetalsInactive(FALSE, 255)
 			if(user && user.client)
-				winset(user.client, "mapwindow.map", "right-click=1")
+				user.client.petal_drag_locked = FALSE
 
 
 // Saga Level 5

@@ -15,12 +15,13 @@
 
 client
 	var/senbonzakura_dragging = FALSE
+	var/petal_drag_locked = FALSE
 	var/petal_target_wx = 0
 	var/petal_target_wy = 0
 
 	MouseDown(atom/object, turf/location, control, params)
 		var/plist = params2list(params)
-		if(plist["right"] == "1" && mob && mob.ShinigamiRelease == "Senbonzakura" && (mob.InShikai() || mob.InBankai()))
+		if(plist["right"] == "1" && !petal_drag_locked && mob && mob.ShinigamiRelease == "Senbonzakura" && (mob.InShikai() || mob.InBankai()))
 			senbonzakura_dragging = TRUE
 			if(location)
 				var/TSIZE = world.icon_size
