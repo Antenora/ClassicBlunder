@@ -307,6 +307,7 @@ client
 				return
 		prefs.loadPrefs(ckey)
 		..()
+		ApplyAudioPref()
 		//src << browse(glob.getMOTD(), "size=600x1000,window=motd" )
 		src.LoginLog("<font color=blue>logged in.</font color>")
 

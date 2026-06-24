@@ -15,10 +15,11 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 	var/label
 	var/command
 	var/defkey
+	var/defkey2
 	var/category
 	var/kind = KB_NORMAL
-	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL)
-		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind
+	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "")
+		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2
 
 var/global/list/keybind_registry
 var/global/list/keybind_by_id = list()
@@ -27,10 +28,11 @@ var/global/list/keybind_by_id = list()
 	if(keybind_registry) return keybind_registry
 	keybind_registry = list()
 	var/list/R = keybind_registry
-	R += new/datum/keyaction("north", "Move Up",    "north", "W", "Movement", KB_MOVE)
-	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE)
-	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE)
-	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE)
+	R += new/datum/keyaction("north", "Move Up",    "north", "W", "Movement", KB_MOVE, "North")
+	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE, "West")
+	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE, "South")
+	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
+	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat")
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
@@ -43,8 +45,8 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("targetswitch","Target Switch",       "Target-Switch",      "Tab", "Combat")
 	R += new/datum/keyaction("togglestyle", "Toggle Style",        "Toggle-Style",       "P",   "Combat")
 	R += new/datum/keyaction("sense",       "Sense",               "Sense",              "O",   "Combat")
-	R += new/datum/keyaction("meditate",    "Meditate",            "Meditate",           "M",   "Combat")
-	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "Alt", "Combat")
+	R += new/datum/keyaction("meditate",    "Meditate",            "Meditation",         "M",   "Combat")
+	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "CTRL+Space", "Combat")
 	R += new/datum/keyaction("seetargets",  "See Target's Target", "See-Targets-Target", "`",   "Combat")
 	R += new/datum/keyaction("say",         "Say",                "Say",                "", "Communication")
 	R += new/datum/keyaction("ooc",         "OOC",                "OOC",                "", "Communication")
@@ -61,24 +63,60 @@ var/global/list/keybind_by_id = list()
 		keybind_by_id[a.id] = a
 	return keybind_registry
 
-// explicit override if set (including "" for deliberately unbound), else the registry default
-/mob/proc/KeybindKey(action_id)
+// slot 1 = primary, 2 = secondary. explicit override if set (incl "" for unbound), else the registry default.
+// storage key is the action id for primary, id@2 for secondary.
+/mob/proc/KeybindKey(action_id, slot = 1)
 	initShortcuts()
-	if(shortcuts.keybinds && (action_id in shortcuts.keybinds))
-		return shortcuts.keybinds[action_id]
+	var/sk = (slot == 2) ? "[action_id]@2" : action_id
+	if(shortcuts.keybinds && (sk in shortcuts.keybinds))
+		return shortcuts.keybinds[sk]
 	BuildKeybindRegistry()
 	var/datum/keyaction/a = keybind_by_id[action_id]
-	return a ? a.defkey : ""
+	if(!a) return ""
+	return (slot == 2) ? a.defkey2 : a.defkey
 
-/mob/proc/SetKeybind(action_id, key)
+/mob/proc/SetKeybind(action_id, slot, key)
 	initShortcuts()
 	if(!shortcuts.keybinds) shortcuts.keybinds = list()
-	shortcuts.keybinds[action_id] = key
+	var/sk = (slot == 2) ? "[action_id]@2" : action_id
+	shortcuts.keybinds[sk] = key
+
+// pretty-print a stored key. arrow keys store as North/West but should read as Arrow Up/Left
+/proc/KeyDisplay(key)
+	if(!key) return "(unbound)"
+	key = replacetext(key, "North", "Arrow Up")
+	key = replacetext(key, "South", "Arrow Down")
+	key = replacetext(key, "West", "Arrow Left")
+	key = replacetext(key, "East", "Arrow Right")
+	return key
 
 /proc/HotbarMacroName(key, suffix = "")
 	if(findtext(key, "=") || findtext(key, ";"))
 		return "\"[key][suffix]\""
 	return "[key][suffix]"
+
+// write one action's macros for one key on one element id: keydown, plus the +UP release for movement
+// (stop) and for held hotbar skills. empty key parks the macros off the key.
+client/proc/MacroCmd(command)
+	return findtext(command, " ") ? "\"[command]\"" : command
+
+client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
+	var/uid = "[eid]_up"
+	if(!key)
+		winset(src, eid, "type=macro;parent=[set_name];name=off_[eid]")
+		winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
+		return
+	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
+	if(kind == KB_MOVE)
+		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
+		return
+	if(kind == KB_HOTBAR && regid)
+		var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
+		var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
+		if(s && s.HeldSkill)
+			winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Release-Held-Skill")
+			return
+	winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
 
 client/proc/ApplyKeybinds()
 	if(!mob) return
@@ -89,26 +127,209 @@ client/proc/ApplyKeybinds()
 		set_name = k
 		break
 	for(var/datum/keyaction/a in keybind_registry)
-		var/key = mob.KeybindKey(a.id)
-		var/eid = "kb_[a.id]"
-		var/uid = "kb_[a.id]_up"
-		if(!key)
-			winset(src, eid, "type=macro;parent=[set_name];name=kboff_[a.id]")        // unbound, park both off the key
-			winset(src, uid, "type=macro;parent=[set_name];name=kboff_[a.id]_up")
-			continue
-		winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[a.command]")
-		switch(a.kind)
-			if(KB_MOVE)
-				winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[a.command]-up")
-			if(KB_HOTBAR)
-				var/n = text2num(copytext(a.id, 7))   // "hotbarN" -> N
-				var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
-				if(s && s.HeldSkill)
-					winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Release-Held-Skill")
-				else
-					winset(src, uid, "type=macro;parent=[set_name];name=kboff_[a.id]_up")
-			else
-				winset(src, uid, "type=macro;parent=[set_name];name=kboff_[a.id]_up")
+		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id)
+		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id)
+	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
+	if(mob.shortcuts.keybinds)
+		for(var/sk in mob.shortcuts.keybinds)
+			if(copytext(sk, 1, 6) != "misc:") continue
+			var/body = copytext(sk, 6)
+			var/slot = 1
+			if(length(body) > 2 && copytext(body, length(body) - 1) == "@2")
+				slot = 2
+				body = copytext(body, 1, length(body) - 1)
+			ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", mob.shortcuts.keybinds[sk], "RunVerb [body]", KB_NORMAL, null)
+
+/datum/keybind_menu/Topic(href, list/href_list)
+	if(!usr || !usr.client) return
+	var/act = href_list["action"]
+	if(act == "reset")
+		usr.initShortcuts()
+		usr.shortcuts.keybinds = list()
+		usr.client.ApplyKeybinds()
+		usr.client.RefreshHotbar()
+		usr.client.OpenKeybindMenu()   // redraw so every key shows its default
+		return
+	if(act == "resetone")            // revert one action to its defaults by dropping its overrides
+		var/rid = href_list["id"]
+		if(rid)
+			usr.initShortcuts()
+			if(usr.shortcuts.keybinds)
+				usr.shortcuts.keybinds -= rid
+				usr.shortcuts.keybinds -= "[rid]@2"
+			usr.client.ApplyKeybinds()
+			usr.client.RefreshHotbar()
+			usr.client.OpenKeybindMenu()
+		return
+	var/id = href_list["id"]
+	var/slot = text2num(href_list["slot"]) || 1
+	if(act == "rebind")
+		var/key = href_list["key"]
+		if(id && key)
+			usr.ClearKeybindKey(key, id, slot)   // a key only ever drives one action+slot
+			usr.SetKeybind(id, slot, key)
+	else if(act == "unbind")
+		if(id) usr.SetKeybind(id, slot, "")
+	usr.client.ApplyKeybinds()
+	usr.client.RefreshHotbar()
+
+// clear a key off every other action+slot (registry and misc) so it never double-fires
+/mob/proc/ClearKeybindKey(key, keepid, keepslot)
+	if(!key) return
+	initShortcuts()
+	BuildKeybindRegistry()
+	for(var/datum/keyaction/a in keybind_registry)
+		for(var/s in 1 to 2)
+			if(a.id == keepid && s == keepslot) continue
+			if(KeybindKey(a.id, s) == key) SetKeybind(a.id, s, "")
+	if(shortcuts.keybinds)
+		var/keepsk = (keepslot == 2) ? "[keepid]@2" : keepid
+		for(var/sk in shortcuts.keybinds)
+			if(copytext(sk, 1, 6) != "misc:") continue
+			if(sk == keepsk) continue
+			if(shortcuts.keybinds[sk] == key) shortcuts.keybinds[sk] = ""
+
+/mob/verb/Keybinds()
+	set category = "Utility"
+	set name = "Keybinds"
+	if(client) client.OpenKeybindMenu()
+
+client/proc/OpenKeybindMenu()
+	if(!mob) return
+	mob << browse(KeybindMenuHTML(), "window=keybinds;size=620x640")
+
+// verbs for the Misc section
+client/proc/MiscVerbs()
+	BuildKeybindRegistry()
+	var/list/reg = list()
+	for(var/datum/keyaction/a in keybind_registry)
+		reg[a.command] = 1
+	var/list/out = list()
+	var/list/srcs = list()
+	for(var/v in mob.verbs) srcs += v
+	if(mob.hud_menu_verbs) for(var/v in mob.hud_menu_verbs) srcs += v
+	for(var/v in srcs)
+		if(!v || v:hidden) continue
+		if(v:category != "Other" && v:category != "Utility") continue
+		var/nm = "[v:name]"
+		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
+		out[nm] = nm
+	for(var/obj/Skills/Buffs/b in mob.contents)
+		if(b.TimerLimit) continue   // timed buffs go in the hotbar
+		for(var/v in b.verbs)
+			if(!v || v:hidden || v:category != "Skills") continue
+			var/nm = "[v:name]"
+			if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
+			out[nm] = nm
+	return out
+
+/mob/verb/RunVerb(cmd as text)
+	set hidden = 1
+	set instant = 1
+	if(!cmd) return
+	for(var/v in verbs)
+		if(v && "[v:name]" == cmd)
+			call(src, v)()
+			return
+	for(var/v in hud_menu_verbs)
+		if(v && "[v:name]" == cmd)
+			call(src, v)()
+			return
+	for(var/v in hud_customize_verbs)
+		if(v && "[v:name]" == cmd)
+			call(src, v)()
+			return
+	for(var/obj/Skills/sk in contents)
+		for(var/v in sk.verbs)
+			if(v && "[v:name]" == cmd)
+				call(sk, v)()
+				return
+
+// one table row: label, primary key box, secondary key box. aid is the action id (or misc:<command>).
+client/proc/KeybindRow(aid, label)
+	var/k1 = mob.KeybindKey(aid, 1)
+	var/k2 = mob.KeybindKey(aid, 2)
+	var/d1 = k1 ? KeyDisplay(k1) : "(unbound)"
+	var/d2 = k2 ? KeyDisplay(k2) : "(unbound)"
+	var/sid = NormalizeSkillName(aid)
+	var/e1 = "kb_[sid]_1"
+	var/e2 = "kb_[sid]_2"
+	return {"<tr><td class='lbl'>[label]</td><td class='kc'><span class='kb' id='[e1]' data-k="[k1]" onclick='rb("[e1]","[aid]",1)'>[d1]</span><span class='ub' onclick='ub("[e1]","[aid]",1)'>x</span></td><td class='kc'><span class='kb' id='[e2]' data-k="[k2]" onclick='rb("[e2]","[aid]",2)'>[d2]</span><span class='ub' onclick='ub("[e2]","[aid]",2)'>x</span></td><td class='rc'><span class='rl' onclick='ro("[aid]")'>reset</span></td></tr>"}
+
+client/proc/KeybindMenuHTML()
+	BuildKeybindRegistry()
+	var/r = "\ref[keybind_menu]"
+	var/rows = ""
+	var/lastcat = ""
+	for(var/datum/keyaction/a in keybind_registry)
+		if(a.category != lastcat)
+			rows += {"<tr><td colspan='4' class='cat'>[a.category]</td></tr>"}
+			lastcat = a.category
+		rows += KeybindRow(a.id, a.label)
+	var/list/misc = MiscVerbs()
+	if(misc.len)
+		rows += {"<tr><td colspan='4' class='cat'>Misc</td></tr>"}
+		for(var/cmd in misc)
+			rows += KeybindRow("misc:[cmd]", misc[cmd])
+	return {"<html><head><style>
+body{background:#0a1420;color:#cfe9ff;font-family:Verdana,Arial,sans-serif;font-size:12px;margin:0;padding:8px;}
+h1{color:#8be9ff;font-size:15px;margin:2px 0 4px;text-align:center;letter-spacing:2px;}
+.hint{color:#7a9bb5;font-size:10px;text-align:center;margin-bottom:6px;}
+table{width:100%;border-collapse:collapse;}
+.hd{color:#8be9ff;font-size:11px;text-align:center;padding:2px;border-bottom:1px solid #2a4a5a;}
+.lbl{padding:3px 6px;}
+.kc{text-align:center;padding:3px 4px;white-space:nowrap;}
+.kb{display:inline-block;background:#16263a;color:#cfe9ff;border:1px solid #3a5a70;padding:2px 6px;min-width:96px;text-align:center;cursor:pointer;}
+.ub{display:inline-block;color:#ff6b6b;cursor:pointer;padding:0 6px;font-weight:bold;}
+.cat{color:#8be9ff;font-weight:bold;border-bottom:1px solid #2a4a5a;padding:9px 6px 2px;}
+.rs{display:block;width:170px;margin:14px auto 6px;background:#3a1a1a;color:#ffb0b0;border:1px solid #6a2a2a;padding:6px;text-align:center;cursor:pointer;}
+.rc{text-align:center;padding:3px 4px;}
+.rl{color:#7a9bb5;cursor:pointer;font-size:10px;text-decoration:underline;}
+</style></head><body>
+<h1>KEYBINDS</h1>
+<div class='hint'>click a key box then press the new key, or a combo like CTRL+W. esc cancels, x clears.</div>
+<table><tr><th class='hd'>Action</th><th class='hd'>Primary</th><th class='hd'>Secondary</th><th class='hd'></th></tr>[rows]</table>
+<div class='rs' onclick='rst()'>Reset to Defaults</div>
+<script>
+var ref='[r]';var w=null;
+function go(a){location.href='byond://?src='+ref+a;}
+function dk(k){if(!k)return '(unbound)';k=k.replace('North','Arrow Up');k=k.replace('South','Arrow Down');k=k.replace('West','Arrow Left');k=k.replace('East','Arrow Right');return k;}
+function setbtn(el,raw){el.setAttribute('data-k',raw);el.innerHTML=dk(raw);el.style.background='#16263a';el.style.color='#cfe9ff';}
+function rb(eid,aid,slot){
+ if(w){var p=document.getElementById(w.eid);if(p)setbtn(p,p.getAttribute('data-k'));}
+ w={eid:eid,aid:aid,slot:slot};
+ var el=document.getElementById(eid);el.innerHTML='press a key';el.style.background='#8be9ff';el.style.color='#0a1420';
+}
+function ub(eid,aid,slot){var el=document.getElementById(eid);if(el)setbtn(el,'');go(';action=unbind;id='+encodeURIComponent(aid)+';slot='+slot);}
+function rst(){go(';action=reset');}
+function ro(aid){go(';action=resetone;id='+encodeURIComponent(aid));}
+function clr(k,exeid){var s=document.getElementsByTagName('span');for(var i=0;i<s.length;i++){var x=s\[i\];if(x.className=='kb'&&x.id!=exeid&&x.getAttribute('data-k')==k)setbtn(x,'');}}
+function mk(e){
+ var c=e.keyCode;
+ if(c==16||c==17||c==18||c==91||c==92||c==93||c==20||c==144)return '';
+ if(c==27)return 'CANCEL';
+ var b='';
+ if(c>=65&&c<=90)b=String.fromCharCode(c);
+ else if(c>=48&&c<=57)b=String.fromCharCode(c);
+ else if(c>=96&&c<=105)b='Numpad'+(c-96);
+ else if(c>=112&&c<=123)b='F'+(c-111);
+ else{var m={32:'Space',9:'Tab',13:'Return',8:'Backspace',37:'West',38:'North',39:'East',40:'South',45:'Insert',46:'Delete',36:'Home',35:'End',33:'PageUp',34:'PageDown',106:'NumpadStar',107:'NumpadPlus',109:'NumpadMinus',111:'NumpadSlash',110:'NumpadPeriod',186:';',187:'=',188:',',189:'-',190:'.',191:'/',192:'`'};b=m\[c\]||'';}
+ if(b=='')return '';
+ var p='';if(e.ctrlKey)p+='CTRL+';if(e.shiftKey)p+='SHIFT+';if(e.altKey)p+='ALT+';
+ return p+b;
+}
+document.onkeydown=function(e){
+ if(!w)return true;
+ e=e||window.event;var k=mk(e);
+ if(k=='')return false;
+ var ctx=w;w=null;var el=document.getElementById(ctx.eid);
+ if(k=='CANCEL'){if(el)setbtn(el,el.getAttribute('data-k'));return false;}
+ clr(k,ctx.eid);if(el)setbtn(el,k);
+ go(';action=rebind;id='+encodeURIComponent(ctx.aid)+';slot='+ctx.slot+';key='+encodeURIComponent(k));
+ return false;
+};
+</script>
+</body></html>"}
 
 // generic for now
 /proc/SKILL_TYPE_ICON(obj/Skills/S)

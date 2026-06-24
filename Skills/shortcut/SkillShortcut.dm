@@ -99,7 +99,7 @@ What shortcut do you want to set?"}
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
             if(attemptedSkill)
                 if(attemptedSkill.HeldSkill && num >= 1 && num <= length(HOTBAR_DEFAULT_KEYS))
-                    held_skill_pending_key = KeybindKey("hotbar[num]");
+                    held_skill_pending_key = KeybindKey("hotbar[num]") || KeybindKey("hotbar[num]", 2);
                 fireShortcut(attemptedSkill);
             else src << "You don't have a skill assigned to <b>Shortcut [num]</b>!";
     //god i hate that this proc is necessary atm = _ =

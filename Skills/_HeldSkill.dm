@@ -57,6 +57,7 @@
 /client/var/tmp/list/held_skill_key_cache = null
 /client/var/tmp/held_skill_cache_build_start = 0
 /client/var/tmp/held_skill_macro_set = "macro"
+/client/control_freak = CONTROL_FREAK_ALL
 
 /client/New(topicdata)
 	..()

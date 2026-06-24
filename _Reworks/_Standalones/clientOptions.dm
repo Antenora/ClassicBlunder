@@ -14,8 +14,9 @@ Options/
     var/CombatMessagesInIC = FALSE
     var/autoAttacking = FALSE
     var/oldZanzo = FALSE
+    var/soundOn = 1
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
+    var/list/savableVars = list("oldZanzo","soundOn","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)
@@ -56,5 +57,13 @@ Options/
 
 /client/proc/getPref(pref)
     return prefs.vars["[pref]"]
+
+/client/proc/ApplyAudioPref()
+    winset(src, null, list("command" = ".configure sound [prefs.soundOn ? "on" : "off"]"))
+
+/mob/verb/Gamepad_Mapping()
+    set category = "Utility"
+    set name = "Gamepad Mapping"
+    winset(src, null, list("command" = ".gamepad-mapping"))
 
 

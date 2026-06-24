@@ -1,7 +1,10 @@
 // Menu HUD. CollectMenuVerbs() removes Other/Utility verbs from the verbs list
 #define MHUD_LAYER (FLY_LAYER+3)
 #define MHUD_PRESS_STEP 1
-#define MHUD_PAGE_SIZE 12        // 2 columns x 6 rows
+#define MHUD_PAGE1_ROWS 5        // page 1 reserves the bottom for the Audio switch + CHAT toggles
+#define MHUD_FULL_ROWS 8         // later pages have no fixed footer, so they fill the panel
+#define MHUD_PAGE1_SIZE (MHUD_PAGE1_ROWS * 2)
+#define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
 #define MHUD_PANEL_W 336
 #define MHUD_PANEL_H 256
 #define MHUD_COL1_X -140
@@ -218,6 +221,7 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	set waitfor = 0
 	if(!sw || !sw.pref || menu_open != "options") return
 	togglePref(sw.pref)
+	if(sw.pref == "soundOn") ApplyAudioPref()
 	AnimateOptToggle(sw, getPref(sw.pref))
 
 // reuses the hat-toggle sprite set, frames 1>5
@@ -360,32 +364,7 @@ client/proc/OpenOptionsMenu()
 	menu_pagetext.screen_loc = "CENTER:-30,CENTER:-116"
 	menu_objs += menu_pagetext
 
-	// chat channel toggles (replaces the Toggle Channels verb), fixed at the panel bottom on every page
-	var/atom/movable/shud/menutext/chh = new
-	chh.maptext_width = MHUD_PANEL_W
-	chh.maptext_height = 18
-	chh.maptext = "<center><span style=\"[MHUD_FONT]; color:#8be9ff\">CHAT</span></center>"
-	chh.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:-62"   // clears the last verb row
-	menu_objs += chh
-	var/list/togs = list("OOC" = "ShowOOC", "All Tab OOC" = "AllTabOOC", "IC Tab LOOC" = "LOOCinIC", "All Tab LOOC" = "LOOCinAll")
-	var/ti = 0
-	for(var/lbl in togs)
-		var/tcol = ti % 2
-		var/trow = (ti - tcol) / 2
-		var/tx = tcol ? MHUD_COL2_X : MHUD_COL1_X
-		var/ty = -75 - 22 * trow   // leaves room above for the CHAT header
-		var/atom/movable/shud/menutext/tl = new
-		tl.maptext_width = 110
-		tl.maptext_height = 20
-		tl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">[lbl]</span>"
-		tl.screen_loc = "CENTER:[tx],CENTER:[ty]"
-		menu_objs += tl
-		var/atom/movable/shud/menutoggle/sw = new
-		sw.pref = togs[lbl]
-		sw.icon = getPref(togs[lbl]) ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-		sw.screen_loc = "CENTER:[tx + 88],CENTER:[ty + 3]"   // pulled left so the col-2 switch clears the edge grid
-		menu_objs += sw
-		ti++
+	// Audio switch + CHAT toggles are built in BuildMenuPage on page 1 only
 
 	for(var/atom/movable/o in menu_objs)
 		screen += o
@@ -405,20 +384,64 @@ client/proc/BuildMenuPage(fade = FALSE)
 		screen -= o
 		del o
 	var/list/L = mob.hud_menu_verbs
-	var/pages = max(1, -round(-L.len / MHUD_PAGE_SIZE)) // ceil division
+	// page 1 holds fewer verbs (bottom reserved for the Audio switch + CHAT), later pages fill the whole panel
+	var/extra = max(0, L.len - MHUD_PAGE1_SIZE)
+	var/pages = 1 - round(-extra / MHUD_FULL_SIZE)   // 1 + ceil(extra / full)
 	menu_page = min(max(menu_page, 1), pages)
 	menu_pagetext.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[menu_page]/[pages]</span></center>"
-	var/start = (menu_page - 1) * MHUD_PAGE_SIZE
-	for(var/k = 1 to MHUD_PAGE_SIZE)
+	var/rows = (menu_page == 1) ? MHUD_PAGE1_ROWS : MHUD_FULL_ROWS
+	var/page_size = rows * 2
+	var/start = (menu_page == 1) ? 0 : (MHUD_PAGE1_SIZE + (menu_page - 2) * MHUD_FULL_SIZE)
+	for(var/k = 1 to page_size)
 		var/idx = start + k
 		if(idx > L.len) break
 		var/atom/movable/shud/menuentry/E = new
 		E.vpath = L[idx]
 		E.SetLabel(FALSE)
-		var/col = round((k - 1) / 6)
-		var/row = (k - 1) % 6
+		var/col = round((k - 1) / rows)
+		var/row = (k - 1) % rows
 		E.screen_loc = "CENTER:[col ? MHUD_COL2_X : MHUD_COL1_X],CENTER:[64 - 22 * row]"
 		menu_entry_objs += E
 		screen += E
+	if(menu_page == 1)
+		BuildOptionsExtras()
 	if(fade)
 		KineticEntrance(menu_entry_objs)
+
+// audio switch + chat toggles, page 1 only, fixed below the verb grid. kept in menu_entry_objs so a page flip clears them
+client/proc/BuildOptionsExtras()
+	var/atom/movable/shud/menutext/al = new
+	al.maptext_width = 110
+	al.maptext_height = 20
+	al.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">Audio</span>"
+	al.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-46"
+	menu_entry_objs += al
+	screen += al
+	var/atom/movable/shud/menutoggle/asw = new
+	asw.pref = "soundOn"
+	asw.icon = getPref("soundOn") ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
+	asw.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-44"
+	menu_entry_objs += asw
+	screen += asw
+	// chat toggles continue the same 22px grid (Audio is row 5), so the bottom row lands at -90 like a full page
+	var/list/togs = list("OOC" = "ShowOOC", "All Tab OOC" = "AllTabOOC", "IC Tab LOOC" = "LOOCinIC", "All Tab LOOC" = "LOOCinAll")
+	var/ti = 0
+	for(var/lbl in togs)
+		var/tcol = ti % 2
+		var/trow = (ti - tcol) / 2
+		var/tx = tcol ? MHUD_COL2_X : MHUD_COL1_X
+		var/ty = -68 - 22 * trow
+		var/atom/movable/shud/menutext/tl = new
+		tl.maptext_width = 110
+		tl.maptext_height = 20
+		tl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">[lbl]</span>"
+		tl.screen_loc = "CENTER:[tx],CENTER:[ty]"
+		menu_entry_objs += tl
+		screen += tl
+		var/atom/movable/shud/menutoggle/sw = new
+		sw.pref = togs[lbl]
+		sw.icon = getPref(togs[lbl]) ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
+		sw.screen_loc = "CENTER:[tx + 88],CENTER:[ty + 2]"
+		menu_entry_objs += sw
+		screen += sw
+		ti++

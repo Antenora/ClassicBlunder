@@ -342,8 +342,9 @@ client/proc/UpdateOrbDisplay(hp, shield, inj, enp, ftg)
 	orbtext_energy.filters = filter(type="outline", size=1, color="#000000")
 
 client/proc/HotbarKeyLabel(n)
-	if(mob && n >= 1 && n <= length(HOTBAR_DEFAULT_KEYS)) return mob.KeybindKey("hotbar[n]")
-	return ""
+	if(!mob || n < 1 || n > length(HOTBAR_DEFAULT_KEYS)) return ""
+	var/k = mob.KeybindKey("hotbar[n]") || mob.KeybindKey("hotbar[n]", 2)
+	return k ? KeyDisplay(k) : ""
 
 // call after any assign/swap/clear and once at HUD init
 client/proc/RefreshHotbar()
