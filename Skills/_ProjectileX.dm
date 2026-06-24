@@ -6116,20 +6116,8 @@ obj
 										KenShockwave(def, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
 										return
 								var/Deflect=0
-								/*var/defIntim = m.GetIntimidation()
-								var/atkIntim = Owner.GetIntimidation()
-								var/atkIntimIgnore = Owner.GetIntimidationIgnore(m)
-								var/defIntimIgnore = m.GetIntimidationIgnore(Owner)
-								// the difference between the two intims
-								var/Rate = ( atkIntim - (atkIntim * (defIntimIgnore))) - (defIntim - (defIntim * (atkIntimIgnore))) * 0.75
-								if(Rate < 0)
-									Rate = abs(Rate)/10*/
 								if(src.Deflectable&&!a:KO)
 									if(istype(a, /mob)) m = a;
-									/*if(m && m.hasMagmicShield())
-										Deflect = 1;
-										Stun(m, 3);
-										m.MagmicShieldOff();*/
 									if(a:HasDeflection())
 										if(!Deflection_Formula(src.Owner, a, (accmult /** Rate*/ * ( min(0.1,1 - (src.MultiHit * 0.025) ) ) /(1+a:GetDeflection())), BaseChance=(glob.WorldDefaultAcc), Backfire=src.Backfire))
 											Deflect=1

@@ -397,7 +397,6 @@
 #include "_Reworks\Combat\DoDamage.dm"
 #include "_Reworks\Combat\GetandUseSkill.dm"
 #include "_Reworks\Combat\Homing.dm"
-#include "_Reworks\Combat\Intimidation.dm"
 #include "_Reworks\Combat\Knockbacks.dm"
 #include "_Reworks\Combat\Launchers.dm"
 #include "_Reworks\Combat\leaveBehind.dm"

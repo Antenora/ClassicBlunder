@@ -4,7 +4,7 @@ race
 		desc = "Dark shadows cast from a world beyond our own, given individuality and humanity."
 		visual = 'Demon.png'
 		locked = TRUE
-		power = 5
+		power = 6
 		strength = 2
 		endurance = 1.5
 		speed = 1.5

@@ -92,7 +92,6 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
-	Intimidation=1//Adding this here for ezpz stuff.
 	HealthCut=0
 	EnergyMax=100
 	Energy=100

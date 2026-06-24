@@ -62,7 +62,6 @@ transformation
 		regeneration
 		anger
 		unlock_potential = -1
-		intimidation
 
 		BioArmor
 		BioArmorMax

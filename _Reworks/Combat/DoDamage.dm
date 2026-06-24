@@ -105,12 +105,6 @@
 	log2text("Damage", val,"damageDebugs.txt", "[src.ckey]/[src.name]")
 	#endif
 	// VALUE THINGS ABOVE (THE PURE DAMAGE)
-	trueMult += getIntimDMGReduction(defender)
-	#if DEBUG_DAMAGE
-	log2text("trueMult", "After Intim", "damageDebugs.txt", "[src.ckey]/[src.name]")
-	log2text("trueMult", trueMult,"damageDebugs.txt", "[src.ckey]/[src.name]")
-	#endif
-	// gain red/dmg from intim
 	trueMult += getSPPower()
 	#if DEBUG_DAMAGE
 	log2text("trueMult", "After SP", "damageDebugs.txt", "[src.ckey]/[src.name]")
