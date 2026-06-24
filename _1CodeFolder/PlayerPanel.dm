@@ -47,6 +47,7 @@ client/proc/PPLoc(px, py)
 	return "[pp_tile]:[pp_xpix + px],[pp_row]:[pp_poff + py]"
 
 client/proc/HidePlayerPanel()
+	HideAdminPanel()   
 	player_panel_target = null
 	if(player_panel_objs)
 		while(player_panel_objs.len)
@@ -181,6 +182,9 @@ client/proc/ShowPlayerPanel(mob/Players/P)
 	for(var/atom/movable/o in player_panel_objs)
 		screen += o
 	KineticEntrance(player_panel_objs)
+
+	if(mob.Admin)
+		ShowAdminPanel(P)   
 
 client/proc/PlayerPanelAction(action)
 	if(!mob) return

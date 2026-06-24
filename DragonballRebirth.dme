@@ -302,6 +302,7 @@
 #include "_1CodeFolder\Admin.dm"
 #include "_1CodeFolder\Admin_Mapper.dm"
 #include "_1CodeFolder\AdminHelp_System.dm"
+#include "_1CodeFolder\AdminPanel.dm"
 #include "_1CodeFolder\BattleSystem.dm"
 #include "_1CodeFolder\BeastTransforms.dm"
 #include "_1CodeFolder\Build.dm"
