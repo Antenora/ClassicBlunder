@@ -746,6 +746,7 @@
 #include "Races\saiyan\transformations_hellspawn.dm"
 #include "Races\shinjin\ascensions.dm"
 #include "Races\shinjin\race.dm"
+#include "Races\wilder\race.dm"
 #include "Races\yokai\moves.dm"
 #include "ReallyOldMaps\ProbablyTheMapWereUsingThisWipe.dmm"
 #include "Sagas\_DefinesSaga.dm"

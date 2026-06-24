@@ -2,7 +2,6 @@ race
 	dragon
 		name = "Dragon"
 		desc = "Dragons represent aspects of the world, said to be born of animosity. Reborn nearing times of great tragedy, they only regain their past lives of protecting the world at age 20."
-		visual = 'Dragon.png'
 
 
 		power = 2

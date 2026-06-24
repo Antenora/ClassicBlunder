@@ -2294,16 +2294,6 @@ mob
 			return 0
 		GetSniper()
 			return passive_handler.Get("Sniper")
-		HasChilling()
-			if(passive_handler.Get("Chilling"))
-				return 1
-			if(src.Attunement=="Water")
-				return 1
-			if(Attunement=="Fox Fire")
-				return 1
-			if(src.InfusionElement=="Water")
-				return 1
-			return 0
 		GetChilling()
 			return passive_handler.Get("Chilling")
 		HasFreezing()

@@ -3,7 +3,6 @@ race
 		name="Chakardi"
 		icon_neuter= list('Gajalaka.dmi', 'Gaja EX.dmi', 'Gaja EX Maim.dmi')
 		desc = {"Chakardi AKA (■■■■■■■■) are native to Mt. Red. Descendants of the illustrious Shiny-Rock tribe. Their former name is considered an insult, aimed to ground them as the monsters they once were decades ago. Chakardi is from the legend of Don Don Chaka, the sound of a heart thumping and Kardia (Heart). Often affluent and insanely resilient, their power is based on pulling from their emotions and heart to summon forth special power. (They’re the ill■■■■■■■.)"}
-		visual = 'Gajalaka.png'
 		passives = list("Tenacity" = 1,"CashCow" = 1, "Blubber" = 0.25)
 		locked = TRUE
 		classes = list("Acolyte", "Rebel", "Nobility", "Heart")

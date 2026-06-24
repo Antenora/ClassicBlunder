@@ -1118,11 +1118,8 @@ mob/proc
 		src:UniqueID = ++glob.IDCounter
 		glob.IDs += src:UniqueID
 		glob.IDs[src:UniqueID] = "[name]"
-		DEBUGMSG("actually we managed to get past the global ids, im shocked")
 		glob.updatePlayer(src);
-		DEBUGMSG("perhaps it is update version that kills the man?")
 		setStartingRPP()
-		DEBUGMSG("or setting starting rpp. did that kill us?")
 		if(!Warped)
 			if(isRace(BEASTKIN))
 				var/Choice=input(src, "Do you want to possess animal characteristics?  These options will give you tails and ears.", "Choose your animal traits.") in list("None", "Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull")
@@ -1171,9 +1168,7 @@ mob/proc
 				src.EraBody="Adult"
 				src << "You've started as a timeless race. You learn slower than others, but can teach younger beings and always have your full power available."
 
-			DEBUGMSG("we made it through the furry zone");
 			src.EraBirth=glob.progress.Era
-			DEBUGMSG("ok we're going to try to set to spawn");
 			src.ChooseSpawn()
 
 			if(src.Intelligence<=0.25)
