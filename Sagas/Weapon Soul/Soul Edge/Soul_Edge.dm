@@ -221,6 +221,9 @@ obj/Skills/AutoHit/Dark_Reconquista
 	ChargeWaveBlend = 2
 
 	OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
+		if(EnergyCost)   
+			var/drain = p.passive_handler["Drained"] ? EnergyCost * (1 + p.passive_handler["Drained"]/10) : EnergyCost
+			p.LoseEnergy(drain)
 		var/obj/Effects/TriumphWave/wave = new(p.loc)
 		wave.owner = p
 		wave.DamageMult = (15 + p.SagaLevel) * benefit
@@ -231,6 +234,9 @@ obj/Skills/AutoHit/Dark_Reconquista
 
 	verb/Triumph()
 		set category = "Skills"
+		if(EnergyCost && usr.Energy < EnergyCost)   
+			usr << "You don't have enough energy to use [name]."
+			return
 		usr.BeginHeldSkill(src)
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge

@@ -129,6 +129,8 @@ client/proc/ApplyKeybinds()
 	for(var/datum/keyaction/a in keybind_registry)
 		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id)
 		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id)
+	for(var/dd in list("Northeast", "Northwest", "Southeast", "Southwest"))
+		ApplyOneBind(set_name, "kbdiag_[lowertext(dd)]", dd, lowertext(dd), KB_MOVE, null)
 	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
 	if(mob.shortcuts.keybinds)
 		for(var/sk in mob.shortcuts.keybinds)
@@ -139,6 +141,8 @@ client/proc/ApplyKeybinds()
 				slot = 2
 				body = copytext(body, 1, length(body) - 1)
 			ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", mob.shortcuts.keybinds[sk], "RunVerb [body]", KB_NORMAL, null)
+
+var/global/datum/keybind_menu/keybind_menu = new()
 
 /datum/keybind_menu/Topic(href, list/href_list)
 	if(!usr || !usr.client) return
@@ -346,11 +350,31 @@ document.onkeydown=function(e){
 
 /proc/SkillHasSkillVerb(obj/Skills/S)
 	if(!S) return 0
+	if(S.fire_ident) return 1   // verb stripped for hotbar-only use, fire_ident is the marker
 	for(var/v in S.verbs)
 		if(!v) continue
 		if(v:hidden) continue
 		if(v:category == "Skills") return 1
 	return 0
+
+/obj/Skills/proc/DisableSkillVerb()
+	if(!SkillMenuVisible(src)) return
+	if(istype(src, /obj/Skills/Buffs))
+		var/obj/Skills/Buffs/b = src
+		if(!b.TimerLimit) return
+	for(var/v in verbs)
+		if(!v || v:hidden || v:category != "Skills") continue
+		fire_ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
+		verbs -= v
+		break
+
+/mob/proc/DisableSlottableSkillVerbs()
+	for(var/obj/Skills/s in contents)
+		s.DisableSkillVerb()
+
+/obj/Skills/New()
+	..()
+	DisableSkillVerb()
 
 /proc/NormalizeSkillName(name)
 	if(!name) return ""
@@ -446,6 +470,50 @@ document.onkeydown=function(e){
 	if(Instinct) L += "Instinct: [Instinct]"
 	return L
 
+// buff classification + info-panel lines
+/proc/IsDebuffBuff(obj/Skills/Buffs/b)
+	return istype(b, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff)
+/proc/IsMenuBuff(obj/Skills/Buffs/b)
+	return istype(b) && !b.TimerLimit && !IsDebuffBuff(b)    // non-timed, non-debuff: usable + shown in the character menu
+/proc/IsStripBuff(obj/Skills/Buffs/b)
+	return istype(b) && b.TimerLimit > 0 && !IsDebuffBuff(b) // timed, non-debuff: shown in the top-left strip
+
+/proc/BuffPct(mult)
+	var/pct = round((mult - 1) * 100)
+	return "[pct >= 0 ? "+" : ""][pct]%"
+/proc/BuffStatLine(list/L, label, add, mult)
+	var/txt = ""
+	if(mult && mult != 1) txt += BuffPct(mult)
+	if(add) txt += "[txt ? ", " : ""][add > 0 ? "+" : ""][add]"
+	if(txt) L += "[label]: [txt]"
+
+// buff stat boosts (duration + stat changes),
+/obj/Skills/Buffs/proc/BuffBoostLines()
+	var/list/L = list()
+	if(TimerLimit > 0) L += "Duration: [round(TimerLimit)]s"
+	BuffStatLine(L, "Strength", strAdd, StrMult)
+	BuffStatLine(L, "Endurance", endAdd, EndMult)
+	BuffStatLine(L, "Force", forAdd, ForMult)
+	BuffStatLine(L, "Speed", spdAdd, SpdMult)
+	BuffStatLine(L, "Offense", offAdd, OffMult)
+	BuffStatLine(L, "Defense", defAdd, DefMult)
+	if(PowerMult != 1) L += "Power: [BuffPct(PowerMult)]"
+	if(RegenMult != 1) L += "Regen: [BuffPct(RegenMult)]"
+	if(RecovMult != 1) L += "Recovery: [BuffPct(RecovMult)]"
+	if(EnergyMult != 1) L += "Energy: [BuffPct(EnergyMult)]"
+	if(!L.len) L += "No stat changes."
+	return L
+
+// fallback
+/obj/Skills/Buffs/InfoPanelLines()
+	var/list/L = BuffBoostLines()
+	if(passives && passives.len)
+		L += "<span style=\"color:#8be9ff\">Passives</span>"
+		for(var/p in passives)
+			var/v = passives[p]
+			L += (v == 1) ? "[p]" : "[p] ([v])"
+	return L
+
 #define SKMENU_COLS 5
 #define SKMENU_ROWS 2
 #define SKMENU_PAGE_SIZE (SKMENU_COLS * SKMENU_ROWS)
@@ -460,6 +528,11 @@ document.onkeydown=function(e){
 #define SKMENU_TAB_ROW_PITCH 34
 #define SKINFO_W 336
 #define SKINFO_H 320
+#define BUFF_VISIBLE 6
+#define BUFF_RH 15
+#define BUFF_ROWS 7        // 6 visible + 1 buffer row for smooth scrolling
+#define BUFF_BAND_H 90     // BUFF_VISIBLE * BUFF_RH
+#define BUFF_Y0 201        // SILoc dy of row 1's bottom edge at sub=0
 
 // tab label -> GetMenuSkills filter key
 var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit")
@@ -483,9 +556,14 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		if(params && findtext(params, "right=1"))
 			if(usr.client.skinfo_skill == skill)
 				usr.client.CloseSkillInfo()
+			else if(istype(skill, /obj/Skills/Buffs))
+				usr.client.ShowBuffInfo(skill)    // buffs get the dedicated panel with right-clickable passive rows
 			else
-				usr.client.ShowSkillInfo(skill)   // closes any open one first, so it swaps
+				usr.client.ShowSkillInfo(skill)
 			return
+		// non-timed, non-debuff buffs are the only skills usable straight from the menu
+		if(IsMenuBuff(skill))
+			usr.fireShortcut(skill)
 	MouseDrop(atom/over_object, atom/src_location, atom/over_location, src_control, over_control, params)
 		if(!usr || !skill) return
 		if(!istype(over_object, /atom/movable/shud/slot)) return
@@ -563,6 +641,13 @@ client
 		list/skmenu_icon_objs
 		list/skmenu_tab_objs
 		list/skinfo_objs
+		list/buffdesc_objs
+		buff_info_open = FALSE
+		list/buff_pass_list
+		list/buff_pass_rows
+		buff_pass_px = 0
+		buff_pass_target = 0
+		buff_pass_anim = FALSE
 		obj/Skills/skinfo_skill
 		si_atx = 1              // info panel tile anchor, computed from view
 		si_aty = 1
@@ -619,6 +704,7 @@ client/proc/CloseSkillMenu()
 
 client/proc/OpenSkillMenu()
 	if(skmenu_open || !mob) return
+	mob.DisableSlottableSkillVerbs()   // catch skills learned since login so they're hotbar-only too
 	CloseMenu()           // never two big panels at once
 	CloseInventory()
 	CloseCharacterMenu()
@@ -769,18 +855,18 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 
 	var/atom/movable/shud/skinfopanel/P = new
 	P.icon = 'HUD/skill_info_panel.png'
-	P.layer = MHUD_LAYER + 1.0
+	P.layer = MHUD_LAYER + 2.0                   // above the character menu (FLY+4.x) when a buff is right-clicked there
 	P.screen_loc = SILoc(0, SKINFO_H)
 	skinfo_objs += P
 
 	var/atom/movable/shud/orbpart/ic = new      // mouse-transparent so the panel keeps the clicks
-	ic.icon = SkillMenuIcon(S)
-	ic.layer = MHUD_LAYER + 1.1
+	ic.icon = SkillMenuIcon(S)                   
+	ic.layer = MHUD_LAYER + 2.1
 	ic.screen_loc = SILoc((SKINFO_W - 32) / 2, 56)
 	skinfo_objs += ic
 
 	var/atom/movable/shud/menutext/nm = new
-	nm.layer = MHUD_LAYER + 1.1
+	nm.layer = MHUD_LAYER + 2.1
 	nm.maptext_width = SKINFO_W
 	nm.maptext_height = 20
 	nm.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffd86b\">[S.name]</span></center>"
@@ -791,7 +877,7 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 	for(var/ln in S.InfoPanelLines())
 		body += "[ln]<br>"
 	var/atom/movable/shud/menutext/tx = new
-	tx.layer = MHUD_LAYER + 1.1
+	tx.layer = MHUD_LAYER + 2.1
 	tx.maptext_width = SKINFO_W - 48
 	tx.maptext_height = SKINFO_H - 96
 	tx.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[body]</span></center>"
@@ -803,6 +889,10 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 	KineticEntrance(skinfo_objs)
 
 client/proc/CloseSkillInfo()
+	CloseBuffPassDesc()
+	buff_info_open = FALSE
+	buff_pass_list = null
+	buff_pass_rows = null
 	skinfo_skill = null
 	if(!skinfo_objs) return
 	while(skinfo_objs.len)
@@ -811,3 +901,206 @@ client/proc/CloseSkillInfo()
 		screen -= o
 		del o
 	skinfo_objs = null
+
+/atom/movable/shud/buffpassrow
+	layer = MHUD_LAYER + 2.2
+	mouse_opacity = 2
+	maptext_height = 15
+	var/pass_name
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
+	MouseEntered(location, control, params)
+		filters = filter(type="outline", size=1, color="#8be9ff")
+	MouseExited(location, control, params)
+		filters = filter(type="outline", size=1, color="#000000")
+	Click(location, control, params)
+		if(!usr || !usr.client || !pass_name) return
+		if(params && findtext(params, "right=1"))
+			usr.client.ShowBuffPassDesc(pass_name)
+
+/atom/movable/shud/buffdescpanel
+	parent_type = /atom/movable/shud/menupanel
+	Click(location, control, params)
+		if(usr && usr.client && params && findtext(params, "right=1"))
+			usr.client.CloseBuffPassDesc()
+
+client/proc/ShowBuffInfo(obj/Skills/Buffs/b)
+	if(!b || !mob) return
+	CloseSkillInfo()
+	skinfo_objs = list()
+	skinfo_skill = b
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/mtw = round(SKINFO_W / 32); if(mtw * 32 < SKINFO_W) mtw++
+	var/mth = round(SKINFO_H / 32); if(mth * 32 < SKINFO_H) mth++
+	si_atx = max(1, round((vw - mtw) / 2) + 1)
+	si_aty = max(1, round((vh - mth) / 2) + 1)
+
+	var/atom/movable/shud/skinfopanel/P = new
+	P.icon = 'HUD/skill_info_panel.png'
+	P.layer = MHUD_LAYER + 2.0
+	P.screen_loc = SILoc(0, SKINFO_H)
+	skinfo_objs += P
+
+	var/atom/movable/shud/orbpart/ic = new
+	ic.icon = SkillMenuIcon(b)
+	ic.layer = MHUD_LAYER + 2.1
+	ic.screen_loc = SILoc((SKINFO_W - 32) / 2, 56)
+	skinfo_objs += ic
+
+	var/atom/movable/shud/menutext/nm = new
+	nm.layer = MHUD_LAYER + 2.1
+	nm.maptext_width = SKINFO_W
+	nm.maptext_height = 20
+	nm.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffd86b\">[b.name]</span></center>"
+	nm.screen_loc = SILoc(0, 84)
+	skinfo_objs += nm
+
+	var/body = ""
+	for(var/ln in b.BuffBoostLines())
+		body += "[ln]<br>"
+	var/atom/movable/shud/menutext/bx = new
+	bx.layer = MHUD_LAYER + 2.1
+	bx.maptext_width = SKINFO_W - 48
+	bx.maptext_height = 64
+	bx.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[body]</span></center>"
+	bx.screen_loc = SILoc(24, 158)
+	skinfo_objs += bx
+
+	buff_info_open = TRUE
+	buff_pass_px = 0
+	buff_pass_target = 0
+	buff_pass_list = list()
+	buff_pass_rows = list()
+	if(b.passives)
+		for(var/p in b.passives)
+			buff_pass_list += p
+	if(buff_pass_list.len)
+		var/atom/movable/shud/menutext/ph = new
+		ph.layer = MHUD_LAYER + 2.4
+		ph.maptext_width = SKINFO_W
+		ph.maptext_height = 16
+		ph.maptext = "<center><span style=\"[MHUD_FONT]; color:#8be9ff\">Passives</span></center>"
+		ph.screen_loc = SILoc(0, 180)
+		skinfo_objs += ph
+		for(var/k = 1 to BUFF_ROWS)             // 6 visible + 1 buffer for smooth scroll
+			var/atom/movable/shud/buffpassrow/r = new
+			r.maptext_width = SKINFO_W - 64
+			buff_pass_rows += r
+			skinfo_objs += r
+		// cover strips in the panel-interior color (#29375F) clip rows scrolling past the band edges
+		var/atom/movable/shud/orbpart/tcov = new
+		tcov.icon = BuffCoverIcon(20)
+		tcov.mouse_opacity = 0
+		tcov.layer = MHUD_LAYER + 2.3
+		tcov.screen_loc = SILoc(20, 186)
+		skinfo_objs += tcov
+		var/atom/movable/shud/orbpart/bcov = new
+		bcov.icon = BuffCoverIcon(18)
+		bcov.mouse_opacity = 0
+		bcov.layer = MHUD_LAYER + 2.3
+		bcov.screen_loc = SILoc(20, 294)
+		skinfo_objs += bcov
+		RefreshBuffPassRows()
+
+	for(var/atom/movable/o in skinfo_objs)
+		screen += o
+	KineticEntrance(skinfo_objs)
+
+/proc/BuffCoverIcon(h)
+	var/icon/I = icon('BLANK.dmi')
+	I.Scale(296, h)
+	I.DrawBox("#29375F", 1, 1, 296, h)
+	return I
+
+client/proc/RefreshBuffPassRows()
+	if(!buff_pass_list || !buff_pass_rows) return
+	var/obj/Skills/Buffs/bb = skinfo_skill
+	var/total = buff_pass_list.len
+	var/maxpx = max(0, total * BUFF_RH - BUFF_BAND_H)
+	buff_pass_px = clamp(buff_pass_px, 0, maxpx)
+	var/sub = buff_pass_px % BUFF_RH
+	var/first = (buff_pass_px - sub) / BUFF_RH
+	for(var/k = 1 to buff_pass_rows.len)
+		var/atom/movable/shud/buffpassrow/r = buff_pass_rows[k]
+		r.screen_loc = SILoc(32, BUFF_Y0 + (k - 1) * BUFF_RH - sub)
+		var/idx = first + k
+		if(idx <= total)
+			var/p = buff_pass_list[idx]
+			var/v = (bb && bb.passives) ? bb.passives[p] : null
+			r.pass_name = p
+			r.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[p][(isnull(v) || v == 1) ? "" : " ([v])"]</span></center>"
+			r.alpha = 255
+		else
+			r.pass_name = null
+			r.maptext = ""
+			r.alpha = 0
+
+// returns 1 if the buff panel is open (and consumed the wheel), so MouseWheel knows to stop
+client/proc/BuffWheelScroll(delta_y)
+	if(!buff_info_open || !buff_pass_list || !buff_pass_list.len) return 0
+	var/bmax = max(0, buff_pass_list.len * BUFF_RH - BUFF_BAND_H)
+	if(bmax > 0)
+		var/bdir = (delta_y > 0) ? -1 : 1
+		buff_pass_target = clamp(buff_pass_target + bdir * BUFF_RH, 0, bmax)
+		if(!buff_pass_anim) AnimateBuffPassScroll()
+	return 1
+
+client/proc/AnimateBuffPassScroll()
+	set waitfor = 0
+	buff_pass_anim = TRUE
+	while(buff_info_open && buff_pass_list && buff_pass_px != buff_pass_target)
+		var/diff = buff_pass_target - buff_pass_px
+		var/stepp = round(diff * 0.5)
+		if(!stepp) stepp = (diff > 0) ? 1 : -1
+		buff_pass_px += stepp
+		RefreshBuffPassRows()
+		sleep(world.tick_lag)
+	buff_pass_anim = FALSE
+
+// passive-description popup shown over the buff panel when a passive row is right-clicked
+client/proc/ShowBuffPassDesc(name)
+	CloseBuffPassDesc()
+	if(!name) return
+	buffdesc_objs = list()
+	var/atom/movable/shud/buffdescpanel/P = new
+	P.icon = 'HUD/skill_info_panel.png'
+	P.layer = MHUD_LAYER + 3.0
+	P.screen_loc = SILoc(0, SKINFO_H)
+	buffdesc_objs += P
+	var/atom/movable/shud/menutext/T = new
+	T.layer = MHUD_LAYER + 3.1
+	T.maptext_width = SKINFO_W
+	T.maptext_height = 20
+	T.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffd86b\">[name]</span></center>"
+	T.screen_loc = SILoc(0, 72)
+	buffdesc_objs += T
+	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
+	var/atom/movable/shud/menutext/B = new
+	B.layer = MHUD_LAYER + 3.1
+	B.maptext_width = SKINFO_W - 48
+	B.maptext_height = SKINFO_H - 140
+	B.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[d]</span></center>"
+	B.screen_loc = SILoc(24, 210)
+	buffdesc_objs += B
+	var/atom/movable/shud/menutext/H = new
+	H.layer = MHUD_LAYER + 3.1
+	H.maptext_width = SKINFO_W
+	H.maptext_height = 16
+	H.maptext = "<center><span style=\"[MHUD_FONT]; color:#7a9bb5\">right-click to close</span></center>"
+	H.screen_loc = SILoc(0, 300)
+	buffdesc_objs += H
+	for(var/atom/movable/o in buffdesc_objs)
+		screen += o
+	KineticEntrance(buffdesc_objs)
+
+client/proc/CloseBuffPassDesc()
+	if(!buffdesc_objs) return
+	while(buffdesc_objs.len)
+		var/atom/movable/o = buffdesc_objs[buffdesc_objs.len]
+		buffdesc_objs.len--
+		screen -= o
+		del o
+	buffdesc_objs = null

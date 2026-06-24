@@ -12,6 +12,7 @@ What shortcut do you want to set?"}
 //VARS
 /obj/Skills/var/
     canBeShortcut=0;
+    fire_ident=null;
 /mob/var/
     shortcut/shortcuts
 /shortcut/var/
@@ -123,15 +124,14 @@ What shortcut do you want to set?"}
             var/obj/Skills/Grapple/g = s;
             g.Activate(src);
         else if(istype(s, /obj/Skills/Buffs))
-            // fire the buff through its own Skills-category verb (runs its pre-checks + Trigger)
-            for(var/v in s.verbs)
-                if(!v) continue
-                if(v:hidden) continue
-                if(v:category != "Skills") continue
-                var/ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
-                if(hascall(s, ident))
-                    call(s, ident)()
+            var/ident = s.fire_ident
+            if(!ident)
+                for(var/v in s.verbs)
+                    if(!v || v:hidden || v:category != "Skills") continue
+                    ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
                     break
+            if(ident && hascall(s, ident))
+                call(s, ident)()
 
 //these are used to assign a shortcut
 /mob/proc/

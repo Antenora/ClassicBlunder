@@ -146,6 +146,7 @@ augments -
 				parent_buff.Cooldown = parent_buff.TimerLimit * 5 - (0.5 * p.AscensionsAcquired)
 			if(x == "Draining")
 				parent_buff.vars["[current_augments[x]]Drain"] = 0.008 - (0.001 * p.AscensionsAcquired)
+		parent_buff.DisableSkillVerb()  
 		if(stat_mult_total > 24 || stat_mult_spent > 24)
 			world.log << "High stat mul on [p]([p.ckey]) [p.client.address]"
 

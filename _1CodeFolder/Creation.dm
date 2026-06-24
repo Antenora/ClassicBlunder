@@ -89,7 +89,7 @@ mob/Players
 		winshow(usr,"StatsWindow2",0)
 		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=true")
-		usr.client.show_verb_panel=1
+		usr.client.show_verb_panel=1   
 		usr.Admin("Check")
 		usr.overlays-='Emoting.dmi'
 		if(!Mapper)

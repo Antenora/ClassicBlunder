@@ -65,10 +65,6 @@ mob/proc/CollectMenuVerbs()
 			target += p
 	for(var/v in toremove)
 		verbs -= v
-	for(var/v in hud_menu_verbs)
-		verbs -= v
-	for(var/v in hud_customize_verbs)
-		verbs -= v
 
 // shared top-bar button (gear=Options, backpack=Inventory), glyph and id set
 // per instance

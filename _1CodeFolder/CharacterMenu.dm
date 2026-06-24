@@ -142,8 +142,31 @@ client/proc/CMloc(dx, dy)
 
 /atom/movable/shud/cmbuff
 	layer = CMENU_LAYER + 0.35
-	mouse_opacity = 1
+	mouse_opacity = 2
 	var/buff_name
+	var/menu_dx                                 // menu-local x of the box, for placing the hover label
+	var/obj/Skills/Buffs/buff
+	proc/SetBuff(obj/Skills/Buffs/b)
+		buff = b
+		if(b)
+			var/icon/I = icon(SkillMenuIcon(b))   
+			I.Scale(26, 26)
+			icon = I
+			buff_name = b.name
+		else
+			icon = null
+			buff_name = null
+	MouseEntered(location, control, params)
+		if(buff) usr?.client?.ShowBuffSlotName(src)
+	MouseExited(location, control, params)
+		usr?.client?.HideBuffSlotName()
+	Click(location, control, params)
+		if(!usr || !usr.client || !buff) return
+		if(params && findtext(params, "right=1"))
+			if(usr.client.skinfo_skill == buff)
+				usr.client.CloseSkillInfo()
+			else
+				usr.client.ShowBuffInfo(buff)   // dedicated buff panel, boosts + right-clickable passive rows
 
 /atom/movable/shud/cmpassrow
 	layer = CMENU_LAYER + 0.3
@@ -323,6 +346,9 @@ client
 		list/cmenu_vals
 		list/cmenu_fills
 		list/cmenu_buffs
+		list/cmenu_buff_all                     // full active-menu-buff list (window of 5 shown in the boxes)
+		cmenu_buff_page = 0                      // 0-based window start when buffs overflow the 5 boxes
+		cmenu_buff_anim = FALSE
 		list/cmenu_desc_objs
 		list/cmenu_gearpass_objs
 		list/cmenu_pass_list
@@ -381,6 +407,7 @@ client
 		atom/movable/shud/cmtext/cm_rp
 		atom/movable/shud/cmtext/cm_rpused
 		atom/movable/shud/cmportrait/cm_portrait
+		atom/movable/shud/menutext/cmbuff_hoverlbl
 
 client/proc/InitCharacterMenuButton()
 	btn_character = new('HUD/ui_icon_profile.png')
@@ -412,6 +439,9 @@ client/proc/ClearCMenuObjs()
 	cmenu_vals = list()
 	cmenu_fills = list()
 	cmenu_buffs = list()
+	cmenu_buff_all = null
+	cmenu_buff_page = 0
+	cmenu_buff_anim = FALSE
 	cmenu_pass_list = null
 	cmenu_pass_rows = null
 	cmenu_thumb = null
@@ -420,11 +450,21 @@ client/proc/ClearCMenuObjs()
 
 client/proc/CloseCharacterMenu()
 	cmenu_open = FALSE
+	CloseSkillInfo()   // close a buff info panel if one is open
 	ClearCMenuObjs()
 	cmenu_objs = null
 	if(btn_character)
 		btn_character.icon = 'HUD/ui_slot_available.png'
 		btn_character.SetGlyphDimmed(FALSE)
+
+// floating buff-name tooltip above the hovered character-menu buff slot
+client/proc/ShowBuffSlotName(atom/movable/shud/cmbuff/b)
+	if(!cmbuff_hoverlbl || !b || !b.buff_name) return
+	cmbuff_hoverlbl.maptext = "<center><span style=\"[CMENU_FONT]; color:#8be9ff\">[b.buff_name]</span></center>"
+	cmbuff_hoverlbl.screen_loc = CMloc(b.menu_dx - 54, 330)   // centered under the slot
+	cmbuff_hoverlbl.alpha = 255
+client/proc/HideBuffSlotName()
+	if(cmbuff_hoverlbl) cmbuff_hoverlbl.alpha = 0
 
 client/proc/OpenCharacterMenu()
 	if(cmenu_open || !mob) return
@@ -545,10 +585,17 @@ client/proc/BuildStatsContent()
 		MkRow(lbl, grows[lbl], 428, 182 + i * 18, 170); i++
 	for(var/j = 1 to 5)
 		var/atom/movable/shud/cmbuff/b = new
-		b.screen_loc = CMloc(428 + (j - 1) * 32, 286 + 28)
+		b.menu_dx = 428 + (j - 1) * 32
+		b.screen_loc = CMloc(b.menu_dx + 1, 313)   // measured + 1px down, seats the 26px icon in the box interior
 		b.alpha = 0
 		cmenu_buffs += b
 		cmenu_objs += b
+	cmbuff_hoverlbl = new /atom/movable/shud/menutext   // floating buff-name tooltip, shown above a slot on hover
+	cmbuff_hoverlbl.layer = CMENU_LAYER + 0.6
+	cmbuff_hoverlbl.maptext_width = 140
+	cmbuff_hoverlbl.maptext_height = 16
+	cmbuff_hoverlbl.alpha = 0
+	cmenu_objs += cmbuff_hoverlbl
 
 client/proc/BuildPersonalContent()
 	var/list/btns = list(
@@ -699,6 +746,11 @@ client/proc/ScrollTrackTo(params)
 
 // real sig is 6 args. use only the sign, the OS reports big magnitudes (120/notch)
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
+	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
+		return
+	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
+		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
+		return
 	if(cmenu_open && cmenu_tab == 1 && cmenu_pass_list)
 		var/maxpx = max(0, cmenu_pass_list.len * PASS_RH - PASS_BAND_H)
 		var/dir = (delta_y > 0) ? -1 : 1
@@ -733,6 +785,43 @@ client/proc/AnimatePassScroll()
 		sleep(world.tick_lag)
 	cmenu_pass_anim = FALSE
 
+// character-menu buff boxes: window of 5, snap-paged crossfade when there are more active buffs than boxes
+client/proc/RefreshCmenuBuffs()
+	if(!cmenu_buffs) return
+	var/total = cmenu_buff_all ? cmenu_buff_all.len : 0
+	cmenu_buff_page = clamp(cmenu_buff_page, 0, max(0, total - cmenu_buffs.len))
+	for(var/i = 1 to cmenu_buffs.len)
+		FillCmenuBuffSlot(i, 255)
+
+client/proc/FillCmenuBuffSlot(i, alpha_target)
+	var/atom/movable/shud/cmbuff/b = cmenu_buffs[i]
+	var/idx = cmenu_buff_page + i
+	if(cmenu_buff_all && idx <= cmenu_buff_all.len)
+		b.SetBuff(cmenu_buff_all[idx])
+		b.alpha = alpha_target
+	else
+		b.SetBuff(null)
+		b.alpha = 0
+
+client/proc/AnimateBuffPage(dir)
+	set waitfor = 0
+	if(cmenu_buff_anim || !cmenu_buffs) return
+	var/total = cmenu_buff_all ? cmenu_buff_all.len : 0
+	var/maxpage = max(0, total - cmenu_buffs.len)
+	var/np = clamp(cmenu_buff_page + dir, 0, maxpage)
+	if(np == cmenu_buff_page) return
+	cmenu_buff_anim = TRUE
+	for(var/atom/movable/shud/cmbuff/ob in cmenu_buffs)
+		if(ob.alpha) animate(ob, alpha = 0, time = 1.5)
+	sleep(1.5)
+	cmenu_buff_page = np
+	for(var/i = 1 to cmenu_buffs.len)
+		FillCmenuBuffSlot(i, 0)            // swap icons in, faded out
+	for(var/atom/movable/shud/cmbuff/nb in cmenu_buffs)
+		if(nb.buff) animate(nb, alpha = 255, time = 1.5)
+	sleep(1.5)
+	cmenu_buff_anim = FALSE
+
 client/proc/UpdateCharacterMenu()
 	if(!cmenu_open || !mob) return
 	var/list/D = mob.GetCharMenuData()
@@ -746,18 +835,11 @@ client/proc/UpdateCharacterMenu()
 			var/icon/ic = icon(CMENU_BARFILL_RESOURCE)
 			ic.Scale(max(1, round(74 * D[fk[i]])), 2)
 			fl.icon = ic
-		var/list/buffs = mob.GetMenuBuffs()
-		for(var/i = 1 to cmenu_buffs.len)
-			var/atom/movable/shud/cmbuff/b = cmenu_buffs[i]
-			if(i <= buffs.len)
-				var/obj/Skills/sk = buffs[i]
-				b.icon = sk.icon
-				b.icon_state = sk.icon_state
-				b.buff_name = sk.name
-				b.alpha = 255
-			else
-				b.alpha = 0
-				b.buff_name = null
+		var/list/buffs = list()
+		for(var/obj/Skills/Buffs/mb in mob.GetMenuBuffs())
+			if(IsMenuBuff(mb)) buffs += mb        // character menu shows active non-timed, non-debuff buffs
+		cmenu_buff_all = buffs
+		if(!cmenu_buff_anim) RefreshCmenuBuffs()  
 	cm_name.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff\">[uppertext(mob.name)]</span>"
 	cm_ident.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">[D["identity"]]</span>"
 	cm_pot.maptext = "<span style=\"[CMENU_FONT]; color:#ffd278\">[D["potential"]]</span>"

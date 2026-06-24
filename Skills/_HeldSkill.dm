@@ -43,6 +43,7 @@
 	if(!HeldSkill) return
 	DamageMult = initial(DamageMult)
 	AccMult    = initial(AccMult)
+	IconLock   = initial(IconLock)   
 	LockX      = initial(LockX)
 	LockY      = initial(LockY)
 	Distance   = initial(Distance)

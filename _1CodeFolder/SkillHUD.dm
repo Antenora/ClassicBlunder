@@ -258,6 +258,7 @@ client/proc/InitSkillHUD()
 		screen += o
 	InitCharacterCard() // top-left card keeps its own object list
 	mob.UpdateResourceOrbs()
+	mob.DisableSlottableSkillVerbs()   // slotted/slottable skills become hotbar-only
 	RefreshHotbar()     // paint slots from the saved /shortcut datum
 	hotbar_ticker = new
 	hotbar_ticker.owner = src

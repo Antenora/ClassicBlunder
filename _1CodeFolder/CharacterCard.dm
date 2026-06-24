@@ -64,6 +64,7 @@ client
 		atom/movable/shud/cardtext/cardstatus // line 2: PWR / INJ-LTL / RP
 		list/intent_chips
 		list/debuff_icons                     // pool of /atom/movable/shud/debufficon
+		list/tbuff_icons                      // pool of /atom/movable/shud/tbufficon (timed buffs)
 		list/debuff_panel_objs
 		debuff_panel_name                     // which debuff the panel is showing, for toggle
 		// target card
@@ -129,6 +130,7 @@ client/proc/InitCharacterCard()
 	UpdateCardText()
 	PositionCharacterCard()
 	UpdateDebuffs()
+	UpdateTimedBuffs()
 	InitTargetCard()
 
 client/proc/InitTargetCard()
@@ -342,6 +344,7 @@ client/proc/PositionCharacterCard()
 	if(cardstatus) cardstatus.screen_loc = sl
 	PlaceIntentChips() // re-place on resize
 	UpdateDebuffs() // re-place on resize
+	UpdateTimedBuffs() // re-place on resize
 
 client/proc/ResetCharacterCard()
 	if(card)
@@ -361,6 +364,11 @@ client/proc/ResetCharacterCard()
 			screen -= o
 			del o
 		debuff_icons = null
+	if(tbuff_icons)
+		for(var/atom/movable/o in tbuff_icons)
+			screen -= o
+			del o
+		tbuff_icons = null
 	ResetIntentChips()
 	HideDebuffPanel()
 	ResetTargetCard()
@@ -500,6 +508,98 @@ client/proc/IntentChipAction(action)
 				usr.client.HideDebuffPanel()
 			else if(usr.client)
 				usr.client.ShowDebuffPanel(src)
+
+// timed-buff strip
+#define TBUFF_ICON 32
+#define TBUFF_GAP 4
+#define TBUFF_PER_ROW 4
+#define TBUFF_BELOW_INTENT 4   // gap between the intent chip row's bottom and the first buff row
+#define TBUFF_NUM_FONT "font-family:'Pixel Operator 8'; font-size:6pt"
+
+/atom/movable/shud/tbuffnum
+	mouse_opacity = 0           // clicks fall through to the icon
+	maptext_width = 30
+	maptext_height = 9
+	maptext_x = 1
+	maptext_y = 1               // bottom-right corner of the 32px icon
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
+
+/atom/movable/shud/tbufficon
+	mouse_opacity = 1           // right-clickable for the reused buff info panel
+	layer = MCARD_LAYER + 0.6
+	var/obj/Skills/Buffs/buff
+	var/atom/movable/shud/tbuffnum/num
+	New()
+		..()
+		num = new
+		num.layer = MCARD_LAYER + 0.62
+		vis_contents += num
+	Del()
+		if(num)
+			vis_contents -= num
+			del num
+		..()
+	Click(location, control, params)
+		if(!usr || !usr.client || !buff) return
+		if(params && findtext(params, "right=1"))
+			if(usr.client.skinfo_skill == buff)
+				usr.client.CloseSkillInfo()
+			else
+				usr.client.ShowBuffInfo(buff)   // same boosts + passives panel as the skill menu
+
+mob/proc/GetTimedBuffs()
+	var/list/out = list()
+	for(var/obj/Skills/Buffs/b in GetMenuBuffs())
+		if(IsStripBuff(b)) out += b              // timed, non-debuff, currently active
+	return out
+
+client/proc/UpdateTimedBuffs()
+	if(!tbuff_icons) tbuff_icons = list()
+	var/list/active = (mob && card) ? mob.GetTimedBuffs() : list()
+	var/list/v = splittext("[view]", "x")
+	var/th = (v.len >= 2) ? (text2num(v[2]) || 20) : 20
+	var/row = max(th - (MCARD_TILES_TALL - 1), 1)            // card's bottom tile, same anchor as the intent chips
+	var/intent_total = 4 * INTENT_CHIP_W + 3 * INTENT_CHIP_GAP
+	var/start_x = MCARD_MARGIN_X + round((MCARD_W - intent_total) / 2)
+	var/ypix0 = -(MCARD_MARGIN_Y + INTENT_CHIP_BELOW + INTENT_CHIP_H) - TBUFF_BELOW_INTENT - TBUFF_ICON
+	var/col = 0
+	var/rw = 0
+	var/i = 0
+	for(var/obj/Skills/Buffs/b in active)
+		i++
+		var/atom/movable/shud/tbufficon/di
+		if(i <= tbuff_icons.len)
+			di = tbuff_icons[i]
+		else
+			di = new
+			tbuff_icons += di
+			screen += di
+		if(di.buff != b)                                     // only rebuild the scaled icon when the slot changes
+			var/icon/I = icon(SkillMenuIcon(b))
+			I.Scale(TBUFF_ICON, TBUFF_ICON)
+			di.icon = I
+			di.buff = b
+		var/x = start_x + col * (TBUFF_ICON + TBUFF_GAP)
+		var/y = ypix0 - rw * (TBUFF_ICON + TBUFF_GAP)
+		di.screen_loc = "1:[x],[row]:[y]"
+		di.alpha = 255
+		var/rem = b.TimerLimit - b.Timer                     // Timer advances 1.0/sec
+		var/secs = round(rem)
+		if(secs < rem) secs++                                // ceil so it reads as time remaining
+		if(secs < 0) secs = 0
+		di.num.maptext = "<span style=\"[TBUFF_NUM_FONT]; color:#ffffff; text-align:right\">[secs]</span>"
+		di.num.alpha = (di.num.alpha == 255) ? 254 : 255     // nudge to force a maptext flush each tick
+		col++
+		if(col >= TBUFF_PER_ROW)
+			col = 0
+			rw++
+	for(var/j = active.len + 1 to tbuff_icons.len)           // hide pooled icons from a larger prior set
+		var/atom/movable/shud/tbufficon/spare = tbuff_icons[j]
+		spare.alpha = 0
+		spare.buff = null
+		spare.num.maptext = ""
 
 client/proc/GetActiveDebuffs()
 	var/list/out = list()

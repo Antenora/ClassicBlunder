@@ -25,19 +25,17 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	ActiveMessage = "releases a wave of Getsuga!"
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
-		var/icon_used
 		var/baseDmg = initial(DamageMult)
 		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? 5 : 0
 		DamageMult = (baseDmg + bonus) * benefit
 		var/inBankai = p.CheckSlotless("Tensa Zangetsu")
 		if(sweet_spot_hit)
-			icon_used = inBankai ? 'Big Getsuga.dmi' : 'Big Getsuga Shikai.dmi'
+			IconLock = inBankai ? 'Big Getsuga.dmi' : 'Big Getsuga Shikai.dmi'
 			LockX = -65
 			LockY = -65
 		else
-			icon_used = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
-		p.Blast(src, p, 1, icon_used)
-		src.Cooldown(1, null, p)
+			IconLock = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
+		p.UseProjectile(src)
 		ResetHeldConfig()
 
 	verb/Getsuga_Tenshou()
