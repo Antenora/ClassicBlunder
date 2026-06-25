@@ -15,9 +15,9 @@
 // referencing the font here bundles it into the rsc for maptext
 /var/MHUD_FONT_RESOURCE = 'HUD/monogram.ttf'
 
-// verbs that stay typeable even though their category matches, players type
-// these with arguments
-/var/list/MENU_VERB_EXCLUDE = list("OOC", "Say", "Emote", "Think", "Whisper")
+// verbs kept out of the Options menu. The verbs stay typeable
+/var/list/MENU_VERB_EXCLUDE = list("OOC", "Say", "Emote", "Think", "Whisper", \
+	"Check AI Kills", "Clear Skill Shortcut", "Ping", "Set Skill Shortcuts", "Toggle Channels", "ViewSelfLogs")
 
 // stripped from the mob entirely, handled by the Character menu or other UI now
 /var/list/MENU_VERB_REMOVE = list("Change Pronouns", "Character Sheet", "Enable Old Zanzoken", \

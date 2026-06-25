@@ -140,6 +140,21 @@ client/proc/CMloc(dx, dy)
 	Click(location, control, params)
 		if(usr) spawn() usr.ChooseMenuPronouns()
 
+// click to rename yourself
+/atom/movable/shud/cmname
+	layer = CMENU_LAYER + 0.4
+	mouse_opacity = 2
+	maptext_height = 16
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
+	MouseEntered(location, control, params)
+		filters = filter(type="outline", size=1, color="#8be9ff")   // cyan hint
+	MouseExited(location, control, params)
+		filters = filter(type="outline", size=1, color="#000000")
+	Click(location, control, params)
+		if(usr) spawn() usr.RenameSelf()
+
 /atom/movable/shud/cmbuff
 	layer = CMENU_LAYER + 0.35
 	mouse_opacity = 2
@@ -399,7 +414,7 @@ client
 		cust_drag_my = 0
 		atom/movable/shud/menubtn/btn_character
 		atom/movable/shud/menulabel/btn_character_label
-		atom/movable/shud/cmtext/cm_name
+		atom/movable/shud/cmname/cm_name
 		atom/movable/shud/cmtext/cm_ident
 		atom/movable/shud/cmtext/cm_pot
 		atom/movable/shud/cmtext/cm_focus
@@ -2124,3 +2139,21 @@ mob/proc/ChooseMenuPronouns()
 	information.pronouns = list(subj, objp)
 	client.UpdateCharacterMenu()
 	src << "Pronouns set to [subj] / [objp]."
+
+// click your name in the Character menu to rename yourself.
+// mirrors the player Rename verb (Chat&Verbs.dm) safeguards: preventRename gate, no html_encode,
+// validation, and the glob.IDs[UniqueID] registry update so the UID->name map stays in sync.
+// Cap is 25 (tighter than the verb's 30) to fit the menu's name field; refreshes the menu after.
+mob/proc/RenameSelf()
+	set waitfor = 0
+	if(!client) return
+	if(preventRename)
+		src << "You cannot rename this."
+		return
+	var/blah = input(src, "Enter a new name.", "Rename", name) as text|null
+	if(blah && blah != "" && blah != " ")
+		name = copytext(blah, 1, 25)
+		if(isplayer(src))
+			glob.IDs[UniqueID] = "[name]"
+		client.UpdateCharacterMenu()
+		src << "You are now known as <b>[name]</b>."
