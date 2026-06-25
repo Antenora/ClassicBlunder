@@ -29,9 +29,9 @@ Difficulty: ★★★
         proc/GiveRacial()
             switch(Racial)
                 if("Mountainheart")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit, 
-                    /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Heart_of_the_Half_Beast, 
-                    /obj/Skills/Queue/Racial/Beastkin/Savagery);
+                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit, 
+                    /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Heart_of_the_Half_Beast, 
+                    /obj/Skills/Queue/Racial/Wilder/Savagery);
                     passives = list("Grit" = 1, "Steady" = 1, "DoubleStrike" = 1, "Heavy Strike" = "Unseen Predator");
                 if("Silverscale")
                     skills = list(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Form, /obj/Skills/AutoHit/Mist_Form, 

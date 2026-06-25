@@ -527,10 +527,10 @@ update
 		version = 23;
 		updateMob(mob/p)
 			. = ..()
-			if(p.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit))
+			if(p.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit))
 				if(p.Class!="Heart of The Beastkin")
 					p.passive_handler.Set("Grit", 0)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit/TG in p)
+					for(var/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit/TG in p)
 						del TG
 	version24
 		version = 24;

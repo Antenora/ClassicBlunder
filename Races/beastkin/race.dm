@@ -48,8 +48,8 @@ Inspiration taken from Sett (League of Legends)}",\
 		proc/GiveRacial(mob/p)
 			switch(Racial)
 				if("Heart of The Beastkin")
-					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit)
-					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Heart_of_the_Half_Beast)
+					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit)
+					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Heart_of_the_Half_Beast)
 					p.passive_handler.Set("Grit", 1)
 					p.passive_handler.Set("Steady", 1)
 					p.passive_handler.Set("DoubleStrike",1)
@@ -61,7 +61,7 @@ Inspiration taken from Sett (League of Legends)}",\
 
 				if("Unseen Predator")
 					p.passive_handler.passives["Heavy Strike"] = "Unseen Predator"
-					p.AddSkill(new/obj/Skills/Queue/Racial/Beastkin/Savagery)
+					p.AddSkill(new/obj/Skills/Queue/Racial/Wilder/Savagery)
 				if("Undying Rage")
 					p.passive_handler.Increase("Fury", 1)
 					p.passive_handler.Increase("Wrathful Tenacity", 0.15)

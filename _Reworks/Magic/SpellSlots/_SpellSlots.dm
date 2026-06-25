@@ -12,8 +12,8 @@
         if(granted && istype(granted, /obj/Skills/Buffs))
             var/obj/Skills/Buffs/granted_buff = granted
             if(granted_buff.passives && ("Grit" in granted_buff.passives))
-                if(!FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit))
-                    findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit)
+                if(!FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit))
+                    findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit)
                     src << "Your magical resilience can now be channeled into a Vai Health shield."
 
 /mob/proc/getSpellSlots()
