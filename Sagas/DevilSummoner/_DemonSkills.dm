@@ -1000,24 +1000,26 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 		for(var/obj/Skills/s in ai_owner)
 			if(!s.Using) continue
 			if(!s.cooldown_start) continue
-			var/elapsed = world.realtime - s.cooldown_start
-			var/remaining = s.cooldown_remaining - elapsed
+			var/remaining = SkillCDRemaining(s)
 			if(remaining <= 0) continue
 			reduced_any = TRUE
 			if(remaining <= 300)
 				s.Using = 0
 				s.cooldown_remaining = 0
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				var/new_remaining = remaining - 300
 				var/new_start = world.realtime
 				s.cooldown_start = new_start
+				s.cooldown_start_wt = world.time
 				s.cooldown_remaining = new_remaining
 				spawn(new_remaining)
 					if(s && s.cooldown_start == new_start)
 						s.Using = 0
 						s.cooldown_remaining = 0
 						s.cooldown_start = 0
+						s.cooldown_start_wt = 0
 		if(reduced_any)
 			DemonSpawnVFX(src)
 			if(ai_owner) ai_owner << "<font color='#88ff88'>[name] reduced your skill cooldowns!</font>"

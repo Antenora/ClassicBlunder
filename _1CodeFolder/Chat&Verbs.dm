@@ -963,8 +963,9 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = dm.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)   
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				s.Cooldown(modify=1,Time=s.cooldown_remaining, p=src)
 	for(var/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/am in src)
@@ -973,8 +974,9 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = am.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)   
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				s.Cooldown(modify=1,Time=s.cooldown_remaining, p=src)
 
@@ -1004,8 +1006,9 @@ mob/proc/RPModeSwitch()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)   
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
 		src.pauseStyleRatingExpiryForRP()
 		return
@@ -1033,8 +1036,9 @@ mob/proc/CutsceneMode()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)   
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
 		src.pauseStyleRatingExpiryForRP()
 		return

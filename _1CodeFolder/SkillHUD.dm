@@ -37,8 +37,8 @@
 
 /proc/SkillCDRemaining(obj/Skills/S)
 	if(!S || S.cooldown_remaining <= 0) return 0
-	if(!S.cooldown_start) return S.cooldown_remaining
-	return max(0, S.cooldown_remaining - (world.realtime - S.cooldown_start))
+	if(!S.cooldown_start || !S.cooldown_start_wt) return S.cooldown_remaining
+	return max(0, S.cooldown_remaining - (world.time - S.cooldown_start_wt))
 
 /atom/movable/shud/slottext
 	mouse_opacity = 0
@@ -57,6 +57,7 @@
 	var/atom/movable/shud/orbpart/iconpart
 	var/atom/movable/shud/orbpart/cdfill
 	var/atom/movable/shud/slottext/keytext
+	var/atom/movable/shud/slottext/cdtext
 	var/glow_on = FALSE
 	var/glow_busy = FALSE     // a one-shot flash currently owns the glow filter
 	var/glow_seq = 0          // flash token so rapid flashes don't look bad
@@ -78,6 +79,11 @@
 		keytext.maptext_width = 32
 		keytext.maptext_height = 12
 		keytext.maptext_y = 0
+		cdtext = new
+		cdtext.layer = SHUD_LAYER + 0.6       
+		cdtext.maptext_width = 32
+		cdtext.maptext_height = 14
+		cdtext.maptext_y = 9
 		vis_contents += iconpart
 		vis_contents += cdfill
 		vis_contents += keytext
@@ -88,6 +94,7 @@
 		iconpart = null
 		cdfill = null
 		keytext = null
+		cdtext = null
 		..()
 	proc/SetSkill(obj/Skills/S, keylabel)
 		cur = S
@@ -105,6 +112,7 @@
 			keytext.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#cfe9ff\">[keylabel]</span></center>"
 		else
 			keytext.maptext = ""
+		cdtext.maptext = ""
 	// replacing the filter stops any running animate, used to freeze on RP-pause
 	proc/SetVeilFrac(frac)
 		cdfill.filters = filter(type="alpha", icon='HUD/cd_mask.png', y = CD_EMPTY_Y + round(CD_H * frac))
@@ -135,9 +143,15 @@
 				GlowSet(SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, 0)   // hand back to the sustained glow
 			else if(iconpart.filters)
 				iconpart.filters = null
-	// tried to do live countdown but couldn't figure it out, may come back to it
+	proc/SetCDText(rem)
+		if(rem <= 0)
+			if(cdtext.maptext) cdtext.maptext = ""
+			return
+		var/r = round(rem)
+		cdtext.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[(r - (r % 10)) / 10].[r % 10]</span></center>"
 	proc/UpdateCooldown()
 		if(!cur)
+			SetCDText(0)
 			return FALSE
 		if(cur.Cooldown == -1)
 			var/locked = (cur.Using || cur.cooldown_remaining > 0)
@@ -146,6 +160,7 @@
 			SetVeilFrac(locked ? 1 : 0)
 			anim_key = 0
 			on_cd = locked
+			SetCDText(0)
 			return FALSE
 		var/rem = SkillCDRemaining(cur)
 		if(!((cur.Using || cur.cooldown_remaining > 0) && rem > 0))
@@ -155,19 +170,16 @@
 				SetVeilFrac(0)
 				on_cd = FALSE
 				anim_key = 0
+			SetCDText(0)
 			return FALSE
 		on_cd = TRUE
 		iconpart.alpha = 120
 		cdfill.alpha = 255
-		var/total = cur.cooldown_remaining
+		var/total = cur.cooldown_full || cur.cooldown_remaining
 		var/frac = total ? rem / total : 0
-		if(!cur.cooldown_start)
-			SetVeilFrac(frac)              
-			anim_key = 0
-		else if(anim_key != cur.cooldown_start)
-			SetVeilFrac(frac)              // fresh cast, plant start then one smooth crawl
-			animate(cdfill.filters[1], y = CD_EMPTY_Y, time = rem, easing = LINEAR_EASING)
-			anim_key = cur.cooldown_start
+		SetCDText(rem) 
+		animate(cdfill.filters[1], y = CD_EMPTY_Y + CD_H * frac, time = world.tick_lag, easing = LINEAR_EASING)
+		anim_key = cur.cooldown_start
 		return TRUE
 	Click(location, control, params)
 		if(!usr || !usr.client) return
@@ -274,8 +286,10 @@ client/proc/InitSkillHUD()
 		var/atom/movable/shud/slot/s = new
 		s.slot_index = i
 		s.screen_loc = "CENTER:[SHUD_ROW_LEFT + (i-1)*SHUD_PITCH],SOUTH:[SHUD_ROW_Y]"
+		s.cdtext.screen_loc = s.screen_loc
 		shud_slots += s
 		shud_parts += s
+		shud_parts += s.cdtext
 	orb_energy = new(null, 'HUD/orb_energy_base.png', 'HUD/fill_energy.png', 'HUD/drain_energy.png', 'HUD/orb_energy_top.png')
 	orb_energy.screen_loc = "CENTER:[SHUD_ORB_LEFT_X],SOUTH:[SHUD_ORB_Y]"
 	shud_parts += orb_energy
