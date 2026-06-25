@@ -123,9 +123,6 @@
 	verb/Shakkahou()
 		set name = "Shakkahou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Oukasen
@@ -221,9 +218,6 @@
 	verb/Soukatsui()
 		set name = "Soukatsui"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 // TIER 3
@@ -355,9 +349,6 @@
 	verb/Raikouhou()
 		set name = "Raikouhou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Souren_Soukatsui
@@ -440,9 +431,6 @@
 	verb/Souren_Soukatsui()
 		set name = "Souren Soukatsui"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/AutoHit/Hado/Zangerin
@@ -653,9 +641,6 @@
 	verb/Senju_Kouten_Taihou()
 		set name = "Senju Kouten Taihou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/AutoHit/Hado/Itto_Kaso

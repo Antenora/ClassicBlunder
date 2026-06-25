@@ -101,9 +101,11 @@ What shortcut do you want to set?"}
         if(shortcuts)
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
             if(attemptedSkill)
+                var/was_on_cd = SkillOnCooldown(attemptedSkill)
                 if(attemptedSkill.HeldSkill && num >= 1 && num <= length(HOTBAR_DEFAULT_KEYS))
                     held_skill_pending_key = KeybindKey("hotbar[num]") || KeybindKey("hotbar[num]", 2);
-                fireShortcut(attemptedSkill);
+                var/used = fireShortcut(attemptedSkill);
+                if(client) client.FlashSkillUse(attemptedSkill, num, was_on_cd, used)   // blue = went off, red = failed
             else src << "You don't have a skill assigned to <b>Shortcut [num]</b>!";
     //god i hate that this proc is necessary atm = _ =
     fireShortcut(obj/Skills/s)
@@ -117,14 +119,14 @@ What shortcut do you want to set?"}
                 BeginHeldSkill(s)
             return;
         if(istype(s, /obj/Skills/Queue))
-            SetQueue(s);
+            return SetQueue(s);
         else if(istype(s, /obj/Skills/Projectile))
-            UseProjectile(s);
+            return UseProjectile(s);
         else if(istype(s, /obj/Skills/AutoHit))
-            Activate(s);
+            return Activate(s);
         else if(istype(s, /obj/Skills/Grapple))
             var/obj/Skills/Grapple/g = s;
-            g.Activate(src);
+            return g.Activate(src);
         else if(istype(s, /obj/Skills/Buffs))
             var/ident = s.fire_ident
             if(!ident)
@@ -133,7 +135,7 @@ What shortcut do you want to set?"}
                     ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
                     break
             if(ident && hascall(s, ident))
-                call(s, ident)()
+                return call(s, ident)()
 
 //these are used to assign a shortcut
 /mob/proc/

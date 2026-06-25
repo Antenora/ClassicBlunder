@@ -234,9 +234,6 @@ obj/Skills/AutoHit/Dark_Reconquista
 
 	verb/Triumph()
 		set category = "Skills"
-		if(EnergyCost && usr.Energy < EnergyCost)   
-			usr << "You don't have enough energy to use [name]."
-			return
 		usr.BeginHeldSkill(src)
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge

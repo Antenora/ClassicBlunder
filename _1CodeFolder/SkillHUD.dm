@@ -27,6 +27,14 @@
 #define CD_EMPTY_Y -22    // mask off, skill ready
 #define CD_FULL_Y 0       // mask on, veil covers the icon
 
+// blue glow on a slot while its skill is held / a beam charges / a timed buff is active
+#define SLOT_GLOW_COLOR "#49b6ff"
+#define SLOT_GLOW_SIZE 4
+#define SLOT_GLOW_IN 2    
+#define SLOT_GLOW_OUT 5   
+#define SLOT_FLASH_CD_COLOR "#ff5a5a"   // red flash, skill pressed while unusable
+#define SLOT_FLASH_OUT 4                // one-shot use/cooldown flash to fade
+
 /proc/SkillCDRemaining(obj/Skills/S)
 	if(!S || S.cooldown_remaining <= 0) return 0
 	if(!S.cooldown_start) return S.cooldown_remaining
@@ -49,6 +57,9 @@
 	var/atom/movable/shud/orbpart/iconpart
 	var/atom/movable/shud/orbpart/cdfill
 	var/atom/movable/shud/slottext/keytext
+	var/glow_on = FALSE
+	var/glow_busy = FALSE     // a one-shot flash currently owns the glow filter
+	var/glow_seq = 0          // flash token so rapid flashes don't look bad
 	New()
 		..()
 		iconpart = new
@@ -97,6 +108,33 @@
 	// replacing the filter stops any running animate, used to freeze on RP-pause
 	proc/SetVeilFrac(frac)
 		cdfill.filters = filter(type="alpha", icon='HUD/cd_mask.png', y = CD_EMPTY_Y + round(CD_H * frac))
+	proc/GlowSet(color, size, intime)            // intime 0 = snap straight to `size`
+		iconpart.filters = filter(type="drop_shadow", x=0, y=0, size=(intime ? 1 : size), color=color)
+		if(intime) animate(iconpart.filters[1], size=size, time=intime)
+	proc/SetGlow(on)
+		if(on == glow_on) return
+		glow_on = on
+		if(glow_busy) return                     
+		if(on)
+			GlowSet(SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, SLOT_GLOW_IN)
+		else if(iconpart.filters && iconpart.filters.len)
+			animate(iconpart.filters[1], size=0, time=SLOT_GLOW_OUT)
+			var/atom/movable/ip = iconpart
+			spawn(SLOT_GLOW_OUT)
+				if(ip && !glow_on && !glow_busy) ip.filters = null
+	proc/FlashGlow(color)
+		glow_busy = TRUE
+		glow_seq += 1
+		var/myseq = glow_seq
+		GlowSet(color, SLOT_GLOW_SIZE, 0)        // snap to full, then fade
+		animate(iconpart.filters[1], size=0, time=SLOT_FLASH_OUT)
+		spawn(SLOT_FLASH_OUT)
+			if(glow_seq != myseq) return         // a newer flash superseded this one
+			glow_busy = FALSE
+			if(glow_on)
+				GlowSet(SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, 0)   // hand back to the sustained glow
+			else if(iconpart.filters)
+				iconpart.filters = null
 	// tried to do live countdown but couldn't figure it out, may come back to it
 	proc/UpdateCooldown()
 		if(!cur)
@@ -357,11 +395,47 @@ client/proc/RefreshHotbar()
 	RefreshHotbarCooldowns()
 	ApplyKeybinds()   // re-sync key binds and held-skill +UP releases on every slot change
 
+// a slot glows blue while its skill is in an active state
+mob/proc/SkillGlowActive(obj/Skills/S)
+	if(!S) return FALSE
+	if(S == held_skill) return TRUE                                // held skill currently charging
+	if(("Charging" in S.vars) && S.vars["Charging"]) return TRUE   // beam mid-charge
+	if(istype(S, /obj/Skills/Buffs))
+		var/obj/Skills/Buffs/b = S
+		if(b.TimerLimit && BuffOn(b)) return TRUE                  // timed buff active
+	return FALSE
+
+// matches the slot's cooldown veil: is this skill currently on cooldown / mid-use?
+mob/proc/SkillOnCooldown(obj/Skills/S)
+	if(!S) return FALSE
+	if(S.Cooldown == -1) return (S.Using || S.cooldown_remaining > 0)
+	return (S.Using || S.cooldown_remaining > 0) && SkillCDRemaining(S) > 0
+
+// flash the slot after a hotbar press: blue if the skill went off, red if it failed for any reason
+client/proc/FlashSkillUse(obj/Skills/S, num, was_on_cd, used)
+	if(!mob || !S) return
+	var/failed
+	if(was_on_cd)
+		failed = TRUE
+	else if(S.HeldSkill)
+		failed = (mob.held_skill != S)                                          // the hold never started
+	else
+		failed = !(used || S.cooldown_remaining > 0 || S.Using || mob.SkillGlowActive(S))
+	FlashSlot(num, failed ? SLOT_FLASH_CD_COLOR : SLOT_GLOW_COLOR)
+
+client/proc/FlashSlot(num, color)
+	if(!shud_slots) return
+	for(var/atom/movable/shud/slot/s in shud_slots)
+		if(s.slot_index == num)
+			s.FlashGlow(color)
+			return
+
 client/proc/RefreshHotbarCooldowns()
 	var/any = FALSE
 	if(shud_slots)
 		for(var/atom/movable/shud/slot/s in shud_slots)
 			if(s.UpdateCooldown()) any = TRUE
+			s.SetGlow(mob.SkillGlowActive(s.cur))
 	return any
 
 // rides the per-tick global_loop so the veil descends smoothly

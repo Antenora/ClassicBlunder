@@ -120,6 +120,59 @@
 	return h
 
 
+/mob/proc/CanUseSkill(obj/Skills/Z)
+	if(!Z) return FALSE
+	if(!CanAttack(-1)) return FALSE  
+	if(src.Airborne) return FALSE
+	if(src.OnMagicalVehicle())
+		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+		return FALSE
+	if(src.passive_handler.Get("Silenced"))
+		src << "<font color='red'>You can't use [Z], you are silenced!</font>"
+		return FALSE
+	if(Z.Sealed)
+		src << "<font color='red'>You can't use [Z], it is sealed!</font>"
+		return FALSE
+	if(Z.Using || Z.cooldown_remaining)
+		src << "<font color='red'>[Z] is on cooldown.</font>"
+		return FALSE
+	if(src.Secret == "Heavenly Restriction" && !Z.heavenlyRestrictionIgnore)
+		if(src.secretDatum?:hasRestriction("All Skills")) return FALSE
+		if(Z.NeedsSword && src.secretDatum?:hasRestriction("Armed Skills")) return FALSE
+	if(Z.NeedsSword && !src.EquippedSword() && !src.HasBladeFisting() && !src.UsingBattleMage())
+		src << "<font color='red'>You need a sword to use this technique!</font>"
+		return FALSE
+	// resource requirements -- availability only; the cost is deducted when the skill fires
+	if(Z.HealthCost && src.Health < Z.HealthCost * glob.WorldDamageMult)
+		src << "<font color='red'>You don't have enough health to use [Z].</font>"
+		return FALSE
+	if(Z.WoundCost && src.TotalInjury + Z.WoundCost * glob.WorldDamageMult > 99)
+		src << "<font color='red'>You're too wounded to use [Z].</font>"
+		return FALSE
+	if(Z.EnergyCost)
+		var/drain = src.passive_handler["Drained"] ? Z.EnergyCost * (1 + src.passive_handler["Drained"]/10) : Z.EnergyCost
+		if(src.Energy < drain && !src.CheckSpecial("One Hundred Percent Power") && !src.CheckSpecial("Fifth Form") && !CheckActive("Eight Gates"))
+			src << "<font color='red'>You don't have enough energy to use [Z].</font>"
+			return FALSE
+	if(Z.FatigueCost && src.TotalFatigue + Z.FatigueCost > 99)
+		src << "<font color='red'>You're too fatigued to use [Z].</font>"
+		return FALSE
+	if(Z.ManaCost && !src.HasDrainlessMana())
+		var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (src.passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+		drain *= src.ChakraCostMult(Z)
+		if(drain <= 0) drain = 0.5
+		var/need = src.TomeSpell(Z) ? drain * (1 - (0.45 * src.TomeSpell(Z))) : drain
+		if(src.ManaAmount < need)
+			src << "<font color='red'>You don't have enough mana to activate [Z].</font>"
+			return FALSE
+	if(Z.CapacityCost && src.TotalCapacity + Z.CapacityCost > 99)
+		src << "<font color='red'>You don't have enough capacity to use [Z].</font>"
+		return FALSE
+	if(Z.CorruptionCost && src.Corruption - Z.CorruptionCost < 0)
+		src << "<font color='red'>You don't have enough Corruption to activate [Z].</font>"
+		return FALSE
+	return TRUE
+
 /mob/proc/BeginHeldSkill(var/obj/Skills/Z)
 	var/from_macro = held_skill_from_macro && (world.time - held_skill_from_macro) <= HELD_MACRO_FLAG_WINDOW
 	held_skill_from_macro = 0
@@ -130,10 +183,7 @@
 	if(!Z || !Z.HeldSkill) return
 	var/client/C = client
 	if(!C) return
-	if(src.Airborne) return
-	if(src.OnMagicalVehicle())
-		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
-		return
+	if(!CanUseSkill(Z)) return 
 
 	// All guards run before touching any charge state.
 
@@ -162,18 +212,7 @@
 	if(held_skill_last_release && world.time - held_skill_last_release < 5)
 		return
 
-	// Cooldown / in-use check
-	if(Z.Using || Z.cooldown_remaining)
-		src << "<font color='red'>[Z.name] is on cooldown.</font>"
-		return
-
-	if(Z.NeedsSword)
-		var/obj/Items/Sword/s = EquippedSword()
-		if(!s && !HasBladeFisting() && !UsingBattleMage())
-			src << "<font color='red'>You need a sword equipped to use [Z.name]!</font>"
-			return
-
-	if(!hotbar_key)   
+	if(!hotbar_key)
 		for(var/k in keys)
 			winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
 
