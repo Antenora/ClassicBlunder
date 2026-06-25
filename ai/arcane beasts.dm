@@ -344,6 +344,7 @@ obj/Skills/Buffs/SlotlessBuffs/
 		OffMessage="disperses their arcane weapon into mist!"
 		verb/Transfigure_Nympharum_Armament()
 			set category="Utility"
+			set hidden = 1
 			var/Choice
 			if(!usr.BuffOn(src))
 				var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
@@ -779,6 +780,7 @@ obj/Skills/Arcane_Regrowth
 	Cooldown=160
 	verb/Regrowth()
 		set category="Skills"
+		set hidden = 1
 		if(!usr.is_arcane_beast)
 			usr << "Due to a lack of a bond, you no longer have access to Regrowth."
 			del(src)

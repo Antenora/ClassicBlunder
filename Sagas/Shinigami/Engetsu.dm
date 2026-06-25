@@ -335,6 +335,7 @@
 		Cooldown=30
 		verb/Phoenix_Down()
 			set category = "Utility"
+			set hidden = 1
 			name = "Phoenix Down"
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in oview(5,usr))

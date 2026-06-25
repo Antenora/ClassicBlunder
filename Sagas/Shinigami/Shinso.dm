@@ -134,6 +134,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Butou()
 		set name = "Butou"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Butou in Bankai."
 			return
@@ -156,6 +157,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Butou_Renjin()
 		set name = "Butou: Renjin"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Butou: Renjin in Bankai."
 			return
@@ -184,6 +186,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Korose()
 		set name = "Korose"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Korose in Bankai."
 			return

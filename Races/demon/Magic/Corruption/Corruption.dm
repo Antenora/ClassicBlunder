@@ -160,6 +160,7 @@
 		// put it on cd
 	verb/Adjust_Name()
 		set category = "Utility"
+		set hidden = 1
 		NameFake = input(usr, "What name?") as text
 	verb/Impose_Will()
 		set category = "Skills"

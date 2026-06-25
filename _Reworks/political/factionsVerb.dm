@@ -53,6 +53,7 @@
 /mob/verb/customizePU()
     set name = "Customize: PU Charging"
     set category = "Other"
+    set hidden = 1
     if(!src.client)
         return
     var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
@@ -70,6 +71,7 @@
 /mob/verb/Admins()
     set name = "Admins"
     set category = "Other"
+    set hidden = 1
     if(!(world.time > src.verb_delay)) return
     src.verb_delay = world.time + 1
     var/View = {"<html><head><title>Admins</title>
@@ -99,6 +101,7 @@ h2{margin:0 0 8px 0;color:#8be9ff;font-size:16px;letter-spacing:1px;}
 /mob/verb/FactionCount()
     set name = "Faction Count"
     set category = "Other"
+    set hidden = 1
     var/list/total = FACTIONS
     for(var/mob/Players/M in players)
         if(!M.client)
@@ -124,6 +127,7 @@ characterInformation*/
 /mob/var/hidingInformation = FALSE
 /mob/verb/Hide_Information()
     set category = "Other"
+    set hidden = 1
     hidingInformation = !hidingInformation
     src << "The ID Card is [hidingInformation ? "hidden." : "not hidden."]"
 

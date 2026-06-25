@@ -41,30 +41,38 @@ client/Click(atom/A, location, control, params)
 mob/proc/CollectMenuVerbs()
 	hud_menu_verbs = list()
 	hud_customize_verbs = list()
-	var/list/toremove = list()   // strip after the loop, don't mutate verbs mid-iterate
-	for(var/p in verbs)
+	CollectMenuVerbsFrom(verbs, TRUE)              // own verbs (allowed to strip MENU_VERB_REMOVE)
+	if(client) CollectMenuVerbsFrom(client.verbs, FALSE)
+	for(var/obj/o in contents)
+		if(istype(o, /obj/Skills)) continue   // skills are hotbar/keybind-driven
+		CollectMenuVerbsFrom(o.verbs, FALSE)
+
+mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
+	if(!vlist) return
+	var/list/toremove = list()   // strip after the loop
+	for(var/p in vlist)
 		if(!p) continue
-		if(p:hidden) continue
 		if(p:category != "Other" && p:category != "Utility") continue
 		var/pn = "[p:name]"
-		if(pn in MENU_VERB_REMOVE)
+		if(can_remove && (pn in MENU_VERB_REMOVE))
 			toremove += p
 			continue
 		if(pn in MENU_VERB_EXCLUDE) continue
 		// these go to the Character menu's Customization tab instead of Options
 		var/is_cust = (pn == "Hair" || pn == "Clothes" || pn == "Reset Overlays" || pn == "Reset Appearance" || findtext(pn, "Customize"))
 		var/list/target = is_cust ? hud_customize_verbs : hud_menu_verbs
+		if(p in target) continue   // guard against dupes
 		var/inserted = FALSE
 		for(var/i = 1 to target.len)
 			var/q = target[i]
-			if(sorttext(p:name, q:name) == 1)
+			if(sorttext("[p:name]", "[q:name]") == 1)
 				target.Insert(i, p)
 				inserted = TRUE
 				break
 		if(!inserted)
 			target += p
 	for(var/v in toremove)
-		verbs -= v
+		vlist -= v
 
 // shared top-bar button (gear=Options, backpack=Inventory), glyph and id set
 // per instance
@@ -310,6 +318,7 @@ client/proc/KineticEntrance(list/objs, time = 3)
 
 client/proc/OpenOptionsMenu()
 	if(menu_open || !mob) return
+	mob.CollectMenuVerbs()   // refresh so Other/Utility verbs granted since login
 	if(!mob.hud_menu_verbs || !mob.hud_menu_verbs.len) return
 	CloseInventory() // never both big panels open at once
 	CloseCharacterMenu()

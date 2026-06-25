@@ -4,6 +4,7 @@ mob/var/list/killed_AI
 mob/Players/verb/CheckAIKills()
 	set name = "Check AI Kills"
 	set category = "Other"
+	set hidden = 1
 	usr << "Your current AI kills are:"
 	for(var/i in killed_AI)
 		usr << "[i] - [killed_AI[i]]"

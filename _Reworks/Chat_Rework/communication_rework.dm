@@ -95,6 +95,7 @@ client/verb/OOC(T as text)
 
 client/verb/Say(T as text)
 	set category="Roleplay"
+	set hidden = 1
 	if(usr.CutsceneMode) return
 
 	sayProc(T, null)
@@ -171,6 +172,7 @@ client/verb/Yell(T as text)
 
 client/verb/Whisper(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	var/list/transmitTo = hearers(SAY_RADIUS, usr)
 	var/header = "<font color=[usr.Text_Color]>[usr.name]"
@@ -218,6 +220,7 @@ client/verb/Whisper(T as text)
 
 client/verb/Think(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	var/header = "<i><font color=[usr.Text_Color]>[usr.name]</i>"
 	var/message = html_encode(T)
@@ -249,6 +252,7 @@ client/verb/Think(T as text)
 /*
 client/verb/Prayer(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	if(!T) return
 
@@ -262,6 +266,7 @@ client/verb/Prayer(T as text)
 */
 client/verb/Emote()
 	set category="Roleplay"
+	set hidden = 1
 
 	if(usr.rping) return
 

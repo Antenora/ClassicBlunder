@@ -86,14 +86,17 @@ characterInformation
 
 /mob/verb/Toggle_Pronouns()
 	set category = "Other"
+	set hidden = 1
 	information.seeOthersPronouns()
 /mob/verb/Toggle_Ask_Pronoun()
 	usr.client.setPref("usePronouns", !usr.client.prefs.usePronouns)
 /mob/verb/Change_Pronouns()
 	set category = "Other"
+	set hidden = 1
 	information.setPronouns(FALSE)
 	usr<<"[information.pronouns[1]]/[information.pronouns[2]] are now your pronouns."
 
 /mob/verb/Set_Catchline()
 	set category = "Other"
+	set hidden = 1
 	information.setCatchLine()

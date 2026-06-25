@@ -116,6 +116,7 @@ obj
 				EnergyCost=1.5
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))

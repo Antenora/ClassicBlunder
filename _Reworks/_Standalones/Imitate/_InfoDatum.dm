@@ -111,6 +111,7 @@ mob/proc/ProfileLoad(presetName)
 
 /mob/verb/Save_Profile()
     set category = "Roleplay"
+    set hidden = 1
     var/pname = input(src, "Name this profile:") as null|text
     if(!pname) return
     pname = replacetext(pname, "/", "-")   // keep it a valid savefile key
@@ -125,6 +126,7 @@ mob/proc/ProfileLoad(presetName)
 
 /mob/verb/Swap_Profiles()
     set category = "Roleplay"
+    set hidden = 1
     if(Imitating)
         src << "You can't swap profiles while imitating another person."
         return

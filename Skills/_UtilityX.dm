@@ -43,6 +43,7 @@ obj/Skills/Utility
 		var/LastTeach//holds a realtime
 		verb/Teach()
 			set category="Utility"
+			set hidden = 1
 			set name="Train Student"
 			if(src.Using)
 				return
@@ -86,6 +87,7 @@ obj/Skills/Utility
 			src.Using=0
 		verb/Teach_Skill()
 			set category="Utility"
+			set hidden = 1
 			set name="Teach Student"
 			if(src.Using)
 				return
@@ -161,6 +163,7 @@ obj/Skills/Utility
 		desc="Cook up a feast!"
 		verb/Cooking()
 			set category="Utility"
+			set hidden = 1
 			var/option = input(usr, "What do you want to do? Your current meal is [currentMeal]", "Cooking") in list("Cook Meal", "Set Current Meal","Make Recipe", "Alter Recipe", "Delete Recipe", "Share Recipe", "Cancel")
 			switch(option)
 				if("Cook Meal")
@@ -374,6 +377,7 @@ obj/Skills/Utility
 		var/NonAlcoholic=0
 		verb/Toggle_Alcohol()
 			set category="Utility"
+			set hidden = 1
 			src.NonAlcoholic=!src.NonAlcoholic
 			if(src.NonAlcoholic)
 				usr << "You <font color='red'>WILL NOT</font color> make drinks with alcohol in them!"
@@ -381,6 +385,7 @@ obj/Skills/Utility
 				usr << "You <font color='green'>WILL</font color> make drinks with alcohol in them!"
 		verb/Set_Drink()
 			set category="Utility"
+			set hidden = 1
 			src.suffix=input(usr, "What are you brewing?", "Brewing") as text|null
 			if(src.suffix==null || src.suffix=="")
 				src.suffix="Booze"
@@ -390,6 +395,7 @@ obj/Skills/Utility
 			src.pixel_y=input("Pixel Y?") as num|null
 		verb/Brew_Drink()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing a meal!"
 				return
@@ -473,6 +479,7 @@ obj/Skills/Utility
 		desc="Focus your thoughts to detect nearby entities."
 		verb/Sense()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasRestriction("Senses"))
 				return
 			if(Using) return
@@ -517,6 +524,7 @@ obj/Skills/Utility
 		verb/GodTransformationToggle()
 			set name = "God Form Toggle"
 			set category = "Utility"
+			set hidden = 1
 			if (usr.transActive >= 1)
 				usr << "You can't wield this power while wielding another."
 				return
@@ -575,6 +583,7 @@ obj/Skills/Utility
 		var/anonymous = FALSE
 		verb/Filter_Thoughts()//why was this not a part of telepathy ??
 			set category="Utility"
+			set hidden = 1
 			if(usr.HearThoughts)
 				usr.HearThoughts=0
 				usr << "You toggle thought hearing <font color='red'>OFF</font color>."
@@ -583,6 +592,7 @@ obj/Skills/Utility
 				usr << "You toggle thought hearing <font color='green'>ON</FONT COLOR>."
 		verb/Toggle_Anonymous()
 			set category = "Utility"
+			set hidden = 1
 			if(src.anonymous)
 				src.anonymous=0
 				usr << "You toggle anonymous telepathy <font color='red'>OFF</font color>."
@@ -591,6 +601,7 @@ obj/Skills/Utility
 				usr << "You toggle anonymous telepathy <font color='green'>ON</font color>."
 		verb/Telepathic_Link()
 			set category="Utility"
+			set hidden = 1
 			if(MasteryCheck==0)
 				usr << "Applying race-based increase on your Mastery!"
 				MasteryCheck=1
@@ -636,6 +647,7 @@ obj/Skills/Utility
 		desc="Can continually transfer energy to someone at the cost of your own life force."
 		verb/Share_Energy()
 			set category="Utility"
+			set hidden = 1
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in oview(5,usr))
 				who.Add(M)
@@ -657,6 +669,7 @@ obj/Skills/Utility
 		desc="This allows you to heal people you are facing."
 		verb/Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Heal",src)
 	Refresh
 		Cooldown=-1
@@ -664,6 +677,7 @@ obj/Skills/Utility
 		desc="This allows you to heal people you are facing."
 		verb/Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Refresh",src)
 
 	Observe
@@ -673,6 +687,7 @@ obj/Skills/Utility
 		Level=100
 		verb/Observe()
 			set category="Utility"
+			set hidden = 1
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in players)
 				who.Add(M)
@@ -733,6 +748,7 @@ obj/Skills/Utility
 		desc="Rip out your own eye to give to someone else."
 		verb/Bestow_Jagan_Eye()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Maimed)
 				usr << "You are not sufficiently whole to bestow an eye."
 				return
@@ -786,6 +802,7 @@ obj/Skills/Utility
 		desc="Pull a soul out of the cycle of reincarnation."
 		verb/Keep_Body()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("KeepBody", src)
 
 	Travel_To_Plane
@@ -793,6 +810,7 @@ obj/Skills/Utility
 		desc="Warp anywhere without cost."
 		verb/Travel_To_Plane()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Stasis)return
 			var/blah=input("Options")in list("Person","Cordinates","Cancel")
 			switch(blah)
@@ -818,6 +836,7 @@ obj/Skills/Utility
 		desc="Bind someone to a particular plane."
 		verb/Bind_To_Plane()
 			set category="Utility"
+			set hidden = 1
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(3, usr))
 				if(M==usr)
@@ -834,6 +853,7 @@ obj/Skills/Utility
 				usr << "They aren't weak enough to bind!"
 		verb/Call_To_Plane()
 			set category="Skills"
+			set hidden = 1
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(10, usr))
 				if(M.Binding)
@@ -864,6 +884,7 @@ obj/Skills/Utility
 			return list(eastWest, norSouth)
 		verb/Materialize_Equipment()
 			set category="Utility"
+			set hidden = 1
 			var/Choice=input(usr, "What kind of item will you make?", "Make Sword") in list("Weapon", "Armor", "Weights")
 			if(Choice=="Weapon")
 				if(usr.HasManaCapacity(5))
@@ -914,6 +935,7 @@ obj/Skills/Utility
 					OMsg(usr, "[usr] creates a set of weighted clothing!", "[usr] materialized some weights.")
 		verb/Clothes_Beam()
 			set category="Skills"
+			set hidden = 1
 			for(var/mob/Target in get_step(usr,usr.dir))
 				var/obj/Items/Wearables/c=new
 				var/Z=input(usr,"Choose an icon for the conjured clothes!","Clothes Beam")as icon|null
@@ -936,6 +958,7 @@ obj/Skills/Utility
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
 		verb/Enchant_Equipment()
 			set category="Utility"
+			set hidden = 1
 			var/list/swords=list("Cancel")
 			var/list/staves=list("Cancel")
 			var/list/armors=list("Cancel")
@@ -1195,6 +1218,7 @@ obj/Skills/Utility
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
 		verb/Upgrade_Equipment()
 			set category="Utility"
+			set hidden = 1
 			var/list/swords=list("Cancel")
 			var/list/staves=list("Cancel")
 			var/list/armors=list("Cancel")
@@ -1451,6 +1475,7 @@ obj/Skills/Utility
 		var/LastTransmute//holds realtime
 		verb/Transmute()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(src.LastTransmute)
@@ -1518,6 +1543,7 @@ obj/Skills/Utility
 	Concoct_Flask
 		verb/Concoct_Flask()
 			set category = "Utility"
+			set hidden = 1
 			var/choice = input(usr, "Choose an option", "Concoct Flask Options") in list("Create New Flask", "Alter Equipped Flask Concoction", "Reset Flask Concoction" ,"Upgrade Existing Flask", "Cancel")
 			if(choice == "Cancel") return
 			if(choice == "Create New Flask")
@@ -1623,6 +1649,7 @@ obj/Skills/Utility
 		// This gives us an Inkwork
 		verb/Bestow_Inkwork()
 			set category = "Utility"
+			set hidden = 1
 			var/choice = input(usr, "Choose an Option", "Bestow Inkwork") in list("Cancel")
 			if(choice == "Cancel") return
 
@@ -1780,6 +1807,7 @@ obj/Skills/Utility
 		desc="Seal a turf so that only you can move through it!"
 		verb/Seal_Turf()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1811,6 +1839,7 @@ obj/Skills/Utility
 		desc="Seal an object so that only you can harm or pick it up!"
 		verb/Seal_Object()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1853,6 +1882,7 @@ obj/Skills/Utility
 		desc="Seal a fallen foe's power!!"
 		verb/Seal_Power()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1909,6 +1939,7 @@ obj/Skills/Utility
 		desc="Seal a fallen foe's ability to leave a particular area!"
 		verb/Seal_Movement()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1975,6 +2006,7 @@ obj/Skills/Utility
 		desc="Crystalize an absolute order in form of a Seal! They'll provide additional options of interacting with your contracts."
 		verb/Crystalize_Command_Seal()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2000,6 +2032,7 @@ obj/Skills/Utility
 		desc="Test your imagination, intelligence, and ability at seal magic against an existing seal to try to break it!"
 		verb/Seal_Break()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2049,6 +2082,7 @@ obj/Skills/Utility
 		desc="Deployment of a magical circle which will cut all capacity costs by 25%."
 		verb/Create_Magic_Circle()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2066,6 +2100,7 @@ obj/Skills/Utility
 		desc="Forge a collection of magical circuits that can be passed down and teaches the skills possessed within it."
 		verb/Create_Magic_Crest()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(usr.EquippedCrest())
@@ -2093,6 +2128,7 @@ obj/Skills/Utility
 			PortalID//this will determine where it leads to...
 		verb/Pocket_Dimension()
 			set category="Utility"
+			set hidden = 1
 			if(usr.KO)return
 			if(usr.InMagitekRestrictedRegion())
 				usr << "The pocket dimensons refuses to function."
@@ -2112,6 +2148,7 @@ obj/Skills/Utility
 		var/Operating//Don't spam this.
 		verb/Grimoire_Arcana()
 			set category="Utility"
+			set hidden = 1
 			var/Economy=glob.progress.EconomyMana//Now based on MANA!
 			var/mob/M//Who's getting the grimgrim?
 			var/GrimoireChoice//What grim is m getting grimmed?
@@ -2588,6 +2625,7 @@ obj/Skills/Utility
 		desc="Smelt an item to refund 50% of its cost."
 		verb/Recycle_Items()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2629,6 +2667,7 @@ obj/Skills/Utility
 		verb
 			Copy_Key()
 				set category="Utility"
+				set hidden = 1
 				var/obj/Items/Choice
 				var/Confirm
 				var/Cost
@@ -2680,6 +2719,7 @@ obj/Skills/Utility
 		verb
 			Reforge()
 				set category="Utility"
+				set hidden = 1
 				var/obj/Items/Choice
 				var/Confirm
 				var/Cost
@@ -2796,6 +2836,7 @@ obj/Skills/Utility
 		var/Cost
 		verb/Surgery()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing to perform surgery!"
 				return
@@ -2853,6 +2894,7 @@ obj/Skills/Utility
 		var/Cost
 		verb/Revival_Protocol()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing to perform the recovery!"
 				return
@@ -2977,6 +3019,7 @@ obj/Skills/Utility
 
 		verb/Toggle_Internal_Scouter()
 			set category="Utility"
+			set hidden = 1
 			if(usr.InternalScouter)
 				usr.InternalScouter=0
 				usr << "You deactivate your internal scouter."
@@ -2985,6 +3028,7 @@ obj/Skills/Utility
 				usr << "You activate your internal scouter."
 		verb/CommunicatorTransmit(A as text)
 			set category="Utility"
+			set hidden = 1
 			set name="Communicator Transmit"
 			set src in usr
 			if(usr.CheckSlotless("Camouflage"))
@@ -3040,6 +3084,7 @@ obj/Skills/Utility
 									break
 		verb/ICFrequency()
 			set category="Utility"
+			set hidden = 1
 			set name="Communicator Frequency"
 			set src in usr
 			var/previousFreq = src.ICFrequency
@@ -3052,6 +3097,7 @@ obj/Skills/Utility
 				addToGlobalListenerOnFreq(src, newFreq)
 		verb/MonitorFrequency()
 			set category="Utility"
+			set hidden = 1
 			set name="Monitoring Frequency"
 			set src in usr
 			var/previousFreq = src.MonitoringFrequency
@@ -3085,6 +3131,7 @@ obj/Skills/Utility
 		desc="Look someone over for wiretaps and remove them if desired."
 		verb/Scan(var/mob/Players/p in view(1,usr))
 			set category="Utility"
+			set hidden = 1
 			var/found=0
 			for(var/obj/Items/Tech/Planted_Wiretap/t in p)
 				if(t.Revealed<=0)
@@ -3110,6 +3157,7 @@ obj/Skills/Utility
 		var/list/ZPlanes=list()
 		verb/Satellite_Network()
 			set category="Utility"
+			set hidden = 1
 			usr << "Not this wipe, chief."
 			return
 			var/list/Choices=list("Cancel", "Launch", "Track")
@@ -3161,6 +3209,7 @@ obj/Skills/Utility
 		desc="Integrate gear into yourself!"
 		verb/Android_Integration()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(usr.GetAndroidIntegrated()<3+usr.AscensionsAcquired)
@@ -3241,6 +3290,7 @@ obj/Skills/Utility
 		desc="Modify your metal babies."
 		verb/Augmentation()
 			set category="Utility"
+			set hidden = 1
 
 			if(usr.Secret=="Heavenly Restriction" && (usr.secretDatum?:hasRestriction("Science") || usr.secretDatum?:hasRestriction("Cybernetics")))
 				return
@@ -3810,6 +3860,7 @@ obj/Skills/Utility
 		desc="Call for assistance of your Zodiacal guardian."
 		verb/Zodiac_Invocation()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.ClothGold)
 				usr.PickGoldCloth()
 				if(!glob.infConstellations)
@@ -3835,6 +3886,7 @@ obj/Skills/Utility
 		desc="Return your legendary blade to where it belongs."
 		verb/Call_Blade()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.BoundLegend)
 				return
 			if(usr.Dead && !usr.KeepBody)
@@ -3919,6 +3971,7 @@ obj/Skills/Utility
 		desc="Kill death."
 		verb/Death_Killer()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				src << "You're already killing death."
 				return
@@ -3977,6 +4030,7 @@ obj/Skills/Utility
 		var/PenaltyCD//holds a realtime
 		verb/Bind_Soul()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(!usr.Move_Requirements()||usr.KO)
@@ -4030,6 +4084,7 @@ obj/Skills/Utility
 				return
 		verb/Raise_Dead()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				src << "You're already raising the dead."
 				return
@@ -4066,6 +4121,7 @@ obj/Skills/Utility
 			src.Using=0
 		verb/Drop_Dead()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				src << "You're already punishing your servants."
 				return

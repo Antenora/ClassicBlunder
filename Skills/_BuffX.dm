@@ -1383,6 +1383,7 @@ NEW VARIABLES
 			Cooldown=30
 			verb/Delete_Bugged_Keyblade()
 				set category="Utility"
+				set hidden = 1
 				var/obj/Items/Sword/s
 				s=usr.EquippedSword()
 				del s
@@ -1812,6 +1813,7 @@ NEW VARIABLES
 						passives = list("BladeFisting" = 1, "SpiritSword" = 2, "Extend" = 1, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6, "MonkeyKing" = 2)
 			verb/Transfigure_Sickle_of_Sorrow()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/modify_sword_num = 1
@@ -1983,6 +1985,7 @@ NEW VARIABLES
 			IconTransform = 'mist.dmi'
 			verb/Fade_Into_Shadows()
 				set category="Roleplay"
+				set hidden = 1
 				src.Trigger(usr)
 				if(usr.secretDatum.currentTier >= 4)
 					usr.Incorporeal=0;
@@ -1992,6 +1995,7 @@ NEW VARIABLES
 						usr.density=0;
 			verb/All_Seeing_Eyes()
 				set category="Roleplay"
+				set hidden = 1
 				var/list/who=list("Cancel")
 
 				if(usr.secretDatum.currentTier < 5) who += usr.getShadowEyeTargets();
@@ -2096,6 +2100,7 @@ NEW VARIABLES
 				Trigger(usr)
 			verb/Set_Zone_Glow()
 				set category="Utility"
+				set hidden = 1
 				ManaGlow=input(usr, "What colour do you want to set your Zone Glow to?", "Zone Colour", "#3399ff") as color;
 		Adrenaline_Rush
 			SignatureTechnique=3
@@ -3265,6 +3270,7 @@ NEW VARIABLES
 					return
 			verb/Toggle_Helmet()
 				set category="Roleplay"
+				set hidden = 1
 				var/image/im=image(icon=src.TopOverlayLock, pixel_x=src.TopOverlayX, pixel_y=src.TopOverlayY, layer=FLOAT_LAYER-1)
 				im.blend_mode=src.IconLockBlend
 				im.transform*=src.OverlaySize
@@ -3623,6 +3629,7 @@ NEW VARIABLES
 						setRandomTime(player)
 				verb/Toggle_Cape()
 					set category="Roleplay"
+					set hidden = 1
 					Cape(usr)
 
 				proc/Cape(mob/user)
@@ -4242,6 +4249,7 @@ NEW VARIABLES
 			verb/Bravery_PowerGlowEdit()
 				set name = "Edit Bravery's PowerGlow"
 				set category = "Utility"
+				set hidden = 1
 				if(!usr || src.loc != usr)
 					return
 				var/chosen_color = input(usr,"Choose this skill's glow color.","Edit Bravery's PowerGlow") as color
@@ -4837,6 +4845,7 @@ NEW VARIABLES
 									"Flicker" = 4, "PureDamage"=8, "PureReduction" = 8, "BuffMastery" = 15,"ZenkaiPower"=2)
 			verb/Toggle_Rose_Transfomation_Sequence()
 				set category="Utility"
+				set hidden = 1
 				if(src.TransformationSequence)
 					src.TransformationSequence=0
 					usr<<"You have turned the Super Saiyan Rose transformation sequence <b>OFF</b>"
@@ -5141,6 +5150,7 @@ NEW VARIABLES
 			TextColor="#FF66CC"
 			verb/Customize_Ki_Armanent()
 				set category="Other"
+				set hidden = 1
 				set name="Customize: Ki Armanent"
 				if(usr.BuffOn(src))
 					usr << "You can't customize ki armanent while using it!"
@@ -5175,6 +5185,7 @@ NEW VARIABLES
 			TextColor="#FF66CC"
 			verb/Customize_Ki_Blade()
 				set category="Other"
+				set hidden = 1
 				set name="Customize: Ki Blade"
 				if(usr.BuffOn(src))
 					usr << "You can't customize ki blade while using it!"
@@ -5212,6 +5223,7 @@ NEW VARIABLES
 			OffMessage="lowers their shield..."
 			verb/Customize_Ki_Shield()
 				set category="Other"
+				set hidden = 1
 				set name="Customize: Ki Shield"
 				if(usr.BuffOn(src))
 					usr << "You can't customize ki shield while using it!"
@@ -5494,6 +5506,7 @@ NEW VARIABLES
 				Cooldown=30
 				verb/Water_Walk()
 					set category="Utility"
+					set hidden = 1
 					var/magicLevel = usr.getTotalMagicLevel()
 					if(magicLevel >= 10)
 						magicLevel = 10
@@ -5519,6 +5532,7 @@ NEW VARIABLES
 				Cooldown=45
 				verb/Swift_Walk()
 					set category="Utility"
+					set hidden = 1
 					var/magicLevel = usr.getTotalMagicLevel()
 					if(magicLevel >= 10)
 						magicLevel = 10
@@ -5545,6 +5559,7 @@ NEW VARIABLES
 				Cooldown=60
 				verb/Wind_Walk()
 					set category="Utility"
+					set hidden = 1
 					var/magicLevel = usr.getTotalMagicLevel()
 					if(magicLevel >= 10)
 						magicLevel = 10
@@ -5561,6 +5576,7 @@ NEW VARIABLES
 				Cooldown=30
 				verb/Magic_Trick()
 					set category="Utility"
+					set hidden = 1
 					if(!src.Using)
 						for(var/mob/Players/m in oviewers(5,usr))
 							if(prob(20))
@@ -5616,6 +5632,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 				verb/Magic_Act()
 					set category="Utility"
+					set hidden = 1
 					if(!usr.BuffOn(src))
 						var/Choices=list("Cancel", "Confuse", "Stun")
 						var/Mode=input(usr, "What act do you perform?", "Magic Act") in Choices
@@ -5731,6 +5748,7 @@ NEW VARIABLES
 					src.Trigger(usr)*/
 				verb/Magic_Show()
 					set category="Utility"
+					set hidden = 1
 					if(!usr.BuffOn(src))
 						var/Choices=list("Cancel", "Disappear", "Confuse", "Stun")
 						var/Mode=input(usr, "What show do you perform?", "Magic Show") in Choices
@@ -5886,6 +5904,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 				verb/Customize_Mage_Armor()
 					set category="Utility"
+					set hidden = 1
 					var/Choice
 					if(!usr.BuffOn(src))
 						var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
@@ -6098,6 +6117,7 @@ NEW VARIABLES
 				Range = 12
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
@@ -6160,6 +6180,7 @@ NEW VARIABLES
 				Range = 12
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
@@ -6223,6 +6244,7 @@ NEW VARIABLES
 				Range = 12
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
@@ -6286,6 +6308,7 @@ NEW VARIABLES
 				Range = 12
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
@@ -6359,6 +6382,7 @@ NEW VARIABLES
 				Range = 10
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
@@ -7155,6 +7179,7 @@ NEW VARIABLES
 				desc="Freeze time for everyone in view."
 				verb/Time_Stop()
 					set category="Utility"
+					set hidden = 1
 					usr.SkillX("Time Stop",src)
 			Time_Alter
 				SignatureTechnique=3
@@ -7694,6 +7719,7 @@ NEW VARIABLES
 			var/secondDevilArmPick
 			verb/Devil_Arm_Evolution()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(src.Mastery>usr.AscensionsAcquired)
 					usr << "Your Devil Arm is fully evolved currently!"
@@ -8068,6 +8094,7 @@ NEW VARIABLES
 			StaffAscension=2
 			verb/Transfigure_Spirit_Bow()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
@@ -8115,6 +8142,7 @@ NEW VARIABLES
 				passives = list("SpiritSword" = clamp(1 + (0.2 * p.AscensionsAcquired), 1, 2), "SwordAscension" = max(3, p.AscensionsAcquired), "SwordAscensionSecond" = max(3, p.AscensionsAcquired), "SwordAscensionThird" = max(3, p.AscensionsAcquired), "Extend" = round(p.AscensionsAcquired/3))
 			verb/Transfigure_Spirit_Sword()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/modify_sword_num = 1
@@ -8177,6 +8205,7 @@ NEW VARIABLES
 			OffMessage="dispels their Dimension Sword!"
 			verb/Transfigure_Dimension_Sword()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/modify_sword_num = 1
@@ -8943,6 +8972,7 @@ NEW VARIABLES
 			var/heavy_y = 0
 			verb/Customize_Projects()
 				set category = "Other"
+				set hidden = 1
 				var/choice = input(usr, "What icon?") in list("wooden","light","med","heavy")
 				vars["[choice]_icon"] = input(usr, "selecting icon for [choice]") as icon|null
 				vars["[choice]_x"] = input(usr, "WHAT X") as num
@@ -10094,6 +10124,7 @@ NEW VARIABLES
 				TransformY=-4
 				verb/Customize_Full_Moon()
 					set category = "Other"
+					set hidden = 1
 					IconTransform=input(usr, "What icon will your Full Moon Form use?", "Full Moon Form Icon") as icon|null
 					TransformX=input(usr, "Pixel X offset.", "Full Moon Form Icon") as num
 					TransformY=input(usr, "Pixel Y offset.", "Full Moon Form Icon") as num

@@ -59,6 +59,7 @@ mob/proc/refund_skill(obj/Skills/refunded_skill)
 
 mob/verb/Refund()
 	set category="Other"
+	set hidden = 1
 	if(refund_banned) return
 	if(refunding)
 		usr << "You're already trying to refund something!"

@@ -57,6 +57,7 @@ mob/Admin3/verb/GiveWitchBook()
 	verb/Kill_Essence(mob/M in get_step(usr, usr.dir))
 		set name = "Drain Essence (Lethal)"
 		set category = "Skills"
+		set hidden = 1
 		if(!M.KO)
 			usr << "[M] needs to be KO'd!"		
 			return       
@@ -74,6 +75,7 @@ mob/Admin3/verb/GiveWitchBook()
 	verb/Take_Essence(mob/M in get_step(usr, usr.dir))
 		set name = "Take Essence"
 		set category = "Skills"
+		set hidden = 1
 		if(!M.KO)
 			usr << "[M] needs to be KO'd!"
 			return
@@ -88,6 +90,7 @@ mob/Admin3/verb/GiveWitchBook()
 	verb/Give_Essence()
 		set name = "Give Essence"
 		set category = "Skills"
+		set hidden = 1
 		var/list/PeopleWithBooks = list("Cancel", "----")
 
 		for(var/mob/M in oview(20, src))
@@ -108,6 +111,7 @@ mob/Admin3/verb/GiveWitchBook()
 	verb/Make_Deal(mob/M in get_step(usr, usr.dir))
 		set name = "Witch Apprenticeship"
 		set category = "Roleplay"
+		set hidden = 1
 		if(canPact)
 			SunderSoul(M, usr)
 			checkIfNoPassives(M)

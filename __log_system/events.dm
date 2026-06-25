@@ -79,6 +79,7 @@ mob/proc/sanitizedChatLog()
 
 /mob/verb/ViewSelfLogs()
 	set category = "Other"
+	set hidden = 1
 	set desc = "View your own logs."
 	usr.SegmentLogs("Saves/PlayerLogs/[usr.key]/sanitized/")
 

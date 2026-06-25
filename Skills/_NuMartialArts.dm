@@ -304,6 +304,7 @@ obj
 						Finisher="/obj/Skills/Queue/Finisher/Ashura_Kai"
 						verb/Toggle_Sword_Count()
 							set category="Other"
+							set hidden = 1
 							if(src.NeedsSecondSword&&src.NeedsThirdSword)
 								src.NeedsSecondSword=1
 								src.NeedsThirdSword=0

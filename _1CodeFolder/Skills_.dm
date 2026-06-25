@@ -4,7 +4,8 @@ mob/var/cooldownAnnounce = 1
 mob/verb
 	CooldownAnnouncement()
 		set category = "Other"
-		set name = "Toggle Cooldown Announcement"
+		set hidden = 1
+		set name = "CD Announce"
 		if(usr.cooldownAnnounce)
 			usr.cooldownAnnounce = 0
 			usr << "Cooldown Announcement Disabled."
@@ -156,11 +157,13 @@ obj/Skills/proc/Recharge(Time, mob/m)
 mob/Players/verb
 	Auto_Attack()
 		set category = "Skills"
+		set hidden = 1
 		client.setPref("autoAttacking", !client.getPref("autoAttacking"))
 		lastHit = world.time
 		src << "You are [client.getPref("autoAttacking") ? "now Auto Attacking." : "no longer Auto Attacking."]"
 	Attack()
 		set category="Skills"
+		set hidden = 1
 		set name="Normal Attack"
 		if(src.icon_state=="Meditate")
 			src.SkillX("Meditate",src)

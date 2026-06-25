@@ -33,9 +33,11 @@ What shortcut do you want to set?"}
 /mob/verb/
     Set_Skill_Shortcuts()
         set category="Utility"
+        set hidden = 1
         usr.setSkillShortcut();
     Clear_Skill_Shortcut()
         set category="Utility"
+        set hidden = 1
         usr.clearSkillShortcut();
 
     //hidden so as to not clutter the tabs
@@ -127,7 +129,7 @@ What shortcut do you want to set?"}
             var/ident = s.fire_ident
             if(!ident)
                 for(var/v in s.verbs)
-                    if(!v || v:hidden || v:category != "Skills") continue
+                    if(!v || v:category != "Skills") continue
                     ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
                     break
             if(ident && hascall(s, ident))

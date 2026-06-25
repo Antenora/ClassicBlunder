@@ -195,6 +195,7 @@ var/global/datum/keybind_menu/keybind_menu = new()
 
 /mob/verb/Keybinds()
 	set category = "Utility"
+	set hidden = 1
 	set name = "Keybinds"
 	if(client) client.OpenKeybindMenu()
 
@@ -205,6 +206,7 @@ client/proc/OpenKeybindMenu()
 // verbs for the Misc section
 client/proc/MiscVerbs()
 	BuildKeybindRegistry()
+	if(mob) mob.CollectMenuVerbs()   // refresh so newly-granted Other/Utility verbs are bindable too
 	var/list/reg = list()
 	for(var/datum/keyaction/a in keybind_registry)
 		reg[a.command] = 1
@@ -213,18 +215,17 @@ client/proc/MiscVerbs()
 	for(var/v in mob.verbs) srcs += v
 	if(mob.hud_menu_verbs) for(var/v in mob.hud_menu_verbs) srcs += v
 	for(var/v in srcs)
-		if(!v || v:hidden) continue
-		if(v:category != "Other" && v:category != "Utility") continue
+		if(!v) continue
+		if(v:category != "Other" && v:category != "Utility") continue   
 		var/nm = "[v:name]"
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
 		out[nm] = nm
 	for(var/obj/Skills/Buffs/b in mob.contents)
 		if(b.TimerLimit) continue   // timed buffs go in the hotbar
-		for(var/v in b.verbs)
-			if(!v || v:hidden || v:category != "Skills") continue
-			var/nm = "[v:name]"
-			if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
-			out[nm] = nm
+		if(!b.fire_ident) continue   // non-timed buffs are now stripped, their verb name lives in fire_ident
+		var/nm = replacetext(b.fire_ident, "_", " ")
+		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
+		out[nm] = nm
 	return out
 
 /mob/verb/RunVerb(cmd as text)
@@ -248,6 +249,12 @@ client/proc/MiscVerbs()
 			if(v && "[v:name]" == cmd)
 				call(sk, v)()
 				return
+	// fire them by their saved fire_ident
+	var/nc = NormalizeSkillName(cmd)
+	for(var/obj/Skills/sk in contents)
+		if(sk.fire_ident && NormalizeSkillName(sk.fire_ident) == nc && hascall(sk, sk.fire_ident))
+			call(sk, sk.fire_ident)()
+			return
 
 // one table row: label, primary key box, secondary key box. aid is the action id (or misc:<command>).
 client/proc/KeybindRow(aid, label)
@@ -353,17 +360,13 @@ document.onkeydown=function(e){
 	if(S.fire_ident) return 1   // verb stripped for hotbar-only use, fire_ident is the marker
 	for(var/v in S.verbs)
 		if(!v) continue
-		if(v:hidden) continue
-		if(v:category == "Skills") return 1
+		if(v:category == "Skills") return 1   
 	return 0
 
 /obj/Skills/proc/DisableSkillVerb()
 	if(!SkillMenuVisible(src)) return
-	if(istype(src, /obj/Skills/Buffs))
-		var/obj/Skills/Buffs/b = src
-		if(!b.TimerLimit) return
 	for(var/v in verbs)
-		if(!v || v:hidden || v:category != "Skills") continue
+		if(!v || v:category != "Skills") continue
 		fire_ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
 		verbs -= v
 		break

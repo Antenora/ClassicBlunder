@@ -56,6 +56,7 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 					StyleDef = 1.35
 		verb/Attune_Mortal_Blade()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.BuffOn(src))
 				var/classChoice = input(usr, "Choose your preferred sword type.") in list("Light", "Medium", "Heavy")
 				SwordClass = classChoice

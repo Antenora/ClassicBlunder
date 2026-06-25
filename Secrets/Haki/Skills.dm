@@ -64,6 +64,7 @@
     TurfStrike=1
     verb/exertWill()
         set category="Roleplay"
+        set hidden = 1
         set name = "Exert Will"
         // for show
         ActiveMessage = "expunges their willpower, suddenly increasing the pressure in the area!"

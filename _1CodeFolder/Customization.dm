@@ -1,14 +1,17 @@
 mob/Players/verb
 	Customize()
 		set category="Other"
+		set hidden = 1
 		usr.Grid("Blasts","Auras","Charges")
 		src.Auraz("Remove")
 	Hair()
 		set category="Other"
+		set hidden = 1
 		usr.Hairz("Remove")
 		usr.Grid("Hair")
 	Clothes()
 		set category="Other"
+		set hidden = 1
 		usr.Grid("Clothes")
 	Relayer_Hair()
 		set hidden=1//hidden for kkt's ocd

@@ -63,6 +63,7 @@ Options/
 
 /mob/verb/Gamepad_Mapping()
     set category = "Utility"
+    set hidden = 1
     set name = "Gamepad Mapping"
     winset(src, null, list("command" = ".gamepad-mapping"))
 

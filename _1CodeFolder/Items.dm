@@ -1058,6 +1058,7 @@ obj/Items/Sword
 				var/SEType="Sword"
 				verb/ChooseForm()
 					set category="Other"
+					set hidden = 1
 					if(usr.StyleActive)
 						usr<<"You cannot use this with a style active!"
 						return

@@ -2,6 +2,7 @@ mob
 	verb
 		Skill_Descriptions()
 			set category = "Other"
+			set hidden = 1
 			var/which = input(usr,"Which skill would you like to see the description for?","Skill Description") as null|anything in usr.Skills
 			if(!which) return
 			var/obj/Skills/s = which
@@ -311,6 +312,7 @@ obj/Skills
 		Cooldown=5
 		verb/Target_Switch()
 			set category="Skills"
+			set hidden = 1
 			if(!src.Using)
 				usr.TargetSkillX("TargetSwitch", src)
 
@@ -336,6 +338,7 @@ obj/Skills
 		verb/DragonDash()
 			set name="Dragon Dash"
 			set category="Skills"
+			set hidden = 1
 			if(usr.HasDashMaster())
 				src.Using=0
 			if(usr.Knockback)
@@ -350,11 +353,13 @@ obj/Skills
 		verb/Transform()
 			set name="Transform!"
 			set category="Utility"
+			set hidden = 1
 			if(usr.StandardTransformRequirements()&&!usr.isRace(HUMAN))
 				usr.Transform()
 		verb/Revert()
 			set name="Revert!"
 			set category="Utility"
+			set hidden = 1
 			if(usr.transActive&&!usr.HasNoRevert()&&!usr.isMazokuHuman())
 				for(var/obj/Skills/Buffs/B in usr)
 					if(usr.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
@@ -366,6 +371,7 @@ obj/Skills
 		verb/TogglePCTrans()
 			set name="Toggle PC Transformations"
 			set category="Utility"
+			set hidden = 1
 			if(usr.PCTransToggle)
 				usr.PCTransToggle=0
 				usr<< "You will now transform through use of Power Control."
@@ -384,6 +390,7 @@ obj/Skills
 		verb/ReverseDash()
 			set name="Reverse Dash"
 			set category="Skills"
+			set hidden = 1
 			if(AntiMash) return
 			if(usr.HasDashMaster())
 				src.Using=0
@@ -404,6 +411,7 @@ obj/Skills
 		CooldownStatic=1
 		verb/Grab()
 			set category="Skills"
+			set hidden = 1
 			set name="Grab"
 			usr:key1=0
 			usr:key2=0
@@ -425,9 +433,11 @@ obj/Skills
 		desc="Allows you to highten or lower your energy level."
 		verb/Power_Up()
 			set category="Skills"
+			set hidden = 1
 			usr.PowerUp() // This proc is in Skills\basics\PowerControl.dm
 		verb/Power_Down()
 			set category="Skills"
+			set hidden = 1
 			usr.PowerDown() // This proc is in Skills\basics\PowerControl.dm
 	Rank_Up_Magic_Limit_Over_Force
 		icon='Skillz.dmi'
@@ -438,10 +448,12 @@ obj/Skills
 		desc="Allows you to highten or lower your energy level."
 		verb/Rank_Up_Magic_Limit_Over_Force()
 			set category="Utility"
+			set hidden = 1
 			set name="Rank Up Magic: Limit Over Force"
 			usr.SkillX("LimitOverForce",src)
 		verb/Give_The_Fourth_Fate()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("GiveFourthFate",src)
 	Telekinesis
 		Cooldown=120
@@ -556,6 +568,7 @@ obj/Skills
 								m.Flying=0
 			Telekinesis()
 				set category="Skills"
+				set hidden = 1
 				if(!src:Choosing)
 					src:Choosing=1
 					var/Choice=input(usr, "What telekinetic power are you using?", "Improved Telekinesis") in list("Lift and Hold", "Lift and Throw", "Pull", "Push", "Throw Around", "Blast Away", "Cancel")
@@ -663,6 +676,7 @@ obj/Skills
 		desc="Allows you to absorb people for their power."
 		verb/Absorb()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Absorb",src)
 
 	Release_Absorb
@@ -673,6 +687,7 @@ obj/Skills
 		desc="Forcibly expel a victim currently held inside your stomach."
 		verb/Release_Absorb()
 			set category="Skills"
+			set hidden = 1
 			set name="Release Absorb"
 			usr.SkillX("Release Absorb",src)
 
@@ -682,6 +697,7 @@ obj/Skills
 		desc="Enhances senses greatly."
 		verb/Clairvoyance()
 			set category="Skills"
+			set hidden = 1
 			set name="Clairvoyance"
 			usr.SkillX("Clairvoyance",src)
 
@@ -691,6 +707,7 @@ obj/Skills
 		verb/Finalize_Fate()
 			var/mob/Target=usr.Target
 			set category="Skills"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -719,6 +736,7 @@ obj/Skills
 		verb/Hakai()
 			var/mob/Target=usr.Target
 			set category="Skills"
+			set hidden = 1
 			switch(input(usr,"Delete [Target]?") in list("No","Yes"))
 				if("Yes")
 					spawn()RecoverImage(Target)
@@ -766,6 +784,7 @@ obj/Skills
 		desc="This allows you to fly while it constantly drains your energy."
 		verb/Fly()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Fly",src)
 			sleep()
 
@@ -775,6 +794,7 @@ obj/Skills
 		desc="Meditation allows you to recover energy faster then standing, as well as Health and Mana. You are far more likely to be hit in Meditation."
 		verb/Meditation()
 			set category="Skills"
+			set hidden = 1
 			if(usr.ActiveZanzo)
 				usr.ActiveZanzo=0
 			for(var/obj/Skills/Zanzoken/z in usr)
@@ -788,6 +808,7 @@ obj/Skills
 		verb/FalseMoon()
 			set name="False Moon"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("FalseMoon",src)
 
 	True_Sun
@@ -796,6 +817,7 @@ obj/Skills
 		verb/TrueSun()
 			set name="True Sun"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("TrueSun",src)
 
 	Celestial_Invocation
@@ -805,6 +827,7 @@ obj/Skills
 		verb/Celestial_Invocation()
 			set name="Celestial Invocation"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("CallStar",src)
 
 	Give_Power
@@ -818,6 +841,7 @@ obj/Skills
 		verb/GivePower()
 			set name="Give Power"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("GivePower",src)
 
 
@@ -837,10 +861,12 @@ obj/Skills
 		var/ZanzoArea
 		verb/Zanzoken()
 			set category="Skills"
+			set hidden = 1
 			if(usr.MovementCharges>=1 && !usr.ActiveZanzo)
 				usr.SkillX("Zanzoken",src)
 		verb/Zanzoken2()
 			set category="Skills"
+			set hidden = 1
 			set name="After Image Strike"
 			if(usr.MovementCharges>=1 && !usr.AfterImageStrike && !src.Using)
 				usr.SkillStunX("After Image Strike",src)
@@ -852,12 +878,14 @@ obj/Skills
 		icon_state="Zanzoken"
 		verb/Walking()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Walking",src)
 	Blink
 		desc="Teleport through space."
 		icon_state="SI"
 		verb/Blink()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Blink",src)
 
 	Six_Paths_of_Pain

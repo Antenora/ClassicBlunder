@@ -115,6 +115,7 @@ obj/Skills/Feva
 
 		verb/SplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return
@@ -171,6 +172,7 @@ obj/Skills/Feva
 
 		verb/MassSplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return
@@ -223,6 +225,7 @@ obj/Skills/Feva
 
 		verb/SuperMassSplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return

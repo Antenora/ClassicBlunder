@@ -3742,6 +3742,7 @@ obj
 					ActiveMessage="invokes: <font size=+1>ERASE!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						var/asc = p.AscensionsAcquired
@@ -3806,6 +3807,7 @@ obj
 					ActiveMessage="invokes: <font size=+1>METEO!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)

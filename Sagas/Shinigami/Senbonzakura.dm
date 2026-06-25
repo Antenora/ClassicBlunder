@@ -233,6 +233,7 @@
 	verb/Petal_Wall()
 		set name = "Petal Wall"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai() && !usr.InBankai()) return
 		if(Using || cooldown_remaining) return
 		var/obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Hakuteiken/hkt = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Hakuteiken)

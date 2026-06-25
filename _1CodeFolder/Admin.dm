@@ -33,6 +33,7 @@ mob
 mob/verb
 	GetPingSound()
 		set category = "Other"
+		set hidden = 1
 		set name = "Toggle Ping Sound"
 		if(usr.PingSound)
 			usr.PingSound = 0
@@ -42,6 +43,7 @@ mob/verb
 			usr << "Ping Sound Enabled."
 	SetPingVolume()
 		set category = "Other"
+		set hidden = 1
 		set name = "Set Ping Volume"
 		var/n = input(src, "What volume?") as num
 		if(n > 100 || n < 0)
@@ -1271,6 +1273,7 @@ mob/proc/PM2(var/mob/who)
 mob/verb
 	Toggle_Auto_Berserk()
 		set category = "Other"
+		set hidden = 1
 		set name = "Toggle Auto Berserk"
 		if(usr.AutoBerserkOptOut)
 			usr.AutoBerserkOptOut = 0

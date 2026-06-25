@@ -47,6 +47,7 @@
 	verb/Goukei()
 		set name = "Goukei"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Goukei can only be used in Bankai."
 			return
@@ -214,6 +215,7 @@
 	verb/Senkei()
 		set name = "Senkei"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Senkei can only be used in Bankai."
 			return
@@ -311,6 +313,7 @@
 	verb/Ikka_Senjinka()
 		set name = "Ikka Senjinka"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Ikka Senjinka can only be used in Bankai."
 			return

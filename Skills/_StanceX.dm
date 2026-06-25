@@ -64,6 +64,7 @@ obj
 					var/tmp/Selecting//Don't spam this.
 					verb/Toggle_Style()
 						set category="Skills"
+						set hidden = 1
 						if(usr.StyleBuff)
 							usr.StyleBuff.Trigger(usr)
 							return

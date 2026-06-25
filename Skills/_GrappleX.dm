@@ -76,6 +76,7 @@ obj/Skills/Grapple
 			DashAfter = FALSE
 		verb/Toss()
 			set category="Skills"
+			set hidden = 1
 			if(!usr.Grab && !src.Using)
 				if(usr.Saga=="Unlimited Blade Works"&&usr.GetSlotless("GaeBolg"))
 					for(var/obj/Skills/Buffs/SlotlessBuffs/GaeBolg/GB in usr)
@@ -316,6 +317,7 @@ obj/Skills/Grapple
 		Cooldown=60
 		verb/Disable_Innovate()
 			set category = "Other"
+			set hidden = 1
 			disableInnovation(usr)
 		adjust(mob/p)
 			if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))

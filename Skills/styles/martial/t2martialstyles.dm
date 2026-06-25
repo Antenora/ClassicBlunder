@@ -56,6 +56,7 @@
 				Finisher="/obj/Skills/Queue/Finisher/Zetsuei" // Shitenketsu, follow up
 		verb/Swap_Stance()
 			set category="Skills"
+			set hidden = 1
 			if(usr.BuffOn(src))
 				turnOff(usr)
 			swap_stance()

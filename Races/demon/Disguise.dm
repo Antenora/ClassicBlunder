@@ -37,6 +37,7 @@
 
 	verb/Create_Identity()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Create Identity"
 		if(!usr || usr.Dead) return
 		if(identities.len >= 5)
@@ -66,6 +67,7 @@
 
 	verb/Select_Identity()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Select Identity"
 		if(!usr || usr.Dead) return
 		if(!identities.len)
@@ -87,6 +89,7 @@
 
 	verb/Delete_Identity()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Delete Identity"
 		if(!usr || usr.Dead) return
 		if(!identities.len)
@@ -111,6 +114,7 @@
 
 	verb/Disguise()
 		set category = "Roleplay"
+		set hidden = 1
 		if(!usr || usr.Dead) return
 		if(!active_identity)
 			usr << "You have no identity selected. Use Create Identity or Select Identity first."
@@ -191,6 +195,7 @@
 				User.SpawnArea = null
 	verb/Create_Ego()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Create Ego"
 		if(!usr || usr.Dead) return
 		if(egos.len >= 1)
@@ -221,6 +226,7 @@
 
 	verb/Select_Ego()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Select Ego"
 		if(!usr || usr.Dead) return
 		if(!egos.len)
@@ -242,6 +248,7 @@
 
 	verb/Delete_Ego()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Delete Ego"
 		if(!usr || usr.Dead) return
 		if(!egos.len)
@@ -266,6 +273,7 @@
 
 	verb/AlterEgo()
 		set category = "Roleplay"
+		set hidden = 1
 		if(!usr || usr.Dead) return
 		if(!active_ego)
 			usr << "You have no ego selected. Use Create Ego or Select Ego first."

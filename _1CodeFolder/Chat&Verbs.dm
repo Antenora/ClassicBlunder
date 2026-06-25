@@ -160,6 +160,7 @@ mob/Players/verb
 
 	Signature_Check()
 		set category="Other"
+		set hidden = 1
 		src.SignatureCheck=!src.SignatureCheck
 		if(src.SignatureCheck)
 			src<<"You have <font color='green'>ENABLED</font color> signature check."
@@ -171,6 +172,7 @@ mob/Players/verb
 	WatchCombat()
 		set name = "Watch"
 		set category = "Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay+4)) return
 		usr.verb_delay=world.time+1
 
@@ -210,6 +212,7 @@ mob/Players/verb
 	ToggleCombatWatchers()
 		set name = "Toggle Combat Watchers"
 		set category = "Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 
@@ -305,6 +308,7 @@ mob/Players/verb
 
 	AFKToggle()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Toggle"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -315,6 +319,7 @@ mob/Players/verb
 			usr.overlays-=usr.AFKIcon
 	AFKIcon()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Icon"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -331,6 +336,7 @@ mob/Players/verb
 			usr.AFKIcon=Z
 	AFKLimit()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Time Limit"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -341,6 +347,7 @@ mob/Players/verb
 			usr.AFKTimeLimit=75000
 	Custom_Appearance_Skills()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Skills"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -532,6 +539,7 @@ mob/Players/verb
 	Custom_Appearance_Hair(var/mob/A as mob in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Hair"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -554,6 +562,7 @@ mob/Players/verb
 				A.Hairz("Add")
 	Custom_Appearance_Hair_Details()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Hair Details"
 		src.Hairz("Remove")
 		src.HairUnderlay=input(src, "Set a hair underlay.", "Hair Underlay") as file|null
@@ -568,6 +577,7 @@ mob/Players/verb
 	Custom_Appearance_General(var/atom/A as mob|obj in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Icon"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -610,6 +620,7 @@ mob/Players/verb
 	Custom_Appearance_Forms(var/atom/A as mob in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Forms"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -736,6 +747,7 @@ mob/Players/verb
 
 	Custom_Appearance_Charge()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Ki Charge"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -745,6 +757,7 @@ mob/Players/verb
 
 	Reset_Multipliers()
 		set category="Other"
+		set hidden = 1
 		set name="Reset Multipliers"
 		if(src.Power_Multiplier==1&&src.StrMultTotal==1&&src.EndMultTotal==1&&src.SpdMultTotal==1&&src.ForMultTotal==1&&src.OffMultTotal==1&&src.DefMultTotal==1&&src.RecovMultTotal==1)
 			src << "Your mults are already at 1!"
@@ -759,12 +772,14 @@ mob/Players/verb
 
 	Reset_Overlays()
 		set category="Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		usr.AppearanceOff()
 		usr.AppearanceOn()
 	Customize_PoweredState_Menu()
 		set category="Utility"
+		set hidden = 1
 		set name="Customize: Powered State"
 		for(var/obj/O in usr)
 			for(var/v in O.verbs)
@@ -774,24 +789,28 @@ mob/Players/verb
 		usr << "You need Ki Control (use Meditation first) to customize your powered state."
 	Text_Color_Say()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: IC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.Text_Color=input(usr, "Choose a color for Say.") as color
 	Emote_Color()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: Emote"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.Emote_Color=input(usr, "Choose a color for Emote.") as color
 	Text_Color_OOC()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: OOC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.OOC_Color=input(usr, "Choose a color for OOC.") as color
 	Who()
 		set category="Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/list/people=new
@@ -858,6 +877,7 @@ a{color:#8be9ff;}
 			usr<<browse("[View]","window=Logzk;size=240x420")
 	Character_Description()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/CharProfile=input(src, "Please input a description for your character.", "Character Description", usr.Profile) as message
@@ -867,6 +887,7 @@ a{color:#8be9ff;}
 		usr.Profile=CharProfile
 	Countdown()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/time=30*10
@@ -882,6 +903,7 @@ a{color:#8be9ff;}
 	WoundIntent()
 		set name="Intent to Injure"
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(usr.WoundIntent)
@@ -897,6 +919,7 @@ a{color:#8be9ff;}
 	LethalityToggle()
 		set name="Intent to Kill"
 		set category= "Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(src.Lethal)
@@ -913,12 +936,14 @@ a{color:#8be9ff;}
 	ToggleRPMode()
 		set name="Intent to Roleplay"
 		set category= "Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		RPModeSwitch()
 	Force_Heavy_Strike()
 		set name="Force Heavy Strike"
 		set category= "Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(src.ForceHeavyStrike)
@@ -1017,6 +1042,7 @@ mob/proc/CutsceneMode()
 mob/Players/verb
 	Roll_Dice()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/textstring=""
@@ -1062,6 +1088,7 @@ mob/Players/verb
 
 	Pose()
 		set category="Skills"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(src.icon_state==""&&!src.PoseEnhancement)
@@ -1138,11 +1165,13 @@ mob/Players/verb
 
 	Access_Technology()
 		set category="Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		usr.Grid("Tech")
 	Access_Enchantment()
 		set category="Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		usr.Grid("Enchant")
@@ -1151,6 +1180,7 @@ mob/Players/verb
 
 /*	Admins()
 		set category="Other"
+		set hidden = 1
 		var/list/admins=new
 		admins.Add(Admins,CodedAdmins)
 		for(var/x in admins)

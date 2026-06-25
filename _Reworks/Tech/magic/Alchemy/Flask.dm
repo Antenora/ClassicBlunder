@@ -33,6 +33,7 @@
 
     verb/Imbibe_Flask() // We cosnume a charge from the flask!
         set category = "Skills"
+        set hidden = 1
         if(usr.hasSecret("Heavenly Restriction") && usr.secretDatum?:hasRestriction("Magic"))
             usr << "Your body cannot possibly accept this."
             return

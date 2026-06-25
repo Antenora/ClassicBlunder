@@ -21,6 +21,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa
 		src.Trigger(usr)
 	verb/Toggle_Weapon_Breaker()
 		set category="Roleplay"
+		set hidden = 1
 		if(!usr.passive_handler.Get("WeaponBreakerQOL"))
 			usr.passive_handler.Set("WeaponBreakerQOL", 1)
 			OMsg(usr, "<b>[usr] toggles off their Weapon Breaker!</b>")

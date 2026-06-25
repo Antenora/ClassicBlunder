@@ -7,8 +7,7 @@ mob/var/currentPoi = 0
 	set category = "Debug"
 	Tension = 100*/
 /mob/Admin3/verb/Admin_Screen_Size()
-	set category="Other"
-	set hidden=1
+	set category="Admin"
 	if(!(world.time > usr.verb_delay)) return
 	usr.verb_delay=world.time+1
 	var/screenx=input("Enter the width of the screen, max is 999.") as num

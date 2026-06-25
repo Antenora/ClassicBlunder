@@ -53,6 +53,7 @@ obj/Skills/Mental_Refitting
 	var/lifeFiberHybridID
 	verb/Life_Fiber_Hybridize()
 		set category = "Utility"
+		set hidden = 1
 		if(!usr.Target)
 			usr << "You require a target to do this!"
 			return

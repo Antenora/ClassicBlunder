@@ -48,6 +48,7 @@ mob/proc/ReclaimGuardianItem(path)
 obj/Skills/Utility/Recall_Armaments
 	verb/Recall_Armaments()
 		set category="Utility"
+		set hidden = 1
 		set name = "Recall Armaments"
 		if(usr.Dead && !usr.KeepBody)
 			usr << "You cannot summon divine artifacts while dead."

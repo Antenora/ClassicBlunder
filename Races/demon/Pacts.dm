@@ -23,6 +23,7 @@ proc/findPactByID(id)
 
 /obj/Pact/verb/Check_Pact()
 	set category = "Skills"
+	set hidden = 1
 	checkPact(usr)
 
 /obj/Pact/proc/checkPact(mob/user)
@@ -51,6 +52,7 @@ proc/findPactByID(id)
 
 /obj/Pact/Pacter/verb/Create_Pact()
 	set category = "Skills"
+	set hidden = 1
 	createPact(usr)
 
 /obj/Pact/Pacter/proc/createPact(mob/user)

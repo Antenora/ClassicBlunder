@@ -1,5 +1,6 @@
 mob/verb/Character_Sheet()
 	set category = "Other"
+	set hidden = 1
 	src<<browse(src.GetAssess(),"window=Assess;size=275x700")
 
 // Unhinged Majins count their Power at MAJIN_UNHINGED_POWER_MULT (2x) in both offense and defense
@@ -159,11 +160,14 @@ proc/SenseDetect(atom/A,Range)
 
 mob/var/list/Tabz=list("Science"="Hide","Build"="Hide","Enchantment"="Hide","Inventory"="Show")
 
+// Legacy stat panel tabs
+/var/HIDE_LEGACY_STAT_PANELS = 1
+
 mob/Players/Stat()
 	if(client)   
 
-		statpanel("Statistics")
-		if(statpanel("Statistics"))
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Statistics")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Statistics"))
 			CHECK_TICK
 			if(src.Mapper)
 				stat("Location", "[src.x], [src.y], [src.z]")
@@ -312,8 +316,8 @@ mob/Players/Stat()
 				stat("Economy Rates", "[Commas(glob.progress.EconomyCost)] [glob.progress.MoneyName] Cost / [Commas(glob.progress.EconomyIncome)] Income / [Commas(glob.progress.EconomyMana)] Mana Cost")
 
 
-		statpanel("Inventory")
-		if(statpanel("Inventory")&&usr.AFKTimer)
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Inventory")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Inventory")&&usr.AFKTimer)
 			CHECK_TICK
 			for(var/obj/Money/M in usr)
 				M.name="[Commas(round(M.Level))] [glob.progress.MoneyName]"
@@ -342,8 +346,8 @@ mob/Players/Stat()
 							else
 								stat("[A:Uses] / [A:MaxUses]")
 
-		statpanel("Current Target")
-		if(statpanel("Current Target")&&usr.Target)
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Current Target")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Current Target")&&usr.Target)
 			CHECK_TICK
 			if(isplayer(usr.Target) || istype(usr.Target, /mob/Player))
 				stat("Focused:",Target)

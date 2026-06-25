@@ -22,6 +22,7 @@
 
 /mob/verb/See_Targets_Target()
 	set category="Skills"
+	set hidden = 1
 	if(Target && Target.Target)
 		Target.Target.Click()
 
@@ -492,7 +493,7 @@ mob/Players
 		if(istype(src, /mob/Players))
 			var/mob/Players/SBP = src
 			SBP.Shadowbringer_ClearShadow()
-		CollectMenuVerbs() 
+		CollectMenuVerbs()
 		return
 	Logout()
 		if(src.Airborne)

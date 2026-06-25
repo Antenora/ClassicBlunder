@@ -85,6 +85,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 
 /mob/verb/learnTech()
 	set category = "Utility"
+	set hidden = 1
 	set name = "Technology"
 	var/int = Intelligence
 	if(passive_handler["Spiritual Tactician"])

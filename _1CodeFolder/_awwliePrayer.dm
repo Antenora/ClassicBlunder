@@ -14,6 +14,7 @@ obj/readPrayers // we hand this out to the dead instead of a typesof(verb) so th
 	verb/ReadAllPlayerPrayers()
 		set name = "Read All Prayers"
 		set category = "Roleplay"
+		set hidden = 1
 
 		var/prayerHTML = {"<html>
 		<title>All Prayers</title>
@@ -146,6 +147,7 @@ mob/proc/returnNames()
 /mob/verb/PrayForTheDeath()
 	set name = "Pray"
 	set category = "Roleplay"
+	set hidden = 1
 	// files we want to write to the prayers..
 	var/fileName = "Saves/everyPrayer.json"
 	var/list/fileText = file2text(file(fileName))

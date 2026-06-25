@@ -594,6 +594,7 @@ obj/Skills/Utility
 		desc="End your awakening."
 		verb/NeverTooEarly()
 			set category="Utility"
+			set hidden = 1
 			set name="Never Too Early"
 			if(!usr.AwakeningSkillUsed)
 				usr<<"No need."
@@ -609,6 +610,7 @@ obj/Skills/Utility
 		Cooldown=-1
 		verb/NeverTooLate()
 			set category="Skills"
+			set hidden = 1
 			set name="Never Too Late (Act 1)"
 			RandomMult=rand(1,25)
 			usr.DoDamage(usr, 10)
@@ -622,6 +624,7 @@ obj/Skills/Utility
 		desc="Shine brightly. Your awakening skill strengthens, but you burn out quicker."
 		verb/TheBlueExperience()
 			set category="Skills"
+			set hidden = 1
 			set name="The Blue Experience (Act 2)"
 			usr.TriggerAwakeningSkill(ActNumber)
 			usr.buffSelf(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Blue_Experience)
@@ -633,6 +636,7 @@ obj/Skills/Utility
 		desc="Translate all your power into rage. Your Rebirth skills become faster, but make you more and more angrier. At 500% Fury, your rage explodes outwards, damaging yourself and everyone in view."
 		verb/Burning_Soul()
 			set category="Skills"
+			set hidden = 1
 			set name="Red Hot Rage (Act 3)"
 			usr.TriggerAwakeningSkill(ActNumber)
 			usr.buffSelf(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Burning_Soul)
@@ -640,6 +644,7 @@ obj/Skills/Utility
 		Copyable=0
 		verb/SoulRed()
 			set category="Utility"
+			set hidden = 1
 			set name="SOUL Shift (Red)"
 			usr.passive_handler.Set("Determination(Red)", 1)
 			usr.passive_handler.Set("Determination(Yellow)", 0)
@@ -649,6 +654,7 @@ obj/Skills/Utility
 			usr<<"You are now using the Red SOUL color."
 		verb/SoulYellow()
 			set category="Utility"
+			set hidden = 1
 			set name="SOUL Shift (Yellow)"
 			usr.passive_handler.Set("Determination(Red)", 0)
 			usr.passive_handler.Set("Determination(Yellow)", 1)
@@ -658,6 +664,7 @@ obj/Skills/Utility
 			usr<<"You are now using the Yellow SOUL color."
 		verb/Toggle_Unleash()
 			set category="Utility"
+			set hidden = 1
 			if(usr.passive_handler.Get("UnleashToggle"))
 				usr.passive_handler.Set("UnleashToggle", 0)
 				usr<<"You will now use Unleash on crit."
@@ -668,6 +675,7 @@ obj/Skills/Utility
 		Copyable=0
 		verb/SoulGreen()
 			set category="Utility"
+			set hidden = 1
 			set name="SOUL Shift (Green)"
 			usr.passive_handler.Set("Determination(Red)", 0)
 			usr.passive_handler.Set("Determination(Yellow)", 0)
@@ -679,6 +687,7 @@ obj/Skills/Utility
 		Copyable=0
 		verb/SoulPurple()
 			set category="Utility"
+			set hidden = 1
 			set name="SOUL Shift (Purple)"
 			usr.passive_handler.Set("Determination(Red)", 0)
 			usr.passive_handler.Set("Determination(Yellow)", 0)
@@ -690,6 +699,7 @@ obj/Skills/Utility
 		Copyable=0
 		verb/SoulOrange()
 			set category="Utility"
+			set hidden = 1
 			set name="SOUL Shift (Orange)"
 			usr.passive_handler.Set("Determination(Red)", 0)
 			usr.passive_handler.Set("Determination(Yellow)", 0)
@@ -704,6 +714,7 @@ obj/Skills/Utility
 		desc="This allows you to attempt to heal people you are facing. At least it clears their fatigue, right?"
 		verb/Ultimate_Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("UltimateHeal",src)
 	BetterHeal
 		ManaCost=75
@@ -712,6 +723,7 @@ obj/Skills/Utility
 		desc="A decent, costly heal."
 		verb/Better_Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("BetterHeal",src)
 	HoldingOutForAHero
 		Cooldown=-1
@@ -725,6 +737,7 @@ obj/Skills/Utility
 		verb/Undying()
 			set name="RISE UP"
 			set category="Skills"
+			set hidden = 1
 			if(src.Using) return
 			src.Using=1
 		//	usr.loc=usr.UndyingLoc
