@@ -118,6 +118,8 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 				usr?.client?.ToggleCharacterMenu()
 			if("skills")
 				usr?.client?.ToggleSkillMenu()
+			if("tech")
+				usr?.client?.ToggleTechMenu()
 
 
 /atom/movable/shud/menulabel
@@ -270,7 +272,7 @@ client/proc/ResetMenuHUD()
 // hover highlight, dims while that button's own panel is open
 client/proc/BtnHover(atom/movable/shud/menubtn/b, over)
 	if(!b) return
-	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open)
+	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open) || (b.btn_id == "tech" && tmenu_open)
 	if(active)
 		b.icon = 'HUD/ui_slot_unavailable.png'
 		if(b.label) b.label.alpha = 0
@@ -323,6 +325,7 @@ client/proc/OpenOptionsMenu()
 	CloseInventory() // never both big panels open at once
 	CloseCharacterMenu()
 	CloseSkillMenu()
+	CloseTechMenu()
 	menu_open = "options"
 	menu_page = 1
 	btn_options.icon = 'HUD/ui_slot_unavailable.png'

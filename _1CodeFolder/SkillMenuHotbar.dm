@@ -711,6 +711,7 @@ client/proc/OpenSkillMenu()
 	CloseMenu()           // never two big panels at once
 	CloseInventory()
 	CloseCharacterMenu()
+	CloseTechMenu()
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1

@@ -306,6 +306,7 @@ client/proc/InitSkillHUD()
 	InitInventoryButton()
 	InitCharacterMenuButton()
 	InitSkillMenuButton()
+	InitTechButton()
 	for(var/atom/movable/o in shud_parts)
 		screen += o
 	InitCharacterCard() // top-left card keeps its own object list
@@ -327,6 +328,7 @@ client/proc/ClearSkillHUD()
 	ResetCharacterCard()
 	CloseCharacterMenu()
 	ResetSkillMenuHUD()
+	ResetTechHUD()
 	health_glowing = FALSE
 	orb_health = null
 	orb_energy = null

@@ -486,6 +486,7 @@ client/proc/OpenCharacterMenu()
 	CloseInventory()
 	CloseMenu()
 	CloseSkillMenu()
+	CloseTechMenu()
 	cmenu_open = TRUE
 	cmenu_tab = 0
 	// tile-anchor the frame so it stays inside the view

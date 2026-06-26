@@ -87,6 +87,12 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 	set category = "Utility"
 	set hidden = 1
 	set name = "Technology"
+	// Now opens the node-based Tech menu
+	if(length(TechnologyTree) < 1)
+		fillOutTechTree()
+	if(client)
+		client.OpenTechMenu("tree")
+	return
 	var/int = Intelligence
 	if(passive_handler["Spiritual Tactician"])
 		if(Imagination > Intelligence)

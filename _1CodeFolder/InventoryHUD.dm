@@ -223,6 +223,7 @@ client/proc/OpenInventory()
 	CloseMenu() // never both big panels at once
 	CloseCharacterMenu()
 	CloseSkillMenu()
+	CloseTechMenu()
 	inv_open = TRUE
 	inv_cat_index = 1
 	btn_inv.icon = 'HUD/ui_slot_unavailable.png'

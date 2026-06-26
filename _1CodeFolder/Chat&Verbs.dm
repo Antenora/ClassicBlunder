@@ -1172,7 +1172,7 @@ mob/Players/verb
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		usr.Grid("Tech")
+		if(usr.client) usr.client.OpenTechMenu("craft")
 	Access_Enchantment()
 		set category="Utility"
 		set hidden = 1
