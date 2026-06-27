@@ -136,6 +136,23 @@ var/list/TT_FAM_COLOR = list(
 	Click()
 		if(usr) usr.client.TechButton(action, arg)
 
+/atom/movable/shud/ttwidget
+	parent_type = /atom/movable/shud/pressbtn
+	layer = TT_LAYER + 0.6
+	mouse_opacity = 2
+	var/ttarg = 0
+	DoAction()
+		if(usr && usr.client) usr.client.TechButton(action, ttarg)
+	Click()
+		if(pressing) return
+		pressing = TRUE
+		var/list/f = PressFrames()
+		icon = f[2]
+		sleep(MHUD_PRESS_STEP)
+		icon = f[3]
+		sleep(MHUD_PRESS_STEP)
+		DoAction()
+
 /atom/movable/shud/ttcraftrow      // craft list row hit area
 	layer = TT_LAYER + 0.42
 	mouse_opacity = 2
@@ -323,10 +340,10 @@ client/proc/BuildTechChrome()
 	tmenu_tab_craft = MakeTabBtn(tmenu_chrome, "tab_craft", 104, 8, 84, 32, "Craft")
 	tmenu_tab_craft_lbl = tmenu_tab_craft.lbl
 
-	var/atom/movable/shud/ttbtn/X = new
-	X.icon = 'HUD/ui_cross.png'
+	var/atom/movable/shud/ttwidget/X = new
+	X.widget_kind = "cross"
+	X.icon = 'HUD/ui_cross_1.png'
 	X.action = "close"
-	X.layer = TT_LAYER + 0.6
 	X.screen_loc = TTloc(590, 12, 24)
 	tmenu_chrome += X
 
@@ -849,10 +866,10 @@ client/proc/BuildCraftChips()
 
 client/proc/BuildCraftPager(pages)
 	if(pages <= 1) return
-	var/atom/movable/shud/ttbtn/prev = new
-	prev.icon = 'HUD/ui_arrow_left.png'
-	prev.action = "craftpage"; prev.arg = -1
-	prev.layer = TT_LAYER + 0.5
+	var/atom/movable/shud/ttwidget/prev = new
+	prev.widget_kind = "arrow_left"
+	prev.icon = 'HUD/ui_arrow_left_1.png'
+	prev.action = "craftpage"; prev.ttarg = -1
 	prev.screen_loc = TTloc(258, 312, 18)
 	tmenu_tabobjs += prev
 	var/atom/movable/shud/ttlabel/pt = new
@@ -861,10 +878,10 @@ client/proc/BuildCraftPager(pages)
 	pt.screen_loc = TTloc(282, 314, 16)
 	pt.maptext = "<center><span style=\"[TT_FONT]; color:#ffffff\">[tmenu_craftpage]/[pages]</span></center>"
 	tmenu_tabobjs += pt
-	var/atom/movable/shud/ttbtn/nxt = new
-	nxt.icon = 'HUD/ui_arrow_right.png'
-	nxt.action = "craftpage"; nxt.arg = 1
-	nxt.layer = TT_LAYER + 0.5
+	var/atom/movable/shud/ttwidget/nxt = new
+	nxt.widget_kind = "arrow_right"
+	nxt.icon = 'HUD/ui_arrow_right_1.png'
+	nxt.action = "craftpage"; nxt.ttarg = 1
 	nxt.screen_loc = TTloc(348, 312, 18)
 	tmenu_tabobjs += nxt
 
