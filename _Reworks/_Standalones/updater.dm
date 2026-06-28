@@ -229,8 +229,8 @@ update
 					p.NewAnger(p.AngerMax+0.1)
 				if(p.AscensionsAcquired>=2)
 					p.NewAnger(p.AngerMax+0.1)
-			if(p.isRace(BEASTKIN))
-				if(p.Class=="Feather Cowl"&&p.AscensionsAcquired>=1)
+			if(p.isRace(WILDER))
+				if(p.Class=="Cloudhammer"&&p.AscensionsAcquired>=1)
 					if(p.StrAscension<0)
 						p.StrAscension=0
 	version11
@@ -444,7 +444,7 @@ update
 			var/fixed = p.RestoreSkillDamageMultsAfterDisarmFix()
 			if(fixed)
 				p << "Your skill DamageMults have been restored. Rejoice."
-			if(p.isRace(BEASTKIN))
+			if(p.isRace(WILDER))
 				for(var/a=p.AscensionsAcquired, a > 0, a--)
 					var/ascension/asc = p.race.ascensions[a];
 					asc.revertAscension(p);
@@ -457,7 +457,7 @@ update
 		version = 19;
 		updateMob(mob/p)
 			. = ..()
-			if(p.isRace(BEASTKIN))
+			if(p.isRace(WILDER))
 				p.race.ascensions = list();
 				if(p.race.ascensions.len <= 0)
 					p.race.ascensions |= new/ascension/beastkin/one
@@ -554,8 +554,8 @@ update
 					p.passive_handler.Decrease("BuffMastery", 2)
 				if(p.AscensionsAcquired>=3)
 					p.passive_handler.Decrease("BuffMastery", 2)
-			if(p.isRace(BEASTKIN))
-				if(p.Class == "Feather Cowl")
+			if(p.isRace(WILDER))
+				if(p.Class == "Cloudhammer")
 					if(p.AscensionsAcquired>=1)
 						p.passive_handler.Increase("PureReduction", 2);
 						p.passive_handler.Increase("PureDamage", 1);
@@ -564,22 +564,19 @@ update
 						p.passive_handler.Decrease("CriticalBlock", 0.1);
 						p.passive_handler.Decrease("CriticalChance", 5);
 						p.passive_handler.Decrease("CriticalDamage", 0.05);
-					if(p.AscensionsAcquired>=2)
-						p.passive_handler.Increase("PureReduction", 2);
-						p.passive_handler.Increase("PureDamage", 1);
-						p.passive_handler.Increase("Juggernaut", 1);
-						p.passive_handler.Decrease("BlockChance", 10);
-						p.passive_handler.Decrease("CriticalBlock", 0.1);
-						p.passive_handler.Decrease("CriticalChance", 5);
-						p.passive_handler.Decrease("CriticalDamage", 0.05);
-				if(p.Class == "Feather Knife")
-					if(p.AscensionsAcquired>=1)
 						p.passive_handler.Increase("PureDamage", 2);
 						p.passive_handler.Increase("PureReduction", 1);
 						p.passive_handler.Increase("BlurringStrikes", 1);
 						p.passive_handler.Decrease("CriticalChance", 25);
 						p.passive_handler.Decrease("CriticalDamage", 0.25);
 					if(p.AscensionsAcquired>=2)
+						p.passive_handler.Increase("PureReduction", 2);
+						p.passive_handler.Increase("PureDamage", 1);
+						p.passive_handler.Increase("Juggernaut", 1);
+						p.passive_handler.Decrease("BlockChance", 10);
+						p.passive_handler.Decrease("CriticalBlock", 0.1);
+						p.passive_handler.Decrease("CriticalChance", 5);
+						p.passive_handler.Decrease("CriticalDamage", 0.05);
 						p.passive_handler.Increase("PureDamage", 2);
 						p.passive_handler.Increase("PureReduction", 1);
 						p.passive_handler.Increase("BlurringStrikes", 1);
@@ -595,8 +592,8 @@ update
 				p << "The Space Squids of old look upon you kindly."
 				p << "WHY THE FRIGGLE FRACK DID THEY TAKE SPACEWALK AND STATIC WALK OFF YOU?!"
 				p << "How can you space squid if you can't even go to space...!"
-			if(p.isRace(BEASTKIN))
-				if(p.Class == "Feather Cowl")
+			if(p.isRace(WILDER))
+				if(p.Class == "Cloudhammer")
 					if(p.AscensionsAcquired>=1)
 						p.passive_handler.Decrease("PureReduction", 2);
 						p.passive_handler.Decrease("PureDamage", 1);

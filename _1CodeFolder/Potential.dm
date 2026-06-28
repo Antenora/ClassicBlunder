@@ -24,25 +24,6 @@ mob
 							val*=2.5
 						if("Focused")
 							val*=5
-					// if(src.SteadyRace())
-					// 	var/eff=min(100, src.Potential)
-					// 	eff=round(eff, 10)
-					// 	eff/=10
-					// 	reduce=eff
-					// 	reduce+=1
-					// if(src.TransRace())
-					// 	var/trans=src.TransUnlocked()
-					// 	if(src.Race=="Changeling")
-					// 		trans-=3
-					// 	reduce=2**(trans)
-					// if(src.Potential>100)
-					// 	var/eff=src.Potential-100
-					// 	reduce+=round(eff/20)//every 20 potential over 100 increases reduction by 1
-					// if(src.CyberCancel)
-					// 	if(reduce)
-					// 		reduce*=(1+src.CyberCancel)
-					// if(reduce)
-					// 	val/=reduce
 					if(src.party)
 						if(src.party.highest_potential>src.Potential)
 							val*=(src.party.members.len)//stop reducing pot gain

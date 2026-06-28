@@ -2579,31 +2579,6 @@ obj
 					usr.Activate(src)
 
 ////Racial
-			Oceanic_Wrath
-				ElementalClass="Water"
-				ForOffense=1.5
-				SpecialAttack=1
-				DamageMult=15
-				Chilling=150
-				Stasis=5
-				TurfShift='IceGround.dmi'
-				Distance=15
-				WindUp=0.5
-				WindupMessage="places a cold hand against the ground..."
-				ActiveMessage="freezes the area with a destructive chill!"
-				Cooldown=90
-				Area="Circle"
-				verb/Oceanic_Wrath()
-					set category="Skills"
-					if(!altered)
-						DamageMult = 6 + (1.5 * usr.AscensionsAcquired)
-						Cooldown = 60 - (5 * usr.AscensionsAcquired)
-						Distance = 10 + (5 * usr.AscensionsAcquired)
-						Stasis = 5 + (2.5 * usr.AscensionsAcquired)
-						ForOffense = 1 + (0.25 * usr.AscensionsAcquired)
-					usr.Activate(src)
-
-
 			Fire_Breath
 				ElementalClass="Fire"
 				StrOffense=1

@@ -16,7 +16,7 @@ mob/proc/Meditation()
 		WarmingUpBonus = 0
 		if(passive_handler["Shellshocked"])
 			passive_handler.Set("Shellshocked", 0)
-		if(isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin")
+		if(isMountainheart())
 			if(passive_handler["Grit"] == 0)
 				passive_handler.Set("Grit", 1)
 		/*if(length(magatamaBeads))

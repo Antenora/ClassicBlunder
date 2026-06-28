@@ -1067,10 +1067,11 @@ mob/proc/
 
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
+			var/silverScale = isSilverscale();
 			if(src.ManaDeath)
 				ManaAmount-=5*GetManaCapMult()
-			else if(src.is_arcane_beast || (isRace(BEASTKIN) && Class=="Trickster" && AscensionsAcquired>0 && !src.Mechanized && !src.ActiveBuff))
-				if(Class == "Trickster")
+			else if((is_arcane_beast || silverScale) && !src.Mechanized && !src.ActiveBuff)
+				if(silverScale)
 					Recover("Mana", 1*GetManaCapMult())
 				else
 					Recover("Mana",1)
@@ -1501,9 +1502,6 @@ mob/proc/Get_Scouter_Reading(mob/B)
 				else
 					AgeRate=1
 
-				if(B.isRace(BEASTKIN) && B.Class == "Trickster")
-					if(B.EraBody=="Elder"||(B.EraBody=="Adult"&&B.Aged))
-						AgeRate=1.25
 				if(B.isRace(HALFSAIYAN)&&B.Anger)
 					AgeRate=1
 				Ratio*=AgeRate

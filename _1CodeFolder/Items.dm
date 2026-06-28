@@ -492,7 +492,7 @@ obj/Items
 			if(!(usr in oview(1,src))&&!(src in usr))
 				return
 			var/RacialHunger=1
-			if(usr.race in list(SAIYAN,BEASTKIN))
+			if(usr.race in list(SAIYAN,WILDER))
 				RacialHunger=5
 			if(usr.race in list(MAJIN,DRAGON,DEMON))
 				RacialHunger=20

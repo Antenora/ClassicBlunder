@@ -60,7 +60,6 @@ proc/log_func(x, a, b)
 #define DRAGON /race/dragon
 #define ELF /race/high_faoroan
 #define ELDRITCH /race/eldritch
-#define BEASTKIN /race/beastkin
 #define GAJALAKA /race/gajalaka
 #define CHANGELING /race/changeling
 #define ANDROID /race/android
@@ -72,6 +71,7 @@ proc/log_func(x, a, b)
 #define NOBODY /race/nobody
 #define FAE /race/fae
 #define DEMIFIEND /race/demi_fiend
+#define WILDER /race/wilder
 
 #define DEBUG_DAMAGE 0
 #define DEBUG_ITEM_DAMAGE 0

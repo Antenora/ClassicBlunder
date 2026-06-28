@@ -23,19 +23,10 @@ race
 					skills = list(/obj/Skills/AutoHit/Dragon_Roar, /obj/Skills/AutoHit/Fire_Breath, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Heat_Of_Passion)
 					passives["DemonicDurability"] = 1
 					passives["SpiritHand"] = 1
-				if("Metal")
-					skills = list(/obj/Skills/AutoHit/Dragon_Roar, /obj/Skills/Projectile/Shard_Storm, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Dragons_Tenacity)
-					passives["Harden"] = 1
-					passives["KBRes"] = 1
 				if("Wind")
 					skills = list(/obj/Skills/AutoHit/Dragon_Roar, /obj/Skills/Projectile/Static_Stream, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Wind_Supremacy)
 					passives["Godspeed"] = 1
 					passives["Flicker"] = 1
-				if("Water")
-					skills = list(/obj/Skills/AutoHit/Dragon_Roar, /obj/Skills/AutoHit/Oceanic_Wrath, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Slithereen_Crush)
-					passives["SoftStyle"] = 1
-					passives["Fishman"] = 1
-					passives["FluidForm"] = 1
 				if("Gold")
 					skills = list(/obj/Skills/AutoHit/Dragon_Roar, /obj/Skills/Projectile/A_Pound_of_Gold, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Hoarders_Riches)
 					user.EconomyMult *= 2

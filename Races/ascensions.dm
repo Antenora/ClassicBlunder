@@ -196,7 +196,7 @@ ascension
 			DEBUGMSG("postAscension firing");
 
 		choiceSelection(mob/owner)
-			if(owner.isRace(BEASTKIN) && owner.AscensionsAcquired >= 2 && !choiceSelected)
+			if(owner.isRace(WILDER) && owner.AscensionsAcquired >= 2 && !choiceSelected)
 				if(!pickingChoice) owner.race.ascensions[owner.AscensionsAcquired+1].choices = owner.getRiftAscensionOptions();
 			if(!choices) return
 			if(choices.len == 0 || choiceSelected || pickingChoice) return

@@ -11592,24 +11592,6 @@ NEW VARIABLES
 					NeedsHealth = 50 + (p.AscensionsAcquired*5);
 					TooMuchHealth = min(95, 75 + (p.AscensionsAcquired*5));
 
-				Dragons_Tenacity
-
-					ActiveMessage = "forms a draconic shell!!"
-					OffMessage = "loses their draconic shell..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						ElementalOffense = "Earth"
-						ElementalDefense = "Earth"
-						endAdd = 0.15 * asc
-						passives = list("PureReduction" = asc+1, "BlockChance" = (5*(asc+1)), "CriticalBlock" = (0.1*(asc+1)),\
-										"CallousedHands" = (0.15*(asc+1)), "Harden" = 2 + (asc/2))
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-
 				Heat_Of_Passion
 					// Fire Dragon Racial, mimics Berserk
 					ActiveMessage = "ignites themselves in a blaze of passion!"

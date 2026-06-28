@@ -40,7 +40,7 @@ mob/proc/setUpScent()
                 custom_scent="Exotic"
         if(ELDRITCH)
             custom_scent=pick("Ocean", "Alien", "Exotic", "Nothingness")
-        if(BEASTKIN)
+        if(WILDER)
             custom_scent=pick("Musk", "Animalistic", "Sweaty", "Unbathed", "Incense", "Alcohol", "Iron", "Thrill")
         if(DEMON)
             custom_scent=pick("Brimstone", "Nothingness", "Blood", "Death")

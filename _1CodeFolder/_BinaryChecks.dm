@@ -804,7 +804,7 @@ mob
 			if(Secret == "Vampire")
 				var/secretLevel = getSecretLevel()
 				Return += 1 + (secretLevel / 4) * (1 + (secretDatum.secretVariable["BloodPower"] * 0.25))
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
+			if(isMountainheart() && VaizardHealth>0)
 				Return += 2
 			if(src.passive_handler.Get("Determination(Yellow)")||src.passive_handler.Get("Determination(White)"))
 				Return += round(ManaAmount/25, 1)
@@ -832,48 +832,34 @@ mob
 			if(Target)
 				if(passive_handler.Get("HellRisen")  && isDominating(Target))
 					Return += clamp((passive_handler.Get("HellRisen")*2), 1, 2)
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
+			if(isMountainheart() && VaizardHealth > 0)
 				Return += 5
 			Return += scalingEldritchPower();
 			return Return
 		HasDeathField()
-			if(passive_handler.Get("DeathField"))
-				return 1
-			if(src.KamuiBuffLock)
-				return 1
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				return 1
-			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
-				return 1
+			if(passive_handler.Get("DeathField")) return 1
+			if(KamuiBuffLock) return 1
+			if(isMountainheart() && VaizardHealth>0) return 1
+			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) return 1
 			return 0
 		GetDeathField()
 			var/HeartVal=0
 			var/GreenVal=0
-			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
-				GreenVal=round(ManaAmount/20,1)
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beast" && src.VaizardHealth>0)
-				HeartVal += 5
-			. = passive_handler.Get("DeathField")+(src.KamuiBuffLock*5)+HeartVal + GreenVal
-			if(src.isLunaticMode())
-				. *= (1 + (src.get_potential() / 100))
+			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) GreenVal=round(ManaAmount/20,1)
+			if(isMountainheart() && VaizardHealth > 0) HeartVal += 5
+			. = passive_handler.Get("DeathField") + (KamuiBuffLock * 5) + HeartVal + GreenVal
+			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
 		HasVoidField()
-			if(passive_handler.Get("VoidField"))
-				return 1
-			if(src.CheckSlotless("Drunken Mastery") && src.Drunk)
-				return 1
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				return 1
+			if(isMountainheart() && VaizardHealth > 0) return 1
+			if(CheckSlotless("Drunken Mastery") && Drunk) return 1
+			if(passive_handler.Get("VoidField")) return 1
 			return 0
 		GetVoidField()
 			var/Extra=0
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				Extra += 5
-
-			if(src.CheckSlotless("Drunken Mastery") && src.Drunk)
-				Extra+=2
-			. = passive_handler.Get("VoidField")+Extra
-			if(src.isLunaticMode())
-				. *= (1 + (src.get_potential() / 100))
+			if(isMountainheart() && VaizardHealth > 0) Extra += 5
+			if(CheckSlotless("Drunken Mastery") && Drunk) Extra+=2
+			. = passive_handler.Get("VoidField") + Extra
+			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
 		HasMaimStrike()
 			return 0
 			if(passive_handler.Get("MaimStrike"))
@@ -3108,18 +3094,6 @@ mob
 			if(src.SenseUnlocked>5&&src.SenseUnlocked>src.SenseRobbed)
 				return 0
 			return 1
-		SteadyRace()
-			if(src.race.type in list(MAJIN, MAKYO, NAMEKIAN, BEASTKIN, ELDRITCH, FAE, DRAGON, MAKAIOSHIN))
-				return 1
-			return 0
-		TransRace()
-			if(isRace(HUMAN, SAIYAN, DEMON))
-				return 1
-			return 0
-		OtherRace()
-			if(isRace(SHINJIN))
-				return 1
-			return 0
 		SureHit()
 			if(src.SureHit)
 				return 1

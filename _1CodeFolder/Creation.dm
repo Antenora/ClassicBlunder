@@ -1121,7 +1121,7 @@ mob/proc
 		glob.updatePlayer(src);
 		setStartingRPP()
 		if(!Warped)
-			if(isRace(BEASTKIN))
+			if(isRace(WILDER))
 				var/Choice=input(src, "Do you want to possess animal characteristics?  These options will give you tails and ears.", "Choose your animal traits.") in list("None", "Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull")
 				switch(Choice)
 					if("Cat")
@@ -1146,7 +1146,7 @@ mob/proc
 					src.Hairz("Add")
 
 			if(!src.Timeless)
-				if(!(src.race in list(BEASTKIN,ELDRITCH,SAIYAN)))//these bois spawn in with deathtimers if theyre elder...
+				if(!(src.race in list(WILDER,ELDRITCH,SAIYAN)))//these bois spawn in with deathtimers if theyre elder...
 					var/Age = "Youth"
 					//=alert(src, "Do you want to start as a youth or an elder?  Youths have not yet reached their full potential as fighters. Elders have already passed it, and may teach younger folks.", "Age", "Youth", "Elder")
 					src.EraBody=Age

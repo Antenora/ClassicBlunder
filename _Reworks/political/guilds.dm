@@ -75,7 +75,7 @@ mob
 			for(var/guild/guild in glob.guilds)
 				guild.updateListing(src)
 				guild.checkVerbs(src)
-			if(isRace(BEASTKIN) && race?:Racial == "Monkey King")
+			if(isBrightcrown())
 				verbs += /mob/proc/change_nimbus_message
 
 guild

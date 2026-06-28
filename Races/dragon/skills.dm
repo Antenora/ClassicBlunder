@@ -3,13 +3,6 @@
 	TimerLimit = 1
 	Cooldown = 4
 	AlwaysOn = 1
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/DragonDebuff/Rattled
-    CrippleAffected = 3
-    EndMult = 0.9
-    DefMult = 0.4
-    SpdMult = 0.3
-    passives = list("PureReduction" =  -1, "Godspeed" = -3)
-    TimerLimit = 20
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/DragonDebuff/WeakenedByRadiance
     CrippleAffected = 3
     StrMult = 0.6
@@ -57,33 +50,6 @@
                 Rounds = 4 + (asc)
                 DelayTime = 3
                 DamageMult = DamageMult/Rounds
-            if("Metal")
-                TurfErupt=1
-                Stunner = 2 + asc
-                BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/DragonDebuff/Rattled"
-                Distance = 2 + (asc)
-                Rounds = 1
-                DamageMult = 0.5 + (asc * 1)
-                EndDefense = 0.5
-            if("Water")
-                ElementalClass="Water"
-                Distance = 10 + (asc * 2)
-                PullIn = Distance + (4 * asc)
-                Deluge = (300 + (300 * asc)) // 30 seconds + 30 each as
-                DamageMult = 12 + (asc * 2)
-                NoLock = 1
-                WindUp=0.25
-                WindupMessage="brings forth the rain..."
-                ActiveMessage="swarms the area with a flood!"
-                TurfReplace='PlainWater.dmi'
-                Area="Circle"
-                SpecialAttack=1
-                HitSparkIcon='Hit Effect Pearl.dmi'
-                HitSparkX=-32
-                HitSparkY=-32
-                HitSparkTurns=1
-                HitSparkSize=1
-                TurfStrike=1
             if("Dark")
                 TurfErupt=1
                 Stunner = 5 + asc
