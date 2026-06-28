@@ -2,6 +2,7 @@
 /mob/proc/RegisterMember()
     set name = "Register Member"
     set category = "Roleplay"
+    set hidden = 1
     // get the person targetted
     if(!Target)
         src<< "You need a target"

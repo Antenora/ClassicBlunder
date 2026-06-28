@@ -85,15 +85,6 @@ proc
 				DebuffRate+=10*(Attacker.SenseUnlocked-5)
 			if(Defender.HasDebuffResistance())
 				DebuffRate/=1+Defender.GetDebuffResistance()
-			if(glob.INTIM_REDUCES_DEBUFFS)
-				if(Defender.HasIntimidation())
-					var/Effective=Defender.GetIntimidation()
-					var/Ratio=Attacker.GetIntimidationIgnore(Defender)
-					var/Ignored=Effective*Ratio
-					Effective-=Ignored
-					if(Effective<0)
-						Effective=0
-					DebuffRate-=Effective/10
 			if(DebuffRate<0)
 				DebuffRate=0
 

@@ -70,7 +70,6 @@ mob/proc/getSenketsuViewers()
 	StripEquip = 1
 	RecovMult=1.5
 	passives = list("BleedHit" = 3, "LifeSteal" = 15)
-	Intimidation=2
 	KenWave=1
 	KenWaveIcon='SparkleRed.dmi'
 	KenWaveSize=5

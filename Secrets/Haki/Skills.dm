@@ -1,4 +1,4 @@
-/obj/Skills/AutoHit/var/buffAffectedType = "" // Power, Potential, Intimidation, etc -- the var to compare, if it is being compared
+/obj/Skills/AutoHit/var/buffAffectedType = "" // Power, Potential, etc -- the var to compare, if it is being compared
 /obj/Skills/AutoHit/var/buffAffectedCompare = FALSE // TRUE if it is being compared, FALSE if it is not
 /obj/Skills/AutoHit/var/buffAffectedBoon = ""
 // then buffAffected is a list, and compare is TRUE, find the type and compare, when it is false, randomly select a buff
@@ -64,6 +64,7 @@
     TurfStrike=1
     verb/exertWill()
         set category="Roleplay"
+        set hidden = 1
         set name = "Exert Will"
         // for show
         ActiveMessage = "expunges their willpower, suddenly increasing the pressure in the area!"

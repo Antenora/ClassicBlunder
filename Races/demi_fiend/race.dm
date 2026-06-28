@@ -5,6 +5,7 @@ race
 		visual = 'Makaioshins.png'
 		locked = TRUE
 		passives = list("MartialMagic" = 1)
+		power = 3;
 		strength = 2
 		endurance = 2
 		speed = 2

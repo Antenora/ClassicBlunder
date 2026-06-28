@@ -92,7 +92,6 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
-	Intimidation=1//Adding this here for ezpz stuff.
 	HealthCut=0
 	EnergyMax=100
 	Energy=100
@@ -134,7 +133,7 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
-	tmp/StaggerMeter=0 // Boss Stun
+	StaggerMeter=0 // Boss Stun
 	StaggerMult=1
 	MaimKOGetups=0
 	EndReplace=0

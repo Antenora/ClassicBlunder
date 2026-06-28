@@ -2,7 +2,6 @@ ascension
 	dragon
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			intimidation = 20
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -55,7 +54,6 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			intimidation = 30
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -106,7 +104,6 @@ ascension
 
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			intimidation = 40
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()

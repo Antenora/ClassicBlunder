@@ -1,5 +1,6 @@
 mob/verb/Character_Sheet()
 	set category = "Other"
+	set hidden = 1
 	src<<browse(src.GetAssess(),"window=Assess;size=275x700")
 
 // Unhinged Majins count their Power at MAJIN_UNHINGED_POWER_MULT (2x) in both offense and defense
@@ -9,11 +10,10 @@ mob/proc/GetEffectivePower()
 		. *= MAJIN_UNHINGED_POWER_MULT
 
 mob/proc/GetAssess()
-	var/PowerDisplay
 	var/PotentialPowerDisplay
+	var/ReplacementPowerDisplay
 	var/PowerMultiplierDisplay
-	var/IntimDisplay
-	var/BaseDisplay
+	var/BaseDisplay = race.power;
 	var/GodKiDisplay
 	var/MaouKiDisplay
 	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef())/6, 0.05)
@@ -39,22 +39,13 @@ mob/proc/GetAssess()
 		if(src.PhylacteryNerf)
 			EffectiveAnger-=(EffectiveAnger*src.PhylacteryNerf)
 
-	PowerDisplay=Get_Scouter_Reading(src)
 
-	if(src.HasPowerReplacement())
-		BaseDisplay=src.GetPowerReplacement()*src.PowerBoost*src.RPPower
-	else
-		BaseDisplay=src.potential_power_mult*src.PowerBoost*src.RPPower
+	PotentialPowerDisplay = potential_power_mult;
 
-	PotentialPowerDisplay = src.GetPowerReplacement() ? src.GetPowerReplacement() : src.potential_power_mult;
-	PotentialPowerDisplay = round(PotentialPowerDisplay, 0.05);
+	if(HasPowerReplacement()) ReplacementPowerDisplay = GetPowerReplacement();
 
 	PowerMultiplierDisplay=src.Power_Multiplier;
 
-	if(src.HasIntimidation())
-		IntimDisplay=src.GetIntimidation()
-	else
-		IntimDisplay=1
 	if(src.HasGodKi()&&!src.passive_handler.Get("Utterly Powerless"))
 		GodKiDisplay=src.GetGodKi()
 		if(src.passive_handler.Get("God"))
@@ -75,7 +66,6 @@ mob/proc/GetAssess()
 	if(passive_handler.Get("Utterly Powerless"))
 		PotentialDisplay=1
 		BaseDisplay=1
-		PowerDisplay=1
 		PowerMultiplierDisplay=1
 		GodKiDisplay=0
 		MaouKiDisplay=0
@@ -100,16 +90,14 @@ mob/proc/GetAssess()
 	Current Anger:	[(EffectiveAnger+src.AngerAdd)*100]%<br>
 	<table cellspacing="6%" cellpadding="1%">
 	<tr><td>Current Power:</td><td>[Power]</td></tr>
+	<tr><td>Base Power:</td><td>[BaseDisplay*PowerBoost*RPPower*potential_power_mult]]/([BaseDisplay])</td></tr>
 	<tr><td>Power From Potential:</td><td>[PotentialPowerDisplay]</td></tr>
+	[HasPowerReplacement() ? "<tr><td>Power Replacement Value:</td><td>[ReplacementPowerDisplay]</td></tr>" : ""]
 	<tr><td>Power From Buffs:</td> <td>x[PowerMultiplierDisplay]</td></tr>
-	<tr><td>Base:</td><td>[BaseDisplay]/([src.PowerBoost*src.RPPower*round(src.potential_power_mult, 0.05)])</td></tr>
-	<tr><td>Intimidation:</td><td>x[IntimDisplay]</td></tr>
 	<tr><td>Damage Boost:</td><td>x[PDam] ([PDam*100]%)</td></tr>
 	<tr><td>Damage Reduction:</td><td>x[PRed] ([PRed*100]%)</td></tr>
 	<tr><td>God Ki:</td><td>x[GodKiDisplay]</td></tr>
 	<tr><td>Maou Ki:</td><td>x[MaouKiDisplay]</td></tr>
-	<tr><td>Current BP:</td><td>[Commas(PowerDisplay)]</td></tr>
-	<tr><td>Real BP:</td><td>[Commas(src.potential_power_mult)]</td></tr>
 	<tr><td>Energy:</td><td>[Commas(round(src.EnergyMax))] (1)</td></tr>
 	<tr><td>Buffed Stat/True Stat (Mod)</td></tr>
 	<tr><td>Strength:</td><td> [round(src.GetStr(), 0.01)] ([round(src.BaseStr() + src.GetEquippedWeaponStrAdd(), 0.01)])</td></tr>
@@ -120,15 +108,12 @@ mob/proc/GetAssess()
 	<tr><td>Defense:</td><td> [round(src.GetDef(), 0.01)] ([round(src.BaseDef() + src.GetEquippedWeaponDefAdd(), 0.01)])</td></tr>
 	<tr><td>Recovery:</td><td> [round(src.GetRecov(), 0.01)] ([src.BaseRecov()])</td></tr>
 	<tr><td>Anger:</td><td>[(src.AngerMax+src.AngerAdd)*100]%</td></tr>
-	<tr><td>Power Mult:</td><td>[round(src.potential_power_mult, 0.05) + src.PowerBoost]%</td></tr>
 	<tr><td>Potential:</td><td>[PotentialDisplay]/150</td></tr>
-	<tr><td>Transformation Potential:</td><td>[src.potential_trans]/100</td></tr>
+	<tr><td>Transformation Potential:</td><td>[potential_trans]/150</td></tr>
 	<tr><td>Average Stats: [StatAverage]</td></tr>
 	<tr><td>Magic Level: [src.getTotalMagicLevel()]</td></tr>
 	<tr><td>Stat Enhancement Chips Installed(Max): [src.EnhanceChips]([src.EnhanceChipsMax])</td></tr>
 			</table></html>"}
-/*	<tr><td>True Tier:</td><td>[POWER_TIERS[potential_power_tier]]</td></tr>
-	<tr><td>Display Tier:</td><td>[POWER_TIERS[power_display]]</td></tr>*/
 	if(src.passive_handler.Get("Utterly Powerless"))
 		blahh={"
 
@@ -175,11 +160,14 @@ proc/SenseDetect(atom/A,Range)
 
 mob/var/list/Tabz=list("Science"="Hide","Build"="Hide","Enchantment"="Hide","Inventory"="Show")
 
-mob/Players/Stat()
-	if(client.show_verb_panel)
+// Legacy stat panel tabs
+/var/HIDE_LEGACY_STAT_PANELS = 1
 
-		statpanel("Statistics")
-		if(statpanel("Statistics"))
+mob/Players/Stat()
+	if(client)   
+
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Statistics")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Statistics"))
 			CHECK_TICK
 			if(src.Mapper)
 				stat("Location", "[src.x], [src.y], [src.z]")
@@ -328,8 +316,8 @@ mob/Players/Stat()
 				stat("Economy Rates", "[Commas(glob.progress.EconomyCost)] [glob.progress.MoneyName] Cost / [Commas(glob.progress.EconomyIncome)] Income / [Commas(glob.progress.EconomyMana)] Mana Cost")
 
 
-		statpanel("Inventory")
-		if(statpanel("Inventory")&&usr.AFKTimer)
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Inventory")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Inventory")&&usr.AFKTimer)
 			CHECK_TICK
 			for(var/obj/Money/M in usr)
 				M.name="[Commas(round(M.Level))] [glob.progress.MoneyName]"
@@ -358,8 +346,8 @@ mob/Players/Stat()
 							else
 								stat("[A:Uses] / [A:MaxUses]")
 
-		statpanel("Current Target")
-		if(statpanel("Current Target")&&usr.Target)
+		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Current Target")
+		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Current Target")&&usr.Target)
 			CHECK_TICK
 			if(isplayer(usr.Target) || istype(usr.Target, /mob/Player))
 				stat("Focused:",Target)
@@ -860,8 +848,8 @@ mob/proc/
 		if(EPM<=0)
 			EPM=0.1
 		//Ratio
-		var/Ratio=1
-		Ratio*=EPM
+		var/Ratio = getRacialPowerMod();
+		Ratio *= EPM
 		var/ShonenPower = ShonenPowerCheck(src)
 		if(ShonenPower)
 			Ratio*=GetSPScaling(ShonenPower)
@@ -1200,14 +1188,12 @@ mob/proc/Update_Stat_Labels()
 	if(!client) return
 	if(!src.ha)
 		var/ManaMessage="%"
-		if(round(TotalInjury))
-			src<<output("Health: [round(Health)+round(VaizardHealth)+round(BioArmor)] (Injuries:[round(TotalInjury)]%)", "BarHealth")
-		else
-			src<<output("Health: [round(Health)+round(VaizardHealth)+round(BioArmor)]%", "BarHealth")
-		if(round(TotalFatigue))
-			src<<output("Energy: [round((Energy/EnergyMax)*100)] (Fatigue:[round(TotalFatigue)]%)","BarEnergy")
-		else
-			src<<output("Energy: [round((Energy/EnergyMax)*100)]%","BarEnergy")
+		UpdateResourceOrbs()
+		client.UpdateCardText()
+		client.UpdateDebuffs()
+		client.UpdateTimedBuffs()
+		client.UpdateTargetCard()
+		client.UpdateCharacterMenu()   
 		if(round(TotalCapacity))
 			ManaMessage=" (Capacity:[100-round(TotalCapacity)]%)"
 		if(src.CheckSlotless("Mang Resonance") || src.CheckSlotless("Shin Radiance"))
@@ -1293,20 +1279,18 @@ mob/proc/Update_Stat_Labels()
 			src<<output("CRP: [round(Crippled, 1)]","BarCripple")
 		else
 			winshow(src, "BarCripple",0)
-		if(src.PureRPMode==1)
-			winshow(src, "BarRP",1)
-			src<<output("RP MODE","BarRP")
-		else
-			winshow(src, "BarRP",0)
-		if(src.WoundIntent==1||src.Lethal>=1)
-			if(src.Lethal==1)
-				winshow(src, "BarWound",1)
-				src<<output("LETHAL","BarWound")
-			else
-				winshow(src, "BarWound",1)
-				src<<output("INJURE","BarWound")
-		else
-			winshow(src, "BarWound",0)
+		winshow(src, "BarRP",0)
+		winshow(src, "BarWound",0)
+		winshow(src, "BarPoison",0)
+		winshow(src, "BarBurning",0)
+		winshow(src, "BarBleed",0)
+		winshow(src, "BarDoomed",0)
+		winshow(src, "BarBreak",0)
+		winshow(src, "BarShock",0)
+		winshow(src, "BarSlow",0)
+		winshow(src, "BarFrenzy",0)
+		winshow(src, "BarPotion",0)
+		winshow(src, "BarCripple",0)
 		if(src.StyleActive)
 			winshow(src, "StyleLabel",1)
 			winshow(src, "StanceLabel",1)
@@ -1564,8 +1548,6 @@ mob/proc/Get_Scouter_Reading(mob/B)
 					a+=B.AngerAdd
 				Ratio*=a
 
-		if(B.HasIntimidation()&&B.PowerControl>25)
-			Ratio*=B.GetIntimidation()
 		if(B.PowerBoost)
 			Ratio*=B.PowerBoost
 		if(B.TarotFate=="The Sun")

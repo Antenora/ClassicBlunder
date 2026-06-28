@@ -1,5 +1,6 @@
 mob/verb/EmoteNew()
 	set category = "Roleplay"
+	set hidden = 1
 	if(usr.rping) return
 
 	usr.rping = TRUE

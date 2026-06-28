@@ -41,6 +41,7 @@
     PowerUpPriority="Transformation";
 /mob/verb/PowerUpPrio()
     set category="Other"
+    set hidden = 1
     set name="Customize: Power Up Priority"
     var/options = list("Nevermind");
     if(race.transformations.len > 0) options |= "Transformation";

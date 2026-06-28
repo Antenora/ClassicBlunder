@@ -261,6 +261,7 @@ obj
 			ActiveMessage="shreds a path forward!"
 			verb/Disable_Innovate()
 				set category = "Other"
+				set hidden = 1
 				disableInnovation(usr)
 			adjust(mob/p)
 				if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))
@@ -364,6 +365,7 @@ obj
 			ActiveMessage="spins their sword like a drill bit!"
 			verb/Disable_Innovate()
 				set category = "Other"
+				set hidden = 1
 				disableInnovation(usr)
 			adjust(mob/p)
 				if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))

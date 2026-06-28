@@ -153,6 +153,7 @@ obj/Skills/Utility
 		desc="Request a Tier 1 genetic sample from a nearby player. They must consent. They can only ever donate one Tier 1 sample in their entire life."
 		verb/Collect_Sample()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer extract samples."
 				return
@@ -220,6 +221,7 @@ obj/Skills/Utility
 		desc="Forcibly extract a Tier 2 sample from a KO'd target. Severely wounds them. Grants both the Tier 1 and Tier 2 sample of their race."
 		verb/Force_Extract()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer extract samples."
 				return
@@ -289,6 +291,7 @@ obj/Skills/Utility
 		desc="Install a Tier 2 genetic sample of any race directly. Costs a large amount of Mana Bits. No donor required."
 		verb/Bio_Augmentation()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer augment yourself."
 				return
@@ -344,6 +347,7 @@ obj/Skills/Utility
 		desc="Sacrifice 3 of your Tier 2 Bio Android samples to unlock your Perfect Form."
 		verb/Bio_Augmentation()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to install samples."
 				return

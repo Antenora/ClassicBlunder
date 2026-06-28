@@ -10,7 +10,6 @@ ascension
 				skills += /obj/Skills/Utility/Send_Energy
 			if(owner.ShinjinAscension=="Makai")
 				owner.ContractPowered=1
-				intimidation = 50
 				owner.PotentialCap*=2
 				passives = list("GodKi" = 0.5)
 			..()

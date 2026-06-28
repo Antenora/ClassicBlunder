@@ -67,7 +67,7 @@
 		petals = list()
 		if(user && user.client)
 			user.client.senbonzakura_dragging = FALSE
-			winset(user.client, "mapwindow.map", "right-click=0")
+			user.client.petal_drag_locked = FALSE // clear in case convergence was interrupted
 		if(user)
 			user.AppearanceOff()
 			for(var/obj/Items/i in user)

@@ -302,6 +302,7 @@
 		name = "Slide Evolution"
 		verb/Slide_Evolution()
 			set category="Skills"
+			set hidden = 1
 			if(!istype(usr.StyleBuff, /obj/Skills/Buffs/NuStyle/MysticStyle/Gamma_Style))
 				usr << "You must be in Gamma Style to use Slide Evolution."
 				return
@@ -311,6 +312,7 @@
 		name = "Dark Evolution"
 		verb/Dark_Evolution()
 			set category="Skills"
+			set hidden = 1
 			if(!istype(usr.StyleBuff, /obj/Skills/Buffs/NuStyle/MysticStyle/Gamma_Style))
 				usr << "You must be in Gamma Style to use Dark Evolution."
 				return

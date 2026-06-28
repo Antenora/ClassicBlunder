@@ -414,6 +414,7 @@ guild
 /*
 /mob/verb/View_Guild_Ranks()
 	set category = "Roleplay"
+	set hidden = 1
 	var/startText = "[SYSTEM]Guild Rankings]"
 	for(var/x in glob.GUILD_RANKINGS)
 		if(glob.GUILD_RANKINGS[x] > 0)

@@ -61,11 +61,13 @@
 /mob/Players/verb
 	View_Maim_History()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Maim History"
 		usr << browse(usr.maimHistoryHtml(), "window=MaimHistory;size=620x520")
 
 	Annotate_Maim()
 		set category = "Roleplay"
+		set hidden = 1
 		set name = "Annotate Maim"
 		if(!MaimHistory || !MaimHistory.len)
 			usr << "You have no maim events on record."

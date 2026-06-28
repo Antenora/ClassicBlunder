@@ -60,6 +60,7 @@
 		passives = c_buff.current_passives
 	verb/Adjust_Shapeshifter()
 		set category = "Utility"
+		set hidden = 1
 		if(!usr.BuffOn(src) && !c_buff.selecting_aguments)
 			c_buff.adjust_custom_buff(usr, src)
 			if(!c_buff.check(usr, src))
@@ -70,5 +71,6 @@
 	ActiveMessage = "blends into their surroundings"
 	verb/Blend_In()
 		set category = "Utility"
+		set hidden = 1
 		Trigger(usr)
 

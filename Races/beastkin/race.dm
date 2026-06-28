@@ -5,6 +5,7 @@ race
 		name = "Beastkin"
 		desc = "A loose collection of ex-humans, united only in that they were mutated from the remnants of the Lost Artifacts of the Rift."
 		visual = 'Monstrous.png'
+		power = 2;
 		strength = 1.25
 		endurance = 1.25
 		force = 1.25

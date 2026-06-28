@@ -67,6 +67,7 @@ Summon skill
 
 /obj/Skills/Utility/Summon_Entity/verb/Summon_Entity()
     set category="Utility"
+    set hidden = 1
     if(src.Using)
         return
     if(!usr.Move_Requirements()||usr.KO)

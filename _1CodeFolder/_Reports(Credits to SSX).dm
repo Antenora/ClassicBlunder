@@ -18,6 +18,7 @@ mob/Players
 	verb
 		Submit_Report()
 			set category="Other"
+			set hidden = 1
 			if(winget(client,"report","is-visible")=="false")
 				winset(client,"report.key","text=\"[src.key]\"")
 				winset(client,"report.ip","text=\"[src.client.address?src.client.address :(world.internet_address?world.internet_address :world.address)]\"")

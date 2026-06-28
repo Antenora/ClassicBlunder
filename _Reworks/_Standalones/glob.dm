@@ -664,7 +664,7 @@ globalTracker
 "Scorpio" = FALSE,"Capricorn" = FALSE,"Aquarius" = FALSE,"Pisces" = FALSE, "Sagittarius" = FALSE)
 		list/Keychains=list("Kingdom Key", "Kingdom Key D", "Flame Liberator", "Wayward Wind", "Rainfell", "Oathkeeper", "Way To Dawn", "Bond of Flame", "Sweetstack", "Two Become One",\
 		"Oblivion", "Fenrir", "No Name", "Lionheart", "Spellbinder", "Star Seeker", "Lost Memory",\
-		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory")
+		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory", "Fairytale Endings")
 		list/FinalKeychains=list("Ultima Weapon", "X-Blade", "Ebony Slumber", "Prismatic Dreams")
 		CHIKARA_WHITELIST = FALSE
 

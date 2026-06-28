@@ -8,7 +8,6 @@ ascension
 			endurance = 1
 			offense = 0.25
 			force = 0.25
-			intimidation = 25
 			anger = 0.15
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
@@ -17,7 +16,6 @@ ascension
 			strength = 1.25
 			force = 0.5
 			offense = 0.5
-			intimidation = 50
 			anger = 0.15
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
@@ -26,7 +24,6 @@ ascension
 			endurance = 1.75
 			force = 1.25
 			offense = 1.25
-			intimidation = 50
 			anger = 0.15
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
@@ -35,7 +32,6 @@ ascension
 			endurance = 2.5
 			force = 1.5
 			offense = 1.5
-			intimidation = 25
 			anger = 0.15
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
@@ -43,7 +39,6 @@ ascension
 			strength = 2.75
 			endurance = 2.75
 			force = 1.75
-			intimidation = 25
 
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
@@ -51,7 +46,6 @@ ascension
 			strength = 3
 			endurance = 3
 			offense = 3
-			intimidation = 25
 
 /*ascension
 	makyo

@@ -15,6 +15,7 @@ obj
 		verb
 			Trait_Options()
 				set category="Other"
+				set hidden = 1
 				set src in usr
 				if(!(world.time > usr.verb_delay)) return
 				usr.verb_delay=world.time+1

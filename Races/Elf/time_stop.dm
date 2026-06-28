@@ -58,6 +58,7 @@
 			StartTimeStop(usr)
 	verb/Change_Stop_Trigger()
 		set category = "Utility"
+		set hidden = 1
 		TriggerMessage = input(usr, "the message") as text
 		if(length(TriggerMessage) >= 150)
 			TriggerMessage = "Fall."

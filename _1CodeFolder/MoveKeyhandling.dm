@@ -1,7 +1,7 @@
 client
 	New()
 		..()
-		setMacros()
+		// setMacros() retired, ApplyKeybinds (SkillMenuHotbar) is what is used now
 
 	// These are here so the default movement commands don't interfere.
 	North()

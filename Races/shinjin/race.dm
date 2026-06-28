@@ -40,7 +40,6 @@ race
 				user.passive_handler.Increase("StaticWalk", 1)
 				anger = 2
 				user.NewAnger(2)
-				user.Intimidation=10
 				user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Majin)
 			user.ShinjinAscension = Choice
 			var/pickedPath = input(user, "Pick a Kaio Direction.") in list("North", "East", "South", "West")

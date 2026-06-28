@@ -22,7 +22,7 @@ mob
 	proc
 
 		AscAvailable()
-			src.potential_ascend(Silent=1)
+			potential_ascend();
 			if(race.ascensions.len==0) return
 			//If a prompt is already open from a prior call (e.g. spammed Meditate),
 			//bail — otherwise race subclass onAscension overrides re-apply their passive Increase() calls
@@ -3136,16 +3136,19 @@ mob
 			for(var/obj/Money/defender in src)
 				defender.Level-=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
+			if(client) client.UpdateInvCurrency()
 		TakeMineral(val)
 			for(var/obj/Items/mineral/m in src)
 				m.Reduce(val)
 				m.name = "[Commas(round(m.value))] Mana Bits"
+			if(client) client.UpdateInvCurrency()
 		GiveMoney(var/Value)
 			for(var/obj/Money/defender in src)
 				defender.Level+=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
 				defender.checkDuplicate(src)
 			src << "You've gained [Commas(round(Value))] [glob.progress.MoneyName]."
+			if(client) client.UpdateInvCurrency()
 		GiveMineral(val)
 			var/found=0;
 			for(var/obj/Items/mineral/m in src)
@@ -3156,6 +3159,7 @@ mob
 				var/obj/Items/mineral/m = new();
 				m.Add(val);
 				src.contents += m;
+			if(client) client.UpdateInvCurrency()
 		TakeManaCapacity(var/Value, ignorePhiloStone = FALSE)
 			var/Remaining=Value
 			if(!ignorePhiloStone)
@@ -3659,20 +3663,11 @@ mob
 				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
-			if(!locate(/obj/Skills/Zanzoken, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to move faster than the eye can see due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Zanzoken)
-			if(!locate(/obj/Skills/Power_Control, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to fluctuate your power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Power_Control)
-					if(!locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
-						src.PoweredFormSetup()
-			if(!locate(/obj/Skills/Utility/Sense, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to sense power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Utility/Sense)
+			// Zanzoken / Power Up-Down / Sense are auto-granted at creation now (addMissingSkills,
+			// retrofitted onto old saves every login). Ki Control's interactive setup still fires on
+			// first use, once the player has Power Control but hasn't configured Ki Control yet:
+			if(locate(/obj/Skills/Power_Control, src) && !locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
+				src.PoweredFormSetup()
 
 			if(!src.SignatureCheck)
 				return

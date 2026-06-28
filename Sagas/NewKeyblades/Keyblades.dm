@@ -210,6 +210,8 @@ proc/
 				return "Heavy"
 			if("Prismatic Dreams")
 				return "Heavy"
+			if("Fairytale Endings")
+				return "Heavy"
 	GetKeychainDamage(var/KC)
 		switch(KC)
 //small
@@ -266,6 +268,8 @@ proc/
 			if("Ebony Slumber")
 				return 2.5
 			if("Prismatic Dreams")
+				return 2.5
+			if("Fairytale Endings")
 				return 2.5
 	GetKeychainAccuracy(var/KC)
 		switch(KC)
@@ -324,6 +328,8 @@ proc/
 				return 1.25
 			if("Prismatic Dreams")
 				return 1.25
+			if("Fairytale Endings")
+				return 1.25
 	GetKeychainDelay(var/KC)
 		switch(KC)
 //small
@@ -381,6 +387,8 @@ proc/
 				return 1
 			if("Prismatic Dreams")
 				return 1
+			if("Fairytale Endings")
+				return 1.
 	GetKeychainElement(var/KC)
 		switch(KC)
 //small
@@ -441,6 +449,8 @@ proc/
 				return "Dark"
 			if("Prismatic Dreams")
 				return "Light"
+			if("Fairytale Endings")
+				return "Fire"
 	GetKeychainIcon(var/KC)
 		switch(KC)
 //small
@@ -498,6 +508,8 @@ proc/
 				return 'Fusion Keyblade - Dark.dmi'
 			if("Prismatic Dreams")
 				return 'Fusion Keyblade - Light.dmi'
+			if("Fairytale Endings")
+				return 'FairytaleEndings.dmi'
 	GetKeychainIconReversed(var/KC)
 		switch(KC)
 //small
@@ -555,6 +567,8 @@ proc/
 				return 'Fusion Keyblade - Dark Sync.dmi'
 			if("Prismatic Dreams")
 				return 'Fusion Keyblade - Light Sync.dmi'
+			if("Fairytale Endings")
+				return 'FairytaleEndings - Sync.dmi'
 
 
 	GetKeybladePassives(var/KC, var/Boost)
@@ -634,6 +648,9 @@ proc/
 				return KeybladePassives
 			if("Ebony Slumber")
 				KeybladePassives=list("PULock" = 1, "Dreamless Sleep" = 1, "GodKi" = 0.25)
+				return KeybladePassives
+			if("Fairytale Endings")
+				KeybladePassives=list("PULock" = 1, "Extend" = 1, "Ashen One" = 1, "Kindling" = 1, "Combustion" = 30)
 				return KeybladePassives
 			if("Prismatic Dreams")
 				KeybladePassives=list("PULock" = 1, "Dream Within a Dream" =1, "GodKi" = 0.25)
