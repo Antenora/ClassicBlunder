@@ -1550,7 +1550,9 @@ mob
 		GetBeamChargeSpeedMult()
 			var/mult = (1+(src.GetKiControlMastery()*0.1))
 			if(src.HasQuickCast())
-				mult *= src.GetQuickCast()
+				mult *= src.GetQuickCast()+1
+			if(src.passive_handler.Get("Dragon Spirit"))
+				mult *= 5
 			return mult
 		HasDualCast()
 			if(passive_handler.Get("DualCast"))
