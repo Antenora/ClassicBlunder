@@ -228,6 +228,7 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	if(!sw || !sw.pref || menu_open != "options") return
 	togglePref(sw.pref)
 	if(sw.pref == "soundOn") ApplyAudioPref()
+	if(sw.pref == "zoom2x") ApplyZoomPref()
 	AnimateOptToggle(sw, getPref(sw.pref))
 
 // reuses the hat-toggle sprite set, frames 1>5
@@ -431,6 +432,19 @@ client/proc/BuildOptionsExtras()
 	asw.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-44"
 	menu_entry_objs += asw
 	screen += asw
+	var/atom/movable/shud/menutext/zl = new
+	zl.maptext_width = 110
+	zl.maptext_height = 20
+	zl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">Zoom 2x</span>"
+	zl.screen_loc = "CENTER:[MHUD_COL2_X],CENTER:-46"
+	menu_entry_objs += zl
+	screen += zl
+	var/atom/movable/shud/menutoggle/zsw = new
+	zsw.pref = "zoom2x"
+	zsw.icon = getPref("zoom2x") ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
+	zsw.screen_loc = "CENTER:[MHUD_COL2_X + 88],CENTER:-44"
+	menu_entry_objs += zsw
+	screen += zsw
 	// chat toggles continue the same 22px grid (Audio is row 5), so the bottom row lands at -90 like a full page
 	var/list/togs = list("OOC" = "ShowOOC", "All Tab OOC" = "AllTabOOC", "IC Tab LOOC" = "LOOCinIC", "All Tab LOOC" = "LOOCinAll")
 	var/ti = 0

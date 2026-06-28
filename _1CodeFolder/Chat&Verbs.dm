@@ -80,83 +80,20 @@ mob
 atom/proc/Examined(mob/user)
 mob/Players/var/tmp/current_party_target_index = 1
 mob/Players/verb
-	Create_Party()
-		set category="Party"
-		if(src.Class in list("Dance", "Potara"))
-			src << "You can't party with fused characters!"
-			return
-		if(src.party)
-			src << "You are already in a party; you cannot create another one."
-			return
-		var/Party/p=new
-		p.create_party(src)
-
 	Party_Target_Cycle()
 		set category = "Party"
 		if(!src.party)
 			src << "You don't have a party to cycle target on!"
 			return
-		current_party_target_index +=1
-		if(current_party_target_index > party.members.len)
-			current_party_target_index = 1
-		usr.SetTarget(party.members[current_party_target_index])
-		usr << "You target [usr.Target]."
-	Manage_Party()
-		set category="Party"
-		if(!src.party)
-			src << "You don't have a party to manage!"
+		var/list/others = src.party.members - src
+		if(!others.len)
+			src << "You have no party members to target."
 			return
-		var/list/options=list("Cancel", "Check Party", "Add Member", "Remove Member", "Pass Leader", "Leave Party")
-		if(src.party.leader!=src)
-			options.Remove("Add Member", "Remove Member", "Pass Leader")
-		switch(input(src, "How do you want to manage your party?", "Manage Party") in options)
-			if("Cancel")
-				return
-			if("Check Party")
-				for(var/mob/m in src.party.members)
-					if(m == src.party.leader)
-						src << "\[LEADER\] - \..."
-					src << "[m.name] - [round(m.Health, 10)]% / [round(m.Energy, 10)]%"
-				return
-			if("Add Member")
-				if(src==src.party.leader)
-					var/list/mob/the_boys=list("Cancel")
-					for(var/mob/m in view(8, src))
-						if(!m.party && !(m.Class in list("Dance", "Potara")))
-							the_boys.Add(m)
-					var/mob/my_boy=input(src, "Who do you want to add to your party?", "Add Member") in the_boys
-					if(my_boy=="Cancel")
-						return
-					if(my_boy.party)
-						return
-					src.party.add_member(my_boy)
-				return
-			if("Remove Member")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/not_my_boy=input(src, "Who do you want to remove from your party?", "Remove Member") in my_boys
-					if(not_my_boy=="Cancel")
-						return
-					if(src.party.members.Find(not_my_boy))
-						src.party.remove_member(not_my_boy)
-				return
-			if("Pass Leader")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/the_best_boy=input(src, "Who do you want to pass your leadership to?", "Pass Leader") in my_boys
-					if(the_best_boy=="Cancel")
-						return
-					if(src.party.members.Find(the_best_boy))
-						src.party.pass_leader(src, the_best_boy)
-				return
-			if("Leave Party")
-				if(src.party)
-					src.party.remove_member(src)
-				return
+		current_party_target_index += 1
+		if(current_party_target_index > others.len)
+			current_party_target_index = 1
+		usr.SetTarget(others[current_party_target_index])
+		usr << "You target [usr.Target]."
 
 	Signature_Check()
 		set category="Other"

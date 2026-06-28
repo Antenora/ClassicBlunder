@@ -1,4 +1,4 @@
-#define DISPLAY_ZOOM 2
+#define DISPLAY_ZOOM_ON 2       // zoom when the player's Zoom 2x option is on; off = 1x (native)
 #define DISPLAY_MIN_VIEW 7
 #define DISPLAY_BASE_MAX_VIEW 31
 
@@ -6,6 +6,9 @@ client
 	var/tmp
 		view_fit_enabled = FALSE
 		view_fit_queued = FALSE
+
+client/proc/CurrentZoom()
+	return getPref("zoom2x") ? DISPLAY_ZOOM_ON : 1
 
 mob/proc/MaxViewCap()
 	return DISPLAY_BASE_MAX_VIEW
@@ -18,13 +21,18 @@ mob/proc/UserMaxView()
 
 client/proc/SetupGameDisplay()
 	if(!mob) return
-	winset(src, "mapwindow.map", "zoom=[DISPLAY_ZOOM];zoom-mode=distort;letterbox=true")
+	winset(src, "mapwindow.map", "zoom=[CurrentZoom()];zoom-mode=distort;letterbox=true")
 	view_fit_enabled = TRUE
 	FitViewNow()
 
 client/proc/SetupTitleDisplay()
 	view_fit_enabled = FALSE
 	winset(src, "mapwindow.map", "zoom=0;zoom-mode=normal;letterbox=true")
+
+client/proc/ApplyZoomPref()
+	if(!mob) return
+	winset(src, "mapwindow.map", "zoom=[CurrentZoom()];zoom-mode=distort;letterbox=true")
+	FitViewNow()
 
 client/verb/FitView()
 	set hidden = 1
@@ -45,14 +53,18 @@ client/proc/FitViewNow()
 	var/pw = text2num(parts[1])
 	var/ph = text2num(parts[2])
 	if(!pw || !ph) return
-	var/tile = world.icon_size * DISPLAY_ZOOM
+	var/ref_tile = world.icon_size * DISPLAY_ZOOM_ON
 	var/cap = mob.MaxViewCap()
 	var/pref = mob.UserMaxView()
 	var/maxtiles = pref ? min(pref, cap) : cap
-	var/tw = min(max(round(pw / tile), DISPLAY_MIN_VIEW), maxtiles)
-	var/th = min(max(round(ph / tile), DISPLAY_MIN_VIEW), maxtiles)
+	var/ref_tw = min(max(round(pw / ref_tile), DISPLAY_MIN_VIEW), maxtiles)
+	var/ref_th = min(max(round(ph / ref_tile), DISPLAY_MIN_VIEW), maxtiles)
+	var/zmul = DISPLAY_ZOOM_ON / CurrentZoom()
+	var/tw = round(ref_tw * zmul)
+	var/th = round(ref_th * zmul)
 	view = "[tw]x[th]"
 	PositionCharacterCard() // re-anchor card to new view height, no-op if no card
+	if(party_invite_from) ShowPartyInvite(party_invite_from) // re-center an open invite prompt on resize
 
 mob/verb
 	Max_View()

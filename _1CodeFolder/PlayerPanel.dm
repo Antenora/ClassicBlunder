@@ -163,6 +163,8 @@ client/proc/ShowPlayerPanel(mob/Players/P)
 	if(self)
 		btns = list(list("set_tagline","Set Tagline"), list("edit_profile","Edit Profile"), list("view_own","Own Profile"), list("save_profile","Save Profile"), list("swap_profile","Swap Profile"), list("roll","Roll Dice"), list("pray","Pray"))
 		btop = 158
+		if(mob.party)
+			btns += list(list("leave_party","Leave Party"))
 	else
 		MkPlayerInfo("Power: [GetPanelPower(P)]", 162)
 		MkPlayerInfo("Origin: [GetPanelOrigin(P)]", 144)
@@ -170,6 +172,8 @@ client/proc/ShowPlayerPanel(mob/Players/P)
 		if(sc) MkPlayerInfo("Scent: [sc]", 126)
 		btns = list(list("view_profile","View Profile"), list("ping","Ping"))
 		btop = 96
+		if(mob.CanInviteToParty() && P.CanBeInvited())
+			btns += list(list("invite_party","Party Invite"))
 	if(mob.Admin || glob.TESTER_MODE)
 		btns += list(list("admin_view_contents", "Admin View"))   // admin only, works on self and others
 	var/bi = 0
@@ -212,6 +216,12 @@ client/proc/PlayerPanelAction(action)
 		if("admin_view_contents")
 			if(!T || !(mob.Admin || glob.TESTER_MODE)) return
 			ShowAdminContents(T)
+		if("invite_party")
+			if(T) spawn() mob.InviteToParty(T)
+			HidePlayerPanel()
+		if("leave_party")
+			if(mob.party) spawn() mob.party.remove_member(mob)
+			HidePlayerPanel()
 
 client/proc/ShowProfileWindow(mob/T)
 	if(!T || !mob) return

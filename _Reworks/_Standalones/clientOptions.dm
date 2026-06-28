@@ -15,8 +15,9 @@ Options/
     var/autoAttacking = FALSE
     var/oldZanzo = FALSE
     var/soundOn = 1
+    var/zoom2x = 0          // off = 1x (default), on = 2x map zoom
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)
