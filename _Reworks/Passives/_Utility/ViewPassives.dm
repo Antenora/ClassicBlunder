@@ -127,5 +127,7 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "Fa Jin"="Enhances queue damage.",
 "Fox Spirit"="Multiplies your SpiritSword, SpiritHand and Spiritflow passives by 40%",
 "Bear Spirit"="Allows you to constantly attack and warp onto a stunned target next to you. Do not move while using this.",
-"Wolf Spirit"="Adds extra range to your dash attacks"
+"Wolf Spirit"="Adds extra range to your dash attacks",
+"Dragon Spirit"="Multiplies your beam charge rate by 5 without decreasing its damage.",
+"Lion Spirit"="Grans you access to Frenzy as if you were a Black Flame Wilder."
 );

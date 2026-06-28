@@ -55,7 +55,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
             passives["Wolf Spirit"] += 1
         if(P.InkworksDatum.Dragon == 1) // Decreases the amount of time you need to charge to get a beam's damage WITHOUt affecting its final damage.
             passives["Dragon Spirit"] += 1
-        if(P.InkworksDatum.Lion)
+        if(P.InkworksDatum.Lion) // Frenzy
             passives["Lion Spirit"] += 1
 
     verb/Ink_Empowerment()
