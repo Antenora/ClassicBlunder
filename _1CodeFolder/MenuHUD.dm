@@ -138,6 +138,15 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 	layer = MHUD_LAYER + 0.2
 	mouse_opacity = 2 // block clicks from reaching the map under the menu
 
+/atom/movable/shud/menupanel/draggable
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.PanelDragStart(src, params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.PanelDragMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.PanelDragEnd()
+
 /atom/movable/shud/menutext
 	layer = MHUD_LAYER + 0.4
 	New()
@@ -249,6 +258,25 @@ client
 		atom/movable/shud/menubtn/btn_options
 		atom/movable/shud/menulabel/btn_options_label
 		atom/movable/shud/menutext/menu_pagetext
+		// draggable-panel state
+		pan_active = null
+		pan_dragged = FALSE
+		pan_drag_mx = 0
+		pan_drag_my = 0
+		pan_drag_ox = 0
+		pan_drag_oy = 0
+		pan_bminx = 0
+		pan_bmaxx = 0
+		pan_bminy = 0
+		pan_bmaxy = 0
+		opt_pan_x = 0
+		opt_pan_y = 0
+		inv_pan_x = 0
+		inv_pan_y = 0
+		sk_pan_x = 0
+		sk_pan_y = 0
+		desc_pan_x = 0
+		desc_pan_y = 0
 
 // called from InitSkillHUD, button lives in shud_parts so the skill HUD owns it
 client/proc/InitMenuButton()
@@ -319,6 +347,173 @@ client/proc/KineticEntrance(list/objs, time = 3)
 		for(var/atom/movable/o in snap)
 			if(o) animate(o, alpha = atgt[o], time = time, easing = SINE_EASING)
 
+client/proc/PanAxis(part, d)
+	var/list/p = splittext(part, ":")
+	var/apx
+	var/pix
+	if(p.len >= 2)
+		var/base = text2num(p[1])
+		if(isnull(base))
+			return "[p[1]]:[text2num(p[2]) + d]"          
+		apx = (base - 1) * 32 + text2num(p[2]) + d        
+		pix = ((apx % 32) + 32) % 32
+		return "[(apx - pix) / 32 + 1]:[pix]"
+	var/num = text2num(part)
+	if(isnull(num)) return "[part]:[d]"                   
+	apx = (num - 1) * 32 + d
+	pix = ((apx % 32) + 32) % 32
+	return "[(apx - pix) / 32 + 1]:[pix]"
+
+client/proc/PanLoc(sl, dpx, dpy)
+	if(!sl) return sl
+	var/list/cm = splittext(sl, ",")
+	if(cm.len < 2) return sl
+	return "[PanAxis(cm[1], dpx)],[PanAxis(cm[2], dpy)]"
+
+client/proc/PanShift(list/objs, dpx, dpy)
+	if((!dpx && !dpy) || !objs) return
+	for(var/atom/movable/o in objs)
+		if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
+
+client/proc/PanBounds(menu, atom/movable/panel)
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/vwpx = vw * 32
+	var/vhpx = vh * 32
+	var/W = 32
+	var/H = 32
+	var/bx = 0   // panel default bottom-left, absolute px
+	var/by = 0
+	switch(menu)
+		if("options", "skills")             // centered panel, 336x256
+			W = MHUD_PANEL_W
+			H = MHUD_PANEL_H
+			bx = vwpx / 2 - W / 2
+			by = vhpx / 2 - H / 2
+		if("inventory")                     // X tile-anchored at InvXLoc(-144)=6, Y at CENTER:-160
+			if(panel && panel.icon)
+				var/icon/ic = icon(panel.icon)
+				W = ic.Width()
+				H = ic.Height()
+			bx = 6
+			by = vhpx / 2 - 160
+		if("invdesc")                       // item-desc popup: X at InvXLoc(152)=302, Y at CENTER:-150
+			if(panel && panel.icon)
+				var/icon/ic = icon(panel.icon)
+				W = ic.Width()
+				H = ic.Height()
+			bx = 302
+			by = vhpx / 2 - 150
+	var/M = 20
+	var/minx = -bx + M
+	if(minx > 0) minx = 0
+	var/maxx = vwpx - W - bx - M
+	if(maxx < 0) maxx = 0
+	var/miny = -by + M
+	if(miny > 0) miny = 0
+	var/maxy = vhpx - H - by - M
+	if(maxy < 0) maxy = 0
+	return list(minx, maxx, miny, maxy)
+
+client/proc/PanelDragStart(atom/movable/panel, params)
+	pan_active = null
+	if(istype(panel, /atom/movable/shud/invdescpanel)) pan_active = "invdesc"   // the item-desc popup, by type
+	else if(menu_open == "options") pan_active = "options"
+	else if(inv_open) pan_active = "inventory"
+	else if(skmenu_open) pan_active = "skills"
+	if(!pan_active) return
+	pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m)
+		pan_active = null
+		return
+	pan_drag_mx = m[1]
+	pan_drag_my = m[2]
+	switch(pan_active)
+		if("options")
+			pan_drag_ox = opt_pan_x
+			pan_drag_oy = opt_pan_y
+		if("inventory")
+			pan_drag_ox = inv_pan_x
+			pan_drag_oy = inv_pan_y
+		if("skills")
+			pan_drag_ox = sk_pan_x
+			pan_drag_oy = sk_pan_y
+		if("invdesc")
+			pan_drag_ox = desc_pan_x
+			pan_drag_oy = desc_pan_y
+	var/list/b = PanBounds(pan_active, panel)
+	pan_bminx = b[1]
+	pan_bmaxx = b[2]
+	pan_bminy = b[3]
+	pan_bmaxy = b[4]
+
+client/proc/PanelDragMove(params)
+	if(!pan_active) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/wantx = clamp(pan_drag_ox + (m[1] - pan_drag_mx), pan_bminx, pan_bmaxx)
+	var/wanty = clamp(pan_drag_oy + (m[2] - pan_drag_my), pan_bminy, pan_bmaxy)
+	var/cx = 0
+	var/cy = 0
+	switch(pan_active)
+		if("options")
+			cx = opt_pan_x
+			cy = opt_pan_y
+		if("inventory")
+			cx = inv_pan_x
+			cy = inv_pan_y
+		if("skills")
+			cx = sk_pan_x
+			cy = sk_pan_y
+		if("invdesc")
+			cx = desc_pan_x
+			cy = desc_pan_y
+	var/dx = wantx - cx
+	var/dy = wanty - cy
+	if(!dx && !dy) return
+	pan_dragged = TRUE
+	switch(pan_active)
+		if("options")
+			opt_pan_x = wantx
+			opt_pan_y = wanty
+			PanShift(menu_objs, dx, dy)
+			PanShift(menu_entry_objs, dx, dy)
+		if("inventory")
+			inv_pan_x = wantx
+			inv_pan_y = wanty
+			PanShift(inv_objs, dx, dy)
+			PanShift(inv_item_objs, dx, dy)
+		if("skills")
+			sk_pan_x = wantx
+			sk_pan_y = wanty
+			PanShift(skmenu_objs, dx, dy)        // skmenu_objs already contains the tabs
+			PanShift(skmenu_icon_objs, dx, dy)
+		if("invdesc")
+			desc_pan_x = wantx
+			desc_pan_y = wanty
+			PanShift(inv_desc_objs, dx, dy)
+
+client/proc/PanelDragEnd()
+	if(!pan_active) return
+	if(pan_dragged)
+		switch(pan_active)
+			if("options")
+				setPref("optPanX", opt_pan_x)
+				setPref("optPanY", opt_pan_y)
+			if("inventory")
+				setPref("invPanX", inv_pan_x)
+				setPref("invPanY", inv_pan_y)
+			if("skills")
+				setPref("skPanX", sk_pan_x)
+				setPref("skPanY", sk_pan_y)
+			if("invdesc")
+				setPref("descPanX", desc_pan_x)
+				setPref("descPanY", desc_pan_y)
+	pan_active = null
+	pan_dragged = FALSE
+
 client/proc/OpenOptionsMenu()
 	if(menu_open || !mob) return
 	mob.CollectMenuVerbs()   // refresh so Other/Utility verbs granted since login
@@ -334,8 +529,14 @@ client/proc/OpenOptionsMenu()
 	btn_options_label.alpha = 0
 	menu_objs = list()
 	menu_entry_objs = list()
+	// restore saved drag position, clamped to the current view
+	opt_pan_x = getPref("optPanX"); if(isnull(opt_pan_x)) opt_pan_x = 0
+	opt_pan_y = getPref("optPanY"); if(isnull(opt_pan_y)) opt_pan_y = 0
+	var/list/ob = PanBounds("options", null)
+	opt_pan_x = clamp(opt_pan_x, ob[1], ob[2])
+	opt_pan_y = clamp(opt_pan_y, ob[3], ob[4])
 
-	var/atom/movable/shud/menupanel/P = new
+	var/atom/movable/shud/menupanel/draggable/P = new
 	P.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:[-MHUD_PANEL_H/2]"
 	menu_objs += P
 
@@ -377,6 +578,7 @@ client/proc/OpenOptionsMenu()
 
 	for(var/atom/movable/o in menu_objs)
 		screen += o
+	PanShift(menu_objs, opt_pan_x, opt_pan_y)
 	KineticEntrance(menu_objs)
 	BuildMenuPage(TRUE)
 
@@ -414,6 +616,7 @@ client/proc/BuildMenuPage(fade = FALSE)
 		screen += E
 	if(menu_page == 1)
 		BuildOptionsExtras()
+	PanShift(menu_entry_objs, opt_pan_x, opt_pan_y)
 	if(fade)
 		KineticEntrance(menu_entry_objs)
 

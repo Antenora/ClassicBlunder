@@ -66,6 +66,13 @@ var/list/TT_FAM_COLOR = list(
 /atom/movable/shud/ttbg            // panel / band / cover
 	layer = TT_LAYER
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.TTPanelStart(params)
+	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
+		if(usr) usr.client.TTPanelMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.TTPanelEnd()
 
 /atom/movable/shud/ttpic           // decorative sprite (icon, money, separator)
 	layer = TT_LAYER + 0.45
@@ -200,6 +207,13 @@ client
 		tmenu_drag_my = 0
 		tmenu_drag_px = 0
 		tmenu_drag_py = 0
+		tt_pan_x = 0    // whole-panel drag offset (px); separate from the canvas pan above
+		tt_pan_y = 0
+		tt_pan_mx = 0
+		tt_pan_my = 0
+		tt_pan_ox = 0
+		tt_pan_oy = 0
+		tt_pan_dragged = FALSE
 		tmenu_sel
 		tmenu_filter = "all"
 		tmenu_craftpage = 1
@@ -209,7 +223,11 @@ client
 
 client/proc/TTloc(dx, dyTop, h = 0)
 	var/py = TT_H - dyTop - h
-	return "[tt_atx + (dx - dx % 32) / 32]:[dx % 32],[tt_aty + (py - py % 32) / 32]:[py % 32]"
+	var/ax = dx + tt_pan_x
+	var/ay = py + tt_pan_y
+	var/axp = ((ax % 32) + 32) % 32
+	var/ayp = ((ay % 32) + 32) % 32
+	return "[tt_atx + (ax - axp) / 32]:[axp],[tt_aty + (ay - ayp) / 32]:[ayp]"
 
 
 client/proc/InitTechButton()
@@ -250,6 +268,12 @@ client/proc/OpenTechMenu(start_tab = "tree")
 	var/mth = round(TT_H / 32); if(mth * 32 < TT_H) mth++
 	tt_atx = max(1, round((vw - mtw) / 2) + 1)
 	tt_aty = max(1, round((vh - mth) / 2) + 1)
+	// restore saved panel position, clamped to the current view
+	tt_pan_x = getPref("ttPanX"); if(isnull(tt_pan_x)) tt_pan_x = 0
+	tt_pan_y = getPref("ttPanY"); if(isnull(tt_pan_y)) tt_pan_y = 0
+	var/list/tb = TTPanBounds()
+	tt_pan_x = clamp(tt_pan_x, tb[1], tb[2])
+	tt_pan_y = clamp(tt_pan_y, tb[3], tb[4])
 
 	if(btn_tech)
 		btn_tech.icon = 'HUD/ui_slot_unavailable.png'
@@ -713,6 +737,62 @@ client/proc/TechPanMove(params)
 	tmenu_lastpanx = tmenu_panx
 	tmenu_lastpany = tmenu_pany
 	RepositionTree()
+
+client/proc/TTPanBounds()
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/bx = (tt_atx - 1) * 32   // panel default bottom-left, absolute px
+	var/by = (tt_aty - 1) * 32
+	var/minx = -bx
+	if(minx > 0) minx = 0
+	var/maxx = vw * 32 - TT_W - bx
+	if(maxx < 0) maxx = 0
+	var/miny = -by
+	if(miny > 0) miny = 0
+	var/maxy = vh * 32 - TT_H - by
+	if(maxy < 0) maxy = 0
+	return list(minx, maxx, miny, maxy)
+
+client/proc/TTShiftLive(dpx, dpy)
+	if(!dpx && !dpy) return
+	// chrome + an open craft popup are small and always visible
+	for(var/atom/movable/o in tmenu_chrome)
+		if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
+	if(craft_desc_objs)
+		for(var/atom/movable/o in craft_desc_objs)
+			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
+	if(tmenu_tabobjs)
+		for(var/atom/movable/o in tmenu_tabobjs)
+			if(o.alpha && o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
+
+client/proc/TTPanelStart(params)
+	tt_pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	tt_pan_mx = m[1]; tt_pan_my = m[2]
+	tt_pan_ox = tt_pan_x; tt_pan_oy = tt_pan_y
+
+client/proc/TTPanelMove(params)
+	if(!tmenu_open) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/list/b = TTPanBounds()
+	var/wantx = clamp(tt_pan_ox + (m[1] - tt_pan_mx), b[1], b[2])
+	var/wanty = clamp(tt_pan_oy + (m[2] - tt_pan_my), b[3], b[4])
+	var/dx = wantx - tt_pan_x
+	var/dy = wanty - tt_pan_y
+	if(!dx && !dy) return
+	tt_pan_x = wantx; tt_pan_y = wanty
+	tt_pan_dragged = TRUE
+	TTShiftLive(dx, dy)
+
+client/proc/TTPanelEnd()
+	if(!tt_pan_dragged) return
+	tt_pan_dragged = FALSE
+	RepositionTree()   // self-guards to the tree tab; re-syncs the culled/off-view nodes to the new position
+	setPref("ttPanX", tt_pan_x)
+	setPref("ttPanY", tt_pan_y)
 
 client/proc/TT_CanvasW()
 	var/maxc = 0

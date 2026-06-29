@@ -7,6 +7,13 @@
 /atom/movable/shud/playerpanel
 	layer = PPANEL_LAYER
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.PPanelStart(params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.PPanelMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.PPanelEnd()
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HidePlayerPanel()
@@ -26,6 +33,13 @@ client
 		pp_xpix = 0
 		pp_row = 1
 		pp_poff = 0
+		pp_pan_x = 0   // drag offset (px) shared by the player panel + admin strip
+		pp_pan_y = 0
+		pp_pan_mx = 0
+		pp_pan_my = 0
+		pp_pan_ox = 0
+		pp_pan_oy = 0
+		pp_pan_dragged = FALSE
 
 client/proc/ComputePlayerPanelAnchor()
 	var/list/v = splittext("[view]", "x")
@@ -44,7 +58,57 @@ client/proc/ComputePlayerPanelAnchor()
 	return 1
 
 client/proc/PPLoc(px, py)
-	return "[pp_tile]:[pp_xpix + px],[pp_row]:[pp_poff + py]"
+	// pp_pan_x/y baked in so the panel (and admin strip, via APLoc) build at the dragged spot
+	return "[pp_tile]:[pp_xpix + px + pp_pan_x],[pp_row]:[pp_poff + py + pp_pan_y]"
+
+// min/max pan (px) that keep the panel (and the admin strip to its left, when present) in view
+client/proc/PPanelBounds()
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/pleft = (pp_tile - 1) * 32 + pp_xpix
+	var/left = pleft
+	if(mob && mob.Admin) left = pleft - 8 - 160   // admin strip = APANEL_GAP(8) + APANEL_W(160) to the left
+	var/right = pleft + PPANEL_W
+	var/bot = (pp_row - 1) * 32 + pp_poff
+	var/top = bot + PPANEL_H
+	var/minx = -left
+	if(minx > 0) minx = 0
+	var/maxx = vw * 32 - right
+	if(maxx < 0) maxx = 0
+	var/miny = -bot
+	if(miny > 0) miny = 0
+	var/maxy = vh * 32 - top
+	if(maxy < 0) maxy = 0
+	return list(minx, maxx, miny, maxy)
+
+client/proc/PPanelStart(params)
+	pp_pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	pp_pan_mx = m[1]; pp_pan_my = m[2]
+	pp_pan_ox = pp_pan_x; pp_pan_oy = pp_pan_y
+
+client/proc/PPanelMove(params)
+	if(!player_panel_objs) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/list/b = PPanelBounds()
+	var/wantx = clamp(pp_pan_ox + (m[1] - pp_pan_mx), b[1], b[2])
+	var/wanty = clamp(pp_pan_oy + (m[2] - pp_pan_my), b[3], b[4])
+	var/dx = wantx - pp_pan_x
+	var/dy = wanty - pp_pan_y
+	if(!dx && !dy) return
+	pp_pan_x = wantx; pp_pan_y = wanty
+	pp_pan_dragged = TRUE
+	PanShift(player_panel_objs, dx, dy)
+	if(admin_panel_objs) PanShift(admin_panel_objs, dx, dy)   // move the admin strip with it
+
+client/proc/PPanelEnd()
+	if(!pp_pan_dragged) return
+	pp_pan_dragged = FALSE
+	setPref("ppPanX", pp_pan_x)
+	setPref("ppPanY", pp_pan_y)
 
 client/proc/HidePlayerPanel()
 	HideAdminPanel()   
@@ -120,6 +184,11 @@ client/proc/ShowPlayerPanel(mob/Players/P)
 	HidePlayerPanel()
 	if(!P || !mob) return
 	if(!ComputePlayerPanelAnchor()) return   // keeps the panel inside the view so the HUD doesn't expand
+	pp_pan_x = getPref("ppPanX"); if(isnull(pp_pan_x)) pp_pan_x = 0
+	pp_pan_y = getPref("ppPanY"); if(isnull(pp_pan_y)) pp_pan_y = 0
+	var/list/pb = PPanelBounds()
+	pp_pan_x = clamp(pp_pan_x, pb[1], pb[2])
+	pp_pan_y = clamp(pp_pan_y, pb[3], pb[4])
 	player_panel_objs = list()
 	player_panel_target = P
 	var/self = (P == mob)

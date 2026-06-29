@@ -116,6 +116,13 @@ mob/proc/InvItemsFor(cat)
 /atom/movable/shud/invdescpanel
 	mouse_opacity = 2
 	layer = MINV_LAYER + 0.5
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.PanelDragStart(src, params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.PanelDragMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.PanelDragEnd()
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			usr?.client?.HideItemDesc()
@@ -232,11 +239,17 @@ client/proc/OpenInventory()
 	inv_objs = list()
 	inv_item_objs = list()
 
-	var/atom/movable/shud/menupanel/P = new
+	var/atom/movable/shud/menupanel/draggable/P = new
 	P.icon = 'HUD/inv_book.png'
 	P.layer = MINV_LAYER
 	P.screen_loc = "[InvXLoc(-144)],CENTER:-160"
 	inv_objs += P
+	// restore saved drag position
+	inv_pan_x = getPref("invPanX"); if(isnull(inv_pan_x)) inv_pan_x = 0
+	inv_pan_y = getPref("invPanY"); if(isnull(inv_pan_y)) inv_pan_y = 0
+	var/list/ib = PanBounds("inventory", P)
+	inv_pan_x = clamp(inv_pan_x, ib[1], ib[2])
+	inv_pan_y = clamp(inv_pan_y, ib[3], ib[4])
 
 	var/atom/movable/shud/invtext/title = new
 	title.maptext_width = 120
@@ -313,6 +326,7 @@ client/proc/OpenInventory()
 
 	for(var/atom/movable/o in inv_objs)
 		screen += o
+	PanShift(inv_objs, inv_pan_x, inv_pan_y)
 	KineticEntrance(inv_objs)
 	BuildInvPage(TRUE)
 
@@ -366,6 +380,7 @@ client/proc/BuildInvPage(fade = FALSE)
 				badge.screen_loc = "[InvXLoc(sx + 21)],CENTER:[sy - 1]"
 				inv_item_objs += badge
 				screen += badge
+	PanShift(inv_item_objs, inv_pan_x, inv_pan_y)
 	if(fade)
 		KineticEntrance(inv_item_objs)
 
@@ -440,6 +455,8 @@ client/proc/ShowItemDesc(obj/Items/I)
 	if(!I || !inv_open) return
 	inv_desc_objs = list()
 	inv_desc_item = I
+	desc_pan_x = getPref("descPanX"); if(isnull(desc_pan_x)) desc_pan_x = 0
+	desc_pan_y = getPref("descPanY"); if(isnull(desc_pan_y)) desc_pan_y = 0
 
 	var/atom/movable/shud/invdescpanel/P = new
 	P.icon = 'HUD/inv_desc.png'
@@ -516,6 +533,11 @@ client/proc/ShowItemDesc(obj/Items/I)
 		rb.screen_loc = "[InvXLoc(252)],CENTER:68"
 		inv_desc_objs += rb
 
+	// clamp the saved popup offset to the current view, then apply it
+	var/list/db = PanBounds("invdesc", inv_desc_objs.len ? inv_desc_objs[1] : null)
+	desc_pan_x = clamp(desc_pan_x, db[1], db[2])
+	desc_pan_y = clamp(desc_pan_y, db[3], db[4])
 	for(var/atom/movable/o in inv_desc_objs)
 		screen += o
+	PanShift(inv_desc_objs, desc_pan_x, desc_pan_y)
 	KineticEntrance(inv_desc_objs)

@@ -74,12 +74,24 @@
 /var/list/HAT_TGL_ON  = list('HUD/toggle_on_1.png', 'HUD/toggle_on_2.png', 'HUD/toggle_on_3.png', 'HUD/toggle_on_4.png', 'HUD/toggle_on_5.png')
 
 client/proc/CMloc(dx, dy)
+	// cm_pan_x/cm_pan_y are the player's drag offset (pixels) from the default centered anchor
 	var/py = CMENU_H - dy
-	return "[cm_atx + (dx - dx % 32) / 32]:[dx % 32],[cm_aty + (py - py % 32) / 32]:[py % 32]"
+	var/ax = dx + cm_pan_x
+	var/ay = py + cm_pan_y
+	var/axp = ((ax % 32) + 32) % 32   // non-negative pixel remainder (BYOND % keeps the dividend's sign)
+	var/ayp = ((ay % 32) + 32) % 32
+	return "[cm_atx + (ax - axp) / 32]:[axp],[cm_aty + (ay - ayp) / 32]:[ayp]"
 
 /atom/movable/shud/cmframe
 	layer = CMENU_LAYER
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER   // enable MouseDrag without showing a drag-ghost cursor
+	MouseDown(location, control, params)
+		if(usr) usr.client.CMPanStart(params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.CMPanMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.CMPanEnd()
 	Click(location, control, params)
 		if(!usr || !usr.client) return
 		if(params && findtext(params, "right=1"))
@@ -357,6 +369,13 @@ client
 		cmenu_tab = 0
 		cm_atx = 0
 		cm_aty = 0
+		cm_pan_x = 0          // saved drag offset (px) from the centered anchor, baked into CMloc
+		cm_pan_y = 0
+		cm_pan_mx = 0         // mouse + pan at grab time
+		cm_pan_my = 0
+		cm_pan_ox = 0
+		cm_pan_oy = 0
+		cm_pan_dragged = FALSE
 		list/cmenu_objs
 		list/cmenu_vals
 		list/cmenu_fills
@@ -497,6 +516,12 @@ client/proc/OpenCharacterMenu()
 	var/mth = round(CMENU_H / 32); if(mth * 32 < CMENU_H) mth++
 	cm_atx = max(1, round((vw - mtw) / 2) + 1)
 	cm_aty = max(1, round((vh - mth) / 2) + 1)
+	// restore the player's saved menu position, clamped to the current view (zoom/window may have changed)
+	cm_pan_x = getPref("cmPanX"); if(isnull(cm_pan_x)) cm_pan_x = 0
+	cm_pan_y = getPref("cmPanY"); if(isnull(cm_pan_y)) cm_pan_y = 0
+	var/list/pb = CMPanBounds()
+	cm_pan_x = clamp(cm_pan_x, pb[1], pb[2])
+	cm_pan_y = clamp(cm_pan_y, pb[3], pb[4])
 	if(btn_character)
 		btn_character.icon = 'HUD/ui_slot_unavailable.png'
 		btn_character.SetGlyphDimmed(TRUE)
@@ -2019,9 +2044,76 @@ client/proc/CustDragMove(params)
 client/proc/CustDragEnd()
 	ApplyCustOption()
 
-//////////////////////////////////////////////////////////////////
-// Data
-//////////////////////////////////////////////////////////////////
+// every live menu object across the main list + transient sub-panels
+client/proc/CMLiveObjs()
+	var/list/all = list()
+	if(cmenu_objs) all += cmenu_objs
+	if(cmenu_desc_objs) all += cmenu_desc_objs
+	if(cmenu_gearpass_objs) all += cmenu_gearpass_objs
+	if(cmenu_cust_panel) all += cmenu_cust_panel
+	return all
+
+// shift every live menu object by (dpx, dpy) screen pixels by rewriting screen_loc
+client/proc/CMShiftLive(dpx, dpy)
+	if(!dpx && !dpy) return
+	for(var/atom/movable/o in CMLiveObjs())
+		var/sl = o.screen_loc
+		if(!sl) continue
+		var/list/cm = splittext(sl, ",")
+		if(cm.len < 2) continue
+		var/list/xp = splittext(cm[1], ":")
+		var/list/yp = splittext(cm[2], ":")
+		if(xp.len < 2 || yp.len < 2) continue
+		var/xt = text2num(xp[1]); var/yt = text2num(yp[1])
+		if(isnull(xt) || isnull(yt)) continue   // skip anything not in tile:pixel form
+		var/ax = (xt - 1) * 32 + text2num(xp[2]) + dpx
+		var/ay = (yt - 1) * 32 + text2num(yp[2]) + dpy
+		var/axp = ((ax % 32) + 32) % 32
+		var/ayp = ((ay % 32) + 32) % 32
+		o.screen_loc = "[(ax - axp) / 32 + 1]:[axp],[(ay - ayp) / 32 + 1]:[ayp]"
+
+// min/max pan (px) that keep the whole menu rectangle inside the current view.
+client/proc/CMPanBounds()
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/lx = (cm_atx - 1) * 32   // default menu left edge (px) in view space
+	var/by = (cm_aty - 1) * 32   // default menu bottom edge (px)
+	var/minx = -lx
+	var/maxx = vw * 32 - CMENU_W - lx
+	var/miny = -by
+	var/maxy = vh * 32 - CMENU_H - by
+	if(maxx < minx) minx = (maxx = 0)   // menu wider than view: pin horizontally
+	if(maxy < miny) miny = (maxy = 0)
+	return list(minx, maxx, miny, maxy)
+
+client/proc/CMPanStart(params)
+	cm_pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	cm_pan_mx = m[1]; cm_pan_my = m[2]
+	cm_pan_ox = cm_pan_x; cm_pan_oy = cm_pan_y
+
+client/proc/CMPanMove(params)
+	if(!cmenu_open) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/list/pb = CMPanBounds()
+	var/wantx = clamp(cm_pan_ox + (m[1] - cm_pan_mx), pb[1], pb[2])
+	var/wanty = clamp(cm_pan_oy + (m[2] - cm_pan_my), pb[3], pb[4])
+	var/dx = wantx - cm_pan_x
+	var/dy = wanty - cm_pan_y
+	if(!dx && !dy) return
+	cm_pan_x = wantx; cm_pan_y = wanty
+	cm_pan_dragged = TRUE
+	CMShiftLive(dx, dy)
+
+client/proc/CMPanEnd()
+	if(!cm_pan_dragged) return   // a clean tap (tab click) shouldn't write prefs
+	cm_pan_dragged = FALSE
+	setPref("cmPanX", cm_pan_x)
+	setPref("cmPanY", cm_pan_y)
+
 
 mob/proc/GetGearItem(slot)
 	switch(slot)
@@ -2142,9 +2234,6 @@ mob/proc/ChooseMenuPronouns()
 	src << "Pronouns set to [subj] / [objp]."
 
 // click your name in the Character menu to rename yourself.
-// mirrors the player Rename verb (Chat&Verbs.dm) safeguards: preventRename gate, no html_encode,
-// validation, and the glob.IDs[UniqueID] registry update so the UID->name map stays in sync.
-// Cap is 25 (tighter than the verb's 30) to fit the menu's name field; refreshes the menu after.
 mob/proc/RenameSelf()
 	set waitfor = 0
 	if(!client) return
