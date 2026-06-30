@@ -1031,7 +1031,6 @@ client
 						world<<parse
 				if(key in VuffaKeys)
 					mob.giveVuffaMoment()
-				mob.gajaConversionCheck()
 				switch(mob.Secret)
 					if("Vampire")
 						mob.vampireBlood = new(mob, 6, 184)

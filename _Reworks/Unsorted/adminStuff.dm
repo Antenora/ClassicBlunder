@@ -21,6 +21,7 @@
 
 	for(var/x in lol)
 		src<<"[x] = [lol[x]]"
+
 var/GlobalStorage/globalStorage
 
 GlobalStorage

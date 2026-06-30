@@ -12,8 +12,7 @@ ascension
 							speed = 0.25
 							anger = 0.25
 							passives = list("AngerAdaptiveForce" = 0.25, "SpiritFlow" = 0.25, "SpiritSword" = 0.25, "TechniqueMastery" = 0.5)
-						if("Dragon")  /// after the merge, unmerged Dragon and Warrior will also receive some scaling power. Levi added it in for Gaja's in his push
-							///power = 0.75
+						if("Dragon")
 							passives = list("SpiritFlow" = 0.25, "QuickCast"=0.5)
 							force = 0.5
 							imaginationAdd = 0.5

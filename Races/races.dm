@@ -59,12 +59,6 @@ proc
 		return null
 
 
-/mob/Admin4/verb/forceCuckRace(mob/Players/P in players)
-	P.race = new()
-
-
-
-
 world
 	New()
 		..()

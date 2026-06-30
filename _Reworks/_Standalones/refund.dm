@@ -95,6 +95,7 @@ mob/verb/Refund()
 
 // im going to sin below
 /mob/Admin3/verb/refund_all_old_value(mob/p in world)
+	if(!src.Alert("Are you sure you want to refund all copyables for all players?")) return
 	p.refund_all_copyables()
 
 mob/proc/refund_skil_old(obj/Skills/refunded_skill)

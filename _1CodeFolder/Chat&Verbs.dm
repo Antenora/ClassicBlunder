@@ -812,6 +812,60 @@ a{color:#8be9ff;}
 			usr<<browse("[View]","window=Logzk;size=900x450")
 		else
 			usr<<browse("[View]","window=Logzk;size=240x420")
+
+	Toggle_Auto_Berserk()
+		set category = "Other"
+		set name = "Toggle Auto Berserk"
+		if(usr.AutoBerserkOptOut)
+			usr.AutoBerserkOptOut = 0
+			usr << "Auto Berserk re-enabled. Buffs that force Anger (Jinchuuriki, Vaizard Mask, Wrathful, etc.) will trigger it normally."
+		else
+			usr.AutoBerserkOptOut = 1
+			usr << "Auto Berserk disabled. Buffs with the Auto Anger flag will no longer force you into the Anger state on activation."
+
+	GetPingSound()
+		set category = "Other"
+		set name = "Toggle Ping Sound"
+		if(usr.PingSound)
+			usr.PingSound = 0
+			usr << "Ping Sound Disabled."
+		else
+			usr.PingSound = 1
+			usr << "Ping Sound Enabled."
+
+	SetPingVolume()
+		set category = "Other"
+		set name = "Set Ping Volume"
+		var/n = input(src, "What volume?") as num
+		if(n > 100 || n < 0)
+			src << " too high or low "
+		else
+			PingVolume = n
+
+	CustomizePU()
+		set name = "Customize: PU Charging"
+		set category = "Other"
+		if(!src.client)
+			return
+		var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
+		if(length(choice)>200)
+			return
+		if(length(choice)<1)
+			return
+		custom_powerup = choice
+		choice = input(src, "Do you want to include your name in the PU charging?") in list("Yes", "No")
+		if(choice == "Yes")
+			customPUnameInclude = TRUE
+		else
+			customPUnameInclude = FALSE
+
+	Admins()
+		set name = "Admins"
+		set category = "Other"
+		for(var/mob/p in players)
+			if(p.Admin)
+				src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"
+
 	Character_Description()
 		set category="Roleplay"
 		set hidden = 1
@@ -900,7 +954,7 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = dm.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 			else
@@ -911,7 +965,7 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = am.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 			else
@@ -943,7 +997,7 @@ mob/proc/RPModeSwitch()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
@@ -973,7 +1027,7 @@ mob/proc/CutsceneMode()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)

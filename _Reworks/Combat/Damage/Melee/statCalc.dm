@@ -18,6 +18,7 @@
 
 
 /mob/Admin3/verb/changeEffectiveness()
+	if(!src.Alert("Are you sure you want to stat calc effectiveness?")) return
 	switch(input(src, "What one?") in list("DMG", "DMG End", "DMG Power", "Melee", "Projectile", "Grapple", "Autohit"))
 		if("DMG")
 			glob.DMG_STR_EXPONENT = input(src, "What value?") as num

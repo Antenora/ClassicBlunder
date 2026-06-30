@@ -14,6 +14,7 @@
 	set category = "Admin"
 	set desc = "Changes the base mod for power"
 	set name = "Change Global Base"
+	if(!src.Alert("Are you sure you want to change global base mod?")) return
 	var/previous = BASE_MOD
 	var/newMod = input(src, "Enter a new base mod for power") as num
 	if(newMod)

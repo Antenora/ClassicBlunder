@@ -1,3 +1,7 @@
+/racials/var/GOLD_DRAGON_FORMULA = 1000000
+/racials/var/GOLD_DRAGON_DROPDIVISOR = 3000
+/racials/var/CASHLEAKREMOVES = FALSE
+
 obj/gold
 	icon = 'Goldpile.dmi'
 	density = 0
@@ -13,7 +17,7 @@ obj/gold
 		originalOwner = owner
 		sourceOfDropping = causer
 		for(var/obj/Money/m in originalOwner)
-			amount = rand(1,m.Level/(glob.racials.GAJACASHDROPDIVISOR-(1+causer.AscensionsAcquired * 10)))
+			amount = rand(1,m.Level/(glob.racials.GOLD_DRAGON_DROPDIVISOR-(1+causer.AscensionsAcquired * 10)))
 			amount = round(amount, 1)
 			m.Level -= amount
 		if(removeOnLeak)

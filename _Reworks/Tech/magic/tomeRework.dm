@@ -27,10 +27,10 @@ Tomes:
 
 #define UPGRADE_BASE_COST 1.5
 
-
+/*
 /mob/Admin3/verb/tierUpTome(obj/Items/Enchantment/Tome/t in world)
     set name = "Tier Up Tome"
-    src << "later..."
+    src << "later..." */
 
 /obj/Items/Enchantment/Tome
     EnchType="TomeCreation"

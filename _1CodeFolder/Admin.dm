@@ -1,5 +1,5 @@
 var/list
-	CodedAdmins=list("NWKY"=3, "Masterdarwin88"=4, "Sunshine Jesse"=4, "Nightmare Zarkus"=4, "NeoGalaxyEyesPhotonDragon"=4, "Lanni.k"=4, "Antenora Luxuria"=4, "Admindred"=4, "Hadoke"=3, "Ghost66"=4)
+	CodedAdmins=list("NWKY"=3, "Masterdarwin88"=4, "Sunshine Jesse"=4, "Nightmare Zarkus"=4, "NeoGalaxyEyesPhotonDragon"=4, "Antenora Luxuria"=4, "Admindred"=4, "Hadoke"=3)
 	Admins=list()
 	Mappers=list()
 	Punishments=list()
@@ -30,29 +30,10 @@ mob
 	var
 		MakeUngrabbable=TRUE
 
-mob/verb
-	GetPingSound()
-		set category = "Other"
-		set hidden = 1
-		set name = "Toggle Ping Sound"
-		if(usr.PingSound)
-			usr.PingSound = 0
-			usr << "Ping Sound Disabled."
-		else
-			usr.PingSound = 1
-			usr << "Ping Sound Enabled."
-	SetPingVolume()
-		set category = "Other"
-		set hidden = 1
-		set name = "Set Ping Volume"
-		var/n = input(src, "What volume?") as num
-		if(n > 100 || n < 0)
-			src << " too high or low "
-		else
-			PingVolume = n
-
 /mob/Admin3/verb/CreateSwapMap()
 	set hidden = 1
+	var/Choice=input(usr, "Are you sure you want to create a swap map?", "Swap Map") in list("Yes", "No")
+	if(Choice=="No") return
 	var/whichMap = input(usr, "What would you like to call it?") as null|text
 	if(!whichMap) return
 	if(fexists("Maps/map_[whichMap].sav"))
@@ -66,8 +47,11 @@ mob/verb
 	SwapMaps_SaveChunk(whichMap, locate(firstX,firstY,Z), locate(secondX, secondY,Z))
 	SwapMaps_Save(whichMap)
 	usr << "Saved!"
+
 mob/Admin3/verb/LoadSwapMap()
 	set hidden = 1
+	var/Choice=input(usr, "Are you sure you want to load a swap map?", "Swap Map") in list("Yes", "No")
+	if(Choice=="No") return
 	var/whichMap = input(usr, "What would you like to call it?") as null|text
 	if(!whichMap) return
 	if(!fexists("Maps/map_[whichMap].sav"))
@@ -87,6 +71,8 @@ mob/Admin3/verb/LoadSwapMap()
 
 /mob/Admin3/verb/ForceCloseSwapMap()
 	set hidden = 1
+	var/Choice=input(usr, "Are you sure you want to force close a swap map?", "Swap Map") in list("Yes", "No")
+	if(Choice=="No") return
 	var/whichMap = input(usr, "Input a map UID.") as null|num
 	if(!whichMap) return
 	for(var/swapmap/map in swapmaps_loaded)
@@ -103,6 +89,8 @@ mob/Admin3/verb/LoadSwapMap()
 
 /mob/Admin3/verb/ForceSaveSwapMap()
 	set hidden = 1
+	var/Choice=input(usr, "Are you sure you want to force save a swap map?", "Swap Map") in list("Yes", "No")
+	if(Choice=="No") return
 	var/whichMap = input(usr, "Which map?") as null|text
 	if(!whichMap) return
 	SwapMaps_Save(whichMap)
@@ -306,6 +294,8 @@ mob/Admin3/verb/LoadSwapMap()
 	set category = "Admin"
 	set name = "Tweak Style/Sig Var"
 	set desc = "Edit a scalar var on a T1/T2/T3 Style or T1/T2 Sig template + propagate to live instances."
+	var/Choice=input(usr, "Are you sure you want to tweak style sig vars?", "Tweak") in list("Yes", "No")
+	if(Choice=="No") return
 	var/category = input(usr, "Pick a category to tweak.", "Tweak Style/Sig") as null|anything in list("T1 Style", "T2 Style", "T3 Style", "T1 Sig", "T2 Sig")
 	if(!category)
 		return
@@ -397,6 +387,8 @@ mob/Admin3/verb/LoadSwapMap()
 	set category = "Admin"
 	set name = "Tweak Pot Reqs"
 	set desc = "Edit potential threshold for a Style/Sig tier unlock slot in glob.progress."
+	var/Choice=input(usr, "Are you sure you want to tweak pot reqs?", "Tweak") in list("Yes", "No")
+	if(Choice=="No") return
 	var/list/slots = list(
 		"1st T1 Style" = list("T1_STYLES", 1),
 		"2nd T1 Style" = list("T1_STYLES", 2),
@@ -445,6 +437,8 @@ mob/Admin3/verb/LoadSwapMap()
 
 /mob/Admin2/verb/PrivateNarrate(mob/m in players)
 	set category="Admin"
+	var/Choice=input(usr, "Are you sure you want to privately narrate to this player?", "Private Narrate") in list("Yes", "No")
+	if(Choice=="No") return
 	var/message = input(usr,"What do you want to whisper to them?","Cursespeak") as message | null
 	if(message)
 		message = "<i><font color='#F82D2D'>[message]</font></i>"
@@ -457,12 +451,16 @@ mob/Admin3/verb/LoadSwapMap()
 
 mob/Admin2/verb
 	EditAllSpawners()
+		var/Choice=input(usr, "Are you sure you want to edit all AI spawners?", "AI") in list("Yes", "No")
+		if(Choice=="No") return
 		for(var/obj/AI_Spot/ai in world)
 			Edit(ai)
 
 	GiveWound(var/mob/m in players)
 		set category="Admin"
 		set name="Give Wound"
+		var/Choice=input(usr, "Are you sure you want to give this person wounds?", "Wound") in list("Yes", "No")
+		if(Choice=="No") return
 		var/choice = input(usr, "What kind of wound for [m]?", "Give Wound") as null|anything in list("Light", "Heavy", "Maim", "Cancel")
 		if(!choice || choice == "Cancel") return
 		switch(choice)
@@ -491,12 +489,36 @@ mob/Admin2/verb
 				m.recordMaim(usr, "Admin")
 				Log("Admin", "[ExtractInfo(usr)] gave [ExtractInfo(m)] a maim wound.")
 				m << "You have been maimed!"
+
 	EditPassiveHandler(mob/m in world)
 		set category = "Admin"
 		if(m.passive_handler.Get("Rank-Down Protection") && !usr.passive_handler.Get("True Edit"))
 			m.OMessage(15, "<b><font color=[m.Text_Color]><font size=+1>[m] was protected from the effects of Rank Magic!</b></font color></font size>", "<font color=blue>[m]([m.key]) cannot be Edited.")
 			return
 		src.Edit(m.passive_handler)
+
+/*	EditPassives(mob/m in world)
+		set category = "Admin"
+		var/variable = m.passive_handler.passive
+		var/list/l = vars[variable]
+		usr.list_view(l, "[variable]")
+
+	EditPassivesTest2(mob/p in world)
+		set category = "Admin"
+		if(p.passive_handler)
+			var/atom/A = p.passive_handler
+			var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
+			var/list/B=new
+			Edit+="[A]<br>[A.type]"
+			Edit+="<table width=10%>"
+			for(var/C in A.vars) B+=C
+			B.Remove("Package","bound_x","bound_y","step_x","step_y","Admin","Profile", "GimmickDesc", "NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile", "Form5Profile")
+			for(var/C in B)
+				Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
+				Edit+=C
+				Edit+="<td>[Value(A.vars[C])]</td></tr>"
+			Edit += "</html>"
+			usr<<browse(Edit,"window=[A];size=450x600")*/
 
 	ViewPassives(mob/m in world)
 		set category = "Admin"
@@ -505,6 +527,28 @@ mob/Admin2/verb
 			if(m.passive_handler.passives[passive])
 				html += "<b>[passive] : [m.passive_handler.passives[passive]]</b><br>"
 		usr<<browse(html,"window=[m]'s Passives;size=450x600")
+
+/*	EditPassivesTest1(mob/A in world)
+		set category = "Admin"
+		A = src.AdminResolveTargetedContent(A)
+		var/list/browserOptions = list()
+		browserOptions.Add("+find");
+		winset(usr, null, list2params(browserOptions));
+		var/Edit = "<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
+		Edit += "[A]<br>[A.type]"
+		Edit += "<table width=10%>"
+		//var/list/B = A.passive_handler.passives.vars
+		for (var/C in A.passive_handler.passives)
+			var/value = Value(A.vars[C])
+			var/row = "<tr><td><a href='byond://?src=\ref[A];action=edit;var=[C]'>[C]</a></td>"
+			if (isdatum(A.vars[C]))
+				row += "<td><a href='byond://?src=\ref[A.vars[C]];action=edit;var=[C]'>[value]</a></td></tr>"
+			else
+				row += "<td>[value]</td></tr>"
+			Edit += row
+			CHECK_TICK
+		Edit += "</table></html>"
+		usr << browse(Edit, "window=[A];size=450x600")*/
 
 mob/Admin3/verb
 	RuntimesView()
@@ -560,6 +604,8 @@ mob/Admin3/verb
 
 	Potential_Boost(mob/m in players, val as num)
 		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to boost this person's potential?", "Potential Boost") in list("Yes", "No")
+		if(Choice=="No") return
 		if(val&&m)
 			m.Potential+=val
 			m.PotentialCap+=val
@@ -570,6 +616,8 @@ mob/Admin3/verb
 
 	SetDeadSpawn()
 		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to set dead spawn?", "Dead Spawn") in list("Yes", "No")
+		if(Choice=="No") return
 		var/turf/NewLoc
 		var/X=input(src, "New X for dead spawn?", "Set Dead Spawn X") as num|null
 		var/Y=input(src, "New Y for dead spawn?", "Set Dead Spawn Y") as num|null
@@ -592,6 +640,8 @@ mob/Admin3/verb
 			src << "That tile doesn't exist."
 	SetStartingProgressValues()
 		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to set starting potential and RPP?", "Set Starting Pot/RPP") in list("Yes", "No")
+		if(Choice=="No") return
 		var/X=input(src, "Starting RPP", "Set spawn RPP") as num|null
 		var/Y=input(src, "Starting Potential", "Set spawn Potential") as num|null
 		if(X<0)
@@ -606,6 +656,8 @@ mob/Admin3/verb
 
 	ForceResetMultis()
 		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to force reset all mults?", "Force Reset Mults") in list("Yes", "No")
+		if(Choice=="No") return
 		for(var/mob/Players/m in players)
 			if(m.ActiveBuff)
 				if(m.CheckActive("Eight Gates"))
@@ -622,6 +674,8 @@ mob/Admin3/verb
 			m.Reset_Multipliers()
 
 	FormMastery(mob/p in players)
+		var/Choice=input(usr, "Are you sure you want to change Form Mastery for someone?", "Form Mastery") in list("Yes", "No")
+		if(Choice=="No") return
 		if(!length(p.race.transformations))
 			usr << "[p] doesn't have any transformations!"
 			return
@@ -633,6 +687,8 @@ mob/Admin3/verb
 
 	Wound_Remove_Mass()
 		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to remove everyone's wounds?", "Mass Wound") in list("Yes", "No")
+		if(Choice=="No") return
 		for(var/mob/m in players)
 			if(m.BPPoison<1)
 				m.BPPoison=1
@@ -747,6 +803,7 @@ mob/proc/CheckPunishment(var/z)
 // (AdminKill, Punish) and from the MasterControl popup in Guides.dm.
 // Single source of truth so both entry points stay in sync.
 mob/proc/AdminDoBan(mob/M)
+	set category="Admin"
 	if(!M || !M.client) return
 	var/Reason = input(src, "Why are you banning [M]?") as text
 	var/Duration = input(src, "Ban Duration?(IN HOURS)", "Rebirth") as num
@@ -880,6 +937,9 @@ mob/proc/AdminFullStealthEnable()
 	src.Incorporeal = 1
 	src.Grabbable = 0
 	src.passive_handler.Increase("AdminVision", 1)
+	src.passive_handler.Increase("True Edit", 1)
+	usr.passive_handler.Increase("StaticWalk", 1)
+	usr.passive_handler.Increase("SpaceWalk", 1)
 	animate(src, alpha = 0, time = 5)
 	// Drop any aggro currently held on us
 	for(var/mob/M in world)
@@ -896,6 +956,9 @@ mob/proc/AdminFullStealthDisable()
 	src.Incorporeal = 0
 	src.Grabbable = 1
 	src.passive_handler.Decrease("AdminVision", 1)
+	src.passive_handler.Decrease("True Edit", 1)
+	usr.passive_handler.Decrease("StaticWalk", 1)
+	usr.passive_handler.Decrease("SpaceWalk", 1)
 	animate(src, alpha = 255, time = 5)
 	src << "<font color=red><b>Overwatch:</b> Full Stealth OFF. You are visible again."
 
@@ -1270,18 +1333,6 @@ mob/proc/PM2(var/mob/who)
 // Default 0 = original behavior preserved for everyone.
 /mob/var/AutoBerserkOptOut = 0
 
-mob/verb
-	Toggle_Auto_Berserk()
-		set category = "Other"
-		set hidden = 1
-		set name = "Toggle Auto Berserk"
-		if(usr.AutoBerserkOptOut)
-			usr.AutoBerserkOptOut = 0
-			usr << "Auto Berserk re-enabled. Buffs that force Anger (Jinchuuriki, Vaizard Mask, Wrathful, etc.) will trigger it normally."
-		else
-			usr.AutoBerserkOptOut = 1
-			usr << "Auto Berserk disabled. Buffs with the Auto Anger flag will no longer force you into the Anger state on activation."
-
 mob/Admin3/verb
 	editRace(mob/Players/m in players)
 		set category = "Admin"
@@ -1360,6 +1411,7 @@ mob/Admin2/verb
 		else
 			usr.IgnoreFlyOver=1
 			Log("Admin","[ExtractInfo(usr)] has enabled their Ignore FlyOverAble flag.")
+
 	ToggleOverview()
 		set category="Admin"
 		if(usr.Overview==1)
@@ -1379,6 +1431,8 @@ mob/Admin2/verb
 			usr.Incorporeal=0
 			usr.density=1
 			usr.passive_handler.Decrease("AdminVision", 1)
+			usr.passive_handler.Decrease("StaticWalk", 1)
+			usr.passive_handler.Decrease("SpaceWalk", 1)
 			usr.Grabbable=1
 			animate(src,alpha=255,time=10)
 		else
@@ -1388,6 +1442,8 @@ mob/Admin2/verb
 			usr.see_invisible=101
 			usr.Incorporeal=1
 			usr.passive_handler.Increase("AdminVision", 1)
+			usr.passive_handler.Increase("StaticWalk", 1)
+			usr.passive_handler.Increase("SpaceWalk", 1)
 			usr.density=0
 			usr.Grabbable=0
 			animate(src,alpha=50,time=10)
@@ -1462,7 +1518,7 @@ mob/Admin2/verb
 	Delete(atom/A in world)
 		set category="Admin"
 		A = src.AdminResolveTargetedContent(A)
-
+		if(!src.Alert("Are you sure you want to delete this?")) return
 		if(istype(A,/area/))
 			usr<<"You can't delete Areas."
 			return
@@ -1487,7 +1543,6 @@ mob/Admin2/verb
 
 	Message_Global(msg as message)
 		set category="Admin"
-
 		var discord_output = msg
 		msg = replacetext(msg, "```","")
 		world << output("<font size=2><font color=green><b>[msg]", "output")
@@ -1543,10 +1598,11 @@ mob/Admin2/verb
 			usr<<"Returned [M] to previous coordinates."
 			M<<"You have been returned to your previous coordinates by admins."
 	XYZTeleport(var/mob/M in world)
+		set category="Admin"
+		if(!src.Alert("Are you sure you want to XYZ Teleport?")) return
 		var/x=input("x","[M]") as num
 		var/y=input("y","[M]") as num
 		var/z=input("z","[M]") as num
-		set category="Admin"
 		M.PrevX=M.x
 		M.PrevY=M.y
 		M.PrevZ=M.z
@@ -1768,6 +1824,7 @@ mob/Admin2/verb
 				A << "Your maim wound has been repaired!"
 	AdminRevive(mob/A in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to revive someone?")) return
 		Log("Admin","[usr.key] revived [A.key].")
 		A.Revive()
 
@@ -1786,6 +1843,7 @@ mob/Admin2/verb
 
 	Event_Character_Setup(mob/Players/M in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to EC Setup someone?")) return
 		var/EMult=glob.progress.RPPBaseMult
 		EMult*=M.GetRPPMult()
 		M.RPPSpendable=getMaxPlayerRPP()
@@ -1797,6 +1855,7 @@ mob/Admin2/verb
 		Log("Admin", "[ExtractInfo(src)] triggered [ExtractInfo(M)]'s event character setup!")
 	Head_Start_Setup(mob/Players/M in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to Head Start Setup someone?")) return
 		M.PotentialHeadStart=input(src, "What potential do you want to set [M] to?", "Set Head Start Potential") as num
 		M.Potential=M.PotentialHeadStart
 		M.RPPHeadStart=input(src, "What RPP cap do you want to set [M] to?", "Set Head RPP ") as num
@@ -1966,6 +2025,9 @@ mob/Admin3/verb
 		set name="Fix SSJ Transformations"
 		if(!M.client)
 			return
+		if(!M.isRace(/race/saiyan))
+			src << "<font color=red>[M] is not a Saiyan.</font>"
+			return
 		var/choice = input(usr, "Which transformation set to apply to [M]?", "Fix SSJ Transformations") as null|anything in list("SSJ1-4 + Limit Breaker", "SSJ1-3 + God + Blue", "Add SSJ5", "Cancel")
 		if(!choice || choice == "Cancel") return
 		switch(choice)
@@ -1998,6 +2060,7 @@ mob/Admin3/verb
 				M << "You have been granted Super Saiyan 5."
 	UnlockAscension(var/mob/m in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to unlock ascension on someone?")) return
 		if(m.passive_handler.Get("Piloting"))
 			m.findMecha().Level = input("Unlock what level? (This is for their mech.)", "([m.findMecha().Level] unlocked)") as num
 			Log("Admin","[ExtractInfo(usr)] unlocked [ExtractInfo(m)]'s mecha([m.findMecha().Level])")
@@ -2007,6 +2070,7 @@ mob/Admin3/verb
 			Log("Admin","[ExtractInfo(usr)] unlocked [ExtractInfo(m)]'s ascension([m.AscensionsUnlocked])")
 	UnlockForm(var/mob/M in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to unlock form on someone?")) return
 		if(M.client)
 			var/blah=input("Unlock to what form?") as num | null
 			if(!blah) return
@@ -2208,8 +2272,10 @@ mob/Admin3/verb
 				if(isnull(val)) return
 				glob.progress.RPPDaily = val
 				Log("Admin", "[ExtractInfo(src)] set the daily RPP increment to [Commas(glob.progress.RPPDaily)].")
+
 	New_Character_Setup(mob/Players/M in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to New Character Setup someone?")) return
 		if(locate(/obj/Skills/Utility/Teachz, M))
 			var/ElderMult=0.5
 			if(M.EraBody=="Senile"||M.isRace(SHINJIN))
@@ -2228,16 +2294,20 @@ mob/Admin3/verb
 
 	Give_Mapper(var/mob/m in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to give this person mapper?")) return
 		m.Admin("GiveMapper")
 		Log("Admin", "[ExtractInfo(usr)] has made [ExtractInfo(m)] into a mapper!")
+
 	Remove_Mapper(var/mob/m in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to remove mapper from this person?")) return
 		m.Admin("RemoveMapper")
 		Log("Admin", "[ExtractInfo(usr)] has removed [ExtractInfo(m)]'s mapper powers!")
 
 	Give_Currency(mob/p in players)
-		set category="Admin"
 		set name="Give Currency"
+		set category="Admin"
+		if(!src.Alert("Are you sure you want to give currency to someone?")) return
 		var/choice = input(usr, "Give what to [p]?", "Give Currency") as null|anything in list("Money", "Fragments", "Cancel")
 		if(!choice || choice == "Cancel") return
 		switch(choice)
@@ -2264,6 +2334,7 @@ mob/Admin3/verb
 
 	Adminize(mob/z in players)
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to adminize someone?")) return
 		var/x=input("What level?(0-3)","0-3",z.Admin)as num
 		if(x>=0&&x<=3)
 			Log("Admin","[ExtractInfo(usr)] set [ExtractInfo(z)]'s admin level to [x].")
@@ -2305,6 +2376,7 @@ mob/Admin3/verb
 
 	SaveWorld()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to save the world?")) return
 		BootWorld("Save")
 		for(var/mob/Players/Q in players)
 			if(Q.Savable)
@@ -2312,12 +2384,14 @@ mob/Admin3/verb
 
 	SaveTurfsObjs()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to save turf objects?")) return
 		find_savableObjects()
 		Save_Turfs()
 		Save_Objects()
 		Log("Admin","<font color=blue>[ExtractInfo(usr)] has saved turfs and objects in world.")
 	Set_Base()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to set battle power?")) return
 		var/NewBase=input(usr,"Set base battle power to what?  Currently [Commas(glob.WorldBaseAmount)]") as num
 		glob.WorldBaseAmount=NewBase
 		for(var/mob/Players/P in players)
@@ -2327,6 +2401,7 @@ mob/Admin3/verb
 
 	SetGetUpSpeed()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to set GetUpVar?")) return
 		var/Speedz=input("Current: [glob.GetUpVar]x") as null|num
 		if(Speedz)
 			glob.GetUpVar=Speedz
@@ -2620,12 +2695,14 @@ mob/Admin4/verb
 				Log("Admin", "[ExtractInfo(src)] pushed the wipe forward by 24 hours.")
 	Potential_Daily_Set()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to set daily potential gain?")) return
 		var/val=input(src, "How much potential is gained daily?", "Potential Daily") as num|null
 		if(val&&val>0)
 			glob.progress.PotentialDaily=val
 			Log("Admin", "[ExtractInfo(src)] has set the daily potential rate to [glob.progress.PotentialDaily].")
 	Rename_Money()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to rename all money?")) return
 		var/NewMoney=input(usr, "What should money be called?  Currently known as: [glob.progress.MoneyName]", "Rename Money") as text|null
 		if(NewMoney)
 			Log("Admin", "[ExtractInfo(usr)] renamed the currency from [glob.progress.MoneyName] to [NewMoney].")
@@ -2658,6 +2735,7 @@ mob/Admin4/verb
 	Give_Rare_Race(mob/Players/P in players)
 		set category="Admin"
 		set name="Give Rare Race"
+		if(!src.Alert("Are you sure you want to give someone access to a rare race?")) return
 		if(!P || !P.ckey)
 			usr << "<font color=red>Invalid target."
 			return
@@ -2790,18 +2868,21 @@ mob/Admin3/verb
 	SetGlobalDamage()
 		set category="Admin"
 		set name = "Set global "
+		if(!src.Alert("Are you sure you want to change Global Damage mult?")) return
 		var/m=input(src, "What do you want to set the global damage multiplier to? (currently x[glob.WorldDamageMult])", "World Damage Multiplier") as num
 		glob.WorldDamageMult=m
 		Log("Admin", "[ExtractInfo(src)] set Global Damage Mult to [m]!")
 	SetDefaultAccuracy()
 		set category="Admin"
 		set name = "World Accuracy"
+		if(!src.Alert("Are you sure you want to change Default Accuracy?")) return
 		var/m=input(src, "What do you want to set the default accuracy to? (currently [glob.WorldDefaultAcc]%)", "World Default Accuracy") as num
 		glob.WorldDefaultAcc=m
 		Log("Admin", "[ExtractInfo(src)] set default accuracy to [m]%!")
 	SetWhiffRate()
 		set category="Admin"
 		set name = "Whiff Rate"
+		if(!src.Alert("Are you sure you want to change Whiff Rate?")) return
 		var/m=input(src, "What do you want the amount of full-powered strikes to be? (currently [glob.WorldWhiffRate]%)", "World Whiff Rate") as num
 		glob.WorldWhiffRate=m
 		Log("Admin", "[ExtractInfo(src)] set whiff rate to [m]%!")
@@ -2809,6 +2890,7 @@ mob/Admin3/verb
 	SetCCDamageMod()
 		set category="Admin"
 		set name = "CC Damage Modifier"
+		if(!src.Alert("Are you sure you want to change damage reduction while stunned/launched?")) return
 		var/m=input(src, "What do you want the damage reduction on damage while stunned/launched to be? (currently [glob.CCDamageModifier]x)", "CC Damage Modifier") as num
 		glob.CCDamageModifier=m
 		Log("Admin", "[ExtractInfo(src)] set CC Damage Modifier to [m]x!")
@@ -2817,6 +2899,7 @@ mob/Admin3/verb
 	SetItemAscensionScaling()
 		set category="Admin"
 		set name = "Item Ascension Scaling"
+		if(!src.Alert("Are you sure you want to adjust item ascension scaling?")) return
 		var/m=input(src, "What do you want to adjust?(0.05 = 5% 'better') \n\n Staff: \nDamage per Ascension:[glob.StaffAscDamage]\nAccuracy per Ascension: [glob.StaffAscAcc]\nDrain per Ascension: [glob.StaffAscDelay]\n\nSword: \nDamage per Ascension:[glob.SwordAscDamage]\nAccuracy per Ascension: [glob.SwordAscAcc]\nDelay per Ascension: [glob.SwordAscDelay]\n\nArmor: \nDamage Reduc per Ascension:[glob.ArmorAscDamage]\nAccuracy per Ascension: [glob.ArmorAscAcc]\nDrain per Ascension: [glob.ArmorAscDelay]", "Item Ascension Scaling") in list("Staff","Sword","Armor", "Cancel")
 		var/changing
 		switch(m)
@@ -2926,6 +3009,7 @@ mob/Admin3/verb
 		usr.SegmentLogs("Saves/AdminLogz/Log")
 	SetWorldPUDrain()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to set Global PU Drain?")) return
 		var/Speedz=input("Current: [glob.WorldPUDrain]x") as null|num
 		if(Speedz)
 			glob.WorldPUDrain=Speedz
@@ -2940,6 +3024,7 @@ mob/Admin3/verb
 
 	TickLag()
 		set category="Admin"
+		if(!src.Alert("Are you sure you want to set Tick Lag?")) return
 		var/Speedz=input("Current Tick Lag [world.tick_lag]") as null|num
 		if(Speedz)
 			world.tick_lag=Speedz

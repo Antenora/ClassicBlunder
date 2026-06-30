@@ -1,6 +1,7 @@
 
 mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
 	set name = "Force AI Spawns"
+	if(!src.Alert("Are you sure you want to force spawns from all AI spawners?")) return
 	var/difference = AI.ai_limit-AI.ai_active.len
 	var/i
 	for(i = 0, i < difference, i++)
@@ -9,6 +10,7 @@ mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
 
 mob/Admin3/verb/MakeAISpawner()
 	set name = "AI Spawner"
+	if(!src.Alert("Are you sure you want to make an AI spawner?")) return
 	var/n = input(src, "What name") as text
 	var/list/monsters = typesof(/monster_info)
 	var/monster = input(src, "What monster") in monsters

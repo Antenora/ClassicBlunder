@@ -13,6 +13,7 @@ var/globalTracker/glob = new()
 /mob/Admin2/verb/editGlobalVariables()
 	set name = "Edit Global Variables"
 	set category = "Admin"
+	if(!src.Alert("Are you sure you want to edit global variables?")) return
 	var/atom/A = glob
 	var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
 	var/list/B=new
@@ -34,6 +35,7 @@ var/globalTracker/glob = new()
 	usr<<browse(Edit,"window=[A];size=450x600")
 
 /mob/Admin3/verb/Debuff_Apply(n as num)
+	if(!src.Alert("Are you sure you want to change global debuff intensity?")) return
 	glob.BURN_INTENSITY = n
 	glob.SHOCK_INTENSITY = n
 	glob.SLOW_INTENSITY = n
@@ -236,7 +238,7 @@ globalTracker
 		BASE_HELL_SCALING_RATIO = 0.01
 		HELL_SCALING_MULT = 1.5
 		UNDERDOG_DIVISOR = 4
-		CONQ_HAKI_RACES = list(HUMAN, DEMON, SAIYAN, NAMEKIAN, MAJIN, MAKYO, DRAGON, BEASTKIN, GAJALAKA, CHANGELING)
+		CONQ_HAKI_RACES = list(HUMAN, DEMON, SAIYAN, NAMEKIAN, MAJIN, MAKYO, DRAGON, BEASTKIN, CHANGELING)
 		EXTRA_CONQ_HAKI_POWER = 1.5
 		CONQ_HAKI_CHANCE = 3
 		MONEYORFRAGMENTS = 1 // 1 = fragments, 0 = cash

@@ -32,6 +32,7 @@ mob/proc/RollVoidForAbsorb()
 /mob/Admin3/verb/AdminVoid()
 	set category = "Admin"
 	set name = "Void"
+	if(!src.Alert("Are you sure you want to explore void options?")) return
 	var/list/actions = list(
 		"Admin-kill with free void",
 		"Change target's extra void chance"

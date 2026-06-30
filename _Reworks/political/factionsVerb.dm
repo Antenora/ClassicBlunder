@@ -68,35 +68,6 @@
     else
         customPUnameInclude = FALSE
 
-/mob/verb/Admins()
-    set name = "Admins"
-    set category = "Other"
-    set hidden = 1
-    if(!(world.time > src.verb_delay)) return
-    src.verb_delay = world.time + 1
-    var/View = {"<html><head><title>Admins</title>
-<style>
-body{margin:0;background:#0d1730;color:#d8f6ff;font-family:Verdana,Arial,sans-serif;font-size:12px;}
-.wrap{border:2px solid #45c7e0;margin:8px;padding:10px;background:#132447;}
-h2{margin:0 0 8px 0;color:#8be9ff;font-size:16px;letter-spacing:1px;}
-.row{display:flex;justify-content:space-between;border-top:1px solid #2e6682;padding:5px 0;}
-.row:first-of-type{border-top:0;}
-.online{color:#55ee55;font-weight:bold;}
-.rank{color:#ffd76b;margin-left:12px;}
-</style></head><body><div class='wrap'><h2>ADMINS</h2>"}
-    var/any = FALSE
-    for(var/mob/p in players)
-        if(p.Admin)
-            any = TRUE
-            var/show_key = p.DisplayKey ? p.DisplayKey : p.key
-            View += "<div class='row'><span>[show_key]<span class='rank'>Rank [p.Admin]</span></span><span class='online'>Online</span></div>"
-    if(!any)
-        View += "<div class='row'><span>No admins are currently online.</span></div>"
-    View += "</div></body></html>"
-    src << browse(View, "window=Admins;size=320x420")
-
-
-
 /*
 /mob/verb/FactionCount()
     set name = "Faction Count"
