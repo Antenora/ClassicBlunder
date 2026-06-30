@@ -80,6 +80,7 @@ mob/Admin4/verb/makeExchanger()
 /mob/proc/ExchangeMinerals()
 	set name = "Exchange Mana Bits"
 	set category = "Roleplay"
+	set hidden = 1
 	var/obj/Items/mineral/found = FALSE
 	for(var/obj/Items/mineral/m in usr)
 		if(m.type == /obj/Items/mineral)

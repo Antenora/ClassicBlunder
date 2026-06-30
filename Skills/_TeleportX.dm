@@ -102,6 +102,7 @@ obj/Skills
 			ArriveMessage="arrives thanks to godly transmission!"
 			verb/Kai_Kai()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Void
 			NoTransplant=1
@@ -119,6 +120,7 @@ obj/Skills
 			ArriveMessage="appears suddenly from the void!"
 			verb/Traverse_Void()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 
 		Instant_Transmission
@@ -136,9 +138,11 @@ obj/Skills
 			var/ClickTeleportToggle=1
 			verb/Instant_Transmission()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 			verb/Short_Range_Teleport()
 				set category="Utility"
+				set hidden = 1
 				ClickTeleportToggle = !ClickTeleportToggle
 				usr << "You will [ClickTeleportToggle ? null : "no longer "]teleport on click."
 		Warp
@@ -154,6 +158,7 @@ obj/Skills
 			ArriveMessage="oozes in from nowhere!"
 			verb/Warp()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Arcane
 			desc="If you are in the arcane realm, this allows you to use a focal on another plane to escape. Otherwise, it allows you to return to the arcane."
@@ -173,6 +178,7 @@ obj/Skills
 			ArriveMessage="emerges from the endless arcane traverse!"
 			verb/Traverse_Arcane()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Naraku_Path
 			desc="Summon the King of Hell to fully restore those adjacent to you as you all warp to the underworld."
@@ -185,6 +191,7 @@ obj/Skills
 			ArriveMessage="is spat out by the giant King of Hell with all aches soothed!"
 			verb/Naraku_Path()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Dimension
 			desc="Warp to any dimension without changing your relative position."
@@ -202,6 +209,7 @@ obj/Skills
 			ArriveMessage="arrives with a flux of Cosmo!"
 			verb/Traverse_Dimension()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Underworld
 			desc="Warp to the afterlife and back."
@@ -218,6 +226,7 @@ obj/Skills
 			ArriveMessage="arrives with a flux of Cosmo!"
 			verb/Traverse_Underworld()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Daat
 			desc="Warp to Da'at and back."
@@ -234,6 +243,7 @@ obj/Skills
 			ArriveMessage="arrives through a portal."
 			verb/Traverse_Daat()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 		Traverse_Depths
 			desc="Warp to the Depths and back."
@@ -253,9 +263,11 @@ obj/Skills
 			var/list/depthsFocals=list();
 			verb/Traverse_Depths()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 			verb/Mark_Focal()
 				set category="Utility"
+				set hidden = 1
 				set name = "Mark Depths Focal"
 				if(depthsFocals.len >= usr.AscensionsAcquired)
 					usr << "You have already marked the maximum amount of focals for your ascension level.";
@@ -275,6 +287,7 @@ obj/Skills
 				depthsFocals.Add(newFocal.name);
 			verb/Remove_Focal()
 				set category="Utility"
+				set hidden = 1
 				set name = "Remove Depths Focal"
 				if(!depthsFocals.len)
 					usr << "You have no marked focals to remove.";
@@ -301,6 +314,7 @@ obj/Skills
 			ArriveMessage="emerges from their heart!"
 			verb/Dive_To_Heart()
 				set category="Utility"
+				set hidden = 1
 				src.Activate(usr)
 
 		New()//this proc is called when the object is created

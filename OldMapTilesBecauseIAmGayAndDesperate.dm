@@ -517,4 +517,5 @@ obj/Spirit
 	verb/Use(var/mob/A in world)
 		set src in oview(1)
 		set category="Other"
+		set hidden = 1
 		usr<<"This does nothing right now."

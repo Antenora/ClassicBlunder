@@ -4,7 +4,7 @@ race
 		desc = "Makaioshins are a mysterious race who's origins can't be accurately traced, but most claim to be something akin to fallen angels. While being able to flawlessly wield the powers of light and darkness- Angels and Demons- in equal measure, they tend towards having a chaotic nature due to their contradictory existence."
 		visual = 'Makaioshins.png'
 		locked = TRUE
-		power = 2
+		power = 8
 		strength = 1.75
 		endurance = 2
 		speed = 1.5

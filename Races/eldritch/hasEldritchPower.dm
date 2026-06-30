@@ -3,7 +3,7 @@
     if(hasSecret("Eldritch (Shrouded)")) . = scalingShroudedPower() * AscensionsAcquired;
     if(hasSecret("Eldritch (Reflected)")) . = scalingReflectedPower() * AscensionsAcquired;
     if(passive_handler.Get("Half Manifestation")) . = max(., 3);
-    if(passive_handler.Get("Full Manifestation")) . = max(., 5);
+    if(passive_handler.Get("Full Manifestation")) . = max(., 6);
 
 /mob/proc/scalingShroudedPower()//once a shrouded takes enough damage determined by potential, 
 //they get 100% of their true form buffs for this potential level

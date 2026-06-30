@@ -161,6 +161,8 @@ proc
 				LightningStrikeRed(M, Offset=Offset)
 			if(4)
 				LightningStrikeVFX5(M, Offset=Offset)
+			if(5)
+				LightningStrikeHyperdeath(M, Offset=Offset)
 	EruptEffect(atom/movable/M, var/type=1, var/Offset=0)
 		set waitfor=0
 		switch(type)

@@ -75,6 +75,7 @@ mob/var
 	tmp/GlowFilter
 	tmp/ArmamentGlow
 	tmp/FlickeringGlow
+	tmp/SuppressPowerGlow
 	tmp/MeditateTime
 	tmp/Party/party//party party party
 	tmp/StunImmune
@@ -91,7 +92,6 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
-	Intimidation=1//Adding this here for ezpz stuff.
 	HealthCut=0
 	EnergyMax=100
 	Energy=100
@@ -133,8 +133,9 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
-	tmp/StaggerMeter=0 // Boss Stun
+	StaggerMeter=0 // Boss Stun
 	StaggerMult=1
+	MaimKOGetups=0
 	EndReplace=0
 	EndTax=0
 	EndCut=0
@@ -278,7 +279,7 @@ mob/var
 	Text_Color="#45fa3f"
 	OOC_Color="#666666"
 	Emote_Color="#f0fa33"
-
+	tmp/current_emote_text = ""
 	Trait_Color//i guess it will be used for furries?!
 
 

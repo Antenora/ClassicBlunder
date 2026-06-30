@@ -52,6 +52,7 @@ world
 			updatePassiveInfo()
 			generateSwapMaps()
 			glob.resetSignaturePotentials();
+			glob.resetPotentialPowerVals();
 	Del()
 		..()
 
@@ -263,6 +264,8 @@ client
 			mob.removeBlobBuffs()
 			if(mob.party)
 				mob.party.remove_member(mob)
+			if(mob.pending_party)
+				mob.pending_party.cancel_invite(mob)   
 
 			mob.RemoveWaterOverlay()
 			var/image/A=image(icon='Say Spark.dmi',pixel_y=6)
@@ -307,6 +310,7 @@ client
 				return
 		prefs.loadPrefs(ckey)
 		..()
+		ApplyAudioPref()
 		//src << browse(glob.getMOTD(), "size=600x1000,window=motd" )
 		src.LoginLog("<font color=blue>logged in.</font color>")
 

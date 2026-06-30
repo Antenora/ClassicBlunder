@@ -222,6 +222,7 @@
 
 	verb/ExpandSizeToggle()
 		set category = "Skills"
+		set hidden = 1
 		set name = "Expand Size Toggle"
 		SuppressExpandVisualSize = !SuppressExpandVisualSize
 		usr << "Expand size visuals are now [SuppressExpandVisualSize ? "<b>off</b> — you stay normal-sized while expanded." : "<b>on</b> — you grow with Expand (default)."]"

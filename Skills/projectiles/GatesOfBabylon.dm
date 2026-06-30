@@ -638,6 +638,7 @@ obj/Skills/Summon_Ea
 
 	verb/Summon_Ea()
 		set category = "Skills"
+		set hidden = 1
 		var/obj/Items/Sword/Medium/Legendary/Ea/ea = locate(/obj/Items/Sword/Medium/Legendary/Ea, usr)
 		if(ea)
 

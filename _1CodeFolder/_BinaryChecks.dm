@@ -750,6 +750,7 @@ mob
 				if(src.HasSpiritPower()>=1)
 					return 1
 				if(scalingEldritchPower()) return 1
+				if(KeepBody) return 1;
 			return 0
 		HasTransMimic()
 			return passive_handler.Get("TransMimic")
@@ -1936,71 +1937,6 @@ mob
 			return 0
 		GetPowerReplacement()
 			return src.passive_handler.Get("PowerReplacement")
-		GetIntimidationIgnore(var/mob/m)
-			var/Return=0
-			if(isRace(HUMAN))
-				Return+=100
-			if(src.passive_handler.Get("Zeal"))
-				Return+=100
-
-			if(m)
-				if(m.isRace(HUMAN))
-					Return-=100
-				if(m.isRace(MAKYO))
-					Return-=(5*m.AscensionsAcquired)
-				if(m.HasGodKi() && !m.HasNull() && !m.isRace(DEMIFIEND) && !istype(m, /mob/Player/AI/Demon))
-					if(src.HasMythical())
-						Return-=(m.GetGodKi())*(100-(src.HasMythical()*100))
-					else
-						Return-=m.GetGodKi()*100
-			if(src.HasGodKi() && !src.HasNullTarget())
-				Return+=src.GetGodKi()*100
-			if(src.HasMaouKi())
-				Return+=src.GetMaouKi()*100
-
-			if(src.Saga=="Ansatsuken")
-				if(src.AnsatsukenAscension=="Chikara")
-					Return+=((src.SagaLevel-4)*25)
-			if(m.Saga=="Ansatsuken")
-				if(m.AnsatsukenAscension=="Chikara")
-					Return-=((m.SagaLevel-4)*25)
-			if(isRace(ANDROID))
-				Return=100
-
-			if(m)
-				if(m.CyberCancel)
-					Return-=m.CyberCancel*100
-				if(m.Mechanized)
-					Return-=100
-				if(m.isRace(ANDROID))
-					Return=0
-			if(Return>100)
-				Return=100
-			if(Return<0)
-				Return=0
-			Return/=100
-			return Return
-		HasIntimidation()
-			var/Effective=src.Intimidation
-			if(src.ShinjinAscension=="Makai")
-				Effective+=1
-			if(src.isRace(DEMON)||src.isRace(MAJIN)||src.isRace(MAKAIOSHIN)||src.oozaru_type=="Demonic")
-				Effective+=1
-			Effective *= 1 + passive_handler.Get("Mythical")
-			if(src.CheckActive("Mobile Suit")||src.CheckSlotless("Battosai")||src.CheckSlotless("Susanoo"))
-				Effective+=1
-			if(src.Health<(1-src.HealthCut)&&src.HealthAnnounce10&&src.Saga=="King of Braves"&&src.SpecialBuff)
-				if(src.CheckSlotless("Genesic Brave"))
-					Effective*=2
-				else if(src.CheckSpecial("King of Braves"))
-					Effective*=3
-			if(src.HasHellPower() == 2)
-				Effective+=1
-			if(src.KaiokenBP>1)
-				Effective*=KaiokenBP
-			if(Effective>1)
-				return 1
-			return 0
 
 		GetHellScaling()
 			var/Return=1
@@ -2091,9 +2027,10 @@ mob
 					return 1
 			if(src.KamuiBuffLock)
 				return 1
+			if(isRace(DRAGON) && AscensionsAcquired) return 1;
 			return 0
 		GetGodKi()
-			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null")) return 0;
+			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null") || passive_handler.Get("Longing")) return 0;
 			var/Total=passive_handler.Get("GodKi")
 			if(src.HasSpiritPower()>=1 && FightingSeriously(src, 0))
 				if(src.Health<=(30+src.TotalInjury)*src.GetSpiritPower())
@@ -2112,20 +2049,16 @@ mob
 					Total += glob.SENSE9GODKI
 					if(SagaLevel>=7)
 						Total+=glob.SENSE9GODKI
-	/*		if(src.CheckSlotless("Saiyan Soul")&&!src.HasGodKiBuff())
-				if(passive_handler.Get("DisableGodKi") && src.Target&&!src.Target.CheckSlotless("Saiyan Soul")&&src.Target.HasGodKi()&&!src.Target.passive_handler.Get("CreateTheHeavens")&&!src.Target.passive_handler.Get("Hidden Potential")&&!src.Target.passive_handler.Get("Orange Namekian"))
-					Total+=src.Target.GetGodKi()/4
-				else if(src.Target&&!src.Target.CheckSlotless("Saiyan Soul")&&src.Target.HasGodKi()&&!src.Target.passive_handler.Get("CreateTheHeavens")&&!src.Target.passive_handler.Get("Hidden Potential")&&!src.Target.passive_handler.Get("Orange Namekian"))
-					Total+=src.Target.GetGodKi()/3*/
 
 			if(passive_handler.Get("GodCloth"))
 				if(src.Target&&(Health+VaizardHealth)<(Target.Health+Target.VaizardHealth))
 					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 3)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(src.isRace(DRAGON))
-				if(src.AscensionsAcquired==6 && Total<0.5)
-					Total=0.25//fully ascended dragon
+			if(isRace(DRAGON))
+				if(!Total) Total = AscensionsAcquired*0.05;
+				if(Anger || HasCalmAnger())
+					Total *= 2;
 			if(passive_handler.Get("CreateTheHeavens") && src.DoubleHelix>=5&&isRace(HUMAN))
 				Total += 0.25
 			var/OSGK=CheckSpecial("OverSoul") ? 0.1 : 0

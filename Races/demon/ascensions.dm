@@ -5,7 +5,6 @@ ascension
 			unlock_potential = ASCENSION_ONE_POTENTIAL
 			passives = list("HellPower" = 0.25, "AbyssMod" = 0.25, "SpiritPower" = 0.25, "HellRisen" = 0.5, "AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 2, "Juggernaut" = 1)
 			anger = 0.15
-			intimidation = 50
 			strength = 0.25
 			endurance = 0.25
 			speed = 0.25
@@ -20,7 +19,6 @@ ascension
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
 			passives = list("HellPower" = 0.25, "AbyssMod" = 0.75, "SpiritPower" = 0.25, "HellRisen" = 0.25, "AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 1, "Juggernaut" = 0.5, "FluidForm" = 1)
-			intimidation = 50
 			strength = 0.25
 			force = 0.5
 			defense = 0.25
@@ -38,7 +36,6 @@ ascension
 			choices = list("Lust" = /ascension/sub_ascension/demon/lust, "Greed" = /ascension/sub_ascension/demon/greed, "Envy" = /ascension/sub_ascension/demon/envy, "Sloth" = /ascension/sub_ascension/demon/sloth, "Gluttony" = /ascension/sub_ascension/demon/gluttony, "Wrath" = /ascension/sub_ascension/demon/wrath, "Pride" = /ascension/sub_ascension/demon/pride)
 			passives = list("HellPower" = 0.25, "AbyssMod" = 1, "SpiritPower" = 0.25, "AngerAdaptiveForce" = 0.05, "TechniqueMastery" = 1, "FluidForm" = 0.5, "Juggernaut" = 0.5)
 			anger = 0.2
-			intimidation = 100
 			strength = 0.25
 			force = 0.25
 			endurance = 0.5
@@ -58,7 +55,6 @@ ascension
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
 			passives = list("HellPower" = 0.25, "AbyssMod" = 2, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "FluidForm" = 0.5)
 			anger = 0.15
-			intimidation = 250
 			strength = 0.25
 			force = 0.25
 			defense = 0.75
@@ -71,14 +67,12 @@ ascension
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			passives = list("HellPower" = 1, "EndlessAnger" = 1, "SpiritPower" = 0.25)
-			intimidation = 250
 
 			postAscension(mob/owner)
 				..()
 				owner.Class = "Maou"
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 250
 
 			postAscension(mob/owner)
 				..()

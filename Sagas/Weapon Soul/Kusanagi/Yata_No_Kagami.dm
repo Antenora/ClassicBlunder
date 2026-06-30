@@ -62,6 +62,7 @@ obj/Skills/Yata_no_Kagami/Mirror_Prison
 	verb/Mirror_Prison()
 		set name = "Yata no Kagami: Mirror Prison"
 		set category = "Skills"
+		set hidden = 1
 		if(usr.KO||usr.Stunned||usr.AutoHitting||usr.Frozen>=2)
 			return
 		if(usr.Stasis)

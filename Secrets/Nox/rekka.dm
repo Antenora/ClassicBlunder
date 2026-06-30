@@ -15,6 +15,7 @@
 
 	verb/Ouroboros()
 		set category = "Skills"
+		set hidden = 1
 		if(!Using)
 			if(glob.OUROMACROLOCK)
 				last_pressed = world.time
@@ -141,6 +142,7 @@
 	verb/Serpents_Redemption() // copy paste ? 
 		set name="Serpents Redemption"
 		set category="Skills"
+		set hidden = 1
 		var/obj/Skills/Utility/Ouroboros/oo = usr.inRekka()
 		if(oo && usr.Target)
 			if(usr.Target.passive_handler["Snared"])
@@ -160,6 +162,7 @@
 	verb/Serpents_Pull() // copy paste ? 
 		set name="Serpents Pull"
 		set category="Skills"
+		set hidden = 1
 		var/obj/Skills/Utility/Ouroboros/oo = usr.inRekka()
 		if(oo && usr.Target)
 			if(usr.Target.passive_handler["Snared"])

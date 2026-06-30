@@ -861,6 +861,7 @@ obj
 				Cooldown=15
 				verb/Heavy_Strike()
 					set category="Skills"
+					set hidden = 1
 					if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Heavy Strike"))
 						return
 					var/maxTension = usr.getMaxTensionValue();
@@ -979,6 +980,7 @@ obj
 				HitSparkSize=1.2
 				verb/Meteor_Mash()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Steam_Driver
 				name="Steam Driver"
@@ -996,6 +998,7 @@ obj
 				HitSparkY=-32
 				verb/Steam_Driver()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Crystal_Crumbling
 				name="Crystal Crumbling"
@@ -1013,6 +1016,7 @@ obj
 				PushOutWaves=1
 				verb/Crystal_Crumbling()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Cyclone_Kicks
 				name="Cyclone Kicks"
@@ -1030,6 +1034,7 @@ obj
 				PushOutWaves=1
 				verb/Cyclone_Kicks()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Blaze_Burst
@@ -1047,6 +1052,7 @@ obj
 				HitSparkSize=0.8
 				verb/Blaze_Burst()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Winter_Shock
@@ -1064,6 +1070,7 @@ obj
 				HitSparkSize=1.1
 				verb/Winter_Shock()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Terra_Crack
@@ -1081,6 +1088,7 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				verb/Terra_Crack()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Aero_Slash
@@ -1099,6 +1107,7 @@ obj
 				HitSparkTurns=1
 				verb/Aero_Slash()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Sharpnel_Scatter
@@ -1119,6 +1128,7 @@ obj
 				HitSparkSize=1.4
 				verb/Sharpnel_Scatter()
 					set category="Skills"
+					set hidden = 1
 					set name="Shrapnel Scatter"
 					usr.SetQueue(src)
 			Desert_Wind
@@ -1138,6 +1148,7 @@ obj
 				HitSparkSize=1.3
 				verb/Desert_Wind()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Uppercut
@@ -1155,6 +1166,7 @@ obj
 				name="Uppercut"
 				verb/Uppercut()
 					set category="Skills"
+					set hidden = 1
 					set name="Uppercut"
 					usr.SetQueue(src)
 
@@ -1175,6 +1187,7 @@ obj
 				ActiveMessage="is surrounded by the ki of a full fledged dragon!!"
 				verb/Super_Dragon_Fist()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Dancing_Lights
@@ -1193,6 +1206,7 @@ obj
 				HitSparkY=-32
 				verb/Dancing_Lights()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Counter_Cannon
@@ -1213,6 +1227,7 @@ obj
 				ActiveMessage="takes a defensive stance while charging a blast!"
 				verb/Counter_Cannon()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Camelia_Dance
@@ -1229,6 +1244,7 @@ obj
 				EnergyCost=1
 				verb/Camelia_Dance()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Swallow_Reversal
@@ -1248,6 +1264,7 @@ obj
 				EnergyCost=3
 				verb/Swallow_Reversal()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 
@@ -1278,6 +1295,7 @@ obj
 				ActiveMessage="'s symbiotic mass takes the shape of a hammer!"
 				verb/Symbiote_Hammer()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 //General app
@@ -1307,6 +1325,7 @@ obj
 				Cooldown=10800
 				verb/Ragna_Blade()
 					set category="Skills"
+					set hidden = 1
 					src.MultiHit=round(usr.ManaAmount/100,1)
 					src.ManaCost=max(80, usr.ManaAmount)
 					usr.SetQueue(src)
@@ -1322,6 +1341,7 @@ obj
 				HitMessage="whacks their enemy with their instrument with a triumphant twang!!"
 				verb/Bad_Luck()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 
@@ -1449,6 +1469,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Q.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Q)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Q))
@@ -1845,6 +1866,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(src.AttackQueue.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(src.AttackQueue)
 				if(drain <= 0)
 					drain = 0.5
 				if(src.TomeSpell(src.AttackQueue))

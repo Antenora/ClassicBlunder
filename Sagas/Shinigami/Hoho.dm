@@ -11,6 +11,7 @@
 	verb/Shunpo()
 		set name = "Shunpo"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		src.ShunpoToggle = !src.ShunpoToggle
 		if(src.ShunpoToggle)
@@ -61,6 +62,7 @@
 	verb/Utsusemi()
 		set name = "Utsusemi"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(src.ManaCost && User.ManaAmount < src.ManaCost)
@@ -111,6 +113,7 @@
 	verb/Speed_Clones()
 		set name = "Speed Clones"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(clones_active)

@@ -11,6 +11,7 @@
     Enchant_Spell
         verb/Enchant_Spell()
             set category="Utility"
+            set hidden = 1
             if(!usr.canEnchant(enchanting)) return;
             enchanting=1;
             usr.enchantSpellMain();
@@ -18,6 +19,7 @@
 
         verb/Disenchant_Spell()//insert the mcr link here
             set category="Utility"
+            set hidden = 1
             if(!usr.canEnchant(enchanting)) return;
             enchanting=1;
             usr.disenchantSpellMain();

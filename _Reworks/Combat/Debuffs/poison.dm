@@ -21,6 +21,7 @@ globalTracker/var/BurnNerf = BURN_NERF
 globalTracker/var/maxBleedDamage = BASE_BLEED_DAMAGE
 globalTracker/var/BleedStackDivisor = BLEED_STACK_DIVISOR
 globalTracker/var/BleedNerf = BLEED_NERF
+//TODO AFTER WIPE: move frenzy here? or split these to their own pages
 globalTracker/var/DEBUFF_STACK_RESISTANCE = 100
 globalTracker/var/HELLFIRE_VALUE_MOD = 2
 globalTracker/var/MAX_DEBUFF_CLAMP = 0.05
@@ -50,7 +51,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Antivenomed)
 				damage = damage / 2
 		if("Frenzy")
-			if(src.IsDarkDragonPlayer())
+			if(IsDarkDragonPlayer())
 				return 0
 
 	return clamp(damage, glob.LOWER_DEBUFF_CLAMP, glob.MAX_DEBUFF_CLAMP)
@@ -100,8 +101,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 		if(typeOfDebuff == "Bleed")
 			Unconscious(null, "bleeding out!")
 	if(typeOfDebuff == "Frenzy")
-		if(src.IsDarkDragonPlayer())
-			reduceDebuffStacks(typeOfDebuff)
+		if(IsDarkDragonPlayer()) reduceDebuffStacks(typeOfDebuff)
 		return
 	reduceDebuffStacks(typeOfDebuff)
 
@@ -150,20 +150,13 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 					if(client.client_plane_master)
 						client.client_plane_master.filters = null
 		if("Frenzy")
-			if(!src.IsDarkDragonPlayer())
-				return
-			var/frenzyBase = clamp(vars["Frenzy"] / glob.BASE_DEBUFF_REDUCTION_DIVISOR, glob.BASE_DEBUFF_REDUCTION_DIVISOR_LOWER,glob.BASE_DEBUFF_REDUCTION_DIVISOR_UPPER)
-			if(Frenzy>0)
-				Frenzy -= (frenzyBase + ((GetEnd(0.15)+GetStr(0.15)) * (1+ (GetDebuffResistance() / 4))  )) * 0.1
-			if(Frenzy<0)
-				Frenzy = 0
+			if(!IsDarkDragonPlayer()) return
+			var/reduction = base * (1 + (GetDebuffResistance() / 4))
+			if(Frenzy) Frenzy = clamp(Frenzy - (reduction/10), 0, 100);
 		if("Bleed")
-			if(Bleed>0)
-				Bleed -= base * (1 + (GetDebuffResistance() / 4))
-			if(Bleed<0)
-				Bleed = 0
-			if(KatenBleedLock && Bleed < KatenBleedLock)
-				Bleed = KatenBleedLock
+			var/reduction = base * (1 + (GetDebuffResistance() / 4));
+			if(Bleed) Bleed = clamp(Bleed - reduction, 0, 100);
+			if(KatenBleedLock) Bleed = max(KatenBleedLock, Bleed);
 
 /mob/var/tmp/last_implode
 mob/proc/implodeDebuff(n, type)

@@ -61,4 +61,5 @@ obj/Skills/Yata_no_Kagami/Mirror_Reflection
 	verb/Mirror_Reflection()
 		set name = "Yata no Kagami: Mirror Reflection"
 		set category = "Skills"
+		set hidden = 1
 		usr.BeginHeldSkill(src)

@@ -11,6 +11,7 @@
 /mob/verb/resetPixelOffset()
 	set name = "Reset Appearance"
 	set category = "Other"
+	set hidden = 1
 	pixel_x = customPixelX
 	pixel_y = customPixelY
 	alpha = 255

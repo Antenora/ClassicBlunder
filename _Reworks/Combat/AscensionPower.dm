@@ -3,6 +3,14 @@
 #define SSJ_3_POWER (2.5-1)
 #define SSJ_4_POWER (3.5-1)
 
+/mob/proc/getRacialPowerMod()
+    if(isAI(src)) return 1;//AI are allowed to not have races
+    if(!istype(src, /mob/Players)) return 1;//If it's not a Players[sic] then we don't account for it having a race
+    if(!race)//but if this is not an AI and it is a Players[sic]...
+        liveDebugMsg("[src]([src.key]) does not have a race variable defined.")
+        return 1;
+    . = race.power;
+
 /mob/proc/GetAscensionPower()
     . = 1;
     . += getRacialAscensionPower()

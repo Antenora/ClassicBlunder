@@ -46,6 +46,7 @@ Summonable skill
 
 /obj/Skills/Devils_Deal/verb/Make_Contract()
     set category = "Utility"
+    set hidden = 1
     if(lastUse + 5 > world.realtime)
         usr << "You must wait [lastUse + 5 - world.realtime] seconds before using this again."
         return
@@ -56,6 +57,7 @@ Summonable skill
 
 /obj/Skills/Devils_Deal/verb/Retrieve_Contracts()
     set category = "Utility"
+    set hidden = 1
     var/list/contracts = retrieveContract(usr)
     if(contracts.len)
         usr << "You have [contracts.len] contracts."

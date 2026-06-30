@@ -1,3 +1,5 @@
+//TODO: Determine what the fuck is going on here because i dont think we want it
+
 ///var/list/POWER_TIERS = list("F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "LEGENDARY", "DIVINE", "GODLY", "OMNI", "INFINITE")
 
 /var/MAX_MULT = 250

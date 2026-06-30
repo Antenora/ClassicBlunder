@@ -981,7 +981,7 @@
 					delay = 0.5
 
 	else
-		var/TurfDamage=(src.potential_power_mult*src.PowerBoost*src.Power_Multiplier*src.AngerMax)*(src.GetStr(3)+src.GetFor(2)+src.GetIntimidation()+(10*src.GetWeaponBreaker()))
+		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))
 		for(var/turf/T in get_step(src,src.dir))
 			flick("Attack",src)
 			T.Health-=TurfDamage
@@ -1014,7 +1014,7 @@
 				if(P.Health<=TurfDamage)
 					Destroy(P)
 			return
-		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)"))
+		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)")||src.passive_handler["Chaos Buster"])
 			flick("Attack",src)
 			NextAttack=world.time
 			if(src.passive_handler.Get("Gun Kata"))
@@ -1089,6 +1089,12 @@
 				src.ClearQueue()
 			else if(src.CheckSlotless("Spirit Bow"))
 				GetAndUseSkill(/obj/Skills/Projectile/Aether_Arrow, Projectiles, TRUE)
+			else if(src.passive_handler.Get("Chaos Buster"))
+				var/level = src.passive_handler.Get("Chaos Buster")
+				if(level == 1)
+					GetAndUseSkill(/obj/Skills/Projectile/ChaosBusterShot, Projectiles, TRUE)
+				if(level == 2)
+					GetAndUseSkill(/obj/Skills/Projectile/SuperChaosBusterShot, Projectiles, TRUE)
 			else if(src.CheckSlotless("Sagittarius Bow")&&!AttackQueue&&!passive_handler.Get("HotHundred"))
 				GetAndUseSkill(/obj/Skills/Projectile/Sagittarius_Arrow, Projectiles, TRUE)
 			else if(st&&st.modifiedAttack)

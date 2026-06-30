@@ -55,6 +55,7 @@ var/global/list/MAJIN_PENDING_DIGEST_CREDITS = list()
 
 /mob/verb/Observe_Majin()
     set category = "Other"
+    set hidden = 1
     set name = "Observe Majin"
     if(!absorbedBy)
         src << "You are not currently absorbed by a Majin."

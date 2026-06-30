@@ -92,6 +92,7 @@ mob/proc/ChooseCelestialWeapon()
 obj/Skills/Utility/Recall_Celestial_Armaments
 	verb/Recall_Celestial_Armaments()
 		set category="Utility"
+		set hidden = 1
 		set name = "Recall Celestial Armaments"
 		if(usr.Dead && !usr.KeepBody)
 			usr << "You cannot summon divine artifacts while dead."

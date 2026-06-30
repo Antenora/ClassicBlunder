@@ -1267,6 +1267,7 @@ obj
 					applyDemonInnovationEffect(usr, can_fire)
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 			Flying_Kick
 				NewCost = TIER_3_COST
@@ -1377,6 +1378,7 @@ obj
 					applyDemonInnovationEffect(usr, can_fire)
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 			Bullrush
 				SkillCost=TIER_4_COST
@@ -1523,6 +1525,7 @@ obj
 					applyDemonInnovationEffect(usr, can_fire)
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 			Dropkick_Surprise
 				SkillCost=TIER_4_COST
@@ -2792,6 +2795,7 @@ obj
 								ManaCost = 3
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					verb/Blizzard()
 						set category="Skills"
@@ -2821,6 +2825,7 @@ obj
 					ActiveMessage="invokes: <font size=+1>BLIZZARA!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						// make it cast a projectile that is like hell zone grenade
@@ -2879,6 +2884,7 @@ obj
 					ActiveMessage="invokes: <font size=+1>BLIZZAGA!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
@@ -2933,6 +2939,7 @@ obj
 					WindupMessage="invokes: <font size=+1>THUNDER!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
@@ -2984,6 +2991,7 @@ obj
 					WindupMessage="invokes: <font size=+1>THUNDARA!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						DamageMult = initial(DamageMult)
@@ -3032,6 +3040,7 @@ obj
 					WindupMessage="invokes: <font size=+1>THUNDAGA!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
@@ -3461,6 +3470,7 @@ obj
 				EnergyCost=3
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))
@@ -5314,6 +5324,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Z)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -5835,6 +5846,7 @@ mob
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Z)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Z))
@@ -6218,6 +6230,7 @@ obj
 				var/elem_mana_red = owner.getSpellElementManaCostReduction(Z.SpellElement)
 				if(elem_mana_red)
 					computed_drain *= (1 - elem_mana_red)
+				computed_drain *= owner.ChakraCostMult(Z)
 				if(computed_drain <= 0)
 					computed_drain = 0.5
 				if(owner.TomeSpell(Z))

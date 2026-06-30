@@ -79,6 +79,7 @@ mob/proc/sanitizedChatLog()
 
 /mob/verb/ViewSelfLogs()
 	set category = "Other"
+	set hidden = 1
 	set desc = "View your own logs."
 	usr.SegmentLogs("Saves/PlayerLogs/[usr.key]/sanitized/")
 
@@ -92,10 +93,9 @@ mob/proc/SegmentLogs(var/e)
 			entries = sortByDate(entries)
 		var/file=input("What one do you want to read?","Rebirth") in entries
 		file = file("[e][file]")
-		var/ISF=file2text(file)
-		var/View={"<html><head><title>Logs</title></head><body>
-<font size=3><font color=red>[file]<hr><font size=2><font color=black>[ISF]</body></html>"}
-		src<<browse(View,"window=Log;size=500x550")
+		var/ISF=html_decode(file2text(file))   
+		var/View={"<html><head><title>Logs</title></head><body bgcolor=#f4f1e8 text=#101010 style='font-family:sans-serif;padding:6px'><b style='color:#b00000'>[file]</b><hr>[ISF]</body></html>"}
+		src<<browse(View,"window=Log;size=560x600")
 
 	else
 		src<<"No logs found."

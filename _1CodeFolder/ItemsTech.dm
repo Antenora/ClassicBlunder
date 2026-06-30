@@ -4057,6 +4057,7 @@ obj/Items/Gear
 		verb/Pilot()
 			set src in range(1, usr)
 			set category="Utility"
+			set hidden = 1
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
 				OMsg(usr, "[src] shocks [usr]!")
 				usr.AddShock(100,usr)

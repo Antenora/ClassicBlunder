@@ -60,7 +60,7 @@
 		petals = list()
 		if(user && user.client)
 			user.client.senbonzakura_dragging = FALSE
-			winset(user.client, "mapwindow.map", "right-click=0")
+			user.client.petal_drag_locked = FALSE // clear in case convergence was interrupted
 		if(user)
 			user.AppearanceOff()
 			for(var/obj/Items/i in user)
@@ -233,6 +233,7 @@
 	verb/Petal_Wall()
 		set name = "Petal Wall"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai() && !usr.InBankai()) return
 		if(Using || cooldown_remaining) return
 		var/obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Hakuteiken/hkt = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Hakuteiken)

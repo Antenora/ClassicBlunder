@@ -11,6 +11,7 @@
 		set name = "Make a Wish"
 		set desc = "Call upon your inner dragon to reshape destiny."
 		set category = "Skills"
+		set hidden = 1
 
 		var/mob/M = usr
 		if(!M) return

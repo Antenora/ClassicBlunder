@@ -120,6 +120,7 @@
 /mob/verb/
     Show_Magic_Tree()
         set category="Utility"
+        set hidden = 1
         if(loadingTree || nodeing) return
         nodeing=1;
         setMagicTreeToElement();

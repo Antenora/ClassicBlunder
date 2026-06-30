@@ -441,6 +441,7 @@ globalTracker
 		GLOBAL_ITEM_DAMAGE_MULT = 1
 		EXPONENTIAL_PROJ_DAMAGE = FALSE
 		PROJ_DAMAGE_MULT = 0.8
+		MMO_PROJ_DAMAGE_MULT = 1 // Specifically for attacks that use a telegraphed marker.
 		AUTOHIT_GLOBAL_DAMAGE = 0.8
 		SOFT_STYLE_RATIO = 0.2
 		SOFT_STYLE_DMG_BOON_DIVISOR = 2
@@ -663,7 +664,7 @@ globalTracker
 "Scorpio" = FALSE,"Capricorn" = FALSE,"Aquarius" = FALSE,"Pisces" = FALSE, "Sagittarius" = FALSE)
 		list/Keychains=list("Kingdom Key", "Kingdom Key D", "Flame Liberator", "Wayward Wind", "Rainfell", "Oathkeeper", "Way To Dawn", "Bond of Flame", "Sweetstack", "Two Become One",\
 		"Oblivion", "Fenrir", "No Name", "Lionheart", "Spellbinder", "Star Seeker", "Lost Memory",\
-		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory")
+		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory", "Fairytale Endings")
 		list/FinalKeychains=list("Ultima Weapon", "X-Blade", "Ebony Slumber", "Prismatic Dreams")
 		CHIKARA_WHITELIST = FALSE
 

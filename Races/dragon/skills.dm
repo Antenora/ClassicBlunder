@@ -16,6 +16,7 @@
     ForMult = 0.6
     OffMult = 0.6
     passives = list("FatigueLeak" = 1, "PureDamage" = -1)
+    TimerLimit = 20;
 
 /obj/Skills/AutoHit/Dragon_Roar
     Area="Circle"

@@ -20,6 +20,7 @@
 		OffMessage="dispels the first stage of Instinct."
 		verb/Instinct_Stage_One()
 			set category="Skills"
+			set hidden = 1
 			src.Trigger(usr)
 
 	Instinct_Stage_Two
@@ -44,6 +45,7 @@
 		OffMessage="dispels the second stage of Instinct."
 		verb/Instinct_Stage_Two()
 			set category="Skills"
+			set hidden = 1
 			src.Trigger(usr)
 
 	Instinct_Stage_Three
@@ -68,6 +70,7 @@
 		OffMessage="dispels the third  stage of Instinct."
 		verb/Instinct_Stage_Three()
 			set category="Skills"
+			set hidden = 1
 			src.Trigger(usr)
 
 	Instinct_Divine_Stage
@@ -92,6 +95,7 @@
 		OffMessage="dispels the final stage of Instinct."
 		verb/Instinct_Divine_Stage()
 			set category="Skills"
+			set hidden = 1
 			src.Trigger(usr)
 			if(usr.AscensionsAcquired==5)
 				passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 5)
@@ -114,6 +118,7 @@
 		OffMessage="dispels the first stage of Instinct."
 		verb/Divine_Instinct()
 			set category="Skills"
+			set hidden = 1
 			var/asc = usr.AscensionsAcquired
 			if(asc==0)
 				ActiveMessage="shows the signs of Divine Instinct."

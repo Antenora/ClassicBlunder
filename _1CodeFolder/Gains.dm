@@ -564,6 +564,15 @@ mob
 			if(passive_handler.Get("Unrelenting Wrath"))
 				src.Anger=src.AngerMax
 				src.AngerMax=5
+			if(src.CheckSpecial("Hyperdeath Mode"))
+				if(src.HyperdeathMeterCurrent > 0)
+					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - 1
+					src.HyperMeterUpdate()
+					if(src.HyperdeathMeterCurrent <= 0)
+						src.HyperdeathMeterCurrent = 0
+						var/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode/hdm = locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in src.contents
+						hdm.Trigger(src)
+						src << "You tire out of your elevated state!"
 			if(passive_handler["TensionPowered"] && !src.isMazokuPathHuman())
 				if(src.canHTM())
 					src.race.transformations[2].transform(src, TRUE)

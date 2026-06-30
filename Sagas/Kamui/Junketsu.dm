@@ -100,6 +100,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Disciplinary Chair"
 		verb/Bestow_Disciplinary_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -118,6 +119,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Athletic Chair"
 		verb/Bestow_Athletic_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -136,6 +138,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Non Athletic Chair"
 		verb/Bestow_Non_Athletic_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -154,6 +157,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Information and Strategy Chair"
 		verb/Bestow_Information_and_Strategy_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -308,6 +312,7 @@ obj/Skills/Buffs/SpecialBuffs
 
 		verb/Toggle_Sword_Count()
 			set category="Other"
+			set hidden = 1
 			if(!src.NeedsSecondSword)
 				src.NeedsSecondSword=1
 				usr << "You decide to wield <font color='yellow'>two</font color> swords."
