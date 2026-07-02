@@ -301,19 +301,19 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		// CREST END // 
 		// INKWORKS START //
 		if("Inkworks")
-			InkworksDatum.Tier = 1 // Sets your tier
+			InkworksDatum.Tier = 0 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 			src.contents += new /obj/Skills/Utility/Bestow_Inkwork
 		if("Advanced Inkworks")
-			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.Tier = 1 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 		if("Master Inkworks")
-			InkworksDatum.Tier = 3 // Sets your tier
+			InkworksDatum.Tier = 2 // Sets your tier
 			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
 		if("Tales of The Living")
-			// make this add the three tales of the living options
+			InkworksTypes.Add("Match Girl", "Ice Queen", "Erlking")
 		if("Tales of The Spirits")
-			// Make this add the tales of the the spirit options
+			InkworksTypes.Add("Fox Spirit", "Bear Spirit", "Wolf Spirit", "Dragon Spirit", "Lion Spirit")
 		// INKWORKS END //
 		// TECH SHIT //
 		if("CyberEngineering")
