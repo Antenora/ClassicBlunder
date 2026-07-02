@@ -1713,6 +1713,7 @@ obj/Skills/Utility
 				usr << "The Lion Spirit has been succesfully inked onto this vessel" 
 				// The Lion does concern himself with inkworks
 			Choice.findOrAddSkill("Inscribed Ink")
+			Choice.InkworksDatum.calculateSlots()
 			return
 
 // 	Summon_Spirit

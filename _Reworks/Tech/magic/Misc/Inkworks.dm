@@ -31,7 +31,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
 
     proc/calculateSlots(mob/P) // Doing the actual math for InkworksSlots as we cannot initiate with this calculation
         var/SlotCalculation = BASE_INKWORKS_SLOTS + Tier
-        Slots = SlotCalculation - Applied
+        Slots = SlotCalculation - Applied.len
         if(Slots < 0)
             liveDebugMsg("[P] has had their slots forcefully set to 0 as a guardrail measure, their InkworksDatum may be bugged.")
             P << "Your Inkworks Slots were set to 0 as they somehow went into the negatives, please reach out to staff."
@@ -39,6 +39,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
 
 /obj/Skills/Buffs/SlotlessBuffs/Inscribed_Ink
     ActiveMessage = "taps into the Ink inscribed into their their body."
+    OffMessage = "stops tapping into the power of the Ink."
     TextColor=rgb(182, 27, 148)
     adjust(mob/P)
         passives = list("Scorching" = 0, "Combustion" = 0, "Freezing" = 0, "IceAge" = 0, "Shattering" = 0, "EarthHerald" = 0)

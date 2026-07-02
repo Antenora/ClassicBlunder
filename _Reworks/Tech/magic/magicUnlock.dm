@@ -129,7 +129,7 @@ var/list/MiscTree = list()
 				p.ReduceAlchemyUnlocked()
 		if((tech.name in list("Inkworks", "Advanced Inkworks", "Mastered Inkworks")))
 			if(p.InkworksDatum.Tier >= 1)
-				p.InkworksDatum.Tier = 0
+				p.ReduceInkworksUnlocked() //  Same as AlchemyUnlocked, check line 303 onward instead though.
 	RemoveTech(tech, "Magic")
 
 mob/Admin3/verb/RefundMagic(mob/p in players)
