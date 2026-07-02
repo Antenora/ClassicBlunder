@@ -1654,7 +1654,7 @@ obj/Skills/Utility
 				return
 			else (Using = 1)
 			var/list/Options = list("Cancel") // List of Players we can use this on
-			for(var/mob/Players/P in oview(1, usr))
+			for(var/mob/Players/P in view(1, usr))
 				Options.Add(P)
 			var/mob/Choice = input(usr, "Choose a Player", "Bestow Inkwork") in Options // The Menu that chooses the player
 			if(Choice == "Cancel") 
