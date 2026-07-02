@@ -738,7 +738,7 @@ client/proc/AqBuildStylesTab()
 			if(!bucket || !bucket.len) continue
 			for(var/pathtext in bucket)
 				AqAddComboStyle(pathtext, t)
-	AqNote("Advanced styles unlock through combinations; pick them here as your Potential passes each threshold.")
+	AqNote("ADVANCED STYLES UNLOCK THROUGH COMBINATIONS - PICK THEM HERE AT EACH POTENTIAL THRESHOLD")
 
 client/proc/AqSigOwned(entryval)
 	var/firsttext = istext(entryval) ? entryval : (length(entryval) ? entryval[1] : null)
@@ -815,7 +815,7 @@ client/proc/AqBuildSigTab()
 		AqHeader("TIER [t]  &#183;  PICKS [mob.CountSigs(t)]/[mob.AqSlotsPassed(mob.AqSigThresholds(t))]")
 		for(var/signame in pool)
 			AqAddSigEntry(signame, pool[signame], t)
-	AqNote("Signature picks unlock as your Potential passes each tier's thresholds.")
+	AqNote("SIGNATURE PICKS UNLOCK AS YOUR POTENTIAL PASSES EACH TIER'S THRESHOLDS")
 
 client/proc/RefreshAcquireRows()
 	if(!aq_rows || !aq_entries) return
@@ -856,9 +856,14 @@ client/proc/AqPaintRow(atom/movable/shud/aqrow/r, idx)
 		r.band.alpha = (E.kind == "header") ? 255 : 0
 		r.icn.alpha = 0
 		r.nametext.maptext_x = 0
-		r.nametext.maptext_y = 7          // centers the label in the tt_band strip (band spans row py 1..25)
 		r.nametext.maptext_width = 560
-		r.nametext.maptext = "<center><span style=\"[AQ_FONT]; color:[E.name_col]\">[E.name]</span></center>"
+		if(E.kind == "note")
+			// this looks slightly better, may still play around with it
+			r.nametext.maptext_y = 9
+			r.nametext.maptext = "<center><span style=\"[AQ_FONT_BODY]; color:[E.name_col]\">[E.name]</span></center>"
+		else
+			r.nametext.maptext_y = 7      // centers the label in the tt_band strip (band spans row py 1..25)
+			r.nametext.maptext = "<center><span style=\"[AQ_FONT]; color:[E.name_col]\">[E.name]</span></center>"
 		r.righttext.maptext = ""
 		return
 	r.band.alpha = 0

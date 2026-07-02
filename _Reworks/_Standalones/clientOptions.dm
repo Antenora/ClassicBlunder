@@ -84,4 +84,11 @@ Options/
     set name = "Gamepad Mapping"
     winset(src, null, list("command" = ".gamepad-mapping"))
 
+// this fires the same client command that control freak got rid of
+/mob/verb/Reconnect()
+    set category = "Utility"
+    set hidden = 1
+    set name = "Reconnect"
+    winset(src, null, list("command" = ".reconnect"))
+
 
