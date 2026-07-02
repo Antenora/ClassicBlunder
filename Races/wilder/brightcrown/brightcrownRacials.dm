@@ -165,3 +165,82 @@
 					monkeyUsed++
 				else
 					usr << "Your gourd is empty."
+
+/obj/Skills/AutoHit/Light_Roar
+    Area="Circle"
+    ElementalClass="Light"
+    AdaptRate=1
+    DamageMult=0.1
+    Rounds=1
+    TurfDirt=1
+    TurfErupt=1
+    ShockIcon='KenShockwave.dmi'
+    Shockwave=4
+    Shockwaves=1
+    PostShockwave=1
+    PreShockwave=0
+    Cooldown=-1
+    Earthshaking=20
+    Instinct=1
+    WindupMessage="ROARRRR"
+    ActiveMessage="ROARRRSSS"
+    ComboMaster = 1
+    BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WeakenedByRadiance"
+    adjust(mob/p)
+        var/asc = p.AscensionsAcquired
+        Distance = 6 + asc
+        DamageMult = 1 + (asc * 1.5)
+    verb/Light_Roar()
+        set category="Skills"
+        if(!Using) adjust(usr)
+        usr.Activate(src)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WeakenedByRadiance
+    NeedsPassword = 1
+    Cooldown = 4
+    AlwaysOn = 1
+    CrippleAffected = 3
+    StrMult = 0.6
+    ForMult = 0.6
+    OffMult = 0.6
+    passives = list("FatigueLeak" = 1, "PureDamage" = -1)
+    TimerLimit = 20;
+
+/obj/Skills/Projectile/Consuming_Light
+    StrRate=0.5
+    EndRate=1.5
+    ForRate=0
+    Distance=20
+    Stream=1
+    MultiHit=2
+    Knockback=1
+    Striking=1
+    Delay=1
+    IconLock='AvalonLight.dmi'
+    Variation=24
+    adjust(mob/p)
+        var/asc = p.AscensionsAcquired;
+        Blasts = 5 + asc
+        DamageMult = 3 + (asc * 1.5)
+        Radius = clamp(asc, 1, 5)
+        Silencing = 5 + clamp(asc*2, 1, 8)
+        DamageMult = DamageMult / Blasts
+        Cooldown = 60 - ( 5 * asc)
+    verb/Consuming_Light()
+        set category="Skills"
+        if(!altered) adjust(usr);
+        usr.UseProjectile(src)
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Radiant_Aegis
+    ActiveMessage = "adorns themselves with a shield of radiant light, you feel your ability to do harm diminished!"
+    OffMessage = "loses their shield of light..."
+    adjust(mob/p)
+        var/asc = p.AscensionsAcquired
+        ..(p);
+        ElementalOffense = "Light"
+        strAdd = 0.075 * asc
+        endAdd = 0.075 * asc
+        passives = list("Wrathful Tenacity" = asc*0.3, "HolyMod" = asc, "LifeGeneration" = asc+1, "CallousedFeet" = asc+1, "HardenedFrame" = 1, "SoftStyle" = asc/2)
+    Trigger(mob/User, Override = FALSE)
+        if(!User.BuffOn(src)) adjust(User)
+        ..()

@@ -54,10 +54,12 @@ Difficulty: ★★★
                     skills = list(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Undying_Rage);
                     passives = list("Fury" = 1, "Wrathful Tenacity" = 0.15);
 
-				
-
-
-				
-
-				
-
+obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage
+    NeedsHealth = 50
+    TooMuchHealth = 75
+    TextColor=rgb(95, 60, 95)
+    ActiveMessage="is consumed by a dragon's rage!"
+    OffMessage = "calms their draconic fury..."
+    adjust(mob/p)
+        NeedsHealth = 50 + (p.AscensionsAcquired*5);
+        TooMuchHealth = min(95, 75 + (p.AscensionsAcquired*5));

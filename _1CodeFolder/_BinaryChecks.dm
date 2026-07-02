@@ -1101,7 +1101,7 @@ mob
 				return 1
 			if(isRace(SHINJIN)&&src.Potential>=25)
 				return 1
-			if(src.race in list(DEMON, DRAGON, MAKAIOSHIN))
+			if(src.race in list(DEMON, WILDER, MAKAIOSHIN))
 				return 1
 			if(src.race in list(HUMAN, MAKYO)&&src.AscensionsAcquired)
 				return 1
@@ -1124,7 +1124,7 @@ mob
 				Total+=src.AscensionsAcquired
 			if(isRace(SHINJIN))
 				Total+=round(src.Potential/25)
-			if(isRace(DRAGON)||isRace(DEMON)||isRace(MAKAIOSHIN))
+			if(isRace(WILDER)||isRace(DEMON)||isRace(MAKAIOSHIN))
 				Total+=1
 			if(isRace(HUMAN)&&src.AscensionsAcquired)
 				Total+=(0.5*src.AscensionsAcquired)
@@ -2039,7 +2039,7 @@ mob
 					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 4)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(src.isRace(DRAGON))
+			if(src.isRace(WILDER))
 				if(src.AscensionsAcquired==6 && Total<0.5)
 					Total=0.25//fully ascended dragon
 			if(passive_handler.Get("CreateTheHeavens") && src.DoubleHelix>=5&&isRace(HUMAN))
@@ -2078,7 +2078,7 @@ mob
 					return 1
 			if(src.KamuiBuffLock)
 				return 1
-			if(isRace(DRAGON) && AscensionsAcquired) return 1;
+			if(isRace(WILDER) && AscensionsAcquired) return 1;
 			return 0
 		GetGodKi()
 			if(passive_handler.Get("Deicide") || passive_handler.Get("EndlessNine") || passive_handler.Get("Null") || passive_handler.Get("Longing")) return 0;
@@ -2106,7 +2106,7 @@ mob
 					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 3)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(isRace(DRAGON))
+			if(isRace(WILDER))
 				if(!Total) Total = AscensionsAcquired*0.05;
 				if(Anger || HasCalmAnger())
 					Total *= 2;
@@ -3215,7 +3215,7 @@ mob
 					return 1
 			if(usingStyle("MysticStyle") && StyleBuff?.SignatureTechnique>=1)
 				return 1
-			if(src.isRace(DRAGON)&&src.AscensionsAcquired>=3)
+			if(src.isRace(WILDER)&&src.AscensionsAcquired>=3)
 				return 1
 			if(src.isRace(MAJIN))
 				return 1

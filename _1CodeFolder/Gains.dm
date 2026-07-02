@@ -1789,7 +1789,7 @@ mob
 					if(SM.suffix)
 						BreathingMaskOn=1
 				if(BreathingMaskOn==0)
-					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN,DRAGON, ELDRITCH)))
+					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN, WILDER, ELDRITCH)))
 						src.Oxygen-=rand(2,4)
 						if(src.Oxygen<0)
 							src.Oxygen=0
@@ -1816,7 +1816,7 @@ mob
 									src.Death(null,"oxygen deprivation!")
 			else if(loc:Deluged||istype(loc,/turf/Waters)||istype(loc,/turf/Special/Ichor_Water)||istype(loc,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
-				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON,ELDRITCH))
+				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN, WILDER, ELDRITCH))
 					BreathingMaskOn=1
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
@@ -1893,7 +1893,7 @@ mob
 							amounttaken=0
 						if(loc:Deluged==1)
 							amounttaken=4
-						if(isRace(DRAGON))
+						if(isRace(WILDER))
 							amounttaken=0
 						if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk"))
 							amounttaken=0
@@ -1908,7 +1908,7 @@ mob
 								if(src.TotalFatigue>=95)
 									src.Unconscious(null,"fatigue due to swimming! They will drown if not rescued!")
 					else
-						if(!isRace(DRAGON))
+						if(!isRace(WILDER))
 							if(BreathingMaskOn==0)
 								src.Oxygen=0
 								src.DamageSelf(TrueDamage(1))

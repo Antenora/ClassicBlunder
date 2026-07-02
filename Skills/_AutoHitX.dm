@@ -2579,61 +2579,6 @@ obj
 					usr.Activate(src)
 
 ////Racial
-			Fire_Breath
-				ElementalClass="Fire"
-				StrOffense=1
-				ForOffense=1
-				SpecialAttack=1
-				GuardBreak=0
-				DamageMult=15
-				Scorching=30
-				TurfErupt=1
-				WindUp=0.5
-				WindupMessage="breathes deeply..."
-				ActiveMessage="lets loose an enormous breath infused with fire!"
-				Cooldown=90
-				Distance=30
-				Slow=1
-				Area="Arc"
-				verb/Fire_Breath()
-					set category="Skills"
-					if(!altered)
-						DamageMult = 3 + (1.5 * usr.AscensionsAcquired)
-						Cooldown = 60 - (5 * usr.AscensionsAcquired)
-						Distance = 6 + (3 * usr.AscensionsAcquired)
-						ForOffense = 0.3 + (0.1 * usr.AscensionsAcquired)
-						StrOffense = 0.3 + (0.1 * usr.AscensionsAcquired)
-					usr.Activate(src)
-			Frenzy_Breath
-				ElementalClass="Dark"
-				StrOffense=1.5
-				SpecialAttack=1
-				DamageMult=15
-				WindUp=0.5
-				Distance=20
-				Area="Arc"
-				ObjIcon=1
-				Size=1.5
-				Rounds=1
-				DelayTime=2
-				HitSparkIcon='fevExplosion - Hellfire.dmi'
-				HitSparkX=-32
-				HitSparkY=-32
-				HitSparkTurns=1
-				HitSparkSize=1
-				HitSparkDispersion=1
-				TurfStrike=1
-				FrenzyDebuff=100
-				Cooldown=90
-				verb/Frenzy_Breath()
-					set category="Skills"
-					if(!altered)
-						DamageMult = 6 + (1.5 * usr.AscensionsAcquired)
-						Cooldown = 60 - (5 * usr.AscensionsAcquired)
-						Distance = 6 + (4 * usr.AscensionsAcquired)
-						StrOffense = 1 + (0.25 * usr.AscensionsAcquired)
-						FrenzyDebuff = 40 + (10 * usr.AscensionsAcquired)
-					usr.Activate(src)
 			Poison_Gas
 				ElementalClass="Poison"
 				StrOffense=0.5

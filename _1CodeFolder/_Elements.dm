@@ -629,7 +629,7 @@ mob
 			if(src.Stasis)
 				return
 
-			if(isRace(DRAGON) && Class == "Wind") Value /= 2
+			if(isRace(WILDER) && Class == "Wind") Value /= 2
 			if(src.HasMythical() > 0.75) Value = Value*(1-(src.Crippled/glob.DEBUFF_STACK_RESISTANCE))
 			Value *= getCrippleResistValue()
 
