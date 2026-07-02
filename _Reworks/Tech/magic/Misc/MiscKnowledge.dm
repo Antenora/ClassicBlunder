@@ -95,6 +95,6 @@
 /knowledgePaths/magic/misc/TalesOfTheSpirit
     name = "Tales of The Spirits" 
     description = "The Stories spread by the presence of spirits, engrained and festered in the mind of the living. This is the knolwedge of those stories and how to engrave them into Ink."
-    requires = list("Tales of The Living ")
+    requires = list("Tales of The Living")
 
     
