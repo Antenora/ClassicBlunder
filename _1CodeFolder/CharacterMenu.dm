@@ -506,6 +506,7 @@ client/proc/OpenCharacterMenu()
 	CloseMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
+	CloseAcquireMenu()
 	cmenu_open = TRUE
 	cmenu_tab = 0
 	// tile-anchor the frame so it stays inside the view
@@ -780,7 +781,7 @@ client/proc/ScrollTrackTo(params)
 	var/row = text2num(yp[1])
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
-	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32
+	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y
 	var/frac = ((CMENU_H - PASS_TRACK_Y) - local_h) / PASS_TRACK_H
 	frac = clamp(frac, 0, 1)
 	SetPassPx(round(frac * maxpx))
@@ -790,6 +791,8 @@ client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(AdminWheelScroll(delta_y))  
 		return
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
+		return
+	if(AqWheelScroll(delta_y))     // Acquire Skills list (AcquireHUD.dm)
 		return
 	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
 		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
@@ -1366,7 +1369,7 @@ client/proc/ScrollGearTrack(params)
 	var/row = text2num(yp[1])
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
-	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32
+	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y   // CMloc bakes the drag offset; undo it or track clicks skew after a vertical drag
 	var/frac = ((CMENU_H - GEAR_TRACK_Y) - local_h) / GEAR_TRACK_H
 	frac = clamp(frac, 0, 1)
 	SetGearRow(round(frac * maxrow))
@@ -1575,7 +1578,7 @@ client/proc/ScrollCustTrack(params)
 	var/row = text2num(yp[1])
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
-	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32
+	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y   // CMloc bakes the drag offset; undo it or track clicks skew after a vertical drag
 	var/frac = ((CMENU_H - CUST_TRACK_Y) - local_h) / CUST_TRACK_H
 	frac = clamp(frac, 0, 1)
 	SetCustPx(round(frac * maxpx))

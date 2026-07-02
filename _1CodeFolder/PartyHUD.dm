@@ -1,6 +1,7 @@
 #define PCARD_W 240
 #define PCARD_H 70
 #define PCARD_GAP 4
+#define PCARD_BUFF_ROWS_RESERVED 2   // buff rows always kept clear above the stack (2 rows = 8 buffs)
 #define PCARD_FONT "font-family:'monogram'; font-size:12pt"
 #define PCARD_BAR_FONT "font-family:'Pixel Operator 8'; font-size:6pt"
 #define PBAR_W 160          // tbar_track.png width (reused)
@@ -237,16 +238,19 @@ client/proc/RepositionPartyCards()
 	if(!th) return
 	pcard_row = max(th - (MCARD_TILES_TALL - 1), 1)         // same anchor row as the main card / intent / buffs
 	var/cluster_bottom = -(MCARD_MARGIN_Y + INTENT_CHIP_BELOW + INTENT_CHIP_H)
+	var/rows = PCARD_BUFF_ROWS_RESERVED                     // fixed reserve
 	var/buffs = mob.GetTimedBuffs().len
-	if(buffs)
-		var/rows = round(buffs / TBUFF_PER_ROW)
+	if(buffs > rows * TBUFF_PER_ROW)                        // overflow past the reserve still pushes cards down
+		rows = round(buffs / TBUFF_PER_ROW)
 		if(rows * TBUFF_PER_ROW < buffs) rows++             // ceil to whole rows
-		cluster_bottom -= TBUFF_BELOW_INTENT + rows * TBUFF_ICON + (rows - 1) * TBUFF_GAP
+	cluster_bottom -= TBUFF_BELOW_INTENT + rows * TBUFF_ICON + (rows - 1) * TBUFF_GAP
 	var/cb = cluster_bottom - PCARD_GAP - PCARD_H
-	if(party_cards)
-		for(var/datum/pcard/pc in party_cards)
-			PlacePCard(pc, cb)
-			cb -= (PCARD_H + PCARD_GAP)
+	var/lowest = cb - (party_cards.len - 1) * (PCARD_H + PCARD_GAP)
+	var/floor_off = -((pcard_row - 1) * 32) + PCARD_GAP     // a footprint past the view bottom expands the HUD view box
+	if(lowest < floor_off) cb += floor_off - lowest         // lift the whole stack just enough to stay inside the view
+	for(var/datum/pcard/pc in party_cards)
+		PlacePCard(pc, cb)
+		cb -= (PCARD_H + PCARD_GAP)
 	UpdateLeaderBadge()
 	if(party_manage_target) PositionPartyManage()
 

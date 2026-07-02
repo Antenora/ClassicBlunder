@@ -399,11 +399,13 @@ mob/Admin3/verb/LoadSwapMap()
 		"3rd T2 Style" = list("T2_STYLES", 3),
 		"4th T2 Style" = list("T2_STYLES", 4),
 		"1st T3 Style" = list("T3_STYLES", 1),
+		"1st T4 Style" = list("T4_STYLES", 1),
 		"1st T1 Sig"   = list("T1_SIGS", 1),
 		"2nd T1 Sig"   = list("T1_SIGS", 2),
 		"3rd T1 Sig"   = list("T1_SIGS", 3),
 		"1st T2 Sig"   = list("T2_SIGS", 1),
-		"2nd T2 Sig"   = list("T2_SIGS", 2)
+		"2nd T2 Sig"   = list("T2_SIGS", 2),
+		"1st T3 Sig"   = list("T3_SIGS", 1)
 	)
 	var/list/labels = list()
 	for(var/k in slots)

@@ -231,6 +231,7 @@ client/proc/OpenInventory()
 	CloseCharacterMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
+	CloseAcquireMenu()
 	inv_open = TRUE
 	inv_cat_index = 1
 	btn_inv.icon = 'HUD/ui_slot_unavailable.png'

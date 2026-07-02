@@ -482,7 +482,7 @@ document.onkeydown=function(e){
 	return istype(b) && b.TimerLimit > 0 && !IsDebuffBuff(b) // timed, non-debuff: shown in the top-left strip
 
 /proc/BuffPct(mult)
-	var/pct = round((mult - 1) * 100)
+	var/pct = round((mult - 1) * 100, 1)
 	return "[pct >= 0 ? "+" : ""][pct]%"
 /proc/BuffStatLine(list/L, label, add, mult)
 	var/txt = ""
@@ -505,6 +505,25 @@ document.onkeydown=function(e){
 	if(RecovMult != 1) L += "Recovery: [BuffPct(RecovMult)]"
 	if(EnergyMult != 1) L += "Energy: [BuffPct(EnergyMult)]"
 	if(!L.len) L += "No stat changes."
+	return L
+
+/proc/StyleAddLine(list/L, label, mult)
+	if(!mult || mult == 1) return
+	var/v = round(mult - 1, 0.01)
+	L += "[label]: [v > 0 ? "+" : ""][v]"
+
+/obj/Skills/Buffs/NuStyle/BuffBoostLines()
+	var/list/L = ..()
+	var/list/S = list()
+	StyleAddLine(S, "Strength", StyleStr)
+	StyleAddLine(S, "Endurance", StyleEnd)
+	StyleAddLine(S, "Force", StyleFor)
+	StyleAddLine(S, "Speed", StyleSpd)
+	StyleAddLine(S, "Offense", StyleOff)
+	StyleAddLine(S, "Defense", StyleDef)
+	if(S.len)
+		L -= "No stat changes."
+		L += S
 	return L
 
 // fallback
@@ -712,6 +731,7 @@ client/proc/OpenSkillMenu()
 	CloseInventory()
 	CloseCharacterMenu()
 	CloseTechMenu()
+	CloseAcquireMenu()
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1

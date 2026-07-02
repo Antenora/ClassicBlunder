@@ -255,7 +255,7 @@ client/proc/ToggleTechMenu()
 client/proc/OpenTechMenu(start_tab = "tree")
 	if(tmenu_open || !mob) return
 	if(length(TechnologyTree) < 1) fillOutTechTree()
-	CloseMenu(); CloseInventory(); CloseCharacterMenu(); CloseSkillMenu()
+	CloseMenu(); CloseInventory(); CloseCharacterMenu(); CloseSkillMenu(); CloseAcquireMenu()
 	tmenu_open = 1
 	tmenu_tab = start_tab
 
