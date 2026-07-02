@@ -13,11 +13,15 @@
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
+				return TRUE
 	else if(option == "Stun")
 		if(enemy.Stunned)
 			if(passive_handler["Sajire Rush"])
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
+				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
 				return TRUE
 	return FALSE
 
@@ -497,6 +501,9 @@
 					if(passive_handler.Get("HotHundred"))
 						lightAtk=0
 						adjust = hh-1
+					if(passive_handler.Get("Bear Spirit"))
+						damage *= 1
+						adjust = 3
 					if(enemy.Launched && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 						damage *= 1+secretDatum?:getBoon(src,"Launchers")
 					if(enemy.Stunned && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))

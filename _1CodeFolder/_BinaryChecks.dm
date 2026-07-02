@@ -1550,7 +1550,9 @@ mob
 		GetBeamChargeSpeedMult()
 			var/mult = (1+(src.GetKiControlMastery()*0.1))
 			if(src.HasQuickCast())
-				mult *= src.GetQuickCast()
+				mult *= src.GetQuickCast()+1
+			if(src.passive_handler.Get("Dragon Spirit"))
+				mult *= 5
 			return mult
 		HasDualCast()
 			if(passive_handler.Get("DualCast"))
@@ -2553,6 +2555,8 @@ mob
 			var/Return=passive_handler.Get("SpiritHand")
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 
 
@@ -2577,8 +2581,9 @@ mob
 				Return += AscensionsAcquired/2
 			if(hasSecret("Eldritch (Reflected)")) Return += (scalingEldritchPower()/2);
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=GetHeroicBoost()
-
+				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
@@ -2589,7 +2594,9 @@ mob
 			if(src.Saga=="Keyblade")
 				Return += src.SagaLevel*0.25
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=GetHeroicBoost()
+				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasHybridStrike()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("HybridStrike"))

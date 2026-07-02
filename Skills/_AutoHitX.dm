@@ -5650,6 +5650,8 @@ mob
 				src.is_dashing++
 				src.WindingUp=1
 				var/GO=Z.Rush
+				if(passive_handler["Wolf Spirit"])
+					GO=Z.Rush*2
 				if(!Z.RushNoFlight)
 					src.icon_state="Flight"
 				if(Z.RushDelay<1)
