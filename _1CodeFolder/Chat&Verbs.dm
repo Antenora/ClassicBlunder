@@ -80,83 +80,20 @@ mob
 atom/proc/Examined(mob/user)
 mob/Players/var/tmp/current_party_target_index = 1
 mob/Players/verb
-	Create_Party()
-		set category="Party"
-		if(src.Class in list("Dance", "Potara"))
-			src << "You can't party with fused characters!"
-			return
-		if(src.party)
-			src << "You are already in a party; you cannot create another one."
-			return
-		var/Party/p=new
-		p.create_party(src)
-
 	Party_Target_Cycle()
 		set category = "Party"
 		if(!src.party)
 			src << "You don't have a party to cycle target on!"
 			return
-		current_party_target_index +=1
-		if(current_party_target_index > party.members.len)
-			current_party_target_index = 1
-		usr.SetTarget(party.members[current_party_target_index])
-		usr << "You target [usr.Target]."
-	Manage_Party()
-		set category="Party"
-		if(!src.party)
-			src << "You don't have a party to manage!"
+		var/list/others = src.party.members - src
+		if(!others.len)
+			src << "You have no party members to target."
 			return
-		var/list/options=list("Cancel", "Check Party", "Add Member", "Remove Member", "Pass Leader", "Leave Party")
-		if(src.party.leader!=src)
-			options.Remove("Add Member", "Remove Member", "Pass Leader")
-		switch(input(src, "How do you want to manage your party?", "Manage Party") in options)
-			if("Cancel")
-				return
-			if("Check Party")
-				for(var/mob/m in src.party.members)
-					if(m == src.party.leader)
-						src << "\[LEADER\] - \..."
-					src << "[m.name] - [round(m.Health, 10)]% / [round(m.Energy, 10)]%"
-				return
-			if("Add Member")
-				if(src==src.party.leader)
-					var/list/mob/the_boys=list("Cancel")
-					for(var/mob/m in view(8, src))
-						if(!m.party && !(m.Class in list("Dance", "Potara")))
-							the_boys.Add(m)
-					var/mob/my_boy=input(src, "Who do you want to add to your party?", "Add Member") in the_boys
-					if(my_boy=="Cancel")
-						return
-					if(my_boy.party)
-						return
-					src.party.add_member(my_boy)
-				return
-			if("Remove Member")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/not_my_boy=input(src, "Who do you want to remove from your party?", "Remove Member") in my_boys
-					if(not_my_boy=="Cancel")
-						return
-					if(src.party.members.Find(not_my_boy))
-						src.party.remove_member(not_my_boy)
-				return
-			if("Pass Leader")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/the_best_boy=input(src, "Who do you want to pass your leadership to?", "Pass Leader") in my_boys
-					if(the_best_boy=="Cancel")
-						return
-					if(src.party.members.Find(the_best_boy))
-						src.party.pass_leader(src, the_best_boy)
-				return
-			if("Leave Party")
-				if(src.party)
-					src.party.remove_member(src)
-				return
+		current_party_target_index += 1
+		if(current_party_target_index > others.len)
+			current_party_target_index = 1
+		usr.SetTarget(others[current_party_target_index])
+		usr << "You target [usr.Target]."
 
 	Signature_Check()
 		set category="Other"
@@ -875,6 +812,60 @@ a{color:#8be9ff;}
 			usr<<browse("[View]","window=Logzk;size=900x450")
 		else
 			usr<<browse("[View]","window=Logzk;size=240x420")
+
+	Toggle_Auto_Berserk()
+		set category = "Other"
+		set name = "Toggle Auto Berserk"
+		if(usr.AutoBerserkOptOut)
+			usr.AutoBerserkOptOut = 0
+			usr << "Auto Berserk re-enabled. Buffs that force Anger (Jinchuuriki, Vaizard Mask, Wrathful, etc.) will trigger it normally."
+		else
+			usr.AutoBerserkOptOut = 1
+			usr << "Auto Berserk disabled. Buffs with the Auto Anger flag will no longer force you into the Anger state on activation."
+
+	GetPingSound()
+		set category = "Other"
+		set name = "Toggle Ping Sound"
+		if(usr.PingSound)
+			usr.PingSound = 0
+			usr << "Ping Sound Disabled."
+		else
+			usr.PingSound = 1
+			usr << "Ping Sound Enabled."
+
+	SetPingVolume()
+		set category = "Other"
+		set name = "Set Ping Volume"
+		var/n = input(src, "What volume?") as num
+		if(n > 100 || n < 0)
+			src << " too high or low "
+		else
+			PingVolume = n
+
+	CustomizePU()
+		set name = "Customize: PU Charging"
+		set category = "Other"
+		if(!src.client)
+			return
+		var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
+		if(length(choice)>200)
+			return
+		if(length(choice)<1)
+			return
+		custom_powerup = choice
+		choice = input(src, "Do you want to include your name in the PU charging?") in list("Yes", "No")
+		if(choice == "Yes")
+			customPUnameInclude = TRUE
+		else
+			customPUnameInclude = FALSE
+
+	Admins()
+		set name = "Admins"
+		set category = "Other"
+		for(var/mob/p in players)
+			if(p.Admin)
+				src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"
+
 	Character_Description()
 		set category="Roleplay"
 		set hidden = 1
@@ -963,7 +954,7 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = dm.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 			else
@@ -974,7 +965,7 @@ a{color:#8be9ff;}
 			var/obj/Skills/s = am.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 			else
@@ -1006,7 +997,7 @@ mob/proc/RPModeSwitch()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
@@ -1036,7 +1027,7 @@ mob/proc/CutsceneMode()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = SkillCDRemaining(s)   
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
 				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)

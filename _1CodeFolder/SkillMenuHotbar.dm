@@ -482,7 +482,7 @@ document.onkeydown=function(e){
 	return istype(b) && b.TimerLimit > 0 && !IsDebuffBuff(b) // timed, non-debuff: shown in the top-left strip
 
 /proc/BuffPct(mult)
-	var/pct = round((mult - 1) * 100)
+	var/pct = round((mult - 1) * 100, 1)
 	return "[pct >= 0 ? "+" : ""][pct]%"
 /proc/BuffStatLine(list/L, label, add, mult)
 	var/txt = ""
@@ -505,6 +505,25 @@ document.onkeydown=function(e){
 	if(RecovMult != 1) L += "Recovery: [BuffPct(RecovMult)]"
 	if(EnergyMult != 1) L += "Energy: [BuffPct(EnergyMult)]"
 	if(!L.len) L += "No stat changes."
+	return L
+
+/proc/StyleAddLine(list/L, label, mult)
+	if(!mult || mult == 1) return
+	var/v = round(mult - 1, 0.01)
+	L += "[label]: [v > 0 ? "+" : ""][v]"
+
+/obj/Skills/Buffs/NuStyle/BuffBoostLines()
+	var/list/L = ..()
+	var/list/S = list()
+	StyleAddLine(S, "Strength", StyleStr)
+	StyleAddLine(S, "Endurance", StyleEnd)
+	StyleAddLine(S, "Force", StyleFor)
+	StyleAddLine(S, "Speed", StyleSpd)
+	StyleAddLine(S, "Offense", StyleOff)
+	StyleAddLine(S, "Defense", StyleDef)
+	if(S.len)
+		L -= "No stat changes."
+		L += S
 	return L
 
 // fallback
@@ -712,6 +731,7 @@ client/proc/OpenSkillMenu()
 	CloseInventory()
 	CloseCharacterMenu()
 	CloseTechMenu()
+	CloseAcquireMenu()
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1
@@ -722,9 +742,15 @@ client/proc/OpenSkillMenu()
 	skmenu_icon_objs = list()
 	skmenu_tab_objs = list()
 
-	var/atom/movable/shud/menupanel/P = new
+	var/atom/movable/shud/menupanel/draggable/P = new
 	P.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:[-MHUD_PANEL_H/2]"
 	skmenu_objs += P
+	// restore saved drag position, clamped to the current view
+	sk_pan_x = getPref("skPanX"); if(isnull(sk_pan_x)) sk_pan_x = 0
+	sk_pan_y = getPref("skPanY"); if(isnull(sk_pan_y)) sk_pan_y = 0
+	var/list/sb = PanBounds("skills", null)
+	sk_pan_x = clamp(sk_pan_x, sb[1], sb[2])
+	sk_pan_y = clamp(sk_pan_y, sb[3], sb[4])
 
 	var/atom/movable/shud/menutext/title = new
 	title.maptext_width = MHUD_PANEL_W
@@ -777,6 +803,7 @@ client/proc/OpenSkillMenu()
 
 	for(var/atom/movable/o in skmenu_objs)
 		screen += o
+	PanShift(skmenu_objs, sk_pan_x, sk_pan_y)
 	KineticEntrance(skmenu_objs)
 	BuildSkillMenuGrid(TRUE)
 
@@ -833,6 +860,7 @@ client/proc/BuildSkillMenuGrid(fade = FALSE)
 		E.screen_loc = "CENTER:[SKMENU_GRID_X0 + col * SKMENU_GRID_PITCH],CENTER:[SKMENU_GRID_Y0 - row * SKMENU_GRID_PITCH]"
 		skmenu_icon_objs += E
 		screen += E
+	PanShift(skmenu_icon_objs, sk_pan_x, sk_pan_y)
 	if(fade)
 		KineticEntrance(skmenu_icon_objs)
 

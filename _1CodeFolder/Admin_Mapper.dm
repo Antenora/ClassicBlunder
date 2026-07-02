@@ -1,4 +1,5 @@
 /mob/Admin3/verb/ADMINSetallRoofsToDense()
+	set category="Mapper"
 	for(var/turf/CustomTurf/T in world)
 		if(T.Roof)
 			T.FlyOverAble = FALSE

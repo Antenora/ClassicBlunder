@@ -147,15 +147,15 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 			if(m.race.type in INORGANIC_RACES && !m.passive_handler.Get("SpiralEngine"))
 				User << "[m] is synthetic and cannot evolve."
 				m << "[User] tried to inspire you to evolve, but it failed."
-				return
+				continue
 			if(m.race.type in CURSED_RACES || (m.Secret &&  m.Secret != "Spiral"))
 				User << "[m]'s biology is warped by the supernatural, they cannot evolve as you do."
 				m <<"[User] tried to inspire you to evolve, but your supernatural gifts interferred."
-				return
+				continue
 			if(m.race.type in STAGNANT_RACES)
 				User <<"[m] is a supernatural entity. They are incapable of change."
 				m <<"[User] tried to inspire you to evolve, but your nature prevents you from lowering yourself to their level."
-				return
+				continue
 			ActiveMessage="screams: <b>WHEN THERE'S A WALL IN OUR WAY, TEAM [User] DRILLS RIGHT THROUGH IT!</b>"
 			var/obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply/applyBuff = new
 			var/secretLevel = User.secretDatum.currentTier

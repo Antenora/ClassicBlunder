@@ -17,7 +17,7 @@
 		AuraY=-10
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"= "/obj/Skills/Buffs/NuStyle/MysticStyle/Plasma_Style",\
 								"/obj/Skills/Buffs/NuStyle/MysticStyle/Inferno"= "/obj/Skills/Buffs/NuStyle/MysticStyle/Hellfire", \
-								"/obj/Skills/Buffs/NutStyle/UnarmedStyle/_Any" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ifrit_Jambe")
+								"/obj/Skills/Buffs/NuStyle/UnarmedStyle/_Any" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ifrit_Jambe")
 		ElementalOffense = "Fire"
 		ElementalDefense = "Earth"
 		ElementalClass = "Fire"

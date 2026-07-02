@@ -5,7 +5,7 @@
 #define MADNESS_ADD_PER_TIER 25
 
 #define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Werewolf", "Heavenly Restriction", "Senjutsu", "Shin",\
-"Ultra Instinct", "Zombie", "Necromancy", "Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Heavenborn")
+"Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Heavenborn")
 #define RACIAL_SECRETS list("Eldritch (Shrouded)", "Eldritch (Reflected)")
 #define RARE_LIST list(MAKAIOSHIN, MAJIN, DEMON, ANGEL, ELDRITCH, DEMIFIEND)
 
@@ -42,12 +42,6 @@
 			Edit+="<td>[Value(A.vars[C])]</td></tr>"
 		Edit += "</html>"
 		usr<<browse(Edit,"window=[A];size=450x600")
-
-/mob/Admin3/verb/TierSecretUp(mob/p in players)
-	if(p.secretDatum)
-		var/confirm = alert(usr, "Are you sure you want to tier up [p]'s [p.secretDatum.name]?",,"Yes","No")
-		if(confirm == "No") return
-		p.secretDatum.tierUp(p.secretDatum.currentTier+1, p)
 
 /mob/proc/getSecretLevel()
 	if(secretDatum)
@@ -91,7 +85,6 @@ SecretInformation
 
 	proc/applySecret(mob/p)
 		if(!p) return;
-		admins << "[p] has been given T[currentTier] [p.secretDatum.name]."
 
 	JaganEye
 		name = "Jagan Eye"
@@ -750,7 +743,11 @@ mob/Admin3/verb
 		set category="Admin"
 		if(!P.client) return
 		if(P.Secret)
-			src << "They already have a secret."
+			var/confirm = alert(usr, "Are you sure you want to tier up [P]'s [P.secretDatum.name]?",,"Yes","No")
+			if(confirm == "No") return
+			P.secretDatum.tierUp(P.secretDatum.currentTier+1, P)
+			P << "Your [P.secretDatum.name] has been tiered up."
+			Log("Admin","<font color=blue>[P] has been given Tier [P.secretDatum.currentTier] [P.secretDatum.name] by [ExtractInfo(usr)]</font>")
 			return
 		if(P.RaceInRareList())
 			src << "No."
@@ -761,13 +758,6 @@ mob/Admin3/verb
 		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in validSecrets;
 		if(Selection=="Cancel") return;
 		switch(Selection)
-			if("Spirits of The World")
-				var/path = input(src, "Which path of Spirits of The World do you wish to follow?", "Spirits of The World") in list("Goetic Virtue", "Stellar Constellation", "Elven Sanctuary")
-				// for now, admins pick it, as there
-				P.Secret = path
-				var/newpath = replacetext(path, " ", "_")
-				newpath = "Spirits_Of_The_World/[newpath]"
-				P.giveSecret(newpath)
 			if("Heavenly Restriction")
 				P.Secret = "Heavenly Restriction"
 				P.giveSecret("HeavenlyRestriction")
@@ -783,19 +773,8 @@ mob/Admin3/verb
 				P.Secret="Senjutsu"//i want to krill myself.
 				P.giveSecret("SageArts")//better yet i want to krill whoever made it this way
 			if("Haki")
-				// P.ModifyPrime+=1
 				P.Secret="Haki"
 				P.giveSecret("Haki")
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armament)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Observation)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor_Lite)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armor)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield_Lite)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax_Lite)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Relax)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash_Lite)
-				// P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Future_Flash)
 				P << "Possessing such an overwhelming amount of willpower, you learn to chart destiny through your own ambition!"
 			if("Werewolf")
 				P.Secret="Werewolf"
@@ -815,6 +794,20 @@ mob/Admin3/verb
 			if("Spiral")
 				P.Secret="Spiral"
 				P.giveSecret("Spiral")
+
+	SecretRemoval(mob/Players/P in players)
+		set category="Admin"
+		var/Choice=input(usr, "Are you sure you want to remove [P]'s secret?", "Secret Decision") in list("Yes", "No")
+		if(Choice=="No") return
+		var/OldSecret = P.secretDatum.name
+		P.Secret=null
+		P.secretDatum.name=null
+		P.secretDatum.lastCheckedTier=1
+		P.secretDatum.currentTier=1
+		P << "Your [OldSecret] has been removed."
+		Log("Admin","<font color=blue>[ExtractInfo(usr)] removed [OldSecret] from [P].</font>")
+
+
 mob
 	proc
 		AddHaki(var/Type)

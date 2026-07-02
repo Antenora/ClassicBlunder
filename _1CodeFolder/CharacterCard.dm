@@ -132,6 +132,7 @@ client/proc/InitCharacterCard()
 	UpdateDebuffs()
 	UpdateTimedBuffs()
 	InitTargetCard()
+	InitPartyHUD()
 
 client/proc/InitTargetCard()
 	tcard = new
@@ -372,6 +373,7 @@ client/proc/ResetCharacterCard()
 	ResetIntentChips()
 	HideDebuffPanel()
 	ResetTargetCard()
+	ResetPartyHUD()
 
 client/proc/UpdateCharacterCard()
 	if(!card || !mob) return
@@ -600,6 +602,7 @@ client/proc/UpdateTimedBuffs()
 		spare.alpha = 0
 		spare.buff = null
 		spare.num.maptext = ""
+	RepositionPartyCards()   // ally cards ride below the buff cluster, whose height just changed
 
 client/proc/GetActiveDebuffs()
 	var/list/out = list()

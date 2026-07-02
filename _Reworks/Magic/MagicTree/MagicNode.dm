@@ -296,7 +296,7 @@ globalTracker/var
     if(isRace(POPO) && popoEarlyUnlocks.Find(element)) return 1;
     if((isRace(ANGEL) || isRace(MAKAIOSHIN)) && angelEarlyUnlocks.Find(element)) return 1;
     if((isRace(DEMON) || isRace(MAKAIOSHIN)) && demonEarlyUnlocks.Find(element)) return 1;
-    
+
     if(!hasAdvancedMagicCapability()) return 0;
     return 1;
 
@@ -308,7 +308,7 @@ globalTracker/var
 /mob/Admin1/verb/Give_Advanced_Magic(mob/Players/p in world|null)
     set category="Admin"
     set name = "Give Advanced Magic"
-    if(!p)
+    if(p)
         var/list/options = list("Cancel")
         for(var/mob/Players/gal in world)
             options |= gal;

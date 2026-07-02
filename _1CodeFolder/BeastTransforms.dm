@@ -167,6 +167,7 @@
 			if((length(User.race.transformations) >= 2 && User.race.transformations[2].type == /transformation/saiyan/hellspawn_super_saiyan_2 && User.transUnlocked >= 2) && User.CanTransform() && !User.transActive&& User.oozaru_type=="Demonic")
 				User.transActive = 1
 				User.race.transformations[2].transform(User, TRUE)
+
 	verb/Tail_Toggle()
 		set category = "Other"
 		set hidden = 1

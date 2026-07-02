@@ -1,5 +1,6 @@
 // this is anything but fast
 /mob/Admin3/verb/Respec(mob/P in players)
+    if(!src.Alert("Are you sure you want to respec a player?")) return
     for(var/obj/Skills/Choice in P)
         if(Choice.Copyable)
             var/Refund

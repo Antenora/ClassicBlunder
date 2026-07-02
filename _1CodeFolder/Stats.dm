@@ -1193,6 +1193,7 @@ mob/proc/Update_Stat_Labels()
 		client.UpdateDebuffs()
 		client.UpdateTimedBuffs()
 		client.UpdateTargetCard()
+		client.UpdatePartyCards()
 		client.UpdateCharacterMenu()   
 		if(round(TotalCapacity))
 			ManaMessage=" (Capacity:[100-round(TotalCapacity)]%)"

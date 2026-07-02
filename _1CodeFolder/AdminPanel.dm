@@ -16,6 +16,13 @@
 /atom/movable/shud/adminpanelbg
 	layer = APANEL_LAYER
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.PPanelStart(params)   // drags the player panel + admin strip together
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.PPanelMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.PPanelEnd()
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HidePlayerPanel()   // right-click either panel closes both
@@ -111,7 +118,8 @@ client/proc/ComputeAdminPanelAnchor()
 	return 1
 
 client/proc/APLoc(px, py)
-	return "[ap_tile]:[ap_xpix + px],[pp_row]:[pp_poff + py]"
+	// shares the player panel's drag offset so both move as one unit
+	return "[ap_tile]:[ap_xpix + px + pp_pan_x],[pp_row]:[pp_poff + py + pp_pan_y]"
 
 client/proc/HideAdminPanel()
 	admin_panel_open = FALSE

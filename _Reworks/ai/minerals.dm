@@ -64,13 +64,15 @@ globalTracker/var/NPC_EXCHANGE_RATE  = 0.75
 // we need an npc that when clicked will exchange these
 // we also need an exchange for the player that can do it
 mob/Admin4/verb/GiveExchangeVerb()
+	set category = "Admin"
+	set name = "Give Exchange Verb"
 	var/mob/p = input(src, "Pick a player", "Player") in players
-	if(p.isRace(GAJALAKA) && !(key in glob.COOL_GAJA_PLAYERS))
-		src << "do not give random gajas exchange"
-		return
 	p.verbs += /mob/proc/ExchangeMinerals
+	Log("Admin","<font color=red>[ExtractInfo(usr)] gave [ExtractInfo(p)] the Exchange Minerals verb.")
 
 mob/Admin4/verb/makeExchanger()
+	set category = "Admin"
+	set name = "Make Exchanger"
 	var/obj/Exchange/npc/exchanger = new()
 	exchanger.loc = get_step(src, src.dir)
 	exchanger << "You have created an exchanger."
@@ -109,7 +111,6 @@ mob/var/playerExchangeRate = 0.5
 globalTracker/var/NORMAL_EXCHANGE_RATE = 0.5
 
 proc/exchangeMineral(obj/Items/mineral/mineral, mob/p, obj/Exchange/npc/npc)
-	p.gajaConversionRateUpdate()
 	var/PopoRate=1
 	if(p.isRace(POPO))
 		PopoRate*=p.GetPowerUpRatio()

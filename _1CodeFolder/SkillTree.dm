@@ -296,12 +296,21 @@ var/list/SkillTree=list(
 "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Psycho_Boxing"=9999,
 "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Phoenix_Eye_Fist"=9999,
 "/obj/Skills/Buffs/NuStyle/SwordStyle/Art_of_Order"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama"=9999
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodseeker"=9999
 ),
 "HybridStylesT3"=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Twin_Dragon_Fire"=9999,
 "/obj/Skills/Buffs/NuStyle/UnarmedStyle/School_of_the_Undefeated_of_the_East"=9999,
 "/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi"=9999
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Tenken"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodwhetter"=9999
+),
+"HybridStylesT4"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Alpha_inForce"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Nebula_Blade"=9999,
+"/obj/Skills/Buffs/NuStyle/SwordStyle/Hearts_Beating_As_One"=9999,
+"/obj/Skills/Buffs/NuStyle/UnarmedStyle/High_Roller"=9999
 ),
 
 "ElementalStyles"=list(
@@ -352,7 +361,8 @@ var/list/SkillTree=list(
 					"/obj/Skills/Buffs/NuStyle/SwordStyle/Fierce_Deity"=9999),
 "SwordStylesT4"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Way_of_the_Kensei"=9999,
 					"/obj/Skills/Buffs/NuStyle/SwordStyle/Kyutoryu"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/War_God"=9999),
+					"/obj/Skills/Buffs/NuStyle/SwordStyle/War_God"=9999,
+					"/obj/Skills/Buffs/NuStyle/SwordStyle/Ulforce"=9999),
 
 )
 
@@ -457,7 +467,7 @@ mob/Players/verb
 		set hidden=1
 		if(!(world.time > verb_delay)) return
 		verb_delay=world.time+1
-		winshow(usr,"skilltree",1)
+		usr.client?.OpenAcquireMenu()   // map-HUD menu (AcquireHUD.dm) replaced the skin window
 	skilltreez(var/z as text)
 		set hidden=1//interface verb doesnt needa be found out
 		if(!(world.time > verb_delay)) return

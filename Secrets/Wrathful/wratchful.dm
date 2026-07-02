@@ -149,6 +149,9 @@ scaling with potential as well
 	set name = "Give Rare Saiyan"
 	var/mob/p = input(src, "Who?", "Give Rare Saiyan") in players
 	if(!p) return
+	if(!p.isRace(/race/saiyan))
+		src << "<font color=red>[p] is not a Saiyan.</font>"
+		return
 	var/choice = input(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan") as null|anything in list("Hellspawn", "Heavenborn", "Legendary", "Wrathful", "Cancel")
 	if(!choice || choice == "Cancel") return
 	switch(choice)

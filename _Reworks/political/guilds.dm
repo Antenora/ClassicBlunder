@@ -6,6 +6,7 @@ mob/Players/var/list/inGuilds = list()
 
 
 /mob/Admin3/verb/CreateGuild()
+	if(!src.Alert("Are you sure you want to create a guild?")) return
 	var/name = input(usr,"What do you want the guild to be named?") as null|text
 	if(!name) return
 	var/guild/guild = new()
@@ -15,6 +16,7 @@ mob/Players/var/list/inGuilds = list()
 	usr << "[guild] is now created."
 
 /mob/Admin3/verb/assignGuildLeader(mob/Players/player in world)
+	if(!src.Alert("Are you sure you want to assign someone to guild leader?")) return
 	var/guild/whatGuild = input(usr, "What guild do you want to make [player.name] the leader of?") as null|anything in glob.guilds
 	if(!whatGuild) return
 	whatGuild.joinGuild(player)
@@ -29,6 +31,7 @@ mob/Players/var/list/inGuilds = list()
 	usr << "[whatGuild] can [whatGuild.givesRanking ? "now":"not"] give rankings"
 
 /mob/Admin3/verb/alterGuildGankTier()
+	if(!src.Alert("Are you sure you want to alter guild gank tier?")) return
 	var/guild/whatGuild = input(usr, "What guild ") as null|anything in glob.guilds
 	if(!whatGuild || !whatGuild.givesRanking) return
 	var/cancel = FALSE
@@ -56,6 +59,7 @@ mob/Players/var/list/inGuilds = list()
 	usr << "[player] has been forced to leave [whatGuild]"
 */
 /mob/Admin3/verb/changeGuildPayoutRate()
+	if(!src.Alert("Are you sure you want to change guild payout rate?")) return
 	var/guild/whatGuild = input(usr, "What guild do you want to change the pay out rate of?") as null|anything in glob.guilds
 	if(!whatGuild) return
 	var/payoutRateNew = input(usr, "What would you like to change their pay out rate to? 0.25 = 4 fragments to 1 money.", whatGuild.payOutRate) as num|null
@@ -394,6 +398,7 @@ guild
 
 /mob/Admin3/verb/AddGuildToRanking()
 	set category = "Politics"
+	if(!src.Alert("Are you sure you want to add a guild to the rankings?")) return
 	var/guild = input("Guild Name: ") as text
 	var/rank = input("Rank: ") as num
 	var/previous = glob.GUILD_RANKINGS[guild]
@@ -407,6 +412,7 @@ guild
 
 /mob/Admin3/verb/RemoveGuildFromRanking()
 	set category = "Politics"
+	if(!src.Alert("Are you sure you want to remove a guild from the rankings?")) return
 	var/guild = input("Guild Name: ") in glob.GUILD_RANKINGS
 	glob.GUILD_RANKINGS.Remove(guild)
 
