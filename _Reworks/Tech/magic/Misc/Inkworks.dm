@@ -27,12 +27,17 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
         Wolf = 0 // + Dash Range for dash skills 
         Dragon = 0 // Buff beams somehow?
         Lion = 0 // Shadow Mantle frenzy mechanics. 
+        list/Applied = list() // How many Inkworks you have applied
 
-    proc/calculateSlots() // Doing the actual math for InkworksSlots as we cannot initiate with this calculation
+    proc/calculateSlots(mob/P) // Doing the actual math for InkworksSlots as we cannot initiate with this calculation
         var/SlotCalculation = BASE_INKWORKS_SLOTS + Tier
-        Slots = SlotCalculation
+        Slots = SlotCalculation - Applied
+        if(Slots < 0)
+            liveDebugMsg("[P] has had their slots forcefully set to 0 as a guardrail measure, their InkworksDatum may be bugged.")
+            P << "Your Inkworks Slots were set to 0 as they somehow went into the negatives, please reach out to staff."
+            Slots = 0
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Inscribed_Ink
+/obj/Skills/Buffs/SlotlessBuffs/Inscribed_Ink
     MagicNeeded = 1
     ActiveMessage = "taps into the Ink inscribed into their their body."
     TextColor=rgb(182, 27, 148)
@@ -58,9 +63,13 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
         if(P.InkworksDatum.Lion) // Frenzy
             passives["Lion Spirit"] += 1
 
-    verb/Ink_Empowerment()
+    verb/Inscribed_Ink()
         set category = "Skills"
+        if(!usr.BuffOn(src)) adjust(usr)
+        src.Trigger(usr)
 
-mob/proc/ReduceInkworksUnlocked()
-    --InkworksDatum.Tier
-    InkworksDatum.calculateSlots()
+mob/proc/ReduceInkworksUnlocked(mob/P) // I know its a mob proc but redundancy just in case
+    --P.InkworksDatum.Tier
+    if(P.InkworksDatum.Tier < 0)
+        P.InkworksDatum.Tier = 0
+    P.InkworksDatum.calculateSlots()
