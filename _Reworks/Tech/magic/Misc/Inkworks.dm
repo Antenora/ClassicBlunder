@@ -38,7 +38,6 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
             Slots = 0
 
 /obj/Skills/Buffs/SlotlessBuffs/Inscribed_Ink
-    MagicNeeded = 1
     ActiveMessage = "taps into the Ink inscribed into their their body."
     TextColor=rgb(182, 27, 148)
     adjust(mob/P)
@@ -65,6 +64,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
 
     verb/Inscribed_Ink()
         set category = "Skills"
+        set name = "Inscribed Ink"
         if(!usr.BuffOn(src)) adjust(usr)
         src.Trigger(usr)
 
