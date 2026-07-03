@@ -126,6 +126,7 @@ client/proc/InitCharacterCard()
 	cardstatus.maptext_y = 48
 	screen += cardstatus
 	InitIntentChips()
+	InitFinisherBar()
 	UpdateCharacterCard()
 	UpdateCardText()
 	PositionCharacterCard()
@@ -346,8 +347,10 @@ client/proc/PositionCharacterCard()
 	PlaceIntentChips() // re-place on resize
 	UpdateDebuffs() // re-place on resize
 	UpdateTimedBuffs() // re-place on resize
+	PositionFinisherBar() // re-place on resize
 
 client/proc/ResetCharacterCard()
+	ResetFinisherBar()
 	if(card)
 		screen -= card
 		del card
@@ -781,3 +784,184 @@ client/proc/ShowDebuffPanel(atom/movable/shud/debufficon/di)
 	for(var/atom/movable/o in debuff_panel_objs)
 		screen += o
 	KineticEntrance(debuff_panel_objs)
+
+// New Tension bar
+#define FIN_X 276             // card right edge (6 + 264) + 6px gap
+#define FIN_BAR_BOTTOM 68     // anchor-row offset: bar top sits at the card's visible frame top
+#define FIN_FILL_X 34         // fill sweep starts here inside the fill icon
+#define FIN_TRACKW 224
+#define FIN_SPAN 190          
+#define FIN_GLOW_COLOR "#b48cff"
+#define FIN_EDGE_COLOR "#5d4f96"
+#define FIN_MINI_X1 92        // left mini slot (stage 2)
+#define FIN_MINI_X2 152       // right mini slot (stage 3)
+#define FIN_MINI_BOTTOM 70    
+#define FIN_MINI_W1 64
+#define FIN_MINI_W2 62
+#define FIN_MINIMASK_W 64
+
+var/FIN_TRACK_RSC = 'HUD/fin_track.png'
+var/FIN_FILL_RSC = 'HUD/fin_fill.png'
+var/FIN_MASK_RSC = 'HUD/fin_mask.png'
+var/FIN_MINIMASK = 'HUD/fin_minimask.png'
+var/FIN_MINIFILL1 = 'HUD/fin_minifill1.png'
+var/FIN_MINIFILL2 = 'HUD/fin_minifill2.png'
+
+client
+	var/tmp
+		atom/movable/shud/fin_track
+		atom/movable/shud/fin_fill
+		list/fin_minis            // per-slot fill overlays
+		fin_mini_count = -1
+		fin_main_last = 0
+		list/fin_mini_last
+		fin_shown = 0
+		fin_glowing = FALSE
+
+client/proc/InitFinisherBar()
+	ResetFinisherBar()
+	fin_track = new /atom/movable/shud/orbpart
+	fin_track.icon = FIN_TRACK_RSC
+	fin_track.layer = MCARD_LAYER
+	fin_track.filters = filter(type="outline", size=1, color=FIN_EDGE_COLOR)   // edge flair so the empty bar reads
+	screen += fin_track
+	fin_fill = new /atom/movable/shud/orbpart
+	fin_fill.icon = FIN_FILL_RSC
+	fin_fill.layer = MCARD_LAYER + 0.01
+	fin_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x=-FIN_TRACKW)   // start empty
+	screen += fin_fill
+	fin_minis = list()
+	fin_mini_last = list()
+	fin_mini_count = -1
+	fin_main_last = 0
+	HideFinisherBar()
+
+client/proc/ResetFinisherBar()
+	for(var/atom/movable/o in list(fin_track, fin_fill))
+		if(o)
+			screen -= o
+			del o
+	fin_track = null
+	fin_fill = null
+	if(fin_minis)
+		while(fin_minis.len)
+			var/atom/movable/o = fin_minis[fin_minis.len]
+			fin_minis.len--
+			screen -= o
+			del o
+	fin_minis = null
+	fin_mini_last = null
+	fin_mini_count = -1
+	fin_shown = 0
+	fin_glowing = FALSE
+
+client/proc/HideFinisherBar()
+	fin_shown = 0
+	SetFinisherGlow(FALSE)
+	if(fin_track) fin_track.alpha = 0
+	if(fin_fill) fin_fill.alpha = 0
+	if(fin_minis)
+		for(var/atom/movable/o in fin_minis)
+			o.alpha = 0
+
+// pulsing ready-glow around the whole bar silhouette
+client/proc/SetFinisherGlow(on)
+	if(fin_glowing == on) return
+	fin_glowing = on
+	if(!fin_track) return
+	if(on)
+		fin_track.filters += filter(type="drop_shadow", x=0, y=0, size=2, offset=1, color=FIN_GLOW_COLOR)
+		spawn(1)   // same-tick filter animation snaps instead of animating
+			if(fin_glowing && fin_track && fin_track.filters && fin_track.filters.len >= 2)
+				animate(fin_track.filters[2], size = 6, time = 9, loop = -1, easing = SINE_EASING)
+				animate(size = 2, time = 9, easing = SINE_EASING)
+	else
+		fin_track.filters = filter(type="outline", size=1, color=FIN_EDGE_COLOR)
+
+client/proc/RebuildFinisherMinis(count)
+	fin_mini_count = count
+	if(fin_minis)
+		while(fin_minis.len)
+			var/atom/movable/o = fin_minis[fin_minis.len]
+			fin_minis.len--
+			screen -= o
+			del o
+	fin_minis = list()
+	fin_mini_last = list()
+	for(var/i = 1 to count)
+		var/atom/movable/shud/orbpart/m = new
+		m.icon = (i == 1) ? FIN_MINIFILL1 : FIN_MINIFILL2
+		m.layer = MCARD_LAYER + 0.02
+		m.filters = filter(type="alpha", icon=FIN_MINIMASK, x=-FIN_MINIMASK_W)   // start empty
+		m.alpha = fin_shown ? 255 : 0
+		screen += m
+		fin_minis += m
+		fin_mini_last += 0
+	PositionFinisherBar()
+
+client/proc/PositionFinisherBar()
+	if(!fin_track) return
+	var/list/v = splittext("[view]", "x")
+	if(v.len < 2) return
+	var/th = text2num(v[2])
+	if(!th) return
+	var/row = max(th - (MCARD_TILES_TALL - 1), 1)   // same anchor row as the card
+	var/sl = "1:[FIN_X],[row]:[FIN_BAR_BOTTOM]"
+	fin_track.screen_loc = sl
+	fin_fill.screen_loc = sl
+	if(fin_minis)
+		for(var/i = 1 to fin_minis.len)
+			var/atom/movable/o = fin_minis[i]
+			o.screen_loc = "1:[FIN_X + ((i == 1) ? FIN_MINI_X1 : FIN_MINI_X2)],[row]:[FIN_MINI_BOTTOM]"
+
+client/proc/UpdateFinisherBar()
+	if(!mob || !fin_track) return
+	if(!mob.StyleActive || !mob.StyleBuff || !card)
+		if(fin_shown) HideFinisherBar()
+		return
+	var/stage = 1
+	if(mob.StyleBuff.FinisherStage > 1) stage = mob.StyleBuff.FinisherStage
+	var/want = min(stage, 3) - 1          // visual mini slots; mechanics are unbounded
+	if(fin_mini_count != want) RebuildFinisherMinis(want)
+	if(!fin_shown)
+		fin_shown = 1
+		fin_track.alpha = 255
+		fin_fill.alpha = 255
+		for(var/atom/movable/o in fin_minis)
+			o.alpha = 255
+	var/barMax = mob.getMaxTensionValue()
+	if(barMax < 1) barMax = 1
+	var/t = mob.Tension
+
+	var/frac = t / barMax
+	if(frac > 1) frac = 1
+	if(frac < 0) frac = 0
+	var/px = frac ? FIN_FILL_X + round(FIN_SPAN * frac) : 0
+	if(px != fin_main_last)
+		var/tm = OrbAnimTime(fin_main_last, px)
+		if(tm) animate(fin_fill.filters[1], x = px - FIN_TRACKW, time = tm, easing = SINE_EASING)
+		else fin_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x = px - FIN_TRACKW)
+		fin_main_last = px
+
+	for(var/i = 1 to fin_minis.len)
+		var/atom/movable/shud/m = fin_minis[i]
+		var/mf = (t - i * barMax) / barMax
+		if(mf > 1) mf = 1
+		if(mf < 0) mf = 0
+		var/mpx = mf ? round(((i == 1) ? FIN_MINI_W1 : FIN_MINI_W2) * mf) : 0
+		if(mpx != fin_mini_last[i])
+			var/tm2 = OrbAnimTime(fin_mini_last[i], mpx)
+			if(tm2) animate(m.filters[1], x = mpx - FIN_MINIMASK_W, time = tm2, easing = SINE_EASING)
+			else m.filters = filter(type="alpha", icon=FIN_MINIMASK, x = mpx - FIN_MINIMASK_W)
+			fin_mini_last[i] = mpx
+
+	// states: locked = grey fill; finisher ready = pulsing glow around the bar
+	if(mob.tempTensionLock)
+		fin_fill.color = "#666666"
+		SetFinisherGlow(FALSE)
+	else if(t >= barMax)
+		fin_fill.color = null
+		SetFinisherGlow(TRUE)
+	else
+		fin_fill.color = null
+		SetFinisherGlow(FALSE)

@@ -870,6 +870,10 @@ obj
 							return
 						if(usr.AttackQueue)
 							return
+						// firing consumes ALL stored tension regardless of stage reached
+						var/finstage = 1
+						if(usr.StyleBuff && usr.StyleBuff.FinisherStage > 1)
+							finstage = min(round(usr.Tension / maxTension), usr.StyleBuff.FinisherStage)
 						usr.Tension=0
 						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
 							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
@@ -881,8 +885,12 @@ obj
 						usr.tryIncreaseTension();//2026.01.13 - reverting "only max HT lvl gets unique finisher"
 						if(usr.StyleBuff.Finisher)//there's probably a less clunky version way of ensuring finishers are only used once
 							var/path = usr.StyleBuff.Finisher
-							if(!ispath(usr.StyleBuff.Finisher))
-								path=text2path(usr.StyleBuff.Finisher)
+							if(finstage >= 2 && usr.StyleBuff.Finisher2)   // stage finishers fall back to the highest defined below
+								path = usr.StyleBuff.Finisher2
+							if(finstage >= 3 && usr.StyleBuff.Finisher3)
+								path = usr.StyleBuff.Finisher3
+							if(!ispath(path))
+								path=text2path(path)
 							var/obj/Skills/Queue/q
 							if(!locate(path, usr))
 								q = new path
