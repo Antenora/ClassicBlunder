@@ -41,8 +41,7 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "SoulFire"= "dealing damage to someone also deals damage to their mana, mana capacity, and fatigues them at a rate based on passive value.",
 "Siphon"= "restores energy (and reduces the damage) when hit by a Projectile, spiritsword/spirithand, hybridstrike, spiritstrike",
 "ManaStats"= "increases your Stats based on your Mana.",
-"SpiritFlow"= "increases autohit and projectile damage based on your force",
-"CallousedFeet"= "increases autohit damage based on your endurance",
+"SpiritFlow"= "increases autohit damage based on your force",
 "ManaGeneration"= "increases mana regen, also allows you regain mana on being hit",
 "DualCast"= "spells hit again if you have the mana necessary to cast it again",
 "Juggernaut"= "increased knockbacks/launch resistance",
@@ -125,6 +124,10 @@ var/list/PassiveInfo = list("Extend"="increases the range of armed autohits base
 "MartialMagic"="You can cast Magic without a Magic Style or Focus,",
 "SpaceWalk"="Immune to environmental tile effects (ie space draining oxygen, lava burning you) except for static tiles.",
 "StaticWalk"="Prevents you from losing oxygen and health on static tiles.",
-"Fa Jin"="Enhances queue damage."
-
+"Fa Jin"="Enhances queue damage.",
+"Fox Spirit"="Multiplies your SpiritSword, SpiritHand and Spiritflow passives by 40%",
+"Bear Spirit"="Allows you to constantly attack and warp onto a stunned target next to you. Do not move while using this.",
+"Wolf Spirit"="Adds extra range to your dash attacks",
+"Dragon Spirit"="Multiplies your beam charge rate by 5 without decreasing its damage.",
+"Lion Spirit"="Grans you access to Frenzy as if you were a Black Flame Wilder."
 );

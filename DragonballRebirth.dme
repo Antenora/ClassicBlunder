@@ -585,6 +585,7 @@
 #include "_Reworks\Tech\magic\Alchemy\AlchemyKnowledge.dm"
 #include "_Reworks\Tech\magic\Alchemy\Flask.dm"
 #include "_Reworks\Tech\magic\Enchanting\EnchantKnowledge.dm"
+#include "_Reworks\Tech\magic\Misc\Inkworks.dm"
 #include "_Reworks\Tech\magic\Misc\MiscKnowledge.dm"
 #include "_Reworks\Tech\magic\rituals\rituals_core.dm"
 #include "_Reworks\Unsorted\AdminSandstorm.dm"

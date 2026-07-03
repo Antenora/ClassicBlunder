@@ -6,7 +6,7 @@ globalTracker/var/FrenzyStackDivisor = 5
 globalTracker/var/FrenzyNerf = 1
 
 /mob/proc/IsDarkDragonPlayer()
-	return istype(src, /mob/Players) && isRace(DRAGON) && Class == "Dark"
+	return (istype(src, /mob/Players) && isRace(DRAGON) && Class == "Dark") || passive_handler.Get("Lion Spirit")
 
 /// hostile Frenzy counts like Sheared stacks
 /mob/proc/GetEffectiveShearForStackingEffects()

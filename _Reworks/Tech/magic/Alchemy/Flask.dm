@@ -149,3 +149,6 @@ mob/proc/GetFlaskCD() // Determines our cooldown
 
 mob/proc/GetMaxFlaskSlots() // adds tier to the define, used in _UtilityX.dm line 1550
     return BASE_MAX_SLOTS + equippedFlask.Tier
+
+mob/proc/ReduceAlchemyUnlocked()
+    --AlchemyUnlocked

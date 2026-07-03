@@ -298,7 +298,23 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			TimeMagicUnlocked++
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds, src))
 				src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds)
-
+		// CREST END // 
+		// INKWORKS START //
+		if("Inkworks")
+			InkworksDatum.Tier = 0 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+			src.contents += new /obj/Skills/Utility/Bestow_Inkwork
+		if("Advanced Inkworks")
+			InkworksDatum.Tier = 1 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Master Inkworks")
+			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Tales of The Living")
+			InkworksTypes.Add("Match Girl", "Ice Queen", "Erlking")
+		if("Tales of The Spirits")
+			InkworksTypes.Add("Fox Spirit", "Bear Spirit", "Wolf Spirit", "Dragon Spirit", "Lion Spirit")
+		// INKWORKS END //
 		// TECH SHIT //
 		if("CyberEngineering")
 			CyberEngineeringUnlocked=1
