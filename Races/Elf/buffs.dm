@@ -26,6 +26,7 @@
     OffMessage="dispels their God Slicer!"
     verb/Transfigure_God_Slicer()
         set category="Utility"
+        set hidden = 1
         var/Choice
         if(!usr.BuffOn(src))
             var/modify_sword_num = 1

@@ -43,6 +43,7 @@
 	if(!HeldSkill) return
 	DamageMult = initial(DamageMult)
 	AccMult    = initial(AccMult)
+	IconLock   = initial(IconLock)   
 	LockX      = initial(LockX)
 	LockY      = initial(LockY)
 	Distance   = initial(Distance)
@@ -57,12 +58,10 @@
 /client/var/tmp/list/held_skill_key_cache = null
 /client/var/tmp/held_skill_cache_build_start = 0
 /client/var/tmp/held_skill_macro_set = "macro"
+/client/control_freak = CONTROL_FREAK_ALL
 
 /client/New(topicdata)
 	..()
-	// Kick off the initial macro scan shortly after connect so it's ready before
-	// the player reaches gameplay. Runs every 5 minutes in the background after that.
-	spawn(5) RebuildHeldSkillKeyCache()
 
 // Charge state
 
@@ -76,6 +75,7 @@
 	var/tmp/held_skill_macro_key          = null
 	var/tmp/held_skill_last_release       = 0
 	var/tmp/held_skill_from_macro         = 0
+	var/tmp/held_skill_pending_key        = null   
 
 
 /proc/_normalizeHeldName(s)
@@ -120,29 +120,80 @@
 	return h
 
 
+/mob/proc/CanUseSkill(obj/Skills/Z)
+	if(!Z) return FALSE
+	if(!CanAttack(-1)) return FALSE  
+	if(src.Airborne) return FALSE
+	if(src.OnMagicalVehicle())
+		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
+		return FALSE
+	if(src.passive_handler.Get("Silenced"))
+		src << "<font color='red'>You can't use [Z], you are silenced!</font>"
+		return FALSE
+	if(Z.Sealed)
+		src << "<font color='red'>You can't use [Z], it is sealed!</font>"
+		return FALSE
+	if(Z.Using || Z.cooldown_remaining)
+		src << "<font color='red'>[Z] is on cooldown.</font>"
+		return FALSE
+	if(src.Secret == "Heavenly Restriction" && !Z.heavenlyRestrictionIgnore)
+		if(src.secretDatum?:hasRestriction("All Skills")) return FALSE
+		if(Z.NeedsSword && src.secretDatum?:hasRestriction("Armed Skills")) return FALSE
+	if(Z.NeedsSword && !src.EquippedSword() && !src.HasBladeFisting() && !src.UsingBattleMage())
+		src << "<font color='red'>You need a sword to use this technique!</font>"
+		return FALSE
+	// resource requirements -- availability only; the cost is deducted when the skill fires
+	if(Z.HealthCost && src.Health < Z.HealthCost * glob.WorldDamageMult)
+		src << "<font color='red'>You don't have enough health to use [Z].</font>"
+		return FALSE
+	if(Z.WoundCost && src.TotalInjury + Z.WoundCost * glob.WorldDamageMult > 99)
+		src << "<font color='red'>You're too wounded to use [Z].</font>"
+		return FALSE
+	if(Z.EnergyCost)
+		var/drain = src.passive_handler["Drained"] ? Z.EnergyCost * (1 + src.passive_handler["Drained"]/10) : Z.EnergyCost
+		if(src.Energy < drain && !src.CheckSpecial("One Hundred Percent Power") && !src.CheckSpecial("Fifth Form") && !CheckActive("Eight Gates"))
+			src << "<font color='red'>You don't have enough energy to use [Z].</font>"
+			return FALSE
+	if(Z.FatigueCost && src.TotalFatigue + Z.FatigueCost > 99)
+		src << "<font color='red'>You're too fatigued to use [Z].</font>"
+		return FALSE
+	if(Z.ManaCost && !src.HasDrainlessMana())
+		var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (src.passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+		drain *= src.ChakraCostMult(Z)
+		if(drain <= 0) drain = 0.5
+		var/need = src.TomeSpell(Z) ? drain * (1 - (0.45 * src.TomeSpell(Z))) : drain
+		if(src.ManaAmount < need)
+			src << "<font color='red'>You don't have enough mana to activate [Z].</font>"
+			return FALSE
+	if(Z.CapacityCost && src.TotalCapacity + Z.CapacityCost > 99)
+		src << "<font color='red'>You don't have enough capacity to use [Z].</font>"
+		return FALSE
+	if(Z.CorruptionCost && src.Corruption - Z.CorruptionCost < 0)
+		src << "<font color='red'>You don't have enough Corruption to activate [Z].</font>"
+		return FALSE
+	return TRUE
+
 /mob/proc/BeginHeldSkill(var/obj/Skills/Z)
 	var/from_macro = held_skill_from_macro && (world.time - held_skill_from_macro) <= HELD_MACRO_FLAG_WINDOW
 	held_skill_from_macro = 0
+	var/hotbar_key = held_skill_pending_key  
+	held_skill_pending_key = null
 
 	if(held_skill) return  // Already charging something
 	if(!Z || !Z.HeldSkill) return
 	var/client/C = client
 	if(!C) return
-	if(src.Airborne) return
-	if(src.OnMagicalVehicle())
-		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
-		return
+	if(!CanUseSkill(Z)) return 
 
 	// All guards run before touching any charge state.
 
-	if(!C.held_skill_key_cache)
-		var/elapsed_s = C.held_skill_cache_build_start > 0 ? round((world.time - C.held_skill_cache_build_start) / 10) : 0
-		var/remaining_s = max(0, 10 - elapsed_s) + 30
-		src << "<font color='red'>Macro bindings are still loading. Try again in [remaining_s] seconds.</font>"
+	var/list/keys
+	if(hotbar_key)
+		keys = list(hotbar_key)
+		from_macro = TRUE
+	else
+		src << "<font color='red'>Put [Z.name] in a hotbar slot and hold its key from there.</font>"
 		return
-
-	// Every key this skill is bound to, for supporting the same skill on 2+ keys
-	var/list/keys = findHeldSkillKeys(C, Z)
 
 	// Clicked from the verb panel / command line instead of pressed on a key
 	if(!from_macro)
@@ -161,19 +212,9 @@
 	if(held_skill_last_release && world.time - held_skill_last_release < 5)
 		return
 
-	// Cooldown / in-use check
-	if(Z.Using || Z.cooldown_remaining)
-		src << "<font color='red'>[Z.name] is on cooldown.</font>"
-		return
-
-	if(Z.NeedsSword)
-		var/obj/Items/Sword/s = EquippedSword()
-		if(!s && !HasBladeFisting() && !UsingBattleMage())
-			src << "<font color='red'>You need a sword equipped to use [Z.name]!</font>"
-			return
-
-	for(var/k in keys)
-		winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
+	if(!hotbar_key)
+		for(var/k in keys)
+			winset(C, "heldskill_up_[k]", "type=macro;parent=[C.held_skill_macro_set];name=[k]+UP;command=Release-Held-Skill")
 
 	held_skill        = Z
 	held_charge_start = world.time
@@ -285,7 +326,7 @@
 			var/norm_cmd = _normalizeHeldName(original_cmd)
 
 			var/matched_shortcut = FALSE
-			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+			for(var/sc_n = 1, sc_n <= 12, sc_n++)
 				if(norm_cmd == "skill shortcut [sc_n]")
 					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
 					shortcut_key_map["[sc_n]"] |= key_name
@@ -308,7 +349,7 @@
 				original_cmd = copytext(cmd, length(HELD_MACRO_PREFIX) + 1)
 			var/norm_cmd = _normalizeHeldName(original_cmd)
 			var/matched_shortcut = FALSE
-			for(var/sc_n = 1, sc_n <= 10, sc_n++)
+			for(var/sc_n = 1, sc_n <= 12, sc_n++)
 				if(norm_cmd == "skill shortcut [sc_n]")
 					if(!shortcut_key_map["[sc_n]"]) shortcut_key_map["[sc_n]"] = list()
 					shortcut_key_map["[sc_n]"] |= k
@@ -324,7 +365,7 @@
 
 	var/mob/sc_mob = src.mob
 	if(sc_mob && sc_mob.shortcuts)
-		for(var/sc_n = 1, sc_n <= 10, sc_n++)
+		for(var/sc_n = 1, sc_n <= 12, sc_n++)
 			var/list/sc_keys = shortcut_key_map["[sc_n]"]
 			if(!sc_keys || !sc_keys.len) continue
 			var/obj/Skills/sc_skill = sc_mob.shortcuts.vars["shortcut[sc_n]"]

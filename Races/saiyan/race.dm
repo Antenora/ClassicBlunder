@@ -6,6 +6,7 @@ race
 
 		locked = FALSE
 
+		power = 3;
 		strength = 1.5
 		endurance = 1.5
 		force = 1.5

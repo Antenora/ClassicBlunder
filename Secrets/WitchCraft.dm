@@ -1,8 +1,8 @@
 /**
- * 
+ *
  * https://docs.google.com/document/d/1sX9XgPEc-sWZ3RnSV4ujga0DnGVbiYtqQV7S6mkpHLw/edit
- * 
- * 
+ *
+ *
  */
 
 // Soul for Power
@@ -35,6 +35,7 @@ obj/proc/checkIfNoPassives(mob/who)
 	who.passive_handler.Set("Maki", 1)
 
 mob/Admin3/verb/GiveWitchBook()
+	if(!src.Alert("Are you sure you want to give someone a witch book?")) return
 	var/mob/who = input(usr, "Who do you wish to grant this crack book") in players
 	var/obj/Items/WitchCraft/WitchesBook/G = new
 	G.loc = who
@@ -57,9 +58,10 @@ mob/Admin3/verb/GiveWitchBook()
 	verb/Kill_Essence(mob/M in get_step(usr, usr.dir))
 		set name = "Drain Essence (Lethal)"
 		set category = "Skills"
+		set hidden = 1
 		if(!M.KO)
-			usr << "[M] needs to be KO'd!"		
-			return       
+			usr << "[M] needs to be KO'd!"
+			return
 		var/kill = input(usr, "You're about to kill [M], by ripping apart their soul from the body, creating nothing but a husk of dust behind, are you sure?") in list("Yes", "No")
 		switch(kill)
 			if("Yes")
@@ -70,10 +72,11 @@ mob/Admin3/verb/GiveWitchBook()
 						M.Death(usr, "an icy breath upon their soul, their body crumbling to dust!", SuperDead = 1, NoRemains = 1)
 						src.CurrentEssenceAmount += 5
 						usr << "You feel yourself empowered, your [src.name] now contains [CurrentEssenceAmount] essence!"
-	
+
 	verb/Take_Essence(mob/M in get_step(usr, usr.dir))
 		set name = "Take Essence"
 		set category = "Skills"
+		set hidden = 1
 		if(!M.KO)
 			usr << "[M] needs to be KO'd!"
 			return
@@ -82,12 +85,13 @@ mob/Admin3/verb/GiveWitchBook()
 			view(10) << output("<font color=red>[M] feels as if their body decays slightly at the magic of [usr]..!!", "output")
 			TakeEssenceCoolDown = world.realtime + 4 HOURS
 			usr << "You feel yourself slightly empowered, your [src.name] now contains [CurrentEssenceAmount] essence!"
-		else 
+		else
 			usr << "You're on cooldown till [time2text(TakeEssenceCoolDown, "hh:ss") ]"
 
 	verb/Give_Essence()
 		set name = "Give Essence"
 		set category = "Skills"
+		set hidden = 1
 		var/list/PeopleWithBooks = list("Cancel", "----")
 
 		for(var/mob/M in oview(20, src))
@@ -101,13 +105,14 @@ mob/Admin3/verb/GiveWitchBook()
 			var/give = input(usr, "You have currently [src.CurrentEssenceAmount], how many of them do you wish to give to [who]?", "Give Essence") as num
 			if((src.CurrentEssenceAmount - give) < 0)
 				return
-			else 
+			else
 				for(var/obj/Items/WitchCraft/WitchesBook/G in who)
 					G.CurrentEssenceAmount += give
 
 	verb/Make_Deal(mob/M in get_step(usr, usr.dir))
 		set name = "Witch Apprenticeship"
 		set category = "Roleplay"
+		set hidden = 1
 		if(canPact)
 			SunderSoul(M, usr)
 			checkIfNoPassives(M)
@@ -123,9 +128,9 @@ mob/Admin3/verb/GiveWitchBook()
 				weapons += Weapon
 			if(weapons.len == 0)
 				usr << "You do not have any sword to enchant"
-				return .	
+				return .
 			var/obj/Items/Sword/Weapon = input(usr, "Select which of the weapons you wish to Fel-Masterwork", "Fel Masterwork") in weapons + "Cancel"
-			if(Weapon == "Cancel") 
+			if(Weapon == "Cancel")
 				usr << "You chose to reserve your Essence"
 				return .
 			Weapon.Element = "Felfire"
@@ -265,7 +270,7 @@ mob/Admin3/verb/GiveWitchBook()
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Witch/WitchCounter
 	IconLock = 'ExcaliTrail.dmi'
-	DefMult = 1.3 
+	DefMult = 1.3
 	CounterSpell = 1
 	CounterMaster = 2
 	BuffName = "WitchCounter"

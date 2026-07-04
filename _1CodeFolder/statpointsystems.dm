@@ -47,6 +47,7 @@ obj/Redo_Stats
 		del src
 	verb/Redo_Stats()
 		set category="Other"
+		set hidden = 1
 		RedoStats(usr)
 
 
@@ -64,6 +65,7 @@ proc/Define_Average(var/i=1)
 
 mob/proc/Redo_Stats()
 	set category="Other"
+	set hidden = 1
 	Redoing_Stats=1
 	RacialStats()
 	UpdateBio()

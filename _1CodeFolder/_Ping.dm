@@ -3,6 +3,7 @@ mob
 	verb
 		Ping(var/mob/m in view(15, src))
 			set category="Other"
+			set hidden = 1
 			if(!(world.time > usr.verb_delay)) return
 			usr.verb_delay=world.time+1
 			if(!src.PingCooldown)

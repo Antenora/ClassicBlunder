@@ -85,6 +85,7 @@ mob/proc/stat_retwo()
 
 mob/Admin3/verb/Assign_Stat_Redo(mob/m in players)
 	if(!m) return
+	if(!src.Alert("Are you sure you want to assign a stat redo?")) return
 	m << "You've been assigned a stat redo!"
 	usr << "You've assigned [m] a stat redo!"
 	m.stat_redo()

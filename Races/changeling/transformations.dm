@@ -2,7 +2,6 @@ transformation
 	changeling
 		second_form
 			PUSpeedModifier = 1.5
-			intimidation = 3
 			pot_trans = 1
 			BioArmorMax = -25
 			endurance = 0.8
@@ -16,7 +15,6 @@ transformation
 
 		third_form
 			PUSpeedModifier = 1.5
-			intimidation = 3
 			pot_trans = 1
 			BioArmorMax = -50
 			endurance = 0.8
@@ -30,7 +28,6 @@ transformation
 
 		final_form
 			PUSpeedModifier = 1.5
-			intimidation = 3
 			pot_trans = 3
 			BioArmorMax = -75
 			endurance = 0.8
@@ -44,7 +41,6 @@ transformation
 
 		fifth_form
 			PUSpeedModifier = 1.5
-			intimidation = 10
 			endurance = 0.8
 			defense = 0.8
 			offense = 1.25

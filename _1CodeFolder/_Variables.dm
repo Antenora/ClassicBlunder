@@ -92,7 +92,6 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
-	Intimidation=1//Adding this here for ezpz stuff.
 	HealthCut=0
 	EnergyMax=100
 	Energy=100
@@ -312,6 +311,7 @@ mob/var
 	//Knowledge Variables
 	list/UnlockedTechnology=list()//this will hold the types of unlocked technology AND enchantment
 	list/PotionTypes=list()//determines what herbs you can use
+	list/InkworksTypes=list() // Determines what Inkworks you can inscribe
 
 	GrimoiresMade//Holds how many Grimoire types you've made total
 

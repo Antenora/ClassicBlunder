@@ -178,6 +178,7 @@ obj
 					StaffAscension=p.SagaLevel
 			verb/Transfigure_Chaos_Buster()
 				set category="Utility"
+				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")

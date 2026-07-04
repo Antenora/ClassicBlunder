@@ -84,6 +84,7 @@ obj
 				applyDemonInnovationEffect(usr, can_fire)
 			verb/Disable_Innovate()
 				set category = "Other"
+				set hidden = 1
 				disableInnovation(usr)
 		Stinger
 			SkillCost= TIER_1_COST
@@ -299,6 +300,7 @@ obj
 			ActiveMessage="swings their weapon in a quick pattern!"
 			verb/Disable_Innovate()
 				set category = "Other"
+				set hidden = 1
 				disableInnovation(usr)
 			adjust(mob/p)
 				if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))

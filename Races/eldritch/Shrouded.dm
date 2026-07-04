@@ -231,6 +231,7 @@ obj/Skills/Utility
         desc="Offer a pact to another character to allow you to teleport to them... always."
         verb/Tether_Pact()
             set category="Utility"
+            set hidden = 1
             var/list/PactOptions = usr.canOfferTether(src);//will be 0 if it is invalid; will return a list otherwise
             if(!PactOptions) return;
             Using=1;
@@ -260,6 +261,7 @@ obj/Skills/Utility
 
         verb/Tether_Warp()
             set category="Utility"
+            set hidden = 1
             var/list/WarpOptions = usr.canTetherWarp(src);
             if(!WarpOptions) return;
             Using=1;

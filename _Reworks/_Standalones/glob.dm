@@ -13,6 +13,7 @@ var/globalTracker/glob = new()
 /mob/Admin2/verb/editGlobalVariables()
 	set name = "Edit Global Variables"
 	set category = "Admin"
+	if(!src.Alert("Are you sure you want to edit global variables?")) return
 	var/atom/A = glob
 	var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
 	var/list/B=new
@@ -34,6 +35,7 @@ var/globalTracker/glob = new()
 	usr<<browse(Edit,"window=[A];size=450x600")
 
 /mob/Admin3/verb/Debuff_Apply(n as num)
+	if(!src.Alert("Are you sure you want to change global debuff intensity?")) return
 	glob.BURN_INTENSITY = n
 	glob.SHOCK_INTENSITY = n
 	glob.SLOW_INTENSITY = n
@@ -140,6 +142,7 @@ progressTracker
 		T1_STYLES = list(10, 20, 25, 35)
 		T2_STYLES = list(25, 35, 45, 55)
 		T3_STYLES = list(50)
+		T4_STYLES = list(70)
 		T1_SIGS = list(10, 20, 30)
 		T2_SIGS = list(25, 45)
 		T3_SIGS = list(50)
@@ -166,6 +169,7 @@ globalTracker
 			glob.progress.T1_STYLES = list(10, 20, 25, 35)
 			glob.progress.T2_STYLES = list(25, 35, 45, 55)
 			glob.progress.T3_STYLES = list(50)
+			glob.progress.T4_STYLES = list(70)
 			glob.progress.T1_SIGS = list(10, 20, 30)
 			glob.progress.T2_SIGS = list(25, 45)
 			glob.progress.T3_SIGS = list(50)
@@ -236,7 +240,7 @@ globalTracker
 		BASE_HELL_SCALING_RATIO = 0.01
 		HELL_SCALING_MULT = 1.5
 		UNDERDOG_DIVISOR = 4
-		CONQ_HAKI_RACES = list(HUMAN, DEMON, SAIYAN, NAMEKIAN, MAJIN, MAKYO, DRAGON, BEASTKIN, GAJALAKA, CHANGELING)
+		CONQ_HAKI_RACES = list(HUMAN, DEMON, SAIYAN, NAMEKIAN, MAJIN, MAKYO, DRAGON, BEASTKIN, CHANGELING)
 		EXTRA_CONQ_HAKI_POWER = 1.5
 		CONQ_HAKI_CHANCE = 3
 		MONEYORFRAGMENTS = 1 // 1 = fragments, 0 = cash
@@ -664,7 +668,7 @@ globalTracker
 "Scorpio" = FALSE,"Capricorn" = FALSE,"Aquarius" = FALSE,"Pisces" = FALSE, "Sagittarius" = FALSE)
 		list/Keychains=list("Kingdom Key", "Kingdom Key D", "Flame Liberator", "Wayward Wind", "Rainfell", "Oathkeeper", "Way To Dawn", "Bond of Flame", "Sweetstack", "Two Become One",\
 		"Oblivion", "Fenrir", "No Name", "Lionheart", "Spellbinder", "Star Seeker", "Lost Memory",\
-		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory")
+		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory", "Fairytale Endings")
 		list/FinalKeychains=list("Ultima Weapon", "X-Blade", "Ebony Slumber", "Prismatic Dreams")
 		CHIKARA_WHITELIST = FALSE
 

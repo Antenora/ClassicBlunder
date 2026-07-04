@@ -92,6 +92,7 @@
 				Finisher="/obj/Skills/Queue/Finisher/Jet_Kindling"
 		verb/Swap_Stance()
 			set category="Skills"
+			set hidden = 1
 			if(usr.BuffOn(src))
 				turnOff(usr)
 			swap_stance()

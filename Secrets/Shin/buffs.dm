@@ -37,6 +37,7 @@
 
     verb/Shin_Colour()
         set category = "Utility"
+        set hidden = 1
         var/colour = input(usr, "Select your Shin Colour", "Shin Colour Selection", rgb(203, 198, 47)) as color | null ;
         ManaGlow = colour
 

@@ -11,6 +11,7 @@ var/global/CLAMP_POWER = TRUE
 
 /mob/Admin3/verb/Clamp_Power()
 	set name = "Enable Power Clamp"
+	if(!src.Alert("Are you sure you want to toggle power clamp?")) return
 	glob.CLAMP_POWER = !glob.CLAMP_POWER
 	src << "Power clamp is now [glob.CLAMP_POWER ? "enabled" : "disabled"]."
 

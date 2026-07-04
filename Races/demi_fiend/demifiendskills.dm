@@ -1518,6 +1518,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 		W.owner = p
 		W.DamageMult = (8 + p.AscensionsAcquired) * benefit
 		W.StrOffense = 2
+		Cooldown()
 
 	verb/Deathbound()
 		set category="Skills"

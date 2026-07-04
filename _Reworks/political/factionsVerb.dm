@@ -53,6 +53,7 @@
 /mob/verb/customizePU()
     set name = "Customize: PU Charging"
     set category = "Other"
+    set hidden = 1
     if(!src.client)
         return
     var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
@@ -67,19 +68,11 @@
     else
         customPUnameInclude = FALSE
 
-/mob/verb/Admins()
-    set name = "Admins"
-    set category = "Other"
-    for(var/mob/p in players)
-        if(p.Admin)
-            src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"
-
-
-
 /*
 /mob/verb/FactionCount()
     set name = "Faction Count"
     set category = "Other"
+    set hidden = 1
     var/list/total = FACTIONS
     for(var/mob/Players/M in players)
         if(!M.client)
@@ -105,6 +98,7 @@ characterInformation*/
 /mob/var/hidingInformation = FALSE
 /mob/verb/Hide_Information()
     set category = "Other"
+    set hidden = 1
     hidingInformation = !hidingInformation
     src << "The ID Card is [hidingInformation ? "hidden." : "not hidden."]"
 

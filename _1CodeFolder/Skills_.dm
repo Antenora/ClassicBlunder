@@ -4,7 +4,8 @@ mob/var/cooldownAnnounce = 1
 mob/verb
 	CooldownAnnouncement()
 		set category = "Other"
-		set name = "Toggle Cooldown Announcement"
+		set hidden = 1
+		set name = "CD Announce"
 		if(usr.cooldownAnnounce)
 			usr.cooldownAnnounce = 0
 			usr << "Cooldown Announcement Disabled."
@@ -17,6 +18,8 @@ mob/verb
 obj/Skills/var
 	cooldown_remaining = 0
 	cooldown_start
+	cooldown_start_wt = 0   
+	cooldown_full = 0       
 	tmp/halve_next_cd = 0
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
@@ -60,6 +63,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			return
 		var/forcemessage=0
 		var/list/lockedoutSkills = list()
+		var/was_fresh = !Time   // a passed Time = an RP-resume re-apply; only a FRESH cast (re)sets cooldown_full
 		if(!Time && src && m)
 			if(!src.CooldownStatic)
 				if(glob.SPEED_COOLDOWN_MODE)
@@ -74,6 +78,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 					var/elem_cd_red = m.getSpellElementCooldownReduction(src.SpellElement)
 					if(elem_cd_red)
 						modify *= (1 - min(elem_cd_red, 0.80))
+				if(src.ChakraNature && m.ChakraSpecialization == src.ChakraNature)
+					modify *= 0.85
 				if(CooldownDrag>=1)
 					modify *= 1 + (CooldownDrag/100)
 					CooldownDrag--
@@ -97,7 +103,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 						if(!m.CheckSlotless("Outrunning the Past"))
 							m.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Outrunning_the_Past);
 					if(m.hasMagePassive(/mage_passive/time/Present))
-						m.addTension(10, m.getMaxTensionValue())
+						m.addTension(10, m.getTensionCap())
 				else if(src.SpellElement == "Space")
 					if(m.hasMagePassive(/mage_passive/space/Linearity))
 						if(!m.CheckSlotless("Distorted Space"))
@@ -117,10 +123,12 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			if(lockedoutSkills.len)
 				forcemessage = 1
 		cooldown_remaining = Time
+		if(was_fresh) cooldown_full = Time
 		if(m)
 			if(m.PureRPMode)
 				return
 			cooldown_start = world.realtime
+			cooldown_start_wt = world.time
 			var/start_time = world.realtime
 			if(announce_cd && m.cooldownAnnounce && Time/10 > 0 && (AlwaysAnnounceCooldown || Time/10 > 5))
 				m << "[src] has gone on Cooldown ([Time/10] Seconds)"
@@ -129,6 +137,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 				src.Using=0
 				cooldown_remaining = 0
 				cooldown_start = 0
+				cooldown_start_wt = 0
+				cooldown_full = 0
 				if(Time>=50 || forcemessage)
 					if(src in typesof(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff))
 						return
@@ -154,11 +164,13 @@ obj/Skills/proc/Recharge(Time, mob/m)
 mob/Players/verb
 	Auto_Attack()
 		set category = "Skills"
+		set hidden = 1
 		client.setPref("autoAttacking", !client.getPref("autoAttacking"))
 		lastHit = world.time
 		src << "You are [client.getPref("autoAttacking") ? "now Auto Attacking." : "no longer Auto Attacking."]"
 	Attack()
 		set category="Skills"
+		set hidden = 1
 		set name="Normal Attack"
 		if(src.icon_state=="Meditate")
 			src.SkillX("Meditate",src)

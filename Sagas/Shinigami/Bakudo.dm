@@ -75,6 +75,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Hainawa()
 		set name = "Hainawa"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(!User.Target || User.Target == User)
@@ -285,6 +286,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Tenteikura()
 		set name = "Tenteikura"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		var/has_spirit_power = User.passive_handler.Get("SpiritPower")
 		var/mode = input(User, "How would you like to use Tenteikura?", "Tenteikura") as null|anything in list("Direct", "Broadcast")
@@ -352,6 +354,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Kuyou_Shibari()
 		set name = "Kuyou Shibari"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(!User.Target || User.Target == User)
@@ -378,6 +381,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Danku()
 		set name = "Danku"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(Using || cooldown_remaining) return
 		if(src.ManaCost && User.ManaAmount < src.ManaCost)

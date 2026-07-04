@@ -34,6 +34,7 @@
 		passives["HellPower"] = hellpowerdif
 	verb/Falldown_Mode()
 		set category = "Skills"
+		set hidden = 1
 		adjust(usr)
 		if(!usr.BuffOn(src))
 			if(current_charges - 1 < 0)

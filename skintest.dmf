@@ -50,7 +50,7 @@ macro "macro"
 	elem 
 		name = "South+REP"
 		command = ".south"
-	elem 
+	elem
 		name = "F1+REP"
 		command = ".options"
 
@@ -98,9 +98,9 @@ menu "menu"
 		name = "Display"
 		command = ""
 		saved-params = "is-checked"
-	elem 
-		name = "Screen Size"
-		command = "Screen-Size"
+	elem
+		name = "Max View"
+		command = "Max-View"
 		category = "Display"
 		saved-params = "is-checked"
 
@@ -1863,13 +1863,14 @@ window "mainwindow"
 		anchor2 = -1,-1
 		background-color = #000000
 		is-default = true
-		saved-params = "pos;size;is-maximized"
+		saved-params = "pos"
 		title = "Roleplay Rebirth: The Fourth Fate"
 		statusbar = false
 		icon = 'CreationPics\\fouthfate.png'
 		image-mode = center
 		macro = "macro"
 		menu = "menu"
+		on-size = "FitView"
 	elem "mainvsplit"
 		type = CHILD
 		pos = 0,0
@@ -1904,32 +1905,6 @@ window "mainwindow"
 		border = sunken
 		saved-params = ""
 		text = "Mana"
-	elem "BarHealth"
-		type = LABEL
-		pos = 480,730
-		size = 121x20
-		anchor1 = 50,100
-		anchor2 = 63,100
-		font-family = "Lucida Console,@DotumChe,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Health"
-	elem "BarEnergy"
-		type = LABEL
-		pos = 601,730
-		size = 119x20
-		anchor1 = 63,100
-		anchor2 = 75,100
-		font-family = "Lucida Console,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Energy"
 	elem "BarPower"
 		type = LABEL
 		pos = 841,730
@@ -1958,7 +1933,8 @@ window "mapwindow"
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		keep-aspect = true
+		background-color = #000000
+		on-size = "FitView"
 	elem "map"
 		type = MAP
 		pos = 0,0
@@ -1967,7 +1943,9 @@ window "mapwindow"
 		anchor2 = 100,100
 		text-color = #000000
 		is-default = true
-		saved-params = "icon-size"
+		background-color = #000000
+		right-click = true
+		saved-params = ""
 		on-show = ".winset\"mainwindow.mainvsplit.left=mapwindow\""
 		on-hide = ".winset\"mainwindow.mainvsplit.left=\""
 	elem "BarDoomed"
@@ -2099,34 +2077,6 @@ window "mapwindow"
 		is-slider = false
 		dir = east
 		value = 50
-	elem "TensionBar"
-		type = BAR
-		pos = 9,29
-		size = 113x20
-		anchor1 = 0,0
-		anchor2 = -1,-1
-		background-color = #1f1f1f
-		is-visible = false
-		saved-params = ""
-		bar-color = #ff80ff
-		is-slider = false
-		width = 0
-		dir = east
-	elem "TensionLabel"
-		type = LABEL
-		pos = 9,9
-		size = 113x20
-		anchor1 = 0,0
-		anchor2 = -1,-1
-		font-family = "@Microsoft JhengHei Light"
-		font-size = 9
-		font-style = "bold"
-		text-color = #ff80ff
-		background-color = #000000
-		is-visible = false
-		border = sunken
-		saved-params = ""
-		text = "TENSION"
 	elem "HardenLabel"
 		type = LABEL
 		pos = 236,436
@@ -2277,21 +2227,6 @@ window "mapwindow"
 		border = sunken
 		saved-params = ""
 		text = "Bleed"
-	elem "BarOxygen"
-		type = LABEL
-		pos = 410,436
-		size = 64x20
-		anchor1 = 50,100
-		anchor2 = -1,-1
-		font-family = "@Microsoft JhengHei Light"
-		font-size = 6
-		font-style = "bold"
-		text-color = #efff80
-		background-color = #000000
-		is-visible = false
-		border = sunken
-		saved-params = ""
-		text = "Oxygen"
 	elem "BarPoison"
 		type = LABEL
 		pos = 352,436

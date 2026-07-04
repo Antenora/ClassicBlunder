@@ -37,6 +37,7 @@
 	TimerLimit = 360
 	verb/Ultimate_Form_Toggle()
 		set category="Other"
+		set hidden = 1
 		if(!usr.SSJ4FromBase)
 			usr.SSJ4FromBase=1
 			usr<<"You can now transform straight into your ultimate forms (God or SSj4) from base, replacing your other Super Saiyan transformations."
@@ -45,6 +46,7 @@
 			usr<<"You can no longer transform straight into your ultimate form (God or SSj4) from base."
 	verb/Moon_Toggle()
 		set category="Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		Looking=!Looking
@@ -165,8 +167,10 @@
 			if((length(User.race.transformations) >= 2 && User.race.transformations[2].type == /transformation/saiyan/hellspawn_super_saiyan_2 && User.transUnlocked >= 2) && User.CanTransform() && !User.transActive&& User.oozaru_type=="Demonic")
 				User.transActive = 1
 				User.race.transformations[2].transform(User, TRUE)
+
 	verb/Tail_Toggle()
 		set category = "Other"
+		set hidden = 1
 		if(usr.Tail)
 			usr.Tail(0)
 		else

@@ -96,6 +96,7 @@ var/list/MiscTree = list()
 
 /mob/verb/learnMagic() // Change this to Thaumaturgy next wipe 
 	set category = "Utility"
+	set hidden = 1
 	set name = "Thaumaturgy"
 	var/choice = input(src, "What branch of magic do you wish to learn?", "Thaumaturgy") in list("Alchemy", "Enchanting", "Misc", "Nevermind")
 	if(choice == "Nevermind") return
@@ -123,6 +124,12 @@ var/list/MiscTree = list()
 		p.RPPSpent -= theCost
 		p.knowledgeTracker.learnedMagic -= tech.name
 		p << "You have refunded [tech.name] for [theCost]!"
+		if((tech.name in list("Basic Alchemy", "Flask Accumen", "Flask Mastery")))
+			if(p.AlchemyUnlocked >= 1) // Refund AlchemyUnlocked improving techs IN ORDER. If you do not know which these are, check line 134 onward in knowledgeUnlock.dm
+				p.ReduceAlchemyUnlocked()
+		if((tech.name in list("Inkworks", "Advanced Inkworks", "Mastered Inkworks")))
+			if(p.InkworksDatum.Tier >= 1)
+				p.ReduceInkworksUnlocked() //  Same as AlchemyUnlocked, check line 303 onward instead though.
 	RemoveTech(tech, "Magic")
 
 mob/Admin3/verb/RefundMagic(mob/p in players)

@@ -82,6 +82,7 @@ proc/LaunchEnd(mob/player)
 /mob/Admin3/verb/alterLaunchLockout()
 	set category = "Admin"
 	set name = "Change Launch Lockout"
+	if(!src.Alert("Are you sure you want to change launch lockout time?")) return
 	var/num = input("Enter new Launch Lockout time (in seconds):") as num
 	if(num>0)
 		glob.LAUNCH_LOCKOUT = num * 10
@@ -90,6 +91,7 @@ proc/LaunchEnd(mob/player)
 /mob/Admin3/verb/alterMaxLaunchTime()
 	set category = "Admin"
 	set name = "Change Max Launch Time"
+	if(!src.Alert("Are you sure you want to alter max launch time?")) return
 	var/num = input("Enter new Max Launch time (in seconds):") as num
 	if(num>0)
 		glob.MAX_LAUNCH_TIME = num * 10

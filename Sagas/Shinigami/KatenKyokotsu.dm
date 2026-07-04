@@ -120,6 +120,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Takaoni()
 		set name = "Takaoni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Takaoni can only be used in Shikai."
 			return
@@ -154,6 +155,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Kageoni()
 		set name = "Kageoni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Kageoni can only be used in Shikai."
 			return
@@ -214,6 +216,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Irooni()
 		set name = "Irooni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Irooni can only be used in Shikai."
 			return
@@ -290,6 +293,7 @@ mob/proc/ClearIrooni()
 	verb/Daruma_san_ga_Koronda()
 		set name = "Daruma-san ga Koronda"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Daruma-san ga Koronda can only be used in Shikai."
 			return
@@ -387,6 +391,7 @@ mob/proc/summonShadowClones(dmg, count, lifetimeTicks)
 	verb/Kageokuri()
 		set name = "Kageokuri"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Kageokuri can only be used in Shikai."
 			return
@@ -717,6 +722,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Ichidanme()
 		set name = "Ichidanme: Tameraikizu no Wakachiai"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -747,6 +753,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Nidanme()
 		set name = "Nidanme: Zanki no Shitone"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -788,6 +795,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Sandanme()
 		set name = "Sandanme: Dangyo no Fuchi"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -889,6 +897,7 @@ mob/proc/KatenClearWater()
 	verb/Shime_no_Dan()
 		set name = "Shime no Dan: Itokiribasami Chizome no Nodobue"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return

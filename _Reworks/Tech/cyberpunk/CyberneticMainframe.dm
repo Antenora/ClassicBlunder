@@ -5,6 +5,7 @@
 			desc="Integrate gear into yourself!"
 			verb/Cyborg_Integration()
 				set category="Utility"
+				set hidden = 1
 				if(src.Using)
 					return
 				if(usr.GetAndroidIntegrated()<3+(usr.AscensionsAcquired*2))

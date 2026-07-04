@@ -1,6 +1,7 @@
 
 mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
 	set name = "Force AI Spawns"
+	if(!src.Alert("Are you sure you want to force spawns from all AI spawners?")) return
 	var/difference = AI.ai_limit-AI.ai_active.len
 	var/i
 	for(i = 0, i < difference, i++)
@@ -9,6 +10,7 @@ mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
 
 mob/Admin3/verb/MakeAISpawner()
 	set name = "AI Spawner"
+	if(!src.Alert("Are you sure you want to make an AI spawner?")) return
 	var/n = input(src, "What name") as text
 	var/list/monsters = typesof(/monster_info)
 	var/monster = input(src, "What monster") in monsters
@@ -183,10 +185,6 @@ obj
 				p.DefMod = round(mi.def_mod + potBoon, 0.05)
 				p.RecovMod = round(mi.recov_mod + potBoon, 0.05)
 
-				p.Intimidation=mi.intimidation*(1+rand())
-				if(p.Intimidation<p.Potential/10)
-					p.Intimidation=p.Potential/10
-				p.Intimidation=round(p.Intimidation, 0.05)
 				p.HealthCut=1-min(1, mi.base_health/100)
 				p.HealthCut=round(p.HealthCut, 0.05)
 				p.AngerMax=1+p.HealthCut//lower health gives higher anger
@@ -273,7 +271,6 @@ obj
 						p.passive_handler.Increase("Godspeed", 3)
 						p.passive_handler.Increase("GodKi", p.Potential/200)
 						p.HealthCut=0
-						p.Intimidation*=2
 						p.AngerMax=2
 						p.passive_handler.Increase("EndlessAnger", 1)
 						p.PowerInvisible*=2
@@ -291,7 +288,6 @@ obj
 						p.ai_hostility=1
 
 						p.HealthCut=0
-						p.Intimidation*=2
 						p.AngerMax=2
 						p.passive_handler.Increase("EndlessAnger", 1)
 						p.PowerInvisible*=2
@@ -435,7 +431,6 @@ monster_info
 	var/enlarge = 1
 	var/potential=5
 	var/hostile=1
-	var/intimidation=1
 	var/potentialScaling = FALSE
 	var/str_mod=1
 	var/end_mod=1
@@ -539,7 +534,6 @@ monster_info
 		end_mod=2
 		for_mod=2
 		attunement="Dark"
-		intimidation=2
 		skilloptions=list(
 		"/obj/Skills/AutoHit/Stinger",\
 		"/obj/Skills/AutoHit/Rising_Spire",\
@@ -631,7 +625,6 @@ monster_info
 		icon=list('MiniMushBlue.dmi', 'MiniMushPurple.dmi', 'MiniMushRed.dmi', 'MiniMushYellow.dmi')
 		murder_chance=50
 		potential=10
-		intimidation=5
 		str_mod=2
 		end_mod=2
 		for_mod=2
@@ -642,7 +635,6 @@ monster_info
 		icon=list('KappaBlue.dmi', 'KappaBrown.dmi', 'KappaGreenDark.dmi', 'KappaGreenLight.dmi')
 		hungry_chance=25
 		potential=20
-		intimidation=2
 		str_mod=2
 		end_mod=5
 		spd_mod=1
@@ -712,7 +704,6 @@ monster_info
 		name="Squid"
 		icon='Mindflayer.dmi'
 		potential=50
-		intimidation=20
 		str_mod=3
 		end_mod=5
 		spd_mod=5
@@ -725,7 +716,6 @@ monster_info
 		name="Heartless Spider"
 		icon='Spider.dmi'
 		potential=50
-		intimidation=12.5
 		str_mod=4
 		end_mod=4
 		for_mod=4
@@ -736,7 +726,6 @@ monster_info
 		name="Heartless Scorpion"
 		icon='Scorpion.dmi'
 		potential=50
-		intimidation=12.5
 		str_mod=4
 		end_mod=4
 		for_mod=4
@@ -749,7 +738,6 @@ monster_info
 		icon='Mindflayer.dmi'
 		murder_chance=100
 		potential=95
-		intimidation=20
 		void=1
 		str_mod=4
 		end_mod=2
@@ -768,7 +756,6 @@ monster_info
 		colors=list(rgb(153,0,0))
 		murder_chance=25
 		potential=50
-		intimidation=20
 		attunement="Fire"
 		str_mod=4
 		end_mod=0.5
@@ -785,7 +772,6 @@ monster_info
 		'Mindflayer.dmi', 'KappaBlue.dmi', 'KappaBrown.dmi', 'KappaGreenDark.dmi', 'KappaGreenLight.dmi', 'Frog.dmi', 'Penguin.dmi', 'TentaEye.dmi')
 		murder_chance=25
 		potential=50
-		intimidation=20
 		attunement="Water"
 		str_mod=1
 		end_mod=3
@@ -803,7 +789,6 @@ monster_info
 		icon=list('DinoMonster.dmi', 'GiantFlower.dmi', 'StoneGolem.dmi')
 		murder_chance=25
 		potential=50
-		intimidation=20
 		epic_power=25
 		attunement="Earth"
 		str_mod=2
@@ -822,7 +807,6 @@ monster_info
 		colors=list(rgb(153,0,0))
 		murder_chance=25
 		potential=50
-		intimidation=20
 		attunement="Fire"
 		str_mod=4
 		end_mod=0.5
@@ -839,7 +823,6 @@ monster_info
 		'Mindflayer.dmi', 'KappaBlue.dmi', 'KappaBrown.dmi', 'KappaGreenDark.dmi', 'KappaGreenLight.dmi', 'Frog.dmi', 'Penguin.dmi', 'TentaEye.dmi')
 		murder_chance=25
 		potential=50
-		intimidation=20
 		attunement="Water"
 		str_mod=1
 		end_mod=3
@@ -857,7 +840,6 @@ monster_info
 		icon=list('DinoMonster.dmi', 'GiantFlower.dmi', 'StoneGolem.dmi')
 		murder_chance=25
 		potential=50
-		intimidation=20
 		attunement="Earth"
 		str_mod=2
 		end_mod=3
@@ -871,7 +853,6 @@ monster_info
 	sunlight_swordsman
 		name="Sunlight Swordsman"
 		potential=50
-		intimidation=20
 		icon='Chaos_Chosen.dmi'
 		str_mod=3
 		end_mod=3
@@ -885,7 +866,6 @@ monster_info
 	sloth_shambler
 		name="Sloth Shambler"
 		potential=50
-		intimidation=20
 		icon='Deep_One.dmi'
 		str_mod=0.1
 		end_mod=10

@@ -76,6 +76,7 @@
 /mob/Admin3/verb/hep(n as num, r as num)
 	set hidden = 1
 	set category = "Admin"
+	if(!src.Alert("Are you sure you want to teabag someone?")) return
 	if(!Target)
 		return
 	Stomp(src, Target, n, r)

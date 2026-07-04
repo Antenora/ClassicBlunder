@@ -249,6 +249,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	verb/Jokaku_Enjo()
 		set name = "Jokaku Enjo"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Jōkaku Enjō can only be used in Shikai."
 			return
@@ -355,6 +356,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	verb/Ennetsu_Jigoku()
 		set name = "Ennetsu Jigoku"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Ennetsu Jigoku can only be used in Shikai."
 			return
@@ -670,6 +672,7 @@ mob/proc/summonFlameSoldiers(dmg, count, lifetimeTicks)
 	verb/Kaka_Jumanokushi_Daisojin()
 		set name = "Kaka Jumanokushi Daisojin"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Kaka Jūmanokushi Daisōjin can only be used in Bankai."
 			return

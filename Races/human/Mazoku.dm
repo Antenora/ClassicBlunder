@@ -3,6 +3,9 @@
 	if(!p.isRace(HUMAN))
 		src << "[p] is not Human."
 		return
+	if(p.Class != "Heroic")
+		src << "[p] is not a Heroic Human."
+		return
 	var/safety = 20
 	while(p.transActive > 0 && safety-- > 0)
 		var/oldTA = p.transActive

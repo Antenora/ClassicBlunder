@@ -3,7 +3,6 @@ ascension
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
 			choices = list("Pride" = /ascension/sub_ascension/saiyan/pride, "Honor" =  /ascension/sub_ascension/saiyan/honor, "Zeal" = /ascension/sub_ascension/saiyan/zeal)
-			intimidation = 4
 			passives = list("Brutalize" = 0.25)
 			strength = 0.25
 			force = 0.25
@@ -12,7 +11,6 @@ ascension
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
 			anger = 0.25
-			intimidation = 1.25
 			passives = list("Brutalize" = 0.5)
 			strength = 0.25
 			force = 0.25
@@ -38,7 +36,6 @@ ascension
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			intimidation = 1.5
 			passives = list("Brutalize" = 0.5)
 			strength = 0.5
 			force = 0.5
@@ -61,7 +58,6 @@ ascension
 				..()
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 1.5
 			anger = 0.25
 			passives = list("Brutalize" = 1)
 			simulateChoiceMutation(mob/owner)
@@ -81,7 +77,6 @@ ascension
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 1.5
 			anger = 0.25
 			simulateChoiceMutation(mob/owner)
 				var/list/ascs = owner.race?.ascensions
@@ -100,7 +95,6 @@ ascension
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 1.5
 			anger = 0.25
 			passives = list("Brutalize" = 1)
 			simulateChoiceMutation(mob/owner)

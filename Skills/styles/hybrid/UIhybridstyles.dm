@@ -28,6 +28,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		var/tmp/obj/Items/Sword/EquippedSword
 		verb/Attune_Instinct_Blade()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.BuffOn(src))
 				var/classChoice = input(usr, "Choose your preferred sword type.") in list("Light", "Medium", "Heavy")
 				SwordClass = classChoice

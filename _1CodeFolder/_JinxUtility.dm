@@ -22,7 +22,7 @@ mob
 	proc
 
 		AscAvailable()
-			src.potential_ascend(Silent=1)
+			potential_ascend();
 			if(race.ascensions.len==0) return
 			//If a prompt is already open from a prior call (e.g. spammed Meditate),
 			//bail — otherwise race subclass onAscension overrides re-apply their passive Increase() calls
@@ -3136,16 +3136,19 @@ mob
 			for(var/obj/Money/defender in src)
 				defender.Level-=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
+			if(client) client.UpdateInvCurrency()
 		TakeMineral(val)
 			for(var/obj/Items/mineral/m in src)
 				m.Reduce(val)
 				m.name = "[Commas(round(m.value))] Mana Bits"
+			if(client) client.UpdateInvCurrency()
 		GiveMoney(var/Value)
 			for(var/obj/Money/defender in src)
 				defender.Level+=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
 				defender.checkDuplicate(src)
 			src << "You've gained [Commas(round(Value))] [glob.progress.MoneyName]."
+			if(client) client.UpdateInvCurrency()
 		GiveMineral(val)
 			var/found=0;
 			for(var/obj/Items/mineral/m in src)
@@ -3156,6 +3159,7 @@ mob
 				var/obj/Items/mineral/m = new();
 				m.Add(val);
 				src.contents += m;
+			if(client) client.UpdateInvCurrency()
 		TakeManaCapacity(var/Value, ignorePhiloStone = FALSE)
 			var/Remaining=Value
 			if(!ignorePhiloStone)
@@ -3651,6 +3655,7 @@ mob
 
 					var/obj/Skills/s=new path
 					if(s.SignatureTechnique==tier)
+						del s   
 						return 1
 					else
 						del s
@@ -3659,20 +3664,11 @@ mob
 				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
-			if(!locate(/obj/Skills/Zanzoken, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to move faster than the eye can see due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Zanzoken)
-			if(!locate(/obj/Skills/Power_Control, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to fluctuate your power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Power_Control)
-					if(!locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
-						src.PoweredFormSetup()
-			if(!locate(/obj/Skills/Utility/Sense, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to sense power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Utility/Sense)
+			// Zanzoken / Power Up-Down / Sense are auto-granted at creation now (addMissingSkills,
+			// retrofitted onto old saves every login). Ki Control's interactive setup still fires on
+			// first use, once the player has Power Control but hasn't configured Ki Control yet:
+			if(locate(/obj/Skills/Power_Control, src) && !locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
+				src.PoweredFormSetup()
 
 			if(!src.SignatureCheck)
 				return
@@ -3702,41 +3698,17 @@ mob
 					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Fist_Of_The_King_Of_Tomorrow)
 					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Apotheosis_Of_The_Fabled_King)
 
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[1] && src.req_styles(0, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[2] && src.req_styles(1, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[3] && src.req_styles(2, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[4] && src.req_styles(3, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[1] && src.req_styles(0, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[2] && src.req_styles(1, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[3] && src.req_styles(2, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[4] && src.req_styles(3, 2))
-				DevelopSignature(src, 2, "Style")
-			if(src.CyberneticMainframe)
-				return
-			if(styles_available(3) && src.Potential>=glob.progress.T3_STYLES[1] && src.req_styles(0, 3))
-				DevelopSignature(src, 3, "Style")
-			if(src.req_pot(glob.progress.T1_SIGS[1]) && src.req_sigs(0, 1))
-				DevelopSignature(src, 1, "Signature")
-			if(src.req_pot(glob.progress.T1_SIGS[2]) && src.req_sigs(1, 1))
-				DevelopSignature(src, 1, "Signature")
-
-			if(src.req_pot(glob.progress.T2_SIGS[1]) && src.req_sigs(0, 2))
-				DevelopSignature(src, 2, "Signature")
-			if(src.req_pot(glob.progress.T1_SIGS[3]) && src.req_sigs(2, 1))
-				DevelopSignature(src, 1, "Signature")
-
-			if(src.req_pot(glob.progress.T2_SIGS[2]) && src.req_sigs(1, 2))
-				DevelopSignature(src, 2, "Signature")
-
-			if(src.req_pot(glob.progress.T3_SIGS[1]) && src.req_sigs(0, 3))
-				DevelopSignature(src, 3, "Signature")
+			// Style/Signature picks are made in the Acquire menu now (AcquireHUD.dm)
+			var/picks = 0
+			for(var/t = 1 to 3)
+				if(src.AqStylePicksLeft(t) && src.styles_available(t))   // styles_available also re-runs StyleUnlock
+					picks += src.AqStylePicksLeft(t)
+			if(src.AqStylePicksLeft(4) && src.AqAnyT4StylePickable())   // temp: any same-category T3 style
+				picks += src.AqStylePicksLeft(4)
+			for(var/t = 1 to 3)
+				picks += src.AqSigPicksLeft(t)
+			if(picks > 0)
+				src << "<font color=#8be9ff>You have [picks] unspent pick[picks > 1 ? "s" : ""] waiting - open the Acquire menu (Styles / Signature tabs) to choose.</font>"
 
 		YeetSignatures()
 			for(var/obj/Skills/s in src.Skills)

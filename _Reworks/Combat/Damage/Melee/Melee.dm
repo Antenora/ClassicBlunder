@@ -13,11 +13,15 @@
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
+				return TRUE
 	else if(option == "Stun")
 		if(enemy.Stunned)
 			if(passive_handler["Sajire Rush"])
 				return TRUE
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
+				return TRUE
+			if(passive_handler.Get("Bear Spirit"))
 				return TRUE
 	return FALSE
 
@@ -497,6 +501,9 @@
 					if(passive_handler.Get("HotHundred"))
 						lightAtk=0
 						adjust = hh-1
+					if(passive_handler.Get("Bear Spirit"))
+						damage *= 1
+						adjust = 3
 					if(enemy.Launched && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Launchers"))
 						damage *= 1+secretDatum?:getBoon(src,"Launchers")
 					if(enemy.Stunned && Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Stunners"))
@@ -981,7 +988,7 @@
 					delay = 0.5
 
 	else
-		var/TurfDamage=(src.potential_power_mult*src.PowerBoost*src.Power_Multiplier*src.AngerMax)*(src.GetStr(3)+src.GetFor(2)+src.GetIntimidation()+(10*src.GetWeaponBreaker()))
+		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))
 		for(var/turf/T in get_step(src,src.dir))
 			flick("Attack",src)
 			T.Health-=TurfDamage

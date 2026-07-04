@@ -33,6 +33,35 @@ mob/proc/CanPickupItem(var/obj/Items/item)
 		return 0
 	return 1
 
+mob/proc/GroundPickup(var/obj/Items/I)
+	if(!I || !isturf(I.loc)) return
+	if(get_dist(src, I) > 1) 
+		src << "You're too far away to pick that up."
+		return
+	if(!I.Grabbable && I.CreatorKey && I.CreatorKey != src.ckey)
+		src << "That doesn't belong to you."
+		return
+	if(istype(I, /obj/Items/mineral))
+		var/obj/Items/mineral/gi = I
+		var/obj/Items/mineral/have = locate() in src
+		if(have && have != gi)
+			have.Add(gi.value)
+			del gi
+			if(client) client.BuildInvPage()
+			return
+	if(I.Stackable)
+		for(var/obj/Items/e in src)
+			if(e.type == I.type && e.Stackable)
+				e.TotalStack += I.TotalStack
+				e.suffix = "[e.TotalStack]"
+				del I
+				if(client) client.BuildInvPage()
+				return
+	if(CheckInventoryFull()) return 
+	I.loc = src
+	src << "You pick up [I]."
+	if(client) client.BuildInvPage()
+
 // Open inventory window
 mob/verb/Open_Inventory()
 	set name = ".Open_Inventory"

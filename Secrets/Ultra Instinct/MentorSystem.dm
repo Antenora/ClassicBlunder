@@ -4,6 +4,7 @@ mob/var
 obj/Skills/Utility/Mentor_System
 	verb/Teach_UI()
 		set category = "Utility"
+		set hidden = 1
 		set name = "Teach Ultra Instinct"
 		if(src.Using)
 			return

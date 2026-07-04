@@ -1550,7 +1550,9 @@ mob
 		GetBeamChargeSpeedMult()
 			var/mult = (1+(src.GetKiControlMastery()*0.1))
 			if(src.HasQuickCast())
-				mult *= src.GetQuickCast()
+				mult *= src.GetQuickCast()+1
+			if(src.passive_handler.Get("Dragon Spirit"))
+				mult *= 5
 			return mult
 		HasDualCast()
 			if(passive_handler.Get("DualCast"))
@@ -1937,71 +1939,6 @@ mob
 			return 0
 		GetPowerReplacement()
 			return src.passive_handler.Get("PowerReplacement")
-		GetIntimidationIgnore(var/mob/m)
-			var/Return=0
-			if(isRace(HUMAN))
-				Return+=100
-			if(src.passive_handler.Get("Zeal"))
-				Return+=100
-
-			if(m)
-				if(m.isRace(HUMAN))
-					Return-=100
-				if(m.isRace(MAKYO))
-					Return-=(5*m.AscensionsAcquired)
-				if(m.HasGodKi() && !m.HasNull() && !m.isRace(DEMIFIEND) && !istype(m, /mob/Player/AI/Demon))
-					if(src.HasMythical())
-						Return-=(m.GetGodKi())*(100-(src.HasMythical()*100))
-					else
-						Return-=m.GetGodKi()*100
-			if(src.HasGodKi() && !src.HasNullTarget())
-				Return+=src.GetGodKi()*100
-			if(src.HasMaouKi())
-				Return+=src.GetMaouKi()*100
-
-			if(src.Saga=="Ansatsuken")
-				if(src.AnsatsukenAscension=="Chikara")
-					Return+=((src.SagaLevel-4)*25)
-			if(m.Saga=="Ansatsuken")
-				if(m.AnsatsukenAscension=="Chikara")
-					Return-=((m.SagaLevel-4)*25)
-			if(isRace(ANDROID))
-				Return=100
-
-			if(m)
-				if(m.CyberCancel)
-					Return-=m.CyberCancel*100
-				if(m.Mechanized)
-					Return-=100
-				if(m.isRace(ANDROID))
-					Return=0
-			if(Return>100)
-				Return=100
-			if(Return<0)
-				Return=0
-			Return/=100
-			return Return
-		HasIntimidation()
-			var/Effective=src.Intimidation
-			if(src.ShinjinAscension=="Makai")
-				Effective+=1
-			if(src.isRace(DEMON)||src.isRace(MAJIN)||src.isRace(MAKAIOSHIN)||src.oozaru_type=="Demonic")
-				Effective+=1
-			Effective *= 1 + passive_handler.Get("Mythical")
-			if(src.CheckActive("Mobile Suit")||src.CheckSlotless("Battosai")||src.CheckSlotless("Susanoo"))
-				Effective+=1
-			if(src.Health<(1-src.HealthCut)&&src.HealthAnnounce10&&src.Saga=="King of Braves"&&src.SpecialBuff)
-				if(src.CheckSlotless("Genesic Brave"))
-					Effective*=2
-				else if(src.CheckSpecial("King of Braves"))
-					Effective*=3
-			if(src.HasHellPower() == 2)
-				Effective+=1
-			if(src.KaiokenBP>1)
-				Effective*=KaiokenBP
-			if(Effective>1)
-				return 1
-			return 0
 
 		GetHellScaling()
 			var/Return=1
@@ -2618,6 +2555,8 @@ mob
 			var/Return=passive_handler.Get("SpiritHand")
 			if(Class=="Heroic"&&ActiveBuff)
 				Return*=GetHeroicBoost()
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 
 
@@ -2642,8 +2581,9 @@ mob
 				Return += AscensionsAcquired/2
 			if(hasSecret("Eldritch (Reflected)")) Return += (scalingEldritchPower()/2);
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=GetHeroicBoost()
-
+				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasSpiritSword()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("SpiritSword"))
@@ -2654,7 +2594,9 @@ mob
 			if(src.Saga=="Keyblade")
 				Return += src.SagaLevel*0.25
 			if(Class=="Heroic"&&ActiveBuff)
-				Return*=GetHeroicBoost()
+				Return*=1.25
+			if(passive_handler.Get("Fox Spirit"))
+				Return*=1.4
 			return Return
 		HasHybridStrike()//Str(0.75)+For(0.75)
 			if(passive_handler.Get("HybridStrike"))

@@ -2,7 +2,6 @@ ascension
 	majin
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			intimidation = 15
 			anger = 0.1
 			imaginationAdd = 0.2
 			endurance = 0.75
@@ -31,7 +30,6 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			intimidation = 15
 			anger = 0.1
 			imaginationAdd = 0.25
 			endurance = 0.75
@@ -57,7 +55,6 @@ ascension
 
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			intimidationMult = 0.5
 			anger = 0.1
 			endurance = 0.75
 			defense = 0.75
@@ -82,7 +79,6 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 10
 			anger = 0.15
 			imaginationAdd = 0.2
 			endurance = 1
@@ -108,7 +104,6 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 10
 			anger = 0.15
 			endurance = 1
 			defense = 1
@@ -133,7 +128,6 @@ ascension
 
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 15
 			anger = 0.2
 			imaginationAdd = 0.25
 			endurance = 1.25

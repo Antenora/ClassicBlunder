@@ -249,6 +249,7 @@ obj/ChrysalisShell
 
 	verb/Break_Chrysalis()
 		set category = "Other"
+		set hidden = 1
 		set src in oview(1)
 		if(!occupant || !occupant.ChrysalisActive)
 			usr << "This chrysalis has already dissolved."
@@ -274,6 +275,7 @@ obj/Skills/Utility
 		desc="Offer a pact for power to a nearby person."
 		verb/Offer_Pact()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -362,6 +364,7 @@ obj/Skills/Utility
 		desc="Revoke a pact you have granted, stripping its power."
 		verb/Revoke_Pact()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -398,6 +401,7 @@ obj/Skills/Utility
 		Cooldown=5
 		verb/Refresh()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(!usr.hasSecret("Eldritch (Reflected)"))
@@ -440,6 +444,7 @@ obj/Skills/Utility
 		Cooldown=120
 		verb/Eldritch_Domain()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -483,6 +488,7 @@ obj/Skills/Utility
 		Cooldown=60
 		verb/Dream_Realization()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -549,6 +555,7 @@ obj/Skills/Utility
 		desc="Enshroud a pacted ally in eldritch protection, granting them passive defenses."
 		verb/With_You_In_Darkness()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -586,6 +593,7 @@ obj/Skills/Utility
 		desc="Deepen the pact with a willing ally, granting more power at the cost of vulnerability."
 		verb/Bared_Souls()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -643,6 +651,7 @@ obj/Skills/Utility
 		Cooldown=60
 		verb/Altered_Nature()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -712,6 +721,7 @@ obj/Skills/Utility
 		Cooldown=120
 		verb/Glimpse_Inside()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -777,6 +787,7 @@ obj/Skills/Utility
 		desc="Reclaim a pact, stripping the target of its power and temporarily absorbing those bonuses yourself."
 		verb/Reclamation()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -828,6 +839,7 @@ obj/Skills/Utility
 		Cooldown=180
 		verb/Shared_Dreaming()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -873,6 +885,7 @@ obj/Skills/Utility
 		Cooldown=300
 		verb/True_Reflection()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1
@@ -912,6 +925,7 @@ obj/Skills/Utility
 		Cooldown=300
 		verb/Eldritch_Covenant()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using = 1

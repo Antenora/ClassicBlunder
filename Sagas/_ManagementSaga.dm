@@ -145,14 +145,27 @@ mob/var
 	KidoSL6Picks = 0   // max 1; tier cap <=4
 	KidoSL7Picks = 0   // max 1; tier cap <=5
 
+	//SHINOBI
+	ShinobiBranch
+	list/ChakraAffinities          // Chakra Natures this Shinobi has an affinity for 
+	ChakraSpecialization           // nature chosen at the one-time SL3 specialization offer, locks out further affinities
+	tmp/ChakraAffinityPending = 0  // affinity prompts in flight (roll or RPP purchase)
+
+	// Jutsu pick tracking, shared across all three categories (Ninjutsu, Genjutsu, Taijutsu)
+	JutsuSL1Picks = 0   // max 2, tier cap <=1
+	JutsuSL3Picks = 0   // max 2, tier cap <=2
+	JutsuSL5Picks = 0   // max 1, tier cap <=3
+	JutsuSL6Picks = 0   // max 1, tier cap <=4
+	JutsuSL7Picks = 0   // max 1, tier cap <=5
+
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Weapon Soul", "Unlimited Blade Works","Force")
 		if(P.Saga)
-			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami")
+			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
 				Level7=2  // Devil Summoner has 8 tiers
@@ -350,6 +363,9 @@ mob/Admin3/verb
 
 				if("Shinigami")
 					P.gainShinigami()
+
+				if("Shinobi")
+					P.gainShinobi()
 
 				if("Kamui")
 					P.SagaLevel=1
@@ -1091,6 +1107,8 @@ mob
 					tierUpSaga("Cosmo")
 				if("Shinigami")
 					tierUpSaga("Shinigami")
+				if("Shinobi")
+					tierUpSaga("Shinobi")
 
 				if("Weapon Soul")
 					tierUpSaga("Weapon Soul")

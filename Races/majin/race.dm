@@ -8,6 +8,7 @@ race
 		skills = list(/obj/Skills/Absorb, /obj/Skills/Release_Absorb, /obj/Skills/Buffs/SlotlessBuffs/Regeneration)
 
 		locked = TRUE
+		power = 9;
 		intellect = 1.25
 		imagination = 4
 		anger = 2

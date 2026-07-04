@@ -150,6 +150,7 @@ Mangekyou_Sharingan
 			OffMessage="closes their eyes with a pained look..."
 			verb/Mangekyou_Sharingan()
 				set category="Skills"
+				set hidden = 1
 							src.Instinct=1
 						if("Resolve")
 							src.LikeWater=usr.SagaLevel / 2
@@ -170,6 +171,7 @@ Mangekyou_Sharingan
 			OffMessage="closes their eyes to the truth of the world..."
 			verb/Rinnegan()
 				set category="Skills"
+				set hidden = 1
 				src.Trigger(usr)
 
                 */

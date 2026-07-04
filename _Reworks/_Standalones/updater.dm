@@ -748,22 +748,3 @@ update
 				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/dr in p.contents)
 					dr.adjust(p);
 					p << "Your Dragon Rage has been adjusted to scale with health!"
-/globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
-/globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
-/globalTracker/var/GAJA_MAX_EXCHANGE = 1
-
-/mob/proc/gajaConversionCheck()
-	if(key in glob.COOL_GAJA_PLAYERS)
-		verbs += /mob/proc/ExchangeMinerals
-
-/mob/proc/gajaConversionRateUpdate()
-	if(isRace(GAJALAKA) && key in glob.COOL_GAJA_PLAYERS)
-		var/asc = AscensionsAcquired
-		var/ascRate = 0.5 + (glob.GAJA_PER_ASC_CONVERSION * asc) // 1.25 max
-		for(var/obj/Money/moni in src)
-			if(moni.Level >= 10000)
-				var/boon = round(moni.Level * 0.00001, 0.1)
-				if(boon > glob.GAJA_MAX_EXCHANGE) // so 1.75 total
-					boon = glob.GAJA_MAX_EXCHANGE
-				playerExchangeRate = ascRate + boon
-

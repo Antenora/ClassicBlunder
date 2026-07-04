@@ -2,7 +2,6 @@ ascension
 	half_saiyan
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			intimidation = 10
 			passives = list("Tenacity" = 1, "Adrenaline" = 0.25)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
@@ -30,7 +29,6 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			intimidation = 10
 			choices = list("Adaptive" = /ascension/sub_ascension/half_saiyan/adaptive, "Dominating" = /ascension/sub_ascension/half_saiyan/dominating)
 			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
@@ -56,7 +54,6 @@ ascension
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL // ?
-			intimidation = 10
 			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5, "TechniqueMastery" = 1)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
@@ -80,7 +77,6 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 10
 			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
@@ -105,7 +101,6 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 10
 			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
@@ -129,7 +124,6 @@ ascension
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 10
 			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)

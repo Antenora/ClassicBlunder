@@ -6,8 +6,8 @@ obj/Skills/Buffs/SlotlessBuffs/Starwalker
 		verb/The_Original_Starwalker()
 			set name="Star                    walker"
 			set category="Starwalker"
-			if(usr.Target.party)
+			if(usr.Target && usr.Target.party && usr.Target.party.members.len < MAX_PARTY_LIMIT)
 				if(usr.party)
 					usr.party.remove_member(usr)
-				usr.Target.party.add_member(usr)
+				usr.Target.party.finalize_join(usr)   
 			src.Trigger(usr)
