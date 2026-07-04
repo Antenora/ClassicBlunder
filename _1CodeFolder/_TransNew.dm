@@ -159,6 +159,9 @@ mob/proc/CanTransform()
 				if(num_of_saiyans<4)
 					src << "You can't transform into this form like that."
 					return 0
+			if(transActive+1 == 5)
+				src << "You can't transform into this form like that."
+				return 0
 		if(length(race.transformations) >= 4 && race.transformations[4].type == /transformation/saiyan/super_saiyan_4 && transActive==0 && src.SSJ4FromBase && src.transUnlocked>=4)
 			src.transActive = 3
 			src.race.transformations[4].transform(src, TRUE)

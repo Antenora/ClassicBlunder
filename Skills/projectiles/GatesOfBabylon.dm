@@ -543,8 +543,8 @@ obj/Skills/AutoHit/Enuma_Elish
 		if(!owner || !m || !damageDealt) return
 		if(!enuma_shatter_fired)
 			enuma_shatter_fired = 1
-			for(var/mob/Players/P in view(12, m))
-				spawn() ScreenShatter(P)
+	//		for(var/mob/Players/P in view(12, m))
+	//			spawn() ScreenShatter(P)
 		if(m == owner.Target)
 			var/ticks = round(Cooldown * 10)
 			if(cooldown_remaining > 0)
@@ -607,8 +607,8 @@ obj/Skills/AutoHit/Enuma_Elish
 			return
 		if(!skill.enuma_shatter_fired)
 			skill.enuma_shatter_fired = 1
-			for(var/mob/Players/P in view(12, target))
-				spawn() ScreenShatter(P)
+	//		for(var/mob/Players/P in view(12, target))
+	//			spawn() ScreenShatter(P)
 		skill.charging_enuma = 0
 		PurgeEnumaElishSharedZones(shooter, target)
 		OMsg(shooter, "<b><font color='gold'>[shooter] [skill.ActiveMessage]</font></b>")
