@@ -1,2 +1,0 @@
-<font color=black>05/21/26(23:06:29)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>05/21/26(23:09:58)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Ba))<br>

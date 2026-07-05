@@ -1,6 +1,0 @@
-<font color=black>05/17/26(13:57:00)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>05/17/26(13:57:44)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(ykwn))<br>
-<font color=black>05/17/26(13:57:44)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>05/17/26(13:59:03)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Mods))<br>
-<font color=black>05/17/26(14:09:11)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>05/17/26(14:09:32)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Mods))<br>

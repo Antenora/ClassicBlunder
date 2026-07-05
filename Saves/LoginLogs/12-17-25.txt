@@ -1,4 +1,0 @@
-<font color=black>12/17/25(16:38:14)<b> XoxoDiablo</b> |  | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>12/17/25(16:40:21)<b> XoxoDiablo</b> |  | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>12/17/25(16:46:59)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
-<font color=black>12/17/25(16:57:29)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(whatev))<br>
