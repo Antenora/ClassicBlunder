@@ -1683,13 +1683,6 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 		if(Defender.SenseRobbed>=4&&(Defender.SenseUnlocked<=Defender.SenseRobbed&&Defender.SenseUnlocked>5))
 			AccMult/=max(0.1, 1-(Defender.SenseRobbed*0.1))
 
-
-		// if(Defender.Adrenaline)
-		// 	var/CombatSlow=10/max(Defender.Health,1)
-		// 	if(CombatSlow>1)
-		// 		AccMult/=1+(0.05*CombatSlow)
-		// ! ADRENALINE NO LONGER LETS PEOPLE DODGE MORE !
-
 		if(Offender.HasClarity()||Offender.HasFluidForm()||Offender.HasIntuition())
 			if(AccMult<1)
 				if(Offender.HasFluidForm())
@@ -1840,10 +1833,6 @@ proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/Base
 			AccMult*=(1-(Offender.SenseRobbed*0.1))
 		if(Defender.SenseRobbed>=4&&(Defender.SenseUnlocked<=Defender.SenseRobbed&&Defender.SenseUnlocked>5))
 			AccMult/=(1-(Defender.SenseRobbed*0.1))
-		// if(Defender.Adrenaline)
-		// 	var/CombatSlow=10/max(Defender.Health,1)
-		// 	if(CombatSlow>1)
-		// 		AccMult/=1+(0.05*CombatSlow)
 		if(Offender.HasClarity()||Offender.HasFluidForm()||Offender.HasIntuition())
 			if(AccMult<1)
 				AccMult+=0.2*AccMult
