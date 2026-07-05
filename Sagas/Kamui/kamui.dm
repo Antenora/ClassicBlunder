@@ -1,1 +1,0 @@
-globalTracker/var/LIFE_FIBER_RENDING_MODIFIER = 1
