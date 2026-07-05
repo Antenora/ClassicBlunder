@@ -1,0 +1,10 @@
+<font color=black>01/17/26(18:30:01)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>01/17/26(18:30:27)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>01/17/26(18:30:47)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Steak))<br>
+<font color=black>01/17/26(18:30:47)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>01/17/26(18:36:10)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Steak))<br>
+<font color=black>01/17/26(18:36:12)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(girl))<br>
+<font color=black>01/17/26(18:57:12)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>01/17/26(18:57:27)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>01/17/26(18:58:59)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(girl))<br>
+<font color=black>01/17/26(18:59:00)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Steak))<br>

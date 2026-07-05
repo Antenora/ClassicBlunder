@@ -1,0 +1,8 @@
+<font color=black>04/17/26(16:23:55)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>04/17/26(16:24:29)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>04/17/26(16:27:03)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Steak))<br>
+<font color=black>04/17/26(16:27:04)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Ack))<br>
+<font color=black>04/17/26(16:48:49)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>04/17/26(16:49:15)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>04/17/26(16:50:08)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Steak))<br>
+<font color=black>04/17/26(16:50:16)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Ack))<br>

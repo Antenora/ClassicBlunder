@@ -1,0 +1,16 @@
+<font color=black>11/30/25(13:25:44)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:26:02)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:26:55)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(whatev))<br>
+<font color=black>11/30/25(13:26:56)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Nicely Will Knot You))<br>
+<font color=black>11/30/25(13:31:24)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:31:42)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:45:43)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Nicely Will Knot You))<br>
+<font color=black>11/30/25(13:45:46)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(whatev))<br>
+<font color=black>11/30/25(13:47:31)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:47:50)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:52:54)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(whatev))<br>
+<font color=black>11/30/25(13:52:56)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Nicely Will Knot You))<br>
+<font color=black>11/30/25(13:56:51)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(13:57:09)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=blue>logged in.</font color>)<br>
+<font color=black>11/30/25(14:00:57)<b> NWKY</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(Nicely Will Knot You))<br>
+<font color=black>11/30/25(14:00:58)<b> XoxoDiablo</b> | 127.0.0.1 | 3813044880 (<font color=red>logged out.</font color>(whatev))<br>
