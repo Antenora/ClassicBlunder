@@ -1,0 +1,41 @@
+#define WATER_NODE_ENTRY_X 284
+#define WATER_NODE_21_X 164
+#define WATER_NODE_22_X 404
+#define WATER_NODE_31_X 104
+#define WATER_NODE_32_X 464
+#define WATER_NODE_41_X 120
+#define WATER_NODE_42_X 448
+#define WATER_NODE_CENTER_X 284
+#define WATER_NODE_61_X 188
+#define WATER_NODE_62_X 380
+#define WATER_NODE_TOP_X 284
+#define WATER_NODE_CROWN_X 284
+
+#define WATER_NODE_ENTRY_Y 512
+#define WATER_NODE_21_Y 480
+#define WATER_NODE_22_Y 480
+#define WATER_NODE_31_Y 386
+#define WATER_NODE_32_Y 386
+#define WATER_NODE_41_Y 260
+#define WATER_NODE_42_Y 260
+#define WATER_NODE_CENTER_Y 328
+#define WATER_NODE_61_Y 152
+#define WATER_NODE_62_Y 152
+#define WATER_NODE_TOP_Y 52
+#define WATER_NODE_CROWN_Y 208
+
+#define WATER_NODE_ENTRY "Riptide (Spell Slot)"
+#define WATER_NODE_21 "WaterNode21"
+#define WATER_NODE_22 "WaterNode22"
+#define WATER_NODE_31 "WaterNode31"
+#define WATER_NODE_32 "WaterNode32"
+#define WATER_NODE_41 "Wetten Socks (Spell Slot)"
+#define WATER_NODE_42 "Frost Shamshir (Spell Slot)"
+#define WATER_NODE_CENTER "WaterNodeCenter"
+#define WATER_NODE_61 "WaterNode61"
+#define WATER_NODE_62 "WaterNode62"
+#define WATER_NODE_TOP "WaterNodeTop"
+#define WATER_NODE_CROWN "WaterNodeCrown"
+
+#define WATER_NODES list(WATER_NODE_ENTRY, WATER_NODE_21, WATER_NODE_22, WATER_NODE_31, WATER_NODE_32, WATER_NODE_41, WATER_NODE_42, WATER_NODE_CENTER,\
+WATER_NODE_61, WATER_NODE_62, WATER_NODE_TOP, WATER_NODE_CROWN)

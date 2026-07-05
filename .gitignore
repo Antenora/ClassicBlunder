@@ -1,0 +1,57 @@
+#Files and folders specified here will never be tracked.
+Data/
+.svn/
+test_server/
+
+*.ban
+*.bdb
+*.log
+*.sav
+
+#Files from hosting the game
+Map1
+Login Menu
+Saves
+
+
+#Compiled files and other files generated during compilation.
+*.dmb
+*.rsc
+*.int
+*.lk
+*.int
+*.dyn.rsc
+*.dme.r*
+
+#other stuff
+.dropbox
+desktop.ini
+
+SaveBackups/Players/fushichou
+SaveBackups/Players/galionknight
+Map/backup/GameMap.dmm
+debug_log.txt
+DragonballRebirth.zip
+.vscode/settings.json
+oldNuDBRSource.rar
+*.db
+Icons/Characters/Androids/Thumbs.db
+Icons/Characters/Changlings/Thumbs.db
+Icons/Characters/Demons/Thumbs.db
+Icons/Characters/Makyo/Thumbs.db
+Icons/Characters/Namek/Thumbs.db
+Icons/Characters/Thumbs.db
+Icons/IntIcons/Thumbs.db
+Icons/NSE/spells/cast/Thumbs.db
+Icons/NSE/spells/debuff/Thumbs.db
+Icons/NSE/spells/tilebuff/Thumbs.db
+Icons/Objects/Thumbs.db
+Icons/Old Icons/Thumbs.db
+Icons/Turfs/Thumbs.db
+Icons/Weather/Thumbs.db
+*.db
+oldNuDBRSource.rar
+oldNuDBRSource.rar
+*.rar
+Telepath
+ReallyOldMaps/ProbablyTheMapWereUsingThisWipe - Copy.dmm

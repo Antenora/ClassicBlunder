@@ -1,0 +1,2 @@
+/mob/Update()
+    GainLoop()

@@ -1,0 +1,76 @@
+"a" = (/turf/Roof3,/area/Outside)
+"b" = (/obj/Turfs/Door/Door2,/turf/Tech2,/area/Outside)
+"c" = (/turf/Tech2,/area/Outside)
+"d" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"e" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"f" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"g" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area/Outside)
+"h" = (/turf/Wall6,/area/Outside)
+"i" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Outside)
+"j" = (/turf/Tech7,/area/Outside)
+"k" = (/turf/Tile14,/area/Outside)
+"l" = (/obj/Turfs/Console3,/turf/Tile14,/area/Outside)
+"m" = (/obj/Turfs/Console2,/turf/Tile14,/area/Outside)
+"n" = (/obj/Items/Tech/Regenerator{Destructable = 0; Lvl = 15; name = "Tuffle Regenerator"; Savable = 0},/turf/Tile14,/area/Outside)
+"o" = (/obj/Turfs/Console1,/turf/Tile14,/area/Outside)
+"p" = (/obj/Turfs/Console5,/turf/Tile14,/area/Outside)
+"q" = (/obj/Turfs/Console4,/turf/Tile14,/area/Outside)
+"r" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"s" = (/turf/Wall6B,/area/Outside)
+"t" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech2,/turf/Wall6,/area/Outside)
+"u" = (/obj/Items/Tech/CameraProbe,/turf/MidgarTiles/MidgarTile2,/area/Outside)
+"v" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/SignTech1,/turf/Wall6,/area/Outside)
+"w" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech1,/turf/Wall6,/area/Outside)
+"x" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech1,/obj/Turfs/SignTech1,/turf/Wall6,/area/Outside)
+"y" = (/turf/MidgarTiles/MidgarTile3,/area/Outside)
+"z" = (/turf/Tile14,/turf/MidgarTiles/MidgarGrate3,/area/Outside)
+"A" = (/turf/MidgarTiles/MidgarTile4,/area/Outside)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aadeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefccccdeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefaa
+aaghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhiccccghhhhhhhhhhhhhhhhhhhhhhhhhhhhhhiaa
+aajjjjkklkkmknnmkklkknnmkklkkkjjjjjjjjjjjjkklkkmknnmkklkknnmkklkkkjjjjaa
+aajjjkkokkokkpqkkokkopqkkokkokkjjjjjjjjjjkkokkokkpqkkokkopqkkokkokkjjjaa
+aajjkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjaa
+aajkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkaaaaaaaaaaaaaaaaaakkkkkjjjjjjjjkkkkkaaaaaaaaaaaaaaaaaakkkkkkkaa
+aakkkkkkkrsdfsdfsdfsdfsdfsrkkkkkjjjjjjjjkkkkkrsdfsdfsdfsdfsdfsrkkkkkkkaa
+aakkkkkkktuvwuvwuvwuvwuvxutkkkkkjjjjjjjjkkkkktuvwuvwuvwuvwuvxutkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkaaaaaaaaaaaaaaaaaakkkkkjjjjjjjjkkkkkaaaaaaaaaaaaaaaaaakkkkkkkaa
+aakkkkkkkrsdfsdfsdfsdfsdfsrkkkkkjjjjjjjjkkkkkrsdfsdfsdfsdfsdfsrkkkkkkkaa
+aakkkkkkktuvwuvwuvwuvwuvxutkkkkkjjjjjjjjkkkkktuvwuvwuvwuvwuvxutkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkyzAyzAyzAyzAyzAyzAkkkkkjjjjjjjjkkkkkyzAyzAyzAyzAyzAyzAkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkaa
+aakkkkkaaaaaaaaaaaaaaaaaaaaaakkkjjjjjjjjkkkaaaaaaaaaaaaaaaaaaaaaakkkkkaa
+aakkkkkdeeeeeeeeeeeeeeeeeeeefkkkjjjjjjjjkkkdeeeeeeeeeeeeeeeeeeeefkkkkkaa
+aakkkkkghhhhhhhhhhhhhhhhhhhhikkkjjjjjjjjkkkghhhhhhhhhhhhhhhhhhhhikkkkkaa
+aakkkkkklkkmknnmkklkknnmkklkkkkkjjjjjjjjkkkklkkmknnmkklkknnmkklkkkkkkkaa
+aakkkkkokkokkpqkkokkopqkkokkokkkjjjjjjjjkkkokkokkpqkkokkopqkkokkokkkkkaa
+aajkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkjaa
+aajjkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkkjjaa
+aajjjkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkkjjjaa
+aajjjjkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjjjjjkkkkkkkkkkkkkkkkkkkkkkkkkkjjjjaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

@@ -1,0 +1,62 @@
+"a" = (/turf/Special/Blank,/area)
+"b" = (/turf/Roof7,/area)
+"c" = (/obj/Turfs/IconsX/Icon5,/turf/Wall1,/area)
+"d" = (/obj/Turfs/IconsX/Icon1,/turf/Wall1,/area)
+"e" = (/obj/Turfs/IconsX/Icon3,/turf/Wall1,/area)
+"f" = (/obj/Turfs/IconsX/Icon2,/turf/Wall1,/area)
+"g" = (/obj/Turfs/IconsX/Icon14,/turf/Tech13,/area)
+"h" = (/obj/Turfs/IconsX/Icon12,/turf/Tech13,/area)
+"i" = (/obj/Turfs/IconsX/Icon13,/turf/Tech13,/area)
+"j" = (/obj/Turfs/IconsX/Icon11,/turf/Tech13,/area)
+"k" = (/turf/Tech13,/area)
+"l" = (/obj/Turfs/IconsX/Icon15,/turf/Tech13,/area)
+"m" = (/obj/Turfs/Jugs,/turf/Tech13,/area)
+"n" = (/obj/Turfs/IconsX/Icon16,/turf/Tech13,/area)
+"o" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon57,/turf/Tech13,/area)
+"p" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon56,/turf/Tech13,/area)
+"q" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon67,/turf/Tech13,/area)
+"r" = (/turf/Wall1,/area)
+"s" = (/obj/Turfs/IconsX/Icon25,/turf/Tech13,/area)
+"t" = (/turf/Carpet3,/area)
+"u" = (/obj/Turfs/IconsX/Icon21,/turf/Carpet3,/area)
+"v" = (/obj/Turfs/IconsX/Icon33,/turf/Carpet3,/area)
+"w" = (/turf/Carpet6,/area)
+"x" = (/turf/Tech3,/area)
+"y" = (/obj/Turfs/RoofGlass,/turf/Carpet6,/area)
+"z" = (/obj/Turfs/Table5,/turf/Carpet3,/area)
+"A" = (/obj/Turfs/Table4,/turf/Carpet3,/area)
+"B" = (/obj/Turfs/Table3,/turf/Carpet3,/area)
+"C" = (/turf/Stairs8,/area)
+"D" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"E" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"F" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area)
+"G" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area)
+"H" = (/turf/Tech10,/area)
+"I" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"J" = (/turf/Wall6,/area)
+
+(1,1,1) = {"
+aaaaaaaaaabbbbbbbbbbbaaaaaaaaa
+aaaaaaaaaabbcdcddefbbaaaaaaaaa
+aaaaaaaaaabbghghijjbbaaaaaaaaa
+aaaaaaaaaabbkkkkkkkbbaaaaaaaaa
+bbbbbbbbbbbblkkkkkmbbbbbbbbbbb
+bbbbbbbbbbbbnkopqkkbbbbbbbbbbb
+bbrrrrrrrrbrskkkkkkrbrrrrrrrrb
+bbtuttttutkkkkkkkkkkktuttttutb
+bbuvuttuvubbbbbkbbbbbuvuttuvub
+bbtuttttutbbrrrwrrrbbtuttttutb
+bbtuttttutbbwwwwwwwbbtuttttutb
+bbuvuttuvurbxyyyyyxbruvuttuvub
+bbtuttttuttrtzAAABtrttuttttutb
+bbtuttttutttttttttttttuttttutb
+bbuvuttuvutttttttttttuvuttuvub
+bbtuttttutttttttttttttuttttutb
+bbtuttttutbbbbtttbbbbtuttttutb
+bbuvuttuvubbbbCCCbbbbuvuttuvub
+bbtuttttutbbDECCCDEbbtuttttutb
+bbbbbbbbbbbbFGHHHFGbbbbbbbbbbb
+bbbbbbbbbbbbHHHHHHHbbbbbbbbbbb
+DIIIIIIIIIIEHHHHHHHDIIIIIIIIII
+FJJJJJJJJJJGHHHHHHHFJJJJJJJJJJ
+"}

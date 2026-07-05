@@ -1,0 +1,116 @@
+"aa" = (/turf/Tech10,/area/Inside)
+"ab" = (/turf/MidgarTiles/MidgarRoofSE,/area/Inside)
+"ac" = (/turf/MidgarTiles/MidgarRoofSouth,/area/Inside)
+"ad" = (/turf/MidgarTiles/MidgarRoofSW,/area/Inside)
+"ae" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech10,/area/Inside)
+"af" = (/turf/MidgarTiles/MidgarRoofEast,/area/Inside)
+"ag" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/MidgarLightWall3,/area/Inside)
+"ah" = (/turf/MidgarTiles/MidgarLightWall3,/area/Inside)
+"ai" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/MidgarLightWall3,/area/Inside)
+"aj" = (/turf/MidgarTiles/MidgarRoofWest,/area/Inside)
+"ak" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech10,/area/Inside)
+"al" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"am" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"an" = (/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"ao" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"ap" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aq" = (/turf/Tech10,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"ar" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech10,/area/Inside)
+"as" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeW,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"at" = (/turf/Roof3,/area/Inside)
+"au" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeE,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"av" = (/turf/MidgarTiles/MidgarRapeWindow,/area/Inside)
+"aw" = (/turf/MidgarTiles/MidgarRoofNW,/area/Inside)
+"ax" = (/turf/MidgarTiles/MidgarRoofNE,/area/Inside)
+"ay" = (/turf/MidgarTiles/MidgarRoofNorth,/area/Inside)
+"az" = (/obj/Turfs/Door{Password = "Coconut"},/turf/Tech2,/area/Outside)
+"aA" = (/turf/MidgarTiles/MidgarStairs,/area/Inside)
+"aB" = (/turf/MidgarTiles/MidgarLightWall,/area/Inside)
+"aC" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/MidgarWall3,/area/Inside)
+"aD" = (/turf/MidgarTiles/MidgarWall3,/area/Inside)
+"aE" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/MidgarWall3,/area/Inside)
+"aF" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aG" = (/turf/MidgarTiles/Midgarwall5,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aH" = (/turf/Tech10,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aI" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech10,/area/Inside)
+"aJ" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech10,/area/Inside)
+"aK" = (/turf/MidgarTiles/Midgarwall5,/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Edges/MetalEdgeE,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aL" = (/turf/MidgarTiles/Midgarwall5,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Edges/MetalEdgeW,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aM" = (/turf/MidgarTiles/Midgarwall5,/obj/Turfs/Edges/MetalEdgeS,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aN" = (/turf/MidgarTiles/Midgarwall5,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Edges/MetalEdgeE,/turf/MidgarTiles/MidgarGrate3,/area/Inside)
+"aO" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/Edges/MetalEdgeW,/turf/Tech10,/area/Inside)
+"aP" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"aQ" = (/obj/Turfs/Edges/MetalEdgeN,/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"aR" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/Midgarwall5,/area/Inside)
+"aS" = (/turf/MidgarTiles/MidgarWall4,/area/Inside)
+"aT" = (/turf/MidgarTiles/MidgarTile1,/area/Inside)
+"aU" = (/turf/MidgarTiles/MidgarWall1,/area/Inside)
+"aV" = (/turf/MidgarTiles/MidgarWall2,/area/Inside)
+"aW" = (/turf/Tech10,/turf/MidgarTiles/MidgarSlime4,/area/Inside)
+"aX" = (/turf/MidgarTiles/MidgarSlime5,/area/Inside)
+"aY" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/MidgarWall4,/area/Inside)
+"aZ" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/MidgarWall4,/area/Inside)
+"ba" = (/turf/Tech10,/turf/MidgarTiles/MidgarSlime,/area/Inside)
+"bb" = (/turf/Tech10,/turf/MidgarTiles/MidgarSlime2,/area/Inside)
+
+(1,1,1) = {"
+aaaaaaabacacacacacacacacacacacacacacacacadaaaaaaaa
+aaaaaeafadagahahahahahahahahahahahahaiabajakaaaaaa
+aaaealafajamananananananananananananaoafajapakaaaa
+aealaqafajaaaaaaaaaaaaaaaaaaaaaaaaaaaaafajaqapakaa
+alaqaqafajaaaaaaaaaaaaaaaaaaaaaaaaaaaaafajaqaqapar
+asaqaqafajaaaaaaaaaaaaatataaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaatataaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaahahaaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaavavaaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaaaaaaaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaaaaaaaaaaaaaaaaaafajaqaqauar
+asaqaqafajaaaaaaaaaaaaaaaaaaaaaaaaaaaaafajaqaqauar
+asaqaqafawaaaaaaaaaaaaaaaaaaaaaaaaaaaaaxajaqaqauar
+asaqaqaxayayayayayayawazazaxayayayayayayawaqaqauar
+asaqaqagahahahahahahahaAaAaBahahahahahahaiaqaqauar
+asaqaqaCaDaDaDaDaDaDaDaAaAaDaDaDaDaDaDaDaEaqaqauar
+aFaqaqaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaqaqaHar
+aIaFaqaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaqaHaJaa
+aaaIaFaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaGaHaJaaaa
+aaaaaIaKaAaAaLaMaMaMaMaMaMaMaMaMaMaMaMaMaNaOaaaaaa
+aaaaaaaPaAaAaQaQaQaQaQaQaQaQaQaQaQaQaQaQaRaaaaaaaa
+aaaaaaamaAaAaSaSaSaSaSaSaSaSaSaSaSaSaSaSaoaaaaaaaa
+aaaaaaamaAaAaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaUaDaDaDaDaDaDaDaDaDaDaDaDaVaAaAaoaaaaaaaa
+aaaaaaamaSaSaSaSaSaSaSaSaSaSaSaSaSaSaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaAaAaUaDaDaDaDaDaDaDaDaDaDaDaDaVaoaaaaaaaa
+aaaaaaamaAaAananananananananananananananaoaaaaaaaa
+aaaaaaamaAaAaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaUaDaDaDaDaDaDaDaDaDaDaDaDaVaAaAaoaaaaaaaa
+aaaaaaamaSaSaSaSaSaSaSaSaSaSaSaSaSaSaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaAaAaUaDaDaDaDaDaDaDaDaDaDaDaDaVaoaaaaaaaa
+aaaaaaamaAaAananananananananananananananaoaaaaaaaa
+aaaaaaamaAaAaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaUaDaDaDaDaDaDaDaDaDaDaDaDaVaAaAaoaaaaaaaa
+aaaaaaamaSaSaSaSaSaSaSaSaSaSaSaSaSaSaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaAaAaUaDaDaDaDaDaDaDaDaDaDaDaDaVaoaaaaaaaa
+aaaaaaamaAaAananananananananananananananaoaaaaaaaa
+aaaaaaamaAaAaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaUaDaDaDaDaDaDaDaDaDaDaDaDaVaAaAaoaaaaaaaa
+aaaaaaamaSaSaSaSaSaSaSaSaSaSaSaSaSaSaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaAaAaoaaaaaaaa
+aaaaaaamaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaTaoaaaaaaaa
+aaaaaaamaAaAaUaDaDaDaDaDaDaDaDaDaDaDaDaVaoaWaaaaaa
+aaaaaaamaAaAananananananananananananananaoaXaaaaaa
+aaaaaaamaAaAananananananananananananananaoaXaaaaaa
+aaaaaaaYaAaAaSaSaSaSaSaSaSaSaSaSaSaSaSaSaZbaaaaaaa
+aaaaaaaaaAaAaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

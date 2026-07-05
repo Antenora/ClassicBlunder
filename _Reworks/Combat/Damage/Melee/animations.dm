@@ -1,0 +1,17 @@
+
+/mob/var/customPixelX = 0
+/mob/var/customPixelY = 0
+
+/mob/proc/Whiff()
+	set waitfor = FALSE
+	KenShockwave(src, icon='fevKiai.dmi', Size = 0.5)
+
+
+
+/mob/verb/resetPixelOffset()
+	set name = "Reset Pixel Offset"
+	set category = "Other"
+	set hidden = 1
+	pixel_x = customPixelX
+	pixel_y = customPixelY
+	alpha = 255

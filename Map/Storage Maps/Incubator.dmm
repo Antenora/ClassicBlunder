@@ -1,0 +1,71 @@
+"a" = (/turf/Misc1,/area)
+"b" = (/turf/MidgarTiles/MidgarRoofWest,/area)
+"c" = (/turf/MidgarTiles/MidgarRoofNorth,/area)
+"d" = (/turf/MidgarTiles/MidgarRoofEast,/area)
+"e" = (/turf/Dirt2,/area)
+"f" = (/turf/MidgarTiles/MidgarRoofSE,/area)
+"g" = (/turf/MidgarTiles/MidgarRoofSouth,/area)
+"h" = (/turf/MidgarTiles/MidgarRoofSW,/area)
+"i" = (/obj/Special/JENOVA,/turf/Special/jenovaTankT,/area)
+"j" = (/turf/MidgarTiles/MidgarRoofNW,/area)
+"k" = (/turf/Special/jenovaTankC,/area)
+"l" = (/turf/MidgarTiles/MidgarRoofNE,/area)
+"m" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarLightWall3,/area)
+"n" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarLightWall3,/area)
+"o" = (/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarLightWall3,/area)
+"p" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarLightWall3,/area)
+"q" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/Midgarwall5,/area)
+"r" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/Midgarwall5,/area)
+"s" = (/turf/MidgarTiles/Midgarwall5,/area)
+"t" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/Midgarwall5,/area)
+"u" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/MidgarWall3,/area)
+"v" = (/obj/Turfs/Edges/DarkEdgeW,/turf/MidgarTiles/MidgarWall3,/area)
+"w" = (/turf/MidgarTiles/MidgarWall3,/area)
+"x" = (/obj/Turfs/Edges/DarkEdgeE,/turf/MidgarTiles/MidgarWall3,/area)
+"y" = (/turf/MidgarTiles/MidgarTile1,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarGrate3,/area)
+"z" = (/turf/Special/jenovaBG,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarGrate3,/area)
+"A" = (/turf/Dirt2,/obj/Turfs/Edges/DarkEdgeN,/turf/MidgarTiles/MidgarGrate3,/area)
+"B" = (/turf/MidgarTiles/MidgarTile1,/area)
+"C" = (/turf/Waters/Water8,/turf/MidgarTiles/MidgarGrate3,/area)
+"D" = (/turf/MidgarTiles/MidgarTile1,/turf/Special/jenovaTankB,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabccccccccccdaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabeeeeeeeeeedaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabeeeeeeeeeedaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabeeeeeeeeeedaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabeeeeeeeeeedaaaaaaaaaaaaaa
+aaaaaaaaaaaaaabeeeeeeeeeedaaaaaaaaaaaaaa
+aaaafgggggggggheeieeeeeeefggggggggghaaaa
+aaaadaaaaaaaaabeeeeeeeeeedaaaaaaaaabaaaa
+aaaadaaaaaaaaabeeeeeeeeeedaaaaaaaaabaaaa
+aaaadaaaaaaaaabeeeeeeeeeedaaaaaaaaabaaaa
+aaaadaaaaaaaaabeeeeeeeeeedaaaaaaaaabaaaa
+aaaadaaaaaaaacjeekeeeeeeelcaaaaaaaabaaaa
+aaablccccccccjmeeeeeeeeeemlccccccccjdaaa
+aaabnoooooooopqeeeeeeeeeeqnoooooooopdaaa
+aaabrsssssssstueeeeeeeeeeursssssssstdaaa
+aaabvwwwwwwwwxyzAAAAAAAAAyvwwwwwwwwxdaaa
+aaabBBBBBBBBCCBBBDBBBBBBBBBCCBBBBBBBdaaa
+aaabBBBBBBBBCCBBBBBBBBBBBBBCCBBBBBBBdaaa
+aaabhBBBBBBBCCBBBBBBBBBBBBBCCBBBBBBfdaaa
+aaaabBBBBBBBCCBBBBBBBBBBBBBCCBBBBBBdaaaa
+aaaabBBBBBBBCCBBBBBBBBBBBBBCCBBBBBBdaaaa
+aaaabBBBBBBBCCBBBBBBBBBBBBBCCBBBBBBdaaaa
+aaaabghBBBBBCCBBBBBBBBBBBBBCCBBBBfgdaaaa
+aaaaaabBBBBBCCBBBBBBBBBBBBBCCBBBBdaaaaaa
+aaaaaabBBBBBCCBBBBBBBBBBBBBCCBBBBdaaaaaa
+aaaaaabBBBBBCCBBBBBBBBBBBBBCCBBBBdaaaaaa
+aaaaaabgghBBCCBBBBBBBBBBBBBCCBBfgdaaaaaa
+aaaaaaaaabBBCCBBBBBBBBBBBBBCCBBdaaaaaaaa
+aaaaaaaaabBBCCBBBBBBBBBBBBBCCBBdaaaaaaaa
+aaaaaaaaabgghCBBBBBBBBBBBBBCfggdaaaaaaaa
+aaaaaaaaaaaabCBBBBBBBBBBBBBCdaaaaaaaaaaa
+aaaaaaaaaaaabCBBBBBBBBBBBBBCdaaaaaaaaaaa
+aaaaaaaaaaaabghBBBfggghBBBfgdaaaaaaaaaaa
+aaaaaaaaaaaaaabBBBdaaabBBBdaaaaaaaaaaaaa
+aaaaaaaaaaaaaabgggdaaabgggdaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

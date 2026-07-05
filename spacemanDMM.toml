@@ -1,0 +1,8 @@
+[debugger]
+engine = "auxtools"
+
+[diagnostics]
+duplicate_include = "false"
+
+[langserver]
+dreamchecker = false

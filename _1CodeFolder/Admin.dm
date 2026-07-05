@@ -2050,7 +2050,6 @@ mob/Admin3/verb
 				M.race.transformations += new /transformation/saiyan/super_saiyan()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_2()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_3()
-				M.race.transformations += new /transformation/saiyan/super_saiyan_4_daima()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_god()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_blue()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_blue_evolved()

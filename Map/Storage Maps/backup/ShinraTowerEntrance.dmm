@@ -1,0 +1,95 @@
+"a" = (/turf/Roof3,/area/Outside/Planet/Earth)
+"b" = (/turf/Roof3,/area/Inside)
+"c" = (/turf/Roof3,/area/Outside)
+"d" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"e" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"f" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Inside)
+"g" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area/Inside)
+"h" = (/turf/Wall6,/area/Inside)
+"i" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Inside)
+"j" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/MidgarObj/Widescreen,/turf/Wall6,/area/Inside)
+"k" = (/obj/Special/Teleporter2{gotoX = 240; gotoY = 124; gotoZ = 11},/turf/Special/CaveEntrance,/area/Inside)
+"l" = (/obj/Special/Teleporter2{gotoX = 241; gotoY = 124; gotoZ = 11},/turf/Special/CaveEntrance,/area/Inside)
+"m" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/MidgarObj/Widescreen,/turf/Wall6,/area/Inside)
+"n" = (/obj/Special/Teleporter2{gotoX = 249; gotoY = 124; gotoZ = 11},/turf/Special/CaveEntrance,/area/Inside)
+"o" = (/obj/Special/Teleporter2{gotoX = 250; gotoY = 124; gotoZ = 11},/turf/Special/CaveEntrance,/area/Inside)
+"p" = (/turf/Tech2,/area/Outside)
+"q" = (/turf/Tech2,/area/Inside)
+"r" = (/turf/Tech9,/area/Inside)
+"s" = (/obj/Special/shinraLogo,/turf/Tech2,/area/Inside)
+"t" = (/turf/Stairs2,/area/Inside)
+"u" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeE,/turf/Wall6,/area/Inside)
+"v" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech2,/area/Outside)
+"w" = (/turf/Tech9,/area/Outside)
+"x" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Tech2,/area/Outside)
+"y" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/obj/Turfs/Edges/MetalEdgeW,/turf/Wall6,/area/Inside)
+"z" = (/turf/Tech13,/area/Inside)
+"A" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/MetalEdgeE,/turf/Wall6,/area/Inside)
+"B" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/MetalEdgeW,/turf/Wall6,/area/Inside)
+"C" = (/obj/Turfs/MidgarObj/Widescreen,/turf/Wall6,/area/Inside)
+"D" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Tech13,/area/Inside)
+"E" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech2,/area/Inside)
+"F" = (/obj/Turfs/Edges/MetalEdgeE,/turf/Tech2,/area/Inside)
+"G" = (/obj/Turfs/Edges/MetalEdgeW,/turf/Tech13,/area/Inside)
+"H" = (/obj/Turfs/MidgarObj/BenchE,/turf/Tech13,/area/Inside)
+"I" = (/obj/Turfs/MidgarObj/BenchW,/turf/Tech13,/area/Inside)
+"J" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Tech13,/area/Inside)
+"K" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech13,/area/Inside)
+"L" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech13,/area/Inside)
+"M" = (/obj/Turfs/MidgarObj/Lampost,/turf/Tech13,/area/Inside)
+"N" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area/Inside)
+"O" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area/Inside)
+"P" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area/Inside)
+"Q" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech2,/area/Inside)
+"R" = (/obj/Turfs/Edges/MetalEdgeS,/turf/Tech2,/area/Inside)
+"S" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/turf/Tech2,/area/Inside)
+"T" = (/obj/Turfs/Door{Password = "Coconut"},/turf/Tech2,/area/Outside)
+"U" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Tile27,/area/Outside/Planet/Earth)
+"V" = (/turf/Tile27,/area/Outside/Planet/Earth)
+"W" = (/turf/Tech13,/area/Outside/Planet/Earth)
+"X" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Tile27,/area/Outside/Planet/Earth)
+
+(1,1,1) = {"
+abccccccccccccccbbbbbbbbbbbbbccccccccccccccb
+abcccccccccccbbbdefdfdefdfdefbbbcccccccccccb
+abccccccccbbbdefghigighigighidefbbbccccccccb
+abccccccccdefghighigighigighighidefccccccccb
+abaccccbbbghighighigighigighighighibbbcccaab
+abacbbbdefghighighjklmhjnomhighighidefbbbaab
+abacdefghighighippqqqqqqqqqqpghighighidefaab
+abacghighighiqqqppqqqqqqqqqqpppqghighighiaab
+abacghighiqqqqqqppqqqqrqqqqqpppqqqqghighiaab
+abbaghighiqqqqqqppqqqrrrqqqqpppqqqqghighibbb
+abaaghiqqqqqqqqqppqqrrrrrqqqpppqqqqqqqghiaab
+abaappqqqqqqqqqqqqqrqrrrqrqqqqqqqqqqqqqppaab
+abaappqqqqqqqqqqqqrqqqrqqqrqqqqqqqqqqqqppaab
+abaappqqqqqqqqqqqrqqqqrqqqqrqqqqqqqqqqqppaab
+abaappqqqqqqqqqqrqqqqqqqqqqqrqqqqqqqqqqppaab
+abbbppqqqqqqqqqrqqqqqqqqqqqqqrqqqqqqqqqppbbb
+abdfppqqqqqqqqrqqqqqqqqqqqqqqqrqqqqqqqqppdfb
+abgippqqqqqqqrqqqqqqqqqqqqqqqqqrqqqqqqqppgib
+abgippqqqqqqqqrqqqqqqqqqqqqqqqrqqqqqqqqppgib
+abgippqqqqqqqqqrqqqqqqqqqqqqqrqqqqqqqqqppgib
+abgippqqqqqqqqqqrqqqqqqqqqqqrqqqqqqqqqqppgib
+abgippqqqqqqqqqqqrqqqqqqqqqrqqqqqqqqqqqppgib
+abgippqqqqqqqqqqqqrqqqqqqqrqqqqqqqqqqqqppgib
+abgippqqqqqqqqqqqqqrqqqqqrqqqqqqqqqqqqqppgib
+abgippqqqdeeeefqqqqqrqqqrqqqqqdeeeefqqqppgib
+abgiqqqqqghhhhisqqqqqrqrqqqqqqghhhhiqqqqqgib
+abgidtttfghhhhideeeeuvwxyeeeefghhhhidtttfgib
+abzzgtttighhhhighhhhAvpxBhhhhighhhhigtttizzb
+abzzgtttighhhhighhhhAvpxBhhhhighhhhigtttizzb
+abzzgtttigChhCighhhhAvpxBhhhhigChhCigtttizzb
+abzzgtttizzzzzzghhhhAvpxBhhhhizzzzzzgtttizzb
+abzzgtttizzzzzzghhhhAvpxBhhhhizzzzzzgtttizzb
+abzzzzzzzzzzzzzzzzzzDEqFGzzzzzzzzzzzzzzzzzzb
+abzzzzzzzzzzzzzzzzzzDEqFGzzzzzzzzzzzzzzzzzzb
+abzHzzzzzIzzzzzzzzzzDEqFGzzzzzzzzzzHzzzzzIzb
+abzHzzzzzIzzzzzzzzJJKEqFLJJzzzzzzzzHzzzzzIzb
+abzMzzzzzMzzzzzzzDNOOqqqOOPGzzzzzzzMzzzzzMzb
+abzHzzzzzIzzzzzzzDEqqqqqqqFGzzzzzzzHzzzzzIzb
+abzHzzzzzIzzzzzzzDEqqqqqqqFGzzzzzzzHzzzzzIzb
+abzzzzzzzzzzzzzzzDQRqqqqqRSGzzzzzzzzzzzzzzzb
+abbbbbbbbbbbbbbzzDbbTTTTTbbGzzbbbbbbbbbbbbbb
+aaaaaaaaaaaaaaazzzaaUVWVXaazzzaaaaaaaaaaaaaa
+"}

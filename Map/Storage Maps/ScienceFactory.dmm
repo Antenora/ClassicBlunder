@@ -1,0 +1,74 @@
+"a" = (/turf/Roof3,/area)
+"b" = (/turf/Tech2,/area)
+"c" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"d" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"e" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"f" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area)
+"g" = (/turf/Wall6,/area)
+"h" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area)
+"i" = (/turf/Tech7,/area)
+"j" = (/turf/Tile14,/area)
+"k" = (/obj/Turfs/Console3,/turf/Tile14,/area)
+"l" = (/obj/Turfs/Console2,/turf/Tile14,/area)
+"m" = (/obj/Turfs/Console1,/turf/Tile14,/area)
+"n" = (/obj/Turfs/Console5,/turf/Tile14,/area)
+"o" = (/obj/Turfs/Console4,/turf/Tile14,/area)
+"p" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area)
+"q" = (/turf/Wall6B,/area)
+"r" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech2,/turf/Wall6,/area)
+"s" = (/turf/MidgarTiles/MidgarTile2,/area)
+"t" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/SignTech1,/turf/Wall6,/area)
+"u" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech1,/turf/Wall6,/area)
+"v" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/SignTech1,/obj/Turfs/SignTech1,/turf/Wall6,/area)
+"w" = (/turf/MidgarTiles/MidgarTile3,/area)
+"x" = (/turf/Tile14,/turf/MidgarTiles/MidgarGrate3,/area)
+"y" = (/turf/MidgarTiles/MidgarTile4,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aacddddddddddddddddddddddddddddddebbbbcddddddddddddddddddddddddddddddeaa
+aafgggggggggggggggggggggggggggggghbbbbfgggggggggggggggggggggggggggggghaa
+aaiiiijjkjjljjjljjkjjjjljjkjjjiiiiiiiiiiiijjkjjljjjljjkjjjjljjkjjjiiiiaa
+aaiiijjmjjmjjnojjmjjmnojjmjjmjjiiiiiiiiiijjmjjmjjnojjmjjmnojjmjjmjjiiiaa
+aaiijjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjiiaa
+aaijjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjiaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjaaaaaaaaaaaaaaaaaajjjjjiiiiiiiijjjjjaaaaaaaaaaaaaaaaaajjjjjjjaa
+aajjjjjjjpqceqceqceqceqceqpjjjjjiiiiiiiijjjjjpqceqceqceqceqceqpjjjjjjjaa
+aajjjjjjjrstustustustustvsrjjjjjiiiiiiiijjjjjrstustustustustvsrjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjaaaaaaaaaaaaaaaaaajjjjjiiiiiiiijjjjjaaaaaaaaaaaaaaaaaajjjjjjjaa
+aajjjjjjjpqceqceqceqceqceqpjjjjjiiiiiiiijjjjjpqceqceqceqceqceqpjjjjjjjaa
+aajjjjjjjrstustustustustvsrjjjjjiiiiiiiijjjjjrstustustustustvsrjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjwxywxywxywxywxywxyjjjjjiiiiiiiijjjjjwxywxywxywxywxywxyjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjjaa
+aajjjjjaaaaaaaaaaaaaaaaaaaaaajjjiiiiiiiijjjaaaaaaaaaaaaaaaaaaaaaajjjjjaa
+aajjjjjcddddddddddddddddddddejjjiiiiiiiijjjcddddddddddddddddddddejjjjjaa
+aajjjjjfgggggggggggggggggggghjjjiiiiiiiijjjfgggggggggggggggggggghjjjjjaa
+aajjjjjjkjjljjjljjkjjjjljjkjjjjjiiiiiiiijjjjkjjljjjljjkjjjjljjkjjjjjjjaa
+aajjjjjmjjmjjnojjmjjmnojjmjjmjjjiiiiiiiijjjmjjmjjnojjmjjmnojjmjjmjjjjjaa
+aaijjjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjjiaa
+aaiijjjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjjiiaa
+aaiiijjjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjjiiiaa
+aaiiiijjjjjjjjjjjjjjjjjjjjjjjjjjiiiiiiiijjjjjjjjjjjjjjjjjjjjjjjjjjiiiiaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+"}

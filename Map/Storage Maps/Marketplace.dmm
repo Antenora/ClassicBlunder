@@ -1,0 +1,83 @@
+"a" = (/turf/Roof7,/area)
+"b" = (/turf/Wall26,/area)
+"c" = (/turf/Roof3,/area)
+"d" = (/obj/Turfs/IconsX/Icon16,/turf/Ice1,/area)
+"e" = (/obj/Turfs/IconsX/Icon37,/turf/Ice1,/area)
+"f" = (/turf/Tile14,/area)
+"g" = (/obj/Turfs/IconsXLBig/Icon20,/turf/Tile12,/area)
+"h" = (/obj/Turfs/IconsXLBig/Icon21,/turf/Tile12,/area)
+"i" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Tile12,/area)
+"j" = (/turf/Ice1,/area)
+"k" = (/turf/Tile12,/area)
+"l" = (/obj/Turfs/IconsX/Icon1,/turf/Wall26,/area)
+"m" = (/obj/Turfs/IconsX/Icon2,/turf/Wall26,/area)
+"n" = (/obj/Turfs/IconsX/Icon4,/turf/Wall26,/area)
+"o" = (/obj/Turfs/IconsX/Icon11,/turf/Tile14,/area)
+"p" = (/obj/Turfs/IconsX/Icon12,/turf/Tile14,/area)
+"q" = (/obj/Turfs/IconsX/Icon14,/turf/Tile14,/area)
+"r" = (/obj/Turfs/IconsX/Icon13,/turf/Tile14,/area)
+"s" = (/obj/Turfs/RoofGlass,/turf/Tile14,/area)
+"t" = (/obj/Turfs/IconsX/Icon16,/turf/Tile14,/area)
+"u" = (/obj/Turfs/Table5,/turf/Tile14,/area)
+"v" = (/obj/Turfs/Table4,/turf/Tile14,/area)
+"w" = (/obj/Turfs/Table3,/turf/Tile14,/area)
+"x" = (/obj/Turfs/IconsX/Icon26,/turf/Tile12,/area)
+"y" = (/obj/Turfs/IconsX/Icon15,/turf/Tile12,/area)
+"z" = (/obj/Turfs/IconsX/Icon25,/turf/Tile12,/area)
+"A" = (/obj/Turfs/IconsX/Icon37,/turf/Tile12,/area)
+"B" = (/obj/Turfs/IconsX/Icon36,/turf/Tile12,/area)
+"C" = (/obj/Turfs/Console6R,/turf/Tile12,/area)
+"D" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Tech2,/area)
+"E" = (/obj/Turfs/Console6L,/turf/Tile12,/area)
+"F" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeS,/obj/Turfs/Console6Top,/turf/Tech2,/area)
+"G" = (/turf/Stairs1,/area)
+"H" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall17,/area)
+"I" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall17,/area)
+"J" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall17,/area)
+"K" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall17,/area)
+"L" = (/turf/Wall17,/area)
+"M" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall17,/area)
+"N" = (/turf/Tech10,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+aabbbbbbbbbcbbbcbbbbcbbbcbbbbbbcbbbbbbbba
+aaddeddeedebfffbffffbfffbffffffcghiiiigha
+aajjjjjjjjjjfffffffffffffffffffckkkkkkkka
+aaccccccccccfffcffffcfffcccccccckkkkkkkka
+aalllmmmnnnbfffcffffcfffbllllnnckkkkkkkka
+aaooooppqqrrfffcffffcfffrrrrrrrckkkkkkkka
+aafffffffffffffcffffcffffffffffckkkkkkkka
+aafffffffffffffckkkkcffffffffffckkkkkkkka
+aasssssssssssssckkkkcssssssssssckkkkkkkka
+aatttttttttttttbkkkkbuvvvvvvvvwbkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkxkkkkykkkkkkkzkkkkkkAkkkkkkkzkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkzkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkAkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkAkkkkkkkzkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkzkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkAkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkxkkkkykkkkkkkzkkkkkkxkkkkkkkAkkkkBkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkCDkkDEkkkkkkkCDkkkkDEkkkkkkkCDkkDEkka
+aakkkFkkFkkkkkkkkkFkkkkFkkkkkkkkkFkkFkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aakkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkka
+aaaaaakkaaaaaaaaaaakkkkaaaaaaaaaaakkaaaaa
+aaaaaaGGaaaaaaaaaaaGGGGaaaaaaaaaaaGGaaaaa
+HIIIIJGGHIIIIIIIIIJGGGGHIIIIIIIIIJGGHIIII
+KLLLLMNNKLLLLLLLLLMNNNNKLLLLLLLLLMNNKLLLL
+"}

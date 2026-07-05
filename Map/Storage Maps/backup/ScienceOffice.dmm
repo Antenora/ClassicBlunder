@@ -1,0 +1,50 @@
+"a" = (/turf/Roof3,/area/Outside)
+"b" = (/turf/Special/EventStars,/area/Outside/Planet/Earth)
+"c" = (/obj/Turfs/RoofGlass,/turf/Tech2,/area/Outside)
+"d" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"e" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"f" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside)
+"g" = (/turf/Tech2,/area/Outside)
+"h" = (/turf/Tech6,/area/Outside)
+"i" = (/obj/Turfs/Console3,/turf/Tech6,/area/Outside)
+"j" = (/turf/Tech10,/area/Outside)
+"k" = (/obj/Turfs/Console6Top,/turf/Tech10,/area/Outside)
+"l" = (/obj/Turfs/Console3,/turf/Tech10,/area/Outside)
+"m" = (/obj/Turfs/Console1,/turf/Tech10,/area/Outside)
+"n" = (/obj/Turfs/Console4,/turf/Tech10,/area/Outside)
+"o" = (/obj/Turfs/MidgarObj/PlushChair,/turf/Tech2,/area/Outside)
+"p" = (/obj/Turfs/MidgarObj/Lampost,/turf/Tech2,/area/Outside)
+"q" = (/obj/Turfs/Table5,/turf/Tech2,/area/Outside)
+"r" = (/obj/Turfs/Table4,/turf/Tech2,/area/Outside)
+"s" = (/obj/Turfs/Table4,/turf/Tech9,/area/Outside)
+"t" = (/obj/Turfs/Table3,/turf/Tech2,/area/Outside)
+"u" = (/turf/Tech9,/area/Outside)
+"v" = (/obj/Special/shinraLogo,/turf/Tech2,/area/Outside)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaabbbbbbbaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaacccccccaaaaaaaaaaaaaaaaa
+adeeeeeeeeeeeeeefgggggggdeeeeeeeeeeeeeefa
+aggghijjkjlhhggggggggggggggghijjkjlhhggga
+aggghhjmnmjhhgggggggoggggggghhjmnmjhhggga
+aggghhjjjjjhhgggpgqrsrtgpggghhjjjjjhhggga
+aggghhjjjjjhhggggguuuuuggggghhjjjjjhhggga
+aggghhjjjjjhhgggguguuugugggghhjjjjjhhggga
+aggghhjjjjjhhgggugguuugguggghhjjjjjhhggga
+aggghhjjjjjhhggugggguggggugghhjjjjjhhggga
+aggghhjjjjjhhgugggggugggggughhjjjjjhhggga
+aggghhjjjjjhhuggggggggggggguhhjjjjjhhggga
+aggghhjjjjjhuggggggggggggggguhjjjjjhhggga
+aggghhjjjjjuhggggggggggggggghujjjjjhhggga
+aggghhjjjjjhuggggggggggggggguhjjjjjhhggga
+aggghhjjjjjhhuggggggggggggguhhjjjjjhhggga
+aggghhjjjjjhhgugggggggggggughhjjjjjhhggga
+aggghhjjjjjhhggugggggggggugghhjjjjjhhggga
+aggghhjjjjjhhggguggggggguggghhjjjjjhhggga
+aggghhjjjjjhhggggugggggugggghhjjjjjhhggga
+aggghhjjjjjhhggggguggguggggghhjjjjjhhggga
+aggghhjjjjjhhvgggggugugggggghhjjjjjhhggga
+aggghhjjjjjhhggggggguggggggghhjjjjjhhggga
+aaaaaaaaaaaaaaaaaaagggaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaagggaaaaaaaaaaaaaaaaaaa
+"}

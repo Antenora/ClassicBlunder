@@ -1,0 +1,75 @@
+/obj/Skills/AutoHit
+	The_Tenth_Strike
+		UnarmedOnly=1
+		FlickAttack=1
+		Area="Strike"
+		StrOffense=2
+		DamageMult=T4_DMG_MULT/2;
+		Stunner=3
+		Rush=3
+		RushDelay=0.1
+		ControlledRush=1
+		Knockback=0
+		Quaking=4
+		PreShockwave=1
+		PreShockwaveDelay=1
+		PostShockwave=0
+		Shockwaves=2
+		Shockwave=0.5
+		ShockIcon='KenShockwaveFocus.dmi'
+		ShockBlend=2
+		ShockDiminish=1.15
+		ShockTime=4
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Lightning_Strikes_Twice"
+		ActiveMessage="curls up their fingers into a fist and delivers a crushing blow!!!"
+
+	Ashura_Bakkei
+		FlickAttack=1
+		Area="Strike"
+		StrOffense=2
+		DamageMult=T4_DMG_MULT/2;
+		Stunner=3
+		Rush=3
+		RushDelay=0.1
+		ControlledRush=1
+		Knockback=0
+		Quaking=4
+		PreShockwave=1
+		PreShockwaveDelay=1
+		PostShockwave=0
+		Shockwaves=2
+		Shockwave=0.5
+		ShockIcon='KenShockwaveFocus.dmi'
+		ShockBlend=2
+		ShockDiminish=1.15
+		ShockTime=4
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Nine_Sword_Style"
+		ActiveMessage="slashes through time and space!!!"
+
+	Seiken_Gradalpha2
+		Area = "Cross"
+		ComboMaster = 1
+		NoLock = 1
+		NoAttackLock = 1
+		Rounds = 2
+		UsesinForce = 1
+		StrOffense = 1
+		DamageMult = T4_DMG_MULT/2/2;
+		Instinct = 2
+		Distance = 4
+		Size = 2
+		Knockback = 1
+		SpeedStrike = 2
+		Stunner = 1
+		ShockIcon = 'KenShockwaveGod.dmi'
+		Shockwaves = 0
+		Shockwave = 0
+		TurfStrike = 5
+		HitSparkIcon = 'Slash - Power.dmi'
+		HitSparkX = -32
+		HitSparkY = -32
+		HitSparkSize = 2
+		HitSparkTurns = 1
+		HitSparkLife = 6
+		ActiveMessage = "replays the entirety of the battle in an instant, unleashing a myriad of attacks within a single strike!"
+		Cooldown = 4

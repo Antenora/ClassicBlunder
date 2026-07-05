@@ -1,0 +1,1 @@
+/mob/var/soIgnore = 0

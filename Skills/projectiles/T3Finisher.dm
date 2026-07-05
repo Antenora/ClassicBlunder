@@ -1,0 +1,21 @@
+/obj/Skills/Projectile
+	ThreeShot_Path
+		Blasts=3
+		Distance=50
+		DamageMult=T3_DMG_MULT/2/3;
+		Dodgeable=-1
+		AccMult = 2
+		Speed=4
+		Instinct=1
+		IconLock='GilgameshBlades.dmi'
+		IconSize=1
+		Variation=4
+		IconVariance=4
+		ZoneAttack=1
+		ZoneAttackX=6
+		ZoneAttackY=6
+		Homing=1
+		LosesHoming=100
+		HyperHoming=1
+		Radius=1
+		Hover=1

@@ -676,40 +676,27 @@ transformation
 				spawn(10)
 					animate(user, color = user.MobColor, time=20)
 		super_saiyan_god
-			tier = 5
-			passives = list("GodKi" = 0.65, "EnergyGeneration" = 1, "Godspeed" = 4, "Flow" = 4, "BackTrack" = 2, "Sunyata" = 1 )
+			tier = 4
+			passives = list("GodKi" = 0.5, "EnergyGeneration" = 1, "Godspeed" = 4, "Flow" = 4, "BackTrack" = 2, "Sunyata" = 1 )
 			//Meant to be unlocked around the same time as Golden Oozaru
 			//Which is to say, intended at 60 potential, but autogranted at 80.
 			unlock_potential = 80
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
-			speedadd = 1.5
-			enduranceadd = 1.5
-			offenseadd = 1.5
-			defenseadd = 1.5
-			strengthadd = 1.5
-			forceadd = 1.5
-			revertToTrans = 0
+			speedadd = 1.25
+			enduranceadd = 1.25
+			offenseadd = 1.25
+			defenseadd = 1.25
+			strengthadd = 1.25
+			forceadd = 1.25
 			// at full mastery, give the saiyan beyond god buff, then remove ssjgod, and replace it with ssjgb
 			mastery_boons(mob/user)
-				speedadd = 1.5
-				enduranceadd = 1.5
-				offenseadd = 1.5
-				defenseadd = 1.5
-				strengthadd = 1.5
-				forceadd = 1.5
 				autoAnger = TRUE
-				if(user.Potential>=74&&mastery<50)
-					mastery=50
-				if(user.Potential>=76&&mastery<75)
-					mastery=75
-				if(user.Potential>=78&&mastery<100)
-					mastery=100
-				passives = list("GodKi" = 0.65, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4, "Flow" = 4 + round(mastery/25, 1),"TechniqueMastery" = 3 + round(mastery/10, 1), \
+				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4, "Flow" = 4 + round(mastery/25, 1),"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Instinct" = 4,"Pursuer"= 4 , "BackTrack" = 2 + round(mastery/50, 1), \
 								"MovementMastery" = 4+round(mastery/25, 1), "Sunyata" = 1 + round(mastery/20 ,1),"GodlyCalm"=1,\
-								"Flicker" = 4, "PureDamage"=5, "PureReduction" = 5, "BuffMastery" = 1 + (mastery/15), "SaiyanPower" = 1, "SaiyanPower1"=1.5)
+								"Flicker" = 4, "PureDamage"=2, "BuffMastery" = 1 + (mastery/25), "SaiyanPower" = 1, "SaiyanPower1"=1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -805,31 +792,31 @@ transformation
 			//Parity with SSj4
 			//Intended for 70 potential, autounlocked at 90.
 			unlock_potential = 90
-			tier = 7
+			tier = 5
 			autoAnger = 1
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
-			speedadd = 2
-			enduranceadd = 2
-			offenseadd = 2
-			defenseadd = 2
-			strengthadd = 2
-			forceadd = 2
+			speedadd = 1.75
+			enduranceadd = 1.75
+			offenseadd = 1.75
+			defenseadd = 1.75
+			strengthadd = 1.75
+			forceadd = 1.75
 			revertToTrans = 0
 
 			mastery_boons(mob/user)
-				passives = list("GodKi" = 0.9, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 12, "MovementMastery" = 10, \
-								"PureDamage" = 6, "PureReduction" = 6, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1.5)
-				speedadd = 2
-				enduranceadd = 2
-				offenseadd = 2
-				defenseadd = 2
-				strengthadd = 2
-				forceadd = 2
+				passives = list("GodKi" = 0.75, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 8, "MovementMastery" = 8, \
+								"PureDamage" = 5, "PureReduction" = 4, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1)
+				speedadd = 1.75
+				enduranceadd = 1.75
+				offenseadd = 1.75
+				defenseadd = 1.75
+				strengthadd = 1.75
+				forceadd = 1.75
 				if(mastery >= 100)
-					passives = list("GodKi" = 1.15, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 15, "MovementMastery" = 13, \
-									"PureDamage" = 6, "PureReduction" = 6, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1.5)
+					passives = list("GodKi" = 1, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 8, "MovementMastery" = 10, \
+									"PureDamage" = 5, "PureReduction" = 4, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1)
 
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -845,9 +832,9 @@ transformation
 
 
 			transform(mob/user)
-				if(user.transActive==5&&user.transUnlocked>=5)
+				if(user.transActive==1&&user.transUnlocked>=5)
 					user.Revert()
-					user.transActive = 5
+					user.transActive = 1
 					..()
 				else return 0
 
@@ -911,7 +898,7 @@ transformation
 			//Intended to be unlocked around 80
 			//Autounlocks at 100 potential
 			unlock_potential = 100
-			tier = 8
+			tier = 6
 			autoAnger = 1
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32

@@ -1,0 +1,89 @@
+"aa" = (/turf/Tech10,/area/Outside/Planet/Earth)
+"ab" = (/turf/Roof3,/area/Outside/Planet/Earth)
+"ac" = (/turf/Roof7,/area/Outside/Planet/Earth)
+"ad" = (/turf/Roof7,/area/Inside)
+"ae" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"af" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"ag" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"ah" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area/Inside)
+"ai" = (/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area/Inside)
+"aj" = (/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area/Inside)
+"ak" = (/turf/Wall54,/area/Inside)
+"al" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"am" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area/Outside/Planet/Earth)
+"an" = (/turf/Wall6,/area/Outside/Planet/Earth)
+"ao" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Outside/Planet/Earth)
+"ap" = (/turf/Carpet7,/area/Inside)
+"aq" = (/obj/Turfs/IconsXLBig/Icon14,/turf/Carpet7,/area/Inside)
+"ar" = (/obj/Turfs/IconsXLBig/Icon15,/turf/Carpet7,/area/Inside)
+"as" = (/obj/Turfs/IconsXLBig/Icon13,/turf/Carpet6,/area/Inside)
+"at" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Carpet8,/area/Inside)
+"au" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Outside/Planet/Earth)
+"av" = (/turf/Tile14,/area/Outside/Planet/Earth)
+"aw" = (/obj/Turfs/Door,/turf/Carpet7,/area/Inside)
+"ax" = (/turf/Carpet6,/area/Inside)
+"ay" = (/turf/Carpet8,/area/Inside)
+"az" = (/obj/Turfs/RoofGlass,/turf/Carpet7,/area/Inside)
+"aA" = (/obj/Turfs/RoofGlass,/turf/Carpet6,/area/Inside)
+"aB" = (/obj/Turfs/RoofGlass,/turf/Carpet8,/area/Inside)
+"aC" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area/Outside/Planet/Earth)
+"aD" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area/Outside/Planet/Earth)
+"aE" = (/obj/Turfs/Surf/Water2Surf,/turf/Stairs2,/area/Outside/Planet/Earth)
+"aF" = (/obj/Turfs/Surf/Water2Surf,/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall50,/area/Outside/Planet/Earth)
+"aG" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/turf/Wall54,/area/Inside)
+"aH" = (/obj/Turfs/Table5,/turf/Carpet7,/area/Inside)
+"aI" = (/obj/Turfs/Table4,/turf/Carpet7,/area/Inside)
+"aJ" = (/obj/Turfs/Table4,/turf/Carpet6,/area/Inside)
+"aK" = (/obj/Turfs/Table4,/turf/Carpet8,/area/Inside)
+"aL" = (/obj/Turfs/Table3,/turf/Carpet7,/area/Inside)
+"aM" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aN" = (/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aO" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aP" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs2,/area/Inside)
+"aQ" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area/Inside)
+"aR" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/MidgarObj/TV,/turf/Wall54,/area/Inside)
+"aS" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Stairs2,/area/Outside/Planet/Earth)
+"aT" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Stairs2,/area/Outside/Planet/Earth)
+"aU" = (/obj/Turfs/Bed,/turf/Carpet7,/area/Inside)
+"aV" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aW" = (/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aX" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeS,/turf/Waters/Water2,/area/Outside/Planet/Earth)
+"aY" = (/obj/Turfs/Edges/MetalEdgeW,/obj/Turfs/Edges/MetalEdgeE,/obj/Turfs/Edges/MetalEdgeN,/turf/Wall54,/area/Inside)
+"aZ" = (/obj/Turfs/Edges/MetalEdgeN,/obj/Turfs/MidgarObj/Widescreen,/turf/Wall54,/area/Inside)
+"ba" = (/obj/Turfs/Chest,/turf/Carpet7,/area/Inside)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaabababababababababababababababababababababababababacadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaababaeafafafafafafafafafafafafafafafafafafafafafafagacadahaiaiaiaiaiaiaiajadakakakakakakakadahaiaiaiaiaiaiaiajad
+aaaaaaaaaaababalamananananananananananananananananananananananaoacadapapapapapapapapapadaqarasatasaqaradapapapapapapapapapad
+aaaaaaaaababalauavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapapapapapawapapaxayaxapapawapapapapapapapapapad
+aaaaaaababalauavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapapapapapadapapaxayaxapapadapapapapapapapapapad
+aaaaababalauavavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapapapapapadazazaAaBaAazazadapapapapapapapapapad
+aaababalauavavavavaCaDaEaEaDaDaDaDaDaDaDaDaDaDaDaEaEaDaFavavavavacadapapapapapapapapapaGaHaIaJaKaJaIaLaGapapapapapapapapapad
+ababalauavavavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavavacadapapapapapapapapapapapapaxayaxapapapapapapapapapapapapad
+abalauavavavavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavavacadapapapapapapapapapapapapaxayaxapapapapapapapapapapapapad
+abauavavavavavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavavacadapapacadadadadadadadapapaxayaxapapadadadadadadadacapapad
+abavavavavavavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavavacadaPaQacadahaiaRaiajadapapaxayaxapapadahaiaRaiajadacaPaQad
+abavavavavavavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavavaeagaSaTacadaUapapapaUadapaxaxayaxaxapadaUapapapaUadacaSaTae
+abavavavavavavavavaVaWaWaWaWaWaWaWaWaWaWaWaWaWaWaWaWaWaXavavavavamaoavavacadapapapapapadaxaxaxayaxaxaxadapapapapapadacaaaaam
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapaYaxaxayayayaxaxaYapapapapapadacaaaaaa
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapaxaxayayayayayaxaxapapapapapadacaaaaaa
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapadaxaxayayayaxaxadapapapapapadacaaaaaa
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadaUapapapaUadaxaxaxayaxaxaxadaUapapapaUadacaaaaaa
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacacacacacadapapapapapadapaxaxayaxaxapadapapapapapadacacacac
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadadadadadadadadadadadapapaxayaxapapadadadadadadadadadadad
+abavavavavavavavavavavavaCaEaEaDaDaDaDaDaDaDaDaDaDaDaEaEaFavavavacadahaiaZaiaiaiaiaiaiajapapaxayaxapapahaiaiaiaiaiaiaZaiajad
+abavavavavavaCaEaFavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavacadaUapapapaUapapapapapapapaxayaxapapapapapapapaUapapapaUad
+abavavavavaCaNaNaNaFavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavacadapapapapapapapapapadapapaxayaxapapadapapapapapapapapapad
+abavavavavaMaNaNaNaOavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavacadbaapapapbaapapapapadapapaxayaxapapadapapapapbaapapapbaad
+abavavavavaVaNaNaNaXavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavacadaUapapapaUapapapaUadapapaxayaxapapadaUapapapaUapapapaUad
+abavavavavavaVaWaXavavavaMaNaNaNaNaNaNaNaNaNaNaNaNaNaNaNaOavavavacadapapapapapapapbaapadapapaxayaxapapadapbaapapapapapapapad
+abavavavavavavavavavavavaVaWaWaWaWaWaWaWaWaWaWaWaWaWaWaWaXavavavacadbaapapapbaapapadadadadadadadadadadadadadapapbaapapapbaad
+abavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadaUapapapaUapapadacacacacacacacacacacacadapapaUapapapaUad
+ababavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadapapapapapapapadacaeafafafafafafafagacadapapapapapapapad
+ababavavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadbaapapapbaapapadacamanananananananaoacadapapbaapapapbaad
+abababavavavavavavavavavavavavavavavavavavavavavavavavavavavavavacadadadadadadadadadacaaaaaaaaaaaaaaaaaaacadadadadadadadadad
+ababababababababababababababababababababababababababababababababacacacacacacacacacacacaaaaaaaaaaaaaaaaaaacacacacacacacacacac
+abababababaeafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafafagaaaaaaaaaaaaaaaaaaaeafafafafafafafafaf
+ababababababananananananananananananananananananananananananananananananananananananaoaaaaaaaaaaaaaaaaaaamananananananananan
+"}

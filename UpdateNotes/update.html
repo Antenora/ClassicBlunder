@@ -1,0 +1,100 @@
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color:rgb(255, 147, 6)
+        }
+        h1, h2, h3 {
+            color: #c25100;
+        }
+        h2 {
+            margin-top: 2em;
+        }
+        ul {
+            list-style-type: none;
+        }
+        li {
+            margin-bottom: 1em;
+        }
+        #spoiler {
+            display: none;
+            border: 1px solid #6c0196;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #spoilerButton {
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: none;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function toggleSpoiler() {
+            var spoiler = document.getElementById('spoiler');
+            var spoilerButton = document.getElementById('spoilerButton');
+            if (spoiler.style.display === 'none') {
+                spoiler.style.display = 'block';
+                spoilerButton.innerHTML = 'Hide';
+            } else {
+                spoiler.style.display = 'none';
+                spoilerButton.innerHTML = 'Show';
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Current Updates</h1>
+    <h2>6/1/2023 Notes</h2>
+    <p>oh brother...</p>
+
+    <h3>Table of Contents</h3>
+    <ul>
+        <li><a href="#changes">Changes</a></li>
+        <li><a href="#bug-fixes">Bug Fixes</a></li>
+        <li><a href="#buffs">Buffs</a></li>
+        <li><a href="#nerfs">Nerfs</a></li>
+        <li><a href="#miscellaneous">Misc</a></li>
+    </ul>
+
+    <h2 id="changes">Champion Updates</h2>
+    <h3>Champion 1</h3>
+    <ul>
+        <li>Buff: Description of the buff</li>
+        <li>Nerf: Description of the nerf</li>
+    </ul>
+
+    <h2 id="bug-fixes">Item Updates</h2>
+    <h3>Item 1</h3>
+    <ul>
+        <li>Buff: Description of the buff</li>
+        <li>Nerf: Description of the nerf</li>
+    </ul>
+
+    <h2 id="buffs">Gameplay Updates</h2>
+    <h3>Gameplay Change 1</h3>
+    <p>Description of the gameplay change</p>
+
+    <h2 id="nerfs">Bug Fixes</h2>
+    <ul>
+        <li>Bug 1: Description of the bug fix</li>
+        <li>Bug 2: Description of the bug fix</li>
+    </ul>
+
+    <h2 id="miscellaneous">Miscellaneous</h2>
+    <ul>
+        <li>Misc 1: Description of the miscellaneous update</li>
+        <li>Misc 2: Description of the miscellaneous update</li>
+    </ul>
+
+    <h1>Old Patch Notes</h1>
+    <button id="spoilerButton" onclick="toggleSpoiler()">Show</button>
+    <div id="spoiler">
+        <embed src="oldNotes.txt">
+    </div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+"a" = (/turf/Tech10,/area/Outside/Planet/Earth)
+"b" = (/turf/Roof7,/area/Outside/Planet/Earth)
+"c" = (/turf/Roof7,/area/Inside)
+"d" = (/obj/Turfs/IconsX/Icon5,/turf/Wall1,/area/Inside)
+"e" = (/obj/Turfs/IconsX/Icon1,/turf/Wall1,/area/Inside)
+"f" = (/obj/Turfs/IconsX/Icon3,/turf/Wall1,/area/Inside)
+"g" = (/obj/Turfs/IconsX/Icon2,/turf/Wall1,/area/Inside)
+"h" = (/obj/Turfs/IconsX/Icon14,/turf/Tech13,/area/Inside)
+"i" = (/obj/Turfs/IconsX/Icon12,/turf/Tech13,/area/Inside)
+"j" = (/obj/Turfs/IconsX/Icon13,/turf/Tech13,/area/Inside)
+"k" = (/obj/Turfs/IconsX/Icon11,/turf/Tech13,/area/Inside)
+"l" = (/turf/Tech13,/area/Inside)
+"m" = (/obj/Turfs/IconsX/Icon15,/turf/Tech13,/area/Inside)
+"n" = (/obj/Turfs/Jugs,/turf/Tech13,/area/Inside)
+"o" = (/obj/Turfs/IconsX/Icon16,/turf/Tech13,/area/Inside)
+"p" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon57,/turf/Tech13,/area/Inside)
+"q" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon56,/turf/Tech13,/area/Inside)
+"r" = (/obj/Turfs/IconsX/Icon13,/obj/Turfs/IconsX/Icon67,/turf/Tech13,/area/Inside)
+"s" = (/turf/Wall1,/area/Inside)
+"t" = (/obj/Turfs/MidgarObj/Widescreen,/turf/Wall1,/area/Inside)
+"u" = (/obj/Turfs/IconsX/Icon25,/turf/Tech13,/area/Inside)
+"v" = (/turf/Carpet3,/area/Inside)
+"w" = (/obj/Turfs/IconsX/Icon21,/turf/Carpet3,/area/Inside)
+"x" = (/obj/Turfs/Door,/turf/Tech13,/area/Inside)
+"y" = (/obj/Turfs/IconsX/Icon33,/turf/Carpet3,/area/Inside)
+"z" = (/turf/Carpet6,/area/Inside)
+"A" = (/obj/Turfs/Door,/turf/Tech3,/area/Inside)
+"B" = (/obj/Turfs/RoofGlass,/turf/Carpet6,/area/Inside)
+"C" = (/obj/Turfs/Table5,/turf/Carpet3,/area/Inside)
+"D" = (/obj/Turfs/Table4,/turf/Carpet3,/area/Inside)
+"E" = (/obj/Turfs/Table3,/turf/Carpet3,/area/Inside)
+"F" = (/turf/Stairs8,/area/Outside/Planet/Earth)
+"G" = (/obj/Turfs/Edges/DarkEdgeW,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"H" = (/obj/Turfs/Edges/DarkEdgeE,/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"I" = (/obj/Turfs/Edges/DarkEdgeW,/turf/Wall6,/area/Outside/Planet/Earth)
+"J" = (/obj/Turfs/Edges/DarkEdgeE,/turf/Wall6,/area/Outside/Planet/Earth)
+"K" = (/obj/Turfs/Edges/DarkEdgeN,/turf/Wall6,/area/Outside/Planet/Earth)
+"L" = (/turf/Wall6,/area/Outside/Planet/Earth)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaabccccccccccbaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaabcdedeeefgcbaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaabchihijjkkcbaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaabcllllllllcbaaaaaaaaaaaaaa
+bbbbbbbbbbbbbbbbcmllllllncbbbbbbbbbbbbbbb
+bccccccccccccccccolpqjrllcccccccccccccccc
+bcststststststscsulllllllscststststststsc
+bcvwvvvvwvvvvwvxllllllllllxvwvvvvwvvvvwvc
+bcwywvvwywvvwywcccccxxcccccwywvvwywvvwywc
+bcvwvvvvwvvvvwvccssszzsssccvwvvvvwvvvvwvc
+bcvwvvvvwvvvvwvcczzzzzzzzccvwvvvvwvvvvwvc
+bcwywvvwywvvwywscABBBBBBAcswywvvwywvvwywc
+bcvwvvvvwvvvvwvvsvCDDDDEvsvvwvvvvwvvvvwvc
+bcvwvvvvwvvvvwvvvvvvvvvvvvvvwvvvvwvvvvwvc
+bcwywvvwywvvwywvvvvvvvvvvvvwywvvwywvvwywc
+bcvwvvvvwvvvvwvvvvvvvvvvvvvvwvvvvwvvvvwvc
+bcvwvvvvwvvvvwvccccvvvvccccvwvvvvwvvvvwvc
+bcwywvvwywvvwywcbbbFFFFbbbcwywvvwywvvwywc
+bcvwvvvvwvvvvwvcbGHFFFFGHbcvwvvvvwvvvvwvc
+bcccccccccccccccbIJaaaaIJbccccccccccccccc
+bbbbbbbbbbbbbbbbbaaaaaaaabbbbbbbbbbbbbbbb
+GKKKKKKKKKKKKKKKHaaaaaaaaGKKKKKKKKKKKKKKK
+ILLLLLLLLLLLLLLLJaaaaaaaaILLLLLLLLLLLLLLL
+"}

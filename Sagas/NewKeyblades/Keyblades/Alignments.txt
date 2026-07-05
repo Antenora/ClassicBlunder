@@ -1,0 +1,6 @@
+All Keyblades: -32 X -32 Y
+
+Moogle O Glory: -64 X -64 Y
+Fusion Keyblade Dark: -64 X -64 Y
+Fusion Keyblade Light: -64 X -64 Y
+Combined Keyblades: -64 X -64 Y

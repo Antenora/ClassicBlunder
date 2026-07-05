@@ -1,0 +1,354 @@
+"aa" = (/turf/Waters/Water10,/area)
+"ab" = (/obj/Turfs/Surf/Water10Surf,/turf/Wall13,/area)
+"ac" = (/obj/Turfs/Edges/Edge4W,/turf/Grass16,/area)
+"ad" = (/turf/Grass16,/area)
+"ae" = (/turf/Roof6,/area)
+"af" = (/turf/Tile30,/area)
+"ag" = (/obj/Turfs/MidgarObj/Steelstool,/turf/Tile30,/area)
+"ah" = (/turf/MidgarTiles/Midgarwall5,/area)
+"ai" = (/turf/MidgarTiles/MidgarLightWall3,/area)
+"aj" = (/turf/MidgarTiles/MidgarGrate2,/area)
+"ak" = (/obj/Turfs/IconsXLBig/Icon14,/turf/Tile35,/area)
+"al" = (/obj/Turfs/IconsXLBig/Icon15,/turf/Tile35,/area)
+"am" = (/turf/Tile35,/area)
+"an" = (/obj/Turfs/IconsX/Icon20,/turf/Tile35,/area)
+"ao" = (/turf/Tile16,/area)
+"ap" = (/turf/Tech2,/area)
+"aq" = (/turf/Tech6,/area)
+"ar" = (/obj/Turfs/MidgarObj/StreetLamp,/turf/MidgarTiles/MidgarGrate2,/area)
+"as" = (/obj/Turfs/IconsX/Icon31,/turf/Tile35,/area)
+"at" = (/obj/Turfs/IconsXLBig/Icon4,/turf/Tile35,/area)
+"au" = (/turf/Tech5B,/area)
+"av" = (/obj/Turfs/IconsX/Icon42,/turf/Tile35,/area)
+"aw" = (/obj/Turfs/MidgarObj/StreetLamp,/turf/Tech2,/area)
+"ax" = (/turf/Tech4,/area)
+"ay" = (/turf/Tile19,/area)
+"az" = (/turf/Tech5,/area)
+"aA" = (/obj/Turfs/RoofGlass,/turf/MidgarTiles/MidgarTile2,/area)
+"aB" = (/obj/Turfs/IconsX/Icon8,/turf/MidgarTiles/Midgarwall5,/area)
+"aC" = (/obj/Turfs/IconsX/Icon2,/turf/MidgarTiles/Midgarwall5,/area)
+"aD" = (/obj/Turfs/IconsX/Icon4,/turf/MidgarTiles/Midgarwall5,/area)
+"aE" = (/obj/Special/Teleporter2{gotoX = 17; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aF" = (/obj/Special/Teleporter2{gotoX = 18; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aG" = (/obj/Special/Teleporter2{gotoX = 19; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aH" = (/obj/Special/Teleporter2{gotoX = 20; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aI" = (/obj/Special/Teleporter2{gotoX = 21; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aJ" = (/obj/Special/Teleporter2{gotoX = 22; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aK" = (/obj/Special/Teleporter2{gotoX = 23; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aL" = (/obj/Special/Teleporter2{gotoX = 24; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aM" = (/obj/Special/Teleporter2{gotoX = 25; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aN" = (/obj/Special/Teleporter2{gotoX = 26; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aO" = (/obj/Special/Teleporter2{gotoX = 27; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aP" = (/obj/Special/Teleporter2{gotoX = 28; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aQ" = (/obj/Special/Teleporter2{gotoX = 29; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aR" = (/obj/Special/Teleporter2{gotoX = 30; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aS" = (/obj/Special/Teleporter2{gotoX = 31; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aT" = (/obj/Special/Teleporter2{gotoX = 32; gotoY = 372; gotoZ = 2},/turf/Tech2,/area)
+"aU" = (/obj/Turfs/IconsXLBig/Icon41,/turf/MidgarTiles/MidgarWall3,/area)
+"aV" = (/obj/Turfs/IconsXLBig/Icon39,/turf/MidgarTiles/MidgarWall3,/area)
+"aW" = (/obj/Turfs/IconsXLBig/Icon40,/turf/MidgarTiles/MidgarWall3,/area)
+"aX" = (/turf/Carpet3,/area)
+"aY" = (/obj/Turfs/MidgarObj/PlushChair,/turf/Carpet3,/area)
+"aZ" = (/turf/Carpet6,/area)
+"ba" = (/obj/Turfs/MidgarObj/PlushChair,/turf/Carpet6,/area)
+"bb" = (/obj/Turfs/IconsX/Icon42,/turf/Carpet3,/area)
+"bc" = (/obj/Turfs/IconsX/Icon3,/turf/MidgarTiles/MidgarLightWall3,/area)
+"bd" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon57,/turf/Carpet6,/area)
+"be" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon64,/turf/Carpet6,/area)
+"bf" = (/obj/Turfs/IconsX/Icon42,/turf/Carpet6,/area)
+"bg" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon65,/turf/Carpet6,/area)
+"bh" = (/obj/Turfs/IconsXLBig/Icon4,/turf/Carpet6,/area)
+"bi" = (/obj/Turfs/IconsX/Icon20,/turf/Carpet6,/area)
+"bj" = (/turf/Tile13,/area)
+"bk" = (/turf/Tile17,/area)
+"bl" = (/obj/Special/Teleporter2{gotoX = 17; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bm" = (/obj/Special/Teleporter2{gotoX = 18; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bn" = (/obj/Special/Teleporter2{gotoX = 19; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bo" = (/obj/Special/Teleporter2{gotoX = 20; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bp" = (/obj/Special/Teleporter2{gotoX = 21; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bq" = (/obj/Special/Teleporter2{gotoX = 22; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"br" = (/obj/Special/Teleporter2{gotoX = 23; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bs" = (/obj/Special/Teleporter2{gotoX = 24; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bt" = (/obj/Special/Teleporter2{gotoX = 25; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bu" = (/obj/Special/Teleporter2{gotoX = 26; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bv" = (/obj/Special/Teleporter2{gotoX = 27; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bw" = (/obj/Special/Teleporter2{gotoX = 28; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"bx" = (/obj/Special/Teleporter2{gotoX = 32; gotoY = 378; gotoZ = 2},/turf/Tech2,/area)
+"by" = (/obj/Turfs/IconsX/Icon8,/turf/MidgarTiles/MidgarLightWall3,/area)
+"bz" = (/obj/Turfs/IconsX/Icon20,/turf/Tile17,/area)
+"bA" = (/obj/Turfs/IconsXLBig/Icon16,/turf/Tile12,/area)
+"bB" = (/obj/Turfs/IconsXLBig/Icon17,/turf/Tile12,/area)
+"bC" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Tile12,/area)
+"bD" = (/obj/Turfs/IconsXLBig/Icon10,/turf/Tile12,/area)
+"bE" = (/obj/Turfs/IconsXLBig/Icon11,/turf/Tile12,/area)
+"bF" = (/obj/Turfs/IconsXLBig/Icon12,/turf/Tile12,/area)
+"bG" = (/obj/Turfs/IconsXLBig/Icon13,/turf/Tile12,/area)
+"bH" = (/obj/Turfs/IconsXLBig/Icon18,/turf/Tile12,/area)
+"bI" = (/obj/Turfs/IconsXLBig/Icon2,/turf/Tile12,/area)
+"bJ" = (/turf/Tile12,/area)
+"bK" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon55,/turf/Tile12,/area)
+"bL" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon66,/turf/Tile12,/area)
+"bM" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon65,/turf/Tile12,/area)
+"bN" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon64,/turf/Tile12,/area)
+"bO" = (/obj/Turfs/IconsX/Icon42,/turf/Tile12,/area)
+"bP" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon77,/turf/Tile12,/area)
+"bQ" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon41,/turf/Tile12,/area)
+"bR" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon72,/turf/Tile12,/area)
+"bS" = (/obj/Turfs/IconsX/Icon49,/turf/Tile12,/area)
+"bT" = (/obj/Turfs/IconsX/Icon20,/turf/Tile13,/area)
+"bU" = (/obj/Turfs/IconsX/Icon48,/turf/Tile12,/area)
+"bV" = (/obj/Turfs/IconsX/Icon42,/turf/Tile13,/area)
+"bW" = (/obj/Turfs/IconsX/Icon50,/turf/Tile12,/area)
+"bX" = (/obj/Turfs/IconsX/Icon51,/turf/Tile12,/area)
+"bY" = (/obj/Turfs/IconsX/Icon63,/turf/Tile12,/area)
+"bZ" = (/obj/Turfs/IconsX/Icon22,/turf/Tile13,/area)
+"ca" = (/turf/MidgarTiles/MidgarWall4,/area)
+"cb" = (/obj/Turfs/RoofGlass,/turf/MidgarTiles/Midgarwall5,/area)
+"cc" = (/turf/MidgarTiles/MidgarTile1,/area)
+"cd" = (/obj/Turfs/IconsX/Icon20,/turf/MidgarTiles/MidgarTile1,/area)
+"ce" = (/obj/Turfs/IconsX/Icon42,/turf/MidgarTiles/MidgarTile1,/area)
+"cf" = (/obj/Turfs/IconsXLBig/Icon10,/turf/Wood9,/area)
+"cg" = (/obj/Turfs/IconsXLBig/Icon11,/turf/Wood9,/area)
+"ch" = (/obj/Turfs/IconsXLBig/Icon18,/turf/Wood9,/area)
+"ci" = (/obj/Turfs/IconsXLBig/Icon19,/turf/Wood9,/area)
+"cj" = (/obj/Turfs/IconsXLBig/Icon13,/turf/Wood9,/area)
+"ck" = (/turf/Wood9,/area)
+"cl" = (/obj/Turfs/IconsX/Icon20,/turf/Wood9,/area)
+"cm" = (/obj/Turfs/IconsX/Icon42,/turf/Wood9,/area)
+"cn" = (/obj/Turfs/IconsX/Icon33,/turf/Wood9,/area)
+"co" = (/turf/MidgarTiles/MidgarTile2,/area)
+"cp" = (/turf/MidgarTiles/MidgarTile3,/area)
+"cq" = (/turf/MidgarTiles/MidgarTile4,/area)
+"cr" = (/obj/Turfs/IconsX/Icon42,/turf/Tile17,/area)
+"cs" = (/turf/Grass16,/turf/Carpet1,/area)
+"ct" = (/turf/Grass16,/obj/Turfs/IconsX/Icon42,/turf/Carpet1,/area)
+"cu" = (/turf/Grass16,/obj/Turfs/IconsXLBig/Icon4,/turf/Carpet1,/area)
+"cv" = (/obj/Turfs/IconsXLBig/Icon4,/turf/Carpet3,/area)
+"cw" = (/obj/Turfs/IconsX/Icon20,/turf/Carpet3,/area)
+"cx" = (/turf/Grass16,/obj/Turfs/IconsX/Icon20,/turf/Carpet1,/area)
+"cy" = (/obj/Turfs/IconsX/Icon31,/turf/Carpet3,/area)
+"cz" = (/obj/Turfs/IconsXLBig/Icon5,/turf/Tile17,/area)
+"cA" = (/turf/Grass16,/obj/Turfs/IconsX/Icon31,/turf/Carpet1,/area)
+"cB" = (/turf/Carpet7,/area)
+"cC" = (/obj/Turfs/IconsX/Icon42,/turf/Carpet7,/area)
+"cD" = (/obj/Turfs/IconsXLBig/Icon4,/turf/Carpet7,/area)
+"cE" = (/obj/Turfs/IconsX/Icon20,/turf/Carpet7,/area)
+"cF" = (/obj/Turfs/IconsX/Icon31,/turf/Carpet7,/area)
+"cG" = (/obj/Turfs/IconsX/Icon31,/turf/Carpet6,/area)
+"cH" = (/turf/MidgarTiles/MidgarWall1,/area)
+"cI" = (/turf/MidgarTiles/MidgarWall3,/area)
+"cJ" = (/obj/Turfs/RoofGlass,/turf/MidgarTiles/MidgarWall3,/area)
+"cK" = (/obj/Turfs/RoofGlass,/turf/MidgarTiles/MidgarWall2,/area)
+"cL" = (/obj/Turfs/RoofGlass,/turf/MidgarTiles/MidgarWall1,/area)
+"cM" = (/turf/MidgarTiles/MidgarWall2,/area)
+"cN" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16NW,/turf/Edges/Grass16SE,/area)
+"cO" = (/turf/Dirt1,/turf/Edges/Grass16NW,/turf/Edges/Grass16EdgeN,/area)
+"cP" = (/turf/Dirt1,/turf/Edges/Grass16EdgeN,/area)
+"cQ" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16SE,/turf/Edges/Grass16EdgeN,/area)
+"cR" = (/turf/Roof15,/area)
+"cS" = (/turf/Dirt1,/turf/Edges/Grass16NW,/area)
+"cT" = (/turf/Dirt1,/turf/Edges/Grass16EdgeS,/area)
+"cU" = (/turf/Dirt1,/turf/Edges/Grass16EdgeE,/area)
+"cV" = (/turf/Dirt1,/turf/Edges/Grass16NW,/turf/Edges/Grass16SW,/area)
+"cW" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16SE,/area)
+"cX" = (/turf/Wall39,/area)
+"cY" = (/turf/Dirt1,/turf/Edges/Grass16SE,/turf/Edges/Grass16SW,/area)
+"cZ" = (/turf/Dirt1,/turf/Edges/Grass16SW,/area)
+"da" = (/turf/Dirt1,/turf/Edges/Grass16NE,/area)
+"db" = (/turf/Dirt1,/turf/Edges/Grass16NW,/turf/Edges/Grass16SW,/turf/Edges/Grass16EdgeN,/turf/Edges/Grass16EdgeS,/area)
+"dc" = (/turf/Dirt1,/turf/Edges/Grass16EdgeS,/turf/Edges/Grass16EdgeN,/turf/Edges/Grass16EdgeS,/area)
+"dd" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16SE,/turf/Edges/Grass16EdgeN,/turf/Edges/Grass16EdgeS,/area)
+"de" = (/obj/Turfs/Bed,/turf/Wood3,/area)
+"df" = (/turf/Wood3,/area)
+"dg" = (/obj/Turfs/IconsX/Icon43,/turf/Wood3,/area)
+"dh" = (/obj/Turfs/IconsX/Icon12,/turf/Wood3,/area)
+"di" = (/obj/Turfs/IconsX/Icon11,/turf/Wood3,/area)
+"dj" = (/obj/Turfs/IconsX/Icon26,/turf/Wood3,/area)
+"dk" = (/obj/Turfs/IconsX/Icon25,/turf/Wood3,/area)
+"dl" = (/obj/Turfs/IconsX/Icon36,/turf/Wood3,/area)
+"dm" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16NW,/turf/Edges/Grass16SW,/area)
+"dn" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16NW,/area)
+"do" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16NW,/turf/Edges/Grass16EdgeW,/turf/Edges/Grass16EdgeE,/area)
+"dp" = (/obj/Turfs/Edges/Edge4S,/turf/MidgarTiles/MidgarWall4,/area)
+"dq" = (/turf/Dirt1,/turf/Edges/Grass16SW,/turf/Edges/Grass16EdgeS,/turf/Edges/Grass16EdgeN,/area)
+"dr" = (/turf/Dirt1,/turf/Edges/Grass16EdgeS,/turf/Edges/Grass16EdgeN,/turf/Edges/Grass16EdgeS,/turf/Edges/Grass16EdgeN,/area)
+"ds" = (/turf/Dirt1,/turf/Edges/Grass16NE,/turf/Edges/Grass16SE,/turf/Edges/Grass16EdgeS,/turf/Edges/Grass16EdgeN,/area)
+"dt" = (/turf/Dirt1,/turf/Edges/Grass16EdgeE,/turf/Edges/Grass16EdgeW,/turf/Edges/Grass16EdgeE,/area)
+"du" = (/turf/Roof11,/area)
+"dv" = (/turf/Dirt1,/turf/Edges/Grass16SE,/turf/Edges/Grass16SW,/turf/Edges/Grass16EdgeW,/turf/Edges/Grass16EdgeE,/area)
+"dw" = (/obj/Turfs/IconsX/Icon3,/turf/Wall39,/area)
+"dx" = (/obj/Turfs/IconsX/Icon79,/turf/Wall39,/area)
+"dy" = (/obj/Turfs/IconsX/Icon26,/turf/Wood8,/area)
+"dz" = (/obj/Turfs/IconsX/Icon54,/turf/Wood8,/area)
+"dA" = (/obj/Turfs/IconsX/Icon43,/turf/Wood8,/area)
+"dB" = (/obj/Turfs/Stove,/turf/Wood8,/area)
+"dC" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/IconsX/Icon42,/turf/Wood8,/area)
+"dD" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/Apples,/turf/Wood8,/area)
+"dE" = (/turf/Wood8,/area)
+"dF" = (/obj/Turfs/Bed,/turf/Wood8,/area)
+"dG" = (/obj/Turfs/IconsX/Icon20,/turf/Wood3,/area)
+"dH" = (/obj/Turfs/Edges/Edge4S,/turf/Waters/Water10,/area)
+"dI" = (/obj/Turfs/IconsX/Icon31,/turf/Wood3,/area)
+"dJ" = (/turf/Roof10,/area)
+"dK" = (/obj/Turfs/Clock,/turf/Wall39,/area)
+"dL" = (/obj/Turfs/IconsX/Icon2,/turf/Wall39,/area)
+"dM" = (/turf/Stone14,/turf/Edges/Grass16NW,/turf/Edges/Grass16EdgeN,/area)
+"dN" = (/turf/Stone14,/turf/Edges/Grass16EdgeN,/area)
+"dO" = (/obj/Turfs/Bed,/turf/Wood9,/area)
+"dP" = (/obj/Turfs/Chest,/turf/Wood9,/area)
+"dQ" = (/obj/Turfs/IconsX/Icon42,/obj/Turfs/Apples,/turf/Wood9,/area)
+"dR" = (/obj/Turfs/IconsX/Icon11,/turf/Wood9,/area)
+"dS" = (/obj/Turfs/Stove,/turf/Wood9,/area)
+"dT" = (/obj/Turfs/IconsX/Icon16,/turf/Wood9,/area)
+"dU" = (/obj/Turfs/IconsX/Icon15,/turf/Wood9,/area)
+"dV" = (/obj/Turfs/IconsX/Icon25,/turf/Wood9,/area)
+"dW" = (/turf/Stone14,/area)
+"dX" = (/obj/Turfs/IconsX/Icon7,/turf/Wood8,/area)
+"dY" = (/obj/Turfs/IconsX/Icon20,/turf/Wood8,/area)
+"dZ" = (/obj/Turfs/IconsX/Icon31,/turf/Wood8,/area)
+"ea" = (/obj/Turfs/IconsX/Icon62,/turf/Wood8,/area)
+"eb" = (/obj/Turfs/IconsX/Icon81,/turf/Wall39,/area)
+"ec" = (/turf/Stone14,/turf/Edges/Grass16SW,/turf/Edges/Grass16EdgeS,/area)
+"ed" = (/turf/Stone14,/turf/Edges/Grass16EdgeS,/area)
+"ee" = (/obj/Turfs/IconsX/Icon31,/turf/Wood9,/area)
+"ef" = (/turf/Roof13,/area)
+"eg" = (/obj/Turfs/IconsX/Icon26,/turf/Wood2,/area)
+"eh" = (/obj/Turfs/IconsX/Icon55,/turf/Wood2,/area)
+"ei" = (/obj/Turfs/IconsX/Icon43,/turf/Wood2,/area)
+"ej" = (/obj/Turfs/Stove,/turf/Wood2,/area)
+"ek" = (/turf/Wood2,/area)
+"el" = (/obj/Turfs/IconsX/Icon62,/turf/Wood2,/area)
+"em" = (/obj/Turfs/IconsX/Icon63,/turf/Wood2,/area)
+"en" = (/obj/Turfs/IconsX/Icon54,/turf/Wood2,/area)
+"eo" = (/obj/Turfs/Chest,/turf/Wood2,/area)
+"ep" = (/obj/Turfs/Drawer,/turf/Wood2,/area)
+"eq" = (/obj/Turfs/Bed,/turf/Wood2,/area)
+"er" = (/obj/Turfs/IconsX/Icon7,/turf/Wood2,/area)
+"es" = (/turf/Roof12,/area)
+"et" = (/obj/Turfs/IconsX/Icon4,/turf/Wall39,/area)
+"eu" = (/obj/Turfs/IconsX/Icon20,/turf/Wood2,/area)
+"ev" = (/obj/Turfs/Table6,/turf/Wood2,/area)
+"ew" = (/obj/Turfs/Edges/Edge4S,/obj/Turfs/Surf/Water10Surf,/obj/Turfs/Edges/Edge4S,/turf/Wall13,/area)
+"ex" = (/obj/Turfs/IconsX/Icon37,/turf/Wood7,/area)
+"ey" = (/obj/Turfs/IconsX/Icon15,/turf/Wood7,/area)
+"ez" = (/obj/Turfs/Stove,/turf/Wood7,/area)
+"eA" = (/obj/Turfs/IconsX/Icon43,/turf/Wood7,/area)
+"eB" = (/obj/Turfs/Apples,/turf/Wood7,/area)
+"eC" = (/turf/Wood7,/area)
+"eD" = (/obj/Turfs/Bed,/turf/Wood7,/area)
+"eE" = (/obj/Turfs/IconsX/Icon20,/turf/Wood7,/area)
+"eF" = (/obj/Turfs/IconsX/Icon31,/obj/Turfs/IconsX/Icon66,/turf/Wood7,/area)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadadadaeafagafafaeafagafafaeafagafafaeaeaeaeadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadadaeafafafafaeafafafafaeafafafafaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeafafafaeaeafafafaeaeafafafaeaeaeaeahahahahahahahahaeahahahahahaeaiahaiaeaiahahaiaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeahahahahahaeahahahahahahahahahahaeahahahahahahahahahahahahahahahahahaeahafafafahahafafafahahafafafahahahaeajajajajajajajajaeakalamamamaeanamamaeanamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaeafafafafafafafafafafafafafafafafafaearajajajajajajaraeamananamamaeasamataeasamamataeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeaqauauauauauauauauauauauauauauauaqaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeafafaeajajajajajajajajaeavavavavamaeanamamaeanamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapawapapapapapapapapaqaqauaxaxaxaxaxaxaxaxaxaxaxaxaxauaqaeahahahahaeahahahahaeahahahahaeafafaeajajajajajajajajaeamamamamamaeaeamaeaeaeaeamaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeaqauaxaxaxaxaxaxaxaxaxaxaxaxaxauaqaeafagafafaeafagafafaeafagafafaeafafaeajajajajajajajajaeamamamamamaeaiamaiahahaiamaiaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaoapapapapapapapapapapaeaqauauauauauauauauauauauauauauauaqaeafafafafaeafafafafaeafafafafaeafafaeajajajajajajajajapamamamamamaeamamamamamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaqaeaeafafafaeaeafafafaeaeafafafaeafafaeajajajajajajajajaeamamamamamaeamamamaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapawapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeahafafafahahafafafahahafafafahafafaeajajajajajajajajaeamamamamamaeamamamaeaiahahaiaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeahahahahahahahahahahahahahahahahahaeafafafafafafafafafafafafafafafafafaeajajajajajajajajaeamamamamamaeamamamaeamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaoaoaoaoaoaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeafafafafafafafafafafafafafafafafafaeajajajajajajajajaeaeaeamaeaeaeamamamamamamamataeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaeaeaeaeaeaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeaeaeafaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeajajajajajajajajaeahaiamaiahahamamamaeamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeahahahahahaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeahahafahahahahahahahahahahahahahahaeajajajajajajajajaeamamamamamamamamamaeamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaqaqaqaqaqaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeafafafafafafafafafafafafafafafafafaeajajajajajajajajaeamamamamamamamamamaeanasanamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaqazaxazaqaqapapapapapapapapapapayayayayayayayayayayayayayayayayayayaeafafafafafafafafafafafafafafafafafafajajajajajajajajaeaeaeaeamaeaeaeaeamaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaqaqaqaqaqaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeafafafafafafafafafafafafafafafafafaeajajajajajajajajaeahahaiamaiahaeaiamaiahahahahaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaeaeaeaeaeaeapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeafafafafafafafafafafafafafafafafafaeajajajajajajajajaeamamamamamanaeanamamamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAahahahahahahapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeajajajajajajajajaeatamamamamasaeasamamamamamataeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeayayayayayayayayayayayayayayayayayaeaiaiaiaiaiaiaeahahahaBahaBahahaCaDaeajajajajajajajajaeamamamamamanaeanamamamamamamaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAaEaFaGaHaIaJaKaLaMaNaOaPaQaRaSaTaeayayayayayayayayayayayayayayayayayaeaUaVaVaVaVaWaeaXaXaXaXaYaXaXaXaXaXaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaZaZaZbaaZaZaeaXaXaXbbbbbbaXaXaXaXaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaiaibcaiaiaiaeaZaZbdbebfaZaeaXaXaXaXaXaXaXaXaXaXaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaZaZaZbgbfaZaeaZaZaZaZaZaZaeaXaXaXaXaXaXaXaXaXaXaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaebhaZaZbiaZaZbjaZaZaZaZaZaZaeaeaeaeaeaXaeaeaeaeaeaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaZaZaZaZaZaZaeaZaZaZaZaZaZaeahahahahbkahahahahahaearajajajajajajaraeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAblbmbnbobpbqbrbsbtbubvbwaQaRaSbxaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaZaeaeaebkbkbkbkbkbkbkbkbkbkaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeahahahahahahahahahahahahahahahaeaeaeahahbybkbyahahbkbkbkbkbkbkbkbkbkbzaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebAbBbCbDbEbFbAbGbHbIbBbDbEbCbFaeaeaebkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbzaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebJbJbJbJbJbJbJbJbJbJbJbJbJbJbJaeaeaebkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbzaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebKbLbMbNbObObObObPbObQbRbJbJbJaeaeaebkbkbkbzbzbzbkbkbkbkbkbkbkbkbkbkbkaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapawapapapapapapapapapapapapawapaebJbJbJbJbJbJbJbJbJbJbJbJbJbJbJaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeapaeaeaeaeaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebJbJbJbJbJbJbJbJbJbJbJbJbJbJbJaeaeaeahahahahahahahahahahahaibjaiahahahaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebJbJbJbJbJbJbJbSbJbJbJbJbJbJbJaeaeaebjbjbjbjbjbjbjbTbjbjbjbjbjbjbjbjbjaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapbJbJbJbJbJbJbJbJbJbJbJbJbUbJbJbJaeaeaebjbjbjbjbjbjbVbVbVbjbjbjbjbjbjbjbjaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebJbJbJbWbJbJbJbJbXbJbJbJbJbJbYaeaeaebjbjbjbjbjbjbjbjbjbjbjbjbjbjbjbjbjaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaebJbJbJbJbJbJbJbJbJbJbJbJbJbYbYaeaeaebjbZbZbZbjbjbjbjbjbjbjbjbZbZbZbjbjaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeapaeaeaeaeaeaeaeaeaeaeajajajajajajajajaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapahahahahahahahahahahahahahahahahaeahaiaiahaeahahahaiajaiahahahahahahahahahajajajajajajajajcacacacacacacacacacacacacacacaaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapajajajajajajajajajajajajajajajajcbcccdcdccaeajajajajajajajajajajajajajajajajajajajajajajajajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapajajajajajajajajajajajajajajajajcccccececcccajajajajajajajajajajajajajajajajajajajajajajajajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapajajajajajajajajajajajajajajajajcbccccccccaeajajajajajajajajajajajajajajajajajajajajajajajajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeajajajajajajajajajajajajajajajajajajajajajajajajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeahahahahahahahahahahahahahahahahahaeahahahajajajajajajajajajajajajajajajajajajajajajajajajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapawapapapapapapapapapapapapawapaecfcgchcicjckckckckckckclckckckckckaeajajajajajajajajajajajajajajajajajajarajajajajajajarajapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckclckckcmckckckclcnclckckckckaeaeaeaeaeaeaeaeaeapaeaeaeaeaeaeaeaeaecocoajajajajcocoaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecmcmcmcmcmcmcmckckckckclckckckckckaeahahahahahahahaibkaiahahahahahahahaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckckckckckckckckckckckckclckckaebkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapckckckckckckckckckclckckckckclcnclckaebkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckckckckckclcnclckckckckclckckaebkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckckckckckckclckckckckckckckckaebkbkcrcrcrcrcrcrbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeckckckaebkbkbkbkbzbzbkcrbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeahahahahahahaeahahahahahahaeckckckaeaeaeaeaeaeaeaeaeaeaeaeapapaeaeaeaeaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecsctcscscscsaeaXbbaXaXaXaXaeckckckaeahaiahaeahahahahahahaibkbkaiahahahaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecucscscscscsaecvaXaXaXcwaXaeckckckaebkbkbkaebkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecscscscscxcsaeaXaXaXcwcycwaeckckckaeczbkbkapbkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecscscscscAcxaeaXaXaXaXcwaXaeckckckaebkbkbkaebkbkbkbkbkbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecscscscscxcsaeaXaXaXaXaXaXaeckckckaebkbkbkaebkbkbkbkaeaeaeaeaeaeaeaeaeaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaecsaeaeaeaeaeaeaXaeaeaeckckckaeaeaeaeaebkbkbkbkaeahahahahaiahahahaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeahahahckahahahahahahckahahahckckckaeahaiahaebkbkbkbkaebkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckckckckckckckckckckckckckckckaebkbkbkaebkbkbkbkaebkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeckckckckckckckckckckckckckckckckckaeczbkbkapbkbkbkbkaebkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaecBaeaeaeaeaeaZaeaeaeaeaeaeaeaeaebkbkbkaebkbkbkbkapbkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeahahcBahahahaeahaZahahahahaeaeaeaeaeaeaeaeaebkbkbkbkaebkbkbkbkbkbkbkbkaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecBcBcBcBcCcBaeaZaZaZaZbfaZaeaeaeaeaeahaiahaebkbkbkbkaeaeaeaeaeaeaeaeaeaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecBcBcBcBcBcDaeaZaZaZaZaZbhaeaeaeaeaebkbkbkapbkbkbkbkaeahahahahaiahahahaecpcqajajajajcpcqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapawapapapapapapapapapapapapawapaecBcEcBcBcBcBaeaZaZbiaZaZaZaeaeaeaeaeczbkbkaebkbkbkbkapbkbkbkbkbkbkbkbkaecpaeaeccaeaeaecqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecEcFcEcBcBcBaeaZbicGbiaZaZaeaeaeaeaebkbkbkaebkbkbkbkaebkbkbkbkbkbkbkbkaecpaeahccaiaiaecqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaecBcEcBcBcBcBaeaZaZbiaZaZaZaeaeaeaeaeaeaeaeaebkbkbkbkaebkbkbkbkbkbkbkbkaecpaecccccdcdaecqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaebkbkbkbkaebkbkbkbkbkbkbkbkaecpaeccccceceaecqaeapapapapapapapapapapapapapapaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeccccccccaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapcHcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcJcJcKcccLcJcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcMadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapcacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacacaadcacacacacacacacacacacacacacacacacacacaadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapapapapapapcNadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapapapapapapadcOcPcPcQadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadcRcRcRcRcRcRcRcRcRcRcRcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaAapapapapapapapapapapapapapapapapapapapapapcScTcTcUadcVcWadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadcRcXcXcXcXcXcXcXcXcXcXcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaecYadadcZdaadaddbdcddadadadadadadadadadadadadadadadadadadadadadadadadadadadadadcRdedfdfdfdgdhdidjdkdlcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaacHcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcIcMadaddmadadaddnadadaddoadadadadadadadadadadadadadadadadadadadadadadadadadadadadcRdfdfdfdfdfdfdfdfdfdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaacacacacacacacacacacadpcacacacacacacacacacacaadadadadcNaddqdrdsaddtadadadadadadadadadaddudududududududududududududuadadadadcRdfdfdfdfdfdfdfdfdfdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadaddvadadadadadadadadadadducXcXcXdwcXcXcXcXdxcXcXcXduadadadadcRdfdfdfdfdfdfdfdfdfdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadaddudydzdAdBdCdDdEdEdEdEdEdFduadadadadcRdfdfdfdfdfdfdfdfdGdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadHacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadaddudEdEdEdEdEdEdEdEdEdEdEdEduadadadadcRdfdfdfdfdfdfdfdGdIdGcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadaddudEdEdEdEdEdEdEdEdEdEdEdEduadadadadcRdfdfdfdfdfdfdfdfdGdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJdJdJdJdJdJdJdJdJdJdJdJdJdJdJdJadadaddudEdEdEdEdEdEdEdEdEdEdEdEduadadadadcRdfdfdfdfdfdfdfdfdfdfcRadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJdKcXcXcXcXdJcXcXcXdLcXcXcXcXdJadadaddudEdEdEdEdEdEdEdEdEdEdEdEduadadadadcRcRcRcRcRcRdfcRcRcRcRcRadadadadadadadadaddMdN
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJdOckdPckckdJcmdQcmdRdSdTdUdVdJadadaddudEdEdEdEdEdEdEdEdEdEdEdEduadadadadcXcXcXcXcXcXadcXcXcXcXcXadadadadadadadadaddWdW
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJckckckckckdJckckckckckckckckdJadadaddudXdEdEdEdEdEdEdYdZdYdEdEduadadadadadadadadadadadadadadadadadadadadadadadadaddWdW
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJckckckckckdJckckckckckckckckdJadadaddudXeadEdEdEdEdEdEdYdEdEdEduadadadadadadadadadadadadadadadadadadadadadadadadaddWdW
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJdJckdJdJdJdJckckckckckckckckdJadadaddudududududEdudududududududuadadadadadadadadadadadadadadadadadadadadadadadadaddWdW
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadaddJcXckcXebcXcXckckckckclckckckdJadadadcXcXcXcXcXadcXcXcXcXcXcXcXcXadadadadadadadadadadadadadadadadadadadadadadadadadeced
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadaddJckckckckckckckckckcleeclckckdJadadadadadadadadadadadadadadadadadadadefefefefefefefefefefefefefefefefefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadaddJckckckckckckckckckckclckckckdJadadadadadadadadadadadadadadadadadadadefcXcXdLcXcXcXcXdKcXefcXcXcXcXcXefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadaddJckckckckckckckckckckckckckckdJadadadadadadadadadadadadadadadadadadadefegeheiejekekelemenefeoepekekeqefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadaddJdJdJdJdJdJdJckdJdJdJdJdJdJdJdJadadadadadadadadadadadadadadadadadadadefekekekekekekerekenefekekekekekefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadcXcXcXcXcXcXcXadcXcXcXcXcXcXcXcXadadadadadadadadadadadadadadadadadadadefekekekekekekekekekefekekekekekefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaababacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadesesesesesesesesesesesesadadadadefekekekekekekekekekefekekekekekefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabababacadadadadadadadadadadadadadadadadadadadadadadadadadadescXcXcXcXetcXdxcXcXcXesadadadadefekeueveuekekekekekefefefekefefefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaababewacadadadadadadadadadadadadadadadadadadadadadadadesexeyezeAeBeCeCeCeCeDesadadadadefekekekekekekekekekcXcXcXekcXcXefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadeseCeCeCeCeCeCeCeCeCeCesadadadadefekekekekekekekekekekekekekekekefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaadHacadadadadadadadadadadadadadadadadadadadadadadadadeseCeCeCeCeCeCeCeCeCeCesadadadadefekekekekekekekekekekekekekekekefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadeseCeCeCeCeCeCeCeCeCeCesadadadadefefefefefefekefefefefefefefefefefadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadeseCeCeEeCeCeCeCeCeCeCesadadadadcXcXcXcXcXcXadcXcXcXcXcXcXcXcXcXcXadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadeseCeEeFeEeCeCeCeCeCeCesadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacadadadadadadadadadadadadadadadadadadadadadadadadadeseCeCeEeCeCeCeCeCeCeCesadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadeseseseseseseseCesesesesadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadcXcXcXcXcXcXcXadcXcXcXcXadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabacadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadadad
+"}
