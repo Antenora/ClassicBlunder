@@ -1662,7 +1662,16 @@ obj/Skills/Utility
 				return
 			else
 				if(Choice.isRace(ANDROID)) // I'm sorry android players...
-					usr << "This Vessel cannot support Inkworks" 
+					usr << "This Vessel cannot support Inkworks"
+					Using = 0 
+					return
+				if(Choice.hasSecret("Heavenly Restriction") && Choice.secretDatum?:hasRestriction("Magic"))
+					usr << "This Vessel's Heavenly Restriction rejects your feeble Magic."
+					Using = 0
+					return
+				if(!Choice.CyberCancel == 0)
+					usr << "This Vessel's Mechanical Augments are incompatible with magic."
+					Using = 0
 					return
 				var/inkchoice = input(usr, "Choose an Inkwork to Bestow on [Choice]", "Bestow Inkwork") in usr.InkworksTypes
 				InkworksIfWall(inkchoice, Choice)
