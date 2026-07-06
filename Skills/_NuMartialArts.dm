@@ -24,9 +24,6 @@ obj
 				StyleOff=1
 				StyleDef=1
 				Finisher//a text path that links to a queue attack which loads an autonomous buff
-				FinisherStage = 1//how many tension bars this style can fill
-				Finisher2//optional stage-2 finisher
-				Finisher3//optional stage-3 finisher
 				CantTrans = FALSE
 
 //Martial

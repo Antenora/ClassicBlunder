@@ -103,7 +103,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 						if(!m.CheckSlotless("Outrunning the Past"))
 							m.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Outrunning_the_Past);
 					if(m.hasMagePassive(/mage_passive/time/Present))
-						m.addTension(10, m.getTensionCap())
+						m.addTension(10, m.getMaxTensionValue())
 				else if(src.SpellElement == "Space")
 					if(m.hasMagePassive(/mage_passive/space/Linearity))
 						if(!m.CheckSlotless("Distorted Space"))
