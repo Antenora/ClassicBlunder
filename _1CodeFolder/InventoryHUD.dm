@@ -232,6 +232,8 @@ client/proc/OpenInventory()
 	CloseSkillMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	inv_open = TRUE
 	inv_cat_index = 1
 	btn_inv.icon = 'HUD/ui_slot_unavailable.png'
@@ -381,6 +383,17 @@ client/proc/BuildInvPage(fade = FALSE)
 				badge.screen_loc = "[InvXLoc(sx + 21)],CENTER:[sy - 1]"
 				inv_item_objs += badge
 				screen += badge
+			// stack count rides the same corner
+			else if(I.Stackable && I.TotalStack > 1)
+				var/atom/movable/shud/invtext/count = new
+				count.maptext_width = 24
+				count.maptext_height = 14
+				count.maptext = "<span style=\"[MINV_FONT]; color:#ffe066; text-align:right\"><b>[I.TotalStack]</b></span>"
+				count.layer = MINV_LAYER + 0.45
+				count.mouse_opacity = 0
+				count.screen_loc = "[InvXLoc(sx + 13)],CENTER:[sy - 1]"
+				inv_item_objs += count
+				screen += count
 	PanShift(inv_item_objs, inv_pan_x, inv_pan_y)
 	if(fade)
 		KineticEntrance(inv_item_objs)
@@ -494,13 +507,31 @@ client/proc/ShowItemDesc(obj/Items/I)
 		if(line)
 			stats = "<br><span style=\"color:#bfefff\">- Stats -</span><br>[line]"
 
+	var/mark = ""
+	if(I.CraftQuality != QUAL_NORMAL)
+		mark += "<br><span style=\"color:[QualityColor(I.CraftQuality)]\">[QualityName(I.CraftQuality)] quality</span>"
+	if(I.metal_id && !istype(I, /obj/Items/Material))
+		mark += "<br><span style=\"color:[LIFE_METAL_UI_RGB[I.metal_id]]\">[LIFE_METAL_NAME[I.metal_id]]-forged</span>"
+		if(istype(I, /obj/Items/Sword))
+			mark += "<br>[LifeFmtMult("DMG", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
+		else if(istype(I, /obj/Items/Armor))
+			mark += "<br>[LifeFmtMult("ABSORB", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
+	if(I.gem_id)
+		mark += "<br><span style=\"color:[QualityColor(I.gem_quality)]\">Socket: [LIFE_GEM_CLASS[I.gem_id]]</span> [GemStatLine(I.gem_id, I.gem_quality)]"
+	if(I.mmat_id)
+		mark += "<br>Essence: [LifeMonsterMatLine(I.mmat_id, I.mmat_quality)]"
+	if(I.metal_id && I.CraftQuality == QUAL_LEGENDARY && !I.Destructable && !istype(I, /obj/Items/Material))
+		mark += "<br><span style=\"color:#ffd86b\">Unbreakable</span>"
+	if(I.CreatorName)
+		mark += "<br><span style=\"color:#b8a06a\">Forged by [I.CreatorName]</span>"
+
 	var/atom/movable/shud/invtext/T = new
 	T.layer = MINV_LAYER + 0.6
 	T.mouse_opacity = 0 // clicks fall through to the panel
 	T.maptext_width = 176
 	T.maptext_height = 152
 	T.screen_loc = "[InvXLoc(164)],CENTER:-70"   // low enough that long descriptions clear the icon
-	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats]</span>"
+	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats][mark]</span>"
 	inv_desc_objs += T
 
 	// gear and clothing actions stacked top-right, clear of the description text

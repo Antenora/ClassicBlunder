@@ -362,6 +362,8 @@ client/proc/OpenAcquireMenu()
 	CloseCharacterMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	aqmenu_open = 1
 	aq_tab = "Unarmed"
 	aq_scroll_px = 0

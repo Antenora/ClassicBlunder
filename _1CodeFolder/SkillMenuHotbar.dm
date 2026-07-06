@@ -9,6 +9,7 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 #define KB_NORMAL 0
 #define KB_MOVE   1
 #define KB_HOTBAR 2   // +UP release only if the slotted skill is a held skill
+#define KB_INTERACT 3 // +UP always bound so hold-minigames see the release
 
 /datum/keyaction
 	var/id
@@ -48,6 +49,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("meditate",    "Meditate",            "Meditation",         "M",   "Combat")
 	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "CTRL+Space", "Combat")
 	R += new/datum/keyaction("seetargets",  "See Target's Target", "See-Targets-Target", "`",   "Combat")
+	R += new/datum/keyaction("interact",    "Interact",            "Interact",           "G",   "Combat", KB_INTERACT)
 	R += new/datum/keyaction("say",         "Say",                "Say",                "", "Communication")
 	R += new/datum/keyaction("ooc",         "OOC",                "OOC",                "", "Communication")
 	R += new/datum/keyaction("whisper",     "Whisper",            "Whisper",            "", "Communication")
@@ -110,6 +112,9 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
 	if(kind == KB_MOVE)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
 		return
+	if(kind == KB_INTERACT)
+		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Interact-Release")
+		return
 	if(kind == KB_HOTBAR && regid)
 		var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
 		var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
@@ -122,6 +127,19 @@ client/proc/ApplyKeybinds()
 	if(!mob) return
 	mob.initShortcuts()
 	BuildKeybindRegistry()
+	if(mob.shortcuts.keybinds && mob.shortcuts.keybinds.len)
+		var/list/ownedkeys = list()
+		for(var/sk in mob.shortcuts.keybinds)
+			var/kv = mob.shortcuts.keybinds[sk]
+			if(kv) ownedkeys[kv] = sk
+		for(var/datum/keyaction/a in keybind_registry)
+			for(var/s = 1 to 2)
+				var/sk = (s == 2) ? "[a.id]@2" : a.id
+				if(sk in mob.shortcuts.keybinds) continue
+				var/key = (s == 2) ? a.defkey2 : a.defkey
+				if(key && ownedkeys[key])
+					mob.SetKeybind(a.id, s, "")
+					mob << "Your custom [KeyDisplay(key)] bind keeps its key, [a.label] is unbound. Give it a key in Keybinds."
 	var/set_name = "macro"
 	for(var/k in params2list(winget(src, null, "macro")))
 		set_name = k
@@ -732,6 +750,8 @@ client/proc/OpenSkillMenu()
 	CloseCharacterMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1

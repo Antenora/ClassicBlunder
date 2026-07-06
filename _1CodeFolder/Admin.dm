@@ -3268,7 +3268,12 @@ atom/Topic(A,B[])/*
 			return
 		switch(class)
 			if("Give To")
-				src.contents+=new variable
+				var/obj/gaveobj = new variable
+				if(istype(gaveobj, /obj/Items))
+					var/mob/gm = src
+					gm.GiveOrDrop(gaveobj)   
+				else
+					src.contents += gaveobj
 				if(istype(variable, /obj/Skills))
 					var/mob/m = src
 					if(istype(variable, /obj/Skills/Queue))

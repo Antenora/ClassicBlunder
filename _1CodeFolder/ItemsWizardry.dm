@@ -363,7 +363,7 @@ obj/Items/Enchantment
 										p.name=Name
 									p.DrinkMessage=input(usr, "Input message for when potion is consumed.", "Potion Active") as text
 									p.OffMessage=input(usr, "Input message for when potion wears off.", "Potion Off") as text
-								usr.contents+=p
+								usr.GiveOrDrop(p)
 							else
 								usr << "You don't have enough capacity to brew this potion!"
 							src.Using=0
@@ -508,7 +508,7 @@ obj/Items/Enchantment
 									usr.TakeMoney(Cost)
 									var/obj/Items/Enchantment/PhilosopherStone/Artificial/a=new
 									a.SoulStrength=2
-									usr.contents+=a
+									usr.GiveOrDrop(a)
 									usr << "You've created an artificial Philosopher Stone!"
 								else
 									usr << "You don't have enough money to make an artificial Philosopher Stone!  ([Commas(Cost)] / [Commas(usr.GetMoney())])"

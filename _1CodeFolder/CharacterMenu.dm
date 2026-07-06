@@ -507,6 +507,8 @@ client/proc/OpenCharacterMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	cmenu_open = TRUE
 	cmenu_tab = 0
 	// tile-anchor the frame so it stays inside the view
@@ -793,6 +795,8 @@ client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return
 	if(AqWheelScroll(delta_y))     // Acquire Skills list (AcquireHUD.dm)
+		return
+	if(StWheelScroll(delta_y))     // Forge/Anvil station list (StationHUD.dm)
 		return
 	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
 		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
@@ -1404,6 +1408,22 @@ client/proc/ShowGearDetail(obj/Items/it)
 	var/sub = cat
 	if(it.Class in list("Light", "Medium", "Heavy")) sub += " - [it.Class]"
 	AddDescLine(gspan(sub, "#96c3e1", "left"), 140, ly, 344); ly += 22
+	// forged identity + combat effectiveness
+	var/gisw = istype(it, /obj/Items/Sword)
+	if(it.metal_id)
+		var/qn = (it.CraftQuality && it.CraftQuality != QUAL_NORMAL) ? "[QualityName(it.CraftQuality)] " : ""
+		var/asc = (it.Ascended > 0) ? " &#183; Asc [it.Ascended]" : ""
+		AddDescLine(gspan("[qn][LIFE_METAL_NAME[it.metal_id]]-forged[asc]", QualityColor(it.CraftQuality), "left"), 140, ly, 344); ly += 16
+	if(gisw || istype(it, /obj/Items/Armor) || istype(it, /obj/Items/Enchantment/Staff))
+		AddDescLine(gspan("[gisw ? "DMG" : "ABSORB"] x[round(it.DamageEffectiveness, 0.01)]  ACC x[round(it.AccuracyEffectiveness, 0.01)]  SPD x[round(it.SpeedEffectiveness, 0.01)]", "#bfe6ff", "left"), 140, ly, 344); ly += 16
+	if(it.metal_id && it.CraftQuality == QUAL_LEGENDARY && !it.Destructable)
+		AddDescLine(gspan("Unbreakable", "#ffd278", "left"), 140, ly, 344); ly += 16
+	if(it.gem_id)
+		AddDescLine(gspan("Socket: [LIFE_GEM_CLASS[it.gem_id]] [GemStatLine(it.gem_id, it.gem_quality)]", QualityColor(it.gem_quality), "left"), 140, ly, 344); ly += 16
+	if(it.mmat_id)
+		AddDescLine(gspan("Essence: [LifeMonsterMatLine(it.mmat_id, it.mmat_quality)]", "#8be9ff", "left"), 140, ly, 344); ly += 16
+	if(it.metal_id && it.CreatorName)
+		AddDescLine(gspan("Forged by [it.CreatorName]", "#9fb4c7", "left"), 140, ly, 344); ly += 16
 	var/list/SL = mob.GearStatList(it)
 	for(var/lbl in SL)
 		var/val = SL[lbl]

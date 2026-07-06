@@ -255,7 +255,7 @@ client/proc/ToggleTechMenu()
 client/proc/OpenTechMenu(start_tab = "tree")
 	if(tmenu_open || !mob) return
 	if(length(TechnologyTree) < 1) fillOutTechTree()
-	CloseMenu(); CloseInventory(); CloseCharacterMenu(); CloseSkillMenu(); CloseAcquireMenu()
+	CloseMenu(); CloseInventory(); CloseCharacterMenu(); CloseSkillMenu(); CloseAcquireMenu(); CloseLifeSkillsMenu(); CloseStationMenu()
 	tmenu_open = 1
 	tmenu_tab = start_tab
 
@@ -813,11 +813,8 @@ client/proc/CraftSectionsFor(filter)
 	var/list/learned = mob.knowledgeTracker.learnedKnowledge
 	if(filter == "all" || filter == TT_FAM_MISC)
 		out += list(CraftSection("Basic Technology", BasicTechnology_List, learned, 1))
-	if(filter == "all" || filter == TT_FAM_FORGE)
-		out += list(CraftSection("Forging", Forging_List, learned, mob.ForgingUnlocked))
-		out += list(CraftSection("Repair & Conversion", RepairAndConversion_List, learned, mob.RepairAndConversionUnlocked))
-		out += list(CraftSection("Engineering", Engineering_List, learned, mob.EngineeringUnlocked))
 	if(filter == "all" || filter == TT_FAM_CYBER)
+		out += list(CraftSection("Engineering", Engineering_List, learned, mob.EngineeringUnlocked))
 		out += list(CraftSection("Cyber Engineering", CyberEngineering_List, learned, mob.CyberEngineeringUnlocked))
 	if(filter == "all" || filter == TT_FAM_MED)
 		out += list(CraftSection("Medicine", Medicine_List, learned, mob.MedicineUnlocked))
@@ -828,7 +825,7 @@ client/proc/CraftSectionsFor(filter)
 	if(filter == "all" || filter == TT_FAM_MIL)
 		out += list(CraftSection("Military Technology", MilitaryTechnology_List, learned, mob.MilitaryTechnologyUnlocked))
 		out += list(CraftSection("Military Engineering", MilitaryEngineering_List, learned, mob.MilitaryEngineeringUnlocked))
-	if(filter == "all" || filter == TT_FAM_FORGE || filter == TT_FAM_MIL)
+	if(filter == "all" || filter == TT_FAM_CYBER || filter == TT_FAM_MIL)
 		out += list(CraftSection("Power Packs", PowerPack_List, learned, (mob.EngineeringUnlocked || mob.MilitaryTechnologyUnlocked)))
 	var/list/clean = list()
 	for(var/list/sec in out)
@@ -926,7 +923,7 @@ client/proc/BuildCraft()
 	RefreshBalance()
 
 client/proc/BuildCraftChips()
-	var/list/fams = list("all" = "All", TT_FAM_FORGE = "Forge", TT_FAM_CYBER = "Cyber", \
+	var/list/fams = list("all" = "All", TT_FAM_CYBER = "Cyber", \
 		TT_FAM_MED = "Medicine", TT_FAM_TELE = "Telecom", TT_FAM_MIL = "Military", TT_FAM_MISC = "Basic")
 	var/cx = 18
 	for(var/key in fams)

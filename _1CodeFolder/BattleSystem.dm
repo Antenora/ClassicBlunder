@@ -2119,7 +2119,7 @@ mob/proc/Grab()
 								del(P)
 								return
 						buh.suffix="[Commas(buh:TotalStack)]"
-					if(src.CheckInventoryFull())
+					if(src.CheckInventoryFull(P))
 						return
 					src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 					P.Move(src)

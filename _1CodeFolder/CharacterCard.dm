@@ -786,16 +786,17 @@ client/proc/ShowDebuffPanel(atom/movable/shud/debufficon/di)
 	KineticEntrance(debuff_panel_objs)
 
 // New Tension bar
-#define FIN_X 276             // card right edge (6 + 264) + 6px gap
-#define FIN_BAR_BOTTOM 68     // anchor-row offset: bar top sits at the card's visible frame top
+// centered above the skill hotbar (slots sit at SOUTH:30..62, CENTER-anchored)
+#define FIN_CX -112           // bar is 224 wide: CENTER:-112 centers it
+#define FIN_SOUTH 76          // bar bottom: 14px above the hotbar slot tops
+#define FIN_MINI_SOUTH 78     // minis: 12px below the bar top (bar spans 76..96)
 #define FIN_FILL_X 34         // fill sweep starts here inside the fill icon
 #define FIN_TRACKW 224
 #define FIN_SPAN 190          
 #define FIN_GLOW_COLOR "#b48cff"
 #define FIN_EDGE_COLOR "#5d4f96"
-#define FIN_MINI_X1 92        // left mini slot (stage 2)
+#define FIN_MINI_X1 92        // left mini slot (stage 2), px from the bar's left edge
 #define FIN_MINI_X2 152       // right mini slot (stage 3)
-#define FIN_MINI_BOTTOM 70    
 #define FIN_MINI_W1 64
 #define FIN_MINI_W2 62
 #define FIN_MINIMASK_W 64
@@ -901,18 +902,13 @@ client/proc/RebuildFinisherMinis(count)
 
 client/proc/PositionFinisherBar()
 	if(!fin_track) return
-	var/list/v = splittext("[view]", "x")
-	if(v.len < 2) return
-	var/th = text2num(v[2])
-	if(!th) return
-	var/row = max(th - (MCARD_TILES_TALL - 1), 1)   // same anchor row as the card
-	var/sl = "1:[FIN_X],[row]:[FIN_BAR_BOTTOM]"
+	var/sl = "CENTER:[FIN_CX],SOUTH:[FIN_SOUTH]"
 	fin_track.screen_loc = sl
 	fin_fill.screen_loc = sl
 	if(fin_minis)
 		for(var/i = 1 to fin_minis.len)
 			var/atom/movable/o = fin_minis[i]
-			o.screen_loc = "1:[FIN_X + ((i == 1) ? FIN_MINI_X1 : FIN_MINI_X2)],[row]:[FIN_MINI_BOTTOM]"
+			o.screen_loc = "CENTER:[FIN_CX + ((i == 1) ? FIN_MINI_X1 : FIN_MINI_X2)],SOUTH:[FIN_MINI_SOUTH]"
 
 client/proc/UpdateFinisherBar()
 	if(!mob || !fin_track) return

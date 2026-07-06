@@ -48,7 +48,7 @@ knowledge
 mob
 	var
 		//Technology
-		ForgingUnlocked=1
+		ForgingUnlocked=0   // legacy, Smithing rank drives forging now, see SmithingLevel()
 		RepairAndConversionUnlocked
 		MedicineUnlocked
 		ImprovedMedicalTechnologyUnlocked

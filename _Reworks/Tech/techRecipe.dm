@@ -1,8 +1,4 @@
-#define QUAL_POOR      1
-#define QUAL_NORMAL    2
-#define QUAL_GOOD      3
-#define QUAL_EPIC      4
-#define QUAL_LEGENDARY 5
+// QUAL_* tier defines live in _1CodeFolder\__Defines.dm so early files can see them
 
 var/list/QUALITY_NAMES  = list("Poor", "Normal", "Good", "Epic", "Legendary")
 var/list/QUALITY_COLORS = list("#9aa3b2", "#dfe7f0", "#5bd75b", "#b46bff", "#ffb020")
@@ -23,22 +19,15 @@ var/list/QUALITY_COLORS = list("#9aa3b2", "#dfe7f0", "#5bd75b", "#b46bff", "#ffb
 	// reuses /obj/Items/CraftQuality as the material's own quality
 	Stackable = 1
 
+// materials live in the Collection Log now
 /proc/CountMaterial(mob/m, material_class, min_quality = QUAL_POOR)
-	. = 0
-	if(!m) return
-	for(var/obj/Items/Material/mat in m)
-		if(mat.MaterialClass == material_class && mat.CraftQuality >= min_quality)
-			. += mat.TotalStack
+	return m ? m.MatLogCount(material_class, min_quality) : 0
 
 /proc/ConsumeMaterial(mob/m, material_class, amount, min_quality = QUAL_POOR)
 	if(!m || amount <= 0) return
-	for(var/obj/Items/Material/mat in m)
+	for(var/q = QualityClamp(min_quality) to QUAL_LEGENDARY)   // spend the lowest eligible quality first
 		if(amount <= 0) break
-		if(mat.MaterialClass != material_class || mat.CraftQuality < min_quality) continue
-		var/take = min(amount, mat.TotalStack)
-		mat.TotalStack -= take
-		amount -= take
-		if(mat.TotalStack <= 0) del mat
+		amount -= m.MatLogTakeQ(material_class, q, amount)
 
 // a fixed material requirement
 /datum/craft_ingredient

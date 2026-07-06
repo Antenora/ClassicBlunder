@@ -69,7 +69,7 @@
 
 	if(made.Stackable)
 		for(var/obj/Items/o in src)
-			if(o.type == made.type)
+			if(o.type == made.type && o.CraftQuality == made.CraftQuality && o.TotalStack < INV_STACK_MAX)
 				o.TotalStack++
 				o.suffix = "[o.TotalStack]"
 				src << "You stack a new [made]."
