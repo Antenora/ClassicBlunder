@@ -24,10 +24,7 @@ proc/LifeMatAdd(id, name, passive_key, passive_label, base_mag, per_quality)
 
 proc/RegisterMonsterMats()
 	if(LifeMonsterMatDefs.len) return
-	// real drops come later
-	LifeMatAdd("wolf_fang",   "Wolf Fang",   "AttackSpeed", "Attack Speed", 1, 1)
-	LifeMatAdd("drake_scale", "Drake Scale", "MeleeResist", "Melee Resist", 1, 1)
-	LifeMatAdd("ogre_sinew",  "Ogre Sinew",  "Brutalize",   "Brutalize",    1, 1)
+	RegisterHuntContent()   // Hunting fills the socketable defs
 
 proc/LifeMonsterMatDef(id)
 	RegisterMonsterMats()
@@ -36,6 +33,7 @@ proc/LifeMonsterMatDef(id)
 // the item type Hunting will drop; MaterialClass = the def id
 /obj/Items/Material/MonsterPart
 	desc = "A trophy from the hunt. A skilled smith can work it into gear, and there may be other uses."
+	var/tier = 1
 
 proc/ApplyMonsterMatToGear(obj/Items/I, mmid, matq)
 	var/datum/monster_mat_def/d = LifeMonsterMatDef(mmid)

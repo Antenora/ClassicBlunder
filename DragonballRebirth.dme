@@ -453,6 +453,7 @@
 #include "_Reworks\libs\anymacro.dms"
 #include "_Reworks\LifeSkills\_LifeDefines.dm"
 #include "_Reworks\LifeSkills\collection_log.dm"
+#include "_Reworks\LifeSkills\hunting.dm"
 #include "_Reworks\LifeSkills\Interact.dm"
 #include "_Reworks\LifeSkills\LifeMinigame.dm"
 #include "_Reworks\LifeSkills\LifeSkillDatum.dm"

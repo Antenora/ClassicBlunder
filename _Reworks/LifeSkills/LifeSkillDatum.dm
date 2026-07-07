@@ -117,3 +117,6 @@ mob/proc/GrantLifeRankPerks(skillid, rank)
 		if("Mining")
 			if(rank >= 10)
 				src << "<b>Prospector's Instinct: once a day, your next mining strike guarantees a gem. Arm it from the Life Skills menu.</b>"
+		if("Hunting")
+			if(rank >= 10)
+				src << "<b>Trophy Extraction: once a day, a carve yields a bonus pristine trophy.</b>"

@@ -24,6 +24,7 @@ obj
 				StyleOff=1
 				StyleDef=1
 				Finisher//a text path that links to a queue attack which loads an autonomous buff
+				FinisherStage = 1//finisher-bar HUD reads this
 				CantTrans = FALSE
 
 //Martial

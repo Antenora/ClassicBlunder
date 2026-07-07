@@ -53,8 +53,16 @@
 // legendary gathers: only rank 8+, and even then it's a roll
 #define LIFE_GATHER_LEG_BASE 2
 
-// mining gate: one over your rank is the frontier, past that is a wall
-#define LIFE_MINE_GATE_OK(rank, diff) ((diff) <= (rank) + 1)
+// gather gate
+#define LIFE_GATHER_GATE_OK(rank, diff) ((diff) <= (rank) + 1)
+#define LIFE_MINE_GATE_OK(rank, diff) LIFE_GATHER_GATE_OK(rank, diff)
+
+// hunting: monster Potential band (tier 1..5) -> carve difficulty on the shared 1..10 scale
+#define LIFE_HUNT_DIFF(tier) ((tier) * 2 - 1)
+#define LIFE_CARVE_STRIKES 3
+#define LIFE_HUNT_BASE_YIELD 2
+#define LIFE_HUNT_DROP_COUNT 2
+#define LIFE_REMAINS_DECAY_SECS 90
 
 // gear crafting v2
 #define LIFE_LEG_AUGMENT 1.15      // legendary gear: base multipliers get this on top
