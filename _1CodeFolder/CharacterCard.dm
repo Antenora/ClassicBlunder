@@ -126,6 +126,7 @@ client/proc/InitCharacterCard()
 	cardstatus.maptext_y = 48
 	screen += cardstatus
 	InitIntentChips()
+	InitFinisherBar()
 	UpdateCharacterCard()
 	UpdateCardText()
 	PositionCharacterCard()
@@ -346,8 +347,10 @@ client/proc/PositionCharacterCard()
 	PlaceIntentChips() // re-place on resize
 	UpdateDebuffs() // re-place on resize
 	UpdateTimedBuffs() // re-place on resize
+	PositionFinisherBar() // re-place on resize
 
 client/proc/ResetCharacterCard()
+	ResetFinisherBar()
 	if(card)
 		screen -= card
 		del card

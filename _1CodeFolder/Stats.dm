@@ -1292,31 +1292,12 @@ mob/proc/Update_Stat_Labels()
 		winshow(src, "BarFrenzy",0)
 		winshow(src, "BarPotion",0)
 		winshow(src, "BarCripple",0)
+		if(client) client.UpdateFinisherBar()   // tension/finisher HUD bar
 		if(src.StyleActive)
 			winshow(src, "StyleLabel",1)
 			winshow(src, "StanceLabel",1)
 			src<<output("[src.StyleActive]","StyleLabel")
 			src<<output("[src.StanceActive]","StanceLabel")
-			if(src.StyleBuff)
-				winshow(src, "TensionLabel",1)
-				winshow(src, "TensionBar",1)
-
-				var/maxTension = getMaxTensionValue();
-				var/tensionPercent = round(Tension / maxTension * 100);
-				winset(src, "TensionBar", "value=[tensionPercent]")
-
-				if(tempTensionLock)
-					winset(src, "TensionBar", "bar-color='#666'")
-					winset(src, "TensionLabel", "text-color='#666'")
-					src << output("*LOCKED*", "TensionLabel")
-				else if(tensionPercent >= 100)
-					winset(src, "TensionBar", "bar-color='#F00'")
-					winset(src, "TensionLabel", "text-color='#F00'")
-					src << output("FINISHER!!!", "TensionLabel")
-				else
-					winset(src, "TensionBar", "bar-color='#F0F'")
-					winset(src, "TensionLabel", "text-color='#F0F'")
-					src << output("TENSION", "TensionLabel")
 			if(client.getPref("oldZanzo"))
 				winshow(src, "MovementBar", 1)
 				winshow(src, "MovementLabel", 1)
@@ -1337,8 +1318,6 @@ mob/proc/Update_Stat_Labels()
 		else
 			winshow(src, "StyleLabel",0)
 			winshow(src, "StanceLabel",0)
-			winshow(src, "TensionLabel",0)
-			winshow(src, "TensionBar",0)
 			winshow(src, "MovementBar", 0)
 			winshow(src, "MovementLabel", 0)
 	if(Secret)
@@ -1386,12 +1365,6 @@ mob/proc/Update_Stat_Labels()
 		else
 			winshow(src, "Storage",0)
 			winshow(src, "StorageLabel",0)
-
-	if(src.Oxygen!=src.OxygenMax)
-		winshow(src, "BarOxygen",1)
-		src<<output("OXY: [round(Oxygen, 1)]","BarOxygen")
-	else
-		winshow(src, "BarOxygen",0)
 
 mob/var/tmp/ha=0
 
