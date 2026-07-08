@@ -5,6 +5,8 @@ var/global/tmp/EventScheduler/LifeScheduler = new()
 
 /obj/LifeSkills
 	Savable = 0
+	Destructable = 0   
+	Attackable = 0
 
 /obj/LifeSkills/OreNode
 	name = "Ore Vein"

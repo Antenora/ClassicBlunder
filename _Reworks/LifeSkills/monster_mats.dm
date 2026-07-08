@@ -32,6 +32,7 @@ proc/LifeMonsterMatDef(id)
 
 // the item type Hunting will drop; MaterialClass = the def id
 /obj/Items/Material/MonsterPart
+	icon = 'Icons/LifeSkills/MonsterMats.dmi'
 	desc = "A trophy from the hunt. A skilled smith can work it into gear, and there may be other uses."
 	var/tier = 1
 

@@ -372,7 +372,28 @@ proc/LifeSkillPageBody(mob/M, id)
 				body += "<br>Capstone: one guaranteed gem per day (arm it above)."
 		if("Smithing")
 			body = "Smelt ore into ingots at a forge, hammer gear out at an anvil.<br><br>[LifeSmithingRecipeLines(M)]"
-		if("Fishing", "Foraging", "Farming", "Hunting", "Cooking", "Thaumaturgy", "Technology")
+		if("Hunting")
+			var/datum/lifeskill/S = M.GetLifeSkill(id)
+			body = "Slain monsters leave carveable remains. Face them and press [M.InteractKeyName()], or click them, then saw up and down to work the carcass.<br>Tougher monsters (higher Potential) yield higher-tier parts - rank up to carve them cleanly.<br><br>"
+			var/found = S.collection_log ? S.collection_log.len : 0
+			body += "Collection log: [found] monster part[found == 1 ? "" : "s"] discovered."
+			if(S.rank >= LIFE_MAX_RANK)
+				body += "<br>Capstone: Trophy Extraction - one bonus pristine trophy per day."
+		if("Foraging")
+			var/datum/lifeskill/S = M.GetLifeSkill(id)
+			body = "Gather herbs, flowers and mushrooms from wild patches, and chop trees for wood and fruit. Face a patch or tree and press [M.InteractKeyName()], or click it.<br>Patches want a steady hand; trees want an axe-swing rhythm. Richer growth (higher tier) needs more rank.<br><br>"
+			var/found = S.collection_log ? S.collection_log.len : 0
+			body += "Collection log: [found] plant[found == 1 ? "" : "s"] discovered."
+			if(S.rank >= LIFE_MAX_RANK)
+				body += "<br>Capstone: Botanist's Eye - one bonus rare specimen per day."
+		if("Fishing")
+			var/datum/lifeskill/S = M.GetLifeSkill(id)
+			body = "Cast at fishing spots on the water. Face the spot and press [M.InteractKeyName()], or click it, then wait for a bite.<br>Reel it in: hold [M.InteractKeyName()] to raise the marker and keep it over the fish. Different fish fight differently - deeper waters hold tougher, rarer fish.<br><br>"
+			var/found = S.collection_log ? S.collection_log.len : 0
+			body += "Collection log: [found] fish discovered."
+			if(S.rank >= LIFE_MAX_RANK)
+				body += "<br>Capstone: Legend of the Deep - one legendary catch per day."
+		if("Farming", "Cooking", "Thaumaturgy", "Technology")
 			body = "Coming soon."
 	return "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">[body]</span>"
 

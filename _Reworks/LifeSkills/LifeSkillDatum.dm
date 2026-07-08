@@ -120,3 +120,9 @@ mob/proc/GrantLifeRankPerks(skillid, rank)
 		if("Hunting")
 			if(rank >= 10)
 				src << "<b>Trophy Extraction: once a day, a carve yields a bonus pristine trophy.</b>"
+		if("Foraging")
+			if(rank >= 10)
+				src << "<b>Botanist's Eye: once a day, a gather turns up a rare specimen.</b>"
+		if("Fishing")
+			if(rank >= 10)
+				src << "<b>Legend of the Deep: once a day, you hook a legendary catch.</b>"

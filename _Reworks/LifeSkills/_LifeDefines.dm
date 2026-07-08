@@ -59,10 +59,34 @@
 
 // hunting: monster Potential band (tier 1..5) -> carve difficulty on the shared 1..10 scale
 #define LIFE_HUNT_DIFF(tier) ((tier) * 2 - 1)
-#define LIFE_CARVE_STRIKES 3
 #define LIFE_HUNT_BASE_YIELD 2
 #define LIFE_HUNT_DROP_COUNT 2
 #define LIFE_REMAINS_DECAY_SECS 90
+
+// foraging: steady-hand hold-release. within the rank+1 gate it stays winnable
+#define LIFE_FORAGE_NEED(D) (round(15 + 5 * (D)))
+#define LIFE_FORAGE_TIME(D, rank) (round(LIFE_FORAGE_NEED(D) * clamp(1.7 - 0.2 * ((D) - (rank)), 1.1, 2.0)))
+#define LIFE_FORAGE_BASE_YIELD 2
+
+// woodcutting (part of Foraging): chop trees for wood + fruit
+#define LIFE_CHOP_STRIKES 4
+#define LIFE_TREE_DENSITY 1600       // trees are sparse (big footprint)
+#define LIFE_TREE_STAGES 6           // s0 stump .. s5 grown; regrows through the sprite stages
+#define LIFE_TREE_GROW_SECS 1800     // 30 min stump to full 
+#define LIFE_WOOD_BASE_YIELD 2
+
+// drop rarity weights (higher = more common). damage-oriented passives are intentionally rarer vs the rest.
+#define LIFE_W_COMMON 100
+#define LIFE_W_UTILITY 30
+#define LIFE_W_STRONG 10
+#define LIFE_W_DAMAGE 1
+
+// carve minigame (drag_saw): saw up AND down. one stroke banks fill over LIFE_SAW_SPAN px
+#define LIFE_SAW_SPAN 96          // px of travel that banks one full stroke
+#define LIFE_SAW_REVERSAL 24      // px you must pull back before a return stroke counts (jitter guard)
+#define LIFE_SAW_STROKES(D) (round(4 + 0.9 * (D)))
+#define LIFE_SAW_TIME(D, rank) (round(LIFE_SAW_STROKES(D) * 8 * clamp(1.0 + 0.1 * ((rank) - (D)), 0.7, 1.4)))
+#define LIFE_SAW_DECAY 0.03       // stroke-units bled off per idle tick
 
 // gear crafting v2
 #define LIFE_LEG_AUGMENT 1.15      // legendary gear: base multipliers get this on top

@@ -3,6 +3,8 @@ mob/var/LifeStaminaLastRefill = 0
 mob/var/LifeCapstoneGemDay = -1   // DaysOfWipe stamp of the last Prospector's Instinct use
 mob/var/LifeLegendaryForgeDay = -1   // the anvil answers once a day
 mob/var/LifeTrophyDay = -1   // Trophy Extraction stamp (Hunting capstone)
+mob/var/LifeBloomDay = -1    // Botanist's Eye stamp (Foraging capstone)
+mob/var/LifeLegendDay = -1   // Legend of the Deep stamp (Fishing capstone)
 mob/var/tmp/LifeGemArmed = 0
 
 mob/proc/CheckLifeStaminaRefill()

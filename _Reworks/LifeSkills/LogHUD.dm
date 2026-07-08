@@ -22,6 +22,8 @@
 		if(usr) usr.client.LogPanelMove(params)
 	MouseUp(location, control, params)
 		if(usr) usr.client.LogPanelEnd()
+	MouseWheel(delta, location, control, params)
+		if(usr) usr.client.LogWheel(delta)
 
 /atom/movable/shud/logpic
 	layer = LOG_LAYER + 0.3
@@ -56,6 +58,8 @@
 		filters = null
 	Click()
 		if(usr && matclass) usr.client.LogSlotClick(matclass)
+	MouseWheel(delta, location, control, params)
+		if(usr) usr.client.LogWheel(delta)
 
 /atom/movable/shud/logwidget          // pressable close X (presses, not just glows)
 	parent_type = /atom/movable/shud/pressbtn
@@ -69,6 +73,7 @@ client
 		logmenu_open = 0
 		log_cat = "Ores"
 		log_sel = ""
+		log_scroll = 0
 		log_wd_class = ""
 		log_wd_quality = 0
 		log_wd_amount = 1
@@ -153,6 +158,7 @@ client/proc/OpenLogMenu()
 	logmenu_open = 1
 	log_cat = "Ores"
 	log_sel = ""
+	log_scroll = 0
 
 	var/list/vd = splittext("[view]", "x")
 	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
@@ -237,10 +243,14 @@ client/proc/RefreshLogPage()
 		if(M.MatLogLifetime(mc) > 0) mapped++
 	LogText(330, 12, 250, 16, "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]; text-align:right\">[log_cat] mapped [mapped] / [mats.len]</span>", 0)
 
-	// slot grid (first LOG_COLS*LOG_ROWS)
-	var/shown = min(mats.len, LOG_COLS * LOG_ROWS)
+	// slot grid - scrollable window of LOG_COLS*LOG_ROWS
+	var/maxrows = round(mats.len / LOG_COLS); if(maxrows * LOG_COLS < mats.len) maxrows++
+	var/maxscroll = max(0, maxrows - LOG_ROWS)
+	log_scroll = clamp(log_scroll, 0, maxscroll)
+	var/start = log_scroll * LOG_COLS
+	var/shown = min(mats.len - start, LOG_COLS * LOG_ROWS)
 	for(var/i = 1 to shown)
-		var/mc = mats[i]
+		var/mc = mats[start + i]
 		var/col = (i - 1) % LOG_COLS
 		var/row = round((i - 1) / LOG_COLS)
 		var/x = LOG_GX + col * LOG_PITCH_X
@@ -271,8 +281,8 @@ client/proc/RefreshLogPage()
 		LogText(x, y + LOG_CELL - 26, LOG_CELL, 16, "<center><span style=\"[LS_FONT_BODY]; color:[owned ? "#ffffff" : LS_C_HINT]\">[owned ? "[d ? d.name : mc]" : "???"]</span></center>", 0, 0.5)
 		if(owned)
 			LogText(x, y + LOG_CELL - 14, LOG_CELL, 14, "<center><span style=\"[LS_FONT_BODY]; color:[LS_C_COST]\">[have]</span></center>", 0, 0.5)
-	if(mats.len > shown)
-		LogText(LOG_GX, LOG_GY + LOG_ROWS * LOG_PITCH_Y, 280, 14, "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">+[mats.len - shown] more (scroll coming with Hunting)</span>", 0)
+	if(maxscroll > 0)
+		LogText(LOG_GX, LOG_GY + LOG_ROWS * LOG_PITCH_Y - 12, 280, 14, "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">scroll-wheel here - rows [log_scroll + 1]-[min(maxrows, log_scroll + LOG_ROWS)] / [maxrows]</span>", 0)
 
 	// detail panel (right side, with breathing room from the grid)
 	LogBG('HUD/log_detail.png', 298, 72, 286, 0.15, 0)
@@ -343,6 +353,11 @@ client/proc/LogDrawWithdraw()
 	LogBtn("WITHDRAW", "wd_ok", null, 312, 248, 180, 24, "#1f7a52", "#eafff0")
 	LogBtn("CANCEL", "wd_cancel", null, 500, 248, 96, 24, "#4a2a2a", "#ffbcbc")
 
+client/proc/LogWheel(delta)
+	if(!logmenu_open) return
+	log_scroll += (delta > 0 ? -1 : 1)   // wheel up = earlier rows
+	RefreshLogPage()                      // re-clamps log_scroll
+
 client/proc/LogSlotClick(mc)
 	if(!logmenu_open) return
 	log_sel = mc
@@ -357,6 +372,7 @@ client/proc/LogButton(action, arg)
 		if("cat")
 			log_cat = arg
 			log_sel = ""
+			log_scroll = 0
 			log_wd_class = ""
 			RefreshLogTabs()
 			RefreshLogPage()
