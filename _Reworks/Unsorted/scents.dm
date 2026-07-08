@@ -45,7 +45,7 @@ mob/proc/setUpScent()
         if(ANDROID)
             custom_scent=pick("Metal", "Electricity")
     if(custom_scent!="Overwhelming")
-        if(usr.Target.HasHellPower())
+        if(usr.Target.GetHellPower())
             custom_scent=pick("Brimstone", "Nothingness", "Blood", "Death", "Overwhelming")
         if(usr.Target.HasJagan())
             custom_scent="Death"

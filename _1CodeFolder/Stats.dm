@@ -51,10 +51,7 @@ mob/proc/GetAssess()
 
 	PowerMultiplierDisplay=src.Power_Multiplier;
 
-	if(src.HasIntimidation())
-		IntimDisplay=src.GetIntimidation()
-	else
-		IntimDisplay=1
+	IntimDisplay=1
 	if(src.HasGodKi()&&!src.passive_handler.Get("Utterly Powerless"))
 		GodKiDisplay=src.GetGodKi()
 		if(src.passive_handler.Get("God"))
@@ -865,8 +862,9 @@ mob/proc/
 		var/ShonenPower = ShonenPowerCheck(src)
 		if(ShonenPower)
 			Ratio*=GetSPScaling(ShonenPower)
-		if(src.HasHellPower())
-			Ratio*=src.GetHellScaling()
+
+		Ratio *= GetHellScaling();//returns 1 if no hell power
+
 		if(src.HasZenkaiPower())
 			Ratio*=src.GetZenkaiScaling()
 		Ratio*=src.Base()
@@ -1468,15 +1466,15 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 	Ratio*=EPM
 
-	if(B.HasMythical())
-		Ratio*= 1 + (2*B.HasMythical())
-	if(B.HasHellPower())
-		Ratio*=(B.GetHellScaling() * 1500)
-	if(B.HasZenkaiPower())
-		Ratio*=(B.GetZenkaiScaling() * 1500)
-	Ratio*=B.Base() * 100
+	if(B.HasMythical()) Ratio *= 1 + (2*B.HasMythical())
+	
+	Ratio *= B.GetHellScaling();//returns 1 if no hell power
+
+	if(B.HasZenkaiPower()) Ratio *= B.GetZenkaiScaling();
+	
+	Ratio *= B.Base() * 100
 	temp_potential_power(B)//get them potential powers
-	Ratio*=B.potential_power_mult
+	Ratio *= B.potential_power_mult
 	if(passive_handler["LegendarySaiyan"])
 		if(Tension==100&&transActive==transUnlocked)
 			Ratio*=50
@@ -1560,21 +1558,17 @@ mob/proc/Get_Scouter_Reading(mob/B)
 					a=0.01
 				if(B.AngerAdd)
 					a+=B.AngerAdd
-				Ratio*=a
+				Ratio *= a
 
-		if(B.HasIntimidation()&&B.PowerControl>25)
-			Ratio*=B.GetIntimidation()
-		if(B.PowerBoost)
-			Ratio*=B.PowerBoost
-		if(B.TarotFate=="The Sun")
-			Ratio*=1.5
+		if(B.PowerBoost) Ratio *= B.PowerBoost
+		if(B.TarotFate == "The Sun") Ratio *= 1.5
 
-	Ratio*=B.GetPowerUpRatioVisble()
+	Ratio *= B.GetPowerUpRatioVisble()
 
 	if(B.Dead&&!B.KeepBody)
-		Ratio*=0.5
+		Ratio *= 0.5
 	else if(B.z==glob.DEATH_LOCATION[3]&&!B.CheckActive("Cancer Cloth")&&B.SenseUnlocked<8&&!B.passive_handler.Get("SpiritPower"))
-		Ratio*=0.1
+		Ratio *= 0.1
 
 	var/Reading=Ratio
 	if(passive_handler.Get("PowerAppearance"))

@@ -12,8 +12,6 @@
 /mob/proc/getIntimDMGReduction(mob/defender)
 	var/defIntim = defender.GetIntimidation()
 	var/atkIntim = GetIntimidation()
-	var/atkIntimIgnore = GetIntimidationIgnore(defender)
-	var/defIntimIgnore = defender.GetIntimidationIgnore(src)
 	var/val = defIntim // the intimidation as it stands
 	var/totalMult = 0 // return value
 
@@ -21,10 +19,6 @@
 
 
 	val = getSSIntim(defender, val)
-	if(val > 1)
-		atkIntim -= (atkIntim*defIntimIgnore)
-	if(val > 1)
-		val -= (val*atkIntimIgnore)
 	if(val == 1 && atkIntim == 1)
 		return 0
 	if(val <=0)
@@ -100,8 +94,6 @@
 	var/ShonenPower = ShonenPowerCheck(src)
 	if(ShonenPower)
 		Effective*=GetSPScaling(ShonenPower)
-	if(src.HasHellPower())
-		Effective*=src.GetHellScaling()
 	if(src.HasZenkaiPower())
 		Effective*=src.GetZenkaiScaling()
 	if(src.KaiokenBP>1)

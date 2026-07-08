@@ -13411,8 +13411,8 @@ mob
 
 		AddSlotlessBuff(var/obj/Skills/Buffs/B)
 			if(B.BuffName=="Regeneration")
-				if(src.HasHellPower())
-					B.RegenerateLimbs=1
+				if(GetHellPower())
+					B.RegenerateLimbs = 1;
 			if(B.HitScanIcon)
 				HitScanIcon = B.HitScanIcon
 			if(B.HitScanHitSpark)

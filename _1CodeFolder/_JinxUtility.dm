@@ -555,10 +555,8 @@ mob
 			if(defender.ActiveBuff&&defender.CheckActive("Keyblade")&&!defender.SpecialBuff)
 				defender.ManaAmount+=(0.25*defender.SagaLevel)
 
-			if(src.HasHellPower()&&!src.transActive())
-				src.HealMana(1)
-			if(defender.HasHellPower()&&!src.transActive())
-				defender.HealMana(1)
+			if(GetHellPower() && !transActive()) HealMana(1)
+			if(defender.GetHellPower() && !defender.transActive()) defender.HealMana(1)
 
 			if(src.SlotlessBuffs)
 				if(src.CheckSlotless("Frost End"))
@@ -1075,72 +1073,35 @@ mob
 			src.TotalCapacity+=val
 			if(src.TotalCapacity>=100)
 				src.TotalCapacity=100
-		HealHealth(val, _isEcho=0)
-			if(src.GetEffectiveShearForStackingEffects())
-				if(src.HasShearImmunity())
+
+		HealHealth(val)
+			if(GetEffectiveShearForStackingEffects())
+				if(HasShearImmunity())
 					val=val
-					src.Sheared=0
-				if(src.HasHellPower())
-					if(src.Sheared > 0)
-						src.Sheared-=val/(2/src.GetHellPower())
-						if(src.Sheared<0)
-							val+=(-1)*src.Sheared
-							src.Sheared=0
-						else
-							val *= 0.5
-					else if(!IsDarkDragonPlayer() && Frenzy > 0)
-						val *= 0.5
-				else
-					if(src.Sheared > 0)
-						src.Sheared-=val
-						if(src.Sheared<0)
-							val=(-1)*src.Sheared
-							src.Sheared=0
-						else
-							val /= 4
-					else if(!IsDarkDragonPlayer() && Frenzy > 0)
-						val /= 4
+					Sheared=0
+				var/notDDP = !IsDarkDragonPlayer();
+				var/hellP = GetHellPower();
+				if(notDDP && Frenzy > 0) val *= 0.5;
+				if(hellP) val *= 0.5;
+				Sheared = max(0, Sheared - val)
 			if(icon_state == "Meditate")
-				src.Tension=max(0, Tension-(val*1.5))
-			if(passive_handler["Staked"])
-				val = 0
-			if(passive_handler["AshChoked"])
-				val = 0
-			if(src.AwakeningSkillUsed==1)
-				val = 0
-			if(src.VaizardHealth&&!src.passive_handler.Get("HealThroughTempHP"))
-				val = 0
-			if(src.CelestialAscension=="Demon" && src.transActive>=5)
-				if(src.transUnlocked<6)
-					val = 0
+				Tension = max(0, Tension - (val * 1.5))
+			if(CannotRegenHealth()) val = 0;
 			val *= getAngelicInfusionMult();//returns 1 if no angelicinfusion
 			if(passive_handler["InverseHealing"])
 				DoDamage(src, val)
 				return
-			src.Health+=val
-			src.MaxHealth()
-			// Light Warden: delayed heal retrigger. Each selection of the Warden mage
-			// passive schedules three echo heals at 50% / 25% / 12.5% of the final
-			// post-processed val. The echoes are fresh HealHealth calls gated on
-			// _isEcho so the retrigger chain terminates after one pass — no recursion
-			// on the echo side. Seed is post-Shear / post-PotionCD / post-Staked /
-			// post-Awakening / post-Vaizard val so zero-heal paths correctly produce
-			// zero echoes, and shear-reduced heals echo off the reduced amount. Delays
-			// (1s / 2s / 3s) are a design choice — the doc does not specify a window,
-			// but short delays keep the echo legible as a payoff on the original heal.
-			/* This shit is disabled for now because wtf
-			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
-				var/echo_seed = val
-				spawn(10)
-					if(src)
-						src.HealHealth(echo_seed * 0.5, 1)
-				spawn(20)
-					if(src)
-						src.HealHealth(echo_seed * 0.25, 1)
-				spawn(30)
-					if(src)
-						src.HealHealth(echo_seed * 0.125, 1)
-			*/
+			Health += val
+			MaxHealth()
+
+		CannotRegenHealth()
+			if(passive_handler["Staked"]) return 1;
+			if(passive_handler["AshChoked"]) return 1;
+			if(AwakeningSkillUsed == 1) return 1;
+			if(VaizardHealth && !passive_handler.Get("HealThroughTempHP")) return 1;
+			if(CelestialAscension == "Demon" && transActive >= 5 && transUnlocked < 6) return 1;
+			return 0;
+
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
 				val/=src.GetPowerUpRatio()
@@ -1777,11 +1738,9 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				Str += (0.1*spPower) * Str
-			var/hellPower = src.GetHellPower()
-			if(hellPower == 2)
-				Str += (hellPower/2) * Str
-			else
-				Str += (0.2 * hellPower) * Str
+			
+			Str *= GetHellStats();
+
 			var/zenkaiPower=src.GetZenkaiPower()
 			if(zenkaiPower == 2)
 				Str += (zenkaiPower/2) * Str
@@ -1866,13 +1825,7 @@ mob
 
 			if(Secret == "Werewolf" && CheckSlotless("Full Moon Form"))
 				Mod += 1 * (secretDatum?:getHungerBoon())
-			var/adaptive = passive_handler.Get("AngerAdaptiveForce")
-			if(adaptive && (src.HasCalmAnger() || passive_handler.Get("EndlessAnger") || Anger))
-				if(BaseStr() > BaseFor())
-					Mod += clamp(adaptive,0.1,1)
-				if(BaseStr() == BaseFor())
-					// lol
-					Mod += clamp(adaptive/2,0.05, 0.5)
+			Mod += GetAngerAdaptiveStr();
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -1972,11 +1925,9 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				For += (0.1*spPower) * For
-			var/hellPower = src.GetHellPower()
-			if(hellPower == 2)
-				For += (hellPower/2) * For
-			else
-				For += (0.2 * hellPower) * For
+			
+			For *= GetHellStats();
+
 			var/zenkaiPower=src.GetZenkaiPower()
 			if(zenkaiPower == 2)
 				For += (zenkaiPower/2) * For
@@ -2702,11 +2653,8 @@ mob
 			Recov+=src.RecovAscension
 			if(src.RecovReplace)
 				Recov=src.RecovReplace
-			if(src.HasHellPower()||(src.Secret=="Werewolf"&&(!src.CheckSlotless("Half Moon Form")))||src.HasZenkaiPower())
-				if(Recov<2)
-					Recov=2
-			if(src.isRace(MAJIN))
-				Recov=2
+			if(GetHellPower() || (Secret == "Werewolf" && !CheckSlotless("Half Moon Form")) || HasZenkaiPower() || isRace(MAJIN))
+				if(Recov<2) Recov=2
 
 			var/Mod=1
 			if(src.HasManaStats())
@@ -2986,8 +2934,7 @@ mob
 					evil = 1
 			if(src.ShinjinAscension=="Makai")
 				evil = 1
-			if(src.HasHellPower())
-				evil = 1
+			if(GetHellPower()) evil = 1
 			if(istype(src, /mob/Player/AI))
 				evil = 1
 			//these are all good.
@@ -3043,8 +2990,7 @@ mob
 				evil = 1
 			if(src.ShinjinAscension=="Makai")
 				evil = 1
-			if(src.HasHellPower())
-				evil = 1
+			if(GetHellPower()) evil = 1
 			if(src.HasAbyssMod())
 				evil = 1
 			if(istype(src, /mob/Player/AI))

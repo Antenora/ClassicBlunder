@@ -1840,8 +1840,8 @@ mob
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 				if(!IgnoresWater)
 					if(istype(loc,/turf/Waters/Water7))
-						if(!src.HasWalkThroughHell())
-							if(!isRace(DEMON)&&!src.HasHellPower())
+						if(!HasWalkThroughHell())
+							if(!isRace(DEMON)&&!GetHellPower())
 								src.AddBurn(10)
 					else
 						if(src.Burn)

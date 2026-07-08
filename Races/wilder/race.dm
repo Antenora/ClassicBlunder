@@ -51,7 +51,7 @@ Difficulty: ★★★
                     /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Turtle_Form);
                     passives = list("Nimbus" = 1, "Instinct" = 1);
                 if("Blackflame")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Undying_Rage);
+                    skills = list(/obj/Skills/AutoHit/Wilder/Blackflame_Breath, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Burning_Cloak);
                     passives = list("Fury" = 1, "Wrathful Tenacity" = 0.15);
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage
