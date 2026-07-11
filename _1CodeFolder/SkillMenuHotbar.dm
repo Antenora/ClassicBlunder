@@ -19,8 +19,9 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 	var/defkey2
 	var/category
 	var/kind = KB_NORMAL
-	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "")
-		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2
+	var/rep = 0      // command repeats while the key is held (+REP macro)
+	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "", _rep = 0)
+		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2; rep = _rep
 
 var/global/list/keybind_registry
 var/global/list/keybind_by_id = list()
@@ -33,7 +34,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE, "West")
 	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE, "South")
 	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
-	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat")
+	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)   
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
@@ -102,13 +103,19 @@ var/global/list/keybind_by_id = list()
 client/proc/MacroCmd(command)
 	return findtext(command, " ") ? "\"[command]\"" : command
 
-client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
+client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 	var/uid = "[eid]_up"
+	var/rid = "[eid]_rep"
 	if(!key)
 		winset(src, eid, "type=macro;parent=[set_name];name=off_[eid]")
 		winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
 		return
 	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
+	if(rep)
+		winset(src, rid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=[MacroCmd(command)]")
+	else
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
 	if(kind == KB_MOVE)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
 		return
@@ -145,8 +152,8 @@ client/proc/ApplyKeybinds()
 		set_name = k
 		break
 	for(var/datum/keyaction/a in keybind_registry)
-		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id)
-		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id)
+		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id, a.rep)
+		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id, a.rep)
 	for(var/dd in list("Northeast", "Northwest", "Southeast", "Southwest"))
 		ApplyOneBind(set_name, "kbdiag_[lowertext(dd)]", dd, lowertext(dd), KB_MOVE, null)
 	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
@@ -159,6 +166,8 @@ client/proc/ApplyKeybinds()
 				slot = 2
 				body = copytext(body, 1, length(body) - 1)
 			ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", mob.shortcuts.keybinds[sk], "RunVerb [body]", KB_NORMAL, null)
+	// an open number prompt re-asserts its key overlay on top of whatever was just written
+	if(np_open) NumPromptMacros()
 
 var/global/datum/keybind_menu/keybind_menu = new()
 

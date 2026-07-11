@@ -22,6 +22,7 @@ proc/RunLifeMinigame(mob/M, id = "timing_bar", difficulty = 1, list/opts)
 		if("hold_fill") g = new/datum/life_minigame/hold_fill
 		if("drag_saw") g = new/datum/life_minigame/drag_saw
 		if("fish_bar") g = new/datum/life_minigame/fish_bar
+		if("water_fill") g = new/datum/life_minigame/water_fill
 	if(!g) return -1
 	if(opts && opts["target"]) g.target = opts["target"]
 	return g.Run(M, difficulty, opts)
@@ -311,7 +312,7 @@ proc/RunLifeMinigame(mob/M, id = "timing_bar", difficulty = 1, list/opts)
 	var/last_y = null
 	var/stroke_dir = 0      // +1 up / -1 down / 0 idle
 	var/anchor_y = 0        // where the current stroke began (last turning point)
-	var/peak = 0            // furthest px travelled in stroke_dir from the anchor
+	var/peak = 0            // furthest px traveled in stroke_dir from the anchor
 	var/credit = 0          // px of this stroke already banked (0..SPAN)
 
 	HandleSawDown(mob/M, params)
@@ -521,7 +522,7 @@ proc/RunLifeMinigame(mob/M, id = "timing_bar", difficulty = 1, list/opts)
 
 		var/atom/movable/lifebar/track = new
 		track.icon = 'Icons/LifeSkills/fishbar_track.png'
-		track.screen_loc = "CENTER+2,CENTER-3"   // location subject to change
+		track.screen_loc = "CENTER:160,SOUTH:66"   // above the right end of the 12-slot hotbar (slot 12 = CENTER:160,SOUTH:30)
 		Show(track)
 		MakePart(track, 'Icons/LifeSkills/fishbar_prog_bg.png', 32, 4, 0)
 		fill_part = MakePart(track, 'Icons/LifeSkills/fishbar_prog_fill.png', 32, 4, 0.1)
@@ -575,3 +576,63 @@ proc/RunLifeMinigame(mob/M, id = "timing_bar", difficulty = 1, list/opts)
 		sleep(2)
 		Cleanup()
 		return perf
+
+/datum/life_minigame/water_fill
+	var/obj/LifeSkills/FarmPlot/plot
+	var/holding = FALSE
+
+	Interrupted()
+		if(!owner || !owner.client || owner.KO || owner.Dead) return TRUE
+		if(!plot || get_dist(owner, plot) > 1) return TRUE
+		return FALSE
+
+	HandlePress(mob/M)
+		holding = TRUE
+
+	HandleRelease(mob/M)
+		holding = FALSE
+
+	Run(mob/M, difficulty = 1, list/opts)
+		Attach(M)
+		plot = opts ? opts["plot"] : null
+		if(!plot)
+			Cleanup()
+			return -1
+		target = plot
+		holding = (M.client && M.client.life_interact_down) ? TRUE : FALSE
+		var/atom/movable/lifebar/track = new
+		track.icon = 'HUD/lifebar_track.png'
+		Show(track)
+		var/atom/movable/lifebar/part/fill_bar = MakePart(track, 'HUD/lifebar_fill.png', 26, 20, 0)
+		fill_bar.filters = filter(type = "alpha", icon = 'HUD/lifebar_mask.png', x = -148)
+		var/atom/movable/lifebar/part/text/hint = new
+		hint.maptext_width = 220
+		hint.maptext_height = 16
+		hint.pixel_y = 78
+		hint.layer = track.layer + 0.3
+		hint.maptext = "<center><span style=\"[LIFE_FONT]; color:#ffffff\">hold [M.InteractKeyName()] - water the plot</span></center>"
+		track.vis_contents += hint
+		hud += hint
+
+		sleep(1)
+		if(Interrupted())
+			Cleanup()
+			return -1
+		var/shown = -1
+		while(plot && plot.water_progress < 100)
+			if(Interrupted())
+				Cleanup()
+				return -1
+			if(!holding) break                       // released: the plot keeps its progress
+			plot.water_progress = min(100, plot.water_progress + FARM_WATER_RATE)
+			var/frac = plot.water_progress / 100
+			if(frac != shown)
+				shown = frac
+				animate(fill_bar.filters[1], x = round(148 * frac) - 148, time = 2, easing = SINE_EASING)
+			sleep(1)
+		var/done = (plot && plot.water_progress >= 100)
+		if(done)
+			plot.SetWatered()
+			sleep(3)
+		Cleanup()
+		return done ? 1 : 0

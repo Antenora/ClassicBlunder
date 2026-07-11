@@ -209,6 +209,7 @@ mob/proc/ForagePayout(obj/LifeSkills/ForageNode/N, datum/plant_def/d, perf, obj/
 		GiveMaterial(src, ftype, amt, q)
 		src << "<font color=#78eb78>You gather [amt]x [QualityName(q)] [fname].</font>"
 		LifeLogFind("Foraging", fname)
+		LifeOppRoll("Foraging", d.tier, ftype, q)
 
 	// Botanist's Eye: rank 10 turns up a rare specimen once a day
 	if(rank >= LIFE_MAX_RANK && LifeBloomDay != DaysOfWipe())
@@ -245,6 +246,7 @@ proc/LifePickSeedPlant()
 	return "plains_bush"
 
 proc/SeedForageNodes()
+	set background = 1   
 	InitLifePlantDefs()
 	for(var/obj/LifeSkills/ForageNode/old in world)
 		del old

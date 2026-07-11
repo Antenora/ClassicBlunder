@@ -34,7 +34,7 @@ proc/InitFishTierPool()
 	if(LifeFishTierPool.len) return
 	for(var/T in typesof(/obj/Items/Material/Fish) - /obj/Items/Material/Fish)
 		var/obj/Items/Material/Fish/f = new T
-		if(!f.MaterialClass) { del f; continue }
+		if(!f.MaterialClass || f.junk) { del f; continue }   // junk hooks
 		var/key = "[f.tier]"
 		if(!LifeFishTierPool[key]) LifeFishTierPool[key] = list()
 		LifeFishTierPool[key] += T
@@ -156,10 +156,19 @@ mob/proc/StartFish(obj/LifeSkills/FishingSpot/S)
 	if(!pool.len) return
 	// the fish is decided at the bite, its pattern + tier drive the reel
 	var/ftype = pick(pool)
+	var/datum/life_opp/armed = OppFishArmed()
+	var/isjunk = 0
+	if(!armed && prob(5))
+		isjunk = 1
+		ftype = pick(/obj/Items/Material/Fish/junk_boot, /obj/Items/Material/Fish/junk_nomessage)
 	var/obj/Items/Material/Fish/fish = new ftype
 	var/fpat = fish.pattern
 	var/fname = fish.name
 	del fish
+	var/oppdiff = 0
+	if(armed)
+		oppdiff = 2
+		if(armed.id == "legendary_strike") fpat = "dart"
 	S.fishing_by = src
 	Using = 1
 	var/obj/LifeSkills/Bobber/bob = new(get_turf(S))
@@ -197,7 +206,7 @@ mob/proc/StartFish(obj/LifeSkills/FishingSpot/S)
 		AddLifeXP("Fishing", LifeGatherXP("Fishing", d.tier) * 0.25, LIFE_PERF_MIN)
 		return
 	var/list/opts = list("target" = S, "pattern" = fpat)
-	var/perf = RunLifeMinigame(src, "fish_bar", d.difficulty, opts)
+	var/perf = RunLifeMinigame(src, "fish_bar", isjunk ? 1 : min(d.difficulty + oppdiff, 10), opts)
 	Using = 0
 	if(S) S.fishing_by = null
 	if(perf < 0)
@@ -205,13 +214,28 @@ mob/proc/StartFish(obj/LifeSkills/FishingSpot/S)
 		return
 	if(perf <= 0)
 		src << "<font color=#ff6464>The [fname] shakes free and gets away!</font>"
+		if(armed) src << "<font color=#ff6464>The [armed.name] slips back into the deep...</font>"
 		AddLifeXP("Fishing", LifeGatherXP("Fishing", d.tier) * 0.4, LIFE_PERF_MIN)
 		return
-	FishPayout(S, d, ftype, fname, perf, rank)
+	FishPayout(S, d, ftype, fname, perf, rank, armed, isjunk)
 
-mob/proc/FishPayout(obj/LifeSkills/FishingSpot/S, datum/fish_spot_def/d, ftype, fname, perf, rank)
+mob/proc/FishPayout(obj/LifeSkills/FishingSpot/S, datum/fish_spot_def/d, ftype, fname, perf, rank, datum/life_opp/armed, isjunk = 0)
 	if(!S || !d) return
 	perf = clamp(perf, LIFE_PERF_MIN, LIFE_PERF_MAX)
+	if(isjunk)
+		GiveMaterial(src, ftype, 1, QUAL_POOR)
+		src << "You reel in... [fname]. The sea has moods."
+		LifeLogFind("Fishing", fname)
+		AddLifeXP("Fishing", LifeGatherXP("Fishing", 1) * 0.3, LIFE_PERF_MIN)
+		if(prob(0.5))
+			var/obj/Items/BottledTreasure/JB = new
+			GiveOrDrop(JB)
+			src << "<font color=#ffd86b><b>Tangled around it - Bottled Treasure!</b></font>"
+		S.charges--
+		if(S.charges <= 0)
+			src << "The fish here have scattered."
+			S.Deplete()
+		return
 	var/q = QUAL_NORMAL
 	if(perf >= 1.4) q++
 	if(perf < 0.7) q--
@@ -222,10 +246,18 @@ mob/proc/FishPayout(obj/LifeSkills/FishingSpot/S, datum/fish_spot_def/d, ftype, 
 		if(perf >= 1.4) legchance += 1
 		if(!prob(legchance)) q = QUAL_EPIC
 	q = QualityClamp(q)
+	if(armed && armed.id == "legendary_strike")
+		q = clamp(LifeQualityCap(rank), QUAL_EPIC, QUAL_LEGENDARY)   // the strike fights like a legend and lands like one
 
 	GiveMaterial(src, ftype, 1, q)
 	src << "<font color=#78eb78>You land a [QualityName(q)] [fname]!</font>"
 	LifeLogFind("Fishing", fname)
+	if(prob((armed && armed.id == "sunken_cache") ? 10 : 0.5))
+		var/obj/Items/BottledTreasure/B = new
+		GiveOrDrop(B)
+		src << "<font color=#ffd86b><b>A sealed bottle glints in the haul - Bottled Treasure!</b></font>"
+	if(armed) OppFishResolve(armed, d.tier, rank)
+	else LifeOppRoll("Fishing", d.tier, ftype, q)
 
 	// Legend of the Deep: rank 10 hooks a legendary catch once a day
 	if(rank >= LIFE_MAX_RANK && LifeLegendDay != DaysOfWipe())
@@ -246,6 +278,54 @@ mob/proc/FishPayout(obj/LifeSkills/FishingSpot/S, datum/fish_spot_def/d, ftype, 
 		src << "The fish here have scattered."
 		S.Deplete()
 
+/obj/Items/Material/Fish/junk_boot
+	name = "Old Boot"
+	MaterialClass = "OldBoot"
+	icon = 'Icons/LifeSkills/FishJunk.dmi'
+	icon_state = "boot"
+	desc = "Someone's lost sole."
+	tier = 1
+	junk = 1
+	pattern = "sinker"
+
+/obj/Items/Material/Fish/junk_nomessage
+	name = "Message not in a Bottle"
+	MaterialClass = "MessageNotInABottle"
+	icon = 'Icons/LifeSkills/FishJunk.dmi'
+	icon_state = "nomessage"
+	desc = "A bottle, conspicuously devoid of message."
+	tier = 1
+	junk = 1
+	pattern = "floater"
+
+/obj/Items/BottledTreasure
+	name = "Bottled Treasure"
+	icon = 'Icons/LifeSkills/BottledTreasure.dmi'
+	icon_state = "bottle"
+	Savable = 1
+	Grabbable = 1
+	Cost = 0
+	desc = "A sealed bottle hauled from the deep. Click it to break the seal."
+	Click()
+		if(!usr || loc != usr) return
+		// 1..1000: $1 15% / $100 30% / $1000 38.9% / $10k 15% / $100k 1% / $1M 0.1%
+		var/roll = rand(1, 1000)
+		var/amt
+		if(roll == 1000) amt = 1000000
+		else if(roll >= 990) amt = 100000
+		else if(roll >= 840) amt = 10000
+		else if(roll >= 451) amt = 1000
+		else if(roll >= 151) amt = 100
+		else amt = 1
+		usr.GiveMoney(amt)
+		if(amt >= 100000)
+			usr << "<font color=#ffd86b><b>The seal cracks - a FORTUNE spills out! $[Commas(amt)]!</b></font>"
+		else if(amt >= 1000)
+			usr << "<font color=#78eb78>The seal cracks - $[Commas(amt)] inside!</font>"
+		else
+			usr << "The seal cracks... $[Commas(amt)]. The sea has a sense of humor."
+		del src
+
 // world seeding
 proc/LifePickSeedSpot()
 	RegisterFishSpots()
@@ -261,6 +341,7 @@ proc/LifePickSeedSpot()
 	return "shallows"
 
 proc/SeedFishSpots()
+	set background = 1
 	RegisterFishSpots()
 	for(var/obj/LifeSkills/FishingSpot/old in world)
 		del old
@@ -302,6 +383,7 @@ mob/Admin4/verb/reseedFishingSpots()
 	desc = "A fresh catch. Cooks and alchemists both have uses for it."
 	var/tier = 1
 	var/pattern = "mixed"
+	var/junk = 0       
 
 /obj/Items/Material/Fish/koi { name = "Koi"; MaterialClass = "Koi"; icon_state = "koi"; tier = 3; pattern = "smooth" }
 /obj/Items/Material/Fish/goldfish { name = "Goldfish"; MaterialClass = "Goldfish"; icon_state = "goldfish"; tier = 1; pattern = "floater" }

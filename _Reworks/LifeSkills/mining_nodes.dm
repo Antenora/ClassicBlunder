@@ -119,6 +119,7 @@ proc/LifePickSeedOre()
 	return "copper"
 
 proc/SeedLifeSkillNodes()
+	set background = 1
 	InitLifeOreDefs()
 	for(var/obj/LifeSkills/OreNode/old in world)
 		del old

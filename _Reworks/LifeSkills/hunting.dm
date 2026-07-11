@@ -156,6 +156,10 @@ mob/proc/CarvePayout(obj/LifeSkills/Remains/R, perf, obj/Items/LifeTool/tool, ra
 
 	if(tool) tool.LifeToolWear(src)
 	AddLifeXP("Hunting", LifeGatherXP("Hunting", tier), perf)
+	var/list/opool = LifeHuntPoolForTier(tier)
+	if(opool.len)
+		var/datum/hunt_drop/ohd = LifeHuntDrops[LifeHuntWeightedPick(opool)]
+		if(ohd) LifeOppRoll("Hunting", tier, ohd.mtype, q)
 	LifeConsumeRemains(R)
 
 proc/LifeConsumeRemains(obj/LifeSkills/Remains/R)

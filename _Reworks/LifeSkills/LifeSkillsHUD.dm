@@ -131,6 +131,7 @@ client/proc/OpenLifeSkillsMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
 	CloseStationMenu()
+	CloseOppMenu()
 	lsmenu_open = 1
 
 	var/list/vd = splittext("[view]", "x")
@@ -227,6 +228,19 @@ client/proc/BuildLifeSkillsChrome()
 	logl.screen_loc = LSloc(462, 13, 16)
 	logl.maptext = "<center><span style=\"[LS_FONT]; color:#8be9ff\">COLLECTION LOG</span></center>"
 	ls_chrome += logl
+
+	var/atom/movable/shud/lsbtn/oppb = new
+	oppb.icon = 'HUD/log_entry_btn.png'
+	oppb.action = "oppboard"
+	oppb.screen_loc = LSloc(18, 10, 24)
+	ls_chrome += oppb
+	var/atom/movable/shud/lstext/oppl = new
+	oppl.layer = LS_LAYER + 0.62
+	oppl.maptext_width = 120
+	oppl.maptext_height = 16
+	oppl.screen_loc = LSloc(18, 13, 16)
+	oppl.maptext = "<center><span style=\"[LS_FONT]; color:#8be9ff\">OPPORTUNITIES</span></center>"
+	ls_chrome += oppl
 
 	for(var/i = 1 to LIFE_SKILL_IDS.len)
 		LsMakeTab(i, LIFE_SKILL_IDS[i])
@@ -343,6 +357,8 @@ client/proc/LifeSkillsButton(action, arg)
 		if("collog")
 			CloseLifeSkillsMenu()
 			OpenLogMenu()
+		if("oppboard")
+			OpenOppMenu()
 		if("tab")
 			if(isnum(arg) && arg >= 1 && arg <= LIFE_SKILL_IDS.len)
 				HideLsConfirm()
@@ -393,7 +409,14 @@ proc/LifeSkillPageBody(mob/M, id)
 			body += "Collection log: [found] fish discovered."
 			if(S.rank >= LIFE_MAX_RANK)
 				body += "<br>Capstone: Legend of the Deep - one legendary catch per day."
-		if("Farming", "Cooking", "Thaumaturgy", "Technology")
+		if("Farming")
+			var/datum/lifeskill/S = M.GetLifeSkill(id)
+			body = "Forge a Hoe and Watering Can, click the hoe to till soil plots on grass or dirt, then plant seeds from a seed stall.<br>Hold [M.InteractKeyName()] at your plot to water it - crops grow one stage per watered day. Miss [FARM_WILT_DAYS] days straight and the crop wilts.<br><br>"
+			var/found = S.collection_log ? S.collection_log.len : 0
+			body += "Collection log: [found] crop[found == 1 ? "" : "s"] harvested."
+			if(S.rank >= LIFE_MAX_RANK)
+				body += "<br>Capstone: Green Colossus - your first planting each day is guaranteed giant (when the crop has a giant form)."
+		if("Cooking", "Thaumaturgy", "Technology")
 			body = "Coming soon."
 	return "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">[body]</span>"
 
@@ -441,7 +464,9 @@ client/proc/ShowLsConfirm()
 	q.maptext_width = 208
 	q.maptext_height = 16
 	q.screen_loc = LSloc(208, 176, 16)
-	q.maptext = "<center><span style=\"[LS_FONT]; color:#bfefff\">Advance for [S.NextRPP()] RPP?</span></center>"
+	var/rcost = S.RankUpRPP(mob)
+	var/rnote = (rcost < S.NextRPP()) ? " <font color=[LS_C_OK]>(aptitude discount)</font>" : ""
+	q.maptext = "<center><span style=\"[LS_FONT]; color:#bfefff\">Advance for [rcost] RPP?[rnote]</span></center>"
 	ls_confirm_objs += q
 	screen += q
 

@@ -335,6 +335,8 @@ client/proc/ClearSkillHUD()
 	ResetLifeSkillsHUD()
 	ResetStationHUD()
 	ResetLogHUD()
+	ResetAhHUD()
+	CloseOppMenu()
 	health_glowing = FALSE
 	orb_health = null
 	orb_energy = null

@@ -203,6 +203,8 @@ client
 		// workbench state
 		list/st_bench
 		st_metal
+		st_metal_q = 0         // chosen ingot quality bucket
+		st_proj_scroll = 0     // PROJECTED panel wheel offset
 		list/st_gem            // list(gid, quality)
 		list/st_mmat           // list(mmid, quality)
 		st_pick_slot
@@ -218,6 +220,7 @@ client
 		datum/craft_recipe/life/st_reopen_recipe
 		st_reopen_kind
 		st_reopen_metal
+		st_reopen_metal_q = 0
 		list/st_reopen_gem
 		list/st_reopen_mmat
 
@@ -249,6 +252,8 @@ client/proc/OpenStationMenu(kind, obj/LifeSkills/Station/S)
 	st_recipe = null
 	st_item = null
 	st_metal = null
+	st_metal_q = 0
+	st_proj_scroll = 0
 	st_gem = null
 	st_mmat = null
 	st_pick_slot = null
@@ -395,17 +400,30 @@ client/proc/StBuildEntries()
 
 	if(st_tab == "mats")
 		StHeader("YOUR MATERIALS")
+		RegisterLifeMaterials()
 		var/found = 0
-		for(var/obj/Items/Material/mat in M)
-			var/datum/stentry/e = new
-			e.kind = "mat"
-			e.label = mat.name
-			e.right = "x[mat.TotalStack]"
-			e.right_col = LS_C_COST
-			e.icon_file = mat.icon
-			e.icon_state = mat.icon_state
-			st_entries += e
-			found++
+		for(var/cat in LifeMatCategories)
+			var/catshown = 0
+			for(var/mc in LifeMatsInCategory(cat))
+				var/total = M.MatLogCount(mc)
+				if(total <= 0) continue
+				if(!catshown)
+					StHeader(uppertext(cat))
+					catshown = 1
+				var/datum/matdef/d = LifeMatDef(mc)
+				var/breakdown = ""
+				for(var/q = QUAL_LEGENDARY to QUAL_POOR step -1)
+					var/n = M.MatLogCountQ(mc, q)
+					if(n) breakdown += "[breakdown ? " &#183; " : ""]<font color=[QualityColor(q)]>[n] [QualityName(q)]</font>"
+				var/datum/stentry/e = new
+				e.kind = "mat"
+				e.label = d ? d.name : mc
+				e.right = breakdown ? breakdown : "x[total]"
+				e.right_col = LS_C_COST
+				e.icon_file = d ? d.icon : null
+				e.icon_state = d ? d.icon_state : ""
+				st_entries += e
+				found++
 		if(!found) StNote("Nothing gathered yet. Go crack a vein open.")
 		return
 
@@ -420,24 +438,26 @@ client/proc/StBuildEntries()
 		st_entries += b
 		if(st_mode == "pick" && st_recipe && st_pick_slot == "metal")
 			StHeader("FORGE [uppertext(st_recipe.label)] FROM...")
+			var/mfound = 0
 			for(var/mid in LIFE_METALS)
 				if(LIFE_METAL_TIER[mid] < st_recipe.metal_min_tier) continue
-				var/have = CountMaterial(M, LIFE_METAL_NAME[mid])
-				var/datum/stentry/e = new
-				e.kind = "metal"
-				e.ref = mid
-				e.label = "[LIFE_METAL_NAME[mid]] Ingot"
-				e.icon_file = 'Icons/LifeSkills/Materials.dmi'
-				e.icon_state = "ingot_[mid]"
-				if(!have)
-					e.locked = 1
-					e.name_col = LS_C_LOCKED
-					e.right = "none in pack"
-					e.right_col = LS_C_LOCKED
-				else
-					e.right = "have [have] / need [st_recipe.ingot_count]"
-					e.right_col = (have >= st_recipe.ingot_count) ? LS_C_OK : LS_C_NOFUND
-				st_entries += e
+				if(st_recipe.fixed_metal && mid != st_recipe.fixed_metal) continue
+				for(var/mq = QUAL_LEGENDARY to QUAL_POOR step -1)
+					var/n = LifeCountExact(M, LIFE_METAL_NAME[mid], mq)
+					if(n <= 0) continue
+					var/datum/stentry/e = new
+					e.kind = "metalpick"
+					e.ref = list(mid, mq)
+					e.label = "[QualityName(mq)] [LIFE_METAL_NAME[mid]] Ingot (x[n])"
+					e.name_col = QualityColor(mq)
+					e.icon_file = 'Icons/LifeSkills/Materials.dmi'
+					e.icon_state = "ingot_[mid]"
+					e.right = "need [st_recipe.ingot_count]"
+					e.right_col = (n >= st_recipe.ingot_count) ? LS_C_OK : LS_C_NOFUND
+					e.locked = (n < st_recipe.ingot_count)
+					st_entries += e
+					mfound++
+			if(!mfound) StNote("No eligible ingots in your log. Smelt some first.")
 		else if(st_mode == "pick" && st_pick_slot == "gem")
 			StHeader("SOCKET A GEM")
 			var/datum/stentry/none = new
@@ -543,8 +563,12 @@ client/proc/StBuildEntries()
 			e.right_col = LS_C_LOCKED
 		else
 			var/money = R.money_cost ? round(R.money_cost * glob.progress.EconomyCost) : 0
-			e.right = "[R.ingot_count]x tier [R.metal_min_tier]+ ingots[money ? " + $[Commas(money)]" : ""]"
-			e.right_col = LifeEligibleMetals(mob, R).len ? LS_C_OK : LS_C_NOFUND
+			if(R.fixed_metal)
+				e.right = "[R.ingot_count]x [LIFE_METAL_NAME[R.fixed_metal]] ingot[R.wood_count ? " + [R.wood_count]x wood" : ""]"
+				e.right_col = (LifeEligibleMetals(mob, R).len && (!R.wood_count || LifeCountAnyWood(mob) >= R.wood_count)) ? LS_C_OK : LS_C_NOFUND
+			else
+				e.right = "[R.ingot_count]x tier [R.metal_min_tier]+ ingots[money ? " + $[Commas(money)]" : ""]"
+				e.right_col = LifeEligibleMetals(mob, R).len ? LS_C_OK : LS_C_NOFUND
 		st_entries += e
 	var/list/broken = LifeRepairableItems(M)
 	if(broken.len && rank < 3)
@@ -647,10 +671,14 @@ client/proc/RefreshBenchPage()
 	var/gear = (ispath(R.result_type, /obj/Items/Sword) || ispath(R.result_type, /obj/Items/Armor))
 
 	// selections must still exist in the log
-	if(st_metal && !CountMaterial(M, LIFE_METAL_NAME[st_metal])) st_metal = null
+	if(st_metal && LifeCountExact(M, LIFE_METAL_NAME[st_metal], st_metal_q) <= 0)
+		st_metal = null
+		st_metal_q = 0
 	if(!st_metal)
-		var/list/el = LifeEligibleMetals(M, R)
-		if(el.len) st_metal = el[el.len]   // highest tier owned
+		var/list/ap = StAutoPickMetal(M, R)
+		if(ap)
+			st_metal = ap[1]
+			st_metal_q = ap[2]
 	if(st_gem && st_gem.len >= 2 && !LifeCountExact(M, LIFE_GEM_CLASS[st_gem[1]], st_gem[2])) st_gem = null
 	if(st_mmat && st_mmat.len >= 2 && !LifeCountExact(M, st_mmat[1], st_mmat[2])) st_mmat = null
 
@@ -669,7 +697,7 @@ client/proc/RefreshBenchPage()
 	StBenchAdd(ric)
 	StBenchText(56, 90, 300, 18, "<span style=\"[LS_FONT]; color:#8be9ff\">[uppertext(R.label)]</span>")
 	var/atom/movable/shud/stbtn/back = new
-	back.icon = AqCoverIcon(64, 22)
+	back.icon = 'HUD/st_backhit.png'   // baked strip, the icon is the click box
 	back.action = "benchback"
 	back.screen_loc = STloc(526, 88, 22)
 	StBenchAdd(back)
@@ -677,25 +705,28 @@ client/proc/RefreshBenchPage()
 
 	// LEFT sub-panel: MATERIALS
 	StBenchText(38, 128, 200, 16, "<span style=\"[LS_FONT]; color:#8be9ff\">MATERIALS</span>")
-	StBenchChip("metal", 150, st_metal ? "METAL: [LIFE_METAL_NAME[st_metal]]" : "METAL: pick one", st_metal ? "[CountMaterial(M, LIFE_METAL_NAME[st_metal])]/[R.ingot_count]" : "", st_metal ? ((CountMaterial(M, LIFE_METAL_NAME[st_metal]) >= R.ingot_count) ? LS_C_OK : LS_C_NOFUND) : LS_C_NOFUND, st_metal ? "ingot_[st_metal]" : null, 0)
+	StBenchChip("metal", 150, st_metal ? "METAL: [QualityName(st_metal_q)] [LIFE_METAL_NAME[st_metal]]" : "METAL: pick one", st_metal ? "[LifeCountExact(M, LIFE_METAL_NAME[st_metal], st_metal_q)]/[R.ingot_count]" : "", st_metal ? ((LifeCountExact(M, LIFE_METAL_NAME[st_metal], st_metal_q) >= R.ingot_count) ? LS_C_OK : LS_C_NOFUND) : LS_C_NOFUND, st_metal ? StIcon16('Icons/LifeSkills/Materials.dmi', "ingot_[st_metal]") : null, 0)
 	if(gear)
 		if(rank >= LIFE_MAT_SLOT_RANK)
-			StBenchChip("mmat", 180, st_mmat ? "MATERIAL: [st_mmat[1]]" : "MONSTER MAT: none", "", LS_C_HINT, null, 0)
+			var/datum/matdef/mmd = st_mmat ? LifeMatDef(st_mmat[1]) : null
+			StBenchChip("mmat", 180, st_mmat ? "MATERIAL: [QualityName(st_mmat[2])] [mmd ? mmd.name : st_mmat[1]]" : "MONSTER MAT: none", "", LS_C_HINT, mmd ? StIcon16(mmd.icon, mmd.icon_state) : null, 0)
 		else
 			StBenchChip("mmat", 180, "MONSTER MAT", "rank [LIFE_MAT_SLOT_RANK]", LS_C_LOCKED, null, 1)
 		if(rank >= LIFE_GEM_SLOT_RANK)
-			StBenchChip("gem", 210, st_gem ? "GEM: [LIFE_GEM_CLASS[st_gem[1]]]" : "GEM: empty socket", "", LS_C_HINT, st_gem ? "gem_[st_gem[1]]" : null, 0)
+			var/datum/matdef/gmd = st_gem ? LifeMatDef(LIFE_GEM_CLASS[st_gem[1]]) : null
+			StBenchChip("gem", 210, st_gem ? "GEM: [QualityName(st_gem[2])] [gmd ? gmd.name : st_gem[1]]" : "GEM: empty socket", "", LS_C_HINT, gmd ? StIcon16(gmd.icon, gmd.icon_state) : null, 0)
 		else
 			StBenchChip("gem", 210, "GEM SOCKET", "rank [LIFE_GEM_SLOT_RANK]", LS_C_LOCKED, null, 1)
 
 	// requirements strip (inside the left panel)
 	var/cost = R.money_cost ? round(R.money_cost * glob.progress.EconomyCost) : 0
-	var/have = st_metal ? CountMaterial(M, LIFE_METAL_NAME[st_metal]) : 0
+	var/have = st_metal ? LifeCountExact(M, LIFE_METAL_NAME[st_metal], st_metal_q) : 0
 	var/req = ""
 	if(st_metal)
-		req += "<font color=[(have >= R.ingot_count) ? LS_C_OK : LS_C_NOFUND]>[R.ingot_count]x [LIFE_METAL_NAME[st_metal]] (have [have])</font>"
+		req += "<font color=[(have >= R.ingot_count) ? LS_C_OK : LS_C_NOFUND]>[R.ingot_count]x [QualityName(st_metal_q)] [LIFE_METAL_NAME[st_metal]] (have [have])</font>"
 	else
 		req += "<font color=[LS_C_NOFUND]>pick a metal</font>"
+	if(R.wood_count) req += " <font color=[(LifeCountAnyWood(M) >= R.wood_count) ? LS_C_OK : LS_C_NOFUND]>+ [R.wood_count]x wood</font>"
 	if(cost) req += " <font color=[M.HasMoney(cost) ? LS_C_OK : LS_C_NOFUND]>+ $[Commas(cost)]</font>"
 	req += " <font color=[(M.LifeStamina >= LIFE_COST_CRAFT) ? LS_C_OK : LS_C_NOFUND]>+ [LIFE_COST_CRAFT] Stam</font>"
 	StBenchText(38, 246, 258, 30, "<span style=\"[LS_FONT_BODY]\">[req]</span>")
@@ -704,17 +735,24 @@ client/proc/RefreshBenchPage()
 	var/blocker = null
 	if(!st_metal) blocker = "PICK A METAL"
 	else if(have < R.ingot_count) blocker = "NEED INGOTS"
+	else if(R.wood_count && LifeCountAnyWood(M) < R.wood_count) blocker = "NEED WOOD"
 	else if(cost && !M.HasMoney(cost)) blocker = "NEED $"
 	else if(M.LifeStamina < LIFE_COST_CRAFT) blocker = "WORN OUT"
-	var/icon/fbx = icon('BLANK.dmi')
-	fbx.Scale(260, 26)
-	fbx.DrawBox(blocker ? "#243a54" : "#1f7a52", 1, 1, 260, 26)
 	st_forge_btn = new
-	st_forge_btn.icon = fbx
+	st_forge_btn.icon = 'HUD/log_btn_md.png'
+	st_forge_btn.alpha = blocker ? 150 : 255
 	st_forge_btn.action = "forge"
-	st_forge_btn.screen_loc = STloc(36, 282, 26)
+	st_forge_btn.screen_loc = STloc(76, 282, 24)
 	StBenchAdd(st_forge_btn)
-	StBenchText(36, 286, 260, 16, "<center><span style=\"[LS_FONT]; color:[blocker ? LS_C_LOCKED : "#eafff0"]\">[blocker ? blocker : "FORGE"]</span></center>", 0.62)
+	var/atom/movable/shud/stbtn/fl = new
+	fl.icon = null
+	fl.action = "forge"
+	fl.maptext_width = 180
+	fl.maptext_height = 16
+	fl.maptext = "<center><span style=\"[LS_FONT]; color:[blocker ? LS_C_LOCKED : "#78eb78"]\">[blocker ? blocker : "FORGE"]</span></center>"
+	fl.layer = ST_LAYER + 0.62
+	fl.screen_loc = STloc(76, 285, 16)
+	StBenchAdd(fl)
 
 	// RIGHT sub-panel: PROJECTED (stats sit right under the header now)
 	var/D = st_metal ? LIFE_GEAR_DIFF(LIFE_METAL_TIER[st_metal], R.shape_diff) : 0
@@ -723,29 +761,49 @@ client/proc/RefreshBenchPage()
 	if(!st_metal)
 		body = "<font color=[LS_C_HINT]>Pick a metal to see what it makes of this.</font>"
 	else if(gear)
-		body = LifeProjectGearStats(M, R, st_metal, st_gem, st_mmat)
+		body = LifeProjectGearStats(M, R, st_metal, st_gem, st_mmat, st_metal_q)
 	else
 		body = "<font color=[LS_C_HINT]>Quality [QualityName(LIFE_QFLOOR_BY_RANK[clamp(rank, 1, LIFE_MAX_RANK)])] - [QualityName(LifeQualityCap(rank))], rolled from your bars and your hands.</font>"
-	// render each line at its own y - a single tall maptext box bottom-anchors and overflows
-	var/py = 148
+	var/list/plines = list()
 	for(var/pl in splittext(body, "<br>"))
-		if(!length(pl)) continue
-		// default light color so uncolored lines (DURABILITY, vs-equipped/socket prefixes) aren't near-black
-		StBenchText(330, py, 258, 16, "<span style=\"[LS_FONT_BODY]; color:#cfe3f5\">[pl]</span>")
-		py += 15
+		if(length(pl)) plines += pl
+	var/pshow = 9
+	var/pmax = max(0, plines.len - pshow)
+	st_proj_scroll = clamp(st_proj_scroll, 0, pmax)
+	var/py = 148
+	for(var/i = st_proj_scroll + 1 to min(plines.len, st_proj_scroll + pshow))
+		StBenchText(330, py, 258, 16, "<span style=\"[LS_FONT_BODY]; color:#cfe3f5\">[plines[i]]</span>")
+		py += 17
+	if(pmax)
+		StBenchText(330, 302, 258, 12, "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">scroll - [st_proj_scroll + 1]-[min(plines.len, st_proj_scroll + pshow)] / [plines.len]</span>")
 
-client/proc/StBenchChip(slotname, dyTop, label, right, right_col, gemstate, locked)
+client/proc/StAutoPickMetal(mob/M, datum/craft_recipe/life/R)
+	var/list/best
+	var/bestscore = -1
+	for(var/mid in LIFE_METALS)
+		if(LIFE_METAL_TIER[mid] < R.metal_min_tier) continue
+		if(R.fixed_metal && mid != R.fixed_metal) continue
+		for(var/mq = QUAL_LEGENDARY to QUAL_POOR step -1)
+			var/n = LifeCountExact(M, LIFE_METAL_NAME[mid], mq)
+			if(n <= 0) continue
+			var/score = (n >= R.ingot_count ? 1000 : 0) + LIFE_METAL_TIER[mid] * 10 + mq
+			if(score > bestscore)
+				bestscore = score
+				best = list(mid, mq)
+	return best
+
+client/proc/StBenchChip(slotname, dyTop, label, right, right_col, chipicon, locked)
 	var/cx = 36, cw = 262
 	var/atom/movable/shud/stslot/c = new
-	c.icon = AqCoverIcon(cw, 26)
+	c.icon = 'HUD/st_chiphit.png'   
 	c.arg = slotname
 	c.locked = locked
 	c.screen_loc = STloc(cx, dyTop, 26)
 	StBenchAdd(c)
 	var/tx = cx + 8
-	if(gemstate)
+	if(chipicon)
 		var/atom/movable/shud/stpic/gi = new
-		gi.icon = StIcon16('Icons/LifeSkills/Materials.dmi', gemstate)
+		gi.icon = chipicon
 		gi.layer = ST_LAYER + 0.5
 		gi.screen_loc = STloc(cx + 6, dyTop + 5, 16)
 		StBenchAdd(gi)
@@ -852,14 +910,25 @@ client/proc/StationButton(action, arg)
 			st_mmat = null
 			RefreshStationMenu()
 		if("forge")
-			if(st_mode != "bench" || !st_recipe || !st_metal || !mob) return
+			if(st_mode != "bench" || !st_recipe || !mob) return
 			var/mob/M = mob
 			var/datum/craft_recipe/life/R = st_recipe
-			// a blockered button shows why - it doesn't fire
+			if(!st_metal)
+				M << "Pick a metal first."
+				return
 			var/cost = R.money_cost ? round(R.money_cost * glob.progress.EconomyCost) : 0
-			if(CountMaterial(M, LIFE_METAL_NAME[st_metal]) < R.ingot_count) return
-			if(cost && !M.HasMoney(cost)) return
-			if(M.LifeStamina < LIFE_COST_CRAFT) return
+			if(LifeCountExact(M, LIFE_METAL_NAME[st_metal], st_metal_q) < R.ingot_count)
+				M << "You need [R.ingot_count]x [QualityName(st_metal_q)] [LIFE_METAL_NAME[st_metal]] ingots."
+				return
+			if(R.wood_count && LifeCountAnyWood(M) < R.wood_count)
+				M << "You need [R.wood_count]x wood of any kind for the haft."
+				return
+			if(cost && !M.HasMoney(cost))
+				M << "You need $[Commas(cost)] for supplies."
+				return
+			if(M.LifeStamina < LIFE_COST_CRAFT)
+				M << "You're too worn out to craft. ([LIFE_COST_CRAFT] Life Stamina needed)"
+				return
 			var/obj/LifeSkills/Station/S = st_station
 			var/mid = st_metal
 			var/list/gem = st_gem
@@ -868,13 +937,19 @@ client/proc/StationButton(action, arg)
 			st_reopen_recipe = R
 			st_reopen_kind = st_kind
 			st_reopen_metal = mid
+			st_reopen_metal_q = st_metal_q
 			st_reopen_gem = gem
 			st_reopen_mmat = mmat
 			CloseStationMenu()
-			spawn() M.DoForge(S, R, mid, gem, mmat)
+			spawn() M.DoForge(S, R, mid, gem, mmat, st_metal_q)
 
 client/proc/StWheelScroll(delta_y)
-	if(!stmenu_open || !st_entries) return 0
+	if(!stmenu_open) return 0
+	if(st_mode == "bench" && st_recipe)
+		st_proj_scroll += (delta_y > 0 ? -1 : 1)
+		RefreshStationMenu()
+		return 1
+	if(!st_entries) return 0
 	var/maxpx = max(0, st_entries.len * ST_ROW_H - ST_BAND_H)
 	var/dir = (delta_y > 0) ? -1 : 1
 	st_scroll_target = clamp(st_scroll_target + dir * ST_ROW_H * 2, 0, maxpx)
@@ -990,14 +1065,16 @@ client/proc/StRowClick(idx)
 				RefreshStationMenu()
 				return
 			ShowStConfirm("ascend", I, "ASCEND?", "[I.name]<br>Ascension [I.Ascended] > [I.Ascended + 1] - $[Commas(LifeAscendCost(I))]")
+		if("metalpick")
+			if(e.locked) return
+			var/list/mr = e.ref
+			st_metal = mr[1]
+			st_metal_q = mr[2]
+			st_mode = "bench"
+			RefreshStationMenu()
 		if("metal")
 			var/mid = e.ref
-			if(st_mode == "pick" && st_pick_slot == "metal" && st_recipe)
-				if(e.locked) return
-				st_metal = mid
-				st_mode = "bench"
-				RefreshStationMenu()
-			else if(st_mode == "repairmetal" && st_item)
+			if(st_mode == "repairmetal" && st_item)
 				var/obj/Items/I = st_item
 				st_mode = "list"
 				st_item = null
@@ -1167,12 +1244,14 @@ client/proc/StForgeDone()
 	var/datum/craft_recipe/life/R = st_reopen_recipe
 	var/kind = st_reopen_kind ? st_reopen_kind : "anvil"
 	var/mid = st_reopen_metal
+	var/mq = st_reopen_metal_q
 	var/list/gem = st_reopen_gem
 	var/list/mmat = st_reopen_mmat
 	st_reopen_station = null
 	st_reopen_recipe = null
 	st_reopen_kind = null
 	st_reopen_metal = null
+	st_reopen_metal_q = 0
 	st_reopen_gem = null
 	st_reopen_mmat = null
 	if(!S || !mob || mob.KO || mob.Dead || get_dist(mob, S) > 1) return
@@ -1182,6 +1261,7 @@ client/proc/StForgeDone()
 		st_recipe = R
 		st_mode = "bench"
 		st_metal = mid          // the picks come back; the bench validation clears anything consumed
+		st_metal_q = mq
 		st_gem = gem
 		st_mmat = mmat
 		RefreshStationMenu()
@@ -1206,6 +1286,7 @@ mob/verb/Set_Legend_Name(t as text)
 	set hidden = 1
 	if(!client) return
 	winset(client, "st_legname", "is-visible=false")
+	client.MapFocus()  
 	var/obj/Items/I = client.st_legend_item
 	if(!I || I.CraftQuality != QUAL_LEGENDARY)
 		client.st_legend_item = null

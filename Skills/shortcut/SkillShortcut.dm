@@ -98,6 +98,7 @@ What shortcut do you want to set?"}
 /mob/proc/
     //these two are used to deploy the assigned skill
     attemptShortcut(num)
+        if(client && client.np_open) return   // a number prompt owns the digit keys
         if(shortcuts)
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
             if(attemptedSkill)

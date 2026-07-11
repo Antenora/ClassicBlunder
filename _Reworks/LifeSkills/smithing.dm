@@ -17,8 +17,10 @@ var/list/LIFE_GEM_CLASS = list("garnet" = "Garnet", "turquoise" = "Turquoise", "
 	var/tool_kind
 	var/shape_diff = 0        // craft difficulty bump: 0 light, 1 medium, 2 heavy
 	var/shape_w = 1.0         // how hard the shape swings the metal's personality
+	var/fixed_metal           // recipe demands this exact metal
+	var/wood_count = 0        // any-wood requirement on top of the ingots
 
-proc/LifeAddRecipe(label, result_type, rank_req, metal_min_tier, ingot_count, tier, list/base_stats, tool_kind = null, money_cost = 0, shape_diff = 0, shape_w = 1.0)
+proc/LifeAddRecipe(label, result_type, rank_req, metal_min_tier, ingot_count, tier, list/base_stats, tool_kind = null, money_cost = 0, shape_diff = 0, shape_w = 1.0, fixed_metal = null, wood_count = 0)
 	var/datum/craft_recipe/life/R = new
 	R.label = label
 	R.result_type = result_type
@@ -31,6 +33,8 @@ proc/LifeAddRecipe(label, result_type, rank_req, metal_min_tier, ingot_count, ti
 	R.money_cost = money_cost
 	R.shape_diff = shape_diff
 	R.shape_w = shape_w
+	R.fixed_metal = fixed_metal
+	R.wood_count = wood_count
 	LifeRecipeRegistry += R
 
 proc/RegisterLifeSkillRecipes()
@@ -38,6 +42,8 @@ proc/RegisterLifeSkillRecipes()
 	// base_stats all null now - stat adds come only from gems. rank-ordered for the forge list.
 	LifeAddRecipe("Pick",              /obj/Items/LifeTool,                  1, 1, 2, 1, null, "Pick")
 	LifeAddRecipe("Hammer",            /obj/Items/LifeTool,                  1, 1, 2, 1, null, "Hammer")
+	LifeAddRecipe("Farmer's Hoe",      /obj/Items/FarmTool/Hoe,              1, 1, 1, 1, null, null, 0, 0, 1.0, "tin", 1)
+	LifeAddRecipe("Watering Can",      /obj/Items/FarmTool/WateringCan,      1, 1, 1, 1, null, null, 0, 0, 1.0, "tin")
 	LifeAddRecipe("Lockpick",          /obj/Items/Tech/Lockpick,             1, 1, 1, 1, null, null, 0.05, 0, 0.8)
 	LifeAddRecipe("Armored Vest",      /obj/Items/Armor/Mobile_Armor,        2, 2, 3, 2, null, null, 0.3, 0, 0.8)
 	LifeAddRecipe("Bastard Sword",     /obj/Items/Sword/Light,               2, 2, 2, 2, null, null, 0.3, 0, 0.8)
@@ -219,6 +225,10 @@ proc/LifeSmeltReqText(mob/M, mid)
 proc/LifeEligibleMetals(mob/M, datum/craft_recipe/life/R)
 	var/list/out = list()
 	if(!M || !R) return out
+	if(R.fixed_metal)
+		if(CountMaterial(M, LIFE_METAL_NAME[R.fixed_metal]) >= R.ingot_count)
+			out += R.fixed_metal
+		return out
 	for(var/mid in LIFE_METALS)
 		if(LIFE_METAL_TIER[mid] < R.metal_min_tier) continue
 		if(CountMaterial(M, LIFE_METAL_NAME[mid]) >= R.ingot_count)
@@ -483,7 +493,7 @@ proc/LifeStageBanner(mob/M, stage, label, list/perfs)
 		del t
 		del b
 
-mob/proc/DoForge(obj/LifeSkills/Station/S, datum/craft_recipe/life/R, mid, list/gem, list/mmat)
+mob/proc/DoForge(obj/LifeSkills/Station/S, datum/craft_recipe/life/R, mid, list/gem, list/mmat, mq = 0)
 	if(!client || KO || Dead || !R || !mid)
 		if(client) client.StForgeDone()
 		return
@@ -491,7 +501,9 @@ mob/proc/DoForge(obj/LifeSkills/Station/S, datum/craft_recipe/life/R, mid, list/
 		src << "You're in the middle of something."
 		client.StForgeDone()
 		return
-	if(client.life_minigame_sink) return
+	if(client.life_minigame_sink)
+		src << "Finish what you're doing first."
+		return
 	var/rank = LifeRank("Smithing")
 	if(R.rank_req > rank)
 		src << "You don't know how to forge that yet. (Smithing rank [R.rank_req])"
@@ -500,8 +512,13 @@ mob/proc/DoForge(obj/LifeSkills/Station/S, datum/craft_recipe/life/R, mid, list/
 	if(LIFE_METAL_TIER[mid] < R.metal_min_tier)
 		client.StForgeDone()
 		return
-	if(CountMaterial(src, LIFE_METAL_NAME[mid]) < R.ingot_count)
-		src << "You need [R.ingot_count]x [LIFE_METAL_NAME[mid]] ingots."
+	var/mhave = mq ? LifeCountExact(src, LIFE_METAL_NAME[mid], mq) : CountMaterial(src, LIFE_METAL_NAME[mid])
+	if(mhave < R.ingot_count)
+		src << "You need [R.ingot_count]x [mq ? "[QualityName(mq)] " : ""][LIFE_METAL_NAME[mid]] ingots."
+		client.StForgeDone()
+		return
+	if(R.wood_count && LifeCountAnyWood(src) < R.wood_count)
+		src << "You need [R.wood_count]x wood of any kind for the haft."
 		client.StForgeDone()
 		return
 	// slots only exist on weapons and armor, and only at rank
@@ -563,24 +580,32 @@ mob/proc/DoForge(obj/LifeSkills/Station/S, datum/craft_recipe/life/R, mid, list/
 	if(p3 < 1.0)
 		// the temper failed - half the bars crack apart. no recipe escapes the wall
 		var/lose = max(1, round(R.ingot_count / 2))
-		LifeConsumeBest(src, LIFE_METAL_NAME[mid], min(lose, CountMaterial(src, LIFE_METAL_NAME[mid])))
+		if(mq) LifeConsumeExact(src, LIFE_METAL_NAME[mid], mq, min(lose, LifeCountExact(src, LIFE_METAL_NAME[mid], mq)))
+		else LifeConsumeBest(src, LIFE_METAL_NAME[mid], min(lose, CountMaterial(src, LIFE_METAL_NAME[mid])))
 		src << "<font color=#ff6464>The temper fails - the piece cracks on the anvil. [R.ingot_count - lose]x ingots survive.</font>"
 		AddLifeXP("Smithing", LifeCraftXP("Smithing", R.tier) * 0.25, LIFE_PERF_MIN)
 		if(client) client.StForgeDone()
 		return
 	var/perf = p1 * LIFE_FORGE_W1 + p2 * LIFE_FORGE_W2 + p3 * LIFE_FORGE_W3
-	LifeCraftItem(R, mid, perf, cost, gem, mmat, hqb)
+	LifeCraftItem(R, mid, perf, cost, gem, mmat, hqb, mq)
 	if(client) client.StForgeDone()
 
-mob/proc/LifeCraftItem(datum/craft_recipe/life/R, mid, perf, cost = 0, list/gem, list/mmat, hqb = -1)
+mob/proc/LifeCraftItem(datum/craft_recipe/life/R, mid, perf, cost = 0, list/gem, list/mmat, hqb = -1, mq = 0)
 	if(!R || !mid) return 0
-	if(CountMaterial(src, LIFE_METAL_NAME[mid]) < R.ingot_count)
+	var/chave = mq ? LifeCountExact(src, LIFE_METAL_NAME[mid], mq) : CountMaterial(src, LIFE_METAL_NAME[mid])
+	if(chave < R.ingot_count)
 		src << "The ingots are gone."
 		return 0
 	if(cost && !HasMoney(cost))
 		src << "You no longer have the [Commas(cost)] for supplies."
 		return 0
-	var/avgq = LifeConsumeBest(src, LIFE_METAL_NAME[mid], R.ingot_count)
+	var/avgq
+	if(mq)
+		LifeConsumeExact(src, LIFE_METAL_NAME[mid], mq, R.ingot_count)
+		avgq = mq
+	else
+		avgq = LifeConsumeBest(src, LIFE_METAL_NAME[mid], R.ingot_count)
+	if(R.wood_count) LifeConsumeAnyWood(src, R.wood_count)
 	if(cost) TakeMoney(cost)
 	var/rank = LifeRank("Smithing")
 	var/q = LifeRollGearQuality(src, avgq, perf, mid, hqb)
@@ -803,13 +828,26 @@ proc/LifeGearStatsAt(datum/craft_recipe/life/R, mid, q, rank)
 	return list("dmg" = dmg, "acc" = acc, "spd" = spd, "dura" = dura)
 
 // preview body for the workbench. floor..cap band at the smith's rank with these mats.
-proc/LifeProjectGearStats(mob/M, datum/craft_recipe/life/R, mid, list/gem, list/mmat)
+proc/LifeProjBandQ(P)
+	if(P >= 195) return QUAL_LEGENDARY
+	if(P >= 145) return QUAL_EPIC
+	if(P >= 105) return QUAL_GOOD
+	if(P >= 55) return QUAL_NORMAL
+	return QUAL_POOR
+
+proc/LifeProjectGearStats(mob/M, datum/craft_recipe/life/R, mid, list/gem, list/mmat, mq = 0)
 	if(!M || !R || !mid) return ""
 	var/rank = M.LifeRank("Smithing")
 	var/qf = LIFE_QFLOOR_BY_RANK[clamp(rank, 1, LIFE_MAX_RANK)]
 	var/qc = LifeQualityCap(rank)
 	if(qc == QUAL_LEGENDARY && M.LifeLegendaryForgeDay == DaysOfWipe())
 		qc = QUAL_EPIC
+	if(mq)
+		var/obj/Items/LifeTool/ph = GetBestLifeTool(M, "Hammer")
+		var/phqb = ph ? ph.QualityBonus : 0
+		var/Pbase = 25 * (mq - 1) + phqb + 3 * rank
+		qf = clamp(LifeProjBandQ(Pbase - 15), qf, qc)
+		qc = clamp(LifeProjBandQ(Pbase + 30 + 15), max(qf, LIFE_QFLOOR_BY_RANK[clamp(rank, 1, LIFE_MAX_RANK)]), qc)
 	var/list/lo = LifeGearStatsAt(R, mid, qf, rank)
 	var/list/hi = LifeGearStatsAt(R, mid, qc, rank)
 	var/obj/Items/T = LifeRecipeTemplate(R)
