@@ -1703,7 +1703,7 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 					AccMult-=(Defender.HasFluidForm()*glob.FLUID_FORM_RATE)
 				if(AccMult<1)
 					AccMult=1
-		var/GodKiDif = 1
+/*		var/GodKiDif = 1
 		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
 			if(Offender.GetGodKi() && !Offender.HasNullTarget())
 				GodKiDif = 1 + Offender.GetGodKi()
@@ -1715,7 +1715,7 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 			if(Offender.passive_handler.Get("Justice"))
 				if(Defender.GetGodKi()>Offender.GetGodKi())
 					GodKiDif=1
-		AccMult *= GodKiDif
+		AccMult *= GodKiDif*/
 
 		// START OF REAL FUNCTION
 		var/OffenseModifier
@@ -1858,13 +1858,13 @@ proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/Base
 					AccMult=1
 
 
-		var/GodKiDif = 1
+/*		var/GodKiDif = 1
 		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
 			if(Offender.GetGodKi() && !Offender.HasNullTarget())
 				GodKiDif = 1 + Offender.GetGodKi()
 			if(Defender.GetGodKi() && !Defender.HasNullTarget())
 				GodKiDif /= (1 + Defender.GetGodKi())
-		AccMult *= GodKiDif
+		AccMult *= GodKiDif*/
 
 		var/OffenseModifier
 		var/DefenseModifier
