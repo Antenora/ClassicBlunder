@@ -3869,6 +3869,8 @@ obj
 						LockY=-17
 						adjust(mob/p)
 							DamageMult = initial(DamageMult)
+							HitboxW = 0 //masks supersede
+							HitboxH = 0
 						verb/Titan_Slayer()
 							set category="Skills"
 							adjust(usr)
@@ -5805,6 +5807,9 @@ obj
 						else
 							src.transform*=Z.IconSize
 					src.ProjectileSpin=Z.ProjectileSpin
+					src.UsesPixelCollision = glob.PIXEL_SKILL_COLLISION
+					if(src.UsesPixelCollision)
+						src.SetupPixelHitbox(Z, DirOverride)
 
 					if(src.Owner.RippleActive())
 						BreathCost=1*src.DamageMult
@@ -5881,6 +5886,9 @@ obj
 				proc/endLife()
 					try
 						Distance = 0
+						if(chain)
+							chain.Unregister(src)
+							chain = null
 						animate(src)
 						if(Homing)
 							Homing = null
@@ -5918,7 +5926,11 @@ obj
 							return
 						else
 							if(src.Area=="Beam")
-								src.BeamGraphics()
+								if(UsesPixelCollision)
+									if(chain)
+										chain.UpdateStates(TRUE)
+								else
+									src.BeamGraphics()
 								if(a:Area=="Beam")
 									if(src.Owner)
 										spawn()
@@ -5957,22 +5969,31 @@ obj
 
 						if(src.HyperHoming&&src.Homing)
 							if(a!=src.Owner.Target)
-								if(forcedTarget)
+								if(UsesPixelCollision) //no tile snaps; pass through non-targets
+									if(!forcedTarget)
+										return
+								else if(forcedTarget)
 									src.loc = forcedTarget?:loc
 								else
 									src.loc=a.loc
 									return
 						if(a==src.Owner&&!src.Backfire)
-							src.loc=a.loc
+							if(!UsesPixelCollision)
+								src.loc=a.loc
 							return
 						if(istype(a, /mob) && a:Airborne)
 							return
-						if(!src.Radius&&src.loc!=a.loc)
-							src.loc=a.loc
-							return
+						if(!UsesPixelCollision)
+							if(!src.Radius&&src.loc!=a.loc)
+								src.loc=a.loc
+								return
 
 						if(src.Area=="Beam")
-							src.BeamGraphics()
+							if(UsesPixelCollision)
+								if(chain)
+									chain.UpdateStates(TRUE)
+							else
+								src.BeamGraphics()
 
 						if(src.Area!="Beam")
 							if(a:HasBulletKill()&&a:dir==turn(src.dir, 180))
@@ -6756,7 +6777,7 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 
 					src.Distance--
-					..()
+					. = ..() //pixel movers need the real px-moved return for glide hints
 				var/tmp/mob/forcedTarget
 				proc/findNextTarget(mob/p, mob/o)
 					for(var/mob/a in view(Bounce, p))
@@ -6771,8 +6792,19 @@ obj
 					Distance=-1
 
 					if(!Killed && (MultiHit > 0) && Area != "Beam")
-						for(var/mob/m in view(max(1, Radius), src))
-							Hit(m, MultDamage = MultiHit)
+						if(UsesPixelCollision)
+							if(src.Explode) 
+								var/pr = 16*src.Explode
+								var/pcx = LowerX() + Width()/2 + vhb_ax //FireOffset skills detonate where the art died
+								var/pcy = LowerY() + Height()/2 + vhb_ay
+								if(glob.PIXEL_DEBUG) world.log << "PXC: [src] endpoint blast at ([x],[y]) r=[pr]"
+								for(var/mob/m in view(round(pr/32)+2, src))
+									if(CircleHitsBody(pcx, pcy, pr, m))
+										if(glob.PIXEL_DEBUG) world.log << "PXC: [src] blast hit -> [m] at ([m.x],[m.y])"
+										Hit(m, MultDamage = MultiHit)
+						else
+							for(var/mob/m in view(max(1, Radius), src))
+								Hit(m, MultDamage = MultiHit)
 
 					if(Owner)
 						Owner.Frozen = 0
@@ -6788,7 +6820,7 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 					if(!src.Killed && src.Owner)
 						if(src.Explode)
-							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX, PY=src.VariationY, icon_override = ExplodeIcon)
+							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay, icon_override = ExplodeIcon)
 						if(src.Cluster)
 							for(var/c=src.ClusterCount, c>0, c--)
 								if(src.ClusterAdjust)
@@ -6804,12 +6836,14 @@ obj
 									src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
 						if(!src.MaxMultiHit&&!src.Piercing&&!src.Striking&&!src.Slashing&&!src.Explode&&!src.Cluster&&src.Area!="Beam")
 							if(!src.Trail)
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX, PY=src.VariationY)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay)
 							else
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX, PY=src.VariationY+src.TrailY)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax, PY=src.VariationY+src.TrailY+vhb_ay)
 					endLife()
 				proc
 					Life()
+						if(UsesPixelCollision)
+							return PixelLife()
 						Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
 						while(src.Distance>0)
 							if(src.Area=="Beam")

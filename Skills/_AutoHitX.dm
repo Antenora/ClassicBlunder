@@ -6184,8 +6184,9 @@ obj
 			hitSelf = Z.HitSelf
 			if(Z.Persistent)
 				src.Persistent = 1
-				bound_height = 32 * Distance
-				bound_width = 32 * Distance
+				if(!glob.PIXEL_SKILL_COLLISION) //pixel path keeps a normal box; zone damage goes geometric
+					bound_height = 32 * Distance
+					bound_width = 32 * Distance
 			src.DistanceMax=Z.Distance
 			if(TrgLoc)
 				src.TargetLoc=TrgLoc
@@ -6442,6 +6443,10 @@ obj
 			src.loc=src.Owner.loc
 			src.Distance=src.DistanceMax
 
+			src.UsesPixelCollision = glob.PIXEL_SKILL_COLLISION
+			if(src.UsesPixelCollision)
+				src.AH_SetupPixel(Z)
+
 			ticking_generic += src
 
 			src.Life()
@@ -6457,15 +6462,19 @@ obj
 							endLife()
 							return
 				if(!Persistent)
-					src.loc=m.loc
+					if(!UsesPixelCollision)
+						src.loc=m.loc
 		Update()
 			if(Persistent)
-				for(var/turf/t in range( Distance, src.TargetLoc))
-					for(var/mob/m in t.contents)
-						if(!hitSelf&&m==src.Owner)
-							continue
-						else
-							src.Damage(m)
+				if(UsesPixelCollision)
+					AH_ZoneDamage(src.TargetLoc, Distance, los=FALSE) //Persistent never had LOS
+				else
+					for(var/turf/t in range( Distance, src.TargetLoc))
+						for(var/mob/m in t.contents)
+							if(!hitSelf&&m==src.Owner)
+								continue
+							else
+								src.Damage(m)
 			if(toDeath-- <= 25)
 				animate(src, alpha = 0, time = 20)
 				endLife()
@@ -7220,6 +7229,8 @@ obj
 
 			Life()
 				if(src.loc == null) return
+				if(AHOwner && AHOwner.UsesPixelCollision && !UsesPixelCollision)
+					AH_InheritPixel(AHOwner) //offshoots skip the Z constructor
 				if(PullIn && Owner)
 					Owner.ApplyPullInArea(PullIn, PullIn)
 				if(src.Circle)
@@ -7246,10 +7257,13 @@ obj
 										if(src.TurfShift)
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-										for(var/mob/m in t.contents)
-											if(!hitSelf&&m==src.Owner)
-												continue
-											src.Damage(m)
+										if(!UsesPixelCollision)
+											for(var/mob/m in t.contents)
+												if(!hitSelf&&m==src.Owner)
+													continue
+												src.Damage(m)
+									if(UsesPixelCollision)
+										AH_ZoneDamage(src.TargetLoc, Rounds)
 									for(var/turf/t in Turf_Circle_Edge(src.TargetLoc, Rounds))
 										if(src.TurfErupt)
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
@@ -7318,12 +7332,15 @@ obj
 												continue
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-									for(var/mob/m in view(Rounds, src.TargetLoc))
-										if(m in view(Rounds-1, src.TargetLoc))//Don't doublehit people
-											continue
-										if(!hitSelf&&m==src.Owner)
-											continue
-										src.Damage(m)
+									if(UsesPixelCollision)
+										AH_ZoneDamage(src.TargetLoc, Rounds, annulus=TRUE)
+									else
+										for(var/mob/m in view(Rounds, src.TargetLoc))
+											if(m in view(Rounds-1, src.TargetLoc))//Don't doublehit people
+												continue
+											if(!hitSelf&&m==src.Owner)
+												continue
+											src.Damage(m)
 								sleep(src.Slow*world.tick_lag)
 							src.Owner.Frozen=0
 						else
@@ -7374,11 +7391,14 @@ obj
 									for(var/turf/t in Turf_Circle(src.TargetLoc, dist))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-								for(var/turf/t in Turf_Circle(src.TargetLoc, src.Distance))
-									sleep(-1)
-									for(var/mob/m in t)
-										if(!hitSelf && src.Owner == m) continue
-										src.Damage(m)
+								if(UsesPixelCollision)
+									AH_ZoneDamage(src.TargetLoc, src.Distance)
+								else
+									for(var/turf/t in Turf_Circle(src.TargetLoc, src.Distance))
+										sleep(-1)
+										for(var/mob/m in t)
+											if(!hitSelf && src.Owner == m) continue
+											src.Damage(m)
 							else//If less than 3 distance...
 								if(src.TurfErupt)
 									for(var/turf/t in view(src.Distance, src.TargetLoc))
@@ -7416,9 +7436,12 @@ obj
 									for(var/turf/t in view(src.Distance, src.TargetLoc))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-								for(var/mob/m in view(src.Distance, src.TargetLoc))
-									if(!hitSelf && src.Owner == m) continue
-									src.Damage(m)
+								if(UsesPixelCollision)
+									AH_ZoneDamage(src.TargetLoc, src.Distance)
+								else
+									for(var/mob/m in view(src.Distance, src.TargetLoc))
+										if(!hitSelf && src.Owner == m) continue
+										src.Damage(m)
 						goto Kill
 					else
 
@@ -7445,10 +7468,13 @@ obj
 										if(src.TurfShift)
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-										for(var/mob/m in t.contents)
-											if(!hitSelf&&m==src.Owner)
-												continue
-											src.Damage(m)
+										if(!UsesPixelCollision)
+											for(var/mob/m in t.contents)
+												if(!hitSelf&&m==src.Owner)
+													continue
+												src.Damage(m)
+									if(UsesPixelCollision)
+										AH_ZoneDamage(src.Owner, Rounds)
 									for(var/turf/t in Turf_Circle_Edge(src.Owner, Rounds))
 										if(src.TurfErupt)
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
@@ -7517,12 +7543,15 @@ obj
 												continue
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-									for(var/mob/m in view(Rounds, src.Owner))
-										if(m in view(Rounds-1, src.Owner))//Don't doublehit people
-											continue
-										if(!hitSelf&&m==src.Owner)
-											continue
-										src.Damage(m)
+									if(UsesPixelCollision)
+										AH_ZoneDamage(src.Owner, Rounds, annulus=TRUE)
+									else
+										for(var/mob/m in view(Rounds, src.Owner))
+											if(m in view(Rounds-1, src.Owner))//Don't doublehit people
+												continue
+											if(!hitSelf&&m==src.Owner)
+												continue
+											src.Damage(m)
 								sleep(src.Slow*world.tick_lag)
 							src.Owner.Frozen=0
 						else
@@ -7570,11 +7599,14 @@ obj
 									for(var/turf/t in Turf_Circle(src.Owner, src.Distance))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-								for(var/turf/t in Turf_Circle(src.Owner, src.Distance))
-									sleep(-1)
-									for(var/mob/m in t)
-										if(!hitSelf && src.Owner == m) continue
-										src.Damage(m)
+								if(UsesPixelCollision)
+									AH_ZoneDamage(src.Owner, src.Distance)
+								else
+									for(var/turf/t in Turf_Circle(src.Owner, src.Distance))
+										sleep(-1)
+										for(var/mob/m in t)
+											if(!hitSelf && src.Owner == m) continue
+											src.Damage(m)
 							else//If less than 3 distance...
 								if(src.TurfErupt)
 									for(var/turf/t in view(src.Distance, src.Owner))
@@ -7612,9 +7644,12 @@ obj
 									for(var/turf/t in view(src.Distance, src.Owner))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
-								for(var/mob/m in view(src.Distance, src.Owner))
-									if(!hitSelf&&src.Owner==m) continue
-									src.Damage(m)
+								if(UsesPixelCollision)
+									AH_ZoneDamage(src.Owner, src.Distance)
+								else
+									for(var/mob/m in view(src.Distance, src.Owner))
+										if(!hitSelf&&src.Owner==m) continue
+										src.Damage(m)
 						goto Kill
 				if(src.Target)
 					if(src.Slow)
@@ -7632,7 +7667,10 @@ obj
 							new/obj/AutoHitter/CrossOffshoot(src, 2)//Back
 							new/obj/AutoHitter/CrossOffshoot(src, 0)//Right
 							src.CardinalTriggered=1
-					step(src, src.dir)
+					if(UsesPixelCollision)
+						AH_PixelStep()
+					else
+						step(src, src.dir)
 					if(src.StepsDamage&&src.StepsTaken>=1)
 						src.Damage+=src.StepsDamage//add growing damage
 					src.Distance--
