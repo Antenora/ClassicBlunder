@@ -28,11 +28,11 @@ globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge", "The Fla
             return TRUE
         if(Health <= 15 + (AscensionsAcquired*5))
             return TRUE
-    var/godKi = !HasNullTarget() ? GetGodKi() : 0;
+ /*   var/godKi = !HasNullTarget() ? GetGodKi() : 0;
     var/defenderGodKi = !defender.HasNullTarget() ? defender.GetGodKi() : 0;
     if(!defenderGodKi && godKi)
         return TRUE
     else
         if(godKi > defenderGodKi && (godKi - defenderGodKi) >= 0.5)
-            return TRUE
+            return TRUE*/
     return FALSE
