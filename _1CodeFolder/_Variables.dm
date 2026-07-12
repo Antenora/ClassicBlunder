@@ -92,6 +92,7 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
+	GrowthRate=1//asc growth rate
 	HealthCut=0
 	EnergyMax=100
 	Energy=100
