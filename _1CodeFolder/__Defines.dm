@@ -150,3 +150,14 @@ var/regex/yellSlashRegex = new(@"^/y\s")
 
 #define YELL_NOUNS list("shouts:", "yells:", "screams:")
 #define QUESTION_NOUNS list("questions:", "queries:", "asks:")
+
+// item quality tiers (used by tech crafting + life skills)
+#define QUAL_POOR      1
+#define QUAL_NORMAL    2
+#define QUAL_GOOD      3
+#define QUAL_EPIC      4
+#define QUAL_LEGENDARY 5
+
+// inventory: 30 held items per HUD category, 999 per stack / per material-quality in the log
+#define INV_CATEGORY_CAP 30
+#define INV_STACK_MAX 999

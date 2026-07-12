@@ -32,8 +32,6 @@ proc/Add_Technology()
 		if(B.TechType)
 			if(B.TechType=="BasicTechnology")
 				BasicTechnology_List+=B
-			if(B.TechType=="Forge")
-				Forging_List+=B
 			if(B.TechType=="RepairAndConversion")
 				RepairAndConversion_List+=B
 			if(B.TechType=="Medicine")
@@ -55,6 +53,7 @@ proc/Add_Technology()
 			if(B.TechType=="MilitaryEngineering")
 				MilitaryEngineering_List+=B
 
+	// swords/armor/weights/plating craft through Smithing now
 	for(var/C in typesof(/obj/Items/Sword))
 		var/obj/Items/D=new C
 		if(D.Saga) continue
@@ -62,8 +61,8 @@ proc/Add_Technology()
 		if(D.Cost>0)
 			if(D.TechType=="BasicTechnology")
 				BasicTechnology_List+=D
-			else
-				Forging_List+=D
+			else if(D.TechType=="MilitaryTechnology")
+				MilitaryTechnology_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -71,7 +70,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			Forging_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -79,7 +77,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			Forging_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -87,7 +84,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			RepairAndConversion_List+=D
 			Technology_List+=D
 		else
 			del(D)

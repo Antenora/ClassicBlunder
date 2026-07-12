@@ -612,6 +612,11 @@ NEW VARIABLES
 				return 0
 			if(src.DashCountLimit)
 				src.DashCount=0
+			if(!User.BuffOn(src) && (MakesSword || MakesArmor || MakesStaff || MakesSecondSword || MakesThirdSword))
+				if(User.GetCategoryCount("Gear") >= INV_CATEGORY_CAP)
+					User << "<font color=#ff6464>You can't hold any more gear (30 max), free a slot to conjure this.</font>"
+					User.BuffingUp = 0
+					return 0
 			var/returnClause
 			returnClause = User.UseBuff(src, Override)
 			User.BuffingUp=0

@@ -2050,7 +2050,6 @@ mob/Admin3/verb
 				M.race.transformations += new /transformation/saiyan/super_saiyan()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_2()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_3()
-				M.race.transformations += new /transformation/saiyan/super_saiyan_4_daima()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_god()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_blue()
 				M.race.transformations += new /transformation/saiyan/super_saiyan_blue_evolved()
@@ -3269,7 +3268,12 @@ atom/Topic(A,B[])/*
 			return
 		switch(class)
 			if("Give To")
-				src.contents+=new variable
+				var/obj/gaveobj = new variable
+				if(istype(gaveobj, /obj/Items))
+					var/mob/gm = src
+					gm.GiveOrDrop(gaveobj)   
+				else
+					src.contents += gaveobj
 				if(istype(variable, /obj/Skills))
 					var/mob/m = src
 					if(istype(variable, /obj/Skills/Queue))

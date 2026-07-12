@@ -3396,7 +3396,7 @@ mob
 				del s
 		AddItem(var/obj/Items/I, var/AlreadyHere=0)
 			if(!AlreadyHere)
-				src.contents+=I
+				GiveOrDrop(I)   // full category drops it at their feet instead of vanishing over the cap
 		AddUnlockedTechnology(var/x)
 			if(x in list("Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing"))
 				src.ForgingUnlocked++

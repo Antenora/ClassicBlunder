@@ -9,6 +9,7 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 #define KB_NORMAL 0
 #define KB_MOVE   1
 #define KB_HOTBAR 2   // +UP release only if the slotted skill is a held skill
+#define KB_INTERACT 3 // +UP always bound so hold-minigames see the release
 
 /datum/keyaction
 	var/id
@@ -18,8 +19,9 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 	var/defkey2
 	var/category
 	var/kind = KB_NORMAL
-	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "")
-		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2
+	var/rep = 0      // command repeats while the key is held (+REP macro)
+	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "", _rep = 0)
+		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2; rep = _rep
 
 var/global/list/keybind_registry
 var/global/list/keybind_by_id = list()
@@ -32,7 +34,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE, "West")
 	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE, "South")
 	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
-	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat")
+	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)   
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
@@ -48,6 +50,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("meditate",    "Meditate",            "Meditation",         "M",   "Combat")
 	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "CTRL+Space", "Combat")
 	R += new/datum/keyaction("seetargets",  "See Target's Target", "See-Targets-Target", "`",   "Combat")
+	R += new/datum/keyaction("interact",    "Interact",            "Interact",           "G",   "Combat", KB_INTERACT)
 	R += new/datum/keyaction("say",         "Say",                "Say",                "", "Communication")
 	R += new/datum/keyaction("ooc",         "OOC",                "OOC",                "", "Communication")
 	R += new/datum/keyaction("whisper",     "Whisper",            "Whisper",            "", "Communication")
@@ -100,15 +103,24 @@ var/global/list/keybind_by_id = list()
 client/proc/MacroCmd(command)
 	return findtext(command, " ") ? "\"[command]\"" : command
 
-client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
+client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 	var/uid = "[eid]_up"
+	var/rid = "[eid]_rep"
 	if(!key)
 		winset(src, eid, "type=macro;parent=[set_name];name=off_[eid]")
 		winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
 		return
 	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
+	if(rep)
+		winset(src, rid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=[MacroCmd(command)]")
+	else
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
 	if(kind == KB_MOVE)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
+		return
+	if(kind == KB_INTERACT)
+		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Interact-Release")
 		return
 	if(kind == KB_HOTBAR && regid)
 		var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
@@ -122,13 +134,26 @@ client/proc/ApplyKeybinds()
 	if(!mob) return
 	mob.initShortcuts()
 	BuildKeybindRegistry()
+	if(mob.shortcuts.keybinds && mob.shortcuts.keybinds.len)
+		var/list/ownedkeys = list()
+		for(var/sk in mob.shortcuts.keybinds)
+			var/kv = mob.shortcuts.keybinds[sk]
+			if(kv) ownedkeys[kv] = sk
+		for(var/datum/keyaction/a in keybind_registry)
+			for(var/s = 1 to 2)
+				var/sk = (s == 2) ? "[a.id]@2" : a.id
+				if(sk in mob.shortcuts.keybinds) continue
+				var/key = (s == 2) ? a.defkey2 : a.defkey
+				if(key && ownedkeys[key])
+					mob.SetKeybind(a.id, s, "")
+					mob << "Your custom [KeyDisplay(key)] bind keeps its key, [a.label] is unbound. Give it a key in Keybinds."
 	var/set_name = "macro"
 	for(var/k in params2list(winget(src, null, "macro")))
 		set_name = k
 		break
 	for(var/datum/keyaction/a in keybind_registry)
-		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id)
-		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id)
+		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id, a.rep)
+		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id, a.rep)
 	for(var/dd in list("Northeast", "Northwest", "Southeast", "Southwest"))
 		ApplyOneBind(set_name, "kbdiag_[lowertext(dd)]", dd, lowertext(dd), KB_MOVE, null)
 	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
@@ -141,6 +166,8 @@ client/proc/ApplyKeybinds()
 				slot = 2
 				body = copytext(body, 1, length(body) - 1)
 			ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", mob.shortcuts.keybinds[sk], "RunVerb [body]", KB_NORMAL, null)
+	// an open number prompt re-asserts its key overlay on top of whatever was just written
+	if(np_open) NumPromptMacros()
 
 var/global/datum/keybind_menu/keybind_menu = new()
 
@@ -732,6 +759,8 @@ client/proc/OpenSkillMenu()
 	CloseCharacterMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1

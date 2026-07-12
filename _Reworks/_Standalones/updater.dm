@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 34
+	var/UPDATE_VERSION = 37
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -748,3 +748,68 @@ update
 				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/dr in p.contents)
 					dr.adjust(p);
 					p << "Your Dragon Rage has been adjusted to scale with health!"
+	version35
+		version = 35
+		updateMob(mob/p)
+			. = ..()
+			var/list/gone = list(\
+				"Forge" = list(0, 1),\
+				"Smelting" = list(1, 1),\
+				"Weapons" = list(1, 0),\
+				"Weighted Clothing" = list(1, 0),\
+				"Armor" = list(1, 0),\
+				"Repair" = list(1, 0),\
+				"Enhancement" = list(1, 0),\
+				"Advanced Plating" = list(2, 0),\
+				"Modular Weaponry" = list(2, 0),\
+				"Locksmithing" = list(1, 0))
+			var/refunded = 0
+			for(var/nm in gone)
+				if(!(nm in p.knowledgeTracker.learnedKnowledge)) continue
+				var/list/e = gone[nm]
+				var/theCost = glob.TECH_BASE_COST / p.TechIntFactor()
+				theCost *= 1 + (0.25 * e[1])
+				if(e[2]) theCost /= 4
+				theCost = round(theCost, 1)
+				var/give = min(theCost, p.RPPSpent)
+				p.RPPSpendable += give
+				p.RPPSpent -= give
+				p.knowledgeTracker.learnedKnowledge -= nm
+				refunded += give
+			for(var/obj/Skills/Utility/Smelt/s in p)
+				del s
+			for(var/obj/Skills/Utility/Reforge/r in p)
+				del r
+			for(var/obj/Skills/Utility/Copy_Key/ck in p)
+				del ck
+			if(!(p.ArmamentEnchantmentUnlocked >= 1 || ("ArmamentEnchantment" in p.knowledgeTracker.learnedMagic) || ("Soul Infusion" in p.knowledgeTracker.learnedMagic)))
+				for(var/obj/Skills/Utility/Upgrade_Equipment/ue in p)
+					del ue
+			p.ForgingUnlocked = 0
+			p.RepairAndConversionUnlocked = 0
+			p.GrantLifeRankPerks("Smithing", p.LifeRank("Smithing"))
+			if(refunded)
+				p << "worked"
+	version36
+		version = 36
+		updateMob(mob/p)
+			. = ..()
+			var/had = 0
+			for(var/obj/Skills/Utility/Upgrade_Equipment/ue in p)
+				del ue
+				had = 1
+			for(var/obj/Skills/Utility/Enchant_Equipment/ee in p)
+				del ee
+				had = 1
+			if(had)
+				p << "worked x2"
+	version37
+		version = 37
+		updateMob(mob/p)
+			. = ..()
+			var/before = 0
+			for(var/obj/Items/Material/m in p)
+				if(m.MaterialClass && m.MaterialClass != "Scrap") before++
+			p.MigrateMaterialsToLog()
+			if(before)
+				p << "<b>Materials update</b>"

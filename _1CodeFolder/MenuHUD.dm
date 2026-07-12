@@ -122,6 +122,8 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 				usr?.client?.ToggleTechMenu()
 			if("acquire")
 				usr?.client?.ToggleAcquireMenu()
+			if("lifeskills")
+				usr?.client?.ToggleLifeSkillsMenu()
 
 
 /atom/movable/shud/menulabel
@@ -303,7 +305,7 @@ client/proc/ResetMenuHUD()
 // hover highlight, dims while that button's own panel is open
 client/proc/BtnHover(atom/movable/shud/menubtn/b, over)
 	if(!b) return
-	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open) || (b.btn_id == "tech" && tmenu_open) || (b.btn_id == "acquire" && aqmenu_open)
+	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open) || (b.btn_id == "tech" && tmenu_open) || (b.btn_id == "acquire" && aqmenu_open) || (b.btn_id == "lifeskills" && lsmenu_open)
 	if(active)
 		b.icon = 'HUD/ui_slot_unavailable.png'
 		if(b.label) b.label.alpha = 0
@@ -406,7 +408,14 @@ client/proc/PanBounds(menu, atom/movable/panel)
 				W = ic.Width()
 				H = ic.Height()
 			bx = 302
-			by = vhpx / 2 - 150
+			by = vhpx / 2 - 200
+		if("geardesc")                      // character-menu gear popup: CMloc(120, 32+H)
+			if(panel && panel.icon)
+				var/icon/ic = icon(panel.icon)
+				W = ic.Width()
+				H = ic.Height()
+			bx = (cm_atx - 1) * 32 + 120 + cm_pan_x
+			by = (cm_aty - 1) * 32 + (CMENU_H - 32 - H) + cm_pan_y
 	var/M = 20
 	var/minx = -bx + M
 	if(minx > 0) minx = 0
@@ -421,6 +430,7 @@ client/proc/PanBounds(menu, atom/movable/panel)
 client/proc/PanelDragStart(atom/movable/panel, params)
 	pan_active = null
 	if(istype(panel, /atom/movable/shud/invdescpanel)) pan_active = "invdesc"   // the item-desc popup, by type
+	else if(istype(panel, /atom/movable/shud/cmdesc)) pan_active = "geardesc"    // character-menu gear popup
 	else if(menu_open == "options") pan_active = "options"
 	else if(inv_open) pan_active = "inventory"
 	else if(skmenu_open) pan_active = "skills"
@@ -445,6 +455,9 @@ client/proc/PanelDragStart(atom/movable/panel, params)
 		if("invdesc")
 			pan_drag_ox = desc_pan_x
 			pan_drag_oy = desc_pan_y
+		if("geardesc")
+			pan_drag_ox = gd_pan_x
+			pan_drag_oy = gd_pan_y
 	var/list/b = PanBounds(pan_active, panel)
 	pan_bminx = b[1]
 	pan_bmaxx = b[2]
@@ -472,6 +485,9 @@ client/proc/PanelDragMove(params)
 		if("invdesc")
 			cx = desc_pan_x
 			cy = desc_pan_y
+		if("geardesc")
+			cx = gd_pan_x
+			cy = gd_pan_y
 	var/dx = wantx - cx
 	var/dy = wanty - cy
 	if(!dx && !dy) return
@@ -496,6 +512,10 @@ client/proc/PanelDragMove(params)
 			desc_pan_x = wantx
 			desc_pan_y = wanty
 			PanShift(inv_desc_objs, dx, dy)
+		if("geardesc")
+			gd_pan_x = wantx
+			gd_pan_y = wanty
+			PanShift(cmenu_desc_objs, dx, dy)
 
 client/proc/PanelDragEnd()
 	if(!pan_active) return
@@ -513,6 +533,9 @@ client/proc/PanelDragEnd()
 			if("invdesc")
 				setPref("descPanX", desc_pan_x)
 				setPref("descPanY", desc_pan_y)
+			if("geardesc")
+				setPref("gdPanX", gd_pan_x)
+				setPref("gdPanY", gd_pan_y)
 	pan_active = null
 	pan_dragged = FALSE
 
@@ -525,6 +548,8 @@ client/proc/OpenOptionsMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	menu_open = "options"
 	menu_page = 1
 	btn_options.icon = 'HUD/ui_slot_unavailable.png'

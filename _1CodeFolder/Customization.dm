@@ -606,35 +606,7 @@ mob/proc
 				src<<output(BT,"GridX:1,[Row]")
 				src<<output("[Commas(BT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
 
-			if(usr.ForgingUnlocked)
-				Row++
-				src<<output("-Forging-","GridX:1,[Row]")
-				for(var/obj/Items/WF in Forging_List)
-					if(WF.Unobtainable)
-						continue
-					if(WF.SubType=="Any")
-						Row++
-						src<<output(WF,"GridX:1,[Row]")
-						src<<output("[Commas(WF.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(WF.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(WF,"GridX:1,[Row]")
-						src<<output("[Commas(WF.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.RepairAndConversionUnlocked)
-				Row++
-				src<<output("-Repair and Conversion-","GridX:1,[Row]")
-				for(var/obj/Items/WC in RepairAndConversion_List)
-					if(WC.Unobtainable)
-						continue
-					if(WC.SubType=="Any")
-						Row++
-						src<<output(WC,"GridX:1,[Row]")
-						src<<output("[Commas(WC.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(WC.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(WC,"GridX:1,[Row]")
-						src<<output("[Commas(WC.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
+			// forging + repair&conversion sections retired, that gear comes from Smithing now
 
 			if(usr.MedicineUnlocked)
 				Row++

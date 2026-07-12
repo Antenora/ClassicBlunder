@@ -201,8 +201,8 @@ mob/Players
 		if(updateVersion && updateVersion.version != glob.UPDATE_VERSION)
 			glob.updatePlayer(src)
 		if(!updateVersion)
-			var/updateversion = "/update/version[glob.UPDATE_VERSION]"
-			if(ispath(updateversion))
+			var/updateversion = text2path("/update/version[glob.UPDATE_VERSION]")
+			if(updateversion)
 				updateVersion = new updateversion
 		if(RPPSpendable + RPPSpent > RPPCurrent)
 			if(!src.PotentialHeadStart)

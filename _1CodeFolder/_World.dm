@@ -32,6 +32,7 @@ world
 		world.log << "//\[info]: [world.name]"
 
 		LOGscheduler.start()
+		LifeScheduler.start()
 
 		WorldLoading=1
 		spawn(100)GlobalSave()
@@ -135,6 +136,13 @@ proc/BootWorld(var/blah)
 			spawn()Add_Enchantment()
 			spawn()InitializeSigCombos()
 			spawn()initMagicNodes()
+			spawn()SeedLifeSkillNodes()
+			spawn()SeedForageNodes()
+			spawn()SeedTrees()
+			spawn()SeedFishSpots()
+			spawn()RegisterLifeSkillRecipes()
+			spawn()FarmGrowthLoop()
+			spawn()AuctionHouseTick()
 			globalStorage = new()
 			generateVersionDatum()
 			spawn()

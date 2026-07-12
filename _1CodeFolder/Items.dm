@@ -172,6 +172,7 @@ obj/Items
 
 
 	proc/setStatLine()
+		var/reset = TRUE
 		switch(Class)
 			if("Light")
 				DamageEffectiveness=1.025
@@ -185,6 +186,10 @@ obj/Items
 				DamageEffectiveness=1.1
 				AccuracyEffectiveness=0.8
 				SpeedEffectiveness=0.8
+			else
+				reset = FALSE
+		if(reset && metal_id)
+			ApplyGearMetalStats(src, metal_id, craft_shape_w)   // don't let buffs wipe the smith's work
 
 	proc/startBreaking(dmg, val, mob/owner, mob/attacker, type)
 		if(val > glob.MAX_BREAK_MULT)
@@ -286,9 +291,18 @@ obj/Items
 			if(Drop>0&&Drop)
 				if(Drop>src.TotalStack)
 					Drop=src.TotalStack
-				var/Drop2=new src.type(get_step(usr, usr.dir))
-				Drop2:TotalStack=Drop
-				Drop2:suffix="[Drop2:TotalStack]"
+				var/obj/Items/Drop2=new src.type(get_step(usr, usr.dir))
+				Drop2.TotalStack=Drop
+				Drop2.CraftQuality=src.CraftQuality   // the split keeps its full forged identity
+				Drop2.name=src.name
+				Drop2.metal_id=src.metal_id
+				Drop2.craft_ingots=src.craft_ingots
+				Drop2.craft_shape_w=src.craft_shape_w
+				Drop2.color=src.color
+				Drop2.CreatorKey=src.CreatorKey
+				Drop2.CreatorName=src.CreatorName
+				Drop2.CreatorSignature=src.CreatorSignature
+				Drop2.suffix="[Drop2.TotalStack]"
 				src.TotalStack-=Drop
 				src.suffix="[src.TotalStack]"
 				if(src.TotalStack==0)
@@ -355,7 +369,7 @@ obj/Items
 					if(ItemMade:Stackable)
 						var/stacktype=ItemMade.type
 						for(var/obj/Items/o in usr)
-							if(o.type==stacktype)
+							if(o.type==stacktype && o.TotalStack < INV_STACK_MAX)
 								o.TotalStack++
 								usr << "You stack a new [ItemMade]."
 								del ItemMade
@@ -704,15 +718,13 @@ obj
 
 		Click()
 			..()
-			if(usr.CheckInventoryFull())
-				return
 			var/obj/Items/Wearables/w = new wearable_path
 			var/Color=input(usr,"Choose color") as color|null
 			if(Color && Color != "#000000")
 				var/icon/newIcon = new(w.icon)
 				newIcon.Blend(Color, ICON_MULTIPLY)
 				w.icon = newIcon
-			usr.contents += w
+			usr.GiveOrDrop(w)
 
 mob/proc/CheckWeightsTraining()
 	var/obj/Items/WeightedClothing/w=EquippedWeights()
@@ -737,8 +749,8 @@ obj/Items/WeightedClothing//we are now a DBZ rip ... or is it pokemon?
 		verb/Apply_Plating()
 			set category=null
 			set src in usr
-			if(!("Advanced Plating" in usr.knowledgeTracker.learnedKnowledge))
-				usr << "You don't know how to add plating to things!"
+			if(usr.LifeRank("Smithing") < 6)
+				usr << "You don't know how to add plating to things! (Smithing rank 6)"
 				return
 			if(src.suffix=="*Equipped*")
 				usr << "Take off the armor if you're going to fiddle with it!"

@@ -232,6 +232,8 @@ client/proc/OpenInventory()
 	CloseSkillMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	inv_open = TRUE
 	inv_cat_index = 1
 	btn_inv.icon = 'HUD/ui_slot_unavailable.png'
@@ -381,6 +383,17 @@ client/proc/BuildInvPage(fade = FALSE)
 				badge.screen_loc = "[InvXLoc(sx + 21)],CENTER:[sy - 1]"
 				inv_item_objs += badge
 				screen += badge
+			// stack count rides the same corner
+			else if(I.Stackable && I.TotalStack > 1)
+				var/atom/movable/shud/invtext/count = new
+				count.maptext_width = 24
+				count.maptext_height = 14
+				count.maptext = "<span style=\"[MINV_FONT]; color:#ffe066; text-align:right\"><b>[I.TotalStack]</b></span>"
+				count.layer = MINV_LAYER + 0.45
+				count.mouse_opacity = 0
+				count.screen_loc = "[InvXLoc(sx + 13)],CENTER:[sy - 1]"
+				inv_item_objs += count
+				screen += count
 	PanShift(inv_item_objs, inv_pan_x, inv_pan_y)
 	if(fade)
 		KineticEntrance(inv_item_objs)
@@ -461,7 +474,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 
 	var/atom/movable/shud/invdescpanel/P = new
 	P.icon = 'HUD/inv_desc.png'
-	P.screen_loc = "[InvXLoc(152)],CENTER:-150"   // docked to the right of the book
+	P.screen_loc = "[InvXLoc(152)],CENTER:-200"   // docked to the right of the book
 	inv_desc_objs += P
 
 	var/atom/movable/shud/orbpart/pic = new
@@ -473,7 +486,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 	pic.transform = matrix(2, 0, 0, 0, 2, 0) // 2x, scales about its center
 	pic.layer = MINV_LAYER + 0.6
 	pic.mouse_opacity = 0 // clicks fall through to the panel so right-click closes
-	pic.screen_loc = "[InvXLoc(191)],CENTER:96"
+	pic.screen_loc = "[InvXLoc(203)],CENTER:146"
 	inv_desc_objs += pic
 
 	// Update_Description is per-subtype not on base /obj/Items, reach it via the ':' operator like the item code does
@@ -494,13 +507,31 @@ client/proc/ShowItemDesc(obj/Items/I)
 		if(line)
 			stats = "<br><span style=\"color:#bfefff\">- Stats -</span><br>[line]"
 
+	var/mark = ""
+	if(I.CraftQuality != QUAL_NORMAL)
+		mark += "<br><span style=\"color:[QualityColor(I.CraftQuality)]\">[QualityName(I.CraftQuality)] quality</span>"
+	if(I.metal_id && !istype(I, /obj/Items/Material))
+		mark += "<br><span style=\"color:[LIFE_METAL_UI_RGB[I.metal_id]]\">[LIFE_METAL_NAME[I.metal_id]]-forged</span>"
+		if(istype(I, /obj/Items/Sword))
+			mark += "<br>[LifeFmtMult("DMG", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
+		else if(istype(I, /obj/Items/Armor))
+			mark += "<br>[LifeFmtMult("ABSORB", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
+	if(I.gem_id)
+		mark += "<br><span style=\"color:[QualityColor(I.gem_quality)]\">Socket: [LIFE_GEM_CLASS[I.gem_id]]</span> [GemStatLine(I.gem_id, I.gem_quality)]"
+	if(I.mmat_id)
+		mark += "<br>Essence: [LifeMonsterMatLine(I.mmat_id, I.mmat_quality)]"
+	if(I.metal_id && I.CraftQuality == QUAL_LEGENDARY && !I.Destructable && !istype(I, /obj/Items/Material))
+		mark += "<br><span style=\"color:#ffd86b\">Unbreakable</span>"
+	if(I.CreatorName)
+		mark += "<br><span style=\"color:#b8a06a\">Forged by [I.CreatorName]</span>"
+
 	var/atom/movable/shud/invtext/T = new
 	T.layer = MINV_LAYER + 0.6
 	T.mouse_opacity = 0 // clicks fall through to the panel
-	T.maptext_width = 176
-	T.maptext_height = 152
-	T.screen_loc = "[InvXLoc(164)],CENTER:-70"   // low enough that long descriptions clear the icon
-	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats]</span>"
+	T.maptext_width = 200
+	T.maptext_height = 300
+	T.screen_loc = "[InvXLoc(164)],CENTER:-190"   // low enough that long descriptions clear the icon
+	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats][mark]</span>"
 	inv_desc_objs += T
 
 	// gear and clothing actions stacked top-right, clear of the description text
@@ -509,14 +540,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		cb.item = I
 		cb.maptext_width = 100
 		cb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9874; Customize</span>"
-		cb.screen_loc = "[InvXLoc(252)],CENTER:112"
+		cb.screen_loc = "[InvXLoc(252)],CENTER:162"
 		inv_desc_objs += cb
 	if(CanBeHat(I))
 		var/atom/movable/shud/invtext/htl = new
 		htl.layer = MINV_LAYER + 0.6
 		htl.mouse_opacity = 0
 		htl.maptext_width = 90
-		htl.screen_loc = "[InvXLoc(252)],CENTER:90"
+		htl.screen_loc = "[InvXLoc(252)],CENTER:140"
 		htl.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">Toggle Hat</span>"
 		inv_desc_objs += htl
 		var/atom/movable/shud/hattoggle/htsw = new
@@ -524,14 +555,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		htsw.ctx = "inv"
 		htsw.layer = MINV_LAYER + 0.7
 		htsw.icon = I.IsHat ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-		htsw.screen_loc = "[InvXLoc(315)],CENTER:92"
+		htsw.screen_loc = "[InvXLoc(315)],CENTER:142"
 		inv_desc_objs += htsw
 	if(IsCustomizableItem(I))
 		var/atom/movable/shud/invrenamebtn/rb = new
 		rb.item = I
 		rb.maptext_width = 100
 		rb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9998; Rename</span>"
-		rb.screen_loc = "[InvXLoc(252)],CENTER:68"
+		rb.screen_loc = "[InvXLoc(252)],CENTER:118"
 		inv_desc_objs += rb
 
 	// clamp the saved popup offset to the current view, then apply it

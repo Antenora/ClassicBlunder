@@ -348,9 +348,20 @@ client/proc/CMloc(dx, dy)
 /atom/movable/shud/cmdesc
 	layer = CMENU_LAYER + 0.6
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	var/draggable = 0
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HideDescPanel()
+	MouseDown(location, control, params)
+		if(draggable && usr) usr.client.PanelDragStart(src, params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(draggable && usr) usr.client.PanelDragMove(params)
+	MouseUp(location, control, params)
+		if(draggable && usr) usr.client.PanelDragEnd()
+
+client/var/tmp/gd_pan_x = 0
+client/var/tmp/gd_pan_y = 0
 
 /atom/movable/shud/cmdtext
 	layer = CMENU_LAYER + 0.7
@@ -507,6 +518,8 @@ client/proc/OpenCharacterMenu()
 	CloseSkillMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
+	CloseLifeSkillsMenu()
+	CloseStationMenu()
 	cmenu_open = TRUE
 	cmenu_tab = 0
 	// tile-anchor the frame so it stays inside the view
@@ -793,6 +806,14 @@ client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return
 	if(AqWheelScroll(delta_y))     // Acquire Skills list (AcquireHUD.dm)
+		return
+	if(StWheelScroll(delta_y))     // Forge/Anvil station list (StationHUD.dm)
+		return
+	if(LogWheelScroll(delta_y))    // Collection Log grid (LogHUD.dm)
+		return
+	if(FarmWheelScroll(delta_y))   // Seed stall / seed picker (farming.dm)
+		return
+	if(AhWheelScroll(delta_y))     // Auction House rows (AuctionHUD.dm)
 		return
 	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
 		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
@@ -1396,7 +1417,8 @@ client/proc/ShowGearDetail(obj/Items/it)
 	cmenu_desc_objs = list()
 	var/atom/movable/shud/cmdesc/P = new
 	P.icon = 'HUD/geardetail.png'
-	P.screen_loc = CMloc(120, 32 + 280)
+	P.draggable = 1
+	P.screen_loc = CMloc(120, 32 + 368)
 	cmenu_desc_objs += P
 	var/cat = GearCat(it)
 	var/ly = 50
@@ -1404,6 +1426,22 @@ client/proc/ShowGearDetail(obj/Items/it)
 	var/sub = cat
 	if(it.Class in list("Light", "Medium", "Heavy")) sub += " - [it.Class]"
 	AddDescLine(gspan(sub, "#96c3e1", "left"), 140, ly, 344); ly += 22
+	// forged identity + combat effectiveness
+	var/gisw = istype(it, /obj/Items/Sword)
+	if(it.metal_id)
+		var/qn = (it.CraftQuality && it.CraftQuality != QUAL_NORMAL) ? "[QualityName(it.CraftQuality)] " : ""
+		var/asc = (it.Ascended > 0) ? " &#183; Asc [it.Ascended]" : ""
+		AddDescLine(gspan("[qn][LIFE_METAL_NAME[it.metal_id]]-forged[asc]", QualityColor(it.CraftQuality), "left"), 140, ly, 344); ly += 16
+	if(gisw || istype(it, /obj/Items/Armor) || istype(it, /obj/Items/Enchantment/Staff))
+		AddDescLine(gspan("[gisw ? "DMG" : "ABSORB"] x[round(it.DamageEffectiveness, 0.01)]  ACC x[round(it.AccuracyEffectiveness, 0.01)]  SPD x[round(it.SpeedEffectiveness, 0.01)]", "#bfe6ff", "left"), 140, ly, 344); ly += 16
+	if(it.metal_id && it.CraftQuality == QUAL_LEGENDARY && !it.Destructable)
+		AddDescLine(gspan("Unbreakable", "#ffd278", "left"), 140, ly, 344); ly += 16
+	if(it.gem_id)
+		AddDescLine(gspan("Socket: [LIFE_GEM_CLASS[it.gem_id]] [GemStatLine(it.gem_id, it.gem_quality)]", QualityColor(it.gem_quality), "left"), 140, ly, 344); ly += 16
+	if(it.mmat_id)
+		AddDescLine(gspan("Essence: [LifeMonsterMatLine(it.mmat_id, it.mmat_quality)]", "#8be9ff", "left"), 140, ly, 344); ly += 16
+	if(it.metal_id && it.CreatorName)
+		AddDescLine(gspan("Forged by [it.CreatorName]", "#9fb4c7", "left"), 140, ly, 344); ly += 16
 	var/list/SL = mob.GearStatList(it)
 	for(var/lbl in SL)
 		var/val = SL[lbl]
@@ -1466,9 +1504,16 @@ client/proc/ShowGearDetail(obj/Items/it)
 			cmenu_desc_objs += pr
 			ly += 16
 			pn++
-	AddDescLine(gspan("left-click an item to equip - right-click to close", "#7a9bb5", "center"), 134, 282, 356)
+	AddDescLine(gspan("left-click to equip &#183; right-click to close &#183; drag to move", "#7a9bb5", "center"), 134, 348, 356)
 	for(var/atom/movable/o in cmenu_desc_objs)
 		screen += o
+	// remembered popup offset, clamped to the view
+	gd_pan_x = getPref("gdPanX"); if(isnull(gd_pan_x)) gd_pan_x = 0
+	gd_pan_y = getPref("gdPanY"); if(isnull(gd_pan_y)) gd_pan_y = 0
+	var/list/gdb = PanBounds("geardesc", P)
+	gd_pan_x = clamp(gd_pan_x, gdb[1], gdb[2])
+	gd_pan_y = clamp(gd_pan_y, gdb[3], gdb[4])
+	PanShift(cmenu_desc_objs, gd_pan_x, gd_pan_y)
 	KineticEntrance(cmenu_desc_objs)
 
 //////////////////////////////////////////////////////////////////

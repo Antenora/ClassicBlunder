@@ -628,6 +628,10 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 			else
 				src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
 
+	// Hunting: fallen monsters leave carveable remains (potential sets the tier)
+	if(istype(src, /mob/Player/AI) && !NoRemains && !fakeDeath)
+		LifeSpawnRemains(src)
+
 	// Reflected Eldritch Chrysalis — intercepts death if body remains
 	if(src.hasSecret("Eldritch (Reflected)") && !src.ChrysalisActive && !NoRemains)
 		src.enterChrysalis()
@@ -2119,7 +2123,7 @@ mob/proc/Grab()
 								del(P)
 								return
 						buh.suffix="[Commas(buh:TotalStack)]"
-					if(src.CheckInventoryFull())
+					if(src.CheckInventoryFull(P))
 						return
 					src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 					P.Move(src)
