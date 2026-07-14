@@ -18,8 +18,8 @@ mob/verb
 obj/Skills/var
 	cooldown_remaining = 0
 	cooldown_start
-	cooldown_start_wt = 0   
-	cooldown_full = 0       
+	cooldown_start_wt = 0
+	cooldown_full = 0
 	tmp/halve_next_cd = 0
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
@@ -183,7 +183,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 			return  FALSE
 	if(src.KO||src.Stunned||src.AutoHitting||src.Frozen>=2||src.Suspended)
 		return  FALSE
-	if(src.judgement_cut_chain_active && !istype(Z, /obj/Skills/AutoHit/Judgement_Cut))
+	if(src.judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))
 		return FALSE
 	if(src.Stasis)
 		return  FALSE
