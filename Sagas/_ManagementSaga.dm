@@ -147,7 +147,7 @@ mob/var
 
 	//SHINOBI
 	ShinobiBranch
-	list/ChakraAffinities          // Chakra Natures this Shinobi has an affinity for 
+	list/ChakraAffinities          // Chakra Natures this Shinobi has an affinity for
 	ChakraSpecialization           // nature chosen at the one-time SL3 specialization offer, locks out further affinities
 	tmp/ChakraAffinityPending = 0  // affinity prompts in flight (roll or RPP purchase)
 
@@ -460,6 +460,7 @@ mob/Admin3/verb
 						if("Rainbow")
 							P.RebirthHeroType="Rainbow"
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero)
+							P.AddSkill(new/obj/Skills/AutoHit/Jarona)
 				//	tierUpSaga("Rebirth")
 
 				if("Devil Summoner")
@@ -989,6 +990,7 @@ mob
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
+										src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Fight_or_Flight)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
@@ -1016,6 +1018,7 @@ mob
 								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
 								src<< "Your Chaos Buster has been upgraded!"
 								src<< "You can access your Hyperdeath State earlier!"
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Mountain_King)
 								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
@@ -1082,6 +1085,7 @@ mob
 								src<< "It's not just those you're carrying on your back, are they?"
 								src<< "buff goes here"
 								src<< "You can access your Hyperdeath State earlier!"
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Dreamlike_Savior)
 								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
@@ -1099,6 +1103,7 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/All_Hail_The_Crownless_King)
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
 							if(src.RebirthHeroType=="Prismatic")
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "The Hearts of the World resonate with Yours."
 								src<< "final buff goes here wooo"
 								src<< "You can access your Hyperdeath State earlier!"

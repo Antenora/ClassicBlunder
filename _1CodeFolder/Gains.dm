@@ -230,7 +230,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			RG.RoyalMeter = 0
 			src << "Your Royal Meter went back to 0."
 			src.client.updateRGMeter()
-
+		if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic") && HyperdeathMeterCurrent>0)
+			HyperdeathMeterCurrent=0
+			HyperMeterUpdate()
+			src << "Your Hyperdeath gauge reset to 0."
 		if(calmcounter<=0)
 			calmcounter=5
 			if(Anger)
