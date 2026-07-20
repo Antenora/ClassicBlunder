@@ -21,6 +21,9 @@ beam_chain
 
 	proc/Register(obj/Skills/Projectile/_Projectile/s)
 		segments += s
+		if(segments.len == 1 && !s._fx_glowed) //front segment = beam head
+			s._fx_glowed = 1
+			FxAttachLight(s, null)
 
 	proc/Unregister(obj/Skills/Projectile/_Projectile/s)
 		segments -= s
@@ -30,6 +33,10 @@ beam_chain
 			owner = null
 			return
 		UpdateStates(TRUE) //front died: immediate head handoff
+		var/obj/Skills/Projectile/_Projectile/front = segments[1]
+		if(front && !front._fx_glowed) //glow follows the head
+			front._fx_glowed = 1
+			FxAttachLight(front, null)
 
 	proc/UpdateStates(force)
 		if(!force && last_update == world.time) return
@@ -57,6 +64,19 @@ beam_chain
 				s.layer = 4
 
 obj/Skills/Projectile/_Projectile/proc/BeamAheadBlocked()
+	if(UsesPixelCollision && vhb_w > 0)
+		//struggle needs real ink overlap
+		for(var/atom/movable/a in range(HitboxSweepRange(), src))
+			if(a == src || a == Owner) continue
+			if(ismob(a))
+				var/mob/m = a
+				if(m.density && HitboxesOverlap(src, m)) return TRUE
+			else if(istype(a, /obj/Skills/Projectile/_Projectile))
+				var/obj/Skills/Projectile/_Projectile/p = a
+				if(p.Owner != src.Owner && HitboxesOverlap(src, p)) return TRUE
+		var/turf/ta = get_step(src, dir)
+		if(ta && ta.density) return TRUE 
+		return FALSE
 	var/turf/ahead = get_step(src, dir)
 	if(!ahead) return FALSE
 	for(var/mob/m in ahead)

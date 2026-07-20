@@ -18,7 +18,7 @@
 
 	New()
 		..()
-		IconLock = icon('explosion.dmi', "2")
+		IconLock = icon('Explosion - Fire.dmi', "2")
 
 	verb/Goukakyu()
 		set name = "Katon: Goukakyu no Jutsu"
@@ -59,7 +59,7 @@
 	Rounds = 10
 	ManaCost = 10
 	Cooldown = 15
-	HitSparkIcon = 'explosion.dmi'
+	HitSparkIcon = 'Explosion - Fire.dmi'
 	HitSparkTurns = 1
 	HitSparkSize = 1
 	HitSparkDispersion = 1

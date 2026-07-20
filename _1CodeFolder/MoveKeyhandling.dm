@@ -68,10 +68,7 @@ mob/Players
 		spawn()
 			MovementLoop()
 
-	//	These are the actual commands players will be using for movement.
-	//	They're set to instant so player inputs react as quickly, as possible.
-	//	Having them hidden isn't required, it just prevents them from filling
-	//	up a statpanel.
+	//	instant so inputs land fast, hidden keeps them off the statpanel
 	verb
 		north()
 			set hidden = 1
@@ -192,8 +189,7 @@ mob
 		//	This is just so tile transitions animate smoothly.
 		animate_movement=SLIDE_STEPS
 		var
-			//	How many ticks to wait between steps.
-			//	Must be a positive number or 0.
+			//	ticks to wait between steps
 			move_delay=1
 
 			//	If movement needs to be disabled for some reason.
@@ -210,22 +206,22 @@ mob
 				key4=0*/
 
 		proc
-			//	MovementLoop() is the main process which handles movement.
-			//	It does a few simple checks to see if the player wants to
-			//	move, can move, and is able to move. Once the player moves
-			//	it will delay itself for a moment until the player is able
-			//	to step again.
 			MovementLoop()
 				var/loop_delay=glob.BASE_LOOP_DELAY
 				while(src)
-					if(src.pixel_z&&(key1||key2||key3||key4)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+					if(src.pixel_z&&(key1||key2||key3||key4)&&(!PmActive()||pm_crossed)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 						if(!src.EquippedFlyingDevice())
 							flick("Flight",src)
 					if(key1||key2||key3||key4)
 						if(canMove())
+							if(PmActive()) //pixel build: per-tick micro-steps, same net speed
+								PmMovementTick()
+								sleep(world.tick_lag)
+								continue
 							/*stepDiagonal()  Test this sometime
 							loop_delay+=MovementSpeed()*/
 							if(stepDiagonal())
+								glide_size = 0 //auto-glide here, also heals a stale pixel-build glide_size from an old save
 								if(SlotlessBuffs.len>0)
 									// only check if there are active slotless
 									var/afterimages = passive_handler.Get("CoolerAfterImages")
@@ -271,8 +267,6 @@ mob
 					// 				loop_delay+=MovementSpeed()
 					// 	sleep(world.tick_lag)
 
-			//	canMove() is where you're able to prevent the player from moving.
-			//	Use it for things like being dead, stunned, in a cutscene, and so on.
 			canMove()
 //				if(Control) return TRUE
 				//if(!Allow_Move()) return FALSE
@@ -281,17 +275,7 @@ mob
 				return TRUE
 
 
-			//	stepDiagonal() checks all the keys the player is holding then
-			//	mixes them together into diagonal steps. In cases where both
-			//	keys for one axis are being pressed they are both ignored.
-			//
-			//	In order to prevent players from getting stuck on walls when
-			//	stepping into them diagonally, diagonal steps are broken into
-			//	two different steps along the x and y axes.
-			//
-			//	After stepping the player's direction is corrected and it reports
-			//	back if the player was able to step or not so MovementLoop() knows
-			//	when to apply a step delay.
+			//	merges held keys into diagonals, split into x/y steps so you don't stick on walls
 			stepDiagonal()
 				var/dir_x
 				var/dir_y
@@ -382,9 +366,7 @@ mob
 						return 1
 					else return 0
 
-			//	keySet() and keyDel() are used to change the order in which the player
-			//	has pressed their movement keys. It's crucial to preserve the sequence
-			//	of key presses in order to determine which directions are prioritized.
+			//	key press order decides which dirs win
 			keySet(dir)
 				if(key1)
 					if(key2)

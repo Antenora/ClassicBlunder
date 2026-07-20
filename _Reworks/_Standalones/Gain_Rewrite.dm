@@ -266,6 +266,14 @@ mob/proc/loseOxygen(mult = 1)
 						src.Death(null,"oxygen deprivation!")
 
 mob/proc/Swim()
+	var/turf/water_turf = GfxGroundTurf(src)
+	if(!water_turf) return
+	if(!(water_turf.Deluged || istype(water_turf,/turf/Waters) || istype(water_turf,/turf/Special/Ichor_Water) || istype(water_turf,/turf/Special/Midgar_Ichor)))
+		if(src.Swim)
+			src.RemoveWaterOverlay()
+			src.Swim = 0
+			if(isplayer(src)) src:move_speed = MovementSpeed()
+		return
 	var/IgnoresWater=0
 	var/BreathingMaskOn = 0
 	if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON))
@@ -291,7 +299,7 @@ mob/proc/Swim()
 			if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 				src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 	if(!IgnoresWater)
-		if(istype(loc,/turf/Waters/Water7))
+		if(istype(water_turf,/turf/Waters/Water7))
 			if(!src.HasWalkThroughHell())
 				if(!isRace(DEMON)&&!src.HasHellPower())
 					src.AddBurn(10)
@@ -300,51 +308,51 @@ mob/proc/Swim()
 				src.Burn-=(src.Burn/2)
 				if(src.Burn<0)
 					src.Burn=0
-		if(istype(loc,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
 			src.AddPoison(2)
-		if(istype(loc,/turf/Waters/WaterD) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Waters/WaterD) && !src.HasVenomImmune())
 			src.AddPoison(2)
-		if(istype(loc,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
 			src.AddPoison(1)
 		if(Swim==0)
 			src.RemoveWaterOverlay()
 			spawn()
-				if(loc:Deluged)
+				if(water_turf.Deluged)
 					src.overlays+=image('WaterOverlay.dmi',"Deluged")
-					var/mob/p = loc:ownerOfEffect
+					var/mob/p = water_turf.ownerOfEffect
 					if(p!= src)
 
 						src.AddSlow(1 + (0.5 * p.AscensionsAcquired))
 						src.AddShock(1 + (0.5 * p.AscensionsAcquired))
 				else if(src.PoseEnhancement&&src.Secret=="Hamon")
 					src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-				else if(loc.type==/turf/Waters/Water7/LavaTile)
+				else if(water_turf.type==/turf/Waters/Water7/LavaTile)
 					src.overlays+=image('LavaTileOverlay.dmi')
 				else
-					src.overlays+=image('WaterOverlay.dmi',"[loc.icon_state]")
+					src.overlays+=image('WaterOverlay.dmi',"[water_turf.icon_state]")
 		if(!Swim)
 			Swim=1
 			if(isplayer(src))
 				src:move_speed = MovementSpeed()
 		if(!src.KO)
 			var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
-			if(loc:Shallow==1)
+			if(water_turf.Shallow==1)
 				amounttaken=0
 			if(src.PoseEnhancement&&src.Secret=="Hamon")
 				amounttaken=0
 			if(BreathingMaskOn)
 				amounttaken=0
-			if(loc:Deluged==1)
+			if(water_turf.Deluged==1)
 				amounttaken=4
 			if(isRace(DRAGON))
 				amounttaken=0

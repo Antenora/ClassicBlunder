@@ -280,8 +280,7 @@ globalTracker
 		MAOUKI_DIFF_MULT = 1 //what the fuck do you think it does
 // combat
 		HIT_SCAN_DELAY = 5
-		PIXEL_SKILL_COLLISION = FALSE //skills hit by fitted bounds instead of view
-		PIXEL_DEBUG = FALSE //log pixel-collision contact decisions
+		PIXEL_SKILL_COLLISION = TRUE //skills hit by fitted bounds instead of view
 		OVERHWELMING_BASE_END_NERF = 0.05
 		OVERHWELMING_SHATTER_APPLY = 150
 		OVERHWELMING_BASE_PR_NERF = 0.05

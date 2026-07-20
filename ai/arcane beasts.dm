@@ -1100,6 +1100,7 @@ obj/Skills/Companion/arcane_follower
 			a.glow_filter = a.filters[a.filters.len]
 
 			animate(a.glow_filter, offset=0, size=10, time=30, loop=-1)
+			animate(offset=1, size=6, time=30)
 
 		Using=0
 

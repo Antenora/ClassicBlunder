@@ -5563,7 +5563,7 @@ mob
 										src << "[Z] is out of power!"
 
 		Blast(var/obj/Skills/Projectile/Z, var/atom/Origin, var/GivesMessage, var/IconUsed, var/DirOverride=0)
-			new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride)
+			return new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride)
 
 
 mob/var/tmp/list/active_projectiles = list()
@@ -5794,7 +5794,8 @@ obj
 						src.pixel_y=Z.LockY
 						if(Z.IconVariance)
 							src.icon_state="[rand(1,Z.IconVariance)]"
-							src.transform*=GoCrand(0.75,1.25)
+							src.icon_var_scale=GoCrand(0.75,1.25)//so the pixel hitbox scales with the random art
+							src.transform*=src.icon_var_scale
 						if(Z.takeAppearance)
 							appearance = m.appearance
 					else
@@ -5834,6 +5835,9 @@ obj
 							if(src.ChargeMessage)
 								OMsg(src.Owner, "<b><font color='[src.ChargeColor]'>[src.Owner] [src.ChargeMessage]</font color></b>")
 						src.loc=locate(src.Owner.x, src.Owner.y, src.Owner.z)
+						if(PmActive() && src.Owner) //the re-place wiped the spawn-copied step offsets
+							src.step_x = src.Owner.step_x
+							src.step_y = src.Owner.step_y
 						if(Z.IconSizeGrowTo)
 							spawn()animate(src, transform=matrix()*Z.IconSizeGrowTo, pixel_z=((Z.IconChargeOverhead*32)-1), time=T, easing=CUBIC_EASING)
 						else
@@ -5852,6 +5856,9 @@ obj
 							if(Z.Hover) sleep(Z.Hover)
 							else sleep(Hover)
 						if(Z.Variation)
+							if(src.UsesPixelCollision)//record the jitter so dir refits re-apply it (art only, not the box)
+								src.vhb_varx = src.VariationX
+								src.vhb_vary = src.VariationY
 							animate(src, pixel_x=src.pixel_x+src.VariationX, pixel_y=src.pixel_y+src.VariationY, time=3)
 						walk(src,0)
 						if(src.DirOverride)
@@ -5871,6 +5878,8 @@ obj
 								animate(src,transform=matrix()*Z.IconSizeGrowTo, time=10, easing=CUBIC_EASING)
 						if(Z.takeAppearance)
 							appearance = m.appearance
+						if(src.Area != "Beam") //beam heads glow via the chain/BeamGraphics hooks
+							FxAttachLight(src, Z)
 						src.Life()
 					if(FollowUp)
 						if(FollowUpDelay != -1)
@@ -5905,7 +5914,7 @@ obj
 							Owner = null
 						loc = null
 						for(var/i in vis_contents)
-							vis_contents -= i
+							vis_contents -= i //never del fx children, del scans the whole world
 						for(var/obj/i in vis_locs)
 							i.vis_contents -= src
 						AlreadyHit = null
@@ -6597,7 +6606,7 @@ obj
 									if(m)
 										AlreadyHit["[m.ckey]"]++
 									if(Piercing && PiercingBang)
-										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX, PY=src.VariationY, icon_override = ExplodeIcon)
+										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 								if(src.Owner.UsingAnsatsuken())
 									src.Owner.HealMana(src.Owner.SagaLevel/15)
 								if(src.Owner.SagaLevel>1&&src.Owner.Saga=="Path of a Hero: Rebirth")
@@ -6722,6 +6731,11 @@ obj
 							if(src.MultiHit)
 								src.MultiHit--
 								src.Distance++
+								if(UsesPixelCollision && src.Homing && a == src.Homing)
+									//re-center on the homing target so multi-hit hovers instead of orbiting
+									src.loc = a.loc
+									src.step_x = a:step_x
+									src.step_y = a:step_y
 								if(src.MultiHit<0)
 									src.MultiHit=0
 									ProjectileFinish()
@@ -6761,6 +6775,28 @@ obj
 							ProjectileFinish()
 							return
 				Move()
+					var/turf/gfx_water_before = get_turf(src)
+					if(pm_substep) //per-tile effects only when a tile line is crossed
+						if(src.EdgeOfMapProjectile())
+							ProjectileFinish()
+							return
+						var/turf/pre = loc
+						. = ..()
+						if(loc == pre) return
+						GfxProjectileWaterMove(src, gfx_water_before)
+						if(src.MiniDivide)
+							if(istype(pre, /turf))
+								Destroy(pre, 9001)
+						if(src.Divide)
+							for(var/turf/t in view(src.Divide, src))
+								Destroy(t, 9001)
+						if(src.Trail)
+							if(src.MultiTrail)
+								WaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+							else
+								LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+						src.Distance--
+						return
 					if(src.EdgeOfMapProjectile())
 						ProjectileFinish()
 						return
@@ -6778,6 +6814,7 @@ obj
 
 					src.Distance--
 					. = ..() //pixel movers need the real px-moved return for glide hints
+					GfxProjectileWaterMove(src, gfx_water_before)
 				var/tmp/mob/forcedTarget
 				proc/findNextTarget(mob/p, mob/o)
 					for(var/mob/a in view(Bounce, p))
@@ -6820,25 +6857,32 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 					if(!src.Killed && src.Owner)
 						if(src.Explode)
-							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay, icon_override = ExplodeIcon)
+							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 						if(src.Cluster)
 							for(var/c=src.ClusterCount, c>0, c--)
+								var/obj/Skills/Projectile/_Projectile/cb
 								if(src.ClusterAdjust)
-									src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
 								else
-									src.Owner.Blast(src.Cluster, src.loc, 0)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0)
+								if(PmActive() && cb && cb.loc == src.loc)//inherit the impact point's mid-tile offset
+									cb.step_x = src.step_x
+									cb.step_y = src.step_y
 								sleep(src.ClusterDelay)
 						if(src.SurroundBurst)
 							var/list/burst_dirs = list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 							for(var/d in burst_dirs)
 								var/turf/T = get_step(src, d)
 								if(T)
-									src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									var/obj/Skills/Projectile/_Projectile/sb = src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									if(PmActive() && sb && sb.loc == T)//center the ring on the impact sprite
+										sb.step_x = src.step_x
+										sb.step_y = src.step_y
 						if(!src.MaxMultiHit&&!src.Piercing&&!src.Striking&&!src.Slashing&&!src.Explode&&!src.Cluster&&src.Area!="Beam")
 							if(!src.Trail)
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, color_override = FxBlastTint(src))
 							else
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax, PY=src.VariationY+src.TrailY+vhb_ay)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax+step_x, PY=src.VariationY+src.TrailY+vhb_ay+step_y, color_override = FxBlastTint(src))
 					endLife()
 				proc
 					Life()
@@ -7004,3 +7048,6 @@ obj
 							if(!locate(src.type, get_step(src, turn(src.dir, 180))))
 								src.icon_state="end"
 								src.layer=5
+							if(src.icon_state=="head" && !src._fx_glowed) //true front segment only
+								src._fx_glowed = 1
+								FxAttachLight(src, null)

@@ -59,13 +59,12 @@ mob/Players
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE
+		PurgeHurtboxDebug() 
+		FxEnsureMasters(client) 
 		ForceClearHeldChargeState()
 		players += usr
 		OverwatchNotifyLogin(usr, "logged in")
-		// StyleRating decay runs in spawn(); the loop dies on disconnect and
-		// leaves the persistent StyleRating var stuck above zero on the next
-		// login, with Stylish multipliers locked in and no decay timer to
-		// retire them. Wipe any leftover rating now so reconnects start clean.
+		//the decay loop dies on disconnect, wipe leftover rating so Stylish doesn't stay stuck
 		if(StyleRating > 0)
 			resetStyleRating()
 		StyleRatingDecaying = FALSE
@@ -381,9 +380,10 @@ mob/Players
 		for(var/x in lol)
 			winset(src,x,"'is-visible'=true")
 		client.SetupGameDisplay()
+		client.InitializeGraphics()
 		client.InitSkillHUD()
 
-		client.fps = src.ChosenFPS || world.fps   
+		client.fps = src.EffectiveClientFPS()
 		client.updateRGMeter()
 		if(usr.SenseRobbed>=5)
 			animate(usr.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1))
@@ -496,6 +496,7 @@ mob/Players
 		CollectMenuVerbs()
 		return
 	Logout()
+		PurgeHurtboxDebug()
 		if(src.Airborne)
 			src.Airborne = 0
 			src.AirborneInterrupted = 0
@@ -621,6 +622,7 @@ mob/Creation
 		usr.loc=locate(1,1,13)
 		client.client_plane_master = new()
 		client.screen += client.client_plane_master
+		FxEnsureMasters(client)
 	Logout()
 		if(src in admins)
 			admins -= src

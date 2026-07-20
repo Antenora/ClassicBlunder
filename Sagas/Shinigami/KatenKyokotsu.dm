@@ -144,6 +144,9 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 		if(!dest || dest.density)
 			dest = get_turf(target)
 		usr.loc = dest
+		if(PmActive())//land aligned with the foe's mid-tile sprite
+			usr.step_x = target.step_x
+			usr.step_y = target.step_y
 		usr.dir = SOUTH
 		OMsg(usr, "<b>[usr] suddenly appears above their foe with Takaoni!</b>")
 

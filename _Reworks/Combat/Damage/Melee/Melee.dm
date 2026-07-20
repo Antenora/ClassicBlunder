@@ -219,8 +219,14 @@
 						nr.Trigger(src)
 				// TODO: make hud later if we feel like it chat
 	if(warpingStrike && !petal_attacking)
-		if(Target && Target.loc && Target != src && Target && get_dist(Target, src) < warpingStrike)
-			forcewarp = Target
+		if(Target && Target.loc && Target != src)
+			var/inWarp
+			if(PmActive())//step-inclusive so a mid-tile target doesn't round out of warp range
+				inWarp = max(abs((Target.x-x)*32 + (Target.step_x-step_x)), abs((Target.y-y)*32 + (Target.step_y-step_y))) < warpingStrike*32
+			else
+				inWarp = get_dist(Target, src) < warpingStrike
+			if(inWarp)
+				forcewarp = Target
 	if((forcewarp && Target.z == z && !petal_attacking))
 		if(passive_handler["Flying Thunder God"] && IaidoCounter>=iaidoGaugeMax)
 			new/obj/tracker/FTG_seeker(locate(x,y,z), Target, src) //TODO: make this a normal projectile maybe? does no damage, but throws this, idk that way it can be used as a follow up
@@ -818,6 +824,9 @@
 							if(!glob.MOMENTUM_PROCS_OFF_DAMAGE)
 								handlePostDamage(enemy) // it already proc'd
 							lastHit = world.time
+							//raw damage on purpose - otherDmg doesn't exist yet at spark time
+							var/hitWeight = clamp((damage - glob.HIT_STOP_MIN) / max(1, 14 - glob.HIT_STOP_MIN), 0, 1)
+							enemy?.HitBend(hitWeight, get_dir(src, enemy))
 					// 										MELEE END																	 //
 							var/shocked=0
 							if((SureKB || AttackQueue && QueuedKBAdd()) && !NoKB)
@@ -844,7 +853,8 @@
 									var/hitsparkSword = swordAtk
 								//	if(swordAtk && HasBladeFisting())
 								//		hitsparkSword = 0
-									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, disperseX, disperseY)
+									//HitEffect args are positional - new ones go on the end, passed named
+									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=hitWeight)
 								if(AttackQueue?.PushOut)
 									var/shockwave = AttackQueue.PushOutWaves
 									var/shockSize = AttackQueue.PushOut
@@ -876,7 +886,8 @@
 							var/hitsparkSword = swordAtk
 						//	if(swordAtk && HasBladeFisting())
 						//		hitsparkSword = 0
-							if(!src.petal_attacking) HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
+							//double HitEffect with the queue dispatch above is intentional
+							if(!src.petal_attacking) HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=hitWeight)
 
 
 							if(passive_handler.Get("MonkeyKing"))
@@ -934,7 +945,9 @@
 									var/quakeIntens = otherDmg
 									if(quakeIntens>14)
 										quakeIntens=14
-									enemy?.Earthquake(quakeIntens, -4,4,-4,4)
+									HitStop(src, enemy, quakeIntens)
+									//shake lurches the way the hit lands
+									enemy?.Earthquake(quakeIntens, -4,4,-4,4, 0, get_dir(src, enemy))
 					else
 							//		MISS START  //
 						if(enemy.CheckSpecial("Ultra Instinct"))

@@ -6,15 +6,6 @@
     mouse_opacity = 0
     layer = BACKGROUND_LAYER
 
-/obj/client_plane_master
-    plane = FLOAT_PLANE
-    appearance_flags = PLANE_MASTER | PIXEL_SCALE
-    screen_loc = "LEFT,BOTTOM"
-    mouse_opacity = 1
-    layer = BACKGROUND_LAYER
-
-//i'm ngl i don't know what it does above but probably best to keep it
-
 /obj/dorkness
     icon = 'blackcutin.dmi'
     alpha = 0

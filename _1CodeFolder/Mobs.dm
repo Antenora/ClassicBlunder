@@ -1,12 +1,14 @@
 mob/Players
 	Savable=0
 	Write(savefile/A)
+		PurgeHurtboxDebug() 
 		..()
 		A["x"]<<x
 		A["y"]<<y
 		A["z"]<<z
 	Read(savefile/A)
 		..()
+		PurgeHurtboxDebug() 
 		loc=locate(A["x"],A["y"],A["z"])
 
 	Bump(mob/A)

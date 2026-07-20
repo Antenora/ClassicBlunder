@@ -17,10 +17,13 @@ mob
 				VanishImage(usr)
 				ActiveZanzo=3.9
 			..() //Usual Move() procedure goes through
+			var/zss = step_size
+			step_size = 32 
 			while(ActiveZanzo>0)
 				ActiveZanzo=round(ActiveZanzo)
 				ActiveZanzo--
 				step(src,src.dir)
+			step_size = zss
 			src.dir=Original_Direction//Player retains direction after using Zanzo [Blast Kiting?]
 
 		else
@@ -41,6 +44,9 @@ proc
 		I.transform=m.transform
 		if(!forceloc)
 			I.loc=m.loc
+			if(PmActive())//mid-tile caster: ghost rides the sprite's true position, not the tile origin
+				I.step_x=m.step_x
+				I.step_y=m.step_y
 		else
 			I.loc=forceloc
 		I.dir=m.dir
@@ -54,6 +60,9 @@ proc
 		I.dir = m.dir
 		if(!forceloc)
 			I.loc=m.loc
+			if(PmActive())//mid-tile caster: ghost rides the sprite's true position, not the tile origin
+				I.step_x=m.step_x
+				I.step_y=m.step_y
 		else
 			I.loc=forceloc
 		I.Owner=m
@@ -66,6 +75,9 @@ proc
 		I.dir = m.dir
 		if(!forceloc)
 			I.loc=m.loc
+			if(PmActive())//mid-tile caster: ghost rides the sprite's true position, not the tile origin
+				I.step_x=m.step_x
+				I.step_y=m.step_y
 		else
 			I.loc=forceloc
 		I.Owner=m
@@ -79,6 +91,9 @@ proc
 		I.alpha=200
 		if(!forceloc)
 			I.loc=m.loc
+			if(PmActive())//mid-tile caster: ghost rides the sprite's true position, not the tile origin
+				I.step_x=m.step_x
+				I.step_y=m.step_y
 		else
 			I.loc=forceloc
 		I.Owner=m
@@ -91,6 +106,9 @@ proc
 		I.dir = m.dir
 		if(!forceloc)
 			I.loc=m.loc
+			if(PmActive())//mid-tile caster: ghost rides the sprite's true position, not the tile origin
+				I.step_x=m.step_x
+				I.step_y=m.step_y
 		else
 			I.loc=forceloc
 		I.Owner=m
@@ -151,6 +169,9 @@ proc
 				if(WEST)
 					I.pixel_x=m.pixel_x + (x * 16)
 					I.pixel_y=m.pixel_y + (rand(-8,8))
+			if(PmActive())//vis-child of the turf: fold the sprite's mid-tile offset into pixel coords
+				I.pixel_x+=m.step_x
+				I.pixel_y+=m.step_y
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
@@ -202,6 +223,9 @@ proc
 				if(WEST)
 					I.pixel_x=m.pixel_x + (x * 16)
 					I.pixel_y=m.pixel_y + (rand(-8,8))
+			if(PmActive())//vis-child of the turf: fold the sprite's mid-tile offset into pixel coords
+				I.pixel_x+=m.step_x
+				I.pixel_y+=m.step_y
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
@@ -229,6 +253,9 @@ proc
 			I.dir=m.dir
 			I.pixel_x=m.pixel_x
 			I.pixel_y=m.pixel_y
+			if(PmActive())//vis-child of the turf: fold the sprite's mid-tile offset into pixel coords
+				I.pixel_x+=m.step_x
+				I.pixel_y+=m.step_y
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
@@ -246,6 +273,9 @@ proc
 		I.color=m.color
 		I.transform=m.transform
 		I.loc=m.loc
+		if(PmActive())//recovery burst tracks a mid-tile sprite
+			I.step_x=m.step_x
+			I.step_y=m.step_y
 		I.dir=m.dir
 		I.layer=EFFECTS_LAYER
 		I.pixel_x=m.pixel_x
@@ -473,15 +503,13 @@ proc
 		var/changeY=pick(-8,-4,4,8)
 		if(!A.Dodging)
 			A.Dodging=1
-			if(A.filters.len > 0)
-				if(A.filters[A.filters.len])
-					animate(A.filters[A.filters.len], x=changeX/4, y=changeY/4, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
+			if(A.filters["trail"]) //the motion_blur AppearanceOn puts on every mob - by name, not "whatever's last"
+				animate(A.filters["trail"], x=changeX/4, y=changeY/4, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 			animate(A,pixel_x=changeX, pixel_y=changeY, time=2, flags=ANIMATION_RELATIVE)
 			sleep(2)
 			animate(A,pixel_x=-changeX, pixel_y=-changeY, time=1, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
-			if(A.filters.len > 0) // why
-				if(A.filters[A.filters.len])
-					animate(A.filters[A.filters.len], x=0, y=0, time=1)
+			if(A.filters["trail"])
+				animate(A.filters["trail"], x=0, y=0, time=1)
 			A.Dodging=0
 	Prediction(mob/A)
 		var/changeX=pick(-16,-8,8,16)

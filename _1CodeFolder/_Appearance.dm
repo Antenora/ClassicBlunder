@@ -5,7 +5,7 @@ mob/proc/AppearanceOn()
 	if(!src.appearance_flags||src.appearance_flags<32)
 		src.appearance_flags=32
 
-	src.filters = filter(type="motion_blur", x=0,y=0)
+	src.filters = filter(name="trail", type="motion_blur", x=0,y=0) //named: dodge/rush smear looks it up by name, not by "last filter"
 
 	src.overlays-=src.AFKIcon
 
@@ -40,7 +40,7 @@ mob/proc/AppearanceOn()
 			filters = null
 			filters += filter(type="drop_shadow",x=0,y=0,size=src.ActiveBuff.ManaGlowSize, offset=src.ActiveBuff.ManaGlowSize/2, color=src.ActiveBuff.ManaGlow)
 			GlowFilter = filters[filters.len]
-			filters += filter(type="motion_blur", x=0,y=0)
+			filters += filter(name="trail", type="motion_blur", x=0,y=0)
 
 	if(src.SpecialBuff)
 		if(src.SpecialBuff.IconLock)
@@ -65,7 +65,7 @@ mob/proc/AppearanceOn()
 			filters = null
 			filters += filter(type="drop_shadow",x=0,y=0,size=src.SpecialBuff.ManaGlowSize, offset=src.SpecialBuff.ManaGlowSize/2, color=src.SpecialBuff.ManaGlow)
 			GlowFilter = filters[filters.len]
-			filters += filter(type="motion_blur", x=0,y=0)
+			filters += filter(name="trail", type="motion_blur", x=0,y=0)
 
 	if(src.StanceBuff)
 		if(src.StanceBuff.IconLock)
@@ -114,7 +114,7 @@ mob/proc/AppearanceOn()
 					filters = null
 					filters += filter(type="drop_shadow",x=0,y=0,size=b.ManaGlowSize, offset=b.ManaGlowSize/2, color=b.ManaGlow)
 					GlowFilter = filters[filters.len]
-					filters += filter(type="motion_blur", x=0,y=0)
+					filters += filter(name="trail", type="motion_blur", x=0,y=0)
 
 	for(var/obj/Items/I in src)
 		if(I.suffix=="*Equipped*"||I.suffix=="*Equipped (Second)*"||I.suffix=="*Equipped (Third)*")

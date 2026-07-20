@@ -71,6 +71,7 @@ prob wont do atoggle
 		newGiga.filters += filter(type="drop_shadow",x=0,y=0,size=3,color="green")
 		newGiga.glow_filter = newGiga.filters[newGiga.filters.len]
 		animate(newGiga.glow_filter, offset=0, size = 10, time=30, loop=-1)
+		animate(size = 3, time=30)
 		Using=0
 		last_use = world.time
 		active_ai+=newGiga

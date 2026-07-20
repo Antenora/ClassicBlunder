@@ -4873,9 +4873,10 @@ NEW VARIABLES
 						GG.color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0)
 						GG.alpha=110
 						sleep(5)
-						usr.filters+=filter(type = "blur", size = 0)
+						usr.filters -= "transblur" //dupe filter names stack, clear first
+						usr.filters+=filter(name="transblur", type = "blur", size = 0)
 						animate(usr, color=list(-1.2,-1.2,-1, 1,1,1, -1.4,-1.4,-1.2,  1,1,1), time=3, flags=ANIMATION_END_NOW)
-						animate(usr.filters[usr.filters.len], size = 0.35, time = 3)
+						animate(usr.filters["transblur"], size = 0.35, time = 3)
 						usr.overlays+=GG
 						spawn()DarknessFlash(usr, SetTime=60)
 						sleep()
@@ -4894,7 +4895,7 @@ NEW VARIABLES
 						usr.Quake(60)
 						sleep(20)
 						sleep(10)
-						usr.filters-=filter(type = "blur", ,size = 0.35)
+						usr.filters -= "transblur"
 						animate(usr, color=list(0,0,0, 0,0,0, 0,0,0, 0.5,0.95,1), time=5, easing=QUAD_EASING)
 						sleep(5)
 						animate(usr, color=null, time=20, easing=CUBIC_EASING)
@@ -14340,7 +14341,7 @@ mob
 				filters = null
 				filters += filter(type="drop_shadow",x=0,y=0,size=B.ManaGlowSize, offset=B.ManaGlowSize/2, color=B.ManaGlow)
 				GlowFilter = filters[filters.len]
-				filters += filter(type="motion_blur", x=0,y=0)
+				filters += filter(name="trail", type="motion_blur", x=0,y=0)
 
 			if(B.ArmamentGlow)
 				src.ArmamentGlow = filter(type="drop_shadow",x=0,y=0,size=B.ArmamentGlowSize, offset=B.ArmamentGlowSize/2, color=B.ArmamentGlow)

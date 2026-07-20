@@ -1,7 +1,7 @@
 var/list/PermaKeys=list("Marlin1", "TiltHour", "Dadafas1", "Miscreated", "Toefiejin", "StrangeBanana", "Cool pro", "Ss4toby", "Uwuesketit", "Sarutabaruta", "Pigepic", "WarHorse76", "George Bush Did 911", "Xaithyl", "Yoshima Monomyth", "Naviel", "Greg76", "Sekots", "TienShenhan", "WhatIsOriginality", "Solobb-", "Xerif", "MikaNX", "Tusk Act 4", "Vaina", "ProtoZSX", "Revelution", "Higashikata Josuke", "BDSMLover92", "Justbroli",)
 var/list/PermaIPs=list("143.244.44.185", "73.132.147.113", "74.105.35.124", "81.132.77.65", "64.130.69.214", "65.185.161.235", "108.61.39.115", "75.65.2.4", "24.50.233.176", "50.39.120.226", "135.180.40.74", "86.181.159.231", "45.36.32.84", "198.85.212.230", "74.88.65.98", "76.23.208.95", "66.172.248.64", "185.156.175.35", "136.62.42.182", "68.8.92.94", "109.246.123.195", "24.36.113.151", "67.198.127.237", "82.34.152.124", "121.223.199.102", "174.108.20.140", "179.43.133.139", "174.108.20.140", "73.47.207.244", "71.64.147.189", "70.35.179.6", "69.10.118.103", "86.19.157.156")
 var/list/PermaComps=list("1280524509 ", "566412451", "3488379531", "1990235738", "1662279420", "835666311", "3995897142", "3272450259", "1395820860", "1629772640", "3856341027", "938246607", "975079193", "1526134833", "4102036161", "3446557113", "3878049361", "2311757843", "3649180149", "991955925", "2016627605", "3836126501", "4003197390", "4145629418", "1476716854", "4229503323", "1353023831", "348890025", "308161406", "729772691", "1049091416", "2196626777", "2781360184", "3770567560", "961693842")
-// Runtime CID bans (auto-captured from PermaKeys login), now with persistent Saves/PermaCompsExtra
+// runtime CID bans auto-captured from PermaKeys logins, persisted in Saves/PermaCompsExtra
 var/list/PermaCompsExtra=list()
 var/tmp/list/players = list()
 var/tmp/list/admins = list()
@@ -40,12 +40,7 @@ world
 		spawn(10)
 			BootWorld("Load")
 
-		// The database-build and passive-info procs used to run inline here in world/New(),
-		// but they depend on SkillTree / typesof lookups that are only safely available after
-		// BootWorld("Load") has finished populating the global lists. Run them deferred so
-		// they fire AFTER BootWorld (spawn(10)) and AFTER the nested spawn()MakeSkillTreeList()
-		// inside BootWorld. generateSwapMaps() is also deferred because it does savefile I/O
-		// and can race with other world init writes on BYOND 516.
+		// deferred: these need BootWorld's lists (and MakeSkillTreeList) populated first
 		spawn(30)
 			BuildGeneralMagicDatabase()
 			BuildGeneralWeaponryDatabase()
@@ -370,12 +365,33 @@ mob/proc/Move_Requirements()
 			return 0
 		return 1
 
+// flag render-only ones and strip them from saves
+obj/var/tmp/gfx_transient_visual = 0
+
+obj/proc/PurgeTransientGraphics()
+	var/list/stale = list()
+	for(var/obj/V in vis_contents)
+		if(V.gfx_transient_visual) stale += V
+	for(var/obj/V in stale)
+		vis_contents -= V
+		V.loc = null
+
 obj/Write(savefile/F)
 	var/list/Old_Overlays=new
 	Old_Overlays+=overlays
+	var/list/Old_Transient_Vis = list()
+	for(var/obj/V in vis_contents)
+		if(V.gfx_transient_visual) Old_Transient_Vis += V
 	overlays=null
+	if(Old_Transient_Vis.len) vis_contents -= Old_Transient_Vis
 	..()
 	overlays+=Old_Overlays
+	if(Old_Transient_Vis.len) vis_contents += Old_Transient_Vis
+
+obj/Read(savefile/F)
+	. = ..()
+	PurgeTransientGraphics()
+
 turf/Write(savefile/F)
 	var/list/Old_Overlays=new
 	Old_Overlays+=overlays

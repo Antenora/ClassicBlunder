@@ -113,7 +113,7 @@ mob/Players/verb
 		if(!(world.time > usr.verb_delay+4)) return
 		usr.verb_delay=world.time+1
 
-		if(usr.client.eye == usr) usr.Observing=0
+		if(GfxClientEyeIsMob(usr.client, usr)) usr.Observing=0
 
 		var/mob/m
 
@@ -712,6 +712,7 @@ mob/Players/verb
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		usr.PurgeHurtboxDebug()
 		usr.AppearanceOff()
 		usr.AppearanceOn()
 	Customize_PoweredState_Menu()

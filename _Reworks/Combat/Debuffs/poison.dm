@@ -138,17 +138,16 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 					src.SilentPoisonAmount = max(0, src.SilentPoisonAmount - (reduction * silentFrac))
 				Poison -= reduction
 				if(BlindingVenom && client)
-					if(!client.client_plane_master) // 3 checks lol ! maybe move this to new noob!
-						client.client_plane_master = new()
-						client.screen += client.client_plane_master
-					client.client_plane_master.filters = filter(type="blur", size=BlindingVenom*(Poison/150))
+					client.cpm_blur_size = BlindingVenom*(Poison/150)
+					CpmApply(client)
 			if(Poison<=0)
 				Poison = 0
 				src.SilentPoisonAmount = 0
 				if(BlindingVenom)
 					BlindingVenom=0
-					if(client.client_plane_master)
-						client.client_plane_master.filters = null
+					if(client)
+						client.cpm_blur_size = 0
+						CpmApply(client)
 		if("Frenzy")
 			if(!IsDarkDragonPlayer()) return
 			var/reduction = base * (1 + (GetDebuffResistance() / 4))

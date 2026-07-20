@@ -1,5 +1,4 @@
-// HUD entry prompts, the replacement for input() as num|text.
-// HUDNumPrompt(title, default) and HUDTextPrompt(title, default) block like input() and return the value, null on cancel
+// HUD input() replacement: HUDNumPrompt/HUDTextPrompt block and return the value, null on cancel
 
 #define NP_LAYER (FLY_LAYER + 5)
 #define NP_W 224
@@ -325,18 +324,13 @@ client/proc/NumPromptMacros()
 			for(var/s = 1 to 2)
 				var/key = mob.KeybindKey(a.id, s)
 				if(key && (uppertext(key) in npkeys))
-					ApplyOneBind(set_name, "kb_[a.id]_[s]", "", a.command, a.kind, a.id)
+					KbClearKey(set_name, key)
 		if(mob.shortcuts && mob.shortcuts.keybinds)
 			for(var/sk in mob.shortcuts.keybinds)
 				if(copytext(sk, 1, 6) != "misc:") continue
 				var/key = mob.shortcuts.keybinds[sk]
 				if(!key || !(uppertext(key) in npkeys)) continue
-				var/body = copytext(sk, 6)
-				var/slot = 1
-				if(length(body) > 2 && copytext(body, length(body) - 1) == "@2")
-					slot = 2
-					body = copytext(body, 1, length(body) - 1)
-				ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", "", null, 0, null)
+				KbClearKey(set_name, key)
 	for(var/i = 0 to 9)
 		ApplyOneBind(set_name, "np_d[i]", "[i]", "NumPromptKey [i]", 0, null, 1)
 		ApplyOneBind(set_name, "np_n[i]", "NUMPAD[i]", "NumPromptKey [i]", 0, null, 1)

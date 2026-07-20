@@ -602,6 +602,9 @@ obj/Skills/Grapple
 							step(Q, src.ThrowDir)
 							sleep(1)
 						Q.transform=matrix()
+						if(PmActive()) //snap the tossed object back to tile center
+							Q.step_x=0
+							Q.step_y=0
 						return//dont trigger cd for object interacts
 
 			if(ismob(User.Grab))

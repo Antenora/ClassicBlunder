@@ -681,6 +681,9 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 			Turfs+=C
 		else
 			CustomTurfs+=CT
+		LightingRecomputeNear(get_step(C, 0)) //AFTER all of C's props are set (CustomTurf density/opacity/icon) so a built occluder re-occludes
+	if(ismovable(C))
+		GfxRefreshStructureMetadata(C)
 
 obj/var
 	Saved_X

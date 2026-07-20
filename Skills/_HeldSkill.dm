@@ -526,6 +526,7 @@
 // ChargeLoop runs for the duration of the hold
 
 /mob/proc/ChargeLoop(var/obj/Skills/Z)
+	FxChargeShimmer(src, Z) //heat wavers over the caster while they hold
 	var/last_tick_fire = 0
 	while(held_skill == Z)
 		// Interrupt conditions

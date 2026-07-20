@@ -25,8 +25,7 @@ obj/Skills
 	var/CyberSignature=0 //lets cybernetic mainframes keep the signature
 
 	var/Cooldown
-	/// When set, Cooldown() always prints the on-cooldown line (if announce_cd and cooldownAnnounce), even for short timers.
-	var/AlwaysAnnounceCooldown = 0
+	var/AlwaysAnnounceCooldown = 0 //print the on-cooldown line even for short timers
 	var/CooldownStatic=0
 	var/CooldownScaling=0
 	var/CooldownScalingCounter=0
@@ -1117,7 +1116,7 @@ turf/Click(turf/T)
 							return
 						if(usr.Energy<100)
 							return
-						if(usr.client.eye!=usr)
+						if(!GfxClientEyeIsMob(usr.client, usr))
 							return
 						if(!T.density)
 							VanishImage(usr)

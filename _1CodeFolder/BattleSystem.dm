@@ -683,9 +683,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.Quake(20)
 		src.passive_handler.Increase("DeathDefied", 1)
 		if(src.race && src.race.transformations)
-			// Mazoku humans don't unlock transformations until this point
-			// Slots 1–5 are HT chain, slot 6 is DT, slot 7 (asc 6+) is SEA, order matters
-			// for mazokuActivateHighestHT() and the Gains.dm Mazoku state machine.
+			//slot order matters: 1-5 HT chain, 6 DT, 7 SEA - mazokuActivateHighestHT counts on it
 			src.race.transformations += new /transformation/human/high_tension/mazoku()
 			src.race.transformations += new /transformation/human/high_tension_MAX/mazoku()
 			src.race.transformations += new /transformation/human/super_high_tension/mazoku()
@@ -1936,12 +1934,25 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 				W=get_step(M, opposite_dirs[M.dir])
 			if(W)
 				if(istype(W,/turf/Special/Blank))
-					return
+					continue //a Blank tile can't be landed on; try another dir instead of aborting the teleport
 				if(!W.density)
+					var/occupied = FALSE
 					for(var/atom/x in W)
 						if(x.density)
-							return
+							occupied = TRUE
+							break
+					if(!occupied && PmActive())//a mid-tile bystander straddles into W though its loc sits elsewhere (M excluded: the step-copy keeps a clean 32px gap from it)
+						for(var/mob/m in range(1, W))
+							if(m == src || m == M || !m.density) continue
+							if(abs((m.x-W.x)*32 + m.step_x) < 32 && abs((m.y-W.y)*32 + m.step_y) < 32)
+								occupied = TRUE
+								break
+					if(occupied)
+						continue //a dense atom (often the adjacent caster) blocks THIS tile; try another dir, don't abort the whole teleport
 					src.loc=W
+					if(PmActive())//land on the target's sprite, not its tile origin
+						src.step_x=M.step_x
+						src.step_y=M.step_y
 					src.dir=ReturnDirection(src,M)
 					if(!LightAttack && get_dist(src,M)>1)
 						if(src.AttackQueue && src.AttackQueue.Rapid)
@@ -2014,10 +2025,19 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		P.previousKnockBack = Distance
 
 mob
+	var/tmp/kb_loft = 0
 	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed)
+		if(PmActive()) //tile-quantize before knockback so its get_step wall/edge probes stay accurate and it doesn't rest ~step_x px short
+			src.step_x=0
+			src.step_y=0
 		src.icon_state="KB"
 		src.Knockbacked=Direction
 		src.Knockback=Distance*world.tick_lag
+		//heavy sends pop the victim into a low arc; the world shadow shrinks under them so it reads as airtime
+		var/w = min(Distance / glob.MAX_KB_TIME, 1)
+		if(w >= glob.KB_LOFT_MIN && !src.Flying && !src.Launched && !src.pixel_z)
+			src.kb_loft = 1
+			animate(src, pixel_z = round(4 + glob.KB_LOFT_PX * w), time = 3, easing = SINE_EASING|EASE_OUT)
 		spawn()
 			while(src.Knockback)
 				src.ContinueKB(Ki)
@@ -2056,19 +2076,23 @@ mob
 		if(src.Knockback<0)
 			src.Knockback=0
 	proc/StopKB(var/DustBlock=0)
+		//generic state-clear callers arrive with this already null, so they don't fire Landfalls
+		var/wasKB = src.Knockbacked
 		if(!src.KO)
 			src.icon_state=""
 		else
 			src.icon_state="KO"
 		src.Knockbacked=null
 		src.Knockback=null
+		if(src.kb_loft) //bring the arc down; animate commits pixel_z=0 instantly so the Landfall gate below still passes
+			src.kb_loft = 0
+			animate(src, pixel_z = 0, time = 2, easing = SINE_EASING|EASE_IN)
 		if(src.Dunked)
 			spawn()
 				Crater(src,round(1+Dunked))
 			src.Dunked=0
-		else if(prob(20)&&src.pixel_z==0&&!DustBlock)
-			Dust(src.loc)
-			Dust(src.loc)
+		else if(wasKB&&src.pixel_z==0&&!DustBlock)
+			Landfall(src, min(previousKnockBack / glob.MAX_KB_TIME, 1)) //dust scales with how hard you were sent
 
 /var/tmp/lastGrabUsage=0
 
@@ -2087,7 +2111,7 @@ mob/proc/Grab()
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Grab"))
 				extraTiles += secretDatum?:getBoon(src, "Grab")
 			src.DashTo(src.Target, 2 + passive_handler.Get("Scoop"))
-			if(src.Target in oview(1, src))
+			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
 				src.Grab_Mob(src.Target)
 			for(var/obj/Skills/Grab/g in src)
 				g.Cooldown(2)
@@ -2237,6 +2261,9 @@ mob/proc/Grab_Update()
 	if(src.Grab)
 		Grab.grabbed = src
 		src.Grab.loc=src.loc
+		if(PmActive())//grabbed victim rides the grabber's mid-tile sprite, not the tile origin
+			src.Grab.step_x=src.step_x
+			src.Grab.step_y=src.step_y
 		if(isAI(Grab)&&!Grab.KO)
 			var/grabbing = Grab
 			spawn(60)
@@ -2245,6 +2272,9 @@ mob/proc/Grab_Update()
 		if(ismob(Grab))
 			if(src.Grab.Grab)
 				src.Grab.Grab.loc=Grab.loc
+				if(PmActive())//chain-grabbed victim rides the middle link's offset (set just above)
+					src.Grab.Grab.step_x=Grab.step_x
+					src.Grab.Grab.step_y=Grab.step_y
 			if(src.Grab.Knockbacked||src.Knockbacked)
 				src.Grab_Release()
 		if(src.KO)
