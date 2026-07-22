@@ -13,7 +13,8 @@ globalTracker
 		MOB_BOUND_SCALE = 1.0 //tightness of the body box: 1.0 = hugs the opaque body exactly (mobs touch, never overlap); <1 = a little body overlap for tighter packing
 		PIXEL_MOB_HURTBOX = 1 //mob-vs-mob stops on the measured body, turfs/objs not affected 0 = off
 		MOB_HURT_SCALE = 1.0 //1.0 = bodies touch exactly; <1 lets bodies overlap a little
-		MOB_REACH_PAD = 2 //px of melee past the body edge, oversized bodies only; 2 covers float truncation, 32 = old full-tile reach
+		MOB_REACH_PAD = 2 //px of melee past the body edge; 2 covers float truncation, 32 = old full-tile reach
+		MELEE_DEBUG = FALSE //swing prints from getEnemies, toggled by the admin verb
 		MOB_INK_COLLIDE = 0 //oversized bodies block/get reached on their per-row ink strips, not the dir-union box; 0 = old AABB
 
 proc/PmActive()
@@ -324,17 +325,23 @@ mob/proc/InBodyReach(mob/O, extra = 0)
 	ApplyHurtbox()
 	O.ApplyHurtbox()
 	if(hurt_w <= 0 || O.hurt_w <= 0) return FALSE //unmeasured: the caller's tile check stands
-	if(!HurtOversized() && !O.HurtOversized()) return FALSE //both fit their tile: leave today's reach alone
+	//facing gate: their body center vs mine on the axis I'm looking down; diagonals pass on either bit
+	var/mcx = HurtL() + hurt_w / 2
+	var/mcy = HurtB() + hurt_h / 2
+	var/ocx = O.HurtL() + O.hurt_w / 2
+	var/ocy = O.HurtB() + O.hurt_h / 2
+	var/facing = FALSE
+	if(dir & NORTH && ocy > mcy) facing = TRUE
+	if(dir & SOUTH && ocy < mcy) facing = TRUE
+	if(dir & EAST && ocx > mcx) facing = TRUE
+	if(dir & WEST && ocx < mcx) facing = TRUE
+	if(!facing) return FALSE
 	//floor 1: the clamp parks you at gap exactly 0 and the test is strict <, so pad 0 can't hit a flush body
 	var/pad = max(1, glob ? glob.MOB_REACH_PAD : 6) + extra
-	var/al = HurtL()
-	var/ab = HurtB()
-	var/ar = al + hurt_w
-	var/at = ab + hurt_h
-	if(dir & NORTH) at += pad //grows only where I face, so this never reaches through the back of my head
-	if(dir & SOUTH) ab -= pad
-	if(dir & EAST)  ar += pad
-	if(dir & WEST)  al -= pad
+	var/al = HurtL() - pad
+	var/ab = HurtB() - pad
+	var/ar = HurtL() + hurt_w + pad
+	var/at = HurtB() + hurt_h + pad
 	if(O.hurt_spans && glob.MOB_INK_COLLIDE) //the same strips the clamp stops on: reach can't fall short of it
 		return HurtInkTouch(O, al, ab, ar - al, at - ab)
 	return (al < O.HurtL() + O.hurt_w) && (O.HurtL() < ar) && (ab < O.HurtB() + O.hurt_h) && (O.HurtB() < at)

@@ -51,7 +51,7 @@ client
 
 mob
 	casts_contact_shadow = 1
-	gfx_directional_response = 0 //the full-sprite additive copy reads as a phantom double on characters
+	gfx_directional_response = 0.32
 	standing = TRUE
 	var/tmp/_gfx_reflection_cardinal_dir = SOUTH
 
@@ -536,11 +536,19 @@ proc/GfxMaterialLight(atom/movable/A)
 	return list(best_dx, best_dy, clamp(best_strength, 0, 1), best_color, key)
 
 proc/GfxEnsureMaterialHighlight(atom/movable/A)
-	if(!A || A.gfx_directional_response <= 0 || !A.icon || !get_turf(A)) return
+	if(!A) return
+	if(A.gfx_directional_response <= 0 || !A.icon || !get_turf(A) || (glob && glob.DBG_NO_HIGHLIGHT))
+		GfxClearMaterialHighlight(A)
+		return
 	var/list/L = GfxMaterialLight(A)
 	if(!L)
 		GfxClearMaterialHighlight(A)
 		return
+	//sweep untracked strays
+	for(var/obj/gfx_material_highlight/stray in A.vis_contents)
+		if(stray != A.gfx_material_highlight)
+			A.vis_contents -= stray
+			stray.loc = null
 	if(!A.gfx_material_highlight)
 		var/obj/gfx_material_highlight/H = new
 		H.owner = A
@@ -581,7 +589,7 @@ proc/GfxFindReflectionSurface(atom/movable/A, radius = 2)
 	return best
 
 proc/GfxEnsureEmissiveReflection(atom/movable/A)
-	if(!A || A.gfx_emissive_strength <= 0 || !A.icon)
+	if(!A || A.gfx_emissive_strength <= 0 || !A.icon || (glob && glob.DBG_NO_GLINT))
 		GfxClearEmissiveReflection(A)
 		return
 	var/turf/surface = GfxFindReflectionSurface(A)
@@ -623,7 +631,11 @@ proc/GfxReflectionPulse(turf/source, size = 1, color = "#ffffff")
 
 proc/GfxRefreshMaterialVisuals(atom/movable/A)
 	if(!A) return
-	if(A.gfx_emissive_strength > 0 && A.icon)
+	if(A.gfx_emissive_strength > 0 && A.icon && !(glob && glob.DBG_NO_EMISSIVE))
+		for(var/obj/gfx_emissive_copy/stray in A.vis_contents)
+			if(stray != A.gfx_emissive_copy)
+				A.vis_contents -= stray
+				stray.loc = null
 		if(!A.gfx_emissive_copy)
 			var/obj/gfx_emissive_copy/E = new
 			E.owner = A
@@ -665,8 +677,18 @@ proc/GfxClearMaterialVisuals(atom/movable/A)
 	GfxClearEmissiveReflection(A)
 
 proc/GfxEnsureContactShadow(atom/movable/A)
-	if(!A || !A.casts_contact_shadow || !A.icon || !get_turf(A)) return
+	if(!A) return
+	if(glob && glob.DBG_NO_CONTACT)
+		GfxClearContactShadow(A)
+		return
+	if(!A.casts_contact_shadow || !A.icon || !get_turf(A)) return
 	_GfxDepthBuildIcons()
+	//sweep untracked strays
+	for(var/obj/gfx_contact_shadow/stray in A.vis_contents)
+		if(stray != A.gfx_contact_shadow)
+			A.vis_contents -= stray
+			_gfx_contact_objs -= stray
+			stray.loc = null
 	if(!A.gfx_contact_shadow)
 		var/obj/gfx_contact_shadow/S = new
 		S.owner = A

@@ -131,7 +131,6 @@ proc/ComputeLightShadows(mob/M)
 		..(null) //no loc - lives in the mob's vis_contents, not its contents
 		owner = o
 		appearance_flags |= KEEP_TOGETHER
-		alpha = 0 //invisible until the first Configure tints+projects: a raw pool copy is a phantom double
 
 	//refresh only when the owner's look or shown facing changes
 	proc/RebuildSilhouette()

@@ -801,7 +801,9 @@ client/proc/ScrollTrackTo(params)
 
 // real sig is 6 args. use only the sign, the OS reports big magnitudes (120/notch)
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
-	if(AdminWheelScroll(delta_y))  
+	if(AdminWheelScroll(delta_y))
+		return
+	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)  
 		return
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return

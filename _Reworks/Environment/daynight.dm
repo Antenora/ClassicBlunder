@@ -9,7 +9,7 @@ globalTracker
 		DAY_NIGHT = TRUE 
 		DN_CYCLE_MINUTES = 120 //full day length in real minutes
 		//multiply-reveal: darkness moves into the lighting buffer and the relay multiplies it back; off = classic additive
-		MULTIPLY_REVEAL = FALSE
+		MULTIPLY_REVEAL = TRUE
 		LIGHT_CAVE_COLOR = "#2b2b33" //opaque cave base under multiply-reveal
 		//full-moon cold override
 		MOON_EVENT = TRUE
@@ -256,6 +256,7 @@ proc/_DnLoop()
 	_DnApplyMode() //move ambient darkness between plane-0 blanket and the plane-2 buffer
 	for(var/client/C) //flip every client's relay so the buffer multiplies (ON) or adds (OFF)
 		if(C.fxlight_relay) FxApplyRelayBlend(C)
+	FxEmissiveApplyMode() //re-seat emissive stamps for the new mode
 	if(glob.LIGHTING) LightingApplyAll()
 	src << "Multiply-reveal lighting: [glob.MULTIPLY_REVEAL ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set multiply-reveal to [glob.MULTIPLY_REVEAL].")

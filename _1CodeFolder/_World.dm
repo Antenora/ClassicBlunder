@@ -368,7 +368,7 @@ mob/proc/Move_Requirements()
 // flag render-only ones and strip them from saves
 obj/var/tmp/gfx_transient_visual = 0
 
-obj/proc/PurgeTransientGraphics()
+atom/movable/proc/PurgeTransientGraphics()
 	var/list/stale = list()
 	for(var/obj/V in vis_contents)
 		if(V.gfx_transient_visual) stale += V
@@ -391,6 +391,29 @@ obj/Write(savefile/F)
 obj/Read(savefile/F)
 	. = ..()
 	PurgeTransientGraphics()
+
+mob/Write(savefile/F)
+	var/list/Old_Transient_Vis = list()
+	for(var/obj/V in vis_contents)
+		if(V.gfx_transient_visual) Old_Transient_Vis += V
+	if(Old_Transient_Vis.len) vis_contents -= Old_Transient_Vis
+	..()
+	if(Old_Transient_Vis.len) vis_contents += Old_Transient_Vis
+
+mob/Read(savefile/F)
+	. = ..()
+	GfxResetTransientVisuals()
+
+//purge saved-in strays and forget the trackers so every visual system rebuilds clean
+mob/proc/GfxResetTransientVisuals()
+	PurgeTransientGraphics()
+	if(shadow_pool)
+		for(var/obj/fx_worldshadow/s in shadow_pool)
+			_shadow_objs -= s
+		shadow_pool = null
+	gfx_contact_shadow = null
+	gfx_emissive_copy = null
+	gfx_material_highlight = null
 
 turf/Write(savefile/F)
 	var/list/Old_Overlays=new

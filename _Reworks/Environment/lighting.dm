@@ -2,6 +2,10 @@
 
 #define LIGHT_OVERLAY_LAYER 6.55 //above the day/night blanket (6.5), below weather/HUD
 
+//emissive reveal tiers
+#define EMISSIVE_REVEAL 1 //sprite draws at full color through darkness
+#define EMISSIVE_GLOW 2 //reveal + soft halo, scaled by the clock
+
 turf/var/blocks_light = 0 //occluder flag for walls that aren't the 'Walls.dmi' tree
 
 turf/MidgarTiles
@@ -17,12 +21,16 @@ turf/Special/Midgar_IchorWall/blocks_light = 1
 
 globalTracker
 	var/tmp
-		LIGHTING = FALSE //master switch
+		LIGHTING = TRUE //master switch
 		LIGHT_DEFAULT_RADIUS = 6
 		LIGHT_DEFAULT_COLOR = "#ffcf9e" //warm torch
 		LIGHT_MAX_ALPHA = 170 //additive strength at the source
 		LIGHT_DAY_STRENGTH = 0.10 //present but deliberately subtle under full daylight
 		LIGHT_BLUR = 10 //blur size on the lighting plane master - smooths the per-tile grid
+		EMISSIVES = TRUE //tagged props (fire, glow decor) punch through darkness at full color
+		CORNER_LIGHTS = TRUE //bilinear corner gradients; off = legacy flat tiles + plane blur
+		UNIFIED_LIGHTS = TRUE //smooth texture + KT-masked shadows + analytic spill wedges
+		UNI_MASK_BLUR = 6 //softness of the room-mask stamp edges inside each light's composite
 		FLICKER_MIN = 95 //flame-glow alpha low (waver floor)
 		FLICKER_MAX = 195 //flame-glow alpha high (waver ceiling)
 		//occluded blast lights: big/slow blasts cast a wall-blocked light while flying, capped + throttled
@@ -48,6 +56,7 @@ var/_light_fov_cells = 0
 	var/lcolor = "#ffcf9e"
 	var/maxalpha = 170
 	var/list/applied //turf -> the additive overlay image we put on it
+	var/list/uni_objs //unified renderer: the light's composite + spill objects
 	var/list/reflection_applied //reflective turf -> pooled-looking glint image on reflection plane
 	var/list/visible_turfs //cached occlusion geometry; dusk/dawn repaints do not raycast again
 	var/geometry_key
@@ -231,6 +240,256 @@ proc/GfxPaintLightReflections(datum/lightsource/L, list/visible, turf/s, light_s
 		L.reflection_applied[T] = I
 		if(--cap <= 0) break
 
+//corner-gradient lighting
+var/icon/_corner_light_icon
+proc/CornerLightIcon()
+	if(_corner_light_icon) return _corner_light_icon
+	var/icon/I = new('sandstorm.dmi')
+	for(var/py = 1, py <= 32, py++)
+		var/fy = (py - 0.5) / 32 //icon y runs bottom-up: fy 1 = north
+		for(var/px = 1, px <= 32, px++)
+			var/fx = (px - 0.5) / 32
+			I.DrawBox(rgb(round(255 * (1 - fx) * fy), round(255 * fx * fy), round(255 * (1 - fx) * (1 - fy))), px, py)
+	_corner_light_icon = I
+	return I
+
+proc/_LightColorVec(c) //"#rrggbb" -> r,g,b fractions
+	if(!istext(c)) return list(1, 1, 1)
+	return list(text2num(copytext(c, 2, 4), 16) / 255, text2num(copytext(c, 4, 6), 16) / 255, text2num(copytext(c, 6, 8), 16) / 255)
+
+proc/_LightCornerPaint(datum/lightsource/L, turf/s, list/visible, lightStrength)
+	var/a = round(255 * lightStrength)
+	if(a < 3) return
+	var/icon/CI = CornerLightIcon()
+	var/rr = L.radius
+	var/scale = L.maxalpha / 255
+	var/list/cvec = _LightColorVec(L.lcolor)
+	var/cr = cvec[1] * scale
+	var/cg = cvec[2] * scale
+	var/cb = cvec[3] * scale
+	//pass 1: corner brightness at every lattice point touching a visible turf
+	var/list/corner = list()
+	for(var/turf/T in visible)
+		for(var/cy = T.y, cy <= T.y + 1, cy++)
+			for(var/cx = T.x, cx <= T.x + 1, cx++)
+				var/key = "[cx]:[cy]"
+				if(corner[key] != null) continue
+				var/ddx = cx - 0.5 - s.x
+				var/ddy = cy - 0.5 - s.y
+				var/f = 1 - sqrt(ddx * ddx + ddy * ddy) / (rr + 0.5)
+				corner[key] = f > 0 ? f * f : 0 //same edge curve as the flat path
+	//pass 2: one gradient image per visible turf
+	for(var/turf/T in visible)
+		var/iSW = corner["[T.x]:[T.y]"]
+		var/iSE = corner["[T.x + 1]:[T.y]"]
+		var/iNW = corner["[T.x]:[T.y + 1]"]
+		var/iNE = corner["[T.x + 1]:[T.y + 1]"]
+		if(iSW <= 0.01 && iSE <= 0.01 && iNW <= 0.01 && iNE <= 0.01) continue
+		var/image/ov = image(CI, T)
+		ov.blend_mode = BLEND_ADD
+		ov.color = list(\
+			(iNW - iSE) * cr, (iNW - iSE) * cg, (iNW - iSE) * cb, 0,\
+			(iNE - iSE) * cr, (iNE - iSE) * cg, (iNE - iSE) * cb, 0,\
+			(iSW - iSE) * cr, (iSW - iSE) * cg, (iSW - iSE) * cb, 0,\
+			0, 0, 0, 1,\
+			iSE * cr, iSE * cg, iSE * cb, 0)
+		ov.alpha = a
+		if(glob.MULTIPLY_REVEAL)
+			ov.plane = BASE_LIGHTING_PLANE //straight into the *fxbase merge, unblurred
+			ov.layer = 6.6
+		else
+			ov.plane = 0 //direct draw above the 6.5 blanket; the blurred buffer would mush the gradient
+			ov.layer = LIGHT_OVERLAY_LAYER
+		ov.appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_APART
+		T.overlays += ov
+		L.applied[T] = ov
+
+var/icon/_uni_edge_icon //32px black strip, alpha ramps across Y: dark half +y
+
+proc/UniEdgeIcon()
+	if(_uni_edge_icon) return _uni_edge_icon
+	var/icon/I = new('sandstorm.dmi')
+	for(var/py = 1, py <= 32, py++)
+		var/a = clamp(round((py - 14) / 4 * 255), 0, 255)
+		for(var/px = 1, px <= 32, px++)
+			I.DrawBox(rgb(0, 0, 0, a), px, py)
+	_uni_edge_icon = I
+	return I
+
+//angular occlusion silhouette
+proc/UniFindEdges(datum/lightsource/L, turf/s)
+	var/list/walls = list()
+	var/rr = L.radius
+	for(var/turf/T in block(locate(max(1, s.x - rr), max(1, s.y - rr), s.z),
+	                        locate(min(world.maxx, s.x + rr), min(world.maxy, s.y + rr), s.z)))
+		if(IsLightOccluder(T) && T != s) walls += T
+	if(!walls.len) return null
+	var/turf/W0 = walls[1]
+	var/cut = arctan(W0.x + 0.5 - (s.x + 0.5), W0.y + 0.5 - (s.y + 0.5))
+	var/list/iv = list() //each: list(a1, a2, c1x, c1y, c2x, c2y, wx, wy)
+	for(var/turf/T in walls)
+		var/list/angs = list()
+		for(var/ci = 0, ci <= 3, ci++)
+			var/cx = T.x + (ci & 1)
+			var/cy = T.y + (ci >> 1)
+			var/ang = arctan(cx - (s.x + 0.5), cy - (s.y + 0.5)) - cut
+			while(ang < 0) ang += 360
+			while(ang >= 360) ang -= 360
+			angs += list(list(ang, cx, cy))
+		var/a_min = 99999
+		var/a_max = -99999
+		var/dmin = 99999
+		var/dmax = 99999
+		var/list/cmin; var/list/cmax
+		for(var/list/A in angs)
+			var/d2 = (A[2] - (s.x + 0.5)) * (A[2] - (s.x + 0.5)) + (A[3] - (s.y + 0.5)) * (A[3] - (s.y + 0.5))
+			if(A[1] < a_min - 0.01 || (abs(A[1] - a_min) <= 0.01 && d2 < dmin)) //colinear ties: nearer corner
+				a_min = A[1]
+				dmin = d2
+				cmin = A
+			if(A[1] > a_max + 0.01 || (abs(A[1] - a_max) <= 0.01 && d2 < dmax))
+				a_max = A[1]
+				dmax = d2
+				cmax = A
+		//row: a1, a2, start corner + ITS wall, end corner + ITS wall (walls tracked per endpoint)
+		if(a_max - a_min <= 180)
+			iv += list(list(a_min, a_max, cmin[2], cmin[3], T.x, T.y, cmax[2], cmax[3], T.x, T.y))
+		else //tile straddles the cut: split into a low piece [0..] and a high piece [..360]
+			var/lo_max = -99999; var/list/lo_c
+			var/hi_min = 99999; var/list/hi_c
+			for(var/list/A in angs)
+				if(A[1] < 180)
+					if(A[1] > lo_max)
+						lo_max = A[1]
+						lo_c = A
+				else
+					if(A[1] < hi_min)
+						hi_min = A[1]
+						hi_c = A
+			if(lo_c) iv += list(list(0, lo_max, lo_c[2], lo_c[3], T.x, T.y, lo_c[2], lo_c[3], T.x, T.y))
+			if(hi_c) iv += list(list(hi_min, 360, hi_c[2], hi_c[3], T.x, T.y, hi_c[2], hi_c[3], T.x, T.y))
+	if(!iv.len) return null
+	//insertion sort by start angle
+	for(var/i = 2, i <= iv.len, i++)
+		var/list/cur = iv[i]
+		var/j = i - 1
+		while(j >= 1)
+			var/list/prev = iv[j]
+			if(prev[1] <= cur[1]) break
+			iv[j + 1] = prev
+			j--
+		iv[j + 1] = cur
+	//merge overlapping blocked intervals; each endpoint keeps its own corner + wall
+	var/list/merged = list()
+	var/list/acc = iv[1].Copy()
+	for(var/i = 2, i <= iv.len, i++)
+		var/list/nxt = iv[i]
+		if(nxt[1] <= acc[2] + 0.5) //overlap/touch: extend, keep the farther end corner + wall
+			if(nxt[2] > acc[2])
+				acc[2] = nxt[2]
+				acc[7] = nxt[7]
+				acc[8] = nxt[8]
+				acc[9] = nxt[9]
+				acc[10] = nxt[10]
+		else
+			merged += list(acc)
+			acc = nxt.Copy()
+	merged += list(acc)
+	//every merged-interval endpoint bordering a real gap (>= 6 deg) casts one straight
+	//penumbra line through its silhouette corner (the hull extreme is the graze point)
+	var/list/out = list()
+	for(var/i = 1, i <= merged.len, i++)
+		var/list/A = merged[i]
+		var/list/B = merged[(i % merged.len) + 1]
+		var/gap_start = A[2]
+		var/gap_end = (i == merged.len) ? B[1] + 360 : B[1]
+		var/span = gap_end - gap_start
+		if(span < 6) continue //crack between wall runs: stamps cover it
+		var/e1x = A[7]; var/e1y = A[8] //end corner of A: blocked side is decreasing angle
+		var/e2x = B[3]; var/e2y = B[4] //start corner of B: blocked side is increasing angle
+		out += list(list(arctan(e1x - (s.x + 0.5), e1y - (s.y + 0.5)), sqrt((e1x - (s.x + 0.5)) * (e1x - (s.x + 0.5)) + (e1y - (s.y + 0.5)) * (e1y - (s.y + 0.5))), -1))
+		out += list(list(arctan(e2x - (s.x + 0.5), e2y - (s.y + 0.5)), sqrt((e2x - (s.x + 0.5)) * (e2x - (s.x + 0.5)) + (e2y - (s.y + 0.5)) * (e2y - (s.y + 0.5))), 1))
+	return out.len ? out : null
+
+proc/UniPaintLight(datum/lightsource/L, turf/s, list/visible, lightStrength)
+	var/a = round(L.maxalpha * lightStrength)
+	if(a < 3) return
+	if(!_fx_glow_icon) _FxBuildIcons()
+	if(!_fx_glow_icon) return
+	var/rr = L.radius
+	var/scale = rr * 2 * 32 / 64 //radial overlay: 64px glow icon out to the light radius
+	L.uni_objs = list()
+	var/list/vis = list()
+	for(var/turf/T in visible) vis[T] = 1
+	//interior unit: untransformed anchor so stamp offsets stay in exact world pixels
+	var/obj/gfx_uni_light/U = new(s)
+	U.color = L.lcolor
+	U.alpha = a
+	if(glob.UNI_MASK_BLUR > 0)
+		U.filters = filter(type = "blur", size = glob.UNI_MASK_BLUR)
+	var/image/R = image(_fx_glow_icon)
+	R.transform = matrix() * scale
+	R.pixel_x = -16
+	R.pixel_y = -16
+	R.layer = 1
+	R.appearance_flags = RESET_COLOR | RESET_ALPHA
+	U.overlays += R
+	//penumbra lines first: stamps near a line yield to its gradient strip
+	var/list/edges = UniFindEdges(L, s)
+	//shadow stamps: every non-visible floor tile in the disc; walls skip (band glow stays)
+	for(var/ty = max(1, s.y - rr), ty <= min(world.maxy, s.y + rr), ty++)
+		for(var/tx = max(1, s.x - rr), tx <= min(world.maxx, s.x + rr), tx++)
+			var/turf/T = locate(tx, ty, s.z)
+			if(!T || vis[T] || IsLightOccluder(T)) continue
+			var/ddx = tx - s.x
+			var/ddy = ty - s.y
+			if(ddx * ddx + ddy * ddy > rr * rr) continue
+			var/near_line = FALSE
+			if(edges)
+				for(var/list/E in edges)
+					var/along = ddx * cos(E[1]) + ddy * sin(E[1])
+					if(along < E[2] - 1) continue
+					var/perp = ddy * cos(E[1]) - ddx * sin(E[1])
+					if(abs(perp) < 1.0)
+						near_line = TRUE
+						break
+			if(near_line) continue //the strip's gradient owns this tile
+			var/image/S = image(EnvWhiteIcon())
+			S.color = "#000000"
+			S.blend_mode = BLEND_MULTIPLY
+			S.pixel_x = ddx * 32
+			S.pixel_y = ddy * 32
+			S.layer = 2
+			S.appearance_flags = RESET_COLOR | RESET_ALPHA
+			U.overlays += S
+	//the strips: one rotated gradient per silhouette ray, dark side facing the shadow
+	if(edges)
+		for(var/list/E in edges)
+			var/elen = rr - E[2] + 1
+			if(elen < 0.6) continue
+			var/image/G = image(UniEdgeIcon())
+			G.blend_mode = BLEND_MULTIPLY
+			G.layer = 3
+			G.appearance_flags = RESET_COLOR | RESET_ALPHA
+			var/matrix/ME = matrix()
+			ME.Scale(elen, E[3] * 2.2)
+			ME.Turn(-E[1])
+			var/ct = E[2] - 0.3 + elen / 2
+			ME.Translate(cos(E[1]) * ct * 32, sin(E[1]) * ct * 32)
+			G.transform = ME
+			U.overlays += G
+	L.uni_objs += U
+
+/obj/gfx_uni_light
+	gfx_transient_visual = 1
+	mouse_opacity = 0
+	blend_mode = BLEND_ADD
+	plane = BASE_LIGHTING_PLANE
+	layer = 6.6
+	appearance_flags = KEEP_TOGETHER | KEEP_APART
+	pixel_x = 0
+	pixel_y = 0
+
 //compute + paint a light's occluded footprint
 proc/LightCompute(datum/lightsource/L)
 	LightClear(L)
@@ -245,26 +504,35 @@ proc/LightCompute(datum/lightsource/L)
 	L.applied = list()
 	var/rr = L.radius
 	var/list/visible = LightBuildVisibility(L, s)
-	for(var/turf/T in visible)
-		var/ddx = T.x - s.x
-		var/ddy = T.y - s.y
-		var/d = sqrt(ddx * ddx + ddy * ddy)
-		var/falloff = 1 - (d / (rr + 0.5))
-		falloff *= falloff //smooth edge
-		var/a = round(L.maxalpha * falloff * lightStrength)
-		if(a < 3) continue
-		var/image/ov = image(EnvWhiteIcon(), T)
-		ov.blend_mode = BLEND_ADD
-		ov.color = L.lcolor
-		ov.alpha = a
-		ov.layer = LIGHT_OVERLAY_LAYER
-		ov.plane = LIGHTING_PLANE //rendered + blurred by the lighting plane master, then relayed
-		ov.appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_APART
-		T.overlays += ov
-		L.applied[T] = ov
+	if(glob.UNIFIED_LIGHTS)
+		UniPaintLight(L, s, visible, lightStrength)
+	else if(glob.CORNER_LIGHTS)
+		_LightCornerPaint(L, s, visible, lightStrength)
+	else
+		for(var/turf/T in visible)
+			var/ddx = T.x - s.x
+			var/ddy = T.y - s.y
+			var/d = sqrt(ddx * ddx + ddy * ddy)
+			var/falloff = 1 - (d / (rr + 0.5))
+			falloff *= falloff //smooth edge
+			var/a = round(L.maxalpha * falloff * lightStrength)
+			if(a < 3) continue
+			var/image/ov = image(EnvWhiteIcon(), T)
+			ov.blend_mode = BLEND_ADD
+			ov.color = L.lcolor
+			ov.alpha = a
+			ov.layer = LIGHT_OVERLAY_LAYER
+			ov.plane = LIGHTING_PLANE //rendered + blurred by the lighting plane master, then relayed
+			ov.appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_APART
+			T.overlays += ov
+			L.applied[T] = ov
 	GfxPaintLightReflections(L, visible, s, lightStrength)
 
 proc/LightClear(datum/lightsource/L)
+	if(L && L.uni_objs)
+		for(var/obj/O in L.uni_objs)
+			O.loc = null //refcount-free, never del
+		L.uni_objs = null
 	if(L && L.applied)
 		for(var/turf/T in L.applied)
 			if(T) T.overlays -= L.applied[T]
@@ -401,6 +669,118 @@ proc/FlameFlicker(obj/flamelight/F)
 		animate(F, alpha = na, time = rand(2, 4))
 		sleep(rand(2, 5))
 
+//emissive reveal: a vis child that keeps the sprite at full color through darkness
+//MR ON = white silhouette added into the unblurred base buffer (multiply-by-white reveals)
+//MR OFF = fullbright copy redrawn above the plane-0 blanket
+obj/var/emissive_tier = 0 //set per type or per map instance; boot sweep picks up tagged props
+obj/var/tmp/obj/gfx_emissive/attached_emissive
+
+var/list/_gfx_emissives = list() //child -> owner prop
+var/list/_fx_emissive_white
+
+/obj/gfx_emissive
+	vis_flags = VIS_INHERIT_ICON | VIS_INHERIT_ICON_STATE | VIS_INHERIT_DIR
+	appearance_flags = KEEP_APART //a KEEP_TOGETHER parent would flatten the stamp off its plane
+	gfx_transient_visual = 1
+	mouse_opacity = 0
+	var/tmp/obj/fx_lightglow/halo
+
+proc/FxEmissiveWhite() //constant-row matrix: every visible pixel -> pure white, alpha kept
+	if(!_fx_emissive_white) _fx_emissive_white = list(0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,1, 1,1,1,0)
+	return _fx_emissive_white
+
+proc/FxEmissiveConfig(obj/gfx_emissive/E, obj/O)
+	if(!E) return
+	if(glob && glob.MULTIPLY_REVEAL)
+		E.plane = BASE_LIGHTING_PLANE 
+		E.layer = 6.56
+		E.blend_mode = BLEND_ADD
+		E.color = FxEmissiveWhite()
+	else
+		E.plane = 0
+		E.layer = 6.52 //above the 6.5 blanket, below the 6.55 glows
+		E.blend_mode = BLEND_OVERLAY
+		E.color = (O && istext(O.color)) ? O.color : null //keep mapper tints on the redraw
+	E.alpha = (glob && glob.EMISSIVES) ? 255 : 0
+
+proc/PurgeStaleEmissives(atom/movable/O)
+	if(!O) return
+	var/list/stale = list()
+	for(var/obj/gfx_emissive/E in O.vis_contents)
+		stale += E
+	for(var/obj/gfx_emissive/E in stale)
+		_gfx_emissives -= E
+		O.vis_contents -= E
+		E.loc = null
+
+proc/FxEmissiveAttach(obj/O, tier = 0)
+	if(!O || O.attached_emissive) return
+	if(!get_turf(O)) return //build-panel phantom guard, same as the light props
+	if(tier) O.emissive_tier = tier
+	if(!O.emissive_tier) return
+	PurgeStaleEmissives(O)
+	var/obj/gfx_emissive/E = new
+	FxEmissiveConfig(E, O)
+	O.vis_contents += E
+	O.attached_emissive = E
+	_gfx_emissives[E] = O
+	if(O.emissive_tier >= EMISSIVE_GLOW)
+		if(!_fx_glow_icon) _FxBuildIcons()
+		if(_fx_glow_icon)
+			var/obj/fx_lightglow/H = new
+			H.icon = _fx_glow_icon
+			H.color = FxIconColor(O.icon, O.icon_state) || "#cfe4ff"
+			H.alpha = 0 //the loop fades it with the clock
+			H.transform = matrix() * 0.8
+			H.pixel_x = -16
+			H.pixel_y = -16
+			if(glob && glob.MULTIPLY_REVEAL) H.plane = LIGHTING_PLANE
+			O.vis_contents += H
+			E.halo = H
+
+proc/FxEmissiveDetach(obj/O)
+	if(!O || !O.attached_emissive) return
+	var/obj/gfx_emissive/E = O.attached_emissive
+	_gfx_emissives -= E
+	if(E.halo)
+		O.vis_contents -= E.halo
+		E.halo.loc = null //refcount-free, never del
+		E.halo = null
+	O.vis_contents -= E
+	E.loc = null
+	O.attached_emissive = null
+
+//re-seat every stamp when multiply-reveal or the master toggle flips
+proc/FxEmissiveApplyMode()
+	for(var/obj/gfx_emissive/E in _gfx_emissives)
+		var/obj/O = _gfx_emissives[E]
+		FxEmissiveConfig(E, O)
+		if(E.halo)
+			E.halo.plane = (glob && glob.MULTIPLY_REVEAL) ? LIGHTING_PLANE : 0
+			if(!glob || !glob.EMISSIVES) E.halo.alpha = 0
+
+//one background tick scales glow halos with the clock; flame props ride the flicker system instead
+proc/_FxEmissiveLoop()
+	set waitfor = 0
+	set background = 1
+	while(1)
+		if(glob && glob.EMISSIVES)
+			for(var/obj/gfx_emissive/E in _gfx_emissives)
+				if(!E.halo) continue
+				var/obj/O = _gfx_emissives[E]
+				var/turf/T = O ? get_turf(O) : null
+				animate(E.halo, alpha = T ? round(120 * LightRenderStrength(T)) : 0, time = 10)
+		sleep(100)
+
+proc/_FxEmissiveBoot()
+	spawn(80) //after build/load settles
+		for(var/obj/O in world)
+			if(O.emissive_tier && !O.attached_emissive && O.loc)
+				FxEmissiveAttach(O)
+		_FxEmissiveLoop()
+	return 1
+var/_fx_emissive_boot = _FxEmissiveBoot()
+
 proc/LightPropDetach(obj/O)
 	if(!O || !O.attached_light) return
 	RemoveLightSource(O.attached_light)
@@ -415,11 +795,15 @@ obj/Turfs/LightProp
 	var/lp_color = "#ffb060"
 	var/lp_alpha = 170
 	var/lp_flicker = 1 //flame props waver; steady lamps set 0
+	emissive_tier = EMISSIVE_REVEAL //light props never darken
 	New()
 		. = ..()
-		spawn(3) LightPropAttach(src, lp_radius, lp_color, lp_alpha, lp_flicker) //spawn: let loc settle after build/load
+		spawn(3) 
+			LightPropAttach(src, lp_radius, lp_color, lp_alpha, lp_flicker)
+			FxEmissiveAttach(src)
 	Del()
 		LightPropDetach(src)
+		FxEmissiveDetach(src)
 		..()
 
 	Campfire
@@ -450,27 +834,39 @@ obj/Turfs/LightProp
 obj/Turfs
 	Torch1/New()
 		. = ..()
-		spawn(3) LightPropAttach(src, 5, "#ffb060", 170, 1)
+		spawn(3)
+			LightPropAttach(src, 5, "#ffb060", 170, 1)
+			FxEmissiveAttach(src, EMISSIVE_REVEAL)
 	Torch1/Del()
 		LightPropDetach(src)
+		FxEmissiveDetach(src)
 		..()
 	Torch2/New()
 		. = ..()
-		spawn(3) LightPropAttach(src, 5, "#ffb060", 170, 1)
+		spawn(3)
+			LightPropAttach(src, 5, "#ffb060", 170, 1)
+			FxEmissiveAttach(src, EMISSIVE_REVEAL)
 	Torch2/Del()
 		LightPropDetach(src)
+		FxEmissiveDetach(src)
 		..()
 	Torch3/New()
 		. = ..()
-		spawn(3) LightPropAttach(src, 5, "#ffb060", 170, 1)
+		spawn(3)
+			LightPropAttach(src, 5, "#ffb060", 170, 1)
+			FxEmissiveAttach(src, EMISSIVE_REVEAL)
 	Torch3/Del()
 		LightPropDetach(src)
+		FxEmissiveDetach(src)
 		..()
 	Fire/New()
 		. = ..()
-		spawn(3) LightPropAttach(src, 7, "#ff8038", 185, 1)
+		spawn(3)
+			LightPropAttach(src, 7, "#ff8038", 185, 1)
+			FxEmissiveAttach(src, EMISSIVE_REVEAL)
 	Fire/Del()
 		LightPropDetach(src)
+		FxEmissiveDetach(src)
 		..()
 
 //a turf's occluder state changed (wall destroyed/built): recompute the lights it could touch
@@ -532,3 +928,108 @@ proc/LightingRefreshReflectionsForArea(area/A)
 		RemoveLightSource(L)
 	src << "Cleared all admin-placed lights."
 	Log("Admin", "[ExtractInfo(src)] cleared all placed lights.")
+
+/mob/Admin2/verb/Emissives_Toggle()
+	set category = "Admin"
+	set name = "Emissives Toggle"
+	glob.EMISSIVES = !glob.EMISSIVES
+	FxEmissiveApplyMode()
+	src << "Emissives: [glob.EMISSIVES ? "ON" : "OFF"]."
+	Log("Admin", "[ExtractInfo(src)] set emissives to [glob.EMISSIVES].")
+
+/mob/Admin2/verb/Corner_Lights_Toggle()
+	set category = "Admin"
+	set name = "Corner Lights Toggle"
+	glob.CORNER_LIGHTS = !glob.CORNER_LIGHTS
+	if(glob.LIGHTING) LightingApplyAll()
+	src << "Corner-gradient lights: [glob.CORNER_LIGHTS ? "ON" : "OFF"]."
+	Log("Admin", "[ExtractInfo(src)] set corner lights to [glob.CORNER_LIGHTS].")
+
+var/obj/_probe_kt_light
+var/obj/_probe_plain_light
+
+/obj/gfx_probe_light
+	gfx_transient_visual = 1
+	mouse_opacity = 0
+	blend_mode = BLEND_ADD
+	layer = 6.6
+
+proc/_ProbeStamps(obj/O)
+	var/image/S1 = image(EnvWhiteIcon())
+	S1.color = "#000000"
+	S1.blend_mode = BLEND_MULTIPLY
+	S1.pixel_x = 12
+	var/image/S2 = image(EnvWhiteIcon())
+	S2.color = "#000000"
+	S2.blend_mode = BLEND_MULTIPLY
+	S2.pixel_x = -6
+	S2.pixel_y = 14
+	O.overlays += S1
+	O.overlays += S2
+
+/mob/Admin2/verb/Unified_Lights_Toggle()
+	set category = "Admin"
+	set name = "Unified Lights Toggle"
+	glob.UNIFIED_LIGHTS = !glob.UNIFIED_LIGHTS
+	if(glob.LIGHTING) LightingApplyAll()
+	src << "Unified lighting: [glob.UNIFIED_LIGHTS ? "ON (smooth + spill wedges)" : "OFF (corner/flat fallback)"]."
+	Log("Admin", "[ExtractInfo(src)] set unified lights to [glob.UNIFIED_LIGHTS].")
+
+/mob/Admin2/verb/Unified_Light_Probe()
+	set category = "Admin"
+	set name = "Unified Light Probe"
+	if(_probe_kt_light)
+		_probe_kt_light.loc = null
+		_probe_kt_light = null
+		if(_probe_plain_light)
+			_probe_plain_light.loc = null
+			_probe_plain_light = null
+		src << "Probe cleared."
+		return
+	if(!_fx_glow_icon) _FxBuildIcons()
+	var/turf/T = get_turf(src)
+	if(!_fx_glow_icon || !T)
+		src << "Probe unavailable (no glow icon or no turf)."
+		return
+	var/obj/gfx_probe_light/K = new(locate(min(T.x + 3, world.maxx), T.y, T.z))
+	K.icon = _fx_glow_icon
+	K.color = "#ffb060"
+	K.transform = matrix() * 4
+	K.pixel_x = -16
+	K.pixel_y = -16
+	K.plane = BASE_LIGHTING_PLANE
+	K.appearance_flags = KEEP_TOGETHER | KEEP_APART
+	_ProbeStamps(K)
+	_probe_kt_light = K
+	var/obj/gfx_probe_light/P = new(locate(max(T.x - 3, 1), T.y, T.z))
+	P.icon = _fx_glow_icon
+	P.color = "#ffb060"
+	P.transform = matrix() * 4
+	P.pixel_x = -16
+	P.pixel_y = -16
+	P.plane = BASE_LIGHTING_PLANE
+	P.appearance_flags = KEEP_APART
+	_ProbeStamps(P)
+	_probe_plain_light = P
+	src << "Probe up (best viewed at night). EAST glow = KT-masked: its two dark notches should cut ONLY the glow, leaving ground/other lights untouched. WEST glow = plain: its stamps will darken everything under them. Run the verb again to clear."
+	Log("Admin", "[ExtractInfo(src)] spawned the unified light probe.")
+
+/mob/Admin2/verb/Make_Emissive() //tag any prop in reach for live testing; run again to untag
+	set category = "Admin"
+	set name = "Make Emissive"
+	var/list/nearby = list()
+	for(var/obj/O in oview(5, src))
+		if(O.icon) nearby += O
+	if(!nearby.len)
+		src << "No props in view."
+		return
+	var/obj/O = input(src, "Toggle emissive on:") as null|anything in nearby
+	if(!O) return
+	if(O.attached_emissive)
+		FxEmissiveDetach(O)
+		O.emissive_tier = 0
+		src << "[O.name]: emissive off."
+	else
+		FxEmissiveAttach(O, EMISSIVE_GLOW)
+		src << "[O.name]: emissive + glow on."
+	Log("Admin", "[ExtractInfo(src)] toggled emissive on [O.name].")
