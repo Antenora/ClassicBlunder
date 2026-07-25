@@ -313,6 +313,9 @@ mob/proc/Unconscious(mob/P,var/text)
 		return
 	src.PoweringUp=0
 	src.PoweringDown=0
+	src.Guarding=0
+	src.GuardMeter=0
+	src.ChargingEnergy=0
 	src.Auraz("Remove")
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
 	src.DealWounds(src,20/max(src.GetRecov(2), 1))
@@ -325,6 +328,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.Burn=0
 	src.Bleed=0
 	src.AfterImageStrike=0
+	src.ais_window_until=0
 	src.VaizardHealth=0
 	src.ForceCancelBeam()
 	src.ForceCancelBuster()
@@ -1634,8 +1638,8 @@ proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldD
 			return MISS
 		if(Offender.HasNoMiss())
 			return HIT
-		if(Defender.HasNoDodge()&&!IgnoreNoDodge)
-			return HIT
+		if((Defender.HasNoDodge()||Defender.IsGuarding())&&!IgnoreNoDodge)
+			return HIT	//guard trades the dodge layer for the DR
 		if(Backfire&&Offender==Defender)
 			return HIT
 		if(Defender.SureDodge&&!Defender.passive_handler.Get("NoDodge"))
@@ -1910,7 +1914,7 @@ proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/Base
 mob/var/tmp/last_combo
 var/static/list/opposite_dirs = list(SOUTH,NORTH,NORTH|SOUTH,WEST,SOUTHWEST,NORTHWEST,NORTH|SOUTH|WEST,EAST,SOUTHEAST,NORTHEAST,NORTH|SOUTH|EAST,WEST|EAST,WEST|EAST|NORTH,WEST|EAST|SOUTH,WEST|EAST|NORTH|SOUTH)
 
-mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE)
+mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE, landDir = 0)
 	if(last_combo >= world.time) return
 	last_combo = world.time
 	var/list/dirs = list(NORTH,SOUTH,EAST,WEST,NORTHWEST,SOUTHWEST,NORTHEAST,SOUTHEAST)
@@ -1926,7 +1930,8 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 
 
 		while(dirs.len)
-			var/direction = pick(dirs)
+			//asked-for side goes first, random fallback after
+			var/direction = (landDir && !landBehind && (landDir in dirs)) ? landDir : pick(dirs)
 			dirs-=direction
 
 			W=get_step(M, direction)
@@ -1988,6 +1993,8 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	if(!P) return
 	if(P.Stasis)
 		return
+	if(P.IsGuarding() && !Forced && !trueForced)
+		return	//guarded hits only move you via the pushback nudge
 	if(!Direction)
 		Direction=src.dir
 	Forced+=isForced()
@@ -2013,6 +2020,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	if(Distance>=0.5&&Distance<1)
 		Distance=1
 
+	P.kb_sender = src	//splat credit + flourish
 	if(P.Knockbacked)
 		var/orgDistance = Distance
 		P.Knockbacked=Direction
@@ -2027,12 +2035,15 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 mob
 	var/tmp/kb_loft = 0
 	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed)
+		if(src.Guarding) src.GuardStop()	//hard cc drops guard
+		if(src.ChargingEnergy) src.ChargeStop()
 		if(PmActive()) //tile-quantize before knockback so its get_step wall/edge probes stay accurate and it doesn't rest ~step_x px short
 			src.step_x=0
 			src.step_y=0
 		src.icon_state="KB"
 		src.Knockbacked=Direction
 		src.Knockback=Distance*world.tick_lag
+		src.kb_start_time = world.time	//fresh KB only - extensions keep the anchor
 		//heavy sends pop the victim into a low arc; the world shadow shrinks under them so it reads as airtime
 		var/w = min(Distance / glob.MAX_KB_TIME, 1)
 		if(w >= glob.KB_LOFT_MIN && !src.Flying && !src.Launched && !src.pixel_z)
@@ -2054,6 +2065,17 @@ mob
 					dense=1
 					break
 			if(dense)
+				//wall splat: force left in the send = stagger + thud
+				if(glob.WALL_SPLAT && src.Knockbacked && src.Knockback >= glob.SPLAT_MIN_REMAINING * world.tick_lag && src.splat_stagger_until < world.time)
+					var/remTiles = src.Knockback / world.tick_lag
+					ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)
+					var/mob/sender = src.kb_sender
+					spawn()
+						if(sender && sender != src)
+							sender.DoDamage(src, remTiles * glob.SPLAT_DMG_PER_TILE)
+							sender.FlourishArm()
+						src.Earthquake(4, -4,4,-4,4, 0, src.Knockbacked)
+						KenShockwave(src, Size = min(remTiles/5, 1.5), Time = 4)
 				src.StopKB(DustBlock)
 	proc/ContinueKB(var/DustBlock=0)
 		set waitfor=0
@@ -2093,12 +2115,29 @@ mob
 			src.Dunked=0
 		else if(wasKB&&src.pixel_z==0&&!DustBlock)
 			Landfall(src, min(previousKnockBack / glob.MAX_KB_TIME, 1)) //dust scales with how hard you were sent
+		src.kb_sender = null
 
 /var/tmp/lastGrabUsage=0
 
 
 mob/proc/Grab()
 	if(src.Stunned||src.Suspended||src.icon_state=="KB")
+		return
+	//tech: mash grab the instant you're grabbed to slip it. grab while held = tech, not a chain grab
+	if(glob.GRAB_TECH && src.grabbed && ismob(src.grabbed) && src.grabbed:Grab == src)
+		var/mob/G = src.grabbed
+		if(world.time <= G.GrabTime + glob.TIMING_WINDOW)
+			src.OMessage(10, "[src] slips [G]'s grip before it closes!", "[src] techs [G]'s grab")
+			G.Grab_Release()
+			if(PmActive())
+				src.PmDashStep(G, 32, away = 1)
+				G.PmDashStep(src, 32, away = 1)
+			else
+				step_away(src, G, 1)
+				step_away(G, src, 1)
+			KenShockwave(src, Size = 0.5, Time = 4)
+			ApplySplatStagger(G, glob.SPLAT_STAGGER_DS)
+			src.FlourishArm()
 		return
 	if(!Grab)
 		if(lastZanzoUsage+3 > world.time)
@@ -2113,6 +2152,8 @@ mob/proc/Grab()
 			src.DashTo(src.Target, 2 + passive_handler.Get("Scoop"))
 			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
 				src.Grab_Mob(src.Target)
+			else
+				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)	//whiffed the lunge, punishable
 			for(var/obj/Skills/Grab/g in src)
 				g.Cooldown(2)
 		else
@@ -2210,6 +2251,8 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 		if(istype(P, /mob/Body))
 			src.Grab=P
 			P.grabbed = src
+			if(P.Guarding) P.GuardStop()	//grabs beat guard
+			if(P.ChargingEnergy) P.ChargeStop()
 			src.GrabTime = world.time
 			src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 			src.Grab_Update()
@@ -2227,6 +2270,8 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 			return
 	src.Grab=P
 	P.grabbed = src
+	if(P.Guarding) P.GuardStop()	//grabs beat guard
+	if(P.ChargingEnergy) P.ChargeStop()
 	src.GrabTime = world.time
 	src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 	src.Grab_Update()

@@ -550,6 +550,9 @@ obj/Skills/Grapple
 	proc
 		Activate(var/mob/User)
 			src.ThrowDir=User.dir
+			if(glob.DIRECTIONAL_TOSS)
+				var/hd = User.heldDir()
+				if(hd) src.ThrowDir = hd
 			if(src.Using)
 				return
 			if(User.HeldSkillBlocksAction(src))

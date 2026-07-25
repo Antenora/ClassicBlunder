@@ -426,7 +426,14 @@ proc
 			var/Zanzes=4
 			var/StartA=A.loc
 			var/StartT=Target.loc
-			if(Target.AfterImageStrike||(locate(/obj/Skills/Zanzoken, Target))&&prob(20))
+			var/clash
+			if(glob.AIS_WINDOW)
+				//both windows live = the cinematic. stack check stays for forced clashes (finisher-vs-finisher)
+				clash = Target.aisArmed() || Target.AfterImageStrike > 0
+				if(Target.aisArmed()) Target.aisConsume()
+			else
+				clash = Target.AfterImageStrike||(locate(/obj/Skills/Zanzoken, Target))&&prob(20)
+			if(clash)
 				if(glob.AISCLASHLOCKSMOVEMENT && Target.client)
 					if(istype(Target, /mob/Players))
 						var/mob/Players/PT = Target
@@ -478,7 +485,7 @@ proc
 					Target.SuppressPowerGlow = 0
 			else
 				AfterImage(A)
-				A.Comboz(Target)
+				A.Comboz(Target, landDir = A.heldDir())	//held key picks the landing side
 				A.dir=get_dir(A,Target)
 				if(Striking)
 					A.NextAttack=0
@@ -486,6 +493,7 @@ proc
 				if(A)
 					A.alpha = 255
 					A.AfterImageStrike = 0
+					A.ais_window_until = 0
 			if(A)
 				A.Dodging=0
 			if(Target)

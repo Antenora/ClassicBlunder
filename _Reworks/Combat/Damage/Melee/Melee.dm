@@ -242,6 +242,27 @@
 
 	delay = adjustDelay(delay)
 
+	var/obj/Items/Armor/atkArmor = EquippedArmor()
+	if(atkArmor)
+		acc *= GetArmorAccuracy(atkArmor)
+		delay /= GetArmorDelay(atkArmor)
+		#if DEBUG_MELEE
+		log2text("Delay", "After Armor", "damageDebugs.txt", "[ckey]/[name]")
+		log2text("Delay", delay, "damageDebugs.txt", "[ckey]/[name]")
+		#endif
+
+	if(spdmulti)
+		if(unarmedAtk)
+			spdmulti += 0.75
+		delay/=spdmulti
+		#if DEBUG_MELEE
+		log2text("Delay", "After Speed", "damageDebugs.txt", "[ckey]/[name]")
+		log2text("Delay", delay, "damageDebugs.txt", "[ckey]/[name]")
+		#endif
+
+	if(delay<=0.5)
+		delay = 0.5
+
 	if(!BreakAttackRate)
 		NextAttack = world.time
 	else
@@ -249,7 +270,7 @@
 			if(AttackQueue.Combo && (!Target || Target == src))
 				NextAttack = world.time
 			if(AttackQueue.Counter)
-				NextAttack = world.time += delay
+				NextAttack = world.time + delay
 
 
 
@@ -382,25 +403,7 @@
 
 		// 				ARMOR					//
 
-				var/obj/Items/Armor/atkArmor = EquippedArmor()
 				var/obj/Items/Armor/defArmor = enemy.EquippedArmor()
-
-				if(atkArmor)
-					acc *= GetArmorAccuracy(atkArmor)
-					delay /= GetArmorDelay(atkArmor)
-					#if DEBUG_MELEE
-					log2text("Delay", "After Armor", "damageDebugs.txt", "[ckey]/[name]")
-					log2text("Delay", delay, "damageDebugs.txt", "[ckey]/[name]")
-					#endif
-
-				if(spdmulti)
-					if(unarmedAtk)
-						spdmulti += 0.75
-					delay/=spdmulti
-					#if DEBUG_MELEE
-					log2text("Delay", "After Speed", "damageDebugs.txt", "[ckey]/[name]")
-					log2text("Delay", delay, "damageDebugs.txt", "[ckey]/[name]")
-					#endif
 		// 				ARMOR END				//
 
 		// 				QUEUE	 				//
@@ -485,11 +488,10 @@
 
 				if(AttackQueue && AttackQueue.Dunker && enemy.Launched)
 					if(AttackQueue.Dunker)
-						spawn()
-							Jump(src)
+						DunkSlam(src, enemy)	//rise to them, hit lands mid-air, both slam down
 						sleep(3)
-						spawn()
-							LaunchEnd(enemy)
+				else if(glob.CC_PRORATION)
+					damage *= enemy.ccProrationMult(src)	//queued hits scale too, that's the point
 				else if(!AttackQueue && (enemy.Launched || enemy.Stunned) && !enemy.passive_handler.Get("Staggered!"))
 					damage *= glob.CCDamageModifier
 					#if DEBUG_MELEE
@@ -534,12 +536,32 @@
 
 		// 				MELEE COUNTER 			//
 				countered = counterShit(enemy, IgnoreCounter)
+				//queue-counter: fresh queue reads the incoming queued swing and punishes it
+				if(glob.QUEUE_COUNTER && !countered && !IgnoreCounter && AttackQueue && enemy.AttackQueue && world.time <= enemy.queue_counter_until && !enemy.Stunned && !enemy.Launched)
+					var/atkFin = istype(AttackQueue, /obj/Skills/Queue/Finisher)
+					var/defFin = istype(enemy.AttackQueue, /obj/Skills/Queue/Finisher)
+					if(!(atkFin && !defFin))	//a finisher punches through normal windows
+						enemy.queue_counter_until = 0
+						countered = 1
+						if(atkFin && defFin)	//finisher clash: both spent, big cinematic
+							ClearQueue()
+							enemy.ClearQueue()
+							enemy.AfterImageStrike++	//forces the clash branch, decremented inside it
+							AfterImageStrike(src, enemy, 0)
+						else
+							enemy.dir = get_dir(enemy, src)
+							enemy.NextAttack = 0
+							var/mob/counterer = enemy
+							spawn() counterer.Melee1(1, 1, IgnoreCounter = 1)
 		// 				MELEE COUNTER END		//
 
 		// 				HIT RESOLUTION 			//
 
 				if(enemy.Stunned)
 					hitResolution = HIT
+
+				//snapshot before the hit can cancel their beam/charge out
+				var/counterHit = glob.COUNTER_HIT && enemy.isCommitted()
 
 				if(!countered)
 					var/dodged = 0
@@ -548,7 +570,7 @@
 					// If it was not countered
 					if(hitResolution != MISS)
 						// and they hit in any way
-						if(!enemy.passive_handler.Get("NoDodge"))
+						if(!enemy.passive_handler.Get("NoDodge") && !enemy.IsGuarding())
 
 
 					// 				FLOW					//
@@ -585,13 +607,11 @@
 										enemy.LoseMana(1)
 					// 				FLOW END				//
 					// 				AIS			 			//
-						if(enemy.AfterImageStrike>0&&!dodged)
-							enemy.AfterImageStrike-=1
-							if(enemy.AfterImageStrike<0)
-								enemy.AfterImageStrike=0
+						if(enemy.aisArmed()&&!dodged)
+							enemy.aisConsume()
 
 							var/instinct = HasInstinct()
-							if(prob(100-(instinct*20)))
+							if(glob.AIS_WINDOW || prob(100-(instinct*20)))
 								if(AttackQueue && AttackQueue.HitSparkIcon)
 									disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 									disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
@@ -614,14 +634,12 @@
 
 					// 	 			NO DODGE				//
 
-							if(enemy.AfterImageStrike>0&&!passive_handler.Get("NoDodge")&&!dodged&&!IgnoreCounter)
-								enemy.AfterImageStrike-=1
-								if(enemy.AfterImageStrike<0)
-									enemy.AfterImageStrike=0
+							if(enemy.aisArmed()&&!enemy.IsGuarding()&&!passive_handler.Get("NoDodge")&&!dodged&&!IgnoreCounter)
+								enemy.aisConsume()
 
 								var/instinct = HasInstinct()
 
-								if(prob(100-(instinct*20)))
+								if(glob.AIS_WINDOW || prob(100-(instinct*20)))
 									if(AttackQueue && AttackQueue.HitSparkIcon)
 										disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
 										disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
@@ -656,6 +674,8 @@
 						if(!dodged)
 					// 				HIT					//
 
+							if(glob.CC_PRORATION)
+								enemy.ccCountHit()
 							var/damageSnapshot = damage
 							STRIKE
 							if(AttackQueue?.InstantStrikesPerformed)
@@ -945,9 +965,13 @@
 									var/quakeIntens = otherDmg
 									if(quakeIntens>14)
 										quakeIntens=14
-									HitStop(src, enemy, quakeIntens)
+									HitStop(src, enemy, quakeIntens, counterHit ? glob.COUNTER_HIT_STOP_BONUS : 0)
+									if(counterHit)
+										src.gainTension(glob.COUNTER_HIT_TENSION)
 									//shake lurches the way the hit lands
 									enemy?.Earthquake(quakeIntens, -4,4,-4,4, 0, get_dir(src, enemy))
+							else if(counterHit)
+								CounterHitReward(src, enemy, otherDmg)
 					else
 							//		MISS START  //
 						if(enemy.CheckSpecial("Ultra Instinct"))
@@ -996,9 +1020,6 @@
 							AddSkill(p)
 						p.adjust(src)
 						src.UseProjectile(p)
-
-				if(delay<=0.5)
-					delay = 0.5
 
 	else
 		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))

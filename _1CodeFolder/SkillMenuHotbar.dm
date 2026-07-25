@@ -10,6 +10,7 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 #define KB_MOVE   1
 #define KB_HOTBAR 2   // +UP release only if the slotted skill is a held skill
 #define KB_INTERACT 3 // +UP always bound so hold-minigames see the release
+#define KB_HOLD   4   // hold-type action: +UP always bound, "-up" suffix like KB_MOVE
 
 /datum/keyaction
 	var/id
@@ -36,11 +37,14 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
 	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)   
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
-	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
+	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
+	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
 	R += new/datum/keyaction("toss",        "Toss",                "Toss",               "V",   "Combat")
 	R += new/datum/keyaction("dragondash",  "Dragon Dash",         "Dragon-Dash",        "Q",   "Combat")
 	R += new/datum/keyaction("reversedash", "Reverse Dash",        "Reverse-Dash",       "E",   "Combat")
+	R += new/datum/keyaction("guard",       "Guard",               "Guard",              "H",   "Combat", KB_HOLD)
+	R += new/datum/keyaction("charge",      "Energy Charge",       "Charge",             "N",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("powerup",     "Power Up",            "Power-Up",           "R",   "Combat")
 	R += new/datum/keyaction("powerdown",   "Power Down",          "Power-Down",         "F",   "Combat")
 	R += new/datum/keyaction("pose",        "Pose",                "Pose",               "T",   "Combat")
@@ -114,7 +118,7 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 		winset(src, rid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=[MacroCmd(command)]")
 	else
 		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
-	if(kind == KB_MOVE)
+	if(kind == KB_MOVE || kind == KB_HOLD)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
 		return
 	if(kind == KB_INTERACT)
@@ -145,6 +149,7 @@ client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
 	var/up_cmd = null
 	switch(kind)
 		if(KB_MOVE)     up_cmd = "[command]-up"
+		if(KB_HOLD)     up_cmd = "[command]-up"
 		if(KB_INTERACT) up_cmd = "Interact-Release"
 		if(KB_HOTBAR)
 			if(regid)

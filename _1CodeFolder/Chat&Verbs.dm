@@ -1087,6 +1087,14 @@ mob/Players/verb
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		//flourish: pose right after a guard break / wall splat / grab tech for a tension nod
+		if(glob.POSE_FLOURISH && world.time <= src.flourish_until)
+			src.flourish_until = 0
+			if(src.canGainTension())
+				src.gainTension(glob.FLOURISH_TENSION)
+			KenShockwave(src, icon='KenShockwaveFocus.dmi', Size=0.5, Blend=2, Time=3)
+			OMsg(src, "[src] strikes a pose!")
+			return
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.CheckSlotless("Half Moon Form")||src.CheckSlotless("Full Moon Form"))
 				OMsg(src, "[src] radiates animalistic bloodlust as they prepare to pounce!")

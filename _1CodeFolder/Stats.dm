@@ -1046,7 +1046,8 @@ mob/proc/
 						Recover("Mana",1)
 				Recover("Capacity",2)
 			else
-				Recover("Energy",0.5)
+				if(!glob.ACTIVE_ENERGY_CHARGE)
+					Recover("Energy",0.5)	//legacy idle trickle, active charge replaces it
 
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
@@ -1177,6 +1178,17 @@ mob/proc/
 				else
 					src.LoseEnergy(2*PowerDrain*glob.WorldPUDrain)
 
+		//active energy channel
+		if(glob.ACTIVE_ENERGY_CHARGE && src.ChargingEnergy && !src.PureRPMode)
+			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
+				src.ChargeStop()
+			else
+				var/ramp = min(1, (world.time - src.charge_started_at) / max(glob.CHARGE_RAMP_DS, 1))
+				var/before = src.Energy
+				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
+				if(src.Energy <= before)
+					src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
+
 
 mob/proc/Update_Stat_Labels()
 	set waitfor=0
@@ -1288,6 +1300,7 @@ mob/proc/Update_Stat_Labels()
 		winshow(src, "BarPotion",0)
 		winshow(src, "BarCripple",0)
 		if(client) client.UpdateFinisherBar()   // tension/finisher HUD bar
+		if(client) client.UpdateGuardBar()
 		if(src.StyleActive)
 			winshow(src, "StyleLabel",1)
 			winshow(src, "StanceLabel",1)

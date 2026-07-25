@@ -6026,6 +6026,8 @@ obj
 			ElementalClass
 			FixedDamage=0
 
+			GuardBreak//mirror of the skill flag - pierces the guard system's DR
+
 			Arcing//Triggers offshoots on every step that expand outwards.  Higher than 1 means that every X steps the range will widen.
 			ArcingCount=0//Number of times arcing has been triggered.  Informs the game how many tiles to send the offshoots.
 			Wave//Triggers offshoots that extend this number of steps on every step.
@@ -6379,6 +6381,7 @@ obj
 			Destroyer = Z.Destroyer
 			src.CanBeBlocked=Z.CanBeBlocked
 			src.CanBeDodged=Z.CanBeDodged
+			src.GuardBreak=Z.GuardBreak
 			src.Slow=Z.Slow
 			src.ApplySlow = Z.ApplySlow
 			src.NerveOverload = Z.NerveOverload
@@ -6760,7 +6763,11 @@ obj
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(src.SpeedStrike/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				if(Owner.UsingFencing())
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(Owner.UsingFencing()/glob.SPEEDSTRIKEDIVISOR))),1,3)
-				if((m.Launched||m.Stunned||m.Suspended))
+				if(glob.CC_PRORATION)
+					FinalDmg *= m.ccProrationMult(Owner, includeSuspended = 1, skillCM = ComboMaster, dunk = (Dunker||Destroyer))
+					if(m.Stunned && Destroyer)
+						FinalDmg *= 1 + (Destroyer/10)
+				else if((m.Launched||m.Stunned||m.Suspended))
 					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer || m.passive_handler.Get("Staggered!")))
 						FinalDmg *= glob.CCDamageModifier
 						Owner.log2text("FinalDmg - Auto Hit", "After ComboMaster", "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
@@ -6966,15 +6973,14 @@ obj
 						Damage /= glob.AUTOHIT_MISS_DAMAGE
 						DEBUGMSG("after FR")
 
-					if(m.AfterImageStrike)
+					if(m.aisArmed())
 						if(!src.TurfStrike)
 							spawn()
 								src.Owner.HitEffect(loc, src.UnarmedTech, src.SwordTech)
 						StunClear(m)
 						AfterImageStrike(m, src.Owner,1)
-						m.AfterImageStrike-=1
-						if(m.AfterImageStrike<0)
-							m.AfterImageStrike=0
+						m.aisConsume()
+						if(!glob.AIS_WINDOW && m.AfterImageStrike<=0)
 							for(var/obj/Skills/Zanzoken/z in src)
 								z.Cooldown()//freeze that after image shieet
 						return
@@ -7107,7 +7113,11 @@ obj
 					// Executing is +1% damage per 1 Injury on the target
 					if(src.Executing && m)
 						FinalDmg *= 1 + (0.01 * src.Executing * m.TotalInjury)
-					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
+					if(glob.COUNTER_HIT && m.isCommitted())
+						CounterHitReward(src.Owner, m, min(FinalDmg, 14))
+					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement, PierceGuard = src.GuardBreak)
+					if(glob.CC_PRORATION)
+						m.ccCountHit(1)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmg)

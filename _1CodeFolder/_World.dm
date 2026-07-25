@@ -131,10 +131,11 @@ proc/BootWorld(var/blah)
 			spawn()Add_Enchantment()
 			spawn()InitializeSigCombos()
 			spawn()initMagicNodes()
-			spawn()SeedLifeSkillNodes()
-			spawn()SeedForageNodes()
-			spawn()SeedTrees()
-			spawn()SeedFishSpots()
+			if(glob.LIFE_NODE_SPAWNS) //temporary off for the sake of making testing not a pain
+				spawn()SeedLifeSkillNodes()
+				spawn()SeedForageNodes()
+				spawn()SeedTrees()
+				spawn()SeedFishSpots()
 			spawn()RegisterLifeSkillRecipes()
 			spawn()FarmGrowthLoop()
 			spawn()AuctionHouseTick()
@@ -280,7 +281,10 @@ client
 			mob.Auraz("Remove")
 			mob.PoweringUp=0
 			mob.PoweringDown=0
+			mob.Guarding=0
+			mob.ChargingEnergy=0
 			mob.AfterImageStrike=0
+			mob.ais_window_until=0
 			mob.Grounded=0
 			for(var/x in hud_ids)
 				remove_hud(x)

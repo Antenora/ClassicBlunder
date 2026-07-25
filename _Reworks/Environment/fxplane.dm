@@ -183,6 +183,9 @@ var/_fx_boot = _FxBoot()
 proc/_FxBoot()
 	spawn(40)
 		_FxBuildIcons()
+		for(var/v = 0, v <= 2, v++)
+			_FxConeIcon(v)
+			sleep(world.tick_lag)
 		_FxBuildLitPaths()
 	return 1
 
@@ -227,6 +230,137 @@ proc/_FxBuildIcons()
 			if(d < 1)
 				H.DrawBox(rgb(128, round(128 + 40*(1-d)), 128, round(150*(1-d))), px, py, px, py)
 	_fx_heat_icon = H
+
+#define FX_CONE_PX 96 //cone texture cell; apex sits at the centre so Turn() aims it cleanly
+
+var/list/_fx_cone_icons = list()
+
+proc/_FxConeIcon(variant = 0)
+	var/key = "cone[variant]"
+	if(_fx_cone_icons[key]) return _fx_cone_icons[key]
+	var/half = FX_CONE_PX / 2 + 0.5
+	var/rad = FX_CONE_PX / 2 - 1
+	var/list/rays = list()
+	if(variant) //deterministic spread per variant, no rand() at boot
+		for(var/i = 1, i <= 7, i++)
+			rays += (((i * 17 + variant * 11) % 53) - 26)
+	var/icon/C = new('sandstorm.dmi')
+	C.Scale(FX_CONE_PX, FX_CONE_PX)
+	C.DrawBox(rgb(0,0,0,0), 1, 1, FX_CONE_PX, FX_CONE_PX)
+	for(var/py = 1, py <= FX_CONE_PX, py++)
+		for(var/px = 1, px <= FX_CONE_PX, px++)
+			var/dx = px - half
+			var/dy = py - half
+			var/r = sqrt(dx*dx + dy*dy)
+			var/d = r / rad
+			if(d >= 1) continue
+			var/ang = (r > 1) ? arccos(dx / r) : 0 //degrees off +x, 0..180
+			var/angK = (ang <= 30) ? 1 : max(0, 1 - (ang - 30) / 9)
+			if(angK <= 0) continue
+			//SOLID body with a soft rim, not a gradient smudge: gentle falloff across
+			//the length, then a short feather at the outer edge
+			var/radial = 1 - 0.45 * d
+			if(d > 0.8) radial *= (1 - d) / 0.2
+			var/a = 0
+			if(!variant)
+				a = radial * angK * 225
+			else
+				var/signed = (dy < 0) ? -ang : ang //mirror for the ray bands
+				var/rk = 0
+				for(var/ra in rays)
+					var/off = abs(signed - ra)
+					if(off < 7) rk = max(rk, 1 - off / 7)
+				if(rk <= 0) continue
+				a = radial * angK * rk * 250
+			if(a < 3) continue
+			C.DrawBox(rgb(255, 255, 255, round(min(a, 255))), px, py, px, py)
+	_fx_cone_icons[key] = C
+	return C
+
+//combat light child: additive, aimable, torn down by ref
+/obj/fx_clashlight
+	gfx_transient_visual = 1
+	Savable = 0
+	blend_mode = BLEND_ADD
+	layer = 6.55
+	mouse_opacity = 0
+	appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
+	var/tmp/is_ray = 0 //ray-streak layer: owns its own wave loop, skip bulk transform tweens
+
+//rays sweep inside the cone
+proc/FxConeRayWave(obj/fx_clashlight/O, matrix/base, phase, base_a)
+	if(!O || !base) return
+	var/matrix/L = matrix(base)
+	L.Turn(-10)
+	var/matrix/R = matrix(base)
+	R.Turn(10)
+	var/lo = round(base_a * 0.35)
+	animate(O, transform = L, alpha = phase ? base_a : lo, time = 7, loop = -1, easing = SINE_EASING, flags = ANIMATION_PARALLEL)
+	animate(transform = R, alpha = phase ? lo : base_a, time = 7, easing = SINE_EASING)
+
+proc/FxClashLightPair(atom/movable/host, icon/tex, col, matrix/mx, wa = 215, ba = 250)
+	. = list()
+	if(!host || !tex) return
+	var/frac = LightRenderStrength(get_turf(host)) //~0.10 daylight, ~1 at night
+	wa = round(wa * (1 - 0.65 * frac))
+	ba = round(ba * (0.35 + 0.65 * frac))
+	var/list/anc = FxChildAnchor(host)
+	var/ox = anc[1] + (64 - tex.Width()) / 2 
+	var/oy = anc[2] + (64 - tex.Height()) / 2
+	for(var/pl in list(1, LIGHTING_PLANE))
+		var/obj/fx_clashlight/L = new
+		L.icon = tex
+		L.color = col
+		L.alpha = (pl == 1) ? wa : ba
+		L.plane = pl
+		if(pl == 1) L.layer = 6
+		L.transform = mx
+		L.pixel_x = ox
+		L.pixel_y = oy
+		host.vis_contents += L
+		. += L
+
+proc/FxConeAim(open_dir, scale = 1)
+	var/matrix/M = matrix()
+	M.Turn(dir2angle(open_dir) - 90)
+	M.Scale(scale)
+	return M
+
+proc/FxAttachConeLight(atom/movable/host, open_dir, col = "#ffffff", scale = 3)
+	. = list()
+	if(!host) return
+	var/matrix/M = FxConeAim(open_dir, scale)
+	. += FxClashLightPair(host, _FxConeIcon(0), col, M, 205, 240) //body
+	var/list/r1 = FxClashLightPair(host, _FxConeIcon(1), col, M, 225, 255)
+	var/list/r2 = FxClashLightPair(host, _FxConeIcon(2), col, M, 200, 235)
+	for(var/obj/fx_clashlight/O in r1)
+		O.is_ray = 1
+		FxConeRayWave(O, M, 1, O.alpha)
+	for(var/obj/fx_clashlight/O in r2)
+		O.is_ray = 1
+		FxConeRayWave(O, M, 0, O.alpha)
+	. += r1
+	. += r2
+
+proc/FxAttachRoundLight(atom/movable/host, col = "#ffffff", scale = 1.6, rays = 0)
+	. = FxClashLightPair(host, _fx_glow_icon, col, matrix() * scale, 165, 230)
+	if(!rays) return
+	for(var/obj/fx_clashlight/O in .)
+		O.filters += filter(name = "clashrays", type = "rays", size = 26, color = col, density = 11, threshold = 0.5, factor = 0.3)
+		var/F = O.filters["clashrays"]
+		if(!F) continue
+		//two steps or loop=-1 silently does nothing; ~12s cycle so it visibly churns
+		animate(F, offset = 1000, time = 120, loop = -1, easing = LINEAR_EASING, flags = ANIMATION_PARALLEL)
+		animate(offset = 0, time = 0)
+
+//detach + free a list of clash lights from their host
+proc/FxDropLights(atom/movable/host, list/objs)
+	if(!objs) return
+	for(var/obj/O in objs)
+		if(host) host.vis_contents -= O
+		animate(O) //cancel the looping wave/churn chains before the obj is freed
+		O.filters = null
+		O.loc = null
 
 proc/_FxBuildLitPaths()
 	for(var/t = 1, t <= 5, t++)
@@ -607,9 +741,9 @@ var/_fx_pulse_tick = 0
 var/_fx_pulse_n = 0
 
 //one-shot glow burst; per-tick cap so turf-AoE loops can't flood the world
-proc/FxLightPulse(turf/T, size = 1.5, col = null)
+proc/FxLightPulse(turf/T, size = 1.5, col = null, min_frac = 0)
 	if(!glob || !glob.DYNAMIC_LIGHTS || !_fx_glow_icon || !T) return
-	var/frac = LightRenderStrength(T)
+	var/frac = max(LightRenderStrength(T), min_frac)
 	if(frac < 0.03) return
 	if(_fx_pulse_tick != world.time)
 		_fx_pulse_tick = world.time

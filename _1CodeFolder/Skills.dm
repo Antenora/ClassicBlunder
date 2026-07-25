@@ -867,7 +867,7 @@ obj/Skills
 			set category="Skills"
 			set hidden = 1
 			set name="After Image Strike"
-			if(usr.MovementCharges>=1 && !usr.AfterImageStrike && !src.Using)
+			if(usr.MovementCharges>=1 && !usr.aisArmed() && !src.Using)
 				usr.SkillStunX("After Image Strike",src)
 
 	Walking

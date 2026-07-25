@@ -1585,6 +1585,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 
 // New versions of skills (old paths preserved for save compatibility)
 /obj/Skills/Projectile/DemiFiend/Freikugel_Beam
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Freikugel"
 	ElementalClass = "Ultima"
 	Area = "Beam"
@@ -1675,6 +1676,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/DemiFiend/Magma_Axis_Beam
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Magma Axis"
 	ElementalClass = "Fire"
 	SpellElement = "Fire"
@@ -1701,6 +1703,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/DemiFiend/Spiral_Viper_Beam
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Spiral Viper"
 	SpellElement = "Air"
 	Area = "Beam"

@@ -12,7 +12,8 @@ obj/Skills/Projectile/_Projectile
 		density = 0 //contact via sweep; walls handled in PixelWallCheck
 		LastHitAt = list()
 		HitInterval = max(Speed, world.tick_lag)
-		if(PmActive() && Owner && (loc == Owner.loc || loc == get_step(Owner, DirOverride || Owner.dir)))
+		//beams are excluded
+		if(PmActive() && Area != "Beam" && Owner && (loc == Owner.loc || loc == get_step(Owner, DirOverride || Owner.dir)))
 			step_x = Owner.step_x //mid-tile casters: launch from the sprite, not the tile
 			step_y = Owner.step_y
 		pm_substep = 0
@@ -32,7 +33,7 @@ obj/Skills/Projectile/_Projectile
 			animate_movement = NO_STEPS //segments arrive in lockstep, no glide, as old BeamGraphics set
 			//key on the TRUE travel dir - a diagonal volley arm collapsed to a cardinal would share its chain
 			var/truedir = DirOverride || (Owner ? Owner.dir : dir)
-			chain = Owner.BeamChainFor(truedir)
+			chain = Owner.BeamChainFor(truedir, SkillPath)
 			chain.Register(src)
 
 	proc/OnContact(atom/a)
@@ -134,13 +135,23 @@ obj/Skills/Projectile/_Projectile
 		pc_lastdir = DisplayedCardinal(dir, pc_lastdir) //dir is only final once the spawn block ran
 		ReapplyHitboxForDir(pc_lastdir)
 		if(glob.PIXEL_DEBUG) world.log << "PXC: [src] PixelLife start dir=[dir] box=[vhb_w]x[vhb_h] scale=[hb_scale] icon=[icon] mask=[vhb_mask ? "y" : "n"] dist=[Distance]"
+		if(beam_owner)
+			return
+		if(Area == "Beam" && !Stream && chain && chain.controlled)
+			return
 		if(pm_substep) //pre-move sample so point-blank casts hit a mob on the spawn tile
 			PixelContactSweep()
 			if(Killed || Distance <= 0)
 				if(Owner) Owner.active_projectiles -= src
 				ProjectileFinish()
 				return
-		while(src.Distance>0)
+		while(src.Distance>0 || (src.clash_lock && !src.clash_lock.ended))
+			if(src.clash_lock)
+				if(src.clash_lock.ended) //struggle is over and never cleared us: self-heal
+					src.clash_lock = null
+				else //frozen: no sweeps, no steps. tick-rate poll so the whole
+					sleep(world.tick_lag) //column resumes together - no gaps, no lag
+					continue
 			if(src.Area=="Beam" && chain)
 				chain.UpdateStates()
 			if(src.EdgeOfMapProjectile())
@@ -186,6 +197,8 @@ obj/Skills/Projectile/_Projectile
 				src.transform = src.transform.Turn(src.ProjectileSpin)
 			if(!pm_substep) //substep mode sleeps+sweeps per tick inside PmTravel instead
 				sleep(src.Speed)
+				if(src.clash_lock) //locked while we slept: no wake sweep, no wake step
+					continue
 				if((src.Static || src.StormFall) && src.Radius>0) //proximity bomb / falling meteor: Radius tiles, not the ink footprint
 					StaticRadiusSweep()
 				else
@@ -213,7 +226,8 @@ obj/Skills/Projectile/_Projectile
 					if(src.StormFall)
 						animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
 			else
-				PixelStep() //32px per Speed sleep = old walk() rate
+				if(!src.clash_lock) //a clash formed mid-iteration: no extra step into the enemy beam
+					PixelStep() //32px per Speed sleep = old walk() rate
 		if(Owner) Owner.active_projectiles -= src
 		ProjectileFinish()
 		return

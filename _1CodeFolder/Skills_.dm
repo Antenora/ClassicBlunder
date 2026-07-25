@@ -157,6 +157,21 @@ obj/Skills/proc/Recharge(Time, mob/m)
 			Using = 0
 		if(m && m.cooldownAnnounce)
 			m << "<font color='white'><b>[src] charge restored. ([Charges]/[MaxCharges])</b></font color>"
+
+//perfect-break refund
+obj/Skills/proc/RefundCooldown(frac = 1)
+	if(!Using) return
+	var/elapsed = world.time - cooldown_start_wt
+	var/remaining = max(0, cooldown_remaining - elapsed)
+	var/newTime = remaining * (1 - frac)
+	if(frac >= 1 || newTime < 1)
+		Using = 0
+		cooldown_remaining = 0
+		cooldown_full = 0
+		cooldown_start = 0	//pending spawn self-cancels on the start-stamp mismatch
+		cooldown_start_wt = 0
+		return
+	Cooldown(Time = newTime, announce_cd = 0)
 #define get_turf(A) (get_step(A, 0))
 
 /mob/var/tmp/lastZanzoUsage = 0
@@ -244,6 +259,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					src.OMessage(1,null,"[src]([src.key]) meditated!")
 					src.dir=SOUTH
 					src.AfterImageStrike=0
+					src.ais_window_until=0
 					src.Grounded=0
 					if(src.InfusionElement)
 						src.InfusionElement=null
@@ -290,8 +306,6 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						Modifier+=1
 				if(src.Saga=="Eight Gates")
 					Modifier+=2
-				if(!src.HasDashMaster())
-					Z.Cooldown(1/Modifier)
 				if(src.CheckSlotless("New Moon Form"))
 					if(src.CheckSlotless("Half Moon Form"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/H in src)
@@ -321,6 +335,11 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					return
 				if(src.Knockbacked)
 					return
+				//cd only once we're actually dashing - used to burn on dead presses
+				if(!src.HasDashMaster())
+					Z.Cooldown(1/Modifier)
+				//launch-break window check has to happen before the dash loop sleeps through it
+				var/perfect_launch = glob.PERFECT_BREAK && src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal, src))
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal)
@@ -391,6 +410,9 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(src.Launched)
 					src.Launched=0
 					LaunchEnd(src)
+					if(perfect_launch)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] rights themselves the instant the blow lands!", "")
 				src.NextAttack=0
 				src.icon_state=""
 				walk(src,0)
@@ -509,6 +531,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(!src.Knockback)
 					return
 				if(src.Energy>EnergyMax/8)
+					var/perfect = glob.PERFECT_BREAK && src.kb_start_time && (world.time <= src.kb_start_time + glob.TIMING_WINDOW)
 					src.OMessage(10,"[src] regained their footing!!","<font color=red>[src]([src.key]) used Aerial Recovery.")
 					RecoverImage(src)
 					src.AerialRecovery=1
@@ -526,6 +549,9 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					else
 						if(!src.HasDashMaster())
 							Z.Cooldown()
+					if(perfect)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] snaps out of the blow the instant it lands!", "")
 			if("Aerial Payback")
 				if(src.KO)
 					return

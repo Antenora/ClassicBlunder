@@ -98,7 +98,7 @@ mob
 					src.Unconscious(null, "succumbing to poison!")
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
-		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0)
+		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0, PierceGuard = 0)
 			#if DEBUG_DAMAGE
 			log2text("Damage", "Start DoDamage", "damageDebugs.txt", src.ckey)
 			log2text("Damage", val, "damageDebugs.txt", src.ckey)
@@ -137,6 +137,23 @@ mob
 					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100+(RG.Mastery-1))
 					val = 0
 					defender.client.updateRGMeter()
+			//guard: front-arc DR + meter chip + corner carry. behind/pierce/self skip it
+			if(glob.GUARD_SYSTEM && defender && val > 0 && src != defender)
+				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender))
+					defender.GuardMeter += glob.GUARD_METER_FLAT + val * glob.GUARD_METER_SCALE
+					val *= (1 - glob.GUARD_DR)
+					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)
+					if(defender.GuardMeter >= glob.GUARD_METER_MAX)
+						defender.GuardStop(broken = 1)
+						src.FlourishArm()
+				else if(defender.IsGuardBroken())
+					val *= glob.GUARD_BREAK_DMG_AMP
+			//charging through hits: three's the limit
+			if(defender && defender.IsChargingEnergy() && val > 0 && src != defender)
+				defender.charge_hits_taken++
+				if(defender.charge_hits_taken >= glob.CHARGE_BREAK_HITS)
+					defender.ChargeStop()
+					defender.charge_lockout_until = world.time + glob.TIMING_WINDOW
 			if(val==0)
 				DEBUGMSG("val is 0 so we're ending dodamage now")
 				return 0;
@@ -3305,6 +3322,7 @@ mob
 					p.Charging=0
 					src.Beaming=0
 					src.BeamCharging=0
+				src.BeamsRelease() //V2: detach-and-fly, the legacy behaviour - never orphan the datum
 		ForceCancelBuster()
 			if(BusterTech)
 				if(BusterTech.Charging)
@@ -3701,8 +3719,8 @@ mob
 			var/flick=src.HasFlicker()
 			if(flick)
 				Mult*=clamp(1+(flick/glob.ZANZO_FLICKER_DIVISOR),glob.ZANZO_FLICKER_LOWEST_CLAMP, glob.ZANZO_FLICKER_HIGHEST_CLAMP)
-			if(src.AfterImageStrike)
-				return
+			if(!glob.AIS_WINDOW && src.AfterImageStrike)
+				return	//legacy: armed stack froze regen. window mode has no armed state to tax
 			var/max_charges = GetMaxMovementCharges()
 			var/taper_basis = max(max_charges, 3)
 			var/add = (glob.ZANZO_FLICKER_BASE_GAIN-(max(0.01,MovementCharges)/taper_basis)/10)*Mult

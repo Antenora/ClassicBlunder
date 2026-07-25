@@ -3560,6 +3560,12 @@ mob
 		CanAttack(ModifyAttack=0)
 			if(ModifyAttack >= 0 && (NextAttack-ModifyAttack > world.time))
 				return 0
+			if(src.splat_stagger_until > world.time)
+				return 0
+			if(src.IsGuarding())
+				return 0
+			if(src.IsChargingEnergy())
+				return 0
 			if(src.BusterCharging)
 				return 0
 			if(src.Beaming)

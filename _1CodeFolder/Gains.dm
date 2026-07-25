@@ -373,6 +373,8 @@ mob
 				p.Auto_Attack()
 		StunCheck(src)
 		StunImmuneCheck(src)
+		if(glob.GUARD_SYSTEM && !Guarding && GuardMeter > 0)
+			GuardMeter = max(0, GuardMeter - glob.GUARD_METER_DECAY)
 		if(glob.BREAK_TARGET && !src.Admin && Target && ismob(Target))
 			var/distance = get_dist(Target, src)
 			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))

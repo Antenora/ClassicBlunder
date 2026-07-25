@@ -52,6 +52,7 @@ mob/Players
 	//	This will initiate movement whenever a client logs into a /mob/player.
 	Login()
 		..()
+		BeamsKill() 
 		if(!ChrysalisActive)
 			Frozen = 0
 		// Re-apply chrysalis state on reconnect (timer loop and shell obj are lost on restart)
@@ -213,6 +214,12 @@ mob
 						if(!src.EquippedFlyingDevice())
 							flick("Flight",src)
 					if(key1||key2||key3||key4)
+						//rooted pivot
+						if((IsGuarding() || IsChargingEnergy()) && !dir_locked)
+							var/hd = heldDir()
+							if(hd) dir = hd
+							sleep(world.tick_lag)
+							continue
 						if(canMove())
 							if(PmActive()) //pixel build: per-tick micro-steps, same net speed
 								PmMovementTick()
@@ -271,6 +278,10 @@ mob
 //				if(Control) return TRUE
 				//if(!Allow_Move()) return FALSE
 				if(move_disabled || passive_handler["Snared"]>0)
+					return FALSE
+				if(splat_stagger_until > world.time)
+					return FALSE
+				if(IsGuarding() || IsChargingEnergy())
 					return FALSE
 				return TRUE
 
@@ -392,8 +403,27 @@ mob
 							key4=0
 						else key4=0
 
+//merged held-key direction
+mob/proc/heldDir()
+	return 0
+mob/Players/heldDir()
+	var/dir_x = 0
+	var/dir_y = 0
+	var/north_held = (key1==NORTH||key2==NORTH||key3==NORTH||key4==NORTH)
+	var/south_held = (key1==SOUTH||key2==SOUTH||key3==SOUTH||key4==SOUTH)
+	var/east_held  = (key1==EAST ||key2==EAST ||key3==EAST ||key4==EAST )
+	var/west_held  = (key1==WEST ||key2==WEST ||key3==WEST ||key4==WEST )
+	if(north_held && !south_held) dir_y = NORTH
+	else if(south_held && !north_held) dir_y = SOUTH
+	if(east_held && !west_held) dir_x = EAST
+	else if(west_held && !east_held) dir_x = WEST
+	return dir_x + dir_y
+
 mob/Players/BeamTurnDir()
 	if(!HasTurningCharge()) return
+	if(clash_resume_noaim) //keys still held from the struggle inputs: don't re-aim off them
+		if(!heldDir()) clash_resume_noaim = 0 //cleared once the player actually lets go
+		return
 	var/dir_x = 0
 	var/dir_y = 0
 	var/north_held = (key1==NORTH||key2==NORTH||key3==NORTH||key4==NORTH)
