@@ -24,9 +24,7 @@ mob
 		AscAvailable()
 			potential_ascend();
 			if(race.ascensions.len==0) return
-			//If a prompt is already open from a prior call (e.g. spammed Meditate),
-			//bail — otherwise race subclass onAscension overrides re-apply their passive Increase() calls
-			//each time we re-enter before the parent's pickingChoice guard is reached.
+			//bail if a prompt is already open (spammed Meditate) or Increase() gets re-applied
 			for(var/ascension/pending in race.ascensions)
 				if(pending.pickingChoice) return
 			for(var/a in race.ascensions)
@@ -100,7 +98,7 @@ mob
 					src.Unconscious(null, "succumbing to poison!")
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
-		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0)
+		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0, PierceGuard = 0)
 			#if DEBUG_DAMAGE
 			log2text("Damage", "Start DoDamage", "damageDebugs.txt", src.ckey)
 			log2text("Damage", val, "damageDebugs.txt", src.ckey)
@@ -139,6 +137,23 @@ mob
 					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100+(RG.Mastery-1))
 					val = 0
 					defender.client.updateRGMeter()
+			//guard: front-arc DR + meter chip + corner carry. behind/pierce/self skip it
+			if(glob.GUARD_SYSTEM && defender && val > 0 && src != defender)
+				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender))
+					defender.GuardMeter += glob.GUARD_METER_FLAT + val * glob.GUARD_METER_SCALE
+					val *= (1 - glob.GUARD_DR)
+					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)
+					if(defender.GuardMeter >= glob.GUARD_METER_MAX)
+						defender.GuardStop(broken = 1)
+						src.FlourishArm()
+				else if(defender.IsGuardBroken())
+					val *= glob.GUARD_BREAK_DMG_AMP
+			//charging through hits: three's the limit
+			if(defender && defender.IsChargingEnergy() && val > 0 && src != defender)
+				defender.charge_hits_taken++
+				if(defender.charge_hits_taken >= glob.CHARGE_BREAK_HITS)
+					defender.ChargeStop()
+					defender.charge_lockout_until = world.time + glob.TIMING_WINDOW
 			if(val==0)
 				DEBUGMSG("val is 0 so we're ending dodamage now")
 				return 0;
@@ -992,17 +1007,7 @@ mob
 				val*=PrideDrain
 				if(src.Health>=85&&!passive_handler.Get("PowerStressed"))
 					val*=0
-			// Light Mender mage passive: 50% of energy spent is converted to mana on
-			// every spend. Hook fires HERE — after all the reduction multipliers
-			// (KiControlMastery, PowerUpPercent, PotionCD, PrideDrain) so the refund
-			// tracks what ACTUALLY gets paid, not the raw caller request. Otherwise
-			// a mage with KiControlMastery would refund more mana than they actually
-			// paid in energy, which is a free-resource exploit. Element-agnostic
-			// (mage-body passive, not Light-only) matching the Session 25/26/27/28
-			// mage-body convention. HealMana is safe — no PotionCD divider, just
-			// ManaAmount += val with MaxMana() clamp at _JinxUtility.dm:1014. The
-			// `val > 0` guard prevents the PrideDrain val*=0 path or any other
-			// zero-out from triggering a no-op HealMana call.
+			//Mender refunds half the energy as mana - after the reduction mults so it tracks what actually got paid
 			if(val > 0 && src.hasMagePassive(/mage_passive/light/Mender))
 				src.HealMana(val * 0.5)
 			src.Energy-=val
@@ -1018,14 +1023,7 @@ mob
 		GainFatigue(var/val)
 			if(src.FusionPowered)
 				return
-			// Space Linearity mage passive: incoming Fatigue gain is reduced to 50%.
-			// Doc literal: "Fatigue gain / Capacity loss at 50% rate (each additional
-			// selection: 33%, 25%, ...)". Currently bound to flat 0.5 because
-			// hasMagePassive is count-blind — same single-tier limitation as Session
-			// 25/26 hooks. Halving the input val before the rest of the pipeline is
-			// mathematically equivalent to halving at the end (every downstream
-			// mutator is multiplicative), but reads cleaner as "Linearity halves the
-			// fatigue you would have taken".
+			//Linearity halves fatigue gain
 			if(src.hasMagePassive(/mage_passive/space/Linearity))
 				val *= 0.5
 			val/=1+src.GetKiControlMastery()
@@ -1061,11 +1059,7 @@ mob
 			if(src.ManaAmount<=0)
 				src.ManaAmount=0
 		LoseCapacity(var/val)
-			// Space Linearity mage passive: Capacity loss is reduced to 50%. Pairs
-			// with the GainFatigue hook above — both halves of the doc line "Fatigue
-			// gain / Capacity loss at 50% rate" are now wired. Single-tier flat 0.5
-			// for the same reason as the Fatigue hook. Halving before the
-			// GetManaCapMult divider is order-equivalent to halving after.
+			//Linearity halves capacity loss too
 			if(src.hasMagePassive(/mage_passive/space/Linearity))
 				val *= 0.5
 			val/=src.GetManaCapMult()
@@ -1119,15 +1113,6 @@ mob
 				return
 			src.Health+=val
 			src.MaxHealth()
-			// Light Warden: delayed heal retrigger. Each selection of the Warden mage
-			// passive schedules three echo heals at 50% / 25% / 12.5% of the final
-			// post-processed val. The echoes are fresh HealHealth calls gated on
-			// _isEcho so the retrigger chain terminates after one pass — no recursion
-			// on the echo side. Seed is post-Shear / post-PotionCD / post-Staked /
-			// post-Awakening / post-Vaizard val so zero-heal paths correctly produce
-			// zero echoes, and shear-reduced heals echo off the reduced amount. Delays
-			// (1s / 2s / 3s) are a design choice — the doc does not specify a window,
-			// but short delays keep the echo legible as a payoff on the original heal.
 			/* This shit is disabled for now because wtf
 			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
 				var/echo_seed = val
@@ -1416,14 +1401,7 @@ mob
 			if(isRace(ANDROID)||CyberneticMainframe&&src.Class=="Resourceful")
 				enhance = vars["Enhanced[statName]"] * 0.6
 			if(Target && ismob(Target))
-				// Rusting: when target carries the Rusting passive (mystic/hybrid styles)
-				// and the player is poisoned, debuff the player's enhance-chip stat by an
-				// amount that scales with both poison stacks and target's Rusting tier.
-				// Prior version had three bugs: (1) read self's Rusting instead of target's,
-				// which zeroed enhance for everyone without their own Rusting source;
-				// (2) formula scaled the multiplier UP with bigger Rusting/Poison, so high
-				// tiers debuffed less; (3) at extreme stacks the multiplier exceeded 1 and
-				// the debuff flipped into a buff. Rewritten as a clamped 1-x reduction.
+				//target's Rusting + your poison cuts enhance, clamped so it can't flip into a buff
 				var/targetRusting = Target.passive_handler["Rusting"]
 				if(targetRusting && Poison >= 1)
 					var/rustReduction = (Poison * glob.RUSTING_RATE * targetRusting) / 100
@@ -1487,8 +1465,7 @@ mob
 			var/transformation/current = race.transformations[transActive]
 			return current.mastery >= MasteryValue
 
-		// Used by the Devil Arm icon-swap path. Demon-only sins / disguise stay
-		// gated by isInDemonDevilTrigger; this one also covers makaioshin forms.
+		//Devil Arm icon-swap check; unlike isInDemonDevilTrigger this also covers makaioshin forms
 		isInDevilTriggerLikeForm()
 			if(!transActive || !race || !race.transformations || transActive > race.transformations.len) return FALSE
 			var/transformation/current = race.transformations[transActive]
@@ -3345,6 +3322,7 @@ mob
 					p.Charging=0
 					src.Beaming=0
 					src.BeamCharging=0
+				src.BeamsRelease() //V2: detach-and-fly, the legacy behaviour - never orphan the datum
 		ForceCancelBuster()
 			if(BusterTech)
 				if(BusterTech.Charging)
@@ -3516,16 +3494,26 @@ mob
 			src.icon_state="Flight"
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
-	//		var/blur_filter = filter(type="angular_blur", x=0, y=0, size=1)
-	//		filters += blur_filter
-			while(MaxDistance>0)
-//				var/travel_angle = GetAngle(src, Trg)
-//				animate(filters[filters.len], x=sin(travel_angle)*(6/Delay), y=cos(travel_angle)*(6/Delay), time=Delay)
-				step_towards(src,Trg)
+			var/pm = PmActive()
+			var/pm_budget = MaxDistance / world.tick_lag * 32 //total dash distance in px (pixel path)
+			var/pm_px = round(64 / Delay) //old per-tick distance; PmDashStep caps it for smoothness
+			while(pm ? pm_budget > 0 : MaxDistance > 0)
+				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
+					var/travel_angle = GetAngle(src, Trg)
+					var/smear = 6 / max(Delay, 0.5)
+					animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Delay)
+				if(pm) //smooth: one glided step per tick instead of batching 32px steps into one tick
+					var/m = src.PmDashStep(Trg, pm_px)
+					if(!m)
+						break
+					pm_budget -= m
+				else
+					step_towards(src,Trg)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
 				if(Trg in oview(1, src))
 					MaxDistance=0
+					pm_budget=0
 					Delay=0
 					src.dir=get_dir(src,Trg)
 					if(Trg.Knockbacked||src.passive_handler.Get("SpiralImpact"))
@@ -3549,20 +3537,22 @@ mob
 										DC.ManaHeal=3+(src.AscensionsAcquired*2)
 									DC.Trigger(src)
 					break
+				else if(pm)
+					sleep(world.tick_lag) //one glided step already taken this tick
 				else
 					MaxDistance-=world.tick_lag
 					DelayRelease+=Delay*world.tick_lag
 					if(DelayRelease>=1)
 						DelayRelease--
 						sleep(1*world.tick_lag)
-	//		filters -= blur_filter
 			src.Frozen=0
 			if(src.is_dashing>0)
 				src.is_dashing--
 			if(src.is_dashing<0)
 				src.is_dashing=0
 			src.icon_state=""
-			//animate(src.filters[filters.len], x=0, y=0)
+			if(src.filters["trail"])
+				animate(src.filters["trail"], x=0, y=0)
 			src.dir=get_dir(src,Trg)
 		Reincarnate()
 			src.Savable=0
@@ -3664,9 +3654,7 @@ mob
 				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
-			// Zanzoken / Power Up-Down / Sense are auto-granted at creation now (addMissingSkills,
-			// retrofitted onto old saves every login). Ki Control's interactive setup still fires on
-			// first use, once the player has Power Control but hasn't configured Ki Control yet:
+			//basics come from addMissingSkills; Ki Control still needs its first-use setup
 			if(locate(/obj/Skills/Power_Control, src) && !locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
 				src.PoweredFormSetup()
 
@@ -3731,8 +3719,8 @@ mob
 			var/flick=src.HasFlicker()
 			if(flick)
 				Mult*=clamp(1+(flick/glob.ZANZO_FLICKER_DIVISOR),glob.ZANZO_FLICKER_LOWEST_CLAMP, glob.ZANZO_FLICKER_HIGHEST_CLAMP)
-			if(src.AfterImageStrike)
-				return
+			if(!glob.AIS_WINDOW && src.AfterImageStrike)
+				return	//legacy: armed stack froze regen. window mode has no armed state to tax
 			var/max_charges = GetMaxMovementCharges()
 			var/taper_basis = max(max_charges, 3)
 			var/add = (glob.ZANZO_FLICKER_BASE_GAIN-(max(0.01,MovementCharges)/taper_basis)/10)*Mult
@@ -3904,8 +3892,7 @@ var/list/general_magic_database = list()
 var/list/general_weaponry_database = list()
 proc
 	BuildGeneralMagicDatabase() // This is a list of generally obtainable magics. For now, it's just used for Crimson grimoire.
-		// Guard: SkillTree is populated by MakeSkillTreeList which runs from BootWorld("Load").
-		// This proc must be called AFTER MakeSkillTreeList, otherwise SkillTree is null/empty.
+		//needs MakeSkillTreeList to have run first or SkillTree is empty
 		if(!SkillTree || !islist(SkillTree))
 			return
 		general_magic_database = list()

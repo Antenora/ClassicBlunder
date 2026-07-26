@@ -529,4 +529,7 @@ obj/Skills/Grapple/Flashback
 		animate(User, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=2)
 		sleep(2)
 		User.loc = dest
+		if(PmActive()) //saved dest has no sub-tile offset, land clean
+			User.step_x = 0
+			User.step_y = 0
 		User.warp_strike_restore_color()

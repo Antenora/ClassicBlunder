@@ -550,6 +550,9 @@ obj/Skills/Grapple
 	proc
 		Activate(var/mob/User)
 			src.ThrowDir=User.dir
+			if(glob.DIRECTIONAL_TOSS)
+				var/hd = User.heldDir()
+				if(hd) src.ThrowDir = hd
 			if(src.Using)
 				return
 			if(User.HeldSkillBlocksAction(src))
@@ -602,6 +605,9 @@ obj/Skills/Grapple
 							step(Q, src.ThrowDir)
 							sleep(1)
 						Q.transform=matrix()
+						if(PmActive()) //snap the tossed object back to tile center
+							Q.step_x=0
+							Q.step_y=0
 						return//dont trigger cd for object interacts
 
 			if(ismob(User.Grab))

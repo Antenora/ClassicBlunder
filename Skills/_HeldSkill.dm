@@ -43,7 +43,7 @@
 	if(!HeldSkill) return
 	DamageMult = initial(DamageMult)
 	AccMult    = initial(AccMult)
-	IconLock   = initial(IconLock)   
+	IconLock   = initial(IconLock)
 	LockX      = initial(LockX)
 	LockY      = initial(LockY)
 	Distance   = initial(Distance)
@@ -75,7 +75,7 @@
 	var/tmp/held_skill_macro_key          = null
 	var/tmp/held_skill_last_release       = 0
 	var/tmp/held_skill_from_macro         = 0
-	var/tmp/held_skill_pending_key        = null   
+	var/tmp/held_skill_pending_key        = null
 
 
 /proc/_normalizeHeldName(s)
@@ -122,7 +122,7 @@
 
 /mob/proc/CanUseSkill(obj/Skills/Z)
 	if(!Z) return FALSE
-	if(!CanAttack(-1)) return FALSE  
+	if(!CanAttack(-1)) return FALSE
 	if(src.Airborne) return FALSE
 	if(src.OnMagicalVehicle())
 		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
@@ -176,14 +176,14 @@
 /mob/proc/BeginHeldSkill(var/obj/Skills/Z)
 	var/from_macro = held_skill_from_macro && (world.time - held_skill_from_macro) <= HELD_MACRO_FLAG_WINDOW
 	held_skill_from_macro = 0
-	var/hotbar_key = held_skill_pending_key  
+	var/hotbar_key = held_skill_pending_key
 	held_skill_pending_key = null
 
 	if(held_skill) return  // Already charging something
 	if(!Z || !Z.HeldSkill) return
 	var/client/C = client
 	if(!C) return
-	if(!CanUseSkill(Z)) return 
+	if(!CanUseSkill(Z)) return
 
 	// All guards run before touching any charge state.
 
@@ -294,8 +294,8 @@
 		var/raw = initial(T:HeldVerbName) ? initial(T:HeldVerbName) : initial(T:name)
 		if(raw) held_names += _normalizeHeldName(raw)
 
-	var/list/new_cache = list()         
-	var/list/shortcut_key_map = list()  
+	var/list/new_cache = list()
+	var/list/shortcut_key_map = list()
 
 	var/macro_set_str = winget(src, null, "macro")
 	var/macro_params = params2list(macro_set_str)
@@ -526,6 +526,7 @@
 // ChargeLoop runs for the duration of the hold
 
 /mob/proc/ChargeLoop(var/obj/Skills/Z)
+	FxChargeShimmer(src, Z) //heat wavers over the caster while they hold
 	var/last_tick_fire = 0
 	while(held_skill == Z)
 		// Interrupt conditions
@@ -575,7 +576,7 @@
 	// Overheld
 	if(hold_ticks > Z.ChargePeriod * 10)
 		if(Z.NoFizzle)
-			hold_ticks = Z.ChargePeriod * 10 
+			hold_ticks = Z.ChargePeriod * 10
 		else
 			FizzleHeldSkill(Z)
 			return
@@ -630,7 +631,7 @@
 	if(held_skill && held_skill != Z)
 		src << "<font color='red'>You can't do that while charging [held_skill.name].</font>"
 		return TRUE
-	if(judgement_cut_chain_active && !istype(Z, /obj/Skills/AutoHit/Judgement_Cut))
+	if(judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))
 		return TRUE
 	return FALSE
 

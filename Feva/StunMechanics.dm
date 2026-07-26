@@ -25,6 +25,8 @@ proc
 				if(p.ContinuousOn && !p.StormFall)
 					m.UseProjectile(p)
 				continue
+		if(m.Guarding) m.GuardStop()	//hard cc drops guard
+		if(m.ChargingEnergy) m.ChargeStop()
 		var/Stun_Amount=world.time+(amount*10)
 		if(m.Stunned)
 			m.Stunned+=(amount * 4);
@@ -57,6 +59,8 @@ proc
 					mob << "You are no longer Shellshocked..."
 				if(mob.passive_handler["Staggered!"])
 					mob.passive_handler.Set("Staggered!", 0)
+				if(!mob.Launched)
+					mob.cc_combo_hits = 0
 			else
 				return 1
 		if(mob.ReflectedFrozen)
@@ -78,6 +82,8 @@ proc
 				var/mod = (mob.HasMythical() * 0.5) + mob.passive_handler.Get("Juggernaut") * 0.25
 				mob.StunImmune=world.time+(glob.STUN_IMMUNE_TIMER*(1+mod))
 				mob << "You can't be stunned for another [glob.STUN_IMMUNE_TIMER*(1+mod)/10]"
+				if(!mob.Launched)
+					mob.cc_combo_hits = 0
 		if(mob.ReflectedFrozen)
 			mob.ReflectedFrozen=0
 	StunImmuneCheck(mob/mob)

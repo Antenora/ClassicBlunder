@@ -329,11 +329,175 @@ obj
 					adjust(usr)
 					usr.UseProjectile(src)
 
+
+/obj/Skills/AutoHit/Jarona
+	name = "Jarona"
+	Area = "Target"
+	NeedsSword=0
+	Distance = 16
+	DamageMult = 5
+	Knockback = 10
+	StrOffense = 1
+	EndDefense = 1
+	PassThrough = 1
+	Rush = 1
+	RushAfterImages = 1
+	RushNoFlight = 1
+	StopAtTarget = 1
+	Copyable=6
+	Cooldown = 75
+	ComboMaster = 1
+	GuardBreak = 1
+	NoLock = 1
+	NoAttackLock = 1
+	ChargeWaveIcon   = 'BLANK.dmi'
+	IconTime = 4
+	ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
+
+	HeldSkill = TRUE
+	ChargePeriod = 3
+	SweetSpot = 1.5
+	SweetSpotBenefit = 1.5
+
+	var/tmp/chain_active = FALSE
+	var/tmp/chain_count = 0
+	var/tmp/mob/chain_user = null
+	var/tmp/mob/chain_target = null
+	var/tmp/initial_charge_period = 3
+	var/tmp/saved_cooldown = 75
+	var/tmp/reengage_deadline = 0
+	var/tmp/window_loop_running = FALSE
+
+
+	proc/RollSweetSpot()
+		var/min_ss = 3
+		var/period_ticks = round(ChargePeriod * 10)
+		var/window_ticks = max(1, round(SweetSpotWindow * 10))
+		var/max_ss = max(min_ss, period_ticks - window_ticks)
+		return rand(min_ss, max_ss) / 10
+
+	proc/StartChain(mob/user, mob/target)
+		chain_active = TRUE
+		chain_user = user
+		chain_target = target
+		chain_count = 0
+		DamageMult = 10
+		ChargePeriod = initial_charge_period
+		SweetSpotWindow = 0.3
+		SweetSpot = RollSweetSpot()
+		user.judgement_cut_chain_active = TRUE
+		saved_cooldown = Cooldown > 0 ? Cooldown : initial(Cooldown)
+		Cooldown = 0
+
+	proc/EndChain(var/apply_cooldown = TRUE)
+		if(!chain_active) return
+		var/mob/user = chain_user
+		chain_active = FALSE
+		window_loop_running = FALSE
+		if(user)
+			user.judgement_cut_chain_active = FALSE
+		chain_user = null
+		chain_target = null
+		chain_count = 0
+		DamageMult = 10
+		ChargePeriod = initial_charge_period
+		SweetSpotWindow = 0.3
+		SweetSpot = initial_charge_period / 2
+		Cooldown = saved_cooldown > 0 ? saved_cooldown : initial(Cooldown)
+		if(user)
+			Using = 0
+			cooldown_remaining = 0
+			cooldown_start = 0
+			if(apply_cooldown)
+				src.Cooldown(1, null, user)
+
+	proc/ScheduleReengageWindow(mob/user)
+		if(window_loop_running) return
+		window_loop_running = TRUE
+		reengage_deadline = world.time + 10
+		while(world.time < reengage_deadline)
+			if(!chain_active)
+				window_loop_running = FALSE
+				return
+			if(user.Stunned || user.Suspended || user.Launched || user.Stasis > 0 || user.KO)
+				window_loop_running = FALSE
+				EndChain()
+				return
+			if(!chain_target || chain_target.KO || chain_target.Stasis > 0 || chain_target.Health <= 0)
+				window_loop_running = FALSE
+				EndChain()
+				return
+			// hold has started again.
+			if(user.held_skill == src)
+				window_loop_running = FALSE
+				reengage_deadline = world.time + 10
+				return
+			sleep(1)
+		// Window expired
+		if(chain_active && (!user.held_skill || user.held_skill != src))
+			window_loop_running = FALSE
+			EndChain()
+
+	OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
+		if(!chain_active) return
+		if(!sweet_spot_hit)
+			EndChain()
+			return
+		if(!chain_target || chain_target.KO || chain_target.Stasis > 0 || chain_target.Health <= 0)
+			EndChain()
+			return
+		chain_count++
+		DamageMult = 10 * (1.2 ** (chain_count - 1))
+		p.Target = chain_target
+		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
+		p.judgement_cut_bonus_value = 1.2 ** (chain_count - 1)
+		p.judgement_cut_bonus_chain_count = chain_count
+		p.judgement_cut_bonus_end_time = world.time + 30
+		ChargePeriod = max(0.6, initial_charge_period - (chain_count * 0.3))
+		SweetSpotWindow = max(0.1, ChargePeriod * 0.1)
+		SweetSpot = RollSweetSpot()
+		p.held_skill_last_release = 0
+		spawn() ScheduleReengageWindow(p)
+
+	OnHeldFizzle(mob/p)
+		if(chain_active)
+			EndChain()
+		// Safety net
+		if(p)
+			p.judgement_cut_chain_active = FALSE
+
+	verb/Jarona()
+		set category = "Skills"
+		var/mob/p = usr
+		if(!chain_active && cooldown_remaining)
+			p << "<font color='red'>[name] is on cooldown.</font>"
+			return
+		if(!chain_active)
+			if(!p.Target || p.Target == p || !ismob(p.Target))
+				p << "<font color='red'>You need a target.</font>"
+				return
+			var/mob/T = p.Target
+			if(T.KO || T.Stasis > 0 || T.Health <= 0)
+				p << "<font color='red'>Invalid target.</font>"
+				return
+			if(get_dist(p, T) > Distance)
+				p << "<font color='red'>Target is out of range.</font>"
+				return
+			StartChain(p, T)
+		else
+			if(world.time > reengage_deadline)
+				EndChain()
+				return
+		p.BeginHeldSkill(src)
+		if(p.held_skill != src && chain_active && chain_user == p)
+			EndChain(apply_cooldown = FALSE)
+
+
 //Meter
 obj/HyperdeathMeterBarBG
 	icon = 'HyperdeathMeter.dmi'
 	icon_state = "Background"
-	screen_loc = "CENTER-2.5,BOTTOM+3"
+	screen_loc = "CENTER-2.5,BOTTOM+3.1"
 	layer = FLOAT_LAYER
 	plane = FLOAT_PLANE
 	mouse_opacity = 0
@@ -341,7 +505,7 @@ obj/HyperdeathMeterBarBG
 obj/HyperdeathMeterBarFill
 	icon = 'HyperdeathMeter.dmi'
 	icon_state = "FillActive"
-	screen_loc = "CENTER-2.5,BOTTOM+3"
+	screen_loc = "CENTER-2.5,BOTTOM+3.1"
 	layer = FLOAT_LAYER + 50
 	plane = FLOAT_PLANE
 	mouse_opacity = 0
@@ -375,8 +539,10 @@ mob/proc/HyperMeterUpdate()
 
 	if(fill_width<=0)
 		HyperBarFill.invisibility=101
+		HyperBar.invisibility=101
 		return
 
+	HyperBar.invisibility = 0
 	HyperBarFill.invisibility = 0
 	var/iconToUse = "FillInactive"
 	if(CheckSpecial("Hyperdeath Mode")||HyperdeathMeterCurrent >= HyperdeathThreshold)

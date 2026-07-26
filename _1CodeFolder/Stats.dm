@@ -747,22 +747,21 @@ mob/proc/Recover(var/blah,Amount=1)
 mob/var/RainbowColor
 mob/var/HoldOn=0
 mob/proc/RainbowGlowStuff()
-	if (HoldOn==0)
-		HoldOn=1
-		for(var/loop=0, loop<=100, loop++)
-			if(src.passive_handler.Get("Prismatic"))
-				if (RainbowColor<359)
-					RainbowColor+=1
-				else
-					RainbowColor=0
-				if (RainbowColor>359)
-					RainbowColor=359
-				filters = null
-				filters += filter(type="drop_shadow",x=0,y=0,size=src.passive_handler.Get("Prismatic"), offset=1, color=HSVtoRGB(hsv(AngleToHue(RainbowColor), 255, 255)))
-				GlowFilter = filters[filters.len]
-				filters += filter(type="motion_blur", x=0,y=0)
-				sleep(0.01)
-		HoldOn=0
+	if(!src.passive_handler.Get("Prismatic"))
+		return
+	if(filters["prismatic"]) //cycle already running; rebuilt only after something wipes filters
+		return
+	filters -= "trail" //duplicate filter names stack, so pull trail before re-adding it after the glow
+	filters += filter(name="prismatic", type="drop_shadow",x=0,y=0,size=src.passive_handler.Get("Prismatic"), offset=1, color="#ff0000")
+	GlowFilter = filters["prismatic"]
+	filters += filter(name="trail", type="motion_blur", x=0,y=0)
+	//hue wheel: 60 deg legs, full lap 180ds
+	animate(GlowFilter, color="#ffff00", time=30, loop=-1)
+	animate(color="#00ff00", time=30)
+	animate(color="#00ffff", time=30)
+	animate(color="#0000ff", time=30)
+	animate(color="#ff00ff", time=30)
+	animate(color="#ff0000", time=30)
 
 mob/proc/
 	Available_Power()
@@ -832,10 +831,7 @@ mob/proc/
 		if(src.passive_handler.Get("ChaosQueen"))
 			src.PowerControl=rand(101, 600)
 		if(src.passive_handler.Get("Prismatic"))
-			for(var/loopstuff=0, loopstuff<=10, loopstuff++)
-				if (HoldOn==0)
-					RainbowGlowStuff()
-				sleep(0.01)
+			RainbowGlowStuff()
 		var/EPM=Power_Multiplier;
 		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
 			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
@@ -1001,7 +997,6 @@ mob/proc/
 		var/nerf = GetPowerUpRatio()+EPM > 2.3 ? 1 : 0
 		power_display=get_power_tier(0, Power, nerf)
 
-		// Track the highest sustained Power this mob has ever reached.
 		if(Power > PeakPowerObserved)
 			PeakPowerObserved = Power
 
@@ -1051,7 +1046,8 @@ mob/proc/
 						Recover("Mana",1)
 				Recover("Capacity",2)
 			else
-				Recover("Energy",0.5)
+				if(!glob.ACTIVE_ENERGY_CHARGE)
+					Recover("Energy",0.5)	//legacy idle trickle, active charge replaces it
 
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
@@ -1182,6 +1178,17 @@ mob/proc/
 				else
 					src.LoseEnergy(2*PowerDrain*glob.WorldPUDrain)
 
+		//active energy channel
+		if(glob.ACTIVE_ENERGY_CHARGE && src.ChargingEnergy && !src.PureRPMode)
+			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
+				src.ChargeStop()
+			else
+				var/ramp = min(1, (world.time - src.charge_started_at) / max(glob.CHARGE_RAMP_DS, 1))
+				var/before = src.Energy
+				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
+				if(src.Energy <= before)
+					src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
+
 
 mob/proc/Update_Stat_Labels()
 	set waitfor=0
@@ -1293,6 +1300,7 @@ mob/proc/Update_Stat_Labels()
 		winshow(src, "BarPotion",0)
 		winshow(src, "BarCripple",0)
 		if(client) client.UpdateFinisherBar()   // tension/finisher HUD bar
+		if(client) client.UpdateGuardBar()
 		if(src.StyleActive)
 			winshow(src, "StyleLabel",1)
 			winshow(src, "StanceLabel",1)

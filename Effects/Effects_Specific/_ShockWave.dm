@@ -124,8 +124,7 @@ obj/shockwave
 					y--
 
 				if(!loc)
-					del src
-					return
+					return //already off-map, ref drops on return
 				if(TurfCall) if(!(loc in Called)) {call(loc,TurfCall)(arglist(TurfCallArg));Called+=loc}
 				var/list/atom/movable/AL=new
 				for(var/atom/movable/A in loc) if(!istype(A,/obj/shockwave)) AL += A
@@ -141,16 +140,16 @@ obj/shockwave
 
 
 				if(StopAtMob)if(locate(/mob)in AL)
-					del src
+					loc = null //not del: burst of ~20 of these = world-scan stall
 					return
 				if(StopAtObj)if(locate(/obj)in AL)
-					del src
+					loc = null
 					return
 				if(StopAtDenseTurf) if(loc.density)
-					del src
+					loc = null
 					return
 				if(StopAtOpacTurf)if(loc.opacity)
-					del src
+					loc = null
 					return
 
 
@@ -158,5 +157,5 @@ obj/shockwave
 				pixel_y = pos_y
 				sleep(1)
 				Ticks--
-			if(src)del src
+			if(src)loc = null
 

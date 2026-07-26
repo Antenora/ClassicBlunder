@@ -78,10 +78,13 @@ client
 		atom/movable/shud/tbar_en_track
 		atom/movable/shud/tbar_en_fill
 		atom/movable/shud/cardtext/tbar_en_text
+		atom/movable/shud/tbar_gd_track
+		atom/movable/shud/tbar_gd_fill
 		atom/movable/shud/tdebuff_icon
 		atom/movable/shud/debuffnum/tdebuff_num
 		tcard_hp_last = 0
 		tcard_en_last = 0
+		tcard_gd_last = 0
 		tcard_basetile = 1                    // cached card anchor so bars place relative to it
 		tcard_basepix = 0
 		tcard_row = 1
@@ -95,6 +98,7 @@ client
 #define TBAR_X 23          // card-local x of the track's left edge
 #define TBAR_HP_Y 35
 #define TBAR_EN_Y 22
+#define TBAR_GD_Y 9
 #define TBAR_FILL_W 158
 #define TBAR_FILL_INSET 1  // fill offset from the track border
 #define TBAR_FONT "font-family:'Pixel Operator 8'; font-size:6pt"
@@ -127,6 +131,7 @@ client/proc/InitCharacterCard()
 	screen += cardstatus
 	InitIntentChips()
 	InitFinisherBar()
+	InitGuardBar()
 	UpdateCharacterCard()
 	UpdateCardText()
 	PositionCharacterCard()
@@ -193,6 +198,18 @@ client/proc/InitTargetCard()
 	tbar_en_text.maptext_y = -3
 	tbar_en_text.alpha = 0
 	screen += tbar_en_text
+	tbar_gd_track = new
+	tbar_gd_track.icon = 'HUD/tbar_track.png'
+	tbar_gd_track.layer = MCARD_LAYER + 0.55
+	tbar_gd_track.alpha = 0
+	screen += tbar_gd_track
+	tbar_gd_fill = new
+	tbar_gd_fill.icon = 'HUD/tbar_fill_en.png'
+	tbar_gd_fill.layer = MCARD_LAYER + 0.56
+	tbar_gd_fill.color = "#e8a33d"	//their guard meter, amber
+	tbar_gd_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=-TBAR_FILL_W)
+	tbar_gd_fill.alpha = 0
+	screen += tbar_gd_fill
 	tdebuff_icon = new
 	tdebuff_icon.layer = MCARD_LAYER + 0.6
 	tdebuff_icon.alpha = 0
@@ -203,7 +220,7 @@ client/proc/InitTargetCard()
 	screen += tdebuff_num
 
 client/proc/ResetTargetCard()
-	for(var/atom/movable/o in list(tcard, tcardtext, tcardstatus, tbar_hp_track, tbar_hp_fill, tbar_hp_text, tbar_en_track, tbar_en_fill, tbar_en_text, tdebuff_icon, tdebuff_num))
+	for(var/atom/movable/o in list(tcard, tcardtext, tcardstatus, tbar_hp_track, tbar_hp_fill, tbar_hp_text, tbar_en_track, tbar_en_fill, tbar_en_text, tbar_gd_track, tbar_gd_fill, tdebuff_icon, tdebuff_num))
 		if(o)
 			screen -= o
 			del o
@@ -216,11 +233,14 @@ client/proc/ResetTargetCard()
 	tbar_en_track = null
 	tbar_en_fill = null
 	tbar_en_text = null
+	tbar_gd_track = null
+	tbar_gd_fill = null
 	tdebuff_icon = null
 	tdebuff_num = null
 	tcard_last = null
 	tcard_hp_last = 0
 	tcard_en_last = 0
+	tcard_gd_last = 0
 
 client/proc/BuildTargetComposite(mob/T)
 	if(!tcard || !T) return
@@ -261,27 +281,39 @@ client/proc/PlaceTargetBars()
 	tbar_en_fill.screen_loc  = TargetChildLoc(TBAR_X + TBAR_FILL_INSET, TBAR_EN_Y + TBAR_FILL_INSET)
 	tbar_hp_text.screen_loc  = TargetChildLoc(TBAR_X, TBAR_HP_Y)
 	tbar_en_text.screen_loc  = TargetChildLoc(TBAR_X, TBAR_EN_Y)
+	if(tbar_gd_track)
+		tbar_gd_track.screen_loc = TargetChildLoc(TBAR_X, TBAR_GD_Y)
+		tbar_gd_fill.screen_loc  = TargetChildLoc(TBAR_X + TBAR_FILL_INSET, TBAR_GD_Y + TBAR_FILL_INSET)
 	if(tdebuff_icon) tdebuff_icon.screen_loc = TargetChildLoc(TDBUFF_X, TDBUFF_Y)
 	if(tdebuff_num)  tdebuff_num.screen_loc  = TargetChildLoc(TDBUFF_X, TDBUFF_Y)
 
 client/proc/SetTargetCardAlpha(a)
 	for(var/atom/movable/o in list(tcard, tcardtext, tcardstatus, tbar_hp_track, tbar_hp_fill, tbar_hp_text, tbar_en_track, tbar_en_fill, tbar_en_text, tdebuff_icon, tdebuff_num))
 		if(o) o.alpha = a
+	if(!a || !glob.GUARD_SYSTEM)	//guard bar only shows when the system is live
+		if(tbar_gd_track) tbar_gd_track.alpha = 0
+		if(tbar_gd_fill) tbar_gd_fill.alpha = 0
 
-client/proc/UpdateTargetBars(hp, en, snap)
+client/proc/UpdateTargetBars(hp, en, snap, gd = 0)
 	if(!tbar_hp_fill || !tbar_en_fill) return
 	var/hpx = round(TBAR_FILL_W * hp / 100) - TBAR_FILL_W
 	var/enx = round(TBAR_FILL_W * en / 100) - TBAR_FILL_W
+	var/gdx = round(TBAR_FILL_W * gd / 100) - TBAR_FILL_W
 	if(snap)
 		tbar_hp_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=hpx)
 		tbar_en_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=enx)
+		if(tbar_gd_fill) tbar_gd_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=gdx)
 	else
 		var/tt = OrbAnimTime(tcard_hp_last, hp)
 		if(tt) animate(tbar_hp_fill.filters[1], x = hpx, time = tt, easing = SINE_EASING)
 		var/te = OrbAnimTime(tcard_en_last, en)
 		if(te) animate(tbar_en_fill.filters[1], x = enx, time = te, easing = SINE_EASING)
+		if(tbar_gd_fill)
+			var/tg = OrbAnimTime(tcard_gd_last, gd)
+			if(tg) animate(tbar_gd_fill.filters[1], x = gdx, time = tg, easing = SINE_EASING)
 	tcard_hp_last = hp
 	tcard_en_last = en
+	tcard_gd_last = gd
 	tbar_hp_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">[hp]%</span></center>"
 	tbar_en_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">[en]%</span></center>"
 
@@ -310,7 +342,13 @@ client/proc/UpdateTargetCard()
 	tcardstatus.maptext = "<center><span style=\"[MCARD_FONT]; color:#bfefff\">[intent][rp][get_dist(mob, T)] Tiles</span></center>"
 	var/hp = min(max(round(T.Health, 0.01), 0), 100)
 	var/en = T.EnergyMax ? min(max(round((T.Energy / T.EnergyMax) * 100, 0.01), 0), 100) : 0
-	UpdateTargetBars(hp, en, newtarget)
+	var/gd = 0
+	if(glob.GUARD_SYSTEM)
+		gd = min(max(round((T.GuardMeter / max(glob.GUARD_METER_MAX, 1)) * 100, 0.01), 0), 100)
+		var/showgd = (T.Guarding || T.GuardMeter > 0)
+		if(tbar_gd_track) tbar_gd_track.alpha = showgd ? 255 : 0
+		if(tbar_gd_fill) tbar_gd_fill.alpha = showgd ? 255 : 0
+	UpdateTargetBars(hp, en, newtarget, gd)
 	UpdateTargetDebuff(T)
 
 client/proc/UpdateTargetDebuff(mob/T)
@@ -348,9 +386,11 @@ client/proc/PositionCharacterCard()
 	UpdateDebuffs() // re-place on resize
 	UpdateTimedBuffs() // re-place on resize
 	PositionFinisherBar() // re-place on resize
+	PositionGuardBar() // re-place on resize
 
 client/proc/ResetCharacterCard()
 	ResetFinisherBar()
+	ResetGuardBar()
 	if(card)
 		screen -= card
 		del card
@@ -961,3 +1001,77 @@ client/proc/UpdateFinisherBar()
 	else
 		fin_fill.color = null
 		SetFinisherGlow(FALSE)
+
+// guard meter, I plan to do something different for these visuals soon though
+#define GUARD_BAR_SOUTH 98
+#define GUARD_FILL_COLOR "#e8a33d"
+#define GUARD_HOT_COLOR "#e05545"
+
+client
+	var/tmp
+		atom/movable/shud/gd_track
+		atom/movable/shud/gd_fill
+		gd_main_last = 0
+		gd_shown = 0
+
+client/proc/InitGuardBar()
+	ResetGuardBar()
+	gd_track = new /atom/movable/shud/orbpart
+	gd_track.icon = FIN_TRACK_RSC
+	gd_track.layer = MCARD_LAYER
+	gd_track.filters = filter(type="outline", size=1, color=FIN_EDGE_COLOR)
+	screen += gd_track
+	gd_fill = new /atom/movable/shud/orbpart
+	gd_fill.icon = FIN_FILL_RSC
+	gd_fill.layer = MCARD_LAYER + 0.01
+	gd_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x=-FIN_TRACKW)
+	gd_fill.color = GUARD_FILL_COLOR
+	screen += gd_fill
+	gd_main_last = 0
+	HideGuardBar()
+
+client/proc/ResetGuardBar()
+	for(var/atom/movable/o in list(gd_track, gd_fill))
+		if(o)
+			screen -= o
+			del o
+	gd_track = null
+	gd_fill = null
+	gd_shown = 0
+
+client/proc/HideGuardBar()
+	gd_shown = 0
+	if(gd_track) gd_track.alpha = 0
+	if(gd_fill) gd_fill.alpha = 0
+
+client/proc/PositionGuardBar()
+	if(!gd_track) return
+	var/sl = "CENTER:[FIN_CX],SOUTH:[GUARD_BAR_SOUTH]"
+	gd_track.screen_loc = sl
+	gd_fill.screen_loc = sl
+
+client/proc/UpdateGuardBar()
+	if(!mob || !gd_track) return
+	if(!glob.GUARD_SYSTEM || (!mob.Guarding && mob.GuardMeter <= 0 && !mob.IsGuardBroken()))
+		if(gd_shown) HideGuardBar()
+		return
+	if(!gd_shown)
+		gd_shown = 1
+		gd_track.alpha = 255
+		gd_fill.alpha = 255
+		PositionGuardBar()
+	var/frac = mob.GuardMeter / max(glob.GUARD_METER_MAX, 1)
+	if(frac > 1) frac = 1
+	if(frac < 0) frac = 0
+	var/px = frac ? FIN_FILL_X + round(FIN_SPAN * frac) : 0
+	if(px != gd_main_last)
+		var/tm = OrbAnimTime(gd_main_last, px)
+		if(tm) animate(gd_fill.filters[1], x = px - FIN_TRACKW, time = tm, easing = SINE_EASING)
+		else gd_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x = px - FIN_TRACKW)
+		gd_main_last = px
+	if(mob.IsGuardBroken())
+		gd_fill.color = "#666666"
+	else if(frac >= 0.8)
+		gd_fill.color = GUARD_HOT_COLOR
+	else
+		gd_fill.color = GUARD_FILL_COLOR

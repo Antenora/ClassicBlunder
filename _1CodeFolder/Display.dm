@@ -2,6 +2,11 @@
 #define DISPLAY_MIN_VIEW 7
 #define DISPLAY_BASE_MAX_VIEW 31
 
+var/CLIENT_FPS_DEFAULT = 40 //client render rate; server tick stays world.fps
+
+mob/proc/EffectiveClientFPS()
+	return ChosenFPS || CLIENT_FPS_DEFAULT
+
 client
 	var/tmp
 		view_fit_enabled = FALSE
@@ -63,6 +68,7 @@ client/proc/FitViewNow()
 	var/tw = round(ref_tw * zmul)
 	var/th = round(ref_th * zmul)
 	view = "[tw]x[th]"
+	GfxResizeScreenOverlays(src, pw, ph)
 	PositionCharacterCard() // re-anchor card to new view height, no-op if no card
 	if(party_invite_from) ShowPartyInvite(party_invite_from) // re-center an open invite prompt on resize
 

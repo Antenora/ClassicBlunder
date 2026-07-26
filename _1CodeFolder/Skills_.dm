@@ -18,8 +18,8 @@ mob/verb
 obj/Skills/var
 	cooldown_remaining = 0
 	cooldown_start
-	cooldown_start_wt = 0   
-	cooldown_full = 0       
+	cooldown_start_wt = 0
+	cooldown_full = 0
 	tmp/halve_next_cd = 0
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
@@ -157,6 +157,21 @@ obj/Skills/proc/Recharge(Time, mob/m)
 			Using = 0
 		if(m && m.cooldownAnnounce)
 			m << "<font color='white'><b>[src] charge restored. ([Charges]/[MaxCharges])</b></font color>"
+
+//perfect-break refund
+obj/Skills/proc/RefundCooldown(frac = 1)
+	if(!Using) return
+	var/elapsed = world.time - cooldown_start_wt
+	var/remaining = max(0, cooldown_remaining - elapsed)
+	var/newTime = remaining * (1 - frac)
+	if(frac >= 1 || newTime < 1)
+		Using = 0
+		cooldown_remaining = 0
+		cooldown_full = 0
+		cooldown_start = 0	//pending spawn self-cancels on the start-stamp mismatch
+		cooldown_start_wt = 0
+		return
+	Cooldown(Time = newTime, announce_cd = 0)
 #define get_turf(A) (get_step(A, 0))
 
 /mob/var/tmp/lastZanzoUsage = 0
@@ -183,7 +198,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 			return  FALSE
 	if(src.KO||src.Stunned||src.AutoHitting||src.Frozen>=2||src.Suspended)
 		return  FALSE
-	if(src.judgement_cut_chain_active && !istype(Z, /obj/Skills/AutoHit/Judgement_Cut))
+	if(src.judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))
 		return FALSE
 	if(src.Stasis)
 		return  FALSE
@@ -244,6 +259,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					src.OMessage(1,null,"[src]([src.key]) meditated!")
 					src.dir=SOUTH
 					src.AfterImageStrike=0
+					src.ais_window_until=0
 					src.Grounded=0
 					if(src.InfusionElement)
 						src.InfusionElement=null
@@ -290,8 +306,6 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						Modifier+=1
 				if(src.Saga=="Eight Gates")
 					Modifier+=2
-				if(!src.HasDashMaster())
-					Z.Cooldown(1/Modifier)
 				if(src.CheckSlotless("New Moon Form"))
 					if(src.CheckSlotless("Half Moon Form"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/H in src)
@@ -321,6 +335,11 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					return
 				if(src.Knockbacked)
 					return
+				//cd only once we're actually dashing - used to burn on dead presses
+				if(!src.HasDashMaster())
+					Z.Cooldown(1/Modifier)
+				//launch-break window check has to happen before the dash loop sleeps through it
+				var/perfect_launch = glob.PERFECT_BREAK && src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal, src))
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal)
@@ -352,7 +371,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					src.OMessage(10,"[src] dashes towards [src.Target], as a true Spiral Warrior never runs from battle!!!!","<font color=red>[src]([src.key]) used  Back Dash.")
 				else
 					src.OMessage(10,"[src] dashes away from [src.Target]!","<font color=red>[src]([src.key]) used  Back Dash.")
-				while(Distance>0)
+				var/pm = PmActive()
+				var/pm_budget = Distance * 32 //total dash distance in px (pixel path)
+				var/pm_px = Delay > 0 ? round(32 / Delay) : glob.PM_DASH_MAX_PX //per-tick, capped in PmDashStep
+				while(pm ? pm_budget > 0 : Distance>0)
 					if(src.StyleActive == "Crane Style")
 						src.icon_state="KB"
 					else if(src.RippleActive())
@@ -361,6 +383,12 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						src.icon_state="Flight"
 					if(src.Secret=="Spiral")
 						src.DashTo(src.Target, 20, 0.5, Clashable=1)
+					else if(pm) //smooth: one glided step away per tick instead of batching them into one tick
+						var/m = src.PmDashStep(src.Target, pm_px, away = 1)
+						if(!m)
+							pm_budget = 0
+						else
+							pm_budget -= m
 					else
 						step_away(src,src.Target,68)
 					for(var/atom/a in get_step(src,dir))
@@ -368,15 +396,23 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							continue
 						if(a.density)
 							Distance=0
+							pm_budget=0
 					if(src.Secret=="Spiral")
 						Distance=0
+						pm_budget=0
 					Distance-=1
-					sleep(Delay*world.tick_lag)
+					if(pm)
+						sleep(world.tick_lag) //one glided step already taken this tick
+					else
+						sleep(Delay*world.tick_lag)
 				src.dir=get_dir(src,src.Target)
 				src.Frozen=0
 				if(src.Launched)
 					src.Launched=0
 					LaunchEnd(src)
+					if(perfect_launch)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] rights themselves the instant the blow lands!", "")
 				src.NextAttack=0
 				src.icon_state=""
 				walk(src,0)
@@ -495,6 +531,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(!src.Knockback)
 					return
 				if(src.Energy>EnergyMax/8)
+					var/perfect = glob.PERFECT_BREAK && src.kb_start_time && (world.time <= src.kb_start_time + glob.TIMING_WINDOW)
 					src.OMessage(10,"[src] regained their footing!!","<font color=red>[src]([src.key]) used Aerial Recovery.")
 					RecoverImage(src)
 					src.AerialRecovery=1
@@ -512,6 +549,9 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					else
 						if(!src.HasDashMaster())
 							Z.Cooldown()
+					if(perfect)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] snaps out of the blow the instant it lands!", "")
 			if("Aerial Payback")
 				if(src.KO)
 					return
@@ -592,11 +632,13 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				src.appearance_flags+=NO_CLIENT_COLOR
 				animate(src.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1), time = 3)
 				for(var/mob/Players/M in oview(20,src))
-					M.client.fps=0.0001
+					if(M.client)
+						M.client.fps=0.0001
+						M._fps_hold_until = world.time + 30 //shared stamp - hit-stop won't unfreeze them
 				spawn(30)
 					for(var/mob/Players/B in players)
-						if(B.client.fps!=world.fps)
-							B.client.fps=world.fps
+						if(B.client && B.client.fps!=B.EffectiveClientFPS() && world.time >= B._fps_hold_until)
+							B.client.fps=B.EffectiveClientFPS()
 						animate(B.client, color = null, time = 3)
 						src.appearance_flags-=NO_CLIENT_COLOR
 			if("Time Stop")
@@ -1029,6 +1071,9 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							if(!(src.Target in view(10, src)))
 								return
 							src.Move(get_step(src.Target,src.Target.dir))
+							if(PmActive())//track the target's mid-tile sprite
+								src.step_x=src.Target.step_x
+								src.step_y=src.Target.step_y
 							src.dir=src.Target.dir
 						else
 							if(src.UsingGhostDrive())
@@ -1126,58 +1171,83 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					Z.Cooldown()
 
 
+
+globalTracker
+	var/tmp
+		CAM_SHAKE = TRUE //master switch
+		CAM_SHAKE_MAX = 16 //px ceiling on any single offset
+		CAM_SHAKE_STEP = 1 //ds between noise samples, sets the shake frequency
+
+//mean 0, bounded +/-a, sd ~a/3
+proc/gauss(a)
+	return (rand() + rand() + rand() - 1.5) / 1.5 * a
+
+//bakes the chain for one client. sustain = fraction held at full amp before the decay tail
+proc/_CamShakeClient(client/C, amp, duration, ix, iy, sustain = 0)
+	if(!C) return
+	if(GfxReducedMotion(C))
+		animate(C, pixel_x = 0, pixel_y = 0, time = 1, flags = ANIMATION_END_NOW)
+		return
+	//client.pixel_x lands before the map zoom, so 2x players feel double - scale it out
+	var/zm = max(1, C.CurrentZoom())
+	amp /= zm
+	var/cap = glob.CAM_SHAKE_MAX / zm
+	var/step = max(0.5, glob.CAM_SHAKE_STEP)
+	var/n = max(1, round(duration / step))
+	ix = clamp(ix / zm, -cap, cap)
+	iy = clamp(iy / zm, -cap, cap)
+	var/mag = sqrt(ix * ix + iy * iy)
+	var/ux = mag > 0 ? ix / mag : 0
+	var/uy = mag > 0 ? iy / mag : 0
+	//END_NOW so a new impact replaces an in-flight shake; round(x,1) because one-arg round is floor
+	animate(C, pixel_x = round(ix, 1), pixel_y = round(iy, 1), time = 0, flags = ANIMATION_END_NOW)
+	for(var/i = 1 to n)
+		var/t = (i - 1) / n //(i-1) so the FIRST sample is full amplitude; i/n never reaches env 1
+		var/env = 1
+		if(t > sustain)
+			env = 1 - (t - sustain) / max(0.001, 1 - sustain)
+			env *= env //trauma^2 tail
+		var/px
+		var/py
+		if(mag > 0)
+			//ring along the impulse, scatter across it; cap the DC lead or it swamps the ring
+			var/along = min(mag, amp) * env * 0.6 + amp * env * ((i % 2) ? 1 : -1)
+			var/cross = gauss(amp * 0.35 * env)
+			px = ux * along - uy * cross
+			py = uy * along + ux * cross
+		else
+			px = gauss(amp * env)
+			py = gauss(amp * env)
+		animate(pixel_x = round(clamp(px, -cap, cap), 1), pixel_y = round(clamp(py, -cap, cap), 1), time = step)
+	animate(pixel_x = 0, pixel_y = 0, time = 2, easing = SINE_EASING | EASE_OUT) //guaranteed settle back to pixel=0
+
+proc/_CamShake(atom/source, amp, duration, ix, iy, globe, sustain = 0)
+	if(!glob || !glob.CAM_SHAKE || !source) return
+	if(duration <= 0) return
+	if(amp <= 0 && !ix && !iy) return
+	if(globe)
+		for(var/mob/M in players)
+			if(M.z != globe && globe != 999) continue
+			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+	else
+		for(var/mob/M in view(source))
+			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+
+//Quake = sustained rumble (transformations, power-ups, lightning)
 atom/proc/Quake(var/duration=30, var/globe=0)
 	set waitfor=0
-	if(duration == null || duration == 0)
-		return
-	while(duration)
-		duration-=world.tick_lag
-		if(!globe)
-			for(var/mob/M in view(src))
-				if(M.client)
-					M.client.pixel_x=rand(-8,8)
-					M.client.pixel_y=rand(-8,8)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		else
-			for(var/mob/M in players)
-				if(M.z!=globe&&globe!=999)
-					continue
-				if(M.client)
-					M.client.pixel_x=rand(-8,8)
-					M.client.pixel_y=rand(-8,8)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		if(duration<0)
-			duration=0
-		sleep(world.tick_lag)
+	if(!duration) return
+	_CamShake(src, 12, duration, 0, 0, globe, 0.7)
 
-atom/proc/Earthquake(var/duration=30,var/xpixelmin=0,var/xpixelmax=5,var/ypixelmin=0,var/ypixelmax=5, var/globe=0)
-	while(duration)
-		duration-=1
-		if(!globe)
-			for(var/mob/M in view(src))
-				if(M.client)
-					M.client.pixel_x=rand(xpixelmin,xpixelmax)
-					M.client.pixel_y=rand(ypixelmin,ypixelmax)
-				if(!duration) if(M.client)
-					M.client.pixel_x=0
-					M.client.pixel_y=0
-		else
-			for(var/mob/M in players)
-				if(M.z!=globe&&globe!=999)
-					continue
-				if(M.client)
-					M.client.pixel_x=rand(xpixelmin,xpixelmax)
-					M.client.pixel_y=rand(ypixelmin,ypixelmax)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		if(duration<0)
-			duration=0
-		sleep(1)
+//Earthquake = impact. the min/max box: size becomes amp, center becomes the shove, impulseDir aims it
+atom/proc/Earthquake(var/duration=30,var/xpixelmin=0,var/xpixelmax=5,var/ypixelmin=0,var/ypixelmax=5, var/globe=0, var/impulseDir=0)
+	set waitfor=0
+	if(!duration) return
+	var/amp = max(xpixelmax - xpixelmin, ypixelmax - ypixelmin) / 2
+	var/ix = (xpixelmin + xpixelmax) / 2
+	var/iy = (ypixelmin + ypixelmax) / 2
+	if(impulseDir)
+		var/a = dir2angle(impulseDir) //dir2angle is 0=north so x=sin y=cos
+		ix += sin(a) * amp * 1.5 //the shove reads stronger than the ring
+		iy += cos(a) * amp * 1.5
+	_CamShake(src, amp, duration, ix, iy, globe, 0) //sustain 0: an impact decays from the first frame

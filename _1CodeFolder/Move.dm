@@ -142,9 +142,10 @@ mob/proc/MovementSpeed()
 			Delay=50
 		if(Delay<glob.SPEED_DELAY_LOWEST)
 			Delay=glob.SPEED_DELAY_LOWEST
-	if(src.Afterimages())
-		if(prob(40*Afterimages()))
-			FlashImage(src)
+	if(!PmActive()) //pixel build does afterimages per tile-crossing in PmMovementTick instead
+		if(src.Afterimages())
+			if(prob(40*Afterimages()))
+				FlashImage(src)
 	if(Swim)
 		if(passive_handler.Get("Fishman"))
 			Delay/=2
@@ -178,6 +179,12 @@ mob/Move()
 				return
 	..()
 
+	//turn the world-shadow with the mob instead of waiting on the 3ds loop
+	if(shadow_pool && length(shadow_pool) && glob && glob.WORLD_SHADOWS)
+		for(var/obj/fx_worldshadow/s in shadow_pool)
+			s.RebuildSilhouette()
+
+
 	if(passive_handler.Get("ForceFielded"))
 		for(var/mob/m in oview(glob.FORCEFIELD_RANGE, src))
 			if(passive_handler.Get("ForceFielded") == m.ckey)
@@ -198,10 +205,10 @@ mob/Move()
 		for(var/mob/M in oview(range, src))
 			if(M != src && M.density)
 				src.Melee1(dmgmulti =(0.15), forcedTarget = M)*/
-	if(Bleed > 0 && !Knockback && !is_dashing && client)
+	if(Bleed > 0 && !Knockback && !is_dashing && client && (!PmActive() || loc != Former_Location)) //micro-steps bleed per tile, not per slide
 		WoundSelf(0.01)
 
-	if(src.Grab)
+	if(src.Grab && (!PmActive() || loc != Former_Location))
 		src.Grab_Update()
 
 	if(MapperWalk&&!Knockback&&Target&&istype(Target,/obj/Others/Build))
@@ -211,7 +218,6 @@ mob/Move()
 		overlays-=AFKIcon
 	AFKTimer=AFKTimeLimit
 
-	// SlothFactor tracking: reset stationary bonus on any movement
 	if(istype(src, /mob/Players))
 		var/mob/Players/P = src
 		P.resetSlothTracking()

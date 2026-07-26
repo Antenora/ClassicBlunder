@@ -119,6 +119,7 @@ proc/LifePickSeedOre()
 	return "copper"
 
 proc/SeedLifeSkillNodes()
+	set background = 1
 	InitLifeOreDefs()
 	for(var/obj/LifeSkills/OreNode/old in world)
 		del old
@@ -150,6 +151,13 @@ mob/Admin4/verb/makeOreNode(id as text)
 	var/obj/LifeSkills/OreNode/N = new(get_step(src, src.dir))
 	N.Setup(id)
 	src << "Placed \a [N.name]."
+
+mob/Admin4/verb/Life_Node_Spawns_Toggle()
+	set category = "Admin"
+	set name = "Life Node Spawns Toggle"
+	glob.LIFE_NODE_SPAWNS = !glob.LIFE_NODE_SPAWNS
+	src << "Boot-time life-skill node seeding: [glob.LIFE_NODE_SPAWNS ? "ON" : "OFF"] (takes effect next world start)."
+	Log("Admin", "[ExtractInfo(src)] set life node boot spawns to [glob.LIFE_NODE_SPAWNS].")
 
 mob/Admin4/verb/reseedOreNodes()
 	set category = "Admin"

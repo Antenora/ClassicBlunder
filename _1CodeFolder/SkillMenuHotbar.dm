@@ -10,6 +10,7 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 #define KB_MOVE   1
 #define KB_HOTBAR 2   // +UP release only if the slotted skill is a held skill
 #define KB_INTERACT 3 // +UP always bound so hold-minigames see the release
+#define KB_HOLD   4   // hold-type action: +UP always bound, "-up" suffix like KB_MOVE
 
 /datum/keyaction
 	var/id
@@ -19,8 +20,9 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 	var/defkey2
 	var/category
 	var/kind = KB_NORMAL
-	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "")
-		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2
+	var/rep = 0      // command repeats while the key is held (+REP macro)
+	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "", _rep = 0)
+		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2; rep = _rep
 
 var/global/list/keybind_registry
 var/global/list/keybind_by_id = list()
@@ -33,13 +35,16 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE, "West")
 	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE, "South")
 	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
-	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat")
+	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)   
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
-	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
+	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
+	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
 	R += new/datum/keyaction("toss",        "Toss",                "Toss",               "V",   "Combat")
 	R += new/datum/keyaction("dragondash",  "Dragon Dash",         "Dragon-Dash",        "Q",   "Combat")
 	R += new/datum/keyaction("reversedash", "Reverse Dash",        "Reverse-Dash",       "E",   "Combat")
+	R += new/datum/keyaction("guard",       "Guard",               "Guard",              "H",   "Combat", KB_HOLD)
+	R += new/datum/keyaction("charge",      "Energy Charge",       "Charge",             "N",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("powerup",     "Power Up",            "Power-Up",           "R",   "Combat")
 	R += new/datum/keyaction("powerdown",   "Power Down",          "Power-Down",         "F",   "Combat")
 	R += new/datum/keyaction("pose",        "Pose",                "Pose",               "T",   "Combat")
@@ -65,8 +70,7 @@ var/global/list/keybind_by_id = list()
 		keybind_by_id[a.id] = a
 	return keybind_registry
 
-// slot 1 = primary, 2 = secondary. explicit override if set (incl "" for unbound), else the registry default.
-// storage key is the action id for primary, id@2 for secondary.
+// slot 1 = primary, 2 = secondary; explicit override wins ("" = unbound), stored as id / id@2
 /mob/proc/KeybindKey(action_id, slot = 1)
 	initShortcuts()
 	var/sk = (slot == 2) ? "[action_id]@2" : action_id
@@ -97,19 +101,24 @@ var/global/list/keybind_by_id = list()
 		return "\"[key][suffix]\""
 	return "[key][suffix]"
 
-// write one action's macros for one key on one element id: keydown, plus the +UP release for movement
-// (stop) and for held hotbar skills. empty key parks the macros off the key.
+// keydown plus the +UP release for movement and held hotbar skills; empty key parks the macros
 client/proc/MacroCmd(command)
 	return findtext(command, " ") ? "\"[command]\"" : command
 
-client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
+client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 	var/uid = "[eid]_up"
+	var/rid = "[eid]_rep"
 	if(!key)
 		winset(src, eid, "type=macro;parent=[set_name];name=off_[eid]")
 		winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
 		return
 	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
-	if(kind == KB_MOVE)
+	if(rep)
+		winset(src, rid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=[MacroCmd(command)]")
+	else
+		winset(src, rid, "type=macro;parent=[set_name];name=off_[eid]_rep")
+	if(kind == KB_MOVE || kind == KB_HOLD)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[command]-up")
 		return
 	if(kind == KB_INTERACT)
@@ -122,6 +131,45 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid)
 			winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Release-Held-Skill")
 			return
 	winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
+
+/proc/KbKeyElemId(key)
+	var/id = "kmac"
+	for(var/i = 1 to length(key))
+		id += "_[text2ascii(key, i)]"
+	return id
+
+// bind one physical key to a command (+ its +UP / +REP siblings, per kind/rep)
+client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
+	var/eid = KbKeyElemId(key)
+	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
+	if(rep)
+		winset(src, "[eid]_rep", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=[MacroCmd(command)]")
+	else
+		winset(src, "[eid]_rep", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=")
+	var/up_cmd = null
+	switch(kind)
+		if(KB_MOVE)     up_cmd = "[command]-up"
+		if(KB_HOLD)     up_cmd = "[command]-up"
+		if(KB_INTERACT) up_cmd = "Interact-Release"
+		if(KB_HOTBAR)
+			if(regid)
+				var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
+				var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
+				if(s && s.HeldSkill) up_cmd = "Release-Held-Skill"
+	if(up_cmd)
+		winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[MacroCmd(up_cmd)]")
+	else
+		winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=")
+
+// park a key: the element stays, its command goes empty
+client/proc/KbClearKey(set_name, key)
+	var/eid = KbKeyElemId(key)
+	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=")
+	winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=")
+	winset(src, "[eid]_rep", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=")
+
+// physical keys bound on the last ApplyKeybinds, so newly-freed keys get cleared
+/client/var/tmp/list/kb_live_keys
 
 client/proc/ApplyKeybinds()
 	if(!mob) return
@@ -144,21 +192,39 @@ client/proc/ApplyKeybinds()
 	for(var/k in params2list(winget(src, null, "macro")))
 		set_name = k
 		break
-	for(var/datum/keyaction/a in keybind_registry)
-		ApplyOneBind(set_name, "kb_[a.id]_1", mob.KeybindKey(a.id, 1), a.command, a.kind, a.id)
-		ApplyOneBind(set_name, "kb_[a.id]_2", mob.KeybindKey(a.id, 2), a.command, a.kind, a.id)
+	// collect the desired bind for each physical key (key -> list(command, kind, regid, rep))
+	var/list/desired = list()
+	// diagonals first so a (practically impossible) player collision would still win below
 	for(var/dd in list("Northeast", "Northwest", "Southeast", "Southwest"))
-		ApplyOneBind(set_name, "kbdiag_[lowertext(dd)]", dd, lowertext(dd), KB_MOVE, null)
+		desired[dd] = list(lowertext(dd), KB_MOVE, null, 0)
+	for(var/datum/keyaction/a in keybind_registry)
+		for(var/s = 1 to 2)
+			var/key = mob.KeybindKey(a.id, s)
+			if(!key) continue
+			desired[key] = list(a.command, a.kind, a.id, a.rep)
 	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
 	if(mob.shortcuts.keybinds)
 		for(var/sk in mob.shortcuts.keybinds)
 			if(copytext(sk, 1, 6) != "misc:") continue
+			var/mkey = mob.shortcuts.keybinds[sk]
+			if(!mkey) continue
 			var/body = copytext(sk, 6)
-			var/slot = 1
 			if(length(body) > 2 && copytext(body, length(body) - 1) == "@2")
-				slot = 2
 				body = copytext(body, 1, length(body) - 1)
-			ApplyOneBind(set_name, "kbm_[NormalizeSkillName(body)]_[slot]", mob.shortcuts.keybinds[sk], "RunVerb [body]", KB_NORMAL, null)
+			desired[mkey] = list("RunVerb [body]", KB_NORMAL, null, 0)
+	var/list/newlive = list()
+	for(var/key in desired)
+		var/list/e = desired[key]
+		KbWriteKey(set_name, key, e[1], e[2], e[3], e[4])
+		newlive[key] = 1
+	// any key bound last time but not this time gets its command cleared so it stops firing
+	if(kb_live_keys)
+		for(var/key in kb_live_keys)
+			if(newlive[key]) continue
+			KbClearKey(set_name, key)
+	kb_live_keys = newlive
+	// an open number prompt re-asserts its key overlay on top of whatever was just written
+	if(np_open) NumPromptMacros()
 
 var/global/datum/keybind_menu/keybind_menu = new()
 
@@ -621,8 +687,7 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		usr.shortcuts.vars["shortcut[tgt.slot_index]"] = skill
 		usr.client?.RefreshHotbar()
 
-// type tab. lit while it's the active filter. label rides on the frame as a separate
-// transparent-bg menutext child so the outline filter traces the text, not the frame
+// type tab. label is a separate transparent child so the outline traces the text, not the frame
 /atom/movable/shud/skmenu_tab
 	icon = 'HUD/ui_tab_idle.png'
 	layer = MHUD_LAYER + 0.3
@@ -884,8 +949,7 @@ client/proc/BuildSkillMenuGrid(fade = FALSE)
 	if(fade)
 		KineticEntrance(skmenu_icon_objs)
 
-// panel-local (dx from left, dy from top) > tile:pixel screen_loc. anchored low to dodge the
-// CENTER HUD-shift bug on tall panels
+// panel-local dx/dy > tile:pixel screen_loc, anchored low to dodge the CENTER HUD-shift bug
 client/proc/SILoc(dx, dy)
 	var/py = SKINFO_H - dy
 	return "[si_atx + round((dx - dx % 32) / 32)]:[dx % 32],[si_aty + round((py - py % 32) / 32)]:[py % 32]"

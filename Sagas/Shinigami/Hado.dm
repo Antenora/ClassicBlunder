@@ -16,6 +16,7 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/Hado/Byakurai
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Byakurai"
 	Area = "Beam"
 	ChargeRate = 0.5
@@ -24,7 +25,6 @@
 	Shocking = 10
 	Piercing = 1
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 0
@@ -126,13 +126,13 @@
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Oukasen
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Oukasen"
 	Area = "Beam"
 	ChargeRate = 1
 	BeamTime = 50
 	DamageMult = 15
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1
@@ -239,13 +239,13 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/Hado/Tenran
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Tenran"
 	Area = "Beam"
 	ChargeRate = 1
 	BeamTime = 50
 	DamageMult = 25
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1
@@ -550,10 +550,10 @@
 // TIER 5
 
 /obj/Skills/Projectile/Hado/Hiryu
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Hiryu Gekizoku Shinten Raihou"
 	Area = "Beam"
 	Radius = 1
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1

@@ -25,6 +25,8 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	ActiveMessage = "releases a wave of Getsuga!"
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+		HitboxW = 0 //mask supersede
+		HitboxH = 0
 		var/baseDmg = initial(DamageMult)
 		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? 5 : 0
 		DamageMult = (baseDmg + bonus) * benefit

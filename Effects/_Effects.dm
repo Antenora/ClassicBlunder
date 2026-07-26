@@ -233,59 +233,12 @@ obj/Effects
 						EffectFinish()
 
 
-	Dust
-		name = ""
-		mouse_opacity = 0
-		layer = 5
-		icon = 'Dust.dmi'
-		icon_state = "dust1"
-		pixel_x = -16
-		pixel_y = -16
-		Lifetime=-1
-		var/disperse_speed=3
-
-		New()
-			..()
-			icon+=rgb(0,0,0,255)
-			icon_state = "dust[rand(1, 2)]"
-			dir = pick(NORTH, WEST, EAST, SOUTH, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST)
-			pixel_x += rand(-8, 8)
-			pixel_y += rand(-8, 8)
-			disperse_speed=rand(1,5)
-
-			disperse()
-
-			spawn(rand(30, 60))
-				EffectFinish()
-
-		proc/disperse()
-			switch(dir)
-				if(NORTH)
-					pixel_y++
-				if(SOUTH)
-					pixel_y--
-				if(WEST)
-					pixel_x--
-				if(EAST)
-					pixel_x++
-				if(NORTHEAST)
-					pixel_y++
-					pixel_x++
-				if(SOUTHEAST)
-					pixel_y--
-					pixel_x++
-				if(NORTHWEST)
-					pixel_y++
-					pixel_x--
-				if(SOUTHWEST)
-					pixel_y--
-					pixel_x--
-			spawn(disperse_speed) .()
-
-
 obj/Effects
 	layer=EFFECTS_LAYER
 	Grabbable=0
+	//quick light pulse at the strike point, tinted from the bolt's own art
+	proc/StrikeFlash(size = 3.4)
+		FxLightPulse(get_turf(src), size, FxEffectColor(src))
 	Stun
 		icon='Stun.dmi'
 	RPMode
@@ -293,10 +246,12 @@ obj/Effects
 	fevLightningStrike
 		icon='Lightning2.dmi'
 		pixel_x=-16
+		Lifetime=-1 //skip the base fade, Strike() finishes itself
 		proc
 			Strike()
 				src.icon_state="Strike"
 				src.blend_mode=2
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(src,Size=0.5)
 				spawn(3)
@@ -306,10 +261,12 @@ obj/Effects
 	fevLightningStrike2
 		icon='Lightning3.dmi'
 		pixel_x=-16
+		Lifetime=-1
 		proc
 			Strike()
 				src.icon_state="Strike"
 				src.blend_mode=2
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(src,Size=0.5)
 				spawn(3)
@@ -319,10 +276,12 @@ obj/Effects
 	fevLightningStrikeBlackPurple
 		icon='LightningBlackPurple.dmi'
 		pixel_x=-16
+		Lifetime=-1
 		proc
 			Strike()
 				src.icon_state="Strike"
-				src.blend_mode=2
+				src.blend_mode=0 //keep at 0, ADD eats the black core and leaves a purple wireframe
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(M=src,Size=0.5)
 				spawn(3)
@@ -332,10 +291,12 @@ obj/Effects
 	fevLightningStrikeRed
 		icon='LightningRed.dmi'
 		pixel_x=-16
+		Lifetime=-1
 		proc
 			Strike()
 				src.icon_state="Strike"
 				src.blend_mode=2
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(M=src,Size=0.5)
 				spawn(3)
@@ -345,10 +306,12 @@ obj/Effects
 	fevLightningStrikeVFX5
 		icon='Lightning VFX4.dmi'
 		pixel_x=-64
+		Lifetime=-1
 		proc
 			Strike()
 				src.icon_state="Strike"
 				src.blend_mode=2
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(src,Size=0.5)
 				spawn(3)
@@ -358,10 +321,12 @@ obj/Effects
 	fevLightningStrikeHyperDeath
 		icon='LightningHyperdeath.dmi'
 		pixel_x=-64
+		Lifetime=-1
 		proc
 			Strike()
 				src.icon_state="Strike"
 				src.blend_mode=2
+				StrikeFlash()
 				spawn(2)
 					KenShockwave(src,Size=0.5)
 				spawn(3)
@@ -372,9 +337,11 @@ obj/Effects
 		icon='Priest VFX2.dmi'
 		pixel_x=-16
 		pixel_y=-21
+		Lifetime=-1
 		proc
 			Strike()
 				src.blend_mode=2
+				StrikeFlash(2.6)
 				spawn(3.5)
 					EffectFinish()
 
@@ -413,11 +380,7 @@ obj/Effects
 		else if(!Lifetime)
 			src.Lifetime=10
 
-		// Only run the fade and finalize chain for effects with a positive Lifetime.
-		// Persistent props (FusionCamera, etc.) use Lifetime <= 0 to opt out —
-		// animate(time<=0) errors with "nothing to animate" on BYOND 516, and a
-		// finalize spawn on a persistent atom would delete it prematurely.
-		if(src.Lifetime > 0)
+		if(src.Lifetime > 0) //Lifetime<=0 opts out of the fade, persistent props stay put
 			spawn(1)
 				animate(src,alpha=overwrite_alpha,time=src.Lifetime)
 			spawn(src.Lifetime+1)
@@ -526,6 +489,24 @@ obj/Effects
 		pixel_y=-32
 		Lifetime=6
 
+//motes for every Dust puff - one shared instance world-wide
+particles/dust_motes
+	icon = 'dust.dmi'
+	icon_state = "dust1"
+	width = 96
+	height = 96
+	count = 7
+	spawning = 1
+	lifespan = 18
+	fade = 6
+	fadein = 2 //particles POP into existence without it
+	position = generator("box", list(-8,-2), list(8,8))
+	scale = generator("num", 0.06, 0.14, NORMAL_RAND)
+	drift = generator("circle", 0, 0.4)
+	friction = 0.1
+	gravity = list(0, -0.05)
+var/particles/dust_motes/FxDustMotes = new
+
 obj
 	Effects
 		density=0
@@ -557,28 +538,34 @@ obj
 				src.transform = matrix()*0.1
 				spawn(1000) if(src) EffectFinish()
 		Dust
+			name=""
 			layer=EFFECTS_LAYER
 			icon='dust.dmi'
+			Lifetime=-1 //no base fade chain
+			var/tmp/matrix/baked //animate() commits its end state, wrappers restage alpha and grow from this
 			New()
 				icon_state = "dust[rand(1, 4)]"
-				transform = turn(transform, pick(0, 45, 90, 135, 180, 225, 270, 315))
 				pixel_x=-16
 				pixel_y=-16
 				pixel_x += rand(-16, 16)
 				pixel_y += rand(-16, 16)
-				animate(src,transform=matrix()*0.5)
+				particles = FxDustMotes
+				//turn and scale go in one matrix or the next animate wipes the rotation
+				var/ang = pick(0, 45, 90, 135, 180, 225, 270, 315)
+				transform = turn(matrix()*0.5, ang)
+				baked = transform
+				animate(src, transform = turn(matrix()*0.85, ang + rand(-25, 25)), pixel_x = pixel_x + gauss(5), pixel_y = pixel_y + rand(2, 7), alpha = 0, time = 26, easing = QUAD_EASING|EASE_OUT)
 				spawn(26) if(src) EffectFinish()
 		Explosion
 			layer=EFFECTS_LAYER
 			icon='explosion.dmi'
 			New()
 				icon_state = "[rand(1, 4)]"
-				transform = turn(transform, pick(0, 45, 90, 135, 180, 225, 270, 315))
 				pixel_x=-16
 				pixel_y=-16
 				pixel_x += rand(-16, 16)
 				pixel_y += rand(-16, 16)
-				animate(src,transform=matrix()*0.5)
+				transform = turn(matrix()*0.5, pick(0, 45, 90, 135, 180, 225, 270, 315))
 
 
 obj/Effects/KenShockwave
@@ -591,7 +578,7 @@ obj/Effects/KenShockwave
 	New()
 		animate(src,transform=matrix()*0.1)//The Shockwave starts out small
 		spawn(1)
-			animate(src,alpha=0,time=Lifetime,transform=matrix()*Size)//Enlarges overtime and then fades away
+			animate(src,alpha=0,time=Lifetime,transform=matrix()*Size,easing=QUAD_EASING|EASE_OUT)//Enlarges overtime and then fades away
 			spawn(Lifetime)
 				EffectFinish()
 proc
@@ -611,8 +598,11 @@ proc
 		S.Lifetime=Time
 		S.pixel_x+=PixelX
 		S.pixel_y+=PixelY
-		/*S.step_x=M.step_x//Step X and Step Y are for pixel movement purposes; not needed in TileBased
-		S.step_y=M.step_y*/
+		if(PmActive() && ismovable(M)) //mid-tile mobs: mirror the real offsets
+			var/atom/movable/AM = M
+			S.step_x = AM.step_x
+			S.step_y = AM.step_y
+		FxDistortRing(M, Size)
 
 obj/Effects/KenShockwave2
 	icon='KenShockwave.dmi'
@@ -623,8 +613,9 @@ obj/Effects/KenShockwave2
 	layer=EFFECTS_LAYER
 	New()
 		animate(src,transform=matrix()*Size)
+		//contracts instead of expanding, so EASE_IN
 		spawn(1)
-			animate(src,alpha=0,time=Lifetime,transform=matrix()*0.1)
+			animate(src,alpha=0,time=Lifetime,transform=matrix()*0.1,easing=QUAD_EASING|EASE_IN)
 			spawn(Lifetime)
 				EffectFinish()
 proc
@@ -642,8 +633,11 @@ proc
 		S.Lifetime=Time
 		S.pixel_x+=PixelX
 		S.pixel_y+=PixelY
-		/*S.step_x=M.step_x//Step X and Step Y are for pixel movement purposes; not needed in TileBased
-		S.step_y=M.step_y*/
+		if(PmActive() && ismovable(M))
+			var/atom/movable/AM = M
+			S.step_x = AM.step_x
+			S.step_y = AM.step_y
+		FxDistortRing(M, min(Size, 5)) //Size here is a contraction start scale, can be huge - the ring needs the cap
 
 obj/Effects/KKTShockwave
 	icon='KenShockwave.dmi'
@@ -656,7 +650,7 @@ obj/Effects/KKTShockwave
 	New()
 		animate(src,transform=matrix()*0.1)//The Shockwave starts out small
 		spawn(1)
-			animate(src,alpha=0,time=Lifetime,transform=matrix()*Size)//Enlarges overtime and then fades away
+			animate(src,alpha=0,time=Lifetime,transform=matrix()*Size,easing=QUAD_EASING|EASE_OUT)//Enlarges overtime and then fades away
 			spawn(Lifetime)
 				EffectFinish()
 proc
@@ -676,6 +670,11 @@ proc
 		S.Lifetime=Time
 		S.pixel_x+=PixelX
 		S.pixel_y+=PixelY
+		if(PmActive() && ismovable(M)) //mirror mid-tile offsets, like KenShockwave
+			var/atom/movable/AM = M
+			S.step_x = AM.step_x
+			S.step_y = AM.step_y
+		FxDistortRing(M, Size)
 
 
 //Proc definitions for object types
@@ -734,8 +733,7 @@ proc
 
 	if(!target?.client)
 		C.screen -= flash_overlay
-		del flash_overlay
-		return
+		return //refcount frees these at proc end, never del
 
 	var/list/all_tiles = list()
 	var/list/cached_overlays = list()
@@ -767,10 +765,7 @@ proc
 
 	if(!target?.client)
 		C.screen -= all_tiles
-		for(var/obj/screen/glass_shard/tile in all_tiles)
-			del tile
 		C.screen -= flash_overlay
-		del flash_overlay
 		return
 
 	var/list/all_shards = list()
@@ -795,10 +790,7 @@ proc
 
 	if(!target?.client)
 		C.screen -= all_shards
-		for(var/obj/screen/glass_shard/shard in all_shards)
-			del shard
 		C.screen -= flash_overlay
-		del flash_overlay
 		return
 
 	for(var/obj/screen/glass_shard/shard in all_shards)
@@ -815,11 +807,9 @@ proc
 
 	if(target?.client)
 		C.screen -= flash_overlay
-	del flash_overlay
 
 	sleep(10)
 
 	if(target?.client)
 		target.client.screen -= all_shards
-	for(var/obj/screen/glass_shard/shard in all_shards)
-		del shard
+	//shards free by refcount once off screen, never del these

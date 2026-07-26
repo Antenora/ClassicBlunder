@@ -52,7 +52,13 @@
         else
             if(glob.progress.STAT_DIMINISHING_RETURNS && base + (invested *glob.progress.STAT_PER_POINT) > glob.progress.STAT_DIMINISHING_THRESHOLD)
                 return exponential_scaling(stat)
-        return base + (invested * glob.progress.STAT_PER_POINT)
+        if(glob.progress.NEW_STAT_SCALING)
+            return base
+        else
+            return base + (invested * glob.progress.STAT_PER_POINT)
+    proc/calc_invested(datum/stat/stat, custom_buff = FALSE)
+        var/invested = stat.invested
+        return (invested * glob.progress.STAT_PER_POINT)
 
 /datum/stat
     var/base = 0

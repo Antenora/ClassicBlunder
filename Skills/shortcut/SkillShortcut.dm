@@ -98,6 +98,7 @@ What shortcut do you want to set?"}
 /mob/proc/
     //these two are used to deploy the assigned skill
     attemptShortcut(num)
+        if(client && client.np_open) return   // a number prompt owns the digit keys
         if(shortcuts)
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
             if(attemptedSkill)
@@ -121,10 +122,16 @@ What shortcut do you want to set?"}
         if(istype(s, /obj/Skills/Queue))
             return SetQueue(s);
         else if(istype(s, /obj/Skills/Projectile))
+            if(s.fire_ident && hascall(s, s.fire_ident))   
+                return call(s, s.fire_ident)()
             return UseProjectile(s);
         else if(istype(s, /obj/Skills/AutoHit))
+            if(s.fire_ident && hascall(s, s.fire_ident))
+                return call(s, s.fire_ident)()
             return Activate(s);
         else if(istype(s, /obj/Skills/Grapple))
+            if(s.fire_ident && hascall(s, s.fire_ident))
+                return call(s, s.fire_ident)()
             var/obj/Skills/Grapple/g = s;
             return g.Activate(src);
         else if(istype(s, /obj/Skills/Buffs))

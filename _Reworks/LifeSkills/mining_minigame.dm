@@ -66,14 +66,32 @@ mob/proc/MiningPayout(obj/LifeSkills/OreNode/N, datum/ore_def/d, perf, obj/Items
 	q = QualityClamp(q)
 
 	var/amt = max(1, round(LIFE_MINING_BASE_YIELD * perf + (tool ? tool.YieldBonus : 0)))
-	GiveMaterial(src, d.yield_type, amt, q)
-	src << "<font color=#78eb78>You break loose [amt]x [QualityName(q)] [d.name].</font>"
-	LifeLogFind("Mining", d.name)
+	if(d.kind == "gem")
+		var/shatter_chance = LifeGemShatterChance(rank)
+		var/intact = 0
+		var/shards = 0
+		for(var/i = 1 to amt)
+			if(prob(shatter_chance)) shards++
+			else intact++
+		if(intact)
+			GiveMaterial(src, d.yield_type, intact, q)
+			src << "<font color=#78eb78>You pry loose [intact]x [QualityName(q)] [d.name] intact.</font>"
+			LifeLogFind("Mining", d.name)
+		if(shards)
+			GiveMaterial(src, /obj/Items/Material/Gem/shards, shards, QUAL_NORMAL)
+			src << "<font color=#ff9a9a>[shards]x [d.name] shatter[shards == 1 ? "s" : ""] under your pick - the shards are still worth something.</font>"
+			LifeLogFind("Mining", "Gem Shards")
+	else
+		GiveMaterial(src, d.yield_type, amt, q)
+		src << "<font color=#78eb78>You break loose [amt]x [QualityName(q)] [d.name].</font>"
+		LifeLogFind("Mining", d.name)
 
 	// gems are precious. capstone guarantees one, otherwise it's a long shot
 	var/gem_id
+	var/gem_sure = 0
 	if(LifeGemArmed && rank >= LIFE_MAX_RANK && LifeCapstoneGemDay != DaysOfWipe())
 		gem_id = LifeRandomGemFor(max(d.tier, 3))
+		gem_sure = 1   // the capstone
 		LifeGemArmed = 0
 		LifeCapstoneGemDay = DaysOfWipe()
 		src << "<b>Prospector's Instinct - you feel exactly where to strike.</b>"
@@ -82,18 +100,42 @@ mob/proc/MiningPayout(obj/LifeSkills/OreNode/N, datum/ore_def/d, perf, obj/Items
 	if(gem_id)
 		var/datum/ore_def/g = LifeOreDef(gem_id)
 		if(g)
-			GiveMaterial(src, g.yield_type, 1, min(q, LifeQualityCap(rank)))
-			src << "<font color=#b46bff>A [g.name] tumbles out of the rock!</font>"
-			LifeLogFind("Mining", g.name)
+			if(!gem_sure && prob(LifeGemShatterChance(rank)))
+				GiveMaterial(src, /obj/Items/Material/Gem/shards, 1, QUAL_NORMAL)
+				src << "<font color=#ff9a9a>A [g.name] tumbles out - and shatters in your grip. The shards are still worth something.</font>"
+				LifeLogFind("Mining", "Gem Shards")
+			else
+				GiveMaterial(src, g.yield_type, 1, min(q, LifeQualityCap(rank)))
+				src << "<font color=#b46bff>A [g.name] tumbles out of the rock!</font>"
+				LifeLogFind("Mining", g.name)
 
 	if(tool) tool.LifeToolWear(src)
 	AddLifeXP("Mining", LifeGatherXP("Mining", d.tier), perf)
+	LifeOppRoll("Mining", d.tier, d.yield_type, q)
+	if(prob(3 + round(rank / 3)))
+		var/obj/Items/Geode/geo = new
+		geo.tier = d.tier
+		GiveOrDrop(geo)
+		src << "<font color=#b46bff><b>A geode rolls free of the rubble!</b> Click it in your pack to crack it open.</font>"
 	N.charges--
 	if(N.charges <= 0)
 		src << "The [N.name] is spent."
 		N.Deplete()
 	else
 		N.UpdateStage()
+
+// rank steadies the extraction: 59% shatter at rank 1 down to 5% at rank 10
+proc/LifeGemShatterChance(rank)
+	return max(5, 65 - rank * 6)
+
+proc/LifeRandomOreFor(tier)
+	InitLifeOreDefs()
+	var/list/pool = list()
+	for(var/id in LifeOreDefs)
+		var/datum/ore_def/d = LifeOreDefs[id]
+		if(d.kind == "ore" && d.tier <= tier)
+			pool += id
+	return pool.len ? pick(pool) : null
 
 proc/LifeRandomGemFor(tier)
 	InitLifeOreDefs()

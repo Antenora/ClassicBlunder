@@ -19,18 +19,23 @@ var/list/gob_weapon_pool = null
 	count     = 80
 	spawning  = 4
 
-	scale     = generator("num", 18.0, 36.0)
+	// gaussian on purpose, a flat spread reads as a synthetic spray (weather wants flat tho)
+	scale     = generator("num", 18.0, 36.0, NORMAL_RAND)
 	// Spawn scattered below and around the user, wide horizontal spread
-	position  = generator("box", list(-200, -120, 0), list(200, 60, 0))
+	position  = generator("box", list(-200, -120, 0), list(200, 60, 0), NORMAL_RAND)
 	// pulls them toward the orb (center)
 	gravity   = list(0, 2.0)
 	// landing right at the orb center, then fade out
 	friction  = 0.25
 	lifespan  = 30
 	fade      = 12
-	drift     = generator("box", list(-0.8, -0.3, 0), list(0.8, 0.3, 0))
+	fadein    = 4 // stops the pop-in
+	drift     = generator("box", list(-0.8, -0.3, 0), list(0.8, 0.3, 0), NORMAL_RAND)
 
-	color     = "#ff5522"
+	// with a gradient, color is a position along it - embers heat as they arrive
+	color        = 0
+	color_change = 0.035
+	gradient     = list("#8a1a00", "#ff5522", "#ffd9a0")
 
 proc/BuildGoBWeaponPool()
 	var/list/pool = list()
@@ -274,9 +279,9 @@ obj/Skills/Projectile/Gates_of_Babylon
 				if(!barrage_mode)
 					proj.alpha = 0
 					animate(proj, alpha = 128, time = max(1, hover_t - 6))
-					proj.filters += filter(type="wave", x=2, y=2, size=1.5)
+					proj.filters += filter(type="wave", x=2, y=2, size=0.75) 
 				else
-					proj.filters += filter(type="wave", x=1, y=1, size=1.0)
+					proj.filters += filter(type="wave", x=1, y=1, size=0.5)
 					var/obj/Skills/Projectile/_Projectile/bf = proj
 					spawn(8) if(bf) bf.filters = list()
 

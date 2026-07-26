@@ -1,3 +1,57 @@
+//queue-layer state
+mob/var/tmp
+	queue_tell_aura = 0
+	queue_counter_until = 0
+	hs_key_down = 0
+
+mob/Players/verb/Heavy_Strike_up()
+	set hidden = 1
+	set instant = 1
+	src.hs_key_down = 0
+
+//tension-full finisher dispatch, pulled out of the Heavy Strike verb so tap/hold can reuse it
+//returns 1 when it consumed the press (fired OR full-but-blocked), 0 when tension isn't full
+mob/proc/FireFinisher(force = 0)
+	var/maxTension = getMaxTensionValue()
+	if(Tension < maxTension)
+		return 0
+	if(HasTensionLock())
+		return force ? 0 : 1
+	if(AttackQueue && !force)
+		return 1
+	// firing consumes ALL stored tension regardless of stage reached
+	var/finstage = 1
+	if(StyleBuff && StyleBuff.FinisherStage > 1)
+		finstage = min(round(Tension / maxTension), StyleBuff.FinisherStage)
+	Tension = 0
+	if(Secret=="Spiral"&&CheckSlotless("Evolution Power"))
+		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in src)
+			if(!ae.SlotlessOn)
+				ae.Trigger(src)
+		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in src)
+			if(!sge.SlotlessOn)
+				sge.Trigger(src)
+	tryIncreaseTension()
+	if(StyleBuff?.Finisher)
+		var/path = StyleBuff.Finisher
+		if(finstage >= 2 && StyleBuff.Finisher2)
+			path = StyleBuff.Finisher2
+		if(finstage >= 3 && StyleBuff.Finisher3)
+			path = StyleBuff.Finisher3
+		if(!ispath(path))
+			path = text2path(path)
+		var/obj/Skills/Queue/q
+		if(!locate(path, src))
+			q = new path
+			AddSkill(q)
+		else
+			q = FindSkill(path)
+		q.adjust(src)
+		SetQueue(q)
+	else
+		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher)
+	return 1
+
 obj
 	Skills
 		Queue//Queued skills like GET DUNKED and Axekick.
@@ -864,45 +918,15 @@ obj
 					set hidden = 1
 					if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Heavy Strike"))
 						return
-					var/maxTension = usr.getMaxTensionValue();
-					if(usr.Tension>=maxTension)
-						if(usr.HasTensionLock())
-							return
-						if(usr.AttackQueue)
-							return
-						// firing consumes ALL stored tension regardless of stage reached
-						var/finstage = 1
-						if(usr.StyleBuff && usr.StyleBuff.FinisherStage > 1)
-							finstage = min(round(usr.Tension / maxTension), usr.StyleBuff.FinisherStage)
-						usr.Tension=0
-						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
-								if(!ae.SlotlessOn)
-									ae.Trigger(usr)
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
-								if(!sge.SlotlessOn)
-									sge.Trigger(usr)
-						usr.tryIncreaseTension();//2026.01.13 - reverting "only max HT lvl gets unique finisher"
-						if(usr.StyleBuff.Finisher)//there's probably a less clunky version way of ensuring finishers are only used once
-							var/path = usr.StyleBuff.Finisher
-							if(finstage >= 2 && usr.StyleBuff.Finisher2)   // stage finishers fall back to the highest defined below
-								path = usr.StyleBuff.Finisher2
-							if(finstage >= 3 && usr.StyleBuff.Finisher3)
-								path = usr.StyleBuff.Finisher3
-							if(!ispath(path))
-								path=text2path(path)
-							var/obj/Skills/Queue/q
-							if(!locate(path, usr))
-								q = new path
-								usr.AddSkill(q)//give it an object type to allow for customizations
-							else
-								q = usr.FindSkill(path)
-							q.adjust(usr)
-							// for(var/obj/Skills/Queue/q in usr.Queues)
-							// 	if(q.type==path)
-							usr.SetQueue(q)
-						else
-							usr.SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher)
+					if(usr.IsGuarding())
+						usr.AlphaCounter()	//heavy strike while guarding = the shove, never a queue
+						return
+					var/handled = 0
+					if(!glob.HS_HOLD_FINISHER)
+						handled = usr.FireFinisher()	//legacy: full tension hijacks the button
+					else
+						usr.hs_key_down = world.time
+					if(handled)
 						return
 					else
 						if(usr.AttackQueue)
@@ -970,6 +994,14 @@ obj
 							hs.adjust(usr);
 							usr.SetQueue(hs);
 						else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
+						//hold to 0.5s at full tension: armed HS morphs into the finisher
+						if(glob.HS_HOLD_FINISHER && usr.AttackQueue)
+							var/mob/u = usr
+							var/obj/Skills/Queue/armed = u.AttackQueue
+							spawn(glob.TIMING_WINDOW)
+								if(u && u.hs_key_down && u.AttackQueue == armed)
+									if(u.FireFinisher(force = 1))
+										armed.Using = 0	//SetQueue burned its cd at arm time - refund the swap
 
 			Meteor_Mash
 				name="Meteor Mash"
@@ -1582,6 +1614,8 @@ mob
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.3, Blend=2, Time=2)
 				CounterMasterTimer = max(1, 25 - (src.HasCounterMaster()*5))
 			src.AttackQueue=Q
+			if(glob.QUEUE_COUNTER)
+				src.queue_counter_until = world.time + min(glob.TIMING_WINDOW + src.HasCounterMaster()*glob.QUEUE_COUNTER_CM_BONUS, glob.QUEUE_COUNTER_MAX)
 			src.AttackQueue.RanOut=0
 			src.AttackQueue.Hit=0
 			src.AttackQueue.Missed=0
@@ -1933,6 +1967,14 @@ mob
 
 
 		QueueOverlayAdd()
+			//tell
+			if(glob.QUEUE_TELLS && src.AttackQueue.IconLock == 'BLANK.dmi')
+				src.queue_tell_aura = 1	//remove
+				if(!src.AuraLocked&&!src.HasKiControl())
+					src.Auraz("Add")
+				else
+					KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
+				return
 			if(src.AttackQueue.IconLock)
 				if(src.AttackQueue.IconLock!=1)
 					if(src.AttackQueue.IconLockUnder)
@@ -1945,6 +1987,11 @@ mob
 					else
 						KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
 		QueueOverlayRemove()
+			if(src.queue_tell_aura)
+				src.queue_tell_aura = 0
+				if(!src.AuraLocked&&!src.HasKiControl())
+					src.Auraz("Remove")
+				return
 			if(src.AttackQueue.IconLock)
 				if(src.AttackQueue.IconLock!=1)
 					if(src.AttackQueue.IconLockUnder)
