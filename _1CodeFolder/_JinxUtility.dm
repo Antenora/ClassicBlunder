@@ -1431,7 +1431,10 @@ mob
 			return enhance
 		BaseStr()
 			var/enhanced = getEnhanced("Strength")
-			return ((src.StrMod+src.StrAscension+(enhanced)))*StrChaos
+			var/Invested=0
+			if(glob.progress.NEW_STAT_SCALING)
+				src.statArchive.calc_invested(statArchive.vars[Strength])
+			return ((src.StrMod+src.StrAscension+(enhanced)))*StrChaos+Invested
 		BaseFor()
 			var/enhanced = getEnhanced("Force")
 			return ((src.ForMod+src.ForAscension+(enhanced)))*ForChaos
@@ -3655,7 +3658,7 @@ mob
 
 					var/obj/Skills/s=new path
 					if(s.SignatureTechnique==tier)
-						del s   
+						del s
 						return 1
 					else
 						del s

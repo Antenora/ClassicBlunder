@@ -7,10 +7,13 @@ mob/proc/RacialStats(statsinquestion)
 	displayStats()
 mob/proc/displayStats()
 	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))
+	var/StatDisplay=statArchive.calc_stat(statArchive.vars[x])
+	var/InvestedPoints=statArchive.calc_invested(statArchive.vars[x])
+	var/TotalDisplay=StatDisplay+InvestedPoints
 	if(glob.progress.NEW_STAT_SCALING)
-		winset(src, "Finalize_Screen.[x]", "text=[statArchive.calc_stat(statArchive.vars[x])+statArchive.calc_invested(statArchive.vars[x])]")
+		winset(src, "Finalize_Screen.[x]", "text=[TotalDisplay]")
 	else
-		winset(src, "Finalize_Screen.[x]", "text=[statArchive.calc_stat(statArchive.vars[x])]")
+		winset(src, "Finalize_Screen.[x]", "text=[StatDisplay]")
 
 /mob/proc/setAllStats()
 	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))

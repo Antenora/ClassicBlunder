@@ -59,6 +59,9 @@
     proc/calc_invested(datum/stat/stat, custom_buff = FALSE)
         var/invested = stat.invested
         return (invested * glob.progress.STAT_PER_POINT)
+    proc/calc_ascension(datum/stat/stat, custom_buff = FALSE)
+        var/invested = stat.invested
+        return (invested * glob.progress.INVESTED_STAT_PER_POINT)
 
 /datum/stat
     var/base = 0
