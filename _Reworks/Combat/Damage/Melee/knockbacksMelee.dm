@@ -8,4 +8,5 @@
         knockDistance += passive_handler.Get("Meaty Paws") * 0.5
     if(UsingCriticalImpact())
         knockDistance *= 1.25
+    return knockDistance
 

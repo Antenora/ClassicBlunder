@@ -59,7 +59,7 @@ mob/proc/InterceptionStrike(stacks)
             hitSpark = _hs
             hs_y = _hsY
             hs_x = _hsX
-        filters = list(filter(type="motion_blur", x=0,y=0), filter(type="outline"))
+        filters = list(filter(name="trail", type="motion_blur", x=0,y=0), filter(type="outline")) //trail is NOT last here - the name is why the smear still finds it
         target = _target
         owner = _owner
         ticking_generic += src

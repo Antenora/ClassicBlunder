@@ -6,6 +6,7 @@ transformation
 			unlock_potential = 50
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
+			form_ki_rays = 1 //light rays
 			strength = 1 //will clean this up in between wipes
 			speed = 1
 			offense = 1
@@ -107,6 +108,10 @@ transformation
 			unlock_potential = 90
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
+			form_ki_rays = 1 
+			form_ray_density = 14
+			form_ray_threshold = 0.6
+			form_ray_size = 16
 			enduranceadd = 1
 			offenseadd = 1
 			defenseadd = 1

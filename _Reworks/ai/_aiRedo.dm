@@ -272,12 +272,12 @@ mob/Player/AI/proc/GoAfterTarget()
 		switch(ai_movement_type)
 			if("ranged")
 				if(get_dist(src, Target) >= pick(6,7,8))
-					step_to(src, Target,, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+					step_to(src, Target,, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED)))) //speed arg is literal px under pixel movement, 0 keeps full strides
 				else
-					step_to(src, get_step(src,skimAround(get_dir(src, Target))),, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+					step_to(src, get_step(src,skimAround(get_dir(src, Target))),, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 
 			if("melee")
-				step_to(src, get_step(src, skimOppdir(get_dir(src, Target))),, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+				step_to(src, get_step(src, skimOppdir(get_dir(src, Target))),, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 
 		dir = get_dir(src, Target)
 		next_move = world.time + 1
@@ -408,7 +408,7 @@ mob/Player/AI/proc/Flee()
 		//move away from target
 		last_activity = world.time
 		if(Move_Requirements() && next_move < world.time)
-			step_away(src, Target, 20, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+			step_away(src, Target, 20, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 			dir = get_dir(Target,src)
 			next_move = world.time + 1
 	if(!Target.WindingUp&&!Target.AutoHitting&&Health>5)

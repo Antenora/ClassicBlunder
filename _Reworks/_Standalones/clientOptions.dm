@@ -16,6 +16,12 @@ Options/
     var/oldZanzo = FALSE
     var/soundOn = 1
     var/zoom2x = 0          // off = 1x (default), on = 2x map zoom
+    var/graphicsQuality = "High"
+    var/reducedMotion = 0
+    var/reducedFlashes = 0
+    var/foregroundFade = 1
+    var/reflections = 1
+    var/experimentalCamera = 0 // opt-in for now
     var/cmPanX = 0          // saved menu drag offsets (px) from each panel's default anchor
     var/cmPanY = 0
     var/optPanX = 0
@@ -37,7 +43,7 @@ Options/
     var/stPanX = 0          // forge/anvil station menu
     var/stPanY = 0
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)

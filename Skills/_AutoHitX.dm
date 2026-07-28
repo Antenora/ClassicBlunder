@@ -5656,17 +5656,25 @@ mob
 					src.icon_state="Flight"
 				if(Z.RushDelay<1)
 					VanishImage(src)
+				var/pm = PmActive()
+				var/pm_px = Z.RushDelay > 0 ? round(32 / Z.RushDelay) : glob.PM_DASH_MAX_PX
+				var/rush_stuck = 0 //a walled dash debits 0 px forever, count dead ticks
 				while(GO>0)
 					if(Z.ControlledRush&&src.Target)
-					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
-
-						//animate(src.filters[length(src.filters)], x=sin(travel_angle)*(6/Z.RushDelay), y=cos(travel_angle)*(6/Z.RushDelay), time=Z.RushDelay)
-						step_towards(src,src.Target)
+						if(src.filters["trail"]) //dash smear
+							var/travel_angle = GetAngle(src, src.Target)
+							var/smear = 6 / max(Z.RushDelay, 0.5) //RushDelay 0 would divide by zero
+							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
+						var/moved = 0
+						if(pm) //one glided step per tick
+							moved = src.PmDashStep(src.Target, pm_px)
+						else
+							step_towards(src,src.Target)
 						if(Z.RushAfterImages)
 							coolerFlashImage(src, Z.RushAfterImages)
-						if(get_dist(src,src.Target)==1)
+						if(get_dist(src,src.Target)<=1)
 							GO=0
 							src.dir=get_dir(src,src.Target)
 							if(src.Target.Knockbacked)
@@ -5674,18 +5682,31 @@ mob
 								src.Target.Frozen=1
 								spawn(3)
 									src.Target.Frozen=0
-						GO-=world.tick_lag
+						if(pm && !moved && ++rush_stuck >= 2)
+							GO = 0 //blocked rush still has to end
+						else if(moved)
+							rush_stuck = 0
+						GO-=(pm ? moved/32 : 1)*world.tick_lag //debit actual px moved
 						if(GO > 0)
-							DelayRelease+=Z.RushDelay
-							if(DelayRelease>=1)
-								DelayRelease--
-								sleep(1)
+							if(pm)
+								sleep(world.tick_lag)
+							else
+								DelayRelease+=Z.RushDelay
+								if(DelayRelease>=1)
+									DelayRelease--
+									sleep(1)
 					else
-						//var/travel_angle = dir2angle(src.dir)
 						if(length(src.filters) < 1)
 							AppearanceOn()
-						//animate(src.filters[filters.len], x=sin(travel_angle)*(6/Z.RushDelay), y=cos(travel_angle)*(6/Z.RushDelay), time=Z.RushDelay)
-						step(src,src.dir)
+						if(src.filters["trail"])
+							var/travel_angle = dir2angle(src.dir)
+							var/smear = 6 / max(Z.RushDelay, 0.5)
+							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
+						var/moved = 0
+						if(pm) //one glided step per tick
+							moved = src.PmDashStep(null, pm_px)
+						else
+							step(src,src.dir)
 						if(Z.RushAfterImages)
 							coolerFlashImage(src, Z.RushAfterImages)
 						if(Z.Area=="Strike"||Z.Area=="Arc"||Z.Area=="Cone")
@@ -5700,17 +5721,25 @@ mob
 									continue
 								if(a.density)
 									GO=0
-						GO-= world.tick_lag
+						if(pm && !moved && ++rush_stuck >= 2)
+							GO = 0 //blocked rush still has to end
+						else if(moved)
+							rush_stuck = 0
+						GO-= (pm ? moved/32 : 1)*world.tick_lag //debit actual px moved
 						if(GO > 0)
-							DelayRelease+=Z.RushDelay
-							if(DelayRelease>=1)
-								DelayRelease--
-								sleep(1)
+							if(pm)
+								sleep(world.tick_lag)
+							else
+								DelayRelease+=Z.RushDelay
+								if(DelayRelease>=1)
+									DelayRelease--
+									sleep(1)
 				src.is_dashing--
 				if(is_dashing<0)
 					is_dashing=0
 				src.WindingUp=0
-				animate(src.filters[filters.len], x=0, y=0)
+				if(src.filters["trail"]) //only the trail filter has x/y to reset
+					animate(src.filters["trail"], x=0, y=0)
 				src.icon_state=""
 			if(Z.FlickAttack==1)
 				flick("Attack",src)
@@ -5786,7 +5815,10 @@ mob
 					if(DelayRelease>=1)
 						DelayRelease--
 						sleep(1)
-					step(src, src.dir)
+					if(PmActive()) //glided full-tile step
+						src.PmDashStep(null, 32)
+					else
+						step(src, src.dir)
 				else
 					sleep(Delay)
 				RoundCount--
@@ -5993,6 +6025,8 @@ obj
 			ApplySentenced
 			ElementalClass
 			FixedDamage=0
+
+			GuardBreak//mirror of the skill flag - pierces the guard system's DR
 
 			Arcing//Triggers offshoots on every step that expand outwards.  Higher than 1 means that every X steps the range will widen.
 			ArcingCount=0//Number of times arcing has been triggered.  Informs the game how many tiles to send the offshoots.
@@ -6294,6 +6328,13 @@ obj
 			src.SwordTech=Z.NeedsSword
 			src.Executing=Z.Executing
 			src.SpecialAttack=Z.SpecialAttack
+			if(src.SpecialAttack || Z.SpellElement || Z.MagicNeeded || _fx_lit_paths["[Z.type]"] || FxAutoHitIsDark(Z))
+				if(owner && owner._fx_pulse_t != world.time) //multi-round casts pulse once per tick
+					owner._fx_pulse_t = world.time
+					if(FxAutoHitIsDark(Z))
+						FxDarkPulse(get_turf(owner), 1.6) //dark casts darken, not flash
+					else
+						FxLightPulse(get_turf(owner), 1.6, FxAutoHitColor(Z))
 			src.Deluge=Z.Deluge
 			src.Stunner=Z.Stunner
 			src.Destructive=Z.Destructive
@@ -6340,6 +6381,7 @@ obj
 			Destroyer = Z.Destroyer
 			src.CanBeBlocked=Z.CanBeBlocked
 			src.CanBeDodged=Z.CanBeDodged
+			src.GuardBreak=Z.GuardBreak
 			src.Slow=Z.Slow
 			src.ApplySlow = Z.ApplySlow
 			src.NerveOverload = Z.NerveOverload
@@ -6490,14 +6532,23 @@ obj
 								if(src.StopAtTarget)//Front
 									if(Owner)
 										src.Owner.loc=get_step(src.Owner.Target, src.Owner.Target.dir)
+										if(PmActive())//track the target's mid-tile sprite
+											src.Owner.step_x=src.Owner.Target.step_x
+											src.Owner.step_y=src.Owner.Target.step_y
 										src.Owner.dir=get_dir(src.Owner, src.Owner.Target)//facing them
 								else
 									if(Owner)
 										src.Owner.loc=get_step(src.Owner.Target, turn(src.Owner.Target.dir, 180))//Appear behind the fucker
+										if(PmActive())
+											src.Owner.step_x=src.Owner.Target.step_x
+											src.Owner.step_y=src.Owner.Target.step_y
 										src.Owner.dir=turn(get_dir(src.Owner, src.Owner.Target), 180)//facing away
 							else
 								if(Owner)
 									src.Owner.loc=src.loc
+									if(PmActive())//land on the strike's mid-tile endpoint, not its tile origin
+										src.Owner.step_x=src.step_x
+										src.Owner.step_y=src.step_y
 			catch()
 			walk(src,0)
 			animate(src)
@@ -6534,8 +6585,9 @@ obj
 									break
 					if(weHitThemAlready)
 						return
-				AlreadyHit |= m
-				for(var/obj/AutoHitter/ah in autohitChildren)
+				var/obj/AutoHitter/root = AHOwner ? AHOwner : src //first hit marks the whole cast so offshoot siblings cant double-hit
+				root.AlreadyHit |= m
+				for(var/obj/AutoHitter/ah in root.autohitChildren)
 					ah.AlreadyHit |= m
 				// Mirror Reflection from Kusanagi
 				var/mirror_reflect = FALSE
@@ -6553,6 +6605,9 @@ obj
 				if(src.StopAtTarget)
 					AfterImage(src.Owner)
 					src.Owner.loc=get_step(m, get_dir(m, src.Owner))
+					if(PmActive())//land on the hit mob's sprite, not its tile origin
+						src.Owner.step_x=m.step_x
+						src.Owner.step_y=m.step_y
 					src.Stopped=1
 				if(src.PassTo)
 					AfterImageA(src.Owner, forceloc=get_step(m, get_dir(m, src.Owner)))
@@ -6708,7 +6763,11 @@ obj
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(src.SpeedStrike/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				if(Owner.UsingFencing())
 					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(Owner.UsingFencing()/glob.SPEEDSTRIKEDIVISOR))),1,3)
-				if((m.Launched||m.Stunned||m.Suspended))
+				if(glob.CC_PRORATION)
+					FinalDmg *= m.ccProrationMult(Owner, includeSuspended = 1, skillCM = ComboMaster, dunk = (Dunker||Destroyer))
+					if(m.Stunned && Destroyer)
+						FinalDmg *= 1 + (Destroyer/10)
+				else if((m.Launched||m.Stunned||m.Suspended))
 					if(!(ComboMaster || Owner.HasComboMaster() || Dunker || Destroyer || m.passive_handler.Get("Staggered!")))
 						FinalDmg *= glob.CCDamageModifier
 						Owner.log2text("FinalDmg - Auto Hit", "After ComboMaster", "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
@@ -6860,7 +6919,7 @@ obj
 					DEBUGMSG("after grabNerf: [FinalDmg]")
 //TODO: Remove a whole lot of those
 				if(src.Bang)
-					Bang(m.loc, src.Bang)
+					Bang(m.loc, src.Bang, PX=(PmActive() ? m.step_x : 0), PY=(PmActive() ? m.step_y : 0), color_override = FxAutoHitTint(src.FromSkill))
 				if(src.Scratch)
 					Scratch(m)
 				if(src.Bolt)
@@ -6914,15 +6973,14 @@ obj
 						Damage /= glob.AUTOHIT_MISS_DAMAGE
 						DEBUGMSG("after FR")
 
-					if(m.AfterImageStrike)
+					if(m.aisArmed())
 						if(!src.TurfStrike)
 							spawn()
 								src.Owner.HitEffect(loc, src.UnarmedTech, src.SwordTech)
 						StunClear(m)
 						AfterImageStrike(m, src.Owner,1)
-						m.AfterImageStrike-=1
-						if(m.AfterImageStrike<0)
-							m.AfterImageStrike=0
+						m.aisConsume()
+						if(!glob.AIS_WINDOW && m.AfterImageStrike<=0)
 							for(var/obj/Skills/Zanzoken/z in src)
 								z.Cooldown()//freeze that after image shieet
 						return
@@ -6997,7 +7055,7 @@ obj
 								var/reversalDmg = FinalDmg * glob.AUTOHIT_REVERSAL_DAMAGE_FRAC / max(1, src.parentRounds)
 								m.DoDamage(src.Owner, reversalDmg, UnarmedAttack=src.UnarmedTech, SwordAttack=src.SwordTech, SpiritAttack=src.SpecialAttack, Autohit = TRUE)
 								if(src.Bang)
-									Bang(src.Owner.loc, src.Bang)
+									Bang(src.Owner.loc, src.Bang, PX=(PmActive() ? src.Owner.step_x : 0), PY=(PmActive() ? src.Owner.step_y : 0), color_override = FxAutoHitTint(src.FromSkill))
 								if(src.Scratch)
 									Scratch(src.Owner)
 								if(src.Bolt)
@@ -7055,7 +7113,11 @@ obj
 					// Executing is +1% damage per 1 Injury on the target
 					if(src.Executing && m)
 						FinalDmg *= 1 + (0.01 * src.Executing * m.TotalInjury)
-					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement)
+					if(glob.COUNTER_HIT && m.isCommitted())
+						CounterHitReward(src.Owner, m, min(FinalDmg, 14))
+					damageDealt = src.Owner.DoDamage(m, FinalDmg, src.UnarmedTech, src.SwordTech, Destructive=src.Destructive, innateLifeSteal = LifeSteal, Autohit = TRUE, atkSpecialFlag=src.SpecialAttack, atkSpellElem=src.SpellElement, PierceGuard = src.GuardBreak)
+					if(glob.CC_PRORATION)
+						m.ccCountHit(1)
 					if(src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
 						src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmg)
@@ -7263,7 +7325,7 @@ obj
 													continue
 												src.Damage(m)
 									if(UsesPixelCollision)
-										AH_ZoneDamage(src.TargetLoc, Rounds)
+										AH_ZoneDamage(src.TargetLoc, Rounds, los=FALSE) //legacy Turf_Circle had no LOS
 									for(var/turf/t in Turf_Circle_Edge(src.TargetLoc, Rounds))
 										if(src.TurfErupt)
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
@@ -7392,7 +7454,7 @@ obj
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 								if(UsesPixelCollision)
-									AH_ZoneDamage(src.TargetLoc, src.Distance)
+									AH_ZoneDamage(src.TargetLoc, src.Distance, los=FALSE) //legacy Turf_Circle had no LOS
 								else
 									for(var/turf/t in Turf_Circle(src.TargetLoc, src.Distance))
 										sleep(-1)
@@ -7474,7 +7536,7 @@ obj
 													continue
 												src.Damage(m)
 									if(UsesPixelCollision)
-										AH_ZoneDamage(src.Owner, Rounds)
+										AH_ZoneDamage(src.Owner, Rounds, los=FALSE) //legacy Turf_Circle had no LOS
 									for(var/turf/t in Turf_Circle_Edge(src.Owner, Rounds))
 										if(src.TurfErupt)
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
@@ -7600,7 +7662,7 @@ obj
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 								if(UsesPixelCollision)
-									AH_ZoneDamage(src.Owner, src.Distance)
+									AH_ZoneDamage(src.Owner, src.Distance, los=FALSE) //legacy Turf_Circle had no LOS
 								else
 									for(var/turf/t in Turf_Circle(src.Owner, src.Distance))
 										sleep(-1)
@@ -7675,12 +7737,14 @@ obj
 						src.Damage+=src.StepsDamage//add growing damage
 					src.Distance--
 					src.StepsTaken++
+					var/tsx = (PmActive() ? src.step_x : 0) //offset turf VFX to the mid-tile sprite
+					var/tsy = (PmActive() ? src.step_y : 0)
 					if(src.TurfErupt)
-						Bang(src.loc, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
+						Bang(src.loc, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4, PX=tsx, PY=tsy)
 					if(src.TurfIce)
-						Bang(src.loc, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, icon_override='SnowBurst2.dmi')
+						Bang(src.loc, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, PX=tsx, PY=tsy, icon_override='SnowBurst2.dmi')
 					if(src.TurfFog)
-						Bang(src.loc, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, icon_override='FogBreath.dmi')
+						Bang(src.loc, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, PX=tsx, PY=tsy, icon_override='FogBreath.dmi')
 					if(src.TurfDirt)
 						Dust(src.loc)
 					if(src.TurfStrike)
@@ -7688,7 +7752,7 @@ obj
 							for(var/s=src.TurfStrike, s>0, s--)
 								if(!src.Owner)
 									break
-								src.Owner.HitEffect(src.loc, src.UnarmedTech, src.SwordTech)
+								src.Owner.HitEffect(src.loc, src.UnarmedTech, src.SwordTech, PX=tsx, PY=tsy)
 								sleep(1)
 							if(!Owner)
 								break

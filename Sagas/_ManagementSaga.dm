@@ -158,14 +158,17 @@ mob/var
 	JutsuSL6Picks = 0   // max 1, tier cap <=4
 	JutsuSL7Picks = 0   // max 1, tier cap <=5
 
+	// Sorcerer 
+	CursedTechnique
+
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works","Force")
 		if(P.Saga)
-			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi")
+			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||"Sorcerer")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
 				Level7=2  // Devil Summoner has 8 tiers
@@ -366,6 +369,9 @@ mob/Admin3/verb
 
 				if("Shinobi")
 					P.gainShinobi()
+				
+				if("Sorcerer")
+					P.gainSorcerer()
 
 				if("Kamui")
 					P.SagaLevel=1

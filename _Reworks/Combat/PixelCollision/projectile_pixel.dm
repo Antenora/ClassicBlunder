@@ -4,15 +4,26 @@ obj/Skills/Projectile/_Projectile
 		list/LastHitAt
 		HitInterval = 1
 		pc_lastdir = 0
+		pm_substep = 0 //ticks per tile under engine pixel movement; 0 = tile stepping
+		icon_var_scale = 1 //IconVariance random art-scale roll, so the box matches the drawn size
 		beam_chain/chain
 
 	proc/SetupPixelHitbox(obj/Skills/Projectile/Z, DirOverride=0)
 		density = 0 //contact via sweep; walls handled in PixelWallCheck
 		LastHitAt = list()
 		HitInterval = max(Speed, world.tick_lag)
+		//beams are excluded
+		if(PmActive() && Area != "Beam" && Owner && (loc == Owner.loc || loc == get_step(Owner, DirOverride || Owner.dir)))
+			step_x = Owner.step_x //mid-tile casters: launch from the sprite, not the tile
+			step_y = Owner.step_y
+		pm_substep = 0
+		if(PmActive() && Area != "Beam" && !Static && !StormFall)
+			pm_substep = max(1, round(Speed / world.tick_lag))
+			step_size = max(1, round(32 / pm_substep)) //step()'s px arg does nothing - step_size is what moves
 		var/s = 1
 		if(Z.IconSize != 1)
 			s = Z.TempSize || Z.IconSize
+		s *= icon_var_scale
 		if(Z.IconSizeGrowTo) //grow-anim skills
 			s = Z.IconSizeGrowTo
 		var/fitdir = DisplayedCardinal(DirOverride || (Owner ? Owner.dir : dir), SOUTH)
@@ -20,7 +31,9 @@ obj/Skills/Projectile/_Projectile
 		pc_lastdir = fitdir
 		if(Area == "Beam" && Owner)
 			animate_movement = NO_STEPS //segments arrive in lockstep, no glide, as old BeamGraphics set
-			chain = Owner.BeamChainFor(fitdir)
+			//key on the TRUE travel dir - a diagonal volley arm collapsed to a cardinal would share its chain
+			var/truedir = DirOverride || (Owner ? Owner.dir : dir)
+			chain = Owner.BeamChainFor(truedir, SkillPath)
 			chain.Register(src)
 
 	proc/OnContact(atom/a)
@@ -31,6 +44,11 @@ obj/Skills/Projectile/_Projectile
 	//shared filters for every contact candidate from the sweep
 	proc/TryPixelContact(atom/movable/a)
 		if(Killed || Distance < 0 || a == src) return
+		if(src.Homing && a == src.Homing && a.loc == src.loc)
+			//co-tile with the locked target always hits - tiny masks can miss point blank
+			if(RehitEligible(LastHitAt, a, HitInterval))
+				OnContact(a)
+			return
 		if(!HitboxesOverlap(src, a)) return
 		if(istype(a, /obj/Skills/Projectile/_Projectile))
 			var/obj/Skills/Projectile/_Projectile/p = a
@@ -58,6 +76,28 @@ obj/Skills/Projectile/_Projectile
 			TryPixelContact(a)
 			if(Killed || Distance < 0) return
 
+	proc/StaticRadiusSweep()
+		for(var/atom/movable/a in view(src.Radius, src))
+			if(a == src) continue
+			if(istype(a, /obj/Skills/Projectile/_Projectile))
+				var/obj/Skills/Projectile/_Projectile/p = a
+				if(p.Owner == src.Owner) continue
+				if(!RehitEligible(LastHitAt, p, HitInterval)) continue
+				OnContact(p)
+			else if(a == src.Owner)
+				if(src.Backfire) OnContact(a)
+			else if(a.Owner == src.Owner)
+				continue
+			else if(src.StormFall && a.pixel_z != src.pixel_z)
+				continue
+			else if(ismob(a))
+				var/mob/m = a
+				if(m.density && RehitEligible(LastHitAt, m, HitInterval))
+					OnContact(m)
+			else if(a.density)
+				OnContact(a)
+			if(Killed || Distance < 0) return
+
 	proc/PixelStep()
 		var/shown = DisplayedCardinal(dir, pc_lastdir) //what the client is drawing, incl. sticky diagonals
 		if(isfile(icon) && icon != hb_icon) //mid-flight reskin (spawn-and-grab pattern): box+mask follow the new art
@@ -73,12 +113,45 @@ obj/Skills/Projectile/_Projectile
 		if(istype(t) && t.density)
 			OnContact(t)
 
+	//32px per Speed spread over per-tick slides, contact sampled at the true drawn position
+	proc/PmTravel()
+		//dir is fixed for the whole slide set - re-aiming every micro-step makes homers spasm on overshoot
+		for(var/i = 1, i <= pm_substep, i++)
+			sleep(world.tick_lag)
+			if(Killed || Distance <= 0) return
+			var/shown = DisplayedCardinal(dir, pc_lastdir)
+			if(isfile(icon) && icon != hb_icon)
+				ApplySkillHitbox(icon, shown, hb_scale, hb_ovW, hb_ovH, hb_ovX, hb_ovY, hb_offX, hb_offY)
+			else if(shown != pc_lastdir)
+				ReapplyHitboxForDir(shown)
+			pc_lastdir = shown
+			step(src, src.dir) //moves step_size px, set at hitbox setup
+			PixelWallCheck()
+			if(Killed || Distance <= 0) return
+			PixelContactSweep()
+
 	proc/PixelLife()
 		Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
 		pc_lastdir = DisplayedCardinal(dir, pc_lastdir) //dir is only final once the spawn block ran
 		ReapplyHitboxForDir(pc_lastdir)
 		if(glob.PIXEL_DEBUG) world.log << "PXC: [src] PixelLife start dir=[dir] box=[vhb_w]x[vhb_h] scale=[hb_scale] icon=[icon] mask=[vhb_mask ? "y" : "n"] dist=[Distance]"
-		while(src.Distance>0)
+		if(beam_owner)
+			return
+		if(Area == "Beam" && !Stream && chain && chain.controlled)
+			return
+		if(pm_substep) //pre-move sample so point-blank casts hit a mob on the spawn tile
+			PixelContactSweep()
+			if(Killed || Distance <= 0)
+				if(Owner) Owner.active_projectiles -= src
+				ProjectileFinish()
+				return
+		while(src.Distance>0 || (src.clash_lock && !src.clash_lock.ended))
+			if(src.clash_lock)
+				if(src.clash_lock.ended) //struggle is over and never cleared us: self-heal
+					src.clash_lock = null
+				else //frozen: no sweeps, no steps. tick-rate poll so the whole
+					sleep(world.tick_lag) //column resumes together - no gaps, no lag
+					continue
 			if(src.Area=="Beam" && chain)
 				chain.UpdateStates()
 			if(src.EdgeOfMapProjectile())
@@ -113,12 +186,23 @@ obj/Skills/Projectile/_Projectile
 							src.Homing=src.Owner.Target
 						src.Distance=src.DistanceMax
 						src.HomingChargeSpent=0
+			if((src.HyperHoming && src.Homing) || (src.HomingCharge && !src.Homing))
+				//bump the locked target whenever it sits within Radius tiles
+				var/mob/htgt = forcedTarget || (src.Owner ? src.Owner.Target : null)
+				if(ismob(htgt) && (htgt in view(max(1, src.Radius), src)) && RehitEligible(LastHitAt, htgt, HitInterval))
+					OnContact(htgt)
 			if(src.ProjectileSpin)
 				if(!src.transform)
 					src.transform = matrix()
 				src.transform = src.transform.Turn(src.ProjectileSpin)
-			sleep(src.Speed)
-			PixelContactSweep()
+			if(!pm_substep) //substep mode sleeps+sweeps per tick inside PmTravel instead
+				sleep(src.Speed)
+				if(src.clash_lock) //locked while we slept: no wake sweep, no wake step
+					continue
+				if((src.Static || src.StormFall) && src.Radius>0) //proximity bomb / falling meteor: Radius tiles, not the ink footprint
+					StaticRadiusSweep()
+				else
+					PixelContactSweep()
 			if(FadeOut && FadeOut>=Distance)
 				animate(src, alpha=0, time=max(1,FadeOut*Speed), flags=ANIMATION_PARALLEL)
 				FadeOut=0
@@ -133,13 +217,17 @@ obj/Skills/Projectile/_Projectile
 						while(src.dir==ODir)
 							src.dir=pick(NORTH, NORTHEAST, NORTHWEST, EAST, WEST, SOUTHEAST, SOUTHWEST, SOUTH)
 				if(!src.Static&&!src.StormFall)
-					PixelStep()
+					if(pm_substep)
+						PmTravel()
+					else
+						PixelStep()
 				else
 					src.Distance--
 					if(src.StormFall)
 						animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
 			else
-				PixelStep() //32px per Speed sleep = old walk() rate
+				if(!src.clash_lock) //a clash formed mid-iteration: no extra step into the enemy beam
+					PixelStep() //32px per Speed sleep = old walk() rate
 		if(Owner) Owner.active_projectiles -= src
 		ProjectileFinish()
 		return

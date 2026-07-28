@@ -68,8 +68,9 @@ GlobalStorage
 	set category = "Other"
 	set hidden = 1
 	set name = "Change Client FPS"
-	client.fps = input(src, "ssss") as num
-	src.ChosenFPS=client.fps
+	var/n = input(src, "ssss") as num
+	src.ChosenFPS = (n > 0) ? n : 0 //0 = back to the default
+	client.fps = EffectiveClientFPS()
 	src.client<<"[client.fps]"
 
 /mob/Admin3/verb/Copy(obj/O in world)

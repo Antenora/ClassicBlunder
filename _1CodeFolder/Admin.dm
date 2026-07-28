@@ -1763,6 +1763,7 @@ mob/Admin2/verb
 			A.icon_state = "Meditate"
 			A.dir=SOUTH
 			A.AfterImageStrike=0
+			A.ais_window_until=0
 			A.Grounded=0
 			A.Meditation()
 			Log("Admin","<font color=red>[ExtractInfo(usr)] made [ExtractInfo(A)] meditate.")

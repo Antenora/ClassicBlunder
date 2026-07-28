@@ -35,6 +35,9 @@ client/Click(atom/A, location, control, params)
 		if(istype(A, /mob/Players))
 			ShowPlayerPanel(A)
 			return
+		if(isturf(A) || isobj(A))
+			ShowAtomPanel(A)   // admin/mapper turf+obj command strip, no-op for everyone else
+			return
 		return
 	return ..()
 

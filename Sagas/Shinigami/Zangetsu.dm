@@ -228,6 +228,7 @@
 					var/obj/Effects/Dust/D = new/obj/Effects/Dust()
 					D.loc = T
 					D.layer = EFFECTS_LAYER
+					D.alpha = 255 //dust fades itself on spawn, reset alpha or the ring never shows
 					animate(D, transform=matrix()*2, time=4)
 					dusts += D
 					dust_dx += od[1]
@@ -267,6 +268,7 @@
 					var/obj/Effects/Dust/E = new/obj/Effects/Dust()
 					E.loc = M.loc
 					E.layer = EFFECTS_LAYER
+					E.alpha = 255 //same deal
 					E.transform = matrix() * 2
 					animate(E, alpha=0, pixel_x=ep[1], pixel_y=ep[2], time=10, easing=SINE_EASING)
 					expel_objs += E

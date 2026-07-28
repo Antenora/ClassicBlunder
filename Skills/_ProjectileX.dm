@@ -5337,9 +5337,24 @@ mob
 						fire_directions = list(NORTH, NORTHEAST, NORTHWEST, EAST, WEST, SOUTHEAST, SOUTHWEST, SOUTH) - list(src.dir)
 					else if(Z.FixedDirections && Z.FixedDirections.len)
 						fire_directions = Z.FixedDirections
-					while(src.Beaming==2)
-						src.BeamTurnDir()
+					var/v2 = (glob.BEAM_V2 && Z.Area == "Beam" && !Z.Stream)
+					if(v2)
 						if(fire_directions && fire_directions.len)
+							for(var/d in fire_directions)
+								var/datum/beam/VB = new(src, Z, d)
+								VB.fixed_dir = 1 //a volley arm keeps its own heading
+						else
+							new/datum/beam(src, Z, src.dir)
+					while(src.Beaming==2)
+						if(src.beam_clash) //struggling: hold the pour, no new segments, BeamTime paused
+							sleep(Z.Speed)
+							if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5)
+								src.UseProjectile(Z)
+							continue
+						src.BeamTurnDir()
+						if(v2)
+							; //the datum grows itself; the pour spawns nothing
+						else if(fire_directions && fire_directions.len)
 							for(var/d in fire_directions)
 								src.Blast(Z, Origin, DirOverride=d)
 						else
@@ -5353,9 +5368,11 @@ mob
 						if(Z.BeamTime)
 							Z.BeamTimeUsed++
 						if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5||(Z.BeamTime>0&&Z.BeamTimeUsed>=Z.BeamTime))
-							src.UseProjectile(Z)
+							src.BeamStop(Z)
 					src.BeamCharging=0
 				else if(src.Beaming==2)
+					if(src.beam_clash && !src.beam_clash.done) //no voluntary bail-out mid-struggle
+						return FALSE
 					src.BeamStop(Z)
 					if(Z.EnergyCost)
 						var/drain = passive_handler["Drained"] ? Z.EnergyCost * (1 + passive_handler["Drained"]/10) : Z.EnergyCost
@@ -5563,7 +5580,7 @@ mob
 										src << "[Z] is out of power!"
 
 		Blast(var/obj/Skills/Projectile/Z, var/atom/Origin, var/GivesMessage, var/IconUsed, var/DirOverride=0)
-			new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride)
+			return new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride)
 
 
 mob/var/tmp/list/active_projectiles = list()
@@ -5597,7 +5614,7 @@ obj
 						BeamCharging=0.5
 					src.Owner=m
 					src.SkillPath=Z.type
-					src.DirOverride=Z.DirOverride
+					src.DirOverride=DirOverride ? DirOverride : Z.DirOverride
 					if(Owner)
 						Owner.active_projectiles |= src
 					if(istype(Origin, /turf))
@@ -5782,7 +5799,7 @@ obj
 						if(src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 					else
-						if(!Z.ignoreBetterAim&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
+						if(!Z.ignoreBetterAim&&Z.Area!="Beam"&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 							src.LosesHoming=src.Owner.GetBetterAim()
 					src.HyperHoming=Z.HyperHoming
@@ -5794,7 +5811,8 @@ obj
 						src.pixel_y=Z.LockY
 						if(Z.IconVariance)
 							src.icon_state="[rand(1,Z.IconVariance)]"
-							src.transform*=GoCrand(0.75,1.25)
+							src.icon_var_scale=GoCrand(0.75,1.25)//so the pixel hitbox scales with the random art
+							src.transform*=src.icon_var_scale
 						if(Z.takeAppearance)
 							appearance = m.appearance
 					else
@@ -5834,6 +5852,9 @@ obj
 							if(src.ChargeMessage)
 								OMsg(src.Owner, "<b><font color='[src.ChargeColor]'>[src.Owner] [src.ChargeMessage]</font color></b>")
 						src.loc=locate(src.Owner.x, src.Owner.y, src.Owner.z)
+						if(PmActive() && src.Owner) //the re-place wiped the spawn-copied step offsets
+							src.step_x = src.Owner.step_x
+							src.step_y = src.Owner.step_y
 						if(Z.IconSizeGrowTo)
 							spawn()animate(src, transform=matrix()*Z.IconSizeGrowTo, pixel_z=((Z.IconChargeOverhead*32)-1), time=T, easing=CUBIC_EASING)
 						else
@@ -5852,6 +5873,9 @@ obj
 							if(Z.Hover) sleep(Z.Hover)
 							else sleep(Hover)
 						if(Z.Variation)
+							if(src.UsesPixelCollision)//record the jitter so dir refits re-apply it (art only, not the box)
+								src.vhb_varx = src.VariationX
+								src.vhb_vary = src.VariationY
 							animate(src, pixel_x=src.pixel_x+src.VariationX, pixel_y=src.pixel_y+src.VariationY, time=3)
 						walk(src,0)
 						if(src.DirOverride)
@@ -5871,6 +5895,8 @@ obj
 								animate(src,transform=matrix()*Z.IconSizeGrowTo, time=10, easing=CUBIC_EASING)
 						if(Z.takeAppearance)
 							appearance = m.appearance
+						if(src.Area != "Beam") //beam heads glow via the chain/BeamGraphics hooks
+							FxAttachLight(src, Z)
 						src.Life()
 					if(FollowUp)
 						if(FollowUpDelay != -1)
@@ -5884,6 +5910,7 @@ obj
 					Hit(a)
 					..()
 				proc/endLife()
+					if(clash_lock && !clash_lock.ended) return //frozen mid-struggle: a death here is a hole in the beam
 					try
 						Distance = 0
 						if(chain)
@@ -5905,7 +5932,7 @@ obj
 							Owner = null
 						loc = null
 						for(var/i in vis_contents)
-							vis_contents -= i
+							vis_contents -= i //never del fx children, del scans the whole world
 						for(var/obj/i in vis_locs)
 							i.vis_contents -= src
 						AlreadyHit = null
@@ -5917,14 +5944,22 @@ obj
 						AssociatedGear = null
 						loc = null
 					catch()
-					sleep(50)
-					del src
+					return
 				proc/Hit(atom/a, MultDamage=1)
 					if(istype(a, /obj/Skills/Projectile/_Projectile))
 						if(a.Owner==src.Owner)
 							src.loc=a.loc
 							return
 						else
+							if(src.clash_victor&&src.clash_pierce&&a:Owner==src.clash_pierce) //breakthrough: sweep the loser's remnants aside
+								if(a:Area=="Beam")
+									a:Distance=0
+									a:endLife()
+								else
+									a:ProjectileFinish()
+								return
+							if(BeamClashTry(src, a)) //struggle entry + frozen-beam swallow, BEFORE any relabel/quake runs
+								return
 							if(src.Area=="Beam")
 								if(UsesPixelCollision)
 									if(chain)
@@ -5946,6 +5981,8 @@ obj
 								else
 									a:ProjectileFinish()
 								return
+							if(isnull(src.Damage)) src.Damage = src.DamageMult * max(src.BeamCharge, 0.5)
+							if(isnull(a:Damage)) a:Damage = a:DamageMult * max(a:BeamCharge, 0.5)
 							if(src.Devour&&!a:Devour)
 								src.Damage+=a:Damage
 								a:Damage=0
@@ -6031,7 +6068,8 @@ obj
 							if(p.passive_handler["Neo"]&&!p.HasNoDodge()&&src.Dodgeable>0)
 								var/dir=get_dir(src,a)
 								if(prob(p.passive_handler["Neo"]*glob.NEO_DODGERATE))
-									src.loc = a.loc
+									if(!UsesPixelCollision)
+										src.loc = a.loc
 									StunClear(a)
 									AfterImageStrike(a, src.Owner)
 									if(src.Homing)
@@ -6062,11 +6100,9 @@ obj
 									if(a:CheckSlotless("Combat CPU"))
 										a:LoseMana(1)
 									return
-							if(a:AfterImageStrike&&src.Dodgeable>0)
+							if(a:aisArmed()&&src.Dodgeable>0)
 								var/dir=get_dir(src,a)
-								a:AfterImageStrike-=1
-								if(a:AfterImageStrike<0)
-									a:AfterImageStrike=0
+								a:aisConsume()
 								if(!m.HasNoDodge())
 									AfterImage(a)
 									if(src.Area=="Beam")
@@ -6096,7 +6132,8 @@ obj
 									var/RipplePower=(1+(0.125*src.Owner.GetRipple()*max(1,src.Owner.PoseEnhancement*2)))
 									accmult*=RipplePower
 							if(Accuracy_Formula(src.Owner, a, accmult*(src.MultiHit+1), BaseChance=glob.WorldDefaultAcc, Backfire=src.Backfire) == MISS &&!a:KO&&!src.Radius&&src.Dodgeable>=0)
-								src.loc = a.loc
+								if(!UsesPixelCollision)
+									src.loc = a.loc
 								var/dir=get_dir(src,a)
 								if(src.Area!="Beam")
 									spawn()Prediction(a)
@@ -6139,7 +6176,7 @@ obj
 										KenShockwave(def, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
 										return
 								var/Deflect=0
-								if(src.Deflectable&&!a:KO)
+								if(src.Deflectable>0&&!a:KO)
 									if(istype(a, /mob)) m = a;
 									if(a:HasDeflection())
 										if(!Deflection_Formula(src.Owner, a, (accmult /** Rate*/ * ( min(0.1,1 - (src.MultiHit * 0.025) ) ) /(1+a:GetDeflection())), BaseChance=(glob.WorldDefaultAcc), Backfire=src.Backfire))
@@ -6292,9 +6329,15 @@ obj
 							src.AccMult*=5
 
 						var/EffectiveDamage=Damage
-						if(a:Launched||a:Stunned)
+						if(glob.CC_PRORATION)
+							EffectiveDamage *= a:ccProrationMult(Owner, 0, src.ComboMaster)
+						else if(a:Launched||a:Stunned)
 							if(!(src.ComboMaster || Owner.HasComboMaster() || m.passive_handler.Get("Staggered!")))
 								EffectiveDamage *= glob.CCDamageModifier
+						if(src.clash_victor == 1 && (!src.beam_owner || src.beam_owner.victor == 1))
+							src.clash_victor = 2
+							if(src.beam_owner) src.beam_owner.victor = 2 
+							m.Knockback(glob.CLASH_WIN_KB, src.Owner, src.dir, 1, 1)
 
 						if(GoldScatter||Owner.CheckSlotless("Hoarders Riches"))
 							for(var/obj/Money/money in a.contents)
@@ -6487,7 +6530,11 @@ obj
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 									src.Owner.ProjectileAttacking = TRUE
+									if(glob.COUNTER_HIT && a:isCommitted())
+										CounterHitReward(src.Owner, a, min(EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR, 14))
 									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+									if(glob.CC_PRORATION)
+										a:ccCountHit()
 									src.Owner.ProjectileAttacking = FALSE
 									if(src.SkillDeicide)
 										src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
@@ -6565,7 +6612,11 @@ obj
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 										src.Owner.ProjectileAttacking = TRUE
+										if(glob.COUNTER_HIT && a:isCommitted())
+											CounterHitReward(src.Owner, a, min(EffectiveDamage, 14))
 										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+										if(glob.CC_PRORATION)
+											a:ccCountHit()
 										src.Owner.ProjectileAttacking = FALSE
 										if(src.SkillDeicide)
 											src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
@@ -6597,7 +6648,7 @@ obj
 									if(m)
 										AlreadyHit["[m.ckey]"]++
 									if(Piercing && PiercingBang)
-										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX, PY=src.VariationY, icon_override = ExplodeIcon)
+										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 								if(src.Owner.UsingAnsatsuken())
 									src.Owner.HealMana(src.Owner.SagaLevel/15)
 								if(src.Owner.SagaLevel>1&&src.Owner.Saga=="Path of a Hero: Rebirth")
@@ -6722,6 +6773,11 @@ obj
 							if(src.MultiHit)
 								src.MultiHit--
 								src.Distance++
+								if(UsesPixelCollision && src.Homing && a == src.Homing)
+									//re-center on the homing target so multi-hit hovers instead of orbiting
+									src.loc = a.loc
+									src.step_x = a:step_x
+									src.step_y = a:step_y
 								if(src.MultiHit<0)
 									src.MultiHit=0
 									ProjectileFinish()
@@ -6761,6 +6817,28 @@ obj
 							ProjectileFinish()
 							return
 				Move()
+					var/turf/gfx_water_before = get_turf(src)
+					if(pm_substep) //per-tile effects only when a tile line is crossed
+						if(src.EdgeOfMapProjectile())
+							ProjectileFinish()
+							return
+						var/turf/pre = loc
+						. = ..()
+						if(loc == pre) return
+						GfxProjectileWaterMove(src, gfx_water_before)
+						if(src.MiniDivide)
+							if(istype(pre, /turf))
+								Destroy(pre, 9001)
+						if(src.Divide)
+							for(var/turf/t in view(src.Divide, src))
+								Destroy(t, 9001)
+						if(src.Trail)
+							if(src.MultiTrail)
+								WaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+							else
+								LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+						src.Distance--
+						return
 					if(src.EdgeOfMapProjectile())
 						ProjectileFinish()
 						return
@@ -6778,6 +6856,7 @@ obj
 
 					src.Distance--
 					. = ..() //pixel movers need the real px-moved return for glide hints
+					GfxProjectileWaterMove(src, gfx_water_before)
 				var/tmp/mob/forcedTarget
 				proc/findNextTarget(mob/p, mob/o)
 					for(var/mob/a in view(Bounce, p))
@@ -6787,6 +6866,7 @@ obj
 					return 0
 				proc/ProjectileFinish() //This function should allow the garbage collector to take care of projectiles. For this to work, make sure all references TOWARD the projectile are cleansed.
 					//Or it will persist even in the void
+					if(clash_lock && !clash_lock.ended) return
 					walk(src, 0)
 					if(0 > Distance) return
 					Distance=-1
@@ -6820,32 +6900,49 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 					if(!src.Killed && src.Owner)
 						if(src.Explode)
-							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay, icon_override = ExplodeIcon)
+							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 						if(src.Cluster)
 							for(var/c=src.ClusterCount, c>0, c--)
+								var/obj/Skills/Projectile/_Projectile/cb
 								if(src.ClusterAdjust)
-									src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
 								else
-									src.Owner.Blast(src.Cluster, src.loc, 0)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0)
+								if(PmActive() && cb && cb.loc == src.loc)//inherit the impact point's mid-tile offset
+									cb.step_x = src.step_x
+									cb.step_y = src.step_y
 								sleep(src.ClusterDelay)
 						if(src.SurroundBurst)
 							var/list/burst_dirs = list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 							for(var/d in burst_dirs)
 								var/turf/T = get_step(src, d)
 								if(T)
-									src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									var/obj/Skills/Projectile/_Projectile/sb = src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									if(PmActive() && sb && sb.loc == T)//center the ring on the impact sprite
+										sb.step_x = src.step_x
+										sb.step_y = src.step_y
 						if(!src.MaxMultiHit&&!src.Piercing&&!src.Striking&&!src.Slashing&&!src.Explode&&!src.Cluster&&src.Area!="Beam")
 							if(!src.Trail)
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax, PY=src.VariationY+vhb_ay)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, color_override = FxBlastTint(src))
 							else
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax, PY=src.VariationY+src.TrailY+vhb_ay)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax+step_x, PY=src.VariationY+src.TrailY+vhb_ay+step_y, color_override = FxBlastTint(src))
 					endLife()
 				proc
 					Life()
 						if(UsesPixelCollision)
 							return PixelLife()
+						if(beam_owner) 
+							return
 						Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
-						while(src.Distance>0)
+						//locked segments must never exit this loop - see projectile_pixel.dm
+						while(src.Distance>0 || (src.clash_lock && !src.clash_lock.ended))
+							if(src.clash_lock)
+								if(src.clash_lock.ended) //struggle over and never cleared us: self-heal
+									src.clash_lock = null
+								else //frozen: hold position, no scans, no walk
+									walk(src, 0)
+									sleep(world.tick_lag) //tick-rate poll: the column resumes together
+									continue
 							if(src.Area=="Beam")
 								src.BeamGraphics()
 							if(src.EdgeOfMapProjectile())
@@ -6936,7 +7033,7 @@ obj
 									src.Distance--
 									if(src.StormFall)
 										animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
-							if(src.Area=="Beam")
+							if(src.Area=="Beam"&&!src.clash_lock) //a clash formed mid-iteration: no extra step
 								walk(src, src.dir, src.Speed)
 						if(Owner) Owner.active_projectiles -= src
 						ProjectileFinish()
@@ -6965,6 +7062,7 @@ mob
 			src.icon_state=""
 			src.Beaming=0
 			Z.Charging=0
+			src.BeamsRelease(Z) //V2: the beam detaches and flies on; it is never orphaned
 			if(src.BeamFiringVolley && !src.BeamVolleyHitPlayer && Z.Cooldown > 0 && Z.Area=="Beam")
 				Z.halve_next_cd=1
 			src.BeamFiringVolley=0
@@ -7004,3 +7102,6 @@ obj
 							if(!locate(src.type, get_step(src, turn(src.dir, 180))))
 								src.icon_state="end"
 								src.layer=5
+							if(src.icon_state=="head" && !src._fx_glowed) //true front segment only
+								src._fx_glowed = 1
+								FxAttachLight(src, null)

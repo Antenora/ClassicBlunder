@@ -3,7 +3,7 @@
 
 /obj/hud
 
-	layer = FLY_LAYER
+	layer = FLY_LAYER + 1.75 //above the day/night blanket (6.5), below the FLY_LAYER+2 HUD stack
 	alpha = 0
 	var/tmp/obj/appear
 	var/tmp/client/client
@@ -52,7 +52,7 @@
 				if("SuperCharge")
 					appear.icon = 'background.dmi'
 					appear.icon_state = "plasma_style"
-			appear.layer = FLY_LAYER
+			appear.layer = FLY_LAYER + 1.75
 			appear.alpha = 255
 
 			if(thing)
@@ -66,7 +66,7 @@
 	iaido
 		icon = 'kunai.dmi'
 		dir = EAST
-		layer = FLY_LAYER
+		layer = FLY_LAYER + 1.75
 		alpha = 0
 		Update()
 			var/iaido = client.mob.passive_handler["Iaido"];

@@ -122,10 +122,16 @@ What shortcut do you want to set?"}
         if(istype(s, /obj/Skills/Queue))
             return SetQueue(s);
         else if(istype(s, /obj/Skills/Projectile))
+            if(s.fire_ident && hascall(s, s.fire_ident))   
+                return call(s, s.fire_ident)()
             return UseProjectile(s);
         else if(istype(s, /obj/Skills/AutoHit))
+            if(s.fire_ident && hascall(s, s.fire_ident))
+                return call(s, s.fire_ident)()
             return Activate(s);
         else if(istype(s, /obj/Skills/Grapple))
+            if(s.fire_ident && hascall(s, s.fire_ident))
+                return call(s, s.fire_ident)()
             var/obj/Skills/Grapple/g = s;
             return g.Activate(src);
         else if(istype(s, /obj/Skills/Buffs))

@@ -111,7 +111,8 @@ client/proc/PPanelEnd()
 	setPref("ppPanY", pp_pan_y)
 
 client/proc/HidePlayerPanel()
-	HideAdminPanel()   
+	HideAdminPanel()
+	HideAtomPanel()   
 	player_panel_target = null
 	if(player_panel_objs)
 		while(player_panel_objs.len)

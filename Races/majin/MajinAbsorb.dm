@@ -49,7 +49,7 @@ var/global/list/MAJIN_PENDING_DIGEST_CREDITS = list()
     if(!verbs) return
     if(/mob/verb/Observe_Majin in verbs)
         verbs -= /mob/verb/Observe_Majin
-    if(client && client.eye != src && !absorbedBy)
+    if(client && !GfxClientEyeIsMob(client, src) && !absorbedBy)
         Observify(src, src)
         Observing = 0
 

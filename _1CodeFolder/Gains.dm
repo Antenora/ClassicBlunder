@@ -322,9 +322,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	if(!client)
 		mainLoop -= src
 		return
-	// One-shot stale-Kamui-lock cleanup. Proc short-circuits on its first line
-	// once the lock clears, so per-tick cost is one var read for any player
-	// without a stuck lock. Locked players unstick on their next gain tick.
+	//unsticks a stale Kamui lock, near-free once it clears
 	if(KamuiBuffLock)
 		AutoClearStaleKamuiLock()
 	if(src.KO&&src.icon_state!="KO")
@@ -375,6 +373,8 @@ mob
 				p.Auto_Attack()
 		StunCheck(src)
 		StunImmuneCheck(src)
+		if(glob.GUARD_SYSTEM && !Guarding && GuardMeter > 0)
+			GuardMeter = max(0, GuardMeter - glob.GUARD_METER_DECAY)
 		if(glob.BREAK_TARGET && !src.Admin && Target && ismob(Target))
 			var/distance = get_dist(Target, src)
 			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
@@ -1530,11 +1530,7 @@ mob
 				if(B.Using)
 					del B
 
-			// AGLock depends only on src.contents and src.passive_handler — invariant
-			// for the duration of this gain tick. Compute once before the Autonomous
-			// loop instead of recomputing per-buff. Prior code was O(N_Autonomous ×
-			// N_Contents) per tick: a player with admin-granted "all skills" walked
-			// ~30 Autonomous × ~300 contents = ~9000 inner iterations every tick.
+			//invariant for the whole tick, compute once instead of per-buff
 			var/PrecomputedAGLock = 0
 			for(var/obj/Items/omni in src.contents)
 				if(omni.LocksOutAutonomous && omni.suffix=="*Equipped*")
@@ -1755,8 +1751,8 @@ mob
 
 	//Okay, stuff past here may be sources of lag. This is just a comment to note this.
 		var/BreathingMaskOn=0
-		if(isturf(loc))
-			var/turf/T = loc
+		var/turf/T = GfxGroundTurf(src)
+		if(T)
 			if(T.effectApplied)
 				//TODO if u reuse this make it a switch
 				switch(T.effectApplied)
@@ -1783,11 +1779,11 @@ mob
 							T.effectApplied?:applyEffects(src, T.ownerOfEffect, dmg)
 
 			if(!passive_handler.Get("StaticWalk")&&!src.Dead)
-				if(istype(loc,/turf/Special/Static))
+				if(istype(T,/turf/Special/Static))
 					src.Health-=0.05
-				if(istype(loc,/turf/Dirt99))
+				if(istype(T,/turf/Dirt99))
 					src.Health-=0.05
-			if(istype(loc,/turf/Special/Stars)||istype(loc,/turf/Special/EventStars))
+			if(istype(T,/turf/Special/Stars)||istype(T,/turf/Special/EventStars))
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
 						BreathingMaskOn=1
@@ -1817,7 +1813,7 @@ mob
 							if(src.Health<-300)
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
-			else if(loc:Deluged||istype(loc,/turf/Waters)||istype(loc,/turf/Special/Ichor_Water)||istype(loc,/turf/Special/Midgar_Ichor))
+			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
 				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON,ELDRITCH))
 					BreathingMaskOn=1
@@ -1842,7 +1838,7 @@ mob
 						if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 				if(!IgnoresWater)
-					if(istype(loc,/turf/Waters/Water7))
+					if(istype(T,/turf/Waters/Water7))
 						if(!src.HasWalkThroughHell())
 							if(!isRace(DEMON)&&!src.HasHellPower())
 								src.AddBurn(10)
@@ -1851,50 +1847,50 @@ mob
 							src.Burn-=(src.Burn/20)
 							if(src.Burn<0)
 								src.Burn=0
-					if(istype(loc,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Waters/WaterD) && !src.HasVenomImmune())
+					if(istype(T,/turf/Waters/WaterD) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
 						src.AddPoison(1)
 					if(Swim==0)
 						src.RemoveWaterOverlay()
 						spawn()
-							if(loc:Deluged)
+							if(T.Deluged)
 								src.overlays+=image('WaterOverlay.dmi',"Deluged")
-								var/mob/p = loc:ownerOfEffect
+								var/mob/p = T.ownerOfEffect
 								if(p!= src && p)
 									src.AddSlow(10 + (5 * p.AscensionsAcquired))
 									src.AddShock(10 + (5 * p.AscensionsAcquired))
 							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-							else if(loc.type==/turf/Waters/Water7/LavaTile)
+							else if(T.type==/turf/Waters/Water7/LavaTile)
 								src.overlays+=image('LavaTileOverlay.dmi')
 							else
-								src.overlays+=image('WaterOverlay.dmi',"[loc.icon_state]")
+								src.overlays+=image('WaterOverlay.dmi',"[T.icon_state]")
 					if(!Swim)
 						Swim=1
 						if(isplayer(src))
 							src:move_speed = MovementSpeed()
 					if(!src.KO)
 						var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
-						if(loc:Shallow==1)
+						if(T.Shallow==1)
 							amounttaken=0
 						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 							amounttaken=0
 						if(BreathingMaskOn)
 							amounttaken=0
-						if(loc:Deluged==1)
+						if(T.Deluged==1)
 							amounttaken=4
 						if(isRace(DRAGON))
 							amounttaken=0

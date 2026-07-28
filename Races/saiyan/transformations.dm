@@ -853,9 +853,10 @@ transformation
 						GG.color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0)
 						GG.alpha=110
 						sleep(5)
-						user.filters+=filter(type = "blur", size = 0)
+						user.filters -= "transblur" //dupe filter names stack, clear first
+						user.filters+=filter(name="transblur", type = "blur", size = 0)
 						animate(user, color=list(-1.2,-1.2,-1, 1,1,1, -1.4,-1.4,-1.2,  1,1,1), time=3, flags=ANIMATION_END_NOW)
-						animate(user.filters[user.filters.len], size = 0.35, time = 3)
+						animate(user.filters["transblur"], size = 0.35, time = 3)
 						user.overlays+=GG
 						spawn()DarknessFlash(user, SetTime=60)
 						sleep()
@@ -875,7 +876,7 @@ transformation
 						sleep(20)
 
 						sleep(10)
-						user.filters-=filter(type = "blur", ,size = 0.35)
+						user.filters -= "transblur"
 						animate(user, color=list(0,0,0, 0,0,0, 0,0,0, 0.5,0.95,1), time=5, easing=QUAD_EASING)
 						sleep(5)
 						animate(user, color=null, time=20, easing=CUBIC_EASING)
@@ -964,9 +965,10 @@ transformation
 				GG.color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0)
 				GG.alpha=110
 				sleep(5)
-				user.filters+=filter(type = "blur", size = 0)
+				user.filters -= "transblur" //dupe filter names stack, clear first
+				user.filters+=filter(name="transblur", type = "blur", size = 0)
 				animate(user, color=list(-1.2,-1.2,-1, 1,1,1, -1.4,-1.4,-1.2,  1,1,1), time=3, flags=ANIMATION_END_NOW)
-				animate(user.filters[user.filters.len], size = 0.35, time = 3)
+				animate(user.filters["transblur"], size = 0.35, time = 3)
 				user.overlays+=GG
 				spawn()DarknessFlash(user, SetTime=60)
 				sleep()
@@ -986,7 +988,7 @@ transformation
 				sleep(20)
 
 				sleep(10)
-				user.filters-=filter(type = "blur", ,size = 0.35)
+				user.filters -= "transblur"
 				animate(user, color=list(0,0,0, 0,0,0, 0,0,0, 0.5,0.95,1), time=5, easing=QUAD_EASING)
 				sleep(5)
 				animate(user, color=null, time=20, easing=CUBIC_EASING)
