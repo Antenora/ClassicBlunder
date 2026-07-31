@@ -230,6 +230,7 @@ race
 		secondary_stats_per_class = list()
 		anger_message = "becomes angry!"
 		anger_point = 50
+		growth = 1
 
 		//anger. 1 = 100%, 2 = 200%
 		anger = 1.5
@@ -367,7 +368,7 @@ race
 			user.SetStat("Learning", learning)
 			user.SetStat("Intellect", intellect)
 			user.SetStat("Imagination", imagination)
-
+			user.SetStat("Growth", growth)
 			user.EconomyMult = economy
 
 		onFinalization(mob/user)

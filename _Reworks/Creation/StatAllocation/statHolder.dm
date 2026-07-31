@@ -47,25 +47,23 @@
     proc/calc_stat(datum/stat/stat, custom_buff = FALSE)
         var/base = stat.base
         var/invested = stat.invested
-        if(custom_buff)
-            return base + (invested * 0.05 )
-        else
-            if(glob.progress.STAT_DIMINISHING_RETURNS && base + (invested *glob.progress.STAT_PER_POINT) > glob.progress.STAT_DIMINISHING_THRESHOLD)
-                return exponential_scaling(stat)
+   //     if(custom_buff)
+   //         return base + (invested * 0.05 )
         if(glob.progress.NEW_STAT_SCALING)
             return base
         else
-            return base + (invested * glob.progress.STAT_PER_POINT)
+            if(glob.progress.STAT_DIMINISHING_RETURNS && base + (invested *glob.progress.STAT_PER_POINT) > glob.progress.STAT_DIMINISHING_THRESHOLD)
+                return exponential_scaling(stat)
+            else
+                return base + (invested * glob.progress.STAT_PER_POINT)
     proc/calc_invested(datum/stat/stat, custom_buff = FALSE)
         var/invested = stat.invested
-        return (invested * glob.progress.STAT_PER_POINT)
-    proc/calc_ascension(datum/stat/stat, custom_buff = FALSE)
-        var/invested = stat.invested
-        return (invested * glob.progress.INVESTED_STAT_PER_POINT)
+        return invested//(invested * glob.progress.STAT_PER_POINT)
 
 /datum/stat
     var/base = 0
     var/invested = 0
+    var/totalinvested
 
     proc/operator+=(n)
         invested+=n

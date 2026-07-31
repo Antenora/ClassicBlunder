@@ -428,11 +428,17 @@ mob/var
 	PowerEroded=0
 	Base=1
 	StrMod=1
+	StrengthInvest=0
 	EndMod=1
+	EnduranceInvest=0
 	ForMod=1
+	ForceInvest=0
 	OffMod=1
+	OffenseInvest=0
 	DefMod=1
+	DefenseInvest=0
 	SpdMod=1
+	SpeedInvest=0
 
 	TrueName//Holds true name for otherworldly beings
 	RPPower=1 //Multiplies overall power, edited by admins to increase power when it is suited to do so.

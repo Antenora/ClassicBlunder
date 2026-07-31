@@ -111,6 +111,7 @@ mob/proc/GetAssess()
 	<tr><td>Potential:</td><td>[PotentialDisplay]/150</td></tr>
 	<tr><td>Transformation Potential:</td><td>[potential_trans]/150</td></tr>
 	<tr><td>Average Stats: [StatAverage]</td></tr>
+	<tr><td>Growth Rate: [GrowthRate]</td></tr>
 	<tr><td>Magic Level: [src.getTotalMagicLevel()]</td></tr>
 	<tr><td>Stat Enhancement Chips Installed(Max): [src.EnhanceChips]([src.EnhanceChipsMax])</td></tr>
 			</table></html>"}
@@ -164,7 +165,7 @@ mob/var/list/Tabz=list("Science"="Hide","Build"="Hide","Enchantment"="Hide","Inv
 /var/HIDE_LEGACY_STAT_PANELS = 1
 
 mob/Players/Stat()
-	if(client)   
+	if(client)
 
 		if(!HIDE_LEGACY_STAT_PANELS) statpanel("Statistics")
 		if(!HIDE_LEGACY_STAT_PANELS && statpanel("Statistics"))
@@ -1201,7 +1202,7 @@ mob/proc/Update_Stat_Labels()
 		client.UpdateTimedBuffs()
 		client.UpdateTargetCard()
 		client.UpdatePartyCards()
-		client.UpdateCharacterMenu()   
+		client.UpdateCharacterMenu()
 		if(round(TotalCapacity))
 			ManaMessage=" (Capacity:[100-round(TotalCapacity)]%)"
 		if(src.CheckSlotless("Mang Resonance") || src.CheckSlotless("Shin Radiance"))

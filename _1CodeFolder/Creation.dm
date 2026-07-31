@@ -59,8 +59,8 @@ mob/Players
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE
-		PurgeHurtboxDebug() 
-		FxEnsureMasters(client) 
+		PurgeHurtboxDebug()
+		FxEnsureMasters(client)
 		ForceClearHeldChargeState()
 		players += usr
 		OverwatchNotifyLogin(usr, "logged in")
@@ -89,7 +89,7 @@ mob/Players
 		winshow(usr,"StatsWindow2",0)
 		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=true")
-		usr.client.show_verb_panel=1   
+		usr.client.show_verb_panel=1
 		usr.Admin("Check")
 		usr.overlays-='Emoting.dmi'
 		if(!Mapper)
@@ -896,6 +896,8 @@ mob/Creation/verb
 			alert("This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.")
 		if(blah=="AngerMod")
 			alert("This determines how much power you gain when you Anger, an event that occurs if a hit that would have reduced you under 25% heatlh happens..")
+		if(blah=="GrowthRate")
+			alert("For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.")
 
 mob/proc/UpdateBio()
 	src.PerkDisplay()
@@ -1100,6 +1102,12 @@ mob/proc
 		LOL.ForMod=src.ForMod
 		LOL.OffMod=src.OffMod
 		LOL.DefMod=src.DefMod
+		LOL.StrengthInvest=src.StrengthInvest
+		LOL.EnduranceInvest=src.EnduranceInvest
+		LOL.SpeedInvest=src.SpeedInvest
+		LOL.ForceInvest=src.ForceInvest
+		LOL.OffenseInvest=src.OffenseInvest
+		LOL.DefenseInvest=src.DefenseInvest
 		src.client.mob=LOL
 		del(src)
 

@@ -158,7 +158,7 @@ mob/var
 	JutsuSL6Picks = 0   // max 1, tier cap <=4
 	JutsuSL7Picks = 0   // max 1, tier cap <=5
 
-	// Sorcerer 
+	// Sorcerer
 	CursedTechnique
 
 
@@ -369,9 +369,9 @@ mob/Admin3/verb
 
 				if("Shinobi")
 					P.gainShinobi()
-				
-				if("Sorcerer")
-					P.gainSorcerer()
+
+//				if("Sorcerer")
+//					P.gainSorcerer()
 
 				if("Kamui")
 					P.SagaLevel=1
