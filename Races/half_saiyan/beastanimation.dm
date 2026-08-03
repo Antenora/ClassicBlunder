@@ -46,7 +46,7 @@
 /*/mob/verb/testBeast()
     set category = "Debug"*/
 /mob/proc/BeastAnimation()
-    var/oldview = client.view
+    client.SetupCutsceneDisplay()
     client.eye = locate(99,99,1)
     Quake(30, z)
     // client.perspective = EDGE_PERSPECTIVE
@@ -118,7 +118,6 @@
     del test
     plane_master.screen_loc = "CENTER,CENTER"
     animate(plane_master, transform=matrix())
-    client.view = oldview
     var/obj/animationobj/aura = new(i = 'Super Amazing Beast Aura.dmi', _px = -32, _py = 32,  appear_flags = PIXEL_SCALE )
     aura.transform = matrix().Scale(1.75)
     bleh.overlays += aura
@@ -137,5 +136,6 @@
     del blankHolder
     del lightness
     client.eye = src
+    client?.EndCutsceneDisplay()
     overlays += aura
     src.CutsceneMode()

@@ -18,14 +18,14 @@ globalTracker
 		MOON_EVENT_ALPHA = 150 //full-moon shadow strength, vs the 42 nobody has ever noticed
 		MOON_EVENT_LEN_MIN = 1.05 //event length FLOOR - the only knob that lengthens (see SunShadowParams)
 		MOON_EVENT_TINT = "#141c30" //cold near-black; the pale #7f8fbf reads as haze, not shadow
-		//altitude (pixel_z): shadow shrinks + fades as the owner rises - flight, lofts, juggles
+		//altitude (pixel_z): shadow shrinks + fades as the mob rises - flight, lofts, juggles
 		SHADOW_ALT_REF = 48 //full-flight height; response saturates here
 		SHADOW_ALT_SHRINK = 0.45 //silhouette size lost at full altitude
 		SHADOW_ALT_FADE = 0.55 //alpha lost at full altitude
 
 mob/var/tmp/list/shadow_pool //reusable /obj/fx_worldshadow, [1..N] for sun + light shadows
 
-var/list/_shadow_objs = list() //every live shadow obj; swept for orphans (deleted owners)
+var/list/_shadow_objs = list() //every live shadow obj; swept for orphans
 var/_ws_boot = _WsBoot()
 
 proc/ShadowDisplayedCardinal(d, prev)
@@ -120,7 +120,7 @@ proc/ComputeLightShadows(mob/M)
 		mob/owner
 		cached_owner_appearance //exact look snapshot; detects same-length gear replacements too
 		measure_key //base icon/state/cardinal used for the feet-pivot measurement
-		display_dir = SOUTH //sticky 4-dir facing while the owner travels diagonally
+		display_dir = SOUTH //sticky 4-dir facing while the mob travels diagonally
 		cached_h = 32
 		cached_gap = 0
 		snap_next = 1 //snap (not animate) the next Configure - set on create + on silhouette rebuild
@@ -132,7 +132,7 @@ proc/ComputeLightShadows(mob/M)
 		owner = o
 		appearance_flags |= KEEP_TOGETHER
 
-	//refresh only when the owner's look or shown facing changes
+	//refresh only when the mob's look or shown facing changes
 	proc/RebuildSilhouette()
 		if(!owner) return
 		var/shown_dir = ShadowDisplayedCardinal(owner.dir, display_dir)
@@ -169,7 +169,7 @@ proc/ComputeLightShadows(mob/M)
 			cached_gap = gap
 
 	//feet-pinned projection: "sun" = shear flip, "rad" = radial away from a point light
-	//owner scale rides in as sx/sy - vis children inherit pixel offsets but NOT transform
+	//mob scale rides in as sx/sy - vis children inherit pixel offsets but not transform
 	proc/Configure(list/c, sx, sy, opz)
 		var/matrix/Mx
 		var/px
@@ -189,7 +189,7 @@ proc/ComputeLightShadows(mob/M)
 			a = c[5]
 			col = c[6]
 			var/ws = glob.SHADOW_WIDTH
-			//height axis -> ln*(ux,uy); width axis -> ws*perp, perp=(-uy,ux); then owner scale
+			//height axis -> ln*(ux,uy); width axis -> ws*perp, perp=(-uy,ux); then mob scale
 			var/mb = sy * ln * ux
 			var/me = sy * ln * uy
 			Mx = matrix(sx * ws * -uy, mb, 0, sx * ws * ux, me, 0)
@@ -239,7 +239,8 @@ mob/proc/EnsureMobShadows(list/configs)
 	for(var/obj/fx_worldshadow/s in stale)
 		vis_contents -= s
 		_shadow_objs -= s
-		del s
+		s.owner = null //ref-drop, never del (del scans the whole world)
+		s.loc = null
 	var/sx = 1
 	var/sy = 1
 	var/matrix/ot = transform
@@ -263,10 +264,11 @@ mob/proc/EnsureMobShadows(list/configs)
 
 mob/proc/ClearMobShadows()
 	if(shadow_pool)
-		for(var/obj/fx_worldshadow/s in shadow_pool.Copy()) //Copy: del scrubs from the live list mid-loop
+		for(var/obj/fx_worldshadow/s in shadow_pool)
 			_shadow_objs -= s
 			vis_contents -= s
-			del s
+			s.owner = null //ref-drop, never del
+			s.loc = null
 		shadow_pool = null
 
 //client.view can be a "WxH" string wider than world.view - cover what the player actually sees
@@ -324,7 +326,8 @@ proc/_ShadowSweep(list/seen)
 			clear |= o
 	for(var/obj/fx_worldshadow/sh in reap)
 		_shadow_objs -= sh
-		del sh
+		sh.owner = null
+		sh.loc = null //ref-drop, never del
 	for(var/mob/o in clear)
 		o.ClearMobShadows()
 

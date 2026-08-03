@@ -3,6 +3,7 @@
 
 /obj/hud
 
+	plane = HUD_PLANE
 	layer = FLY_LAYER + 1.75 //above the day/night blanket (6.5), below the FLY_LAYER+2 HUD stack
 	alpha = 0
 	var/tmp/obj/appear
@@ -89,6 +90,7 @@
 	proc/animateBar(x_offset, time2death)
 		animate(src, pixel_x = x_offset, time=time2death, easing = LINEAR_EASING)
 /obj/Container
+	plane = HUD_PLANE
 	appearance_flags = KEEP_TOGETHER
 	icon = 'smallbar.dmi'
 	icon_state = "background"
@@ -98,6 +100,7 @@
 			screen_loc = "1:[loc_x],1:[loc_y]"
 
 /obj/barbg
+	plane = HUD_PLANE
 	icon = 'barbgs.dmi'
 	New(state)
 		icon_state = state
@@ -115,11 +118,19 @@ client/proc/remove_hud(id)
 		var/obj/thing = hud_ids[id]
 		screen -= hud_ids[id]
 		mob.contents -= hud_ids[id]
-
-		del thing
+		var/obj/bar/B = thing
+		if(istype(B))
+			if(B.holder)
+				screen -= B.holder
+				B.holder = null
+			if(B.barbg)
+				screen -= B.barbg
+				B.barbg = null
+			B.meter = null
 		hud_ids -= id
 
 /obj/bar
+	plane = HUD_PLANE
 	var/tmp/linked_var = ""
 	var/obj/Bar/meter
 	var/obj/Container/holder

@@ -1973,7 +1973,6 @@ obj/Items/Tech
 		SubType="Local Range Devices"
 		icon='Binoculars.dmi'
 		Cost=0.2
-		var/viewOld
 		desc="Use this to increase your sight range temporarily."
 		Click()
 			if(!(src in usr))
@@ -1982,11 +1981,9 @@ obj/Items/Tech
 				return
 			else
 				Using=1
-				viewOld=usr.client.view
 				usr.client.view="69x69"
 				spawn(100)
-					usr.client.view=viewOld
-					viewOld=null
+					usr?.client?.FitViewNow()
 					Using=0
 	Doorbell
 		Health=10

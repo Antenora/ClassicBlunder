@@ -40,6 +40,7 @@ mob/var
 
 
 mob/proc/Auraz(var/Z)
+	spawn(1) MobAuraLightRefresh(src)
 	var/image/pegasus=image('Cosmo_Pegasus.dmi',pixel_x=-17, pixel_y=-22)
 	var/image/dragon=image('Cosmo_Dragon.dmi',pixel_x=-17, pixel_y=-22)
 	var/image/cygnus=image('Cosmo_Cygnus.dmi',pixel_x=-17, pixel_y=-22)

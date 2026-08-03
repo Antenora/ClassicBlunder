@@ -430,7 +430,9 @@ proc/GfxMaterialsNear(turf/T, radius)
 
 atom/movable/New()
 	. = ..()
-	spawn(3) GfxRefreshStructureMetadata(src)
+	spawn(3)
+		SurfaceApply(src) //profile side effects (wind, light emission) for runtime-placed props too
+		GfxRefreshStructureMetadata(src)
 
 atom/movable/Del()
 	GfxClearMaterialVisuals(src)
@@ -449,7 +451,8 @@ proc/GfxRefreshStructureMetadata(atom/movable/A)
 		A.gfx_structure_role = GFX_STRUCTURE_DECK
 		A.gfx_walk_elevation = max(A.gfx_walk_elevation, 1)
 		A.gfx_directional_response = max(A.gfx_directional_response, 0.4)
-	if(A.casts_contact_shadow || A.gfx_emissive_strength > 0 || A.foreground_occluder || A.gfx_directional_response > 0 || A.gfx_structure_role != GFX_STRUCTURE_NONE)
+	//wind belongs in this gate: foliage with ONLY a wind response never registered before
+	if(A.casts_contact_shadow || A.gfx_emissive_strength > 0 || A.foreground_occluder || A.gfx_directional_response > 0 || A.gfx_wind_response > 0 || A.gfx_structure_role != GFX_STRUCTURE_NONE)
 		_gfx_material_atoms |= A
 		GfxMaterialBucketRegister(A)
 		if(!A.gfx_wind_phase) A.gfx_wind_phase = rand(0, 359)
@@ -470,6 +473,20 @@ proc/GfxApplyStructureVisuals(atom/movable/A)
 				A.layer = MOB_LAYER + 0.012
 		if(GFX_STRUCTURE_FOREGROUND)
 			A.layer = max(A.layer, MOB_LAYER + 0.035)
+			A.filters -= "hd2dcanopy"
+
+proc/GfxApplyForegroundRole(atom/movable/A)
+	if(!A || !isobj(A)) return
+	if(SurfaceProp(A, "fg"))
+		if(A.gfx_structure_role == GFX_STRUCTURE_NONE)
+			A.gfx_structure_role = GFX_STRUCTURE_FOREGROUND
+		if(A.gfx_structure_role == GFX_STRUCTURE_FOREGROUND)
+			GfxApplyStructureVisuals(A)
+	else if(A.gfx_structure_role == GFX_STRUCTURE_FOREGROUND)
+		A.gfx_structure_role = GFX_STRUCTURE_NONE
+		A.plane = initial(A.plane) //heals stragglers from the scrapped plane-31 routing
+		A.layer = initial(A.layer)
+		A.filters -= "hd2dcanopy"
 
 proc/GfxElevationAt(atom/A)
 	var/turf/T = get_turf(A)
@@ -651,16 +668,55 @@ proc/GfxRefreshMaterialVisuals(atom/movable/A)
 
 proc/GfxApplyMaterialWind(atom/movable/A)
 	if(!A || A.gfx_wind_response <= 0) return
+	if(A.gfx_canopy_obj)
+		var/obj/gfx_canopy/CN = A.gfx_canopy_obj
+		var/turf/PT = get_turf(A)
+		var/list/PW = EnvWindForArea(PT ? PT.loc : null)
+		var/ppow = clamp(sqrt(PW[1] * PW[1] + PW[2] * PW[2]) / 2, 0, 1)
+		if(!CN.gfx_wind_base_transform)
+			CN.gfx_wind_base_transform = CN.transform ? new/matrix(CN.transform) : matrix()
+		var/pamp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
+		var/pang = sin(world.time * (2.4 + ppow * 2.2) + CN.gfx_wind_phase) * pamp * CN.gfx_wind_response * ppow
+		var/pv2 = CN.sp_wind_pivot ? CN.sp_wind_pivot : 0
+		var/matrix/CM = matrix()
+		if(pv2)
+			CM.Translate(0, -pv2)
+			CM.Turn(pang)
+			CM.Translate(0, pv2)
+		else
+			CM.Turn(pang)
+		animate(CN, transform = CN.gfx_wind_base_transform * CM, time = 10,
+		        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+		return //trunk never moves
 	var/turf/T = get_turf(A)
 	var/area/AR = T ? T.loc : null
 	var/list/W = EnvWindForArea(AR)
-	var/power = clamp(sqrt(W[1] * W[1] + W[2] * W[2]) / 5, 0, 1)
+	var/power = clamp(sqrt(W[1] * W[1] + W[2] * W[2]) / 2, 0, 1)
 	if(!A.gfx_wind_base_transform)
 		A.gfx_wind_base_transform = A.transform ? new/matrix(A.transform) : matrix()
-	var/angle = sin(world.time * (0.7 + power * 0.45) + A.gfx_wind_phase) * 1.8 * A.gfx_wind_response * power
-	var/matrix/target = A.gfx_wind_base_transform * turn(matrix(), angle)
-	//END_NOW so a busy server doesn't stack a queue; LINEAR keeps tree overlays together
-	animate(A, transform = target, time = 10, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+	var/amp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
+	var/angle = sin(world.time * (2.4 + power * 2.2) + A.gfx_wind_phase) * amp * A.gfx_wind_response * power
+	if(!(A.appearance_flags & KEEP_TOGETHER))
+		A.appearance_flags |= PIXEL_SCALE | KEEP_TOGETHER
+	var/hh = SurfaceIconHeight(A)
+	var/vh = SurfaceVisualHeight(A) //base cell + overlay crown: the palm is 96px, not 32
+	var/mn = (glob && glob.WIND_MIN_PX) ? glob.WIND_MIN_PX : 6
+	var/mx = (glob && glob.WIND_MAX_PX) ? glob.WIND_MAX_PX : 24
+	var/peak = abs(tan(clamp(amp * A.gfx_wind_response * power, -35, 35))) * vh
+	var/gain = 1
+	if(peak > 0.01)
+		if(peak < mn) gain = mn / peak
+		else if(peak > mx) gain = mx / peak
+	var/k = tan(clamp(angle, -35, 35)) * gain
+	//x' = x + k*(y - ybase) with ybase = -h/2, so the bottom row never moves
+	var/matrix/S = matrix(1, k, k * hh / 2, 0, 1, 0)
+	animate(A, transform = A.gfx_wind_base_transform * S, time = 10,
+	        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+	for(var/atom/movable/V in A.vis_contents)
+		if(V == A.gfx_canopy_obj) continue
+		if(V == A.gfx_canopy_shaft_obj) continue //the sun shaft holds its own lean, not the sway
+		animate(V, transform = S, time = 10,
+		        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
 
 proc/GfxClearMaterialVisuals(atom/movable/A)
 	if(!A) return
@@ -716,6 +772,7 @@ proc/GfxClearContactShadow(atom/movable/A)
 
 proc/GfxAOInvalidateNear(turf/T)
 	if(!T) return
+	Hd2dInvalidateColumn(T) //wall-shadow stack heights go stale on the same edits
 	for(var/turf/N in range(1, T))
 		N._gfx_ao_mask = -1
 		_gfx_ao_dirty |= N

@@ -11,11 +11,13 @@ globalTracker
 		//multiply-reveal: darkness moves into the lighting buffer and the relay multiplies it back; off = classic additive
 		MULTIPLY_REVEAL = TRUE
 		LIGHT_CAVE_COLOR = "#2b2b33" //opaque cave base under multiply-reveal
+		INDOOR_DIM = 0.6 //how far non-sky, non-cave areas follow the clock (0 = never dim = the old glowing-rectangle behaviour, 1 = as dark as outdoors)
 		//full-moon cold override
 		MOON_EVENT = TRUE
 		MOON_GRADE_COLOR = "#7898e8" //strong silver-blue ambient lift over the ordinary #566294 night
 		MOON_FILL_COLOR = "#8fb9ff" //subtle additive outdoor fill, applied client-side below combat FX
 		MOON_FILL_ALPHA = 24
+		MOON_LIGHT_DIM = 0.45 //full moon: outdoor lamp render strength drops by this much at peak
 		MOON_EVENT_PHASE = 0.64 //DnPhase the natural moon waits for - keeps the event inside the night plateau (0.58-0.88)
 		MOON_EVENT_RAMP = 1200 //ds; matches the MoonWarning->MoonTrigger gap so the sky lands with Oozaru and other moon procs
 		MOON_EVENT_HOLD = 6000
@@ -68,6 +70,12 @@ area/Outside/Planet/AlienDesolate/ADUnderground/sees_sky = 0
 
 var/list/_dn_sky_areas = list()
 var/list/_dn_cave_areas = list()
+var/list/_dn_indoor_areas = list()
+
+area
+	var
+		dn_indoor = 0 //managed interior: follows the clock at INDOOR_DIM strength
+		dn_no_dim = 0 //opt out entirely
 var/_dn_offset = 0
 var/_moon_event_from = 0 //world.time the ramp-in started
 var/_moon_event_until = 0 //world.time deadline - the ONLY moon-event state. 0 or past = inactive
@@ -95,7 +103,14 @@ proc/_DnSetup()
 			A.dark_cave = 1
 			A._dn_orig_layer = A.layer
 			_dn_cave_areas += A
+		else if(!A.icon && !A.dn_no_dim)
+			A.dn_indoor = 1
+			_dn_indoor_areas += A
 	_DnApplyMode()
+
+//how dark a managed interior goes relative to the open sky
+proc/DnIndoorColor(skycol)
+	return DnLerp("#ffffff", skycol, glob ? glob.INDOOR_DIM : 0.6)
 
 //set every managed area up for the current MR mode: off = classic plane-0 multiply, on = opaque base in the lighting buffer
 proc/_DnApplyMode()
@@ -112,6 +127,18 @@ proc/_DnApplyMode()
 			A.plane = 0
 			A.layer = DN_BLANKET_LAYER
 			A.blend_mode = BLEND_MULTIPLY //classic plane-0 darkening
+	var/incol = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(skycol) : "#ffffff"
+	for(var/area/A in _dn_indoor_areas)
+		A.icon = EnvWhiteIcon()
+		A.color = incol
+		if(mr)
+			A.plane = BASE_LIGHTING_PLANE
+			A.layer = DN_BASE_LAYER
+			A.blend_mode = BLEND_OVERLAY
+		else
+			A.plane = 0
+			A.layer = DN_BLANKET_LAYER
+			A.blend_mode = BLEND_MULTIPLY
 	for(var/area/A in _dn_cave_areas)
 		if(mr)
 			A.icon = EnvWhiteIcon()
@@ -161,8 +188,10 @@ proc/LightDarkFrac(turf/T)
 	if(!T) return 0
 	var/area/A = T.loc
 	if(!A) return 0
-	if(A.sees_sky) return DnDarknessFrac()
+	//full moon lifts ambient, so outdoor pools render softer with it
+	if(A.sees_sky) return DnDarknessFrac() * (1 - glob.MOON_LIGHT_DIM * MoonEventK())
 	if(A.dark_cave) return 1 //baked-dark caves: the DARKEST - full light strength (both modes)
+	if(A.dn_indoor) return DnDarknessFrac() * (glob ? glob.INDOOR_DIM : 0.6)
 	if(A.icon) //underwater tints: dark in additive mode, but NOT a multiply-reveal surface
 		return (glob && glob.MULTIPLY_REVEAL) ? 0 : 1
 	return 0 //opted-out sky-less areas (Heaven/Hell/etc.): never dark
@@ -212,10 +241,17 @@ proc/_DnLoop()
 			var/target = DnColorNow()
 			for(var/area/A in _dn_sky_areas)
 				animate(A, color = target, time = 100)
+			var/intarget = glob.INDOOR_DIM > 0 ? DnIndoorColor(target) : "#ffffff"
+			for(var/area/A in _dn_indoor_areas)
+				animate(A, color = intarget, time = 100)
 		else
 			for(var/area/A in _dn_sky_areas)
 				if(A.color != "#ffffff")
 					animate(A, color = "#ffffff", time = 10)
+			for(var/area/A in _dn_indoor_areas)
+				if(A.color != "#ffffff")
+					animate(A, color = "#ffffff", time = 10)
+		Hd2dSunTick() //wall shadows re-aim + shaft sun state, same cadence as the sky
 		sleep(100)
 
 /mob/Admin2/verb/Day_Night_Toggle()

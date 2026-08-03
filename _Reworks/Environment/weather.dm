@@ -297,14 +297,14 @@ proc/_WxNearbyWeatherArea(mob/Players/P)
 
 proc/_WxDetachPlayer(mob/Players/P)
 	if(!P) return
+	if(P._wx_objs) GfxWatchdogSnapshot("WX_DETACH") //teardown markers in the log
 	_WxClearOutdoorMask(P)
 	if(P._wx_objs)
 		for(var/obj/screen/O in P._wx_objs.Copy())
 			if(P.client) P.client.screen -= O
 			if(istype(O, /obj/screen/wx_emitter))
 				O.particles = null
-			if(istype(O, /obj/screen/wx_emitter) || istype(O, /obj/screen/wx_panel_row) || istype(O, /obj/screen/wx_precip_master) || istype(O, /obj/screen/wx_outdoor_mask_master) || istype(O, /obj/screen/wx_precip_relay))
-				del O
+			//no del - drop the refs and let refcount free them (del scans the whole world)
 	P._wx_objs = null
 	P._wx_key = null
 	P._wx_tier = 0

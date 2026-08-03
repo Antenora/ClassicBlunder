@@ -126,7 +126,6 @@ proc/GfxCameraDisable(client/C)
 		C.gfx_camera = null
 		G.owner = null
 		G.loc = null
-		del G
 
 proc/GfxCameraSync(client/C)
 	if(!C) return

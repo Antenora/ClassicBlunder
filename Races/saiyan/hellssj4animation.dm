@@ -45,7 +45,7 @@
 
 
 /mob/proc/HellSSJ4Animation1(appearance1, appearance2, user) // the anim take the appearance before and after the transformation. necessary to make everything show up as it should
-    var/oldview = client.view
+    client.SetupCutsceneDisplay()
     client.eye = locate(99,99,1)
     Quake(30, z)
     // client.perspective = EDGE_PERSPECTIVE
@@ -136,7 +136,7 @@
     sleep(20)
     animate(bleh2, transform = matrix().Scale(4).Translate(-20, 0), time = 2)
     sleep(20)
-    client.view = oldview
+    client?.EndCutsceneDisplay()
     del blankHolder
     del dorkness
     del lightness

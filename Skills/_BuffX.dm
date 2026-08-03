@@ -622,6 +622,7 @@ NEW VARIABLES
 			User.BuffingUp=0
 			if(!src.BuffName)
 				src.BuffName="[src.name]"
+			spawn(1) MobAuraLightRefresh(User) //aura light follows buff on/off instantly
 			return returnClause
 	ActiveBuffs
 		ActiveSlot=1

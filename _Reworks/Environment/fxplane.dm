@@ -10,6 +10,8 @@ globalTracker
 		LIGHT_ICON_COLOR = TRUE //glow color sampled from the skill's own art; off = element palette
 		DARK_SKILLS = TRUE //predominantly-black skills swap the glow for a darkening blob (negative light)
 		DARKGLOW_ALPHA = 145 //peak strength of that blob
+		CHARGE_LIGHTS = TRUE //aura'd actors (charging, transformed) shed a glow colored from their aura art
+		CHARGE_LIGHT_ALPHA = 150 //peak strength of that glow in full darkness
 		ADAPTIVE_EXPLOSIONS = TRUE //explosion tint follows the skill's own art; off = stock orange
 		SCREEN_DISTORT = TRUE //displacement: shockwave rings + fire heat shimmer
 		DISTORT_SIZE = 14 //max displacement in px
@@ -43,6 +45,21 @@ globalTracker
 	mouse_opacity = 0
 	layer = BACKGROUND_LAYER
 	render_target = "*fxdisp"
+
+//no-bloom fx plate: near-white energy art defeats any bloom threshold, so it gets its own plane
+/obj/fxnb_master
+	plane = 23
+	appearance_flags = PLANE_MASTER | PIXEL_SCALE
+	screen_loc = "LEFT,BOTTOM"
+	mouse_opacity = 0
+	layer = BACKGROUND_LAYER
+	render_target = "*fxnb"
+
+/obj/fxnb_relay
+	screen_loc = "SOUTHWEST"
+	layer = 6.89 //just under the bloomed plate at 6.9
+	mouse_opacity = 0
+	render_source = "*fxnb"
 
 //LIGHTING_PLANE is defined in daynight.dm
 
@@ -88,6 +105,8 @@ client
 		obj/fxbase_master/fxbase_master
 		obj/fxlight_into_base/fxlight_into_base
 		obj/fx_relay/fx_relay
+		obj/fxnb_master/fxnb_master
+		obj/fxnb_relay/fxnb_relay
 		cpm_blur_size = 0 //current fullscreen blur (poison/drunk); applied by CpmApply
 
 mob/var/tmp/_fx_pulse_t = 0 //autohit cast-pulse debounce (once per tick per caster)
@@ -154,7 +173,7 @@ mob/var/tmp/_fx_pulse_t = 0 //autohit cast-pulse debounce (once per tick per cas
 	pixel_y = -16
 
 obj/Skills/Projectile
-	plane = 1 //bloomed effects plane
+	plane = 23 //no-bloom fx plate: near-white energy art defeats any bloom threshold
 	var/tmp/_fx_glowed = 0 //legacy beam head: glow attached once
 
 //effects render on the bloomed plane; ground props opt back out so they still layer under mobs
@@ -175,6 +194,7 @@ obj/Effects
 	Shadowbringer_Shadow/plane = FLOAT_PLANE //under-caster shadow decal
 
 var/icon/_fx_glow_icon
+var/icon/_fx_fill_icon //flat disc, soft rim: the indirect-fill bounce layer inside light composites
 var/icon/_fx_ring_icon
 var/icon/_fx_heat_icon
 var/list/_fx_lit_paths = list()
@@ -205,6 +225,19 @@ proc/_FxBuildIcons()
 			if(d < 1)
 				G.DrawBox(rgb(255, 255, 255, round((1-d)*(1-d)*255)), px, py, px, py)
 	_fx_glow_icon = G
+	//flat inside, smooth rim: bounce fill must be even across the room, not a second hotspot
+	var/icon/FD = new('sandstorm.dmi')
+	FD.Scale(64, 64)
+	FD.DrawBox(rgb(0,0,0,0), 1, 1, 64, 64)
+	for(py = 1, py <= 64, py++)
+		for(px = 1, px <= 64, px++)
+			var/dx = px - 32.5
+			var/dy = py - 32.5
+			var/d = sqrt(dx*dx + dy*dy) / 31
+			if(d < 1)
+				var/e = (d <= 0.8) ? 1 : (1 - d) / 0.2
+				FD.DrawBox(rgb(255, 255, 255, round(255 * e * e * (3 - 2 * e))), px, py, px, py)
+	_fx_fill_icon = FD
 	var/icon/R = new('sandstorm.dmi')
 	R.Scale(64, 64)
 	R.DrawBox(rgb(128,128,128,0), 1, 1, 64, 64)
@@ -231,7 +264,7 @@ proc/_FxBuildIcons()
 				H.DrawBox(rgb(128, round(128 + 40*(1-d)), 128, round(150*(1-d))), px, py, px, py)
 	_fx_heat_icon = H
 
-#define FX_CONE_PX 96 //cone texture cell; apex sits at the centre so Turn() aims it cleanly
+#define FX_CONE_PX 96 //cone texture cell; apex sits at the center so Turn() aims it cleanly
 
 var/list/_fx_cone_icons = list()
 
@@ -257,8 +290,7 @@ proc/_FxConeIcon(variant = 0)
 			var/ang = (r > 1) ? arccos(dx / r) : 0 //degrees off +x, 0..180
 			var/angK = (ang <= 30) ? 1 : max(0, 1 - (ang - 30) / 9)
 			if(angK <= 0) continue
-			//SOLID body with a soft rim, not a gradient smudge: gentle falloff across
-			//the length, then a short feather at the outer edge
+			//solid body with a soft rim: gentle falloff across the length, then a short feather
 			var/radial = 1 - 0.45 * d
 			if(d > 0.8) radial *= (1 - d) / 0.2
 			var/a = 0
@@ -414,7 +446,7 @@ proc/FxSkillIsDark(obj/Skills/Projectile/P, obj/Skills/Projectile/Z)
 		f = _FxIconDarkFrac(Z.IconLock, P.icon_state)
 	return f >= FX_DARK_FRAC_MIN
 
-//anchor a 64px vis_contents child on the art's true center - big skills carry pixel_x like -158 and a naive child inherits it and lands off-screen
+//anchor a 64px vis child on the art's true center - big skills carry pixel_x like -158
 proc/FxChildAnchor(atom/movable/P)
 	if(P.vhb_w > 0) //pixel hitbox active: its center is the art's true center
 		return list(-16 + P.vhb_ox - P.pixel_x, -16 + P.vhb_oy - P.pixel_y)
@@ -665,6 +697,7 @@ proc/FxRegisterLight(atom/movable/source, turf/fixed_t, radius = 6, lcolor = nul
 	L.lcolor = lcolor
 	if(life) L.expire = world.time + life
 	_fx_lights += L
+	return L
 
 proc/FxLightTurf(datum/fx_light/L)
 	if(L.fixed) return L.fixed
@@ -676,6 +709,316 @@ proc/FxPruneLights()
 			if(world.time >= L.expire) _fx_lights -= L
 		else if(!L.src_atom || !L.src_atom.loc) //moving source deleted, or off-map/dying (endLife nulls loc before its sleep)
 			_fx_lights -= L
+
+// aura lights
+//aura light: one pooled vis child + a shadow entry riding the actor - follows aura state, not Auraz edges
+mob/var/tmp/obj/fx_lightglow/charge_glow
+mob/var/tmp/datum/fx_light/charge_fxlight
+mob/var/tmp/charge_glow_cycle //icon-file text driving a color cycle, or null
+mob/var/tmp/charge_glow_frac = 0 //darkness the glow was last driven at - drift re-bases alpha
+mob/var/tmp/charge_glow_ikey //name-or-ref of the aura icon sizing/coloring the glow now
+
+//animated multi-hue auras baked offline; Rainbow runs the full hue wheel
+var/list/_aura_cycle_cache
+proc/AuraCycleColors()
+	if(_aura_cycle_cache) return _aura_cycle_cache
+	_aura_cycle_cache = list(\
+		"RainbowAura.dmi" = list(48, "#ff3838", "#ff9b38", "#ffff38", "#9bff38", "#38ff38", "#38ff9b",\
+		                         "#38ffff", "#389bff", "#3838ff", "#9b38ff", "#ff38ff", "#ff389b"))
+	return _aura_cycle_cache
+
+//IconLock art worn from a buff or held skill ('BLANK.dmi' = the held default)
+proc/_BuffLockIcon(mob/M)
+	if(M.ActiveBuff && M.ActiveBuff.IconLock && "[M.ActiveBuff.IconLock]" != "BLANK.dmi") return M.ActiveBuff.IconLock
+	if(M.SpecialBuff && M.SpecialBuff.IconLock && "[M.SpecialBuff.IconLock]" != "BLANK.dmi") return M.SpecialBuff.IconLock
+	if(M.AttackQueue && M.AttackQueue.IconLock && "[M.AttackQueue.IconLock]" != "BLANK.dmi") return M.AttackQueue.IconLock
+	return null
+
+//aura icon priority: lock, buff IconLocks, form auras, powered aura, overlays, underlays
+proc/MobAuraIcon(mob/M)
+	if(M.AuraLocked && M.AuraLock) return M.AuraLock
+	var/il = _BuffLockIcon(M)
+	if(il) return il
+	if(M.transActive >= 2 && M.Form2Aura) return M.Form2Aura //player-uploaded form auras
+	if(M.transActive && M.Form1Aura) return M.Form1Aura //render plain-blend: the ADD scan can't see them
+	if(M.ChargingEnergy || M.PoweringUp || M.PowerControl > 100)
+		for(var/obj/Skills/Power_Control/PC in M.contents) //the customized powered-state aura
+			if(PC.sicon) return PC.sicon
+	for(var/o in M.overlays)
+		var/image/I = o //appearances aren't /image datums - raw cast, then read the vars
+		if(I && I.blend_mode == BLEND_ADD && I.icon) return I.icon
+	for(var/o in M.underlays)
+		var/image/I = o
+		if(I && I.icon) return I.icon
+	return null
+
+//runtime cycle probe for uploaded animated auras; no real hue travel = static color
+var/list/_aura_custom_cycle = list() //"[ref]" -> list(total_ds, colors...) | "static"
+proc/AuraCustomCycle(f)
+	var/id = "[f]"
+	if(length(id) && id != "/icon") return null //named files are the offline table's job
+	var/key = "[ref(f)]"
+	var/hit = _aura_custom_cycle[key]
+	if(hit) return islist(hit) ? hit : null
+	var/list/cols = list()
+	try
+		for(var/i = 1, i <= 8, i++)
+			var/icon/F = new(f, null, SOUTH, i)
+			var/c = _FxSampleIcon(F, null)
+			if(!c) break
+			cols += c
+	catch //frame extraction from an uploaded datum can runtime - degrade, never crash the attach
+		_aura_custom_cycle[key] = "static"
+		return null
+	//count occupied hue bins: an aura that TRAVELS the wheel fills several
+	var/list/bins = list()
+	var/list/uniq = list()
+	for(var/c in cols)
+		var/list/p = _FxRGB(c)
+		if(!p) continue
+		var/mx = max(p[1], max(p[2], p[3]))
+		var/mn = min(p[1], min(p[2], p[3]))
+		if(!mx || (mx - mn) / mx < 0.15) continue //neutral frame: no hue to bin
+		var/ch = mx - mn
+		var/hue = 0
+		if(mx == p[1]) hue = 60 * (p[2] - p[3]) / ch
+		else if(mx == p[2]) hue = 60 * ((p[3] - p[1]) / ch + 2)
+		else hue = 60 * ((p[1] - p[2]) / ch + 4)
+		if(hue < 0) hue += 360
+		var/bin = "[round(hue / 30)]"
+		if(!(bin in bins))
+			bins += bin
+			uniq += c //one representative color per hue bin keeps the chain short
+	if(bins.len >= 4) //4+ distinct hue regions = genuinely color-shifting
+		var/list/out = list(max(12, uniq.len * 4)) //~4ds per stop reads calm
+		out += uniq
+		_aura_custom_cycle[key] = out
+		return out
+	_aura_custom_cycle[key] = "static"
+	return null
+
+//mirrors the Auraz Add branches, keep them in step
+proc/MobAuraActive(mob/M)
+	if(!M) return 0
+	//var checks first (can't runtime); NEVER test skill ownership - skills sit in contents forever
+	if(M.ChargingEnergy || M.PoweringUp) return 1
+	if(M.PowerControl > 100) return 1 //holding a powered state (Ki Control etc) keeps the aura up
+	if(M.AuraLocked && M.AuraLock) return 1
+	if(_BuffLockIcon(M)) return 1 //IconLock buffs + held-skill locks wear visible art
+	if(M.transActive) return 1
+	if(M.tension >= 5) return 1
+	if(M.ClothBronze) return 1
+	if(M.Saga == "Spiral") return 1
+	try //proc-backed checks last: a runtime in any of them must not kill the light path
+		if(M.passive_handler && M.passive_handler.Get("Controlled Chaos")) return 1
+		if(M.passive_handler && M.passive_handler.Get("BurningShot")) return 1
+		if(M.CheckSpecial("Kamui Unite")) return 1
+		if(M.RippleActive()) return 1
+	catch
+	return 0
+
+//inked extent of an icon (max bbox of visible pixels), cached - tiny art lights small
+var/list/_fx_icon_inked = list()
+proc/_FxIconInked(f)
+	if(!f) return 32
+	var/id = "[f]"
+	if(!length(id) || id == "/icon") id = "[ref(f)]"
+	var/hit = _fx_icon_inked[id]
+	if(hit) return hit
+	var/inked = 32
+	try
+		var/icon/I = new(f)
+		var/w = I.Width()
+		var/h = I.Height()
+		if(w > 0 && h > 0)
+			var/minx = w + 1
+			var/maxx = 0
+			var/miny = h + 1
+			var/maxy = 0
+			for(var/py = 1, py <= h, py += 2)
+				for(var/px = 1, px <= w, px += 2)
+					var/c = I.GetPixel(px, py)
+					if(!c) continue
+					if(length(c) >= 9 && text2num(copytext(c, 8, 10), 16) < 40) continue
+					if(px < minx) minx = px
+					if(px > maxx) maxx = px
+					if(py < miny) miny = py
+					if(py > maxy) maxy = py
+			if(maxx >= minx) inked = max(maxx - minx + 1, maxy - miny + 1)
+	catch
+		inked = 32
+	_fx_icon_inked[id] = inked
+	return inked
+
+//glow scale from inked size: ~12px flame -> ~1.4 tiles, 96px aura -> ~4.8
+proc/_AuraGlowScale(inked)
+	return clamp(0.5 + inked * 0.02, 0.6, 3.2)
+
+//single entry point: attach, refresh or drop the light to match the mob's real state
+proc/MobAuraLightRefresh(mob/M)
+	if(!M) return
+	if(!glob || !glob.CHARGE_LIGHTS || !glob.LIGHTING || !glob.DYNAMIC_LIGHTS || !MobAuraActive(M))
+		MobAuraLightOff(M)
+		return
+	MobAuraLightOn(M)
+
+//loop the glow through a baked color cycle; gentle alpha wave rides the same chain
+proc/_AuraCycleDrive(obj/fx_lightglow/L, list/cyc, frac)
+	var/steps = cyc.len - 1
+	var/step_t = max(1, round(cyc[1] / steps))
+	var/aHi = round(glob.CHARGE_LIGHT_ALPHA * frac)
+	var/aLo = round(aHi * 0.8)
+	L.color = cyc[2]
+	L.alpha = aHi
+	animate(L, color = cyc[3], alpha = aLo, time = step_t, loop = -1)
+	for(var/i = 4, i <= cyc.len, i++)
+		animate(color = cyc[i], alpha = (i % 2) ? aHi : aLo, time = step_t)
+	animate(color = cyc[2], alpha = aHi, time = step_t)
+
+proc/MobAuraLightOn(mob/M)
+	if(!M || !glob || !glob.CHARGE_LIGHTS || !glob.LIGHTING || !glob.DYNAMIC_LIGHTS) return
+	if(!_fx_glow_icon) _FxBuildIcons()
+	if(!_fx_glow_icon) return
+	var/turf/t = get_turf(M)
+	if(!t) return
+	var/frac = LightRenderStrength(t)
+	//the daylight floor is 0.10 - below dusk, no aura light at all (a dim husk otherwise sticks)
+	if(frac < 0.25)
+		MobAuraLightOff(M)
+		return
+	//the light must attach no matter what sampling does - failures fall back to the default color
+	var/aicon
+	var/list/cyc
+	var/col
+	var/inked = 32
+	try
+		aicon = MobAuraIcon(M)
+		cyc = aicon ? (AuraCycleColors()["[aicon]"] || AuraCustomCycle(aicon)) : null
+		col = cyc ? cyc[2] : (aicon ? FxIconColor(aicon, null) : null)
+		inked = _FxIconInked(aicon)
+	catch
+		cyc = null
+		col = null
+	if(!col) col = "#cfe4ff" //bare ki charge: cool white
+	//icon datums all stringify alike - key by ref or two custom auras read as the same
+	var/aid = "[aicon]"
+	var/ikey = aicon ? ((length(aid) && aid != "/icon") ? aid : "[ref(aicon)]") : null
+	var/key = cyc ? ikey : null
+	var/rad = clamp(round(inked / 16) + 2, 2, 8)
+	if(M.charge_glow) //already lit: track color/cycle/size/strength in place
+		if(M.charge_fxlight)
+			M.charge_fxlight.lcolor = col
+			M.charge_fxlight.radius = rad
+		if(M.charge_glow_ikey != ikey)
+			M.charge_glow_ikey = ikey
+			M.charge_glow.transform = matrix() * _AuraGlowScale(inked)
+		if(key != M.charge_glow_cycle || abs(frac - M.charge_glow_frac) > 0.02)
+			M.charge_glow_cycle = key
+			M.charge_glow_frac = frac
+			if(cyc)
+				_AuraCycleDrive(M.charge_glow, cyc, frac)
+			else
+				animate(M.charge_glow) //end any running chain
+				M.charge_glow.color = col
+				M.charge_glow.alpha = round(glob.CHARGE_LIGHT_ALPHA * frac)
+				animate(M.charge_glow, alpha = round(glob.CHARGE_LIGHT_ALPHA * frac * 0.72), time = 9, loop = -1, easing = SINE_EASING)
+				animate(alpha = round(glob.CHARGE_LIGHT_ALPHA * frac), time = 9, easing = SINE_EASING)
+		else if(!cyc)
+			M.charge_glow.color = col
+		return
+	var/obj/fx_lightglow/L = new
+	L.icon = _fx_glow_icon
+	L.color = col
+	L.alpha = round(glob.CHARGE_LIGHT_ALPHA * frac)
+	L.transform = matrix() * _AuraGlowScale(inked) //light footprint follows the art's real size
+	var/list/anc = FxChildAnchor(M)
+	L.pixel_x = anc[1]
+	L.pixel_y = anc[2]
+	if(glob.MULTIPLY_REVEAL) L.plane = LIGHTING_PLANE //add INTO the buffer so the multiply reveals it
+	M.vis_contents += L
+	M.charge_glow = L
+	M.charge_fxlight = FxRegisterLight(M, null, rad, col)
+	M.charge_glow_cycle = key
+	M.charge_glow_frac = frac
+	M.charge_glow_ikey = ikey
+	if(cyc)
+		_AuraCycleDrive(L, cyc, frac)
+	else
+		//slow breathing so the pool reads alive without strobing
+		animate(L, alpha = round(glob.CHARGE_LIGHT_ALPHA * frac * 0.72), time = 9, loop = -1, easing = SINE_EASING)
+		animate(alpha = round(glob.CHARGE_LIGHT_ALPHA * frac), time = 9, easing = SINE_EASING)
+
+proc/MobAuraLightOff(mob/M)
+	if(!M) return
+	if(M.charge_glow)
+		M.vis_contents -= M.charge_glow
+		M.charge_glow.loc = null //refcount-free, never del
+		M.charge_glow = null
+	if(M.charge_fxlight)
+		_fx_lights -= M.charge_fxlight
+		M.charge_fxlight = null
+	M.charge_glow_cycle = null
+	M.charge_glow_frac = 0
+	M.charge_glow_ikey = null
+
+//reconciler: catches aura paths with no edge hook + day/night moving under standing players
+proc/_AuraLightTick()
+	set waitfor = 0
+	set background = 1
+	while(1)
+		if(glob && glob.CHARGE_LIGHTS && glob.LIGHTING)
+			for(var/client/C)
+				var/mob/M = C.mob
+				if(M) spawn(-1) MobAuraLightRefresh(M) //isolated: one mob's runtime must not kill the sweep
+		sleep(50) //5s: the net for paths with no edge hook (timer-expired buffs etc)
+
+var/_aura_light_boot = _AuraLightBoot()
+proc/_AuraLightBoot()
+	spawn(120)
+		_AuraLightTick()
+	return 1
+
+//walks the aura-light chain and prints every gate; run it while the aura is up
+/mob/Admin2/verb/Aura_Light_Debug()
+	set category = "Admin"
+	set name = "Aura Light Debug"
+	var/mob/M = src
+	src << "<b>--- aura light debug ---</b>"
+	src << "globs: CHARGE_LIGHTS=[glob.CHARGE_LIGHTS] LIGHTING=[glob.LIGHTING] DYNAMIC_LIGHTS=[glob.DYNAMIC_LIGHTS] MULTIPLY_REVEAL=[glob.MULTIPLY_REVEAL] CHARGE_LIGHT_ALPHA=[glob.CHARGE_LIGHT_ALPHA]"
+	src << "state: ChargingEnergy=[M.ChargingEnergy] PoweringUp=[M.PoweringUp] AuraLocked=[M.AuraLocked] AuraLock=[M.AuraLock ? "SET" : "null"] transActive=[M.transActive] tension=[M.tension] ClothBronze=[M.ClothBronze] Saga=[M.Saga]"
+	var/pc = 0
+	for(var/obj/Skills/Power_Control/P in M.contents)
+		pc++
+		src << "  Power_Control #[pc]: [P.type] sicon=[P.sicon ? "SET ([P.sicon])" : "null"]"
+	src << "Power_Control objs in contents: [pc]"
+	src << "PowerControl=[M.PowerControl] ActiveBuff=[M.ActiveBuff ? "[M.ActiveBuff.type] lock=[M.ActiveBuff.IconLock]" : "null"] SpecialBuff=[M.SpecialBuff ? "[M.SpecialBuff.type] lock=[M.SpecialBuff.IconLock]" : "null"] QueueLock=[M.AttackQueue ? "[M.AttackQueue.IconLock]" : "null"]"
+	src << "MobAuraActive = [MobAuraActive(M)]"
+	var/aicon = MobAuraIcon(M)
+	src << "MobAuraIcon = [aicon ? "SET (\"[aicon]\" ref [ref(aicon)])" : "null"]"
+	if(aicon) src << "inked=[_FxIconInked(aicon)]px -> glow scale [_AuraGlowScale(_FxIconInked(aicon))]"
+	var/turf/t = get_turf(M)
+	src << "turf=[t ? "[t.x],[t.y],[t.z]" : "NULL"] LightRenderStrength=[t ? LightRenderStrength(t) : "n/a"]"
+	src << "_fx_glow_icon=[_fx_glow_icon ? "built" : "NULL"]"
+	src << "before: charge_glow=[M.charge_glow ? "EXISTS alpha=[M.charge_glow.alpha] color=[M.charge_glow.color] plane=[M.charge_glow.plane] in_vis=[(M.charge_glow in M.vis_contents) ? "yes" : "NO"]" : "null"] fxlight=[M.charge_fxlight ? "yes" : "null"] cycle=[M.charge_glow_cycle] driven_frac=[M.charge_glow_frac]"
+	src << "calling MobAuraLightRefresh synchronously..."
+	MobAuraLightRefresh(M)
+	src << "after refresh: charge_glow=[M.charge_glow ? "EXISTS alpha=[M.charge_glow.alpha] color=[M.charge_glow.color] plane=[M.charge_glow.plane] in_vis=[(M.charge_glow in M.vis_contents) ? "yes" : "NO"]" : "null"]"
+	if(!M.charge_glow)
+		src << "refresh did not attach - forcing MobAuraLightOn directly..."
+		MobAuraLightOn(M)
+		src << "after forced On: charge_glow=[M.charge_glow ? "EXISTS alpha=[M.charge_glow.alpha] color=[M.charge_glow.color] plane=[M.charge_glow.plane]" : "STILL NULL"]"
+	src << "vis_contents total: [M.vis_contents ? M.vis_contents.len : 0]"
+	src << "<b>--- end ---</b>"
+
+/mob/Admin2/verb/Charge_Lights_Toggle()
+	set category = "Admin"
+	set name = "Charge Lights Toggle"
+	glob.CHARGE_LIGHTS = !glob.CHARGE_LIGHTS
+	if(!glob.CHARGE_LIGHTS)
+		for(var/mob/M in world)
+			if(M.charge_glow) MobAuraLightOff(M)
+	src << "Aura charge lights: [glob.CHARGE_LIGHTS ? "ON" : "OFF"]."
+	Log("Admin", "[ExtractInfo(src)] set charge lights to [glob.CHARGE_LIGHTS].")
 
 //attach glow (and heat blob for fire) to a flying projectile/beam head; Z can be null on the legacy beam path
 proc/FxAttachLight(obj/Skills/Projectile/P, obj/Skills/Projectile/Z)
@@ -950,6 +1293,12 @@ proc/CpmApply(client/C)
 		C.client_plane_master = new()
 		C.screen += C.client_plane_master
 	var/list/fl = list()
+	if(glob && glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM)
+		fl += Hd2dGradeFilter(C) //zone-aware grade: plane-0 master only, the HUD (plane 100) stays clean
+	if(glob && glob.WORLD_BLOOM && _Hd2dLocalDark(C) > 0.35 && GfxBloomEnabled(C))
+		//whole-scene night bloom: placed fires/lights blossom (skill-FX bloom never sees them)
+		var/wt = clamp(glob.WORLD_BLOOM_THRESHOLD, 96, 245)
+		fl += filter(type="bloom", threshold=rgb(wt, wt, wt), size=glob.WORLD_BLOOM_SIZE)
 	if(C.cpm_blur_size > 0)
 		fl += filter(type="blur", size=C.cpm_blur_size)
 	if(glob && glob.SCREEN_DISTORT && GfxDistortEnabled(C))
@@ -960,7 +1309,9 @@ proc/CpmApply(client/C)
 //bloom + a mirror of the fullscreen blur - the effects plane escapes client_plane_master
 proc/FxApplyBloom(client/C)
 	if(!C || !C.fxplane_master) return
+	var/grade = glob && glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM
 	var/list/fl = list()
+	if(grade) fl += Hd2dGradeFilter(C) //the fx plates escape the world master - mirror the grade
 	if(glob && glob.BLOOM && GfxBloomEnabled(C))
 		var/t = clamp(glob.BLOOM_THRESHOLD + C.gfx_env_bloom_bias, 96, 245)
 		var/bs = GfxQualityRank(C) >= GFX_QUALITY_HIGH ? glob.BLOOM_SIZE : max(2, round(glob.BLOOM_SIZE * 0.55))
@@ -968,6 +1319,12 @@ proc/FxApplyBloom(client/C)
 	if(C.cpm_blur_size > 0)
 		fl += filter(type="blur", size=C.cpm_blur_size)
 	C.fxplane_master.filters = fl.len ? fl : null
+	if(C.fxnb_master) //the no-bloom plate: same mirrors, never the bloom
+		var/list/nfl = list()
+		if(grade) nfl += Hd2dGradeFilter(C)
+		if(C.cpm_blur_size > 0)
+			nfl += filter(type="blur", size=C.cpm_blur_size)
+		C.fxnb_master.filters = nfl.len ? nfl : null
 
 proc/FxEnsureMasters(client/C)
 	if(!C) return
@@ -992,6 +1349,12 @@ proc/FxEnsureMasters(client/C)
 	if(!C.fxlight_into_base)
 		C.fxlight_into_base = new()
 		C.screen += C.fxlight_into_base
+	if(!C.fxnb_master)
+		C.fxnb_master = new()
+		C.screen += C.fxnb_master
+	if(!C.fxnb_relay)
+		C.fxnb_relay = new()
+		C.screen += C.fxnb_relay
 	FxApplyLightBlur(C)
 	FxApplyRelayBlend(C)
 	FxApplyBloom(C)

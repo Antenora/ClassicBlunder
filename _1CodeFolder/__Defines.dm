@@ -1,5 +1,7 @@
 proc/log_func(x, a, b)
 	return a * (log(x) / log(10) - b )
+#define HUD_PLANE 100
+
 #define TIER_1_COST 30
 #define TIER_2_COST 60
 #define TIER_3_COST 90

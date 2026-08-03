@@ -30,11 +30,17 @@
 		haze_alpha = 0
 		haze_density = 0
 		haze_depth = 1
+		//zone mood anchors; null falls back to the global GRADE_* knobs
+		grade_gain
+		grade_black
+		grade_warm
+		ambient_day
+		ambient_night
 
 area
 	var/env_profile_id = "default"
 
-//maps opt areas into profiles later; everything defaults to neutral for now
+//everything defaults to neutral for now
 
 var/list/_env_profiles = list()
 var/_env_profile_boot = _EnvProfileBoot()
@@ -60,6 +66,15 @@ proc/_EnvProfileHaze(id, haze_color, haze_alpha, haze_density, haze_depth = 1)
 	P.haze_alpha = haze_alpha
 	P.haze_density = haze_density
 	P.haze_depth = haze_depth
+
+proc/_EnvProfileMood(id, gain, black, warm, aday, anight)
+	var/datum/environment_profile/P = _env_profiles[id]
+	if(!P) return
+	P.grade_gain = gain
+	P.grade_black = black
+	P.grade_warm = warm
+	P.ambient_day = aday
+	P.ambient_night = anight
 
 proc/_EnvProfileBoot()
 	_EnvProfileMake("default", "Neutral", "#ffffff", 0, 0, 0.5, 0, 0)
@@ -91,6 +106,21 @@ proc/_EnvProfileBoot()
 	_EnvProfileHaze("void", "#9d8abe", 24, 0.28, 1.3)
 	_EnvProfileHaze("toxic", "#bddb82", 34, 0.48, 1.35)
 	_EnvProfileHaze("corrupted", "#c68aa9", 28, 0.4, 1.25)
+	//starter values, tuned live with Preview Environment Profile
+	_EnvProfileMood("temperate", null, null, null, null, "fireflies")
+	_EnvProfileMood("lush", 1.24, 0.035, 0.02, "leaves", "fireflies")
+	_EnvProfileMood("arid", 1.24, 0.035, 0.16, "dust", null)
+	_EnvProfileMood("frozen", 1.2, 0.03, -0.06, null, null)
+	_EnvProfileMood("volcanic", 1.3, 0.05, 0.2, "ash", "ash")
+	_EnvProfileMood("coastal", 1.18, 0.02, 0.03, null, "fireflies")
+	_EnvProfileMood("swamp", 1.18, 0.045, 0.04, "motes", "fireflies")
+	_EnvProfileMood("subterranean", 1.26, 0.055, 0.08, "motes", "motes")
+	_EnvProfileMood("underwater", 1.15, 0.04, -0.12, "bubbles", "bubbles")
+	_EnvProfileMood("industrial", 1.18, 0.04, 0.05, "motes", "motes")
+	_EnvProfileMood("ethereal", 1.12, 0.015, -0.05, "motes", "motes")
+	_EnvProfileMood("void", 1.3, 0.06, -0.08, null, null)
+	_EnvProfileMood("toxic", 1.2, 0.04, -0.04, "motes", "fireflies")
+	_EnvProfileMood("corrupted", 1.28, 0.05, -0.02, null, null)
 	spawn(100)
 		_EnvProfileLoop()
 	return 1
@@ -116,15 +146,36 @@ proc/EnvWeatherWetness(area/A)
 		if("blizzard") return 0.35
 	return 0
 
-proc/EnvWindForArea(area/A)
-	var/datum/environment_profile/P = EnvProfile(A)
-	var/wx = 1
-	if(A)
-		switch(A.wx_kind)
-			if("storm") wx = 2.4
-			if("blizzard") wx = 3
-			if("dust") wx = 2.6
-			if("rain", "snow") wx = 1.35
+globalTracker
+	var/tmp
+		WIND_SCALE = 1 //global multiplier over every wind source
+		WIND_AMPLITUDE = 9 //max sway in degrees at full power
+		WIND_MIN_PX = 6 //floor on peak lean, so small plants still visibly move
+		WIND_MAX_PX = 24 //ceiling, so a very tall tree doesn't lean absurdly
+		WIND_OVERRIDE = 0 //1 = ignore profile/weather, use the manual vector below
+		WIND_MAN_X = 0
+		WIND_MAN_Y = 0
+		//per-weather multipliers - tune these instead of editing the switch
+		WIND_WX_STORM = 2.4
+		WIND_WX_BLIZZARD = 3
+		WIND_WX_DUST = 2.6
+		WIND_WX_PRECIP = 1.35 //ordinary rain/snow
+
+//single source of truth for the weather multiplier
+proc/EnvWeatherWindMult(area/A)
+	if(!A || !A.wx_kind || !glob) return 1
+	switch(A.wx_kind)
+		if("storm") return glob.WIND_WX_STORM
+		if("blizzard") return glob.WIND_WX_BLIZZARD
+		if("dust") return glob.WIND_WX_DUST
+		if("rain", "snow") return glob.WIND_WX_PRECIP
+	return 1
+
+//client path passes its own resolved profile
+proc/EnvWindForArea(area/A, datum/environment_profile/prof)
+	if(glob && glob.WIND_OVERRIDE) return list(glob.WIND_MAN_X, glob.WIND_MAN_Y)
+	var/datum/environment_profile/P = prof ? prof : EnvProfile(A)
+	var/wx = EnvWeatherWindMult(A) * (glob ? glob.WIND_SCALE : 1)
 	return list(P.wind_x * wx, P.wind_y * wx)
 
 proc/EnvAtmosphereFor(datum/environment_profile/P, area/A)
@@ -205,16 +256,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	var/area/A = T ? T.loc : null
 	var/datum/environment_profile/P = EnvProfileForClient(C, A)
 	if(!P) return
-	var/list/wind = list(P.wind_x, P.wind_y)
-	if(A && A.wx_kind)
-		var/wind_mult = 1
-		switch(A.wx_kind)
-			if("storm") wind_mult = 2.4
-			if("blizzard") wind_mult = 3
-			if("dust") wind_mult = 2.6
-			if("rain", "snow") wind_mult = 1.35
-		wind[1] *= wind_mult
-		wind[2] *= wind_mult
+	var/list/wind = EnvWindForArea(A, P) //shared path: weather mult, global scale, manual override
 	C.gfx_env_wind_x = wind[1]
 	C.gfx_env_wind_y = wind[2]
 	C.gfx_env_wetness = clamp(max(P.base_wetness, EnvWeatherWetness(A)), 0, 1)
@@ -233,16 +275,23 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 			if("snow", "blizzard") grade_color = DnLerp(grade_color, "#e6f2ff", 0.35)
 			if("dust") grade_color = DnLerp(grade_color, "#d4aa72", 0.4)
 	var/time = immediate ? 0 : 10
-	var/profile_key = "[P.id]-[A ? A.wx_kind : null]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]"
+	var/lightclass = !A ? "none" : A.sees_sky ? "sky" : A.dark_cave ? "cave" : "bright"
+	var/profile_key = "[P.id]-[A ? A.wx_kind : null]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]-[lightclass]"
 	if(C.gfx_env_profile_id != profile_key)
 		C.gfx_env_profile_id = profile_key
 		animate(C.gfx_env_grade, color = grade_color, alpha = target_alpha, time = time)
-		FxApplyBloom(C)
+		FxApplyBloom(C) //fx plates snap to the new zone grade; the world plate glides below
+		if(C.hd2d_lightclass != lightclass)
+			C.hd2d_lightclass = lightclass
+			CpmApply(C) //stepping indoors is a CUT: bloom presence + day-grade snap together
+		else
+			Hd2dGradeShift(C, immediate ? 0 : 40) //outdoor zone-to-zone keeps the crossfade
 	var/wet_alpha = GfxReflectionEnabled(C) ? round(C.gfx_env_wetness * 10) : 0
 	animate(C.gfx_wet_sheen, alpha = wet_alpha, time = time)
 	GfxConfigureAtmosphere(C, P, A, time)
 	GfxApplyReflectionPass(C, A)
 	GfxUpdateMoonlight(C, A, time)
+	_Hd2dAmbientApply(C, P, A) //self-keyed: zone, dusk/dawn, quality, resize, wind
 
 proc/GfxUpdateMoonlight(client/C, area/A, transition_time = 10)
 	if(!C || !C.gfx_moon_fill) return
@@ -273,6 +322,27 @@ proc/_EnvProfileLoop()
 	var/list/W = EnvWindForArea(A)
 	src << "Area [A ? A.name : "none"] uses profile [P.display_name] ([P.id]); wind [round(W[1], 0.1)], [round(W[2], 0.1)], wetness [round(max(P.base_wetness, EnvWeatherWetness(A)), 0.01)], haze [P.haze_alpha]/[round(P.haze_density, 0.01)]."
 
+//sets the AREA world-side; the preview verb below only overrides your client
+/mob/Admin2/verb/Set_Area_Environment_Profile()
+	set category = "Mapper"
+	set name = "Set Area Environment Profile"
+	var/turf/T = get_turf(src)
+	var/area/A = T ? T.loc : null
+	if(!A)
+		src << "No area here."
+		return
+	var/list/options = list()
+	for(var/id in _env_profiles)
+		var/datum/environment_profile/EP = _env_profiles[id]
+		options["[EP.display_name] ([id])"] = id
+	var/choice = input(src, "Assign a profile to AREA [A.name] ([A.type]). Session-only until pinned in code.", "Area Environment") as null|anything in options
+	if(!choice) return
+	A.env_profile_id = options[choice]
+	for(var/client/CC)
+		CC.gfx_env_profile_id = null //re-key everyone within a second
+	src << "[A.name] -> [options[choice]] (until reboot - report the area type to pin it)."
+	Log("Admin", "[ExtractInfo(src)] set area env profile of [A.type] to [options[choice]].")
+
 /mob/Admin2/verb/Preview_Environment_Profile()
 	set category = "Admin"
 	set name = "Preview Environment Profile"
@@ -289,3 +359,68 @@ proc/_EnvProfileLoop()
 	client.gfx_reflection_filter_key = null
 	EnvUpdateClient(client, TRUE)
 	src << "Environment preview: [client.gfx_env_preview_id || "map default"]."
+
+// wind controls
+proc/EnvWindRefresh()
+	for(var/client/C)
+		EnvUpdateClient(C, TRUE)
+
+proc/EnvWindReport(area/A)
+	var/list/W = EnvWindForArea(A)
+	var/mag = sqrt(W[1] * W[1] + W[2] * W[2])
+	var/dir = mag > 0.001 ? round(arctan(W[1], W[2])) : 0
+	return "strength [round(mag, 0.01)] dir [dir]deg (x [round(W[1], 0.01)], y [round(W[2], 0.01)])"
+
+/mob/Admin2/verb/Wind_Control()
+	set category = "Admin"
+	set name = "Wind Control"
+	var/turf/T = get_turf(src)
+	var/area/A = T ? T.loc : null
+	var/list/opts = list("Global scale", "Sway amplitude", "Manual wind (override)",
+	                     "Clear override (back to auto)", "Weather multipliers", "Show current wind")
+	var/pick = input(src, "Wind here: [EnvWindReport(A)]") as null|anything in opts
+	if(!pick) return
+	switch(pick)
+		if("Global scale")
+			var/s = input(src, "Global wind scale (1 = normal, 0 = still, 3 = gale)?") as num|null
+			if(s == null) return
+			glob.WIND_SCALE = clamp(s, 0, 10)
+			src << "Global wind scale -> [glob.WIND_SCALE]."
+		if("Sway amplitude")
+			var/amp = input(src, "Max foliage sway in degrees (current [glob.WIND_AMPLITUDE]; 0 = still, 9 = default, 25 = wild)?") as num|null
+			if(amp == null) return
+			glob.WIND_AMPLITUDE = clamp(amp, 0, 45)
+			src << "Sway amplitude -> [glob.WIND_AMPLITUDE] degrees."
+		if("Manual wind (override)")
+			var/mag = input(src, "Wind strength (0-10; profile values are ~0.5-3)?") as num|null
+			if(mag == null) return
+			var/dir = input(src, "Direction in degrees (0 = east, 90 = north)?") as num|null
+			if(dir == null) return
+			mag = clamp(mag, 0, 10)
+			glob.WIND_MAN_X = mag * cos(dir)
+			glob.WIND_MAN_Y = mag * sin(dir)
+			glob.WIND_OVERRIDE = 1
+			src << "Manual wind ON: [EnvWindReport(A)]."
+		if("Clear override (back to auto)")
+			glob.WIND_OVERRIDE = 0
+			src << "Manual wind OFF - profile + weather again: [EnvWindReport(A)]."
+		if("Weather multipliers")
+			var/k = input(src, "Which weather?") as null|anything in list("storm", "blizzard", "dust", "rain/snow")
+			if(!k) return
+			var/cur = k == "storm" ? glob.WIND_WX_STORM : k == "blizzard" ? glob.WIND_WX_BLIZZARD : \
+			          k == "dust" ? glob.WIND_WX_DUST : glob.WIND_WX_PRECIP
+			var/v = input(src, "[k] wind multiplier (current [cur])?") as num|null
+			if(v == null) return
+			v = clamp(v, 0, 10)
+			switch(k)
+				if("storm") glob.WIND_WX_STORM = v
+				if("blizzard") glob.WIND_WX_BLIZZARD = v
+				if("dust") glob.WIND_WX_DUST = v
+				else glob.WIND_WX_PRECIP = v
+			src << "[k] wind multiplier -> [v]."
+		if("Show current wind")
+			src << "Area [A ? A.name : "?"] ([A ? (A.wx_kind || "clear") : "?"]): [EnvWindReport(A)]"
+			src << "scale [glob.WIND_SCALE] | override [glob.WIND_OVERRIDE ? "ON" : "off"] | storm [glob.WIND_WX_STORM] blizzard [glob.WIND_WX_BLIZZARD] dust [glob.WIND_WX_DUST] rain/snow [glob.WIND_WX_PRECIP]"
+			return
+	EnvWindRefresh()
+	Log("Admin", "[ExtractInfo(src)] wind control: [pick].")

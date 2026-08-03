@@ -14,6 +14,7 @@
 #define SHUD_FONT_STYLE "font-family:'monogram'; font-size:12pt"
 
 /atom/movable/shud
+	plane = HUD_PLANE //off plane 0 so the farblur world capture can't eat or ghost the HUD
 	layer = SHUD_LAYER
 	mouse_opacity = 0
 	Click()

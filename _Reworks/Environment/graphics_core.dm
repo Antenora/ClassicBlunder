@@ -436,6 +436,7 @@ client/proc/ApplyGraphicsPreferences()
 	GfxApplyShadowPass(src)
 	GfxApplyMaterialLightPass(src)
 	GfxApplyReflectionPass(src)
+	Hd2dApplyClient(src)
 	EnvUpdateClient(src, TRUE)
 	if(mob)
 		mob._wx_key = null
@@ -454,7 +455,7 @@ client/proc/InitializeGraphics()
 	set name = "Graphics Settings"
 	if(!client || !client.prefs) return
 	var/choice = input(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings") in list(
-		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Experimental Camera", "Apply / Close")
+		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close")
 	switch(choice)
 		if("Quality Preset")
 			var/q = input(src, "Higher presets enable more particles, soft shadows, bloom, distortion, and reflections.", "Graphics Quality", client.prefs.graphicsQuality) in list("Low", "Medium", "High", "Ultra", "Cancel")
@@ -463,10 +464,13 @@ client/proc/InitializeGraphics()
 		if("Reduced Flashes") client.prefs.reducedFlashes = !client.prefs.reducedFlashes
 		if("Foreground Fading") client.prefs.foregroundFade = !client.prefs.foregroundFade
 		if("Reflections") client.prefs.reflections = !client.prefs.reflections
+		if("Light Shafts") client.prefs.lightShafts = !client.prefs.lightShafts
+		if("Far Field Blur") client.prefs.farBlur = !client.prefs.farBlur
+		if("Vignette") client.prefs.vignette = !client.prefs.vignette
 		if("Experimental Camera") client.prefs.experimentalCamera = !client.prefs.experimentalCamera
 	client.prefs.savePrefs(ckey)
 	client.ApplyGraphicsPreferences()
-	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | camera [client.prefs.experimentalCamera ? "EXPERIMENTAL ON" : "OFF"]."
+	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | shafts [client.prefs.lightShafts ? "ON" : "OFF"] | far blur [client.prefs.farBlur ? "ON" : "OFF"] | vignette [client.prefs.vignette ? "ON" : "OFF"] | camera [client.prefs.experimentalCamera ? "EXPERIMENTAL ON" : "OFF"]."
 
 /mob/verb/Graphics_Diagnostics()
 	set category = "Other"
@@ -492,6 +496,17 @@ client/proc/InitializeGraphics()
 	src << "Environment: [P ? P.display_name : "Neutral"] | haze particles: [client.gfx_haze_emitter && client.gfx_haze_emitter.particles ? client.gfx_haze_emitter.particles.count : 0] | material highlights: [highlights]"
 	src << "Cached light FOV builds: [_light_fov_builds] | average visible cells: [_light_fov_builds ? round(_light_fov_cells / _light_fov_builds, 0.1) : 0] | actor reflections: SCRAPPED | reflection ticks: [_gfx_actor_reflection_ticks] | emissive reflections: [_gfx_emissive_reflection_objs.len] | water mask runs: [client.gfx_water_mask_images ? client.gfx_water_mask_images.len : 0]"
 	src << "AO view cache: [client.gfx_ao_scan_incomplete ? "building" : "ready"] | queued AO updates: [_gfx_ao_dirty.len] | water ripples: [_gfx_water_ripple_count] active / [_gfx_water_ripple_spawns] spawned"
+	src << "HD-2D: wall shadows [_hd2d_shadow_by_turf.len] live / [_hd2d_shadow_pool.len] pooled | shafts [client.hd2d_shaft ? "on a=[client.hd2d_shaft.alpha]" : "off"] (a=0 = overcast, no-sky area, or moon w/ MOON_SHAFTS off) | farblur [client.hd2d_fb_heavy ? "ON" : "off"] | embers [glob.EMBERS ? "on" : "off"] | glint clusters [_hd2d_glints_by_turf.len]"
+	//report the resolved kind, live particle count and emitter alpha
+	var/amb_kind = "none"
+	var/amb_alive = 0
+	if(P)
+		amb_kind = "[_Hd2dLocalDark(client) > 0.5 ? (P.ambient_night || "none") : (P.ambient_day || "none")] ([_Hd2dLocalDark(client) > 0.5 ? "night" : "day"] slot)"
+	if(client.hd2d_ambient && client.hd2d_ambient.particles)
+		var/particles/AP = client.hd2d_ambient.particles
+		amb_alive = AP.count
+	src << "Ambient: profile slot [amb_kind] | emitter [client.hd2d_ambient ? "attached a=[client.hd2d_ambient.alpha]" : "NOT attached"] | particle cap [amb_alive] | local darkness [round(_Hd2dLocalDark(client), 0.01)] | fireflies [_hd2d_fireflies_by_turf.len] tiles | area profile [A ? A.env_profile_id : "n/a"][client.gfx_env_preview_id ? " (PREVIEW [client.gfx_env_preview_id])" : ""]"
+	src << "AMBIENT: emitter [client.hd2d_ambient ? "attached a=[client.hd2d_ambient.alpha] particles=[client.hd2d_ambient.particles ? "yes" : "NULL"]" : "none"] | key [client.hd2d_ambient_key] | lightclass [client.hd2d_lightclass] | localdark [round(_Hd2dLocalDark(client), 0.01)] | fireflies [_hd2d_fireflies_by_turf.len] homes | area profile [A ? A.env_profile_id : "none"] (resolved [P ? P.id : "?"])"
 	src << "Watchdog: [_gfx_watchdog_sequence > 0 ? "ACTIVE" : "waiting for first sample"] | samples written: [_gfx_watchdog_sequence] | file: graphics_watchdog.log"
 	src << "Standing surface: water [GfxIsWaterSurface(T) ? "YES" : "no"] | reflection edge: [reflection_edge] | target: [reflection_target] | gap: [round(reflection_gap)]px | actor strength [round(GfxActorReflectionStrength(src, reflection_surface, reflection_gap), 0.01)] | actor eligible [reflection_surface ? "YES" : "no"]"
 
@@ -513,6 +528,26 @@ proc/_GfxAdaptiveLoop()
 				glob.GRAPHICS_BUDGET_SCALE = min(1, glob.GRAPHICS_BUDGET_SCALE + 0.025)
 		sleep(20)
 
+//globalTracker edits don't propagate - edit knobs, then run this to rebuild every client
+/mob/Admin2/verb/Graphics_Reapply()
+	set category = "Admin"
+	set name = "Graphics Reapply"
+	var/n = 0
+	for(var/client/C)
+		C.ApplyGraphicsPreferences()
+		n++
+	src << "Graphics pipeline reapplied for [n] client[n == 1 ? "" : "s"]."
+	Log("Admin", "[ExtractInfo(src)] reapplied the graphics pipeline.")
+
+/mob/Admin2/verb/World_Bloom_Toggle()
+	set category = "Admin"
+	set name = "World Bloom Toggle"
+	glob.WORLD_BLOOM = !glob.WORLD_BLOOM
+	for(var/client/C)
+		CpmApply(C)
+	src << "World bloom: [glob.WORLD_BLOOM ? "ON (night-gated)" : "OFF"]."
+	Log("Admin", "[ExtractInfo(src)] set world bloom to [glob.WORLD_BLOOM].")
+
 /mob/Admin2/verb/Graphics_Adaptive_Toggle()
 	set category = "Admin"
 	set name = "Graphics Adaptive Toggle"
@@ -521,7 +556,7 @@ proc/_GfxAdaptiveLoop()
 	src << "Adaptive graphics budget: [glob.GRAPHICS_ADAPTIVE ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set adaptive graphics to [glob.GRAPHICS_ADAPTIVE].")
 
-//crash-forensics heartbeat log; lives in this file so a .dme rewrite can't drop it
+//crash-forensics heartbeat log
 
 #define GFX_WATCHDOG_FILE "graphics_watchdog.log"
 var/_gfx_watchdog_sequence = 0

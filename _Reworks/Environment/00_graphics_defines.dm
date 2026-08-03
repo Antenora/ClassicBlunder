@@ -9,6 +9,14 @@
 #define WEATHER_PRECIP_PLANE 16 //native weather panels are flattened here before the outdoor mask
 #define WEATHER_MASK_PLANE 17 //white outdoor runs used as the precipitation alpha mask
 #define WATER_MASK_PLANE 18 //white water runs: the reflection plane is alpha-clipped to these
+#define VIGNETTE_PLANE 32 //corner darkening above the whole world composite
+
+//surface occlusion modes (surfaces.dm resolves them; lighting.dm consumes them)
+#define OCCLUDE_NONE 0
+#define OCCLUDE_PARTIAL 1 //fences, railings: a weak shadow, light still reads through
+#define OCCLUDE_DAPPLE 2 //foliage: broken, noisy shadow
+#define OCCLUDE_FULL 3
+#define SHADOW_INFINITE 0 //walls: project past the light's reach
 
 #define GFX_STRUCTURE_NONE 0
 #define GFX_STRUCTURE_EDGE 1
