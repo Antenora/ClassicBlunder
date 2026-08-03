@@ -50,7 +50,7 @@ macro "macro"
 	elem 
 		name = "South+REP"
 		command = ".south"
-	elem
+	elem 
 		name = "F1+REP"
 		command = ".options"
 
@@ -98,7 +98,7 @@ menu "menu"
 		name = "Display"
 		command = ""
 		saved-params = "is-checked"
-	elem
+	elem 
 		name = "Max View"
 		command = "Max-View"
 		category = "Display"
@@ -325,14 +325,9 @@ window "EmoteEditor"
 		size = 640x480
 		anchor1 = -1,-1
 		anchor2 = -1,-1
-		background-color = none
 		is-visible = false
 		saved-params = "pos;size;is-minimized;is-maximized"
 		on-close = "EmoteEditorClosed"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 2560x1400
 	elem "label13"
 		type = LABEL
 		pos = 344,0
@@ -373,9 +368,7 @@ window "EmoteEditor"
 		size = 640x432
 		anchor1 = 0,10
 		anchor2 = 100,100
-		background-color = none
 		saved-params = ""
-		inner-background-color = none
 
 window "ICChatTab"
 	elem "ICChatTab"
@@ -1864,13 +1857,13 @@ window "mainwindow"
 		background-color = #000000
 		is-default = true
 		saved-params = "pos"
+		on-size = "FitView"
 		title = "Roleplay Rebirth: The Fourth Fate"
 		statusbar = false
 		icon = 'CreationPics\\fouthfate.png'
 		image-mode = center
 		macro = "macro"
 		menu = "menu"
-		on-size = "FitView"
 	elem "mainvsplit"
 		type = CHILD
 		pos = 0,0
@@ -1926,15 +1919,15 @@ window "mapwindow"
 		size = 680x460
 		anchor1 = -1,-1
 		anchor2 = -1,-1
+		background-color = #000000
 		saved-params = "pos;size;is-minimized;is-maximized"
+		on-size = "FitView"
 		titlebar = false
 		statusbar = false
 		can-close = false
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		background-color = #000000
-		on-size = "FitView"
 	elem "map"
 		type = MAP
 		pos = 0,0
@@ -1942,8 +1935,8 @@ window "mapwindow"
 		anchor1 = 0,0
 		anchor2 = 100,100
 		text-color = #000000
-		is-default = true
 		background-color = #000000
+		is-default = true
 		right-click = true
 		saved-params = ""
 		on-show = ".winset\"mainwindow.mainvsplit.left=mapwindow\""
@@ -2763,7 +2756,7 @@ window "Grid2"
 window "Finalize_Screen"
 	elem "Finalize_Screen"
 		type = MAIN
-		pos = 1176,408
+		pos = 291,0
 		size = 1008x276
 		anchor1 = -1,-1
 		anchor2 = -1,-1
@@ -2776,6 +2769,11 @@ window "Finalize_Screen"
 		can-minimize = false
 		can-resize = false
 		image-mode = tile
+		outer-size = 1024x315
+		outer-pos = 291,0
+		inner-size = 1008x276
+		inner-pos = 8,31
+		screen-size = 1920x1032
 	elem "button51"
 		type = BUTTON
 		pos = 322,212
@@ -2914,7 +2912,7 @@ window "Finalize_Screen"
 		border = line
 		saved-params = "is-checked"
 		text = "?"
-		command = ".ToggleHelp \"MedRate\""
+		command = ".ToggleHelp \"GrowthRate\""
 		is-flat = true
 	elem "button37"
 		type = BUTTON
@@ -3122,7 +3120,7 @@ window "Finalize_Screen"
 		border = line
 		saved-params = ""
 		text = "1x RPP Mult"
-	elem "Race Imagination"
+	elem "RaceGrowthRate"
 		type = LABEL
 		pos = 360,124
 		size = 274x29
@@ -3134,7 +3132,7 @@ window "Finalize_Screen"
 		background-color = #000000
 		border = line
 		saved-params = ""
-		text = "1x Imagination"
+		text = "1x Growth Rate"
 		image-mode = stretch
 	elem "Race Intellect"
 		type = LABEL

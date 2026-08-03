@@ -1409,23 +1409,50 @@ mob
 			return enhance
 		BaseStr()
 			var/enhanced = getEnhanced("Strength")
-			return ((src.StrMod+src.StrAscension+(enhanced)))*StrChaos
+			var/Invested=0
+			var/Ascended=src.StrAscension+src.DetermineAscension("Strength")
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.StrengthInvest*glob.progress.STAT_PER_POINT
+			return ((src.StrMod+Ascended+(enhanced)+Invested))*StrChaos
 		BaseFor()
 			var/enhanced = getEnhanced("Force")
-			return ((src.ForMod+src.ForAscension+(enhanced)))*ForChaos
+			var/Invested=0
+			var/Ascended=src.ForAscension+src.DetermineAscension("Force")
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.ForceInvest*glob.progress.STAT_PER_POINT
+			return ((src.ForMod+Ascended+(enhanced)+Invested))*ForChaos
 		BaseEnd()
 			var/enhanced = getEnhanced("Endurance")
-			return ((src.EndMod+src.EndAscension+(enhanced)))*EndChaos
+			var/Ascended=src.EndAscension+src.DetermineAscension("Endurance")
+			var/Invested=0
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.EnduranceInvest*glob.progress.STAT_PER_POINT
+			return ((src.EndMod+Ascended+(enhanced)+Invested))*EndChaos
 		BaseSpd()
 			var/enhanced = getEnhanced("Speed")
-			return ((src.SpdMod+src.SpdAscension+(enhanced)))*SpdChaos
+			var/Ascended=src.SpdAscension+src.DetermineAscension("Speed")
+			var/Invested=0
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.SpeedInvest*glob.progress.STAT_PER_POINT
+			return ((src.SpdMod+Ascended+(enhanced)+Invested))*SpdChaos
 		BaseOff()
 			var/enhanced = getEnhanced("Aggression")
-			return ((src.OffMod+src.OffAscension+(enhanced)))*OffChaos
+			var/Ascended=src.OffAscension+src.DetermineAscension("Offense")
+			var/Invested=0
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.OffenseInvest*glob.progress.STAT_PER_POINT
+			return ((src.OffMod+Ascended+(enhanced)+Invested))*OffChaos
 		BaseDef()
 			var/enhanced = getEnhanced("Reflexes")
-			return ((src.DefMod+src.DefAscension+(enhanced)))*DefChaos
-
+			var/Ascended=src.DefAscension+src.DetermineAscension("Defense")
+			var/Invested=0
+			if(glob.progress.NEW_STAT_SCALING)
+				Invested=src.DefenseInvest*glob.progress.STAT_PER_POINT
+			return ((src.DefMod+Ascended+(enhanced)+Invested))*DefChaos
+		DetermineAscension(var/Stat)
+			var/Invest=src.vars["[Stat]Invest"]
+			var/AscStat=Invest*src.AscensionsAcquired*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
+			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
 		HandleEldritchTax()
@@ -1723,7 +1750,9 @@ mob
 					if("Survival")
 						EldritchMod=0.25*/
 			Str+=EldritchMod
-			var/EffectiveAsc=src.StrAscension
+			var/EffectiveAsc=src.StrAscension+src.DetermineAscension("Strength")
+			var/Invested=src.StrengthInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -1925,7 +1954,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			For+=EldritchMod
-			var/EffectiveAsc=src.ForAscension
+			var/EffectiveAsc=src.ForAscension+src.DetermineAscension("Force")
+			var/Invested=src.ForceInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2122,7 +2153,9 @@ mob
 					if("Survival")
 						EldritchMod=1*/
 			End+=EldritchMod
-			var/EffectiveAsc=src.EndAscension
+			var/EffectiveAsc=src.EndAscension+src.DetermineAscension("Endurance")
+			var/Invested=src.EnduranceInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2295,7 +2328,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			Spd+=EldritchMod
-			var/EffectiveAsc=src.SpdAscension
+			var/EffectiveAsc=src.SpdAscension+src.DetermineAscension("Speed")
+			var/Invested=src.SpeedInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2445,7 +2480,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			Off+=EldritchMod
-			var/EffectiveAsc=src.OffAscension
+			var/EffectiveAsc=src.OffAscension+src.DetermineAscension("Offense")
+			var/Invested=src.OffenseInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2568,7 +2605,9 @@ mob
 					if("Survival")
 						EldritchMod=0.5*/
 			Def+=EldritchMod
-			var/EffectiveAsc=src.DefAscension
+			var/EffectiveAsc=src.DefAscension+src.DetermineAscension("Defense")
+			var/Invested=src.DefenseInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -3645,7 +3684,7 @@ mob
 
 					var/obj/Skills/s=new path
 					if(s.SignatureTechnique==tier)
-						del s   
+						del s
 						return 1
 					else
 						del s

@@ -15,6 +15,7 @@ race
 		speed = 1
 		regeneration = 1.5
 		imagination = 0.5
+		growth=0.75
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
 		passives = list("Brutalize" = 0.25)
 

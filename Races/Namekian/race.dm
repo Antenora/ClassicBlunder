@@ -17,6 +17,7 @@ race
 		imagination = 2
 		intellect = 1.5
 		learning = 1.25
+		growth = 1.25
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Regeneration, /obj/Skills/Queue/Infestation)
 		/* /obj/Skills/AutoHit/AntennaBeam */
 		classes = list("Warrior", "Dragon", "Demon")
