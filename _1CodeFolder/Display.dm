@@ -141,21 +141,45 @@ client/proc/FitViewNow()
 	var/z = EffectiveZoom(pw)
 	if(z != view_fit_last_zoom) // pane crossed the width the HUD needs at 2x
 		ApplyMapZoom(z)
-	var/ref_tile = world.icon_size * DISPLAY_ZOOM_ON
+	var/tile = world.icon_size * z
 	var/cap = mob.MaxViewCap()
 	var/pref = mob.UserMaxView()
-	var/maxtiles = pref ? min(pref, cap) : cap
-	var/ref_tw = min(max(round(pw / ref_tile), DISPLAY_MIN_VIEW), maxtiles)
-	var/ref_th = min(max(round(ph / ref_tile), DISPLAY_MIN_VIEW), maxtiles)
-	var/zmul = DISPLAY_ZOOM_ON / z
-	var/tw = round(ref_tw * zmul)
-	var/th = round(ref_th * zmul)
+	var/zmul = DISPLAY_ZOOM_ON / z          // caps stay in 2x reference tiles
+	var/maxtiles = (pref ? min(pref, cap) : cap) * zmul
+	var/tw = min(max(round(pw / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
+	var/th = min(max(round(ph / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
 	view = "[tw]x[th]"
 	GfxResizeScreenOverlays(src, pw, ph)
 	PositionSkillHUD()
 	Hd2dApplyClient(src) // shaft transform + farblur masks re-fit to the new view
 	PositionCharacterCard() // re-anchor card to new view height, no-op if no card
 	if(party_invite_from) ShowPartyInvite(party_invite_from) // re-center an open invite prompt on resize
+
+mob/Admin1/verb/Display_Report()
+	set category = "Debug"
+	set name = "Display Report"
+	var/client/C = client
+	if(!C) return
+	var/list/c = splittext(winget(C, "mapwindow.map", "size"), "x")
+	var/list/p = splittext(winget(C, "mapwindow", "size"), "x")
+	var/list/vs = splittext(winget(C, "mapwindow.map", "view-size"), "x")
+	var/list/v = splittext("[C.view]", "x")
+	var/cw = c.len >= 2 ? text2num(c[1]) : 0
+	var/ch = c.len >= 2 ? text2num(c[2]) : 0
+	var/pw = p.len >= 2 ? text2num(p[1]) : 0
+	var/ph = p.len >= 2 ? text2num(p[2]) : 0
+	var/vw = vs.len >= 2 ? text2num(vs[1]) : 0
+	var/vh = vs.len >= 2 ? text2num(vs[2]) : 0
+	var/z = C.view_fit_last_zoom || C.CurrentZoom()
+	C << "--- display report ---"
+	C << "mainwindow: size [winget(C, "mainwindow", "size")] pos [winget(C, "mainwindow", "pos")]"
+	C << "mapwindow pane: size [pw]x[ph] pos [winget(C, "mapwindow", "pos")]"
+	C << "map control: size [cw]x[ch] pos [winget(C, "mapwindow.map", "pos")]"
+	C << "map view-size: [vw]x[vh] (rendered area, no letterbox)"
+	C << "splitter: [winget(C, "mainwindow.mainvsplit", "splitter")]"
+	C << "view [C.view] | zoom pref [C.CurrentZoom()] applied [z] | expected [v.len >= 2 ? text2num(v[1]) * world.icon_size * z : 0]x[v.len >= 2 ? text2num(v[2]) * world.icon_size * z : 0]px"
+	C << "padding inside map control: [cw - vw] wide, [ch - vh] tall"
+	C << "control vs pane gap: [pw - cw] wide, [ph - ch] tall (0 = control fills pane)"
 
 mob/verb
 	Max_View()
