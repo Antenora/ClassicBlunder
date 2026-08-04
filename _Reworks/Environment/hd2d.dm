@@ -57,6 +57,17 @@ var/icon/_hd2d_vignette_icon
 var/icon/_hd2d_leaf_icon
 var/icon/_hd2d_bubble_icon
 var/list/_hd2d_glint_icons = list()
+var/list/_hd2d_shaft_fit = list()
+
+proc/Hd2dShaftIcon(spx)
+	if(spx >= 512) return _hd2d_shaft_icon
+	var/key = "[spx]"
+	var/icon/I = _hd2d_shaft_fit[key]
+	if(!I)
+		I = icon(_hd2d_shaft_icon)
+		I.Scale(spx, spx)
+		_hd2d_shaft_fit[key] = I
+	return I
 
 proc/_Hd2dBuildIcons()
 	if(_hd2d_wallshadow_icon) return
@@ -449,8 +460,8 @@ proc/Hd2dApplyClient(client/C)
 	if(Hd2dShaftEnabled(C))
 		if(!C.hd2d_shaft)
 			C.hd2d_shaft = new
-			C.hd2d_shaft.icon = _hd2d_shaft_icon
 			C.screen += C.hd2d_shaft
+		C.hd2d_shaft.icon = Hd2dShaftIcon(clamp(min(vtw, vth) * 32, 64, 512))
 		//no rays filter here; the blur smooths 8-bit contour banding on faint moon shafts
 		C.hd2d_shaft.filters = filter(type = "blur", size = 2)
 		C.hd2d_env_key = null //force a transform rebuild at the current sun
@@ -547,11 +558,13 @@ proc/Hd2dClientTick(client/C, snap = 0)
 		if(C.hd2d_env_key != skey)
 			C.hd2d_env_key = skey
 			//scale to cover any lean, then center on the viewport; one animate - a second call cancels the first
+			var/spx = clamp(min(svw, svh) * 32, 64, 512)
+			C.hd2d_shaft.icon = Hd2dShaftIcon(spx)
 			var/covpx = max(svw, svh) * 32
 			var/matrix/SM = matrix()
-			SM.Scale(covpx * 1.5 / 512)
+			SM.Scale(covpx * 1.5 / spx)
 			SM.Turn(-arctan(sp[1]) * 0.5) //shafts lean with the sun; flip the sign if they fight the shadows
-			SM.Translate(svw * 16 - 256, svh * 16 - 256)
+			SM.Translate(svw * 16 - spx / 2, svh * 16 - spx / 2)
 			if(first || snap)
 				//snap into place - a 10s glide from identity reads as the sheet crawling on-screen
 				C.hd2d_shaft.transform = SM

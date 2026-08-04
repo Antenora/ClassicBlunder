@@ -80,6 +80,8 @@ client/proc/SetupCutsceneDisplay()
 	view_fit_last_zoom = 0
 	winset(src, "mapwindow.map", "zoom=0;zoom-mode=distort;letterbox=true")
 	view = "21x21"
+	PositionSkillHUD()
+	PositionCharacterCard()
 	if(!cutscene_hud_hider)
 		cutscene_hud_hider = new /atom/movable/cutscene_hud_hider()
 		screen += cutscene_hud_hider
@@ -155,6 +157,17 @@ client/proc/FitViewNow()
 	PositionCharacterCard() // re-anchor card to new view height, no-op if no card
 	if(party_invite_from) ShowPartyInvite(party_invite_from) // re-center an open invite prompt on resize
 
+var/list/_disp_icon_dims = list()
+proc/_DispIconDims(f)
+	if(!f) return list(32, 32)
+	var/key = "\ref[f]"
+	var/list/d = _disp_icon_dims[key]
+	if(!d)
+		var/icon/I = new(f)
+		d = list(I.Width() || 32, I.Height() || 32)
+		_disp_icon_dims[key] = d
+	return d
+
 mob/Admin1/verb/Display_Report()
 	set category = "Debug"
 	set name = "Display Report"
@@ -180,6 +193,31 @@ mob/Admin1/verb/Display_Report()
 	C << "view [C.view] | zoom pref [C.CurrentZoom()] applied [z] | expected [v.len >= 2 ? text2num(v[1]) * world.icon_size * z : 0]x[v.len >= 2 ? text2num(v[2]) * world.icon_size * z : 0]px"
 	C << "padding inside map control: [cw - vw] wide, [ch - vh] tall"
 	C << "control vs pane gap: [pw - cw] wide, [ph - ch] tall (0 = control fills pane)"
+	var/vtw = v.len >= 2 ? text2num(v[1]) : 0
+	var/vth = v.len >= 2 ? text2num(v[2]) : 0
+	if(vtw && vth)
+		var/n = 0
+		for(var/atom/movable/O in C.screen)
+			var/sl = O.screen_loc
+			if(!sl) continue
+			if(findtext(sl, "CENTER") || findtext(sl, "NORTH") || findtext(sl, "SOUTH") || findtext(sl, "EAST") || findtext(sl, "WEST") || findtext(sl, "TOP") || findtext(sl, "BOTTOM") || findtext(sl, "LEFT") || findtext(sl, "RIGHT")) continue
+			var/list/bits = splittext(sl, " to ")
+			var/list/xy = splittext(bits[bits.len], ",")
+			if(xy.len < 2) continue
+			var/list/xp = splittext(xy[1], ":")
+			var/list/yp = splittext(xy[2], ":")
+			var/tx = text2num(xp[1])
+			var/ty = text2num(yp[1])
+			if(isnull(tx) || isnull(ty)) continue
+			var/list/idim = _DispIconDims(O.icon)
+			var/px = xp.len >= 2 ? max(0, text2num(xp[2]) || 0) : 0
+			var/py = yp.len >= 2 ? max(0, text2num(yp[2]) || 0) : 0
+			var/fx = tx + max(0, -round(-(idim[1] + px - 32) / 32))
+			var/fy = ty + max(0, -round(-(idim[2] + py - 32) / 32))
+			if(tx < 1 || ty < 1 || fx > vtw || fy > vth)
+				n++
+				if(n <= 10) C << "OUTSIDE VIEW: [O.type] loc \"[sl]\" icon [idim[1]]x[idim[2]]px"
+		C << "screen objects outside the view: [n] (each one stretches the rendered area)"
 
 mob/verb
 	Max_View()
