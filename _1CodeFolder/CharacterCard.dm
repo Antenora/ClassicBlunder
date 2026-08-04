@@ -645,6 +645,7 @@ client/proc/UpdateTimedBuffs()
 		spare.alpha = 0
 		spare.buff = null
 		spare.num.maptext = ""
+		spare.screen_loc = null 
 	RepositionPartyCards()   // ally cards ride below the buff cluster, whose height just changed
 
 client/proc/GetActiveDebuffs()
@@ -712,6 +713,7 @@ client/proc/UpdateDebuffs()
 		var/atom/movable/shud/debufficon/spare = debuff_icons[j]
 		spare.alpha = 0
 		spare.num.maptext = ""
+		spare.screen_loc = null 
 
 #define MDEBUFF_LINE_H 16    // px per wrapped description line
 #define MDEBUFF_PANEL_GAP 4  // px gap between the card's bottom and the panel's top

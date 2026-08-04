@@ -258,6 +258,7 @@ client/proc/UpdateLeaderBadge()
 	if(!party_leader_badge) return
 	if(!(mob && mob.party && mob.party.leader == mob && card))
 		party_leader_badge.alpha = 0
+		party_leader_badge.screen_loc = null 
 		party_badge_shown = 0                     // reset so the badge fades back in when you next lead
 		return
 	var/list/v = splittext("[view]", "x")
