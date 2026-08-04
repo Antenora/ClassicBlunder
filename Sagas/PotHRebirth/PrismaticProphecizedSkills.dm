@@ -492,6 +492,8 @@ obj
 		if(p.held_skill != src && chain_active && chain_user == p)
 			EndChain(apply_cooldown = FALSE)
 
+#define HYPER_FILL_WIDTH 186
+#define HYPER_MASK_RSC 'HyperdeathMeterMask.dmi'
 
 //Meter
 obj/HyperdeathMeterBarBG
@@ -509,6 +511,19 @@ obj/HyperdeathMeterBarFill
 	layer = FLOAT_LAYER + 50
 	plane = FLOAT_PLANE
 	mouse_opacity = 0
+
+	var/tmp/last_fill_width = -1
+
+	New()
+		..()
+
+		filters = list(
+			filter(
+				type = "alpha",
+				icon = HYPER_MASK_RSC,
+				x = -HYPER_FILL_WIDTH
+			)
+		)
 
 mob/var/tmp/obj/HyperdeathMeterBarBG/HyperBar
 mob/var/tmp/obj/HyperdeathMeterBarFill/HyperBarFill
@@ -529,30 +544,55 @@ mob/proc/HyperMeterUpdate()
 	if(!HyperBar || !HyperBarFill)
 		HyperMeterCreate()
 
-	var/max_width = 186
-	var/bar_height = 9
+	if(HyperdeathMeterCurrent <= 0)
+		HyperBar.alpha = 0
+		HyperBarFill.alpha = 0
+
+		HyperBar.invisibility = 0
+		HyperBarFill.invisibility = 0
+
+		if(HyperBarFill.filters && HyperBarFill.filters.len)
+			var/F = HyperBarFill.filters[1]
+			animate(F)
+			F:x = -HYPER_FILL_WIDTH
+
+		HyperBarFill.last_fill_width = 0
+		return
+
+	HyperBar.alpha = 255
+	HyperBarFill.alpha = 255
+
+	HyperBar.invisibility = 0
+	HyperBarFill.invisibility = 0
+
+	if(!HyperBarFill.filters || !HyperBarFill.filters.len)
+		HyperBarFill.filters = list(
+			filter(
+				type = "alpha",
+				icon = HYPER_MASK_RSC,
+				x = -HYPER_FILL_WIDTH
+			)
+		)
 
 	var/percent = HyperdeathMeterCurrent / 100
 	percent = min(max(percent, 0), 1)
 
-	var/fill_width = round(max_width * percent)
+	var/fill_width = round(HYPER_FILL_WIDTH * percent)
+	fill_width = min(max(fill_width, 0), HYPER_FILL_WIDTH)
 
-	if(fill_width<=0)
-		HyperBarFill.invisibility=101
-		HyperBar.invisibility=101
-		return
+	if(CheckSpecial("Hyperdeath Mode") || HyperdeathMeterCurrent >= HyperdeathThreshold)
+		HyperBarFill.icon_state = "FillActive"
+	else
+		HyperBarFill.icon_state = "FillInactive"
 
-	HyperBar.invisibility = 0
-	HyperBarFill.invisibility = 0
-	var/iconToUse = "FillInactive"
-	if(CheckSpecial("Hyperdeath Mode")||HyperdeathMeterCurrent >= HyperdeathThreshold)
-		iconToUse = "FillActive"
+	if(fill_width != HyperBarFill.last_fill_width)
+		var/F = HyperBarFill.filters[1]
 
-	var/icon/I = icon('HyperdeathMeter.dmi', iconToUse)
-	I.Crop(1, 1, fill_width, bar_height)
+		animate(F)
+		F:x = fill_width - HYPER_FILL_WIDTH
 
-	HyperBarFill.icon = I
-	HyperBarFill.icon_state = ""
+		HyperBarFill.last_fill_width = fill_width
+
 
 /*
 obj/AttackMarker
