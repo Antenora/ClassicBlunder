@@ -330,6 +330,85 @@ obj
 					usr.UseProjectile(src)
 
 
+obj/Skills/Buffs/SlotlessBuffs/Miracle_of_DreamsApply
+	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
+	KenWave = 4
+	KenWaveIcon='SparkleRainbow.dmi'
+	HitSpark='Spiral_Hitspark.dmi'
+	TopOverlayLock = 'RainbowAura.dmi'
+	TopOverlayX = -32
+	TimerLimit=20
+	ActiveMessage="screams: <b><font color=#FF0000>N</font color><font color=#FF2900>O</font color><font color=#FF5200>T</font color><font color=#FF7C00>H</font color><font color=#FFA500>I</font color><font color=#FFCE00>N</font color><font color=#FFF800>G</font color> <font color=#B3FF00>I</font color><font color=#89FF00>S</font color> <font color=#37FF00>S</font color><font color=#0DFF00>T</font color><font color=#00FF1B>R</font color><font color=#00FF44>O</font color><font color=#00FF6E>N</font color><font color=#00FF97>G</font color><font color=#00FFC0>E</font color><font color=#00FFEA>R</font color> <font color=#00C0FF>T</font color><font color=#0097FF>H</font color><font color=#006EFF>A</font color><font color=#0044FF>N</font color> <font color=#0D00FF>O</font color><font color=#3700FF>U</font color><font color=#6000FF>R</font color> <font color=#B300FF>D</font color><font color=#DC00FF>R</font color><font color=#FF00F8>E</font color><font color=#FF00CE>A</font color><font color=#FF00A5>M</font color><font color=#FF007C>S</font color><font color=#FF0052>!</font color><font color=#FF0029>!</font color></b>"
+	OffMessage="once again dreams as normal."
+	TextColor="green"
+	MagicNeeded=0
+
+obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
+	EndYourself=1
+	Cooldown=600
+	KenWave=1
+	KenWaveIcon='SparkleRainbow.dmi'
+	KenWaveSize=4
+	KenWaveX=50
+	KenWaveY=50
+	Range=20
+	ActiveMessage="screams: <b><font color=#FF0000>N</font color><font color=#FF2900>O</font color><font color=#FF5200>T</font color><font color=#FF7C00>H</font color><font color=#FFA500>I</font color><font color=#FFCE00>N</font color><font color=#FFF800>G</font color> <font color=#B3FF00>I</font color><font color=#89FF00>S</font color> <font color=#37FF00>S</font color><font color=#0DFF00>T</font color><font color=#00FF1B>R</font color><font color=#00FF44>O</font color><font color=#00FF6E>N</font color><font color=#00FF97>G</font color><font color=#00FFC0>E</font color><font color=#00FFEA>R</font color> <font color=#00C0FF>T</font color><font color=#0097FF>H</font color><font color=#006EFF>A</font color><font color=#0044FF>N</font color> <font color=#0D00FF>O</font color><font color=#3700FF>U</font color><font color=#6000FF>R</font color> <font color=#B300FF>D</font color><font color=#DC00FF>R</font color><font color=#FF00F8>E</font color><font color=#FF00CE>A</font color><font color=#FF00A5>M</font color><font color=#FF007C>S</font color><font color=#FF0052>!</font color><font color=#FF0029>!</font color></b>"
+	verb/Miracle_of_Dreams()
+		set category="Skills"
+		set name="Miracle of Dreams"
+		var/mob/User = usr
+		if(!User.party || !User.party.members || User.party.members.len == 0)
+			User << "You're fighting all by yourself..."
+			return
+		if(src.cooldown_remaining > 0)
+			User << "[src] is on cooldown."
+			return
+		if(!altered)
+			adjust(User)
+		for(var/mob/m in User.party.members)
+			if(!m || !ismob(m)) continue
+			if(m.race.type in INORGANIC_RACES)
+				User << "[m] is synthetic and cannot dream."
+				m << "[User] tried to uplift your dreams, but you do not have those."
+				continue
+			if(m.race.type in CURSED_RACES)
+				User << "[m]'s supernatural influence prevents them from truly dreaming.."
+				m <<"[User] tried to inspire you to dream, but your supernatural gifts interferred."
+				continue
+			if(m.race.type in STAGNANT_RACES)
+				User <<"[m] is a supernatural entity. They are incapable of dreaming."
+				m <<"[User] tried to inspire you to dream, but your nature prevents you from lowering yourself to their level."
+				continue
+			ActiveMessage="lets their dream burst forth!!"
+			var/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_DreamsApply/applyBuff = new
+			var/sl = User.SagaLevel
+			var/OmegaPower=1
+			switch(sl)
+				if(1 to 2)//this will never happen unless the skill is given unnaturally
+					OmegaPower=1//which, i guess, given the subject matter, is more likely than you'd think
+				if(3)
+					OmegaPower=1
+				if(4)
+					OmegaPower=1
+				if(5)
+					OmegaPower=2
+			switch(m.RebirthHeroType)
+				if("Cyan")
+					m << "Even if broken, you are more than a cage. <b>X-Slash is now Omega X-Slash!</b>"
+				if("Purple")
+					m << "Write what you know, right? <b>Rude Buster is now Omega Buster!</b>"
+			applyBuff.PowerMult=1+(0.05*sl*sl)
+			applyBuff.StrMult=1.25
+			applyBuff.ForMult=1.25
+			applyBuff.EndMult=1.25
+			applyBuff.TimerLimit = 20 * (m.AscensionsAcquired+2)
+			applyBuff.passives = list("OmegaPower" = OmegaPower)
+			applyBuff.Trigger(m, 1)
+		User.OMessage(1, null, "[User] manifests the dreams of [User.party.members.len == 1 ? "themselves" : "their party"]!")
+		src.Cooldown(1, null, User)
+
+
+
 /obj/Skills/AutoHit/Jarona
 	name = "Jarona"
 	Area = "Target"

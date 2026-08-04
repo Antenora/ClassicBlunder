@@ -976,6 +976,7 @@ mob
 										src<< "You are now the Cyan Hero of Soul, a cage for a human SOUL. Your ACT meter slows, but as it builds, a certain power wells up within you..."
 										src.passive_handler.Increase("Determination")
 										src.AddSkill(new/obj/Skills/Utility/SoulShift)
+										src.AddSkill(new/obj/Skills/AutoHit/X_Slash)
 										src<<"You unlock the Red SOUL color, boosting your crit rate as you gain ACT!"
 										src<<"You unlock the Yellow SOUL color, granting your melee attacks projectiles!!"
 										src.AddSkill(new/obj/Skills/Buffs/Rebirth/Spookysword)
@@ -992,6 +993,7 @@ mob
 										src.RebirthHeroType="Prismatic"
 										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One. (WIP)"
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
+										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)

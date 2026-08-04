@@ -481,6 +481,41 @@ obj/Skills/AutoHit
 			set hidden=1
 			src.RebirthLastUse=world.realtime
 			usr.Activate(src)
+	X_Slash
+		Area="Target"
+		Cooldown=35
+		StrOffense=1
+		Rush=10
+		SpecialAttack=1
+		CanBeDodged=0
+		CanBeBlocked=1
+		DamageMult=10
+		ManaCost=10
+		Knockback=0
+		ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
+		HitSparkIcon='Slash_Multi.dmi'
+		HitSparkX=-32
+		HitSparkY=-32
+		HitSparkSize=1
+		ControlledRush=1
+		Instinct=1
+		adjust(mob/p)
+			if(p.passive_handler.Get("OmegaPower"))
+				Cooldown=20
+				ManaCost=20
+				DamageMult=25
+				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7500>m</font color><font color=#FFEB00>e</font color><font color=#9CFF00>g</font color><font color=#27FF00>a</font color> <font color=#00FFC4>X</font color><font color=#00C4FF>-</font color><font color=#004EFF>S</font color><font color=#2700FF>l</font color><font color=#9C00FF>a</font color><font color=#FF00EB>s</font color><font color=#FF0075>h</font color></b>!!!!"
+			else
+				Cooldown=35
+				ManaCost=10
+				DamageMult=10
+				ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
+		verb/X_Slash()
+			set category="Skills"
+			set name="X-Slash"
+			if(!altered)
+				adjust(usr)
+			usr.Activate(src)
 mob/proc/TriggerAwakeningSkill(ActNumber)
 	if(ActNumber>=1)
 		src<< "<b>Fate turns its eye to you, watching with interest.</b>"
@@ -810,10 +845,20 @@ obj/Skills/Projectile
 		Dodgeable=-1
 		Deflectable=-1
 		IconLock='RudeBuster2.dmi'
+		ActiveMessage="uses Rude Buster!!"
 		LockX=-16
 		IconSize=1
 		Radius=3
 		Homing=1
+		adjust(mob/p)
+			if(p.passive_handler.Get("OmegaPower"))
+				ManaCost=40
+				DamageMult=15
+				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7F00>m</font color><font color=#FFFF00>e</font color><font color=#7FFF00>g</font color><font color=#00FF00>a</font color> <font color=#00FEFF>B</font color><font color=#007FFF>u</font color><font color=#0000FF>s</font color><font color=#7F00FF>t</font color><font color=#FF00FE>e</font color><font color=#FF007F>r</font color></b>!!!!"
+			else
+				ManaCost=50
+				DamageMult=4
+				ActiveMessage="uses Rude Buster!!"
 		verb/Rude_Buster()
 			set category="Skills"
 			set name="Rude Buster"
