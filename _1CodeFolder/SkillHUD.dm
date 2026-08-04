@@ -6,6 +6,7 @@
 #define SHUD_ORB_Y 12
 #define SHUD_ORB_LEFT_X -267
 #define SHUD_ORB_RIGHT_X 198
+#define SHUD_ORB_D 69     // orb art width; the row+orbs span SHUD_ORB_LEFT_X to SHUD_ORB_RIGHT_X+this
 #define SHUD_BALL_D 44
 #define SHUD_FILL_EMPTY_Y -54
 #define SHUD_DRAIN_HIDDEN_Y 59
@@ -274,6 +275,28 @@ client
 		shud_inj_last = 0
 		shud_ftg_last = 0
 
+client/proc/PositionSkillHUD()
+	if(!shud_slots || !shud_slots.len) return
+	var/list/v = splittext("[view]", "x")
+	if(v.len < 2) return
+	var/tw = text2num(v[1])
+	if(!tw) return
+	var/vw = tw * world.icon_size
+	var/mid = round(vw / 2)
+	for(var/i = 1 to shud_slots.len)
+		var/atom/movable/shud/slot/s = shud_slots[i]
+		if(!s) continue
+		s.screen_loc = "1:[mid + SHUD_ROW_LEFT + (i-1)*SHUD_PITCH],SOUTH:[SHUD_ROW_Y]"
+		if(s.cdtext) s.cdtext.screen_loc = s.screen_loc
+	var/lx = max(mid + SHUD_ORB_LEFT_X, 0)
+	var/rx = min(mid + SHUD_ORB_RIGHT_X, vw - SHUD_ORB_D)
+	var/ll = "1:[lx],SOUTH:[SHUD_ORB_Y]"
+	var/rl = "1:[rx],SOUTH:[SHUD_ORB_Y]"
+	if(orb_energy) orb_energy.screen_loc = ll
+	if(orbtext_energy) orbtext_energy.screen_loc = ll
+	if(orb_health) orb_health.screen_loc = rl
+	if(orbtext_health) orbtext_health.screen_loc = rl
+
 client/proc/InitSkillHUD()
 	ClearSkillHUD()
 	if(!mob) return
@@ -286,23 +309,18 @@ client/proc/InitSkillHUD()
 	for(var/i = 1 to SHUD_SLOTS)
 		var/atom/movable/shud/slot/s = new
 		s.slot_index = i
-		s.screen_loc = "CENTER:[SHUD_ROW_LEFT + (i-1)*SHUD_PITCH],SOUTH:[SHUD_ROW_Y]"
-		s.cdtext.screen_loc = s.screen_loc
 		shud_slots += s
 		shud_parts += s
 		shud_parts += s.cdtext
 	orb_energy = new(null, 'HUD/orb_energy_base.png', 'HUD/fill_energy.png', 'HUD/drain_energy.png', 'HUD/orb_energy_top.png')
-	orb_energy.screen_loc = "CENTER:[SHUD_ORB_LEFT_X],SOUTH:[SHUD_ORB_Y]"
 	shud_parts += orb_energy
 	orb_health = new(null, 'HUD/orb_health_base.png', 'HUD/fill_health.png', 'HUD/drain_health.png', 'HUD/orb_health_top.png')
-	orb_health.screen_loc = "CENTER:[SHUD_ORB_RIGHT_X],SOUTH:[SHUD_ORB_Y]"
 	shud_parts += orb_health
 	orbtext_energy = new
-	orbtext_energy.screen_loc = "CENTER:[SHUD_ORB_LEFT_X],SOUTH:[SHUD_ORB_Y]"
 	shud_parts += orbtext_energy
 	orbtext_health = new
-	orbtext_health.screen_loc = "CENTER:[SHUD_ORB_RIGHT_X],SOUTH:[SHUD_ORB_Y]"
 	shud_parts += orbtext_health
+	PositionSkillHUD()
 	InitMenuButton()
 	InitInventoryButton()
 	InitCharacterMenuButton()

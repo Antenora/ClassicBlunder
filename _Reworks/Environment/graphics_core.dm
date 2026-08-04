@@ -229,6 +229,7 @@ proc/GfxReducedFlashes(client/C)
 	return istype(P, /Options) && P.reducedFlashes
 
 proc/GfxBloomEnabled(client/C)
+	if(C && C.cutscene_active) return FALSE
 	return GfxQualityRank(C) >= GFX_QUALITY_MEDIUM
 
 proc/GfxDistortEnabled(client/C)

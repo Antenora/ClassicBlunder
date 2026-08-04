@@ -1189,7 +1189,7 @@ proc/_CamShakeClient(client/C, amp, duration, ix, iy, sustain = 0)
 		animate(C, pixel_x = 0, pixel_y = 0, time = 1, flags = ANIMATION_END_NOW)
 		return
 	//client.pixel_x lands before the map zoom, so 2x players feel double - scale it out
-	var/zm = max(1, C.CurrentZoom())
+	var/zm = max(1, C.view_fit_last_zoom || C.CurrentZoom())
 	amp /= zm
 	var/cap = glob.CAM_SHAKE_MAX / zm
 	var/step = max(0.5, glob.CAM_SHAKE_STEP)

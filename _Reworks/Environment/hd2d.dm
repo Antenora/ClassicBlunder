@@ -484,7 +484,7 @@ proc/Hd2dApplyClient(client/C)
 			filter(type = "alpha", icon = _Hd2dFarblurMask(vw, vh, glob.FARBLUR_MID)))
 		//bloom after the heavy blur: distant lights blossom into discs instead of smearing away
 		var/list/hfl = list(filter(type = "blur", size = glob.FARBLUR_HEAVY_SIZE))
-		if(glob.FARBLUR_BLOOM)
+		if(glob.FARBLUR_BLOOM && GfxBloomEnabled(C))
 			var/bt = clamp(glob.FARBLUR_BLOOM_THRESHOLD, 96, 245)
 			hfl += filter(type = "bloom", threshold = rgb(bt, bt, bt), size = glob.FARBLUR_BLOOM_SIZE)
 		hfl += filter(type = "alpha", icon = _Hd2dFarblurMask(vw, vh, glob.FARBLUR_TOP))
