@@ -59,7 +59,7 @@ obj
 			ForMult = 1.25
 			RecovMult = 1.10
 			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "HybridStrike" = 0.25, "SpiritFlow" = 2, "SpiritSword" = 1, "Pressure" = 2,\
-			"Instinct" = 2, "Flow" = 2, "RainbowAfterImages" = 1)
+			"Instinct" = 2, "Flow" = 2, "RainbowAfterImages" = 1, "Health Obfuscation" = 1)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
@@ -78,10 +78,10 @@ obj
 				EndMult = 1.10 + (0.01 * pLv)
 				RecovMult = 1.10 + (0.01 * pLv)
 				passives = list("MovementMastery" = 2,"TechniqueMastery" = 2, "HybridStrike" = 0.25 + min(1, (pLv / 5)), "SpiritFlow" = 1 + pLv, "SpiritSword" = max(1, round(pLv / 2, 1)), \
-				"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1)
+				"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1, "Health Obfuscation" = 1)
 				if(pLv > 4)
 					passives = list("MovementMastery" = 2,"TechniqueMastery" = 2, "HybridStrike" = 0.25 + min(1, (pLv / 5)), "SpiritFlow" = 1 + pLv, "SpiritSword" = max(1, round(pLv / 2, 1)), \
-					"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1, "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5))
+					"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1, "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1)
 			verb/Hyperdeath_Mode()
 				set category = "Skills"
 				adjust(usr)

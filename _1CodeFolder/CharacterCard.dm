@@ -115,7 +115,7 @@ client/proc/InitCharacterCard()
 	if(!mob) return
 	card = new
 	screen += card
-	cardtext = new 
+	cardtext = new
 	cardtext.layer = MCARD_LAYER + 0.5
 	cardtext.maptext_width = 162
 	cardtext.maptext_height = 40
@@ -176,7 +176,7 @@ client/proc/InitTargetCard()
 	tbar_hp_text.maptext_width = TBAR_OUTER_W
 	tbar_hp_text.maptext_height = 16
 	tbar_hp_text.maptext_x = 0
-	tbar_hp_text.maptext_y = -3 
+	tbar_hp_text.maptext_y = -3
 	tbar_hp_text.alpha = 0
 	screen += tbar_hp_text
 	tbar_en_track = new
@@ -214,7 +214,7 @@ client/proc/InitTargetCard()
 	tdebuff_icon.layer = MCARD_LAYER + 0.6
 	tdebuff_icon.alpha = 0
 	screen += tdebuff_icon
-	tdebuff_num = new 
+	tdebuff_num = new
 	tdebuff_num.layer = MCARD_LAYER + 0.61
 	tdebuff_num.alpha = 0
 	screen += tdebuff_num
@@ -296,25 +296,45 @@ client/proc/SetTargetCardAlpha(a)
 
 client/proc/UpdateTargetBars(hp, en, snap, gd = 0)
 	if(!tbar_hp_fill || !tbar_en_fill) return
+	var/iconToUse = 'HUD/tbar_fill_hp.png'
+	var/mob/T = mob.Target
+	var/fakeHP = T.passive_handler.Get("Health Obfuscation")
+	var/valid = (T && T != mob && (isplayer(T) || istype(T, /mob/Player)))
+	if(valid)
+		if(fakeHP) // Used for "Heatlh Obfuscation" passive to make your HP bar seemingly infinite
+			iconToUse = 'HUD/tbar_infinite.gif'
+		else
+			iconToUse = 'HUD/tbar_fill_hp.png'
+	tbar_hp_fill.icon = iconToUse
 	var/hpx = round(TBAR_FILL_W * hp / 100) - TBAR_FILL_W
 	var/enx = round(TBAR_FILL_W * en / 100) - TBAR_FILL_W
 	var/gdx = round(TBAR_FILL_W * gd / 100) - TBAR_FILL_W
 	if(snap)
-		tbar_hp_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=hpx)
+		if(fakeHP)
+			tbar_hp_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=0)
+		else
+			tbar_hp_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=hpx)
 		tbar_en_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=enx)
 		if(tbar_gd_fill) tbar_gd_fill.filters = filter(type="alpha", icon='HUD/tbar_mask.png', x=gdx)
 	else
 		var/tt = OrbAnimTime(tcard_hp_last, hp)
-		if(tt) animate(tbar_hp_fill.filters[1], x = hpx, time = tt, easing = SINE_EASING)
+		if(fakeHP)
+			if(tt) animate(tbar_hp_fill.filters[1], x = 0, time = tt, easing = SINE_EASING)
+		else
+			if(tt) animate(tbar_hp_fill.filters[1], x = hpx, time = tt, easing = SINE_EASING)
 		var/te = OrbAnimTime(tcard_en_last, en)
 		if(te) animate(tbar_en_fill.filters[1], x = enx, time = te, easing = SINE_EASING)
 		if(tbar_gd_fill)
 			var/tg = OrbAnimTime(tcard_gd_last, gd)
 			if(tg) animate(tbar_gd_fill.filters[1], x = gdx, time = tg, easing = SINE_EASING)
+	if(valid)
+		if(fakeHP)
+			tbar_hp_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">???%</span></center>"
+		else
+			tbar_hp_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">[hp]%</span></center>"
 	tcard_hp_last = hp
 	tcard_en_last = en
 	tcard_gd_last = gd
-	tbar_hp_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">[hp]%</span></center>"
 	tbar_en_text.maptext = "<center><span style=\"[TBAR_FONT]; color:#ffffff\">[en]%</span></center>"
 
 client/proc/UpdateTargetCard()
@@ -456,7 +476,7 @@ client/proc/InitIntentChips()
 		c.lbl.maptext_x = 0
 		c.lbl.maptext_width = INTENT_CHIP_W
 		c.lbl.maptext_height = INTENT_CHIP_H
-		c.lbl.maptext_y = 4               
+		c.lbl.maptext_y = 4
 		intent_chips += c
 		screen += c
 		screen += c.lbl
@@ -479,19 +499,19 @@ client/proc/PlaceIntentChips()
 	if(!th) return
 	var/row = max(th - (MCARD_TILES_TALL - 1), 1)
 	var/total = 4 * INTENT_CHIP_W + 3 * INTENT_CHIP_GAP
-	var/start = MCARD_MARGIN_X + round((MCARD_W - total) / 2)  
+	var/start = MCARD_MARGIN_X + round((MCARD_W - total) / 2)
 	var/ypix = -(MCARD_MARGIN_Y + INTENT_CHIP_BELOW + INTENT_CHIP_H)  // sit just below the card's bottom edge
 	var/i = 0
 	for(var/atom/movable/shud/intentchip/c in intent_chips)
 		var/sl = "1:[start + i * (INTENT_CHIP_W + INTENT_CHIP_GAP)],[row]:[ypix]"
 		c.screen_loc = sl
-		if(c.lbl) c.lbl.screen_loc = sl   
+		if(c.lbl) c.lbl.screen_loc = sl
 		i++
 
 client/proc/UpdateIntentChips()
 	if(!intent_chips || !mob) return
 	for(var/atom/movable/shud/intentchip/c in intent_chips)
-		var/col = "#8be9ff"   
+		var/col = "#8be9ff"
 		switch(c.action)
 			if("injure") col = (mob.WoundIntent >= 1) ? "#ff5050" : "#7f8c9a"
 			if("kill")   col = (mob.Lethal >= 1) ? "#ff5050" : "#7f8c9a"
@@ -645,7 +665,7 @@ client/proc/UpdateTimedBuffs()
 		spare.alpha = 0
 		spare.buff = null
 		spare.num.maptext = ""
-		spare.screen_loc = null 
+		spare.screen_loc = null
 	RepositionPartyCards()   // ally cards ride below the buff cluster, whose height just changed
 
 client/proc/GetActiveDebuffs()
@@ -713,7 +733,7 @@ client/proc/UpdateDebuffs()
 		var/atom/movable/shud/debufficon/spare = debuff_icons[j]
 		spare.alpha = 0
 		spare.num.maptext = ""
-		spare.screen_loc = null 
+		spare.screen_loc = null
 
 #define MDEBUFF_LINE_H 16    // px per wrapped description line
 #define MDEBUFF_PANEL_GAP 4  // px gap between the card's bottom and the panel's top
@@ -834,7 +854,7 @@ client/proc/ShowDebuffPanel(atom/movable/shud/debufficon/di)
 #define FIN_MINI_SOUTH 78     // minis: 12px below the bar top (bar spans 76..96)
 #define FIN_FILL_X 34         // fill sweep starts here inside the fill icon
 #define FIN_TRACKW 224
-#define FIN_SPAN 190          
+#define FIN_SPAN 190
 #define FIN_GLOW_COLOR "#b48cff"
 #define FIN_EDGE_COLOR "#5d4f96"
 #define FIN_MINI_X1 92        // left mini slot (stage 2), px from the bar's left edge
