@@ -352,7 +352,6 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	KenWaveX=50
 	KenWaveY=50
 	Range=20
-	ActiveMessage="screams: <b><font color=#FF0000>N</font color><font color=#FF2900>O</font color><font color=#FF5200>T</font color><font color=#FF7C00>H</font color><font color=#FFA500>I</font color><font color=#FFCE00>N</font color><font color=#FFF800>G</font color> <font color=#B3FF00>I</font color><font color=#89FF00>S</font color> <font color=#37FF00>S</font color><font color=#0DFF00>T</font color><font color=#00FF1B>R</font color><font color=#00FF44>O</font color><font color=#00FF6E>N</font color><font color=#00FF97>G</font color><font color=#00FFC0>E</font color><font color=#00FFEA>R</font color> <font color=#00C0FF>T</font color><font color=#0097FF>H</font color><font color=#006EFF>A</font color><font color=#0044FF>N</font color> <font color=#0D00FF>O</font color><font color=#3700FF>U</font color><font color=#6000FF>R</font color> <font color=#B300FF>D</font color><font color=#DC00FF>R</font color><font color=#FF00F8>E</font color><font color=#FF00CE>A</font color><font color=#FF00A5>M</font color><font color=#FF007C>S</font color><font color=#FF0052>!</font color><font color=#FF0029>!</font color></b>"
 	verb/Miracle_of_Dreams()
 		set category="Skills"
 		set name="Miracle of Dreams"
@@ -383,6 +382,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			var/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_DreamsApply/applyBuff = new
 			var/sl = User.SagaLevel
 			var/OmegaPower=1
+			var/extraP
 			switch(sl)
 				if(1 to 2)//this will never happen unless the skill is given unnaturally
 					OmegaPower=1//which, i guess, given the subject matter, is more likely than you'd think
@@ -395,6 +395,12 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			switch(m.RebirthHeroType)
 				if("Cyan")
 					m << "Even if broken, you are more than a cage. <b>X-Slash is now Omega X-Slash!</b>"
+					if(m.FinalHeroChoice=="White Pen of Hope")
+						m << "Faint courage blossoms into unwavering determination! <b>Your DF went up!</b>"
+						extraP = list("PureReduction" = 5)
+					if(m.FinalHeroChoice=="Roaring Knight")
+						m << "<i>Hear my voice. Look my way. I'm with you no matter what.</i> <b>Your AT went up!</b>"
+						extraP = list("PureDamage" = 5, "Forever After" = 1)
 				if("Purple")
 					m << "Write what you know, right? <b>Rude Buster is now Omega Buster!</b>"
 			applyBuff.PowerMult=1+(0.05*sl*sl)
@@ -402,7 +408,11 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			applyBuff.ForMult=1.25
 			applyBuff.EndMult=1.25
 			applyBuff.TimerLimit = 20 * (m.AscensionsAcquired+2)
-			applyBuff.passives = list("OmegaPower" = OmegaPower)
+			applyBuff.passives = list("OmegaPower" = OmegaPower) + extraP
+			if(m == User)
+				applyBuff.ActiveMessage="screams: <b><font color=#FF0000>N</font color><font color=#FF2900>O</font color><font color=#FF5200>T</font color><font color=#FF7C00>H</font color><font color=#FFA500>I</font color><font color=#FFCE00>N</font color><font color=#FFF800>G</font color> <font color=#B3FF00>I</font color><font color=#89FF00>S</font color> <font color=#37FF00>S</font color><font color=#0DFF00>T</font color><font color=#00FF1B>R</font color><font color=#00FF44>O</font color><font color=#00FF6E>N</font color><font color=#00FF97>G</font color><font color=#00FFC0>E</font color><font color=#00FFEA>R</font color> <font color=#00C0FF>T</font color><font color=#0097FF>H</font color><font color=#006EFF>A</font color><font color=#0044FF>N</font color> <font color=#0D00FF>O</font color><font color=#3700FF>U</font color><font color=#6000FF>R</font color> <font color=#B300FF>D</font color><font color=#DC00FF>R</font color><font color=#FF00F8>E</font color><font color=#FF00CE>A</font color><font color=#FF00A5>M</font color><font color=#FF007C>S</font color><font color=#FF0052>!</font color><font color=#FF0029>!</font color></b>"
+			else
+				applyBuff.ActiveMessage="'s dreams burst forth!"
 			applyBuff.Trigger(m, 1)
 		User.OMessage(1, null, "[User] manifests the dreams of [User.party.members.len == 1 ? "themselves" : "their party"]!")
 		src.Cooldown(1, null, User)
@@ -432,11 +442,13 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	ChargeWaveIcon   = 'BLANK.dmi'
 	IconTime = 4
 	ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
-
 	HeldSkill = TRUE
 	ChargePeriod = 3
 	SweetSpot = 1.5
 	SweetSpotBenefit = 1.5
+	adjust(mob/p)
+		var/tmp/jaboner = pick("rushes down the opponent and shouts 'JARONA'!", "rushes down the opponent and shouts 'JA-Orange'!", "rushes down the opponent and shouts 'JA-st kidding'!")
+		ActiveMessage = jaboner
 
 	var/tmp/chain_active = FALSE
 	var/tmp/chain_count = 0
