@@ -16,10 +16,9 @@
             people += Target
             if(!(Target in get_step(src,dir)) && !InBodyReach(Target))
                 NextAttack+=10
-    else if((HasSweepingStrike() || passive_handler.Get("GiantSwings")) && !q)
-        var/range = max(passive_handler.Get("GiantSwings"), passive_handler.Get("SweepingStrike"))
+    else if(HasSweepingStrike() && !q)
+        var/range = passive_handler.Get("SweepingStrike")
         range = max(range, 1);
-        if(passive_handler.Get("GiantSwings") && passive_handler.Get("SweepingStrike")) range += 1;
         for(var/mob/M in oview(range, src))
             if(M != src && M.density)
                 if(istype(M, /mob/irlNPC))
@@ -104,7 +103,7 @@
         people.Remove(party.members)
     if(glob.MELEE_DEBUG && client)
         var/td = Target ? get_dist(get_turf(src), get_turf(Target)) : -1
-        src << "melee-dbg: dir=[dir] tdist=[td] bodyreach=[Target ? InBodyReach(Target) : "no target"] hitscan=[passive_handler["Hit Scan"]] sweep=[HasSweepingStrike()] giant=[passive_handler.Get("GiantSwings")] prec=[q ? q.PrecisionStrike : 0] warp=[getWarpingStrike()] hits=[people.len]"
+        src << "melee-dbg: dir=[dir] tdist=[td] bodyreach=[Target ? InBodyReach(Target) : "no target"] hitscan=[passive_handler["Hit Scan"]] sweep=[HasSweepingStrike()] prec=[q ? q.PrecisionStrike : 0] warp=[getWarpingStrike()] hits=[people.len]"
     return people
 
 /mob/Admin2/verb/Melee_Debug_Toggle()

@@ -220,7 +220,7 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 		SuperDash=1 //Compound Gravity.
 		Skimming=1 //The lashings make these boiz fly.
 		Pursuer=1 //Is mobile af
-		passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "ManaStats" = 0.5)
+		passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1)
 		SpdMult=1.4
 		DefMult=1.3
 		OffMult=1.3
@@ -234,7 +234,7 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 					Skimming=2
 					SoftStyle=0.5 //Wear the opponent down
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "SoftStyle" = 0.5, "ManaStats" = 1)
+					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "SoftStyle" = 0.5)
 					ManaStats=1
 			src.Trigger(usr)
 
@@ -254,17 +254,17 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 			ManaGlow = usr.is_arcane_beast.aura_color
 			if(usr.is_arcane_beast)
 				if(usr.is_arcane_beast.Mastery>=3)
-					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2, "ManaStats" = 0.5)
+					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2)
 					MovingCharge=1
 					QuickCast=2
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2, "ManaStats" = 1)
+					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2)
 					ManaStats=1
 			src.Trigger(usr)
 
 	Arcane_Empowerment
 		name = "Arcane Empowerment"
-		passives = list("PureReduction" = 1, "Juggernaut" = 1, "Harden" = 2, "ManaStats" = 0.5, "SpiritHand" = 2)
+		passives = list("PureReduction" = 1, "Juggernaut" = 1, "Harden" = 2)
 		PureReduction=1
 		Juggernaut=1
 
@@ -283,7 +283,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 					PureReduction=2
 					HardStyle=0.5
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives["ManaStats"] = 1
 					ManaStats=1
 			src.Trigger(usr)
 
@@ -335,7 +334,7 @@ obj/Skills/Buffs/SlotlessBuffs/
 		SwordIcon='Icons/Buffs/nympharum sword.dmi'
 		SwordX=-32
 		SwordY=-32
-		passives = list("SpiritSword" = 0.25, "SwordAscension" = 1, "MagicSword" = 1)
+		passives = list( "SwordAscension" = 1, "MagicSword" = 1)
 		MagicSword=1
 		SwordUnbreakable=1 //SHARDBLADES CANNOT BE SHATTERED
 		SwordAscension=1

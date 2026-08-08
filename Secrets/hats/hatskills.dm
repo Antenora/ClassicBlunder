@@ -145,7 +145,7 @@
 	ArmorClass = "Light"
 	ArmorElement = "Chaos"
 	ArmorAscension = 3
-	passives = list("SpiritPower" = 2, "MovementMastery" = 10, "DebuffResistance" = 1, "Godspeed" = 2)
+	passives = list("SpiritPower" = 2,  "DebuffResistance" = 1, "Godspeed" = 2)
 	ForMult = 1.25
 	EndMult = 1.1
 	StrMult = 1.25
@@ -161,7 +161,7 @@
 		StrMult = 1.25 + (p.Potential*0.05)
 		OffMult = 1.25 + (p.Potential*0.05)
 		DefMult = 1 + (p.Potential*0.05)
-		passives = list("SpiritPower" = p.Potential/25, "MovementMastery" = p.Potential/3, "DebuffResistance" = 1, "Godspeed" = p.Potential/15)
+		passives = list("SpiritPower" = p.Potential/25,  "DebuffResistance" = 1, "Godspeed" = p.Potential/15)
 		// they r ending at 50 pot, so we imagine that 50 is the new 100
 	verb/HeraldOfTheConstellation()
 		set category="Skills"

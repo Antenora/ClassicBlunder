@@ -1,7 +1,7 @@
 /obj/Skills/Buffs/NuStyle/UnarmedStyle
 	Circuit_Breaker_Style
 		passives = list("HybridStyle" = "MysticStyle", "SoulTug" = 1.5, \
-				"SpiritFlow" = 1, "SpiritHand" = 1,  "Poisoning" = 3, "Rusting" = 2,
+				   "Poisoning" = 3, "Rusting" = 2,
 					 "BlindingVenom" = 1, "CyberStigma" = 2)
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Black_Leg_Style" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Psycho_Boxing")
 		ElementalClass = "Poison"

@@ -2,7 +2,7 @@
 	Divine_Arts_of_The_Heavenly_Demon // unarmed+armed
 		SignatureTechnique=2
 		Copyable=0
-		passives = list("HybridStyle" = "SwordStyle", "Harden" = 2, "Deflection" = 1, "Momentum" = 2, "Pressure" = 2, "BladeFisting" = 1,\
+		passives = list("HybridStyle" = "SwordStyle", "Harden" = 2, "Deflection" = 1, "Momentum" = 2,  "BladeFisting" = 1,\
 					"NeedsSword" = 0, "NoSword" = 1)
 		NeedsSword=0
 		NoSword=1
@@ -23,19 +23,19 @@
 		StyleEnd=1.1
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Twin_Dragon_Fire")
 		StyleActive="Ifrit Jambe"
-		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 1.5, "Instinct" = 2, \
-						"Flow" = 2, "SpiritFlow" = 1.5, "Combustion" = 40, "Scorching" = 5, "Shattering" = 7, "CallousedHands" = 0.15, "SweepingStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2,  "Instinct" = 2, \
+						"Flow" = 2,  "Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 1.5, "Instinct" = 2, \
-				"Flow" = 2, "SpiritFlow" = 1.5, "Combustion" = 40, "Scorching" = 5, "Shattering" = 7, "CallousedHands" = 0.15, "SweepingStrike" = 1)
+			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2,  "Instinct" = 2, \
+				"Flow" = 2,  "Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1)
 		verb/Ifrit_Jambe()
 			set hidden=1
 			src.Trigger(usr)
 
 	Psycho_Boxing // mystic+unarmed (anti cyborg)
 		SignatureTechnique=2
-		passives = list("HybridStyle" = "MysticStyle", "Rusting" = 2, "SoulTug" = 1, "SpiritHand" = 1.5, "SpiritFlow" = 1.5, "CyberStigma" = 4, \
+		passives = list("HybridStyle" = "MysticStyle", "Rusting" = 2, "SoulTug" = 1,   "CyberStigma" = 4, \
 			"Toxic" = 4, "Instinct" = 1, "Flow" = 1, "Harden" = 1,  "Poisoning" = 5)
 		StyleStr=1.3
 		StyleFor=1.3
@@ -47,10 +47,10 @@
 
 	Phoenix_Eye_Fist // unarmed + armed
 		SignatureTechnique=2
-		passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.25, "Interception" = 1.5, \
+		passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2,  "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "NeedsSword" = 0, "NoSword" = 1)
 		adjust(mob/p)
-			passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 0.25, "Interception" = 1.5, \
+			passives = list("HybridStyle" = "SwordStyle","Backstabber" = 1, "Backshot" = 2.5, "Fa Jin" = 2, "Momentum" = 2,  "Interception" = 1.5, \
 				"Extend" = 1, "Gum Gum" = 1, "Tossing" = 1.5, "Secret Knives" = "Secret_Knives", "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1)
 		NeedsSword=0
 		NoSword=1
@@ -69,8 +69,8 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle/Bloodseeker
 	SignatureTechnique=2
 	passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
-		"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
-		"SpiritSword" = 0.25, "Crippling" = 3, "Poisoning" = 3, "Pursuer" = 1, )
+		 "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
+		 "Crippling" = 3, "Poisoning" = 3, "Pursuer" = 1, )
 	// crits deal an extra amount based on the enemy's max health
 	StyleStr = 1.15
 	StyleFor = 1.15
@@ -84,8 +84,8 @@
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Bloodmancer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodwhetter")
 
 		passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
-		"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
-		"SpiritSword" = 0.25, "Crippling" = 3, "Poisoning" = 3, "Pursuer" = 1, )
+		 "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
+		 "Crippling" = 3, "Poisoning" = 3, "Pursuer" = 1, )
 	verb/Bloodseeker()
 		set hidden=1
 		Trigger(usr)
@@ -93,8 +93,8 @@
 
 /obj/Skills/Buffs/NuStyle/SwordStyle/Art_of_Order// mystic+armed
 	SignatureTechnique=2
-	passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "ThunderHerald" = 1, \
-					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 2, "Rain" = 3)
+	passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05,  "ThunderHerald" = 1, \
+					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2)
 	// crits deal an extra amount based on the enemy's max health
 	StyleSpd = 1.3
 	StyleOff = 1.15
@@ -107,15 +107,15 @@
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi",\
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade")
-		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "ThunderHerald" = 1, \
-					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 2, "Rain" = 3)
+		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 10, "CriticalDamage"= 0.05,  "ThunderHerald" = 1, \
+					"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2)
 
 	verb/Art_of_Order()
 		set hidden=1
 		Trigger(usr)
 /obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama// mystic+armed
 	SignatureTechnique=2
-	passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
+	passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05,  "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
 					"Heavy Strike" = "Inferno", "Instinct" = 1, "Persistence" = 0.5, "BurnHit" = 0.5)
 	// crits deal an extra amount based on the enemy's max health
 	StyleStr = 1.45
@@ -135,7 +135,7 @@
 	adjust(mob/p)
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
 		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi")
-		passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.25, "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
+		passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05,  "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
 					"Heavy Strike" = "Inferno", "Instinct" = 1, "Persistence" = 0.5, "BurnHit" = 0.5)
 	Trigger(mob/User, Override)
 		if(!demonSkill)

@@ -398,7 +398,6 @@ proc/BuildAIDatabase()
 	xeno_prae_props["name"] = "Xenomorph Praetorian"
 	xeno_prae_props["BaseMod"] = 10
 	xeno_prae_props["ai_adapting_power"] = 1
-	xeno_prae_props["Mythical"] = 1
 	xeno_prae_props["StrMod"] = 7
 	xeno_prae_props["EndMod"] = 5
 	xeno_prae_props["ForMod"] = 1.5
@@ -1959,70 +1958,66 @@ mob/Player/AI
 
 		//BODY CONDITION INFLUENCES
 		if(!passive_handler.Get("Piloting"))
-			if(!src.HasPossessive())
-				if(!src.Timeless&&!src.Dead)
-					if((src.EraBody=="Child"||src.EraBody=="Youth")&&src.Aged)
-						Ratio*=1
-					else if(src.EraBody=="Child"||src.EraBody=="Senile")
-						if(src.ParasiteCrest())
-							Ratio*=0.5
-						Ratio*=0.4
-					else if(src.EraBody=="Youth"||src.EraBody=="Elder")
-						if(src.ParasiteCrest())
-							Ratio*=0.5
-						Ratio*=0.8
-					else
-						Ratio*=1
-				if(locate(/obj/Seal/Power_Seal, src))
-					Ratio*=0.5
-				else if(src.CanLoseVitalBP()||src.passive_handler.Get("Anaerobic"))
-					Ratio*=1+(src.GetHealthBPMult()+src.GetEnergyBPMult())
-				if(src.JaganPowerNerf)
-					Ratio*=src.JaganPowerNerf
-				if(src.BPPoison)
-					if((src.Secret=="Zombie"||src.Doped)&&src.BPPoison<1)
-						Ratio*=1
-					else
-						Ratio*=src.BPPoison
-				if(src.Maimed && !src.HasMaimMastery())
-					src.MaimsOutstanding=max(src.Maimed-(0.5*src.GetProsthetics()), 0)
-					Ratio*=(1-(0.2*src.MaimsOutstanding))
-				if(src.HasWeights()&&src.Saga!="Eight Gates")
+			if(!src.Timeless&&!src.Dead)
+				if((src.EraBody=="Child"||src.EraBody=="Youth")&&src.Aged)
+					Ratio*=1
+				else if(src.EraBody=="Child"||src.EraBody=="Senile")
+					if(src.ParasiteCrest())
+						Ratio*=0.5
+					Ratio*=0.4
+				else if(src.EraBody=="Youth"||src.EraBody=="Elder")
+					if(src.ParasiteCrest())
+						Ratio*=0.5
 					Ratio*=0.8
-				if(src.PotionCD)
-					Ratio*=0.8
-				if(src.Roided)
-					Ratio*=1.25
-				if(src.OverClockNerf)
-					Ratio*=max(1-src.OverClockNerf,0.1)
-				if(src.GatesNerfPerc)
-					Ratio*=((100-src.GatesNerfPerc)/100)
-				if(src.AngerMax)
-					var/a=1
-					if(src.HasCalmAnger())
-						a*=src.AngerMax
-					else if(Anger&&!src.HasNoAnger())
-						a*=Anger
-						if(src.AngerMult>1)
-							var/ang=a-1//Usable anger
-							var/mult=ang*src.AngerMult
-							a=mult+1
-						if(src.HasAngerThreshold())
-							if(a<src.GetAngerThreshold())
-								a=src.GetAngerThreshold()
-						if(src.DefianceCounter)
-							a+=src.DefianceCounter*0.05
-					if(src.CyberCancel>0)
-						var/ang=a-1//Usable anger.
-						var/cancel=ang*src.CyberCancel//1 Cyber Cancel = all of usable anger.
-						a-=cancel
-						if(a<1)//Only nerf anger.
-							a=1
-					if(src.PhylacteryNerf)
-						a-=(a*src.PhylacteryNerf)
-					if(a<=0)
-						a=0.01
-					Ratio*=a
+				else
+					Ratio*=1
+			if(locate(/obj/Seal/Power_Seal, src))
+				Ratio*=0.5
+			else if(src.CanLoseVitalBP()||src.passive_handler.Get("Anaerobic"))
+				Ratio*=1+(src.GetHealthBPMult()+src.GetEnergyBPMult())
+			if(src.JaganPowerNerf)
+				Ratio*=src.JaganPowerNerf
+			if(src.BPPoison)
+				if((src.Secret=="Zombie"||src.Doped)&&src.BPPoison<1)
+					Ratio*=1
+				else
+					Ratio*=src.BPPoison
+			if(src.Maimed && !src.HasMaimMastery())
+				src.MaimsOutstanding=max(src.Maimed-(0.5*src.GetProsthetics()), 0)
+				Ratio*=(1-(0.2*src.MaimsOutstanding))
+			if(src.HasWeights()&&src.Saga!="Eight Gates")
+				Ratio*=0.8
+			if(src.PotionCD)
+				Ratio*=0.8
+			if(src.Roided)
+				Ratio*=1.25
+			if(src.OverClockNerf)
+				Ratio*=max(1-src.OverClockNerf,0.1)
+			if(src.GatesNerfPerc)
+				Ratio*=((100-src.GatesNerfPerc)/100)
+			if(src.AngerMax)
+				var/a=1
+				if(src.HasCalmAnger())
+					a*=src.AngerMax
+				else if(Anger&&!src.HasNoAnger())
+					a*=Anger
+					if(src.AngerMult>1)
+						var/ang=a-1//Usable anger
+						var/mult=ang*src.AngerMult
+						a=mult+1
+					if(src.DefianceCounter)
+						a+=src.DefianceCounter*0.05
+				if(src.CyberCancel>0)
+					var/ang=a-1//Usable anger.
+					var/cancel=ang*src.CyberCancel//1 Cyber Cancel = all of usable anger.
+					a-=cancel
+					if(a<1)//Only nerf anger.
+						a=1
+				if(src.PhylacteryNerf)
+					a-=(a*src.PhylacteryNerf)
+				if(a<=0)
+					a=0.01
+				Ratio*=a
 
 			if(src.PowerInvisible)
 				Ratio*=src.PowerInvisible
@@ -2055,21 +2050,16 @@ mob/Player/AI
 					if(Health<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
 						Recover("Health",1)
 						Recover("Injury",1)
-						if(passive_handler.Get("Restoration")||src.Secret=="Zombie")
+						if(src.Secret=="Zombie")
 							Recover("Health",1)
 							Recover("Injury",1)
 							BPPoisonTimer-=15
 					if(src.Energy<src.EnergyMax)
 						Recover("Energy",2)
 						Recover("Fatigue",2)
-						if(src.passive_handler.Get("Restoration"))
-							Recover("Energy",1)
-							Recover("Fatigue",1)
 					if(ManaAmount<((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult())||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
 						if(!src.HasMechanized())
 							Recover("Mana",1)
-							if(src.passive_handler.Get("Restoration"))
-								Recover("Mana",1)
 					Recover("Capacity",2)
 				else
 					Recover("Energy",1)

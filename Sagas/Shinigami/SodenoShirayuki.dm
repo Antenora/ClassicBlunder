@@ -26,7 +26,6 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"SpiritSword"    = 0.25 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 5 * SL,
 			"CriticalDamage" = 0.05 * SL,
 			"Shirayuki"      = 1 //This currently does nothing but it's meant to give you Chill Stacks when you power up, and Bonuses based on chill-stacks.
@@ -34,7 +33,6 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		if(SL < 3)
 			passives["ManaLeak"] = 2
 		if(SL > 3)
-			passives["IceHerald"] = 1 // Enhances the potency of the Shikai once you obtain baseline Bankai by giving your crits more OOMPH.
 			passives["IceAge"] = 7.5 * SL // This is Combustion but for Chill. Seems pretty thematic.
 
 		EndMult = 1.1 + (0.1 * SL) // I feel like ICE IS HARD makes a lot of sense here. Someone else can do the stats if they want somethign more thematic.
@@ -87,11 +85,9 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"SpiritSword"    = 0.5 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
 			"CriticalChance" = 10 * SL,
 			"CriticalDamage" = 0.1 * SL,
 			"AbsoluteZero"   = 1, // This gives other debuffs scaling off Chill stacks.
-			"IceHerald"      = 1, // Lets you use IceHerald in Bankai, Always.
 			"IceAge"         = 10 + (10 * SL), // This is Combustion but for Chill. Seems pretty thematic.
 			"AttackSpeed"    = -5 + (0.5 * SL), //Ice makes you cold. Rukia is shown having difficulty moving in her Bankai, may need it's numbers tweaked.
 			"Godspeed"       = -5 + (0.5 * SL), //Same Reason as above.

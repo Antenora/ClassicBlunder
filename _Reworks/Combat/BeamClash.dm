@@ -354,8 +354,6 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 		var/atk = 0
 		if(force) atk += force
 		if(str) atk += str
-		if(S.SpellElement)
-			atk += O.getPowerfulCastingBonus() + O.getForcefulCastingBonus() + O.getAgileCastingBonus() + O.getStalwartCastingBonus()
 		if(O.HasSpiritFlow())
 			atk += O.GetFor(O.GetSpiritFlow() / glob.SPIRIT_FLOW_DIVISOR)
 		if(atk < 1) atk = 1

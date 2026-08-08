@@ -1504,7 +1504,7 @@ mob
 					if(!src.CheckSpecial("One Hundred Percent Power")&&!src.CheckSpecial("Fifth Form")&&!CheckActive("Eight Gates"))
 						return
 			if(Q.ManaCost && !src.HasDrainlessMana() && !Q.AllOutAttack)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? Q.ManaCost - (Q.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Q.ManaCost
+				var/drain = Q.ManaCost
 				if(Q.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Q.SpellElement)
 					if(elem_mana_red)
@@ -1903,7 +1903,7 @@ mob
 			if(src.AttackQueue.ManaGain)
 				src.HealMana(AttackQueue.ManaGain)
 			if(src.AttackQueue.ManaCost)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? AttackQueue.ManaCost - (AttackQueue.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : AttackQueue.ManaCost
+				var/drain = AttackQueue.ManaCost
 				if(src.AttackQueue.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(src.AttackQueue.SpellElement)
 					if(elem_mana_red)

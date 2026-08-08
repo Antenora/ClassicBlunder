@@ -1,3 +1,7 @@
+globalTracker/var/SKILL_INNATE_RATIOS = 0
+/obj/Skills/var/innateHybridStat = null
+/obj/Skills/var/innateHybridRatio = 0
+
 // SPIRIT STRIKE - USE FORCE AS BASE
 
 
@@ -53,17 +57,10 @@
 		else
 			unarmed = 1
 	var/statDamage
-	if(passive_handler.Get("IdealStrike"))
-		if(GetFor() > GetStr())
-			statDamage = GetFor()
-		else
-			statDamage = GetStr()
-	else if(HasSpiritStrike())
+	if(HasSpiritStrike())
 		statDamage = GetFor(1)
 	else
 		statDamage = GetStr(1)
-	if(passive_handler.Get("HardenedFrame"))
-		statDamage = GetEnd(1)
 	if(!glob.EXTRASTATSONAUTOHIT && autohit && !passive_handler["Divine Technique"])
 		return statDamage
 	var/endExtra = GetCallousedHands();
@@ -80,36 +77,6 @@
 		else
 			statDamage += endBonus
 	// there should only b one use case for this
-	var/full_effeciency = passive_handler.Get("FullyEffecient")
-	if(full_effeciency)
-		if(GetFor() > GetStr())
-			if((HasSpiritHand() || spirithand)&&unarmed)
-				if(spirithand < GetSpiritHand())
-					spirithand = GetSpiritHand()
-				var/shBonus_fe = GetStr(spirithand)
-				if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
-					src.Target.applyApathyBonus(shBonus_fe)
-				else
-					statDamage += shBonus_fe
-			if((HasSpiritSword())&&sword)
-				var/ssBonus_fe = GetStr(GetSpiritSword())
-				if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
-					src.Target.applyApathyBonus(ssBonus_fe)
-				else
-					statDamage += ssBonus_fe
-		if(HasHybridStrike())
-			var/hsMult_fe = clamp(1+sqrt(GetStr(GetHybridStrike())/15),1,3)
-			if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
-				src.Target.applyApathyBonus(statDamage * (hsMult_fe - 1))
-			else
-				statDamage *= hsMult_fe
-		if(HasPhysPleroma())
-			var/ppMult_fe = clamp(1+sqrt(GetStr(GetPhysPleroma())/15),1,3)
-			if(src.Target && src.Target.passive_handler && src.Target.passive_handler.Get("ApathyFactor") && src.Target.isInHighTension() && src.Target.Health >= 30)
-				src.Target.applyApathyBonus(statDamage * (ppMult_fe - 1))
-			else
-				statDamage *= ppMult_fe
-		return statDamage
 	// otherwise there is no problem
 	if(HasSpiritHand()&&unarmed)
 		if(HasPhysPleroma())

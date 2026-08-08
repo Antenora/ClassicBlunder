@@ -9,7 +9,7 @@ transformation
 			form_glow_x = -32
 			form_glow_y = -32
 			unlock_potential = 45
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = -4, "SaiyanPower"=1, "SaiyanPower1"=0.5)
+			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = -4,  "SaiyanPower1"=0.5)
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
 			offenseadd = 0.3
@@ -26,7 +26,7 @@ transformation
 				if(user.Potential>=43&&mastery<100)
 					mastery=100
 				var/MasteryBoost=round(mastery/25, 1)
-				passives = list("Instinct" = 1+(MasteryBoost/4), "Flow" = 1+(MasteryBoost/4), "Flicker" = 1+(MasteryBoost/4), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=0.8)
+				passives = list("Instinct" = 1+(MasteryBoost/4), "Flow" = 1+(MasteryBoost/4), "Flicker" = 1+(MasteryBoost/4), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost,  "SaiyanPower1"=0.8)
 				if(user.Potential>=27)
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2, user)&&user.isRace(SAIYAN))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
@@ -38,7 +38,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanTypeY)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
-					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost, "SaiyanPower"=1, "SaiyanPower1"=1.75)
+					passives = list("Instinct" = 1+(MasteryBoost/2), "Flow" = 1+(MasteryBoost/2), "Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost,  "SaiyanPower1"=1.75)
 				if(user.Potential>=35)
 					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
@@ -140,7 +140,7 @@ transformation
 				sleep(2)
 
 			transform(mob/user)
-				if(user.CheckSlotless("Beyond God")||user.passive_handler.Get("InBlue"))
+				if(user.CheckSlotless("Beyond God")||user.passive_handler.Get("TrueBlue"))
 					return
 				else
 					..()
@@ -161,9 +161,9 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 3, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			mastery_boons(mob/user)
-				passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 3, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+				passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 3, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -219,7 +219,7 @@ transformation
 			var/tailIcon = 'saiyantail_ssj4.dmi'
 			var/tailUnderlayIcon = 'saiyantail_ssj4_under.dmi'
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1, "AllOutAttack" = 1, "Reversal" = 0.3)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -228,7 +228,7 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list("Juggernaut" = 1+(mastery/25), "BuffMastery" = 2, "SweepingStrike" = 1, "Brutalize" = 3,\
+				passives = list("Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
 				"KiControlMastery" = 4, "PureReduction" = 3, "Reversal" = 0.1 + (mastery/200),\
 				"Flow" = 4, "Instinct" = 4, "Deicide" = 10,\
 				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 3,"EndlessNine"=0.25,"SSJ4LimitBreaker"=1)
@@ -285,7 +285,7 @@ transformation
 				spawn(10)
 					animate(user, color = user.MobColor, time=20)
 			transform(mob/user)
-				if(user.CheckSlotless("Beyond God")||user.passive_handler.Get("InBlue"))
+				if(user.CheckSlotless("Beyond God")||user.passive_handler.Get("TrueBlue"))
 					return
 				else
 					..()

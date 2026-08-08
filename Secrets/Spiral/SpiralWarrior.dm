@@ -35,7 +35,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -48,7 +48,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -83,7 +83,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply
 			if(1 to 10)
 				passives = list("SpiralPowerUnlocked" = 7)
 				HealthHeal=25
-				p.passive_handler.Set("SpiralSpark", 1)
 			if(11 to 30)
 				passives = list("SpiralPowerUnlocked" = 4)
 			if(31 to 50)
@@ -160,7 +159,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 			var/obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply/applyBuff = new
 			var/secretLevel = User.secretDatum.currentTier
 			var/SpiralPower=1
-			m.passive_handler.Set("SpiralSpark", 1)
 			switch(secretLevel)
 				if(1 to 2)//this will never happen unless the skill is given unnaturally
 					SpiralPower=1//which, i guess, given the subject matter, is more likely than you'd think
@@ -176,7 +174,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 			applyBuff.EndMult=1.25
 			applyBuff.TimerLimit = 20 * (m.AscensionsAcquired+2)
 			applyBuff.passives = list("SpiralPowerUnlocked" = SpiralPower)
-			applyBuff.passives = list("SpiralSpark" = 1)
 			applyBuff.Trigger(m, 1)
 		User.OMessage(1, null, "[User] inspires the evolution of [User.party.members.len == 1 ? "themselves" : "their party"]!")
 		src.Cooldown(1, null, User)
@@ -206,7 +203,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Impose_Evolution
 		var/mob/m = User.Target
 		if(m && ismob(m))
 			var/obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply/applyBuff = new
-			m.passive_handler.Set("SpiralSpark", 1)
 			applyBuff.StrMult=1.25
 			applyBuff.ForMult=1.25
 			applyBuff.EndMult=1.25

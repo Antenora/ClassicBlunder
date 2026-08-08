@@ -53,7 +53,6 @@ Inspiration taken from Sett (League of Legends)}",\
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit)
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Heart_of_the_Half_Beast)
 					p.passive_handler.Set("Grit", 1)
-					p.passive_handler.Set("Steady", 1)
 					p.passive_handler.Set("DoubleStrike",1)
 				if("Monkey King")
 					p.passive_handler.Increase("Nimbus", 1)
@@ -62,22 +61,20 @@ Inspiration taken from Sett (League of Legends)}",\
 					p.passive_handler.Increase("Instinct", 1)
 
 				if("Unseen Predator")
-					p.passive_handler.passives["Heavy Strike"] = "Unseen Predator"
+					p.passive_handler.Set("Heavy Strike", "Unseen Predator")
 					p.AddSkill(new/obj/Skills/Queue/Racial/Beastkin/Savagery)
 				if("Undying Rage")
 					p.passive_handler.Increase("Fury", 1)
-					p.passive_handler.Increase("Wrathful Tenacity", 0.15)
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Undying_Rage)
 
 				if("Feather Cowl")
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Feather_Cowl)
 					p.passive_handler.Increase("Harden", 1)
-					p.passive_handler.Increase("Pressure", 1)
 					p.passive_handler.Increase("BladeFisting", 1)
 
 				if("Feather Knife")
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Clean_Cuts)
-					p.passive_handler.passives["Extra Secret Knives"] = "Feathers"
+					p.passive_handler.Set("Extra Secret Knives", "Feathers")
 					p.passive_handler.Increase("Tossing", 1)
 					p.passive_handler.Increase("Momentum", 1)
 					p.passive_handler.Increase("BladeFisting", 1)
@@ -104,7 +101,6 @@ Inspiration taken from Sett (League of Legends)}",\
 
 				if("Fox Fire")
 					p.Attunement = "Fox Fire"
-					p.passive_handler.passives["Heavy Strike"] = "Fox Fire"
-					p.passive_handler.Increase("SpiritStrike", 1) //Allows their Basic attacks to use force INSTEAD of Strength.
+					p.passive_handler.Set("Heavy Strike", "Fox Fire")
 					p.AddSkill(new/obj/Skills/Projectile/Racial/Fox_Fire_Barrage)
 

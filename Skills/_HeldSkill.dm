@@ -158,7 +158,7 @@
 		src << "<font color='red'>You're too fatigued to use [Z].</font>"
 		return FALSE
 	if(Z.ManaCost && !src.HasDrainlessMana())
-		var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (src.passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+		var/drain = Z.ManaCost
 		drain *= src.ChakraCostMult(Z)
 		if(drain <= 0) drain = 0.5
 		var/need = src.TomeSpell(Z) ? drain * (1 - (0.45 * src.TomeSpell(Z))) : drain

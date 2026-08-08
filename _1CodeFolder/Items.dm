@@ -1027,7 +1027,7 @@ obj/Items/Sword
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
-				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15, "IceHerald"=1, "Freezing"=5, "SpiritFlow"=2, "WaveDancer"=2, "RenameMana"="HEAT")
+				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15,  "Freezing"=5,  "WaveDancer"=2)
 				Destructable=0
 				ShatterTier=0
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Frost_End", "/obj/Skills/AutoHit/FrostBite", "/obj/Skills/Projectile/Sword/TougaHyoujin", "/obj/Skills/Queue/KokujinYukikaze")
@@ -1114,7 +1114,7 @@ obj/Items/Sword
 				NoSaga = 1
 				Unobtainable = 1
 				Element = "Ultima"
-				passives = list("PureDamage"=5, "PridefulRage"=1, "SpiritSword"=2, "SweepingStrike"=1, "Extend"=2)
+				passives = list("PureDamage"=5,   "SweepingStrike"=1, "Extend"=2)
 
 				// Ea can only be dismissed via the Summon Ea skill
 				AlignEquip(mob/A, dontUnEquip = FALSE)
@@ -1173,7 +1173,7 @@ obj/Items/Sword
 				pixel_x=-32
 				pixel_y=-32
 				NoSaga=1
-				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5, "RenameMana"="HEAT", "BlockChance"=20, "CriticalBlock"=0.15, "Brutalize"=2, "Deflection"=2)
+				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5,  "BlockChance"=20, "CriticalBlock"=0.15,  "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
 				CalmAnger=1
@@ -2344,8 +2344,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 			if(suffix=="*Equipped*")
 				current_passives = passives
 				User.passive_handler.increaseList(passives)
-				if("RenameMana" in passives)
-					User.ManaAmount = 0
 			else if(suffix == null)
 				User.passive_handler.decreaseList(current_passives)
 

@@ -39,12 +39,12 @@
 			// is gated by (Anger||HasCalmAnger()) in _JinxUtility.dm, which leaves it
 			// dead for non-Mazoku/Wrathful/etc. mages. Tenacity is universal and fits
 			// the same defensive role.
-			passives = list("Scorching" = 3, "Momentum" = 1, "FireHerald" = 1, "HeavyHitter" = 1,"Tenacity" = 2)
+			passives = list("Scorching" = 3, "Momentum" = 1,  "HeavyHitter" = 1,"Tenacity" = 2)
 		else if(tier >= 2)
 			ForMult = 1.25
 			StrMult = 1.15
 			OffMult = 1
-			passives = list("Scorching" = 2, "Momentum" = 1, "FireHerald" = 1, "HeavyHitter" = 1)
+			passives = list("Scorching" = 2, "Momentum" = 1,  "HeavyHitter" = 1)
 		else
 			ForMult = 1.1
 			StrMult = 1
@@ -74,12 +74,12 @@
 			EndMult = 1.4
 			ForMult = 1.35
 			DefMult = 1.3
-			passives = list("Chilling" = 1, "FluidForm" = 1, "IceHerald" = 1, "ControlResist" = 1, "Blubber" = 3, "MeleeResist" = 1)
+			passives = list("Chilling" = 1, "FluidForm" = 1,   "Blubber" = 3, "MeleeResist" = 1)
 		else if(tier >= 2)
 			EndMult = 1.25
 			ForMult = 1.15
 			DefMult = 1
-			passives = list("Chilling" = 1, "FluidForm" = 1, "IceHerald" = 1, "ControlResist" = 1)
+			passives = list("Chilling" = 1, "FluidForm" = 1)
 		else
 			EndMult = 1.1
 			ForMult = 1
@@ -144,17 +144,17 @@
 			ForMult = 1.4
 			SpdMult = 1.35
 			OffMult = 1.3
-			passives = list("Shocking" = 1, "Afterimages" = 1, "ThunderHerald" = 1, "BlurringStrikes" = 1, "AttackSpeed" = 2, "Godspeed" = 2, "DenkoSekka" = 3)
+			passives = list("Shocking" = 1, "AfterImages" = 1, "ThunderHerald" = 1,  "AttackSpeed" = 2, "Godspeed" = 2, "DenkoSekka" = 3)
 		else if(tier >= 2)
 			ForMult = 1.25
 			SpdMult = 1.15
 			OffMult = 1
-			passives = list("Shocking" = 1, "Afterimages" = 1, "ThunderHerald" = 1, "BlurringStrikes" = 1)
+			passives = list("Shocking" = 1, "AfterImages" = 1, "ThunderHerald" = 1)
 		else
 			ForMult = 1.1
 			SpdMult = 1
 			OffMult = 1
-			passives = list("Shocking" = 1, "Afterimages" = 1)
+			passives = list("Shocking" = 1, "AfterImages" = 1)
 	verb/Wind_Gestalt_Buff()
 		set category="Skills"
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -179,17 +179,17 @@
 			SpdMult = 1.4
 			EndMult = 1.35
 			DefMult = 1.3
-			passives = list("LifeGeneration" = 3, "BuffMastery" = 1, "Restoration" = 1, "DebuffResistance" = 1, "AngelicInfusion" = 1)
+			passives = list("LifeGeneration" = 3,   "DebuffResistance" = 1)
 		else if(tier >= 2)
 			SpdMult = 1.25
 			EndMult = 1.15
 			DefMult = 1
-			passives = list("LifeGeneration" = 1, "BuffMastery" = 1, "Restoration" = 1, "DebuffResistance" = 1)
+			passives = list("LifeGeneration" = 1,   "DebuffResistance" = 1)
 		else
 			SpdMult = 1.1
 			EndMult = 1
 			DefMult = 1
-			passives = list("LifeGeneration" = 1, "BuffMastery" = 1)
+			passives = list("LifeGeneration" = 1)
 	verb/Light_Gestalt_Buff()
 		set category="Skills"
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -214,17 +214,16 @@
 			StrMult = 1.4
 			ForMult = 1.35
 			OffMult = 1.3
-			passives = list("KillerInstinct" = 0.15, "Pressure" = 1, "AngerAdaptiveForce" = 0.3, "DemonicInfusion" = 1, "Piercing" = 0.25)
+			passives = list(   "DemonicInfusion" = 1, "Piercing" = 0.25)
 		else if(tier >= 2)
 			StrMult = 1.25
 			ForMult = 1.15
 			OffMult = 1
-			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "AngerAdaptiveForce" = 0.2, "DemonicInfusion" = 1, "Piercing" = 0.25)
+			passives = list(   "DemonicInfusion" = 1, "Piercing" = 0.25)
 		else
 			StrMult = 1.1
 			ForMult = 1
 			OffMult = 1
-			passives = list("KillerInstinct" = 0.1, "Pressure" = 1, "AngerAdaptiveForce" = 0.1)
 	verb/Dark_Gestalt_Buff()
 		set category="Skills"
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -249,12 +248,12 @@
 			ForMult = 1.4
 			SpdMult = 1.35
 			DefMult = 1.3
-			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1, "FluidForm" = 1, "Entropic" = 1,"IgnoreNoWhiff" = 1)
+			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1, "FluidForm" = 1, "Entropic" = 1)
 		else if(tier >= 2)
 			ForMult = 1.25
 			SpdMult = 1.15
 			DefMult = 1
-			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1,"IgnoreNoWhiff" = 1)
+			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1)
 		else
 			ForMult = 1.1
 			SpdMult = 1
@@ -284,7 +283,7 @@
 			SpdMult = 1.4
 			ForMult = 1.35
 			OffMult = 1.3
-			passives = list("Warping" = 1, "Flicker" = 1, "Siphon" = 2, "PUSpike" = 5, "Steady" = 2, "Vortex" = 5,"BetterAim"=5)
+			passives = list("Warping" = 1, "Flicker" = 1, "Siphon" = 2, "PUSpike" = 5,  "Vortex" = 5,"BetterAim"=5)
 		else if(tier >= 2)
 			SpdMult = 1.25
 			ForMult = 1.15

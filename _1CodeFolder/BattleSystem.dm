@@ -128,11 +128,6 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
-//	if(src.passive_handler.Get("AdvanceFurther"))
-	//	src.passive_handler.Set("AdvanceFurther", 0)
-	if(src.passive_handler.Get("Herald of the End")&&src.transUnlocked<2)
-		src.passive_handler.Increase("The Clock Is Ticking", 1)
-		src<<"<font color=red><b>You really let someone get the better of you like that...? The clock is ticking.</font></b>"
 	var/HellspawnOdds=(10+(src.TotalInjury-40))/(src.Potential/20)//less likely the further you are from 20 pot without outright disabling it before then
 	var/CalamityOdds=src.passive_handler.Get("The Clock Is Ticking")*(src.Potential/55)
 	if(CalamityOdds<0)
@@ -208,7 +203,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.VaizardHealth+=15
 			src.HealthAnnounce10=2
 			return
-	if(src.passive_handler.Get("The Unstoppable Force"))
+	if(src.passive_handler.Get("SecondWind") == "Unstoppable")
 		if(src.UnstoppableForceCounter<9&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "<b>But [src] is unwavering in their pursuit of victory.</b>", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
@@ -216,7 +211,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.HealthAnnounce10=10
 			src.UnstoppableForceCounter+=1
 			return
-	if(src.passive_handler.Get("Neverending Hope"))
+	if(src.passive_handler.Get("SecondWind") == "Hope")
 		if(src.HealthAnnounce10<=1&&FightingSeriously(P,src))
 			if(prob((src.passive_handler.Get("Tenacity")*glob.TENACITY_GETUP_CHANCE)+10))
 				src.KO=0
@@ -237,7 +232,7 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.VaizardHealth+=clamp(passive_handler.Get("Tenacity")* glob.TENACITY_VAI_MULT, glob.TENACITY_VAI_MIN, glob.TENACITY_VAI_MAX) //actual clutch now.
 				src.HealthAnnounce10+=1
 				return
-	if(src.passive_handler.Get("The Echo"))
+	if(src.passive_handler.Get("SecondWind") == "Echo")
 		if(src.HealthAnnounce10<=2+RedTenacity&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "[src] saw a world in which they lost, and starts to push just a little bit harder!", "<font color=red>[src]([src.key]) activates The Echo!")
@@ -255,9 +250,9 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.VaizardHealth+=20
 				src.HealthAnnounce10+=1
 				return
-	if(src.passive_handler.Get("The Comeback King"))
+	if(src.passive_handler.Get("SecondWind") == "Comeback")
 		if(src.HealthAnnounce10<=9)
-			if(prob(src.passive_handler.Get("The Comeback King")))
+			if(prob(1))
 				var/HealthRecovery=P.Health/2
 				src.KO=0
 				src.OMessage(15, "[src] reloads their last SAVE!", "<font color=red>[src]([src.key]) stages a miraculous comeback!!")
@@ -400,7 +395,7 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.MortallyWounded+=1
 				src.OMessage(10, "[src] has been grieviously wounded!", "[src]([src.key]) has over 85% injury.")
 	if(src.client)
-		if((transActive||tension)&&!src.HasNoRevert()&&!src.HasMystic())
+		if((transActive||tension)&&!src.HasMystic())
 			for(var/obj/Skills/Buffs/B in src)
 				if(src.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
 					B.Trigger(src)
@@ -447,7 +442,7 @@ mob/proc/Conscious()
 			src.TotalInjury/=2
 			src.TotalFatigue/=2
 			src.OMessage(15,"<font color='green'><b>[src] refuses to let fate get the better of them!!!</b></font color>","<font color=blue>[src]([src.key]) regains consciousness.")
-		else if(src.passive_handler.Get("Neverending Hope"))
+		else if(src.passive_handler.Get("SecondWind") == "Hope")
 			src.Health=30
 			src.Energy=EnergyMax/2
 			src.OMessage(15,"[src] is ready for another go.","<font color=blue>[src]([src.key]) regains consciousness.")
@@ -1039,8 +1034,6 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 	A.transform=src.transform
 	src.loc=locate(glob.currentlyVoidingLoc[1], glob.currentlyVoidingLoc[2], glob.currentlyVoidingLoc[3])
 	var/NotYet=0
-	if(src.passive_handler.Get("Undying"))
-		NotYet=1
 
 	if(!SuperDead||NotYet)
 		if(glob.VoidsAllowed||ForceVoid)
@@ -1179,56 +1172,6 @@ mob/proc/Barely_Alive(mob/P) if(P)
 		P.Conscious()
 	P.Revive()
 	P<<"You have returned to your body, barely alive."
-	if(P.passive_handler.Get("Undying"))
-		P.passive_handler["Undying"]=0
-		P.passive_handler.Increase("CalmAnger")
-		P.OMessage(15,"[P] shines brightly with everlasting Hope, refusing to allow their story to end!","<font color=red>[P]([P.key]) used Undying.")
-		var/image/GG=image('GodGlow.dmi',pixel_x=-32,pixel_y=-32, loc = P, layer=MOB_LAYER-0.5)
-		GG.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
-		GG.color=list(1,0,0, 0,1,0, 0,0,1, 0.2,0.2,0.4)
-		GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
-		animate(GG, alpha=0, transform=matrix()*0.7)
-		world << GG
-		animate(GG, alpha=255, time=30, transform=matrix()*1)
-		animate(P, color = list(0.45,0.6,0.75, 0.64,0.88,1, 0.16,0.21,0.27, 0,0,0), pixel_y=32, time=30)
-		sleep(40)
-
-		var/image/GO=image('GodOrb.dmi',pixel_x=-16,pixel_y=-16, loc = P, layer=EFFECTS_LAYER+0.5)
-		GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
-		GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 156), size = 3)
-		animate(GO, alpha=0)
-		world << GO
-		animate(GO, alpha=255, time=40)
-		for(var/mob/Players/T in view(31, P))
-			animate(T.client, color=list(0.5,0,0, 0,0.5,0, 0,0,0.5, 0,0,0.1), time = 40)
-			spawn(40)
-				animate(T.client, color=null, time = 40)
-		spawn(10)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-			animate(GO, color=list(1,0,0, 0,1,0, 0,0,1, 0.8,0.8,0.8), time=30)
-		spawn(20)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(30)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(40)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(50)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		sleep(50)
-		animate(P, color = null)
-		sleep(30)
-		GG.filters-=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
-		GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(51, 220, 243), size = 1)
-
-		animate(GO, alpha=0, time=10)
-		sleep(10)
-		animate(P, pixel_y=0, time=30)
-		animate(GG, alpha=0, time=50)
-		spawn(50)
-			GO.filters=null
-			del GO
-			GG.filters=null
-			del GG
 	del(src)
 
 mob/proc/Unholy_Alive(mob/P) if(P)
@@ -1631,9 +1574,6 @@ mob/var/minhitroll = 0
 	//LABEL: ACCURACY FORMULA
 proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldDefaultAcc, Backfire=0, IgnoreNoDodge=0)
 	if(Offender&&Defender)
-		if(Defender.passive_handler.Get("The Crownless King") && Defender.TotalFatigue !=99)
-			if(Defender.passive_handler.Get("The Crownless King") && Defender.ManaAmount !=0) //until you run out of mana and are fully fatigued, you can't be hit.
-				return MISS
 		if(Defender.Frozen==3)
 			return MISS
 		if(Offender.HasNoMiss())
@@ -1898,8 +1838,6 @@ proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/Base
 		var/TotalAccuracy = BaseChance * ((Offense*AccMult) / max(Defense,0.01)) * 100
 
 		TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
-		if(Defender.passive_handler.Get("TotalDeflection"))
-			return MISS
 
 		if(!prob(TotalAccuracy))
 			if(!prob(TotalAccuracy))
@@ -2243,8 +2181,6 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 				aa.SetTarget(src)
 				aa.ai_state = "Chase"
 				aa.last_activity = world.time
-	if(passive_handler.Get("Grippy"))
-		Forced = 1
 	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Grab"))
 		Forced = 1
 	if(!Forced)
@@ -2289,7 +2225,6 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(icon_state=="Meditate") return 1;
 	if(HasGiantForm()) return 0;
 	if(HasMythical()>=1) return 0;
-	if(passive_handler.Get("Fishman")) return 0;
 	return 1;
 
 

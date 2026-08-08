@@ -1,8 +1,8 @@
 client
 	New()
 		..()
-		// setMacros() retired, ApplyKeybinds (SkillMenuHotbar) is what is used now
 
+		// setMacros() retired, ApplyKeybinds (SkillMenuHotbar) is what is used now
 	// These are here so the default movement commands don't interfere.
 	North()
 	South()
@@ -230,13 +230,13 @@ mob
 							if(stepDiagonal())
 								glide_size = 0 //auto-glide here, also heals a stale pixel-build glide_size from an old save
 								if(SlotlessBuffs.len>0)
-									// only check if there are active slotless
-									var/afterimages = passive_handler.Get("CoolerAfterImages")
-									var/rainbowimages = passive_handler.Get("RainbowAfterImages")
-									if(afterimages)
-										coolerFlashImage(src, afterimages)
-									if(rainbowimages)
-										rainbowFlashImage(src, rainbowimages)
+									var/ai_skin = passive_handler.Get("AfterImageSkin")
+									if(ai_skin)
+										var/ai_count = passive_handler.Get("AfterImages")
+										if(ai_count)
+											switch(ai_skin)
+												if("Cooler") coolerFlashImage(src, ai_count)
+												if("Rainbow") rainbowFlashImage(src, ai_count)
 								loop_delay = glob.BASE_LOOP_DELAY
 								if(dir==NORTHEAST||dir==NORTHWEST||dir==SOUTHEAST||dir==SOUTHWEST)
 									loop_delay *= glob.DIAG_LOOP_DELAY
@@ -260,8 +260,7 @@ mob
 								sleep(world.tick_lag * (delay))
 								continue
 					sleep(world.tick_lag)
-					// if(loop_delay>=1)
-					// 	sleep(world.tick_lag)
+
 					// 	loop_delay--
 					// else
 					// 	if(key1||key2||key3||key4)
@@ -272,8 +271,8 @@ mob
 					// 			loop_delay+=MovementSpeed()*/
 					// 			if(stepDiagonal())
 					// 				loop_delay+=MovementSpeed()
+					// if(loop_delay>=1)
 					// 	sleep(world.tick_lag)
-
 			canMove()
 //				if(Control) return TRUE
 				//if(!Allow_Move()) return FALSE
@@ -320,7 +319,7 @@ mob
 
 						//	If you don't want diagonal steps broken in two use this line.
 						var/step_d=dir_x+dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -360,7 +359,7 @@ mob
 						if(prob(src.Confused) || passive_handler.Get("Manic") ? prob(passive_handler.Get("Manic") * 5) : 0)
 							dir_y = pick(DIRSY)
 						var/step_d=dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -418,21 +417,4 @@ mob/Players/heldDir()
 	if(east_held && !west_held) dir_x = EAST
 	else if(west_held && !east_held) dir_x = WEST
 	return dir_x + dir_y
-
-mob/Players/BeamTurnDir()
-	if(!HasTurningCharge()) return
-	if(clash_resume_noaim) //keys still held from the struggle inputs: don't re-aim off them
-		if(!heldDir()) clash_resume_noaim = 0 //cleared once the player actually lets go
-		return
-	var/dir_x = 0
-	var/dir_y = 0
-	var/north_held = (key1==NORTH||key2==NORTH||key3==NORTH||key4==NORTH)
-	var/south_held = (key1==SOUTH||key2==SOUTH||key3==SOUTH||key4==SOUTH)
-	var/east_held  = (key1==EAST ||key2==EAST ||key3==EAST ||key4==EAST )
-	var/west_held  = (key1==WEST ||key2==WEST ||key3==WEST ||key4==WEST )
-	if(north_held && !south_held) dir_y = NORTH
-	else if(south_held && !north_held) dir_y = SOUTH
-	if(east_held && !west_held) dir_x = EAST
-	else if(west_held && !east_held) dir_x = WEST
-	if(dir_x || dir_y)
-		src.dir = dir_x + dir_y
+

@@ -1,6 +1,6 @@
 /obj/Skills/Buffs/NuStyle/MysticStyle
 	Hellfire
-		passives = list("SpiritFlow" = 3, "Familiar" = 2, "Combustion" = 60, "Heavy Strike" = "Inferno",\
+		passives = list( "Familiar" = 2, "Combustion" = 60, "Heavy Strike" = "Inferno",\
 						"Scorching" = 4)
 		ElementalOffense = "HellFire"
 		ElementalDefense = "Fire"
@@ -28,7 +28,7 @@
 		StyleFor = 1.3
 		StyleSpd = 1.3
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Earth"
-		passives = list("SuperCharge" = 1,"Familiar" = 2, "SpiritFlow" = 3, "ThunderHerald" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.1, \
+		passives = list("SuperCharge" = 1,"Familiar" = 2,  "ThunderHerald" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.1, \
 						"Godspeed" = 2, "AirBend" = 1.5, "Harden" = 2, "Burning" = 2, "Shattering" = 5, "Shocking" = 2, "Chilling" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Mega_Arm" // Super_mega_buster
 		StyleActive = "Plasma"
@@ -41,8 +41,8 @@
 		ElementalDefense = "Wind"
 		ElementalClass = list("Wind","Water")
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Water"
-		passives = list("IceHerald" = 1,"IceAge" = 40, "Familiar" = 2, "ThunderHerald" = 1, "CriticalChance" = 25, "CriticalDamage" = 0.2,\
-						"SpiritFlow" = 3, "Harden" = 2,"Freezing" = 8, "Rain" = 8, "WaveDancer" = 1.5, "Godspeed" = 2)
+		passives = list("IceAge" = 40, "Familiar" = 2, "ThunderHerald" = 1, "CriticalChance" = 25, "CriticalDamage" = 0.2,\
+						 "Harden" = 2,"Freezing" = 8,  "WaveDancer" = 1.5, "Godspeed" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Frostfist"
 		StyleActive = "Blizzard"
 		StyleOff=1.15
@@ -59,7 +59,7 @@
 		ElementalDefense = "Water"
 		ElementalClass = list("Fire")
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Fire"
-		passives = list("HeatingUp" = 1,"Familiar" = 2, "Amplify" = 2, "Heavy Strike" = "Inferno", "Scorching" = 10, "Combustion" = 60, "SpiritFlow" = 3, "SpiritHand" = 1)
+		passives = list("HeatingUp" = 1,"Familiar" = 2, "Amplify" = 2, "Heavy Strike" = "Inferno", "Scorching" = 10, "Combustion" = 60)
 		StyleFor = 1.45
 		StyleOff = 1.15
 		StyleActive = "Hot Style"
@@ -76,7 +76,7 @@
 				ElementalDefense = "Fire"
 				ElementalClass = "Water"
 				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Water"
-				passives = list("CoolingDown" = 1,"Familiar" = 2, "Amplify" = 2, "Harden" = 3, "Freezing" = 10, "IceAge" = 50, "SpiritFlow" = 3, "WaveDancer" = 2)
+				passives = list("CoolingDown" = 1,"Familiar" = 2, "Amplify" = 2, "Harden" = 3, "Freezing" = 10, "IceAge" = 50,  "WaveDancer" = 2)
 
 				Finisher="/obj/Skills/Queue/Finisher/Phosphor"
 			else
@@ -87,7 +87,7 @@
 				StyleFor = 1.45
 				StyleOff = 1.15
 				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Fire"
-				passives = list("HeatingUp" = 1,"Familiar" = 2, "Amplify" = 2, "Heavy Strike" = "Inferno", "Scorching" = 10, "Combustion" = 50, "SpiritFlow" = 3, "SpiritHand" = 1)
+				passives = list("HeatingUp" = 1,"Familiar" = 2, "Amplify" = 2, "Heavy Strike" = "Inferno", "Scorching" = 10, "Combustion" = 50)
 
 				Finisher="/obj/Skills/Queue/Finisher/Jet_Kindling"
 		verb/Swap_Stance()

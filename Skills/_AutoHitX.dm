@@ -5220,13 +5220,6 @@ mob
 					return
 				if(Z.HealthRecovery)
 					src.HealHealth(Z.HealthRecoveryValue)
-				if(Target && Target.passive_handler.Get("CounterSpell"))
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Counterspell/s in Target)
-						if(s.Using)
-							s.Trigger(Target, Override = 1)
-					OMsg(Target, "[Target]'s counterspell nullified [Z]")
-					Z.Cooldown(1, null, src)
-					return
 				if(Z.type == /obj/Skills/AutoHit/I_Want_To_Be_Like_You)
 					var/iwtl_cd = src.passive_handler && src.passive_handler.Get("Limited Rank-Up") ? 30 : 45
 					if(src.Target == src)
@@ -5319,7 +5312,7 @@ mob
 					if(!src.CheckSpecial("One Hundred Percent Power")&&!src.CheckSpecial("Fifth Form")&&!CheckActive("Eight Gates"))
 						return
 			if(Z.ManaCost && !src.HasDrainlessMana() && !Z.AllOutAttack)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				var/drain = Z.ManaCost
 				if(Z.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
@@ -5390,13 +5383,6 @@ mob
 				last_autohit_used = Z.type
 			if(Z.Area=="Around Target"||Z.Area=="Target")
 				TrgLoc=src.Target.loc
-				if(Target.passive_handler.Get("CounterSpell"))
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Counterspell/s in Target)
-						if(s.Using)
-							s.Trigger(Target, Override = 1)
-					OMsg(Target, "[Target]'s counterspell nullified [Z]")
-					Z.Cooldown(1, null, src)
-					return
 			if(Z.CustomCharge)
 				OMsg(src, "[Z.CustomCharge]")
 			else
@@ -5875,7 +5861,7 @@ mob
 			if(Z.FatigueCost)
 				src.GainFatigue(Z.FatigueCost*CostMultiplier)
 			if(Z.ManaCost)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				var/drain = Z.ManaCost
 				if(Z.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Z.SpellElement)
 					if(elem_mana_red)
@@ -6263,7 +6249,7 @@ obj
 			// (b.2) for the same reason — adding Future refund to projectiles would
 			// need to track 4-5 distinct deduction sites, deferred for later.
 			if(Z.ManaCost && Z.SpellElement && owner && owner.hasMagePassive(/mage_passive/time/Future))
-				var/computed_drain = owner.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (owner.passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+				var/computed_drain = Z.ManaCost
 				var/elem_mana_red = owner.getSpellElementManaCostReduction(Z.SpellElement)
 				if(elem_mana_red)
 					computed_drain *= (1 - elem_mana_red)
@@ -6611,10 +6597,6 @@ obj
 					src.Stopped=1
 				if(src.PassTo)
 					AfterImageA(src.Owner, forceloc=get_step(m, get_dir(m, src.Owner)))
-				if(src.MagicNeeded)
-					if(m.passive_handler.Get("CounterSpell"))
-						OMsg(m, "[m]'s counterspell negates the spells damage!")
-						return
 				// Time Future mage passive: 50% spell cost refund on land. SpellManaCostPaid
 				// was captured at the AH constructor (see New() above) only when Owner held
 				// Future + Z.SpellElement + Z.ManaCost > 0 at cast time, so a non-zero value
@@ -6656,10 +6638,6 @@ obj
 					Owner << "Your auto hit could not calculate the damage it just did!! Report this !!"
 				if(SpellElement)
 					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).
-					atk += Owner.getPowerfulCastingBonus()
-					atk += Owner.getForcefulCastingBonus()
-					atk += Owner.getAgileCastingBonus()
-					atk += Owner.getStalwartCastingBonus()
 					//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
 					//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
 					var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
@@ -6792,7 +6770,7 @@ obj
 				if(WearingArmor)//Reduced delay and accuracy
 					Precision*=src.Owner.GetArmorAccuracy(WearingArmor)
 
-				if(src.CanBeBlocked||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("The Crownless King")||m.passive_handler.Get("IgnoreNoWhiff"))
+				if(src.CanBeBlocked||m.passive_handler.Get("YataNoKagami"))
 					if(Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=0) == WHIFF)
 						if(!src.Owner.NoWhiff())
 							var/obj/Items/Sword/s = Owner.EquippedSword()
@@ -6932,7 +6910,7 @@ obj
 					m.applySnare(Snaring, SnaringOverlay)
 				//EFFECTS HERE
 
-				if(src.CanBeDodged||m.passive_handler.Get("YataNoKagami")||m.passive_handler.Get("IgnoreNoWhiff"))
+				if(src.CanBeDodged||m.passive_handler.Get("YataNoKagami"))
 					var/loc=m.loc
 					if(m.AttackQueue&&(m.AttackQueue.Counter||m.AttackQueue.CounterTemp))
 						m.dir=get_dir(m, src.Owner)
@@ -7043,7 +7021,7 @@ obj
 					reversalProcChance = (reversalChance / (reversalChance + 2)) * 100
 				if(prob(min(reversalProcChance, 100)))
 					if(m.HasAutoReversal())
-						if(!src.SpecialAttack||m.passive_handler.Get("TotalReversal"))
+						if(!src.SpecialAttack)
 							var/reversalAcc = Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=1)
 							if(reversalAcc == HIT || reversalAcc == WHIFF)
 								/*if(m.hasMagmicShield())
@@ -7073,13 +7051,13 @@ obj
 				if(src.DirectWounds)
 					src.Owner.DealWounds(m, src.DirectWounds);
 				if(SpellElement == "Water" && m.passive_handler.Get("ChillAbsorb"))
-					m.HealHealth(FinalDmg * 0.5)
+					m.HealHealth(FinalDmg * (0.1 * m.passive_handler.Get("ChillAbsorb")))
 					return
 				if(SpellElement == "Lightning" && m.passive_handler.Get("ShockAbsorb"))
-					m.HealHealth(FinalDmg * 0.5)
+					m.HealHealth(FinalDmg * (0.1 * m.passive_handler.Get("ShockAbsorb")))
 					return
 				if(SpellElement == "Wind" && m.passive_handler.Get("WindAbsorb"))
-					m.HealHealth(FinalDmg * 0.5)
+					m.HealHealth(FinalDmg * (0.1 * m.passive_handler.Get("WindAbsorb")))
 					return
 				var/damageDealt
 				if(skipPureDamage)

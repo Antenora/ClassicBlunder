@@ -24,8 +24,7 @@
 	TransformX = -32
 	TransformY = -32
 	AuraLock = 'BLANK.dmi'
-	passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 1, \
-	"Meaty Paws" = 1, "PureDamage" = 2, "PureReduction" = 2, "GiantSwings" = 1)
+	passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 	StrMult = 1.3
 	ForMult = 1.2
 	SpdMult = 0.3
@@ -64,12 +63,10 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
-		passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 1, \
-			"Meaty Paws" = 1, "PureDamage" = 2, "PureReduction" = 2, "GiantSwings" = 1)
+		passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired
-				passives["Meaty Paws"] = 2 + (p.AscensionsAcquired /2)
 				StrMult = 1.2
 				ForMult = 1.15
 				EndMult = 1.2
@@ -109,7 +106,6 @@
 					if(SS1pot<5)
 						SS1pot=5
 					passives["Transformation Power"] = SS1pot //MATH COMES LATER
-					passives["BuffMastery"] = 5 + p.AscensionsAcquired
 					passives["PureReduction"] = 2 + p.AscensionsAcquired
 					passives["PureDamage"] = 1 + p.AscensionsAcquired
 					VaizardHealth =25
@@ -121,10 +117,7 @@
 			passives["Transformation Power"] = clamp(p.AscensionsAcquired * 6, 1, 40)
 			passives["Flow"] = 4
 			passives["Instinct"] = 4
-			passives["Meaty Paws"] = 2 + (p.AscensionsAcquired /2)
 			passives["Juggernaut"] = 1 + (p.AscensionsAcquired / 2)
-			passives["BuffMastery"] = 3 + (p.AscensionsAcquired / 2)
-			passives["Brutalize"] = 3
 			passives["DisableGodKi"] = 1
 			passives["Unstoppable"] = 1
 			passives["Deicide"] = 10
@@ -144,7 +137,6 @@
 			PowerMult = 1.6
 			if(p.oozaru_type=="Demonic")
 				PowerMult=2.5
-				passives["BuffMastery"] = 5 + p.AscensionsAcquired
 				passives["PureReduction"] = 2 + (p.AscensionsAcquired*1.25)
 				passives["PureDamage"] = 2 + (p.AscensionsAcquired*1.25)
 				SpdMult=1

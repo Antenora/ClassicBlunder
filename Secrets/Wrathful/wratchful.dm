@@ -26,8 +26,8 @@ scaling with potential as well
 	AutoAnger = 1
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/35,1), "Instinct" = 1, "Flow" = 1, \
-						"LikeWater" = 1 + round(p.Potential/25,1), "Meaty Paws" = round(p.Potential/20,1))
+		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/35,1), "Instinct" = 1, "Flow" = 1, \
+						"LikeWater" = 1 + round(p.Potential/25,1))
 		switch(p.oozaru_type)
 			if("Wrathful")
 				StrMult = 1.4
@@ -64,9 +64,9 @@ scaling with potential as well
 	BuffName = "Wrathful"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/25,1), "DemonicDurability" = round(p.Potential/30,1), \
+		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/25,1),  \
 						"LikeWater" = 2 + round(p.Potential/25,1), "Flicker" = 1, "Pursuer" = 1, "PureDamage" = 0.5, "PureReduction" = 0.5, \
-						"Meaty Paws" = round(p.Potential/20,1), "Instinct" = 2, "Flow" = 2 )
+						 "Instinct" = 2, "Flow" = 2 )
 		switch(p.oozaru_type)
 			if("Wrathful")
 				StrMult = 1.4
@@ -103,7 +103,7 @@ scaling with potential as well
 	BuffName = "Chou Wrathful"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/10,1), "DemonicDurability" = round(p.Potential/50,1), "AngerAdaptiveForce" = round(p.Potential/200), \
+		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/10,1),   \
 						"Powerhouse" = 1 + (p.Potential/75), "Instinct" = 3, "Flow" = 3, "Flicker" = 2, "Pursuer" = 2, "PureDamage" = 1, "PureReduction" = 1)
 		EndMult = 1 + (p.Potential/125)
 		StrMult = 1 + (p.Potential/125)
@@ -128,8 +128,8 @@ scaling with potential as well
 	BuffName = "Full Power Chou Wrathful"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("GiantForm" = 1, "AutoAnger" = 1, "Harden" = round(p.Potential/5,1), "DemonicDurability" = round(p.Potential/25,1), "AngerAdaptiveForce" = round(p.Potential/200), \
-						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 4, "Flow" = 4, "Flicker" = 3, "Pursuer" = 3, "BuffMastery" = 3, "PureDamage" = 1.5, "PureReduction" = 1.5)
+		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/5,1),   \
+						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 4, "Flow" = 4, "Flicker" = 3, "Pursuer" = 3,  "PureDamage" = 1.5, "PureReduction" = 1.5)
 		EndMult = 1 + (p.Potential/100)
 		StrMult = 1 + (p.Potential/100)
 		ForMult = 1 + (p.Potential/100)

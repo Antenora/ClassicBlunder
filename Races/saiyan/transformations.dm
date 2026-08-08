@@ -11,7 +11,7 @@ transformation
 			form_glow_y = -32
 			//Automatically unlocked at 25, intended to be unlocked around 20
 			unlock_potential = 25
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = 1, "SaiyanPower"=1, "SaiyanPower1"=0.4)
+			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = 1,  "SaiyanPower1"=0.4)
 			angerPoint = 75
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
@@ -56,7 +56,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
-					passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower"=1, "SaiyanPower1"=0.5)
+					passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 2, "PureReduction" = 2,  "SaiyanPower1"=0.5)
 					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor)
@@ -459,7 +459,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "PureDamage" = 5, "EnergyGeneration" = 5, "AllOutAttack" = 1, "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 5, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -521,7 +521,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1, "AllOutAttack" = 1, "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -529,11 +529,11 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list("GiantForm" = 1, "Juggernaut" = 1+(mastery/25), "BuffMastery" = 5 + (mastery/10), "SweepingStrike" = 1, "Brutalize" = 3,\
-				"Meaty Paws" = 2 + (mastery/50), "KiControlMastery" = 3 + (mastery/50), "PureReduction" = 5 + (mastery/10),\
-				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1, "AllOutAttack" = 1, "Reversal" = 0.1 + (mastery/200),\
+				passives = list("GiantForm" = 1, "Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
+				 "KiControlMastery" = 3 + (mastery/50), "PureReduction" = 5 + (mastery/10),\
+				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
 				"Flow" = 4, "Instinct" = 4, "Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), "Deicide" = 10,\
-				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 4 + (mastery/10),"SSJ4" = 1,"EndlessNine"=0.25, "SaiyanPower"=1, "SaiyanPower4"=2.5)
+				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 4 + (mastery/10),"SSJ4" = 1,"EndlessNine"=0.25,  "SaiyanPower4"=2.5)
 				autoAnger = 1
 				angerPoint = 99 // funny fix for golden ooz stopping endless anger
 
@@ -617,7 +617,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1, "Brutalize" = 3, "Meaty Paws" = 2, "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1, "AllOutAttack" = 1, "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -626,7 +626,7 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list("BuffMastery" = 2, "SweepingStrike" = 1, "Brutalize" = 3,\
+				passives = list( "SweepingStrike" = 1, \
 				"KiControlMastery" = 4, "PureReduction" = 3, "EnergyGeneration" = 5, \
 				"Flow" = 4, "Instinct" = 4, "Deicide" = 10,\
 				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 3,"EndlessNine"=0.25,"SSJ4LimitBreaker"=1, "SaiyanPower4"=0.5)
@@ -695,8 +695,8 @@ transformation
 				autoAnger = TRUE
 				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4, "Flow" = 4 + round(mastery/25, 1),"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Instinct" = 4,"Pursuer"= 4 , "BackTrack" = 2 + round(mastery/50, 1), \
-								"MovementMastery" = 4+round(mastery/25, 1), "Sunyata" = 1 + round(mastery/20 ,1),"GodlyCalm"=1,\
-								"Flicker" = 4, "PureDamage"=2, "BuffMastery" = 1 + (mastery/25), "SaiyanPower" = 1, "SaiyanPower1"=1)
+								 "Sunyata" = 1 + round(mastery/20 ,1),"CalmAnger"=1,\
+								"Flicker" = 4, "PureDamage"=2,   "SaiyanPower1"=1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -788,7 +788,7 @@ transformation
 
 
 		super_saiyan_blue
-			passives = list("GodKi" = 1, "Instinct" = 4, "Brutalize" = 1)
+			passives = list("GodKi" = 1, "Instinct" = 4)
 			//Parity with SSj4
 			//Intended for 70 potential, autounlocked at 90.
 			unlock_potential = 90
@@ -806,8 +806,8 @@ transformation
 			revertToTrans = 0
 
 			mastery_boons(mob/user)
-				passives = list("GodKi" = 0.75, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 8, "MovementMastery" = 8, \
-								"PureDamage" = 5, "PureReduction" = 4, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1)
+				passives = list("GodKi" = 0.75, "Instinct" = 4,      \
+								"PureDamage" = 5, "PureReduction" = 4, "CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4,  "SaiyanPower1"=1)
 				speedadd = 1.75
 				enduranceadd = 1.75
 				offenseadd = 1.75
@@ -815,8 +815,8 @@ transformation
 				strengthadd = 1.75
 				forceadd = 1.75
 				if(mastery >= 100)
-					passives = list("GodKi" = 1, "Instinct" = 4, "Brutalize" = 3, "Steady" = 5,  "BuffMastery" = 8, "MovementMastery" = 10, \
-									"PureDamage" = 5, "PureReduction" = 4, "InBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4, "SaiyanPower" = 1, "SaiyanPower1"=1)
+					passives = list("GodKi" = 1, "Instinct" = 4,      \
+									"PureDamage" = 5, "PureReduction" = 4, "CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4, "LikeWater"=6,"Flicker"=4,  "SaiyanPower1"=1)
 
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -842,7 +842,7 @@ transformation
 				if(user.CheckSlotless("Beyond God"))
 					user.SlotlessBuffs["Beyond God"].Trigger(user, TRUE)
 				// disable
-				if(!user.passive_handler.Get("GodlyCalm"))
+				if(!user.passive_handler.Get("CalmAnger"))
 					if(mastery<25)
 						user.appearance_flags+=16
 						animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 0.9,1,1), time=5)
@@ -894,7 +894,7 @@ transformation
 				user.transActive = 0
 			//UBuffNeeded
 		super_saiyan_blue_evolved
-			passives = list("GodKi" = 1, "Instinct" = 4, "Brutalize" = 1)
+			passives = list("GodKi" = 1, "Instinct" = 4)
 			//Parity with SSj4 Limit Breaker
 			//Intended to be unlocked around 80
 			//Autounlocks at 100 potential
@@ -908,7 +908,7 @@ transformation
 				mastery = 100 //true end stage for saiyans, mastery would be superfluous
 				// perfected: sustainable version of the form, strict upgrade over blue
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
-					passives = list("GodKi" = 0.25, "Instinct" = 4, "Brutalize" = 3, "Steady" = 1, "MovementMastery" = 2, \
+					passives = list("GodKi" = 0.25, "Instinct" = 4,    \
 									"EnergyGeneration" = 3,  "PureDamage" = 3, "PureReduction" = 2, "LikeWater" = 2, \
 									"BackTrack" = 1 , "StunningStrike" = 2, "Sunyata" = 3, "InBlueEvolved" = 1,"Flow"=4)
 					speedadd = 0.35
@@ -919,7 +919,7 @@ transformation
 					forceadd = 0.35
 				//evolved: high risk high reward. glass cannon stage that drains heavily
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
-					passives = list("GodKi" = 0.5, "Brutalize" = 2, "MovementMastery" = 7, "EnergyLeak" = 3, "FatigueLeak"=1,\
+					passives = list("GodKi" = 0.5,   "EnergyLeak" = 3, "FatigueLeak"=1,\
 							 	"PureDamage" = 9, "PureReduction" = -2,"LikeWater" = 4, \
 								"Sunyata" = 6, "InBlueEvolved" = 1, "Pursuer" = 2)
 					speedadd = 0.5
@@ -928,7 +928,7 @@ transformation
 					forceadd = 0.65
 				//enraged: draw out fights, anger makes user stronger but wounds put a limit on it
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
-					passives = list("GodKi" = 0.25, "Brutalize" = 2, "MovementMastery" = 5, \
+					passives = list("GodKi" = 0.25,   \
 							 	"PureDamage" = 2,"PureReduction" = 5, "LikeWater" = 4, "BleedHit"=0.25, \
 								"Persistence" = 3, "InBlueEvolved" = 1, "UnderDog" = 5, "Flicker" = 3)
 					speedadd = 0.25
@@ -1008,7 +1008,7 @@ transformation
 			autoAnger = 1
 			form_hair_icon = 'Hair_SSJ5.dmi'
 			form_icon_1_icon = 'Hair_SSJ5.dmi'
-			passives = list("The Unstoppable Force" = 1, "The Immovable Object" = 1, "To Govern Strength" = 1)
+			passives = list("SecondWind" = "Unstoppable", "The Immovable Object" = 1, "To Govern Strength" = 1)
 			speed = 4
 			endurance = 4
 			offense = 4

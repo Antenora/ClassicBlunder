@@ -94,11 +94,11 @@ proc/applyNearSighted(mob/target, mob/caster)
 		var/SL = p.SagaLevel
 		passives = list(
 			"Harden"    = 1 + SL,
-			"Steady"    = 1 + SL,
+			
 			"Flow"      = 3 + SL,
 			"FluidForm" = 2.5 + (SL * 0.5),
 			"Flicker"   = 3 + SL,
-			"Pressure"  = 3 + SL,
+			
 			"LikeWater" = 1 + SL
 		)
 		if(SL < 5)

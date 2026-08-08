@@ -35,7 +35,7 @@
 var/list/randomPassives = list("PureDamage", 
 "Godspeed", "Void", "NoWhiff", "HolyMod", "AbyssMod",
 "VenomImmune", "CounterMaster", "TechniqueMastery",
-"HybridStrike", "SpiritStrike", "Extend", "MovementMastery", "UnlimitedPU",
+"Extend",
 "CriticalBlock", "Unstoppable", "DebuffResistance")
 mob/var/futureDiaryLevel = 0 // maxes out at 4.
 mob/var/whichDiary = 0 /// 1, 2, 3, 4 look for above...
@@ -127,7 +127,7 @@ mob/proc/levelUpDiary(mob/M)
 							OffMult = 1.3
 							SpdMult = 1.1
 						if(3)
-							passives = list("MortalStrike" = 1, "MaimStrike" = 2, "Maki" = 1)
+							passives = list(  "Maki" = 1)
 							StrMult = 1.3
 							OffMult = 1
 						if(4)
@@ -142,11 +142,11 @@ mob/proc/levelUpDiary(mob/M)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							DefMult = 1.3
 						if(2)
-							passives = list("KillerInstinct" = 0.5 , "Flow" = 3, "Omnipotent" = 1)
+							passives = list( "Flow" = 3, "Omnipotent" = 1)
 							OffMult = 1.3
 							SpdMult = 1.1
 						if(3)
-							passives = list("MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list(  "Maki" = 1)
 							StrMult = 1.3
 							OffMult = 1
 						if(4)
@@ -164,11 +164,11 @@ mob/proc/levelUpDiary(mob/M)
 							passives += list(getPassivesFutureDiary(usr) = 1)							
 							DefMult = 1.2
 						if(2)
-							passives = list("Desperation" = 1, "KillerInstinct" = 2 , "Flow" = 4, "Omnipotent" = 1)
+							passives = list("Desperation" = 1,  "Flow" = 4, "Omnipotent" = 1)
 							OffMult = 1.4
 							SpdMult = 1.2
 						if(3)
-							passives = list("VoidField" = 2, "MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list("VoidField" = 2,   "Maki" = 1)
 							StrMult = 1.4
 							OffMult = 1
 						if(4)
@@ -187,11 +187,11 @@ mob/proc/levelUpDiary(mob/M)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							DefMult = 1.1
 						if(2)
-							passives = list("GodKi" = 1, "Desperation" = 1, "KillerInstinct" = 3 , "Flow" = 4, "Omnipotent" = 1)
+							passives = list("GodKi" = 1, "Desperation" = 1,  "Flow" = 4, "Omnipotent" = 1)
 							OffMult = 1.6
 							SpdMult = 1.4
 						if(3)
-							passives = list("GodKi" = 1, "DeathField" = 4, "VoidField" = 3, "MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list("GodKi" = 1, "DeathField" = 4, "VoidField" = 3,   "Maki" = 1)
 							StrMult = 1.5
 							OffMult = 1
 						if(4)

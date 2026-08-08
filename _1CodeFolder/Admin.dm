@@ -528,6 +528,11 @@ mob/Admin2/verb
 		for(var/passive in m.passive_handler.passives)
 			if(m.passive_handler.passives[passive])
 				html += "<b>[passive] : [m.passive_handler.passives[passive]]</b><br>"
+		if(m.passive_handler.states && m.passive_handler.states.len)
+			html += "<br><b>Internal state:</b><br>"
+			for(var/skey in m.passive_handler.states)
+				if(m.passive_handler.states[skey])
+					html += "<b>[skey] : [m.passive_handler.states[skey]]</b><br>"
 		usr<<browse(html,"window=[m]'s Passives;size=450x600")
 
 /*	EditPassivesTest1(mob/A in world)

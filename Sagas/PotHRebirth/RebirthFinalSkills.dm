@@ -1,7 +1,7 @@
 /obj/Skills/Buffs/SpecialBuffs
 	SpecialSlot=1
 	Banish_The_ANGELS_HEAVEN
-		passives = list("HolyMod" = 30, "SpiritPower" = 5, "EndlessNine" = 3.85, "Shatter Fate"=1, "MovementMastery"=20)
+		passives = list("HolyMod" = 30, "SpiritPower" = 5, "EndlessNine" = 3.85, "Shatter Fate"=1)
 		ActiveMessage="puts pen to paper, undoing the influence of the Gods."
 		HealthCut=0.9
 		verb/Banish_The_ANGELS_HEAVEN()
@@ -9,7 +9,7 @@
 			src.Trigger(usr)
 		//	if(src.Using)
 	Shatter_The_Glass_Of_Fate
-		passives = list("DisableGodKi" = 1, "Deicide" = 10, "EndlessNine" = 5, "CallousedHands" = 0.5, "Shatter Fate"=1, "MovementMastery"=20)
+		passives = list("DisableGodKi" = 1, "Deicide" = 10, "EndlessNine" = 5,  "Shatter Fate"=1)
 		ActiveMessage="focuses the power to change reality within their axe, as the glass of fate shatters..."
 		HealthCut=0.9
 		verb/Shatter_The_Glass_Of_Fate()
@@ -41,7 +41,7 @@
 		SpecialSlot=0
 		Slotless=1
 		Cooldown=-1
-		passives= list("The Crownless King" = 1, "FatigueLeak" = 3, "ManaLeak" = 3)
+		passives= list( "FatigueLeak" = 3, "ManaLeak" = 3)
 		ActiveMessage="becomes a Legendary Fighter with no equal!<font color=#00FFFF> <b>You feel like you are in for a Bad Time...</b>"
 		verb/All_Hail_The_Crownless_King()
 			set category="Skills"
@@ -54,7 +54,7 @@
 		EndTax=0.1
 		ForTax=0.1
 		ActiveMessage="becomes the personification of defiance itself! <font color=red> <b>Nothing will stand between them and victory!!!</b></font>"
-		passives = list("The Comeback King" = 1)
+		passives = list("SecondWind" = "Comeback")
 		verb/Glory_To_The_King()
 			set category="Skills"
 			set name= "Glory To The King (Final Act)"
@@ -89,7 +89,7 @@ obj/Skills/Buffs/SlotlessBuffs
 		TimerLimit=300
 		HealthDrain = 0.05
 		NeedsHealth=50
-		passives = list("BuffMastery" = 3,"Pursuer" =2, "Godspeed"=2)
+		passives = list("Pursuer" =2, "Godspeed"=2)
 		ActNumber=2
 		verb/The_Blue_Experience()
 			set category="Skills"

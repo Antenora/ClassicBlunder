@@ -4,4 +4,4 @@
         var/desperation = p.passive_handler.Get("Desperation")
         if(desperation<=0)
             desperation = 0.5
-        passives = list("DemonicInfluence" = -demonicInfluence, "HellPower" = demonicInfluence, "AngerAdaptiveForce" = desperation/10)
+        passives = list("DemonicInfluence" = -demonicInfluence, "HellPower" = demonicInfluence)

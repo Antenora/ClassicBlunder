@@ -4,7 +4,6 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory//Caledfwlch
 	pixel_x=-31
 	pixel_y=-30
 	var/caledLight = TRUE
-	passives = list("SpiritSword" = 0.25)
 	Ascended = 6
 	Destructable=0
 	ShatterTier=0
@@ -202,7 +201,7 @@ obj/Skills/Projectile/Weapon_Soul
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Knight_Of_Camelot
 		StyleActive="Knight of Camelot"
-		passives = list("HolyMod" = 0.5, "SpiritSword" = 0.25, "Harden" = 0.5)
+		passives = list("HolyMod" = 0.5,  "Harden" = 0.5)
 		StyleEnd=1.25
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
@@ -210,7 +209,6 @@ obj/Skills/Projectile/Weapon_Soul
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 			passives["HolyMod"] = 1 + (0.5* p.SagaLevel)
-			passives["SpiritSword"] = 0.25*p.SagaLevel
 			passives["Harden"] = 0.25*p.SagaLevel
 		verb/Knight_Of_Camelot()
 			set hidden=1
@@ -228,4 +226,4 @@ obj/Skills/Projectile/Weapon_Soul
 	King_Of_Camelot
 		StrMult=1.3
 		ForMult=1.3
-		passives = list("SpiritFlow" = 1, "Duelist" = 1, "DemonicDurability" = 1)
+		passives = list( "Duelist" = 1)

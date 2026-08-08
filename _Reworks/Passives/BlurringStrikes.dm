@@ -1,5 +1,5 @@
 /mob/proc/GetBlurringStrikes()
-    var/b = passive_handler.Get("BlurringStrikes") //This stores stuff from sources of BlurringStrikes... yay.
+    var/b = 0
     b += scalingEldritchPower();
     b += max(GetMangLevel(), 3)
     b = clamp(b, 0, 15);

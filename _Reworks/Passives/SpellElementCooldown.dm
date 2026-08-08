@@ -13,46 +13,6 @@
 // on a Fire mage stacks to 0.20 (-20% cd on Fire spells), matching the doc
 // spec of "-10% to -20% cd" for a full basic-element vertical. Clamped at
 
-passiveInfo/FireSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Fire spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/WaterSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Water spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/EarthSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Earth spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/AirSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Wind spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/LightSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Light spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/DarkSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Dark spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/TimeSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Time spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
-passiveInfo/SpaceSpellCooldown
-    setLines()
-        lines = list("Reduces the cooldown of every Space spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's base cooldown.");
-
 mob/proc/
     getSpellElementCooldownReduction(element)
         // Returns the cumulative decimal cooldown reduction for spells of the
@@ -66,7 +26,7 @@ mob/proc/
         var/prefix = "[element]"
         if(element == "Wind")
             prefix = "Air"
-        var/key = "[prefix]SpellCooldown"
+        var/key = "[prefix] Magic Mastery"
         var/cumulative = 0
         var/pval = passive_handler.passives[key]
         if(isnum(pval))

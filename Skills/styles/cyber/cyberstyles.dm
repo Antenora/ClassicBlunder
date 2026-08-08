@@ -49,7 +49,7 @@
 		Copyable=0
 		StyleStr=1.30
 		StyleEnd=1.15
-		passives = list("Fa Jin" = 2,"Acupuncture" = 1, "Flow" = 1, "Interception" = 1)
+		passives = list("Fa Jin" = 2, "Flow" = 1, "Interception" = 1)
 		StyleActive="College Ball Style"
 		Finisher="/obj/Skills/Queue/Finisher/Dark_Dragon_Commandment"
 		verb/College_Ball_Style()

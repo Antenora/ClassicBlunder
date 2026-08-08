@@ -6,7 +6,7 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 	Destructable=0
 	ShatterTier=0
 	Ascended=6
-	passives = list("Shearing" = 1, "CursedWounds" = 1, "MortalStrike" = 0.5)
+	passives = list("Shearing" = 1, "CursedWounds" = 1)
 	var/hasKilled = FALSE
 	proc/drawDainsleif(mob/p)
 		hasKilled = FALSE
@@ -54,7 +54,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif
 	name = "Heavenly Regalia: Ruined World"
 	StrMult=1.5
 	OffMult=1.5
-	passives = list("Instinct" = 3, "LifeStealTrue" = 1, "PureDamage" = 1)
+	passives = list("Instinct" = 3, "LifeSteal" = 25, "LifeStealPierce" = 1, "PureDamage" = 1)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="soaks the world in blood: Heavenly Regalia!"
 	OffMessage="'s treasure loses its ruinous luster..."
@@ -158,7 +158,7 @@ obj/Skills/AutoHit/Destined_Death
 		usr.Activate(src)
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
-	passives = list("Maki" = 1,"Steady" = 1,"HardStyle" = 1, "Duelist" = 1, "KillerInstinct" = 0.10, "SuperDash" = 1,)
+	passives = list("Maki" = 1,"HardStyle" = 1, "Duelist" = 1,  "SuperDash" = 1,)
 	TimerLimit=20
 	ManaGlow=rgb(165,0,0)
 	ManaGlowSize=3
@@ -167,7 +167,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Might_of_Dainn
 		StyleActive="Might of Dáinn"
-		passives = list("Duelist" = 1, "Steady" = 1)
+		passives = list("Duelist" = 1)
 		StyleOff=1
 		StyleStr=1.30
 		Finisher="/obj/Skills/Queue/Finisher/Wrath_of_Hogni"
@@ -175,7 +175,6 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 			StyleStr = 1.10 + (0.05 * p.SagaLevel)
 			StyleOff = 1 + (0.05 * p.SagaLevel)
 			passives["Duelist"] = 1 + (0.5* p.SagaLevel)
-			passives["Steady"] = 1+p.SagaLevel
 		verb/Might_of_Dainn()
 			set hidden=1
 			adjust(usr)
@@ -192,7 +191,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
 	Hymn_of_Hjaoningavig
 		StrMult=1.6
-		passives = list("KillerInstinct" = 0.1, "SlayerMod" = 1, "FavoredPrey" = "All", "Duelist" = 2)
+		passives = list( "SlayerMod" = 1, "FavoredPrey" = "All", "Duelist" = 2)
 	Lament_of_Hildr
 		IconLock='SweatDrop.dmi'
 		IconApart=1

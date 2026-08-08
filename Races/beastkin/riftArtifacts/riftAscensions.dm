@@ -17,15 +17,15 @@
     speed = 1;
     offense = 0.5;
 /ascension/sub_ascension/beastkin/rus
-    passives = list("Godspeed" = 1, "ChillResistance" = 1);
+    passives = list("Godspeed" = 1, "ChillResist" = 1);
     speed = 1.5;
 /ascension/sub_ascension/beastkin/mer
-    passives = list("Deflection" = 1, "ControlResist" = 1);
+    passives = list("Deflection" = 1);
     endurance = 0.5;
     speed = 0.5;
     defense = 0.5;
 /ascension/sub_ascension/beastkin/mil
-    passives=list("Unnerve" = 1, "MeleeResist" = 1);
+    passives=list( "MeleeResist" = 1);
     endurance = 1;
     speed = 0.5;
 
@@ -38,24 +38,23 @@
 /ascension/sub_ascension/beastkin/kingsblood
     strength = 0.5
     endurance = 1.5
-    passives = list("CallousedHands" = 0.3, "DemonicDurability"=0.3, "PureReduction" = 2, "Rage" = 2)
+    passives = list(  "PureReduction" = 2, "Rage" = 2)
 /ascension/sub_ascension/beastkin/overreach
     endurance = 1;
     defense = 1;
-    passives = list("PureReduction" = 2, "Steady" = 2, "Unnerve" = 2, "DebuffResistance" = 0.2)
+    passives = list("PureReduction" = 2,   "DebuffResistance" = 0.2)
 /ascension/sub_ascension/beastkin/matchless
     strength = 1;
     endurance = 1;
-    passives = list("TechniqueMastery" = 3, "UnarmedDamage" = 3, "The Way" = 1, "BladeFisting" = 1)
+    passives = list("TechniqueMastery" = 3, "UnarmedDamage" = 3, "SwordAscension" = 6, "BladeFisting" = 1)
 /ascension/sub_ascension/beastkin/wargob
     endurance = 2;
-    passives = list("Restoration" = 1, "Harden" = 4, "DemonicDurability" = 0.5, "LifeGeneration" = 3)
+    passives = list( "Harden" = 4,  "LifeGeneration" = 3)
 /ascension/sub_ascension/beastkin/triad
     strength = 0.5;
     speed = 0.5;
     endurance = 0.5;
     force = 0.5;
-    passives = list("SpiritSword" = 0.5, "SpiritHand" = 1, "SpiritFlow" = 1, "BlurringStrikes" = 1, "CallousedHands" = 0.1)
 /ascension/sub_ascension/beastkin/firstlight
     strength = 0.75;
     endurance = 0.75;
@@ -65,7 +64,7 @@
     strength = 0.75;
     offense = 0.75;
     endurance = 0.5;
-    passives = list("PureDamage" = 2, "Fury" = 2, "Brutalize"=2, "Extend"=2, "SwordDamage"=2)
+    passives = list("PureDamage" = 2, "Fury" = 2,  "Extend"=2, "Sword Mastery"=2)
 /ascension/sub_ascension/beastkin/phantomflicker
     strength = 1.25;
     offense = 0.375;
@@ -73,15 +72,15 @@
     passives = list("AttackSpeed" = 3, "Iaijutsu" = 3, "DoubleStrike" = 1, "SoulSteal" = 0.1)
 /ascension/sub_ascension/beastkin/deadlight
     strength = 2;
-    passives = list("TechniqueMastery" = 3, "Void" = 1, "Brutalize" = 2, "HardStyle" = 2)
+    passives = list("TechniqueMastery" = 3, "Void" = 1,  "HardStyle" = 2)
 /ascension/sub_ascension/beastkin/demonsong
     strength = 1.5;
     speed = 0.5;
-    passives = list("SpiritHand" = 2, "SpiritFlow" = 2, "GiantSwings" = 1, "LifeSteal" = 10)
+    passives = list(  "SweepingStrike" = 1, "LifeSteal" = 10)
 /ascension/sub_ascension/beastkin/worldwhisper
     endurance = 1;
     defense = 1;
-    passives = list("Freezing" = 2, "Paralyzing" = 2, "IceHerald" = 1, "ThunderHerald" = 1)
+    passives = list("Freezing" = 2, "Paralyzing" = 2,  "ThunderHerald" = 1)
 /ascension/sub_ascension/beastkin/godword
     force = 0.5;
     offense = 0.5;

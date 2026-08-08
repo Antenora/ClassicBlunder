@@ -37,9 +37,8 @@
     adjust(mob/p)
         TooMuchHealth = 35
         TimerLimit = 10 + (glob.racials.UNDYINGRAGE_DURATION * (p.AscensionsAcquired))
-        var/wT = 1.5 - p.passive_handler["Wrathful Tenacity"]
         passives = list("Undying Rage" = 1, "Fury" = 1 + p.AscensionsAcquired, "Godspeed" = 3, "Relentlessness" = 1, "ShearImmunity" = 1, "Adrenaline" = 3, "LifeSteal" = 50 + (25 * p.AscensionsAcquired), \
-                        "Enrage" = p.AscensionsAcquired, "Rage" = p.AscensionsAcquired, "Wrathful Tenacity" = wT) // 150% of str as end
+                         "Rage" = p.AscensionsAcquired)
     Trigger(mob/User, Override)
         . = ..()
         if(!User.BuffOn(src))
@@ -170,8 +169,7 @@
         ElementalDefense = "Dark"
         NeedsHealth = 50 + (5*asc);
         TooMuchHealth = min(95, 75 + (5*asc));
-        passives = list("PhysPleroma" = asc/2, "AbyssMod" = asc/2, "HellPower" = asc/6, "HellRisen" = asc/4, "Shadowbringer" = 1, "FrenzyCarrier" = 1,\
-        "Wrathful Tenacity" = (0.1*asc))
+        passives = list( "AbyssMod" = asc/2, "HellPower" = asc/6, "HellRisen" = asc/4,  "FrenzyCarrier" = 1)
     Trigger(mob/User, Override = FALSE)
         if(!User.BuffOn(src)) adjust(User)
         ..()
@@ -185,8 +183,8 @@
         strAdd = 0.15 * asc
         ElementalOffense = "Fire"
         ElementalDefense = "Fire"
-        passives = list("Scorching" = (clamp(asc*0.5, 1, 3)) , "SoulFire" = asc, "HybridStrike" = asc / 2, \
-                        "Steady" = asc + 1, "PureDamage" = asc + 1)
+        passives = list("Scorching" = (clamp(asc*0.5, 1, 3)) , "SoulFire" = asc,  \
+                         "PureDamage" = asc + 1)
     Trigger(mob/User, Override = FALSE)
         if(!User.BuffOn(src)) adjust(User)
         ..()

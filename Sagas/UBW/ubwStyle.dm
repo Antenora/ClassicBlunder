@@ -3,7 +3,7 @@
     Copyable = 0
     SagaSignature = 1
     StyleActive = "Sword Savant"
-    passives = list("BladeFisting" = 1, "SwordDamage" = 1, "NeedsSword" = 0)
+    passives = list("BladeFisting" = 1, "Sword Mastery" = 1, "NeedsSword" = 0)
     NeedsSword = 0
     Mastery = 4
     StyleStr = 1.15
@@ -13,7 +13,7 @@
     Cooldown = 0
     Finisher="/obj/Skills/Queue/Finisher/UBW_finisher"
     adjust(mob/p)
-        passives = list("BladeFisting" = 1, "SwordDamage" = 1, "NeedsSword" = 0, "Sword Master" = 1)
+        passives = list("BladeFisting" = 1, "Sword Mastery" = 1, "NeedsSword" = 0, "Sword Master" = 1)
     proc/swap_stance(version, sagaLevel)
         switch(version)
             if("Striking")
@@ -98,7 +98,7 @@
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sword_Flow
-    passives = list("ManaGeneration" = 5, "Brutalize" = 1.5, "Flow" = 1, "Instinct" = 1, "Warping" = 4)
+    passives = list("ManaGeneration" = 5,  "Flow" = 1, "Instinct" = 1, "Warping" = 4)
     Warping=4
     TimerLimit=45
     ActiveMessage="is in the flow of battle!"

@@ -13,7 +13,7 @@
     . += HasGiantForm() * 1.25
     . += getLegendPMult()
     . += passive_handler.Get("HeavyHitter")
-    . += 1 + passive_handler.Get("KBMult")
+    . += 1
     var/zanzibarbreeze =  . 
     . = zanzibarbreeze/glob.KBMODDIVIDER
     if(. > glob.MAX_KB_MULT)
@@ -30,7 +30,6 @@
         if(!defender.passive_handler)
             return 1
         var/mod = ( ((defender.HasGiantForm() * 0.15) + (defender.HasMythical() * 0.5) + (defender.passive_handler.Get("Juggernaut") * 0.05)) )
-        mod += clamp(defender.passive_handler.Get("KBRes") * 0.1, 0, 1)
         var/res = 1 - mod
         if(res < glob.MAX_KB_RES)
             res = glob.MAX_KB_RES

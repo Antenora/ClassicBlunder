@@ -36,9 +36,9 @@ mob
 
 		is_dashing = 0
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Feather Knife")
-			src.passive_handler.passives["Extra Secret Knives"] = "Feathers"
+			src.passive_handler.Set("Extra Secret Knives", "Feathers")
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Fox Fire")
-			src.passive_handler.passives["Heavy Strike"] = "Fox Fire"
+			src.passive_handler.Set("Heavy Strike", "Fox Fire")
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Monkey King")
 			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall/)
 			if(!s.Using)

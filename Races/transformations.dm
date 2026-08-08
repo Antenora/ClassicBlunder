@@ -379,7 +379,7 @@ transformation
 			if(drain>0)
 				user.LoseEnergy(drain)
 
-				if(user.Energy < cut_off &&!user.HasNoRevert()&&!user.Dead&&!user.HasMystic())
+				if(user.Energy < cut_off &&!user.Dead&&!user.HasMystic())
 					user.Revert()
 					user.LoseEnergy(30)
 					user << "The strain of [src] is too much for you to handle!"

@@ -17,12 +17,11 @@
 		IconLock='SweatDrop.dmi'
 		StrMult=1.3
 		EndMult=1.3
-		passives = list("CallousedHands"=0.25, "Harden"=3, "Speed Force" = 2, "BlurringStrikes"=2)
+		passives = list( "Harden"=3, "Speed Force" = 2)
 	Boss_Monster_Form
 		IconLock='SweatDrop.dmi'
 		StrMult=1.3
 		ForMult=1.3
-		passives = list("SpiritFlow"=1, "SpiritSword"=1, "ManaStats" = 1)
 
 
 

@@ -6,7 +6,7 @@ ascension
 				switch(owner.Class)//These are jsut concepts right now. Numbers will be adjusted by staff before implimented.
 
 					if("Pixie")
-						var/newpassives = list("SpiritFlow" = 1, "Adrenaline" = 1, "Siphon" = 1)
+						var/newpassives = list( "Adrenaline" = 1, "Siphon" = 1)
 						passives+= newpassives
 						speed = 0.25
 						force = 0.5
@@ -55,7 +55,7 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Class)
 					if("Pixie")
-						var/newpassives = list("SpiritStrike" = 1, "Adrenaline" = 1, "Siphon" = 1)
+						var/newpassives = list( "Adrenaline" = 1, "Siphon" = 1)
 						passives+= newpassives
 						speed = 0.75
 						force = 0.75
@@ -101,7 +101,7 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Class)
 					if("Pixie")
-						var/newpassives = list("MovingCast" = 1, "Adrenaline" = 1, "Siphon" = 1)
+						var/newpassives = list( "Adrenaline" = 1, "Siphon" = 1)
 						passives+= newpassives
 						speed = 0.75
 						force = 0.75

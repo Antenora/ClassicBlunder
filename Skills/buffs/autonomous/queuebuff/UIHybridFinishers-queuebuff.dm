@@ -29,7 +29,7 @@
 		OffMult = 1.2
 		SpdMult = 1.15
 		DefMult = 1.1
-		passives = list("SpiritFlow" = 2, "Amplify" = 1.5, "LikeWater" = 2, "Flow" = 2, "ManaStats" = 1, "Momentum" = 1, "TensionLock" = 1)
+		passives = list( "Amplify" = 1.5, "LikeWater" = 2, "Flow" = 2,  "Momentum" = 1, "TensionLock" = 1)
 		ActiveMessage = "enters a prismatic trance, channeling balanced elemental instinct!"
 		OffMessage = "lets the mirrored lights fade into stillness."
 
@@ -40,7 +40,7 @@
 		SpdMult = 1.15
 		DefMult = 1.15
 		EndMult = 1.1
-		passives = list("Flow" = 2, "LikeWater" = 2, "Pressure" = 1.5, "Momentum" = 2, "Interception" = 2, "CounterMaster" = 2, "Deflection" = 1, "Reversal" = 1, "TensionLock" = 1)
+		passives = list("Flow" = 2, "LikeWater" = 2,  "Momentum" = 2, "Interception" = 2, "CounterMaster" = 2, "Deflection" = 1, "Reversal" = 1, "TensionLock" = 1)
 		ActiveMessage = "enters total stillness - every strike guided by perfect awareness."
 		OffMessage = "lets go of their centered calm."
 

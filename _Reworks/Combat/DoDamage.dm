@@ -83,7 +83,7 @@
 	log2text("Damage", val,"damageDebugs.txt", "[src.ckey]/[src.name]")
 	#endif
 	var/preCrit = val
-	if((unarmed || sword) || (spiritAtk && !autohit && passive_handler["IceHerald"]) || (autohit && passive_handler["DemonicInfusion"]) || (autohit && passive_handler["CriticalChance"]) || (spiritAtk && passive_handler["CriticalChance"]) || DenkoSekkaCharged)
+	if((unarmed || sword) || (autohit && passive_handler["DemonicInfusion"]) || (autohit && passive_handler["CriticalChance"]) || (spiritAtk && passive_handler["CriticalChance"]) || DenkoSekkaCharged)
 		val = getCritAndBlock(defender, val)
 		if(val > preCrit)
 			if(passive_handler["Wuju"] == 1)
@@ -301,11 +301,6 @@
 	#endif
 	val = calculateTrueMult(trueMult, val)
 
-	if(passive_handler.Get("Ruckus"))
-		if(defender.race.name == passive_handler.Get("RuckusRace")) // this should technically work
-			val *= 1 + (0.1 * passive_handler.Get("Ruckus"))
-		else
-			val *= 1 - (0.05 * passive_handler.Get("Ruckus"))
 
 	if(passive_handler.Get("Undying Rage"))
 		val*=0.1

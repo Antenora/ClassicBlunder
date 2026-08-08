@@ -1038,7 +1038,7 @@ mob
 							if(src.RebirthHeroType=="Purple")
 								src<<"<font color='#9BFD4D'><b>I see a story hidden in your eyes.</font></b>" //i literally extracted the mod files for gerson's rude buster to make sure this color was as accurate as possible. praise me.
 								src<<"<font color='#9BFD4D'><b>Burnin' bright...</font></b>"
-								src.passive_handler.Increase("HolyMod" = 3)
+								src.passive_handler.Increase("HolyMod", 3)
 								src.AddSkill(new/obj/Skills/Projectile/Burning_Black)
 								src<<"<font color='#9BFD4D'><b>Burnin' black...</font></b>"
 								src.AddSkill(new/obj/Skills/AutoHit/Burning_Up_Everything)
@@ -1222,7 +1222,6 @@ mob
 								if("Strong")
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WillofAlaya)
 								if("Firm")
-									passive_handler.Increase("SpiritFlow",0.5)
 									passive_handler.Increase("DeathField", 2)
 									passive_handler.Increase("VoidField", 2)
 
@@ -1889,8 +1888,6 @@ mob/Admin3/verb
 			P.passive_handler["Pursuer"] = 0
 			P.passive_handler["Godspeed"] = 0
 			P.passive_handler["AttackSpeed"] = 0
-			P.passive_handler["Brutalize"] = 0
-			P.passive_handler["MovementMastery"] = 0
 			P.passive_handler["TechniqueMastery"] = 0
 			P.passive_handler["AsuraStrike"] = 0
 			P.passive_handler["FavoredPrey"] = null;

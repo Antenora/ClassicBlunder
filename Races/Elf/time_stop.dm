@@ -3,7 +3,7 @@
 	var/tmp/mob/owner = null
 	var/TriggerMessage = "Fall."
 	Mastery = 1
-	passives = list("CoolerAfterImages" = 4, "Godspeed" = 4, "Adrenaline" = 4,"LimitBroken" = 1) // make sure u go fast
+	passives = list("AfterImages" = 4, "AfterImageSkin" = "Cooler", "Godspeed" = 4, "Adrenaline" = 4,"LimitBroken" = 1)
 	Cooldown=-1
 	proc/applyTimeEffect(mob/p)
 		var/asc = p.AscensionsAcquired

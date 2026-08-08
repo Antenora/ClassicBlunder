@@ -13,10 +13,10 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 			"PureReduction"  = 1 + SL,
 			"Persistence"    = 1 + SL,
 			"NoDodge"        = 1,
-			"KillerInstinct" = 0.15 + (0.1 * SL),
+			
 			"Instinct"       = 1 + SL,
-			"ManaStats"      = 1 + SL,
-			"Pressure"       = 1 + SL,
+			
+			
 			"ManaLeak"       = 4,
 			"ZenkaiPower"    = 0.15
 		)
@@ -82,8 +82,8 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 			"Persistence"   = 1 + (SL/2),
 			"BulletKill"    = 1,
 			"NoDodge"       = 1,
-			"Brutalize"     = 0.5 + (0.5 * SL),
-			"Zornhau"       = 1 + SL,
+			
+			
 			"Inevitable"    = 1 + SL,
 			"Instinct"      = 1 + SL,
 			"UnderDog"      = 1 + (SL*1.25),
@@ -228,12 +228,12 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		passives = list(
 			"Duelist"           = 0.5 + (SL * 1.5),
 			"Persistence"       = 3 + (SL/2),
-			"PridefulRage"      = 1,
+			
 			"BulletKill"        = 1,
 			"NoDodge"           = 1,
 			"Half-Sword"        = 1 + SL,
 			"Instinct"          = 1 + SL,
-			"DemonicDurability" = 1 + SL,
+			
 			"HellRisen"         = 0.25 + (0.25 * SL),
 			"Juggernaut"        = 1 + SL,
 			"UnderDog"          = 1 + (SL*2),

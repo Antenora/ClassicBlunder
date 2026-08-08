@@ -1,7 +1,7 @@
 
 sagaInfo/courage
 	choicesPaths = list("1" = list("Endless Evolution", "Bright Bravery", "Divine Destiny"))
-	perLevelPassives = list("Deus Ex Machina" = 5, "Willpower" = 5) // dxm is how much u have, can be consumed from using abilities, willpwoer is the battery
+	perLevelPassives = list("Deus Ex Machina" = 5)
 	skillsPerTier = list()
 
 sagaInfo/courage/Endless_Evolution

@@ -118,7 +118,7 @@
 	The_Other_Promise
 		OffMult=1.35
 		SpdMult=1.35
-		passives = list("SwordAscension" = 1, "Flicker" = 3, "Brutalize" = 1, "Instinct" = 2)
+		passives = list("SwordAscension" = 1, "Flicker" = 3,  "Instinct" = 2)
 		verb/The_Other_Promise()
 			set category="Skills"
 			src.Trigger(usr)

@@ -371,13 +371,6 @@ mob
 							implodeDebuff(combThresh * combMult, "Burn")
 
 
-			if(Attacker)
-				if(Attacker.passive_handler["FireHerald"] && src.Burn >= 100)
-					implodeDebuff(100, "Burn")
-					for(var/mob/Players/P in range(2, src))
-						if(P != src && P != Attacker)
-							P.AddBurn(25)
-
 			if(src.Burn>100)
 				src.Burn=100
 			if(src.SilentBurnAmount > src.Burn)
@@ -444,8 +437,6 @@ mob
 			if(Attacker)
 				if(Attacker.passive_handler["IceAge"] && Slow >= Attacker.passive_handler["IceAge"])
 					implodeDebuff(Attacker.passive_handler["IceAge"], "Chill")
-				if(Attacker.passive_handler["IceHerald"] && src.Slow >= 100)
-					implodeDebuff(100, "Chill")
 			if(src.Slow>100)
 				src.Slow=100
 			if(src.Slow<0)
@@ -502,8 +493,6 @@ mob
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Sprayed+=100
 		AddShock(var/Value, var/mob/Attacker=null)
-			if(src.HasShockImmunity())
-				return
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/air/ShockMastery))
@@ -550,7 +539,6 @@ mob
 
 			if(Attunement=="Poison")
 				Value/=2
-			Value /= 1+passive_handler.Get("VenomResistance")
 			Value = Value*(1-(src.Poison/glob.DEBUFF_STACK_RESISTANCE))
 			src.Poison+=Value
 
@@ -638,10 +626,14 @@ mob
 		AddAttracting(var/Value, var/mob/m)
 			if(src.Stasis)
 				return
+			if(world.time < src.AttractingCooldown)
+				return
 			src.Attracted+=Value
 			src.AttractedTo=m
-			if(src.Attracted>100)
-				src.Attracted=100
+			if(src.Attracted>=100)
+				src.Attracted=0
+				src.AttractingCooldown = world.time + glob.ATTRACTING_CHARM_CD
+				src.applyCharmed(m, 5)
 		AddTerrifying(var/Value, var/mob/m)
 			if(src.Stasis)
 				return

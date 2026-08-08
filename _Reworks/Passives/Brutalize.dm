@@ -1,7 +1,6 @@
 /mob/proc/GetBrutalize()
     if(ButouActive) return 0.9
-    var/b = passive_handler.Get("Brutalize") //This stores stuff from sources of brutalize... yay.
-    if(!b) return 0
+    var/b = 0
     b += GetMangLevel()*0.5
     b += (scalingEldritchPower()*0.5);
     var/raw = b / 10 //legacy scaling

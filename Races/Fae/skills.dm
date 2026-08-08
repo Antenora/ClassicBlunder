@@ -21,8 +21,8 @@
 				NeedsHealth = 50 + (5 * asc)
 				TooMuchHealth = 65 + (5 * asc)
 				spdAdd = 0.15 * asc
-				passives = list("ManaStats" = (1+(asc/2)), "Innovation" = 1, "BlurringStrikes" = (0.5+(asc/4)), "Brutalize" = (0.5*(asc+1)),\
-								"SpiritHand" = (2*(asc+1)), "SpiritSword" = (0.5*(asc+1)), "Afterimages" = 1)
+				passives = list( "Innovation" = 1,  \
+								  "AfterImages" = 1)
 			Trigger(mob/User, Override = FALSE)
 				if(!User.BuffOn(src))
 					adjust(User)
@@ -41,8 +41,8 @@
 				NeedsHealth = 50 + (5 * asc)
 				TooMuchHealth = 65 + (5 * asc)
 				forAdd = 0.15 * asc
-				passives = list("ManaStats" = (1+(asc/2)), "Innovation" = 1, "DebuffResistance" = (0.2*(asc+1)), "Blubber" = (0.75*(asc+1)),\
-								"FluidForm" = (1+(0.75*asc)), "Afterimages" = 1) //Pixies are supposed to be annoying to put down once they go into Mania.
+				passives = list( "Innovation" = 1, "DebuffResistance" = (0.2*(asc+1)), "Blubber" = (0.75*(asc+1)),\
+								"FluidForm" = (1+(0.75*asc)), "AfterImages" = 1)
 			Trigger(mob/User, Override = FALSE)
 				if(!User.BuffOn(src))
 					adjust(User)

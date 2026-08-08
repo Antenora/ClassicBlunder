@@ -78,12 +78,12 @@
 		var/asc = p.AscensionsAcquired
 		if(p.usingStyle("UnarmedStyle"))
 			MakesSword = 0
-			passives = list("SpiritHand" = (1 + (asc/2)) / 2, "MartialMagic" = 1, "BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list( "MartialMagic" = 1, "BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			ElementalOffense = "Fire"
 			BurnAffected=5 * asc
 			IconLock = saved_icon
 		else
-			passives = list("SpiritSword" = (1 + (asc/2)) / 2, "MagicSword" = 1, "BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list( "MagicSword" = 1, "BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			SwordAscension = asc
 			SwordAscensionSecond = asc
 			SwordAscensionThird = asc
@@ -153,7 +153,7 @@
 		passives = list(
 			"PureDamage"    =  N,
 			"PureReduction" =  N,
-			"Steady"        =  2 * N,
+			
 			"Inevitable"    =  N
 		)
 		if(!mastered)
@@ -167,7 +167,6 @@
 		if(N >= 5)
 			passives["FatigueImmune"]  = 1
 			passives["DebuffReversal"] = 1
-			passives["Brutalize"]      = 6
 			if(!mastered)
 				passives["NoDodge"] = 1
 

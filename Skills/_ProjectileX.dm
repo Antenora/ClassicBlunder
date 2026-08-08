@@ -4934,16 +4934,6 @@ mob
 					src<<"You lack the required party member to use this."
 					return
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
-				// find people in a zone, if the person in the zone has counterspell up and is not in the party, then return and go on cooldown
-				for(var/mob/x in orange(5, src))
-					if(x in party)
-						continue
-					if(x.client)
-						if(x.passive_handler.Get("CounterSpell"))
-							if(x.Target==src)
-								src << "Your [Z] was countered!"
-								Z.Cooldown()
-								return 0
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
 					src << "You lack the ability to use magic!"
 					return
@@ -5004,7 +4994,7 @@ mob
 							if(src.TotalFatigue+Z.FatigueCost>99)
 								return 0
 						if(Z.ManaCost && !src.HasDrainlessMana())
-							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							var/drain = Z.ManaCost
 							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
@@ -5351,7 +5341,6 @@ mob
 							if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5)
 								src.UseProjectile(Z)
 							continue
-						src.BeamTurnDir()
 						if(v2)
 							; //the datum grows itself; the pour spawns nothing
 						else if(fire_directions && fire_directions.len)
@@ -5378,7 +5367,7 @@ mob
 						var/drain = passive_handler["Drained"] ? Z.EnergyCost * (1 + passive_handler["Drained"]/10) : Z.EnergyCost
 						src.LoseEnergy((drain)/Drain)
 					if(Z.ManaCost)
-						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						var/drain = Z.ManaCost
 						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
@@ -5440,7 +5429,7 @@ mob
 								src.LoseEnergy(drain/10/Drain)
 							if(Z.ManaCost)
 								if(Z.ManaCost)
-									var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+									var/drain = Z.ManaCost
 									drain *= src.ChakraCostMult(Z)
 									if(drain <= 0)
 										drain = 0.5
@@ -5506,7 +5495,7 @@ mob
 					if(Z.FatigueCost)
 						src.GainFatigue(Z.FatigueCost/Drain)
 					if(Z.ManaCost)
-						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						var/drain = Z.ManaCost
 						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
@@ -5550,7 +5539,7 @@ mob
 						if(Z.FatigueCost)
 							src.GainFatigue(Z.FatigueCost/Drain)
 						if(Z.ManaCost)
-							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							var/drain = Z.ManaCost
 							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
@@ -6064,20 +6053,6 @@ obj
 						if(itemMods[2]>0)
 							accmult *= itemMods[2]
 						if(!a:Stasis)
-							var/mob/p = a
-							if(p.passive_handler["Neo"]&&!p.HasNoDodge()&&src.Dodgeable>0)
-								var/dir=get_dir(src,a)
-								if(prob(p.passive_handler["Neo"]*glob.NEO_DODGERATE))
-									if(!UsesPixelCollision)
-										src.loc = a.loc
-									StunClear(a)
-									AfterImageStrike(a, src.Owner)
-									if(src.Homing)
-										src.dir=dir
-										src.Homing=0
-										if(src.Area!="Beam")
-											src.Backfire=1
-									return
 							if(m.HasFlow()&&!m.HasNoDodge()&&src.Dodgeable>0)
 								if(prob(getFlowCalc(Owner, m )) )
 									var/dir=get_dir(src,a)
@@ -6265,10 +6240,6 @@ obj
 							atk += str
 						if(SpellElement)
 							//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the projectile is a spell (SpellElement is set).
-							atk += Owner.getPowerfulCastingBonus()
-							atk += Owner.getForcefulCastingBonus()
-							atk += Owner.getAgileCastingBonus()
-							atk += Owner.getStalwartCastingBonus()
 							//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
 							//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
 							var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
@@ -7041,9 +7012,6 @@ obj
 
 mob
 	proc
-		BeamTurnDir()
-			return
-
 		BeamCharge(var/obj/Skills/Projectile/Z)
 			set waitfor=0
 			src.BeamFiringVolley=0

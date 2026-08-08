@@ -11,7 +11,7 @@
 			"Extend"         = 1.25 + (0.25 * SL),
 			"SweepingStrike" = 1,
 			"Instinct"       = 1 + SL,
-			"PhysPleroma"    = 0.5 + (0.5 * SL),
+			
 			"Fury"           = 0.5 + (0.5 * SL),
 			"Momentum"       = 0.5 + (0.5 * SL),
 		)
@@ -68,7 +68,7 @@
 			"Extend"         = 1.25 + (0.25 * SL),
 			"SweepingStrike" = 1,
 			"Instinct"       = 1 + SL,
-			"PhysPleroma"    = 0.5 + (0.5 * SL),
+			
 			"Fury"           = 0.5 + (0.5 * SL),
 			"Momentum"       = 0.5 + (0.5 * SL),
 			"Harden"         = 1.5 + (0.5 * SL),

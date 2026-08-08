@@ -152,14 +152,14 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			desc = "A sword so light that its blade is almost impossible to keep up with."
 			icon = 'Lol_Sword_reg.dmi'
 			Class = "Light"
-			passives = list("Warping" = 1, "BlurringStrikes" = 1)
+			passives = list("Warping" = 1)
 			spdAdd=1
 			strAdd=1
 			DamageEffectiveness = 1.025
 			AccuracyEffectiveness = 0.9
 			SpeedEffectiveness = 1.25
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Warping" = (User.Potential / 25), "BlurringStrikes" = 1 + (User.Potential / 25))
+				src.passives = list("Warping" = (User.Potential / 25))
 				..()
 		Light_Celestial_Blade_II
 			name = "Aurelius"
@@ -203,12 +203,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			strAdd=1
 			offAdd=0.5
 			defAdd=0.5
-			passives = list("Half-Sword" = 1, "Zornhau" = 1)
+			passives = list("Half-Sword" = 1)
 			DamageEffectiveness = 1.05
 			AccuracyEffectiveness = 0.875
 			SpeedEffectiveness = 1
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Half-Sword" = 1 + (User.Potential / 50), "Zornhau" = 1 + (User.Potential / 50))
+				src.passives = list("Half-Sword" = 1 + (User.Potential / 50))
 				..()
 		Medium_Celestial_Blade_II
 			name = "Soulkeeper"
@@ -217,12 +217,10 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			Class = "Medium"
 			strAdd=1
 			forAdd=1
-			passives = list("SpiritSword" = 1, "HybridStrike" = 1)
 			DamageEffectiveness = 1.05
 			AccuracyEffectiveness = 0.875
 			SpeedEffectiveness = 1
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("SpiritSword" = (User.Potential / 50), "HybridStrike" = 1 + (User.Potential/50))
 				..()
 		Medium_Celestial_Blade_III
 			name = "Pillar of Dawn"
@@ -231,12 +229,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			Class = "Medium"
 			strAdd=1
 			endAdd=1
-			passives = list("Steady" = 1, "Momentum" = 1)
+			passives = list( "Momentum" = 1)
 			DamageEffectiveness = 1.05
 			AccuracyEffectiveness = 0.875
 			SpeedEffectiveness = 1
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Steady" = (User.Potential / 10), "Momentum" = 1 + (User.Potential / 25))
+				src.passives = list( "Momentum" = 1 + (User.Potential / 25))
 				..()
 
 // =============================================
@@ -277,12 +275,10 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			icon = 'Ragnarok Blade Forme.dmi'
 			Class = "Heavy"
 			strAdd = 2
-			passives = list("Brutalize" = 1, "KillerInstinct" = 0.1)
 			DamageEffectiveness = 1.1
 			AccuracyEffectiveness = 0.8
 			SpeedEffectiveness = 0.8
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Brutalize" = 1 + (User.Potential / 25), "KillerInstinct" = 0.1 + (User.Potential / 110))
 				..()
 
 // =============================================
@@ -344,12 +340,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			forAdd = 1
 			offAdd = 0.5
 			defAdd = 0.5
-			passives = list("ManaStats" = 1, "ManaCapMult" = 0.1)
+			passives = list( "ManaCapMult" = 0.1)
 			DamageEffectiveness = 0.95
 			AccuracyEffectiveness = 1.2
 			SpeedEffectiveness = 1.2
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("ManaStats" = (User.Potential / 10), "ManaCapMult" = (User.Potential / 10))
+				src.passives = list( "ManaCapMult" = (User.Potential / 10))
 				..()
 		Celestial_Wand_III
 			name = "Ember of Elysium"
@@ -379,12 +375,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			forAdd = 1
 			endAdd = 0.5
 			spdAdd = 0.5
-			passives = list("SpiritFlow" = 1, "MovingCharge" = 1)
+			passives = list( "MovingCharge" = 1)
 			DamageEffectiveness = 1
 			AccuracyEffectiveness = 1
 			SpeedEffectiveness = 0.85
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("SpiritFlow" = 1 + (User.Potential / 25), "MovingCharge" = 1)
+				src.passives = list( "MovingCharge" = 1)
 				..()
 		Celestial_Rod_II
 			name = "Siphon of Aethon"
@@ -440,12 +436,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			icon = 'MHLS.dmi'
 			Class = "Staff"
 			forAdd = 2
-			passives = list("IceHerald" = 1, "Chilling" = 4, "IceAge" = 30)
+			passives = list( "Chilling" = 4, "IceAge" = 30)
 			DamageEffectiveness = 1.1
 			AccuracyEffectiveness = 0.85
 			SpeedEffectiveness = 0.65
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("IceHerald" = 1, "Chilling" = 1 + (User.Potential / 20), "IceAge" = 30 + (User.Potential / 5))
+				src.passives = list( "Chilling" = 1 + (User.Potential / 20), "IceAge" = 30 + (User.Potential / 5))
 				..()
 		Celestial_Staff_III
 			name = "Pact of the Exalted"

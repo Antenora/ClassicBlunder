@@ -38,7 +38,7 @@ race
 			if(user.Class=="Warrior")
 				passives = list("TechniqueMastery" = 1, "Tenacity" = 1, "Pursuer" = 1)
 			if(user.Class=="Demon")
-				passives = list("SpiritSword" = 0.25, "TechniqueMastery" = 1, "SpiritFlow" = 0.25, "Maki" = 1)
+				passives = list( "TechniqueMastery" = 1,  "Maki" = 1)
 			for(var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r in user)
 				r.RegenerateLimbs=1
 			user.passive_handler.increaseList(passives)

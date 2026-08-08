@@ -20,7 +20,6 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"BladeFisting"   = 1, //Isshin has been shown to be just as talented, if not more so with Hand-to-hand as he is with a sword.
-			"HybridStrike"   = 0.5 + (SL/2), //Sword on fire, should be self explanatory why it gets this.
 			"Scorching"      = 2 * SL, // Fire sword burns you when it touches you, who would've thought.
 			"Combustion"     = 7.5 * SL, // BOOM.
 			"CriticalChance" = 5 * SL, // Exists to proc DemonicInfusion. This release does not get bonus crit damage.
@@ -86,7 +85,6 @@
 			HealthThreshold = 0
 		passives = list(
 			"BladeFisting"    = 1, //Isshin has been shown to be just as talented, if not more so with Hand-to-hand as he is with a sword.
-			"HybridStrike"    = 1.5 + (SL/2), //Sword on fire, should be self explanatory why it gets this.
 			"Scorching"       = 4 * SL, // Fire sword burns you when it touches you, who would've thought.
 			"Combustion"      = 10 + (10 * SL), // BOOM.
 			"CriticalChance"  = 10 * SL, // Exists as a Proc for Demonic Infusion. This release does not get bonus crit damage.

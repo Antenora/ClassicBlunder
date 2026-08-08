@@ -142,7 +142,7 @@
             projectileOnlyPassives = list("Distance" = 8)
         flashfreeze
             name="Flashfreeze"
-            passives = list("Freezing" = 6, "ApplySlow" = 1)
+            passives = list("Freezing" = 6)
             autohitOnlyPassives = list("Chilling" = 3)
             projectileOnlyPassives = list("Chilling" = 3)
         sublimate//phase transition

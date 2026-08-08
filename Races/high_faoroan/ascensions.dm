@@ -8,7 +8,7 @@ ascension
 			offense = 0.25
 			defense = 0.25
 			speed = 0.25
-			passives = list("ManaCapMult" = 0.25, "Deicide" = 1, "Xenobiology" = 1, "SpiritFlow" = 1)
+			passives = list("ManaCapMult" = 0.25, "Deicide" = 1, "Xenobiology" = 1)
 			choices = list("Distort" = /ascension/sub_ascension/high_faoroan/distort, "Define" = /ascension/sub_ascension/high_faoroan/define)
 			skills = list(/obj/Skills/Buffs/SlotlessBuffs/Elf/God_Slicer)
 		two
@@ -93,8 +93,6 @@ ascension
 				onAscension(mob/owner)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/The_Crown/tc in owner.contents)
 						tc.passives["Extend"] = 1
-						tc.passives["SpiritStrike"] = 1
-						tc.passives["HybridStrike"] = 1
 					..()
 
 			conquer
@@ -111,7 +109,7 @@ ascension
 				onAscension(mob/owner)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/The_Crown/tc in owner.contents)
 						tc.passives["WeaponBreaker"] = 1
-						tc.passives["Hellpower"] = 0.25
+						tc.passives["HellPower"] = 0.25
 						tc.passives["Erosion"] = 0.25
 					..()
 

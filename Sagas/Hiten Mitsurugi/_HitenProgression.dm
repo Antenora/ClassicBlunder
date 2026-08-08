@@ -1,7 +1,7 @@
 #define HITEN_PASSIVES_TIER_1 list("SlayerMod"=1, "Godspeed"=1, "Flicker"=1, "Pursuer"=1, "FavoredPrey"="Mortal")
 #define HITEN_PASSIVES_TIER_2 list("Godspeed"=1, "AttackSpeed"=2, "Pursuer"=1, "Flow" = 1, "Instinct" = 1)
 #define HITEN_PASSIVES_TIER_3 list("Godspeed"=1, "TechniqueMastery"=2, "Flow" = 1, "Instinct" = 1)
-#define HITEN_PASSIVES_TIER_4 list("SlayerMod"=1, "Godspeed"=1, "MovementMastery"=4, "FavoredPrey"="All")
+#define HITEN_PASSIVES_TIER_4 list("SlayerMod"=1, "Godspeed"=1,  "FavoredPrey"="All")
 #define HITEN_PASSIVES_TIER_5 list("Godspeed"=1, "AttackSpeed"=3, "Pursuer"=1, "Deicide"=5, "EndlessNine"=0.1)
 #define HITEN_PASSIVES_TIER_6 list("Godspeed"=1, "TechniqueMastery"=3, "Deicide"=5, "EndlessNine"=0.1)
 #define HITEN_PASSIVES_TIER_7 list("SlayerMod"=1, "Godspeed"=2, "Deicide"=10, "EndlessNine"=0.2, "AsuraStrike"=1)

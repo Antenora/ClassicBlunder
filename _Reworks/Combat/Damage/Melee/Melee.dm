@@ -37,7 +37,7 @@
 					if((last_aura_toss - ((passive_handler["Familiar"]-1) * glob.FAMILIAR_CD_REDUCTION)) + glob.FAMILIAR_SKILL_CD < world.time && (Target && Target != src))
 						last_aura_toss = world.time
 						throwFollowUp(aura.skillToToss)
-		if(passive_handler["EntanglingRoots"] && can_use_style_effect("EntaglingRoots") && Target != src)
+		if(passive_handler["EntanglingRoots"] && can_use_style_effect("EntanglingRoots") && Target != src)
 			var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare/s = Target.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare)
 			if(!s)
 				s = new(glob.ROOTS_DURATION, 'root.dmi')
@@ -702,11 +702,7 @@
 								var/whiffed = TRUE
 								if(AttackQueue)
 									if(AttackQueue.NoWhiff)
-										if(!enemy.passive_handler.Get("NoForcedWhiff"))
-											hitResolution = HIT
-										else
-											hitResolution = MISS // this doesn't do anything
-											damage = 0
+										hitResolution = HIT
 								else
 									if(NoWhiff()) // cant whiff
 										whiffed = FALSE
@@ -809,8 +805,11 @@
 							if(enemy.passive_handler["Perfect Counter"])
 								// if only we could ping the thing that is giving this
 								enemy.TriggerPerfectCounter(src) // i cant actually test this
-							if(defArmor&&!passive_handler.Get("ArmorPeeling"))
+							if(defArmor)
 								var/dmgEffective = enemy.GetArmorDamage(defArmor)
+								var/peel = passive_handler.Get("ArmorPeeling")
+								if(peel)
+									dmgEffective *= 1 - (glob.ARMOR_PEEL_CAP * peel / (peel + 2))
 								if(UsingHalfSword())
 									dmgEffective -= UsingHalfSword() * glob.HALF_SWORD_ARMOR_REDUCTION
 								if(dmgEffective>0)
@@ -924,8 +923,6 @@
 										HealMana(clamp((damage*0.4) * SagaLevel, 0.5, 20), 1)
 								else
 									HealMana(clamp((damage*1) * SagaLevel, 0.5, 20), 1)
-							if(passive_handler["RenameMana"])
-								HealMana(clamp(damage * (Potential/10), 0.005, 25), 1)
 							if(GetAttracting())
 								enemy.AddAttracting(GetAttracting(), src)
 								// 		OTHER DMG START 		//
@@ -938,12 +935,6 @@
 							if(UsingCriticalImpact())
 								otherDmg *= 1.25
 
-							if(passive_handler.Get("Quaker"))
-								otherDmg += passive_handler.Get("Quaker")
-							if(passive_handler.Get("QuakerMod"))
-								otherDmg *= passive_handler.Get("QuakerMod")
-							if(passive_handler["Rupture"])
-								applyDebuff(enemy, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Rupture, "Rupture","rupture", 200)
 							if(passive_handler["Overwhelming"])
 								applyDebuff(enemy, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Cornered, "Overwhelming","overwhelm", 200)
 							if(passive_handler["Serrated"] && (s || s2 || s3))
@@ -1161,27 +1152,6 @@
 /mob/var/Momentum = 0
 
 /mob/proc/handlePostDamage(mob/enemy, damage)
-	var/acu = enemy.passive_handler["Acupuncture"]
-	if(passive_handler["LeakCash"])
-		for(var/obj/Money/money in src.contents)
-			if(money.Level>0)
-				var/newX = 0
-				var/newY = 0
-				if(!glob.racials.CASHLEAKREMOVES)
-					newX = src.x + rand(-3, 3)
-					newY = src.y + rand(-3, 3)
-					for(var/i = 0, i < 10, i++)
-						var/turf/t = locate(newX,newY,src.z)
-						if(t.density)
-							if(i == 9) break
-							newX = src.x + rand(-3, 3)
-							newY = src.y + rand(-3, 3)
-							continue
-						else
-							break
-				var/obj/gold/gold = new()
-				gold.createPile(src, enemy, newX, newY, src.z, glob.racials.CASHLEAKREMOVES)
-				src << "You feel a need to go collect your coins before they're stolen!"
 	if(passive_handler.Get("Mortal Will"))
 		passive_handler.Increase("MortalStacks")
 		if(passive_handler.Get("MortalStacks") >= 6)
@@ -1192,6 +1162,6 @@
 				cp.adjust(src)
 				src.UseProjectile(cp)
 	if(passive_handler["Momentum"])
-		MomentumAccumulate(acu)
+		MomentumAccumulate()
 	if(passive_handler["Fury"])
-		FuryAccumulate(acu);
+		FuryAccumulate();

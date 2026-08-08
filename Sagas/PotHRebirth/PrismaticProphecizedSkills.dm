@@ -6,7 +6,7 @@
 		StyleOff = 1.05
 		StyleDef = 1.05
 		StyleActive = "Fight or Flight"
-		passives = list("HybridStyle" = "MysticStyle", "SpiritFlow" = 1, "SpiritSword" = 0.5, "Flow" = 1, "Instinct" = 0.5)
+		passives = list("HybridStyle" = "MysticStyle",   "Flow" = 1, "Instinct" = 0.5)
 		verb/Fight_or_Flight()
 			set hidden=1
 			src.Trigger(usr)
@@ -18,7 +18,7 @@
 		StyleDef = 1.10
 		StyleSpd = 1.10
 		StyleActive = "Mountain King"
-		passives = list("HybridStyle" = "MysticStyle", "HybridStrike" = 0.5, "SpiritFlow" = 2, "SpiritSword" = 1, "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle",    "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
 		verb/Mountain_King()
 			set hidden=1
 			src.Trigger(usr)
@@ -30,7 +30,7 @@
 		StyleDef = 1.20
 		StyleSpd = 1.20
 		StyleActive = "Dreamlike Savior"
-		passives = list("HybridStyle" = "MysticStyle",  "HybridStrike" = 1, "SpiritFlow" = 3, "SpiritSword" = 1.5,\
+		passives = list("HybridStyle" = "MysticStyle",    \
 		"Flow" = 3, "Instinct" = 2, "DoubleStrike" = 2, "Deflection" = 2,)
 		verb/Dreamlike_Savior()
 			set hidden=1
@@ -43,8 +43,8 @@
 		StyleDef = 1.35
 		StyleSpd = 1.35
 		StyleActive = "Afterlife"
-		passives = list("HybridStyle" = "MysticStyle",  "HybridStrike" = 1.5, "SpiritFlow" = 4, "SpiritSword" = 2, "Flow" = 4, "Instinct" = 3,\
-		"LikeWater" = 3, "DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2, "Pressure" = 2, "PUSpike" = 50)
+		passives = list("HybridStyle" = "MysticStyle",     "Flow" = 4, "Instinct" = 3,\
+		"LikeWater" = 3, "DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50)
 		verb/Afterlife()
 			set hidden=1
 			src.Trigger(usr)
@@ -58,8 +58,8 @@ obj
 			SpdMult = 1.15
 			ForMult = 1.25
 			RecovMult = 1.10
-			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "HybridStrike" = 0.25, "SpiritFlow" = 2, "SpiritSword" = 1, "Pressure" = 2,\
-			"Instinct" = 2, "Flow" = 2, "RainbowAfterImages" = 1)
+			passives = list( "TechniqueMastery" = 2,    \
+			"Instinct" = 2, "Flow" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow")
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
@@ -77,11 +77,11 @@ obj
 				SpdMult = 1.15 + (0.01 * pLv)
 				EndMult = 1.10 + (0.01 * pLv)
 				RecovMult = 1.10 + (0.01 * pLv)
-				passives = list("MovementMastery" = 2,"TechniqueMastery" = 2, "HybridStrike" = 0.25 + min(1, (pLv / 5)), "SpiritFlow" = 1 + pLv, "SpiritSword" = max(1, round(pLv / 2, 1)), \
-				"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1)
+				passives = list("TechniqueMastery" = 2,    \
+				 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow")
 				if(pLv > 4)
-					passives = list("MovementMastery" = 2,"TechniqueMastery" = 2, "HybridStrike" = 0.25 + min(1, (pLv / 5)), "SpiritFlow" = 1 + pLv, "SpiritSword" = max(1, round(pLv / 2, 1)), \
-					"Pressure" = 1 + round(pLv / 2, 1), "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "RainbowAfterImages" = 1, "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5))
+					passives = list("TechniqueMastery" = 2,    \
+					 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5))
 			verb/Hyperdeath_Mode()
 				set category = "Skills"
 				adjust(usr)
@@ -111,7 +111,7 @@ obj
 				ForMult = 1.15
 				PowerMult = 1.15
 				EnergyHeal=1
-				passives = list("SwordAscension" = 2, "PUSpike" = 25, "KiControl" = 1, "SpiritSword" = 1, "HybridStrike" = 0.25, \
+				passives = list("SwordAscension" = 2, "PUSpike" = 25, "KiControl" = 1,   \
 				"DoubleStrike" = 0.5, "BlockChance" = 5, "CriticalBlock" = 0.05, "ManaGeneration" = 1)
 				if(p.SagaLevel>=3)
 					SwordAscension=p.SagaLevel
@@ -119,7 +119,7 @@ obj
 					ForMult=1.25
 					PowerMult=1.20
 					//HybridStrike is removed because t2 style gives it
-					passives = list("SwordAscension"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=35,"KiControl" = 1,"Chaos Buster" = 1,"SpiritSword" = 1.5, \
+					passives = list("SwordAscension"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=35,"KiControl" = 1,"Chaos Buster" = 1, \
 					"DoubleStrike" = 1, "BlockChance" = 10, "CriticalBlock" = 0.10, "ManaGeneration" = 2)
 				if(p.SagaLevel>=4)
 					MakesSecondSword=1
@@ -128,15 +128,15 @@ obj
 					PowerMult=1.25
 					ActiveMessage="manifests their Chaos Sabers in a burst of prismatic light."
 					OffMessage="dispels the Chaos Sabers."
-					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1, "SpiritSword" = 2, \
-					"DoubleStrike" = 1.5, "Pressure" = 1, "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 3)
+					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1,  \
+					"DoubleStrike" = 1.5,  "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 3)
 				if(p.SagaLevel>=5)
 					MakesSecondSword=1
 					StrMult=1.65
 					ForMult=1.40
 					PowerMult=1.30
-					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1, "SpiritSword" = 2.25, \
-					"DoubleStrike" = 2, "TripleStrike" = 0.5, "Pressure" = 1, "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 4)
+					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1,  \
+					"DoubleStrike" = 2, "TripleStrike" = 0.5,  "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 4)
 			verb/Chaos_Saber()
 				set category="Skills"
 				if(usr.CheckSlotless("Chaos Buster"))
@@ -157,21 +157,21 @@ obj
 				ForMult=1.35
 				PowerMult = 1.15
 				StaffAscension=2
-				passives = list("KiControl" = 1, "StaffAscension" = 2, "Chaos Buster" = 1, "SpiritStrike" = 1, "SpiritFlow" = 1.5, "GodSpeed" = 1, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 1)
+				passives = list("KiControl" = 1, "StaffAscension" = 2, "Chaos Buster" = 1,   "Godspeed" = 1, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 1)
 				if(p.SagaLevel>=3)
-					passives = list("KiControl" = 1, "StaffAscension" = 3, "Chaos Buster" = 2, "SpiritStrike" = 1, "SpiritFlow" = 2.5, "GodSpeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 1)
+					passives = list("KiControl" = 1, "StaffAscension" = 3, "Chaos Buster" = 2,   "Godspeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 1)
 					StrMult=1.25
 					ForMult=1.50
 					PowerMult = 1.20
 					StaffAscension=3
 				if(p.SagaLevel>=4)
-					passives = list("KiControl" = 1, "StaffAscension" = 4, "Chaos Buster" = 2, "SpiritStrike" = 1, "SpiritFlow" = 3, "GodSpeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 2,)
+					passives = list("KiControl" = 1, "StaffAscension" = 4, "Chaos Buster" = 2,   "Godspeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" = 2,)
 					StrMult=1.30
 					ForMult=1.60
 					PowerMult = 1.25
 					StaffAscension=4
 				if(p.SagaLevel>=5)
-					passives = list("KiControl" = 1, "StaffAscension" = p.SagaLevel, "Chaos Buster" = 2, "SpiritStrike" = 1, "SpiritFlow" = 3.5, "GodSpeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" =3)
+					passives = list("KiControl" = 1, "StaffAscension" = p.SagaLevel, "Chaos Buster" = 2,   "Godspeed" = 2, "Skimming" = 1, "MovingCharge" = 1, "QuickCast" =3)
 					StrMult=1.30
 					ForMult=1.60
 					PowerMult = 1.25

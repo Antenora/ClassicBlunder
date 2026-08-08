@@ -102,7 +102,7 @@ blobDropper/proc/resetVariables(mob/Players/p)
         icon_state = "superheal"
         val = 1 + (0.1 * ascen) + (0.05 * (100 - p.Health)) + (powerFloor * INNOCENT_BLOB_HEAL_FRAC)
     else
-        buff = pick("PureReduction","Juggernaut","GiantForm","DemonicDurability")
+        buff = pick("PureReduction","Juggernaut","GiantForm")
         val = 0.1 + (0.1 * ascen) + (0.05 * ((100 - p.Health)/2)) + (powerFloor * INNOCENT_BLOB_BUFF_FRAC)
     heldBuff = new(p, val, buff)
 

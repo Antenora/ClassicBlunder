@@ -15,12 +15,8 @@ transformation
 				var/list/basepassives
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Ripper_Mode, user.contents))
 					basepassives = list("LifeSteal" = 20)
-				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Armstrong_Augmentation, user.contents))
-					basepassives = list("CallousedHands" = 0.3)
-				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Ray_Gear, user.contents))
-					basepassives = list("SpiritHand" = 0.5, "SpiritSword" = 0.5)
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Overdrive,user.contents))
-					basepassives = list("MovementMastery" = 6, "ManaGeneration" = 2)
+					basepassives = list( "ManaGeneration" = 2)
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Hilbert_Effect,user.contents))
 					basepassives = list("Deicide" = 5, "EndlessNine" = 0.2)
 				if(user.InfinityModule)

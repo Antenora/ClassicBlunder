@@ -93,8 +93,6 @@ mob/proc/RollVoidForAbsorb()
 /mob/var/extraVoidChance = 0
 
 /mob/proc/applyVoidNerf()
-	if(src.passive_handler.Get("Undying"))
-		return
 	if(glob.VoidMaim||!src)
 		Maimed++
 		recordMaim(null, "Survived Void")
@@ -169,7 +167,7 @@ mob/proc/StartFresh()
 
 /mob/proc/makeCorpse(oldLoc)
 	Stunned = 0
-	if(src.passive_handler.Get("Undying")||glob.VoidChance>=90)
+	if(glob.VoidChance>=90)
 		return
 	var/mob/Body/corpse = new()
 	corpse.race = new/race/human()
@@ -246,7 +244,7 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 
 	// handle the rolling here maybe
 	var/NotYet=0
-	if(src.passive_handler.Get("Undying")||src.passive_handler.Get("Reflected"))
+	if(src.passive_handler.Get("Reflected"))
 		NotYet=1
 	if(override&&!NotYet)
 		if(zombie)

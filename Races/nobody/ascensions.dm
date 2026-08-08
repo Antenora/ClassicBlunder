@@ -39,11 +39,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"= 1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -96,11 +96,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -142,17 +142,17 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Steady" = 1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -194,17 +194,17 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Steady" = 1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5,  "Unstoppable" = 1)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5,  "Unstoppable" = 1)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -252,11 +252,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "PridefulRage"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,   "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -299,11 +299,11 @@ ascension
 							force=1 * SMod
 							offense=1 * SMod
 							defense=1 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=1 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=1 * SMod
 							strength=1 * SMod

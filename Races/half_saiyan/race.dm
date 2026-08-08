@@ -17,7 +17,7 @@ race
 		imagination = 1
 		intellect = 1.5
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
-		passives = list("Tenacity" = 0.5, "Brutalize" = 0.25, "Adrenaline" = 0.5)
+		passives = list("Tenacity" = 0.5,  "Adrenaline" = 0.5)
 		class_info = list("Channeling humanity to pave a path forward in a murky future.", "Fight for your own justice.")
 		stats_per_class = list("Compassion" = list(1.25, 1.75, 1.75, 1.25, 1.25, 1.5),"Justice" = list(1.75,1.5,1.75,1.25,1,1.25))
 		classes = list("Compassion", "Justice")

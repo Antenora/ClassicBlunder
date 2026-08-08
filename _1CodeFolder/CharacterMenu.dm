@@ -2219,7 +2219,6 @@ mob/proc/GetCharMenuData()
 	var/PDam = 1 + ((HasPureDamage() / 10) * glob.PURE_MODIFIER)
 	var/PRed = 1 + ((HasPureReduction() / 10) * glob.PURE_MODIFIER)
 	var/gk = (HasGodKi() && !passive_handler.Get("Utterly Powerless")) ? GetGodKi() : 0
-	if(passive_handler.Get("God")) gk = "?"
 	var/mk = (HasMaouKi() && !passive_handler.Get("Utterly Powerless")) ? GetMaouKi() : 0
 	D["power"] = "[Power]"
 	D["frompot"] = "[round(PotPow, 0.05)]"
@@ -2245,7 +2244,7 @@ mob/proc/GetCharMenuData()
 	D["magic"] = "[getTotalMagicLevel()]"
 	D["transpot"] = "[potential_trans]/100"
 	D["chips"] = "[EnhanceChips]/[EnhanceChipsMax]"
-	D["potential"] = "[passive_handler.Get("God") ? "?" : Potential]"
+	D["potential"] = "[Potential]"
 	D["pronouns"] = "[subjectpronoun()] / [objectpronoun()]"
 	var/mx = max(GetStr(), GetEnd(), GetSpd(), GetFor(), GetOff(), GetDef(), 0.0001)
 	D["fstr"] = GetStr() / mx; D["fend"] = GetEnd() / mx; D["fspd"] = GetSpd() / mx

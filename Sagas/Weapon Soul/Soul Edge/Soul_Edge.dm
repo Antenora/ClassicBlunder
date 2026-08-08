@@ -241,7 +241,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	StrMult=1.3
 	OffMult=1.3
 	EndMult=1.3
-	passives = list("DemonicDurability" = 3, "Instinct" = 4, "Momentum" = 2, "EnhancedSmell" = 1, "EnhancedHearing" = 1)
+	passives = list( "Instinct" = 4, "Momentum" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s chaotic treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their chaotic luster..."
@@ -251,16 +251,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Stained_Memories
 		StyleActive="Stained Memories"
-		passives = list("CallousedHands" = 0.1, "Shearing" = 2,"Zornhau" = 1)
+		passives = list( "Shearing" = 2)
 		StyleEnd=1.25
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
 		adjust(mob/p)
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
-			passives["CallousedHands"] = 0.1 + (0.05* p.SagaLevel)
 			passives["Shearing"] = 2+p.SagaLevel
-			passives["Zornhau"] = 1+(0.25*p.SagaLevel)
 		verb/Stained_Memories()
 			set hidden=1
 			adjust(usr)
@@ -277,4 +275,3 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	Grim_Lord
 		StrMult=1.3
 		EndMult=1.3
-		passives = list("DemonicDurability" = 1, "AngerAdaptiveForce" = 0.5, "CallousedHands" = 0.15)

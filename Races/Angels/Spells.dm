@@ -127,7 +127,6 @@
 	TimerLimit = 60
 	StrMult = 1.2
 	ForMult = 1.2
-	passives = list("HybridStrike" = 1, "SpiritSword" = 1, "SpiritHand" = 4)
 	ActiveMessage = "is filled with holy zeal!"
 	OffMessage = "feels their zeal subside."
 	Trigger(mob/User, Override = 0)

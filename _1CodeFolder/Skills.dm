@@ -338,8 +338,6 @@ obj/Skills
 			set name="Dragon Dash"
 			set category="Skills"
 			set hidden = 1
-			if(usr.HasDashMaster())
-				src.Using=0
 			if(usr.Knockback)
 				for(var/obj/Skills/Aerial_Payback/x in usr.Skills)
 					if(!x.Using)
@@ -359,7 +357,7 @@ obj/Skills
 			set name="Revert!"
 			set category="Utility"
 			set hidden = 1
-			if(usr.transActive&&!usr.HasNoRevert()&&!usr.isMazokuHuman())
+			if(usr.transActive&&!usr.isMazokuHuman())
 				for(var/obj/Skills/Buffs/B in usr)
 					if(usr.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
 						B.Trigger(usr)
@@ -391,8 +389,6 @@ obj/Skills
 			set category="Skills"
 			set hidden = 1
 			if(AntiMash) return
-			if(usr.HasDashMaster())
-				src.Using=0
 			if(usr.Knockback)
 				for(var/obj/Skills/Aerial_Recovery/x in usr)
 					if(!x.Using)

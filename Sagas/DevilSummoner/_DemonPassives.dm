@@ -319,7 +319,6 @@ var/global/list/DEMON_PASSIVE_DB = list()
 			passive_handler.Increase("CriticalChance", 50)
 			passive_handler.Increase("CriticalDamage", 0.25)
 		if("Pierce")
-			passive_handler.Increase("Brutalize", 9)
 		if("Double Strike")
 			passive_double_strike = TRUE
 			passive_handler.Increase("DoubleStrike", 5)

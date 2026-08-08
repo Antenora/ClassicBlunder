@@ -467,7 +467,7 @@ SecretInformation
 	Werewolf
 		name = "Werewolf"
 		givenSkills = list("/obj/Skills/Buffs/SlotlessBuffs/Werewolf/New_Moon_Form", "/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form", "/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form")
-		givenVariables = list("Restoration", "EnhancedHearing", "EnhancedSmell", "Timeless")
+		givenVariables = list("EnhancedHearing", "EnhancedSmell", "Timeless")
 		secretVariable = list("Hunger Satiation" = 0, "Hunger Active" = 0)
 		proc/getHungerLimit(mob/p)
 			. = WW_HUNGER_MAX - (WW_REDUCTION_PER_TIER * (currentTier))

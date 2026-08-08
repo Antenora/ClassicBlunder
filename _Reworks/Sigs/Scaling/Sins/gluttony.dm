@@ -22,7 +22,7 @@
         hungerMult = 1 + (p.Potential/200)
         if(anAcquiredTaste)
             passives = list("Gluttony" = round(p.Potential/100,0.1), "BulletKill" = 1, "Siphon" = round(p.Potential/100, 0.1) ,\
-                "Juggernaut" = 0.1 * anAcquiredTaste, "DemonicDurability" = 0.1 * anAcquiredTaste, Hellpower = 0.05 * anAcquiredTaste)
+                "Juggernaut" = 0.1 * anAcquiredTaste,  Hellpower = 0.05 * anAcquiredTaste)
             if(anAcquiredTaste >= 10)
                 passives["GodKi"] = 0.05 * (anAcquiredTaste-9)
         else
@@ -53,7 +53,7 @@
 
     adjust(mob/p)
         VaizardHealth = (p.SpecialBuff:gluttonStorage*0.25)/5
-        passives = list("Siphon" = round(p.Potential/200, 0.1), "Juggernaut" = 0.5, "FluidForm" = 1 + round(p.Potential/150,0.25), "DemonicDurability" = p.Potential/200, "NoDodge" = 1)
+        passives = list("Siphon" = round(p.Potential/200, 0.1), "Juggernaut" = 0.5, "FluidForm" = 1 + round(p.Potential/150,0.25),  "NoDodge" = 1)
         // fairly sure it don't work with uh fluid form but i'll leave it in for now
         MinActivation = 25 + (p.Potential/2)
     verb/Digestion()

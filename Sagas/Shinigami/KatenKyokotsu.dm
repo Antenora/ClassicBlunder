@@ -41,8 +41,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 			"Flicker"          = 1 + SL,
 			"Pursuer"          = 1 + SL,
 			"TechniqueMastery" = 1 + SL,
-			"Duelist"          = 1 + SL,
-			"Shadowbringer"    = 1
+			"Duelist"          = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
@@ -614,7 +613,7 @@ var/global/list/BG_CONTRAST_HIGH = list(
 			"DeathField"       = 3 + SL,
 			"Duelist"          = 1 + SL,
 			"ManaCapMult"      = 0.2 + (0.15 * SL),
-			"Shadowbringer"    = 1,
+			
 			"Tragedy"          = 1
 		)
 		if(SL < 5)

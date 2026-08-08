@@ -329,7 +329,7 @@ obj/Skills
 			Activate(var/mob/User)
 				if(User.Suspended)
 					return
-				if(glob.DISABLE_ALL_TELEPORTS&&!User.passive_handler.Get("FreeTeleport"))
+				if(glob.DISABLE_ALL_TELEPORTS)
 					User<<"The ability to teleport has been sealed off!"
 					return
 				if(src.type==/obj/Skills/Teleport/Traverse_Underworld&&User.Saga!="Cosmo")

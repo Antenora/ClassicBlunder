@@ -184,7 +184,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 
 	Athletics_Chair
 		SpdMult = 1.25
-		passives = list("Pursuer" = 2, "Godspeed" = 2, "BlurringStrikes" = 0.2)
+		passives = list("Pursuer" = 2, "Godspeed" = 2)
 		ActiveMessage="takes up their role as the Athletics Chair beneath the banner of an empire!"
 		OffMessage="forsakes their role..."
 		verb/Athletics_Chair()
@@ -203,7 +203,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 	Information_and_Strategy_Chair
 		OffMult = 1.15
 		DefMult = 1.15
-		passives = list("Adaptation" = 1, "Flow" = 1, "Instinct" = 1)
+		passives = list( "Flow" = 1, "Instinct" = 1)
 		ActiveMessage="takes up their role as the Information and Strategy Chair beneath the banner of an empire!"
 		OffMessage="forsakes their role..."
 		verb/Information_and_Strategy_Chair()
@@ -287,7 +287,7 @@ obj/Skills/Buffs/SpecialBuffs
 		StyleSpd=1.1
 		SureHitTimerLimit=25
 		SureDodgeTimerLimit=25
-		passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 2, "TechniqueMastery" = 3, "BuffMastery" = 3)
+		passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 2, "TechniqueMastery" = 3)
 		NeedsSecondSword = 1
 		Mastery=4
 		Finisher="/obj/Skills/Queue/Finisher/Generic_Finisher"
@@ -308,7 +308,7 @@ obj/Skills/Buffs/SpecialBuffs
 				SureHitTimerLimit=25 - (2.5 * p.SagaLevel)
 				SureDodgeTimerLimit=25 - (2.5 * p.SagaLevel)
 			if(p.SagaLevel >= 5)
-				passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel, "TechniqueMastery" = p.SagaLevel/2, "BuffMastery" = p.SagaLevel/2)
+				passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel, "TechniqueMastery" = p.SagaLevel/2)
 
 		verb/Toggle_Sword_Count()
 			set category="Other"

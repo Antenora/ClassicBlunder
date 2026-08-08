@@ -332,8 +332,6 @@ mob/proc/Allow_Move(D)
 			src.dir=D
 			return
 	if(src.Beaming==2)
-		if(src.HasTurningCharge())
-			src.dir=D
 		return
 	if(src.PoweringUp)
 		return

@@ -136,11 +136,10 @@ var/global/list/BW_CONTRAST_HIGH = list(
 		var/SL = p.SagaLevel
 		passives = list(
 			"Harden"    = 1 + SL,
-			"Steady"    = 1 + SL,
+			
 			"Flow"      = 1 + SL,
 			"FluidForm" = 0.5 + (SL * 0.5),
-			"Flicker"   = 1 + SL,
-			"Pressure"  = 1 + SL
+			"Flicker"   = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2

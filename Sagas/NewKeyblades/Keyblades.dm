@@ -585,13 +585,13 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Combustion" = 60, "Scorching" = 2+Boost)
 				return KeybladePassives
 			if("Wayward Wind")
-				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1,"BlurringStrikes" = 3, "AttackSpeed" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1, "AttackSpeed" = 2+(Boost/2))
 				return KeybladePassives
 			if("Rainfell")
 				KeybladePassives=list("PULock" = 1, "CriticalChance" = 30+(Boost*5), "ThunderHerald" = 1, "CriticalDamage"= 0.15)
 				return KeybladePassives
 			if("Oathkeeper")
-				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost,"ManaStats" = 1+Boost)
+				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost)
 				return KeybladePassives
 			if("Way To Dawn")
 				KeybladePassives=list("PULock" = 1, "AbyssMod" = 3+Boost,"HolyMod"=3+Boost,"Controlled Darkness" = 1)
@@ -600,20 +600,20 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Scorching" = 10+(Boost*2), "MeltyBlood" = 1)
 				return KeybladePassives
 			if("Sweetstack")
-				KeybladePassives=list("PULock" = 1, "TechniqueMastery" = Boost, "BuffMastery" = Boost)
+				KeybladePassives=list("PULock" = 1, "TechniqueMastery" = Boost)
 				return KeybladePassives
 			if("Two Become One")
-				KeybladePassives=list("PULock" = 1, "Two Become One" = 1, "BlurringStrikes" = 4, "ManaGeneration" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1, "Two Become One" = 1,  "ManaGeneration" = 2+(Boost/2))
 				return KeybladePassives
 			if("Blind Justice")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 3+(Boost/2), "PureReduction" = -3+(Boost/2))
 				return KeybladePassives
 //medium
 			if("Oblivion")
-				KeybladePassives=list("PULock" = 1, "AbyssMod" = 1+Boost,"EnergyGeneration" = 3+Boost, "Momentum" = 2,"SpiritFlow" =1+round(Boost/2))
+				KeybladePassives=list("PULock" = 1, "AbyssMod" = 1+Boost,"EnergyGeneration" = 3+Boost, "Momentum" = 2)
 				return KeybladePassives
 			if("Fenrir")
-				KeybladePassives=list("PULock" = 1, "Steady" = 3, "Brutalize" = Boost/1.5, "Extend" = 1, "Conductor" = -50, "DemonicDurability" = Boost, "AngerAdaptiveForce" = 0.2*Boost)
+				KeybladePassives=list("PULock" = 1,   "Extend" = 1, "Conductor" = -50)
 				return KeybladePassives
 			if("No Name")
 				KeybladePassives=list("PULock" = 1, "HardStyle" = 1)
@@ -622,23 +622,23 @@ proc/
 				KeybladePassives=list("PULock" = 1, "SpiritPower" = round(Boost/5), "Persistence" = 1+(Boost/2), "UnderDog" = 1+Boost)
 				return KeybladePassives
 			if("Spellbinder")
-				KeybladePassives=list("PULock" = 1, "ManaCapMult" = (0.15*Boost),"ManaStats" = 0.5+(Boost/2), "ManaGeneration" = 5)
+				KeybladePassives=list("PULock" = 1, "ManaCapMult" = (0.15*Boost), "ManaGeneration" = 5)
 				return KeybladePassives
 			if("Star Seeker")
 				KeybladePassives=list("PULock" = 1, "UnderDog" = 1+Boost, "Tenacity" = 3+Boost)
 				return KeybladePassives
 			if("Lost Memory")
-				KeybladePassives=list("PULock" = 1, "HybridStrike" = 1, "Flow" = 3, "Instinct" = 3)
+				KeybladePassives=list("PULock" = 1,  "Flow" = 3, "Instinct" = 3)
 				return KeybladePassives
 			if("Ultima Weapon")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 10, "PureReduction" = 10, "GodKi" = 0.25)
 				return KeybladePassives
 //heavy
 			if("Earthshaker")
-				KeybladePassives=list("PULock" = 1, "Harden" = 3, "CallousedHands" = Boost/10)
+				KeybladePassives=list("PULock" = 1, "Harden" = 3)
 				return KeybladePassives
 			if("Chaos Ripper")
-				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5, "Zornhau" = 5, "HardStyle" = 1)
+				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5,  "HardStyle" = 1)
 				return KeybladePassives
 			if("One Winged Angel")
 				KeybladePassives=list("PULock" = 1, "CriticalChance" = 5+(Boost*2), "CriticalDamage"= 0.3+(Boost/10))

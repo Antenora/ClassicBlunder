@@ -247,6 +247,32 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	if(sw.pref == "zoom2x") ApplyZoomPref()
 	AnimateOptToggle(sw, getPref(sw.pref))
 
+// FPS value in the Options menu - click the gold number to type a new one
+/atom/movable/shud/menufpsval
+	layer = MHUD_LAYER + 0.5
+	mouse_opacity = 2
+	maptext_width = 110
+	maptext_height = 20
+	proc/SetVal(f)
+		maptext = "<span style=\"[MHUD_FONT]; color:#ffd86b\">[f]</span>"
+	MouseEntered(location, control, params)
+		filters = filter(type="outline", size=1, color="#8be9ff")
+	MouseExited(location, control, params)
+		filters = null
+	Click()
+		if(usr) usr.client.OptFpsClick()
+
+client/proc/OptFpsClick()
+	set waitfor = 0
+	if(menu_open != "options" || !mob) return
+	spawn()
+		var/n = mob.HUDNumPrompt("FPS (0 = DEFAULT)", mob.EffectiveClientFPS())
+		if(isnull(n) || !mob) return
+		var/f = mob.SetClientFPS(n)
+		if(menu_open != "options") return
+		for(var/atom/movable/shud/menufpsval/v in menu_entry_objs)
+			v.SetVal(f)
+
 // reuses the hat-toggle sprite set, frames 1>5
 client/proc/AnimateOptToggle(atom/movable/sw, on)
 	set waitfor = 0
@@ -701,3 +727,16 @@ client/proc/BuildOptionsExtras()
 		menu_entry_objs += sw
 		screen += sw
 		ti++
+	// FPS row below the toggle grid; panel fill runs to ~-123 so -112 still clears the frame
+	var/atom/movable/shud/menutext/fl = new
+	fl.maptext_width = 110
+	fl.maptext_height = 20
+	fl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">FPS</span>"
+	fl.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-112"
+	menu_entry_objs += fl
+	screen += fl
+	var/atom/movable/shud/menufpsval/fv = new
+	fv.SetVal(mob ? mob.EffectiveClientFPS() : CLIENT_FPS_DEFAULT)
+	fv.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-112"
+	menu_entry_objs += fv
+	screen += fv

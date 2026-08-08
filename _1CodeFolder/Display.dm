@@ -5,10 +5,21 @@
 // (-267..267). Keep in sync if the orb layout moves.
 #define DISPLAY_HUD_SPAN 534
 
-var/CLIENT_FPS_DEFAULT = 40 //client render rate; server tick stays world.fps
+#define FPS_PLAYER_MIN 10
+#define FPS_PLAYER_MAX 240
+
+var/CLIENT_FPS_DEFAULT = 100 //client render rate; server tick stays world.fps
 
 mob/proc/EffectiveClientFPS()
-	return ChosenFPS || CLIENT_FPS_DEFAULT
+	if(ChosenFPS >= FPS_PLAYER_MIN && ChosenFPS <= FPS_PLAYER_MAX) return ChosenFPS
+	return CLIENT_FPS_DEFAULT // unset or out-of-band save = default
+
+// the one place a player FPS choice gets stored. 0 = back to the default
+mob/proc/SetClientFPS(n)
+	ChosenFPS = (n > 0) ? clamp(round(n), FPS_PLAYER_MIN, FPS_PLAYER_MAX) : 0
+	if(client && world.time >= _fps_hold_until) // don't break an active hit-stop freeze
+		client.fps = EffectiveClientFPS()
+	return EffectiveClientFPS()
 
 client
 	var/tmp

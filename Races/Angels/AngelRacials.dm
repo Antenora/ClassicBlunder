@@ -68,7 +68,6 @@ obj/Skills/Utility/Recall_Armaments
 
 //no ascensions
 /obj/Items/Sword/Guardian/Sword_of_the_Saint
-	passives = list("SpiritSword" = 1)
 	Class = "Medium"
 	SubType = "Weapons"
 	DamageEffectiveness=1.05
@@ -94,7 +93,7 @@ obj/Skills/Utility/Recall_Armaments
 	icon = 'MachoBrace.dmi'
 //ascension 2
 /obj/Items/Armor/Guardian/Breastplate_of_Righteousness
-	passives = list("Juggernaut" = 3, "GiantForm" = 1, "Steady" = 5)
+	passives = list("Juggernaut" = 3, "GiantForm" = 1)
 	Ascended = 6
 	Class = "Medium"
 	SubType = "Armor"
@@ -110,7 +109,7 @@ obj/Skills/Utility/Recall_Armaments
 	desc = "A shining cuirass that shields the heart with virtue."
 	icon = 'ArmorLight-White.dmi'
 /obj/Items/Wearables/Guardian/Sandals_of_Peace
-	passives = list("MovementMastery" = 10, "Purity" = 1, "BeyondPurity" = 1)
+	passives = list( "Purity" = 1, "BeyondPurity" = 1)
 	Augmented = 1
 	Stealable = 0
 	Destructable = 0
@@ -119,7 +118,7 @@ obj/Skills/Utility/Recall_Armaments
 	icon = 'shoes_mono.dmi'
 //ascension 3
 /obj/Items/Wearables/Guardian/Helmet_of_Salvation
-	passives = list("DebuffResistance" = 3,  "LifeGeneration" = 2, "Anaerobic" = 2, "Pressure" = 5)
+	passives = list("DebuffResistance" = 3,  "LifeGeneration" = 2, "Anaerobic" = 2)
 	Augmented = 1
 	Stealable = 0
 	Destructable = 0
@@ -138,7 +137,7 @@ obj/Skills/Utility/Recall_Armaments
 //ascension 4
 /obj/Items/Sword/Guardian/Sword_of_the_Spirit
 	Techniques = list(new/obj/Skills/Buffs/SpecialBuffs/The_Ten_Commandments, new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Word_Of_God)
-	passives = list("SweepingStrike" = 1, "SpiritSword" = 1, "BlurringStrikes" = 3, "DoubleStrike" = 1, "TripleStrike" = 1)
+	passives = list("SweepingStrike" = 1,   "DoubleStrike" = 1, "TripleStrike" = 1)
 	Class = "Medium"
 	SubType = "Weapons"
 	DamageEffectiveness=1.1
@@ -225,7 +224,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Ultra Instinct (Complete)"
 		adjust(mob/p)
-			passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1, "BlurringStrikes"=4, "UnarmedDamage"=4)
+			passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1,  "UnarmedDamage"=4)
 			StyleStr=1.35
 			StyleFor=1.35
 			StyleSpd=1.75
@@ -257,7 +256,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Perfected Ultra Instinct"
 		adjust(mob/p)
-			passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1, "BlurringStrikes"=4)
+			passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1)
 			StyleStr=1.45
 			StyleFor=1.45
 			StyleSpd=2

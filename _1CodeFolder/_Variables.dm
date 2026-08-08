@@ -542,6 +542,7 @@ mob/var
 	Crippled=0
 	Attracting=0
 	Attracted=0
+	tmp/AttractingCooldown=0
 	tmp/mob/AttractedTo=0
 	Terrifying=0
 	Terrified=0

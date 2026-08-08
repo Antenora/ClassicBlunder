@@ -98,7 +98,7 @@ scaling with potential as well
 		PowerMult = 1.15 + (p.Potential/75)
 		EnergyHeal = 0.01 * p.Potential
 		AutoAnger=0
-		if(prob(15)&&p.transUnlocked<2&&p.passive_handler.Get("Herald of the End"))
+		if(0)
 			p.passive_handler.Increase("The Clock Is Ticking", 0.5)
 			p<<"<font color=red><b>You of all people should know how dangerous this power is. The clock is ticking, [p]...</font></b>"
 	Trigger(mob/User, Override=FALSE)

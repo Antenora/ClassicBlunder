@@ -13,4 +13,4 @@
         Shattering = 5 + (asc*2.5)
         Steady = clamp(asc/2, 0.5, 2)
         PureDamage = 1 + (asc/2)
-        passives = list("Shattering" = Shattering, "Steady" = Steady, "PureDamage" = PureDamage, "HotHundred" = 1, "Warping" = 4)
+        passives = list("Shattering" = Shattering,  "PureDamage" = PureDamage, "HotHundred" = 1, "Warping" = 4)

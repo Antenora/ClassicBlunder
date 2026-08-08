@@ -19,7 +19,6 @@ proc
 
 		if(m.HasDebuffResistance())
 			amount/=(m.GetDebuffResistance()*0.75)
-		amount *= m.getControlResistValue();
 		if(m.ContinuousAttacking)
 			for(var/obj/Skills/Projectile/p in m.contents)
 				if(p.ContinuousOn && !p.StormFall)

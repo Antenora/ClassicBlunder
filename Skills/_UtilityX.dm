@@ -176,7 +176,7 @@ obj/Skills/Utility
 					if(src.Using)
 						usr << "You're already preparing a meal!"
 						return
-					if(usr.passive_handler.Get("Piloting")||usr.HasPossessive())
+					if(usr.passive_handler.Get("Piloting"))
 						usr << "You're not capable of necessary precision!"
 						return
 					if(usr.TotalFatigue>=90)
@@ -399,7 +399,7 @@ obj/Skills/Utility
 			if(src.Using)
 				usr << "You're already preparing a meal!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -709,8 +709,6 @@ obj/Skills/Utility
 						who.Remove(W)
 				if(W.HasGodKi() && !usr.HasGodKi())
 					who.Remove(W)
-				if(W.HasMaouKi())
-					who.Remove(W)
 				if(W.invisibility)
 					who.Remove(W)
 				if(W.isRace(ELDRITCH)||W.isRace(NOBODY))
@@ -725,9 +723,7 @@ obj/Skills/Utility
 			else
 				if(selector.passive_handler.Get("Anti-Scrying"))
 					var/antiscry = 1
-					if(usr.passive_handler.Get("God's Gaze"))
-						antiscry = 0
-					else if(usr.HasGodKi())
+					if(usr.HasGodKi())
 						if(usr.passive_handler.Get("GodKi") > selector.passive_handler.Get("GodKi"))
 							antiscry = 0
 					if(antiscry)
@@ -2376,7 +2372,7 @@ obj/Skills/Utility
 			if(usr.KO)
 				usr << "You can't perform surgery while knocked out!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2431,7 +2427,7 @@ obj/Skills/Utility
 			if(src.Using)
 				usr << "You're already preparing to perform the recovery!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2981,7 +2977,6 @@ obj/Skills/Utility
 				ModChoices.Remove("Armstrong Augmentation")
 				ModChoices.Remove("Ray Gear")
 				ModChoices.Remove("Hilbert Effect")
-				ModChoices.Remove("Overdrive")
 
 			if(M.isRace(ANDROID)||M.CyberneticMainframe)
 				if(M.Maimed||M.HealthCut)

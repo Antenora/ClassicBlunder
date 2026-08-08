@@ -2,7 +2,7 @@
     Heavenly_Dragon_Ascendant_Zenith
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("HardenedFrame" = 1, "Steady" = 1, "TensionLock" = 1)
+        passives = list(  "TensionLock" = 1)
         EndMult = 1.3
         StrMult = 1.2
         ActiveMessage="is grasping for their next breakthrough..!"
@@ -26,7 +26,7 @@
         StrMult=1.1
         EndMult=1.1
         ForMult=1.1
-        passives = list("BuffMastery" = 1, "StyleMastery" = 1, "DebuffResistance" = 1,"TensionLock" = 1)// not sure what 2 do w/ it
+        passives = list(  "DebuffResistance" = 1,"TensionLock" = 1)
 
     Unlocked_Potential
         StyleNeeded="Turtle"
@@ -36,7 +36,6 @@
             // this is goofy, sigh
             var/ascension/nextasc = p.race.ascensions[p.AscensionsAcquired+1]
             passives = nextasc.passives
-            passives["MovementMastery"] = 3
             StrMult = 1+nextasc.strength // problematic late game but i doubt ppl will go base turtle for it, this will however b swole for saga users
             OffMult = 1+nextasc.offense
             DefMult = 1+nextasc.defense
@@ -50,7 +49,7 @@
         OffMult=1.15
         StrMult=1.25
         DefMult=1.1
-        passives = list("Steady" = 1, "Instinct" = 1)
+        passives = list( "Instinct" = 1)
 
     // the debuff
     Shredded
@@ -117,7 +116,7 @@
         ManaGlow="#794512"
         ManaGlowSize=1
         IconLock=null
-        passives = list("TensionLock" = 1, "Harden" = 1, "CallousedHands" = 0.1)
+        passives = list("TensionLock" = 1, "Harden" = 1)
         StrMult=1.1
         ForMult=1.2
         EndMult=1.2
@@ -127,7 +126,7 @@
         ManaGlow="#c06"
         ManaGlowSize=1
         IconLock=null
-        passives = list("TensionLock" = 1, "Burning" = 4, "SpiritHand" = 1)
+        passives = list("TensionLock" = 1, "Burning" = 4)
         StrMult=1.2
         ForMult=1.3
         ActiveMessage="channels mystic forces through their Fire Kata!"
@@ -136,7 +135,7 @@
         ManaGlow="#06c"
         ManaGlowSize=1
         IconLock=null
-        passives = list("TensionLock" = 1, "Chilling" = 4, "Steady" = 1)
+        passives = list("TensionLock" = 1, "Chilling" = 4)
         ForMult=1.2
         OffMult=1.3
         ActiveMessage="channels mystic forces through their Water Kata!"

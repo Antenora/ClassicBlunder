@@ -134,7 +134,7 @@ mob/proc/PowerDown()
             src << "You return to normal power."
             return
         // Mazoku humans are gated out here because of their racial gimmick
-        if(transActive&&!HasNoRevert()&&!isMazokuHuman()&&!PCTransToggle)
+        if(transActive&&!isMazokuHuman()&&!PCTransToggle)
             for(var/obj/Skills/Buffs/B in src)
                 if(BuffOn(B)&&B.Transform&&!B.AlwaysOn)
                     B.Trigger(src)

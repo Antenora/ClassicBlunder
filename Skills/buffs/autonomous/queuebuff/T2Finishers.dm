@@ -5,12 +5,12 @@
         EndMult=0.8
         StrMult=1.3
         DefMult=0.8
-        passives = list("Brutalize" = 1.5, "StyleMastery" = 2, "BuffMastery" = 2,\
+        passives = list(  \
                         "Relentlessness" = 1, "Fury" = 6, "DebuffResistance" = 2, "TensionLock" = 1)
     Ushin
         EndMult=1.3
         StrMult=1.15
-        passives = list("Brutalize" = 2, "StyleMastery" = 2, "BuffMastery" = 2,\
+        passives = list(  \
                         "Relentlessness" = 1, "Momentum" = 3, "UnarmedDamage" = 2, "DebuffResistance" = 2, "TensionLock" = 1)
 
     Potemkin_Buster
@@ -20,10 +20,10 @@
         SpdMult = 0.75
         StrMult = 1.5
         EndMult = 1.5
-        passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "DeathField" = 7, "Juggernaut"= 5, "KBRes"= 5, "TensionLock" = 1)
+        passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "DeathField" = 7, "Juggernaut"= 5, "TensionLock" = 1)
     Emergent_Demon_Breakthrough
         StyleNeeded="Divine Arts of The Heavenly Demon"
-        passives = list("Harden" = 1.5, "Deflection" = 2, "UnarmedDamage" = 2, "Momentum" = 2, "Unnerve" = 2, "TensionLock" = 1)  //TODO come back 2 this perhaps
+        passives = list("Harden" = 1.5, "Deflection" = 2, "UnarmedDamage" = 2, "Momentum" = 2,  "TensionLock" = 1)
         StrMult=1.3
         SpdMult=1.2
         ActiveMessage="presses on the cusp of the Ultimate Heavenly Demon Realm!"
@@ -35,7 +35,7 @@
         StrMult=1.3
         EndMult=0.6
         passives = list("ComboMaster" = 1, "Gum Gum" = 1, "Relentlessness" = 1, "Momentum" = 2, "Flow" = 2,\
-                        "BuffMastery" = 3, "Brutalize" = 1.5, "MovementMastery" = 3, "TensionLock" = 1)
+                           "TensionLock" = 1)
 
 
 
@@ -43,18 +43,18 @@
         EndMult = 1.5
         SpdMult = 0.75
         ForMult = 1.25
-        passives = list("CallousedHands" = 0.15, "Freezing" = 10, "Juggernaut" = 2.5, "KBRes" = 2.5, \
-                        "Shattering" = 10, "Steady" = 4, "Harden" = 2, "TensionLock" = 1)
+        passives = list( "Freezing" = 10, "Juggernaut" = 2.5, \
+                        "Shattering" = 10,  "Harden" = 2, "TensionLock" = 1)
     Heated_Up
         ForMult = 1.5
         EndMult = 0.75
         SpdMult = 1.25
-        passives = list("SpiritHand" = 1, "Scorching" = 10, "BlurringStrikes" = 0.25, "Godspeed" = 2, \
+        passives = list( "Scorching" = 10,  "Godspeed" = 2, \
                         "Shattering" = 10, "Flicker" = 2, "Pursuer" = 2, "Momentum" = 2, "TensionLock" = 1)
 
     X_Buster
-        passives = list("Hit Scan" = 2, "SpiritStrike" = 1, "EnergyGeneration" = 2.5, "MovingCharge" = 1, "QuickCast" = 1, \
-                        "SpiritFlow" = 1, "Paralyzing" = 10, "Shattering" = 10, "SuperCharge" = 1, "TensionLock" = 1)
+        passives = list("Hit Scan" = 2,  "EnergyGeneration" = 2.5, "MovingCharge" = 1, "QuickCast" = 1, \
+                         "Paralyzing" = 10, "Shattering" = 10, "SuperCharge" = 1, "TensionLock" = 1)
         HitScanIcon = 'Plasma1.dmi'
         HitScanHitSpark = 'Trail - Plasma.dmi'
         ForMult = 1.3
@@ -67,8 +67,8 @@
 
 
     In_the_Details
-        passives = list("KillerInstinct" = 0.1, "Godspeed" = 2, "DebuffResistance" = 0.25, \
-                        "Steady" = 2, "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
+        passives = list( "Godspeed" = 2, "DebuffResistance" = 0.25, \
+                         "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
         HealthDrain = 0.033
         DefMult = 0.75
         EndMult = 0.75
@@ -102,7 +102,7 @@
         ActiveMessage="advances with the bloodlust of a manslayer."
         IconApart=1
     Future_Mode
-        passives = list("Godspeed" = 4, "Skimming" = 3, "Speed Force" = 4, "BlurringStrikes" = 4, "TripleStrike" = 2, "DoubleStrike" = 3, "Iaijutsu" = 2, \
+        passives = list("Godspeed" = 4, "Skimming" = 3, "Speed Force" = 4,  "TripleStrike" = 2, "DoubleStrike" = 3, "Iaijutsu" = 2, \
                          "CriticalChance" = 30, "CriticalDamage"= 0.15, "LifeSteal" = 30, "ShearImmunity" = 1, "TensionLock" = 1)
         SpdMult=1.5
         StrMult=1.5
@@ -121,7 +121,7 @@
         TimerLimit = 10
         IconLock='SweatDrop.dmi'
     Alpha_Strike
-        passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, "Rain" = 5,\
+        passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
                          "CriticalChance" = 33, "TensionLock" = 1)
         SpdMult=1.5
         TimerLimit = 10
@@ -130,8 +130,8 @@
     Indomitable_Will
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("Duelist" = 2, "Half-Sword" = 1, "Zornhau" = 1, "LifeGeneration" = 1, \
-                        "KBRes" = 4, "Harden" = 3, "Unnerve" = 2, "Pressure" = 1, "TensionLock" = 1)
+        passives = list("Duelist" = 2, "Half-Sword" = 1,  "LifeGeneration" = 1, \
+                        "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1)
         StrMult=1.35
         EndMult=1.35
         SpdMult=0.75
@@ -159,8 +159,8 @@
         IconApart=1
         StrMult=1.25
         ForMult=1.25
-        passives = list("TensionLock" = 1, "SpiritHand" = 0.5, "Flicker" = 2, "Pursuer" = 2, "Instinct" = 2, "Momentum" = 2, \
-                        "Scorching" = 5, "SpiritFlow" = 0.5)
+        passives = list("TensionLock" = 1,  "Flicker" = 2, "Pursuer" = 2, "Instinct" = 2, "Momentum" = 2, \
+                        "Scorching" = 5)
         ActiveMessage="ignites their legs!"
         OffMessage="burns out..."
 
@@ -181,7 +181,7 @@
 
     Silence
         IconLock='SweatDrop.dmi'
-        passives = list("Silence" = 1)
+        passives = list("Silenced" = 1)
         TimerLimit = 3
     Bloodrage
         StrMult=1.5
@@ -189,7 +189,7 @@
         EndMult=0.5
         AngerMult=1.25
         passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 0.5, "Instinct" = 2, \
-         "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5, "Enrage" = 1)
+         "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5)
     Ruptured
         IconLock='Bleed.dmi'
         IconState = "1"
@@ -203,8 +203,8 @@
         StrMult=1.1
         SpdMult=1.5
     Dark_Firaga_Style
-        passives = list("KillerInstinct" = 0.1, "Godspeed" = 2, "DebuffResistance" = 0.25, \
-                        "Steady" = 2, "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
+        passives = list( "Godspeed" = 2, "DebuffResistance" = 0.25, \
+                         "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
         StrMult = 1.1
         ForMult = 1.5
     Dark_Wave_Style

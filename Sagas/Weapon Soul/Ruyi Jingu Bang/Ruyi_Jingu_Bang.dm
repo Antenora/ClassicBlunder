@@ -7,7 +7,6 @@ obj/Items/Sword/Wooden/Legendary/WeaponSoul/RyuiJinguBang
 	pixel_y = -32
 	unsheatheOffsetX = -32
 	unsheatheOffsetY = -32
-	passives = list("Steady" = 1)
 	Destructable=0
 	ShatterTier=0
 	Element = "Earth"
@@ -19,7 +18,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang
 	OffMult=1.3
 	DefMult = 1.3
 	EndMult=1.3
-	passives = list("DoubleStrike" = 2, "Flow" = 2, "Instinct" = 2, "EnhancedHearing" = 1, "EnhancedSmell" = 1)
+	passives = list("DoubleStrike" = 2, "Flow" = 2, "Instinct" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s bountiful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their strange luster..."

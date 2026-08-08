@@ -1,6 +1,5 @@
-#define TRUTH_PASSIVES_ASC_1 list("Extend" = 1, "BlurringStrikes" = 0.5, "QuickCast" = 1, "MovingCharge" = 1)
-#define TRUTH_PASSIVES_ASC_2 list("Duelist" = 1, "Deflection" = 1, "HybridStrike" = 1.5, "ManaSteal" = 25)
-#define TRUTH_PASSIVES_ASC_3 list("ManaStats" = 0.25, "Steady" = 2)
+#define TRUTH_PASSIVES_ASC_1 list("Extend" = 1,  "QuickCast" = 1, "MovingCharge" = 1)
+#define TRUTH_PASSIVES_ASC_2 list("Duelist" = 1, "Deflection" = 1,  "ManaSteal" = 25)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Elf/God_Slicer
@@ -102,15 +101,10 @@
                         var/passive = input(p, "what passive") in TRUTH_PASSIVES_ASC_2
                         truthPassives += TRUTH_PASSIVES_ASC_2[passive]
                         truthApplied = 3
-                    if(3)
-                        if(truthApplied != 3) break
-                        var/passive = input(p, "what passive") in TRUTH_PASSIVES_ASC_3
-                        truthPassives += TRUTH_PASSIVES_ASC_3[passive]
-                        truthApplied = 4
     adjust(mob/p, )
         truthChoice(p)
         var/asc = p.AscensionsAcquired
-        passives = list("SpiritSword" = (1 + (asc/2)) / 4, "MagicSword" = 1)
+        passives = list( "MagicSword" = 1)
         for(var/x in truthPassives)
             passives[x] = truthPassives[x]
         SwordAscension = asc 

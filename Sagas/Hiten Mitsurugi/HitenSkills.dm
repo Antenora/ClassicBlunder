@@ -282,7 +282,7 @@
             TooMuchHealth=75
             StrMult = 1.5
             SpdMult = 1.5
-            passives = list("TripleStrike" = 0.25, "MovementMastery"=5, "Instinct" = 1, "AutoAnger"=1, "EndlessAnger"=1, "Curse" = 1)
+            passives = list("TripleStrike" = 0.25,  "Instinct" = 1,  "EndlessAnger"=1)
             IconLock='SlayerEyes.dmi'
             LockX=0
             LockY=0
@@ -295,7 +295,6 @@
                 if(!User.BuffOn(src))
                     Mastery = (User.SagaLevel-3);
                     passives["TripleStrike"] = (0.25*Mastery);
-                    passives["MovementMastery"] = max(5, 2.5*Mastery);
                     passives["Instinct"] = Mastery;
                     if(Mastery>=4) passives["TechniqueMastery"]=5;
                     NeedsHealth = min(90, 50 + ((Mastery-1) * 12.5));

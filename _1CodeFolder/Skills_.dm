@@ -336,8 +336,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(src.Knockbacked)
 					return
 				//cd only once we're actually dashing - used to burn on dead presses
-				if(!src.HasDashMaster())
-					Z.Cooldown(1/Modifier)
+				Z.Cooldown(1/Modifier)
 				//launch-break window check has to happen before the dash loop sleeps through it
 				var/perfect_launch = glob.PERFECT_BREAK && src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
@@ -420,16 +419,13 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
 							src.UseProjectile(B)
-				if(src.HasDashCount())
-					src.IncDashCount()
 
 			if("DragonDash")
 				if(!CanDash())
 					return
 
 				var/Modifier = (src.HasPursuer()/10)
-				if(!src.HasDashMaster())
-					Z.Cooldown(clamp(1-Modifier,0.1, 1))
+				Z.Cooldown(clamp(1-Modifier,0.1, 1))
 
 				if(src.CheckSlotless("New Moon Form"))
 					if(!src.CheckSlotless("Half Moon Form"))
@@ -518,8 +514,6 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							src.SetQueue(new/obj/Skills/Queue/East_Rush)
 					src.Melee1(1, 5, accmulti=1.125+(src.GetSuperDash()/4), BreakAttackRate=1)
 
-				if(src.HasDashCount())
-					src.IncDashCount()
 
 			if("Aerial Recovery")
 				if(src.KO)
@@ -547,8 +541,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						src.Activate(a);
 						Z.Cooldown()
 					else
-						if(!src.HasDashMaster())
-							Z.Cooldown()
+						Z.Cooldown()
 					if(perfect)
 						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
 						src.OMessage(10, "[src] snaps out of the blow the instant it lands!", "")
@@ -593,8 +586,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					src.Activate(a);
 					Z.Cooldown()
 				else
-					if(!src.HasDashMaster())
-						Z.Cooldown()
+					Z.Cooldown()
 					if(src.Target in oview(src, 1))
 						src.dir=get_dir(src, src.Target)
 						src.Melee1(1, 5, accmulti=1.125+(src.GetSuperDash()/4))

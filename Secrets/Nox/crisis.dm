@@ -19,7 +19,7 @@
 	adjust(mob/p)
 		var/pot = p.Potential
 		passives = list("TechniqueMastery" = 1 + round(pot/25, 0.25), "ManaSteal" = pot/10,"CursedWounds" = 1,"HeavyHitter" = 1, \
-						"Extend" = 1, "Gum Gum" = 1, "Divine Technique" = 1, "SpiritFlow" =  max(1 + round(pot/25,1), 4), \
+						"Extend" = 1, "Gum Gum" = 1, "Divine Technique" = 1,  \
 						"Juggernaut" = round(pot/30, 0.25), "EnergyLeak" = 5 - round(pot/50, 0.25), "EnergySteal" = pot, "AfterImages" = 2, "NoWhiff" = 1 )
 		ForMult = 1.2 + (pot/200)
 		StrMult = 1.2 + (pot/200)

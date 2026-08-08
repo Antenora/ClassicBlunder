@@ -101,7 +101,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	TimerLimit = 15
 	Cooldown = 30
 	ManaCost = 5
-	passives = list("Blubber" = 4, "KBRes" = 2)
+	passives = list("Blubber" = 4, "Juggernaut" = 2)
 	ActiveMessage = "cloaks themselves in a repelling field with Bakudō #8: Seki!"
 	OffMessage = "releases Seki."
 

@@ -13,8 +13,7 @@
 
 /mob/proc/applySoftCC(mob/defender, val)
     if(defender.getHarden())
-        var/acu = passive_handler["Acupuncture"]
-        defender.HardenAccumulate(acu);
+        defender.HardenAccumulate();
     if(passive_handler["SoulTug"] && (defender.CyberCancel||defender.Mechanized))
         defender.AddConfusing(passive_handler["SoulTug"]*glob.SOULTUGMULT)
     if(HasDisorienting())
@@ -25,7 +24,7 @@
             if(prob(clamp(GetStunningStrike() * 10, 10, 70)))
                 Stun(defender, 3)
 /mob/proc/applyAdditonalDebuffs(mob/defender, value)
-    var/list/debuffs = list("Shearing", "Confusing","Crippling", "Attracting", "Terrifying", "Pacifying", "Enraging","Doom")
+    var/list/debuffs = list("Shearing", "Confusing","Crippling", "Attracting")
     for(var/debuff in debuffs)
         if(passive_handler.Get("[debuff]"))
             call(defender, "Add[debuff]")(passive_handler.Get("[debuff]") * clamp(value, 0.1, 1))

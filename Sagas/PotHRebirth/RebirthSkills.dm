@@ -79,7 +79,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dont_Stop_Me_Now //first act
 	SpdMult=1.15
 	Cooldown = 1
 	AwakeningRequired=1
-	passives = list("BuffMastery" = 1,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 //HE'S GOTTA BE STRONG AND HE'S GOTTA BE FAST AND HE'S GOTTA BE FRESH FROM THE NIGHT
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Temporary_Hero_Heart
 	ActiveMessage="awakens a heroic heart!"
@@ -154,7 +154,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Axe_of_Justice
 	EndMult = 1.25
 	ForMult=1.5
 	Cooldown = 1
-	passives = list("Neverending Hope" = 1, "Unstoppable" =1)
+	passives = list("SecondWind" = "Hope", "Unstoppable" =1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/We_Are_The_Champions //second act
 	StrMult=1.1
 	EndMult = 1.1
@@ -162,14 +162,14 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/We_Are_The_Champions //second act
 	SpdMult=1.15
 	Cooldown = 1
 	AwakeningRequired=2
-	passives = list("BuffMastery" = 2,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Blue_Experience //second act
 	ActiveMessage="burns brighter than they should."
 	SpdMult=1.5
 	Cooldown = 1
 	TimerLimit=300
 	HealthDrain = 0.05
-	passives = list("BuffMastery" = 3,"Pursuer" =2, "Godspeed"=2)
+	passives = list("Pursuer" =2, "Godspeed"=2)
 //t4 path buffs
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Show_Must_Go_On //third act
 	StrMult=1.25
@@ -179,7 +179,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Show_Must_Go_On //third act
 	Cooldown = 1
 	AwakeningRequired=3
 	TimerLimit=300
-	passives = list("BuffMastery" = 3,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Burning_Soul
 	ActiveMessage="transforms their passion into fury, their desire to win surpassing all."
 	Cooldown = 1
@@ -189,7 +189,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Burning_Soul
 //debuffs
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Rebirth/Dissociation
 	ActiveMessage="doesn't appear to be all there."
-	passives = list("BuffMastery" = -1, "Flow" = -2, "Instinct" = -2)
+	passives = list( "Flow" = -2, "Instinct" = -2)
 	SlowAffected = 1
 	TimerLimit = 6000
 	Cooldown = 4
@@ -777,7 +777,6 @@ obj/Skills/Utility
 			src.Using=1
 		//	usr.loc=usr.UndyingLoc
 			//usr.loc=usr.UndyingLoc
-			usr.passive_handler.Decrease("Undying")
 		//	usr.OMessage(15,"[usr] <b>shines brightly with everlasting Hope, refusing to allow their story to end!</b>","<font color=red>[usr]([usr.key]) used Undying.")
 			var/image/GG=image('GodGlow.dmi',pixel_x=-32,pixel_y=-32, loc = usr, layer=MOB_LAYER-0.5)
 			GG.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
@@ -1086,11 +1085,11 @@ obj/Skills/Buffs
 			PowerMult=1.25
 			Cooldown = 1
 			SwordAscension=6
-			passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=3, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+			passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 			ActiveMessage="materializes the Black Knife."
 			OffMessage="puts the black knife away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=5, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+				passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1118,7 +1117,7 @@ obj/Skills/Buffs
 			ActiveMessage="pulls out a small shard of glass that seems barely usable as a weapon."
 			OffMessage="puts the black shard away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "HolyMod" = 3, "BlurringStrikes"=5, "KiControl"=1)
+				passives = list("PUSpike"=50, "HolyMod" = 3,  "KiControl"=1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1146,7 +1145,7 @@ obj/Skills/Buffs
 			ActiveMessage="manifests their will to change fate, every determination color melding into one: White!"
 			OffMessage="puts the pen away."
 			adjust(mob/p)
-				passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 0.5,"EndlessNine"=0.15)
+				passives = list("PUSpike"=100, "HolyMod" = 5,  "KiControl"=1, "EndlessNine"=0.15)
 				PowerMult=1.25
 				StrMult=1.5
 				ForMult=1.5
@@ -1154,7 +1153,7 @@ obj/Skills/Buffs
 				EnergyHeal=1
 				SwordUnbreakable=1
 				if(p.SagaLevel>=6)
-					passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 1,"EndlessNine"=0.5,"MovementMastery"=6)
+					passives = list("PUSpike"=100, "HolyMod" = 5,  "KiControl"=1, "EndlessNine"=0.5)
 			verb/White_Pen_of_Hope()
 				set category="Skills"
 				adjust(usr)
@@ -1200,11 +1199,11 @@ obj/Skills/Buffs
 					EnergyHeal=1
 					SwordUnbreakable=1
 					if(p.SagaLevel>=6)
-						passives = list("PUSpike"=50,"KiControl" = 1,"CallousedHands"=0.25, "ManaGeneration"=2)
+						passives = list("PUSpike"=50,"KiControl" = 1, "ManaGeneration"=2)
 					if(p.passive_handler["FutureRewritten"])
-						passives = list("PUSpike"=50, "SpiritSword" = 0.75, "ManaGeneration" = 1,"KiControl" = 1)
+						passives = list("PUSpike"=50,  "ManaGeneration" = 1,"KiControl" = 1)
 						if(p.SagaLevel>=6)
-							passives = list("PUSpike"=50, "SpiritSword" = 0.75, "ManaGeneration" = 3,"KiControl" = 1,"CallousedHands"=0.25)
+							passives = list("PUSpike"=50,  "ManaGeneration" = 3,"KiControl" = 1)
 			verb/JusticeAxe()
 				set category="Skills"
 				set name="Axe of Justice"
@@ -1224,7 +1223,7 @@ obj/Skills/Buffs
 			ActiveMessage="draws forth a black and orange sword!"
 			OffMessage="sheathes their spooky blade!"
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"KiControl" = 1)
+				passives = list("PUSpike"=50, "KiControl" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
@@ -1269,7 +1268,7 @@ obj/Skills/Grapple
 /obj/Skills/Buffs/NuStyle/SwordStyle //t3 scaled styles
 	The_Roaring_Knight //cyan t5 evil path
 		StyleActive="The Roaring Knight"
-		passives = list("BlurringStrikes"=2, "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2, "Twisted Sentimentality" = 1)
+		passives = list( "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2, "Twisted Sentimentality" = 1)
 		StyleEnd=1.5
 		StyleStr=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Twisted_Heartbeat"
@@ -1279,13 +1278,13 @@ obj/Skills/Grapple
 			Trigger(usr)
 	White_Pen_Of_Hope //cyan t5 good path
 		StyleActive="The White Pen of Hope"
-		passives = list("ManaGeneration" = 2, "ManaStats"=2, "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
+		passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
 		StyleSpd=1.5
 		StyleStr=1.25
 		StyleFor=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Cross_Slash"
 		adjust(mob/p)
-			passives = list("ManaGeneration" = 2, "ManaStats"=2, "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
+			passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
 		verb/Pen_Of_Hope()
 			set hidden=1
 			adjust(usr)
@@ -1352,7 +1351,7 @@ obj/Skills/Grapple
 	Hope_Crossed_On_Your_Heart
 		StrMult=1.3
 		EndMult=1.3
-		passives = list("CallousedHands"=0.5, "Harden"=3, "TensionLock" = 1, "Brutalize" = 1.5)
+		passives = list( "Harden"=3, "TensionLock" = 1)
 	The_Cage_With_Human_Soul_And_Parts
 		StrMult=1.3
 		ForMult=1.3
@@ -1360,4 +1359,4 @@ obj/Skills/Grapple
 	Blackened_Knife
 		StrMult=1.3
 		SpdMult=1.3
-		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1, "BlurringStrikes" = 3, "Relentlessness" = 1, "Fury" = 3)
+		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1,  "Relentlessness" = 1, "Fury" = 3)

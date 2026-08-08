@@ -10,7 +10,7 @@
 	Ultra_Instinct_Style
 		Copyable = 0
 		StyleActive = "Ultra Ego (Omen)"
-		passives = list("Persistence" = 2, "HardStyle" = 1, "UnderDog" = 3, "Instinct" = 3, "Brutalize" = 2, "Godspeed" = 1,"PureDamage" = 4, "DemonicInfusion" = 1)
+		passives = list("Persistence" = 2, "HardStyle" = 1, "UnderDog" = 3, "Instinct" = 3,  "Godspeed" = 1,"PureDamage" = 4, "DemonicInfusion" = 1)
 		StyleSpd = 1.5
 		StyleOff = 1.5
 		StyleStr = 1.5
@@ -30,7 +30,7 @@
 	Perfected_Ultra_Instinct_Style
 		Copyable = 0
 		StyleActive = "Perfected Ultra Ego"
-		passives = list("Persistence" = 2, "HardStyle" = 2,"UnderDog" = 6, "Instinct" = 3, "Brutalize" = 3, "Godspeed" = 1,"PureDamage" = 5, "DemonicInfusion" = 1, "LikeWater" = 3, "PUSpike" = 25)
+		passives = list("Persistence" = 2, "HardStyle" = 2,"UnderDog" = 6, "Instinct" = 3,  "Godspeed" = 1,"PureDamage" = 5, "DemonicInfusion" = 1, "LikeWater" = 3, "PUSpike" = 25)
 		StyleSpd = 1.6
 		StyleStr = 1.55
 		StyleOff = 1.6

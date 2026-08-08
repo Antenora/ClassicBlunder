@@ -1,8 +1,8 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
 	Intercepting_Fist
-		passives = list("Relentlessness" = 1, "Fury" = 6, "Momentum" = 4, "BuffMastery" = 3,\
-		                "StyleMastery" = 4, "Brutalize" = 2, "Interception" = 4, "CounterMaster" = 10,\
-		                "BlurringStrikes" = 1,  "TensionLock" = 1)
+		passives = list("Relentlessness" = 1, "Fury" = 6, "Momentum" = 4, \
+		                  "Interception" = 4, "CounterMaster" = 10,\
+		                  "TensionLock" = 1)
 		OffMult=1.5
 		DefMult=1.5
 
@@ -14,7 +14,7 @@
 		StrMult = 1.75
 		EndMult = 1.75
 		passives = list("Muscle Power" = 4, "TechniqueMastery" = 5, "DeathField" = 7, \
-		                "Juggernaut"= 5, "KBRes"= 5, "PureReduction" = 2, "GiantForm" = 1,  "TensionLock" = 1)
+		                "Juggernaut"= 5, "PureReduction" = 2, "GiantForm" = 1,  "TensionLock" = 1)
 
 	Kensei
 		StyleNeeded="Two Heavens As One"
@@ -31,7 +31,7 @@
 	Enten
 		IconLock='SweatDrop.dmi'
 		IconApart=1
-		passives= list("Technique Mastery" = -6)
+		passives= list("TechniqueMastery" = -6)
 		ActiveMessage="has the core of their Techniques disrupted by the Peerless Blade's passing..."
 		OffMessage="finds themselves again..."
 
@@ -40,8 +40,8 @@
 		IconLock='EyesSage.dmi'
 		IconLayer=4
 		IconApart=1
-		passives = list("Duelist" = 3, "Half-Sword" = 1, "Zornhau" = 1, "EndlessNine" = 0.25, "LifeGeneration" = 2, \
-		               "KBRes" = 4, "Harden" = 3, "Unnerve" = 2, "Pressure" = 1, "TensionLock" = 1, "PureDamage"=2)
+		passives = list("Duelist" = 3, "Half-Sword" = 1,  "EndlessNine" = 0.25, "LifeGeneration" = 2, \
+		               "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1, "PureDamage"=2)
 		StrMult=1.5
 		EndMult=1.5
 		VaizardHealth=2
@@ -85,9 +85,9 @@
 		AngerMult=1.25
 		VaizardHealth=10
 		passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2, "Instinct" = 2, \
-		 "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5, "Enrage" = 1, "PureReduction" = -2)
+		 "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5,  "PureReduction" = -2)
 	Radioactive
-		passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, "Rain" = 5,\
+		passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
 		"CriticalChance" = 20, "TensionLock" = 1)
 		SpdMult=1.5
 		StrMult=1.25

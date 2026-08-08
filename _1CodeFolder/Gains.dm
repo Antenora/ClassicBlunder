@@ -263,7 +263,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			drain = 0
 		if(InfinityModule)
 			drain = 0
-		if(Energy < drain && !HasNoRevert() && !Dead && !HasMystic())
+		if(Energy < drain && !Dead && !HasMystic())
 
 			Revert()
 			LoseEnergy(drain)
@@ -273,7 +273,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
-		if(Energy < drain && !HasNoRevert())
+		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
 			src<<"The strain of Golden Form forced you to revert!"
@@ -535,7 +535,7 @@ mob
 
 
 
-				if(passive_handler["Iaido"])
+				if(UsingFTG())
 					if(client&&hudIsLive("Iaido", /obj/hud/iaido))
 						client.hud_ids["Iaido"]?:Update()
 				else
@@ -602,14 +602,14 @@ mob
 				src.HandleEldritchTax()
 			if(passive_handler.Get("TrueZenkaiPower")&&src.icon_state=="Meditate")
 				passive_handler.Set("TrueZenkaiPower", 0)
-			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 				if(src.Tension<src.getTensionCap())
 					var/TensionRando=rand(6,15)
 					src.Tension+=0.7 * (glob.TENSION_MULTIPLIER)*(TensionRando/10)
 					if(src.Tension>src.getTensionCap())
 						src.Tension=src.getTensionCap()
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
-				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 					if(!src.Stunned&&!src.Suspended)
 						src.DoDamage(src, (rand(1,5)/30))
 			if(passive_handler["Grit"])
@@ -670,7 +670,7 @@ mob
 					cut_off = glob.racials.SSJ_BASE_CUT_OFF + (glob.racials.SSJ_CUT_OFF_PER_MAST * (race.transformations[transActive].mastery/100))
 					if(src.passive_handler["SSJ4"])
 						drain/=10
-					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("GodlyCalm"))
+					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("CalmAnger"))
 						drain = 0
 
 				if(drain>0)
@@ -681,14 +681,14 @@ mob
 						race.transformations[transActive].mastery+=_mastery
 						if(race.transformations[transActive].mastery>=95)
 							race.transformations[transActive].mastery=100
-					if(Energy < cut_off &&!src.HasNoRevert()&&!src.Dead&&!src.HasMystic())
+					if(Energy < cut_off &&!src.Dead&&!src.HasMystic())
 						src.Revert()
 						src.LoseEnergy(30)
 						src<<"The strain of Super Saiyan forced you to revert!"
 
 /*
 			if(src.trans["active"]>3 && src.masteries["4mastery"]<100 && src.Race=="Changeling")
-				if(src.Energy<30&&!src.HasNoRevert())
+				if(src.Energy<30)
 					src.GainFatigue(30)
 					src.Revert()
 					src<<"The strain of Golden Form forced you to revert!"

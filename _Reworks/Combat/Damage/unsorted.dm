@@ -1,5 +1,5 @@
 
-globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge", "The Flame of Youth")
+globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge")
 
 
 /mob/proc/ignoresPowerClamp(mob/defender)
@@ -15,7 +15,7 @@ globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge", "The Fla
     if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Power"))
         return TRUE
     for(var/passive in glob.IGNORE_POWER_CLAMP_PASSIVES)
-        if(passive_handler|=passive)
+        if(passive_handler.Get(passive))
             return TRUE
     if(passive_handler.Get("WrathFactor") && Health <= 50 && demonDevilTriggerSinMastery())
         return TRUE

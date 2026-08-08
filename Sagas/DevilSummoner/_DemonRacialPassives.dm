@@ -47,7 +47,6 @@
 			passive_handler.Increase("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Increase("ManaCapMult", 0.25)
-			passive_handler.Increase("ManaStats", 4)
 		if("Ghost")
 			passive_handler.Increase("FluidForm", 1)
 			passive_handler.Increase("Flow", 3)
@@ -86,8 +85,6 @@
 			spawn() DemonTyrantAuraLoop()
 		if("Vile")
 			demon_racial_vile_active = TRUE
-		if("Wilder")
-			passive_handler.Increase("Brutalize", 3)
 
 /mob/proc/RemoveDemonRacialPassive()
 	var/race = demon_racial_passive_race
@@ -122,7 +119,6 @@
 			passive_handler.Decrease("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Decrease("ManaCapMult", 0.25)
-			passive_handler.Decrease("ManaStats", 4)
 		if("Ghost")
 			passive_handler.Decrease("FluidForm", 1)
 			passive_handler.Decrease("Flow", 3)
@@ -156,8 +152,6 @@
 				demon_tyrant_underlay = null
 		if("Vile")
 			demon_racial_vile_active = FALSE
-		if("Wilder")
-			passive_handler.Decrease("Brutalize", 3)
 
 
 /mob/var/demon_fallen_last_boost = 0

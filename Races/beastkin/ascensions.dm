@@ -19,13 +19,11 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 						if("Heart of The Beastkin")
 							passives["Adrenaline"] = 1
 							passives["Harden"] = 1
-							passives["CallousedHands"] = 0.1
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							passives["Nimbus"] = 1
-							passives["HybridStrike"] = 1
 							owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Monkey_Gourd)
 							endurance = 0.3
 							strength = 0.35
@@ -34,15 +32,11 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							passives["Steady"] = 1
-							passives["Brutalize"] = 1
 							strength = 0.75
 							offense = 0.75
 							speed = 0.5
 						if("Undying Rage")
 							passives["Momentum"] = 1
-							passives["KillerInstinct"] = 0.05
-							passives["Wrathful Tenacity"] = 0.15
 							strength = 0.5
 							speed = 0.5
 							offense = 0.25
@@ -60,7 +54,6 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							passives["PureReduction"] = 0.125;
 							passives["Musoken"] = 1;
 							passives["AttackSpeed"] = 1;
-							passives["BlurringStrikes"] = 1;
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -83,12 +76,9 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							passives["Touch of Death"] = 1
 							passives["QuickCast"] = 1
 							passives["ManaGeneration"] = 2
-							passives["ManaStats"] = 0.25
 						if("Fox Fire")
 							passives["SoftStyle"] = 1
 							passives["SoulFire"] = 1
-							passives["SpiritFlow"] = 1 // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							passives["HybridStrike"] = 0.5 // Little bit more Force-scaling to damage.
 							passives["LifeSteal"] = 5 //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.5
 							force = 0.5
@@ -115,14 +105,12 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Heart of The Beastkin")
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("CallousedHands", 0.1)
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
 							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("HybridStrike", 1)
 							endurance = 0.3
 							strength = 0.35
 							offense = 0.35
@@ -130,15 +118,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.5
 							offense = 0.75
 							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
-							owner.passive_handler.Increase("KillerInstinct", 0.1)
-							owner.passive_handler.Increase("Wrathful Tenacity", 0.15)
 							strength = 0.5
 							speed = 0.25
 							offense = 0.25
@@ -156,7 +140,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureDamage", 0.25)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -179,13 +162,9 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("ManaGeneration", 1);
 							owner.passive_handler.Increase("QuickCast", 2);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("ManaStats", 0.5);
-							owner.passive_handler.Increase("MovementMastery", 1);
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							owner.passive_handler.Increase("SpiritFlow", 1) // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							owner.passive_handler.Increase("HybridStrike", 0.5) // Little bit more Force-scaling to damage.
 							owner.passive_handler.Increase("LifeSteal", 5) //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.25
 							force = 0.5
@@ -204,13 +183,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Heart of The Beastkin")
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("CallousedHands", 0.1)
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
-							owner.passive_handler.Increase("HybridStrike", 1)
 							endurance = 0.3
 							strength = 0.35
 							offense = 0.35
@@ -218,15 +195,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.75
 							offense = 0.5
 							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
-							owner.passive_handler.Increase("KillerInstinct", 0.1)
-							owner.passive_handler.Increase("Wrathful Tenacity", 0.15)
 							strength = 0.5
 							speed = 0.25
 							offense = 0.25
@@ -245,7 +218,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -267,14 +239,9 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("ManaGeneration", 1);
 							owner.passive_handler.Increase("QuickCast", 1);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("HybridStrike", 0.25);
-							owner.passive_handler.Increase("MovementMastery", 2);
-							owner.passive_handler.Increase("ManaStats", 0.25);
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							owner.passive_handler.Increase("SpiritFlow", 1) // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							owner.passive_handler.Increase("HybridStrike", 0.5) // Little bit more Force-scaling to damage.
 							owner.passive_handler.Increase("LifeSteal", 5) //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.5
 							force = 0.5
@@ -294,13 +261,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 						if("Heart of The Beastkin")
 							owner.passive_handler.Increase("Blubber", 0.25)
 							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("CallousedHands", 0.1)
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
-							owner.passive_handler.Increase("HybridStrike", 1)
 							endurance = 0.3
 							strength = 0.35
 							offense = 0.35
@@ -308,15 +273,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.75
 							offense = 0.75
 							speed = 0.5
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
-							owner.passive_handler.Increase("KillerInstinct", 0.1)
-							owner.passive_handler.Increase("Wrathful Tenacity", 0.15)
 							strength = 0.5
 							speed = 0.25
 							offense = 0.25
@@ -332,7 +293,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureDamage", 0.25)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -351,15 +311,10 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
-							owner.passive_handler.Increase("HybridStrike", 0.25);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("MovementMastery", 2);
-							owner.passive_handler.Increase("ManaStats", 0.25);
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							owner.passive_handler.Increase("SpiritFlow", 1) // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							owner.passive_handler.Increase("HybridStrike", 0.5) // Little bit more Force-scaling to damage.
 							owner.passive_handler.Increase("LifeSteal", 5) //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.5
 							force = 0.5
@@ -377,14 +332,12 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 					switch(choice)
 						if("Heart of The Beastkin")
 							owner.passive_handler.Increase("Harden", 1)
-							owner.passive_handler.Increase("CallousedHands", 0.1)
 							owner.passive_handler.Increase("Deflection", 2)
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
-							owner.passive_handler.Increase("HybridStrike", 1)
 							endurance = 0.3
 							strength = 0.35
 							offense = 0.35
@@ -392,15 +345,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.5
 							offense = 0.75
 							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
-							owner.passive_handler.Increase("KillerInstinct", 0.1)
-							owner.passive_handler.Increase("Wrathful Tenacity", 0.15)
 							strength = 0.25
 							speed = 0.25
 							offense = 0.25
@@ -416,7 +365,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							owner.passive_handler.Increase("PureReduction", 0.125);
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
-							owner.passive_handler.Increase("BlurringStrikes", 1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -435,15 +383,10 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							force = 0.5
 							offense = 0.5
 							defense = 0.5
-							owner.passive_handler.Increase("HybridStrike", 0.75);
 							owner.passive_handler.Increase("ManaCapMult", 0.25);
-							owner.passive_handler.Increase("MovementMastery", 2);
-							owner.passive_handler.Increase("ManaStats", 0.5);
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							owner.passive_handler.Increase("SpiritFlow", 2) // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							owner.passive_handler.Increase("HybridStrike", 1) // Little bit more Force-scaling to damage.
 							owner.passive_handler.Increase("LifeSteal", 5) //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.5
 							force = 0.5
@@ -462,15 +405,12 @@ Today, another God of the Rifts is born."}
 					var/choice = owner.race?:Racial
 					switch(choice)
 						if("Heart of The Beastkin")
-							owner.passive_handler.Increase("CallousedHands", 0.2)
 							owner.passive_handler.Increase("Deflection", 2)
-							owner.passive_handler.Increase("DemonicDurability", 1);
 							endurance = 1
 							strength = 0.5
 							speed = 0.5
 						if("Monkey King")
 							owner.passive_handler.Increase("Nimbus", 1)
-							owner.passive_handler.Increase("HybridStrike", 1)
 							endurance = 0.3
 							strength = 0.35
 							offense = 0.35
@@ -478,15 +418,11 @@ Today, another God of the Rifts is born."}
 							speed = 0.3
 							force = 0.35
 						if("Unseen Predator")
-							owner.passive_handler.Increase("Steady", 1)
-							owner.passive_handler.Increase("Brutalize", 1)
 							strength = 0.75
 							offense = 0.5
 							speed = 0.75
 						if("Undying Rage")
 							owner.passive_handler.Increase("Momentum", 1)
-							owner.passive_handler.Increase("KillerInstinct", 0.1)
-							owner.passive_handler.Increase("Wrathful Tenacity", 0.15)
 							strength = 0.25
 							speed = 0.25
 							offense = 0.25
@@ -500,7 +436,6 @@ Today, another God of the Rifts is born."}
 						if("Feather Knife")
 							owner.passive_handler.Increase("PureReduction", 0.125);
 							owner.passive_handler.Increase("PureDamage", 0.25);
-							owner.passive_handler.Increase("BlurringStrikes", 1);
 							strength = 0.5
 							speed = 0.5
 							endurance = 0.5
@@ -525,8 +460,6 @@ Today, another God of the Rifts is born."}
 						if("Fox Fire")
 							owner.passive_handler.Increase("SoftStyle", 1)
 							owner.passive_handler.Increase("SoulFire", 1)
-							owner.passive_handler.Increase("SpiritFlow", 2) // Gives Autohits and Projectiles a bit more Force Scaling. Allows them to ACTUALLY use MA/Sword skills without them being dogshit.
-							owner.passive_handler.Increase("HybridStrike", 1) // Little bit more Force-scaling to damage.
 							owner.passive_handler.Increase("LifeSteal", 5) //Kitsunes are just fox-coded Succubi and I'm tired of pretending they aren't.
 							offense = 0.5
 							force = 0.5

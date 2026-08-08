@@ -33,14 +33,13 @@ SecretInformation/Spirits_Of_The_World // when given make them make a choice, th
 // place parent functions here
 	givenSkills = list("/obj/Skills/Buffs/SlotlessBuffs/Spirits/Base_Hat_Buff") // TODO: change this typing if wanted
 	proc/applyPassives(mob/p)
-		return list("MartialMagic" = 1, "Gravity" = 1)
+		return list("MartialMagic" = 1, "FluidForm" = 1, "WaterWalk" = 1)
 	proc/pickElement(mob/p)
 		var/element = input(p, "Pick an attunement", "Elemental Attunement") in list("Pick an element", "Fire", "Water", "Earth", "Wind", "Lightning", "Poison")
 		p.Attunement = element
 	Goetic_Virtue
 		applyPassives(mob/p)
-			var/pot = p.Potential
-			. = list("Hellpower" = currentTier/4, "SpiritSword" = 0.15 * currentTier + (pot/125), "BladeFisting" = 1, "MartialMagic" = 1, "Gravity" = 1)
+			. = list("Hellpower" = currentTier/4,  "BladeFisting" = 1, "MartialMagic" = 1, "FluidForm" = 1, "WaterWalk" = 1)
 
 		applySecret(mob/p)
 			switch(currentTier)
@@ -58,7 +57,7 @@ SecretInformation/Spirits_Of_The_World // when given make them make a choice, th
 	Stellar_Constellation
 		applyPassives(mob/p)
 			var/pot = p.Potential
-			. = list("HolyMod" = currentTier, "SpiritPower" = 0.25 + (currentTier * 0.25 + (pot/250)), "HybridStrike" = currentTier/4 + pot/100, "BladeFisting" = 1, "MartialMagic" = 1, "Gravity" = 1)
+			. = list("HolyMod" = currentTier, "SpiritPower" = 0.25 + (currentTier * 0.25 + (pot/250)),  "BladeFisting" = 1, "MartialMagic" = 1, "FluidForm" = 1, "WaterWalk" = 1)
 		applySecret(mob/p)
 			switch(currentTier)
 				if(1)
@@ -78,7 +77,7 @@ SecretInformation/Spirits_Of_The_World // when given make them make a choice, th
 	Elven_Sanctuary
 		applyPassives(mob/p)
 			var/pot = p.Potential
-			. = list("Mythical" = currentTier/4, "SpiritFlow" = 1, "SpiritualDamage" = currentTier*1.25 + pot/25, "MartialMagic" = 1, "Gravity" = 1)
+			. = list(  "SpiritualDamage" = currentTier*1.25 + pot/25, "MartialMagic" = 1, "FluidForm" = 1, "WaterWalk" = 1)
 		applySecret(mob/p)
 			switch(currentTier)
 				if(1)

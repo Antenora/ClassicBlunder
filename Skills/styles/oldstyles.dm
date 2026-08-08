@@ -58,7 +58,7 @@
 						Copyable=0
 						StyleFor=1.5
 						StyleEnd=1.5
-						passives = list("SpiritStrike" = 1, "WeaponBreaker" = 1, "MovingCharge" = 1)
+						passives = list( "WeaponBreaker" = 1, "MovingCharge" = 1)
 						SpiritStrike=1
 						WeaponBreaker=1
 						MovingCharge=1
@@ -125,7 +125,7 @@
 						StyleFor=1.4
 						StyleEnd=1.1
 						StyleSpd=1.1
-						passives = list("IdealStrike" = 1, "HybridStrike" = 0.5, "MartialMagic" = 1,\
+						passives = list(  "MartialMagic" = 1,\
 						"TechniqueMastery" = 2.5,"MovingCharge" = 1)
 						StyleActive="Shunko"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Blade_Singing_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Rhythm_of_War_Style")
@@ -204,7 +204,7 @@
 						StyleStr=1.25
 						StyleFor=1.25
 						StyleSpd=1.5
-						passives = list("IdealStrike" = 1, "WeaponBreaker" = 2, "Flicker" = 2, "Pursuer" = 3, "SuperDash" = 2, "BladeFisting" = 1, "TechniqueMastery" = 2, "MovementMastery" = 6, "MartialMagic" = 1, "MovingCharge" = 1)
+						passives = list( "WeaponBreaker" = 2, "Flicker" = 2, "Pursuer" = 3, "SuperDash" = 2, "BladeFisting" = 1, "TechniqueMastery" = 2,  "MartialMagic" = 1, "MovingCharge" = 1)
 						HybridStrike=1
 						WeaponBreaker=3
 						Flicker=3

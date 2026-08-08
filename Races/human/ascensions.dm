@@ -83,7 +83,7 @@ ascension
 				..()
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("Tenacity" = 1, "Shonen" = 1, "ShonenPower" = 0.15, "UnderDog"=1, "Adrenaline"=1, "Persistence" = 1, "Adaptation" = 1)
+			passives = list("Tenacity" = 1, "Shonen" = 1, "ShonenPower" = 0.15, "UnderDog"=1, "Adrenaline"=1, "Persistence" = 1)
 			new_anger_message = "grows determined!"
 			on_ascension_message = "You learn the meaning of responsibility..."
 			simulateChoiceMutation(mob/owner)
@@ -124,7 +124,7 @@ ascension
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			var/mazokuSinChosen = ""
-			passives = list("Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list("Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message="grows confident!"
 			on_ascension_message = "You learn the meaning of confidence..."
 			anger = 0.1
@@ -191,7 +191,7 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			passives = list("Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list("Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "gains absolute clarity!"
 			on_ascension_message = "You learn the meaning of competence..."
 			simulateChoiceMutation(mob/owner)
@@ -228,7 +228,7 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			passives = list( "Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list( "Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "becomes angry!"
 			on_ascension_message = "You learn the meaning of humanity..."
 			simulateChoiceMutation(mob/owner)
@@ -266,7 +266,7 @@ ascension
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			passives = list( "Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list( "Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "becomes angry!"
 			on_ascension_message = "You learn the meaning of humanity..."
 			simulateChoiceMutation(mob/owner)

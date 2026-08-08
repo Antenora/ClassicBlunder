@@ -2,7 +2,7 @@
 
 	Magma_Walker
 		SignatureTechnique = 1
-		passives = list("SpiritFlow" = 2, "Familiar" = 1, "Burning" = 2.5, "Shattering" = 2.5, \
+		passives = list( "Familiar" = 1, "Burning" = 2.5, "Shattering" = 2.5, \
 						"Combustion" = 30, "Harden" = 1)
 		StyleActive = "Magma"
 		StyleFor = 1.2
@@ -26,7 +26,7 @@
 			src.Trigger(usr)
 	Ice_Dancing
 		SignatureTechnique = 1
-		passives = list("SpiritFlow" = 2, "Familiar" = 1, "IceAge" = 50, "Chilling" = 4, "Shattering" = 1, \
+		passives = list( "Familiar" = 1, "IceAge" = 50, "Chilling" = 4, "Shattering" = 1, \
 						"Harden" = 1, "WaveDancer" = 1.5)
 		StyleActive = "Ice"
 		StyleOff = 1.15
@@ -50,8 +50,8 @@
 			src.Trigger(usr)
 	Stormbringer
 		SignatureTechnique = 1
-		passives = list("SpiritFlow" = 2, "Familiar" = 1, "ThunderHerald" = 1, "CriticalChance" = 15, "CriticalDamage" = 0.1, \
-						"Rain" = 5, "Godspeed" = 1, "WaveDancer" = 1)
+		passives = list( "Familiar" = 1, "ThunderHerald" = 1, "CriticalChance" = 15, "CriticalDamage" = 0.1, \
+						 "Godspeed" = 1, "WaveDancer" = 1)
 		StyleActive = "Storm"
 		StyleSpd = 1.15
 		StyleOff = 1.15
@@ -75,7 +75,7 @@
 			src.Trigger(usr)
 	Inferno
 		SignatureTechnique = 1
-		passives = list("SpiritFlow" = 2, "Familiar" = 1, "Combustion" = 45, "Heavy Strike" = "Inferno",\
+		passives = list( "Familiar" = 1, "Combustion" = 45, "Heavy Strike" = "Inferno",\
 						 "Shocking" = 2, "Burning" = 3)
 		StyleActive = "Inferno"
 		StyleFor = 1.3
@@ -99,7 +99,7 @@
 			src.Trigger(usr)
 	Bloodmancer
 		SignatureTechnique = 1
-		passives = list("Familiar" = 1, "SpiritFlow" = 2, "Poisoning" = 3, "BlindingVenom" = 1.5, "Rusting" = 2, \
+		passives = list("Familiar" = 1,  "Poisoning" = 3, "BlindingVenom" = 1.5, "Rusting" = 2, \
 					"BloodEruption" = 1, "LingeringPoison" = 1)
 		StyleActive = "Bloodmancer"
 		StyleFor = 1.3

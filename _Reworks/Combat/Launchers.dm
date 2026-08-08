@@ -24,7 +24,7 @@
 	else
 		target.Frozen=1
 		target.startOfLaunch = world.time
-		target.Launched = 10 * time * target.getControlResistValue()// 1 second per time
+		target.Launched = 10 * time
 		target.launch_total = target.Launched
 		//pop up fast, sink slow. the world shadow stays pinned + shrinks off pixel_z on its own
 		animate(target, pixel_z = glob.LAUNCH_LIFT_PX, time = 2, easing = SINE_EASING|EASE_OUT)
