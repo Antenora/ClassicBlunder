@@ -1,7 +1,7 @@
 // Menu HUD. CollectMenuVerbs() removes Other/Utility verbs from the verbs list
 #define MHUD_LAYER (FLY_LAYER+3)
 #define MHUD_PRESS_STEP 1
-#define MHUD_PAGE1_ROWS 5        // page 1 reserves the bottom for the Audio switch + CHAT toggles
+#define MHUD_PAGE1_ROWS 4        // page 1 reserves the bottom for the FPS row + Audio switch + CHAT toggles
 #define MHUD_FULL_ROWS 8         // later pages have no fixed footer, so they fill the panel
 #define MHUD_PAGE1_SIZE (MHUD_PAGE1_ROWS * 2)
 #define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
@@ -253,12 +253,15 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	mouse_opacity = 2
 	maptext_width = 110
 	maptext_height = 20
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
 	proc/SetVal(f)
 		maptext = "<span style=\"[MHUD_FONT]; color:#ffd86b\">[f]</span>"
 	MouseEntered(location, control, params)
 		filters = filter(type="outline", size=1, color="#8be9ff")
 	MouseExited(location, control, params)
-		filters = null
+		filters = filter(type="outline", size=1, color="#000000")
 	Click()
 		if(usr) usr.client.OptFpsClick()
 
@@ -727,16 +730,17 @@ client/proc/BuildOptionsExtras()
 		menu_entry_objs += sw
 		screen += sw
 		ti++
-	// FPS row below the toggle grid; panel fill runs to ~-123 so -112 still clears the frame
+	// FPS row takes the verb slot freed by MHUD_PAGE1_ROWS 4: row 4 at -24, above Audio.
+	// -112 is pager territory (arrows at y -122..-90) - nothing else goes down there
 	var/atom/movable/shud/menutext/fl = new
 	fl.maptext_width = 110
 	fl.maptext_height = 20
 	fl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">FPS</span>"
-	fl.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-112"
+	fl.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-24"
 	menu_entry_objs += fl
 	screen += fl
 	var/atom/movable/shud/menufpsval/fv = new
 	fv.SetVal(mob ? mob.EffectiveClientFPS() : CLIENT_FPS_DEFAULT)
-	fv.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-112"
+	fv.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-24"
 	menu_entry_objs += fv
 	screen += fv
