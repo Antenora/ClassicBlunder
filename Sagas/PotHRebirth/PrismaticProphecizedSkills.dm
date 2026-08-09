@@ -6,7 +6,7 @@
 		StyleOff = 1.05
 		StyleDef = 1.05
 		StyleActive = "Fight or Flight"
-		passives = list("HybridStyle" = "MysticStyle",   "Flow" = 1, "Instinct" = 0.5)
+		passives = list("HybridStyle" = "MysticStyle", "Flow" = 1, "Instinct" = 0.5)
 		verb/Fight_or_Flight()
 			set hidden=1
 			src.Trigger(usr)
@@ -18,7 +18,7 @@
 		StyleDef = 1.10
 		StyleSpd = 1.10
 		StyleActive = "Mountain King"
-		passives = list("HybridStyle" = "MysticStyle",    "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle", "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
 		verb/Mountain_King()
 			set hidden=1
 			src.Trigger(usr)
@@ -43,7 +43,7 @@
 		StyleDef = 1.35
 		StyleSpd = 1.35
 		StyleActive = "Afterlife"
-		passives = list("HybridStyle" = "MysticStyle",     "Flow" = 4, "Instinct" = 3,\
+		passives = list("HybridStyle" = "MysticStyle", "Flow" = 4, "Instinct" = 3,\
 		"LikeWater" = 3, "DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50)
 		verb/Afterlife()
 			set hidden=1
@@ -59,7 +59,7 @@ obj
 			ForMult = 1.25
 			RecovMult = 1.10
 			passives = list( "TechniqueMastery" = 2,    \
-			"Instinct" = 2, "Flow" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow")
+			"Instinct" = 2, "Flow" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
@@ -78,10 +78,10 @@ obj
 				EndMult = 1.10 + (0.01 * pLv)
 				RecovMult = 1.10 + (0.01 * pLv)
 				passives = list("TechniqueMastery" = 2,    \
-				 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow")
+				 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
 				if(pLv > 4)
 					passives = list("TechniqueMastery" = 2,    \
-					 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5))
+					 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1)
 			verb/Hyperdeath_Mode()
 				set category = "Skills"
 				adjust(usr)
