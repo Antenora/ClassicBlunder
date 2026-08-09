@@ -227,4 +227,4 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Void" = 1, "Vulnerable Behind" = 1, "WalkThroughHell" = 1, "WarmingUp" = 1,\
 	"WarpPoint" = 1, "WeaponBreakerQOL" = 1, "Whirlwind" = 1, "Wolf Spirit" = 1,\
 	"WrathFactor" = 1, "Wrathful" = 1, "X-Antibody" = 1, "YataNoKagami" = 1,\
-	"Yosuga" = 1, "You Thought" = 1, "Zeal" = 1, "ZenkaiPower" = 1)
+	"Yosuga" = 1, "You Thought" = 1, "Zeal" = 1, "ZenkaiPower" = 1,  "Health Obfuscation" = 1)
