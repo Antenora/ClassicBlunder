@@ -183,7 +183,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"InverseHealing" = 1, "Judged" = 1, "Justice" = 1, "Kaioken" = 1,\
 	"Kaioken Blue" = 1, "Kindling" = 1, "Knight of the Empty Seat" = 1, "LegendarySaiyan" = 1,\
 	"Life Fiber Rending" = 1, "LimitBroken" = 1, "Limited Rank-Up" = 1, "LimitlessMagic" = 1,\
-	"AfterImageSkin" = 1, "LifeStealPierce" = 1, "Lion Spirit" = 1, "TrueBlue" = 1, "VoidBlade" = 1, "Longing" = 1, "LunarAnger" = 1, "LunarWrath" = 1,\
+	"AfterImageSkin" = 1, "LifeStealPierce" = 1, "Lion Spirit" = 1, "TrueBlue" = 1, "VoidBlade" = 1, "Longing" = 1, "LunarWrath" = 1,\
 	"LustFactor" = 1, "MagmicInfusion" = 1, "MagnifiedDef" = 1, "MagnifiedEnd" = 1,\
 	"MagnifiedFor" = 1, "MagnifiedOff" = 1, "MagnifiedSSJ1" = 1, "MagnifiedSpd" = 1,\
 	"MagnifiedStr" = 1, "Maki" = 1, "ManaCapMult" = 1, "ManaDrain" = 1,\

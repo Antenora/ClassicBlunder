@@ -65,7 +65,7 @@
 		if("Megami")
 			passive_handler.Increase("ManaGeneration", 5)
 		if("Mitama")
-			Anger += 0.2
+			AngerAdd += 0.2
 		if("Omega")
 			passive_handler.Increase("PureReduction", 2)
 		if("Snake")
@@ -137,7 +137,7 @@
 		if("Megami")
 			passive_handler.Decrease("ManaGeneration", 5)
 		if("Mitama")
-			Anger -= 0.2
+			AngerAdd -= 0.2
 		if("Omega")
 			passive_handler.Decrease("PureReduction", 2)
 		if("Snake")

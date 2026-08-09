@@ -41,10 +41,8 @@ mob
 		DamageSelf(var/val, trueDmg)
 			if(val < 0)
 				val = 0.015
-			if(src.Health-val<=src.AngerPoint*(1-src.HealthCut))
-				if(!src.Anger&&!src.HasCalmAnger()&&!src.HasNoAnger()&&!src.AngerCD&&!src.HasLunarAnger())
-					src.Anger()
-					val/=src.AngerMax
+			if(src.AngerAdvance(val))
+				val/=src.AngerMax
 			if(src.VaizardHealth)
 				src.VaizardHealth-=val
 				if(src.VaizardHealth<=0)
@@ -227,10 +225,8 @@ mob
 				else
 					val=0
 
-			if(defender.Health-val<=defender.AngerPoint*(1-defender.HealthCut))
-				if(!defender.Anger&&!defender.HasCalmAnger()&&!defender.HasNoAnger()&&!defender.AngerCD&&!defender.HasLunarAnger())
-					defender.Anger()
-					val/=defender.AngerMax
+			if(defender.AngerAdvance(val))
+				val/=defender.AngerMax
 
 			if(defender.passive_handler.Get("Persistence")&&!defender.HasInjuryImmune()||defender.passive_handler.Get("Determination(Orange)")&&!defender.HasInjuryImmune()||defender.passive_handler.Get("Determination(Orange)")&&!defender.HasInjuryImmune())
 				if(FightingSeriously(src,defender))
@@ -1214,11 +1210,12 @@ mob
 			if(src.Oxygen>KeyOxygen)
 				src.Oxygen-=1
 		Calm(var/Pacified=0)
-			if(passive_handler.Get("EndlessAnger"))
-				return
 			if(!Pacified)src.OMessage(10,"<font color=white><i>[src] becomes calm.","<font color=silver>[src]([src.key]) becomes calm.")
 			src.DefianceCounter=0
 			src.Anger=0
+			src.AngerTier=0
+			src.AngerRush=0
+			src.AngerCalmHigh=0
 			race.onCalm(src)
 			src.AngerCD=5
 			if(src.oozaru_type=="Demonic")
@@ -2701,17 +2698,6 @@ mob
 					src.AngerMax = num
 			else
 				src.AngerMax=num
-		AngerMult(var/num)
-			src.AngerMax=1+((src.AngerMax-1)*num)
-		AngerDiv(var/num)
-			src.AngerMax=1+((src.AngerMax-1)/num)
-		LunarWrathAnger()
-			if(src.ManaAmount>=50 && src.passive_handler.Get("LunarWrath"))
-				src.AngerMax=1+(src.ManaAmount/100)
-			if(src.passive_handler.Get("Unrelenting Wrath"))
-				src.AngerMax=5
-			else
-				src.AngerMax=1
 		WeirdAngerStuff() //additive anger that won't be affected by mult
 			var/AngerTotal
 			if(src.passive_handler.Get("Red Hot Rage"))

@@ -32,7 +32,7 @@
 	DefMult = 0.1
 	PowerMult=1.5
 	HealthThreshold=0.01
-	AutoAnger = 1
+	AngerFloor = 90
 	TimerLimit = 360
 	verb/Ultimate_Form_Toggle()
 		set category="Other"
@@ -124,7 +124,7 @@
 			passives["EndlessNine"] = 0.25
 			passives["PUSpike"] = 50
 			passives["KiControl"] = 1
-			AutoAnger = 0
+			AngerFloor = 0
 			VaizardShatter=0
 			StrMult = 1.5
 			ForMult = 1.5

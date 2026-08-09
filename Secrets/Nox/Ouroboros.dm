@@ -11,7 +11,6 @@
 Ouroboros is summoned from a special space, and can directly attack the soul or mind of the target."}
 	passives = list("BladeFisting" = 1, "Extend" = 1, "Grippy" = 3, "CalmAnger" = 1)
 	NoSaga=1
-	CalmAnger=1
 	MagicSword=1
 	icon = 'ouroboros (1).dmi'
 	pixel_x = -32

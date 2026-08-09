@@ -895,7 +895,7 @@ mob/Creation/verb
 		if(blah=="RecoveryMod")
 			alert("This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.")
 		if(blah=="AngerMod")
-			alert("This determines how much power you gain when you Anger, an event that occurs if a hit that would have reduced you under 25% heatlh happens..")
+			alert("This determines your peak Anger power bonus. Anger builds as you take damage - a quarter of the bonus at 75% health, half at 50% where you properly Anger, and the full bonus at 25%. Some buffs and events can push you along the curve faster.")
 		if(blah=="GrowthRate")
 			alert("For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.")
 

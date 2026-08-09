@@ -600,7 +600,7 @@ obj/Items/Enchantment
 					CD+=(src.Hard*MEDIUM_EFFECT_CD)
 				if(src.Hallucinogen)
 					FoundHallucinogen=1
-					PP.AutoAnger=1
+					PP.AngerFloor=75
 					var/buff = 0.25 * src.Hallucinogen
 					PP.AngerMult= 1 + buff
 					PP.DefMult = 1 - buff
@@ -2610,7 +2610,6 @@ obj/Items/Enchantment/Staff
 	var/PointsAssigned=0
 	var/ManaGeneration=0
 	var/ElementallyInfused
-	var/CalmAnger=0
 	var/StaffIconSelected=0
 	var/Conjured=0
 	var/modifiedAttack = TRUE
@@ -2668,7 +2667,6 @@ obj/Items/Enchantment/Staff
 					ShatterTier=0
 					NoSaga=1
 					ManaGeneration=5
-					CalmAnger=1
 					Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Chain_Quasar", "/obj/Skills/AutoHit/OpticBarrel", "/obj/Skills/Projectile/Fenrir", "/obj/Skills/Projectile/Thor", "/obj/Skills/Queue/ChainRevolver")
 		Staff
 			name="Null Staff"

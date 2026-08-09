@@ -443,11 +443,9 @@ NEW VARIABLES
 	var/MagicSwordThird
 	var/KillSword//Kills the sword when the buff is removed.
 //Anger stuff
-	var/AutoAnger //Flicks anger on
+	var/AngerFloor //hp% by which this thing makes you hit peak anger. replaces AutoAnger
 	var/AngerMult //Mults anger.
-	var/AngerThreshold //If anger is lower than this, it will set your anger.
 	var/CalmAnger //Adds your anger to power mult.
-	var/AngerStorage//holds your anger so that calm anger doesnt bug you the FUCK out.
 	var/WaveringAngerLimit//Every time this amount of seconds passes, there is a chance for your anger to fail for the same interval.
 	var/WaveringAnger//This tallies how long the current increment is.
 	var/NoAnger //Cant be mad about that...
@@ -1530,8 +1528,7 @@ NEW VARIABLES
 			StrMult=1.5
 			SpdMult=1.5
 			PowerReplacement=5
-			AngerThreshold=2
-			AutoAnger=1
+			AngerFloor=75
 			passives = list("GiantForm" = 1)
 			GiantForm=1
 			Enlarge=2
@@ -2183,7 +2180,7 @@ NEW VARIABLES
 				LifeGeneration=0.5
 				Deflection=2
 				Reversal=0.1
-				AutoAnger=1
+				AngerFloor=75
 				ActiveMessage="overflows with berserk demon chakra!"
 				OffMessage="can no longer bear the strain of channelling demon chakra..."
 				TextColor="#FF7700"
@@ -2200,11 +2197,11 @@ NEW VARIABLES
 						if(Mastery >= 4)
 							src.TooMuchHealth=null
 						if(Mastery >= 3)
-							AutoAnger=0
+							AngerFloor=0
 							passives = list("Maki" = 1,  "LifeGeneration" = 2.5, "Deflection" = 2, "Reversal" = Mastery/5,"CalmAnger" = 1)
 							CalmAnger=1
 						else
-							AutoAnger=1
+							AngerFloor=75
 							passives = list("Maki" = 1,  "LifeGeneration" = 1, "Deflection" = 2,  "Reversal" = Mastery/10)
 							CalmAnger=0
 					src.Trigger(usr)
@@ -2215,7 +2212,7 @@ NEW VARIABLES
 				CooldownStatic = 1
 				Cooldown=60
 				passives = list("Maki" = 1, "Instinct" = 2, "Pursuer" = 2, "Flicker" = 2)
-				AutoAnger=1
+				AngerFloor=75
 				VaizardHealth=1
 				CooldownScaling = 1
 				ActiveMessage="is taken over by a violent rage as a mask forms on their face!"
@@ -4232,7 +4229,7 @@ NEW VARIABLES
 				if(player.SagaLevel>=1)
 					ActiveMessage="draws power from their courage as they pulse with green light!"
 				if(player.SagaLevel>=2)
-					AutoAnger=1
+					AngerFloor=75
 					passives = list("Tenacity" = player.SagaLevel, "UnderDog" = player.SagaLevel/2, "Persistence" = player.SagaLevel)
 				if(player.SagaLevel>=5)
 					ActiveMessage="roars with a heart full of courage, they are the embodiment of courage itself!"
@@ -4669,7 +4666,7 @@ NEW VARIABLES
 			EndMult=1.5
 			SpdMult=1.5
 			DefMult=1.5
-			AutoAnger=1
+			AngerFloor=75
 			passives = list("GodKi" = 0.75, "EnergyGeneration" = 5, "Godspeed" = 4, "Flow" = 5,   "PureDamage" = 3, "PureReduction" = 3, \
 								"BackTrack" = 2 , "StunningStrike" = 3, "Sunyata" = 5,  "Flicker" = 5, "Pursuer" = 5,"CalmAnger"=1)
 			PUSpeedModifier=2
@@ -4987,7 +4984,7 @@ NEW VARIABLES
 				return//it triggers when you DIE now
 				src.Trigger(usr)
 		Saiyan_Dominance
-			AutoAnger=1
+			AngerFloor=75
 			PridefulRage=1
 			TextColor=rgb(230, 230, 100)
 			Cooldown=300
@@ -7552,8 +7549,7 @@ NEW VARIABLES
 		Mark_of_the_Crone
 			SignatureTechnique=3
 			SpecialSlot=1
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=75
 			IconLock='CroneMajinSparks.gif'
 			LockX=0
 			LockY=0
@@ -7623,8 +7619,7 @@ NEW VARIABLES
 			SignatureTechnique=4
 			SpecialSlot=0
 			Slotless=1
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=90
 			IconLock='AuraMysticBig.dmi'
 			IconLockBlend=4
 			StrMult = 1.5
@@ -8028,8 +8023,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		Majin
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=75
 			IconLock='MajinAura.dmi'
 			LockX=0
 			LockY=0
@@ -9651,7 +9645,7 @@ NEW VARIABLES
 			SBuffNeeded="Sharingan"
 			passives = list( "Deflection" = 1, "Flow" = 1)
 			BuffMastery=5
-			AutoAnger = 1
+			AngerFloor = 90
 			Cooldown=-1
 			Deflection=1
 			Flow=1
@@ -10024,7 +10018,7 @@ NEW VARIABLES
 		Werewolf
 			New_Moon_Form
 				HairLock=1
-				AutoAnger=1
+				AngerFloor=60
 				passives = list("Pursuer" = 1)
 				Pursuer=1
 				ActiveMessage="discards their humanity, their jaws stretching into a bloodthirsty maw!"
@@ -10094,7 +10088,7 @@ NEW VARIABLES
 
 				HealthThreshold=0.1
 				RegenMult=2
-				AutoAnger=1
+				AngerFloor=90
 				Pursuer=2
 				Godspeed=2
 				Curse=1
@@ -10894,7 +10888,7 @@ NEW VARIABLES
 						ElementalOffense="Void"
 						passives = list("TensionLock" = 1)
 						AngerMult=1.5
-						AutoAnger=1
+						AngerFloor=90
 						TimerLimit=60
 					Ghost_Drive
 						FlashChange=1
@@ -10914,7 +10908,7 @@ NEW VARIABLES
 						ElementalOffense="Void"
 						passives = list("TensionLock" = 1)
 						AngerMult=1.75
-						AutoAnger=1
+						AngerFloor=90
 						TimerLimit=60
 					The_Fourteenth_One
 						FlashChange=1
@@ -11499,7 +11493,7 @@ NEW VARIABLES
 				OffMult=2
 				PowerMult=2
 				AngerMult=2
-				AutoAnger=1
+				AngerFloor=90
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1)
 				AuraLock='AntiAura.dmi'
 				AuraX=-18
@@ -11796,7 +11790,7 @@ NEW VARIABLES
 				DarkChange=1
 				StrMult=1.5
 				SpdMult=1.5
-				AutoAnger=1
+				AngerFloor=75
 				passives = list("SpecialBuffLock" = 1,  "Pursuer" = 1, "Flicker" = 1, "StunningStrike" = 1, "DoubleStrike" = 3, "TechniqueMastery" = 5,  "QuickCast" = 2, "Godspeed" = 1)
 				Curse=1
 				Pursuer=1
@@ -11925,7 +11919,7 @@ NEW VARIABLES
 				Cooldown=1
 			Punishment_of_Demons
 				AlwaysOn=1
-				AutoAnger=1
+				AngerFloor=75
 				MovementMastery=-3
 				ActiveMessage="experiences the suffering of Demon Realm - boundless fury leading into peril!"
 				KenWave=1
@@ -11959,7 +11953,7 @@ NEW VARIABLES
 				SpdMult=1.5
 				RecovMult=1.5
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1,  "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
-				AutoAnger=1
+				AngerFloor=75
 				TooLittleMana=1
 				AuraLock='AntiAura.dmi'
 				VaizardHealth = 15
@@ -12009,7 +12003,7 @@ NEW VARIABLES
 				TooMuchHealth = 90
 				Godspeed = 1
 				PowerMult=1.25
-				AutoAnger=1
+				AngerFloor=75
 				ManaLeak=0.5
 				TooLittleMana=1
 				Pursuer = 1
@@ -13141,7 +13135,6 @@ mob
 					if("Tatsumaki")
 						StyleBuff.Finisher="/obj/Skills/Queue/Finisher/Shippu_Jinraikyaku"
 				if(src.SagaLevel>=5)
-					src.StyleBuff.AngerThreshold=2
 					switch(src.AnsatsukenAscension)
 						if("Chikara")
 							src.StyleBuff.StyleStr=1.5
@@ -13159,7 +13152,7 @@ mob
 								src.StyleBuff.passives["EnergyGeneration"] = 5
 								src.StyleBuff.passives["ManaGeneration"] = 5
 						if("Satsui")
-							src.StyleBuff.AutoAnger=1
+							src.StyleBuff.AngerFloor=75
 							src.StyleBuff.StyleStr=1.5
 							src.StyleBuff.StyleFor=1.4
 							src.StyleBuff.StyleOff=1.4
@@ -13259,10 +13252,9 @@ mob
 					src.ActiveBuff.icon=src.ExpandBase
 					src.ActiveBuff.passives["GiantForm"] = round(AscensionsAcquired/2)
 					src.ActiveBuff.passives["Godspeed"] = AscensionsAcquired
-					src.ActiveBuff.AutoAnger=0
-					src.ActiveBuff.AngerStorage=0
+					src.ActiveBuff.AngerFloor=0
 					if(src.passive_handler.Get("StarPower"))
-						src.ActiveBuff.AutoAnger=1
+						src.ActiveBuff.AngerFloor=75
 						src.ActiveBuff.AngerMult=2
 						src.ActiveBuff.passives["Pursuer"] = 2 * AscensionsAcquired
 					else
@@ -14337,17 +14329,15 @@ mob
 				src.SenseUnlocked+=B.SenseUnlocked
 			if(B.Afterimages)
 				src.Afterimages+=1
-			if(B.AutoAnger && !src.AutoBerserkOptOut)
-				Anger()
-				passive_handler.Increase("EndlessAnger")
 			if(B.CalmAnger)
 				src.Anger=0
+				src.AngerTier=0
 			if(B.AngerMult)
 				src.AngerMult+=B.AngerMult
-			// if(B.AngerThreshold)
-			// 	src.AngerThreshold=B.AngerThreshold
 			if(B.AngerPoint)
 				src.AngerPoint += B.AngerPoint
+			if(B.AngerFloor)
+				UpdateAnger()
 			if(B.WaveringAngerLimit)
 				B.WaveringAnger=0
 				B.NoAnger=0
@@ -14849,14 +14839,10 @@ mob
 				src.SenseUnlocked-=B.SenseUnlocked
 			if(B.Afterimages)
 				src.Afterimages-=B.Afterimages
-			if(B.AutoAnger && !src.AutoBerserkOptOut)
-				if(passive_handler.Get("EndlessAnger"))
-					passive_handler.Decrease("EndlessAnger")
-				src.Calm()
-			// if(B.AngerThreshold)
-			// 	src.AngerThreshold-=B.AngerThreshold
 			if(B.AngerPoint)
 				src.AngerPoint -= B.AngerPoint
+			if(B.AngerFloor)
+				AngerReclamp(B)
 			if(B.AngerMult)
 				src.AngerMult-=B.AngerMult
 			if(B.AngerMessage)
@@ -14973,8 +14959,6 @@ mob
 			if(B.PotionCD)
 				src.PotionCD+=B.PotionCD
 
-			if(B.AngerStorage)
-				src.AngerMax=B.AngerStorage
 			if(B.PowerInvisible)
 				src.PowerInvisible/=B.PowerInvisible
 			if(B.PURestrictionRemove)

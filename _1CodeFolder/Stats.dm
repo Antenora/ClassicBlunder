@@ -17,19 +17,14 @@ mob/proc/GetAssess()
 	var/GodKiDisplay
 	var/MaouKiDisplay
 	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef())/6, 0.05)
-	var/EffectiveAnger=Anger
+	var/EffectiveAnger=AngerCurveValue()
 	var/PDam=1+((src.HasPureDamage()/10)*glob.PURE_MODIFIER)
 	var/PRed=1+((src.HasPureReduction()/10)*glob.PURE_MODIFIER)
-	if(src.Anger)
+	if(EffectiveAnger>1||src.Anger)
 		if(src.AngerMult>1)
 			var/ang=EffectiveAnger-1//Usable anger
 			var/mult=ang*src.AngerMult
 			EffectiveAnger=mult+1
-		if(src.AngerThreshold)
-			if(EffectiveAnger<src.AngerThreshold)
-				EffectiveAnger=src.AngerThreshold
-		if(src.DefianceCounter>0&&!CheckSlotless("Great Ape"))
-			EffectiveAnger+=src.DefianceCounter*0.05
 		if(src.CyberCancel>0)
 			var/ang=EffectiveAnger-1//Usable anger.
 			var/cancel=ang*src.CyberCancel//1 Cyber Cancel = all of usable anger.
@@ -885,25 +880,19 @@ mob/proc/
 			if(src.AngerMax)
 				var/a=1
 				if(HasCalmAnger())
-					a=src.AngerMax
-					if((src.AnsatsukenAscension=="Chikara"&&src.StyleActive=="Ansatsuken"))
-						a=max(src.AngerMax,2)
-					if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
-						a *= 1+(secretDatum?:getBoon(src, "Anger")/10)
+					a=src.AngerCurveValue()
 					if(src.AngerMult>1)
 						var/ang=a-1//Usable anger.
 						var/mult=ang*src.AngerMult
 						a=mult+1
-				else if(Anger&&!src.HasNoAnger())
-					a=Anger
+				else if(!src.HasNoAnger())
+					a=src.AngerCurveValue()
 					if(src.AngerMult>1)
 						var/ang=a-1//Usable anger
 						var/mult=ang*src.AngerMult
 						a=mult+1
-					if(src.DefianceCounter)
-						a+=src.DefianceCounter*0.05
 					// WrathFactor
-					if(src.passive_handler.Get("WrathFactor") && src.demonDevilTriggerSinMastery())
+					if((a>1||src.Anger)&&src.passive_handler.Get("WrathFactor")&&src.demonDevilTriggerSinMastery())
 						var/missing = max(0, 100 - Health)
 						var/steps = round(missing / 10)
 						if(steps > 0)
@@ -1473,20 +1462,12 @@ mob/proc/Get_Scouter_Reading(mob/B)
 			Ratio*=((100-B.GatesNerfPerc)/100)
 		if(B.AngerMax)
 			var/a=1
-			if(B.HasCalmAnger())
-				a=B.AngerMax
+			if(!B.HasCalmAnger()&&!B.HasNoAnger())
+				a=B.AngerCurveValue()
 				if(B.AngerMult>1)
 					var/ang=a-1
 					var/mult=ang*B.AngerMult
 					a=mult+1
-			else if(B.Anger&&!B.HasNoAnger()&&!B.HiddenAnger)
-				a=B.Anger
-				if(B.AngerMult>1)
-					var/ang=a-1
-					var/mult=ang*B.AngerMult
-					a=mult+1
-				if(B.DefianceCounter)
-					a+=B.DefianceCounter*0.25
 			if(B.CyberCancel>0)
 				var/ang=a-1
 				var/cancel=ang*B.CyberCancel

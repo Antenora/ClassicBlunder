@@ -590,7 +590,7 @@ obj/Items
 					usr.AddPoison(4*src.EatToxicity)
 				if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You feel aggressive!</font>"
-					usr.Anger()
+					usr.ForceAngered()
 				else if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You grow mellow!</font>"
 					usr.AddPacifying(20*src.EatToxicity)
@@ -898,7 +898,6 @@ obj/Items/Sword
 	var/Shearing=0//shears stuff
 	var/ElementallyInfused
 	var/SpiritSword=0
-	var/CalmAnger=0
 	var/SweepingStrike
 	var/BulletKill=0
 	var/Extend=0
@@ -1023,7 +1022,6 @@ obj/Items/Sword
 				pixel_x=-16
 				pixel_y=-16
 				NoSaga=1
-				CalmAnger=1
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
@@ -1176,7 +1174,6 @@ obj/Items/Sword
 				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5,  "BlockChance"=20, "CriticalBlock"=0.15,  "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
-				CalmAnger=1
 				MagicSword=1
 				Extend=1
 				BulletKill=1

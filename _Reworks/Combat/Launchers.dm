@@ -20,6 +20,7 @@
 		else
 			target.Launched += clamp(time * 2.5 , 1, 10)
 			target.launch_total = max(target.launch_total, target.Launched)	//re-launch pops them back to peak
+			target.AngerCCEvent()
 			return
 	else
 		target.Frozen=1
@@ -28,6 +29,7 @@
 		target.launch_total = target.Launched
 		//pop up fast, sink slow. the world shadow stays pinned + shrinks off pixel_z on its own
 		animate(target, pixel_z = glob.LAUNCH_LIFT_PX, time = 2, easing = SINE_EASING|EASE_OUT)
+	target.AngerCCEvent()
 	target.Grounded = 0
 	target.ForceCancelBeam()
 	target.ForceCancelBuster()

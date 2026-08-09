@@ -166,7 +166,7 @@ transformation
 			form_icon_2_icon = 'SS2Sparks.dmi'
 			//Autounlocked at 55, intended to be unlocked around 35
 			unlock_potential = 55
-			autoAnger = TRUE
+			angerFloor = 50
 			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower2"=0.5)
 			PUSpeedModifier = 1.5
 			speedadd = 0.35
@@ -444,7 +444,7 @@ transformation
 		super_saiyan_4_daima
 			tier = 4
 			unlock_potential = 70 //intended to be unlocked at around 55 potential
-			autoAnger = 1
+			angerFloor = 75
 			speedadd = 0.5
 			enduranceadd = 0.5
 			offenseadd = 0.5
@@ -505,7 +505,7 @@ transformation
 			tier = 4
 			//Autounlocked at 90, intended to be unlocked at around 70 potential
 			unlock_potential = 90
-			autoAnger = 1
+			angerFloor = 75
 			speedadd = 3
 			enduranceadd = 3
 			offenseadd = 3
@@ -534,7 +534,7 @@ transformation
 				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
 				"Flow" = 4, "Instinct" = 4, "Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), "Deicide" = 10,\
 				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 4 + (mastery/10),"SSJ4" = 1,"EndlessNine"=0.25,  "SaiyanPower4"=2.5)
-				autoAnger = 1
+				angerFloor = 90
 				angerPoint = 99 // funny fix for golden ooz stopping endless anger
 
 			transform(mob/user)
@@ -602,7 +602,7 @@ transformation
 			//Intended to be unlocked at around 80 potential, autounlocked at 100
 			//Probably the in game reason for people going beyond 100 potential. Rolls eyes in seiyn
 			unlock_potential = 100
-			autoAnger = 1
+			angerFloor = 90
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -692,7 +692,7 @@ transformation
 			forceadd = 1.25
 			// at full mastery, give the saiyan beyond god buff, then remove ssjgod, and replace it with ssjgb
 			mastery_boons(mob/user)
-				autoAnger = TRUE
+				angerFloor = 75
 				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4, "Flow" = 4 + round(mastery/25, 1),"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Instinct" = 4,"Pursuer"= 4 , "BackTrack" = 2 + round(mastery/50, 1), \
 								 "Sunyata" = 1 + round(mastery/20 ,1),"CalmAnger"=1,\
@@ -793,7 +793,7 @@ transformation
 			//Intended for 70 potential, autounlocked at 90.
 			unlock_potential = 90
 			tier = 5
-			autoAnger = 1
+			angerFloor = 75
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
@@ -900,7 +900,7 @@ transformation
 			//Autounlocks at 100 potential
 			unlock_potential = 100
 			tier = 6
-			autoAnger = 1
+			angerFloor = 90
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
@@ -1005,7 +1005,7 @@ transformation
 			//UBuffNeeded
 		super_saiyan_5
 			unlock_potential = 150
-			autoAnger = 1
+			angerFloor = 90
 			form_hair_icon = 'Hair_SSJ5.dmi'
 			form_icon_1_icon = 'Hair_SSJ5.dmi'
 			passives = list("SecondWind" = "Unstoppable", "The Immovable Object" = 1, "To Govern Strength" = 1)

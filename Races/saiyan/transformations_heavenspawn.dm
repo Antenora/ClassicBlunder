@@ -113,7 +113,7 @@ transformation
 			form_aura_icon = 'AurasBig.dmi'
 			form_aura_x = -32
 			form_aura_icon_state = "Toji"
-			autoAnger = 1
+			angerFloor = 90
 			speedadd = 3.5
 			enduranceadd = 4.5
 			offenseadd = 3.5

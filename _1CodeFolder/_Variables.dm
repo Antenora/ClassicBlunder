@@ -187,7 +187,6 @@ mob/var
 	AngerPoint=50//get angry with this percent of health left
 	AngerMessage//custom anger messages
 	AngerColor
-	HiddenAnger //hide BP from anger
 	CalmAnger //Never get angry unless something forces you to.  Like maki.
 	ExhaustedMessage
 	NanoBoostMessage = "'s nanites respond to their physical trauma, bolstering their cybernetic power!"
@@ -224,7 +223,6 @@ mob/var
 	VanishDuration
 
 	//Battle Variables
-	NoAnger //Can't get angry when this is flagged.
 	NoRevert=0 //Transformations don't revert.
 	NoVoid //YOU THOUGHT YOU WERE GONNA VOID, BITCH?!
 	NoDeath=0 //it means no worries...for the rest of your daaaays
@@ -454,7 +452,11 @@ mob/var
 	SpecialSlot=0
 	Anger=0
 	AngerMax=1
-	AngerStorage=1
+	AngerTier=0//ratcheted curve tier, Calm() resets it
+	AngerRush=0//event fuel - evaluates you as if you were this much lower hp
+	AngerCalmHigh=0//composure highwater - calm anger doesn't recede until a real calm
+	tmp/AngerManaLast=0//berserker watcher - last seen mana, drops feed the rage
+	tmp/AngerCCWindow=0//repeat-cc tracker for the anger event
 
 	Tail
 	TailIcon='Tail.dmi'
@@ -515,14 +517,9 @@ mob/var
 	StyleActive
 	Confused//The amount of time you have reversed movement for.
 	AngerMult//allows anger multipliers to stack. oh my god
-	AngerThreshold//if you're not angry enough, this will make you angry enough
 	AngerAdd //just adds anger
 	AngerCD=0
 	CyberCancel//Basically the same, but for cyber stuffs.
-	CyberPowerAngerNerf
-	CyberPassiveAngerNerf
-	CyberActiveAngerNerf
-	CyberStatAngerNerf
 	EnhancedHearing=0
 	//New variables; Advanced Stances and Staves give offense and defense.  Swords give offense.  Armor gives defense.
 	ElementalOffense

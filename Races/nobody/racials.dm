@@ -3,6 +3,7 @@
 	TextColor=rgb(255, 0, 0)
 	Cooldown=60
 	LunarWrath=1
+	AngerFloor=90
 	ManaDrain=1
 	PostBuffEff="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
 	CustomActive="<b>The light of Kingdom Hearts fills the air, as the wrath of the moon coalesces into a single point!</b>"

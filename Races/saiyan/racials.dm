@@ -8,14 +8,17 @@
     if(DefianceCounter < 10)
         if(val >= glob.SAIYAN_DEFIANCE_THRESHOLD_1/asc && val < glob.SAIYAN_DEFIANCE_THRESHOLD_2 / asc)
             DefianceCounter += 1
+            AngerEvent(glob.ANGER_RUSH_DEFIANCE)
             if(Tail)
                 OMessage(10, "<font color=red>[src]'s defiance sparks!","Defiance (1) passive.")
         else if(val >= glob.SAIYAN_DEFIANCE_THRESHOLD_2 / asc && val < glob.SAIYAN_DEFIANCE_THRESHOLD_3 / asc)
             DefianceCounter += 2
+            AngerEvent(2*glob.ANGER_RUSH_DEFIANCE)
             if(Tail)
                 OMessage(10, "<font color=red>[src] grows more defiant!","Defiance (2) passive.")
         else if(val >= glob.SAIYAN_DEFIANCE_THRESHOLD_3 / asc)
             DefianceCounter += 3
+            AngerEvent(3*glob.ANGER_RUSH_DEFIANCE)
             if(Tail)
                 OMessage(10, "<font color=red>[src] roars in complete defiance of odds!","Defiance (3) passive.")
         if(DefianceCounter>=10)

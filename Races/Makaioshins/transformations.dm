@@ -2,7 +2,7 @@ transformation
 	makaioshin
 		falldown_mode
 			passives = list("HellPower" = 0.1,  "TechniqueMastery" = 2, "Juggernaut" = 0.5)
-			autoAnger = 1
+			angerFloor = 60
 			unlock_potential = 50
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
@@ -104,7 +104,7 @@ transformation
 					ShockSize/=2
 		satan_mode
 			passives = list("GodKi" = 0.75, "HolyMod" = 10, "AbyssMod" = 10, "SpiritPower" = 2,  "Purity" = 1, "BeyondPurity" = 1)
-			autoAnger = 1
+			angerFloor = 90
 			unlock_potential = 90
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32

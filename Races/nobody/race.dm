@@ -34,9 +34,10 @@ race
 				user.NobodyOrigin()
 			if(user.Class=="Berserker")
 				user.ManaAmount=0
+				user.AngerMax=2
 				user.AddSkill(new /obj/Skills/Queue/Desperation/LunarRave)
 				user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Nobody/Lunar_Wrath)
-				passives = list( "LunarWrath" = 1,"LunarAnger"=1)
+				passives = list( "LunarWrath" = 1, "EndlessAnger" = 1)
 				user.NobodyOrigin()
 			if(user.Class=="Imaginary")
 				user.AddSkill(new /obj/Skills/Projectile/Zone_Attacks/Desperation/MagicHour)

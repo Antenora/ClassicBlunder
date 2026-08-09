@@ -649,7 +649,7 @@ mob
 		AddEnraging(var/Value, var/mob/Attacker=null)
 			if(src.Stasis)
 				return
-			src.Anger(Enraged=1)
+			src.ForceAngered(Enraged=1)
 		AddDoom(var/Value, var/mob/Attacker=null, var/DI)
 			if(src.Stasis)
 				return

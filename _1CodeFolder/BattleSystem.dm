@@ -24,6 +24,190 @@ mob/proc/SetNoAnger(var/obj/Skills/Buffs/b, var/Value=0)
 	else
 		OMsg(src, "<font color='red'>[src]'s anger flares back to life!</font color>")
 
+//anger is a curve now, not a switch. tiers of list(hp, frac-of-usable-anger, msg or null).
+//AngerPoint slides the whole thing, AngerFloor on buffs/forms squeezes it so peak lands at higher hp,
+//AngerRush is event fuel that evaluates you as if you were lower. tiers only ratchet up; Calm() resets.
+var/list/ANGER_CURVE_DEFAULT = list(list(75, 0.25, "is starting to get worked up..."), list(50, 0.5, null), list(25, 1, "flies into a rage!"))
+
+mob/proc/GetAngerCurve()
+	if(race&&race.anger_curve) return race.anger_curve
+	return ANGER_CURVE_DEFAULT
+
+mob/proc/GetAngeredIndex()
+	var/list/curve=GetAngerCurve()
+	return min(race ? race.anger_curve_angered : 2, curve.len)
+
+mob/proc/GetAngerFloor(var/obj/Skills/Buffs/exclude)
+	//exclude = a buff mid-removal whose slot pointer hasn't been cleared yet
+	var/F=0
+	if(ActiveBuff&&ActiveBuff!=exclude&&ActiveBuff.AngerFloor>F) F=ActiveBuff.AngerFloor
+	if(SpecialBuff&&SpecialBuff!=exclude&&SpecialBuff.AngerFloor>F) F=SpecialBuff.AngerFloor
+	if(StyleBuff&&StyleBuff!=exclude&&StyleBuff.AngerFloor>F) F=StyleBuff.AngerFloor
+	for(var/sb in SlotlessBuffs)
+		var/obj/Skills/Buffs/B=SlotlessBuffs[sb]
+		if(B&&B!=exclude&&B.AngerFloor>F) F=B.AngerFloor
+	if(race&&transActive&&transActive<=race.transformations.len)
+		var/transformation/T=race.transformations[transActive]
+		if(T&&T.angerFloor>F) F=T.angerFloor
+	return min(F,99)
+
+mob/proc/AngerTierList(var/obj/Skills/Buffs/exclude)
+	var/list/curve=GetAngerCurve()
+	var/slide=AngerPoint-50
+	var/list/last=curve[curve.len]
+	var/peak=last[1]+slide
+	var/F=GetAngerFloor(exclude)
+	var/list/out=list()
+	for(var/list/tier in curve)
+		var/t=tier[1]+slide
+		if(F>0&&F>peak&&peak<100)
+			t=100-(100-t)*(100-F)/(100-peak)
+		out+=min(t,99.9)
+	return out
+
+mob/proc/AngerFracAt(var/hp)
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList()
+	var/n=curve.len
+	if(hp>T[1]) return 0
+	var/list/last=curve[n]
+	if(hp<=T[n])
+		var/f=last[2]
+		//EndlessAnger = no peak. keep climbing past the last tier, Calm() is the only way down
+		if(passive_handler.Get("EndlessAnger"))
+			f+=(T[n]-hp)*glob.ANGER_ENDLESS_RATE
+		return f
+	for(var/i=2, i<=n, i++)
+		if(hp>T[i])
+			var/list/hi=curve[i-1]
+			if(!glob.ANGER_GRADIENT) return hi[2]
+			var/list/lo=curve[i]
+			var/span=T[i-1]-T[i]
+			if(span<=0) return lo[2]
+			return hi[2]+(lo[2]-hi[2])*(T[i-1]-hp)/span
+	return last[2]
+
+mob/proc/AngerEvalHP(var/incoming=0)
+	return ((Health-incoming)/max(1-HealthCut,0.01))-AngerRush
+
+mob/proc/AngerCurveValue()
+	//the live multiplier the power calcs read. 1 = nothing going on
+	if(AngerMax<1) return 1
+	if(HasCalmAnger())
+		var/list/curve=GetAngerCurve()
+		var/list/T=AngerTierList()
+		var/n=curve.len
+		var/list/last=curve[n]
+		var/eval=AngerEvalHP()
+		var/f=0
+		if(eval<=T[n])
+			f=last[2]
+			if(passive_handler.Get("EndlessAnger"))
+				f+=(T[n]-eval)*glob.ANGER_ENDLESS_RATE
+		else if(eval<100&&T[n]<100)
+			f=last[2]*(100-eval)/(100-T[n])
+		if(f>AngerCalmHigh)
+			AngerCalmHigh=f
+		else
+			f=AngerCalmHigh
+		if(f<=0) return 1
+		var/am=AngerMax
+		if(AnsatsukenAscension=="Chikara"&&StyleActive=="Ansatsuken")
+			am=max(am,2)
+		var/cv=1+(am-1)*f
+		if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
+			cv *= 1+(secretDatum?:getBoon(src, "Anger")/10)
+		return cv
+	if(HasNoAnger()||AngerCD) return 1
+	var/frac=AngerFracAt(AngerEvalHP())
+	if(AngerTier)
+		var/list/curve=GetAngerCurve()
+		var/list/reached=curve[min(AngerTier,curve.len)]
+		if(reached[2]>frac) frac=reached[2]
+	if(frac<=0) return 1
+	var/v=1+(AngerMax-1)*frac
+	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
+		v *= 1+(secretDatum?:getBoon(src, "Anger")/10)
+	return v
+
+mob/proc/AngerAdvance(var/incoming=0)
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return 0
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList()
+	var/eval=AngerEvalHP(incoming)
+	var/newtier=0
+	for(var/i=1, i<=curve.len, i++)
+		if(eval<=T[i]) newtier=i
+	if(newtier<=AngerTier) return 0
+	var/ang=GetAngeredIndex()
+	var/fired=0
+	while(AngerTier<newtier)
+		var/i=AngerTier+1
+		AngerTier=i
+		if(i==ang)
+			if(!Anger)
+				src.Anger()
+				fired=1
+		else
+			AngerTierMessage(i)
+	return fired
+
+mob/proc/UpdateAnger()
+	AngerAdvance(0)
+
+mob/proc/AngerTierMessage(var/i)
+	var/list/curve=GetAngerCurve()
+	if(i>curve.len) return
+	var/list/tier=curve[i]
+	if(tier.len<3||!tier[3]) return
+	if(!AngerColor)
+		OMsg(src, "<font color='red'>[src] [tier[3]]</font color>")
+	else
+		OMsg(src, "<font color='[AngerColor]'>[src] [tier[3]]</font color>")
+
+mob/proc/AngerEvent(var/points)
+	if(points<=0) return
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return
+	AngerRush=min(AngerRush+points, glob.ANGER_RUSH_CAP)
+	AngerAdvance(0)
+
+mob/proc/AngerCCEvent()
+	//chain cc pisses you off. first one's free, repeats inside the window stoke you
+	if(world.time<AngerCCWindow)
+		AngerEvent(glob.ANGER_RUSH_CC)
+	AngerCCWindow=world.time+glob.ANGER_CC_WINDOW
+
+mob/proc/ForceAngered(var/Enraged=0)
+	//instant angry for enrage debuffs and weird food. banks rush so the state survives reclamps
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return
+	var/ang=GetAngeredIndex()
+	var/list/T=AngerTierList()
+	var/need=AngerEvalHP()-T[ang]
+	if(need>0)
+		AngerRush=min(AngerRush+need, glob.ANGER_RUSH_CAP)
+	if(AngerTier<ang)
+		AngerTier=ang
+	if(!Anger)
+		src.Anger(Enraged)
+
+mob/proc/AngerReclamp(var/obj/Skills/Buffs/gone)
+	if(!AngerTier) return
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList(gone)
+	var/eval=AngerEvalHP()
+	var/newtier=0
+	for(var/i=1, i<=curve.len, i++)
+		if(eval<=T[i]) newtier=i
+	if(newtier>=AngerTier) return
+	AngerTier=newtier
+	if(AngerTier<GetAngeredIndex()&&Anger)
+		Anger=0
+		DefianceCounter=0
+		race.onCalm(src)
+		AngerCD=5
+		if(src.oozaru_type=="Demonic")
+			AngerCD=0
+
 mob/proc/Anger(var/Enraged=0)
 	if(src.HasCalmAnger()||src.HasNoAnger())
 		if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger") && !secretDatum?:hasRestriction("Anger"))
@@ -126,6 +310,11 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(text)
 		if(!istype(src,/mob/Player/FevaSplits))
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
+	if(src.party)
+		for(var/mob/m in src.party.members)
+			if(m==src||m.KO||m.z!=src.z||get_dist(m,src)>12) continue
+			m.AngerEvent(glob.ANGER_RUSH_ALLY_DOWN)
+			m << "<font color=red>Seeing [src] go down sets your blood boiling!</font>"
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
 	var/HellspawnOdds=(10+(src.TotalInjury-40))/(src.Potential/20)//less likely the further you are from 20 pot without outright disabling it before then

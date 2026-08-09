@@ -1334,11 +1334,6 @@ mob/proc/PM2(var/mob/who)
 /mob/var/PingSound = TRUE
 /mob/var/PingVolume = 30
 
-// Opt-out flag for buffs that force Anger on activation (Jinchuuriki M<3,
-// Vaizard Mask, Wrathful, Hellbornfury, etc — anything with AutoAnger=1 or
-// passives["AutoAnger"]=1). Read in _BuffX.dm at the BuffOn/BuffOff handlers.
-// Default 0 = original behavior preserved for everyone.
-/mob/var/AutoBerserkOptOut = 0
 
 mob/Admin3/verb
 	editRace(mob/Players/m in players)

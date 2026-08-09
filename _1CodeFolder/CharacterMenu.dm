@@ -2200,14 +2200,10 @@ mob/proc/GetMenuPassives()
 
 mob/proc/GetCharMenuData()
 	var/list/D = list()
-	var/EffectiveAnger = Anger
-	if(Anger)
+	var/EffectiveAnger = AngerCurveValue()
+	if(EffectiveAnger>1||Anger)
 		if(AngerMult > 1)
 			EffectiveAnger = (EffectiveAnger - 1) * AngerMult + 1
-		if(AngerThreshold && EffectiveAnger < AngerThreshold)
-			EffectiveAnger = AngerThreshold
-		if(DefianceCounter > 0 && !CheckSlotless("Great Ape"))
-			EffectiveAnger += DefianceCounter * 0.05
 		if(CyberCancel > 0)
 			EffectiveAnger -= (EffectiveAnger - 1) * CyberCancel
 			if(EffectiveAnger < 1) EffectiveAnger = 1

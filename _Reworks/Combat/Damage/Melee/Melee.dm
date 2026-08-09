@@ -843,6 +843,8 @@
 							if(!glob.MOMENTUM_PROCS_OFF_DAMAGE)
 								handlePostDamage(enemy) // it already proc'd
 							lastHit = world.time
+							if(istype(AttackQueue, /obj/Skills/Queue/Finisher))
+								enemy.AngerEvent(glob.ANGER_RUSH_FINISHER)
 							//raw damage on purpose - otherDmg doesn't exist yet at spark time
 							var/hitWeight = clamp((damage - glob.HIT_STOP_MIN) / max(1, 14 - glob.HIT_STOP_MIN), 0, 1)
 							enemy?.HitBend(hitWeight, get_dir(src, enemy))

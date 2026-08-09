@@ -1346,7 +1346,7 @@ mob/Player/AI
 			OMsg(src, "<font color='green'>[src]'s nanites respond to their physical trauma, bolstering their cybernetic power!</font color>")
 			src.NanoAnnounce=1
 
-		if(src.Health>=75*(1-src.HealthCut)&&src.icon_state=="Meditate"&&src.Anger!=0)
+		if(src.Health>=75*(1-src.HealthCut)&&src.icon_state=="Meditate"&&(src.Anger||src.AngerTier||src.AngerRush||src.AngerCalmHigh))
 			calmcounter-=1
 		else
 			calmcounter=5
@@ -1354,6 +1354,10 @@ mob/Player/AI
 			calmcounter=5
 			if(Anger)
 				src.Calm()
+			else if(AngerTier||AngerRush||AngerCalmHigh)
+				AngerTier=0
+				AngerRush=0
+				AngerCalmHigh=0
 		if(src.Grab)src.Grab_Update()
 
 		if(src.Stasis||src.StasisFrozen)
@@ -1998,15 +2002,13 @@ mob/Player/AI
 			if(src.AngerMax)
 				var/a=1
 				if(src.HasCalmAnger())
-					a*=src.AngerMax
-				else if(Anger&&!src.HasNoAnger())
-					a*=Anger
+					a*=src.AngerCurveValue()
+				else if(!src.HasNoAnger())
+					a*=src.AngerCurveValue()
 					if(src.AngerMult>1)
 						var/ang=a-1//Usable anger
 						var/mult=ang*src.AngerMult
 						a=mult+1
-					if(src.DefianceCounter)
-						a+=src.DefianceCounter*0.05
 				if(src.CyberCancel>0)
 					var/ang=a-1//Usable anger.
 					var/cancel=ang*src.CyberCancel//1 Cyber Cancel = all of usable anger.

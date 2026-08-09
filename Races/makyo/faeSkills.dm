@@ -50,10 +50,9 @@
 				icon=p.ExpandBase
 				passives["GiantForm"] = round(p.AscensionsAcquired/2)
 				passives["Godspeed"] = p.AscensionsAcquired
-				AutoAnger=0
-				AngerStorage=0
+				AngerFloor=0
 				if(p.passive_handler.Get("StarPower")||p.AscensionsAcquired>=4)
-					AutoAnger=1
+					AngerFloor=75
 					AngerMult=2
 					passives["Pursuer"] = 2 * p.AscensionsAcquired
 				else

@@ -26,6 +26,7 @@ proc
 				continue
 		if(m.Guarding) m.GuardStop()	//hard cc drops guard
 		if(m.ChargingEnergy) m.ChargeStop()
+		m.AngerCCEvent()
 		var/Stun_Amount=world.time+(amount*10)
 		if(m.Stunned)
 			m.Stunned+=(amount * 4);

@@ -237,7 +237,7 @@ transformation
 			defenseadd = 0.5
 			strengthadd = 0.5
 			forceadd = 0.5
-			autoAnger = 1
+			angerFloor = 60
 			unlock_potential = 55
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
@@ -283,7 +283,7 @@ transformation
 			defenseadd = 2.5
 			strengthadd = 2.5
 			forceadd = 2.5
-			autoAnger = 1
+			angerFloor = 90
 			unlock_potential = 90
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32

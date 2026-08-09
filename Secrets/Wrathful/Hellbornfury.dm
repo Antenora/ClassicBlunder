@@ -30,7 +30,7 @@ scaling with potential as well
 		ForMult = 1.15 + (p.Potential/150)
 		OffMult = 1.15 + (p.Potential/200)
 		PowerMult = 1.05 + (p.Potential/200)
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -53,7 +53,7 @@ scaling with potential as well
 		ForMult = 1.2 + (p.Potential/100)
 		OffMult = 1.2 + (p.Potential/200)
 		PowerMult = 1.075 + (p.Potential/200)
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -76,7 +76,7 @@ scaling with potential as well
 		OffMult = 1.25 + (p.Potential/75)
 		PowerMult = 1.1 + (p.Potential/150)
 		EnergyHeal = 0.005 * p.Potential
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -97,7 +97,7 @@ scaling with potential as well
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
 		EnergyHeal = 0.01 * p.Potential
-		AutoAnger=0
+		AngerFloor=0
 		if(0)
 			p.passive_handler.Increase("The Clock Is Ticking", 0.5)
 			p<<"<font color=red><b>You of all people should know how dangerous this power is. The clock is ticking, [p]...</font></b>"
@@ -120,7 +120,7 @@ scaling with potential as well
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
 		BioArmor=0
-		AutoAnger=1
+		AngerFloor=90
 		Enlarge = 3
 		DarkChange=1
 		IconTint=list(0.15,0,0, 0.05,0.25,0.15, 0.05,0.05,0.35, 0,0,0)

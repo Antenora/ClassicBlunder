@@ -814,16 +814,6 @@ a{color:#8be9ff;}
 		else
 			usr<<browse("[View]","window=Logzk;size=240x420")
 
-	Toggle_Auto_Berserk()
-		set category = "Other"
-		set name = "Toggle Auto Berserk"
-		if(usr.AutoBerserkOptOut)
-			usr.AutoBerserkOptOut = 0
-			usr << "Auto Berserk re-enabled. Buffs that force Anger (Jinchuuriki, Vaizard Mask, Wrathful, etc.) will trigger it normally."
-		else
-			usr.AutoBerserkOptOut = 1
-			usr << "Auto Berserk disabled. Buffs with the Auto Anger flag will no longer force you into the Anger state on activation."
-
 	GetPingSound()
 		set category = "Other"
 		set name = "Toggle Ping Sound"

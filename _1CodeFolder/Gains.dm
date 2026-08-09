@@ -166,7 +166,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && Anger!=0)
+		if(Health>=75*(1-HealthCut) && (Anger||AngerTier||AngerRush||AngerCalmHigh))
 			calmcounter--
 		else
 			calmcounter=5
@@ -238,6 +238,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			calmcounter=5
 			if(Anger)
 				Calm()
+			else if(AngerTier||AngerRush||AngerCalmHigh)
+				AngerTier=0
+				AngerRush=0
+				AngerCalmHigh=0
 	//	if(MeditateTime == 15)
 	//		src << "If any skills reset on Meditate, they've been reset."
 		if(CheckSpecial("Jinchuuriki") || CheckSpecial("Vaizard Mask"))
@@ -556,17 +560,11 @@ mob
 				if(src.Health<50)
 					ManaRando*=2
 				src.ManaAmount+=0.5*(ManaRando/10)
-			if(passive_handler.Get("LunarAnger")&&!passive_handler.Get("Unrelenting Wrath"))
-				if(ManaAmount>50)
-					src.AngerMax=1+(src.ManaAmount/100)
-					src.Anger=src.AngerMax
-					src.Anger()
-				else if(ManaAmount<=50)
-					src.Anger=0
-					src.AngerMax=1
-			if(passive_handler.Get("Unrelenting Wrath"))
-				src.Anger=src.AngerMax
-				src.AngerMax=5
+			if(passive_handler.Get("LunarWrath"))
+				//berserker rage runs on mana leaving you - spells, drains, leak, all of it
+				if(ManaAmount<AngerManaLast)
+					AngerEvent((AngerManaLast-ManaAmount)*glob.ANGER_RUSH_MANA)
+				AngerManaLast=ManaAmount
 			if(src.CheckSpecial("Hyperdeath Mode"))
 				if(src.HyperdeathMeterCurrent > 0)
 					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - 1

@@ -354,6 +354,7 @@ mob/proc/Allow_Move(D)
 		if(prob(Grab_Escape))
 			view(P)<<"[usr] breaks free of [P]!"
 			P.Grab_Release()
+			usr.AngerEvent(glob.ANGER_RUSH_GRAB_BREAK)
 		else
 			view(P)<<"[usr] struggles against [P]!"
 		sleep(10)

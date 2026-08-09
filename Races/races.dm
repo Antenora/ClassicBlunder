@@ -234,6 +234,11 @@ race
 
 		//anger. 1 = 100%, 2 = 200%
 		anger = 1.5
+
+		//curve override for race reworks. list(list(hp, frac, msg), ...) high hp first, null = the default 75/50/25 curve.
+		//anger_curve_angered = which tier is the classic "gets angry" moment (message, anger-locked passives, the works)
+		list/anger_curve
+		anger_curve_angered = 2
 		regeneration = 1
 		recovery = 2
 
