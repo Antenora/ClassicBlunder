@@ -418,7 +418,7 @@ mob/proc/ShowHurtboxInkDebug()
 			hurt_ink_dbg = null
 			hurt_ink_key = null
 		return
-	var/key = "[icon]:[hurt_ox],[hurt_oy],[hurt_w],[hurt_h]" //dir-free: the collider is a dir UNION
+	var/key = "[icon]:[hurt_ox],[hurt_oy],[hurt_w],[hurt_h]:[HurtSolidH(hurt_h)]" //dir-free
 	if(hurt_ink_dbg && hurt_ink_key == key) return
 	try
 		if(!hurt_ink_dbg)
@@ -436,11 +436,12 @@ mob/proc/ShowHurtboxInkDebug()
 		I.DrawBox(rgb(0, 0, 0, 0), 1, 1, cw, ch)
 		var/list/S = hurt_spans
 		var/list/RS = S[3]
+		var/sh = hurt_oy + HurtSolidH(hurt_h) //rows above this are walk-through (MOB_TALL_SOLID): drawn faded
 		for(var/r = 0, r < S[2], r++) //one block per row strip, exactly what HurtInkF sweeps
 			var/k = r*2 + 1
 			var/lo = RS[k]
 			if(lo < 0) continue
-			I.DrawBox(rgb(40, 255, 90), lo + 1, r*4 + 1, min(RS[k+1], cw), min(r*4 + 4, ch))
+			I.DrawBox((r*4 < sh) ? rgb(40, 255, 90) : rgb(40, 255, 90, 70), lo + 1, r*4 + 1, min(RS[k+1], cw), min(r*4 + 4, ch))
 		var/x1 = hurt_ox + 1 //1px outline of the DERIVED box: reach reads this, the clamp stops on the strips
 		var/y1 = hurt_oy + 1
 		var/x2 = min(hurt_ox + hurt_w, cw)

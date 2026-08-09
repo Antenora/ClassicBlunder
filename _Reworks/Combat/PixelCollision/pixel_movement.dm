@@ -16,6 +16,7 @@ globalTracker
 		MOB_REACH_PAD = 2 //px of melee past the body edge; 2 covers float truncation, 32 = old full-tile reach
 		MELEE_DEBUG = FALSE //swing prints from getEnemies, toggled by the admin verb
 		MOB_INK_COLLIDE = 0 //oversized bodies block/get reached on their per-row ink strips, not the dir-union box; 0 = old AABB
+		MOB_TALL_SOLID = 40 //bodies this tall+ block walking on their bottom half only
 
 proc/PmActive()
 	return world.movement_mode == PIXEL_MOVEMENT_MODE
@@ -155,8 +156,9 @@ proc/HurtInkF(mob/A, al, ab, aw, ah, dx, dy, mob/O)
 	var/sat = ab + ah + mxdy
 	var/bl = O.HurtL()
 	var/bb = O.HurtB()
+	var/bh = HurtSolidH(O.hurt_h) //blocker's walkable height; ah arrives pre-clipped from Move
 	//free pre-reject: the box is derived from the spans, so a swept-AABB miss proves an ink miss
-	if(!(sal < bl + O.hurt_w && bl < sar && sab < bb + O.hurt_h && bb < sat)) return 1
+	if(!(sal < bl + O.hurt_w && bl < sar && sab < bb + bh && bb < sat)) return 1
 	var/list/SO = O.hurt_spans
 	var/list/SA = A.hurt_spans
 	var/list/RSb = SO ? SO[3] : null
@@ -170,6 +172,7 @@ proc/HurtInkF(mob/A, al, ab, aw, ah, dx, dy, mob/O)
 	if(SO) //only the blocker strips the mover's swept y-band can reach
 		j0 = max(0, round((sab - boy) / 4))
 		j1 = min(SO[2] - 1, round((sat - 1 - boy) / 4))
+		j1 = min(j1, round((O.hurt_oy + bh - 1) / 4)) //rows above the walkable half don't block
 	var/f = 1
 	for(var/j = j0, j <= j1, j++)
 		var/rl
@@ -188,12 +191,13 @@ proc/HurtInkF(mob/A, al, ab, aw, ah, dx, dy, mob/O)
 			rl = bl
 			rb = bb
 			rw = O.hurt_w
-			rh = O.hurt_h
+			rh = bh
 		var/i0 = 0
 		var/i1 = 0
 		if(SA) //mover strips whose own swept y-band can meet this blocker strip
 			i0 = max(0, round((rb - aoy - 4 - mxdy) / 4) + 1)
 			i1 = min(SA[2] - 1, round((rb + rh - mndy - aoy - 1) / 4))
+			i1 = min(i1, round((A.hurt_oy + ah - 1) / 4)) //mover's own top half sweeps nothing either
 		for(var/i = i0, i <= i1, i++)
 			var/ml
 			var/mb
@@ -402,6 +406,11 @@ proc/HurtSweep(al, ab, aw, ah, dx, dy, bl, bb, bw, bh)
 proc/HurtTrunc(v) //round() is floor in DM; truncate toward zero so a clamp can never overshoot
 	return (v >= 0) ? round(v) : -round(-v)
 
+proc/HurtSolidH(h)
+	var/t = glob ? glob.MOB_TALL_SOLID : 0
+	if(t > 0 && h >= t) return h - round(h / 2)
+	return h
+
 mob/Cross(atom/movable/O)
 	if(HurtboxOn() && ismob(O)) return 1 //let bodies close; Move()'s clamp does the real stopping
 	return ..()
@@ -418,14 +427,15 @@ mob/Move(atom/NewLoc, Dir = 0, sx = 0, sy = 0)
 	if(!dx && !dy) return ..()
 	var/al = HurtL()
 	var/ab = HurtB()
+	var/ash = HurtSolidH(hurt_h) 
 	var/f = 1
 	var/ink = glob.MOB_INK_COLLIDE
 	for(var/mob/O in range(HURT_REACH_MAX, src))
 		if(!HurtboxBlockedBy(O)) continue
 		//EITHER side oversized -> strips, or a giant mover reads a flush player as overlapping and walks through them
 		var/nf = (ink && (O.hurt_spans || hurt_spans)) ? \
-			HurtInkF(src, al, ab, hurt_w, hurt_h, dx, dy, O) : \
-			HurtSweep(al, ab, hurt_w, hurt_h, dx, dy, O.HurtL(), O.HurtB(), O.hurt_w, O.hurt_h)
+			HurtInkF(src, al, ab, hurt_w, ash, dx, dy, O) : \
+			HurtSweep(al, ab, hurt_w, ash, dx, dy, O.HurtL(), O.HurtB(), O.hurt_w, HurtSolidH(O.hurt_h))
 		if(nf < f)
 			f = nf
 			if(!f) break
