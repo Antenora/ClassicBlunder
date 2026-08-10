@@ -3925,7 +3925,7 @@ obj/Items/Gear
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Two)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Three)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Four)
-				usr.AddSkill(new /obj/Skills/False_Moon)
+				usr.AddSkill(new /obj/Skills/AutoHit/False_Moon)
 				usr.passive_handler.Increase("HellPower", 0.1)
 				usr.passive_handler.Increase("Persistence", 2)
 				usr.passive_handler.Increase("MaimMastery", 1)

@@ -797,10 +797,10 @@ obj/Skills
 			usr.SkillX("Meditate",src)
 			sleep(10)
 
-	False_Moon
+	AutoHit/False_Moon
 		Cooldown=-1
 		desc="Create a false moon."
-		verb/FalseMoon()
+		verb/False_Moon()
 			set name="False Moon"
 			set category="Skills"
 			set hidden = 1

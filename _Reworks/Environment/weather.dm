@@ -26,6 +26,8 @@ mob
 		_wx_tier = 0
 		_wx_cover_w = 0
 		_wx_cover_h = 0
+		_wx_view_w = 0 
+		_wx_view_h = 0
 		_wx_mask_key
 		list/_wx_mask_images
 
@@ -185,6 +187,18 @@ proc/_WxConfigureClientEmitter(client/C, area/A, obj/screen/wx_emitter/E, kind)
 	E.particles.position = generator("box", list(-half_w, -half_h, -100), list(half_w, half_h, 100))
 	_WxConfigureWind(A, E, kind)
 
+var/list/_wx_row_crops = list() //bottom bands of the 128px sheets, for the row at the view's top edge
+
+//grid-aligned anchor + bottom band = the exact pixels the full sheet would show there, so no seam
+proc/_WxRowIcon(file, state, keep_px)
+	var/key = "[file]-[state]-[keep_px]"
+	var/icon/I = _wx_row_crops[key]
+	if(!I)
+		I = icon(file, state)
+		I.Crop(1, 1, 32, keep_px)
+		_wx_row_crops[key] = I
+	return I
+
 proc/_WxAttachPanelRows(mob/Players/P, kind)
 	if(!P || !P.client) return
 	var/list/layers = _WxPanelLayers(kind)
@@ -201,8 +215,12 @@ proc/_WxAttachPanelRows(mob/Players/P, kind)
 		var/sx = (li == 1) ? 0 : rand(1, 31)
 		for(var/y = 1, y <= view_h, y += 4)
 			var/obj/screen/wx_panel_row/R = new()
-			R.icon = spec[1]
-			R.icon_state = spec[2]
+			var/keep = min(view_h - y + 1, 4) * 32
+			if(keep >= 128)
+				R.icon = spec[1]
+				R.icon_state = spec[2]
+			else
+				R.icon = _WxRowIcon(spec[1], spec[2], keep)
 			R.alpha = spec[3]
 			R.layer = spec[4]
 			if(sx) R.transform = matrix(1, 0, -sx, 0, 1, 0)
@@ -310,6 +328,8 @@ proc/_WxDetachPlayer(mob/Players/P)
 	P._wx_tier = 0
 	P._wx_cover_w = 0
 	P._wx_cover_h = 0
+	P._wx_view_w = 0
+	P._wx_view_h = 0
 
 proc/_WxStartMsg(kind)
 	switch(kind)
@@ -415,7 +435,8 @@ proc/_WxSyncPass()
 		var/tier = GfxWeatherTier(P.client)
 		var/cover_w = P.client.gfx_screen_cover_w
 		var/cover_h = P.client.gfx_screen_cover_h
-		if(P._wx_key == want_key && P._wx_standing == !!standing && P._wx_tier == tier && P._wx_cover_w == cover_w && P._wx_cover_h == cover_h)
+		var/list/vdims = GfxCameraViewTiles(P.client)
+		if(P._wx_key == want_key && P._wx_standing == !!standing && P._wx_tier == tier && P._wx_cover_w == cover_w && P._wx_cover_h == cover_h && P._wx_view_w == vdims[1] && P._wx_view_h == vdims[2])
 			if(want) _WxUpdateOutdoorMask(P, want)
 			continue
 		_WxDetachPlayer(P)
@@ -424,6 +445,8 @@ proc/_WxSyncPass()
 		P._wx_tier = tier
 		P._wx_cover_w = cover_w
 		P._wx_cover_h = cover_h
+		P._wx_view_w = vdims[1]
+		P._wx_view_h = vdims[2]
 		if(want_key)
 			P._wx_objs = list(want_key)
 			if(standing) P.client.screen += want_key //the tint grades YOUR sky, not the roof over you

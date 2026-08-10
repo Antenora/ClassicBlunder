@@ -2099,7 +2099,7 @@ mob/Admin3/verb
 						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved)|| istype(ssj, /transformation/saiyan/super_saiyan_4_daima))
 							M.race.transformations -= ssj
 							del ssj
-					M.AddSkill(new/obj/Skills/False_Moon)
+					M.AddSkill(new/obj/Skills/AutoHit/False_Moon)
 				else
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/saiyan/super_saiyan_4)||istype(ssj, /transformation/saiyan/super_full_power_saiyan_4_limit_breaker))
@@ -2112,7 +2112,7 @@ mob/Admin3/verb
 						if(istype(ssj, /transformation/half_saiyan/human/beast_mode))
 							M.race.transformations -= ssj
 							del ssj
-					M.AddSkill(new/obj/Skills/False_Moon)
+					M.AddSkill(new/obj/Skills/AutoHit/False_Moon)
 				else
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/saiyan/super_saiyan_4))

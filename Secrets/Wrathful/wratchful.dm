@@ -164,7 +164,7 @@ scaling with potential as well
 			p.passive_handler.Increase("HellPower", 0.1)
 			p.passive_handler.Increase("Persistence", 2)
 			p.passive_handler.Increase("MaimMastery", 1)
-			p.AddSkill(new/obj/Skills/False_Moon)
+			p.AddSkill(new/obj/Skills/AutoHit/False_Moon)
 			p.oozaru_type = "Demonic"
 			for(var/transformation/saiyan/ssj in p.race.transformations)
 				p.race.transformations -= ssj

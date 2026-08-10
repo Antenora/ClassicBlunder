@@ -862,7 +862,6 @@
 #include "Sagas\Rinnegan\rinneganBuff.dm"
 #include "Sagas\Rinnegan\rinneganSkills.dm"
 #include "Sagas\Shinigami\Bakudo.dm"
-#include "Sagas\Shinigami\Engetsu.dm"
 #include "Sagas\Shinigami\EnmaKorogi.dm"
 #include "Sagas\Shinigami\Hado.dm"
 #include "Sagas\Shinigami\Hoho.dm"
