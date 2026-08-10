@@ -349,8 +349,6 @@ mob
 			if(defender.passive_handler.Get("Corruption"))
 				gainCorruption(val * 0.75 * glob.CORRUPTION_GAIN)
 
-			if(src.HasEnergyLeak())
-				src.LoseEnergy(src.GetEnergyLeak()*0.25*leakVal)
 			if(defender.HasEnergyLeak())
 				defender.LoseEnergy((defender.GetEnergyLeak()*0.25*leakVal)/4)
 
