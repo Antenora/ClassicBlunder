@@ -106,6 +106,28 @@
         src << "melee-dbg: dir=[dir] tdist=[td] bodyreach=[Target ? InBodyReach(Target) : "no target"] hitscan=[passive_handler["Hit Scan"]] sweep=[HasSweepingStrike()] prec=[q ? q.PrecisionStrike : 0] warp=[getWarpingStrike()] hits=[people.len]"
     return people
 
+//reactive reach for the parry riposte
+/mob/proc/CanMeleeReach(mob/M)
+    if(!ismob(M) || M == src || M.z != z) return FALSE
+    if(Grab == M) return TRUE
+    var/reach = 1
+    if(passive_handler["Hit Scan"])
+        reach = max(reach, 1 + passive_handler["Hit Scan"])
+    var/obj/Skills/Queue/q = AttackQueue
+    if(q)
+        if(q.PrecisionStrike)
+            reach = max(reach, q.PrecisionStrike)
+    else if(HasSweepingStrike())
+        reach = max(reach, max(passive_handler.Get("SweepingStrike"), 1))
+    if(passive_handler.Get("PowerPole"))
+        reach = max(reach, passive_handler.Get("PowerPole"))
+    if(get_dist(get_turf(src), get_turf(M)) <= reach) return TRUE
+    //bodies can touch while loc tiles sit apart (giants, pixel offsets)
+    var/held = dir
+    dir = get_dir(src, M)
+    . = InBodyReach(M, 32*(reach-1))
+    dir = held
+
 /mob/Admin2/verb/Melee_Debug_Toggle()
     set category = "Admin"
     set name = "Melee Debug Toggle"

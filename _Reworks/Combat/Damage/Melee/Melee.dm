@@ -787,21 +787,21 @@
 							// reduce damage by 1% for every 0.1 damage effectiveness, 1 damage effectiveness = 10% damage reduction
 							//TODO ARMOR AT THE END
 							if(enemy.passive_handler["Parry"] && (s || s2 || s3 || swordAtk))
-
-								if(prob(enemy.passive_handler["Parry"] * glob.PARRY_CHANCE) && hitback <= glob.MAX_CHAIN_PARRY)
+								var/parryVal = enemy.passive_handler["Parry"]
+								if(prob(glob.PARRY_CHANCE_CAP * parryVal / (parryVal + glob.PARRY_CHANCE_CURVE)) && hitback <= glob.MAX_CHAIN_PARRY && enemy.CanMeleeReach(src))
 									var/obj/Effects/Parry/p = new()
 									p.Target = enemy
 									enemy.vis_contents += p
 									flick("parry", p)
-									damage /= (enemy.passive_handler["Parry"]+enemy.BonusParry()) * glob.PARRY_REDUCTION_MULT
-									enemy.Melee1(dmgmulti = (glob.PARRY_BASE_DMG * (enemy.passive_handler["Parry"]+enemy.BonusParry())), forcedTarget=src, hitback=hitback+1) // this does mean that they will hit from no matter the range if hit by melee
-							if(enemy.passive_handler["Iaijutsu"])
-								if(prob(enemy.passive_handler["Iaijutsu"] * glob.IAI_CHANCE) && hitback <= glob.MAX_CHAIN_PARRY)
+									enemy.Melee1(dmgmulti = (glob.PARRY_BASE_DMG * (parryVal+enemy.BonusParry())), forcedTarget=src, hitback=hitback+1)
+							if(enemy.passive_handler["Iaijutsu"] && (s || s2 || s3 || swordAtk))
+								var/iaiVal = enemy.passive_handler["Iaijutsu"]
+								if(prob(glob.IAI_CHANCE_CAP * iaiVal / (iaiVal + glob.IAI_CHANCE_CURVE)))
 									var/obj/Effects/Iai/p = new()
 									p.Target = enemy
 									enemy.vis_contents += p
 									flick("iai", p)
-									enemy.Melee1(dmgmulti =(glob.IAI_BASE_DAMAGE * enemy.passive_handler["Iaijutsu"]), forcedTarget = src, hitback=hitback+1)
+									damage *= glob.IAI_DR_MULT
 							if(enemy.passive_handler["Perfect Counter"])
 								// if only we could ping the thing that is giving this
 								enemy.TriggerPerfectCounter(src) // i cant actually test this
