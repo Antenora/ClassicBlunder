@@ -16,6 +16,7 @@ obj/Skills
 	var/Copied = FALSE
 	var/Sealed = FALSE
 	var/Temporary = FALSE
+	var/altered = FALSE
 	var/description
 	var/AdaptRate
 	var/MultiTrail = 0

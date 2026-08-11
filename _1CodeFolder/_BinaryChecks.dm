@@ -1,7 +1,7 @@
 #define Swordsmanship list("Hiten Mitsurugi-Ryuu","Unlimited Blade Works", "Weapon Soul")
 #define SECRETS list("Spirits of The World","Jagan", "Hamon of the Sun", "Werewolf", "Vampire", "Sage Arts", "Haki", "Eldritch", "Heavenly Restriction")
-#define SAGAS list("Ansatsuken","Eight Gates","Cosmo","Spiral","Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Sharingan","Weapon Soul", "Unlimited Blade Works")
-#define RACES list("Android", "Human", "Beastkin", "Changeling", "Demon", "Dragon", "Eldritch","Chakardi","Half_Saiyan", "High_Faoroan","Majin","Makyo","Namekian","Saiyan","Shinjin","Celestial","Makaioshin")
+#define SAGAS list("Ansatsuken","Eight Gates","Cosmo","Spiral","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Sharingan","Weapon Soul", "Unlimited Blade Works")
+#define RACES list("Android", "Human", "Beastkin", "Changeling", "Demon", "Dragon", "Eldritch","Chakardi","Half_Saiyan","Majin","Makyo","Namekian","Saiyan","Celestial","Makaioshin")
 
 mob
 	proc
@@ -1010,7 +1010,7 @@ mob
 				return 1
 			return 0
 		HasKiControlMastery()
-			if((!src.HasNullTarget() ? src.GetGodKi() : 0 >=0.25) && !isRace(SHINJIN))
+			if(!src.HasNullTarget() ? src.GetGodKi() : 0 >=0.25)
 				return 1
 			if(src.GetMaouKi())
 				return 1
@@ -1024,8 +1024,6 @@ mob
 				return 1
 			if(src.isRace(NAMEKIAN)&&src.transActive())
 				return 1
-			if(isRace(SHINJIN)&&src.Potential>=25)
-				return 1
 			if(src.race in list(DEMON, DRAGON, MAKAIOSHIN))
 				return 1
 			if(src.race in list(HUMAN, MAKYO)&&src.AscensionsAcquired)
@@ -1037,8 +1035,6 @@ mob
 				Total+=src.AdaptationCounter
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Power Control"))
 				Total += secretDatum?:getBoon("Power Control") / 8
-			if(src.HasGodKi() && src.isRace(SHINJIN))
-				Total+=(!src.HasNullTarget() ? round(src.GetGodKi()/0.25) : 0)
 			if(src.HasMaouKi())
 				Total+=round(src.GetMaouKi()/0.25)
 			if(src.isRace(NAMEKIAN)&&src.transActive())
@@ -1047,8 +1043,6 @@ mob
 				Total += 5
 			if(src.isRace(MAKYO)&&src.AscensionsAcquired)
 				Total+=src.AscensionsAcquired
-			if(isRace(SHINJIN))
-				Total+=round(src.Potential/25)
 			if(isRace(DRAGON)||isRace(DEMON)||isRace(MAKAIOSHIN))
 				Total+=1
 			if(isRace(HUMAN)&&src.AscensionsAcquired)
@@ -1675,15 +1669,11 @@ mob
 				return 1
 			if(Saga=="Keyblade")
 				return 1
-			if(isRace(FAE))
-				return 1
 			return 0
 		GetManaGeneration()
 			var/managen = passive_handler.Get("ManaGeneration")
 			if(Saga=="Keyblade")
 				managen+=SagaLevel/2
-			if(isRace(FAE))
-				managen += AscensionsAcquired
 			return managen
 		HasMystic()
 			if(src.passive_handler.Get("Mystic"))
@@ -2325,8 +2315,6 @@ mob
 		HasCalmAnger()
 			if(passive_handler.Get("CalmAnger"))
 				return 1
-			if(isRace(SHINJIN) && src.ShinjinAscension=="Makai")
-				return 1
 			if(src.isRace(NAMEKIAN) && src.transActive())
 				return 1
 			if(src.TarotFate=="Temperance")
@@ -2848,15 +2836,11 @@ mob
 				return 0
 			return 1
 		SteadyRace()
-			if(src.race.type in list(MAJIN, MAKYO, NAMEKIAN, BEASTKIN, ELDRITCH, FAE, DRAGON, MAKAIOSHIN))
+			if(src.race.type in list(MAJIN, MAKYO, NAMEKIAN, BEASTKIN, ELDRITCH, DRAGON, MAKAIOSHIN))
 				return 1
 			return 0
 		TransRace()
 			if(isRace(HUMAN, SAIYAN, DEMON))
-				return 1
-			return 0
-		OtherRace()
-			if(isRace(SHINJIN))
 				return 1
 			return 0
 		SureHit()
@@ -3443,7 +3427,7 @@ mob
 				if(Saga&&Saga!="Keyblade")
 					return FALSE
 			// if(reqRace == HUMAN) return
-			if(isRace(reqRace) || path == "Any" && reqRace == FAE && Saga=="Keyblade")
+			if(reqRace == KEYBLADE_MAGIC ? (path == "Any" && Saga=="Keyblade") : isRace(reqRace))
 				if(passive_handler.Get("Innovation"))
 					switch(path)
 						if("Sword")

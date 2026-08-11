@@ -13,7 +13,7 @@
 	else
 		GestaltTier = 3
 	if(Saga&&!isRace(DEMIFIEND)&&!isRace(NOBODY) || CyberCancel || Secret&&!isRace(ELDRITCH))
-		if(!isRace(HUMAN)&&!isRace(FAE))
+		if(!isRace(HUMAN))
 			GestaltTier -=1
 	if(GestaltTier<1) GestaltTier=1
 	return GestaltTier

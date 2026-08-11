@@ -16,7 +16,7 @@
 		OffMessage="releases the hex!"
 		adjust(mob/p)
 			if(!altered)
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=18
 					SlowAffected=4
 					CrippleAffected=3
@@ -53,7 +53,7 @@
 			if(!altered)
 				DamageMult=8
 				Cooldown=45
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=11
 					Freezing=3
 					ActiveMessage="invokes a powerful: <font size=+1>RIPTIDE!</font size>"
@@ -81,7 +81,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=7
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=9
 					Freezing=3
 					ActiveMessage="invokes a powerful: <font size=+1>FROST SHAMSHIR!</font size>"

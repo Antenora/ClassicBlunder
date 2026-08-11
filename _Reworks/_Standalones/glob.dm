@@ -260,7 +260,7 @@ globalTracker
 		WorldDefaultAcc = 50
 		WorldWhiffRate = 25
 		celestialObjectTicks
-		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, DRAGON, ELF, SAIYAN, ANGEL, MAKAIOSHIN)
+		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, DRAGON, SAIYAN, ANGEL, MAKAIOSHIN)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
 		T3_STYLES_GODKI_VALUE = 0.15//Would recommend moving this to 0.25
 		T3_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
@@ -567,7 +567,6 @@ globalTracker
 		MAX_STUN_TIME = 600
 		LAUNCH_LOCKOUT = 200
 		MAX_LAUNCH_TIME = 25
-		TIMESTOP_MULTIPLIER = 70
 // acc
 		SWORD_GLOBAL_ACCURACY_NERF = 0.1
 		STAFF_GLOBAL_ACCURACY_NERF = 0.1
@@ -737,8 +736,6 @@ globalTracker
 		list/WeaponSoul = list("Muramasa" = FALSE, "Soul Calibur" = FALSE,"Soul Edge" = FALSE,\
  "Dainsleif" = FALSE)
  // false = open, true = taken
-
-		list/var/Heroes = list("Finn")
 
 		infConstellations = TRUE
 		BronzeConstellationNames = BRONZECLOTHS

@@ -64,13 +64,6 @@ mob
 			else if(Potential > Max * 0.8 && Potential < Max) PotentialStatus = "Average"
 			else PotentialStatus="Focused"
 
-			//i dont think shinjin are even in the game anymore .. 
-			if(isRace(SHINJIN))
-				var/Cap = Max / 100;
-				if(AscensionsAcquired > 0 && ShinjinAscension == "Makai") Cap += 0.5
-				if(ShinjinAscension == "Kai" && !AscensionsAcquired) Cap /= 2
-				if(GodKi > Cap && PotentialRate > 0) GodKi = Cap;
-
 		SpendRPP(val, Purchase=0, Training=0)//Purchase is a variable that holds whatever you're trying to buy.  Optional.
 			var/TotalSpend = GetRPPSpendable()
 			if(TotalSpend >= val)

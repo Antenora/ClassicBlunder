@@ -170,7 +170,6 @@ obj
 
 			var/RipplePower=1//used to make ripple go higher
 			var/DrainBlood=0// This is used for vampire grab + toss, makes them gain bloodpower
-			var/ForceCost = 0
 			var/WaveHit=0//Applies BYOND wave filter briefly on the hit target
 
 			var/Ooze
@@ -1891,8 +1890,6 @@ mob
 			if(src.AttackQueue.EnergyCost)
 				var/drain = passive_handler["Drained"] ? src.AttackQueue.EnergyCost * (1 + passive_handler["Drained"]/10) : src.AttackQueue.EnergyCost
 				src.LoseEnergy(drain)
-			if(src.AttackQueue.ForceCost)
-				src.LoseForce(src.AttackQueue.ForceCost)
 			if(src.AttackQueue.FatigueCost)
 				src.GainFatigue(src.AttackQueue.FatigueCost)
 

@@ -49,9 +49,7 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Changeling"   = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Makyo"        = list("t1_passives"=list("Juggernaut" = 0.5), "t1_skills"=list(), "t2_passives"=list("Juggernaut" = 0.5), "t2_skills"=list(/obj/Skills/Buffs/SlotlessBuffs/Makyo/Expand)),
 	"Makaioshin"   = list("t1_passives"=list("SpiritPower" = 0.1), "t1_skills"=list(), "t2_passives"=list("SpiritPower" = 0.15), "t2_skills"=list()),
-	"Shinjin"      = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Demi-fiend"   = list("t1_passives"=list("ManaGeneration" = 1, "ManaCapMult" = 0.5), "t1_skills"=list(), "t2_passives"=list("ManaGeneration" = 2), "t2_skills"=list()),
-	"High Faoroan" = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Chakardi"     = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list( "CashCow" = 5), "t2_skills"=list()),
 	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalChance" = 10, "CriticalDamage" = 0.15), "t2_skills"=list())
@@ -76,14 +74,14 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	ApplyBioSample(race_name, tier)
 	return TRUE
 /mob/proc/RemoveBioSample(race_name, tier)
-	// Returns TRUE if granted, FALSE if collector already had it.
+	// Returns TRUE if removed, FALSE if collector never had it.
 	if(!bio_samples)
-		bio_samples = list()
+		return FALSE
 	var/key = "[race_name]:[tier]"
-	if(key in bio_samples)
+	if(!(key in bio_samples))
 		return FALSE
 	bio_samples -= key
-	ApplyBioSample(race_name, tier)
+	StripBioSample(race_name, tier)
 	return TRUE
 
 /mob/proc/ApplyBioSample(race_name, tier)
@@ -104,6 +102,26 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	if(skills_to_apply && skills_to_apply.len)
 		for(var/skill_path in skills_to_apply)
 			AddSkill(new skill_path)
+
+/mob/proc/StripBioSample(race_name, tier)
+	// Inverse of ApplyBioSample.
+	var/list/def = BIO_SAMPLE_DEFS[race_name]
+	if(!def)
+		return
+	var/passive_key = "t2_passives"
+	var/skill_key = "t2_skills"
+	if(tier == 1)
+		passive_key = "t1_passives"
+		skill_key = "t1_skills"
+	var/list/passives_to_strip = def[passive_key]
+	var/list/skills_to_strip = def[skill_key]
+	if(passives_to_strip && passives_to_strip.len)
+		passive_handler.decreaseList(passives_to_strip)
+	if(skills_to_strip && skills_to_strip.len)
+		for(var/skill_path in skills_to_strip)
+			var/obj/Skills/found = locate(skill_path) in src.contents
+			if(found)
+				DeleteSkill(found)
 
 /mob/proc/RefreshAllBioSamples()
 	// Re-applies every collected sample on src. Useful after editing BIO_SAMPLE_DEFS

@@ -6116,7 +6116,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							VaizardHealth=1.5
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/10)
@@ -6145,7 +6145,7 @@ NEW VARIABLES
 				verb/Shell()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6179,7 +6179,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							VaizardHealth=3
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/5)
@@ -6208,7 +6208,7 @@ NEW VARIABLES
 				verb/Barrier()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6243,7 +6243,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							passives = list("PureReduction" = round(p.getTotalMagicLevel()/10,0.1), "DebuffResistance" = p.getTotalMagicLevel()/20, "Sunyata" = round(p.Potential/10,0.5)) // 5% per 10 pot to negate queues
 							TimerLimit = 15 + p.getTotalMagicLevel()
 							AffectTarget = 0
@@ -6272,7 +6272,7 @@ NEW VARIABLES
 				verb/Protect()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6307,7 +6307,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any")&& !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any")&& !isInnovationDisable(p))
 							VaizardHealth=5
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/5)
@@ -6338,7 +6338,7 @@ NEW VARIABLES
 				verb/Resilient_Sphere()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6381,7 +6381,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							passives = list("PureReduction" = round(p.getTotalMagicLevel()/5,0.1), "DebuffResistance" = p.getTotalMagicLevel()/10, "Sunyata" = round(p.Potential/5,0.5)) // 5% per 10 pot to negate queues
 							TimerLimit = 20 + p.getTotalMagicLevel()
 							AffectTarget = 0
@@ -6409,7 +6409,7 @@ NEW VARIABLES
 				verb/Protega()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any")&& !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any")&& !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)

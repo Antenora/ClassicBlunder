@@ -101,7 +101,6 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 					who << output("<font color=#99FF99><b>(Telepath)</b></font>- From  <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> :[blah]", "output")
 					who << output("<font color=#99FF99><b>(Telepath)</b></font>- From  <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> :[blah]", "icchat")
 
-		if(src.isRace(SHINJIN)) return;//no peeking, I guess
 		for(var/mob/Players/m in hearers(25,src))
 			if(m==src || m == who) continue;//if src, you've already seen your own message. if who, you've seen it directly from src
 

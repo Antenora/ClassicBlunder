@@ -80,8 +80,6 @@ obj/Skills/Utility
 					return
 			Choice.RPPSpendable+=(Amount*Choice.GetRPPMult())
 			usr.RPPDonate-=Amount
-			if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-				usr.potential_gain(Amount/glob.progress.RPPDaily*50)//kais have a 0.1 potential rate so this is only x5 potential in reality and i really dont think the fuckers are gonna be out there slaying npcs
 			OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 			Choice.LastTeach=world.realtime+Day(1)
 			src.Using=0
@@ -138,8 +136,6 @@ obj/Skills/Utility
 				if(Choice.SpendRPP((Choice2.SkillCost*0.5/Choice.GetRPPMult()), Choice2, Training=1))
 					Choice.AddSkill( new Choice2.type )
 					usr.RPPDonate-=Choice2.SkillCost*0.5
-					if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-						usr.potential_gain(Choice2.SkillCost*0.5/glob.progress.RPPDaily*50)//kai only have 0.1 potential rate so this is only x5
 					OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 					Choice.LastTeach=world.realtime+Day(1)
 					src.Using=0
@@ -624,17 +620,16 @@ obj/Skills/Utility
 					if(A == usr) continue
 					who.Add(A)
 			for(var/mob/Players/W in who)
-				if(!usr.isRace(SHINJIN))
-					if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
-						if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
-							if(!(W in hearers(50,usr)))
-								who.Remove(W)
-						if(!W.EnergySignature)
+				if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
+					if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
+						if(!(W in hearers(50,usr)))
 							who.Remove(W)
-						if(W.Dead)
-							who.Remove(W)
-					if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					if(!W.EnergySignature)
 						who.Remove(W)
+					if(W.Dead)
+						who.Remove(W)
+				if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					who.Remove(W)
 			var/mob/Players/selector=input("Select a player to telepath.") in who||null
 			if(selector=="Cancel")
 				return

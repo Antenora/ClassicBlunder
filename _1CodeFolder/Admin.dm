@@ -2177,7 +2177,7 @@ mob/Admin3/verb
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
 						var/ElderMult = 0.5
-						if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+						if(P.EraBody == "Senile")
 							ElderMult = 1
 						P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
@@ -2201,7 +2201,7 @@ mob/Admin3/verb
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
 						var/ElderMult = 0.5
-						if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+						if(P.EraBody == "Senile")
 							ElderMult = 1
 						P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
@@ -2217,7 +2217,7 @@ mob/Admin3/verb
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
 							var/ElderMult = 0.5
-							if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+							if(P.EraBody == "Senile")
 								ElderMult = 1
 							P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
@@ -2238,7 +2238,7 @@ mob/Admin3/verb
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
 							var/ElderMult = 0.5
-							if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+							if(P.EraBody == "Senile")
 								ElderMult = 1
 							P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
@@ -2281,7 +2281,7 @@ mob/Admin3/verb
 		if(!src.Alert("Are you sure you want to New Character Setup someone?")) return
 		if(locate(/obj/Skills/Utility/Teachz, M))
 			var/ElderMult=0.5
-			if(M.EraBody=="Senile"||M.isRace(SHINJIN))
+			if(M.EraBody=="Senile")
 				ElderMult=1
 			M.RPPDonate+=(glob.progress.RPPStarting*ElderMult*M.RPPMult*glob.progress.RPPBaseMult)
 			M << "You have gained knowledge on how to help further other's development!"
@@ -2712,7 +2712,7 @@ mob/Admin4/verb
 			glob.progress.MoneyName=NewMoney
 	Common_Toggle()
 		set category="Admin"
-		var/list/Races=list("Cancel", "Half Saiyan", "Elite", "Giant", "Shinjin", "Demon", "Majin", "Dragon", "Makyo", "Changeling")
+		var/list/Races=list("Cancel", "Half Saiyan", "Demon", "Majin", "Dragon", "Makyo", "Changeling")
 		var/Mode=alert(usr, "You can set a normally rare race to be common, or strip that same status with this verb.  Which do you want to do?", "Common Toggle", "Make Common", "Make Rare")
 		if(Mode=="Make Common")
 			var/list/Choices=Races

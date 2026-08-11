@@ -62,9 +62,6 @@ mob/var
 
 	//SHARINGAN
 	SharinganEvolution
-	//FORCE
-	DarkSide
-	LightSide
 	//JINCHUURIKI
 	JinchuuType
 
@@ -166,7 +163,7 @@ mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
 		if(P.Saga)
 			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||"Sorcerer")
 				Level7=1
@@ -209,14 +206,6 @@ mob/Admin3/verb
 					s.Trigger(P, TRUE)
 			var/list/passiveGain=list();
 			switch(selection)
-				if("Hero")
-					P.Saga="Hero"
-					P.SagaLevel=1
-					HeroLegend = input(P, "What legend are you going to follow?") in glob.Heroes
-					var/path = "/obj/Skills/Buffs/ActiveBuffs/Hero/[HeroLegend]Buff"
-					var/obj/Skills/Buffs/ActiveBuffs/Hero/h = new path
-					P.AddSkill(h)
-					tierUpSaga("Hero")
 				if("King of Courage")
 					P.Saga="King of Courage"
 					P.SagaLevel=1
@@ -435,10 +424,6 @@ mob/Admin3/verb
 							P.OffAscension+=0.5
 						if("Defense")
 							P.DefAscension+=0.5
-				if("Force")
-					src.ChoseSideOfForce()
-					P.Saga="Force"
-					P.SagaLevel=1
 				if("Path of a Hero: Rebirth")
 					P.SagaLevel=1
 					P.Saga="Path of a Hero: Rebirth"
@@ -934,8 +919,6 @@ mob
 				src.SagaAdminPermission=0
 
 			switch(src.Saga)
-				if("Hero")
-					tierUpSaga("Hero")
 				if("Path of a Hero: Rebirth")
 					switch(SagaLevel)
 						if(2)

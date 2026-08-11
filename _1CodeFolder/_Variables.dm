@@ -679,8 +679,6 @@ mob/var
 
 	tension = 0
 
-	ShinjinAscension
-
 	AngelAscension
 
 	CelestialAscension

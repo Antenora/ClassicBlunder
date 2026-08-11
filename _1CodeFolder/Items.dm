@@ -1047,6 +1047,7 @@ obj/Items/Sword
 		unsheatheOffsetX = -16
 		unsheatheOffsetY = -16
 		Legendary
+			icon = 'LightSword.dmi'
 			LegendaryItem=1
 			Unobtainable=1
 			Ascended=3

@@ -29,7 +29,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=7.5
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=9
 					Distance=7
 					ActiveMessage="invokes a powerful: <font size=+1>BLAZING WHIP!</font size>"
@@ -59,7 +59,7 @@
 			if(!altered)
 				DamageMult=6
 				Cooldown=45
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=8
 					Distance=15
 					Area="Wide Wave"
@@ -93,7 +93,7 @@
 			if(!altered)
 				DamageMult=6
 				Cooldown=45
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					Speed=0.5
 					Distance=15
 					Radius=1
@@ -120,7 +120,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=8
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					Scorching=3
 					Knockback=5
 					ActiveMessage="invokes a powerful: <font size=+1>FIREBALL!</font size>"

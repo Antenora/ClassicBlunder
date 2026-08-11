@@ -2907,15 +2907,11 @@ mob
 					evil = 1
 				if(src.HasAbyssMod())
 					evil = 1
-			if(src.ShinjinAscension=="Makai")
-				evil = 1
 			if(src.HasHellPower())
 				evil = 1
 			if(istype(src, /mob/Player/AI))
 				evil = 1
 			//these are all good.
-			if(src.ShinjinAscension=="Kai")
-				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
 			if(src.Secret=="Hamon")
@@ -2941,8 +2937,6 @@ mob
 			if(src.passive_handler.Get("Emptiness"))
 				return FALSE
 			//these are all good.
-			if(src.ShinjinAscension=="Kai")
-				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
 			if(src.GetSpiritPower()>=1)
@@ -2956,8 +2950,6 @@ mob
 				if(isRace(race))
 					evil = 1
 			if(src.Secret in EvilSecrets)
-				evil = 1
-			if(src.ShinjinAscension=="Makai")
 				evil = 1
 			if(src.HasHellPower())
 				evil = 1
@@ -3691,16 +3683,6 @@ mob
 
 			if(passive_handler.Get("Transformation Power")) // add straight potential
 				Return+=passive_handler.Get("Transformation Power")
-
-			if(isRace(SHINJIN))//one determines the other
-				if(src.ShinjinAscension=="Kai")
-					var/NoFite=2
-					if(src.AscensionsAcquired>0)
-						NoFite=1
-					src.passive_handler.Set("GodKi", src.Potential/(100*NoFite))
-				if(src.ShinjinAscension=="Makai")
-					src.passive_handler.Set("GodKi", src.Potential/100)
-			//TODO: ALTER SHINJIN GODKI POTENTIAL THING
 
 			return Return
 
