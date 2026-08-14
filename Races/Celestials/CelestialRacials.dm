@@ -168,12 +168,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			Class = "Light"
 			spdAdd=1
 			strAdd=1
-			passives = list("Duelist" = 1, "LikeWater" = 1)
+			passives = list("Duelist" = 1)
 			DamageEffectiveness = 1.025
 			AccuracyEffectiveness = 0.9
 			SpeedEffectiveness = 1.25
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("Duelist" = 1 + (User.Potential / 25), "LikeWater" = 1 + (User.Potential / 25))
+				src.passives = list("Duelist" = 1 + (User.Potential / 25))
 				..()
 
 		Light_Celestial_Blade_III
@@ -389,12 +389,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			Class = "Rod"
 			forAdd = 1
 			endAdd = 1
-			passives = list("ManaSteal" = 5, "Siphon" = 1)
+			passives = list("ManaSteal" = 5)
 			DamageEffectiveness = 1
 			AccuracyEffectiveness = 1
 			SpeedEffectiveness = 0.85
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("ManaSteal" = 5 + (User.Potential / 2), "Siphon" = 1 + (User.Potential / 25))
+				src.passives = list("ManaSteal" = 5 + (User.Potential / 2))
 				..()
 		Celestial_Rod_III
 			name = "The Pale Axis"
@@ -420,7 +420,7 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			desc = "Those struck by its power hear thunder long after the blow."
 			icon = 'Spirit Sword.dmi'
 			Class = "Staff"
-			passives = list("ThunderHerald" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05)
+			passives = list("ThunderHerald" = 1, "CriticalDamage" = 0.05)
 			forAdd = 1
 			strAdd = 0.5
 			spdAdd = 0.5
@@ -428,7 +428,7 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			AccuracyEffectiveness = 0.85
 			SpeedEffectiveness = 0.65
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list("ThunderHerald" = 1, "CriticalChance" = 5 + (User.Potential / 4), "CriticalDamage" = (User.Potential / 200))
+				src.passives = list("ThunderHerald" = 1, "CriticalDamage" = 0.05 + (User.Potential * 0.0075))
 				..()
 		Celestial_Staff_II
 			name = "Rime Throne"
@@ -497,7 +497,7 @@ obj/Skills/Grapple/Flashback
 	name = "Flashback"
 	Cooldown = 0
 	DamageMult = 4
-	StrRate = 1
+	StrScaling = 1
 	ThrowMult = 0
 	ThrowAdd = 0
 	UnarmedOnly = 0
@@ -506,15 +506,17 @@ obj/Skills/Grapple/Flashback
 		if(!User || !Target || !User.warp_strike_saved_loc)
 			return
 		var/userPower = User.getPower(Target)
-		var/statPower = User.getStatDmg2(unarmed=1) * StrRate
+		var/statPower = User.getStatDmg2(unarmed=1) * StrScaling
 		var/endFactor = Target.getEndStat(1)
-		var/Damage = (userPower**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.GRAPPLE_EFFECTIVNESS) ** -(endFactor**glob.DMG_END_EXPONENT / statPower**glob.DMG_STR_EXPONENT)
-		Damage *= User.GetDamageMod()
+		var/Damage = strikeCoreDamage(userPower, statPower, endFactor)
+		Damage *= User.strikeJudgmentMult()
 		Damage *= DamageMult
 		var/extra = User.passive_handler.Get("Muscle Power") / glob.MUSCLE_POWER_DIVISOR
 		Damage *= (glob.GRAPPLE_MELEE_BOON + extra)
 		Damage *= glob.GRAPPLE_DAMAGE_MULT
-		User.DoDamage(Target, Damage, 1, 0)
+		var/strike/S = new(User, Target, Damage)
+		S.unarmed = 1
+		S.resolve()
 		OMsg(User, "[User] [TriggerMessage] [Target] behind!")
 		var/turf/dest = User.warp_strike_saved_loc
 		if(Target.grabbed == User)

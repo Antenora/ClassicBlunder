@@ -25,8 +25,8 @@
     Rounds=5
     DelayTime=30
     GuardBreak=1
-    StrOffense=1
-    EndDefense=1
+    StrScaling=1
+    EndEffectiveness=1
     PassThrough=1
     ActiveMessage="rips through their opponent with rapid godspeed slashes!"
     HitSparkIcon='Slash - Zan.dmi'
@@ -35,7 +35,6 @@
     HitSparkSize=2
     HitSparkTurns=1
     HitSparkLife=10
-    IconTime=10
     Cooldown=4
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff
     Godspeed_Assaulted//debuff

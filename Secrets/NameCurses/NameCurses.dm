@@ -7,7 +7,7 @@
 		EndMult=1.2
 		SpdMult=1.2
 		ForMult=1.2
-		passives = list("Deicide" = 10, "EndlessNine" = 0.2)
+		passives = list()
 		ActiveMessage="claims dominion over names."
 		OffMessage="discards their dominion over names."
 		verb/Monk_of_The_True_Name()

@@ -89,7 +89,6 @@ obj
 				Instinct=2
 				UnarmedOnly=1
 				EnergyCost=5
-				Confusing=25
 				HitMessage="confuses the opponent's senses with a volley of pressure point strikes!"
 				verb/Nerve_Shot()
 					set category="Skills"
@@ -263,7 +262,6 @@ obj
 				HitMessage="slashes at the opponent's body with their enlightened blade!"
 				DamageMult=11
 				AccuracyMult = 1.25
-				SpiritSword=1
 				KBAdd=10
 				Duration=5
 				Instinct=2
@@ -287,8 +285,6 @@ obj
 				KBMult=0.00001
 				Combo=5
 				Warp=5
-				SpiritHand=0.5
-				SpiritSword=0.5
 				Duration=5
 				Cooldown=150
 				NeedsSword=1

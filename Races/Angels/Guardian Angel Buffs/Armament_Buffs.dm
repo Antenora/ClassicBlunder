@@ -18,7 +18,7 @@
 		HealthThreshold = 0.001
 		SpecialSlot=0
 		Slotless=1
-		passives = list("Deflection" = 1, "Instinct" = 2, "Pursuer" = 2, "Flicker" = 2, "BeyondPurity" = 1, "Godspeed" = 1)
+		passives = list("Deflection" = 1, "Pursuer" = 2, "Flicker" = 2, "BeyondPurity" = 1, "Godspeed" = 1)
 		StrMult = 1.2
 		ForMult = 1.2
 		SpdMult = 1.2

@@ -6,12 +6,9 @@
 /globalTracker/var/KB_LOFT_MIN = 0.35 //KB weight (distance/max) below this stays a flat slide
 /globalTracker/var/KB_LOFT_PX = 16 //loft arc height at full weight
 //TODO convert to glob
-/mob/proc/getLegendPMult()
-    return HasMythical()*0.5
 /mob/proc/gatherKBMods()
     . = 0
     . += HasGiantForm() * 1.25
-    . += getLegendPMult()
     . += passive_handler.Get("HeavyHitter")
     . += 1
     var/zanzibarbreeze =  . 
@@ -29,7 +26,7 @@
         // get the defenders anti kb measures
         if(!defender.passive_handler)
             return 1
-        var/mod = ( ((defender.HasGiantForm() * 0.15) + (defender.HasMythical() * 0.5) + (defender.passive_handler.Get("Juggernaut") * 0.05)) )
+        var/mod = ( ((defender.HasGiantForm() * 0.15) + (defender.passive_handler.Get("Juggernaut") * 0.05)) )
         var/res = 1 - mod
         if(res < glob.MAX_KB_RES)
             res = glob.MAX_KB_RES

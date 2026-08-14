@@ -2,7 +2,7 @@
 	Ghost_of_Sparta
 		IconLock='SweatDrop.dmi'
 		IconApart=1
-		passives = list("Deicide" = 10, "Half-Sword" = 1,  "EndlessNine" = 1, "LifeGeneration" = 3, \
+		passives = list("Half-Sword" = 1,  "LifeGeneration" = 3, \
 		                "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1, "PureDamage"=4)
 		StrMult=1.5
 		EndMult=1.75
@@ -37,7 +37,7 @@
 		IconLock='Mist Veil.dmi'
 		IconApart=1
 		IconLayer=4
-		passives = list("Tossing" = 4, "Mortal Will" = 1, "MortalStacks" = 1, "CriticalChance" = 30, "CriticalDamage"= 0.15, "Secret Knives" = "Blade_Addition",  \
+		passives = list("Tossing" = 4, "Mortal Will" = 1, "MortalStacks" = 1, "SureCrit" = 1, "CriticalDamage"= 0.15, "Secret Knives" = "Blade_Addition",  \
 		"TensionLock" = 1)
 		StyleEnd = 1.5
 		StyleStr = 1.5
@@ -45,7 +45,7 @@
 		ActiveMessage="is naught but an extension of their blade, which swings with divine precision."
 	Ionization
 		passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
-		"CriticalChance" = 33, "TensionLock" = 1)
+		"SureCrit" = 1, "TensionLock" = 1)
 		SpdMult=1.5
 		StrMult=1.25
 		EndMult=1.25

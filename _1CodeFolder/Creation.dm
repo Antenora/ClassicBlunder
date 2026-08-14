@@ -194,8 +194,6 @@ mob/Players
 		//stop holding zanzo charges
 		if(ActiveZanzo)
 			ActiveZanzo=0
-		for(var/obj/Skills/Zanzoken/z in src)
-			z.ZanzoAmount=0
 
 		if(updateVersion && updateVersion.version != glob.UPDATE_VERSION)
 			glob.updatePlayer(src)

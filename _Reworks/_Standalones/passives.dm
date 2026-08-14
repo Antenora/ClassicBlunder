@@ -167,11 +167,11 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Distance" = 1, "Divine Technique" = 1, "DivineArmory" = 1, "Don't Move" = 1,\
 	"DormantDemon" = 1, "DoubleHelix" = 1, "Drained" = 1, "DrainlessPUSpike" = 1,\
 	"Dream Within a Dream" = 1, "Dreamless Sleep" = 1, "Duren" = 1, "Emptiness" = 1,\
-	"EmptyFlashStep" = 1, "EndDefense" = 1, "EndlessAnger" = 1, "Endrate" = 1,\
+	"EmptyFlashStep" = 1, "EndEffectiveness" = 1, "EndlessAnger" = 1,\
 	"EnergyExpenditure" = 1, "EnergyHeal" = 1, "Enshrine" = 1, "EnvyFactor" = 1,\
 	"EruptingBlows" = 1, "Explode" = 1, "Extra Secret Knives" = 1, "Fabled King" = 1,\
 	"FakePeace" = 1, "FatigueDrain" = 1, "FatigueLeak" = 1, "Field of Destruction" = 1,\
-	"Fishman" = 1, "FlashDOT" = 1, "ForOffense" = 1, "ForRate" = 1,\
+	"Fishman" = 1, "FlashDOT" = 1, "ForScaling" = 1,\
 	"ForceField" = 1, "ForceFielded" = 1, "Fox Spirit" = 1, "FrenzyCarrier" = 1,\
 	"Full Manifestation" = 1, "FullTensionLock" = 1, "FutureRewritten" = 1, "Gluttony" = 1,\
 	"GluttonyFactor" = 1, "GodspeedDisabled" = 1, "GreedFactor" = 1, "Grit" = 1,\
@@ -211,7 +211,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Sparks of Black" = 1, "SpecialBuffLock" = 1, "SpecialStrike" = 1, "SpiralEngine" = 1,\
 	"SpiralImpact" = 1, "SpiritForm" = 1, "Spiritual Tactician" = 1, "Staggered!" = 1,\
 	"Staked" = 1, "Star Surge" = 1, "StarCrossed" = 1, "StarPower" = 1,\
-	"StealsStats" = 1, "StrOffense" = 1, "StrRate" = 1, "Stylish" = 1,\
+	"StealsStats" = 1, "StrScaling" = 1, "Stylish" = 1,\
 	"SunStricken" = 1, "Super Kaioken" = 1, "SuperHighTension" = 1, "SuperMode" = 1,\
 	"SuperSaiyanSignature" = 1, "Sure-Strike Black Flash" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1,\
 	"TeamFighter" = 1, "TeamHater" = 1, "TensionLock" = 1, "TensionPowered" = 1,\
@@ -224,7 +224,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Twisted Sentimentality" = 1, "Two Become One" = 1, "Unbroken" = 1, "Undeterred" = 1,\
 	"Undying Rage" = 1, "UnleashToggle" = 1, "UnlimitedHighTension" = 1, "Unreality" = 1,\
 	"Unrelenting Wrath" = 1, "UnstableSpace" = 1, "Utterly Powerless" = 1, "VenomBlood" = 1,\
-	"Void" = 1, "Vulnerable Behind" = 1, "WalkThroughHell" = 1, "WarmingUp" = 1,\
+	"Void" = 1, "WalkThroughHell" = 1, "WarmingUp" = 1,\
 	"WarpPoint" = 1, "WeaponBreakerQOL" = 1, "Whirlwind" = 1, "Wolf Spirit" = 1,\
 	"WrathFactor" = 1, "Wrathful" = 1, "X-Antibody" = 1, "YataNoKagami" = 1,\
 	"Yosuga" = 1, "You Thought" = 1, "Zeal" = 1, "ZenkaiPower" = 1,  "Health Obfuscation" = 1)

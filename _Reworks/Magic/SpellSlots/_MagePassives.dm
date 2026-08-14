@@ -163,11 +163,6 @@
     time
         element="Time"
 
-        Past
-            name="Past"
-            desc="The mage's casting echoes through the moments behind them. Each selection deepens the weight of memory — speed in the wake of a cast, suffering returned to those who would strike them."
-            passives = list()
-
         Present
             name="Present"
             desc="The mage moves with the now. Each selection sharpens the agility behind their casting and the rhythm of their counters."

@@ -48,9 +48,9 @@ obj/Skills/Projectile/BlazingSlashProjectile
 	FireFromEnemy=0
 	Variation=0
 	Speed=0.75
-	StrRate=1
-	ForRate=0
-	EndRate=1
+	StrScaling=1
+	ForScaling=0
+	EndEffectiveness=1
 	Knockback=1
 	MultiHit=8
 	DamageMult=0.5

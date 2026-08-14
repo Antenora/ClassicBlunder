@@ -427,14 +427,11 @@ proc
 			var/StartA=A.loc
 			var/StartT=Target.loc
 			var/clash
-			if(glob.AIS_WINDOW)
-				//both windows live = the cinematic. stack check stays for forced clashes (finisher-vs-finisher)
-				clash = Target.aisArmed() || Target.AfterImageStrike > 0
-				if(Target.aisArmed()) Target.aisConsume()
-			else
-				clash = Target.AfterImageStrike||(locate(/obj/Skills/Zanzoken, Target))&&prob(20)
+			//both windows live = the cinematic. stack check stays for forced clashes (finisher-vs-finisher)
+			clash = Target.aisArmed() || Target.AfterImageStrike > 0
+			if(Target.aisArmed()) Target.aisConsume()
 			if(clash)
-				if(glob.AISCLASHLOCKSMOVEMENT && Target.client)
+				if(Target.client)
 					if(istype(Target, /mob/Players))
 						var/mob/Players/PT = Target
 						PT.move_disabled = TRUE
@@ -468,13 +465,12 @@ proc
 						AfterImageA(Target)
 						KenShockwave(Target,icon='KenShockwave.dmi',Size=max(GoCrand(0.04,0.4),0.2),PixelX=((Target.x-A.x)*(-16)+pick(-12,-8,8,12)),PixelY=((Target.y-A.y)*(-16)+pick(-12,-8,8,12)), Time=6)
 						sleep(5)
-				if(glob.AISCLASHLOCKSMOVEMENT)
-					if(Target && istype(Target, /mob/Players))
-						var/mob/Players/PT = Target
-						PT.move_disabled = FALSE
-					if(A && istype(A, /mob/Players))
-						var/mob/Players/PA = A
-						PA.move_disabled = FALSE
+				if(Target && istype(Target, /mob/Players))
+					var/mob/Players/PT = Target
+					PT.move_disabled = FALSE
+				if(A && istype(A, /mob/Players))
+					var/mob/Players/PA = A
+					PA.move_disabled = FALSE
 				if(A)
 					A.loc = StartA
 					A.alpha = 255
@@ -529,24 +525,6 @@ proc
 			animate(A,pixel_x=changeX, pixel_y=changeY, time=3, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 			sleep(3)
 			animate(A,pixel_x=-changeX, pixel_y=-changeY, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
-			A.Dodging=0
-	UltraPrediction(mob/A,mob/Target)
-		var/changeX=pick(-16,-8,8,16)
-		var/changeY=pick(-16,-8,8,16)
-		if(!A.Dodging)
-			A.Dodging=1
-			spawn()
-				AfterImagePrediction(A,changeX/8,changeY/8)
-				sleep(1)
-				AfterImagePrediction(A,changeX/4,changeY/4)
-				sleep(2)
-				AfterImagePrediction(A,changeX/2,changeY/2)
-			sleep(2)
-			animate(A,pixel_x=changeX, pixel_y=changeY, time=0, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
-			animate(A,pixel_x=-changeX, pixel_y=-changeY, time=3, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
-			sleep(3)
-			A.dir=get_dir(A,Target)
-			A.Melee1(1, 5, accmulti=1.25, SureKB=15)
 			A.Dodging=0
 	UltraPrediction2(mob/A,mob/Target)
 		var/changeX=pick(-16,-8,8,16)

@@ -1078,7 +1078,7 @@ mob/Players/verb
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		//flourish: pose right after a guard break / wall splat / grab tech for a tension nod
-		if(glob.POSE_FLOURISH && world.time <= src.flourish_until)
+		if(world.time <= src.flourish_until)
 			src.flourish_until = 0
 			if(src.canGainTension())
 				src.gainTension(glob.FLOURISH_TENSION)

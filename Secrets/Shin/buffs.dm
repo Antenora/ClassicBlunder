@@ -67,7 +67,7 @@
    // IconApart = 1
 
      /* All of Mang's passives and stats are scattered across passive procs. This is so that they can scale based off of how many Mang you have
-     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Brutalize, Blurring Strikes, Cheap Shot
+     The passives are as follows: Steady, Godspeed, PUSpike, PureDamage, Cheap Shot
      They scale off of how many mang you have active. They do NOT show up in the passive handler rn 
      and if you want to know their values check the passive files
      Please do not go screaming about how "Mang does nothing" I will gut you myself - Hadoje */
@@ -84,7 +84,7 @@ mob/proc/GetMangStats() //This proc is ued in _JinxUtility.dm specifically for a
     var/SecretInformation/Shin/ShinSecret = secretDatum
     return MANG_BASE_VALUE + (ShinSecret.Mang * MANG_MULT_VALUE)
 
-mob/proc/GetMangLevel() //This proc gets how many Mang you have active is used in _BinaryChecks.dm, BlurringStrikes.dm, and Brutalize.dm
+mob/proc/GetMangLevel() //This proc gets how many Mang you have active is used in _BinaryChecks.dm
     if(hasSecret("Shin"))
         var/SecretInformation/Shin/ShinSecret = secretDatum
         if(!CheckSlotless("Mang Resonance"))

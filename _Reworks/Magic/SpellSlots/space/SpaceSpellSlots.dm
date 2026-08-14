@@ -11,7 +11,7 @@
 		Knockback=3
 		Instinct=1
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -40,7 +40,7 @@
 		DamageMult=10
 		Instinct=1
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1

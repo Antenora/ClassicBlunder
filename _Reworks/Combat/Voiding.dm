@@ -93,32 +93,33 @@ mob/proc/RollVoidForAbsorb()
 /mob/var/extraVoidChance = 0
 
 /mob/proc/applyVoidNerf()
-	if(glob.VoidMaim||!src)
-		Maimed++
-		recordMaim(null, "Survived Void")
-		src << "After managing to survive, you're left with a maim."
+	Maimed++
+	recordMaim(null, "Survived Void")
+	src << "After managing to survive, you're left with a maim."
 	if(glob.VoidCut)
 		var/highestStat = 0
 		var/highestStatName = ""
-		for(var/i in 1 to 5)
-			if(BaseStr() > highestStat)
-				highestStat = GetStr()
-				highestStatName = "Str"
-			if(BaseEnd() > highestStat)
-				highestStat = GetEnd()
-				highestStatName = "End"
-			if(BaseFor() > highestStat)
-				highestStat = GetFor()
-				highestStatName = "For"
-			if(BaseDef() > highestStat)
-				highestStat = GetDef()
-				highestStatName = "Def"
-			if(BaseOff() > highestStat)
-				highestStat = GetOff()
-				highestStatName = "Off"
-		var/statCutAmount = clamp(0, glob.VoidCut / 100, 1)
+		if(BaseStr() > highestStat)
+			highestStat = BaseStr()
+			highestStatName = "Str"
+		if(BaseEnd() > highestStat)
+			highestStat = BaseEnd()
+			highestStatName = "End"
+		if(BaseFor() > highestStat)
+			highestStat = BaseFor()
+			highestStatName = "For"
+		if(BaseDef() > highestStat)
+			highestStat = BaseDef()
+			highestStatName = "Def"
+		if(BaseOff() > highestStat)
+			highestStat = BaseOff()
+			highestStatName = "Off"
+		if(BaseSpd() > highestStat)
+			highestStat = BaseSpd()
+			highestStatName = "Spd"
+		var/statCutAmount = clamp(glob.VoidCut / 100, 0, 1) // was comparing Base against stored buffed values, looping 5x for nothing, and clamping with scrambled args
 		vars["[highestStatName]Cut"] += statCutAmount
-		src<<"After managing to survive, you are left with a permanent injury. Your [highestStatName] is cut by [statCutAmount]%."
+		src<<"After managing to survive, you are left with a permanent injury. Your [highestStatName] is cut by [statCutAmount*100]%."
 
 
 
@@ -291,16 +292,14 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 			while(rolls>0)
 				var/roll = rand(Chance, 100)
 				if(roll >= 100-glob.VoidChance)
-					if(glob.SHOW_VOID_ROLL)
-						src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! Congratulations, you have voided!"
+					src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! Congratulations, you have voided!"
 					rolls = 0
 					actuallyDead = 0
 					break
 				else
 					rolls--
 					actuallyDead = 1
-					if(glob.SHOW_VOID_ROLL)
-						src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! You have died!"
+					src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! You have died!"
 				if(rolls<0)
 					rolls = 0
 		if(NotYet)

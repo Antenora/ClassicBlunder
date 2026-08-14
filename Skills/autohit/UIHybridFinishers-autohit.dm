@@ -5,7 +5,7 @@
 		NoLock = 1
 		NoAttackLock = 1
 		Rounds = 2
-		StrOffense = 1
+		StrScaling = 1
 		DamageMult = 2.2
 		Instinct = 2
 		Distance = 4
@@ -36,8 +36,8 @@
 		Rounds = 4
 		IgnoreAlreadyHit = 1
 		DamageMult = 1.8
-		ForOffense = 1
-		EndDefense = 0.75
+		ForScaling = 1
+		EndEffectiveness = 0.75
 		Instinct = 2
 		TurfShift = 'SparkleRainbow.dmi'
 		TurfShiftDuration = 12
@@ -55,7 +55,7 @@
 		Area = "Strike"
 		NoLock = 1
 		NoAttackLock = 1
-		StrOffense = 2
+		StrScaling = 2
 		DamageMult = 2.4
 		Instinct = 2
 		Stunner = 2
@@ -84,8 +84,8 @@ obj/Skills/Grapple
 		Reversal = 1
 		OneAndDone = 1
 		DamageMult = 4
-		StrRate = 1
-		EndRate = 0.9
+		StrScaling = 1
+		EndEffectiveness = 0.9
 		ThrowAdd = 2
 		ThrowMult = 1.25
 		ThrowSpeed = 1.25

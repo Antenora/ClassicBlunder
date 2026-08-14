@@ -121,7 +121,7 @@ mob/proc/UsingHotnCold()
 /mob/proc/getPower(mob/def)
     var/powerDif = Power / def.Power
     if(glob.CLAMP_POWER)
-        if(!ignoresPowerClamp())
+        if(!ignoresPowerClamp(def))
             powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
     return powerDif
 

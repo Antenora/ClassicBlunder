@@ -47,7 +47,6 @@
     Jarret_Jarret
         SweepStrike=4
         SpeedStrike=2
-        Bolt=1
         Quaking=5
         PushOut=1
         PushOutWaves=2
@@ -122,7 +121,6 @@
     Divine_Finisher
         name = "Heavenly Demon's Radiant Divine Palm that Shatters the Nine Heavens and Illuminates the Eternal Night"
         Warp = 10
-        Bolt = 1
         Shining = 1
         Explosive = 1
         Instinct = 2

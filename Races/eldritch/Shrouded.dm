@@ -70,7 +70,6 @@
             es.ShroudedPassives = list();
             switch(es.ShroudedSubtype)
                 if("Feathers")
-                    es.ShroudedPassives["CriticalChance"] = 15;
                     es.ShroudedPassives["CriticalDamage"] = 0.15;
                     es.ShroudedPassives["CriticalBlock"] = 15;
                 if("Heart")
@@ -87,8 +86,6 @@
                 if("Honor")
                     es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Juggernaut"] = 2;
-                if("Zeal")
-                    es.ShroudedPassives["LikeWater"] = 2;
                 if("Pride")
                     es.ShroudedPassives["PureDamage"] = 2;
                 if("Warrior")
@@ -124,8 +121,6 @@
                     es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Flicker"] = 2;
                 if("Eternity")
-                    es.ShroudedPassives["Instinct"] = 3;
-                    es.ShroudedPassives["Flow"] = 3;
                     es.ShroudedPassives["Pursuer"] = 3;
 
 /mob/var

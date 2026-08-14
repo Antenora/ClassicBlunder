@@ -15,8 +15,8 @@
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
 		forAdd = 0.15 * asc
-		passives = list("Ocean Bringer" = 0.25 + (round(asc/4)), "AbsoluteZero" = 1, "LikeWater" = 1 + asc, "FluidForm" = 1 + (0.5 * asc), \
-			"Flow" = 1 + (asc/2), "VoidField" = asc * 2, "Godspeed" = asc)
+		passives = list("Ocean Bringer" = 0.25 + (round(asc/4)), "AbsoluteZero" = 1, \
+			"VoidField" = asc * 2, "Godspeed" = asc)
 		ElementalOffense = "Water"
 		ElementalDefense = "Water"
 	Trigger(mob/User, Override = FALSE)

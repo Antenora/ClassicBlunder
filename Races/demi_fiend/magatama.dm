@@ -415,8 +415,8 @@ mob/proc/CraftMagatama()
 obj/Items/Magatama/Marogareh
 	name = "Marogareh"
 	desc = "The first Magatama, born when the Conception reshaped the world. A writhing, parasitic organism that awakens the demonic potential within its host."
-	base_passives = list("UnarmedDamage" = 1, "LifeGeneration" = 0.5, "Flow" = 1, "Instinct" = 1)
-	passive_scaling = list("UnarmedDamage" = 0.09, "CounterMaster" = 0.1, "LifeGeneration" = 0.04,  "Flow" = 0.04, "Instinct" = 0.04, "HeavyHitter" = 0.09)
+	base_passives = list("UnarmedDamage" = 1, "LifeGeneration" = 0.5)
+	passive_scaling = list("UnarmedDamage" = 0.09, "CounterMaster" = 0.1, "LifeGeneration" = 0.04, "HeavyHitter" = 0.09)
 	ascension_passives = list("2" = list("CounterMaster" = 1,  "HeavyHitter" = 1), "3" = list("ComboMaster" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Lunge)
 	ascension_skills = list("2" = list(/obj/Skills/AutoHit/DemiFiend/Berserk))
@@ -425,8 +425,8 @@ obj/Items/Magatama/Wadatsumi
 	name = "Wadatsumi"
 	desc = "A Magatama borne of the sea god Wadatsumi. Those who ingest it command the bitter cold and the rhythmic power of ocean waves."
 	base_passives = list("ManaCapMult" = 0.2, "Water Magic Mastery" = 0.25, "Chilling" = 2)
-	passive_scaling = list("ManaCapMult" = 0.008, "ChillResist" = 0.04, "Water Magic Mastery" = 0.0075, "Chilling" = 0.1, "LikeWater" = 0.04)
-	ascension_passives = list("2" = list("ChillResist" = 1,  "LikeWater" = 1))
+	passive_scaling = list("ManaCapMult" = 0.008, "ChillResist" = 0.04, "Water Magic Mastery" = 0.0075, "Chilling" = 0.1)
+	ascension_passives = list("2" = list("ChillResist" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Ice_Breath)
 	ascension_skills = list("2" = list(/obj/Skills/AutoHit/DemiFiend/Fog_Breath))
 	craft_cost = 5000
@@ -473,8 +473,8 @@ obj/Items/Magatama/Hifumi
 obj/Items/Magatama/Kamudo
 	name = "Kamudo"
 	desc = "A Magatama of the war god's fury. Those who endure its trial become instruments of destruction, wielding power that transcends mortal limits."
-	base_passives = list(   "UnarmedDamage" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05)
-	passive_scaling = list(  "CriticalChance" = 0.25,  "MeleeResist" = 0.04, "CriticalDamage" = 0.0045, "UnarmedDamage" = 0.09, "DoubleStrike" = 0.03)
+	base_passives = list(   "UnarmedDamage" = 1, "CriticalDamage" = 0.1)
+	passive_scaling = list(  "MeleeResist" = 0.04, "CriticalDamage" = 0.007, "UnarmedDamage" = 0.09, "DoubleStrike" = 0.03)
 	ascension_passives = list("2" = list("MeleeResist" = 1, "DoubleStrike" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Heat_Wave, /obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Focus)
 	ascension_skills = list("2" = list(/obj/Skills/Projectile/DemiFiend/Freikugel_Beam))
@@ -486,8 +486,8 @@ obj/Items/Magatama/Narukami
 	name = "Narukami"
 	desc = "A Magatama crackling with divine lightning. It carries the wrath of the thunder god, striking with the fury of the storm."
 	base_passives = list("Air Magic Mastery" = 0.15, "ShockResist" = 1, "Shocking" = 5)
-	passive_scaling = list("Air Magic Mastery" = 0.0085, "ShockResist" = 0.04, "Shocking" = 0.15, "DenkoSekka" = 0.05, "CriticalChance" = 0.25, "CriticalDamage" = 0.0045)
-	ascension_passives = list("2" = list("ThunderHerald" = 1, "DenkoSekka" = 1), "3" = list("CriticalChance" = 5, "CriticalDamage" = 0.05))
+	passive_scaling = list("Air Magic Mastery" = 0.0085, "ShockResist" = 0.04, "Shocking" = 0.15, "DenkoSekka" = 0.05, "CriticalDamage" = 0.007)
+	ascension_passives = list("2" = list("ThunderHerald" = 1, "DenkoSekka" = 1), "3" = list("CriticalDamage" = 0.1))
 	ascension_skills = list("2" = list(/obj/Skills/AutoHit/DemiFiend/Shock))
 	craft_cost = 5000
 
@@ -506,8 +506,8 @@ obj/Items/Magatama/Miasma
 	name = "Miasma"
 	desc = "A Magatama exhaled by a dying god of winter. Its frigid breath chokes the living and drinks the ice that flows from the wounds it opens."
 	base_passives = list("ChillResist" = 2, "Water Magic Mastery" = 0.2)
-	passive_scaling = list("ChillResist" = 0.03, "ChillAbsorb" = 0.075, "Water Magic Mastery" = 0.008, "Blubber" = 0.04, "FluidForm" = 0.03)
-	ascension_passives = list("4" = list("ChillAbsorb" = 1, "Blubber" = 1, "FluidForm" = 1))
+	passive_scaling = list("ChillResist" = 0.03, "ChillAbsorb" = 0.075, "Water Magic Mastery" = 0.008, "Blubber" = 0.04)
+	ascension_passives = list("4" = list("ChillAbsorb" = 1, "Blubber" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Glacial_Blast_Ice)
 	ascension_skills = list("4" = list(/obj/Skills/AutoHit/DemiFiend/Wild_Dance))
 	craft_cost = 15000
@@ -565,8 +565,7 @@ obj/Items/Magatama/Muspell
 	name = "Muspell"
 	desc = "A Magatama of the burning south. Its howl unmakes minds, sears tongues silent, and crushes the still-standing underfoot."
 	base_passives = list( "Confusing" = 5, "Harden" = 1, "BurnResist" = 1, "CrippleResist" = 1, "Disarm" = 1)
-	passive_scaling = list( "Confusing" = 0.25, "Harden" = 0.09, "BurnResist" = 0.04, "CrippleResist" = 0.04, "Disarm" = 0.02,  "DebuffResistance" = 0.03)
-	ascension_passives = list("4" = list( "DebuffResistance" = 1))
+	passive_scaling = list( "Confusing" = 0.25, "Harden" = 0.09, "BurnResist" = 0.04, "CrippleResist" = 0.04, "Disarm" = 0.02)
 	magatama_skills = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Tentarafoo)
 	ascension_skills = list("4" = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon), "5" = list(/obj/Skills/Projectile/DemiFiend/Xeros_Beat_Proj))
 	craft_cost = 15000
@@ -588,8 +587,8 @@ obj/Items/Magatama/Gehenna
 obj/Items/Magatama/Kamurogi
 	name = "Kamurogi"
 	desc = "A Magatama imbued with the primordial authority of the Heavenly Ancestors. Its bearer's wounds close on their own, their skin turns aside what would wound them, and every raised hand is met in kind."
-	base_passives = list("LifeGeneration" = 1, "CounterMaster" = 2, "Sword Mastery" = 1, "AttackSpeed" = 0.2, "LikeWater" = 1)
-	passive_scaling = list("LifeGeneration" = 0.04, "CounterMaster" = 0.1, "Sword Mastery" = 0.09, "AttackSpeed" = 0.008, "LikeWater" = 0.04, "HardStyle" = 0.04, "Fa Jin" = 0.03, "DoubleStrike" = 0.03, "TripleStrike" = 0.02)
+	base_passives = list("LifeGeneration" = 1, "CounterMaster" = 2, "Sword Mastery" = 1, "AttackSpeed" = 0.2)
+	passive_scaling = list("LifeGeneration" = 0.04, "CounterMaster" = 0.1, "Sword Mastery" = 0.09, "AttackSpeed" = 0.008, "HardStyle" = 0.04, "Fa Jin" = 0.03, "DoubleStrike" = 0.03, "TripleStrike" = 0.02)
 	ascension_passives = list("6" = list("HardStyle" = 1, "Fa Jin" = 1, "DoubleStrike" = 1, "TripleStrike" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Blight)
 	ascension_skills = list("6" = list(/obj/Skills/AutoHit/DemiFiend/Iron_Claw, /obj/Skills/AutoHit/DemiFiend/Oni_Kagura))
@@ -625,9 +624,8 @@ obj/Items/Magatama/Adama
 obj/Items/Magatama/Vimana
 	name = "Vimana"
 	desc = "A Magatama shaped like the sky-chariot of the gods. Its bearer rides the howling stratosphere, striking with the swiftness of divine flight."
-	base_passives = list("Tenacity" = 1, "BlockChance" = 10, "CriticalBlock" = 0.1, "Harden" = 1, "MeleeResist" = 1,  "AttackSpeed" = 0.1)
-	passive_scaling = list("Harden" = 0.09, "BlockChance" = 0.2, "CriticalBlock" = 0.0075, "Tenacity" = 0.075,  "MeleeResist" = 0.04,  "AttackSpeed" = 0.008, "Siphon" = 0.04)
-	ascension_passives = list("6" = list( "Siphon" = 1))
+	base_passives = list("Tenacity" = 1, "CriticalBlock" = 0.1, "Harden" = 1, "MeleeResist" = 1,  "AttackSpeed" = 0.1)
+	passive_scaling = list("Harden" = 0.09, "CriticalBlock" = 0.0075, "Tenacity" = 0.075,  "MeleeResist" = 0.04,  "AttackSpeed" = 0.008)
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Tempest)
 	ascension_skills = list("6" = list(/obj/Skills/Projectile/DemiFiend/Javelin_Rain_Proj, /obj/Skills/AutoHit/DemiFiend/Hades_Blast))
 	craft_cost = 30000
@@ -677,10 +675,22 @@ obj/Items/Magatama/Gaea
 obj/Items/Magatama/Kailash
 	name = "Kailash"
 	desc = "A Magatama that hums with the silence of the unreachable peak. Its bearer strikes with the weight of the underworld itself — a single blow capable of breaking armies."
-	base_passives = list("MeleeResist" = 1, "TechniqueMastery" = 1,  "Vortex" = 5, "Entropic" = 0.5)
-	passive_scaling = list("MeleeResist" = 0.04, "TechniqueMastery" = 0.09,  "Vortex" = 0.2, "Entropic" = 0.035, "PUSpike" = 0.5, "DeathField" = 0.09, "VoidField" = 0.09)
+	base_passives = list("MeleeResist" = 1, "TechniqueMastery" = 1,  "Entropic" = 0.5)
+	passive_scaling = list("MeleeResist" = 0.04, "TechniqueMastery" = 0.09,  "Entropic" = 0.035, "PUSpike" = 0.5, "DeathField" = 0.09, "VoidField" = 0.09)
 	ascension_passives = list("6" = list("SuperDash" = 1, "PUSpike" = 50, "DeathField" = 1, "VoidField" = 1))
 	magatama_skills = list(/obj/Skills/Projectile/DemiFiend/Freikugel_Beam)
 	ascension_skills = list()
 	craft_cost = 50000
 	craft_ascension = 5
+
+//demi-fiend magatama mastery gain
+/strikeHook/demiFiendMagatamaMastery
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if(FightingSeriously(attacker, defender) && attacker.isRace(/race/demi_fiend))
+			for(var/obj/Items/Magatama/M in attacker)
+				if(M.suffix == "*Equipped*" && M.mastery < 100)
+					M.gainMastery(val * 0.02)

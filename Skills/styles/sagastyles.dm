@@ -31,8 +31,7 @@
 	DamageMult = 3
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sharingan_Perception
 	adjust(mob/p)
-		passives = list("TechniqueMastery" = p.SagaLevel , "Godspeed" = round(p.SagaLevel/2,0.5), "ComboMaster" = 1, \
-			"FluidForm" = round(p.SagaLevel / 3, 1) )
+		passives = list("TechniqueMastery" = p.SagaLevel , "Godspeed" = round(p.SagaLevel/2,0.5), "ComboMaster" = 1)
 		DefMult = 1 + (0.05 * p.SagaLevel)
 		OffMult = 1 + (0.05 * p.SagaLevel)
 		SpdMult = 1 + (0.1 * p.SagaLevel)

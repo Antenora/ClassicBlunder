@@ -98,7 +98,7 @@
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sword_Flow
-    passives = list("ManaGeneration" = 5,  "Flow" = 1, "Instinct" = 1, "Warping" = 4)
+    passives = list("ManaGeneration" = 5,  "Warping" = 4)
     Warping=4
     TimerLimit=45
     ActiveMessage="is in the flow of battle!"
@@ -112,7 +112,7 @@
     Instinct=4
     DamageMult=2
     Rounds=4
-    StrOffense=1
+    StrScaling=1
     ActiveMessage="sends a barrage of swords at their enemy!"
     HitSparkIcon='Slash - Zan.dmi'
     HitSparkX=-16
@@ -120,5 +120,4 @@
     HitSparkSize=2
     HitSparkTurns=1
     HitSparkLife=10
-    IconTime=10
     Cooldown=4

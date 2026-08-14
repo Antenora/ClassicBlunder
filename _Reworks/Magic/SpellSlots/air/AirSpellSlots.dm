@@ -12,7 +12,7 @@
 		Paralyzing=3
 		Knockback=2
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -43,7 +43,7 @@
 		DamageMult=6
 		Paralyzing=4
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Instinct=1
 		Distance=12
 		ManaCost=5
@@ -76,12 +76,12 @@
 		ManaCost=8
 		ManaDrain=0.01
 		SpdMult=1.15
-		passives=list("FluidForm" = 2, "Flow" = 2, "Godspeed" = 2, "Skimming" = 1)
+		passives=list("Godspeed" = 2, "Skimming" = 1)
 		ActiveMessage="wraps themselves in a veil of wind!"
 		OffMessage="lets the wind dissipate..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("FluidForm" = 2, "Flow" = 2, "Godspeed" = 2, "Skimming" = 1)
+				passives=list("Godspeed" = 2, "Skimming" = 1)
 				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=30
 					SpdMult=1.25

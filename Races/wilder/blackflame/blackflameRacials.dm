@@ -11,9 +11,9 @@
         Slow = 0.1;
         TurfErupt = 1;
         
-        StrOffense = 0.5;
-        ForOffense = 0.5;
-        EndDefense = 0.75;
+        StrScaling = 0.5;
+        ForScaling = 0.5;
+        EndEffectiveness = 0.75;
         Scorching = 5;
         Toxic = 5;
         FrenzyDebuff = 5;
@@ -122,8 +122,8 @@
         DamageMult = 3 + (1.5 * asc)
         Cooldown = 60 - (5 * asc)
         Distance = 6 + (3 * asc)
-        ForOffense = 0.3 + (0.1 * asc)
-        StrOffense = 0.3 + (0.1 * asc)
+        ForScaling = 0.3 + (0.1 * asc)
+        StrScaling = 0.3 + (0.1 * asc)
     verb/Fire_Breath()
         set category="Skills"
         if(!Using) adjust(usr);
@@ -150,7 +150,7 @@
         DamageMult = 6 + (1.5 * asc)
         Cooldown = 60 - (5 * asc)
         Distance = 6 + (4 * asc)
-        StrOffense = 1 + (0.25 * asc)
+        StrScaling = 1 + (0.25 * asc)
         FrenzyDebuff = 40 + (10 * asc)
     verb/Frenzy_Breath()
         set category="Skills"

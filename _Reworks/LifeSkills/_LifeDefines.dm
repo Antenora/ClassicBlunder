@@ -129,13 +129,13 @@ var/list/LIFE_METAL_TRAITS = list(\
 	"bronze"     = list("wDmg" =  0.010, "wAcc" =  0.005, "wSpd" =  0.010, "aAbs" =  0.02, "aAcc" =  0.005, "aSpd" =  0.010, "dura" = 1.1, "adds" = list("Str" = 1.05, "End" = 1.05, "For" = 1.05, "Spd" = 1.05, "Off" = 1.05, "Def" = 1.05)),\
 	"iron"       = list("wDmg" =  0.020, "wAcc" =  0.000, "wSpd" = -0.020, "aAbs" =  0.05, "aAcc" =  0.000, "aSpd" = -0.020, "dura" = 1.3, "adds" = list("End" = 1.25, "Def" = 1.25, "Spd" = 0.85)),\
 	"steel"      = list("wDmg" =  0.025, "wAcc" =  0.005, "wSpd" =  0.000, "aAbs" =  0.06, "aAcc" =  0.005, "aSpd" =  0.000, "dura" = 1.5, "adds" = list("Str" = 1.15, "Def" = 1.15)),\
-	"cobalt"     = list("wDmg" =  0.035, "wAcc" = -0.015, "wSpd" =  0.010, "aAbs" =  0.03, "aAcc" = -0.010, "aSpd" =  0.020, "dura" = 1.2, "adds" = list("Str" = 1.3, "Off" = 1.3, "Def" = 0.8), "wpass" = list("CriticalChance" = 5, "CriticalDamage" = 0.05)),\
+	"cobalt"     = list("wDmg" =  0.035, "wAcc" = -0.015, "wSpd" =  0.010, "aAbs" =  0.03, "aAcc" = -0.010, "aSpd" =  0.020, "dura" = 1.2, "adds" = list("Str" = 1.3, "Off" = 1.3, "Def" = 0.8), "wpass" = list("CriticalDamage" = 0.05)),\
 	"silver"     = list("wDmg" = -0.015, "wAcc" =  0.030, "wSpd" =  0.015, "aAbs" = -0.03, "aAcc" =  0.020, "aSpd" =  0.015, "dura" = 1.0, "adds" = list("Spd" = 1.25, "Off" = 1.1, "Str" = 0.8), "apass" = list("EvilResist" = 2)),\
 	"gold"       = list("wDmg" = -0.020, "wAcc" =  0.010, "wSpd" = -0.010, "aAbs" = -0.04, "aAcc" =  0.010, "aSpd" = -0.010, "dura" = 0.5, "adds" = list("Str" = 0.7, "End" = 0.7, "For" = 0.7, "Spd" = 0.7, "Off" = 0.7, "Def" = 0.7)),\
 	"mythril"    = list("wDmg" = -0.005, "wAcc" =  0.015, "wSpd" =  0.045, "aAbs" = -0.01, "aAcc" =  0.015, "aSpd" =  0.040, "dura" = 1.2, "adds" = list("Spd" = 1.3, "Off" = 1.3, "End" = 0.9), "wpass" = list("ManaGeneration" = 2), "apass" = list("ManaGeneration" = 2)),\
 	"adamantite" = list("wDmg" =  0.030, "wAcc" = -0.005, "wSpd" = -0.030, "aAbs" =  0.09, "aAcc" = -0.015, "aSpd" = -0.030, "dura" = 2.0, "adds" = list("Def" = 1.35, "End" = 1.35, "Spd" = 0.75), "apass" = list("ShatterResist" = 5)),\
 	"starmetal"  = list("wDmg" =  0.050, "wAcc" =  0.010, "wSpd" = -0.010, "aAbs" =  0.07, "aAcc" =  0.010, "aSpd" =  0.000, "dura" = 1.4, "adds" = list("Str" = 1.35, "Off" = 1.35, "For" = 1.35, "Def" = 0.9), "wpass" = list("PureDamage" = 1)),\
-	"orichalcum" = list("wDmg" =  0.030, "wAcc" =  0.015, "wSpd" =  0.020, "aAbs" =  0.08, "aAcc" =  0.015, "aSpd" =  0.020, "dura" = 1.7, "adds" = list("Def" = 1.3, "End" = 1.3, "Spd" = 1.1, "Str" = 0.9), "apass" = list("BlockChance" = 10, "CriticalBlock" = 0.10)))
+	"orichalcum" = list("wDmg" =  0.030, "wAcc" =  0.015, "wSpd" =  0.020, "aAbs" =  0.08, "aAcc" =  0.015, "aSpd" =  0.020, "dura" = 1.7, "adds" = list("Def" = 1.3, "End" = 1.3, "Spd" = 1.1, "Str" = 0.9), "apass" = list("CriticalBlock" = 0.10)))
 
 // every gem gives AND takes. T4-5 give twice. magnitude = gem quality (1..5) on every listed stat.
 var/list/LIFE_GEM_EFFECT = list(\

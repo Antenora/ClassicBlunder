@@ -4,7 +4,7 @@ obj/Skills/AutoHit/Gaze_of_Despair
 	Gravity=5
 	DamageMult=7
 	DelayTime=5
-	StrOffense=1
+	StrScaling=1
 	Rounds = 5
 	ActiveMessage="gazes into the Infernal Eye. . . and reflects it's gaze back around them."
 	Area="Circle"

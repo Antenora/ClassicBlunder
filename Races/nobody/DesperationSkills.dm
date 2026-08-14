@@ -6,7 +6,7 @@ obj/Skills/AutoHit/Desperation
 		WindUp=1
 		WindupMessage="readies their Desperation Move...!"
 		DamageMult=15
-		StrOffense=1.5
+		StrScaling=1.5
 		ActiveMessage="slashes through their enemy in the blink of an eye, aiming to mortally wound them!"
 		Area="Target"
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
@@ -27,7 +27,7 @@ obj/Skills/AutoHit/Desperation
 			var/asc = usr.AscensionsAcquired
 			set category="Skills"
 			DamageMult=(15 * (1+asc))
-			StrOffense=(1.5 * (1+asc))
+			StrScaling=(1.5 * (1+asc))
 			Cooldown=300-(10*(asc))
 			usr.Activate(src)
 	Deathscythe
@@ -41,7 +41,7 @@ obj/Skills/AutoHit/Desperation
 		DamageMult=1
 		FixedDamage=6.5
 		NeedsHealth=20
-		StrOffense=1
+		StrScaling=1
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
 		BuffSelfDelay=30
 		Cooldown=300
@@ -109,7 +109,6 @@ obj/Skills/AutoHit/Desperation
 		BuffSelfDelay=40
 		NeedsSword=1
 		Stunner=1.5
-		ProjAuraOnCast='SweepingKick.dmi'
 		ProjAuraUnder=1
 		ProjAuraSize=1
 		ProjAuraX=-32

@@ -155,10 +155,6 @@
 			
 			"Inevitable"    =  N
 		)
-		if(!mastered)
-			passives["Flow"]      = -N
-			passives["Instinct"]  = -N
-			passives["FluidForm"] = -0.5 * N
 		if(N >= 3)
 			passives["GiantForm"]     = 1
 		if(N >= 4)
@@ -228,7 +224,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Makyo/Fall/Shedding_Leaves
 	EndMult=0.6
 	TimerLimit=60
-	passives= list("DebuffResistance"=1, "ManaGeneration"= 10, "EnergyGeneration" =10,"PureReduction"= -5)
+	passives= list("ManaGeneration"= 10, "EnergyGeneration" =10,"PureReduction"= -5)
 	verb/Shed_Leaves()
 		set category="Skills"
 		src.Trigger(usr)

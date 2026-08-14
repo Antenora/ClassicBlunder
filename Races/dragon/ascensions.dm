@@ -21,7 +21,7 @@ ascension
 						offense= 0.5
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 0.5
 						defense = 1
@@ -70,7 +70,7 @@ ascension
 						force = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 0.5
 						defense = 1.5
@@ -119,7 +119,7 @@ ascension
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 1.5
 						speed = 1
@@ -170,7 +170,7 @@ ascension
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1, "CalmAnger" = 1)
+						var/newpassives = list("SoftStyle" = 1, "CalmAnger" = 1)
 						passives+= newpassives
 						force = 2
 						defense = 2
@@ -220,7 +220,7 @@ ascension
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 1
 						defense = 3
@@ -270,7 +270,7 @@ ascension
 						offense = 2
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						speed = 1
 						force = 2

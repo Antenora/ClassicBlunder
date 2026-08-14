@@ -588,7 +588,7 @@ proc/
 				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1, "AttackSpeed" = 2+(Boost/2))
 				return KeybladePassives
 			if("Rainfell")
-				KeybladePassives=list("PULock" = 1, "CriticalChance" = 30+(Boost*5), "ThunderHerald" = 1, "CriticalDamage"= 0.15)
+				KeybladePassives=list("PULock" = 1, "ThunderHerald" = 1, "CriticalDamage"= 0.15)
 				return KeybladePassives
 			if("Oathkeeper")
 				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost)
@@ -628,7 +628,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "UnderDog" = 1+Boost, "Tenacity" = 3+Boost)
 				return KeybladePassives
 			if("Lost Memory")
-				KeybladePassives=list("PULock" = 1,  "Flow" = 3, "Instinct" = 3)
+				KeybladePassives=list("PULock" = 1)
 				return KeybladePassives
 			if("Ultima Weapon")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 10, "PureReduction" = 10, "GodKi" = 0.25)
@@ -641,7 +641,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5,  "HardStyle" = 1)
 				return KeybladePassives
 			if("One Winged Angel")
-				KeybladePassives=list("PULock" = 1, "CriticalChance" = 5+(Boost*2), "CriticalDamage"= 0.3+(Boost/10))
+				KeybladePassives=list("PULock" = 1, "CriticalDamage"= 0.3+(Boost/10))
 				return KeybladePassives
 			if("Moogle O Glory")
 				KeybladePassives=list("PULock" = 1, "Extend" = 1, "CashCow" = 2, "SoftStyle" = 1, "Blubber" = Boost/4)

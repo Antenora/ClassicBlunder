@@ -50,7 +50,7 @@
 			src.Trigger(usr)
 	Stormbringer
 		SignatureTechnique = 1
-		passives = list( "Familiar" = 1, "ThunderHerald" = 1, "CriticalChance" = 15, "CriticalDamage" = 0.1, \
+		passives = list( "Familiar" = 1, "ThunderHerald" = 1, "CriticalDamage" = 0.1, \
 						 "Godspeed" = 1, "WaveDancer" = 1)
 		StyleActive = "Storm"
 		StyleSpd = 1.15

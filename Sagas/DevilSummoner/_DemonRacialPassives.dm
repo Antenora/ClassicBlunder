@@ -19,8 +19,6 @@
 	demon_racial_passive_race = race
 
 	switch(race)
-		if("Avatar")
-			passive_handler.Increase("DebuffResistance", 1)
 		if("Avian")
 			SpdMultTotal *= 1.15
 		if("Beast")
@@ -47,9 +45,6 @@
 			passive_handler.Increase("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Increase("ManaCapMult", 0.25)
-		if("Ghost")
-			passive_handler.Increase("FluidForm", 1)
-			passive_handler.Increase("Flow", 3)
 		if("Hero")
 			StrMultTotal *= 1.08
 			EndMultTotal *= 1.08
@@ -92,8 +87,6 @@
 	demon_racial_passive_race = ""
 
 	switch(race)
-		if("Avatar")
-			passive_handler.Decrease("DebuffResistance", 1)
 		if("Avian")
 			SpdMultTotal /= 1.15
 		if("Beast")
@@ -119,9 +112,6 @@
 			passive_handler.Decrease("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Decrease("ManaCapMult", 0.25)
-		if("Ghost")
-			passive_handler.Decrease("FluidForm", 1)
-			passive_handler.Decrease("Flow", 3)
 		if("Hero")
 			StrMultTotal /= 1.08
 			EndMultTotal /= 1.08
@@ -242,3 +232,14 @@
 			M.OffMultTotal /= 0.9
 			M.DefMultTotal /= 0.9
 		demon_tyrant_debuffed.Cut()
+
+/strikeHook/demonRacialOnHit
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		// Devil Summoner racial on-hit passives
+		if(attacker.demon_racial_femme_active)
+			attacker.DemonFemmeCharmCheck(defender)
+		if(attacker.demon_racial_snake_active)
+			attacker.DemonSnakePoisonCheck(defender)

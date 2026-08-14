@@ -43,7 +43,6 @@
         HitMessage="unleashes their pent up legendary power."
     Heavenly_Dragons_Omniscient_Surge
         Warp = 10
-        Bolt = 1
         Shining = 1
         Explosive = 1
         Shocking = 4
@@ -62,7 +61,6 @@
 
 
     Behemoth_Typhoon
-        Steady = 4
         WeaponBreaker = 2
         Crushing = 20
         Finisher = 1

@@ -377,7 +377,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.ElementalDefense="Ultima"
 				passive_handler.Increase("InjuryImmune")
 				passive_handler.Increase("FatigueImmune")
-				passive_handler.Increase("Siphon")
 				src.Sheared=0
 				src.HealWounds(50)
 				src.HealHealth(50)
@@ -658,7 +657,6 @@ mob/proc/RevertWS()
 			src.ElementalDefense=null
 			passive_handler.Decrease("InjuryImmune")
 			passive_handler.Decrease("FatigueImmune")
-			passive_handler.Decrease("Siphon")
 		if("Kusanagi")
 			src.ElementalOffense=null
 			src.ElementalDefense=null

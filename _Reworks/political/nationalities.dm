@@ -5,49 +5,7 @@ characterInformation
     var/secondNationality = FALSE
     proc/setNationality(mob/p)
         nationality = input(p, "What nationality are you?") in glob.NATIONALITIES
-        if(glob.ALLOW_OTHER_NATIONALITIES)
-            if(nationality == "Other")
-                var/tempNationality = input(p, "What nationality?") as text
-                nationality = 0
-                while(nationality == 0)
-                    if(length(tempNationality) >= 20)
-                        p << " too long "
-                    else
-                        nationality = tempNationality
-                    if(lowertext(tempNationality) in FILTER_LIST)
-                        world<<"[p.ckey] has been booted for using a word found in <a href='https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en'>a bad words list</a>"
-                        del usr
-                    tempNationality = input(p, "What nationality?") as text
-
-                if(!(nationality in DEDICATED_NATIONALITIES))
-                    usr<<"Your nationality has been set to [nationality], however it is not in the dedicated list of nationalities and as such, the admins have been alerted."
-                    for(var/mob/admin in admins)
-                        admin<<"[p]([p.ckey]) has set their nationality to [nationality], please edit it if it is incorrect."
-        if(glob.ALLOW_SECOND_NATIONALITIES)
-            var/yesno = input(p, "Do you have a second nationality?") in list("Yes", "No")
-            if(yesno == "Yes")
-                secondNationality = input(p, "What is your second nationality?") in glob.NATIONALITIES - nationality
-                if(glob.ALLOW_OTHER_NATIONALITIES)
-                    if(secondNationality == "Other")
-                        var/tempsecondNationality = input(p, "What nationality?") as text
-                        secondNationality = 0
-                        while(secondNationality == 0 )
-                            if(lowertext(secondNationality) in FILTER_LIST)
-                                world<<"[p.ckey] has been booted for using a word found in <a href='https://github.com/LDNOOBW/List-of-Dirty-Naughty-Obscene-and-Otherwise-Bad-Words/blob/master/en'>a bad words list</a>"
-                                del usr
-                            if(secondNationality == nationality)
-                                secondNationality = 0
-                            if(length(tempsecondNationality) >= 20)
-                                p << " too long "
-                            else
-                                secondNationality = tempsecondNationality
-                            tempsecondNationality = input(p, "What nationality?") as text
-                        if(!(secondNationality in DEDICATED_NATIONALITIES))
-                            usr<<"Your nationality has been set to [nationality], however it is not in the dedicated list of nationalities and as such, the admins have been alerted."
-                            for(var/mob/admin in admins)
-                                admin<<"[usr]([usr.ckey]) has set their second nationality to [secondNationality], please edit it if it is incorrect."
-        else
-            secondNationality = FALSE
+        secondNationality = FALSE
 
 
 /mob/proc/getNationalityInformation()

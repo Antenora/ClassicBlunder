@@ -29,8 +29,6 @@ obj
 						DelayTime=2
 						src.Rounds=5
 						DamageMult=2
-						MaxCharges=3
-						Charges=3
 						ChargeRefresh=15
 				verb/Sonic_Blade()
 					set category="Skills"
@@ -315,7 +313,7 @@ obj
 					HitSparkSize=5
 					HitSparkCount=10
 					HitSparkDispersion=1
-					ForOffense=1
+					ForScaling=1
 					AdaptRate=1
 					SpecialAttack=1
 					WindupMessage="invokes: <font size=+1>ULTIMA!!!</font size>"

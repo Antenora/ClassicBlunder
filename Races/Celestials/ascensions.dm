@@ -59,7 +59,6 @@ ascension
 			postAscension(mob/owner)
 				..()
 				if(owner.CelestialAscension=="Angel")
-					owner.passive_handler.Increase("DebuffResistance", 1)
 					owner.passive_handler.Increase("LifeGeneration", 1)
 					owner.passive_handler.Increase("Anaerobic", 1)
 					spawn(5)

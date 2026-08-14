@@ -38,7 +38,7 @@
 	NeedsSword = 1
 	Area = "Target"
 	GuardBreak = 1
-	StrOffense = 1
+	StrScaling = 1
 	MortalBlow = 0.25
 	DamageMult = 10
 	Distance = 10

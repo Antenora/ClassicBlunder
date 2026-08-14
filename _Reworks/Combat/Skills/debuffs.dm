@@ -143,7 +143,7 @@
 	// -3 PureReduction, -3 PureDamage, -5 BuffMastery, all stats x0.9
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Cornered
-	passives = list("PureReduction" = 0.05, "Flow" = -0.1)
+	passives = list("PureReduction" = 0.05)
 	TimerLimit = 10
 	IconLock='Cornered.dmi'
 	do_effect(mob/defender, mob/attacker)
@@ -156,7 +156,7 @@
 			IconState = 2
 		else
 			IconState = "[total_stacks]"
-		passives = list("PureReduction" = -glob.OVERHWELMING_BASE_PR_NERF * total_stacks, "Flow" = -glob.OVERHWELMING_BASE_FLOW * total_stacks)
+		passives = list("PureReduction" = -glob.OVERHWELMING_BASE_PR_NERF * total_stacks)
 		endAdd = -glob.OVERHWELMING_BASE_END_NERF * total_stacks
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed

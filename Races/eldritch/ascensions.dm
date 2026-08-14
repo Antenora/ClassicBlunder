@@ -22,7 +22,7 @@ ascension
 			speed = 0.25;
 			anger = 0.2;
 			on_ascension_message = "Your dreams are twisted by chaos... but what do you dream of?"
-			passives = list("DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1, "BlockChance"=10, "CriticalChance"=10, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
+			passives = list("PureDamage"=1, "PureReduction"=1, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
@@ -43,7 +43,7 @@ ascension
 			offense = 0.25;
 			speed = 0.25;
 			anger = 0.2;
-			passives = list("Null"=1, "DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1, "BlockChance"=10, "CriticalChance"=10, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
+			passives = list("Null"=1, "PureDamage"=1, "PureReduction"=1, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
 			on_ascension_message = "You catch a distant glimpse of ᛉᛜꓦᚱᛢᛊᚳᚪ ᛫᛫᛫"
 			onAscension(mob/owner)
 				switch(owner.Secret)
@@ -68,7 +68,7 @@ ascension
 			defense = 0.25;
 			speed = 0.25;
 			anger = 0.2;
-			passives = list("DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1, "BlockChance"=10, "CriticalChance"=10, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
+			passives = list("PureDamage"=1, "PureReduction"=1, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
 			on_ascension_message = "Your fantasies are bleeding entropy... But what fantasy do you chase?"
 			onAscension(mob/owner)
 				switch(owner.Secret)
@@ -92,7 +92,7 @@ ascension
 			defense = 0.5
 			speed = 0.5
 			anger = 0.2;
-			passives = list("DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1, "BlockChance"=10, "CriticalChance"=10, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
+			passives = list("PureDamage"=1, "PureReduction"=1, "CriticalBlock"=0.05, "CriticalDamage"=0.05);
 			on_ascension_message = "Your illusory ᛢᛊᚳᚪ is beginning to ᚪᚱᚣᛉ at the ᛊᚧᛩᛊᛢ.\nYou can't keep manifesting like this ᚪᛜᚱᛊꓦᛊᚱ...Can ᛉᛜꓦ?"
 			onAscension(mob/owner)
 				switch(owner.Secret)
@@ -114,7 +114,7 @@ ascension
 			speed = 0.5
 			anger = 0.2;
 			choices = list("Endless Prey" = /ascension/sub_ascension/eldritch/advancedHunter, "Cyclical Permutation" = /ascension/sub_ascension/eldritch/advancedEternal, "Fangs That Reach Forever" = /ascension/sub_ascension/eldritch/advancedWrithing)
-			passives = list("DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=6);
+			passives = list("PureDamage"=1, "PureReduction"=6);
 			on_ascension_message = "ꐞꉻ꒦ ꋬꋪꏂ."
 			onAscension(mob/owner)
 				switch(owner.Secret)

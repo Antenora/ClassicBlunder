@@ -26,7 +26,6 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"CriticalChance" = 5 * SL,
 			"CriticalDamage" = 0.05 * SL,
 			"Shirayuki"      = 1 //This currently does nothing but it's meant to give you Chill Stacks when you power up, and Bonuses based on chill-stacks.
 		)
@@ -85,7 +84,6 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"CriticalChance" = 10 * SL,
 			"CriticalDamage" = 0.1 * SL,
 			"AbsoluteZero"   = 1, // This gives other debuffs scaling off Chill stacks.
 			"IceAge"         = 10 + (10 * SL), // This is Combustion but for Chill. Seems pretty thematic.
@@ -229,8 +227,8 @@ obj/Skills/AutoHit
 	Tsukishiro
 		SignatureTechnique=3
 		SagaSignature=1
-		StrOffense=0
-		ForOffense=1
+		StrScaling=0
+		ForScaling=1
 		Rounds=10
 		DamageMult=0.5
 		Area="Around Target"
@@ -264,8 +262,8 @@ obj/Skills/AutoHit
 	Hakuren
 		SignatureTechnique=3
 		SagaSignature=1
-		StrOffense=0
-		ForOffense=1
+		StrScaling=0
+		ForScaling=1
 		DamageMult=10
 		Area="Wave"
 		ElementalClass="Water"
@@ -299,8 +297,8 @@ obj/Skills/AutoHit
 				usr.Activate(src)
 	Hakusen // Given at T4, Bankai Exclusive
 		name="Hakusen"
-		ForOffense=1
-		StrOffense=0
+		ForScaling=1
+		StrScaling=0
 		Area="Circle"
 		ElementalClass="Water"
 		TurfShift='SnowFloor.dmi'
@@ -392,8 +390,8 @@ obj/Skills/Buffs/SlotlessBuffs
 	name = "True Getsuga Tenshou"
 	Cooldown = 180
 	NeedsSword = 1
-	StrRate = 1
-	ForRate = 1
+	StrScaling = 1
+	ForScaling = 1
 	DamageMult = 35
 	AccMult = 1.3
 	Distance = 20
@@ -401,7 +399,6 @@ obj/Skills/Buffs/SlotlessBuffs
 	Instinct = 2
 	Explode = 1
 	BypassTempHP = 1
-	SkillDeicide = 20
 
 	IconLock = 'Big Getsuga Shikai.dmi'
 	LockX = -65

@@ -10,7 +10,6 @@
 			if("Dragon")
 				ManaGain = 5 + (p.AscensionsAcquired * 3)
 				Paralyzing = 10 * p.AscensionsAcquired
-				SpiritHand = 1 * p.AscensionsAcquired
 			if("Warrior")
 				Crippling = 2.5 * p.AscensionsAcquired
 				Toxic = 5 * p.AscensionsAcquired
@@ -18,7 +17,6 @@
 				DamageMult = (1.5 + (p.AscensionsAcquired)) / Combo
 
 			if("Demon")
-				PridefulRage = 1
 				Burning = 5 * p.AscensionsAcquired
 				Toxic = 5 * p.AscensionsAcquired
 

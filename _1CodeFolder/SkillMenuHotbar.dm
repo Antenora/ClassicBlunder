@@ -426,7 +426,9 @@ document.onkeydown=function(e){
 </script>
 </body></html>"}
 
-// generic for now
+#define SKILL_ICON_FILE 'HUD/SkillIcons.dmi'
+
+// per-type fallback for skills with no MenuIcon
 /proc/SKILL_TYPE_ICON(obj/Skills/S)
 	if(istype(S, /obj/Skills/Projectile)) return 'HUD/skill_projectile.png'
 	if(istype(S, /obj/Skills/Queue))      return 'HUD/skill_queue.png'
@@ -437,7 +439,12 @@ document.onkeydown=function(e){
 
 /proc/SkillMenuIcon(obj/Skills/S)
 	if(!S) return null
+	if(S.MenuIcon) return SKILL_ICON_FILE
 	return SKILL_TYPE_ICON(S)
+
+/proc/SkillMenuIconState(obj/Skills/S)
+	if(!S) return null
+	return S.MenuIcon
 
 /proc/SkillHasSkillVerb(obj/Skills/S)
 	if(!S) return 0
@@ -940,6 +947,7 @@ client/proc/BuildSkillMenuGrid(fade = FALSE)
 		var/atom/movable/shud/skmenu_icon/E = new
 		E.skill = S
 		E.icon = SkillMenuIcon(S)
+		E.icon_state = SkillMenuIconState(S)
 		var/col = (k - 1) % SKMENU_COLS
 		var/row = round((k - 1) / SKMENU_COLS)
 		E.screen_loc = "CENTER:[SKMENU_GRID_X0 + col * SKMENU_GRID_PITCH],CENTER:[SKMENU_GRID_Y0 - row * SKMENU_GRID_PITCH]"
@@ -976,7 +984,8 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 	skinfo_objs += P
 
 	var/atom/movable/shud/orbpart/ic = new      // mouse-transparent so the panel keeps the clicks
-	ic.icon = SkillMenuIcon(S)                   
+	ic.icon = SkillMenuIcon(S)
+	ic.icon_state = SkillMenuIconState(S)
 	ic.layer = MHUD_LAYER + 2.1
 	ic.screen_loc = SILoc((SKINFO_W - 32) / 2, 56)
 	skinfo_objs += ic
@@ -1062,6 +1071,7 @@ client/proc/ShowBuffInfo(obj/Skills/Buffs/b)
 
 	var/atom/movable/shud/orbpart/ic = new
 	ic.icon = SkillMenuIcon(b)
+	ic.icon_state = SkillMenuIconState(b)
 	ic.layer = MHUD_LAYER + 2.1
 	ic.screen_loc = SILoc((SKINFO_W - 32) / 2, 56)
 	skinfo_objs += ic

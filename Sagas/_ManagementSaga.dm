@@ -217,15 +217,7 @@ mob/Admin3/verb
 					P.passive_handler.Increase("KiControlMastery")
 					P.KiControlMastery+=1
 					if(!P.ClothBronze)
-						if(!glob.infConstellations)
-							var/list/openConstellations = glob.getOpen("BronzeConstellation")
-							if(length(openConstellations) < 1)
-								src<< "There are no more constellations available."
-								return
-							P.ClothBronze=input(P, "What cloth are you going!?") in openConstellations
-							glob.takeLimited("BronzeConstellation", P.ClothBronze)
-						else
-							P.ClothBronze=input(P, "What cloth are you going!?") in glob.BronzeConstellationNames
+						P.ClothBronze=input(P, "What cloth are you going!?") in glob.BronzeConstellationNames
 					var/path = "/obj/Skills/Buffs/SpecialBuffs/Saint_Cloth/Bronze_Cloth/[P.ClothBronze]_Cloth"
 					P.AddSkill(new path)
 					P<<"Your destiny is defined by the stars of [P.ClothBronze]; you have become a champion of Gods: <b>Saint</b>!"
@@ -390,10 +382,7 @@ mob/Admin3/verb
 					else if(P.KamuiType=="Junketsu")
 						P.contents += new/obj/Items/Sword/Heavy/Secret_Sword_Bakuzan
 						P.passive_handler.Increase("CriticalDamage", 0.1)
-						P.passive_handler.Increase("CriticalChance", 10)
 						P.passive_handler.Increase("CriticalBlock", 0.1)
-						P.passive_handler.Increase("BlockChance", 10)
-						P.passive_handler.Increase("LikeWater", 2)
 						P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Resolve)
 						P<<"With each movement forward towards the realization of your ideals, your resolve strengthens..."
 
@@ -1192,7 +1181,6 @@ mob
 									// passive_handler.Increase("Desperation")
 									passive_handler.Increase("WeaponBreaker")
 								if("Firm")
-									passive_handler.Increase("DebuffResistance",0.5)
 									passive_handler.Increase("PureReduction",2)
 						if(5)
 							Adaptation += 0.5

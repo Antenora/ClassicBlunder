@@ -118,7 +118,7 @@ obj/Skills/Utility/Recall_Armaments
 	icon = 'shoes_mono.dmi'
 //ascension 3
 /obj/Items/Wearables/Guardian/Helmet_of_Salvation
-	passives = list("DebuffResistance" = 3,  "LifeGeneration" = 2, "Anaerobic" = 2)
+	passives = list("LifeGeneration" = 2, "Anaerobic" = 2)
 	Augmented = 1
 	Stealable = 0
 	Destructable = 0
@@ -126,7 +126,7 @@ obj/Skills/Utility/Recall_Armaments
 	desc = "A helm of light that guards the mind with divine insight."
 	icon = 'goldsaintlibra_helmet.dmi'
 /obj/Items/Wearables/Guardian/Shield_of_Faith
-	passives = list("BlockChance" = 25, "CriticalBlock" = 0.2)
+	passives = list("CriticalBlock" = 0.2)
 	Techniques = list(new/obj/Skills/Buffs/SpecialBuffs/Aphotic_Shield)
 	Augmented = 1
 	Stealable = 0
@@ -159,7 +159,7 @@ obj/Skills/Utility/Recall_Armaments
 /obj/Skills/Buffs/NuStyle/UnarmedStyle/AngelStyles
 	Selfless_State //placeholder because I might implement the Demon Slayer thing. basically baby UI
 		Copyable=0
-		passives = list("Flow" = 2, "Deflection" = 1, "SoftStyle" = 1)
+		passives = list("Deflection" = 1, "SoftStyle" = 1)
 		NeedsSword=0
 		NeedsStaff=0
 		NoSword=0
@@ -180,7 +180,7 @@ obj/Skills/Utility/Recall_Armaments
 			src.Trigger(usr)
 	Incomplete_Ultra_Instinct
 		Copyable=0
-		passives = list("Deflection" = 1, "SoftStyle" = 1, "Flow" = 3, "Instinct" = 1, "CounterMaster" = 1)
+		passives = list("Deflection" = 1, "SoftStyle" = 1, "CounterMaster" = 1)
 		NeedsSword=0
 		NeedsStaff=0
 		NoSword=0
@@ -204,7 +204,7 @@ obj/Skills/Utility/Recall_Armaments
 			src.Trigger(usr)
 	Ultra_Instinct
 		Copyable=0
-		passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1, "UnarmedDamage"=4)
+		passives = list("Deflection" = 1, "SoftStyle" = 1, "CounterMaster" = 3, "Godspeed" = 1, "UnarmedDamage"=4)
 		NeedsSword=0
 		NeedsStaff=0
 		NoSword=0
@@ -224,7 +224,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Ultra Instinct (Complete)"
 		adjust(mob/p)
-			passives = list("Flow" = 3, "Deflection" = 1, "SoftStyle" = 1, "Instinct" = 3, "CounterMaster" = 3, "Godspeed" = 1,  "UnarmedDamage"=4)
+			passives = list("Deflection" = 1, "SoftStyle" = 1, "CounterMaster" = 3, "Godspeed" = 1, "UnarmedDamage"=4)
 			StyleStr=1.35
 			StyleFor=1.35
 			StyleSpd=1.75
@@ -236,7 +236,7 @@ obj/Skills/Utility/Recall_Armaments
 			src.Trigger(usr)
 	Perfected_Ultra_Instinct //I hope this is as gorked as I intend it on being.
 		Copyable=0
-		passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1)
+		passives = list("Deflection" = 1, "SoftStyle" = 1, "CounterMaster" = 5, "Godspeed" = 1)
 		NeedsSword=0
 		NeedsStaff=0
 		NoSword=0
@@ -256,7 +256,7 @@ obj/Skills/Utility/Recall_Armaments
 		NoSword=1
 		StyleActive="Perfected Ultra Instinct"
 		adjust(mob/p)
-			passives = list("Deflection" = 1, "SoftStyle" = 1, "LikeWater" = 4, "Flow" = 4, "Instinct" = 4, "CounterMaster" = 5, "Godspeed" = 1)
+			passives = list("Deflection" = 1, "SoftStyle" = 1, "CounterMaster" = 5, "Godspeed" = 1)
 			StyleStr=1.45
 			StyleFor=1.45
 			StyleSpd=2

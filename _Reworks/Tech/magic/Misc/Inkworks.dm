@@ -13,7 +13,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
         IceQueen = 0 // Freezing + IceHerald/IceAge
         Erlking = 0 // Shattering + EarthHerald
         // Tales of The Spirit - Adjust your moves
-        Fox = 0 //SpiritFlow and Spiritsword scale better
+        Fox = 0 //TODO: redesign — referenced passive was purged
         Bear = 0 //HotHundred / SajireRush effect
         Wolf = 0 // + Dash Range for dash skills 
         Dragon = 0 // Buff beams somehow?

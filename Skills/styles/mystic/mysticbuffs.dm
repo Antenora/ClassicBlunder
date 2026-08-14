@@ -6,11 +6,6 @@
     var/TossSkill = 1
     GainLoop(mob/source)
         ..()
-        if(!glob.AURASPELLONATTACK)
-            if(!source.AttackQueue&&TossSkill)
-                if((source.last_aura_toss - ((source.passive_handler["Familiar"]-1) * glob.FAMILIAR_CD_REDUCTION)) + glob.FAMILIAR_SKILL_CD < world.time && (source.Target && source.Target != source))
-                    source.last_aura_toss = world.time
-                    source.throwFollowUp(skillToToss)
 
     Water
         skillToToss = "/obj/Skills/Projectile/Bubblebeam"

@@ -45,7 +45,7 @@ race
 				user.NobodyOrigin()
 				passives = list("ImbuedSoul" = 1, , "EnergyGeneration" = 2, "ManaGeneration" = 2, "DrainlessPUSpike" = 1)
 			if(user.Class=="Reaper")
-				passives = list( "SlayerMod" = 1, "FavoredPrey" = "Mortal", "Extend" = 1, "Gum Gum" = 1, "CriticalChance" = 15, "CriticalDamage" = 0.25, "Instinct" = 1 )
+				passives = list( "SlayerMod" = 1, "FavoredPrey" = "Mortal", "Extend" = 1, "Gum Gum" = 1, "CriticalDamage" = 0.25 )
 				user.AddSkill(new /obj/Skills/AutoHit/Desperation/Deathscythe)
 				user.NobodyOrigin()
 			passives += list("Emptiness" = 1, "Longing" = 1)

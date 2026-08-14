@@ -20,8 +20,8 @@
 	Cooldown = 180
 	ManaCost=25
 	NeedsSword = 1
-	StrRate = 1
-	ForRate = 1
+	StrScaling = 1
+	ForScaling = 1
 	DamageMult = 35
 	AccMult = 1.3
 	Distance = 20
@@ -29,7 +29,6 @@
 	Instinct = 2
 	Explode = 1
 	BypassTempHP = 1
-	SkillDeicide = 20
 
 	IconLock = 'Big Getsuga Shikai.dmi'
 	LockX = -65
@@ -70,7 +69,6 @@
 			
 			
 			"Half-Sword"     = 1 + SL,
-			"Instinct"       = 1 + SL,
 			"HeavyHitter" 	 = 1 + (0.25 * SL),
 			"PureDamage"     = 1 + SL
 		)
@@ -143,9 +141,6 @@
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
-		if(SL >= 7)
-			passives["Deicide"]  = 15
-			passives["EndlessNine"]  = 0.5
 		if(SL >= 7)
 			StrMult = 1.4 + (0.15 * SL)
 			ForMult = 1.4 + (0.15 * SL)

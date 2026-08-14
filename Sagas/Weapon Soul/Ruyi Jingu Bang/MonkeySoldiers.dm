@@ -78,7 +78,7 @@ SoldierTracker// i don't think this object is even necessary. it can literally b
         ForMult = 3
         SpdMult = 3
         OffMult = 3
-        passives = list("BackTrack" = 1, "Flow" = 1, "Instinct" = 1, "GodKi" = 1, "NoWhiff" = 1, "MonkeyKing" = 4)
+        passives = list("GodKi" = 1, "NoWhiff" = 1, "MonkeyKing" = 4)
         FlashChange=1
         HairLock=1
         AuraLock='BLANK.dmi'
@@ -89,7 +89,7 @@ SoldierTracker// i don't think this object is even necessary. it can literally b
         TopOverlayLock='UltraInstinctSpark.dmi'
         IconTint=list(1,0.15,0.15, 0.15,1,0.15, 0,0,1, 0,0,0)
         adjust(mob/p)
-            passives = list("BackTrack" = clamp(round(p.Potential/10), 1,10), "Flow" = clamp(round(p.Potential/10), 1,10), "Instinct" = clamp(round(p.Potential/10), 1,10), "GodKi" = 1, "NoWhiff" = 1)
+            passives = list("GodKi" = 1, "NoWhiff" = 1)
         verb/Anti_Job()
             set category = "Skills"
             set name = "Anti Job Mode"

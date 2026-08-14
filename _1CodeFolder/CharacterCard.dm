@@ -290,7 +290,7 @@ client/proc/PlaceTargetBars()
 client/proc/SetTargetCardAlpha(a)
 	for(var/atom/movable/o in list(tcard, tcardtext, tcardstatus, tbar_hp_track, tbar_hp_fill, tbar_hp_text, tbar_en_track, tbar_en_fill, tbar_en_text, tdebuff_icon, tdebuff_num))
 		if(o) o.alpha = a
-	if(!a || !glob.GUARD_SYSTEM)	//guard bar only shows when the system is live
+	if(!a)
 		if(tbar_gd_track) tbar_gd_track.alpha = 0
 		if(tbar_gd_fill) tbar_gd_fill.alpha = 0
 
@@ -363,11 +363,10 @@ client/proc/UpdateTargetCard()
 	var/hp = min(max(round(T.Health, 0.01), 0), 100)
 	var/en = T.EnergyMax ? min(max(round((T.Energy / T.EnergyMax) * 100, 0.01), 0), 100) : 0
 	var/gd = 0
-	if(glob.GUARD_SYSTEM)
-		gd = min(max(round((T.GuardMeter / max(glob.GUARD_METER_MAX, 1)) * 100, 0.01), 0), 100)
-		var/showgd = (T.Guarding || T.GuardMeter > 0)
-		if(tbar_gd_track) tbar_gd_track.alpha = showgd ? 255 : 0
-		if(tbar_gd_fill) tbar_gd_fill.alpha = showgd ? 255 : 0
+	gd = min(max(round((T.GuardMeter / max(glob.GUARD_METER_MAX, 1)) * 100, 0.01), 0), 100)
+	var/showgd = (T.Guarding || T.GuardMeter > 0)
+	if(tbar_gd_track) tbar_gd_track.alpha = showgd ? 255 : 0
+	if(tbar_gd_fill) tbar_gd_fill.alpha = showgd ? 255 : 0
 	UpdateTargetBars(hp, en, newtarget, gd)
 	UpdateTargetDebuff(T)
 
@@ -642,7 +641,7 @@ client/proc/UpdateTimedBuffs()
 			tbuff_icons += di
 			screen += di
 		if(di.buff != b)                                     // only rebuild the scaled icon when the slot changes
-			var/icon/I = icon(SkillMenuIcon(b))
+			var/icon/I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
 			I.Scale(TBUFF_ICON, TBUFF_ICON)
 			di.icon = I
 			di.buff = b
@@ -1074,7 +1073,7 @@ client/proc/PositionGuardBar()
 
 client/proc/UpdateGuardBar()
 	if(!mob || !gd_track) return
-	if(!glob.GUARD_SYSTEM || (!mob.Guarding && mob.GuardMeter <= 0 && !mob.IsGuardBroken()))
+	if(!mob.Guarding && mob.GuardMeter <= 0 && !mob.IsGuardBroken())
 		if(gd_shown) HideGuardBar()
 		return
 	if(!gd_shown)

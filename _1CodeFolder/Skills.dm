@@ -19,6 +19,16 @@ obj/Skills
 	var/altered = FALSE
 	var/description
 	var/AdaptRate
+	var/StrScaling=0 //attacker stats feeding atk
+	var/ForScaling=0
+	var/EndScaling=0
+	var/SpdScaling=0
+	var/OffScaling=0
+	var/DefScaling=0
+	var/EndEffectiveness=1 //DEFENDER'S End vs this skill. 1 = normal mitigation, 0 = pierces End entirely
+	var/CritEffectiveness=1 //multiplies crit chance vs this skill's hits. 0 = can't crit
+	var/BlockEffectiveness=1 //multiplies the defender's block chance. 0 = unblockable
+	var/CritChanceBonus=0 //flat crit-chance points on top of the Off curve
 	var/MultiTrail = 0
 	var/SignatureTechnique
 	var/SignatureName //lets you label things by a string other than the object name e.g. "Advanced White Magic"
@@ -34,16 +44,13 @@ obj/Skills
 	var/Charges=0
 	var/ChargeRefresh=30
 	var/Mastery=1
-	var/BeamUsing
 	var/BuffUsing
 	var/SkillCost=1
-	var/RevNum = 0
 
 	var/sicon
 	var/sicon_state
+	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
 	var/list/Learn=new
-
-	var/ZanzoAmount=0
 
 	var/PureDamage=0
 	var/PureReduction=0
@@ -63,33 +70,20 @@ obj/Skills
 
 	var/NoStaff
 	var/NeedsStaff
-	var/StaffClassNeeded //just in case
 
 	var/Instinct  //Penetrate AIS and WS
 	var/NoForcedWhiff  //Super anti whiff
 	var/MaimStrike  //if it does 25+ damage, maim.
 
-	var/DeathField  //get this NONstatic amount of wounds just for slapping someone.
-	var/VoidField  //get this NONstatic amount of fatigue just for slapping someone.
 	var/SoftStyle
 	var/HardStyle
-	var/CyberStigma //Like Soft/HardStyles, but for cybernetics
 
-	var/LifeStealTrue //Applies health cuts and heals your health cuts
-	var/SoulSteal //Adds stolen health to vaizard health.
 	var/LifeSteal
 	var/LifeGeneration
 	var/EnergySteal
-	var/EnergyGeneration
-	var/ManaSteal
-	var/ManaGeneration
-
-	var/NoDodge //can always touch this
-	var/NoMiss //cant stop touching that
 
 	var/HealthCost=0 //Cost of health; pretty much just used for kikohohohoho.
 	var/WoundCost=0 //ya...
-	var/HeavyStrain=0 //as above, though it may include some other finishers
 	var/EnergyCost=0 //Cost of energy.
 	var/FatigueCost=0 //Cost of fatigue.  Additional to energy.
 	var/ManaCost=0
@@ -116,10 +110,7 @@ obj/Skills
 	var/SlayerMod //mortal dmg
 	var/ShonenPower  // become MC
 	var/SpiritPower //become medium
-	var/Mythical //become giant
 	var/HellPower //become satan
-	var/Disorienting  //rolls for confuse
-	var/Confusing  //adds confuse
 	var/Stunner=0 //Stuns for this amount of time
 	var/Shearing //Debuffs regen
 	var/Crippling //Cripples movement
@@ -140,21 +131,15 @@ obj/Skills
 	var/TurfBurn=0 //Fire Ashfield: adds Burn per hit
 	var/Excruciating //fucks up senses
 	var/Attracting //Makes you follow someone, probably.
-	var/Terrifying //Makes them chicken out instead!
-	var/Pacifying  //Divides power by AngerMax for this length of time
 	var/Silencing=0 //Applies Silenced passive for this many seconds on hit
-	var/Enraging  //Triggers anger for this amount of time
 	var/CursedWounds
 	var/SoulFire
 	var/DarknessFlame  //It does darkness flame things!
-	var/AbsoluteZero  //It does absolute zero things!
 	var/CosmoPowered
 	var/GodPowered  //this makes the technique add Transcendant buff and use GodPowered as god ki.
 	var/Destructive
-	var/DashMaster  //spam ddash. should be limited.
 
 	var/DoubleStrike
-	var/TripleStrike
 
 	var/MasteryCheck=0
 	 //only projectiles have this function rn
@@ -162,7 +147,6 @@ obj/Skills
 	var/FollowUpDelay = 0  //after waiting this amt of time
 	var/OnMobHit = null
 	var/ThrowOnCounter
-	var/Controlling //Love potion effects TODO: Remove/discontinue for...
 	var/BuffSelf
 	var/BuffSelfDelay = 0
 	var/BuffAffected
@@ -254,34 +238,33 @@ obj/Skills
 				description = replacetext(description, ", ", -1, -3)
 				description += "\n"
 
-				if(NeedsSword)
-					description += "Requires Sword.\n"
-				if(HeavyOnly)
-					description += "Heavy Sword Only.\n"
-				if(NoSword)
-					description += "Unarmed Only.\n"
-				if(BuffSelf)
-					description += "Applies a buff to self: [BuffSelf]\n"
-				if(BuffAffected)
-					description += "Applies a buff to effected: [BuffAffected]\n"
+			if(NeedsSword)
+				description += "Requires Sword.\n"
+			if(HeavyOnly)
+				description += "Heavy Sword Only.\n"
+			if(NoSword)
+				description += "Unarmed Only.\n"
+			if(BuffSelf)
+				description += "Applies a buff to self: [BuffSelf]\n"
+			if(BuffAffected)
+				description += "Applies a buff to effected: [BuffAffected]\n"
 
-				if(HealthCost)
-					description += "Health Cost: [HealthCost]\n"
-				if(WoundCost)
-					description += "Wound Cost: [WoundCost]\n"
-				if(EnergyCost)
-					description += "Energy Cost: [EnergyCost]\n"
-				if(FatigueCost)
-					description += "Fatigue Cost: [FatigueCost]\n"
-				if(ManaCost)
-					description += "Mana Cost: [ManaCost]\n"
-				if(CapacityCost)
-					description += "Capacity Cost: [CapacityCost]\n"
-				if(Instinct)
-					description += "Instinct: [Instinct]\n"
+			if(HealthCost)
+				description += "Health Cost: [HealthCost]\n"
+			if(WoundCost)
+				description += "Wound Cost: [WoundCost]\n"
+			if(EnergyCost)
+				description += "Energy Cost: [EnergyCost]\n"
+			if(FatigueCost)
+				description += "Fatigue Cost: [FatigueCost]\n"
+			if(ManaCost)
+				description += "Mana Cost: [ManaCost]\n"
+			if(CapacityCost)
+				description += "Capacity Cost: [CapacityCost]\n"
+			if(Instinct)
+				description += "Instinct: [Instinct]\n"
 
 	icon='Skillz.dmi'
-	var/Teachable
 
 	var/delay = 0
 	verb/Set_Cooldown_Note()
@@ -666,7 +649,6 @@ obj/Skills
 					src:Choosing=0
 
 	Absorb
-		Teachable=0
 		Cooldown=30
 		icon_state=""
 		desc="Allows you to absorb people for their power."
@@ -676,7 +658,6 @@ obj/Skills
 			usr.SkillX("Absorb",src)
 
 	Release_Absorb
-		Teachable=0
 		Cooldown=5
 		icon_state=""
 		name="Release Absorb"
@@ -688,7 +669,6 @@ obj/Skills
 			usr.SkillX("Release Absorb",src)
 
 	Clairvoyance
-		Teachable=0
 		Level=0
 		desc="Enhances senses greatly."
 		verb/Clairvoyance()
@@ -744,10 +724,6 @@ obj/Skills
 							sleep(30)
 							OMsg(usr, "...but there is no existence for [usr] to destroy.", "[usr] FAILED TO DESTROY [Target].")
 							return
-						if(Target.passive_handler.Get("EndlessNine"))
-							sleep(30)
-							OMsg(usr, "...but [Target] rejects the legitimacy of the divine, rendering [usr]'s attempts fruitless.", "[usr] FAILED TO DESTROY [Target].")
-							return
 						Target.Savable=0
 						if(istype(Target, /mob/Players))
 							fdel("Saves/Players/[Target.ckey]")
@@ -769,7 +745,6 @@ obj/Skills
 			Teleported=0
 			Summoned=0
 			Powerz
-		Teachable=0
 		Level=100
 		icon_state="Majin"
 		desc="You've been contracted by a powerful entity.."
@@ -793,8 +768,6 @@ obj/Skills
 			set hidden = 1
 			if(usr.ActiveZanzo)
 				usr.ActiveZanzo=0
-			for(var/obj/Skills/Zanzoken/z in usr)
-				z.ZanzoAmount=0
 			usr.SkillX("Meditate",src)
 			sleep(10)
 
@@ -939,14 +912,8 @@ obj/Skills
 				var/obj/Skills/weapon
 				weapon = text2path(pick(arsenal))
 				weapon = new weapon
-				if(istype(weapon, /obj/Skills/Queue))
-					usr.SetQueue(weapon)
-					src.Cooldown(1/12)
-				else if(istype(weapon, /obj/Skills/AutoHit))
-					usr.Activate(weapon)
-					src.Cooldown(1/12)
-				else if(istype(weapon, /obj/Skills/Projectile))
-					usr.UseProjectile(weapon)
+				if(istype(weapon, /obj/Skills/Queue) || istype(weapon, /obj/Skills/AutoHit) || istype(weapon, /obj/Skills/Projectile))
+					weapon.Use(usr)
 					src.Cooldown(1/12)
 		verb/Human_Path()
 			set hidden=1
@@ -1094,11 +1061,8 @@ turf/Click(turf/T)
 						if(usr.Energy < 1)
 							usr.Energy = 1
 						usr.LoseMana(mana_cost)
-						var/recharge_ticks = max(20, (10 - 2*upgrades) * 10)
-						s.Charges--
-						if(s.Charges <= 0)
-							s.Using = 1
-						s.Recharge(recharge_ticks, usr)
+						s.ChargeRefresh = max(2, 10 - 2*upgrades)
+						s.Cooldown(1, null, usr)
 
 		else if(locate(/obj/Skills/Blink,usr.contents))
 			for(var/obj/Skills/Blink/W in usr.contents)

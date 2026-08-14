@@ -52,7 +52,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 3
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	Disarm = 1
 	ManaCost = 5
 	Cooldown = 30
@@ -155,7 +155,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	Snaring = 5
 	SnaringOverlay = 'rikujoukourou.dmi'
 	ManaCost = 20
@@ -215,7 +215,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	Stunner = 5
 	ManaCost = 20
 	Cooldown = 60
@@ -236,7 +236,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	Stasis = 100
 	ManaCost = 30
 	Cooldown = 90

@@ -42,8 +42,6 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
-					passives += list( "LikeWater" = 0.5)
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list( "Juggernaut" = 1, "PureReduction" = 0.5)
 				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
@@ -60,8 +58,6 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
-					passives += list( "LikeWater" = 0.5)
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
 				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
@@ -78,8 +74,6 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
-					passives += list( "LikeWater" = 1)
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
 				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
@@ -96,8 +90,6 @@ ascension
 				var/ascension/first = ascs[1]
 				if(!first) return
 				var/choice = first.choiceSelected
-				if(istype(choice, /ascension/sub_ascension/saiyan/zeal))
-					passives += list( "LikeWater" = 0.5)
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
 					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
 				if(istype(choice, /ascension/sub_ascension/saiyan/pride))

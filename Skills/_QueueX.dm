@@ -55,7 +55,6 @@ mob/proc/FireFinisher(force = 0)
 obj
 	Skills
 		Queue//Queued skills like GET DUNKED and Axekick.
-			canBeShortcut=1;
 			var/Duration=5//This is how long the queue remains up for.
 			var/UnarmedOnly=0//Can't use this with a sword.
 			//var/ClassNeeded//Requires a sword class.
@@ -69,7 +68,6 @@ obj
 			var/HitsUsed//Keeps a tally of how many hits have been used.
 			var/KBAdd//Adds knockback
 			var/KBMult//Multiplies knockback.
-			var/KBDelayed//KBs after the move is finished
 			var/Recoil/*If this is set, it will mark the attackers recoil damage.*/
 			var/Finisher//Passive that makes damage scale.
 			var/Opener//Passive that makes damage higher when health is higher.
@@ -86,10 +84,8 @@ obj
 			var/SweepStrike/*Passive that multiplies damage by enemy's speed.  Reverse Speed Strike!*/
 			var/DrawIn/*Passive that draws people in.  DrawIn value = the amount of tiles drawn in.*/
 			var/PushOut//Passive that pushes people away. PushOut value = the amount of tiles pushed away.
-			var/AntiSunyata
 			var/PushOutWaves=1
 			var/PushOutIcon='fevKiai.dmi'
-			var/Punt
 			var/ComboMessaged//If the combo has displayed a message, flag this
 			var/Combo//Value of combo is how many times it hits.
 			var/ComboPerformed=0//Tracks number of hits done.
@@ -100,7 +96,6 @@ obj
 			var/InstantStrikesDelay//when fass is too fass
 			var/Warp//If this is ticked, it homes onto people.
 			var/NoWarp
-			var/AntiSuyata
 			var/SpecialEffect//shinies
 			var/SpecialEffectRange=3//shinies big or smol
 			var/RozanEffect//super launcher
@@ -108,8 +103,6 @@ obj
 			var/GoshoryukenEffect
 			var/Explosive//Makes explosions, duh.
 			var/Shining//Makes shock effects.
-			var/Bolt//Makes lightning drop effect.
-			var/Darkness//Makes darkness tiles.
 			var/IconLock='BLANK.dmi'
 			var/IconLockUnder=0
 			var/LockX=0
@@ -145,17 +138,10 @@ obj
 
 
 
-			var/SpiritStrike //Targets End with Force
-			var/HybridStrike //For+Str
-			var/SpiritHand //Sunlight stance
-			var/SpiritSword //duh
-			var/KiBlade //duh
-			var/PridefulRage
 
 			var/ManaGain
 
 			//Instinct //Ignore AIS/WS
-			var/Steady //It do what steady do.
 			var/WeaponBreaker //WHAT DO U THINK?!
 			var/MortalBlow //WHHHHHHHHHHHAAAAAAAAAA-
 
@@ -169,7 +155,6 @@ obj
 
 
 			var/RipplePower=1//used to make ripple go higher
-			var/DrainBlood=0// This is used for vampire grab + toss, makes them gain bloodpower
 			var/WaveHit=0//Applies BYOND wave filter briefly on the hit target
 
 			var/Ooze
@@ -227,7 +212,7 @@ obj
 				Duration=5
 				Instinct=4
 				DamageMult=1
-				AccuracyMult=20
+				AccuracyMult=2
 				KBMult=0.001
 				Decider=1
 				Instinct=4
@@ -430,7 +415,6 @@ obj
 				//tier 1 sig styles
 
 				Behemoth_Typhoon
-					Steady = 4
 					WeaponBreaker = 2
 					Crushing = 20
 					Finisher = 1
@@ -509,7 +493,6 @@ obj
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Maim_Mastery"
 				Sacred_Edge
 					DamageMult=3
-					SpiritStrike=3
 					HitMessage="drives a colossal shard of concentrated mana into the foe point-blank!"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Mana_Break"
 					BuffSelf=0
@@ -564,7 +547,6 @@ obj
 				Impact_Palm
 					KBAdd=10
 					DamageMult=1.5
-					SpiritStrike=1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sure_Shot"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
 					HitMessage="breaks their enemy's defenses by shattering their aura with a swift energized palm!"
@@ -572,7 +554,6 @@ obj
 					KBMult=0.01
 					Crippling=10
 					DamageMult=1.5
-					SpiritStrike=1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Seeking_Spirits"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
 					HitMessage="'s fist surge with power as they plunge into the enemy's aura, halting them in place!"
@@ -728,7 +709,7 @@ obj
 					name="Shoryureppa"
 					HitStep=/obj/Skills/Queue/Finisher/Shoryureppa2
 					ShoryukenEffect=0.5
-					AccuracyMult=20
+					AccuracyMult=2
 					HitMessage=0
 				Shoryureppa2
 					DamageMult=7
@@ -753,7 +734,7 @@ obj
 
 				Rakan_Dantojin
 					DamageMult=2
-					AccuracyMult=20
+					AccuracyMult=2
 					FollowUp="/obj/Skills/AutoHit/Shun_Goku_Satsu"
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Violent_Personality"
 
@@ -826,25 +807,17 @@ obj
 					FollowUp="/obj/Skills/AutoHit/Dark_Blast"
 					HitMessage="unleashes a point-blank blast of darkness!"
 				Ghost_Drive
-					SpiritHand=1
-					SpiritStrike=1
-					PridefulRage=1
 					Combo=10
 					DamageMult=0.1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ghost_Drive"
 					HitMessage="phases through every defense like a ghost!"
 				Blade_Charge
-					SpiritHand=1
-					SpiritStrike=1
-					PridefulRage=1
 					Crippling=10
 					KBMult=0.001
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Blade_Charge"
 					FollowUp="/obj/Skills/AutoHit/BladeChargeRave"
 					HitMessage="hyper charges their keyblade with mana!"
 				Radiant_Brands
-					SpiritHand=1
-					SpiritStrike=1
 					Crippling=10
 					Warp=20
 					Combo=15
@@ -861,8 +834,6 @@ obj
 					Warp=20
 					Combo=14
 					DamageMult=0.2
-					SpiritStrike=2
-					PridefulRage=2
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/The_Fourteenth_One"
 					HitMessage="unleashes a flurry of blows, calling forth beams of light from above!"
 
@@ -920,87 +891,80 @@ obj
 					if(usr.IsGuarding())
 						usr.AlphaCounter()	//heavy strike while guarding = the shove, never a queue
 						return
-					var/handled = 0
-					if(!glob.HS_HOLD_FINISHER)
-						handled = usr.FireFinisher()	//legacy: full tension hijacks the button
-					else
-						usr.hs_key_down = world.time
-					if(handled)
-						return
-					else
-						if(usr.AttackQueue)
-							return // prevent heavy strike from overriding
-						if(usr.passive_handler["Heavy Strike"]&&!usr.ForceHeavyStrike)
-							switch(usr.passive_handler["Heavy Strike"])
-								if("Wrestling")
-									Grapple = 1
-									KBAdd =0
-									KBMult = 0
-									DamageMult = 4
-									AccuracyMult = 2
-									HitMessage = "puts his hands on em'."
-									Duration=7
-									Cooldown = 20
-								if("Inferno")
-									FollowUp = "/obj/Skills/AutoHit/Hyper_Inferno"
-								if("HellfireInferno")
-									FollowUp = "/obj/Skills/AutoHit/HellfireInferno"
-								if("ChaosBlaster")
-									FollowUp = "/obj/Skills/AutoHit/ChaosBlaster"
-								if("GetsugaClad")
-									FollowUp = "/obj/Skills/AutoHit/Getsuga_Followthrough"
-								if("Warp Strike")
-									var/obj/Skills/Projectile/Warp_Strike_MasterOfArms/P = usr.FindSkill(/obj/Skills/Projectile/Warp_Strike_MasterOfArms)
-									if(!P)
-										usr << "You need to be in Master of Arms to use Warp Strike!"
-										return
-									if(P.Using || P.cooldown_remaining)
-										return
-									if(!usr.Target || usr.Target == usr)
-										usr << "You need a target to use Warp Strike!"
-										return
-									var/obj/Items/Sword/sword = usr.EquippedSword()
-									var/obj/Items/Enchantment/Staff/staff = usr.EquippedStaff()
-									if(!sword && !staff)
-										usr << "You need a weapon equipped to use Warp Strike!"
-										return
-									// FlashChange: weapon "disappears" as it's thrown
-									animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=1)
-									spawn(1)
-										if(usr)
-											animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0), time=1)
-									P.IconLock = sword ? sword.icon : staff.icon
-									P.adjust(usr)
-									usr.WarpStrikeHidingWeapon = 1
+					usr.hs_key_down = world.time
+					if(usr.AttackQueue)
+						return // prevent heavy strike from overriding
+					if(usr.passive_handler["Heavy Strike"]&&!usr.ForceHeavyStrike)
+						switch(usr.passive_handler["Heavy Strike"])
+							if("Wrestling")
+								Grapple = 1
+								KBAdd =0
+								KBMult = 0
+								DamageMult = 4
+								AccuracyMult = 2
+								HitMessage = "puts his hands on em'."
+								Duration=7
+								Cooldown = 20
+							if("Inferno")
+								FollowUp = "/obj/Skills/AutoHit/Hyper_Inferno"
+							if("HellfireInferno")
+								FollowUp = "/obj/Skills/AutoHit/HellfireInferno"
+							if("ChaosBlaster")
+								FollowUp = "/obj/Skills/AutoHit/ChaosBlaster"
+							if("GetsugaClad")
+								FollowUp = "/obj/Skills/AutoHit/Getsuga_Followthrough"
+							if("Warp Strike")
+								var/obj/Skills/Projectile/Warp_Strike_MasterOfArms/P = usr.FindSkill(/obj/Skills/Projectile/Warp_Strike_MasterOfArms)
+								if(!P)
+									usr << "You need to be in Master of Arms to use Warp Strike!"
+									return
+								if(P.Using || P.cooldown_remaining)
+									return
+								if(!usr.Target || usr.Target == usr)
+									usr << "You need a target to use Warp Strike!"
+									return
+								var/obj/Items/Sword/sword = usr.EquippedSword()
+								var/obj/Items/Enchantment/Staff/staff = usr.EquippedStaff()
+								if(!sword && !staff)
+									usr << "You need a weapon equipped to use Warp Strike!"
+									return
+								// FlashChange: weapon "disappears" as it's thrown
+								animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=1)
+								spawn(1)
+									if(usr)
+										animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0), time=1)
+								P.IconLock = sword ? sword.icon : staff.icon
+								P.adjust(usr)
+								usr.WarpStrikeHidingWeapon = 1
+								usr.AppearanceOff()
+								usr.AppearanceOn()
+								usr.warp_strike_saved_loc = get_turf(usr)
+								if(!usr.UseProjectile(P))
+									usr.WarpStrikeHidingWeapon = 0
 									usr.AppearanceOff()
 									usr.AppearanceOn()
-									usr.warp_strike_saved_loc = get_turf(usr)
-									if(!usr.UseProjectile(P))
-										usr.WarpStrikeHidingWeapon = 0
-										usr.AppearanceOff()
-										usr.AppearanceOn()
-										usr.warp_strike_saved_loc = null
-									return
+									usr.warp_strike_saved_loc = null
+								return
 
-						else
-							// reset all
-							Grapple = 0
-							FollowUp = null
+					else
+						// reset all
+						Grapple = 0
+						FollowUp = null
 
-						var/obj/Skills/Queue/Secret_Heavy_Strike/hs = usr.getSpecialHeavyStrike();
-						if(hs)
-							if(hs.Using || Using) return;//if heavy strike or secret heavy strike is on cooldown, stop
-							hs.adjust(usr);
-							usr.SetQueue(hs);
-						else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
-						//hold to 0.5s at full tension: armed HS morphs into the finisher
-						if(glob.HS_HOLD_FINISHER && usr.AttackQueue)
-							var/mob/u = usr
-							var/obj/Skills/Queue/armed = u.AttackQueue
-							spawn(glob.TIMING_WINDOW)
-								if(u && u.hs_key_down && u.AttackQueue == armed)
-									if(u.FireFinisher(force = 1))
-										armed.Using = 0	//SetQueue burned its cd at arm time - refund the swap
+					var/obj/Skills/Queue/Secret_Heavy_Strike/hs = usr.getSpecialHeavyStrike();
+					if(hs)
+						if(hs.Using || Using) return;//if heavy strike or secret heavy strike is on cooldown, stop
+						hs.adjust(usr);
+						usr.SetQueue(hs);
+					else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
+					//hold to 0.5s at full tension: armed HS morphs into the finisher
+					if(usr.AttackQueue)
+						var/mob/u = usr
+						var/obj/Skills/Queue/armed = u.AttackQueue
+						spawn(glob.TIMING_WINDOW)
+							if(u && u.hs_key_down && u.AttackQueue == armed)
+								if(u.FireFinisher(force = 1))
+									armed.Using = 0	//SetQueue burned its cd at arm time - refund the swap
 
 			Meteor_Mash
 				name="Meteor Mash"
@@ -1219,7 +1183,6 @@ obj
 				UnarmedOnly=1
 				Instinct=5
 				Stunner=5
-				AntiSunyata=1
 				Projectile="/obj/Skills/Projectile/Beams/Big/Super_Dragon_Beam"
 				ProjectileBeam=1
 				HitMessage="throws a crippling punch into the opponent's midsection!"
@@ -1316,7 +1279,6 @@ obj
 				DamageMult=1
 				AccuracyMult=1
 				Duration=3
-				Pacifying=60
 				//doesn't get a verb because it is set from the tech item
 
 
@@ -1347,8 +1309,6 @@ obj
 				Shearing=10
 				Crippling=10
 				Instinct=4
-				SpiritStrike=1
-				PridefulRage=1
 				MortalBlow=0.5
 				IconLock='Ragna Blade.dmi'
 				LockX=-32
@@ -1371,7 +1331,6 @@ obj
 
 			Bad_Luck
 				name="Bad Luck"
-				HybridStrike=1
 				DamageMult=4
 				AccuracyMult = 1.1
 				Duration=5
@@ -1587,12 +1546,8 @@ mob
 							copy = Q.NewCopyable
 						else
 							copy = Q.Copyable
-						if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-							if(copyLevel < copy)
-								continue
-						else
-							if(copyLevel <= copy)
-								continue
+						if(copyLevel < copy)
+							continue
 						if(m.client&&m.client.address==src.client.address)
 							continue
 						if(!locate(Q.type, m))
@@ -1613,8 +1568,7 @@ mob
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.3, Blend=2, Time=2)
 				CounterMasterTimer = max(1, 25 - (src.HasCounterMaster()*5))
 			src.AttackQueue=Q
-			if(glob.QUEUE_COUNTER)
-				src.queue_counter_until = world.time + min(glob.TIMING_WINDOW + src.HasCounterMaster()*glob.QUEUE_COUNTER_CM_BONUS, glob.QUEUE_COUNTER_MAX)
+			src.queue_counter_until = world.time + min(glob.TIMING_WINDOW + src.HasCounterMaster()*glob.QUEUE_COUNTER_CM_BONUS, glob.QUEUE_COUNTER_MAX)
 			src.AttackQueue.RanOut=0
 			src.AttackQueue.Hit=0
 			src.AttackQueue.Missed=0
@@ -1965,7 +1919,7 @@ mob
 
 		QueueOverlayAdd()
 			//tell
-			if(glob.QUEUE_TELLS && src.AttackQueue.IconLock == 'BLANK.dmi')
+			if(src.AttackQueue.IconLock == 'BLANK.dmi')
 				src.queue_tell_aura = 1	//remove
 				if(!src.AuraLocked&&!src.HasKiControl())
 					src.Auraz("Add")

@@ -74,17 +74,17 @@
 			EndMult = 1.4
 			ForMult = 1.35
 			DefMult = 1.3
-			passives = list("Chilling" = 1, "FluidForm" = 1,   "Blubber" = 3, "MeleeResist" = 1)
+			passives = list("Chilling" = 1, "Blubber" = 3, "MeleeResist" = 1)
 		else if(tier >= 2)
 			EndMult = 1.25
 			ForMult = 1.15
 			DefMult = 1
-			passives = list("Chilling" = 1, "FluidForm" = 1)
+			passives = list("Chilling" = 1)
 		else
 			EndMult = 1.1
 			ForMult = 1
 			DefMult = 1
-			passives = list("Chilling" = 1, "FluidForm" = 1)
+			passives = list("Chilling" = 1)
 	verb/Water_Gestalt_Buff()
 		set category="Skills"
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -109,7 +109,7 @@
 			ForMult = 1.4
 			EndMult = 1.35
 			DefMult = 1.3
-			passives = list("Shattering" = 1, "Harden" = 1, "EarthHerald" = 1, "Juggernaut" = 1, "BlockChance" = 20, "CriticalBlock" = 0.2)
+			passives = list("Shattering" = 1, "Harden" = 1, "EarthHerald" = 1, "Juggernaut" = 1, "CriticalBlock" = 0.2)
 		else if(tier >= 2)
 			ForMult = 1.25
 			EndMult = 1.15
@@ -179,12 +179,12 @@
 			SpdMult = 1.4
 			EndMult = 1.35
 			DefMult = 1.3
-			passives = list("LifeGeneration" = 3,   "DebuffResistance" = 1)
+			passives = list("LifeGeneration" = 3)
 		else if(tier >= 2)
 			SpdMult = 1.25
 			EndMult = 1.15
 			DefMult = 1
-			passives = list("LifeGeneration" = 1,   "DebuffResistance" = 1)
+			passives = list("LifeGeneration" = 1)
 		else
 			SpdMult = 1.1
 			EndMult = 1
@@ -248,7 +248,7 @@
 			ForMult = 1.4
 			SpdMult = 1.35
 			DefMult = 1.3
-			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1, "FluidForm" = 1, "Entropic" = 1)
+			passives = list("TechniqueMastery" = 2, "DebuffDurationReduction" = 1, "Blubber" = 2, "Godspeed" = 1, "Entropic" = 1)
 		else if(tier >= 2)
 			ForMult = 1.25
 			SpdMult = 1.15
@@ -283,12 +283,12 @@
 			SpdMult = 1.4
 			ForMult = 1.35
 			OffMult = 1.3
-			passives = list("Warping" = 1, "Flicker" = 1, "Siphon" = 2, "PUSpike" = 5,  "Vortex" = 5,"BetterAim"=5)
+			passives = list("Warping" = 1, "Flicker" = 1, "PUSpike" = 5, "BetterAim"=5)
 		else if(tier >= 2)
 			SpdMult = 1.25
 			ForMult = 1.15
 			OffMult = 1
-			passives = list("Warping" = 1, "Flicker" = 1, "Siphon" = 2, "PUSpike" = 5,"BetterAim"=3)
+			passives = list("Warping" = 1, "Flicker" = 1, "PUSpike" = 5,"BetterAim"=3)
 		else
 			SpdMult = 1.1
 			ForMult = 1

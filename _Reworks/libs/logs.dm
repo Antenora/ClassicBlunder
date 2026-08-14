@@ -13,21 +13,8 @@
             for(var/a in 1 to 50)
                 Potential = a
                 f << "for a demon at [a] pot, [y] health, and [x] hell power. hellscaling is [GetHellScaling()]"*/
-/globalTracker/var/SHAR_COPY_ALL = FALSE // just fuck it
-/globalTracker/var/SHAR_COPY_EQUAL_OR_LOWER = TRUE // 1 tier behind
-/globalTracker/var/SHAR_COPY_MANUAL = FALSE // lol put a gun to ur brain
-/globalTracker/var/SHAR_COPY_PLUS = FALSE // +1 would be tier = tier in terms of saga:skill, +2 higher
-
-
 proc/getSharCopyLevel(sagaLevel)
-    if(glob.SHAR_COPY_ALL)
-        return 10
-    if(glob.SHAR_COPY_MANUAL)
-        return glob.SHAR_COPY_MANUAL
-    if(glob.SHAR_COPY_PLUS)
-        return sagaLevel + glob.SHAR_COPY_PLUS
-    if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-        return sagaLevel
+    return sagaLevel
 
 
 

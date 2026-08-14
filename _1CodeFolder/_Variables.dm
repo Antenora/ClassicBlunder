@@ -336,7 +336,6 @@ mob/var
 	SureDodgeTimerLimit
 	tmp/CounterMasterTimer
 	Afterimages//Jitters effect.
-	EnergySiphon//(not) Raiju skill.
 
 	obj/Skills/Buffs/ActiveBuff//New buff variable.
 	obj/Skills/Buffs/SpecialBuff//New buff variable.
@@ -541,7 +540,6 @@ mob/var
 	Attracted=0
 	tmp/AttractingCooldown=0
 	tmp/mob/AttractedTo=0
-	Terrifying=0
 	Terrified=0
 	tmp/mob/TerrifiedOf=0
 	PotionCD=0
@@ -642,7 +640,6 @@ mob/var
 	WillPower
 	Regenerating
 	Judgment
-	PridefulRage
 	Defiance
 	DefianceCounter=0
 	DefianceRetaliate

@@ -334,6 +334,6 @@
 	DamageMult=12
 	Immediate=1
 	Dodgeable=0
-	StrRate=1
-	ForRate=1
+	StrScaling=1
+	ForScaling=1
 	IconLock='SuperDuperRainbowBeam.dmi'

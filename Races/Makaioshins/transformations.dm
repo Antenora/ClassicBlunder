@@ -74,7 +74,7 @@ transformation
 					forceadd = 0.35
 					speedadd = 0.35
 				if(mastery >= 50)
-					passives = list("GodKi" = 0.25, "TechniqueMastery" = 4, "FluidForm" = 1, "Juggernaut" = 1.5, "HellRisen" = 0.5)
+					passives = list("GodKi" = 0.25, "TechniqueMastery" = 4, "Juggernaut" = 1.5, "HellRisen" = 0.5)
 					enduranceadd = 0.5
 					offenseadd = 0.5
 					defenseadd = 0.5
@@ -82,7 +82,7 @@ transformation
 					forceadd = 0.5
 					speedadd = 0.5
 				if(mastery >= 75)
-					passives = list("GodKi" = 0.35, "TechniqueMastery" = 6, "FluidForm" = 1.5, "Juggernaut" = 2,"HellRisen" = 0.75)
+					passives = list("GodKi" = 0.35, "TechniqueMastery" = 6, "Juggernaut" = 2,"HellRisen" = 0.75)
 					enduranceadd = 0.5
 					offenseadd = 0.5
 					defenseadd = 0.5
@@ -90,7 +90,7 @@ transformation
 					forceadd = 0.5
 					speedadd = 0.5
 				if(mastery >= 100)
-					passives = list("GodKi" = 0.5, "TechniqueMastery" = 8, "FluidForm" = 2, "Juggernaut" = 3,"HellRisen" = 1)
+					passives = list("GodKi" = 0.5, "TechniqueMastery" = 8, "Juggernaut" = 3,"HellRisen" = 1)
 					enduranceadd = 1
 					offenseadd = 1
 					defenseadd = 1

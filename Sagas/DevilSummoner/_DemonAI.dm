@@ -12,18 +12,12 @@
 
 	var/demon_hp = 100
 	var/next_attack_multiplier = 1
-	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, DoDamage uses parent convention (src=attacker)
+	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, ResolveStrike uses parent convention (src=attacker)
 	var/image/reflect_overlay_self = null
 	var/image/reflect_overlay_owner = null
 
 	// Summoner passive inheritance
 	var/demon_summoner_pure_grant      = 0
-	var/demon_summoner_brutalize_grant = 0   
-	var/demon_summoner_blurring_grant  = 0   
-	var/demon_summoner_hybrid_grant    = 0   
-	var/demon_summoner_spirit_sword    = 0   
-	var/demon_summoner_spirit_hand     = 0   
-	var/demon_summoner_calloused_grant = 0   
 
 	New()
 		..()
@@ -32,21 +26,9 @@
 		if(!ai_owner) return
 		var/f = glob.DEMON_SUMMONER_GRANT_FACTOR
 		demon_summoner_pure_grant      = ai_owner.HasPureDamage()      * f
-		demon_summoner_brutalize_grant = ai_owner.GetBrutalize()       * f
-		demon_summoner_blurring_grant  = ai_owner.GetBlurringStrikes() * f
-		demon_summoner_hybrid_grant    = ai_owner.GetHybridStrike()    * f
-		demon_summoner_spirit_sword    = ai_owner.GetSpiritSword()     * f
-		demon_summoner_spirit_hand     = ai_owner.GetSpiritHand()      * f
-		demon_summoner_calloused_grant = ai_owner.GetCallousedHands()  * f
 
 	proc/RemoveSummonerPassiveGrants()
 		demon_summoner_pure_grant      = 0
-		demon_summoner_brutalize_grant = 0.0
-		demon_summoner_blurring_grant  = 0.0
-		demon_summoner_hybrid_grant    = 0.0
-		demon_summoner_spirit_sword    = 0.0
-		demon_summoner_spirit_hand     = 0.0
-		demon_summoner_calloused_grant = 0.0
 
 	proc/DemonInit(datum/demon_data/dd, mob/owner, datum/party_demon/pd)
 		demon_data = dd
@@ -220,11 +202,7 @@
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
 		var/atk = max(0.01, atk_val)
 		var/def = max(0.01, target.getEndStat(1))
-		if(demon_summoner_spirit_sword > 0)    atk += ForMod * ForMultTotal * demon_summoner_spirit_sword
-		if(demon_summoner_spirit_hand > 0)     atk += ForMod * ForMultTotal * demon_summoner_spirit_hand / 4
-		if(demon_summoner_calloused_grant > 0) atk += EndMod * EndMultTotal * demon_summoner_calloused_grant
-		if(demon_summoner_brutalize_grant > 0) def = max(0.01, def * (1 - demon_summoner_brutalize_grant))
-		return (powerDif ** glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT + glob.MELEE_EFFECTIVENESS) ** -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
+		return strikeCoreDamage(powerDif, atk, def)
 
 	// Visual feedback for demon attacks
 	proc/DemonHitVisual(mob/target)
@@ -235,10 +213,6 @@
 	// Outgoing damage wrapper
 	proc/DemonDealDamage(mob/target, val)
 		if(!isnum(val) || val <= 0) return
-		if(demon_summoner_blurring_grant > 0)
-			val *= clamp(sqrt(1 + SpdMod * demon_summoner_blurring_grant / 15), 1, 3)
-		if(demon_summoner_hybrid_grant > 0)
-			val *= clamp(sqrt(1 + ForMod * demon_summoner_hybrid_grant / 15), 1, 3)
 		val += demon_summoner_pure_grant
 		// Killing blow: finish off a KO'd NPC
 		if(target && target.KO && istype(target, /mob/Player/AI) && !istype(target, /mob/Player/AI/Demon) && !target.client)
@@ -315,10 +289,9 @@
 		if(!isnum(val) || val <= 0) return
 		DemonTakeDamage(val, null)
 
-	DoDamage(mob/other, damage)
+	ResolveStrike(strike/S)
 		if(_outgoing_damage)
 			_outgoing_damage = FALSE
-			..(other, damage)
-			return
-		if(isnum(damage) && damage > 0)
-			DemonTakeDamage(damage, other)
+			return ..(S)
+		if(isnum(S.val) && S.val > 0)
+			DemonTakeDamage(S.val, S.defender)

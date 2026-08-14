@@ -6,7 +6,7 @@
 		StyleOff = 1.05
 		StyleDef = 1.05
 		StyleActive = "Fight or Flight"
-		passives = list("HybridStyle" = "MysticStyle", "Flow" = 1, "Instinct" = 0.5)
+		passives = list("HybridStyle" = "MysticStyle")
 		verb/Fight_or_Flight()
 			set hidden=1
 			src.Trigger(usr)
@@ -18,7 +18,7 @@
 		StyleDef = 1.10
 		StyleSpd = 1.10
 		StyleActive = "Mountain King"
-		passives = list("HybridStyle" = "MysticStyle", "Flow" = 2, "Instinct" = 1, "DoubleStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle", "DoubleStrike" = 1)
 		verb/Mountain_King()
 			set hidden=1
 			src.Trigger(usr)
@@ -31,7 +31,7 @@
 		StyleSpd = 1.20
 		StyleActive = "Dreamlike Savior"
 		passives = list("HybridStyle" = "MysticStyle",    \
-		"Flow" = 3, "Instinct" = 2, "DoubleStrike" = 2, "Deflection" = 2,)
+		"DoubleStrike" = 2, "Deflection" = 2,)
 		verb/Dreamlike_Savior()
 			set hidden=1
 			src.Trigger(usr)
@@ -43,8 +43,8 @@
 		StyleDef = 1.35
 		StyleSpd = 1.35
 		StyleActive = "Afterlife"
-		passives = list("HybridStyle" = "MysticStyle", "Flow" = 4, "Instinct" = 3,\
-		"LikeWater" = 3, "DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50)
+		passives = list("HybridStyle" = "MysticStyle",\
+		"DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50)
 		verb/Afterlife()
 			set hidden=1
 			src.Trigger(usr)
@@ -59,7 +59,7 @@ obj
 			ForMult = 1.25
 			RecovMult = 1.10
 			passives = list( "TechniqueMastery" = 2,    \
-			"Instinct" = 2, "Flow" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
+			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
@@ -78,10 +78,10 @@ obj
 				EndMult = 1.10 + (0.01 * pLv)
 				RecovMult = 1.10 + (0.01 * pLv)
 				passives = list("TechniqueMastery" = 2,    \
-				 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
+				 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
 				if(pLv > 4)
 					passives = list("TechniqueMastery" = 2,    \
-					 "Instinct" = 1 + round(pLv / 2, 1), "Flow" = 1 + round(pLv / 2, 1), "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1)
+					 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1)
 			verb/Hyperdeath_Mode()
 				set category = "Skills"
 				adjust(usr)
@@ -112,15 +112,14 @@ obj
 				PowerMult = 1.15
 				EnergyHeal=1
 				passives = list("SwordAscension" = 2, "PUSpike" = 25, "KiControl" = 1,   \
-				"DoubleStrike" = 0.5, "BlockChance" = 5, "CriticalBlock" = 0.05, "ManaGeneration" = 1)
+				"DoubleStrike" = 0.5, "CriticalBlock" = 0.05, "ManaGeneration" = 1)
 				if(p.SagaLevel>=3)
 					SwordAscension=p.SagaLevel
 					StrMult=1.50
 					ForMult=1.25
 					PowerMult=1.20
-					//HybridStrike is removed because t2 style gives it
 					passives = list("SwordAscension"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=35,"KiControl" = 1,"Chaos Buster" = 1, \
-					"DoubleStrike" = 1, "BlockChance" = 10, "CriticalBlock" = 0.10, "ManaGeneration" = 2)
+					"DoubleStrike" = 1, "CriticalBlock" = 0.10, "ManaGeneration" = 2)
 				if(p.SagaLevel>=4)
 					MakesSecondSword=1
 					StrMult=1.60
@@ -129,14 +128,14 @@ obj
 					ActiveMessage="manifests their Chaos Sabers in a burst of prismatic light."
 					OffMessage="dispels the Chaos Sabers."
 					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1,  \
-					"DoubleStrike" = 1.5,  "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 3)
+					"DoubleStrike" = 1.5,  "CriticalBlock" = 0.15, "ManaGeneration" = 3)
 				if(p.SagaLevel>=5)
 					MakesSecondSword=1
 					StrMult=1.65
 					ForMult=1.40
 					PowerMult=1.30
 					passives = list("SwordAscension"=p.SagaLevel, "SwordAscensionSecond"=p.SagaLevel, "Secret Knives" = "ChaosKnife", "Tossing"=2, "PUSpike"=50, "KiControl" = 1, "Chaos Buster" = 1,  \
-					"DoubleStrike" = 2, "TripleStrike" = 0.5,  "BlockChance" = 15, "CriticalBlock" = 0.15, "ManaGeneration" = 4)
+					"DoubleStrike" = 2, "TripleStrike" = 0.5,  "CriticalBlock" = 0.15, "ManaGeneration" = 4)
 			verb/Chaos_Saber()
 				set category="Skills"
 				if(usr.CheckSlotless("Chaos Buster"))
@@ -209,9 +208,9 @@ obj
 			Radius=0
 			DamageMult=0.25
 			AccMult=0.5
-			StrRate=0.5
-			ForRate=0.5
-			EndRate=1
+			StrScaling=0.5
+			ForScaling=0.5
+			EndEffectiveness=1
 			Distance=30
 			Homing=1
 			ManaCost=2
@@ -226,9 +225,9 @@ obj
 			Radius=0
 			DamageMult=0.75
 			AccMult=1
-			StrRate=1
-			ForRate=1
-			EndRate=1
+			StrScaling=1
+			ForScaling=1
+			EndEffectiveness=1
 			Piercing=1
 			IconSize=2
 			Distance=30
@@ -249,7 +248,7 @@ obj
 			Distance=6
 			AdaptRate=1
 			Area="Target"
-			ForOffense=1
+			ForScaling=1
 			DamageMult=6
 			Paralyzing=5
 			Size=1
@@ -426,8 +425,8 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	Distance = 16
 	DamageMult = 5
 	Knockback = 10
-	StrOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	EndEffectiveness = 1
 	PassThrough = 1
 	Rush = 1
 	RushAfterImages = 1
@@ -440,7 +439,6 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	NoLock = 1
 	NoAttackLock = 1
 	ChargeWaveIcon   = 'BLANK.dmi'
-	IconTime = 4
 	ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
 	HeldSkill = TRUE
 	ChargePeriod = 3
@@ -826,3 +824,23 @@ mob/proc/SpawnCrossMarkers(projectile_path, Target, marker_range = 3)
 		new /obj/AttackMarker(T, src, projectile_path, marker_delay, side_dir)
 
 		count++*/
+
+/strikeHook/prismaticHyperdeathAttacker
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/val = S.dealt
+		if((attacker.Saga=="Path of a Hero: Rebirth") && (attacker.RebirthHeroType=="Prismatic"))
+			var/meterGain = min(max(val,0.1), 0.9)
+			attacker.HyperdeathMeterCurrent=min(attacker.HyperdeathMeterCurrent+meterGain, 100)
+			attacker.HyperMeterUpdate()
+
+/strikeHook/prismaticHyperdeathDefender
+	stage = "post"
+	fire(strike/S)
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if((defender.Saga=="Path of a Hero: Rebirth") && (defender.RebirthHeroType=="Prismatic"))
+			var/meterGain = min(max(val,0.1), 0.2)
+			defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)
+			defender.HyperMeterUpdate()

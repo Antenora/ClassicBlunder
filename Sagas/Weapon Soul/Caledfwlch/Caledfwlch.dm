@@ -14,7 +14,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch
 	name = "Heavenly Regalia: The King"
 	StrMult=1.5
 	EndMult=1.5
-	passives = list("CriticalBlock" = 0.25, "Juggernaut" = 0.5, "Reversal" = 0.5, "BlockChance" = 25)
+	passives = list("CriticalBlock" = 0.25, "Juggernaut" = 0.5, "Reversal" = 0.5)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="resonates their royal treasures: Heavenly Regalia!"
 	OffMessage="'s treasures loses their royal luster..."
@@ -72,9 +72,9 @@ obj/Skills/AutoHit/True_Excalibur
 	Rounds=2
 	Knockback=30
 	RoundMovement=0
-	StrOffense=1
-	EndDefense=0.75
-	ForOffense=1
+	StrScaling=1
+	EndEffectiveness=0.75
+	ForScaling=1
 	Cooldown=90
 	HitSparkIcon='Hit Effect Excal.dmi'
 	HitSparkX=-32
@@ -110,9 +110,9 @@ obj/Skills/Projectile/ExcaliburProjectile
 	FireFromEnemy=0
 	Speed=0.5
 	Variation=0
-	StrRate=1
-	ForRate=1
-	EndRate=1
+	StrScaling=1
+	ForScaling=1
+	EndEffectiveness=1
 	Knockback=1
 	Trail='ExcaliTrail.dmi'
 	MultiHit=8
@@ -141,9 +141,9 @@ obj/Skills/Projectile/Weapon_Soul
 		FireFromSelf=1
 		FireFromEnemy=0
 		Explode=3
-		StrRate=1
-		ForRate=1
-		EndRate=1
+		StrScaling=1
+		ForScaling=1
+		EndEffectiveness=1
 		Trail='ExcaliTrail.dmi'
 		TrailDuration=1
 		Dodgeable=-1
@@ -181,9 +181,9 @@ obj/Skills/Projectile/Weapon_Soul
 		FireFromSelf=1
 		FireFromEnemy=0
 		Explode=3
-		StrRate=1
-		ForRate=1
-		EndRate=1
+		StrScaling=1
+		ForScaling=1
+		EndEffectiveness=1
 		Dodgeable=-1
 		Deflectable=-1
 		Distance=100

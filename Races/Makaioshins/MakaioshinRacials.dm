@@ -54,8 +54,8 @@
 /obj/Skills/AutoHit/Purgatorial_Flame
 	Area="Arc"
 	Distance=5
-	StrOffense=1
-	ForOffense=1
+	StrScaling=1
+	ForScaling=1
 	DamageMult=0.7
 	RoundMovement=0
 	ComboMaster=1
@@ -163,8 +163,8 @@
 	Cooldown = 300
 	FixedDamage = 10
 	DamageMult = 25
-	StrOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	EndEffectiveness = 1
 	GuardBreak = 1
 	ActiveMessage = "corrodes their target's existence with chaos!"
 

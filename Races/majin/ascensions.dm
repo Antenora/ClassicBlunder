@@ -22,7 +22,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -47,7 +47,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -71,7 +71,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -96,7 +96,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -120,7 +120,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -145,7 +145,7 @@ ascension
 					if("Super")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0

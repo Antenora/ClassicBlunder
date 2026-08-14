@@ -24,7 +24,7 @@ var/global/list/BW_CONTRAST_HIGH = list(
 	Area = "Target"
 	Distance = 6
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	ManaCost = 20
 	Cooldown = 30
 	ActiveMessage = "seizes their target's movement with the piercing ring of Suzumushi!"
@@ -136,9 +136,6 @@ var/global/list/BW_CONTRAST_HIGH = list(
 		var/SL = p.SagaLevel
 		passives = list(
 			"Harden"    = 1 + SL,
-			
-			"Flow"      = 1 + SL,
-			"FluidForm" = 0.5 + (SL * 0.5),
 			"Flicker"   = 1 + SL
 		)
 		if(SL < 3)

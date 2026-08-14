@@ -324,7 +324,7 @@ obj/Skills/AutoHit/Spiral
 			Explode=1
 			Dodgeable=0
 			Deflectable=0
-			EndRate=0.75
+			EndEffectiveness=0.75
 			Blasts=50
 			Delay=0
 			LosesHoming=3

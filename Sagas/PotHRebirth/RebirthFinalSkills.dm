@@ -1,7 +1,7 @@
 /obj/Skills/Buffs/SpecialBuffs
 	SpecialSlot=1
 	Banish_The_ANGELS_HEAVEN
-		passives = list("HolyMod" = 30, "SpiritPower" = 5, "EndlessNine" = 3.85, "Shatter Fate"=1)
+		passives = list("HolyMod" = 30, "SpiritPower" = 5, "Shatter Fate"=1)
 		ActiveMessage="puts pen to paper, undoing the influence of the Gods."
 		HealthCut=0.9
 		verb/Banish_The_ANGELS_HEAVEN()
@@ -9,7 +9,7 @@
 			src.Trigger(usr)
 		//	if(src.Using)
 	Shatter_The_Glass_Of_Fate
-		passives = list("DisableGodKi" = 1, "Deicide" = 10, "EndlessNine" = 5,  "Shatter Fate"=1)
+		passives = list("DisableGodKi" = 1, "Shatter Fate"=1)
 		ActiveMessage="focuses the power to change reality within their axe, as the glass of fate shatters..."
 		HealthCut=0.9
 		verb/Shatter_The_Glass_Of_Fate()

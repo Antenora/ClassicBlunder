@@ -12,7 +12,6 @@
         HitMessage="grabs hold of their enemy!"
     Heavenly_Storm_Dragon_Emergence
         Warp = 10
-        Bolt = 1
         Shining = 1
         Explosive = 1
         Shocking = 3
@@ -30,7 +29,6 @@
         Warp = 3
         Combo=10
         DamageMult = 0.15
-        Bolt = 1
         Shining = 1
         Explosive = 1
         KBAdd = 0.001

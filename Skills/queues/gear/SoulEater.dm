@@ -9,8 +9,6 @@ obj
 				KBMult=0.00001
 				Combo=5
 				Warp=5
-				SpiritHand=0.5
-				SpiritSword=0.5
 				Duration=10
 				Cooldown=40
 				NeedsSword=1
@@ -32,8 +30,8 @@ obj
 				NeedsSword=1
 				Area="Target"
 				GuardBreak=1
-				StrOffense=1
-				ForOffense=1
+				StrScaling=1
+				ForScaling=1
 				DamageMult=5
 				SpeedStrike=5
 				Distance=10
@@ -56,8 +54,8 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Wide Wave"
-				StrOffense=1
-				ForOffense=1
+				StrScaling=1
+				ForScaling=1
 				Distance=10
 				PassThrough=1
 				PreShockwave=1
@@ -101,7 +99,7 @@ obj
 			if(!SE) return
 			if(SE.SEType=="Sword")
 				passives = list("HybridStyle" = "MysticStyle", "SweepingStrike" = 1, "BladeFisting" = 1, "MagicSword" = 1, "LifeSteal" = 25, "AbyssMod" = 2,\
-				 "Iaijutsu" = 1,  "CriticalChance" = 15, "CriticalDamage"= 0.1,"Fury" = 3 )
+				 "Iaijutsu" = 1,  "CriticalDamage"= 0.1,"Fury" = 3 )
 				StyleSpd = 1.3
 				StyleStr = 1.3
 				StyleFor = 1
@@ -117,7 +115,7 @@ obj
 				Finisher="/obj/Skills/Queue/Finisher/Dark_Firaga"
 			else if(SE.SEType=="Shield")
 				passives = list("HybridStyle" = "MysticStyle", "SweepingStrike" = 1, "BladeFisting" = 1, "MagicSword" = 1, "LifeSteal" = 25, "AbyssMod" = 2,\
-				 "Harden"=2, "Momentum" = 1.5,  "BlockChance" = 15)
+				 "Harden"=2, "Momentum" = 1.5)
 				StyleEnd = 1.3
 				StyleStr = 1.15
 				StyleFor = 1.15
@@ -163,7 +161,7 @@ obj
 				Finisher="/obj/Skills/Queue/Finisher/Dark_Firaga"
 			else if(SE.SEType=="Shield")
 				passives = list("HybridStyle" = "MysticStyle", "SweepingStrike" = 1, "BladeFisting" = 1, "MagicSword" = 1, "AbyssMod" = 2,\
-				 "Harden"=1, "Momentum" = 2, "BlockChance" = 15, "DoubleStrike" = 3, "NeedsSecondSword" = 1)
+				 "Harden"=1, "Momentum" = 2, "DoubleStrike" = 3, "NeedsSecondSword" = 1)
 				StyleEnd = 1.3
 				StyleStr = 1.15
 				StyleFor = 1.15
@@ -183,8 +181,8 @@ obj
 		Instinct=4
 		DamageMult=2
 		Rounds=2
-		StrOffense=1
-		EndDefense=0.75
+		StrScaling=1
+		EndEffectiveness=0.75
 		TurfErupt=2
 		TurfEruptOffset=3
 		Earthshaking = 15
@@ -198,7 +196,6 @@ obj
 		Icon='SweepingKick.dmi'
 		IconX=-32
 		IconY=-32
-		IconTime=10
 		Cooldown=4
 /obj/Skills/Projectile
 	Dark_Firagun

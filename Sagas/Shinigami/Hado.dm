@@ -50,7 +50,7 @@
 	ManaCost = 5
 	ElementalOffense = "Wind"
 	ElementalDefense = "Wind"
-	passives = list("Shocking"=3, "ThunderHerald"=1, "CriticalChance"=5, "CriticalDamage"=0.05)
+	passives = list("Shocking"=3, "ThunderHerald"=1, "CriticalDamage"=0.05)
 	ActiveMessage = "conducts lightning through their body — Tsuzuri Raiden!"
 	OffMessage = "releases the conducted lightning."
 
@@ -270,7 +270,7 @@
 	Area = "Target"
 	Distance = 20
 	DamageMult = 30
-	ForOffense = 1
+	ForScaling = 1
 	Bolt = 4
 	BoltOffset = 0
 	Paralyzing = 10
@@ -434,10 +434,14 @@
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/AutoHit/Hado/Zangerin
+	parent_type = /obj/Skills/AutoHit/Wave
 	name = "Zangerin"
-	StrOffense = 2
+	StrScaling = 2
 	ManaCost = 30
 	Cooldown = 75
+	DamageMult = 40
+	WaveIcon = 'KenShockwaveGold.dmi'
+	WaveHitBurstIcon = null
 
 	verb/Zangerin()
 		set name = "Zangerin"
@@ -446,106 +450,9 @@
 		if(src.cooldown_remaining > 0)
 			User << "[src] is on cooldown."
 			return
-		var/obj/Effects/ZangerinWave/W = new(User.loc)
-		W.owner = User
-		W.DamageMult = 40
-		W.StrOffense = 2
+		spawnWave(User)
 		User.OMessage(1, null, "[User] sweeps their blade in a crescent arc with Hadō #78: Zangerin!")
 		src.Cooldown(1, null, User)
-
-/obj/Effects/ZangerinWave
-	icon = 'KenShockwaveGold.dmi'
-	pixel_x = -105
-	pixel_y = -105
-	Grabbable = 0
-	mouse_opacity = 0
-	layer = EFFECTS_LAYER
-	var/max_size = 4.0
-	var/wave_lifetime = 20
-	var/tmp/mob/Players/owner
-	var/DamageMult = 7
-	var/StrOffense = 2
-	var/EndRes = 1
-	var/list/hitList = list()
-
-	New()
-		animate(src)
-		transform = matrix() * 0.1
-		alpha = 255
-		spawn(0)
-			hitDetectLoop()
-
-	proc/hitDetectLoop()
-		set waitfor = FALSE
-		var/start_time = world.time
-		var/prev_radius_tiles = 0.0
-		var/list/outsideSet = list()
-		while(src)
-			var/tick_begin = world.time
-			if(!owner || !owner.loc) break
-			if(owner.PureRPMode)
-				sleep(1)
-				start_time += (world.time - tick_begin)
-				continue
-
-			var/elapsed = world.time - start_time
-			if(elapsed >= wave_lifetime)
-				EffectFinish()
-				break
-
-			var/t = elapsed / wave_lifetime
-			var/scale = 0.1 + (max_size - 0.1) * t
-			var/curr_radius_tiles = (scale * 121.0) / 32.0
-			src.transform = matrix() * scale
-			src.alpha = round(255 * (1 - t))
-
-			for(var/mob/Players/P in players)
-				if(!P.client) continue
-				if(P == owner) continue
-				if(P.z != owner.z) continue
-				if(owner.inParty(P.ckey)) continue
-
-				var/dx = P.x - owner.x
-				var/dy = P.y - owner.y
-				var/dist = sqrt(dx * dx + dy * dy)
-
-				if(dist > curr_radius_tiles)
-					if(!(P in outsideSet))
-						outsideSet += P
-				else
-					if(P in outsideSet)
-						outsideSet -= P
-						if(!(P in hitList))
-							if(dist > prev_radius_tiles)
-								hitList += P
-								dealWaveDamage(P)
-
-			prev_radius_tiles = curr_radius_tiles
-			sleep(1)
-
-	proc/dealWaveDamage(mob/Players/target)
-		if(!owner || !target) return
-		if(owner.PureRPMode) return
-
-		var/powerDif = owner.Power / target.Power
-		if(glob.CLAMP_POWER && !owner.ignoresPowerClamp())
-			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-
-		var/atk = owner.GetStr(StrOffense)
-		if(atk <= 0) atk = 0.01
-
-		var/def = target.getEndStat(1) * EndRes
-		if(def <= 0) def = 0.01
-
-		var/FinalDmg = (clamp(powerDif, 0.1, 100000) ** glob.DMG_POWER_EXPONENT) * \
-		               (glob.CONSTANT_DAMAGE_EXPONENT + glob.AUTOHIT_EFFECTIVNESS) ** \
-		               -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
-		FinalDmg *= DamageMult
-		FinalDmg *= owner.GetDamageMod()
-		FinalDmg *= glob.AUTOHIT_GLOBAL_DAMAGE
-
-		if(FinalDmg <= 0) return
-		target.LoseHealth(FinalDmg)
 
 // TIER 5
 
@@ -648,8 +555,8 @@
 	WoundCost = 25
 	Cooldown = -1
 	DamageMult = 75
-	StrOffense = 0
-	ForOffense = 1
+	StrScaling = 0
+	ForScaling = 1
 	Area = "Circle"
 	Distance = 10
 	TurfErupt = 2

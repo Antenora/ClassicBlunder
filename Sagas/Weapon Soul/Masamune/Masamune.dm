@@ -10,7 +10,7 @@ obj/Skills/AutoHit/Divine_Cleansing
 	NeedsSword = 1
 	Area="Circle"
 	Slow=0.5
-	StrOffense=1
+	StrScaling=1
 	HitSelf = TRUE
 	DamageMult=1//set in adjust code
 	Cleansing = 1//set in adjust code
@@ -85,7 +85,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 	Refined_Fate
 		ForMult=1.2
 		StrMult=1.2
-		passives = list("BulletKill" = 1, "Instinct" = 1, "Siphon" = 1)
+		passives = list("BulletKill" = 1)
 	Weapon_Soul_Hunt
 		IconLock='SweatDrop.dmi'
 		IconApart=1

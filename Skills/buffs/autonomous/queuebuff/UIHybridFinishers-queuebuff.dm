@@ -7,7 +7,7 @@
 		OffMult = 1.15
 		DefMult = 1.1
 		SpdMult = 1.25
-		passives = list("Parry" = 2, "Deflection" = 2, "CounterMaster" = 2, "Momentum" = 2, "Flow" = 2, "LikeWater" = 2, "Duelist" = 1, "TensionLock" = 1)
+		passives = list("Parry" = 2, "Deflection" = 2, "CounterMaster" = 2, "Momentum" = 2, "Duelist" = 1, "TensionLock" = 1)
 		ActiveMessage = "moves in harmony with their sword, beyond thought."
 		OffMessage = "releases their focused awareness."
 
@@ -18,7 +18,7 @@
 		EndMult = 1.2
 		DefMult = 1.15
 		SpdMult = 1.15
-		passives = list("LikeWater" = 2, "Momentum" = 2, "Reversal" = 2, "CounterMaster" = 1, "Grippy" = 1, "Flow" = 2, "TensionLock" = 1)
+		passives = list("Momentum" = 2, "Reversal" = 2, "CounterMaster" = 1, "Grippy" = 1, "TensionLock" = 1)
 		ActiveMessage = "moves with seamless instinct, every motion flowing into the next."
 		OffMessage = "lets the rhythm of combat fade from their senses."
 
@@ -29,7 +29,7 @@
 		OffMult = 1.2
 		SpdMult = 1.15
 		DefMult = 1.1
-		passives = list( "Amplify" = 1.5, "LikeWater" = 2, "Flow" = 2,  "Momentum" = 1, "TensionLock" = 1)
+		passives = list( "Amplify" = 1.5, "Momentum" = 1, "TensionLock" = 1)
 		ActiveMessage = "enters a prismatic trance, channeling balanced elemental instinct!"
 		OffMessage = "lets the mirrored lights fade into stillness."
 
@@ -40,7 +40,7 @@
 		SpdMult = 1.15
 		DefMult = 1.15
 		EndMult = 1.1
-		passives = list("Flow" = 2, "LikeWater" = 2,  "Momentum" = 2, "Interception" = 2, "CounterMaster" = 2, "Deflection" = 1, "Reversal" = 1, "TensionLock" = 1)
+		passives = list("Momentum" = 2, "Interception" = 2, "CounterMaster" = 2, "Deflection" = 1, "Reversal" = 1, "TensionLock" = 1)
 		ActiveMessage = "enters total stillness - every strike guided by perfect awareness."
 		OffMessage = "lets go of their centered calm."
 
@@ -64,7 +64,7 @@
 		DefMult = 0.9
 		EndMult = 0.9
 		SpdMult = 0.85
-		passives = list("Instinct" = -2, "NoDodge" = 1, "Momentum" = -1)
+		passives = list("NoDodge" = 1, "Momentum" = -1)
 		ActiveMessage = "loses their footing and composure!"
 		OffMessage = "regains their stance."
 
@@ -86,6 +86,6 @@
 		SpdMult = 0.9
 		OffMult = 0.9
 		DefMult = 0.9
-		passives = list("Flow" = -1)
+		passives = list()
 		ActiveMessage = "stumbles as their fighting rhythm falters!"
 		OffMessage = "regains their composure."

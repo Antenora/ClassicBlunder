@@ -29,3 +29,14 @@
             if(Health <= 5) // hasnt been used and they r obligated to get their shit
             // might make this too easy a mechanic
                 DefianceCounter = 10
+
+//saiyan defiance comeback trigger
+/strikeHook/defianceComeback
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if(defender.Health<=defender.AngerPoint*(1-attacker.HealthCut)&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
+			if(defender.Anger)
+				defender.DefianceCalcs(val, attacker)

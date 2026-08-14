@@ -653,7 +653,7 @@
 
 /obj/Skills/AutoHit/Charged_Lightning_Kicks
 	Area = "Arc"
-	StrOffense = 1
+	StrScaling = 1
 	DamageMult = 2.75
 	Rush = 5
 	ControlledRush = 1

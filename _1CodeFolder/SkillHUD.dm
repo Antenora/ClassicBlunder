@@ -103,7 +103,7 @@
 		on_cd = FALSE
 		anim_key = 0
 		if(S)
-			var/icon/I = icon(SkillMenuIcon(S))
+			var/icon/I = icon(SkillMenuIcon(S), SkillMenuIconState(S))
 			I.Scale(SLOT_ICON_SZ, SLOT_ICON_SZ)
 			iconpart.icon = I
 		else

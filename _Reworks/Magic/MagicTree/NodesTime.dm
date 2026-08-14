@@ -33,7 +33,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_12_X;
         yLoc = TIME_NODE_12_Y;
         nodeType = "Mage Passive"
-        grantsMagePassives = list(/mage_passive/time/Past)
+        grantsMagePassives = list()
         unlocksNodes = list(TIME_NODE_11, TIME_NODE_33);
     
     time_node_13
@@ -49,7 +49,7 @@ magic_node/time_tree
         xLoc = TIME_NODE_14_X;
         yLoc = TIME_NODE_14_Y;
         nodeType = "Mage Passive"
-        grantsMagePassives = list(/mage_passive/time/Past)
+        grantsMagePassives = list()
         unlocksNodes = list(TIME_NODE_13, TIME_NODE_22);
     
     time_node_21

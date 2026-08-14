@@ -1,5 +1,5 @@
 obj/Skills/Grapple
-	canBeShortcut = 1;
+	StrScaling=1
 	var
 		removeAfter = FALSE
 
@@ -7,11 +7,6 @@ obj/Skills/Grapple
 		DamageMult=1
 		MultiHit=1//hit multiple times durr
 		EnergyDamage=0//do damage to energy+fatigue and heal self mana
-		GrabMaster=1
-
-		StrRate=1
-		ForRate=0
-		EndRate=1
 
 		UnarmedOnly=1
 		SpecialAttack=0//staves n shiet
@@ -40,12 +35,12 @@ obj/Skills/Grapple
 			description += "DamageMult: [DamageMult]\n"
 		if(MultiHit)
 			description += "Hits [MultiHit] times.\n"
-		if(StrRate)
-			description += "Strength Damage %: [StrRate*100]\n"
-		if(ForRate)
-			description += "Force Damage %: [ForRate*25]\n"
-		if(EndRate<1)
-			description += "Endurance Ignoring: [1-EndRate]%\n"
+		if(StrScaling)
+			description += "Strength Damage %: [StrScaling*100]\n"
+		if(ForScaling)
+			description += "Force Damage %: [ForScaling*25]\n"
+		if(EndEffectiveness<1)
+			description += "Endurance Ignoring: [1-EndEffectiveness]%\n"
 		if(UnarmedOnly)
 			description += "Unarmed Only.\n"
 		if(Reversal)
@@ -69,7 +64,7 @@ obj/Skills/Grapple
 			Effect = initial(Effect)
 			EffectMult = initial(EffectMult)
 			DamageMult = initial(DamageMult)
-			StrRate = initial(StrRate)
+			StrScaling = initial(StrScaling)
 			ThrowMult = initial(ThrowMult)
 			ThrowAdd = initial(ThrowAdd)
 			ThrowSpeed = initial(ThrowSpeed)
@@ -97,7 +92,7 @@ obj/Skills/Grapple
 					var/secretLevel = usr.getSecretLevel()
 					DamageMult = (6 + secretLevel) * (1 + usr.secretDatum:getBloodPowerRatio())
 					Cooldown = 20
-					StrRate = 0.8 * (1 + usr.secretDatum:getBloodPowerRatio())
+					StrScaling = 0.8 * (1 + usr.secretDatum:getBloodPowerRatio())
 					var/boon = 0// check to see if in wassail or in rotschreck
 					if(usr.CheckSlotless("Wassail"))
 						boon = 1
@@ -138,7 +133,7 @@ obj/Skills/Grapple
 
 	Muscle_Buster
 		DamageMult = 2
-		StrRate = 1.5
+		StrScaling = 1.5
 		EffectMult=3
 		OneAndDone=1
 		HarderTheyFall = 2
@@ -147,7 +142,7 @@ obj/Skills/Grapple
 
 	Giant_Swing
 		DamageMult = 4
-		StrRate = 1.25
+		StrScaling = 1.25
 		EffectMult=2
 		OneAndDone=1
 		Effect="MuscleBuster"
@@ -156,8 +151,8 @@ obj/Skills/Grapple
 
 	Heavenly_Potemkin_Buster
 		DamageMult = T2_DMG_MULT / 2;
-		StrRate=1
-		EndRate=0.75
+		StrScaling=1
+		EndEffectiveness=0.75
 		OneAndDone = 1
 		EffectMult=3
 		HarderTheyFall = 4
@@ -166,16 +161,16 @@ obj/Skills/Grapple
 	Tombstone_Piledriver
 		DamageMult = T3_DMG_MULT/2;
 		HarderTheyFall = 6
-		StrRate=1.5
-		EndRate=0.75
+		StrScaling=1.5
+		EndEffectiveness=0.75
 		EffectMult=3
 		Effect="PotemkinBuster" //TODO: MAKE ANIMATION LATER
 		TriggerMessage = "is dropping the tombstone on"
 	Throw_Shit_At_The_Wall
 		DamageMult = 8
 		HarderTheyFall = 4
-		StrRate=1.5
-		EndRate=0.75
+		StrScaling=1.5
+		EndEffectiveness=0.75
 		EffectMult=3
 		Effect="MuscleBuster"
 		TriggerMessage = "aims and throws"
@@ -186,13 +181,13 @@ obj/Skills/Grapple
 		EffectMult=1.5
 		Effect="Lotus"
 		OneAndDone = 1
-		EndRate=0.75
-		StrRate=0.75
+		EndEffectiveness=0.75
+		StrScaling=0.75
 
 
 	Lotus_Drop
 		DamageMult=5
-		StrRate=1
+		StrScaling=1
 		TriggerMessage="spins into a vicious lotus drop to crack the skull of"
 		Effect="Lotus"
 		EffectMult=3
@@ -202,7 +197,7 @@ obj/Skills/Grapple
 		//Set from other queues
 	True_Lotus
 		DamageMult=8
-		StrRate=1
+		StrScaling=1
 		TriggerMessage="embraces the full power of their youth to spiral into a lotus drop to crack the skull of"
 		Effect="Lotus"
 		EffectMult=4
@@ -214,8 +209,8 @@ obj/Skills/Grapple
 		Reversal = 1
 		OneAndDone = 1
 		DamageMult = 2.5
-		StrRate = 1
-		EndRate = 0.9
+		StrScaling = 1
+		EndEffectiveness = 0.9
 		ThrowAdd = 2
 		ThrowMult = 1.25
 		ThrowSpeed = 1.25
@@ -227,8 +222,8 @@ obj/Skills/Grapple
 	Snake_Fang_Bites
 		MultiHit=2
 		DamageMult=2
-		StrRate=1
-		ForRate=4
+		StrScaling=1
+		ForScaling=4
 		ThrowAdd=5
 		TriggerMessage="drives two fang-hands into"
 		Effect="Strike"
@@ -236,8 +231,8 @@ obj/Skills/Grapple
 	Hammer_Crush
 		Stunner=3
 		DamageMult=4
-		StrRate=1
-		ForRate=0
+		StrScaling=1
+		ForScaling=0
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="presses down fiercely on"
@@ -245,8 +240,8 @@ obj/Skills/Grapple
 	Imperial_Disgust
 		Stunner=5
 		DamageMult=10
-		StrRate=1
-		ForRate=4
+		StrScaling=1
+		ForScaling=4
 		ThrowMult=0
 		ThrowAdd=10
 		TriggerMessage="casts all of their disgust upon"
@@ -260,7 +255,7 @@ obj/Skills/Grapple
 		SkillCost=TIER_3_COST
 		Copyable=3
 		DamageMult=2
-		StrRate=1
+		StrScaling=1
 		ThrowAdd=5
 		ThrowMult=1.5
 		TriggerMessage="violently throws"
@@ -275,7 +270,7 @@ obj/Skills/Grapple
 		DamageMult=7
 		Reversal=1
 		Stunner=2
-		StrRate=1
+		StrScaling=1
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="performs a judo throw on"
@@ -288,8 +283,8 @@ obj/Skills/Grapple
 		SkillCost=TIER_3_COST
 		Copyable=4
 		DamageMult=7
-		EndRate = 0.8
-		StrRate=1
+		EndEffectiveness = 0.8
+		StrScaling=1
 		ThrowAdd=0
 		ThrowMult=0
 		TriggerMessage="goes on a short flight with"
@@ -308,7 +303,7 @@ obj/Skills/Grapple
 		AlwaysAnnounceCooldown = 1
 		DamageMult=5.5
 		Stunner=3
-		StrRate=1
+		StrScaling=1
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="suplexes"
@@ -326,7 +321,7 @@ obj/Skills/Grapple
 				EffectMult=0.5
 				Stunner=5
 				OneAndDone=1
-				StrRate=1
+				StrScaling=1
 				DamageMult = 2.5 + (p.Potential / 50)
 				EnergyDamage=0
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
@@ -335,7 +330,7 @@ obj/Skills/Grapple
 				EffectMult=0.5
 				Stunner=5
 				OneAndDone=1
-				StrRate=1
+				StrScaling=1
 				DamageMult = 2.5 + (p.Potential / 50)
 				EnergyDamage=1
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption))
@@ -344,7 +339,7 @@ obj/Skills/Grapple
 				EffectMult=0.5
 				Stunner=5
 				OneAndDone=1
-				StrRate=1
+				StrScaling=1
 				DamageMult = 2.5 + (p.Potential / 50)
 				EnergyDamage=0
 			else
@@ -352,7 +347,7 @@ obj/Skills/Grapple
 				DamageMult=5.5
 				EffectMult=1
 				Stunner=3
-				StrRate=1
+				StrScaling=1
 				EnergyDamage=0
 		verb/Suplex()
 			set category="Skills"
@@ -366,8 +361,8 @@ obj/Skills/Grapple
 		SkillCost=120
 		Copyable=4
 		DamageMult=5
-		ForRate=2
-		StrRate=0.5
+		ForScaling=2
+		StrScaling=0.5
 		TriggerMessage="shoves their burning red hand through"
 		Effect="Bang"
 		EffectMult=2
@@ -384,8 +379,8 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		DamageMult=12
-		StrRate=1
-		ForRate=0.5
+		StrScaling=1
+		ForScaling=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
 		Effect="Bang"
 		EffectMult=5
@@ -402,8 +397,8 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		DamageMult=12
-		ForRate=1
-		StrRate=0.5
+		ForScaling=1
+		StrScaling=0.5
 		TriggerMessage="fills their grasp with lightning and takes hold of"
 		Effect="Lightning"
 		EffectMult=5
@@ -420,8 +415,8 @@ obj/Skills/Grapple
 	Energy_Drain
 		DamageMult=0.75
 		EnergyDamage=2
-		ForRate=3
-		StrRate=0.25
+		ForScaling=3
+		StrScaling=0.25
 		TriggerMessage="drains energy from"
 		Effect="Drain"
 		EffectMult=1
@@ -438,7 +433,7 @@ obj/Skills/Grapple
 		Butterfly_Souffle
 			DamageMult=2
 			MultiHit=5
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=1
 			TriggerMessage="rips and tears into"
@@ -449,7 +444,7 @@ obj/Skills/Grapple
 			Copyable=3
 			SkillCost=120
 			DamageMult=4
-			StrRate=1.5
+			StrScaling=1.5
 			TriggerMessage="impales"
 			Effect="Strike"
 			EffectMult=2
@@ -460,7 +455,7 @@ obj/Skills/Grapple
 				src.Activate(usr)
 		Blade_Drive//run through pt 2
 			DamageMult=5
-			StrRate=1
+			StrScaling=1
 			ThrowMult=2
 			TriggerMessage="drives their weapon through the guts of"
 			Effect="Shockwave"
@@ -468,7 +463,7 @@ obj/Skills/Grapple
 			//set from other queues
 		Shank
 			DamageMult=1
-			StrRate=1
+			StrScaling=1
 			ThrowMult=3
 			ThrowAdd=1
 			Effect="Shockwave"
@@ -478,7 +473,7 @@ obj/Skills/Grapple
 			SkillCost=TIER_3_COST
 			DamageMult=1.1
 			MultiHit=8
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=0
 			TriggerMessage="eviscerates"
@@ -492,7 +487,7 @@ obj/Skills/Grapple
 			Copyable=4
 			SkillCost=TIER_3_COST
 			DamageMult=11
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=0
 			TriggerMessage="hacks their weapon cruelly into"
@@ -511,7 +506,7 @@ obj/Skills/Grapple
 		No_Worries
 			Copyable = 0
 			DamageMult=8
-			StrRate=1.5
+			StrScaling=1.5
 			Stunner=3
 			Effect="Shockwave"
 			EffectMult=1
@@ -521,7 +516,7 @@ obj/Skills/Grapple
 			Copyable = 0
 			NeedsSword = 1
 			DamageMult=8
-			StrRate=1.5
+			StrScaling=1.5
 			Stunner=4
 			EnergyDamage=1
 			Effect="DarkSuplex"
@@ -533,7 +528,7 @@ obj/Skills/Grapple
 			SkillCost=TIER_3_COST
 			DamageMult=10
 			Reversal=1
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=1
 			TriggerMessage="does a slashing flip to break free of"
@@ -550,9 +545,8 @@ obj/Skills/Grapple
 	proc
 		Activate(var/mob/User)
 			src.ThrowDir=User.dir
-			if(glob.DIRECTIONAL_TOSS)
-				var/hd = User.heldDir()
-				if(hd) src.ThrowDir = hd
+			var/hd = User.heldDir()
+			if(hd) src.ThrowDir = hd
 			if(src.Using)
 				return
 			if(User.HeldSkillBlocksAction(src))
@@ -615,25 +609,12 @@ obj/Skills/Grapple
 				var/mob/Trg=User.Grab
 				// Trg.isGrabbed = TRUE
 				User.Grab=null
-				var/dmgRoll = User.GetDamageMod()
-				#if DEBUG_GRAPPLE
-				User.log2text("Grapple dmg roll ", dmgRoll, "damageDebugs.txt", User.ckey)
-				#endif
-				// get their damage roll, they don't get to ignore it cause its a grapple
 				var/userPower = User.getPower(Trg)
-				var/statPower = 1
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
 				var/itemDmg = 1
-				if(src.StrRate)
-					if(src.ForRate)
-						statPower = User.getStatDmg2(unarmed = !NeedsSword, sword = NeedsSword, spirithand = ForRate) * StrRate
-					else
-						statPower = User.getStatDmg2(unarmed = !NeedsSword, sword = NeedsSword,) * StrRate
-				else
-					if(src.ForRate)
-						statPower += User.GetFor(src.ForRate,)
+				var/statPower = (StrScaling ? User.GetStr(StrScaling) : 0) + (ForScaling ? User.GetFor(ForScaling) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
 				if(HarderTheyFall)
 					var/enemyEnd = Trg.GetEnd(1)
 					statPower += enemyEnd * (HarderTheyFall/10)
@@ -654,10 +635,7 @@ obj/Skills/Grapple
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple Item Damage", itemDmg, "damageDebugs.txt", User.ckey)
 				#endif
-				var/endFactor = Trg.getEndStat(EndRate)
-				var/pride = User.HasPridefulRage();
-				if(pride) endFactor = clamp(Trg.getEndStat(1)/2, 1, Trg.getEndStat(1));
-				if(pride >= 2) endFactor = 1;
+				var/endFactor = Trg.getEndStat(1) * EndEffectiveness
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple End Factor", endFactor, "damageDebugs.txt", User.ckey)
 				#endif
@@ -666,12 +644,12 @@ obj/Skills/Grapple
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
-				Damage = (userPower**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.GRAPPLE_EFFECTIVNESS) ** -(endFactor**glob.DMG_END_EXPONENT / statPower**glob.DMG_STR_EXPONENT)
+				Damage = strikeCoreDamage(userPower, statPower, endFactor)
 
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 				#endif
-				Damage *= dmgRoll
+				Damage *= User.strikeJudgmentMult()
 				var/extra = User.passive_handler.Get("Muscle Power") / glob.MUSCLE_POWER_DIVISOR
 				Damage *= DamageMult
 				if(HarderTheyFall && Trg.BioArmor)
@@ -700,7 +678,15 @@ obj/Skills/Grapple
 						#if DEBUG_GRAPPLE
 						User.log2text("Before do damage Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 						#endif
-						User.DoDamage(Trg, Damage, src.UnarmedOnly, src.NeedsSword, SpiritAttack=src.SpecialAttack)
+						var/strike/S = new(User, Trg, Damage)
+						S.unarmed = src.UnarmedOnly
+						S.sword = src.NeedsSword
+						S.spirit = src.SpecialAttack
+						S.dmgTypes = buildSpecDmgTypes(src.HolyMod, src.Sanctify, src.AbyssMod, src.SlayerMod)
+						S.critEff = src.CritEffectiveness
+						S.blockEff = src.BlockEffectiveness
+						S.critBonus = src.CritChanceBonus
+						S.resolve()
 						if(DrainBlood)
 							User.secretDatum:gainBloodPower(Damage*src.DrainBlood)
 							User.vampireBlood.fillGauge(clamp(User.secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
@@ -772,7 +758,7 @@ obj/Skills/Grapple
 							Stomp(User, Trg, 2, EffectMult)
 					sleep(world.tick_lag)
 					Times--
-				User.Knockback((dmgRoll*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed)
+				User.Knockback((0.6*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed)
 				if(src.Stunner)
 					Stun(Trg, src.Stunner)
 					// sleep(5)//final effects

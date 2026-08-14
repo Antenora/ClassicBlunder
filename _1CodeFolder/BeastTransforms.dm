@@ -1,19 +1,6 @@
 #define OOZARU_POTENTIAL_TRANS 10
 
-/mob/var/tail_mastery = 1 // per 100 = 1 asc worth of resistance
 /mob/var/oozaru_type = null
-
-/mob/proc/tailResistanceTraining(probability)
-	if(tail_mastery / 100 > clamp(AscensionsAcquired, 1, 5))
-		return // maxed out
-	if(prob(probability))
-		if(prob(1))
-			tail_mastery += rand(2,4)
-		else
-			tail_mastery++
-	if(tail_mastery%100 == 0)
-		src << "You have learned to adjust to attacks towards your tail!"
-		src << "You have reached [tail_mastery/100] ascensions worth of resistance!"
 
 /obj/Skills/Buffs/SlotlessBuffs/Oozaru
 	var/Looking = 1
@@ -24,7 +11,7 @@
 	TransformX = -32
 	TransformY = -32
 	AuraLock = 'BLANK.dmi'
-	passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
+	passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 	StrMult = 1.3
 	ForMult = 1.2
 	SpdMult = 0.3
@@ -63,7 +50,7 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
-		passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
+		passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired
@@ -80,8 +67,6 @@
 				OffMult = 1.2
 				TimerLimit = 720
 			if("Instinctual")
-				passives["Flow"] = 1
-				passives["Instinct"] = 1
 				StrMult = 1.2
 				ForMult = 1.2
 				EndMult = 1.2
@@ -115,13 +100,9 @@
 			if(!altered)
 				IconTransform = 'SSJOozaru.dmi'
 			passives["Transformation Power"] = clamp(p.AscensionsAcquired * 6, 1, 40)
-			passives["Flow"] = 4
-			passives["Instinct"] = 4
 			passives["Juggernaut"] = 1 + (p.AscensionsAcquired / 2)
 			passives["DisableGodKi"] = 1
 			passives["Unstoppable"] = 1
-			passives["Deicide"] = 10
-			passives["EndlessNine"] = 0.25
 			passives["PUSpike"] = 50
 			passives["KiControl"] = 1
 			AngerFloor = 0

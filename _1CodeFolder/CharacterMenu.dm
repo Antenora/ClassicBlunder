@@ -176,7 +176,7 @@ client/proc/CMloc(dx, dy)
 	proc/SetBuff(obj/Skills/Buffs/b)
 		buff = b
 		if(b)
-			var/icon/I = icon(SkillMenuIcon(b))   
+			var/icon/I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
 			I.Scale(26, 26)
 			icon = I
 			buff_name = b.name
@@ -2212,8 +2212,8 @@ mob/proc/GetCharMenuData()
 	var/BaseDisplay = HasPowerReplacement() ? GetPowerReplacement() * PowerBoost * RPPower : potential_power_mult * PowerBoost * RPPower
 	var/PotPow = GetPowerReplacement() ? GetPowerReplacement() : potential_power_mult
 	var/denom = PowerBoost * RPPower * round(potential_power_mult, 0.05)
-	var/PDam = 1 + ((HasPureDamage() / 10) * glob.PURE_MODIFIER)
-	var/PRed = 1 + ((HasPureReduction() / 10) * glob.PURE_MODIFIER)
+	var/PDam = 1 + (HasPureDamage() / 10)
+	var/PRed = 1 + (HasPureReduction() / 10)
 	var/gk = (HasGodKi() && !passive_handler.Get("Utterly Powerless")) ? GetGodKi() : 0
 	var/mk = (HasMaouKi() && !passive_handler.Get("Utterly Powerless")) ? GetMaouKi() : 0
 	D["power"] = "[Power]"

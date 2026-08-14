@@ -38,7 +38,7 @@
 		Freezing=2
 		Slow=1
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1

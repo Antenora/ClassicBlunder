@@ -18,8 +18,8 @@ mob/proc/GetAssess()
 	var/MaouKiDisplay
 	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef())/6, 0.05)
 	var/EffectiveAnger=AngerCurveValue()
-	var/PDam=1+((src.HasPureDamage()/10)*glob.PURE_MODIFIER)
-	var/PRed=1+((src.HasPureReduction()/10)*glob.PURE_MODIFIER)
+	var/PDam=1+(src.HasPureDamage()/10)
+	var/PRed=1+(src.HasPureReduction()/10)
 	if(EffectiveAnger>1||src.Anger)
 		if(src.AngerMult>1)
 			var/ang=EffectiveAnger-1//Usable anger
@@ -294,14 +294,9 @@ mob/Players/Stat()
 				stat("World Item Damage", "[glob.GLOBAL_ITEM_DAMAGE_MULT]x")
 				stat("World Autohit Damage", "[glob.AUTOHIT_GLOBAL_DAMAGE]x")
 				stat("World Proj Damage", "[glob.PROJ_DAMAGE_MULT]x")
-				stat("DMG Effectiveness", "[glob.DMG_STR_EXPONENT]")
-				stat("DMG END Effectiveness", "[glob.DMG_END_EXPONENT]")
 				stat("Power in DMG effectiveness", "[glob.DMG_POWER_EXPONENT]")
-				stat("Melee Effectiveness", "[glob.MELEE_EFFECTIVENESS]x")
-				stat("Projectile Effectiveness", "[glob.PROJECTILE_EFFECTIVNESS]x")
-				stat("Grapple Effectiveness", "[glob.GRAPPLE_EFFECTIVNESS]x")
-				stat("AutoHit Effectiveness", "[glob.AUTOHIT_EFFECTIVNESS]x")
-				stat("Damage Rolls", "[glob.min_damage_roll],[glob.max_damage_roll]")
+				stat("Strike Damage Scale", "[glob.STRIKE_DAMAGE_SCALE]")
+				stat("Strike Mitigation K", "[glob.STRIKE_MITIGATION_K]")
 				stat("Intim Ratio", "[glob.INTIMRATIO]x")
 				stat("RPP Routine", "[Commas(glob.progress.RPPDaily)]")
 				stat("RPP Starting / RPP Starting Days", "[Commas(glob.progress.RPPStarting)] / [Commas(glob.progress.RPPStartingDays)]")
@@ -1013,9 +1008,6 @@ mob/proc/
 					if(ManaAmount<((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult()))
 						Recover("Mana",1)
 				Recover("Capacity",2)
-			else
-				if(!glob.ACTIVE_ENERGY_CHARGE)
-					Recover("Energy",0.5)	//legacy idle trickle, active charge replaces it
 
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
@@ -1143,7 +1135,7 @@ mob/proc/
 					src.LoseEnergy(2*PowerDrain*glob.WorldPUDrain)
 
 		//active energy channel
-		if(glob.ACTIVE_ENERGY_CHARGE && src.ChargingEnergy && !src.PureRPMode)
+		if(src.ChargingEnergy && !src.PureRPMode)
 			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
 				src.ChargeStop()
 			else
@@ -1395,8 +1387,6 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 	Ratio*=EPM
 
-	if(B.HasMythical())
-		Ratio*= 1 + (2*B.HasMythical())
 	if(B.HasHellPower())
 		Ratio*=(B.GetHellScaling() * 1500)
 	if(B.HasZenkaiPower())

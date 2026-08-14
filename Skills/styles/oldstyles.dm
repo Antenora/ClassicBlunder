@@ -6,7 +6,7 @@
 						StyleActive="Feral"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/FreeStyle/Blitz_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Spirit_Style",\
 						"/obj/Skills/Buffs/NuStyle/FreeStyle/Flow_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Yin_Yang_Style")
-						passives = list("Instinct" = 1)
+						passives = list()
 						Instinct=1
 						Finisher="/obj/Skills/Queue/Finisher/Berserker_Claw"
 						verb/Feral_Style()
@@ -19,8 +19,7 @@
 						StyleActive="Flow"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/FreeStyle/Breaker_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Soul_Crushing_Style",\
 						"/obj/Skills/Buffs/NuStyle/FreeStyle/Feral_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Yin_Yang_Style")
-						passives = list("Flow" = 1)
-						Flow=1
+						passives = list()
 						Finisher="/obj/Skills/Queue/Finisher/Evac_Toss"
 						verb/Flow_Style()
 							set hidden=1
@@ -59,7 +58,6 @@
 						StyleFor=1.5
 						StyleEnd=1.5
 						passives = list( "WeaponBreaker" = 1, "MovingCharge" = 1)
-						SpiritStrike=1
 						WeaponBreaker=1
 						MovingCharge=1
 						StyleActive="Soul Crushing"
@@ -90,7 +88,7 @@
 						StyleOff=1.25
 						StyleDef=1.25
 						StyleEnd=1.5
-						passives = list("Flow" = 0.5, "Instinct" = 0.5, "LikeWater" = 1, "CounterMaster" = 2)
+						passives = list("CounterMaster" = 2)
 						//adaptation passive
 						StyleActive="Balance"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/FreeStyle/Resonance_Style"="/obj/Skills/Buffs/NuStyle/FreeStyle/Metta_Sutra_Style",\
@@ -140,9 +138,8 @@
 						StyleFor=1.1
 						StyleEnd=1.4
 						StyleSpd=1.4
-						passives = list("WeaponBreaker" = 3, "Flow" = 1, "Instinct" = 1, "LikeWater" = 2, "Flicker" = 1, "Pursuer" = 1, "CounterMaster" = 4)
+						passives = list("WeaponBreaker" = 3, "Flicker" = 1, "Pursuer" = 1, "CounterMaster" = 4)
 						WeaponBreaker=3
-						Flow=2
 						Instinct=2
 						//adaptation
 						Flicker=1
@@ -160,8 +157,7 @@
 						NoStaff=0
 						StyleStr=1.5
 						StyleFor=1.5
-						passives = list("Flow" = 2, "Instinct" = 2, "BladeFisting" = 1)
-						Flow=2
+						passives = list("BladeFisting" = 1)
 						Instinct=2
 						//adaptation passive
 						//champloo's sord punching
@@ -181,9 +177,8 @@
 						NoStaff=0
 						StyleEnd=1.5
 						StyleSpd=1.5
-						passives = list("WeaponBreaker" = 4, "Flow" = 3, "Instinct" = 3, "Flicker" = 2, "Pursuer" = 2, "BladeFisting" = 1)
+						passives = list("WeaponBreaker" = 4, "Flicker" = 2, "Pursuer" = 2, "BladeFisting" = 1)
 						WeaponBreaker=4
-						Flow=3
 						Instinct=3
 						Flicker=2
 						Pursuer=2
@@ -205,7 +200,6 @@
 						StyleFor=1.25
 						StyleSpd=1.5
 						passives = list( "WeaponBreaker" = 2, "Flicker" = 2, "Pursuer" = 3, "SuperDash" = 2, "BladeFisting" = 1, "TechniqueMastery" = 2,  "MartialMagic" = 1, "MovingCharge" = 1)
-						HybridStrike=1
 						WeaponBreaker=3
 						Flicker=3
 						Pursuer=3

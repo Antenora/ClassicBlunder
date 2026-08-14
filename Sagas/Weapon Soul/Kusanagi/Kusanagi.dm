@@ -14,7 +14,7 @@ obj/Skills/AutoHit/Gale_Slash
 	NeedsSword = 1
 	Area="Circle"
 	Distance=2
-	StrOffense=1
+	StrScaling=1
 	DamageMult=2
 	ManaDrain = 2
 	Launcher=1

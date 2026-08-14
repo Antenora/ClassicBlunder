@@ -51,7 +51,7 @@
 	Cooldown = 120
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc, "Flow" = asc, "Instinct" = asc)
+		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc)
 		TimerLimit = 30 + (glob.racials.FEATHERDUR * asc)
 		Cooldown = 120 - ((glob.racials.FEATHERDUR*2) * asc)
 		EnergyDrain = 0.05 - (asc/100)
@@ -65,7 +65,7 @@
     Copyable=0
     NeedsSword=0
     Area="Arc"
-    StrOffense=1
+    StrScaling=1
     DamageMult=2
     Cooldown=5
     Distance=2

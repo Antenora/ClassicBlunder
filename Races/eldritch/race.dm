@@ -9,7 +9,7 @@ race
 		desc = "Distant thoughts, either a dream or a nightmare, made manifest within the soul of a living being. They are chaotic and unstable, only able to imitate mortal life and individuality."
 		visual = 'Eldritch.png'
 
-		passives = list("Void" = 1, "DebuffResistance"=0.2, "PureDamage"=1, "PureReduction"=1,  "Obfuscated Origin" = 1, "SpaceWalk"=1, "StaticWalk"=1, "Fishman"=1)
+		passives = list("Void" = 1, "PureDamage"=1, "PureReduction"=1,  "Obfuscated Origin" = 1, "SpaceWalk"=1, "StaticWalk"=1, "Fishman"=1)
 		locked = TRUE
 
 		power = 1
@@ -39,3 +39,22 @@ race
 				user.passive_handler.Increase("MovingCharge", 1);
 				user.AddSkill(new /obj/Skills/Utility/Offer_Pact);
 				user.AddSkill(new /obj/Skills/Utility/Revoke_Pact);
+
+//eldritch madness gain, both sides
+/strikeHook/eldritchMadnessGain
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if(attacker.hasSecret("Eldritch"))
+			if(!S.second)
+				var/SecretInformation/Eldritch/s = attacker.secretDatum
+				s.addMadness(attacker,val*(s.getMadnessLimit(attacker)/100))
+				attacker.Update_Stat_Labels()
+
+		if(defender.hasSecret("Eldritch"))
+			if(!S.second)
+				var/SecretInformation/Eldritch/s = defender.secretDatum
+				s.addMadness(defender,val*(s.getMadnessLimit(defender)/100))
+				defender.Update_Stat_Labels()

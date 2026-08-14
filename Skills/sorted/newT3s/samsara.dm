@@ -30,7 +30,7 @@
         OffMult=1.2
         DefMult=1.2
     Asura
-        passives = list("Conductor" = -25, "Momentum" = 2, "LikeWater" = 8, "Antsy" = -3)
+        passives = list("Conductor" = -25, "Momentum" = 2, "Antsy" = -3)
         offAdd = 0.25
         defAdd = 0.25
         spdAdd = 0.25
@@ -42,7 +42,7 @@
     Mansuya
         passives = list("Tenacity" = 3, "Persistence" = 3, "UnderDog" = 3)
     Deva
-        passives = list("Deicide" = 5, "Momentum" = 4, "UnarmedDamage" = 2, "Deflection" = 2, "Harden" = 5)
+        passives = list("Momentum" = 4, "UnarmedDamage" = 2, "Deflection" = 2, "Harden" = 5)
     Buddha
         passives = list("GodKi" = 0.5, "UnarmedDamage" = 5, "Deflection" = 5, "PureReduction" = -20, "NoDodge" = 1, "NoWhiff" = 1)
         TimerLimit = 60

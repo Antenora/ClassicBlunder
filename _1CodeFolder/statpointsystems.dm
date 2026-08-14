@@ -13,8 +13,7 @@ mob/proc/displayStats()
 		StatDisplay=src.statArchive.calc_stat(statArchive.vars[x])
 		InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[x])*glob.progress.STAT_PER_POINT)
 		var/TotalDisplay=StatDisplay+InvestedPoints
-		if(glob.progress.NEW_STAT_SCALING)
-			winset(src, "Finalize_Screen.[x]", "text=[TotalDisplay]")
+		winset(src, "Finalize_Screen.[x]", "text=[TotalDisplay]")
 
 
 /mob/proc/setAllStats()
@@ -49,10 +48,7 @@ mob/verb/Skill_Points(type as text,skill as text)
 		StatDisplay=src.statArchive.calc_stat(statArchive.vars[skill])
 		InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[skill])*glob.progress.STAT_PER_POINT)
 		TotalDisplay=StatDisplay+InvestedPoints
-		if(glob.progress.NEW_STAT_SCALING)
-			winset(src,"Finalize_Screen.[skill]","text=[TotalDisplay]")
-		else
-			winset(src,"Finalize_Screen.[skill]","text=[statArchive.calc_stat(statArchive.vars[skill])]")
+		winset(src,"Finalize_Screen.[skill]","text=[TotalDisplay]")
 		Points-=Increase
 		winset(src,"Finalize_Screen.Points Remaining","text=[Points]")
 	setAllStats()

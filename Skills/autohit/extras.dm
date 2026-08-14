@@ -2,9 +2,9 @@
     UnarmedOnly=1
     FlickAttack=1
     Area="Strike"
-    StrOffense=1
+    StrScaling=1
     DamageMult=1.5
-    EndDefense=0.75
+    EndEffectiveness=0.75
     Rush=1
     ControlledRush=1
     Knockback=0

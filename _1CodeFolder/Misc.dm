@@ -7,8 +7,8 @@ mob/Players/proc/ExamineInflol(mob/p)
 mob/Click()
 	if(usr.client.macros.IsPressed("Alt") && usr.Observing)
 		usr?:ExamineInflol(src)
-	if(glob.CANT_CLICK_INVS && !usr.Admin)
-		if((!glob.ADMIN_INVIS_ONLY && (src.invisibility >= usr)) || src.AdminInviso)
+	if(!usr.Admin)
+		if((src.invisibility >= usr) || src.AdminInviso)
 			return
 	if(src.HiddenInShadow && usr != src && !usr.Admin)
 		return

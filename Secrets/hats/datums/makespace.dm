@@ -25,7 +25,7 @@ spaceMaker
 		else if("Force" in s?:scalingValues)
 			return p.GetFor(s?:scalingValues["Force"][asc])
 		else if("Strength" in s?:scalingValues)
-			return p.GetFor(s?:scalingValues["Strength"][asc])
+			return p.GetStr(s?:scalingValues["Strength"][asc]) // copy-paste was returning Force
 		world.log << "[p] messed up dmg calc on [src]"
 		return 1
 

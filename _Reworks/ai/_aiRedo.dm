@@ -1,5 +1,5 @@
-#define AI_MOVE_SPEED 1 + ( 0.5 * sqrt(max(1,passive_handler.Get("Godspeed"))))
-#define AI_SPEED_TOTAL SpdMod + SpdAscension + SpdChaos * SpdMultTotal
+#define AI_MOVE_SPEED (1 + ( 0.5 * sqrt(max(1,passive_handler.Get("Godspeed")))))
+#define AI_SPEED_TOTAL (SpdMod + SpdAscension + SpdChaos * SpdMultTotal) // unparenthesized, Godspeed only multiplied the SpdChaos term
 
 mob/Player/AI/var/tmp/last_activity = 0
 mob/Player/AI/var/tmp/reaction_time = 2

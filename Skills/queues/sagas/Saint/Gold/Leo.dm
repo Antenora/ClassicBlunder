@@ -10,7 +10,6 @@ obj/Skills/Queue/Lightning_Plasma_Strike
 	Duration=5
 	PrecisionStrike=10
 	Cooldown=-1
-	HybridStrike=1
 	KBAdd=1
 	IconLock=1
 	HitSparkIcon='LightningPlasma.dmi'

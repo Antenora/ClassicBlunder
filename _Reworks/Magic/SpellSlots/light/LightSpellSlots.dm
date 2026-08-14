@@ -26,7 +26,7 @@
 		ElementalClass="Light"
 		DamageMult=8
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Instinct=1
 		Distance=15
 		ManaCost=5

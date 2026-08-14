@@ -653,7 +653,7 @@ proc
 		if(Size >= 3)
 			E.filters += filter(name="blast", type="radial_blur", size=0.12, offset=7)
 			var/bf = E.filters["blast"] //only the attached copy animates, not the filter() return
-			//PARALLEL is load-bearing, without it the next animate(E) queues behind the blur decay
+			//todo: make negative light actually work 
 			if(bf) animate(bf, size=0, time=2+Vanish, easing=SINE_EASING|EASE_OUT, flags=ANIMATION_PARALLEL)
 		if(FxBangIsDark(icon_override, color_override))
 			FxDarkPulse(A, 1 + Size * 0.8) //black art throws negative light, not a bright flash

@@ -145,10 +145,9 @@ obj
 						Copyable=0
 						StyleEnd=1.3
 						StyleDef=1.3
-						passives = list("CounterMaster" = 3, "SoftStyle" = 2, "FluidForm" = 1)
+						passives = list("CounterMaster" = 3, "SoftStyle" = 2)
 						CounterMaster=2
 						SoftStyle=2
-						FluidForm=1
 						StyleActive="Drunken Fist"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Golden_Kirin_Style"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/North_Star_Style")
 						Finisher="/obj/Skills/Queue/Finisher/Tetsuzankou"
@@ -170,10 +169,6 @@ obj
 						ManaCost=100
 						Mastery=4
 						AllOutAttack=1
-						adjust(mob/p)
-							if(p.SagaLevel>=5)
-								passives["Deicide"] = 10*(p.SagaLevel-4)
-								passives["EndlessNine"] = 0.15*(p.SagaLevel-4)
 						verb/Ansatsuken_Style()
 							set hidden=1
 							src.Trigger(usr)
@@ -238,7 +233,7 @@ obj
 						NoStaff=0
 						ArcaneBladework=1
 						TechniqueMastery=5
-						SpiritSword=0.75
+						SummonSwordVisual=0.75
 						WeaponBreaker=2
 						StyleActive="Arcane Bladework"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Battle_Mage_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/South_Star_Style")
@@ -300,7 +295,6 @@ obj
 						Crippling=5
 						NoForcedWhiff=1
 						DoubleStrike=2
-						TripleStrike=2
 						SweepingStrike=1
 						SlayerMod=2.5
 						StyleActive="Five Rings"
@@ -337,8 +331,6 @@ obj
 						TechniqueMastery=10
 						MartialMagic=1
 						DoubleStrike=1
-						TripleStrike=1
-						HybridStrike=1
 						NoSword=1
 						NoStaff=1
 						KiBlade=1
@@ -377,7 +369,7 @@ obj
 							StyleEnd = 1
 							StyleOff = 1
 							StyleActive="Critical Impact"
-							passives = list("AttackSpeed" = -2, "CriticalChance" = 15, "CriticalDamage" = 0.1, "HeavyHitter" = 1)
+							passives = list("AttackSpeed" = -2, "CriticalDamage" = 0.1, "HeavyHitter" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Fatal_Mode"
 							adjust(mob/p)
 								StyleStr = 1.2 + (0.1 * p.SagaLevel)
@@ -391,7 +383,7 @@ obj
 							StyleSpd = 1.5
 							StyleDef = 1.1
 							StyleActive="Spell Weaver"
-							passives = list( "QuickCast" = 3, "MovingCharge" = 1, "Siphon" = 2)
+							passives = list( "QuickCast" = 3, "MovingCharge" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Magic_Wish"
 							adjust(mob/p)
 								StyleFor = 1.1 + (0.1 * p.SagaLevel)
@@ -530,7 +522,7 @@ obj
 							StyleDef=1.25
 							StyleFor=1.5
 							StyleActive="Ghost Drive"
-							passives = list("LikeWater" = 1, "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1)
+							passives = list("Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1)
 							Afterimages=1
 							Finisher="/obj/Skills/Queue/Finisher/Ghost_Drive"
 							adjust(mob/p)
@@ -643,7 +635,7 @@ obj
 						StyleActive = "Witch"
 						ElementalOffense = "Felfire"
 						Finisher = "/obj/Skills/Queue/Finisher/Sundered_Sky"
-						passives = list("QuickCast" = 1, "Flow" = 0.5, "MartialMagic" = 1)
+						passives = list("QuickCast" = 1, "MartialMagic" = 1)
 						verb/Witch_Style()
 							set hidden=1
 							src.Trigger(usr)

@@ -4,7 +4,7 @@ mob/var/tmp
 	kb_start_time = 0		//fresh KB stamp, perfect-break window anchors here
 
 proc/ApplySplatStagger(mob/M, ds)
-	if(!glob.WALL_SPLAT || !M) return
+	if(!M) return
 	M.splat_stagger_until = world.time + ds
 	M.icon_state = "KB"
 	spawn(ds)
@@ -15,6 +15,5 @@ proc/ApplySplatStagger(mob/M, ds)
 mob/var/tmp/flourish_until = 0
 
 mob/proc/FlourishArm()
-	if(!glob.POSE_FLOURISH) return
 	flourish_until = world.time + glob.FLOURISH_WINDOW_DS
 	KenShockwave(src, Size = 0.2, Blend = 2, Time = 2)

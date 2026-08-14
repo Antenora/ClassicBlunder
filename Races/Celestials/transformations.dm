@@ -276,7 +276,7 @@ transformation
 					KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=ShockSize, Blend=2, Time=8)
 					ShockSize/=2
 		Celestial_Sin_Devil_Trigger
-			passives = list("Smokin' Sick Style!!!" = 1, "HellPower" = 1, "AbyssMod" = 6, "Scorching" = 6, "Poisoning" = 6, "DemonicInfusion" = 1, "CriticalChance" = 36, "CriticalDamage" = 0.6)
+			passives = list("Smokin' Sick Style!!!" = 1, "HellPower" = 1, "AbyssMod" = 6, "Scorching" = 6, "Poisoning" = 6, "DemonicInfusion" = 1, "CriticalDamage" = 0.96)
 			speedadd = 2.5
 			enduranceadd = 2.5
 			offenseadd = 2.5

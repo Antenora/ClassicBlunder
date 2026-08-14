@@ -4,7 +4,7 @@
 		Copyable=6
 		NeedsSword=1
 		Area="Arc"
-		StrOffense=1
+		StrScaling=1
 		DamageMult=2.5
 		ControlledRush=1
 		Rush=10
@@ -65,7 +65,6 @@ obj/Skills/Queue
 		Finisher=1
 		Dunker=4
 		Warp=15
-		Bolt=1
 		Stunner=5
 		NeedsSword=1
 		EnergyCost=4

@@ -11,7 +11,7 @@
 		Instinct=1
 		Slow=1
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -43,12 +43,12 @@
 		ManaDrain=0.01
 		SpdMult=1.2
 		Godspeed=1
-		passives=list("Godspeed" = 6,  "FluidForm" = 1, "Skimming" = 2)
+		passives=list("Godspeed" = 6, "Skimming" = 2)
 		ActiveMessage="accelerates through time!"
 		OffMessage="slows back to a normal pace..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("Godspeed" = 6,  "FluidForm" = 1, "Skimming" = 2)
+				passives=list("Godspeed" = 6, "Skimming" = 2)
 		verb/Haste()
 			set category="Skills"
 			adjust(usr)
@@ -71,11 +71,3 @@
 			adjust(usr)
 			src.Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/
-	Outrunning_the_Past
-		BuffName="Outrunning the Past"
-		passives = list("Godspeed" = 2)
-		TimerLimit=10;
-		AlwaysOn=1;
-		ActiveMessage="'s usage of time magic allows them to outpace the them of a second ago!"
-		OffMessage="falls back into sync with the timeline."

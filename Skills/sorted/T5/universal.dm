@@ -83,14 +83,13 @@
 	DistanceAround=6
 	DamageMult = 5
 	AdaptRate = 1
-	EndDefense = 0.75
+	EndEffectiveness = 0.75
 	Copyable=6
 	Cooldown = 360
 	ComboMaster = 1
 	GuardBreak = 1
 	NoLock = 1
 	NoAttackLock = 1
-	IconTime = 4
 //	TextColor="red"
 	var/ChantNumber=0
 	ActiveMessage = "starts chanting..."

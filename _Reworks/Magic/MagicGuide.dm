@@ -142,9 +142,9 @@ td{padding:3px 6px;border-bottom:1px solid #1a1a2e;font-size:9pt}
 <h2>Gestalt (Tier 3)</h2>
 <div class='bx'>
 <b>Style:</b> Str +90%, For +75%, Off +60%<br>
-Passives: Heavy Hitter, Scorching, Momentum, Brutalize, Martial Magic, Pure Damage<br><br>
+Passives: Heavy Hitter, Scorching, Momentum, Martial Magic, Pure Damage<br><br>
 <b>Buff:</b> For x1.4, Str x1.35, Off x1.3<br>
-Passives: Scorching, Momentum, Fire Herald, Brutalize, Critical Chance + Damage, Tenacity
+Passives: Scorching, Momentum, Fire Herald, Critical Chance + Damage, Tenacity
 </div>
 "}
 
@@ -262,7 +262,7 @@ Passives: Shocking, Afterimages, Thunder Herald, Blurring Strikes, Attack Speed,
 <h2>Gestalt (Tier 3)</h2>
 <div class='bx'>
 <b>Style:</b> End +90%, For +75%, Def +60%<br>
-Passives: Harden, Steady, Grit, Melee Resist, Tenacity, Pure Reduction<br><br>
+Passives: Harden, Grit, Melee Resist, Tenacity, Pure Reduction<br><br>
 <b>Buff:</b> For x1.4, End x1.35, Def x1.3<br>
 Passives: Shattering, Harden, Earth Herald, Grit, Juggernaut, Block Chance + Critical Block
 </div>
@@ -302,7 +302,7 @@ Passives: Shattering, Harden, Earth Herald, Grit, Juggernaut, Block Chance + Cri
 <h2>Gestalt (Tier 3)</h2>
 <div class='bx'>
 <b>Style:</b> End +90%, Spd +75%, Def +60%<br>
-Passives: Steady, Holy Mod, Buff Mastery, Grit, Fury<br><br>
+Passives: Holy Mod, Buff Mastery, Grit, Fury<br><br>
 <b>Buff:</b> Spd x1.4, End x1.35, Def x1.3<br>
 Passives: Life Generation, Buff Mastery, Restoration, Debuff Resistance, Angelic Infusion
 </div>
@@ -343,7 +343,7 @@ Passives: Life Generation, Buff Mastery, Restoration, Debuff Resistance, Angelic
 <h2>Gestalt (Tier 3)</h2>
 <div class='bx'>
 <b>Style:</b> For +90%, Str +75%, Off +60%<br>
-Passives: Killer Instinct, Critical Chance + Damage, Life Steal, Pressure, Momentum, Brutalize<br><br>
+Passives: Killer Instinct, Critical Chance + Damage, Life Steal, Pressure, Momentum<br><br>
 <b>Buff:</b> Str x1.4, For x1.35, Off x1.3<br>
 Passives: Killer Instinct, Pressure, Critical Chance + Damage, Life Steal, Demonic Infusion
 </div>
@@ -425,7 +425,7 @@ Passives: Technique Mastery, Debuff Duration Reduction, Blubber, Godspeed, Fluid
 <b>Style:</b> For +90%, Spd +75%, Off +60%<br>
 Passives: Warping, Super Dash, Flicker, Movement Mastery, Pressure, Unnerve<br><br>
 <b>Buff:</b> Spd x1.4, For x1.35, Off x1.3<br>
-Passives: Warping, Flicker, Siphon, PU Spike, Steady, Vortex
+Passives: Warping, Flicker, PU Spike
 </div>
 "}
 

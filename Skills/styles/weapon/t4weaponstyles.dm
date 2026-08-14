@@ -7,7 +7,7 @@
 		StyleSpd=1.5
 		StyleDef=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Jinzen_Senkei"
-		passives = list( "SwordAscension" = 6, "Sword Master" = 1, "LikeWater" = 6, "SweepingStrike" = 1, "DoubleStrike" = 3,  \
+		passives = list( "SwordAscension" = 6, "Sword Master" = 1, "SweepingStrike" = 1, "DoubleStrike" = 3,  \
 			 "Half-Sword" = 2, "Rage" = 1, "TripleStrike" = 1, "Iaijutsu" = 8, "Musoken" = 1, "Fury" = 3, "Momentum" = 3, "Harden" = 3, \
 			"Parry" = 3, "Disarm" = 2, "Deflection" = 2)
 		StyleActive="Way of the Kensei"
@@ -34,7 +34,7 @@
 		StyleEnd=1.25
 		StyleOff=1.25
 		StyleSpd=1.25
-		passives = list("Knight of the Empty Seat" = 1, "HybridStyle" = "MysticStyle", "CriticalChance" = 15, "CriticalDamage"= 0.15,   "SweepingStrike" = 1, \
+		passives = list("Knight of the Empty Seat" = 1, "HybridStyle" = "MysticStyle", "CriticalDamage"= 0.15,   "SweepingStrike" = 1, \
 			"MovingCharge"= 1, "TripleStrike" = 1, "DoubleStrike" = 2, "Momentum" = 2, "Parry" = 2, "Deflection" = 2,  "QuickCast" = 5, "ManaSteal" = 25, "ManaGeneration" = 5)
 		Finisher = "/obj/Skills/Queue/Finisher/Seiken_Gradalpha"
 		verb/Alpha_inForce()
@@ -56,12 +56,12 @@
 		StyleStr=2
 		StyleEnd=1.5
 		Finisher="/obj/Skills/Queue/Finisher/The_Blade_of_Chaos"
-		passives = list("DisableGodKi" = 1, "EndlessNine" = 0.25, "Deicide" = 10, "Rage" = 5, "Half-Sword" = 5,  "FavoredPrey" = "All", \
+		passives = list("DisableGodKi" = 1, "Rage" = 5, "Half-Sword" = 5,  "FavoredPrey" = "All", \
 			"Shearing" = 10, "Deflection" = 5, "Disarm" = 3,"Parry" = 5, "Momentum" = 5, \
 			"Secret Knives" = "GodSlayer", "Tossing" = 5,   "BladeFisting" = 1, "SlayerMod" = 3, "Extend" = 2)
 		// either throw swords at them, or runes, depending on icon_state do a different effect
 		adjust(mob/p)
-			passives = list("DisableGodKi" = 1, "EndlessNine" = 0.25, "Deicide" = 10, "Rage" = 5, "Half-Sword" = 5,  "FavoredPrey" = "All", \
+			passives = list("DisableGodKi" = 1, "Rage" = 5, "Half-Sword" = 5,  "FavoredPrey" = "All", \
 				"Shearing" = 10, "Deflection" = 5, "Disarm" = 3,"Parry" = 5, "Momentum" = 5, \
 				"Secret Knives" = "GodSlayer", "Tossing" = 5,   "BladeFisting" = 1, "SlayerMod" = 3, "Extend" = 2)
 		verb/War_God()
@@ -70,8 +70,8 @@
 			src.Trigger(usr)
 	Nebula_Blade
 		SignatureTechnique=4
-		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
-			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 4,   "Combustion" = 40, "Scorching" = 5)
+		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
+			"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 4,   "Combustion" = 40, "Scorching" = 5)
 		StyleSpd = 1.5
 		StyleFor = 1.75
 		StyleStr = 1.75
@@ -88,11 +88,11 @@
 		StyleFor = 1.75
 		StyleEnd = 1.75
 		ElementalOffense = "Chaos"
-		passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalChance" = 25, "CriticalDamage"= 0.15,   \
+		passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalDamage"= 0.15,   \
 					"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2, "BladeFisting"= 1, "Extend" = 1, "Gum Gum" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Hyper_Goner_Two"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalChance" = 25, "CriticalDamage"= 0.15,   \
+			passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalDamage"= 0.15,   \
 					"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2, "BladeFisting"= 1, "Extend" = 1, "Gum Gum" = 1)
 		verb/Hearts_Beating_As_One()
 			set hidden=1

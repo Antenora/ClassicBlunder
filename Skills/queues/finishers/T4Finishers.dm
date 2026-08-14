@@ -127,7 +127,7 @@
 		ComboMaster=1
 		Stunner=3
 		Size=4
-		StrOffense=1
+		StrScaling=1
 		GuardBreak=1
 		Rush=5
 		PullIn=2
@@ -144,8 +144,8 @@
 		Copyable=5
 		NeedsSword=1
 		Area="Wide Wave"
-		StrOffense=1
-		ForOffense=1
+		StrScaling=1
+		ForScaling=1
 		Distance=10
 		PassThrough=1
 		PreShockwave=1

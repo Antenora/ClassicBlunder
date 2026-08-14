@@ -28,7 +28,7 @@
 		StyleFor = 1.3
 		StyleSpd = 1.3
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Earth"
-		passives = list("SuperCharge" = 1,"Familiar" = 2,  "ThunderHerald" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.1, \
+		passives = list("SuperCharge" = 1,"Familiar" = 2,  "ThunderHerald" = 1, "CriticalDamage" = 0.1, \
 						"Godspeed" = 2, "AirBend" = 1.5, "Harden" = 2, "Burning" = 2, "Shattering" = 5, "Shocking" = 2, "Chilling" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Mega_Arm" // Super_mega_buster
 		StyleActive = "Plasma"
@@ -41,7 +41,7 @@
 		ElementalDefense = "Wind"
 		ElementalClass = list("Wind","Water")
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Water"
-		passives = list("IceAge" = 40, "Familiar" = 2, "ThunderHerald" = 1, "CriticalChance" = 25, "CriticalDamage" = 0.2,\
+		passives = list("IceAge" = 40, "Familiar" = 2, "ThunderHerald" = 1, "CriticalDamage" = 0.2,\
 						 "Harden" = 2,"Freezing" = 8,  "WaveDancer" = 1.5, "Godspeed" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Frostfist"
 		StyleActive = "Blizzard"

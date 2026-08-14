@@ -2,7 +2,7 @@
 	NeedsSword=1
 	Area="Arc"
 	Distance=7
-	StrOffense=1
+	StrScaling=1
 	DamageMult=1
 	RoundMovement=0
 	ComboMaster=1

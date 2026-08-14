@@ -83,8 +83,10 @@ proc
 			var/CelestialDebuffRate=1
 			if(Attacker.SenseUnlocked>5&&Attacker.SenseUnlocked>Attacker.SenseRobbed)
 				DebuffRate+=10*(Attacker.SenseUnlocked-5)
-			if(Defender.HasDebuffResistance())
-				DebuffRate/=1+Defender.GetDebuffResistance()
+			if(Attacker != Defender)
+				DebuffRate += Attacker.GetOff(glob.OFF_DEBUFF_PROC_RATE)
+			if(!Defender.HasDebuffReversal())
+				DebuffRate -= Defender.GetDef(glob.DEF_DEBUFF_PROC_RESIST_RATE)
 			if(DebuffRate<0)
 				DebuffRate=0
 
@@ -324,6 +326,8 @@ mob
 		AddBurn(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/fire/BurnMastery))
 				Value *= 2
 			if(Attacker && (Attacker == src ? !src.passive_handler.Get("BurningShot") : 1))
@@ -342,8 +346,8 @@ mob
 				if(!src.InfusionElement)
 					src.InfusionElement="Fire"
 				Value/=2
-			if(src.HasDebuffResistance() && !src.passive_handler.Get("BurningShot"))
-				Value/=1+src.GetDebuffResistance()
+			if(!src.passive_handler.Get("BurningShot"))
+				Value/=1+src.GetStatusResist()
 			Value *= getBurnResistValue()
 			Value = Value // this makes 100 impossible ?
 			src.Burn+=Value
@@ -389,8 +393,10 @@ mob
 		AddBleed(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
-			if(src.HasDebuffResistance())
-				Value /= 1 + src.GetDebuffResistance()
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetPhysResist()
 			Value = Value * (1 - (src.Bleed / glob.DEBUFF_STACK_RESISTANCE))
 			src.Bleed += Value
 			if(Value >= 1)
@@ -406,6 +412,8 @@ mob
 				return
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
 				Value *= 2
 			if(Attacker && Attacker.Attunement == "Water")
@@ -418,8 +426,7 @@ mob
 				if(!src.InfusionElement)
 					src.InfusionElement="Water"
 				Value/=2
-			if(src.HasDebuffResistance())
-				Value/=1+src.GetDebuffResistance()
+			Value/=1+src.GetStatusResist()
 			Value = Value*(1-(src.Slow/glob.DEBUFF_STACK_RESISTANCE))
 			Value *= getChillResistValue()
 			src.Slow+=Value
@@ -452,6 +459,8 @@ mob
 		AddShatter(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/earth/ShatterMastery))
 				Value *= 2
 			if(Attacker && Attacker.Attunement=="Earth")
@@ -464,8 +473,8 @@ mob
 				if(!src.InfusionElement)
 					src.InfusionElement="Earth"
 				Value/=2
-			if(src.HasDebuffResistance())
-				Value/=1+src.GetDebuffResistance()
+			Value/=1+src.GetStatusResist()
+			Value /= 1 + src.GetPhysResist()
 			Value *= getShatterResistValue()
 			Value = Value*(1-(src.Shatter/glob.DEBUFF_STACK_RESISTANCE))
 			src.Shatter+=Value
@@ -495,6 +504,8 @@ mob
 		AddShock(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/air/ShockMastery))
 				Value *= 2
 			if(Attacker && Attacker.Attunement=="Wind")
@@ -508,8 +519,7 @@ mob
 					src.InfusionElement="Wind"
 				Value/=2
 
-			if(src.HasDebuffResistance())
-				Value/=1+src.GetDebuffResistance()
+			Value/=1+src.GetStatusResist()
 			Value *= getShockResistValue()
 			Value = Value*(1-(src.Shock/glob.DEBUFF_STACK_RESISTANCE))
 			src.Shock+=Value
@@ -533,6 +543,9 @@ mob
 		AddPoison(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
 			// Devil Summoner Vile racial
 			if(Attacker && Attacker.demon_racial_vile_active)
 				Value *= Attacker.GetDemonVileMult()
@@ -575,6 +588,10 @@ mob
 		AddConfusing(var/Value, var/mob/Attacker=null)
 			if(src.Stasis)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetMentalResist()
 			src.Confused+=Value
 			if(src.Confused>100)
 				src.Confused=100
@@ -591,6 +608,10 @@ mob
 				return
 			if(src.Stasis)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetPhysResist()
 			Value *= getShearResistValue()
 			Value = Value*(1-(src.GetEffectiveShearForStackingEffects()/glob.DEBUFF_STACK_RESISTANCE))
 			src.Sheared+=Value
@@ -607,9 +628,12 @@ mob
 		AddCrippling(var/Value, var/mob/Attacker=null)
 			if(src.Stasis)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetPhysResist()
 
 			if(isRace(DRAGON) && Class == "Wind") Value /= 2
-			if(src.HasMythical() > 0.75) Value = Value*(1-(src.Crippled/glob.DEBUFF_STACK_RESISTANCE))
 			Value *= getCrippleResistValue()
 
 			src.Crippled+=Value
@@ -628,6 +652,10 @@ mob
 				return
 			if(world.time < src.AttractingCooldown)
 				return
+			if(m && m != src)
+				Value *= 1 + m.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetMentalResist()
 			src.Attracted+=Value
 			src.AttractedTo=m
 			if(src.Attracted>=100)
@@ -655,6 +683,10 @@ mob
 				return
 			if(src.DownToEarth)
 				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value /= 1 + src.GetStatusResist()
+			Value /= 1 + src.GetMentalResist()
 			src.Doomed+=Value
 			if(src.Doomed>=100)
 				if(src.passive_handler.Get("The Inkstone"))
@@ -715,7 +747,7 @@ mob
 				if(src.Shatter > glob.DEBUFF_STACK_MAX)
 					src.Shatter = glob.DEBUFF_STACK_MAX;
 
-				var/shatterReduction = max(0.1, (src.GetEnd(0.25)+src.GetDef(0.1))*(1+src.GetDebuffResistance()))
+				var/shatterReduction = max(0.1, (src.GetEnd(0.25)+src.GetDef(0.1))*(1+src.GetStatusResist()))
 				if(src.Sprayed) shatterReduction *= 2;
 				src.Shatter-= shatterReduction;
 
@@ -726,7 +758,7 @@ mob
 				if(src.Slow > glob.DEBUFF_STACK_MAX)
 					src.Slow = glob.DEBUFF_STACK_MAX;
 
-				var/slowReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetDebuffResistance()))
+				var/slowReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetStatusResist()))
 				if(src.Cooled) slowReduction *= 2;
 				if(passive_handler["Shirayuki"]) //Rukia Zanpakuto Shenanigans.
 					if(!src.CheckActive("Ki Control")) // Shirayuki Passive + Ki Control Active = Slow does not decay.
@@ -741,7 +773,7 @@ mob
 				if(src.Shock > glob.DEBUFF_STACK_MAX)
 					src.Shock = glob.DEBUFF_STACK_MAX;
 
-				var/shockReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetDebuffResistance()));
+				var/shockReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetStatusResist()));
 				if(src.Stabilized) shockReduction *= 2;
 				src.Shock-= shockReduction;
 
@@ -752,7 +784,7 @@ mob
 				if(src.Crippled > glob.DEBUFF_STACK_MAX)
 					src.Crippled = glob.DEBUFF_STACK_MAX;
 
-				var/cripReduction = max(0.1, (src.GetSpd(0.25)+src.GetDef(0.1))*(1+src.GetDebuffResistance()));
+				var/cripReduction = max(0.1, (src.GetSpd(0.25)+src.GetDef(0.1))*(1+src.GetStatusResist()));
 				if(src.Sprayed) cripReduction *= 2;
 				src.Crippled-= cripReduction;
 

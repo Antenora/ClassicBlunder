@@ -18,7 +18,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang
 	OffMult=1.3
 	DefMult = 1.3
 	EndMult=1.3
-	passives = list("DoubleStrike" = 2, "Flow" = 2, "Instinct" = 2)
+	passives = list("DoubleStrike" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s bountiful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their strange luster..."

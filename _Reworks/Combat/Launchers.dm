@@ -2,7 +2,7 @@
 /mob/var/tmp/LaunchImmune = FALSE
 /mob/var/tmp/launch_total = 0	//starting Launched value - height ratio anchors to it
 /proc/getLaunchLockOut(mob/player)
-	var/mod = 1 + (player.passive_handler.Get("Juggernaut") * 0.25) + (player.HasMythical() * 0.25)
+	var/mod = 1 + (player.passive_handler.Get("Juggernaut") * 0.25)
 	return glob.LAUNCH_LOCKOUT * mod
 
 /proc/applyLaunch(mob/target, time)

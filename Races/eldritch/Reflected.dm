@@ -77,7 +77,6 @@ mob/proc/applyWithYouInDarkness()
 	if(!passive_handler)
 		return
 	WithYouInDarkness = 1
-	passive_handler.Increase("DebuffResistance", 0.1)
 	passive_handler.Increase("PureReduction", 1)
 	passive_handler.Increase("Void", 1)
 
@@ -85,7 +84,6 @@ mob/proc/removeWithYouInDarkness()
 	if(!passive_handler)
 		return
 	WithYouInDarkness = 0
-	passive_handler.Decrease("DebuffResistance", 0.1)
 	passive_handler.Decrease("PureReduction", 1)
 	passive_handler.Decrease("Void", 1)
 
@@ -449,7 +447,6 @@ obj/Skills/Utility
 					continue
 				if(P.EldritchPacted && P.ReflectedPactOwner == caster.key && P.passive_handler)
 					affected.Add(P)
-					P.passive_handler.Increase("DebuffResistance", 0.2)
 					P.passive_handler.Increase("ManaGeneration", 3)
 					P << "You feel [caster]'s eldritch domain settle around you, bolstering your defenses."
 			if(caster.passive_handler)
@@ -460,7 +457,6 @@ obj/Skills/Utility
 			spawn(300)
 				for(var/mob/Players/P in affected)
 					if(P && P.passive_handler)
-						P.passive_handler.Decrease("DebuffResistance", 0.2)
 						P.passive_handler.Decrease("ManaGeneration", 3)
 				if(caster && caster.passive_handler)
 					caster.passive_handler.Decrease("PureReduction", 1)
@@ -844,8 +840,6 @@ obj/Skills/Utility
 					affected.Add(P)
 					P.passive_handler.Increase("PureDamage", 1)
 					P.passive_handler.Increase("PureReduction", 1)
-					P.passive_handler.Increase("DebuffResistance", 0.2)
-					P.passive_handler.Increase("CriticalChance", 5)
 					P << "You feel [caster]'s presence wash over you in a waking dream, bolstering your power."
 			if(affected.len < 1)
 				caster << "You have no pacted allies to reach."
@@ -858,8 +852,6 @@ obj/Skills/Utility
 					if(P && P.passive_handler)
 						P.passive_handler.Decrease("PureDamage", 1)
 						P.passive_handler.Decrease("PureReduction", 1)
-						P.passive_handler.Decrease("DebuffResistance", 0.2)
-						P.passive_handler.Decrease("CriticalChance", 5)
 				if(caster)
 					OMsg(caster, "The shared dream fades.")
 					caster << "Your projected essence returns to you."
@@ -932,7 +924,6 @@ obj/Skills/Utility
 					P.EndAscension += 0.5
 					P.passive_handler.Increase("PureDamage", 2)
 					P.passive_handler.Increase("PureReduction", 2)
-					P.passive_handler.Increase("DebuffResistance", 0.3)
 					P << "An overwhelming surge of eldritch power courses through your pact."
 			if(affected.len < 1)
 				caster << "You have no pacted allies to empower."
@@ -945,7 +936,6 @@ obj/Skills/Utility
 				caster.EndAscension += 0.5
 				caster.passive_handler.Increase("PureDamage", 2)
 				caster.passive_handler.Increase("PureReduction", 2)
-				caster.passive_handler.Increase("DebuffResistance", 0.3)
 			OMsg(caster, "[caster] invokes the Eldritch Covenant! Reality warps as pact energy surges to its apex!")
 			caster << "You invoke the Covenant. Every bond resonates at its peak."
 			spawn(600)
@@ -957,7 +947,6 @@ obj/Skills/Utility
 						P.EndAscension -= 0.5
 						P.passive_handler.Decrease("PureDamage", 2)
 						P.passive_handler.Decrease("PureReduction", 2)
-						P.passive_handler.Decrease("DebuffResistance", 0.3)
 				if(caster && caster.passive_handler)
 					caster.StrAscension -= 0.5
 					caster.ForAscension -= 0.5
@@ -965,7 +954,6 @@ obj/Skills/Utility
 					caster.EndAscension -= 0.5
 					caster.passive_handler.Decrease("PureDamage", 2)
 					caster.passive_handler.Decrease("PureReduction", 2)
-					caster.passive_handler.Decrease("DebuffResistance", 0.3)
 				if(caster)
 					OMsg(caster, "The Eldritch Covenant's power subsides.")
 					caster << "The Covenant ends. The bonds settle."

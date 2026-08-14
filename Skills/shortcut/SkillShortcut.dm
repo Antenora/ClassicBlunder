@@ -11,7 +11,7 @@ What shortcut do you want to set?"}
 
 //VARS
 /obj/Skills/var/
-    canBeShortcut=0;
+    canBeShortcut=1;
     fire_ident=null;
 /mob/var/
     shortcut/shortcuts
@@ -120,21 +120,8 @@ What shortcut do you want to set?"}
                 BeginHeldSkill(s)
             return;
         if(istype(s, /obj/Skills/Queue))
-            return SetQueue(s);
-        else if(istype(s, /obj/Skills/Projectile))
-            if(s.fire_ident && hascall(s, s.fire_ident))   
-                return call(s, s.fire_ident)()
-            return UseProjectile(s);
-        else if(istype(s, /obj/Skills/AutoHit))
-            if(s.fire_ident && hascall(s, s.fire_ident))
-                return call(s, s.fire_ident)()
-            return Activate(s);
-        else if(istype(s, /obj/Skills/Grapple))
-            if(s.fire_ident && hascall(s, s.fire_ident))
-                return call(s, s.fire_ident)()
-            var/obj/Skills/Grapple/g = s;
-            return g.Activate(src);
-        else if(istype(s, /obj/Skills/Buffs))
+            return s.Use(src);   // queues ignore fire_ident on purpose
+        if(istype(s, /obj/Skills/Buffs))
             var/ident = s.fire_ident
             if(!ident)
                 for(var/v in s.verbs)
@@ -143,6 +130,10 @@ What shortcut do you want to set?"}
                     break
             if(ident && hascall(s, ident))
                 return call(s, ident)()
+            return
+        if(s.fire_ident && hascall(s, s.fire_ident))
+            return call(s, s.fire_ident)()
+        return s.Use(src)
 
 //these are used to assign a shortcut
 /mob/proc/

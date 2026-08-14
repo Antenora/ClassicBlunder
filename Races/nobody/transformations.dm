@@ -16,7 +16,7 @@ transformation
 			defenseadd = 0.25
 			strengthadd = 0.25
 			forceadd = 0.25
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,   "PureDamage" = 1, "PureReduction" = 1,  "SaiyanPowerVoid" = 1, "ZenkaiPower" = 0.5)
+			passives = list("Flicker" = 1, "Pursuer" = 2,   "PureDamage" = 1, "PureReduction" = 1,  "SaiyanPowerVoid" = 1, "ZenkaiPower" = 0.5)
 			angerPoint = 75
 
 			adjust_transformation_visuals(mob/user)
@@ -50,7 +50,7 @@ transformation
 					defenseadd = 0.35 * asc
 					strengthadd = 0.35 * asc
 					forceadd = 0.35 * asc
-					passives = list("Instinct" = 1+(mdivP*12), "Flow" = 1+(mdivP*10), "Flicker" = 1+(mdivP*10), "Pursuer" = 2+(mdivP*10), "PureDamage" = 1+(2*asc), "PureReduction" = 1+(2*asc),  "SaiyanPowerVoid" = 1+(1.5*asc), "ZenkaiPower" = 0.5+(0.25*asc))
+					passives = list("Flicker" = 1+(mdivP*10), "Pursuer" = 2+(mdivP*10), "PureDamage" = 1+(2*asc), "PureReduction" = 1+(2*asc),  "SaiyanPowerVoid" = 1+(1.5*asc), "ZenkaiPower" = 0.5+(0.25*asc))
 
 			transform_animation(mob/user)
 				if(first_time && mastery<25)
@@ -96,7 +96,7 @@ transformation
 
 
 		spectral_tension // temp
-			passives = list("Instinct" = 1, "Flow" = 1, "Flicker" = 1, "Pursuer" = 2,   "PureDamage" = 1, "PureReduction" = 1)
+			passives = list("Flicker" = 1, "Pursuer" = 2,   "PureDamage" = 1, "PureReduction" = 1)
 			speedadd = 0.35
 			enduranceadd = 0.35
 			offenseadd = 0.35
@@ -128,7 +128,7 @@ transformation
 					defenseadd = 0.45 + (0.35 * asc)
 					strengthadd = 0.45 + (0.35 * asc)
 					forceadd = 0.45 + (0.35 * asc)
-					passives = list("Instinct" = 1+(mdivP*14), "Flow" = 1+(mdivP*11), "Flicker" = 1+(mdivP*11), "Pursuer" = 2+(mdivP*12), "PureDamage" = 1+(2.5*asc), "PureReduction" = 1+(2.5*asc))
+					passives = list("Flicker" = 1+(mdivP*11), "Pursuer" = 2+(mdivP*12), "PureDamage" = 1+(2.5*asc), "PureReduction" = 1+(2.5*asc))
 
 			transform_animation(mob/user)
 				var/ShockSize=5

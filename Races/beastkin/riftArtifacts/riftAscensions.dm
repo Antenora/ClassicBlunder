@@ -42,7 +42,7 @@
 /ascension/sub_ascension/beastkin/overreach
     endurance = 1;
     defense = 1;
-    passives = list("PureReduction" = 2,   "DebuffResistance" = 0.2)
+    passives = list("PureReduction" = 2)
 /ascension/sub_ascension/beastkin/matchless
     strength = 1;
     endurance = 1;
@@ -59,7 +59,7 @@
     strength = 0.75;
     endurance = 0.75;
     offense = 0.5;
-    passives = list("CriticalChance" = 10, "BlockChance"=10, "CriticalDamage"=0.15, "CriticalBlock"=0.15)
+    passives = list("CriticalDamage"=0.15, "CriticalBlock"=0.15)
 /ascension/sub_ascension/beastkin/felglass
     strength = 0.75;
     offense = 0.75;
@@ -85,7 +85,7 @@
     force = 0.5;
     offense = 0.5;
     defense = 1;
-    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Siphon" = 2, "Harden" = 2, "Persistence" = 1)
+    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Harden" = 2, "Persistence" = 1)
 
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)

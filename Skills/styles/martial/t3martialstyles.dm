@@ -25,9 +25,8 @@
         StyleSpd = 1.25
         StyleStr = 1.25
         StyleActive="Jeet Kune Do"
-        passives = list("LikeWater" = 4, "Fa Jin" = 3, "Interception" = 3, "Sunyata" = 3 , "Gum Gum" = 1,  \
-                        "Flow" = 2, "Instinct" = 2, "Momentum" = 1.5, "Harden" = 1.5,  "SoftStyle" = 1, \
-                        "FluidForm" = 1)
+        passives = list("Fa Jin" = 3, "Interception" = 3, "Sunyata" = 3 , "Gum Gum" = 1,  \
+                        "Momentum" = 1.5, "Harden" = 1.5,  "SoftStyle" = 1)
         Finisher="/obj/Skills/Queue/Finisher/Be_Water"
         verb/Jeet_Kune_Do()
             set hidden=1
@@ -47,8 +46,8 @@
 
     Flying_Thunder_God
         SignatureTechnique=3
-        passives = list( "Flying Thunder God" = 1,  "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
-        "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1,"Flow" = 3, "LikeWater"=3, "Godspeed" = 2, "Skimming" = 2)
+        passives = list( "Flying Thunder God" = 1,  "Fury" = 2.5, "Fa Jin" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
+        "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1, "Godspeed" = 2, "Skimming" = 2)
         // make it so every cooldown like iaido, also make the tracker appear on hud
         // make an animation for the tp
         StyleSpd = 1.5
@@ -56,8 +55,8 @@
         StyleActive="Flying Thunder God"
         Finisher="/obj/Skills/Queue/Finisher/Be_Water" //TODO: make a finisher here
         adjust(mob/p)
-            passives = list( "Flying Thunder God" = 1,  "Fury" = 2.5, "Fa Jin" = 2, "Instinct" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
-            "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1,"Flow" = 3, "LikeWater"=3, "Godspeed" = 2, "Skimming" = 2)
+            passives = list( "Flying Thunder God" = 1,  "Fury" = 2.5, "Fa Jin" = 2, "Secret Knives" = "FTG", "Tossing" = 2, \
+            "BladeFisting" = 1, "NeedsSword" = 0, "NoSword" = 1, "Godspeed" = 2, "Skimming" = 2)
         verb/Flying_Thunder_God()
             set hidden=1
             adjust(usr)

@@ -4,10 +4,6 @@ mob/proc/gainWeaponSoul()
 	src.SagaLevel=1
 	src.AddSkill(new/obj/Skills/Buffs/ActiveBuffs/Weapon_Soul)
 	var/list/openSwords = glob.WeaponSoulNames
-	if(!glob.infWeaponSoul)
-		openSwords = glob.getOpen("WeaponSoul")
-		if(openSwords.len<1)
-			glob.ResetSwords()
 	WeaponSoulType = input("Which sword resonates with your soul?") in openSwords
 	BoundLegend = WeaponSoulType
 	src << "[WeaponSoulType] manifests within your grip, peerless and refined..."
@@ -94,7 +90,6 @@ mob/tierUpSaga(Path)
 
 					if("Muramasa")
 						src << "The blade of assured Death whispers the arts of Death to you..."
-						passive_handler.Increase("CriticalChance", 5)
 						passive_handler.Increase("CriticalDamage", 0.2)
 						AddSkill(new/obj/Skills/AutoHit/Masterful_Death)
 
@@ -123,8 +118,6 @@ mob/tierUpSaga(Path)
 
 					if("Green Dragon Crescent Blade")
 						src << "The Green Dragon Crescent Blade unveils the secrets to an unstoppable rush..."
-						passive_handler.Increase("Flow", 2)
-						passive_handler.Increase("Instinct", 2)
 						AddSkill(new/obj/Skills/AutoHit/Crushing_Dragon_Strike)
 						AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Gong_Bu)
 						// SagaThreshold("Spd",2)
@@ -252,7 +245,6 @@ mob/tierUpSaga(Path)
 
 					if("Dainsleif")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif/dainsleif in src.Buffs)
-							dainsleif.passives["Instinct"] = 4
 							dainsleif.passives["Adrenaline"] = 1
 							dainsleif.passives["AbyssMod"] = 4
 							dainsleif.passives["SwordAscension"] = 1
@@ -260,7 +252,6 @@ mob/tierUpSaga(Path)
 					if("Caledfwlch")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch/caled in src.Buffs)
 							caled.passives["Xenobiology"] = 1
-							caled.passives["CriticalChance"] = 10
 							caled.passives["CriticalDamage"] = 0.5
 							caled.passives["Pursuer"] = 2
 
@@ -291,7 +282,6 @@ mob/tierUpSaga(Path)
 
 					if("Ryui Jingu Bang")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang/Ryui in src.Buffs)
-							Ryui.passives["FluidForm"] = 1
 							Ryui.passives["StunningStrike"] = 1
 
 					if("Green Dragon Crescent Blade")

@@ -32,8 +32,6 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			Using = 1
 		if(!Time && m)
 			if(!CooldownStatic)
-				if(glob.SPEED_COOLDOWN_MODE)
-					modify /= clamp(glob.SPEED_COOLDOWN_MIN, m.GetSpd()**glob.SPEED_COOLDOWN_EXPONENT, glob.SPEED_COOLDOWN_MAX)
 				if(m.HasTechniqueMastery())
 					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
 					if(TM < 0)
@@ -66,8 +64,6 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		var/was_fresh = !Time   // a passed Time = an RP-resume re-apply; only a FRESH cast (re)sets cooldown_full
 		if(!Time && src && m)
 			if(!src.CooldownStatic)
-				if(glob.SPEED_COOLDOWN_MODE)
-					modify /= clamp(glob.SPEED_COOLDOWN_MIN, m.GetSpd()**glob.SPEED_COOLDOWN_EXPONENT, glob.SPEED_COOLDOWN_MAX)
 				if(m.HasTechniqueMastery())
 					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
 					if(TM < 0)
@@ -86,7 +82,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			else
 				if(m.Hustling())
 					modify*=0.75
-			if(glob.SKILL_BRANCH_LOCK&&LockOut.len>0)
+			if(LockOut.len>0)
 				for(var/obj/Skills/otherSkills in m.Skills)
 					var/typeString = "[otherSkills.type]"
 					for(var/x in LockOut)
@@ -99,9 +95,6 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 							otherSkills.Using=1
 			if(src.SpellElement)
 				if(src.SpellElement == "Time")
-					if(m.hasMagePassive(/mage_passive/time/Past))
-						if(!m.CheckSlotless("Outrunning the Past"))
-							m.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Outrunning_the_Past);
 					if(m.hasMagePassive(/mage_passive/time/Present))
 						m.addTension(10, m.getTensionCap())
 				else if(src.SpellElement == "Space")
@@ -142,7 +135,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 				if(Time>=50 || forcemessage)
 					if(src in typesof(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff))
 						return
-					if(glob.SKILL_BRANCH_LOCK&&lockedoutSkills.len>0)
+					if(lockedoutSkills.len>0)
 						for(var/obj/Skills/ski in lockedoutSkills)
 							ski.Using=0
 					if(src.CooldownNote)
@@ -338,7 +331,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				//cd only once we're actually dashing - used to burn on dead presses
 				Z.Cooldown(1/Modifier)
 				//launch-break window check has to happen before the dash loop sleeps through it
-				var/perfect_launch = glob.PERFECT_BREAK && src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
+				var/perfect_launch = src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal, src))
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal)
@@ -525,7 +518,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(!src.Knockback)
 					return
 				if(src.Energy>EnergyMax/8)
-					var/perfect = glob.PERFECT_BREAK && src.kb_start_time && (world.time <= src.kb_start_time + glob.TIMING_WINDOW)
+					var/perfect = src.kb_start_time && (world.time <= src.kb_start_time + glob.TIMING_WINDOW)
 					src.OMessage(10,"[src] regained their footing!!","<font color=red>[src]([src.key]) used Aerial Recovery.")
 					RecoverImage(src)
 					src.AerialRecovery=1
@@ -1142,6 +1135,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					else
 						P.KeepBody=1
 						src.OMessage(10,"[src] gives [P]'s their body.","[src]([src.key]) gave [P]([P.key]) their body.")
+					Z.Cooldown()
 					break
 
 			if("GivePower")

@@ -43,6 +43,7 @@ obj
 				Copyable=2
 				ActiveMessage="punches with precisely articulated strikes to create whirlwind-like pull!"
 				name="Dempsey Roll"
+				MenuIcon="Dempsey Roll"
 				DamageMult=0.33
 				AccuracyMult = 1.15
 				Determinator=1

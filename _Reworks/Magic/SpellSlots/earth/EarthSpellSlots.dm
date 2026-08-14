@@ -11,7 +11,7 @@
 		Instinct=1
 		Crushing=3
 		SpecialAttack=1
-		StrOffense=1
+		StrScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1

@@ -13,7 +13,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	StrMult=1.3
 	OffMult=1.3
 	DefMult=1.3
-	passives = list(  "LikeWater" = 2, "Iaijutsu" = 2)
+	passives = list(  "Iaijutsu" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s warful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their warful luster..."
@@ -67,7 +67,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	Rush = 2
 	ControlledRush = 1
 	MortalBlow=1
-	StrOffense=1
+	StrScaling=1
 	DamageMult=12
 	Distance=1
 	Shattering = 30

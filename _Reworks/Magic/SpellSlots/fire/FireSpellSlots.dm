@@ -11,7 +11,7 @@
 		DamageMult=7.5
 		Scorching=2
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -42,7 +42,7 @@
 		ElementalClass="Fire"
 		DamageMult=6
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Scorching=1
 		Knockback=2
 		Instinct=1
@@ -87,7 +87,6 @@
 		ManaCost=4
 		Cooldown=45
 		Trail='Fireball.dmi'
-		TrailVariance = 32;
 		ActiveMessage="invokes: <font size=+1>DRAGON ARC!</font size>"
 		adjust(mob/p)
 			if(!altered)

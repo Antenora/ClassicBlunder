@@ -38,7 +38,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Saintlike_Behavior
 		StyleActive="Saintlike Behavior"
-		passives = list("HolyMod" = 1,"Instinct" = 2)
+		passives = list("HolyMod" = 1)
 		StyleStr=1.25
 		StyleEnd=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Heavenly_Judgement"
@@ -46,7 +46,6 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 			passives["HolyMod"] = 1 + (p.SagaLevel)
-			passives["Instinct"] = 1 + (p.SagaLevel)
 		verb/Saintlike_Behavior()
 			set hidden=1
 			adjust(usr)

@@ -87,9 +87,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"       = 1 + SL,
 			"MagicSword"     = 1,
-			
+
 			"Scorching"      = 1 + SL,
 			"Combustion"     = 50 + (SL * 5),
 			"SoulFire"       = 1 + SL
@@ -300,8 +299,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	Area="Target"
 	Distance=20
 	DamageMult=10
-	StrOffense=1
-	ForOffense=1
+	StrScaling=1
+	ForScaling=1
 	Scorching=20
 	Cooldown=0
 	WindUp=0
@@ -388,9 +387,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"         = 1 + SL,
 			"MagicSword"       = 1,
-			
+
 			"Scorching"        = 3 + SL,
 			"SoulFire"         = 3 + SL
 		)

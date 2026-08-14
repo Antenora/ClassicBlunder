@@ -3,8 +3,8 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	ManaCost=5
 	Cooldown = 3
 	NeedsSword=1
-	StrRate = 1
-	ForRate = 1
+	StrScaling = 1
+	ForScaling = 1
 	DamageMult = 5
 	AccMult = 1.2
 	Distance = 20
@@ -58,8 +58,8 @@ obj/Skills/Projectile/Getsuga_Jujisho
 	Cooldown = 120
 	ManaCost=20
 	NeedsSword=1
-	StrRate = 1
-	ForRate = 1
+	StrScaling = 1
+	ForScaling = 1
 	DamageMult = 25
 	AccMult = 1.3
 	Distance = 20

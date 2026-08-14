@@ -3,7 +3,7 @@
 		UnarmedOnly=1
 		FlickAttack=1
 		Area="Strike"
-		StrOffense=2
+		StrScaling=2
 		DamageMult=T3_DMG_MULT/2;
 		Stunner=3
 		Rush=3
@@ -26,7 +26,7 @@
 		Distance=15
 		Gravity=5
 		DamageMult = (T3_DMG_MULT*0.9);
-		StrOffense=1
+		StrScaling=1
 		ActiveMessage="cleaves through all protections in Defiance of the Gods!"
 		Area="Target"
 		GuardBreak=1
@@ -92,9 +92,9 @@
 		NoAttackLock=1
 		Distance=50
 		DamageMult= T3_DMG_MULT / 2;
-		StrOffense=1
-		ForOffense=1
-		EndDefense=1
+		StrScaling=1
+		ForScaling=1
+		EndEffectiveness=1
 		Cooldown=4
 		BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ruptured"
 	Atomic_Dismantling
@@ -112,7 +112,7 @@
 		HitSparkSize=5
 		HitSparkCount=2
 		HitSparkDispersion=1
-		ForOffense=1
+		ForScaling=1
 		SpecialAttack=1
 		ComboMaster=1
 		WindupMessage="invokes: <font size=+1>TEAR APART!</font size>"

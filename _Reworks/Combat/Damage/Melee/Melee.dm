@@ -28,7 +28,7 @@
 
 /mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0)
 	if(HeldSkillBlocksAction(null)) return
-	if(glob.AURASPELLONATTACK && !AttackQueue)
+	if(!AttackQueue)
 		for(var/a in SlotlessBuffs)
 			var/obj/Skills/Buffs/b = SlotlessBuffs[a]
 			if(istype(b, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura))
@@ -81,7 +81,6 @@
 	var/obj/Items/Enchantment/Staff/st = EquippedStaff()
 	var/acc = 1
 	var/damage = 0 // potential will form the basis of the damage, potential is constant, only some things boost it
-	var/dmgRoll = GetDamageMod() // damage mod is a random roll
 	var/delay = SpeedDelay()
 	// 				VARIABLES END			//
 
@@ -106,7 +105,6 @@
 				delay /= 10 //Rapid and Launcher attacks are 10x faster
 	#if DEBUG_MELEE
 	log2text("Damageroll", "Starting DamageRoll", "damageDebugs.txt", "[ckey]/[name]")
-	log2text("Damageroll", dmgRoll, "damageDebugs.txt", "[ckey]/[name]")
 	#endif
 	// 				EXTRA EFFECTS 			//
 
@@ -321,20 +319,14 @@
 				#endif
 				var/powerDif = Power / enemy.Power
 				if(glob.CLAMP_POWER)
-					if(!ignoresPowerClamp())
+					if(!ignoresPowerClamp(enemy))
 						powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
 
 				#if DEBUG_MELEE
 				log2text("powerDif", powerDif, "damageDebugs.txt", "[ckey]/[name]")
 				#endif
 				var/atk = getStatDmg2()
-				if(enemy.passive_handler.Get("Field of Destruction")||enemy.passive_handler.Get("The Immovable Object"))
-					if(HasHybridStrike())
-						atk/=clamp(sqrt(1+GetFor(GetHybridStrike())/30),1,3)
 				var/def = enemy.getEndStat(1)
-				var/brutalize = GetBrutalize()
-				if(brutalize)
-					def -= (def * clamp(brutalize, 0.01, 0.9)) // MOVE THIS TO A GET PROC SO IT CAN BE TRACKED
 				var/damageMultiplier = dmgmulti
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()
@@ -344,9 +336,6 @@
 				log2text("DamageMod", damage, "damageDebugs.txt", "[ckey]/[name]")
 				#endif
 
-				var/pride = HasPridefulRage();
-				if(pride) def = clamp(enemy.GetEnd()/2, 1, enemy.GetEnd())
-				if(pride >= 2) def = 1
 
 				#if DEBUG_MELEE
 				log2text("atk/def stats", "[atk]/[def]", "damageDebugs.txt", "[ckey]/[name]")
@@ -356,7 +345,7 @@
 				log2text("powerDif (After Intim)", powerDif, "damageDebugs.txt", "[ckey]/[name]")
 				#endif
 
-				damage = (powerDif**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.MELEE_EFFECTIVENESS) ** -(def**glob.DMG_END_EXPONENT / atk**glob.DMG_STR_EXPONENT)
+				damage = strikeCoreDamage(powerDif, atk, def)
 
 
 				#if DEBUG_MELEE
@@ -371,15 +360,10 @@
 				damage *= damageMultiplier
 		// 				GIANT FORM 				//
 				if(enemy.HasGiantForm())
-					var/modifier = glob.max_damage_roll / 6
-					dmgRoll = clamp(dmgRoll - modifier, glob.min_damage_roll, glob.max_damage_roll);
-					#if DEBUG_MELEE
-					log2text("Damageroll", "After GiantForm", "damageDebugs.txt", "[ckey]/[name]")
-					log2text("Damageroll", dmgRoll, "damageDebugs.txt", "[ckey]/[name]")
-					#endif
+					damage *= glob.GIANT_FORM_DMG_MULT
 		// 				GIANT FORM END			//
 
-				damage *= dmgRoll
+				damage *= strikeJudgmentMult()
 
 				#if DEBUG_MELEE
 				log2text("Damage", "After DamageRoll", "damageDebugs.txt", "[ckey]/[name]")
@@ -408,17 +392,6 @@
 
 		// 				QUEUE	 				//
 				var/knockDistance = 0
-				var/speedStrike = GetBlurringStrikes() //This is in the _Reworks/Passives folder
-				var/fenceBonus = UsingFencing()
-				if(fenceBonus || speedStrike)
-					var/totalStrike = speedStrike + fenceBonus
-					var/bsMult = clamp(sqrt(1+(GetSpd()*(totalStrike/15))),1,3)
-					if(speedStrike > 0 && enemy && enemy.passive_handler && enemy.passive_handler.Get("ApathyFactor") && enemy.isInHighTension() && enemy.Health >= 30)
-						var/fenceMult = fenceBonus > 0 ? clamp(sqrt(1+(GetSpd()*(fenceBonus/15))),1,3) : 1
-						enemy.applyApathyBonus(damage * (bsMult - fenceMult))
-						damage *= fenceMult
-					else
-						damage *= bsMult
 				if(AttackQueue)
 					damage *= QueuedDamage(enemy)
 					if(Secret=="Heavenly Restriction" && secretDatum?:hasImprovement("Queues"))
@@ -429,9 +402,7 @@
 					#endif
 					if(QueuedKBMult()<1 && !QueuedKBAdd())
 						NoKB=1
-					else
-						knockDistance *= QueuedKBMult()
-					knockDistance = QueuedKBAdd()
+					knockDistance += QueuedKBAdd()
 
 					if(AttackQueue.Ooze)
 /*						world << "[enemy.x] [enemy.y] [enemy.z]"
@@ -490,14 +461,8 @@
 					if(AttackQueue.Dunker)
 						DunkSlam(src, enemy)	//rise to them, hit lands mid-air, both slam down
 						sleep(3)
-				else if(glob.CC_PRORATION)
+				else
 					damage *= enemy.ccProrationMult(src)	//queued hits scale too, that's the point
-				else if(!AttackQueue && (enemy.Launched || enemy.Stunned) && !enemy.passive_handler.Get("Staggered!"))
-					damage *= glob.CCDamageModifier
-					#if DEBUG_MELEE
-					log2text("Damage", "After Stun", "damageDebugs.txt", "[ckey]/[name]")
-					log2text("Damage", damage, "damageDebugs.txt", "[ckey]/[name]")
-					#endif
 		// 				STATUS END				//
 
 		// 				HOT HUNDRED 			//
@@ -520,8 +485,7 @@
 						damage *= 0 + (0.25 * passive_handler["Speed Force"])
 					else
 						damage /= max(2,4-adjust)
-					if(glob.LIGHT_ATTACK_SPEED_DMG_ENABLED)
-						damage *= clamp(glob.LIGHT_ATTACK_SPEED_DMG_LOWER,GetSpd()**glob.LIGHT_ATTACK_SPEED_DMG_EXPONENT,glob.LIGHT_ATTACK_SPEED_DMG_UPPER)
+					damage *= clamp(GetSpd()**glob.LIGHT_ATTACK_SPEED_DMG_EXPONENT,glob.LIGHT_ATTACK_SPEED_DMG_LOWER,glob.LIGHT_ATTACK_SPEED_DMG_UPPER) // args were swapped - the 3x cap never applied
 					if(!adjust)
 						NoKB=1
 					if(SecondStrike || ThirdStrike || AsuraStrike)
@@ -537,7 +501,7 @@
 		// 				MELEE COUNTER 			//
 				countered = counterShit(enemy, IgnoreCounter)
 				//queue-counter: fresh queue reads the incoming queued swing and punishes it
-				if(glob.QUEUE_COUNTER && !countered && !IgnoreCounter && AttackQueue && enemy.AttackQueue && world.time <= enemy.queue_counter_until && !enemy.Stunned && !enemy.Launched)
+				if(!countered && !IgnoreCounter && AttackQueue && enemy.AttackQueue && world.time <= enemy.queue_counter_until && !enemy.Stunned && !enemy.Launched)
 					var/atkFin = istype(AttackQueue, /obj/Skills/Queue/Finisher)
 					var/defFin = istype(enemy.AttackQueue, /obj/Skills/Queue/Finisher)
 					if(!(atkFin && !defFin))	//a finisher punches through normal windows
@@ -561,7 +525,7 @@
 					hitResolution = HIT
 
 				//snapshot before the hit can cancel their beam/charge out
-				var/counterHit = glob.COUNTER_HIT && enemy.isCommitted()
+				var/counterHit = enemy.isCommitted()
 
 				if(!countered)
 					var/dodged = 0
@@ -570,63 +534,20 @@
 					// If it was not countered
 					if(hitResolution != MISS)
 						// and they hit in any way
-						if(!enemy.passive_handler.Get("NoDodge") && !enemy.IsGuarding())
-
-
-					// 				FLOW					//
-
-							if(enemy.HasFlow()&&!IgnoreCounter)
-
-								var/BASE_FLOW_PROB = glob.BASE_FLOW_PROB
-								var/flow = enemy.GetFlow()
-								var/instinct = HasInstinct()
-								var/result = 0
-
-								if(instinct)
-									result = flow - instinct
-								else
-									result = flow
-								var/backtrack = enemy.passive_handler.Get("BackTrack")
-								if(prob((BASE_FLOW_PROB*result) + glob.BASE_BACKTRACK_PROB * backtrack))
-									if(AttackQueue && AttackQueue.HitSparkIcon)
-										var/hitsparkSword = swordAtk
-										disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-										disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-								//		if(swordAtk && HasBladeFisting())
-								//			hitsparkSword = 0
-										HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
-									if(enemy.CheckSpecial("Ultra Instinct"))
-										//TODO play the ultra instinct sound
-										StunClear(enemy)
-										UltraPrediction(enemy)
-									else
-										StunClear(enemy)
-										WildSense(enemy, src, 0)
-									dodged = 1
-									if(enemy.CombatCPU)
-										enemy.LoseMana(1)
-					// 				FLOW END				//
 					// 				AIS			 			//
 						if(enemy.aisArmed()&&!dodged)
 							enemy.aisConsume()
 
-							var/instinct = HasInstinct()
-							if(glob.AIS_WINDOW || prob(100-(instinct*20)))
-								if(AttackQueue && AttackQueue.HitSparkIcon)
-									disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-									disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-									var/hitsparkSword = swordAtk
-								//	if(swordAtk && HasBladeFisting())
-								//		hitsparkSword = 0
-									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
-								StunClear(enemy)
-								AfterImageStrike(enemy,src,1)
-								dodged = 1
-							else
-
-								StunClear(enemy)
-								AfterImageStrike(enemy,src,0)
-								AfterImageStrike(src,enemy,0)
+							if(AttackQueue && AttackQueue.HitSparkIcon)
+								disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
+								disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
+								var/hitsparkSword = swordAtk
+							//	if(swordAtk && HasBladeFisting())
+							//		hitsparkSword = 0
+								HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
+							StunClear(enemy)
+							AfterImageStrike(enemy,src,1)
+							dodged = 1
 
 					// 				AIS END					//
 
@@ -637,24 +558,18 @@
 							if(enemy.aisArmed()&&!enemy.IsGuarding()&&!passive_handler.Get("NoDodge")&&!dodged&&!IgnoreCounter)
 								enemy.aisConsume()
 
-								var/instinct = HasInstinct()
-
-								if(glob.AIS_WINDOW || prob(100-(instinct*20)))
-									if(AttackQueue && AttackQueue.HitSparkIcon)
-										disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-										disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
-										var/hitsparkSword = swordAtk
-								//		if(swordAtk && HasBladeFisting())
-								//			hitsparkSword = 0
-										HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
-									enemy.dir = get_dir(enemy,src)
-									StunClear(enemy)
-									enemy.NextAttack=0
-									enemy.Melee1(1,1,SureKB=1)
-									dodged = 1
-								else
-									StunClear(enemy)
-									AfterImageStrike(src,enemy,0)
+								if(AttackQueue && AttackQueue.HitSparkIcon)
+									disperseX=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
+									disperseY=rand((-1)*AttackQueue.HitSparkDispersion, AttackQueue.HitSparkDispersion)
+									var/hitsparkSword = swordAtk
+							//		if(swordAtk && HasBladeFisting())
+							//			hitsparkSword = 0
+									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY)
+								enemy.dir = get_dir(enemy,src)
+								StunClear(enemy)
+								enemy.NextAttack=0
+								enemy.Melee1(1,1,SureKB=1)
+								dodged = 1
 					// 				NO DODGE END		//
 						if(AttackQueue && enemy.passive_handler.Get("Sunyata"))
 							if( prob(enemy.passive_handler.Get("Sunyata") * glob.SUNYATA_BASE_CHANCE))
@@ -663,8 +578,7 @@
 						if((AttackQueue && enemy.passive_handler["Interception"]) && !AttackQueue.Finisher)
 							if(prob(enemy.passive_handler["Interception"] * glob.INTERCEPTION_BASE_CHANCE))
 								OMsg(enemy, "<b><font color=#ff0000>[enemy] reverses [src]'s attack!</font></b>")
-								if(glob.INTERCEPTION_NEGATES_DAMAGE)
-									dodged = 1
+								dodged = 1
 								ClearQueue()
 								var/obj/Effects/Interception/p = new()
 								p.Target = enemy
@@ -674,8 +588,7 @@
 						if(!dodged)
 					// 				HIT					//
 
-							if(glob.CC_PRORATION)
-								enemy.ccCountHit()
+							enemy.ccCountHit()
 							var/damageSnapshot = damage
 							STRIKE
 							if(AttackQueue?.InstantStrikesPerformed)
@@ -698,7 +611,7 @@
 							log2text("Damage", "Start of Hit", "damageDebugs.txt", "[ckey]/[name]")
 							log2text("Damage", damage, "damageDebugs.txt", "[ckey]/[name]")
 							#endif
-							if(hitResolution == WHIFF || prob(glob.BASE_FLUIDFORM_PROB * enemy.HasFluidForm()))
+							if(hitResolution == WHIFF)
 								var/whiffed = TRUE
 								if(AttackQueue)
 									if(AttackQueue.NoWhiff)
@@ -716,26 +629,11 @@
 									#endif
 					// 				WHIFFING END				//
 
-							if(enemy.passive_handler.Get("Siphon"))
-								var/usingEnergy = HasSpiritHand() || HasSpiritSword() || HasHybridStrike() || UsingSpiritStrike() ? 1 : 0
-								if(usingEnergy && prob(10 * enemy.passive_handler.Get("Siphon")))
-									var/heal = damage * (enemy.passive_handler.Get("Siphon") / 10)
-									if(passive_handler.Get("Determination(Black)"))
-										heal *= 0.5
-									if(passive_handler.Get("Determination(White)"))
-										heal *= 0.15
-									//TODO TEST ENERGY SIPHON IT MIGHT BE WONKY
-									damage -= heal*0.15
-									enemy.HealEnergy(heal)
-									#if DEBUG_MELEE
-									log2text("Damage", "After Energy Siphon", "damageDebugs.txt", "[ckey]/[name]")
-									log2text("Damage", damage, "damageDebugs.txt", "[ckey]/[name]")
-									#endif
 							if(AttackQueue)
 							// 				ONHITS				//
-								if(AttackQueue.Scorching||AttackQueue.Chilling||AttackQueue.Freezing||AttackQueue.Crushing||AttackQueue.Shattering||AttackQueue.Shocking||AttackQueue.Paralyzing||AttackQueue.Poisoning||AttackQueue.Toxic)
+								if(AttackQueue.Burning||AttackQueue.Scorching||AttackQueue.Chilling||AttackQueue.Freezing||AttackQueue.Crushing||AttackQueue.Shattering||AttackQueue.Shocking||AttackQueue.Paralyzing||AttackQueue.Poisoning||AttackQueue.Toxic)
 									var/list/addElements = list()
-									if(AttackQueue.Scorching)
+									if(AttackQueue.Burning||AttackQueue.Scorching)
 										addElements |= "Fire"
 									else if(AttackQueue.Chilling||AttackQueue.Freezing)
 										addElements |= "Water"
@@ -745,7 +643,7 @@
 										addElements |= "Wind"
 									else if(AttackQueue.Poisoning||AttackQueue.Toxic)
 										addElements |= "Poison"
-									ElementalCheck(src, enemy, 0,, addElements)
+									ElementalCheck(src, enemy, 0, glob.DEBUFF_INTENSITY, addElements)
 
 								if(AttackQueue.Shearing)
 									enemy.AddShearing(AttackQueue.Shearing,src)
@@ -838,10 +736,20 @@
 								if(dist > 0)
 									damage *= 1 + (sniper * dist * 0.01)
 							// For Tetrakarn reflect
-							var/dmgValue = DoDamage(enemy, damage, unarmedAtk, swordAtk, SecondStrike, ThirdStrike, AsuraStrike, atkMeleePipe=1, atkSpellElem=(AttackQueue ? AttackQueue.SpellElement : null))
+							var/strike/S = new(src, enemy, damage)
+							S.unarmed = unarmedAtk
+							S.sword = swordAtk
+							S.second = SecondStrike
+							S.third = ThirdStrike
+							S.melee = 1
+							S.element = (AttackQueue ? AttackQueue.SpellElement : null)
+							if(AttackQueue)
+								S.dmgTypes = buildSpecDmgTypes(AttackQueue.HolyMod, AttackQueue.Sanctify, AttackQueue.AbyssMod, AttackQueue.SlayerMod)
+								S.critEff = AttackQueue.CritEffectiveness
+								S.blockEff = AttackQueue.BlockEffectiveness
+								S.critBonus = AttackQueue.CritChanceBonus
+							var/dmgValue = S.resolve()
 							. = dmgValue
-							if(!glob.MOMENTUM_PROCS_OFF_DAMAGE)
-								handlePostDamage(enemy) // it already proc'd
 							lastHit = world.time
 							if(istype(AttackQueue, /obj/Skills/Queue/Finisher))
 								enemy.AngerEvent(glob.ANGER_RUSH_FINISHER)
@@ -851,6 +759,8 @@
 					// 										MELEE END																	 //
 							var/shocked=0
 							if((SureKB || AttackQueue && QueuedKBAdd()) && !NoKB)
+								if(AttackQueue)
+									knockDistance *= QueuedKBMult()
 								knockDistance = round(knockDistance)
 								if(SureKB && knockDistance < max(SureKB, 5))
 									knockDistance = max(SureKB, 5)

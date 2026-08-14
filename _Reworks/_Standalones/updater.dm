@@ -185,13 +185,8 @@ update
 			if(p.Saga=="Hiten Mitsurugi-Ryuu")
 				if(p.SagaLevel>=2)
 					p.passive_handler.Decrease("SlayerMod", 1)
-					p.passive_handler.Increase("Flow", 1)
-					p.passive_handler.Increase("Instinct", 1)
 				if(p.SagaLevel>=3)
 					p.passive_handler.Decrease("SlayerMod", 1)
-					p.passive_handler.Decrease("Brutalize", 2)
-					p.passive_handler.Increase("Flow", 1)
-					p.passive_handler.Increase("Instinct", 1)
 	version9
 		version = 9;
 		updateMob(mob/p)
@@ -383,12 +378,10 @@ update
 							p.StrAscension += 0.5
 							p.ForAscension += 0.5
 							p.OffAscension += 0.25
-							p.passive_handler.Increase("SpiritHand", 1.5)
 						if(p.AscensionsAcquired >= 2)
 							p.StrAscension += 0.75
 							p.ForAscension += 0.75
 							p.OffAscension -= 0.25
-							p.passive_handler.Increase("SpiritHand", 1.5)
 					if("Water")
 						if(p.AscensionsAcquired >= 1)
 							p.StrAscension -= 0.25
@@ -560,30 +553,22 @@ update
 						p.passive_handler.Increase("PureReduction", 2);
 						p.passive_handler.Increase("PureDamage", 1);
 						p.passive_handler.Increase("Juggernaut", 1);
-						p.passive_handler.Decrease("BlockChance", 10);
 						p.passive_handler.Decrease("CriticalBlock", 0.1);
-						p.passive_handler.Decrease("CriticalChance", 5);
 						p.passive_handler.Decrease("CriticalDamage", 0.05);
 					if(p.AscensionsAcquired>=2)
 						p.passive_handler.Increase("PureReduction", 2);
 						p.passive_handler.Increase("PureDamage", 1);
 						p.passive_handler.Increase("Juggernaut", 1);
-						p.passive_handler.Decrease("BlockChance", 10);
 						p.passive_handler.Decrease("CriticalBlock", 0.1);
-						p.passive_handler.Decrease("CriticalChance", 5);
 						p.passive_handler.Decrease("CriticalDamage", 0.05);
 				if(p.Class == "Feather Knife")
 					if(p.AscensionsAcquired>=1)
 						p.passive_handler.Increase("PureDamage", 2);
 						p.passive_handler.Increase("PureReduction", 1);
-						p.passive_handler.Increase("BlurringStrikes", 1);
-						p.passive_handler.Decrease("CriticalChance", 25);
 						p.passive_handler.Decrease("CriticalDamage", 0.25);
 					if(p.AscensionsAcquired>=2)
 						p.passive_handler.Increase("PureDamage", 2);
 						p.passive_handler.Increase("PureReduction", 1);
-						p.passive_handler.Increase("BlurringStrikes", 1);
-						p.passive_handler.Decrease("CriticalChance", 10);
 						p.passive_handler.Decrease("CriticalDamage", 0.1);
 	version26
 		version = 26;
@@ -632,16 +617,6 @@ update
 		version = 28;
 		updateMob(mob/p)
 			. = ..()
-			if(p.isRace(HUMAN)&&p.Class=="Heroic")
-				if(p.AscensionsAcquired>=1)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
-				if(p.AscensionsAcquired>=2)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
-				if(p.AscensionsAcquired>=3)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
 	version29
 		version = 29;
 		updateMob(mob/p)
@@ -724,7 +699,6 @@ update
 						p.passive_handler.Increase("Steady", 1)
 					if(p.Class=="Zeal")
 						p.passive_handler.Increase("Adaptation", 0.5)
-						p.passive_handler.Increase("LikeWater", 0.5)
 					if(p.Class=="Honor")
 						p.passive_handler.Increase("PureReduction", 0.5)
 						p.passive_handler.Increase("Juggernaut", 1)
@@ -735,7 +709,6 @@ update
 						p.passive_handler.Increase("Steady", 1)
 					if(p.Class=="Zeal")
 						p.passive_handler.Increase("Adaptation", 0.5)
-						p.passive_handler.Increase("LikeWater", 0.5)
 					if(p.Class=="Honor")
 						p.passive_handler.Increase("PureReduction", 1)
 						p.passive_handler.Increase("Adrenaline", 1)

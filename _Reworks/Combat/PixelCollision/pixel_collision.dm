@@ -1,4 +1,4 @@
-//Pixel skill collision core. Live path only when glob.PIXEL_SKILL_COLLISION is on
+//Pixel skill collision core.
 //Hitbox data: per-skill Hitbox* overrides > BAKED_HITBOXES (hitbox_table.dm) > 32x32
 
 obj/Skills/Projectile/var/tmp

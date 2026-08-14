@@ -64,10 +64,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 	var/desp = clamp(passive_handler.Get("Persistence"), 0.1, glob.MAX_PERSISTENCE_CALCULATED)
 	if(prob(desp)*(glob.PERSISTENCE_CHANCE * 2)&&!src.HasInjuryImmune())
 		desp = clamp(desp, 1, glob.PRESISTENCE_DIVISOR_MAX)
-		if(glob.PERSISTENCE_NEGATES_DAMAGE)
-			src.WoundSelf(dmg/desp)//Take all damage as wounds
-		else
-			WoundSelf(dmg)
+		src.WoundSelf(dmg/desp)//Take all damage as wounds
 		dmg=0//but no health damage.
 	// anger will not reduce debuff damage
 	if(VaizardHealth)
@@ -117,7 +114,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Cooled)
 				base = 1.5
 			if(Burn>0)
-				var/reduction = base * (1+ (GetDebuffResistance() / 4))
+				var/reduction = base * (1+ (GetStatusResist() / 4))
 				// Reduce Erupting Blows stacks proportionally
 				if(src.SilentBurnAmount > 0)
 					var/silentFrac = min(1.0, src.SilentBurnAmount / Burn)
@@ -130,7 +127,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Antivenomed)
 				base = 1.25
 			if(Poison>0)
-				var/reduction = base * (1 + (GetDebuffResistance() / 4) + boon)
+				var/reduction = base * (1 + (GetStatusResist() / 4) + boon)
 				// Reduce silent stacks proportionally
 				if(src.SilentPoisonAmount > 0)
 					var/silentFrac = min(1.0, src.SilentPoisonAmount / Poison)
@@ -149,10 +146,10 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 						CpmApply(client)
 		if("Frenzy")
 			if(!IsDarkDragonPlayer()) return
-			var/reduction = base * (1 + (GetDebuffResistance() / 4))
+			var/reduction = base * (1 + (GetStatusResist() / 4))
 			if(Frenzy) Frenzy = clamp(Frenzy - (reduction/10), 0, 100);
 		if("Bleed")
-			var/reduction = base * (1 + (GetDebuffResistance() / 4));
+			var/reduction = base * (1 + (GetStatusResist() / 4));
 			if(Bleed) Bleed = clamp(Bleed - reduction, 0, 100);
 			if(KatenBleedLock) Bleed = max(KatenBleedLock, Bleed);
 

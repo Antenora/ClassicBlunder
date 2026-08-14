@@ -15,12 +15,12 @@
 			StyleStr = 1.9
 			StyleFor = 1.75
 			StyleOff = 1.6
-			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2,  "MartialMagic" = 1, "PureDamage" = 3, "CriticalChance" = 20, "CriticalDamage" = 0.2)
+			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2,  "MartialMagic" = 1, "PureDamage" = 3, "CriticalDamage" = 0.2)
 		else if(tier >= 2)
 			StyleStr = 1.4
 			StyleFor = 1.35
 			StyleOff = 1.3
-			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2,  "CriticalChance" = 10, "CriticalDamage" = 0.1)
+			passives = list("HeavyHitter" = 1, "Scorching" = 1, "Momentum" = 2,  "CriticalDamage" = 0.1)
 		else
 			StyleStr = 1.2
 			StyleFor = 1.15
@@ -45,17 +45,17 @@
 			StyleFor = 1.9
 			StyleEnd = 1.75
 			StyleDef = 1.6
-			passives = list("FluidForm" = 1, "Blubber" = 1, "LikeWater" = 4,  "MeleeResist" = 2)
+			passives = list("Blubber" = 1, "MeleeResist" = 2)
 		else if(tier >= 2)
 			StyleFor = 1.4
 			StyleEnd = 1.35
 			StyleDef = 1.3
-			passives = list("FluidForm" = 1, "Blubber" = 1, "LikeWater" = 2)
+			passives = list("Blubber" = 1)
 		else
 			StyleFor = 1.2
 			StyleEnd = 1.15
 			StyleDef = 1.1
-			passives = list("FluidForm" = 1, "Blubber" = 1)
+			passives = list("Blubber" = 1)
 	verb/Water_Gestalt()
 		set hidden = 1
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -165,17 +165,17 @@
 			StyleFor = 1.9
 			StyleStr = 1.75
 			StyleOff = 1.6
-			passives = list( "CriticalChance" = 20, "CriticalDamage" = 0.2, "LifeSteal" = 20,  "Momentum" = 2)
+			passives = list( "CriticalDamage" = 0.2, "LifeSteal" = 20,  "Momentum" = 2)
 		else if(tier >= 2)
 			StyleFor = 1.4
 			StyleStr = 1.35
 			StyleOff = 1.3
-			passives = list( "CriticalChance" = 20, "CriticalDamage" = 0.2, "LifeSteal" = 10)
+			passives = list( "CriticalDamage" = 0.2, "LifeSteal" = 10)
 		else
 			StyleFor = 1.2
 			StyleStr = 1.15
 			StyleOff = 1.1
-			passives = list( "CriticalChance" = 20, "CriticalDamage" = 0.2)
+			passives = list( "CriticalDamage" = 0.2)
 	verb/Dark_Gestalt()
 		set hidden = 1
 		if(usr.Saga && !usr.isRace(NOBODY) && !usr.isRace(DEMIFIEND))
@@ -195,12 +195,12 @@
 			StyleSpd = 1.9
 			StyleFor = 1.75
 			StyleDef = 1.6
-			passives = list("TechniqueMastery" = 5, "CounterMaster" = 1, "FluidForm" = 1, "Deflection" = 1, "Godspeed" = 3)
+			passives = list("TechniqueMastery" = 5, "CounterMaster" = 1, "Deflection" = 1, "Godspeed" = 3)
 		else if(tier >= 2)
 			StyleSpd = 1.4
 			StyleFor = 1.35
 			StyleDef = 1.3
-			passives = list("TechniqueMastery" = 3, "CounterMaster" = 1, "FluidForm" = 1, "Deflection" = 1)
+			passives = list("TechniqueMastery" = 3, "CounterMaster" = 1, "Deflection" = 1)
 		else
 			StyleSpd = 1.2
 			StyleFor = 1.15

@@ -8,7 +8,7 @@
 	// Corrupt = 1
 	CanBeBlocked=0
 	CanBeDodged=0
-	EndDefense = 0.0001
+	EndEffectiveness = 0.0001
 	Bang = 3
 	CorruptionCost = 25
 	Cooldown = -1
@@ -116,7 +116,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Magic/Corruption/Corrupt_Self
 	Cooldown = -1
 	passives = list("AfterImageSkin" = "Cooler")
-	scalingValues = list("LifeGeneration" = list(1,1,1.5,2,2,2.5), "DebuffResistance" = list(0.25,0.5,0.75,1,1,1), \
+	scalingValues = list("LifeGeneration" = list(1,1,1.5,2,2,2.5), \
 	"TechniqueMastery" = list(2,3,5,5,8), "Godspeed" = list(1,2,3,4,5), "Adrenaline" = list(1,2,2,3,3,3),  \
 	 "AfterImages" = list(3,4,4,4,4,4), "CorruptAffected" = list(1,1,1,1,1,1))
 	AngerFloor = 90
@@ -202,3 +202,13 @@
 			StrMult = 0.95
 			ForMult = 0.95
 			target.AddSlotlessBuff(src)
+
+//CorruptAffected debuff delegate
+/strikeHook/corruptAffectedDebuff
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		if(attacker.passive_handler.Get("CorruptAffected"))
+			if(attacker.demon)
+				attacker.demon.applyDebuffs(defender, attacker)

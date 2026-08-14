@@ -20,7 +20,7 @@
 		StyleNeeded="Two Heavens As One"
 		ManaGlow=rgb(255, 255, 255)
 		ManaGlowSize=2
-		passives = list("TensionLock" = 1,"CursedWounds" = 1, "PureDamage" = 5, "Instinct" = 4, "TechniqueMastery" = 3)
+		passives = list("TensionLock" = 1,"CursedWounds" = 1, "PureDamage" = 5, "TechniqueMastery" = 3)
 		HitSpark='Slash - Ragna.dmi'
 		HitX=-32
 		HitY=-32
@@ -40,7 +40,7 @@
 		IconLock='EyesSage.dmi'
 		IconLayer=4
 		IconApart=1
-		passives = list("Duelist" = 3, "Half-Sword" = 1,  "EndlessNine" = 0.25, "LifeGeneration" = 2, \
+		passives = list("Duelist" = 3, "Half-Sword" = 1,  "LifeGeneration" = 2, \
 		               "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1, "PureDamage"=2)
 		StrMult=1.5
 		EndMult=1.5
@@ -51,7 +51,7 @@
 	Justice_of_Hell
 		IconLock='SweatDrop.dmi'
 		IconApart=1
-		passives = list("PureReduction" = -2, "Flow" = -2, "PureDamage" = -2, "Godspeed" = -2)
+		passives = list("PureReduction" = -2, "PureDamage" = -2, "Godspeed" = -2)
 		CrippleAffected = 50
 		SlowAffected = 50
 
@@ -60,7 +60,7 @@
 		IconLock='Mist Veil.dmi'
 		IconApart=1
 		IconLayer=4
-		passives = list("Tossing" = 4, "Mortal Will" = 1, "MortalStacks" = 1, "BlockChance" = 33, "CriticalBlock" = 0.3 , "Secret Knives" = "Blade_Addition",  \
+		passives = list("Tossing" = 4, "Mortal Will" = 1, "MortalStacks" = 1, "CriticalBlock" = 0.3 , "Secret Knives" = "Blade_Addition",  \
 		"TensionLock" = 1) // not sure
 		StyleOff = 1.5
 		StyleStr = 1.25
@@ -84,11 +84,11 @@
 		EndMult=0.5
 		AngerMult=1.25
 		VaizardHealth=10
-		passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2, "Instinct" = 2, \
+		passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2, \
 		 "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5,  "PureReduction" = -2)
 	Radioactive
 		passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
-		"CriticalChance" = 20, "TensionLock" = 1)
+		"SureCrit" = 1, "TensionLock" = 1)
 		SpdMult=1.5
 		StrMult=1.25
 		EndMult=1.25

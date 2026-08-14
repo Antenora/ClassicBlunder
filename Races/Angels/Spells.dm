@@ -10,7 +10,7 @@
 	CooldownStatic = 1
 	Cooldown = 60
 	AngelMagicCompatible = 1
-	EndRate = 0.8
+	EndEffectiveness = 0.8
 	Distance = 20
 	DamageMult = 12
 	ManaCost = 5

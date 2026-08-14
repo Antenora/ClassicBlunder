@@ -36,7 +36,6 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 		var/SL = p.SagaLevel
 		passives = list(
 			"DoubleStrike"     = 1 + SL,
-			"CriticalChance"   = 5 + (5 * SL),
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"Flicker"          = 1 + SL,
 			"Pursuer"          = 1 + SL,
@@ -189,7 +188,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	HitSparkX=-32
 	HitSparkY=-32
 	ComboMaster = 1
-	StrOffense = 1
+	StrScaling = 1
 	Distance = 2
 	NoLock = 1
 	NoAttackLock = 1
@@ -607,7 +606,6 @@ var/global/list/BG_CONTRAST_HIGH = list(
 		var/SL = p.SagaLevel
 		passives = list(
 			"DoubleStrike"     = 3 + SL,
-			"CriticalChance"   = 5 + (5 * SL),
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"HardStyle"        = 3 + SL,
 			"DeathField"       = 3 + SL,
@@ -878,7 +876,7 @@ mob/proc/KatenClearWater()
 	Area = "Target"
 	DamageMult = 25
 	ComboMaster = 1
-	StrOffense = 1
+	StrScaling = 1
 	Executing = 1
 	Distance = 10
 	NoLock = 1

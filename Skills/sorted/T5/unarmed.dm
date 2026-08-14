@@ -6,8 +6,8 @@
 	DamageMult=12
 	HarderTheyFall=5
 	Crippling = 50
-	StrRate=2
-	ForRate=0
+	StrScaling=2
+	ForScaling=0
 	Effect="ShowStopper"
 	Cooldown=150
 	OneAndDone=1
@@ -22,7 +22,7 @@
 	SkillCost = TIER_5_COST
 	Copyable = 6
 	Area = "Around Target"
-	StrOffense = 2
+	StrScaling = 2
 	DamageMult = 20
 	Distance = 12
 	DistanceAround = 7

@@ -332,36 +332,27 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 	try
 		var/mob/O = S.Owner
 		if(!O || !enemy) return 1
-		var/str = S.StrRate ? O.GetStr(S.StrRate) : 0
-		var/force = S.ForRate ? O.GetFor(S.ForRate) : 0
+		var/str = S.StrScaling ? O.GetStr(S.StrScaling) : 0
+		var/force = S.ForScaling ? O.GetFor(S.ForScaling) : 0
 		if(S.AdaptRate)
 			if(O.GetStr(1) > O.GetFor(1))
 				str = O.GetStr(S.AdaptRate)
 			else
-				force = O.GetStr(S.AdaptRate)
+				force = O.GetFor(S.AdaptRate)
 		var/powerDif = O.Power / max(enemy.Power, 1)
-		if(glob.CLAMP_POWER && !O.ignoresPowerClamp())
+		if(glob.CLAMP_POWER && !O.ignoresPowerClamp(enemy))
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		var/EndRate = S.EndRate
+		var/EndEffectiveness = S.EndEffectiveness
 		if(O.isSuperCharged(O))
-			EndRate -= clamp(glob.SUPERCHARGERATE * O.passive_handler["SuperCharge"], 0, 1)
+			EndEffectiveness -= clamp(glob.SUPERCHARGERATE * O.passive_handler["SuperCharge"], 0, 1)
 		if(O.passive_handler["Atomizer"])
-			EndRate = clamp(EndRate - (EndRate * (O.passive_handler["Atomizer"] * glob.ATOMIZERRATE)), 0.0001, 2)
-		var/def = enemy.getEndStat(1) * EndRate
-		var/pride = O.HasPridefulRage()
-		if(pride) def = clamp(enemy.GetEnd(EndRate)/2, 1, enemy.GetEnd(EndRate))
-		if(pride >= 2) def = 1
+			EndEffectiveness = clamp(EndEffectiveness - (EndEffectiveness * (O.passive_handler["Atomizer"] * glob.ATOMIZERRATE)), 0.0001, 2)
+		var/def = enemy.getEndStat(1) * EndEffectiveness
 		var/atk = 0
 		if(force) atk += force
 		if(str) atk += str
-		if(O.HasSpiritFlow())
-			atk += O.GetFor(O.GetSpiritFlow() / glob.SPIRIT_FLOW_DIVISOR)
 		if(atk < 1) atk = 1
-		var/D
-		if(glob.DMG_CALC_2)
-			D = (powerDif**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.PROJECTILE_EFFECTIVNESS) ** -(def**glob.DMG_END_EXPONENT / atk**glob.DMG_STR_EXPONENT)
-		else
-			D = ((atk * powerDif)*glob.CONSTANT_DAMAGE_EXPONENT)** -(def / atk)
+		var/D = strikeCoreDamage(powerDif, atk, def)
 		D *= S.DamageMult
 		D = ProjectileDamage(D)
 		if(O.HasUnarmedDamage() && !O.EquippedSword() && !O.EquippedStaff())

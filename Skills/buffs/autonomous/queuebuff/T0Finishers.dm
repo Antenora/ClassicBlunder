@@ -26,7 +26,7 @@
         StrMult=1.1
         EndMult=1.1
         ForMult=1.1
-        passives = list(  "DebuffResistance" = 1,"TensionLock" = 1)
+        passives = list(  "TensionLock" = 1)
 
     Unlocked_Potential
         StyleNeeded="Turtle"
@@ -49,7 +49,7 @@
         OffMult=1.15
         StrMult=1.25
         DefMult=1.1
-        passives = list( "Instinct" = 1)
+        passives = list()
 
     // the debuff
     Shredded
@@ -100,7 +100,7 @@
     Emperor_Time
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("Flow" = 1, "Instinct" = 1, "SweepingStrike" = 1)
+        passives = list("SweepingStrike" = 1)
         SpdMult = 1.15
         OffMult = 1.15
     Judgment_Chain

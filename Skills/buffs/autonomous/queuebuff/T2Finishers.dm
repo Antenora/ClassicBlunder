@@ -6,12 +6,12 @@
         StrMult=1.3
         DefMult=0.8
         passives = list(  \
-                        "Relentlessness" = 1, "Fury" = 6, "DebuffResistance" = 2, "TensionLock" = 1)
+                        "Relentlessness" = 1, "Fury" = 6, "TensionLock" = 1)
     Ushin
         EndMult=1.3
         StrMult=1.15
         passives = list(  \
-                        "Relentlessness" = 1, "Momentum" = 3, "UnarmedDamage" = 2, "DebuffResistance" = 2, "TensionLock" = 1)
+                        "Relentlessness" = 1, "Momentum" = 3, "UnarmedDamage" = 2, "TensionLock" = 1)
 
     Potemkin_Buster
         StyleNeeded = "Ubermensch"
@@ -34,7 +34,7 @@
         DefMult=1.3
         StrMult=1.3
         EndMult=0.6
-        passives = list("ComboMaster" = 1, "Gum Gum" = 1, "Relentlessness" = 1, "Momentum" = 2, "Flow" = 2,\
+        passives = list("ComboMaster" = 1, "Gum Gum" = 1, "Relentlessness" = 1, "Momentum" = 2,\
                            "TensionLock" = 1)
 
 
@@ -62,12 +62,12 @@
 
 
     Plasma_Burned
-        passives = list("PureReduction" = -1, "Flow" = -2, "Godspeed" = -1)
+        passives = list("PureReduction" = -1, "Godspeed" = -1)
 
 
 
     In_the_Details
-        passives = list( "Godspeed" = 2, "DebuffResistance" = 0.25, \
+        passives = list( "Godspeed" = 2, \
                          "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
         HealthDrain = 0.033
         DefMult = 0.75
@@ -77,9 +77,9 @@
         TimerLimit = 30
 
     Frozen_Summit
-        passives = list("BlockChance" = 25, "CriticalBlock" = 0.25, \
+        passives = list("CriticalBlock" = 0.25, \
                         "MovingCharge" = 1, "QuickCast" = 1, "Freezing" = 10, "Shattering" = 10, "LifeGeneration" = 0.5, \
-                        "LikeWater" = 4, "TensionLock" = 1)
+                        "TensionLock" = 1)
         EndMult=1.2
         ForMult=1.2
         DefMult=1.2
@@ -103,7 +103,7 @@
         IconApart=1
     Future_Mode
         passives = list("Godspeed" = 4, "Skimming" = 3, "Speed Force" = 4,  "TripleStrike" = 2, "DoubleStrike" = 3, "Iaijutsu" = 2, \
-                         "CriticalChance" = 30, "CriticalDamage"= 0.15, "LifeSteal" = 30, "ShearImmunity" = 1, "TensionLock" = 1)
+                         "SureCrit" = 1, "CriticalDamage"= 0.15, "LifeSteal" = 30, "ShearImmunity" = 1, "TensionLock" = 1)
         SpdMult=1.5
         StrMult=1.5
         EndMult=1.5
@@ -122,7 +122,7 @@
         IconLock='SweatDrop.dmi'
     Alpha_Strike
         passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
-                         "CriticalChance" = 33, "TensionLock" = 1)
+                         "SureCrit" = 1, "TensionLock" = 1)
         SpdMult=1.5
         TimerLimit = 10
         IconLock='SweatDrop.dmi'
@@ -149,7 +149,7 @@
         HitScanIcon = 'stake.dmi'
         HitScanHitSpark = 'Hit_Effect_KanjuriKanKan.dmi'
     Staked
-        passives = list("Staked" = 1, "Godspeed" = -2, "Flow" = -1)
+        passives = list("Staked" = 1, "Godspeed" = -2)
         CrippleAffected = 3
         HealthDrain = 0.025
         SpdMult=0.75
@@ -159,7 +159,7 @@
         IconApart=1
         StrMult=1.25
         ForMult=1.25
-        passives = list("TensionLock" = 1,  "Flicker" = 2, "Pursuer" = 2, "Instinct" = 2, "Momentum" = 2, \
+        passives = list("TensionLock" = 1,  "Flicker" = 2, "Pursuer" = 2, "Momentum" = 2, \
                         "Scorching" = 5)
         ActiveMessage="ignites their legs!"
         OffMessage="burns out..."
@@ -188,7 +188,7 @@
         SpdMult=1.5
         EndMult=0.5
         AngerMult=1.25
-        passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 0.5, "Instinct" = 2, \
+        passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 0.5, \
          "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5)
     Ruptured
         IconLock='Bleed.dmi'
@@ -203,12 +203,12 @@
         StrMult=1.1
         SpdMult=1.5
     Dark_Firaga_Style
-        passives = list( "Godspeed" = 2, "DebuffResistance" = 0.25, \
+        passives = list( "Godspeed" = 2, \
                          "Scorching" = 15, "Toxic" = 10, "CursedWounds" = 1, "TensionLock" = 1)
         StrMult = 1.1
         ForMult = 1.5
     Dark_Wave_Style
-        passives= list("Mortal Will" = 1, "MortalStacks" = 1, "BlockChance" = 33, "CriticalBlock" = 0.3, "StunningStrike" = 3, "ComboMaster" = 1, "Deflection" = 1, "Reversal" = 0.25 )
+        passives= list("Mortal Will" = 1, "MortalStacks" = 1, "CriticalBlock" = 0.3, "StunningStrike" = 3, "ComboMaster" = 1, "Deflection" = 1, "Reversal" = 0.25 )
         EndMult = 1.4
         ForMult = 1.1
         StrMult = 1.1

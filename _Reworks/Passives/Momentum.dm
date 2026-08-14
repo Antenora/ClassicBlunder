@@ -2,7 +2,7 @@
     MOMENTUM_MIN = 0;//minimum value of passive
     MOMENTUM_MAX = 2;//maximum value of passive
     //will probably squint at the below variables
-    //located in otherPassives.dm BASE_MOMENTUM_CHANCE = 50
+    //located in Strike/Modifiers.dm BASE_MOMENTUM_CHANCE = 50
     // MAX_MOMENTUM_STACKS = 32
     // MOMENTUM_DIVISOR = 4
     // MOMENTUM_MAX_BOON = 4

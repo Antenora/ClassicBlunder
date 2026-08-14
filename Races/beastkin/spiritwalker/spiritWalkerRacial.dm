@@ -40,7 +40,7 @@
 	forAdd = 0.25
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("StunningStrike" = 2.5+asc, "ComboMaster" = 1,  "CheapShot" = asc/2, "Instinct" = asc)
+		passives = list("StunningStrike" = 2.5+asc, "ComboMaster" = 1,  "CheapShot" = asc/2)
 		Cooldown = 90 - (10 *p.AscensionsAcquired)
 		TimerLimit = 30 + (6 *p.AscensionsAcquired)
 	verb/Bear_Form()

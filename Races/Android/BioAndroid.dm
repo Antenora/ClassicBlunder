@@ -28,9 +28,9 @@
 //
 // EXAMPLE entry once you fill it in:
 //   "Saiyan" = list(
-//       "t1_passives" = list("Brutalize" = 0.05),
+//       "t1_passives" = list("Persistence" = 0.05),
 //       "t1_skills"   = list(),
-//       "t2_passives" = list("Brutalize" = 0.15),
+//       "t2_passives" = list("Persistence" = 0.15),
 //       "t2_skills"   = list(/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
 //   )
 
@@ -43,16 +43,16 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Demon"        = list("t1_passives"=list("PureDamage" = 2, "AbyssMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureDamage" = 3, "AbyssMod" = 5), "t2_skills"=list()),
 	"Angel"        = list("t1_passives"=list("PureReduction" = 2, "HolyMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureReduction" = 3, "HolyMod" = 5), "t2_skills"=list()),
 	"Celestial"    = list("t1_passives"=list("MartialMagic" = 1), "t1_skills"=list(), "t2_passives"=list("BladeFisting" = 1), "t2_skills"=list()),
-	"Dragon"       = list("t1_passives"=list(  "LikeWater" = 1, "Flow" = 1, "Instinct" = 1), "t1_skills"=list(), "t2_passives"=list(  "LikeWater" = 2, "Flow" = 2, "Instinct" = 2), "t2_skills"=list()),
+	"Dragon"       = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Beastkin"     = list("t1_passives"=list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5), "t1_skills"=list(), "t2_passives"=list("Fury" = 2, "Harden" = 2, "Momentum" = 2), "t2_skills"=list()),
-	"Eldritch"     = list("t1_passives"=list("DebuffResistance"=0.1), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list("DebuffResistance"=0.3), "t2_skills"=list()),
+	"Eldritch"     = list("t1_passives"=list(), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list(), "t2_skills"=list()),
 	"Changeling"   = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Makyo"        = list("t1_passives"=list("Juggernaut" = 0.5), "t1_skills"=list(), "t2_passives"=list("Juggernaut" = 0.5), "t2_skills"=list(/obj/Skills/Buffs/SlotlessBuffs/Makyo/Expand)),
 	"Makaioshin"   = list("t1_passives"=list("SpiritPower" = 0.1), "t1_skills"=list(), "t2_passives"=list("SpiritPower" = 0.15), "t2_skills"=list()),
 	"Demi-fiend"   = list("t1_passives"=list("ManaGeneration" = 1, "ManaCapMult" = 0.5), "t1_skills"=list(), "t2_passives"=list("ManaGeneration" = 2), "t2_skills"=list()),
 	"Chakardi"     = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list( "CashCow" = 5), "t2_skills"=list()),
-	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalChance" = 10, "CriticalDamage" = 0.15), "t2_skills"=list())
+	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
 )
 
 

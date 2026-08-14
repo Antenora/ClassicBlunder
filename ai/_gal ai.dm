@@ -1952,8 +1952,6 @@ mob/Player/AI
 //Ratio
 		var/Ratio=1
 		Ratio*=EPM
-		if(src.HasMythical())
-			Ratio*=1.5
 		potential_last_checked=-1
 		Ratio*=src.Base()
 		potential_power(src)//get them potential powers

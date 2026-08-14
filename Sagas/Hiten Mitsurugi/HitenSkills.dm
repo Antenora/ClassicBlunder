@@ -108,7 +108,6 @@
         Rapid=1
         Counter=1
         NoWhiff=1
-        AntiSunyata=1
         Cooldown=-1
         HitSparkIcon='Slash - Power.dmi'
         HitSparkX=-32
@@ -139,7 +138,6 @@
         Counter=1
         NoWhiff=1
         Determinator=1
-        AntiSunyata=1
         Decider=1
         Finisher=1
         HitSparkIcon='Slash - Power.dmi'
@@ -153,7 +151,7 @@
         name="Ryusousen"
         StyleNeeded="Hiten Mitsurugi"
         Area="Arc"
-        StrOffense=1
+        StrScaling=1
         DamageMult = 3
         Launcher = 2
         ComboMaster = 1
@@ -162,7 +160,6 @@
         ControlledRush=1
         Cooldown=60
         Icon='Nest Slash.dmi'
-        IconTime=0.7
         IconX=-16
         IconY=-16
         Size=0.8
@@ -184,7 +181,7 @@
         StyleNeeded="Hiten Mitsurugi"
         Area="Wave"
         ComboMaster = 1;
-        StrOffense=1
+        StrScaling=1
         DamageMult=5
         ChargeTech=1
         SpeedStrike = 2
@@ -216,7 +213,7 @@
     Sonic_Sheath//T4
         name="Ryumeisen"
         Area="Circle"
-        StrOffense=1
+        StrScaling=1
         StyleNeeded="Hiten Mitsurugi"
         DamageMult=10
         Distance=7
@@ -268,7 +265,7 @@
         StrMult = 1.2
         SpdMult = 1.3
         OffMult = 1.3
-        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3, "Flow" = 4)
+        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3)
         ActiveMessage="draws a second blade in display of mastery of their style!"
         OffMessage="sheathes their second blade..."
         verb/Dance_Of_The_Full_Moon()
@@ -282,7 +279,7 @@
             TooMuchHealth=75
             StrMult = 1.5
             SpdMult = 1.5
-            passives = list("TripleStrike" = 0.25,  "Instinct" = 1,  "EndlessAnger"=1)
+            passives = list("TripleStrike" = 0.25,  "EndlessAnger"=1)
             IconLock='SlayerEyes.dmi'
             LockX=0
             LockY=0
@@ -295,7 +292,6 @@
                 if(!User.BuffOn(src))
                     Mastery = (User.SagaLevel-3);
                     passives["TripleStrike"] = (0.25*Mastery);
-                    passives["Instinct"] = Mastery;
                     if(Mastery>=4) passives["TechniqueMastery"]=5;
                     NeedsHealth = min(90, 50 + ((Mastery-1) * 12.5));
                     TooMuchHealth = min(100, 75 + ((Mastery-1) * 6.25));

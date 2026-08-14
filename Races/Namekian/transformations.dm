@@ -7,7 +7,7 @@ transformation
 			form_glow_icon = 'Ripple Radiance.dmi'
 			form_glow_x = -32
 			form_glow_y = -32
-			passives = list("Instinct" = 2, "Flow" = 2, "Flicker" = 2, "Pursuer" = 3,  "PureDamage" = 2, "PureReduction" = 2)
+			passives = list("Flicker" = 2, "Pursuer" = 3,  "PureDamage" = 2, "PureReduction" = 2)
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -27,12 +27,12 @@ transformation
 				if(user.Potential<45)
 					if(user.Health>=(20+user.Potential/4)) return
 				if(user.Class=="Demon") return
-				passives = list("Instinct" = round(max(user.AscensionsAcquired/3, 1)), "Flow" = round(max(user.AscensionsAcquired/3, 1)), "Flicker" = round(max(user.AscensionsAcquired, 2)), "Pursuer" = round(max(user.AscensionsAcquired/3, 1)),   "PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
+				passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), "Pursuer" = round(max(user.AscensionsAcquired/3, 1)),   "PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
 				..()
 			mastery_boons(mob/user)
 				switch(user.Potential)
 					if(0 to 30)
-						passives = list("Instinct" = round(max(user.AscensionsAcquired/3, 1)), "Flow" = round(max(user.AscensionsAcquired/3, 1)), "Flicker" = round(max(user.AscensionsAcquired, 2)), \
+						passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), \
 						"Pursuer" = round(max(user.AscensionsAcquired/3, 1)),  \
 						"PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
 						speedadd = 0.6
@@ -42,7 +42,7 @@ transformation
 						forceadd = 0.5
 						enduranceadd = 0.5
 					if(31 to 60)
-						passives = list("Instinct" = round(max(user.AscensionsAcquired, 1)), "Flow" = round(max(user.AscensionsAcquired, 1)), "Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
+						passives = list("Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
 							"Pursuer" = round(max(user.AscensionsAcquired, 1)),  \
 							"PureDamage" = round(max(user.AscensionsAcquired, 1)), "PureReduction" = round(max(user.AscensionsAcquired, 1)),   "Orange Namekian"=1)
 						speedadd = 0.75
@@ -53,7 +53,7 @@ transformation
 						enduranceadd = 0.75
 
 					if(61 to 100)
-						passives = list("Instinct" = round(max(user.AscensionsAcquired*1.5, 1)), "Flow" = round(max(user.AscensionsAcquired*1.5, 1)), "Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
+						passives = list("Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
 							"Pursuer" = round(max(user.AscensionsAcquired, 1)),  \
 							"PureDamage" = round(max(user.AscensionsAcquired*1.5, 1)), "PureReduction" = round(max(user.AscensionsAcquired, 1)),   "Orange Namekian"=1)
 						speedadd = 1.5

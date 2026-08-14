@@ -59,8 +59,6 @@ Or was it Infi, with the brand of the ring, endlessly energetic?"};
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							passives["Flow"] = 1
-							passives["Instinct"] = 1
 							strength = 0.5
 							endurance = 0.5
 							offense = 0.5
@@ -145,8 +143,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 1)
-							owner.passive_handler.Increase("Instinct", 1)
 							strength=0.5;
 							force=0.5;
 							offense=0.5;
@@ -207,14 +203,11 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = -0.25
 							anger = 1
 						if("Feather Cowl")
-							owner.passive_handler.Increase("BlockChance", 10);
 							owner.passive_handler.Increase("CriticalBlock", 0.1);
-							owner.passive_handler.Increase("CriticalChance", 5);
 							owner.passive_handler.Increase("CriticalDamage", 0.05);
 							speed = 1
 							strength = 1
 						if("Feather Knife")
-							owner.passive_handler.Increase("CriticalChance", 10)
 							owner.passive_handler.Increase("CriticalDamage", 0.1)
 							owner.passive_handler.Increase("Musoken", 1)
 							owner.passive_handler.Increase("AttackSpeed", 1)
@@ -223,8 +216,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 1)
-							owner.passive_handler.Increase("Instinct", 1)
 							strength=0.5;
 							force=0.5;
 							offense=0.5;
@@ -298,8 +289,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 1)
-							owner.passive_handler.Increase("Instinct", 1)
 							strength=0.5;
 							force=0.5;
 							offense=0.5;
@@ -370,8 +359,6 @@ Or is it made of Mil? Not the admin. It's the defensive option. No offense, Mil.
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 1)
-							owner.passive_handler.Increase("Instinct", 1)
 							strength=0.5;
 							force=0.5;
 							offense=0.5;
@@ -441,9 +428,6 @@ Today, another God of the Rifts is born."}
 							endurance = 0.5
 							offense = 0.5
 						if("Spirit Walker")
-							owner.passive_handler.Increase("Flow", 2)
-							owner.passive_handler.Increase("Instinct", 2)
-							owner.passive_handler.Increase("LikeWater", 3)
 							strength=0.5;
 							force=0.5;
 							offense=0.5;

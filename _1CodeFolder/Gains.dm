@@ -377,11 +377,10 @@ mob
 				p.Auto_Attack()
 		StunCheck(src)
 		StunImmuneCheck(src)
-		if(glob.GUARD_SYSTEM && !Guarding && GuardMeter > 0)
+		if(!Guarding && GuardMeter > 0)
 			GuardMeter = max(0, GuardMeter - glob.GUARD_METER_DECAY)
-		if(glob.BREAK_TARGET && !src.Admin && Target && ismob(Target))
-			var/distance = get_dist(Target, src)
-			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
+		if(!src.Admin && Target && ismob(Target))
+			if(Target.z != src.z)
 				Target = null
 		MajinAbsorbZoneSafeguard()
 		MajinAbsorbVictimTick()
@@ -673,12 +672,6 @@ mob
 
 				if(drain>0)
 					src.LoseEnergy(drain)
-					var/_mastery = randValue(glob.racials.SSJ_MIN_MASTERY_GAIN,glob.racials.SSJ_MAX_MASTERY_GAIN)
-					if(glob.racials.AUTO_SSJ_MASTERY)
-						_mastery *= transActive
-						race.transformations[transActive].mastery+=_mastery
-						if(race.transformations[transActive].mastery>=95)
-							race.transformations[transActive].mastery=100
 					if(Energy < cut_off &&!src.Dead&&!src.HasMystic())
 						src.Revert()
 						src.LoseEnergy(30)

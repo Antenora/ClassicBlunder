@@ -74,7 +74,7 @@
         // This is used so that passives can be added and subtracted so I don't use = like a fucking moron.
         // Any potions that introduce passives must have the new passives added to this list at 0
         // Never use = Operator for passives outside of this list, instead use += and make downsides negative or 0 - Hadoje
-        passives = list("PureReduction" = 0, "Godspeed" = 0,  "PureDamage" = 0,  "Flow" = 0, "LikeWater"= 0,  "Skimming" = 0)
+        passives = list("PureReduction" = 0, "Godspeed" = 0,  "PureDamage" = 0,  "Skimming" = 0)
         // I am so fucking sorry for what is about to happen
         /* SOMEONE BROKE THE HEALS SO THEY ONLY WORK PER TIC WHICH MAKES IT IMPOSSIBLE TO HAVE A BALANCED HEALTH POTION I FUCKING HATE THESE ANIMALS
         if(P.equippedFlask.Heal == 1) // if you chose a  herb, your value for said herb should be 1 and ONLY 1
@@ -108,8 +108,6 @@
             DefMult = 1 + (P.equippedFlask.Tier+1)/4 // T0 = 1.25, T1 = 1.5, T2 = 1.75 // This makes you dodge more
             StrMult = 0.85 + (P.equippedFlask.Tier+1)/20  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             ForMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
-            passives["Flow"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
-            passives["LikeWater"] += (P.equippedFlask.Tier+1) // Same as Above
         if(P.equippedFlask.Hard == 1) // Defense
             EndMult = 1 + (P.equippedFlask.Tier+1)/10 //T0 = 1.1, T1 = 1.2, T3 = 1.3 endurance mult
             SpdMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)

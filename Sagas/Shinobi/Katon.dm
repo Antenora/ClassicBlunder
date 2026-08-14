@@ -54,7 +54,7 @@
 	Area = "Arc"
 	Distance = 3
 	DamageMult = 0.5
-	ForOffense = 1
+	ForScaling = 1
 	Scorching = 15
 	Rounds = 10
 	ManaCost = 10

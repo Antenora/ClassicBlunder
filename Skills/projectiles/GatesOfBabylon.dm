@@ -409,9 +409,9 @@ obj/GoB_Sentinel
 				var/powerDif = Owner.getPower(m)
 				var/statPower = Owner.getStatDmg2()
 				var/endFactor = m.getEndStat(1)
-				var/dmg = (clamp(powerDif,0.1,100000)**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.AUTOHIT_EFFECTIVNESS) ** -(endFactor**glob.DMG_END_EXPONENT / statPower**glob.DMG_STR_EXPONENT)
-				dmg *= 0.5
-				dmg *= Owner.GetDamageMod()
+				var/dmg = strikeCoreDamage(clamp(powerDif,0.1,100000), statPower, endFactor)
+				dmg *= 0.3
+				dmg *= Owner.strikeJudgmentMult()
 				if(IsLegendary) dmg *= 1.5
 				dmg *= 1 + (SentinelMastery * 0.05)
 				m.LoseHealth(dmg, Owner)
@@ -525,9 +525,9 @@ obj/Skills/AutoHit/Enuma_Elish
 	Distance = 35
 	DistanceAround = 3
 	DamageMult = 50
-	StrOffense = 1
-	ForOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	ForScaling = 1
+	EndEffectiveness = 1
 	CanBeBlocked = 0
 	CanBeDodged = 0
 	Scorching = 50

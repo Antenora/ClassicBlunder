@@ -11,14 +11,14 @@ transformation
 			unlock_potential = 30
 			mastery_boons(mob/user)
 				var/list/chippassives = list("PureDamage" = round((user.EnhancedStrength/3)+(user.EnhancedForce/3),1), "PureReduction" = round(user.EnhancedEndurance/3, 1),\
-				"Instinct"= round(user.EnhancedAggression/3, 1), "Flow" = round(user.EnhancedReflexes/3, 1), "Godspeed" = round(user.EnhancedSpeed/6, 1))
+				"Godspeed" = round(user.EnhancedSpeed/6, 1))
 				var/list/basepassives
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Ripper_Mode, user.contents))
 					basepassives = list("LifeSteal" = 20)
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Overdrive,user.contents))
 					basepassives = list( "ManaGeneration" = 2)
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Hilbert_Effect,user.contents))
-					basepassives = list("Deicide" = 5, "EndlessNine" = 0.2)
+					basepassives = list()
 				if(user.InfinityModule)
 					basepassives = list("ManaGeneration" = 1)
 				passives=chippassives+basepassives
