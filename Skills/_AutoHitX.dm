@@ -1201,6 +1201,7 @@ obj
 				RoundMovement=0
 				NoAttackLock=1
 				NoLock=1
+				MenuIcon="LightningKick"
 				Cooldown=60
 				Icon='Nest Slash.dmi'
 				IconX=-16
@@ -1260,6 +1261,7 @@ obj
 				Jump=1
 				ControlledRush=1
 				DamageMult=9
+				MenuIcon="FlyingKick"
 				Knockback=1
 				Shattering = 15
 				GuardBreak=1

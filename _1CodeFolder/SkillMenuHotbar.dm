@@ -35,7 +35,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("west",  "Move Left",  "west",  "A", "Movement", KB_MOVE, "West")
 	R += new/datum/keyaction("south", "Move Down",  "south", "S", "Movement", KB_MOVE, "South")
 	R += new/datum/keyaction("east",  "Move Right", "east",  "D", "Movement", KB_MOVE, "East")
-	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)   
+	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
 	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat", KB_HOLD)
@@ -300,7 +300,7 @@ client/proc/MiscVerbs()
 	if(mob.hud_menu_verbs) for(var/v in mob.hud_menu_verbs) srcs += v
 	for(var/v in srcs)
 		if(!v) continue
-		if(v:category != "Other" && v:category != "Utility") continue   
+		if(v:category != "Other" && v:category != "Utility") continue
 		var/nm = "[v:name]"
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
 		out[nm] = nm
@@ -451,7 +451,7 @@ document.onkeydown=function(e){
 	if(S.fire_ident) return 1   // verb stripped for hotbar-only use, fire_ident is the marker
 	for(var/v in S.verbs)
 		if(!v) continue
-		if(v:category == "Skills") return 1   
+		if(v:category == "Skills") return 1
 	return 0
 
 /obj/Skills/proc/DisableSkillVerb()

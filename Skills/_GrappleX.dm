@@ -269,6 +269,7 @@ obj/Skills/Grapple
 		Copyable=4
 		DamageMult=7
 		Reversal=1
+		MenuIcon="JudoThrow"
 		Stunner=2
 		StrScaling=1
 		ThrowAdd=1
@@ -285,6 +286,7 @@ obj/Skills/Grapple
 		DamageMult=7
 		EndEffectiveness = 0.8
 		StrScaling=1
+		MenuIcon="IzunaDrop"
 		ThrowAdd=0
 		ThrowMult=0
 		TriggerMessage="goes on a short flight with"
@@ -304,6 +306,7 @@ obj/Skills/Grapple
 		DamageMult=5.5
 		Stunner=3
 		StrScaling=1
+		MenuIcon="Suplex"
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="suplexes"
@@ -361,6 +364,7 @@ obj/Skills/Grapple
 		SkillCost=120
 		Copyable=4
 		DamageMult=5
+		MenuIcon="BurningFinger"
 		ForScaling=2
 		StrScaling=0.5
 		TriggerMessage="shoves their burning red hand through"
@@ -379,6 +383,7 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		DamageMult=12
+		MenuIcon="BurningFinger"
 		StrScaling=1
 		ForScaling=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
