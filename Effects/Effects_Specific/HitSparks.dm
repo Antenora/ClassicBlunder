@@ -20,10 +20,13 @@ mob
 	proc
 		//New hit effect proc; src inflicts the effect on m.
 		//src is kept track of to determine if they have a sword, or whatever.
-		HitEffect(var/atom/movable/m, var/UnarmedAttack, var/SwordAttack, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8))
+		HitEffect(var/atom/movable/m, var/UnarmedAttack, var/SwordAttack, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8), var/PX=0, var/PY=0, var/Weight=0)
 			if(!m) return
+			Weight = clamp(Weight, 0, 1)
+			var/wsize = 1 + Weight*0.6 //hit weight: identity at 0, heavies read bigger
+			var/wlife = round(Weight*3)
 			if(src.AttackQueue&&src.AttackQueue.HitSparkIcon)
-				var/obj/Effects/HE=new(null, src.AttackQueue.HitSparkIcon, src.AttackQueue.HitSparkX, src.AttackQueue.HitSparkY, src.AttackQueue.HitSparkTurns, src.AttackQueue.HitSparkSize)
+				var/obj/Effects/HE=new(null, src.AttackQueue.HitSparkIcon, src.AttackQueue.HitSparkX, src.AttackQueue.HitSparkY, src.AttackQueue.HitSparkTurns, src.AttackQueue.HitSparkSize*wsize)
 				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 				HE.dir=src.dir
 				HE.pixel_z=m.pixel_z
@@ -42,7 +45,7 @@ mob
 				var/icony=src.HitScanHitSparkY
 				while(AMT)
 					AMT--
-					var/obj/Effects/HE=new(null, icon, iconx, icony, 0, 1, 3)
+					var/obj/Effects/HE=new(null, icon, iconx, icony, 0, wsize, 3+wlife)
 					HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 					HE.dir=src.dir
 					HE?.pixel_z=m?.pixel_z
@@ -65,7 +68,7 @@ mob
 				var/life=src.HitSparkLife
 				while(AMT)
 					AMT--
-					var/obj/Effects/HE=new(null, icon, iconx, icony, turns, size, life)
+					var/obj/Effects/HE=new(null, icon, iconx, icony, turns, size*wsize, life+wlife)
 					HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 					HE.dir=src.dir
 					HE?.pixel_z=m?.pixel_z
@@ -76,9 +79,12 @@ mob
 					m.vis_contents += HE
 					HE.pixel_x+=rand((-1)*dispersion,dispersion)
 					HE.pixel_y+=rand((-1)*dispersion,dispersion)
+					if(!ismob(m)) //turf placement: apply the caller's sub-tile offset (a mob target already tracks it via vis_contents)
+						HE.pixel_x+=PX
+						HE.pixel_y+=PY
 					sleep(delay)
 			else if(src.BuffHitSparkIcon)
-				var/obj/Effects/HE=new(null, src.BuffHitSparkIcon, src.BuffHitSparkX, src.BuffHitSparkY, src.BuffHitSparkTurns, src.BuffHitSparkSize)
+				var/obj/Effects/HE=new(null, src.BuffHitSparkIcon, src.BuffHitSparkX, src.BuffHitSparkY, src.BuffHitSparkTurns, src.BuffHitSparkSize*wsize)
 				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 				HE.dir=src.dir
 				HE.pixel_z=m.pixel_z
@@ -95,22 +101,22 @@ mob
 				var/obj/Items/Sword/s3=src.EquippedThirdSword()
 				if(SwordAttack)
 					if(!s)
-						Slash(m)
+						Slash(m, Weight=Weight)
 					if(s&&!s2)
-						Slash(m, s)
+						Slash(m, s, Weight=Weight)
 					else
 						if(s&&!SecondStrike&&!ThirdStrike)
-							Slash(m, s)
+							Slash(m, s, Weight=Weight)
 						if(s2&&SecondStrike&&!ThirdStrike)
-							Slash(m, s2)
+							Slash(m, s2, Weight=Weight)
 						if(s3&&SecondStrike&&ThirdStrike)
-							Slash(m, s3)
+							Slash(m, s3, Weight=Weight)
 						if(s&&SecondStrike&&ThirdStrike&&AsuraStrike)
-							Slash(m, s)
+							Slash(m, s, Weight=Weight)
 				else
-					Hit_Effect(m)
+					Hit_Effect(m, Weight=Weight)
 proc
-	Slash(atom/movable/M, var/obj/Items/Sword/S, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8))
+	Slash(atom/movable/M, var/obj/Items/Sword/S, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8), var/Weight=0)
 		if(M)
 			var/obj/Effects/Slash/P = new
 			P.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
@@ -126,16 +132,20 @@ proc
 					else
 						P.pixel_y=0
 				P.transform*=S.HitSparkSize
+			if(Weight > 0)
+				P.transform *= 1 + min(Weight, 1)*0.6 //hit weight
 			P.Target=M
 			M.vis_contents += P
 			P.pixel_z=M.pixel_z
 			P.pixel_x+=DisperseX
 			P.pixel_y+=DisperseY
-	Hit_Effect(atom/movable/M, var/Size=1, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8))
+	Hit_Effect(atom/movable/M, var/Size=1, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8), var/Weight=0)
 		if(M)
 			var/obj/Effects/HitEffect/P = new
 			P.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 			P.transform*=Size
+			if(Weight > 0)
+				P.transform *= 1 + min(Weight, 1)*0.6 //hit weight
 			P.Target=M
 			M.vis_contents += P
 			P.pixel_z=M.pixel_z
@@ -168,4 +178,39 @@ proc
 		switch(type)
 			if(1)
 				PriestErupt(M, Offset=Offset)
+
+//HitBend: lean off the blow
+var/list/_hb_cellh = list() //icon -> cell half-height: big-form icons (64px+) pin feet lower than 16
+proc/_HbHalfHeight(f)
+	if(!f) return 16
+	var/k = "\ref[f]"
+	var/h = _hb_cellh[k]
+	if(!h)
+		var/icon/I = new(f)
+		h = I ? max(I.Height() / 2, 1) : 16
+		_hb_cellh[k] = h
+	return h
+mob
+	var/tmp
+		_hitbend //debounce: one lean at a time keeps flurries subtle
+	proc
+		HitBend(weight = 0, hitdir = 0)
+			if(_hitbend) return
+			var/matrix/M = transform
+			if(!M) M = matrix()
+			if(M.b || M.d) return //rotating/thrown - leave the spin alone
+			var/hh = _HbHalfHeight(icon) * abs(M.e) //half-height in screen px, tracks a live Enlarge
+			if(!hh) return
+			var/L = 1.5 + 4 * min(weight, 1) //head lean: 1.5px normals -> 5.5px max
+			if(hitdir & WEST)
+				L = -L
+			else if(!(hitdir & EAST))
+				L *= pick(1, -1)
+			_hitbend = 1
+			//feet stay pinned; PARALLEL so the bend doesn't cancel a pending hop or Enlarge
+			var/matrix/bent = M * matrix(1, L/(2*hh), L/2, 0, 1, 0)
+			animate(src, transform = bent, time = 1, flags = ANIMATION_PARALLEL)
+			animate(transform = M, time = 5, easing = ELASTIC_EASING|EASE_OUT) //6 ticks total - outlives a 3ds HitStop freeze
+			spawn(7)
+				_hitbend = null
 

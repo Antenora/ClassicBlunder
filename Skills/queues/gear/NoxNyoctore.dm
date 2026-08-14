@@ -33,7 +33,6 @@ obj
 				Cooldown=60
 				Warp=2
 				MultiHit=5
-				SpiritStrike=1
 				HitSparkIcon='Hit Effect Ripple.dmi'
 				HitSparkX=-32
 				HitSparkY=-32

@@ -113,25 +113,6 @@
 		// higher health = better
 
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Rupture
-	HealthDrain = 0.01
-	TimerLimit = 25
-	IconLock='Bleed.dmi'
-	max_stacks = 3
-	do_effect(mob/defender, mob/attacker)
-		defender.LoseHealth(attacker.passive_handler["Rupture"] * glob.RUPTURE_BASE_DAMAGE)
-		OMsg(defender, "[defender]'s wound fully ruptures, causing massive damage!")
-	adjust(mob/p)
-		switch(total_stacks)
-			if(1)
-				IconState = "1"
-				HealthDrain = 0.025
-				ShearAffected = 1
-			if(2)
-				IconState = "2"
-				HealthDrain = 0.05
-				ShearAffected = 2
-				CrippleAffected = 2
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Judged
 	TimerLimit = 120
@@ -151,7 +132,7 @@
 	AlwaysOn = 0
 	NeedsPassword = 0
 	IconLock = 'marked.dmi'
-	passives = list("PureReduction" = -3, "PureDamage" = -3, "BuffMastery" = -5)
+	passives = list("PureReduction" = -3, "PureDamage" = -3)
 	PowerMult = 0.9
 	StrMult = 0.9
 	EndMult = 0.9
@@ -162,7 +143,7 @@
 	// -3 PureReduction, -3 PureDamage, -5 BuffMastery, all stats x0.9
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Cornered
-	passives = list("PureReduction" = 0.05, "Flow" = -0.1)
+	passives = list("PureReduction" = 0.05)
 	TimerLimit = 10
 	IconLock='Cornered.dmi'
 	do_effect(mob/defender, mob/attacker)
@@ -175,7 +156,7 @@
 			IconState = 2
 		else
 			IconState = "[total_stacks]"
-		passives = list("PureReduction" = -glob.OVERHWELMING_BASE_PR_NERF * total_stacks, "Flow" = -glob.OVERHWELMING_BASE_FLOW * total_stacks)
+		passives = list("PureReduction" = -glob.OVERHWELMING_BASE_PR_NERF * total_stacks)
 		endAdd = -glob.OVERHWELMING_BASE_END_NERF * total_stacks
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed

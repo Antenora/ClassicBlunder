@@ -166,7 +166,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && Anger!=0)
+		if(Health>=75*(1-HealthCut) && (Anger||AngerTier||AngerRush||AngerCalmHigh))
 			calmcounter--
 		else
 			calmcounter=5
@@ -230,11 +230,18 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			RG.RoyalMeter = 0
 			src << "Your Royal Meter went back to 0."
 			src.client.updateRGMeter()
-
+		if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic") && HyperdeathMeterCurrent>0)
+			HyperdeathMeterCurrent=0
+			HyperMeterUpdate()
+			src << "Your Hyperdeath gauge reset to 0."
 		if(calmcounter<=0)
 			calmcounter=5
 			if(Anger)
 				Calm()
+			else if(AngerTier||AngerRush||AngerCalmHigh)
+				AngerTier=0
+				AngerRush=0
+				AngerCalmHigh=0
 	//	if(MeditateTime == 15)
 	//		src << "If any skills reset on Meditate, they've been reset."
 		if(CheckSpecial("Jinchuuriki") || CheckSpecial("Vaizard Mask"))
@@ -260,7 +267,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			drain = 0
 		if(InfinityModule)
 			drain = 0
-		if(Energy < drain && !HasNoRevert() && !Dead && !HasMystic())
+		if(Energy < drain && !Dead && !HasMystic())
 
 			Revert()
 			LoseEnergy(drain)
@@ -270,7 +277,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
-		if(Energy < drain && !HasNoRevert())
+		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
 			src<<"The strain of Golden Form forced you to revert!"
@@ -319,9 +326,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	if(!client)
 		mainLoop -= src
 		return
-	// One-shot stale-Kamui-lock cleanup. Proc short-circuits on its first line
-	// once the lock clears, so per-tick cost is one var read for any player
-	// without a stuck lock. Locked players unstick on their next gain tick.
+	//unsticks a stale Kamui lock, near-free once it clears
 	if(KamuiBuffLock)
 		AutoClearStaleKamuiLock()
 	if(src.KO&&src.icon_state!="KO")
@@ -372,9 +377,10 @@ mob
 				p.Auto_Attack()
 		StunCheck(src)
 		StunImmuneCheck(src)
-		if(glob.BREAK_TARGET && !src.Admin && Target && ismob(Target))
-			var/distance = get_dist(Target, src)
-			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
+		if(!Guarding && GuardMeter > 0)
+			GuardMeter = max(0, GuardMeter - glob.GUARD_METER_DECAY)
+		if(!src.Admin && Target && ismob(Target))
+			if(Target.z != src.z)
 				Target = null
 		MajinAbsorbZoneSafeguard()
 		MajinAbsorbVictimTick()
@@ -532,7 +538,7 @@ mob
 
 
 
-				if(passive_handler["Iaido"])
+				if(UsingFTG())
 					if(client&&hudIsLive("Iaido", /obj/hud/iaido))
 						client.hud_ids["Iaido"]?:Update()
 				else
@@ -553,17 +559,11 @@ mob
 				if(src.Health<50)
 					ManaRando*=2
 				src.ManaAmount+=0.5*(ManaRando/10)
-			if(passive_handler.Get("LunarAnger")&&!passive_handler.Get("Unrelenting Wrath"))
-				if(ManaAmount>50)
-					src.AngerMax=1+(src.ManaAmount/100)
-					src.Anger=src.AngerMax
-					src.Anger()
-				else if(ManaAmount<=50)
-					src.Anger=0
-					src.AngerMax=1
-			if(passive_handler.Get("Unrelenting Wrath"))
-				src.Anger=src.AngerMax
-				src.AngerMax=5
+			if(passive_handler.Get("LunarWrath"))
+				//berserker rage runs on mana leaving you - spells, drains, leak, all of it
+				if(ManaAmount<AngerManaLast)
+					AngerEvent((AngerManaLast-ManaAmount)*glob.ANGER_RUSH_MANA)
+				AngerManaLast=ManaAmount
 			if(src.CheckSpecial("Hyperdeath Mode"))
 				if(src.HyperdeathMeterCurrent > 0)
 					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - 1
@@ -599,14 +599,14 @@ mob
 				src.HandleEldritchTax()
 			if(passive_handler.Get("TrueZenkaiPower")&&src.icon_state=="Meditate")
 				passive_handler.Set("TrueZenkaiPower", 0)
-			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 				if(src.Tension<src.getTensionCap())
 					var/TensionRando=rand(6,15)
 					src.Tension+=0.7 * (glob.TENSION_MULTIPLIER)*(TensionRando/10)
 					if(src.Tension>src.getTensionCap())
 						src.Tension=src.getTensionCap()
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
-				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 					if(!src.Stunned&&!src.Suspended)
 						src.DoDamage(src, (rand(1,5)/30))
 			if(passive_handler["Grit"])
@@ -667,25 +667,19 @@ mob
 					cut_off = glob.racials.SSJ_BASE_CUT_OFF + (glob.racials.SSJ_CUT_OFF_PER_MAST * (race.transformations[transActive].mastery/100))
 					if(src.passive_handler["SSJ4"])
 						drain/=10
-					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("GodlyCalm"))
+					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("CalmAnger"))
 						drain = 0
 
 				if(drain>0)
 					src.LoseEnergy(drain)
-					var/_mastery = randValue(glob.racials.SSJ_MIN_MASTERY_GAIN,glob.racials.SSJ_MAX_MASTERY_GAIN)
-					if(glob.racials.AUTO_SSJ_MASTERY)
-						_mastery *= transActive
-						race.transformations[transActive].mastery+=_mastery
-						if(race.transformations[transActive].mastery>=95)
-							race.transformations[transActive].mastery=100
-					if(Energy < cut_off &&!src.HasNoRevert()&&!src.Dead&&!src.HasMystic())
+					if(Energy < cut_off &&!src.Dead&&!src.HasMystic())
 						src.Revert()
 						src.LoseEnergy(30)
 						src<<"The strain of Super Saiyan forced you to revert!"
 
 /*
 			if(src.trans["active"]>3 && src.masteries["4mastery"]<100 && src.Race=="Changeling")
-				if(src.Energy<30&&!src.HasNoRevert())
+				if(src.Energy<30)
 					src.GainFatigue(30)
 					src.Revert()
 					src<<"The strain of Golden Form forced you to revert!"
@@ -1527,11 +1521,7 @@ mob
 				if(B.Using)
 					del B
 
-			// AGLock depends only on src.contents and src.passive_handler — invariant
-			// for the duration of this gain tick. Compute once before the Autonomous
-			// loop instead of recomputing per-buff. Prior code was O(N_Autonomous ×
-			// N_Contents) per tick: a player with admin-granted "all skills" walked
-			// ~30 Autonomous × ~300 contents = ~9000 inner iterations every tick.
+			//invariant for the whole tick, compute once instead of per-buff
 			var/PrecomputedAGLock = 0
 			for(var/obj/Items/omni in src.contents)
 				if(omni.LocksOutAutonomous && omni.suffix=="*Equipped*")
@@ -1752,8 +1742,8 @@ mob
 
 	//Okay, stuff past here may be sources of lag. This is just a comment to note this.
 		var/BreathingMaskOn=0
-		if(isturf(loc))
-			var/turf/T = loc
+		var/turf/T = GfxGroundTurf(src)
+		if(T)
 			if(T.effectApplied)
 				//TODO if u reuse this make it a switch
 				switch(T.effectApplied)
@@ -1780,11 +1770,11 @@ mob
 							T.effectApplied?:applyEffects(src, T.ownerOfEffect, dmg)
 
 			if(!passive_handler.Get("StaticWalk")&&!src.Dead)
-				if(istype(loc,/turf/Special/Static))
+				if(istype(T,/turf/Special/Static))
 					src.Health-=0.05
-				if(istype(loc,/turf/Dirt99))
+				if(istype(T,/turf/Dirt99))
 					src.Health-=0.05
-			if(istype(loc,/turf/Special/Stars)||istype(loc,/turf/Special/EventStars))
+			if(istype(T,/turf/Special/Stars)||istype(T,/turf/Special/EventStars))
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
 						BreathingMaskOn=1
@@ -1814,7 +1804,7 @@ mob
 							if(src.Health<-300)
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
-			else if(loc:Deluged||istype(loc,/turf/Waters)||istype(loc,/turf/Special/Ichor_Water)||istype(loc,/turf/Special/Midgar_Ichor))
+			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
 				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON,ELDRITCH))
 					BreathingMaskOn=1
@@ -1839,7 +1829,7 @@ mob
 						if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 				if(!IgnoresWater)
-					if(istype(loc,/turf/Waters/Water7))
+					if(istype(T,/turf/Waters/Water7))
 						if(!src.HasWalkThroughHell())
 							if(!isRace(DEMON)&&!src.HasHellPower())
 								src.AddBurn(10)
@@ -1848,50 +1838,50 @@ mob
 							src.Burn-=(src.Burn/20)
 							if(src.Burn<0)
 								src.Burn=0
-					if(istype(loc,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Waters/WaterD) && !src.HasVenomImmune())
+					if(istype(T,/turf/Waters/WaterD) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
 						src.AddPoison(1)
 					if(Swim==0)
 						src.RemoveWaterOverlay()
 						spawn()
-							if(loc:Deluged)
+							if(T.Deluged)
 								src.overlays+=image('WaterOverlay.dmi',"Deluged")
-								var/mob/p = loc:ownerOfEffect
+								var/mob/p = T.ownerOfEffect
 								if(p!= src && p)
 									src.AddSlow(10 + (5 * p.AscensionsAcquired))
 									src.AddShock(10 + (5 * p.AscensionsAcquired))
 							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-							else if(loc.type==/turf/Waters/Water7/LavaTile)
+							else if(T.type==/turf/Waters/Water7/LavaTile)
 								src.overlays+=image('LavaTileOverlay.dmi')
 							else
-								src.overlays+=image('WaterOverlay.dmi',"[loc.icon_state]")
+								src.overlays+=image('WaterOverlay.dmi',"[T.icon_state]")
 					if(!Swim)
 						Swim=1
 						if(isplayer(src))
 							src:move_speed = MovementSpeed()
 					if(!src.KO)
 						var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
-						if(loc:Shallow==1)
+						if(T.Shallow==1)
 							amounttaken=0
 						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 							amounttaken=0
 						if(BreathingMaskOn)
 							amounttaken=0
-						if(loc:Deluged==1)
+						if(T.Deluged==1)
 							amounttaken=4
 						if(isRace(DRAGON))
 							amounttaken=0

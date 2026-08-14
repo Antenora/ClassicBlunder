@@ -26,13 +26,13 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateTwo
 	GatesNeeded=2
 	BuffName = "Second Gate"
-	passives = list("Blurring Strikes"=1, "Momentum"=1, "Instinct"=1)
+	passives = list( "Momentum"=1)
 	PUSpike = 20
 	strAdd=0.1
 	spdAdd=0.15
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1,"PUSpike" = 20)
+		passives = list( "Momentum"=1,"PUSpike" = 20)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -52,13 +52,13 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateFour
 	GatesNeeded=4
 	BuffName = "Fourth Gate"
-	passives = list("Blurring Strikes"=1.5, "Momentum"=1.5, "Instinct"=1,"PUSpike" = 20)
+	passives = list( "Momentum"=1.5,"PUSpike" = 20)
 	PUSpike = 20
 	strAdd=0.1
 	spdAdd=0.25
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=1.5, "Momentum"=1.5, "Instinct"=1,"PUSpike" = 10)
+		passives = list( "Momentum"=1.5,"PUSpike" = 10)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -79,25 +79,25 @@
 	GatesNeeded=6
 	Slotless = TRUE
 	BuffName = "Sixth Gate"
-	passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1)
+	passives = list( "Momentum"=1)
 	PUSpike = 20
 	strAdd=0.1
 	spdAdd=0.25
 	endAdd=0.1
 	adjust(mob/p)
-		passives = list("BlurringStrikes"=1, "Momentum"=1, "Instinct"=1, "PUSpike" = 20, "Deicide" = 5)
+		passives = list( "Momentum"=1, "PUSpike" = 20)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateSeven
 	GatesNeeded=7
 	BuffName = "Seventh Gate"
-	passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4, "Deicide" = 15)
+	passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4)
 	strAdd=0.4
 	spdAdd=0.75
 	endAdd=0.4
 	adjust(mob/p)
-		passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4, "Deicide" = 15, "The Flame of Youth" = 1)
+		passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4)
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateEight
 	BuffName = "Eight Inner Gates Released Formation"
 	GatesNeeded=8
@@ -107,7 +107,7 @@
 		endAdd=10
 		HealthCut=0.99
 		BuffTechniques=list("/obj/Skills/AutoHit/Night_Guy")
-		passives = list("Sunyata"=3, "Seki"=100, "PUSpike" = 200, "Deicide" = 20, "EndlessNine" = 2, "Sekizou" = 1)
+		passives = list("Sunyata"=3, "Seki"=100, "PUSpike" = 200, "Sekizou" = 1)
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateJort
 	BuffName = "Jort Gate"
 /obj/Skills/AutoHit
@@ -120,7 +120,7 @@
 		ComboMaster=1
 		Stunner=3
 		Size=4
-		StrOffense=1
+		StrScaling=1
 		GuardBreak=1
 		Rush=5
 		PullIn=2

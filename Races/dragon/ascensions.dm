@@ -14,20 +14,20 @@ ascension
 						strength=0.5
 						force=0.5
 					if("Fire")
-						var/newpassives = list("SpiritHand" = 2, "AngerAdaptiveForce" = 0.25, "MeltyBlood" = 1)
+						var/newpassives = list(  "MeltyBlood" = 1)
 						passives+= newpassives
 						strength=1
 						force=1
 						offense= 0.5
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 0.5
 						defense = 1
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "VenomBlood" = 1, "Adrenaline" = 2)
+						var/newpassives = list( "Flicker" = 1, "Godspeed" = 1, "VenomBlood" = 1, "Adrenaline" = 2)
 						passives+= newpassives
 						strength = 0.25
 						force = 0.25
@@ -46,7 +46,7 @@ ascension
 						speed = 0.5
 						offense = 0.5
 					if("Light")
-						passives += list("SoulFire" = 1.5, "DemonicDurability" = 1)
+						passives += list("SoulFire" = 1.5)
 						defense = 1.0
 						endurance = 1.0
 						strength = 0.5
@@ -66,19 +66,17 @@ ascension
 						endurance = 1
 						force = 0.5
 					if("Fire")
-						var/newpassives = list("SpiritHand" = 2, "AngerAdaptiveForce" = 0.25)
-						passives+= newpassives
 						strength = 1
 						force = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 0.5
 						defense = 1.5
 						speed = 0.5
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1)
+						var/newpassives = list( "Flicker" = 1, "Godspeed" = 1)
 						passives+= newpassives
 						strength = 0.25
 						force = 0.25
@@ -116,20 +114,18 @@ ascension
 						endurance = 1.5
 						force = 1
 					if("Fire")
-						var/newpassives = list("SpiritHand" = 2, "SpiritFlow" = 2)
-						passives+= newpassives
 						strength = 1
 						force = 1
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 1.5
 						speed = 1
 						defense = 2
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1)
+						var/newpassives = list( "Flicker" = 1, "Godspeed" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -148,7 +144,7 @@ ascension
 						speed = 1.5
 						offense = 1.5
 					if("Light")
-						passives += list("CallousedHands" = 0.2, "DemonicDurability" = 1, "SoulFire" = 1.5, "BeyondPurity" = 1)
+						passives += list(  "SoulFire" = 1.5, "BeyondPurity" = 1)
 						defense = 1.0
 						endurance = 1.5
 						strength = 1
@@ -169,20 +165,18 @@ ascension
 						endurance = 2
 						force = 1
 					if("Fire")
-						var/newpassives = list("SpiritHand" = 2, "AngerAdaptiveForce" = 0.25, "SpiritFlow" = 2)
-						passives+= newpassives
 						strength = 2
 						force = 2
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1, "CalmAnger" = 1)
+						var/newpassives = list("SoftStyle" = 1, "CalmAnger" = 1)
 						passives+= newpassives
 						force = 2
 						defense = 2
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
+						var/newpassives = list( "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -201,7 +195,7 @@ ascension
 						speed = 2
 						offense = 1
 					if("Light")
-						passives += list("CallousedHands" = 0.2, "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
+						passives += list( "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
 						defense = 1.5
 						endurance = 2
 						strength = 1
@@ -221,20 +215,18 @@ ascension
 						endurance = 2
 						force = 1
 					if("Fire")
-						var/newpassives = list("SpiritHand" = 2, "AngerAdaptiveForce" = 0.25, "SpiritFlow" = 2)
-						passives+= newpassives
 						strength = 2
 						force = 2
 						offense = 1
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						force = 1
 						defense = 3
 						speed = 1
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
+						var/newpassives = list( "Flicker" = 1, "Godspeed" = 1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 0.5
 						force = 0.5
@@ -253,7 +245,7 @@ ascension
 						speed = 1
 						offense = 2
 					if("Light")
-						passives += list("DebuffReversal" = 1, "DemonicDurability" = 1, "SoulFire" = 1.5)
+						passives += list("DebuffReversal" = 1,  "SoulFire" = 1.5)
 						defense = 1.5
 						endurance = 2.0
 						strength = 1
@@ -273,20 +265,18 @@ ascension
 						endurance = 2
 						force = 2
 					if("Fire")
-						var/newpassives = list("HybridStrike" = 3, "SpiritFlow" = 4)
-						passives+= newpassives
 						strength = 2
 						force = 2
 						offense = 2
 						anger=0.25
 					if("Water")
-						var/newpassives = list("SoftStyle" = 1, "LikeWater" = 1, "Flow" = 1, "FluidForm" = 1)
+						var/newpassives = list("SoftStyle" = 1)
 						passives+= newpassives
 						speed = 1
 						force = 2
 						defense = 3
 					if("Wind")
-						var/newpassives = list("BlurringStrikes" = 0.5, "Flicker" = 1, "Godspeed"=1, "DenkoSekka" = 1)
+						var/newpassives = list( "Flicker" = 1, "Godspeed"=1, "DenkoSekka" = 1)
 						passives+= newpassives
 						strength = 1
 						force = 1
@@ -304,7 +294,7 @@ ascension
 						speed = 2
 						offense = 2
 					if("Light")
-						passives += list("CallousedHands" = 0.2, "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
+						passives += list( "VoidField" = 3, "EnergySteal" = 15, "Harden" = 1)
 						defense = 1.5
 						endurance = 2
 						strength = 1

@@ -3,7 +3,7 @@
 		UnarmedOnly=1
 		FlickAttack=1
 		Area="Strike"
-		StrOffense=2
+		StrScaling=2
 		DamageMult=T4_DMG_MULT/2;
 		Stunner=3
 		Rush=3
@@ -26,7 +26,7 @@
 	Ashura_Bakkei
 		FlickAttack=1
 		Area="Strike"
-		StrOffense=2
+		StrScaling=2
 		DamageMult=T4_DMG_MULT/2;
 		Stunner=3
 		Rush=3
@@ -53,7 +53,7 @@
 		NoAttackLock = 1
 		Rounds = 2
 		UsesinForce = 1
-		StrOffense = 1
+		StrScaling = 1
 		DamageMult = T4_DMG_MULT/2/2;
 		Instinct = 2
 		Distance = 4

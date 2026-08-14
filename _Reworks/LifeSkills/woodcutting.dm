@@ -206,6 +206,7 @@ mob/proc/ChopPayout(obj/LifeSkills/Tree/T, datum/tree_def/d, perf, obj/Items/Lif
 
 	if(tool) tool.LifeToolWear(src)
 	AddLifeXP("Foraging", LifeGatherXP("Foraging", d.tier), perf)
+	LifeOppRoll("Foraging", d.tier, d.wood_type, q)
 	T.charges--
 	if(T.charges <= 0)
 		src << "The [T.name] is felled to a stump."
@@ -226,6 +227,7 @@ proc/LifePickSeedTree()
 	return "apple_green"
 
 proc/SeedTrees()
+	set background = 1 
 	RegisterTrees()
 	for(var/obj/LifeSkills/Tree/old in world)
 		del old

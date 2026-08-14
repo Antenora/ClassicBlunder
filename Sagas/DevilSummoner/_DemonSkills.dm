@@ -3,7 +3,7 @@
 	TimerLimit = 60
 	AlwaysOn = 0
 	NeedsPassword = 0
-	passives = list("DebuffResistance" = 2)
+	passives = list()
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/DemonSilence
 	BuffName = "Demon Silence"

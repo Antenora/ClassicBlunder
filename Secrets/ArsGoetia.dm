@@ -32,7 +32,7 @@
 				usr.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic)
 				usr.AddSkill(new/obj/Skills/Teleport/Traverse_Depths)
 				usr.AddSkill(new/obj/Skills/Utility/Imitate)
-				usr.passive_handler.Increase("Hellpower" = 0.5)
+				usr.passive_handler.Increase("HellPower", 0.5)
 				usr.client.updateCorruption()
 				usr.demon.selectPassive(usr, "CORRUPTION_PASSIVES", "Buff", TRUE)
 				usr.demon.selectPassive(usr, "CORRUPTION_DEBUFFS", "Debuff")
@@ -58,7 +58,7 @@
 				usr.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic)
 				usr.AddSkill(new/obj/Skills/Teleport/Traverse_Depths)
 				usr.AddSkill(new/obj/Skills/Utility/Imitate)
-				usr.passive_handler.Increase("Hellpower" = 0.5)
+				usr.passive_handler.Increase("HellPower", 0.5)
 				usr.client.updateCorruption()
 				usr.demon.selectPassive(usr, "CORRUPTION_PASSIVES", "Buff", TRUE)
 				usr.demon.selectPassive(usr, "CORRUPTION_DEBUFFS", "Debuff")
@@ -251,7 +251,7 @@
 
 	verb/Activate_Void()
 		set category = "Ars Goetia"
-		usr.passive_handler.Set("Void", !usr.passive_handler.passives["Void"])
+		usr.passive_handler.Set("Void", !usr.passive_handler.Get("Void"))
 		usr << "Void is [usr.passive_handler["Void"] ? "on" : "off"]."
 
 

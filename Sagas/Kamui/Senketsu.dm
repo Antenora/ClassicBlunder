@@ -40,10 +40,10 @@ mob/proc/getSenketsuViewers()
 		if(usr.Saga!="Kamui")
 			ActiveMessage="attempts to wear a Kamui which they have no connection to!<br><center><font color='red'>Life Fiber ?Synchronize?: Kamui Senketsu!?!?</font color></center>"
 			OffMessage="has their power stolen from them..."
-			passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 2, "Shameful Display" = 1, "Persistence" = 3, "UnderDog" = 3, "DemonicDurability" = 2, "ContinuallyStun" = 5)
+			passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 2, "Shameful Display" = 1, "Persistence" = 3, "UnderDog" = 3,  "ContinuallyStun" = 5)
 
 		else
-			passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Shameful Display" = level, "Persistence" = level, "UnderDog" = level, "Adrenaline" = level / 2, "DemonicDurability" = level)
+			passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Shameful Display" = level, "Persistence" = level, "UnderDog" = level, "Adrenaline" = level / 2)
 			if(usr.SagaLevel == 1)
 				IconLock='senketsu_activated.dmi'
 				TopOverlayLock='senketsu_activated_headpiece.dmi'
@@ -85,8 +85,8 @@ mob/proc/getSenketsuViewers()
 
 obj/Skills/AutoHit/Shippu_Rush
 	Area="Circle"
-	StrOffense=1
-	EndDefense=1
+	StrScaling=1
+	EndEffectiveness=1
 	DamageMult=1
 	GuardBreak=1
 	ChargeTech=1
@@ -186,7 +186,7 @@ obj/Skills/Buffs/SpecialBuffs
 		adjust(mob/p)
 			SpdMult = 1.05 + (p.SagaLevel * 0.05)
 			DefMult = 1.05 + (p.SagaLevel * 0.05)
-			passives = list("Skimming" = 2, "Godspeed"=1+(p.SagaLevel/1.5), "Flicker" = p.SagaLevel, "Flow" = p.SagaLevel/2, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
+			passives = list("Skimming" = 2, "Godspeed"=1+(p.SagaLevel/1.5), "Flicker" = p.SagaLevel, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
 
 		verb/Kamui_Shippu()
 			set category="Skills"
@@ -218,7 +218,7 @@ obj/Skills/Buffs/SpecialBuffs
 			OffMult = 1.04 + (p.SagaLevel * 0.04)
 			SpdMult = 1.04 + (p.SagaLevel * 0.04)
 			DefMult = 1.04 + (p.SagaLevel * 0.04)
-			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = p.SagaLevel/1.5, "PureDamage" = round(p.SagaLevel/2.5,1), "Skimming" = 2, "Godspeed"=1+(p.SagaLevel*1.25),"Flicker" = round(p.SagaLevel/1.25,1), "Flow" = round(p.SagaLevel/2.5,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = p.SagaLevel/1.5, "PureDamage" = round(p.SagaLevel/2.5,1), "Skimming" = 2, "Godspeed"=1+(p.SagaLevel*1.25),"Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
 
 		verb/Kamui_Senjin_Shippu()
 			set category="Skills"

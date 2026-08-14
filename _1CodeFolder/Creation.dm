@@ -59,13 +59,12 @@ mob/Players
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE
+		PurgeHurtboxDebug()
+		FxEnsureMasters(client)
 		ForceClearHeldChargeState()
 		players += usr
 		OverwatchNotifyLogin(usr, "logged in")
-		// StyleRating decay runs in spawn(); the loop dies on disconnect and
-		// leaves the persistent StyleRating var stuck above zero on the next
-		// login, with Stylish multipliers locked in and no decay timer to
-		// retire them. Wipe any leftover rating now so reconnects start clean.
+		//the decay loop dies on disconnect, wipe leftover rating so Stylish doesn't stay stuck
 		if(StyleRating > 0)
 			resetStyleRating()
 		StyleRatingDecaying = FALSE
@@ -90,7 +89,7 @@ mob/Players
 		winshow(usr,"StatsWindow2",0)
 		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=true")
-		usr.client.show_verb_panel=1   
+		usr.client.show_verb_panel=1
 		usr.Admin("Check")
 		usr.overlays-='Emoting.dmi'
 		if(!Mapper)
@@ -195,8 +194,6 @@ mob/Players
 		//stop holding zanzo charges
 		if(ActiveZanzo)
 			ActiveZanzo=0
-		for(var/obj/Skills/Zanzoken/z in src)
-			z.ZanzoAmount=0
 
 		if(updateVersion && updateVersion.version != glob.UPDATE_VERSION)
 			glob.updatePlayer(src)
@@ -381,9 +378,10 @@ mob/Players
 		for(var/x in lol)
 			winset(src,x,"'is-visible'=true")
 		client.SetupGameDisplay()
+		client.InitializeGraphics()
 		client.InitSkillHUD()
 
-		client.fps = src.ChosenFPS || world.fps   
+		client.fps = src.EffectiveClientFPS()
 		client.updateRGMeter()
 		if(usr.SenseRobbed>=5)
 			animate(usr.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1))
@@ -496,6 +494,7 @@ mob/Players
 		CollectMenuVerbs()
 		return
 	Logout()
+		PurgeHurtboxDebug()
 		if(src.Airborne)
 			src.Airborne = 0
 			src.AirborneInterrupted = 0
@@ -621,6 +620,7 @@ mob/Creation
 		usr.loc=locate(1,1,13)
 		client.client_plane_master = new()
 		client.screen += client.client_plane_master
+		FxEnsureMasters(client)
 	Logout()
 		if(src in admins)
 			admins -= src
@@ -893,7 +893,9 @@ mob/Creation/verb
 		if(blah=="RecoveryMod")
 			alert("This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.")
 		if(blah=="AngerMod")
-			alert("This determines how much power you gain when you Anger, an event that occurs if a hit that would have reduced you under 25% heatlh happens..")
+			alert("This determines your peak Anger power bonus. Anger builds as you take damage - a quarter of the bonus at 75% health, half at 50% where you properly Anger, and the full bonus at 25%. Some buffs and events can push you along the curve faster.")
+		if(blah=="GrowthRate")
+			alert("For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.")
 
 mob/proc/UpdateBio()
 	src.PerkDisplay()
@@ -1098,6 +1100,12 @@ mob/proc
 		LOL.ForMod=src.ForMod
 		LOL.OffMod=src.OffMod
 		LOL.DefMod=src.DefMod
+		LOL.StrengthInvest=src.StrengthInvest
+		LOL.EnduranceInvest=src.EnduranceInvest
+		LOL.SpeedInvest=src.SpeedInvest
+		LOL.ForceInvest=src.ForceInvest
+		LOL.OffenseInvest=src.OffenseInvest
+		LOL.DefenseInvest=src.DefenseInvest
 		src.client.mob=LOL
 		del(src)
 

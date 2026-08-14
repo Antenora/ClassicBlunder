@@ -3,15 +3,14 @@
 /globalTracker/var/MAX_KB_TIME = 15
 /globalTracker/var/KB_SPEED = 0.75 // was 0.15
 /globalTracker/var/KBMODDIVIDER = 2
+/globalTracker/var/KB_LOFT_MIN = 0.35 //KB weight (distance/max) below this stays a flat slide
+/globalTracker/var/KB_LOFT_PX = 16 //loft arc height at full weight
 //TODO convert to glob
-/mob/proc/getLegendPMult()
-    return HasMythical()*0.5
 /mob/proc/gatherKBMods()
     . = 0
     . += HasGiantForm() * 1.25
-    . += getLegendPMult()
     . += passive_handler.Get("HeavyHitter")
-    . += 1 + passive_handler.Get("KBMult")
+    . += 1
     var/zanzibarbreeze =  . 
     . = zanzibarbreeze/glob.KBMODDIVIDER
     if(. > glob.MAX_KB_MULT)
@@ -27,8 +26,7 @@
         // get the defenders anti kb measures
         if(!defender.passive_handler)
             return 1
-        var/mod = ( ((defender.HasGiantForm() * 0.15) + (defender.HasMythical() * 0.5) + (defender.passive_handler.Get("Juggernaut") * 0.05)) )
-        mod += clamp(defender.passive_handler.Get("KBRes") * 0.1, 0, 1)
+        var/mod = ( ((defender.HasGiantForm() * 0.15) + (defender.passive_handler.Get("Juggernaut") * 0.05)) )
         var/res = 1 - mod
         if(res < glob.MAX_KB_RES)
             res = glob.MAX_KB_RES
@@ -60,6 +58,27 @@
             return
         if(max_steps > glob.MAX_KB_TIME)
             max_steps = glob.MAX_KB_TIME
+    if(PmActive())
+        //tile per tick
+        var/steps = max_steps
+        spawn()
+            if(!Flying) Skid(src, steps) //drag trail while vacuumed along the ground
+            for(var/i = 1, i <= steps, i++)
+                if(!src || !source) return
+                if(get_dist(src, source) <= 1) return
+                var/d = get_dir(src, source)
+                if(!d) return
+                var/turf/T = get_step(src, d)
+                if(!T || T.density) return
+                var/blocked = 0
+                for(var/atom/a in T)
+                    if(a.density)
+                        blocked = 1
+                        break
+                if(blocked) return
+                src.PmDashStep(source, 32)
+                sleep(world.tick_lag)
+        return
     for(var/i = 1, i <= max_steps, i++)
         if(get_dist(src, source) <= 1)
             return

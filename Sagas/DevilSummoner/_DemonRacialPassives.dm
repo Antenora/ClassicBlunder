@@ -19,8 +19,6 @@
 	demon_racial_passive_race = race
 
 	switch(race)
-		if("Avatar")
-			passive_handler.Increase("DebuffResistance", 1)
 		if("Avian")
 			SpdMultTotal *= 1.15
 		if("Beast")
@@ -47,10 +45,6 @@
 			passive_handler.Increase("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Increase("ManaCapMult", 0.25)
-			passive_handler.Increase("ManaStats", 4)
-		if("Ghost")
-			passive_handler.Increase("FluidForm", 1)
-			passive_handler.Increase("Flow", 3)
 		if("Hero")
 			StrMultTotal *= 1.08
 			EndMultTotal *= 1.08
@@ -66,7 +60,7 @@
 		if("Megami")
 			passive_handler.Increase("ManaGeneration", 5)
 		if("Mitama")
-			Anger += 0.2
+			AngerAdd += 0.2
 		if("Omega")
 			passive_handler.Increase("PureReduction", 2)
 		if("Snake")
@@ -86,8 +80,6 @@
 			spawn() DemonTyrantAuraLoop()
 		if("Vile")
 			demon_racial_vile_active = TRUE
-		if("Wilder")
-			passive_handler.Increase("Brutalize", 3)
 
 /mob/proc/RemoveDemonRacialPassive()
 	var/race = demon_racial_passive_race
@@ -95,8 +87,6 @@
 	demon_racial_passive_race = ""
 
 	switch(race)
-		if("Avatar")
-			passive_handler.Decrease("DebuffResistance", 1)
 		if("Avian")
 			SpdMultTotal /= 1.15
 		if("Beast")
@@ -122,10 +112,6 @@
 			passive_handler.Decrease("LifeSteal", 20)
 		if("Genma")
 			passive_handler.Decrease("ManaCapMult", 0.25)
-			passive_handler.Decrease("ManaStats", 4)
-		if("Ghost")
-			passive_handler.Decrease("FluidForm", 1)
-			passive_handler.Decrease("Flow", 3)
 		if("Hero")
 			StrMultTotal /= 1.08
 			EndMultTotal /= 1.08
@@ -141,7 +127,7 @@
 		if("Megami")
 			passive_handler.Decrease("ManaGeneration", 5)
 		if("Mitama")
-			Anger -= 0.2
+			AngerAdd -= 0.2
 		if("Omega")
 			passive_handler.Decrease("PureReduction", 2)
 		if("Snake")
@@ -156,8 +142,6 @@
 				demon_tyrant_underlay = null
 		if("Vile")
 			demon_racial_vile_active = FALSE
-		if("Wilder")
-			passive_handler.Decrease("Brutalize", 3)
 
 
 /mob/var/demon_fallen_last_boost = 0
@@ -248,3 +232,14 @@
 			M.OffMultTotal /= 0.9
 			M.DefMultTotal /= 0.9
 		demon_tyrant_debuffed.Cut()
+
+/strikeHook/demonRacialOnHit
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		// Devil Summoner racial on-hit passives
+		if(attacker.demon_racial_femme_active)
+			attacker.DemonFemmeCharmCheck(defender)
+		if(attacker.demon_racial_snake_active)
+			attacker.DemonSnakePoisonCheck(defender)

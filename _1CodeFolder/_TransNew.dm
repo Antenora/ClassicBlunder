@@ -179,8 +179,6 @@ mob/proc/CanRevert()
 		return 0
 	if(src.CyberCancel&&!isRace(ANDROID)&&!isRace(HUMAN)&&!isRace(CELESTIAL)&&!HasKOB())
 		return 0
-	if(src.HasNoRevert())
-		return 0
 	if(src.ActiveBuff)
 		if(src.ActiveBuff.NeedsTrans||src.ActiveBuff.NeedsSSJ)
 			src.ActiveBuff.Trigger(src)
@@ -339,8 +337,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("CounterMaster", 10)
 				passive_handler.Increase("Extend")
 				passive_handler.Increase("TechniqueMastery", 5)
-				passive_handler.Increase("MovementMastery", 5)
-				passive_handler.Increase("Mythical")
 				src.OMessage(10, "<b><font color=red><center>The very air shakes, as [src.name] shakes the world with their yell of potent, overwhelming power!!</center></font></b>")
 				Quake(10)
 				KenShockwave(src,icon='fevKiai.dmi',Size=4)
@@ -381,7 +377,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.ElementalDefense="Ultima"
 				passive_handler.Increase("InjuryImmune")
 				passive_handler.Increase("FatigueImmune")
-				passive_handler.Increase("Siphon")
 				src.Sheared=0
 				src.HealWounds(50)
 				src.HealHealth(50)
@@ -541,9 +536,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.ElementalOffense="Void"//eat stats
 				src.ElementalDefense="Void"
 				passive_handler.Increase("TechniqueMastery", 5)
-				passive_handler.Increase("MovementMastery", 5)
 				passive_handler.Increase("Momentum", 4)
-				passive_handler.Increase("Steady", 5)
 				passive_handler.Increase("PureDamage",6)
 				passive_handler.Increase("HellPower", 1)
 				var/i='LavaTile.dmi'
@@ -598,7 +591,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.OMessage(10,"<b>[src] invokes the spirit of destruction through their blade!</b>")
 			if("Dainsleif")
 				src.ElementalOffense="Poison" //This already has cursed wounds, so it will become hyper murder poison.
-				passive_handler.Increase("NoForcedWhiff")
 				passive_handler.Increase("HardStyle", 5)
 				passive_handler.Increase("DeathField", 5)
 				passive_handler.Increase("SoulSteal")
@@ -661,13 +653,10 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("CounterMaster",10)
 			passive_handler.Decrease("Extend")
 			passive_handler.Decrease("TechniqueMastery", 5)
-			passive_handler.Decrease("MovementMastery", 5)
-			passive_handler.Decrease("Mythical")
 		if("Caledfwlch")
 			src.ElementalDefense=null
 			passive_handler.Decrease("InjuryImmune")
 			passive_handler.Decrease("FatigueImmune")
-			passive_handler.Decrease("Siphon")
 		if("Kusanagi")
 			src.ElementalOffense=null
 			src.ElementalDefense=null
@@ -707,9 +696,7 @@ mob/proc/RevertWS()
 			src.ElementalOffense=null
 			src.ElementalDefense=null
 			passive_handler.Decrease("TechniqueMastery", 5)
-			passive_handler.Decrease("MovementMastery", 5)
 			passive_handler.Decrease("Momentum", 4)
-			passive_handler.Decrease("Steady", 5)
 			passive_handler.Decrease("PureDamage",6)
 			passive_handler.Decrease("HellPower", 1)
 		if("Muramasa")
@@ -723,7 +710,6 @@ mob/proc/RevertWS()
 			src.overlays-=image(icon='DeathbringerMode.dmi')
 		if("Dainsleif")
 			src.ElementalOffense=null
-			passive_handler.Decrease("NoForcedWhiff")
 			passive_handler.Decrease("HardStyle", 5)
 			passive_handler.Decrease("DeathField",5)
 			passive_handler.Decrease("SoulSteal")

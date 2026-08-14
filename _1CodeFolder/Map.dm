@@ -104,23 +104,28 @@ var/list/nonDestroyable_turfs = list("/turf/Special/Blank",
 proc/VoidDestroy(turf/A)
 	if(isturf(A))
 		if(A.type!=/turf/Dirt1&&A.Destructable)
-			new/turf/Special/Static(locate(A.x,A.y,A.z))
+			var/turf/nt = new/turf/Special/Static(locate(A.x,A.y,A.z))
+			LightingRecomputeNear(nt)
 	else if(isobj(A))
-		new/turf/Special/Static(locate(A.x,A.y,A.z))
+		var/turf/nt = new/turf/Special/Static(locate(A.x,A.y,A.z))
 		del(A)
+		LightingRecomputeNear(nt)
 	else if(ismob(A))
 		del(A)
 
 proc/Destroy(turf/A,var/DestroyDamageMulti)
 	if(isturf(A))
 		if(!nonDestroyable_turfs.Find("[A.type]") && A.Destructable)
+			var/turf/nt
 			if(usr==0)
-				new/turf/Dirt1(locate(A.x,A.y,A.z))
+				nt = new/turf/Dirt1(locate(A.x,A.y,A.z))
 				A.Destroyer=null
 			else
 				if(A.Health<DestroyDamageMulti)
-					new/turf/Dirt1(locate(A.x,A.y,A.z))
+					nt = new/turf/Dirt1(locate(A.x,A.y,A.z))
 					A.Destroyer=usr.ckey
+			if(nt)
+				LightingRecomputeNear(nt) //wall gone: re-light through the new gap
 	else if(isobj(A))
 		if(A.Destructable)
 			if(istype(A, /obj/Items/Sword)&&!A.suffix)

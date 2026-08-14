@@ -1,6 +1,3 @@
-passiveInfo/ShockImmunity
-    setLines()
-        lines = list("You are completely immune to the Shock debuff. Electrical attacks cannot Shock you.");
 
 passiveInfo/ChillAbsorb
     setLines()

@@ -36,6 +36,7 @@
 	GatesNerf=0
 
 obj/Skills/Utility
+	canBeShortcut=0 //menu tools
 //General
 
 	Teachz
@@ -80,8 +81,6 @@ obj/Skills/Utility
 					return
 			Choice.RPPSpendable+=(Amount*Choice.GetRPPMult())
 			usr.RPPDonate-=Amount
-			if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-				usr.potential_gain(Amount/glob.progress.RPPDaily*50)//kais have a 0.1 potential rate so this is only x5 potential in reality and i really dont think the fuckers are gonna be out there slaying npcs
 			OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 			Choice.LastTeach=world.realtime+Day(1)
 			src.Using=0
@@ -138,8 +137,6 @@ obj/Skills/Utility
 				if(Choice.SpendRPP((Choice2.SkillCost*0.5/Choice.GetRPPMult()), Choice2, Training=1))
 					Choice.AddSkill( new Choice2.type )
 					usr.RPPDonate-=Choice2.SkillCost*0.5
-					if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-						usr.potential_gain(Choice2.SkillCost*0.5/glob.progress.RPPDaily*50)//kai only have 0.1 potential rate so this is only x5
 					OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 					Choice.LastTeach=world.realtime+Day(1)
 					src.Using=0
@@ -176,7 +173,7 @@ obj/Skills/Utility
 					if(src.Using)
 						usr << "You're already preparing a meal!"
 						return
-					if(usr.passive_handler.Get("Piloting")||usr.HasPossessive())
+					if(usr.passive_handler.Get("Piloting"))
 						usr << "You're not capable of necessary precision!"
 						return
 					if(usr.TotalFatigue>=90)
@@ -399,7 +396,7 @@ obj/Skills/Utility
 			if(src.Using)
 				usr << "You're already preparing a meal!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -473,7 +470,6 @@ obj/Skills/Utility
 
 	Sense
 		SkillCost=100
-		Teachable=0
 		Level=0
 		Cooldown=5
 		desc="Focus your thoughts to detect nearby entities."
@@ -573,7 +569,6 @@ obj/Skills/Utility
 								ordered += T
 					usr.race.transformations = ordered
 					usr.removed_ssj_forms.Cut()
-			usr.SkillX("GodTransToggle", usr)
 
 	Telepathy
 		Learn=list("energyreq"=1000)
@@ -624,17 +619,16 @@ obj/Skills/Utility
 					if(A == usr) continue
 					who.Add(A)
 			for(var/mob/Players/W in who)
-				if(!usr.isRace(SHINJIN))
-					if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
-						if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
-							if(!(W in hearers(50,usr)))
-								who.Remove(W)
-						if(!W.EnergySignature)
+				if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
+					if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
+						if(!(W in hearers(50,usr)))
 							who.Remove(W)
-						if(W.Dead)
-							who.Remove(W)
-					if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					if(!W.EnergySignature)
 						who.Remove(W)
+					if(W.Dead)
+						who.Remove(W)
+				if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					who.Remove(W)
 			var/mob/Players/selector=input("Select a player to telepath.") in who||null
 			if(selector=="Cancel")
 				return
@@ -642,7 +636,6 @@ obj/Skills/Utility
 
 	Send_Energy
 		SignatureTechnique=1
-		Teachable=0
 		Level=100
 		desc="Can continually transfer energy to someone at the cost of your own life force."
 		verb/Share_Energy()
@@ -709,8 +702,6 @@ obj/Skills/Utility
 						who.Remove(W)
 				if(W.HasGodKi() && !usr.HasGodKi())
 					who.Remove(W)
-				if(W.HasMaouKi())
-					who.Remove(W)
 				if(W.invisibility)
 					who.Remove(W)
 				if(W.isRace(ELDRITCH)||W.isRace(NOBODY))
@@ -725,9 +716,7 @@ obj/Skills/Utility
 			else
 				if(selector.passive_handler.Get("Anti-Scrying"))
 					var/antiscry = 1
-					if(usr.passive_handler.Get("God's Gaze"))
-						antiscry = 0
-					else if(usr.HasGodKi())
+					if(usr.HasGodKi())
 						if(usr.passive_handler.Get("GodKi") > selector.passive_handler.Get("GodKi"))
 							antiscry = 0
 					if(antiscry)
@@ -812,6 +801,7 @@ obj/Skills/Utility
 			set category="Utility"
 			set hidden = 1
 			if(usr.Stasis)return
+			if(Using) return
 			var/blah=input("Options")in list("Person","Cordinates","Cancel")
 			switch(blah)
 				if("Person")
@@ -823,6 +813,7 @@ obj/Skills/Utility
 						return
 					for(var/mob/m in view(1, usr))
 						m.loc=whoto.loc
+					src.Cooldown()
 
 				if("Cordinates")
 					var/blahx=input("x")as num
@@ -830,6 +821,7 @@ obj/Skills/Utility
 					var/blahz=input("z")as num
 					for(var/mob/m in view(1, usr))
 						m.loc=locate(blahx+rand(-1,1), blahy+rand(-1,1), blahz)
+					src.Cooldown()
 
 	Bind_To_Plane
 		Cooldown=600
@@ -837,6 +829,7 @@ obj/Skills/Utility
 		verb/Bind_To_Plane()
 			set category="Utility"
 			set hidden = 1
+			if(Using) return
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(3, usr))
 				if(M==usr)
@@ -849,11 +842,13 @@ obj/Skills/Utility
 				Choice.Binding=list(Choice.x,Choice.y,Choice.z)
 				Choice.BindingTimer = Day(3)
 				OMsg(usr, "[usr] has bound [Choice] to this plane of existence!!")
+				src.Cooldown()
 			else
 				usr << "They aren't weak enough to bind!"
 		verb/Call_To_Plane()
 			set category="Skills"
 			set hidden = 1
+			if(Using) return
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(10, usr))
 				if(M.Binding)
@@ -863,12 +858,12 @@ obj/Skills/Utility
 				return
 			OMsg(usr, "[usr] has forced [Choice]'s binding to take them back to their plane!")
 			Choice.TriggerBinding()
+			src.Cooldown()
 
 //Knowledge
 
 	Make_Equipment
 		Level=100
-		Teachable=0
 		desc="Forge a basic blade."
 		proc/getDropDir()
 			var/norSouth = 0
@@ -954,12 +949,10 @@ obj/Skills/Utility
 				OMsg(usr, "[usr] conjures clothing!", "[usr] materialized some clothes.")
 	Enchant_Equipment
 		Level=100
-		Teachable=0
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
 		// verb removed
 	Upgrade_Equipment
 		Level=100
-		Teachable=0
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
 		// verb removed
 	Transmute//PHILOSTONES
@@ -2376,7 +2369,7 @@ obj/Skills/Utility
 			if(usr.KO)
 				usr << "You can't perform surgery while knocked out!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2431,7 +2424,7 @@ obj/Skills/Utility
 			if(src.Using)
 				usr << "You're already preparing to perform the recovery!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2981,7 +2974,6 @@ obj/Skills/Utility
 				ModChoices.Remove("Armstrong Augmentation")
 				ModChoices.Remove("Ray Gear")
 				ModChoices.Remove("Hilbert Effect")
-				ModChoices.Remove("Overdrive")
 
 			if(M.isRace(ANDROID)||M.CyberneticMainframe)
 				if(M.Maimed||M.HealthCut)
@@ -3396,8 +3388,6 @@ obj/Skills/Utility
 			set hidden = 1
 			if(!usr.ClothGold)
 				usr.PickGoldCloth()
-				if(!glob.infConstellations)
-					glob.takeLimited("GoldConstellation", usr.ClothGold)
 			if(!usr.ZodiacCharges)
 				usr<<"You have no charges of Zodiac Invocation left!"
 				return
@@ -3425,6 +3415,7 @@ obj/Skills/Utility
 			if(usr.Dead && !usr.KeepBody)
 				usr << "You cannot call blade while dead."
 				return
+			if(Using) return
 			switch(usr.BoundLegend)
 				if("Green Dragon Crescent Blade")
 					if(!locate(/obj/Items/Sword/Heavy/Legendary/WeaponSoul/Spear_of_War, usr))
@@ -3499,6 +3490,7 @@ obj/Skills/Utility
 								usr.contents+=S
 								break
 			OMsg(usr, "[usr] summons forth their legendary blade!")
+			src.Cooldown()
 
 	Death_Killer
 		desc="Kill death."

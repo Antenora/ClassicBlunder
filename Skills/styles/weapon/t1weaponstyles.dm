@@ -38,7 +38,7 @@
 		Copyable=0
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu",\
 		"/obj/Skills/Buffs/NuStyle/SwordStyle/Fist_of_Khonshu"="/obj/Skills/Buffs/NuStyle/SwordStyle/Gatotsu")
-		passives = list("Iaijutsu" = 2, "Musoken" = 1, "BlurringStrikes" = 0.5)
+		passives = list("Iaijutsu" = 2, "Musoken" = 1)
 		StyleActive="Seitei Iaido"
 		StyleSpd=1.3
 		StyleOff=1.15
@@ -64,7 +64,7 @@
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Fist_of_Khonshu"="/obj/Skills/Buffs/NuStyle/SwordStyle/Witch_Hunter",
 							"/obj/Skills/Buffs/NuStyle/SwordStyle/Dardi_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk",
 							"/obj/Skills/Buffs/NuStyle/MysticStyle/Fire_Weaving"="/obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama")
-		passives = list("Half-Sword" = 1.5, "Zornhau" = 1)
+		passives = list("Half-Sword" = 1.5)
 		StyleActive="Art of Fighting"
 		StyleStr=1.3
 		StyleOff=1.3

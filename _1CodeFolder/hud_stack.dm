@@ -3,7 +3,8 @@
 
 /obj/hud
 
-	layer = FLY_LAYER
+	plane = HUD_PLANE
+	layer = FLY_LAYER + 1.75 //above the day/night blanket (6.5), below the FLY_LAYER+2 HUD stack
 	alpha = 0
 	var/tmp/obj/appear
 	var/tmp/client/client
@@ -52,7 +53,7 @@
 				if("SuperCharge")
 					appear.icon = 'background.dmi'
 					appear.icon_state = "plasma_style"
-			appear.layer = FLY_LAYER
+			appear.layer = FLY_LAYER + 1.75
 			appear.alpha = 255
 
 			if(thing)
@@ -66,10 +67,10 @@
 	iaido
 		icon = 'kunai.dmi'
 		dir = EAST
-		layer = FLY_LAYER
+		layer = FLY_LAYER + 1.75
 		alpha = 0
 		Update()
-			var/iaido = client.mob.passive_handler["Iaido"];
+			var/iaido = client.mob.UsingFTG();
 			var/counter = client.mob.IaidoCounter
 			if(iaido)
 				if(counter >= 100)
@@ -89,6 +90,7 @@
 	proc/animateBar(x_offset, time2death)
 		animate(src, pixel_x = x_offset, time=time2death, easing = LINEAR_EASING)
 /obj/Container
+	plane = HUD_PLANE
 	appearance_flags = KEEP_TOGETHER
 	icon = 'smallbar.dmi'
 	icon_state = "background"
@@ -98,6 +100,7 @@
 			screen_loc = "1:[loc_x],1:[loc_y]"
 
 /obj/barbg
+	plane = HUD_PLANE
 	icon = 'barbgs.dmi'
 	New(state)
 		icon_state = state
@@ -115,11 +118,19 @@ client/proc/remove_hud(id)
 		var/obj/thing = hud_ids[id]
 		screen -= hud_ids[id]
 		mob.contents -= hud_ids[id]
-
-		del thing
+		var/obj/bar/B = thing
+		if(istype(B))
+			if(B.holder)
+				screen -= B.holder
+				B.holder = null
+			if(B.barbg)
+				screen -= B.barbg
+				B.barbg = null
+			B.meter = null
 		hud_ids -= id
 
 /obj/bar
+	plane = HUD_PLANE
 	var/tmp/linked_var = ""
 	var/obj/Bar/meter
 	var/obj/Container/holder
@@ -202,8 +213,8 @@ client/proc/remove_hud(id)
 			animate(barbg, alpha = 0, time = 2)
 
 
-#define BAR_X_LOCS list("Fury" = 1, "Momentum" = 1, "Harden" = 1, "Iaido" = 1, "MysticT0" = 1, "MysticT1" = 32, "SuperCharge" = 32, "HotnCold" = 128, "Grit" = 192)
-#define BAR_Y_LOCS list("Fury" = 86, "Momentum" = 118, "Harden" = 150, "Iaido" = 32, "MysticT0" = 64, "MysticT1" = 64, "SuperCharge" = 32, "HotnCold" = 1, "Grit" = 1)
+#define BAR_X_LOCS list("Fury" = 1, "Momentum" = 1, "Harden" = 1,  "MysticT0" = 1, "MysticT1" = 32, "SuperCharge" = 32, "HotnCold" = 128, "Grit" = 192)
+#define BAR_Y_LOCS list("Fury" = 86, "Momentum" = 118, "Harden" = 150,  "MysticT0" = 64, "MysticT1" = 64, "SuperCharge" = 32, "HotnCold" = 1, "Grit" = 1)
 
 /mob/proc/hudIsLive(option, path, toss_obj,var_callback)
 	if(client.hud_ids[option])

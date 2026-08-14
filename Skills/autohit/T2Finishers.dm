@@ -4,7 +4,7 @@
 		Area="Circle"
 		NoLock=1
 		NoAttackLock=1
-		StrOffense=1
+		StrScaling=1
 		Rush=3
 		Rounds=5
 		DamageMult = T2_DMG_MULT/2/5;
@@ -27,8 +27,8 @@
 		DamageMult = T2_DMG_MULT/2/10;
 		Rounds=10
 		ComboMaster = 1
-		StrOffense=1
-		EndDefense=1
+		StrScaling=1
+		EndEffectiveness=1
 		WindUp=0.2
 		CanBeDodged=1
 		WindupMessage="sets themselves into a handstand..."
@@ -36,7 +36,6 @@
 		Icon='SweepingKick.dmi'
 		IconX=-32
 		IconY=-32
-		IconTime=10
 		Cooldown=4
 	Ice_Ply
 		AdaptRate = 1
@@ -56,7 +55,7 @@
 		SpecialAttack = 1
 		DamageMult = T2_DMG_MULT / 2 / 5;
 		AdaptRate = 1
-		EndDefense = 0.75
+		EndEffectiveness = 0.75
 	Flashfire_Fist
 		Area = "Wave"
 		TurfShift='BurnedGround.dmi'
@@ -66,7 +65,7 @@
 		DamageMult = T2_DMG_MULT / 2;
 		AdaptRate = 1
 		Rush = 3
-		EndDefense = 1
+		EndEffectiveness = 1
 		Scorching = 50
 
 	Pinning_Stake
@@ -84,9 +83,9 @@
 		NoAttackLock=1
 		Distance=5
 		DamageMult = T2_DMG_MULT / 2;
-		StrOffense=1
-		ForOffense=1
-		EndDefense=1
+		StrScaling=1
+		ForScaling=1
+		EndEffectiveness=1
 		Knockback=10
 		Scorching=30
 		ActiveMessage="follows up with an incendiary kick!!"
@@ -108,9 +107,9 @@
 		NoAttackLock=1
 		Distance=50
 		DamageMult= T2_DMG_MULT / 2;
-		StrOffense=1
-		ForOffense=1
-		EndDefense=1
+		StrScaling=1
+		ForScaling=1
+		EndEffectiveness=1
 		Cooldown=4
 		BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ruptured"
 		//TODO: finish

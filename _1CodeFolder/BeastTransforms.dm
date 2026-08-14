@@ -1,19 +1,6 @@
 #define OOZARU_POTENTIAL_TRANS 10
 
-/mob/var/tail_mastery = 1 // per 100 = 1 asc worth of resistance
 /mob/var/oozaru_type = null
-
-/mob/proc/tailResistanceTraining(probability)
-	if(tail_mastery / 100 > clamp(AscensionsAcquired, 1, 5))
-		return // maxed out
-	if(prob(probability))
-		if(prob(1))
-			tail_mastery += rand(2,4)
-		else
-			tail_mastery++
-	if(tail_mastery%100 == 0)
-		src << "You have learned to adjust to attacks towards your tail!"
-		src << "You have reached [tail_mastery/100] ascensions worth of resistance!"
 
 /obj/Skills/Buffs/SlotlessBuffs/Oozaru
 	var/Looking = 1
@@ -24,8 +11,7 @@
 	TransformX = -32
 	TransformY = -32
 	AuraLock = 'BLANK.dmi'
-	passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 1, \
-	"Meaty Paws" = 1, "PureDamage" = 2, "PureReduction" = 2, "GiantSwings" = 1)
+	passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 	StrMult = 1.3
 	ForMult = 1.2
 	SpdMult = 0.3
@@ -33,7 +19,7 @@
 	DefMult = 0.1
 	PowerMult=1.5
 	HealthThreshold=0.01
-	AutoAnger = 1
+	AngerFloor = 90
 	TimerLimit = 360
 	verb/Ultimate_Form_Toggle()
 		set category="Other"
@@ -64,12 +50,10 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
-		passives = list("Vulnerable Behind" = 1, "GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 1, \
-			"Meaty Paws" = 1, "PureDamage" = 2, "PureReduction" = 2, "GiantSwings" = 1)
+		passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired
-				passives["Meaty Paws"] = 2 + (p.AscensionsAcquired /2)
 				StrMult = 1.2
 				ForMult = 1.15
 				EndMult = 1.2
@@ -83,8 +67,6 @@
 				OffMult = 1.2
 				TimerLimit = 720
 			if("Instinctual")
-				passives["Flow"] = 1
-				passives["Instinct"] = 1
 				StrMult = 1.2
 				ForMult = 1.2
 				EndMult = 1.2
@@ -109,7 +91,6 @@
 					if(SS1pot<5)
 						SS1pot=5
 					passives["Transformation Power"] = SS1pot //MATH COMES LATER
-					passives["BuffMastery"] = 5 + p.AscensionsAcquired
 					passives["PureReduction"] = 2 + p.AscensionsAcquired
 					passives["PureDamage"] = 1 + p.AscensionsAcquired
 					VaizardHealth =25
@@ -119,19 +100,12 @@
 			if(!altered)
 				IconTransform = 'SSJOozaru.dmi'
 			passives["Transformation Power"] = clamp(p.AscensionsAcquired * 6, 1, 40)
-			passives["Flow"] = 4
-			passives["Instinct"] = 4
-			passives["Meaty Paws"] = 2 + (p.AscensionsAcquired /2)
 			passives["Juggernaut"] = 1 + (p.AscensionsAcquired / 2)
-			passives["BuffMastery"] = 3 + (p.AscensionsAcquired / 2)
-			passives["Brutalize"] = 3
 			passives["DisableGodKi"] = 1
 			passives["Unstoppable"] = 1
-			passives["Deicide"] = 10
-			passives["EndlessNine"] = 0.25
 			passives["PUSpike"] = 50
 			passives["KiControl"] = 1
-			AutoAnger = 0
+			AngerFloor = 0
 			VaizardShatter=0
 			StrMult = 1.5
 			ForMult = 1.5
@@ -144,7 +118,6 @@
 			PowerMult = 1.6
 			if(p.oozaru_type=="Demonic")
 				PowerMult=2.5
-				passives["BuffMastery"] = 5 + p.AscensionsAcquired
 				passives["PureReduction"] = 2 + (p.AscensionsAcquired*1.25)
 				passives["PureDamage"] = 2 + (p.AscensionsAcquired*1.25)
 				SpdMult=1

@@ -2,7 +2,7 @@
 	//50% injury check
 	var/exhaustedMessage = SpecialBuff ? SpecialBuff.ExhaustedMessage : ExhaustedMessage
 	var/desperateMessage = SpecialBuff ? SpecialBuff.DesperateMessage : BarelyStandingMessage
-	if(TotalInjury > 50 && !src.InjuryAnnounce && !passive_handler["Beefy"])
+	if(TotalInjury > 50 && !src.InjuryAnnounce)
 		OMessage(10, "[src] [BeatenMessage]!")
 		InjuryAnnounce = 1
 
@@ -12,12 +12,11 @@
 		NanoAnnounce = 1
 	// 25% health check
 	if(Health < 25*(1-HealthCut) && !HealthAnnounce25)
-		if(!passive_handler["Beefy"])
-			if(!ExhaustedColor)
-				OMessage(10, "<font color=#F07E1F>[src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
-			else
-				OMessage(10,"<font color='[ExhaustedColor]'> [src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
-			HealthAnnounce25 = 1
+		if(!ExhaustedColor)
+			OMessage(10, "<font color=#F07E1F>[src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
+		else
+			OMessage(10,"<font color='[ExhaustedColor]'> [src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
+		HealthAnnounce25 = 1
 		var/shonenMoment = ShonenPowerCheck(src)
 		if(shonenMoment)
 			VaizardHealth += triggerPlotArmor(shonenMoment, HasUnstoppable())
@@ -25,12 +24,11 @@
 
 	// 10% health check
 	if(Health < 10*(1-HealthCut) && !HealthAnnounce10)
-		if(!passive_handler["Beefy"])
-			if(!BarelyStandingColor)
-				OMessage(10, "<font color=#F07E1F>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
-			else
-				OMessage(10,"<font color='[BarelyStandingColor]'>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
-			HealthAnnounce10 = 1
+		if(!BarelyStandingColor)
+			OMessage(10, "<font color=#F07E1F>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
+		else
+			OMessage(10,"<font color='[BarelyStandingColor]'>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
+		HealthAnnounce10 = 1
 //**TESTED AND WORKS */
 /mob/proc/reduceErodeStolen()
 	var/list/stats = list("Str","Spd","For", "End","Off","Def")
@@ -128,7 +126,7 @@
 		drain = round(30 - ((transMastery - 5) * 30) / (75 - 5), 1)
 		if(drain < 0)
 			drain = 0
-		if(Energy < drain && !HasNoRevert() && !Dead && !HasMystic())
+		if(Energy < drain && !Dead && !HasMystic())
 
 			Revert()
 			LoseEnergy(drain)
@@ -138,7 +136,7 @@
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
-		if(Energy < drain && !HasNoRevert())
+		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
 			src<<"The strain of Golden Form forced you to revert!"

@@ -18,13 +18,11 @@
     ActiveMessage = "enters the next realm of Samsara."
     
     Naraka
-        passives = list("Conductor" = -15, "Harden" = 1, "Momentum" = 1, "Pressure" = 2)
+        passives = list("Conductor" = -15, "Harden" = 1, "Momentum" = 1)
     Preta
-        passives = list("Antsy" = -2, "Harden" = 2, "Momentum" = 1, "UnarmedDamage" = 3, "Deflection" = 2, \
-                        "Pressure" = 1)
+        passives = list("Antsy" = -2, "Harden" = 2, "Momentum" = 1, "UnarmedDamage" = 3, "Deflection" = 2)
     Tiryag
-        passives = list("Conductor" = -25, "Antsy" = -2, "Harden" = 2, "Momentum" = 2, "Deflection" = 1, \
-                        "Pressure" = 1)
+        passives = list("Conductor" = -25, "Antsy" = -2, "Harden" = 2, "Momentum" = 2, "Deflection" = 1)
         StrMult=1.2
         ForMult=1.2
         SpdMult=1.2
@@ -32,8 +30,7 @@
         OffMult=1.2
         DefMult=1.2
     Asura
-        passives = list("Conductor" = -25, "Momentum" = 2, "LikeWater" = 8, "Antsy" = -3, \
-                        "Pressure" = 1)
+        passives = list("Conductor" = -25, "Momentum" = 2, "Antsy" = -3)
         offAdd = 0.25
         defAdd = 0.25
         spdAdd = 0.25
@@ -43,11 +40,11 @@
         SureDodgeTimerLimit = 15
         SureHitTimerLimit = 15
     Mansuya
-        passives = list("Tenacity" = 3, "Persistence" = 3, "UnderDog" = 3, "DemonicDurability" = 2, "Pressure" = 2)
+        passives = list("Tenacity" = 3, "Persistence" = 3, "UnderDog" = 3)
     Deva
-        passives = list("Deicide" = 5, "Momentum" = 4, "UnarmedDamage" = 2, "Deflection" = 2, "Harden" = 5)
+        passives = list("Momentum" = 4, "UnarmedDamage" = 2, "Deflection" = 2, "Harden" = 5)
     Buddha
-        passives = list("GodKi" = 0.5, "UnarmedDamage" = 5, "Deflection" = 5, "PureReduction" = -20, "NoDodge" = 1, "NoMiss" = 1)
+        passives = list("GodKi" = 0.5, "UnarmedDamage" = 5, "Deflection" = 5, "PureReduction" = -20, "NoDodge" = 1, "NoWhiff" = 1)
         TimerLimit = 60
         StrMult=2
         ForMult=2

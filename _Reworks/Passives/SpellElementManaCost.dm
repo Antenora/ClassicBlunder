@@ -10,46 +10,6 @@
 // Selecting the same Mastery on two nodes adds the bind a second time, so
 // two ticks of BurnMastery = 0.30 = 30% cheaper Fire spells.
 
-passiveInfo/FireSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Fire spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/WaterSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Water spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/EarthSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Earth spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/AirSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Wind spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/LightSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Light spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/DarkSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Dark spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/TimeSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Time spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
-passiveInfo/SpaceSpellManaCost
-    setLines()
-        lines = list("Reduces the mana cost of every Space spell you cast.",\
-"Stored as a decimal reduction, applied as a multiplier on top of the spell's mana cost.");
-
 mob/proc/
     getSpellElementManaCostReduction(element)
         // Returns the cumulative decimal mana cost reduction for spells of the
@@ -60,7 +20,10 @@ mob/proc/
         // catches anything that slips past it).
         . = 0
         if(!element) return 0
-        var/value = passive_handler.Get("[element]SpellManaCost")
+        var/prefix = "[element]"
+        if(element == "Wind")
+            prefix = "Air"
+        var/value = passive_handler.Get("[prefix] Magic Mastery")
         if(!value) return 0
         if(value > 0.95)
             value = 0.95

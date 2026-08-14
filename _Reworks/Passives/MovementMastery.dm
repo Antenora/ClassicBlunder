@@ -8,7 +8,6 @@ globalTracker/var
 
 /mob/proc/GetMovementMastery()
     . = 0;
-    . += passive_handler.Get("MovementMastery")
     if(passive_handler.Get("Zeal")) . += (transActive * glob.MOVE_MASTERY_PER_ZEAL_TRANS);
     if(Saga=="Cosmo" && !SpecialBuff) . += (SagaLevel * glob.MOVE_MASTERY_PER_COSMO_SAGA);
     if(InfinityModule) . += (AscensionsAcquired * glob.MOVE_MASTERY_PER_INFINITY_MOD);

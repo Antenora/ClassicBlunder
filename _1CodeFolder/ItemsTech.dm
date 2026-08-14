@@ -1,6 +1,6 @@
 #define INORGANIC_RACES list(ANDROID)
-#define CURSED_RACES list(CELESTIAL, ELF, MAJIN, POPO)
-#define STAGNANT_RACES list(ANGEL, DEMON, ELDRITCH, MAKAIOSHIN, SHINJIN)
+#define CURSED_RACES list(CELESTIAL, MAJIN, POPO)
+#define STAGNANT_RACES list(ANGEL, DEMON, ELDRITCH, MAKAIOSHIN)
 
 mob/proc
 	UpdateTechnologyWindow()
@@ -1973,7 +1973,6 @@ obj/Items/Tech
 		SubType="Local Range Devices"
 		icon='Binoculars.dmi'
 		Cost=0.2
-		var/viewOld
 		desc="Use this to increase your sight range temporarily."
 		Click()
 			if(!(src in usr))
@@ -1982,11 +1981,9 @@ obj/Items/Tech
 				return
 			else
 				Using=1
-				viewOld=usr.client.view
 				usr.client.view="69x69"
 				spawn(100)
-					usr.client.view=viewOld
-					viewOld=null
+					usr?.client?.FitViewNow()
 					Using=0
 	Doorbell
 		Health=10
@@ -3928,7 +3925,7 @@ obj/Items/Gear
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Two)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Three)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Four)
-				usr.AddSkill(new /obj/Skills/False_Moon)
+				usr.AddSkill(new /obj/Skills/AutoHit/False_Moon)
 				usr.passive_handler.Increase("HellPower", 0.1)
 				usr.passive_handler.Increase("Persistence", 2)
 				usr.passive_handler.Increase("MaimMastery", 1)

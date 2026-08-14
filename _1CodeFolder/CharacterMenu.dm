@@ -176,7 +176,7 @@ client/proc/CMloc(dx, dy)
 	proc/SetBuff(obj/Skills/Buffs/b)
 		buff = b
 		if(b)
-			var/icon/I = icon(SkillMenuIcon(b))   
+			var/icon/I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
 			I.Scale(26, 26)
 			icon = I
 			buff_name = b.name
@@ -348,9 +348,20 @@ client/proc/CMloc(dx, dy)
 /atom/movable/shud/cmdesc
 	layer = CMENU_LAYER + 0.6
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	var/draggable = 0
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HideDescPanel()
+	MouseDown(location, control, params)
+		if(draggable && usr) usr.client.PanelDragStart(src, params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(draggable && usr) usr.client.PanelDragMove(params)
+	MouseUp(location, control, params)
+		if(draggable && usr) usr.client.PanelDragEnd()
+
+client/var/tmp/gd_pan_x = 0
+client/var/tmp/gd_pan_y = 0
 
 /atom/movable/shud/cmdtext
 	layer = CMENU_LAYER + 0.7
@@ -790,13 +801,21 @@ client/proc/ScrollTrackTo(params)
 
 // real sig is 6 args. use only the sign, the OS reports big magnitudes (120/notch)
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
-	if(AdminWheelScroll(delta_y))  
+	if(AdminWheelScroll(delta_y))
+		return
+	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)  
 		return
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return
 	if(AqWheelScroll(delta_y))     // Acquire Skills list (AcquireHUD.dm)
 		return
 	if(StWheelScroll(delta_y))     // Forge/Anvil station list (StationHUD.dm)
+		return
+	if(LogWheelScroll(delta_y))    // Collection Log grid (LogHUD.dm)
+		return
+	if(FarmWheelScroll(delta_y))   // Seed stall / seed picker (farming.dm)
+		return
+	if(AhWheelScroll(delta_y))     // Auction House rows (AuctionHUD.dm)
 		return
 	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
 		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
@@ -1400,7 +1419,8 @@ client/proc/ShowGearDetail(obj/Items/it)
 	cmenu_desc_objs = list()
 	var/atom/movable/shud/cmdesc/P = new
 	P.icon = 'HUD/geardetail.png'
-	P.screen_loc = CMloc(120, 32 + 280)
+	P.draggable = 1
+	P.screen_loc = CMloc(120, 32 + 368)
 	cmenu_desc_objs += P
 	var/cat = GearCat(it)
 	var/ly = 50
@@ -1486,9 +1506,16 @@ client/proc/ShowGearDetail(obj/Items/it)
 			cmenu_desc_objs += pr
 			ly += 16
 			pn++
-	AddDescLine(gspan("left-click an item to equip - right-click to close", "#7a9bb5", "center"), 134, 282, 356)
+	AddDescLine(gspan("left-click to equip &#183; right-click to close &#183; drag to move", "#7a9bb5", "center"), 134, 348, 356)
 	for(var/atom/movable/o in cmenu_desc_objs)
 		screen += o
+	// remembered popup offset, clamped to the view
+	gd_pan_x = getPref("gdPanX"); if(isnull(gd_pan_x)) gd_pan_x = 0
+	gd_pan_y = getPref("gdPanY"); if(isnull(gd_pan_y)) gd_pan_y = 0
+	var/list/gdb = PanBounds("geardesc", P)
+	gd_pan_x = clamp(gd_pan_x, gdb[1], gdb[2])
+	gd_pan_y = clamp(gd_pan_y, gdb[3], gdb[4])
+	PanShift(cmenu_desc_objs, gd_pan_x, gd_pan_y)
 	KineticEntrance(cmenu_desc_objs)
 
 //////////////////////////////////////////////////////////////////
@@ -2173,14 +2200,10 @@ mob/proc/GetMenuPassives()
 
 mob/proc/GetCharMenuData()
 	var/list/D = list()
-	var/EffectiveAnger = Anger
-	if(Anger)
+	var/EffectiveAnger = AngerCurveValue()
+	if(EffectiveAnger>1||Anger)
 		if(AngerMult > 1)
 			EffectiveAnger = (EffectiveAnger - 1) * AngerMult + 1
-		if(AngerThreshold && EffectiveAnger < AngerThreshold)
-			EffectiveAnger = AngerThreshold
-		if(DefianceCounter > 0 && !CheckSlotless("Great Ape"))
-			EffectiveAnger += DefianceCounter * 0.05
 		if(CyberCancel > 0)
 			EffectiveAnger -= (EffectiveAnger - 1) * CyberCancel
 			if(EffectiveAnger < 1) EffectiveAnger = 1
@@ -2189,10 +2212,9 @@ mob/proc/GetCharMenuData()
 	var/BaseDisplay = HasPowerReplacement() ? GetPowerReplacement() * PowerBoost * RPPower : potential_power_mult * PowerBoost * RPPower
 	var/PotPow = GetPowerReplacement() ? GetPowerReplacement() : potential_power_mult
 	var/denom = PowerBoost * RPPower * round(potential_power_mult, 0.05)
-	var/PDam = 1 + ((HasPureDamage() / 10) * glob.PURE_MODIFIER)
-	var/PRed = 1 + ((HasPureReduction() / 10) * glob.PURE_MODIFIER)
+	var/PDam = 1 + (HasPureDamage() / 10)
+	var/PRed = 1 + (HasPureReduction() / 10)
 	var/gk = (HasGodKi() && !passive_handler.Get("Utterly Powerless")) ? GetGodKi() : 0
-	if(passive_handler.Get("God")) gk = "?"
 	var/mk = (HasMaouKi() && !passive_handler.Get("Utterly Powerless")) ? GetMaouKi() : 0
 	D["power"] = "[Power]"
 	D["frompot"] = "[round(PotPow, 0.05)]"
@@ -2218,7 +2240,7 @@ mob/proc/GetCharMenuData()
 	D["magic"] = "[getTotalMagicLevel()]"
 	D["transpot"] = "[potential_trans]/100"
 	D["chips"] = "[EnhanceChips]/[EnhanceChipsMax]"
-	D["potential"] = "[passive_handler.Get("God") ? "?" : Potential]"
+	D["potential"] = "[Potential]"
 	D["pronouns"] = "[subjectpronoun()] / [objectpronoun()]"
 	var/mx = max(GetStr(), GetEnd(), GetSpd(), GetFor(), GetOff(), GetDef(), 0.0001)
 	D["fstr"] = GetStr() / mx; D["fend"] = GetEnd() / mx; D["fspd"] = GetSpd() / mx

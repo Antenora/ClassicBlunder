@@ -1,6 +1,5 @@
 
 #define ROUND_DIVIDE(N,N2) round(N/N2,0.1)
-#define PURE_GRIM_SCALING FALSE
 obj/Skills/Buffs
 	Cooldown=1
 /**
@@ -292,18 +291,11 @@ NEW VARIABLES
 	//AbyssMod//Adds abyss mod.
 	//Purity//Can only damage what it's designed to damage (Abyss for holy, Holy for abyss, humans for slayer)
 	var/KiBlade//its fooken ki blade m8
-	var/SpiritStrike //Punches with FORCE only
-	var/SpiritHand //Sunlight stance passive.
-	var/SpiritFlow //Moonlight stance passive.
-	var/HybridStrike //Punches with For/Str
-	var/PridefulRage //Ignore defenses.
 	var/NoWhiff //Melee attacks won't whiff.
 	//NoForcedWhiff//THEY WON'T WHIFF EVEN HARDER NOW
 	//Instinct - go away, AIS/WS
-	var/Steady //Consistent damage.
 	var/HotHundred//No nerf on light attacks.
 	var/Extend//Autohits reach longer.
-	var/CriticalChance//Sets the chance to inflict a critical attack.
 	var/CriticalDamage//Sets the critical multiplier.
 	var/SureHitTimerLimit//Causes a constant CD for sure hit moves to proc.
 	var/Duelist//does more damage/take less damage if hitting the person youre targetting; you take more damage if someone youre not targetting hits you and do less damage to them
@@ -315,21 +307,16 @@ NEW VARIABLES
 	var/KBMult//Adds KB Mult to everything.
 	var/KBRes//Sets knockback resistance.
 	var/KBAdd//Adds KB Add to everything.
-	var/FluidForm //Makes all attacks whiff.
 	var/GiantForm //Makes all attacks roll low
 	var/BioArmor //Honest Vaizard Health
 	var/VaizardHealth //Triggers vaizard health passive.
 	var/VaizardShatter //Shatters when Vai Health runs out.
-	var/Siphon//Raijuu shit
 	var/Juggernaut //no KB, harder to launch after stabilizing
 	//var/NoDodge//everything hits you
 	var/CriticalBlock//Holds the value of division
-	var/BlockChance//Holds the chance of blocking.
 	var/SureDodgeTimerLimit
-	var/Flow //makes you dodge without AIS/WS
 	var/CounterMaster//Punch people back with ur queus
 	var/Unstoppable//regen through fatigue and injury
-	var/DebuffResistance//idgaf about elements
 	var/VenomImmune//idgaf about poison tiles
 	var/InjuryImmune//duh
 	var/FatigueImmune//duuh
@@ -437,17 +424,15 @@ NEW VARIABLES
 	var/SwordAscensionSecond//ascension level buff. buffs everything and shatterproofs
 	var/SwordAscensionThird//ascension level buff. buffs everything and shatterproofs
 	var/SwordRefinement
-	var/SpiritSword//ACTUALLY MAKES A SPIRIT SWORD FFS
+	var/SummonSwordVisual//ACTUALLY MAKES A SPIRIT SWORD FFS
 	var/MagicSword//sword is treated as a staff. only a staff. heh.
 	var/MagicSwordSecond
 	var/MagicSwordThird
 	var/KillSword//Kills the sword when the buff is removed.
 //Anger stuff
-	var/AutoAnger //Flicks anger on
+	var/AngerFloor //hp% by which this thing makes you hit peak anger. replaces AutoAnger
 	var/AngerMult //Mults anger.
-	var/AngerThreshold //If anger is lower than this, it will set your anger.
 	var/CalmAnger //Adds your anger to power mult.
-	var/AngerStorage//holds your anger so that calm anger doesnt bug you the FUCK out.
 	var/WaveringAngerLimit//Every time this amount of seconds passes, there is a chance for your anger to fail for the same interval.
 	var/WaveringAnger//This tallies how long the current increment is.
 	var/NoAnger //Cant be mad about that...
@@ -574,11 +559,9 @@ NEW VARIABLES
 	var/DesperateMessage = FALSE
 	var/DeleteOnRemove = FALSE
 	var/KillerInstinct = 0 // Increase Str/For Mult as missing health goes up
-	var/Deicide = 0 // Do more damage vs gods, goes up to 10
 	var/Blubber = 0 // reverse knockbacks at 25% of total per tick
 	var/DemonicDurability
 	var/BladeFisting = 0 // Punch with sword
-	var/LikeWater = 0 // give flow if they have more off than your def, and instinct if they have more def than your off
 	var/Shadowbringer = 0
 	var/list/passives = list()
 	var/list/current_passives
@@ -622,6 +605,7 @@ NEW VARIABLES
 			User.BuffingUp=0
 			if(!src.BuffName)
 				src.BuffName="[src.name]"
+			spawn(1) MobAuraLightRefresh(User) //aura light follows buff on/off instantly
 			return returnClause
 	ActiveBuffs
 		ActiveSlot=1
@@ -764,7 +748,7 @@ NEW VARIABLES
 				OffMult=1.2
 				RecovMult=0.5
 				MakesArmor=1
-				passives = list("Mechanized" = 1, "PULock" = 1, "ManaLeak" = 0.25, "SpiritHand" = 1)
+				passives = list("Mechanized" = 1, "PULock" = 1, "ManaLeak" = 0.25)
 				ArmorAscension = 1
 				ArmorClass="Heavy"
 				ArmorIcon='BLANK.dmi'
@@ -797,7 +781,7 @@ NEW VARIABLES
 				DefMult=0.7
 				RecovMult=0.5
 				MakesArmor=1
-				passives = list("Mechanized" = 1, "PULock" = 1, "CallousedHands" = 0.15)
+				passives = list("Mechanized" = 1, "PULock" = 1)
 				ArmorAscension = 1
 				ArmorClass="Heavy"
 				ArmorIcon='BLANK.dmi'
@@ -834,7 +818,7 @@ NEW VARIABLES
 				StrMult = 1.1
 				RecovMult=0.5
 				MakesArmor=1
-				passives = list("Mechanized" = 1, "PULock" = 1, "BlurringStrikes" = 1)
+				passives = list("Mechanized" = 1, "PULock" = 1)
 				ArmorAscension = 1
 				ArmorClass="Light"
 				ArmorIcon='BLANK.dmi'
@@ -868,7 +852,7 @@ NEW VARIABLES
 				ManaHeal=100
 				InstantAffect=1
 				PowerReplacement=10
-				passives = list("Piloting" = 1, "SpecialBuffLock" = 1,"GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, "NoDodge" = 1)
+				passives = list("Piloting" = 1, "SpecialBuffLock" = 1,"GiantForm" = 1, "VenomImmune" = 1, "SweepingStrike" = 1, "NoDodge" = 1)
 				Piloting=1
 				FusionPowered=1
 				NoAnger=1
@@ -897,9 +881,9 @@ NEW VARIABLES
 				"/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Beam_Saber")
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
 						passives = list("Piloting" = 1, "SpecialBuffLock" = 1,"GiantForm" = 1,\
-									 "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
+									 "VenomImmune" = 1, "SweepingStrike" = 1, \
 									 "Godspeed" = mecha.Level, "SuperDash" = 1, "Pursuer" = mecha.Level, "Flicker" = mecha.Level, \
-									 "Flow" = (mecha.Level * 0.25) + 1, "NoDodge" = 1)
+									 "NoDodge" = 1)
 						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						Afterimages = 1
@@ -911,8 +895,8 @@ NEW VARIABLES
 				"/obj/Skills/Projectile/Gear/Installed/Installed_Missile_Launcher", \
 				"/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Beam_Saber")
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
-						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
-						"Juggernaut" = mecha.Level, "Reversal" = 0.5, "BlockChance" = mecha.Level*5, "CriticalBlock" = mecha.Level*0.05, "NoDodge" = 1)
+						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "VenomImmune" = 1, "SweepingStrike" = 1, \
+						"Juggernaut" = mecha.Level, "Reversal" = 0.5, "CriticalBlock" = mecha.Level*0.05, "NoDodge" = 1)
 						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						VaizardHealth = mecha.Level * 2
@@ -924,8 +908,8 @@ NEW VARIABLES
 				"/obj/Skills/Projectile/Gear/Installed/Installed_Missile_Launcher", \
 				"/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Beam_Saber")
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
-						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
-						"CriticalChance" = mecha.Level*10, "CriticalDamage" = mecha.Level*0.1, "Steady" = mecha.Level, "Duelist" = mecha.Level, "NoDodge" = 1)
+						passives = list("Piloting" = 1,"SpecialBuffLock" = 1,"GiantForm" = 1, "VenomImmune" = 1, "SweepingStrike" = 1, \
+						"CriticalDamage" = mecha.Level*0.1,  "Duelist" = mecha.Level, "NoDodge" = 1)
 						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						..()
@@ -936,8 +920,8 @@ NEW VARIABLES
 				"/obj/Skills/Projectile/Gear/Installed/Installed_Missile_Launcher", \
 				"/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Beam_Saber")
 					init(obj/Items/Gear/Mobile_Suit/mecha, mob/player)
-						passives = list("Piloting" = 1, "GiantForm" = 1, "DebuffResistance" = 2, "VenomImmune" = 1, "SweepingStrike" = 1, \
-						"Steady" = mecha.Level/2, "Duelist" = mecha.Level/2, "NoDodge" = 1, "Juggernaut" = mecha.Level/2, "Reversal" = 0.25)
+						passives = list("Piloting" = 1, "GiantForm" = 1, "VenomImmune" = 1, "SweepingStrike" = 1, \
+						 "Duelist" = mecha.Level/2, "NoDodge" = 1, "Juggernaut" = mecha.Level/2, "Reversal" = 0.25)
 						if(player.PilotingProwess >= 5)
 							passives["NoDodge"] = 0
 						..()
@@ -1012,9 +996,9 @@ NEW VARIABLES
 				FatigueLeak = num+1 / p.SagaLevel
 				BleedHit = p.SagaLevel-1
 				passives = list("PUSpike" = PUSpike, "KiControl" = 1, "PULock" = 1,\
-				"DemonicDurability" = clamp(num*0.2,0.25,4), "HeavyHitter" = num / 8, \
+				 "HeavyHitter" = num / 8, \
 				"Flicker" = round(clamp(num/2,1,8)), "Godspeed" = round(clamp(num/2,1,8)),\
-				"SuperDash" = puBoon ? 1 : 0, "Neo" = num)
+				"SuperDash" = puBoon ? 1 : 0)
 				StrMult = 1.15 + num / glob.GATES_STAT_MULT_DIVISOR
 				EndMult = 1.1 + num / glob.GATES_STAT_MULT_DIVISOR
 				SpdMult = 1.05 + num / glob.GATES_STAT_MULT_DIVISOR*/
@@ -1205,13 +1189,13 @@ NEW VARIABLES
 						multsSet = TRUE
 					switch(usr.BoundLegend)
 						if("Redacted")
-							passives = list("Instinct" = 1, "Flow" = 1, "PULock" = 1)
+							passives = list("PULock" = 1)
 							src.SwordName=null
 							src.SwordIcon=null
 							src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 							src.OffMessage="conceals █████████████.."
 						if("Green Dragon Crescent Blade")
-							passives = list("Duelist" = max(5,usr.SagaLevel), "Harden" = usr.SagaLevel, "Mythical" = usr.SagaLevel*0.25, "Momentum" = usr.SagaLevel, "PULock" = 1)
+							passives = list("Duelist" = max(5,usr.SagaLevel), "Harden" = usr.SagaLevel,  "Momentum" = usr.SagaLevel, "PULock" = 1)
 							src.ActiveMessage="calls forth the true form of the Green Dragon Crescent Blade, the Spear of War!"
 							src.OffMessage="restrains Guan Yu's fury..."
 
@@ -1234,7 +1218,7 @@ NEW VARIABLES
 								if(istype(usr.EquippedSword(),/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory))
 									light = usr.EquippedSword():caledLight
 							if(light)
-								passives = list("HolyMod" = usr.SagaLevel, "SpiritSword" = 0.25 * usr.SagaLevel, "LikeWater" = max(1,usr.SagaLevel/2), "PULock" = 1)
+								passives = list("HolyMod" = usr.SagaLevel, "PULock" = 1)
 								if(!redacted)
 									src.SwordName="Caledfwlch"
 									src.ActiveMessage="calls forth the true form of Caledfwlch, the Sword of Glory!"
@@ -1245,7 +1229,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 							else
-								passives = list("AbyssMod" = usr.SagaLevel, "SpiritSword" = 0.25 * usr.SagaLevel, "Instinct" = max(1, usr.SagaLevel/3), "Pursuer" = max(1,usr.SagaLevel/2),"PULock" = 1)
+								passives = list("AbyssMod" = usr.SagaLevel, "Pursuer" = max(1,usr.SagaLevel/2),"PULock" = 1)
 								if(!redacted)
 									src.SwordName="Caledfwlch"
 									src.ActiveMessage="calls forth the true form of Caledfwlch Morgan, the Shadow Sword of Glory!"
@@ -1256,7 +1240,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 						if("Kusanagi")
-							passives = list("BlurringStrikes" = usr.SagaLevel/2, "SpiritFlow" = usr.SagaLevel/2, "ManaGeneration" = usr.SagaLevel*5, "SpiritSword" = max(1, usr.SagaLevel/4), "PULock" = 1)
+							passives = list(  "ManaGeneration" = usr.SagaLevel*5,  "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Kusanagi"
 								src.ActiveMessage="calls forth the true form of Kusanagi, the Sword of Faith!"
@@ -1279,7 +1263,7 @@ NEW VARIABLES
 								src.OffMessage="conceals █████████████.."
 						if("Dainsleif")
 							HealthDrain = 0
-							passives = list("SlayerMod" = usr.SagaLevel/2, "FavoredPrey" = "Mortal", "MortalStrike" = 0.5, "AbyssMod" = usr.SagaLevel/2, "LifeSteal" = usr.SagaLevel*5, "Curse" = 1, "PULock" = 1)
+							passives = list("SlayerMod" = usr.SagaLevel/2, "FavoredPrey" = "Mortal",  "AbyssMod" = usr.SagaLevel/2, "LifeSteal" = usr.SagaLevel*5,  "PULock" = 1)
 
 							if(!redacted)
 								src.SwordName="Dainsleif"
@@ -1302,7 +1286,7 @@ NEW VARIABLES
 								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 								src.OffMessage="conceals █████████████.."
 						if("Masamune")
-							passives = list("HolyMod"=usr.SagaLevel*2,"Purity"=1,"Steady"=usr.SagaLevel, "PULock" = 1)
+							passives = list("HolyMod"=usr.SagaLevel*2,"Purity"=1, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Masamune"
 								src.ActiveMessage="calls forth the true form of Masamune, the Sword of Purity!"
@@ -1318,7 +1302,7 @@ NEW VARIABLES
 								if(istype(usr.EquippedSword(),/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order))
 									light = usr.EquippedSword():caliburLight
 							if(light)
-								passives = list("HolyMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8,"Steady"=usr.SagaLevel, "PULock" = 1)
+								passives = list("HolyMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Purified Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -1328,7 +1312,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 							else
-								passives = list("AbyssMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8,"Steady"=usr.SagaLevel, "PULock" = 1)
+								passives = list("AbyssMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Crystal Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -1338,7 +1322,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 						if("Soul Edge")
-							passives = list("AbyssMod" = usr.SagaLevel, "Steady" = usr.SagaLevel, "Extend" = 1, "BleedHit" = 0.25, "PULock" = 1)
+							passives = list("AbyssMod" = usr.SagaLevel,  "Extend" = 1, "BleedHit" = 0.25, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Soul Edge"
 								src.ActiveMessage="calls forth the true form of Soul Edge, the Blade of Chaos!"
@@ -1353,12 +1337,9 @@ NEW VARIABLES
 							src.ForMult=2.25
 							src.OffMult=1.5
 							src.DefMult=1.3
-							passives = list("SpiritFlow" = 2, "SpiritStrike" = 2, "SoulFire" = 2, "DrainlessMana" = 1, "CyberStigma" = 2)
-							src.SpiritFlow=2
-							src.SpiritStrike=2
+							passives = list(  "SoulFire" = 2, "DrainlessMana" = 1, "CyberStigma" = 2)
 							src.ManaSeal=2
 							src.DrainlessMana=1
-							src.CyberStigma=2
 							src.SwordName="Moonlight Greatsword"
 							src.ActiveMessage="conjures forth the Moonlight Greatsword, basked in otherworldly lunar radiance..."
 					if(!PULock)
@@ -1425,13 +1406,10 @@ NEW VARIABLES
 							src.ForMult=1.2+ImaginaryBonus
 							src.OffMult=1.2+ImaginaryBonus
 							src.DefMult=1.2+ImaginaryBonus
-					passives["SpiritSword"] = 0.2 * usr.SagaLevel
 					if(usr.Class=="Imaginary")
 						passives["KiControl"] = 1
 					passives["PULock"] = 1
-					passives["SwordDamage"] = GetKeychainDamage(usr.KeychainAttached) + usr.SagaLevel
-					passives["SwordAccuracy"] = GetKeychainAccuracy(usr.KeychainAttached) + usr.SagaLevel
-					passives["SwordDelay"] = GetKeychainDelay(usr.KeychainAttached) + usr.SagaLevel
+					passives["Sword Mastery"] = max(GetKeychainDamage(usr.KeychainAttached), GetKeychainAccuracy(usr.KeychainAttached), GetKeychainDelay(usr.KeychainAttached)) + usr.SagaLevel
 				src.Trigger(usr)
 
 
@@ -1447,7 +1425,7 @@ NEW VARIABLES
 			SpdMult = 0.5
 			Enlarge=2
 			EnergyThreshold = 1
-			passives = list("GiantForm" = 1, "Sweeping Strikes" = 1, "NoDodge" = 1, "EnergyLeak" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1, "NoDodge" = 1, "EnergyLeak" = 1)
 			ActiveMessage="channels their regenerative abilities into a bout of monstrous growth!"
 			OffMessage="shrinks to normal size..."
 			Cooldown=0
@@ -1461,14 +1439,14 @@ NEW VARIABLES
 			StrMult=1.1
 			ForMult=1.1
 			EnergyThreshold = 1
-			passives = list("HellRisen" = 0.25, "Hellpower" = 0.1, "Flicker" = 1)
+			passives = list("HellRisen" = 0.25, "HellPower" = 0.1, "Flicker" = 1)
 			ActiveMessage="unleashes the heretical power of the Demon clan!"
 			OffMessage="discards the Demon clan's dreadful power..."
 			Cooldown=-1
 			KenWave=2
 			KenWaveIcon="LightningRed.dmi"
 			adjust(mob/p)
-				passives = list("HellRisen" = 0.25 * (p.AscensionsAcquired-1), "Godspeed" = p.AscensionsAcquired/2, "CoolerAfterImages" = 3, "Hellpower" = p.AscensionsAcquired/6, "Flicker" = round(p.AscensionsAcquired/2, 1), "Enrage" = p.AscensionsAcquired,  "EnergyLeak" = 1)
+				passives = list("HellRisen" = 0.25 * (p.AscensionsAcquired-1), "Godspeed" = p.AscensionsAcquired/2, "AfterImages" = 3, "AfterImageSkin" = "Cooler", "HellPower" = p.AscensionsAcquired/6, "Flicker" = round(p.AscensionsAcquired/2, 1),   "EnergyLeak" = 1)
 				StrMult = 1.15 + (p.Potential/250)
 				ForMult = 1.1 + (p.Potential/250)
 				EndMult = 1.1 + (p.Potential/250)
@@ -1485,7 +1463,7 @@ NEW VARIABLES
 			EndMult = 1.5
 			SpdMult = 1.5
 			AuraLock=1
-			passives = list("Flicker" = 2, "Flow" = 2, "MovementMastery" = 1, "Pursuer" = 1, "AllOutPU" = 1, "PureReduction" = 3, "PureDamage" = -3, "FatigueLeak" = 2)
+			passives = list("Flicker" = 2, "Pursuer" = 1, "AllOutPU" = 1, "PureReduction" = 3, "PureDamage" = -3, "FatigueLeak" = 2)
 			Cooldown=600
 			KKTWave=3
 			KKTWaveSize=2
@@ -1519,7 +1497,7 @@ NEW VARIABLES
 			OffMessage="tires out..."
 			adjust(mob/p)
 				passives = list("MagnifiedStr" = 0.2*round(p.Potential/10, 1), "MagnifiedEnd" = 0.2*round(p.Potential/10, 1),"MagnifiedFor" = 0.2*round(p.Potential/10, 1),\
-					"MagnifiedOff" = 0.2*round(p.Potential/10, 1),"MagnifiedDef" = 0.2*round(p.Potential/10, 1),"MovementMastery" = 1*round(p.Potential/10, 1))
+					"MagnifiedOff" = 0.2*round(p.Potential/10, 1),"MagnifiedDef" = 0.2*round(p.Potential/10, 1))
 			verb/Super_Namekian()
 				set category="Skills"
 				if(!usr.BuffOn(src))
@@ -1532,8 +1510,7 @@ NEW VARIABLES
 			StrMult=1.5
 			SpdMult=1.5
 			PowerReplacement=5
-			AngerThreshold=2
-			AutoAnger=1
+			AngerFloor=75
 			passives = list("GiantForm" = 1)
 			GiantForm=1
 			Enlarge=2
@@ -1546,7 +1523,7 @@ NEW VARIABLES
 			adjust(mob/p)
 				PowerReplacement = DaysOfWipe()+5
 				AngerMult = 2
-				passives = list("AngerMult" = 2, "GiantForm" = 1, "PowerReplacement" = DaysOfWipe()+5)
+				passives = list("GiantForm" = 1, "PowerReplacement" = DaysOfWipe()+5)
 
 			verb/Wrathful()
 				set category="Skills"
@@ -1663,10 +1640,10 @@ NEW VARIABLES
 			KenWaveIcon='KenShockwaveGold.dmi'
 			ActiveMessage="lets loose a furious Saiyan roar!"
 			OffMessage="loses steam..."
-			passives = list("UnderDog" = 5, "Persistence" = 2, "CallousedHands" = 0.15)
+			passives = list("UnderDog" = 5, "Persistence" = 2)
 			adjust(mob/p)
 				if(p.Potential>=glob.progress.T3_SIGS[1])
-					passives = list("UnderDog" = 10, "Persistence" = 4, "CallousedHands" = 0.3, "PureReduction" = 2, "PureDamage" = 1)
+					passives = list("UnderDog" = 10, "Persistence" = 4,  "PureReduction" = 2, "PureDamage" = 1)
 			verb/Saiyan_Roar()
 				set category="Skills"
 				src.Trigger(usr)
@@ -1677,12 +1654,11 @@ NEW VARIABLES
 			StrMult=1.3
 			ForMult=1.3
 			OffMult=1.25
-			passives = list("PhysPleroma" = 1, "Steady" = 1)
 			ActiveMessage="unleashes the pride of their warrior race, commanding strength absolute!"
 			OffMessage="contains their superiority."
 			adjust(mob/p)
 				if(p.Potential>=glob.progress.T3_SIGS[1])
-					passives = list("PhysPleroma" = 1, "Steady" = 2, "Brutalize" = 1, "PureDamage" = 2, "PureReduction" = 1)
+					passives = list(   "PureDamage" = 2, "PureReduction" = 1)
 			verb/Royal_Lineage()
 				set category="Skills"
 				src.Trigger(usr)
@@ -1697,10 +1673,10 @@ NEW VARIABLES
 			ForMult=1.1
 			ActiveMessage="grows eager to test the strength of their opponent!"
 			OffMessage="contains their excitement."
-			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2)
+			passives = list( "TechniqueMastery" = 2)
 			adjust(mob/p)
 				if(p.Potential>=glob.progress.T3_SIGS[1])
-					passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "EnergyGeneration" = 3, "Instinct" = 2, "Flow" = 2, "ZenkaiPower" = 0.5)
+					passives = list( "TechniqueMastery" = 4, "EnergyGeneration" = 3, "ZenkaiPower" = 0.5)
 			verb/Saiyan_Fervor()
 				set category="Skills"
 				src.Trigger(usr)
@@ -1719,10 +1695,10 @@ NEW VARIABLES
 			KenWaveIcon='KenShockwaveLegend.dmi'
 			ActiveMessage="grasps the sun in their hands, manifesting the unbreakable fist of the Fabled King!"
 			OffMessage="contains their excitement."
-			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "PhysPleroma" = 1, "Steady" = 1, "UnderDog" = 5, "Persistence" = 2, "CallousedHands" = 0.15)
+			passives = list( "TechniqueMastery" = 2,   "UnderDog" = 5, "Persistence" = 2)
 			adjust(mob/p)
 				if(p.Potential>=glob.progress.T3_SIGS[1])
-					passives = list("MovementMastery" = 3, "TechniqueMastery" = 3, "PhysPleroma" = 1, "Steady" = 2, "UnderDog" = 8, "Persistence" = 3, "CallousedHands" = 0.2)
+					passives = list( "TechniqueMastery" = 3,   "UnderDog" = 8, "Persistence" = 3)
 			verb/The_Unbreakable_Fist()
 				set category="Skills"
 				src.Trigger(usr)
@@ -1741,7 +1717,7 @@ NEW VARIABLES
 			OffMessage="contains their superiority."
 			adjust(mob/p)
 				if(p.Potential>=glob.progress.T3_SIGS[1])
-					passives = list("CursedWounds" = 1, "BleedHit" = 0.25, "EnergyGeneration" = 5, "LifeSteal" = 40, "HellPower" = 0.25, "Piercing" = 0.25, "Deicide" = 5, "EndlessNine" = 0.15)
+					passives = list("CursedWounds" = 1, "BleedHit" = 0.25, "EnergyGeneration" = 5, "LifeSteal" = 40, "HellPower" = 0.25, "Piercing" = 0.25)
 			verb/Saiyan_Carnage()
 				set category="Skills"
 				src.Trigger(usr)
@@ -1756,7 +1732,7 @@ NEW VARIABLES
 			KenWave=5
 			KenWaveSize=0.5
 			KenWaveIcon='KenShockwaveDivine.dmi'
-			passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.25, "GodKi" = 0.2, "EnergyGeneration" = 3, "SlayerMod" = 1.5, "FavoredPrey" = "Mortal")
+			passives = list("HellRisen" = 0.25, "GodKi" = 0.2, "EnergyGeneration" = 3, "SlayerMod" = 1.5, "FavoredPrey" = "Mortal")
 			ActiveMessage="manifests the superiority of their birthright!"
 			OffMessage="lets their contempt for mortal life regress."
 			adjust(mob/p)
@@ -1765,28 +1741,28 @@ NEW VARIABLES
 				if(rose)
 					if(rose.mastery >= 25)
 						ActiveMessage="anger at their Lessers manifests into sparks of godhood!"
-						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.35, "GodKi" = 0.3, "EnergyGeneration" = 3, "SlayerMod" = 2, "FavoredPrey" = "Mortal", "Heavensent" = 1)
+						passives = list("HellRisen" = 0.35, "GodKi" = 0.3, "EnergyGeneration" = 3, "SlayerMod" = 2, "FavoredPrey" = "Mortal", "Heavensent" = 1)
 						AngerMult=1.1
 						StrMult=1.4
 						ForMult=1.4
 						OffMult=1.35
 					if(rose.mastery >= 50)
 						ActiveMessage="manifests true animosity towards mortals!"
-						passives = list("WrathfulTenacity" = 0.2, "HellRisen" = 0.50, "GodKi" = 0.45, "EnergyGeneration" = 4, "SlayerMod" = 3, "FavoredPrey" = "Mortal", "Heavensent" = 2)
+						passives = list("HellRisen" = 0.50, "GodKi" = 0.45, "EnergyGeneration" = 4, "SlayerMod" = 3, "FavoredPrey" = "Mortal", "Heavensent" = 2)
 						AngerMult=1.3
 						StrMult=1.5
 						ForMult=1.5
 						OffMult=1.45
 					if(rose.mastery >= 75)
 						ActiveMessage="'s animosity manifests them as close to perfection as they can get!"
-						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 0.75, "GodKi" = 0.7, "EnergyGeneration" = 5, "SlayerMod" = 4, "FavoredPrey" = "Mortal", "Heavensent" = 3)
+						passives = list("HellRisen" = 0.75, "GodKi" = 0.7, "EnergyGeneration" = 5, "SlayerMod" = 4, "FavoredPrey" = "Mortal", "Heavensent" = 3)
 						AngerMult=1.4
 						StrMult=1.6
 						ForMult=1.6
 						OffMult=1.55
 					if(rose.mastery >= 100)
 						ActiveMessage="becomes the perfect image of Godhood!"
-						passives = list("WrathfulTenacity" = 0.3, "HellRisen" = 1, "GodKi" = 1, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "All", "Heavensent" = 4)
+						passives = list("HellRisen" = 1, "GodKi" = 1, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "All", "Heavensent" = 4)
 						AngerMult=1.5
 						StrMult=1.7
 						ForMult=1.7
@@ -1804,18 +1780,18 @@ NEW VARIABLES
 			BladeFisting = 1
 			SwordName="Sickle of Sorrow"
 			SwordIcon='Sorrowful Sickle.dmi'
-			passives = list("BladeFisting" = 1, "SpiritSword" = 1, "Extend" = 1, "SwordAscension" = 3, "SwordAscensionSecond" = 3, "SwordAscensionThird" = 3, "MonkeyKing" = 1)
+			passives = list("BladeFisting" = 1,  "Extend" = 1, "SwordAscension" = 3, "SwordAscensionSecond" = 3, "SwordAscensionThird" = 3, "MonkeyKing" = 1)
 			ActiveMessage="draws spirit energy into their hand to form a spacetime-rending blade!"
 			OffMessage="dispels their Sickle of Sorrow!"
 			adjust(mob/p)
 				var/asc=p.AscensionsAcquired
 				switch(asc)
 					if(4)
-						passives = list("BladeFisting" = 1, "SpiritSword" = 1, "Extend" = 1, "SwordAscension" = 4, "SwordAscensionSecond" = 4, "SwordAscensionThird" = 4, "MonkeyKing" = 1)
+						passives = list("BladeFisting" = 1,  "Extend" = 1, "SwordAscension" = 4, "SwordAscensionSecond" = 4, "SwordAscensionThird" = 4, "MonkeyKing" = 1)
 					if(5)
-						passives = list("BladeFisting" = 1, "SpiritSword" = 2, "Extend" = 1, "SwordAscension" = 5, "SwordAscensionSecond" = 5, "SwordAscensionThird" = 5, "MonkeyKing" = 2)
+						passives = list("BladeFisting" = 1,  "Extend" = 1, "SwordAscension" = 5, "SwordAscensionSecond" = 5, "SwordAscensionThird" = 5, "MonkeyKing" = 2)
 					if(6)
-						passives = list("BladeFisting" = 1, "SpiritSword" = 2, "Extend" = 1, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6, "MonkeyKing" = 2)
+						passives = list("BladeFisting" = 1,  "Extend" = 1, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6, "MonkeyKing" = 2)
 			verb/Transfigure_Sickle_of_Sorrow()
 				set category="Utility"
 				set hidden = 1
@@ -1880,7 +1856,7 @@ NEW VARIABLES
 			EndMult=1.3
 			SpdMult=1.3
 			MovementMastery=8
-			passives = list("MovementMastery" = 3, "PureDamage" = 2, "PureReduction" = 2, "Flicker" = 2)
+			passives = list( "PureDamage" = 2, "PureReduction" = 2, "Flicker" = 2)
 			PUSpeedModifier=2
 			PureDamage=2
 			PureReduction=2
@@ -1895,10 +1871,10 @@ NEW VARIABLES
 			OffMessage="releases their perfected form..."
 			adjust(mob/p)
 				var/asc=p.AscensionsAcquired
-				passives = list("MovementMastery" = 3*asc, "PureDamage" = 2*asc, "PureReduction" = 2*asc, "Flicker" = 1*asc, "SaiyanPower1"=0.2*asc,"KiControlMastery" = 0.5*asc, "ZenkaiPower" = 0.2*asc)
+				passives = list( "PureDamage" = 2*asc, "PureReduction" = 2*asc, "Flicker" = 1*asc, "SaiyanPower1"=0.2*asc,"KiControlMastery" = 0.5*asc, "ZenkaiPower" = 0.2*asc)
 			verb/Super_Saiyan_Perfected()
 				set category="Skills"
-				if(usr.passive_handler.Get("GodlyCalm")||usr.passive_handler.Get("InBlue"))
+				if(usr.passive_handler.Get("CalmAnger"))
 					usr<<"You cannot use these forms with a godly form active."
 					return
 				adjust(usr)
@@ -1957,7 +1933,7 @@ NEW VARIABLES
 						p.passive_handler.Set("Super Kaioken", 1)
 				if(p.isRace(SAIYAN)&&p.transActive>=2||p.isRace(HALFSAIYAN)&&p.transActive>=2)
 					src.ActiveMessage="erupts with immense intensity, their golden aura overcome with a furious red!!"
-				if(p.passive_handler.Get("InBlue"))
+				if(p.passive_handler.Get("TrueBlue"))
 					p.passive_handler.Set("Kaioken Blue", 1)
 					p.passive_handler.Set("Super Kaioken", 1)
 					src.ActiveMessage="erupts with immense intensity, their blue and red auras coalescing into one!!!"
@@ -2047,17 +2023,17 @@ NEW VARIABLES
 			SignatureTechnique=3
 			UnrestrictedBuff=1
 			EnergyMult=2
-			passives = list("MirrorStats" = 1, "Flow" = 1, "Instinct" = 1, "LikeWater" = 4, "FluidForm" = 1)
+			passives = list("MirrorStats" = 1)
 			ActiveMessage="reflects their opponent's power like a still lake!"
 			OffMessage="returns to their own movements, unable to hold the simulacrum..."
 			TextColor=rgb(65, 177, 218)
 			adjust(mob/p)
 				if(src.Mastery<1)
 					src.Mastery=1
-				passives = list("MirrorStats" = 1, "Flow" = 1 + p.Potential/30, "Instinct" = 1 + p.Potential/30, "LikeWater" = 2 + p.Potential/30, "FluidForm" = 1)
+				passives = list("MirrorStats" = 1)
 				if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 					if(p.race.transformations[p.transActive].mastery==100)
-						passives = list("MirrorStats" = 1, "Flow" = 1 + p.Potential/20, "Instinct" = 1 + p.Potential/20, "LikeWater" = 2 + p.Potential/20, "FluidForm" = 1,"KiControlMastery" = 1+p.Potential/50, "SuperSaiyanSignature" = 1)
+						passives = list("MirrorStats" = 1,"KiControlMastery" = 1+p.Potential/50, "SuperSaiyanSignature" = 1)
 			verb/Kyoukaken()
 				set category="Skills"
 				adjust(usr)
@@ -2092,7 +2068,7 @@ NEW VARIABLES
 			SpdMult=1.4
 			DefMult=1.2
 			EndMult = 0.8
-			passives = list("BlurringStrikes" = 3, "Fury"=4, "Godspeed"=8, "Skimming"=1, "Adrenaline"=1, "Warping"=2);
+			passives = list( "Fury"=4, "Godspeed"=8, "Skimming"=1, "Adrenaline"=1, "Warping"=2);
 			ActiveMessage="has reached their limitations and shattered through all obstacles, a strange energy begins to surround them as they enter their Zone!"
 			OffMessage="releases their strange power."
 			ManaGlowSize=2;
@@ -2134,7 +2110,7 @@ NEW VARIABLES
 				set category="Skills"
 				src.Trigger(usr)
 		Cursed
-			passives = list("Maki" = 1, "Curse" = 1)
+			passives = list("Maki" = 1)
 			Maki=1
 			Curse=1
 			PreRequisite=list("/obj/Skills/Utility/Summon_Absurdity")
@@ -2150,10 +2126,9 @@ NEW VARIABLES
 				IconLock='Third Eye.dmi'
 				LockX=0
 				LockY=0
-				passives = list("Maki" = 1, "Curse" = 1, "Instinct" = 1, "Flow" = 1, "Godspeed" = 1, "CalmAnger"=1, "FatigueLeak" = 3)
+				passives = list("Maki" = 1, "Godspeed" = 1, "CalmAnger"=1, "FatigueLeak" = 3)
 				CalmAnger=1
 				Instinct=1
-				Flow=1
 				Godspeed=1
 				ActiveMessage="draws on the power of Demon World through their Jagan Eye!"
 				OffMessage="shuts their Jagan Eye..."
@@ -2167,7 +2142,7 @@ NEW VARIABLES
 					EndMult = 0.7 + (0.1 * secretLevel)
 					SureDodgeTimerLimit = 30 - (4 * secretLevel)
 					SureHitTimerLimit = 30 - (4 * secretLevel)
-					passives = list("Maki" = 1, "Curse" = 1, "Instinct" = 1, "Flow" = 1, "Godspeed" = 1 + secretLevel/2, \
+					passives = list("Maki" = 1,  "Godspeed" = 1 + secretLevel/2, \
 					"CalmAnger"=1, FatigueLeak = clamp(3 - secretLevel/2,0 , 3), \
 					"PureDamage" = 1 + secretLevel)
 					if(secretLevel>=4)
@@ -2182,11 +2157,11 @@ NEW VARIABLES
 				//NeedsHealth=50
 				//TooMuchHealth=75
 				WoundThreshold=95
-				passives = list("Maki" = 1, "Curse" = 1,"LifeGeneration" = 0.5, "Deflection" = 2, "Reversal" = 0.1)
+				passives = list("Maki" = 1, "LifeGeneration" = 0.5, "Deflection" = 2, "Reversal" = 0.1)
 				LifeGeneration=0.5
 				Deflection=2
 				Reversal=0.1
-				AutoAnger=1
+				AngerFloor=75
 				ActiveMessage="overflows with berserk demon chakra!"
 				OffMessage="can no longer bear the strain of channelling demon chakra..."
 				TextColor="#FF7700"
@@ -2203,12 +2178,12 @@ NEW VARIABLES
 						if(Mastery >= 4)
 							src.TooMuchHealth=null
 						if(Mastery >= 3)
-							AutoAnger=0
-							passives = list("Maki" = 1, "Curse" = 1, "LifeGeneration" = 2.5, "Deflection" = 2, "Reversal" = Mastery/5,"CalmAnger" = 1)
+							AngerFloor=0
+							passives = list("Maki" = 1,  "LifeGeneration" = 2.5, "Deflection" = 2, "Reversal" = Mastery/5,"CalmAnger" = 1)
 							CalmAnger=1
 						else
-							AutoAnger=1
-							passives = list("Maki" = 1, "Curse" = 1, "LifeGeneration" = 1, "Deflection" = 2, "AutoAnger" = 1, "Reversal" = Mastery/10)
+							AngerFloor=75
+							passives = list("Maki" = 1,  "LifeGeneration" = 1, "Deflection" = 2,  "Reversal" = Mastery/10)
 							CalmAnger=0
 					src.Trigger(usr)
 			Vaizard_Mask
@@ -2217,8 +2192,8 @@ NEW VARIABLES
 				ManaThreshold=1
 				CooldownStatic = 1
 				Cooldown=60
-				passives = list("Maki" = 1, "Curse" = 1,"Instinct" = 2, "Pursuer" = 2, "Flicker" = 2)
-				AutoAnger=1
+				passives = list("Maki" = 1, "Pursuer" = 2, "Flicker" = 2)
+				AngerFloor=75
 				VaizardHealth=1
 				CooldownScaling = 1
 				ActiveMessage="is taken over by a violent rage as a mask forms on their face!"
@@ -2238,7 +2213,7 @@ NEW VARIABLES
 								SuperSaiyanBuff = 1.3
 						ActiveMessage="is taken over by a violent rage as a mask forms on their face, tainting their golden aura!"
 					AngerMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
-					passives = list("Maki" = 1, "Curse" = 1, "AutoAnger" = 1, "VaizardHealth" = 1)
+					passives = list("Maki" = 1)
 					var/pRedBoost = 0
 					var/pDmgBoost = 0
 					switch(p.VaizardType)
@@ -2263,7 +2238,7 @@ NEW VARIABLES
 							EndMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
 							DefMult = 1.3 + (0.1 * Mastery*SuperSaiyanBuff)
 					passives = list("ManaLeak" = 4-Mastery, "PureReduction" = (Mastery * 0.5)+ pRedBoost, "PureDamage" = (Mastery * 0.5) + pDmgBoost, \
-					"Maki" = 1, "Curse" = 1,"Instinct" = 2, "Pursuer" = 2, "Flicker" = 2)
+					"Maki" = 1, "Pursuer" = 2, "Flicker" = 2)
 					VaizardHealth = 5 + (2.5 * Mastery)
 					VaizardShatter = 1
 					Cooldown=60
@@ -2283,7 +2258,7 @@ NEW VARIABLES
 			SpdMult=1.3
 			EndMult=0.8
 			DefMult=0.8
-			passives = list("SlayerMod" = 3, "LifeSteal" = 10, "FavoredPrey" = "Depths", "MovementMastery" = 3, "TechniqueMastery" = 3, "Deicide"= 5)
+			passives = list("SlayerMod" = 3, "LifeSteal" = 10, "FavoredPrey" = "Depths",  "TechniqueMastery" = 3)
 			ManaGlowSize=3
 			ManaGlow="#C03434"
 			TextColor=rgb(192, 52, 52)
@@ -2299,7 +2274,7 @@ NEW VARIABLES
 			StrMult=1.3
 			ForMult=1.2
 			EndMult=1.5
-			passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
+			passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
 			IconLock='zekkai.dmi'
 			IconLockBlend=1
 			IconUnder=1
@@ -2318,7 +2293,7 @@ NEW VARIABLES
 					EndMult=1.5
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
+							passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
 							ActiveMessage="condenses all light around them to form an orb of darkness around their Super Saiyan aura!"
 							StrMult=1.4
 							ForMult=1.4
@@ -2327,10 +2302,10 @@ NEW VARIABLES
 					StrMult=1.4
 					ForMult=1.3
 					EndMult=1.6
-					passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
+					passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
+							passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
 							ActiveMessage="condenses all light around them to form an orb of darkness around their Super Saiyan aura!"
 							StrMult=1.4
 							ForMult=1.4
@@ -2339,10 +2314,10 @@ NEW VARIABLES
 					StrMult=1.5
 					ForMult=1.4
 					EndMult=1.8
-					passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
+					passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
+							passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1,"SuperSaiyanSignature"=1)
 							ActiveMessage="condenses all light around them to form an orb of darkness around their Super Saiyan aura!"
 							StrMult=1.4
 							ForMult=1.4
@@ -2363,7 +2338,7 @@ NEW VARIABLES
 					IconLock='Android Shield Gold.dmi'
 					src.TopOverlayLock = 'AngelicGlow.dmi'
 				if(!altered)
-					passives = list("Deflection" = 3, "Siphon" = 3, "FluidForm" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
+					passives = list("Deflection" = 3, "PureReduction" = 3, "SpaceWalk" = 1, "StaticWalk" = 1, "Void" = 1)
 				adjust(usr)
 				src.Trigger(usr)
 		Titan_Form
@@ -2372,39 +2347,39 @@ NEW VARIABLES
 			EndMult=2
 			DefMult = 0.5
 			Enlarge=3
-			passives = list("Brutalize" = 2, "CallousedHands" = 0.3, "Steady" = 2, "PureReduction"=2, "KBMult" = 2, "KBRes" = 5, "GiantForm" = 1, "SweepingStrike" = 1, "GiantSwings" = 1)
+			passives = list(   "PureReduction"=2, "HeavyHitter" = 2, "Juggernaut" = 5, "GiantForm" = 1, "SweepingStrike" = 2)
 			ActiveMessage="explodes into a mountain of flesh that weaves itself into an enormous body!"
 			OffMessage="sheds the excess flesh..."
 			verb/Titan_Form()
 				set category="Skills"
 				if(!altered)
-					passives = list("Brutalize" = 2, "CallousedHands" = 0.3, "Steady" = 2, "PureReduction"=2, "KBMult" = 2, "KBRes" = 5, "GiantForm" = 1, "SweepingStrike" = 1, "GiantSwings" = 1)
+					passives = list(   "PureReduction"=2, "HeavyHitter" = 2, "Juggernaut" = 5, "GiantForm" = 1, "SweepingStrike" = 2)
 				src.Trigger(usr)
 		Spirit_Pulse
 			SignatureTechnique=3
 			OffMult = 1.25
 			DefMult = 1.25
 			EndMult = 1.5
-			passives = list("Flow" = 4, "FluidForm" = 2, "MovementMastery" = 10, "PureReduction" = 2)
+			passives = list("PureReduction" = 2)
 			ActiveMessage="is enveloped in a cascading glow!!"
 			OffMessage="dissipates the glow..."
 			verb/Spirit_Pulse()
 				set category="Skills"
 				if(!altered)
-					passives = list("Flow" = 4, "FluidForm" = 2, "MovementMastery" = 10, "PureReduction" = 2)
+					passives = list("PureReduction" = 2)
 				src.Trigger(usr)
 		Spirit_Burst
 			SignatureTechnique=3
 			EnergyThreshold=25
 			StrMult=1.5
 			ForMult=1.5
-			passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
+			passives = list("SweepingStrike"= 1, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
 			ActiveMessage="spikes their energy in sudden bursts!"
 			OffMessage="quells their energy..."
 			verb/Spirit_Burst()
 				set category="Skills"
 				if(!altered)
-					passives = list("SweepingStrike"= 1, "Instinct" = 3, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
+					passives = list("SweepingStrike"= 1, "PureDamage" = 4, "FatigueLeak" = 1, "PUSpike"=100, "QuickCast"=3)
 				src.Trigger(usr)
 		Power_of_Destruction
 			BuffName = "Power of Destruction - Omen"
@@ -2415,7 +2390,7 @@ NEW VARIABLES
 			ForMult=1.5
 			EndMult=1.2
 			passives = list("BulletKill" = 1, "Deflection" = 5, "Persistence" = 1, "UnderDog" = 15,\
-								"Power of Destruction" = 1, "Field of Destruction" = 1, "CursedWounds"=1, "HardStyle"=1, "BleedHit" = 0.25)
+								 "Field of Destruction" = 1, "CursedWounds"=1, "HardStyle"=1, "BleedHit" = 0.25)
 			DarkChange=1
 			ActiveMessage="taps into the power of a Destroyer, harnessing their overwhelming sense of self."
 			OffMessage="casts aside their destructive power."
@@ -2431,7 +2406,7 @@ NEW VARIABLES
 			SpdMult=1.2
 			ForMult=1.2
 			RecovMult=1.2
-			passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1)
+			passives = list( "TechniqueMastery" = 2)
 			FlashChange=1
 			KenWaveIcon='Unbound.dmi'
 			KenWave=1
@@ -2451,30 +2426,30 @@ NEW VARIABLES
 					SpdMult=1.2
 					ForMult=1.2
 					RecovMult=1.2
-					passives = list("MovementMastery" = 2, "TechniqueMastery" = 2, "BuffMastery" = 1)
+					passives = list( "TechniqueMastery" = 2)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
+							passives = list( "TechniqueMastery" = 4, "SuperSaiyanSignature"=1)
 				if(src.Mastery==2)
 					StrMult=1.25
 					EndMult=1.25
 					SpdMult=1.25
 					ForMult=1.25
 					RecovMult=1.25
-					passives = list("MovementMastery" = 3, "TechniqueMastery" = 3, "BuffMastery" = 3)
+					passives = list( "TechniqueMastery" = 3)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
+							passives = list( "TechniqueMastery" = 4, "SuperSaiyanSignature"=1)
 				if(src.Mastery==3)
 					StrMult=1.35
 					EndMult=1.35
 					SpdMult=1.35
 					ForMult=1.35
 					RecovMult=1.35
-					passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5)
+					passives = list( "TechniqueMastery" = 4)
 					if(p.isRace(SAIYAN)&&p.transActive>=1||p.isRace(HALFSAIYAN)&&p.transActive>=1||p.passive_handler.Get("SuperSaiyanSignature"))
 						if(p.race.transformations[p.transActive].mastery==100)
-							passives = list("MovementMastery" = 4, "TechniqueMastery" = 4, "BuffMastery" = 5,"SuperSaiyanSignature"=1)
+							passives = list( "TechniqueMastery" = 4, "SuperSaiyanSignature"=1)
 
 			verb/Unbound_Mode()
 				set category="Skills"
@@ -2518,7 +2493,7 @@ NEW VARIABLES
 			NeedsHealth=50
 			TooMuchHealth=51
 			OverClock=0.1
-			passives = list ("Persistence" = 2, "UnderDog" = 2, "Tenacity" = 2, "AutoAnger" = 1, "AngerThreshhold" = 2)
+			passives = list ("Persistence" = 2, "UnderDog" = 2, "Tenacity" = 2)
 			SpdMult=2
 			HealthDrain = 0.001
 			Cooldown=-1
@@ -2540,9 +2515,9 @@ NEW VARIABLES
 								var/tenacity = usr.passive_handler.Get("Tenacity")
 								if(desp >= 6 || underDog >= 6 || tenacity >= 6)
 									// they r gorked
-									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "AngerThreshold" = 2,"Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "Adrenaline" = 2, "LimitBroken" = 1)
 								else
-									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity, "AngerThreshold" = 2, "Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity,  "Adrenaline" = 2, "LimitBroken" = 1)
 								PowerMult = 1.5
 								HealthDrain = 0.006
 								StrMult = 1.3
@@ -2562,9 +2537,9 @@ NEW VARIABLES
 								var/tenacity = usr.passive_handler.Get("Tenacity")
 								if(desp >= 4 || underDog >= 4 || tenacity >= 4)
 									// they r gorked
-									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "AngerThreshold" = 2,"Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "Adrenaline" = 2, "LimitBroken" = 1)
 								else
-									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity, "AngerThreshold" = 2, "Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity,  "Adrenaline" = 2, "LimitBroken" = 1)
 								PowerMult = 1.15
 								HealthDrain = 0.003
 								StrMult = 1.2
@@ -2583,9 +2558,9 @@ NEW VARIABLES
 								var/tenacity = usr.passive_handler.Get("Tenacity")
 								if(desp >=  1 || underDog >= 1 || tenacity >= 1)
 									// they r gorked
-									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "AngerThreshold" = 2,"Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 1, "UnderDog" = 1, "Tenacity" = 1, "Adrenaline" = 2, "LimitBroken" = 1)
 								else
-									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity, "AngerThreshold" = 2, "Adrenaline" = 2, "LimitBroken" = 1)
+									passives = list("Persistence" = 6 - desp, "UnderDog" = 6 - underDog, "Tenacity" = 6 - tenacity,  "Adrenaline" = 2, "LimitBroken" = 1)
 								StrMult = 1.2
 								SpdMult = 1.2
 								OffMult = 1.2
@@ -2650,7 +2625,7 @@ NEW VARIABLES
 			StrMult=1.4
 			OffMult=1.4
 			DefMult=1.2
-			passives = list("MagicFocus" = 1, "Extend" = 2, "HybridStrike" = 2, "Instinct" = 2, "TechniqueMastery" = 3, "SwordAscension" = 3, "SwordDamage" = 3, "ManaLeak"=1)
+			passives = list("MartialMagic" = 1, "Extend" = 2, "TechniqueMastery" = 3, "SwordAscension" = 3, "Sword Mastery" = 3, "ManaLeak"=1)
 			DropOverlays=1
 			HairLock='BLANK.dmi'
 			IconLock='TranceArmor.dmi'
@@ -2667,7 +2642,7 @@ NEW VARIABLES
 			OffMessage="seals off the magical might..."
 			proc/alter(mob/p)
 				if(altered) return
-				passives = list("MagicFocus" = 1, "Extend" = 2, "HybridStrike" = 2, "Instinct" = 2, "TechniqueMastery" = 3, "SwordAscension" = 3, "SwordDamage" = 3)
+				passives = list("MartialMagic" = 1, "Extend" = 2, "TechniqueMastery" = 3, "SwordAscension" = 3, "Sword Mastery" = 3)
 		Magus_Trance
 			MagicNeeded=1
 			MagicFocus=1
@@ -2675,7 +2650,7 @@ NEW VARIABLES
 			ForMult=1.4
 			OffMult=1.4
 			DefMult=1.2
-			passives = list("MagicFocus"=1, "SpiritStrike" = 1, "HybridStrike" = 0.5, "SpiritHand" = 2, "SpiritFlow"=2, "QuickCast" = 2, "ManaLeak"=1)
+			passives = list("MartialMagic"=1,     "QuickCast" = 2, "ManaLeak"=1)
 			FlashChange=1
 			KenWave=1
 			KenWaveSize=1
@@ -2688,7 +2663,7 @@ NEW VARIABLES
 			OffMessage="seals off the magical might..."
 			proc/alter(mob/p)
 				if(altered) return
-				passives = list("SpiritStrike" = 1, "HybridStrike" = 0.5, "SpiritHand" = 2, "SpiritFlow"=2, "QuickCast" = 2, "ManaLeak"=1)
+				passives = list(    "QuickCast" = 2, "ManaLeak"=1)
 		Holy_Trance
 			MagicNeeded=1
 			MagicFocus=1
@@ -2696,7 +2671,7 @@ NEW VARIABLES
 			EndMult=1.5
 			OffMult=1.2
 			DefMult=1.3
-			passives = list("MagicFocus"=1, "DebuffResistance" = 1, "FluidForm" = 3, "GiantForm"  = 1, "LifeGeneration" = 5)
+			passives = list("MartialMagic"=1, "GiantForm"  = 1, "LifeGeneration" = 5)
 			StableHeal=1
 			FlashChange=1
 			KenWave=1
@@ -2710,14 +2685,14 @@ NEW VARIABLES
 			proc/alter(mob/p)
 				if(altered) return
 				HealthHeal = (2/240) * world.tick_lag
-				passives = list("MagicFocus"=1, "DebuffResistance" = 1, "FluidForm" = 3, "GiantForm"  = 1, "LifeGeneration" = 5)
+				passives = list("MartialMagic"=1, "GiantForm"  = 1, "LifeGeneration" = 5)
 		Beast_Trance
 			MagicNeeded=1
 			MagicFocus=1
 			SpdMult=1.5
 			OffMult=1.3
 			DefMult=1.2
-			passives = list("MovementMastery" = 5, "BlurringStrikes" = 2, "DoubleStrike" = 1.5, "TripleStrike" = 0.75, "Flicker" = 3, "Pursuer" = 3)
+			passives = list(  "DoubleStrike" = 1.5, "TripleStrike" = 0.75, "Flicker" = 3, "Pursuer" = 3)
 			DropOverlays=1
 			HairLock=1
 			PowerGlows=list(0.7,0.3,0.5, 0.99,0.59,0.78, 0.51,0.11,0.3, 0,0,0)
@@ -2734,7 +2709,7 @@ NEW VARIABLES
 			OffMessage="seals off the magical might..."
 			proc/alter(mob/p)
 				if(altered) return
-				passives = list("MovementMastery" = 5, "BlurringStrikes" = 2, "DoubleStrike" = 1.5, "TripleStrike" = 0.75, "Flicker" = 3, "Pursuer" = 3)
+				passives = list(  "DoubleStrike" = 1.5, "TripleStrike" = 0.75, "Flicker" = 3, "Pursuer" = 3)
 
 		High_Tension
 			SignatureTechnique=3
@@ -2787,13 +2762,11 @@ NEW VARIABLES
 				SignatureTechnique=4
 				OffMult=1.5
 				DefMult=1.5
-				passives = list("MovementMastery" = 10, "TechniqueMastery" = 10, "Instinct" = 5, "Flow" = 5, "WeaponBreaker" = 3, "HybridStrike" = 1, "Reversal" = 1, "MovingCharge" = 1, "MartialMagic" = 1, "SuperDash" = 1, "Pursuer" = 1, "Flicker" = 1, "GodKi" = 1)
+				passives = list( "TechniqueMastery" = 10, "WeaponBreaker" = 3,  "Reversal" = 1, "MovingCharge" = 1, "MartialMagic" = 1, "SuperDash" = 1, "Pursuer" = 1, "Flicker" = 1, "GodKi" = 1)
 				MovementMastery=10
 				TechniqueMastery=10
 				Instinct=3
-				Flow=3
 				WeaponBreaker=3
-				HybridStrike=1
 				Reversal=5
 				MovingCharge=1
 				MartialMagic=1
@@ -2821,7 +2794,7 @@ NEW VARIABLES
 				DefMult=1.5
 				ActiveMessage= "ascends in a pillar of light, manifesting Wings of Pure, Spiritual Energy!"
 				OffMessage= "returns to the earth, their task done..."
-				passives= list("MovementMastery" = 10, "Siphon" = 10, "EnergyGeneration" = 10, "SpiritStrike" = 1, "LifeGeneration" = 10, "Skimming" = 1, "Godspeed" = 5, "Tossing" = 4, "Secret Knives" = "Quincy")
+				passives= list( "EnergyGeneration" = 10,  "LifeGeneration" = 10, "Skimming" = 1, "Godspeed" = 5, "Tossing" = 4, "Secret Knives" = "Quincy")
 				IconLock='DA-Bellerophon.dmi'
 				IconUnder=1
 				LockX=-15
@@ -2847,20 +2820,20 @@ NEW VARIABLES
 						if(!usr.BuffOn(src))
 							switch(fightingType)
 								if("Berserker")
-									passives = list("PureReduction" = -1, "PureDamage" = 2, "DoubleStrike" = 3, "HeavyHitter" = 1, "Steady" = 2, "CancelDemonicDura" = 1 )
+									passives = list("PureReduction" = -1, "PureDamage" = 2, "DoubleStrike" = 3, "HeavyHitter" = 1)
 									StrMult = 1.4
 									ForMult = 1.4
 									OffMult = 1.3
 									DefMult = 0.8
 								if("Warrior")
-									passives = list("UnarmedDamage" = 2, "Steady" = 4, "PureReduction" = 1, "PureDamage" = 1, "MovementMastery" = 5)
+									passives = list("UnarmedDamage" = 2,  "PureReduction" = 1, "PureDamage" = 1)
 									StrMult = 1.2
 									ForMult = 1.2
 									EndMult = 1.2
 									OffMult = 1.2
 									DefMult = 1.2
 								if("Hunter")
-									passives = list("Godspeed" = 4, "Flicker" = 4, "Pursuer" = 4, "FluidForm" = 4, "BlurringStrikes" = 4)
+									passives = list("Godspeed" = 4, "Flicker" = 4, "Pursuer" = 4)
 									SpdMult = 1.5
 									OffMult = 1.3
 									DefMult = 1.2
@@ -2868,7 +2841,7 @@ NEW VARIABLES
 
 			Way_of_the_Stripe//true tiger
 				SignatureTechnique=3
-				passives = list("MovementMastery" = 5,"TechniqueMastery" = 5, "HardStyle" = 2, "UnarmedDamage" = 2)
+				passives = list("TechniqueMastery" = 5, "HardStyle" = 2, "UnarmedDamage" = 2)
 				StrMult=1.4
 				SpdMult=1.2
 				OffMult=1.4
@@ -2879,7 +2852,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Constricting_Coil_Dance//true dragon
 				SignatureTechnique=3
-				passives = list("MovementMastery" = 5,"TechniqueMastery" = 5, "SoftStyle" = 2, "SpiritHand" = 1, "Deflection" = 1)
+				passives = list("TechniqueMastery" = 5, "SoftStyle" = 2,  "Deflection" = 1)
 				ForMult=1.4
 				SpdMult=1.2
 				DefMult=1.4
@@ -2890,7 +2863,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Hollow_Shell_Kata//true tortoise
 				SignatureTechnique=3
-				passives = list("MovementMastery" = 5,"TechniqueMastery" = 5, "FluidForm"=3, "Void" = 1, "VoidField" = 4, "DeathField" = 4)
+				passives = list("TechniqueMastery" = 5, "Void" = 1, "VoidField" = 4, "DeathField" = 4)
 				StrMult=1.4
 				EndMult=1.4
 				DefMult=1.2
@@ -2901,7 +2874,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Sky_Emperor_Walk//true phoenix
 				SignatureTechnique=3
-				passives = list("MovementMastery" = 5,"TechniqueMastery" = 5, "Skimming" = 2, "SpiritFlow" = 2, "HybridStrike" = 1)
+				passives = list("TechniqueMastery" = 5, "Skimming" = 2)
 				ForMult=1.5
 				StrMult=1.5
 				ActiveMessage="ascends with serene grace as they ascend into the Sky Emperor's Walk!"
@@ -2930,19 +2903,16 @@ NEW VARIABLES
 					set category="Skills"
 					set name="Sacred Energy Armor: Offense"
 					if(!usr.BuffOn(src))
-						passives = list("GodKi" = 0.5, "Instinct" = 2, "NoWhiff" = 1, "Flicker" = 2, "Pursuer" = 2, "Steady" = 9)
+						passives = list("GodKi" = 0.5, "NoWhiff" = 1, "Flicker" = 2, "Pursuer" = 2)
 						src.Instinct=2
 						src.NoWhiff=1
 						src.Flicker=2
 						src.Pursuer=2
-						src.Steady=9
 						src.StrMult=1.5
 						src.EndMult=1
 						src.OffMult=1.5
 						src.DefMult=1
-						src.FluidForm=0
 						src.GiantForm=0
-						src.Flow=0
 						src.Reversal=0
 						src.ActiveMessage="manifests regalia of offense: Sacred Energy Armor!"
 						src.OffMessage="casts away the power to change the world..."
@@ -2954,19 +2924,16 @@ NEW VARIABLES
 					set category="Skills"
 					set name="Sacred Energy Armor: Defense"
 					if(!usr.BuffOn(src))
-						passives = list("FluidForm" = 1, "GiantForm" = 1, "Flow" = 2, "Reversal" = 1)
+						passives = list("GiantForm" = 1, "Reversal" = 1)
 						src.Instinct=0
 						src.NoWhiff=0
 						src.Flicker=0
 						src.Pursuer=0
-						src.Steady=0
 						src.StrMult=1
 						src.EndMult=1.5
 						src.OffMult=1
 						src.DefMult=1.5
-						src.FluidForm=1
 						src.GiantForm=1
-						src.Flow=2
 						src.Reversal=1
 						src.ActiveMessage="manifests regalia of defense: Sacred Energy Armor!"
 						src.OffMessage="casts away the power to change the world..."
@@ -2979,8 +2946,8 @@ NEW VARIABLES
 				SignatureTechnique=5
 				ForMult=5
 				NoSword=0
-				passives = list("MaouKi" = 1, "GodKi" = 0.5, "MovingCharge" = 1, "QuickCast" = 6, "DualCast" = 3, "SpiritStrike" = 1, "ThunderHerald", "IceHerald", "AbyssMod" = 10, \
-									"AmuletBeaming" = 1, "MartialMagic" = 1, "Atomizer" = 1, "SuperCharge" = 2, "BetterAim" = 5, "DemonicInfusion" = 1, "CriticalChance" = 35, "CriticalDamage" = 0.15)
+				passives = list( "GodKi" = 0.5, "MovingCharge" = 1, "QuickCast" = 6, "DualCast" = 3,  "ThunderHerald", "AbyssMod" = 10, \
+									"AmuletBeaming" = 1, "MartialMagic" = 1, "Atomizer" = 1, "SuperCharge" = 2, "BetterAim" = 5, "DemonicInfusion" = 1, "CriticalDamage" = 0.15)
 				ElementalDefense = "Void"
 				ElementalOffense = "Void"
 				DarkChange=1
@@ -2997,7 +2964,7 @@ NEW VARIABLES
 				StrMult=1.3
 				OffMult=1.4
 				DefMult=1.3
-				passives = list("CriticalChance" = 15, "BlockChance" = 15, "CriticalDamage" = 0.5, "CriticalBlock" = 0.5, "Flicker" = 2, "Reversal" = 0.5, "SwordAscension" = 6)
+				passives = list("CriticalDamage" = 0.5, "CriticalBlock" = 0.5, "Flicker" = 2, "Reversal" = 0.5, "SwordAscension" = 6)
 				IconLock='EyeFlameC.dmi'
 				ActiveMessage="begins to handle their weapon with endless dedication!"
 				OffMessage="loses their extreme focus..."
@@ -3005,13 +2972,13 @@ NEW VARIABLES
 					set category="Skills"
 					if(!altered)
 						if(!usr.BuffOn(src))
-							passives = list("CriticalChance" = usr.Potential/10, "BlockChance" = usr.Potential/10, "CriticalDamage" = 0.075 * usr.Potential/10, "CriticalBlock" = 0.075 * usr.Potential/10, "Flicker" = 2, "Reversal" = 0.5, "SwordAscension" = (usr.Potential/30))
+							passives = list("CriticalDamage" = 0.085 * usr.Potential/10, "CriticalBlock" = 0.075 * usr.Potential/10, "Flicker" = 2, "Reversal" = 0.5, "SwordAscension" = (usr.Potential/30))
 					src.Trigger(usr)
 			PranaBurst
 				SignatureTechnique=3
 				SagaSignature=1
 				ManaThreshold=2
-				passives = list("ManaLeak" = 1, "SpiritSword" = 1, "Extend" = 2, "SwordAscension" = 3, "SuperDash" = 2, "HybridStrike" = 1)
+				passives = list("ManaLeak" = 1,  "Extend" = 2, "SwordAscension" = 3, "SuperDash" = 2)
 				SpdMult=1.2
 				StrMult=1.4
 				ForMult=1.4
@@ -3029,14 +2996,14 @@ NEW VARIABLES
 				verb/Prana_Burst()
 					set category="Skills"
 					if(!altered)
-						passives = list("ManaLeak" = 1, "SpiritSword" = 1, "Extend" = 2, "SwordAscension" = 3, "SuperDash" = 2, "HybridStrike" = 1)
+						passives = list("ManaLeak" = 1,  "Extend" = 2, "SwordAscension" = 3, "SuperDash" = 2)
 					src.Trigger(usr)
 			Getsuga_Tenshou_Clad
 				SignatureTechnique=3
 				SagaSignature=1
 				TimerLimit=30
 				Cooldown=30
-				passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1, "SpiritFlow" = 4)
+				passives = list("Heavy Strike" = "GetsugaClad", "CriticalDamage" = 0.25,  "SwordAscension" = 1)
 				StrMult=1.3
 				OffMult=1.3
 				ForMult=1.3
@@ -3049,7 +3016,7 @@ NEW VARIABLES
 						usr << "Getsuga Clad can only be used in Bankai."
 						return
 					if(!altered)
-						passives = list("Heavy Strike" = "GetsugaClad", "CriticalChance" = 25, "CriticalDamage" = 0.25, "Brutalize" = 2, "SwordAscension" = 1, "SpiritSword" = 0.5, "HybridStrike" = 1)
+						passives = list("Heavy Strike" = "GetsugaClad", "CriticalDamage" = 0.25,  "SwordAscension" = 1)
 					src.Trigger(usr)
 			Final_Getsuga_Tenshou
 				SignatureTechnique=4
@@ -3065,7 +3032,7 @@ NEW VARIABLES
 				SpdMult=2
 				SureDodgeTimerLimit=10
 				SureHitTimerLimit=10
-				passives = list("CriticalChance" = 50, "BlockChance" = 50, "CriticalDamage" = 1, "CriticalBlock" = 1, "Flicker" = 2, "Reversal" =1, "SuperDash" = 2, "SwordAscension" = 2, "SwordDamage" = 2, "SwordAccuracy" = 2, "SwordDelay" = 2, "Extend" = 2, "SpiritHand" = 1, "Steady" = 9, "GiantForm" = 1, "FluidForm" = 1, "GodKi" = 1)
+				passives = list("CriticalDamage" = 1, "CriticalBlock" = 1, "Flicker" = 2, "Reversal" =1, "SuperDash" = 2, "SwordAscension" = 2, "Sword Mastery" = 2, "Extend" = 2,   "GiantForm" = 1, "GodKi" = 1)
 				IconLock='DarknessFlame.dmi'
 				HitSpark='Slash - Black.dmi'
 				HitSize=1.5
@@ -3110,7 +3077,7 @@ NEW VARIABLES
 				CyberSignature=1
 				KiControl=1
 				ManaThreshold=0.001
-				passives = list("KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
+				passives = list("KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1)
 				SpdMult=1.2
 				RecovMult=1.2
 				OverClock=0.2
@@ -3128,7 +3095,7 @@ NEW VARIABLES
 					EndMult = 0.6 + (0.05*p.AscensionsAcquired)
 					var/reducedPot = totalPot/10
 					ManaDrain = 0.008 - (0.001 * reducedPot)
-					passives = list("ManaLeak" = 1 - totalPot/100, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1, "Overdrive" = 1)
+					passives = list("ManaLeak" = 1 - totalPot/100, "KiControl" = 1, "ManaLeak" = 1, "AllOutPU" = 1)
 
 
 				verb/Overdrive()
@@ -3139,12 +3106,11 @@ NEW VARIABLES
 				SignatureTechnique=3
 				CyberSignature=1
 				ManaThreshold=0.001
-				passives = list("ManaLeak" = 1, "Steady" = 2, "Godspeed" = 1, "Pursuer" = 1, "Flicker" = 1)
+				passives = list("ManaLeak" = 1,  "Godspeed" = 1, "Pursuer" = 1, "Flicker" = 1)
 				ManaLeak=1
 				SpdMult=1.2
 				OffMult=1.3
 				DefMult=0.8
-				Steady=2
 				Godspeed=1
 				Pursuer=1
 				Flicker=1
@@ -3166,7 +3132,7 @@ NEW VARIABLES
 					SureHitTimerLimit = -40 + (100-totalPot)
 					passives = list("ManaLeak" = 1 - totalPot/200, "HardStyle" = 0.3 * reducedPot, \
 					"Flicker" = clamp(round(reducedPot/5,1), 1, 2), "Pursuer" = clamp(round(reducedPot/5,1), 1, 2), \
-					"Instinct" = reducedPot * 0.5, "Godspeed" = round(reducedPot/2.5, 1), "Steady" = reducedPot * 0.5)
+					"Godspeed" = round(reducedPot/2.5, 1))
 
 				verb/Ripper_Mode()
 					set category="Skills"
@@ -3182,7 +3148,7 @@ NEW VARIABLES
 				StrMult=1.2
 				EndMult=1.3
 				passives = list ("ManaLeak" = 1, "WeaponBreaker" = 1, "Juggernaut" = 1,\
-				 "Harden" = 2, "CriticalDamage" = 0.5, "CriticalChance" = 5)
+				 "Harden" = 2, "CriticalDamage" = 0.5)
 				DefMult=0.5
 				IconLock='BusoKoka.dmi'
 				LockX=0
@@ -3198,8 +3164,8 @@ NEW VARIABLES
 					DefMult = 0.1 + (0.05*p.AscensionsAcquired)
 					var/reducedPot = totalPot/10
 					passives = list("ManaLeak" = 1 - totalPot/200, "WeaponBreaker" = 0.3 * reducedPot, \
-					"BlockChance" = round(reducedPot/10,1), "CriticalBlock" = round(reducedPot/15), \
-					"Harden" = reducedPot * 0.5, "Juggernaut" = 1, "DemonicDurability" = reducedPot * 0.3)
+					"CriticalBlock" = round(reducedPot/15), \
+					"Harden" = reducedPot * 0.5, "Juggernaut" = 1)
 				verb/Armstrong_Augmentation()
 					set category="Skills"
 					adjust(usr)
@@ -3213,7 +3179,7 @@ NEW VARIABLES
 				ForMult=1.3
 				OffMult=1.2
 				SpdMult=0.7
-				passives = list("ManaLeak" = 1, "Instinct" = 1, "QuickCast" = 3, "SpecialStrike" = 1)
+				passives = list("ManaLeak" = 1, "QuickCast" = 3, "SpecialStrike" = 1)
 				SureHitTimerLimit=30
 				ActiveMessage="arms themselves with enormous firepower, a weapon to surpass all!"
 				OffMessage="ditches the excess weaponry..."
@@ -3224,8 +3190,8 @@ NEW VARIABLES
 					OffMult = 1.2 + (0.1*p.AscensionsAcquired)
 					SpdMult = 0.7 + (0.05*p.AscensionsAcquired)
 					var/reducedPot = totalPot/10
-					passives = list("ManaLeak" = 1 - totalPot/200, "Instinct" = 0.5 * reducedPot, \
-					"QuickCast" = round(reducedPot/10,1), "SpecialStrike" = 1, "MovingCharge" = 1, "SpiritHand" = round(totalPot/4,1))
+					passives = list("ManaLeak" = 1 - totalPot/200, \
+					"QuickCast" = round(reducedPot/10,1), "SpecialStrike" = 1, "MovingCharge" = 1)
 
 				verb/Ray_Gear()
 					set category="Skills"
@@ -3245,7 +3211,7 @@ NEW VARIABLES
 				KenWaveBlend=2
 				KenWaveIcon='KenShockwavePurple.dmi'
 				IconTint=list(0.7,0.3,0.6, 0.99,0.59,0.88, 0.51,0.11,0.4, 0,0,0)
-				passives = list("ManaLeak" = 1, "SpiritSword" = 0.25, "SpiritHand" = 0.25,"Deicide" = 5)
+				passives = list("ManaLeak" = 1)
 				SureHitTimerLimit=30
 				ActiveMessage="breaches into a higher domain through the power of cybernetics!"
 				OffMessage="returns to the standard domain."
@@ -3254,8 +3220,7 @@ NEW VARIABLES
 					ForMult = 1.2 + (0.1*p.AscensionsAcquired)
 					StrMult = 1.2 + (0.1*p.AscensionsAcquired)
 					DefMult = 0.6 + (0.05*p.AscensionsAcquired)
-					passives = list("ManaLeak" = 1 - (p.AscensionsAcquired/10), "EndlessNine" = 0.1*p.AscensionsAcquired, \
-					"Deicide" = 5*p.AscensionsAcquired, "SpiritSword" = 0.25*p.AscensionsAcquired, "SpiritHand" = 0.25*p.AscensionsAcquired)
+					passives = list("ManaLeak" = 1 - (p.AscensionsAcquired/10))
 
 				verb/Hilbert_Effect()
 					set category="Skills"
@@ -3326,7 +3291,7 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						if(!altered)
-							passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 1, "Tenacity" = 1, "Persistence" = 1, "UnderDog" = 1, "Godspeed" = 1)
+							passives = list( "ArmorAscension" = 1, "Tenacity" = 1, "Persistence" = 1, "UnderDog" = 1, "Godspeed" = 1)
 							StrMult = 1 + (player.SagaLevel * 0.2)
 							SpdMult = 1 + (player.SagaLevel * 0.2)
 					verb/Don_Cloth()
@@ -3349,7 +3314,7 @@ NEW VARIABLES
 							StrMult = 1 + (player.SagaLevel * 0.2)
 							EndMult = 1.1 + (player.SagaLevel * 0.2)
 							DefMult = 1 + (player.SagaLevel * 0.2)
-							passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 1, "Reversal" = player.SagaLevel * 0.1, "CriticalBlock" = player.SagaLevel / 6, "BlockChance" = 5 + (player.SagaLevel * 1.5))
+							passives = list( "ArmorAscension" = 1, "Reversal" = player.SagaLevel * 0.1, "CriticalBlock" = player.SagaLevel / 6)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3361,7 +3326,7 @@ NEW VARIABLES
 					OffMult=1.1
 					DefMult=1.2
 					HairLock=1
-					passives = list("MovementMastery" =  3, "ArmorAscension" = 1, "VenomImmune" = 1, "WalkThroughHell" = 1, "Chilling" = 1, "SpiritStrike" = 1)
+					passives = list( "ArmorAscension" = 1, "VenomImmune" = 1, "WalkThroughHell" = 1, "Chilling" = 1)
 					ArmorIcon='saintcygnus_armor.dmi'
 					TopOverlayLock='saintcygnus_helmet.dmi'
 					ActiveMessage="dons the Cloth of the Swan, embracing its stoic and cold grace!"
@@ -3373,7 +3338,7 @@ NEW VARIABLES
 							OffMult = 1 + (player.SagaLevel * 0.2)
 							DefMult = 1 + (player.SagaLevel * 0.2)
 							EndMult = 0.9 + (player.SagaLevel * 0.2)
-							passives = list("MovementMastery" =  player.SagaLevel * 2, "SpiritStrike" = 1,  "ArmorAscension" = 1, "Chilling" = 1 + round(player.SagaLevel / 2,0.5), "VenomImmune" = 2 + (player.SagaLevel / 6), \
+							passives = list(   "ArmorAscension" = 1, "Chilling" = 1 + round(player.SagaLevel / 2,0.5), "VenomImmune" = 2 + (player.SagaLevel / 6), \
 							 "WalkThroughHell" = 1)
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3399,7 +3364,7 @@ NEW VARIABLES
 						SpdMult = 1 + (player.SagaLevel * 0.2)
 						OffMult = 1 + (player.SagaLevel * 0.2)
 						DefMult = 1.1 + (player.SagaLevel * 0.2)
-						passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 1, "BladeFisting" = 1)
+						passives = list( "ArmorAscension" = 1, "BladeFisting" = 1)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3414,7 +3379,7 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 2, "SpiritHand" = 2+(player.SagaLevel/2))
+						passives = list( "ArmorAscension" = 2)
 						StrMult = 1.1 + (player.SagaLevel * 0.2)
 						ForMult = 1.1 + (player.SagaLevel * 0.2)
 						OffMult = 1 + (player.SagaLevel * 0.1)
@@ -3433,7 +3398,7 @@ NEW VARIABLES
 					ActiveMessage="dons the Cloth of the Unicorn, embracing its brilliant speed!"
 					adjustments(mob/player)
 						..()
-						passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 2, "Pursuer" = 1.2 + (player.SagaLevel*0.2), "Flicker" = max(1,player.SagaLevel*0.5))
+						passives = list( "ArmorAscension" = 2, "Pursuer" = 1.2 + (player.SagaLevel*0.2), "Flicker" = max(1,player.SagaLevel*0.5))
 						SpdMult = 1.2 + (player.SagaLevel * 0.2)
 						OffMult = 1 + (player.SagaLevel * 0.2)
 						DefMult = 1.1 + (player.SagaLevel * 0.2)
@@ -3465,8 +3430,8 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						var/newLevel = clamp(player.SagaLevel - 2, 1,4)
-						passives = list("MovementMastery" = player.SagaLevel * 2, "ArmorAscension" = 2, "Tenacity" = (player.SagaLevel * 1.5), "Persistence" = (player.SagaLevel * 1.5), \
-									 "UnderDog" = (player.SagaLevel * 2), "Godspeed" = (player.SagaLevel*0.5), "BlurringStrikes" = (player.SagaLevel/2))
+						passives = list( "ArmorAscension" = 2, "Tenacity" = (player.SagaLevel * 1.5), "Persistence" = (player.SagaLevel * 1.5), \
+									 "UnderDog" = (player.SagaLevel * 2), "Godspeed" = (player.SagaLevel*0.5))
 						StrMult = 1.3 + (newLevel * 0.2)
 						SpdMult = 1.3 + (newLevel * 0.2)
 						Godspeed = 1 + (player.SagaLevel * 0.2)
@@ -3489,8 +3454,8 @@ NEW VARIABLES
 						StrMult = 1.3 + (newLevel * 0.2)
 						EndMult = 1.5 + (newLevel * 0.2)
 						DefMult = 1.3 + (newLevel * 0.2)
-						passives = list("MovementMastery" = player.SagaLevel * 2, "ArmorAscension" = 2, "Reversal" = player.SagaLevel * 0.1,\
-						"CriticalBlock" = player.SagaLevel / 6, "BlockChance" = 10 + (player.SagaLevel * 1.5))
+						passives = list( "ArmorAscension" = 2, "Reversal" = player.SagaLevel * 0.1,\
+						"CriticalBlock" = player.SagaLevel / 6)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3518,7 +3483,7 @@ NEW VARIABLES
 							OffMult = 1.3 + (newLevel * 0.2)
 							DefMult = 1.3 + (newLevel * 0.2)
 							EndMult = 1.2 + (newLevel * 0.2)
-							passives = list("MovementMastery" =  player.SagaLevel * 2, "SpiritStrike" = 1, "ArmorAscension" = 2, "Freezing" = 1 + player.SagaLevel, "VenomImmune" = 1, \
+							passives = list(  "ArmorAscension" = 2, "Freezing" = 1 + player.SagaLevel, "VenomImmune" = 1, \
 							 "WalkThroughHell" = 1, "Erosion" = 0.05 * newLevel)
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3540,7 +3505,7 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						var/newLevel = clamp(player.SagaLevel - 2, 1,4)
-						passives = list("MovementMastery" = player.SagaLevel * 2, "ArmorAscension" = 2, "BladeFisting" = 1)
+						passives = list( "ArmorAscension" = 2, "BladeFisting" = 1)
 						SpdMult = 1.2 + (newLevel * 0.2)
 						EndMult = 1.1 + (newLevel * 0.2)
 						StrMult = 1.1 + (newLevel * 0.2)
@@ -3566,7 +3531,7 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						var/newLevel = clamp(player.SagaLevel - 2, 1,4)
-						passives = list("MovementMastery" = player.SagaLevel * 2.25, "ArmorAscension" = 2, "SpiritHand" = player.SagaLevel*1.5)
+						passives = list( "ArmorAscension" = 2)
 						StrMult = 1.4 + (newLevel * 0.2)
 						ForMult = 1.4 + (newLevel * 0.2)
 						OffMult = 1.3 + (newLevel * 0.2)
@@ -3585,7 +3550,7 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("MovementMastery" =  player.SagaLevel * 2, "ArmorAscension" = 2, "Pursuer" = 1 + (player.SagaLevel * 0.3), "Flicker" = max(1,player.SagaLevel))
+						passives = list( "ArmorAscension" = 2, "Pursuer" = 1 + (player.SagaLevel * 0.3), "Flicker" = max(1,player.SagaLevel))
 						SpdMult = 1.3 + (player.SagaLevel * 0.2)
 						OffMult = 1.1 + (player.SagaLevel * 0.2)
 						DefMult = 1.2 + (player.SagaLevel * 0.2)
@@ -3596,7 +3561,6 @@ NEW VARIABLES
 						src.Trigger(usr)
 			Gold_Cloth
 				MovementMastery=20
-				DebuffResistance=1
 				SpaceWalk=1//gold
 				StaticWalk=1
 				ArmorClass="Heavy"
@@ -3629,7 +3593,7 @@ NEW VARIABLES
 
 				adjustments(mob/player)
 					..()
-					passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25))
+					passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25))
 					if(!timeLimit&&player.SagaLevel < 5)
 						setRandomTime(player)
 				verb/Toggle_Cape()
@@ -3656,8 +3620,6 @@ NEW VARIABLES
 					ForMult=1.3
 					EndMult=1.3
 					DefMult=1.4
-					SpiritFlow=1
-					SpiritHand=1
 					TechniqueMastery=5
 					ArmorIcon='goldsaintaries_armor.dmi'
 					TopOverlayLock='goldsaintaries_helmet.dmi'
@@ -3670,7 +3632,7 @@ NEW VARIABLES
 						ForMult = 1.4 + ((player.SagaLevel-2) * 0.2)
 						EndMult = 1.4 + ((player.SagaLevel-2) * 0.2)
 						DefMult = 1.5 + ((player.SagaLevel-2) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "SpiritFlow" = player.SagaLevel*1.5, "SpiritHand" = player.SagaLevel*1.5, "TechniqueMastery" = 3 + (player.SagaLevel/1.5))
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25),   "TechniqueMastery" = 3 + (player.SagaLevel/1.5))
 
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3698,7 +3660,7 @@ NEW VARIABLES
 						EndMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.1 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HolyMod" = 2 + player.SagaLevel, "AbyssMod" = 2 + player.SagaLevel, "HellPower" =0.25 * (player.SagaLevel+2), "BuffMastery" = 1 + player.SagaLevel, "SpiritPower" = player.SagaLevel*0.25)
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HolyMod" = 2 + player.SagaLevel, "AbyssMod" = 2 + player.SagaLevel, "HellPower" =0.25 * (player.SagaLevel+2),  "SpiritPower" = player.SagaLevel*0.25)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3719,7 +3681,7 @@ NEW VARIABLES
 						ForMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.2 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, \
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, \
 						"Godspeed" = 1+(player.SagaLevel*0.25), "MartialMagic" = 1, "AbyssMod" = player.SagaLevel*2, "SlayerMod" = 3+(player.SagaLevel/2), "FavoredPrey" = "Mortal", "SpiritPower" = player.SagaLevel*0.25)
 
 					verb/Don_Cloth()
@@ -3742,7 +3704,7 @@ NEW VARIABLES
 						StrMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						ForMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						SpdMult = 1.5 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.75), "DoubleStrike" = 1 +(player.SagaLevel/2), "TripleStrike" = 1 + (player.SagaLevel/3))
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.75), "DoubleStrike" = 1 +(player.SagaLevel/2), "TripleStrike" = 1 + (player.SagaLevel/3))
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3762,7 +3724,7 @@ NEW VARIABLES
 						ForMult = 1.4 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.4 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "FluidForm" = 1 + (player.SagaLevel*0.25), "HolyMod" = player.SagaLevel * 4, "HybridStrike" = player.SagaLevel*0.5)
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HolyMod" = player.SagaLevel * 4)
 
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3784,7 +3746,7 @@ NEW VARIABLES
 						OffMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						SpdMult = 1.4 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1, "MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "BlockChance" = 20 + (player.SagaLevel*5), "CriticalBlock" = 1 + (player.SagaLevel/3), "Deflection" = 2+(player.SagaLevel/3))
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1,  "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "CriticalBlock" = 1 + (player.SagaLevel/3), "Deflection" = 2+(player.SagaLevel/3))
 
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3806,7 +3768,7 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HardStyle" = 1 + player.SagaLevel, "Curse" = 1, "Shearing" = 1 + player.SagaLevel)
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HardStyle" = 1 + player.SagaLevel,  "Shearing" = 1 + player.SagaLevel)
 						ForMult = 1.4 + ((player.SagaLevel-3) * 0.2)
 						SpdMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.3 + ((player.SagaLevel-3) * 0.2)
@@ -3831,7 +3793,7 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1, "MovementMastery" = 10+player.SagaLevel, "ArmorAscension" = 3, \
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1,  "ArmorAscension" = 3, \
 						"Godspeed" = 1+(player.SagaLevel*0.25), "SwordAscension" = player.SagaLevel, "BladeFisting" = 1)
 						StrMult = 1.3 + ((player.SagaLevel-2) * 0.2)
 						ForMult = 1.3 + ((player.SagaLevel-2) * 0.2)
@@ -3856,7 +3818,7 @@ NEW VARIABLES
 						DefMult = 1.1 + ((player.SagaLevel-3) * 0.2)
 						ForMult = 1.5 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.1 + ((player.SagaLevel-3) * 0.2)
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1, "SpiritStrike" = 1, "MovementMastery" = 8+player.SagaLevel, \
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1,   \
 						 "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25),"SoftStyle" = 1 + player.SagaLevel, "AbsoluteZero"= 1, "Freezing" = 1, "Erosion" = clamp(0.2 * (player.SagaLevel-3), 0.2, 0.75))
 					verb/Don_Cloth()
 						set category="Skills"
@@ -3875,7 +3837,7 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("DebuffResistance" = 1, "SpaceWalk" =1, "StaticWalk" = 1,"MovementMastery" = 8+player.SagaLevel, "ArmorAscension" = 3, \
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, \
 						"Godspeed" = 1+(player.SagaLevel*0.25), "Toxic" = 1, "DeathField" = 5 + player.SagaLevel, "VoidField" = 5 + player.SagaLevel)
 						DefMult = 1.4 + ((player.SagaLevel-3) * 0.2)
 						ForMult = 1.1 + ((player.SagaLevel-3) * 0.2)
@@ -3896,8 +3858,8 @@ NEW VARIABLES
 					OffMessage="discards the Cloth..."
 					adjustments(mob/player)
 						..()
-						passives = list("DebuffResistance" = 1, "SpaceWalk" = 1, "StaticWalk" = 1, "MovementMastery" = 8 + player.SagaLevel, "ArmorAscension" = 3, "MovingCharge" = 1, \
-						"Godspeed" = 1 + (player.SagaLevel*0.5), "BlurringStrikes" = player.SagaLevel*0.5, "Flow" = player.SagaLevel-3, "Skimming" = 1, "SpiritFlow" = player.SagaLevel-2)
+						passives = list("SpaceWalk" = 1, "StaticWalk" = 1,  "ArmorAscension" = 3, "MovingCharge" = 1, \
+						"Godspeed" = 1 + (player.SagaLevel*0.5), "Skimming" = 1)
 						SpdMult = 1.4 + ((player.SagaLevel-3) * 0.2)
 						StrMult = 1.1 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.1 + ((player.SagaLevel-3) * 0.2)
@@ -3918,8 +3880,8 @@ NEW VARIABLES
 					adjustments(mob/player)
 						..()
 						passives = list("ArmorAscension" = 3,"UnderDog"=player.SagaLevel*2, "Tenacity" = player.SagaLevel*2, "SpaceWalk" = 1, "StaticWalk" = 1, "MovingCharge" = 1, \
-						"Godspeed" = 1 + (player.SagaLevel*0.5), "BlurringStrikes" = player.SagaLevel*0.75,"SpiritFlow" = player.SagaLevel-2, "Flow" = player.SagaLevel-2, "Skimming" = 2, \
-						"MovementMastery" = 10 + (player.SagaLevel),"GodCloth" = 1,"Persistence" = player.SagaLevel*0.75)
+						"Godspeed" = 1 + (player.SagaLevel*0.5), "Skimming" = 2, \
+						"GodCloth" = 1,"Persistence" = player.SagaLevel*0.75)
 						StrMult=1.75
 						ForMult=1.75
 						SpdMult=1.75
@@ -3972,7 +3934,7 @@ NEW VARIABLES
 							src.SwordDelaySecond=GetKeychainDelay(usr.SyncAttached)
 							src.SwordElementSecond=GetKeychainElement(usr.SyncAttached)
 							src.SwordIconSecond=GetKeychainIconReversed(usr.SyncAttached)
-							passives = list("ManaLeak" = 2, "Pursuer" = 1+ (usr.SagaLevel/2), "Flicker" = 1+ (usr.SagaLevel/2), "StunningStrike" = 1, "DoubleStrike" = 1 + (usr.SagaLevel/2), "MasterfulCasting" = 1)
+							passives = list("ManaLeak" = 2, "Pursuer" = 1+ (usr.SagaLevel/2), "Flicker" = 1+ (usr.SagaLevel/2), "StunningStrike" = 1, "DoubleStrike" = 1 + (usr.SagaLevel/2))
 							passives+=GetKeybladePassives(usr.SyncAttached)
 
 							usr.LimitCounter+=1
@@ -4009,7 +3971,7 @@ NEW VARIABLES
 			ABuffNeeded=list("Keyblade")
 			ManaLeak=1
 			ManaThreshold=1
-			passives = list("ManaLeak"= 1, "QuickCast"= 2, "TechniqueMastery" = 5, "Skimming" = 1, "DualCast" = 1, "SpecialStrike" = 1, "MasterfulCasting" = 1)
+			passives = list("ManaLeak"= 1, "QuickCast"= 2, "TechniqueMastery" = 5, "Skimming" = 1, "DualCast" = 1, "SpecialStrike" = 1)
 			ForMult=1.5
 			DefMult=1.5
 			KenWave=1
@@ -4032,7 +3994,7 @@ NEW VARIABLES
 								usr.LimitCounter=0
 								return
 							usr.LimitCounter+=1
-						passives = list("ManaLeak"= 1, "QuickCast"= usr.SagaLevel/2, "TechniqueMastery" = 5, "Skimming" = 1, "DualCast" = 1, "SpecialStrike" = 1, "MasterfulCasting" = usr.SagaLevel/2, "PureDamage" = usr.SagaLevel/2, "PureReduction" = usr.SagaLevel/2)
+						passives = list("ManaLeak"= 1, "QuickCast"= usr.SagaLevel/2, "TechniqueMastery" = 5, "Skimming" = 1, "DualCast" = 1, "SpecialStrike" = 1,  "PureDamage" = usr.SagaLevel/2, "PureReduction" = usr.SagaLevel/2)
 				src.Trigger(usr)
 		Master_Form
 			FlashChange=1
@@ -4088,7 +4050,7 @@ NEW VARIABLES
 							src.SwordElementSecond=GetKeychainElement(usr.SyncAttached)
 							src.SwordIconSecond=GetKeychainIconReversed(usr.SyncAttached)
 							passives = list("ManaLeak" = 2, "SwordAscensionSecond" = usr.SagaLevel, "TechniqueMastery" = 5+usr.SagaLevel, "Pursuer" = 1, "QuickCast" = 4, "Flicker" = 1, \
-								"DoubleStrike" = 3, "DualCast" = 1, "MovingCharge" = 1, "MasterfulCasting" = 2,"PureDamage" = usr.SagaLevel*1.25, "PureReduction" = usr.SagaLevel*1.25)
+								"DoubleStrike" = 3, "DualCast" = 1, "MovingCharge" = 1, "PureDamage" = usr.SagaLevel*1.25, "PureReduction" = usr.SagaLevel*1.25)
 							passives += GetKeybladePassives(usr.SyncAttached)
 							usr.LimitCounter+=2
 				src.Trigger(usr)
@@ -4113,7 +4075,6 @@ NEW VARIABLES
 			Flicker=2
 			Skimming=2
 			DoubleStrike=1
-			TripleStrike=1
 			MovingCharge=1
 			CalmAnger=1
 			StrMult=1.25
@@ -4147,7 +4108,7 @@ NEW VARIABLES
 							src.SwordElementSecond=GetKeychainElement(usr.SyncAttached)
 							src.SwordIconSecond=GetKeychainIconReversed(usr.SyncAttached)
 							passives = list("ManaLeak" = 3, "SwordAscensionSecond" = 6, "TechniqueMastery" = 12, "Pursuer" = 1, "QuickCast" = 2, "Flicker" = 1, "DualCast" = 1, "DoubleStrike" = 3, "MovingCharge" = 1, "TripleStrike" = 1, "CalmAnger" = 1,\
-							"PureDamage" = usr.SagaLevel*1.25, "PureReduction" = usr.SagaLevel*1.25, "GodKi" = 0.25, "MasterfulCasting" = 5)
+							"PureDamage" = usr.SagaLevel*1.25, "PureReduction" = usr.SagaLevel*1.25, "GodKi" = 0.25)
 							passives+=GetKeybladePassives(usr.SyncAttached)
 							usr.LimitCounter+=3
 				src.Trigger(usr)
@@ -4156,7 +4117,7 @@ NEW VARIABLES
 			ABuffNeeded=list("Keyblade")
 			ManaLeak=1
 			ManaThreshold=1
-			passives = list("ManaLeak"= 1, "CursedWounds" = 1, "GodSpeed" = 1, "Pursuer" = 3, "Flicker" = 3, "Instinct" = 3, "TechniqueMastery" = 5, "QuickCast" = 2)
+			passives = list("ManaLeak"= 1, "CursedWounds" = 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "TechniqueMastery" = 5, "QuickCast" = 2)
 			ForMult=1.25
 			StrMult=1.25
 			SpdMult=1.5
@@ -4171,18 +4132,18 @@ NEW VARIABLES
 			Cooldown=60
 			adjust(mob/p)
 				if(p.passive_handler.Get("Dreamless Sleep") && p.passive_handler.Get("Two Become One")||p.passive_handler.Get("Dreamless Sleep") && p.passive_handler.Get("Controlled Darkness"))
-					passives = list("Godspeed" = 2, "Pursuer" = 5, "Flicker" = 3, "Instinct" = 4, "Flow" = 4, "TechniqueMastery" = 7, "QuickCast" = 2)
+					passives = list("Godspeed" = 2, "Pursuer" = 5, "Flicker" = 3, "TechniqueMastery" = 7, "QuickCast" = 2)
 					ForMult=2
 					StrMult=2
 					SpdMult=2.5
 				else if(p.passive_handler.Get("Controlled Darkness"))
-					passives = list("ManaLeak"= 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "Instinct" = 3, "TechniqueMastery" = 5, "QuickCast" = 2, "HolyMod" = 3, "AbyssMod" = 3, "SpiritPower" = 0.25)
+					passives = list("ManaLeak"= 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "TechniqueMastery" = 5, "QuickCast" = 2, "HolyMod" = 3, "AbyssMod" = 3, "SpiritPower" = 0.25)
 					if(p.SagaLevel>=5)
 						ForMult=1.5
 						StrMult=1.5
 						SpdMult=1.75
 				else if(p.passive_handler.Get("Two Become One"))
-					passives = list("ManaLeak"= 1, "CursedWounds" = 1, "Godspeed" = 2, "Pursuer" = 5, "Flicker" = 3, "Instinct" = 4, "Flow" = 4, "TechniqueMastery" = 7, "QuickCast" = 2, "BleedHit" = 0.5)
+					passives = list("ManaLeak"= 1, "CursedWounds" = 1, "Godspeed" = 2, "Pursuer" = 5, "Flicker" = 3, "TechniqueMastery" = 7, "QuickCast" = 2, "BleedHit" = 0.5)
 					ForMult=1.5
 					StrMult=1.5
 					SpdMult=1.75
@@ -4191,12 +4152,12 @@ NEW VARIABLES
 						StrMult=1.75
 						SpdMult=2
 				else if(p.passive_handler.Get("Dreamless Sleep"))
-					passives = list("CursedWounds" = 1, "Godspeed" = 3, "Pursuer" = 5, "Flicker" = 3, "Instinct" = 4, "Flow" = 4, "TechniqueMastery" = 7, "QuickCast" = 2)
+					passives = list("CursedWounds" = 1, "Godspeed" = 3, "Pursuer" = 5, "Flicker" = 3, "TechniqueMastery" = 7, "QuickCast" = 2)
 					ForMult=1.5
 					StrMult=1.5
 					SpdMult=1.75
 				else
-					passives = list("ManaLeak"= 1, "CursedWounds" = 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "Instinct" = 3, "TechniqueMastery" = 5, "QuickCast" = 2)
+					passives = list("ManaLeak"= 1, "CursedWounds" = 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "TechniqueMastery" = 5, "QuickCast" = 2)
 					ForMult=1.25
 					StrMult=1.25
 					SpdMult=1.5
@@ -4207,7 +4168,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 		Denjin_Renki
 			ForMult=2
-			passives = list("SoftStyle" = 2, "StunningStrike" = 1, "SpiritHand" = 2, "Paralyzing" = 1)
+			passives = list("SoftStyle" = 2, "StunningStrike" = 1,  "Paralyzing" = 1)
 			IconLock='Ripple Arms.dmi'
 			LockX=0
 			LockY=0
@@ -4215,7 +4176,7 @@ NEW VARIABLES
 			ActiveMessage="projects a disciplined aura as their fists crackle with lightning!"
 			OffMessage="releases their tremendous focus..."
 			adjust(mob/p)
-				passives = list("SoftStyle" = p.SagaLevel, "StunningStrike" = p.SagaLevel/2, "SpiritHand" = p.SagaLevel, "Paralyzing" = p.SagaLevel/2, "ComboMaster" = 1)
+				passives = list("SoftStyle" = p.SagaLevel, "StunningStrike" = p.SagaLevel/2,  "Paralyzing" = p.SagaLevel/2, "ComboMaster" = 1)
 			verb/Denjin_Renki()
 				set category="Skills"
 				if(!usr.BuffOn(src))
@@ -4235,8 +4196,8 @@ NEW VARIABLES
 				if(player.SagaLevel>=1)
 					ActiveMessage="draws power from their courage as they pulse with green light!"
 				if(player.SagaLevel>=2)
-					AutoAnger=1
-					passives = list("Tenacity" = player.SagaLevel, "UnderDog" = player.SagaLevel/2, "Persistence" = player.SagaLevel, "AngerThreshold" = 1.75)
+					AngerFloor=75
+					passives = list("Tenacity" = player.SagaLevel, "UnderDog" = player.SagaLevel/2, "Persistence" = player.SagaLevel)
 				if(player.SagaLevel>=5)
 					ActiveMessage="roars with a heart full of courage, they are the embodiment of courage itself!"
 					AngerMult=2
@@ -4353,18 +4314,16 @@ NEW VARIABLES
 							src.OffMult=1.2
 							src.DefMult=1.3
 							src.SureDodgeTimerLimit=40
-							passives = list("Maki" = 1, "PUSpike" = 10, "Flow" = 1)
+							passives = list("Maki" = 1, "PUSpike" = 10)
 							src.Instinct=0
-							src.Flow=1
 							AngerPoint = 15
 							ActiveMessage="is filled with cold rage as their eyes turn red and one tomoe appears in their iris!"
 						if(2)
 							src.OffMult=1.2
 							src.DefMult=1.3
 							src.SureDodgeTimerLimit=35
-							passives = list("Maki" = 1, "PUSpike" = 20, "Flow" = 1, "Instinct" = 1)
+							passives = list("Maki" = 1, "PUSpike" = 20)
 							src.Instinct=1
-							src.Flow=1
 							src.FatigueDrain=0.05
 							PUSpike=20
 							AngerPoint = 20
@@ -4374,19 +4333,16 @@ NEW VARIABLES
 							OffMult=1.4
 							DefMult=1.4
 							SureDodgeTimerLimit=25
-							passives = list("Maki" = 1, "PUSpike" = 20, "Flow" = 2, "Instinct" = 2, "LikeWater" = 2)
-							LikeWater=2
+							passives = list("Maki" = 1, "PUSpike" = 20)
 							Instinct=2
-							Flow=2
 							src.FatigueDrain=0
 							PUSpike=20
 						else
 							src.OffMult=1.3
 							src.DefMult=1.3
 							src.SureDodgeTimerLimit=30
-							passives = list("Maki" = 1, "PUSpike" = 15, "Flow" = 2, "Instinct" = 2)
+							passives = list("Maki" = 1, "PUSpike" = 15)
 							src.Instinct=2
-							src.Flow=1
 							src.FatigueDrain=0
 						AngerPoint = 25
 						ActiveMessage="is filled with blinding hatred as their eyes turn red and three tomoe appear in their iris!"
@@ -4399,7 +4355,7 @@ NEW VARIABLES
 			StrMult=1.3
 			EndMult=1.3
 			OffMult=1.2
-			passives = list("Flow" = 3, "Persistence" = 4)
+			passives = list("Persistence" = 4)
 			BuffTechniques = list("/obj/Skills/Buffs/SlotlessBuffs/Regeneration")
 			ActiveMessage="forces their symbiote out!"
 			OffMessage="restrains their symbiotic companion..."
@@ -4587,7 +4543,7 @@ NEW VARIABLES
 		The_Echo_From_Hit_MMO_FF14
 			BuffName = "The Echo"
 			Mastery=-1
-			passives = list("The Echo" = 1)
+			passives = list("SecondWind" = "Echo")
 			FlashChange=1
 			ActiveMessage="enshrouds themselves in a blessing of light, granting brief visions of the future..."
 			OffMessage="is no longer blessed by light."
@@ -4615,7 +4571,7 @@ NEW VARIABLES
 		Beyond_Strength
 			BuffName = "Strength Beyond Strength"
 			Mastery=-1
-			passives = list("PridefulRage" = 1, "ZenkaiPower"=0.5)
+			passives = list( "ZenkaiPower"=0.5)
 			FlashChange=1
 			ActiveMessage="reaches for that which lies beyond strength, surrounding themselves in a red aura."
 			OffMessage="dispels their ultimate aura."
@@ -4633,7 +4589,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 		Supervillain
 			BuffName = "Supervillain Mode"
-			passives = list("MovementMastery" = 6, "HellPower" = 0.5, "BleedHit" = 0.5, "AbyssMod"=3, "FatigueLeak" = 1)
+			passives = list( "HellPower" = 0.5, "BleedHit" = 0.5, "AbyssMod"=3, "FatigueLeak" = 1)
 			DarkChange=1
 			ActiveMessage="trades their life force for dark power."
 			OffMessage="dispels their dark aura."
@@ -4641,7 +4597,7 @@ NEW VARIABLES
 				set category="Skills"
 				src.Trigger(usr)
 		Time_Power_Unleashed
-			passives = list("GodKi" = 0.25, "EnergyGeneration"=3, "Flow" = 5, "Instinct" = 5, "HolyMod" = 3, "FatigueLeak" = 2)
+			passives = list("GodKi" = 0.25, "EnergyGeneration"=3, "HolyMod" = 3, "FatigueLeak" = 2)
 			FlashChange=1
 			ActiveMessage="taps into the power to control time!"
 			OffMessage="is no longer unleashing their Time Power."
@@ -4655,7 +4611,7 @@ NEW VARIABLES
 			SagaSignature=1
 			Mastery=-1
 			UnrestrictedBuff=1
-			passives = list("MagnifiedStr" = 0.35, "MagnifiedEnd" = 0.35,"MagnifiedFor" = 0.35, "MovementMastery" = 4, "SaiyanPower2"=0.75,\
+			passives = list("MagnifiedStr" = 0.35, "MagnifiedEnd" = 0.35,"MagnifiedFor" = 0.35,  "SaiyanPower2"=0.75,\
 				"Flicker" = 2, "Pursuer" = 2, "PureDamage" = 1, "PureReduction" = 1)
 			ActiveMessage="magnifies their Super Saiyan 2 power!"
 			OffMessage="releases their magnified power..."
@@ -4672,9 +4628,9 @@ NEW VARIABLES
 			EndMult=1.5
 			SpdMult=1.5
 			DefMult=1.5
-			AutoAnger=1
-			passives = list("GodKi" = 0.75, "EnergyGeneration" = 5, "Godspeed" = 4, "Flow" = 5,  "BuffMastery" = 5, "PureDamage" = 3, "PureReduction" = 3, \
-								"BackTrack" = 2 , "StunningStrike" = 3, "Sunyata" = 5, "MovementMastery" = 10, "Flicker" = 5, "Pursuer" = 5,"GodlyCalm"=1)
+			AngerFloor=75
+			passives = list("GodKi" = 0.75, "EnergyGeneration" = 5, "Godspeed" = 4, "PureDamage" = 3, "PureReduction" = 3, \
+								"StunningStrike" = 3, "Sunyata" = 5,  "Flicker" = 5, "Pursuer" = 5,"CalmAnger"=1)
 			PUSpeedModifier=2
 			FlashChange=1
 			KenWave=5
@@ -4693,7 +4649,7 @@ NEW VARIABLES
 			SignatureTechnique=4
 			Mastery=-1
 			UnrestrictedBuff=1
-			passives = list("GodKi" = 1, "The Almighty" = 1, "Sunyata" = 5, "LikeWater" = 8, "BuffMastery" = 5, "CriticalChance" = 35, "CriticalDamage"= 0.15, \
+			passives = list("GodKi" = 1, "The Almighty" = 1, "Sunyata" = 5, "CriticalDamage"= 0.15, \
 								"Extend" = 2, "Gum Gum" = 2)
 			PUSpeedModifier=2
 			FlashChange=1
@@ -4717,8 +4673,8 @@ NEW VARIABLES
 			DefMult=1.5
 			OffMult=1.5
 			SpecialSlot=1
-			passives = list("GodKi" = 0.5, "Grippy" = 10, "IronGrip" = 10, "Scoop" = 5, "BuffMastery" = 5, "SpiritStrike" = 1, "SpiritFlow" = 6, \
-								"SpiritSword" = 2, "SpiritHand" = 8, "AmuletBeaming" = 1, "MovingCharge" = 1, "ManaStats" = 4, "QuickCast" = 8, "ManaGeneration" = 50, "Siphon" = 7)
+			passives = list("GodKi" = 0.5, "Grippy" = 10,  "Scoop" = 5,    \
+								  "AmuletBeaming" = 1, "MovingCharge" = 1,  "QuickCast" = 8, "ManaGeneration" = 50)
 			DarkChange=1
 			ActiveMessage="calls upon the power of the forgotten Lord of the Seventh Circle."
 			OffMessage="releases the power of The Seventh One."
@@ -4731,8 +4687,8 @@ NEW VARIABLES
 			Mastery=-1
 			UnrestrictedBuff=1
 			SpecialSlot=1
-			passives = list("GodKi" = 0.5, "Miracle" = 1, "Sunyata" = 5, "Flow" = 10, "Instinct" = 10, "LifeSteal" = 30, "Deflection" = 5, "Reversal" = 2.5, "CounterMaster" = 5, \
-								"BlockChance" = 25, "CriticalBlock" = 0.25, "Unstoppable" = 1)
+			passives = list("GodKi" = 0.5, "Miracle" = 1, "Sunyata" = 5, "LifeSteal" = 30, "Deflection" = 5, "Reversal" = 2.5, "CounterMaster" = 5, \
+								"CriticalBlock" = 0.25, "Unstoppable" = 1)
 			FlashChange=1
 			ActiveMessage="radiates with a miraculous power that can overcome any predicament!"
 			OffMessage="releases the power of miracles."
@@ -4750,8 +4706,8 @@ NEW VARIABLES
 			SpdMult=1.2
 			DefMult=1.2
 			SpecialSlot=1
-			passives = list("GodKi" = 0.25, "DeathField" = 10, "VoidField" = 5, "Brutalize" = 5, "Deflection" = 5, "SlayerMod" = 1, "FavoredPrey" = "All", \
-								"Power of Destruction" = 1, "Field of Destruction" = 1, "CursedWounds"=1, "HardStyle"=1)
+			passives = list("GodKi" = 0.25, "DeathField" = 10, "VoidField" = 5,  "Deflection" = 5, "SlayerMod" = 1, "FavoredPrey" = "All", \
+								 "Field of Destruction" = 1, "CursedWounds"=1, "HardStyle"=1)
 			DarkChange=1
 			ActiveMessage="taps into the power of a Destroyer."
 			OffMessage="casts aside their destructive power."
@@ -4764,7 +4720,7 @@ NEW VARIABLES
 			Mastery=1
 			UnrestrictedBuff=1
 			passives = list("GodKi"=0.25, "Heart of Darkness" = 1, "Speed Force" = 1, "MovingCharge" = 1, \
-							"Secret Knives" = "GodSlayer", "Tossing" = 5, "Pressure" = 5, "Unnerve" = 5, "Relentlessness" = 1)
+							"Secret Knives" = "GodSlayer", "Tossing" = 5,   "Relentlessness" = 1)
 			PUSpeedModifier=2
 			DarkChange=1
 			KenWave=5
@@ -4777,7 +4733,7 @@ NEW VARIABLES
 				if(Mastery==2)
 					BuffName = "Heart of Darkness (True)"
 					passives = list("GodKi"=0.5, "Heart of Darkness" = 1, "Speed Force" = 1, "MovingCharge" = 1, \
-									"Secret Knives" = "GodSlayer", "Tossing" = 5, "Pressure" = 5, "Unnerve" = 5, "Relentlessness" = 1)
+									"Secret Knives" = "GodSlayer", "Tossing" = 5,   "Relentlessness" = 1)
 			verb/Heart_of_Darkness()
 				set category="Skills"
 				adjust(usr)
@@ -4788,8 +4744,8 @@ NEW VARIABLES
 			Mastery=-1
 			UnrestrictedBuff=1
 			SpecialSlot=1
-			passives = list("DisableGodKi" = 1, "Deicide" = 10, "EndlessNine" = 1, "Heart of Darkness" = 1, "Speed Force" = 1,  "Disarm" = 3, "MovingCharge" = 1, \
-								"Secret Knives" = "GodSlayer", "Tossing" = 5, "Pressure" = 5, "Unnerve" = 5, "Relentlessness" = 1)
+			passives = list("DisableGodKi" = 1, "Heart of Darkness" = 1, "Speed Force" = 1,  "Disarm" = 3, "MovingCharge" = 1, \
+								"Secret Knives" = "GodSlayer", "Tossing" = 5,   "Relentlessness" = 1)
 			PUSpeedModifier=2
 			DarkChange=1
 			ActiveMessage="asks the question, 'Who is like God?'"
@@ -4804,7 +4760,7 @@ NEW VARIABLES
 			ActiveSlot=1
 			SpecialSlot=1
 			passives = list("Aspect of Death"=1,"PureDamage"=5,"PureReduction"=5, "StunningStrike" = 3, "HardStyle"=1, "SoftStyle"=1, "PUSpike"=400,\
-			"Deicide"=15, "DisableGodKi"=1, "SlayerMod" = 1.5, "FavoredPrey" = "All","Extend"=2, "Gum Gum"=2,"KiControlMastery"=20,"Shearing"=15,"KiControl"=1)
+			"DisableGodKi"=1, "SlayerMod" = 1.5, "FavoredPrey" = "All","Extend"=2, "Gum Gum"=2,"KiControlMastery"=20,"Shearing"=15,"KiControl"=1)
 			ElementalOffense="Death"
 			PUSpeedModifier=2
 			DarkChange=1
@@ -4837,17 +4793,17 @@ NEW VARIABLES
 			EndMult=1.5
 			OffMult=1.5
 			DefMult=1.5
-			passives = list("GodKi" = 1.5, "EnergyGeneration" = 6, "Godspeed" = 4, "Flow" = 6,"TechniqueMastery" = 8, \
-								"Instinct" = 4, "Pursuer"= 4 , "BackTrack" = 4, \
-								"MovementMastery" = 15, "StunningStrike" = 3, "Sunyata" = 3,"SSJRose"=1,\
-								"Flicker" = 4, "PureDamage"=8, "PureReduction" = 8, "BuffMastery" = 15,"ZenkaiPower"=2)
+			passives = list("GodKi" = 1.5, "EnergyGeneration" = 6, "Godspeed" = 4, "TechniqueMastery" = 8, \
+								"Pursuer"= 4 , \
+								 "StunningStrike" = 3, "Sunyata" = 3,"SSJRose"=1,\
+								"Flicker" = 4, "PureDamage"=8, "PureReduction" = 8, "ZenkaiPower"=2)
 			ActiveMessage="awakens their latent Saiyan gifts, erupting with tremendous power! "
 			OffMessage="suppresses their Saiyan power."
 			adjust(mob/p)
-				passives = list("GodKi" = 1.5*(p.Potential/80), "EnergyGeneration" = 6, "Godspeed" = 4, "Flow" = 6,"TechniqueMastery" = 8, \
-									"Instinct" = 4, "Pursuer"= 4 , "BackTrack" = 4, \
-									"MovementMastery" = 15, "StunningStrike" = 3, "Sunyata" = 3,"SSJRose"=1,\
-									"Flicker" = 4, "PureDamage"=8, "PureReduction" = 8, "BuffMastery" = 15,"ZenkaiPower"=2)
+				passives = list("GodKi" = 1.5*(p.Potential/80), "EnergyGeneration" = 6, "Godspeed" = 4, "TechniqueMastery" = 8, \
+									"Pursuer"= 4 , \
+									 "StunningStrike" = 3, "Sunyata" = 3,"SSJRose"=1,\
+									"Flicker" = 4, "PureDamage"=8, "PureReduction" = 8, "ZenkaiPower"=2)
 			verb/Toggle_Rose_Transfomation_Sequence()
 				set category="Utility"
 				set hidden = 1
@@ -4873,9 +4829,10 @@ NEW VARIABLES
 						GG.color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0)
 						GG.alpha=110
 						sleep(5)
-						usr.filters+=filter(type = "blur", size = 0)
+						usr.filters -= "transblur" //dupe filter names stack, clear first
+						usr.filters+=filter(name="transblur", type = "blur", size = 0)
 						animate(usr, color=list(-1.2,-1.2,-1, 1,1,1, -1.4,-1.4,-1.2,  1,1,1), time=3, flags=ANIMATION_END_NOW)
-						animate(usr.filters[usr.filters.len], size = 0.35, time = 3)
+						animate(usr.filters["transblur"], size = 0.35, time = 3)
 						usr.overlays+=GG
 						spawn()DarknessFlash(usr, SetTime=60)
 						sleep()
@@ -4894,7 +4851,7 @@ NEW VARIABLES
 						usr.Quake(60)
 						sleep(20)
 						sleep(10)
-						usr.filters-=filter(type = "blur", ,size = 0.35)
+						usr.filters -= "transblur"
 						animate(usr, color=list(0,0,0, 0,0,0, 0,0,0, 0.5,0.95,1), time=5, easing=QUAD_EASING)
 						sleep(5)
 						animate(usr, color=null, time=20, easing=CUBIC_EASING)
@@ -4930,7 +4887,7 @@ NEW VARIABLES
 			DefMult=2
 			OffMult=1.25
 			SpecialSlot=1
-			passives = list("TechniqueMastery" = 5, "BuffMastery" = 5, "MovementMastery" = 10, "X-Antibody" = 1)
+			passives = list("TechniqueMastery" = 5,   "X-Antibody" = 1)
 			FlashChange=1
 			ActiveMessage="taps into the power of the X-Antibody within them, drawing out their innermost potential."
 			OffMessage="releases the power of their evolution."
@@ -4950,8 +4907,8 @@ NEW VARIABLES
 			DefMult=2.5
 			OffMult=1.5
 			SpecialSlot=1
-			passives = list("GodKi" = 0.25, "BlockChance" = 50, "CriticalBlock" = 0.5, "Sunyata" = 3, "Deflection" = 10, "Reversal" = 1, "GiantForm" = 1, \
-								"Blubber" = 5, "KBRes" = 5, "Harden" = 5, "CounterMaster" = 10, "Juggernaut" = 5, "LikeWater" = 10, "LifeGeneration" = 5, "Death X-Antibody" = 1)
+			passives = list("GodKi" = 0.25, "CriticalBlock" = 0.5, "Sunyata" = 3, "Deflection" = 10, "Reversal" = 1, "GiantForm" = 1, \
+								"Blubber" = 5, "Harden" = 5, "CounterMaster" = 10, "Juggernaut" = 5, "LifeGeneration" = 5, "Death X-Antibody" = 1)
 			FlashChange=1
 			ActiveMessage="taps into the power of the X-Antibody within them, achieving an evolution superior to any other."
 			OffMessage="releases the power of their evolution."
@@ -4979,8 +4936,8 @@ NEW VARIABLES
 			SpdMult=2
 			DefMult=0.25
 			OffMult=2
-			passives = list("GodKi" = 1.5, "CriticalChance" = 50, "CriticalDamage" = 0.5, "AsuraStrike" = 2, "DoubleStrike" = 3, "TripleStrike" = 2, "Warping" = 4, \
-								"HotHundred" = 1, "SoulSteal" = 3, "KillerInstinct" = 0.5, "SpiritSword" = 2, "SpiritHand" = 8, "Instinct" = 10, "Extend" = 2, "Gum Gum" = 2, "SweepingStrike" = 1, "PridefulRage" = 1, "Death-X-Evolution" = 1)
+			passives = list("GodKi" = 1.5, "CriticalDamage" = 0.5, "AsuraStrike" = 2, "DoubleStrike" = 3, "TripleStrike" = 2, "Warping" = 4, \
+								"HotHundred" = 1, "SoulSteal" = 3, "Extend" = 2, "Gum Gum" = 2, "SweepingStrike" = 1)
 			DarkChange=1
 			ActiveMessage="overcomes the very concept of mortality itself."
 			OffMessage="relinquishes the Evolution of Death."
@@ -4989,9 +4946,7 @@ NEW VARIABLES
 				return//it triggers when you DIE now
 				src.Trigger(usr)
 		Saiyan_Dominance
-			AutoAnger=1
-			passives = list("PridefulRage" = 1)
-			PridefulRage=1
+			AngerFloor=75
 			TextColor=rgb(230, 230, 100)
 			Cooldown=300
 			NeedsHealth = 75
@@ -5071,7 +5026,6 @@ NEW VARIABLES
 				var/zenkaiLevel = user.AscensionsAcquired
 				passives = list()
 				passives["TechniqueMastery"] = 0.5*zenkaiLevel
-				passives["MovementMastery"] = 2*zenkaiLevel
 				var/passiveLimit = zenkaiLevel
 				var/passiveNumber = 0
 				for(var/x in user.Target.StyleBuff.passives)
@@ -5104,7 +5058,6 @@ NEW VARIABLES
 			adjust(mob/p)
 				passives["ManaGeneration"] = 0;
 				passives["Cryokenesis"] = 1 + p.AscensionsAcquired
-				passives["MovementMastery"] = min(5, p.AscensionsAcquired);
 				passives["TechniqueMastery"] = min(5, p.AscensionsAcquired);
 				passives["FatigueLeak"] = max(0, 0.25 - (0.05*p.AscensionsAcquired));
 				passives["ManaLeak"] = max(0.25 - (0.05*p.AscensionsAcquired));
@@ -5146,8 +5099,6 @@ NEW VARIABLES
 			SkillCost=0
 			NoSword=1
 			NoStaff=1
-			passives = list("HybridStrike" = 0.5)
-			HybridStrike = 0.5
 			EnergyLeak=2
 			Cooldown=5
 			IconLock='Ki-Blade.dmi'
@@ -5181,8 +5132,8 @@ NEW VARIABLES
 			NoSword=1
 			NoStaff=1
 			KiBlade=1
-			passives = list("KiBlade" = 1, "SpiritSword" = 0.25, "EnergyLeak" = 2)
-			SpiritSword=0.5
+			passives = list(  "EnergyLeak" = 2)
+			SummonSwordVisual=0.5
 			EnergyLeak=2
 			Cooldown=5
 			IconLock='Ki-Blade.dmi'
@@ -5215,7 +5166,6 @@ NEW VARIABLES
 			SkillCost=0
 			passives = list("Deflection" = 1, "NoDodge" = 1)
 			Deflection=1
-			NoDodge=1
 			TimerLimit=10
 			EnergyCost = 10
 			Cooldown=90
@@ -5317,10 +5267,8 @@ NEW VARIABLES
 				adjust(mob/p)
 					NoForcedWhiff = 1 // make it so people cant force whiff u
 					var/magicLevel = p.getTotalMagicLevel()
-					passives = list("NoForcedWhiff" = 1, "FluidForm" = 1, "Godspeed" = clamp(round(magicLevel/10), 1, 2), "DoubleStrike" = 1, \
-					"BlurringStrikes" = 1)
+					passives = list( "Godspeed" = clamp(round(magicLevel/10), 1, 2), "DoubleStrike" = 1)
 					TimerLimit = round(15 + (magicLevel * 1.5))
-					FluidForm = 1
 					SpdMult = 1 + (magicLevel * 0.01)
 					Godspeed = round(magicLevel / 10)
 					DoubleStrike = 1
@@ -5845,7 +5793,7 @@ NEW VARIABLES
 				Copyable=4
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Stone_Skin")
 				ManaCost=12
-				passives = list("Harden" = 1, "Pursuer" = 1, "Instinct" = 1)
+				passives = list("Harden" = 1, "Pursuer" = 1)
 				Instinct=1
 				Pursuer=1
 				TextColor=rgb(255, 0, 0)
@@ -5867,8 +5815,7 @@ NEW VARIABLES
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/True_Effort")
 				ManaCost=10
 				TimerLimit=30
-				passives = list("Harden" = 1.5, "Flow" = 1, "Instinct" = 1, "Pursuer" = 1)
-				Flow=1
+				passives = list("Harden" = 1.5, "Pursuer" = 1)
 				Instinct=1
 				Pursuer=1
 				TextColor=rgb(255, 0, 0)
@@ -5936,7 +5883,7 @@ NEW VARIABLES
 				StrMult=1
 				EndMult=1
 				DefMult=1 // 0.3
-				passives = list("CriticalChance" = 2, "BlockChance" = 2, "CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
+				passives = list("CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
 				 "NoDodge" = 1)
 				MakesArmor=1
 				ActiveMessage="enters a martial trance, sacrificing their magical abilities!"
@@ -5952,13 +5899,12 @@ NEW VARIABLES
 							DefMult = 0.5
 							StrMult = 1 + (magicLevel * 0.015)
 							EndMult = 1 + (magicLevel * 0.015)
-							passives = list("CriticalChance" = 5, "BlockChance" = 5, "CriticalDamage" = 0.5, "CriticalBlock" = 0.5, "ArmorAscension" = 1)
+							passives = list("CriticalDamage" = 0.5, "CriticalBlock" = 0.5, "ArmorAscension" = 1)
 							Cooldown = 240
 							TimerLimit = 60 + magicLevel
 						else
-							passives = list("CriticalChance" = 2, "BlockChance" = 2, "CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
+							passives = list("CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
 							 "NoDodge" = 1)
-							NoDodge = 1
 							DefMult = 1
 							StrMult = 1
 							EndMult = 1
@@ -5983,8 +5929,6 @@ NEW VARIABLES
 				EndMult=1 //1.3
 				SpdMult=1 //0.8
 				DefMult=1 //0.3
-				CriticalChance=5
-				BlockChance=5
 				SweepingStrike=1
 				MakesArmor=1
 				ArmorAscension=1
@@ -6001,7 +5945,7 @@ NEW VARIABLES
 						var/magicLevel = usr.getTotalMagicLevel()
 						if(magicLevel>=20) // max magic
 							passives = list("Mechanized" = 1, "Xenobiology" = 1, "GiantForm" = 1, \
-						 "SweepingStrike" = 1, "CriticalChance" = 5, "BlockChance" = 5, "CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 2)
+						 "SweepingStrike" = 1, "CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 2)
 							StrMult = 1 + (magicLevel * 0.015)
 							EndMult = 1 + (magicLevel * 0.015)
 							SpdMult = 1 - (magicLevel * 0.015)
@@ -6009,7 +5953,7 @@ NEW VARIABLES
 							TimerLimit = 120 + magicLevel
 						else
 							passives = list("Mechanized" = 1, "Xenobiology" = 1, \
-						 "SweepingStrike" = 1, "CriticalChance" = 5, "BlockChance" = 5, "CriticalDamage" = 0.15, "CriticalBlock" = 0.15, "ArmorAscension" = 1, "NoDodge" = 1)
+						 "SweepingStrike" = 1, "CriticalDamage" = 0.15, "CriticalBlock" = 0.15, "ArmorAscension" = 1, "NoDodge" = 1)
 							TimerLimit = 120 + magicLevel
 					if(!usr.BuffOn(src))
 						src.ManaAdd=(-1)*(usr.ManaAmount*1)
@@ -6126,7 +6070,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							VaizardHealth=1.5
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/10)
@@ -6155,7 +6099,7 @@ NEW VARIABLES
 				verb/Shell()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6189,7 +6133,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 							VaizardHealth=3
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/5)
@@ -6218,16 +6162,15 @@ NEW VARIABLES
 				verb/Barrier()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
 					src.Trigger(usr)
 			ProtectApply
 				name = "Protect"
-				passives = list("PureReduction" = 2, "DebuffResistance" = 0.5)
+				passives = list("PureReduction" = 2)
 				PureReduction = 2
-				DebuffResistance = 0.5
 				MagicNeeded = 0
 				IconLock='Bubble Shield.dmi'
 				IconLockBlend=4
@@ -6253,8 +6196,8 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
-							passives = list("PureReduction" = round(p.getTotalMagicLevel()/10,0.1), "DebuffResistance" = p.getTotalMagicLevel()/20, "Sunyata" = round(p.Potential/10,0.5)) // 5% per 10 pot to negate queues
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
+							passives = list("PureReduction" = round(p.getTotalMagicLevel()/10,0.1), "Sunyata" = round(p.Potential/10,0.5)) // 5% per 10 pot to negate queues
 							TimerLimit = 15 + p.getTotalMagicLevel()
 							AffectTarget = 0
 							CastingTime = 1
@@ -6282,7 +6225,7 @@ NEW VARIABLES
 				verb/Protect()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6317,7 +6260,7 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any")&& !isInnovationDisable(p))
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any")&& !isInnovationDisable(p))
 							VaizardHealth=5
 							AffectTarget = 0
 							passives = list("Harden" = p.getTotalMagicLevel()/5)
@@ -6348,7 +6291,7 @@ NEW VARIABLES
 				verb/Resilient_Sphere()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any") && !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6361,9 +6304,8 @@ NEW VARIABLES
 			ProtegaApply
 				name = "Protega"
 				MagicNeeded = 0
-				passives = list("PureReduction" = 5, "DebuffResistance" = 1)
+				passives = list("PureReduction" = 5)
 				PureReduction=5
-				DebuffResistance=1
 				MagicNeeded = 0
 				IconLock='Bubble Shield.dmi'
 				IconLockBlend=2
@@ -6391,8 +6333,8 @@ NEW VARIABLES
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(!altered)
-						if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
-							passives = list("PureReduction" = round(p.getTotalMagicLevel()/5,0.1), "DebuffResistance" = p.getTotalMagicLevel()/10, "Sunyata" = round(p.Potential/5,0.5)) // 5% per 10 pot to negate queues
+						if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
+							passives = list("PureReduction" = round(p.getTotalMagicLevel()/5,0.1), "Sunyata" = round(p.Potential/5,0.5)) // 5% per 10 pot to negate queues
 							TimerLimit = 20 + p.getTotalMagicLevel()
 							AffectTarget = 0
 							CastingTime = 1
@@ -6419,7 +6361,7 @@ NEW VARIABLES
 				verb/Protega()
 					set category="Skills"
 					if(usr.Target==usr&&!altered)
-						if(!(usr.isInnovative(FAE, "Any")&& !isInnovationDisable(usr)))
+						if(!(usr.isInnovative(KEYBLADE_MAGIC, "Any")&& !isInnovationDisable(usr)))
 							usr << "You can't use [name] on yourself!"
 							return
 					adjust(usr)
@@ -6602,7 +6544,6 @@ NEW VARIABLES
 					src.Trigger(usr)
 			Bubble_Shield
 				passives = list("NoDodge" = 1)
-				NoDodge=1
 				VaizardHealth=5
 				VaizardShatter=1
 				TimerLimit=5
@@ -6640,7 +6581,6 @@ NEW VARIABLES
 					set category="Skills"
 					src.Trigger(usr)
 			Progressive_Blade
-				passives = list("SpiritSword" = 0.15)
 				MakesSword=1
 				FlashDraw=1
 				SwordClass="Light"
@@ -6657,8 +6597,7 @@ NEW VARIABLES
 				NoSword=1
 				NoStaff=1
 				PhysicalHitsLimit=6
-				passives = list("SpiritHand" = 1, "Scorching" = 1)
-				SpiritHand=1
+				passives = list( "Scorching" = 1)
 				Scorching=1
 				HitSpark='fevExplosion.dmi'
 				HitX=-32
@@ -6674,8 +6613,7 @@ NEW VARIABLES
 				NoSword=1
 				NoStaff=1
 				PhysicalHitsLimit=12
-				passives = list("SpiritHand" = 1, "Shearing" = 1)
-				SpiritHand=1
+				passives = list( "Shearing" = 1)
 				Shearing=1
 				Cooldown=60
 				IconLock='Chainsaw.dmi'
@@ -6698,7 +6636,6 @@ NEW VARIABLES
 						src.Trigger(usr)
 				Integrated_Bubble_Shield
 					passives = list("NoDodge" = 1)
-					NoDodge=1
 					VaizardHealth=5
 					VaizardShatter=1
 					TimerLimit=5
@@ -6735,8 +6672,7 @@ NEW VARIABLES
 						set category="Skills"
 						src.Trigger(usr)
 				Integrated_Progressive_Blade
-					passives = list("SpiritSword" = 0.25)
-					SpiritSword=0.25
+					SummonSwordVisual=0.25
 					MakesSword=1
 					FlashDraw=1
 					SwordClass="Light"
@@ -6750,8 +6686,8 @@ NEW VARIABLES
 						set category="Skills"
 						src.Trigger(usr)
 				Integrated_Lightsaber
-					passives = list("SpiritSword" = 0.5, "Deflection" = 1, "SwordAscension" = 1)
-					SpiritSword=0.5
+					passives = list( "Deflection" = 1, "SwordAscension" = 1)
+					SummonSwordVisual=0.5
 					MakesSword=1
 					FlashDraw=1
 					Deflection=1
@@ -6782,8 +6718,7 @@ NEW VARIABLES
 					NoSword=1
 					NoStaff=1
 					PhysicalHitsLimit=6
-					passives = list("SpiritHand" = 1, "Scorching" = 1)
-					SpiritHand=1
+					passives = list( "Scorching" = 1)
 					Scorching=1
 					HitSpark='fevExplosion.dmi'
 					HitX=-32
@@ -6799,8 +6734,7 @@ NEW VARIABLES
 					NoSword=1
 					NoStaff=1
 					PhysicalHitsLimit=12
-					passives = list("SpiritHand" = 1, "Shearing" = 1)
-					SpiritHand=1
+					passives = list( "Shearing" = 1)
 					Shearing=1
 					Cooldown=60
 					ActiveMessage="deploys a chainsaw blade and revs it to life!"
@@ -6981,7 +6915,6 @@ NEW VARIABLES
 				ExplosiveFinish = 1
 				ExplosiveFinishIntensity = 0.75
 				HotHundred = 1
-				Flow = 1
 				Instinct = 1
 				Godspeed = 1
 				TextColor = rgb(140, 255, 140)
@@ -6996,12 +6929,11 @@ NEW VARIABLES
 					HealthHeal = -((10 * mecha.Level)/TimerLimit) * world.tick_lag
 					ManaCost = 25 - (mecha.Level * 2)
 					PhysicalHitsLimit = mecha.Level * 5
-					passives = list("Warping" = mecha.Level, "HotHundred" = 1, "Godspeed" = mecha.Level, "PureDamage" = -4, "Flow" = mecha.Level, "Instinct" = mecha.Level)
+					passives = list("Warping" = mecha.Level, "HotHundred" = 1, "Godspeed" = mecha.Level, "PureDamage" = -4)
 					Warping = mecha.Level
 					HotHundred = 1
 					PureDamage = -4
 					Godspeed = mecha.Level
-					Flow = mecha.Level
 					Instinct = mecha.Level
 				verb/Twin_Drive()
 					set category="Skills"
@@ -7011,7 +6943,6 @@ NEW VARIABLES
 			Destroyer_Mode
 				TimerLimit = 15
 				Extend = 1
-				Steady = 1
 				Paralyzing = 1
 				Shattering = 1
 				PhysicalHitsLimit = 1
@@ -7025,10 +6956,9 @@ NEW VARIABLES
 					ManaGlowSize = 1
 					TimerLimit = 10 + (mecha.Level * 10)
 					PhysicalHitsLimit = mecha.Level * 8
-					passives = list("Shattering" = mecha.Level/2, "Paralyzing" = mecha.Level/2, "Steady" = mecha.Level/2, "Extend" = round(1 + (mecha.Level/2),1))
+					passives = list("Shattering" = mecha.Level/2, "Paralyzing" = mecha.Level/2,  "Extend" = round(1 + (mecha.Level/2),1))
 					Shattering = mecha.Level/2
 					Paralyzing = mecha.Level/2
-					Steady = mecha.Level/2
 					Extend = round(1 + (mecha.Level/2),1)
 					Cooldown = 120 - (mecha.Level * 10)
 				verb/Destroyer_Mode()
@@ -7038,7 +6968,6 @@ NEW VARIABLES
 			Annihilation_Mode
 				TimerLimit = 15
 				Extend = 1
-				Steady = 1
 				Shearing = 1
 				CursedWounds = 1
 				SlayerMod = 1
@@ -7055,10 +6984,9 @@ NEW VARIABLES
 					ManaGlowSize = 1
 					TimerLimit = 10 + (mecha.Level * 10)
 					PhysicalHitsLimit = mecha.Level * 5
-					passives = list("Shearing" = mecha.Level/2, "SlayerMod" = mecha.Level/2, "FavoredPrey" = "Mortal", "Steady" = mecha.Level/2, "Extend" = mecha.Level/2 + 1)
+					passives = list("Shearing" = mecha.Level/2, "SlayerMod" = mecha.Level/2, "FavoredPrey" = "Mortal",  "Extend" = mecha.Level/2 + 1)
 					Shearing = mecha.Level/2
 					SlayerMod = mecha.Level/2
-					Steady = mecha.Level/2
 					Extend = mecha.Level/2 + 1
 
 				verb/Annihilation_Mode()
@@ -7118,18 +7046,18 @@ NEW VARIABLES
 				KillSword = 1
 				SwordAscension = 1
 				Burning = 0.25
-				SpiritSword = 0.5
+				SummonSwordVisual = 0.5
 				TextColor=rgb(255, 0, 0)
 				ActiveMessage="activates a beam saber!"
 				OffMessage="deactivates the beam saber..."
 				proc/init(mob/player)
 					var/obj/Items/Gear/Mobile_Suit/mecha = player.findMecha()
 					if(!mecha) return
-					passives = list("Extend" = 1, "SwordAscension" = mecha.Level, "SpiritSword" = mecha.Level * 0.125, "Burning" = mecha.Level*0.25)
+					passives = list("Extend" = 1, "SwordAscension" = mecha.Level,  "Burning" = mecha.Level*0.25)
 					SwordAscension = mecha.Level
-					SpiritSword = mecha.Level * 0.125
-					if(SpiritSword >= 0.5)
-						SpiritSword = 0.5
+					SummonSwordVisual = mecha.Level * 0.125
+					if(SummonSwordVisual >= 0.5)
+						SummonSwordVisual = 0.5
 					Burning = mecha.Level * 0.25
 				proc/beamSaberSetUp(mob/player)
 					var/obj/Items/Gear/Mobile_Suit/mecha = player.findMecha()
@@ -7198,7 +7126,7 @@ NEW VARIABLES
 					set name="Time Alter: Double Accel"
 					set category="Skills"
 					if(!usr.BuffOn(src))
-						passives = list("Speed Force" = 1, "BleedHit" = 0.75/src.Mastery, "Instinct" = 2, "Flow" = 2, "BlurringStrikes" = 1, "Warping" = 1)
+						passives = list("Speed Force" = 1, "BleedHit" = 0.75/src.Mastery, "Warping" = 1)
 						SpdMult=1.5
 						ActiveMessage="yells: <b>Time Alter: Double Accel!</b>"
 					src.Trigger(usr)
@@ -7208,7 +7136,7 @@ NEW VARIABLES
 					set name="Time Alter: Triple Accel"
 					set category="Skills"
 					if(!usr.BuffOn(src))
-						passives = list("Speed Force" = 2, "BleedHit" = 1.5/Mastery, "Instinct" = 3, "Flow" = 3, "BlurringStrikes" = 2, "Warping" = 2)
+						passives = list("Speed Force" = 2, "BleedHit" = 1.5/Mastery, "Warping" = 2)
 						SpdMult=2
 						ActiveMessage="yells: <b>Time Alter: Triple Accel!</b>"
 					src.Trigger(usr)
@@ -7219,7 +7147,7 @@ NEW VARIABLES
 					set category="Skills"
 					if(!usr.BuffOn(src))
 						SpdMult=3
-						passives = list("Speed Force" = 3,"BleedHit" = 3/Mastery, "Instinct" = 4, "Flow" = 4, "EnergyExpenditure" = 4, "BlurringStrikes" = 3, "Warping" = 3)
+						passives = list("Speed Force" = 3,"BleedHit" = 3/Mastery, "EnergyExpenditure" = 4,  "Warping" = 3)
 						ActiveMessage="yells: <b>Time Alter: Square Accel!</b>"
 					src.Trigger(usr)
 					if(usr.BuffOn(src))
@@ -7228,7 +7156,7 @@ NEW VARIABLES
 				SignatureTechnique=3
 				SpecialSlot=1
 				OffMult=2
-				passives = list("DrainlessMana" = 1, "ManaStats" = 0.5, "BleedHit" = 1, "LifeSteal" = 20, "MagicFocus" = 1)
+				passives = list("DrainlessMana" = 1,  "BleedHit" = 1, "LifeSteal" = 20, "MartialMagic" = 1)
 				DrainlessMana=1
 				ManaStats=0.5
 				BleedHit=1
@@ -7254,7 +7182,7 @@ NEW VARIABLES
 				SignatureTechnique=3
 				SpecialSlot=1
 				DefMult=2
-				passives = list("DrainlessMana" = 1, "ManaStats" = 0.5, "LifeSteal" = 20, "MagicFocus" = 1)
+				passives = list("DrainlessMana" = 1,  "LifeSteal" = 20, "MartialMagic" = 1)
 				DrainlessMana=1
 				ManaStats=0.5
 				MagicFocus=1
@@ -7275,7 +7203,7 @@ NEW VARIABLES
 				SpecialSlot=1
 				OffMult=2
 				DefMult=2
-				passives = list("DrainlessMana" = 1, "ManaStats" = 1, "LifeSteal" = 20, "MagicFocus" = 1, "GodKi" = 1)
+				passives = list("DrainlessMana" = 1,  "LifeSteal" = 20, "MartialMagic" = 1, "GodKi" = 1)
 				DrainlessMana=1
 				MagicFocus=1
 				ManaStats=1
@@ -7326,7 +7254,7 @@ NEW VARIABLES
 								usr.EraDeathClock=world.realtime+DeathClock
 								usr << "You will die from overexertion soon. Use your remaining time well."
 			Crimson_Grimoire
-				passives = list("LimitlessMagic" = 1, "MagicFocus" = 1, "Crimson Grimoire" = 1)
+				passives = list("LimitlessMagic" = 1, "MartialMagic" = 1)
 				LimitlessMagic=1
 				TimerLimit=90
 				Cooldown=180
@@ -7340,7 +7268,6 @@ NEW VARIABLES
 					BuffTechniques = general_magic_database
 					src.Trigger(usr)
 /*			Pure_Grimoire
-				passives = list("BuffMastery" = 3, "StyleMastery" = 3)
 				StrMult = 1.15
 				SpdMult = 1.15
 				OffMult = 1.15
@@ -7351,35 +7278,6 @@ NEW VARIABLES
 				ActiveMessage="fills their blank Grimoire with their power, greatly enhancing it!"
 				OffMessage="seals their Grimoire..."
 				adjust(mob/p)
-					if(PURE_GRIM_SCALING)
-						if(p.key in glob.WILL_NOT_TARP_LIST)
-							if(!altered)
-								var/typeOfDamage
-								if(p.usingStyle("SwordStyle"))
-									typeOfDamage = "Sword"
-								else if(p.usingStyle("UnarmedStyle"))
-									typeOfDamage = "Unarmed"
-								else if(p.usingStyle("FreeStyle"))
-									typeOfDamage = "Free"
-								else if(p.usingStyle("Mystic"))
-									typeOfDamage = "Spiritual"
-								var/pot = p.Potential
-								if(typeOfDamage == "Free")
-									passives["SwordDamage"] = 1 + (round(pot/20, 0.25))
-									passives["UnarmedDamage"] = 1 + (round(pot/20, 0.25))
-								else
-									passives["[typeOfDamage]Damage"] = 1 + (round(pot/10, 0.5))
-								passives["Godspeed"] = 2 + (round(pot/25))
-								passives["BuffMastery"] = 2 + (round(pot/10, 0.5))
-								passives["TechniqueMastery"] = 2 +( round(pot/10, 0.5))
-								passives["BlurringStrikes"] = 1 +( round(pot/50))
-								passives["CallousedHands"] = 0.15 +( round(pot/100, 0.1))
-								passives["HybridStrike"] = ( round(pot/100, 0.1))
-								StrMult = 1 + (pot/100)
-								SpdMult = 1 + (pot/100)
-								OffMult = 1 + (pot/100)
-								DefMult = 1 + (pot/100)
-								EndMult = 1 + (pot/100)
 				verb/Pure_Grimoire()
 					set category="Skills"
 					if(!usr.StyleBuff)
@@ -7392,7 +7290,7 @@ NEW VARIABLES
 				IconLock='Demon_Blood_Talismans Active.dmi'
 				LockX=0
 				LockY=0
-				passives = list("ManaCapMult" = 1, "MagicFocus" = 1)
+				passives = list("ManaCapMult" = 1, "MartialMagic" = 1)
 				ManaAdd=100
 				ForMult=1.5
 				MagicFocus=1
@@ -7409,11 +7307,11 @@ NEW VARIABLES
 				Frost_End
 					TimerLimit=30
 					Cooldown=-1
-					passives = list("StunningStrike" = 2, "Freezing" = 20, "ComboMaster"=1, "ManaStats"=2)
+					passives = list("StunningStrike" = 2, "Freezing" = 20, "ComboMaster"=1)
 					ActiveMessage="overloads their Drive, turning their swordsmanship into a slicing blizzard - <b>Frost End</b>!"
 					OffMessage="seals the frost of Yukianesa..."
 					adjust(mob/p)
-						passives = list("StunningStrike" = 2, "Freezing" = 20, "ComboMaster"=1, "ManaStats"=2);
+						passives = list("StunningStrike" = 2, "Freezing" = 20, "ComboMaster"=1);
 
 					verb/Frost_End()
 						set category="Skills"
@@ -7422,14 +7320,14 @@ NEW VARIABLES
 				Chain_Quasar
 					TimerLimit=30
 					Cooldown=120
-					passives = list("CoolerAfterimages"=2, "Godspeed" = 8, "SweepingStrike" = 2, "Warp" = 1, "SpiritStrike" = 1, "ManaStats"=1)
+					passives = list("AfterImages"=2, "AfterImageSkin" = "Cooler", "Godspeed" = 8, "SweepingStrike" = 2, "Warping" = 1)
 					HitSpark='Hit Effect Ripple.dmi'
 					HitX=-32
 					HitY=-32
 					ActiveMessage="overloads their Drive, turning their movement into a dancelike flow - <b>Chain Quasar</b>!"
 					OffMessage="seals the accuracy of Bolverk..."
 					adjust(mob/p)
-						passives = list("CoolerAfterimages"=2, "Godspeed" = 8, "SweepingStrike" = 2, "Warp" = 1, "SpiritStrike" = 1, "ManaStats"=1)
+						passives = list("AfterImages"=2, "AfterImageSkin" = "Cooler", "Godspeed" = 8, "SweepingStrike" = 2, "Warping" = 1)
 					verb/Chain_Quasar()
 						set category="Skills"
 						if(!usr.BuffOn(src)) adjust(usr)
@@ -7437,14 +7335,14 @@ NEW VARIABLES
 				Fierce_God
 					TimerLimit=30
 					Cooldown=-1
-					passives = list("ComboMaster"=1, "TechniqueMastery" = 10, "EnergyHeal"=3, "ManaHeal"=3, "ManaStats"=1)
+					passives = list("ComboMaster"=1, "TechniqueMastery" = 10, "EnergyHeal"=3, "ManaHeal"=3)
 					TechniqueMastery=10
 					EnergyHeal=3
 					ManaHeal=3
 					ActiveMessage="overloads their Drive, entering a tireless frenzy - <b>Kishin</b>!"
 					OffMessage="seals the justice of Ookami..."
 					adjust(mob/p)
-						passives = list("ComboMaster"=1, "TechniqueMastery" = 10, "EnergyHeal"=3, "ManaHeal"=3, "ManaStats"=1)
+						passives = list("ComboMaster"=1, "TechniqueMastery" = 10, "EnergyHeal"=3, "ManaHeal"=3)
 					verb/Fierce_God()
 						set category="Skills"
 						if(!usr.BuffOn(src)) adjust(usr)
@@ -7469,7 +7367,7 @@ NEW VARIABLES
 			IconLock = 'Necromorph.dmi'
 			LockX = -16
 			LockY = -16
-			passives = list("BladeFisting" = 1, "PureDamage" = -1, "PureReduction" = 10, "NoDodge" = 1, "Instinct" = 1)
+			passives = list("BladeFisting" = 1, "PureDamage" = -1, "PureReduction" = 10, "NoDodge" = 1)
 			ActiveMessage = "is taken over by sprawling masses of flesh and necrotization!"
 			OffMessage = "'s fleshy overgrowth recedes..."
 			var/forceZombie = 1
@@ -7502,7 +7400,7 @@ NEW VARIABLES
 /*		Unbound_Mode
 			SignatureTechnique=3
 			SpecialSlot=1
-			passives = list("MovementMastery" = 5, "TechniqueMastery" = 5, "BuffMastery" = 5, "ManaLeak" = 1)
+			passives = list( "TechniqueMastery" = 5,  "ManaLeak" = 1)
 			MovementMastery=5
 			TechniqueMastery=5
 			BuffMastery=5
@@ -7528,10 +7426,8 @@ NEW VARIABLES
 		Sparking_Blast
 			SignatureTechnique=3
 			SpecialSlot=1
-			passives = list("LifeGeneration"=1, "EnergyGeneration" = 5, "ManaGeneration" = 5, "Pursuer" = 3, "PureDamage" = 2, "Instinct" = 2, "Flicker" = 2)
+			passives = list("LifeGeneration"=1, "EnergyGeneration" = 5, "ManaGeneration" = 5, "Pursuer" = 3, "PureDamage" = 2, "Flicker" = 2)
 			LifeGeneration=5
-			EnergyGeneration=5
-			ManaGeneration=5
 			Pursuer=3
 			PureDamage=2
 			Instinct=2
@@ -7566,8 +7462,7 @@ NEW VARIABLES
 		Mark_of_the_Crone
 			SignatureTechnique=3
 			SpecialSlot=1
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=75
 			IconLock='CroneMajinSparks.gif'
 			LockX=0
 			LockY=0
@@ -7628,7 +7523,7 @@ NEW VARIABLES
 								PactBoostPow=0
 								PactBoostDef=0.5
 								EndMult=2
-					passives = list("Brutalize" = 1+(usr.AscensionsAcquired*(0.5+PactBoostDef)) , "PureDamage" = 1+(usr.AscensionsAcquired*(0.75+PactBoostPow)), \
+					passives = list( "PureDamage" = 1+(usr.AscensionsAcquired*(0.75+PactBoostPow)), \
 					"PureReduction" = 1+(usr.AscensionsAcquired*(0.75+PactBoostDef)), "Pursuer" = 2, "HellPower" = 0.1+(PactBoostPow/2), \
 					"Gum Gum" = 1, "Extend" = 1,"Unbreakable" = 0.25+PactBoostDef,"Undeterred" = 1)
 				src.Trigger(usr)
@@ -7637,8 +7532,7 @@ NEW VARIABLES
 			SignatureTechnique=4
 			SpecialSlot=0
 			Slotless=1
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=90
 			IconLock='AuraMysticBig.dmi'
 			IconLockBlend=4
 			StrMult = 1.5
@@ -7665,8 +7559,9 @@ NEW VARIABLES
 				set category="Skills"
 				if(!usr.BuffOn(src))
 					var/asc = usr.AscensionsAcquired
-					passives = list("PureDamage" = 5+asc, "PureReduction" = 5+asc, "GodKi" = 0.1+(asc/10), "DebuffResistance" = 3+asc, "Heavensent" = 1+asc, \
-					"Extend" = 1+asc, "Godspeed" = 4, "Skimming" = 1, "AutoAnger" = 1, "AngerMult" = 3, "BleedHit" = 1.5, "FatigueLeak" = 1.5, "Unstoppable" = -10)
+					passives = list("PureDamage" = 5+asc, "PureReduction" = 5+asc, "GodKi" = 0.1+(asc/10), "Heavensent" = 1+asc, \
+					"Extend" = 1+asc, "Godspeed" = 4, "Skimming" = 1,  "BleedHit" = 1.5, "FatigueLeak" = 1.5, "Unstoppable" = -10)
+					AngerMult = 3
 				src.Trigger(usr)
 
 		Gods_Protection
@@ -7690,8 +7585,6 @@ NEW VARIABLES
 				set category="Skills"
 				src.Trigger(usr)
 		Embrace_Legend
-			passives = list("Mythical" = 1)
-			Mythical=1
 			ActiveMessage="roars as they embrace their legendary power!"
 			OffMessage="regains their senses..."
 			verb/Embrace_Legend()
@@ -7817,8 +7710,7 @@ NEW VARIABLES
 									passives["Extend"] = 1
 									src.Extend=1
 								if(Enhancement=="Emit")
-									passives["SpiritSword"] = 1
-									src.SpiritSword=1
+									src.SummonSwordVisual=1
 							if(src.MakesStaff)
 								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", "Speed", "Sustain")
 								if(Enhancement=="Speed")
@@ -7835,9 +7727,7 @@ NEW VARIABLES
 								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", "Fortress", "Fierce")
 								if(Enhancement=="Fortress")
 									passives["Juggernaut"] = 1
-									passives["DebuffResistance"] = 1
 									src.Juggernaut=1
-									src.DebuffResistance=1
 								if(Enhancement=="Fierce")
 									passives["DoubleStrike"] = 1
 									passives["Godspeed"] = 1
@@ -7853,20 +7743,15 @@ NEW VARIABLES
 									passives["SoftStyle"] = 2
 									src.SoftStyle=2
 							if(src.MakesStaff)
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire", "Siphon")
+								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire")
 								if(Enhancement=="Soulfire")
 									passives["SoulFire"] = 1
 									src.SoulFire=1
-								if(Enhancement=="Siphon")
-									passives["Siphon"] = 4
-									src.Siphon=4
 							if(src.MakesArmor)
 								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", "Riposte", "Repel")
 								if(Enhancement=="Riposte")
 									passives["CounterMaster"] = 2
-									passives["Flow"] = 2
 									src.CounterMaster=2
-									src.Flow=2
 								if(Enhancement=="Repel")
 									passives["Deflection"] = 1
 									passives["Reversal"] = 1
@@ -7923,8 +7808,7 @@ NEW VARIABLES
 									passives["Extend"] = 1
 									src.Extend=1
 								if(Enhancement=="Emit")
-									passives["SpiritSword"] = 1
-									src.SpiritSword=1
+									src.SummonSwordVisual=1
 							if(secondDevilArmPick=="Staff")
 								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", "Speed", "Sustain")
 								if(Enhancement=="Speed")
@@ -7941,9 +7825,7 @@ NEW VARIABLES
 								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", "Fortress", "Fierce")
 								if(Enhancement=="Fortress")
 									passives["Juggernaut"] = 1
-									passives["DebuffResistance"] = 1
 									src.Juggernaut=1
-									src.DebuffResistance=1
 								if(Enhancement=="Fierce")
 									passives["DoubleStrike"] = 1
 									passives["Godspeed"] = 1
@@ -7959,20 +7841,15 @@ NEW VARIABLES
 									passives["SoftStyle"] = 2
 									src.SoftStyle=2
 							if(secondDevilArmPick=="Staff")
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire", "Siphon")
+								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire")
 								if(Enhancement=="Soulfire")
 									passives["SoulFire"] = 1
 									src.SoulFire=1
-								if(Enhancement=="Siphon")
-									passives["Siphon"] = 4
-									src.Siphon=4
 							if(secondDevilArmPick=="Armor")
 								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", "Riposte", "Repel")
 								if(Enhancement=="Riposte")
 									passives["CounterMaster"] = 2
-									passives["Flow"] = 2
 									src.CounterMaster=2
-									src.Flow=2
 								if(Enhancement=="Repel")
 									passives["Deflection"] = 1
 									passives["Reversal"] = 1
@@ -7999,14 +7876,14 @@ NEW VARIABLES
 			TopOverlayLock='Elf_Crown.dmi'
 			ActiveMessage=null
 			OffMessage=null
-			passives = list("Deicide" = 1, "TechniqueMastery" = 1, "Flicker" = 1)
+			passives = list("TechniqueMastery" = 1, "Flicker" = 1)
 
 			verb/Don_Crown()
 				set category="Skills"
 				src.Trigger(usr)
 
 		Sacrifice
-			passives = list("ManaStats" = 1, "Anaerobic" = 1, "Tenacity" = 4, "CursedWounds" = 1)
+			passives = list( "Anaerobic" = 1, "Tenacity" = 4, "CursedWounds" = 1)
 			Cooldown = -1
 			HealthCost = 25
 			verb/Sacrifice()
@@ -8044,8 +7921,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		Majin
-			AutoAnger=1
-			AngerThreshold=2
+			AngerFloor=75
 			IconLock='MajinAura.dmi'
 			LockX=0
 			LockY=0
@@ -8062,7 +7938,8 @@ NEW VARIABLES
 			verb/Majin_Form()
 				set category="Skills"
 				if(!usr.BuffOn(src))
-					passives = list("HellPower" = 1, "AngerMult" = 1.5, "PowerReplacement" = glob.progress.totalPotentialToDate+5)
+					passives = list("HellPower" = 1, "PowerReplacement" = glob.progress.totalPotentialToDate+5)
+					AngerMult = 1.5
 				src.Trigger(usr)
 
 		Duel
@@ -8094,7 +7971,7 @@ NEW VARIABLES
 			StaffIcon='Aether Bow.dmi'
 			ActiveMessage="draws spirit energy into their hand to form a bow!"
 			OffMessage="dispels their Spirit Bow!"
-			passives = list("SpecialStrike" = 1, "StaffAscension" = 2, "Godspeed"=2, "Skimming"=1,"SpiritStrike"=1)
+			passives = list("SpecialStrike" = 1, "StaffAscension" = 2, "Godspeed"=2, "Skimming"=1)
 			SpecialStrike=1
 			StaffAscension=2
 			verb/Transfigure_Spirit_Bow()
@@ -8119,7 +7996,7 @@ NEW VARIABLES
 				else
 					usr << "You can't set this while using Spirit Bow."
 			adjust(mob/p)
-				passives = list("SpecialStrike" = 1, "StaffAscension" = max(2, p.AscensionsAcquired), "Godspeed"=max(2, p.AscensionsAcquired), "Skimming"=max(1, round(p.AscensionsAcquired/2)),"SpiritStrike"=1)
+				passives = list("SpecialStrike" = 1, "StaffAscension" = max(2, p.AscensionsAcquired), "Godspeed"=max(2, p.AscensionsAcquired), "Skimming"=max(1, round(p.AscensionsAcquired/2)))
 				//WHY DOES IT MAKE YOU BETTER AT KITING?
 				//I AM INFURIATED. ~xoxo
 			verb/Spirit_Bow()
@@ -8135,7 +8012,7 @@ NEW VARIABLES
 			SwordIcon='Aether Blade.dmi'
 			SwordX=-32
 			SwordY=-32
-			passives = list("SpiritSword" = 1, "SwordAscension" = 3, "SwordAscensionSecond" = 3, "SwordAscensionThird" = 3)
+			passives = list( "SwordAscension" = 3, "SwordAscensionSecond" = 3, "SwordAscensionThird" = 3)
 			SwordNameSecond="Spirit Sword"
 			SwordIconSecond='Aether Blade Alternate.dmi'
 			SwordXSecond=-32
@@ -8144,7 +8021,7 @@ NEW VARIABLES
 			ActiveMessage="draws spirit energy into their hand to form a blade!"
 			OffMessage="dispels their Spirit Sword!"
 			adjust(mob/p)
-				passives = list("SpiritSword" = clamp(1 + (0.2 * p.AscensionsAcquired), 1, 2), "SwordAscension" = max(3, p.AscensionsAcquired), "SwordAscensionSecond" = max(3, p.AscensionsAcquired), "SwordAscensionThird" = max(3, p.AscensionsAcquired), "Extend" = round(p.AscensionsAcquired/3))
+				passives = list( "SwordAscension" = max(3, p.AscensionsAcquired), "SwordAscensionSecond" = max(3, p.AscensionsAcquired), "SwordAscensionThird" = max(3, p.AscensionsAcquired), "Extend" = round(p.AscensionsAcquired/3))
 			verb/Transfigure_Spirit_Sword()
 				set category="Utility"
 				set hidden = 1
@@ -8205,7 +8082,7 @@ NEW VARIABLES
 			FlashDraw=1
 			SwordName="Dimension Sword"
 			SwordIcon='Aether Blade.dmi'
-			passives = list("SpiritSword" = 2, "PridefulRage" = 1, "ArmorPeeling"= 1,  "BulletKill" = 1, "Extend" = 2, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6)
+			passives = list(  "ArmorPeeling"= 1,  "BulletKill" = 1, "Extend" = 2, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6)
 			ActiveMessage="draws spirit energy into their hand to form a spacetime-rending blade!"
 			OffMessage="dispels their Dimension Sword!"
 			verb/Transfigure_Dimension_Sword()
@@ -8271,8 +8148,7 @@ NEW VARIABLES
 			MakesSword=1
 			NeedsSword=0
 			MagicSword=1
-			passives = list("SpiritStrike" = 1, "SwordAscension" = 3, "TechniqueMastery" = 5)
-			SpiritStrike=1
+			passives = list( "SwordAscension" = 3, "TechniqueMastery" = 5)
 			SwordAscension=3
 			TechniqueMastery=5
 			SwordClass="Medium"
@@ -8314,9 +8190,9 @@ NEW VARIABLES
 		SwordOfDarknessFlame
 			NeedsSword=1
 			ElementalOffense="Fire"
-			passives = list("DarknessFlame" = 1, "SpiritSword" = 0.75)
+			passives = list("DarknessFlame" = 1)
 			DarknessFlame=1
-			SpiritSword=0.75
+			SummonSwordVisual=0.75
 			KenWave=1
 			KenWaveIcon='fevExplosion - Hellfire.dmi'
 			KenWaveSize=2
@@ -8332,7 +8208,7 @@ NEW VARIABLES
 			OffMessage="releases the dark flames..."
 			proc/init(mob/p)
 				if(altered) return
-				passives = list("DarknessFlame" = 1, "SpiritSword" = (0.25 * p.secretDatum.currentTier) + p.Potential/100)
+				passives = list("DarknessFlame" = 1)
 
 
 			verb/Sword_of_Darkness_Flame()
@@ -8358,7 +8234,7 @@ NEW VARIABLES
 			proc/init(mob/p)
 				if(altered) return
 				var/secretLevel = p.secretDatum.currentTier
-				passives = list("PUSpike" = 5 + (5 * secretLevel), "SpiritHand" = 0.25 * secretLevel, "FatigueLeak" = 6 - secretLevel)
+				passives = list("PUSpike" = 5 + (5 * secretLevel),  "FatigueLeak" = 6 - secretLevel)
 
 			verb/Jagan_Expert_Mode()
 				set category="Skills"
@@ -8369,14 +8245,13 @@ NEW VARIABLES
 			Slotless=1
 			UBuffNeeded="Jagan Eye"
 			NeedsHealth=25
-			passives = list("FatigueLeak" = 1, "SpiritSword" = 0.25, "Flow" = 1, "Instinct" =1)
+			passives = list("FatigueLeak" = 1)
 			FatigueLeak=1
 			FatigueThreshold=95
 			KenWave=4
 			KenWaveIcon='DarkKiai.dmi'
-			SpiritSword=0.25
+			SummonSwordVisual=0.25
 			EndMult=1.1//remove end nerfs from jagan
-			Flow=1
 			Instinct=1
 			PowerInvisible=2
 			IconLock='DarknessFlame.dmi'
@@ -8388,7 +8263,7 @@ NEW VARIABLES
 			proc/init(mob/p)
 				if(altered) return
 				var/currentPot = p.Potential
-				passives = list("FatigueLeak" = 1, "SpiritSword" = 0.25  , "Flow" = 1 + currentPot/100, "Instinct" = 1 + currentPot/100)
+				passives = list("FatigueLeak" = 1)
 				ForMult = 1 + round(currentPot/150, 0.01)
 				StrMult = 1 + round(currentPot/150, 0.01)
 				EndMult = 1 + round(currentPot/200, 0.01)
@@ -8430,11 +8305,11 @@ NEW VARIABLES
 				src.Trigger(usr)
 		Andromeda
 			Rolling_Defense
-				passives = list("Flow" = 1, "LikeWater" = 1, "BackTrack" = 1)
+				passives = list()
 				SBuffNeeded="Andromeda Cloth"
 				Cooldown=60
 				adjust(mob/p)
-					passives = list("Flow" = max(p.SagaLevel/2, 1), "LikeWater" = p.SagaLevel, "BackTrack" = max(p.SagaLevel-3, 1))
+					passives = list()
 				verb/Rolling_Defense()
 					set category="Skills"
 					adjust(usr)
@@ -8642,9 +8517,8 @@ NEW VARIABLES
 			NoSword=1
 			NoStaff=1
 			KiBlade=1
-			passives = list("KiBlade" = 1, "SwordAscension" = 2, "HybridStrike" = 1)
+			passives = list( "SwordAscension" = 2)
 			SwordAscension=3
-			HybridStrike=1
 			IconLock='LightningArm.dmi'
 			IconLockBlend=2
 			IconLayer=1
@@ -8661,7 +8535,6 @@ NEW VARIABLES
 		Kolco
 			TimerLimit=25
 			AffectTarget=1
-			AbsoluteZero=1
 			Range=10
 			SlowAffected=5
 			TargetOverlay='SnowRing.dmi'
@@ -8748,7 +8621,7 @@ NEW VARIABLES
 			ABuffNeeded=list("Soul Resonance")
 			NeedsHealth=50
 			FINISHINGMOVE=1
-			passives = list("TaxThreshold" = 0.5, "Curse" = 1, "PureDamage" = 4, "Pursuer" = 2, "Flicker" = 2)
+			passives = list("TaxThreshold" = 0.5,  "PureDamage" = 4, "Pursuer" = 2, "Flicker" = 2)
 			Curse=1
 			PureDamage=4
 			Pursuer=2
@@ -8763,11 +8636,10 @@ NEW VARIABLES
 		Fate_of_Blood
 			NeedsSword=1
 			ABuffNeeded=list("Soul Resonance")
-			LifeStealTrue=1//But you can steal it from others
 			// NoDodge=1
 			Instinct=3//never
 			// SureHitTimerLimit=5
-			passives = list("Instinct" = 3, "LifeStealTrue" = 1, "PureDamage" = 1)
+			passives = list("LifeSteal" = 25, "LifeStealPierce" = 1, "PureDamage" = 1)
 			PureDamage = 1
 			TimerLimit=60
 			KenWave=5
@@ -9009,7 +8881,7 @@ NEW VARIABLES
 							SwordAscension = 6
 						if(8 to 9)
 							SwordAscension = 7
-				passives = list("SwordDamage" = SwordAscension/2) // so it can go over 6
+				passives = list("Sword Mastery" = SwordAscension/2)
 				var/classRNG = rand(1,4)
 				switch(classRNG)
 					if(1)
@@ -9078,7 +8950,7 @@ NEW VARIABLES
 						SwordElement = ""
 				src.Trigger(usr)
 				if(usr.BuffOn(src))
-					usr << "[SwordElement] [SwordClass] Sword with [SwordAscension]([passives["SwordDamage"]]) Damage"
+					usr << "[SwordElement] [SwordClass] Sword with [SwordAscension]([passives["Sword Mastery"]]) Damage"
 
 		Avalon
 			StableHeal=1
@@ -9215,7 +9087,7 @@ NEW VARIABLES
 						PureDamage = 4
 						Instinct = 4*/
 				TimerLimit = 60 * (clamp(1,usr.SagaLevel/2,4))
-				passives = list("PureDamage" = PureDamage, "CursedWounds" = CursedWounds, "Instinct" = Instinct)
+				passives = list("PureDamage" = PureDamage, "CursedWounds" = CursedWounds)
 				if(usr.UBWPath=="Feeble"&&usr.SagaLevel>=4)
 					src.VaizardHealth = 2.5*(max(1,usr.SagaLevel-4))
 					WoundCost = 5 - (max(1,usr.SagaLevel-4))
@@ -9277,7 +9149,6 @@ NEW VARIABLES
 					if(11 to 13)
 						SwordElement = null
 				SwordAscension = max(0, usr.getAriaCount() / 2)
-				Flow = max(0, ceil(usr.getAriaCount() / 3))
 				Deflection = max(0, usr.getAriaCount() / 2)
 				DoubleStrike = max(0, ceil(usr.getAriaCount() / 2.5))
 /*				switch(usr.getAriaCount())
@@ -9320,7 +9191,7 @@ NEW VARIABLES
 						DoubleStrike = 2
 					if(7 to 9)
 						DoubleStrike = 3*/
-				passives = list("DoubleStrike" = DoubleStrike, "Flow" = Flow, "Deflection" = Deflection)
+				passives = list("DoubleStrike" = DoubleStrike, "Deflection" = Deflection)
 				if(usr.UBWPath=="Feeble"&&usr.SagaLevel>=4)
 					src.VaizardHealth = 2.5*(max(1,usr.SagaLevel-4))
 					WoundCost = 5 - (max(1,usr.SagaLevel-4))
@@ -9499,17 +9370,17 @@ NEW VARIABLES
 			SwordIcon='willKnifev2.dmi'
 			SwordX=-6
 			SwordY=-13
-			passives = list("SwordAscension" = 1, "SpiritSword" = 0.5)
+			passives = list("SwordAscension" = 1)
 			SwordClass="Wooden"
 			ActiveMessage="condenses their bravery!"
 			var/saved_icon = 'GaoGaoFists.dmi'
 			adjust(mob/p)
 				if(p.usingStyle("UnarmedStyle"))
 					MakesSword = 0
-					passives = list("UnarmedDamage" = clamp(usr.SagaLevel/2, 1,6), "SpiritHand" = 0.8 * (usr.SagaLevel), "BladeFisting" = 1)
+					passives = list("UnarmedDamage" = clamp(usr.SagaLevel/2, 1,6),  "BladeFisting" = 1)
 					IconLock = saved_icon
 				else
-					passives = list("SwordAscension" = clamp(usr.SagaLevel - 1,1,6), "SpiritSword" = 0.2 * (usr.SagaLevel), "BladeFisting" = 1)
+					passives = list("SwordAscension" = clamp(usr.SagaLevel - 1,1,6),  "BladeFisting" = 1)
 					MakesSword = 1
 					IconLock = null
 			verb/Modify_Armament()
@@ -9632,7 +9503,7 @@ NEW VARIABLES
 		Dividing_Driver
 			WarpZone=1
 			Duel=1
-			passives = list("Duelist" = 1, "CoolerAfterImages" = 3)
+			passives = list("Duelist" = 1, "AfterImages" = 3, "AfterImageSkin" = "Cooler")
 			CastingTime=2
 			KenWave=3
 			KenWaveSize=3
@@ -9664,17 +9535,16 @@ NEW VARIABLES
 			OffTaxDrain=0.0002
 			DefTaxDrain=0.0002
 			SBuffNeeded="Sharingan"
-			passives = list("AutoAnger" = 1,"BuffMastery" = 5, "Deflection" = 1, "Flow" = 1)
+			passives = list( "Deflection" = 1)
 			BuffMastery=5
-			AutoAnger = 1
+			AngerFloor = 90
 			Cooldown=-1
 			Deflection=1
-			Flow=1
 			ActiveMessage="gives into hatred; their tomoe twist into a kaleidoscope pattern!"
 			OffMessage="closes their eyes with a pained look..."
 			verb/Mangekyou_Sharingan()
 				set category="Skills"
-				passives = list("BuffMastery" = 1 + usr.SagaLevel/2, "Deflection" = 1, "Flow" = 1, "AutoAnger" = 1, "PUSpike" = -15)
+				passives = list( "Deflection" = 1,  "PUSpike" = -15)
 				if(!usr.BuffOn(src))
 					if(usr.SagaLevel>=5)
 						src.OffTaxDrain=0
@@ -9693,14 +9563,11 @@ NEW VARIABLES
 							src.BuffTechniques=list("/obj/Skills/AutoHit/Tsukiyomi","/obj/Skills/AutoHit/Amaterasu", "/obj/Skills/AutoHit/Sharingan_Genjutsu")
 						if("Hatred")
 							src.BuffTechniques=list("/obj/Skills/AutoHit/Amaterasu2","/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Kagutsuchi", "/obj/Skills/AutoHit/Sharingan_Genjutsu")
-							passives["Instinct"] = 1
 							src.Instinct=1
 						if("Resolve")
 							BuffTechniques = list("/obj/Skills/AutoHit/Sharingan_Genjutsu")
-							passives = list("BuffMastery" = 1 + usr.SagaLevel/2, "Deflection" = 1 + usr.SagaLevel/4, "Flow" = 1, "Instinct" = 1, "FluidForm" = 1, "Godspeed" = usr.SagaLevel/4,
-							"LikeWater" = usr.SagaLevel/2,  "PUSpike" = -20)
-							src.LikeWater=usr.SagaLevel / 2
-							src.Flow=1
+							passives = list( "Deflection" = 1 + usr.SagaLevel/4, "Godspeed" = usr.SagaLevel/4,
+							"PUSpike" = -20)
 							src.Instinct=1
 							src.Deflection= 1 + usr.SagaLevel / 4
 							Godspeed= usr.SagaLevel / 4
@@ -9713,7 +9580,7 @@ NEW VARIABLES
 			FlashChange=1
 			VaizardShatter=1
 			Cooldown=-1
-			passives = list("GiantForm" = 1, "HybridStrike" = 1)
+			passives = list("GiantForm" = 1)
 			IconLockBlend=2
 			LockX=-32
 			LockY=-32
@@ -9750,18 +9617,18 @@ NEW VARIABLES
 				set category="Skills"
 				init(usr)
 				if(!usr.BuffOn(src))
-					passives = list("GiantForm" = 1, "HybridStrike" = 1, "PureReduction" = 1, "Flow" = -1)
+					passives = list("GiantForm" = 1,  "PureReduction" = 1)
 					VaizardHealth = 6 * (usr.SagaLevel-3)
 					EnergyCost = 10 - (usr.SagaLevel-4)
 					FatigueCost = 6 - (usr.SagaLevel-4)
 					switch(usr.SharinganEvolution)
 						if("Resolve")
 							passives = list("NoDodge" = 0, "GiantForm" = 1,\
-							"HybridStrike" = 1, "SweepingStrike" = 1, "Flow" = -1, "Instinct" = -1, "PureDamage" = 2, "PureReduction" = 2)
+							 "SweepingStrike" = 1, "PureDamage" = 2, "PureReduction" = 2)
 							VaizardHealth += 2 * (usr.SagaLevel-3)
 							if(usr.SagaLevel>=6)
 								passives = list("NoDodge" = 0, "GiantForm" = 1,\
-								"HybridStrike" = 1, "SweepingStrike" = 1, "Flow" = -1, "Instinct" = -1, "PureDamage" = 2, "PureReduction" = 2,"Skimming"=1)
+								 "SweepingStrike" = 1, "PureDamage" = 2, "PureReduction" = 2,"Skimming"=1)
 					if(usr.SagaLevel>=5)
 						DefMult = 0.8
 						src.ActiveMessage="conjures a partially humanoid figure around them!"
@@ -9770,13 +9637,13 @@ NEW VARIABLES
 						DefMult = 1
 						Cooldown = 240
 						if(usr.SharinganEvolution!="Resolve")
-							passives = list("GiantForm" = 1, "HybridStrike" = 1, "PureReduction" = 1, "Flow" = -1,"Skimming"=1)
+							passives = list("GiantForm" = 1,  "PureReduction" = 1,"Skimming"=1)
 						src.ActiveMessage="conjures a fully humanoid, titanic figure around them!"
 						src.OffMessage="dissipates the divine avatar..."
 				src.Trigger(usr)
 		Rinnegan2
 			SBuffNeeded="Sharingan"
-			passives = list("GodKi" = 0.25, "Siphon" = 10, "MonkeyKing" = 4)
+			passives = list("GodKi" = 0.25, "MonkeyKing" = 4)
 			GodKi=0.5
 			Cooldown=-1
 			IconLock='RinneganEyes.dmi'
@@ -9785,7 +9652,7 @@ NEW VARIABLES
 			verb/Rinnegan()
 				set category="Skills"
 				if(!usr.BuffOn(src))
-					passives = list("Siphon" = 10, "GodKi" = 0.25, "MonkeyKing" = 4) //Limbo Clones
+					passives = list("GodKi" = 0.25, "MonkeyKing" = 4) //Limbo Clones
 				src.Trigger(usr)
 		// Rinnegan
 		// 	SBuffNeeded="Sharingan"
@@ -9811,7 +9678,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		Boss_Form
-			passives = list("GiantForm" = 1, "CallousedHands" = 0.1, "SweepingStrike" = 1, "KBRes" = 2)
+			passives = list("GiantForm" = 1,  "SweepingStrike" = 1, "Juggernaut" = 2)
 			GiantForm=1
 			Enlarge=2
 			SpdMult = 0.8
@@ -9821,7 +9688,7 @@ NEW VARIABLES
 			verb/Boss_Form()
 				set category="Skills"
 				if(!altered)
-					passives = list("GiantForm" = 1, "CallousedHands" = 0.1, "SweepingStrike" = 1, "KBRes" = 2)
+					passives = list("GiantForm" = 1,  "SweepingStrike" = 1, "Juggernaut" = 2)
 				src.Trigger(usr)
 
 //Secrets
@@ -9832,7 +9699,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
-					passives = list("Harden" = clamp(secretLevel,1,2), "NoForcedWhiff" = 1, "UnarmedDamage" = secretLevel/2, "SwordDamage" = secretLevel/2 )
+					passives = list("Harden" = clamp(secretLevel,1,2),  "UnarmedDamage" = secretLevel/2, "Sword Mastery" = secretLevel/2 )
 					strAdd = 0.1 * secretLevel
 					endAdd = 0.05 * secretLevel
 				Trigger(mob/User, Override = 1)
@@ -9850,7 +9717,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
-					passives = list("Harden" = clamp(secretLevel,1,4), "KBRes" = secretLevel, "KBMult" = secretLevel)
+					passives = list("Harden" = clamp(secretLevel,1,4), "Juggernaut" = secretLevel, "HeavyHitter" = secretLevel)
 					StrMult = 1.05 + (0.05 * secretLevel)
 					EndMult = 1.05 + (0.05 * secretLevel)
 					TimerLimit = 20 + (10 * secretLevel)
@@ -9886,7 +9753,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
-					passives = list("PureReduction" = clamp(secretLevel/2,1,3), "Deflection" = clamp(secretLevel,1,3), "CounterMaster" = clamp(secretLevel,2,5), "KBAdd" = 3)
+					passives = list("PureReduction" = clamp(secretLevel/2,1,3), "Deflection" = clamp(secretLevel,1,3), "CounterMaster" = clamp(secretLevel,2,5), "HeavyHitter" = 3)
 					TimerLimit = 15 + (10 * secretLevel)
 				Trigger(mob/User, Override = 1)
 					if(!User.BuffOn(src))
@@ -9909,7 +9776,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
-					passives = list("Instinct" = clamp(secretLevel, 1, 5), "Flow" = clamp(secretLevel, 1, 5), "NoWhiff" = 1, "CheapShot" = secretLevel/3)
+					passives = list("NoWhiff" = 1, "CheapShot" = secretLevel/3)
 
 				Trigger(mob/User, Override = 1)
 					if(!User.BuffOn(src))
@@ -9956,28 +9823,26 @@ NEW VARIABLES
 					..()
 			Haki_Relax
 				TimerLimit=30
-				passives = list("Flow" = 2)
-				Flow=2
+				passives = list()
 				ActiveMessage="weaves through every incoming attacks!"
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
 					TimerLimit = 10 + (5 * secretLevel)
-					passives = list("Flow" = secretLevel)
+					passives = list()
 				Trigger(mob/User, Override = 1)
 					if(!User.BuffOn(src))
 						adjust(User)
 					..()
 			Haki_Relax_Lite
 				TimerLimit=15
-				passives = list("Flow" = 1)
-				Flow=1
+				passives = list()
 				ActiveMessage="determines trajectories of incoming strikes at a glance!"
 				adjust(mob/p)
 					if(altered) return
 					var/secretLevel = p.secretDatum.currentTier
 					TimerLimit = 5 + (5 * secretLevel)
-					passives = list("Flow" = secretLevel/2)
+					passives = list()
 				Trigger(mob/User, Override = 1)
 					if(!User.BuffOn(src))
 						adjust(User)
@@ -9998,7 +9863,7 @@ NEW VARIABLES
 
 		Ripple
 			Ripple_Breathing
-				passives = list("Purity" = 1, "HolyMod" = 2, "PUDrainReduction" = 2, "Ripple" = 1)
+				passives = list("Purity" = 1, "HolyMod" = 2,  "Ripple" = 1)
 				HolyMod=2
 				PUDrainReduction=2
 				ActiveMessage="begins to channel the power of the Sun!"
@@ -10011,15 +9876,15 @@ NEW VARIABLES
 				adjust(mob/p)
 					var/secretLevel = p.secretDatum.currentTier
 					if(secretLevel >= 4)
-						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel, "PUDrainReduction" = 2 + (secretLevel / 4), "Ripple" = 1 + (secretLevel / 4), "FavoredPrey" = "Beyond", "SlayerMod" = (secretLevel / 2))
+						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel,  "Ripple" = 1 + (secretLevel / 4), "FavoredPrey" = "Beyond", "SlayerMod" = (secretLevel / 2))
 					else
-						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel, "PUDrainReduction" = 2 + (secretLevel / 4), "Ripple" = 1 + (secretLevel / 4))
+						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel,  "Ripple" = 1 + (secretLevel / 4))
 				verb/Ripple_Breathing()
 					set category="Skills"
 					adjust(usr)
 					src.Trigger(usr)
 			Life_Magnetism_Overdrive
-				passives = list("Instinct" = 1, "WindRelease" = 0.5, "Blubber" = 1, "Deflection" = 1, "Reversal" = 0.2, "KBRes" = 1, "Juggernaut" = 1)
+				passives = list("WindRelease" = 0.5, "Blubber" = 1, "Deflection" = 1, "Reversal" = 0.2, "Juggernaut" = 1)
 				VaizardHealth=1.5
 				VaizardShatter=1
 				TimerLimit=10//lasts for 10 seconds.
@@ -10028,7 +9893,7 @@ NEW VARIABLES
 				OffMessage="stops channeling the Ripple through the debris..."
 				adjust(mob/p)
 					var/secretLevel = p.secretDatum.currentTier
-					passives = list("Instinct" = 1 + secretLevel, "WindRelease" = 0.4 * secretLevel, "Blubber" = 1 + (secretLevel/2), "Deflection" = 1 + (secretLevel/2), "Reversal" = 0.2 * secretLevel, "KBRes" = secretLevel, "Juggernaut" = secretLevel)
+					passives = list("WindRelease" = 0.4 * secretLevel, "Blubber" = 1 + (secretLevel/2), "Deflection" = 1 + (secretLevel/2), "Reversal" = 0.2 * secretLevel, "Juggernaut" = secretLevel)
 					VaizardHealth=1.5 * secretLevel
 					VaizardShatter=1
 					TimerLimit=10 + (secretLevel * 2)
@@ -10039,7 +9904,7 @@ NEW VARIABLES
 		Werewolf
 			New_Moon_Form
 				HairLock=1
-				AutoAnger=1
+				AngerFloor=60
 				passives = list("Pursuer" = 1)
 				Pursuer=1
 				ActiveMessage="discards their humanity, their jaws stretching into a bloodthirsty maw!"
@@ -10065,7 +9930,7 @@ NEW VARIABLES
 				DefMult=0.75
 				// RegenMult=0.1
 				// RecovMult=0.1
-				passives = list("Curse" = 1, "Godspeed" = 1, "TechniqueMastery" = 1)
+				passives = list( "Godspeed" = 1, "TechniqueMastery" = 1)
 				Curse=1
 				Godspeed=1
 				TechniqueMastery = 1
@@ -10082,7 +9947,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(!altered)
 						if(p.Secret == "Werewolf")
-							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier, "TechniqueMastery" = 1,"Skimming" = 2, "MovementMastery" = p.secretDatum.currentTier)
+							passives = list( "Godspeed" =  p.secretDatum.currentTier, "TechniqueMastery" = 1,"Skimming" = 2)
 							MovementMastery = p.secretDatum.currentTier * 1.5
 							Godspeed = p.secretDatum.currentTier
 							StrMult = 1 + (p.secretDatum.currentTier * 0.05)
@@ -10097,8 +9962,8 @@ NEW VARIABLES
 					TimerLimit=180
 					if(!altered)
 						if(p.Secret == "Werewolf")
-							passives = list("Curse" = 1, "Godspeed" =  p.secretDatum.currentTier,\
-							 "Pursuer" = 2, "BlurringStrikes" = p.secretDatum.currentTier, "Skimming" = 2, "MovementMastery" = p.secretDatum.currentTier * 1.25)
+							passives = list( "Godspeed" =  p.secretDatum.currentTier,\
+							 "Pursuer" = 2,  "Skimming" = 2)
 							MovementMastery = p.secretDatum.currentTier * 2
 							Godspeed = p.secretDatum.currentTier * 2
 							StrMult = 1.05 + (p.secretDatum.currentTier * 0.15)
@@ -10109,7 +9974,7 @@ NEW VARIABLES
 
 				HealthThreshold=0.1
 				RegenMult=2
-				AutoAnger=1
+				AngerFloor=90
 				Pursuer=2
 				Godspeed=2
 				Curse=1
@@ -10269,16 +10134,15 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(!altered)
 						passives = list("Void" = 1,\
-										"Curse" = 1,\
+										\
 										"DeathField" = 1 * (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
 										"VoidField" = 1 * (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
 										"SoulFire" = (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
-										"Instinct" = (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
 						 				"Godspeed" =  (1+(p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired)),\
-										"BuffMastery" =  (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
-										"AngerThreshold" = 1.25 + (0.15 * (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired)),\
+										\
+										\
 						 				"Pursuer" = (p.transUnlocked ? p.transUnlocked : p.AscensionsAcquired),\
-										"CallousedHands" = ROUND_DIVIDE(p.secretDatum.secretVariable["Madness"],250),\
+										\
 						  				"Harden" = ROUND_DIVIDE(p.secretDatum.secretVariable["Madness"],50), \
 										"Flicker" = ROUND_DIVIDE(p.secretDatum.secretVariable["Madness"],25));
 
@@ -10501,10 +10365,9 @@ NEW VARIABLES
 				passives = list("GodKi" = 0.25)
 				GodKi=0.25//usually its 0.25 for seint seiya stuff
 			Vanish
-				passives = list("HotHundred" = 1, "Warping" = 3, "Steady" = 3)
+				passives = list("HotHundred" = 1, "Warping" = 3)
 				HotHundred=1
 				Warping=3
-				Steady=3
 				TimerLimit=3
 				Incorporeal=1
 				ActiveMessage="vanishes in the wake of their attack!"
@@ -10533,7 +10396,7 @@ NEW VARIABLES
 
 
 					Heavenly_Dragon_Ascendant_Zenith
-						passives = list("HardenedFrame" = 1, "Steady" = 1, "WeaponBreaker" = 1, "Disorienting" = 1)
+						passives = list(  "WeaponBreaker" = 1, "Disorienting" = 1)
 						OffMult = 1.1
 						EndMult = 1.3
 						StrMult = 1.2
@@ -10549,13 +10412,13 @@ NEW VARIABLES
 						SpdMult = 0.75
 						StrMult = 1.5
 						EndMult = 1.5
-						passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "DeathField" = 7, "Juggernaut"= 5, "KBRes"= 5, "TensionLock" = 1)
+						passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "DeathField" = 7, "Juggernaut"= 5, "TensionLock" = 1)
 					Turtle_Martial_Mastery
 						StyleNeeded="Turtle"
 						StrMult=1.1
 						EndMult=1.3
 						DefMult=1.2
-						passives = list("TensionLock" = 1, "KiControlMastery" = 1, "Void" = 1, "FluidForm" = 1)
+						passives = list("TensionLock" = 1, "KiControlMastery" = 1, "Void" = 1)
 						ActiveMessage="begins a flawless Turtle Kata!"
 						OffMessage="completes the Turtle Kata..."
 					Crane_Martial_Mastery
@@ -10563,7 +10426,7 @@ NEW VARIABLES
 						ForMult=1.3
 						SpdMult=1.2
 						OffMult=1.1
-						passives = list("TensionLock" = 1, "PureDamage" = 1, "Skimming" = 1, "Flow" = 1, "SpiritFlow" = 1)
+						passives = list("TensionLock" = 1, "PureDamage" = 1, "Skimming" = 1)
 						ActiveMessage="begins a flawless Crane Kata!"
 						OffMessage="completes the Crane Kata..."
 					Snake_Martial_Mastery
@@ -10571,7 +10434,7 @@ NEW VARIABLES
 						ForMult=1.1
 						SpdMult=1.2
 						DefMult=1.1
-						passives = list("TensionLock" = 1, "SoftStyle" = 1, "CounterMaster" = 10, "SpiritHand" = 1, "Deflection" = 1)
+						passives = list("TensionLock" = 1, "SoftStyle" = 1, "CounterMaster" = 10,  "Deflection" = 1)
 						ActiveMessage="begins a flawless Snake Kata!"
 						OffMessage="completes the Snake Kata..."
 					Cat_Martial_Mastery
@@ -10588,7 +10451,7 @@ NEW VARIABLES
 						StyleNeeded="Gentle Fist"
 						ForMult=1.5
 						EndMult=1.5
-						passives = list("TensionLock" = 1, "SoftStyle" = 2, "KiControlMastery" = 1, "FluidForm" = 1, "Flow" = 1, "SpiritFlow" = 1)
+						passives = list("TensionLock" = 1, "SoftStyle" = 2, "KiControlMastery" = 1)
 						Erosion=0.5
 
 						ActiveMessage="perceives the flow of ki perfectly!"
@@ -10599,7 +10462,7 @@ NEW VARIABLES
 						StrMult=1.5
 						EndMult=1.25
 						OffMult=1.25
-						passives = list("TensionLock" = 1, "Pursuer" = 1, "Flicker" = 1, "KiControlMastery" = 1, "FluidForm" = 1)
+						passives = list("TensionLock" = 1, "Pursuer" = 1, "Flicker" = 1, "KiControlMastery" = 1)
 						ActiveMessage="circulates blood throughout their body perfectly!"
 						OffMessage="loses their intense focus..."
 
@@ -10608,13 +10471,13 @@ NEW VARIABLES
 						StrMult=1.25
 						ForMult=1.25
 						SpdMult=1.5
-						passives = list("TensionLock" = 1, "Pursuer" = 3, "QuickCast" = 3, "CounterMaster" = 10, "SpiritHand" = 1, "SpiritFlow" = 1, "Deflection" = 2)
+						passives = list("TensionLock" = 1, "Pursuer" = 3, "QuickCast" = 3, "CounterMaster" = 10,   "Deflection" = 2)
 						ActiveMessage="ignites their chivalrous spirit!"
 						OffMessage="burns out their manly spirit..."
 
 					Rush_Mastery
 						StyleNeeded="Lightning Kickboxing"
-						passives = list("TensionLock" = 1, "MovementMastery" = 3, "Flicker" = 3, "PureDamage" = 0.5, "Flow" = 2, "CounterMaster" = 10, "Deflection" = 2)
+						passives = list("TensionLock" = 1,  "Flicker" = 3, "PureDamage" = 0.5, "CounterMaster" = 10, "Deflection" = 2)
 						ForMult=1.5
 						SpdMult=1.5
 						OffMult=1.25
@@ -10628,7 +10491,7 @@ NEW VARIABLES
 						ForMult=1.5
 						SpdMult=1.25
 						EndMult=1.25
-						passives = list("TensionLock" = 1, "SoftStyle" = 3, "MovementMastery" = 3, "PureDamage" = 1, "Flow" = 2, "Deflection" = 2)
+						passives = list("TensionLock" = 1, "SoftStyle" = 3,  "PureDamage" = 1, "Deflection" = 2)
 						ActiveMessage="stumbles around drunkenly..."
 						OffMessage="resumes normal motion..."
 
@@ -10652,7 +10515,7 @@ NEW VARIABLES
 						DefMult=1.25
 						ElementalOffense="Dark"
 						ElementalDefense="Dark"
-						passives = list("TensionLock" = 1, "SpiritHand" = 1, "SpiritFlow" = 1, "PureReduction" = 2, "TechniqueMastery" = 5, "Harden" = 1, "SpiritualDamage" = 2, "DeathField" = 2)
+						passives = list("TensionLock" = 1,   "PureReduction" = 2, "TechniqueMastery" = 5, "Harden" = 1, "SpiritualDamage" = 2, "DeathField" = 2)
 						ActiveMessage="enters a Dire Trance!!"
 						OffMessage="loses their magical rage..."
 					Astral_Empowerment
@@ -10700,7 +10563,7 @@ NEW VARIABLES
 						StyleNeeded="Phage"
 						ManaGlow="#000"
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1, "Toxic" = 3, "MortalStrike" = 0.25, "Curse" = 1, "VoidField" = 2, "DeathField" = 2)
+						passives = list("TensionLock" = 1, "Toxic" = 3,   "VoidField" = 2, "DeathField" = 2)
 						StrMult=1.25
 						ForMult=1.5
 						ActiveMessage="radiates a miasma of death!"
@@ -10756,7 +10619,7 @@ NEW VARIABLES
 						StyleNeeded="North Star"
 						ManaGlow="#fff"
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"PureDamage" = 2.5, "PureReduction" = 2.5, "MovementMastery" = 10, "Pursuer" = 2, "Curse" = 1, "HardStyle" = 2, "SoftStyle" = 2)
+						passives = list("TensionLock" = 1,"PureDamage" = 2.5, "PureReduction" = 2.5,  "Pursuer" = 2,  "HardStyle" = 2, "SoftStyle" = 2)
 						StrMult=1.5
 						OffMult=1.5
 						ActiveMessage="taps into all of their latent strength!"
@@ -10774,7 +10637,7 @@ NEW VARIABLES
 						OffMessage="disperses their immense wind pressure..."
 
 					Battle_Strength //North Star / South Star
-						passives = list("TensionLock" = 1,"PureDamage" = 2.5, "PureReduction" = 2.5, "MovementMastery" = 10)
+						passives = list("TensionLock" = 1,"PureDamage" = 2.5, "PureReduction" = 2.5)
 						EnergyHeal=3
 						FatigueHeal=1
 						ManaGlow="#ffffff"
@@ -10782,7 +10645,7 @@ NEW VARIABLES
 						ActiveMessage="taps into all of their latent strength!"
 						OffMessage="releases their gathered strength..."
 					Battle_Focus //East Star / West Star
-						passives = list("TensionLock" = 1,"Instinct" = 2, "Flow" = 2, "MovementMastery" = 10)
+						passives = list("TensionLock" = 1)
 						EnergyHeal=3
 						FatigueHeal=1
 						ManaGlow="#ffffff"
@@ -10797,7 +10660,7 @@ NEW VARIABLES
 						ManaGlowSize=2
 						StrMult=1.5
 						ForMult=1.5
-						passives = list("TensionLock" = 1,"MovementMastery" = 10, "TechniqueMastery" = 5)
+						passives = list("TensionLock" = 1, "TechniqueMastery" = 5)
 						ManaHeal=2.5
 					Heat_Rush
 						StyleNeeded="Ansatsuken"
@@ -10805,7 +10668,7 @@ NEW VARIABLES
 						ManaGlowSize=2
 						StrMult=1.5
 						ForMult=1.5
-						passives = list("TensionLock" = 1,"MovementMastery" = 10, "TechniqueMastery" = 5)
+						passives = list("TensionLock" = 1, "TechniqueMastery" = 5)
 						ManaHeal=2.5
 					Violent_Personality
 						StyleNeeded="Ansatsuken"
@@ -10813,7 +10676,7 @@ NEW VARIABLES
 						ManaGlowSize=2
 						StrMult=1.5
 						ForMult=1.5
-						passives = list("TensionLock" = 1,"MovementMastery" = 10, "TechniqueMastery" = 5)
+						passives = list("TensionLock" = 1, "TechniqueMastery" = 5)
 						ManaHeal=2.5
 
 					//keyblades
@@ -10823,7 +10686,7 @@ NEW VARIABLES
 						SpdMult=1.25
 						HotHundred = 1
 						Warping = 6
-						passives = list("TensionLock" = 1, "Steady" = 2, "BlurringStrikes" = 2)
+						passives = list("TensionLock" = 1)
 						TimerLimit = 10
 						Trigger(mob/User, Override)
 							if(!User.BuffOn(src))
@@ -10835,7 +10698,7 @@ NEW VARIABLES
 							..()
 					Fatal_Mode
 						StrMult=2
-						passives = list("TensionLock" = 1,"Steady" = 6, "CriticalChance" = 100)
+						passives = list("TensionLock" = 1, "SureCrit" = 1)
 						FlashChange=1
 						ManaGlow=rgb(255, 255, 204)
 						ManaGlowSize=2
@@ -10863,7 +10726,7 @@ NEW VARIABLES
 						FlashChange=1
 						ManaGlow=rgb(255, 204, 204)
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"SpiritHand" = 1)
+						passives = list("TensionLock" = 1)
 						StrMult=1.5
 						ForMult=1.5
 					Diamond_Dust
@@ -10877,14 +10740,14 @@ NEW VARIABLES
 						FlashChange=1
 						ManaGlow=rgb(255, 255, 204)
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"Paralyzing" = 1, "StunningStrike" = 2, "Warping" = 2, "HotHundred" = 1, "Steady" = 2)
+						passives = list("TensionLock" = 1,"Paralyzing" = 1, "StunningStrike" = 2, "Warping" = 2, "HotHundred" = 1)
 						SpdMult=1.5
 						OffMult=1.5
 					Wing_Blade
 						FlashChange=1
 						ManaGlow=rgb(255, 255, 255)
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"SwordDamage" = 2, "Steady" = 4)
+						passives = list("TensionLock" = 1,"Sword Mastery" = 2)
 						SureHitTimerLimit = 15
 						OffMult=1.5
 					Cyclone
@@ -10907,9 +10770,9 @@ NEW VARIABLES
 						ManaGlow=rgb(153, 102, 51)
 						ManaGlowSize=2
 						ElementalOffense="Void"
-						passives = list("TensionLock" = 1,"DemonicDurability" = 1)
+						passives = list("TensionLock" = 1)
 						AngerMult=1.5
-						AutoAnger=1
+						AngerFloor=90
 						TimerLimit=60
 					Ghost_Drive
 						FlashChange=1
@@ -10921,15 +10784,15 @@ NEW VARIABLES
 						FlashChange=1
 						ManaGlow=rgb(255, 0, 255)
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"SpiritHand" = 1, "SpiritSword" = 0.25, "Extend" = 1)
+						passives = list("TensionLock" = 1,  "Extend" = 1)
 					Call_Calamity
 						FlashChange=1
 						ManaGlow=rgb(153, 102, 51)
 						ManaGlowSize=2
 						ElementalOffense="Void"
-						passives = list("TensionLock" = 1,"DemonicDurability" = 1)
+						passives = list("TensionLock" = 1)
 						AngerMult=1.75
-						AutoAnger=1
+						AngerFloor=90
 						TimerLimit=60
 					The_Fourteenth_One
 						FlashChange=1
@@ -10938,13 +10801,13 @@ NEW VARIABLES
 						SpdMult = 1.25
 						ForMult = 1.25
 						ElementalOffense="Chaos"
-						passives = list("TensionLock" = 1,"Tossing" = 1, "SpiritSword" = 0.25, "Extend" = 1, "BlurringStrikes" = 2, "Warping" = 2)
+						passives = list("TensionLock" = 1,"Tossing" = 1,  "Extend" = 1,  "Warping" = 2)
 					Radiant_Brands
 						FlashChange=1
 						ManaGlow=rgb(153, 153, 153)
 						ManaGlowSize=2
 						ElementalOffense="Ultima"
-						passives = list("TensionLock" = 1,"Godspeed" = 3, "Flicker" = 4, "SuperDash" = 2, "Warping" = 3, "BlurringStrikes" = 3)
+						passives = list("TensionLock" = 1,"Godspeed" = 3, "Flicker" = 4, "SuperDash" = 2, "Warping" = 3)
 						SpdMult = 1.5
 
 
@@ -10980,7 +10843,7 @@ NEW VARIABLES
 						ActiveMessage="flows through a Dual Wielding Kata!"
 						OffMessage="finishes their kata..."
 					Flowing_Slash_Follow_Up
-						passives = list("TensionLock" = 1,"Warping" = 2, "PureDamage" = 10, "Instinct" = 2, "KBAdd" = 5, "KBMult" = 10)
+						passives = list("TensionLock" = 1,"Warping" = 2, "PureDamage" = 10, "HeavyHitter" = 10)
 						ActiveMessage="brings their sword back..."
 						OffMessage="strikes through their opponent suddenly!"
 					Crippling_Blows
@@ -10997,7 +10860,7 @@ NEW VARIABLES
 
 					//t2 sig styles
 					Mortal_Will
-						passives= list("Mortal Will" = 1, "MortalStacks" = 1, "BlockChance" = 33, "CriticalBlock" = 0.3, "StunningStrike" = 3, "ComboMaster" = 1, "Deflection" = 1, "Reversal" = 0.25 )
+						passives= list("Mortal Will" = 1, "MortalStacks" = 1, "CriticalBlock" = 0.3, "StunningStrike" = 3, "ComboMaster" = 1, "Deflection" = 1, "Reversal" = 0.25 )
 						ActiveMessage = "channels the will of a Phalanx!"
 						OffMessage = "falls out of flow..."
 					Trinity_Mastery
@@ -11005,7 +10868,7 @@ NEW VARIABLES
 						ActiveMessage="flows through a Tri Wielding Kata!"
 						OffMessage="finishes their kata..."
 					Maim_Mastery
-						passives = list("TensionLock" = 1,"MortalStrike" = 0.5, "CursedWounds" = 1)
+						passives = list("TensionLock" = 1, "CursedWounds" = 1)
 						ActiveMessage="embraces their murderous nature!"
 						OffMessage="calms down from their murderous high..."
 					Mana_Blitz
@@ -11015,7 +10878,7 @@ NEW VARIABLES
 						ActiveMessage="radiates potent mana!"
 						OffMessage="runs dry their surplus of mana..."
 					Endurance_Negation
-						passives = list("TensionLock" = 1,"PridefulRage" = 1)
+						passives = list("TensionLock" = 1)
 						PhysicalHitsLimit=1
 						SpiritHitsLimit=1
 						ActiveMessage="scythes through any resistance with keenly honed wisdom!"
@@ -11025,7 +10888,7 @@ NEW VARIABLES
 						StyleNeeded="Five Rings"
 						ManaGlow=rgb(255, 0, 0)
 						ManaGlowSize=2
-						passives = list("TensionLock" = 1,"CursedWounds" = 1, "PureDamage" = 5, "Instinct" = 4, "SpiritFlow" = 1)
+						passives = list("TensionLock" = 1,"CursedWounds" = 1, "PureDamage" = 5)
 						HitSpark='Slash - Ragna.dmi'
 						HitX=-32
 						HitY=-32
@@ -11034,7 +10897,7 @@ NEW VARIABLES
 
 
 					Bashing
-						passives = list("HardenedFrame" = 1, "StunningStrike" = 3, "ComboMaster" = 1)
+						passives = list( "StunningStrike" = 3, "ComboMaster" = 1)
 						EndMult = 1.3
 						OffMult = 1.2
 						ActiveMessage="starts using their shield as a weapon!"
@@ -11043,11 +10906,11 @@ NEW VARIABLES
 					Bestial_Accuracy
 						StrMult=1.3
 						EndMult=0.8
-						passives = list("TensionLock" = 1,"NoDodge" = 1, "NoMiss" = 1)
+						passives = list("TensionLock" = 1,"NoDodge" = 1, "NoWhiff" = 1)
 						ActiveMessage="becomes empowered by instinct!"
 						OffMessage="regains reason..."
 					Martial_Flow
-						passives = list("TensionLock" = 1,"Flow" = 1, "Instinct" = 1, "Steady" = 3)
+						passives = list("TensionLock" = 1)
 						OffMult=1.2
 						DefMult=1.2
 						ActiveMessage="enters a flow state!"
@@ -11083,13 +10946,13 @@ NEW VARIABLES
 						OffMult=1.4
 						DefMult=1.2
 						EndMult=1.2
-						passives = list("TensionLock" = 1,"Steady" = 2, "CriticalChance" = 5, "CriticalDamage" = 0.25)
+						passives = list("TensionLock" = 1, "CriticalDamage" = 0.25)
 						ActiveMessage="is blessed by a turn of fortune!"
 						OffMessage="uses up their karma..."
 					Speed_of_Sound
 						StyleNeeded="Resonance"
 						SpdMult=1.4
-						passives = list("TensionLock" = 1,"Disorienting" = 1, "Godspeed" = 2, "Warping" = 2, "Steady" = 1)
+						passives = list("TensionLock" = 1,"Disorienting" = 1, "Godspeed" = 2, "Warping" = 2)
 						ActiveMessage="resonates with the speed of sound!"
 						OffMessage="stops vibrating..."
 
@@ -11123,7 +10986,7 @@ NEW VARIABLES
 						SpdMult=1.5
 						OffMult=1.25
 						StrMult=1.25
-						passives = list("TensionLock" = 1,"Warping" = 1, "HotHundred" = 1, "Steady" = 2, "Flow" = 2, "Instinct" = 2, "Godspeed" = 2)
+						passives = list("TensionLock" = 1,"Warping" = 1, "HotHundred" = 1, "Godspeed" = 2)
 						ActiveMessage="steps between attacks and counters with effortless grace!"
 						OffMessage="quiets their rhythmic dance..."
 
@@ -11136,7 +10999,7 @@ NEW VARIABLES
 						SpdMult=2
 						OffMult=1.25
 						DefMult=1.25
-						passives = list("TensionLock" = 1,"WeaponBreaker" = 6, "SoftStyle" = 2, "HardStyle" = 2, "Warping" = 1, "HotHundred" = 1, "Flow" = 2,"Instinct" = 2, "Godspeed" = 2, "CounterMaster" = 10)
+						passives = list("TensionLock" = 1,"WeaponBreaker" = 6, "SoftStyle" = 2, "HardStyle" = 2, "Warping" = 1, "HotHundred" = 1, "Godspeed" = 2, "CounterMaster" = 10)
 						ActiveMessage="flows through every defense with calm precision!"
 						OffMessage="runs dry their well of fluidity..."
 
@@ -11154,7 +11017,7 @@ NEW VARIABLES
 				Serum_W
 					ActiveMessage="crackles about in Super-position!"
 					OffMessage="'s position in Space stabilizes..."
-					passives = list("Grippy" = 4, "CoolerAfterImages"=2, "Godspeed"=2)
+					passives = list("Grippy" = 4, "AfterImages"=2, "AfterImageSkin" = "Cooler", "Godspeed"=2)
 				//these last for 10 seconds so they will stack about 30 of their elemental debuffs.
 
 				Astral_Drain
@@ -11353,9 +11216,7 @@ NEW VARIABLES
 					IconLock='SweatDrop.dmi'
 					IconApart=1
 					EndMult=0.8
-					passives = list("NoMiss" =  1, "NoDodge" = 1)
-					NoMiss=1
-					NoDodge=1
+					passives = list("NoWhiff" =  1, "NoDodge" = 1)
 					ActiveMessage="knows they are being hunted!"
 					OffMessage="shakes off their pursuer!"
 				Disoriented
@@ -11389,7 +11250,6 @@ NEW VARIABLES
 					IconLock='SweatDrop.dmi'
 					IconApart=1
 					passives = list("NoDodge" = 1)
-					NoDodge=1
 					ShatterAffected=10
 					SlowAffected=10
 					CrippleAffected=10
@@ -11400,7 +11260,7 @@ NEW VARIABLES
 					IconApart=1
 					StrMult=0.8
 					OffMult=0.8
-					passives = list("Flow" = -1)
+					passives = list()
 					ActiveMessage="knows that karma is against them!"
 					OffMessage="feels more sure of their luck!"
 				Shattered
@@ -11476,10 +11336,8 @@ NEW VARIABLES
 			Swell_Up
 				NeedsHealth=50
 				TooMuchHealth=75
-				passives = list("GiantForm" = 1, "FluidForm" = 1, "DebuffResistance" = 1)
+				passives = list("GiantForm" = 1)
 				GiantForm=1
-				FluidForm=1
-				DebuffResistance=1
 				Enlarge=2
 				TextColor=rgb(255, 255, 0)
 				Cooldown=-1
@@ -11514,7 +11372,7 @@ NEW VARIABLES
 				OffMult=2
 				PowerMult=2
 				AngerMult=2
-				AutoAnger=1
+				AngerFloor=90
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1)
 				AuraLock='AntiAura.dmi'
 				AuraX=-18
@@ -11532,7 +11390,7 @@ NEW VARIABLES
 
 //Cybernetic
 			Blade_Mode
-				passives = list("Warping" = 2, "Steady" = 3, "HotHundred" = 1, "PureDamage" = 1)
+				passives = list("Warping" = 2,  "HotHundred" = 1, "PureDamage" = 1)
 				Warping=2
 				HotHundred=1
 				TimerLimit=6
@@ -11562,8 +11420,7 @@ NEW VARIABLES
 				WoundHeal=0.1
 				FatigueHeal=1
 				PowerMult=1.5
-				passives = list("LifeGeneration" = 4, "EnergyGeneration"=4, "ManaGeneration" = 4, "Steady" = 9, "Flicker" = 1, "Pursuer" = 1, "Godspeed" = 1)
-				Steady=9
+				passives = list("LifeGeneration" = 4, "EnergyGeneration"=4, "ManaGeneration" = 4,  "Flicker" = 1, "Pursuer" = 1, "Godspeed" = 1)
 				Pursuer=1
 				Flicker=1
 				Godspeed=1
@@ -11623,8 +11480,8 @@ NEW VARIABLES
 						ElementalOffense = "Earth"
 						ElementalDefense = "Earth"
 						endAdd = 0.15 * asc
-						passives = list("PureReduction" = asc+1, "BlockChance" = (5*(asc+1)), "CriticalBlock" = (0.1*(asc+1)),\
-										"CallousedHands" = (0.15*(asc+1)), "Harden" = 2 + (asc/2))
+						passives = list("PureReduction" = asc+1, "CriticalBlock" = (0.1*(asc+1)),\
+										 "Harden" = 2 + (asc/2))
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
 							adjust(User)
@@ -11641,8 +11498,8 @@ NEW VARIABLES
 						strAdd = 0.15 * asc
 						ElementalOffense = "Fire"
 						ElementalDefense = "Fire"
-						passives = list("Scorching" = (clamp(asc*0.5, 1, 3)) , "SoulFire" = asc, "HybridStrike" = asc/2, \
-										"Steady" = asc+1, "PureDamage" = asc+1)
+						passives = list("Scorching" = (clamp(asc*0.5, 1, 3)) , "SoulFire" = asc,  \
+										 "PureDamage" = asc+1)
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
 							adjust(User)
@@ -11660,7 +11517,7 @@ NEW VARIABLES
 						ElementalOffense = "Wind"
 						ElementalDefense = "Wind"
 						passives = list("DoubleStrike" = asc/2, "TripleStrike" = asc/3, "ThunderHerald" = 1, \
-							"Pursuer" = 1 + (asc/2), "Flicker" = 1 + (asc/2), "CriticalDamage" = asc*0.05, "CriticalChance" = asc*5, \
+							"Pursuer" = 1 + (asc/2), "Flicker" = 1 + (asc/2), "CriticalDamage" = asc*0.05, \
 							"Shocking" = (clamp(asc*0.5, 1, 3)))
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
@@ -11679,8 +11536,8 @@ NEW VARIABLES
 						ElementalDefense = "Dark"
 						NeedsHealth = 50 + (5*asc);
 						TooMuchHealth = min(95, 75 + (5*asc));
-						passives = list("PhysPleroma" = asc/2, "AbyssMod" = asc/2, \
-							"HellPower" = asc/6, "HellRisen" = asc/4, "Shadowbringer" = 1, "FrenzyCarrier" = 1, "Wrathful Tenacity" = (0.1*asc))
+						passives = list( "AbyssMod" = asc/2, \
+							"HellPower" = asc/6, "HellRisen" = asc/4,  "FrenzyCarrier" = 1)
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
 							adjust(User)
@@ -11695,8 +11552,8 @@ NEW VARIABLES
 						ElementalOffense = "Light"
 						strAdd = 0.075 * asc
 						endAdd = 0.075 * asc
-						passives = list("Wrathful Tenacity" = asc*0.3, "HolyMod" = asc, \
-							"LifeGeneration" = asc+1, "CallousedFeet" = asc+1, "HardenedFrame" = 1, "SoftStyle" = asc/2)
+						passives = list( "HolyMod" = asc, \
+							"LifeGeneration" = asc+1,   "SoftStyle" = asc/2)
 					Trigger(mob/User, Override = FALSE)
 						if(!User.BuffOn(src))
 							adjust(User)
@@ -11747,7 +11604,6 @@ NEW VARIABLES
 				NeedsHealth=10
 				TooMuchHealth=15
 				AngerMult=1.2
-				passives = list("Brutalize" = 0.5)
 				TextColor=rgb(255, 0, 0)
 				Cooldown=180
 				ActiveMessage="enters a berserk fury!!"
@@ -11795,8 +11651,8 @@ NEW VARIABLES
 				adjust(mob/p)
 					if(altered) return
 					var/asc = p.AscensionsAcquired
-					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Gum Gum" = 1 + (0.5 * asc), "Blubber" = 1 + (0.5 * asc), "KillerInstinct" = 0.1 + (0.15 * asc), \
-						"Brutalize" = 1 + asc, "AttackSpeed" = asc/2, "Curse" = 1, "Flow" = asc/2)
+					passives = list("Unstoppable" = 1, "Harden" = 1 + (0.5 * asc), "LifeSteal" = 5*asc, "Godspeed" = 1+(asc), "SweepingStrike" = 1, "Gum Gum" = 1 + (0.5 * asc), "Blubber" = 1 + (0.5 * asc),  \
+						 "AttackSpeed" = asc/2)
 					VaizardHealth = 10 + p.GetEnd() + (p.TotalInjury/20) + (asc)
 					if(asc>=1)
 						if(!locate(/obj/Skills/AutoHit/Symbiote_Tendril_Wave, p.AutoHits))
@@ -11812,8 +11668,8 @@ NEW VARIABLES
 				DarkChange=1
 				StrMult=1.5
 				SpdMult=1.5
-				AutoAnger=1
-				passives = list("SpecialBuffLock" = 1, "Curse" = 1, "Pursuer" = 1, "Flicker" = 1, "StunningStrike" = 1, "DoubleStrike" = 3, "TechniqueMastery" = 5, "MovementMastery" = 5, "QuickCast" = 2, "Godspeed" = 1)
+				AngerFloor=75
+				passives = list("SpecialBuffLock" = 1,  "Pursuer" = 1, "Flicker" = 1, "StunningStrike" = 1, "DoubleStrike" = 3, "TechniqueMastery" = 5,  "QuickCast" = 2, "Godspeed" = 1)
 				Curse=1
 				Pursuer=1
 				Flicker=1
@@ -11941,8 +11797,7 @@ NEW VARIABLES
 				Cooldown=1
 			Punishment_of_Demons
 				AlwaysOn=1
-				AutoAnger=1
-				passives = list("MovementMastery" = -3)
+				AngerFloor=75
 				MovementMastery=-3
 				ActiveMessage="experiences the suffering of Demon Realm - boundless fury leading into peril!"
 				KenWave=1
@@ -11975,8 +11830,8 @@ NEW VARIABLES
 				EndMult = 1.5
 				SpdMult=1.5
 				RecovMult=1.5
-				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1, "Curse" = 1, "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
-				AutoAnger=1
+				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1,  "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
+				AngerFloor=75
 				TooLittleMana=1
 				AuraLock='AntiAura.dmi'
 				VaizardHealth = 15
@@ -11997,7 +11852,7 @@ NEW VARIABLES
 					if(!altered)
 						if(player.passive_handler.Get("Two Become One"))
 							src.passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1, "MartialMagic" = 1, "BladeFisting" = 1, "Godspeed" = 2, "ManaLeak" = 1, "TechniqueMastery" = 5,\
-							"Pursuer" = 1, "DoubleStrike" = 4, "TripleStrike" = 4, "BlurringStrikes" = 4, "ManaGeneration" = 2)
+							"Pursuer" = 1, "DoubleStrike" = 4, "TripleStrike" = 4,  "ManaGeneration" = 2)
 							src.VaizardHealth = 45
 							src.PowerMult=2
 							src.ActiveMessage="is overwhelmed by their inner darkness... but keeps a semblance of who they are!"
@@ -12016,7 +11871,7 @@ NEW VARIABLES
 				Cooldown=4//Just in case
 				Trigger(mob/player, Override)
 					if(!altered)
-						passives = list("Godspeed" = floor(player.SagaLevel/2), "Pursuer" = floor(player.SagaLevel/2), "BlockChance" = player.SagaLevel*3, "CriticalBlock" = 0.2, "CriticalChance" = player.SagaLevel*3, "CriticalDamage" = 0.1)
+						passives = list("Godspeed" = floor(player.SagaLevel/2), "Pursuer" = floor(player.SagaLevel/2), "CriticalBlock" = 0.2, "CriticalDamage" = 0.1)
 						if(player.UBWPath=="Firm")
 							passives["FakePeace"] = 1
 					..()
@@ -12026,7 +11881,7 @@ NEW VARIABLES
 				TooMuchHealth = 90
 				Godspeed = 1
 				PowerMult=1.25
-				AutoAnger=1
+				AngerFloor=75
 				ManaLeak=0.5
 				TooLittleMana=1
 				Pursuer = 1
@@ -12064,7 +11919,7 @@ NEW VARIABLES
 				ActiveMessage="has fallen victim to their demonic impulse to win at any cost!"
 				OffMessage="manages to repress their demonic powers..."
 				adjust(mob/p)
-					passives = list("SpecialBuffLock" = 1,"KillerInstinct" = 0.1 * p.SagaLevel, "Curse" = 1, "Enrage" = p.SagaLevel, \
+					passives = list("SpecialBuffLock" = 1,   \
 					"SlayerMod" = p.SagaLevel*0.25, "HardStyle" = 0.25 + (p.SagaLevel*0.25), "TechniqueMastery" = p.SagaLevel*0.75)
 					NeedsHealth = 15 + (2.5 * p.SagaLevel)
 					TooMuchHealth = NeedsHealth + p.SagaLevel
@@ -12090,8 +11945,7 @@ NEW VARIABLES
 				OffMessage="loses their connection to the Kyoi no Hado..."
 				Trigger(mob/player, Override)
 					if(!altered)
-						passives = list("TechniqueMastery" = player.SagaLevel, "BuffMastery" = player.SagaLevel/2, "LikeWater" = player.SagaLevel-2, "Sunyata" = player.SagaLevel-2, \
-						"FluidForm" = 1)
+						passives = list("TechniqueMastery" = player.SagaLevel, "Sunyata" = player.SagaLevel-2)
 					..()
 
 			Satsui_no_Hado
@@ -12117,7 +11971,7 @@ NEW VARIABLES
 				OffMessage="manages to repress their urges..."
 				Trigger(mob/player, Override)
 					if(!altered)
-						passives = list("SpecialBuffLock" = 1,"KillerInstinct" = clamp(player.SagaLevel/8, 0.1, 1), "Curse" = 1, "Enraged" =  2 + player.SagaLevel, "SlayerMod" = player.SagaLevel*0.75, \
+						passives = list("SpecialBuffLock" = 1,  "SlayerMod" = player.SagaLevel*0.75, \
 						"HardStyle" = 1 + (player.SagaLevel*0.5), "TechniqueMastery" = player.SagaLevel)
 						SlayerMod = player.SagaLevel * 0.5
 						HardStyle = 1 + (player.SagaLevel * 0.25)
@@ -12132,7 +11986,6 @@ NEW VARIABLES
 				DefTaxDrain=0.0002
 				passives = list("DarknessFlame" = 1, "DeathField" = 5)
 				DarknessFlame=1
-				DeathField=5
 				DarkChange=1
 				IconLock='DarknessFlameAura.dmi'
 				LockX=-32
@@ -12152,17 +12005,15 @@ NEW VARIABLES
 						OffTaxDrain = 0
 						DefTaxDrain = 0
 					if(p.equippedSword)
-						passives = list("DarknessFlame" = 1, "DeathField" = p.SagaLevel, "SpiritSword" =  p.SagaLevel * 0.25)
+						passives = list("DarknessFlame" = 1, "DeathField" = p.SagaLevel)
 					else
-						passives = list("DarknessFlame" = 1, "DeathField" = p.SagaLevel, "SpiritHand" =  p.SagaLevel * 0.25)
+						passives = list("DarknessFlame" = 1, "DeathField" = p.SagaLevel)
 				Trigger(mob/User, Override = FALSE)
 					if(!User.BuffOn(src))
 						adjust(User)
 					..()
 			Absorbtion_Shield
 				AlwaysOn=1
-				passives = list("Siphon" = 1)
-				Siphon=1
 				FlashChange=1
 				IconLock='preta.dmi'
 				IconLayer=-1
@@ -12174,10 +12025,9 @@ NEW VARIABLES
 				Cooldown=1
 			Godly_Empowerment
 				AlwaysOn=1
-				passives = list("GiantForm" = 1, "Juggernaut" = 1, "DebuffResistance" = 3)
+				passives = list("GiantForm" = 1, "Juggernaut" = 1)
 				GiantForm=1
 				Juggernaut=1
-				DebuffResistance=1
 				Enlarge=3
 				Cooldown=1
 
@@ -12205,9 +12055,8 @@ NEW VARIABLES
 			Restraint_Release
 				AlwaysOn=1
 				DarkChange=1
-				passives = list("FluidForm" = 1)
+				passives = list()
 				PoseEnhancement=1
-				FluidForm=1
 				IconTint=list(0.08,0,0, 0,0,0, 0.06,0,0, 0,0,0)
 				IconLock='Vampire Transformation.dmi'
 				IconApart=1
@@ -12217,7 +12066,7 @@ NEW VARIABLES
 				BuffName="Sage Mode"
 				ManaThreshold=125
 				TooLittleMana=25
-				passives = list("SweepingStrike" = 1, "ManaLeak" = 1, "ManaStats" = 1, "DrainlessMana" = 1, "MagicFocus" = 1, "AllOutAttack" = 1, "SuperDash" = 1)
+				passives = list("SweepingStrike" = 1, "ManaLeak" = 1,  "DrainlessMana" = 1, "MartialMagic" = 1,  "SuperDash" = 1)
 				ManaLeak=2
 				ManaStats=1
 				DrainlessMana=1
@@ -12233,7 +12082,6 @@ NEW VARIABLES
 				adjust(mob/p)
 					var/mastery = p.secretDatum.currentTier;
 					passives["ManaLeak"] = max(0.1, 1 - (mastery*0.2))
-					passives["ManaStats"] = mastery
 					passives["SuperDash"] = 1 + (mastery * 0.2);
 					passives["Pursuer"] = mastery;
 					passives["Godspeed"] = mastery;
@@ -12558,8 +12406,8 @@ mob
 								s.InnatelyAscended=make_another.SwordAscensionSecond ? make_another.SwordAscensionSecond : make_another.SwordAscension
 							if(make_another.MagicSword)
 								s.MagicSword+=make_another.MagicSwordSecond ? make_another.MagicSwordSecond : make_another.MagicSword
-							if(make_another.SpiritSword)
-								s.SpiritSword+=make_another.SpiritSword
+							if(make_another.SummonSwordVisual)
+								s.SummonSwordVisual+=make_another.SummonSwordVisual
 							if(make_another.Extend)
 								s.Extend+=make_another.Extend
 							s.Conjured=1
@@ -12646,8 +12494,8 @@ mob
 									s.InnatelyAscended=make_another.SwordAscensionThird ? make_another.SwordAscensionThird : make_another.SwordAscension
 								if(make_another.MagicSword)
 									s.MagicSword+=make_another.MagicSwordThird ? make_another.MagicSwordThird : make_another.MagicSword
-								if(make_another.SpiritSword)
-									s.SpiritSword+=make_another.SpiritSword
+								if(make_another.SummonSwordVisual)
+									s.SummonSwordVisual+=make_another.SummonSwordVisual
 								if(make_another.Extend)
 									s.Extend+=make_another.Extend
 								s.Conjured=1
@@ -12695,8 +12543,8 @@ mob
 								s.InnatelyAscended=make_another.SwordAscensionThird ? make_another.SwordAscensionThird : make_another.SwordAscension
 							if(make_another.MagicSword)
 								s.MagicSword+=make_another.MagicSwordThird ? make_another.MagicSwordThird : make_another.MagicSword
-							if(make_another.SpiritSword)
-								s.SpiritSword+=make_another.SpiritSword
+							if(make_another.SummonSwordVisual)
+								s.SummonSwordVisual+=make_another.SummonSwordVisual
 							if(make_another.Extend)
 								s.Extend+=make_another.Extend
 							s.Conjured=1
@@ -13029,12 +12877,8 @@ mob
 								copy = B.NewCopyable
 							else
 								copy = B.Copyable
-							if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-								if(copyLevel < copy)
-									continue
-							else
-								if(copyLevel <= copy)
-									continue
+							if(copyLevel < copy)
+								continue
 							if(!locate(B.type, m))
 								var/obj/Skills/copiedSkill = new B.type
 								m.AddSkill(copiedSkill)
@@ -13159,7 +13003,6 @@ mob
 					if("Tatsumaki")
 						StyleBuff.Finisher="/obj/Skills/Queue/Finisher/Shippu_Jinraikyaku"
 				if(src.SagaLevel>=5)
-					src.StyleBuff.AngerThreshold=2
 					switch(src.AnsatsukenAscension)
 						if("Chikara")
 							src.StyleBuff.StyleStr=1.5
@@ -13177,7 +13020,7 @@ mob
 								src.StyleBuff.passives["EnergyGeneration"] = 5
 								src.StyleBuff.passives["ManaGeneration"] = 5
 						if("Satsui")
-							src.StyleBuff.AutoAnger=1
+							src.StyleBuff.AngerFloor=75
 							src.StyleBuff.StyleStr=1.5
 							src.StyleBuff.StyleFor=1.4
 							src.StyleBuff.StyleOff=1.4
@@ -13277,10 +13120,9 @@ mob
 					src.ActiveBuff.icon=src.ExpandBase
 					src.ActiveBuff.passives["GiantForm"] = round(AscensionsAcquired/2)
 					src.ActiveBuff.passives["Godspeed"] = AscensionsAcquired
-					src.ActiveBuff.AutoAnger=0
-					src.ActiveBuff.AngerStorage=0
+					src.ActiveBuff.AngerFloor=0
 					if(src.passive_handler.Get("StarPower"))
-						src.ActiveBuff.AutoAnger=1
+						src.ActiveBuff.AngerFloor=75
 						src.ActiveBuff.AngerMult=2
 						src.ActiveBuff.passives["Pursuer"] = 2 * AscensionsAcquired
 					else
@@ -13902,8 +13744,8 @@ mob
 					s.MagicSword+=B.MagicSword
 				if(B.SwordElement)
 					s.Element = B.SwordElement
-				if(B.SpiritSword)
-					s.SpiritSword+=B.SpiritSword
+				if(B.SummonSwordVisual)
+					s.SummonSwordVisual+=B.SummonSwordVisual
 				if(B.Extend)
 					s.Extend+=B.Extend
 				if(B.swordHasHistory)
@@ -13955,8 +13797,8 @@ mob
 					s.MagicSword+=B.MagicSwordSecond
 				if(B.SwordElementSecond)
 					s.Element=B.SwordElementSecond
-				if(B.SpiritSword)
-					s.SpiritSword+=B.SpiritSword
+				if(B.SummonSwordVisual)
+					s.SummonSwordVisual+=B.SummonSwordVisual
 				if(B.Extend)
 					s.Extend+=B.Extend
 				s.Conjured=1
@@ -14003,8 +13845,8 @@ mob
 					s.MagicSword+=B.MagicSwordThird
 				if(B.SwordElementThird)
 					s.Element=B.SwordElementThird
-				if(B.SpiritSword)
-					s.SpiritSword+=B.SpiritSword
+				if(B.SummonSwordVisual)
+					s.SummonSwordVisual+=B.SummonSwordVisual
 				if(B.Extend)
 					s.Extend+=B.Extend
 				s.Conjured=1
@@ -14212,8 +14054,8 @@ mob
 					s.InnatelyAscended=B.SwordAscension
 				if(B.MagicSword)
 					s.MagicSword+=B.MagicSword
-				if(B.SpiritSword)
-					s.SpiritSword+=B.SpiritSword
+				if(B.SummonSwordVisual)
+					s.SummonSwordVisual+=B.SummonSwordVisual
 				if(B.Extend)
 					s.Extend+=B.Extend
 				if(B.FlashDraw)
@@ -14340,7 +14182,7 @@ mob
 				filters = null
 				filters += filter(type="drop_shadow",x=0,y=0,size=B.ManaGlowSize, offset=B.ManaGlowSize/2, color=B.ManaGlow)
 				GlowFilter = filters[filters.len]
-				filters += filter(type="motion_blur", x=0,y=0)
+				filters += filter(name="trail", type="motion_blur", x=0,y=0)
 
 			if(B.ArmamentGlow)
 				src.ArmamentGlow = filter(type="drop_shadow",x=0,y=0,size=B.ArmamentGlowSize, offset=B.ArmamentGlowSize/2, color=B.ArmamentGlow)
@@ -14355,17 +14197,15 @@ mob
 				src.SenseUnlocked+=B.SenseUnlocked
 			if(B.Afterimages)
 				src.Afterimages+=1
-			if((B.AutoAnger || B.passives["AutoAnger"]) && !src.AutoBerserkOptOut)
-				Anger()
-				passive_handler.Increase("EndlessAnger")
 			if(B.CalmAnger)
 				src.Anger=0
+				src.AngerTier=0
 			if(B.AngerMult)
 				src.AngerMult+=B.AngerMult
-			// if(B.AngerThreshold)
-			// 	src.AngerThreshold=B.AngerThreshold
 			if(B.AngerPoint)
 				src.AngerPoint += B.AngerPoint
+			if(B.AngerFloor)
+				UpdateAnger()
 			if(B.WaveringAngerLimit)
 				B.WaveringAnger=0
 				B.NoAnger=0
@@ -14438,10 +14278,10 @@ mob
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(s)
 					s.MagicSword+=B.MagicSword
-			if(B.SpiritSword&&!B.MakesSword)
+			if(B.SummonSwordVisual&&!B.MakesSword)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(s)
-					s.SpiritSword+=B.SpiritSword
+					s.SummonSwordVisual+=B.SummonSwordVisual
 			if(B.Extend&&!B.MakesSword)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(s)
@@ -14502,10 +14342,6 @@ mob
 				src.EnergyExpenditure+=B.EnergyExpenditure
 			if(B.Warping)
 				src.Warping=B.Warping
-			if(B.Siphon)
-				src.EnergySiphon+=(0.1*B.Siphon)
-			if(B.PridefulRage)
-				src.PridefulRage+=B.PridefulRage
 			if(B.DefianceRetaliate)
 				src.DefianceRetaliate+=B.DefianceRetaliate
 			if(B.FusionPowered)
@@ -14851,10 +14687,10 @@ mob
 				B.Timer=0
 			if(B.Warp)
 				src.Warp-=B.Warp
-			if(B.SpiritSword)
+			if(B.SummonSwordVisual)
 				if(src.HasSword())
 					var/obj/Items/Sword/s=src.EquippedSword()
-					s.SpiritSword-=B.SpiritSword
+					s.SummonSwordVisual-=B.SummonSwordVisual
 			if(B.Extend)
 				if(src.HasSword())
 					var/obj/Items/Sword/s=src.EquippedSword()
@@ -14867,14 +14703,10 @@ mob
 				src.SenseUnlocked-=B.SenseUnlocked
 			if(B.Afterimages)
 				src.Afterimages-=B.Afterimages
-			if((B.AutoAnger || B.passives["AutoAnger"]) && !src.AutoBerserkOptOut)
-				if(passive_handler.Get("EndlessAnger"))
-					passive_handler.Decrease("EndlessAnger")
-				src.Calm()
-			// if(B.AngerThreshold)
-			// 	src.AngerThreshold-=B.AngerThreshold
 			if(B.AngerPoint)
 				src.AngerPoint -= B.AngerPoint
+			if(B.AngerFloor)
+				AngerReclamp(B)
 			if(B.AngerMult)
 				src.AngerMult-=B.AngerMult
 			if(B.AngerMessage)
@@ -14991,8 +14823,6 @@ mob
 			if(B.PotionCD)
 				src.PotionCD+=B.PotionCD
 
-			if(B.AngerStorage)
-				src.AngerMax=B.AngerStorage
 			if(B.PowerInvisible)
 				src.PowerInvisible/=B.PowerInvisible
 			if(B.PURestrictionRemove)
@@ -15058,10 +14888,6 @@ mob
 				world.log<<"What called? [src] [B]"*/
 			if(B.Warping)
 				src.Warping=0
-			if(B.Siphon)
-				src.EnergySiphon-=(0.1*B.Siphon)
-			if(B.PridefulRage)
-				src.PridefulRage-=B.PridefulRage
 			if(B.DefianceRetaliate)
 				src.DefianceRetaliate-=B.DefianceRetaliate
 				src.DefianceCounter=0

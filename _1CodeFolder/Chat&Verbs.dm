@@ -36,9 +36,9 @@ mob
 
 		is_dashing = 0
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Feather Knife")
-			src.passive_handler.passives["Extra Secret Knives"] = "Feathers"
+			src.passive_handler.Set("Extra Secret Knives", "Feathers")
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Fox Fire")
-			src.passive_handler.passives["Heavy Strike"] = "Fox Fire"
+			src.passive_handler.Set("Heavy Strike", "Fox Fire")
 		if(src.isRace(BEASTKIN) && src.race?:Racial == "Monkey King")
 			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall/)
 			if(!s.Using)
@@ -113,7 +113,7 @@ mob/Players/verb
 		if(!(world.time > usr.verb_delay+4)) return
 		usr.verb_delay=world.time+1
 
-		if(usr.client.eye == usr) usr.Observing=0
+		if(GfxClientEyeIsMob(usr.client, usr)) usr.Observing=0
 
 		var/mob/m
 
@@ -712,6 +712,7 @@ mob/Players/verb
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		usr.PurgeHurtboxDebug()
 		usr.AppearanceOff()
 		usr.AppearanceOn()
 	Customize_PoweredState_Menu()
@@ -812,16 +813,6 @@ a{color:#8be9ff;}
 			usr<<browse("[View]","window=Logzk;size=900x450")
 		else
 			usr<<browse("[View]","window=Logzk;size=240x420")
-
-	Toggle_Auto_Berserk()
-		set category = "Other"
-		set name = "Toggle Auto Berserk"
-		if(usr.AutoBerserkOptOut)
-			usr.AutoBerserkOptOut = 0
-			usr << "Auto Berserk re-enabled. Buffs that force Anger (Jinchuuriki, Vaizard Mask, Wrathful, etc.) will trigger it normally."
-		else
-			usr.AutoBerserkOptOut = 1
-			usr << "Auto Berserk disabled. Buffs with the Auto Anger flag will no longer force you into the Anger state on activation."
 
 	GetPingSound()
 		set category = "Other"
@@ -1086,6 +1077,14 @@ mob/Players/verb
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		//flourish: pose right after a guard break / wall splat / grab tech for a tension nod
+		if(world.time <= src.flourish_until)
+			src.flourish_until = 0
+			if(src.canGainTension())
+				src.gainTension(glob.FLOURISH_TENSION)
+			KenShockwave(src, icon='KenShockwaveFocus.dmi', Size=0.5, Blend=2, Time=3)
+			OMsg(src, "[src] strikes a pose!")
+			return
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.CheckSlotless("Half Moon Form")||src.CheckSlotless("Full Moon Form"))
 				OMsg(src, "[src] radiates animalistic bloodlust as they prepare to pounce!")

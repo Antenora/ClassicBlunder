@@ -223,7 +223,7 @@ client/proc/AdminWheelScroll(delta_y)
 		if(!admin_anim) AnimateAdminScroll()
 	return 1
 
-client/proc/AdminInvoke(ident, mob/T)
+client/proc/AdminInvoke(ident, atom/T)
 	if(!mob) return
 	if(!hascall(mob, ident))
 		mob << "<font color=red>You don't have permission for that command (or it's unavailable).</font>"
@@ -268,3 +268,269 @@ client/proc/AdminPanelAction(action)
 		if("editph")   AdminInvoke("EditPassiveHandler", T)
 		if("viewp")    AdminInvoke("ViewPassives", T)
 		if("dodmg")    AdminInvoke("AdminDoDamage", T)
+
+/atom/movable/shud/atompanelbg
+	layer = APANEL_LAYER
+	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.ATPanelStart(params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.ATPanelMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.ATPanelEnd()
+	Click(location, control, params)
+		if(params && findtext(params, "right=1"))
+			if(usr) usr.client.HideAtomPanel()
+
+// adminbtn child so it inherits the label plumbing, only the dispatch differs
+/atom/movable/shud/adminbtn/atombtn
+	Click(location, control, params)
+		if(usr && action) usr.client.AtomPanelAction(action)
+
+client
+	var/tmp
+		list/atom_panel_objs
+		list/atom_btn_objs
+		list/atom_cmd_list
+		atom/atom_panel_target
+		atom_panel_open = FALSE
+		atomp_px = 0
+		atomp_target_px = 0
+		atomp_anim = FALSE
+		atomp_tile = 1
+		atomp_xpix = 0
+		atomp_row = 1
+		atomp_poff = 0
+
+// per-target list. hascall gates by what the mob actually has
+client/proc/AtomCommandList(atom/A)
+	var/list/L = list()
+	if(mob.Admin)
+		if(hascall(mob, "Edit"))        L += list(list("a_edit",   "Edit"))
+		if(hascall(mob, "AdminRename")) L += list(list("a_rename", "Rename"))
+		if(hascall(mob, "Delete"))      L += list(list("a_delete", "Delete"))
+	if(mob.Mapper)
+		if(hascall(mob, "Mapper_Edit")) L += list(list("m_edit", "Mapper Edit"))
+		if(hascall(mob, "Mapper_Fade")) L += list(list("m_fade", "Mapper Fade"))
+		// Mapper_Delete only touches custom build objects
+		if((istype(A, /obj/Turfs) || istype(A, /obj/KatieObj)) && hascall(mob, "Mapper_Delete"))
+			L += list(list("m_delete", "Mapper Delete"))
+	// surface-profile tools (Mapper category), hascall carries the permission
+	if(hascall(mob, "Surface_Inspect"))          L += list(list("s_inspect", "Surface Inspect"))
+	if(hascall(mob, "Surface_Set_Profile"))      L += list(list("s_profile", "Set Profile"))
+	if(hascall(mob, "Surface_Set_Type_Profile")) L += list(list("s_tprofile", "Set Type Profile"))
+	if(hascall(mob, "Surface_Set_Occlusion"))    L += list(list("s_occlude", "Set Occlusion"))
+	if(isobj(A) && hascall(mob, "Surface_Set_Light")) L += list(list("s_light", "Set Light"))
+	if(isobj(A) && hascall(mob, "Surface_Set_Wind"))  L += list(list("s_wind", "Set Wind"))
+	if(hascall(mob, "Surface_Clear_Overrides"))  L += list(list("s_clear", "Clear Overrides"))
+	return L
+
+client/proc/ComputeAtomPanelAnchor()
+	// same right-margin dock as the player panel, sized for the 160px strip
+	var/list/v = splittext("[view]", "x")
+	if(v.len < 2) return 0
+	var/tw = text2num(v[1]); var/th = text2num(v[2])
+	if(!tw || !th) return 0
+	var/leftpx = tw * 32 - 44 - APANEL_W
+	atomp_tile = (leftpx - leftpx % 32) / 32 + 1
+	atomp_xpix = leftpx % 32
+	var/ptop = max(0, round((th * 32 - APANEL_H) / 2))
+	var/pbot = ptop + APANEL_H
+	var/ptiles = round(pbot / 32)
+	if(ptiles * 32 < pbot) ptiles++
+	atomp_row = max(th - ptiles + 1, 1)
+	atomp_poff = (th - atomp_row + 1) * 32 - pbot
+	return 1
+
+client/proc/ATPLoc(px, py)
+	// shares the player panel's saved drag offset so both dock at the same spot (might change this to be closer to actual right click loc)
+	return "[atomp_tile]:[atomp_xpix + px + pp_pan_x],[atomp_row]:[atomp_poff + py + pp_pan_y]"
+
+client/proc/ATPanelBounds()
+	var/list/vd = splittext("[view]", "x")
+	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
+	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
+	var/left = (atomp_tile - 1) * 32 + atomp_xpix
+	var/right = left + APANEL_W
+	var/bot = (atomp_row - 1) * 32 + atomp_poff
+	var/top = bot + APANEL_H
+	var/minx = -left
+	if(minx > 0) minx = 0
+	var/maxx = vw * 32 - right
+	if(maxx < 0) maxx = 0
+	var/miny = -bot
+	if(miny > 0) miny = 0
+	var/maxy = vh * 32 - top
+	if(maxy < 0) maxy = 0
+	return list(minx, maxx, miny, maxy)
+
+client/proc/ATPanelStart(params)
+	pp_pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	pp_pan_mx = m[1]; pp_pan_my = m[2]
+	pp_pan_ox = pp_pan_x; pp_pan_oy = pp_pan_y
+
+client/proc/ATPanelMove(params)
+	if(!atom_panel_objs) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/list/b = ATPanelBounds()
+	var/wantx = clamp(pp_pan_ox + (m[1] - pp_pan_mx), b[1], b[2])
+	var/wanty = clamp(pp_pan_oy + (m[2] - pp_pan_my), b[3], b[4])
+	var/dx = wantx - pp_pan_x
+	var/dy = wanty - pp_pan_y
+	if(!dx && !dy) return
+	pp_pan_x = wantx; pp_pan_y = wanty
+	pp_pan_dragged = TRUE
+	PanShift(atom_panel_objs, dx, dy)
+
+client/proc/ATPanelEnd()
+	if(!pp_pan_dragged) return
+	pp_pan_dragged = FALSE
+	setPref("ppPanX", pp_pan_x)
+	setPref("ppPanY", pp_pan_y)
+
+client/proc/HideAtomPanel()
+	atom_panel_open = FALSE
+	atom_panel_target = null
+	atom_btn_objs = null
+	atom_cmd_list = null
+	if(atom_panel_objs)
+		while(atom_panel_objs.len)
+			var/atom/movable/o = atom_panel_objs[atom_panel_objs.len]
+			atom_panel_objs.len--
+			screen -= o
+			del o
+		atom_panel_objs = null
+
+client/proc/ShowAtomPanel(atom/A)
+	if(!A || !mob) return
+	if(!mob.Admin && !mob.Mapper) return
+	if(!isturf(A) && !(isobj(A) && A.loc)) return   // map atoms only, screen objs keep their own handlers
+	var/list/cmds = AtomCommandList(A)
+	if(!cmds.len) return
+	HidePlayerPanel()   // shared dock. also clears the admin strip + any old atom panel
+	if(!ComputeAtomPanelAnchor()) return
+	pp_pan_x = getPref("ppPanX"); if(isnull(pp_pan_x)) pp_pan_x = 0
+	pp_pan_y = getPref("ppPanY"); if(isnull(pp_pan_y)) pp_pan_y = 0
+	var/list/pb = ATPanelBounds()
+	pp_pan_x = clamp(pp_pan_x, pb[1], pb[2])
+	pp_pan_y = clamp(pp_pan_y, pb[3], pb[4])
+	atom_panel_objs = list()
+	atom_btn_objs = list()
+	atom_cmd_list = cmds
+	atom_panel_target = A
+	atom_panel_open = TRUE
+	atomp_px = 0
+	atomp_target_px = 0
+
+	var/atom/movable/shud/atompanelbg/bg = new
+	bg.icon = 'HUD/admin_panel.png'
+	bg.screen_loc = ATPLoc(0, 0)
+	atom_panel_objs += bg
+
+	var/icon/btnicon = AdminBtnIcon(ABTN_W)
+	for(var/k = 1 to ADMIN_ROWS)
+		var/atom/movable/shud/adminbtn/atombtn/b = new
+		b.icon = btnicon
+		atom_btn_objs += b
+		atom_panel_objs += b
+
+	// interior-colored cover strips clip rows that scroll past the band edges
+	var/atom/movable/shud/tcov = new
+	tcov.icon = AdminCoverIcon(136, 30)
+	tcov.mouse_opacity = 0
+	tcov.layer = APANEL_LAYER + 0.2
+	tcov.screen_loc = ATPLoc(12, 276)
+	atom_panel_objs += tcov
+	var/atom/movable/shud/bcov = new
+	bcov.icon = AdminCoverIcon(136, 30)
+	bcov.mouse_opacity = 0
+	bcov.layer = APANEL_LAYER + 0.2
+	bcov.screen_loc = ATPLoc(12, 22)
+	atom_panel_objs += bcov
+
+	// target readout over the top cover strip so staff can see what they grabbed
+	var/atom/movable/shud/adminlbl/nm = new
+	nm.layer = APANEL_LAYER + 0.3
+	nm.maptext_width = 136
+	nm.maptext_height = 30
+	nm.screen_loc = ATPLoc(12, 278)
+	nm.maptext = "<center><span style=\"[APANEL_FONT]; color:#8be9ff\">[html_encode("[A.name]")]</span></center>"
+	atom_panel_objs += nm
+
+	RefreshAtomBtns()
+	for(var/atom/movable/o in atom_panel_objs)
+		screen += o
+	KineticEntrance(atom_panel_objs)
+
+client/proc/RefreshAtomBtns()
+	if(!atom_btn_objs || !atom_cmd_list) return
+	var/total = atom_cmd_list.len
+	var/maxpx = max(0, total * ABTN_RH - ADMIN_BAND_H)
+	atomp_px = clamp(atomp_px, 0, maxpx)
+	var/sub = atomp_px % ABTN_RH
+	var/first = (atomp_px - sub) / ABTN_RH
+	for(var/k = 1 to atom_btn_objs.len)
+		var/atom/movable/shud/adminbtn/b = atom_btn_objs[k]
+		b.screen_loc = ATPLoc(ABTN_X, ADMIN_Y0 - (k - 1) * ABTN_RH + sub)
+		var/idx = first + k
+		if(idx <= total)
+			var/list/cmd = atom_cmd_list[idx]
+			b.action = cmd[1]
+			b.alpha = 255
+			b.mouse_opacity = 2
+			b.lbl.maptext = "<center><span style=\"[APANEL_FONT]; color:#ffffff\">[cmd[2]]</span></center>"
+			b.lbl.alpha = 255
+		else
+			b.action = null
+			b.alpha = 0
+			b.mouse_opacity = 0
+			b.lbl.maptext = ""
+			b.lbl.alpha = 0
+
+client/proc/AnimateAtomScroll()
+	set waitfor = 0
+	atomp_anim = TRUE
+	while(atom_panel_open && atom_btn_objs && atomp_px != atomp_target_px)
+		var/diff = atomp_target_px - atomp_px
+		var/stepp = round(diff * 0.5)
+		if(!stepp) stepp = (diff > 0) ? 1 : -1
+		atomp_px += stepp
+		RefreshAtomBtns()
+		sleep(world.tick_lag)
+	atomp_anim = FALSE
+
+client/proc/AtomWheelScroll(delta_y)
+	if(!atom_panel_open || !atom_cmd_list || !atom_cmd_list.len) return 0
+	var/maxpx = max(0, atom_cmd_list.len * ABTN_RH - ADMIN_BAND_H)
+	if(maxpx > 0)
+		var/dir = (delta_y > 0) ? -1 : 1
+		atomp_target_px = clamp(atomp_target_px + dir * ABTN_RH, 0, maxpx)
+		if(!atomp_anim) AnimateAtomScroll()
+	return 1
+
+client/proc/AtomPanelAction(action)
+	if(!mob || (!mob.Admin && !mob.Mapper)) return
+	var/atom/T = atom_panel_target
+	if(!T) return
+	switch(action)
+		if("a_edit")   AdminInvoke("Edit", T)
+		if("a_rename") AdminInvoke("AdminRename", T)
+		if("a_delete")
+			AdminInvoke("Delete", T)
+			HideAtomPanel()
+		if("m_edit")   AdminInvoke("Mapper_Edit", T)
+		if("m_fade")   AdminInvoke("Mapper_Fade", T)
+		if("m_delete")
+			AdminInvoke("Mapper_Delete", T)
+			HideAtomPanel()
+		if("s_inspect")  AdminInvoke("Surface_Inspect", T)
+		if("s_profile")  AdminInvoke("Surface_Set_Profile", T)
+		if("s_tprofile") AdminInvoke("Surface_Set_Type_Profile", T)
+		if("s_occlude")  AdminInvoke("Surface_Set_Occlusion", T)
+		if("s_light")    AdminInvoke("Surface_Set_Light", T)
+		if("s_wind")     AdminInvoke("Surface_Set_Wind", T)
+		if("s_clear")    AdminInvoke("Surface_Clear_Overrides", T)

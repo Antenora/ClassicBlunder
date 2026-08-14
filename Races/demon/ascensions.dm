@@ -3,7 +3,7 @@ ascension
 		passives = list()
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			passives = list("HellPower" = 0.25, "AbyssMod" = 0.25, "SpiritPower" = 0.25, "HellRisen" = 0.5, "AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 2, "Juggernaut" = 1)
+			passives = list("HellPower" = 0.25, "AbyssMod" = 0.25, "SpiritPower" = 0.25, "HellRisen" = 0.5,  "TechniqueMastery" = 2, "Juggernaut" = 1)
 			anger = 0.15
 			strength = 0.25
 			endurance = 0.25
@@ -18,7 +18,7 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("HellPower" = 0.25, "AbyssMod" = 0.75, "SpiritPower" = 0.25, "HellRisen" = 0.25, "AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 1, "Juggernaut" = 0.5, "FluidForm" = 1)
+			passives = list("HellPower" = 0.25, "AbyssMod" = 0.75, "SpiritPower" = 0.25, "HellRisen" = 0.25,  "TechniqueMastery" = 1, "Juggernaut" = 0.5)
 			strength = 0.25
 			force = 0.5
 			defense = 0.25
@@ -34,7 +34,7 @@ ascension
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			choices = list("Lust" = /ascension/sub_ascension/demon/lust, "Greed" = /ascension/sub_ascension/demon/greed, "Envy" = /ascension/sub_ascension/demon/envy, "Sloth" = /ascension/sub_ascension/demon/sloth, "Gluttony" = /ascension/sub_ascension/demon/gluttony, "Wrath" = /ascension/sub_ascension/demon/wrath, "Pride" = /ascension/sub_ascension/demon/pride)
-			passives = list("HellPower" = 0.25, "AbyssMod" = 1, "SpiritPower" = 0.25, "AngerAdaptiveForce" = 0.05, "TechniqueMastery" = 1, "FluidForm" = 0.5, "Juggernaut" = 0.5)
+			passives = list("HellPower" = 0.25, "AbyssMod" = 1, "SpiritPower" = 0.25,  "TechniqueMastery" = 1, "Juggernaut" = 0.5)
 			anger = 0.2
 			strength = 0.25
 			force = 0.25
@@ -53,7 +53,7 @@ ascension
 						owner.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Racial/Demon/Object_of_Desire)
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			passives = list("HellPower" = 0.25, "AbyssMod" = 2, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "FluidForm" = 0.5)
+			passives = list("HellPower" = 0.25, "AbyssMod" = 2,  "TechniqueMastery" = 2)
 			anger = 0.15
 			strength = 0.25
 			force = 0.25

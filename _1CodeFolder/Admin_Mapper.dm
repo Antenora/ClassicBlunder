@@ -117,7 +117,7 @@ mob
 				usr.client.view="69x69"
 				usr.Bino=1
 			else
-				usr.client.view="17x17"
+				usr.client.FitViewNow()
 				usr.Bino=0
 		verb/Mapper_Delete(var/obj/o in view(10, usr))
 			set category="Mapper"

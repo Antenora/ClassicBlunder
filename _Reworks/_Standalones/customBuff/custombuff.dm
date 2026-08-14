@@ -182,15 +182,6 @@ augments -
 		if(current_passives["[input]"])
 			if(current_passives["[input]"] + theList[input][1] > theList[input][2])
 				return FALSE
-			switch(input)
-				if("CriticalChance")
-					current_passives["[input]"] += theList[input][1]
-					current_passives["CriticalDamage"] += 0.1
-					return
-				if("BlockChance")
-					current_passives["[input]"] += theList[input][1]
-					current_passives["CriticalDamage"] += 0.1
-					return
 			current_passives["[input]"] += theList[input][1]
 		else
 			current_passives["[input]"] = theList[input][1]

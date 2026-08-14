@@ -11,7 +11,7 @@
 		DamageMult=7.5
 		Scorching=2
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -29,7 +29,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=7.5
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=9
 					Distance=7
 					ActiveMessage="invokes a powerful: <font size=+1>BLAZING WHIP!</font size>"
@@ -42,7 +42,7 @@
 		ElementalClass="Fire"
 		DamageMult=6
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Scorching=1
 		Knockback=2
 		Instinct=1
@@ -59,7 +59,7 @@
 			if(!altered)
 				DamageMult=6
 				Cooldown=45
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=8
 					Distance=15
 					Area="Wide Wave"
@@ -87,13 +87,12 @@
 		ManaCost=4
 		Cooldown=45
 		Trail='Fireball.dmi'
-		TrailVariance = 32;
 		ActiveMessage="invokes: <font size=+1>DRAGON ARC!</font size>"
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=6
 				Cooldown=45
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					Speed=0.5
 					Distance=15
 					Radius=1
@@ -120,7 +119,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=8
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					Scorching=3
 					Knockback=5
 					ActiveMessage="invokes a powerful: <font size=+1>FIREBALL!</font size>"

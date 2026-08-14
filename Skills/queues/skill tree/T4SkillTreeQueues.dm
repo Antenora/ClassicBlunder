@@ -58,6 +58,7 @@ obj
 				DamageMult=10
 				AccuracyMult = 1.1
 				Duration=5
+				MenuIcon="Curbstomp"
 				KBMult=0.0001
 				PushOut=5
 				PushOutWaves=3

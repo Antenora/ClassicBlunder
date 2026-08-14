@@ -41,13 +41,12 @@ var/list/MiscTree = list()
 				src<< "You do not have a soul. You can't learn magic."
 				return
 			theCost = glob.MAGIC_BASE_COST
-			if(glob.MAGIC_INTELL_MATTERS)
-				if(passive_handler["Spiritual Tactician"])
-					if(Imagination > Intelligence)
-						int = Imagination
-				if(int < 0.5)
-					int = 0.5
-				theCost /= int // can only increase it by half, so majins dont cry
+			if(passive_handler["Spiritual Tactician"])
+				if(Imagination > Intelligence)
+					int = Imagination
+			if(int < 0.5)
+				int = 0.5
+			theCost /= int // can only increase it by half, so majins dont cry
 			if(passive_handler["Spiritual Tactician"])
 				if(Imagination < Intelligence)
 					imag = Intelligence
@@ -141,8 +140,7 @@ mob/Admin3/verb/RefundMagic(mob/p in players)
 	var/choice = input(src, "What magic?") in p.generateMagicList() + "Cancel"
 	if(choice != "Cancel")
 		var/the_cost = glob.MAGIC_BASE_COST / p.Imagination
-		if(glob.MAGIC_INTELL_MATTERS)
-			the_cost /= p.Intelligence
+		the_cost /= p.Intelligence
 		p.removeMagicKnowledge(p, choice, the_cost, 0)
 
 /mob/Admin4/verb/RefundALLmagic(mob/p in world)

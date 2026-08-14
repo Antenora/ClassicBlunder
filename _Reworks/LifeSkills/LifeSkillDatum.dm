@@ -16,10 +16,21 @@
 		if(rank >= LIFE_MAX_RANK) return -1
 		return LIFE_RANK_RPP[rank + 1]
 
+	// Int discounts Smithing/Technology rank-ups, Imag discounts, Cooking/Thaumaturgy - 15% per stat point above 1, additive, floored at 10%
+	proc/RankUpRPP(mob/M)
+		var/base = NextRPP()
+		if(base <= 0 || !M) return base
+		var/stat = 0
+		switch(id)
+			if("Smithing", "Technology") stat = M.Intelligence
+			if("Cooking", "Thaumaturgy") stat = M.Imagination
+		if(stat <= 1) return base
+		return max(1, round(base * clamp(1 - 0.15 * (stat - 1), 0.1, 1)))
+
 	proc/CanRankUp(mob/M)
 		if(rank >= LIFE_MAX_RANK) return 0
 		if(xp < NextXP()) return 0
-		if(M.GetRPPSpendable() < NextRPP()) return 0
+		if(M.GetRPPSpendable() < RankUpRPP(M)) return 0
 		return 1
 
 	proc/TryRankUp(mob/M)
@@ -29,7 +40,7 @@
 		if(xp < NextXP())
 			M << "You need [Commas(NextXP() - xp)] more [id] XP to rank up."
 			return 0
-		if(!M.SpendRPP(NextRPP(), "[id] Rank [rank + 1]", Training = 0))
+		if(!M.SpendRPP(RankUpRPP(M), "[id] Rank [rank + 1]", Training = 0))
 			return 0
 		rank++
 		M << "<b>[id] is now Rank [rank] - [Title()]!</b>"
@@ -73,7 +84,7 @@ mob/proc/AddLifeXP(skillid, base, perf = 1)
 	if(S.xp == old) return 0
 	src << "<font color=#8be9ff>+[S.xp - old] [skillid] XP ([Commas(S.xp)]/[S.rank < LIFE_MAX_RANK ? Commas(S.NextXP()) : "MAX"])</font>"
 	if(S.rank < LIFE_MAX_RANK && old < S.NextXP() && S.xp >= S.NextXP())
-		src << "<b>[skillid] rank up available! ([S.NextRPP()] RPP)</b>"
+		src << "<b>[skillid] rank up available! ([S.RankUpRPP(src)] RPP)</b>"
 	if(client) client.RefreshLifeSkillsPage()
 	return S.xp - old
 
@@ -126,3 +137,6 @@ mob/proc/GrantLifeRankPerks(skillid, rank)
 		if("Fishing")
 			if(rank >= 10)
 				src << "<b>Legend of the Deep: once a day, you hook a legendary catch.</b>"
+		if("Farming")
+			if(rank >= 10)
+				src << "<b>Green Colossus: your first planting each day is guaranteed to grow giant.</b>"

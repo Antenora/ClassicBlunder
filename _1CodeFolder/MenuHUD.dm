@@ -1,7 +1,7 @@
 // Menu HUD. CollectMenuVerbs() removes Other/Utility verbs from the verbs list
 #define MHUD_LAYER (FLY_LAYER+3)
 #define MHUD_PRESS_STEP 1
-#define MHUD_PAGE1_ROWS 5        // page 1 reserves the bottom for the Audio switch + CHAT toggles
+#define MHUD_PAGE1_ROWS 4        // page 1 reserves the bottom for the FPS row + Audio switch + CHAT toggles
 #define MHUD_FULL_ROWS 8         // later pages have no fixed footer, so they fill the panel
 #define MHUD_PAGE1_SIZE (MHUD_PAGE1_ROWS * 2)
 #define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
@@ -34,6 +34,9 @@ client/Click(atom/A, location, control, params)
 			return ..()
 		if(istype(A, /mob/Players))
 			ShowPlayerPanel(A)
+			return
+		if(isturf(A) || isobj(A))
+			ShowAtomPanel(A)   // admin/mapper turf+obj command strip, no-op for everyone else
 			return
 		return
 	return ..()
@@ -244,6 +247,35 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	if(sw.pref == "zoom2x") ApplyZoomPref()
 	AnimateOptToggle(sw, getPref(sw.pref))
 
+// FPS value in the Options menu - click the gold number to type a new one
+/atom/movable/shud/menufpsval
+	layer = MHUD_LAYER + 0.5
+	mouse_opacity = 2
+	maptext_width = 110
+	maptext_height = 20
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
+	proc/SetVal(f)
+		maptext = "<span style=\"[MHUD_FONT]; color:#ffd86b\">[f]</span>"
+	MouseEntered(location, control, params)
+		filters = filter(type="outline", size=1, color="#8be9ff")
+	MouseExited(location, control, params)
+		filters = filter(type="outline", size=1, color="#000000")
+	Click()
+		if(usr) usr.client.OptFpsClick()
+
+client/proc/OptFpsClick()
+	set waitfor = 0
+	if(menu_open != "options" || !mob) return
+	spawn()
+		var/n = mob.HUDNumPrompt("FPS (0 = DEFAULT)", mob.EffectiveClientFPS())
+		if(isnull(n) || !mob) return
+		var/f = mob.SetClientFPS(n)
+		if(menu_open != "options") return
+		for(var/atom/movable/shud/menufpsval/v in menu_entry_objs)
+			v.SetVal(f)
+
 // reuses the hat-toggle sprite set, frames 1>5
 client/proc/AnimateOptToggle(atom/movable/sw, on)
 	set waitfor = 0
@@ -408,7 +440,14 @@ client/proc/PanBounds(menu, atom/movable/panel)
 				W = ic.Width()
 				H = ic.Height()
 			bx = 302
-			by = vhpx / 2 - 150
+			by = vhpx / 2 - 200
+		if("geardesc")                      // character-menu gear popup: CMloc(120, 32+H)
+			if(panel && panel.icon)
+				var/icon/ic = icon(panel.icon)
+				W = ic.Width()
+				H = ic.Height()
+			bx = (cm_atx - 1) * 32 + 120 + cm_pan_x
+			by = (cm_aty - 1) * 32 + (CMENU_H - 32 - H) + cm_pan_y
 	var/M = 20
 	var/minx = -bx + M
 	if(minx > 0) minx = 0
@@ -423,6 +462,7 @@ client/proc/PanBounds(menu, atom/movable/panel)
 client/proc/PanelDragStart(atom/movable/panel, params)
 	pan_active = null
 	if(istype(panel, /atom/movable/shud/invdescpanel)) pan_active = "invdesc"   // the item-desc popup, by type
+	else if(istype(panel, /atom/movable/shud/cmdesc)) pan_active = "geardesc"    // character-menu gear popup
 	else if(menu_open == "options") pan_active = "options"
 	else if(inv_open) pan_active = "inventory"
 	else if(skmenu_open) pan_active = "skills"
@@ -447,6 +487,9 @@ client/proc/PanelDragStart(atom/movable/panel, params)
 		if("invdesc")
 			pan_drag_ox = desc_pan_x
 			pan_drag_oy = desc_pan_y
+		if("geardesc")
+			pan_drag_ox = gd_pan_x
+			pan_drag_oy = gd_pan_y
 	var/list/b = PanBounds(pan_active, panel)
 	pan_bminx = b[1]
 	pan_bmaxx = b[2]
@@ -474,6 +517,9 @@ client/proc/PanelDragMove(params)
 		if("invdesc")
 			cx = desc_pan_x
 			cy = desc_pan_y
+		if("geardesc")
+			cx = gd_pan_x
+			cy = gd_pan_y
 	var/dx = wantx - cx
 	var/dy = wanty - cy
 	if(!dx && !dy) return
@@ -498,6 +544,10 @@ client/proc/PanelDragMove(params)
 			desc_pan_x = wantx
 			desc_pan_y = wanty
 			PanShift(inv_desc_objs, dx, dy)
+		if("geardesc")
+			gd_pan_x = wantx
+			gd_pan_y = wanty
+			PanShift(cmenu_desc_objs, dx, dy)
 
 client/proc/PanelDragEnd()
 	if(!pan_active) return
@@ -515,6 +565,9 @@ client/proc/PanelDragEnd()
 			if("invdesc")
 				setPref("descPanX", desc_pan_x)
 				setPref("descPanY", desc_pan_y)
+			if("geardesc")
+				setPref("gdPanX", gd_pan_x)
+				setPref("gdPanY", gd_pan_y)
 	pan_active = null
 	pan_dragged = FALSE
 
@@ -677,3 +730,17 @@ client/proc/BuildOptionsExtras()
 		menu_entry_objs += sw
 		screen += sw
 		ti++
+	// FPS row takes the verb slot freed by MHUD_PAGE1_ROWS 4: row 4 at -24, above Audio.
+	// -112 is pager territory (arrows at y -122..-90) - nothing else goes down there
+	var/atom/movable/shud/menutext/fl = new
+	fl.maptext_width = 110
+	fl.maptext_height = 20
+	fl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">FPS</span>"
+	fl.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-24"
+	menu_entry_objs += fl
+	screen += fl
+	var/atom/movable/shud/menufpsval/fv = new
+	fv.SetVal(mob ? mob.EffectiveClientFPS() : CLIENT_FPS_DEFAULT)
+	fv.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-24"
+	menu_entry_objs += fv
+	screen += fv

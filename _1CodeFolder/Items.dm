@@ -121,7 +121,6 @@ obj/Items
 	var/BoundEquip//defines true owner
 	var/LegendaryItem//Does this have verbs associated with it / a Tier S?
 	var/SpiritPower//gives spirit power
-	var/Mythical//gives legendary power
 	var/HellPower //gives hell power
 	var/ShonenPower //makes you into a shonen protagonist
 	var/TrueLegend //flagged so that a bunch of legendaries don't spawn when you boot up the world...
@@ -194,7 +193,7 @@ obj/Items
 	proc/startBreaking(dmg, val, mob/owner, mob/attacker, type)
 		if(val > glob.MAX_BREAK_MULT)
 			val = glob.MAX_BREAK_MULT
-		var/breakVal = (dmg * val) * (attacker.GetOff(0.3)+(attacker.GetStr(0.3) * glob.DMG_STR_EXPONENT))
+		var/breakVal = (dmg * val) * (attacker.GetOff(0.3)+(attacker.GetStr(0.3) * 0.4))
 
 		if(breakVal > glob.MAX_BREAK_VAL)
 			breakVal = glob.MAX_BREAK_VAL
@@ -590,7 +589,7 @@ obj/Items
 					usr.AddPoison(4*src.EatToxicity)
 				if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You feel aggressive!</font>"
-					usr.Anger()
+					usr.ForceAngered()
 				else if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You grow mellow!</font>"
 					usr.AddPacifying(20*src.EatToxicity)
@@ -888,7 +887,6 @@ obj/Items/Sword
 	Health=10
 	Unobtainable=1
 	var/Conjured=0
-	var/SpiritStrike
 	var/SwordIconSelected=0
 	var/ImprovedStat
 	var/ProjectionBlade=0//Dissolves on drop
@@ -897,14 +895,12 @@ obj/Items/Sword
 	var/WeaponBreaker=0
 	var/Shearing=0//shears stuff
 	var/ElementallyInfused
-	var/SpiritSword=0
-	var/CalmAnger=0
+	var/SummonSwordVisual=0
 	var/SweepingStrike
 	var/BulletKill=0
 	var/Extend=0
 
 	// New Vars //
-	var/Steady = 0
 	// End New Vars //
 
 
@@ -913,7 +909,6 @@ obj/Items/Sword
 	var/HitSparkY
 	var/HitSparkSize=1
 	var/Purity //waifu swords
-	var/ManaGeneration=0
 	var/iconAlt=null
 	var/iconAltX=0
 	var/iconAltY=0
@@ -1023,11 +1018,10 @@ obj/Items/Sword
 				pixel_x=-16
 				pixel_y=-16
 				NoSaga=1
-				CalmAnger=1
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
-				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15, "IceHerald"=1, "Freezing"=5, "SpiritFlow"=2, "WaveDancer"=2, "RenameMana"="HEAT")
+				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalDamage"=0.15,  "Freezing"=5,  "WaveDancer"=2)
 				Destructable=0
 				ShatterTier=0
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Frost_End", "/obj/Skills/AutoHit/FrostBite", "/obj/Skills/Projectile/Sword/TougaHyoujin", "/obj/Skills/Queue/KokujinYukikaze")
@@ -1049,6 +1043,7 @@ obj/Items/Sword
 		unsheatheOffsetX = -16
 		unsheatheOffsetY = -16
 		Legendary
+			icon = 'LightSword.dmi'
 			LegendaryItem=1
 			Unobtainable=1
 			Ascended=3
@@ -1114,7 +1109,7 @@ obj/Items/Sword
 				NoSaga = 1
 				Unobtainable = 1
 				Element = "Ultima"
-				passives = list("PureDamage"=5, "PridefulRage"=1, "SpiritSword"=2, "SweepingStrike"=1, "Extend"=2)
+				passives = list("PureDamage"=5,   "SweepingStrike"=1, "Extend"=2)
 
 				// Ea can only be dismissed via the Summon Ea skill
 				AlignEquip(mob/A, dontUnEquip = FALSE)
@@ -1173,14 +1168,12 @@ obj/Items/Sword
 				pixel_x=-32
 				pixel_y=-32
 				NoSaga=1
-				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5, "RenameMana"="HEAT", "BlockChance"=20, "CriticalBlock"=0.15, "Brutalize"=2, "Deflection"=2)
+				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5,  "CriticalBlock"=0.15,  "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
-				CalmAnger=1
 				MagicSword=1
 				Extend=1
 				BulletKill=1
-				ManaGeneration=3
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Fierce_God", "/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Slaying_God", "/obj/Skills/Projectile/Sword/KokujinShippu", "/obj/Skills/Queue/KokujinYukikaze")
 
 			WeaponSoul
@@ -1462,7 +1455,6 @@ obj/Items/proc/Equip(mob/A)
 					var/confirm = input(A, "Are you sure you want to draw Dainsleif?") in list("Yes", "No")
 					if(confirm == "No") return
 					s.drawDainsleif(A)
-				spawn(-1) s.dainsleifDrain(A)
 			if(A.NeedsSecondSword() && A.EquippedSword() && !A.EquippedSecondSword())
 				var/found = 0
 				for(var/obj/Items/Sword/s in A)
@@ -2344,8 +2336,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 			if(suffix=="*Equipped*")
 				current_passives = passives
 				User.passive_handler.increaseList(passives)
-				if("RenameMana" in passives)
-					User.ManaAmount = 0
 			else if(suffix == null)
 				User.passive_handler.decreaseList(current_passives)
 

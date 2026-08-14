@@ -2,7 +2,7 @@ ascension
 	popo
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 3, "CashCow" = 1, "ManaGeneration" =1 , "QuickCast" = 1, "Holding Back" = -1, "MovementMastery" = 6)
+			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 3, "CashCow" = 1, "ManaGeneration" =1 , "QuickCast" = 1, "Holding Back" = -1)
 			on_ascension_message = "You come to understand the pecking order."
 			strength = 1
 			force = 1
@@ -17,7 +17,7 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1, "MovementMastery" = 10)
+			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1)
 			strength = 2
 			force = 2
 			endurance = 2
@@ -30,7 +30,7 @@ ascension
 				owner.Class = "The Worms Inside The Dirt"
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1, "MovementMastery" = 10)
+			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1)
 			strength = 3
 			force = 3
 			endurance = 3
@@ -43,7 +43,7 @@ ascension
 				owner.Class = "Popo's Stool"
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1, "MovementMastery" = 10)
+			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1)
 			strength = 4
 			force = 4
 			endurance = 4
@@ -56,7 +56,7 @@ ascension
 				owner.Class = "Kami"
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1, "MovementMastery" = 10)
+			passives = list("Persistence" = 1, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -1)
 			strength = 5
 			force = 5
 			endurance = 5
@@ -70,7 +70,7 @@ ascension
 				owner.Class = "Popo"
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			passives = list("Tenacity" = 20, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -5, "MovementMastery" = 20)
+			passives = list("Tenacity" = 20, "Adrenaline" = 1, "TechniqueMastery" = 1, "UnderDog" = 5, "CashCow" = 1, "ManaGeneration" =1, "QuickCast" = 1, "Holding Back" = -5)
 			strength = 6
 			force = 6
 			endurance = 6

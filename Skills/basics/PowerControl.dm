@@ -116,14 +116,17 @@ mob/proc/PowerDown()
         if(CheckActive("Ki Control"))
             for(var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC in src)
                 UseBuff(KC)
+                spawn(1) MobAuraLightRefresh(src)
                 return
         if(CheckSpecial("One Hundred Percent Power"))
             for(var/obj/Skills/Buffs/SpecialBuffs/OneHundredPercentPower/FF in src)
                 UseBuff(FF)
+                spawn(1) MobAuraLightRefresh(src)
                 return
         if(CheckSpecial("Fifth Form"))
             for(var/obj/Skills/Buffs/SpecialBuffs/FifthForm/FF in src)
                 UseBuff(FF)
+                spawn(1) MobAuraLightRefresh(src)
                 return
         if(HasKiControl() && src.PowerControl > 100)
             PowerControl=100
@@ -131,7 +134,7 @@ mob/proc/PowerDown()
             src << "You return to normal power."
             return
         // Mazoku humans are gated out here because of their racial gimmick
-        if(transActive&&!HasNoRevert()&&!isMazokuHuman()&&!PCTransToggle)
+        if(transActive&&!isMazokuHuman()&&!PCTransToggle)
             for(var/obj/Skills/Buffs/B in src)
                 if(BuffOn(B)&&B.Transform&&!B.AlwaysOn)
                     B.Trigger(src)

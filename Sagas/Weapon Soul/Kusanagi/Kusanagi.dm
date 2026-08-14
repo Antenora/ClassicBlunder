@@ -14,7 +14,7 @@ obj/Skills/AutoHit/Gale_Slash
 	NeedsSword = 1
 	Area="Circle"
 	Distance=2
-	StrOffense=1
+	StrScaling=1
 	DamageMult=2
 	ManaDrain = 2
 	Launcher=1
@@ -56,7 +56,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi
 	StrMult=1.3
 	ForMult=1.3
 	SpdMult=1.3
-	passives = list("WindRelease" = 3, "Flicker" = 2, "Pursuer" = 2, "HybridStrike" = 1)
+	passives = list("WindRelease" = 3, "Flicker" = 2, "Pursuer" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s three divine treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their imperial luster..."
@@ -66,15 +66,13 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Imperial_Heritage
 		StyleActive="Imperial Heritage"
-		passives = list("SpiritSword" = 0.5, "ManaStats" = 0.5, "ManaSteal" = 0.5) //Probably needs to scale with asc. (this was gonna be spirit sword and hybrid strike lmao)
+		passives = list(  "ManaSteal" = 0.5) //Probably needs to scale with asc. (this was gonna be spirit sword and hybrid strike lmao)
 		StyleStr=1.25
 		StyleFor=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Storms_Of_Susanoo"
 		adjust(mob/p)
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleFor = 1.05 + (0.05 * p.SagaLevel)
-			passives["SpiritSword"] = 0.5 + (0.1* p.SagaLevel)
-			passives["ManaStats"] = 0.5*p.SagaLevel
 			passives["ManaSteal"] = 0.5 + (0.1* p.SagaLevel)
 		verb/Imperial_Heritage()
 			set hidden=1
@@ -93,4 +91,4 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi
 	Divine_Rain
 		StrMult=1.3
 		ForMult=1.3
-		passives = list("Godspeed" = 1, "BlurringStrikes" = 0.5, "DualCast" = 1)
+		passives = list("Godspeed" = 1,  "DualCast" = 1)

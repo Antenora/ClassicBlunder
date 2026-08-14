@@ -1,5 +1,7 @@
 proc/log_func(x, a, b)
 	return a * (log(x) / log(10) - b )
+#define HUD_PLANE 100
+
 #define TIER_1_COST 30
 #define TIER_2_COST 60
 #define TIER_3_COST 90
@@ -58,19 +60,17 @@ proc/log_func(x, a, b)
 #define MAJIN_UNHINGED_POWER_MULT 2
 #define MAKYO /race/makyo
 #define DRAGON /race/dragon
-#define ELF /race/high_faoroan
 #define ELDRITCH /race/eldritch
 #define BEASTKIN /race/beastkin
 #define CHANGELING /race/changeling
 #define ANDROID /race/android
-#define SHINJIN /race/shinjin
 #define MAKAIOSHIN /race/makaioshin
 #define ANGEL /race/angel
 #define POPO /race/popo
 #define CELESTIAL /race/celestial
 #define NOBODY /race/nobody
-#define FAE /race/fae
 #define DEMIFIEND /race/demi_fiend
+#define KEYBLADE_MAGIC "KeybladeMagic"
 
 #define DEBUG_DAMAGE 0
 #define DEBUG_ITEM_DAMAGE 0

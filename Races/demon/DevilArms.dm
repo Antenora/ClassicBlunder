@@ -346,12 +346,10 @@
         if(!altered)
             SpecialSlot=1
             Slotless=0
-        if(passives["CriticalChance"]>30)
-            passives["CriticalChance"]=30
-            passives["CriticalDamage"]=0.15
-        if(passives["BlockChance"]>30)
-            passives["BlockChance"]=30
-            passives["CriticalBlock"]=0.15
+        if(passives["CriticalDamage"]>0.45)
+            passives["CriticalDamage"]=0.45
+        if(passives["CriticalBlock"]>0.45)
+            passives["CriticalBlock"]=0.45
         switch(selection)
             if("Sword")
                 passives["SwordAscension"] = p.AscensionsAcquired + 1
@@ -385,6 +383,10 @@
             applyDTIcons(usr)
 
     proc/checkPassiveAmt(list/theList, input)
+        if(input == "CriticalChance")
+            return passives["CriticalDamage"] + 0.05 + theList[input][1]/100 <= 0.45
+        if(input == "BlockChance")
+            return passives["CriticalBlock"] + 0.05 + theList[input][1]/100 <= 0.45
         if(passives["[input]"])
             if(passives["[input]"] + theList[input][1] > theList[input][2])
                 return FALSE
@@ -395,12 +397,10 @@
         if(checkPassiveAmt(theList, input))
             switch(input)
                 if("CriticalChance")
-                    passives["[input]"] += theList[input][1]
-                    passives["CriticalDamage"] += 0.05
+                    passives["CriticalDamage"] += 0.05 + theList[input][1]/100
                     return
                 if("BlockChance")
-                    passives["[input]"] += theList[input][1]
-                    passives["CriticalBlock"] += 0.05
+                    passives["CriticalBlock"] += 0.05 + theList[input][1]/100
                     return
             passives["[input]"] += theList[input][1]
         else

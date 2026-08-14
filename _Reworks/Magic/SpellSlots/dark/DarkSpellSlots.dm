@@ -9,7 +9,7 @@
 		Distance=3
 		DamageMult=12
 		SpecialAttack=1
-		StrOffense=1
+		StrScaling=1
 		Instinct=1
 		CanBeDodged=1
 		CanBeBlocked=0
@@ -38,7 +38,7 @@
 		DamageMult=4
 		Rounds=3
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Instinct=1
 		Distance=12
 		ManaCost=5

@@ -41,9 +41,10 @@ var/list/AQ_ICON16 = list()
 /proc/AqIcon16(obj/Skills/T)
 	if(!T) return null
 	var/f = SkillMenuIcon(T)
-	var/key = "[f]"
+	var/st = SkillMenuIconState(T)
+	var/key = "[f]#[st]"
 	if(!AQ_ICON16[key])
-		var/icon/I = icon(f)
+		var/icon/I = icon(f, st)
 		I.Scale(16, 16)
 		AQ_ICON16[key] = I
 	return AQ_ICON16[key]
@@ -995,6 +996,7 @@ client/proc/ShowAqConfirm(datum/aqentry/E)
 	if(T)
 		var/atom/movable/shud/aqpic/ic = new
 		ic.icon = SkillMenuIcon(T)
+		ic.icon_state = SkillMenuIconState(T)
 		ic.layer = AQ_LAYER + 1.1
 		ic.screen_loc = AQloc(200 + 96, 102 + 14, 32)
 		aq_confirm_objs += ic

@@ -16,7 +16,8 @@ globalTracker/var/FrenzyNerf = 1
 /mob/proc/AddFrenzy(Value)
 	if(Stasis) return
 	if(Value <= 0) return
-	Value /= 1 + GetDebuffResistance()
+	Value /= 1 + GetStatusResist()
+	Value /= 1 + GetMentalResist()
 	Value *= (1 - (Frenzy / glob.DEBUFF_STACK_RESISTANCE))
 	Frenzy += Value
 	if(Frenzy > glob.DEBUFF_STACK_MAX) Frenzy = glob.DEBUFF_STACK_MAX
@@ -30,7 +31,7 @@ globalTracker/var/FrenzyNerf = 1
 	if(IsDarkDragonPlayer()) return
 	if(Frenzy <= 0) return
 	var/base = clamp(Frenzy / glob.BASE_DEBUFF_REDUCTION_DIVISOR, glob.BASE_DEBUFF_REDUCTION_DIVISOR_LOWER, glob.BASE_DEBUFF_REDUCTION_DIVISOR_UPPER)
-	var/reduction = base  * (1 + (GetDebuffResistance() / 4));
+	var/reduction = base  * (1 + (GetStatusResist() / 4));
 	if(Frenzy) Frenzy = clamp(Frenzy - reduction, 0, 100);
 
 /mob/proc/ClearHostileFrenzyFromMeditate()

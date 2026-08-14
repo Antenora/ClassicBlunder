@@ -277,7 +277,7 @@
 	SpdMult = 1.5
 	OffMult = 1.5
 	DefMult = 1.5
-	passives = list("BleedHit" = 1, "BulletKill" = 1, "SpiritSword" = 2, "HybridStrike" = 3, "SpiritFlow" = 4, "Duelist" = 5, "CriticalChance" = 25, "CriticalDamage" = 0.25)
+	passives = list("BleedHit" = 1, "BulletKill" = 1,    "Duelist" = 5, "CriticalDamage" = 0.25)
 	ActiveMessage = "murmurs quietly... \"Shukei: Hakuteiken.\""
 	OffMessage = "lets the white glow of Hakuteiken fade..."
 

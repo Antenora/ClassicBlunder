@@ -27,7 +27,7 @@
 	defAdd = -0.25
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/4, 0.25, 1), "Brutalize" = 0.5 + (asc/2))
+		passives = list("Godspeed" = 1 + (asc/2))
 		Cooldown = 90 - (10 *p.AscensionsAcquired)
 		TimerLimit = 30 + (6 *p.AscensionsAcquired)
 	verb/Ram_Form()
@@ -40,7 +40,7 @@
 	forAdd = 0.25
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("StunningStrike" = 2.5+asc, "ComboMaster" = 1,  "CheapShot" = asc/2, "Instinct" = asc)
+		passives = list("StunningStrike" = 2.5+asc, "ComboMaster" = 1,  "CheapShot" = asc/2)
 		Cooldown = 90 - (10 *p.AscensionsAcquired)
 		TimerLimit = 30 + (6 *p.AscensionsAcquired)
 	verb/Bear_Form()
@@ -52,7 +52,7 @@
 	defAdd = -0.5
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Harden" = 2 + asc/2,  "HardenedFrame" = 1, "DeathField" = 2+asc*2)
+		passives = list("Harden" = 2 + asc/2,   "DeathField" = 2+asc*2)
 		Cooldown = 90 - (10 *p.AscensionsAcquired)
 		TimerLimit = 30 + (6 *p.AscensionsAcquired)
 	verb/Turtle_Form()

@@ -7,8 +7,8 @@ mob/Players/proc/ExamineInflol(mob/p)
 mob/Click()
 	if(usr.client.macros.IsPressed("Alt") && usr.Observing)
 		usr?:ExamineInflol(src)
-	if(glob.CANT_CLICK_INVS && !usr.Admin)
-		if((!glob.ADMIN_INVIS_ONLY && (src.invisibility >= usr)) || src.AdminInviso)
+	if(!usr.Admin)
+		if((src.invisibility >= usr) || src.AdminInviso)
 			return
 	if(src.HiddenInShadow && usr != src && !usr.Admin)
 		return
@@ -101,7 +101,6 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 					who << output("<font color=#99FF99><b>(Telepath)</b></font>- From  <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> :[blah]", "output")
 					who << output("<font color=#99FF99><b>(Telepath)</b></font>- From  <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> :[blah]", "icchat")
 
-		if(src.isRace(SHINJIN)) return;//no peeking, I guess
 		for(var/mob/Players/m in hearers(25,src))
 			if(m==src || m == who) continue;//if src, you've already seen your own message. if who, you've seen it directly from src
 

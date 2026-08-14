@@ -54,7 +54,7 @@
     NoAttackLock=1
     Area="Circle"
     DamageMult = 0.001
-    StrOffense = 1
+    StrScaling = 1
     Distance = 12
     Stunner = 5
     GuardBreak = 1
@@ -117,8 +117,8 @@
     ComboMaster=1
     Area="Circle"
     Size = 1
-    StrOffense = 1
-    EndDefense = 0.75
+    StrScaling = 1
+    EndEffectiveness = 0.75
     Distance = 1
     Rounds = 2
     Knockback = 1
@@ -137,7 +137,6 @@
     Launcher = 3
     DamageMult = 1
     EnergyCost = 15
-    AntiSunyata=1
     FollowUp = "/obj/Skills/AutoHit/Haki/Galaxy_Impact_Follow"
     HitSparkIcon = 'Icons/HitWind.dmi'
     HitSparkSize = 2
@@ -160,7 +159,7 @@
     Icon = "Tornado.dmi"
     IconX=-8
     IconY=-8
-    StrOffense = 1
+    StrScaling = 1
     Distance = 10
     Rounds = 1
     Knockback = 1
@@ -178,7 +177,7 @@
     EnergyCost = 15
     Cooldown = 160
     MultiHit = 5
-    EndRate = 0.6
+    EndEffectiveness = 0.6
     FadeOut = 5
     Slashing = 1
     Knockback = 3
@@ -194,8 +193,8 @@
     HomingCharge=1
     HomingDelay=1
     Devour = 1
-    StrRate = 1.5
-    ForRate = 1.25
+    StrScaling = 1.5
+    ForScaling = 1.25
     Explode=3
     ExplodeIcon='Black_Flash_Hitspark_1.dmi'
     IconLock='BlackGetsuga.dmi'

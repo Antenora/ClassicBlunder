@@ -64,7 +64,7 @@
                 Distance = 2 + (asc)
                 Rounds = 1
                 DamageMult = 0.5 + (asc * 1)
-                EndDefense = 0.5
+                EndEffectiveness = 0.5
             if("Water")
                 ElementalClass="Water"
                 Distance = 10 + (asc * 2)

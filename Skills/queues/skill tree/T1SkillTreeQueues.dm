@@ -10,6 +10,7 @@ obj
 				AccuracyMult = 1.1
 				Dominator=2
 				Crippling=5
+				MenuIcon="Ikkotsu"
 				Duration=5
 				KBAdd=10
 				Launcher=1
@@ -29,6 +30,7 @@ obj
 				AccuracyMult = 1.15
 				Launcher=3
 				Duration=6
+				MenuIcon="Showstopper"
 				KBMult=0.00001
 				Cooldown=30
 				UnarmedOnly=1
@@ -43,6 +45,7 @@ obj
 				Copyable=2
 				ActiveMessage="punches with precisely articulated strikes to create whirlwind-like pull!"
 				name="Dempsey Roll"
+				MenuIcon="DempseyRoll"
 				DamageMult=0.33
 				AccuracyMult = 1.15
 				Determinator=1
@@ -70,6 +73,7 @@ obj
 				ActiveMessage="strikes with cyclone power!"
 				name="Corkscrew Blow"
 				DamageMult=0.75
+				MenuIcon="CorkscrewBlow"
 				AccuracyMult = 1.15
 				KBAdd=4
 				Duration=10
@@ -103,6 +107,7 @@ obj
 			Kinshasa
 				SkillCost=TIER_1_COST
 				Copyable=2
+				MenuIcon="Kinshasa"
 				AlwaysAnnounceCooldown = 1
 				name="Kinshasa"//Skill name displayed in message.
 				HitMessage="builds up speed and knees their target in the face!!"
@@ -141,6 +146,7 @@ obj
 				HitMessage="launches a shattering front kick with their heel!"
 				DamageMult=1.8
 				Shattering = 12
+				MenuIcon="PistonKick"
 				HarderTheyFall=0.5
 				AccuracyMult = 1.1
 				Opener=3
@@ -158,6 +164,7 @@ obj
 				DamageMult=1.5
 				AccuracyMult = 1.15
 				Duration=5
+				MenuIcon="Cripple"
 				Cooldown=30
 				Crippling=50
 				SpeedStrike=2
@@ -175,6 +182,7 @@ obj
 				AccuracyMult = 1.15
 				Instinct=2
 				Grapple=1
+				MenuIcon="Pin"
 				KBMult=0.001
 				Warp=3
 				SweepStrike=1

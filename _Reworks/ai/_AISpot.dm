@@ -220,7 +220,6 @@ obj
 					p.ElementalOffense=mi.force_offense
 				var/legen = powerModifier == 1 ? 100 : mi.legend_power
 				if(prob(legen))
-					p.passive_handler.Increase("Mythical", (p.Potential/100))
 
 					p.EndMod*=1.5
 					p.DefMod*=1.5

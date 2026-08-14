@@ -4,3 +4,12 @@ mob/proc/tierUpSaga(path)
 sagaTierUpMessages
     var/list/messages = list()
 
+sagaInfo
+    var/list/perLevelPassives = list()
+    var/list/specificPassives = list()
+    var/list/choicePassives = list()
+    var/list/chosenChoices = list()
+    var/list/skillsPerTier = list()
+    var/list/choicesPaths = list()
+    var/list/pathsPicked = list()
+

@@ -62,9 +62,6 @@ mob/var
 
 	//SHARINGAN
 	SharinganEvolution
-	//FORCE
-	DarkSide
-	LightSide
 	//JINCHUURIKI
 	JinchuuType
 
@@ -147,7 +144,7 @@ mob/var
 
 	//SHINOBI
 	ShinobiBranch
-	list/ChakraAffinities          // Chakra Natures this Shinobi has an affinity for 
+	list/ChakraAffinities          // Chakra Natures this Shinobi has an affinity for
 	ChakraSpecialization           // nature chosen at the one-time SL3 specialization offer, locks out further affinities
 	tmp/ChakraAffinityPending = 0  // affinity prompts in flight (roll or RPP purchase)
 
@@ -158,14 +155,17 @@ mob/var
 	JutsuSL6Picks = 0   // max 1, tier cap <=4
 	JutsuSL7Picks = 0   // max 1, tier cap <=5
 
+	// Sorcerer
+	CursedTechnique
+
 
 mob/Admin3/verb
 	SagaManagement(mob/Players/P in players)
 		set category="Admin"
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo", "Hero","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Weapon Soul", "Unlimited Blade Works","Force")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
 		if(P.Saga)
-			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi")
+			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||"Sorcerer")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
 				Level7=2  // Devil Summoner has 8 tiers
@@ -206,14 +206,6 @@ mob/Admin3/verb
 					s.Trigger(P, TRUE)
 			var/list/passiveGain=list();
 			switch(selection)
-				if("Hero")
-					P.Saga="Hero"
-					P.SagaLevel=1
-					HeroLegend = input(P, "What legend are you going to follow?") in glob.Heroes
-					var/path = "/obj/Skills/Buffs/ActiveBuffs/Hero/[HeroLegend]Buff"
-					var/obj/Skills/Buffs/ActiveBuffs/Hero/h = new path
-					P.AddSkill(h)
-					tierUpSaga("Hero")
 				if("King of Courage")
 					P.Saga="King of Courage"
 					P.SagaLevel=1
@@ -225,15 +217,7 @@ mob/Admin3/verb
 					P.passive_handler.Increase("KiControlMastery")
 					P.KiControlMastery+=1
 					if(!P.ClothBronze)
-						if(!glob.infConstellations)
-							var/list/openConstellations = glob.getOpen("BronzeConstellation")
-							if(length(openConstellations) < 1)
-								src<< "There are no more constellations available."
-								return
-							P.ClothBronze=input(P, "What cloth are you going!?") in openConstellations
-							glob.takeLimited("BronzeConstellation", P.ClothBronze)
-						else
-							P.ClothBronze=input(P, "What cloth are you going!?") in glob.BronzeConstellationNames
+						P.ClothBronze=input(P, "What cloth are you going!?") in glob.BronzeConstellationNames
 					var/path = "/obj/Skills/Buffs/SpecialBuffs/Saint_Cloth/Bronze_Cloth/[P.ClothBronze]_Cloth"
 					P.AddSkill(new path)
 					P<<"Your destiny is defined by the stars of [P.ClothBronze]; you have become a champion of Gods: <b>Saint</b>!"
@@ -367,6 +351,9 @@ mob/Admin3/verb
 				if("Shinobi")
 					P.gainShinobi()
 
+//				if("Sorcerer")
+//					P.gainSorcerer()
+
 				if("Kamui")
 					P.SagaLevel=1
 					P.Saga="Kamui"
@@ -395,10 +382,7 @@ mob/Admin3/verb
 					else if(P.KamuiType=="Junketsu")
 						P.contents += new/obj/Items/Sword/Heavy/Secret_Sword_Bakuzan
 						P.passive_handler.Increase("CriticalDamage", 0.1)
-						P.passive_handler.Increase("CriticalChance", 10)
 						P.passive_handler.Increase("CriticalBlock", 0.1)
-						P.passive_handler.Increase("BlockChance", 10)
-						P.passive_handler.Increase("LikeWater", 2)
 						P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Resolve)
 						P<<"With each movement forward towards the realization of your ideals, your resolve strengthens..."
 
@@ -429,10 +413,6 @@ mob/Admin3/verb
 							P.OffAscension+=0.5
 						if("Defense")
 							P.DefAscension+=0.5
-				if("Force")
-					src.ChoseSideOfForce()
-					P.Saga="Force"
-					P.SagaLevel=1
 				if("Path of a Hero: Rebirth")
 					P.SagaLevel=1
 					P.Saga="Path of a Hero: Rebirth"
@@ -460,6 +440,7 @@ mob/Admin3/verb
 						if("Rainbow")
 							P.RebirthHeroType="Rainbow"
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero)
+							P.AddSkill(new/obj/Skills/AutoHit/Jarona)
 				//	tierUpSaga("Rebirth")
 
 				if("Devil Summoner")
@@ -927,8 +908,6 @@ mob
 				src.SagaAdminPermission=0
 
 			switch(src.Saga)
-				if("Hero")
-					tierUpSaga("Hero")
 				if("Path of a Hero: Rebirth")
 					switch(SagaLevel)
 						if(2)
@@ -969,6 +948,7 @@ mob
 										src<< "You are now the Cyan Hero of Soul, a cage for a human SOUL. Your ACT meter slows, but as it builds, a certain power wells up within you..."
 										src.passive_handler.Increase("Determination")
 										src.AddSkill(new/obj/Skills/Utility/SoulShift)
+										src.AddSkill(new/obj/Skills/AutoHit/X_Slash)
 										src<<"You unlock the Red SOUL color, boosting your crit rate as you gain ACT!"
 										src<<"You unlock the Yellow SOUL color, granting your melee attacks projectiles!!"
 										src.AddSkill(new/obj/Skills/Buffs/Rebirth/Spookysword)
@@ -985,10 +965,12 @@ mob
 										src.RebirthHeroType="Prismatic"
 										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One. (WIP)"
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
+										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
+										src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Fight_or_Flight)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
@@ -1016,6 +998,7 @@ mob
 								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
 								src<< "Your Chaos Buster has been upgraded!"
 								src<< "You can access your Hyperdeath State earlier!"
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Mountain_King)
 								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
@@ -1027,7 +1010,7 @@ mob
 							if(src.RebirthHeroType=="Purple")
 								src<<"<font color='#9BFD4D'><b>I see a story hidden in your eyes.</font></b>" //i literally extracted the mod files for gerson's rude buster to make sure this color was as accurate as possible. praise me.
 								src<<"<font color='#9BFD4D'><b>Burnin' bright...</font></b>"
-								src.passive_handler.Increase("HolyMod" = 3)
+								src.passive_handler.Increase("HolyMod", 3)
 								src.AddSkill(new/obj/Skills/Projectile/Burning_Black)
 								src<<"<font color='#9BFD4D'><b>Burnin' black...</font></b>"
 								src.AddSkill(new/obj/Skills/AutoHit/Burning_Up_Everything)
@@ -1082,6 +1065,7 @@ mob
 								src<< "It's not just those you're carrying on your back, are they?"
 								src<< "buff goes here"
 								src<< "You can access your Hyperdeath State earlier!"
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Dreamlike_Savior)
 								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
@@ -1099,6 +1083,7 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/All_Hail_The_Crownless_King)
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
 							if(src.RebirthHeroType=="Prismatic")
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "The Hearts of the World resonate with Yours."
 								src<< "final buff goes here wooo"
 								src<< "You can access your Hyperdeath State earlier!"
@@ -1196,7 +1181,6 @@ mob
 									// passive_handler.Increase("Desperation")
 									passive_handler.Increase("WeaponBreaker")
 								if("Firm")
-									passive_handler.Increase("DebuffResistance",0.5)
 									passive_handler.Increase("PureReduction",2)
 						if(5)
 							Adaptation += 0.5
@@ -1209,7 +1193,6 @@ mob
 								if("Strong")
 									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WillofAlaya)
 								if("Firm")
-									passive_handler.Increase("SpiritFlow",0.5)
 									passive_handler.Increase("DeathField", 2)
 									passive_handler.Increase("VoidField", 2)
 
@@ -1876,8 +1859,6 @@ mob/Admin3/verb
 			P.passive_handler["Pursuer"] = 0
 			P.passive_handler["Godspeed"] = 0
 			P.passive_handler["AttackSpeed"] = 0
-			P.passive_handler["Brutalize"] = 0
-			P.passive_handler["MovementMastery"] = 0
 			P.passive_handler["TechniqueMastery"] = 0
 			P.passive_handler["AsuraStrike"] = 0
 			P.passive_handler["FavoredPrey"] = null;

@@ -123,6 +123,50 @@ proc/LifeOreSeedWeight(D)
 	emerald     { name = "Emerald";      MaterialClass = "Emerald";     icon_state = "gem_emerald";     ore_id = "emerald";     tier = 4 }
 	obsidian    { name = "Obsidian";     MaterialClass = "Obsidian";    icon_state = "gem_obsidian";    ore_id = "obsidian";    tier = 5 }
 	voidcrystal { name = "Void Crystal"; MaterialClass = "VoidCrystal"; icon_state = "gem_voidcrystal"; ore_id = "voidcrystal"; tier = 5 }
+	shards      { name = "Gem Shards";   MaterialClass = "GemShards";   icon = 'Icons/LifeSkills/GemShards.dmi'; icon_state = "shards"; tier = 1 }
+
+/obj/Items/Geode
+	name = "Geode"
+	icon = 'Icons/LifeSkills/Geode.dmi'
+	icon_state = "geode"
+	Savable = 1
+	Grabbable = 1
+	Cost = 0
+	desc = "A heavy, unassuming stone. Something glitters in the cracks - click it to break it open."
+	var/tier = 1
+	Click()
+		if(!usr || loc != usr) return
+		var/rank = usr.LifeRank("Mining")
+		usr << "You brace the geode and crack it open..."
+		var/roll = rand(1, 100)
+		if(roll <= 10)
+			usr.OppGrant("Mining", /obj/Items/Material/stone, 3, QUAL_POOR)
+			usr << "Rock. It's rock all the way through."
+		else if(roll <= 60)
+			var/gid = LifeRandomGemFor(tier)
+			var/datum/ore_def/g = gid ? LifeOreDef(gid) : null
+			if(g)
+				usr << "<font color=#b46bff>A [g.name] glitters inside!</font>"
+				usr.OppGrant("Mining", g.yield_type, 1, min(prob(30) ? QUAL_GOOD : QUAL_NORMAL, LifeQualityCap(rank)))
+		else if(roll <= 80)
+			var/oid = LifeRandomOreFor(tier)
+			var/datum/ore_def/o = oid ? LifeOreDef(oid) : null
+			if(o)
+				usr << "<font color=#78eb78>It's packed with ore!</font>"
+				usr.OppGrant("Mining", o.yield_type, 5, QUAL_NORMAL)
+		else if(roll <= 95)
+			usr << "<font color=#b46bff>A twin pocket - two gems!</font>"
+			for(var/i = 1 to 2)
+				var/gid = LifeRandomGemFor(tier)
+				var/datum/ore_def/g = gid ? LifeOreDef(gid) : null
+				if(g) usr.OppGrant("Mining", g.yield_type, 1, min(QUAL_NORMAL, LifeQualityCap(rank)))
+		else
+			var/gid = LifeRandomGemFor(min(tier + 1, 5))
+			var/datum/ore_def/g = gid ? LifeOreDef(gid) : null
+			if(g)
+				usr << "<font color=#ffd86b><b>A pristine core - flawless!</b></font>"
+				usr.OppGrant("Mining", g.yield_type, 1, min(QUAL_EPIC, LifeQualityCap(rank)))
+		del src
 
 /obj/Items/Material/clay
 	name = "Clay"

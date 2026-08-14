@@ -11,8 +11,7 @@
 	form_aura_x = -28
 	form_icon_2_icon = 'ultimate_elec.dmi'
 	unlock_potential = 65
-	passives = list("Mystic" = 1, "PUSpike" = 65, "Godspeed" = 1.5, "Adaptation" = 4, \
-						"Brutalize" = 2, "LikeWater" = 6, "BuffMastery" = 2)
+	passives = list("Mystic" = 1, "PUSpike" = 65, "Godspeed" = 1.5)
 	proc/shockwaves(mob/p)
 		set waitfor = 0
 		for(var/wav=25, wav>0, wav--)
@@ -47,8 +46,8 @@
 	// one of these was holding it up
 	mastery_boons(mob/user)
 		// apply scaling passives here
-		passives = list("Mystic" = 1,"MovementMastery" = (user.AscensionsAcquired*1.5), "Godspeed" = 1.5, "Adaptation" = 4, \
-						"Brutalize" = 1.5, "LikeWater" = 6 + round(user.Potential/25, 1), "SaiyanPower3"=0.35)
+		passives = list("Mystic" = 1, "Godspeed" = 1.5,  \
+						 "SaiyanPower3"=0.35)
 		speedadd = 1 //these are additive. base is 1, so 0.3=1.3x
 		enduranceadd = 1
 		offenseadd = 1
@@ -91,13 +90,13 @@
 	form_aura_icon = 'Super Amazing Beast Aura.dmi'
 	form_aura_x = -32
 	unlock_potential = 90
-	passives = list("Hidden Potential" = 1, "Mystic" = 1, "PUSpike" = 1, "BuffMastery" = 1, \
-					"LikeWater" = 1, "Brutalize"= 1, "Momentum" = 1, "Overwhelming" = 1,"Heavy Attack" = "Beast Mode")
+	passives = list("Hidden Potential" = 1, "Mystic" = 1, "PUSpike" = 1,  \
+					"Momentum" = 1, "Overwhelming" = 1,"Heavy Attack" = "Beast")
 	// Rupture applies a debuff that causes bleed damage, overwhelming applies a debuff that increases damage dealt
 	mastery_boons(mob/user)
 		var/pot = user.Potential
-		passives = list("Hidden Potential" = 1, "Mystic" = 1, "PUSpike" = round(pot) + round(mastery/2, 50), "BuffMastery" = 9, \
-					"LikeWater" = 8 + round(pot/25, 1), "Brutalize" = 4, "Momentum" = 10, "Overwhelming" = glob.BEAST_OVERHWELMING_STATIC,"Heavy Attack" = "Beast", \
+		passives = list("Hidden Potential" = 1, "Mystic" = 1, "PUSpike" = round(pot) + round(mastery/2, 50),  \
+					"Momentum" = 10, "Overwhelming" = glob.BEAST_OVERHWELMING_STATIC,"Heavy Attack" = "Beast", \
 					"TechniqueMastery" = 5)
 		unlock_potential=90
 	transform_animation(mob/user)
@@ -115,22 +114,21 @@
 	form_aura_icon = 'SSBGlow.dmi'
 	form_aura_x = -32
 	form_aura_y = -32
-	passives = list("GodKi" = 0.25, "Instinct" = 4, "Brutalize" = 1.5, "Steady" = 3,  "BuffMastery" = 4, "MovementMastery" = 3, \
+	passives = list("GodKi" = 0.25,      \
 					"PureDamage" = 2, "PureReduction" = 1, "EnergyLeak" = 3)
 	strength = 1.5
 	speed = 1.5
 	force = 1.5
 	unlock_potential = 80
 	mastery_boons(mob/user)
-		var/pot = user.Potential
 		if(mastery<50)
-			passives = list("GodKi" = 0.25, "Instinct" = 4, "Brutalize" = 1.5 + (pot/50), "Steady" = 2 + round(pot/25),  "BuffMastery" = 5, "MovementMastery" = 3 + (pot/50), \
+			passives = list("GodKi" = 0.25,      \
 					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 3)
 		if(mastery>=50)
-			passives = list("GodKi" = 0.5, "Instinct" = 4, "Brutalize" = 1.5 + (pot/50), "Steady" = 2 + round(pot/25),  "BuffMastery" = 5, "MovementMastery" = 3 + (pot/50), \
+			passives = list("GodKi" = 0.5,      \
 					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 2)
 		if(mastery==100)
-			passives = list("GodKi" = 0.75, "Instinct" = 4, "Brutalize" = 1.5 + (pot/50), "Steady" = 2 + round(pot/25),  "BuffMastery" = 5, "MovementMastery" = 3 + (pot/50), \
+			passives = list("GodKi" = 0.75,      \
 					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 1)
 
 		strength = 1.5

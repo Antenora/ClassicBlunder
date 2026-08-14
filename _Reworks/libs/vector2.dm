@@ -261,13 +261,23 @@ atom/movable
 			
 atom
 	var/standing = FALSE
+	var/tmp/gfx_depth_owned_layer
 	New()
 		..()
 		if(standing)
 			UpdateStandingLayer()
 	proc
 		UpdateStandingLayer()
-			layer = FLY_LAYER - LowerY() / world.maxy*TileHeight * 1e-3
+			if(!standing || !glob || !glob.DEPTH_SORTING) return
+			//flight/cutscene layers own the atom til they put it back
+			if(ismob(src) && abs(layer - MOB_LAYER) > 0.03)
+				if(isnull(gfx_depth_owned_layer) || abs(layer - gfx_depth_owned_layer) > 0.001) return
+			var/world_h = max(1, world.maxy * TileHeight)
+			var/depth = clamp(LowerY() / world_h, 0, 1)
+			var/base = ismob(src) ? MOB_LAYER : initial(layer)
+			//south over north in a tiny band so legacy layer offsets stay outside it
+			layer = base + (0.009 - depth * 0.018) + depth_sort_bias + GfxElevationLayerBias(src)
+			gfx_depth_owned_layer = layer
 		/*
 			Width of the atom, in pixels.
 		*/

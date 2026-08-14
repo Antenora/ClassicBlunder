@@ -17,7 +17,7 @@
 		Copyable=0
 		StyleEnd=1.15
 		StyleStr=1.45
-		passives = list("DoubleStrike" = 3, "Fa Jin" = 2, "Momentum" = 2, "HardStyle"=1, "Instinct"=2)
+		passives = list("DoubleStrike" = 3, "Fa Jin" = 2, "Momentum" = 2, "HardStyle"=1)
 		StyleActive="Futae no Kiwami"
 		Finisher="/obj/Skills/Queue/Finisher/Mastery_of_Two_Layers"
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Wing_Chun_Style" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Flying_Thunder_God",\
@@ -26,7 +26,7 @@
 			set hidden=1
 			src.Trigger(usr)
 	Mantis_And_Crane_Style
-		passives = list("Acupuncture" = 2, "Interception" = 2, "Flow" = 2, "SoftStyle" = 1, "FluidForm" = 1)
+		passives = list( "Interception" = 2, "SoftStyle" = 1)
 		StyleDef=1.45
 		StyleEnd=1.45
 		StyleStr=0.85
@@ -44,7 +44,7 @@
 				StyleEnd=0.85
 				StyleStr=1.45
 				StyleOff=1.45
-				passives = list("Fa Jin" = 3, "Momentum" = 2,"Fury" = 1, "BlurringStrikes" = 0.5, "Instinct" = 2)
+				passives = list("Fa Jin" = 3, "Momentum" = 2,"Fury" = 1)
 				Finisher="/obj/Skills/Queue/Finisher/Teiga" // Ryukoha grapple follow up
 			else
 				StyleActive = "Mantis Style"
@@ -52,7 +52,7 @@
 				StyleEnd=1.45
 				StyleStr=0.85
 				StyleOff=0.85
-				passives = list("Acupuncture" = 2, "Interception" = 2, "Flow" = 2, "SoftStyle" = 1, "FluidForm" = 1)
+				passives = list( "Interception" = 2, "SoftStyle" = 1)
 				Finisher="/obj/Skills/Queue/Finisher/Zetsuei" // Shitenketsu, follow up
 		verb/Swap_Stance()
 			set category="Skills"
@@ -66,8 +66,8 @@
 			set hidden=1
 			src.Trigger(usr)
 	Long_Fist_Style
-		passives = list("Fa Jin" = 2, "Gum Gum" = 1, "Acupuncture" = 1.5, "Flow" = 1, \
-						"Momentum" = 1.5, "Harden" = 1.5, "Pressure" = 1)
+		passives = list("Fa Jin" = 2, "Gum Gum" = 1, \
+						"Momentum" = 1.5, "Harden" = 1.5)
 		StyleEnd=1.3
 		StyleOff=1.15
 		StyleDef=1.15

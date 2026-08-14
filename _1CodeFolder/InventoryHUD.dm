@@ -474,7 +474,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 
 	var/atom/movable/shud/invdescpanel/P = new
 	P.icon = 'HUD/inv_desc.png'
-	P.screen_loc = "[InvXLoc(152)],CENTER:-150"   // docked to the right of the book
+	P.screen_loc = "[InvXLoc(152)],CENTER:-200"   // docked to the right of the book
 	inv_desc_objs += P
 
 	var/atom/movable/shud/orbpart/pic = new
@@ -486,7 +486,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 	pic.transform = matrix(2, 0, 0, 0, 2, 0) // 2x, scales about its center
 	pic.layer = MINV_LAYER + 0.6
 	pic.mouse_opacity = 0 // clicks fall through to the panel so right-click closes
-	pic.screen_loc = "[InvXLoc(191)],CENTER:96"
+	pic.screen_loc = "[InvXLoc(203)],CENTER:146"
 	inv_desc_objs += pic
 
 	// Update_Description is per-subtype not on base /obj/Items, reach it via the ':' operator like the item code does
@@ -528,9 +528,9 @@ client/proc/ShowItemDesc(obj/Items/I)
 	var/atom/movable/shud/invtext/T = new
 	T.layer = MINV_LAYER + 0.6
 	T.mouse_opacity = 0 // clicks fall through to the panel
-	T.maptext_width = 176
-	T.maptext_height = 152
-	T.screen_loc = "[InvXLoc(164)],CENTER:-70"   // low enough that long descriptions clear the icon
+	T.maptext_width = 200
+	T.maptext_height = 300
+	T.screen_loc = "[InvXLoc(164)],CENTER:-190"   // low enough that long descriptions clear the icon
 	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats][mark]</span>"
 	inv_desc_objs += T
 
@@ -540,14 +540,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		cb.item = I
 		cb.maptext_width = 100
 		cb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9874; Customize</span>"
-		cb.screen_loc = "[InvXLoc(252)],CENTER:112"
+		cb.screen_loc = "[InvXLoc(252)],CENTER:162"
 		inv_desc_objs += cb
 	if(CanBeHat(I))
 		var/atom/movable/shud/invtext/htl = new
 		htl.layer = MINV_LAYER + 0.6
 		htl.mouse_opacity = 0
 		htl.maptext_width = 90
-		htl.screen_loc = "[InvXLoc(252)],CENTER:90"
+		htl.screen_loc = "[InvXLoc(252)],CENTER:140"
 		htl.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">Toggle Hat</span>"
 		inv_desc_objs += htl
 		var/atom/movable/shud/hattoggle/htsw = new
@@ -555,14 +555,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		htsw.ctx = "inv"
 		htsw.layer = MINV_LAYER + 0.7
 		htsw.icon = I.IsHat ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-		htsw.screen_loc = "[InvXLoc(315)],CENTER:92"
+		htsw.screen_loc = "[InvXLoc(315)],CENTER:142"
 		inv_desc_objs += htsw
 	if(IsCustomizableItem(I))
 		var/atom/movable/shud/invrenamebtn/rb = new
 		rb.item = I
 		rb.maptext_width = 100
 		rb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9998; Rename</span>"
-		rb.screen_loc = "[InvXLoc(252)],CENTER:68"
+		rb.screen_loc = "[InvXLoc(252)],CENTER:118"
 		inv_desc_objs += rb
 
 	// clamp the saved popup offset to the current view, then apply it

@@ -10,7 +10,6 @@
     CrippleAffected = 1
     OffMult = 0.8
     DefMult = 0.8
-    passives = list("Flow" = -1, "FluidForm" = -1)
     ActiveMessage = "resists most of the effects of the King's Will!"
     OffMessage = "regains their will to fight!"
 
@@ -20,7 +19,7 @@
     DefMult = 0.8
     StrMult = 0.8
     CrippleAffected = 1
-    passives = list("PureReduction" = -1, "Flow" = -1, "FluidForm" = -1)
+    passives = list("PureReduction" = -1)
     ActiveMessage = "is shaken by the King's Will!"
     OffMessage = "regains their will to fight!"
 

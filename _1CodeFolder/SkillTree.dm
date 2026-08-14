@@ -504,7 +504,7 @@ mob/Players/verb
 
 
 
-/globalTracker/var/list/KI_CONTROL_PASSIVES = list("Flicker", "Pursuer", "Instinct", )
+/globalTracker/var/list/KI_CONTROL_PASSIVES = list("Flicker", "Pursuer", )
 
 
 mob/proc

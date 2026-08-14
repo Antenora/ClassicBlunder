@@ -13,18 +13,19 @@ proc
 			return
 		if(m.CheckSlotless("Great Ape"))
 			amount *= 0.75
-		if(m.HasMythical() > 0.25 || m.passive_handler.Get("Juggernaut"))
-			var/mod = (m.HasMythical() * 0.5) + m.passive_handler.Get("Juggernaut") * 0.25
+		if(m.passive_handler.Get("Juggernaut"))
+			var/mod = m.passive_handler.Get("Juggernaut") * 0.25
 			amount /= 1 + mod
 
-		if(m.HasDebuffResistance())
-			amount/=(m.GetDebuffResistance()*0.75)
-		amount *= m.getControlResistValue();
+		amount/=1+m.GetStatusResist()*0.75 // old form divided by (resist*0.75) raw - tiny resists INFLATED stun
 		if(m.ContinuousAttacking)
 			for(var/obj/Skills/Projectile/p in m.contents)
 				if(p.ContinuousOn && !p.StormFall)
 					m.UseProjectile(p)
 				continue
+		if(m.Guarding) m.GuardStop()	//hard cc drops guard
+		if(m.ChargingEnergy) m.ChargeStop()
+		m.AngerCCEvent()
 		var/Stun_Amount=world.time+(amount*10)
 		if(m.Stunned)
 			m.Stunned+=(amount * 4);
@@ -49,7 +50,7 @@ proc
 				mob.overlays-=S
 				mob.Stunned=0
 				mob.overlays-='IceCoffin.dmi'
-				var/mod = (mob.HasMythical() * 0.5) + mob.passive_handler.Get("Juggernaut") * 0.25
+				var/mod = mob.passive_handler.Get("Juggernaut") * 0.25
 				mob.StunImmune=world.time+(glob.STUN_IMMUNE_TIMER*(1+mod))
 				mob << "You can't be stunned for another [glob.STUN_IMMUNE_TIMER*(1+mod)/10]"
 				if(mob.passive_handler["Shellshocked"])
@@ -57,6 +58,8 @@ proc
 					mob << "You are no longer Shellshocked..."
 				if(mob.passive_handler["Staggered!"])
 					mob.passive_handler.Set("Staggered!", 0)
+				if(!mob.Launched)
+					mob.cc_combo_hits = 0
 			else
 				return 1
 		if(mob.ReflectedFrozen)
@@ -75,9 +78,11 @@ proc
 				mob.overlays-=S
 				mob.Stunned=0
 				mob.overlays-='IceCoffin.dmi'
-				var/mod = (mob.HasMythical() * 0.5) + mob.passive_handler.Get("Juggernaut") * 0.25
+				var/mod = mob.passive_handler.Get("Juggernaut") * 0.25
 				mob.StunImmune=world.time+(glob.STUN_IMMUNE_TIMER*(1+mod))
 				mob << "You can't be stunned for another [glob.STUN_IMMUNE_TIMER*(1+mod)/10]"
+				if(!mob.Launched)
+					mob.cc_combo_hits = 0
 		if(mob.ReflectedFrozen)
 			mob.ReflectedFrozen=0
 	StunImmuneCheck(mob/mob)

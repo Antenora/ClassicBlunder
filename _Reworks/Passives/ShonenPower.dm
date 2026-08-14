@@ -57,17 +57,69 @@ Hell Power does what this does but instead of health it's fatigue
 
 proc/ShonenPowerCheck(mob/player)
 	if(!player) return FALSE
-	if(player.Health>25) return FALSE
+	if(player.Health >= glob.SHONEN_RAMP_START) return FALSE
+	if(player.Health < 1) return FALSE
 	if(!player.HasShonenPower())
 		return FALSE
-	if(player.Health>=1 && player.Health<=25)
-		return player.passive_handler.Get("ShonenPower")
+	return player.passive_handler.Get("ShonenPower")
 
 
 /mob/proc/getSPPower()
 	var/totalSP = ShonenPowerCheck(src)
 	if(totalSP)
-		var/spPow = 0.5 * totalSP
-		var/healthRatio = Health/100
-		return round(spPow * healthRatio,0.1)*10
+		var/f = clamp((glob.SHONEN_RAMP_START - Health) / (glob.SHONEN_RAMP_START - glob.SHONEN_RAMP_FLOOR), 0, 1)
+		return totalSP * f * glob.SHONEN_POWER_SCALE
 
+/strikeHook/shonenCounter
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if(defender.passive_handler["Shonen"]&&defender.Target)
+			if(defender.Health < defender.Target.Health && attacker.Health < 50 + 5 * defender.AscensionsAcquired)
+				defender.ShonenCounter+=(val * (defender.AscensionsAcquired/40)) * 1 + (defender.passive_handler["Shonen"]/5)
+				if(defender.ShonenCounter>=glob.SHONENCOUNTERLIMIT)
+					defender.ShonenCounter=1
+					if(!defender.ShonenAnnounce)
+						defender << "This is your...Moment! (No App)"
+						var/obj/Skills/Buffs/s = defender.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Deus_Ex_Machina)
+						if(!defender.BuffOn(s))
+							s.Trigger(defender, TRUE)
+						defender.ShonenAnnounce=1
+		if(attacker.passive_handler["Shonen"]&&defender==attacker.Target)
+			if(attacker.Health < attacker.Target.Health && attacker.Health < 50 + 5 * attacker.AscensionsAcquired)
+				attacker.ShonenCounter+=(val * (attacker.AscensionsAcquired/40)) * 1 + (attacker.passive_handler["Shonen"]/5)
+				if(attacker.ShonenCounter>=glob.SHONENCOUNTERLIMIT)
+					attacker.ShonenCounter=1
+					if(!attacker.ShonenAnnounce)
+						attacker << "This is your...Moment! (No App)"
+						var/obj/Skills/Buffs/s = attacker.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Deus_Ex_Machina)
+						if(!attacker.BuffOn(s))
+							s.Trigger(attacker, TRUE)
+						attacker.ShonenAnnounce=1
+
+/strikeHook/adaptationCounter
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/val = S.dealt
+		if(!(defender.HasAdaptation()&&attacker==defender.Target||attacker.HasAdaptation()&&defender==attacker.Target))
+			return
+		if(defender.HasAdaptation()&&!defender.CheckSlotless("Great Ape"))
+			defender.AdaptationTarget=attacker
+			defender.AdaptationCounter+=( val*(defender.AscensionsAcquired/40) )
+			if(defender.AdaptationCounter>=1)
+				defender.AdaptationCounter=1
+				if(!defender.AdaptationAnnounce)
+					defender << "<b>You've adapted to your target's style!</b>"
+					defender.AdaptationAnnounce=1
+		if(attacker.HasAdaptation()&&!attacker.CheckSlotless("Great Ape"))
+			attacker.AdaptationTarget=defender
+			attacker.AdaptationCounter+=(val*(attacker.AscensionsAcquired/40))
+			if(attacker.AdaptationCounter>=1)
+				attacker.AdaptationCounter=1
+				if(!attacker.AdaptationAnnounce)
+					attacker << "<b>You've adapted to your target's style!</b>"
+					attacker.AdaptationAnnounce=1

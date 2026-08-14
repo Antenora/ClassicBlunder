@@ -10,10 +10,17 @@ proc/CelestialBodiesLoop()
 	while(1)
 		celestialObjectTicks--
 		if(celestialObjectTicks==0)
-			CallMoon()
+			MoonRise() //waits for nightfall, then runs the moon. The admin force stays immediate
 			// CallStar()
 			celestialObjectTicks = Hour(12)/10
 		sleep(10)
+
+//natural moon only
+proc/MoonRise()
+	set waitfor = 0
+	set background = 1
+	MoonWaitForNight()
+	CallMoon()
 
 mob
 	proc
@@ -87,6 +94,7 @@ mob
 proc/CallMoon(var/OnlyZ=null)
 	set waitfor=0
 	set background=1
+	MoonEventBegin()
 	for(var/mob/Players/P in players)
 		if(OnlyZ)
 			if(P.z==OnlyZ)

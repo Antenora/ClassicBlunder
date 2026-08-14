@@ -36,27 +36,19 @@
                     return TRUE
         return FALSE
 
-    proc/exponential_scaling(datum/stat/s)
-        var/per_point = glob.progress.STAT_PER_POINT
-        var/denom_base = glob.progress.DENOMINATOR_BASE
-        var/denom_mod = glob.progress.DENOMINATOR_MOD
-        if(s.base <= 0.25)
-            denom_mod *= (s.base / glob.progress.STAT_DIMINISHING_THRESHOLD)
-        return round(s.base + (per_point * (s.invested/(denom_base+denom_mod * s.invested))), 0.01)
-
     proc/calc_stat(datum/stat/stat, custom_buff = FALSE)
         var/base = stat.base
+   //     if(custom_buff)
+   //         return base + (invested * 0.05 )
+        return base
+    proc/calc_invested(datum/stat/stat, custom_buff = FALSE)
         var/invested = stat.invested
-        if(custom_buff)
-            return base + (invested * 0.05 )
-        else
-            if(glob.progress.STAT_DIMINISHING_RETURNS && base + (invested *glob.progress.STAT_PER_POINT) > glob.progress.STAT_DIMINISHING_THRESHOLD)
-                return exponential_scaling(stat)
-        return base + (invested * glob.progress.STAT_PER_POINT)
+        return invested//(invested * glob.progress.STAT_PER_POINT)
 
 /datum/stat
     var/base = 0
     var/invested = 0
+    var/totalinvested
 
     proc/operator+=(n)
         invested+=n

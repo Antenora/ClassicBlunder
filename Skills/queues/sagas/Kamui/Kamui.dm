@@ -24,7 +24,7 @@ obj
 			Sword
 				Senjin_Drive
 					DamageMult=5
-					StrRate=1
+					StrScaling=1
 					ThrowMult=2
 					TriggerMessage="stabs their numerous blades into their opponent and spins before tossing"
 					Effect="Shockwave"

@@ -29,8 +29,6 @@ obj
 						DelayTime=2
 						src.Rounds=5
 						DamageMult=2
-						MaxCharges=3
-						Charges=3
 						ChargeRefresh=15
 				verb/Sonic_Blade()
 					set category="Skills"
@@ -315,7 +313,7 @@ obj
 					HitSparkSize=5
 					HitSparkCount=10
 					HitSparkDispersion=1
-					ForOffense=1
+					ForScaling=1
 					AdaptRate=1
 					SpecialAttack=1
 					WindupMessage="invokes: <font size=+1>ULTIMA!!!</font size>"
@@ -378,8 +376,8 @@ obj
 					ArmorIcon='LancelotArmor.dmi'
 					ArmorClass="Light"
 					passives = list()
-					var/list/SwordPassives = list("BlurringStrikes" = 1, "Brutalize" = 2, "TechniqueMastery" = 3)
-					var/list/ShieldPassives = list("CallousedHands" = 0.15, "Juggernaut" = 1)
+					var/list/SwordPassives = list(  "TechniqueMastery" = 3)
+					var/list/ShieldPassives = list( "Juggernaut" = 1)
 					var/list/StaffPassives = list("ManaGeneration" = 1, "QuickCast" = 1)
 					adjust(mob/p)
 						var/ImaginaryBonus=0

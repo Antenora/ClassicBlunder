@@ -35,8 +35,8 @@
 var/list/randomPassives = list("PureDamage", 
 "Godspeed", "Void", "NoWhiff", "HolyMod", "AbyssMod",
 "VenomImmune", "CounterMaster", "TechniqueMastery",
-"HybridStrike", "SpiritStrike", "Extend", "MovementMastery", "UnlimitedPU",
-"CriticalBlock", "Unstoppable", "DebuffResistance")
+"Extend",
+"CriticalBlock", "Unstoppable")
 mob/var/futureDiaryLevel = 0 // maxes out at 4.
 mob/var/whichDiary = 0 /// 1, 2, 3, 4 look for above...
 
@@ -119,66 +119,66 @@ mob/proc/levelUpDiary(mob/M)
 				if(1)
 					switch(usr.whichDiary)
 						if(1)
-							passives = list("Desperation" = 2, "Flow" = 1)
+							passives = list("Desperation" = 2)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							DefMult = 1.4
 						if(2)
-							passives = list("Flow" = 2, "Omnipotent" = 1)
+							passives = list("Omnipotent" = 1)
 							OffMult = 1.3
 							SpdMult = 1.1
 						if(3)
-							passives = list("MortalStrike" = 1, "MaimStrike" = 2, "Maki" = 1)
+							passives = list(  "Maki" = 1)
 							StrMult = 1.3
 							OffMult = 1
 						if(4)
-							passives = list("HolyMod" = 1, "PUSpike" = 5, "Instinct" = 1)
+							passives = list("HolyMod" = 1, "PUSpike" = 5)
 							DefMult = 1.3 
 							EndMult = 1.2
 				if(2)
 					switch(usr.whichDiary)
 						if(1)
-							passives = list("Desperation" = 3, "Flow" = 2)
+							passives = list("Desperation" = 3)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							DefMult = 1.3
 						if(2)
-							passives = list("KillerInstinct" = 0.5 , "Flow" = 3, "Omnipotent" = 1)
+							passives = list("Omnipotent" = 1)
 							OffMult = 1.3
 							SpdMult = 1.1
 						if(3)
-							passives = list("MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list(  "Maki" = 1)
 							StrMult = 1.3
 							OffMult = 1
 						if(4)
-							passives = list("HolyMod" = 2, "PUSpike" = 5, "Instinct" = 3)
+							passives = list("HolyMod" = 2, "PUSpike" = 5)
 							DefMult = 1.3 
 							EndMult = 1.2
 
 				if(3)
 					switch(usr.whichDiary)
 						if(1)
-							passives = list("Desperation" = 3, "Flow" = 2)
+							passives = list("Desperation" = 3)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)							
 							DefMult = 1.2
 						if(2)
-							passives = list("Desperation" = 1, "KillerInstinct" = 2 , "Flow" = 4, "Omnipotent" = 1)
+							passives = list("Desperation" = 1, "Omnipotent" = 1)
 							OffMult = 1.4
 							SpdMult = 1.2
 						if(3)
-							passives = list("VoidField" = 2, "MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list("VoidField" = 2,   "Maki" = 1)
 							StrMult = 1.4
 							OffMult = 1
 						if(4)
-							passives = list("HolyMod" = 4, "PUSpike" = 5, "Instinct" = 3)
+							passives = list("HolyMod" = 4, "PUSpike" = 5)
 							DefMult = 1.4 
 							EndMult = 1.2
 				if(4)
 					switch(usr.whichDiary)
 						if(1)
-							passives = list("GodKi" = 0.5,"Desperation" = 3, "Flow" = 2)
+							passives = list("GodKi" = 0.5,"Desperation" = 3)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							passives += list(getPassivesFutureDiary(usr) = 1)
@@ -187,15 +187,15 @@ mob/proc/levelUpDiary(mob/M)
 							passives += list(getPassivesFutureDiary(usr) = 1)
 							DefMult = 1.1
 						if(2)
-							passives = list("GodKi" = 1, "Desperation" = 1, "KillerInstinct" = 3 , "Flow" = 4, "Omnipotent" = 1)
+							passives = list("GodKi" = 1, "Desperation" = 1, "Omnipotent" = 1)
 							OffMult = 1.6
 							SpdMult = 1.4
 						if(3)
-							passives = list("GodKi" = 1, "DeathField" = 4, "VoidField" = 3, "MortalStrike" = 2, "MaimStrike" = 4, "Maki" = 1)
+							passives = list("GodKi" = 1, "DeathField" = 4, "VoidField" = 3,   "Maki" = 1)
 							StrMult = 1.5
 							OffMult = 1
 						if(4)
-							passives = list("HolyMod" = 4, "PUSpike" = 5, "Instinct" = 3)
+							passives = list("HolyMod" = 4, "PUSpike" = 5)
 							DefMult = 1.6 
 							EndMult = 1.3
 		src.Trigger(usr)
@@ -221,7 +221,7 @@ mob/proc/levelUpDiary(mob/M)
 	Area = "Circle"
 	BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Afraid"
 	Cooldown = 60
-	StrOffense = 1
+	StrScaling = 1
 	DamageMult = 1.5
 	verb/Murder_Gaze()
 		set category = "Skills"
@@ -234,8 +234,8 @@ mob/proc/levelUpDiary(mob/M)
 	Distance=20
 	Paralyzing=2
 	Cooldown=90
-	StrRate=1.5
-	ForRate=0
+	StrScaling=1.5
+	ForScaling=0
 	IconLock='Icons/Blasts/Arrow - Bolt.dmi'
 	verb/Chaos_Shot()
 		set category="Skills"
@@ -255,7 +255,7 @@ mob/proc/levelUpDiary(mob/M)
 	NeedsHealth = 50
 	TooMuchHealth = 75
 	SureDodgeTimerLimit	= 5
-	passives = list("Godspeed" = 1, "Flow" = 1)
+	passives = list("Godspeed" = 1)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/FutureDiary/FutureRead
@@ -267,7 +267,7 @@ mob/proc/levelUpDiary(mob/M)
 	NeedsHealth = 40
 	TooMuchHealth = 80
 	SureDodgeTimerLimit = 50
-	passives = list("Flow" = 5)
+	passives = list()
 
 
 
@@ -362,7 +362,7 @@ mob/proc/levelUpDiary(mob/M)
 // 	Area="Strike"
 // 	NeedsSword = 1
 // 	EnergyCost = 15	
-// 	StrOffense = 1
+// 	StrScaling = 1
 // 	DamageMult = 4
 // 	MaimStrike = 4
 // 	Instinct = 1
@@ -407,8 +407,8 @@ mob/proc/levelUpDiary(mob/M)
 // 	FireFromSelf=1
 // 	FireFromEnemy=0
 // 	Explode=3
-// 	StrRate=1
-// 	ForRate=1
+// 	StrScaling=1
+// 	ForScaling=1
 // 	Dodgeable=-1
 // 	Deflectable=-1
 // 	HolyMod=10

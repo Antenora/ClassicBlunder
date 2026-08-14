@@ -53,9 +53,7 @@ racials
 		UNDYINGRAGE_HEAL = 2.5
 		UNDYINGRAGE_DURATION = 3
 		COWLSHIELDVAL = 0.025
-		DEVIL_ARM_STAT_MULTS = FALSE
 		DEMON_NAME = "Shatterspawn"
-		REVEALDEMONONTRUEFORM = FALSE
 		DEMON_ERODE_DEBUFF_INTENSITY = 0.005
 		DEMON_DOT_DEBUFF_INTENSITY = 6
 		DEMON_RESOURCE_DEBUFF_INTENSITY = 0.2
@@ -64,9 +62,6 @@ racials
 		SSJ_BASE_CUT_OFF = 10
 		SSJ_BASE_DRAIN = 0.1
 		SSJ_CUT_OFF_PER_MAST = 0.25
-		SSJ_MIN_MASTERY_GAIN = 0.01
-		SSJ_MAX_MASTERY_GAIN = 0.02
-		AUTO_SSJ_MASTERY = FALSE
 		GRITSUBTRACT = 0.5
 		GRITMULT = 5
 		GRITDIVISOR = 1000
@@ -95,7 +90,6 @@ progressTracker
 //TODO add a proc that increases total rpp/pot daily, ensuring nothing goes over the rpp limit
 
 		Era = 1
-		SpawnLoc=1 //1 for midgar, 2 for space colony
 		FourthFateEndwipe
 
 //economy
@@ -123,11 +117,8 @@ progressTracker
 		RPPBaseMult = 1
 		MinRPP = 0
 
-		STAT_DIMINISHING_RETURNS = TRUE
-		STAT_DIMINISHING_THRESHOLD = 1.25
 		STAT_PER_POINT = 0.25
-		DENOMINATOR_BASE = 1
-		DENOMINATOR_MOD = 0.1
+		INVESTED_STAT_PER_POINT = 0.1
 // time
 		WipeStart = 0
 		DaysOfWipe = 1
@@ -183,27 +174,12 @@ globalTracker
 		LIVE_TESTING = FALSE
 		TESTER_WHITE_LIST = list("Digi-Daisuke","RevealingFortune","Zamas2","Niezan", "Etro", "AMajin", "Redsarge", "Gogeto25",\
  "Tilthour", "Sakata Gintoki San", "Hellbante", "FoxMagnus")
-		ALLOW_OTHER_NATIONALITIES = FALSE
-		ALLOW_SECOND_NATIONALITIES = FALSE
 // TARGETING
-		LIMIT_CLICKS = TRUE
-		CLICK_SAME_Z_FORCE = TRUE
-		MAX_CLICK_DISTANCE = 60
-		CANT_CLICK_INVS = TRUE
-		ADMIN_INVIS_ONLY = FALSE
-		BREAK_TARGET = TRUE
-		BREAK_TARGET_ON_Z_CHANGE = TRUE
-		BREAK_TARGET_ON_DIST = FALSE
-		DEVILARMDEMONONLY = FALSE
 		ROOTS_DURATION = 2
-		AISCLASHLOCKSMOVEMENT = TRUE
-		OUROMACROLOCK = 0
 		AVALON_COOLDOWN = 300
 
 //INTIM
 		INTIMRATIO = 500
-		NEWINTIMCALC = FALSE
-		INTIM_REDUCES_DEBUFFS
 		SHONENCOUNTERLIMIT = 1
 //Wipe Specific
 		list/GUILD_RANKINGS = list("Aegis" = 1, "Crimson Dawn" = 2, "Golden Circle" = 3, "Black Ifrit" = 5, "Revenants" = 6)
@@ -212,13 +188,10 @@ globalTracker
 		list/currentlyVoidingLoc = list(150,150,1)
 		VoidsAllowed = 1
 		VoidChance = 78
-		VoidMaim = TRUE
 		VoidCut = 10
 		VOID_MESSAGE = ""
 		VOID_TIME = 15 MINUTES
-		SHOW_VOID_ROLL = 1
 
-		IGNORE_NOT_LOGGEDIN_LOGINS = TRUE
 
 		list/Spawns = list()
 
@@ -243,7 +216,6 @@ globalTracker
 		CONQ_HAKI_RACES = list(HUMAN, DEMON, SAIYAN, NAMEKIAN, MAJIN, MAKYO, DRAGON, BEASTKIN, CHANGELING)
 		EXTRA_CONQ_HAKI_POWER = 1.5
 		CONQ_HAKI_CHANCE = 3
-		MONEYORFRAGMENTS = 1 // 1 = fragments, 0 = cash
 		REBELHEARTMOD=200
 		MYTHICALPUREREDMULT = 3
 		SATSUICHANCE = 10
@@ -257,8 +229,7 @@ globalTracker
 		WorldDamageMult = 1.5
 		WorldDefaultAcc = 50
 		WorldWhiffRate = 25
-		celestialObjectTicks
-		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, DRAGON, ELF, SAIYAN, ANGEL, MAKAIOSHIN)
+		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, DRAGON, SAIYAN, ANGEL, MAKAIOSHIN)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
 		T3_STYLES_GODKI_VALUE = 0.15//Would recommend moving this to 0.25
 		T3_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
@@ -275,7 +246,6 @@ globalTracker
 		CUSTOMBUFFPASSIVETOTAL = 2
 		TRIPLEHELIX_MAX_NEG_HP = -50
 		GODKI_DIFF_MULT = 1 //For figuring out less swingy values for GodKi DMG/RES. 1 is what we're used to, so try 0.5 or something. Doesn't affect accuracy.
-		MAOUKI_DIFF_MULT = 1 //what the fuck do you think it does
 // combat
 		HIT_SCAN_DELAY = 5
 		OVERHWELMING_BASE_END_NERF = 0.05
@@ -286,24 +256,21 @@ globalTracker
 		RUPTURE_BASE_DAMAGE = 2
 		SUNYATA_BASE_CHANCE = 5
 		INTERCEPTION_BASE_CHANCE = 10
-		INTERCEPTION_NEGATES_DAMAGE = 1
 
-		MOMENTUM_PROCS_OFF_DAMAGE = 1
 
 		HALF_SWORD_ARMOR_REDUCTION = 1
 		HALF_SWORD_UNARMOURED_DIVISOR = 10
-		IAI_CHANCE = 100
-		IAI_BASE_DAMAGE = 0.15
-		PARRY_CHANCE = 100 //TODO: come back here
-		PARRY_REDUCTION_MULT = 2
+		IAI_CHANCE_CAP = 80
+		IAI_CHANCE_CURVE = 2
+		IAI_DR_MULT = 0.5
+		PARRY_CHANCE_CAP = 80
+		PARRY_CHANCE_CURVE = 2
 		PARRY_BASE_DMG = 0.3
 		MAX_CHAIN_PARRY = 5
 		PERSISTENCE_CHANCE_SELF = 6
 		PERSISTENCE_CHANCE = 3
-		PERSISTENCE_DIVIDES_DAMAGE = TRUE
 		PRESISTENCE_DIVISOR_MIN = 1
 		PRESISTENCE_DIVISOR_MAX = 8
-		PERSISTENCE_NEGATES_DAMAGE = TRUE
 
 		MAX_PERSISTENCE_CALCULATED = 8
 
@@ -312,15 +279,24 @@ globalTracker
 		TENACITY_VAI_MIN = 2
 		TENACITY_VAI_MAX = 14
 
+		ANGER_RUSH_CAP = 50
+		ANGER_RUSH_ALLY_DOWN = 15
+		ANGER_RUSH_DEFIANCE = 3
+		ANGER_RUSH_MANA = 0.5
+		ANGER_RUSH_FINISHER = 10
+		ANGER_RUSH_CC = 6
+		ANGER_RUSH_GRAB_BREAK = 4
+		ANGER_CC_WINDOW = 150
+		ANGER_ENDLESS_RATE = 0.02
+
 		ELEMENTAL_DIVIDER = 1
 
-		UNDERDOG_DMG_MULTIPLER = 1
-		UNDERDOG_RED_MULTIPLER = 1
+		DESPERATION_ATK_RATE = 1.5 //trueMult per (UnderDog+Det) point at full Injury, x the flavor ratio
+		DESPERATION_DEF_RATE = 0.75
+		DESPERATION_CAP = 5 //the whole system tops out at +-50% damage swing
 
-		GOD_KI_AFFECTS_DAMAGE = TRUE
 		GOD_KI_CAP = 1.5
 
-		KOB_GETS_STATS_LOW_LIFE = 1
 
 		MAX_CRIPPLE_MULT = 2
 		CRIPPLE_DIVISOR = 100
@@ -344,8 +320,6 @@ globalTracker
 		TECHNIQUE_MASTERY_LIMIT = 2.5 // 1+(techmastery/10) is formula. 2.5 = 15 techmastery before no more does nothing at effectiveness = 1
 		FAMILIAR_SKILL_CD = 500
 		FAMILIAR_CD_REDUCTION = 30
-		AURASPELLONATTACK = 1
-		SKILL_BRANCH_LOCK = 1
 		FATIGUEDIVIDE = 10
 
 		Q_DIVISOR = 10
@@ -354,8 +328,6 @@ globalTracker
 		DECIDERDMG = 0.2
 		SPEEDSTRIKEDIVISOR = 5
 		SWEEPSTRIKEDIVISOR = 5
-		SWEEPINGSTRIKE_GIANTSWINGS_CONVERT_TOGGLE = 1
-		LIGHT_ATTACK_SPEED_DMG_ENABLED = 1
 		LIGHT_ATTACK_SPEED_DMG_EXPONENT = 0.4
 		LIGHT_ATTACK_SPEED_DMG_LOWER = 0.5
 		LIGHT_ATTACK_SPEED_DMG_UPPER = 3
@@ -365,7 +337,6 @@ globalTracker
 		ZANZO_SPEED_LOWEST_CLAMP = 0.25
 
 
-		USE_SPEED_IN_ZANZO_RECHARGE = 1
 
 
 		ZANZO_FLICKER_DIVISOR = 5
@@ -384,6 +355,14 @@ globalTracker
 		SHATTER_INTENSITY = 1
 		SHOCK_INTENSITY = 1
 		POISON_INTENSITY = 1
+		OFF_DEBUFF_RATE = 0.015 //precision pays: attacker Off scales applied debuff stacks
+		OFF_DEBUFF_PROC_RATE = 0.3 //and nudges elemental proc rolls
+		DEF_DEBUFF_RESIST_RATE = 0.01 //Def is the baseline status res - lags Off on purpose, typed resists stack on top
+		DEF_DEBUFF_PROC_RESIST_RATE = 0.2
+		STR_PHYS_RESIST_RATE = 0.005 //muscle shrugs off Cripple/Shear/Bleed/Shatter
+		FOR_MENTAL_RESIST_RATE = 0.005 //will shrugs off Confuse/Charm/Doom/Frenzy
+		STR_KB_RATE = 0.004 //muscle sends harder and stays planted
+		FOR_BLAST_DENSITY = 0.2 //dense blasts resist deflection (shooter For -> deflect contest)
 		VENOMBLINDMULT = 10
 		CHAOS_CHANCE = 25
 		BASE_DEBUFF_REDUCTION_DIVISOR = 100
@@ -403,9 +382,7 @@ globalTracker
 		GetUpVar = 1 // how fast u get up ?
 		MAGIC_BASE_COST = 100
 		TECH_BASE_COST = 30
-		MAGIC_INTELL_MATTERS = TRUE
 		WorldPUDrain = 1
-		DMG_CALC_2 = TRUE
 // global mults
 		WHILEWARPINGNERF = 10
 		GATES_PUSPIKE_BASE = 6
@@ -415,7 +392,7 @@ globalTracker
 		ATTACK_DELAY_EXPONENT=0.6
 		ATTACK_DELAY_DIVISOR=12
 		ATTACK_DELAY_MAX = 20
-		ATTACK_DELAY_MIN = 2
+		ATTACK_DELAY_MIN = 1.5 //was 2 - floor-touch moves from Spd~20 to Spd~32 so the real band differentiates
 		SPEED_FORCE_TRUEMULT = 2
 		SPEED_FORCE_DELAYMULT = 4
 		CYBERIZESAGAS = list("King of Braves")
@@ -432,7 +409,6 @@ globalTracker
 		OXYGEN_DRAIN_DIVISOR = 2
 
 		CAN_BE_SLOWED_GODSPEED = 6
-		SAGAINNOVATION = TRUE
 		FA_JIN_BASE_DMG_ADD = 1.75
 		FA_JIN_BASE_KB_ADD = 3
 		FA_JIN_BASE_COOLDOWN = 250
@@ -440,13 +416,13 @@ globalTracker
 		BASE_WUJUDAMAGE = 0.015
 		GLOBAL_BEAM_DAMAGE_DIVISOR = 35
 		GLOBAL_QUEUE_DAMAGE = 0.8
-		GLOBAL_MELEE_MULT = 0.9
+		GIANT_FORM_DMG_MULT = 0.7778	//what the old GiantForm roll clamp worked out to
+		GLOBAL_MELEE_MULT = 0.54	//0.9 with the old 0.6 roll baked in
 		GLOBAL_POWER_MULT = 1
 		GLOBAL_ITEM_DAMAGE_MULT = 1
-		EXPONENTIAL_PROJ_DAMAGE = FALSE
 		PROJ_DAMAGE_MULT = 0.8
 		MMO_PROJ_DAMAGE_MULT = 1 // Specifically for attacks that use a telegraphed marker.
-		AUTOHIT_GLOBAL_DAMAGE = 0.8
+		AUTOHIT_GLOBAL_DAMAGE = 0.48	//0.8 with the old 0.6 roll baked in
 		SOFT_STYLE_RATIO = 0.2
 		SOFT_STYLE_DMG_BOON_DIVISOR = 2
 		HARD_STYLE_DMG_BOON_DIVISOR = 3
@@ -463,7 +439,6 @@ globalTracker
 		MAX_POWER_DIFF = 5
 		AUTOHIT_GRAB_NERF = 0.5
 		PARTY_DAMAGE_NERF = 0.8
-		MOD_AFTER_ACC = TRUE
 		MANA_STATS_BASE_BOON = 0.15
 		MANA_STATS_EFF_MULT = 2
 		MANA_STATS_MAX_BOON = 2
@@ -479,36 +454,20 @@ globalTracker
 		ATOMIZERRATE = 0.1
 		GLADIATOR_DISARM_MAX = 30
 		DISARM_TIMER = 5
-		BASE_FLOW_PROB = 5
-		BASE_FLUIDFORM_PROB = 5
-		BASE_BACKTRACK_PROB = 8
 		NEO_DODGERATE = 10
 		BOUNCE_REDUCTION = 0.25
 		LOWEST_ACC = 25
 		MACROCHECKTIME = 3
-		CUCK_MACROSTRINGS = TRUE
-		CONSTANT_DAMAGE_EXPONENT = 4
 		STYLE_EFFECT_CD = 400
 		BLINDINGVENOM_CD = 400
-		SPIRIT_FLOW_DIVISOR = 4
-		AUTOHIT_HYBRID_AS_MULT = FALSE
 		LINGERCHANCE = 5
 		GRAPPLE_WHIFF_DAMAGE = 3
-		EXTRASTATSONAUTOHIT = FALSE
 // effectiveness (dmg calc  shit)
-		MELEE_EFFECTIVENESS = 1
-		PROJECTILE_EFFECTIVNESS = 1
-		GRAPPLE_EFFECTIVNESS = 1
-		AUTOHIT_EFFECTIVNESS = 1
-		GRAPPLE_DAMAGE_MULT = 0.8
+		GRAPPLE_DAMAGE_MULT = 0.48	//0.8 with the old 0.6 roll baked in
 		MUSCLE_POWER_DIVISOR = 4
 		MAX_PURSUER_BOON = 10
-		DMG_END_EXPONENT = 0.4
-		DMG_STR_EXPONENT = 0.4
 		DMG_POWER_EXPONENT = 0.3
 		DMG_ACC_EXPONENT = 0.4
-		PURE_MODIFIER = 0.5
-		PURE_MOD_POST_CALC = TRUE
 		TENSION_MULTIPLIER = 1
 		UNDERDOG_HUMAN_TENSION_MULT = 1.2
 		DEFENDER_TENSION_REDUCER = 0.65
@@ -535,14 +494,8 @@ globalTracker
 
 		SANCTIFY_EFFECTIVENESS = 1
 // dmg rolls
-		min_damage_roll = 0.4
-		max_damage_roll = 0.8
 
 //SPEED COOLDOWN SHIT
-		SPEED_COOLDOWN_MODE = 0
-		SPEED_COOLDOWN_EXPONENT = 0.25
-		SPEED_COOLDOWN_MIN = 0.75
-		SPEED_COOLDOWN_MAX = 1.5
 
 
 // CC related
@@ -552,7 +505,6 @@ globalTracker
 		MAX_STUN_TIME = 600
 		LAUNCH_LOCKOUT = 200
 		MAX_LAUNCH_TIME = 25
-		TIMESTOP_MULTIPLIER = 70
 // acc
 		SWORD_GLOBAL_ACCURACY_NERF = 0.1
 		STAFF_GLOBAL_ACCURACY_NERF = 0.1
@@ -572,35 +524,87 @@ globalTracker
 		MAX_WHIFF_DMG = 1.5
 
 
-		GRABS_AUTOHIT = 1
 
-		FLUID_FORM_RATE = 0.1
+// TIMING_WINDOW is the one true timing number - touch it and everything moves together
+		TIMING_WINDOW = 5
+// fixed damage roll
+// cc proration - replaces the 0.1x rule when on
+		PRORATION_FLOOR = 0.3
+		PRORATION_DECAY = 0.15
+		PRORATION_CM_FLOOR_BONUS = 0.1
+		PRORATION_CM_DECAY_CUT = 0.03
+		PRORATION_LIGHT_FLOOR_BONUS = 0.2
+		PRORATION_DUNK_FLOOR = 0.6
+// counter-hit
+		COUNTER_HIT_TENSION = 5
+		COUNTER_HIT_STOP_BONUS = 2
+		COUNTER_HIT_STOP_CAP = 5
+// life skills
+		//temporarily off
+		LIFE_NODE_SPAWNS = 0
+// wall splat
+		SPLAT_STAGGER_DS = 10
+		SPLAT_MIN_REMAINING = 3
+		SPLAT_DMG_PER_TILE = 0.5
+// perfect break
+		PERFECT_BREAK_REFUND = 1
+// launch visuals
+		LAUNCH_LIFT_PX = 28
+// grab tech / toss aim / ais
+// guard
+		GUARD_DR = 0.65
+		GUARD_METER_MAX = 100
+		GUARD_METER_FLAT = 6
+		GUARD_METER_SCALE = 2
+		GUARD_METER_DECAY = 4
+		GUARD_BREAK_DS = 50
+		GUARD_BREAK_DMG_AMP = 1.3
+		GUARD_PUSHBACK_PX = 7
+		ALPHA_COUNTER_TENSION = 30
+		ALPHA_COUNTER_RANGE = 2
+		ALPHA_COUNTER_KB = 5
+		ALPHA_COUNTER_CD_DS = 50
+// queue layer
+		QUEUE_COUNTER_CM_BONUS = 1
+		QUEUE_COUNTER_MAX = 10
+		FLOURISH_WINDOW_DS = 20
+		FLOURISH_TENSION = 10
+// active energy charge kills idle regen when on
+		CHARGE_BASE = 0.5
+		CHARGE_RAMP_MAX = 2
+		CHARGE_RAMP_DS = 35
+		CHARGE_BREAK_HITS = 3
+
+		PERCEPTION_CORRECTION_RATE = 0.1
 		DESPERATION_HIT_CHANCE = 0.005
 		DESPERATION_MAX_HIT_CHANCE = 0.05
 
-		JORDAN_ACCURACY = FALSE
-
-		MIN_JORDAN_ACC_MOD = 0.05
-		MAX_JORDAN_ACC_MOD = 3
-
-
-		OLD_ACCURACY = 0
-
-		MOD_AFTER_ROLL = 0
-
-		//Min & max of AccMult in accuracy formula
-		ACC_ACCMULT_MIN = 0.25
-		ACC_ACCMULT_MAX = 2
 		DEBUG_MESSAGES_ACCURACY = FALSE
-		//how large the modifier for accuracy can be (off/def*accmult) clamped between these.
 
-		//How much off, def, and spd contribute.
+		//to-hit contest. base 50, every rating point of (atk - def) moves it by ACC_POINT
 		ACC_OFF = 0.8
 		ACC_DEF = 0.8
 		ACC_OFF_SPD = 0.3
 		ACC_DEF_SPD = 0.3
-		EXTRA_DEF_MOD = 1.1
-		//Attaches an exponent to the accmult before clamping.
+		TRUEMULT_POINT_VALUE = 0.1 //one trueMult point = this much damage swing
+		ACC_POINT = 1
+		WHIFF_BAND = 25 //glancing zone above the hit roll
+		POWER_ACC_POINT = 5 //acc per point of clamped power-advantage gap
+		PERCEPTION_CORRECTION_LEVELS = 2 //Clarity/Intuition each count as this many perception levels
+		SHONEN_RAMP_START = 30 //SP Power wakes up below this Health
+		SHONEN_RAMP_FLOOR = 5 //and peaks here
+		SHONEN_POWER_SCALE = 1.25 //trueMult points per ShonenPower at the peak
+		WOUND_RATE = 0.25 //share of a hit that lands as wounds, before the End curve
+		SWORD_WOUND_SCALE = 0.5 //sword damage feeds the wound share
+		STAGGER_HIT_CAP = 5 //per-hit stagger contribution ceiling
+		EROSION_RATE_DIVISOR = 45
+		STAT_STEAL_RATE = 0.025
+		LEAK_ATTACKER_RATE = 0.21
+		LEAK_DEFENDER_RATE = 0.05
+		RECOIL_RATE = 0.125 //BleedHit/BurnHit self-recoil
+		WorldDeflectBase = 75 //deflection contest base - deliberately above WorldDefaultAcc
+		DEF_DEFLECT_RATE = 0.004 //Def digs into the deflection pre-empt
+		FOR_BLAST_DENSITY_MIT = 0.002 //shooter For shaves it back
 
 		//straight multiplier to how much it breaks.
 		WEAPON_BREAKER_EFFECTIVENESS = 1
@@ -618,7 +622,6 @@ globalTracker
 		MAX_BREAK_VAL = 200
 
 
-		DEICIDE_DAMAGE_DIVISOR = 2
 		HOLY_DAMAGE_DIVISOR = 10
 		ABYSS_DAMAGE_DIVISOR = 10
 		SLAYER_DAMAGE_DIVISOR = 2
@@ -626,7 +629,6 @@ globalTracker
 		SLAYER_DAMAGE_CLAMP = 10
 		SPIRIT_FORM_BASE_RATE = 0.15
 		SPIRIT_FORM_LEAK_VAL = 3
-		BEYOND_PURITY_AUTOHIT = 0
 
 		DEFLECTION_DAMAGE_MULT = 0.075
 // -- items -- //
@@ -647,35 +649,21 @@ globalTracker
 // not sure why he made them all variable, but its more flexibility= FALSE
 
 		/// Dainsleif Drain
-		DainsleifDrainAmount = 0.005
-		DainsleifDrain = FALSE
 
 
-		infWeaponSoul = TRUE
 		WeaponSoulNames = WSNAMES
 		prayerTargetNames = GODS
-		list/WeaponSoul = list("Muramasa" = FALSE, "Soul Calibur" = FALSE,"Soul Edge" = FALSE,\
- "Dainsleif" = FALSE)
- // false = open, true = taken
 
-		list/var/Heroes = list("Finn")
-
-		infConstellations = TRUE
 		BronzeConstellationNames = BRONZECLOTHS
 		GoldConstellationNames = GOLDCLOTHS
-		list/BronzeConstellation = list("Pegasus" = FALSE, "Dragon" = FALSE, "Cygnus" = FALSE, "Andromeda" = FALSE, "Phoenix" = FALSE, "Unicorn" = FALSE)
-		list/GoldConstellation = list("Aries" = FALSE,"Gemini" = FALSE,"Cancer" = FALSE,"Leo" = FALSE,"Virgo" = FALSE,"Libra" = FALSE,\
-"Scorpio" = FALSE,"Capricorn" = FALSE,"Aquarius" = FALSE,"Pisces" = FALSE, "Sagittarius" = FALSE)
 		list/Keychains=list("Kingdom Key", "Kingdom Key D", "Flame Liberator", "Wayward Wind", "Rainfell", "Oathkeeper", "Way To Dawn", "Bond of Flame", "Sweetstack", "Two Become One",\
 		"Oblivion", "Fenrir", "No Name", "Lionheart", "Spellbinder", "Star Seeker", "Lost Memory",\
 		"Earthshaker", "Chaos Ripper", "One Winged Angel", "Moogle O Glory", "Fairytale Endings")
 		list/FinalKeychains=list("Ultima Weapon", "X-Blade", "Ebony Slumber", "Prismatic Dreams")
-		CHIKARA_WHITELIST = FALSE
 
 		STAT_DMG_EXPONENT = 0.75
 		SOULTUGMULT = 5
 
-		ALLOW_CLICK_CORPSE = 0
 		STACK_ANIMATE_TIME = 4
 		list/trueNames = list()
 
@@ -684,23 +672,3 @@ globalTracker
 		discordAdminHelpWebhookURL
 // FUNCTIONS
 
-globalTracker/proc/takeLimited(option, n)
-	if(vars[option][n] == TRUE)
-		usr << "This is already taken, please report this error"
-		return
-	vars[option][n] = TRUE
-
-
-
-globalTracker/proc/ResetSwords()
-	WeaponSoul = list("Muramasa" = FALSE, "Soul Calibur" = FALSE,"Soul Edge" = FALSE,\
-	"Dainsleif" = FALSE)
-	Log("Admin", "All legendary swords have been selected, so the list was reset.")
-
-
-globalTracker/proc/getOpen(option)
-	var/list/returnList = vars["[option]Names"]
-	for(var/item in vars[option])
-		if(vars[option][item] == TRUE)
-			returnList.Remove(item)
-	return returnList

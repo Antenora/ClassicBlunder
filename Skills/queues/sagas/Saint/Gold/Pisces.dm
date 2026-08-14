@@ -9,7 +9,6 @@ obj/Skills/Queue/Piranhan_Rose
 	PrecisionStrike=10
 	InstantStrikes=10
 	InstantStrikesDelay=2
-	PridefulRage=1
 	HitSparkIcon='fevExplosion - Hellfire.dmi'
 	HitSparkX=-32
 	HitSparkY=-32

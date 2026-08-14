@@ -49,8 +49,8 @@
 	DamageMult=4
 	Reversal=0
 	Stunner=2
-	StrRate=0.5
-	ForRate=0.5
+	StrScaling=0.5
+	ForScaling=0.5
 	ThrowAdd=12
 	ThrowMult=1.25
 	OneAndDone=1

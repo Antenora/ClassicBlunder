@@ -9,8 +9,8 @@
 		passives = list(
 			"MartialMagic"   = 1,
 			"ManaGeneration" = 2 * SL,
-			"SpiritSword"    = 0.5 * SL,
-			"SpiritFlow"     = 1 * SL,
+			
+			
 			"SpiritPower"    = 0.25 * SL,
 			"HolyMod"        = 2,
 			"EvilResist"     = 2
@@ -237,8 +237,6 @@
 		StrMult=1.2
 		EndMult=1.2
 		ForMult=1.2
-		passives = list("Flow" = 1, "Instinct" = 1, "TechniqueMastery" = 1)
+		passives = list("TechniqueMastery" = 1)
 		adjust(mob/p)
-			passives["Flow"]             = 1 + p.SagaLevel
-			passives["Instinct"]         = 1 + p.SagaLevel
 			passives["TechniqueMastery"] = 1 + p.SagaLevel

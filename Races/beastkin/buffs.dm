@@ -5,10 +5,10 @@
 	NeedsPassword = 1
 	TimerLimit = 30
 	Crippling = 15
-	passives = list("Brutalize" = 1.5, "Afterimages" = 2, "Crippling" = 5)
+	passives = list( "AfterImages" = 2, "Crippling" = 5)
 	adjust(mob/p)
 		Crippling= 5 + 5 * p.AscensionsAcquired
-		passives = list("Brutalize" = 1.25 + (0.5 * p.AscensionsAcquired), "Godspeed" = p.AscensionsAcquired,  "Afterimages" = 2, "Crippling" = 5 + 5 * p.AscensionsAcquired)
+		passives = list( "Godspeed" = p.AscensionsAcquired,  "AfterImages" = 2, "Crippling" = 5 + 5 * p.AscensionsAcquired)
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Undying_Rage
 	TooMuchHealth = 35
 	NeedsHealth = 10
@@ -21,9 +21,8 @@
 	adjust(mob/p)
 		TooMuchHealth = 35
 		TimerLimit = 10 + (glob.racials.UNDYINGRAGE_DURATION * (p.AscensionsAcquired))
-		var/wT = 1.5 - p.passive_handler["Wrathful Tenacity"]
 		passives = list("Undying Rage" = 1, "Fury" = 1 + p.AscensionsAcquired, "Godspeed" = 3, "Relentlessness" = 1, "ShearImmunity" = 1, "Adrenaline" = 3, "LifeSteal" = 50 + (25 * p.AscensionsAcquired), \
-						"Enrage" = p.AscensionsAcquired, "Rage" = p.AscensionsAcquired, "Wrathful Tenacity" = wT) // 150% of str as end
+						 "Rage" = p.AscensionsAcquired)
 	Trigger(mob/User, Override)
 		. = ..()
 		if(!User.BuffOn(src))
@@ -52,7 +51,7 @@
 	Cooldown = 120
 	adjust(mob/p)
 		var/asc = p.AscensionsAcquired
-		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc,"BlurringStrikes" = 3+asc, "Flow" = asc, "Instinct" = asc)
+		passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc)
 		TimerLimit = 30 + (glob.racials.FEATHERDUR * asc)
 		Cooldown = 120 - ((glob.racials.FEATHERDUR*2) * asc)
 		EnergyDrain = 0.05 - (asc/100)
@@ -66,7 +65,7 @@
     Copyable=0
     NeedsSword=0
     Area="Arc"
-    StrOffense=1
+    StrScaling=1
     DamageMult=2
     Cooldown=5
     Distance=2

@@ -7,7 +7,6 @@
 	var/HitSparkY
 	var/HitSparkSize=1
 	var/Purity //waifu swords
-	var/ManaGeneration=0
 	var/iconAlt=null
 	var/iconAltX=0
 	var/iconAltY=0

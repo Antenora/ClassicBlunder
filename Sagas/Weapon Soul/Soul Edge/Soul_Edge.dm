@@ -15,7 +15,7 @@ obj/Skills/AutoHit/Soul_Drain
 	WindUp=1
 	WindupMessage="channels the chaos of Soul Edge...."
 	DamageMult=3
-	StrOffense=1
+	StrScaling=1
 	ActiveMessage="unleashes a tidal wave of chaos into the area!"
 	Area="Around Target"
 	GuardBreak=1
@@ -45,8 +45,8 @@ obj/Skills/AutoHit/Dark_Reconquista
 	Area="Wide Wave"
 	ComboMaster=1
 	Distance=2
-	StrOffense=1
-	EndDefense=1
+	StrScaling=1
+	EndEffectiveness=1
 	DamageMult=10
 	HitSparkIcon='Slash - Vampire.dmi'
 	HitSparkX=-32
@@ -81,110 +81,11 @@ obj/Skills/AutoHit/Dark_Reconquista
 		set category="Skills"
 		usr.BeginHeldSkill(src)
 
-/obj/Effects/TriumphWave
-	icon = 'KenShockwavePurple.dmi'
-	pixel_x = -105
-	pixel_y = -105
-	Grabbable = 0
-	mouse_opacity = 0
-	layer = EFFECTS_LAYER
-	var/max_size = 4.0
-	var/wave_lifetime = 30
-	var/tmp/mob/Players/owner
-	var/DamageMult = 1
-	var/StrOffense = 1
-	var/EndRes = 1
-	var/tmp/list/hitList = list()
-
-	New()
-		animate(src)
-		transform = matrix() * 0.1
-		alpha = 255
-		spawn(0)
-			hitDetectLoop()
-
-	proc/hitDetectLoop()
-		set waitfor = FALSE
-		var/start_time = world.time
-		var/prev_radius_tiles = 0.0
-		var/list/outsideSet = list()
-		while(src)
-			var/tick_begin = world.time
-			if(!owner || !owner.loc) break
-			if(owner.PureRPMode)
-				sleep(1)
-				start_time += (world.time - tick_begin)
-				continue
-
-			var/elapsed = world.time - start_time
-			if(elapsed >= wave_lifetime)
-				EffectFinish()
-				break
-
-			var/t = elapsed / wave_lifetime
-			var/scale = 0.1 + (max_size - 0.1) * t
-			var/curr_radius_tiles = (scale * 121.0) / 32.0
-			src.transform = matrix() * scale
-			src.alpha = round(255 * (1 - t))
-
-			for(var/mob/Players/P in players)
-				if(!P.client) continue
-				if(P == owner) continue
-				if(P.z != owner.z) continue
-				if(owner.inParty(P.ckey)) continue
-
-				var/dx = P.x - owner.x
-				var/dy = P.y - owner.y
-				var/dist = sqrt(dx * dx + dy * dy)
-
-				if(dist > curr_radius_tiles)
-					if(!(P in outsideSet))
-						outsideSet += P
-				else
-					if(P in outsideSet)
-						outsideSet -= P
-						if(!(P.ckey in hitList))
-							if(dist > prev_radius_tiles)
-								hitList += P.ckey
-								dealWaveDamage(P)
-
-			prev_radius_tiles = curr_radius_tiles
-			sleep(1)
-
-	proc/dealWaveDamage(mob/Players/target)
-		if(!owner || !target) return
-		if(owner.PureRPMode) return
-
-		var/powerDif = owner.Power / target.Power
-		if(glob.CLAMP_POWER && !owner.ignoresPowerClamp())
-			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-
-		var/atk = owner.GetStr(StrOffense)
-		if(atk <= 0) atk = 0.01
-
-		var/def = target.getEndStat(1) * EndRes
-		if(def <= 0) def = 0.01
-
-		var/FinalDmg = (clamp(powerDif, 0.1, 100000) ** glob.DMG_POWER_EXPONENT) * \
-		               (glob.CONSTANT_DAMAGE_EXPONENT + glob.AUTOHIT_EFFECTIVNESS) ** \
-		               -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
-		FinalDmg *= DamageMult
-		FinalDmg *= owner.GetDamageMod()
-		FinalDmg *= glob.AUTOHIT_GLOBAL_DAMAGE
-
-		if(FinalDmg <= 0) return
-		target.LoseHealth(FinalDmg)
-
-		var/obj/Effects/HE = new(null, 'fevExplosion - Hellfire.dmi', -32, -32, 0, 1, 8)
-		HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
-		HE.Target = target
-		target.vis_contents += HE
-
 // Automatic followup AutoHit triggered when Triumph's sweet spot is hit.
 /obj/Skills/AutoHit/Reconquista_Triumph_Strike
 	Area = "Circle"
 	AdaptRate = 1
-	StrOffense = 1
+	StrScaling = 1
 	DamageMult = 2.5
 	ComboMaster = 1
 	Rounds = 10
@@ -205,11 +106,12 @@ obj/Skills/AutoHit/Dark_Reconquista
 	ActiveMessage = "drives Soul Edge home with a conquering lunge!"
 
 /obj/Skills/AutoHit/Dark_Reconquista_Triumph
+	parent_type = /obj/Skills/AutoHit/Wave
 	name = "Triumph"
 	NeedsSword = 1
 	Copyable = 2
-	StrOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	EndEffectiveness = 1
 	Cooldown = 120
 	EnergyCost = 3
 	HeldSkill = TRUE
@@ -219,16 +121,15 @@ obj/Skills/AutoHit/Dark_Reconquista
 	ChargeOverlay = 'DarkShock.dmi'
 	ChargeWaveIcon = 'KenShockwaveBloodlust.dmi'
 	ChargeWaveBlend = 2
+	WaveIcon = 'KenShockwavePurple.dmi'
+	WaveLifetime = 30
 
 	OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 		if(EnergyCost)   
 			var/drain = p.passive_handler["Drained"] ? EnergyCost * (1 + p.passive_handler["Drained"]/10) : EnergyCost
 			p.LoseEnergy(drain)
-		var/obj/Effects/TriumphWave/wave = new(p.loc)
-		wave.owner = p
-		wave.DamageMult = (15 + p.SagaLevel) * benefit
-		wave.StrOffense = 1
-		wave.EndRes = 1
+		DamageMult = (15 + p.SagaLevel) * benefit
+		spawnWave(p)
 		if(sweet_spot_hit)
 			p.throwFollowUp(/obj/Skills/AutoHit/Reconquista_Triumph_Strike)
 
@@ -241,7 +142,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	StrMult=1.3
 	OffMult=1.3
 	EndMult=1.3
-	passives = list("DemonicDurability" = 3, "Instinct" = 4, "Momentum" = 2, "EnhancedSmell" = 1, "EnhancedHearing" = 1)
+	passives = list( "Momentum" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s chaotic treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their chaotic luster..."
@@ -251,16 +152,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Stained_Memories
 		StyleActive="Stained Memories"
-		passives = list("CallousedHands" = 0.1, "Shearing" = 2,"Zornhau" = 1)
+		passives = list( "Shearing" = 2)
 		StyleEnd=1.25
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
 		adjust(mob/p)
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
-			passives["CallousedHands"] = 0.1 + (0.05* p.SagaLevel)
 			passives["Shearing"] = 2+p.SagaLevel
-			passives["Zornhau"] = 1+(0.25*p.SagaLevel)
 		verb/Stained_Memories()
 			set hidden=1
 			adjust(usr)
@@ -277,4 +176,3 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	Grim_Lord
 		StrMult=1.3
 		EndMult=1.3
-		passives = list("DemonicDurability" = 1, "AngerAdaptiveForce" = 0.5, "CallousedHands" = 0.15)

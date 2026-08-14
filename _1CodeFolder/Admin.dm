@@ -528,6 +528,11 @@ mob/Admin2/verb
 		for(var/passive in m.passive_handler.passives)
 			if(m.passive_handler.passives[passive])
 				html += "<b>[passive] : [m.passive_handler.passives[passive]]</b><br>"
+		if(m.passive_handler.states && m.passive_handler.states.len)
+			html += "<br><b>Internal state:</b><br>"
+			for(var/skey in m.passive_handler.states)
+				if(m.passive_handler.states[skey])
+					html += "<b>[skey] : [m.passive_handler.states[skey]]</b><br>"
 		usr<<browse(html,"window=[m]'s Passives;size=450x600")
 
 /*	EditPassivesTest1(mob/A in world)
@@ -1329,11 +1334,6 @@ mob/proc/PM2(var/mob/who)
 /mob/var/PingSound = TRUE
 /mob/var/PingVolume = 30
 
-// Opt-out flag for buffs that force Anger on activation (Jinchuuriki M<3,
-// Vaizard Mask, Wrathful, Hellbornfury, etc — anything with AutoAnger=1 or
-// passives["AutoAnger"]=1). Read in _BuffX.dm at the BuffOn/BuffOff handlers.
-// Default 0 = original behavior preserved for everyone.
-/mob/var/AutoBerserkOptOut = 0
 
 mob/Admin3/verb
 	editRace(mob/Players/m in players)
@@ -1763,6 +1763,7 @@ mob/Admin2/verb
 			A.icon_state = "Meditate"
 			A.dir=SOUTH
 			A.AfterImageStrike=0
+			A.ais_window_until=0
 			A.Grounded=0
 			A.Meditation()
 			Log("Admin","<font color=red>[ExtractInfo(usr)] made [ExtractInfo(A)] meditate.")
@@ -2098,7 +2099,7 @@ mob/Admin3/verb
 						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved)|| istype(ssj, /transformation/saiyan/super_saiyan_4_daima))
 							M.race.transformations -= ssj
 							del ssj
-					M.AddSkill(new/obj/Skills/False_Moon)
+					M.AddSkill(new/obj/Skills/AutoHit/False_Moon)
 				else
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/saiyan/super_saiyan_4)||istype(ssj, /transformation/saiyan/super_full_power_saiyan_4_limit_breaker))
@@ -2111,7 +2112,7 @@ mob/Admin3/verb
 						if(istype(ssj, /transformation/half_saiyan/human/beast_mode))
 							M.race.transformations -= ssj
 							del ssj
-					M.AddSkill(new/obj/Skills/False_Moon)
+					M.AddSkill(new/obj/Skills/AutoHit/False_Moon)
 				else
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/saiyan/super_saiyan_4))
@@ -2176,7 +2177,7 @@ mob/Admin3/verb
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
 						var/ElderMult = 0.5
-						if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+						if(P.EraBody == "Senile")
 							ElderMult = 1
 						P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
@@ -2200,7 +2201,7 @@ mob/Admin3/verb
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
 						var/ElderMult = 0.5
-						if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+						if(P.EraBody == "Senile")
 							ElderMult = 1
 						P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
@@ -2216,7 +2217,7 @@ mob/Admin3/verb
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
 							var/ElderMult = 0.5
-							if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+							if(P.EraBody == "Senile")
 								ElderMult = 1
 							P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
@@ -2237,7 +2238,7 @@ mob/Admin3/verb
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
 							var/ElderMult = 0.5
-							if(P.EraBody == "Senile" || P.isRace(SHINJIN))
+							if(P.EraBody == "Senile")
 								ElderMult = 1
 							P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
@@ -2280,7 +2281,7 @@ mob/Admin3/verb
 		if(!src.Alert("Are you sure you want to New Character Setup someone?")) return
 		if(locate(/obj/Skills/Utility/Teachz, M))
 			var/ElderMult=0.5
-			if(M.EraBody=="Senile"||M.isRace(SHINJIN))
+			if(M.EraBody=="Senile")
 				ElderMult=1
 			M.RPPDonate+=(glob.progress.RPPStarting*ElderMult*M.RPPMult*glob.progress.RPPBaseMult)
 			M << "You have gained knowledge on how to help further other's development!"
@@ -2711,7 +2712,7 @@ mob/Admin4/verb
 			glob.progress.MoneyName=NewMoney
 	Common_Toggle()
 		set category="Admin"
-		var/list/Races=list("Cancel", "Half Saiyan", "Elite", "Giant", "Shinjin", "Demon", "Majin", "Dragon", "Makyo", "Changeling")
+		var/list/Races=list("Cancel", "Half Saiyan", "Demon", "Majin", "Dragon", "Makyo", "Changeling")
 		var/Mode=alert(usr, "You can set a normally rare race to be common, or strip that same status with this verb.  Which do you want to do?", "Common Toggle", "Make Common", "Make Rare")
 		if(Mode=="Make Common")
 			var/list/Choices=Races

@@ -5,8 +5,8 @@
 	Area="Target"
 	Distance=10
 	EnergyCost=30
-	ForOffense=1
-	StrOffense=0
+	ForScaling=1
+	StrScaling=0
 	DamageMult=40
 	Cooldown=-1
 	CanBeDodged=0

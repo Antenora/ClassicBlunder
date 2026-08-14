@@ -19,8 +19,6 @@
 
 mob/proc/setUpScent()
     switch(usr.Target.race.type)
-        if(ELF)
-            custom_scent=pick("Society", "Rich", "Noble","Royalty")
         if(HUMAN)
             custom_scent=pick("Sweat","Gamer Musk","Flowery","Cologne")
         if(NAMEKIAN)

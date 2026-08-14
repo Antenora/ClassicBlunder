@@ -74,7 +74,7 @@
         // This is used so that passives can be added and subtracted so I don't use = like a fucking moron.
         // Any potions that introduce passives must have the new passives added to this list at 0
         // Never use = Operator for passives outside of this list, instead use += and make downsides negative or 0 - Hadoje
-        passives = list("PureReduction" = 0, "Godspeed" = 0, "AngerAdaptiveForce" = 0, "PureDamage" = 0, "Steady" = 0, "Flow" = 0, "LikeWater "= 0, "Unnerve" = 0, "Skimming" = 0)
+        passives = list("PureReduction" = 0, "Godspeed" = 0,  "PureDamage" = 0,  "Skimming" = 0)
         // I am so fucking sorry for what is about to happen
         /* SOMEONE BROKE THE HEALS SO THEY ONLY WORK PER TIC WHICH MAKES IT IMPOSSIBLE TO HAVE A BALANCED HEALTH POTION I FUCKING HATE THESE ANIMALS
         if(P.equippedFlask.Heal == 1) // if you chose a  herb, your value for said herb should be 1 and ONLY 1
@@ -94,30 +94,24 @@
             src.EnergyHeal = (glob.POTIONHEAL*(P.equippedFlask.Tier+1)) // I also give up on quantifying this.
 
         if(P.equippedFlask.Hallucinogen == 1) // This gives you immediate anger and anger buffs at expense of defense
-            AutoAnger=1 // Makes you angry instantly
+            AngerFloor=75 // makes you hit peak anger way sooner
             // Please note: the comments will tell you what the math does
             EndMult = 0.6 + (P.equippedFlask.Tier+1)/10 // T0 = 0.7, T1 = 0.8, T3 = 0.9 endurance mult (DOWNSIDE)
             DefMult = 0.6 + (P.equippedFlask.Tier+1)/10 // T0 = 0.7, T1 = 0.8, T3 = 0.9 Defense mult (DOWNSIDE)
             passives["PureReduction"] += -7 + (P.equippedFlask.Tier+1) // T0 = -6, T1 = -5 T2 = -4, PS: -1 PureReduction = 5% extra damage taken,
-            passives["AngerAdaptiveForce"] += ((P.equippedFlask.Tier+1)/10) // T0 0.1 AAF, T1 0.2, T2 0.3 PS: 0.1 AAF = 10% increase of strongest dmg stat
-            passives["AngerThreshold"] += 2 + ((P.equippedFlask.Tier/2)) // t0 = 200 Anger, T1 = 250 Anger, T2 = 300 Anger
         if(P.equippedFlask.Searing == 1) // Damage
             StrMult = 1 + (P.equippedFlask.Tier+1)/10 // T0 = 1.1, T1 = 1.2, T2 = 1.3
             ForMult = 1 + (P.equippedFlask.Tier+1)/10 // Same as above
             passives["PureDamage"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3 // 5% to 15% dmg boost
-            passives["Steady"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["PureReduction"] += -5 + (P.equippedFlask.Tier+1) // T0 = -4, T1= -3 T2 = -2 // 20% to 10% extra damage taken (DOWNSIDE)
         if(P.equippedFlask.Flowy == 1) // Dodging
             DefMult = 1 + (P.equippedFlask.Tier+1)/4 // T0 = 1.25, T1 = 1.5, T2 = 1.75 // This makes you dodge more
             StrMult = 0.85 + (P.equippedFlask.Tier+1)/20  // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             ForMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
-            passives["Flow"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
-            passives["LikeWater"] += (P.equippedFlask.Tier+1) // Same as Above
         if(P.equippedFlask.Hard == 1) // Defense
             EndMult = 1 + (P.equippedFlask.Tier+1)/10 //T0 = 1.1, T1 = 1.2, T3 = 1.3 endurance mult
             SpdMult = 0.85 + (P.equippedFlask.Tier+1)/20 // T0 = 0.9, T1 = 0.95, T3 = 1 (DOWNSIDE)
             passives["PureReduction"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
-            passives["Unnerve"] += (P.equippedFlask.Tier+1) // T0 = 1, T1 = 2, T2 = 3
             passives["Godspeed"] += -4 + (P.equippedFlask.Tier+1) // T0 = -3, T1 = -2, T2 = -1 (DOWNSIDE)
         if(P.equippedFlask.Quicksilver == 1) // Speed, you must be feeling pretty stupid restricting magic now huh Jess?
             SpdMult = 1 + (P.equippedFlask.Tier+1)/10 //T0 = 1.1, T1 = 1.2, T3 = 1.3 speed mult

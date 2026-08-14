@@ -58,7 +58,7 @@ mob/proc/MatLogBest(matclass)
 
 var/list/LifeMatRegistry = list()       // matclass -> /datum/matdef, in display order
 var/list/LifeMatClassByType = list()    // material type path -> matclass
-var/list/LifeMatCategories = list("Ores", "Ingots", "Gems", "Fuel", "Monster Parts", "Flora", "Wood", "Fruit", "Fish", "Other")
+var/list/LifeMatCategories = list("Ores", "Ingots", "Gems", "Fuel", "Monster Parts", "Flora", "Wood", "Fruit", "Fish", "Crops")
 
 /datum/matdef
 	var/matclass
@@ -93,9 +93,8 @@ proc/RegisterLifeMaterials()
 	for(var/T in typesof(/obj/Items/Material/Gem) - /obj/Items/Material/Gem)
 		LifeMatReg(T, "Gems")
 	LifeMatReg(/obj/Items/Material/coal, "Fuel")
-	LifeMatReg(/obj/Items/Material/clay, "Other")
-	LifeMatReg(/obj/Items/Material/stone, "Other")
-	// Hunting adds leaf MonsterPart subtypes later
+	LifeMatReg(/obj/Items/Material/clay, "Ores")
+	LifeMatReg(/obj/Items/Material/stone, "Ores")
 	for(var/T in typesof(/obj/Items/Material/MonsterPart) - /obj/Items/Material/MonsterPart)
 		LifeMatReg(T, "Monster Parts")
 	for(var/T in typesof(/obj/Items/Material/Flora) - /obj/Items/Material/Flora)
@@ -106,6 +105,8 @@ proc/RegisterLifeMaterials()
 		LifeMatReg(T, "Fruit")
 	for(var/T in typesof(/obj/Items/Material/Fish) - /obj/Items/Material/Fish)
 		LifeMatReg(T, "Fish")
+	for(var/T in typesof(/obj/Items/Material/Crop) - /obj/Items/Material/Crop)
+		LifeMatReg(T, "Crops")
 
 proc/LifeMatDef(matclass)
 	RegisterLifeMaterials()

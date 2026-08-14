@@ -10,7 +10,7 @@ obj/Skills/AutoHit/Divine_Cleansing
 	NeedsSword = 1
 	Area="Circle"
 	Slow=0.5
-	StrOffense=1
+	StrScaling=1
 	HitSelf = TRUE
 	DamageMult=1//set in adjust code
 	Cleansing = 1//set in adjust code
@@ -49,7 +49,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 	StrMult=1.3
 	OffMult=1.3
 	DefMult=1.3
-	passives = list("BeyondPurity" = 1, "PureReduction" = 4, "HybridStrike" = 1, "Momentum" = 2) // may god have mercy on my soul
+	passives = list("BeyondPurity" = 1, "PureReduction" = 4,  "Momentum" = 2) // may god have mercy on my soul
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s soothing treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their healing luster..."
@@ -59,16 +59,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Forgemaster_Lifeblood
 		StyleActive="Forgemaster"
-		passives = list("Steady" = 1, "EvilResist" = 1, "BlurringStrikes" = 1)
+		passives = list( "EvilResist" = 1)
 		StyleOff=1
 		StyleDef=1
 		Finisher="/obj/Skills/Queue/Finisher/Snowfall"
 		adjust(mob/p)
 			StyleOff = 1.10 + (0.10 * p.SagaLevel)
 			StyleDef = 1 + (0.10 * p.SagaLevel)
-			passives["Steady"] = 1 + (0.5* p.SagaLevel)
 			passives["EvilResist"] = 1 + (0.25* p.SagaLevel)
-			passives["BlurringStrikes"] = 1 + (0.5* p.SagaLevel)
 		verb/Forgemaster_Lifeblood()
 			set hidden=1
 			adjust(usr)
@@ -87,7 +85,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 	Refined_Fate
 		ForMult=1.2
 		StrMult=1.2
-		passives = list("BulletKill" = 1, "Instinct" = 1, "Siphon" = 1)
+		passives = list("BulletKill" = 1)
 	Weapon_Soul_Hunt
 		IconLock='SweatDrop.dmi'
 		IconApart=1

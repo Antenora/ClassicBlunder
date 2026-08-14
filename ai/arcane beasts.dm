@@ -83,8 +83,8 @@ obj/Skills/Projectile/Arcane_Burst
 	ZoneAttackY=3
 	FireFromSelf=1
 	FireFromEnemy=0
-	ForRate=1
-	EndRate=1
+	ForScaling=1
+	EndEffectiveness=1
 	Distance=20
 
 obj/Skills/Projectile/Beams/Arcane_Bullet
@@ -220,7 +220,7 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 		SuperDash=1 //Compound Gravity.
 		Skimming=1 //The lashings make these boiz fly.
 		Pursuer=1 //Is mobile af
-		passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "ManaStats" = 0.5)
+		passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1)
 		SpdMult=1.4
 		DefMult=1.3
 		OffMult=1.3
@@ -234,16 +234,15 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 					Skimming=2
 					SoftStyle=0.5 //Wear the opponent down
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "SoftStyle" = 0.5, "ManaStats" = 1)
+					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "SoftStyle" = 0.5)
 					ManaStats=1
 			src.Trigger(usr)
 
 	Arcane_Transmutation // EXPLOOOSION
 		name = "Arcane Transmutation"
 		//Will also convert elemental status effects + poison into small trickles of energy. or not
-		Siphon=2.5 //Transformation. Converts matter/particiles into energy.
 		QuickCast=1
-		passives = list("Siphon" = 2.5, "QuickCast" = 1)
+		passives = list("QuickCast" = 1)
 		ForMult=1.4
 		OffMult=1.3
 		EndMult=1.3
@@ -254,17 +253,17 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 			ManaGlow = usr.is_arcane_beast.aura_color
 			if(usr.is_arcane_beast)
 				if(usr.is_arcane_beast.Mastery>=3)
-					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2, "ManaStats" = 0.5)
+					passives = list("MovingCharge" = 1, "QuickCast" = 2)
 					MovingCharge=1
 					QuickCast=2
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("Siphon" = 2.5, "MovingCharge" = 1, "QuickCast" = 2, "ManaStats" = 1)
+					passives = list("MovingCharge" = 1, "QuickCast" = 2)
 					ManaStats=1
 			src.Trigger(usr)
 
 	Arcane_Empowerment
 		name = "Arcane Empowerment"
-		passives = list("PureReduction" = 1, "Juggernaut" = 1, "Harden" = 2, "ManaStats" = 0.5, "SpiritHand" = 2)
+		passives = list("PureReduction" = 1, "Juggernaut" = 1, "Harden" = 2)
 		PureReduction=1
 		Juggernaut=1
 
@@ -283,7 +282,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 					PureReduction=2
 					HardStyle=0.5
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives["ManaStats"] = 1
 					ManaStats=1
 			src.Trigger(usr)
 
@@ -306,9 +304,8 @@ obj/Skills/Buffs/SpecialBuffs/Bond_Keeper
 
 obj/Skills/Buffs/SlotlessBuffs/Arcane_Burst //potential posebuff. not used atm, but may trigger off of the arcane beast burning the fuck out of their mana.
 	name = "Arcane Burst"
-	passives = list("Instinct" = 1, "Flow" = 1, "TechniqueMastery" = 10)
+	passives = list("TechniqueMastery" = 10)
 	Instinct=1
-	Flow=1
 	TechniqueMastery=10
 	ManaThreshold = 100
 
@@ -335,7 +332,7 @@ obj/Skills/Buffs/SlotlessBuffs/
 		SwordIcon='Icons/Buffs/nympharum sword.dmi'
 		SwordX=-32
 		SwordY=-32
-		passives = list("SpiritSword" = 0.25, "SwordAscension" = 1, "MagicSword" = 1)
+		passives = list( "SwordAscension" = 1, "MagicSword" = 1)
 		MagicSword=1
 		SwordUnbreakable=1 //SHARDBLADES CANNOT BE SHATTERED
 		SwordAscension=1
@@ -378,8 +375,8 @@ obj/Skills/AutoHit/Gravity_Lunge
 	ManaCost=15
 	NeedsSword=1
 	Area="Circle"
-	StrOffense=1
-	EndDefense=1
+	StrScaling=1
+	EndEffectiveness=1
 	DamageMult=1
 	GuardBreak=1
 	ChargeTech=1
@@ -459,8 +456,8 @@ obj/Skills/Projectile/Arcane_Discharge
 	ZoneAttackY=1
 	FireFromSelf=1
 	FireFromEnemy=0
-	ForRate=1
-	EndRate=1
+	ForScaling=1
+	EndEffectiveness=1
 	Distance=10
 	Cooldown=60
 	ActiveMessage="discharges arcane energies in a vibrant wave!"
@@ -481,9 +478,9 @@ obj/Skills/AutoHit/Lesser_Division
 	DamageMult=10
 	WindUp=1
 	SpecialAttack=1
-	StrOffense=0
-	ForOffense=1
-	EndDefense=1
+	StrScaling=0
+	ForScaling=1
+	EndEffectiveness=1
 	GuardBreak=1
 	Knockback=5
 	Instinct=2
@@ -535,8 +532,8 @@ obj/Skills/AutoHit/Overpower
 	ManaCost=10
 	Area="Wide Wave"
 	Distance=5
-	StrOffense=1
-	EndDefense=1
+	StrScaling=1
+	EndEffectiveness=1
 	DamageMult=10
 	Knockback=15
 	Cooldown=300
@@ -743,9 +740,9 @@ obj/Skills/Projectile/Arcane_Fist_Discharge
 	Deflectable=0
 	Striking=1
 	Radius=1
-	ForRate=0
-	StrRate=1
-	EndRate=1
+	ForScaling=0
+	StrScaling=1
+	EndEffectiveness=1
 	Distance=4
 
 obj/Skills/Projectile/Heavy_Discharge
@@ -767,9 +764,9 @@ obj/Skills/Projectile/Heavy_Discharge
 	Deflectable=0
 	Striking=1
 	Radius=1
-	ForRate=1
-	StrRate=1
-	EndRate=1
+	ForScaling=1
+	StrScaling=1
+	EndEffectiveness=1
 	Distance=4
 
 obj/Skills/Projectile/Arcane_Explosion
@@ -1100,6 +1097,7 @@ obj/Skills/Companion/arcane_follower
 			a.glow_filter = a.filters[a.filters.len]
 
 			animate(a.glow_filter, offset=0, size=10, time=30, loop=-1)
+			animate(offset=1, size=6, time=30)
 
 		Using=0
 

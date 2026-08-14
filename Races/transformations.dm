@@ -132,7 +132,7 @@ transformation
 
 		priorAngerPoint
 		angerPoint
-		autoAnger = FALSE
+		angerFloor = 0//hp% by which this form makes you hit peak anger. replaces autoAnger
 
 		PUSpeedModifier = 1
 
@@ -267,9 +267,8 @@ transformation
 
 			user.PUSpeedModifier *= PUSpeedModifier
 
-			if(autoAnger)
-				user.Anger()
-				user.passive_handler.Increase("EndlessAnger")
+			if(angerFloor)
+				user.UpdateAnger()
 
 			is_active = TRUE
 
@@ -344,9 +343,6 @@ transformation
 			user.PUSpeedModifier /= PUSpeedModifier
 			user.DoubleHelix=0
 
-			if(autoAnger)
-				user.passive_handler.Decrease("EndlessAnger")
-
 			if(stored_profile)
 				user.Profile = stored_profile
 				stored_profile = null
@@ -379,7 +375,7 @@ transformation
 			if(drain>0)
 				user.LoseEnergy(drain)
 
-				if(user.Energy < cut_off &&!user.HasNoRevert()&&!user.Dead&&!user.HasMystic())
+				if(user.Energy < cut_off &&!user.Dead&&!user.HasMystic())
 					user.Revert()
 					user.LoseEnergy(30)
 					user << "The strain of [src] is too much for you to handle!"

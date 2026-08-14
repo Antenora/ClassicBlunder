@@ -26,6 +26,7 @@
 
 //This is called when the world loads and when a global save happens
 /proc/updatePassiveInfo()
+    buildPassiveInfoDB()
     for(var/infoType in subtypesof(/passiveInfo))
         if(!ispath(infoType)) continue
         var/passiveInfo/info = new infoType()

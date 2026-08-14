@@ -6,12 +6,12 @@
 		StyleFor=1.3
 		StyleSpd=1.25
 		StyleActive="Twin Dragon Fire"
-		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 2, "Instinct" = 2, \
-							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 2, "SweepingStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
+							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, "SpiritHand" = 2, "Instinct" = 2, \
-							"Flow" = 2, "SpiritFlow" = 2, "Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno", "BlurringStrikes" = 2, "SweepingStrike" = 1)
+			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
+							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1)
 		verb/Twin_Dragon_Fire()
 			set hidden=1
 			adjust(usr)
@@ -19,8 +19,8 @@
 
 	School_of_the_Undefeated_of_the_East // unarmed + armed
 		SignatureTechnique=3
-		passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
-				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25)
+		passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2,  "Interception" = 1.5, \
+				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3)
 		NeedsSword=0
 		NoSword=1
 		BladeFisting=1
@@ -30,8 +30,8 @@
 		Finisher="/obj/Skills/Queue/Finisher/Winds_Of_The_King"
 		StyleActive = "School of the Undefeated Of The East"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2, "BlurringStrikes" = 3, "Interception" = 1.5, \
-				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3, "CallousedHands"=0.25, "Grippy" = 4)
+			passives = list("HybridStyle" = "SwordStyle", "Fa Jin" = 2, "Momentum" = 2,  "Interception" = 1.5, \
+				"Extend" = 1, "Gum Gum" = 1, "BladeFisting" = 1,  "NeedsSword" = 0, "NoSword" = 1, "Flicker" = 3,  "Grippy" = 4)
 		verb/School_of_the_Undefeated_of_the_East()
 			set hidden=1
 			adjust(usr)
@@ -44,11 +44,11 @@
 		StyleStr = 1.35
 		StyleFor = 1.35
 		StyleEnd = 1.3
-		passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalChance" = 25, "CriticalDamage"= 0.15, "SpiritSword" = 1.5, "SpiritFlow"=2.5, \
+		passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalDamage"= 0.15,   \
 					"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2)
 		Finisher="/obj/Skills/Queue/Finisher/Hyper_Goner"
 		adjust(mob/p)
-			passives = list("HybridStyle" = "MysticStyle", "CriticalChance" = 25, "CriticalDamage"= 0.15, "SpiritSword" = 1.5, "SpiritFlow"=2.5, \
+			passives = list("HybridStyle" = "MysticStyle", "CriticalDamage"= 0.15,   \
 						"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2)
 
 		verb/God_of_Hyperdeath()
@@ -57,8 +57,8 @@
 			Trigger(usr)
 	Tsui_no_Hiken_Kaguzuchi // mystic+armed, but on fire
 		SignatureTechnique=3
-		passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 10, "CriticalDamage"= 0.05, "SpiritSword" = 0.5, "DemonicInfusion" = 1, "Combustion" = 60, "Scorching" = 8,\
-						"Heavy Strike" = "Inferno", "Instinct" = 1, "Persistence" = 1, "BurnHit" = 0.5, "SpiritFlow"=2)
+		passives = list("HybridStyle" = "MysticStyle",  "CriticalDamage"= 0.05,  "DemonicInfusion" = 1, "Combustion" = 60, "Scorching" = 8,\
+						"Heavy Strike" = "Inferno", "Persistence" = 1, "BurnHit" = 0.5)
 		// crits deal an extra amount based on the enemy's max health
 		StyleStr = 1.65
 		StyleFor = 1.65
@@ -73,8 +73,8 @@
 		Finisher="/obj/Skills/Queue/Finisher/Deal_with_the_Devil"
 		var/obj/Skills/demonSkill = FALSE
 		adjust(mob/p)
-			passives = list("HybridStyle" = "MysticStyle",  "CriticalChance" = 15, "CriticalDamage"= 0.15, "SpiritSword" = 0.5, "DemonicInfusion" = 1, "Combustion" = 60, "Scorching" = 8,\
-						"Heavy Strike" = "Inferno", "Instinct" = 1, "Persistence" = 1, "BurnHit" = 0.5, "SpiritFlow"=2)
+			passives = list("HybridStyle" = "MysticStyle",  "CriticalDamage"= 0.15,  "DemonicInfusion" = 1, "Combustion" = 60, "Scorching" = 8,\
+						"Heavy Strike" = "Inferno", "Persistence" = 1, "BurnHit" = 0.5)
 		Trigger(mob/User, Override)
 			if(!demonSkill)
 				var/inp = input(User, "What demon skill do you want?") in list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat")
@@ -88,9 +88,8 @@
 			Trigger(usr)
 	Plasma_Blade
 		SignatureTechnique=3
-		passives = list("Iaido" = 4, "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
-			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BlurringStrikes" = 1.5, "Rain" = 3,\
-			"SpiritSword" = 1, "SpiritFlow"=4)
+		passives = list( "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
+			"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2)
 		StyleSpd = 1.5
 		StyleFor = 1.35
 		StyleOff = 1.15
@@ -98,8 +97,8 @@
 		StyleActive="Plasma Blade"
 		Finisher="/obj/Skills/Queue/Finisher/Plasma_Formation"
 		adjust(mob/p)
-			passives = list( "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalChance" = 40, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
-			"Instinct" = 1, "Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 3, "BlurringStrikes" = 1.5, "Rain" = 3, "SpiritSword" = 1, "SpiritFlow"=4);
+			passives = list( "HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalDamage"= 0.05, "Shocking" = 4, "ThunderHerald" = 1, \
+			"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 3);
 		verb/Plasma_Blade()
 			set hidden=1
 			if(!usr.BuffOn(src)) adjust(usr);
@@ -107,8 +106,8 @@
 	Bloodwhetter
 		SignatureTechnique=3
 		passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
-			"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
-			"SpiritSword" = 0.25, "Crippling" = 3, "Poisoning" = 5, "Pursuer" = 1, )
+			 "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
+			 "Crippling" = 3, "Poisoning" = 5, "Pursuer" = 1, )
 		// crits deal an extra amount based on the enemy's max health
 		StyleStr = 1.35
 		StyleFor = 1.35
@@ -118,8 +117,8 @@
 		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Poison"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle", "Serrated" = 1, "Familiar" = 2, \
-			"SpiritFlow" = 2, "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
-			"SpiritSword" = 0.5, "Crippling" = 5, "Poisoning" = 5, "Pursuer" = 1)
+			 "BlindingVenom" = 2, "BloodEruption" = 2, "LingeringPoison" = 1,\
+			 "Crippling" = 5, "Poisoning" = 5, "Pursuer" = 1)
 		verb/Bloodwhetter()
 			set hidden=1
 			Trigger(usr)

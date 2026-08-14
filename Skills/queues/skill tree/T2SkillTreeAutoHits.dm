@@ -8,6 +8,7 @@ obj
 			Area="Cone"
 			ComboMaster=1
 			Destroyer = 2
+			MenuIcon="ForcePalm"
 			Distance=3
 			Knockback=10
 			PreShockwave=1
@@ -18,8 +19,8 @@ obj
 			ShockBlend=2
 			ShockTime=4
 			NoPierce=0
-			StrOffense=1
-			EndDefense=0.9
+			StrScaling=1
+			EndEffectiveness=0.9
 			DamageMult=8
 			Cooldown=45
 			HitSparkIcon='BLANK.dmi'
@@ -43,8 +44,9 @@ obj
 			UnarmedOnly=1
 			Area="Circle"
 			ComboMaster=1
+			MenuIcon="ForceStomp"
 			Distance=4
-			StrOffense=1
+			StrScaling=1
 			DamageMult=5
 			Cooldown=45
 			Stunner=2
@@ -73,9 +75,10 @@ obj
 			Distance=15
 			WindUp=1
 			ComboMaster=1
+			MenuIcon="SlashingHandChop"
 			WindupMessage="relaxes their fist into a straight palm..."
 			DamageMult=5
-			StrOffense=1
+			StrScaling=1
 			ActiveMessage="uses their hand as a blade, trying to cut down their opponent!"
 			Area="Target"
 			GuardBreak=1
@@ -99,7 +102,8 @@ obj
 			Area="Wave"
 			ComboMaster=1
 			GuardBreak=1
-			StrOffense=1
+			StrScaling=1
+			MenuIcon="PhantomStrike"
 			PassThrough=1
 			PreShockwave=1
 			PostShockwave=0
@@ -126,7 +130,8 @@ obj
 			Area="Circle"
 			NoLock=1
 			NoAttackLock=1
-			StrOffense=1
+			MenuIcon="DragonRush"
+			StrScaling=1
 			DamageMult=6.5
 			DelayTime=0
 			PreShockwave=1
@@ -164,7 +169,7 @@ obj
 			Area="Arc"
 			ComboMaster=1
 			Distance=4
-			StrOffense=1
+			StrScaling=1
 			DamageMult=4.8
 			Knockback=3
 			Cooldown=60
@@ -182,9 +187,10 @@ obj
 			UnarmedOnly=1
 			Area="Circle"
 			Distance=1
-			StrOffense=1
+			StrScaling=1
 			DamageMult=4.75
 			Launcher=3
+			MenuIcon="SweepingKick"
 			NoLock=1
 			NoAttackLock=1
 			Cooldown=45
@@ -207,9 +213,10 @@ obj
 			Copyable=3
 			UnarmedOnly=1
 			Area="Circle"
-			StrOffense=1
+			StrScaling=1
 			DamageMult=1.75
 			Cooldown=45
+			MenuIcon="HelicopterKick"
 			Rounds=5
 			Shattering=1
 			RoundMovement=1
@@ -236,7 +243,7 @@ obj
 			DamageMult=2.5
 			Rounds=2
 			ChargeTech=1
-			StrOffense=1
+			StrScaling=1
 			ChargeFlight=1
 			ChargeTime=0.75
 			Grapple=1
@@ -318,7 +325,7 @@ obj
 			Copyable=2
 			NeedsSword=1
 			Area="Circle"
-			StrOffense=1
+			StrScaling=1
 			DamageMult=4.8
 			Cooldown=60
 			Knockback=3
@@ -343,7 +350,7 @@ obj
 			ChargeTech=1
 			ChargeTime=1
 			Rounds=5
-			StrOffense=1
+			StrScaling=1
 			DamageMult=1
 			Cooldown=45
 			Knockback=1
@@ -438,7 +445,7 @@ obj
 			PassThrough=1
 			Slow=0.75
 			Area="Wave"
-			StrOffense=1
+			StrScaling=1
 			ComboMaster = 1
 			DamageMult=3
 			Cooldown=45
@@ -468,8 +475,8 @@ obj
 			Copyable=3
 			NeedsSword=1
 			Area="Circle"
-			StrOffense=1
-			EndDefense=1
+			StrScaling=1
+			EndEffectiveness=1
 			DamageMult=6.5
 			Cooldown=45
 			Knockback=5
@@ -503,7 +510,7 @@ obj
 			Copyable=3
 			NeedsSword=1
 			Area="Circle"
-			StrOffense=1
+			StrScaling=1
 			Cooldown = 45
 			DamageMult=0.5
 			Rounds=20

@@ -15,8 +15,11 @@ race
 		speed = 1
 		regeneration = 1.5
 		imagination = 0.5
+		growth=0.75
+		//slow to build, explosive at the end
+		anger_curve = list(list(75, 0.1, "is getting fired up..."), list(50, 0.3, null), list(35, 0.55, "is being pushed to their limit!"), list(20, 1, "'s power explodes with rage!!"))
+		anger_curve_angered = 2
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
-		passives = list("Brutalize" = 0.25)
 
 		onFinalization(mob/user)
 			..()

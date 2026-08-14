@@ -7,7 +7,7 @@ obj/Skills/AutoHit/Purifying_Frost
 	ChargeTech=1
 	ChargeTime=1
 	Rounds=5
-	StrOffense=1
+	StrScaling=1
 	DamageMult=2
 	Purity = 1
 	Chilling = 100

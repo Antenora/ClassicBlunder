@@ -3,9 +3,9 @@
 //
 	Oblivion_Storm
 		SignatureTechnique = 3
-		passives = list("DemonicInfusion" = 1, "IceHerald" = 1, "ThunderHerald" = 1, "Heavy Strike" = "HellfireInferno", \
-		            "Chaos" = 15, "Scorching" = 15, "Combustion" = 80, "IceAge" = 25, "SpiritFlow" = 4, "Familiar" = 3,\
-		            "CriticalChance" = 35, "CriticalDamage" = 0.25,"Harden" = 2, "WaveDancer" = 2)
+		passives = list("DemonicInfusion" = 1,  "ThunderHerald" = 1, "Heavy Strike" = "HellfireInferno", \
+		            "Chaos" = 15, "Scorching" = 15, "Combustion" = 80, "IceAge" = 25,  "Familiar" = 3,\
+		            "CriticalDamage" = 0.25,"Harden" = 2, "WaveDancer" = 2)
 		StyleFor = 1.6
 		StyleSpd = 1.2
 		StyleOff = 1.2
@@ -16,8 +16,8 @@
 			src.Trigger(usr)
 	Annihilation
 		SignatureTechnique = 3
-		passives = list("Atomizer" = 1, "BetterAim" = 3, "SuperCharge" = 2, "Familiar" = 3, "SpiritFlow" = 4, \
-		            "ThunderHerald" = 1, "CriticalChance" = 25, "CriticalDamage" = 0.1, "Godspeed" = 3, "AirBend" = 2, \
+		passives = list("Atomizer" = 1, "BetterAim" = 3, "SuperCharge" = 2, "Familiar" = 3,  \
+		            "ThunderHerald" = 1, "CriticalDamage" = 0.1, "Godspeed" = 3, "AirBend" = 2, \
 		            "Harden" = 2, "Scorching" = 8, "Shattering" = 8, "Shocking" = 8, "Freezing" = 8)
 		StyleFor = 1.5
 		StyleOff = 1.5
@@ -28,7 +28,7 @@
 			src.Trigger(usr)
 	Omnimancer
 		SignatureTechnique = 3
-		passives = list("Deterioration" = 1, "Erosion" = 0.15, "SpiritFlow" = 4, "Amplify" = 3, "LikeWater" = 4)
+		passives = list("Deterioration" = 1, "Erosion" = 0.15,  "Amplify" = 3)
 		ElementalDefense = "Void"
 		ElementalOffense = "Void"
 		StyleFor = 1.3
@@ -49,7 +49,7 @@
 					ElementalDefense = "Wind"
 					ElementalClass = list("Wind","Water")
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Water"
-					passives = list("IceHerald" = 1,"Familiar" = 2, "ThunderHerald" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.2, "SpiritFlow" = 4, "Harden" = 2, \
+					passives = list("Familiar" = 2, "ThunderHerald" = 1, "CriticalDamage" = 0.2,  "Harden" = 2, \
 					                "Freezing" = 5, "Shocking" = 5, "WaveDancer" = 1.5)
 					Finisher="/obj/Skills/Queue/Finisher/Frostfist"
 					StyleActive = "Blizzard"
@@ -57,7 +57,7 @@
 					StyleSpd=1.15
 					StyleFor=1.3
 				if("hellfire")
-					passives = list("SpiritFlow" = 4, "Familiar" = 2, "Combustion" = 60, "Heavy Strike" = "Inferno",\
+					passives = list( "Familiar" = 2, "Combustion" = 60, "Heavy Strike" = "Inferno",\
 						"Scorching" = 1)
 					ElementalOffense = "HellFire"
 					ElementalDefense = "Fire"
@@ -73,12 +73,12 @@
 					StyleFor = 1.3
 					StyleSpd = 1.3
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/Earth"
-					passives = list("SuperCharge" = 1,"Familiar" = 2, "SpiritFlow" = 4, "ThunderHerald" = 1, "CriticalChance" = 20, "CriticalDamage" = 0.1, \
+					passives = list("SuperCharge" = 1,"Familiar" = 2,  "ThunderHerald" = 1, "CriticalDamage" = 0.1, \
 					                "Godspeed" = 2, "AirBend" = 1.5, "Harden" = 2, "Burning" = 2, "Shattering" = 5, "Shocking" = 2, "Chilling" = 2)
 					Finisher="/obj/Skills/Queue/Finisher/Mega_Arm" // Super_mega_buster
 					StyleActive = "Plasma"
 				if("singularity")
-					passives = list("Deterioration" = 1, "Erosion" = 0.15, "SpiritFlow" = 4, "Amplify" = 3, "LikeWater" = 4, /* ??? */)
+					passives = list("Deterioration" = 1, "Erosion" = 0.15,  "Amplify" = 3, /* ??? */)
 					ElementalDefense = "Void"
 					ElementalOffense = "Void"
 					StyleFor = 1.3
@@ -117,7 +117,7 @@
 	Gamma_Style
 		SignatureTechnique = 3
 		StyleActive = "Betel"
-		passives = list("SpiritFlow" = 4, "LikeWater" = 4, "Adaptation" = 4, "Steady" = 4)
+		passives = list()
 		StyleStr = 1.3
 		StyleSpd = 1.3
 		StyleFor = 1
@@ -155,7 +155,7 @@
 					ElementalClass = "Fire"
 					ElementalOffense = "Fire"
 					ElementalDefense = "Fire"
-					passives = list("Adaptation" = 5, "Scorching" = 2, "Combustion" = 60, "SpiritHand" = 4, "Heavy Strike" = "Inferno", "Fa Jin" = 2, "Instinct" = 4, "Momentum" = 4)
+					passives = list( "Scorching" = 2, "Combustion" = 60,  "Heavy Strike" = "Inferno", "Fa Jin" = 2, "Momentum" = 4)
 					Finisher = "/obj/Skills/Queue/Finisher/Sorblow"
 				if("kaus")
 					StyleActive = "Kaus"
@@ -168,7 +168,7 @@
 					ElementalClass = "Wind"
 					ElementalOffense = "Wind"
 					ElementalDefense = "Wind"
-					passives = list("Adaptation" = 5, "BlurringStrikes" = 3, "Shocking" = 3, "Flicker" = 4, "Flow" = 4, "Speed Force" = 1, "AttackSpeed" = 2, "Fury" = 4, "Skimming" = 2)
+					passives = list(  "Shocking" = 3, "Flicker" = 4, "Speed Force" = 1, "AttackSpeed" = 2, "Fury" = 4, "Skimming" = 2)
 					Finisher = "/obj/Skills/Queue/Finisher/Urda_Impulse"
 				if("wezen")
 					StyleActive = "Wezen"
@@ -181,7 +181,7 @@
 					ElementalClass = "Earth"
 					ElementalOffense = "Earth"
 					ElementalDefense = "Earth"
-					passives = list("Adaptation" = 5, "Harden" = 5, "Blubber" = 4, "SweepingStrike" = 1, "Extend" = 2, "Gum Gum" = 2, "GiantForm" = 1, "Juggernaut" = 4, "Shattering" = 5)
+					passives = list( "Harden" = 5, "Blubber" = 4, "SweepingStrike" = 1, "Extend" = 2, "Gum Gum" = 2, "GiantForm" = 1, "Juggernaut" = 4, "Shattering" = 5)
 					Finisher = "/obj/Skills/Queue/Finisher/Albion"
 				if("gulus")
 					StyleActive = "Gulus"
@@ -194,7 +194,7 @@
 					ElementalClass = "Dark"
 					ElementalOffense = "Dark"
 					ElementalDefense = "Dark"
-					passives = list("HellPower" = 0.25, "AbyssMod" = 5, "DemonicDurability" = 5, "HellRisen" = 0.5, "SpiritHand" = 4, "SpiritFlow" = 4, "AngerAdaptiveForce" = 0.25, "Scorching" = 5, "Poisoning" = 5, "LikeWater" = 4)
+					passives = list("HellPower" = 0.25, "AbyssMod" = 5,  "HellRisen" = 0.5,    "Scorching" = 5, "Poisoning" = 5)
 					Finisher = "/obj/Skills/Queue/Finisher/Desdemona"
 		proc/doSlideEvolution(mob/owner)
 			if(!owner) return

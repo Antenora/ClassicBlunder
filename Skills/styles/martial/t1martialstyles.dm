@@ -16,7 +16,7 @@
 		StyleStr=1.15
 		StyleEnd=1.15
 		StyleDef=1.15
-		passives = list("Harden" = 1.5, "Deflection" = 0.5, "Momentum" = 1.5, "Pressure" = 1)
+		passives = list("Harden" = 1.5, "Deflection" = 0.5, "Momentum" = 1.5)
 		StyleActive="Heavenly Dragon Stance"
 		Finisher="/obj/Skills/Queue/Finisher/Heavenly_Dragons_Omniscient_Surge"
 		verb/Wushu_Style()
@@ -32,7 +32,7 @@
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Wushu_Style"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/Mantis_And_Crane_Style", \
 		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Circuit_Breaker_Style"= "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Psycho_Boxing", \
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker"= "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ifrit_Jambe")
-		passives = list("Harden" = 1, "SpiritHand" = 1, "Instinct" = 1, "Flow" = 1)
+		passives = list("Harden" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Mouton_Shot"
 		verb/Black_Leg_Style()
 			set hidden=1
@@ -45,7 +45,7 @@
 		StyleSpd=1.15
 		StyleOff=1.15
 		StyleDef=1.15
-		passives = list("Fa Jin" = 2, "Momentum" = 1, "BlurringStrikes" = 0.25, "Interception" = 1)
+		passives = list("Fa Jin" = 2, "Momentum" = 1,  "Interception" = 1)
 		StyleActive="Wing Chun"
 		Finisher="/obj/Skills/Queue/Finisher/Dark_Dragon_Commandment"
 		verb/Wing_Chun_Style()
@@ -60,7 +60,7 @@
 		StyleEnd=1.3
 		StyleOff=1.15
 		StyleDef=1.15
-		passives = list("Fa Jin" = 2,"Acupuncture" = 1, "Flow" = 1, "Interception" = 1)
+		passives = list("Fa Jin" = 2, "Interception" = 1)
 		StyleActive="Tai Chi"
 		Finisher="/obj/Skills/Queue/Finisher/Dim_Mak"
 		verb/Tai_Chi_Style()

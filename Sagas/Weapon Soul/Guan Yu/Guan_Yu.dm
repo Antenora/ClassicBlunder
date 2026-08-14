@@ -13,7 +13,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	StrMult=1.3
 	OffMult=1.3
 	DefMult=1.3
-	passives = list("Zornhau" = 2, "Steady" = 2, "LikeWater" = 2, "Iaijutsu" = 2)
+	passives = list(  "Iaijutsu" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s warful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their warful luster..."
@@ -32,7 +32,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 
 /obj/Skills/Buffs/NuStyle/SwordStyle/Gong_Bu
 	StyleActive="Gong Bu"
-	passives = list("Reversal" = 0.1, "Brutalize" = 0.5, "Parry" = 0.25)
+	passives = list("Reversal" = 0.1,  "Parry" = 0.25)
 	StyleEnd=1.1
 	StyleStr=1.1
 	Finisher="/obj/Skills/Queue/Finisher/Descending_Dragon"
@@ -40,7 +40,6 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 		StyleStr = 1.05 + (0.05 * p.SagaLevel)
 		StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 		passives["Reversal"] = 0.1 + (0.2 * p.SagaLevel)
-		passives["Brutalize"] = 0.5 + (0.5 * p.SagaLevel)
 		passives["Parry"] = 0.25 + (0.25 * p.SagaLevel)
 	verb/Gong_Bu()
 		set hidden=1
@@ -51,7 +50,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	StrMult=1.3
 	DefMult=1.15
 	OffMult=1.15
-	passives = list("Brutalize" = 2, "Disarm" = 2, "Iajutsu" = 2)
+	passives = list( "Disarm" = 2, "Iaijutsu" = 2)
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Reeling_Blow
 	IconLock='SweatDrop.dmi'
@@ -68,7 +67,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	Rush = 2
 	ControlledRush = 1
 	MortalBlow=1
-	StrOffense=1
+	StrScaling=1
 	DamageMult=12
 	Distance=1
 	Shattering = 30

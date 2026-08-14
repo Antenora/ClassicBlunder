@@ -69,7 +69,7 @@ ascension
 							defense = 0.5
 							endurance = 0.5
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "Flow" = 2, "Instinct" = 2)
+							passives += list("KiControlMastery"= 1)
 						if("Resourceful")
 							offense = 0.1
 							strength = 0.1
@@ -83,7 +83,7 @@ ascension
 				..()
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("Tenacity" = 1, "Shonen" = 1, "ShonenPower" = 0.15, "UnderDog"=1, "Adrenaline"=1, "Persistence" = 1, "Adaptation" = 1)
+			passives = list("Tenacity" = 1, "Shonen" = 1, "ShonenPower" = 0.15, "UnderDog"=1, "Adrenaline"=1, "Persistence" = 1)
 			new_anger_message = "grows determined!"
 			on_ascension_message = "You learn the meaning of responsibility..."
 			simulateChoiceMutation(mob/owner)
@@ -105,7 +105,7 @@ ascension
 							defense = 1
 							endurance = 1
 							speed = 0.4
-							passives  += list("PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
+							passives  += list("PureDamage" = 2, "PureReduction" = 2)
 							if(!owner.passive_handler.Get("FavoredPrey"))
 								passives  += list("FavoredPrey" = "Transformations")
 						if("Resourceful")
@@ -124,7 +124,7 @@ ascension
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			var/mazokuSinChosen = ""
-			passives = list("Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list("Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message="grows confident!"
 			on_ascension_message = "You learn the meaning of confidence..."
 			anger = 0.1
@@ -152,7 +152,7 @@ ascension
 							defense = 1
 							endurance = 1
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 3, "PureReduction" = 3, "Flow" = 2, "Instinct" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 3, "PureReduction" = 3)
 							//TO DO - Something that makes them scale with SSj2. Passives? Inherent buff? hm.
 						if("Resourceful")
 							offense = 0.1
@@ -191,7 +191,7 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			passives = list("Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list("Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "gains absolute clarity!"
 			on_ascension_message = "You learn the meaning of competence..."
 			simulateChoiceMutation(mob/owner)
@@ -212,7 +212,7 @@ ascension
 							defense = 2
 							endurance = 2
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this three times
 						if("Resourceful")
 							offense = 0.1
@@ -228,7 +228,7 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			passives = list( "Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list( "Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "becomes angry!"
 			on_ascension_message = "You learn the meaning of humanity..."
 			simulateChoiceMutation(mob/owner)
@@ -249,7 +249,7 @@ ascension
 							defense = 2.5
 							endurance = 2.5
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 2, "Instinct" = 2)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this four times
 						if("Resourceful")
 							offense = 0.1
@@ -266,7 +266,7 @@ ascension
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			passives = list( "Tenacity" = 1, "DemonicDurability" = 0.5, "UnderDog"=1, "Persistence" = 1)
+			passives = list( "Tenacity" = 1,  "UnderDog"=1, "Persistence" = 1)
 			new_anger_message = "becomes angry!"
 			on_ascension_message = "You learn the meaning of humanity..."
 			simulateChoiceMutation(mob/owner)
@@ -286,7 +286,7 @@ ascension
 							defense = 2
 							endurance = 2
 							speed = 0.4
-							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2, "Flow" = 3, "Instinct" = 3)
+							passives += list("KiControlMastery"= 1, "PureDamage" = 2, "PureReduction" = 2)
 							//TO DO - Something that makes it not obvious that I just copied and pasted this five times
 						if("Resourceful")
 							offense = 0.1

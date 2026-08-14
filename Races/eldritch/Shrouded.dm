@@ -9,7 +9,7 @@
             EnhancedHearing=1;
             src << "Your senses sharpen!"
         if("Saiyan")
-            passive_handler.passives["ZenkaiPower"] = 0.5;
+            passive_handler.Set("ZenkaiPower", 0.5);
             src << "Your power rises in response to stress!"
         if("Human")
             RPPMult=1.35;
@@ -36,7 +36,6 @@
             switch(es.ShroudedOrigin)
                 if("Beastkin")
                     es.ShroudedPassives["DoubleStrike"]=1;
-                    es.ShroudedPassives["Pressure"]=1;
                     es.ShroudedPassives["Fury"]=1;
                     es.ShroudedPassives["Momentum"]=1;
                 if("Human")
@@ -45,13 +44,9 @@
                     es.ShroudedPassives["ShonenPower"]=0.5;
                     es.ShroudedPassives["Persistence"]=1;
                 if("Saiyan")
-                    es.ShroudedPassives["Steady"]=1;
                     es.ShroudedPassives["PureDamage"]=1;
                     es.ShroudedPassives["PureReduction"]=1;
-                    es.ShroudedPassives["Brutalize"]=1;
                 if("Namekian")
-                    es.ShroudedPassives["SpiritSword"]=1;
-                    es.ShroudedPassives["SpiritFlow"]=1;
                     es.ShroudedPassives["TechniqueMastery"]=1;
                     es.ShroudedPassives["Pursuer"]=1;
         if(es.currentTier >= 2)
@@ -75,49 +70,31 @@
             es.ShroudedPassives = list();
             switch(es.ShroudedSubtype)
                 if("Feathers")
-                    es.ShroudedPassives["CriticalChance"] = 15;
                     es.ShroudedPassives["CriticalDamage"] = 0.15;
                     es.ShroudedPassives["CriticalBlock"] = 15;
-                    es.ShroudedPassives["BlockDamage"] = 0.15;
                 if("Heart")
                     es.ShroudedPassives["Harden"] = 2;
-                    es.ShroudedPassives["CallousedHands"] = 0.2;
                     es.ShroudedPassives["Adrenaline"] = 1;
                 if("Predator")
-                    es.ShroudedPassives["Steady"] = 2;
-                    es.ShroudedPassives["Brutalize"] = 2;
-                    es.ShroudedPassives["Unnerve"] = 1;
                 if("Heroism")
-                    es.ShroudedPassives["BuffMastery"] = 5;
                     es.ShroudedPassives["ShonenPower"] = 0.5;
                     es.ShroudedPassives["Persistence"] = 3;
                 if("Resourceful")
-                    es.ShroudedPassives["GodSpeed"] = 4;
+                    es.ShroudedPassives["Godspeed"] = 4;
                 if("Dogged")
                     es.ShroudedPassives["Motivation"] = 0.25;
                 if("Honor")
-                    es.ShroudedPassives["AngerAdaptiveForce"] = 0.3;
                     es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Juggernaut"] = 2;
-                if("Zeal")
-                    es.ShroudedPassives["LikeWater"] = 2;
-                    es.ShroudedPassives["Adaptation"] = 2;
-                    es.ShroudedPassives["MovementMastery"] = 5;
                 if("Pride")
                     es.ShroudedPassives["PureDamage"] = 2;
-                    es.ShroudedPassives["Steady"] = 2;
-                    es.ShroudedPassives["Brutalize"] = 2;
                 if("Warrior")
                     es.ShroudedPassives["TechniqueMastery"] = 2;
                     es.ShroudedPassives["Duelist"] = 2;
                     es.ShroudedPassives["Tenacity"] = 2;
                 if("Dragon")
                     es.ShroudedPassives["QuickCast"] = 2;
-                    es.ShroudedPassives["SpiritFlow"] = 1;
-                    es.ShroudedPassives["HybridStrike"] = 1;
                 if("Demon")
-                    es.ShroudedPassives["AngerAdaptiveForce"] = 0.3;
-                    es.ShroudedPassives["MovementMastery"] = 5;
                     es.ShroudedPassives["Extend"] = 1;
                     es.ShroudedPassives["Gum Gum"] = 1;
         if(es.currentTier >= 5)
@@ -140,14 +117,10 @@
                     es.ShroudedPassives["UnderDog"] = 2;
                     es.ShroudedPassives["Tenacity"] = 2;
                 if("Despair")
-                    es.ShroudedPassives["SaiyanPower"] = 0.5;
                     es.ShroudedPassives["PureDamage"] = 2;
                     es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Flicker"] = 2;
                 if("Eternity")
-                    es.ShroudedPassives["Instinct"] = 3;
-                    es.ShroudedPassives["Flow"] = 3;
-                    es.ShroudedPassives["BuffMastery"] = 5;
                     es.ShroudedPassives["Pursuer"] = 3;
 
 /mob/var

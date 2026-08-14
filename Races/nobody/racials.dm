@@ -3,6 +3,7 @@
 	TextColor=rgb(255, 0, 0)
 	Cooldown=60
 	LunarWrath=1
+	AngerFloor=90
 	ManaDrain=1
 	PostBuffEff="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
 	CustomActive="<b>The light of Kingdom Hearts fills the air, as the wrath of the moon coalesces into a single point!</b>"
@@ -118,7 +119,7 @@
 	The_Other_Promise
 		OffMult=1.35
 		SpdMult=1.35
-		passives = list("SwordAscension" = 1, "Flicker" = 3, "Brutalize" = 1, "Instinct" = 2)
+		passives = list("SwordAscension" = 1, "Flicker" = 3)
 		verb/The_Other_Promise()
 			set category="Skills"
 			src.Trigger(usr)

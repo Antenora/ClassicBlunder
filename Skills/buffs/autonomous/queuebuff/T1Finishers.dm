@@ -28,7 +28,7 @@
         StyleNeeded = "Wing Chun"
         SpdMult = 1.3
         OffMult = 1.2
-        passives = list("Relentlessness" = 1, "Fury" = 4, "BuffMastery" = 2, "StyleMastery" = 2, "DebuffResistance" = 2, "TensionLock" = 1)
+        passives = list("Relentlessness" = 1, "Fury" = 4,   "TensionLock" = 1)
         ActiveMessage = "showcases the essence of Wing Chun!"
     Contempt_for_the_Weak
         IconLock='SweatDrop.dmi'
@@ -40,7 +40,7 @@
         OffMult=1.3 // freebie
         SpdMult=1.3 // other .2
         // flip flop the stats
-        passives = list("BuffMastery" = 1, "StyleMastery" = 2, "Brutalize" = 1, "TensionLock" = 1)
+        passives = list(   "TensionLock" = 1)
     Iron_Muscle
         IconLock='SweatDrop.dmi'
         IconApart=1
@@ -50,14 +50,14 @@
         SpdMult = 0.5
         StrMult = 1.5
         EndMult = 1.5
-        passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "Juggernaut"= 2, "KBRes"= 2, "TensionLock" = 1)
+        passives = list("Muscle Power" = 2, "TechniqueMastery" = 3, "Juggernaut"= 2, "TensionLock" = 1)
     Diable_Jambe
         IconLock='SweatDrop.dmi'
         IconApart=1
         StyleNeeded="Black Leg"
         StrMult=1.25
         ForMult=1.25
-        passives = list("TensionLock" = 1, "SpiritHand" = 1, "Pursuer" = 2, "Instinct" = 2)
+        passives = list("TensionLock" = 1,  "Pursuer" = 2)
         ActiveMessage="ignites their legs!"
         OffMessage="burns out..."
     Heavenly_Dragons_Transient_Enlightenment
@@ -66,7 +66,7 @@
         IconApart=1
         StrMult=1.25
         EndMult=1.25
-        passives = list("TensionLock" = 1, "Deflection" = 0.5, "Disorienting" = 2,"Momentum" = 2, "MovementMastery" = 3, "TensionLock" = 1)
+        passives = list("TensionLock" = 1, "Deflection" = 0.5, "Disorienting" = 2,"Momentum" = 2,  "TensionLock" = 1)
         ActiveMessage="achieves the peak of their breakthrough..."
         OffMessage="comes back down to mortal level..."
 
@@ -77,7 +77,7 @@
         StyleSpd=1.25
         StyleStr=1.25
         passives = list("TensionLock" = 1, "Momentum" = 1, "DoubleStrike" = 1,\
-                        "Steady" = 2, "Instinct" = 2, "TensionLock" = 1)
+                         "TensionLock" = 1)
 
     Iai
         IconLock='SweatDrop.dmi'
@@ -121,7 +121,7 @@
     Zwercopter
         IconLock='Ice_Aura_2.dmi'
         IconApart=1
-        passives = list("Half-Sword" = 0.5, "Zornhau" = 0.5, "Momentum" = 2, "HeavyHitter" = 1, "CheapShot" = 1,\
+        passives = list("Half-Sword" = 0.5,  "Momentum" = 2, "HeavyHitter" = 1, "CheapShot" = 1,\
                      "HardStyle" = 1, "TensionLock" = 1)
         StrMult=1.3
         OffMult=1.2
@@ -131,22 +131,22 @@
     Magma_Fist
         ForMult=1.3
         EndMult=1.2
-        passives = list("Harden" = 2, "BlockChance" = 25, "CriticalBlock" = 0.15, "Burning" = 3, "Crushing" = 5, "TensionLock" = 1)
+        passives = list("Harden" = 2, "CriticalBlock" = 0.15, "Burning" = 3, "Crushing" = 5, "TensionLock" = 1)
 
     Cool_Guy
         OffMult=1.15
         ForMult=1.15
         EndMult=1.2
-        passives = list("Freezing" = 5, "Shattering" = 3, "Harden" = 2, "Steady" = 2, "TensionLock" = 1)
+        passives = list("Freezing" = 5, "Shattering" = 3, "Harden" = 2,  "TensionLock" = 1)
 
     Conduit
         SpdMult=1.2
         ForMult=1.2
         OffMult=1.1
-        passives = list("Paralyzing" = 5, "Chilling" = 3, "Steady" = 1, "Flicker" = 2, "Pursuer" = 2, "TensionLock" = 1)
+        passives = list("Paralyzing" = 5, "Chilling" = 3,  "Flicker" = 2, "Pursuer" = 2, "TensionLock" = 1)
 
     Fire_Fist
-        passives = list("SpiritHand" = 1, "Scorching" = 5, "Shocking" = 3, "Flicker" = 1, "Pursuer" = 1, "TensionLock" = 1)
+        passives = list( "Scorching" = 5, "Shocking" = 3, "Flicker" = 1, "Pursuer" = 1, "TensionLock" = 1)
         ForMult=1.3
         StrMult=1.2
 

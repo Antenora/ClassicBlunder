@@ -110,7 +110,7 @@ imitation_info
     verb/Activate_Void()
         set category = "Roleplay"
         set hidden = 1
-        usr.passive_handler.Set("Void", !usr.passive_handler.passives["Void"])
+        usr.passive_handler.Set("Void", !usr.passive_handler.Get("Void"))
         usr << "Void is [usr.passive_handler["Void"] ? "on" : "off"]."
 
 

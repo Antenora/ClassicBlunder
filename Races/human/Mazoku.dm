@@ -18,8 +18,7 @@
 		del T
 	p << "You have been given Mazoku."
 	p.passive_handler.Increase("HellPower", 0.25)
-	p.passive_handler.Increase("DemonicDurability", 2)
 	p.passive_handler.Increase("AbyssMod", 1)
 	p.passive_handler.Increase("DormantDemon", 1)
 	p.TrueName=input(p, "Your lineage can be traced to a Great Demon Lord. Who were they?", "Get True Name") as text
-	p << "The name your Mazoku Ancestor is <b>[p.TrueName]</b>."
+	p << "The name of your Mazoku Ancestor is <b>[p.TrueName]</b>."

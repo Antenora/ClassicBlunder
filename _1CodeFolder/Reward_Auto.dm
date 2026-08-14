@@ -27,6 +27,7 @@ mob
 	proc
 		reward_auto()
 			CheckLifeStaminaRefill()
+			spawn(50) AhLoginPing()
 			if(RewardsLastGained < DaysOfWipe())
 				var/Dif = glob.progress.DaysOfWipe - RewardsLastGained
 				Dif = round(Dif)

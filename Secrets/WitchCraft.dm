@@ -208,7 +208,6 @@ mob/Admin3/verb/GiveWitchBook()
 	HitMessage="slams back the opponents attack from the Mirrors!!"
 	Counter = 1
 	NoWhiff = 1
-	NoMiss = 1
 	DamageMult = 0.1
 	AccuracyMult = 1.175
 	Instinct = 1

@@ -6,7 +6,7 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 	Destructable=0
 	ShatterTier=0
 	Ascended=6
-	passives = list("Shearing" = 1, "CursedWounds" = 1, "MortalStrike" = 0.5)
+	passives = list("Shearing" = 1, "CursedWounds" = 1)
 	var/hasKilled = FALSE
 	proc/drawDainsleif(mob/p)
 		hasKilled = FALSE
@@ -14,7 +14,6 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 			p << "You draw the blade from it sheathe and are barely able to contain its immense bloodlust. The sword cries out, waning for blood."
 			OMsg(p, "[p.name] draws their blade from its sheathe and they can barely contain it. The Sword of Ruin wans for blood...")
 		p.dainsleifDrawn = TRUE
-		spawn(20) dainsleifDrain(p)
 	proc/onKill(mob/atk, mob/defend)
 		hasKilled = TRUE
 		OMsg(atk, "The Sword of Ruin's blood lust has been sated by [defend.name]'s death!")
@@ -41,20 +40,12 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 			p.dainsleifDrawn = TRUE
 			return TRUE
 
-	proc/dainsleifDrain(mob/p)
-		if(glob.DainsleifDrain && p.dainsleifDrawn)
-			while(p.dainsleifDrawn)
-				sleep(10)
-				if(!p.KO)
-					p.DoDamage(p, glob.DainsleifDrainAmount / p.SagaLevel)
-		else
-			return .
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif
 	name = "Heavenly Regalia: Ruined World"
 	StrMult=1.5
 	OffMult=1.5
-	passives = list("Instinct" = 3, "LifeStealTrue" = 1, "PureDamage" = 1)
+	passives = list("LifeSteal" = 25, "LifeStealPierce" = 1, "PureDamage" = 1)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="soaks the world in blood: Heavenly Regalia!"
 	OffMessage="'s treasure loses its ruinous luster..."
@@ -87,7 +78,7 @@ obj/Skills/AutoHit/Bloody_CravingEnhanced
 	Area="Wave"
 	ComboMaster=1
 	GuardBreak=1
-	StrOffense=1
+	StrScaling=1
 	PassThrough=1
 	PreShockwave=1
 	PostShockwave=0
@@ -111,8 +102,8 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/We_Dine
 obj/Skills/AutoHit/Destined_Death
 	NeedsSword=1
 	Area="Circle"
-	StrOffense=1
-	EndDefense=1
+	StrScaling=1
+	EndEffectiveness=1
 	DamageMult=8
 	Shearing=10
 	CursedWounds=1
@@ -158,7 +149,7 @@ obj/Skills/AutoHit/Destined_Death
 		usr.Activate(src)
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
-	passives = list("Maki" = 1,"Steady" = 1,"HardStyle" = 1, "Duelist" = 1, "KillerInstinct" = 0.10, "SuperDash" = 1,)
+	passives = list("Maki" = 1,"HardStyle" = 1, "Duelist" = 1,  "SuperDash" = 1,)
 	TimerLimit=20
 	ManaGlow=rgb(165,0,0)
 	ManaGlowSize=3
@@ -167,7 +158,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Might_of_Dainn
 		StyleActive="Might of Dáinn"
-		passives = list("Duelist" = 1, "Steady" = 1)
+		passives = list("Duelist" = 1)
 		StyleOff=1
 		StyleStr=1.30
 		Finisher="/obj/Skills/Queue/Finisher/Wrath_of_Hogni"
@@ -175,7 +166,6 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 			StyleStr = 1.10 + (0.05 * p.SagaLevel)
 			StyleOff = 1 + (0.05 * p.SagaLevel)
 			passives["Duelist"] = 1 + (0.5* p.SagaLevel)
-			passives["Steady"] = 1+p.SagaLevel
 		verb/Might_of_Dainn()
 			set hidden=1
 			adjust(usr)
@@ -192,7 +182,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
 	Hymn_of_Hjaoningavig
 		StrMult=1.6
-		passives = list("KillerInstinct" = 0.1, "SlayerMod" = 1, "FavoredPrey" = "All", "Duelist" = 2)
+		passives = list( "SlayerMod" = 1, "FavoredPrey" = "All", "Duelist" = 2)
 	Lament_of_Hildr
 		IconLock='SweatDrop.dmi'
 		IconApart=1
@@ -200,3 +190,12 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 		DefMult=0.8
 		ActiveMessage="feels themselves shake as they feel Queen Hildr's lament..."
 		OffMessage="shakes off the vestiges of grief!"
+
+/strikeHook/dainsleifCursedSheath
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/val = S.dealt
+		if(attacker.dainsleifDrawn&&attacker.passive_handler.Get("CursedSheath")) // dainsleif passive
+			attacker.cursedSheathValue += val
+			attacker.cursedSheathValue = clamp(0, attacker.cursedSheathValue, attacker.SagaLevel*50)

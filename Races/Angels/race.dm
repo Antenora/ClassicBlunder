@@ -47,7 +47,6 @@ race
 								user << "You have embarked upon the path of true martial arts mastery: Ultra Instinct."
 								user.Secret="Ultra Instinct"
 								user.UILevel=1
-								passives["StyleMastery"]=7
 				user.AngelAscension = Choice
 				//t1 style/armor unlocked
 

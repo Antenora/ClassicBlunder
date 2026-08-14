@@ -1,3 +1,12 @@
+//ais window mode helpers
+mob/var/tmp/ais_window_until = 0
+
+mob/proc/aisArmed()
+	return world.time <= ais_window_until
+
+mob/proc/aisConsume()
+	ais_window_until = 0
+
 mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE)
 	if(Z)
 		if(!locate(Z) in src)
@@ -11,9 +20,9 @@ mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE
 					src << "You can't clear Stagger with AIS!!"
 					return
 				if(src.TimeFrozen)return
-				if(!src.AfterImageStrike)
+				if(!src.aisArmed())
 					KenShockwave(src, icon='KenShockwaveLegend.dmi', Size=0.5, Blend=2, Time=4)
-					src.AfterImageStrike=1
+					src.ais_window_until = world.time + glob.TIMING_WINDOW
 					if(Stunned)
 						StunClear(src)
 					src << "You focus intently on your opponents movements..."

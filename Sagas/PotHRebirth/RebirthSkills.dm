@@ -32,7 +32,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Soul
 	Cooldown = 1
 	adjust(mob/p)
 		if(altered) return
-		passives = list("Instinct" = round(p.Potential/20,1), "Pursuer" = round(p.Potential/20,1))
+		passives = list("Pursuer" = round(p.Potential/20,1))
 		PowerMult=1.15
 		StrMult=1.25
 		ForMult = 1.15
@@ -57,7 +57,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero
 	Cooldown = 1
 	adjust(mob/p)
 		if(altered) return
-		passives = list("FluidForm" = round(p.Potential/20,1), "LikeWater" = round(p.Potential/20,1)) //cat joke
+		passives = list()
 		StrMult=1.1
 		EndMult = 1.1
 		ForMult = 1.1
@@ -79,7 +79,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dont_Stop_Me_Now //first act
 	SpdMult=1.15
 	Cooldown = 1
 	AwakeningRequired=1
-	passives = list("BuffMastery" = 1,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 //HE'S GOTTA BE STRONG AND HE'S GOTTA BE FAST AND HE'S GOTTA BE FRESH FROM THE NIGHT
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Temporary_Hero_Heart
 	ActiveMessage="awakens a heroic heart!"
@@ -99,7 +99,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Temporary_Hero_Soul
 	RecovMult=1.25
 	Cooldown = 1
 	TimerLimit = 30
-	passives = list("Instinct" = 1, "Pursuer" = 1)
+	passives = list("Pursuer" = 1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Heart
 	ActiveMessage="awakens a heroic heart!"
 	PowerMult=1.15
@@ -118,7 +118,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Soul
 	RecovMult=1.25
 	AlwaysOn = 1
 	TimerLimit = 30
-	passives = list("Instinct" = 1, "Pursuer" = 1)
+	passives = list("Pursuer" = 1)
 //t3 path buffs
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shining_Star
 	TooMuchHealth = 100
@@ -146,7 +146,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Of_Chaos
 	AngerPoint=65
 	RecovMult=1.75
 	Cooldown = 1
-	passives = list("FluidForm" = 1, "Controlled Chaos" = 1)
+	passives = list("Controlled Chaos" = 1)
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Axe_of_Justice
 	TooMuchHealth = 100
@@ -154,7 +154,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Axe_of_Justice
 	EndMult = 1.25
 	ForMult=1.5
 	Cooldown = 1
-	passives = list("Neverending Hope" = 1, "Unstoppable" =1)
+	passives = list("SecondWind" = "Hope", "Unstoppable" =1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/We_Are_The_Champions //second act
 	StrMult=1.1
 	EndMult = 1.1
@@ -162,14 +162,14 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/We_Are_The_Champions //second act
 	SpdMult=1.15
 	Cooldown = 1
 	AwakeningRequired=2
-	passives = list("BuffMastery" = 2,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Blue_Experience //second act
 	ActiveMessage="burns brighter than they should."
 	SpdMult=1.5
 	Cooldown = 1
 	TimerLimit=300
 	HealthDrain = 0.05
-	passives = list("BuffMastery" = 3,"Pursuer" =2, "Godspeed"=2)
+	passives = list("Pursuer" =2, "Godspeed"=2)
 //t4 path buffs
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Show_Must_Go_On //third act
 	StrMult=1.25
@@ -179,7 +179,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/The_Show_Must_Go_On //third act
 	Cooldown = 1
 	AwakeningRequired=3
 	TimerLimit=300
-	passives = list("BuffMastery" = 3,"KiControlMastery" =1, "TechniqueMastery"=1)
+	passives = list("KiControlMastery" =1, "TechniqueMastery"=1)
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Burning_Soul
 	ActiveMessage="transforms their passion into fury, their desire to win surpassing all."
 	Cooldown = 1
@@ -189,7 +189,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Burning_Soul
 //debuffs
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Rebirth/Dissociation
 	ActiveMessage="doesn't appear to be all there."
-	passives = list("BuffMastery" = -1, "Flow" = -2, "Instinct" = -2)
+	passives = list()
 	SlowAffected = 1
 	TimerLimit = 6000
 	Cooldown = 4
@@ -204,7 +204,7 @@ obj/Skills/AutoHit
 		AwakeningSkill=1
 		Cooldown=-1
 		ActNumber=3
-		StrOffense=1
+		StrScaling=1
 		Rush=10
 		SpecialAttack=1
 		CanBeDodged=0
@@ -231,7 +231,7 @@ obj/Skills/AutoHit
 			usr.TriggerAwakeningSkill(ActNumber)
 	Snowgrave
 		ElementalClass="Water"
-		ForOffense=1.5
+		ForScaling=1.5
 		SpecialAttack=1
 		GuardBreak=1
 		DamageMult=1500
@@ -255,7 +255,7 @@ obj/Skills/AutoHit
 		SpecialAttack=1
 		GuardBreak=1
 		DamageMult=1
-		StrOffense=1
+		StrScaling=1
 		TurfShift='IceGround.dmi'
 		Distance=15
 		WindUp=0.5
@@ -299,8 +299,8 @@ obj/Skills/AutoHit
 			usr.TriggerAwakeningSkill(ActNumber)
 	Unleash
 		ManaCost=75
-		StrOffense=0
-		ForOffense=1
+		StrScaling=0
+		ForScaling=1
 		HolyMod=40
 		DamageMult=15
 		Area="Circle"
@@ -347,7 +347,7 @@ obj/Skills/AutoHit
 		HitSparkSize=5
 		HitSparkCount=10
 		HitSparkDispersion=1
-		ForOffense=1
+		ForScaling=1
 		SpecialAttack=1
 		adjust(mob/p)
 			if(p.passive_handler.Get("Shatter Fate"))
@@ -358,8 +358,8 @@ obj/Skills/AutoHit
 			adjust(usr)
 			usr.Activate(src)
 	Burning_Up_Everything
-		StrOffense=0
-		ForOffense=1
+		StrScaling=0
+		ForScaling=1
 		DamageMult=14
 		HealthCost=3
 		Area="Circle"
@@ -450,8 +450,8 @@ obj/Skills/AutoHit
 			adjust(usr)
 			usr.Activate(src)
 	Platinum_Mad
-		StrOffense=1
-		ForOffense=1
+		StrScaling=1
+		ForScaling=1
 		DamageMult=3
 		Area="Circle"
 		Distance=12
@@ -480,6 +480,41 @@ obj/Skills/AutoHit
 			set category="Skills"
 			set hidden=1
 			src.RebirthLastUse=world.realtime
+			usr.Activate(src)
+	X_Slash
+		Area="Target"
+		Cooldown=35
+		StrScaling=1
+		Rush=10
+		SpecialAttack=1
+		CanBeDodged=0
+		CanBeBlocked=1
+		DamageMult=10
+		ManaCost=10
+		Knockback=0
+		ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
+		HitSparkIcon='Slash_Multi.dmi'
+		HitSparkX=-32
+		HitSparkY=-32
+		HitSparkSize=1
+		ControlledRush=1
+		Instinct=1
+		adjust(mob/p)
+			if(p.passive_handler.Get("OmegaPower"))
+				Cooldown=20
+				ManaCost=20
+				DamageMult=25
+				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7500>m</font color><font color=#FFEB00>e</font color><font color=#9CFF00>g</font color><font color=#27FF00>a</font color> <font color=#00FFC4>X</font color><font color=#00C4FF>-</font color><font color=#004EFF>S</font color><font color=#2700FF>l</font color><font color=#9C00FF>a</font color><font color=#FF00EB>s</font color><font color=#FF0075>h</font color></b>!!!!"
+			else
+				Cooldown=35
+				ManaCost=10
+				DamageMult=10
+				ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
+		verb/X_Slash()
+			set category="Skills"
+			set name="X-Slash"
+			if(!altered)
+				adjust(usr)
 			usr.Activate(src)
 mob/proc/TriggerAwakeningSkill(ActNumber)
 	if(ActNumber>=1)
@@ -742,7 +777,6 @@ obj/Skills/Utility
 			src.Using=1
 		//	usr.loc=usr.UndyingLoc
 			//usr.loc=usr.UndyingLoc
-			usr.passive_handler.Decrease("Undying")
 		//	usr.OMessage(15,"[usr] <b>shines brightly with everlasting Hope, refusing to allow their story to end!</b>","<font color=red>[usr]([usr.key]) used Undying.")
 			var/image/GG=image('GodGlow.dmi',pixel_x=-32,pixel_y=-32, loc = usr, layer=MOB_LAYER-0.5)
 			GG.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
@@ -810,10 +844,20 @@ obj/Skills/Projectile
 		Dodgeable=-1
 		Deflectable=-1
 		IconLock='RudeBuster2.dmi'
+		ActiveMessage="uses Rude Buster!!"
 		LockX=-16
 		IconSize=1
 		Radius=3
 		Homing=1
+		adjust(mob/p)
+			if(p.passive_handler.Get("OmegaPower"))
+				ManaCost=40
+				DamageMult=15
+				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7F00>m</font color><font color=#FFFF00>e</font color><font color=#7FFF00>g</font color><font color=#00FF00>a</font color> <font color=#00FEFF>B</font color><font color=#007FFF>u</font color><font color=#0000FF>s</font color><font color=#7F00FF>t</font color><font color=#FF00FE>e</font color><font color=#FF007F>r</font color></b>!!!!"
+			else
+				ManaCost=50
+				DamageMult=4
+				ActiveMessage="uses Rude Buster!!"
 		verb/Rude_Buster()
 			set category="Skills"
 			set name="Rude Buster"
@@ -888,8 +932,8 @@ obj/Skills/Projectile
 			DamageMult=12
 			Immediate=1
 			Dodgeable=0
-			StrRate=1
-			ForRate=1
+			StrScaling=1
+			ForScaling=1
 			IconLock='carefully.dmi'
 			Cooldown=120
 			EnergyCost=5
@@ -1005,7 +1049,7 @@ obj/Skills/Buffs
 			DefMult=1.1
 			EnergyHeal=1
 			ManaGlow="Rainbow"
-			passives = list("Flicker" = 1, "Pursuer"=1, "Instinct"=1, "ChaosQueen" = 1, "Prismatic" =1, "KiControl" = 1)
+			passives = list("Flicker" = 1, "Pursuer"=1, "ChaosQueen" = 1, "Prismatic" =1, "KiControl" = 1)
 			ActiveMessage="casts aside certainty in the name of possibility, singing the <b>Song of the Chaos Queen!</b>"
 			OffMessage="normalizes their outcomes, putting aside the mantle of the Chaos Queen."
 			verb/Chaos_Queen()
@@ -1041,11 +1085,11 @@ obj/Skills/Buffs
 			PowerMult=1.25
 			Cooldown = 1
 			SwordAscension=6
-			passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=3, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+			passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 			ActiveMessage="materializes the Black Knife."
 			OffMessage="puts the black knife away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "AbyssMod" = 3, "BlurringStrikes"=5, "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+				passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1073,7 +1117,7 @@ obj/Skills/Buffs
 			ActiveMessage="pulls out a small shard of glass that seems barely usable as a weapon."
 			OffMessage="puts the black shard away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "HolyMod" = 3, "BlurringStrikes"=5, "KiControl"=1)
+				passives = list("PUSpike"=50, "HolyMod" = 3,  "KiControl"=1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1101,7 +1145,7 @@ obj/Skills/Buffs
 			ActiveMessage="manifests their will to change fate, every determination color melding into one: White!"
 			OffMessage="puts the pen away."
 			adjust(mob/p)
-				passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 0.5,"EndlessNine"=0.15)
+				passives = list("PUSpike"=100, "HolyMod" = 5,  "KiControl"=1)
 				PowerMult=1.25
 				StrMult=1.5
 				ForMult=1.5
@@ -1109,7 +1153,7 @@ obj/Skills/Buffs
 				EnergyHeal=1
 				SwordUnbreakable=1
 				if(p.SagaLevel>=6)
-					passives = list("PUSpike"=100, "HolyMod" = 5, "BlurringStrikes"=5, "KiControl"=1, "SpiritSword" = 1,"EndlessNine"=0.5,"MovementMastery"=6)
+					passives = list("PUSpike"=100, "HolyMod" = 5,  "KiControl"=1)
 			verb/White_Pen_of_Hope()
 				set category="Skills"
 				adjust(usr)
@@ -1155,11 +1199,11 @@ obj/Skills/Buffs
 					EnergyHeal=1
 					SwordUnbreakable=1
 					if(p.SagaLevel>=6)
-						passives = list("PUSpike"=50,"KiControl" = 1,"CallousedHands"=0.25, "ManaGeneration"=2)
+						passives = list("PUSpike"=50,"KiControl" = 1, "ManaGeneration"=2)
 					if(p.passive_handler["FutureRewritten"])
-						passives = list("PUSpike"=50, "SpiritSword" = 0.75, "ManaGeneration" = 1,"KiControl" = 1)
+						passives = list("PUSpike"=50,  "ManaGeneration" = 1,"KiControl" = 1)
 						if(p.SagaLevel>=6)
-							passives = list("PUSpike"=50, "SpiritSword" = 0.75, "ManaGeneration" = 3,"KiControl" = 1,"CallousedHands"=0.25)
+							passives = list("PUSpike"=50,  "ManaGeneration" = 3,"KiControl" = 1)
 			verb/JusticeAxe()
 				set category="Skills"
 				set name="Axe of Justice"
@@ -1179,7 +1223,7 @@ obj/Skills/Buffs
 			ActiveMessage="draws forth a black and orange sword!"
 			OffMessage="sheathes their spooky blade!"
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "BlurringStrikes"=3,"KiControl" = 1)
+				passives = list("PUSpike"=50, "KiControl" = 1)
 				PowerMult=1.25
 				EnergyHeal=1
 				if(p.SagaLevel>=3)
@@ -1210,7 +1254,7 @@ obj/Skills/Buffs
 obj/Skills/Grapple
 	CHAOS_DUNK
 		DamageMult=10
-		StrRate=1
+		StrScaling=1
 		TriggerMessage="comes on and slams"
 		Effect="Lotus"
 		EffectMult=4
@@ -1224,7 +1268,7 @@ obj/Skills/Grapple
 /obj/Skills/Buffs/NuStyle/SwordStyle //t3 scaled styles
 	The_Roaring_Knight //cyan t5 evil path
 		StyleActive="The Roaring Knight"
-		passives = list("BlurringStrikes"=2, "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2, "Twisted Sentimentality" = 1)
+		passives = list( "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2, "Twisted Sentimentality" = 1)
 		StyleEnd=1.5
 		StyleStr=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Twisted_Heartbeat"
@@ -1234,13 +1278,13 @@ obj/Skills/Grapple
 			Trigger(usr)
 	White_Pen_Of_Hope //cyan t5 good path
 		StyleActive="The White Pen of Hope"
-		passives = list("ManaGeneration" = 2, "ManaStats"=2, "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
+		passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
 		StyleSpd=1.5
 		StyleStr=1.25
 		StyleFor=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Cross_Slash"
 		adjust(mob/p)
-			passives = list("ManaGeneration" = 2, "ManaStats"=2, "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
+			passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
 		verb/Pen_Of_Hope()
 			set hidden=1
 			adjust(usr)
@@ -1251,11 +1295,11 @@ obj/Skills/Grapple
 		StyleFor=1.25
 		StyleEnd=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
-		passives = list("Deicide" = 10, "Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		adjust(mob/p)
-			passives = list("Deicide" = 10, "Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "EndlessNine"=0.25, "PureDamage"=4,"PureReduction"=4)
+			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=4,"PureReduction"=4)
 			if(p.SagaLevel>=6)
-				passives = list("Deicide" = 10, "Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "EndlessNine"=0.5, "PureDamage"=6,"PureReduction"=6)
+				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=6,"PureReduction"=6)
 		verb/Justice_Incarnate()
 			set hidden=1
 			adjust(usr)
@@ -1307,7 +1351,7 @@ obj/Skills/Grapple
 	Hope_Crossed_On_Your_Heart
 		StrMult=1.3
 		EndMult=1.3
-		passives = list("CallousedHands"=0.5, "Harden"=3, "TensionLock" = 1, "Brutalize" = 1.5)
+		passives = list( "Harden"=3, "TensionLock" = 1)
 	The_Cage_With_Human_Soul_And_Parts
 		StrMult=1.3
 		ForMult=1.3
@@ -1315,4 +1359,72 @@ obj/Skills/Grapple
 	Blackened_Knife
 		StrMult=1.3
 		SpdMult=1.3
-		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1, "BlurringStrikes" = 3, "Relentlessness" = 1, "Fury" = 3)
+		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1,  "Relentlessness" = 1, "Fury" = 3)
+
+//Determination spends the tank on a crit
+/strikeHook/determinationUnleash
+	stage = "crit"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		if(!(attacker.passive_handler["Determination(Red)"] && attacker.ManaAmount>=75 || attacker.passive_handler["Determination(White)"] && attacker.ManaAmount>=75))
+			return
+		if(attacker.SagaLevel<4||attacker.RebirthHeroType=="Red")
+			if(attacker.SagaLevel==3&&!attacker.passive_handler["UnleashToggle"])
+				var/obj/Skills/rider = attacker.findOrAddSkill(/obj/Skills/AutoHit/Unleash)
+				rider.adjust(attacker)
+				attacker.Activate(rider)
+			attacker.ManaAmount=0
+		if(attacker.SagaLevel>=4&&attacker.RebirthHeroType!="Red")
+			if(attacker.ManaAmount>=98)
+				if(!attacker.passive_handler["UnleashToggle"])
+					var/obj/Skills/rider = attacker.findOrAddSkill(/obj/Skills/AutoHit/Unleash)
+					rider.adjust(attacker)
+					attacker.Activate(rider)
+				if(attacker.SagaLevel<5)
+					attacker.ManaAmount=0
+				if(attacker.SagaLevel>=5&&attacker.ManaAmount>=150)
+					attacker.ManaAmount-=50
+
+//every Determination bonus the strike core reads lives here
+/mob/proc/hasDeterminationDesperation()
+	return passive_handler.Get("Determination(Orange)") || passive_handler.Get("Determination(White)")
+
+/mob/proc/getDeterminationCount()
+	. = passive_handler.Get("Determination(Orange)") ? 1 : 0
+	. += passive_handler.Get("Determination(White)") ? 1 : 0
+
+/mob/proc/getDeterminationDesperationRatio()
+	. = 0
+	. += passive_handler.Get("Determination(Orange)") ? (ManaAmount/250) : 0
+	. += passive_handler.Get("Determination(White)") ? (ManaAmount/250) : 0
+
+/mob/proc/getDeterminationPersistenceBonus()
+	if(passive_handler["Determination(Orange)"] || passive_handler["Determination(White)"])
+		return ManaAmount/20
+	return 0
+
+/mob/proc/getDeterminationBlockBonus()
+	. = 0
+	if(passive_handler["Determination(Red)"] && ManaAmount>=75 || passive_handler["Determination(White)"] && ManaAmount>=75)
+		if(SagaLevel<4||RebirthHeroType=="Red")
+			. += (ManaAmount/100)
+		else
+			if(ManaAmount<98)
+				. += (ManaAmount/150)
+			if(ManaAmount>=98)
+				. += (ManaAmount/33)
+
+/mob/proc/getDeterminationMeleeBonus()
+	. = 0
+	if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
+		. = GetEnd(round(ManaAmount/400,1))
+		if(passive_handler.Get("Determination(White)"))
+			. *= 2.5
+
+/mob/proc/determinationSoulRegen()
+	if(passive_handler["Determination(Purple)"] || passive_handler["Determination(White)"])
+		HealMana(SagaLevel / 60, 1)
+		if(ManaAmount>=100 && RebirthHeroType=="Cyan" && !passive_handler["Determination(White)"])
+			passive_handler.Set("Determination(Green)", 1)
+			passive_handler.Set("Determination(Purple)", 0)
+			src<<"Your SOUL color shifts to green!"

@@ -87,9 +87,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"       = 1 + SL,
 			"MagicSword"     = 1,
-			"HybridStrike"   = 0.5 + (0.5 * SL),
+
 			"Scorching"      = 1 + SL,
 			"Combustion"     = 50 + (SL * 5),
 			"SoulFire"       = 1 + SL
@@ -300,8 +299,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	Area="Target"
 	Distance=20
 	DamageMult=10
-	StrOffense=1
-	ForOffense=1
+	StrScaling=1
+	ForScaling=1
 	Scorching=20
 	Cooldown=0
 	WindUp=0
@@ -388,12 +387,10 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"         = 1 + SL,
 			"MagicSword"       = 1,
-			"HybridStrike"     = 2.5 + (0.5 * SL),
+
 			"Scorching"        = 3 + SL,
-			"SoulFire"         = 3 + SL,
-			"FireHerald"       = 1
+			"SoulFire"         = 3 + SL
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
@@ -468,10 +465,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	adjust(mob/p)
 		var/SL = p.SagaLevel
 		passives = list(
-			"PridefulRage" = 1,
-			"PureDamage"   = 1 + SL,
-			"Zornhau"      = 1 + SL,
-			"SpiritSword"   = 2
+			
+			"PureDamage"   = 1 + SL
 		)
 		OffMult = 1.1 + (0.1 * SL)
 		SpdMult = 1.1 + (0.1 * SL)

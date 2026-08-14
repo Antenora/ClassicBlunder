@@ -59,17 +59,17 @@
         BurnMastery
             name="Burn Mastery"
             desc="The mage's foundational understanding of fire. Each selection increases their resistance to Burn debuffs and deepens their grip on fire spells."
-            passives = list("BurnResist" = 1, "FireSpellManaCost" = 0.15)
+            passives = list("BurnResist" = 1, "Fire Magic Mastery" = 0.15)
 
         ScorchedForm
             name="Scorched Form"
             desc="The mage's body remembers the heat of every cast. Each selection further reinforces their physical conditioning around the practice of fire."
-            passives = list("BurnResist" = 1, "FireSpellCooldown" = 0.10)
+            passives = list("BurnResist" = 1, "Fire Magic Mastery" = 0.1)
 
         Alight
             name="Alight"
             desc="The mage has become a vessel for fire itself. The path beyond mastery — mana flows freely, the world bends to the heat."
-            passives = list("ManaGeneration" = 1, "PowerfulCasting" = 1, "FireSpellDamage" = 0.10, "FireSpellCooldown" = 0.10)
+            passives = list("ManaGeneration" = 1,  "Fire Magic Mastery" = 0.1)
 
     water
         element="Water"
@@ -77,17 +77,17 @@
         ChillMastery
             name="Chill Mastery"
             desc="The mage's foundational understanding of water. Each selection increases their resistance to Chill debuffs and deepens their grip on water spells."
-            passives = list("ChillResist" = 1, "WaterSpellManaCost" = 0.15)
+            passives = list("ChillResist" = 1, "Water Magic Mastery" = 0.15)
 
         FluidTechnique
             name="Fluid Technique"
             desc="The mage's mind moves in time with the tide. Each selection further sharpens their mental conditioning around the practice of water."
-            passives = list("ChillResist" = 1, "WaterSpellCooldown" = 0.10)
+            passives = list("ChillResist" = 1, "Water Magic Mastery" = 0.1)
 
         Awash
             name="Awash"
             desc="The mage has become a vessel for water itself. The path beyond mastery — mana flows freely, the world yields to the current."
-            passives = list("ManaGeneration" = 1, "ForcefulCasting" = 1, "WaterSpellDamage" = 0.10, "WaterSpellCooldown" = 0.10)
+            passives = list("ManaGeneration" = 1,  "Water Magic Mastery" = 0.1)
 
     earth
         element="Earth"
@@ -95,17 +95,17 @@
         ShatterMastery
             name="Shatter Mastery"
             desc="The mage's foundational understanding of earth. Each selection increases their resistance to Shatter debuffs and deepens their grip on earth spells."
-            passives = list("ShatterResist" = 1, "EarthSpellManaCost" = 0.15)
+            passives = list("ShatterResist" = 1, "Earth Magic Mastery" = 0.15)
 
         FirmGuard
             name="Firm Guard"
             desc="The mage's body becomes as steady as stone. Each selection further reinforces their endurance around the practice of earth."
-            passives = list("ShatterResist" = 1, "EarthSpellCooldown" = 0.10)
+            passives = list("ShatterResist" = 1, "Earth Magic Mastery" = 0.1)
 
         Aerde
             name="Aerde"
             desc="The mage has become a vessel for earth itself. The path beyond mastery — mana flows freely, the world holds beneath them."
-            passives = list("ManaGeneration" = 1, "StalwartCasting" = 1, "EarthSpellDamage" = 0.10, "EarthSpellCooldown" = 0.10)
+            passives = list("ManaGeneration" = 1,  "Earth Magic Mastery" = 0.1)
 
     air
         element="Air"
@@ -113,17 +113,17 @@
         ShockMastery
             name="Shock Mastery"
             desc="The mage's foundational understanding of wind. Each selection increases their resistance to Shock debuffs and deepens their grip on wind spells."
-            passives = list("ShockResist" = 1, "AirSpellManaCost" = 0.15)
+            passives = list("ShockResist" = 1, "Air Magic Mastery" = 0.15)
 
         FleetFooted
             name="Fleet Footed"
             desc="The mage's footwork carries the rhythm of the gale. Each selection further sharpens their reflexes around the practice of wind."
-            passives = list("ShockResist" = 1, "AirSpellCooldown" = 0.10)
+            passives = list("ShockResist" = 1, "Air Magic Mastery" = 0.1)
 
         Aloft
             name="Aloft"
             desc="The mage has become a vessel for wind itself. The path beyond mastery — mana flows freely, the world parts at their passing."
-            passives = list("ManaGeneration" = 1, "AgileCasting" = 1, "AirSpellDamage" = 0.10, "AirSpellCooldown" = 0.10)
+            passives = list("ManaGeneration" = 1,  "Air Magic Mastery" = 0.1)
 
     light
         element="Light"
@@ -136,12 +136,12 @@
         Seeker
             name="Seeker"
             desc="The mage's vision reaches further than their hands. Each selection extends the range at which their spells may strike, and steels them for the work."
-            passives = list("SpellRange" = 1, "StalwartCasting" = 1)
+            passives = list("SpellRange" = 1)
 
         Mender
             name="Mender"
             desc="The mage has become a vessel for light itself. Mana flows in abundance, and the wounds of the world are theirs to close."
-            passives = list("ManaGeneration" = 2, "LightSpellDamage" = 0.15, "LightSpellManaCost" = 0.15, "LightSpellCooldown" = 0.15)
+            passives = list("ManaGeneration" = 2, "Light Magic Mastery" = 0.15)
 
     dark
         element="Dark"
@@ -154,30 +154,23 @@
         Iconoclast
             name="Iconoclast"
             desc="The mage breaks the work of others as readily as their own. Each selection sharpens the strength behind their casting and the malice that drives it."
-            passives = list("PowerfulCasting" = 1)
 
         Survivor
             name="Survivor"
             desc="The mage has become a vessel for darkness itself. Mana flows in abundance, and the wounds they take only feed the next casting."
-            passives = list("ManaGeneration" = 2, "DarkSpellDamage" = 0.20, "DarkSpellManaCost" = 0.10, "DarkSpellCooldown" = 0.15)
+            passives = list("ManaGeneration" = 2, "Dark Magic Mastery" = 0.2)
 
     time
         element="Time"
 
-        Past
-            name="Past"
-            desc="The mage's casting echoes through the moments behind them. Each selection deepens the weight of memory — speed in the wake of a cast, suffering returned to those who would strike them."
-            passives = list()
-
         Present
             name="Present"
             desc="The mage moves with the now. Each selection sharpens the agility behind their casting and the rhythm of their counters."
-            passives = list("AgileCasting" = 1)
 
         Future
             name="Future"
             desc="The mage has become a vessel for time itself. Mana flows in abundance, and the cost of every casting is felt only in moments yet to come."
-            passives = list("ManaGeneration" = 2, "TimeSpellDamage" = 0.10, "TimeSpellManaCost" = 0.15, "TimeSpellCooldown" = 0.20)
+            passives = list("ManaGeneration" = 2, "Time Magic Mastery" = 0.2)
 
     space
         element="Space"
@@ -190,12 +183,11 @@
         Linearity
             name="Linearity"
             desc="The mage moves in a single direction — forward. Each selection sharpens the agility behind their casting and softens the toll their body would otherwise pay."
-            passives = list("AgileCasting" = 1)
 
         Kinematics
             name="Kinematics"
             desc="The mage has become a vessel for space itself. Their reservoir of mana grows vast, and the world bends to allow their workings."
-            passives = list("ManaCapMult" = 0.5, "ManaGeneration" = 2, "SpaceSpellDamage" = 0.15, "SpaceSpellManaCost" = 0.20, "SpaceSpellCooldown" = 0.10)
+            passives = list("ManaCapMult" = 0.5, "ManaGeneration" = 2, "Space Magic Mastery" = 0.2)
 
 // --- Gestalt Unlock System ---
 // Gestalt Style and Buff are granted automatically when a player acquires

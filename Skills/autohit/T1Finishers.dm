@@ -3,7 +3,7 @@
 		UnarmedOnly=1
 		FlickAttack=1
 		Area="Strike"
-		StrOffense=2
+		StrScaling=2
 		DamageMult= T1_DMG_MULT / 2;
 		Stunner=3
 		Rush=3
@@ -27,9 +27,9 @@
 		NoAttackLock=1
 		Distance=5
 		DamageMult = T1_DMG_MULT / 2;
-		StrOffense=0.5
-		ForOffense=0.5
-		EndDefense=1
+		StrScaling=0.5
+		ForScaling=0.5
+		EndEffectiveness=1
 		Knockback=10
 		Scorching=30
 		ActiveMessage="follows up with an incendiary kick!!"
@@ -52,8 +52,8 @@
 		Instinct=4
 		DamageMult= T1_DMG_MULT / 2 / 2;
 		Rounds=2
-		StrOffense=1
-		EndDefense=0.5
+		StrScaling=1
+		EndEffectiveness=0.5
 		PullIn = 5
 		TurfErupt=2
 		TurfEruptOffset=3
@@ -68,7 +68,6 @@
 		Icon='SweepingKick.dmi'
 		IconX=-32
 		IconY=-32
-		IconTime=10
 		Cooldown=4
 	Rashomon
 		Area="Wave"
@@ -79,8 +78,8 @@
 		Instinct=4
 		Size=2
 		DamageMult= T1_DMG_MULT / 2;
-		StrOffense=1
-		EndDefense=1
+		StrScaling=1
+		EndEffectiveness=1
 		ActiveMessage="rushes past their enemy!"
 		HitSparkIcon='Slash - Zan.dmi'
 		HitSparkX=-16
@@ -122,8 +121,8 @@
 		Distance=7
 		Instinct=1
 		DamageMult= T1_DMG_MULT / 2;
-		StrOffense=1
-		EndDefense=0.75
+		StrScaling=1
+		EndEffectiveness=0.75
 		ActiveMessage="ruptures the ground with their mega-powerful slash!"
 		HitSparkIcon='Slash - Black.dmi'
 		HitSparkX=-32

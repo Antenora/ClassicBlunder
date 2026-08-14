@@ -7,7 +7,7 @@ obj
 			NeedsSword=1
 			Area="Wave"
 			Distance=6
-			StrOffense=1
+			StrScaling=1
 			Knockback=5
 			HitSparkIcon='Hit Effect Pearl.dmi'
 			HitSparkX=-32
@@ -93,7 +93,7 @@ obj
 			Area="Strike"
 			PassThrough=1
 			Distance=4
-			StrOffense=1
+			StrScaling=1
 			NoPierce=1
 			Knockback=3
 			DamageMult=2.2
@@ -111,7 +111,7 @@ obj
 			Area="Wave"
 			Distance=4
 			PassThrough=1
-			StrOffense=1
+			StrScaling=1
 			DamageMult=1.5
 			EnergyCost=3
 			Rounds = 1
@@ -141,8 +141,8 @@ obj
 			Area="Wave"
 			ComboMaster=1
 			Distance=2
-			StrOffense=1
-			EndDefense=1
+			StrScaling=1
+			EndEffectiveness=1
 			DamageMult=3.25
 			HitSparkIcon='Slash.dmi'
 			HitSparkX=-32
@@ -166,7 +166,7 @@ obj
 			Copyable=1
 			NeedsSword=1
 			Area="Arc"
-			StrOffense=1
+			StrScaling=1
 			DamageMult=2.2
 			Cooldown=30
 			EnergyCost=1
@@ -191,7 +191,7 @@ obj
 			Copyable=2
 			NeedsSword=1
 			Area="Arc"
-			StrOffense=1
+			StrScaling=1
 			DamageMult=2
 			Shearing=12
 			Cooldown=30
@@ -221,7 +221,7 @@ obj
 			NeedsSword=1
 			Area="Arc"
 			Distance=3
-			StrOffense=1
+			StrScaling=1
 			DamageMult=0.35
 			RoundMovement=0
 			ComboMaster=1
@@ -254,7 +254,7 @@ obj
 			Rush = 2
 			ControlledRush = 1
 			Launcher=2
-			StrOffense=1
+			StrScaling=1
 			DamageMult=2.8
 			Distance=1
 			Crippling=5
@@ -284,7 +284,7 @@ obj
 			Area="Circle"
 			Distance=3
 			Rush=2
-			StrOffense=1
+			StrScaling=1
 			DamageMult=1.5
 			EnergyCost=3
 			HitSparkIcon='Slash - Zan.dmi'
@@ -363,7 +363,7 @@ obj
 			NeedsSword=1
 			Area="Circle"
 			Distance=3
-			StrOffense=1
+			StrScaling=1
 			NoAttackLock=1
 			DamageMult=1
 			Icon='BladeCharge.dmi'
@@ -393,7 +393,7 @@ obj
 			NeedsSword=1
 			Area="Circle"
 			Distance=3
-			StrOffense=1
+			StrScaling=1
 			NoAttackLock=1
 			DamageMult=1
 			Icon='DarknessFlameAura.dmi'

@@ -57,7 +57,6 @@ obj
 				Cooldown=180
 				Determinator=1
 				Counter=1
-				AntiSunyata=1
 				UnarmedOnly=1
 				EnergyCost=10
 				name="Defiance"

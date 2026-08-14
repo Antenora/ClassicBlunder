@@ -1,9 +1,6 @@
 /mob/proc/inRekka()
 	var/obj/Skills/Utility/Ouroboros/oo = FindSkill(/obj/Skills/Utility/Ouroboros)
 	if(oo)
-		if(glob.OUROMACROLOCK && oo.last_pressed + glob.OUROMACROLOCK > world.time)
-			src << "You pressed too fast! (Ouroboros MACROLOCK is on.)"
-			return FALSE
 		if(oo.Using)
 			return oo
 	return FALSE
@@ -11,14 +8,11 @@
 /obj/Skills/Utility/Ouroboros
 	var/last_triggered = ""
 	var/list/inputQueue = list()
-	var/tmp/last_pressed = -9999
 
 	verb/Ouroboros()
 		set category = "Skills"
 		set hidden = 1
 		if(!Using)
-			if(glob.OUROMACROLOCK)
-				last_pressed = world.time
 			Using = 1
 			if(usr.hudIsLive("Oro", /obj/orohud))
 				usr.client.hud_ids["Oro"].filters = list(type="outline", size=1, color=rgb(255, 255, 255))
