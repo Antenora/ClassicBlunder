@@ -5657,7 +5657,7 @@ mob
 				if(Z.RushDelay<1)
 					VanishImage(src)
 				while(GO>0)
-					if(Z.ControlledRush&&src.Target)
+					if(Z.ControlledRush || HasControlledRush() &&src.Target) // HasControlledRush is in _BinaryChecks.dm
 					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
@@ -5676,7 +5676,7 @@ mob
 									src.Target.Frozen=0
 						GO-=world.tick_lag
 						if(GO > 0)
-							DelayRelease+=Z.RushDelay
+							DelayRelease+=Z.RushDelay/HasFastRush() // HasFastRush is in _BinaryChecks.dm
 							if(DelayRelease>=1)
 								DelayRelease--
 								sleep(1)

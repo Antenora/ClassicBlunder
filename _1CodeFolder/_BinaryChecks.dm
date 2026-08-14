@@ -2536,6 +2536,25 @@ mob
 			return 0
 		GetExtend()
 			return passive_handler.Get("Extend")
+		HasControlledRush() // Add any buffs/passives here that should set controlled rush on all rush skills to 1
+			if(passive_handler.Get("Wolf Spirit"))
+				return 1
+			if(passive_handler.Get("Kaioken") || passive_handler.Get("Super Kaioken"))
+				return 1
+			if(SpecialBuff.BuffName == "Ripper Mode")
+				return 1
+			return 0
+		HasFastRush() // Determines the Rush Delay divisor
+			var/divisor = 5
+			if(passive_handler.Get("Wolf Spirit"))
+				return divisor
+			if(passive_handler.Get("Kaioken")) 
+				return divisor
+			if(passive_handler.Get("Super Kaioken"))
+				return divisor
+			if(SpecialBuff.BuffName == "Ripper Mode")
+				return divisor
+			return 0
 		HasWarp()
 			if(passive_handler.Get("Warp"))
 				return 1
