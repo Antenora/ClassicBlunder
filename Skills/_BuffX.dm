@@ -525,7 +525,7 @@ NEW VARIABLES
 	var/FocusShifter
 	var/FocusShiftType = "None"
 	var/FocusShiftBoost = 1.5
-	var/FocusShiftTimer = 5
+	var/FocusShiftTimer = 10
 //Imitation
 	var/Imitate//guh!
 	var/ImitateBadly//guuuuuh!!

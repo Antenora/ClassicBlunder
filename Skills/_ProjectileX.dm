@@ -124,7 +124,7 @@ obj
 				var/FocusShifter
 				var/FocusShiftType = "None"
 				var/FocusShiftBoost = 1.5
-				var/FocusShiftTimer = 5
+				var/FocusShiftTimer = 10
 
 				MultiHit//Single projectile hits multiple times.
 				MaxMultiHit//just used to keep track of if a technique has hit yet

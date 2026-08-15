@@ -710,7 +710,7 @@ mob
 					src.FocusShiftActive = FALSE
 					src << "Your Focus Shift ran out!"
 					src.HideShiftAura()
-					src.FocusShiftCooldown = 30
+					src.FocusShiftCooldown = 60
 
 			if(src.FocusShiftCooldown > 0)
 				src.FocusShiftCooldown--

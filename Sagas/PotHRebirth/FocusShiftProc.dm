@@ -68,4 +68,3 @@ mob/proc/ActivateFocusShift(type, multiplier, timer, strScale, forScale)
 	FocusShiftTimer = timer
 	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType])"
 	UpdateShiftAura()
-

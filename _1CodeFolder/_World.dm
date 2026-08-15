@@ -265,11 +265,12 @@ client
 		src.LoginLog("LOGOUT")
 
 		if(mob)
+			mob.HideShiftAura()
 			mob.removeBlobBuffs()
 			if(mob.party)
 				mob.party.remove_member(mob)
 			if(mob.pending_party)
-				mob.pending_party.cancel_invite(mob)   
+				mob.pending_party.cancel_invite(mob)
 
 			mob.RemoveWaterOverlay()
 			var/image/A=image(icon='Say Spark.dmi',pixel_y=6)
