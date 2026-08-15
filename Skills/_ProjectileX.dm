@@ -120,6 +120,11 @@ obj
 				MultiShot=0//Can be fired multiple times before going on CD.
 				MultiShots=0//How many times have been fired.
 				MultiFatigueExponent=0 //scaling exponential value
+				//FocusShift
+				var/FocusShifter
+				var/FocusShiftType = "None"
+				var/FocusShiftBoost = 1.5
+				var/FocusShiftTimer = 10
 
 				MultiHit//Single projectile hits multiple times.
 				MaxMultiHit//just used to keep track of if a technique has hit yet
@@ -224,6 +229,18 @@ obj
 					description += "Will fire blasts to hover in a [ZoneAttackX]x[ZoneAttackY] area.\n"
 				if(Buster)
 					description += "Charges up before firing: At max: [BusterDamage] damage. [BusterHits] hits. [BusterRadius] radius. [BusterAccuracy] accuracy. [BusterSize] size. [BusterStream] blasts.\n"
+				if(FocusShifter)
+					var/typeSelected
+					var/autoSelectedType
+					if(StrScaling > ForScaling)
+						autoSelectedType = "FOR"
+					else
+						autoSelectedType = "STR"
+					if(FocusShiftType != "None")
+						typeSelected = FocusShiftType
+					else
+						typeSelected = autoSelectedType
+					description += "Activates Focus Shift: [typeSelected] Autohits/Queue/Projectiles deal x[FocusShiftBoost] damage for [FocusShiftTimer] secs."
 //Autoblasts
 			Comet_Spear
 				Distance=15
@@ -5007,6 +5024,9 @@ mob
 						src << "You need a sword to use this technique!"
 						return
 
+			if(Z.FocusShifter)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
+
 			if(Z.UnarmedOnly)
 				if(src.EquippedSword())
 					if(!src.HasBladeFisting())
@@ -6170,8 +6190,15 @@ obj
 						if(CosmoPowered)
 							if(!src.Owner.SpecialBuff)
 								src.DamageMult*=1+(src.Owner.SenseUnlocked-5)
+						var/fShift = Owner.FocusShiftType
 						var/str = StrScaling ? Owner.GetStr(StrScaling) : 0
+						if(fShift == "STR" && Owner.FocusShiftActive && StrScaling > 0)
+							str *= Owner.FocusShiftBoost
+							//Owner << "[str] total strScale"
 						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
+						if(fShift == "FOR" && Owner.FocusShiftActive && ForScaling > 0)
+							force *= Owner.FocusShiftBoost
+							//Owner << "[force] total forScale"
 						if(AdaptRate)
 							if(Owner.GetStr(1) > Owner.GetFor(1))
 								str = Owner.GetStr(AdaptRate)
@@ -6259,7 +6286,7 @@ obj
 						EffectiveDamage *= a:ccProrationMult(Owner, 0, src.ComboMaster)
 						if(src.clash_victor == 1 && (!src.beam_owner || src.beam_owner.victor == 1))
 							src.clash_victor = 2
-							if(src.beam_owner) src.beam_owner.victor = 2 
+							if(src.beam_owner) src.beam_owner.victor = 2
 							m.Knockback(glob.CLASH_WIN_KB, src.Owner, src.dir, 1, 1)
 
 						if(GoldScatter||Owner.CheckSlotless("Hoarders Riches"))
@@ -6765,7 +6792,7 @@ obj
 
 					if(!Killed && (MultiHit > 0) && Area != "Beam")
 						if(UsesPixelCollision)
-							if(src.Explode) 
+							if(src.Explode)
 								var/pr = 16*src.Explode
 								var/pcx = LowerX() + Width()/2 + vhb_ax //FireOffset skills detonate where the art died
 								var/pcy = LowerY() + Height()/2 + vhb_ay
@@ -6823,7 +6850,7 @@ obj
 					Life()
 						if(UsesPixelCollision)
 							return PixelLife()
-						if(beam_owner) 
+						if(beam_owner)
 							return
 						Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
 						//locked segments must never exit this loop - see projectile_pixel.dm

@@ -521,6 +521,11 @@ NEW VARIABLES
 	var/PoseEnhancement
 	var/MagicFocus//operates as a magic focus
 	var/DebuffCrash//immediately deals debuff damage
+//FocusShift
+	var/FocusShifter
+	var/FocusShiftType = "None"
+	var/FocusShiftBoost = 1.5
+	var/FocusShiftTimer = 10
 //Imitation
 	var/Imitate//guh!
 	var/ImitateBadly//guuuuuh!!
@@ -642,7 +647,7 @@ NEW VARIABLES
 
 			verb/Customize_Powered_State()
 				set category="Utility"
-				set hidden = 1   
+				set hidden = 1
 				var/list/Options=list("Cancel", "Overlay", "Top Overlay", "Aura", "Hair", "Text")
 				Options.Add("Base")
 				var/Option=input("What aspect do you wish to customize?", "Ki Control Customize") in Options
@@ -14434,7 +14439,8 @@ mob
 				src.SuperSpiralMode("On")
 			if(B.EndYourself)
 				src.RemoveSlotlessBuff(B)
-
+			if(B.FocusShifter)
+				src.ActivateFocusShift(B.FocusShiftType, B.FocusShiftBoost, B.FocusShiftTimer, B.StrScaling, B.ForScaling)
 			src.BuffingUp=0
 
 		AllSkillsRemove(obj/Skills/Buffs/B)
