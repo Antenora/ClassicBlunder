@@ -562,6 +562,18 @@ document.onkeydown=function(e){
 	if(ManaCost) L += "Mana Cost: [ManaCost]"
 	if(CapacityCost) L += "Capacity Cost: [CapacityCost]"
 	if(Instinct) L += "Instinct: [Instinct]"
+	if(("FocusShifter" in vars) && vars["FocusShifter"])
+		var/str_scaling = ("StrScaling" in vars) ? vars["StrScaling"] : 0
+		var/for_scaling = ("ForScaling" in vars) ? vars["ForScaling"] : 0
+
+		var/selected_type = ("FocusShiftType" in vars) ? vars["FocusShiftType"] : "None"
+		var/boost = ("FocusShiftBoost" in vars) ? vars["FocusShiftBoost"] : 1.5
+		var/timer = ("FocusShiftTimer" in vars) ? vars["FocusShiftTimer"] : 0
+
+		if(!selected_type || selected_type == "None")
+			selected_type = str_scaling > for_scaling ? "FOR" : "STR"
+
+		L += "Focus Shift: [selected_type] Type, Autohits/Queue/Projectiles scaling is boosted by x[boost] for [timer/2] secs."
 	return L
 
 // buff classification + info-panel lines

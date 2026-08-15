@@ -210,7 +210,7 @@ obj
 				src.Trigger(usr)
 
 	Skills/Projectile
-		ChaosBusterShot
+		ChaosBusterShot // Fired from Chaos Saber too at a higher Saber level, requires 10 mana min to use with Chaos Saber so you don't spam text chat with "can't use"
 			Radius=0
 			DamageMult=0.25
 			AccMult=0.5

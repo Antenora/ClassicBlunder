@@ -977,7 +977,7 @@
 				if(P.Health<=TurfDamage)
 					Destroy(P)
 			return
-		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)")||src.passive_handler["Chaos Buster"])
+		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)")||src.passive_handler["Chaos Buster"]&&src.ManaAmount > 10)
 			flick("Attack",src)
 			NextAttack=world.time
 			if(src.passive_handler.Get("Gun Kata"))
