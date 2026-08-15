@@ -99,6 +99,9 @@ obj
 			SwordIcon='Spookysword.dmi'
 			SwordX=-32
 			SwordY=-32
+			FocusShifter=1
+			FocusShiftType="STR"
+			FocusShiftBoost=2
 			SwordClass="Medium"
 			Cooldown = 1
 			SwordAscension=3
@@ -150,6 +153,9 @@ obj
 			StaffIcon='Aether Bow.dmi'
 			ActiveMessage="readies CHAOS BUSTER!"
 			OffMessage="dispels their CHAOS BUSTER."
+			FocusShifter=1
+			FocusShiftType="FOR"
+			FocusShiftBoost=2
 			StaffAscension=2
 			adjust(mob/p)
 				StrMult=1.15
@@ -248,8 +254,10 @@ obj
 			Distance=6
 			AdaptRate=1
 			Area="Target"
-			ForScaling=1
+			ForScaling=1.5
 			DamageMult=6
+			FocusShifter=1
+			FocusShiftBoost=2
 			Paralyzing=5
 			Size=1
 			Bolt=5
@@ -257,7 +265,7 @@ obj
 			HitSparkIcon='BLANK.dmi'
 			HitSparkX=0
 			HitSparkY=0
-			WindUp=1
+			WindUp=0.5
 			ManaCost=10
 			SpecialAttack=1
 			CanBeDodged=1
@@ -275,7 +283,10 @@ obj
 			AccMult=2
 			Cooldown=45
 			IconSize=1
-			Homing=1
+			Homing = 1
+			StrScaling = 1.5
+			FocusShifter=1
+			FocusShiftBoost=2
 			Knockback=3
 			ManaCost=5
 			Trail='Trail - Flare.dmi'

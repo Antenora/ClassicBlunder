@@ -128,7 +128,8 @@ proc/ComputeLightShadows(mob/M)
 		last_uy = -1
 
 	New(mob/o)
-		..(null) //no loc - lives in the mob's vis_contents, not its contents
+		..(null)
+		loc = null
 		owner = o
 		appearance_flags |= KEEP_TOGETHER
 

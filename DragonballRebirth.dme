@@ -827,6 +827,7 @@
 #include "Sagas\NewKeyblades\Keyblades.dm"
 #include "Sagas\NewKeyblades\KeybladeSkills.dm"
 #include "Sagas\PotHRebirth\AnimationStuff.dm"
+#include "Sagas\PotHRebirth\FocusShiftProc.dm"
 #include "Sagas\PotHRebirth\PrismaticProphecizedSkills.dm"
 #include "Sagas\PotHRebirth\RebirthFinalSkills.dm"
 #include "Sagas\PotHRebirth\RebirthSkills.dm"
