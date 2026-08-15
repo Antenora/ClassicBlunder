@@ -337,7 +337,7 @@ proc/FxClashLightPair(atom/movable/host, icon/tex, col, matrix/mx, wa = 215, ba 
 	wa = round(wa * (1 - 0.65 * frac))
 	ba = round(ba * (0.35 + 0.65 * frac))
 	var/list/anc = FxChildAnchor(host)
-	var/ox = anc[1] + (64 - tex.Width()) / 2 
+	var/ox = anc[1] + (64 - tex.Width()) / 2
 	var/oy = anc[2] + (64 - tex.Height()) / 2
 	for(var/pl in list(1, LIGHTING_PLANE))
 		var/obj/fx_clashlight/L = new
@@ -808,6 +808,7 @@ proc/MobAuraActive(mob/M)
 	if(M.transActive) return 1
 	if(M.tension >= 5) return 1
 	if(M.ClothBronze) return 1
+	if(M.FocusShiftActive) return 1
 	if(M.Saga == "Spiral") return 1
 	try //proc-backed checks last: a runtime in any of them must not kill the light path
 		if(M.passive_handler && M.passive_handler.Get("Controlled Chaos")) return 1

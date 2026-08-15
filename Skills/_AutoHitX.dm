@@ -166,6 +166,12 @@ obj
 				Earthshaking//as above but even if you miss
 				PreQuake//gives people the jitters in windup
 
+				//FocusShift
+				var/FocusShifter
+				var/FocusShiftType = "None"
+				var/FocusShiftBoost = 1.5
+				var/FocusShiftTimer = 5
+
 				SpecialAttack=0//ignores all of the above
 				Dunker
 				Destroyer
@@ -268,6 +274,18 @@ obj
 					description += "Doesn't lose damage from grabbing opponent while in use.\n"
 				if(PullIn)
 					description += "Pulls all people nearby in [PullIn] tiles.\n"
+				if(FocusShifter)
+					var/typeSelected
+					var/autoSelectedType
+					if(StrScaling > ForScaling)
+						autoSelectedType = "FOR"
+					else
+						autoSelectedType = "STR"
+					if(FocusShiftType != "None")
+						typeSelected = FocusShiftType
+					else
+						typeSelected = autoSelectedType
+					description += "Activates Focus Shift: [typeSelected] Autohits/Queue/Projectiles deal x[FocusShiftBoost] damage for [FocusShiftTimer] secs."
 //NPC attacks
 			Venom_Sting
 				Area="Target"
@@ -5291,6 +5309,9 @@ mob
 					if(src.ManaAmount<drain*(1-(0.45*src.TomeSpell(Z))))
 						src << "You don't have enough mana to activate [Z]."
 						return FALSE
+
+			if(Z.FocusShifter)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
 			if(Z.CorruptionCost)
 				if(Corruption - Z.CorruptionCost < 0)
 					src << "You don't have enough Corruption to activate [Z]"
@@ -6525,7 +6546,16 @@ obj
 						StrDmg = AdaptDmg
 					else
 						ForDmg = AdaptDmg
-				atk = (StrDmg ? Owner.GetStr(StrDmg) : 0) + (ForDmg ? Owner.GetFor(ForDmg) : 0) + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
+				var/str = FromSkill.StrScaling ? Owner.GetStr(FromSkill.StrScaling) : 0
+				var/fShift = Owner.FocusShiftType
+				if(fShift == "STR" && Owner.FocusShiftActive && FromSkill.StrScaling > 0) ///Block that works out FocusShift's scale multiplier
+					str *= Owner.FocusShiftBoost
+					Owner << "[str] total strScale"
+				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
+				if(fShift == "FOR" && Owner.FocusShiftActive && FromSkill.ForScaling > 0)
+					force *= Owner.FocusShiftBoost
+					Owner << "[force] total forScale"
+				atk = str + force + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
 				if(SpellElement)
 					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).
 					//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).

@@ -97,6 +97,13 @@ mob/var
 	EnergyMax=100
 	Energy=100
 	EnergyCut=0
+	//FocusShift variables
+	FocusShiftActive= FALSE
+	FocusShiftType= "None" // Variables are STR, FOR
+	FocusShiftBoost= 1.5 // Defaults to 1.5. This is a multiplier!
+	FocusShiftTimer = 0 // Cancels out if the timer hits 0.
+	FocusShiftCooldown = 0 // Defaults to 30. How long until you can use it again.
+	//
 	EnergyExpenditure=1//Crank that drain if higher than 1
 	EnergyUniqueness=1//EVERYONE'S A SNOWFLAKE
 	EnergySignature//holds your unique energy signature

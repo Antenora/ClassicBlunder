@@ -702,6 +702,23 @@ mob
 						else
 							src.Transfering=null
 
+			//FocusShift stuff
+			if(src.FocusShiftActive)
+				src.FocusShiftTimer--
+
+				if(src.FocusShiftTimer <= 0)
+					src.FocusShiftActive = FALSE
+					src << "Your Focus Shift ran out!"
+					src.HideShiftAura()
+					src.FocusShiftCooldown = 30
+
+			if(src.FocusShiftCooldown > 0)
+				src.FocusShiftCooldown--
+
+				if(src.FocusShiftCooldown == 0)
+					src << "<b>Focus Shift is now available.</b>"
+					src.FocusShiftCooldown = -1
+
 			/* not used
 				if(void_timer < world.realtime && voiding)
 					// send to spawn
