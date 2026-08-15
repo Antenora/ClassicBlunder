@@ -5584,6 +5584,8 @@ mob
 				var/pm = PmActive()
 				var/pm_px = Z.RushDelay > 0 ? round(32 / Z.RushDelay) : glob.PM_DASH_MAX_PX
 				var/rush_stuck = 0 //a walled dash debits 0 px forever, count dead ticks
+				if(HasFastRush())
+					Z.RushDelay = min(glob.RUSH_DELAY_MIN, Z.RushDelay / HasFastRush())
 				while(GO>0)
 					if(Z.ControlledRush || HasControlledRush() &&src.Target) // HasControlledRush is in _BinaryChecks.dm
 					//	var/travel_angle = GetAngle(src, src.Target)
@@ -5614,7 +5616,7 @@ mob
 							rush_stuck = 0
 						GO-=(pm ? moved/32 : 1)*world.tick_lag //debit actual px moved
 						if(GO > 0)
-							DelayRelease+=Z.RushDelay/HasFastRush() // HasFastRush is in _BinaryChecks.dm
+							DelayRelease+=Z.RushDelay // HasFastRush is in _BinaryChecks.dm
 							if(DelayRelease>=1)
 								DelayRelease--
 								sleep(1)
