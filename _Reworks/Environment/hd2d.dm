@@ -432,6 +432,26 @@ proc/_Hd2dGradeMatrix(client/C)
 proc/Hd2dGradeFilter(client/C)
 	return filter(name = "hd2dgrade", type = "color", color = _Hd2dGradeMatrix(C))
 
+proc/WorldBloomThreshold(client/C)
+	var/atom/anchor = C ? GfxViewAnchor(C) : null
+	var/turf/T = anchor ? get_turf(anchor) : null
+	var/area/A = T ? T.loc : null
+	var/amb
+	if(A && A.dark_cave)
+		amb = glob.LIGHT_CAVE_COLOR
+	else
+		amb = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
+		if(A && A.dn_indoor) amb = DnIndoorColor(amb)
+	var/list/sk = _FxRGB(amb)
+	var/a = sk ? max(sk[1], max(sk[2], sk[3])) : 255
+	. = a
+	if(glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM) //bloom samples post-grade pixels
+		var/list/M = _Hd2dGradeMatrix(C)
+		. = max(a * (M[1] + M[5] + M[9]) + 255 * M[17],\
+		    max(a * (M[2] + M[6] + M[10]) + 255 * M[18],\
+		        a * (M[3] + M[7] + M[11]) + 255 * M[19]))
+	return clamp(max(glob.WORLD_BLOOM_THRESHOLD, round(.) + 10), 96, 245)
+
 //zone crossings glide the grade ~4s instead of snapping; falls back to a full rebuild
 proc/Hd2dGradeShift(client/C, time = 40)
 	if(!C) return
@@ -579,7 +599,7 @@ proc/Hd2dClientTick(client/C, snap = 0)
 proc/Hd2dSunTick()
 	if(!glob) return
 	//clock buckets rebuild the world-plane filters; grade + bloom read local darkness per client
-	var/gbucket = round((1 - DnDarknessFrac()) * 8)
+	var/gbucket = round((1 - DnDarknessFrac()) * 8) + round(MoonEventK() * 8) * 100
 	if((glob.COLOR_GRADE || glob.WORLD_BLOOM) && gbucket != _hd2d_grade_bucket)
 		_hd2d_grade_bucket = gbucket
 		for(var/mob/Players/WP in players)

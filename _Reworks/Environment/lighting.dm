@@ -82,6 +82,17 @@ proc/LightRenderStrength(turf/T)
 	var/floor = glob ? clamp(glob.LIGHT_DAY_STRENGTH, 0, 0.35) : 0.10
 	return floor + (1 - floor) * eased
 
+proc/LightHeadroomK(turf/T)
+	if(!glob || !glob.MULTIPLY_REVEAL) return 1
+	var/area/A = T ? T.loc : null
+	if(A && A.dark_cave) return 1 //cave base #2b2b33: full headroom already
+	var/amb = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
+	if(A && A.dn_indoor) amb = DnIndoorColor(amb)
+	var/list/sk = _FxRGB(amb)
+	if(!sk) return 1
+	var/head = 255 - max(sk[1], max(sk[2], sk[3]))
+	return clamp(head / 107, 0, 1) //107 = deep-night headroom (255 - #566294's blue)
+
 proc/LightSrcTurf(datum/lightsource/L)
 	if(!L) return null
 	return L.src_obj ? get_turf(L.src_obj) : locate(L.lx, L.ly, L.lz)
@@ -564,7 +575,7 @@ proc/LightCompute(datum/lightsource/L)
 	if(!s) return
 	LightBucketRegister(L)
 	var/darkFrac = LightDarkFrac(s) //true ambient darkness; retained for cheap repaint detection
-	var/lightStrength = LightRenderStrength(s)
+	var/lightStrength = LightRenderStrength(s) * LightHeadroomK(s)
 	if(glob.LIGHT_SOFTCLIP) lightStrength *= _LightOverlapScale(L, s)
 	L.painted_dark = darkFrac
 	UpdateFlameGlow(L, lightStrength)
