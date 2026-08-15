@@ -6550,11 +6550,11 @@ obj
 				var/fShift = Owner.FocusShiftType
 				if(fShift == "STR" && Owner.FocusShiftActive && FromSkill.StrScaling > 0) ///Block that works out FocusShift's scale multiplier
 					str *= Owner.FocusShiftBoost
-					Owner << "[str] total strScale"
+					//Owner << "[str] total strScale"
 				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
 				if(fShift == "FOR" && Owner.FocusShiftActive && FromSkill.ForScaling > 0)
 					force *= Owner.FocusShiftBoost
-					Owner << "[force] total forScale"
+					//Owner << "[force] total forScale"
 				atk = str + force + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
 				if(SpellElement)
 					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).

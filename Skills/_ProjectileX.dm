@@ -6194,11 +6194,11 @@ obj
 						var/str = StrScaling ? Owner.GetStr(StrScaling) : 0
 						if(fShift == "STR" && Owner.FocusShiftActive && StrScaling > 0)
 							str *= Owner.FocusShiftBoost
-							Owner << "[str] total strScale"
+							//Owner << "[str] total strScale"
 						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
 						if(fShift == "FOR" && Owner.FocusShiftActive && ForScaling > 0)
 							force *= Owner.FocusShiftBoost
-							Owner << "[force] total forScale"
+							//Owner << "[force] total forScale"
 						if(AdaptRate)
 							if(Owner.GetStr(1) > Owner.GetFor(1))
 								str = Owner.GetStr(AdaptRate)

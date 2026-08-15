@@ -333,11 +333,11 @@
 					var/qStr = AttackQueue.StrScaling
 					if(fShift == "STR" && Owner.FocusShiftActive && AttackQueue.StrScaling > 0)
 						qStr *= Owner.FocusShiftBoost
-						Owner << "[qStr] total strScale"
+						//Owner << "[qStr] total strScale"
 					var/qFor = AttackQueue.ForScaling
 					if(fShift == "FOR" && Owner.FocusShiftActive && AttackQueue.ForScaling > 0)
 						qFor *= Owner.FocusShiftBoost
-						Owner << "[qFor] total forScale"
+						//Owner << "[qFor] total forScale"
 					if(AttackQueue.AdaptRate)
 						if(GetStr(1) > GetFor(1))
 							qStr = AttackQueue.AdaptRate
