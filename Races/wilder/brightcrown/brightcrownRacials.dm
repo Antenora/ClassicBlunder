@@ -9,64 +9,126 @@
             if(istype(SlotlessBuffs[index], /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker))
                 SlotlessBuffs[index].Trigger(src, TRUE)
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker
-    TimerLimit = 30
-    Cooldown = 90
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Pheonix_Form
-    endAdd = -0.25
-    defAdd = -0.25
-    offAdd = 0.5
+/obj/Skills/AutoHit/Crown_Radiation//called by swapping into phoenix form
+    Area="Circle"
+    ElementalClass="Light"
+    AdaptRate=1
+    Rounds=1
+    TurfDirt=1
+    TurfErupt=1
+    ShockIcon='KenShockwave.dmi'
+    Shockwave=4
+    Shockwaves=1
+    PostShockwave=1
+    PreShockwave=0
+    Earthshaking=20
+    Instinct=1
+    ComboMaster = 1
+    Distance = 8;
+    DamageMult = 1;
+    BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded_by_the_Light"
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded_by_the_Light//but not literally
+    NeedsPassword = 1
+    Cooldown = 4
+    AlwaysOn = 1
+    CrippleAffected = 3.5;//should generate around 20 cripple over its duration, unmodified
+    StrMult = 0.8
+    ForMult = 0.8
+    OffMult = 0.5
+    passives = list("FatigueLeak" = 1, "PureDamage" = -2)
+    TimerLimit = 6;
+
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance
+    TimerLimit = 15;
+    Cooldown = 90;
     adjust(mob/p)
-        var/asc = p.AscensionsAcquired
-        passives = list("SweepingStrike" = 1, "Extend" = 1 + (asc/4), "Gum Gum" = 1 + (asc/4), "ComboMaster" = 1)
-        Cooldown = 90 - (10 *p.AscensionsAcquired)
-        TimerLimit = 30 + (6 *p.AscensionsAcquired)
-    verb/Pheonix_Form()
+        var/asc = p.AscensionsAcquired;
+        ElementalOffense = "Light";
+        endAdd = (0.5 + (1/3*asc) / 2);
+        spdAdd = (0.5 + (1/3*asc) / 2);
+        offAdd = (0.5 + (1/3*asc) / 2);
+        defAdd = (0.5 + (1/3*asc) / 2);
+        passives = list("Wrathful Tenacity" = 0.25, "HardenedFrame" = 1);
+        passives["HolyMod"] = 0.2 + (asc * 0.1);
+        passives["CallousedFeet"] = 2 + asc;
+        passives["SoftStyle"] = asc;
+        TimerLimit = 15 + (asc * 5);
+
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Pheonix_Form//extended attacks, disables hardened frame so that spirit strike can be used instead
+    FollowUp = "/obj/Skills/AutoHit/Crown_Radiation";//triggers light dragon roar
+    passives = list("Scorching" = 5, "SweepingStrike" = 1, "Extend" = 1, "Gum Gum" = 1, "HardenedFrame" = -1, "SpiritStrike" = 1);
+    endAdd = -0.5;
+    strAdd = -0.5;
+    forAdd = 1;
+    defAdd = 1;
+    ActiveMessage = "takes up the radiance of the Phoenix!"
+    verb/Pheonix_Form()//these will be modified once the official Style Switching verb is implemented
         set category = "Stances"
         usr.preForm()
+        if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Ram_Form
-    spdAdd = 0.25
-    endAdd = 0.25
-    offAdd = -0.25
-    defAdd = -0.25
-    adjust(mob/p)
-        var/asc = p.AscensionsAcquired
-        passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/4, 0.25, 1), "Brutalize" = 0.5 + (asc/2))
-        Cooldown = 90 - (10 *p.AscensionsAcquired)
-        TimerLimit = 30 + (6 *p.AscensionsAcquired)
+/obj/Skills/AutoHit/Dragon_Whirlwind//called rfom using Dragon Form
+    NoAttackLock = 1;
+    Rounds = 4;
+    DamageMult = 1.5;
+    AdaptRate = 1;
+    Area = "Circle"
+    Size=4;
+    Distance = 4;
+    Icon='SweepingKick.dmi'
+    IconX=-32
+    IconY=-32
+    FlickSpin=1
+    Cooldown = 15;
+
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Dragon_Form//stunning strikes and combomaster. god save me
+    FollowUp = "/obj/Skills/AutoHit/Dragon_Whirlwind";
+    strAdd = -0.25;
+    endAdd = -0.25;
+    forAdd = -0.25;
+    spdAdd = 0.5;
+    offAdd = 1;
+    defAdd = 1;
+    passives = list("StunningStrike" = 3, "ComboMaster" = 1, "TechniqueMastery" = 3, "Flow" = 2);
+    ActiveMessage = "takes up the technique of the Dragon!"
     verb/Ram_Form()
         set category = "Stances"
         usr.preForm()
+        if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Bear_Form
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Tiger_Form
     strAdd = 0.25
     defAdd = -0.5
     forAdd = 0.25
+    ActiveMessage = "takes up the ferocity of the Tiger!"
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list("StunningStrike" = 2.5+asc, "ComboMaster" = 1,  "CheapShot" = asc/2, "Instinct" = asc)
+        passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/4, 0.25, 1))
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)
     verb/Bear_Form()
         set category = "Stances"
         usr.preForm()
+        if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Turtle_Form
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Tortoise_Form
     endAdd = 0.5
     defAdd = -0.5
+    ActiveMessage = "takes up the determination of the Tortoise!"
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list("Harden" = 2 + asc/2,  "HardenedFrame" = 1, "DeathField" = 2+asc*2)
+        passives = list("Harden" = 2 + asc/2,  "HardenedFrame" = 1, "DeathField" = 2+asc*2, "Brutalize" = 0.5 + (asc/2))
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)
     verb/Turtle_Form()
         set category = "Stances"
         usr.preForm()
+        if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
 
@@ -79,7 +141,7 @@
     else
         nimbus_message = inP
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder
     Nimbus_Rider
         BuffName="Nimbus Rider"
         IconLock='Flying Nimbus.dmi'
@@ -109,23 +171,6 @@
                 owner = p
                 trigger_at = 50 - (p.AscensionsAcquired * 5)
                 reference_this = p // likely good to make this a .vars otherwise or some sort of list to refernce vars
-
-
-
-/obj/Skills/AutoHit/MonkeyKingWhirlwind
-    ActiveMessage = "swings around AWOOOOO!!"
-    DamageMult = 1
-    AdaptRate = 1
-    Area = "Circle"
-    Size=4
-    Icon='SweepingKick.dmi'
-    IconX=-32
-    IconY=-32
-    FlickSpin=1
-    Cooldown = 20
-    adjust(mob/p)
-        DamageMult = (2 - (p.AscensionsAcquired * 0.25))
-        Rounds = 1 + (p.AscensionsAcquired)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous
@@ -166,45 +211,7 @@
 				else
 					usr << "Your gourd is empty."
 
-/obj/Skills/AutoHit/Light_Roar
-    Area="Circle"
-    ElementalClass="Light"
-    AdaptRate=1
-    DamageMult=0.1
-    Rounds=1
-    TurfDirt=1
-    TurfErupt=1
-    ShockIcon='KenShockwave.dmi'
-    Shockwave=4
-    Shockwaves=1
-    PostShockwave=1
-    PreShockwave=0
-    Cooldown=-1
-    Earthshaking=20
-    Instinct=1
-    WindupMessage="ROARRRR"
-    ActiveMessage="ROARRRSSS"
-    ComboMaster = 1
-    BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WeakenedByRadiance"
-    adjust(mob/p)
-        var/asc = p.AscensionsAcquired
-        Distance = 6 + asc
-        DamageMult = 1 + (asc * 1.5)
-    verb/Light_Roar()
-        set category="Skills"
-        if(!Using) adjust(usr)
-        usr.Activate(src)
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WeakenedByRadiance
-    NeedsPassword = 1
-    Cooldown = 4
-    AlwaysOn = 1
-    CrippleAffected = 3
-    StrMult = 0.6
-    ForMult = 0.6
-    OffMult = 0.6
-    passives = list("FatigueLeak" = 1, "PureDamage" = -1)
-    TimerLimit = 20;
 
 /obj/Skills/Projectile/Consuming_Light
     StrRate=0.5
@@ -230,17 +237,3 @@
         set category="Skills"
         if(!altered) adjust(usr);
         usr.UseProjectile(src)
-
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/Radiant_Aegis
-    ActiveMessage = "adorns themselves with a shield of radiant light, you feel your ability to do harm diminished!"
-    OffMessage = "loses their shield of light..."
-    adjust(mob/p)
-        var/asc = p.AscensionsAcquired
-        ..(p);
-        ElementalOffense = "Light"
-        strAdd = 0.075 * asc
-        endAdd = 0.075 * asc
-        passives = list("Wrathful Tenacity" = asc*0.3, "HolyMod" = asc, "LifeGeneration" = asc+1, "CallousedFeet" = asc+1, "HardenedFrame" = 1, "SoftStyle" = asc/2)
-    Trigger(mob/User, Override = FALSE)
-        if(!User.BuffOn(src)) adjust(User)
-        ..()
