@@ -328,6 +328,18 @@
 				var/atk = getStatDmg2()
 				var/def = enemy.getEndStat(1)
 				var/damageMultiplier = dmgmulti
+				if(AttackQueue)
+					var/qStr = AttackQueue.StrScaling
+					var/qFor = AttackQueue.ForScaling
+					if(AttackQueue.AdaptRate)
+						if(GetStr(1) > GetFor(1))
+							qStr = AttackQueue.AdaptRate
+						else
+							qFor = AttackQueue.AdaptRate
+					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
+					if(queueAtk)
+						atk = queueAtk
+					def *= AttackQueue.EndEffectiveness
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()
 					atk += enemyEnd * (AttackQueue.HarderTheyFall/10)
