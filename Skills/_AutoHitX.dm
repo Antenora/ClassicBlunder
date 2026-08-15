@@ -1201,6 +1201,7 @@ obj
 				RoundMovement=0
 				NoAttackLock=1
 				NoLock=1
+				MenuIcon="LightningKick"
 				Cooldown=60
 				Icon='Nest Slash.dmi'
 				IconX=-16
@@ -1260,6 +1261,7 @@ obj
 				Jump=1
 				ControlledRush=1
 				DamageMult=9
+				MenuIcon="FlyingKick"
 				Knockback=1
 				Shattering = 15
 				GuardBreak=1
@@ -5583,7 +5585,8 @@ mob
 				var/pm_px = Z.RushDelay > 0 ? round(32 / Z.RushDelay) : glob.PM_DASH_MAX_PX
 				var/rush_stuck = 0 //a walled dash debits 0 px forever, count dead ticks
 				while(GO>0)
-					if(Z.ControlledRush&&src.Target)
+					if(Z.ControlledRush || HasControlledRush() &&src.Target) // HasControlledRush is in _BinaryChecks.dm
+					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
 						if(src.filters["trail"]) //dash smear
@@ -5611,13 +5614,10 @@ mob
 							rush_stuck = 0
 						GO-=(pm ? moved/32 : 1)*world.tick_lag //debit actual px moved
 						if(GO > 0)
-							if(pm)
-								sleep(world.tick_lag)
-							else
-								DelayRelease+=Z.RushDelay
-								if(DelayRelease>=1)
-									DelayRelease--
-									sleep(1)
+							DelayRelease+=Z.RushDelay/HasFastRush() // HasFastRush is in _BinaryChecks.dm
+							if(DelayRelease>=1)
+								DelayRelease--
+								sleep(1)
 					else
 						if(length(src.filters) < 1)
 							AppearanceOn()

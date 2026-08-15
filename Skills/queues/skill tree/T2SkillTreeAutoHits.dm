@@ -8,6 +8,7 @@ obj
 			Area="Cone"
 			ComboMaster=1
 			Destroyer = 2
+			MenuIcon="ForcePalm"
 			Distance=3
 			Knockback=10
 			PreShockwave=1
@@ -43,6 +44,7 @@ obj
 			UnarmedOnly=1
 			Area="Circle"
 			ComboMaster=1
+			MenuIcon="ForceStomp"
 			Distance=4
 			StrScaling=1
 			DamageMult=5
@@ -73,6 +75,7 @@ obj
 			Distance=15
 			WindUp=1
 			ComboMaster=1
+			MenuIcon="SlashingHandChop"
 			WindupMessage="relaxes their fist into a straight palm..."
 			DamageMult=5
 			StrScaling=1
@@ -100,6 +103,7 @@ obj
 			ComboMaster=1
 			GuardBreak=1
 			StrScaling=1
+			MenuIcon="PhantomStrike"
 			PassThrough=1
 			PreShockwave=1
 			PostShockwave=0
@@ -126,6 +130,7 @@ obj
 			Area="Circle"
 			NoLock=1
 			NoAttackLock=1
+			MenuIcon="DragonRush"
 			StrScaling=1
 			DamageMult=6.5
 			DelayTime=0
@@ -185,6 +190,7 @@ obj
 			StrScaling=1
 			DamageMult=4.75
 			Launcher=3
+			MenuIcon="SweepingKick"
 			NoLock=1
 			NoAttackLock=1
 			Cooldown=45
@@ -210,6 +216,7 @@ obj
 			StrScaling=1
 			DamageMult=1.75
 			Cooldown=45
+			MenuIcon="HelicopterKick"
 			Rounds=5
 			Shattering=1
 			RoundMovement=1
