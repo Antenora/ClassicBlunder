@@ -1466,15 +1466,6 @@ mob
 
 						else if(src.KamuiType=="Junketsu")
 							src << "You gain the means to form an empire!"
-							var/name = input(src, "What do you want the empire to be named?") as text
-							var/guild/guild = new()
-							guild.name = name
-							guild.id = ++glob.guildIDTicker
-							glob.guilds += guild
-							guild.joinGuild(src)
-							guild.ownerID = src?:UniqueID
-							guild.checkVerbs(src)
-							src << "Your empire, [guild.name], is now created."
 							src << "You gain the means to assign pieces of life fibers to infuse into your subjects; enough for four roles!"
 							AddSkill(new/obj/Skills/Bestow_Life_Fiber/Bestow_Disciplinary_Chair)
 							src << "An Disciplinary Committee Chair, someone to take the harshest of assaults at your walls."

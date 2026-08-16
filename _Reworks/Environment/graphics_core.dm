@@ -454,6 +454,7 @@ client/proc/InitializeGraphics()
 /mob/verb/Graphics_Settings()
 	set category = "Other"
 	set name = "Graphics Settings"
+	set hidden = 1
 	if(!client || !client.prefs) return
 	var/choice = input(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings") in list(
 		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close")
