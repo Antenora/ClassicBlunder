@@ -40,7 +40,7 @@ obj/Skills
 		return 0
 	var/BaseStatDefault="STR" //path-default base stat identity; Projectile overrides to "FOR"
 	proc/FocusStatIdentity()
-		null = non str/for base, outside FocusShift entirely.
+		//null = non str/for base, outside FocusShift entirely.
 		if(UsesStr) return "STR"
 		if(UsesFor) return "FOR"
 		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
