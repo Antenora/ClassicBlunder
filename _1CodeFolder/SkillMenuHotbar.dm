@@ -570,11 +570,27 @@ document.onkeydown=function(e){
 		var/selected_type = ("FocusShiftType" in vars) ? vars["FocusShiftType"] : "None"
 		var/boost = ("FocusShiftBoost" in vars) ? vars["FocusShiftBoost"] : 1.5
 		var/timer = ("FocusShiftTimer" in vars) ? vars["FocusShiftTimer"] : 0
+		var/burstpassive = loc:passive_handler.Get("FocusShiftBurst")
+		var/timerpassive = loc:passive_handler.Get("FocusShiftMastery")
 
 		if(!selected_type || selected_type == "None")
 			selected_type = FocusStatIdentity() == "STR" ? "FOR" : "STR"
 
-		L += "Focus Shift: [selected_type] Type, [selected_type]-based skills get x[boost] [selected_type] scaling (min 150%) for [timer/2] secs."
+		var/ftext = "Focus Shift: [selected_type] Type, [selected_type]-based skills get "
+		var/stextNormal = "x[boost] "
+		var/stextBoosted = "x<span style=\"color:#ffd86b\">[boost + burstpassive]</span> "
+
+		var/pickedText = burstpassive ? stextBoosted : stextNormal
+		var/ttext = "[selected_type] scaling (min 150%) "
+
+		var/ftextNormal = "for [timer/2] secs."
+		var/ftextBoosted = "for <span style=\"color:#ffd86b\">[(timer / 2) + (timerpassive / 2)]</span> secs."
+		var/pickedText2 = timerpassive ? ftextBoosted : ftextNormal
+
+
+		L += ftext+pickedText+ttext+pickedText2
+
+	//	L += "Focus Shift: [selected_type] Type, [selected_type]-based skills get x[boost] [selected_type] scaling (min 150%) for [timer/2] secs."
 	return L
 
 // buff classification + info-panel lines
