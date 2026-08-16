@@ -6,7 +6,7 @@
 		StyleOff = 1.05
 		StyleDef = 1.05
 		StyleActive = "Fight or Flight"
-		passives = list("HybridStyle" = "MysticStyle")
+		passives = list("HybridStyle" = "MysticStyle", "FocusShiftRelease" = 2)
 		verb/Fight_or_Flight()
 			set hidden=1
 			src.Trigger(usr)
@@ -18,7 +18,7 @@
 		StyleDef = 1.10
 		StyleSpd = 1.10
 		StyleActive = "Mountain King"
-		passives = list("HybridStyle" = "MysticStyle", "DoubleStrike" = 1)
+		passives = list("HybridStyle" = "MysticStyle", "DoubleStrike" = 1, "FocusShiftRelease" = 4)
 		verb/Mountain_King()
 			set hidden=1
 			src.Trigger(usr)
@@ -31,7 +31,7 @@
 		StyleSpd = 1.20
 		StyleActive = "Dreamlike Savior"
 		passives = list("HybridStyle" = "MysticStyle",    \
-		"DoubleStrike" = 2, "Deflection" = 2,)
+		"DoubleStrike" = 2, "Deflection" = 2, "FocusShiftRelease" = 5)
 		verb/Dreamlike_Savior()
 			set hidden=1
 			src.Trigger(usr)
@@ -44,7 +44,7 @@
 		StyleSpd = 1.35
 		StyleActive = "Afterlife"
 		passives = list("HybridStyle" = "MysticStyle",\
-		"DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50)
+		"DoubleStrike" = 2, "TripleStrike" = 0.5, "Deflection" = 2,  "PUSpike" = 50, "FocusShiftRelease" = 6)
 		verb/Afterlife()
 			set hidden=1
 			src.Trigger(usr)
@@ -59,7 +59,7 @@ obj
 			ForMult = 1.25
 			RecovMult = 1.10
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
+			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 5, "FocusShiftMastery" = 1, "FocusShiftBoost" = 0.25)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
@@ -78,10 +78,10 @@ obj
 				EndMult = 1.10 + (0.01 * pLv)
 				RecovMult = 1.10 + (0.01 * pLv)
 				passives = list("TechniqueMastery" = 2,    \
-				 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1)
+				 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 5+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBoost" = 0.25+(pLv*2))
 				if(pLv > 4)
 					passives = list("TechniqueMastery" = 2,    \
-					 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1)
+					 "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "GodKi" = min(max((pLv - 4) * 0.25, 0), 0.5), "Health Obfuscation" = 1, "FocusShiftRelease" = 5+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBoost" = 0.25+(pLv*2))
 			verb/Hyperdeath_Mode()
 				set category = "Skills"
 				adjust(usr)

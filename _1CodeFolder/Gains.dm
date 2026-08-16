@@ -707,10 +707,11 @@ mob
 				src.FocusShiftTimer--
 
 				if(src.FocusShiftTimer <= 0)
+					var/bonusCooldown = src.passive_handler.Get("FocusShiftRelease")
 					src.FocusShiftActive = FALSE
-					src << "Your Focus Shift ran out!"
 					src.HideShiftAura()
-					src.FocusShiftCooldown = 60
+					src.FocusShiftCooldown = 60 - (0+bonusCooldown*2)
+					src << "Your Focus Shift ran out! (Cooldown: [src.FocusShiftCooldown/2] seconds.)"
 
 			if(src.FocusShiftCooldown > 0)
 				src.FocusShiftCooldown--

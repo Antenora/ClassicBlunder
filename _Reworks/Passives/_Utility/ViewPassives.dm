@@ -252,3 +252,6 @@ proc/buildPassiveInfoDB()
 	PassiveInfo["WindRelease"] = "Each melee swing has a chance equal to 5% times your WindRelease value to release a gust of wind that knocks back every non-party enemy within a radius of 3 tiles times your WindRelease value, pushing them directly away from you. This deals no damage."
 	PassiveInfo["Wuju"] = "Wuju discipline: your blade autohits are eligible to critically strike. Does not stack."
 	PassiveInfo["Xenobiology"] = "Your alien biology confounds hunters: reduces Favored Prey bonus damage against you."
+	PassiveInfo["FocusShiftMastery"] = "Adds 1 second per tick to how long your FocusShift lasts."
+	PassiveInfo["FocusShiftRelease"] = "Removes 1 second per tick on the cooldown of FocusShift."
+	PassiveInfo["FocusShiftBurst"] = "Adds the passive's number to the final multiplier used on the scaling. (IE. 1 FocusShiftBurst with a FocusShift holding a x2 boost will instead make it a x3 boost.)"
