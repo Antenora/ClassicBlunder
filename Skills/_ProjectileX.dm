@@ -5,6 +5,7 @@ obj
 		var/NewCost // we will do this the hard way.
 		var/NewCopyable // sigh
 		Projectile
+			BaseStatDefault="FOR"
 			proc
 				EdgeOfMapProjectile()
 					var/turf/t=get_step(src, src.dir)
@@ -5019,7 +5020,7 @@ mob
 						return
 
 			if(Z.FocusShifter)
-				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
 
 			if(Z.UnarmedOnly)
 				if(src.EquippedSword())
@@ -6194,15 +6195,11 @@ obj
 						if(CosmoPowered)
 							if(!src.Owner.SpecialBuff)
 								src.DamageMult*=1+(src.Owner.SenseUnlocked-5)
-						var/fShift = Owner.FocusShiftType
-						var/str = StrScaling ? Owner.GetStr(StrScaling) : 0
-						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
-						if(fShift == "STR" && Owner.FocusShiftActive && StrScaling > 0)
-							str *= Owner.FocusShiftBoost
-							//Owner << "[str] total strScale"
-						if(fShift == "FOR" && Owner.FocusShiftActive && ForScaling > 0)
-							force *= Owner.FocusShiftBoost
-							//Owner << "[force] total forScale"
+						var/pIdnt = FocusStatIdentity()
+						var/strScale = Owner.FocusShiftScaling(pIdnt, "STR", StrScaling)
+						var/forScale = Owner.FocusShiftScaling(pIdnt, "FOR", ForScaling)
+						var/str = strScale ? Owner.GetStr(strScale) : 0
+						var/force = forScale ? Owner.GetFor(forScale) : 0
 						var/powerDif = Owner.Power / a:Power
 						// + Owner.getIntimDMGReduction(m)
 						if(glob.CLAMP_POWER)

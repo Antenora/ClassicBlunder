@@ -1424,7 +1424,7 @@ mob
 					src << "You have to open at least Gate [Q.GateNeeded] to use this skill!"
 					return
 			if(Q.FocusShifter)
-				src.ActivateFocusShift(Q.FocusShiftType, Q.FocusShiftBoost, Q.FocusShiftTimer, Q.StrScaling, Q.ForScaling)
+				src.ActivateFocusShift(Q.FocusShiftType, Q.FocusShiftBoost, Q.FocusShiftTimer, Q.FocusStatIdentity())
 			if(Q.NeedsHealth)
 				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"

@@ -38,6 +38,13 @@ obj/Skills
 		if(UsesDef) return M.GetDef(1)
 		if(UsesOff) return M.GetOff(1)
 		return 0
+	var/BaseStatDefault="STR" //path-default base stat identity; Projectile overrides to "FOR"
+	proc/FocusStatIdentity()
+		null = non str/for base, outside FocusShift entirely.
+		if(UsesStr) return "STR"
+		if(UsesFor) return "FOR"
+		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
+		return BaseStatDefault
 	var/EndEffectiveness=1 //DEFENDER'S End vs this skill. 1 = normal mitigation, 0 = pierces End entirely
 	var/CritEffectiveness=1 //multiplies crit chance vs this skill's hits. 0 = can't crit
 	var/BlockEffectiveness=1 //multiplies the defender's block chance. 0 = unblockable

@@ -329,17 +329,9 @@
 				var/def = enemy.getEndStat(1)
 				var/damageMultiplier = dmgmulti
 				if(AttackQueue)
-					var/qStr = AttackQueue.StrScaling
-					var/qFor = AttackQueue.ForScaling
-					var/fShift = src ? src.FocusShiftType : null
-
-					if(fShift == "STR" && src.FocusShiftActive && qStr > 0)
-						qStr *= src.FocusShiftBoost
-						//Owner << "[qStr] total strScale"
-
-					if(fShift == "FOR" && src.FocusShiftActive && qFor > 0)
-						qFor *= src.FocusShiftBoost
-						//Owner << "[qFor] total forScale"
+					var/qIdnt = AttackQueue.FocusStatIdentity()
+					var/qStr = FocusShiftScaling(qIdnt, "STR", AttackQueue.StrScaling)
+					var/qFor = FocusShiftScaling(qIdnt, "FOR", AttackQueue.ForScaling)
 					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
 					var/qBase = AttackQueue.BaseStatOverride(src)
 					if(qBase)

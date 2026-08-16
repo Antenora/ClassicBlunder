@@ -332,8 +332,11 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 	try
 		var/mob/O = S.Owner
 		if(!O || !enemy) return 1
-		var/str = S.StrScaling ? O.GetStr(S.StrScaling) : 0
-		var/force = S.ForScaling ? O.GetFor(S.ForScaling) : 0
+		var/cIdnt = S.FocusStatIdentity()
+		var/strScale = O.FocusShiftScaling(cIdnt, "STR", S.StrScaling)
+		var/forScale = O.FocusShiftScaling(cIdnt, "FOR", S.ForScaling)
+		var/str = strScale ? O.GetStr(strScale) : 0
+		var/force = forScale ? O.GetFor(forScale) : 0
 		var/powerDif = O.Power / max(enemy.Power, 1)
 		if(glob.CLAMP_POWER && !O.ignoresPowerClamp(enemy))
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)

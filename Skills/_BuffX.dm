@@ -14440,7 +14440,7 @@ mob
 			if(B.EndYourself)
 				src.RemoveSlotlessBuff(B)
 			if(B.FocusShifter)
-				src.ActivateFocusShift(B.FocusShiftType, B.FocusShiftBoost, B.FocusShiftTimer, B.StrScaling, B.ForScaling)
+				src.ActivateFocusShift(B.FocusShiftType, B.FocusShiftBoost, B.FocusShiftTimer, B.FocusStatIdentity())
 			src.BuffingUp=0
 
 		AllSkillsRemove(obj/Skills/Buffs/B)

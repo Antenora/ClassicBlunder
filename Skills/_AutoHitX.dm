@@ -5291,7 +5291,7 @@ mob
 						return FALSE
 
 			if(Z.FocusShifter)
-				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
 			if(Z.CorruptionCost)
 				if(Corruption - Z.CorruptionCost < 0)
 					src << "You don't have enough Corruption to activate [Z]"
@@ -6520,16 +6520,11 @@ obj
 				Owner.log2text("powerDif - Auto Hit", powerDif, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 				#endif
 				var/atk = 0
-				var/str = FromSkill.StrScaling ? Owner.GetStr(FromSkill.StrScaling) : 0
-				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
-				var/fShift = Owner.FocusShiftType
-				if(fShift == "STR" && Owner.FocusShiftActive && FromSkill.StrScaling > 0) ///Block that works out FocusShift's scale multiplier
-					str *= Owner.FocusShiftBoost
-					//Owner << "[str] total strScale"
-
-				if(fShift == "FOR" && Owner.FocusShiftActive && FromSkill.ForScaling > 0)
-					force *= Owner.FocusShiftBoost
-					//Owner << "[force] total forScale"
+				var/fIdnt = FromSkill.FocusStatIdentity()
+				var/strScale = Owner.FocusShiftScaling(fIdnt, "STR", FromSkill.StrScaling)
+				var/forScale = Owner.FocusShiftScaling(fIdnt, "FOR", FromSkill.ForScaling)
+				var/str = strScale ? Owner.GetStr(strScale) : 0
+				var/force = forScale ? Owner.GetFor(forScale) : 0
 				atk = (FromSkill.BaseStatOverride(Owner) || Owner.getStatDmg2(autohit = TRUE)) + str + force + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
 				if(SpellElement)
 					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).
@@ -8111,6 +8106,11 @@ obj
 		if(UsesDef) return M.GetDef(1)
 		if(UsesOff) return M.GetOff(1)
 		return 0
+	proc/FocusStatIdentity()
+		if(UsesStr) return "STR"
+		if(UsesFor) return "FOR"
+		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
+		return "STR"
 	var/tmp/mob/Players/owner
 	var/tmp/list/hitList = list()
 	var/tmp/list/dmgTypes = null
@@ -8171,7 +8171,10 @@ obj
 		var/powerDif = owner.Power / target.Power
 		if(glob.CLAMP_POWER && !owner.ignoresPowerClamp(target))
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		var/atk = (BaseStatOverride(owner) || owner.getStatDmg2(autohit = TRUE)) + (StrScaling ? owner.GetStr(StrScaling) : 0) + (ForScaling ? owner.GetFor(ForScaling) : 0) + (SpdScaling ? owner.GetSpd(SpdScaling) : 0) + (OffScaling ? owner.GetOff(OffScaling) : 0) + (DefScaling ? owner.GetDef(DefScaling) : 0) + (EndScaling ? owner.GetEnd(EndScaling) : 0)
+		var/wIdnt = FocusStatIdentity()
+		var/wStr = owner.FocusShiftScaling(wIdnt, "STR", StrScaling)
+		var/wFor = owner.FocusShiftScaling(wIdnt, "FOR", ForScaling)
+		var/atk = (BaseStatOverride(owner) || owner.getStatDmg2(autohit = TRUE)) + (wStr ? owner.GetStr(wStr) : 0) + (wFor ? owner.GetFor(wFor) : 0) + (SpdScaling ? owner.GetSpd(SpdScaling) : 0) + (OffScaling ? owner.GetOff(OffScaling) : 0) + (DefScaling ? owner.GetDef(DefScaling) : 0) + (EndScaling ? owner.GetEnd(EndScaling) : 0)
 		var/def = target.getEndStat(1) * EndEffectiveness
 		var/FinalDmg = strikeCoreDamage(powerDif, atk, def)
 		FinalDmg *= DamageMult

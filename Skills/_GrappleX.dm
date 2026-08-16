@@ -617,7 +617,10 @@ obj/Skills/Grapple
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
 				var/itemDmg = 1
-				var/statPower = (BaseStatOverride(User) || User.getStatDmg2(autohit = TRUE)) + (StrScaling ? User.GetStr(StrScaling) : 0) + (ForScaling ? User.GetFor(ForScaling) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
+				var/gIdnt = FocusStatIdentity()
+				var/gStr = User.FocusShiftScaling(gIdnt, "STR", StrScaling)
+				var/gFor = User.FocusShiftScaling(gIdnt, "FOR", ForScaling)
+				var/statPower = (BaseStatOverride(User) || User.getStatDmg2(autohit = TRUE)) + (gStr ? User.GetStr(gStr) : 0) + (gFor ? User.GetFor(gFor) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
 				if(HarderTheyFall)
 					var/enemyEnd = Trg.GetEnd(1)
 					statPower += enemyEnd * (HarderTheyFall/10)
