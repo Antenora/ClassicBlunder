@@ -102,22 +102,6 @@ characterInformation*/
     hidingInformation = !hidingInformation
     src << "The ID Card is [hidingInformation ? "hidden." : "not hidden."]"
 
-characterInformation/proc/getFactionGuild(mob/Players/p)
-    var/content = ""
-    if(showFaction)
-        content += "<font color='[factionColor]'>[faction] (<font color='[jobColor]'>[job]</font>)</font>"
-    if(showGuild)
-        content += "\n"
-        for(var/x in p.inGuilds)
-            if(findGuildByID(x))
-                var/guild/g = findGuildByID(x)
-                if(p.UniqueID == g.ownerID)
-                    content += "[g.name] ( Leader )"
-                else if(p.UniqueID in g.officers)
-                    content += "[g.name] ( Officer )"
-
-                else
-                    content += "[g.name] ( Member )"
 characterInformation/proc/getInformation(mob/p, see_pronouns)
     if(p.hidingInformation)
         return "[p.subjectpronoun() == "They" ? "They have" : "[p.subjectpronoun()] has"] no ID Card"

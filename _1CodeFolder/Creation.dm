@@ -110,7 +110,8 @@ mob/Players
 			if(src.isRace(MAKAIOSHIN))
 				da.name="Devil Arm ([src.TrueName])"
 
-		checkVerbs()
+		if(src.isRace(BEASTKIN) && src.race?:Racial == "Monkey King")
+			src.verbs += /mob/proc/change_nimbus_message
 		if(src.isRace(/race/demi_fiend))
 			if(!(/mob/proc/CraftMagatama in src.verbs))
 				src.verbs += /mob/proc/CraftMagatama

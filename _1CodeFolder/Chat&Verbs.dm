@@ -78,23 +78,7 @@ mob
 		return TRUE
 
 atom/proc/Examined(mob/user)
-mob/Players/var/tmp/current_party_target_index = 1
 mob/Players/verb
-	Party_Target_Cycle()
-		set category = "Party"
-		if(!src.party)
-			src << "You don't have a party to cycle target on!"
-			return
-		var/list/others = src.party.members - src
-		if(!others.len)
-			src << "You have no party members to target."
-			return
-		current_party_target_index += 1
-		if(current_party_target_index > others.len)
-			current_party_target_index = 1
-		usr.SetTarget(others[current_party_target_index])
-		usr << "You target [usr.Target]."
-
 	Signature_Check()
 		set category="Other"
 		set hidden = 1
@@ -817,6 +801,7 @@ a{color:#8be9ff;}
 	GetPingSound()
 		set category = "Other"
 		set name = "Toggle Ping Sound"
+		set hidden = 1
 		if(usr.PingSound)
 			usr.PingSound = 0
 			usr << "Ping Sound Disabled."
@@ -827,6 +812,7 @@ a{color:#8be9ff;}
 	SetPingVolume()
 		set category = "Other"
 		set name = "Set Ping Volume"
+		set hidden = 1
 		var/n = input(src, "What volume?") as num
 		if(n > 100 || n < 0)
 			src << " too high or low "
@@ -836,6 +822,7 @@ a{color:#8be9ff;}
 	CustomizePU()
 		set name = "Customize: PU Charging"
 		set category = "Other"
+		set hidden = 1
 		if(!src.client)
 			return
 		var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
@@ -853,6 +840,7 @@ a{color:#8be9ff;}
 	Admins()
 		set name = "Admins"
 		set category = "Other"
+		set hidden = 1
 		for(var/mob/p in players)
 			if(p.Admin)
 				src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"

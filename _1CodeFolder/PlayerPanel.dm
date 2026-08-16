@@ -68,7 +68,7 @@ client/proc/PPanelBounds()
 	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
 	var/pleft = (pp_tile - 1) * 32 + pp_xpix
 	var/left = pleft
-	if(mob && mob.Admin) left = pleft - 8 - 160   // admin strip = APANEL_GAP(8) + APANEL_W(160) to the left
+	if(mob && mob.Admin) left = pleft - 8 - 176   // admin strip = APANEL_GAP(8) + APANEL_W(176) to the left
 	var/right = pleft + PPANEL_W
 	var/bot = (pp_row - 1) * 32 + pp_poff
 	var/top = bot + PPANEL_H

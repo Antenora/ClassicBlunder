@@ -1,4 +1,4 @@
-#define APANEL_W 160
+#define APANEL_W 176                          // widened 160->176 for the scrollbar gutter
 #define APANEL_H 316
 #define APANEL_GAP 8                          // gap between the admin strip and the player panel
 #define APANEL_LAYER (FLY_LAYER + 3)
@@ -12,6 +12,10 @@
 #define ADMIN_BAND_H (ADMIN_VISIBLE * ABTN_RH)
 #define ADMIN_Y0 252                          // panel-local py (from bottom) of the top row's bottom edge (AH-40-24)
 #define ADMIN_FILL "#213050"                  // panel interior color, cover strips clip scrolling rows
+#define ADMIN_TRACK_X 148                     // gutter right of the buttons
+#define ADMIN_TRACK_PY 52                     // panel-local py of the track bottom = band bottom
+#define ADMIN_TRACK_H 224                     // = ADMIN_BAND_H
+#define ADMIN_THUMB_H 36
 
 /atom/movable/shud/adminpanelbg
 	layer = APANEL_LAYER
@@ -54,6 +58,24 @@
 	Click(location, control, params)
 		if(usr && action) usr.client.AdminPanelAction(action)
 
+// routes the jump to the admin or atom strip's list
+/atom/movable/shud/admintrack
+	layer = APANEL_LAYER + 0.15
+	mouse_opacity = 2
+	var/kind = "admin"
+	Click(location, control, params)
+		if(usr) usr.client.AdminTrackTo(kind, params)
+	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
+		if(usr) usr.client.AdminTrackTo(kind, params)
+
+/atom/movable/shud/adminthumb
+	layer = APANEL_LAYER + 0.16
+	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	var/kind = "admin"
+	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
+		if(usr) usr.client.AdminTrackTo(kind, params)
+
 client
 	var/tmp
 		list/admin_panel_objs
@@ -66,6 +88,7 @@ client
 		admin_anim = FALSE
 		ap_tile = 1                            // horizontal anchor
 		ap_xpix = 0
+		atom/movable/shud/adminthumb/admin_thumb
 
 /proc/AdminCommandList()
 	return list(
@@ -126,6 +149,7 @@ client/proc/HideAdminPanel()
 	admin_panel_target = null
 	admin_btn_objs = null
 	admin_cmd_list = null
+	admin_thumb = null
 	if(admin_panel_objs)
 		while(admin_panel_objs.len)
 			var/atom/movable/o = admin_panel_objs[admin_panel_objs.len]
@@ -172,6 +196,14 @@ client/proc/ShowAdminPanel(mob/P)
 	bcov.screen_loc = APLoc(12, 22)
 	admin_panel_objs += bcov
 
+	var/atom/movable/shud/admintrack/tr = new
+	tr.icon = 'HUD/scroll_track_224.png'
+	tr.screen_loc = APLoc(ADMIN_TRACK_X, ADMIN_TRACK_PY)
+	admin_panel_objs += tr
+	admin_thumb = new
+	admin_thumb.icon = 'HUD/scroll_thumb.png'
+	admin_panel_objs += admin_thumb
+
 	RefreshAdminBtns()
 	for(var/atom/movable/o in admin_panel_objs)
 		screen += o
@@ -201,6 +233,14 @@ client/proc/RefreshAdminBtns()
 			b.mouse_opacity = 0
 			b.lbl.maptext = ""
 			b.lbl.alpha = 0
+	if(admin_thumb)
+		if(maxpx <= 0)
+			admin_thumb.alpha = 80
+			admin_thumb.screen_loc = APLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H)
+		else
+			admin_thumb.alpha = 255
+			var/off = round((admin_px / maxpx) * (ADMIN_TRACK_H - ADMIN_THUMB_H))
+			admin_thumb.screen_loc = APLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H - off)
 
 client/proc/AnimateAdminScroll()
 	set waitfor = 0
@@ -222,6 +262,38 @@ client/proc/AdminWheelScroll(delta_y)
 		admin_target_px = clamp(admin_target_px + dir * ABTN_RH, 0, maxpx)
 		if(!admin_anim) AnimateAdminScroll()
 	return 1
+
+// track click/drag jumps the list to the cursor; kind picks which strip's state
+client/proc/AdminTrackTo(kind, params)
+	var/list/pl = params2list(params)
+	var/sl = pl["screen-loc"]
+	if(!sl) return
+	var/list/cm = splittext(sl, ",")
+	if(cm.len < 2) return
+	var/list/yp = splittext(cm[2], ":")
+	if(yp.len < 2) return
+	var/row = text2num(yp[1])
+	var/py = text2num(yp[2])
+	if(isnull(row) || isnull(py)) return
+	var/top_py = ADMIN_TRACK_PY + ADMIN_TRACK_H
+	if(kind == "atom")
+		if(!atom_panel_open || !atom_cmd_list) return
+		var/maxpx = max(0, atom_cmd_list.len * ABTN_RH - ADMIN_BAND_H)
+		if(maxpx <= 0) return
+		var/local_py = (row - 1) * 32 + py - (atomp_row - 1) * 32 - atomp_poff - pp_pan_y
+		var/frac = clamp((top_py - local_py) / ADMIN_TRACK_H, 0, 1)
+		atomp_px = round(frac * maxpx)
+		atomp_target_px = atomp_px           // cancel any running wheel glide
+		RefreshAtomBtns()
+	else
+		if(!admin_panel_open || !admin_cmd_list) return
+		var/maxpx = max(0, admin_cmd_list.len * ABTN_RH - ADMIN_BAND_H)
+		if(maxpx <= 0) return
+		var/local_py = (row - 1) * 32 + py - (pp_row - 1) * 32 - pp_poff - pp_pan_y
+		var/frac = clamp((top_py - local_py) / ADMIN_TRACK_H, 0, 1)
+		admin_px = round(frac * maxpx)
+		admin_target_px = admin_px           // cancel any running wheel glide
+		RefreshAdminBtns()
 
 client/proc/AdminInvoke(ident, atom/T)
 	if(!mob) return
@@ -302,6 +374,7 @@ client
 		atomp_xpix = 0
 		atomp_row = 1
 		atomp_poff = 0
+		atom/movable/shud/adminthumb/atomp_thumb
 
 // per-target list. hascall gates by what the mob actually has
 client/proc/AtomCommandList(atom/A)
@@ -397,6 +470,7 @@ client/proc/HideAtomPanel()
 	atom_panel_target = null
 	atom_btn_objs = null
 	atom_cmd_list = null
+	atomp_thumb = null
 	if(atom_panel_objs)
 		while(atom_panel_objs.len)
 			var/atom/movable/o = atom_panel_objs[atom_panel_objs.len]
@@ -452,10 +526,20 @@ client/proc/ShowAtomPanel(atom/A)
 	bcov.screen_loc = ATPLoc(12, 22)
 	atom_panel_objs += bcov
 
+	var/atom/movable/shud/admintrack/tr = new
+	tr.kind = "atom"
+	tr.icon = 'HUD/scroll_track_224.png'
+	tr.screen_loc = ATPLoc(ADMIN_TRACK_X, ADMIN_TRACK_PY)
+	atom_panel_objs += tr
+	atomp_thumb = new
+	atomp_thumb.kind = "atom"
+	atomp_thumb.icon = 'HUD/scroll_thumb.png'
+	atom_panel_objs += atomp_thumb
+
 	// target readout over the top cover strip so staff can see what they grabbed
 	var/atom/movable/shud/adminlbl/nm = new
 	nm.layer = APANEL_LAYER + 0.3
-	nm.maptext_width = 136
+	nm.maptext_width = 152
 	nm.maptext_height = 30
 	nm.screen_loc = ATPLoc(12, 278)
 	nm.maptext = "<center><span style=\"[APANEL_FONT]; color:#8be9ff\">[html_encode("[A.name]")]</span></center>"
@@ -490,6 +574,14 @@ client/proc/RefreshAtomBtns()
 			b.mouse_opacity = 0
 			b.lbl.maptext = ""
 			b.lbl.alpha = 0
+	if(atomp_thumb)
+		if(maxpx <= 0)
+			atomp_thumb.alpha = 80
+			atomp_thumb.screen_loc = ATPLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H)
+		else
+			atomp_thumb.alpha = 255
+			var/off = round((atomp_px / maxpx) * (ADMIN_TRACK_H - ADMIN_THUMB_H))
+			atomp_thumb.screen_loc = ATPLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H - off)
 
 client/proc/AnimateAtomScroll()
 	set waitfor = 0

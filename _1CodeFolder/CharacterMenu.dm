@@ -67,6 +67,38 @@
 	var/cut = findtext(d, "<hr>")
 	if(cut) return copytext(d, 1, cut)
 	return d
+
+/proc/WrapDescLines(d, maxchars)
+	var/list/out = list()
+	if(!d) return out
+	d = replacetext(d, "<ul>", "")
+	d = replacetext(d, "</ul>", "@BR@")
+	d = replacetext(d, "<li>", "@BR@@LI@")
+	d = replacetext(d, "</li>", "@BR@")
+	d = replacetext(d, "<br/>", "@BR@")
+	d = replacetext(d, "<br>", "@BR@")
+	d = replacetext(d, "<b>", "")
+	d = replacetext(d, "</b>", "")
+	for(var/p in splittext(d, "@BR@"))
+		var/bullet = FALSE
+		if(findtext(p, "@LI@") == 1)
+			bullet = TRUE
+			p = copytext(p, 5)
+		var/wrapw = maxchars - (bullet ? 2 : 0)
+		var/list/words = splittext(p, " ")
+		var/cur = ""
+		var/first = TRUE
+		for(var/w in words)
+			if(!length(w)) continue
+			if(length(cur) && length(cur) + 1 + length(w) > wrapw)
+				out += "[bullet ? (first ? "&#9670; " : "&nbsp;&nbsp;") : ""][cur]"
+				first = FALSE
+				cur = w
+			else
+				cur = length(cur) ? "[cur] [w]" : w
+		if(length(cur))
+			out += "[bullet ? (first ? "&#9670; " : "&nbsp;&nbsp;") : ""][cur]"
+	return out
 /var/list/CUST_SWATCHES = list("#e84a4a", "#f0c040", "#5fc05f", "#5b9be8", "#ffffff", "#202028")
 /mob/var/list/cust_recent_colors
 
@@ -945,30 +977,47 @@ client/proc/ShowGearPassiveInfo(name)
 	HideGearPassiveInfo()
 	if(!name || !cmenu_open) return
 	cmenu_gearpass_objs = list()
-	var/atom/movable/shud/gearpasspanel/P = new
+	BuildPassDescPopup(cmenu_gearpass_objs, name, TRUE)
+
+client/proc/MkPDescText(gear)
+	if(gear)
+		return new /atom/movable/shud/gearpasstext
+	return new /atom/movable/shud/cmdtext
+
+client/proc/BuildPassDescPopup(list/objs, name, gear)
+	var/atom/movable/P
+	if(gear)
+		P = new /atom/movable/shud/gearpasspanel
+	else
+		P = new /atom/movable/shud/cmdesc
 	P.icon = CMENU_R3
-	P.screen_loc = CMloc(122, 70 + 168)
-	cmenu_gearpass_objs += P
-	var/atom/movable/shud/gearpasstext/T = new
-	T.maptext_width = 350
-	T.screen_loc = CMloc(136, 82 + CMENU_VY)
+	P.screen_loc = CMloc(92, 322)                 // centered in the 624x344 menu
+	objs += P
+	var/atom/movable/T = MkPDescText(gear)
+	T.maptext_width = 404
+	T.screen_loc = CMloc(110, 48 + CMENU_VY)
 	T.maptext = gspan(name, "#ffd278", "left")
-	cmenu_gearpass_objs += T
-	var/atom/movable/shud/gearpasstext/B = new
-	B.maptext_width = 352
-	B.maptext_height = 130
-	B.screen_loc = CMloc(136, 106 + CMENU_VY)
+	objs += T
 	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
-	B.maptext = gspan(d, "#ffffff", "left")
-	cmenu_gearpass_objs += B
-	var/atom/movable/shud/gearpasstext/H = new
-	H.maptext_width = 352
-	H.screen_loc = CMloc(136, 222 + CMENU_VY)
+	var/list/lines = WrapDescLines(d, 66)         // 404px body at 6px/char (monogram 12pt)
+	var/n = min(lines.len, 13)                    // 13 rows fit between title and hint
+	for(var/i = 1 to n)
+		var/txt = lines[i]
+		if(i == 13 && lines.len > 13) txt += " ..."
+		var/atom/movable/L = MkPDescText(gear)
+		L.maptext_width = 404
+		L.maptext_height = 16
+		L.screen_loc = CMloc(110, 72 + (i - 1) * 16 + CMENU_VY)
+		L.maptext = gspan(txt, "#ffffff", "left")
+		objs += L
+	var/atom/movable/H = MkPDescText(gear)
+	H.maptext_width = 404
+	H.screen_loc = CMloc(110, 302 + CMENU_VY)
 	H.maptext = gspan("right-click to close", "#7a9bb5", "left")
-	cmenu_gearpass_objs += H
-	for(var/atom/movable/o in cmenu_gearpass_objs)
+	objs += H
+	for(var/atom/movable/o in objs)
 		screen += o
-	KineticEntrance(cmenu_gearpass_objs)
+	KineticEntrance(objs)
 
 // ctx picks which panel to refresh after, "gear" or "inv"
 client/proc/RenameItem(obj/Items/it, ctx)
@@ -998,30 +1047,7 @@ client/proc/ShowPassDesc(name)
 	HideDescPanel()
 	if(!name || !cmenu_open) return
 	cmenu_desc_objs = list()
-	var/atom/movable/shud/cmdesc/P = new
-	P.icon = CMENU_R3
-	P.screen_loc = CMloc(122, 110 + 168)
-	cmenu_desc_objs += P
-	var/atom/movable/shud/cmdtext/T = new
-	T.maptext_width = 350
-	T.screen_loc = CMloc(136, 122 + CMENU_VY)
-	T.maptext = "<span style=\"[CMENU_FONT]; color:#ffd278\">[name]</span>"
-	cmenu_desc_objs += T
-	var/atom/movable/shud/cmdtext/B = new
-	B.maptext_width = 352
-	B.maptext_height = 130
-	B.screen_loc = CMloc(136, 146 + CMENU_VY)
-	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
-	B.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff\">[d]</span>"
-	cmenu_desc_objs += B
-	var/atom/movable/shud/cmdtext/H = new
-	H.maptext_width = 352
-	H.screen_loc = CMloc(136, 262 + CMENU_VY)
-	H.maptext = "<span style=\"[CMENU_FONT]; color:#7a9bb5\">right-click to close</span>"
-	cmenu_desc_objs += H
-	for(var/atom/movable/o in cmenu_desc_objs)
-		screen += o
-	KineticEntrance(cmenu_desc_objs)
+	BuildPassDescPopup(cmenu_desc_objs, name, FALSE)
 
 //////////////////////////////////////////////////////////////////
 // Gear tab

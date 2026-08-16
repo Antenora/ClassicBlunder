@@ -1655,10 +1655,31 @@ mob/var/minhitroll = 0
 mob/var/tmp/last_combo
 var/static/list/opposite_dirs = list(SOUTH,NORTH,NORTH|SOUTH,WEST,SOUTHWEST,NORTHWEST,NORTH|SOUTH|WEST,EAST,SOUTHEAST,NORTHEAST,NORTH|SOUTH|EAST,WEST|EAST,WEST|EAST|NORTH,WEST|EAST|SOUTH,WEST|EAST|NORTH|SOUTH)
 
-mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE, landDir = 0)
+mob/proc/ComboLandingClear(mob/M, direction)
+	var/turf/W = get_step(M, direction)
+	if(!W)
+		return null
+	if(istype(W,/turf/Special/Blank))
+		return null //a Blank tile can't be landed on
+	if(W.density)
+		return null
+	for(var/atom/x in W)
+		if(x.density)
+			return null //a dense atom (often the adjacent caster) blocks this tile
+	if(PmActive())
+		for(var/mob/m in range(1, W))
+			if(m == src || m == M || !m.density) continue
+			if(abs((m.x-W.x)*32 + m.step_x) < 32 && abs((m.y-W.y)*32 + m.step_y) < 32)
+				return null
+	return W
+
+mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE, landDir = 0, frontOnly = FALSE)
 	if(last_combo >= world.time) return
 	last_combo = world.time
 	var/list/dirs = list(NORTH,SOUTH,EAST,WEST,NORTHWEST,SOUTHWEST,NORTHEAST,SOUTHEAST)
+	if(frontOnly && M)
+		var/front = DisplayedCardinal(M.dir, 0)
+		dirs = list(landBehind ? opposite_dirs[front] : front)	
 	var/limit = 15
 	if(ignoreTiledistance)
 		limit  = 100
@@ -1674,40 +1695,24 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 			//asked-for side goes first, random fallback after
 			var/direction = (landDir && !landBehind && (landDir in dirs)) ? landDir : pick(dirs)
 			dirs-=direction
-
-			W=get_step(M, direction)
-			if(landBehind)
-				W=get_step(M, opposite_dirs[M.dir])
-			if(W)
-				if(istype(W,/turf/Special/Blank))
-					continue //a Blank tile can't be landed on; try another dir instead of aborting the teleport
-				if(!W.density)
-					var/occupied = FALSE
-					for(var/atom/x in W)
-						if(x.density)
-							occupied = TRUE
-							break
-					if(!occupied && PmActive())//a mid-tile bystander straddles into W though its loc sits elsewhere (M excluded: the step-copy keeps a clean 32px gap from it)
-						for(var/mob/m in range(1, W))
-							if(m == src || m == M || !m.density) continue
-							if(abs((m.x-W.x)*32 + m.step_x) < 32 && abs((m.y-W.y)*32 + m.step_y) < 32)
-								occupied = TRUE
-								break
-					if(occupied)
-						continue //a dense atom (often the adjacent caster) blocks THIS tile; try another dir, don't abort the whole teleport
-					src.loc=W
-					if(PmActive())//land on the target's sprite, not its tile origin
-						src.step_x=M.step_x
-						src.step_y=M.step_y
-					src.dir=ReturnDirection(src,M)
-					if(!LightAttack && get_dist(src,M)>1)
-						if(src.AttackQueue && src.AttackQueue.Rapid)
-							FlashImage(src)
-						else
-							VanishImage(src)
-					if(M.Beaming!=2)
-						M.dir=ReturnDirection(M,src)
-					break
+			if(landBehind && !frontOnly)
+				direction = opposite_dirs[M.dir]
+			W=ComboLandingClear(M, direction)
+			if(!W)
+				continue //blocked tile; try another dir, don't abort the whole teleport
+			src.loc=W
+			if(PmActive())//land on the target's sprite, not its tile origin
+				src.step_x=M.step_x
+				src.step_y=M.step_y
+			src.dir=ReturnDirection(src,M)
+			if(!LightAttack && get_dist(src,M)>1)
+				if(src.AttackQueue && src.AttackQueue.Rapid)
+					FlashImage(src)
+				else
+					VanishImage(src)
+			if(M.Beaming!=2 && !(frontOnly && landBehind))
+				M.dir=ReturnDirection(M,src)
+			break
 
 mob/proc/SpeedDelay(var/Modifier=1)
 	var/Spd=src.GetSpd()**glob.ATTACK_DELAY_EXPONENT

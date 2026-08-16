@@ -305,7 +305,7 @@ client/proc/MiscVerbs()
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
 		out[nm] = nm
 	for(var/obj/Skills/Buffs/b in mob.contents)
-		if(b.TimerLimit) continue   // timed buffs go in the hotbar
+		if(b.TimerLimit && !b.MiscBindable) continue   // timed buffs go in the hotbar
 		if(!b.fire_ident) continue   // non-timed buffs are now stripped, their verb name lives in fire_ident
 		var/nm = replacetext(b.fire_ident, "_", " ")
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
@@ -646,6 +646,10 @@ document.onkeydown=function(e){
 #define BUFF_ROWS 7        // 6 visible + 1 buffer row for smooth scrolling
 #define BUFF_BAND_H 90     // BUFF_VISIBLE * BUFF_RH
 #define BUFF_Y0 201        // SILoc dy of row 1's bottom edge at sub=0
+#define BUFF_TRACK_X 298   // right of the row band, inside the panel border
+#define BUFF_TRACK_Y 186   // dy of the track top = band top
+#define BUFF_TRACK_H 90    // = BUFF_BAND_H
+#define BUFF_THUMB_H 36
 
 // tab label -> GetMenuSkills filter key
 var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit")
@@ -760,6 +764,7 @@ client
 		buff_pass_px = 0
 		buff_pass_target = 0
 		buff_pass_anim = FALSE
+		atom/movable/shud/buffthumb/buff_thumb
 		obj/Skills/skinfo_skill
 		si_atx = 1              // info panel tile anchor, computed from view
 		si_aty = 1
@@ -1018,6 +1023,7 @@ client/proc/CloseSkillInfo()
 	buff_info_open = FALSE
 	buff_pass_list = null
 	buff_pass_rows = null
+	buff_thumb = null
 	skinfo_skill = null
 	if(!skinfo_objs) return
 	while(skinfo_objs.len)
@@ -1043,6 +1049,22 @@ client/proc/CloseSkillInfo()
 		if(!usr || !usr.client || !pass_name) return
 		if(params && findtext(params, "right=1"))
 			usr.client.ShowBuffPassDesc(pass_name)
+
+// passive-band scrollbar; click or drag jumps the list to the cursor
+/atom/movable/shud/bufftrack
+	layer = MHUD_LAYER + 2.25
+	mouse_opacity = 2
+	Click(location, control, params)
+		if(usr) usr.client.BuffScrollTrackTo(params)
+	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
+		if(usr) usr.client.BuffScrollTrackTo(params)
+
+/atom/movable/shud/buffthumb
+	layer = MHUD_LAYER + 2.26
+	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
+		if(usr) usr.client.BuffScrollTrackTo(params)
 
 /atom/movable/shud/buffdescpanel
 	parent_type = /atom/movable/shud/menupanel
@@ -1129,6 +1151,13 @@ client/proc/ShowBuffInfo(obj/Skills/Buffs/b)
 		bcov.layer = MHUD_LAYER + 2.3
 		bcov.screen_loc = SILoc(20, 294)
 		skinfo_objs += bcov
+		var/atom/movable/shud/bufftrack/tr = new
+		tr.icon = 'HUD/scroll_track_90.png'
+		tr.screen_loc = SILoc(BUFF_TRACK_X, BUFF_TRACK_Y + BUFF_TRACK_H)
+		skinfo_objs += tr
+		buff_thumb = new
+		buff_thumb.icon = 'HUD/scroll_thumb.png'
+		skinfo_objs += buff_thumb
 		RefreshBuffPassRows()
 
 	for(var/atom/movable/o in skinfo_objs)
@@ -1163,6 +1192,14 @@ client/proc/RefreshBuffPassRows()
 			r.pass_name = null
 			r.maptext = ""
 			r.alpha = 0
+	if(buff_thumb)
+		if(maxpx <= 0)
+			buff_thumb.alpha = 80
+			buff_thumb.screen_loc = SILoc(BUFF_TRACK_X + 1, BUFF_TRACK_Y + BUFF_THUMB_H)
+		else
+			buff_thumb.alpha = 255
+			var/off = round((buff_pass_px / maxpx) * (BUFF_TRACK_H - BUFF_THUMB_H))
+			buff_thumb.screen_loc = SILoc(BUFF_TRACK_X + 1, BUFF_TRACK_Y + off + BUFF_THUMB_H)
 
 // returns 1 if the buff panel is open (and consumed the wheel), so MouseWheel knows to stop
 client/proc/BuffWheelScroll(delta_y)
@@ -1186,7 +1223,27 @@ client/proc/AnimateBuffPassScroll()
 		sleep(world.tick_lag)
 	buff_pass_anim = FALSE
 
-// passive-description popup shown over the buff panel when a passive row is right-clicked
+client/proc/BuffScrollTrackTo(params)
+	if(!buff_info_open || !buff_pass_list) return
+	var/maxpx = max(0, buff_pass_list.len * BUFF_RH - BUFF_BAND_H)
+	if(maxpx <= 0) return
+	var/list/pl = params2list(params)
+	var/sl = pl["screen-loc"]
+	if(!sl) return
+	var/list/cm = splittext(sl, ",")
+	if(cm.len < 2) return
+	var/list/yp = splittext(cm[2], ":")
+	if(yp.len < 2) return
+	var/row = text2num(yp[1])
+	var/py = text2num(yp[2])
+	if(isnull(row) || isnull(py)) return
+	var/local_h = (row - 1) * 32 + py - (si_aty - 1) * 32
+	var/frac = ((SKINFO_H - BUFF_TRACK_Y) - local_h) / BUFF_TRACK_H
+	frac = clamp(frac, 0, 1)
+	buff_pass_px = round(frac * maxpx)
+	buff_pass_target = buff_pass_px          // cancel any running wheel glide
+	RefreshBuffPassRows()
+
 client/proc/ShowBuffPassDesc(name)
 	CloseBuffPassDesc()
 	if(!name) return
@@ -1201,22 +1258,27 @@ client/proc/ShowBuffPassDesc(name)
 	T.maptext_width = SKINFO_W
 	T.maptext_height = 20
 	T.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffd86b\">[name]</span></center>"
-	T.screen_loc = SILoc(0, 72)
+	T.screen_loc = SILoc(0, 44)
 	buffdesc_objs += T
 	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
-	var/atom/movable/shud/menutext/B = new
-	B.layer = MHUD_LAYER + 3.1
-	B.maptext_width = SKINFO_W - 48
-	B.maptext_height = SKINFO_H - 140
-	B.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[d]</span></center>"
-	B.screen_loc = SILoc(24, 210)
-	buffdesc_objs += B
+	var/list/lines = WrapDescLines(d, 47)   // 288px body at 6px/char (monogram 12pt)
+	var/n = min(lines.len, 14)              // 14 rows fit between title and hint
+	for(var/i = 1 to n)
+		var/txt = lines[i]
+		if(i == 14 && lines.len > 14) txt += " ..."
+		var/atom/movable/shud/menutext/L = new
+		L.layer = MHUD_LAYER + 3.1
+		L.maptext_width = SKINFO_W - 48
+		L.maptext_height = 16
+		L.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">[txt]</span>"
+		L.screen_loc = SILoc(24, 68 + (i - 1) * 16)
+		buffdesc_objs += L
 	var/atom/movable/shud/menutext/H = new
 	H.layer = MHUD_LAYER + 3.1
 	H.maptext_width = SKINFO_W
 	H.maptext_height = 16
 	H.maptext = "<center><span style=\"[MHUD_FONT]; color:#7a9bb5\">right-click to close</span></center>"
-	H.screen_loc = SILoc(0, 300)
+	H.screen_loc = SILoc(0, 306)
 	buffdesc_objs += H
 	for(var/atom/movable/o in buffdesc_objs)
 		screen += o
