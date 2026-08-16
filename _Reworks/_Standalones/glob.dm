@@ -374,6 +374,9 @@ globalTracker
 		KAIOKEN_BASE_TAX = 0.5
 		KAIOKEN_TAX_DIVISOR = 1000
 		KAIOKEN_EXPONENT = 2
+
+		RUSH_DELAY_MIN = 0.5 // The minimum rush delay, half of a decisecond.
+		RUSH_DELAY_DIVISOR = 2 // The Default Divisor for rushes.
 //EXTRAS?? //
 		MORTAL_BLOW_CHANCE = 8
 		MULTIHIT_NERF = FALSE

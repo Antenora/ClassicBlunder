@@ -2134,16 +2134,15 @@ mob
 			if(SpecialBuff.BuffName == "Ripper Mode")
 				return 1
 			return 0
-		HasFastRush() // Determines the Rush Delay divisor
-			var/divisor = 5
+		HasFastRush() // Returns the Rush Delay divisor set in glob.dm
 			if(passive_handler.Get("Wolf Spirit"))
-				return divisor
+				return glob.RUSH_DELAY_DIVISOR
 			if(passive_handler.Get("Kaioken")) 
-				return divisor
+				return glob.RUSH_DELAY_DIVISOR
 			if(passive_handler.Get("Super Kaioken"))
-				return divisor
+				return glob.RUSH_DELAY_DIVISOR
 			if(SpecialBuff.BuffName == "Ripper Mode")
-				return divisor
+				return glob.RUSH_DELAY_DIVISOR
 			return 0
 		HasWarp()
 			if(passive_handler.Get("Warping"))

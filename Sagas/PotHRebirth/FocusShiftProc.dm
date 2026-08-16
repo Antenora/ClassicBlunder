@@ -47,11 +47,13 @@ mob/proc/HideShiftAura()
 		shiftAura = null
 
 mob/proc/ActivateFocusShift(type, multiplier, timer, strScale, forScale)
+	var/bonusMult = passive_handler.Get("FocusShiftBurst")
+	var/bonusTime = passive_handler.Get("FocusShiftMastery")
 	if(FocusShiftActive)
 		src << "FocusShift is already up! (Type: [FocusShiftType])"
 		return
 	if(FocusShiftCooldown > 0)
-		src << "FocusShift is still on cooldown! (CD: [FocusShiftCooldown])"
+		src << "FocusShift is still on cooldown! (CD: [FocusShiftCooldown/2])"
 		return
 	var/autoSelectedType
 	if(strScale > forScale)
@@ -64,7 +66,7 @@ mob/proc/ActivateFocusShift(type, multiplier, timer, strScale, forScale)
 		FocusShiftType = type
 	else
 		FocusShiftType = autoSelectedType
-	FocusShiftBoost = multiplier
-	FocusShiftTimer = timer
-	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType])"
+	FocusShiftBoost = multiplier + (0 + bonusMult)
+	FocusShiftTimer = timer + (0 + bonusTime*2)
+	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType]. Boost: [FocusShiftBoost])"
 	UpdateShiftAura()

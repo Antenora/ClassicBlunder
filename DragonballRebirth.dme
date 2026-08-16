@@ -496,6 +496,7 @@
 #include "_Reworks\LifeSkills\opportunities.dm"
 #include "_Reworks\LifeSkills\smithing.dm"
 #include "_Reworks\LifeSkills\StationHUD.dm"
+#include "_Reworks\LifeSkills\thaumaturgy.dm"
 #include "_Reworks\LifeSkills\woodcutting.dm"
 #include "_Reworks\Magic\MagicTree\___treeDefines.dm"
 #include "_Reworks\Magic\MagicTree\__airDefines.dm"
