@@ -710,7 +710,7 @@ mob
 					var/bonusCooldown = src.passive_handler.Get("FocusShiftRelease")
 					src.FocusShiftActive = FALSE
 					src.HideShiftAura()
-					src.FocusShiftCooldown = 60 - (0+bonusCooldown*2)
+					src.FocusShiftCooldown = max(60 - (0+bonusCooldown * 2), 5)
 					src << "Your Focus Shift ran out! (Cooldown: [src.FocusShiftCooldown/2] seconds.)"
 
 			if(src.FocusShiftCooldown > 0)
