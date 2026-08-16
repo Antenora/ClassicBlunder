@@ -6543,17 +6543,13 @@ obj
 				Owner.log2text("powerDif - Auto Hit", powerDif, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 				#endif
 				var/atk = 0
-				if(AdaptDmg)
-					if(Owner.GetStr(1) > Owner.GetFor(1))
-						StrDmg = AdaptDmg
-					else
-						ForDmg = AdaptDmg
 				var/str = FromSkill.StrScaling ? Owner.GetStr(FromSkill.StrScaling) : 0
+				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
 				var/fShift = Owner.FocusShiftType
 				if(fShift == "STR" && Owner.FocusShiftActive && FromSkill.StrScaling > 0) ///Block that works out FocusShift's scale multiplier
 					str *= Owner.FocusShiftBoost
 					//Owner << "[str] total strScale"
-				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
+
 				if(fShift == "FOR" && Owner.FocusShiftActive && FromSkill.ForScaling > 0)
 					force *= Owner.FocusShiftBoost
 					//Owner << "[force] total forScale"

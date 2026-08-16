@@ -1300,6 +1300,8 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=25
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				DamageMult=1.25
 				Knockback=3
 				Radius=2
@@ -1323,6 +1325,8 @@ obj
 				DamageMult=4
 				AccMult=2
 				Crippling=3
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Speed=0
 				Knockback=0.001
 				Deflectable=1
@@ -1441,6 +1445,8 @@ obj
 				ComboMaster=1
 				EnergyCost=5
 				Deflectable=0
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Charge=0.5
 				IconChargeOverhead=1
 				IconLock='Kienzan.dmi'
@@ -1621,6 +1627,8 @@ obj
 				DamageMult=6.5
 				Knockback=0
 				AccMult=50
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Deflectable=0
 				Static=1
 				Radius=1
@@ -4533,8 +4541,8 @@ obj
 							usr.UseProjectile(src)
 					True_Kamehameha
 						AttackReplace=1
-						StrScaling = 1
-						ForScaling = 0
+						StrScaling = 0
+						ForScaling = 1
 						DamageMult=9
 						Distance=60
 						IconLock='BeamKHH.dmi'
@@ -4559,6 +4567,8 @@ obj
 					Final_Shine
 						DamageMult=9
 						Distance=60
+						StrScaling = 1
+						ForScaling = 0
 						IconLock='BeamFS.dmi'
 						IconSize=2
 						EnergyCost=15
@@ -6192,18 +6202,13 @@ obj
 								src.DamageMult*=1+(src.Owner.SenseUnlocked-5)
 						var/fShift = Owner.FocusShiftType
 						var/str = StrScaling ? Owner.GetStr(StrScaling) : 0
+						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
 						if(fShift == "STR" && Owner.FocusShiftActive && StrScaling > 0)
 							str *= Owner.FocusShiftBoost
 							//Owner << "[str] total strScale"
-						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
 						if(fShift == "FOR" && Owner.FocusShiftActive && ForScaling > 0)
 							force *= Owner.FocusShiftBoost
 							//Owner << "[force] total forScale"
-						if(AdaptRate)
-							if(Owner.GetStr(1) > Owner.GetFor(1))
-								str = Owner.GetStr(AdaptRate)
-							else
-								force = Owner.GetFor(AdaptRate)
 						var/powerDif = Owner.Power / a:Power
 						// + Owner.getIntimDMGReduction(m)
 						if(glob.CLAMP_POWER)

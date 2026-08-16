@@ -111,6 +111,8 @@ obj
 			Area="Wave"
 			Distance=4
 			PassThrough=1
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			StrScaling=1
 			DamageMult=1.5
 			EnergyCost=3
@@ -194,6 +196,8 @@ obj
 			StrScaling=1
 			DamageMult=2
 			Shearing=12
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			Cooldown=30
 			EnergyCost=3
 			Distance=3
@@ -224,6 +228,8 @@ obj
 			StrScaling=1
 			DamageMult=0.35
 			RoundMovement=0
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			ComboMaster=1
 			Rounds=10
 			Cooldown=30

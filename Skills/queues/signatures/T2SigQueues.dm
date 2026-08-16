@@ -152,6 +152,9 @@ obj
 					usr.SetQueue(src)
 			True_Kamehameha2
 				UnarmedOnly=1
+				FocusShifter=1
+				FocusShiftType="FOR"
+				FocusShiftBoost=2
 				DamageMult=5
 				AccuracyMult=25
 				Instinct=5
@@ -184,6 +187,9 @@ obj
 				UnarmedOnly=1
 				DamageMult=5
 				AccuracyMult=25
+				FocusShifter=1
+				FocusShiftType="STR"
+				FocusShiftBoost=2
 				Instinct=5
 				Duration=3
 				Warp=10

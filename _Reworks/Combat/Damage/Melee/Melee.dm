@@ -329,20 +329,17 @@
 				var/def = enemy.getEndStat(1)
 				var/damageMultiplier = dmgmulti
 				if(AttackQueue)
-					var/fShift = Owner.FocusShiftType
 					var/qStr = AttackQueue.StrScaling
-					if(fShift == "STR" && Owner.FocusShiftActive && AttackQueue.StrScaling > 0)
+					var/qFor = AttackQueue.ForScaling
+					var/fShift = Owner ? Owner.FocusShiftType : null
+
+					if(fShift == "STR" && Owner.FocusShiftActive && qStr > 0)
 						qStr *= Owner.FocusShiftBoost
 						//Owner << "[qStr] total strScale"
-					var/qFor = AttackQueue.ForScaling
-					if(fShift == "FOR" && Owner.FocusShiftActive && AttackQueue.ForScaling > 0)
+
+					if(fShift == "FOR" && Owner.FocusShiftActive && qFor > 0)
 						qFor *= Owner.FocusShiftBoost
 						//Owner << "[qFor] total forScale"
-					if(AttackQueue.AdaptRate)
-						if(GetStr(1) > GetFor(1))
-							qStr = AttackQueue.AdaptRate
-						else
-							qFor = AttackQueue.AdaptRate
 					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
 					if(queueAtk)
 						atk = queueAtk
