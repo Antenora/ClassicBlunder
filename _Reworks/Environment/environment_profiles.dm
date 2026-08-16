@@ -275,6 +275,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 			if("snow", "blizzard") grade_color = DnLerp(grade_color, "#e6f2ff", 0.35)
 			if("dust") grade_color = DnLerp(grade_color, "#d4aa72", 0.4)
 	var/time = immediate ? 0 : 10
+	if(Hd2dWorldBloomOn(C)) _Hd2dScanIndoor(C) //fresh geometry before any lightclass rebuild below
 	var/lightclass = !A ? "none" : A.sees_sky ? "sky" : A.dark_cave ? "cave" : "bright"
 	var/profile_key = "[P.id]-[A ? A.wx_kind : null]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]-[lightclass]"
 	if(C.gfx_env_profile_id != profile_key)
@@ -292,6 +293,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	GfxApplyReflectionPass(C, A)
 	GfxUpdateMoonlight(C, A, time)
 	_Hd2dAmbientApply(C, P, A) //self-keyed: zone, dusk/dawn, quality, resize, wind
+	Hd2dBloomRefresh(C) 
 
 proc/GfxUpdateMoonlight(client/C, area/A, transition_time = 10)
 	if(!C || !C.gfx_moon_fill) return
@@ -321,6 +323,7 @@ proc/_EnvProfileLoop()
 	var/datum/environment_profile/P = EnvProfileForClient(client, A)
 	var/list/W = EnvWindForArea(A)
 	src << "Area [A ? A.name : "none"] uses profile [P.display_name] ([P.id]); wind [round(W[1], 0.1)], [round(W[2], 0.1)], wetness [round(max(P.base_wetness, EnvWeatherWetness(A)), 0.01)], haze [P.haze_alpha]/[round(P.haze_density, 0.01)]."
+	src << "DN: sees_sky [A ? A.sees_sky : "?"] | dn_indoor [A ? A.dn_indoor : "?"] | dark_cave [A ? A.dark_cave : "?"] | icon [A && A.icon ? "[A.icon]" : "none"] | color [A ? A.color : "?"] | bloom_t [client ? client.hd2d_bloom_t : "?"] (0 = off) | indoor_seen [client ? client.hd2d_indoor_seen : "?"] sky_seen [client ? client.hd2d_sky_seen : "?"] shaft_add [client ? client.hd2d_shaft_add : "?"]"
 
 //sets the AREA world-side; the preview verb below only overrides your client
 /mob/Admin2/verb/Set_Area_Environment_Profile()

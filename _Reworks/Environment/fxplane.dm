@@ -1296,10 +1296,11 @@ proc/CpmApply(client/C)
 	var/list/fl = list()
 	if(glob && glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM)
 		fl += Hd2dGradeFilter(C) //zone-aware grade: plane-0 master only, the HUD (plane 100) stays clean
-	if(glob && glob.WORLD_BLOOM && _Hd2dLocalDark(C) > 0.35 && GfxBloomEnabled(C))
+	var/wt = Hd2dWorldBloomOn(C) ? WorldBloomThreshold(C) : 0
+	if(wt)
 		//whole-scene night bloom: placed fires/lights blossom (skill-FX bloom never sees them)
-		var/wt = WorldBloomThreshold(C)
 		fl += filter(type="bloom", threshold=rgb(wt, wt, wt), size=glob.WORLD_BLOOM_SIZE)
+	C.hd2d_bloom_t = wt //0 = no bloom filter installed
 	if(C.cpm_blur_size > 0)
 		fl += filter(type="blur", size=C.cpm_blur_size)
 	if(glob && glob.SCREEN_DISTORT && GfxDistortEnabled(C))
