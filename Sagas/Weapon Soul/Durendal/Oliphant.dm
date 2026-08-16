@@ -1,7 +1,6 @@
 obj/Skills/AutoHit/Blow_The_Horn
 	Area="Circle"
 	Distance=15
-	AdaptRate = 1
 	GuardBreak=1
 	DamageMult=10
 	Knockback=20

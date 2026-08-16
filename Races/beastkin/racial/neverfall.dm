@@ -20,7 +20,6 @@
 /obj/Skills/AutoHit/MonkeyKingWhirlwind
     ActiveMessage = "swings around AWOOOOO!!"
     DamageMult = 1
-    AdaptRate = 1
     Area = "Circle"
     Size=4
     Icon='SweepingKick.dmi'

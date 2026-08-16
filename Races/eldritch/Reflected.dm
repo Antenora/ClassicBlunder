@@ -969,7 +969,6 @@ obj/Skills/Projectile
 		DamageMult=0.55
 		Radius=1
 		AttackReplace=1
-		AdaptRate = 1
 		AccMult=1
 		Blasts=10
 		Cooldown = 15
@@ -980,7 +979,6 @@ obj/Skills/Projectile
 	Convergence
 		AttackReplace=1
 		Variation=8
-		AdaptRate = 1
 		RandomPath=1
 		Delay=0
 		Distance=60
@@ -999,7 +997,6 @@ obj/Skills/AutoHit
 	The_Other_Side
 		Area="Circle"
 		Distance=13
-		AdaptRate = 1
 		DamageMult=6
 		PullIn=7
 		Cooldown=40

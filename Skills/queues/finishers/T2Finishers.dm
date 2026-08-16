@@ -194,27 +194,22 @@
         FollowUp = "/obj/Skills/AutoHit/Dantes_Inferno"
         BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/In_the_Details"
         DamageMult = T2_DMG_MULT / 2;
-        AdaptRate = 1
     Mega_Arm
         FollowUp = "/obj/Skills/Projectile/Super_Mega_Buster"
         BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/X_Buster"
         BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Plasma_Burned" // pure red
         DamageMult = T2_DMG_MULT / 2;
-        AdaptRate = 1
     Frostfist
         Freezing = 255
         DamageMult = T2_DMG_MULT / 2;
         FollowUp = "/obj/Skills/AutoHit/Ice_Ply"
         BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Frozen_Summit"
-        AdaptRate = 1
     Phosphor
         FollowUp = "/obj/Skills/Projectile/Coldflame_Pale_Blade"
         BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Cooled_Down"
         DamageMult = T2_DMG_MULT / 2;
-        AdaptRate = 1
     Jet_Kindling
         FollowUp = "/obj/Skills/AutoHit/Flashfire_Fist"
         BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Heated_Up"
         DamageMult = T2_DMG_MULT / 2;
-        AdaptRate = 1
     //Soul Eater

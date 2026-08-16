@@ -18,13 +18,26 @@ obj/Skills
 	var/Temporary = FALSE
 	var/altered = FALSE
 	var/description
-	var/AdaptRate
 	var/StrScaling=0 //attacker stats feeding atk
 	var/ForScaling=0
 	var/EndScaling=0
 	var/SpdScaling=0
 	var/OffScaling=0
 	var/DefScaling=0
+	var/UsesStr=0 //base-stat override: 1 = base damage uses this stat instead of the path default (Str melee-side, For projectiles)
+	var/UsesFor=0
+	var/UsesSpd=0
+	var/UsesEnd=0
+	var/UsesDef=0
+	var/UsesOff=0
+	proc/BaseStatOverride(mob/M)
+		if(UsesStr) return M.GetStr(1)
+		if(UsesFor) return M.GetFor(1)
+		if(UsesSpd) return M.GetSpd(1)
+		if(UsesEnd) return M.GetEnd(1)
+		if(UsesDef) return M.GetDef(1)
+		if(UsesOff) return M.GetOff(1)
+		return 0
 	var/EndEffectiveness=1 //DEFENDER'S End vs this skill. 1 = normal mitigation, 0 = pierces End entirely
 	var/CritEffectiveness=1 //multiplies crit chance vs this skill's hits. 0 = can't crit
 	var/BlockEffectiveness=1 //multiplies the defender's block chance. 0 = unblockable

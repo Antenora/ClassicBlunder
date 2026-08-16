@@ -5,7 +5,6 @@
 	Area="Circle"
 	NoLock=1
 	NoAttackLock=1
-	AdaptRate=1
 	DamageMult=6
 	DelayTime=0
 	Rush=6

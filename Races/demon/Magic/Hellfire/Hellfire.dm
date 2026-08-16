@@ -5,7 +5,6 @@
     ElementalClass="Fire"
     SpellElement = "Dark"
     DamageMult = 3
-    AdaptRate = 1
     IconLock='Fire Blessing.dmi'
     IconSize=2
     Trail='Aura_Fire_Small.dmi'

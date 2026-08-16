@@ -164,7 +164,6 @@ proc/applyAshChoked(mob/target, mob/caster)
 /obj/Skills/AutoHit/Taimatsu
 	name = "Taimatsu"
 	Area="Wave"
-	AdaptRate=1
 	DamageMult=0.15
 	ComboMaster=1
 	NoLock = 1

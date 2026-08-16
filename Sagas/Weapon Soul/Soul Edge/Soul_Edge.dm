@@ -84,7 +84,6 @@ obj/Skills/AutoHit/Dark_Reconquista
 // Automatic followup AutoHit triggered when Triumph's sweet spot is hit.
 /obj/Skills/AutoHit/Reconquista_Triumph_Strike
 	Area = "Circle"
-	AdaptRate = 1
 	StrScaling = 1
 	DamageMult = 2.5
 	ComboMaster = 1

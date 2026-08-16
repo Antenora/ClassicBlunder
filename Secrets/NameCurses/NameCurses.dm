@@ -29,7 +29,6 @@ obj/Skills/AutoHit
 	BlackAnt
 		Area="Target"
 		SignatureTechnique=3
-		AdaptRate = 1
 		Cooldown=-1
 		DamageMult = 5
 		Distance = 15

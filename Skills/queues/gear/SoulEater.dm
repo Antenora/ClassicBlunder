@@ -200,7 +200,6 @@ obj
 /obj/Skills/Projectile
 	Dark_Firagun
 		Distance=50
-		AdaptRate=1
 		DamageMult=0.5
 		HyperHoming=1
 		IgnoreStun=1

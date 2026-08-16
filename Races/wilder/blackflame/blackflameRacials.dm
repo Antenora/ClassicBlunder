@@ -47,7 +47,6 @@
 
 /obj/Skills/AutoHit/Darkness_Roar
     Area="Circle"
-    AdaptRate=1
     DamageMult=0.1
     Rounds=1
     TurfDirt=1
@@ -76,7 +75,6 @@
 
 /obj/Skills/AutoHit/Flame_Roar
     Area="Arc"
-    AdaptRate=1
     DamageMult=0.1
     Rounds=1
     TurfDirt=1

@@ -314,7 +314,6 @@ obj
 			Distance=2
 			GrabMaster=1
 			DamageMult=2
-			AdaptRate=1
 			Size=2
 			HitSparkIcon='Slash.dmi'
 			HitSparkX=-32

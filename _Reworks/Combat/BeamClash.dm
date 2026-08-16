@@ -334,11 +334,6 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 		if(!O || !enemy) return 1
 		var/str = S.StrScaling ? O.GetStr(S.StrScaling) : 0
 		var/force = S.ForScaling ? O.GetFor(S.ForScaling) : 0
-		if(S.AdaptRate)
-			if(O.GetStr(1) > O.GetFor(1))
-				str = O.GetStr(S.AdaptRate)
-			else
-				force = O.GetFor(S.AdaptRate)
 		var/powerDif = O.Power / max(enemy.Power, 1)
 		if(glob.CLAMP_POWER && !O.ignoresPowerClamp(enemy))
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
@@ -348,7 +343,7 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 		if(O.passive_handler["Atomizer"])
 			EndEffectiveness = clamp(EndEffectiveness - (EndEffectiveness * (O.passive_handler["Atomizer"] * glob.ATOMIZERRATE)), 0.0001, 2)
 		var/def = enemy.getEndStat(1) * EndEffectiveness
-		var/atk = 0
+		var/atk = S.BaseStatOverride(O) || O.GetFor(1)
 		if(force) atk += force
 		if(str) atk += str
 		if(atk < 1) atk = 1

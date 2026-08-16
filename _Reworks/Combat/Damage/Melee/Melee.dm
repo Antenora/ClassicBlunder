@@ -341,8 +341,10 @@
 						qFor *= src.FocusShiftBoost
 						//Owner << "[qFor] total forScale"
 					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
-					if(queueAtk)
-						atk = queueAtk
+					var/qBase = AttackQueue.BaseStatOverride(src)
+					if(qBase)
+						atk = qBase
+					atk += queueAtk
 					def *= AttackQueue.EndEffectiveness
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()

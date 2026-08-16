@@ -20,7 +20,6 @@
 
 /obj/Skills/AutoHit/Dragon_Roar
     Area="Circle"
-    AdaptRate=1
     DamageMult=0.1
     Rounds=1
     TurfDirt=1
@@ -49,7 +48,6 @@
                 Area="Arc"
                 TurfErupt=1
                 SpecialAttack=1
-                AdaptRate=1
                 Distance = 2 + (asc * 2)
                 Size = 2 + (asc * 1 )
                 Scorching = 8 + (8 * asc)

@@ -1,5 +1,4 @@
 obj/Skills/Grapple
-	StrScaling=1
 	var
 		removeAfter = FALSE
 
@@ -126,7 +125,6 @@ obj/Skills/Grapple
 		Effect = "Shockwave"
 		EffectMult=1
 		DamageMult=2
-		AdaptRate = 1
 		ThrowAdd=15
 		TriggerMessage = "stabs their lightning infused hand into"
 
@@ -619,7 +617,7 @@ obj/Skills/Grapple
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
 				var/itemDmg = 1
-				var/statPower = (StrScaling ? User.GetStr(StrScaling) : 0) + (ForScaling ? User.GetFor(ForScaling) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
+				var/statPower = (BaseStatOverride(User) || User.getStatDmg2(autohit = TRUE)) + (StrScaling ? User.GetStr(StrScaling) : 0) + (ForScaling ? User.GetFor(ForScaling) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
 				if(HarderTheyFall)
 					var/enemyEnd = Trg.GetEnd(1)
 					statPower += enemyEnd * (HarderTheyFall/10)

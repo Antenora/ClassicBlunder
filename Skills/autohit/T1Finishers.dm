@@ -96,7 +96,6 @@
 		Area="Around Target"
 		NoLock=1
 		NoAttackLock=1
-		AdaptRate=1
 		DamageMult = T1_DMG_MULT / 2 / 20;
 		Distance=12
 		DistanceAround=4
@@ -138,7 +137,6 @@
 	
 	Orb_of_Storms
 		Area="Around Target"
-		AdaptRate = 1
 		DamageMult= T1_DMG_MULT / 2 / 20;
 		Rounds=20
 		Shattering=1
@@ -151,7 +149,6 @@
 	
 	Hemoplague
 		Area="Around Target"
-		AdaptRate = 1
 		DamageMult= T1_DMG_MULT / 2;
 		SpecialAttack=1
 		Crippling=5

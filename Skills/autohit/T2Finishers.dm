@@ -38,7 +38,6 @@
 		IconY=-32
 		Cooldown=4
 	Ice_Ply
-		AdaptRate = 1
 		SpecialAttack=1
 		DamageMult = T2_DMG_MULT/2;
 		Stasis=5
@@ -54,7 +53,6 @@
 		Rounds = 5
 		SpecialAttack = 1
 		DamageMult = T2_DMG_MULT / 2 / 5;
-		AdaptRate = 1
 		EndEffectiveness = 0.75
 	Flashfire_Fist
 		Area = "Wave"
@@ -63,7 +61,6 @@
 		SpecialAttack = 1
 		Size = 3
 		DamageMult = T2_DMG_MULT / 2;
-		AdaptRate = 1
 		Rush = 3
 		EndEffectiveness = 1
 		Scorching = 50
@@ -73,7 +70,6 @@
 		Snaring = 4
 		Distance = 4
 		DamageMult = T2_DMG_MULT / 2;
-		AdaptRate = 1
 		Shattering = 25
 		HitSparkIcon='HitsparkStar.dmi'
 

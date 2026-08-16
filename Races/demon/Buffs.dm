@@ -88,3 +88,9 @@
 		S.DamageMult = DamageMult
 		S.StrScaling = StrScaling
 		S.ForScaling = ForScaling
+		S.UsesStr = UsesStr
+		S.UsesFor = UsesFor
+		S.UsesSpd = UsesSpd
+		S.UsesEnd = UsesEnd
+		S.UsesDef = UsesDef
+		S.UsesOff = UsesOff

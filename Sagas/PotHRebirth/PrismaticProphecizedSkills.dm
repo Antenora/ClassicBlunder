@@ -252,7 +252,6 @@ obj
 			SpellElement="Air"
 			FlickAttack=1
 			Distance=6
-			AdaptRate=1
 			Area="Target"
 			ForScaling=1.5
 			DamageMult=6

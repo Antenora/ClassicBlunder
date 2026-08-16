@@ -144,7 +144,6 @@ mob/Admin3/verb/GiveWitchBook()
 
 /obj/Skills/AutoHit/Dream_Walk
 	Area="Circle"
-	AdaptRate= 1
 	DamageMult= 6
 	Rounds= 10
 	TurfStrike=1
@@ -230,7 +229,6 @@ mob/Admin3/verb/GiveWitchBook()
 
 /obj/Skills/AutoHit/Hex
 	Area="Target"
-	AdaptRate = 1
 	DamageMult = 5
 	Distance = 15
 	DelayTime = 0

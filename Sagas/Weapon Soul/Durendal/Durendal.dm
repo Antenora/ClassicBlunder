@@ -9,7 +9,6 @@ obj/Items/Sword/Heavy/Legendary/WeaponSoul/Sword_of_Hope//Durendal
 obj/Skills/AutoHit/Shockwave_Blows
 	Area="Circle"
 	Distance=5
-	AdaptRate = 1
 	GuardBreak=1
 	DamageMult=1
 	Knockback=2
