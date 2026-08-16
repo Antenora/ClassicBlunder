@@ -518,6 +518,10 @@ document.onkeydown=function(e){
 
 /obj/Skills/proc/InfoPanelLines()
 	var/list/L = list()
+	if(StrScaling)
+		L += "Strength Scaling: [round(StrScaling * 100)]%"
+	if(ForScaling)
+		L += "Force Scaling: [round(ForScaling * 100)]%"
 	if(MaxCharges > 0)
 		L += "Charges: [Charges]/[MaxCharges] (refreshes every [ChargeRefresh]s)"
 	else if(Cooldown != -1)

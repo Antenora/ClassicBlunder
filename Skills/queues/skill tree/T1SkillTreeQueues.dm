@@ -205,6 +205,8 @@ obj
 				AccuracyMult = 1.175
 				Duration=5
 				Combo=4
+				StrScaling=0.5
+				ForScaling=0.5
 				Rapid=1
 				Cooldown=30
 				EnergyCost=10
@@ -229,6 +231,8 @@ obj
 				SkillCost=80
 				Copyable=3
 				DamageMult=0.15
+				StrScaling=0.5
+				ForScaling=0.5
 				AccuracyMult = 1.175
 				Stunner=2
 				Duration=5

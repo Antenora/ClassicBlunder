@@ -55,6 +55,7 @@ mob/proc/FireFinisher(force = 0)
 obj
 	Skills
 		Queue//Queued skills like GET DUNKED and Axekick.
+			StrScaling= 1
 			var/Duration=5//This is how long the queue remains up for.
 			var/UnarmedOnly=0//Can't use this with a sword.
 			//var/ClassNeeded//Requires a sword class.

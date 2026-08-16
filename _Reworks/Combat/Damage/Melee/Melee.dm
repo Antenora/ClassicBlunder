@@ -331,14 +331,14 @@
 				if(AttackQueue)
 					var/qStr = AttackQueue.StrScaling
 					var/qFor = AttackQueue.ForScaling
-					var/fShift = Owner ? Owner.FocusShiftType : null
+					var/fShift = src ? src.FocusShiftType : null
 
-					if(fShift == "STR" && Owner.FocusShiftActive && qStr > 0)
-						qStr *= Owner.FocusShiftBoost
+					if(fShift == "STR" && src.FocusShiftActive && qStr > 0)
+						qStr *= src.FocusShiftBoost
 						//Owner << "[qStr] total strScale"
 
-					if(fShift == "FOR" && Owner.FocusShiftActive && qFor > 0)
-						qFor *= Owner.FocusShiftBoost
+					if(fShift == "FOR" && src.FocusShiftActive && qFor > 0)
+						qFor *= src.FocusShiftBoost
 						//Owner << "[qFor] total forScale"
 					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
 					if(queueAtk)
