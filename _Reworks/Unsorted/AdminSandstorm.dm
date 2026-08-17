@@ -18,6 +18,7 @@ var/datum/sandstorm_controller/admin_sandstorm_active = null
 
 /obj/screen/sandstorm_tint
 	screen_loc = "CENTER"
+	plane = FX_RELAY_PLANE
 	layer = 19
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
@@ -32,6 +33,7 @@ var/datum/sandstorm_controller/admin_sandstorm_active = null
 
 /obj/screen/sandstorm_dots_emitter
 	screen_loc = "CENTER"
+	plane = FX_RELAY_PLANE
 	layer = 20
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE

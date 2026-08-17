@@ -1,4 +1,5 @@
 /atom/movable/lifebar
+	plane = HUD_PLANE
 	layer = FLY_LAYER + 4
 	mouse_opacity = 0
 	screen_loc = "CENTER-3,SOUTH+5"

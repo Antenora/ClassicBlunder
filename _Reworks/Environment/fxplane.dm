@@ -30,8 +30,8 @@ globalTracker
 	layer = BACKGROUND_LAYER
 	render_target = "*fx"
 
-//the render plate: bloomed effects, drawn above world+weather, below the FLY_LAYER+2 HUD
 /obj/fx_relay
+	plane = FX_RELAY_PLANE
 	screen_loc = "SOUTHWEST" //render_source anchors bottom-left
 	layer = 6.9
 	mouse_opacity = 0
@@ -56,6 +56,7 @@ globalTracker
 	render_target = "*fxnb"
 
 /obj/fxnb_relay
+	plane = FX_RELAY_PLANE
 	screen_loc = "SOUTHWEST"
 	layer = 6.89 //just under the bloomed plate at 6.9
 	mouse_opacity = 0
@@ -1320,12 +1321,17 @@ proc/FxApplyBloom(client/C)
 		fl += filter(type="bloom", threshold=rgb(t,t,t), size=bs)
 	if(C.cpm_blur_size > 0)
 		fl += filter(type="blur", size=C.cpm_blur_size)
+	var/distort = glob && glob.SCREEN_DISTORT && GfxDistortEnabled(C)
+	if(distort) 
+		fl += filter(type="displace", size=glob.DISTORT_SIZE, render_source="*fxdisp")
 	C.fxplane_master.filters = fl.len ? fl : null
 	if(C.fxnb_master) //the no-bloom plate: same mirrors, never the bloom
 		var/list/nfl = list()
 		if(grade) nfl += Hd2dGradeFilter(C)
 		if(C.cpm_blur_size > 0)
 			nfl += filter(type="blur", size=C.cpm_blur_size)
+		if(distort)
+			nfl += filter(type="displace", size=glob.DISTORT_SIZE, render_source="*fxdisp")
 		C.fxnb_master.filters = nfl.len ? nfl : null
 
 proc/FxEnsureMasters(client/C)

@@ -665,6 +665,7 @@ obj/Skills/Summon_Ea
 // Particle emitter for the Enuma Elish charge-up sequence
 obj/EaParticleEmitter
 	density       = 0
+	plane         = FX_RELAY_PLANE
 	layer         = 20
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
@@ -682,6 +683,7 @@ obj/EaVisual
 	name          = "Enuma Elish"
 	icon          = 'Hellnova.dmi'
 	density       = 0
+	plane         = FX_RELAY_PLANE
 	layer         = 20
 	mouse_opacity = 0
 	alpha         = 255

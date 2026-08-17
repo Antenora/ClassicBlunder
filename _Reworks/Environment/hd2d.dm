@@ -1,6 +1,6 @@
 // structure sun shadows, light shafts, fire embers, vignette, farblur, bloom, color grading
 
-#define FARBLUR_PLANE 30 //drawn above the world, below the HUD
+#define FARBLUR_PLANE 3
 
 globalTracker
 	var/tmp

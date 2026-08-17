@@ -52,7 +52,7 @@
 	img_a.pixel_y = -3 * DEMON_FUSION_TILE_SIZE
 	img_a.alpha = 0
 	img_a.layer = MOB_LAYER + 10
-	img_a.plane = 5
+	img_a.plane = 20 
 	img_a.mouse_opacity = 0
 
 	// --- Image B (right ingredient) ---
@@ -62,7 +62,7 @@
 	img_b.pixel_y = -3 * DEMON_FUSION_TILE_SIZE
 	img_b.alpha = 0
 	img_b.layer = MOB_LAYER + 10
-	img_b.plane = 5
+	img_b.plane = 20
 	img_b.mouse_opacity = 0
 
 	// --- Dark portal (spawned later, layered above merged ingredients, below result) ---
@@ -72,7 +72,7 @@
 	img_portal.pixel_y = -34
 	img_portal.alpha = 0
 	img_portal.layer = MOB_LAYER + 11
-	img_portal.plane = 5
+	img_portal.plane = 20
 	img_portal.mouse_opacity = 0
 
 	// --- Result demon (spawned last, layered above portal) ---
@@ -83,7 +83,7 @@
 	img_r.alpha = 0
 	img_r.color = "#000000"  // start as silhouette
 	img_r.layer = MOB_LAYER + 12
-	img_r.plane = 5
+	img_r.plane = 20
 	img_r.mouse_opacity = 0
 
 	demon_fusion_anim_images += img_a

@@ -682,6 +682,7 @@ proc
 
 /obj/screen/glass_shard
 	icon = 'Icons/Effects/GlassEffect.dmi'
+	plane = FX_RELAY_PLANE
 	layer = 20
 	mouse_opacity = 0
 	appearance_flags = KEEP_TOGETHER
@@ -716,6 +717,7 @@ proc
 
 	var/obj/flash_overlay = new
 	flash_overlay.screen_loc = "CENTER"
+	flash_overlay.plane = FX_RELAY_PLANE
 	flash_overlay.layer = 21
 	flash_overlay.mouse_opacity = 0
 	flash_overlay.appearance_flags = PIXEL_SCALE
