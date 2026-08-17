@@ -3,7 +3,7 @@
 	Distance=5
 	DamageMult=6
 	Rush=5
-	ControlledRush=1
+	ControlledRush=0
 	Cooldown=30
 	StrScaling=1
 	RushAfterImages=3
@@ -414,7 +414,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Focus
 	Distance=6
 	DamageMult=8
 	Rush=6
-	ControlledRush=1
+	ControlledRush=0
 	StrScaling=2
 	ForScaling=1
 	SpecialAttack=1
@@ -1077,7 +1077,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 	Area="Wave"
 	Distance=6
 	Rush=5
-	ControlledRush=1
+	ControlledRush=0
 	DamageMult=3
 	StrScaling=2
 	ForScaling=1
@@ -1121,7 +1121,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 	Area="Wave"
 	Distance=3
 	Rush=3
-	ControlledRush=1
+	ControlledRush=0
 	DamageMult=4
 	StrScaling=2
 	SpecialAttack=1
@@ -1151,7 +1151,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 	Area="Arc"
 	Distance=2
 	Rush=4
-	ControlledRush=1
+	ControlledRush=0
 	DamageMult=3
 	StrScaling=2
 	SpecialAttack=1
@@ -1218,7 +1218,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 	Area="Arc"
 	Distance=2
 	Rush=4
-	ControlledRush=1
+	ControlledRush=0
 	DamageMult=3
 	StrScaling=1
 	SpecialAttack=1
@@ -1368,7 +1368,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 	Area="Wave"
 	Distance=8
 	Rush=7
-	ControlledRush=1
+	ControlledRush=0
 	DamageMult=5
 	StrScaling=2
 	ForScaling=1

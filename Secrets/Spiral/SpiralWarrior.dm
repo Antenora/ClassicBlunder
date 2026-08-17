@@ -256,7 +256,7 @@ obj/Skills/AutoHit/Spiral
 		AdaptRate=1
 		DamageMult=6
 		Rush=20
-		ControlledRush=1
+		ControlledRush=0
 		WindUp = 0.5
 		Rounds=1
 		Knockback=15
@@ -284,7 +284,7 @@ obj/Skills/AutoHit/Spiral
 		AdaptRate=1
 		DamageMult=6
 		Rush=20
-		ControlledRush=1
+		ControlledRush=0
 		WindUp = 0.5
 		Rounds=1
 		ComboMaster=1

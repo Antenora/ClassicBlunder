@@ -11,8 +11,8 @@ obj
 				Distance=4
 				AdaptRate=1
 				DamageMult=1.5
-				Rush=3
-				ControlledRush=1
+				Rush=6
+				ControlledRush=0
 				Cooldown=30
 				EnergyCost=2
 				DelayTime=1.5
@@ -233,8 +233,8 @@ obj
 				Area="Arc"
 				AdaptRate=1
 				DamageMult=2.25
-				Rush=5
-				ControlledRush=1
+				Rush=10
+				ControlledRush=0
 				Rounds=5
 				ComboMaster=1
 				RoundMovement=1

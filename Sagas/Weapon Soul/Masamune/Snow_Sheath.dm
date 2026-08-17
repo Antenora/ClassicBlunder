@@ -2,8 +2,8 @@ obj/Skills/AutoHit/Purifying_Frost
 	NeedsSword=1
 	Area="Circle"
 	Cleansing = 5
-	ControlledRush=1
-	Rush=3
+	ControlledRush=0
+	Rush=6
 	ChargeTech=1
 	ChargeTime=1
 	Rounds=5

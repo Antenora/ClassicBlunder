@@ -156,8 +156,8 @@
         Launcher = 2
         ComboMaster = 1
         EnergyCost=2
-        Rush=3
-        ControlledRush=1
+        Rush=6
+        ControlledRush=0
         Cooldown=60
         Icon='Nest Slash.dmi'
         IconX=-16

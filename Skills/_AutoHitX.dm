@@ -900,7 +900,7 @@ obj
 				Flash=1
 				Rush=15
 				Instinct=2
-				ControlledRush=1
+				ControlledRush=0
 				WindUp=0.5
 				ShockIcon='KenShockwaveGold.dmi'
 				Shockwave=4
@@ -1213,7 +1213,7 @@ obj
 				StrScaling=1
 				DamageMult=2.75
 				Rush=5
-				ControlledRush=1
+				ControlledRush=0
 				Rounds=3
 				ComboMaster=1
 				RoundMovement=0
@@ -1277,7 +1277,7 @@ obj
 				StrScaling=1
 				Rush=8
 				Jump=1
-				ControlledRush=1
+				ControlledRush=0
 				DamageMult=9
 				MenuIcon="FlyingKick"
 				Knockback=1
@@ -1655,7 +1655,7 @@ obj
 
 				Rush=1
 				RushDelay=0.1
-				ControlledRush=1
+				ControlledRush=0
 				Knockback=0
 				Earthshaking=15
 				PreShockwave=1
@@ -1696,7 +1696,7 @@ obj
 				// GuardBreak=1
 				SpecialAttack=1
 				Rush=5
-				ControlledRush=1
+				ControlledRush=0
 				Instinct=1
 				Icon='Glowing Electricity.dmi'
 				ActiveMessage="is covered in lightning as they charge forward!"
@@ -1711,7 +1711,7 @@ obj
 				ForScaling=1
 				DamageMult=8
 				ComboMaster=1
-				ControlledRush=1
+				ControlledRush=0
 				Rush=7
 				Instinct=2
 				Knockback=15
@@ -1871,7 +1871,7 @@ obj
 				Rush=8
 				NoLock=1
 				NoAttackLock=1
-				ControlledRush=1
+				ControlledRush=0
 				Rounds=3
 				DamageMult=4
 				ComboMaster=1
@@ -1952,7 +1952,7 @@ obj
 				GuardBreak=1
 				ComboMaster=1
 				Rush=5
-				ControlledRush=1
+				ControlledRush=0
 				HitSparkIcon='Slash - Future.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -2292,7 +2292,7 @@ obj
 				verb/Chidori()
 					set category="Skills"
 					if(usr.Saga=="Sharingan")
-						src.ControlledRush=1
+						src.ControlledRush=0
 					adjust(usr)
 					usr.Activate(src)
 			The_Seventh_Super_Explosive_Wave
@@ -3412,7 +3412,7 @@ obj
 				StrScaling=1
 				Distance=1
 				Rush=10
-				ControlledRush=1
+				ControlledRush=0
 				PassThrough=1
 				DamageMult=10
 				WindUp=1
@@ -3815,7 +3815,7 @@ obj
 				Distance=4
 				Rush=10
 				RushDelay=0.5
-				ControlledRush=1
+				ControlledRush=0
 				GuardBreak=1
 				PassThrough=1
 				Knockback=0
@@ -3845,7 +3845,7 @@ obj
 				Distance=4
 				Rush=10
 				RushDelay=0.5
-				ControlledRush=1
+				ControlledRush=0
 				GuardBreak=1
 				PassThrough=1
 				Knockback=0
@@ -3917,7 +3917,7 @@ obj
 				WindUp=0.5
 
 				Rush = 10
-				ControlledRush = 1
+				ControlledRush = 0
 				WindupIcon=1
 				Slow=1
 				HitSparkIcon='Hit Effect Ripple.dmi'
@@ -4083,7 +4083,7 @@ obj
 				WindUp=1
 				WindupIcon=1
 				Rush=3
-				ControlledRush=1
+				ControlledRush=0
 				WindupMessage="focuses Cosmo into their fist..."
 				ActiveMessage="unleashes billion strikes in a second, creating a cage of light!"
 				verb/Lightning_Plasma_Burst()
@@ -4315,7 +4315,7 @@ obj
 					set category="Skills"
 					if(usr.SagaLevel>5)
 						src.DamageMult=4
-						src.ControlledRush=1
+						src.ControlledRush=0
 						WindupMessage="combines the forces of Destruction and Creation with absolute control!"
 					usr.Activate(src)
 			Goldion_Hammer
@@ -4491,7 +4491,7 @@ obj
 				Cooldown=40
 				Size=1
 				Rush=3
-				ControlledRush=1
+				ControlledRush=0
 				IgnoreAlreadyHit=1
 				// CanBeBlocked=0
 				// CanBeDodged=0
@@ -4572,7 +4572,7 @@ obj
 				Distance=3
 				ManaCost=75
 				Rush=5
-				ControlledRush=1
+				ControlledRush=0
 				Launcher=3
 				ComboMaster=1
 				StyleNeeded="Ansatsuken"
@@ -4593,7 +4593,7 @@ obj
 				Cooldown=10800
 				Size=1
 				Rush=3
-				ControlledRush=1
+				ControlledRush=0
 				Launcher=2
 				ComboMaster=1
 				StyleNeeded="Ansatsuken"
@@ -4613,7 +4613,7 @@ obj
 				Distance = 10
 				Rush=5
 				RushDelay=2
-				ControlledRush=1
+				ControlledRush=0
 				GuardBreak=1
 				PassThrough=1
 				Cooldown=-10
@@ -4655,7 +4655,7 @@ obj
 				Distance=5
 				Rush=5
 				RushDelay=2
-				ControlledRush=1
+				ControlledRush=0
 				GuardBreak=1
 				FlickAttack=1
 				PassThrough=1
@@ -4981,7 +4981,7 @@ obj
 					ComboMaster=1
 					Rounds=10
 					Rush=25
-					ControlledRush=1
+					ControlledRush=0
 					Cooldown=60
 					HitSparkIcon='Hit Effect Ripple.dmi'
 					HitSparkX=-32
@@ -5002,7 +5002,7 @@ obj
 			FrostBite
 				NoTransplant=1
 				Area="Arc"
-				ControlledRush=1
+				ControlledRush=0
 				Rush=7
 				Distance=1
 				StrScaling=0.5

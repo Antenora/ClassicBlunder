@@ -389,8 +389,8 @@ obj/Skills/AutoHit/Gravity_Lunge
 	WindUp=0.5
 	Cooldown=160
 	Size=1
-	Rush=3
-	ControlledRush=1
+	Rush=6
+	ControlledRush=0
 	Hurricane="/obj/Skills/Projectile/GravityTornado"
 	HurricaneDelay=0.5
 	WindUp=0.1
