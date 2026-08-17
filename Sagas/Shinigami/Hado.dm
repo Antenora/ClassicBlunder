@@ -109,7 +109,7 @@
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ActiveMessage = "chants: <b><font size=+1>Shakkahō!</font></b>"
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
 		src.DamageMult = 6
 		src.IconSize = 1
@@ -200,7 +200,7 @@
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ActiveMessage = "chants: <b><font size=+1>Sōkatsui!</font></b>"
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
 		src.DamageMult = 5
 		src.Scorching = 10
@@ -321,7 +321,7 @@
 		sleep(8)
 
 		// Fire at the apex
-		p.Activate(src)
+		p.Activate(src, noGCD = TRUE)
 
 		// Quick descent
 		animate(p, pixel_z = saved_pz, time = 4, easing = QUAD_EASING|EASE_IN)
@@ -411,7 +411,7 @@
 		src.Radius = 7
 		src.Combustion = 100
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
 		src.DamageMult = 30
 		src.Scorching = 50
@@ -536,7 +536,7 @@
 		src.ActiveMessage = "chants: <b><font size=+2>Senju Kōten Taihō!</font></b>"
 		src.DamageMult = 12
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
 		src.DamageMult = 6
 

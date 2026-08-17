@@ -1888,7 +1888,7 @@ mob
 				AngerTotal+=((src.PowerControl-100)/100)+(passive_handler.Get("PUSpike")/100)
 				if(AngerTotal>=500)
 					var/obj/Skills/s = src.findOrAddSkill(/obj/Skills/AutoHit/Platinum_Mad)
-					src.Activate(s)
+					src.Activate(s, noGCD = TRUE)
 					spawn(100)
 						del s
 			if(src.passive_handler.Get("Determination(Black)"))
@@ -2902,11 +2902,11 @@ mob
 				// Z.Cooldown()
 				return
 			if(src.Secret=="Werewolf")
-				src.Activate(new/obj/Skills/AutoHit/Howl)
+				src.Activate(new/obj/Skills/AutoHit/Howl, noGCD = TRUE)
 				Z.Cooldown(3)
 				return
 			if(hasEldritchPower())
-				src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Strike(p = src))
+				src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Strike(p = src), noGCD = TRUE)
 				Z.Cooldown()
 				return
 			if(src.Secret=="Haki")

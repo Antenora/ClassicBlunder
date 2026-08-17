@@ -326,8 +326,10 @@ obj/Skills
 					src.FallThrough=global.ArcaneRealmZ
 
 		proc
-			Activate(var/mob/User)
+			Activate(var/mob/User, noGCD = FALSE)
 				if(User.Suspended)
+					return
+				if(!noGCD && User.GCDBlocked(src))
 					return
 				if(glob.DISABLE_ALL_TELEPORTS)
 					User<<"The ability to teleport has been sealed off!"

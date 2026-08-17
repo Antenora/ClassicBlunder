@@ -546,13 +546,15 @@ obj/Skills/Grapple
 
 
 	proc
-		Activate(var/mob/User)
+		Activate(var/mob/User, noGCD = FALSE)
 			src.ThrowDir=User.dir
 			var/hd = User.heldDir()
 			if(hd) src.ThrowDir = hd
 			if(src.Using)
 				return
 			if(User.HeldSkillBlocksAction(src))
+				return
+			if(!noGCD && User.GCDBlocked(src))
 				return
 			if(User.Airborne)
 				return

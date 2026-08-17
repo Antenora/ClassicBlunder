@@ -56,7 +56,7 @@
 			return
 		var/obj/Skills/rider = attacker.findOrAddSkill(/obj/Skills/AutoHit/Thunder_Bolt)
 		rider.adjust(attacker)
-		attacker.Activate(rider)
+		attacker.Activate(rider, noGCD = TRUE)
 
 /strikeHook/demonicInfusion
 	stage = "crit"
@@ -66,7 +66,7 @@
 			return
 		var/obj/Skills/rider = attacker.findOrAddSkill(/obj/Skills/AutoHit/HellfireRain)
 		rider.adjust(attacker)
-		attacker.Activate(rider)
+		attacker.Activate(rider, noGCD = TRUE)
 
 /strikeHook/reaperBlossom
 	stage = "crit"
@@ -76,4 +76,4 @@
 			return
 		var/obj/Skills/rider = attacker.findOrAddSkill(/obj/Skills/AutoHit/Blossom_Shower)
 		rider.adjust(attacker)
-		attacker.Activate(rider)
+		attacker.Activate(rider, noGCD = TRUE)

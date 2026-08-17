@@ -26,7 +26,7 @@ obj
 				adjust(p)
 				if(Using || cooldown_remaining)
 					return FALSE
-				var/aaa = p.Activate(src)
+				var/aaa = p.Activate(src, noGCD = TRUE)
 				return aaa
 			Distance=1//Unless otherwise stated, assume it's a one tile attack of varying style.
 			var/DistanceAround //this is only used for AroundTarget type techs.
@@ -5068,10 +5068,11 @@ obj
 
 mob
 	proc
-		Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE)
+		Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE)
 			set waitfor = FALSE
 			. = TRUE
 			if(HeldSkillBlocksAction(Z)) return FALSE
+			if(!noGCD && GCDBlocked(Z)) return FALSE
 			if(!ignoreCuck)
 				if(last_autohit + glob.MACROCHECKTIME > world.time)
 					return FALSE
@@ -5433,7 +5434,7 @@ mob
 					var/obj/Skills/s = findOrAddSkill(text2path(Z.Hurricane))
 					spawn(Z.HurricaneDelay*10)
 						src.dir=get_dir(src,src.Target)
-						src.UseProjectile(s)
+						src.UseProjectile(s, noGCD = TRUE)
 				else
 					spawn()src.WindupGlow(src)
 				if(Z.Float||Z.Ice||Z.Thunderstorm||Z.Gravity)
@@ -7990,7 +7991,7 @@ obj
 		chain_count++
 		DamageMult = 10 * (1.2 ** (chain_count - 1))
 		p.Target = chain_target
-		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
+		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE, noGCD=TRUE)
 		p.judgement_cut_bonus_value = 1.2 ** (chain_count - 1)
 		p.judgement_cut_bonus_chain_count = chain_count
 		p.judgement_cut_bonus_end_time = world.time + 30

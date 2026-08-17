@@ -158,7 +158,7 @@
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ChantNumber=0
 		src.ActiveMessage="chants: <b><font size = +3>KUROHITSUGI!</font size></b>"
-		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
+		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE, noGCD=TRUE)
 		src.Cooldown(1, null, p)
 		ActiveMessage = "starts chanting..."
 		p.ActionLocked=0

@@ -6,6 +6,7 @@
 	return FALSE
 
 /obj/Skills/Utility/Ouroboros
+	NoGCD = 1
 	var/last_triggered = ""
 	var/list/inputQueue = list()
 
@@ -23,6 +24,15 @@
 				animate(usr.client.hud_ids["Oro"], alpha = 0, time = 3)
 
 
+
+/obj/Skills/AutoHit/Ouroboros
+	NoGCD = 1
+/obj/Skills/Projectile/Ouroboros
+	NoGCD = 1
+/obj/Skills/Ouroboros
+	NoGCD = 1
+/obj/Skills/Buffs/SlotlessBuffs/Ouroboros
+	NoGCD = 1
 
 /obj/Skills/AutoHit/Ouroboros/Devouring_Fang
 	Area = "Arc"

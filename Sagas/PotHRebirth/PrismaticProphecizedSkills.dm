@@ -756,7 +756,7 @@ obj/AttackMarker
 			p.YSpawnOffset=4
 			p.XSpawnOffset=0
 
-		owner.UseProjectile(p)
+		owner.UseProjectile(p, noGCD = TRUE)
 
 		del(src)
 

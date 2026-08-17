@@ -495,7 +495,7 @@ mob
 					src.LoseHealth(5/ts.Mastery)
 					ts:TimeStopped++
 					if(ts:TimeStopped>ts.Mastery+1)
-						src.SkillX("Time Stop",x)
+						src.SkillX("Time Stop",x, noGCD = TRUE)
 			if(passive_handler["Fa Jin"])
 				if(canFaJin())
 					if(!fa_jin_effect)

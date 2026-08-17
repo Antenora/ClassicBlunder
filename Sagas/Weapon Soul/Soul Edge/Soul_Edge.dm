@@ -75,7 +75,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 		adjust(p)
 		DamageMult *= benefit
 		Distance = (benefit * 3)
-		p.Activate(src)
+		p.Activate(src, noGCD = TRUE)
 
 	verb/Dark_Reconquista()
 		set category="Skills"

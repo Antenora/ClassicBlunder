@@ -47,9 +47,9 @@ mob/proc/FireFinisher(force = 0)
 		else
 			q = FindSkill(path)
 		q.adjust(src)
-		SetQueue(q)
+		SetQueue(q, TRUE)
 	else
-		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher)
+		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher, TRUE)
 	return 1
 
 obj
@@ -1350,8 +1350,9 @@ obj
 
 mob
 	proc
-		SetQueue(var/obj/Skills/Queue/Q)
+		SetQueue(var/obj/Skills/Queue/Q, noGCD = FALSE)
 			if(src.HeldSkillBlocksAction(Q)) return
+			if(!noGCD && GCDBlocked(Q)) return
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Q] you are silenced!"
 				return 0
@@ -1384,7 +1385,7 @@ mob
 				src.AppearanceOff()
 				src.AppearanceOn()
 				src.warp_strike_saved_loc = get_turf(src)
-				if(!src.UseProjectile(P))
+				if(!src.UseProjectile(P, noGCD = TRUE))
 					src.WarpStrikeHidingWeapon = 0
 					src.AppearanceOff()
 					src.AppearanceOn()
@@ -1786,9 +1787,9 @@ mob
 								p.Using=0
 							if(!p.AttackReplace)
 								p.AttackReplace=1
-							src.UseProjectile(p)
+							src.UseProjectile(p, noGCD = TRUE)
 							if(src.AttackQueue.ProjectileBeam&&!p.Immediate)
-								src.UseProjectile(p)//Double tap for beaming
+								src.UseProjectile(p, noGCD = TRUE)//Double tap for beaming
 							sleep(1)
 						break
 
@@ -1817,9 +1818,9 @@ mob
 								p.Using=0
 							if(!p.AttackReplace)
 								p.AttackReplace=1
-							src.UseProjectile(p)
+							src.UseProjectile(p, noGCD = TRUE)
 							if(src.AttackQueue.ProjectileBeam&&!p.Immediate)
-								src.UseProjectile(p)//Double tap for beaming
+								src.UseProjectile(p, noGCD = TRUE)//Double tap for beaming
 							sleep(1)
 						break
 			if(src.AttackQueue.MultiHit)
@@ -1892,7 +1893,7 @@ mob
 					var/grabPath = src.AttackQueue.GrabTrigger
 					for(var/obj/Skills/Grapple/g in src.Skills)
 						if(g.type==text2path(grabPath))
-							g.Activate(src)
+							g.Activate(src, TRUE)
 				if(src.AttackQueue.FollowUp)
 					spawn(AttackQueue.FollowUpDelay) // EWWWW
 						throwFollowUp(AttackQueue.FollowUp)
@@ -1906,19 +1907,19 @@ mob
 					if(src.AttackQueue.MissStep)
 						var/obj/Skills/Queue/S=new src.AttackQueue.MissStep
 						src.AttackQueue=null
-						src.SetQueue(S)
+						src.SetQueue(S, TRUE)
 						return
 				else if(!src.AttackQueue.RanOut&&!src.AttackQueue.Missed&&src.AttackQueue.Hit)
 					if(src.AttackQueue.HitStep)
 						var/obj/Skills/Queue/S=new src.AttackQueue.HitStep
 						S.adjust(src)
 						src.AttackQueue=null
-						src.SetQueue(S)
+						src.SetQueue(S, TRUE)
 						return
 				else if(!src.AttackQueue.RanOut&&(src.AttackQueue.Missed||src.AttackQueue.Hit))
 					var/obj/Skills/Queue/S=new src.AttackQueue.Step
 					src.AttackQueue=null//But this triggers either way so long as you didn't just run out of time.
-					src.SetQueue(S)
+					src.SetQueue(S, TRUE)
 					return
 
 				src.AttackQueue=null

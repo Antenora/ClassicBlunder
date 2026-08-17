@@ -37,7 +37,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 			LockY = -65
 		else
 			IconLock = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		ResetHeldConfig()
 
 	verb/Getsuga_Tenshou()

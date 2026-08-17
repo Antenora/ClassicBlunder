@@ -45,7 +45,7 @@ obj/Skills/AutoHit/Gale_Slash
 		adjust(p)
 		DamageMult *= benefit
 		Launcher *= benefit
-		p.Activate(src)
+		p.Activate(src, noGCD = TRUE)
 
 	verb/Gale_Slash()
 		set category="Skills"

@@ -1,7 +1,7 @@
 mob/proc/InterceptionStrike(stacks)
     var/obj/Skills/AutoHit/Counter/_counter = findOrAddSkill(/obj/Skills/AutoHit/Counter)
     _counter.adjust(src, stacks)
-    Activate(_counter)
+    Activate(_counter, noGCD = TRUE)
 
 /mob/proc/canFaJin()
     if(passive_handler["Fa Jin"])

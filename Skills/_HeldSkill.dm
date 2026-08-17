@@ -122,6 +122,7 @@
 
 /mob/proc/CanUseSkill(obj/Skills/Z)
 	if(!Z) return FALSE
+	if(GCDBlocked(Z)) return FALSE
 	if(!CanAttack(-1)) return FALSE
 	if(src.Airborne) return FALSE
 	if(src.OnMagicalVehicle())
@@ -702,7 +703,7 @@
 		else
 			Rounds = 3
 
-		p.Activate(src)
+		p.Activate(src, noGCD = TRUE)
 
 	verb/Charged_Lightning_Kicks()
 		set category = "Skills"

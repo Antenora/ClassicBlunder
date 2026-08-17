@@ -1930,7 +1930,7 @@ obj/Items/Enchantment
 			nt.FocalExceptions.Add(src)
 			for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 				nt.FocalExceptions.Add(ta)
-			nt.Activate(usr)
+			nt.Activate(usr, TRUE)
 			return
 		verb/Set_Password()
 			set category=null
@@ -1956,7 +1956,7 @@ obj/Items/Enchantment
 				ns.FocalExceptions.Add(src)
 				for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 					ns.FocalExceptions.Add(ta)
-				ns.Activate(usr)
+				ns.Activate(usr, TRUE)
 			else
 				usr << "That is not the password to use the nexus."
 		verb/Nexus_Rally()
@@ -1971,7 +1971,7 @@ obj/Items/Enchantment
 				ns.FocalExceptions.Add(src)
 				for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 					ns.FocalExceptions.Add(ta)
-				ns.Activate(usr)
+				ns.Activate(usr, TRUE)
 			else
 				usr << "That is not the password to use the nexus."
 
@@ -2005,7 +2005,7 @@ obj/Items/Enchantment
 			nt.FocalExceptions.Add(src)
 			for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 				nt.FocalExceptions.Add(ta)
-			nt.Activate(usr)
+			nt.Activate(usr, TRUE)
 			return
 
 

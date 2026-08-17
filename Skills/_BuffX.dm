@@ -12095,9 +12095,10 @@ NEW VARIABLES
 
 mob
 	proc
-		UseBuff(var/obj/Skills/Buffs/B, var/Override)
+		UseBuff(var/obj/Skills/Buffs/B, var/Override, noGCD = FALSE)
 			. = TRUE
 			if(HeldSkillBlocksAction(B)) return
+			if(!Override && !noGCD && GCDBlocked(B)) return
 			if(src.Airborne)
 				return
 			B.SpellSlotModification();
@@ -12192,7 +12193,7 @@ mob
 									sb.Trigger(src, Override=1)
 					if(src.StanceBuff)
 						src << "[src.StanceBuff] cannot be used with a sword and no Champloo Style."
-						src.StanceBuff.Trigger(src)
+						src.StanceBuff.Trigger(src, Override=1)
 				if(B.type==/obj/Skills/Buffs/NuStyle/SwordStyle/Battle_Mage_Style)
 					if(src.ActiveBuff)
 						if(src.ActiveBuff.NoStaff&&src.HasStaff())
@@ -12207,7 +12208,7 @@ mob
 							var/obj/Skills/Buffs/SlotlessBuffs/sb = SlotlessBuffs[b]
 							if(sb.NoStaff&&src.HasStaff())
 								src << "[sb] cannot be used with a staff and no Battle Mage."
-								sb.Trigger(src)
+								sb.Trigger(src, Override=1)
 					if(src.StanceBuff)
 						if(src.StanceBuff.NoStaff&&src.HasStaff())
 							src << "[src.StanceBuff] cannot be used with a staff and no Battle Mage."
@@ -14916,7 +14917,7 @@ mob
 			if(B.HitSpark)
 				src.ClearHitSpark()
 			if(B.ExplosiveFinish)
-				src.Activate(new/obj/Skills/AutoHit/Explosive_Finish, ignoreCuck = TRUE)
+				src.Activate(new/obj/Skills/AutoHit/Explosive_Finish, ignoreCuck = TRUE, noGCD = TRUE)
 			if(B.FINISHINGMOVE)
 				src.Unconscious()
 			if(B.HealthCut)

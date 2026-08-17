@@ -1027,17 +1027,17 @@
 							src.Target << "You've been stripped of your sixth sense! Your mind is clouded and your abilities are crippled!"
 					else
 						src.ClearQueue()
-						src.Activate(new/obj/Skills/AutoHit/Heavenly_Ring_Dance)
+						src.Activate(new/obj/Skills/AutoHit/Heavenly_Ring_Dance, noGCD = TRUE)
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Ring_Dance/TH in src.AutoHits)
-							src.UseBuff(TH)
+							src.UseBuff(TH, noGCD = TRUE)
 
 					NextAttack+=30
 					sleep(10)
 					src.Target.Frozen=0
 				else
-					src.Activate(new/obj/Skills/AutoHit/Heavenly_Ring_Dance_Burst)
+					src.Activate(new/obj/Skills/AutoHit/Heavenly_Ring_Dance_Burst, noGCD = TRUE)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Ring_Dance/TH in src.AutoHits)
-						src.UseBuff(TH)
+						src.UseBuff(TH, noGCD = TRUE)
 			else if(src.CheckSlotless("Libra Armory")&&src.AttackQueue)
 				GetAndUseSkill(/obj/Skills/Projectile/Libra_Slash, Projectiles, TRUE)
 				src.ClearQueue()

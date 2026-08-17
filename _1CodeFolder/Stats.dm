@@ -1072,7 +1072,7 @@ mob/proc/
 /*					if(src.Race!="Changeling"||(src.Race=="Changeling"&&src.transActive()==4))*/
 					for(var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC in src)
 						if(!src.BuffOn(KC))
-							src.UseBuff(KC)
+							src.UseBuff(KC, noGCD = TRUE)
 							break
 /*					else
 						if(src.transActive()==3)

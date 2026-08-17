@@ -617,7 +617,7 @@ obj/Skills/AutoHit/Enuma_Elish
 		skill.charging_enuma = 0
 		PurgeEnumaElishSharedZones(shooter, target)
 		OMsg(shooter, "<b><font color='gold'>[shooter] [skill.ActiveMessage]</font></b>")
-		shooter.Activate(skill)
+		shooter.Activate(skill, noGCD = TRUE)
 
 	verb/Enuma_Elish()
 		set category = "Skills"

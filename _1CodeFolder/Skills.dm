@@ -323,6 +323,7 @@ obj/Skills
 		name="Aerial Payback"
 		Cooldown=40
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Cancel knockback and dash towards your target!"
 		Level=100
@@ -330,11 +331,13 @@ obj/Skills
 		name="Aerial Recovery"
 		Cooldown=20
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Cancel knockback!"
 	Dragon_Dash
 		Cooldown=30
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Dash towards your target!"
 		Level=100
@@ -384,6 +387,7 @@ obj/Skills
 	Reverse_Dash
 		Cooldown=30
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Quickly dash away!"
 		Level=100
@@ -843,6 +847,7 @@ obj/Skills
 		Level=100
 		Cooldown=10
 		CooldownStatic=1
+		NoGCD=1
 		desc="Allows you to move at high velocities."
 		icon_state="Zanzoken"
 		name="After Image Strike"

@@ -20,11 +20,33 @@ obj/Skills/var
 	cooldown_start
 	cooldown_start_wt = 0
 	cooldown_full = 0
+	NoGCD = 0
 	tmp/halve_next_cd = 0
+
+mob/var/tmp/gcd_ready = 0
+mob/var/tmp/gcd_stamp = 0
+mob/var/GCDMult = 1
+
+mob/proc/GCDBlocked(obj/Skills/Z)
+	if(!client) return FALSE
+	if(Z && Z.NoGCD) return FALSE
+	if(world.time >= gcd_ready) return FALSE
+	return world.time != gcd_stamp
+
+mob/proc/StartGCD(obj/Skills/Z)
+	if(!client) return
+	if(Z && Z.NoGCD) return
+	if(PureRPMode) return
+	var/until = world.time + glob.GCD_TIME * max(GCDMult, 0)
+	if(until > gcd_ready)
+		gcd_ready = until
+		gcd_stamp = world.time
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
 	if(p)
 		m = p
+	if(!Time && ismob(m) && !istype(src, /obj/Skills/Buffs))
+		m.StartGCD(src)
 	if(MaxCharges > 0)
 		if(p) hasMagmicInfusion(p)
 		Charges--
@@ -185,7 +207,7 @@ mob/Players/verb
 		// get step in front, get all stuff on that turf, only use melee if it has more than a turf
 		src.Melee1()
 
-mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
+mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 	if(Z)
 		if(!locate(Z) in src)
 			return  FALSE
@@ -195,6 +217,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 		return FALSE
 	if(src.Stasis)
 		return  FALSE
+	if(!noGCD && GCDBlocked(Z))
+		return FALSE
 	if(Z.Using && Wut!="Zanzoken")
 		return FALSE
 	if(Z.MagicNeeded&&!src.HasLimitlessMagic())
@@ -242,11 +266,11 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 
 					if(src.CheckActive("Ki Control"))
 						for(var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC in src)
-							src.UseBuff(KC)
+							src.UseBuff(KC, noGCD = TRUE)
 					if(src.CheckSlotless("What Must Be Done"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/wmbd in src.Buffs)
 							if(wmbd.Password)
-								src.UseBuff(wmbd)
+								src.UseBuff(wmbd, noGCD = TRUE)
 								del wmbd
 
 					src.OMessage(1,null,"[src]([src.key]) meditated!")
@@ -411,7 +435,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(src.Beaming==1)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
-							src.UseProjectile(B)
+							src.UseProjectile(B, noGCD = TRUE)
 
 			if("DragonDash")
 				if(!CanDash())
@@ -499,7 +523,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(src.Beaming==1)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
-							src.UseProjectile(B)
+							src.UseProjectile(B, noGCD = TRUE)
 				else
 					src.NextAttack=0
 					if(src.CheckSlotless("East Strength"))
@@ -531,7 +555,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						Z.Cooldown(0.5)
 					else if(hasEldritchPower())
 						var/obj/Skills/AutoHit/a = findOrAddSkill(/obj/Skills/AutoHit/Attractive_Force);
-						src.Activate(a);
+						src.Activate(a, noGCD = TRUE);
 						Z.Cooldown()
 					else
 						Z.Cooldown()
@@ -572,7 +596,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						src.SetQueue(new/obj/Skills/Queue/Rebuff_Overdrive)
 					Z.Cooldown(1.5)
 				else if(src.Secret=="Werewolf")
-					src.Activate(new/obj/Skills/AutoHit/Rabid_Retaliation)
+					src.Activate(new/obj/Skills/AutoHit/Rabid_Retaliation, noGCD = TRUE)
 					Z.Cooldown(2)
 				else if(hasEldritchPower())
 					var/obj/Skills/AutoHit/a = findOrAddSkill(/obj/Skills/AutoHit/Attractive_Force);

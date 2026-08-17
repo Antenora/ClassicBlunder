@@ -1,12 +1,12 @@
 /mob/proc/throwSkill(obj/Skills/s)
     if(istype(s, /obj/Skills/AutoHit))
-        Activate(s, TRUE)
+        Activate(s, TRUE, noGCD = TRUE)
     else if(istype(s, /obj/Skills/Projectile))
-        UseProjectile(s)
+        UseProjectile(s, TRUE)
     else if(istype(s, /obj/Skills/Queue))
-        SetQueue(s)
+        SetQueue(s, TRUE)
     else if(istype(s, /obj/Skills/Grapple))
-        s:Activate(src)
+        s:Activate(src, TRUE)
 
 /mob/proc/findOrAddSkill(path) // find it, regardless
     var/obj/Skills/s = null
@@ -30,7 +30,7 @@
     var/obj/Skills/s = findOrAddSkill(path)
     s.adjust(src)
     if(istype(s, /obj/Skills/AutoHit))
-        Activate(s, TRUE, TRUE)
+        Activate(s, TRUE, TRUE, TRUE)
     else
         throwSkill(s)
 

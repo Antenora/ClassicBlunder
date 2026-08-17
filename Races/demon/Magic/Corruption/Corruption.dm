@@ -23,7 +23,7 @@
 		if(Using || cooldown_remaining || !p.Target || !(p.Target.Health <= 50))
 			p << "On cd, being used, or target is above 50."
 			return FALSE
-		var/aaa = p.Activate(src)
+		var/aaa = p.Activate(src, noGCD = TRUE)
 		return aaa
 
 	verb/Corrupt_Reality()

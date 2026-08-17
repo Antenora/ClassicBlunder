@@ -22,7 +22,7 @@ obj
 				adjust(p)
 				if(Using || cooldown_remaining)
 					return FALSE
-				var/aaa = p.UseProjectile(src)
+				var/aaa = p.UseProjectile(src, noGCD = TRUE)
 				return aaa
 			layer=EFFECTS_LAYER
 			Distance=10
@@ -4878,9 +4878,10 @@ obj
 
 mob
 	proc
-		UseProjectile(var/obj/Skills/Projectile/Z)
+		UseProjectile(var/obj/Skills/Projectile/Z, noGCD = FALSE)
 			. = TRUE
 			if(HeldSkillBlocksAction(Z)) return FALSE
+			if(!noGCD && GCDBlocked(Z)) return FALSE
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Z] you are silenced!"
 				return FALSE

@@ -21,7 +21,7 @@ proc
 		if(m.ContinuousAttacking)
 			for(var/obj/Skills/Projectile/p in m.contents)
 				if(p.ContinuousOn && !p.StormFall)
-					m.UseProjectile(p)
+					m.UseProjectile(p, noGCD = TRUE)
 				continue
 		if(m.Guarding) m.GuardStop()	//hard cc drops guard
 		if(m.ChargingEnergy) m.ChargeStop()

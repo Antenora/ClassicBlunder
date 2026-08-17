@@ -55,7 +55,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Divine_Verdict
@@ -92,7 +92,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Divine_Verdict()
 		set category = "Skills"
@@ -164,7 +164,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Dazzle()
 		set category = "Skills"
@@ -210,7 +210,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Divine_Sentence()
 		set category = "Skills"
