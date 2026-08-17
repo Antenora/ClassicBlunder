@@ -82,7 +82,6 @@
 	Distance = 999
 	DistanceAround=6
 	DamageMult = 5
-	AdaptRate = 1
 	EndEffectiveness = 0.75
 	Copyable=6
 	Cooldown = 360

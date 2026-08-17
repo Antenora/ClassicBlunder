@@ -221,7 +221,6 @@ obj/Skills/AutoHit/Spiral
 		HitSparkSize=5
 		HitSparkCount=10
 		HitSparkDispersion=1
-		AdaptRate=1
 		SpecialAttack=1
 		BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply"
 		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Spiral_King"
@@ -230,7 +229,6 @@ obj/Skills/AutoHit/Spiral
 			adjust(usr)
 			usr.Activate(src)
 	Giga_Drill_Maximum
-		AdaptRate=1
 		DamageMult=18
 		Area="Circle"
 		Distance=8
@@ -253,7 +251,6 @@ obj/Skills/AutoHit/Spiral
 	Lagann_Impact
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		AdaptRate=1
 		DamageMult=6
 		Rush=20
 		ControlledRush=0
@@ -281,7 +278,6 @@ obj/Skills/AutoHit/Spiral
 	Lagann_Impact2
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		AdaptRate=1
 		DamageMult=6
 		Rush=20
 		ControlledRush=0
@@ -320,7 +316,6 @@ obj/Skills/AutoHit/Spiral
 			Speed = 0.75
 			Distance=30
 			DamageMult=0.5
-			AdaptRate=1
 			Explode=1
 			Dodgeable=0
 			Deflectable=0

@@ -3,7 +3,6 @@
 /obj/Skills/Projectile/Magic/DarkMagic/Shadow_Ball
 	scalingValues = list("Blasts" = list(2,2,3,3,4,4), "DamageMult" = list(0.75,1.25,1.5,2.5,3,4), "EndEffectiveness" = list(0.75, 0.6, 0.45, 0.3, 0.25, 0.2), "IconSize" = list(1, 1.15,1.25,1.5,2))
 	DamageMult = 3
-	AdaptRate = 1
 	SpellElement = "Dark"
 	IconLock='shadowflameball.dmi'
 	Trail='shadowfire.dmi'
@@ -39,7 +38,6 @@
 /obj/Skills/Projectile/Magic/DarkMagic/Abyssal_Sphere
 	scalingValues = list("Blasts" = list(2,2,3,3,4,4), "DamageMult" = list(0.75,1.25,1.5,2.5,3,4), "EndEffectiveness" = list(0.75, 0.6, 0.45, 0.3, 0.25, 0.2), "IconSize" = list(1, 1.15,1.25,1.5,2))
 	DamageMult = 3
-	AdaptRate = 1
 	SpellElement = "Dark"
 	IconLock='shadowflameball.dmi'
 	Trail='shadowfire.dmi'

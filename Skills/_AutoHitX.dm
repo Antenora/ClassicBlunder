@@ -342,7 +342,6 @@ obj
 			Heavenly_Dragon_Violet_Ponds_Annihilation_of_the_Nine_Realms
 				NoLock=1
 				NoAttackLock=1
-				AdaptRate=2
 				DamageMult=2
 				Area="Target"
 				Distance=10
@@ -993,7 +992,6 @@ obj
 				Slow=1
 				Area="Target"
 				ActiveMessage="bursts out with tendrils of shadow!"
-				AdaptRate = 1
 				DamageMult=0.5
 				TurfStrike=3
 				HitSparkIcon='Slash - Vampire.dmi'
@@ -1617,7 +1615,6 @@ obj
 				SignatureTechnique=1
 				UnarmedOnly=1
 				Area="Circle"
-				AdaptRate = 1
 				DamageMult=1.3
 				ComboMaster=1
 				Rounds=10
@@ -1681,7 +1678,6 @@ obj
 			Lariat
 				SignatureTechnique=2
 				Area="Circle"
-				AdaptRate=1.5
 				DamageMult=1.5
 				Rounds=10
 				ComboMaster=1
@@ -1746,7 +1742,6 @@ obj
 			Warp_Storm
 				Area="Circle"
 				Distance=2
-				AdaptRate=1
 				SpecialAttack=1
 				ComboMaster=1
 				Rounds=5
@@ -1763,7 +1758,6 @@ obj
 			Warp_Bomb
 				Area="Circle"
 				Distance=3
-				AdaptRate=1
 				SpecialAttack=1
 				ComboMaster=1
 				Rounds=3
@@ -2145,7 +2139,6 @@ obj
 			Imperial_Wrath
 				Area="Circle"
 				Distance=10
-				AdaptRate = 1
 				GuardBreak=1
 				DamageMult=1
 				Knockback=20
@@ -2164,7 +2157,6 @@ obj
 				SignatureTechnique=1
 				Area="Circle"
 				Distance=10
-				AdaptRate = 1
 				GuardBreak=1
 				DamageMult=8
 				Knockback=15
@@ -2188,7 +2180,6 @@ obj
 				AllOutAttack=1
 				Area="Circle"
 				Distance=10
-				AdaptRate = 1
 				DamageMult = 4
 				Flash=30
 				WindUp=0.75
@@ -2213,7 +2204,6 @@ obj
 			Chidori
 				Area="Strike"
 				SignatureTechnique=1
-				AdaptRate=1
 				Rush=20
 				SpecialAttack=1
 				CanBeDodged=0
@@ -2237,7 +2227,6 @@ obj
 				Instinct=1
 				proc/reset2default()
 					Area="Strike"
-					AdaptRate=1
 					Rush=20
 					SpecialAttack=1
 					CanBeDodged=0
@@ -2876,7 +2865,6 @@ obj
 							//	Rounds = 3 + p.Potential/25
 								Distance = 7
 								Freezing = 6 + p.getTotalMagicLevel()
-								AdaptRate = 1
 								DamageMult = 5 + p.getTotalMagicLevel()/5 + p.Potential/25
 								ForScaling=0
 								NoLock=1
@@ -2890,7 +2878,6 @@ obj
 								Distance= 6
 								DamageMult=8
 								ForScaling=1
-								AdaptRate=0
 								Freezing = 6
 								ManaCost = 9
 					verb/Blizzaga()
@@ -3572,7 +3559,6 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1
 				DamageMult=0.5
 				HolyMod=1.15
 				Distance=5
@@ -3605,7 +3591,6 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				AdaptRate=1
 				DamageMult=0.5
 				AbyssMod=1.15
 				Distance=5
@@ -4348,7 +4333,6 @@ obj
 ///Sharingan
 			Sharingan_Genjutsu
 				Area="Arc"
-				AdaptRate = 1
 				DamageMult=2
 				Distance=10
 				DelayTime=0
@@ -5007,7 +4991,6 @@ obj
 				Distance=1
 				StrScaling=0.5
 				ForScaling=0.5
-				AdaptRate=1
 				DamageMult=5
 				HitSparkIcon='Hit Effect Pearl.dmi'
 				HitSparkX=-32
@@ -5281,9 +5264,6 @@ mob
 				if(s.Class!=Z.ClassNeeded && (istype(Z.ClassNeeded, /list) && !(s.Class in Z.ClassNeeded)))
 					src << "You need a [istype(Z.ClassNeeded, /list) ? Z.ClassNeeded[1] : Z.ClassNeeded]-class weapon to use this technique."
 					return
-			if(!Z.StrScaling&&!Z.ForScaling && !Z.AdaptRate && !Z.FixedDamage)
-				src << "[Z] is bugged and doesn't know how to calculate damage."
-				return
 			if(Z.HealthCost)
 				if(src.Health<Z.HealthCost*glob.WorldDamageMult&&!Z.AllOutAttack)
 					return
@@ -5311,7 +5291,7 @@ mob
 						return FALSE
 
 			if(Z.FocusShifter)
-				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
 			if(Z.CorruptionCost)
 				if(Corruption - Z.CorruptionCost < 0)
 					src << "You don't have enough Corruption to activate [Z]"
@@ -6075,7 +6055,6 @@ obj
 			Executing
 			Primordial
 			SpeedStrike
-			AdaptDmg
 
 			Scorching
 			Chilling
@@ -6219,8 +6198,6 @@ obj
 					cost_mult *= owner.GetSwordDelay(sord)
 				src.SpellManaCostPaid = computed_drain * cost_mult
 			src.EndRes=Z.EndEffectiveness
-			if(Z.AdaptRate)
-				AdaptDmg = Z.AdaptRate
 			FoxFire = Z.FoxFire
 			ManaDrain = Z.ManaDrain
 			Snaring=Z.Snaring
@@ -6543,21 +6520,12 @@ obj
 				Owner.log2text("powerDif - Auto Hit", powerDif, "damageDebugs.txt", "[Owner.ckey]/[Owner.name]")
 				#endif
 				var/atk = 0
-				if(AdaptDmg)
-					if(Owner.GetStr(1) > Owner.GetFor(1))
-						StrDmg = AdaptDmg
-					else
-						ForDmg = AdaptDmg
-				var/str = FromSkill.StrScaling ? Owner.GetStr(FromSkill.StrScaling) : 0
-				var/fShift = Owner.FocusShiftType
-				if(fShift == "STR" && Owner.FocusShiftActive && FromSkill.StrScaling > 0) ///Block that works out FocusShift's scale multiplier
-					str *= Owner.FocusShiftBoost
-					//Owner << "[str] total strScale"
-				var/force = FromSkill.ForScaling ? Owner.GetFor(FromSkill.ForScaling) : 0
-				if(fShift == "FOR" && Owner.FocusShiftActive && FromSkill.ForScaling > 0)
-					force *= Owner.FocusShiftBoost
-					//Owner << "[force] total forScale"
-				atk = str + force + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
+				var/fIdnt = FromSkill.FocusStatIdentity()
+				var/strScale = Owner.FocusShiftScaling(fIdnt, "STR", FromSkill.StrScaling)
+				var/forScale = Owner.FocusShiftScaling(fIdnt, "FOR", FromSkill.ForScaling)
+				var/str = strScale ? Owner.GetStr(strScale) : 0
+				var/force = forScale ? Owner.GetFor(forScale) : 0
+				atk = (FromSkill.BaseStatOverride(Owner) || Owner.getStatDmg2(autohit = TRUE)) + str + force + (FromSkill.SpdScaling ? Owner.GetSpd(FromSkill.SpdScaling) : 0) + (FromSkill.OffScaling ? Owner.GetOff(FromSkill.OffScaling) : 0) + (FromSkill.DefScaling ? Owner.GetDef(FromSkill.DefScaling) : 0) + (FromSkill.EndScaling ? Owner.GetEnd(FromSkill.EndScaling) : 0)
 				if(SpellElement)
 					//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the autohitter is a spell (SpellElement is set).
 					//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
@@ -7681,7 +7649,6 @@ obj
 				src.Damage=AH.Damage
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
-				src.AdaptDmg=AH.AdaptDmg
 				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
@@ -7757,7 +7724,6 @@ obj
 				src.Damage= AH.Damage / glob.AUTOHIT_WAVE_OFFSHOOT_DAMAGE_DIVISOR
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
-				src.AdaptDmg=AH.AdaptDmg
 				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
@@ -7833,7 +7799,6 @@ obj
 				src.StepsDamage=AH.StepsDamage
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
-				src.AdaptDmg=AH.AdaptDmg
 				src.SpellElement=AH.SpellElement
 				src.EndRes=AH.EndRes
 				src.Knockback=AH.Knockback
@@ -8095,6 +8060,12 @@ obj
 		W.SpdScaling = SpdScaling
 		W.OffScaling = OffScaling
 		W.DefScaling = DefScaling
+		W.UsesStr = UsesStr
+		W.UsesFor = UsesFor
+		W.UsesSpd = UsesSpd
+		W.UsesEnd = UsesEnd
+		W.UsesDef = UsesDef
+		W.UsesOff = UsesOff
 		W.dmgTypes = buildSpecDmgTypes(HolyMod, Sanctify, AbyssMod, SlayerMod)
 		return W
 
@@ -8121,6 +8092,25 @@ obj
 	var/SpdScaling = 0
 	var/OffScaling = 0
 	var/DefScaling = 0
+	var/UsesStr = 0
+	var/UsesFor = 0
+	var/UsesSpd = 0
+	var/UsesEnd = 0
+	var/UsesDef = 0
+	var/UsesOff = 0
+	proc/BaseStatOverride(mob/M)
+		if(UsesStr) return M.GetStr(1)
+		if(UsesFor) return M.GetFor(1)
+		if(UsesSpd) return M.GetSpd(1)
+		if(UsesEnd) return M.GetEnd(1)
+		if(UsesDef) return M.GetDef(1)
+		if(UsesOff) return M.GetOff(1)
+		return 0
+	proc/FocusStatIdentity()
+		if(UsesStr) return "STR"
+		if(UsesFor) return "FOR"
+		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
+		return "STR"
 	var/tmp/mob/Players/owner
 	var/tmp/list/hitList = list()
 	var/tmp/list/dmgTypes = null
@@ -8181,7 +8171,10 @@ obj
 		var/powerDif = owner.Power / target.Power
 		if(glob.CLAMP_POWER && !owner.ignoresPowerClamp(target))
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		var/atk = (StrScaling ? owner.GetStr(StrScaling) : 0) + (ForScaling ? owner.GetFor(ForScaling) : 0) + (SpdScaling ? owner.GetSpd(SpdScaling) : 0) + (OffScaling ? owner.GetOff(OffScaling) : 0) + (DefScaling ? owner.GetDef(DefScaling) : 0) + (EndScaling ? owner.GetEnd(EndScaling) : 0)
+		var/wIdnt = FocusStatIdentity()
+		var/wStr = owner.FocusShiftScaling(wIdnt, "STR", StrScaling)
+		var/wFor = owner.FocusShiftScaling(wIdnt, "FOR", ForScaling)
+		var/atk = (BaseStatOverride(owner) || owner.getStatDmg2(autohit = TRUE)) + (wStr ? owner.GetStr(wStr) : 0) + (wFor ? owner.GetFor(wFor) : 0) + (SpdScaling ? owner.GetSpd(SpdScaling) : 0) + (OffScaling ? owner.GetOff(OffScaling) : 0) + (DefScaling ? owner.GetDef(DefScaling) : 0) + (EndScaling ? owner.GetEnd(EndScaling) : 0)
 		var/def = target.getEndStat(1) * EndEffectiveness
 		var/FinalDmg = strikeCoreDamage(powerDif, atk, def)
 		FinalDmg *= DamageMult

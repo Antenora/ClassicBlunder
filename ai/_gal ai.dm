@@ -153,8 +153,6 @@ var/list/ai_autohit_pool=list(
 	"/obj/Skills/AutoHit/RecklessCharge","/obj/Skills/AutoHit/BloodRush",\
 	"/obj/Skills/AutoHit/SoulCharge","/obj/Skills/AutoHit/Judgment",\
 	"/obj/Skills/AutoHit/HolyJudgment","/obj/Skills/AutoHit/DarkPurge",\
-	"/obj/Skills/AutoHit/FlashCutter","/obj/Skills/AutoHit/CrowdCutter",\
-	"/obj/Skills/AutoHit/JetSlicer","/obj/Skills/AutoHit/Pinpoint_Blast",\
 	"/obj/Skills/AutoHit/Destruction_Wave","/obj/Skills/AutoHit/Blazing_Storm",\
 )
 var/list/ai_projectile_pool = list(

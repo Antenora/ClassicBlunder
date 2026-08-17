@@ -12,6 +12,8 @@ obj
 			Distance=3
 			Knockback=10
 			PreShockwave=1
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			PostShockwave=0
 			Shockwaves=1
 			Shockwave=0.5
@@ -108,6 +110,8 @@ obj
 			PreShockwave=1
 			PostShockwave=0
 			Shockwave=2
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			Shockwaves=2
 			DamageMult=8.5
 			Knockback=2
@@ -310,7 +314,6 @@ obj
 			Distance=2
 			GrabMaster=1
 			DamageMult=2
-			AdaptRate=1
 			Size=2
 			HitSparkIcon='Slash.dmi'
 			HitSparkX=-32
@@ -513,6 +516,8 @@ obj
 			StrScaling=1
 			Cooldown = 45
 			DamageMult=0.5
+			FocusShifter=1
+			FocusShiftBoost=1.5
 			Rounds=20
 			ComboMaster=1
 			Size=2

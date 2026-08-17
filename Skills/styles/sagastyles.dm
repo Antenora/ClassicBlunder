@@ -25,7 +25,6 @@
 	DamageMult = 2
 	HitMessage = "leaps over their enemy, then proceeds to unleash a combo!"
 /obj/Skills/AutoHit/Shackling_Stakes
-	AdaptRate = 1
 	Stunner = 6
 	Area="Target"
 	DamageMult = 3

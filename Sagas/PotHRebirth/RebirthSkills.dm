@@ -275,7 +275,6 @@ obj/Skills/AutoHit
 			usr.TriggerAwakeningSkill(ActNumber)
 	PowerWordGenderDysphoria
 		Area="Target"
-		AdaptRate = 1
 		Cooldown=-1
 		DamageMult = 5
 		Distance = 15
@@ -392,7 +391,6 @@ obj/Skills/AutoHit
 		Area="Circle"
 		Distance=10
 		RedTechnique=1
-		AdaptRate = 1
 		GuardBreak=1
 		DamageMult=6
 		PullIn=15
@@ -427,7 +425,6 @@ obj/Skills/AutoHit
 		ManaCost=100
 		Distance=10
 		RedTechnique=1
-		AdaptRate = 1
 		GuardBreak=1
 		DamageMult=15
 		PullIn=15
@@ -928,7 +925,6 @@ obj/Skills/Projectile
 			usr.UseProjectile(src)
 	Beams
 		TasteTheRainbow //Nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan
-			AdaptRate=1
 			DamageMult=12
 			Immediate=1
 			Dodgeable=0

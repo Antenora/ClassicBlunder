@@ -13,6 +13,7 @@ What shortcut do you want to set?"}
 /obj/Skills/var/
     canBeShortcut=1;
     fire_ident=null;
+    MiscBindable=0;//stays keybindable under Misc anyway
 /mob/var/
     shortcut/shortcuts
 /shortcut/var/

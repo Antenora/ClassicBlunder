@@ -26,7 +26,6 @@
 			set category="Skills"
 			usr.Activate(src)
 	Judgment_Cut_End
-		AdaptRate=1
 		NeedsSword=1
 		DamageMult=16
 		Area="Around Target"

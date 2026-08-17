@@ -76,7 +76,6 @@
 	ComboMaster=1
 	Distance = 5
 	Size = 4
-	AdaptRate = 1
 	DamageMult=1
 	Slow = 0.25
 	Chilling=5

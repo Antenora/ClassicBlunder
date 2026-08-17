@@ -69,7 +69,6 @@
     Toxic_Wheel
         Area="Circle"
         ComboMaster=1
-        AdaptRate=1
         DamageMult=5
         Size=2
         Knockback=1

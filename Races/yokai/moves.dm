@@ -1,7 +1,6 @@
 /obj/Skills/AutoHit/Mist_Form
 	Area="Circle"
 	ComboMaster=1
-	AdaptRate=1
 	DamageMult=0.025
 	Rounds=10
 	Cooldown=180

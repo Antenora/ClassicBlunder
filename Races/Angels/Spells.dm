@@ -27,7 +27,6 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/AutoHit/Magic/AngelMagic
-	AdaptRate = 1
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Consecration
 	name = "Consecration"
@@ -40,7 +39,6 @@
 	Distance = 15
 	DamageMult = 10
 	Scorching = 30
-	AdaptRate = 1
 	HitSparkIcon = 'LightImpulseTrail.dmi'
 	HitSparkTurns=1
 	HitSparkSize=1.5
@@ -64,7 +62,6 @@
 	name = "Divine Verdict"
 	Area = "Around Target"
 	SpellElement = "Light"
-	AdaptRate = 1.5
 	DamageMult = 0.5
 	HolyMod = 2.5
 	Distance = 5
@@ -153,7 +150,6 @@
 	Area = "Circle"
 	SpellElement = "Light"
 	Distance = 3
-	AdaptRate = 1
 	DamageMult = 0
 	Flash = 18
 	BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded"
@@ -179,7 +175,6 @@
 	Area = "Target"
 	SpellElement = "Light"
 	Distance = 12
-	AdaptRate = 1
 	Snaring = 5
 	SnaringOverlay = 'root.dmi'
 	ApplyJudged = 1
@@ -204,7 +199,6 @@
 	SpellElement = "Light"
 	Area = "Target"
 	Distance = 12
-	AdaptRate = 1
 	ApplySentenced = 1
 	DamageMult = 0.2
 	ActiveMessage = "passes divine sentence upon the target!"

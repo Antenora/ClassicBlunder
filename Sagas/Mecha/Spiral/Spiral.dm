@@ -87,7 +87,6 @@ mob/tierUpSaga(path)
 			var/dr = sl + sp
 			var/se = p.passive_handler.Get("SpiralPowerUnlocked")
 			ControlledRush = 5 + dr
-			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
@@ -139,7 +138,6 @@ mob/tierUpSaga(path)
 		var/sp = p.AscensionsAcquired
 		var/dr = sl + sp
 		ControlledRush = 5 + dr
-		AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 		Size = 1 + dr
 		TurfStrike = Size
 		WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)

@@ -380,6 +380,11 @@ client
 		hd2d_ambient_key
 		hd2d_lightclass //sky/cave/bright - a change means indoor/outdoor crossing: CpmApply cut
 		hd2d_env_key
+		hd2d_bloom_t = 0 
+		hd2d_indoor_seen = 0 
+		hd2d_sky_seen = 0 
+		hd2d_scan_key 
+		hd2d_shaft_add = 0 
 
 proc/Hd2dShaftEnabled(client/C)
 	return glob && glob.LIGHT_SHAFTS && C && C.prefs && C.prefs.lightShafts && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM
@@ -409,7 +414,8 @@ proc/_Hd2dGradeMatrix(client/C)
 	var/black = glob.GRADE_BLACK
 	var/warm = glob.GRADE_WARM
 	if(C && C.mob)
-		var/turf/T = get_turf(C.mob)
+		var/atom/anchor = GfxViewAnchor(C) 
+		var/turf/T = anchor ? get_turf(anchor) : null
 		var/datum/environment_profile/P = EnvProfileForClient(C, T ? T.loc : null)
 		if(P)
 			if(!isnull(P.grade_gain)) gain = P.grade_gain
@@ -432,25 +438,75 @@ proc/_Hd2dGradeMatrix(client/C)
 proc/Hd2dGradeFilter(client/C)
 	return filter(name = "hd2dgrade", type = "color", color = _Hd2dGradeMatrix(C))
 
+proc/_Hd2dScanIndoor(client/C)
+	if(!C) return
+	var/atom/anchor = GfxViewAnchor(C)
+	var/turf/T = anchor ? get_turf(anchor) : null
+	var/list/vt = GfxCameraViewTiles(C)
+	var/hw = round(vt[1] / 2) + 1
+	var/hh = round(vt[2] / 2) + 1
+	var/key = T ? "[ref(T)]-[hw]x[hh]" : null
+	if(key && key == C.hd2d_scan_key) return 
+	C.hd2d_scan_key = key
+	var/prev = C.hd2d_indoor_seen
+	var/prevsky = C.hd2d_sky_seen
+	C.hd2d_indoor_seen = 0
+	C.hd2d_sky_seen = 0
+	if(!T) return
+	var/area/A = T.loc
+	if(A && A.dn_indoor) return 
+	var/cave = A && A.dark_cave ? 1 : 0
+	var/turf/lo = locate(max(1, T.x - hw - 3), max(1, T.y - hh - 3), T.z)
+	var/turf/hi = locate(min(world.maxx, T.x + hw + 3), min(world.maxy, T.y + hh + 3), T.z)
+	var/outer = 0
+	var/outersky = 0
+	for(var/turf/V in block(lo, hi))
+		var/area/VA = V.loc
+		if(!VA) continue
+		var/inner = abs(V.x - T.x) <= hw && abs(V.y - T.y) <= hh
+		if(cave && VA.sees_sky)
+			if(inner)
+				C.hd2d_sky_seen = 1
+			else
+				outersky = 1
+		if(VA.dn_indoor)
+			if(inner)
+				C.hd2d_indoor_seen = 1
+			else
+				outer = 1
+		if(C.hd2d_indoor_seen && (!cave || C.hd2d_sky_seen)) return
+	if(!C.hd2d_indoor_seen && outer) C.hd2d_indoor_seen = prev
+	if(cave && !C.hd2d_sky_seen && outersky) C.hd2d_sky_seen = prevsky
+
 proc/WorldBloomThreshold(client/C)
 	var/atom/anchor = C ? GfxViewAnchor(C) : null
 	var/turf/T = anchor ? get_turf(anchor) : null
 	var/area/A = T ? T.loc : null
 	var/amb
+	var/sky = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
 	if(A && A.dark_cave)
 		amb = glob.LIGHT_CAVE_COLOR
+		if(C && C.hd2d_indoor_seen) amb = DnIndoorColor(sky) 
+		else if(C && C.hd2d_sky_seen) amb = sky
 	else
-		amb = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
+		amb = sky
 		if(A && A.dn_indoor) amb = DnIndoorColor(amb)
+		else if(C && C.hd2d_indoor_seen) amb = DnIndoorColor(amb) 
 	var/list/sk = _FxRGB(amb)
-	var/a = sk ? max(sk[1], max(sk[2], sk[3])) : 255
-	. = a
-	if(glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM) //bloom samples post-grade pixels
+	if(!sk) sk = list(255, 255, 255)
+	var/sadd = C ? C.hd2d_shaft_add : 0
+	var/cr = min(255, sk[1] + sadd)
+	var/cg = min(255, sk[2] + sadd)
+	var/cb = min(255, sk[3] + sadd)
+	. = max(cr, max(cg, cb))
+	if(glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM) 
 		var/list/M = _Hd2dGradeMatrix(C)
-		. = max(a * (M[1] + M[5] + M[9]) + 255 * M[17],\
-		    max(a * (M[2] + M[6] + M[10]) + 255 * M[18],\
-		        a * (M[3] + M[7] + M[11]) + 255 * M[19]))
-	return clamp(max(glob.WORLD_BLOOM_THRESHOLD, round(.) + 10), 96, 245)
+		. = max(cr * M[1] + cg * M[5] + cb * M[9] + 255 * M[17],\
+		    max(cr * M[2] + cg * M[6] + cb * M[10] + 255 * M[18],\
+		        cr * M[3] + cg * M[7] + cb * M[11] + 255 * M[19]))
+	. = round(.) + 10
+	if(. > 250) return 0 
+	return clamp(max(glob.WORLD_BLOOM_THRESHOLD, .), 96, 250)
 
 //zone crossings glide the grade ~4s instead of snapping; falls back to a full rebuild
 proc/Hd2dGradeShift(client/C, time = 40)
@@ -467,6 +523,24 @@ proc/Hd2dGradeShift(client/C, time = 40)
 			animate(F, color = M, time = time)
 			hit++
 	if(!hit) CpmApply(C)
+
+proc/Hd2dWorldBloomOn(client/C)
+	return glob && glob.WORLD_BLOOM && _Hd2dLocalDark(C) > 0.35 && GfxBloomEnabled(C)
+
+proc/Hd2dBloomRefresh(client/C, gradechanged = 0)
+	if(!C || !glob) return
+	var/wt = 0
+	if(Hd2dWorldBloomOn(C))
+		_Hd2dScanIndoor(C)
+		wt = WorldBloomThreshold(C)
+	else
+		C.hd2d_scan_key = null 
+		C.hd2d_indoor_seen = 0
+		C.hd2d_sky_seen = 0
+	if(abs(wt - C.hd2d_bloom_t) >= 5)
+		CpmApply(C) 
+	else if(gradechanged && glob.COLOR_GRADE)
+		Hd2dGradeShift(C, 100) 
 
 proc/Hd2dApplyClient(client/C)
 	if(!C) return
@@ -569,6 +643,7 @@ proc/Hd2dClientTick(client/C, snap = 0)
 		if(wxA) sa = 0 //overcast kills shafts BY DESIGN - clear-sky test only
 		if(!opensky) sa = 0 //no sky, no shafts - the area gate that replaced pixel masking
 		if(isMoon && !glob.MOON_SHAFTS) sa = 0
+		C.hd2d_shaft_add = round(165 * sa / 255) //165 = the sheet's brightest streak; feeds the bloom ceiling
 		var/rcol = isMoon ? "#aebfe8" : DnLerp("#fff3d2", "#ffd9a8", 1 - elev)
 		var/list/svd = GfxCameraViewTiles(C)
 		var/svw = max(1, svd[1])
@@ -594,16 +669,16 @@ proc/Hd2dClientTick(client/C, snap = 0)
 				animate(C.hd2d_shaft, transform = SM, color = rcol, alpha = round(sa), time = 100)
 		else
 			animate(C.hd2d_shaft, color = rcol, alpha = round(sa), time = snap ? 0 : 100)
+	else
+		C.hd2d_shaft_add = 0
 
 //called from the daynight loop every 10s: re-aim wall shadows on sun-bucket change, tick clients
 proc/Hd2dSunTick()
 	if(!glob) return
-	//clock buckets rebuild the world-plane filters; grade + bloom read local darkness per client
+	//grade steps in 1/8 clock buckets; the bloom gate/threshold refreshes per client below
 	var/gbucket = round((1 - DnDarknessFrac()) * 8) + round(MoonEventK() * 8) * 100
-	if((glob.COLOR_GRADE || glob.WORLD_BLOOM) && gbucket != _hd2d_grade_bucket)
-		_hd2d_grade_bucket = gbucket
-		for(var/mob/Players/WP in players)
-			if(WP.client) CpmApply(WP.client)
+	var/gradechanged = gbucket != _hd2d_grade_bucket
+	if(gradechanged) _hd2d_grade_bucket = gbucket
 	if(glob.WALL_SHADOWS && _hd2d_shadow_by_turf.len)
 		var/list/sp = SunShadowParams()
 		var/key = "[round(sp[1], 0.08)]-[round(sp[2], 0.08)]-[round(sp[3] / 12)]-[sp[5]]"
@@ -616,7 +691,9 @@ proc/Hd2dSunTick()
 	if(glob.AMBIENT_FX && _hd2d_fireflies_by_turf.len)
 		_Hd2dFireflyTick()
 	for(var/mob/Players/P in players)
-		if(P.client) Hd2dClientTick(P.client)
+		if(!P.client) continue
+		Hd2dClientTick(P.client) //refreshes hd2d_shaft_add before the bloom pass reads it
+		Hd2dBloomRefresh(P.client, gradechanged)
 
 //one per-client emitter, kind chosen by the camera's environment profile (day/night slots)
 //glow kinds ride above the blanket additively; matter kinds sit under it and darken

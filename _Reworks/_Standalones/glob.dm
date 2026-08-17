@@ -182,8 +182,6 @@ globalTracker
 		INTIMRATIO = 500
 		SHONENCOUNTERLIMIT = 1
 //Wipe Specific
-		list/GUILD_RANKINGS = list("Aegis" = 1, "Crimson Dawn" = 2, "Golden Circle" = 3, "Black Ifrit" = 5, "Revenants" = 6)
-
 		list/VOID_LOCATION = list(144,140,15)
 		list/currentlyVoidingLoc = list(150,150,1)
 		VoidsAllowed = 1

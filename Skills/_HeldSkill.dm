@@ -408,6 +408,8 @@
 
 	var/image/bg = image(icon_file, src, "Bar")
 	bg.layer = MOB_LAYER + 10
+	bg.plane = HUD_PLANE
+	bg.appearance_flags = KEEP_APART | NO_CLIENT_COLOR | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 	bg.pixel_x = start_x
 	bg.pixel_y = start_y
 	bg.alpha = 0
@@ -421,6 +423,8 @@
 	for(var/i = 0, i < segment_count, i++)
 		var/image/fill = image(icon_file, src, "Progress")
 		fill.layer = bg.layer + 0.3
+		fill.plane = bg.plane
+		fill.appearance_flags = bg.appearance_flags
 		fill.pixel_x = start_x + fill_left_inset_x + (i * fill_step)
 		fill.pixel_y = start_y
 		fill.alpha = 0
@@ -448,6 +452,8 @@
 		for(var/px = first_px, px <= last_px, px++)
 			var/image/sweet = image(icon_file, src, "VariableSweetSpot")
 			sweet.layer = bg.layer + 0.2
+			sweet.plane = bg.plane
+			sweet.appearance_flags = bg.appearance_flags
 			sweet.pixel_x = px
 			sweet.pixel_y = start_y
 			sweet.alpha = 0

@@ -1050,21 +1050,26 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							return
 						if(last_combo >= world.time)
 							return
+						var/zdir = DisplayedCardinal(src.Target.dir, 0)
+						if(src.Target.Beaming!=2 && !src.UsingGhostDrive() && passive_handler["Backstabber"])
+							zdir = opposite_dirs[zdir]
+						if(!ComboLandingClear(src.Target, zdir))
+							return
 						lastZanzoUsage = world.time
 						src.StopKB()
 						if(src.Target.Beaming==2)
 							if(!(src.Target in view(10, src)))
 								return
-							src.Move(get_step(src.Target,src.Target.dir))
+							src.Move(get_step(src.Target,DisplayedCardinal(src.Target.dir, 0)))
 							if(PmActive())//track the target's mid-tile sprite
 								src.step_x=src.Target.step_x
 								src.step_y=src.Target.step_y
-							src.dir=src.Target.dir
+							src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 						else
 							if(src.UsingGhostDrive())
 								AfterImageGhost(src)
-								src.Comboz(src.Target)
-								src.dir=get_dir(src,src.Target)
+								src.Comboz(src.Target, frontOnly = TRUE)
+								src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 								src.Melee1(1, 5, accmulti=1.2, SureKB=1, BreakAttackRate=1)
 							else
 								var/denko = getDenkoSekka()
@@ -1077,8 +1082,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 									var/denkoSavedPixelZ = src.pixel_z
 									src.DenkoSekkaZanzoFade(denkoSavedPixelZ)
 									sleep(5)
-									src.Comboz(src.Target, FALSE, FALSE, passive_handler["Backstabber"])
-									src.dir=get_dir(src,src.Target)
+									src.Comboz(src.Target, landBehind = passive_handler["Backstabber"], frontOnly = TRUE)
+									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 									src.DenkoSekkaZanzoLand(denkoSavedColor, denkoSavedPixelZ)
 									src.DenkoSekkaCharged = denko
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
@@ -1091,8 +1096,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 											Wave/=2
 									else
 										VanishImage(src)
-									src.Comboz(src.Target, FALSE, FALSE, passive_handler["Backstabber"])
-									src.dir=get_dir(src,src.Target)
+									src.Comboz(src.Target, landBehind = passive_handler["Backstabber"], frontOnly = TRUE)
+									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
 						src.MovementCharges--
 						if(MovementCharges<0)

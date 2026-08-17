@@ -3,7 +3,6 @@
 	Area= "Target"
 	SpellElement = "Dark"
 	SpecialAttack=1
-	AdaptRate = 1
 	Distance = 10
 	// Corrupt = 1
 	CanBeBlocked=0

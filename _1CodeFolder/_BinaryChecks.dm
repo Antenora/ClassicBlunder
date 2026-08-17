@@ -741,7 +741,7 @@ mob
 				return 1
 			return 0
 		HasNoDodge()
-			if(passive_handler.Get("NoDodge"))
+			if(passive_handler.Get("NoDodge") || passive_handler.Get("BossStagger"))
 				return 1
 			return 0
 		HasVoid()
@@ -2137,7 +2137,7 @@ mob
 		HasFastRush() // Returns the Rush Delay divisor set in glob.dm
 			if(passive_handler.Get("Wolf Spirit"))
 				return glob.RUSH_DELAY_DIVISOR
-			if(passive_handler.Get("Kaioken")) 
+			if(passive_handler.Get("Kaioken"))
 				return glob.RUSH_DELAY_DIVISOR
 			if(passive_handler.Get("Super Kaioken"))
 				return glob.RUSH_DELAY_DIVISOR

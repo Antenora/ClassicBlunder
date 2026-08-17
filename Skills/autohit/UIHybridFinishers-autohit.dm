@@ -30,7 +30,6 @@
 		Area = "Around Target"
 		NoLock = 1
 		NoAttackLock = 1
-		AdaptRate = 1
 		Distance = 3
 		DistanceAround = 3
 		Rounds = 4

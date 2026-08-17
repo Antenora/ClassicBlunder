@@ -1,6 +1,5 @@
 /obj/Skills/AutoHit/Ouroboros/Venomous_Bite
 	Area="Circle"
-	AdaptRate = 1
 	DamageMult=2
 	CanBeDodged = 0
 	CanBeBlocked = 0
@@ -36,7 +35,6 @@
 
 /obj/Skills/AutoHit/Ouroboros/Snake_Bite
 	Area="Circle"
-	AdaptRate = 1
 	DamageMult = 1
 	CanBeDodged = 0
 	CanBeBlocked = 0
@@ -63,7 +61,6 @@
 
 /obj/Skills/Grapple/Cleaving_Fang
 	DamageMult=4
-	AdaptRate=1
 	ThrowAdd=1
 	ThrowMult=2
 	EffectMult = 3

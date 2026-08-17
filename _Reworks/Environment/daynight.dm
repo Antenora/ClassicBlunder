@@ -279,6 +279,9 @@ proc/_DnLoop()
 	var/col = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff" //bare DnColorNow would paint a night sky with day/night OFF
 	for(var/area/A in _dn_sky_areas) //reconcile now instead of waiting out _DnLoop's 10s tick
 		animate(A, color = col, time = 20)
+	var/incol = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(col) : "#ffffff"
+	for(var/area/A in _dn_indoor_areas)
+		animate(A, color = incol, time = 20)
 	if(glob.LIGHTING) LightingApplyAll()
 	for(var/client/C) EnvUpdateClient(C, TRUE)
 	src << "Peak moonlight forced (~[round((glob.MOON_EVENT_HOLD+glob.MOON_EVENT_FADE)/600, 0.1)] min). Visual only."
@@ -312,6 +315,10 @@ proc/_DnLoop()
 	var/col = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff" //bare DnColorNow would paint a night sky with day/night OFF
 	for(var/area/A in _dn_sky_areas)
 		animate(A, color = col, time = 20)
+	var/incol = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(col) : "#ffffff"
+	for(var/area/A in _dn_indoor_areas)
+		animate(A, color = incol, time = 20)
 	if(glob.LIGHTING) LightingApplyAll() //clock jumps repaint now instead of waiting for _LightLoop
+	Hd2dSunTick() 
 	src << "Time of day set to [pick]."
 	Log("Admin", "[ExtractInfo(src)] set time of day to [pick].")

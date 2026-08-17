@@ -9,7 +9,6 @@ obj
 				Area="Strike"
 				PassThrough=1
 				Distance=4
-				AdaptRate=1
 				DamageMult=1.5
 				Rush=6
 				ControlledRush=0
@@ -38,7 +37,6 @@ obj
 				NeedsSword=1
 				Area="Wave"
 				Distance=7
-				AdaptRate=1
 				HitSparkIcon='Hit Effect Pearl.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -65,7 +63,6 @@ obj
 				SignatureTechnique=1
 				Area="Circle"
 				Distance=5
-				AdaptRate = 1
 				GuardBreak=1
 				DamageMult=1
 				PullIn=8
@@ -91,7 +88,6 @@ obj
 			Ripple_Drive
 				Area="Circle"
 				Distance=5
-				AdaptRate = 1
 				GuardBreak=1
 				DamageMult=6
 				Knockback=15
@@ -123,7 +119,6 @@ obj
 				Area="Circle"
 				PassThrough=0
 				Distance=4
-				AdaptRate=1
 				NoPierce=1
 				DamageMult=9
 				Rush=6
@@ -145,7 +140,6 @@ obj
 				Area="Circle"
 				PassThrough=0
 				Distance=4
-				AdaptRate=1
 				NoPierce=1
 				DamageMult=9
 				Rush=6
@@ -167,7 +161,6 @@ obj
 			Raging_Storm
 				NeedsSword=1
 				Area="Circle"
-				AdaptRate=1
 				Cooldown = 75
 				DamageMult=1.5
 				Rounds=20
@@ -196,7 +189,6 @@ obj
 					adjust(usr)
 					usr.Activate(src)
 			Salvation
-				AdaptRate=1
 				DamageMult=12
 				Area="Circle"
 				Distance=8
@@ -231,7 +223,6 @@ obj
 			Ragnarok
 				NeedsSword=1
 				Area="Arc"
-				AdaptRate=1
 				DamageMult=2.25
 				Rush=10
 				ControlledRush=0
@@ -266,7 +257,6 @@ obj
 				Area="Around Target"
 				Distance=12
 				DistanceAround=5
-				AdaptRate=1
 				Knockback=0
 				ComboMaster=1
 				HitSparkIcon='Hit Effect Pearl.dmi'
@@ -282,7 +272,6 @@ obj
 				ActiveMessage="thrusts their blade forward, magic exploding from the tip of the blade!"
 			ExplosionFollowup
 				Area="Circle"
-				AdaptRate=1
 				DamageMult=9
 				Shattering=1
 				Size=2
@@ -314,7 +303,6 @@ obj
 					HitSparkCount=10
 					HitSparkDispersion=1
 					ForScaling=1
-					AdaptRate=1
 					SpecialAttack=1
 					WindupMessage="invokes: <font size=+1>ULTIMA!!!</font size>"
 					adjust(mob/p)

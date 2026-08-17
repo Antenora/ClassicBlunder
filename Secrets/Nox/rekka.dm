@@ -26,7 +26,6 @@
 
 /obj/Skills/AutoHit/Ouroboros/Devouring_Fang
 	Area = "Arc"
-	AdaptRate = 1
 	DamageMult = 1
 	Distance = 2
 	TurfStrike=1
@@ -59,7 +58,6 @@
 
 	Area="Arc"
 	Distance=1
-	AdaptRate = 1
 	Launcher = 4
 	DamageMult=1
 	Cooldown=45 
@@ -81,7 +79,6 @@
 /obj/Skills/AutoHit/Ouroboros/Falling_Fang
 	Area="Cone"
 	Distance=1
-	AdaptRate = 1
 	Dunker = 1
 	DamageMult=1
 	Cooldown=45 

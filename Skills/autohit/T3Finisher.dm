@@ -48,7 +48,6 @@
 		ControlledRush=1
 		Stunner=2
 		Knockback=0
-		AdaptRate=1
 		HitSparkIcon='Hit Effect.dmi'
 		HitSparkX=-32
 		HitSparkY=-32
@@ -58,7 +57,6 @@
 		Area="Target"
 		Distance=8
 		DamageMult=T3_DMG_MULT;
-		AdaptRate=1
 		NoLock=1
 		NoAttackLock=1
 		CanBeDodged=0
@@ -76,7 +74,6 @@
 		DamageMult=T3_DMG_MULT;
 		Burning=100
 		Poisoning=100
-		AdaptRate=1
 		NoLock=1
 		NoAttackLock=1
 		CanBeDodged=0

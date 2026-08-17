@@ -46,25 +46,28 @@ mob/proc/HideShiftAura()
 		del shiftAura
 		shiftAura = null
 
-mob/proc/ActivateFocusShift(type, multiplier, timer, strScale, forScale)
+mob/proc/ActivateFocusShift(type, multiplier, timer, identity)
+	if(!identity) return //STR/FOR only
+	var/bonusMult = passive_handler.Get("FocusShiftBurst")
+	var/bonusTime = passive_handler.Get("FocusShiftMastery")
 	if(FocusShiftActive)
 		src << "FocusShift is already up! (Type: [FocusShiftType])"
 		return
 	if(FocusShiftCooldown > 0)
-		src << "FocusShift is still on cooldown! (CD: [FocusShiftCooldown])"
+		src << "FocusShift is still on cooldown! (CD: [FocusShiftCooldown/2])"
 		return
-	var/autoSelectedType
-	if(strScale > forScale)
-		autoSelectedType = "FOR"
-	else
-		autoSelectedType = "STR"
 
 	FocusShiftActive = TRUE
 	if(type != "None")
 		FocusShiftType = type
 	else
-		FocusShiftType = autoSelectedType
-	FocusShiftBoost = multiplier
-	FocusShiftTimer = timer
-	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType])"
+		FocusShiftType = identity == "STR" ? "FOR" : "STR"
+	FocusShiftBoost = multiplier + (0 + bonusMult)
+	FocusShiftTimer = timer + (0 + bonusTime*2)
+	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType]. Boost: [FocusShiftBoost])"
 	UpdateShiftAura()
+
+mob/proc/FocusShiftScaling(identity, statType, scale)
+	//active shift + matching skill identity = that stat's scaling is boosted, floored at 1.5. Zero scaling still gets the floor.
+	if(!FocusShiftActive || FocusShiftType != statType || identity != statType) return scale
+	return max(scale * FocusShiftBoost, 1.5)

@@ -132,6 +132,11 @@ obj
 			var/SBuffNeeded
 			var/GateNeeded
 
+			//FocusShift
+			var/FocusShifter
+			var/FocusShiftType = "None"
+			var/FocusShiftBoost = 1.5
+			var/FocusShiftTimer = 10
 
 			var/Quaking //Makes screen go shakka shakka
 			var/WarpAway
@@ -1417,6 +1422,8 @@ mob
 				if(src.GatesActive<Q.GateNeeded)
 					src << "You have to open at least Gate [Q.GateNeeded] to use this skill!"
 					return
+			if(Q.FocusShifter)
+				src.ActivateFocusShift(Q.FocusShiftType, Q.FocusShiftBoost, Q.FocusShiftTimer, Q.FocusStatIdentity())
 			if(Q.NeedsHealth)
 				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"

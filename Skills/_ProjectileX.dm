@@ -5,7 +5,7 @@ obj
 		var/NewCost // we will do this the hard way.
 		var/NewCopyable // sigh
 		Projectile
-			ForScaling=1
+			BaseStatDefault="FOR"
 			proc
 				EdgeOfMapProjectile()
 					var/turf/t=get_step(src, src.dir)
@@ -313,7 +313,6 @@ obj
 				Radius=2
 				Speed=0.5
 				Distance=50
-				AdaptRate=1
 				DamageMult=1.8
 				Knockback=2
 				MultiHit=10
@@ -349,7 +348,6 @@ obj
 				RandomPath=1
 				IconLock='FireBlast.dmi'
 				DamageMult=0.33
-				AdaptRate=1.5
 				Scorching=2
 				AccMult = 1.175
 				Distance=30
@@ -388,7 +386,6 @@ obj
 				DamageMult=0.3
 				Radius=1
 				Piercing=1
-				AdaptRate=1
 				AccMult=30
 				Knockback=3
 				Explode=1
@@ -408,7 +405,6 @@ obj
 				Blasts=1
 				Distance=7
 				DamageMult=0.25
-				AdaptRate=1
 				AccMult=30
 				Dodgeable=0
 				Speed=0
@@ -857,7 +853,6 @@ obj
 					Blasts=5
 					Distance=30
 					DamageMult=0.15
-					AdaptRate=1
 					EndEffectiveness=1
 					AccMult=0.33
 					Paralyzing=0.2
@@ -875,7 +870,6 @@ obj
 					IconLock='BlastTracer.dmi'
 					Distance=30
 					DamageMult=0.2
-					AdaptRate=1
 					EndEffectiveness=1
 					AccMult=0.2
 					Paralyzing=0.3
@@ -998,7 +992,6 @@ obj
 						Blasts=5
 						Distance=30
 						DamageMult=0.3
-						AdaptRate=1
 						EndEffectiveness=1
 						AccMult=0.2
 						Paralyzing=0.2
@@ -1016,7 +1009,6 @@ obj
 						Variation=8
 						IconLock='BlastTracer.dmi'
 						DamageMult=0.2
-						AdaptRate=1
 						EndEffectiveness=1
 						AccMult=0.3
 						Paralyzing=0.2
@@ -1300,6 +1292,8 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=25
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				DamageMult=1.25
 				Knockback=3
 				Radius=2
@@ -1323,6 +1317,8 @@ obj
 				DamageMult=4
 				AccMult=2
 				Crippling=3
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Speed=0
 				Knockback=0.001
 				Deflectable=1
@@ -1441,6 +1437,8 @@ obj
 				ComboMaster=1
 				EnergyCost=5
 				Deflectable=0
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Charge=0.5
 				IconChargeOverhead=1
 				IconLock='Kienzan.dmi'
@@ -1621,6 +1619,8 @@ obj
 				DamageMult=6.5
 				Knockback=0
 				AccMult=50
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Deflectable=0
 				Static=1
 				Radius=1
@@ -2150,7 +2150,6 @@ obj
 				Knockback=1
 				Homing=1
 				HyperHoming=1
-				AdaptRate=1
 				EndEffectiveness=1
 				IconLock='deathball2.dmi'
 				IconSize=0.1
@@ -2185,7 +2184,6 @@ obj
 				Knockback=1
 				Homing=1
 				HyperHoming=1
-				AdaptRate=1
 				EndEffectiveness=1
 				IconLock='Supernova.dmi'
 				IconSize=0.1
@@ -4310,7 +4308,6 @@ obj
 
 //T5 has damage mult 5, usually. Divine_Atonement moved to Races/Makaioshins/MakaioshinRacials.dm
 				The_Original_Kamehameha
-					AdaptRate = 1
 					DamageMult=2
 					ChargeRate = 8
 					Dodgeable = 0
@@ -4322,7 +4319,6 @@ obj
 					Immediate=1
 				Kamehameha//Well rounded
 					SignatureTechnique=1
-					AdaptRate=1
 					DamageMult=12
 					ChargeRate=1
 					Dodgeable=0
@@ -4336,7 +4332,6 @@ obj
 				Motionless_Kamehameha//Well rounded
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Kamehameha")
 					SignatureTechnique=1
-					AdaptRate=1
 					DamageMult=16
 					Immediate=1
 					Dodgeable=0
@@ -4350,7 +4345,6 @@ obj
 
 				Galic_Gun
 					SignatureTechnique=1
-					AdaptRate=1
 					DamageMult=10
 					ChargeRate=0.5
 					Dodgeable=0
@@ -4425,7 +4419,6 @@ obj
 					Soaring_Mountain_Dragon
 						AttackReplace=1
 						CosmoPowered=1
-						AdaptRate=1
 						EndEffectiveness=0.25
 						DamageMult=21
 						MultiHit=4
@@ -4533,8 +4526,8 @@ obj
 							usr.UseProjectile(src)
 					True_Kamehameha
 						AttackReplace=1
-						StrScaling = 1
-						ForScaling = 0
+						StrScaling = 0
+						ForScaling = 1
 						DamageMult=9
 						Distance=60
 						IconLock='BeamKHH.dmi'
@@ -4559,6 +4552,8 @@ obj
 					Final_Shine
 						DamageMult=9
 						Distance=60
+						StrScaling = 1
+						ForScaling = 0
 						IconLock='BeamFS.dmi'
 						IconSize=2
 						EnergyCost=15
@@ -5025,7 +5020,7 @@ mob
 						return
 
 			if(Z.FocusShifter)
-				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.StrScaling, Z.ForScaling)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
 
 			if(Z.UnarmedOnly)
 				if(src.EquippedSword())
@@ -5669,6 +5664,16 @@ obj
 					src.Static=Z.Static
 					src.StrScaling=Z.StrScaling
 					src.ForScaling=Z.ForScaling
+					src.SpdScaling=Z.SpdScaling
+					src.OffScaling=Z.OffScaling
+					src.DefScaling=Z.DefScaling
+					src.EndScaling=Z.EndScaling
+					src.UsesStr=Z.UsesStr
+					src.UsesFor=Z.UsesFor
+					src.UsesSpd=Z.UsesSpd
+					src.UsesEnd=Z.UsesEnd
+					src.UsesDef=Z.UsesDef
+					src.UsesOff=Z.UsesOff
 					src.EndEffectiveness=Z.EndEffectiveness
 					src.SpellElement=Z.SpellElement
 					src.MaxMultiHit=Z.MultiHit
@@ -6190,26 +6195,17 @@ obj
 						if(CosmoPowered)
 							if(!src.Owner.SpecialBuff)
 								src.DamageMult*=1+(src.Owner.SenseUnlocked-5)
-						var/fShift = Owner.FocusShiftType
-						var/str = StrScaling ? Owner.GetStr(StrScaling) : 0
-						if(fShift == "STR" && Owner.FocusShiftActive && StrScaling > 0)
-							str *= Owner.FocusShiftBoost
-							//Owner << "[str] total strScale"
-						var/force = ForScaling ? Owner.GetFor(ForScaling) : 0
-						if(fShift == "FOR" && Owner.FocusShiftActive && ForScaling > 0)
-							force *= Owner.FocusShiftBoost
-							//Owner << "[force] total forScale"
-						if(AdaptRate)
-							if(Owner.GetStr(1) > Owner.GetFor(1))
-								str = Owner.GetStr(AdaptRate)
-							else
-								force = Owner.GetFor(AdaptRate)
+						var/pIdnt = FocusStatIdentity()
+						var/strScale = Owner.FocusShiftScaling(pIdnt, "STR", StrScaling)
+						var/forScale = Owner.FocusShiftScaling(pIdnt, "FOR", ForScaling)
+						var/str = strScale ? Owner.GetStr(strScale) : 0
+						var/force = forScale ? Owner.GetFor(forScale) : 0
 						var/powerDif = Owner.Power / a:Power
 						// + Owner.getIntimDMGReduction(m)
 						if(glob.CLAMP_POWER)
 							if(!Owner.ignoresPowerClamp(a))
 								powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-						var/atk = 0
+						var/atk = BaseStatOverride(Owner) || Owner.GetFor(1)
 						var/endScale = EndEffectiveness
 						if(Owner.isSuperCharged(Owner))
 							endScale -= clamp(glob.SUPERCHARGERATE * Owner.passive_handler["SuperCharge"], 0, 1)

@@ -23,7 +23,6 @@
 		Variation=128
 	Precept_Flame_Emperor
 		Distance=50
-		AdaptRate=1
 		DamageMult=0.15
 		MultiHit=20
 		AccMult=25

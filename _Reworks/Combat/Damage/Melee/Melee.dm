@@ -329,23 +329,14 @@
 				var/def = enemy.getEndStat(1)
 				var/damageMultiplier = dmgmulti
 				if(AttackQueue)
-					var/fShift = Owner.FocusShiftType
-					var/qStr = AttackQueue.StrScaling
-					if(fShift == "STR" && Owner.FocusShiftActive && AttackQueue.StrScaling > 0)
-						qStr *= Owner.FocusShiftBoost
-						//Owner << "[qStr] total strScale"
-					var/qFor = AttackQueue.ForScaling
-					if(fShift == "FOR" && Owner.FocusShiftActive && AttackQueue.ForScaling > 0)
-						qFor *= Owner.FocusShiftBoost
-						//Owner << "[qFor] total forScale"
-					if(AttackQueue.AdaptRate)
-						if(GetStr(1) > GetFor(1))
-							qStr = AttackQueue.AdaptRate
-						else
-							qFor = AttackQueue.AdaptRate
+					var/qIdnt = AttackQueue.FocusStatIdentity()
+					var/qStr = FocusShiftScaling(qIdnt, "STR", AttackQueue.StrScaling)
+					var/qFor = FocusShiftScaling(qIdnt, "FOR", AttackQueue.ForScaling)
 					var/queueAtk = (qStr ? GetStr(qStr) : 0) + (qFor ? GetFor(qFor) : 0) + (AttackQueue.SpdScaling ? GetSpd(AttackQueue.SpdScaling) : 0) + (AttackQueue.OffScaling ? GetOff(AttackQueue.OffScaling) : 0) + (AttackQueue.DefScaling ? GetDef(AttackQueue.DefScaling) : 0) + (AttackQueue.EndScaling ? GetEnd(AttackQueue.EndScaling) : 0)
-					if(queueAtk)
-						atk = queueAtk
+					var/qBase = AttackQueue.BaseStatOverride(src)
+					if(qBase)
+						atk = qBase
+					atk += queueAtk
 					def *= AttackQueue.EndEffectiveness
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()
@@ -977,7 +968,7 @@
 				if(P.Health<=TurfDamage)
 					Destroy(P)
 			return
-		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)")||src.passive_handler["Chaos Buster"])
+		if(src.HasSpecialStrike()||EquippedStaff()||src.passive_handler["Determination(Yellow)"]||src.passive_handler["Determination(White)"]||hasSecret("Eldritch (Reflected)")||src.passive_handler["Chaos Buster"]&&src.ManaAmount > 10)
 			flick("Attack",src)
 			NextAttack=world.time
 			if(src.passive_handler.Get("Gun Kata"))
