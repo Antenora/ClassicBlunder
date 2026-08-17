@@ -133,3 +133,9 @@
     set name = "Melee Debug Toggle"
     glob.MELEE_DEBUG = !glob.MELEE_DEBUG
     src << "Melee debug: [glob.MELEE_DEBUG ? "ON - every swing prints which branch acquired the target and at what distance" : "OFF"]."
+
+/mob/Admin2/verb/Clash_Debug_Toggle()
+    set category = "Admin"
+    set name = "Clash Debug Toggle"
+    glob.DRAGON_CLASH_DEBUG = !glob.DRAGON_CLASH_DEBUG
+    src << "Dragon Clash debug: [glob.DRAGON_CLASH_DEBUG ? "ON" : "OFF"]."

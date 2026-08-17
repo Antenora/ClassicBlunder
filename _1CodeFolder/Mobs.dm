@@ -12,6 +12,7 @@ mob/Players
 		loc=locate(A["x"],A["y"],A["z"])
 
 	Bump(mob/A)
+		ClashBump(A)
 /*		if(istype(A, /obj/Skills/Projectile/Beams))
 			src.loc=A.loc
 			//A.Bump(src)

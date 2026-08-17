@@ -332,6 +332,7 @@
 #include "_1CodeFolder\KatieMap.dm"
 #include "_1CodeFolder\KnowledgeTree.dm"
 #include "_1CodeFolder\MaimHistory.dm"
+#include "_1CodeFolder\makespace.dm"
 #include "_1CodeFolder\Map.dm"
 #include "_1CodeFolder\MenuHUD.dm"
 #include "_1CodeFolder\Misc.dm"

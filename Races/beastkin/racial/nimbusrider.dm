@@ -1,5 +1,6 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin
 	Nimbus_Rider
+		NoGCD=1
 		BuffName="Nimbus Rider"
 		IconLock='Flying Nimbus.dmi'
 		LockY=-10

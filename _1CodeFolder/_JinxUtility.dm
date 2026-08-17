@@ -2592,12 +2592,15 @@ mob
 		DashTo(mob/Trg, MaxDistance=24, Delay=0.75, Clashable=0)
 			var/DelayRelease=0
 			src.Frozen=1
+			src.dash_clash = Clashable ? 2 : 1 
+			src.ClashWatch(Trg, Clashable) 
 			src.icon_state="Flight"
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
 			var/pm = PmActive()
 			var/pm_budget = MaxDistance / world.tick_lag * 32 //total dash distance in px (pixel path)
 			var/pm_px = round(64 / Delay) //old per-tick distance; PmDashStep caps it for smoothness
+			var/stall = 0
 			while(pm ? pm_budget > 0 : MaxDistance > 0)
 				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
 					var/travel_angle = GetAngle(src, Trg)
@@ -2606,36 +2609,22 @@ mob
 				if(pm) //smooth: one glided step per tick instead of batching 32px steps into one tick
 					var/m = src.PmDashStep(Trg, pm_px)
 					if(!m)
-						break
-					pm_budget -= m
+						stall++
+						if(stall > 4 || get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
+							break
+					else
+						stall = 0
+						pm_budget -= m
 				else
 					step_towards(src,Trg)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
-				if(Trg in oview(1, src))
+				if(get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
 					MaxDistance=0
 					pm_budget=0
 					Delay=0
 					src.dir=get_dir(src,Trg)
-					if(Trg.Knockbacked||src.passive_handler.Get("SpiralImpact"))
-						src.NextAttack=0
-						Trg.StopKB()
-						if(Clashable || Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash")||src.passive_handler.Get("SpiralImpact"))
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive/DC in Trg)
-								if(!Trg.BuffOn(DC))
-									var/pursuerBoon = Trg.HasPursuer()
-									DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									DC.Trigger(Trg)
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash/DC in src)
-								if(!src.BuffOn(DC))
-									var/pursuerBoon = HasPursuer()
-									DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									if(isRace(MAKYO) && ActiveBuff)
-										DC.passives["Star Surge"] = 1
-										DC.TimerLimit = 1.5 + clamp(0.5 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									if(src.hasSecret("Eldritch (Reflected)"))
-										DC.ManaHeal=3+(src.AscensionsAcquired*2)
-									DC.Trigger(src)
+					src.TryDragonClash(Trg)
 					break
 				else if(pm)
 					sleep(world.tick_lag) //one glided step already taken this tick
@@ -2645,7 +2634,9 @@ mob
 					if(DelayRelease>=1)
 						DelayRelease--
 						sleep(1*world.tick_lag)
+			src.TryDragonClash(Trg)
 			src.Frozen=0
+			src.dash_clash=0
 			if(src.is_dashing>0)
 				src.is_dashing--
 			if(src.is_dashing<0)

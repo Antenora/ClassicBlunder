@@ -350,6 +350,9 @@ obj/Skills
 					if(!x.Using)
 						usr.SkillX("Aerial Payback",x)
 			else
+				if(src.Using)
+					usr << "[src] is still on cooldown."
+					return
 				usr.SkillX("DragonDash",src)
 	Transformation
 		Cooldown=1

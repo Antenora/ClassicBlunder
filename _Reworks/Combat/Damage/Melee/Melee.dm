@@ -761,6 +761,8 @@
 							var/dmgValue = S.resolve()
 							. = dmgValue
 							lastHit = world.time
+							if(dash_clash >= 2 || (clash_pursuit == enemy && world.time <= clash_pursuit_until))
+								TryDragonClash(enemy, from_hit = 1)
 							if(istype(AttackQueue, /obj/Skills/Queue/Finisher))
 								enemy.AngerEvent(glob.ANGER_RUSH_FINISHER)
 							//raw damage on purpose - otherDmg doesn't exist yet at spark time
@@ -887,6 +889,8 @@
 								CounterHitReward(src, enemy, otherDmg)
 					else
 							//		MISS START  //
+						if(dash_clash >= 2 || (clash_pursuit == enemy && world.time <= clash_pursuit_until))
+							TryDragonClash(enemy, from_hit = 1)
 						if(enemy.CheckSpecial("Ultra Instinct"))
 							if(AttackQueue)
 								if(AttackQueue.HitSparkIcon)

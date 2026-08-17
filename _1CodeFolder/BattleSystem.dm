@@ -216,17 +216,17 @@ mob/proc/Anger(var/Enraged=0)
 			if(!J.Using&&J.Mastery==1)
 				if(src.ActiveBuff)
 					if(src.ActiveBuff.SpecialBuffLock)
-						src.ActiveBuff.Trigger(src)
+						src.ActiveBuff.Trigger(src,Override=1)
 				for(var/sb in src.SlotlessBuffs)
 					var/obj/Skills/Buffs/SB = src.SlotlessBuffs[sb]
 					if(SB)
 						if(SB.SpecialBuffLock)
-							SB.Trigger(src)
+							SB.Trigger(src,Override=1)
 				if(src.SpecialBuff)
 					if(src.SpecialBuff.BuffName=="Jinchuuriki")
 						return
 					else
-						src.SpecialBuff.Trigger(src)
+						src.SpecialBuff.Trigger(src,Override=1)
 						J.Trigger(src)
 						return
 
@@ -249,7 +249,7 @@ mob/proc/Anger(var/Enraged=0)
 					if(src.SpecialBuff.BuffName=="Vaizard Mask")
 						return
 					else
-						src.SpecialBuff.Trigger(src)
+						src.SpecialBuff.Trigger(src,Override=1)
 						V.Trigger(src)
 						return
 				else
@@ -1713,7 +1713,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		var/orgDistance = Distance
 		P.Knockbacked=Direction
 		Distance -= (P.previousKnockBack * glob.KB_SPEED)
-		P.Knockback+=Distance
+		P.Knockback += max(Distance, 0) //stacking diminishes, but a fresh send never shortens the ride
 		if(Forced>=3)
 			P.Knockback = (orgDistance) * world.tick_lag
 	else
@@ -1722,6 +1722,10 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 
 mob
 	var/tmp/kb_loft = 0
+	var/tmp/kb_recent_until = 0 
+	var/tmp/dash_clash = 0 
+	var/tmp/mob/clash_pursuit 
+	var/tmp/clash_pursuit_until = 0
 	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed)
 		if(src.Guarding) src.GuardStop()	//hard cc drops guard
 		if(src.ChargingEnergy) src.ChargeStop()
@@ -1750,6 +1754,10 @@ mob
 					if(istype(a, /obj/Items/Tech/Door))
 						PlanetEnterBump(a, src)
 						continue
+					if(ismob(a))
+						var/mob/dm = a
+						if(dm == src.kb_sender || (dm.is_dashing && dm.Target == src))
+							continue
 					dense=1
 					break
 			if(dense)
@@ -1788,6 +1796,8 @@ mob
 	proc/StopKB(var/DustBlock=0)
 		//generic state-clear callers arrive with this already null, so they don't fire Landfalls
 		var/wasKB = src.Knockbacked
+		if(wasKB)
+			src.kb_recent_until = world.time + glob.TIMING_WINDOW
 		if(!src.KO)
 			src.icon_state=""
 		else
@@ -1804,6 +1814,77 @@ mob
 		else if(wasKB&&src.pixel_z==0&&!DustBlock)
 			Landfall(src, min(previousKnockBack / glob.MAX_KB_TIME, 1)) //dust scales with how hard you were sent
 		src.kb_sender = null
+	proc/ClashPxDist(mob/M)
+		if(!ismob(M) || M == src || M.z != z || !isturf(loc) || !isturf(M.loc))
+			return 1000000
+		return max(abs((M.x-x)*32 + (M.step_x-step_x)), abs((M.y-y)*32 + (M.step_y-step_y)))
+	proc/ClashReach(mob/M)
+		if(!M)
+			return 0
+		return (get_dist(src, M) <= 1 || ClashPxDist(M) <= 48) //overlap reads 0px and passes
+	proc/TryDragonClash(mob/Trg, force_clashable = 0, from_hit = 0)
+		if(!Trg || Trg == src)
+			return
+		if(!from_hit && !ClashReach(Trg))
+			return //no clashing with someone you haven't reached
+		var/pursued = (src.clash_pursuit == Trg && world.time <= src.clash_pursuit_until)
+		if(Trg.Knockbacked||world.time<=Trg.kb_recent_until||pursued||src.passive_handler&&src.passive_handler.Get("SpiralImpact"))
+			src.NextAttack=0
+			Trg.StopKB()
+			if(force_clashable || pursued || src.dash_clash>=2 || Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash")||src.passive_handler&&src.passive_handler.Get("SpiralImpact"))
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive/DC in Trg)
+					if(!Trg.BuffOn(DC))
+						var/pursuerBoon = Trg.HasPursuer()
+						DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						DC.Trigger(Trg)
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash/DC in src)
+					if(!src.BuffOn(DC))
+						var/pursuerBoon = HasPursuer()
+						DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						if(isRace(MAKYO) && ActiveBuff)
+							DC.passives["Star Surge"] = 1
+							DC.TimerLimit = 1.5 + clamp(0.5 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						if(src.hasSecret("Eldritch (Reflected)"))
+							DC.ManaHeal=3+(src.AscensionsAcquired*2)
+						DC.Trigger(src)
+			src.clash_pursuit = null 
+			return 1
+	proc/ClashWatch(mob/Trg, clashable = 0)
+		set waitfor = 0
+		var/until = world.time + 30
+		var/tail = 0
+		var/armed = 0
+		while(src && Trg && Trg.loc && world.time <= until)
+			if(clashable && (Trg.Knockbacked || world.time <= Trg.kb_recent_until))
+				armed = 1
+				src.clash_pursuit = Trg
+				src.clash_pursuit_until = world.time + 30
+			if(glob && glob.DRAGON_CLASH_DEBUG && client)
+				src << "clash-dbg: px=[ClashPxDist(Trg)] gd=[get_dist(src, Trg)] kb=[Trg.Knockbacked ? Trg.Knockbacked : 0] grace=[max(0, Trg.kb_recent_until - world.time)] armed=[armed] dash=[dash_clash]"
+			if(TryDragonClash(Trg, clashable))
+				if(glob && glob.DRAGON_CLASH_DEBUG && client) src << "clash-dbg: FIRED"
+				return
+			if(!src.dash_clash && !tail)
+				tail = 1
+				until = min(until, world.time + glob.TIMING_WINDOW)
+			sleep(world.tick_lag)
+		if(src && Trg && Trg.loc && armed && ClashPxDist(Trg) <= 64)
+			if(glob && glob.DRAGON_CLASH_DEBUG && client) src << "clash-dbg: settling debt at px=[ClashPxDist(Trg)]"
+			TryDragonClash(Trg, clashable, from_hit = 1)
+		else if(glob && glob.DRAGON_CLASH_DEBUG && client)
+			src << "clash-dbg: watcher exit unpaid armed=[armed] px=[Trg ? ClashPxDist(Trg) : "gone"]"
+	proc/ClashBump(atom/A)
+		if(!ismob(A))
+			return
+		var/mob/M = A
+		if(src.dash_clash)
+			src.TryDragonClash(M)
+		if(M.dash_clash && (src.Knockbacked||world.time<=src.kb_recent_until))
+			M.TryDragonClash(src)
+
+mob/Bump(atom/A)
+	ClashBump(A)
+	..()
 
 /var/tmp/lastGrabUsage=0
 

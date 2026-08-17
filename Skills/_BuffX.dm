@@ -9952,6 +9952,7 @@ NEW VARIABLES
 				OffMessage="lives to see another day."
 				TextColor="green"
 			Arc_Evolution
+				NoGCD=1
 				TimerLimit= 60
 				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 				Cooldown= 1
@@ -9975,6 +9976,7 @@ NEW VARIABLES
 						ForMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 						EndMult = 1.15 + (0.02*secretLevel) + (0.015*asc*asc)
 			Super_Galaxy_Evolution
+				NoGCD=1
 				TimerLimit= 60
 				PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 				Cooldown= 1
@@ -10221,11 +10223,13 @@ NEW VARIABLES
 			Infection
 				NeedsPassword=1
 			Dragon_Clash
+				NoGCD=1
 				passives = list("PureDamage" = 2, "HotHundred" = 1, "Warping" = 3)
 				HotHundred=1
 				Warping=3
 				TimerLimit=3
 			Dragon_Clash_Defensive
+				NoGCD=1
 				passives = list("PureDamage" = 1, "HotHundred" = 1, "Warping" = 3)
 				HotHundred=1
 				Warping=3
@@ -11261,6 +11265,7 @@ NEW VARIABLES
 
 //Cybernetic
 			Blade_Mode
+				NoGCD=1
 				passives = list("Warping" = 2,  "HotHundred" = 1, "PureDamage" = 1)
 				Warping=2
 				HotHundred=1

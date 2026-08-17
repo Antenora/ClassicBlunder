@@ -15,6 +15,7 @@ globalTracker
 		MOB_HURT_SCALE = 1.0 //1.0 = bodies touch exactly; <1 lets bodies overlap a little
 		MOB_REACH_PAD = 2 //px of melee past the body edge; 2 covers float truncation, 32 = old full-tile reach
 		MELEE_DEBUG = FALSE //swing prints from getEnemies, toggled by the admin verb
+		DRAGON_CLASH_DEBUG = FALSE
 		MOB_INK_COLLIDE = 0 //oversized bodies block/get reached on their per-row ink strips, not the dir-union box; 0 = old AABB
 		MOB_TALL_SOLID = 40 //bodies this tall+ block walking on their bottom half only
 
@@ -71,6 +72,12 @@ mob/proc/PmDashStep(atom/Trg, px, away = 0)
 	var/d = Trg ? (away ? get_dir(Trg, src) : get_dir(src, Trg)) : dir
 	if(!d) return 0
 	var/use = max(1, min(px, glob.PM_DASH_MAX_PX))
+	if(!away && ismob(Trg))
+		var/gap = ClashPxDist(Trg) - 32
+		if(gap < use)
+			use = round(max(gap, 0))
+		if(use <= 0)
+			return 0
 	var/bx = (x-1)*32 + step_x //measure real displacement - Move()'s return can't tell moved from blocked here
 	var/by = (y-1)*32 + step_y
 	var/oss = step_size

@@ -1,4 +1,5 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dominating
+    NoGCD=1
     Warping=4
     HotHundred=1
     TimerLimit=2
