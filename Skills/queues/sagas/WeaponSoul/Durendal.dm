@@ -23,6 +23,7 @@ obj/Skills/Queue/Blazing_Slash_Part_2
 	SagaSignature=1
 	DamageMult=0.75
 	Dunker=1
+	NoGCD=1
 	AccuracyMult=5
 	KBMult=0.00001
 	Shining=1

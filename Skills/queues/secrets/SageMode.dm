@@ -8,6 +8,7 @@ obj
 				Paralyzing=1
 				KBAdd = 2
 				Dunker = 1
+				NoGCD = 1
 				InstantStrikes = 5
 				EnergyCost = 6
 				Cooldown = 60
@@ -30,6 +31,7 @@ obj
 				Paralyzing=1
 				KBAdd = 4
 				Dunker = 1
+				NoGCD = 1
 				InstantStrikes = 5
 				EnergyCost = 6
 				ManaCost = 15

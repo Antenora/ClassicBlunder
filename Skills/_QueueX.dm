@@ -872,6 +872,7 @@ obj
 				Finisher=1
 				CursedWounds=1
 				Dunker=1 //Just flashy to end the combo. No extra damage.
+				NoGCD=1
 				Warp=5
 				KBAdd=5
 				KBMult=0.00001

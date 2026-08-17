@@ -286,12 +286,14 @@ obj
 				ActiveMessage="smashes down with a Hammer..."
 				Warp=1
 				Dunker=3
+				NoGCD=1
 				DamageMult=1.25
 				HitSparkIcon='FevExplosion - Steam.dmi'
 				HitStep=/obj/Skills/Queue/Furioso4
 			Furioso4
 				ActiveMessage="makes a whirlwind of cuts with a Katana..."
 				Dunker=2
+				NoGCD=1
 				Combo=10
 				DamageMult=0.25
 				Determinator=1

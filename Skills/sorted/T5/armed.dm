@@ -63,6 +63,7 @@ obj/Skills/Queue
 		KBMult=0.01
 		Finisher=1
 		Dunker=4
+		NoGCD=1
 		Warp=15
 		Stunner=5
 		NeedsSword=1

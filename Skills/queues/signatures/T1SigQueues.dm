@@ -6,6 +6,7 @@ obj
 				Warp=50
 				Cooldown=150
 				Dunker=3
+				NoGCD=1
 				DamageMult=4
 				Instinct=2
 				Duration=12
@@ -149,6 +150,7 @@ obj
 				PushOutWaves=3
 				Quaking=5
 				Dunker=1
+				NoGCD=1
 				EnergyCost=8
 				HitMessage="violently spikes the opponent towards the ground!!!"
 

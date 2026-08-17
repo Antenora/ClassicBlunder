@@ -1,4 +1,5 @@
 obj/Skills/Grapple
+	NoGCD = 1
 	var
 		removeAfter = FALSE
 
@@ -555,6 +556,8 @@ obj/Skills/Grapple
 			if(User.HeldSkillBlocksAction(src))
 				return
 			if(!noGCD && User.GCDBlocked(src))
+				return
+			if(!noGCD && User.Grab && world.time <= User.GrabTime + glob.TIMING_WINDOW)
 				return
 			if(User.Airborne)
 				return

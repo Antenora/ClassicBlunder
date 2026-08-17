@@ -200,6 +200,7 @@
 #define HEAVENLY_BOON_VARS list("DamageMult"=2, "PushOutWaves"=0, "PushOut"=0, "AccuracyMult"=1, "KBAdd"=5, "KBMult"=1, "Dunker"=0, "Launcher"=0)
 /obj/Skills/Queue/Secret_Heavy_Strike
     Heavenly_Strike
+        NoGCD = 1
         adjust(mob/p)
             var/SecretInformation/HeavenlyRestriction/hs = p.secretDatum;
             var/dunkValue = hs.getBoon(p, "Heavy Strike");

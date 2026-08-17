@@ -1649,6 +1649,7 @@ obj
 
 				Destroyer = 5 // make it do more dmg if tht guy is stunned or launched, ig this is dunker for stuns
 				Dunker = 3
+				NoGCD = 1
 
 				Rush=1
 				RushDelay=0.1

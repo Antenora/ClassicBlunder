@@ -63,6 +63,7 @@
         Warp = 3
         DamageMult = 1.5
         Dunker = 1
+        NoGCD = 1
         PushOut=1
         PushOutWaves=1
         HitMessage="leads into it"

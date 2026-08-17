@@ -8,6 +8,7 @@ obj
 			Area="Cone"
 			ComboMaster=1
 			Destroyer = 2
+			NoGCD = 1
 			MenuIcon="ForcePalm"
 			Distance=3
 			Knockback=10

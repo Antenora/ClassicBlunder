@@ -412,6 +412,7 @@ obj/Skills
 	Grab
 		Cooldown=5
 		CooldownStatic=1
+		NoGCD=1
 		verb/Grab()
 			set category="Skills"
 			set hidden = 1

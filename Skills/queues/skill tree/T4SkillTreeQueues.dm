@@ -15,6 +15,7 @@ obj
 				PushOutWaves=2
 				Finisher=1
 				Dunker=4
+				NoGCD=1
 				Warp=5
 				Stunner=3
 				UnarmedOnly=1
@@ -41,6 +42,7 @@ obj
 				Finisher=1
 				Warp=3
 				Dunker=2
+				NoGCD=1
 				Stunner=2
 				Instinct=1
 				UnarmedOnly=1
@@ -65,6 +67,7 @@ obj
 				Finisher=1
 				Warp=1
 				Dunker=2
+				NoGCD=1
 				Stunner=2
 				UnarmedOnly=1
 				EnergyCost=4
@@ -87,6 +90,7 @@ obj
 				Crippling=5
 				Stunner=2
 				Dunker=1
+				NoGCD=1
 				Decider=1
 				KBMult=0.0001
 				Cooldown=60

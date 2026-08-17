@@ -22,6 +22,7 @@
         AccuracyMult = 4
         SpeedStrike=2
         Dunker=2
+        NoGCD=1
         Rapid=1
         Duration=5
         Cooldown=30
