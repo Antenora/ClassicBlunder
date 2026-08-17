@@ -1,3 +1,6 @@
+/obj/Skills/Buffs
+	var/spaceMaker/makSpace
+
 spaceMaker
 	var
 		toDeath
@@ -68,17 +71,6 @@ spaceMaker
 		spaceMade = 1
 // below we will commit crimes
 
-	Constellation
-		toDeath = 1200// 2 mins
-		range = 6
-		configuration = "Random"
-		amount = 21
-		New(toDeath, range, configuration, amount)
-			src.toDeath = 1200
-			src.range = 6
-			src.configuration = "Random"
-			src.amount = 18
-
 	Demon
 		configuration = "Fill"
 		shape = "Circle"
@@ -115,15 +107,6 @@ spaceMaker
 		world << i
 		effects += i
 		animate(i, alpha = 255, time = 10)
-	else
-		switch(option)
-			if("Stellar")
-				var/direction = pick("ew","ns")
-				var/num = rand(1,15)
-				var/image/i = image(icon = 'GalSpace.dmi', icon_state = "speedspace_[direction]_[num]")
-				overlays+=i
-				i.alpha = 0
-				animate(i, alpha = 255, time = 10)
 
 
 

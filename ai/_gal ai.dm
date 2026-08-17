@@ -1299,17 +1299,16 @@ mob/Player/AI
 			else if(src.Saga=="Magic Knight")
 				src.OMessage(10, "<font color=#FF2222>[src] draws on their conviction!", "[src]([src.key]) has 25% health left.</font>")
 			else
-				if(src.Secret!="Zombie")
-					if(!src.ExhaustedMessage)
-						if(!src.ExhaustedColor)
-							src.OMessage(10, "[src] looks exhausted!", "[src]([src.key]) has 25% health left.")
-						else
-							src.OMessage(10, "<font color='[src.ExhaustedColor]'>[src] looks exhausted!</font color>", "[src]([src.key]) has 25% health left.")
+				if(!src.ExhaustedMessage)
+					if(!src.ExhaustedColor)
+						src.OMessage(10, "[src] looks exhausted!", "[src]([src.key]) has 25% health left.")
 					else
-						if(!src.ExhaustedColor)
-							src.OMessage(10, "[src] [src.ExhaustedMessage]", "[src]([src.key]) has 25% health left.")
-						else
-							src.OMessage(10, "<font color='[src.ExhaustedColor]'>[src] [src.ExhaustedMessage]</font color>", "[src]([src.key]) has 25% health left.")
+						src.OMessage(10, "<font color='[src.ExhaustedColor]'>[src] looks exhausted!</font color>", "[src]([src.key]) has 25% health left.")
+				else
+					if(!src.ExhaustedColor)
+						src.OMessage(10, "[src] [src.ExhaustedMessage]", "[src]([src.key]) has 25% health left.")
+					else
+						src.OMessage(10, "<font color='[src.ExhaustedColor]'>[src] [src.ExhaustedMessage]</font color>", "[src]([src.key]) has 25% health left.")
 			src.HealthAnnounce25=1
 
 		if(src.Health < 10*(1-src.HealthCut) && !src.HealthAnnounce10)
@@ -1325,19 +1324,18 @@ mob/Player/AI
 				src.HealEnergy(15)
 				src.HealHealth(5)
 			else
-				if(src.Secret!="Zombie")
-					if(!src.BarelyStandingMessage)
-						if(!src.BarelyStandingColor)
-							src.OMessage(10, "[src] is barely standing up!", "[src]([src.key]) has 10% health left.")
-						else
-							src.OMessage(10, "<font color='[src.BarelyStandingColor]'>[src] is barely standing up!</font color>", "[src]([src.key]) has 10% health left.")
+				if(!src.BarelyStandingMessage)
+					if(!src.BarelyStandingColor)
+						src.OMessage(10, "[src] is barely standing up!", "[src]([src.key]) has 10% health left.")
 					else
-						if(!src.BarelyStandingColor)
-							src.OMessage(10, "[src] [src.BarelyStandingMessage]", "[src]([src.key]) has 10% health left.")
-						else
-							src.OMessage(10, "<font color='[src.BarelyStandingColor]'>[src] [src.BarelyStandingMessage]</font color>", "[src]([src.key]) has 10% health left.")
+						src.OMessage(10, "<font color='[src.BarelyStandingColor]'>[src] is barely standing up!</font color>", "[src]([src.key]) has 10% health left.")
+				else
+					if(!src.BarelyStandingColor)
+						src.OMessage(10, "[src] [src.BarelyStandingMessage]", "[src]([src.key]) has 10% health left.")
+					else
+						src.OMessage(10, "<font color='[src.BarelyStandingColor]'>[src] [src.BarelyStandingMessage]</font color>", "[src]([src.key]) has 10% health left.")
 			src.HealthAnnounce10=1
-		if(src.TotalInjury > 50 && !src.InjuryAnnounce && src.Secret!="Zombie")
+		if(src.TotalInjury > 50 && !src.InjuryAnnounce)
 			src.OMessage(10, "[src] looks beaten half to death!", "[src]([src.key]) has 50% injury.")
 			src.InjuryAnnounce=1
 		if(src.NanoBoost&&src.Health<=25*(1-src.HealthCut)&&!src.NanoAnnounce)
@@ -1978,7 +1976,7 @@ mob/Player/AI
 			if(src.JaganPowerNerf)
 				Ratio*=src.JaganPowerNerf
 			if(src.BPPoison)
-				if((src.Secret=="Zombie"||src.Doped)&&src.BPPoison<1)
+				if(src.Doped&&src.BPPoison<1)
 					Ratio*=1
 				else
 					Ratio*=src.BPPoison
@@ -2011,8 +2009,6 @@ mob/Player/AI
 					a-=cancel
 					if(a<1)//Only nerf anger.
 						a=1
-				if(src.PhylacteryNerf)
-					a-=(a*src.PhylacteryNerf)
 				if(a<=0)
 					a=0.01
 				Ratio*=a
@@ -2048,10 +2044,6 @@ mob/Player/AI
 					if(Health<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
 						Recover("Health",1)
 						Recover("Injury",1)
-						if(src.Secret=="Zombie")
-							Recover("Health",1)
-							Recover("Injury",1)
-							BPPoisonTimer-=15
 					if(src.Energy<src.EnergyMax)
 						Recover("Energy",2)
 						Recover("Fatigue",2)

@@ -52,7 +52,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	//50% injury check
 	var/exhaustedMessage = SpecialBuff ? SpecialBuff.ExhaustedMessage : FALSE
 	var/desperateMessage = SpecialBuff ? SpecialBuff.DesperateMessage : FALSE
-	if(TotalInjury > 50 && !src.InjuryAnnounce && Secret!="Zombie")
+	if(TotalInjury > 50 && !src.InjuryAnnounce)
 		OMessage(10, "[src] looks beaten half to death!")
 		InjuryAnnounce = 1
 
@@ -67,11 +67,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		if(exhaustedMessage)
 			OMessage(10, "<font color=#00FF55>[src] [exhaustedMessage]", "[src]([src.key]) has 25% health left.</font>")
 		else
-			if(Secret != "Zombie")
-				if(!ExhaustedColor)
-					OMessage(10, "<font color=#F07E1F>[src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
-				else
-					OMessage(10,"<font color='[ExhaustedColor]'> [src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
+			if(!ExhaustedColor)
+				OMessage(10, "<font color=#F07E1F>[src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
+			else
+				OMessage(10,"<font color='[ExhaustedColor]'> [src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
 		var/shonenMoment = ShonenPowerCheck(src)
 		if(shonenMoment)
 			VaizardHealth += triggerPlotArmor(shonenMoment, HasUnstoppable())
@@ -84,11 +83,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		if(desperateMessage)
 			OMessage(10, "<font color=#00FF55>[src] [desperateMessage]", "[src]([src.key]) has 10% health left.</font>")
 		else
-			if(Secret !="Zombie")
-				if(!BarelyStandingColor)
-					OMessage(10, "<font color=#F07E1F>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
-				else
-					OMessage(10,"<font color='[BarelyStandingColor]'>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
+			if(!BarelyStandingColor)
+				OMessage(10, "<font color=#F07E1F>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
+			else
+				OMessage(10,"<font color='[BarelyStandingColor]'>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
 		HealthAnnounce10 = 1
 //**TESTED AND WORKS */
 /mob/proc/reduceErodeStolen()
@@ -215,9 +213,6 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 				if(SpecialBuff.BuffName == "Ripper Mode")
 					SpecialBuff?:sandevistanUsages = 0
 					src << "Your Sandevistan Usages has been reset."
-		if(Secret == "Zombie" && MeditateTime == 70)
-			zombieGetUps = 0
-			src << "Your get ups have been reset"
 		if(Secret == "Black Flash")
 			var/SecretInformation/BlackFlash/bf = getBlackFlashSecret();
 			if (bf.BlackFlashChance != bf.BlackFlashBaseChance)
@@ -727,20 +722,6 @@ mob
 					voiding = 0*/
 
 
-/*
-			if(src.Phylactery&&!src.Dead)
-				spawn()
-					var/found=0
-					for(var/obj/Items/Enchantment/Phylactery/Phy in world)
-						if(Phy.Signature==src.ckey)
-							found=1
-							break
-					if(!found)
-						src.Phylactery=0
-						src.NoDeath=0
-						src.Death(null, "their phylactery being destroyed!", SuperDead=1, NoRemains=1)
-*/
-
 			if(passive_handler.Get("ContinuallyStun"))
 				if(prob(passive_handler.Get("ContinuallyStun")))
 					Stun(src, rand(1,3), TRUE)
@@ -807,20 +788,6 @@ mob
 						if(src.PoseTime==5)
 							src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
 
-				if(Secret=="Werewolf")
-					if(passive_handler.Get("SunStricken") && CheckSlotless("Full Moon Form") && !PureRPMode)
-						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-							fmf.Trigger(src, Override=1)
-					if(secretDatum.secretVariable["Hunger Active"] == 1)
-						var/SecretInformation/Werewolf/s = secretDatum
-						if(!PureRPMode)
-							s.releaseHunger()
-							if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
-								src << "You have exhausted all the flesh you consumed and have reverted from your war form."
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-									fmf.Trigger(src, Override=1)
-
 				if(Secret=="Eldritch")
 					if(passive_handler.Get("SunStricken") && CheckSlotless("True Form") && !PureRPMode)
 						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
@@ -845,38 +812,34 @@ mob
 					senjutsuOverloadAlert=FALSE
 					src << "You exhaust your natural energy, avoiding death by overexposure."
 
-			if(src.RippleActive()||(!src.CheckSlotless("Half Moon Form")&&!src.CheckSlotless("Full Moon Form"))||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus")||Secret=="Eldritch"&&!CheckSlotless("True Form"))
-				if(src.icon_state=="Train"&&!src.PoseEnhancement)
-					if(src.Secret=="Werewolf"&&!src.PoseTime)
-						src << "You focus your instincts perfectly on the chosen target, ready to leap any second!"
-					src.PoseTime++
-					if(src.PoseTime>=glob.POSE_TIME_NEEDED)
-						if(Secret=="Spiral")
-							icon_state = ""
-							PoseTime = 0
-							if(src.CheckSlotless("Evolution Power"))
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
-									AE.Trigger(src)
-							if(!src.CheckSlotless("Evolution Power"))
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
-									fmf.Trigger(src)
-						if(Secret=="Eldritch")
-							icon_state = ""
-							PoseTime = 0
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+			if(src.icon_state=="Train"&&!src.PoseEnhancement)
+				src.PoseTime++
+				if(src.PoseTime>=glob.POSE_TIME_NEEDED)
+					if(Secret=="Spiral")
+						icon_state = ""
+						PoseTime = 0
+						if(src.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
+								AE.Trigger(src)
+						if(!src.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
 								fmf.Trigger(src)
-						if(src.RippleActive() && src.PoseTime==5)
-							src << "The Ripple flows through your body perfectly!  You have gained full control over your breathing!"
-						if(src.RippleActive())
-							if(src.Swim==1)
-								src.RemoveWaterOverlay()
-								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-						if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
-							src << "You managed to mold some natural energy!"
-						if(src.PoseTime >= 5 && src.passive_handler.Get("Stylish"))
-							if(!src.CheckSlotless("Half Moon Form") && !src.CheckSlotless("Full Moon Form"))
-								src.gainStyleRating(1, TRUE)
-								src.PoseTime = 0
+					if(Secret=="Eldritch")
+						icon_state = ""
+						PoseTime = 0
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+							fmf.Trigger(src)
+					if(src.RippleActive() && src.PoseTime==5)
+						src << "The Ripple flows through your body perfectly!  You have gained full control over your breathing!"
+					if(src.RippleActive())
+						if(src.Swim==1)
+							src.RemoveWaterOverlay()
+							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
+					if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
+						src << "You managed to mold some natural energy!"
+					if(src.PoseTime >= 5 && src.passive_handler.Get("Stylish"))
+						src.gainStyleRating(1, TRUE)
+						src.PoseTime = 0
 
 			if(src.Stasis||src.StasisFrozen)
 				src.Stasis-=world.tick_lag
@@ -1763,20 +1726,6 @@ mob
 		var/turf/T = GfxGroundTurf(src)
 		if(T)
 			if(T.effectApplied)
-				//TODO if u reuse this make it a switch
-				switch(T.effectApplied)
-					if("Stellar")
-						if(!passive_handler.Get("Constellation"))
-						// start draining or somethin
-							if(Energy > 1)
-								Energy -= 0.15
-							if(TotalFatigue < 99)
-								TotalFatigue += 0.15
-						else
-							if(Energy < 99)
-								Energy += 0.15
-							if(TotalFatigue > 0)
-								TotalFatigue -= 0.15
 				if(isdatum(T.effectApplied))
 					if((istype(T.effectApplied, /datum/DemonRacials)))
 						if(src != T.ownerOfEffect)

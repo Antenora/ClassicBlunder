@@ -308,7 +308,7 @@ majinAbsorb/proc/doAbsorb(mob/absorber, mob/absorbee)
         permanentAbsorbPower += halfPeak
         absorber << "<font color='purple'>[absorbee]'s essence slips through your fingers and is lost to the Void! You drag a fraction of their power back with you.</font>"
         OMsg(absorber, "[absorber] tries to absorb [absorbee], but their soul is dragged into the Void!")
-        absorbee.Void(0, 0, 1)
+        absorbee.Void(0, 1)
         return
 
     if(absorbed.len >= absorbLimit)

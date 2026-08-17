@@ -1,10 +1,7 @@
-#define WW_HUNGER_MAX 250
-#define WW_REDUCTION_PER_TIER 25
-
 #define MADNESS_MAX 100
 #define MADNESS_ADD_PER_TIER 25
 
-#define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Werewolf", "Heavenly Restriction", "Senjutsu", "Shin",\
+#define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Heavenly Restriction", "Senjutsu", "Shin",\
 "Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Heavenborn")
 #define RACIAL_SECRETS list("Eldritch (Shrouded)", "Eldritch (Reflected)")
 #define RARE_LIST list(MAKAIOSHIN, MAJIN, DEMON, ANGEL, ELDRITCH, DEMIFIEND)
@@ -464,72 +461,6 @@ SecretInformation
 		proc/getMadnessBoon()
 			return secretVariable["Madness"]/getMadnessLimit()
 
-	Werewolf
-		name = "Werewolf"
-		givenSkills = list("/obj/Skills/Buffs/SlotlessBuffs/Werewolf/New_Moon_Form", "/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form", "/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form")
-		givenVariables = list("EnhancedHearing", "EnhancedSmell", "Timeless")
-		secretVariable = list("Hunger Satiation" = 0, "Hunger Active" = 0)
-		proc/getHungerLimit(mob/p)
-			. = WW_HUNGER_MAX - (WW_REDUCTION_PER_TIER * (currentTier))
-			if(. <0)
-				. = 50
-			else if(. > WW_HUNGER_MAX)
-				. = WW_HUNGER_MAX
-		proc/addHunger(amount)
-			if(secretVariable["Hunger Active"] == 1) return
-			if(amount < 0.9)
-				amount *= 4
-			else if(amount > 1.5)
-				amount *= 2
-			else
-				amount *= 3
-			var/tierEffectiveness = currentTier * 1.5
-			amount *= tierEffectiveness
-			if(secretVariable["Hunger Satiation"] + amount > getHungerLimit())
-				secretVariable["Hunger Satiation"] = getHungerLimit()
-			else
-				secretVariable["Hunger Satiation"] += amount
-
-		proc/releaseHunger()
-			if(secretVariable["Hunger Active"] == 0) return
-			var/tierEffectiveness = 8 - currentTier
-			// LESS = MORE
-			secretVariable["Hunger Satiation"] -= tierEffectiveness
-			if(secretVariable["Hunger Satiation"] <= 0)
-				secretVariable["Hunger Satiation"] = 0
-				secretVariable["Hunger Active"] = 0
-
-		proc/getHungerBoon()
-			return secretVariable["Hunger Satiation"]/getHungerLimit()
-
-		applySecret(mob/p)
-			switch(currentTier)
-				if(1)
-					p << "You have given into the lunar curse, forsaking your humanity... You've awakened the power of a Werewolf!"
-					giveSkills(p)
-					giveVariables(p)
-					var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r = new()
-					r = locate() in p
-					if(!r)
-						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Regeneration)
-						p << "The Moon's energy has granted you the ability to regenerate"
-				if(2)
-					var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r = new()
-					r = locate() in p
-					if(r)
-						r.RegenerateLimbs = 1
-					p << "You can now restore lost limbs with ease!"
-					nextTierUp = 4
-				if(3)
-					p << "Your mastery of the lunar curse is coming close to its peak..."
-					nextTierUp = 3
-				if(4)
-					p << "Your prowess as a Werewolf knows no limits"
-					nextTierUp = 4
-				if(5)
-					p << "Your mastery of the lunar curse is godly..."
-			..(p);
-
 	HeavenlyRestriction
 		name = "Heavenly Restriction"
 		givenSkills = list("/obj/Skills/Buffs/SlotlessBuffs/HeavenlyRestriction/HeavenlyRestriction")
@@ -776,9 +707,6 @@ mob/Admin3/verb
 				P.Secret="Haki"
 				P.giveSecret("Haki")
 				P << "Possessing such an overwhelming amount of willpower, you learn to chart destiny through your own ambition!"
-			if("Werewolf")
-				P.Secret="Werewolf"
-				P.giveSecret("Werewolf")
 			if("Eldritch")
 				P.Secret = "Eldritch"
 				P.giveSecret("Eldritch")

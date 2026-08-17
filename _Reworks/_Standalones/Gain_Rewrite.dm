@@ -190,19 +190,6 @@
 
 turf/proc/GainLoop(mob/source)
 	if(effectApplied)
-		switch(effectApplied)
-			if("Stellar")
-				if(!source.passive_handler.Get("Constellation"))
-				// start draining or somethin
-					if(source.Energy > 1)
-						source.Energy -= 0.015
-					if(source.TotalFatigue < 99)
-						source.TotalFatigue += 0.015
-				else
-					if(source.Energy < 99)
-						source.Energy += 0.015
-					if(source.TotalFatigue > 0)
-						source.TotalFatigue -= 0.015
 		if(isdatum(effectApplied))
 			if((istype(effectApplied, /datum/DemonRacials)))
 				if(source != ownerOfEffect)

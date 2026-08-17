@@ -1,5 +1,5 @@
 #define Swordsmanship list("Hiten Mitsurugi-Ryuu","Unlimited Blade Works", "Weapon Soul")
-#define SECRETS list("Spirits of The World","Jagan", "Hamon of the Sun", "Werewolf", "Vampire", "Sage Arts", "Haki", "Eldritch", "Heavenly Restriction")
+#define SECRETS list("Jagan", "Hamon of the Sun", "Vampire", "Sage Arts", "Haki", "Eldritch", "Heavenly Restriction")
 #define SAGAS list("Ansatsuken","Eight Gates","Cosmo","Spiral","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Sharingan","Weapon Soul", "Unlimited Blade Works")
 #define RACES list("Android", "Human", "Beastkin", "Changeling", "Demon", "Dragon", "Eldritch","Chakardi","Half_Saiyan","Majin","Makyo","Namekian","Saiyan","Celestial","Makaioshin")
 
@@ -991,8 +991,6 @@ mob
 			// Tragedy (Katen Kyokotsu Bankai) negates Unstoppable on the Bankai user and their current target.
 			if(HasTragedyNullify())
 				return 0
-			if(Secret == "Zombie")
-				return 1
 			if(passive_handler.Get("Unstoppable")>=1||passive_handler.Get("The Immovable Object"))
 				return 1
 			if(passive_handler.Get("You Thought"))
@@ -2856,8 +2854,6 @@ mob
 			if(src.StyleActive=="Moonlight")
 				return 1
 			if(src.StyleActive=="Atomic Karate")
-				return 1
-			if(src.StyleActive&&src.Secret=="Werewolf"&&(!src.CheckSlotless("Half Moon Form")))
 				return 1
 			return 0
 		UsingVoidDefense()

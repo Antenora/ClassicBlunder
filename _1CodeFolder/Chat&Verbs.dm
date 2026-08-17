@@ -1074,9 +1074,7 @@ mob/Players/verb
 			OMsg(src, "[src] strikes a pose!")
 			return
 		if(src.icon_state==""&&!src.PoseEnhancement)
-			if(src.CheckSlotless("Half Moon Form")||src.CheckSlotless("Full Moon Form"))
-				OMsg(src, "[src] radiates animalistic bloodlust as they prepare to pounce!")
-			else if(src.Secret=="Hamon")
+			if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")
 			else if(src.Secret=="Vampire")
 				OMsg(src, "[src] begins posing ominously!")
@@ -1114,28 +1112,15 @@ mob/Players/verb
 		if(src.icon_state=="Train")
 			src.icon_state=""
 			if(!src.PoseEnhancement)
-				if(!src.CheckSlotless("Half Moon Form")&&!src.CheckSlotless("Full Moon Form"))
-					if(src.PoseTime>=5&&(src.RippleActive()||src.Secret=="Vampire"||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))||Secret=="Eldritch"||Secret=="Spiral")
-						src.PoseTime=0
-						if(src.RippleActive())
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement/H in src)
-								H.Trigger(src)
-						if(src.Secret=="Vampire")
-							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Restraint_Release)
-						if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
-							src.ManaAmount+=25
-
-				else
-					var/PoseBuff=(src.PoseTime/4)
-					if(PoseBuff<1)
-						PoseBuff=1
+				if(src.PoseTime>=5&&(src.RippleActive()||src.Secret=="Vampire"||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))||Secret=="Eldritch"||Secret=="Spiral")
 					src.PoseTime=0
-					if(src.Target)
-						src.Comboz(src.Target)
-						src.Melee1(damagemulti=PoseBuff, accmulti=PoseBuff, NoKB=1)
-					src.PoseEnhancement=1
-					spawn(Second(30))
-						src.PoseEnhancement=0
+					if(src.RippleActive())
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement/H in src)
+							H.Trigger(src)
+					if(src.Secret=="Vampire")
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Restraint_Release)
+					if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
+						src.ManaAmount+=25
 			return
 	Skill_Sheet()
 		set name="Skill Sheet"

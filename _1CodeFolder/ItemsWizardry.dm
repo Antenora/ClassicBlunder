@@ -2349,30 +2349,6 @@ obj/Items/Enchantment
 				..()
 
 
-	Phylactery
-		icon='Phylactery.dmi'
-		desc="A container for your soul, making you incapable of dying...but if it is shattered, you will die instantly."
-		Cost=1000
-		EnchType="TimeMagic"
-		SubType="NOT IN"
-		var
-			Signature//ckey
-		Click()
-			if(src in oview(1, usr))
-				var/Confirm=alert(usr, "Do you wish to place your soul in this phylactery?  It will make you immortal and ageless, but if it is ever destroyed you will perish.", "Phylactery", "No", "Yes")
-				if(usr.Secret||usr.HasMechanized())
-					usr << "Your nature makes you incompatibile with this phylactery!"
-					return
-				if(Confirm=="Yes")
-					usr.Phylactery=1
-					usr.PhylacteryNerf=0
-					usr.Timeless=1
-					usr.Secret="Zombie"
-					src.Signature=usr.ckey
-					OMsg(usr, "[usr] seals their soul into [src]!")
-					return
-			else
-				..()
 	Elixir_of_Reincarnation
 		icon='ElixerOfReincarnation.dmi'
 		desc="A potion which will allow the drinker to come back as a child with their current memories."

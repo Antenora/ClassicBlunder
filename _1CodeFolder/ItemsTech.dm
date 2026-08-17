@@ -2314,17 +2314,6 @@ obj/Items/Tech
 							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
 								m.Tail=1
 								m.Oozaru(1)
-							if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, m))
-								if(!m.CheckSlotless("FullMoonForm"))
-									if(m.SpecialBuff)
-										m.SpecialBuff.Trigger(m)
-									if(m.SlotlessBuffs.len>0)
-										for(var/sb in m.SlotlessBuffs)
-											var/obj/Skills/Buffs/b = m.SlotlessBuffs[sb]
-											if(b)
-												b.Trigger(m)
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F)
-										F.Trigger(m)
 				if("Ultraviolet")
 					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
 					for(var/turf/t in Turf_Circle(src, 10))
@@ -2389,24 +2378,6 @@ obj/Items/Tech
 							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
 								m.Tail=1
 								m.Oozaru(1)
-							if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, m))
-								if(!m.CheckSlotless("FullMoonForm"))
-									if(m.ActiveBuff)
-										if(m.CheckActive("Eight Gates"))
-											var/obj/Skills/Buffs/ActiveBuffs/Eight_Gates/eg = m.ActiveBuff
-											eg.Stop_Cultivation()
-											m.GatesActive=0
-										else
-											m.ActiveBuff.Trigger(m)
-									if(m.SpecialBuff)
-										m.SpecialBuff.Trigger(m)
-									if(m.SlotlessBuffs.len>0)
-										for(var/sb in m.SlotlessBuffs)
-											var/obj/Skills/Buffs/b = m.SlotlessBuffs[sb]
-											if(b)
-												b.Trigger(m)
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F)
-										F.Trigger(m)
 				if("Ultraviolet")
 					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
 					for(var/turf/t in Turf_Circle(src, 10))

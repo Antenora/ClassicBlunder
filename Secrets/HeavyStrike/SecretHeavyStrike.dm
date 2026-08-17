@@ -138,64 +138,6 @@
         HitSparkSize=2;
         HitMessage="rips their opponent to shreds!";
 
-//WEREWOLF
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Rip_and_Tear
-        AccuracyMult=1.1
-        KBAdd=0;
-        KBMult=5;
-        Cooldown=20;
-        HitMessage="digs their claws 🤤 into their opponent to deal crippling wounds!";
-        Crippling=3;
-        HitSparkIcon='WolfFF.dmi'
-        HitSparkX=0
-        HitSparkY=0
-        HitSparkTurns=1
-        HitSparkSize=2
-
-//WITCH
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Soulsap_Strike
-        DamageMult=1.5;
-        AccuracyMult=1.15;
-        KBAdd=0;
-        KBMult=1;
-        Cooldown=20;
-        Freezing=1;
-        Crippling=15;
-        CursedWounds=1;
-        Decider=1;
-        Warp=2;
-        HitSparkIcon='Icons/NSE/spells/debuff/holywaterflow.dmi'
-        HitSparkX=-32
-        HitSparkY=-32
-        HitSparkTurns=1
-        HitSparkSize=1
-        ActiveMessage="weaves their hands towards their enemy's centre!";
-        HitMessage="grasps hold of their opponent's soul to sap away its energy!";
-
-//ZOMBIE
-//why is this so cracked lmao
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Death_Grasp
-        DamageMult=2.5;
-        AccuracyMult=1.15;
-        KBAdd=0;
-        KBMult=1;
-        Cooldown=20;
-        Toxic=25;
-        Shearing=25;
-        Crippling=15;
-        CursedWounds=1;
-        Decider=1;
-        Grapple=1;
-        HitSparkIcon='Hit Effect Wind.dmi'
-        HitSparkX=-32
-        HitSparkY=-32
-        HitSparkTurns=1
-        HitSparkSize=1
-        HitMessage="grasps hold of their opponent with necrotic energy!";
-
 //HEAVENLY RESTRICTION
 #define HEAVENLY_BOON_VARS list("DamageMult"=2, "PushOutWaves"=0, "PushOut"=0, "AccuracyMult"=1, "KBAdd"=5, "KBMult"=1, "Dunker"=0, "Launcher"=0)
 /obj/Skills/Queue/Secret_Heavy_Strike

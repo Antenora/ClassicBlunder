@@ -230,20 +230,6 @@ obj/ProjectionMoon
 		if(src)
 			for(var/mob/Players/P in view(10))
 				P.triggerOozaru()
-				if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, P))
-					if(P.passive_handler.Get("SunStricken"))
-						P << "You are afflicted by The Sun, you cannot shift into your cursed form."
-						return
-					if(!P.CheckSlotless("FullMoonForm"))
-						if(P.SpecialBuff)
-							P.SpecialBuff.Trigger(P)
-						if(P.SlotlessBuffs.len>0)
-							for(var/sb in P.SlotlessBuffs)
-								var/obj/Skills/Buffs/b = P.SlotlessBuffs[sb]
-								if(b)
-									b.Trigger(P)
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F)
-							F.Trigger(P)
 
 
 obj/ProjectionSun
@@ -265,7 +251,7 @@ obj/ProjectionSun
 					var/obj/Skills/Buffs/SlotlessBuffs/Sun_Seared/applyBuff1 = new
 					applyBuff1.Trigger(P, 1)
 					P.AddBurn(100)
-				else if(P.IsEvil() || P.isRace(MAKAIOSHIN) || P.isRace(ELDRITCH) || P.Secret=="Vampire" || P.Secret=="Werewolf" || P.Secret=="Eldritch")
+				else if(P.IsEvil() || P.isRace(MAKAIOSHIN) || P.isRace(ELDRITCH) || P.Secret=="Vampire" || P.Secret=="Eldritch")
 					var/obj/Skills/Buffs/SlotlessBuffs/Sun_Stricken/applyBuff2 = new
 					applyBuff2.Trigger(P, 1)
 					P.AddBurn(50)

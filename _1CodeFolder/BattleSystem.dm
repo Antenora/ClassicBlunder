@@ -278,7 +278,6 @@ mob/proc/Anger(var/Enraged=0)
 					if(!Enraged)OMsg(src, "<font color='red'>[src] becomes angry!</font color>")
 				else
 					if(!Enraged)OMsg(src, "<font color='[src.AngerColor]'>[src] becomes angry!</font color>")
-/mob/var/zombieGetUps = 0
 mob/proc/Unconscious(mob/P,var/text)
 	if(src.KO)
 		return
@@ -520,13 +519,6 @@ mob/proc/Unconscious(mob/P,var/text)
 		src << "Your Royal Meter went back to 0."
 		src.client.updateRGMeter()
 
-	if(Secret == "Zombie"&&P.Secret!="Hamon")
-		if(HealthCut + 0.1 < 1 && zombieGetUps + 1 <= AscensionsAcquired)
-			Conscious()
-			var/healthcutClose = clamp(0.9-(zombieGetUps/10),0,0.9)
-			HealHealth(30 * (1 - healthcutClose))
-			zombieGetUps++
-
 	if(P && P.Saga == "Kamui" && P.CheckSlotless("Decapitation Mode"))
 		var/a=0
 		for(var/obj/Items/Wearables/w in src)
@@ -635,14 +627,11 @@ mob/proc/Conscious()
 			src.Health=15
 			src.Energy=EnergyMax/5
 
-		if(src.Secret=="Zombie")
-			src.HealthCut+=0.1
-			src.OMessage(15,"[src] degenerates further.","<font color=blue>[src]([src.key]) decomposes...")
 		if(isplayer(src))
 			src:move_speed = MovementSpeed()
 		src.OMessage(15,"[src] regains consciousness.","<font color=blue>[src]([src.key]) regains consciousness")
 
-mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extraChance, fakeDeath)
+mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fakeDeath)
 	if(majinCheatDeathInProgress) return
 	// Majin once-per-ascension cheat death
 	if(isRace(MAJIN) && !fakeDeath && !SuperDead && !NoVoid && !majinCheatDeathUsed)
@@ -713,10 +702,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				a.in_squad.RemoveMember(src) //Squad members die die when they die.
 				a.Potential = 0 //No gains!
 			if(a.Potential)
-				if(P.Secret=="Zombie")
-					if(P.HealthCut > 0)
-						P.HealthCut-=(0.001*src.Potential)
-						P.HealthCut = max(0, P.HealthCut)
 				var/potential_gain=(a.Potential/2)*glob.MOB_POTENTIAL_MODIFIER
 				if(P.party)
 					if(P.party.members.len>0)
@@ -864,18 +849,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				else if(P.Secret=="Hamon"&&P.HasPurity())
 					src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 
-		if(src.Phylactery)
-			for(var/obj/Items/Enchantment/Phylactery/Phy in world)
-				if(Phy.Signature==src.ckey)
-					OMsg(src, "[src] vanishes!")
-					src.loc=Phy.loc
-					src << "Your phylactery has saved you from doom."
-					src.PhylacteryNerf+=0.2
-					src.MortallyWounded=0
-					src.BPPoison=0.9
-					src.BPPoisonTimer=1
-					src.Conscious()
-					return
 		if(src.NoDeath)
 			if(src.HealthCut<0.5&&!SuperDead)
 				src.KO=1
@@ -889,9 +862,8 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				src << "Due to damage suffered you will be inert for a minute."
 				src.Conscious()
 				src.Stasis=0
-				if(src.Secret!="Zombie")
-					src.HealWounds(50)
-					src.HealFatigue(50)
+				src.HealWounds(50)
+				src.HealFatigue(50)
 				src.HealHealth(50)
 				src.HealEnergy(50)
 				if(passive_handler.Get("VenomBlood"))
@@ -920,12 +892,10 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 	if(ClothBronze&&ClothBronze=="Phoenix")
 		NoRemains=0
 		SuperDead=0
-		Zombie=0
 
 	if(!src.client)
 		NoRemains=1
 		SuperDead=1
-		Zombie=0
 
 	if(src.Dead)
 		NoRemains=1
@@ -972,7 +942,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 
 	if(src.client)
 		if(!(isRace(MAJIN) && (!majinCheatDeathUsed || majinCheatFXRunning || majinCheatDeathInProgress)))
-			Void(SuperDead, Zombie, fakeDeath, 0)
+			Void(SuperDead, fakeDeath, 0)
 
 	if(!src.Dead)
 		src.Conscious()
@@ -1025,10 +995,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.DefEroded=0
 		src.RecovTax=0
 		src.RecovCut=0
-		if(src.Secret=="Zombie")
-			src.Secret=null
-			src.NoDeath=0
-			src.Timeless=0
 
 /mob/proc/DeathEvolutionEffects()//Proc that doesn't do anything. but maybe someone wants to do visuals at some point
 
@@ -1168,7 +1134,7 @@ proc/Load_Bodies()
 			world.log << "[A] found in [L] [A.loc], at [A.x], [A.y], [A.z] | [A.buildPreviousX], [A.buildPreviousY], [A.buildPreviousZ]"
 		goto wowza
 
-mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
+mob/proc/Leave_Body(var/SuperDead=0, var/ForceVoid=0)
 	var/mob/Body/A=new
 	var/ActuallyDead=0
 	var/Chance=glob.VoidChance
@@ -1235,14 +1201,6 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 								return
 							src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
 
-	else if(SuperDead&&Zombie)
-		src<<"<font color=red><big>DO NOT LOG OUT!"
-		src<<"Your life is being shackled by a powerful curse!"
-		src.OMessage(0,"","<font color=red>[src] is zombifying.")
-		ActuallyDead=0
-		spawn(600)
-			if(src&&A)
-				A.Unholy_Alive(src)
 	else
 		ActuallyDead=1
 		if(src.NoSoul)
@@ -1308,7 +1266,7 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 			M.Level=Q.Level
 			M.name="[Commas(round(M.Level))] [glob.progress.MoneyName]"
 			src.TakeMoney(M.Level)
-	if(src.NoSoul && !ForceVoid && !Zombie)
+	if(src.NoSoul && !ForceVoid)
 		src << "<font size='big'><b>You have died on a plane with no Afterlife; there is nothing for you now. This is oblivion.</b></font size>"
 		src.Savable=0
 		if(src.isRace(MAJIN))
@@ -1325,23 +1283,6 @@ mob/proc/Barely_Alive(mob/P) if(P)
 		P.Conscious()
 	P.Revive()
 	P<<"You have returned to your body, barely alive."
-	del(src)
-
-mob/proc/Unholy_Alive(mob/P) if(P)
-	var/icon/Z=new(P.icon)
-	Z.MapColors(0.3,0.3,0.3, 0.59,0.59,0.59, 0.11,0.11,0.11, 0,0,0)
-	P.loc=loc
-	P.Conscious()
-	P.Health=50
-	P.Energy=100
-	P.Sheared=100
-	P.HealthCut=0.2
-	P.NoDeath=1
-	P.Timeless=1
-	P.Revive()
-	P.icon=Z
-	P.Secret="Zombie"
-	P<<"You have returned to your body, a mockery of what you once were."
 	del(src)
 
 mob/proc/Revive()
@@ -2120,21 +2061,4 @@ mob/proc/Grab_Effects(var/mob/P)
 
 						else
 							P.Death(src, "[src] sucking out their life essence!!")
-
-
-
-
-		if((src.Secret=="Werewolf"&&(src.CheckSlotless("New Moon Form")||src.CheckSlotless("Full Moon Form"))))
-			if(P.KO&&istype(P, /mob/Players))
-				if(istype(P, /mob/Player/AI))
-					src << "[P] is an AI!"
-					return
-				var/Choice=alert(src, "Do you wish to devour [P]?", "Feast", "No", "Yes")
-				if(P in range(1, src))
-					if(Choice=="Yes")
-						src.Grab=null
-						if(src.Secret=="Werewolf")
-							P.Death(null, "[src] ripping them apart!!", 1, NoRemains=1)
-							src.TotalInjury=0
-							src.HealHealth(50)
 

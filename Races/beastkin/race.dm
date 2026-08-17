@@ -102,17 +102,3 @@ Inspiration taken from Sett (League of Legends)}",\
 					p.Attunement = "Fox Fire"
 					p.passive_handler.Set("Heavy Strike", "Fox Fire")
 					p.AddSkill(new/obj/Skills/Projectile/Racial/Fox_Fire_Barrage)
-
-//werewolf hunger meter
-/strikeHook/werewolfHunger
-	stage = "post"
-	fire(strike/S)
-		var/mob/attacker = S.attacker
-		var/val = S.dealt
-		// WEREWOLF HUNGER MECHANIC
-		if(attacker.Secret == "Werewolf" && attacker.CheckSlotless("New Moon Form"))
-			if(!S.second)
-				var/SecretInformation/Werewolf/s = attacker.secretDatum
-				s.addHunger(val)
-				attacker.Update_Stat_Labels()
-		//END WEREWOLF HUNGER MECHANIC

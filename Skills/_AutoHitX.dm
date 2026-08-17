@@ -1103,20 +1103,6 @@ obj
 				Crippling=15
 				ShockIcon='DarkKiai.dmi'
 				ActiveMessage="unleashes a terrifying howl!"
-			Rabid_Retaliation
-				Area="Arc"
-				StrScaling=1
-				DamageMult=1
-				Rounds=15
-				Knockback=1
-				Size=1
-				Crippling=2
-				ActiveMessage="retaliates with bestial ferocity!"
-				HitSparkIcon='WolfFF.dmi'
-				HitSparkX=0
-				HitSparkY=0
-				HitSparkTurns=1
-				HitSparkSize=1.2
 			Attractive_Force
 				Area="Circle"
 				Distance=15

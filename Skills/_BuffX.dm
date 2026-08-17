@@ -4444,7 +4444,7 @@ NEW VARIABLES
 						return 1.25
 					if("Namekian")
 						return 0.8
-				if(p.Secret == "Werewolf" || p.Secret == "Vampire")
+				if(p.Secret == "Vampire")
 					return 1.1
 
 			proc/getRegenRate(mob/p)
@@ -7368,22 +7368,6 @@ NEW VARIABLES
 					set category="Skills"
 					src.Trigger(usr)
 
-		Necromorph
-			IconLock = 'Necromorph.dmi'
-			LockX = -16
-			LockY = -16
-			passives = list("BladeFisting" = 1, "PureDamage" = -1, "PureReduction" = 10, "NoDodge" = 1)
-			ActiveMessage = "is taken over by sprawling masses of flesh and necrotization!"
-			OffMessage = "'s fleshy overgrowth recedes..."
-			var/forceZombie = 1
-			verb/Necromorphization()
-				set category = "Skills"
-				if(forceZombie)
-					if(!Using)
-						usr.Secret = "Zombie"
-					else
-						usr.Secret = null
-				src.Trigger(usr)
 //General
 		Posture//for custom shit
 			verb/Posture()
@@ -9906,124 +9890,6 @@ NEW VARIABLES
 					if(!User.BuffOn(src))
 						adjust(User)
 					..()
-		Werewolf
-			New_Moon_Form
-				HairLock=1
-				AngerFloor=60
-				passives = list("Pursuer" = 1)
-				Pursuer=1
-				ActiveMessage="discards their humanity, their jaws stretching into a bloodthirsty maw!"
-				OffMessage="conceals their bloodthirsty nature..."
-				TextColor=rgb(153, 0, 0)
-				IconLock='NewMoon.dmi'
-				verb/New_Moon_Frenzy()
-					set category="Skills"
-					src.Trigger(usr)
-					if(usr.BuffOn(src))
-						winshow(usr, "HungerLabel", 1)
-						winshow(usr, "Hunger", 1)
-					else
-						winshow(usr, "HungerLabel", 0)
-						winshow(usr, "Hunger", 0)
-			Half_Moon_Form
-				HealthThreshold=0.1
-				StrMult=1.25
-				EndMult=1.25
-				SpdMult=1.25
-				ForMult=0.2
-				OffMult=1.25
-				DefMult=0.75
-				// RegenMult=0.1
-				// RecovMult=0.1
-				passives = list( "Godspeed" = 1, "TechniqueMastery" = 1)
-				Curse=1
-				Godspeed=1
-				TechniqueMastery = 1
-				HairLock='BLANK.dmi'
-				HitSpark='WolfFF.dmi'
-				HitX=0
-				HitY=0
-				HitTurn=1
-				HitSize=0.8
-				ActiveMessage="abandons rationality and transforms into a hulking beast of prey!"
-				OffMessage="restrains their inner beast..."
-				TextColor=rgb(153, 0, 0)
-				IconTransform='HalfMoon.dmi'
-				adjust(mob/p)
-					if(!altered)
-						if(p.Secret == "Werewolf")
-							passives = list( "Godspeed" =  p.secretDatum.currentTier, "TechniqueMastery" = 1,"Skimming" = 2)
-							MovementMastery = p.secretDatum.currentTier * 1.5
-							Godspeed = p.secretDatum.currentTier
-							StrMult = 1 + (p.secretDatum.currentTier * 0.05)
-							EndMult = 0.75
-							SpdMult = 1 + (p.secretDatum.currentTier * 0.05)
-							OffMult = 1 + (p.secretDatum.currentTier * 0.05)
-				Trigger(mob/p, Override = 0 )
-					adjust(p)
-					..()
-			Full_Moon_Form
-				adjust(mob/p)
-					TimerLimit=180
-					if(!altered)
-						if(p.Secret == "Werewolf")
-							passives = list( "Godspeed" =  p.secretDatum.currentTier,\
-							 "Pursuer" = 2,  "Skimming" = 2)
-							MovementMastery = p.secretDatum.currentTier * 2
-							Godspeed = p.secretDatum.currentTier * 2
-							StrMult = 1.05 + (p.secretDatum.currentTier * 0.15)
-							EndMult = 0.75
-							SpdMult = 1.05 + (p.secretDatum.currentTier * 0.15)
-							OffMult = 1.05 + (p.secretDatum.currentTier * 0.15)
-							DefMult = 0.25
-
-				HealthThreshold=0.1
-				RegenMult=2
-				AngerFloor=90
-				Pursuer=2
-				Godspeed=2
-				Curse=1
-				KenWave=4
-				KenWaveIcon='DarkKiai.dmi'
-				HairLock='BLANK.dmi'
-				HitSpark='Hit Effect Vampire.dmi'
-				HitX=-32
-				HitY=-32
-				TimerLimit=180
-				NameFake="Wolf"
-				ActiveMessage="becomes the incarnation of wild nature itself!"
-				OffMessage="retains their humanity..."
-				TextColor=rgb(153, 0, 0)
-				IconTransform='FullMoon.dmi'
-				TransformX=-7
-				TransformY=-4
-				verb/Customize_Full_Moon()
-					set category = "Other"
-					set hidden = 1
-					IconTransform=input(usr, "What icon will your Full Moon Form use?", "Full Moon Form Icon") as icon|null
-					TransformX=input(usr, "Pixel X offset.", "Full Moon Form Icon") as num
-					TransformY=input(usr, "Pixel Y offset.", "Full Moon Form Icon") as num
-					NameFake = input(usr, "What will your name be while in Full Moon Form?", "Full Moon Form Icon") as text
-					HairLock = input(usr, "What will your hair look like while in Full Moon Form?", "Full Moon Form Icon") as icon|null
-
-
-				verb/Full_Moon_Frenzy()
-					set category="Skills"
-					if(usr.Secret=="Werewolf")
-						if(usr.secretDatum.secretVariable["Hunger Satiation"] >= usr.secretDatum?:getHungerLimit())
-							if(usr.CheckSlotless("Half Moon Form"))
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/hmf in usr)
-									if(usr.BuffOn(hmf))
-										hmf.Trigger(usr, 1)
-							adjust(usr)
-							src.Trigger(usr)
-							if(usr.BuffOn(src))
-								usr.secretDatum.secretVariable["Hunger Active"] = 1
-						else
-							usr << "You are too hungry to transform!"
-					else
-						usr << "You are not a werewolf!"
-
 		Spiral
 			Evolution_Power
 				TimerLimit= 10
@@ -12323,10 +12189,6 @@ mob
 						if(B.BuffName != "Great Ape")
 							src << "You can't use buffs in Great Ape Mode!"
 							return
-				if(src.CheckSlotless("Full Moon Form")&&!B.UnrestrictedBuff)
-					if(!B.StanceSlot&&!B.StyleSlot&&!B.Autonomous)
-						src << "You can't use buffs in Full Moon Frenzy!"
-						return
 				if(B.Using&&!Override)
 					if(!(src.CheckSlotless("Libra Armory")&&istype(B, /obj/Skills/Buffs/NuStyle)))
 						src << "It's too soon to use [B] yet!"
@@ -12901,12 +12763,8 @@ mob
 					src << "You channel the graceful motions of the Ripple through your style!"
 				if(src.Secret=="Senjutsu")
 					src << "You surround your body with a nimbus of natural energy, becoming able to strike targets without physical contact!"
-				if(src.Secret=="Werewolf")
-					src << "You channel the shifting phases of the Moon through your style!"
 				if(src.Secret=="Vampire")
 					src << "You channel the haziness of Shadow through your style!"
-				if(src.Secret=="Zombie")
-					src << "You channel the stillness of the Underworld through your style!"
 				if(hasSecret("Eldritch (Shrouded)"))
 					src << "You channel the Origin behind your Shroud through your style!"
 					setShroudedStyle();

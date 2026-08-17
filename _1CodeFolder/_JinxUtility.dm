@@ -361,7 +361,7 @@ mob
 			src.MaxMana()
 		MaxHealth()
 			var/HasWounds=1
-			if(src.HasUnstoppable()||src.Secret=="Zombie")
+			if(src.HasUnstoppable())
 				HasWounds=0
 			var/KeyHealth=100-(src.TotalInjury*HasWounds)
 			var/Sub
@@ -375,7 +375,7 @@ mob
 				src.Health=KeyHealth
 		MaxEnergy()
 			var/HasFatigue=1
-			if(src.HasUnstoppable()||src.Secret=="Zombie")
+			if(src.HasUnstoppable())
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
@@ -884,10 +884,6 @@ mob
 							MA /= 2
 						else
 							MA = 0
-				if(Secret=="Zombie" && stat in list("Str","For", "Off","Def"))
-					MA+=0.1
-				if((Secret=="Werewolf"&&(!CheckSlotless("Half Moon Form"))) && stat in list("Str", "Off"))
-					MA+=0.1
 				if(Secret=="Haki")
 					if(secretDatum.secretVariable["HakiSpecialization"]=="Armament")
 						if(stat=="Str")
@@ -1031,8 +1027,6 @@ mob
 			if(src.StrEroded)
 				Mod-=src.StrEroded
 
-			if(Secret == "Werewolf" && CheckSlotless("Full Moon Form"))
-				Mod += 1 * (secretDatum?:getHungerBoon())
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -1534,8 +1528,6 @@ mob
 			if(src.SpdEroded)
 				Mod-=src.SpdEroded
 
-			if(Secret && Secret == "Werewolf" && CheckSlotless("Full Moon Form"))
-				Mod += 1 * (secretDatum?:getHungerBoon())
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=((passive_handler.Get("TensionPowered")*2))
 			if(src.RebirthHeroPath=="Red" && src.SagaLevel>=3)
@@ -1830,7 +1822,7 @@ mob
 			Recov+=src.RecovAscension
 			if(src.RecovReplace)
 				Recov=src.RecovReplace
-			if(src.HasHellPower()||(src.Secret=="Werewolf"&&(!src.CheckSlotless("Half Moon Form")))||src.HasZenkaiPower())
+			if(src.HasHellPower()||src.HasZenkaiPower())
 				if(Recov<2)
 					Recov=2
 			if(src.isRace(MAJIN))
@@ -2076,7 +2068,7 @@ mob
 		IsGood()
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
-			var/list/EvilSecrets=list("Vampire", "Werewolf", "Zombie")
+			var/list/EvilSecrets=list("Vampire")
 			//these are all bad.
 			var/good = 0
 			var/evil = 0
@@ -2117,7 +2109,7 @@ mob
 		IsEvil()
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
-			var/list/EvilSecrets=list("Vampire", "Werewolf", "Zombie")
+			var/list/EvilSecrets=list("Vampire")
 			var/good = 0
 			var/evil = 0
 			if(src.passive_handler.Get("Emptiness"))
@@ -2900,10 +2892,6 @@ mob
 				// else
 				// 	src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Wave)
 				// Z.Cooldown()
-				return
-			if(src.Secret=="Werewolf")
-				src.Activate(new/obj/Skills/AutoHit/Howl, noGCD = TRUE)
-				Z.Cooldown(3)
 				return
 			if(hasEldritchPower())
 				src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Strike(p = src), noGCD = TRUE)

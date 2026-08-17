@@ -627,15 +627,3 @@ obj
 					NeedsSword=0
 					NoSword=0
 					NoStaff=0
-				// WitchCraft
-					Witch_Style
-						StyleFor = 1.5
-						StyleSpd = 1.1
-						ElementalClass= "Water"
-						StyleActive = "Witch"
-						ElementalOffense = "Felfire"
-						Finisher = "/obj/Skills/Queue/Finisher/Sundered_Sky"
-						passives = list("QuickCast" = 1, "MartialMagic" = 1)
-						verb/Witch_Style()
-							set hidden=1
-							src.Trigger(usr)

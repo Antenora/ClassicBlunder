@@ -31,9 +31,6 @@ mob/proc/GetAssess()
 			EffectiveAnger-=cancel//take the anger away.
 			if(EffectiveAnger<1)//Only nerf anger.
 				EffectiveAnger=1
-		if(src.PhylacteryNerf)
-			EffectiveAnger-=(EffectiveAnger*src.PhylacteryNerf)
-
 
 	PotentialPowerDisplay = potential_power_mult;
 
@@ -850,7 +847,7 @@ mob/proc/
 			if(src.JaganPowerNerf)
 				Ratio*=src.JaganPowerNerf
 			if(src.BPPoison)
-				if((src.Secret=="Zombie"||src.Doped||(src.SagaLevel>=5&&src.AnsatsukenAscension=="Chikara"))&&src.BPPoison<1)
+				if((src.Doped||(src.SagaLevel>=5&&src.AnsatsukenAscension=="Chikara"))&&src.BPPoison<1)
 					Ratio*=1
 				else
 					Ratio*=src.BPPoison
@@ -901,8 +898,6 @@ mob/proc/
 					a-=cancel//take the anger away.
 					if(a<1)//Only nerf anger.
 						a=1
-			/*					if(src.PhylacteryNerf)
-						a-=(a*src.PhylacteryNerf)*/
 				if(src.AngerAdd)
 					a+=src.AngerAdd
 				if(a<=0)
@@ -990,10 +985,6 @@ mob/proc/
 					Recover("Health",1*Boosted)
 					if(isRace(HUMAN))
 						Boosted *= 1 + (TotalInjury/50)
-					if(src.Secret=="Zombie")
-						Recover("Health",1)
-						Recover("Injury",1)
-						BPPoisonTimer-=15
 				if(src.Energy<src.EnergyMax)
 					Recover("Energy",1)
 				if(TotalFatigue>0)
@@ -1284,16 +1275,6 @@ mob/proc/Update_Stat_Labels()
 			winshow(src, "MovementLabel", 0)
 	if(Secret)
 		switch(Secret)
-			if("Werewolf")
-				if(CheckSlotless("New Moon Form"))
-					var/SecretInformation/Werewolf/s = secretDatum
-					var/maxHunger = s:getHungerLimit()
-					var/currentHunger = secretDatum.secretVariable["Hunger Satiation"]
-					if(currentHunger > 0)
-						winshow(src, "Hunger", 1)
-						winset(src, "Hunger", "value=[round(currentHunger/maxHunger*100)]")
-					else
-						winshow(src, "Hunger", 0)
 			if("Eldritch")
 				var/SecretInformation/Eldritch/s = secretDatum
 				var/maxMadness = s:getMadnessLimit(src)
@@ -1431,7 +1412,7 @@ mob/proc/Get_Scouter_Reading(mob/B)
 		if(B.JaganPowerNerf)
 			Ratio*=B.JaganPowerNerf
 		if(B.BPPoison)
-			if(B.Secret=="Zombie"||B.Doped||(B.SagaLevel>=5&&B.AnsatsukenAscension=="Chikara"))
+			if(B.Doped||(B.SagaLevel>=5&&B.AnsatsukenAscension=="Chikara"))
 				Ratio*=1
 			else
 				Ratio*=B.BPPoison

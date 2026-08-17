@@ -39,7 +39,7 @@
 /var/list/typesOfItemsRemoved = list(/obj/Items/Enchantment/Arcane_Mask, /obj/Items/Enchantment/Magic_Crest, /obj/Items/Enchantment/ArcanicOrb, \
 /obj/Items/Enchantment/Teleport_Amulet, /obj/Items/Enchantment/Teleport_Nexus, /obj/Items/Enchantment/Dimensional_Cage, \
 /obj/Items/Enchantment/PocketDimensionGenerator, /obj/Items/Enchantment/Crystal_of_Bilocation, \
-/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Phylactery, /obj/Items/Enchantment/Elixir_of_Reincarnation, \
+/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Elixir_of_Reincarnation, \
 /obj/Items/Enchantment/Time_Displacer)
 /mob/proc/AdjustJob()
 	if(information.job != "Branch Director" && information.job == "Staff Member")

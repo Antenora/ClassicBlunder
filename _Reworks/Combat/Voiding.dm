@@ -51,7 +51,7 @@ mob/proc/RollVoidForAbsorb()
 		if("Admin-kill with free void")
 			var/mob/A = input(usr, "Auto-void-kill whom?", "Void") in players
 			if(!A) return
-			A.Death(null, "ADMIN", 0, 0, 0, 0, 1)
+			A.Death(null, "ADMIN", 0, 0, 0, 1)
 			Log("Admin", "<font color=red>[ExtractInfo(usr)] admin-killed [ExtractInfo(A)] (Free Void)")
 		if("Change target's extra void chance")
 			var/mob/A = input(usr, "Change whose void chance?", "Void") in players
@@ -226,9 +226,8 @@ mob/proc/StartFresh()
 	overlays -= 'Halo.dmi'
 
 /mob/var/totalExtraVoidRolls = 0
-#define SPIRITS_NAMES list("Goetic Virtue", "Stellar Constellation", "Elven Sanctuary")
 
-mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
+mob/proc/Void(override, forceVoid, extraChance = 0, extraRolls = 0)
 	var/actuallyDead
 	var/Chance = getExtraVoidChance(extraChance)
 	if(forceVoid) Chance = 100
@@ -239,45 +238,34 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 	if(override)
 		Chance = 0
 
-	if(secretDatum && secretDatum.name in SPIRITS_NAMES)
-		extraChance -= Potential/4 + (secretDatum.currentTier * 5)
-		src<<"You have [extraChance] reduced void chance from your REDACTED" //TODO: leaving as a note to change if needed
-
 	// handle the rolling here maybe
 	var/NotYet=0
 	if(src.passive_handler.Get("Reflected"))
 		NotYet=1
 	if(override&&!NotYet)
-		if(zombie)
-			actuallyDead = 0
-			src<<"You get past it all"
-			OMessage(0,"","<font color=red>[src] is zombie'd out")
-			//OMSg(src, "[src] stands right back up, as if nothing happened.")
-			return
+		actuallyDead = 1
+		new/obj/readPrayers(src)
+		if(NoSoul)
+			src<<"You feel your life flash before your eyes, and then in an abrupt snap -- nothingness."
+			if(istype(src, /mob/Players/))
+				ArchiveSave(src)
+			src.loc=locate(glob.NO_SOUL_LOCATION[1], glob.NO_SOUL_LOCATION[2], glob.NO_SOUL_LOCATION[3])
+			makeCorpse(oldLoc)
+			sleep(10)
+			overlays += 'halo.dmi'
 		else
-			actuallyDead = 1
-			new/obj/readPrayers(src)
-			if(NoSoul)
-				src<<"You feel your life flash before your eyes, and then in an abrupt snap -- nothingness."
-				if(istype(src, /mob/Players/))
-					ArchiveSave(src)
-				src.loc=locate(glob.NO_SOUL_LOCATION[1], glob.NO_SOUL_LOCATION[2], glob.NO_SOUL_LOCATION[3])
-				makeCorpse(oldLoc)
-				sleep(10)
-				overlays += 'halo.dmi'
-			else
-				src<<"You sustain the injuries detailed in your death -- as the pain fades, you awaken in the afterlife. Alone, but not for long."
-				src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
-				if(src.isRace(DEMON)||src.isRace(ELDRITCH)||src.Damned||hasEldritchPower())
-					src.Damned=0
-					src.loc=locate(198, 238, 8)
-				if(istype(src, /mob/Players/))
-					ArchiveSave(src)
-				Dead = 1
-				makeCorpse(oldLoc)
-				sleep(10)
-				src.overlays += 'halo.dmi'
-			return
+			src<<"You sustain the injuries detailed in your death -- as the pain fades, you awaken in the afterlife. Alone, but not for long."
+			src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
+			if(src.isRace(DEMON)||src.isRace(ELDRITCH)||src.Damned||hasEldritchPower())
+				src.Damned=0
+				src.loc=locate(198, 238, 8)
+			if(istype(src, /mob/Players/))
+				ArchiveSave(src)
+			Dead = 1
+			makeCorpse(oldLoc)
+			sleep(10)
+			src.overlays += 'halo.dmi'
+		return
 
 
 	makeCorpse(oldLoc)
@@ -348,7 +336,7 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 		m.Grab_Release()
 	StartFresh()
 	Stunned  = 0
-	if(NoSoul && !forceVoid && !zombie)
+	if(NoSoul && !forceVoid)
 		src<<"You have no soul contained within your body; you are embracing nothingness"
 		if(istype(src, /mob/Players/))
 			ArchiveSave(src)

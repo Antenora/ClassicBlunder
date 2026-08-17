@@ -2233,8 +2233,6 @@ mob/proc/GetCharMenuData()
 		if(CyberCancel > 0)
 			EffectiveAnger -= (EffectiveAnger - 1) * CyberCancel
 			if(EffectiveAnger < 1) EffectiveAnger = 1
-		if(PhylacteryNerf)
-			EffectiveAnger -= EffectiveAnger * PhylacteryNerf
 	var/BaseDisplay = HasPowerReplacement() ? GetPowerReplacement() * PowerBoost * RPPower : potential_power_mult * PowerBoost * RPPower
 	var/PotPow = GetPowerReplacement() ? GetPowerReplacement() : potential_power_mult
 	var/denom = PowerBoost * RPPower * round(potential_power_mult, 0.05)

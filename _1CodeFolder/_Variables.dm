@@ -270,8 +270,6 @@ mob/var
 	list/Binding//Holds the zplane of binding
 	BindingTimer//Every time this goes off, the person is returned to their zplane.
 	HearThoughts=1
-	Phylactery//if 1, make sure their phylactery is in the world
-	PhylacteryNerf=0//take this percent out of anger
 
 	Immortal //Not timeless, but won't die from age
 	Spiritual//Demons and shinjin and yokai, o mai

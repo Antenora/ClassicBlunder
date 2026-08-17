@@ -518,7 +518,7 @@ mob
 				var/CursedBlood=0
 				var/NoBlood=0
 				NoBlood=defender.CyberCancel
-				if(defender.isRace(ANDROID)||defender.isRace(ELDRITCH)||defender.Secret=="Zombie"||defender.Dead)
+				if(defender.isRace(ANDROID)||defender.isRace(ELDRITCH)||defender.Dead)
 					NoBlood=1
 				var/Effectiveness=1
 				if(NoBlood>0)

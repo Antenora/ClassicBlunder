@@ -156,7 +156,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"BossStagger" = 1, "CapacityHeal" = 1, "CastingTime" = 1, "Certain Progress" = 1,\
 	"Chaos Buster" = 1, "ChaosQueen" = 1, "ChaosRuler" = 1, "ChargeDelay" = 1,\
 	"Cleansing" = 1, "Compassion" = 1, "Completely Obliterated" = 1, "ConfuseAffected" = 1,\
-	"Constellation" = 1, "ContinuallyStun" = 1, "Controlled Chaos" = 1, "Controlled Darkness" = 1,\
+	"ContinuallyStun" = 1, "Controlled Chaos" = 1, "Controlled Darkness" = 1,\
 	"CooldownDrag" = 1, "CoolingDown" = 1, "CorruptAffected" = 1, "Corruption" = 1,\
 	"CreateTheHeavens" = 1, "CriticalParalyze" = 1, "CriticalSpark" = 1, "CursedSheath" = 1,\
 	"DamageMult" = 1, "Death X-Antibody" = 1, "DeathDefied" = 1, "Defiance" = 1,\

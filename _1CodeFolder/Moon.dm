@@ -25,36 +25,17 @@ proc/MoonRise()
 mob
 	proc
 		MoonWarning()
-			if(src.Secret=="Werewolf")
-				src << "You feel the moon begin to rise... "
 			if(src.Tail&&(src.isRace(SAIYAN)||src.isRace(HALFSAIYAN)))
 				src << "You feel the moon begin to rise... "
 			if(src.AdvancedTransmissionTechnologyUnlocked>0)
 				src << "Your observation devices are warning you about full moon... "
 		MoonTrigger()
 			triggerOozaru()
-			if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, src))
-				if(!src.CheckSlotless("FullMoonForm"))
-					if(src.SpecialBuff)
-						src.SpecialBuff.Trigger(src)
-					if(src.SlotlessBuffs.len>0)
-						for(var/obj/Skills/Buffs/b in src.SlotlessBuffs)
-							b.Trigger(src)
-					if(usr.CheckSlotless("Half Moon Form"))
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/hmf in usr)
-							if(usr.BuffOn(hmf))
-								hmf.Trigger(usr, 1)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F in src)
-						F.Trigger(src)
 			src<<"<font color=yellow>[global.MoonMessage]</font color>"
 		MoonSetTrigger()
 			for(var/obj/Oozaru/O in src)
 				if(O.icon)
 					src.Oozaru(0)
-			if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, src))
-				if(src.CheckSlotless("FullMoonForm"))
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F in src)
-						F.Trigger(src)
 			src<<"<font color=yellow>[global.MoonSetMessage]</font color>"
 /*		MakyoWarning()
 			if(src.isRace(MAKYO))
