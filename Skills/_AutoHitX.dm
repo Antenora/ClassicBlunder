@@ -2281,7 +2281,7 @@ obj
 				verb/Chidori()
 					set category="Skills"
 					if(usr.Saga=="Sharingan")
-						src.ControlledRush=0
+						src.ControlledRush=1
 					adjust(usr)
 					usr.Activate(src)
 			The_Seventh_Super_Explosive_Wave
