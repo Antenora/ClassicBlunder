@@ -16,11 +16,6 @@
     alpha = 0
     layer = 999
 
-/obj/lightness
-    icon = 'lightcutin.dmi'
-    alpha = 0
-    layer = 999
-
 /obj/animationobj
     layer = 4.9
     appearance_flags = PIXEL_SCALE | KEEP_TOGETHER

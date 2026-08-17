@@ -1,7 +1,7 @@
 /obj/DemonSkillSlot
 	appearance_flags = NO_CLIENT_COLOR | TILE_BOUND
-	plane = 10
-	layer = FLOAT_LAYER
+	plane = HUD_PLANE 
+	layer = FLY_LAYER + 2 
 	mouse_opacity = 1
 	icon = 'Icons/DevilSummoner/SkillIcons.dmi'
 	icon_state = "Physical"

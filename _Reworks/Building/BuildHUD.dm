@@ -24,7 +24,8 @@ mob/proc/GenerateHUD()
 	hudActive = 1
 
 obj/screen_object/screen_button
-	plane = 10
+	plane = HUD_PLANE 
+	layer = FLY_LAYER + 2.5 
 
 	Click(location, control, params)
 		ButtonUse()
@@ -170,7 +171,6 @@ obj/screen_object/screen_button/toggle/direction
 		usr?.client?.buildDir = build_dir
 
 obj/screen_object/screen_button/toggle/build_button
-	plane = 10
 	icon = 'build mode buttons.dmi'
 	icon_state = "blank"
 	var
@@ -205,7 +205,7 @@ obj/screen_object/screen_button/toggle/build_button
 		SetMaptext()
 			maptext_width = 256
 			maptext_x = -(maptext_width + 4)
-			maptext = "<span style='font-family:Walk The Moon;font-size:7pt;text-align:right;-dm-text-outline:1px white;color:black]'>[build_tool]</span>"
+			maptext = "<span style='font-family:Walk The Moon;font-size:7pt;text-align:right;-dm-text-outline:1px white;color:black'>[build_tool]</span>"
 
 mob/var/tmp/obj/screen_object/build_hud_holder
 mob/proc/AddBuildButtons()
@@ -256,6 +256,8 @@ mob/proc/AddBuildButtons()
 			B.pixel_x -= floor((8 * scale) + (8 * scale) / 4)
 		B.color = hudColor
 		G.AddButton(B)
+		if(i == SOUTH)
+			G.SetActive(B) 
 	count++
 	G.AddOverlays(build_hud_holder)
 
@@ -283,5 +285,7 @@ mob/proc/AddBuildButtons()
 	count++
 
 client/proc/ClearHUD()
+	var/list/drop = list() 
 	for(var/obj/screen_object/O in screen)
-		screen -= O
+		drop += O
+	screen -= drop
