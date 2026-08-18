@@ -835,7 +835,7 @@ client/proc/ScrollTrackTo(params)
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(AdminWheelScroll(delta_y))
 		return
-	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)  
+	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)
 		return
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return
@@ -940,7 +940,7 @@ client/proc/UpdateCharacterMenu()
 		for(var/obj/Skills/Buffs/mb in mob.GetMenuBuffs())
 			if(IsMenuBuff(mb)) buffs += mb        // character menu shows active non-timed, non-debuff buffs
 		cmenu_buff_all = buffs
-		if(!cmenu_buff_anim) RefreshCmenuBuffs()  
+		if(!cmenu_buff_anim) RefreshCmenuBuffs()
 	cm_name.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff\">[uppertext(mob.name)]</span>"
 	cm_ident.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">[D["identity"]]</span>"
 	cm_pot.maptext = "<span style=\"[CMENU_FONT]; color:#ffd278\">[D["potential"]]</span>"
@@ -1942,7 +1942,10 @@ client/proc/CustButtonAction(action)
 		if("open")
 			if(cmenu_cust_list && cust_sel >= 1 && cust_sel <= cmenu_cust_list.len)
 				var/vp = cmenu_cust_list[cust_sel]
-				spawn() call(usr, vp)()
+				if("[vp:name]" == "Customize: Forms")
+					spawn() call(usr, vp)(usr)
+				else
+					spawn() call(usr, vp)()
 		if("browse")
 			CustBrowse()
 		if("colorpick")
