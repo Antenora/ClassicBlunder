@@ -12,7 +12,7 @@
 
 /mob/proc/canDoATransform()
 //    if(!canPC()) return 0;//doesn't check for ki control
-    if(isRace(HUMAN)) return 0;//humans do not transform like this!
+ //   if(isRace(HUMAN)) return 0;//humans do not transform like this!
     if(ChangelingTransformRequirements()) return 1;//changelings transform weird
     if(StandardTransformRequirements()) return 1;
     return 0;

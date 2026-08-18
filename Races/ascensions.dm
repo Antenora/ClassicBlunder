@@ -51,6 +51,7 @@ ascension
 		intelligenceAdd = 0
 		imaginationAdd = 0
 		anger = 0
+		growthadd=0
 		unlock_potential = 1
 		pilotingProwess = 0
 		cyberizeModAdd = 0
@@ -171,6 +172,7 @@ ascension
 			owner.EconomyMult += ecoAdd
 			owner.PilotingProwess += pilotingProwess
 			owner.EnhanceChipsMax += enhanceChips
+			owner.GrowthRate += growthadd
 
 			if(!istype(src, /ascension/sub_ascension))
 				owner.AscensionsAcquired+=1

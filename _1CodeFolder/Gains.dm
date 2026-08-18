@@ -268,14 +268,14 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			LoseEnergy(drain)
 			src<<"The strain of your transformation forced you to revert."
 
-	if(trans==4 && transMastery < 100 && isRace(CHANGELING))
+/*	if(trans==4 && transMastery < 100 && isRace(CHANGELING))
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
 		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
-			src<<"The strain of Golden Form forced you to revert!"
+			src<<"The strain of Golden Form forced you to revert!"*/
 
 /mob/proc/doLoopTimers()
 	if(Lethal-- <= 0 && Lethal)
