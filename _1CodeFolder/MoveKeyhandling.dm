@@ -179,6 +179,7 @@ mob/Players
 globalTracker/var/BASE_LOOP_DELAY = 1.25
 globalTracker/var/DIAG_LOOP_DELAY = 1.15
 globalTracker/var/GODSPEED_LOOP_DELAY = 0.8
+globalTracker/var/PLAYER_SPEED_MULT = 2
 
 
 mob
@@ -241,7 +242,7 @@ mob
 								if(dir==NORTHEAST||dir==NORTHWEST||dir==SOUTHEAST||dir==SOUTHWEST)
 									loop_delay *= glob.DIAG_LOOP_DELAY
 								move_speed = MovementSpeed()
-								var/delay = loop_delay + move_speed
+								var/delay = (loop_delay + move_speed) / glob.PLAYER_SPEED_MULT
 								if(src.Crippled)
 									var/debuffRev = src.GetDebuffReversal();
 									if(debuffRev)

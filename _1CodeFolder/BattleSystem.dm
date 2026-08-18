@@ -1713,7 +1713,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		var/orgDistance = Distance
 		P.Knockbacked=Direction
 		Distance -= (P.previousKnockBack * glob.KB_SPEED)
-		P.Knockback += max(Distance, 0) //stacking diminishes, but a fresh send never shortens the ride
+		P.Knockback += max(Distance, 0)
 		if(Forced>=3)
 			P.Knockback = (orgDistance) * world.tick_lag
 	else
@@ -1821,12 +1821,12 @@ mob
 	proc/ClashReach(mob/M)
 		if(!M)
 			return 0
-		return (get_dist(src, M) <= 1 || ClashPxDist(M) <= 48) //overlap reads 0px and passes
+		return (get_dist(src, M) <= 1 || ClashPxDist(M) <= 48)
 	proc/TryDragonClash(mob/Trg, force_clashable = 0, from_hit = 0)
 		if(!Trg || Trg == src)
 			return
 		if(!from_hit && !ClashReach(Trg))
-			return //no clashing with someone you haven't reached
+			return
 		var/pursued = (src.clash_pursuit == Trg && world.time <= src.clash_pursuit_until)
 		if(Trg.Knockbacked||world.time<=Trg.kb_recent_until||pursued||src.passive_handler&&src.passive_handler.Get("SpiralImpact"))
 			src.NextAttack=0

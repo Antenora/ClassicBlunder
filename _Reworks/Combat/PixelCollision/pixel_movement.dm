@@ -470,7 +470,7 @@ mob/Players
 				delay /= (1 + ((glob.MAX_CRIPPLE_MULT * (Crippled / glob.CRIPPLE_DIVISOR) / 2) * debuffRev))
 			else
 				delay *= (1 + (glob.MAX_CRIPPLE_MULT * (Crippled / glob.CRIPPLE_DIVISOR)))
-		pm_owed = min(pm_owed + 32 / max(1, -round(-delay)), 32)
+		pm_owed = min(pm_owed + 32 * glob.PLAYER_SPEED_MULT / max(1, -round(-delay)), 32)
 		var/px = round(pm_owed)
 		if(px < 1) return
 		step_size = px //stepDiagonal's step() moves step_size px (the engine ignores step()'s px arg)
