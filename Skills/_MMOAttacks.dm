@@ -263,6 +263,7 @@ obj/Skills
 			AccMult=10
 			Cooldown=45
 			Crippling=10
+			NoGCD=1
 			Piercing=1
 			Striking=1
 			IconSize=1
@@ -299,6 +300,7 @@ obj/Skills
 			IconSize=1
 			Dodgeable=0
 			DirOverride=2
+			NoGCD=1
 			Crippling=10
 			ignoreBetterAim = TRUE // my fucking god tigers what did you do
 			Piercing=1

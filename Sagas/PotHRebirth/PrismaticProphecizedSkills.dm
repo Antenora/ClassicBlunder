@@ -283,6 +283,7 @@ obj
 			Cooldown=45
 			IconSize=1
 			Homing = 1
+			NoGCD=1
 			StrScaling = 1.5
 			FocusShifter=1
 			FocusShiftBoost=2
@@ -324,6 +325,7 @@ obj
 			DirOverride=2
 			Piercing=1
 			Striking=1
+			NoGCD=1
 			ManaCost=0
 			Cooldown=0
 			Trail='Trail - Flare.dmi'
