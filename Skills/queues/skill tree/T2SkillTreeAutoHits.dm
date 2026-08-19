@@ -106,7 +106,7 @@ obj
 			ComboMaster=1
 			GuardBreak=1
 			StrScaling=1
-			MenuIcon="PhantomStrike"
+			MenuIcon="PhantomRush"
 			PassThrough=1
 			PreShockwave=1
 			PostShockwave=0

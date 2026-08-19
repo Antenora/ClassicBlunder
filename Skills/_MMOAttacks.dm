@@ -261,6 +261,7 @@ obj/Skills
 			DamageMult=35
 			Blasts=4
 			AccMult=10
+			MenuIcon="SwordsOfRevealingLight"
 			Cooldown=45
 			Crippling=10
 			NoGCD=1

@@ -7,6 +7,7 @@
 	Blasts=30
 	Charge=1
 	DamageMult=1
+	MenuIcon="CataclysmicOrb"
 	ComboMaster=1
 	Stunner= 3
 	Instinct=1
@@ -35,6 +36,7 @@
 	Explode = 1
 	AccMult = 2
 	Speed = 1
+	MenuIcon="DesperadoBlaster"
 	Instinct = 1
 	Cooldown = 75
 	Variation = 0

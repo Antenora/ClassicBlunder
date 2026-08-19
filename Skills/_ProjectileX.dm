@@ -1253,6 +1253,7 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=20
+				MenuIcon="RapidBarrage"
 				AccMult=0.7
 				DamageMult=0.8
 				Blasts=25
@@ -1275,6 +1276,7 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=15
+				MenuIcon="StraightSiege"
 				AccMult=0.75
 				DamageMult=0.5
 				Speed = 0.75
@@ -1294,6 +1296,7 @@ obj
 				Distance=25
 				FocusShifter=1
 				FocusShiftBoost=1.5
+				MenuIcon="FlareWave"
 				DamageMult=1.25
 				Knockback=3
 				Radius=2
@@ -1317,6 +1320,7 @@ obj
 				DamageMult=4
 				AccMult=2
 				Crippling=3
+				MenuIcon="DeathBeam"
 				FocusShifter=1
 				FocusShiftBoost=1.5
 				Speed=0
@@ -1359,6 +1363,7 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=30
+				MenuIcon="SpiritBall"
 				DamageMult=10
 				Blasts=3
 				AccMult=2
@@ -1388,6 +1393,7 @@ obj
 				EnergyCost=8
 				Distance=20
 				Blasts=20
+				MenuIcon="CrashBurst"
 				Charge=1
 				DamageMult=1
 				AccMult=0.8
@@ -1415,6 +1421,7 @@ obj
 				AccMult=25
 				Radius=2
 				Charge=0.5
+				MenuIcon="DragonNova"
 				Knockback=1
 				Explode=2
 				EnergyCost=3
@@ -1443,6 +1450,7 @@ obj
 				IconChargeOverhead=1
 				IconLock='Kienzan.dmi'
 				LockX=0
+				MenuIcon="Kienzan"
 				LockY=0
 				IconSize=0.1
 				IconSizeGrowTo=2
@@ -1460,6 +1468,7 @@ obj
 				SkillCost=90
 				Copyable=3
 				Blasts=10
+				MenuIcon="SuddenStorm"
 				HomingCharge=1
 				RandomPath=1
 				IconLock='Dancing.dmi'
@@ -1486,6 +1495,7 @@ obj
 				Copyable=3
 				Charge=0.5
 				HomingCharge=2
+				MenuIcon="WarpStrike"
 				IconLock='Blast2.dmi'
 				Variation=4
 				Distance=20
@@ -1533,6 +1543,7 @@ obj
 				AccMult=3
 				Deflectable=0
 				Static=1
+				MenuIcon="EnergyMinefield"
 				Distance=100
 				IconLock='Blast31.dmi'
 				LockX=0
@@ -1567,6 +1578,7 @@ obj
 				NewCopyable = 4
 				SkillCost=80
 				Copyable=3
+				MenuIcon="TrackingBomb"
 				DamageMult=12
 				Knockback=5
 				Radius=1
@@ -1598,6 +1610,7 @@ obj
 				AccMult=50
 				Deflectable=0
 				Speed=1
+				MenuIcon="StealthBomb"
 				Static=1
 				Distance=100
 				IconLock='BLANK.dmi'
@@ -1625,6 +1638,7 @@ obj
 				Static=1
 				Radius=1
 				Distance=100
+				MenuIcon="PillarBomb"
 				IconLock='Blast23.dmi'
 				LockX=0
 				LockY=0
@@ -1717,6 +1731,7 @@ obj
 				Copyable=5
 				SkillCost=TIER_4_COST
 				Charge=0.2
+				MenuIcon="BurstBuster"
 				DamageMult=1
 				AccMult=1.25
 				Radius=1
@@ -1743,6 +1758,7 @@ obj
 				Knockback=1
 				DamageMult=10
 				MultiHit=1
+				MenuIcon="WarpBuster"
 				AccMult=2.5
 				Explode=2
 				EnergyCost=8
@@ -1765,6 +1781,7 @@ obj
 				AccMult=0.5
 				Stream=4
 				RandomPath=1
+				MenuIcon="ScatterBurst"
 				IconLock='Dancing.dmi'
 				FireFromSelf=1
 				ZoneAttackX=8
@@ -1787,6 +1804,7 @@ obj
 				BusterAccuracy=10
 				BusterSize=2//purely aesthetic
 				Knockback=1
+				MenuIcon="CounterBuster"
 				DamageMult=2
 				MultiHit=5
 				Instinct=1
@@ -4242,6 +4260,7 @@ obj
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
+					MenuIcon="EraserGun"
 					Distance=50
 					DamageMult=12
 					ChargeRate=2.5
@@ -4259,6 +4278,7 @@ obj
 					SkillCost=120
 					Copyable=4
 					Distance=15
+					MenuIcon="ShineRay"
 					DamageMult=8
 					ChargeRate=0.5
 					Knockback=0
@@ -4276,6 +4296,7 @@ obj
 					SkillCost=120
 					Copyable=4
 					DamageMult=10
+					MenuIcon="GammaRay"
 					ChargeRate=1
 					Distance=50
 					Knockback=1
@@ -4292,6 +4313,7 @@ obj
 					SkillCost=120
 					Copyable=4
 					DamageMult=5
+					MenuIcon="PiercerRay"
 					Distance=50
 					ChargeRate=1
 					Knockback=0

@@ -1791,6 +1791,7 @@ obj
 				Area="Wide Wave"
 				FlickAttack=1
 				Distance=15
+				MenuIcon="BreakerWave"
 				ForScaling=1
 				DamageMult=11
 				Scorching = 10
@@ -1815,6 +1816,7 @@ obj
 				SkillCost=TIER_4_COST
 				Copyable=5
 				StrScaling=0
+				MenuIcon="BlazingStorm"
 				ForScaling=1
 				Rounds=10
 				DamageMult=0.9
@@ -1852,6 +1854,7 @@ obj
 				Rush=8
 				NoLock=1
 				NoAttackLock=1
+				MenuIcon="GhostWave"
 				ControlledRush=0
 				Rounds=3
 				DamageMult=4
@@ -1879,6 +1882,7 @@ obj
 				Distance=3
 				RoundMovement=0
 				Rounds=5
+				MenuIcon="PowerPillar"
 				ForScaling=1
 				DamageMult=3.2
 				NoAttackLock=1

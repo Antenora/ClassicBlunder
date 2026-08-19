@@ -203,6 +203,7 @@ obj
 				Copyable=3
 				DamageMult=0.75
 				AccuracyMult = 1.175
+				MenuIcon="LightRush"
 				Duration=5
 				Combo=4
 				StrScaling=0.5
@@ -231,6 +232,7 @@ obj
 				SkillCost=80
 				Copyable=3
 				DamageMult=0.15
+				MenuIcon="BurstCombination"
 				StrScaling=0.5
 				ForScaling=0.5
 				AccuracyMult = 1.175
