@@ -62,7 +62,7 @@
             passives = list("Relentlessness" = 1, "Shadowbringer" = 1, "FrenzyCarrier" = 1);
             passives["Wrathful Tenacity"] = 0.2 + (0.1 * asc);
             passives["DemonicDurability"] = 2 + asc;
-            passives["AngerAdaptiveForce"] = 2 + asc;
+            //passives were kill: angeradaptiveforce
             passives["HellPower"] = 0.2 + (0.1 * asc);
             passives["Adrenaline"] = asc * 2;
         Trigger(mob/User, Override)

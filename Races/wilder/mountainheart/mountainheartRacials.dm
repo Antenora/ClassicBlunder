@@ -61,10 +61,11 @@
 	NeedsPassword = 1
 	TimerLimit = 30
 	Crippling = 15
-	passives = list("Brutalize" = 1.5, "Afterimages" = 2, "Crippling" = 5)
+	passives = list("Afterimages" = 2, "Crippling" = 5)
+    //passives were kill: brutalize
 	adjust(mob/p)
 		Crippling= 5 + 5 * p.AscensionsAcquired
-		passives = list("Brutalize" = 1.25 + (0.5 * p.AscensionsAcquired), "Godspeed" = p.AscensionsAcquired,  "Afterimages" = 2, "Crippling" = 5 + 5 * p.AscensionsAcquired)
+		passives = list("Godspeed" = p.AscensionsAcquired,  "Afterimages" = 2, "Crippling" = 5 + 5 * p.AscensionsAcquired)
 
 
 /obj/Skills/AutoHit/Haymaker
@@ -243,7 +244,8 @@
         ElementalDefense = "Earth"
         endAdd = 0.15 * asc
         passives = list("PureReduction" = asc+1, "BlockChance" = (5*(asc+1)), "CriticalBlock" = (0.1*(asc+1)),\
-                        "CallousedHands" = (0.15*(asc+1)), "Harden" = 2 + (asc/2))
+                        "Harden" = 2 + (asc/2))
+        //passives were kill: harden
     Trigger(mob/User, Override = FALSE)
         if(!User.BuffOn(src)) adjust(User)
         ..()

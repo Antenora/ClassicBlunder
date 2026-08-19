@@ -39,7 +39,7 @@ mob
 		if(isSilverscale()) passive_handler.passives["Heavy Strike"] = "Fox Fire"
 		if(isMountainheart()) passive_handler.Set("Grit", 1)
 		if(isBrightcrown())
-			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall/)
+			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Never_Fall/)
 			if(!s.Using)
 				s.Trigger(src, TRUE)
 		

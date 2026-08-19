@@ -32,7 +32,8 @@ Difficulty: ★★★
                     skills = list(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit, 
                     /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Heart_of_the_Half_Beast, 
                     /obj/Skills/Queue/Racial/Wilder/Savagery);
-                    passives = list("Grit" = 1, "Steady" = 1, "DoubleStrike" = 1, "Heavy Strike" = "Unseen Predator");
+                    passives = list("Grit" = 1, "DoubleStrike" = 1, "Heavy Strike" = "Unseen Predator");
+                    //passives were kill: steady
                 if("Silverscale")
                     skills = list(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Form, /obj/Skills/AutoHit/Mist_Form, 
                     /obj/Skills/Utility/Imitate, /obj/Skills/Buffs/SlotlessBuffs/Racial/Blend_In, 
@@ -44,12 +45,13 @@ Difficulty: ★★★
                     passives = list("Harden" = 1, "Pressure" = 1, "Bladefisting" = 1, "Extra Secret Knives" = "Feathers", "Tossing" = 1,
                     "Momentum" = 1);
                 if("Brightcrown")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall,
-                    /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Pheonix_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Ram_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Bear_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker/Turtle_Form);
-                    passives = list("Nimbus" = 1, "Instinct" = 1);
+                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Never_Fall,
+                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Pheonix_Form,
+                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Dragon_Form,
+                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tiger_Form,
+                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tortoise_Form);
+                    passives = list("Nimbus" = 1);
+                    //passives were kill: instinct
                 if("Blackflame")
                     skills = list(/obj/Skills/AutoHit/Wilder/Blackflame_Breath, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Burning_Cloak);
                     passives = list("Fury" = 1, "Wrathful Tenacity" = 0.15);

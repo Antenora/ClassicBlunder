@@ -207,11 +207,11 @@
 				msg = replacetext(msg, "target_name", "[src.Target]")
 				src.OMessage(10,"[msg]","<font color=red>[src]([src.key]) rides the Nimbus.")
 				last_nimbus = world.time
-				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Nimbus_Rider, src)) // TODO maybe change this so its better
-					AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Nimbus_Rider)
-				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Nimbus_Rider/nr in src)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Nimbus_Rider, src)) // TODO maybe change this so its better
+					AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Nimbus_Rider)
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Nimbus_Rider/nr in src)
 					if(!nr.Using)
-						nr.passives = /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Nimbus_Rider::passives
+						nr.passives = /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Nimbus_Rider::passives
 						nr.Trigger(src)
 				// TODO: make hud later if we feel like it chat
 	if(warpingStrike && !petal_attacking)

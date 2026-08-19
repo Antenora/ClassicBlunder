@@ -6,7 +6,7 @@
 /mob/proc/preForm()
     if(SlotlessBuffs["Pheonix Form"] || SlotlessBuffs["Ram Form"] || SlotlessBuffs["Bear Form"] || SlotlessBuffs["Turtle Form"])
         for(var/index in SlotlessBuffs)
-            if(istype(SlotlessBuffs[index], /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Spirit_Walker))
+            if(istype(SlotlessBuffs[index], /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance))
                 SlotlessBuffs[index].Trigger(src, TRUE)
 
 
@@ -40,7 +40,7 @@
     passives = list("FatigueLeak" = 1, "PureDamage" = -2)
     TimerLimit = 6;
 
-/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance
     TimerLimit = 15;
     Cooldown = 90;
     adjust(mob/p)
@@ -50,15 +50,16 @@
         spdAdd = (0.5 + (1/3*asc) / 2);
         offAdd = (0.5 + (1/3*asc) / 2);
         defAdd = (0.5 + (1/3*asc) / 2);
-        passives = list("Wrathful Tenacity" = 0.25, "HardenedFrame" = 1);
+        passives = list("Wrathful Tenacity" = 0.25);
         passives["HolyMod"] = 0.2 + (asc * 0.1);
-        passives["CallousedFeet"] = 2 + asc;
+        //passives were kill: callousedfeet, hardenedframe
         passives["SoftStyle"] = asc;
         TimerLimit = 15 + (asc * 5);
 
-/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Pheonix_Form//extended attacks, disables hardened frame so that spirit strike can be used instead
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Pheonix_Form//extended attacks, disables hardened frame so that spirit strike can be used instead
     FollowUp = "/obj/Skills/AutoHit/Crown_Radiation";//triggers light dragon roar
-    passives = list("Scorching" = 5, "SweepingStrike" = 1, "Extend" = 1, "Gum Gum" = 1, "HardenedFrame" = -1, "SpiritStrike" = 1);
+    passives = list("Scorching" = 5, "SweepingStrike" = 1, "Extend" = 1, "Gum Gum" = 1);
+    //passives were kill: spiritstrike, hardenedframe
     endAdd = -0.5;
     strAdd = -0.5;
     forAdd = 1;
@@ -84,7 +85,7 @@
     FlickSpin=1
     Cooldown = 15;
 
-/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Dragon_Form//stunning strikes and combomaster. god save me
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Dragon_Form//stunning strikes and combomaster. god save me
     FollowUp = "/obj/Skills/AutoHit/Dragon_Whirlwind";
     strAdd = -0.25;
     endAdd = -0.25;
@@ -92,7 +93,8 @@
     spdAdd = 0.5;
     offAdd = 1;
     defAdd = 1;
-    passives = list("StunningStrike" = 3, "ComboMaster" = 1, "TechniqueMastery" = 3, "Flow" = 2);
+    passives = list("StunningStrike" = 3, "ComboMaster" = 1, "TechniqueMastery" = 3);
+    //passives were kill: flow
     ActiveMessage = "takes up the technique of the Dragon!"
     verb/Ram_Form()
         set category = "Stances"
@@ -100,14 +102,15 @@
         if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Tiger_Form
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tiger_Form
     strAdd = 0.25
     defAdd = -0.5
     forAdd = 0.25
     ActiveMessage = "takes up the ferocity of the Tiger!"
+    //passives were kill: blurringstrikes
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list("Godspeed" = 1 + (asc/2), "BlurringStrikes" = clamp(asc/4, 0.25, 1))
+        passives = list("Godspeed" = 1 + (asc/2))
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)
     verb/Bear_Form()
@@ -116,13 +119,14 @@
         if(!usr.BuffOn(src)) adjust(usr);
         Trigger(usr)
 
-/obj/Skills/Buffs/SlotlessBuffs/Wilder/BrightcrownStance/Tortoise_Form
+/obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tortoise_Form
     endAdd = 0.5
     defAdd = -0.5
     ActiveMessage = "takes up the determination of the Tortoise!"
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list("Harden" = 2 + asc/2,  "HardenedFrame" = 1, "DeathField" = 2+asc*2, "Brutalize" = 0.5 + (asc/2))
+        passives = list("Harden" = 2 + asc/2,  "DeathField" = 2+asc*2)
+        //passives were kill: brutalize, hardenedframe
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)
     verb/Turtle_Form()
@@ -147,15 +151,14 @@
         IconLock='Flying Nimbus.dmi'
         LockY=-10
         UnrestrictedBuff=1
-        Steady=1
-        passives = list("BlurringStrikes" = 1, "Steady" = 1, "Brutalize" = 0.5)
+        passives = list()
+        //passives were kill: steady, brutalize, blurringstrikes
         TimerLimit=5
         Cooldown=10
         adjust(mob/p)
             if(altered) return
-            Steady=p.AscensionsAcquired
             TimerLimit=1+(3*p.AscensionsAcquired)
-            passives = list("BlurringStrikes" = p.passive_handler["Nimbus"], "Steady" = p.passive_handler["Nimbus"], "Brutalize" = (p.passive_handler["Nimbus"]/2))
+            passives = list()
 
 /datum/BuffTrigger
     NeverFall
@@ -176,7 +179,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous
     var/datum/BuffTrigger/Triggers = null
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder
     Never_Fall
         AlwaysOn = 1
         doNotDelete = 1
@@ -186,7 +189,7 @@
                 Triggers = new/datum/BuffTrigger/NeverFall(User, src)
             ..()
 
-/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin
+/obj/Skills/Buffs/SlotlessBuffs/Wilder
 	Monkey_Gourd
 		BuffName="Monkey Gourd"
 		UnrestrictedBuff=1
