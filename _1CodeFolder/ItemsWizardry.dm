@@ -2372,69 +2372,9 @@ obj/Items/Enchantment
 				del C
 
 				OMsg(usr, "[usr] is reborn!")
-				usr.EraAge=glob.progress.Era
-				usr.EraBody="Child"
 				if(usr.isRace(SAIYAN)||usr.isRace(HALFSAIYAN))
 					usr.Tail(1)
 
-				src.Using=0
-				del src
-				return
-			else
-				..()
-
-	Time_Displacer
-		icon='TimeDisplacer.dmi'
-		desc="Use this to shift one age category around between yourself and another person!"
-		Cost=800
-		EnchType="TimeMagic"
-		SubType="NOT IN"
-		Click()
-			if((src in usr))
-				if(src.Using)
-					return
-				if(usr.HasMechanized())
-					usr<<"They're not affected by the device."
-					return
-				src.Using=1
-				var/list/mob/Players/Options=list("Cancel")
-				for(var/mob/Players/P in view(1, usr))
-					if(usr==P)
-						continue
-					if(P.icon_state=="Meditate")
-						Options.Add(P)
-				if(Options.len<2)
-					usr << "There's no one nearby to displace time with! Make sure they're meditating to do this."
-					src.Using=0
-					return
-				var/mob/Players/Choice=input(usr, "What person do you want to displace time with?", "Time Displacer") in Options
-				if(Choice=="Cancel")
-					src.Using=0
-					return
-				var/Consent
-				if(Choice.KO)
-					Consent="Yes"
-				else
-					Consent=alert(Choice, "[usr] is wanting to displace a time period with you!  This means you will either gain or lower an age category.  Do you wish to do this?", "Time Displacer", "No", "Yes")
-				if(Consent=="No")
-					OMsg(usr, "[Choice] refuses [usr]'s offer to have their time displaced!")
-					src.Using=0
-					return
-				var/Mode=alert(usr, "Do you want to TAKE an age category from [Choice], or GIVE an age category to [Choice]?", "Time Displacer", "Take Age", "Give Age")
-				if(Mode=="Take Age")
-					usr.EraAge-=1
-					Choice.EraAge+=1
-					OMsg(usr, "[usr] takes some of the years lived away from [Choice]!")
-				if(Mode=="Give Age")
-					usr.EraAge+=1
-					Choice.EraAge-=1
-					OMsg(usr, "[usr] gives [Choice] their excess age!")
-				if(usr.EraAge>glob.progress.Era)
-					usr.Death(null, "being reverted to a time before their birth!", SuperDead=1)
-				if(Choice.EraAge>glob.progress.Era)
-					Choice.Death(null, "being reverted to a time before their birth!", SuperDead=1)
-				usr << "Relog to change to your new age."
-				Choice << "Relog to change to your new age."
 				src.Using=0
 				del src
 				return

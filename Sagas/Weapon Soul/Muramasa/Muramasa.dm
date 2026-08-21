@@ -7,6 +7,8 @@ obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades//Muramasa
 	Ascended=6
 	Destructable=0
 	ShatterTier=0
+
+
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa
 	name = "Heavenly Regalia: The Death"
 	StrMult=1.3

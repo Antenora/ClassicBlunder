@@ -39,8 +39,7 @@
 /var/list/typesOfItemsRemoved = list(/obj/Items/Enchantment/Arcane_Mask, /obj/Items/Enchantment/Magic_Crest, /obj/Items/Enchantment/ArcanicOrb, \
 /obj/Items/Enchantment/Teleport_Amulet, /obj/Items/Enchantment/Teleport_Nexus, /obj/Items/Enchantment/Dimensional_Cage, \
 /obj/Items/Enchantment/PocketDimensionGenerator, /obj/Items/Enchantment/Crystal_of_Bilocation, \
-/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Elixir_of_Reincarnation, \
-/obj/Items/Enchantment/Time_Displacer)
+/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Elixir_of_Reincarnation)
 /mob/proc/AdjustJob()
 	if(information.job != "Branch Director" && information.job == "Staff Member")
 		information.job = "Unregistered"
@@ -310,17 +309,6 @@ mob/Players
 
 		for(var/obj/Skills/Projectile/_Projectile/PS in src)
 			del PS
-
-		if(src.ModifyBaby)
-			src.ModifyBaby=0
-		if(src.ModifyEarly)
-			src.ModifyEarly=0
-		if(src.ModifyPrime)
-			src.ModifyPrime=0
-		if(src.ModifyLate)
-			src.ModifyLate=0
-
-		// var/Dif=glob.progress.Era-src.EraAge
 
 		if(src.SummoningMagicUnlocked>0)
 			src.GeneralMagicKnowledgeUnlocked=src.SummoningMagicUnlocked;
@@ -1160,40 +1148,17 @@ mob/proc
 					src.Hairz("Remove")
 					src.Hairz("Add")
 
-			if(!src.Timeless)
-				if(!(src.race in list(WILDER,ELDRITCH,SAIYAN)))//these bois spawn in with deathtimers if theyre elder...
-					var/Age = "Youth"
-					//=alert(src, "Do you want to start as a youth or an elder?  Youths have not yet reached their full potential as fighters. Elders have already passed it, and may teach younger folks.", "Age", "Youth", "Elder")
-					src.EraBody=Age
-					if(src.EraBody=="Youth")
-						src.EraAge=glob.progress.Era-src.GetPassedEras("Youth")
-						if(src.isRace(SAIYAN)||isRace(HALFSAIYAN))
-							src.Tail(1)
-					else
-						src.EraAge=glob.progress.Era-src.GetPassedEras("Elder")
-						if(src.isRace(SAIYAN)||isRace(HALFSAIYAN))
-							src.Tail(1)
-				else
-					src.EraBody="Youth"
-					src.EraAge=glob.progress.Era-src.GetPassedEras("Youth")
-			else
-				src.EraAge=-4
-				if(isRace(ELDRITCH) || src.isRace(MAJIN))
-					src.EraAge=glob.progress.Era-GetPassedEras("Adult")
-				src.EraBody="Adult"
-				src << "You've started as a timeless race. You learn slower than others, but can teach younger beings and always have your full power available."
+			if(src.isRace(SAIYAN)||isRace(HALFSAIYAN))
+				src.Tail(1)
 
-			src.EraBirth=glob.progress.Era
+			DEBUGMSG("we made it through the furry zone");
+			DEBUGMSG("ok we're going to try to set to spawn");
 			src.ChooseSpawn()
 
 			if(src.Intelligence<=0.25)
 				src.Intelligence=0.25
 			if(src.Imagination<=0.25)
 				src.Imagination=0.25
-
-			if(src.EraAge > 0) //WE ARE ALL ADULTS NOW
-				src.EraAge=0
-				src.EraBody="Adult"
 
 			// Always set RewardsLastGained for new characters so they don't get catch-up rewards for days before they existed
 			src.RewardsLastGained = glob.progress.DaysOfWipe
@@ -1210,22 +1175,6 @@ mob/proc
 				giveVuffaMoment()
 
 var/list/VuffaKeys = list("N/A", "N/A")
-mob
-	proc
-		GetPassedEras(var/Age)
-			var/Return=0
-			Return+=(1+src.ModifyBaby)//How many eras did it take to become a youth?
-			if(Age=="Youth")
-				return Return
-			Return+=(1+src.ModifyEarly)//How many eras did it take to become an adult?
-			if(Age=="Adult")
-				return Return
-			Return+=(2+src.ModifyPrime)//How many eras did it take to become an elder?
-			if(Age=="Elder")
-				return Return
-			Return+=(1+src.ModifyLate)//How many eras did it take to become an old, dying fuck?
-			if(Age=="Senile")
-				return Return
 
 mob/proc/PilotMecha(var/mob/Mecha,var/mob/Pilot)
 	Pilot.client.mob=Mecha

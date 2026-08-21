@@ -2176,22 +2176,13 @@ mob/Admin3/verb
 				var/YourRPP = AddRPP
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
-						var/ElderMult = 0.5
-						if(P.EraBody == "Senile")
-							ElderMult = 1
-						P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
+						P.RPPDonate += (YourRPP * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
 					var/EMult = glob.progress.RPPBaseMult
 					EMult *= P.GetRPPMult()
 					YourRPP *= EMult
 					P.RPPSpendable += round(YourRPP)
-				if((P.EraBody != "Child" || !P.EraBody) && !P.Dead)
-					var/AgeMult = 1
-					if(P.EraBody == "Youth" || P.EraBody == "Elder")
-						AgeMult = 0.5
-					if(P.EraBody == "Senile")
-						AgeMult = 0.25
-					P.GiveMoney(round(glob.progress.EconomyIncome * P.EconomyMult * P.Intelligence * AgeMult))
+					P.GiveMoney(round(glob.progress.EconomyIncome * P.EconomyMult * P.Intelligence))
 				Log("Admin", "[ExtractInfo(src)] triggered [ExtractInfo(P)]'s routine RPP gains of [Commas(AddRPP)].")
 			if("Equalize target to value")
 				var/mob/Players/P = input(usr, "Equalize whose RPP?", "RPP") in players
@@ -2200,10 +2191,7 @@ mob/Admin3/verb
 				var/YourRPP = Cap
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
-						var/ElderMult = 0.5
-						if(P.EraBody == "Senile")
-							ElderMult = 1
-						P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
+						P.RPPDonate = (Cap * P.RPPMult * glob.progress.RPPBaseMult)
 						P << "You have gained knowledge on how to help further other's development!"
 					var/EMult = glob.progress.RPPBaseMult
 					EMult *= P.GetRPPMult()
@@ -2216,19 +2204,13 @@ mob/Admin3/verb
 					var/YourRPP = AddRPP
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
-							var/ElderMult = 0.5
-							if(P.EraBody == "Senile")
-								ElderMult = 1
-							P.RPPDonate += (YourRPP * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
+							P.RPPDonate += (YourRPP * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
 						var/EMult = glob.progress.RPPBaseMult
 						EMult *= P.GetRPPMult()
 						YourRPP *= EMult
 						P.RPPSpendable += YourRPP
-					if((P.EraBody != "Child" || !P.EraBody) && !P.Dead)
-						P << "You gain money from routine tasks."
-						var/AgeMult = 1
-						P.GiveMoney(round(glob.progress.EconomyIncome * P.EconomyMult * P.Intelligence * AgeMult))
+						P.GiveMoney(round(glob.progress.EconomyIncome * P.EconomyMult * P.Intelligence))
 				glob.progress.RPPStarting += AddRPP
 				Log("Admin", "[ExtractInfo(src)] triggered routine RPP gains of [Commas(AddRPP)].")
 			if("Equalize EVERYONE to value")
@@ -2237,10 +2219,7 @@ mob/Admin3/verb
 					var/YourRPP = Cap
 					if(YourRPP > 0)
 						if(locate(/obj/Skills/Utility/Teachz, P))
-							var/ElderMult = 0.5
-							if(P.EraBody == "Senile")
-								ElderMult = 1
-							P.RPPDonate = (Cap * ElderMult * P.RPPMult * glob.progress.RPPBaseMult)
+							P.RPPDonate = (Cap * P.RPPMult * glob.progress.RPPBaseMult)
 							P << "You have gained knowledge on how to help further other's development!"
 						var/EMult = glob.progress.RPPBaseMult
 						EMult *= P.GetRPPMult()
@@ -2280,10 +2259,7 @@ mob/Admin3/verb
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to New Character Setup someone?")) return
 		if(locate(/obj/Skills/Utility/Teachz, M))
-			var/ElderMult=0.5
-			if(M.EraBody=="Senile")
-				ElderMult=1
-			M.RPPDonate+=(glob.progress.RPPStarting*ElderMult*M.RPPMult*glob.progress.RPPBaseMult)
+			M.RPPDonate+=(glob.progress.RPPStarting*M.RPPMult*glob.progress.RPPBaseMult)
 			M << "You have gained knowledge on how to help further other's development!"
 
 		var/EMult=glob.progress.RPPBaseMult

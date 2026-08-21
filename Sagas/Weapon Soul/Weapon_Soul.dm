@@ -142,10 +142,27 @@ mob/tierUpSaga(Path)
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Niohoggrs_Chains)
 
 					if("Caledfwlch")
-						src << "A set of Armor coats your frame, allowing you to weather the strongest of blows."
 						src.contents += new/obj/Items/Armor/Plated_Armor/Noble_Armor
 						AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Noble_Shield)
-						AddSkill(new/obj/Skills/AutoHit/True_Excalibur)
+						src << "A set of Armor coats your frame, allowing you to weather the strongest of blows."
+						var/Mode=alert(src, "What is the path to kingship?", "Caledfwlch", "Sacrifice", "Legacy")
+						if(Mode == "Sacrifice")
+							src.contents += new/mob/Players/verb/Excalignment
+							AddSkill(new/obj/Skills/AutoHit/True_Excalibur)
+							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory/excalibur in contents)
+								excalibur.caledLight = TRUE
+								excalibur.Element = "Light"
+							src << "You stand tall beneath the sun as a righteous king."
+						else
+							src.contents += new/mob/Players/verb/Excalignment
+							DeleteSkill(new/obj/Skills/Queue/Excalibur)
+							AddSkill(new/obj/Skills/AutoHit/False_Excalibur)
+							AddSkill(new/obj/Skills/Queue/ExcaliburMorgan)
+							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory/excalibur in contents)
+								excalibur.caledLight = FALSE
+								excalibur.Element = "Dark"
+								excalibur.icon= 'Caledfwlch Morgan.dmi'
+							src << "You embrace your selfish desires and dark future."
 
 					if("Muramasa")
 						src << "Muramasa makes your body become a little closer to a demon's..."
@@ -153,8 +170,6 @@ mob/tierUpSaga(Path)
 							muramasa.Element = "Dark"
 							muramasa.passives = list("WeaponBreaker" = 2, "AbyssMod" = 4)
 						passive_handler.Increase("PureDamage",2)
-						// SagaThreshold("Spd",1)
-						// SagaThreshold("Str",1)
 
 					if("Masamune")
 						src << "The hilt of Masamune glitters in the light, offering it's blessed nature to aid your attacks..."
@@ -224,10 +239,8 @@ mob/tierUpSaga(Path)
 						src << "The power of Heavenly Regalia: War King resonates in your body."
 						src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu)
 
-
 			if(5)
 				src << "The power of Heavenly Regalia grows even stronger...!"
-
 				switch(WeaponSoulType)
 					if("Kusanagi")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi/kusa in src.Buffs)
@@ -251,7 +264,6 @@ mob/tierUpSaga(Path)
 
 					if("Caledfwlch")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch/caled in src.Buffs)
-							caled.passives["Xenobiology"] = 1
 							caled.passives["CriticalDamage"] = 0.5
 							caled.passives["Pursuer"] = 2
 
@@ -290,10 +302,12 @@ mob/tierUpSaga(Path)
 							GuanYu.passives["TechniqueMastery"] = 2
 							GuanYu.passives["SwordAscension"] = 1
 							GuanYu.passives["LifeGeneration"] = 1
+
 			if(6)
 				if(!locate(/obj/Skills/Buffs/SpecialBuffs/OverSoul, src))
 					src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/OverSoul)
 					src << "You've learned to unseal the true form of your legendary weapon."
+
 			if(7)
 				switch(WeaponSoulType)
 					if("Kusanagi")
@@ -370,7 +384,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=1.25
 		ForMult=1.25
 		EndMult=1.5
-		passives= list("PureReduction"=2)
+		passives= list("PureReduction" = 5, "Miracle" = 1)
 		ActiveMessage= "invokes the Origin of Glory, embracing the Honour of a King!"
 		OffMessage= "casts aside the Origin of Glory..."
 		verb/Fundament_Honour()

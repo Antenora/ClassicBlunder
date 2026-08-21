@@ -9,6 +9,7 @@ obj/Items/Sword/Wooden/Legendary/WeaponSoul/RyuiJinguBang
 	unsheatheOffsetY = -32
 	Destructable=0
 	ShatterTier=0
+	Ascended=6
 	Element = "Earth"
 	ElementallyInfused = "Earth"
 

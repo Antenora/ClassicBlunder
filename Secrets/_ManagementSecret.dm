@@ -1,8 +1,8 @@
 #define MADNESS_MAX 100
 #define MADNESS_ADD_PER_TIER 25
 
-#define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Heavenly Restriction", "Senjutsu", "Shin",\
-"Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Heavenborn")
+#define VALID_SECRET_LIST list("Jagan Eye", "Haki", "Hamon", "Vampire", "Werewolf", "Heavenly Restriction", "Senjutsu", "Shin",\
+"Eldritch", "Eldritch (Shrouded)", "Eldritch (Reflected)", "Black Flash", "Spiral", "Rare Variant")
 #define RACIAL_SECRETS list("Eldritch (Shrouded)", "Eldritch (Reflected)")
 #define RARE_LIST list(MAKAIOSHIN, MAJIN, DEMON, ANGEL, ELDRITCH, DEMIFIEND)
 
@@ -674,6 +674,9 @@ mob/Admin3/verb
 		set category="Admin"
 		if(!P.client) return
 		if(P.Secret)
+			if(P.Secret == "Rare Variant")
+				src << "[P] is a Rare Saiyan or Human and cannot have a Secret."
+				return
 			var/confirm = alert(usr, "Are you sure you want to tier up [P]'s [P.secretDatum.name]?",,"Yes","No")
 			if(confirm == "No") return
 			P.secretDatum.tierUp(P.secretDatum.currentTier+1, P)
@@ -696,11 +699,9 @@ mob/Admin3/verb
 				P.Secret = "Jagan Eye"
 				P.giveSecret("JaganEye")
 			if("Hamon")
-				P.ModifyPrime+=1
 				P.Secret="Hamon"
 				P.giveSecret("Hamon")
 			if("Senjutsu")
-				P.ModifyPrime+=1
 				P.Secret="Senjutsu"//i want to krill myself.
 				P.giveSecret("SageArts")//better yet i want to krill whoever made it this way
 			if("Haki")

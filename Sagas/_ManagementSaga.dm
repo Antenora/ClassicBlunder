@@ -165,7 +165,7 @@ mob/Admin3/verb
 		var/Level7=0
 		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
 		if(P.Saga)
-			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||"Sorcerer")
+			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||P.Saga=="Sorcerer")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
 				Level7=2  // Devil Summoner has 8 tiers
@@ -1090,8 +1090,10 @@ mob
 								src.HyperdeathThreshold=10
 				if("Cosmo")
 					tierUpSaga("Cosmo")
+
 				if("Shinigami")
 					tierUpSaga("Shinigami")
+
 				if("Shinobi")
 					tierUpSaga("Shinobi")
 

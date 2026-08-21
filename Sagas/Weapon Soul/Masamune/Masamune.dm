@@ -56,6 +56,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
+
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Forgemaster_Lifeblood
 		StyleActive="Forgemaster"
@@ -71,6 +72,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 			set hidden=1
 			adjust(usr)
 			Trigger(usr)
+
 /obj/Skills/Queue/Finisher
 	Snowfall
 		DamageMult=2

@@ -163,8 +163,6 @@ mob/Players/Stat()
 				stat("Location", "[src.x], [src.y], [src.z]")
 /*			if(power_display)
 				stat("Power Tier: ", "[POWER_TIERS[power_display]]")*/
-			if(src.EraDeathClock)
-				stat("Death Timer: ", "[round((src.EraDeathClock-world.realtime)/Hour(1), 0.1)] hours")
 
 			switch(BPPoison)
 				if(0.01 to 0.5)
@@ -1385,6 +1383,51 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 	//BODY CONDITION ADJUSTMENTS
 	if(!B.passive_handler.Get("Piloting"))
+		if(locate(/obj/Seal/Power_Seal, B))
+			Ratio*=0.5
+		if(B.CanLoseVitalBP())
+			Ratio*=1+(B.GetHealthBPMult()+B.GetEnergyBPMult())
+		if(B.JaganPowerNerf)
+			Ratio*=B.JaganPowerNerf
+		if(B.BPPoison)
+			if(B.Doped||(B.SagaLevel>=5&&B.AnsatsukenAscension=="Chikara"))
+				Ratio*=1
+			else
+				Ratio*=B.BPPoison
+		if(B.Maimed)
+			var/Ignore=B.HasMaimMastery()
+			if(Ignore || isRace(CHANGELING))
+				Ratio*=1
+			else
+				B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
+				Ratio*=(1-(0.2*B.MaimsOutstanding))
+		if(B.HasWeights())
+			Ratio*=0.75
+		if(B.Roided)
+			Ratio*=1.15
+		if(B.OverClockNerf)
+			Ratio*=(1-B.OverClockNerf)
+		if(B.GatesNerfPerc)
+			Ratio*=((100-B.GatesNerfPerc)/100)
+		if(B.AngerMax)
+			var/a=1
+			if(!B.HasCalmAnger()&&!B.HasNoAnger())
+				a=B.AngerCurveValue()
+				if(B.AngerMult>1)
+					var/ang=a-1
+					var/mult=ang*B.AngerMult
+					a=mult+1
+			if(B.CyberCancel>0)
+				var/ang=a-1
+				var/cancel=ang*B.CyberCancel
+				a-=cancel
+				if(a<1)
+					a=1
+			if(a<=0)
+				a=0.01
+			if(B.AngerAdd)
+				a+=B.AngerAdd
+			Ratio*=a
 		if(!B.Timeless)
 			B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
 			Ratio*=(1-(0.2*B.MaimsOutstanding))

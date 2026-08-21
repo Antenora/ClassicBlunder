@@ -5078,17 +5078,6 @@ obj
 						set category="Skills"
 						usr.UseProjectile(src)
 
-//Moonlight Greatsword
-				Moonlight_Wave
-					ForScaling=1.5
-					Blasts=1
-					DamageMult=5
-					AccMult=1
-					IconLock="MoonWave.dmi"
-					Variation=6
-					Cooldown=10
-					AttackReplace=1
-
 
 
 mob

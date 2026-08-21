@@ -148,6 +148,8 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
+
+
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Stained_Memories
 		StyleActive="Stained Memories"
@@ -163,6 +165,8 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 			set hidden=1
 			adjust(usr)
 			Trigger(usr)
+
+
 /obj/Skills/Queue/Finisher
 	Rook_Splitter
 		DamageMult=8

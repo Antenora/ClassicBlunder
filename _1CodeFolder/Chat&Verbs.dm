@@ -776,7 +776,6 @@ a{color:#8be9ff;}
 							<td>[M.race.name]</td>
 							<td>[M.loc] ([M.x],[M.y],[M.z])</td>
 							<td class='num'>[M.Base] ([M.potential_power_mult])</td>
-							<td>[M.EraBody]</td>
 							<td class='num'>[M.RPPSpent]</td>
 							<td class='num'>[M.RPPSpendable]</td>
 							<td class='num'>[M.RPPSpendable + M.RPPSpent]</td>

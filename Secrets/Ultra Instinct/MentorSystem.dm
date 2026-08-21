@@ -14,7 +14,7 @@ obj/Skills/Utility/Mentor_System
 		var/list/mob/Players/Students = list("Cancel")
 
 		for(var/mob/Players/P in oview(1, Mentor))
-			if(P.EraAge > Mentor.EraAge || Mentor.Timeless)
+			if(Mentor.Timeless)
 				Students.Add(P)
 
 		if(Students.len < 2)

@@ -53,9 +53,9 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		if("Cyber Augmentations")
 			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
 				del ca
-		if("Revival Protocol")
+/*		if("Revival Protocol")
 			for(var/obj/Skills/Utility/Revival_Protocol/rp in src)
-				del rp
+				del rp*/
 		if("Espionage Equipment")
 			for(var/obj/Skills/Utility/Espionage_Scan/es in src)
 				del es
@@ -316,10 +316,10 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		if("Cyber Augmentations")
 			src.AddSkill(new/obj/Skills/Utility/Cybernetic_Augmentation)
 			src << "You learn how to operate with cybernetics!"
-		if("Revival Protocol")
+	/*	if("Revival Protocol")
 			if(!locate(/obj/Skills/Utility/Revival_Protocol, src))
 				src.AddSkill(new/obj/Skills/Utility/Revival_Protocol)
-				src << "You learn how to attempt to save people from the threshold of death!"
+				src << "You learn how to attempt to save people from the threshold of death!"*/
 		if("Espionage Equipment")
 			if(!locate(/obj/Skills/Utility/Espionage_Scan, src))
 				src.AddSkill(new/obj/Skills/Utility/Espionage_Scan)
@@ -533,10 +533,10 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
 				del ca
 
-		if("Revival Protocol")
+	/*	if("Revival Protocol")
 			if(locate(/obj/Skills/Utility/Revival_Protocol, src))
 				for(var/obj/Skills/Utility/Revival_Protocol/rp in src)
-					del rp
+					del rp*/
 		if("Espionage Equipment")
 			if(locate(/obj/Skills/Utility/Espionage_Scan, src))
 				for(var/obj/Skills/Utility/Espionage_Scan/sc in src)

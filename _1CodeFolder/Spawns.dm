@@ -19,6 +19,8 @@ obj/Special
 		var/ImaginationChange=1
 		var/SpawnLocation="None"
 
+		var/Afterlife=0 // decides if you start dead here or not
+
 
 mob
 	proc
@@ -79,6 +81,10 @@ mob
 			src << "Your native location is [src.Spawn]."
 			src.SpawnArea = Choice.SpawnLocation
 			src << "Your native location displays as [src.SpawnArea]."
+			if(src.Spawn == "Soul Society" || src.Spawn == "Hueco Mundo" || Choice.Afterlife == 1)
+				src.Dead = 1
+				src.KeepBody = 1
+				src << "Because you're spawning in an Afterlife, you are dead!"
 			MoveToSpawn(src)
 			src.loc = locate(Choice.gotoX, Choice.gotoY, Choice.gotoZ)
 
@@ -222,6 +228,12 @@ mob
 				NewS.LearningChange=lC
 				NewS.IntelligenceChange=tC
 				NewS.ImaginationChange=gC
+
+				switch(input(src, "Is the new spawn going to be in an Afterlife?", "New Spawn") in list("Yes","No"))
+					if("Yes")
+						NewS.Afterlife=1
+					if("No")
+						NewS.Afterlife=0
 
 				var/Enter
 				var/list/raceList = races.Copy()

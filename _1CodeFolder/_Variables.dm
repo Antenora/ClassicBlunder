@@ -354,16 +354,6 @@ mob/var
 	MaimCooldown //Prevents maims from happening too quickly.
 
 	Timeless//Doesn't give a FUK about era
-	EraBirth//keeps track of birth date for future interests
-	EraAge//Keeps track of the numbers
-	EraBody
-	EraDeathClock//when u get too old, this will hold a value that will say when u die
-	tmp/EraDeathTrigger
-	ModifyBaby=0
-	ModifyEarly=0
-	ModifyPrime=0
-	ModifyLate=0
-	ModifyFinal=0
 
 	tmp/obj/Skills/Queue/AttackQueue//This variable holds an object which has queue stats.
 	Pursuiting//Chasing people down.
@@ -476,8 +466,6 @@ mob/var
 	Regenning=0
 
 	Dead=0
-	DeadAge=0
-	DeadTime
 	KeepBody=0
 	Flying
 	Skimming//pretends you're flying

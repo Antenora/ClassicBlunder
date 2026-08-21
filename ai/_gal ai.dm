@@ -1958,19 +1958,6 @@ mob/Player/AI
 
 		//BODY CONDITION INFLUENCES
 		if(!passive_handler.Get("Piloting"))
-			if(!src.Timeless&&!src.Dead)
-				if((src.EraBody=="Child"||src.EraBody=="Youth")&&src.Aged)
-					Ratio*=1
-				else if(src.EraBody=="Child"||src.EraBody=="Senile")
-					if(src.ParasiteCrest())
-						Ratio*=0.5
-					Ratio*=0.4
-				else if(src.EraBody=="Youth"||src.EraBody=="Elder")
-					if(src.ParasiteCrest())
-						Ratio*=0.5
-					Ratio*=0.8
-				else
-					Ratio*=1
 			if(locate(/obj/Seal/Power_Seal, src))
 				Ratio*=0.5
 			else if(src.CanLoseVitalBP()||src.passive_handler.Get("Anaerobic"))

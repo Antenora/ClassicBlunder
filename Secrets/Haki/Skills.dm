@@ -96,9 +96,9 @@
             InstantStrikes = 1 + secretLevel
             Shocking = 5 * secretLevel
             Shattering = 5 * secretLevel
-            Cooldown = 15
-            EnergyCost = 3
-            HitMessage= "strikes their opponent with a Ryou-infused strike!"
+            Cooldown = 75
+            EnergyCost = 1.25 * secretLevel
+            HitMessage= "strikes their opponent with a Ryuo-infused strike!"
         else
             DamageMult = 0.42 * secretLevel
             InstantStrikes = 1 + (secretLevel/2)

@@ -51,7 +51,7 @@ obj/Skills/Utility
 			src.Using=1
 			var/list/mob/Players/Students=list("Cancel")
 			for(var/mob/Players/P in oview(1, usr))
-				if(P.EraAge>usr.EraAge||usr.Timeless)
+				if(usr.Timeless)
 					Students.Add(P)
 			if(Students.len<2)
 				usr << "There's no one nearby to train!"
@@ -92,7 +92,7 @@ obj/Skills/Utility
 				return
 			var/list/mob/Players/Students=list("Cancel")
 			for(var/mob/Players/P in oview(1, usr))
-				if(P.EraAge>usr.EraAge||usr.Timeless)
+				if(usr.Timeless)
 					Students.Add(P)
 			if(Students.len<2)
 				usr << "There's no one nearby to teach!"
@@ -2415,7 +2415,7 @@ obj/Skills/Utility
 			OMsg(usr, "[usr] finishes performing surgery on [Choice]!")
 			src.Using=0
 
-	Revival_Protocol
+	/*Revival_Protocol
 		desc="Inject a fresh corpse with a rejuvenating mixture. Outcome might vary."
 		var/Cost
 		verb/Revival_Protocol()
@@ -2498,7 +2498,7 @@ obj/Skills/Utility
 					OMsg(usr, "[usr] seems to create a spark of life in [Choice]...but they're still unconscious...")
 					Log("Admin","<font color=green>([usr.name])([usr.key]) failed in bringing [Choice]([Choice.key]) back to life using revival protocol...but they're voiding anyway.")
 
-			src.Using=0
+			src.Using=0*/
 
 	Internal_Communicator
 		var/ICFrequency=9999
@@ -3480,12 +3480,6 @@ obj/Skills/Utility
 				if("Dainsleif")
 					if(!locate(/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin, usr))
 						for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin/S in world)
-							if(!S.LockedLegend)
-								usr.contents+=S
-								break
-				if("Moonlight Greatsword")
-					if(!locate(/obj/Items/Sword/Heavy/Legendary/WeaponSoul/Sword_of_the_Moon, usr))
-						for(var/obj/Items/Sword/Heavy/Legendary/WeaponSoul/Sword_of_the_Moon/S in world)
 							if(!S.LockedLegend)
 								usr.contents+=S
 								break

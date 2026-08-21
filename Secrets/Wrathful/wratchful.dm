@@ -150,6 +150,9 @@ scaling with potential as well
 	if(!p.isRace(/race/saiyan))
 		src << "<font color=red>[p] is not a Saiyan.</font>"
 		return
+	if(p.Secret)
+		src << "[p] has a Secret and cannot become a Rare Variant."
+		return
 	var/choice = input(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan") as null|anything in list("Hellspawn", "Heavenborn", "Legendary", "Wrathful", "Cancel")
 	if(!choice || choice == "Cancel") return
 	switch(choice)
@@ -170,6 +173,7 @@ scaling with potential as well
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_saiyan()
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_saiyan_2()
 			p.race.transformations += new /transformation/saiyan/hellspawn_super_full_power_saiyan_2_limit_breaker()
+			p.Secret = "Rare Variant"
 		if("Heavenborn")
 			p << "You are now a Heavenborn Saiyan."
 			for(var/transformation/saiyan/ssj in p.race.transformations)
@@ -177,7 +181,7 @@ scaling with potential as well
 				del ssj
 			p.race.transformations += new /transformation/saiyan/heavenborn_super_saiyan()
 			p.race.transformations += new /transformation/saiyan/super_saiyan_rose()
-			p.Secret="Heavenborn"
+			p.Secret= "Rare Variant"
 		if("Legendary")
 			p << "You have become a Legendary Super Saiyan."
 			p.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Legendary_Stance)
@@ -185,9 +189,12 @@ scaling with potential as well
 			p.passive_handler.Increase("True Inheritor", 1)
 			p.passive_handler.Increase("Duren", 1)
 			p.AngerMessage = "grasps the sun."
+			p.Secret="Haki"
+			p.giveSecret("Haki")
 		if("Wrathful")
 			p << "You have been given the Wrathful buff."
 			p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wrathful/Stage_One)
 			p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wrathful/Stage_Two)
 			p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wrathful/Stage_Three)
 			p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wrathful/Stage_Four)
+			p.Secret = "Rare Variant"

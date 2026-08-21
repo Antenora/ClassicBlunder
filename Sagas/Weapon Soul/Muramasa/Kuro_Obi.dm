@@ -30,6 +30,7 @@
 		Size = 1.5 + p.SagaLevel
 		Toxic = 20 * p.SagaLevel
 		Burning = 20 * p.SagaLevel
+		Cooldown = 90 - (p.SagaLevel * 5)
 	verb/Masterful_Death()
 		set category="Skills"
 		adjust(usr)

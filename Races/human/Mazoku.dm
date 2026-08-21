@@ -6,6 +6,9 @@
 	if(p.Class != "Heroic")
 		src << "[p] is not a Heroic Human."
 		return
+	if(p.Secret)
+		src << "[p] has a Secret and cannot become a Rare Variant."
+		return
 	var/safety = 20
 	while(p.transActive > 0 && safety-- > 0)
 		var/oldTA = p.transActive
@@ -22,3 +25,9 @@
 	p.passive_handler.Increase("DormantDemon", 1)
 	p.TrueName=input(p, "Your lineage can be traced to a Great Demon Lord. Who were they?", "Get True Name") as text
 	p << "The name of your Mazoku Ancestor is <b>[p.TrueName]</b>."
+	p.Secret = "Rare Variant"
+	if(!locate(/obj/Skills/Projectile/Spirit_Gun, p))
+		p.AddSkill(new/obj/Skills/Projectile/Spirit_Gun)
+		for(var/obj/Skills/Projectile/Spirit_Gun/se in p.contents)
+			se.SagaSignature=1
+			se.SignatureTechnique=0

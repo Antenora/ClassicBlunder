@@ -51,7 +51,7 @@ mob
 				var/totalRPP = round(YourRPP * days)
 				GiveRPP(totalRPP)
 
-			if((src.EraBody != "Child" || !src.EraBody) && !src.Dead)
+			if(!src.Dead)
 				src << "You gain money from routine tasks."
 				var/extraMoney = 0
 				if(!information)

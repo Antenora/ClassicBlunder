@@ -1674,9 +1674,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 			var/obj/Items/W=src
 			W.AlignEquip(User)
 			if(src.suffix=="*Equipped*")
-				if(src:Parasite)
-					User.ModifyPrime=-1
-					User.ModifyLate=-1
 				if(src:Spells.len>0)
 					for(var/x=1, x<=src:Spells.len, x++)
 						var/obj/Skills/Tech=src:Spells[x]

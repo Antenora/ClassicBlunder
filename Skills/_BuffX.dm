@@ -1191,25 +1191,28 @@ NEW VARIABLES
 						vars["[ki.selectedStats[2]]Mult"] = 1.1
 						vars["[ki.selectedStats[3]]Mult"] = 1.05
 						multsSet = TRUE
+					var/Choice = alert(usr, "Do you want to conceal your sword's true nature?", "Concealment", "Yes", "No")
+					if(Choice == "Yes")
+						redacted = TRUE
+					else if(Choice == "No")
+						redacted = FALSE
 					switch(usr.BoundLegend)
-						if("Redacted")
-							passives = list("PULock" = 1)
-							src.SwordName=null
-							src.SwordIcon=null
-							src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
-							src.OffMessage="conceals █████████████.."
 						if("Green Dragon Crescent Blade")
-							passives = list("Duelist" = max(5,usr.SagaLevel), "Harden" = usr.SagaLevel,  "Momentum" = usr.SagaLevel, "PULock" = 1)
-							src.ActiveMessage="calls forth the true form of the Green Dragon Crescent Blade, the Spear of War!"
-							src.OffMessage="restrains Guan Yu's fury..."
+							if(!redacted)
+								passives = list("Duelist" = max(5,usr.SagaLevel), "Harden" = usr.SagaLevel,  "Momentum" = usr.SagaLevel, "PULock" = 1)
+								src.ActiveMessage="calls forth the true form of the Green Dragon Crescent Blade, the Spear of War!"
+								src.OffMessage="restrains Guan Yu's fury..."
+							else
+								src.SwordName=null
+								src.SwordIcon=null
+								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
+								src.OffMessage="conceals █████████████.."
 
 						if("Ryui Jingu Bang")
 							passives = list("SpiritPower" = usr.SagaLevel*0.25, "Duelist" = usr.SagaLevel*0.25, "Extend" = max(1,usr.SagaLevel/2), "PULock" = 1)
 							if(!redacted)
 								src.ActiveMessage="calls forth the true form of Ryui Jingu Bang, the Pole of the Monkey King!"
 								src.OffMessage="shrinks Ryui Jingu Bang back down..."
-								SwordName = null
-								SwordIcon = null
 							else
 								src.SwordName=null
 								src.SwordIcon=null
@@ -1222,7 +1225,7 @@ NEW VARIABLES
 								if(istype(usr.EquippedSword(),/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory))
 									light = usr.EquippedSword():caledLight
 							if(light)
-								passives = list("HolyMod" = usr.SagaLevel, "PULock" = 1)
+								passives = list("HolyMod" = usr.SagaLevel, "Pursuer" = usr.SagaLevel, "PULock" = 1)
 								if(!redacted)
 									src.SwordName="Caledfwlch"
 									src.ActiveMessage="calls forth the true form of Caledfwlch, the Sword of Glory!"
@@ -1233,7 +1236,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 							else
-								passives = list("AbyssMod" = usr.SagaLevel, "Pursuer" = max(1,usr.SagaLevel/2),"PULock" = 1)
+								passives = list("AbyssMod" = usr.SagaLevel, "Pursuer" = usr.SagaLevel, "PULock" = 1)
 								if(!redacted)
 									src.SwordName="Caledfwlch"
 									src.ActiveMessage="calls forth the true form of Caledfwlch Morgan, the Shadow Sword of Glory!"
@@ -1244,7 +1247,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 						if("Kusanagi")
-							passives = list(  "ManaGeneration" = usr.SagaLevel*5,  "PULock" = 1)
+							passives = list("ManaGeneration" = usr.SagaLevel*5, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Kusanagi"
 								src.ActiveMessage="calls forth the true form of Kusanagi, the Sword of Faith!"
@@ -1290,7 +1293,7 @@ NEW VARIABLES
 								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 								src.OffMessage="conceals █████████████.."
 						if("Masamune")
-							passives = list("HolyMod"=usr.SagaLevel*2,"Purity"=1, "PULock" = 1)
+							passives = list("HolyMod"=usr.SagaLevel*2, "Purity"=1, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Masamune"
 								src.ActiveMessage="calls forth the true form of Masamune, the Sword of Purity!"
@@ -1306,7 +1309,7 @@ NEW VARIABLES
 								if(istype(usr.EquippedSword(),/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order))
 									light = usr.EquippedSword():caliburLight
 							if(light)
-								passives = list("HolyMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
+								passives = list("HolyMod"=usr.SagaLevel, "LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Purified Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -1316,7 +1319,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 							else
-								passives = list("AbyssMod"=usr.SagaLevel,"LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
+								passives = list("AbyssMod"=usr.SagaLevel, "LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Crystal Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -1326,7 +1329,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 						if("Soul Edge")
-							passives = list("AbyssMod" = usr.SagaLevel,  "Extend" = 1, "BleedHit" = 0.25, "PULock" = 1)
+							passives = list("AbyssMod" = usr.SagaLevel, "Extend" = 1, "BleedHit" = 0.25, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Soul Edge"
 								src.ActiveMessage="calls forth the true form of Soul Edge, the Blade of Chaos!"
@@ -1336,16 +1339,6 @@ NEW VARIABLES
 								src.SwordIcon=null
 								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 								src.OffMessage="conceals █████████████.."
-						if("Moonlight Greatsword")
-							src.EndMult=1.3
-							src.ForMult=2.25
-							src.OffMult=1.5
-							src.DefMult=1.3
-							passives = list(  "SoulFire" = 2, "DrainlessMana" = 1, "CyberStigma" = 2)
-							src.ManaSeal=2
-							src.DrainlessMana=1
-							src.SwordName="Moonlight Greatsword"
-							src.ActiveMessage="conjures forth the Moonlight Greatsword, basked in otherworldly lunar radiance..."
 					if(!PULock)
 						passives["PULock"] = 0
 				src.Trigger(usr)
@@ -1917,6 +1910,42 @@ NEW VARIABLES
 				adjust(usr)
 				src.Trigger(usr)
 
+		FadeIntoShadows
+			IconTint=list(0,0,0, 0,0,0, 0,0,0, 0,0,0)
+			passives = list("Nightmare" = 1, "PULock" = 1, "Skimming"=4, "Godspeed"=8)
+			AllowedPower=0.5
+			DarkChange=1
+			Invisible=20
+			IconTransform = 'mist.dmi'
+			verb/Fade_Into_Shadows()
+				set category="Roleplay"
+				set hidden = 1
+				src.Trigger(usr)
+				if(usr.secretDatum.currentTier >= 4)
+					usr.Incorporeal=0;
+					usr.density=1;
+					if(usr.passive_handler.Get("Nightmare"))
+						usr.Incorporeal=1;
+						usr.density=0;
+			verb/All_Seeing_Eyes()
+				set category="Roleplay"
+				set hidden = 1
+				var/list/who=list("Cancel")
+
+				if(usr.secretDatum.currentTier < 5) who += usr.getShadowEyeTargets();
+				else who += usr.getAdvancedShadowEyeTargets();
+
+				var/mob/Players/selector=input("Who do you want to observe?","Observe")in who
+				if(selector=="Cancel")
+					Observify(usr,usr)
+					usr.Observing=0
+					return
+				else
+					Observify(usr,selector)
+					if(prob(10))
+						selector << "Nobody is watching you. But some<b>thing</b> might be."
+					usr.Observing=1
+
 		Kaioken
 			SignatureTechnique=3
 			UnrestrictedBuff=1
@@ -1961,41 +1990,7 @@ NEW VARIABLES
 					usr.passive_handler.Set("Super Kaioken", 0)
 				usr.Auraz("Remove")
 				src.Trigger(usr)
-		FadeIntoShadows
-			IconTint=list(0,0,0, 0,0,0, 0,0,0, 0,0,0)
-			passives = list("Nightmare" = 1, "PULock" = 1, "Skimming"=4, "Godspeed"=8)
-			AllowedPower=0.5
-			DarkChange=1
-			Invisible=20
-			IconTransform = 'mist.dmi'
-			verb/Fade_Into_Shadows()
-				set category="Roleplay"
-				set hidden = 1
-				src.Trigger(usr)
-				if(usr.secretDatum.currentTier >= 4)
-					usr.Incorporeal=0;
-					usr.density=1;
-					if(usr.passive_handler.Get("Nightmare"))
-						usr.Incorporeal=1;
-						usr.density=0;
-			verb/All_Seeing_Eyes()
-				set category="Roleplay"
-				set hidden = 1
-				var/list/who=list("Cancel")
 
-				if(usr.secretDatum.currentTier < 5) who += usr.getShadowEyeTargets();
-				else who += usr.getAdvancedShadowEyeTargets();
-
-				var/mob/Players/selector=input("Who do you want to observe?","Observe")in who
-				if(selector=="Cancel")
-					Observify(usr,usr)
-					usr.Observing=0
-					return
-				else
-					Observify(usr,selector)
-					if(prob(10))
-						selector << "Nobody is watching you. But some<b>thing</b> might be."
-					usr.Observing=1
 		Rekkaken
 			SignatureTechnique=3
 			UnrestrictedBuff=1
@@ -5024,6 +5019,7 @@ NEW VARIABLES
 			OffMessage="releases their power spike, incredibly exhausted..."
 			adjust(mob/user)
 				var/zenkaiLevel = user.AscensionsAcquired
+				TimerLimit = 50 + (5 * zenkaiLevel)
 				passives = list()
 				passives["TechniqueMastery"] = 0.5*zenkaiLevel
 				var/passiveLimit = zenkaiLevel
@@ -7248,11 +7244,7 @@ NEW VARIABLES
 					src.Trigger(usr)
 					if(src.Using)
 						src.Mastery++
-						if(usr.EraBody=="Elder"||usr.EraBody=="Senile"||src.Mastery>=3)
-							if(!usr.EraDeathClock)
-								var/DeathClock=Minute(30)
-								usr.EraDeathClock=world.realtime+DeathClock
-								usr << "You will die from overexertion soon. Use your remaining time well."
+
 			Crimson_Grimoire
 				passives = list("LimitlessMagic" = 1, "MartialMagic" = 1)
 				LimitlessMagic=1

@@ -2525,43 +2525,7 @@ mob
 				src.TimeMagicUnlocked++
 
 			src.knowledgeTracker.learnedKnowledge.Add(x)
-		LoseLifespan(var/val)
-			var/Remaining=val
-			if(Remaining>0)
-				if(src.ModifyFinal>(-1))
-					if(src.ModifyFinal-Remaining<(-1))//if there's not enough life left in this stage
-						Remaining=abs(-1)-abs(src.ModifyFinal)
-						src.ModifyFinal=-1
-					else//if there is enough life left
-						src.ModifyFinal-=Remaining
-						Remaining=0
-			if(Remaining>0)
-				if(src.ModifyLate>(-1))
-					if(src.ModifyLate-Remaining<(-1))//if there's not enough life left in this stage
-						Remaining=abs(-1)-abs(src.ModifyLate)
-						src.ModifyLate=-1
-					else//if there is enough life left
-						src.ModifyLate-=Remaining
-						Remaining=0
-			if(Remaining>0)
-				if(src.ModifyPrime>(-2))
-					if(src.ModifyPrime-Remaining<(-2))//if there's not enough life left in this stage
-						Remaining=abs(-2)-abs(src.ModifyPrime)
-						src.ModifyPrime=-2
-					else//if there is enough life left
-						src.ModifyPrime-=Remaining
-						Remaining=0
-			if(Remaining>0)
-				if(src.ModifyEarly>(-1))
-					if(src.ModifyEarly-Remaining<(-1))//if there's not enough life left in this stage
-						Remaining=abs(-1)-abs(src.ModifyEarly)
-						src.ModifyEarly=-1
-					else//if there is enough life left
-						src.ModifyEarly-=Remaining
-						Remaining=0
-			if(Remaining>0)
-				src.EraDeathTrigger=1
-				src.Death(null, "exhausting their remaining lifespan!", SuperDead=10)
+
 		MakeWarper(var/_x, var/_y, var/_z)
 			var/obj/Special/Teleporter2/q=new(src.loc)
 			var/obj/Special/Teleporter2/q2=new(locate(_x, _y, _z))

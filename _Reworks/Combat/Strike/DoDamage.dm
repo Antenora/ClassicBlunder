@@ -120,7 +120,11 @@
 		var/boon = src.Energy/100 * passive_handler.Get("Powerhouse")
 		trueMult += boon
 
-
+	if(WSMuramasa())
+		if(defender.Dead || src.Dead)
+			trueMult += 1
+		if(defender.Secret == "Vampire")
+			trueMult += 1
 
 	var/puredmg = HasPureDamage() ? HasPureDamage() : 0
 	trueMult += puredmg

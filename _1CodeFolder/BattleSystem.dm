@@ -833,6 +833,11 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 				src.transUnlocked = 3
 		Conscious()
 		world<<"<font color=red><b>[src] has awakened.</b></font>"
+		if(!locate(/obj/Skills/Projectile/Spirit_Gun_Mega, src))
+			src.AddSkill(new/obj/Skills/Projectile/Spirit_Gun_Mega)
+			for(var/obj/Skills/Projectile/Spirit_Gun_Mega/se in src.contents)
+				se.SagaSignature=1
+				se.SignatureTechnique=0
 		return
 
 	if(NoRemains!=2)
@@ -1285,6 +1290,7 @@ mob/proc/Barely_Alive(mob/P) if(P)
 mob/proc/Revive()
 		overlays-='Halo.dmi'
 		Dead=0
+		KeepBody=0
 
 
 proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
