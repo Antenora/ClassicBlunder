@@ -99,8 +99,8 @@ menu "menu"
 		command = ""
 		saved-params = "is-checked"
 	elem 
-		name = "Screen Size"
-		command = "Screen-Size"
+		name = "Max View"
+		command = "Max-View"
 		category = "Display"
 		saved-params = "is-checked"
 
@@ -325,14 +325,9 @@ window "EmoteEditor"
 		size = 640x480
 		anchor1 = -1,-1
 		anchor2 = -1,-1
-		background-color = none
 		is-visible = false
 		saved-params = "pos;size;is-minimized;is-maximized"
 		on-close = "EmoteEditorClosed"
-		outer-size = 656x538
-		outer-pos = 291,0
-		inner-pos = 8,31
-		screen-size = 2560x1400
 	elem "label13"
 		type = LABEL
 		pos = 344,0
@@ -373,9 +368,7 @@ window "EmoteEditor"
 		size = 640x432
 		anchor1 = 0,10
 		anchor2 = 100,100
-		background-color = none
 		saved-params = ""
-		inner-background-color = none
 
 window "ICChatTab"
 	elem "ICChatTab"
@@ -1863,7 +1856,8 @@ window "mainwindow"
 		anchor2 = -1,-1
 		background-color = #000000
 		is-default = true
-		saved-params = "pos;size;is-maximized"
+		saved-params = "pos"
+		on-size = "FitView"
 		title = "Roleplay Rebirth: The Fourth Fate"
 		statusbar = false
 		icon = 'CreationPics\\fouthfate.png'
@@ -1904,32 +1898,6 @@ window "mainwindow"
 		border = sunken
 		saved-params = ""
 		text = "Mana"
-	elem "BarHealth"
-		type = LABEL
-		pos = 480,730
-		size = 121x20
-		anchor1 = 50,100
-		anchor2 = 63,100
-		font-family = "Lucida Console,@DotumChe,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Health"
-	elem "BarEnergy"
-		type = LABEL
-		pos = 601,730
-		size = 119x20
-		anchor1 = 63,100
-		anchor2 = 75,100
-		font-family = "Lucida Console,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Energy"
 	elem "BarPower"
 		type = LABEL
 		pos = 841,730
@@ -1951,14 +1919,15 @@ window "mapwindow"
 		size = 680x460
 		anchor1 = -1,-1
 		anchor2 = -1,-1
+		background-color = #000000
 		saved-params = "pos;size;is-minimized;is-maximized"
+		on-size = "FitView"
 		titlebar = false
 		statusbar = false
 		can-close = false
 		can-minimize = false
 		can-resize = false
 		is-pane = true
-		keep-aspect = true
 	elem "map"
 		type = MAP
 		pos = 0,0
@@ -1966,8 +1935,10 @@ window "mapwindow"
 		anchor1 = 0,0
 		anchor2 = 100,100
 		text-color = #000000
+		background-color = #000000
 		is-default = true
-		saved-params = "icon-size"
+		right-click = true
+		saved-params = ""
 		on-show = ".winset\"mainwindow.mainvsplit.left=mapwindow\""
 		on-hide = ".winset\"mainwindow.mainvsplit.left=\""
 	elem "BarDoomed"
@@ -2785,7 +2756,7 @@ window "Grid2"
 window "Finalize_Screen"
 	elem "Finalize_Screen"
 		type = MAIN
-		pos = 1176,408
+		pos = 291,0
 		size = 1008x276
 		anchor1 = -1,-1
 		anchor2 = -1,-1
@@ -2798,6 +2769,11 @@ window "Finalize_Screen"
 		can-minimize = false
 		can-resize = false
 		image-mode = tile
+		outer-size = 1024x315
+		outer-pos = 291,0
+		inner-size = 1008x276
+		inner-pos = 8,31
+		screen-size = 1920x1032
 	elem "button51"
 		type = BUTTON
 		pos = 322,212
@@ -2936,7 +2912,7 @@ window "Finalize_Screen"
 		border = line
 		saved-params = "is-checked"
 		text = "?"
-		command = ".ToggleHelp \"MedRate\""
+		command = ".ToggleHelp \"GrowthRate\""
 		is-flat = true
 	elem "button37"
 		type = BUTTON
@@ -3144,7 +3120,7 @@ window "Finalize_Screen"
 		border = line
 		saved-params = ""
 		text = "1x RPP Mult"
-	elem "Race Imagination"
+	elem "RaceGrowthRate"
 		type = LABEL
 		pos = 360,124
 		size = 274x29
@@ -3156,7 +3132,7 @@ window "Finalize_Screen"
 		background-color = #000000
 		border = line
 		saved-params = ""
-		text = "1x Imagination"
+		text = "1x Growth Rate"
 		image-mode = stretch
 	elem "Race Intellect"
 		type = LABEL
@@ -3187,9 +3163,9 @@ window "Finalize_Screen"
 		text = "2x Battle Power"
 	elem "Proceed"
 		type = BUTTON
-		pos = 636,212
+		pos = 636,241
 		size = 367x28
-		anchor1 = 63,78
+		anchor1 = 63,87
 		anchor2 = 99,97
 		font-family = "TinyPixie2"
 		font-size = 8
@@ -3200,6 +3176,81 @@ window "Finalize_Screen"
 		saved-params = "is-checked"
 		text = "FINISH"
 		command = ".Skill_Points_Done"
+	elem "button52"
+		type = BUTTON
+		pos = 636,212
+		size = 38x28
+		anchor1 = 63,77
+		anchor2 = 67,87
+		font-size = 15
+		text-color = #ff8040
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "?"
+		command = ".ToggleHelp \"VitalityMod\""
+		is-flat = true
+	elem "minusVIT"
+		type = BUTTON
+		pos = 674,212
+		size = 39x28
+		anchor1 = 67,77
+		anchor2 = 71,87
+		font-family = "Arial Black"
+		font-size = 16
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "-"
+		command = ".Skill_Points \"-\" \"Vitality\""
+		is-flat = true
+	elem "VIT"
+		type = LABEL
+		pos = 713,212
+		size = 153x28
+		anchor1 = 71,77
+		anchor2 = 86,87
+		font-size = 10
+		font-style = "bold"
+		text-color = #ff80ff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		text = "Vitality"
+		image-mode = stretch
+	elem "plusVIT"
+		type = BUTTON
+		pos = 866,212
+		size = 40x28
+		anchor1 = 86,77
+		anchor2 = 90,87
+		font-family = "Arial Black"
+		font-size = 16
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "+"
+		command = ".Skill_Points \"+\" \"Vitality\""
+		is-flat = true
+	elem "Vitality"
+		type = LABEL
+		pos = 906,212
+		size = 97x28
+		anchor1 = 90,77
+		anchor2 = 100,87
+		font-family = "Arial"
+		font-size = 10
+		font-style = "bold"
+		text-color = #80ffff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		text = "0"
+		image-mode = stretch
 	elem "Points Remaining"
 		type = LABEL
 		pos = 934,-1

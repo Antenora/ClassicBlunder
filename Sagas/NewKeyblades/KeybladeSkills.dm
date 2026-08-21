@@ -9,11 +9,10 @@ obj
 				Area="Strike"
 				PassThrough=1
 				Distance=4
-				AdaptRate=1
-				DamageMult=1.5
-				Rush=3
-				ControlledRush=1
-				Cooldown=30
+				DamageMult=1.2
+				Rush=6
+				ControlledRush=0
+				Cooldown=8
 				EnergyCost=2
 				DelayTime=1.5
 				Rounds=3
@@ -23,14 +22,12 @@ obj
 				ActiveMessage="dashes forward repeatedly with a jousting strike!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=30
+						src.Cooldown=8
 						src.Distance=7
 						src.Rush=7
 						DelayTime=2
 						src.Rounds=5
-						DamageMult=2
-						MaxCharges=3
-						Charges=3
+						DamageMult=1.58
 						ChargeRefresh=15
 				verb/Sonic_Blade()
 					set category="Skills"
@@ -40,7 +37,6 @@ obj
 				NeedsSword=1
 				Area="Wave"
 				Distance=7
-				AdaptRate=1
 				HitSparkIcon='Hit Effect Pearl.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -48,14 +44,14 @@ obj
 				HitSparkSize=3
 				TurfStrike=1
 				Slow=1
-				DamageMult=3
-				Cooldown=45
-				EnergyCost=3
+				DamageMult=4.75
+				Cooldown=10
+				EnergyCost=2
 				ActiveMessage="throws their Keyblade forward!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=30
-						DamageMult=4
+						src.Cooldown=8
+						DamageMult=6.2
 						DelayTime=1
 						Rounds=3
 				verb/Strike_Raid()
@@ -67,25 +63,25 @@ obj
 				SignatureTechnique=1
 				Area="Circle"
 				Distance=5
-				AdaptRate = 1
 				GuardBreak=1
-				DamageMult=1
+				DamageMult=2.55
 				PullIn=8
-				Cooldown=45
+				Cooldown=10
+				EnergyCost=2
 				Shockwaves=3
 				Shockwave=4
 				BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Staggered"
 				SpecialAttack=1
-				Stunner=3
+				Stunner=1
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
 				ActiveMessage="draws in everyone nearby with a burst of magnetism!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=30
+						src.Cooldown=8
 						Distance=8
-						DamageMult=5
+						DamageMult=12.64
 				verb/Magnet_Burst()
 					set category="Skills"
 					usr.Activate(src)
@@ -93,29 +89,28 @@ obj
 			Ripple_Drive
 				Area="Circle"
 				Distance=5
-				AdaptRate = 1
 				GuardBreak=1
-				DamageMult=6
+				DamageMult=2.55
 				Knockback=15
-				Cooldown=45
+				Cooldown=10
 				Shockwaves=3
 				Shockwave=4
 				BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Staggered"
 				SpecialAttack=1
-				Stunner=3
+				Stunner=1
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
 				ActiveMessage="unleashes a damaging aura around nearby enemies!"
-				EnergyCost=5
+				EnergyCost=2
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=30
+						src.Cooldown=8
 						src.Distance=7
-						src.DamageMult=9
+						src.DamageMult=3.79
 						src.Knockback=20
 						src.Shockwaves=4
-						src.Stunner=5
+						src.Stunner=1
 				verb/Ripple_Drive()
 					set category="Skills"
 					adjust(usr)
@@ -125,19 +120,18 @@ obj
 				Area="Circle"
 				PassThrough=0
 				Distance=4
-				AdaptRate=1
 				NoPierce=1
-				DamageMult=9
+				DamageMult=7
 				Rush=6
 				ControlledRush=0
-				Cooldown=60
-				EnergyCost=2
+				Cooldown=15
+				EnergyCost=3
 				ActiveMessage="dashes forward, surrounded by flames!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=45
+						src.Cooldown=10
 						src.Distance=6
-						src.DamageMult=12
+						src.DamageMult=9.2
 						src.Rush=8
 				verb/Fire_Surge()
 					set category="Skills"
@@ -147,19 +141,18 @@ obj
 				Area="Circle"
 				PassThrough=0
 				Distance=4
-				AdaptRate=1
 				NoPierce=1
-				DamageMult=9
+				DamageMult=7
 				Rush=6
 				ControlledRush=0
-				Cooldown=60
-				EnergyCost=2
+				Cooldown=15
+				EnergyCost=3
 				ActiveMessage="dashes forward, surrounded by lightning!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=45
+						src.Cooldown=10
 						src.Distance=6
-						src.DamageMult=12
+						src.DamageMult=9.2
 						src.Rush=8
 				verb/Thunder_Surge()
 					set category="Skills"
@@ -169,9 +162,8 @@ obj
 			Raging_Storm
 				NeedsSword=1
 				Area="Circle"
-				AdaptRate=1
-				Cooldown = 75
-				DamageMult=1.5
+				Cooldown = 18
+				DamageMult=0.45
 				Rounds=20
 				ComboMaster=1
 				Size=2
@@ -189,8 +181,8 @@ obj
 				ActiveMessage="surrounds themselves in fire!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=60
-						src.DamageMult=2
+						src.Cooldown=15
+						src.DamageMult=0.57
 						src.Rounds=25
 						src.Size=3
 				verb/Raging_Storm()
@@ -198,8 +190,7 @@ obj
 					adjust(usr)
 					usr.Activate(src)
 			Salvation
-				AdaptRate=1
-				DamageMult=12
+				DamageMult=8.5
 				Area="Circle"
 				Distance=8
 				Slow=1
@@ -219,11 +210,12 @@ obj
 				TurfStrike=1
 				TurfShift='StarPixel.dmi'
 				TurfShiftDuration=3
-				Cooldown=75
+				Cooldown=18
+				EnergyCost=5
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=60
-						src.DamageMult=16
+						src.Cooldown=15
+						src.DamageMult=11.46
 						src.Distance=10
 						src.HealthRecoveryValue=8
 				verb/Salvation()
@@ -233,30 +225,29 @@ obj
 			Ragnarok
 				NeedsSword=1
 				Area="Arc"
-				AdaptRate=1
-				DamageMult=2.25
-				Rush=5
-				ControlledRush=1
+				DamageMult=0.58
+				Rush=10
+				ControlledRush=0
 				Rounds=5
 				ComboMaster=1
 				RoundMovement=1
 				NoAttackLock=1
 				NoLock=1
-				Cooldown=60
+				Cooldown=15
 				Icon='Nest Slash.dmi'
 				IconX=-16
 				IconY=-16
 				Size=2
 				Distance=2
-				EnergyCost=5
+				EnergyCost=3
 				Launcher=2
 				Instinct=1
 				ActiveMessage="unleashes a flurry of strikes!"
 				FollowUp="/obj/Skills/AutoHit/Ragnarok_Blast"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=45
-						src.DamageMult=3
+						src.Cooldown=10
+						src.DamageMult=0.77
 						src.Rush=7
 						src.Rounds=7
 				verb/Ragnarok()
@@ -268,7 +259,6 @@ obj
 				Area="Around Target"
 				Distance=12
 				DistanceAround=5
-				AdaptRate=1
 				Knockback=0
 				ComboMaster=1
 				HitSparkIcon='Hit Effect Pearl.dmi'
@@ -280,12 +270,11 @@ obj
 				Slow=3
 				Rounds=5
 				Size=3
-				DamageMult=2
+				DamageMult=0.51
 				ActiveMessage="thrusts their blade forward, magic exploding from the tip of the blade!"
 			ExplosionFollowup
 				Area="Circle"
-				AdaptRate=1
-				DamageMult=9
+				DamageMult=6.91
 				Shattering=1
 				Size=2
 				Icon='SweepingKick.dmi'
@@ -315,8 +304,7 @@ obj
 					HitSparkSize=5
 					HitSparkCount=10
 					HitSparkDispersion=1
-					ForOffense=1
-					AdaptRate=1
+					ForScaling=1
 					SpecialAttack=1
 					WindupMessage="invokes: <font size=+1>ULTIMA!!!</font size>"
 					adjust(mob/p)
@@ -328,20 +316,21 @@ obj
 		Queue
 			var/UpgradedKeybladeSkill=0
 			Stun_Impact
-				DamageMult=6
+				DamageMult=4.5
 				AccuracyMult = 1.25
 				Duration=10
-				Cooldown=60
+				Cooldown=15
+				EnergyCost=3
 				Instinct=4
-				Stunner=3
+				Stunner=1
 				PushOut=3
 				PushOutWaves=2
 				HitMessage="releases the energy they gathered into their Keyblade!"
 				ActiveMessage="gathers energy into their Keyblade!"
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=45
-						src.DamageMult=8
+						src.Cooldown=10
+						src.DamageMult=6.02
 						src.Stunner=5
 						src.PushOutWaves=3
 						src.Instinct=6
@@ -350,19 +339,20 @@ obj
 					adjust(usr)
 					usr.SetQueue(src)
 			Explosion
-				DamageMult=1
+				DamageMult=0.77
 				AccuracyMult = 1.5
-				Cooldown=60
+				Cooldown=15
+				EnergyCost=3
 				Instinct=5
 				FollowUp="/obj/Skills/AutoHit/ExplosionFollowup"
 				HitMessage="strikes with their Keyblade, as it glows brightly..."
 				adjust(mob/P)
 					if(src.UpgradedKeybladeSkill)
-						src.Cooldown=45
+						src.Cooldown=10
 						src.AccuracyMult=1.75
 						src.Instinct=7
 						for(var/obj/Skills/AutoHit/ExplosionFollowup/EF in P)
-							EF.DamageMult=12
+							EF.DamageMult=9.21
 							EF.Shockwaves=4
 				verb/Explosion()
 					set category="Skills"
@@ -378,8 +368,8 @@ obj
 					ArmorIcon='LancelotArmor.dmi'
 					ArmorClass="Light"
 					passives = list()
-					var/list/SwordPassives = list("BlurringStrikes" = 1, "Brutalize" = 2, "TechniqueMastery" = 3)
-					var/list/ShieldPassives = list("CallousedHands" = 0.15, "Juggernaut" = 1)
+					var/list/SwordPassives = list(  "TechniqueMastery" = 3)
+					var/list/ShieldPassives = list( "Juggernaut" = 1)
 					var/list/StaffPassives = list("ManaGeneration" = 1, "QuickCast" = 1)
 					adjust(mob/p)
 						var/ImaginaryBonus=0

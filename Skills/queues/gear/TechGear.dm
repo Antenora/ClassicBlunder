@@ -5,9 +5,6 @@ obj
 				Pile_Bunker
 					DamageMult=9
 					AccuracyMult = 1.175
-					HybridStrike=0.5
-					SpiritHand=1
-					Steady=5
 					Duration=10
 					PushOut=2
 					Explosive=2
@@ -49,7 +46,6 @@ obj
 						usr.SetQueue(src)
 				Power_Claw
 					DamageMult=1.25
-					HybridStrike=0.5
 					AccuracyMult = 1.1
 					Cooldown=20
 					Grapple=1
@@ -66,7 +62,6 @@ obj
 						usr.SetQueue(src)
 				Hook_Grip_Claw
 					DamageMult=5
-					HybridStrike=0.5
 					AccuracyMult=1
 					Cooldown=120
 					Grapple=1
@@ -86,9 +81,6 @@ obj
 					Integrated_Pile_Bunker
 						DamageMult=9
 						AccuracyMult = 1.175
-						HybridStrike=0.5
-						SpiritHand=1
-						Steady=5
 						Duration=10
 						PushOut=2
 						Explosive=2
@@ -110,9 +102,6 @@ obj
 							usr.SetQueue(src)
 					Integrated_Power_Fist
 						NoSword=1
-						SpiritHand=1
-						HybridStrike=0.5
-						Steady=5
 						DamageMult=3.5
 						AccuracyMult = 1.175
 						Duration=10
@@ -134,7 +123,6 @@ obj
 							usr.SetQueue(src)
 					Integrated_Power_Claw
 						DamageMult=1.25
-						HybridStrike=0.5
 						AccuracyMult = 1.1
 						Cooldown=20
 						Grapple=1
@@ -151,7 +139,6 @@ obj
 							usr.SetQueue(src)
 					Integrated_Hook_Grip_Claw
 						DamageMult=5
-						HybridStrike=0.5
 						AccuracyMult=1
 						Cooldown=20
 						Grapple=1

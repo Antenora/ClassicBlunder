@@ -14,13 +14,15 @@
 	/obj/Skills/Grab, /obj/Skills/Grapple/Toss, /obj/Skills/Dragon_Dash, /obj/Skills/Target_Clear, /obj/Skills/Target_Switch, \
 	/obj/Skills/Reverse_Dash, /obj/Skills/Aerial_Payback, /obj/Skills/Aerial_Recovery, \
 	/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive, \
-	/obj/Skills/Buffs/Styles/Style_Selector, /obj/Skills/Transformation)
+	/obj/Skills/Buffs/Styles/Style_Selector, /obj/Skills/Transformation, \
+	/obj/Skills/Zanzoken, /obj/Skills/Power_Control, /obj/Skills/Utility/Sense)
 	for(var/S in missingSkills)
 		if(!locate(S, usr.contents))
 			usr.AddSkill(new S)
 
 /mob/verb/See_Targets_Target()
 	set category="Skills"
+	set hidden = 1
 	if(Target && Target.Target)
 		Target.Target.Click()
 
@@ -37,7 +39,7 @@
 /var/list/typesOfItemsRemoved = list(/obj/Items/Enchantment/Arcane_Mask, /obj/Items/Enchantment/Magic_Crest, /obj/Items/Enchantment/ArcanicOrb, \
 /obj/Items/Enchantment/Teleport_Amulet, /obj/Items/Enchantment/Teleport_Nexus, /obj/Items/Enchantment/Dimensional_Cage, \
 /obj/Items/Enchantment/PocketDimensionGenerator, /obj/Items/Enchantment/Crystal_of_Bilocation, \
-/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Phylactery, /obj/Items/Enchantment/Elixir_of_Reincarnation, \
+/obj/Items/Enchantment/AgeDeceivingPills, /obj/Items/Enchantment/Elixir_of_Reincarnation, \
 /obj/Items/Enchantment/Time_Displacer)
 /mob/proc/AdjustJob()
 	if(information.job != "Branch Director" && information.job == "Staff Member")
@@ -57,13 +59,12 @@ mob/Players
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE
+		PurgeHurtboxDebug()
+		FxEnsureMasters(client)
 		ForceClearHeldChargeState()
 		players += usr
 		OverwatchNotifyLogin(usr, "logged in")
-		// StyleRating decay runs in spawn(); the loop dies on disconnect and
-		// leaves the persistent StyleRating var stuck above zero on the next
-		// login, with Stylish multipliers locked in and no decay timer to
-		// retire them. Wipe any leftover rating now so reconnects start clean.
+		//the decay loop dies on disconnect, wipe leftover rating so Stylish doesn't stay stuck
 		if(StyleRating > 0)
 			resetStyleRating()
 		StyleRatingDecaying = FALSE
@@ -86,7 +87,7 @@ mob/Players
 
 		winshow(usr,"StatsWindow",0)
 		winshow(usr,"StatsWindow2",0)
-		for(var/e in list("Health","Energy","Power","Mana"))
+		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=true")
 		usr.client.show_verb_panel=1
 		usr.Admin("Check")
@@ -109,7 +110,6 @@ mob/Players
 			if(src.isRace(MAKAIOSHIN))
 				da.name="Devil Arm ([src.TrueName])"
 
-		checkVerbs()
 		if(src.isRace(/race/demi_fiend))
 			if(!(/mob/proc/CraftMagatama in src.verbs))
 				src.verbs += /mob/proc/CraftMagatama
@@ -193,14 +193,12 @@ mob/Players
 		//stop holding zanzo charges
 		if(ActiveZanzo)
 			ActiveZanzo=0
-		for(var/obj/Skills/Zanzoken/z in src)
-			z.ZanzoAmount=0
 
 		if(updateVersion && updateVersion.version != glob.UPDATE_VERSION)
 			glob.updatePlayer(src)
 		if(!updateVersion)
-			var/updateversion = "/update/version[glob.UPDATE_VERSION]"
-			if(ispath(updateversion))
+			var/updateversion = text2path("/update/version[glob.UPDATE_VERSION]")
+			if(updateversion)
 				updateVersion = new updateversion
 		if(RPPSpendable + RPPSpent > RPPCurrent)
 			if(!src.PotentialHeadStart)
@@ -378,10 +376,11 @@ mob/Players
 		var/list/lol=list("butt3","butt4")
 		for(var/x in lol)
 			winset(src,x,"'is-visible'=true")
-		if(ScreenSize)
-			src.client.view=ScreenSize
+		client.SetupGameDisplay()
+		client.InitializeGraphics()
+		client.InitSkillHUD()
 
-		client.fps=src.ChosenFPS
+		client.fps = src.EffectiveClientFPS()
 		client.updateRGMeter()
 		if(usr.SenseRobbed>=5)
 			animate(usr.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1))
@@ -439,6 +438,7 @@ mob/Players
 				s.Using=0
 				if(s.MaxCharges > 0)
 					s.Charges = s.MaxCharges
+					s.recharge_ends = null
 			for(var/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/dm in src)
 				if(dm.possible_skills)
 					for(var/path in dm.possible_skills)
@@ -485,13 +485,16 @@ mob/Players
 						whoToInflict = PACT_SUBJECT
 				p.breakPact(TRUE, whoToInflict)
 		DevilSummonerRestoreVerbs()
+		ShinobiRestoreVerbs()
 		initShortcuts();
 		MajinAbsorbOnLogin()
 		if(istype(src, /mob/Players))
 			var/mob/Players/SBP = src
 			SBP.Shadowbringer_ClearShadow()
+		CollectMenuVerbs()
 		return
 	Logout()
+		PurgeHurtboxDebug()
 		if(src.Airborne)
 			src.Airborne = 0
 			src.AirborneInterrupted = 0
@@ -584,6 +587,8 @@ mob/Creation
 	Login()
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE | EDGE_PERSPECTIVE
+		client.SetupTitleDisplay()
+		client.ClearSkillHUD()
 		usr.client.view=18
 		usr<<browse("[basehtml][Notes]")
 		winshow(usr, "HungerLabel", 0)
@@ -593,7 +598,7 @@ mob/Creation
 			sleep(10)
 			del(usr)
 
-		for(var/e in list("Health","Energy","Power","Mana"))
+		for(var/e in list("Power","Mana"))
 			winset(src,"Bar[e]","is-visible=false")
 		usr.CheckPunishment("Ban")
 		usr.Gender="Male"
@@ -615,6 +620,7 @@ mob/Creation
 		usr.loc=locate(1,1,13)
 		client.client_plane_master = new()
 		client.screen += client.client_plane_master
+		FxEnsureMasters(client)
 	Logout()
 		if(src in admins)
 			admins -= src
@@ -887,7 +893,9 @@ mob/Creation/verb
 		if(blah=="RecoveryMod")
 			alert("This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.")
 		if(blah=="AngerMod")
-			alert("This determines how much power you gain when you Anger, an event that occurs if a hit that would have reduced you under 25% heatlh happens..")
+			alert("This determines your peak Anger power bonus. Anger builds as you take damage - a quarter of the bonus at 75% health, half at 50% where you properly Anger, and the full bonus at 25%. Some buffs and events can push you along the curve faster.")
+		if(blah=="GrowthRate")
+			alert("For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.")
 
 mob/proc/UpdateBio()
 	src.PerkDisplay()
@@ -1025,7 +1033,6 @@ client
 						world<<parse
 				if(key in VuffaKeys)
 					mob.giveVuffaMoment()
-				mob.gajaConversionCheck()
 				switch(mob.Secret)
 					if("Vampire")
 						mob.vampireBlood = new(mob, 6, 184)
@@ -1089,10 +1096,18 @@ mob/proc
 		LOL.setRace(race, TRUE)
 		LOL.StrMod=src.StrMod
 		LOL.EndMod=src.EndMod
+		LOL.VitMod=src.VitMod
 		LOL.SpdMod=src.SpdMod
 		LOL.ForMod=src.ForMod
 		LOL.OffMod=src.OffMod
 		LOL.DefMod=src.DefMod
+		LOL.StrengthInvest=src.StrengthInvest
+		LOL.EnduranceInvest=src.EnduranceInvest
+		LOL.VitalityInvest=src.VitalityInvest
+		LOL.SpeedInvest=src.SpeedInvest
+		LOL.ForceInvest=src.ForceInvest
+		LOL.OffenseInvest=src.OffenseInvest
+		LOL.DefenseInvest=src.DefenseInvest
 		src.client.mob=LOL
 		del(src)
 

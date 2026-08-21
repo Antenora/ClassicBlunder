@@ -1,4 +1,4 @@
-/obj/Skills/AutoHit/var/buffAffectedType = "" // Power, Potential, Intimidation, etc -- the var to compare, if it is being compared
+/obj/Skills/AutoHit/var/buffAffectedType = "" // Power, Potential, etc -- the var to compare, if it is being compared
 /obj/Skills/AutoHit/var/buffAffectedCompare = FALSE // TRUE if it is being compared, FALSE if it is not
 /obj/Skills/AutoHit/var/buffAffectedBoon = ""
 // then buffAffected is a list, and compare is TRUE, find the type and compare, when it is false, randomly select a buff
@@ -54,16 +54,18 @@
     NoAttackLock=1
     Area="Circle"
     DamageMult = 0.001
-    StrOffense = 1
+    StrScaling = 1
     Distance = 12
-    Stunner = 5
+    Stunner = 3
     GuardBreak = 1
     Cooldown = -1
+    EnergyCost = 12
     Instinct = 5
     ActiveMessage="'s willpower is exerted, showcasing the qualities of a King!"
     TurfStrike=1
     verb/exertWill()
         set category="Roleplay"
+        set hidden = 1
         set name = "Exert Will"
         // for show
         ActiveMessage = "expunges their willpower, suddenly increasing the pressure in the area!"
@@ -81,28 +83,28 @@
 /obj/Skills/Queue/Haki/Kings_Infusion
     NoWhiff = 1
     Duration = 6
-    Cooldown = 30
+    Cooldown = 8
     InstantStrikes = 2
     Shocking = 5
-    DamageMult = 1
-    EnergyCost = 1.5
+    DamageMult = 1.39
+    EnergyCost = 2
     FollowUp = "/obj/Skills/AutoHit/Haki/Kings_Infusion_Follow"
     adjust(mob/p)
         var/secretLevel = p.getSecretLevel()
         if(secretLevel >= 5)
-            DamageMult = 1 * secretLevel
+            DamageMult = 0.21 * secretLevel
             InstantStrikes = 1 + secretLevel
             Shocking = 5 * secretLevel
             Shattering = 5 * secretLevel
-            Cooldown = 75
-            EnergyCost = 1.25 * secretLevel
+            Cooldown = 15
+            EnergyCost = 3
             HitMessage= "strikes their opponent with a Ryou-infused strike!"
         else
-            DamageMult = 0.5 * secretLevel
+            DamageMult = 0.42 * secretLevel
             InstantStrikes = 1 + (secretLevel/2)
             Shocking = 5
-            EnergyCost = 0.5 * secretLevel
-            Cooldown = 20 + (5 * secretLevel)
+            EnergyCost = 2
+            Cooldown = 8 + secretLevel
             HitMessage = "strikes their foe with a blow infused with their King's Will!"
     verb/Kings_Infusion()
         set category="Skills"
@@ -116,14 +118,14 @@
     ComboMaster=1
     Area="Circle"
     Size = 1
-    StrOffense = 1
-    EndDefense = 0.75
+    StrScaling = 1
+    EndEffectiveness = 0.75
     Distance = 1
     Rounds = 2
     Knockback = 1
     GuardBreak = 1
     Cooldown=4
-    DamageMult = 0.5
+    DamageMult = 0.69
 
 
 /obj/Skills/Queue/Haki/Galaxy_Impact
@@ -131,12 +133,11 @@
     Delayer = 0.2
     Decider = 2
     Duration = 8
-    Cooldown = 160
+    Cooldown = 40
     InstantStrikes = 3
     Launcher = 3
-    DamageMult = 1
-    EnergyCost = 15
-    AntiSunyata=1
+    DamageMult = 1.55
+    EnergyCost = 8
     FollowUp = "/obj/Skills/AutoHit/Haki/Galaxy_Impact_Follow"
     HitSparkIcon = 'Icons/HitWind.dmi'
     HitSparkSize = 2
@@ -159,13 +160,13 @@
     Icon = "Tornado.dmi"
     IconX=-8
     IconY=-8
-    StrOffense = 1
+    StrScaling = 1
     Distance = 10
     Rounds = 1
     Knockback = 1
     GuardBreak = 1
     Cooldown=4
-    DamageMult = 11
+    DamageMult = 17.05
     HitSparkIcon = 'Icons/GojoHitspark.dmi'
     TurfShift = 'Icons/LavaRock2.dmi'
     TurfShiftDuration = 15
@@ -174,17 +175,17 @@
 
 
 /obj/Skills/Projectile/Divine_Departure
-    EnergyCost = 15
-    Cooldown = 160
+    EnergyCost = 8
+    Cooldown = 40
     MultiHit = 5
-    EndRate = 0.6
+    EndEffectiveness = 0.6
     FadeOut = 5
     Slashing = 1
     Knockback = 3
     AccMult = 2
     Dodgeable = 1
     Deflectable = 0
-    DamageMult = 6
+    DamageMult = 1.2
     Piercing = 1
     MortalBlow = 0.5
     Radius = 3
@@ -193,8 +194,8 @@
     HomingCharge=1
     HomingDelay=1
     Devour = 1
-    StrRate = 1.5
-    ForRate = 1.25
+    StrScaling = 1.5
+    ForScaling = 1.25
     Explode=3
     ExplodeIcon='Black_Flash_Hitspark_1.dmi'
     IconLock='BlackGetsuga.dmi'

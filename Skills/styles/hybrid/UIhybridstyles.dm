@@ -13,8 +13,8 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SwordName = "Instinct Blade"
 		SwordIcon = 'Icons/Buffs/Ki-Blade.dmi'
 		SwordClass = "Medium"
-		passives = list("HybridStyle" = "SwordStyle", "LikeWater" = 5, "Instinct" = 4, "The Way" = 1, "Sword Master" = 1, "Flow" = 2.5, "Parry" = 2, "Deflection" = 2,\
-                        "Godspeed" = 2, "BlurringStrikes" = 1.5, "Fury" = 3, "Deicide" = 1, "Pressure" = 3, "Momentum" = 1.5, "PUSpike" = 50)
+		passives = list("HybridStyle" = "SwordStyle", "SwordAscension" = 6, "Sword Master" = 1, "Parry" = 2, "Deflection" = 2,\
+                        "Godspeed" = 2,  "Fury" = 3, "Momentum" = 1.5, "PUSpike" = 50)
 		StyleActive = "Sword Without Thought"
 		StyleStr = 1.4
 		StyleOff = 1.4
@@ -28,6 +28,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		var/tmp/obj/Items/Sword/EquippedSword
 		verb/Attune_Instinct_Blade()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.BuffOn(src))
 				var/classChoice = input(usr, "Choose your preferred sword type.") in list("Light", "Medium", "Heavy")
 				SwordClass = classChoice
@@ -61,7 +62,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 				if("ShatterCounter" in newSword.vars) newSword.vars["ShatterCounter"] = 999999
 				if("ShatterMax" in newSword.vars) newSword.vars["ShatterMax"] = 999999
 				if("Deflection" in newSword.vars) newSword.vars["Deflection"] = 1
-				if("SpiritSword" in newSword.vars) newSword.vars["SpiritSword"] = 1
+				if("SummonSwordVisual" in newSword.vars) newSword.vars["SummonSwordVisual"] = 1
 				if("SwordAscension" in newSword.vars) newSword.vars["SwordAscension"] = 3
 				if("MagicSword" in newSword.vars) newSword.vars["MagicSword"] = 1
 				if("Unbreakable" in newSword.vars) newSword.vars["Unbreakable"] = 1
@@ -104,8 +105,8 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
-		passives = list("HybridStyle" = "UnarmedStyle", "Instinct" = 4, "LikeWater" = 4, "Muscle Power" = 5, "Grippy" = 4, "Scoop" = 3, "CounterMaster" = 4,\
-                       "Momentum" = 3, "Pressure" = 3, "Flow" = 3, "Juggernaut" = 1, "Fury" = 2, "Deflection" = 2, "Reversal" = 1,\
+		passives = list("HybridStyle" = "UnarmedStyle", "Muscle Power" = 5, "Grippy" = 4, "Scoop" = 3, "CounterMaster" = 4,\
+                       "Momentum" = 3,  "Juggernaut" = 1, "Fury" = 2, "Deflection" = 2, "Reversal" = 1,\
                        "Parry" = 2, "Godspeed" = 1.5, "PUSpike" = 50)// DO NOT GET GRABBNED ODDO NOT GET GRABBED DO NOT GET GRABBED DO NOT TRY TO THROW THEM DO NOT GET GRABBED
 		StyleActive = "Heavenly Wrestling"
 		StyleStr = 1.5
@@ -130,8 +131,8 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
-		passives = list("HybridStyle" = "MysticStyle", "Instinct" = 4, "SpiritFlow" = 5, "LikeWater" = 4, "Amplify" = 3, "Familiar" = 3, "Harden" = 2, "Flow" = 3, "Godspeed" = 1.5,\
-                       "Erosion" = 0.15, "Deterioration" = 1, "WaveDancer" = 2, "Rain" = 3, "ManaGeneration"=3,\
+		passives = list("HybridStyle" = "MysticStyle", "Amplify" = 3, "Familiar" = 3, "Harden" = 2, "Godspeed" = 1.5,\
+                       "Erosion" = 0.15, "Deterioration" = 1, "WaveDancer" = 2,  "ManaGeneration"=3,\
                        "Burning" = 2, "Freezing" = 2, "Shocking" = 2, "Shattering" = 2, "PUSpike" = 50)/*This should bridge the gap between grappling/sword/martial without being too bad to fight against.
                                                                                         Should. Might need to finetune it because I'm not super familiar with magic shenanigans*/
 		StyleActive = "Aetherial Flow"
@@ -161,7 +162,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
-		passives = list("HybridStyle" = "UnarmedStyle", "Instinct" = 5, "LikeWater" = 4, "Momentum" = 3, "Fa Jin" = 3, "Flow" = 3, "Pressure" = 3, "Deflection" = 1.5, "BlurringStrikes" = 1,\
+		passives = list("HybridStyle" = "UnarmedStyle", "Momentum" = 3, "Fa Jin" = 3, "Deflection" = 1.5, \
                        "CounterMaster" = 2.5, "Interception" = 3, "Harden" = 2, "Godspeed" = 2, "Fury" = 2, "Parry" = 2, \
                        "Sunyata" = 2, "Reversal" = 1, "PUSpike" = 50)//Hey, it's me, goku.
 		StyleActive = "Heavenly Palm"

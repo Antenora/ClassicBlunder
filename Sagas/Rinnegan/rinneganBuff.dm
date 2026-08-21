@@ -35,13 +35,11 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
     proc/resetToDefault()
         //asura
         Mechanized = 0
-        HybridStrike = 0
         StrMult = 1
         EndMult = 1
         OffMult = 1
         DefMult = 1
         DoubleStrike = 0
-        TripleStrike = 0
         // Human
         StealsStats = 0
         Erosion = 0
@@ -49,7 +47,6 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
         // Preta
         BulletKill = 0
         EnergySteal = 0
-        ManaSteal = 0
         ElementalDefense = "None"
         // Deva
         DevaPull = 0
@@ -65,13 +62,10 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
             if("Asura")
                 // mechanical
                 Mechanized=1
-                HybridStrike = pot / 20 // double dmg at 100 pot
-                SpiritHand = pot / 25 // Str + For at 100 pot
                 ForMult = 1.3
                 OffMult = 1.2
                 EndMult = 1.3
                 DoubleStrike = 2
-                TripleStrike = 1
             if("Human")
                 StealsStats = pot / 20
                 ElementalOffense = "Void"
@@ -81,7 +75,6 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
             if("Preta")
                 BulletKill = 1
                 EnergySteal = pot
-                ManaSteal = pot
                 ElementalDefense = "Void"
                 EndMult = 1.4
             if("Deva")
@@ -93,7 +86,6 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
                 OffMult = 1.1
                 DefMult = 1.1
                 NoWhiff = 1
-                NoMiss = 1
 
     proc/swapPath(path, mob/p)
         activePath = path
@@ -150,6 +142,7 @@ Mangekyou_Sharingan
 			OffMessage="closes their eyes with a pained look..."
 			verb/Mangekyou_Sharingan()
 				set category="Skills"
+				set hidden = 1
 							src.Instinct=1
 						if("Resolve")
 							src.LikeWater=usr.SagaLevel / 2
@@ -170,6 +163,7 @@ Mangekyou_Sharingan
 			OffMessage="closes their eyes to the truth of the world..."
 			verb/Rinnegan()
 				set category="Skills"
+				set hidden = 1
 				src.Trigger(usr)
 
                 */

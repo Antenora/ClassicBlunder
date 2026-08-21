@@ -52,26 +52,25 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	//50% injury check
 	var/exhaustedMessage = SpecialBuff ? SpecialBuff.ExhaustedMessage : FALSE
 	var/desperateMessage = SpecialBuff ? SpecialBuff.DesperateMessage : FALSE
-	if(TotalInjury > 50 && !src.InjuryAnnounce && Secret!="Zombie")
+	if(TotalInjury > 50 && !src.InjuryAnnounce)
 		OMessage(10, "[src] looks beaten half to death!")
 		InjuryAnnounce = 1
 
 	// Nanite Check
-	if(NanoBoost && Health<=25*(1-HealthCut)&&!NanoAnnounce)
+	if(NanoBoost && HealthPct()<=25*(1-HealthCut)&&!NanoAnnounce)
 		OMsg(src, "<font color='[src.NanoColor]'>[src][src.NanoBoostMessage]</font color>")
 		NanoAnnounce = 1
 		if(Saga && !(Saga in glob.CYBERIZESAGAS))
 			Unconscious(src, "cybernetic implosion!")
 	// 25% health check
-	if(Health < 25*(1-HealthCut) && !HealthAnnounce25)
+	if(HealthPct() < 25*(1-HealthCut) && !HealthAnnounce25)
 		if(exhaustedMessage)
 			OMessage(10, "<font color=#00FF55>[src] [exhaustedMessage]", "[src]([src.key]) has 25% health left.</font>")
 		else
-			if(Secret != "Zombie")
-				if(!ExhaustedColor)
-					OMessage(10, "<font color=#F07E1F>[src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
-				else
-					OMessage(10,"<font color='[ExhaustedColor]'> [src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
+			if(!ExhaustedColor)
+				OMessage(10, "<font color=#F07E1F>[src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
+			else
+				OMessage(10,"<font color='[ExhaustedColor]'> [src] [ExhaustedMessage ? "[ExhaustedMessage]" : " looks exhausted!"]!", "[src]([src.key]) has 25% health left.</font>")
 		var/shonenMoment = ShonenPowerCheck(src)
 		if(shonenMoment)
 			VaizardHealth += triggerPlotArmor(shonenMoment, HasUnstoppable())
@@ -80,15 +79,14 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		HealthAnnounce25 = 1
 
 	// 10% health check
-	if(Health < 10*(1-HealthCut) && !HealthAnnounce10)
+	if(HealthPct() < 10*(1-HealthCut) && !HealthAnnounce10)
 		if(desperateMessage)
 			OMessage(10, "<font color=#00FF55>[src] [desperateMessage]", "[src]([src.key]) has 10% health left.</font>")
 		else
-			if(Secret !="Zombie")
-				if(!BarelyStandingColor)
-					OMessage(10, "<font color=#F07E1F>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
-				else
-					OMessage(10,"<font color='[BarelyStandingColor]'>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
+			if(!BarelyStandingColor)
+				OMessage(10, "<font color=#F07E1F>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
+			else
+				OMessage(10,"<font color='[BarelyStandingColor]'>[src] [BarelyStandingMessage ? "[BarelyStandingMessage]" : " is barely standing!"]!", "[src]([src.key]) has 10% health left.</font>")
 		HealthAnnounce10 = 1
 //**TESTED AND WORKS */
 /mob/proc/reduceErodeStolen()
@@ -166,7 +164,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && Anger!=0)
+		if(HealthPct()>=75*(1-HealthCut) && (Anger||AngerTier||AngerRush||AngerCalmHigh))
 			calmcounter--
 		else
 			calmcounter=5
@@ -215,9 +213,6 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 				if(SpecialBuff.BuffName == "Ripper Mode")
 					SpecialBuff?:sandevistanUsages = 0
 					src << "Your Sandevistan Usages has been reset."
-		if(Secret == "Zombie" && MeditateTime == 70)
-			zombieGetUps = 0
-			src << "Your get ups have been reset"
 		if(Secret == "Black Flash")
 			var/SecretInformation/BlackFlash/bf = getBlackFlashSecret();
 			if (bf.BlackFlashChance != bf.BlackFlashBaseChance)
@@ -230,11 +225,18 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			RG.RoyalMeter = 0
 			src << "Your Royal Meter went back to 0."
 			src.client.updateRGMeter()
-
+		if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic") && HyperdeathMeterCurrent>0)
+			HyperdeathMeterCurrent=0
+			HyperMeterUpdate()
+			src << "Your Hyperdeath gauge reset to 0."
 		if(calmcounter<=0)
 			calmcounter=5
 			if(Anger)
 				Calm()
+			else if(AngerTier||AngerRush||AngerCalmHigh)
+				AngerTier=0
+				AngerRush=0
+				AngerCalmHigh=0
 	//	if(MeditateTime == 15)
 	//		src << "If any skills reset on Meditate, they've been reset."
 		if(CheckSpecial("Jinchuuriki") || CheckSpecial("Vaizard Mask"))
@@ -260,20 +262,20 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			drain = 0
 		if(InfinityModule)
 			drain = 0
-		if(Energy < drain && !HasNoRevert() && !Dead && !HasMystic())
+		if(Energy < drain && !Dead && !HasMystic())
 
 			Revert()
 			LoseEnergy(drain)
 			src<<"The strain of your transformation forced you to revert."
 
-	if(trans==4 && transMastery < 100 && isRace(CHANGELING))
+/*	if(trans==4 && transMastery < 100 && isRace(CHANGELING))
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
-		if(Energy < drain && !HasNoRevert())
+		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
-			src<<"The strain of Golden Form forced you to revert!"
+			src<<"The strain of Golden Form forced you to revert!"*/
 
 /mob/proc/doLoopTimers()
 	if(Lethal-- <= 0 && Lethal)
@@ -294,7 +296,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	if(TimeStop)
 		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = new
 		book = locate() in src
-		LoseHealth(5/book.Mastery)
+		LoseHealth(PctToHP(5/book.Mastery))
 		book:TimeStopped++
 		if(book:TimeStopped>book.Mastery+1)
 			SkillX("Time Stop",x)
@@ -319,9 +321,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	if(!client)
 		mainLoop -= src
 		return
-	// One-shot stale-Kamui-lock cleanup. Proc short-circuits on its first line
-	// once the lock clears, so per-tick cost is one var read for any player
-	// without a stuck lock. Locked players unstick on their next gain tick.
+	//unsticks a stale Kamui lock, near-free once it clears
 	if(KamuiBuffLock)
 		AutoClearStaleKamuiLock()
 	if(src.KO&&src.icon_state!="KO")
@@ -372,9 +372,10 @@ mob
 				p.Auto_Attack()
 		StunCheck(src)
 		StunImmuneCheck(src)
-		if(glob.BREAK_TARGET && !src.Admin && Target && ismob(Target))
-			var/distance = get_dist(Target, src)
-			if((glob.BREAK_TARGET_ON_Z_CHANGE && Target.z != src.z) || (glob.BREAK_TARGET_ON_DIST && distance >= glob.BREAK_TARGET_ON_DIST))
+		if(!Guarding && GuardMeter > 0)
+			GuardMeter = max(0, GuardMeter - glob.GUARD_METER_DECAY)
+		if(!src.Admin && Target && ismob(Target))
+			if(Target.z != src.z)
 				Target = null
 		MajinAbsorbZoneSafeguard()
 		MajinAbsorbVictimTick()
@@ -446,7 +447,7 @@ mob
 			// else
 			// 	MeditateTime=0
 			var/grit_value = passive_handler["Grit"]
-			if (grit_value >= 1 && Health <= clamp(15 + AscensionsAcquired * 10, 15, 75))
+			if (grit_value >= 1 && HealthPct() <= clamp(15 + AscensionsAcquired * 10, 15, 75))
 				HealHealth(grit_value / glob.racials.GRITDIVISOR)
 				if(prob(15*(AscensionsAcquired+1))&&src.icon_state!="Meditate")//penis text
 					src.VaizardHealth += (grit_value / glob.racials.GRITDIVISOR)
@@ -459,7 +460,7 @@ mob
 			Update_Stat_Labels()
 			if(grabbed && grabbed.Grab == src)
 				if(grabbed.passive_handler["Touch of Death"])
-					LoseHealth(glob.racials.TOD_DMG_PER_TICK * grabbed.passive_handler["Touch of Death"])
+					LoseHealth(PctToHP(glob.racials.TOD_DMG_PER_TICK * grabbed.passive_handler["Touch of Death"]))
 				if(grabbed.passive_handler["Cryokenesis"])
 					CryokenesisTime++
 					if(passive_handler["Fishman"])
@@ -472,7 +473,7 @@ mob
 							StunImmune = 0
 						Stun(src, 1+grabbed.passive_handler["Cryokenesis"])
 						passive_handler.Set("Shellshocked", 1)
-						LoseHealth(glob.racials.CRYOKENESISDAMAGE*grabbed.passive_handler["Cryokenesis"])
+						LoseHealth(PctToHP(glob.racials.CRYOKENESISDAMAGE*grabbed.passive_handler["Cryokenesis"]))
 						CryokenesisTime=0
 			else
 				grabbed = null
@@ -486,10 +487,10 @@ mob
 				// find out the cause
 				var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/ts = FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop)
 				if(ts)
-					src.LoseHealth(5/ts.Mastery)
+					src.LoseHealth(src.PctToHP(5/ts.Mastery))
 					ts:TimeStopped++
 					if(ts:TimeStopped>ts.Mastery+1)
-						src.SkillX("Time Stop",x)
+						src.SkillX("Time Stop",x, noGCD = TRUE)
 			if(passive_handler["Fa Jin"])
 				if(canFaJin())
 					if(!fa_jin_effect)
@@ -532,7 +533,7 @@ mob
 
 
 
-				if(passive_handler["Iaido"])
+				if(UsingFTG())
 					if(client&&hudIsLive("Iaido", /obj/hud/iaido))
 						client.hud_ids["Iaido"]?:Update()
 				else
@@ -550,20 +551,14 @@ mob
 				src.Revert()
 			if(passive_handler.Get("LunarWrath")&&PowerControl>100&&!passive_handler.Get("Unrelenting Wrath"))
 				var/ManaRando=rand(6,15)
-				if(src.Health<50)
+				if(src.HealthPct()<50)
 					ManaRando*=2
 				src.ManaAmount+=0.5*(ManaRando/10)
-			if(passive_handler.Get("LunarAnger")&&!passive_handler.Get("Unrelenting Wrath"))
-				if(ManaAmount>50)
-					src.AngerMax=1+(src.ManaAmount/100)
-					src.Anger=src.AngerMax
-					src.Anger()
-				else if(ManaAmount<=50)
-					src.Anger=0
-					src.AngerMax=1
-			if(passive_handler.Get("Unrelenting Wrath"))
-				src.Anger=src.AngerMax
-				src.AngerMax=5
+			if(passive_handler.Get("LunarWrath"))
+				//berserker rage runs on mana leaving you - spells, drains, leak, all of it
+				if(ManaAmount<AngerManaLast)
+					AngerEvent((AngerManaLast-ManaAmount)*glob.ANGER_RUSH_MANA)
+				AngerManaLast=ManaAmount
 			if(src.CheckSpecial("Hyperdeath Mode"))
 				if(src.HyperdeathMeterCurrent > 0)
 					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - 1
@@ -577,80 +572,80 @@ mob
 				if(src.canHTM())
 					src.race.transformations[2].transform(src, TRUE)
 			if(src.transActive==1&&src.isRace(NAMEKIAN))
-				if(src.Health<=(20+src.Potential/4))
+				if(src.HealthPct()<=(20+src.Potential/4))
 					src.race.transformations[2].transform(src, TRUE)
 			if(passive_handler.Get("TrueZenkai")&&src.transActive>=4)
-				if(Health>=70&&Health<=90)
+				if(HealthPct()>=70&&HealthPct()<=90)
 					if(passive_handler.Get("TrueZenkaiPower")<0.5)
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
-				if(Health>=50&&Health<=69)
+				if(HealthPct()>=50&&HealthPct()<=69)
 					if(passive_handler.Get("TrueZenkaiPower")<0.6)
 						passive_handler.Increase("TrueZenkaiPower", 0.003)
-				if(Health>=30&&Health<=49)
+				if(HealthPct()>=30&&HealthPct()<=49)
 					if(passive_handler.Get("TrueZenkaiPower")<1)
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
-				if(Health>=15&&Health<=29)
+				if(HealthPct()>=15&&HealthPct()<=29)
 					if(passive_handler.Get("TrueZenkaiPower")<2)
 						passive_handler.Increase("TrueZenkaiPower", 0.008)
-				if(Health<=14)
+				if(HealthPct()<=14)
 					if(passive_handler.Get("TrueZenkaiPower")<3)
 						passive_handler.Increase("TrueZenkaiPower", 0.01)
 			if(passive_handler.Get("Full Manifestation"))
 				src.HandleEldritchTax()
 			if(passive_handler.Get("TrueZenkaiPower")&&src.icon_state=="Meditate")
 				passive_handler.Set("TrueZenkaiPower", 0)
-			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
-				if(src.Tension<src.getMaxTensionValue())
+			if(passive_handler["LegendarySaiyan"]&&src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+				if(src.Tension<src.getTensionCap())
 					var/TensionRando=rand(6,15)
 					src.Tension+=0.7 * (glob.TENSION_MULTIPLIER)*(TensionRando/10)
-					if(src.Tension>100)
-						src.Tension=100
+					if(src.Tension>src.getTensionCap())
+						src.Tension=src.getTensionCap()
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
-				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["MovementMastery"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
+				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 					if(!src.Stunned&&!src.Suspended)
-						src.DoDamage(src, (rand(1,5)/30))
+						src.DoDamage(src, src.PctToHP((rand(1,5)/30)))
 			if(passive_handler["Grit"])
 				AdjustGrit("sub", glob.racials.GRITSUBTRACT)
 			if((isRace(HUMAN)||isRace(CELESTIAL)&&CelestialAscension=="Angel") && !isMazokuPathHuman())
-				if(Health<=30)
+				if(HealthPct()<=30)
 					if(transActive==4&&transUnlocked>=5&&DoubleHelix>=4)
 						src.race.transformations[5].transform(src, TRUE)
 			if(isMazokuHuman() && src.icon_state != "Meditate")
 				var/ht_trigger_threshold = isMazokuAscension6() ? 40 : 25
 				// ≤75% HP from base form → activate Devil Trigger (slot 6)
-				if(transActive == 0 && Health <= 75 * (1 - HealthCut) && !src.KO)
+				if(transActive == 0 && HealthPct() <= 75 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// DT to HT drop below threshold
-				if(isInMazokuDT() && Health <= ht_trigger_threshold * (1 - HealthCut) && !src.KO)
+				if(isInMazokuDT() && HealthPct() <= ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// ≤25% HP in HT (Ascension 6 only): revert all HT forms, activate Sacred Energy Aura
-				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && Health <= 25 * (1 - HealthCut) && !src.KO)
+				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && HealthPct() <= 25 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 7)
 						mazokuRevertAllHT()
 						transActive = 6
 						race.transformations[7].transform(src, TRUE)
 				// HP rising SEA to HT (Ascension 6 only)
-				if(isMazokuAscension6() && isInMazokuSEA() && Health > 25 * (1 - HealthCut) && !src.KO)
+				if(isMazokuAscension6() && isInMazokuSEA() && HealthPct() > 25 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// HP rising HT to DT (revert all HT, re-enter Devil Trigger)
-				if(transActive >= 1 && transActive <= 5 && Health > ht_trigger_threshold * (1 - HealthCut) && !src.KO)
+				if(transActive >= 1 && transActive <= 5 && HealthPct() > ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					mazokuRevertAllHT()
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// HP rising DT to base form
-				if(isInMazokuDT() && Health > 75 * (1 - HealthCut) && !src.KO)
+				if(isInMazokuDT() && HealthPct() > 75 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 			if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive>0)
 				if(HellspawnBerserk)
 					HellspawnTimer-=1
 				if(TheCalamity&&BioArmor)
 					BioArmor-=1
-				if(HellspawnTimer <= 0 && HellspawnBerserk||Health<=50&&TheCalamity)
+				if(HellspawnTimer <= 0 && HellspawnBerserk||HealthPct()<=50&&TheCalamity)
 					HellspawnTimer = 0
 					OMsg(src, "<font color='grey'>[src] is no longer posessed by that thing.</font color>")
 					if(HellspawnBerserk)
@@ -667,25 +662,19 @@ mob
 					cut_off = glob.racials.SSJ_BASE_CUT_OFF + (glob.racials.SSJ_CUT_OFF_PER_MAST * (race.transformations[transActive].mastery/100))
 					if(src.passive_handler["SSJ4"])
 						drain/=10
-					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("GodlyCalm"))
+					if(src.HasMystic()||src.CheckSlotless("Beyond God")||src.passive_handler.Get("CalmAnger"))
 						drain = 0
 
 				if(drain>0)
 					src.LoseEnergy(drain)
-					var/_mastery = randValue(glob.racials.SSJ_MIN_MASTERY_GAIN,glob.racials.SSJ_MAX_MASTERY_GAIN)
-					if(glob.racials.AUTO_SSJ_MASTERY)
-						_mastery *= transActive
-						race.transformations[transActive].mastery+=_mastery
-						if(race.transformations[transActive].mastery>=95)
-							race.transformations[transActive].mastery=100
-					if(Energy < cut_off &&!src.HasNoRevert()&&!src.Dead&&!src.HasMystic())
+					if(Energy < cut_off &&!src.Dead&&!src.HasMystic())
 						src.Revert()
 						src.LoseEnergy(30)
 						src<<"The strain of Super Saiyan forced you to revert!"
 
 /*
 			if(src.trans["active"]>3 && src.masteries["4mastery"]<100 && src.Race=="Changeling")
-				if(src.Energy<30&&!src.HasNoRevert())
+				if(src.Energy<30)
 					src.GainFatigue(30)
 					src.Revert()
 					src<<"The strain of Golden Form forced you to revert!"
@@ -708,26 +697,30 @@ mob
 						else
 							src.Transfering=null
 
+			//FocusShift stuff
+			if(src.FocusShiftActive)
+				src.FocusShiftTimer--
+
+				if(src.FocusShiftTimer <= 0)
+					var/bonusCooldown = src.passive_handler.Get("FocusShiftRelease")
+					src.FocusShiftActive = FALSE
+					src.HideShiftAura()
+					src.FocusShiftCooldown = max(60 - (0+bonusCooldown * 2), 5)
+					src << "Your Focus Shift ran out! (Cooldown: [src.FocusShiftCooldown/2] seconds.)"
+
+			if(src.FocusShiftCooldown > 0)
+				src.FocusShiftCooldown--
+
+				if(src.FocusShiftCooldown == 0)
+					src << "<b>Focus Shift is now available.</b>"
+					src.FocusShiftCooldown = -1
+
 			/* not used
 				if(void_timer < world.realtime && voiding)
 					// send to spawn
 					loc = locate(100,100,3)
 					voiding = 0*/
 
-
-/*
-			if(src.Phylactery&&!src.Dead)
-				spawn()
-					var/found=0
-					for(var/obj/Items/Enchantment/Phylactery/Phy in world)
-						if(Phy.Signature==src.ckey)
-							found=1
-							break
-					if(!found)
-						src.Phylactery=0
-						src.NoDeath=0
-						src.Death(null, "their phylactery being destroyed!", SuperDead=1, NoRemains=1)
-*/
 
 			if(passive_handler.Get("ContinuallyStun"))
 				if(prob(passive_handler.Get("ContinuallyStun")))
@@ -775,7 +768,7 @@ mob
 					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
 						Wassail = W
-					if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
+					if(!BuffOn(Wassail) && HealthPct() <= 75*(1-HealthCut))
 						if(!CheckSlotless("Rotschreck"))
 							Wassail.adjust(src)
 							Wassail.Trigger(src, Override=1)
@@ -794,20 +787,6 @@ mob
 						src.PoseTime += 1
 						if(src.PoseTime==5)
 							src << "The restraints of your bloodlust crumble away as you dissolve into a living shadow!!"
-
-				if(Secret=="Werewolf")
-					if(passive_handler.Get("SunStricken") && CheckSlotless("Full Moon Form") && !PureRPMode)
-						src << "<font color=#ffcc00>You are afflicted by The Sun, you cannot maintain your cursed form.</font>"
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-							fmf.Trigger(src, Override=1)
-					if(secretDatum.secretVariable["Hunger Active"] == 1)
-						var/SecretInformation/Werewolf/s = secretDatum
-						if(!PureRPMode)
-							s.releaseHunger()
-							if(secretDatum.secretVariable["Hunger Satiation"] <=0 && CheckSlotless("Full Moon Form"))
-								src << "You have exhausted all the flesh you consumed and have reverted from your war form."
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/fmf in src)
-									fmf.Trigger(src, Override=1)
 
 				if(Secret=="Eldritch")
 					if(passive_handler.Get("SunStricken") && CheckSlotless("True Form") && !PureRPMode)
@@ -833,38 +812,34 @@ mob
 					senjutsuOverloadAlert=FALSE
 					src << "You exhaust your natural energy, avoiding death by overexposure."
 
-			if(src.RippleActive()||(!src.CheckSlotless("Half Moon Form")&&!src.CheckSlotless("Full Moon Form"))||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus")||Secret=="Eldritch"&&!CheckSlotless("True Form"))
-				if(src.icon_state=="Train"&&!src.PoseEnhancement)
-					if(src.Secret=="Werewolf"&&!src.PoseTime)
-						src << "You focus your instincts perfectly on the chosen target, ready to leap any second!"
-					src.PoseTime++
-					if(src.PoseTime>=glob.POSE_TIME_NEEDED)
-						if(Secret=="Spiral")
-							icon_state = ""
-							PoseTime = 0
-							if(src.CheckSlotless("Evolution Power"))
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
-									AE.Trigger(src)
-							if(!src.CheckSlotless("Evolution Power"))
-								for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
-									fmf.Trigger(src)
-						if(Secret=="Eldritch")
-							icon_state = ""
-							PoseTime = 0
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+			if(src.icon_state=="Train"&&!src.PoseEnhancement)
+				src.PoseTime++
+				if(src.PoseTime>=glob.POSE_TIME_NEEDED)
+					if(Secret=="Spiral")
+						icon_state = ""
+						PoseTime = 0
+						if(src.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/AE in src)
+								AE.Trigger(src)
+						if(!src.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Evolution_Power/fmf in src)
 								fmf.Trigger(src)
-						if(src.RippleActive() && src.PoseTime==5)
-							src << "The Ripple flows through your body perfectly!  You have gained full control over your breathing!"
-						if(src.RippleActive())
-							if(src.Swim==1)
-								src.RemoveWaterOverlay()
-								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-						if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
-							src << "You managed to mold some natural energy!"
-						if(src.PoseTime >= 5 && src.passive_handler.Get("Stylish"))
-							if(!src.CheckSlotless("Half Moon Form") && !src.CheckSlotless("Full Moon Form"))
-								src.gainStyleRating(1, TRUE)
-								src.PoseTime = 0
+					if(Secret=="Eldritch")
+						icon_state = ""
+						PoseTime = 0
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Eldritch/True_Form/fmf in src)
+							fmf.Trigger(src)
+					if(src.RippleActive() && src.PoseTime==5)
+						src << "The Ripple flows through your body perfectly!  You have gained full control over your breathing!"
+					if(src.RippleActive())
+						if(src.Swim==1)
+							src.RemoveWaterOverlay()
+							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
+					if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
+						src << "You managed to mold some natural energy!"
+					if(src.PoseTime >= 5 && src.passive_handler.Get("Stylish"))
+						src.gainStyleRating(1, TRUE)
+						src.PoseTime = 0
 
 			if(src.Stasis||src.StasisFrozen)
 				src.Stasis-=world.tick_lag
@@ -896,7 +871,7 @@ mob
 
 			if(src.Beaming || src.HasMovingCharge())
 				for(var/obj/Skills/Projectile/Z in Skills)
-					if(Z.Area=="Beam"&&Z.Charging&&Z.ChargeRate)
+					if(Z.Area=="Beam"&&Z.Charging&&Z.ChargeRate&&!Z.HeldBeam)
 						var/beamChargeCap = Z.ChargeRate * BEAM_CHARGE_CAP_MULT
 						if(src.BeamCharging>=0.5&&src.BeamCharging<=beamChargeCap)
 							src.BeamCharging+=src.GetRecov(0.2)*src.GetBeamChargeSpeedMult()
@@ -1158,10 +1133,10 @@ mob
 				if(safety!=0) break
 				safety++
 				if(src.ActiveBuff.HealthDrain)
-					if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-						src.DoDamage(src, TrueDamage(src.ActiveBuff.HealthDrain))
+					if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+						src.DoDamage(src, src.PctToHP(TrueDamage(src.ActiveBuff.HealthDrain)))
 				if(src.ActiveBuff.HealthThreshold&&!src.ActiveBuff.AllOutAttack)
-					if(src.Health<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+					if(src.HealthPct()<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 						if(src.CheckActive("Eight Gates"))
 							var/obj/Skills/Buffs/ActiveBuffs/Eight_Gates/eg = src.ActiveBuff
 							eg.Stop_Cultivation()
@@ -1230,7 +1205,7 @@ mob
 						break
 
 				if(src.ActiveBuff.TooMuchHealth)
-					if(src.Health>=src.ActiveBuff.TooMuchHealth)
+					if(src.HealthPct()>=src.ActiveBuff.TooMuchHealth)
 						src.ActiveBuff.Trigger(src,Override=1)
 						break
 
@@ -1258,7 +1233,7 @@ mob
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 						src.HealCapacity(src.ActiveBuff.CapacityHeal)
 				if(src.ActiveBuff.HealthHeal)
-					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+					if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 							src.HealWounds(src.ActiveBuff.HealthHeal)
 					else
@@ -1328,12 +1303,12 @@ mob
 				if(safety!=0) break
 				safety++
 				var/HealthDrainMult=1
-				if(src.passive_handler.Get("ShiningBrightly")&&src.Health<=25)
+				if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()<=25)
 					HealthDrainMult=0
 				if(src.SpecialBuff.HealthDrain)
-					src.DoDamage(src, TrueDamage(src.SpecialBuff.HealthDrain*HealthDrainMult))
+					src.DoDamage(src, src.PctToHP(TrueDamage(src.SpecialBuff.HealthDrain*HealthDrainMult)))
 				if(src.SpecialBuff.HealthThreshold&&!src.SpecialBuff.AllOutAttack)
-					if(src.Health<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+					if(src.HealthPct()<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 						src.SpecialBuff.Trigger(src,Override=1)
 						break
 
@@ -1386,7 +1361,7 @@ mob
 						break
 
 				if(src.SpecialBuff.TooMuchHealth)
-					if(src.Health>=src.SpecialBuff.TooMuchHealth)
+					if(src.HealthPct()>=src.SpecialBuff.TooMuchHealth)
 						src.SpecialBuff.Trigger(src,Override=1)
 						break
 
@@ -1407,7 +1382,7 @@ mob
 				if(src.SpecialBuff.CapacityHeal)
 					src.HealCapacity(src.SpecialBuff.CapacityHeal)
 				if(src.SpecialBuff.HealthHeal)
-					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+					if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						src.HealWounds(src.SpecialBuff.HealthHeal)
 					else
 						src.HealHealth(src.SpecialBuff.HealthHeal)
@@ -1527,11 +1502,7 @@ mob
 				if(B.Using)
 					del B
 
-			// AGLock depends only on src.contents and src.passive_handler — invariant
-			// for the duration of this gain tick. Compute once before the Autonomous
-			// loop instead of recomputing per-buff. Prior code was O(N_Autonomous ×
-			// N_Contents) per tick: a player with admin-granted "all skills" walked
-			// ~30 Autonomous × ~300 contents = ~9000 inner iterations every tick.
+			//invariant for the whole tick, compute once instead of per-buff
 			var/PrecomputedAGLock = 0
 			for(var/obj/Items/omni in src.contents)
 				if(omni.LocksOutAutonomous && omni.suffix=="*Equipped*")
@@ -1568,7 +1539,7 @@ mob
 						if(!src.WoundIntent)
 							continue
 					if(A.NeedsHealth&&!A.Using&&!src.KO&&!AGLock)
-						if(src.Health<=A.NeedsHealth*(1-src.HealthCut))
+						if(src.HealthPct()<=A.NeedsHealth*(1-src.HealthCut))
 							A.Trigger(src,Override=1)
 							if(A.NeedsVary)
 								A.NeedsHealth=rand(10,A.TooMuchHealth-5)
@@ -1690,12 +1661,12 @@ mob
 							A.Trigger(src,Override=1)
 							continue
 					if(A.TooMuchHealth)
-						if(src.Health>=A.TooMuchHealth)
+						if(src.HealthPct()>=A.TooMuchHealth)
 							if(A.SlotlessOn)
 								A.Trigger(src,Override=1)
 								continue
 					if(A.TooLittleHealth)
-						if(src.Health<=A.TooLittleHealth)
+						if(src.HealthPct()<=A.TooLittleHealth)
 							if(A.SlotlessOn)
 								A.Trigger(src,Override=1)
 								continue
@@ -1740,8 +1711,8 @@ mob
 				animate(src.client, color=list(1,0,0, 0.25,0.75,0, 0.25,0,0.75, 0,0,0), time=3) */
 			if(src.KO||src.MortallyWounded>3)
 				if(prob(10*src.MortallyWounded/src.GetRecov()))
-					src.Health-=10/max(src.Health,10)
-					if(src.Health<=-300)
+					src.Health-=src.PctToHP(10/max(src.HealthPct(),10))
+					if(src.Health<=-3*src.MaxHP())
 						if(prob(90/GetRecov())&&!src.StabilizeModule)
 							src.Death(null,"internal injuries!")
 						else
@@ -1752,23 +1723,9 @@ mob
 
 	//Okay, stuff past here may be sources of lag. This is just a comment to note this.
 		var/BreathingMaskOn=0
-		if(isturf(loc))
-			var/turf/T = loc
+		var/turf/T = GfxGroundTurf(src)
+		if(T)
 			if(T.effectApplied)
-				//TODO if u reuse this make it a switch
-				switch(T.effectApplied)
-					if("Stellar")
-						if(!passive_handler.Get("Constellation"))
-						// start draining or somethin
-							if(Energy > 1)
-								Energy -= 0.15
-							if(TotalFatigue < 99)
-								TotalFatigue += 0.15
-						else
-							if(Energy < 99)
-								Energy += 0.15
-							if(TotalFatigue > 0)
-								TotalFatigue -= 0.15
 				if(isdatum(T.effectApplied))
 					if((istype(T.effectApplied, /datum/DemonRacials)))
 						if(src != T.ownerOfEffect)
@@ -1780,11 +1737,11 @@ mob
 							T.effectApplied?:applyEffects(src, T.ownerOfEffect, dmg)
 
 			if(!passive_handler.Get("StaticWalk")&&!src.Dead)
-				if(istype(loc,/turf/Special/Static))
-					src.Health-=0.05
-				if(istype(loc,/turf/Dirt99))
-					src.Health-=0.05
-			if(istype(loc,/turf/Special/Stars)||istype(loc,/turf/Special/EventStars))
+				if(istype(T,/turf/Special/Static))
+					src.Health-=src.PctToHP(0.05)
+				if(istype(T,/turf/Dirt99))
+					src.Health-=src.PctToHP(0.05)
+			if(istype(T,/turf/Special/Stars)||istype(T,/turf/Special/EventStars))
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
 						BreathingMaskOn=1
@@ -1797,7 +1754,7 @@ mob
 						src.LoseEnergy(20)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
 				else if(BreathingMaskOn==1)
@@ -1811,10 +1768,10 @@ mob
 						src.LoseEnergy(20)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
-			else if(loc:Deluged||istype(loc,/turf/Waters)||istype(loc,/turf/Special/Ichor_Water)||istype(loc,/turf/Special/Midgar_Ichor))
+			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
 				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN, WILDER, ELDRITCH))
 					BreathingMaskOn=1
@@ -1839,59 +1796,59 @@ mob
 						if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 							src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 				if(!IgnoresWater)
-					if(istype(loc,/turf/Waters/Water7))
-						if(!HasWalkThroughHell())
-							if(!isRace(DEMON)&&!GetHellPower())
+					if(istype(T,/turf/Waters/Water7))
+						if(!src.HasWalkThroughHell())
+							if(!isRace(DEMON)&&!src.GetHellPower())
 								src.AddBurn(10)
 					else
 						if(src.Burn)
 							src.Burn-=(src.Burn/20)
 							if(src.Burn<0)
 								src.Burn=0
-					if(istype(loc,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Waters/WaterD) && !src.HasVenomImmune())
+					if(istype(T,/turf/Waters/WaterD) && !src.HasVenomImmune())
 						src.AddPoison(2)
-					if(istype(loc,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
 						src.AddPoison(1)
-					if(istype(loc,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
+					if(istype(T,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
 						src.AddPoison(1)
 					if(Swim==0)
 						src.RemoveWaterOverlay()
 						spawn()
-							if(loc:Deluged)
+							if(T.Deluged)
 								src.overlays+=image('WaterOverlay.dmi',"Deluged")
-								var/mob/p = loc:ownerOfEffect
+								var/mob/p = T.ownerOfEffect
 								if(p!= src && p)
 									src.AddSlow(10 + (5 * p.AscensionsAcquired))
 									src.AddShock(10 + (5 * p.AscensionsAcquired))
 							else if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 								src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-							else if(loc.type==/turf/Waters/Water7/LavaTile)
+							else if(T.type==/turf/Waters/Water7/LavaTile)
 								src.overlays+=image('LavaTileOverlay.dmi')
 							else
-								src.overlays+=image('WaterOverlay.dmi',"[loc.icon_state]")
+								src.overlays+=image('WaterOverlay.dmi',"[T.icon_state]")
 					if(!Swim)
 						Swim=1
 						if(isplayer(src))
 							src:move_speed = MovementSpeed()
 					if(!src.KO)
 						var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
-						if(loc:Shallow==1)
+						if(T.Shallow==1)
 							amounttaken=0
 						if(src.SlotlessBuffs["Sparkling Ripple"] && src.Secret=="Hamon")
 							amounttaken=0
 						if(BreathingMaskOn)
 							amounttaken=0
-						if(loc:Deluged==1)
+						if(T.Deluged==1)
 							amounttaken=4
 						if(isRace(WILDER))
 							amounttaken=0
@@ -1912,7 +1869,7 @@ mob
 							if(BreathingMaskOn==0)
 								src.Oxygen=0
 								src.DamageSelf(TrueDamage(1))
-								if(src.Health<-300)
+								if(src.Health < -3*src.MaxHP())
 									if(prob(20)&&!src.StabilizeModule)
 										src.Death(null,"oxygen deprivation!")
 							else
@@ -1922,7 +1879,7 @@ mob
 									src.LoseEnergy(20)
 									if(src.TotalFatigue>=95)
 										src.DamageSelf(TrueDamage(1))
-										if(src.Health<-300)
+										if(src.Health < -3*src.MaxHP())
 											if(prob(20)&&!src.StabilizeModule)
 												src.Death(null,"oxygen deprivation!")
 			else
@@ -1941,7 +1898,7 @@ mob
 					src.LoseEnergy(20)
 					if(src.TotalFatigue>=95)
 						src.DamageSelf(TrueDamage(1))
-						if(src.Health<-300)
+						if(src.Health < -3*src.MaxHP())
 							if(prob(20)&&!src.StabilizeModule)
 								src.Death(null,"oxygen deprivation!")
 

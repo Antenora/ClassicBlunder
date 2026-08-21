@@ -3,8 +3,7 @@
         "Steady": [2, 10],
         "Godspeed": [1, 5],
         "Extend": [1, 2],
-		"Half-Sword": [1, 2],
-        "SpiritSword": [1, 1]
+		"Half-Sword": [1, 2]
     },
     "SWORD_PASSIVES_II": {
         "MagicSword": [1, 1],
@@ -16,14 +15,12 @@
     "SWORD_PASSIVES_III": { 
         "Duelist": [1, 4],
         "TripleStrike": [1, 2],
-        "CriticalChance": [10, 30],
         "BulletKill": [1, 1]
     },
     "SWORD_PASSIVES_IV": {
         "KillerInstinct": [0.5, 1],
         "HardStyle": [1, 3],
         "Parry": [1, 3],
-        "BlurringStrikes": [2, 6],
 		"AsuraStrike": [1, 1],
 		"Musoken": [1, 1]
     },
@@ -31,26 +28,21 @@
 		"GiantSwings": [1, 1]
     },
     "UNARMED_PASSIVES_I": {
-        "BlurringStrikes": [1, 5],
         "Adrenaline": [1, 5],
         "Godspeed": [2, 6],
         "Momentum": [1, 4]
     },
     "UNARMED_PASSIVES_II": {
-        "SpiritHand": [4, 4],
-        "HybridStrike": [1, 4],
         "SoftStyle": [1, 3],
         "HardStyle": [1, 3]
     },
     "UNARMED_PASSIVES_III": {
         "Duelist": [1, 4],
-        "SpiritStrike": [1, 1],
         "FluidForm": [1, 2],
         "LifeSteal": [5, 25]
     },
     "UNARMED_PASSIVES_IV": {
         "ComboMaster": [1, 1],
-        "Brutalize": [2, 6],
         "LikeWater": [1, 5],
         "Flow": [2, 6],
 		"Warping": [1, 4],
@@ -58,19 +50,16 @@
     },
     "STAFF_PASSIVES_I": {
         "SoulFire": [1, 4],
-        "SpiritHand": [4, 4],
         "MovingCharge": [1, 1],
         "QuickCast": [1, 3]
     },
     "STAFF_PASSIVES_II": {
-        "HybridStrike": [1, 4],
         "EnergySteal": [10, 50],
         "ManaSteal": [5, 25]
     },
     "STAFF_PASSIVES_III": {
         "ManaStats": [2, 8],
-        "ManaGeneration": [5, 25],
-        "SpiritFlow": [2, 6]
+        "ManaGeneration": [5, 25]
     },
     "STAFF_PASSIVES_IV": {
         "KillerInstinct": [0.5, 1],
@@ -90,7 +79,6 @@
         "Harden": [1, 5]
     },
     "ARMOR_PASSIVES_II": {
-        "DebuffResistance": [0.5, 2],
         "SweepingStrike": [1, 1],
         "GiantForm": [1, 1],
         "Flow": [1, 5]
@@ -109,10 +97,8 @@
     },
     "ARMOR_PASSIVES_V": {
         "LifeGeneration": [1, 5],
-        "Brutalize": [2, 6],
         "DemonicDurability": [1, 5],
         "DebuffReversal": [1, 1],
-		"Siphon": [1, 5],
 		"InjuryImmune": [1, 1],
 		"FatigueImmune": [1, 1]
     },
@@ -135,7 +121,6 @@
         "Blubber": [1, 4]
     },
     "GENERIC_PASSIVES_IV": {
-        "FluidForm": [1, 2],
         "BlockChance": [10, 30],
         "EnergyGeneration": [1, 4]
     },
@@ -160,7 +145,6 @@
     "CORRUPTION_PASSIVES_III": {
         "DarknessFlame": [3, 15],
         "SoulFire": [1, 4],
-        "Brutalize": [1, 5],
         "Tenacity": [2, 6],
         "MovementMastery": [2, 10]
     },

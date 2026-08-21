@@ -11,6 +11,7 @@
     Enchant_Spell
         verb/Enchant_Spell()
             set category="Utility"
+            set hidden = 1
             if(!usr.canEnchant(enchanting)) return;
             enchanting=1;
             usr.enchantSpellMain();
@@ -18,6 +19,7 @@
 
         verb/Disenchant_Spell()//insert the mcr link here
             set category="Utility"
+            set hidden = 1
             if(!usr.canEnchant(enchanting)) return;
             enchanting=1;
             usr.disenchantSpellMain();
@@ -140,22 +142,22 @@
             projectileOnlyPassives = list("Distance" = 8)
         flashfreeze
             name="Flashfreeze"
-            passives = list("Freezing" = 6, "ApplySlow" = 1)
+            passives = list("Freezing" = 6)
             autohitOnlyPassives = list("Chilling" = 3)
             projectileOnlyPassives = list("Chilling" = 3)
         sublimate//phase transition
             name="Sublimate"
             passives = list("Chilling" = 4)
-            autohitOnlyPassives = list("ForOffense" = 0.5, "StrOffense" = 0.5, "DamageMult" = 1.15)
-            projectileOnlyPassives = list("ForRate" = 0.5, "StrRate" = 0.5, "DamageMult" = 1.15)
+            autohitOnlyPassives = list("ForScaling" = 0.5, "StrScaling" = 0.5, "DamageMult" = 1.15)
+            projectileOnlyPassives = list("ForScaling" = 0.5, "StrScaling" = 0.5, "DamageMult" = 1.15)
         
     fire
         spellElement="Fire";
         blaze//fire
             name="Blaze";
             passives = list("Scorching" = 4);
-            autohitOnlyPassives = list("StrOffense" = 0.5, "ForOffense" = 0.5, "DamageMult"=1.2);
-            projectileOnlyPassives = list("StrRate" = 0.5, "ForRate"=0.5, "DamageMult"=1.2);
+            autohitOnlyPassives = list("StrScaling" = 0.5, "ForScaling" = 0.5, "DamageMult"=1.2);
+            projectileOnlyPassives = list("StrScaling" = 0.5, "ForScaling"=0.5, "DamageMult"=1.2);
             buffOnlyPassives = list("PureDamage"=2);
         magma
             name="Magma";
@@ -168,7 +170,7 @@
         nuclear
             name="Nuclear"
             passives = list("DarknessFlame" = 1, "Toxic" = 4);
-            autohitOnlyPassives = list("EndDefense" = -0.25);
+            autohitOnlyPassives = list("EndEffectiveness" = -0.25);
             projectileOnlyPassives = list("Endrate" = -0.25);
 
     air
@@ -221,7 +223,7 @@
         paradox//temporal echo
             name="Paradox"
             passives = list("DamageMult" = 1.25, "PureDamage" = 2)
-            autohitOnlyPassives = list("StrOffense" = 0.5, "ForOffense" = 0.5)
+            autohitOnlyPassives = list("StrScaling" = 0.5, "ForScaling" = 0.5)
             projectileOnlyPassives = list("Explode" = 1)
         chargeflux
             name="Charge Flux"

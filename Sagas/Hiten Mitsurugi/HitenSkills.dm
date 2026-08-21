@@ -2,14 +2,14 @@
     JawStrike//t1
         name="Ryushosen"
         StyleNeeded="Hiten Mitsurugi"
-        DamageMult=2
+        DamageMult=3.3
         AccuracyMult = 4
         SpeedStrike=2
         KBMult=0.0001
         Launcher=3
         Rapid=1
         Duration=5
-        Cooldown=30
+        Cooldown=8
         EnergyCost=2
         HitMessage="strikes their opponent in the jaw with the flat of their sword!"
         verb/Ryushosen()
@@ -18,13 +18,14 @@
     FallingBlade//t1
         name="Ryutsuisen"
         StyleNeeded="Hiten Mitsurugi"
-        DamageMult=2.5
+        DamageMult=3.3
         AccuracyMult = 4
         SpeedStrike=2
         Dunker=2
+        NoGCD=1
         Rapid=1
         Duration=5
-        Cooldown=30
+        Cooldown=8
         EnergyCost=2
         HitMessage="jumps up and brings their blade down to add momentum to their strike!"
         verb/Ryutsuisen()
@@ -33,15 +34,15 @@
     Twin_Dragon_Slash//T3
         name="Souryusen"
         StyleNeeded="Hiten Mitsurugi"
-        DamageMult=5
+        DamageMult=14.17
         AccuracyMult = 4
         KBMult=0.0001
         SpeedStrike=2
         Duration=5
         Instinct=3
-        Cooldown=120
+        Cooldown=30
         Rapid=1
-        EnergyCost=5
+        EnergyCost=8
         HitMessage="strikes with their blade faster than the eye can see!"
         HitStep=/obj/Skills/Queue/Sheath_Strike
         MissStep=/obj/Skills/Queue/Sheath_Strike
@@ -50,7 +51,7 @@
             usr.SetQueue(src)
     Sheath_Strike//T3
         HitMessage="whips their sheath to follow up with their blade!"
-        DamageMult=1
+        DamageMult=2.83
         AccuracyMult = 4
         KBMult=2
         SpeedStrike=4
@@ -68,7 +69,7 @@
     Nine_Dragons_Strike//T5
         name="Kuzuryusen"
         StyleNeeded="Hiten Mitsurugi"
-        DamageMult=1
+        DamageMult=2.75
         AccuracyMult = 4
         KBMult=0.00001
         SpeedStrike=6
@@ -78,7 +79,7 @@
         Warp=10
         Duration=20
         Finisher=1
-        Cooldown=180
+        Cooldown=45
         HitSparkIcon='Hit Effect Ripple.dmi'
         HitSparkX=-32
         HitSparkY=-32
@@ -88,7 +89,7 @@
         Rapid=1
         PushOutIcon='BLANK.dmi'
         Instinct=4
-        EnergyCost=5
+        EnergyCost=8
         verb/Kuzuryusen()
             set category="Skills"
             usr.SetQueue(src)
@@ -96,7 +97,7 @@
         name="Amakakeru Ryuu no Hirameki"
         StyleNeeded="Hiten Mitsurugi"
         Duration=8
-        DamageMult=8
+        DamageMult=20
         SpeedStrike=15
         AccuracyMult=4
         KBMult=0.00001
@@ -108,8 +109,8 @@
         Rapid=1
         Counter=1
         NoWhiff=1
-        AntiSunyata=1
         Cooldown=-1
+        EnergyCost=12
         HitSparkIcon='Slash - Power.dmi'
         HitSparkX=-32
         HitSparkY=-32
@@ -128,7 +129,7 @@
     Heavenly_Dragon_Claw//T6
         StyleNeeded="Hiten Mitsurugi"
         Duration=10
-        DamageMult=8 // but gimp damage since u will be doing 3x
+        DamageMult=20 // but gimp damage since u will be doing 3x
         SpeedStrike=15 // p much get all ur speed
         AccuracyMult=20
         KBAdd=10
@@ -139,7 +140,6 @@
         Counter=1
         NoWhiff=1
         Determinator=1
-        AntiSunyata=1
         Decider=1
         Finisher=1
         HitSparkIcon='Slash - Power.dmi'
@@ -153,16 +153,15 @@
         name="Ryusousen"
         StyleNeeded="Hiten Mitsurugi"
         Area="Arc"
-        StrOffense=1
-        DamageMult = 3
+        StrScaling=1
+        DamageMult = 6.75
         Launcher = 2
         ComboMaster = 1
-        EnergyCost=2
-        Rush=3
-        ControlledRush=1
-        Cooldown=60
+        EnergyCost=3
+        Rush=6
+        ControlledRush=0
+        Cooldown=15
         Icon='Nest Slash.dmi'
-        IconTime=0.7
         IconX=-16
         IconY=-16
         Size=0.8
@@ -184,15 +183,15 @@
         StyleNeeded="Hiten Mitsurugi"
         Area="Wave"
         ComboMaster = 1;
-        StrOffense=1
-        DamageMult=5
+        StrScaling=1
+        DamageMult=0.9
         ChargeTech=1
         SpeedStrike = 2
-        Crippling = 50
+        Crippling = 30
         PassThrough = 1
         ChargeTime=0
         DelayTime=0
-        Cooldown=60
+        Cooldown=15
         Distance = 3
         Size=1
         Rounds=6
@@ -205,7 +204,7 @@
         HitSparkSize=0.8
         HitSparkTurns=1
         TurfStrike=1
-        EnergyCost=2
+        EnergyCost=3
         NoLock=1
         NoAttackLock=1
         ActiveMessage="bursts forward, performing a whirling slash!"
@@ -216,18 +215,19 @@
     Sonic_Sheath//T4
         name="Ryumeisen"
         Area="Circle"
-        StrOffense=1
+        StrScaling=1
         StyleNeeded="Hiten Mitsurugi"
-        DamageMult=10
+        DamageMult=13.75
         Distance=7
         GuardBreak = 1
         PassThrough=1
-        Stunner=5
+        Stunner=3
         PreShockwave=1
         Shockwave=5
         Shockwaves=5
         PostShockwave=0
-        Cooldown=180
+        Cooldown=45
+        EnergyCost=8
         NoLock=1
         NoAttackLock=1
         HitSparkIcon='BLANK.dmi'
@@ -243,7 +243,7 @@
             name="Doryusen"
             Distance=5
             AccMult = 1.25
-            DamageMult=2
+            DamageMult=1.5
             Blasts=5
             Radius=1
             Slashing=0
@@ -251,7 +251,7 @@
             Crushing=2
             Crippling=2
             EnergyCost=5
-            Cooldown=90
+            Cooldown=25
             Stream=2
             IconLock='Boulder Normal2.dmi'
             IconSize=0.2
@@ -268,7 +268,7 @@
         StrMult = 1.2
         SpdMult = 1.3
         OffMult = 1.3
-        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3, "Flow" = 4)
+        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3)
         ActiveMessage="draws a second blade in display of mastery of their style!"
         OffMessage="sheathes their second blade..."
         verb/Dance_Of_The_Full_Moon()
@@ -282,7 +282,7 @@
             TooMuchHealth=75
             StrMult = 1.5
             SpdMult = 1.5
-            passives = list("TripleStrike" = 0.25, "MovementMastery"=5, "Instinct" = 1, "AutoAnger"=1, "EndlessAnger"=1, "Curse" = 1)
+            passives = list("TripleStrike" = 0.25,  "EndlessAnger"=1)
             IconLock='SlayerEyes.dmi'
             LockX=0
             LockY=0
@@ -295,8 +295,6 @@
                 if(!User.BuffOn(src))
                     Mastery = (User.SagaLevel-3);
                     passives["TripleStrike"] = (0.25*Mastery);
-                    passives["MovementMastery"] = max(5, 2.5*Mastery);
-                    passives["Instinct"] = Mastery;
                     if(Mastery>=4) passives["TechniqueMastery"]=5;
                     NeedsHealth = min(90, 50 + ((Mastery-1) * 12.5));
                     TooMuchHealth = min(100, 75 + ((Mastery-1) * 6.25));

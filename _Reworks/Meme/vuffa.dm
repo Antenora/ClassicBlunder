@@ -18,12 +18,14 @@ vuffa
 vuffa/verb/toggleVuffaMoment()
     set name = "Vuffa Moment"
     set category = "Utility"
+    set hidden = 1
     usr.vuffa.vuffaMoment = usr.vuffa.vuffaMoment ? 0 : 1
     usr << "Vuffa Moment is now [usr.vuffa.vuffaMoment ? "on" : "off"]"
 
 vuffa/verb/setVuffaMomentMessage()
     set name = "Set Vuffa Moment Message"
     set category = "Utility"
+    set hidden = 1
     usr << "Enter the message you want to display when you're in a Vuffa Moment."
     usr << "Enter \"none\" to disable the message. example: (name is in a Vuffa Moment! They take ) "
     var/input = input(src, "Enter the message you want to display when you're in a Vuffa Moment.") as text

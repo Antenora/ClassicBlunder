@@ -3,7 +3,7 @@
 	TimerLimit = 60
 	AlwaysOn = 0
 	NeedsPassword = 0
-	passives = list("DebuffResistance" = 2)
+	passives = list()
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/DemonSilence
 	BuffName = "Demon Silence"
@@ -740,7 +740,7 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 		if(!DemonValidTarget(target)) return FALSE
 		if(!ai_owner) return FALSE
 		var/max_est = max(100, ai_owner.Potential * 5)
-		var/missing_ratio = clamp(1 - (ai_owner.Health / max_est), 0, 1)
+		var/missing_ratio = clamp(1 - (ai_owner.HealthPct() / max_est), 0, 1)
 		var/atk_val = StrMod * (1 + missing_ratio * 3)
 		var/dmg = DemonComputeKernelDamage(target, atk_val) * glob.DevilSummonerDemonSkillMod
 		dmg *= dmg_mult
@@ -1000,24 +1000,26 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 		for(var/obj/Skills/s in ai_owner)
 			if(!s.Using) continue
 			if(!s.cooldown_start) continue
-			var/elapsed = world.realtime - s.cooldown_start
-			var/remaining = s.cooldown_remaining - elapsed
+			var/remaining = SkillCDRemaining(s)
 			if(remaining <= 0) continue
 			reduced_any = TRUE
 			if(remaining <= 300)
 				s.Using = 0
 				s.cooldown_remaining = 0
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				var/new_remaining = remaining - 300
 				var/new_start = world.realtime
 				s.cooldown_start = new_start
+				s.cooldown_start_wt = world.time
 				s.cooldown_remaining = new_remaining
 				spawn(new_remaining)
 					if(s && s.cooldown_start == new_start)
 						s.Using = 0
 						s.cooldown_remaining = 0
 						s.cooldown_start = 0
+						s.cooldown_start_wt = 0
 		if(reduced_any)
 			DemonSpawnVFX(src)
 			if(ai_owner) ai_owner << "<font color='#88ff88'>[name] reduced your skill cooldowns!</font>"

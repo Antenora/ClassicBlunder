@@ -3,7 +3,7 @@
         Area="Around Target"
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
+        StrScaling=1
         DamageMult=3
         Distance=2
         DistanceAround=2
@@ -29,13 +29,13 @@
         Falling = 1
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
+        StrScaling=1
         Rounds = 15
         DamageMult = 0.2
         Distance=1
         DistanceAround=1
         IgnoreAlreadyHit=1
-        StrOffense=1
+        StrScaling=1
         Size=1
         Instinct=1
         Cooldown=4
@@ -43,7 +43,7 @@
     Shishi_Sonson
         Area="Wave"
         ComboMaster=1
-        StrOffense=1
+        StrScaling=1
         PassThrough=1
         DamageMult=5
         Size=4
@@ -58,7 +58,7 @@
     Uppercut
         Area="Wave"
         ComboMaster=1
-        StrOffense=1
+        StrScaling=1
         PassThrough=1
         DamageMult=5
         Size=2
@@ -69,7 +69,6 @@
     Toxic_Wheel
         Area="Circle"
         ComboMaster=1
-        AdaptRate=1
         DamageMult=5
         Size=2
         Knockback=1
@@ -82,8 +81,8 @@
     Duel
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
-        EndDefense=0.75
+        StrScaling=1
+        EndEffectiveness=0.75
         DamageMult=2
         Area="Circle"
         Distance=4
@@ -103,7 +102,7 @@
         Area="Around Target"
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
+        StrScaling=1
         DamageMult=3
         Distance=2
         DistanceAround=2
@@ -127,7 +126,7 @@
         Area="Around Target"
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
+        StrScaling=1
         DamageMult=3
         Distance=2
         DistanceAround=2
@@ -151,7 +150,7 @@
         Area="Around Target"
         NoLock=1
         NoAttackLock=1
-        StrOffense=1
+        StrScaling=1
         DamageMult=3
         Distance=2
         DistanceAround=2

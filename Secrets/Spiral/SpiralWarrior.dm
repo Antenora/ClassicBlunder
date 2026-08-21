@@ -35,7 +35,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -48,7 +48,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list("MovementMastery" = 6, "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -79,11 +79,10 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply
 	MagicNeeded=0
 	passives = list("SpiralPowerUnlocked" = 1)
 	adjust(mob/p)
-		switch(p.Health)
+		switch(p.HealthPct())
 			if(1 to 10)
 				passives = list("SpiralPowerUnlocked" = 7)
 				HealthHeal=25
-				p.passive_handler.Set("SpiralSpark", 1)
 			if(11 to 30)
 				passives = list("SpiralPowerUnlocked" = 4)
 			if(31 to 50)
@@ -107,7 +106,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Spiral_King
 	MagicNeeded=0
 	passives = list("SpiralPowerUnlocked" = 1)
 	adjust(mob/p)
-		switch(p.Health)
+		switch(p.HealthPct())
 			if(1 to 10)
 				passives = list("SpiralPowerUnlocked" = 7)
 				HealthHeal=25
@@ -147,20 +146,19 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 			if(m.race.type in INORGANIC_RACES && !m.passive_handler.Get("SpiralEngine"))
 				User << "[m] is synthetic and cannot evolve."
 				m << "[User] tried to inspire you to evolve, but it failed."
-				return
+				continue
 			if(m.race.type in CURSED_RACES || (m.Secret &&  m.Secret != "Spiral"))
 				User << "[m]'s biology is warped by the supernatural, they cannot evolve as you do."
 				m <<"[User] tried to inspire you to evolve, but your supernatural gifts interferred."
-				return
+				continue
 			if(m.race.type in STAGNANT_RACES)
 				User <<"[m] is a supernatural entity. They are incapable of change."
 				m <<"[User] tried to inspire you to evolve, but your nature prevents you from lowering yourself to their level."
-				return
+				continue
 			ActiveMessage="screams: <b>WHEN THERE'S A WALL IN OUR WAY, TEAM [User] DRILLS RIGHT THROUGH IT!</b>"
 			var/obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply/applyBuff = new
 			var/secretLevel = User.secretDatum.currentTier
 			var/SpiralPower=1
-			m.passive_handler.Set("SpiralSpark", 1)
 			switch(secretLevel)
 				if(1 to 2)//this will never happen unless the skill is given unnaturally
 					SpiralPower=1//which, i guess, given the subject matter, is more likely than you'd think
@@ -176,7 +174,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 			applyBuff.EndMult=1.25
 			applyBuff.TimerLimit = 20 * (m.AscensionsAcquired+2)
 			applyBuff.passives = list("SpiralPowerUnlocked" = SpiralPower)
-			applyBuff.passives = list("SpiralSpark" = 1)
 			applyBuff.Trigger(m, 1)
 		User.OMessage(1, null, "[User] inspires the evolution of [User.party.members.len == 1 ? "themselves" : "their party"]!")
 		src.Cooldown(1, null, User)
@@ -206,7 +203,6 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Impose_Evolution
 		var/mob/m = User.Target
 		if(m && ismob(m))
 			var/obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply/applyBuff = new
-			m.passive_handler.Set("SpiralSpark", 1)
 			applyBuff.StrMult=1.25
 			applyBuff.ForMult=1.25
 			applyBuff.EndMult=1.25
@@ -225,7 +221,6 @@ obj/Skills/AutoHit/Spiral
 		HitSparkSize=5
 		HitSparkCount=10
 		HitSparkDispersion=1
-		AdaptRate=1
 		SpecialAttack=1
 		BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply"
 		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Spiral_King"
@@ -234,8 +229,7 @@ obj/Skills/AutoHit/Spiral
 			adjust(usr)
 			usr.Activate(src)
 	Giga_Drill_Maximum
-		AdaptRate=1
-		DamageMult=18
+		DamageMult=20.75
 		Area="Circle"
 		Distance=8
 		TurfStrike=1
@@ -253,14 +247,14 @@ obj/Skills/AutoHit/Spiral
 		HitSparkDispersion=1
 		Earthshaking=15
 		ComboMaster=1
-		Cooldown=180
+		Cooldown=45
+		EnergyCost=8
 	Lagann_Impact
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		AdaptRate=1
-		DamageMult=6
+		DamageMult=1.6
 		Rush=20
-		ControlledRush=1
+		ControlledRush=0
 		WindUp = 0.5
 		Rounds=1
 		Knockback=15
@@ -268,7 +262,8 @@ obj/Skills/AutoHit/Spiral
 		RoundMovement=0
 		NoAttackLock=1
 		NoLock=1
-		Cooldown=2
+		Cooldown=5
+		EnergyCost=1
 		Size=2
 		Distance=2
 		Instinct=10
@@ -285,17 +280,17 @@ obj/Skills/AutoHit/Spiral
 	Lagann_Impact2
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		AdaptRate=1
-		DamageMult=6
+		DamageMult=1.8
 		Rush=20
-		ControlledRush=1
+		ControlledRush=0
 		WindUp = 0.5
 		Rounds=1
 		ComboMaster=1
 		RoundMovement=0
 		NoAttackLock=1
 		NoLock=1
-		Cooldown=3
+		Cooldown=5
+		EnergyCost=1
 		Size=2
 		Distance=2
 		Instinct=10
@@ -314,7 +309,8 @@ obj/Skills/AutoHit/Spiral
 /obj/Skills/Projectile
 	Spiral
 		Probability_Negation_Missiles
-			Cooldown=180
+			Cooldown=45
+			EnergyCost=8
 			ZoneAttack=1
 			ZoneAttackX=8
 			ZoneAttackY=8
@@ -323,12 +319,11 @@ obj/Skills/AutoHit/Spiral
 			RandomPath=1
 			Speed = 0.75
 			Distance=30
-			DamageMult=0.5
-			AdaptRate=1
+			DamageMult=0.2
 			Explode=1
 			Dodgeable=0
 			Deflectable=0
-			EndRate=0.75
+			EndEffectiveness=0.75
 			Blasts=50
 			Delay=0
 			LosesHoming=3

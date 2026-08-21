@@ -35,7 +35,7 @@
 			OverClock = 0
 			StrMult=1.25 + (level * 0.025)
 			EndMult=1.25 + (level * 0.025)
-		passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Anaerobic" = 1, "CriticalDamage" = (0.1 + (level/10)), "CriticalChance" = level * 5, "CriticalBlock" = 1 + level/10, "BlockChance" = level * 5)
+		passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Anaerobic" = 1, "CriticalDamage" = (0.1 + (level/10)), "CriticalBlock" = 1 + (level * 0.15))
 		ActiveMessage="forces their blood into their Kamui, making use of its full power!<br><center><font color='blue'>Life Fiber Override: Kamui Junketsu!</font color></center>"
 		OffMessage="relaxes their bloodflow, allowing the Kamui they wear to revert..."
 
@@ -100,6 +100,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Disciplinary Chair"
 		verb/Bestow_Disciplinary_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -118,6 +119,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Athletic Chair"
 		verb/Bestow_Athletic_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -136,6 +138,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Non Athletic Chair"
 		verb/Bestow_Non_Athletic_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -154,6 +157,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 		role = "Information and Strategy Chair"
 		verb/Bestow_Information_and_Strategy_Chair()
 			set category = "Utility"
+			set hidden = 1
 			if(!usr.Target)
 				usr << "You require a target to do this!"
 				return
@@ -180,7 +184,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 
 	Athletics_Chair
 		SpdMult = 1.25
-		passives = list("Pursuer" = 2, "Godspeed" = 2, "BlurringStrikes" = 0.2)
+		passives = list("Pursuer" = 2, "Godspeed" = 2)
 		ActiveMessage="takes up their role as the Athletics Chair beneath the banner of an empire!"
 		OffMessage="forsakes their role..."
 		verb/Athletics_Chair()
@@ -199,7 +203,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 	Information_and_Strategy_Chair
 		OffMult = 1.15
 		DefMult = 1.15
-		passives = list("Adaptation" = 1, "Flow" = 1, "Instinct" = 1)
+		passives = list()
 		ActiveMessage="takes up their role as the Information and Strategy Chair beneath the banner of an empire!"
 		OffMessage="forsakes their role..."
 		verb/Information_and_Strategy_Chair()
@@ -231,7 +235,7 @@ obj/Skills/Buffs/SpecialBuffs
 		adjust(mob/p)
 			SpdMult = 1.05 + (p.SagaLevel * 0.05)
 			DefMult = 1.05 + (p.SagaLevel * 0.05)
-			passives = list("Skimming" = 2,"Godspeed"=1+p.SagaLevel, "Flicker" = p.SagaLevel, "Flow" = p.SagaLevel/2, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
+			passives = list("Skimming" = 2,"Godspeed"=1+p.SagaLevel, "Flicker" = p.SagaLevel, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
 
 		verb/Kamui_Senpu()
 			set category="Skills"
@@ -265,7 +269,7 @@ obj/Skills/Buffs/SpecialBuffs
 			OffMult = 1.04 + (p.SagaLevel * 0.04)
 			SpdMult = 1.04 + (p.SagaLevel * 0.04)
 			DefMult = 1.04 + (p.SagaLevel * 0.04)
-			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = round(p.SagaLevel/1.5,1), "PureDamage" = round(p.SagaLevel/2.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "Flow" = round(p.SagaLevel/2.5,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = round(p.SagaLevel/1.5,1), "PureDamage" = round(p.SagaLevel/2.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
 
 		verb/Kamui_Senpu_Zanken()
 			set category="Skills"
@@ -283,7 +287,7 @@ obj/Skills/Buffs/SpecialBuffs
 		StyleSpd=1.1
 		SureHitTimerLimit=25
 		SureDodgeTimerLimit=25
-		passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 2, "TechniqueMastery" = 3, "BuffMastery" = 3)
+		passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 2, "TechniqueMastery" = 3)
 		NeedsSecondSword = 1
 		Mastery=4
 		Finisher="/obj/Skills/Queue/Finisher/Generic_Finisher"
@@ -304,10 +308,11 @@ obj/Skills/Buffs/SpecialBuffs
 				SureHitTimerLimit=25 - (2.5 * p.SagaLevel)
 				SureDodgeTimerLimit=25 - (2.5 * p.SagaLevel)
 			if(p.SagaLevel >= 5)
-				passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel, "TechniqueMastery" = p.SagaLevel/2, "BuffMastery" = p.SagaLevel/2)
+				passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel, "TechniqueMastery" = p.SagaLevel/2)
 
 		verb/Toggle_Sword_Count()
 			set category="Other"
+			set hidden = 1
 			if(!src.NeedsSecondSword)
 				src.NeedsSecondSword=1
 				usr << "You decide to wield <font color='yellow'>two</font color> swords."

@@ -38,7 +38,7 @@
         if(passive_handler["Heavy Strike"] == "Fox Fire")
             applyDebuff(enemy, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Soul_Drained, FALSE, FALSE, FALSE)
     if(AttackQueue.WaveHit)
-        var/waveFilter = filter(type="wave", x=3, y=3, size=2)
+        var/waveFilter = filter(type="wave", x=3, y=3, size=1) //516.1674 doubled wave amplitude - size 1 is the old 2
         enemy.filters += waveFilter
         spawn(8)
             if(enemy)

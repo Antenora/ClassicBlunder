@@ -6,16 +6,15 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				HitMessage="delivers a destructive one handed strike!!"
-				DamageMult=2
+				DamageMult=3.9
 				AccuracyMult = 1.1
-				Dominator=2
-				Crippling=5
+				MenuIcon="Ikkotsu"
 				Duration=5
 				KBAdd=10
-				Launcher=1
-				Cooldown=30
+				SplatBonus=1.5
+				Cooldown=5
 				UnarmedOnly=1
-				EnergyCost=2
+				EnergyCost=1
 				name="Ikkotsu"
 				verb/Ikkotsu()
 					set category="Skills"
@@ -25,14 +24,16 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				HitMessage="delivers a vicious uppercut!!"
-				DamageMult=2.2
+				DamageMult=4.5
 				AccuracyMult = 1.15
 				Launcher=3
+				QueueWindup=8
 				Duration=6
+				MenuIcon="Showstopper"
 				KBMult=0.00001
-				Cooldown=30
+				Cooldown=5
 				UnarmedOnly=1
-				EnergyCost=2
+				EnergyCost=1
 				name="Showstopper"
 				verb/Showstopper()
 					set category="Skills"
@@ -43,17 +44,18 @@ obj
 				Copyable=2
 				ActiveMessage="punches with precisely articulated strikes to create whirlwind-like pull!"
 				name="Dempsey Roll"
-				DamageMult=0.33
+				MenuIcon="DempseyRoll"
+				DamageMult=0.9
 				AccuracyMult = 1.15
+				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Bob_and_Weave"
 				Determinator=1
 				KBMult=0.01
 				KBAdd=1
 				Duration=8
-				Cooldown=30
+				Cooldown=5
 				UnarmedOnly=1
-				Combo=5
+				Combo=4
 				Warp=6
-				Stunner=3
 				IconLock='dempsey.dmi'
 				LockX=-16
 				LockY=-16
@@ -69,14 +71,15 @@ obj
 				Copyable=2
 				ActiveMessage="strikes with cyclone power!"
 				name="Corkscrew Blow"
-				DamageMult=0.75
+				DamageMult=3.75
+				WoundRider=0.4
+				MenuIcon="CorkscrewBlow"
 				AccuracyMult = 1.15
 				KBAdd=4
 				Duration=10
-				Cooldown=30
+				Cooldown=5
 				UnarmedOnly=1
 				IconLock='Corkscrew.dmi'
-				MultiHit=5
 				Warp=4
 				EnergyCost=1
 				verb/Corkscrew_Blow()
@@ -84,38 +87,26 @@ obj
 					set name="Corkscrew Blow"
 					usr.SetQueue(src)
 
-			Axe_Kick
-				SkillCost=40
-				Copyable=1
-				name="Axe Kick"//Skill name displayed in message.
-				HitMessage="brings their heel down in a mighty axe kick!!"
-				DamageMult=2
-				AccuracyMult = 1.1
-				Duration=5
-				SpeedStrike=2
-				Cooldown=30
-				UnarmedOnly=1
-				EnergyCost=1.5
-				verb/Axe_Kick()
-					set category="Skills"
-					set name="Axe Kick"//Verb name.
-					usr.SetQueue(src)
 			Kinshasa
 				SkillCost=TIER_1_COST
 				Copyable=2
+				MenuIcon="Kinshasa"
 				AlwaysAnnounceCooldown = 1
 				name="Kinshasa"//Skill name displayed in message.
 				HitMessage="builds up speed and knees their target in the face!!"
-				DamageMult=2.5
+				DamageMult=2.75
 				AccuracyMult = 1.15
 				Duration=6
 				SpeedStrike=3
-				Cooldown=30
+				Warp=6
+				DashScaling=1
+				Cooldown=5
 				Crippling = 8
 				UnarmedOnly=1
-				EnergyCost=1.5
+				EnergyCost=1
 				verb/Disable_Innovate()
 					set category = "Other"
+					set hidden = 1
 					disableInnovation(usr)
 				adjust(mob/p)
 					if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))
@@ -138,15 +129,21 @@ obj
 				Copyable=2
 				name="Piston Kick"//Skill name displayed in message.
 				HitMessage="launches a shattering front kick with their heel!"
-				DamageMult=1.8
+				DamageMult=7
 				Shattering = 12
+				MenuIcon="PistonKick"
 				HarderTheyFall=0.5
 				AccuracyMult = 1.1
 				Opener=3
 				Duration=5
-				Cooldown=30
+				Cooldown=12
 				UnarmedOnly=1
-				EnergyCost=2.5
+				EnergyCost=1
+				MaxCharges=2
+				Charges=2
+				ChargeRefresh=12
+				Launcher=1
+				JuggleBonus=1.15
 				verb/Piston_Kick()
 					set category="Skills"
 					set name="Piston Kick"//Verb name.
@@ -154,15 +151,16 @@ obj
 			Cripple
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=1.5
+				DamageMult=3.75
 				AccuracyMult = 1.15
 				Duration=5
-				Cooldown=30
-				Crippling=50
+				MenuIcon="Cripple"
+				Cooldown=5
 				SpeedStrike=2
 				SweepStrike=2
 				UnarmedOnly=1
-				EnergyCost=2.5
+				EnergyCost=1
+				Shearing=4
 				HitMessage="delivers a crippling strike!"
 				verb/Cripple()
 					set category="Skills"
@@ -170,17 +168,19 @@ obj
 			Pin
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=2.8
+				DamageMult=2.15
 				AccuracyMult = 1.15
 				Instinct=2
 				Grapple=1
+				MenuIcon="Pin"
 				KBMult=0.001
 				Warp=3
 				SweepStrike=1
 				UnarmedOnly=1
 				Duration=5
-				Cooldown=30
-				EnergyCost=2.5
+				Cooldown=5
+				EnergyCost=1
+				RootRider=0.5
 				HitMessage="performs a pinning maneuver!"
 				verb/Pin()
 					set category="Skills"
@@ -192,13 +192,16 @@ obj
 				NewCopyable=2
 				SkillCost=80
 				Copyable=3
-				DamageMult=0.75
+				DamageMult=0.85
 				AccuracyMult = 1.175
+				MenuIcon="LightRush"
 				Duration=5
 				Combo=4
+				StrScaling=0.5
+				ForScaling=0.5
 				Rapid=1
-				Cooldown=30
-				EnergyCost=10
+				Cooldown=5
+				EnergyCost=1
 				IconLock=1
 				HitSparkIcon='Hit Effect Divine.dmi'
 				HitSparkX=-32
@@ -208,7 +211,7 @@ obj
 					set category="Skills"
 					usr.SetQueue(src)
 			Light_Rush2
-				DamageMult=0.15
+				DamageMult=0.5
 				AccuracyMult=25
 				Duration=3
 				Warp=10
@@ -219,15 +222,18 @@ obj
 				name="Burst Combination"
 				SkillCost=80
 				Copyable=3
-				DamageMult=0.15
+				DamageMult=0.4
+				MenuIcon="BurstCombination"
+				StrScaling=0.5
+				ForScaling=0.5
 				AccuracyMult = 1.175
-				Stunner=2
 				Duration=5
 				Combo=10
+				BankedRelease=1
 				Projectile="/obj/Skills/Projectile/BurstBlast"
 				ProjectileCount=1
-				Cooldown=30
-				EnergyCost=3
+				Cooldown=5
+				EnergyCost=1
 				IconLock=1
 				HitSparkIcon='Hit Effect Satsui.dmi'
 				HitSparkX=-32
@@ -239,7 +245,7 @@ obj
 			Sword_Clinch
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=3
+				DamageMult=2.4
 				AccuracyMult = 1.15
 				Instinct=2
 				Grapple=1
@@ -248,8 +254,9 @@ obj
 				Crippling=6
 				NeedsSword = 1
 				Duration=5
-				Cooldown=30
-				EnergyCost=2.5
+				Cooldown=5
+				EnergyCost=1
+				Disarm=1
 				HitMessage="secures their opposition with their blade!"
 				verb/Sword_Clinch()
 					set category="Skills"

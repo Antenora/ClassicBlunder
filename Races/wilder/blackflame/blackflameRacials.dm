@@ -12,9 +12,6 @@
         TurfErupt = 1;
         TurfShift = 'BlackflameTrail.dmi';
         TurfShiftDuration = 5;
-        StrOffense = 0.5;
-        ForOffense = 0.5;
-        EndDefense = 0.75;
         Scorching = 5;
         Toxic = 5;
         FrenzyDebuff = 5;
@@ -26,8 +23,6 @@
         adjust(mob/p)
             //Wilders only have 3 ascensions
             var/asc = p.AscensionsAcquired;
-            StrOffense = 0.5 + (0.15 * asc);
-            ForOffense = 0.5 + (0.15 * asc);
             DamageMult = 1.5 + (0.5 * asc);
             Rounds = 3 + asc;
         verb/Blackflame_Breath()

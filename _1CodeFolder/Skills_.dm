@@ -4,7 +4,8 @@ mob/var/cooldownAnnounce = 1
 mob/verb
 	CooldownAnnouncement()
 		set category = "Other"
-		set name = "Toggle Cooldown Announcement"
+		set hidden = 1
+		set name = "CD Announce"
 		if(usr.cooldownAnnounce)
 			usr.cooldownAnnounce = 0
 			usr << "Cooldown Announcement Disabled."
@@ -17,29 +18,76 @@ mob/verb
 obj/Skills/var
 	cooldown_remaining = 0
 	cooldown_start
+	cooldown_start_wt = 0
+	cooldown_full = 0
+	NoGCD = 0
 	tmp/halve_next_cd = 0
+
+mob/var/tmp/gcd_ready = 0
+mob/var/tmp/gcd_stamp = 0
+mob/var/GCDMult = 1
+
+mob/proc/GCDBlocked(obj/Skills/Z)
+	if(!client) return FALSE
+	if(Z && Z.NoGCD) return FALSE
+	if(world.time >= gcd_ready) return FALSE
+	return world.time != gcd_stamp
+
+mob/proc/StartGCD(obj/Skills/Z)
+	if(!client) return
+	if(Z && Z.NoGCD) return
+	if(PureRPMode) return
+	var/until = world.time + glob.GCD_TIME * max(GCDMult, 0)
+	if(until > gcd_ready)
+		gcd_ready = until
+		gcd_stamp = world.time
+
+mob/proc/GetHaste(obj/Skills/Z)
+	if(!passive_handler) return 0
+	if(Z && Z.CooldownStatic)
+		var/sh = Hustling() ? 100/3 : 0
+		if(istype(Z, /obj/Skills/Dragon_Dash))
+			var/P = min(HasPursuer(), 9)
+			if(P > 0)
+				sh += 100 * P / (10 - P)
+		else if(istype(Z, /obj/Skills/Reverse_Dash))
+			var/M = 1
+			if(Secret == "Haki" && secretDatum && secretDatum.secretVariable["HakiSpecialization"] == "Observation")
+				M += 1
+			if(Saga == "Eight Gates")
+				M += 2
+			if(M > 1)
+				sh += 100 * (M - 1)
+		return sh
+	var/h = passive_handler.Get("Haste")
+	var/tval = passive_handler.tmp_passives["Haste"]
+	if(isnum(tval))
+		h += tval
+	h += GetTechniqueMastery() * 3
+	if(Z)
+		if(Z.ChakraNature && ChakraSpecialization == Z.ChakraNature)
+			h += 18
+		if(Z.SpellElement)
+			h += min(getSpellElementCooldownReduction(Z.SpellElement) * 150, 45)
+	return max(h, -50)
+
+mob/proc/HasteCDMult(obj/Skills/Z)
+	return 100 / (100 + GetHaste(Z))
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
 	if(p)
 		m = p
+	if(ismob(m) && !Time && !istype(src, /obj/Skills/Buffs))
+		m.last_skill_fire_time = world.time
+	if(!Time && ismob(m) && !istype(src, /obj/Skills/Buffs))
+		m.StartGCD(src)
 	if(MaxCharges > 0)
 		if(p) hasMagmicInfusion(p)
 		Charges--
 		if(Charges <= 0)
 			Using = 1
 		if(!Time && m)
-			if(!CooldownStatic)
-				if(glob.SPEED_COOLDOWN_MODE)
-					modify /= clamp(glob.SPEED_COOLDOWN_MIN, m.GetSpd()**glob.SPEED_COOLDOWN_EXPONENT, glob.SPEED_COOLDOWN_MAX)
-				if(m.HasTechniqueMastery())
-					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
-					if(TM < 0)
-						modify *= clamp(1+abs(TM), 1.1, glob.TECHNIQUE_MASTERY_LIMIT)
-					else if(TM > 0)
-						modify /= clamp((1+TM), 0.1, glob.TECHNIQUE_MASTERY_LIMIT)
-			else
-				if(m.Hustling())
-					modify *= 0.75
+			modify *= m.HasteCDMult(src)
 			Time = src.ChargeRefresh * 10 * modify
 		if(isnull(Time) || Time == 0)
 			Time = src.ChargeRefresh * 10
@@ -60,27 +108,13 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			return
 		var/forcemessage=0
 		var/list/lockedoutSkills = list()
+		var/was_fresh = !Time   // a passed Time = an RP-resume re-apply; only a FRESH cast (re)sets cooldown_full
 		if(!Time && src && m)
-			if(!src.CooldownStatic)
-				if(glob.SPEED_COOLDOWN_MODE)
-					modify /= clamp(glob.SPEED_COOLDOWN_MIN, m.GetSpd()**glob.SPEED_COOLDOWN_EXPONENT, glob.SPEED_COOLDOWN_MAX)
-				if(m.HasTechniqueMastery())
-					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
-					if(TM < 0)
-						modify *= clamp(1+abs(TM), 1.1, glob.TECHNIQUE_MASTERY_LIMIT)
-					else if(TM > 0)
-						modify/=clamp((1+(TM)),0.1,glob.TECHNIQUE_MASTERY_LIMIT)
-				if(src.SpellElement)
-					var/elem_cd_red = m.getSpellElementCooldownReduction(src.SpellElement)
-					if(elem_cd_red)
-						modify *= (1 - min(elem_cd_red, 0.80))
-				if(CooldownDrag>=1)
-					modify *= 1 + (CooldownDrag/100)
-					CooldownDrag--
-			else
-				if(m.Hustling())
-					modify*=0.75
-			if(glob.SKILL_BRANCH_LOCK&&LockOut.len>0)
+			modify *= m.HasteCDMult(src)
+			if(!src.CooldownStatic && CooldownDrag>=1)
+				modify *= 1 + (CooldownDrag/100)
+				CooldownDrag--
+			if(LockOut.len>0)
 				for(var/obj/Skills/otherSkills in m.Skills)
 					var/typeString = "[otherSkills.type]"
 					for(var/x in LockOut)
@@ -93,11 +127,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 							otherSkills.Using=1
 			if(src.SpellElement)
 				if(src.SpellElement == "Time")
-					if(m.hasMagePassive(/mage_passive/time/Past))
-						if(!m.CheckSlotless("Outrunning the Past"))
-							m.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Outrunning_the_Past);
 					if(m.hasMagePassive(/mage_passive/time/Present))
-						m.addTension(10, m.getMaxTensionValue())
+						m.addTension(10, m.getTensionCap())
 				else if(src.SpellElement == "Space")
 					if(m.hasMagePassive(/mage_passive/space/Linearity))
 						if(!m.CheckSlotless("Distorted Space"))
@@ -117,22 +148,26 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			if(lockedoutSkills.len)
 				forcemessage = 1
 		cooldown_remaining = Time
+		if(was_fresh) cooldown_full = Time
 		if(m)
 			if(m.PureRPMode)
 				return
 			cooldown_start = world.realtime
-			var/start_time = world.realtime
+			cooldown_start_wt = world.time
+			var/start_time = world.time
 			if(announce_cd && m.cooldownAnnounce && Time/10 > 0 && (AlwaysAnnounceCooldown || Time/10 > 5))
 				m << "[src] has gone on Cooldown ([Time/10] Seconds)"
 			spawn(Time)
-				if(cooldown_start != start_time) return //This instance of the CD was canceled.
+				if(cooldown_start_wt != start_time) return //This instance of the CD was canceled.
 				src.Using=0
 				cooldown_remaining = 0
 				cooldown_start = 0
+				cooldown_start_wt = 0
+				cooldown_full = 0
 				if(Time>=50 || forcemessage)
 					if(src in typesof(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff))
 						return
-					if(glob.SKILL_BRANCH_LOCK&&lockedoutSkills.len>0)
+					if(lockedoutSkills.len>0)
 						for(var/obj/Skills/ski in lockedoutSkills)
 							ski.Using=0
 					if(src.CooldownNote)
@@ -141,12 +176,33 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 						m << "<font color='white'><b>[src] is off cooldown.</b></font color>"
 
 obj/Skills/proc/Recharge(Time, mob/m)
+	var/end_at = world.time + Time
+	if(!recharge_ends)
+		recharge_ends = list()
+	recharge_ends += end_at
 	spawn(Time)
+		if(recharge_ends)
+			recharge_ends -= end_at
 		Charges = min(Charges + 1, MaxCharges)
 		if(Charges > 0)
 			Using = 0
 		if(m && m.cooldownAnnounce)
 			m << "<font color='white'><b>[src] charge restored. ([Charges]/[MaxCharges])</b></font color>"
+
+//perfect-break refund
+obj/Skills/proc/RefundCooldown(frac = 1)
+	if(!Using) return
+	var/elapsed = world.time - cooldown_start_wt
+	var/remaining = max(0, cooldown_remaining - elapsed)
+	var/newTime = remaining * (1 - frac)
+	if(frac >= 1 || newTime < 1)
+		Using = 0
+		cooldown_remaining = 0
+		cooldown_full = 0
+		cooldown_start = 0	//pending spawn self-cancels on the start-stamp mismatch
+		cooldown_start_wt = 0
+		return
+	Cooldown(Time = newTime, announce_cd = 0)
 #define get_turf(A) (get_step(A, 0))
 
 /mob/var/tmp/lastZanzoUsage = 0
@@ -154,27 +210,31 @@ obj/Skills/proc/Recharge(Time, mob/m)
 mob/Players/verb
 	Auto_Attack()
 		set category = "Skills"
+		set hidden = 1
 		client.setPref("autoAttacking", !client.getPref("autoAttacking"))
 		lastHit = world.time
 		src << "You are [client.getPref("autoAttacking") ? "now Auto Attacking." : "no longer Auto Attacking."]"
 	Attack()
 		set category="Skills"
+		set hidden = 1
 		set name="Normal Attack"
 		if(src.icon_state=="Meditate")
 			src.SkillX("Meditate",src)
 		// get step in front, get all stuff on that turf, only use melee if it has more than a turf
 		src.Melee1()
 
-mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
+mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 	if(Z)
 		if(!locate(Z) in src)
 			return  FALSE
 	if(src.KO||src.Stunned||src.AutoHitting||src.Frozen>=2||src.Suspended)
 		return  FALSE
-	if(src.judgement_cut_chain_active && !istype(Z, /obj/Skills/AutoHit/Judgement_Cut))
+	if(src.judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))
 		return FALSE
 	if(src.Stasis)
 		return  FALSE
+	if(!noGCD && GCDBlocked(Z))
+		return FALSE
 	if(Z.Using && Wut!="Zanzoken")
 		return FALSE
 	if(Z.MagicNeeded&&!src.HasLimitlessMagic())
@@ -222,16 +282,17 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 
 					if(src.CheckActive("Ki Control"))
 						for(var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC in src)
-							src.UseBuff(KC)
+							src.UseBuff(KC, noGCD = TRUE)
 					if(src.CheckSlotless("What Must Be Done"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/wmbd in src.Buffs)
 							if(wmbd.Password)
-								src.UseBuff(wmbd)
+								src.UseBuff(wmbd, noGCD = TRUE)
 								del wmbd
 
 					src.OMessage(1,null,"[src]([src.key]) meditated!")
 					src.dir=SOUTH
 					src.AfterImageStrike=0
+					src.ais_window_until=0
 					src.Grounded=0
 					if(src.InfusionElement)
 						src.InfusionElement=null
@@ -271,19 +332,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 
 
 			if("ReverseDash")
-				var/Modifier=1
 				if(hasEldritchPower()) summonEldritchMinion();
-				if(src.Secret=="Haki")
-					if(src.secretDatum.secretVariable["HakiSpecialization"]=="Observation")
-						Modifier+=1
-				if(src.Saga=="Eight Gates")
-					Modifier+=2
-				if(!src.HasDashMaster())
-					Z.Cooldown(1/Modifier)
-				if(src.CheckSlotless("New Moon Form"))
-					if(src.CheckSlotless("Half Moon Form"))
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/H in src)
-							H.Trigger(src)
 				if(src.Secret=="Haki")
 					if(src.CheckSlotless("Haki Armament"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armament/H in src)
@@ -309,6 +358,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					return
 				if(src.Knockbacked)
 					return
+				//cd only once we're actually dashing - used to burn on dead presses
+				Z.Cooldown()
+				//launch-break window check has to happen before the dash loop sleeps through it
+				var/perfect_launch = src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal, src))
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Heavenly_Reversal)
@@ -340,7 +393,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					src.OMessage(10,"[src] dashes towards [src.Target], as a true Spiral Warrior never runs from battle!!!!","<font color=red>[src]([src.key]) used  Back Dash.")
 				else
 					src.OMessage(10,"[src] dashes away from [src.Target]!","<font color=red>[src]([src.key]) used  Back Dash.")
-				while(Distance>0)
+				var/pm = PmActive()
+				var/pm_budget = Distance * 32 //total dash distance in px (pixel path)
+				var/pm_px = Delay > 0 ? round(32 / Delay) : glob.PM_DASH_MAX_PX //per-tick, capped in PmDashStep
+				while(pm ? pm_budget > 0 : Distance>0)
 					if(src.StyleActive == "Crane Style")
 						src.icon_state="KB"
 					else if(src.RippleActive())
@@ -349,6 +405,12 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						src.icon_state="Flight"
 					if(src.Secret=="Spiral")
 						src.DashTo(src.Target, 20, 0.5, Clashable=1)
+					else if(pm) //smooth: one glided step away per tick instead of batching them into one tick
+						var/m = src.PmDashStep(src.Target, pm_px, away = 1)
+						if(!m)
+							pm_budget = 0
+						else
+							pm_budget -= m
 					else
 						step_away(src,src.Target,68)
 					for(var/atom/a in get_step(src,dir))
@@ -356,37 +418,37 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							continue
 						if(a.density)
 							Distance=0
+							pm_budget=0
 					if(src.Secret=="Spiral")
 						Distance=0
+						pm_budget=0
 					Distance-=1
-					sleep(Delay*world.tick_lag)
+					if(pm)
+						sleep(world.tick_lag) //one glided step already taken this tick
+					else
+						sleep(Delay*world.tick_lag)
 				src.dir=get_dir(src,src.Target)
 				src.Frozen=0
 				if(src.Launched)
 					src.Launched=0
 					LaunchEnd(src)
+					if(perfect_launch)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] rights themselves the instant the blow lands!", "")
 				src.NextAttack=0
 				src.icon_state=""
 				walk(src,0)
 				if(src.Beaming==1)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
-							src.UseProjectile(B)
-				if(src.HasDashCount())
-					src.IncDashCount()
+							src.UseProjectile(B, noGCD = TRUE)
 
 			if("DragonDash")
 				if(!CanDash())
 					return
 
-				var/Modifier = (src.HasPursuer()/10)
-				if(!src.HasDashMaster())
-					Z.Cooldown(clamp(1-Modifier,0.1, 1))
+				Z.Cooldown()
 
-				if(src.CheckSlotless("New Moon Form"))
-					if(!src.CheckSlotless("Half Moon Form"))
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/H in src)
-							H.Trigger(src)
 				if(src.hasSecret("Eldritch (Reflected)"))
 					src.HealMana(5)
 				if(src.Secret=="Haki")
@@ -462,7 +524,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(src.Beaming==1)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
-							src.UseProjectile(B)
+							src.UseProjectile(B, noGCD = TRUE)
 				else
 					src.NextAttack=0
 					if(src.CheckSlotless("East Strength"))
@@ -470,8 +532,6 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							src.SetQueue(new/obj/Skills/Queue/East_Rush)
 					src.Melee1(1, 5, accmulti=1.125+(src.GetSuperDash()/4), BreakAttackRate=1)
 
-				if(src.HasDashCount())
-					src.IncDashCount()
 
 			if("Aerial Recovery")
 				if(src.KO)
@@ -483,6 +543,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				if(!src.Knockback)
 					return
 				if(src.Energy>EnergyMax/8)
+					var/perfect = src.kb_start_time && (world.time <= src.kb_start_time + glob.TIMING_WINDOW)
 					src.OMessage(10,"[src] regained their footing!!","<font color=red>[src]([src.key]) used Aerial Recovery.")
 					RecoverImage(src)
 					src.AerialRecovery=1
@@ -491,15 +552,15 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						if(!src.AttackQueue)
 							src.SetQueue(new/obj/Skills/Queue/Rebuff_Overdrive)
 						Z.Cooldown(1.5)
-					else if(src.Secret=="Werewolf")
-						Z.Cooldown(0.5)
 					else if(hasEldritchPower())
 						var/obj/Skills/AutoHit/a = findOrAddSkill(/obj/Skills/AutoHit/Attractive_Force);
-						src.Activate(a);
+						src.Activate(a, noGCD = TRUE);
 						Z.Cooldown()
 					else
-						if(!src.HasDashMaster())
-							Z.Cooldown()
+						Z.Cooldown()
+					if(perfect)
+						Z.RefundCooldown(glob.PERFECT_BREAK_REFUND)
+						src.OMessage(10, "[src] snaps out of the blow the instant it lands!", "")
 			if("Aerial Payback")
 				if(src.KO)
 					return
@@ -533,16 +594,12 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					if(!src.AttackQueue)
 						src.SetQueue(new/obj/Skills/Queue/Rebuff_Overdrive)
 					Z.Cooldown(1.5)
-				else if(src.Secret=="Werewolf")
-					src.Activate(new/obj/Skills/AutoHit/Rabid_Retaliation)
-					Z.Cooldown(2)
 				else if(hasEldritchPower())
 					var/obj/Skills/AutoHit/a = findOrAddSkill(/obj/Skills/AutoHit/Attractive_Force);
 					src.Activate(a);
 					Z.Cooldown()
 				else
-					if(!src.HasDashMaster())
-						Z.Cooldown()
+					Z.Cooldown()
 					if(src.Target in oview(src, 1))
 						src.dir=get_dir(src, src.Target)
 						src.Melee1(1, 5, accmulti=1.125+(src.GetSuperDash()/4))
@@ -580,11 +637,13 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 				src.appearance_flags+=NO_CLIENT_COLOR
 				animate(src.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 1,1,1), time = 3)
 				for(var/mob/Players/M in oview(20,src))
-					M.client.fps=0.0001
+					if(M.client)
+						M.client.fps=0.0001
+						M._fps_hold_until = world.time + 30 //shared stamp - hit-stop won't unfreeze them
 				spawn(30)
 					for(var/mob/Players/B in players)
-						if(B.client.fps!=world.fps)
-							B.client.fps=world.fps
+						if(B.client && B.client.fps!=B.EffectiveClientFPS() && world.time >= B._fps_hold_until)
+							B.client.fps=B.EffectiveClientFPS()
 						animate(B.client, color = null, time = 3)
 						src.appearance_flags-=NO_CLIENT_COLOR
 			if("Time Stop")
@@ -601,7 +660,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							spawn()animate(B.client, color = null, time = 3)
 					Z.Cooldown()
 				else
-					if(src.Health<20/Z.Mastery)
+					if(src.HealthPct()<20/Z.Mastery)
 						src << "You haven't the vitality to stop time..."
 						return
 					for(var/mob/E in hearers(12,src))
@@ -629,7 +688,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 			if("Chaos Control")
 				if(Z.Using)
 					return
-				if(src.Health<20/max(Z.Mastery,1))
+				if(src.HealthPct()<20/max(Z.Mastery,1))
 					src << "You haven't the vitality to invoke chaos control..."
 					return
 				Z.Using = 1
@@ -688,7 +747,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 						view(src)<<"[src] heals [P]"
 						if(src.Imagination<=1)
 							src.LoseEnergy(50)
-						src.LoseHealth(25)
+						src.LoseHealth(src.PctToHP(25))
 						if(P.KO)
 							P.Conscious()
 						P.Sheared=0
@@ -1011,18 +1070,26 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 							return
 						if(last_combo >= world.time)
 							return
+						var/zdir = DisplayedCardinal(src.Target.dir, 0)
+						if(src.Target.Beaming!=2 && !src.UsingGhostDrive() && passive_handler["Backstabber"])
+							zdir = opposite_dirs[zdir]
+						if(!ComboLandingClear(src.Target, zdir))
+							return
 						lastZanzoUsage = world.time
 						src.StopKB()
 						if(src.Target.Beaming==2)
 							if(!(src.Target in view(10, src)))
 								return
-							src.Move(get_step(src.Target,src.Target.dir))
-							src.dir=src.Target.dir
+							src.Move(get_step(src.Target,DisplayedCardinal(src.Target.dir, 0)))
+							if(PmActive())//track the target's mid-tile sprite
+								src.step_x=src.Target.step_x
+								src.step_y=src.Target.step_y
+							src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 						else
 							if(src.UsingGhostDrive())
 								AfterImageGhost(src)
-								src.Comboz(src.Target)
-								src.dir=get_dir(src,src.Target)
+								src.Comboz(src.Target, frontOnly = TRUE)
+								src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 								src.Melee1(1, 5, accmulti=1.2, SureKB=1, BreakAttackRate=1)
 							else
 								var/denko = getDenkoSekka()
@@ -1035,8 +1102,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 									var/denkoSavedPixelZ = src.pixel_z
 									src.DenkoSekkaZanzoFade(denkoSavedPixelZ)
 									sleep(5)
-									src.Comboz(src.Target, FALSE, FALSE, passive_handler["Backstabber"])
-									src.dir=get_dir(src,src.Target)
+									src.Comboz(src.Target, landBehind = passive_handler["Backstabber"], frontOnly = TRUE)
+									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 									src.DenkoSekkaZanzoLand(denkoSavedColor, denkoSavedPixelZ)
 									src.DenkoSekkaCharged = denko
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
@@ -1049,8 +1116,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 											Wave/=2
 									else
 										VanishImage(src)
-									src.Comboz(src.Target, FALSE, FALSE, passive_handler["Backstabber"])
-									src.dir=get_dir(src,src.Target)
+									src.Comboz(src.Target, landBehind = passive_handler["Backstabber"], frontOnly = TRUE)
+									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
 						src.MovementCharges--
 						if(MovementCharges<0)
@@ -1093,6 +1160,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					else
 						P.KeepBody=1
 						src.OMessage(10,"[src] gives [P]'s their body.","[src]([src.key]) gave [P]([P.key]) their body.")
+					Z.Cooldown()
 					break
 
 			if("GivePower")
@@ -1100,7 +1168,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					return
 				if(!src.KO)
 					for(var/mob/P in get_step(src,dir))
-						P.HealHealth(src.Health/2*src.Imagination)
+						P.HealHealth(src.HealthPct()/2*src.Imagination)
 						P.HealEnergy(src.Energy/2*src.Imagination)
 						P.BPPoison+=((src.Power/src.GetPowerUpRatio())/(P.Power/P.GetPowerUpRatio()))
 						P.BPPoisonTimer=RawMinutes(5*src.Imagination)
@@ -1114,58 +1182,83 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0)
 					Z.Cooldown()
 
 
+
+globalTracker
+	var/tmp
+		CAM_SHAKE = TRUE //master switch
+		CAM_SHAKE_MAX = 16 //px ceiling on any single offset
+		CAM_SHAKE_STEP = 1 //ds between noise samples, sets the shake frequency
+
+//mean 0, bounded +/-a, sd ~a/3
+proc/gauss(a)
+	return (rand() + rand() + rand() - 1.5) / 1.5 * a
+
+//bakes the chain for one client. sustain = fraction held at full amp before the decay tail
+proc/_CamShakeClient(client/C, amp, duration, ix, iy, sustain = 0)
+	if(!C) return
+	if(GfxReducedMotion(C))
+		animate(C, pixel_x = 0, pixel_y = 0, time = 1, flags = ANIMATION_END_NOW)
+		return
+	//client.pixel_x lands before the map zoom, so 2x players feel double - scale it out
+	var/zm = max(1, C.view_fit_last_zoom || C.CurrentZoom())
+	amp /= zm
+	var/cap = glob.CAM_SHAKE_MAX / zm
+	var/step = max(0.5, glob.CAM_SHAKE_STEP)
+	var/n = max(1, round(duration / step))
+	ix = clamp(ix / zm, -cap, cap)
+	iy = clamp(iy / zm, -cap, cap)
+	var/mag = sqrt(ix * ix + iy * iy)
+	var/ux = mag > 0 ? ix / mag : 0
+	var/uy = mag > 0 ? iy / mag : 0
+	//END_NOW so a new impact replaces an in-flight shake; round(x,1) because one-arg round is floor
+	animate(C, pixel_x = round(ix, 1), pixel_y = round(iy, 1), time = 0, flags = ANIMATION_END_NOW)
+	for(var/i = 1 to n)
+		var/t = (i - 1) / n //(i-1) so the FIRST sample is full amplitude; i/n never reaches env 1
+		var/env = 1
+		if(t > sustain)
+			env = 1 - (t - sustain) / max(0.001, 1 - sustain)
+			env *= env //trauma^2 tail
+		var/px
+		var/py
+		if(mag > 0)
+			//ring along the impulse, scatter across it; cap the DC lead or it swamps the ring
+			var/along = min(mag, amp) * env * 0.6 + amp * env * ((i % 2) ? 1 : -1)
+			var/cross = gauss(amp * 0.35 * env)
+			px = ux * along - uy * cross
+			py = uy * along + ux * cross
+		else
+			px = gauss(amp * env)
+			py = gauss(amp * env)
+		animate(pixel_x = round(clamp(px, -cap, cap), 1), pixel_y = round(clamp(py, -cap, cap), 1), time = step)
+	animate(pixel_x = 0, pixel_y = 0, time = 2, easing = SINE_EASING | EASE_OUT) //guaranteed settle back to pixel=0
+
+proc/_CamShake(atom/source, amp, duration, ix, iy, globe, sustain = 0)
+	if(!glob || !glob.CAM_SHAKE || !source) return
+	if(duration <= 0) return
+	if(amp <= 0 && !ix && !iy) return
+	if(globe)
+		for(var/mob/M in players)
+			if(M.z != globe && globe != 999) continue
+			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+	else
+		for(var/mob/M in view(source))
+			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+
+//Quake = sustained rumble (transformations, power-ups, lightning)
 atom/proc/Quake(var/duration=30, var/globe=0)
 	set waitfor=0
-	if(duration == null || duration == 0)
-		return
-	while(duration)
-		duration-=world.tick_lag
-		if(!globe)
-			for(var/mob/M in view(src))
-				if(M.client)
-					M.client.pixel_x=rand(-8,8)
-					M.client.pixel_y=rand(-8,8)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		else
-			for(var/mob/M in players)
-				if(M.z!=globe&&globe!=999)
-					continue
-				if(M.client)
-					M.client.pixel_x=rand(-8,8)
-					M.client.pixel_y=rand(-8,8)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		if(duration<0)
-			duration=0
-		sleep(world.tick_lag)
+	if(!duration) return
+	_CamShake(src, 12, duration, 0, 0, globe, 0.7)
 
-atom/proc/Earthquake(var/duration=30,var/xpixelmin=0,var/xpixelmax=5,var/ypixelmin=0,var/ypixelmax=5, var/globe=0)
-	while(duration)
-		duration-=1
-		if(!globe)
-			for(var/mob/M in view(src))
-				if(M.client)
-					M.client.pixel_x=rand(xpixelmin,xpixelmax)
-					M.client.pixel_y=rand(ypixelmin,ypixelmax)
-				if(!duration) if(M.client)
-					M.client.pixel_x=0
-					M.client.pixel_y=0
-		else
-			for(var/mob/M in players)
-				if(M.z!=globe&&globe!=999)
-					continue
-				if(M.client)
-					M.client.pixel_x=rand(xpixelmin,xpixelmax)
-					M.client.pixel_y=rand(ypixelmin,ypixelmax)
-				if(!duration)
-					if(M.client)
-						M.client.pixel_x=0
-						M.client.pixel_y=0
-		if(duration<0)
-			duration=0
-		sleep(1)
+//Earthquake = impact. the min/max box: size becomes amp, center becomes the shove, impulseDir aims it
+atom/proc/Earthquake(var/duration=30,var/xpixelmin=0,var/xpixelmax=5,var/ypixelmin=0,var/ypixelmax=5, var/globe=0, var/impulseDir=0)
+	set waitfor=0
+	if(!duration) return
+	var/amp = max(xpixelmax - xpixelmin, ypixelmax - ypixelmin) / 2
+	var/ix = (xpixelmin + xpixelmax) / 2
+	var/iy = (ypixelmin + ypixelmax) / 2
+	if(impulseDir)
+		var/a = dir2angle(impulseDir) //dir2angle is 0=north so x=sin y=cos
+		ix += sin(a) * amp * 1.5 //the shove reads stronger than the ring
+		iy += cos(a) * amp * 1.5
+	_CamShake(src, amp, duration, ix, iy, globe, 0) //sustain 0: an impact decays from the first frame

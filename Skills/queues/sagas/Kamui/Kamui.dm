@@ -2,9 +2,10 @@ obj
 	Skills
 		Queue
 			Senjin_Shredder
-				DamageMult=5
+				DamageMult=4.06
 				AccuracyMult=1.2
-				Cooldown=60
+				Cooldown=15
+				EnergyCost=3
 				Grapple=1
 				KBMult=0.001
 				PrecisionStrike=5
@@ -23,8 +24,8 @@ obj
 		Grapple
 			Sword
 				Senjin_Drive
-					DamageMult=5
-					StrRate=1
+					DamageMult=4.06
+					StrScaling=1
 					ThrowMult=2
 					TriggerMessage="stabs their numerous blades into their opponent and spins before tossing"
 					Effect="Shockwave"

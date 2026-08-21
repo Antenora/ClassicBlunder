@@ -30,7 +30,7 @@ var/global/list/DEMON_PASSIVE_DB = list()
 	pdb["Force Boost"]  = new /datum/demon_passive("Force Boost", "+20% damage to demon's force attacks.",        "stat", "Force")
 	pdb["Force Amp"]    = new /datum/demon_passive("Force Amp",   "+50% damage to demon's force attacks.",        "stat", "Force")
 	pdb["Crit Up"]      = new /datum/demon_passive("Crit Up",     "Demon gains +0.75 CriticalDamage.",            "stat")
-	pdb["Pierce"]       = new /datum/demon_passive("Pierce",      "Demon gains +9 Brutalize.",                    "stat", "Phys")
+	pdb["Pierce"]       = new /datum/demon_passive("Pierce",      "Demon gains +9 armor penetration.",            "stat", "Phys")
 
 	// ===== RESISTS =====
 	pdb["Anti-Phys"]    = new /datum/demon_passive("Anti-Phys",   "-25% damage taken from normal attacks/queues.","resist", "Phys")
@@ -40,7 +40,7 @@ var/global/list/DEMON_PASSIVE_DB = list()
 	pdb["Anti-Force"]   = new /datum/demon_passive("Anti-Force",  "-50% damage taken from wind spells/skills.",   "resist", "Force")
 	pdb["Anti-Curse"]   = new /datum/demon_passive("Anti-Curse",  "-50% damage taken from dark spells/skills.",   "resist", "Curse")
 	pdb["Anti-Almighty"]= new /datum/demon_passive("Anti-Almighty","Demon gains DebuffReversal.",                 "resist", "Almighty")
-	pdb["Anti-Ailment"] = new /datum/demon_passive("Anti-Ailment","Demon gains +2 DebuffResistance.",             "resist")
+	pdb["Anti-Ailment"] = new /datum/demon_passive("Anti-Ailment","Demon's Defense is raised 50%, shrugging off ailments.",             "resist")
 	pdb["Anti-Most"]    = new /datum/demon_passive("Anti-Most",   "Demon End x2.",                                "resist")
 	pdb["Anti-All"]     = new /datum/demon_passive("Anti-All",    "All damage taken halved.",                     "resist")
 
@@ -107,7 +107,7 @@ var/global/list/DEMON_PASSIVE_DB = list()
 	pdb["Knight Soul"]   = new /datum/demon_passive("Knight Soul",   "User: -25% damage; demon takes 300% of that damage.",       "special")
 	pdb["Paladin Soul"]  = new /datum/demon_passive("Paladin Soul",  "User: -50% damage; demon takes 200% of that damage.",       "special")
 	pdb["Extra One"]     = new /datum/demon_passive("Extra One",     "User: gains +5 TechniqueMastery while demon summoned.",     "special")
-	pdb["Extra Bonus"]   = new /datum/demon_passive("Extra Bonus",   "Demon's skill cooldowns reduced by ~15% (uncapped).",       "special")
+	pdb["Extra Bonus"]   = new /datum/demon_passive("Extra Bonus",   "Demon gains 4.5 Haste (~4% faster skill cooldowns).",       "special")
 	pdb["Preserve Extra"]= new /datum/demon_passive("Preserve Extra","Halves cooldown of next skill on kill.",                    "special")
 	pdb["Grimoire"]      = new /datum/demon_passive("Grimoire",      "Demon inflicts more statuses from its attacks.",            "special")
 	pdb["Moneybags"]     = new /datum/demon_passive("Moneybags",     "User: 1.25x EconomyMult while demon summoned.",             "special")
@@ -267,7 +267,7 @@ var/global/list/DEMON_PASSIVE_DB = list()
 			resist_curse    *= 0.50
 			resist_almighty *= 0.50
 		if("Anti-Ailment")
-			passive_handler.Increase("DebuffResistance", 2)
+			DefMod = max(1, round(DefMod * 1.5, 0.01)) //Def IS debuff resistance now
 		if("Anti-Almighty")
 			passive_handler.Increase("DebuffReversal", 1)
 
@@ -319,7 +319,6 @@ var/global/list/DEMON_PASSIVE_DB = list()
 			passive_handler.Increase("CriticalChance", 50)
 			passive_handler.Increase("CriticalDamage", 0.25)
 		if("Pierce")
-			passive_handler.Increase("Brutalize", 9)
 		if("Double Strike")
 			passive_double_strike = TRUE
 			passive_handler.Increase("DoubleStrike", 5)

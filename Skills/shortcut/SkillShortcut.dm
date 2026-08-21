@@ -11,7 +11,9 @@ What shortcut do you want to set?"}
 
 //VARS
 /obj/Skills/var/
-    canBeShortcut=0;
+    canBeShortcut=1;
+    fire_ident=null;
+    MiscBindable=0;//stays keybindable under Misc anyway
 /mob/var/
     shortcut/shortcuts
 /shortcut/var/
@@ -25,47 +27,69 @@ What shortcut do you want to set?"}
     obj/Skills/shortcut8;
     obj/Skills/shortcut9;
     obj/Skills/shortcut10;
-    
+    obj/Skills/shortcut11;
+    obj/Skills/shortcut12;
+    list/keybinds;          
 //VERBS
 /mob/verb/
     Set_Skill_Shortcuts()
         set category="Utility"
+        set hidden = 1
         usr.setSkillShortcut();
     Clear_Skill_Shortcut()
         set category="Utility"
+        set hidden = 1
         usr.clearSkillShortcut();
 
     //hidden so as to not clutter the tabs
     Skill_Shortcut_1()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(1);
     Skill_Shortcut_2()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(2);
     Skill_Shortcut_3()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(3);
     Skill_Shortcut_4()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(4);
     Skill_Shortcut_5()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(5);
     Skill_Shortcut_6()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(6);
     Skill_Shortcut_7()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(7);
     Skill_Shortcut_8()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(8);
     Skill_Shortcut_9()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(9);
     Skill_Shortcut_10()
         set hidden=1;
+        set instant=1;
         usr.attemptShortcut(10);
+    Skill_Shortcut_11()
+        set hidden=1;
+        set instant=1;
+        usr.attemptShortcut(11);
+    Skill_Shortcut_12()
+        set hidden=1;
+        set instant=1;
+        usr.attemptShortcut(12);
 
 //PROCS
 /mob/proc/
@@ -75,9 +99,15 @@ What shortcut do you want to set?"}
 /mob/proc/
     //these two are used to deploy the assigned skill
     attemptShortcut(num)
+        if(client && client.np_open) return   // a number prompt owns the digit keys
         if(shortcuts)
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
-            if(attemptedSkill)fireShortcut(attemptedSkill);
+            if(attemptedSkill)
+                var/was_on_cd = SkillOnCooldown(attemptedSkill)
+                if(attemptedSkill.HeldSkill && num >= 1 && num <= length(HOTBAR_DEFAULT_KEYS))
+                    held_skill_pending_key = KeybindKey("hotbar[num]") || KeybindKey("hotbar[num]", 2);
+                var/used = fireShortcut(attemptedSkill);
+                if(client) client.FlashSkillUse(attemptedSkill, num, was_on_cd, used)   // blue = went off, red = failed
             else src << "You don't have a skill assigned to <b>Shortcut [num]</b>!";
     //god i hate that this proc is necessary atm = _ =
     fireShortcut(obj/Skills/s)
@@ -91,14 +121,20 @@ What shortcut do you want to set?"}
                 BeginHeldSkill(s)
             return;
         if(istype(s, /obj/Skills/Queue))
-            SetQueue(s);
-        else if(istype(s, /obj/Skills/Projectile))
-            UseProjectile(s);
-        else if(istype(s, /obj/Skills/AutoHit))
-            Activate(s);
-        else if(istype(s, /obj/Skills/Grapple))
-            var/obj/Skills/Grapple/g = s;
-            g.Activate(src);
+            return s.Use(src);   // queues ignore fire_ident on purpose
+        if(istype(s, /obj/Skills/Buffs))
+            var/ident = s.fire_ident
+            if(!ident)
+                for(var/v in s.verbs)
+                    if(!v || v:category != "Skills") continue
+                    ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
+                    break
+            if(ident && hascall(s, ident))
+                return call(s, ident)()
+            return
+        if(s.fire_ident && hascall(s, s.fire_ident))
+            return call(s, s.fire_ident)()
+        return s.Use(src)
 
 //these are used to assign a shortcut
 /mob/proc/
@@ -114,7 +150,7 @@ What shortcut do you want to set?"}
         src << "<b>[sChoice]</b> has been set as your <b>[choice]</b>!"
     getSkillShortcutChoices()
         var/list/l = list("Nevermind");
-        for(var/c = 1, c <= 10, c++)
+        for(var/c = 1, c <= 12, c++)
             var/option = "Shortcut [c]"
             var/obj/Skills/skillAssigned = shortcuts.vars["shortcut[c]"];
             if(skillAssigned) option+="   ([skillAssigned.name])";
@@ -138,7 +174,7 @@ What shortcut do you want to set?"}
         src << "<b>[choice]</b> was cleared out of your shortcuts!"
     getFilledSkillShortcuts()
         var/list/r = list("Nevermind");
-        for(var/i = 1, i <= 10, i++)
+        for(var/i = 1, i <= 12, i++)
             var/obj/Skills/skillExist = shortcuts.vars["shortcut[i]"]
             if(skillExist) r.Add("Shortcut [i]   [skillExist.name]");
         if(r.len < 2) src << "You don't have any shortcuts to clear out!";
@@ -154,7 +190,7 @@ What shortcut do you want to set?"}
         if(r.len < 2) src << "You don't have any skills that can be used with shortcuts!"
         return r;
     skillIsShortcut(obj/Skills/s)
-        for(var/i = 1, i <= 10, i++)
+        for(var/i = 1, i <= 12, i++)
             if(src.shortcuts.vars["shortcut[i]"] == s)
                 return 1
         return 0;

@@ -23,14 +23,14 @@ scaling with potential as well
 	StrMult = 1
 	adjust(mob/p)
 		if(altered) return
-		passives = list("CalmAnger" = 1, "Instinct" = 2, "PureDamage" = 2, "Persistence" = p.AscensionsAcquired/2, \
-						"LikeWater" = 1 + round(p.Potential/25,1), "AbyssMod" = round(p.Potential/40,1), \
+		passives = list("CalmAnger" = 1, "PureDamage" = 2, "Persistence" = p.AscensionsAcquired/2, \
+						"AbyssMod" = round(p.Potential/40,1), \
 						"BleedHit"=1.5, "FavoredPrey" = "Depths", "SlayerMod"= 0.25*(p.AscensionsAcquired+1))
 		StrMult = 1.15 + (p.Potential/150)
 		ForMult = 1.15 + (p.Potential/150)
 		OffMult = 1.15 + (p.Potential/200)
 		PowerMult = 1.05 + (p.Potential/200)
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -47,13 +47,13 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("CalmAnger" = 1, \
-						"LikeWater" = 2 + round(p.Potential/25,1), "Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 1, "HellPower" = 0.15, "Persistence" = p.AscensionsAcquired, \
-						"Instinct" = 3, "AbyssMod" = round(p.Potential/30,1), "BleedHit"=0.75, "FavoredPrey" = "Depths","SlayerMod"= 0.25*(p.AscensionsAcquired+1))
+						"Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 1, "HellPower" = 0.15, "Persistence" = p.AscensionsAcquired, \
+						"AbyssMod" = round(p.Potential/30,1), "BleedHit"=0.75, "FavoredPrey" = "Depths","SlayerMod"= 0.25*(p.AscensionsAcquired+1))
 		StrMult = 1.2 + (p.Potential/100)
 		ForMult = 1.2 + (p.Potential/100)
 		OffMult = 1.2 + (p.Potential/200)
 		PowerMult = 1.075 + (p.Potential/200)
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -69,14 +69,14 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("CalmAnger" = 1, "BleedHit"=0.25,"PureReduction" = 2, \
-						"LikeWater" = 2 + round(p.Potential/20,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1), "HellPower" = 0.4, "Persistence" = p.AscensionsAcquired, \
-						"Powerhouse" = 1 + (p.Potential/75), "Instinct" = 4, "Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2.5, "AbyssMod" = round(p.Potential/20,1), "FavoredPrey" = "Depths")
+						"SlayerMod"= 0.5*(p.AscensionsAcquired+1), "HellPower" = 0.4, "Persistence" = p.AscensionsAcquired, \
+						"Powerhouse" = 1 + (p.Potential/75), "Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2.5, "AbyssMod" = round(p.Potential/20,1), "FavoredPrey" = "Depths")
 		StrMult = 1.25 + (p.Potential/75)
 		ForMult = 1.25 + (p.Potential/75)
 		OffMult = 1.25 + (p.Potential/75)
 		PowerMult = 1.1 + (p.Potential/150)
 		EnergyHeal = 0.005 * p.Potential
-		AutoAnger=0
+		AngerFloor=0
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
 		..()
@@ -90,15 +90,15 @@ scaling with potential as well
 	BuffName = "Herald of the Depths"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("CalmAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1), "HellPower" = 0.65, \
-						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 5, "Flicker" = 3, "Pursuer" = 3, "PureDamage" = 3, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
+		passives = list("CalmAnger" = 1, "SlayerMod"= 0.5*(p.AscensionsAcquired+1), "HellPower" = 0.65, \
+						"Powerhouse" = 2 + (p.Potential/25), "Flicker" = 3, "Pursuer" = 3, "PureDamage" = 3, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
 		StrMult = 1.25 + (p.Potential/50)
 		ForMult = 1.25 + (p.Potential/50)
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
 		EnergyHeal = 0.01 * p.Potential
-		AutoAnger=0
-		if(prob(15)&&p.transUnlocked<2&&p.passive_handler.Get("Herald of the End"))
+		AngerFloor=0
+		if(0)
 			p.passive_handler.Increase("The Clock Is Ticking", 0.5)
 			p<<"<font color=red><b>You of all people should know how dangerous this power is. The clock is ticking, [p]...</font></b>"
 	Trigger(mob/User, Override=FALSE)
@@ -113,20 +113,20 @@ scaling with potential as well
 	BuffName = "Bringer of the Calamity"
 	adjust(mob/p)
 		if(altered) return
-		passives = list("EndlessAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1),\
-						"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 5, "Flicker" = 5, "Pursuer" = 5, "PureDamage" = 5, "PureReduction" = 4, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
+		passives = list("EndlessAnger" = 1, "SlayerMod"= 0.5*(p.AscensionsAcquired+1),\
+						"Powerhouse" = 2 + (p.Potential/25), "Flicker" = 5, "Pursuer" = 5, "PureDamage" = 5, "PureReduction" = 4, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
 		StrMult = 1.25 + (p.Potential/50)
 		ForMult = 1.25 + (p.Potential/50)
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
 		BioArmor=0
-		AutoAnger=1
+		AngerFloor=90
 		Enlarge = 3
 		DarkChange=1
 		IconTint=list(0.15,0,0, 0.05,0.25,0.15, 0.05,0.05,0.35, 0,0,0)
 		if(p.transUnlocked<2)
-			passives = list("Unstoppable"=1, "EndlessAnger" = 1, "LikeWater" = 2 + round(p.Potential/15,1),"SlayerMod"= 0.5*(p.AscensionsAcquired+1),\
-							"Powerhouse" = 2 + (p.Potential/25), "Instinct" = 5, "Flicker" = 5, "Pursuer" = 5, "PureDamage" = 5,"PureReduction" = 4, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
+			passives = list("Unstoppable"=1, "EndlessAnger" = 1, "SlayerMod"= 0.5*(p.AscensionsAcquired+1),\
+							"Powerhouse" = 2 + (p.Potential/25), "Flicker" = 5, "Pursuer" = 5, "PureDamage" = 5,"PureReduction" = 4, "AbyssMod" = round(p.Potential/15,1), "FavoredPrey" = "Beyond")
 			Enlarge = 3
 			DarkChange=1
 			IconTint=list(0.15,0,0, 0.05,0.25,0.15, 0.05,0.05,0.35, 0,0,0)

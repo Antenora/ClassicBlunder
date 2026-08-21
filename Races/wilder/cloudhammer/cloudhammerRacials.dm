@@ -41,7 +41,6 @@
 
 /obj/Skills/AutoHit/Wind_Roar
     Area="Circle"
-    AdaptRate=1
     TurfDirt=1
     ShockIcon='KenShockwave.dmi'
     Shockwave=4
@@ -70,9 +69,6 @@
 /obj/Skills/Projectile/Beam/Static_Stream
     Dodgeable=0
     Distance=20
-    StrRate=0.5
-    EndRate=1
-    ForRate=0.5
     Delay=1
     Blasts=1
     Stream=1

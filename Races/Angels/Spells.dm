@@ -10,7 +10,7 @@
 	CooldownStatic = 1
 	Cooldown = 60
 	AngelMagicCompatible = 1
-	EndRate = 0.8
+	EndEffectiveness = 0.8
 	Distance = 20
 	DamageMult = 12
 	ManaCost = 5
@@ -27,7 +27,6 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/AutoHit/Magic/AngelMagic
-	AdaptRate = 1
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Consecration
 	name = "Consecration"
@@ -40,7 +39,6 @@
 	Distance = 15
 	DamageMult = 10
 	Scorching = 30
-	AdaptRate = 1
 	HitSparkIcon = 'LightImpulseTrail.dmi'
 	HitSparkTurns=1
 	HitSparkSize=1.5
@@ -57,14 +55,13 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 
 /obj/Skills/AutoHit/Magic/AngelMagic/Divine_Verdict
 	name = "Divine Verdict"
 	Area = "Around Target"
 	SpellElement = "Light"
-	AdaptRate = 1.5
 	DamageMult = 0.5
 	HolyMod = 2.5
 	Distance = 5
@@ -95,7 +92,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Divine_Verdict()
 		set category = "Skills"
@@ -127,7 +124,6 @@
 	TimerLimit = 60
 	StrMult = 1.2
 	ForMult = 1.2
-	passives = list("HybridStrike" = 1, "SpiritSword" = 1, "SpiritHand" = 4)
 	ActiveMessage = "is filled with holy zeal!"
 	OffMessage = "feels their zeal subside."
 	Trigger(mob/User, Override = 0)
@@ -154,7 +150,6 @@
 	Area = "Circle"
 	SpellElement = "Light"
 	Distance = 3
-	AdaptRate = 1
 	DamageMult = 0
 	Flash = 18
 	BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded"
@@ -169,7 +164,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Dazzle()
 		set category = "Skills"
@@ -180,7 +175,6 @@
 	Area = "Target"
 	SpellElement = "Light"
 	Distance = 12
-	AdaptRate = 1
 	Snaring = 5
 	SnaringOverlay = 'root.dmi'
 	ApplyJudged = 1
@@ -205,7 +199,6 @@
 	SpellElement = "Light"
 	Area = "Target"
 	Distance = 12
-	AdaptRate = 1
 	ApplySentenced = 1
 	DamageMult = 0.2
 	ActiveMessage = "passes divine sentence upon the target!"
@@ -217,7 +210,7 @@
 			adjust(User)
 		if(Using || cooldown_remaining)
 			return FALSE
-		var/aaa = User.Activate(src)
+		var/aaa = User.Activate(src, noGCD = TRUE)
 		return aaa
 	verb/Divine_Sentence()
 		set category = "Skills"

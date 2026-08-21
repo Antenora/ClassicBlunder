@@ -72,7 +72,6 @@
     Copyable=0
     NeedsSword=0
     Area="Arc"
-    StrOffense=1
     DamageMult=2
     Cooldown=5
     Distance=2
@@ -173,7 +172,6 @@
 
 /obj/Skills/AutoHit/Mountain_Roar
     Area="Circle"
-    AdaptRate=1
     DamageMult=0.1
     Rounds=1
     TurfDirt=1
@@ -189,7 +187,6 @@
     WindupMessage="ROARRRR"
     ActiveMessage="ROARRRSSS"
     ComboMaster = 1
-    EndDefense = 0.5
     BuffAffected ="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Rattled"
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
@@ -204,9 +201,6 @@
 
 /obj/Skills/Projectile/Shard_Storm
     ElementalClass = "Earth"
-    StrRate=1
-    EndRate=1
-    ForRate=0
     Distance=20
     DamageMult=2.5
     Blasts=10

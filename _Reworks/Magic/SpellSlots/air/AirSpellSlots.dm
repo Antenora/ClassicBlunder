@@ -12,7 +12,7 @@
 		Paralyzing=3
 		Knockback=2
 		SpecialAttack=1
-		ForOffense=1
+		ForScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -29,7 +29,7 @@
 		adjust(mob/p) //Coded out for Balance checking reasons.
 			if(!altered)
 				DamageMult=6
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=8
 					Distance=7
 					ActiveMessage="invokes a powerful: <font size=+1>BREAKING TWISTER!</font size>"
@@ -43,7 +43,7 @@
 		DamageMult=6
 		Paralyzing=4
 		Area="Wave"
-		ForOffense=1
+		ForScaling=1
 		Instinct=1
 		Distance=12
 		ManaCost=5
@@ -57,7 +57,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=6
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=8
 					Distance=15
 					Area="Wide Wave"
@@ -76,13 +76,13 @@
 		ManaCost=8
 		ManaDrain=0.01
 		SpdMult=1.15
-		passives=list("FluidForm" = 2, "Flow" = 2, "Godspeed" = 2, "Skimming" = 1)
+		passives=list("Godspeed" = 2, "Skimming" = 1)
 		ActiveMessage="wraps themselves in a veil of wind!"
 		OffMessage="lets the wind dissipate..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("FluidForm" = 2, "Flow" = 2, "Godspeed" = 2, "Skimming" = 1)
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				passives=list("Godspeed" = 2, "Skimming" = 1)
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=30
 					SpdMult=1.25
 					Cooldown=75
@@ -110,7 +110,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=6
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					Speed=0.25
 					Distance=15
 					Radius=1

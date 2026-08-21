@@ -59,6 +59,7 @@ var/list/Tier2 = list(
 	"Big Bang Attack" = "/obj/Skills/Projectile/Big_Bang_Attack",
 	"Omega Blaster" = "/obj/Skills/Projectile/Omega_Blaster",
 	"Death Ball" = "/obj/Skills/Projectile/Death_Ball",
+	"Supernova" = "/obj/Skills/Projectile/Supernova",
 	"Super Kamehameha" = "/obj/Skills/Projectile/Beams/Big/Super_Kamehameha",
 	"True Kamehameha" = "/obj/Skills/Queue/True_Kamehameha",
 	"Final Flash" = "/obj/Skills/Projectile/Beams/Big/Final_Flash",

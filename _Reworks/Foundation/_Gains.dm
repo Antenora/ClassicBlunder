@@ -2,35 +2,33 @@
 	//50% injury check
 	var/exhaustedMessage = SpecialBuff ? SpecialBuff.ExhaustedMessage : ExhaustedMessage
 	var/desperateMessage = SpecialBuff ? SpecialBuff.DesperateMessage : BarelyStandingMessage
-	if(TotalInjury > 50 && !src.InjuryAnnounce && !passive_handler["Beefy"])
+	if(TotalInjury > 50 && !src.InjuryAnnounce)
 		OMessage(10, "[src] [BeatenMessage]!")
 		InjuryAnnounce = 1
 
 	// Nanite Check
-	if(NanoBoost && Health<=glob.gains.NANOHEALTH*(1-HealthCut)&&!NanoAnnounce)
+	if(NanoBoost && HealthPct()<=glob.gains.NANOHEALTH*(1-HealthCut)&&!NanoAnnounce)
 		OMsg(src, "<font color='green'>[src]'s nanites respond to their physical trauma, bolstering their cybernetic power!</font color>")
 		NanoAnnounce = 1
 	// 25% health check
-	if(Health < 25*(1-HealthCut) && !HealthAnnounce25)
-		if(!passive_handler["Beefy"])
-			if(!ExhaustedColor)
-				OMessage(10, "<font color=#F07E1F>[src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
-			else
-				OMessage(10,"<font color='[ExhaustedColor]'> [src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
-			HealthAnnounce25 = 1
+	if(HealthPct() < 25*(1-HealthCut) && !HealthAnnounce25)
+		if(!ExhaustedColor)
+			OMessage(10, "<font color=#F07E1F>[src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
+		else
+			OMessage(10,"<font color='[ExhaustedColor]'> [src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
+		HealthAnnounce25 = 1
 		var/shonenMoment = ShonenPowerCheck(src)
 		if(shonenMoment)
 			VaizardHealth += triggerPlotArmor(shonenMoment, HasUnstoppable())
 			src.OMessage(10, "<font color=#c3b329>[src]'s will to be a HERO gives them a second wind!</font>", "[src]([src.key]) has triggered plot armor.")
 
 	// 10% health check
-	if(Health < 10*(1-HealthCut) && !HealthAnnounce10)
-		if(!passive_handler["Beefy"])
-			if(!BarelyStandingColor)
-				OMessage(10, "<font color=#F07E1F>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
-			else
-				OMessage(10,"<font color='[BarelyStandingColor]'>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
-			HealthAnnounce10 = 1
+	if(HealthPct() < 10*(1-HealthCut) && !HealthAnnounce10)
+		if(!BarelyStandingColor)
+			OMessage(10, "<font color=#F07E1F>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
+		else
+			OMessage(10,"<font color='[BarelyStandingColor]'>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
+		HealthAnnounce10 = 1
 //**TESTED AND WORKS */
 /mob/proc/reduceErodeStolen()
 	var/list/stats = list("Str","Spd","For", "End","Off","Def")
@@ -55,7 +53,7 @@
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && Anger!=0)
+		if(HealthPct()>=75*(1-HealthCut) && Anger!=0)
 			calmcounter -= tick_second
 		else
 			calmcounter = 5
@@ -128,7 +126,7 @@
 		drain = round(30 - ((transMastery - 5) * 30) / (75 - 5), 1)
 		if(drain < 0)
 			drain = 0
-		if(Energy < drain && !HasNoRevert() && !Dead && !HasMystic())
+		if(Energy < drain && !Dead && !HasMystic())
 
 			Revert()
 			LoseEnergy(drain)
@@ -138,7 +136,7 @@
 		drain = round(30 - (40 * log(1 + transMastery / 100)), 1)
 		if(drain < 0)
 			drain = 1
-		if(Energy < drain && !HasNoRevert())
+		if(Energy < drain)
 			GainFatigue(drain)
 			Revert()
 			src<<"The strain of Golden Form forced you to revert!"
@@ -164,7 +162,7 @@
 	if(TimeStop)
 		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = new
 		book = locate() in src
-		LoseHealth(0.5/book.Mastery)
+		LoseHealth(PctToHP(0.5/book.Mastery))
 		book:TimeStopped+= world.tick_lag
 		if(book:TimeStopped>book.Mastery+1)
 			SkillX("Time Stop",x)

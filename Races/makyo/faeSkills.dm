@@ -50,10 +50,9 @@
 				icon=p.ExpandBase
 				passives["GiantForm"] = round(p.AscensionsAcquired/2)
 				passives["Godspeed"] = p.AscensionsAcquired
-				AutoAnger=0
-				AngerStorage=0
+				AngerFloor=0
 				if(p.passive_handler.Get("StarPower")||p.AscensionsAcquired>=4)
-					AutoAnger=1
+					AngerFloor=75
 					AngerMult=2
 					passives["Pursuer"] = 2 * p.AscensionsAcquired
 				else
@@ -78,12 +77,12 @@
 		var/asc = p.AscensionsAcquired
 		if(p.usingStyle("UnarmedStyle"))
 			MakesSword = 0
-			passives = list("SpiritHand" = (1 + (asc/2)) / 2, "MartialMagic" = 1, "BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list( "MartialMagic" = 1, "BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			ElementalOffense = "Fire"
 			BurnAffected=5 * asc
 			IconLock = saved_icon
 		else
-			passives = list("SpiritSword" = (1 + (asc/2)) / 2, "MagicSword" = 1, "BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list( "MagicSword" = 1, "BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			SwordAscension = asc
 			SwordAscensionSecond = asc
 			SwordAscensionThird = asc
@@ -153,13 +152,9 @@
 		passives = list(
 			"PureDamage"    =  N,
 			"PureReduction" =  N,
-			"Steady"        =  2 * N,
+			
 			"Inevitable"    =  N
 		)
-		if(!mastered)
-			passives["Flow"]      = -N
-			passives["Instinct"]  = -N
-			passives["FluidForm"] = -0.5 * N
 		if(N >= 3)
 			passives["GiantForm"]     = 1
 		if(N >= 4)
@@ -167,7 +162,6 @@
 		if(N >= 5)
 			passives["FatigueImmune"]  = 1
 			passives["DebuffReversal"] = 1
-			passives["Brutalize"]      = 6
 			if(!mastered)
 				passives["NoDodge"] = 1
 
@@ -222,6 +216,7 @@
 
 	verb/ExpandSizeToggle()
 		set category = "Skills"
+		set hidden = 1
 		set name = "Expand Size Toggle"
 		SuppressExpandVisualSize = !SuppressExpandVisualSize
 		usr << "Expand size visuals are now [SuppressExpandVisualSize ? "<b>off</b> — you stay normal-sized while expanded." : "<b>on</b> — you grow with Expand (default)."]"
@@ -229,7 +224,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Makyo/Fall/Shedding_Leaves
 	EndMult=0.6
 	TimerLimit=60
-	passives= list("DebuffResistance"=1, "ManaGeneration"= 10, "EnergyGeneration" =10,"PureReduction"= -5)
+	passives= list("ManaGeneration"= 10, "EnergyGeneration" =10,"PureReduction"= -5)
 	verb/Shed_Leaves()
 		set category="Skills"
 		src.Trigger(usr)

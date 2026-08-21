@@ -128,7 +128,7 @@
                         else if(initName == "Order" && curName == "HellFire")
                             var/obj/Skills/Buffs/SlotlessBuffs/Chaos_Control/cc = locate(/obj/Skills/Buffs/SlotlessBuffs/Chaos_Control) in User
                             if(cc)
-                                User.SkillX("Chaos Control", cc)
+                                User.SkillX("Chaos Control", cc, noGCD = TRUE)
                                 if(User.isRace(MAKAIOSHIN) && User.passive_handler && User.passive_handler.Get("Limited Rank-Up"))
                                     User.cooldownChaosSkillSingle(cc)
                                 else

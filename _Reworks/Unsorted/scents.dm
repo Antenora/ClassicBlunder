@@ -53,7 +53,5 @@ mob/proc/setUpScent()
             custom_scent="Metal"
         if(usr.Target.Secret=="Hamon"||usr.Target.Secret=="Senjutsu")
             custom_scent="Grass"
-        if(usr.Target.Secret=="Vampire"||usr.Target.Secret=="Werewolf")
+        if(usr.Target.Secret=="Vampire")
             custom_scent="Blood"
-        if(usr.Target.Secret=="Necromancer"||usr.Target.Secret=="Zombie")
-            custom_scent="Decay"

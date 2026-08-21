@@ -2,16 +2,16 @@ obj/Skills/AutoHit/Purifying_Frost
 	NeedsSword=1
 	Area="Circle"
 	Cleansing = 5
-	ControlledRush=1
-	Rush=3
+	ControlledRush=0
+	Rush=6
 	ChargeTech=1
 	ChargeTime=1
 	Rounds=5
-	StrOffense=1
+	StrScaling=1
 	DamageMult=2
 	Purity = 1
 	Chilling = 100
-	Cooldown=120
+	Cooldown=30
 	Knockback=1
 	Size=1
 	Icon='CircleWind.dmi'
@@ -26,12 +26,12 @@ obj/Skills/AutoHit/Purifying_Frost
 	TurfStrike=1
 	TurfShift='IceGround.dmi'
 	TurfShiftDuration=30
-	EnergyCost=5
+	EnergyCost=8
 	Instinct=1
 	ActiveMessage="'s soothing blade causes frost to snap out!"
 	adjust(mob/p)
 		Size = p.SagaLevel
-		DamageMult = 2 + p.SagaLevel
+		DamageMult = (2 + p.SagaLevel) * 0.2857
 		Rush = 3 + p.SagaLevel
 	verb/Purifying_Frost()
 		set category="Skills"

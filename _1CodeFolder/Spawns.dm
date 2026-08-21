@@ -125,30 +125,35 @@ mob
 	Admin3
 		verb/Spawn_Race_Add(var/obj/Special/Spawn/s in glob.Spawns)
 			set category="Admin"
+			if(!src.Alert("Are you sure you want to add a race to spawns?")) return
 			var/newrace=input(src, "What race do you want to add to [s]'s spawns?", "Spawn Race Add") in races
 			if(newrace)
 				s.DefaultRaces.Add(newrace)
 				Log("Admin", "[ExtractInfo(src)] added [newrace] to [s]'s default race spawns.")
 		verb/Spawn_Race_Remove(var/obj/Special/Spawn/s in glob.Spawns)
 			set category="Admin"
+			if(!src.Alert("Are you sure you want to remove a race from spawns?")) return
 			var/newrace=input(src, "What race do you want to remove from [s]'s spawns?", "Spawn Race Add") in s.DefaultRaces
 			if(newrace)
 				s.DefaultRaces.Remove(newrace)
 				Log("Admin", "[ExtractInfo(src)] removed [newrace] from [s]'s default race spawns.")
 		verb/Spawn_Permission_Add(var/obj/Special/Spawn/s in glob.Spawns)
 			set category="Admin"
+			if(!src.Alert("Are you sure you want to add a key to spawns?")) return
 			var/newrace=input(src, "What ckey do you want to add to [s]'s spawns?", "Spawn Ckey Add") as text|null
 			if(newrace)
 				s.SpecialPermissions.Add(newrace)
 				Log("Admin", "[ExtractInfo(src)] added ckey [newrace] to [s]'s special permission spawns.")
 		verb/Spawn_Permission_Remove(var/obj/Special/Spawn/s in glob.Spawns)
 			set category="Admin"
+			if(!src.Alert("Are you sure you want to remove a key from spawnsr?")) return
 			var/newrace=input(src, "What ckey do you want to remove from [s]'s spawns?", "Spwn Ckey Remove") in s.SpecialPermissions
 			if(newrace)
 				s.SpecialPermissions.Remove(newrace)
 				Log("Admin", "[ExtractInfo(src)] removed [newrace] from [s]'s special permission spawns.")
 		verb/Spawn_Swap(var/mob/m in players)
 			set category="Admin"
+			if(!src.Alert("Are you sure you want to swap spawns?")) return
 			var/obj/Special/Spawn/s=input(src, "What spawn do you want to change [m] to? They are currently from [m.Spawn].", "Spawn Swap") in glob.Spawns
 
 			Log("Admin", "[ExtractInfo(src)] swapped [ExtractInfo(m)]'s spawn from [m.Spawn] to [s]!")

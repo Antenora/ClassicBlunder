@@ -66,56 +66,11 @@ Fast Actig -> Automed dispensers
     var/unlocks
     var/description = "This description wasn't filled out."
     tech
-        Forge
-            name = "Forge"
-            breakthrough = TRUE
-            description = "Increases Forging talent. Doesn't provide any items.\nNeeded in order to gain Smelting.";
-            requires = list()
-
-        Smelting
-            name = "Smelting"
-            breakthrough = TRUE
-            description = "Gives the Smelt object, allowing you to melt down items for 50% of their original value.\nNeeded in order to gain Weapons, Weighted Clothing, Enhancement, and Light Alloys."
-            requires = list("Forge")
-
-        Weapons
-            name = "Weapons"
-            description = "Allows access to Swords from Access Technology menu.\nNeeded in order to gain Repair, and Modular Weaponry."
-            requires = list("Smelting")
-
-        Weighted_Clothing
-            name = "Weighted Clothing"
-            description = "Allows access to weights from Access Technology menu.\nNeeded in order to gain Armor."
-            requires = list("Smelting")
-
-        Armor
-            name = "Armor"
-            description = "Allows access to Armors from Access Technology menu.\nNeeded in order to gain Engineering and Advanced Plating."
-            requires = list("Weighted Clothing")
-        Repair
-            name = "Repair"
-            description = "Gives the Repair object, allowing you to reforge broken swords / staves / armors.\nNeeded in order to gain Advanced Plating, and Shock Absorbers."
-            requires = list("Weapons")
-        Enhancement
-            name = "Enhancement"
-            description = "Increases Forging talent. Gives the Upgrade Equipment object, allowing you to upgrade swords and armor.\nDoesn't unlock any specific technology."
-            requires = list("Smelting")
-
         Engineering
             name = "Engineering"
             breakthrough = TRUE
-            description = "Increases Forging talent and allows reinforced doors, laser gates, digital keys, remotes, safes and air masks to be accessed in Access Technology.\nNeeded in order to gain Modular Weaponry, Power Generators, Hazard Suits, and Force Shielding."
-            requires = list("Armor")
-
-        Advanced_Plating
-            name = "Advanced Plating"
-            description = "Allows access to ceramic plating, resistant coating, and refractive plating in Access Technology menu."
-            requires = list("Armor", "Repair")
-
-        Modular_Weaponry
-            name = "Modular Weaponry"
-            description = "Allows access to trick weapon kit, fiber bonding agents, and quicksilver alloys in Access Technology menu.\nDoesn't unlock any specific technology."
-            requires = list("Engineering", "Weapons")
+            description = "Allows reinforced doors, laser gates, digital keys, remotes, safes and air masks to be accessed in Access Technology.\nNeeded in order to gain Power Generators, Hazard Suits, and Force Shielding."
+            requires = list()
 
         Power_Generators
             name = "Power Generators"
@@ -162,7 +117,7 @@ Fast Actig -> Automed dispensers
         Force_Shielding
             name = "Force Shielding"
             description = "Allows access to deflector shields in Access Technology menu.\nDoesn't unlock any further technology."
-            requires = list("Engineering", "Advanced Plating")
+            requires = list("Engineering")
 
         Medicine
             name = "Medicine"
@@ -310,7 +265,7 @@ Fast Actig -> Automed dispensers
         MilitaryEngineering
             name = "MilitaryEngineering"
             breakthrough = TRUE
-            description = "Increases Forging talent. Allows access to powered exoskeleton through Access Technology menu.\nNeeded for Armorpiercing Weaponry."
+            description = "Allows access to powered exoskeleton through Access Technology menu.\nNeeded for Armorpiercing Weaponry."
             requires = list("Thermal Weaponry")
 
         Armorpiercing_Weaponry

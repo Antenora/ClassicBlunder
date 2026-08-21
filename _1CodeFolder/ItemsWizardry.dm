@@ -363,7 +363,7 @@ obj/Items/Enchantment
 										p.name=Name
 									p.DrinkMessage=input(usr, "Input message for when potion is consumed.", "Potion Active") as text
 									p.OffMessage=input(usr, "Input message for when potion wears off.", "Potion Off") as text
-								usr.contents+=p
+								usr.GiveOrDrop(p)
 							else
 								usr << "You don't have enough capacity to brew this potion!"
 							src.Using=0
@@ -508,7 +508,7 @@ obj/Items/Enchantment
 									usr.TakeMoney(Cost)
 									var/obj/Items/Enchantment/PhilosopherStone/Artificial/a=new
 									a.SoulStrength=2
-									usr.contents+=a
+									usr.GiveOrDrop(a)
 									usr << "You've created an artificial Philosopher Stone!"
 								else
 									usr << "You don't have enough money to make an artificial Philosopher Stone!  ([Commas(Cost)] / [Commas(usr.GetMoney())])"
@@ -600,7 +600,7 @@ obj/Items/Enchantment
 					CD+=(src.Hard*MEDIUM_EFFECT_CD)
 				if(src.Hallucinogen)
 					FoundHallucinogen=1
-					PP.AutoAnger=1
+					PP.AngerFloor=75
 					var/buff = 0.25 * src.Hallucinogen
 					PP.AngerMult= 1 + buff
 					PP.DefMult = 1 - buff
@@ -609,7 +609,6 @@ obj/Items/Enchantment
 					CD+=(src.Hallucinogen*STRONG_EFFECT_CD)
 				if(src.Flowy)
 					FoundFlowy=1
-					PP.passives["Flow"] = src.Flowy
 					CD+=(src.Flowy*MEDIUM_EFFECT_CD)
 
 				if(src.Sexy)
@@ -1931,7 +1930,7 @@ obj/Items/Enchantment
 			nt.FocalExceptions.Add(src)
 			for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 				nt.FocalExceptions.Add(ta)
-			nt.Activate(usr)
+			nt.Activate(usr, TRUE)
 			return
 		verb/Set_Password()
 			set category=null
@@ -1957,7 +1956,7 @@ obj/Items/Enchantment
 				ns.FocalExceptions.Add(src)
 				for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 					ns.FocalExceptions.Add(ta)
-				ns.Activate(usr)
+				ns.Activate(usr, TRUE)
 			else
 				usr << "That is not the password to use the nexus."
 		verb/Nexus_Rally()
@@ -1972,7 +1971,7 @@ obj/Items/Enchantment
 				ns.FocalExceptions.Add(src)
 				for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 					ns.FocalExceptions.Add(ta)
-				ns.Activate(usr)
+				ns.Activate(usr, TRUE)
 			else
 				usr << "That is not the password to use the nexus."
 
@@ -2006,7 +2005,7 @@ obj/Items/Enchantment
 			nt.FocalExceptions.Add(src)
 			for(var/obj/Items/Enchantment/Teleport_Amulet/ta in usr)
 				nt.FocalExceptions.Add(ta)
-			nt.Activate(usr)
+			nt.Activate(usr, TRUE)
 			return
 
 
@@ -2350,30 +2349,6 @@ obj/Items/Enchantment
 				..()
 
 
-	Phylactery
-		icon='Phylactery.dmi'
-		desc="A container for your soul, making you incapable of dying...but if it is shattered, you will die instantly."
-		Cost=1000
-		EnchType="TimeMagic"
-		SubType="NOT IN"
-		var
-			Signature//ckey
-		Click()
-			if(src in oview(1, usr))
-				var/Confirm=alert(usr, "Do you wish to place your soul in this phylactery?  It will make you immortal and ageless, but if it is ever destroyed you will perish.", "Phylactery", "No", "Yes")
-				if(usr.Secret||usr.HasMechanized())
-					usr << "Your nature makes you incompatibile with this phylactery!"
-					return
-				if(Confirm=="Yes")
-					usr.Phylactery=1
-					usr.PhylacteryNerf=0
-					usr.Timeless=1
-					usr.Secret="Zombie"
-					src.Signature=usr.ckey
-					OMsg(usr, "[usr] seals their soul into [src]!")
-					return
-			else
-				..()
 	Elixir_of_Reincarnation
 		icon='ElixerOfReincarnation.dmi'
 		desc="A potion which will allow the drinker to come back as a child with their current memories."
@@ -2608,9 +2583,7 @@ obj/Items/Enchantment/Staff
 	icon='MageStaff.dmi'
 	var/Points=0
 	var/PointsAssigned=0
-	var/ManaGeneration=0
 	var/ElementallyInfused
-	var/CalmAnger=0
 	var/StaffIconSelected=0
 	var/Conjured=0
 	var/modifiedAttack = TRUE
@@ -2663,12 +2636,10 @@ obj/Items/Enchantment/Staff
 					pixel_x=-32
 					pixel_y=-32
 					Ascended = 6;
-					passives = list("ManaGeneration" = 5, "CalmAnger" = 1, "MovingCharge"=1, "Adrenaline"=1, "Flicker"=2, "Flow"=2, "BlurringStrikes"=2, "HybridStrike"=1)
+					passives = list("ManaGeneration" = 5, "CalmAnger" = 1, "MovingCharge"=1, "Adrenaline"=1, "Flicker"=2)
 					Destructable=0
 					ShatterTier=0
 					NoSaga=1
-					ManaGeneration=5
-					CalmAnger=1
 					Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Chain_Quasar", "/obj/Skills/AutoHit/OpticBarrel", "/obj/Skills/Projectile/Fenrir", "/obj/Skills/Projectile/Thor", "/obj/Skills/Queue/ChainRevolver")
 		Staff
 			name="Null Staff"

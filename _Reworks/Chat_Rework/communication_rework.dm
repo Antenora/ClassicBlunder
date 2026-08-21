@@ -44,6 +44,7 @@ client/proc/outputToChat(text, list/channels)
 
 client/verb/Toggle_Channels()
 	set category="Other"
+	set hidden = 1   
 	var/selection=input("Select a toggle option.")in list("Toggle OOC","Toggle All Tab OOC","Toggle IC Tab LOOC","Toggle All Tab LOOC")
 	switch(selection)
 		if("Toggle OOC")
@@ -61,6 +62,7 @@ client/verb/Toggle_Channels()
 
 client/verb/OOC(T as text)
 	set category = "Other"
+	set hidden = 1   
 	if(!T||length(T)<1) return
 	if(!OOC_Check(T)) return
 	if(!usr.Admin) T=copytext(T,1,700)
@@ -93,6 +95,7 @@ client/verb/OOC(T as text)
 
 client/verb/Say(T as text)
 	set category="Roleplay"
+	set hidden = 1
 	if(usr.CutsceneMode) return
 
 	sayProc(T, null)
@@ -169,6 +172,7 @@ client/verb/Yell(T as text)
 
 client/verb/Whisper(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	var/list/transmitTo = hearers(SAY_RADIUS, usr)
 	var/header = "<font color=[usr.Text_Color]>[usr.name]"
@@ -216,6 +220,7 @@ client/verb/Whisper(T as text)
 
 client/verb/Think(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	var/header = "<i><font color=[usr.Text_Color]>[usr.name]</i>"
 	var/message = html_encode(T)
@@ -247,6 +252,7 @@ client/verb/Think(T as text)
 /*
 client/verb/Prayer(T as text)
 	set category="Roleplay"
+	set hidden = 1
 
 	if(!T) return
 
@@ -260,6 +266,7 @@ client/verb/Prayer(T as text)
 */
 client/verb/Emote()
 	set category="Roleplay"
+	set hidden = 1
 
 	if(usr.rping) return
 

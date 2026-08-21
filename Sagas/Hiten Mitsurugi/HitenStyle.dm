@@ -20,9 +20,9 @@
 		passives["SuperDash"] = 1 + round(p.SagaLevel / 4);
 		passives["DoubleStrike"] = (2 / SAGA_TIERS * p.SagaLevel);
 		passives["TripleStrike"] = (1 / SAGA_TIERS * p.SagaLevel);
-		passives["BlurringStrikes"] = 2+(p.SagaLevel);
 		passives["SlayerMod"] = p.SagaLevel/3
-		if(p.SagaLevel>=3) passives["CoolerAfterImages"] = p.SagaLevel
+		if(p.SagaLevel>=3) passives["AfterImages"] = p.SagaLevel
+		if(p.SagaLevel>=3) passives["AfterImageSkin"] = "Cooler"
 		if(p.SagaLevel>=4) Finisher="/obj/Skills/Queue/Finisher/True_Flash_Strike"
 	verb/Hiten_Mitsurugi_Ryuu()
 		set hidden=1

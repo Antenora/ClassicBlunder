@@ -32,6 +32,7 @@ mob/proc/RollVoidForAbsorb()
 /mob/Admin3/verb/AdminVoid()
 	set category = "Admin"
 	set name = "Void"
+	if(!src.Alert("Are you sure you want to explore void options?")) return
 	var/list/actions = list(
 		"Admin-kill with free void",
 		"Change target's extra void chance"
@@ -50,7 +51,7 @@ mob/proc/RollVoidForAbsorb()
 		if("Admin-kill with free void")
 			var/mob/A = input(usr, "Auto-void-kill whom?", "Void") in players
 			if(!A) return
-			A.Death(null, "ADMIN", 0, 0, 0, 0, 1)
+			A.Death(null, "ADMIN", 0, 0, 0, 1)
 			Log("Admin", "<font color=red>[ExtractInfo(usr)] admin-killed [ExtractInfo(A)] (Free Void)")
 		if("Change target's extra void chance")
 			var/mob/A = input(usr, "Change whose void chance?", "Void") in players
@@ -92,34 +93,33 @@ mob/proc/RollVoidForAbsorb()
 /mob/var/extraVoidChance = 0
 
 /mob/proc/applyVoidNerf()
-	if(src.passive_handler.Get("Undying"))
-		return
-	if(glob.VoidMaim||!src)
-		Maimed++
-		recordMaim(null, "Survived Void")
-		src << "After managing to survive, you're left with a maim."
+	Maimed++
+	recordMaim(null, "Survived Void")
+	src << "After managing to survive, you're left with a maim."
 	if(glob.VoidCut)
 		var/highestStat = 0
 		var/highestStatName = ""
-		for(var/i in 1 to 5)
-			if(BaseStr() > highestStat)
-				highestStat = GetStr()
-				highestStatName = "Str"
-			if(BaseEnd() > highestStat)
-				highestStat = GetEnd()
-				highestStatName = "End"
-			if(BaseFor() > highestStat)
-				highestStat = GetFor()
-				highestStatName = "For"
-			if(BaseDef() > highestStat)
-				highestStat = GetDef()
-				highestStatName = "Def"
-			if(BaseOff() > highestStat)
-				highestStat = GetOff()
-				highestStatName = "Off"
-		var/statCutAmount = clamp(0, glob.VoidCut / 100, 1)
+		if(BaseStr() > highestStat)
+			highestStat = BaseStr()
+			highestStatName = "Str"
+		if(BaseEnd() > highestStat)
+			highestStat = BaseEnd()
+			highestStatName = "End"
+		if(BaseFor() > highestStat)
+			highestStat = BaseFor()
+			highestStatName = "For"
+		if(BaseDef() > highestStat)
+			highestStat = BaseDef()
+			highestStatName = "Def"
+		if(BaseOff() > highestStat)
+			highestStat = BaseOff()
+			highestStatName = "Off"
+		if(BaseSpd() > highestStat)
+			highestStat = BaseSpd()
+			highestStatName = "Spd"
+		var/statCutAmount = clamp(glob.VoidCut / 100, 0, 1) // was comparing Base against stored buffed values, looping 5x for nothing, and clamping with scrambled args
 		vars["[highestStatName]Cut"] += statCutAmount
-		src<<"After managing to survive, you are left with a permanent injury. Your [highestStatName] is cut by [statCutAmount]%."
+		src<<"After managing to survive, you are left with a permanent injury. Your [highestStatName] is cut by [statCutAmount*100]%."
 
 
 
@@ -168,7 +168,7 @@ mob/proc/StartFresh()
 
 /mob/proc/makeCorpse(oldLoc)
 	Stunned = 0
-	if(src.passive_handler.Get("Undying")||glob.VoidChance>=90)
+	if(glob.VoidChance>=90)
 		return
 	var/mob/Body/corpse = new()
 	corpse.race = new/race/human()
@@ -186,6 +186,7 @@ mob/proc/StartFresh()
 	corpse.Power=src.Power
 	corpse.StrMod=src.GetStr()
 	corpse.EndMod=src.GetEnd()
+	corpse.VitMod=src.GetVit()
 	corpse.ForMod=src.GetFor()
 	corpse.DeathKillerTargets=src.key//used for Death Killer
 	corpse.Savable=1
@@ -226,9 +227,8 @@ mob/proc/StartFresh()
 	overlays -= 'Halo.dmi'
 
 /mob/var/totalExtraVoidRolls = 0
-#define SPIRITS_NAMES list("Goetic Virtue", "Stellar Constellation", "Elven Sanctuary")
 
-mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
+mob/proc/Void(override, forceVoid, extraChance = 0, extraRolls = 0)
 	var/actuallyDead
 	var/Chance = getExtraVoidChance(extraChance)
 	if(forceVoid) Chance = 100
@@ -239,45 +239,34 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 	if(override)
 		Chance = 0
 
-	if(secretDatum && secretDatum.name in SPIRITS_NAMES)
-		extraChance -= Potential/4 + (secretDatum.currentTier * 5)
-		src<<"You have [extraChance] reduced void chance from your REDACTED" //TODO: leaving as a note to change if needed
-
 	// handle the rolling here maybe
 	var/NotYet=0
-	if(src.passive_handler.Get("Undying")||src.passive_handler.Get("Reflected"))
+	if(src.passive_handler.Get("Reflected"))
 		NotYet=1
 	if(override&&!NotYet)
-		if(zombie)
-			actuallyDead = 0
-			src<<"You get past it all"
-			OMessage(0,"","<font color=red>[src] is zombie'd out")
-			//OMSg(src, "[src] stands right back up, as if nothing happened.")
-			return
+		actuallyDead = 1
+		new/obj/readPrayers(src)
+		if(NoSoul)
+			src<<"You feel your life flash before your eyes, and then in an abrupt snap -- nothingness."
+			if(istype(src, /mob/Players/))
+				ArchiveSave(src)
+			src.loc=locate(glob.NO_SOUL_LOCATION[1], glob.NO_SOUL_LOCATION[2], glob.NO_SOUL_LOCATION[3])
+			makeCorpse(oldLoc)
+			sleep(10)
+			overlays += 'halo.dmi'
 		else
-			actuallyDead = 1
-			new/obj/readPrayers(src)
-			if(NoSoul)
-				src<<"You feel your life flash before your eyes, and then in an abrupt snap -- nothingness."
-				if(istype(src, /mob/Players/))
-					ArchiveSave(src)
-				src.loc=locate(glob.NO_SOUL_LOCATION[1], glob.NO_SOUL_LOCATION[2], glob.NO_SOUL_LOCATION[3])
-				makeCorpse(oldLoc)
-				sleep(10)
-				overlays += 'halo.dmi'
-			else
-				src<<"You sustain the injuries detailed in your death -- as the pain fades, you awaken in the afterlife. Alone, but not for long."
-				src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
-				if(src.isRace(DEMON)||src.isRace(ELDRITCH)||src.Damned||hasEldritchPower())
-					src.Damned=0
-					src.loc=locate(198, 238, 8)
-				if(istype(src, /mob/Players/))
-					ArchiveSave(src)
-				Dead = 1
-				makeCorpse(oldLoc)
-				sleep(10)
-				src.overlays += 'halo.dmi'
-			return
+			src<<"You sustain the injuries detailed in your death -- as the pain fades, you awaken in the afterlife. Alone, but not for long."
+			src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
+			if(src.isRace(DEMON)||src.isRace(ELDRITCH)||src.Damned||hasEldritchPower())
+				src.Damned=0
+				src.loc=locate(198, 238, 8)
+			if(istype(src, /mob/Players/))
+				ArchiveSave(src)
+			Dead = 1
+			makeCorpse(oldLoc)
+			sleep(10)
+			src.overlays += 'halo.dmi'
+		return
 
 
 	makeCorpse(oldLoc)
@@ -292,16 +281,14 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 			while(rolls>0)
 				var/roll = rand(Chance, 100)
 				if(roll >= 100-glob.VoidChance)
-					if(glob.SHOW_VOID_ROLL)
-						src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! Congratulations, you have voided!"
+					src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! Congratulations, you have voided!"
 					rolls = 0
 					actuallyDead = 0
 					break
 				else
 					rolls--
 					actuallyDead = 1
-					if(glob.SHOW_VOID_ROLL)
-						src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! You have died!"
+					src<<"You rolled a [roll] and the roll to beat was [100-glob.VoidChance]! You have died!"
 				if(rolls<0)
 					rolls = 0
 		if(NotYet)
@@ -350,7 +337,7 @@ mob/proc/Void(override, zombie, forceVoid, extraChance = 0, extraRolls = 0)
 		m.Grab_Release()
 	StartFresh()
 	Stunned  = 0
-	if(NoSoul && !forceVoid && !zombie)
+	if(NoSoul && !forceVoid)
 		src<<"You have no soul contained within your body; you are embracing nothingness"
 		if(istype(src, /mob/Players/))
 			ArchiveSave(src)

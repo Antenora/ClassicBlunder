@@ -19,18 +19,23 @@ var/list/gob_weapon_pool = null
 	count     = 80
 	spawning  = 4
 
-	scale     = generator("num", 18.0, 36.0)
+	// gaussian on purpose, a flat spread reads as a synthetic spray (weather wants flat tho)
+	scale     = generator("num", 18.0, 36.0, NORMAL_RAND)
 	// Spawn scattered below and around the user, wide horizontal spread
-	position  = generator("box", list(-200, -120, 0), list(200, 60, 0))
+	position  = generator("box", list(-200, -120, 0), list(200, 60, 0), NORMAL_RAND)
 	// pulls them toward the orb (center)
 	gravity   = list(0, 2.0)
 	// landing right at the orb center, then fade out
 	friction  = 0.25
 	lifespan  = 30
 	fade      = 12
-	drift     = generator("box", list(-0.8, -0.3, 0), list(0.8, 0.3, 0))
+	fadein    = 4 // stops the pop-in
+	drift     = generator("box", list(-0.8, -0.3, 0), list(0.8, 0.3, 0), NORMAL_RAND)
 
-	color     = "#ff5522"
+	// with a gradient, color is a position along it - embers heat as they arrive
+	color        = 0
+	color_change = 0.035
+	gradient     = list("#8a1a00", "#ff5522", "#ffd9a0")
 
 proc/BuildGoBWeaponPool()
 	var/list/pool = list()
@@ -274,9 +279,9 @@ obj/Skills/Projectile/Gates_of_Babylon
 				if(!barrage_mode)
 					proj.alpha = 0
 					animate(proj, alpha = 128, time = max(1, hover_t - 6))
-					proj.filters += filter(type="wave", x=2, y=2, size=1.5)
+					proj.filters += filter(type="wave", x=2, y=2, size=0.75) 
 				else
-					proj.filters += filter(type="wave", x=1, y=1, size=1.0)
+					proj.filters += filter(type="wave", x=1, y=1, size=0.5)
 					var/obj/Skills/Projectile/_Projectile/bf = proj
 					spawn(8) if(bf) bf.filters = list()
 
@@ -404,9 +409,9 @@ obj/GoB_Sentinel
 				var/powerDif = Owner.getPower(m)
 				var/statPower = Owner.getStatDmg2()
 				var/endFactor = m.getEndStat(1)
-				var/dmg = (clamp(powerDif,0.1,100000)**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.AUTOHIT_EFFECTIVNESS) ** -(endFactor**glob.DMG_END_EXPONENT / statPower**glob.DMG_STR_EXPONENT)
-				dmg *= 0.5
-				dmg *= Owner.GetDamageMod()
+				var/dmg = strikeCoreDamage(clamp(powerDif,0.1,100000), statPower, endFactor)
+				dmg *= 0.3
+				dmg *= Owner.strikeJudgmentMult()
 				if(IsLegendary) dmg *= 1.5
 				dmg *= 1 + (SentinelMastery * 0.05)
 				m.LoseHealth(dmg, Owner)
@@ -520,9 +525,9 @@ obj/Skills/AutoHit/Enuma_Elish
 	Distance = 35
 	DistanceAround = 3
 	DamageMult = 50
-	StrOffense = 1
-	ForOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	ForScaling = 1
+	EndEffectiveness = 1
 	CanBeBlocked = 0
 	CanBeDodged = 0
 	Scorching = 50
@@ -535,6 +540,7 @@ obj/Skills/AutoHit/Enuma_Elish
 	IconX = -158
 	IconY = -169
 	NeedsSword = 1
+	EraseProjectiles = 1
 	ActiveMessage = "channels the Sword of Rupturing Heaven — Enuma Elish!"
 	var/tmp/enuma_shatter_fired = 0
 	var/tmp/charging_enuma = 0
@@ -612,7 +618,7 @@ obj/Skills/AutoHit/Enuma_Elish
 		skill.charging_enuma = 0
 		PurgeEnumaElishSharedZones(shooter, target)
 		OMsg(shooter, "<b><font color='gold'>[shooter] [skill.ActiveMessage]</font></b>")
-		shooter.Activate(skill)
+		shooter.Activate(skill, noGCD = TRUE)
 
 	verb/Enuma_Elish()
 		set category = "Skills"
@@ -638,6 +644,7 @@ obj/Skills/Summon_Ea
 
 	verb/Summon_Ea()
 		set category = "Skills"
+		set hidden = 1
 		var/obj/Items/Sword/Medium/Legendary/Ea/ea = locate(/obj/Items/Sword/Medium/Legendary/Ea, usr)
 		if(ea)
 
@@ -659,6 +666,7 @@ obj/Skills/Summon_Ea
 // Particle emitter for the Enuma Elish charge-up sequence
 obj/EaParticleEmitter
 	density       = 0
+	plane         = FX_RELAY_PLANE
 	layer         = 20
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
@@ -676,6 +684,7 @@ obj/EaVisual
 	name          = "Enuma Elish"
 	icon          = 'Hellnova.dmi'
 	density       = 0
+	plane         = FX_RELAY_PLANE
 	layer         = 20
 	mouse_opacity = 0
 	alpha         = 255

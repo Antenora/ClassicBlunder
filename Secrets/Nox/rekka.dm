@@ -1,23 +1,19 @@
 /mob/proc/inRekka()
 	var/obj/Skills/Utility/Ouroboros/oo = FindSkill(/obj/Skills/Utility/Ouroboros)
 	if(oo)
-		if(glob.OUROMACROLOCK && oo.last_pressed + glob.OUROMACROLOCK > world.time)
-			src << "You pressed too fast! (Ouroboros MACROLOCK is on.)"
-			return FALSE
 		if(oo.Using)
 			return oo
 	return FALSE
 
 /obj/Skills/Utility/Ouroboros
+	NoGCD = 1
 	var/last_triggered = ""
 	var/list/inputQueue = list()
-	var/tmp/last_pressed = -9999
 
 	verb/Ouroboros()
 		set category = "Skills"
+		set hidden = 1
 		if(!Using)
-			if(glob.OUROMACROLOCK)
-				last_pressed = world.time
 			Using = 1
 			if(usr.hudIsLive("Oro", /obj/orohud))
 				usr.client.hud_ids["Oro"].filters = list(type="outline", size=1, color=rgb(255, 255, 255))
@@ -29,9 +25,17 @@
 
 
 
+/obj/Skills/AutoHit/Ouroboros
+	NoGCD = 1
+/obj/Skills/Projectile/Ouroboros
+	NoGCD = 1
+/obj/Skills/Ouroboros
+	NoGCD = 1
+/obj/Skills/Buffs/SlotlessBuffs/Ouroboros
+	NoGCD = 1
+
 /obj/Skills/AutoHit/Ouroboros/Devouring_Fang
 	Area = "Arc"
-	AdaptRate = 1
 	DamageMult = 1
 	Distance = 2
 	TurfStrike=1
@@ -64,7 +68,6 @@
 
 	Area="Arc"
 	Distance=1
-	AdaptRate = 1
 	Launcher = 4
 	DamageMult=1
 	Cooldown=45 
@@ -86,7 +89,6 @@
 /obj/Skills/AutoHit/Ouroboros/Falling_Fang
 	Area="Cone"
 	Distance=1
-	AdaptRate = 1
 	Dunker = 1
 	DamageMult=1
 	Cooldown=45 
@@ -141,6 +143,7 @@
 	verb/Serpents_Redemption() // copy paste ? 
 		set name="Serpents Redemption"
 		set category="Skills"
+		set hidden = 1
 		var/obj/Skills/Utility/Ouroboros/oo = usr.inRekka()
 		if(oo && usr.Target)
 			if(usr.Target.passive_handler["Snared"])
@@ -160,6 +163,7 @@
 	verb/Serpents_Pull() // copy paste ? 
 		set name="Serpents Pull"
 		set category="Skills"
+		set hidden = 1
 		var/obj/Skills/Utility/Ouroboros/oo = usr.inRekka()
 		if(oo && usr.Target)
 			if(usr.Target.passive_handler["Snared"])

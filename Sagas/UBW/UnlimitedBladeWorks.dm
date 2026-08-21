@@ -60,9 +60,10 @@ obj/DomainExpansionRoof
 /mob/Admin3/verb/GiveDomainExpansion()
 	set category = "Admin"
 	set name = "Give Domain Expansion"
-	var/demonName = input(src, "What is the name of the Demon? (e.g. 'Malovent Imperium' -> activation says 'X says: Domain Expansion.. Malovent Imperium')", "Domain Expansion - Name") as text|null
+	if(!src.Alert("Are you sure you want to give someone Domain Expansion?")) return
+	var/demonName = input(src, "What is the name of the Domain? (e.g. 'Malovent Imperium' -> activation says 'X says: Domain Expansion.. Malovent Imperium')", "Domain Expansion - Name") as text|null
 	if(!demonName || !length(demonName))
-		src << "Cancelled. No demon name provided."
+		src << "Cancelled. No domain name provided."
 		return
 	var/icon/customTurfIcon = input(src, "Upload the custom floor icon for the Domain (32x32 .dmi, single state).", "Domain Expansion - Turf Icon") as icon|null
 	if(!customTurfIcon)

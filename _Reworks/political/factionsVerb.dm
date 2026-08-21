@@ -53,6 +53,7 @@
 /mob/verb/customizePU()
     set name = "Customize: PU Charging"
     set category = "Other"
+    set hidden = 1
     if(!src.client)
         return
     var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
@@ -67,19 +68,11 @@
     else
         customPUnameInclude = FALSE
 
-/mob/verb/Admins()
-    set name = "Admins"
-    set category = "Other"
-    for(var/mob/p in players)
-        if(p.Admin)
-            src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"
-
-
-
 /*
 /mob/verb/FactionCount()
     set name = "Faction Count"
     set category = "Other"
+    set hidden = 1
     var/list/total = FACTIONS
     for(var/mob/Players/M in players)
         if(!M.client)
@@ -105,25 +98,10 @@ characterInformation*/
 /mob/var/hidingInformation = FALSE
 /mob/verb/Hide_Information()
     set category = "Other"
+    set hidden = 1
     hidingInformation = !hidingInformation
     src << "The ID Card is [hidingInformation ? "hidden." : "not hidden."]"
 
-characterInformation/proc/getFactionGuild(mob/Players/p)
-    var/content = ""
-    if(showFaction)
-        content += "<font color='[factionColor]'>[faction] (<font color='[jobColor]'>[job]</font>)</font>"
-    if(showGuild)
-        content += "\n"
-        for(var/x in p.inGuilds)
-            if(findGuildByID(x))
-                var/guild/g = findGuildByID(x)
-                if(p.UniqueID == g.ownerID)
-                    content += "[g.name] ( Leader )"
-                else if(p.UniqueID in g.officers)
-                    content += "[g.name] ( Officer )"
-
-                else
-                    content += "[g.name] ( Member )"
 characterInformation/proc/getInformation(mob/p, see_pronouns)
     if(p.hidingInformation)
         return "[p.subjectpronoun() == "They" ? "They have" : "[p.subjectpronoun()] has"] no ID Card"

@@ -1,11 +1,11 @@
 obj/Skills/Projectile/Getsuga_Tenshou
 	name = "Getsuga Tenshou"
-	ManaCost=5
-	Cooldown = 3
+	ManaCost=1
+	Cooldown = 5
 	NeedsSword=1
-	StrRate = 1
-	ForRate = 1
-	DamageMult = 5
+	StrScaling = 1
+	ForScaling = 1
+	DamageMult = 0.55
 	AccMult = 1.2
 	Distance = 20
 	Homing = 1
@@ -25,19 +25,19 @@ obj/Skills/Projectile/Getsuga_Tenshou
 	ActiveMessage = "releases a wave of Getsuga!"
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
-		var/icon_used
+		HitboxW = 0 //mask supersede
+		HitboxH = 0
 		var/baseDmg = initial(DamageMult)
-		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? 5 : 0
+		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? initial(DamageMult) : 0
 		DamageMult = (baseDmg + bonus) * benefit
 		var/inBankai = p.CheckSlotless("Tensa Zangetsu")
 		if(sweet_spot_hit)
-			icon_used = inBankai ? 'Big Getsuga.dmi' : 'Big Getsuga Shikai.dmi'
+			IconLock = inBankai ? 'Big Getsuga.dmi' : 'Big Getsuga Shikai.dmi'
 			LockX = -65
 			LockY = -65
 		else
-			icon_used = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
-		p.Blast(src, p, 1, icon_used)
-		src.Cooldown(1, null, p)
+			IconLock = inBankai ? 'Small Getsuga.dmi' : 'Small Getsuga Shikai.dmi'
+		p.UseProjectile(src, noGCD = TRUE)
 		ResetHeldConfig()
 
 	verb/Getsuga_Tenshou()
@@ -55,12 +55,12 @@ obj/Skills/Projectile/Getsuga_Tenshou
 
 obj/Skills/Projectile/Getsuga_Jujisho
 	name = "Getsuga Jujisho"
-	Cooldown = 120
-	ManaCost=20
+	Cooldown = 30
+	ManaCost=8
 	NeedsSword=1
-	StrRate = 1
-	ForRate = 1
-	DamageMult = 25
+	StrScaling = 1
+	ForScaling = 1
+	DamageMult = 8.25
 	AccMult = 1.3
 	Distance = 20
 	Homing = 1

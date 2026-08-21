@@ -17,6 +17,7 @@ race
 		imagination = 2
 		intellect = 1.5
 		learning = 1.25
+		growth = 1.25
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Regeneration, /obj/Skills/Queue/Infestation)
 		/* /obj/Skills/AutoHit/AntennaBeam */
 		classes = list("Warrior", "Dragon", "Demon")
@@ -37,7 +38,7 @@ race
 			if(user.Class=="Warrior")
 				passives = list("TechniqueMastery" = 1, "Tenacity" = 1, "Pursuer" = 1)
 			if(user.Class=="Demon")
-				passives = list("SpiritSword" = 0.25, "TechniqueMastery" = 1, "SpiritFlow" = 0.25, "Maki" = 1)
+				passives = list( "TechniqueMastery" = 1,  "Maki" = 1)
 			for(var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r in user)
 				r.RegenerateLimbs=1
 			user.passive_handler.increaseList(passives)

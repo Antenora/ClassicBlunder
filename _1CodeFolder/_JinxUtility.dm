@@ -1,4 +1,3 @@
-#define GLOBAL_LEAK_REDUCTION 1.2
 #define isplayer(x) istype(x,/mob/Players)
 
 // Was previously in MajinAscensions.dm
@@ -22,11 +21,9 @@ mob
 	proc
 
 		AscAvailable()
-			src.potential_ascend(Silent=1)
+			potential_ascend();
 			if(race.ascensions.len==0) return
-			//If a prompt is already open from a prior call (e.g. spammed Meditate),
-			//bail — otherwise race subclass onAscension overrides re-apply their passive Increase() calls
-			//each time we re-enter before the parent's pickingChoice guard is reached.
+			//bail if a prompt is already open (spammed Meditate) or Increase() gets re-applied
 			for(var/ascension/pending in race.ascensions)
 				if(pending.pickingChoice) return
 			for(var/a in race.ascensions)
@@ -43,10 +40,8 @@ mob
 		DamageSelf(var/val, trueDmg)
 			if(val < 0)
 				val = 0.015
-			if(src.Health-val<=src.AngerPoint*(1-src.HealthCut))
-				if(!src.Anger&&!src.HasCalmAnger()&&!src.HasNoAnger()&&!src.AngerCD&&!src.HasLunarAnger())
-					src.Anger()
-					val/=src.AngerMax
+			if(src.AngerAdvance(val))
+				val/=src.AngerMax
 			if(src.VaizardHealth)
 				src.VaizardHealth-=val
 				if(src.VaizardHealth<=0)
@@ -79,18 +74,14 @@ mob
 			if(passive_handler["Determination(Orange)"]||passive_handler["Determination(White)"])
 				persistence+=ManaAmount/20
 			if(prob(persistence * glob.PERSISTENCE_CHANCE_SELF)&&!HasInjuryImmune())
-				if(glob.PERSISTENCE_DIVIDES_DAMAGE)
-					var/clamped = clamp(persistence, glob.PRESISTENCE_DIVISOR_MIN, glob.PRESISTENCE_DIVISOR_MAX)
-					WoundSelf(val/clamped)
-				else
-					WoundSelf(val)
-				if(glob.PERSISTENCE_NEGATES_DAMAGE)
-					val = 0
-			src.Health-=val
+				var/clamped = clamp(persistence, glob.PRESISTENCE_DIVISOR_MIN, glob.PRESISTENCE_DIVISOR_MAX)
+				WoundSelf(val/clamped)
+				val = 0
+			src.Health-=src.PctToHP(val)
 			if(src.CursedWounds())
 				src.WoundSelf(val)
 			if(src.Health<=0&&!src.KO)
-				if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP)
+				if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
 					return
 				if(src.Burn&&src.Poison)
 					src.Unconscious(null, "succumbing to terrible pain!")
@@ -100,804 +91,9 @@ mob
 					src.Unconscious(null, "succumbing to poison!")
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
-		DoDamage(var/mob/defender, var/val, var/UnarmedAttack=0, var/SwordAttack=0, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/TrueMult=0, var/SpiritAttack=0, var/Destructive=0, Autohit = FALSE, innateLifeSteal = FALSE, atkSpecialFlag = 0, atkSpellElem = null, atkMeleePipe = 0)
-			#if DEBUG_DAMAGE
-			log2text("Damage", "Start DoDamage", "damageDebugs.txt", src.ckey)
-			log2text("Damage", val, "damageDebugs.txt", src.ckey)
-			#endif
-			val = newDoDamage(defender, val, UnarmedAttack, SwordAttack, SecondStrike, ThirdStrike, AsuraStrike, TrueMult, SpiritAttack, Destructive, Autohit)
-			DEBUGMSG("val after newDoDamage [val]")
-			// Devil Summoner: Knight/Paladin/Hero Soul redirects part of the damage to the active demon
-			if(defender && defender.demon_active && defender.demon_soul_dmg_pct > 0 && istype(defender.demon_active, /mob/Player/AI/Demon))
-				var/mob/Player/AI/Demon/_ds_d = defender.demon_active
-				if(_ds_d && _ds_d.demon_hp > 0 && src != _ds_d)
-					var/orig_val = val
-					val = round(val * (1 - defender.demon_soul_dmg_pct))
-					var/demon_takes = max(1, round(orig_val * defender.demon_soul_transfer_pct))
-					_ds_d.demon_hp = max(0, _ds_d.demon_hp - demon_takes)
-					var/datum/party_demon/_ds_pd = _ds_d.DemonGetPartyDemon()
-					if(_ds_pd) _ds_pd.current_hp = _ds_d.demon_hp
-					if(defender.client)
-						defender << "<font color='#aaccff'>[_ds_d.name] absorbs [demon_takes] damage in your stead!</font>"
-					if(_ds_d.demon_hp <= 0)
-						_ds_d.DemonDespawn()
-			if(src.HasPurity())//If damager is pure
-				var/found=0//Assume you haven't found a proper target
-				if(defender.IsEvil()||src.HasBeyondPurity())
-					DEBUGMSG("[defender] is evil or [src] has beyond purity")
-					found=1
-				if(!found)//If you don't find what you're supposed to hunt
-					DEBUGMSG("[src] is attacking a pure target and so value is set to 0")
-					val = 0;
-			if(defender && defender.passive_handler["RoyalGuarding"])
-				var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in defender.contents
-				if(RG)
-					defender << "<font color= 'green'>ATTACK PARRIED!</font>"
-					RG.SuccessfulParry = 2
-					var/masteryMult = 1 + ((RG.Mastery - 1) / 100)
-					var/meterGain = max((val * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
-					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100+(RG.Mastery-1))
-					val = 0
-					defender.client.updateRGMeter()
-			if(val==0)
-				DEBUGMSG("val is 0 so we're ending dodamage now")
-				return 0;
-
-			if(src != defender)
-				var/reflectMakarakarn = defender.demon_makarakarn_until > world.time && (atkSpecialFlag || atkSpellElem)
-				var/reflectTetrakarn  = defender.demon_tetrakarn_until > world.time && atkMeleePipe
-				if(reflectMakarakarn || reflectTetrakarn)
-					var/reflected = val
-					var/barrier = reflectTetrakarn ? "Tetrakarn" : "Makarakarn"
-					OMsg(defender, "<font color='#88ddff'>[defender]'s [barrier] reflects the attack back at [src]!</font>")
-					src.LoseHealth(reflected)
-					return 0
-
-			if(src.isLunaticMode())
-				src.InflictLunacy(val, defender);
-
-			fieldAndDefense(defender, UnarmedAttack, SwordAttack, SpiritAttack, val)
-
-			if(defender.passive_handler["Determination(Purple)"] || defender.passive_handler["Determination(White)"])
-				defender.HealMana(defender.SagaLevel / 60, 1)
-				if(defender.ManaAmount>=100 && defender.RebirthHeroType=="Cyan"&&!defender.passive_handler["Determination(White)"])
-					defender.passive_handler.Set("Determination(Green)", 1)
-					defender.passive_handler.Set("Determination(Purple)", 0)
-					defender<<"Your SOUL color shifts to green!"
-			if(src.HasSoftStyle())
-				defender.GainFatigue(val*clamp(glob.SOFT_STYLE_RATIO*src.GetSoftStyle(), 0.0001, 0.5))
-			if(src.HasHardStyle())
-				if(!src.CursedWounds())
-					src.DealWounds(defender, val*clamp(glob.HARD_STYLE_RATIO*src.GetHardStyle(), 0.0001, 0.75))
-			if(src.HasCyberStigma())
-				if(defender.CyberCancel||defender.Mechanized)
-					defender.LoseMana(val*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
-
-			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", val/2)
-			handlePostDamage(defender)
-			if(defender.VaizardHealth)
-				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
-					val *= glob.SYMBIOTE_DMG_TEST
-				defender.VaizardHealth-=val
-				if(defender.VaizardHealth<=0)
-					if(defender.ActiveBuff)
-						if(defender.ActiveBuff.VaizardShatter)
-							defender.ActiveBuff.Trigger(defender)
-					if(defender.SpecialBuff)
-						if(defender.SpecialBuff.VaizardShatter)
-							defender.SpecialBuff.Trigger(defender)
-					for(var/sb in defender.SlotlessBuffs)
-						var/obj/Skills/Buffs/SlotlessBuffs/b = defender.SlotlessBuffs[sb]
-						if(b)
-							if(b.VaizardShatter)
-								b.Trigger(defender)
-					if(defender.VaizardHealth<0)
-						val=((-1)*defender.VaizardHealth)
-						defender.VaizardHealth=0
-				else
-					var/PD=src.passive_handler.Get("Piercing") //don't make this over 1. if anyone makes it over 1 i will kill them. hell, if anyone makes it equal to 1 i will also kill you. i swear to go. unless it's me, then it's okay. d
-					if(src.passive_handler.Get("Determination(Black)"))
-						val/=4
-					else if(src.passive_handler.Get("Piercing"))
-						val*=PD
-					else
-						val=0
-
-			if(defender.BioArmor)
-				defender.BioArmor-=val
-				if(defender.BioArmor<0)
-					val=(-1)*defender.BioArmor
-					defender.BioArmor=0
-				else
-					val=0
-
-			if(defender.Health-val<=defender.AngerPoint*(1-defender.HealthCut))
-				if(!defender.Anger&&!defender.HasCalmAnger()&&!defender.HasNoAnger()&&!defender.AngerCD&&!defender.HasLunarAnger())
-					defender.Anger()
-					val/=defender.AngerMax
-
-			if(defender.passive_handler.Get("Persistence")&&!defender.HasInjuryImmune()||defender.passive_handler.Get("Determination(Orange)")&&!defender.HasInjuryImmune()||defender.passive_handler.Get("Determination(Orange)")&&!defender.HasInjuryImmune())
-				if(FightingSeriously(src,defender))
-					var/desp = clamp(passive_handler.Get("Persistence"), 0.1, glob.MAX_PERSISTENCE_CALCULATED)
-					if(defender.passive_handler["Determination(Orange)"]||defender.passive_handler["Determination(White)"])
-						desp+=ManaAmount/20
-					if(prob(desp*glob.PERSISTENCE_CHANCE))
-						desp = clamp(desp, 1, glob.PRESISTENCE_DIVISOR_MAX)
-						if(glob.PERSISTENCE_NEGATES_DAMAGE)
-							defender.WoundSelf(val/sqrt(1+desp))//Take all damage as wounds
-						else
-							WoundSelf(val)
-						val=0//but no health damage.
-
-			if(defender.KO&&!src.Lethal)
-				val=0
-
-			if(defender.CheckSpecial("Kamui Unite") && defender.passive_handler.Get("GodKi") < 1)
-				if(defender.Health<=10)
-					defender.TotalInjury=0
-					defender.TotalFatigue=0
-					defender.Health += (50 * (1 - defender.passive_handler.Get("GodKi")))
-					defender.Energy += (50 * (1 - defender.passive_handler.Get("GodKi")))
-					defender.BPPoison=1
-					defender.passive_handler.Increase("GodKi", 0.25)
-					OMsg(defender, "<font color='red'><font size=+2>[defender] stitches themselves back together with life fibers!</font size></font color>")
-
-
-			if(istype(defender, /mob/Player/AI))
-
-				var/mob/Player/AI/aa = defender
-				if(!istype(src, /mob/Player/AI))
-					if(aa.ai_hostility >= 1)
-						if(aa.inloop == FALSE && !(aa in ticking_ai) && !(aa in companion_ais))
-							ticking_ai.Add(aa)
-						aa.SetTarget(src)
-						aa.ai_state = "Chase"
-						aa.last_activity = world.time
-
-			if(defender.CheckSlotless("Crystal Wall"))
-				src.LoseHealth(val)
-				return 0;
-
-
-			if(getBackSide(src, defender, passive_handler["Fault Finder"]) && passive_handler["Backshot"])
-				val *= 1 + (passive_handler["Backshot"]/10)
-
-
-
-			if(passive_handler["CoolingDown"])
-				StyleBuff?:hotCold = clamp(StyleBuff?:hotCold - val * glob.HOTNCOLD_MODIFIER, -100, 100)
-			else if(passive_handler["HeatingUp"])
-				StyleBuff?:hotCold  = clamp(StyleBuff?:hotCold + val * glob.HOTNCOLD_MODIFIER, -100, 100)
-			if(passive_handler["Grit"])
-				AdjustGrit("add", val*glob.racials.GRITMULT)
-			if(passive_handler["BlindingVenom"] && can_use_style_effect("BlindingVenom"))
-				if(client)
-					var/dur = passive_handler["BlindingVenom"]*glob.VENOMBLINDMULT
-					defender.flash(dur, rgb(137, 0, 161), 2)
-					defender.drunkeffect(dur)
-					defender.RemoveTarget()
-					defender.Grab_Release()
-					last_style_effect = world.time
-
-
-			var/tmpval = val
-			if(defender.key=="Vuffa" && defender.findVuffa())
-				if(defender.findVuffa().vuffaMoment)
-					tmpval*=1000000
-					if(defender.findVuffa().vuffaMessage)
-						OMsg(defender, "<font color='[rgb(255, 0, 0)]'>[defender.findVuffa().vuffaMessage]</font color>")
-					else
-						OMsg(src, "<font color='[rgb(255, 0, 0)]'>[defender] takes a critical hit! They take [tmpval] damage!</font color>")
-				DEBUGMSG("this was a voof hit and the dmg is: [tmpval]")
-				var/final_vuffa_damage = max(0,tmpval)
-				defender.LoseHealth(final_vuffa_damage)
-			else
-				DEBUGMSG("this is the damage actually dealt: [val]")
-				var/final_damage = max(0,val)
-				defender.LoseHealth(final_damage);
-				if(defender.passive_handler.Get("LustFactor")) defender.applySinBonusFromTakenDamage(final_damage);
-				if(passive_handler.Get("LustFactor")) applySinBonusFromDealtDamage(final_damage);
-				if(passive_handler.Get("WarmingUp")) applyWarmingUpFromDealtDamage(final_damage)
-				if(defender.passive_handler.Get("WarmingUp")) defender.applyWarmingUpFromTakenDamage(final_damage)
-				if(passive_handler.Get("SlothFactor"))
-					DevilTriggerSlothBonus = 0
-					LastSlothTick = world.time
-				if(defender.passive_handler.Get("SlothFactor"))
-					defender.DevilTriggerSlothBonus = 0
-					defender.LastSlothTick = world.time
-
-			// Overwatch CombatLog hook — record the hit on both sides for admin review.
-			if(val > 0)
-				src.RecordCombatEvent("Hit [defender] for [round(val,0.1)]")
-				defender.RecordCombatEvent("Hit by [src] for [round(val,0.1)]")
-
-			ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
-
-			if(defender.Flying)
-				var/obj/Items/check = defender.EquippedFlyingDevice()
-				if(istype(check))
-					check.ObjectUse(defender)
-					defender << "You are knocked off your flying device!"
-
-
-
-			if(UnarmedAttack || SwordAttack || SpiritAttack)
-				var/Motivation=1+defender.passive_handler.Get("Motivation")
-				if(src.StyleBuff && canGainTension())
-					if(!SecondStrike)
-						src.gainTension(val);
-				if(defender && defender.StyleBuff && defender.canGainTension())
-					if(!SecondStrike)
-						defender.gainTension((val*Motivation)*glob.DEFENDER_TENSION_REDUCER);
-						if(defender.Health<src.Health && defender.passive_handler.Get("SpiralPowerUnlocked"))
-							defender.gainTension((val*Motivation*2)*glob.DEFENDER_TENSION_REDUCER);
-			var/leakVal = val/GLOBAL_LEAK_REDUCTION
-			if(passive_handler.Get("Corruption"))
-				gainCorruption(val * 1.5 * glob.CORRUPTION_GAIN)
-			if(defender.passive_handler.Get("Corruption"))
-				gainCorruption(val * 0.75 * glob.CORRUPTION_GAIN)
-
-			if(src.HasEnergyLeak())
-				src.LoseEnergy(src.GetEnergyLeak()*0.25*leakVal)
-			if(defender.HasEnergyLeak())
-				defender.LoseEnergy((defender.GetEnergyLeak()*0.25*leakVal)/4)
-
-			if(src.HasFatigueLeak())
-				src.GainFatigue(src.GetFatigueLeak()*0.25*leakVal)
-			if(defender.HasFatigueLeak())
-				defender.GainFatigue((src.GetFatigueLeak()*0.25*leakVal)/4)
-
-			if(src.HasManaLeak())
-				src.LoseMana(src.GetManaLeak()*0.25*leakVal, 1)
-			if(defender.HasManaLeak())
-				defender.LoseMana((defender.GetManaLeak()*0.25*leakVal)/4, 1)
-
-			if(src.HasBleedHit())
-				src.WoundSelf(src.GetBleedHit()*0.15*leakVal)
-			if(src.HasBurnHit())
-				src.AddBurn(src.GetBurnHit()*0.15*leakVal, src)
-			if(src.passive_handler.Get("Ashen One"))
-				src.AddBurn(passive_handler.Get("Kindling"), src)
-			if(src.Kaioken)
-				src.HandleKaiokenTax()
-			//If you are burned and have debuff reversal, smack fire into the other fighter
-			var/debuffRev = src.GetDebuffReversal();
-			if(src.Burn && debuffRev)
-				defender.AddBurn(src.Burn/50*debuffRev, src);
-			//Same for poison
-			if(src.Poison && debuffRev)
-				defender.AddPoison(src.Poison/50*debuffRev, src);
-
-
-			var/mortalStrike = GetMortalStrike()
-			if(mortalStrike > 0  && FightingSeriously(src, 0))
-				if(val > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
-					if(!defender.MortallyWounded) // the last time, plus the timer
-						defender.MortallyWounded += 1
-						var/dmg = defender.Health * 0.15
-						defender.LoseHealth(dmg)
-						defender.WoundSelf(dmg)
-						OMsg(defender, "<font color='red'><font size=+2><b>[src] mortally wounded [defender] with a devistating attack!</b></font size></font color>")
-			if(src.HasMaimStrike()&&FightingSeriously(src, 0))
-				if(val>(6*glob.WorldDamageMult/src.GetMaimStrike())&&defender.Maimed<4 && world.realtime > MaimCooldown+Day(0.75))
-					defender.Maimed+=1
-					defender.recordMaim(src, "Combat")
-					OMsg(defender, "<font color='red'><font size=+2><b>[src] maimed [defender] with a brutal attack!</b></font size></font color>")
-				else if(val>(3*glob.WorldDamageMult/src.GetMaimStrike())&&defender.Tail)
-					defender.Tail=0
-					OMsg(defender, "<font color='red'><font size=+2><b>[src] took off [defender]'s tail!</b></font size></font color>")
-			if(passive_handler.Get("Gluttony") && FightingSeriously(src, 0))
-				var/amount = val * (passive_handler.Get("Gluttony") * SpecialBuff:hungerMult)
-				defender.LoseMana(amount/2)
-				defender.LoseCapacity(amount/2)
-				SpecialBuff:eatEnergies(amount * 10)
-				defender.TotalFatigue+=amount/2
-				Update_Stat_Labels()
-
-			if(FightingSeriously(src, defender) && src.isRace(/race/demi_fiend))
-				for(var/obj/Items/Magatama/M in src)
-					if(M.suffix == "*Equipped*" && M.mastery < 100)
-						M.gainMastery(val * 0.02)
-
-			if(passive_handler.Get("CorruptAffected"))
-				if(demon)
-					demon.applyDebuffs(defender, src)
-
-
-			var/soulfire = GetSoulFire();
-			if(soulfire)
-				if(!(defender.CyberCancel || defender.Mechanized))
-					defender.LoseCapacity(val*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
-				defender.LoseMana(val*(soulfire*glob.SOUL_FIRE_MANA_RATIO))
-				defender.TotalFatigue+=(val*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
-
-			if(defender.CheckSlotless("Protega"))
-				src.LoseHealth(val/10)
-			if(painShared)
-				applyPainSharedDamage(val)
-			if(defender.passive_handler.Get("MeltyBlood"))
-				if(defender.Health<50*(1-src.HealthCut))
-					if(FightingSeriously(src,0))
-						if(!defender.MeltyMessage)
-							defender.MeltyMessage=1
-							OMsg(defender, "<font color='red'>[defender]'s blood burns through all it comes in contact with!</font>")
-						src.AddBurn(val * (1 + defender.passive_handler.Get("MeltyBlood")), defender)
-			if(defender.passive_handler.Get("VenomBlood"))
-				if(defender.Health<50*(1-src.HealthCut))
-					if(FightingSeriously(src,0))
-						if(!defender.VenomMessage)
-							defender.VenomMessage+=1
-							OMsg(defender, "<font color='red'>[defender]'s toxic blood sprays out!</font>")
-						src.AddPoison(val* (1 + defender.passive_handler.Get("VenomBlood")), defender)
-
-
-			if(defender.Health<=defender.AngerPoint*(1-src.HealthCut)&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
-				if(defender.Anger)
-					defender.DefianceCalcs(val, src)
-			if(defender.passive_handler["Shonen"]&&defender.Target)
-				if(defender.Health < defender.Target.Health && Health < 50 + 5 * defender.AscensionsAcquired)
-					defender.ShonenCounter+=(val * (defender.AscensionsAcquired/40)) * 1 + (defender.passive_handler["Shonen"]/5)
-					if(defender.ShonenCounter>=glob.SHONENCOUNTERLIMIT)
-						defender.ShonenCounter=1
-						if(!defender.ShonenAnnounce)
-							defender << "This is your...Moment! (No App)"
-							var/obj/Skills/Buffs/s = defender.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Deus_Ex_Machina)
-							if(!defender.BuffOn(s))
-								s.Trigger(defender, TRUE)
-							defender.ShonenAnnounce=1
-			if(passive_handler["Shonen"]&&defender==Target)
-				if(Health < Target.Health && Health < 50 + 5 * AscensionsAcquired)
-					ShonenCounter+=(val * (AscensionsAcquired/40)) * 1 + (passive_handler["Shonen"]/5)
-					if(ShonenCounter>=glob.SHONENCOUNTERLIMIT)
-						ShonenCounter=1
-						if(!ShonenAnnounce)
-							src << "This is your...Moment! (No App)"
-							var/obj/Skills/Buffs/s = findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Deus_Ex_Machina)
-							if(!BuffOn(s))
-								s.Trigger(src, TRUE)
-							ShonenAnnounce=1
-
-			if(defender.HasAdaptation()&&src==defender.Target||src.HasAdaptation()&&defender==src.Target)
-				if(defender.HasAdaptation()&&!defender.CheckSlotless("Great Ape"))
-					defender.AdaptationTarget=src
-					var/ticks = defender.passive_handler.Get("Adaptation")
-					defender.AdaptationCounter+=( val*(defender.AscensionsAcquired/40) ) * 1 + (ticks/5)
-					if(defender.AdaptationCounter>=1)
-						defender.AdaptationCounter=1
-						if(!defender.AdaptationAnnounce)
-							defender << "<b>You've adapted to your target's style!</b>"
-							defender.AdaptationAnnounce=1
-				if(src.HasAdaptation()&&!CheckSlotless("Great Ape"))
-					src.AdaptationTarget=defender
-					var/ticks = passive_handler.Get("Adaptation")
-					src.AdaptationCounter+=(val*(src.AscensionsAcquired/40)) * 1 + (ticks/5)
-					if(src.AdaptationCounter>=1)
-						src.AdaptationCounter=1
-						if(!src.AdaptationAnnounce)
-							src << "<b>You've adapted to your target's style!</b>"
-							src.AdaptationAnnounce=1
-			// ADD HERE THE FUCKING FUTURE DIARY SHIT
-			if(src.HasWeaponBreaker()||defender.Saga=="Unlimited Blade Works")
-				if((defender.HasSword()||defender.HasStaff()||defender.HasArmor())&&(UnarmedAttack||SwordAttack))
-					var/obj/Items/Sword/s=defender.EquippedSword()
-					var/obj/Items/Enchantment/Staff/st=defender.EquippedStaff()
-					var/obj/Items/Armor/ar=defender.EquippedArmor()
-					// Equip
-					var/shatterTier = defender.GetShatterTier(s) // isn't even used i think
-					var/addWeaponBreaker = 0
-					if(AttackQueue&&AttackQueue.WeaponBreaker)
-						addWeaponBreaker += AttackQueue.WeaponBreaker
-					var/breakTicks = ((GetWeaponBreaker()+addWeaponBreaker) / glob.WEAPON_BREAKER_DIVISOR) * glob.WEAPON_BREAKER_EFFECTIVENESS
-					var/duraBoon = glob.WEAPON_ASC_DURA_BOON // SWORD DURA VARS
-					var/duraBase = 1 // SWORD DURA VARS
-					// Breaker Vars
-					var/SwordQuality
-					var/StaffQuality
-					var/ArmorQuality
-
-					if(s)
-						SwordQuality=min(s.Ascended+defender.GetSwordAscension(),6)
-					if(st)
-						StaffQuality=min(st.Ascended+defender.GetStaffAscension(),6)
-					if(ar)
-						ArmorQuality=min(ar.Ascended+defender.GetArmorAscension(),6)
-
-					if(defender.UsingKendo()&&defender.HasSword())
-						if(s.Class=="Wooden")
-							SwordQuality+=1
-						if(src.StyleActive=="Shinzan")
-							SwordQuality+=3
-						if(SwordQuality > 7)
-							SwordQuality=7
-
-
-
-					if(s)
-						if(s.Destructable)
-							s.startBreaking(val, breakTicks+shatterTier / ((duraBoon * SwordQuality) + duraBase), defender, src, "sword")
-					if(st)
-						if(st.Destructable)
-							st.startBreaking(val, breakTicks / ((duraBoon * StaffQuality) + duraBase), defender, src, "staff")
-					if(ar)
-						if(ar.Destructable)
-							ar.startBreaking(val, breakTicks / ((duraBoon * ArmorQuality) + duraBase), defender, src, "armor")
-
-					if(defender.EquippedSecondSword())
-						var/obj/Items/Sword/s2=defender.EquippedSecondSword()
-						var/Sword2Quality=min(s2.Ascended+defender.GetSwordAscension(),6)
-						if(s2&&s2.Destructable)
-							s.startBreaking(val, breakTicks / ((duraBoon * Sword2Quality) + duraBase), defender, src, "sword")
-					if(defender.EquippedThirdSword())
-						var/obj/Items/Sword/s3=defender.EquippedThirdSword()
-						var/Sword3Quality=min(s3.Ascended+defender.GetSwordAscension(),6)
-						if(s3&&s3.Destructable)
-							s.startBreaking(val, breakTicks / ((duraBoon * Sword3Quality) + duraBase), defender, src, "sword")
-
-			if(defender.HasLifeGeneration())
-				defender.HealHealth(defender.GetLifeGeneration()/glob.LIFE_GEN_DIVISOR * val)
-				if(defender.Health>=100-100*defender.HealthCut-defender.TotalInjury)
-					defender.HealWounds((defender.GetLifeGeneration() / glob.LIFE_GEN_DIVISOR * glob.WOUND_RECOVERY_REDUCTION * val))
-			if(HasEnergyGeneration())
-				var/gen = GetEnergyGeneration()/glob.ENERGY_GEN_DIVISOR;
-				HealEnergy(gen);
-				HealFatigue(gen/2);
-			if(HasManaGeneration())
-				HealMana(src.GetManaGeneration()/glob.MANA_GEN_DIVISOR);
-			if(defender.DownToEarth)
-				var/gen=5/glob.ENERGY_GEN_DIVISOR;
-				HealEnergy(gen);
-				HealFatigue(gen/2);
-				HealMana(5/glob.MANA_GEN_DIVISOR);
-
-			if(src.ActiveBuff&&src.CheckActive("Keyblade")&&!src.SpecialBuff)
-				src.ManaAmount+=(0.25*src.SagaLevel)
-			if(defender.ActiveBuff&&defender.CheckActive("Keyblade")&&!defender.SpecialBuff)
-				defender.ManaAmount+=(0.25*defender.SagaLevel)
-
-			if(GetHellPower() && !transActive()) HealMana(1)
-			if(defender.GetHellPower() && !defender.transActive()) defender.HealMana(1)
-
-			if(src.SlotlessBuffs)
-				if(src.CheckSlotless("Frost End"))
-					if(SwordAttack&&defender.Stunned)
-						defender.overlays+='IceCoffin.dmi'
-				if(src.CheckSlotless("AntiForm"))
-					src.ManaAmount-=1
-					if(src.ManaAmount<0)
-						ManaAmount=0
-				if(defender.CheckSlotless("OverSoul")&&defender.BoundLegend=="Caledfwlch")
-					if(!defender.Shielding)
-						defender.Shielding=1
-						spawn()
-							defender.AvalonField()
-
-			if(src.HasSoulSteal())
-				var/Amt=val*src.GetSoulSteal()
-				var/Cap=15*src.GetSoulSteal()
-				src.VaizardHealth+=Amt
-				if(src.VaizardHealth>Cap)
-					src.VaizardHealth=Cap
-
-			// WEREWOLF HUNGER MECHANIC
-			if(src.Secret == "Werewolf" && CheckSlotless("New Moon Form"))
-				if(!SecondStrike)
-					var/SecretInformation/Werewolf/s = src.secretDatum
-					s.addHunger(val)
-					Update_Stat_Labels()
-			//END WEREWOLF HUNGER MECHANIC
-
-			if(hasSecret("Eldritch"))
-				if(!SecondStrike)
-					var/SecretInformation/Eldritch/s = src.secretDatum
-					s.addMadness(src,val*(s.getMadnessLimit(src)/100))
-					Update_Stat_Labels()
-
-			if(defender.hasSecret("Eldritch"))
-				if(!SecondStrike)
-					var/SecretInformation/Eldritch/s = defender.secretDatum
-					s.addMadness(defender,val*(s.getMadnessLimit(defender)/100))
-					defender.Update_Stat_Labels()
-
-			if(src.HasLifeSteal()&&!SecondStrike || innateLifeSteal&&!SecondStrike)
-				var/CursedBlood=0
-				var/NoBlood=0
-				NoBlood=defender.CyberCancel
-				if(defender.isRace(ANDROID)||defender.isRace(ELDRITCH)||defender.Secret=="Zombie"||defender.Dead)
-					NoBlood=1
-				var/Effectiveness=1
-				if(NoBlood>0)
-					Effectiveness-=(Effectiveness*NoBlood)
-				if(defender.ActiveBuff && defender.ActiveBuff.BuffName == "Life Fiber Synchronize")
-					Effectiveness += min(0,4 - defender.SagaLevel)
-				if(defender.passive_handler.Get("MeltyBlood") && NoBlood<1)
-					CursedBlood=1
-					Effectiveness += defender.passive_handler.Get("MeltyBlood")
-					src.AddBurn(val*Effectiveness)
-					val/=2
-				if(defender.passive_handler.Get("VenomBlood"))
-					CursedBlood=1
-					Effectiveness+= defender.passive_handler.Get("VenomBlood")
-					src.AddPoison(val*Effectiveness,defender)
-				if(defender.Secret=="Hamon")
-					src.AddBurn(val*Effectiveness*defender.secretDatum.currentTier)
-					val/=defender.secretDatum.currentTier
-				if(!CursedBlood)
-					var/amtHeal = val*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness/100;
-					if(src.passive_handler.Get("Undying Rage"))
-						src.LifeStolen=0
-					amtHeal*=1*((100-src.LifeStolen)/100)
-					src.HealHealth(amtHeal)
-					if(defender.passive_handler.Get("The Inkstone") && src.LifeStolen>=50)
-						if(!src.passive_handler.Get("The Power of Stories"))
-							OMsg(src, "<b><font size=+3> [src] erupts with tremendous power, having stolen enough life from the Narrative to temporarily match it!")
-							src.passive_handler.Increase("The Power of Stories", 1)
-					src.LifeStolen+=amtHeal/2
-					if(passive_handler.Get("TrueAbsorb") && src.LifeStolen>=25)
-						src.LifeStolen=25
-					if(src.LifeStolen>=95)
-						src.LifeStolen=95
-					DEBUGMSG("[amtHeal] was healed by life steal");
-					if(src.Health>=(100-100*src.HealthCut-src.TotalInjury))
-						src.HealWounds(val*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness / 100 * glob.WOUND_RECOVERY_REDUCTION)
-			if(src.HasLifeStealTrue())
-				defender.AddHealthCut(val/200)
-				if(defender.HealthCut>=0.15)
-					defender.HealthCut=0.15
-				src.HealthCut-=(val/100)
-				if(src.HealthCut<=0)
-					src.HealthCut=0
-			if(src.HasEnergySteal())
-				src.HealEnergy(val*(src.GetEnergySteal() / 100))
-				defender.LoseEnergy(val*(src.GetEnergySteal() / 100))
-			if(HasManaSteal())
-				var/value = val * (GetManaSteal() / 100)
-				HealMana(value)
-				defender.LoseMana(value)
-
-			if(dainsleifDrawn&&passive_handler.Get("CursedSheath")) // dainsleif passive
-				cursedSheathValue += val
-				cursedSheathValue = clamp(0, cursedSheathValue, SagaLevel*50)
-
-			// Devil Summoner racial on-hit passives
-			if(src.demon_racial_femme_active)
-				src.DemonFemmeCharmCheck(defender)
-			if(src.demon_racial_snake_active)
-				src.DemonSnakePoisonCheck(defender)
-
-			if(src.HasErosion())
-				var/Erosion = (src.GetErosion()/4)
-				var/MPow=defender.Power_Multiplier/8
-				var/BPCap=MPow*Erosion
-				var/MStr=defender.GetStrMult()
-				var/StrCap=MStr*Erosion
-				var/MEnd=defender.GetEndMult()
-				var/EndCap=MEnd*Erosion
-				var/MSpd=defender.GetSpdMult()
-				var/SpdCap=MSpd*Erosion
-				var/MFor=defender.GetForMult()
-				var/ForCap=MFor*Erosion
-				var/MOff=defender.GetOffMult()
-				var/OffCap=MOff*Erosion
-				var/MDef=defender.GetDefMult()
-				var/DefCap=MDef*Erosion
-				var/MRecov=defender.GetRecovMult()
-				var/RecovCap=MRecov*Erosion
-				if(MPow>0)
-					defender.PowerEroded+=(BPCap/45)*val
-					if(defender.PowerEroded>BPCap)
-						defender.PowerEroded=BPCap
-				if(MStr>=1)
-					defender.StrEroded+=(StrCap/45)*val
-					if(defender.StrEroded>StrCap)
-						defender.StrEroded=StrCap
-				if(MEnd>=1)
-					defender.EndEroded+=(EndCap/45)*val
-					if(defender.EndEroded>EndCap)
-						defender.EndEroded=EndCap
-				if(MSpd>=1)
-					defender.SpdEroded+=(SpdCap/45)*val
-					if(defender.SpdEroded>SpdCap)
-						defender.SpdEroded=SpdCap
-				if(MFor>=1)
-					defender.ForEroded+=(ForCap/45)*val
-					if(defender.ForEroded>ForCap)
-						defender.ForEroded=ForCap
-				if(MOff>=1)
-					defender.OffEroded+=(OffCap/45)*val
-					if(defender.OffEroded>OffCap)
-						defender.OffEroded=OffCap
-				if(MDef>=1)
-					defender.DefEroded+=(DefCap/45)*val
-					if(defender.DefEroded>DefCap)
-						defender.DefEroded=DefCap
-				if(MRecov>=1)
-					defender.RecovEroded+=(RecovCap/45)*val
-					if(defender.RecovEroded>RecovCap)
-						defender.RecovEroded=RecovCap
-
-
-			if(passive_handler.Get("StealsStats")||src.ElementalOffense=="Void")
-				var/Effective=1
-				if(passive_handler.Get("StealsStats"))
-					Effective*=passive_handler.Get("StealsStats")
-				var/MStr=defender.GetStrMult()
-				var/MEnd=defender.GetEndMult()
-				var/MSpd=defender.GetSpdMult()
-				var/MFor=defender.GetForMult()
-				var/MOff=defender.GetOffMult()
-				var/MDef=defender.GetDefMult()
-				if(MStr>1)
-					if(src.StrStolen<(MStr-1))
-						src.StrStolen+=(((MStr-1)*0.025*Effective)*val)
-						if(src.StrStolen>(MStr-1))
-							src.StrStolen=(MStr-1)
-				if(MEnd>1)
-					if(src.EndStolen<(MEnd-1))
-						src.EndStolen+=(((MEnd-1)*0.025*Effective)*val)
-						if(src.EndStolen>(MEnd-1))
-							src.EndStolen=(MEnd-1)
-				if(MSpd>1)
-					if(src.SpdStolen<(MSpd-1))
-						src.SpdStolen+=(((MSpd-1)*0.025*Effective)*val)
-						if(src.SpdStolen>(MSpd-1))
-							src.SpdStolen=(MSpd-1)
-				if(MFor>1)
-					if(src.ForStolen<(MFor-1))
-						src.ForStolen+=(((MFor-1)*0.025*Effective)*val)
-						if(src.ForStolen>(MFor-1))
-							src.ForStolen=(MFor-1)
-				if(MOff>1)
-					if(src.OffStolen<(MOff-1))
-						src.OffStolen+=(((MOff-1)*0.025*Effective)*val)
-						if(src.OffStolen>(MOff-1))
-							src.OffStolen=(MOff-1)
-				if(MDef>1)
-					if(src.DefStolen<(MDef-1))
-						src.DefStolen+=(((MDef-1)*0.025*Effective)*val)
-						if(src.DefStolen>(MDef-1))
-							src.DefStolen=(MDef-1)
-
-			if(FightingSeriously(src,0))
-				var/WoundsInflicted
-				var/obj/Items/Sword/s=src.EquippedSword()
-				var/obj/Items/Enchantment/Staff/st=src.EquippedStaff()
-				if(src.CursedWounds())
-					if(defender.UsingMuken())
-						WoundsInflicted=val/defender.GetEnd()
-					else
-						if(defender.GetEnd(glob.CURSED_WOUNDS_RATE) < 2)
-							WoundsInflicted=val/(1+GetEnd(glob.CURSED_WOUNDS_RATE))
-						else
-							WoundsInflicted=val/defender.GetEnd(glob.CURSED_WOUNDS_RATE)
-				else if(src.HasPurity()&&defender.IsEvil()||HasPurity()&&HasBeyondPurity())
-					WoundsInflicted=val
-				else if(s||st)
-					if(((s&&s.Element=="Silver")||(st&&st.Element=="Silver"))&&defender.IsEvil())
-						WoundsInflicted=val/defender.GetEnd(glob.CURSED_WOUNDS_RATE)
-					else if(src.SwordWounds())
-						if(defender.GetEnd(0.5) < 2)
-							WoundsInflicted=val/clamp((1 + defender.GetEnd(0.5))/max(GetSwordDamage(s),0.01), 1, 15)
-						else
-							WoundsInflicted= val / clamp(defender.GetEnd(0.5)/max(GetSwordDamage(s),0.01), 1, 15)
-					else
-						if(defender.GetEnd(0.5) < 2)
-							WoundsInflicted=val/clamp(1 + defender.GetEnd(0.5), 1, 15)
-						else
-							WoundsInflicted=val/clamp(defender.GetEnd(0.5), 1, 15)
-				else
-					if(defender.GetEnd(0.5) < 2)
-						WoundsInflicted=val/clamp(1 + defender.GetEnd(0.5), 1, 15)
-					else
-						WoundsInflicted=val/clamp(defender.GetEnd(0.5), 1, 15)
-				if(WoundsInflicted<0)
-					WoundsInflicted=0.001
-				if(WoundsInflicted > val)
-				//	world.log << "[src] vs [defender] wonds([WoundsInflicted]) inflict was over val([val])"
-					WoundsInflicted = val
-				src.DealWounds(defender, WoundsInflicted)
-
-			if(isplayer(defender))
-				defender:move_speed = defender.MovementSpeed()
-			if(isplayer(src))
-				src:move_speed = MovementSpeed()
-
-			if(defender.Health<=0&&Destructive>0)
-				defender.Death(src, "being completely obliterated!", SuperDead=1, NoRemains=2)
-				return
-
-
-			if(defender.KO && istype(defender, /mob/Player/AI))
-				var/mob/Player/AI/a = defender
-				if(!a.ai_owner)
-					a.Death(src, null)
-					if(src.Frozen)
-						src.Frozen=0
-					return
-			if(defender.Health<=0&&!defender.KO)
-				defender.Unconscious(src)
-				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
-					defender.client.PlaySwoon()
-					defender.Maimed+=1
-					defender.recordMaim(src, "Combat")
-					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
-				if(passive_handler.Get("MaimKOStrike") && defender.client)
-					var/getup = defender.MaimKOGetups
-					var/limit = passive_handler.Get("MaimKOStrike")
-					defender.Maimed+=1
-					defender.MaimKOGetups+=1
-					defender.recordMaim(src, "Combat")
-					OMsg(defender, "<font color='red'><font size=+1><b>[defender] got maimed and knocked down by [src]...</b></font size></font color>")
-					if (getup < limit)
-						defender.KOTimer = 30
-						OMsg(defender, "<font color='green'><font size=+1><b>... but [defender] can still fight! ([defender] can get back into the fight once they get back up!)</b></font size></font color>")
-					if (getup >= limit)
-						OMsg(defender, "<font color='red'><font size=+1><b>[defender] cannot fight any longer.</b></font size></font color>")
-						defender.RPModeSwitch()
-						defender << "<b>You've been set to RP Mode as you cannot fight any longer for this encounter.</b>"
-			else if(defender.KO&&src.Lethal)
-				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
-					if(defender.client)
-						var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin/bor=EquippedSword()
-						bor.onKill(src, defender)
-				if(src.isRace(DEMON)||src.oozaru_type=="Demonic"&&src.transActive)
-					defender<<"Your soul has been irrevocably corrupted, a peaceful afterlife eternally torn from you."
-					defender.Damned=1
-				defender.Death(src, null)
-			if(src.passive_handler.Get("Certain Progress"))
-				if(val<0.1)
-					val=0.1
-			if(defender.passive_handler.Get("Certain Progress"))
-				if(val>1)
-					val=1
-			if(passive_handler.Get("Absolute Despair"))
-				if(val<0.1)
-					val=0.1
-			if(defender.passive_handler.Get("The Inkstone")&&defender.passive_handler.Get("Absolute Despair"))
-				if(prob(2)&& defender.BioArmor)
-					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! A crack in [defender]'s armor appears!</font color></font size></b>")
-					defender.BioArmor*=0.995
-					defender.BioArmor-=5
-					if(defender.BioArmor<0)
-						defender.BioArmor=0
-			if(passive_handler.Get("Ultimate Desperation"))
-				val=0
-				defender.Health/=10
-			if(defender.passive_handler.Get("Ultimate Defense"))
-				if(prob(95))
-					val=0.05
-
-			if(defender.passive_handler.Get("BossStagger") && !defender.passive_handler.Get("Staggered!"))
-				defender.StaggerMeter+=min(max(val, 0.1), 1.5)*defender.StaggerMult
-				if(prob(2))
-					defender.StaggerMeter+=2*defender.StaggerMult
-				defender.UpdateBossStaggerBar()
-				if(defender.StaggerMeter>=100)
-					defender.HideBossStaggerBar()
-					defender.StaggerMeter=0
-					var/StunStacking = 0
-					if(defender.Stunned > 0) //Was already stunned
-						StunStacking = 1
-					Stun(defender, 15, TRUE)
-					if(StunStacking == 1)
-						defender.last_stunned = defender.last_stunned + 150
-					KKTShockwave(defender, icon='KenShockwaveGold.dmi', Size=4, Time=16)
-					OMsg(src, "<b><font color='green'><font size=+1>[src] lands a decisive strike! [defender] is stunned-- Use everything you've got!</font color></font size></b>")
-					defender.passive_handler.Set("Staggered!", 1)
-
-			if((Saga=="Path of a Hero: Rebirth") && (RebirthHeroType=="Prismatic"))
-				var/meterGain = min(max(val,0.1), 0.9)
-				HyperdeathMeterCurrent=min(HyperdeathMeterCurrent+meterGain, 100)
-				HyperMeterUpdate()
-
-			if((defender.Saga=="Path of a Hero: Rebirth") && (defender.RebirthHeroType=="Prismatic"))
-				var/meterGain = min(max(val,0.1), 0.2)
-				defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)
-				defender.HyperMeterUpdate()
-
-			return val
 
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
+			val = defender.HPToPct(val)
 			if(defender.CyberCancel)
 				val*=(1-defender.CyberCancel)
 			if(defender.BioArmor)
@@ -923,7 +119,7 @@ mob
 			else
 				var/woundTaken = val;
 				if(defender.HasInjuryImmune())
-					woundTaken *= (1 - defender.GetInjuryImmune());
+					woundTaken *= clamp(1 - defender.GetInjuryImmune(), 0, 0.99);
 				defender.TotalInjury += woundTaken;
 
 				if(!isLunaticMode() && hasSecret("Eldritch") && !FromSelf)//Attacker gains blood stock from wounds dealt
@@ -953,9 +149,9 @@ mob
 			src.MaxHealth()
 			var/Absorb = passive_handler.Get("AbsorbingDamage")
 			if(passive_handler["Grit"])
-				AdjustGrit("add", val*glob.racials.GRITMULT)
+				AdjustGrit("add", HPToPct(val)*glob.racials.GRITMULT)
 			if(Absorb)
-				AbsorbingDamage += val
+				AbsorbingDamage += HPToPct(val)
 			if(isRace(MAJIN))
 				if(majinPassive != null)
 					majinPassive.tryDropBlob(src)
@@ -982,25 +178,15 @@ mob
 					*/
 			var/PrideDrain
 			if(passive_handler.Get("Pride"))
-				PrideDrain=(100-Health)*0.01
+				PrideDrain=(100-HealthPct())*0.01
 				if(PrideDrain>1)
 					PrideDrain=1
 				if(PrideDrain<0.01)
 					PrideDrain=0.01
 				val*=PrideDrain
-				if(src.Health>=85&&!passive_handler.Get("PowerStressed"))
+				if(src.HealthPct()>=85&&!passive_handler.Get("PowerStressed"))
 					val*=0
-			// Light Mender mage passive: 50% of energy spent is converted to mana on
-			// every spend. Hook fires HERE — after all the reduction multipliers
-			// (KiControlMastery, PowerUpPercent, PotionCD, PrideDrain) so the refund
-			// tracks what ACTUALLY gets paid, not the raw caller request. Otherwise
-			// a mage with KiControlMastery would refund more mana than they actually
-			// paid in energy, which is a free-resource exploit. Element-agnostic
-			// (mage-body passive, not Light-only) matching the Session 25/26/27/28
-			// mage-body convention. HealMana is safe — no PotionCD divider, just
-			// ManaAmount += val with MaxMana() clamp at _JinxUtility.dm:1014. The
-			// `val > 0` guard prevents the PrideDrain val*=0 path or any other
-			// zero-out from triggering a no-op HealMana call.
+			//Mender refunds half the energy as mana - after the reduction mults so it tracks what actually got paid
 			if(val > 0 && src.hasMagePassive(/mage_passive/light/Mender))
 				src.HealMana(val * 0.5)
 			src.Energy-=val
@@ -1016,14 +202,7 @@ mob
 		GainFatigue(var/val)
 			if(src.FusionPowered)
 				return
-			// Space Linearity mage passive: incoming Fatigue gain is reduced to 50%.
-			// Doc literal: "Fatigue gain / Capacity loss at 50% rate (each additional
-			// selection: 33%, 25%, ...)". Currently bound to flat 0.5 because
-			// hasMagePassive is count-blind — same single-tier limitation as Session
-			// 25/26 hooks. Halving the input val before the rest of the pipeline is
-			// mathematically equivalent to halving at the end (every downstream
-			// mutator is multiplicative), but reads cleaner as "Linearity halves the
-			// fatigue you would have taken".
+			//Linearity halves fatigue gain
 			if(src.hasMagePassive(/mage_passive/space/Linearity))
 				val *= 0.5
 			val/=1+src.GetKiControlMastery()
@@ -1059,11 +238,7 @@ mob
 			if(src.ManaAmount<=0)
 				src.ManaAmount=0
 		LoseCapacity(var/val)
-			// Space Linearity mage passive: Capacity loss is reduced to 50%. Pairs
-			// with the GainFatigue hook above — both halves of the doc line "Fatigue
-			// gain / Capacity loss at 50% rate" are now wired. Single-tier flat 0.5
-			// for the same reason as the Fatigue hook. Halving before the
-			// GetManaCapMult divider is order-equivalent to halving after.
+			//Linearity halves capacity loss too
 			if(src.hasMagePassive(/mage_passive/space/Linearity))
 				val *= 0.5
 			val/=src.GetManaCapMult()
@@ -1086,21 +261,11 @@ mob
 				Sheared = max(0, Sheared - val)
 			if(icon_state == "Meditate")
 				Tension = max(0, Tension - (val * 1.5))
-			if(CannotRegenHealth()) val = 0;
-			val *= getAngelicInfusionMult();//returns 1 if no angelicinfusion
 			if(passive_handler["InverseHealing"])
-				DoDamage(src, val)
+				DoDamage(src, src.PctToHP(val))
 				return
-			Health += val
-			MaxHealth()
-
-		CannotRegenHealth()
-			if(passive_handler["Staked"]) return 1;
-			if(passive_handler["AshChoked"]) return 1;
-			if(AwakeningSkillUsed == 1) return 1;
-			if(VaizardHealth && !passive_handler.Get("HealThroughTempHP")) return 1;
-			if(CelestialAscension == "Demon" && transActive >= 5 && transUnlocked < 6) return 1;
-			return 0;
+			src.Health+=src.PctToHP(val)
+			src.MaxHealth()
 
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
@@ -1159,11 +324,28 @@ mob
 			if(src.TotalCapacity<=0)
 				src.TotalCapacity=0
 			src.MaxMana()
+		MaxHP()
+			return glob.HP_PER_VIT*(src.GetVit()+glob.HP_STAT_BASE)
+		HealthCeiling()
+			var/HasWounds=1
+			if(src.HasUnstoppable())
+				HasWounds=0
+			return src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)*(1-src.HealthCut)
+		HealthPct()
+			return src.Health/src.MaxHP()*100
+		HPToPct(val)
+			return val/src.MaxHP()*100
+		PctToHP(pct)
+			return pct/100*src.MaxHP()
+		SetHealthPct(pct)
+			src.Health=src.PctToHP(pct)
+		HealPct(pct)
+			src.Health+=src.PctToHP(pct)
 		MaxHealth()
 			var/HasWounds=1
-			if(src.HasUnstoppable()||src.Secret=="Zombie")
+			if(src.HasUnstoppable())
 				HasWounds=0
-			var/KeyHealth=100-(src.TotalInjury*HasWounds)
+			var/KeyHealth=src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)
 			var/Sub
 			var/Cut
 			if(src.HealthCut)
@@ -1175,10 +357,10 @@ mob
 				src.Health=KeyHealth
 		MaxEnergy()
 			var/HasFatigue=1
-			if(src.HasUnstoppable()||src.Secret=="Zombie")
+			if(src.HasUnstoppable())
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
-				HasFatigue=0.7/(src.passive_handler.Get("Anaerobic"))
+				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
 			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
 			var/Sub
 			var/Cut
@@ -1221,11 +403,12 @@ mob
 			if(src.Oxygen>KeyOxygen)
 				src.Oxygen-=1
 		Calm(var/Pacified=0)
-			if(passive_handler.Get("EndlessAnger"))
-				return
 			if(!Pacified)src.OMessage(10,"<font color=white><i>[src] becomes calm.","<font color=silver>[src]([src.key]) becomes calm.")
 			src.DefianceCounter=0
 			src.Anger=0
+			src.AngerTier=0
+			src.AngerRush=0
+			src.AngerCalmHigh=0
 			race.onCalm(src)
 			src.AngerCD=5
 			if(src.oozaru_type=="Demonic")
@@ -1377,14 +560,7 @@ mob
 			if(isRace(ANDROID)||CyberneticMainframe&&src.Class=="Resourceful")
 				enhance = vars["Enhanced[statName]"] * 0.6
 			if(Target && ismob(Target))
-				// Rusting: when target carries the Rusting passive (mystic/hybrid styles)
-				// and the player is poisoned, debuff the player's enhance-chip stat by an
-				// amount that scales with both poison stacks and target's Rusting tier.
-				// Prior version had three bugs: (1) read self's Rusting instead of target's,
-				// which zeroed enhance for everyone without their own Rusting source;
-				// (2) formula scaled the multiplier UP with bigger Rusting/Poison, so high
-				// tiers debuffed less; (3) at extreme stacks the multiplier exceeded 1 and
-				// the debuff flipped into a buff. Rewritten as a clamped 1-x reduction.
+				//target's Rusting + your poison cuts enhance, clamped so it can't flip into a buff
 				var/targetRusting = Target.passive_handler["Rusting"]
 				if(targetRusting && Poison >= 1)
 					var/rustReduction = (Poison * glob.RUSTING_RATE * targetRusting) / 100
@@ -1392,25 +568,50 @@ mob
 			return enhance
 		BaseStr()
 			var/enhanced = getEnhanced("Strength")
-			return ((src.StrMod+src.StrAscension+(enhanced)))*StrChaos
+			var/Invested=0
+			var/Ascended=src.StrAscension+src.DetermineAscension("Strength")
+			Invested=src.StrengthInvest*glob.progress.STAT_PER_POINT
+			return ((src.StrMod+Ascended+(enhanced)+Invested))*StrChaos
 		BaseFor()
 			var/enhanced = getEnhanced("Force")
-			return ((src.ForMod+src.ForAscension+(enhanced)))*ForChaos
+			var/Invested=0
+			var/Ascended=src.ForAscension+src.DetermineAscension("Force")
+			Invested=src.ForceInvest*glob.progress.STAT_PER_POINT
+			return ((src.ForMod+Ascended+(enhanced)+Invested))*ForChaos
 		BaseEnd()
 			var/enhanced = getEnhanced("Endurance")
-			return ((src.EndMod+src.EndAscension+(enhanced)))*EndChaos
+			var/Ascended=src.EndAscension+src.DetermineAscension("Endurance")
+			var/Invested=0
+			Invested=src.EnduranceInvest*glob.progress.STAT_PER_POINT
+			return ((src.EndMod+Ascended+(enhanced)+Invested))*EndChaos
 		BaseSpd()
 			var/enhanced = getEnhanced("Speed")
-			return ((src.SpdMod+src.SpdAscension+(enhanced)))*SpdChaos
+			var/Ascended=src.SpdAscension+src.DetermineAscension("Speed")
+			var/Invested=0
+			Invested=src.SpeedInvest*glob.progress.STAT_PER_POINT
+			return ((src.SpdMod+Ascended+(enhanced)+Invested))*SpdChaos
 		BaseOff()
 			var/enhanced = getEnhanced("Aggression")
-			return ((src.OffMod+src.OffAscension+(enhanced)))*OffChaos
+			var/Ascended=src.OffAscension+src.DetermineAscension("Offense")
+			var/Invested=0
+			Invested=src.OffenseInvest*glob.progress.STAT_PER_POINT
+			return ((src.OffMod+Ascended+(enhanced)+Invested))*OffChaos
 		BaseDef()
 			var/enhanced = getEnhanced("Reflexes")
-			return ((src.DefMod+src.DefAscension+(enhanced)))*DefChaos
-
+			var/Ascended=src.DefAscension+src.DetermineAscension("Defense")
+			var/Invested=0
+			Invested=src.DefenseInvest*glob.progress.STAT_PER_POINT
+			return ((src.DefMod+Ascended+(enhanced)+Invested))*DefChaos
+		DetermineAscension(var/Stat)
+			var/Invest=src.vars["[Stat]Invest"]
+			var/AscStat=Invest*src.AscensionsAcquired*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
+			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
+		BaseVit()
+			var/Ascended=src.VitAscension+src.DetermineAscension("Vitality")
+			var/Invested=src.VitalityInvest*glob.progress.STAT_PER_POINT
+			return src.VitMod+Ascended+Invested
 		HandleEldritchTax()
 			var/TaxVal=glob.racials.FULL_MANIFESTATION_TAX/glob.racials.FULL_MANIFESTATION_TAX_DIVISOR
 			if(passive_handler.Get("Full Manifestation")&&AscensionsAcquired<5)
@@ -1448,8 +649,7 @@ mob
 			var/transformation/current = race.transformations[transActive]
 			return current.mastery >= MasteryValue
 
-		// Used by the Devil Arm icon-swap path. Demon-only sins / disguise stay
-		// gated by isInDemonDevilTrigger; this one also covers makaioshin forms.
+		//Devil Arm icon-swap check; unlike isInDemonDevilTrigger this also covers makaioshin forms
 		isInDevilTriggerLikeForm()
 			if(!transActive || !race || !race.transformations || transActive > race.transformations.len) return FALSE
 			var/transformation/current = race.transformations[transActive]
@@ -1519,7 +719,7 @@ mob
 
 			// PrideFactor (uncapped; other sin bonuses stay capped at 3 unless Limited Rank-Up)
 			if(passive_handler && passive_handler.Get("PrideFactor") && Target && istype(Target, /mob/Players))
-				var/healthDiff = Health - Target.Health
+				var/healthDiff = HealthPct() - Target.HealthPct()
 				if(healthDiff > 0)
 					var/steps = round(healthDiff / 10)
 					if(steps > 0) pride_bonus = 0.25 * steps * passive_handler.Get("PrideFactor")
@@ -1670,12 +870,6 @@ mob
 							MA /= 2
 						else
 							MA = 0
-				if(passive_handler["StyleMastery"])
-					MA *= 1 + (passive_handler["StyleMastery"]/glob.STYLE_MASTERY_DIVISOR)
-				if(Secret=="Zombie" && stat in list("Str","For", "Off","Def"))
-					MA+=0.1
-				if((Secret=="Werewolf"&&(!CheckSlotless("Half Moon Form"))) && stat in list("Str", "Off"))
-					MA+=0.1
 				if(Secret=="Haki")
 					if(secretDatum.secretVariable["HakiSpecialization"]=="Armament")
 						if(stat=="Str")
@@ -1707,7 +901,9 @@ mob
 					if("Survival")
 						EldritchMod=0.25*/
 			Str+=EldritchMod
-			var/EffectiveAsc=src.StrAscension
+			var/EffectiveAsc=src.StrAscension+src.DetermineAscension("Strength")
+			var/Invested=src.StrengthInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -1733,8 +929,6 @@ mob
 			Str+=StrAdded
 			if(passive_handler.Get("WarmingUp")) Str += WarmingUpBonus
 			Str+=src.GetEquippedWeaponStatAdd("Str")
-			if(src.HasManaStats())
-				Str += getManaStatsBoon()
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				Str += (0.1*spPower) * Str
@@ -1752,8 +946,6 @@ mob
 			if(Secret == "Heavenly Restriction")
 				if(secretDatum?:hasImprovement("Strength"))
 					strMult += round(clamp(1 + secretDatum?:getBoon(src, "Strength") / 8, 1, 8), 0.1)
-			if(passive_handler.Get("KillerInstinct") && Health <= 50)
-				strMult += GetKillerInstinct()
 			if(KaiokenBP > 1)
 				strMult += KaiokenBP-0.8
 			Mod+=(strMult-1)
@@ -1777,9 +969,6 @@ mob
 				var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/ki = src.FindSkill(/obj/Skills/Buffs/ActiveBuffs/Ki_Control)
 				if(ki && "Str" in ki.selectedStats)
 					Mult += (AscensionsAcquired/10) * ki.StrMult
-			if(glob.racials.DEVIL_ARM_STAT_MULTS)
-				if(src.CheckSlotless("Devil Arm")&&!src.SpecialBuff)
-					Mod+=(0.1 * AscensionsAcquired)
 			if(src.StrStolen)
 				Mod+=src.StrStolen*0.5
 			Mod += (scalingEldritchPower() / 10);
@@ -1791,41 +980,37 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 			if(src.Burn)
 				if(passive_handler.Get("BurningShot"))
-					if(src.Burn>0&&src.Burn<=25)
-						Mod+=0.25*passive_handler.Get("BurningShot")
-					else if(src.Burn>25&&src.Burn<=75)
-						Mod+=0.5*passive_handler.Get("BurningShot")
+					if(src.Burn>0&&src.Burn<=glob.BURNING_SHOT_TIER1_MAX)
+						Mod+=glob.BURNING_SHOT_TIER1_MULT*passive_handler.Get("BurningShot")
+					else if(src.Burn>glob.BURNING_SHOT_TIER1_MAX&&src.Burn<=glob.BURNING_SHOT_TIER2_MAX)
+						Mod+=glob.BURNING_SHOT_TIER2_MULT*passive_handler.Get("BurningShot")
 					else
-						Mod+=0.75*passive_handler.Get("BurningShot")
+						Mod+=glob.BURNING_SHOT_TIER3_MULT*passive_handler.Get("BurningShot")
 			if(Momentum)
 				Mod *= getMomentumMult();
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
-				if(glob.KOB_GETS_STATS_LOW_LIFE)
-					var/threshold = 25 * (1 - src.HealthCut)
-					if(src.Health <= threshold)
-						var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
-						var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
-						Mod += base_bonus
+				var/threshold = 25 * (1 - src.HealthCut)
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
+					Mod += base_bonus
 
-					if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-						var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
-						if(minhp >= 0)
-							minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
-						var/den2 = 0 - minhp //normalization of range
-						if(den2 <= 0)
-							den2 = 1
-						var/t2 = (0 - src.Health) / den2
-						t2 = max(0, min(t2, 1))
-						var/extra_max_bonus = 1.0
-						Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
+				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+					if(minhp >= 0)
+						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
+					var/den2 = 0 - minhp //normalization of range
+					if(den2 <= 0)
+						den2 = 1
+					var/t2 = (0 - src.HealthPct()) / den2
+					t2 = max(0, min(t2, 1))
+					var/extra_max_bonus = 1.0
+					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
 
 			if(src.StrEroded)
 				Mod-=src.StrEroded
 
-			if(Secret == "Werewolf" && CheckSlotless("Full Moon Form"))
-				Mod += 1 * (secretDatum?:getHungerBoon())
-			Mod += GetAngerAdaptiveStr();
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -1901,7 +1086,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			For+=EldritchMod
-			var/EffectiveAsc=src.ForAscension
+			var/EffectiveAsc=src.ForAscension+src.DetermineAscension("Force")
+			var/Invested=src.ForceInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -1935,14 +1122,10 @@ mob
 				For += (0.2 * zenkaiPower) * For
 			if(passive_handler.Get("Piloting")&&findMecha())
 				For = getMechStat(findMecha(), For)
-			if(src.HasManaStats())
-				For += getManaStatsBoon()
 
 
 			var/Mod=1
 			var/forMult = ForMultTotal
-			if(passive_handler.Get("KillerInstinct") && Health <= 75)
-				forMult += GetKillerInstinct()
 			if(Secret == "Heavenly Restriction")
 				if(secretDatum?:hasImprovement("Force"))
 					forMult += round(clamp(1 + secretDatum?:getBoon(src, "Force") / 8, 1, 8), 0.1)
@@ -1968,9 +1151,6 @@ mob
 			// if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive&&!src.SpecialBuff)
 			// 	if(src.race.transformations[transActive].mastery==100)
 			// 		Mod+=0.1
-			if(glob.racials.DEVIL_ARM_STAT_MULTS)
-				if(src.CheckSlotless("Devil Arm")&&!src.SpecialBuff)
-					Mod+=(0.1 * AscensionsAcquired)
 			if(src.ForStolen)
 				Mod+=src.ForStolen*0.5
 			Mod += (scalingEldritchPower() / 10);
@@ -1990,24 +1170,23 @@ mob
 						Mod+=0.75*src.passive_handler.Get("BurningShot")
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
-				if(glob.KOB_GETS_STATS_LOW_LIFE)
-					var/threshold = 25 * (1 - src.HealthCut)
-					if(src.Health <= threshold)
-						var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
-						var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
-						Mod += base_bonus
+				var/threshold = 25 * (1 - src.HealthCut)
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
+					Mod += base_bonus
 
-					if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-						var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
-						if(minhp >= 0)
-							minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
-						var/den2 = 0 - minhp //normalization of range
-						if(den2 <= 0)
-							den2 = 1
-						var/t2 = (0 - src.Health) / den2
-						t2 = max(0, min(t2, 1))
-						var/extra_max_bonus = 1.0
-						Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
+				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+					if(minhp >= 0)
+						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
+					var/den2 = 0 - minhp //normalization of range
+					if(den2 <= 0)
+						den2 = 1
+					var/t2 = (0 - src.HealthPct()) / den2
+					t2 = max(0, min(t2, 1))
+					var/extra_max_bonus = 1.0
+					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
 
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
@@ -2019,13 +1198,6 @@ mob
 			Mod += getDevilTriggerSinBonusMult()
 			Mod += getMazokuSinBonusMult()
 
-			var/adaptive = passive_handler.Get("AngerAdaptiveForce")
-			if(adaptive && (src.HasCalmAnger() || passive_handler.Get("EndlessAnger") || Anger))
-				if(BaseFor() > BaseStr())
-					Mod += clamp(adaptive,0.1,1)
-				if(BaseFor() == BaseStr())
-					// lol
-					Mod += clamp(adaptive/2,0.05, 0.5)
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=(passive_handler.Get("TensionPowered")/4)
 			if(passive_handler.Get("TensionPowered")&&transActive>=2)
@@ -2096,7 +1268,9 @@ mob
 					if("Survival")
 						EldritchMod=1*/
 			End+=EldritchMod
-			var/EffectiveAsc=src.EndAscension
+			var/EffectiveAsc=src.EndAscension+src.DetermineAscension("Endurance")
+			var/Invested=src.EnduranceInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2114,11 +1288,6 @@ mob
 			if(passive_handler.Get("Piloting")&&findMecha())
 				End = getMechStat(findMecha(), End)
 
-			if(passive_handler.Get("DemonicDurability") && (Anger||HasCalmAnger()))
-				if(!passive_handler.Get("CancelDemonicDura"))
-					End += End * (glob.DEMONIC_DURA_BASE * passive_handler.Get("DemonicDurability"))
-			if(passive_handler.Get("LunarDurability") && (Anger||HasCalmAnger()))
-				End*=AngerMax
 			if(CheckSlotless("The Grit") && (Anger||HasCalmAnger()))
 				End += End * (glob.DEMONIC_DURA_BASE)
 			End+=EndAdded
@@ -2127,10 +1296,6 @@ mob
 			if(UsingHotnCold())
 				if(StyleBuff?:hotCold<0)
 					End+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
-			if(src.HasManaStats())
-				End += getManaStatsBoon()/2
-			if(passive_handler["Wrathful Tenacity"] && (Anger || HasCalmAnger()))
-				End += GetStr() * (passive_handler["Wrathful Tenacity"])
 			var/Mod=1
 			Mod+=(src.EndMultTotal-1)
 			if(src.KamuiBuffLock)
@@ -2154,9 +1319,6 @@ mob
 					Mod+=0.01*(src.Tension/10)
 				else if(src.Tension>=src.getMaxTensionValue())
 					Mod+=1
-			if(glob.racials.DEVIL_ARM_STAT_MULTS)
-				if(src.CheckSlotless("Devil Arm")&&!src.SpecialBuff)
-					Mod+=(0.05 * AscensionsAcquired)
 			if(src.EndStolen)
 				Mod+=src.EndStolen*0.5
 			if(Secret == "Heavenly Restriction")
@@ -2171,36 +1333,34 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
-				if(glob.KOB_GETS_STATS_LOW_LIFE)
-					var/threshold = 25 * (1 - src.HealthCut)
-					if(src.Health <= threshold)
-						var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
-						var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
-						Mod += base_bonus
+				var/threshold = 25 * (1 - src.HealthCut)
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
+					Mod += base_bonus
 
-					if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-						var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
-						if(minhp >= 0)
-							minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
-						var/den2 = 0 - minhp //normalization of range
-						if(den2 <= 0)
-							den2 = 1
-						var/t2 = (0 - src.Health) / den2
-						t2 = max(0, min(t2, 1))
-						var/extra_max_bonus = 1.0
-						Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
+				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+					if(minhp >= 0)
+						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
+					var/den2 = 0 - minhp //normalization of range
+					if(den2 <= 0)
+						den2 = 1
+					var/t2 = (0 - src.HealthPct()) / den2
+					t2 = max(0, min(t2, 1))
+					var/extra_max_bonus = 1.0
+					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
 
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
 			if(HardenAccumulated) Mod *= getHardenMult();
 			if(src.Shatter)
-				if(!src.HasDebuffResistance()>=1)
-					var/debuffRev = src.GetDebuffReversal();
-					if(debuffRev)
-						Mod*=1 + Shatter * glob.DEBUFF_EFFECTIVENESS * debuffRev;
-					else
-						Mod*=1 - Shatter * glob.DEBUFF_EFFECTIVENESS
+				var/debuffRev = src.GetDebuffReversal();
+				if(debuffRev)
+					Mod*=1 + Shatter * glob.DEBUFF_EFFECTIVENESS * debuffRev;
+				else
+					Mod*=1 - Shatter * glob.DEBUFF_EFFECTIVENESS
 			if(src.EndEroded)
 				Mod-=src.EndEroded
 			if(passive_handler.Get("TensionPowered")&&transActive>=3)
@@ -2269,7 +1429,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			Spd+=EldritchMod
-			var/EffectiveAsc=src.SpdAscension
+			var/EffectiveAsc=src.SpdAscension+src.DetermineAscension("Speed")
+			var/Invested=src.SpeedInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2295,8 +1457,6 @@ mob
 					Spd-=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
 				else
 					Spd+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
-			if(src.HasManaStats())
-				Spd += getManaStatsBoon()
 			var/Mod=1
 			Mod+=(src.SpdMultTotal-1)
 			if(KaiokenBP > 1)
@@ -2320,10 +1480,6 @@ mob
 			// if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive&&!src.SpecialBuff)
 			// 	if(src.race.transformations[transActive].mastery==100)
 			// 		Mod+=0.1
-			if(glob.racials.DEVIL_ARM_STAT_MULTS)
-				if(src.CheckSlotless("Devil Arm")&&!src.SpecialBuff)
-					Mod+=(0.05 * AscensionsAcquired)
-
 			if(src.SpdStolen)
 				Mod+=src.SpdStolen*0.5
 			if(FuryAccumulated) Mod *= src.getFuryMult();
@@ -2346,17 +1502,14 @@ mob
 					else
 						Mod+=0.75*src.passive_handler.Get("BurningShot")
 			if(src.Slow)
-				if(!src.HasDebuffResistance()>=1)
-					var/debuffRev = src.GetDebuffReversal();
-					if(debuffRev)
-						Mod*= 1 + (Slow * glob.DEBUFF_EFFECTIVENESS * debuffRev);
-					else
-						Mod*= 1 - (Slow * glob.DEBUFF_EFFECTIVENESS)
+				var/debuffRev = src.GetDebuffReversal();
+				if(debuffRev)
+					Mod*= 1 + (Slow * glob.DEBUFF_EFFECTIVENESS * debuffRev);
+				else
+					Mod*= 1 - (Slow * glob.DEBUFF_EFFECTIVENESS)
 			if(src.SpdEroded)
 				Mod-=src.SpdEroded
 
-			if(Secret && Secret == "Werewolf" && CheckSlotless("Full Moon Form"))
-				Mod += 1 * (secretDatum?:getHungerBoon())
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=((passive_handler.Get("TensionPowered")*2))
 			if(src.RebirthHeroPath=="Red" && src.SagaLevel>=3)
@@ -2419,7 +1572,9 @@ mob
 					if("Survival")
 						EldritchMod=0*/
 			Off+=EldritchMod
-			var/EffectiveAsc=src.OffAscension
+			var/EffectiveAsc=src.OffAscension+src.DetermineAscension("Offense")
+			var/Invested=src.OffenseInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2437,8 +1592,6 @@ mob
 			Off+=OffAdded
 			if(passive_handler.Get("WarmingUp")) Off += WarmingUpBonus
 			Off+=src.GetEquippedWeaponStatAdd("Off")
-			if(src.HasManaStats())
-				Off += getManaStatsBoon()
 			var/Mod=1
 			Mod+=(src.OffMultTotal-1)
 			// if(src.isRace(HUMAN))
@@ -2464,12 +1617,11 @@ mob
 					else
 						Mod+=0.75*passive_handler.Get("BurningShot")
 			if(src.Shock)
-				if(!src.HasDebuffResistance()>=1)
-					var/debuffRev = src.GetDebuffReversal();
-					if(debuffRev)
-						Mod*=1 + (Shock * glob.DEBUFF_EFFECTIVENESS * debuffRev);
-					else
-						Mod*= 1 - (Shock * glob.DEBUFF_EFFECTIVENESS)
+				var/debuffRev = src.GetDebuffReversal();
+				if(debuffRev)
+					Mod*=1 + (Shock * glob.DEBUFF_EFFECTIVENESS * debuffRev);
+				else
+					Mod*= 1 - (Shock * glob.DEBUFF_EFFECTIVENESS)
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -2542,7 +1694,9 @@ mob
 					if("Survival")
 						EldritchMod=0.5*/
 			Def+=EldritchMod
-			var/EffectiveAsc=src.DefAscension
+			var/EffectiveAsc=src.DefAscension+src.DetermineAscension("Defense")
+			var/Invested=src.DefenseInvest*glob.progress.STAT_PER_POINT
+			EffectiveAsc+=Invested
 			if(isRace(POPO)&&ActiveBuff)
 				var/HoldingBackLess=(passive_handler["Holding Back"]/10)
 				EffectiveAsc*=(GetPowerUpRatio()*HoldingBackLess)
@@ -2565,8 +1719,6 @@ mob
 			Def+=DefAdded
 			if(passive_handler.Get("WarmingUp")) Def += WarmingUpBonus
 			Def+=src.GetEquippedWeaponStatAdd("Def")
-			if(src.HasManaStats())
-				Def += getManaStatsBoon()
 			var/Mod=1
 			Mod+=(src.DefMultTotal-1)
 			// if(src.isRace(HUMAN))
@@ -2592,12 +1744,11 @@ mob
 					else
 						Mod+=0.75*passive_handler.Get("BurningShot")
 			if(src.Shock)
-				if(!src.HasDebuffResistance()>=1)
-					var/debuffRev = src.GetDebuffReversal();
-					if(debuffRev)
-						Mod*=1 + (Shock * glob.DEBUFF_EFFECTIVENESS * debuffRev);
-					else
-						Mod*=1 - (Shock * glob.DEBUFF_EFFECTIVENESS)
+				var/debuffRev = src.GetDebuffReversal();
+				if(debuffRev)
+					Mod*=1 + (Shock * glob.DEBUFF_EFFECTIVENESS * debuffRev);
+				else
+					Mod*=1 - (Shock * glob.DEBUFF_EFFECTIVENESS)
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -2648,22 +1799,24 @@ mob
 				Def=0.1
 			return Def
 
+		GetVit(var/Mult=1)
+			var/Vit=src.BaseVit()
+			Vit*=Mult
+			if(Vit<0.1)
+				Vit=0.1
+			return Vit
 		GetRecov(var/Mult=1)
 			var/Recov=src.RecovMod
 			Recov+=src.RecovAscension
 			if(src.RecovReplace)
 				Recov=src.RecovReplace
-			if(GetHellPower() || (Secret == "Werewolf" && !CheckSlotless("Half Moon Form")) || HasZenkaiPower() || isRace(MAJIN))
-				if(Recov<2) Recov=2
+			if(src.GetHellPower()||src.HasZenkaiPower())
+				if(Recov<2)
+					Recov=2
+			if(src.isRace(MAJIN))
+				Recov=2
 
 			var/Mod=1
-			if(src.HasManaStats())
-				var/manaStatPerc = GetManaStats() // 0.1 per tick
-				var/maxStatBoon = 1
-				var/baseBoon = 0.25
-				var/manaMissing = (ManaAmount / ManaMax)
-				var/bonus = baseBoon * manaMissing * manaStatPerc >= maxStatBoon ? maxStatBoon : baseBoon * manaMissing * manaStatPerc
-				Mod += bonus
 
 			Mod+=(src.RecovMultTotal-1)
 			var/BM=src.HasBuffMastery()
@@ -2673,10 +1826,9 @@ mob
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves"))
-				if(glob.KOB_GETS_STATS_LOW_LIFE)
-					if(src.Health<=25*(1-src.HealthCut))
-						var/thisVar = 10/Health < 0 ? 0.1 : 10/Health
-						Mod+=thisVar
+				if(src.HealthPct()<=25*(1-src.HealthCut))
+					var/thisVar = 10/HealthPct() < 0 ? 0.1 : 10/HealthPct()
+					Mod+=thisVar
 			if(src.RecovEroded)
 				Mod-=src.RecovEroded
 
@@ -2710,28 +1862,17 @@ mob
 					src.AngerMax = num
 			else
 				src.AngerMax=num
-		AngerMult(var/num)
-			src.AngerMax=1+((src.AngerMax-1)*num)
-		AngerDiv(var/num)
-			src.AngerMax=1+((src.AngerMax-1)/num)
-		LunarWrathAnger()
-			if(src.ManaAmount>=50 && src.passive_handler.Get("LunarWrath"))
-				src.AngerMax=1+(src.ManaAmount/100)
-			if(src.passive_handler.Get("Unrelenting Wrath"))
-				src.AngerMax=5
-			else
-				src.AngerMax=1
 		WeirdAngerStuff() //additive anger that won't be affected by mult
 			var/AngerTotal
 			if(src.passive_handler.Get("Red Hot Rage"))
 				AngerTotal+=((src.PowerControl-100)/100)+(passive_handler.Get("PUSpike")/100)
 				if(AngerTotal>=500)
 					var/obj/Skills/s = src.findOrAddSkill(/obj/Skills/AutoHit/Platinum_Mad)
-					src.Activate(s)
+					src.Activate(s, noGCD = TRUE)
 					spawn(100)
 						del s
 			if(src.passive_handler.Get("Determination(Black)"))
-				AngerTotal+=(50*src.SagaLevel)-src.Health
+				AngerTotal+=(50*src.SagaLevel)-src.HealthPct()
 			else
 				AngerTotal=0
 			src.AngerAdd=AngerTotal
@@ -2915,7 +2056,7 @@ mob
 		IsGood()
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
-			var/list/EvilSecrets=list("Vampire", "Werewolf", "Zombie")
+			var/list/EvilSecrets=list("Vampire")
 			//these are all bad.
 			var/good = 0
 			var/evil = 0
@@ -2932,14 +2073,11 @@ mob
 					evil = 1
 				if(src.HasAbyssMod())
 					evil = 1
-			if(src.ShinjinAscension=="Makai")
+			if(src.GetHellPower())
 				evil = 1
-			if(GetHellPower()) evil = 1
 			if(istype(src, /mob/Player/AI))
 				evil = 1
 			//these are all good.
-			if(src.ShinjinAscension=="Kai")
-				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
 			if(src.Secret=="Hamon")
@@ -2947,13 +2085,6 @@ mob
 			if(src.GetSpiritPower()>=1)
 				good = 1
 
-			if(passive_handler.Get("Illusion"))
-				if(evil)
-					good = 1
-					evil = 0
-				else if(good)
-					good = 0
-					evil = 1
 			if(isRace(MAKAIOSHIN))
 				return TRUE
 			if(good)
@@ -2966,14 +2097,12 @@ mob
 		IsEvil()
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
-			var/list/EvilSecrets=list("Vampire", "Werewolf", "Zombie")
+			var/list/EvilSecrets=list("Vampire")
 			var/good = 0
 			var/evil = 0
 			if(src.passive_handler.Get("Emptiness"))
 				return FALSE
 			//these are all good.
-			if(src.ShinjinAscension=="Kai")
-				good = 1
 			if(src.HasHolyMod() && !src.HasAbyssMod())
 				good = 1
 			if(src.GetSpiritPower()>=1)
@@ -2988,22 +2117,14 @@ mob
 					evil = 1
 			if(src.Secret in EvilSecrets)
 				evil = 1
-			if(src.ShinjinAscension=="Makai")
+			if(src.GetHellPower())
 				evil = 1
-			if(GetHellPower()) evil = 1
 			if(src.HasAbyssMod())
 				evil = 1
 			if(istype(src, /mob/Player/AI))
 				evil = 1
 			if(src.NoDeath && !hasEldritchPower())
 				evil = 1
-			if(passive_handler.Get("Illusion"))
-				if(good)
-					good = 0
-					evil = 1
-				else if(evil)
-					good = 1
-					evil = 0
 			if(isRace(MAKAIOSHIN))
 				return TRUE
 			if(good)
@@ -3025,7 +2146,7 @@ mob
 			else if(P.IsEvil() || HasBeyondPurity())
 				return HolyDamageValue
 			else
-				return 1
+				return 0
 		AbyssDamage(mob/P, Forced=0)//Stick this in the DoDamage proc.
 			//yadda yadda gotta have abyss
 			// abyss strength when the attacker has no AbyssMod passive.
@@ -3034,7 +2155,7 @@ mob
 				return (-1)*AbyssDamageValue
 			else if(P.IsGood())
 				return AbyssDamageValue
-			return 0.001
+			return 0
 
 		SpiritShift()
 			var/SFStr=src.BaseFor()+(glob.SPIRIT_FORM_BASE_RATE*src.AscensionsAcquired*(src.BaseStr()-src.BaseFor()))
@@ -3082,16 +2203,19 @@ mob
 			for(var/obj/Money/defender in src)
 				defender.Level-=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
+			if(client) client.UpdateInvCurrency()
 		TakeMineral(val)
 			for(var/obj/Items/mineral/m in src)
 				m.Reduce(val)
 				m.name = "[Commas(round(m.value))] Mana Bits"
+			if(client) client.UpdateInvCurrency()
 		GiveMoney(var/Value)
 			for(var/obj/Money/defender in src)
 				defender.Level+=Value
 				defender.name="[Commas(round(defender.Level))] [glob.progress.MoneyName]"
 				defender.checkDuplicate(src)
 			src << "You've gained [Commas(round(Value))] [glob.progress.MoneyName]."
+			if(client) client.UpdateInvCurrency()
 		GiveMineral(val)
 			var/found=0;
 			for(var/obj/Items/mineral/m in src)
@@ -3102,6 +2226,7 @@ mob
 				var/obj/Items/mineral/m = new();
 				m.Add(val);
 				src.contents += m;
+			if(client) client.UpdateInvCurrency()
 		TakeManaCapacity(var/Value, ignorePhiloStone = FALSE)
 			var/Remaining=Value
 			if(!ignorePhiloStone)
@@ -3151,9 +2276,10 @@ mob
 				OMsg(src, "[src] suddenly appears as a result of their binding!")
 
 		SetStasis(var/StasisTime)
+			if(src.cc_immune_until > world.time)
+				return
 			StasisTime*=glob.STASIS_LENGTH_MODIFIER
-			if(src.HasDebuffResistance())
-				StasisTime/=min(1.5,passive_handler["DebuffResistance"])
+			StasisTime/=clamp(1+src.GetStatusResist(), 1, 1.5)
 			src.Stasis=StasisTime
 			if(!src.StasisFrozen)
 				src.StasisEffect("Form")
@@ -3285,8 +2411,10 @@ mob
 						else
 							src.Chargez("Remove")
 					p.Charging=0
-					src.Beaming=0
-					src.BeamCharging=0
+				src.Beaming=0
+				src.BeamCharging=0
+				src.icon_state=""
+				src.BeamsRelease() //V2: detach-and-fly, the legacy behaviour - never orphan the datum
 		ForceCancelBuster()
 			if(BusterTech)
 				if(BusterTech.Charging)
@@ -3338,7 +2466,7 @@ mob
 				del s
 		AddItem(var/obj/Items/I, var/AlreadyHere=0)
 			if(!AlreadyHere)
-				src.contents+=I
+				GiveOrDrop(I)   // full category drops it at their feet instead of vanishing over the cap
 		AddUnlockedTechnology(var/x)
 			if(x in list("Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing"))
 				src.ForgingUnlocked++
@@ -3455,56 +2583,58 @@ mob
 		DashTo(mob/Trg, MaxDistance=24, Delay=0.75, Clashable=0)
 			var/DelayRelease=0
 			src.Frozen=1
+			src.dash_clash = Clashable ? 2 : 1 
+			src.ClashWatch(Trg, Clashable) 
 			src.icon_state="Flight"
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
-	//		var/blur_filter = filter(type="angular_blur", x=0, y=0, size=1)
-	//		filters += blur_filter
-			while(MaxDistance>0)
-//				var/travel_angle = GetAngle(src, Trg)
-//				animate(filters[filters.len], x=sin(travel_angle)*(6/Delay), y=cos(travel_angle)*(6/Delay), time=Delay)
-				step_towards(src,Trg)
+			var/pm = PmActive()
+			var/pm_budget = MaxDistance / world.tick_lag * 32 //total dash distance in px (pixel path)
+			var/pm_px = round(64 / Delay) //old per-tick distance; PmDashStep caps it for smoothness
+			var/stall = 0
+			while(pm ? pm_budget > 0 : MaxDistance > 0)
+				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
+					var/travel_angle = GetAngle(src, Trg)
+					var/smear = 6 / max(Delay, 0.5)
+					animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Delay)
+				if(pm) //smooth: one glided step per tick instead of batching 32px steps into one tick
+					var/m = src.PmDashStep(Trg, pm_px)
+					if(!m)
+						stall++
+						if(stall > 4 || get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
+							break
+					else
+						stall = 0
+						pm_budget -= m
+				else
+					step_towards(src,Trg)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
-				if(Trg in oview(1, src))
+				if(get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
 					MaxDistance=0
+					pm_budget=0
 					Delay=0
 					src.dir=get_dir(src,Trg)
-					if(Trg.Knockbacked||src.passive_handler.Get("SpiralImpact"))
-						src.NextAttack=0
-						Trg.StopKB()
-						if(Clashable || Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash")||src.passive_handler.Get("SpiralImpact"))
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive/DC in Trg)
-								if(!Trg.BuffOn(DC))
-									var/pursuerBoon = Trg.HasPursuer()
-									DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									DC.Trigger(Trg)
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash/DC in src)
-								if(!src.BuffOn(DC))
-									var/pursuerBoon = HasPursuer()
-									DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									if(isRace(MAKYO) && ActiveBuff)
-										DC.passives["Star Surge"] = 1
-										DC.passives["Steady"] = 2
-										DC.TimerLimit = 1.5 + clamp(0.5 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
-									if(src.hasSecret("Eldritch (Reflected)"))
-										DC.ManaHeal=3+(src.AscensionsAcquired*2)
-									DC.Trigger(src)
+					src.TryDragonClash(Trg)
 					break
+				else if(pm)
+					sleep(world.tick_lag) //one glided step already taken this tick
 				else
 					MaxDistance-=world.tick_lag
 					DelayRelease+=Delay*world.tick_lag
 					if(DelayRelease>=1)
 						DelayRelease--
 						sleep(1*world.tick_lag)
-	//		filters -= blur_filter
+			src.TryDragonClash(Trg)
 			src.Frozen=0
+			src.dash_clash=0
 			if(src.is_dashing>0)
 				src.is_dashing--
 			if(src.is_dashing<0)
 				src.is_dashing=0
 			src.icon_state=""
-			//animate(src.filters[filters.len], x=0, y=0)
+			if(src.filters["trail"])
+				animate(src.filters["trail"], x=0, y=0)
 			src.dir=get_dir(src,Trg)
 		Reincarnate()
 			src.Savable=0
@@ -3597,6 +2727,7 @@ mob
 
 					var/obj/Skills/s=new path
 					if(s.SignatureTechnique==tier)
+						del s
 						return 1
 					else
 						del s
@@ -3605,20 +2736,9 @@ mob
 				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
-			if(!locate(/obj/Skills/Zanzoken, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to move faster than the eye can see due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Zanzoken)
-			if(!locate(/obj/Skills/Power_Control, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to fluctuate your power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Power_Control)
-					if(!locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
-						src.PoweredFormSetup()
-			if(!locate(/obj/Skills/Utility/Sense, src))
-				if(src.req_pot(1))
-					src << "You develop the ability to sense power due to your experience fighting!"
-					src.AddSkill(new/obj/Skills/Utility/Sense)
+			//basics come from addMissingSkills; Ki Control still needs its first-use setup
+			if(locate(/obj/Skills/Power_Control, src) && !locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
+				src.PoweredFormSetup()
 
 			if(!src.SignatureCheck)
 				return
@@ -3648,41 +2768,17 @@ mob
 					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Fist_Of_The_King_Of_Tomorrow)
 					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Apotheosis_Of_The_Fabled_King)
 
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[1] && src.req_styles(0, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[2] && src.req_styles(1, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[3] && src.req_styles(2, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(1) && src.Potential>=glob.progress.T1_STYLES[4] && src.req_styles(3, 1))
-				DevelopSignature(src, 1, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[1] && src.req_styles(0, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[2] && src.req_styles(1, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[3] && src.req_styles(2, 2))
-				DevelopSignature(src, 2, "Style")
-			if(styles_available(2) && src.Potential>=glob.progress.T2_STYLES[4] && src.req_styles(3, 2))
-				DevelopSignature(src, 2, "Style")
-			if(src.CyberneticMainframe)
-				return
-			if(styles_available(3) && src.Potential>=glob.progress.T3_STYLES[1] && src.req_styles(0, 3))
-				DevelopSignature(src, 3, "Style")
-			if(src.req_pot(glob.progress.T1_SIGS[1]) && src.req_sigs(0, 1))
-				DevelopSignature(src, 1, "Signature")
-			if(src.req_pot(glob.progress.T1_SIGS[2]) && src.req_sigs(1, 1))
-				DevelopSignature(src, 1, "Signature")
-
-			if(src.req_pot(glob.progress.T2_SIGS[1]) && src.req_sigs(0, 2))
-				DevelopSignature(src, 2, "Signature")
-			if(src.req_pot(glob.progress.T1_SIGS[3]) && src.req_sigs(2, 1))
-				DevelopSignature(src, 1, "Signature")
-
-			if(src.req_pot(glob.progress.T2_SIGS[2]) && src.req_sigs(1, 2))
-				DevelopSignature(src, 2, "Signature")
-
-			if(src.req_pot(glob.progress.T3_SIGS[1]) && src.req_sigs(0, 3))
-				DevelopSignature(src, 3, "Signature")
+			// Style/Signature picks are made in the Acquire menu now (AcquireHUD.dm)
+			var/picks = 0
+			for(var/t = 1 to 3)
+				if(src.AqStylePicksLeft(t) && src.styles_available(t))   // styles_available also re-runs StyleUnlock
+					picks += src.AqStylePicksLeft(t)
+			if(src.AqStylePicksLeft(4) && src.AqAnyT4StylePickable())   // temp: any same-category T3 style
+				picks += src.AqStylePicksLeft(4)
+			for(var/t = 1 to 3)
+				picks += src.AqSigPicksLeft(t)
+			if(picks > 0)
+				src << "<font color=#8be9ff>You have [picks] unspent pick[picks > 1 ? "s" : ""] waiting - open the Acquire menu (Styles / Signature tabs) to choose.</font>"
 
 		YeetSignatures()
 			for(var/obj/Skills/s in src.Skills)
@@ -3700,13 +2796,10 @@ mob
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasRestriction("Zanzoken"))
 				return
 
-			if(glob.USE_SPEED_IN_ZANZO_RECHARGE)
-				Mult *= clamp(GetSpd()**glob.ZANZO_SPEED_EXPONENT, glob.ZANZO_SPEED_LOWEST_CLAMP, glob.ZANZO_SPEED_HIGHEST_CLAMP)
+			Mult *= clamp(GetSpd()**glob.ZANZO_SPEED_EXPONENT, glob.ZANZO_SPEED_LOWEST_CLAMP, glob.ZANZO_SPEED_HIGHEST_CLAMP)
 			var/flick=src.HasFlicker()
 			if(flick)
 				Mult*=clamp(1+(flick/glob.ZANZO_FLICKER_DIVISOR),glob.ZANZO_FLICKER_LOWEST_CLAMP, glob.ZANZO_FLICKER_HIGHEST_CLAMP)
-			if(src.AfterImageStrike)
-				return
 			var/max_charges = GetMaxMovementCharges()
 			var/taper_basis = max(max_charges, 3)
 			var/add = (glob.ZANZO_FLICKER_BASE_GAIN-(max(0.01,MovementCharges)/taper_basis)/10)*Mult
@@ -3747,16 +2840,6 @@ mob
 			if(passive_handler.Get("Transformation Power")) // add straight potential
 				Return+=passive_handler.Get("Transformation Power")
 
-			if(isRace(SHINJIN))//one determines the other
-				if(src.ShinjinAscension=="Kai")
-					var/NoFite=2
-					if(src.AscensionsAcquired>0)
-						NoFite=1
-					src.passive_handler.Set("GodKi", src.Potential/(100*NoFite))
-				if(src.ShinjinAscension=="Makai")
-					src.passive_handler.Set("GodKi", src.Potential/100)
-			//TODO: ALTER SHINJIN GODKI POTENTIAL THING
-
 			return Return
 
 		GetMaxMovementCharges()
@@ -3792,12 +2875,8 @@ mob
 				// 	src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Wave)
 				// Z.Cooldown()
 				return
-			if(src.Secret=="Werewolf")
-				src.Activate(new/obj/Skills/AutoHit/Howl)
-				Z.Cooldown(3)
-				return
 			if(hasEldritchPower())
-				src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Strike(p = src))
+				src.Activate(new/obj/Skills/AutoHit/Shadow_Tendril_Strike(p = src), noGCD = TRUE)
 				Z.Cooldown()
 				return
 			if(src.Secret=="Haki")
@@ -3878,8 +2957,7 @@ var/list/general_magic_database = list()
 var/list/general_weaponry_database = list()
 proc
 	BuildGeneralMagicDatabase() // This is a list of generally obtainable magics. For now, it's just used for Crimson grimoire.
-		// Guard: SkillTree is populated by MakeSkillTreeList which runs from BootWorld("Load").
-		// This proc must be called AFTER MakeSkillTreeList, otherwise SkillTree is null/empty.
+		//needs MakeSkillTreeList to have run first or SkillTree is empty
 		if(!SkillTree || !islist(SkillTree))
 			return
 		general_magic_database = list()

@@ -5,8 +5,8 @@
 	Area="Target"
 	Distance=10
 	EnergyCost=30
-	ForOffense=1
-	StrOffense=0
+	ForScaling=1
+	StrScaling=0
 	DamageMult=40
 	Cooldown=-1
 	CanBeDodged=0
@@ -120,8 +120,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 		"intelligenceAdd" = 0,
 		"imaginationAdd" = 0,
 		"angerPoint" = 0,
-		"intimidation" = 0,
-		"intimidationMult" = 1,
 		"pilotingProwess" = 0,
 		"cyberizeModAdd" = 0,
 		"enhanceChips" = 0,
@@ -150,9 +148,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 	snap["imaginationAdd"]  += a.imaginationAdd
 	if(a.angerPoint)
 		snap["angerPoint"]  += a.angerPoint
-	snap["intimidation"]    += a.intimidation
-	if(a.intimidationMult && a.intimidationMult != 1)
-		snap["intimidationMult"] *= a.intimidationMult
 	snap["pilotingProwess"] += a.pilotingProwess
 	snap["cyberizeModAdd"]  += a.cyberizeModAdd
 	snap["enhanceChips"]    += a.enhanceChips
@@ -179,13 +174,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 	RecovAscension  += sign * snap["recovery"]
 	Intelligence    += sign * snap["intelligenceAdd"]
 	Imagination     += sign * snap["imaginationAdd"]
-	Intimidation    += sign * snap["intimidation"]
-	var/im = snap["intimidationMult"]
-	if(isnum(im) && im != 1 && im != 0)
-		if(sign > 0)
-			Intimidation *= im
-		else
-			Intimidation /= im
 	PilotingProwess += sign * snap["pilotingProwess"]
 	CyberizeMod     += sign * snap["cyberizeModAdd"]
 	EnhanceChipsMax += sign * snap["enhanceChips"]

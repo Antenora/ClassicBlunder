@@ -12,11 +12,10 @@
 		passives = list(
 			"Sniper"       = 5 + SL,
 			"HardStyle"    = 2 + SL,
-			"Brutalize"    = 1.5 + (0.5 * SL),
+			
 			"DeathField"   = 1.5 + (1.5 * SL),
 			"Bloodletting" = 6 + (3 * SL),
-			"Parry"        = 1.5 + (0.5 * SL),
-			"IdealStrike"  = 1
+			"Parry"        = 1.5 + (0.5 * SL)
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 4
@@ -67,7 +66,7 @@
 		petals = list()
 		if(user && user.client)
 			user.client.senbonzakura_dragging = FALSE
-			winset(user.client, "mapwindow.map", "right-click=0")
+			user.client.petal_drag_locked = FALSE // clear in case convergence was interrupted
 		if(user)
 			user.AppearanceOff()
 			for(var/obj/Items/i in user)

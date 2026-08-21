@@ -1,16 +1,14 @@
 /var/BASE_DELAY = 3 //base delay for all attacks
 #define MISS 0 // WHEN YOU B MISSIN
 #define HIT 1 // WHEN YOU B HITTIN
-#define GLANCING 3 // ONLY FOR WHEN SURE HIT / SURE DODGE INTERACT
 #define WHIFF 2 // WHEN YOU HIT ON THE 2ND ROLL
 #define STATIC_RPP_GAIN 999
-var/global/EXPERIMENTAL_ACCURACY = TRUE
-var/global/CLAMP_POWER = TRUE
 
 
 
 /mob/Admin3/verb/Clamp_Power()
 	set name = "Enable Power Clamp"
+	if(!src.Alert("Are you sure you want to toggle power clamp?")) return
 	glob.CLAMP_POWER = !glob.CLAMP_POWER
 	src << "Power clamp is now [glob.CLAMP_POWER ? "enabled" : "disabled"]."
 
@@ -22,6 +20,189 @@ mob/proc/SetNoAnger(var/obj/Skills/Buffs/b, var/Value=0)
 		OMsg(src, "<font color='grey'>[src]'s anger ebbs away...</font color>")
 	else
 		OMsg(src, "<font color='red'>[src]'s anger flares back to life!</font color>")
+
+//anger is a curve now, not a switch. tiers of list(hp, frac-of-usable-anger, msg or null).
+//AngerPoint slides the whole thing, AngerFloor on buffs/forms squeezes it so peak lands at higher hp,
+//AngerRush is event fuel that evaluates you as if you were lower. tiers only ratchet up; Calm() resets.
+var/list/ANGER_CURVE_DEFAULT = list(list(75, 0.25, "is starting to get worked up..."), list(50, 0.5, null), list(25, 1, "flies into a rage!"))
+
+mob/proc/GetAngerCurve()
+	if(race&&race.anger_curve) return race.anger_curve
+	return ANGER_CURVE_DEFAULT
+
+mob/proc/GetAngeredIndex()
+	var/list/curve=GetAngerCurve()
+	return min(race ? race.anger_curve_angered : 2, curve.len)
+
+mob/proc/GetAngerFloor(var/obj/Skills/Buffs/exclude)
+	//exclude = a buff mid-removal whose slot pointer hasn't been cleared yet
+	var/F=0
+	if(ActiveBuff&&ActiveBuff!=exclude&&ActiveBuff.AngerFloor>F) F=ActiveBuff.AngerFloor
+	if(SpecialBuff&&SpecialBuff!=exclude&&SpecialBuff.AngerFloor>F) F=SpecialBuff.AngerFloor
+	if(StyleBuff&&StyleBuff!=exclude&&StyleBuff.AngerFloor>F) F=StyleBuff.AngerFloor
+	for(var/sb in SlotlessBuffs)
+		var/obj/Skills/Buffs/B=SlotlessBuffs[sb]
+		if(B&&B!=exclude&&B.AngerFloor>F) F=B.AngerFloor
+	if(race&&transActive&&transActive<=race.transformations.len)
+		var/transformation/T=race.transformations[transActive]
+		if(T&&T.angerFloor>F) F=T.angerFloor
+	return min(F,99)
+
+mob/proc/AngerTierList(var/obj/Skills/Buffs/exclude)
+	var/list/curve=GetAngerCurve()
+	var/slide=AngerPoint-50
+	var/list/last=curve[curve.len]
+	var/peak=last[1]+slide
+	var/F=GetAngerFloor(exclude)
+	var/list/out=list()
+	for(var/list/tier in curve)
+		var/t=tier[1]+slide
+		if(F>0&&F>peak&&peak<100)
+			t=100-(100-t)*(100-F)/(100-peak)
+		out+=min(t,99.9)
+	return out
+
+mob/proc/AngerFracAt(var/hp)
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList()
+	var/n=curve.len
+	if(hp>T[1]) return 0
+	var/list/last=curve[n]
+	if(hp<=T[n])
+		var/f=last[2]
+		//EndlessAnger = no peak. keep climbing past the last tier, Calm() is the only way down
+		if(passive_handler.Get("EndlessAnger"))
+			f+=(T[n]-hp)*glob.ANGER_ENDLESS_RATE
+		return f
+	for(var/i=2, i<=n, i++)
+		if(hp>T[i])
+			var/list/hi=curve[i-1]
+			var/list/lo=curve[i]
+			var/span=T[i-1]-T[i]
+			if(span<=0) return lo[2]
+			return hi[2]+(lo[2]-hi[2])*(T[i-1]-hp)/span
+	return last[2]
+
+mob/proc/AngerEvalHP(var/incoming=0)
+	return ((HealthPct()-incoming)/max(1-HealthCut,0.01))-AngerRush
+
+mob/proc/AngerCurveValue()
+	//the live multiplier the power calcs read. 1 = nothing going on
+	if(AngerMax<1) return 1
+	if(HasCalmAnger())
+		var/list/curve=GetAngerCurve()
+		var/list/T=AngerTierList()
+		var/n=curve.len
+		var/list/last=curve[n]
+		var/eval=AngerEvalHP()
+		var/f=0
+		if(eval<=T[n])
+			f=last[2]
+			if(passive_handler.Get("EndlessAnger"))
+				f+=(T[n]-eval)*glob.ANGER_ENDLESS_RATE
+		else if(eval<100&&T[n]<100)
+			f=last[2]*(100-eval)/(100-T[n])
+		if(f>AngerCalmHigh)
+			AngerCalmHigh=f
+		else
+			f=AngerCalmHigh
+		if(f<=0) return 1
+		var/am=AngerMax
+		if(AnsatsukenAscension=="Chikara"&&StyleActive=="Ansatsuken")
+			am=max(am,2)
+		var/cv=1+(am-1)*f
+		if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
+			cv *= 1+(secretDatum?:getBoon(src, "Anger")/10)
+		return cv
+	if(HasNoAnger()||AngerCD) return 1
+	var/frac=AngerFracAt(AngerEvalHP())
+	if(AngerTier)
+		var/list/curve=GetAngerCurve()
+		var/list/reached=curve[min(AngerTier,curve.len)]
+		if(reached[2]>frac) frac=reached[2]
+	if(frac<=0) return 1
+	var/v=1+(AngerMax-1)*frac
+	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
+		v *= 1+(secretDatum?:getBoon(src, "Anger")/10)
+	return v
+
+mob/proc/AngerAdvance(var/incoming=0)
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return 0
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList()
+	var/eval=AngerEvalHP(incoming)
+	var/newtier=0
+	for(var/i=1, i<=curve.len, i++)
+		if(eval<=T[i]) newtier=i
+	if(newtier<=AngerTier) return 0
+	var/ang=GetAngeredIndex()
+	var/fired=0
+	while(AngerTier<newtier)
+		var/i=AngerTier+1
+		AngerTier=i
+		if(i==ang)
+			if(!Anger)
+				src.Anger()
+				fired=1
+		else
+			AngerTierMessage(i)
+	return fired
+
+mob/proc/UpdateAnger()
+	AngerAdvance(0)
+
+mob/proc/AngerTierMessage(var/i)
+	var/list/curve=GetAngerCurve()
+	if(i>curve.len) return
+	var/list/tier=curve[i]
+	if(tier.len<3||!tier[3]) return
+	if(!AngerColor)
+		OMsg(src, "<font color='red'>[src] [tier[3]]</font color>")
+	else
+		OMsg(src, "<font color='[AngerColor]'>[src] [tier[3]]</font color>")
+
+mob/proc/AngerEvent(var/points)
+	if(points<=0) return
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return
+	AngerRush=min(AngerRush+points, glob.ANGER_RUSH_CAP)
+	AngerAdvance(0)
+
+mob/proc/AngerCCEvent()
+	//chain cc pisses you off. first one's free, repeats inside the window stoke you
+	if(world.time<AngerCCWindow)
+		AngerEvent(glob.ANGER_RUSH_CC)
+	AngerCCWindow=world.time+glob.ANGER_CC_WINDOW
+
+mob/proc/ForceAngered(var/Enraged=0)
+	//instant angry for enrage debuffs and weird food. banks rush so the state survives reclamps
+	if(HasCalmAnger()||HasNoAnger()||AngerCD) return
+	var/ang=GetAngeredIndex()
+	var/list/T=AngerTierList()
+	var/need=AngerEvalHP()-T[ang]
+	if(need>0)
+		AngerRush=min(AngerRush+need, glob.ANGER_RUSH_CAP)
+	if(AngerTier<ang)
+		AngerTier=ang
+	if(!Anger)
+		src.Anger(Enraged)
+
+mob/proc/AngerReclamp(var/obj/Skills/Buffs/gone)
+	if(!AngerTier) return
+	var/list/curve=GetAngerCurve()
+	var/list/T=AngerTierList(gone)
+	var/eval=AngerEvalHP()
+	var/newtier=0
+	for(var/i=1, i<=curve.len, i++)
+		if(eval<=T[i]) newtier=i
+	if(newtier>=AngerTier) return
+	AngerTier=newtier
+	if(AngerTier<GetAngeredIndex()&&Anger)
+		Anger=0
+		DefianceCounter=0
+		race.onCalm(src)
+		AngerCD=5
+		if(src.oozaru_type=="Demonic")
+			AngerCD=0
 
 mob/proc/Anger(var/Enraged=0)
 	if(src.HasCalmAnger()||src.HasNoAnger())
@@ -35,17 +216,17 @@ mob/proc/Anger(var/Enraged=0)
 			if(!J.Using&&J.Mastery==1)
 				if(src.ActiveBuff)
 					if(src.ActiveBuff.SpecialBuffLock)
-						src.ActiveBuff.Trigger(src)
+						src.ActiveBuff.Trigger(src,Override=1)
 				for(var/sb in src.SlotlessBuffs)
 					var/obj/Skills/Buffs/SB = src.SlotlessBuffs[sb]
 					if(SB)
 						if(SB.SpecialBuffLock)
-							SB.Trigger(src)
+							SB.Trigger(src,Override=1)
 				if(src.SpecialBuff)
 					if(src.SpecialBuff.BuffName=="Jinchuuriki")
 						return
 					else
-						src.SpecialBuff.Trigger(src)
+						src.SpecialBuff.Trigger(src,Override=1)
 						J.Trigger(src)
 						return
 
@@ -68,7 +249,7 @@ mob/proc/Anger(var/Enraged=0)
 					if(src.SpecialBuff.BuffName=="Vaizard Mask")
 						return
 					else
-						src.SpecialBuff.Trigger(src)
+						src.SpecialBuff.Trigger(src,Override=1)
 						V.Trigger(src)
 						return
 				else
@@ -77,9 +258,9 @@ mob/proc/Anger(var/Enraged=0)
 
 		if(CheckActive("Kamui Senketsu") && !CheckSlotless("Life Fiber Berserker") && (!Saga || Saga != "Kamui" || SagaLevel > 1 && SagaLevel < 4))
 			if(Saga == "Kamui" && prob(50 - SagaLevel * 5))
-				GetAndUseSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Life_Fiber_Berserker)
+				UseBuff(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Life_Fiber_Berserker)
 			else if(!Saga || Saga != "Kamui")
-				GetAndUseSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Life_Fiber_Berserker)
+				UseBuff(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Life_Fiber_Berserker)
 
 		Anger=AngerMax
 		if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Anger"))
@@ -97,7 +278,6 @@ mob/proc/Anger(var/Enraged=0)
 					if(!Enraged)OMsg(src, "<font color='red'>[src] becomes angry!</font color>")
 				else
 					if(!Enraged)OMsg(src, "<font color='[src.AngerColor]'>[src] becomes angry!</font color>")
-/mob/var/zombieGetUps = 0
 mob/proc/Unconscious(mob/P,var/text)
 	if(src.KO)
 		return
@@ -110,7 +290,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			return
 		if(!istype(src,/mob/Player/FevaSplits))
 			if(P.passive_handler["Undying Rage"])
-				P.Health += 2.5 + (glob.racials.UNDYINGRAGE_HEAL * P.AscensionsAcquired)
+				P.HealPct(2.5 + (glob.racials.UNDYINGRAGE_HEAL * P.AscensionsAcquired))
 			src.OMessage(15,"[src] is knocked out by [P]!","<font color=red>[src]([src.key]) is knocked out by [P]([P.key])")
 			if(FightingSeriously(P,0)||src.BPPoison<1||src.MortallyWounded)
 				src.KOBrutal=1
@@ -120,13 +300,13 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(text)
 		if(!istype(src,/mob/Player/FevaSplits))
 			src.OMessage(15,"[src] is knocked out by [text]!","<font color=red>[src]([src.key]) is knocked out by [text]")
+	if(src.party)
+		for(var/mob/m in src.party.members)
+			if(m==src||m.KO||m.z!=src.z||get_dist(m,src)>12) continue
+			m.AngerEvent(glob.ANGER_RUSH_ALLY_DOWN)
+			m << "<font color=red>Seeing [src] go down sets your blood boiling!</font>"
 	if(src.passive_handler.Get("TrueZenkai"))
 		src.passive_handler.Set("TrueZenkaiPower", 0)
-//	if(src.passive_handler.Get("AdvanceFurther"))
-	//	src.passive_handler.Set("AdvanceFurther", 0)
-	if(src.passive_handler.Get("Herald of the End")&&src.transUnlocked<2)
-		src.passive_handler.Increase("The Clock Is Ticking", 1)
-		src<<"<font color=red><b>You really let someone get the better of you like that...? The clock is ticking.</font></b>"
 	var/HellspawnOdds=(10+(src.TotalInjury-40))/(src.Potential/20)//less likely the further you are from 20 pot without outright disabling it before then
 	var/CalamityOdds=src.passive_handler.Get("The Clock Is Ticking")*(src.Potential/55)
 	if(CalamityOdds<0)
@@ -139,7 +319,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.HellspawnTimer=360
 		src.ForcedHellspawn=0
 		src.KO=0
-		src.Health=60
+		src.SetHealthPct(60)
 		src.TotalInjury=40
 		src.VaizardHealth+=30
 		src.OMessage(15,"...you thought it was over? You thought you had hope?","<font color=red>[src]([src.key]) awakens.")
@@ -150,7 +330,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.race.transformations[1].transform(src, TRUE)
 		src.OMessage(15,"<b>HOW INTERESTING THAT YOU CONTINUE TO MISUNDERSTAND WHAT'S AT STAKE HERE.</b>","<font color=red>[src]([src.key]) heralds the end..")
 		src.HellspawnBerserk=1
-		src.Health=30
+		src.SetHealthPct(30)
 		return
 	if((src.oozaru_type=="Demonic" && prob(CalamityOdds)&&src.transUnlocked==1&&!src.TheCalamity&&!src.CalamityCaused&&src.race.transformations[1].mastery==100)||(src.ForcedCalamity&&!src.CalamityCaused))
 		src.Revert()
@@ -161,7 +341,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.TheCalamity=1
 		src.CalamityCaused=1
 		sleep(30)
-		src.Health=100
+		src.SetHealthPct(100)
 		src.TotalInjury=0
 		world<<"<font color=red><b>Here, on this one fateful day...</b></font>"
 		src.race.transformations[1].transform(src, TRUE)
@@ -181,7 +361,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(src.GatesActive==8 && src.Gate8Getups<2)
 		src.KO=0
 		src.OMessage(15,"...but [src]'s youth is burning too bright to be stopped!","<font color=red>[src]([src.key]) remains standing in their celebration of youth!")
-		src.Health=1
+		src.SetHealthPct(1)
 		src.VaizardHealth+=30
 		src.HealthAnnounce10++
 		src.Gate8Getups++
@@ -198,24 +378,24 @@ mob/proc/Unconscious(mob/P,var/text)
 		if(src.HealthAnnounce10<=1&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "...but [src] refused, reloading a quicksave.", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-			src.Health=15
+			src.SetHealthPct(15)
 			src.VaizardHealth+=15
 			src.HealthAnnounce10=2
 			return
-	if(src.passive_handler.Get("The Unstoppable Force"))
+	if(src.passive_handler.Get("SecondWind") == "Unstoppable")
 		if(src.UnstoppableForceCounter<9&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "<b>But [src] is unwavering in their pursuit of victory.</b>", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-			src.Health=10
+			src.SetHealthPct(10)
 			src.HealthAnnounce10=10
 			src.UnstoppableForceCounter+=1
 			return
-	if(src.passive_handler.Get("Neverending Hope"))
+	if(src.passive_handler.Get("SecondWind") == "Hope")
 		if(src.HealthAnnounce10<=1&&FightingSeriously(P,src))
 			if(prob((src.passive_handler.Get("Tenacity")*glob.TENACITY_GETUP_CHANCE)+10))
 				src.KO=0
 				src.OMessage(15, "...but [src] refused.", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-				src.Health=10
+				src.SetHealthPct(10)
 				src.VaizardHealth+=20
 				src.HealthAnnounce10+=1
 				return
@@ -225,17 +405,17 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.KO=0
 				src.OMessage(15, "...but [src] refuses to go down!", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
 				if(src.passive_handler.Get("Color of Courage"))
-					src.Health+=5
+					src.HealPct(5)
 				else
-					src.Health=5
+					src.SetHealthPct(5)
 				src.VaizardHealth+=clamp(passive_handler.Get("Tenacity")* glob.TENACITY_VAI_MULT, glob.TENACITY_VAI_MIN, glob.TENACITY_VAI_MAX) //actual clutch now.
 				src.HealthAnnounce10+=1
 				return
-	if(src.passive_handler.Get("The Echo"))
+	if(src.passive_handler.Get("SecondWind") == "Echo")
 		if(src.HealthAnnounce10<=2+RedTenacity&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "[src] saw a world in which they lost, and starts to push just a little bit harder!", "<font color=red>[src]([src.key]) activates The Echo!")
-			src.Health=10
+			src.SetHealthPct(10)
 			src.VaizardHealth+=20
 			src.HealthAnnounce10+=3
 			return
@@ -244,55 +424,55 @@ mob/proc/Unconscious(mob/P,var/text)
 			if(prob(src.passive_handler.Get("Alter the Future")))
 				src.KO=0
 				src.OMessage(15, "...but [src] rewrites the future to prevent their defeat!", "<font color=red>[src]([src.key]) rewrites the future!")
-				src.Health=10
+				src.SetHealthPct(10)
 				src.passive_handler.Decrease("Alter the Future", 25)
 				src.VaizardHealth+=20
 				src.HealthAnnounce10+=1
 				return
-	if(src.passive_handler.Get("The Comeback King"))
+	if(src.passive_handler.Get("SecondWind") == "Comeback")
 		if(src.HealthAnnounce10<=9)
-			if(prob(src.passive_handler.Get("The Comeback King")))
-				var/HealthRecovery=P.Health/2
+			if(prob(1))
+				var/HealthRecovery=P.HealthPct()/2
 				src.KO=0
 				src.OMessage(15, "[src] reloads their last SAVE!", "<font color=red>[src]([src.key]) stages a miraculous comeback!!")
-				src.Health=HealthRecovery
-				P.Health+=HealthRecovery/2
+				src.SetHealthPct(HealthRecovery)
+				P.HealPct(HealthRecovery/2)
 				src.HealthAnnounce10+=1
 				return
 	if(src.race in list(HUMAN, CELESTIAL) && !src.isMazokuPathHuman())
 		if(src.transActive==1&&src.transUnlocked>=2)
 			src.KO=0
 			src.OMessage(15, "...<b>but [src] evolves one final time, pushing out every last bit of their potential!!!!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-			src.Health=5
+			src.SetHealthPct(5)
 			if(src.isRace(HUMAN))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/1.5
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/1.5
 			if(src.isRace(CELESTIAL))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/2
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/2
 			src.race.transformations[2].transform(src, TRUE)
 			src.Tension=100
 			return
 		if(src.transActive==2&&src.transUnlocked>=3)
 			src.KO=0
 			src.OMessage(15, "...<b>but [src] evolves one final time, pushing out every last bit of their potential!!!!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-			src.Health=5
+			src.SetHealthPct(5)
 			if(src.isRace(HUMAN))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/1.5
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/1.5
 			if(src.isRace(CELESTIAL))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/2
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/2
 			src.race.transformations[3].transform(src, TRUE)
 			src.Tension=100
 			return
 	if(src.passive_handler.Get("DoubleHelix")&&src.transActive==4&&src.transUnlocked>=5&&src.CelestialAscension=="Demon")
 		src.KO=0
 		src.OMessage(15, "...<b>but [src] evolves one final time, drawing out the full might of their demonic ancestor!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-		src.Health=10
+		src.SetHealthPct(10)
 		src.DoubleHelix=5
 		if(src.isRace(CELESTIAL))
 			src.VaizardHealth+=10;
 		src.race.transformations[5].transform(src, TRUE)
 		return
 	if(passive_handler["Undying Rage"])
-		Health = 0.1
+		SetHealthPct(0.1)
 		return
 	if(src.AwakeningSkillUsed)
 		src.AwakeningSkillUsed=0
@@ -307,18 +487,22 @@ mob/proc/Unconscious(mob/P,var/text)
 		return
 	src.PoweringUp=0
 	src.PoweringDown=0
+	src.Guarding=0
+	src.GuardMeter=0
+	src.ChargingEnergy=0
 	src.Auraz("Remove")
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
-	src.DealWounds(src,20/max(src.GetRecov(2), 1))
+	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
 	src.icon_state="KO"
-	src.Health=1
+	src.SetHealthPct(1)
 	src.Energy=1
 	src.PowerControl=100
 	src.ClearFrenzyOnKO()
 	src.Burn=0
 	src.Bleed=0
 	src.AfterImageStrike=0
+	src.ais_window_until=0
 	src.VaizardHealth=0
 	src.ForceCancelBeam()
 	src.ForceCancelBuster()
@@ -329,13 +513,6 @@ mob/proc/Unconscious(mob/P,var/text)
 		RG.RoyalMeter = 0
 		src << "Your Royal Meter went back to 0."
 		src.client.updateRGMeter()
-
-	if(Secret == "Zombie"&&P.Secret!="Hamon")
-		if(HealthCut + 0.1 < 1 && zombieGetUps + 1 <= AscensionsAcquired)
-			Conscious()
-			var/healthcutClose = clamp(0.9-(zombieGetUps/10),0,0.9)
-			HealHealth(30 * (1 - healthcutClose))
-			zombieGetUps++
 
 	if(P && P.Saga == "Kamui" && P.CheckSlotless("Decapitation Mode"))
 		var/a=0
@@ -367,21 +544,22 @@ mob/proc/Unconscious(mob/P,var/text)
 			GatesActive=0
 	if(src.TotalInjury)
 		if(!src.HasInjuryImmune())
-			if(src.TotalInjury>=35&&src.TotalInjury<60&&src.BPPoison>=0.9)
+			var/inj = src.TotalInjury / (1 + src.GetVit(glob.VIT_INJURY_SOFTEN))
+			if(inj>=35&&inj<60&&src.BPPoison>=0.9)
 				var/Time=RawHours(1)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
 					src.BPPoisonTimer=Time
 				src.BPPoison=0.9
 				src.OMessage(10, "[src] has been lightly wounded!", "[src]([src.key]) has over 35% injury.")
-			if(src.TotalInjury>=60&&src.BPPoison>=0.7)
+			if(inj>=60&&src.BPPoison>=0.7)
 				var/Time=RawHours(3)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
 					src.BPPoisonTimer=Time
 				src.BPPoison=0.7
 				src.OMessage(10, "[src] has been heavily wounded!", "[src]([src.key]) has over 50% injury.")
-			if(src.TotalInjury>=85)
+			if(inj>=85)
 				var/Time=RawHours(4)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
@@ -390,7 +568,7 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.MortallyWounded+=1
 				src.OMessage(10, "[src] has been grieviously wounded!", "[src]([src.key]) has over 85% injury.")
 	if(src.client)
-		if((transActive||tension)&&!src.HasNoRevert()&&!src.HasMystic())
+		if((transActive||tension)&&!src.HasMystic())
 			for(var/obj/Skills/Buffs/B in src)
 				if(src.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
 					B.Trigger(src)
@@ -428,31 +606,28 @@ mob/proc/Conscious()
 
 		if(src.KOBrutal)
 			src.KOBrutal=0
-			src.Health=1
+			src.SetHealthPct(1)
 			src.Energy=EnergyMax/100
 		if(src.passive_handler.Get("Our Future"))
 			src.KOBrutal=0
-			src.Health=100
+			src.SetHealthPct(100)
 			src.Energy=src.EnergyMax
 			src.TotalInjury/=2
 			src.TotalFatigue/=2
 			src.OMessage(15,"<font color='green'><b>[src] refuses to let fate get the better of them!!!</b></font color>","<font color=blue>[src]([src.key]) regains consciousness.")
-		else if(src.passive_handler.Get("Neverending Hope"))
-			src.Health=30
+		else if(src.passive_handler.Get("SecondWind") == "Hope")
+			src.SetHealthPct(30)
 			src.Energy=EnergyMax/2
 			src.OMessage(15,"[src] is ready for another go.","<font color=blue>[src]([src.key]) regains consciousness.")
 		else
-			src.Health=15
+			src.SetHealthPct(15)
 			src.Energy=EnergyMax/5
 
-		if(src.Secret=="Zombie")
-			src.HealthCut+=0.1
-			src.OMessage(15,"[src] degenerates further.","<font color=blue>[src]([src.key]) decomposes...")
 		if(isplayer(src))
 			src:move_speed = MovementSpeed()
 		src.OMessage(15,"[src] regains consciousness.","<font color=blue>[src]([src.key]) regains consciousness")
 
-mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extraChance, fakeDeath)
+mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fakeDeath)
 	if(majinCheatDeathInProgress) return
 	// Majin once-per-ascension cheat death
 	if(isRace(MAJIN) && !fakeDeath && !SuperDead && !NoVoid && !majinCheatDeathUsed)
@@ -466,7 +641,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.KO=0
 		src.icon_state=""
 		src.HealWounds(99999)
-		src.Health = 25
+		src.SetHealthPct(25)
 		src.MaxEnergy()
 		src.MaxMana()
 		spawn() src.MajinCheatDeathReformFX()
@@ -482,7 +657,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.TsukiyomiTime=1
 		src.KOTimer=0
 		src.KO=0
-		src.Health=100
+		src.SetHealthPct(100)
 		src.Energy=src.EnergyMax
 		return
 	if(isplayer(src))
@@ -523,10 +698,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				a.in_squad.RemoveMember(src) //Squad members die die when they die.
 				a.Potential = 0 //No gains!
 			if(a.Potential)
-				if(P.Secret=="Zombie")
-					if(P.HealthCut > 0)
-						P.HealthCut-=(0.001*src.Potential)
-						P.HealthCut = max(0, P.HealthCut)
 				var/potential_gain=(a.Potential/2)*glob.MOB_POTENTIAL_MODIFIER
 				if(P.party)
 					if(P.party.members.len>0)
@@ -551,62 +722,34 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 					// rpp gain on ai kill (normal)
 			var/totalValue = 0
 			var/foundMineral = FALSE
-			var/foundMoney = FALSE
 			if(P.moneyGrindedDaily < glob.progress.DailyGrindCap * P.EconomyMult)
-				if(glob.MONEYORFRAGMENTS)
-					for(var/obj/Items/mineral/m in src)
-						totalValue += m.value
-						del(m)
-					for(var/obj/Items/mineral/min in P)
-						foundMineral = TRUE
-						if(P.passive_handler.Get("CashCow"))
-							totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
-						if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
-							totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
-						P.moneyGrindedDaily += totalValue
-						min.value += totalValue
-						min.assignState()
-						min.name = "[Commas(round(min.value))] Mana Bits"
-						P << "You've gained [totalValue * 1+(P.passive_handler.Get("CashCow")/10)] Mana Bits!"
-						min.checkDuplicate(P)
-					if(!foundMineral)
-						var/obj/Items/mineral/mineral = new()
-						P.contents += mineral
-						if(P.passive_handler.Get("CashCow"))
-							totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
-						if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
-							totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
-						P.moneyGrindedDaily += totalValue
-						mineral.value = totalValue
-						mineral.assignState()
-						mineral.name = "[Commas(round(mineral.value))] Mana Bits"
-						P << "You've gained [totalValue*1+(P.passive_handler.Get("CashCow")/10)] Mana Bits!"
-				else
-					for(var/obj/Money/m in src)
-						totalValue += m.Level
-						del(m)
-					for(var/obj/Money/money in P)
-						foundMoney = TRUE
-						if(P.passive_handler.Get("CashCow"))
-							totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
-						if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
-							totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
-						P.moneyGrindedDaily += totalValue
-						money.Level += totalValue
-						money.name = "[Commas(round(money.Level))] Cash"
-						P << "You've gained [totalValue * 1+(P.passive_handler.Get("CashCow")/10)] Cash!"
-						money.checkDuplicate(P)
-					if(!foundMoney)
-						var/obj/Money/money = new()
-						P.contents += money
-						if(P.passive_handler.Get("CashCow"))
-							totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
-						if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
-							totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
-						P.moneyGrindedDaily += totalValue
-						money.Level = totalValue
-						money.name = "[Commas(round(money.Level))] Mana Bits"
-						P << "You've gained [totalValue*1+(P.passive_handler.Get("CashCow")/10)] Cash!"
+				for(var/obj/Items/mineral/m in src)
+					totalValue += m.value
+					del(m)
+				for(var/obj/Items/mineral/min in P)
+					foundMineral = TRUE
+					if(P.passive_handler.Get("CashCow"))
+						totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
+					if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
+						totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
+					P.moneyGrindedDaily += totalValue
+					min.value += totalValue
+					min.assignState()
+					min.name = "[Commas(round(min.value))] Mana Bits"
+					P << "You've gained [totalValue * 1+(P.passive_handler.Get("CashCow")/10)] Mana Bits!"
+					min.checkDuplicate(P)
+				if(!foundMineral)
+					var/obj/Items/mineral/mineral = new()
+					P.contents += mineral
+					if(P.passive_handler.Get("CashCow"))
+						totalValue *= 1+(P.passive_handler.Get("CashCow")/10)
+					if(totalValue + P.moneyGrindedDaily > glob.progress.DailyGrindCap * P.EconomyMult)
+						totalValue = glob.progress.DailyGrindCap * P.EconomyMult - P.moneyGrindedDaily
+					P.moneyGrindedDaily += totalValue
+					mineral.value = totalValue
+					mineral.assignState()
+					mineral.name = "[Commas(round(mineral.value))] Mana Bits"
+					P << "You've gained [totalValue*1+(P.passive_handler.Get("CashCow")/10)] Mana Bits!"
 
 	if(text)
 		src.OMessage(20,"[src] was just killed by [text]!","<font color=red>[src] was just killed by [text]!")
@@ -621,6 +764,10 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 			else
 				src.OMessage(20,"[src]'s existence is purged from the world!","<font color=red>[src] was purified [P]([P.key])!")
+
+	// Hunting: fallen monsters leave carveable remains (potential sets the tier)
+	if(istype(src, /mob/Player/AI) && !NoRemains && !fakeDeath)
+		LifeSpawnRemains(src)
 
 	// Reflected Eldritch Chrysalis — intercepts death if body remains
 	if(src.hasSecret("Eldritch (Reflected)") && !src.ChrysalisActive && !NoRemains)
@@ -673,9 +820,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.Quake(20)
 		src.passive_handler.Increase("DeathDefied", 1)
 		if(src.race && src.race.transformations)
-			// Mazoku humans don't unlock transformations until this point
-			// Slots 1–5 are HT chain, slot 6 is DT, slot 7 (asc 6+) is SEA, order matters
-			// for mazokuActivateHighestHT() and the Gains.dm Mazoku state machine.
+			//slot order matters: 1-5 HT chain, 6 DT, 7 SEA - mazokuActivateHighestHT counts on it
 			src.race.transformations += new /transformation/human/high_tension/mazoku()
 			src.race.transformations += new /transformation/human/high_tension_MAX/mazoku()
 			src.race.transformations += new /transformation/human/super_high_tension/mazoku()
@@ -700,18 +845,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				else if(P.Secret=="Hamon"&&P.HasPurity())
 					src.OMessage(20,"[src] is completely destroyed by the Ripple running through their body!","<font color=red>[src] was purified [P]([P.key])!")
 
-		if(src.Phylactery)
-			for(var/obj/Items/Enchantment/Phylactery/Phy in world)
-				if(Phy.Signature==src.ckey)
-					OMsg(src, "[src] vanishes!")
-					src.loc=Phy.loc
-					src << "Your phylactery has saved you from doom."
-					src.PhylacteryNerf+=0.2
-					src.MortallyWounded=0
-					src.BPPoison=0.9
-					src.BPPoisonTimer=1
-					src.Conscious()
-					return
 		if(src.NoDeath)
 			if(src.HealthCut<0.5&&!SuperDead)
 				src.KO=1
@@ -725,9 +858,8 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 				src << "Due to damage suffered you will be inert for a minute."
 				src.Conscious()
 				src.Stasis=0
-				if(src.Secret!="Zombie")
-					src.HealWounds(50)
-					src.HealFatigue(50)
+				src.HealWounds(50)
+				src.HealFatigue(50)
 				src.HealHealth(50)
 				src.HealEnergy(50)
 				if(passive_handler.Get("VenomBlood"))
@@ -756,12 +888,10 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 	if(ClothBronze&&ClothBronze=="Phoenix")
 		NoRemains=0
 		SuperDead=0
-		Zombie=0
 
 	if(!src.client)
 		NoRemains=1
 		SuperDead=1
-		Zombie=0
 
 	if(src.Dead)
 		NoRemains=1
@@ -808,7 +938,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 
 	if(src.client)
 		if(!(isRace(MAJIN) && (!majinCheatDeathUsed || majinCheatFXRunning || majinCheatDeathInProgress)))
-			Void(SuperDead, Zombie, fakeDeath, 0)
+			Void(SuperDead, fakeDeath, 0)
 
 	if(!src.Dead)
 		src.Conscious()
@@ -861,10 +991,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, var/Zombie, extr
 		src.DefEroded=0
 		src.RecovTax=0
 		src.RecovCut=0
-		if(src.Secret=="Zombie")
-			src.Secret=null
-			src.NoDeath=0
-			src.Timeless=0
 
 /mob/proc/DeathEvolutionEffects()//Proc that doesn't do anything. but maybe someone wants to do visuals at some point
 
@@ -941,11 +1067,7 @@ mob/Body
 		..()
 	Click()
 		..()
-		if(!glob.ALLOW_CLICK_CORPSE) return
-		if(!description)
-			description = input(usr, "What sort of description would you like to set upon this body? How were they killed?\n The format is 'Name's corpse' INPUT ", "Dead Body") as message
-		else
-			usr << "[src] [description]"
+		return
 /proc/SaveIRLNPCs()
 	set background = 1
 	var/savefile/F = new("Saves/IRLNPCs")
@@ -1008,7 +1130,7 @@ proc/Load_Bodies()
 			world.log << "[A] found in [L] [A.loc], at [A.x], [A.y], [A.z] | [A.buildPreviousX], [A.buildPreviousY], [A.buildPreviousZ]"
 		goto wowza
 
-mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
+mob/proc/Leave_Body(var/SuperDead=0, var/ForceVoid=0)
 	var/mob/Body/A=new
 	var/ActuallyDead=0
 	var/Chance=glob.VoidChance
@@ -1027,8 +1149,6 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 	A.transform=src.transform
 	src.loc=locate(glob.currentlyVoidingLoc[1], glob.currentlyVoidingLoc[2], glob.currentlyVoidingLoc[3])
 	var/NotYet=0
-	if(src.passive_handler.Get("Undying"))
-		NotYet=1
 
 	if(!SuperDead||NotYet)
 		if(glob.VoidsAllowed||ForceVoid)
@@ -1077,14 +1197,6 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 								return
 							src.loc=locate(glob.DEATH_LOCATION[1], glob.DEATH_LOCATION[2], glob.DEATH_LOCATION[3])
 
-	else if(SuperDead&&Zombie)
-		src<<"<font color=red><big>DO NOT LOG OUT!"
-		src<<"Your life is being shackled by a powerful curse!"
-		src.OMessage(0,"","<font color=red>[src] is zombifying.")
-		ActuallyDead=0
-		spawn(600)
-			if(src&&A)
-				A.Unholy_Alive(src)
 	else
 		ActuallyDead=1
 		if(src.NoSoul)
@@ -1113,12 +1225,13 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 	src.Stunned=0
 	A.Body=Body
 	if(1>=ForceVoid)
-		A.Health=1000
+		A.SetHealthPct(1000)
 	A.EnergyMax=src.EnergyMax
 	A.Energy=src.Energy
 	A.Power=src.Power
 	A.StrMod=src.GetStr()
 	A.EndMod=src.GetEnd()
+	A.VitMod=src.GetVit()
 	A.ForMod=src.GetFor()
 	A.Target=src
 	A.icon=src.icon
@@ -1150,7 +1263,7 @@ mob/proc/Leave_Body(var/SuperDead=0, var/Zombie, var/ForceVoid=0)
 			M.Level=Q.Level
 			M.name="[Commas(round(M.Level))] [glob.progress.MoneyName]"
 			src.TakeMoney(M.Level)
-	if(src.NoSoul && !ForceVoid && !Zombie)
+	if(src.NoSoul && !ForceVoid)
 		src << "<font size='big'><b>You have died on a plane with no Afterlife; there is nothing for you now. This is oblivion.</b></font size>"
 		src.Savable=0
 		if(src.isRace(MAJIN))
@@ -1167,73 +1280,6 @@ mob/proc/Barely_Alive(mob/P) if(P)
 		P.Conscious()
 	P.Revive()
 	P<<"You have returned to your body, barely alive."
-	if(P.passive_handler.Get("Undying"))
-		P.passive_handler["Undying"]=0
-		P.passive_handler.Increase("CalmAnger")
-		P.OMessage(15,"[P] shines brightly with everlasting Hope, refusing to allow their story to end!","<font color=red>[P]([P.key]) used Undying.")
-		var/image/GG=image('GodGlow.dmi',pixel_x=-32,pixel_y=-32, loc = P, layer=MOB_LAYER-0.5)
-		GG.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
-		GG.color=list(1,0,0, 0,1,0, 0,0,1, 0.2,0.2,0.4)
-		GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
-		animate(GG, alpha=0, transform=matrix()*0.7)
-		world << GG
-		animate(GG, alpha=255, time=30, transform=matrix()*1)
-		animate(P, color = list(0.45,0.6,0.75, 0.64,0.88,1, 0.16,0.21,0.27, 0,0,0), pixel_y=32, time=30)
-		sleep(40)
-
-		var/image/GO=image('GodOrb.dmi',pixel_x=-16,pixel_y=-16, loc = P, layer=EFFECTS_LAYER+0.5)
-		GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
-		GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 156), size = 3)
-		animate(GO, alpha=0)
-		world << GO
-		animate(GO, alpha=255, time=40)
-		for(var/mob/Players/T in view(31, P))
-			animate(T.client, color=list(0.5,0,0, 0,0.5,0, 0,0,0.5, 0,0,0.1), time = 40)
-			spawn(40)
-				animate(T.client, color=null, time = 40)
-		spawn(10)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-			animate(GO, color=list(1,0,0, 0,1,0, 0,0,1, 0.8,0.8,0.8), time=30)
-		spawn(20)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(30)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(40)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		spawn(50)
-			KenShockwave(P, icon='KenShockwaveDivine.dmi', PixelY=24, Size=5, Blend=2)
-		sleep(50)
-		animate(P, color = null)
-		sleep(30)
-		GG.filters-=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
-		GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(51, 220, 243), size = 1)
-
-		animate(GO, alpha=0, time=10)
-		sleep(10)
-		animate(P, pixel_y=0, time=30)
-		animate(GG, alpha=0, time=50)
-		spawn(50)
-			GO.filters=null
-			del GO
-			GG.filters=null
-			del GG
-	del(src)
-
-mob/proc/Unholy_Alive(mob/P) if(P)
-	var/icon/Z=new(P.icon)
-	Z.MapColors(0.3,0.3,0.3, 0.59,0.59,0.59, 0.11,0.11,0.11, 0,0,0)
-	P.loc=loc
-	P.Conscious()
-	P.Health=50
-	P.Energy=100
-	P.Sheared=100
-	P.HealthCut=0.2
-	P.NoDeath=1
-	P.Timeless=1
-	P.Revive()
-	P.icon=Z
-	P.Secret="Zombie"
-	P<<"You have returned to your body, a mockery of what you once were."
 	del(src)
 
 mob/proc/Revive()
@@ -1281,9 +1327,6 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 		return
 	var/looplength = input(src, "How many attempts") as num
 	var/list/damageMatrix = list()
-	var/forcedmgrolls = input(src, "Force the dmg rolls temporarily?") in list(1,0)
-	var/orgdmgrolls = list(glob.min_damage_roll, glob.max_damage_roll)
-	var/dmgrolls = list(glob.min_damage_roll, glob.max_damage_roll)
 	var/_range = input(src, "Do you want to do a range?") in list(1,0)
 	var/min_range
 	var/max_range
@@ -1292,11 +1335,6 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 		min_range = input(src, "min_range") as num
 		max_range = input(src, "max_range") as num
 		per_change = input(src, "per_change") as num
-	if(forcedmgrolls)
-		dmgrolls[1] = input(src, "What is the min?") as num
-		dmgrolls[2] = input(src, "What is the upper?") as num
-		glob.min_damage_roll = dmgrolls[1]
-		glob.max_damage_roll = dmgrolls[2]
 	if(_range)
 		var/total_iteration = (max_range-min_range)/per_change
 		var/statInQuestion = input(src, "what stat") in list("Str", "End")
@@ -1314,7 +1352,7 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 				damageMatrix["[result]"]++
 				if(Target.KO)
 					Target.Conscious()
-				Target.Health=100
+				Target.SetHealthPct(100)
 				Target.Energy=Target.EnergyMax
 				Target.Burn=0
 				Target.SilentBurnAmount=0
@@ -1346,13 +1384,15 @@ The average damage was [average] over [looplength] times.
 			damageMatrix = list()
 			sum = 0
 			average = 0
+		StrReplace = 0
+		Target.EndReplace = 0
 	else
 		for(var/attempts in 1 to looplength)
 			var/result = Melee1(BreakAttackRate=1)
 			damageMatrix["[result]"]++
 			if(Target.KO)
 				Target.Conscious()
-			Target.Health=100
+			Target.SetHealthPct(100)
 			Target.Energy=Target.EnergyMax
 			Target.Burn=0
 			Target.SilentBurnAmount=0
@@ -1383,11 +1423,6 @@ The average damage was [average] over [looplength] times.
 [Target] has [Target.GetEnd()] End."}
 
 		src << msg
-	if(forcedmgrolls)
-		glob.min_damage_roll = orgdmgrolls[1]
-		glob.max_damage_roll = orgdmgrolls[2]
-		StrReplace = 0
-		Target.EndReplace = 0
 /mob/Admin3/verb/SimulateAccuracyNOSTATCHANGE()
 	set category = "Debug"
 	var/self = input(src, "Use on self?") in list("Yes", "No")
@@ -1403,7 +1438,6 @@ The average damage was [average] over [looplength] times.
 	var/hits = 0
 	var/misses = 0
 	var/whiffs = 0
-	var/flowdodge = 0
 	var/obj/Items/Sword/s = p1.EquippedSword()
 	var/obj/Items/Sword/s2 = p1.EquippedSecondSword()
 	if(!s2 && p1.UsingDualWield()) s2 = s
@@ -1421,19 +1455,6 @@ The average damage was [average] over [looplength] times.
 			newaccmult = itemMod[2]
 		if(atkArmor)
 			newaccmult *= p1.GetArmorAccuracy(atkArmor)
-		if(Target.GetFlow())
-			var/enemyflow
-			var/instinct = p1.HasInstinct()
-			var/base_prob = glob.BASE_FLOW_PROB
-			var/result = 0
-			enemyflow = Target.GetFlow()
-			if(instinct)
-				result = enemyflow - instinct
-			else
-				result = enemyflow
-			if(prob(base_prob*result))
-				flowdodge++
-				continue
 		var/result = Accuracy_Formula(p1, Target, newaccmult, glob.WorldDefaultAcc, 0, 0)
 		switch(result)
 			if(HIT)
@@ -1442,12 +1463,11 @@ The average damage was [average] over [looplength] times.
 				whiffs++
 			if(MISS)
 				misses++
-	src <<"\nsimulated [p1] vs [Target]  [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%)\nmissed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
+	src <<"\nsimulated [p1] vs [Target]  [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nmissed [((misses+whiffs)/looplength)*100]% of the time"
 	src <<"simulating target vs src"
 	hits = 0
 	misses = 0
 	whiffs = 0
-	flowdodge = 0
 	s = Target.EquippedSword()
 	s2 = Target.EquippedSecondSword()
 	if(!s2 && Target.UsingDualWield()) s2 = s
@@ -1460,19 +1480,6 @@ The average damage was [average] over [looplength] times.
 		swordAtk = TRUE
 	for(var/attempts in 1 to looplength)
 		var/newaccmult = accmult
-		if(p1.HasFlow())
-			var/flow
-			var/base_prob = glob.BASE_FLOW_PROB
-			var/result = 0
-			var/enemyinstinct = Target.HasInstinct()
-			flow = GetFlow()
-			if(enemyinstinct)
-				result = flow - enemyinstinct
-			else
-				result = flow
-			if(prob(base_prob*result))
-				flowdodge++
-				continue
 		var/list/itemMod = Target.getItemDamage(list(s,s2,s3,st), 1, newaccmult, FALSE, FALSE, swordAtk)
 		if(s)
 			newaccmult = itemMod[2]
@@ -1486,7 +1493,7 @@ The average damage was [average] over [looplength] times.
 				whiffs++
 			if(MISS)
 				misses++
-	src <<"\nsimulated [Target] vs [p1] [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%) missed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
+	src <<"\nsimulated [Target] vs [p1] [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%) missed [((misses+whiffs)/looplength)*100]% of the time"
 
 mob/var/minhitroll = 0
 /mob/Admin3/verb/SimulateAccuracy()
@@ -1500,10 +1507,6 @@ mob/var/minhitroll = 0
 	SpdMod = spd
 	var/def = input(src, "What def do u want") as num
 	DefMod = def
-	var/flow = input(src, "What flow do u want") as num
-	var/instinct = input(src, "What instinct do u want") as num
-	passive_handler.Set("Flow", flow)
-	passive_handler.Set("Instinct", instinct)
 	var/accmult = input(src, "What accmult do u want") as num
 	var/enemyoff = input(src, "What off do u want enemy to have") as num
 	Target.OffMod = enemyoff
@@ -1511,16 +1514,11 @@ mob/var/minhitroll = 0
 	Target.DefMod = enemydef
 	var/enemyspd = input(src, "What spd do u want enemy to have") as num
 	Target.SpdReplace = enemyspd
-	var/enemyflow = input(src, "What flow do u want") as num
-	var/enemyinstinct = input(src, "What instinct do u want") as num
-	Target.passive_handler.Set("Flow",  enemyflow)
-	Target.passive_handler.Set("Instinct",enemyinstinct)
 	var/looplength = input(src, "How many attempts") as num
 	var/randomizeAccMult = input(src, "randomize acc mult between 1 and accmult?") in list(TRUE, FALSE)
 	var/hits = 0
 	var/misses = 0
 	var/whiffs = 0
-	var/flowdodge = 0
 	var/obj/Items/Sword/s = EquippedSword()
 	var/obj/Items/Sword/s2 = EquippedSecondSword()
 	if(!s2 && UsingDualWield()) s2 = s
@@ -1540,18 +1538,6 @@ mob/var/minhitroll = 0
 			newaccmult = itemMod[2]
 		if(atkArmor)
 			newaccmult *= GetArmorAccuracy(atkArmor)
-		if(enemyflow)
-			var/base_prob = glob.BASE_FLOW_PROB
-			var/result = 0
-			enemyflow = Target.GetFlow()
-			instinct = HasInstinct()
-			if(instinct)
-				result = enemyflow - instinct
-			else
-				result = enemyflow
-			if(prob(base_prob*result))
-				flowdodge++
-				continue
 		var/result = Accuracy_Formula(src, Target, newaccmult, glob.WorldDefaultAcc, 0, 0)
 		switch(result)
 			if(HIT)
@@ -1560,12 +1546,11 @@ mob/var/minhitroll = 0
 				whiffs++
 			if(MISS)
 				misses++
-	src <<"\nsimulated [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%)\nminhitsrolles:[minhitroll]\nmissed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
+	src <<"\nsimulated [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nminhitsrolles:[minhitroll]\nmissed [((misses+whiffs)/looplength)*100]% of the time"
 	src <<"simulating target vs src"
 	hits = 0
 	misses = 0
 	whiffs = 0
-	flowdodge = 0
 	s = Target.EquippedSword()
 	s2 = Target.EquippedSecondSword()
 	if(!s2 && Target.UsingDualWield()) s2 = s
@@ -1581,17 +1566,6 @@ mob/var/minhitroll = 0
 		var/newaccmult = accmult
 		if(randomizeAccMult)
 			newaccmult = randValue(0.8, accmult)
-		if(flow)
-			var/base_prob = glob.BASE_FLOW_PROB
-			var/result = 0
-			flow = GetFlow()
-			if(enemyinstinct)
-				result = flow - enemyinstinct
-			else
-				result = flow
-			if(prob(base_prob*result))
-				flowdodge++
-				continue
 		var/list/itemMod = Target.getItemDamage(list(s,s2,s3,st), 1, newaccmult, FALSE, FALSE, swordAtk)
 		if(s)
 			newaccmult = itemMod[2]
@@ -1605,7 +1579,7 @@ mob/var/minhitroll = 0
 				whiffs++
 			if(MISS)
 				misses++
-	src <<"\nsimulated [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nflowdodge:[flowdodge]([round((flowdodge/looplength)*100)]%)\nminhitsrolled:[minhitroll]\nmissed [((misses+whiffs+flowdodge)/looplength)*100]% of the time"
+	src <<"\nsimulated [looplength] times at \nhits:[hits]([round((hits/looplength)*100)]%)\nwhiffs:[whiffs]([round((whiffs/looplength)*100)]%)\nmisses:[misses]([round((misses/looplength)*100)]%)\nminhitsrolled:[minhitroll]\nmissed [((misses+whiffs)/looplength)*100]% of the time"
 	minhitroll = 0
 	// var/list/itemMod = getItemDamage(list(s,s2,s3,st), delay, acc, SecondStrike, ThirdStrike, swordAtk)
 	// delay = itemMod[1]
@@ -1616,285 +1590,34 @@ mob/var/minhitroll = 0
 // 				if(atkArmor)
 // 					acc *= GetArmorAccuracy(atkArmor)
 // 					delay /= GetArmorDelay(atkArmor)
-	//LABEL: ACCURACY FORMULA
-proc/Accuracy_Formula(mob/Offender,mob/Defender,AccMult=1,BaseChance=glob.WorldDefaultAcc, Backfire=0, IgnoreNoDodge=0)
-	if(Offender&&Defender)
-		if(Defender.passive_handler.Get("The Crownless King") && Defender.TotalFatigue !=99)
-			if(Defender.passive_handler.Get("The Crownless King") && Defender.ManaAmount !=0) //until you run out of mana and are fully fatigued, you can't be hit.
-				return MISS
-		if(Defender.Frozen==3)
-			return MISS
-		if(Offender.HasNoMiss())
-			return HIT
-		if(Defender.HasNoDodge()&&!IgnoreNoDodge)
-			return HIT
-		if(Backfire&&Offender==Defender)
-			return HIT
-		if(Defender.SureDodge&&!Defender.passive_handler.Get("NoDodge"))
-			Defender.SureDodge=0
-			if(Offender.SureHit)
-				return WHIFF
-			else
-				return MISS
-		if(Offender.SureHit)
-			Offender.SureHit=0
-			return HIT
-		if(Defender.Stunned || Defender.Launched || Defender.PoweringUp)
-			return HIT
-		if(Offender.Grab == Defender && glob.GRABS_AUTOHIT)
-			return HIT
-
-		if(getBackSide(Offender, Defender))
-
-			if(Defender.CheckSlotless("Great Ape")|| Defender.passive_handler.Get("Vulnerable Behind"))
-				var/tail_resistance_max = Defender.AscensionsAcquired + (round(Defender.AscensionsAcquired/2))
-				var/tail_resistance = Defender.tail_mastery / 20
-				tail_resistance += Defender.AscensionsAcquired * 5
-				tail_resistance = clamp(tail_resistance, 0, tail_resistance_max * 5)
-				if(prob(50 - tail_resistance))
-					Stun(Defender, 2 - (tail_resistance * 0.1))
-					Defender.tailResistanceTraining(25 + tail_resistance * 2)
-					if(Defender.Stunned)
-						return HIT
-				else
-					Defender.tailResistanceTraining(5)
-			if(prob(0.5))
-				// smirk
-				OMsg(Defender, "[Defender] is getting Ashton'd.")
-
-			AccMult*=1.2
-
-		if(Offender.UsingCriticalImpact())
-			AccMult*=1.15
-		if(Defender.HasRefractivePlating()||Defender.HasPlatedWeights())
-			AccMult*=1.15
-
-
-		if(Offender.AttackQueue)
-			AccMult+=Offender.QueuedAccuracy()
-
-		if(Offender.SenseRobbed>=4&&(Offender.SenseUnlocked<=Offender.SenseRobbed&&Offender.SenseUnlocked>5))
-			AccMult*=(1-(Offender.SenseRobbed*0.1))
-		if(Defender.SenseRobbed>=4&&(Defender.SenseUnlocked<=Defender.SenseRobbed&&Defender.SenseUnlocked>5))
-			AccMult/=max(0.1, 1-(Defender.SenseRobbed*0.1))
-
-		if(Offender.HasClarity()||Offender.HasFluidForm()||Offender.HasIntuition())
-			if(AccMult<1)
-				if(Offender.HasFluidForm())
-					AccMult+=(Offender.HasFluidForm()*glob.FLUID_FORM_RATE)*AccMult
-				if(AccMult>1)
-					AccMult=1
-		if(Defender.HasClarity()||Defender.HasFluidForm()||Defender.HasIntuition())
-			if(AccMult>1)
-				if(Defender.HasFluidForm())
-					AccMult-=(Defender.HasFluidForm()*glob.FLUID_FORM_RATE)
-				if(AccMult<1)
-					AccMult=1
-		var/GodKiDif = 1
-		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
-			if(Offender.GetGodKi() && !Offender.HasNullTarget())
-				GodKiDif = 1 + Offender.GetGodKi()
-			if(Defender.GetGodKi() && !Defender.HasNullTarget())
-				GodKiDif /= (1 + Defender.GetGodKi())
-			if(Defender.passive_handler.Get("Justice"))
-				if(Offender.GetGodKi()>Defender.GetGodKi())
-					GodKiDif=1
-			if(Offender.passive_handler.Get("Justice"))
-				if(Defender.GetGodKi()>Offender.GetGodKi())
-					GodKiDif=1
-		AccMult *= GodKiDif
-
-		// START OF REAL FUNCTION
-		var/OffenseModifier
-		var/DefenseModifier
-		var/OffenderEffPower = Offender.GetEffectivePower()
-		var/DefenderEffPower = Defender.GetEffectivePower()
-		var/OffenseAdvantage = OffenderEffPower / max(DefenderEffPower,0.01)
-		var/DefenseAdvantage = DefenderEffPower / max(OffenderEffPower,0.01)
-		var/Offense
-		var/Defense
-		var/TotalAccuracy
-		if(glob.CLAMP_POWER)
-			if(!Offender.ignoresPowerClamp())
-				OffenseAdvantage = clamp(OffenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-			if(!Defender.ignoresPowerClamp())
-				DefenseAdvantage = clamp(DefenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		if(Offender.passive_handler.Get("Justice"))
-			if(DefenseAdvantage>OffenseAdvantage)
-				DefenseAdvantage=1
-				OffenseAdvantage=1
-		if(Defender.passive_handler.Get("Justice"))
-			if(OffenseAdvantage>DefenseAdvantage)
-				DefenseAdvantage=1
-				OffenseAdvantage=1
-
-		if(glob.JORDAN_ACCURACY)
-			// trying to make it less complex for the very roughly same result
-			Offense = Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD)
-			Defense = Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD)
-
-			var/mod = clamp(((Offense/max(Defense,0.01)) * AccMult) * OffenseAdvantage, glob.MIN_JORDAN_ACC_MOD, glob.MAX_JORDAN_ACC_MOD)
-
-
-
-			if(glob.OLD_ACCURACY)
-				Offense=(OffenderEffPower*(Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD)))*(1+((Offender.GetMaouKi()) + !Offender.HasNullTarget()&&!Offender.HasMaouKi() ? Offender.GetGodKi() : 0))
-				Defense=(DefenderEffPower*(Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD)))*(1+((Defender.GetMaouKi()) + !Defender.HasNullTarget()&&!Defender.HasMaouKi() ? Defender.GetGodKi() : 0))
-				mod = clamp(((Offense*AccMult)/max(Defense,0.01)), 0.5, 2)
-
-			var/roll = randValue((100-BaseChance) * mod, 100)
-			if(glob.MOD_AFTER_ROLL)
-				roll = randValue((100-BaseChance), 100)
-				roll*=mod
-
-			if(roll >= BaseChance)
-				return HIT
-			else
-				if(glob.MOD_AFTER_ROLL)
-					roll = randValue((100-BaseChance), 100)
-					roll*=mod
-				else
-					roll = randValue((100-BaseChance) * mod, 100)
-
-				if(roll <= glob.WorldWhiffRate)
-					return MISS
-				else if(roll > glob.WorldWhiffRate)
-					return WHIFF
-		else
-			if(1 + ((OffenseAdvantage - DefenseAdvantage)/2) < 1) // output is if = or under, make 1
-				OffenseModifier = 1
-			else
-				OffenseModifier = 1 + ((OffenseAdvantage - DefenseAdvantage)/2) // at 2x power instead of hitting 2x times mroe, u hit 1.75x more
-
-			if(1 + ((DefenseAdvantage - OffenseAdvantage)/2) < 1)
-				DefenseModifier = 1
-			else
-				DefenseModifier = 1 + ((DefenseAdvantage - OffenseAdvantage)/2)
-
-			Offense= OffenseModifier * (Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD))
-			Defense= DefenseModifier * (Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD)) * glob.EXTRA_DEF_MOD
-			TotalAccuracy = (BaseChance/100) * ((Offense*AccMult) / max(Defense,0.01)) * 100
-			if(glob.DEBUG_MESSAGES_ACCURACY)
-				Offender << "--------------------"
-				Offender << "Offense: [Offense]"
-				Offender << "Defense: [Defense]"
-				Offender << "Chance: [BaseChance]"
-				Offender << "Accuracy: [TotalAccuracy]"
-				Offender << "Accuracy Modifier: [AccMult]"
-				Offender << "Defense Mod: [DefenseModifier]"
-				Offender << "Offense Mod: [OffenseModifier]"
-				Offender << "--------------------"
-
-			TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
-			if(TotalAccuracy <= glob.LOWEST_ACC)
-				Offender.minhitroll++
-			if(!prob(TotalAccuracy))
-				if(!prob(TotalAccuracy))
-					return MISS
-				else
-					return WHIFF
-			else
-				return HIT
-	else
-		return MISS
-
-proc/Deflection_Formula(var/mob/Offender,var/mob/Defender,var/AccMult=1,var/BaseChance=glob.WorldDefaultAcc, var/Backfire=0)
-	if(Offender&&Defender)
-		if(Defender.Frozen==3)
-			return MISS
-		if(Offender.HasNoMiss())
-			return HIT
-		if(Defender.SureDodge)
-			Defender.SureDodge=0
-			if(Offender.SureHit)
-				return HIT
-			else
-				return MISS
-		if(Offender.SureHit)
-			Offender.SureHit=0
-			return HIT
-		if(Defender.Stunned || Defender.Launched || Defender.PoweringUp)
-			return HIT
-
-		if(Backfire&&Offender==Defender)
-			AccMult*=0.8
-		if(getBackSide(Offender, Defender))
-			AccMult*=1.2
-		if(Defender.Beaming || Defender.BusterTech)
-			AccMult*=1.15
-		if(Defender.HasRefractivePlating()||Defender.HasPlatedWeights())
-			AccMult/=1.15
-		if(Offender.SenseRobbed>=4&&(Offender.SenseUnlocked<=Offender.SenseRobbed&&Offender.SenseUnlocked>5))
-			AccMult*=(1-(Offender.SenseRobbed*0.1))
-		if(Defender.SenseRobbed>=4&&(Defender.SenseUnlocked<=Defender.SenseRobbed&&Defender.SenseUnlocked>5))
-			AccMult/=(1-(Defender.SenseRobbed*0.1))
-		if(Offender.HasClarity()||Offender.HasFluidForm()||Offender.HasIntuition())
-			if(AccMult<1)
-				AccMult+=0.2*AccMult
-				if(AccMult>1)
-					AccMult=1
-		if(Defender.HasClarity()||Defender.HasFluidForm()||Defender.HasIntuition())
-			var/cumAvoidance = (Defender.HasClarity()/4) + (Defender.HasIntuition() / 4) + Defender.HasFluidForm()
-			if(AccMult>1)
-				AccMult-=(0.2*AccMult) * cumAvoidance
-				if(AccMult<1)
-					AccMult=1
-
-
-		var/GodKiDif = 1
-		if(!istype(Offender, /mob/Player/AI/Demon) && !istype(Defender, /mob/Player/AI/Demon) && !Offender.isRace(DEMIFIEND) && !Defender.isRace(DEMIFIEND))
-			if(Offender.GetGodKi() && !Offender.HasNullTarget())
-				GodKiDif = 1 + Offender.GetGodKi()
-			if(Defender.GetGodKi() && !Defender.HasNullTarget())
-				GodKiDif /= (1 + Defender.GetGodKi())
-		AccMult *= GodKiDif
-
-		var/OffenseModifier
-		var/DefenseModifier
-		var/OffenderEffPower = Offender.GetEffectivePower()
-		var/DefenderEffPower = Defender.GetEffectivePower()
-		var/OffenseAdvantage = OffenderEffPower / max(DefenderEffPower,0.01)
-		var/DefenseAdvantage = DefenderEffPower / max(OffenderEffPower,0.01)
-		if(glob.CLAMP_POWER)
-			if(!Offender.ignoresPowerClamp())
-				OffenseAdvantage = clamp(OffenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-			if(!Defender.ignoresPowerClamp())
-				DefenseAdvantage = clamp(DefenseAdvantage,glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-		if(1 + ((OffenseAdvantage - DefenseAdvantage)/2) < 1)
-			OffenseModifier = 1
-		else
-			OffenseModifier = 1 + ((OffenseAdvantage - DefenseAdvantage)/2)
-
-		if(1 + ((DefenseAdvantage - OffenseAdvantage)/2) < 1)
-			DefenseModifier = 1
-		else
-			DefenseModifier = 1 + ((DefenseAdvantage - OffenseAdvantage)/2)
-
-		var/Offense= OffenseModifier * (Offender.GetOff(glob.ACC_OFF)+Offender.GetSpd(glob.ACC_OFF_SPD))
-		var/Defense= DefenseModifier * (Defender.GetDef(glob.ACC_DEF)+Defender.GetSpd(glob.ACC_DEF_SPD))
-		var/TotalAccuracy = BaseChance * ((Offense*AccMult) / max(Defense,0.01)) * 100
-
-		TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
-		if(Defender.passive_handler.Get("TotalDeflection"))
-			return MISS
-
-		if(!prob(TotalAccuracy))
-			if(!prob(TotalAccuracy))
-				return MISS
-			else
-				return WHIFF
-		else
-			return HIT
-	else
-		return MISS
-
 mob/var/tmp/last_combo
 var/static/list/opposite_dirs = list(SOUTH,NORTH,NORTH|SOUTH,WEST,SOUTHWEST,NORTHWEST,NORTH|SOUTH|WEST,EAST,SOUTHEAST,NORTHEAST,NORTH|SOUTH|EAST,WEST|EAST,WEST|EAST|NORTH,WEST|EAST|SOUTH,WEST|EAST|NORTH|SOUTH)
 
-mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE)
+mob/proc/ComboLandingClear(mob/M, direction)
+	var/turf/W = get_step(M, direction)
+	if(!W)
+		return null
+	if(istype(W,/turf/Special/Blank))
+		return null //a Blank tile can't be landed on
+	if(W.density)
+		return null
+	for(var/atom/x in W)
+		if(x.density)
+			return null //a dense atom (often the adjacent caster) blocks this tile
+	if(PmActive())
+		for(var/mob/m in range(1, W))
+			if(m == src || m == M || !m.density) continue
+			if(abs((m.x-W.x)*32 + m.step_x) < 32 && abs((m.y-W.y)*32 + m.step_y) < 32)
+				return null
+	return W
+
+mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = FALSE, landDir = 0, frontOnly = FALSE)
 	if(last_combo >= world.time) return
 	last_combo = world.time
 	var/list/dirs = list(NORTH,SOUTH,EAST,WEST,NORTHWEST,SOUTHWEST,NORTHEAST,SOUTHEAST)
+	if(frontOnly && M)
+		var/front = DisplayedCardinal(M.dir, 0)
+		dirs = list(landBehind ? opposite_dirs[front] : front)	
 	var/limit = 15
 	if(ignoreTiledistance)
 		limit  = 100
@@ -1907,35 +1630,34 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 
 
 		while(dirs.len)
-			var/direction = pick(dirs)
+			//asked-for side goes first, random fallback after
+			var/direction = (landDir && !landBehind && (landDir in dirs)) ? landDir : pick(dirs)
 			dirs-=direction
-
-			W=get_step(M, direction)
-			if(landBehind)
-				W=get_step(M, opposite_dirs[M.dir])
-			if(W)
-				if(istype(W,/turf/Special/Blank))
-					return
-				if(!W.density)
-					for(var/atom/x in W)
-						if(x.density)
-							return
-					src.loc=W
-					src.dir=ReturnDirection(src,M)
-					if(!LightAttack && get_dist(src,M)>1)
-						if(src.AttackQueue && src.AttackQueue.Rapid)
-							FlashImage(src)
-						else
-							VanishImage(src)
-					if(M.Beaming!=2)
-						M.dir=ReturnDirection(M,src)
-					break
+			if(landBehind && !frontOnly)
+				direction = opposite_dirs[M.dir]
+			W=ComboLandingClear(M, direction)
+			if(!W)
+				continue //blocked tile; try another dir, don't abort the whole teleport
+			src.last_combo_warp_dist = get_dist(src, M)
+			src.loc=W
+			if(PmActive())//land on the target's sprite, not its tile origin
+				src.step_x=M.step_x
+				src.step_y=M.step_y
+			src.dir=ReturnDirection(src,M)
+			if(!LightAttack && get_dist(src,M)>1)
+				if(src.AttackQueue && src.AttackQueue.Rapid)
+					FlashImage(src)
+				else
+					VanishImage(src)
+			if(M.Beaming!=2 && !(frontOnly && landBehind))
+				M.dir=ReturnDirection(M,src)
+			break
 
 mob/proc/SpeedDelay(var/Modifier=1)
-	var/Spd=src.GetSpd()**glob.ATTACK_DELAY_EXPONENT
+	var/Spd=(src.GetSpd()+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT
 	var/Delay=glob.ATTACK_DELAY_DIVISOR/Spd
 	if(passive_handler["Speed Force"])
-		Delay = glob.ATTACK_DELAY_DIVISOR/(GetSpd()*glob.SPEED_FORCE_DELAYMULT)
+		Delay = glob.ATTACK_DELAY_DIVISOR/((GetSpd()*glob.SPEED_FORCE_DELAYMULT+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT)
 	// Inevitable (Makyo)
 	Delay += passive_handler.Get("Inevitable")
 	if(Delay>=glob.ATTACK_DELAY_MAX)
@@ -1956,6 +1678,8 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	if(!P) return
 	if(P.Stasis)
 		return
+	if(P.IsGuarding() && !Forced && !trueForced)
+		return	//guarded hits only move you via the pushback nudge
 	if(!Direction)
 		Direction=src.dir
 	Forced+=isForced()
@@ -1965,10 +1689,11 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 				P.UseProjectile(p)
 			continue
 	Distance*=(gatherKBMods())
+	Distance*=1+src.GetStr(glob.STR_KB_RATE) //muscle sends harder
+	Distance/=1+P.GetVit(glob.VIT_KB_RATE) //mass stays planted
 	Distance*=getKnockbackMultiplier(P) // gets the knockback multiplier(reduction) for the target
 	if(!Forced)
-		var/chance2Stop = prob(50*(P.HasMythical()))
-		if(P.is_dashing || chance2Stop)
+		if(P.is_dashing)
 			return
 		Distance /= 1 + ((/*P.passive_handler.Get("Juggernaut") + P.HasMythical()*/ P.is_dashing) * 0.5)
 	else
@@ -1981,11 +1706,12 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	if(Distance>=0.5&&Distance<1)
 		Distance=1
 
+	P.kb_sender = src	//splat credit + flourish
 	if(P.Knockbacked)
 		var/orgDistance = Distance
 		P.Knockbacked=Direction
 		Distance -= (P.previousKnockBack * glob.KB_SPEED)
-		P.Knockback+=Distance
+		P.Knockback += max(Distance, 0)
 		if(Forced>=3)
 			P.Knockback = (orgDistance) * world.tick_lag
 	else
@@ -1993,10 +1719,26 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		P.previousKnockBack = Distance
 
 mob
+	var/tmp/kb_loft = 0
+	var/tmp/kb_recent_until = 0 
+	var/tmp/dash_clash = 0 
+	var/tmp/mob/clash_pursuit 
+	var/tmp/clash_pursuit_until = 0
 	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed)
+		if(src.Guarding) src.GuardStop()	//hard cc drops guard
+		if(src.ChargingEnergy) src.ChargeStop()
+		if(PmActive()) //tile-quantize before knockback so its get_step wall/edge probes stay accurate and it doesn't rest ~step_x px short
+			src.step_x=0
+			src.step_y=0
 		src.icon_state="KB"
 		src.Knockbacked=Direction
 		src.Knockback=Distance*world.tick_lag
+		src.kb_start_time = world.time	//fresh KB only - extensions keep the anchor
+		//heavy sends pop the victim into a low arc; the world shadow shrinks under them so it reads as airtime
+		var/w = min(Distance / glob.MAX_KB_TIME, 1)
+		if(w >= glob.KB_LOFT_MIN && !src.Flying && !src.Launched && !src.pixel_z)
+			src.kb_loft = 1
+			animate(src, pixel_z = round(4 + glob.KB_LOFT_PX * w), time = 3, easing = SINE_EASING|EASE_OUT)
 		spawn()
 			while(src.Knockback)
 				src.ContinueKB(Ki)
@@ -2010,9 +1752,28 @@ mob
 					if(istype(a, /obj/Items/Tech/Door))
 						PlanetEnterBump(a, src)
 						continue
+					if(ismob(a))
+						var/mob/dm = a
+						if(dm == src.kb_sender || (dm.is_dashing && dm.Target == src))
+							continue
 					dense=1
 					break
 			if(dense)
+				//wall splat: force left in the send = stagger + thud
+				if(src.Knockbacked && src.Knockback >= glob.SPLAT_MIN_REMAINING * world.tick_lag && src.splat_stagger_until < world.time)
+					var/remTiles = src.Knockback / world.tick_lag
+					ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)
+					var/splat_mult = 1
+					if(src.splat_bonus_until > world.time && src.splat_bonus)
+						splat_mult = 1 + src.splat_bonus
+						src.splat_bonus_until = 0
+					var/mob/sender = src.kb_sender
+					spawn()
+						if(sender && sender != src)
+							sender.DoDamage(src, remTiles * glob.SPLAT_DMG_PER_TILE * splat_mult)
+							sender.FlourishArm()
+						src.Earthquake(4, -4,4,-4,4, 0, src.Knockbacked)
+						KenShockwave(src, Size = min(remTiles/5, 1.5), Time = 4)
 				src.StopKB(DustBlock)
 	proc/ContinueKB(var/DustBlock=0)
 		set waitfor=0
@@ -2035,25 +1796,119 @@ mob
 		if(src.Knockback<0)
 			src.Knockback=0
 	proc/StopKB(var/DustBlock=0)
+		//generic state-clear callers arrive with this already null, so they don't fire Landfalls
+		var/wasKB = src.Knockbacked
+		if(wasKB)
+			src.kb_recent_until = world.time + glob.TIMING_WINDOW
 		if(!src.KO)
 			src.icon_state=""
 		else
 			src.icon_state="KO"
 		src.Knockbacked=null
 		src.Knockback=null
+		if(src.kb_loft) //bring the arc down; animate commits pixel_z=0 instantly so the Landfall gate below still passes
+			src.kb_loft = 0
+			animate(src, pixel_z = 0, time = 2, easing = SINE_EASING|EASE_IN)
 		if(src.Dunked)
 			spawn()
 				Crater(src,round(1+Dunked))
 			src.Dunked=0
-		else if(prob(20)&&src.pixel_z==0&&!DustBlock)
-			Dust(src.loc)
-			Dust(src.loc)
+		else if(wasKB&&src.pixel_z==0&&!DustBlock)
+			Landfall(src, min(previousKnockBack / glob.MAX_KB_TIME, 1)) //dust scales with how hard you were sent
+		src.kb_sender = null
+	proc/ClashPxDist(mob/M)
+		if(!ismob(M) || M == src || M.z != z || !isturf(loc) || !isturf(M.loc))
+			return 1000000
+		return max(abs((M.x-x)*32 + (M.step_x-step_x)), abs((M.y-y)*32 + (M.step_y-step_y)))
+	proc/ClashReach(mob/M)
+		if(!M)
+			return 0
+		return (get_dist(src, M) <= 1 || ClashPxDist(M) <= 48)
+	proc/TryDragonClash(mob/Trg, force_clashable = 0, from_hit = 0)
+		if(!Trg || Trg == src)
+			return
+		if(!from_hit && !ClashReach(Trg))
+			return
+		var/pursued = (src.clash_pursuit == Trg && world.time <= src.clash_pursuit_until)
+		if(Trg.Knockbacked||world.time<=Trg.kb_recent_until||pursued||src.passive_handler&&src.passive_handler.Get("SpiralImpact"))
+			src.NextAttack=0
+			Trg.StopKB()
+			if(force_clashable || pursued || src.dash_clash>=2 || Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash")||src.passive_handler&&src.passive_handler.Get("SpiralImpact"))
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash_Defensive/DC in Trg)
+					if(!Trg.BuffOn(DC))
+						var/pursuerBoon = Trg.HasPursuer()
+						DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						DC.Trigger(Trg)
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Clash/DC in src)
+					if(!src.BuffOn(DC))
+						var/pursuerBoon = HasPursuer()
+						DC.TimerLimit = 3 + clamp(0.25 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						if(isRace(MAKYO) && ActiveBuff)
+							DC.passives["Star Surge"] = 1
+							DC.TimerLimit = 1.5 + clamp(0.5 * pursuerBoon, 0.001, glob.MAX_PURSUER_BOON)
+						if(src.hasSecret("Eldritch (Reflected)"))
+							DC.ManaHeal=3+(src.AscensionsAcquired*2)
+						DC.Trigger(src)
+			src.clash_pursuit = null 
+			return 1
+	proc/ClashWatch(mob/Trg, clashable = 0)
+		set waitfor = 0
+		var/until = world.time + 30
+		var/tail = 0
+		var/armed = 0
+		while(src && Trg && Trg.loc && world.time <= until)
+			if(clashable && (Trg.Knockbacked || world.time <= Trg.kb_recent_until))
+				armed = 1
+				src.clash_pursuit = Trg
+				src.clash_pursuit_until = world.time + 30
+			if(glob && glob.DRAGON_CLASH_DEBUG && client)
+				src << "clash-dbg: px=[ClashPxDist(Trg)] gd=[get_dist(src, Trg)] kb=[Trg.Knockbacked ? Trg.Knockbacked : 0] grace=[max(0, Trg.kb_recent_until - world.time)] armed=[armed] dash=[dash_clash]"
+			if(TryDragonClash(Trg, clashable))
+				if(glob && glob.DRAGON_CLASH_DEBUG && client) src << "clash-dbg: FIRED"
+				return
+			if(!src.dash_clash && !tail)
+				tail = 1
+				until = min(until, world.time + glob.TIMING_WINDOW)
+			sleep(world.tick_lag)
+		if(src && Trg && Trg.loc && armed && ClashPxDist(Trg) <= 64)
+			if(glob && glob.DRAGON_CLASH_DEBUG && client) src << "clash-dbg: settling debt at px=[ClashPxDist(Trg)]"
+			TryDragonClash(Trg, clashable, from_hit = 1)
+		else if(glob && glob.DRAGON_CLASH_DEBUG && client)
+			src << "clash-dbg: watcher exit unpaid armed=[armed] px=[Trg ? ClashPxDist(Trg) : "gone"]"
+	proc/ClashBump(atom/A)
+		if(!ismob(A))
+			return
+		var/mob/M = A
+		if(src.dash_clash)
+			src.TryDragonClash(M)
+		if(M.dash_clash && (src.Knockbacked||world.time<=src.kb_recent_until))
+			M.TryDragonClash(src)
+
+mob/Bump(atom/A)
+	ClashBump(A)
+	..()
 
 /var/tmp/lastGrabUsage=0
 
 
 mob/proc/Grab()
 	if(src.Stunned||src.Suspended||src.icon_state=="KB")
+		return
+	//tech: mash grab the instant you're grabbed to slip it. grab while held = tech, not a chain grab
+	if(src.grabbed && ismob(src.grabbed) && src.grabbed:Grab == src)
+		var/mob/G = src.grabbed
+		if(world.time <= G.GrabTime + glob.TIMING_WINDOW)
+			src.OMessage(10, "[src] slips [G]'s grip before it closes!", "[src] techs [G]'s grab")
+			G.Grab_Release()
+			if(PmActive())
+				src.PmDashStep(G, 32, away = 1)
+				G.PmDashStep(src, 32, away = 1)
+			else
+				step_away(src, G, 1)
+				step_away(G, src, 1)
+			KenShockwave(src, Size = 0.5, Time = 4)
+			ApplySplatStagger(G, glob.SPLAT_STAGGER_DS)
+			src.FlourishArm()
 		return
 	if(!Grab)
 		if(lastZanzoUsage+3 > world.time)
@@ -2066,8 +1921,10 @@ mob/proc/Grab()
 			if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Grab"))
 				extraTiles += secretDatum?:getBoon(src, "Grab")
 			src.DashTo(src.Target, 2 + passive_handler.Get("Scoop"))
-			if(src.Target in oview(1, src))
+			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
 				src.Grab_Mob(src.Target)
+			else
+				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)	//whiffed the lunge, punishable
 			for(var/obj/Skills/Grab/g in src)
 				g.Cooldown(2)
 		else
@@ -2102,7 +1959,7 @@ mob/proc/Grab()
 								del(P)
 								return
 						buh.suffix="[Commas(buh:TotalStack)]"
-					if(src.CheckInventoryFull())
+					if(src.CheckInventoryFull(P))
 						return
 					src.OMessage(10,"[src] picks up [P].","[src]([src.key]) picks up [ExtractInfo(P)] made by [buh.CreatorKey].")
 					P.Move(src)
@@ -2157,14 +2014,14 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 				aa.SetTarget(src)
 				aa.ai_state = "Chase"
 				aa.last_activity = world.time
-	if(passive_handler.Get("Grippy"))
-		Forced = 1
 	if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Grab"))
 		Forced = 1
 	if(!Forced)
 		if(istype(P, /mob/Body))
 			src.Grab=P
 			P.grabbed = src
+			if(P.Guarding) P.GuardStop()	//grabs beat guard
+			if(P.ChargingEnergy) P.ChargeStop()
 			src.GrabTime = world.time
 			src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 			src.Grab_Update()
@@ -2182,6 +2039,8 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 			return
 	src.Grab=P
 	P.grabbed = src
+	if(P.Guarding) P.GuardStop()	//grabs beat guard
+	if(P.ChargingEnergy) P.ChargeStop()
 	src.GrabTime = world.time
 	src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
 	src.Grab_Update()
@@ -2198,8 +2057,6 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(KO) return 1;
 	if(icon_state=="Meditate") return 1;
 	if(HasGiantForm()) return 0;
-	if(HasMythical()>=1) return 0;
-	if(passive_handler.Get("Fishman")) return 0;
 	return 1;
 
 
@@ -2216,6 +2073,9 @@ mob/proc/Grab_Update()
 	if(src.Grab)
 		Grab.grabbed = src
 		src.Grab.loc=src.loc
+		if(PmActive())//grabbed victim rides the grabber's mid-tile sprite, not the tile origin
+			src.Grab.step_x=src.step_x
+			src.Grab.step_y=src.step_y
 		if(isAI(Grab)&&!Grab.KO)
 			var/grabbing = Grab
 			spawn(60)
@@ -2224,6 +2084,9 @@ mob/proc/Grab_Update()
 		if(ismob(Grab))
 			if(src.Grab.Grab)
 				src.Grab.Grab.loc=Grab.loc
+				if(PmActive())//chain-grabbed victim rides the middle link's offset (set just above)
+					src.Grab.Grab.step_x=Grab.step_x
+					src.Grab.Grab.step_y=Grab.step_y
 			if(src.Grab.Knockbacked||src.Knockbacked)
 				src.Grab_Release()
 		if(src.KO)
@@ -2281,21 +2144,4 @@ mob/proc/Grab_Effects(var/mob/P)
 
 						else
 							P.Death(src, "[src] sucking out their life essence!!")
-
-
-
-
-		if((src.Secret=="Werewolf"&&(src.CheckSlotless("New Moon Form")||src.CheckSlotless("Full Moon Form"))))
-			if(P.KO&&istype(P, /mob/Players))
-				if(istype(P, /mob/Player/AI))
-					src << "[P] is an AI!"
-					return
-				var/Choice=alert(src, "Do you wish to devour [P]?", "Feast", "No", "Yes")
-				if(P in range(1, src))
-					if(Choice=="Yes")
-						src.Grab=null
-						if(src.Secret=="Werewolf")
-							P.Death(null, "[src] ripping them apart!!", 1, NoRemains=1)
-							src.TotalInjury=0
-							src.HealHealth(50)
 

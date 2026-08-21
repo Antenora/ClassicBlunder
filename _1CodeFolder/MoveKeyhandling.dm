@@ -1,8 +1,8 @@
 client
 	New()
 		..()
-		setMacros()
 
+		// setMacros() retired, ApplyKeybinds (SkillMenuHotbar) is what is used now
 	// These are here so the default movement commands don't interfere.
 	North()
 	South()
@@ -52,6 +52,7 @@ mob/Players
 	//	This will initiate movement whenever a client logs into a /mob/player.
 	Login()
 		..()
+		BeamsKill() 
 		if(!ChrysalisActive)
 			Frozen = 0
 		// Re-apply chrysalis state on reconnect (timer loop and shell obj are lost on restart)
@@ -68,10 +69,7 @@ mob/Players
 		spawn()
 			MovementLoop()
 
-	//	These are the actual commands players will be using for movement.
-	//	They're set to instant so player inputs react as quickly, as possible.
-	//	Having them hidden isn't required, it just prevents them from filling
-	//	up a statpanel.
+	//	instant so inputs land fast, hidden keeps them off the statpanel
 	verb
 		north()
 			set hidden = 1
@@ -181,6 +179,7 @@ mob/Players
 globalTracker/var/BASE_LOOP_DELAY = 1.25
 globalTracker/var/DIAG_LOOP_DELAY = 1.15
 globalTracker/var/GODSPEED_LOOP_DELAY = 0.8
+globalTracker/var/PLAYER_SPEED_MULT = 2
 
 
 mob
@@ -192,8 +191,7 @@ mob
 		//	This is just so tile transitions animate smoothly.
 		animate_movement=SLIDE_STEPS
 		var
-			//	How many ticks to wait between steps.
-			//	Must be a positive number or 0.
+			//	ticks to wait between steps
 			move_delay=1
 
 			//	If movement needs to be disabled for some reason.
@@ -210,35 +208,43 @@ mob
 				key4=0*/
 
 		proc
-			//	MovementLoop() is the main process which handles movement.
-			//	It does a few simple checks to see if the player wants to
-			//	move, can move, and is able to move. Once the player moves
-			//	it will delay itself for a moment until the player is able
-			//	to step again.
 			MovementLoop()
 				var/loop_delay=glob.BASE_LOOP_DELAY
 				while(src)
-					if(src.pixel_z&&(key1||key2||key3||key4)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+					if(src.pixel_z&&(key1||key2||key3||key4)&&(!PmActive()||pm_crossed)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 						if(!src.EquippedFlyingDevice())
 							flick("Flight",src)
 					if(key1||key2||key3||key4)
+						//rooted pivot
+						if((IsGuarding() || IsChargingEnergy() || wall_cling_until > world.time) && !dir_locked)
+							var/hd = heldDir()
+							if(hd) dir = hd
+							sleep(world.tick_lag)
+							continue
 						if(canMove())
+							if(PmActive()) //pixel build: per-tick micro-steps, same net speed
+								PmMovementTick()
+								sleep(world.tick_lag)
+								continue
 							/*stepDiagonal()  Test this sometime
 							loop_delay+=MovementSpeed()*/
 							if(stepDiagonal())
+								glide_size = 0 //auto-glide here, also heals a stale pixel-build glide_size from an old save
 								if(SlotlessBuffs.len>0)
-									// only check if there are active slotless
-									var/afterimages = passive_handler.Get("CoolerAfterImages")
-									var/rainbowimages = passive_handler.Get("RainbowAfterImages")
-									if(afterimages)
-										coolerFlashImage(src, afterimages)
-									if(rainbowimages)
-										rainbowFlashImage(src, rainbowimages)
+									var/ai_skin = passive_handler.Get("AfterImageSkin")
+									if(ai_skin)
+										var/ai_count = passive_handler.Get("AfterImages")
+										if(ai_count)
+											switch(ai_skin)
+												if("Cooler") coolerFlashImage(src, ai_count)
+												if("Rainbow") rainbowFlashImage(src, ai_count)
 								loop_delay = glob.BASE_LOOP_DELAY
 								if(dir==NORTHEAST||dir==NORTHWEST||dir==SOUTHEAST||dir==SOUTHWEST)
 									loop_delay *= glob.DIAG_LOOP_DELAY
 								move_speed = MovementSpeed()
-								var/delay = loop_delay + move_speed
+								var/delay = (loop_delay + move_speed) / glob.PLAYER_SPEED_MULT
+								if(held_skill?.HeldBeam && !HasMovingCharge())
+									delay *= glob.HELD_BEAM_MOVE_PENALTY
 								if(src.Crippled)
 									var/debuffRev = src.GetDebuffReversal();
 									if(debuffRev)
@@ -250,15 +256,14 @@ mob
 										var/slowCrippleEffect = (1 + (glob.MAX_CRIPPLE_MULT*(Crippled/glob.CRIPPLE_DIVISOR)));
 										delay *= slowCrippleEffect;
 								if(passive_handler["Don't Move"])
-									LoseHealth(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"])
+									LoseHealth(PctToHP(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"]))
 									loop_delay/=2
 									animate(src, color = "#850000")
 									animate(src, color = src.MobColor, time=world.tick_lag * (delay))
 								sleep(world.tick_lag * (delay))
 								continue
 					sleep(world.tick_lag)
-					// if(loop_delay>=1)
-					// 	sleep(world.tick_lag)
+
 					// 	loop_delay--
 					// else
 					// 	if(key1||key2||key3||key4)
@@ -269,29 +274,21 @@ mob
 					// 			loop_delay+=MovementSpeed()*/
 					// 			if(stepDiagonal())
 					// 				loop_delay+=MovementSpeed()
+					// if(loop_delay>=1)
 					// 	sleep(world.tick_lag)
-
-			//	canMove() is where you're able to prevent the player from moving.
-			//	Use it for things like being dead, stunned, in a cutscene, and so on.
 			canMove()
 //				if(Control) return TRUE
 				//if(!Allow_Move()) return FALSE
 				if(move_disabled || passive_handler["Snared"]>0)
 					return FALSE
+				if(splat_stagger_until > world.time)
+					return FALSE
+				if(IsGuarding() || IsChargingEnergy())
+					return FALSE
 				return TRUE
 
 
-			//	stepDiagonal() checks all the keys the player is holding then
-			//	mixes them together into diagonal steps. In cases where both
-			//	keys for one axis are being pressed they are both ignored.
-			//
-			//	In order to prevent players from getting stuck on walls when
-			//	stepping into them diagonally, diagonal steps are broken into
-			//	two different steps along the x and y axes.
-			//
-			//	After stepping the player's direction is corrected and it reports
-			//	back if the player was able to step or not so MovementLoop() knows
-			//	when to apply a step delay.
+			//	merges held keys into diagonals, split into x/y steps so you don't stick on walls
 			stepDiagonal()
 				var/dir_x
 				var/dir_y
@@ -325,7 +322,7 @@ mob
 
 						//	If you don't want diagonal steps broken in two use this line.
 						var/step_d=dir_x+dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -365,7 +362,7 @@ mob
 						if(prob(src.Confused) || passive_handler.Get("Manic") ? prob(passive_handler.Get("Manic") * 5) : 0)
 							dir_y = pick(DIRSY)
 						var/step_d=dir_y
-						if(!src.dir_locked&&(src.Beaming!=2||src.HasTurningCharge())&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
+						if(!src.dir_locked&&src.Beaming!=2&&!src.Stasis&&!src.Frozen&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 							src.dir=step_d
 						if(src.Attracted&&get_dist(src, src.AttractedTo)>=3)
 							src.dir=get_dir(src, src.AttractedTo)
@@ -382,9 +379,7 @@ mob
 						return 1
 					else return 0
 
-			//	keySet() and keyDel() are used to change the order in which the player
-			//	has pressed their movement keys. It's crucial to preserve the sequence
-			//	of key presses in order to determine which directions are prioritized.
+			//	key press order decides which dirs win
 			keySet(dir)
 				if(key1)
 					if(key2)
@@ -410,8 +405,10 @@ mob
 							key4=0
 						else key4=0
 
-mob/Players/BeamTurnDir()
-	if(!HasTurningCharge()) return
+//merged held-key direction
+mob/proc/heldDir()
+	return 0
+mob/Players/heldDir()
 	var/dir_x = 0
 	var/dir_y = 0
 	var/north_held = (key1==NORTH||key2==NORTH||key3==NORTH||key4==NORTH)
@@ -422,5 +419,5 @@ mob/Players/BeamTurnDir()
 	else if(south_held && !north_held) dir_y = SOUTH
 	if(east_held && !west_held) dir_x = EAST
 	else if(west_held && !east_held) dir_x = WEST
-	if(dir_x || dir_y)
-		src.dir = dir_x + dir_y
+	return dir_x + dir_y
+

@@ -33,7 +33,6 @@ obj/Skills/Companion
 
 		companion_team_fire = 1
 		//Common Passives
-		companion_intimidation = 1
 		companion_godspeed = 0
 		companion_sweeping_strike = 0
 		companion_evil = 0
@@ -121,18 +120,18 @@ obj/Skills/Companion
 				a.StrMod = (companion_strmod == -1) ? usr.StrMod : companion_strmod
 				a.ForMod = (companion_formod == -1) ? usr.ForMod : companion_formod
 				a.EndMod = (companion_endmod == -1) ? usr.EndMod : companion_endmod
+				a.VitMod = a.EndMod
 				a.SpdMod = (companion_spdmod == -1) ? usr.SpdMod : companion_spdmod
 				a.OffMod = (companion_offmod == -1) ? usr.OffMod : companion_offmod
 				a.DefMod = (companion_defmod == -1) ? usr.DefMod : companion_defmod
 				a.RecovMod = (companion_recovmod == -1) ? usr.RecovMod : companion_recovmod
 				a.AngerMax = (companion_angermax == -1) ? usr.AngerMax : companion_angermax
 				a.AngerPoint = (companion_angerpoint == -1) ? usr.AngerPoint : companion_angerpoint
-				a.Intimidation = (companion_intimidation == -1) ? usr.Intimidation : companion_intimidation
 				a.ai_spammer = companion_skill_aggression
 				a.ko_death = companion_ko_death
 				a.Timeless = 1
 				a.ai_team_fire=companion_team_fire
-				a.potential_power_mult = companion_bpm == -1 ? ((usr.potential_power_mult*usr.RPPower*usr.PowerBoost) * 0.5*(1+(src.Mastery/4))) : companion_bpm
+				a.potential_power_mult = companion_bpm == -1 ? ((usr.potential_power_mult*usr.RPPower*usr.PowerBoost) * 0.5*(1+(Mastery/4))) : companion_bpm
 				a.Potential = (companion_potential == -1) ? (usr.Potential * 0.5*(1+(src.Mastery/4))) : companion_potential
 				usr.ai_followers +=a
 				a.ai_alliances = list()
@@ -550,11 +549,11 @@ obj/Skills/Companion/Pet
 			a.StrMod = 1
 			a.ForMod = 1
 			a.EndMod = 1
+			a.VitMod = a.EndMod
 			a.SpdMod = 5
 			a.OffMod = 1
 			a.DefMod = 1
 			a.RecovMod = 1
-			a.Intimidation = 1
 			a.Timeless = 1
 			a.Potential = usr.Potential
 			a.Text_Color = text_color
@@ -581,7 +580,7 @@ mob/Player/AI/Pet //Pets get their own subtype because we strip away a lot of th
 			EndLife(0)
 			return
 		ai_state = "Idle"
-		Health=100
+		SetHealthPct(100)
 		switch(ai_state)
 			if("Idle")
 				//If the pet is told to hold position.
@@ -621,7 +620,7 @@ mob/Player/AI/Pet //Pets get their own subtype because we strip away a lot of th
 							if(loc == ai_owner.loc) step_away(src, src.ai_owner)
 							if(get_dist(src, ai_owner) <= 1) dir = ai_owner.dir
 
-					else if(Health != 100 || (ai_owner && ai_owner.icon_state =="Meditate"))
+					else if(HealthPct() != 100 || (ai_owner && ai_owner.icon_state =="Meditate"))
 						icon_state = "Meditate"
 						if(ai_stall == 0)
 							ai_stall = 10
@@ -637,7 +636,7 @@ mob/Player/AI/Pet //Pets get their own subtype because we strip away a lot of th
 	AIGain()
 		set waitfor=0
 		density=0
-		Health = 100
+		SetHealthPct(100)
 		Energy = 100
 		ManaAmount = 100
 		TotalInjury = 0

@@ -31,7 +31,7 @@
         proc/init(mob/p)
             if(altered) return
             var/sLevel = p.SagaLevel
-            passives = list("HardStyle" = sLevel, "Crushing" = sLevel*2, "GiantSwings" = clamp(sLevel,2,6), "Brutalize" = 0.05 * sLevel)
+            passives = list("HardStyle" = sLevel, "Crushing" = sLevel*2, "SweepingStrike" = clamp(sLevel,2,6))
         verb/Huadong_Stance()
             set category = "Skills"
             set name = "Huadong Stance"

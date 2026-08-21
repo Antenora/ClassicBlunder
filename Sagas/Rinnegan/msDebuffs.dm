@@ -29,7 +29,6 @@ obj/blades
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/MSDebuff/Genjutsu
 	DefMult = 0.75
-	passives = list("Instinct" = -1, "Flow" = -1)
 	ShockAffected = 1
 	SlowAffected = 1
 	IconLock = 'SweatDrop.dmi'
@@ -108,7 +107,6 @@ obj/blades
 	Cooldown = 4
 	AlwaysOn = 1
 	DefMult=0.5
-	passives = list("Flow" = -5, "Instinct"=-5, "FluidForm" = -2)
 	IconLock = 'SweatDrop.dmi'
 	TimerLimit = 35
 
@@ -120,7 +118,7 @@ obj/blades
 	CrippleAffected = 2
 	SpdMult = 0.9
 	DefMult = 0.9
-	passives = list("Flow" = -1, "Godspeed" = -2)
+	passives = list("Godspeed" = -2)
 	IconLock = 'LegendSparks.dmi'
 	TimerLimit = 20
 	Disgruntled
@@ -129,7 +127,7 @@ obj/blades
 		CrippleAffected = 0.1
 		ShatterAffected = 0.1
 		TimerLimit=10
-		passives = list("Godspeed" = -1, "Flow" = -0.5)
+		passives = list("Godspeed" = -1)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Staggered
@@ -137,6 +135,5 @@ obj/blades
 	Cooldown = 15
 	AlwaysOn = 1
 	ShatterAffected = 2
-	passives = list("Flow" = -1)
 	IconLock = 'LegendSparks.dmi'
 	TimerLimit = 30

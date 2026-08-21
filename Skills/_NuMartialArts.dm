@@ -24,6 +24,9 @@ obj
 				StyleOff=1
 				StyleDef=1
 				Finisher//a text path that links to a queue attack which loads an autonomous buff
+				FinisherStage = 1//how many tension bars this style can fill
+				Finisher2//optional stage-2 finisher
+				Finisher3//optional stage-3 finisher
 				CantTrans = FALSE
 
 //Martial
@@ -142,10 +145,9 @@ obj
 						Copyable=0
 						StyleEnd=1.3
 						StyleDef=1.3
-						passives = list("CounterMaster" = 3, "SoftStyle" = 2, "FluidForm" = 1)
+						passives = list("CounterMaster" = 3, "SoftStyle" = 2)
 						CounterMaster=2
 						SoftStyle=2
-						FluidForm=1
 						StyleActive="Drunken Fist"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Golden_Kirin_Style"="/obj/Skills/Buffs/NuStyle/UnarmedStyle/North_Star_Style")
 						Finisher="/obj/Skills/Queue/Finisher/Tetsuzankou"
@@ -167,10 +169,6 @@ obj
 						ManaCost=100
 						Mastery=4
 						AllOutAttack=1
-						adjust(mob/p)
-							if(p.SagaLevel>=5)
-								passives["Deicide"] = 10*(p.SagaLevel-4)
-								passives["EndlessNine"] = 0.15*(p.SagaLevel-4)
 						verb/Ansatsuken_Style()
 							set hidden=1
 							src.Trigger(usr)
@@ -230,12 +228,11 @@ obj
 						StyleStr=1.25
 						StyleFor=1.25
 						StyleSpd=1.5
-						passives = list("DoubleStrike" = 1, "ArcaneBladework" = 1, "TechniqueMastery" = 3, "SpiritSword" = 0.75, "WeaponBreaker" = 2)
+						passives = list("DoubleStrike" = 1, "ArcaneBladework" = 1, "TechniqueMastery" = 3,  "WeaponBreaker" = 2)
 						DoubleStrike=1
 						NoStaff=0
 						ArcaneBladework=1
-						TechniqueMastery=5
-						SpiritSword=0.75
+						SummonSwordVisual=0.75
 						WeaponBreaker=2
 						StyleActive="Arcane Bladework"
 						StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Battle_Mage_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/South_Star_Style")
@@ -297,13 +294,13 @@ obj
 						Crippling=5
 						NoForcedWhiff=1
 						DoubleStrike=2
-						TripleStrike=2
 						SweepingStrike=1
 						SlayerMod=2.5
 						StyleActive="Five Rings"
 						Finisher="/obj/Skills/Queue/Finisher/Ashura_Kai"
 						verb/Toggle_Sword_Count()
 							set category="Other"
+							set hidden = 1
 							if(src.NeedsSecondSword&&src.NeedsThirdSword)
 								src.NeedsSecondSword=1
 								src.NeedsThirdSword=0
@@ -326,15 +323,12 @@ obj
 						StyleStr=1.4
 						StyleFor=1.4
 						StyleSpd=1.2
-						passives = list("Flicker" = 3, "Pursuer" = 3, "MovementMastery" = 8, "TechniqueMastery" = 4, "MartialMagic" = 1, "HybridStrike" = 1, "KiBlade" = 1)
+						passives = list("Flicker" = 3, "Pursuer" = 3,  "TechniqueMastery" = 4, "MartialMagic" = 1)
 						Flicker=3
 						Pursuer=3
 						MovementMastery=8
-						TechniqueMastery=10
 						MartialMagic=1
 						DoubleStrike=1
-						TripleStrike=1
-						HybridStrike=1
 						NoSword=1
 						NoStaff=1
 						KiBlade=1
@@ -358,7 +352,7 @@ obj
 							StyleOff = 1.1
 							StyleDef = 1.1
 							StyleActive="Speed Rave"
-							passives = list("AttackSpeed" = 3, "BlurringStrikes" = 2, "AfterImages" = 1, "Steady" = 1)
+							passives = list("AttackSpeed" = 3,  "AfterImages" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Fever_Pitch"
 							adjust(mob/p)
 								StyleStr = 1.2 + (0.05 * p.SagaLevel)
@@ -373,7 +367,7 @@ obj
 							StyleEnd = 1
 							StyleOff = 1
 							StyleActive="Critical Impact"
-							passives = list("AttackSpeed" = -2, "CriticalChance" = 15, "CriticalDamage" = 0.1, "HeavyHitter" = 1, "CallousedHands" = 0.15)
+							passives = list("AttackSpeed" = -2, "CriticalDamage" = 0.1, "HeavyHitter" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Fatal_Mode"
 							adjust(mob/p)
 								StyleStr = 1.2 + (0.1 * p.SagaLevel)
@@ -387,7 +381,7 @@ obj
 							StyleSpd = 1.5
 							StyleDef = 1.1
 							StyleActive="Spell Weaver"
-							passives = list("SpiritFlow" = 2, "QuickCast" = 3, "MovingCharge" = 1, "Siphon" = 2)
+							passives = list( "QuickCast" = 3, "MovingCharge" = 1)
 							Finisher="/obj/Skills/Queue/Finisher/Magic_Wish"
 							adjust(mob/p)
 								StyleFor = 1.1 + (0.1 * p.SagaLevel)
@@ -449,7 +443,7 @@ obj
 							StyleFor=1.25
 							StyleSpd=1.5
 							StyleActive="Wing Blade"
-							passives = list("SweepingStrike" = 1, "DoubleStrike" = 3, "BlurringStrikes" = 1.5)
+							passives = list("SweepingStrike" = 1, "DoubleStrike" = 3)
 							SweepingStrike=1
 							SwordIcon='BLANK.dmi'
 							SwordIconSecond='BLANK.dmi'
@@ -474,7 +468,7 @@ obj
 							StyleActive="Cyclone"
 							ElementalOffense="Wind"
 							ElementalDefense="Wind"
-							passives = list("TechniqueMastery" = 3, "BlurringStrikes" = 2, "Paralyzing" = 1, "SpiritFlow" = 2)
+							passives = list("TechniqueMastery" = 3,  "Paralyzing" = 1)
 							Shocking=1
 							Paralyzing=0.2
 							Finisher="/obj/Skills/Queue/Finisher/Cyclone"
@@ -493,7 +487,7 @@ obj
 							StyleActive="Rock Breaker"
 							ElementalOffense="Earth"
 							ElementalDefense="Earth"
-							passives = list("Harden" = 1, "Crushing" = 1, "ArmorPeeling" = 1, "CallousedHands" = 0.35)
+							passives = list("Harden" = 1, "Crushing" = 1, "ArmorPeeling" = 1)
 							Crushing=1
 							Finisher="/obj/Skills/Queue/Finisher/Rock_Breaker"
 							adjust(mob/p)
@@ -508,7 +502,7 @@ obj
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
 							IconUnder=1
-							passives = list("Momentum" = 1, "CallousedHands" = 0.3, "Piercing" = 0.25)
+							passives = list("Momentum" = 1,  "Piercing" = 0.25)
 							LockX=-32
 							LockY=-32
 							StyleActive="Dark Impulse"
@@ -526,7 +520,7 @@ obj
 							StyleDef=1.25
 							StyleFor=1.5
 							StyleActive="Ghost Drive"
-							passives = list("LikeWater" = 1, "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1, "SpiritFlow" = 2)
+							passives = list("Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1)
 							Afterimages=1
 							Finisher="/obj/Skills/Queue/Finisher/Ghost_Drive"
 							adjust(mob/p)
@@ -541,7 +535,7 @@ obj
 							StyleOff = 1.25
 							StyleFor = 1.5
 							StyleActive="Blade Charge"
-							passives = list("Extend" = 1, "SpiritSword" = 1.5, "SpiritHand" = 1)
+							passives = list("Extend" = 1)
 							Extend=1
 							Finisher="/obj/Skills/Queue/Finisher/Blade_Charge"
 							adjust(mob/p)
@@ -558,7 +552,7 @@ obj
 							StyleEnd = 1.75
 							StyleActive="Ultimate Form"
 							ElementalOffense = "Love"
-							passives = list("Extend" = 2, "SpiritSword" = 0.75, "SpiritHand" = 1, "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1, "BlurringStrikes" = 5)
+							passives = list("Extend" = 2,   "Godspeed" = 1, "MovingCharge" = 1, "QuickCast" = 1)
 							Extend=1
 							Finisher="/obj/Skills/Queue/Finisher/Radiant_Brands"
 							adjust(mob/p)
@@ -575,7 +569,7 @@ obj
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
 							IconUnder=1
-							passives = list("Momentum" = 1, "CallousedHands" = 0.5, "Tossing" = 3, "Secret Knives" = "FTG","HellPower"=0.5,"AbyssMod"=3)
+							passives = list("Momentum" = 1,  "Tossing" = 3, "Secret Knives" = "FTG","HellPower"=0.5,"AbyssMod"=3)
 							LockX=-32
 							LockY=-32
 							StyleActive="Forces of Darkness"
@@ -594,7 +588,7 @@ obj
 							StyleFor=1.25
 							StyleSpd=1.5
 							StyleActive="Vector to the Heavens"
-							passives = list("BlurringStrikes" = 4, "HolyMod" = 5,"Tossing" = 3, "Secret Knives" = "GodSlayer")
+							passives = list( "HolyMod" = 5,"Tossing" = 3, "Secret Knives" = "GodSlayer")
 							SweepingStrike=1
 							ElementalOffense = "Light"
 							ElementalDefense = "Light"
@@ -631,15 +625,3 @@ obj
 					NeedsSword=0
 					NoSword=0
 					NoStaff=0
-				// WitchCraft
-					Witch_Style
-						StyleFor = 1.5
-						StyleSpd = 1.1
-						ElementalClass= "Water"
-						StyleActive = "Witch"
-						ElementalOffense = "Felfire"
-						Finisher = "/obj/Skills/Queue/Finisher/Sundered_Sky"
-						passives = list("QuickCast" = 1, "Flow" = 0.5, "MartialMagic" = 1)
-						verb/Witch_Style()
-							set hidden=1
-							src.Trigger(usr)

@@ -6,7 +6,6 @@
 			IconApart=1
 			IconLayer=1
 			// this is a constant buff that should never be off
-			Flow = 1
 			StrMult = 1.2
 			OffMult = 1.1
 			DefMult = 1.1
@@ -31,7 +30,6 @@
 		Wassail
 			Curse=1
 			Godspeed=1
-			Intimidation=1
 			LifeSteal=10
 			ActiveMessage="has entered Wassail -- the hunger frenzy!"
 			OffMessage="regains their sanity..."

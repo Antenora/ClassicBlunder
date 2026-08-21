@@ -37,7 +37,7 @@ proc/hitApplyBakudoSnare(mob/target, obj/Skills/Projectile/_Projectile/proj)
 proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	if(!target || !target.loc) return
 	applyBakudoSnare(target, 6)
-	target.applySnare(6, 'ShitotsuSansen.dmi')
+	target.applySnare(1, 'ShitotsuSansen.dmi')
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/BakudoSnare
 	AlwaysOn = 0
@@ -52,10 +52,10 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 3
 	DamageMult = 1
-	ForOffense = 0.01
+	ForScaling = 0.01
 	Disarm = 1
-	ManaCost = 5
-	Cooldown = 30
+	ManaCost = 2
+	Cooldown = 8
 	ActiveMessage = "binds their opponent's arms with Bakudō #1: Sai!"
 
 	verb/Sai()
@@ -68,13 +68,14 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 
 /obj/Skills/Bakudo/Hainawa
 	name = "Hainawa"
-	ManaCost = 5
-	Cooldown = 30
+	ManaCost = 2
+	Cooldown = 8
 	Distance = 5
 
 	verb/Hainawa()
 		set name = "Hainawa"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(!User.Target || User.Target == User)
@@ -90,7 +91,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 		src.Cooldown(1, null, User)
 		if(src.ManaCost) User.LoseMana(src.ManaCost)
 		OMsg(User, "<b>[User] ensnares [T] with a rope of energy with Bakudō #4: Hainawa!</b>")
-		T.applySnare(3, 'Hainawa.dmi')
+		T.applySnare(0.8, 'Hainawa.dmi')
 		applyBakudoSnare(T, 3)
 
 /obj/Skills/Buffs/ActiveBuffs/Bakudo/Seki
@@ -100,7 +101,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	TimerLimit = 15
 	Cooldown = 30
 	ManaCost = 5
-	passives = list("Blubber" = 4, "KBRes" = 2)
+	passives = list("Blubber" = 4, "Juggernaut" = 2)
 	ActiveMessage = "cloaks themselves in a repelling field with Bakudō #8: Seki!"
 	OffMessage = "releases Seki."
 
@@ -117,8 +118,8 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Distance = 10
 	Homing = 0
 	IconLock = 'ShitotsuSansen.dmi'
-	ManaCost = 10
-	Cooldown = 45
+	ManaCost = 2
+	Cooldown = 10
 	ActiveMessage = "fires the binding pins of Bakudō #30: Shitotsu Sansen!"
 	OnMobHit = "/proc/hitApplyShitotsuSansen"
 
@@ -154,11 +155,11 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
-	Snaring = 5
+	ForScaling = 0.01
+	Snaring = 1
 	SnaringOverlay = 'rikujoukourou.dmi'
-	ManaCost = 20
-	Cooldown = 60
+	ManaCost = 3
+	Cooldown = 15
 	ActiveMessage = "traps their opponent in pillars of light with Bakudō #61: Rikujōkōrō!"
 
 	verb/Rikujoukourou()
@@ -177,14 +178,14 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 				src.Cooldown(1, null, User)
 				if(src.ManaCost) User.LoseMana(src.ManaCost)
 				OMsg(User, "<b>[User] completes the binding, [T] is suspended by Bakudō #61: Rikujōkōrō!</b>")
-				applySuspend(T, 5, 'rikujoukourou.dmi')
+				applySuspend(T, 2, 'rikujoukourou.dmi')
 				return
-		src.Snaring = 5
+		src.Snaring = 1
 		User.Activate(src)
 
 /obj/Skills/Projectile/Bakudo/Hyapporankan
 	name = "Hyapporankan"
-	DamageMult = 0.5
+	DamageMult = 0.3
 	Knockback = 3
 	Explode = 0
 	Distance = 20
@@ -197,8 +198,8 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Hover = 7
 	Blasts = 15
 	IconLock = 'Hyapporankan.dmi'
-	ManaCost = 20
-	Cooldown = 60
+	ManaCost = 3
+	Cooldown = 15
 	ActiveMessage = "launches a wave of javelins with Bakudō #62: Hyapporankan!"
 
 	verb/Hyapporankan()
@@ -214,10 +215,10 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
-	Stunner = 5
-	ManaCost = 20
-	Cooldown = 60
+	ForScaling = 0.01
+	Stunner = 1
+	ManaCost = 3
+	Cooldown = 15
 	ActiveMessage = "crushes their opponent in binding ropes with Bakudō #63: Sajō Sabaku!"
 
 	verb/Sajou_Sabaku()
@@ -235,10 +236,10 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	Area = "Target"
 	Distance = 5
 	DamageMult = 1
-	ForOffense = 0.01
-	Stasis = 100
-	ManaCost = 30
-	Cooldown = 90
+	ForScaling = 0.01
+	Stasis = 4
+	ManaCost = 5
+	Cooldown = 25
 	ActiveMessage = "seals their opponent inside an inverted mountain — Bakudō #73: Tōzanshō!"
 
 	verb/Touzanshou()
@@ -254,7 +255,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 			src.Cooldown(1, null, User)
 			if(src.ManaCost) User.LoseMana(src.ManaCost)
 			User.StasisFrozen = 1
-			User.SetStasis(src.Stasis * world.tick_lag)
+			User.SetStasis(10)
 			OMsg(User, "<b>[User] seals themselves inside an inverted mountain with Bakudō #73: Tōzanshō!</b>")
 			var/image/sov = image('Tozansho2.dmi', pixel_x=-32, pixel_y=-32, layer=EFFECTS_LAYER)
 			sov.appearance_flags = KEEP_APART | RESET_ALPHA | RESET_COLOR
@@ -285,6 +286,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Tenteikura()
 		set name = "Tenteikura"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		var/has_spirit_power = User.passive_handler.Get("SpiritPower")
 		var/mode = input(User, "How would you like to use Tenteikura?", "Tenteikura") as null|anything in list("Direct", "Broadcast")
@@ -345,13 +347,14 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 
 /obj/Skills/Bakudo/Kuyou_Shibari
 	name = "Kuyou Shibari"
-	ManaCost = 40
-	Cooldown = 120
+	ManaCost = 8
+	Cooldown = 30
 	Distance = 5
 
 	verb/Kuyou_Shibari()
 		set name = "Kuyou Shibari"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(!User.Target || User.Target == User)
@@ -367,7 +370,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 		src.Cooldown(1, null, User)
 		if(src.ManaCost) User.LoseMana(src.ManaCost)
 		OMsg(User, "<b>[User] binds [T] with nine spiritual orbs using Bakudō #79: Kuyō Shibari!</b>")
-		applySuspend(T, 5, 'KuyoShibari.dmi')
+		applySuspend(T, 3, 'KuyoShibari.dmi')
 
 /obj/Skills/Bakudo/Danku
 	name = "Danku"
@@ -378,6 +381,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	verb/Danku()
 		set name = "Danku"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(Using || cooldown_remaining) return
 		if(src.ManaCost && User.ManaAmount < src.ManaCost)

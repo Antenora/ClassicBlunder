@@ -30,7 +30,7 @@
 		PowerMult = 1 + level/20
 		SureHitTimerLimit = 30 - (level * 3)
 		SureDodgeTimerLimit = 30 - (level * 3)
-		passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Anaerobic" = 1, "CriticalDamage" = (0.1 + (level/10)), "CriticalChance" = level * 5, "CriticalBlock" = 1 + level/10, "LifeSteal" = level * 5, "BlockChance" = level * 5, "GiantForm" = 1, "GodKi" = 0.5)
+		passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Anaerobic" = 1, "CriticalDamage" = (0.1 + (level/10)), "CriticalBlock" = 1 + (level * 0.15), "LifeSteal" = level * 5, "GiantForm" = 1, "GodKi" = 0.5)
 		ActiveMessage="becomes one with the very concept of Life Fibers!<br><center><font color='white'><b>Life Fiber Domination: Shinra Koketsu!</b></font color></center>"
 		OffMessage="seperates from their unity with Life Fibers..."
 
@@ -53,6 +53,7 @@ obj/Skills/Mental_Refitting
 	var/lifeFiberHybridID
 	verb/Life_Fiber_Hybridize()
 		set category = "Utility"
+		set hidden = 1
 		if(!usr.Target)
 			usr << "You require a target to do this!"
 			return

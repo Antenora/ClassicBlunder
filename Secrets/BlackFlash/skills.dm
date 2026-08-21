@@ -14,7 +14,7 @@
 		OffMult=1.20
 		IconLock='CE Divergent Fist.dmi'
 		TimerLimit=90
-		passives = list("TechniqueMastery" = 5, "BuffMastery" = 2, "MovementMastery" = 5)
+		passives = list("TechniqueMastery" = 5)
 		DarkChange=1
 		ActiveMessage="...!"
 		OffMessage="cools down."

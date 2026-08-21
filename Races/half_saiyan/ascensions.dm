@@ -2,7 +2,6 @@ ascension
 	half_saiyan
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			intimidation = 10
 			passives = list("Tenacity" = 1, "Adrenaline" = 0.25)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
@@ -15,9 +14,7 @@ ascension
 						endurance=0.25
 						anger = 0.1
 					if("Justice")
-						passives["Enrage"]=1
 						passives["CheapShot"]=0.5
-						passives["Brutalize"]=0.25
 						passives["Justice"] = 1
 						offense = 0.25
 						strength = 0.5
@@ -30,9 +27,8 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			intimidation = 10
 			choices = list("Adaptive" = /ascension/sub_ascension/half_saiyan/adaptive, "Dominating" = /ascension/sub_ascension/half_saiyan/dominating)
-			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
+			passives = list( "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
 					if("Compassion")
@@ -42,9 +38,7 @@ ascension
 						defense=0.25
 						endurance=0.25
 					if("Justice")
-						passives["Enrage"]=1
 						passives["CheapShot"]=0.5
-						passives["Brutalize"]=0.25
 						endurance = 0.25
 						strength = 0.25
 						force = 0.5
@@ -56,8 +50,7 @@ ascension
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL // ?
-			intimidation = 10
-			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5, "TechniqueMastery" = 1)
+			passives = list( "Tenacity" = 0.5, "TechniqueMastery" = 1)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
 					if("Compassion")
@@ -68,8 +61,6 @@ ascension
 						offense = 0.5
 						force = 0.5
 					if("Justice")
-						passives["Brutalize"] = 0.5
-						passives["KillerInstinct"] = 0.05
 						endurance = 0.5
 						offense = 0.5
 						strength = 0.5
@@ -80,8 +71,7 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 10
-			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
+			passives = list( "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
 					if("Compassion")
@@ -92,8 +82,6 @@ ascension
 						offense = 0.5
 						force = 0.5
 					if("Justice")
-						passives["Brutalize"] = 0.5
-						passives["KillerInstinct"] = 0.05
 						strength = 0.5
 						force = 0.5
 						offense = 0.5
@@ -105,8 +93,7 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 10
-			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
+			passives = list( "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
 					if("Compassion")
@@ -117,8 +104,6 @@ ascension
 						offense = 0.5
 						force = 0.25
 					if("Justice")
-						passives["Brutalize"] = 0.5
-						passives["KillerInstinct"] = 0.05
 						strength = 0.25
 						force = 0.25
 						offense = 0.5
@@ -129,8 +114,7 @@ ascension
 				..()
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 10
-			passives = list("Brutalize" = 0.25, "Tenacity" = 0.5)
+			passives = list( "Tenacity" = 0.5)
 			simulateChoiceMutation(mob/owner)
 				switch(owner.Class)
 					if("Compassion")
@@ -141,8 +125,6 @@ ascension
 						offense = 0.5
 						force = 0.5
 					if("Justice")
-						passives["Brutalize"] = 0.5
-						passives["KillerInstinct"] = 0.05
 						strength = 0.5
 						force = 0.5
 						offense = 0.5
@@ -156,7 +138,7 @@ ascension
 	sub_ascension
 		half_saiyan
 			adaptive
-				passives = list("Adaptation" = 1, "TechniqueMastery" = 1)
+				passives = list( "TechniqueMastery" = 1)
 				offense = 0.5
 				defense = 0.5
 				endurance = 0.25
@@ -168,7 +150,7 @@ ascension
 						owner.race.transformations += new /transformation/half_saiyan/saiyan/super_saiyan_rage()
 
 			dominating
-				passives = list("KillerInstinct" = 0.05, "Brutalize" = 0.25, "ZenkaiPower" = 0.1)
+				passives = list(  "ZenkaiPower" = 0.1)
 				strength = 0.25
 				endurance = 0.25
 				force = 0.25

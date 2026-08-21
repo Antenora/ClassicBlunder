@@ -7,8 +7,9 @@ race
 		desc	=	"A race with many transformations, their body is designed to handle the harshest of climates."
 		visual	=	'Changeling.png'
 
-		passives = list("Xenobiology" = 1, "Juggernaut" = 1, "CriticalBlock" = 0.25, "BlockChance" = 25, "PureReduction" = 3, "PureDamage" = -2, "AllOutAttack" = 1, "MovementMastery" = -8)
+		passives = list("Xenobiology" = 1, "Juggernaut" = 1, "CriticalBlock" = 0.25, "PureReduction" = 3, "PureDamage" = -2)
 		statPoints 	= 8
+		power = 3;
 		strength	=	0.25
 		endurance	=	2
 		force	=	0.25
@@ -21,7 +22,6 @@ race
 
 		onFinalization(mob/user)
 			. = ..()
-			user.Intimidation = 50
 			user.BioArmorMax = 100
 			user.BioArmor = user.BioArmorMax
 

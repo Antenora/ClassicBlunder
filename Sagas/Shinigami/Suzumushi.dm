@@ -24,9 +24,9 @@ var/global/list/BW_CONTRAST_HIGH = list(
 	Area = "Target"
 	Distance = 6
 	DamageMult = 1
-	ForOffense = 0.01
-	ManaCost = 20
-	Cooldown = 30
+	ForScaling = 0.01
+	ManaCost = 2
+	Cooldown = 8
 	ActiveMessage = "seizes their target's movement with the piercing ring of Suzumushi!"
 
 	verb/Suzumushi()
@@ -39,7 +39,7 @@ var/global/list/BW_CONTRAST_HIGH = list(
 			return
 		var/mob/T = usr.Target
 		if(!T) return
-		applySuspend(T, 5)
+		applySuspend(T, 0.8)
 		playSuzumushiVisual(usr, T)
 
 /proc/playSuzumushiVisual(mob/user, atom/target)
@@ -136,11 +136,7 @@ var/global/list/BW_CONTRAST_HIGH = list(
 		var/SL = p.SagaLevel
 		passives = list(
 			"Harden"    = 1 + SL,
-			"Steady"    = 1 + SL,
-			"Flow"      = 1 + SL,
-			"FluidForm" = 0.5 + (SL * 0.5),
-			"Flicker"   = 1 + SL,
-			"Pressure"  = 1 + SL
+			"Flicker"   = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
@@ -183,13 +179,13 @@ var/global/list/BW_CONTRAST_HIGH = list(
 
 /obj/Skills/Projectile/Benihiko
 	name = "Benihiko"
-	ManaCost = 10
+	ManaCost = 3
 	ZoneAttack = 1
 	Speed = 0.25
 	Distance = 20
 	Blasts = 15
 	Charge = 1
-	DamageMult = 1
+	DamageMult = 0.25
 	Instinct = 1
 	AccMult = 2
 	Homing = 3
@@ -198,7 +194,7 @@ var/global/list/BW_CONTRAST_HIGH = list(
 	ZoneAttackY = 3
 	Hover = 7
 	Variation = 0
-	Cooldown = 60
+	Cooldown = 15
 	IconLock = 'TousenTechs.dmi'
 	icon_state = "Benihiko2"
 	ActiveMessage = "launches a swarm of sonic blades with Benihiko!"

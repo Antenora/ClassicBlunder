@@ -1,53 +1,60 @@
-var/global/celestialObjectTicks = Hour(12)/10
 var
 	MoonMessage="The moon shines brightly!"
 	MakyoMessage="A cursed star shines in the sky..."
 	MoonSetMessage="The moon sets!"
 	MakyoSetMessage="A cursed star disappears from the sky..."
 
+proc/SaveMoonClock()
+	if(!glob)
+		return
+	var/savefile/F = new("Saves/MoonClock")
+	F["ticks"] << glob.celestialObjectTicks
+
+proc/LoadMoonClock()
+	if(!glob || !fexists("Saves/MoonClock"))
+		return
+	var/savefile/F = new("Saves/MoonClock")
+	var/t
+	F["ticks"] >> t
+	if(isnum(t) && t > 0)
+		glob.celestialObjectTicks = t
+
 proc/CelestialBodiesLoop()
 	set waitfor = 0
+	var/save_beat = 0
 	while(1)
-		celestialObjectTicks--
-		if(celestialObjectTicks==0)
-			CallMoon()
+		glob.celestialObjectTicks--
+		if(glob.celestialObjectTicks<=0)
+			spawn() MoonRise() //waits for nightfall, then runs the moon. The admin force stays immediate
 			// CallStar()
-			celestialObjectTicks = Hour(12)/10
+			glob.celestialObjectTicks = Hour(12)/10
+			SaveMoonClock()
+		if(++save_beat >= 60)
+			save_beat = 0
+			SaveMoonClock()
 		sleep(10)
+
+//natural moon only
+proc/MoonRise()
+	set waitfor = 0
+	set background = 1
+	MoonWaitForNight()
+	CallMoon()
 
 mob
 	proc
 		MoonWarning()
-			if(src.Secret=="Werewolf")
-				src << "You feel the moon begin to rise... "
 			if(src.Tail&&(src.isRace(SAIYAN)||src.isRace(HALFSAIYAN)))
 				src << "You feel the moon begin to rise... "
 			if(src.AdvancedTransmissionTechnologyUnlocked>0)
 				src << "Your observation devices are warning you about full moon... "
 		MoonTrigger()
 			triggerOozaru()
-			if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, src))
-				if(!src.CheckSlotless("FullMoonForm"))
-					if(src.SpecialBuff)
-						src.SpecialBuff.Trigger(src)
-					if(src.SlotlessBuffs.len>0)
-						for(var/obj/Skills/Buffs/b in src.SlotlessBuffs)
-							b.Trigger(src)
-					if(usr.CheckSlotless("Half Moon Form"))
-						for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Half_Moon_Form/hmf in usr)
-							if(usr.BuffOn(hmf))
-								hmf.Trigger(usr, 1)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F in src)
-						F.Trigger(src)
 			src<<"<font color=yellow>[global.MoonMessage]</font color>"
 		MoonSetTrigger()
 			for(var/obj/Oozaru/O in src)
 				if(O.icon)
 					src.Oozaru(0)
-			if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, src))
-				if(src.CheckSlotless("FullMoonForm"))
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F in src)
-						F.Trigger(src)
 			src<<"<font color=yellow>[global.MoonSetMessage]</font color>"
 /*		MakyoWarning()
 			if(src.isRace(MAKYO))
@@ -87,19 +94,20 @@ mob
 proc/CallMoon(var/OnlyZ=null)
 	set waitfor=0
 	set background=1
+	MoonEventBegin()
 	for(var/mob/Players/P in players)
 		if(OnlyZ)
 			if(P.z==OnlyZ)
-				P.MoonWarning()
+				spawn() P.MoonWarning()
 		else
-			P.MoonWarning()
+			spawn() P.MoonWarning()
 	sleep(Minute(2))
 	for(var/mob/Players/P in players)
 		if(OnlyZ)
 			if(P.z==OnlyZ)
-				P.MoonTrigger()
+				spawn() P.MoonTrigger()
 		else
-			P.MoonTrigger()
+			spawn() P.MoonTrigger()
 
 
 /* var/starActive = FALSE

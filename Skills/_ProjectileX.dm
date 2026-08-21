@@ -4,8 +4,8 @@ obj
 	Skills
 		var/NewCost // we will do this the hard way.
 		var/NewCopyable // sigh
-		canBeShortcut=1;
 		Projectile
+			BaseStatDefault="FOR"
 			proc
 				EdgeOfMapProjectile()
 					var/turf/t=get_step(src, src.dir)
@@ -22,7 +22,7 @@ obj
 				adjust(p)
 				if(Using || cooldown_remaining)
 					return FALSE
-				var/aaa = p.UseProjectile(src)
+				var/aaa = p.UseProjectile(src, noGCD = TRUE)
 				return aaa
 			layer=EFFECTS_LAYER
 			Distance=10
@@ -40,7 +40,6 @@ obj
 				DistanceVariance=0//if you want the things to sometimes blow up early
 				Area="Blast"//What type of projectile?  Blast...
 				FlickBlast=1
-				ProjSize//Area of the projectile
 				Radius=0//hits everything in a range...
 				Homing
 				HyperHoming//With this, it won't count dense objects that aren't its target as things to explode on
@@ -86,7 +85,6 @@ obj
 				TrailY=0
 				TrailDuration=5
 				TrailSize=1
-				TrailVariance=0
 				Explode=0//again, what do u think?
 				ExplodeIcon //set this and explode icon changes.
 				Striking=0//Normal hitspark
@@ -100,10 +98,6 @@ obj
 				ChainBeam//back and forth
 				//IconChargeOverhead
 				FadeOut=0 //makes the projectile fade out at x tiles to its end
-				StrRate=0
-				ForRate=1
-
-				EndRate=1
 
 				//icon
 				//pixel x
@@ -116,7 +110,6 @@ obj
 				IconVariance//modfies how the icon appears on generation of projectile
 				ProjectileSpin=0//degrees to rotate per tick while moving (e.g. spinning weapon throw)
 				Variation=8//pixelx/y offsets randomly
-				Deviation//unlike variation, this actually affects where the projectile generates
 
 				Blasts=1//Multiple blasts happen at once.
 				BlastsShot=0//only used for continuous
@@ -126,8 +119,12 @@ obj
 				ContinuousOn//Have you started the attack?
 				MultiShot=0//Can be fired multiple times before going on CD.
 				MultiShots=0//How many times have been fired.
-				MultiFatigue=0//drains more fatigue
 				MultiFatigueExponent=0 //scaling exponential value
+				//FocusShift
+				var/FocusShifter
+				var/FocusShiftType = "None"
+				var/FocusShiftBoost = 1.5
+				var/FocusShiftTimer = 10
 
 				MultiHit//Single projectile hits multiple times.
 				MaxMultiHit//just used to keep track of if a technique has hit yet
@@ -149,7 +146,6 @@ obj
 				ClusterAdjust=1//[slightly]
 				ClusterDelay//CRAY
 				SurroundBurst//skill to spawn in 8 directions around impact point
-				SurroundBurstRange=4//how many tiles away the burst projectiles spawn
 				RandomPath//yolo directions
 				list/FixedDirections//list of fixed directions to fire beams in simultaneously
 				ExcludeFacingDir//fire in all directions EXCEPT the user's facing direction
@@ -172,10 +168,6 @@ obj
 				BusterSize//if the charge is max, this size is used instead
 				BusterStream//if the charge is max, this stream is used instead
 
-				ProjAuraOnCast
-				ProjAuraRed=0
-				ProjAuraBlue=0
-				ProjAuraGreen=0
 				ProjAuraX
 				ProjAuraY
 				ProjAuraZ
@@ -211,10 +203,8 @@ obj
 				GoldScatter
 				Snaring
 				AngelMagicCompatible
-				CriticalChance
 				LingeringTornado//spawn obj/leftOver/LingeringTornado on hit
 				BypassTempHP=0//if 1, damage bypasses VaizardHealth and BioArmor, hitting Health directly
-				SkillDeicide=0//temporarily adds this much Deicide on hit
 
 				ignoreBetterAim = FALSE
 				Primordial=0
@@ -223,12 +213,12 @@ obj
 				..()
 				if(MaimCost)
 					description += "MaimCost: [MaimCost]\n"
-				if(StrRate)
-					description += "Strength Damage %: [StrRate*100]\n"
-				if(ForRate)
-					description += "Force Damage %: [ForRate*100]\n"
-				if(EndRate<1)
-					description += "Endurance Ignoring: [1-EndRate]%\n"
+				if(StrScaling)
+					description += "Strength Damage %: [StrScaling*100]\n"
+				if(ForScaling)
+					description += "Force Damage %: [ForScaling*100]\n"
+				if(EndEffectiveness<1)
+					description += "Endurance Ignoring: [1-EndEffectiveness]%\n"
 				if(Blasts)
 					description += "Fires [Blasts] blast(s).\n"
 				if(MultiShot)
@@ -239,11 +229,23 @@ obj
 					description += "Will fire blasts to hover in a [ZoneAttackX]x[ZoneAttackY] area.\n"
 				if(Buster)
 					description += "Charges up before firing: At max: [BusterDamage] damage. [BusterHits] hits. [BusterRadius] radius. [BusterAccuracy] accuracy. [BusterSize] size. [BusterStream] blasts.\n"
+				if(FocusShifter)
+					var/typeSelected
+					var/autoSelectedType
+					if(StrScaling > ForScaling)
+						autoSelectedType = "FOR"
+					else
+						autoSelectedType = "STR"
+					if(FocusShiftType != "None")
+						typeSelected = FocusShiftType
+					else
+						typeSelected = autoSelectedType
+					description += "Activates Focus Shift: [typeSelected] Autohits/Queue/Projectiles deal x[FocusShiftBoost] damage for [FocusShiftTimer] secs."
 //Autoblasts
 			Comet_Spear
 				Distance=15
 				DamageMult = 2
-				EndRate = 1
+				EndEffectiveness = 1
 				Dodgeable=-1
 				AccMult = 5
 				Speed=1
@@ -270,8 +272,8 @@ obj
 				Blasts=3
 				IconLock='Air Render.dmi'
 				DamageMult=0.5
-				StrRate=1
-				ForRate=0
+				StrScaling=1
+				ForScaling=0
 				MultiHit=3
 				Knockback=0.05
 				KBMult
@@ -291,8 +293,8 @@ obj
 				IconLock='BLANK.dmi'
 				Radius=2
 				Distance=50
-				StrRate=1
-				ForRate=0
+				StrScaling=1
+				ForScaling=0
 				Charge=1
 				DamageMult=0.75
 				MultiHit=10
@@ -311,7 +313,6 @@ obj
 				Radius=2
 				Speed=0.5
 				Distance=50
-				AdaptRate=1
 				DamageMult=1.8
 				Knockback=2
 				MultiHit=10
@@ -347,7 +348,6 @@ obj
 				RandomPath=1
 				IconLock='FireBlast.dmi'
 				DamageMult=0.33
-				AdaptRate=1.5
 				Scorching=2
 				AccMult = 1.175
 				Distance=30
@@ -364,8 +364,8 @@ obj
 				RandomPath=1
 				IconLock='FireBlast.dmi'
 				DamageMult=0.5
-				StrRate=0.5
-				ForRate=0.5
+				StrScaling=0.5
+				ForScaling=0.5
 				Scorching=2
 				AccMult=0.75
 				Distance=30
@@ -386,7 +386,6 @@ obj
 				DamageMult=0.3
 				Radius=1
 				Piercing=1
-				AdaptRate=1
 				AccMult=30
 				Knockback=3
 				Explode=1
@@ -405,8 +404,7 @@ obj
 				AttackReplace=1
 				Blasts=1
 				Distance=7
-				DamageMult=0.25
-				AdaptRate=1
+				DamageMult=0.4
 				AccMult=30
 				Dodgeable=0
 				Speed=0
@@ -425,13 +423,13 @@ obj
 				Charge=1
 				DamageMult=0.2
 				AccMult=1.5
-				ForRate=1
+				ForScaling=1
 				Homing=1
 				Explode=1
 				ZoneAttackX=8
 				ZoneAttackY=8
 				Deflectable = 1
-				ForRate=1
+				ForScaling=1
 				Hover=5
 				IconLock='lighting_proj.dmi'
 				LockX=-12
@@ -482,8 +480,8 @@ obj
 				Variation=0
 				IconLock='Air Render.dmi'
 				adjust(mob/p)
-					DamageMult = 0.3 + p.Potential /100
-					Blasts = 1 + (round(p.Potential / 25))
+					DamageMult = (0.3 + p.Potential /100) * 0.6
+					Blasts = min(1 + (round(p.Potential / 25)), 2)
 
 
 
@@ -491,8 +489,8 @@ obj
 				AttackReplace=1
 				ZoneAttack=1
 				Distance=30
-				StrRate=1
-				ForRate=1
+				StrScaling=1
+				ForScaling=1
 				Crippling=0.5
 				Blasts=5
 				DamageMult=0.5
@@ -515,8 +513,8 @@ obj
 			Warsong
 				AttackReplace=1
 				Distance=30
-				StrRate=1
-				ForRate=1
+				StrScaling=1
+				ForScaling=1
 				Crippling=1
 				Blasts=1
 				DamageMult=0.75
@@ -542,8 +540,8 @@ obj
 				FireFromSelf=0
 				FireFromEnemy=1
 				Hover=10
-				StrRate=1
-				ForRate=1
+				StrScaling=1
+				ForScaling=1
 				Blasts=20
 				DamageMult=0.5
 				HyperHoming=1
@@ -572,9 +570,9 @@ obj
 				FireFromSelf=1
 				FireFromEnemy=0
 				Variation=0
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				Knockback=1
 				MultiHit=5
 				DamageMult=0.5
@@ -684,16 +682,16 @@ obj
 				LockY=-36
 				Variation=8
 				Striking=1
-				StrRate=1
-				ForRate=0
+				StrScaling=1
+				ForScaling=0
 ////Magic Shit
 			Aether_Arrow
 				Radius=0
 				DamageMult=0.25
 				AccMult=0.5
-				StrRate=0.5
-				ForRate=0.5
-				EndRate=1
+				StrScaling=0.5
+				ForScaling=0.5
+				EndEffectiveness=1
 				Distance=30
 				AttackReplace=1
 				Striking=1
@@ -705,9 +703,9 @@ obj
 			Sagittarius_Arrow
 				DamageMult=1
 				AccMult=1
-				StrRate=0.5
-				ForRate=0.5
-				EndRate=1
+				StrScaling=0.5
+				ForScaling=0.5
+				EndEffectiveness=1
 				Distance=30
 				AttackReplace=1
 				Striking=1
@@ -723,8 +721,8 @@ obj
 				Radius=0
 				DamageMult=1
 				AccMult=1
-				ForRate=1
-				EndRate=1
+				ForScaling=1
+				EndEffectiveness=1
 				Distance=30
 				AttackReplace=1
 				Striking=1
@@ -819,9 +817,9 @@ obj
 					AccMult = 1.25
 					Knockback=5
 					Deflectable=1
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					Homing=1
 					Explode=2
 					IconLock='RocketPunch.dmi'
@@ -835,9 +833,9 @@ obj
 			Gear
 				Plasma_Blaster
 					DamageMult=1
-					StrRate=0.5
-					ForRate=0.5
-					EndRate=1
+					StrScaling=0.5
+					ForScaling=0.5
+					EndEffectiveness=1
 					Distance=20
 					Knockback=2
 					IconLock='Blast - Charged.dmi'
@@ -855,8 +853,7 @@ obj
 					Blasts=5
 					Distance=30
 					DamageMult=0.15
-					AdaptRate=1
-					EndRate=1
+					EndEffectiveness=1
 					AccMult=0.33
 					Paralyzing=0.2
 					Homing=1
@@ -873,8 +870,7 @@ obj
 					IconLock='BlastTracer.dmi'
 					Distance=30
 					DamageMult=0.2
-					AdaptRate=1
-					EndRate=1
+					EndEffectiveness=1
 					AccMult=0.2
 					Paralyzing=0.3
 					Blasts=30
@@ -894,9 +890,9 @@ obj
 					Distance=40
 					Explode=1
 					DamageMult=0.35
-					StrRate=0.5
-					ForRate=0.5
-					EndRate=1
+					StrScaling=0.5
+					ForScaling=0.5
+					EndEffectiveness=1
 					AccMult=2
 					Blasts=20
 					LosesHoming=3
@@ -914,9 +910,9 @@ obj
 					Distance=200
 					Explode=3
 					DamageMult=4.5
-					StrRate=0.5
-					ForRate=0.5
-					EndRate=1
+					StrScaling=0.5
+					ForScaling=0.5
+					EndEffectiveness=1
 					AccMult = 1.15
 					LosesHoming=3
 					HomingCharge=10
@@ -936,9 +932,9 @@ obj
 					Distance = 40
 					Explode = 1
 					DamageMult = 15
-					StrRate = 0.25
-					ForRate = 0.75
-					EndRate = 0.65
+					StrScaling = 0.25
+					ForScaling = 0.75
+					EndEffectiveness = 0.65
 					AccMult = 1.5
 					Cooldown = 120
 					IconLock='BlastTracer.dmi'
@@ -959,9 +955,9 @@ obj
 					Speed = 0.75
 					Distance=30
 					DamageMult=0.5
-					StrRate=0.35
-					ForRate=0.65
-					EndRate=0.75
+					StrScaling=0.35
+					ForScaling=0.65
+					EndEffectiveness=0.75
 					AccMult = 1.15
 					Blasts=25
 					Delay=0
@@ -976,9 +972,9 @@ obj
 					Integrated=1
 					Integrated_Plasma_Blaster
 						DamageMult=1
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						Distance=20
 						Knockback=2
 						IconLock='Blast - Charged.dmi'
@@ -996,8 +992,7 @@ obj
 						Blasts=5
 						Distance=30
 						DamageMult=0.3
-						AdaptRate=1
-						EndRate=1
+						EndEffectiveness=1
 						AccMult=0.2
 						Paralyzing=0.2
 						Homing=1
@@ -1014,8 +1009,7 @@ obj
 						Variation=8
 						IconLock='BlastTracer.dmi'
 						DamageMult=0.2
-						AdaptRate=1
-						EndRate=1
+						EndEffectiveness=1
 						AccMult=0.3
 						Paralyzing=0.2
 						Cooldown=60
@@ -1037,9 +1031,9 @@ obj
 						Distance=40
 						Explode=1
 						DamageMult=0.5
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						AccMult=2
 						Blasts=20
 						LosesHoming=3
@@ -1055,9 +1049,9 @@ obj
 						Distance=200
 						Explode=3
 						DamageMult=4.5
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						AccMult = 1.15
 						LosesHoming=3
 						HomingCharge=10
@@ -1077,9 +1071,9 @@ obj
 						Distance = 40
 						Explode = 1
 						DamageMult = 15
-						StrRate = 0.25
-						ForRate = 0.75
-						EndRate = 0.65
+						StrScaling = 0.25
+						ForScaling = 0.75
+						EndEffectiveness = 0.65
 						AccMult = 1.5
 						Cooldown = 120
 						IconLock='BlastTracer.dmi'
@@ -1100,9 +1094,9 @@ obj
 						Speed = 0.75
 						Distance=30
 						DamageMult=0.5
-						StrRate=0.35
-						ForRate=0.65
-						EndRate=0.75
+						StrScaling=0.35
+						ForScaling=0.65
+						EndEffectiveness=0.75
 						AccMult = 1.15
 						Blasts=25
 						Delay=0
@@ -1115,17 +1109,17 @@ obj
 							usr.UseProjectile(src)
 				Installed
 					Giga_Laser
-						ManaCost=15
+						ManaCost=8
 						Charge = 1.5
 						Delay = 0.5
 						Distance = 40
 						Explode = 1
-						DamageMult = 6.5
-						StrRate = 0.25
-						ForRate = 0.75
-						EndRate = 0.65
+						DamageMult = 8
+						StrScaling = 0.25
+						ForScaling = 0.75
+						EndEffectiveness = 0.65
 						AccMult = 1.5
-						Cooldown = 120
+						Cooldown = 30
 						IconLock='BlastTracer.dmi'
 						HomingCharge = 10
 						LosesHoming = 3
@@ -1134,9 +1128,9 @@ obj
 							usr.UseProjectile(src)
 
 					Missle_Onslaught
-						ManaCost=3
+						ManaCost=2
 						Variation=8
-						Cooldown=30
+						Cooldown=8
 						ZoneAttack=1
 						ZoneAttackX=5
 						ZoneAttackY=5
@@ -1146,10 +1140,10 @@ obj
 						Speed = 1.25
 						Distance=15
 						Explode=1
-						DamageMult=0.35
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						DamageMult=0.1
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						AccMult=2
 						Blasts=20
 						Delay=0
@@ -1161,8 +1155,8 @@ obj
 							set category="Mecha"
 							usr.UseProjectile(src)
 					Laser_Circus
-						ManaCost=6
-						Cooldown=45
+						ManaCost=2
+						Cooldown=10
 						ZoneAttack=1
 						ZoneAttackX=8
 						ZoneAttackY=8
@@ -1171,10 +1165,10 @@ obj
 						RandomPath=1
 						Speed = 0.75
 						Distance=30
-						DamageMult=0.3
-						StrRate=0.35
-						ForRate=0.65
-						EndRate=0.75
+						DamageMult=0.1
+						StrScaling=0.35
+						ForScaling=0.65
+						EndEffectiveness=0.75
 						AccMult = 1.15
 						Blasts=25
 						Delay=0
@@ -1194,22 +1188,22 @@ obj
 						Delay=0.5
 						Variation=8
 						IconLock='BlastTracer.dmi'
-						DamageMult=0.2
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						DamageMult=0.25
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						AccMult=0.75
 						Paralyzing=0.2
-						Cooldown=90
+						Cooldown=25
 						Blasts=30
 						ChargeMessage="revs up their Plasma Gatling!!"
 						verb/Plasma_Gatling()
 							set category="Mecha"
 							usr.UseProjectile(src)
 					Installed_Missile_Launcher
-						ManaCost=10
+						ManaCost=3
 						Variation=8
-						Cooldown=60
+						Cooldown=15
 						ZoneAttack=1
 						ZoneAttackX=2
 						ZoneAttackY=2
@@ -1219,10 +1213,10 @@ obj
 						Delay=1
 						Distance=40
 						Explode=1
-						DamageMult=0.35
-						StrRate=0.5
-						ForRate=0.5
-						EndRate=1
+						DamageMult=0.2
+						StrScaling=0.5
+						ForScaling=0.5
+						EndEffectiveness=1
 						AccMult=2
 						Blasts=20
 						LosesHoming=3
@@ -1259,16 +1253,15 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=20
+				MenuIcon="RapidBarrage"
 				AccMult=0.7
-				DamageMult=0.8
+				DamageMult=0.2
 				Blasts=25
 				Delay=0.75
 				Stream=-1
-				EnergyCost=8
-				Cooldown=60
+				EnergyCost=3
+				Cooldown=12
 				Deflectable = 1
-				Homing=1
-				LosesHoming=3
 				IconLock='Blast - Rapid.dmi'
 				IconSize=0.7
 				Variation=16
@@ -1281,15 +1274,17 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=15
+				MenuIcon="StraightSiege"
 				AccMult=0.75
-				DamageMult=0.5
+				DamageMult=0.2
 				Speed = 0.75
 				Knockback=0
-				Blasts=23
+				KBRamp=0.35
+				Blasts=15
 				Continuous=1
-				EnergyCost=7
+				EnergyCost=2
 				IconLock='Blast - Small.dmi'
-				Cooldown=60
+				Cooldown=8
 				Variation=24
 				verb/Straight_Siege()
 					set category="Skills"
@@ -1298,19 +1293,23 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=25
-				DamageMult=1.25
+				FocusShifter=1
+				FocusShiftBoost=1.5
+				MenuIcon="FlareWave"
+				DamageMult=2.35
 				Knockback=3
 				Radius=2
-				Homing=4
-				LosesHoming=2
-				MultiShot=3
-				EnergyCost=3
+				NoGCD=1
+				EnergyCost=1
 				IconLock='Excaliblast.dmi'
 				LockX=-50
 				LockY=-50
 				IconSize=0.5
-				Cooldown=30
+				Cooldown=6
 				Variation=0
+				MaxCharges=3
+				Charges=3
+				ChargeRefresh=6
 				verb/Flare_Wave()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1318,9 +1317,12 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=20
-				DamageMult=4
+				DamageMult=1.9
 				AccMult=2
 				Crippling=3
+				MenuIcon="DeathBeam"
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Speed=0
 				Knockback=0.001
 				Deflectable=1
@@ -1328,11 +1330,38 @@ obj
 				IconSize=1
 				Trail='Trail - Death.dmi'
 				TrailSize=1
-				Cooldown=30
+				Cooldown=5
 				EnergyCost=1
 				Variation=4
+				NoGCD=1
+				var/tmp/dt_window = 0
 				verb/Death_Beam()
 					set category="Skills"
+					if(usr.Target && ismob(usr.Target))
+						var/mob/T = usr.Target
+						BlockEffectiveness = T.RecentSkillHitBy(usr, src.type, 70) ? 0 : 1
+					else
+						BlockEffectiveness = 1
+					if(Using && dt_window > world.time)
+						dt_window = 0
+						var/sv_rem = cooldown_remaining
+						var/sv_start = cooldown_start
+						var/sv_wt = cooldown_start_wt
+						var/sv_full = cooldown_full
+						Using = 0
+						cooldown_remaining = 0
+						cooldown_start = 0
+						cooldown_start_wt = 0
+						cooldown_full = 0
+						if(!usr.UseProjectile(src, noGCD = TRUE))
+							Using = 1
+							cooldown_remaining = sv_rem
+							cooldown_start = sv_start
+							cooldown_start_wt = sv_wt
+							cooldown_full = sv_full
+						return
+					if(!Using && !cooldown_remaining)
+						dt_window = world.time + 20
 					usr.UseProjectile(src)
 
 			Charge
@@ -1361,21 +1390,23 @@ obj
 				SkillCost=40
 				Copyable=2
 				Distance=30
-				DamageMult=10
+				MenuIcon="SpiritBall"
+				DamageMult=0.95
 				Blasts=3
 				AccMult=2
 				Launcher=4
 				Piercing=1
 				Striking=1
 				Homing=1
-				HomingCharge=1
+				HyperHoming=1
+				HomingCharge=3
 				HomingDelay=0.5
-				EnergyCost=8
+				EnergyCost=3
 				Delay=3
 				Speed=1
 				IconChargeOverhead=1
 				Explode=1
-				Cooldown=60
+				Cooldown=12
 				IconLock='Plasma2.dmi'
 				Variation=0
 				verb/Spirit_Ball()
@@ -1387,11 +1418,12 @@ obj
 				SkillCost=40
 				Copyable=2
 				ZoneAttack=1
-				EnergyCost=8
-				Distance=20
+				EnergyCost=3
+				Distance=40
 				Blasts=20
+				MenuIcon="CrashBurst"
 				Charge=1
-				DamageMult=1
+				DamageMult=0.25
 				AccMult=0.8
 				Homing=1
 				Explode=1
@@ -1399,12 +1431,13 @@ obj
 				ZoneAttackY=5
 				Deflectable = 1
 				Hover=10
+				StormFall=1
 				IconLock='Blast - Charged.dmi'
 				LockX=-12
 				LockY=-12
 				IconSize=0.75
 				Variation=4
-				Cooldown=60
+				Cooldown=12
 				verb/Crash_Burst()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1412,15 +1445,16 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=50
-				DamageMult=1
+				DamageMult=0.6
 				MultiHit=3
 				AccMult=25
 				Radius=2
 				Charge=0.5
+				MenuIcon="DragonNova"
 				Knockback=1
 				Explode=2
-				EnergyCost=3
-				Cooldown=30
+				EnergyCost=1
+				Cooldown=5
 				IconLock='Supernova.dmi'
 				LockX=-158
 				LockY=-169
@@ -1437,16 +1471,19 @@ obj
 				Distance=50
 				DamageMult=1.5 // this shit ass, if u land it u deserve to do damage
 				ComboMaster=1
-				EnergyCost=5
+				EnergyCost=1
 				Deflectable=0
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Charge=0.5
 				IconChargeOverhead=1
 				IconLock='Kienzan.dmi'
 				LockX=0
+				MenuIcon="Kienzan"
 				LockY=0
 				IconSize=0.1
 				IconSizeGrowTo=2
-				Cooldown=30
+				Cooldown=5
 				Slashing=1
 				Piercing=1
 				Variation=0
@@ -1460,10 +1497,11 @@ obj
 				SkillCost=90
 				Copyable=3
 				Blasts=10
+				MenuIcon="SuddenStorm"
 				HomingCharge=1
 				RandomPath=1
 				IconLock='Dancing.dmi'
-				DamageMult=1.2
+				DamageMult=0.45
 				AccMult = 1.15
 				Distance=25
 				IconSize=0.5
@@ -1474,8 +1512,8 @@ obj
 				HyperHoming=1
 				FireFromSelf=1
 				FireFromEnemy=0
-				Cooldown=60
-				EnergyCost=5
+				Cooldown=12
+				EnergyCost=3
 				verb/Sudden_Storm()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1485,18 +1523,18 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=3
 				Charge=0.5
-				HomingCharge=2
+				MenuIcon="WarpStrike"
 				IconLock='Blast2.dmi'
 				Variation=4
 				Distance=20
-				Stunner=1.5
+				Stunner=0.8
 				Deflectable = FALSE
-				DamageMult=1.25
+				DamageMult=1
 				WarpUser=1
 				FollowUp="/obj/Skills/AutoHit/Warp_Storm"
 				FollowUpDelay=-1
-				Cooldown=30
-				EnergyCost=5
+				Cooldown=5
+				EnergyCost=1
 				verb/Warp_Strike()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1528,24 +1566,25 @@ obj
 				SkillCost=80
 				Copyable=3
 				Blasts=12
-				DamageMult=0.33
+				DamageMult=0.25
 				Radius=1
 				AccMult=3
 				Deflectable=0
 				Static=1
+				MenuIcon="EnergyMinefield"
 				Distance=100
 				IconLock='Blast31.dmi'
 				LockX=0
 				LockY=0
 				ZoneAttack=1
-				ZoneAttackX=8
-				ZoneAttackY=8
+				ZoneAttackX=4
+				ZoneAttackY=4
 				Hover=24
-				FireFromSelf=0
-				FireFromEnemy=1
-				Cooldown=30
+				FireFromSelf=1
+				FireFromEnemy=0
+				Cooldown=5
 				Explode=1
-				EnergyCost=6
+				EnergyCost=1
 				verb/Energy_Minefield()
 					set category="Skills"
 					if(!Using)
@@ -1567,7 +1606,8 @@ obj
 				NewCopyable = 4
 				SkillCost=80
 				Copyable=3
-				DamageMult=12
+				MenuIcon="TrackingBomb"
+				DamageMult=3.1
 				Knockback=5
 				Radius=1
 				AccMult=50
@@ -1583,32 +1623,36 @@ obj
 				IconChargeOverhead=1
 				IconSize=3
 				IconSizeGrowTo=1
-				Cooldown=60
+				Cooldown=12
 				Explode=3
-				EnergyCost=5
+				EnergyCost=3
 				verb/Tracking_Bomb()
 					set category="Skills"
 					usr.UseProjectile(src)
 			Stealth_Bomb
 				SkillCost=TIER_2_COST
 				Copyable=3
-				DamageMult=6.5
+				DamageMult=3.05
 				Knockback=3
 				Radius=1
-				AccMult=50
+				AccMult=2
 				Deflectable=0
 				Speed=1
+				MenuIcon="StealthBomb"
 				Static=1
-				Distance=100
+				MultiHit=1
+				ignoreBetterAim=TRUE
+				Distance=600
 				IconLock='BLANK.dmi'
 				LockX=0
 				LockY=0
 				IconChargeOverhead=1
 				IconSize=3
 				IconSizeGrowTo=1
-				Cooldown=60
+				Cooldown=8
 				Explode=3
-				EnergyCost=5
+				EnergyCost=2
+				Hover=10
 				verb/Stealth_Bomb()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1616,22 +1660,29 @@ obj
 				SkillCost=TIER_2_COST
 				Copyable=3
 				Launcher=3
-				DamageMult=6.5
+				DamageMult=2.85
 				Knockback=0
 				AccMult=50
+				FocusShifter=1
+				FocusShiftBoost=1.5
 				Deflectable=0
 				Static=1
 				Radius=1
-				Distance=100
+				MultiHit=1
+				ignoreBetterAim=TRUE
+				Speed=1
+				Distance=600
+				Hover=10
+				MenuIcon="PillarBomb"
 				IconLock='Blast23.dmi'
 				LockX=0
 				LockY=0
 				IconChargeOverhead=1
 				IconSize=3
 				IconSizeGrowTo=1
-				Cooldown=60
+				Cooldown=8
 				Explode=2
-				EnergyCost=5
+				EnergyCost=2
 				verb/Pillar_Bomb()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -1714,67 +1765,102 @@ obj
 			Burst_Buster
 				Copyable=5
 				SkillCost=TIER_4_COST
-				Charge=0.2
-				DamageMult=1
+				MenuIcon="BurstBuster"
+				DamageMult=0.6
 				AccMult=1.25
 				Radius=1
+				Buster=0.5
 				BusterRadius=2
 				Stream=2
 				BusterStream=3
 				Blasts=10
 				Explode=1
 				EnergyCost=5
-				Cooldown=75
+				Cooldown=18
 				IconLock='Blast10.dmi'
 				LockX=0
 				LockY=0
 				Variation=32
+				HeldSkill=TRUE
+				NoFizzle=1
+				ChargePeriod=5
+				OnHeldStart(mob/p)
+					p.UseProjectile(src)
+					if(!Charging)
+						p.ForceClearHeldChargeState()
+				OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+					if(Charging)
+						p.UseProjectile(src, noGCD = TRUE)
+				OnHeldFizzle(mob/p)
+					if(Charging)
+						Charging = 0
+						p.BusterTech = null
+						p.BusterCharging = 0
+						p.Chargez("Remove")
 				verb/Burst_Buster()
 					set category="Skills"
-					usr.UseProjectile(src)
+					usr.BeginHeldSkill(src)
 			Warp_Buster
 				Copyable=5
 				SkillCost=TIER_4_COST
-				Charge=2
-				Homing=1
-				HyperHoming=1
 				Knockback=1
-				DamageMult=10
+				DamageMult=1.45
 				MultiHit=1
+				MenuIcon="WarpBuster"
 				AccMult=2.5
-				Explode=2
-				EnergyCost=8
-				Cooldown=75
+				Explode=3
+				WarpUser=1
+				WarpResetCD=1
+				EnergyCost=5
+				Cooldown=18
 				FollowUp="/obj/Skills/AutoHit/Warp_Bomb"
 				FollowUpDelay=-1
 				IconLock='Blast12.dmi'
 				LockX=0
 				LockY=0
 				Variation=0
-				Feint=1
 				verb/Warp_Buster()
 					set category="Skills"
-					usr.UseProjectile(src)
+					var/mob/c = usr
+					for(var/obj/Skills/Projectile/_Projectile/P in c.active_projectiles)
+						if(P.SkillPath == src.type && !P.Killed && P.loc && P.Area != "Beam")
+							P.ProjectileFinish()
+							return
+					c.UseProjectile(src)
 			Scatter_Burst
 				Copyable=5
 				SkillCost=TIER_4_COST
-				Blasts=12
-				DamageMult=0.5
+				Blasts=8
+				DamageMult=0.9
 				AccMult=0.5
-				Stream=4
-				RandomPath=1
+				MenuIcon="ScatterBurst"
 				IconLock='Dancing.dmi'
-				FireFromSelf=1
-				ZoneAttackX=8
-				ZoneAttackY=8
-				ZoneAttack=1
 				LockX=0
 				LockY=0
-				Variation=16
-				Cooldown=60
+				Variation=0
+				Cooldown=18
+				EnergyCost=5
+				ActiveMessage="erupts with a ring of energy!"
 				verb/Scatter_Burst()
 					set category="Skills"
-					usr.UseProjectile(src)
+					var/mob/caster = usr
+					if(caster.Stasis || caster.Airborne)
+						return
+					if(caster.Secret=="Heavenly Restriction" && (caster.secretDatum?:hasRestriction("Projectiles") || caster.secretDatum?:hasRestriction("All Skills")))
+						return
+					if(!caster.CanUseSkill(src))
+						return
+					src.Cooldown(1, null, caster)
+					var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
+					caster.LoseEnergy(drain)
+					OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+					for(var/d in list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST))
+						var/turf/t = get_step(caster, d)
+						if(!t || t.density)
+							continue
+						var/obj/Skills/Projectile/Scatter_Burst/RZ = new
+						RZ.SpawnPosition = t
+						new /obj/Skills/Projectile/_Projectile(caster, RZ, t, 0.5, 0, 0, d)
 			Counter_Buster
 				Copyable=5
 				SkillCost=TIER_4_COST
@@ -1785,21 +1871,39 @@ obj
 				BusterAccuracy=10
 				BusterSize=2//purely aesthetic
 				Knockback=1
-				DamageMult=2
+				MenuIcon="CounterBuster"
+				DamageMult=0.65
 				MultiHit=5
 				Instinct=1
 				AccMult=2.5
 				Explode=2
-				EnergyCost=2.5
-				Cooldown=60
+				EnergyCost=5
+				Cooldown=18
 				IconLock='Blast28.dmi'
 				LockX=0
 				LockY=0
 				Variation=0
-				CounterShot=1//makes things fire when you're bopped
+				CounterShot=1
+				CounterNova=1//makes things fire when you're bopped
+				HeldSkill=TRUE
+				NoFizzle=1
+				ChargePeriod=5
+				OnHeldStart(mob/p)
+					p.UseProjectile(src)
+					if(!Charging)
+						p.ForceClearHeldChargeState()
+				OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+					if(Charging)
+						p.UseProjectile(src, noGCD = TRUE)
+				OnHeldFizzle(mob/p)
+					if(Charging)
+						Charging = 0
+						p.BusterTech = null
+						p.BusterCharging = 0
+						p.Chargez("Remove")
 				verb/Counter_Buster()
 					set category="Skills"
-					usr.UseProjectile(src)
+					usr.BeginHeldSkill(src)
 
 //T5 (Sig 1) has damage mult 5, usually.
 
@@ -1838,8 +1942,10 @@ obj
 				Distance=15
 				AccMult=2
 				DamageMult=0.5
-				EnergyCost=8
-				Cooldown=120
+				BlastRamp=0.05
+				BlastRampFloor=0.7
+				EnergyCost=4
+				Cooldown=15
 				Explode=1
 				Homing=1
 				Knockback=1
@@ -1850,7 +1956,7 @@ obj
 				Deflectable = 1
 				Homing=1
 				LosesHoming=3
-				Blasts=23
+				Blasts=12
 				Continuous=1
 				Variation=24
 				verb/Buster_Barrage()
@@ -1860,46 +1966,66 @@ obj
 			Makosen
 				SignatureTechnique=1
 				Distance=50
-				DamageMult=12.5
+				DamageMult=1.9
 				AccMult = 1.15
 				Blasts=1
-				EnergyCost=15
-				Cooldown=150
+				EnergyCost=3
+				Cooldown=12
 				Radius=2
-				Charge=2
 				Explode=1
-				Homing=1
 				Knockback=1
 				LosesHoming=0
 				Speed=0.8
-				Delay=1.45
 				IconLock='Blast - Rapid.dmi'
 				IconSize=3.4
+				ActiveMessage="fires a staggered double wave of demon light!"
 				verb/Makosen()
 					set category="Skills"
-					usr.UseProjectile(src)
+					var/mob/caster = usr
+					if(!caster.CanUseSkill(src))
+						return
+					src.Cooldown(1, null, caster)
+					var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
+					caster.LoseEnergy(drain)
+					OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+					var/turf/o = get_turf(caster)
+					var/d = caster.dir
+					if(!o || !d)
+						return
+					var/obj/Skills/Projectile/Makosen/W1 = new
+					W1.TempDamage = 0.95
+					W1.SpawnPosition = o
+					new /obj/Skills/Projectile/_Projectile(caster, W1, o, 0.5, 0, 0, d)
+					spawn(7)
+						if(!caster || caster.KO)
+							return
+						var/obj/Skills/Projectile/Makosen/W2 = new
+						W2.TempDamage = 2.85
+						W2.SpawnPosition = o
+						new /obj/Skills/Projectile/_Projectile(caster, W2, o, 0.5, 0, 0, d)
 			Jecht_Shot
 				SignatureTechnique=1
 
-				StrRate=0.3
-				ForRate=0.7
-				EndRate=1
+				StrScaling=0.3
+				ForScaling=0.7
+				EndEffectiveness=1
 				Distance=15
-				DamageMult=2
+				DamageMult=0.3
 				Blasts=2
 				AccMult = 1.15
 				Homing=1
 				HomingDelay=2
 				HomingCharge=4
-				EnergyCost=6
+				EnergyCost=3
 				Charge=1
 				Piercing=1
 				Dodgeable=1
 				Deflectable=1
 				Launcher=1
 				MultiHit=4
+				Knockback=15
 				IconChargeOverhead=1
-				Cooldown=150
+				Cooldown=12
 				Variation=0
 				verb/Jecht_Shot()
 					set category="Skills"
@@ -1911,13 +2037,12 @@ obj
 				Speed=1.45
 				Crippling=1
 				Distance=50
-				DamageMult=3.5
-				EnergyCost=25
+				DamageMult=1.55
+				EnergyCost=4
 				Deflectable=0
 				AccMult=0.75
-				Homing=1
-				HomingCharge=14
-				LosesHoming=3
+				FollowFacing=1
+				BackfireShot=1
 				Charge=2
 				IconChargeOverhead=1
 				IconLock='Saucer.dmi'
@@ -1925,7 +2050,7 @@ obj
 				LockY=0
 				IconSize=0.1
 				IconSizeGrowTo=1.25
-				Cooldown=150
+				Cooldown=15
 				Slashing=1
 				Piercing=0
 				Variation=0
@@ -1936,12 +2061,13 @@ obj
 			Blaster_Shell
 				SignatureTechnique=1
 				Distance=25
-				DamageMult= 4.5
+				DamageMult= 1.05
 				AccMult = 1.15
 				Dodgeable=0
 				Instinct=1
+				ArcShot=1
 				MultiShot=3
-				EnergyCost=1
+				EnergyCost=2
 				Knockback=1
 				Homing=1
 				IconLock='BlasterShell2.dmi'
@@ -1949,14 +2075,14 @@ obj
 				LockY=-12
 				IconSize=0.6
 				Variation=8
-				Cooldown=150
+				Cooldown=10
 				verb/Blaster_Shell()
 					set category="Skills"
 					usr.UseProjectile(src)
 			Spirit_Gun
 				SignatureTechnique=1
 				Distance=50
-				DamageMult=5
+				DamageMult=2.95
 				AccMult=25
 				MultiShot=5
 				MultiFatigueExponent=2
@@ -1967,17 +2093,17 @@ obj
 				Deflectable=0
 				AllOutAttack=1
 				Charge=0.5
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				IconLock='SpiritGun2.dmi'
 				LockX=-12
 				LockY=-12
 				Variation=0
-				Cooldown=150
+				Cooldown=12
 				adjust(mob/p)
-					EnergyCost=MultiShots**1.75
-					DamageMult=5+(MultiShots**1.75)
+					EnergyCost=3+(MultiShots*2)
+					DamageMult=2.95*(1+(0.125*MultiShots))
 				verb/Spirit_Gun()
 					set category="Skills"
 					adjust(usr)
@@ -1987,7 +2113,7 @@ obj
 				PreRequisite=list("/obj/Skills/Projectile/Spirit_Gun")
 				SignatureTechnique=2
 				Distance=50
-				DamageMult=10
+				DamageMult=12
 				AccMult=25
 				Explode=5
 				ComboMaster=1
@@ -1996,21 +2122,21 @@ obj
 				Deflectable=0
 				AllOutAttack=1
 				Charge=0.75
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				IconLock='SpiritGun2.dmi'
 				IconSize=2
 				LockX=-12
 				LockY=-12
 				Variation=0
-				Cooldown=180
+				Cooldown=60
 				adjust(mob/p)
-					WoundCost=p.TotalFatigue*0.75
-					HealthCost=WoundCost*0.75
-					if(HealthCost>=50)
+					WoundCost=min(p.TotalFatigue*0.5, 40)
+					HealthCost=WoundCost*0.5
+					if(WoundCost>=30)
 						ActiveMessage="<b>puts everything they have into this one final blast, casting aside concern for their lives!</b>"
-					DamageMult=10+(WoundCost*0.5)
+					DamageMult=12+(WoundCost*0.3125)
 				verb/Spirit_Gun_Mega()
 					set category="Skills"
 					adjust(usr)
@@ -2019,13 +2145,13 @@ obj
 				SignatureTechnique=2
 				Charge=1
 				Distance=50
-				DamageMult=1.6
+				DamageMult=2.75
 				AccMult=30
-				MultiHit=10
+				MultiHit=9
 				Knockback=1
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				Explode=2
 				Radius=1
 				ZoneAttack=1
@@ -2039,22 +2165,24 @@ obj
 				TrailX=-32
 				TrailY=-32
 				Variation=0
-				Cooldown=180
+				Cooldown=60
 				Instinct=1
-				EnergyCost=5
+				EnergyCost=12
+				adjust(mob/p)
+					DamageMult = p.Energy >= p.EnergyMax * 9/10 ? 2.75 : 1.65
 				verb/Sekiha_Tenkyoken()
 					set category="Skills"
+					adjust(usr)
 					usr.UseProjectile(src)
 			Big_Bang_Attack
 				SignatureTechnique=2
-				Homing=1
-				HyperHoming=1
+				Launcher=1
 				Charge=1.5
 				Dodgeable=-1
-				Distance=50
-				DamageMult=1.5
+				Distance=8
+				DamageMult=3.25
 				AccMult=30
-				MultiHit=10
+				MultiHit=5
 				Knockback=1
 				ZoneAttack=1
 				ZoneAttackX=0
@@ -2067,7 +2195,7 @@ obj
 				IconSize=0.5
 				IconChargeOverhead=1/32
 				IconSizeGrowTo=1.5
-				Cooldown=180
+				Cooldown=45
 				Instinct=2
 				EnergyCost=10
 				verb/Big_Bang_Attack()
@@ -2075,7 +2203,6 @@ obj
 					usr.UseProjectile(src)
 			Omega_Blaster
 				SignatureTechnique=2
-				Charge=1.5
 				Distance=200
 				GrowingLife=1
 				ComboMaster=1
@@ -2093,19 +2220,32 @@ obj
 				FireFromEnemy=0
 				Dodgeable=-1
 				Knockback=1
-				DamageMult=2.5
-				Stunner=3
+				DamageMult=1.5
 				AccMult=30
-				MultiHit=10
+				MultiHit=9
 				Explode=5
 				Variation=0
-				Cooldown=180
+				Cooldown=60
 				Instinct=2
-				EnergyCost=10
-				ComboMaster=1
+				EnergyCost=12
+				HeldSkill=TRUE
+				InfiniteHold=TRUE
+				FireRate=10
+				OnHeldStart(mob/p)
+					p.UseProjectile(src)
+				OnHeldTick(mob/p)
+					if(!p)
+						return
+					for(var/obj/Skills/Projectile/_Projectile/o in p.active_projectiles)
+						if(o.SkillPath == src.type && !o.Killed)
+							if(o.DamageMult < 2.5)
+								o.DamageMult = min(o.DamageMult + 0.25, 2.5)
+								o.Radius = min(o.Radius + 0.25, 2)
+								p.LoseEnergy(1)
+							break
 				verb/Omega_Blaster()
 					set category="Skills"
-					usr.UseProjectile(src)
+					usr.BeginHeldSkill(src)
 			Genki_Dama
 				Dodgeable=-1
 				Distance=100
@@ -2116,9 +2256,9 @@ obj
 				Homing=1
 				HyperHoming=1
 				Destructive=0
-				StrRate=0.5
-				ForRate=0.5
-				EndRate=1
+				StrScaling=0.5
+				ForScaling=0.5
+				EndEffectiveness=1
 				IconLock='SupernovaBlue.dmi'
 				LockX=-158
 				LockY=-169
@@ -2142,34 +2282,32 @@ obj
 			Death_Ball
 				SignatureTechnique=2
 				Dodgeable=-1
-				Distance=150
+				Static=1
+				Distance=1
 				Deflectable=1
-				Cooldown=180
+				Cooldown=60
 				Knockback=1
-				Homing=1
-				HyperHoming=1
-				AdaptRate=1
-				EndRate=1
+				EndEffectiveness=1
 				IconLock='deathball2.dmi'
 				IconSize=0.1
-				IconSizeGrowTo=0.5
+				IconSizeGrowTo=1.5
 				LockX=-33
 				LockY=-33
 				Variation=0
-				Charge=2
 				IconChargeOverhead=1
-				DamageMult=1.5
+				DamageMult=19.5
 				AccMult=25
-				MultiHit=10
-				Radius=1
+				Radius=2
 				ZoneAttack=1
 				ZoneAttackX=0
 				ZoneAttackY=0
-				FireFromSelf=1
-				FireFromEnemy=0
+				FireFromSelf=0
+				FireFromEnemy=1
+				Hover=40
 				Explode=4
 				Instinct=2
-				EnergyCost=10
+				EnergyCost=12
+				ActiveMessage="plants a seething death ball - the ground begins to crack!"
 				verb/Death_Ball()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -2179,23 +2317,23 @@ obj
 				Dodgeable=-1
 				Distance=150
 				Deflectable=1
-				Cooldown=180
+				PushBack=3
+				Cooldown=60
 				Knockback=1
 				Homing=1
 				HyperHoming=1
-				AdaptRate=1
-				EndRate=1
+				EndEffectiveness=1
 				IconLock='Supernova.dmi'
 				IconSize=0.1
 				IconSizeGrowTo=1
 				LockX=-158
 				LockY=-169
 				Variation=0
-				Charge=3
+				Charge=0.5
 				IconChargeOverhead=1
-				DamageMult=1.75
+				DamageMult=4
 				AccMult=25
-				MultiHit=10
+				MultiHit=5
 				Radius=2
 				ZoneAttack=1
 				ZoneAttackX=0
@@ -2204,7 +2342,7 @@ obj
 				FireFromEnemy=0
 				Explode=5
 				Instinct=2
-				EnergyCost=25
+				EnergyCost=12
 				verb/Supernova()
 					set category="Skills"
 					usr.UseProjectile(src)
@@ -2375,9 +2513,9 @@ obj
 				Shattering=10
 				Distance=200
 				Variation=0
-				StrRate=1
-				ForRate=0
-				EndRate=1
+				StrScaling=1
+				ForScaling=0
+				EndEffectiveness=1
 				Explode=2
 				Dodgeable=-1
 				Hover=20
@@ -2396,11 +2534,11 @@ obj
 				FireFromSelf=1
 				FireFromEnemy=0
 				Variation=0
-				StrRate=1
-				EndRate=1
+				StrScaling=1
+				EndEffectiveness=1
 				Knockback=10
-				MultiHit=4
-				DamageMult=0.15
+				MultiHit=1
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=1
 				Distance=10
@@ -2418,12 +2556,12 @@ obj
 				FireFromSelf=1
 				FireFromEnemy=0
 				Variation=0
-				StrRate=0.5
-				EndRate=0.5
-				ForRate=0.5
+				StrScaling=0.5
+				EndEffectiveness=0.5
+				ForScaling=0.5
 				Knockback=5
-				MultiHit=2
-				DamageMult=0.25
+				MultiHit=1
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=0
 				Distance=8
@@ -2442,12 +2580,12 @@ obj
 				FireFromSelf=1
 				FireFromEnemy=0
 				Variation=0
-				StrRate=0.5
-				EndRate=0.5
-				ForRate=0.5
+				StrScaling=0.5
+				EndEffectiveness=0.5
+				ForScaling=0.5
 				Knockback=5
-				MultiHit=2
-				DamageMult=0.25
+				MultiHit=1
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=0
 				Distance=8
@@ -2466,12 +2604,12 @@ obj
 				FireFromSelf=1
 				FireFromEnemy=0
 				Variation=0
-				StrRate=1
-				ForRate=0
-				EndRate=0.75
+				StrScaling=1
+				ForScaling=0
+				EndEffectiveness=0.75
 				Knockback=2
 				MultiHit=8
-				DamageMult=2
+				DamageMult=0.25
 				AccMult = 1.25
 				Deflectable=0
 				Distance=10
@@ -2480,13 +2618,12 @@ obj
 			Flash_Fist_Crush
 				UnarmedOnly=1
 				SignatureTechnique=2
-				StrRate=1
-				ForRate=0
+				StrScaling=1
+				ForScaling=0
 				Radius=1
 				Distance=20
-				DamageMult=17
-				Dodgeable=-1
-				Deflectable=-1
+				DamageMult=4.05
+				MultiHit=9
 				Speed=0
 				Knockback=0
 				Striking=1
@@ -2494,17 +2631,24 @@ obj
 				IconLock='FlashFist.dmi'
 				Trail='FlashFist.dmi'
 				Cooldown=-1
-				EnergyCost=25
+				EnergyCost=10
 				Variation=0
 				verb/Flash_Fist_Crush()
 					set category="Skills"
+					var/mob/T = usr.Target
+					if(!T || !ismob(T) || T == usr)
+						usr << "<font color='red'>You need a target to execute.</font>"
+						return
+					if(T.HealthPct() >= 40)
+						usr << "<font color='red'>[T] is not weakened enough to execute - below 40% health only.</font>"
+						return
 					usr.UseProjectile(src)
 			Void_Dragon_Fist
 				UnarmedOnly=1
 				SignatureTechnique=2
-				StrRate=1
-				ForRate=1
-				DamageMult=1.55
+				StrScaling=1
+				ForScaling=1
+				DamageMult=1.65
 				Speed=0
 				Dodgeable=-1
 				Deflectable=-1
@@ -2514,13 +2658,14 @@ obj
 				Radius=1
 				Knockback=2
 				Striking=1
+				Piercing=1
 				IconLock='VDF-Burst.dmi'
 				IconSize=1
 				Trail='VDF-Trail.dmi'
 				TrailSize=1
 				Variation=24
-				Cooldown=180
-				EnergyCost=2
+				Cooldown=45
+				EnergyCost=10
 				ActiveMessage="unleashes an instant flurry of hypersonic blows!"
 				verb/Void_Dragon_Fist()
 					set category="Skills"
@@ -2536,9 +2681,9 @@ obj
 				Scorching=1
 				Dodgeable=-1
 				Deflectable=-1
-				StrRate=1
-				ForRate=0
-				EndRate=1
+				StrScaling=1
+				ForScaling=0
+				EndEffectiveness=1
 				Deflectable=0
 				IconLock='FireBlast.dmi'
 				IconSize=1
@@ -2564,9 +2709,9 @@ obj
 				Deflectable=-1
 				Feint=1
 				Launcher=1
-				StrRate=4
-				ForRate=0
-				EndRate=0.0001
+				StrScaling=4
+				ForScaling=0
+				EndEffectiveness=0.0001
 				Knockback=10
 				Variation=0
 				Distance=20
@@ -2581,7 +2726,7 @@ obj
 				FlickBlast=0
 				AttackReplace=1
 				Distance=15
-				DamageMult=8
+				DamageMult=5.25
 				Dodgeable=0
 				Deflectable=0
 				Instinct=2
@@ -2624,9 +2769,9 @@ obj
 				Homing = 3
 				Dodgeable=1
 				Deflectable=0
-				StrRate=1.25
-				ForRate=1
-				EndRate=0.75
+				StrScaling=1.25
+				ForScaling=1
+				EndEffectiveness=0.75
 				IconLock='SpiritGun2.dmi'
 				IconSize=0.5
 				IconSizeGrowTo=1.5
@@ -2651,8 +2796,8 @@ obj
 				MultiHit=10
 				Knockback=1
 				Charge=0.1
-				StrRate=1
-				EndRate=1
+				StrScaling=1
+				EndEffectiveness=1
 				IconLock='SpiritGun2.dmi'
 				IconSize=0.8
 				LockX=-12
@@ -2699,7 +2844,6 @@ obj
 				DamageMult=1.1
 				AccMult = 1.15
 				Freezing=1
-				AbsoluteZero=1
 				Blasts=10
 				Stream=2
 				Radius=1
@@ -2827,7 +2971,7 @@ obj
 				ActiveMessage="unleashes a storm of stardust channeled from the depths of space!"
 				verb/Stardust_Revolution()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -2869,7 +3013,7 @@ obj
 				ActiveMessage="unleashes an eruption of power on galactic scale!"
 				verb/Galaxian_Explosion()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -2908,7 +3052,7 @@ obj
 				verb/Praesepe_Demonic_Blue_Flames()
 					set category="Skills"
 					set name="Sekishiki Kisoen"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -2926,8 +3070,8 @@ obj
 				ZoneAttackY=0
 				FireFromSelf=1
 				FireFromEnemy=0
-				StrRate=1
-				ForRate=1
+				StrScaling=1
+				ForScaling=1
 				IconLock='LightningBolt2.dmi'
 				LockX=-33
 				LockY=-33
@@ -2960,17 +3104,17 @@ obj
 				ZoneAttackY=0
 				FireFromSelf=1
 				FireFromEnemy=0
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				Distance=15
 			Scarlet_Needle
 				CosmoPowered=1
 				GodPowered=0.25
 				MultiShot=4
 				Area="Blast"
-				StrRate=0
-				ForRate=1
+				StrScaling=0
+				ForScaling=1
 				Distance=20
 				DamageMult=3
 				Dodgeable=-1
@@ -2988,7 +3132,7 @@ obj
 				Variation=8
 				verb/Scarlet_Needle()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3048,7 +3192,7 @@ obj
 				ActiveMessage="casts a handful of poisonous crimson roses at their target!"
 				verb/Royal_Demon_Rose()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3086,7 +3230,7 @@ obj
 				ActiveMessage="roars their Cosmos across their wings into a brilliant display of light towards their enemy!"
 				verb/Light_Impulse()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3123,7 +3267,7 @@ obj
 					IconLock='Excaliblast.dmi'
 					LockX=-50
 					LockY=-50
-					DamageMult=0.08
+					DamageMult=0.05
 					AccMult=25
 					MultiHit=100
 					Knockback=1
@@ -3134,9 +3278,9 @@ obj
 					FireFromSelf=1
 					FireFromEnemy=0
 					Explode=3
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					Dodgeable=-1
 					Deflectable=-1
 					HolyMod=10
@@ -3146,7 +3290,7 @@ obj
 					IconLock='DExcaliblast.dmi'
 					LockX=-50
 					LockY=-50
-					DamageMult=0.08
+					DamageMult=0.05
 					AccMult=25
 					MultiHit=100
 					Knockback=1
@@ -3157,9 +3301,9 @@ obj
 					FireFromSelf=1
 					FireFromEnemy=0
 					Explode=3
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					Dodgeable=-1
 					Deflectable=-1
 					Distance=100
@@ -3175,35 +3319,37 @@ obj
 					MultiHit=5
 					Knockback=1
 					Charge=0
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					Explode=1
 					IconLock='SYO!.dmi'
 					IconSize=0.75
 					Variation=0
-					Cooldown=150
+					Cooldown=38
+					EnergyCost=8
 					SBuffNeeded="King of Braves"
 					verb/Broken_Magnum()
 						set category="Skills"
 						usr.UseProjectile(src)
 				Broken_Phantom
 					Distance=25
-					DamageMult=2.4
+					DamageMult=2.15
 					AccMult = 1.25
 					Deflectable=-1
 					MultiHit=5
 					Knockback=1
 					Charge=0.5
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					Explode=2
 					Homing=1
 					IconLock='SYO!.dmi'
 					IconSize=0.75
 					Variation=0
-					Cooldown=180
+					Cooldown=45
+					EnergyCost=8
 					SBuffNeeded="King of Braves"
 					verb/Broken_Phantom()
 						set category="Skills"
@@ -3239,9 +3385,9 @@ obj
 ////Ansatsuken
 			Ansatsuken
 
-				StrRate=1
-				ForRate=1
-				EndRate=1
+				StrScaling=1
+				ForScaling=1
+				EndEffectiveness=1
 				AccMult = 1.25
 				Striking=1
 				IconLock='Hadoken.dmi'
@@ -3252,9 +3398,9 @@ obj
 				StyleNeeded="Ansatsuken"
 				Instinct=1
 				proc/ResetVars()
-					StrRate = initial(StrRate)
-					ForRate = initial(ForRate)
-					EndRate = initial(EndRate)
+					StrScaling = initial(StrScaling)
+					ForScaling = initial(ForScaling)
+					EndEffectiveness = initial(EndEffectiveness)
 					AccMult = initial(AccMult)
 					Striking = initial(Striking)
 					HyperHoming = initial(HyperHoming)
@@ -3459,24 +3605,56 @@ obj
 					//No verb because it is set from melee
 				Hellzone_Grenade
 					SignatureTechnique=1
-					EnergyCost=15
+					EnergyCost=4
 					Speed = 0.25
 					Distance=20
-					Blasts=15
-					Charge=1
-					DamageMult=0.7
+					Blasts=12
+					DamageMult=0.45
 					Instinct=1
 					AccMult=2
 					Homing=3
 					Explode=1
-					ZoneAttackX=3
-					ZoneAttackY=3
-					Hover=7
+					Hover=10
 					Variation=0
-					Cooldown = 180
+					Cooldown = 15
+					ActiveMessage="surrounds their prey with a ring of seeking blasts!"
 					verb/Hellzone_Grenade()
 						set category="Skills"
-						usr.UseProjectile(src)
+						var/mob/caster = usr
+						var/mob/T = caster.Target
+						if(!T || !ismob(T) || T == caster || T.z != caster.z)
+							caster << "<font color='red'>You need a target to encircle.</font>"
+							return
+						if(!caster.CanUseSkill(src))
+							return
+						src.Cooldown(1, null, caster)
+						var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
+						caster.LoseEnergy(drain)
+						OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+						var/turf/c = get_turf(T)
+						if(!c)
+							return
+						for(var/d in list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST))
+							var/turf/t1 = get_step(c, d)
+							var/turf/t2 = t1 ? get_step(t1, d) : null
+							if(!t2 || t2.density)
+								continue
+							var/obj/Skills/Projectile/Zone_Attacks/Hellzone_Grenade/HZ = new
+							HZ.SpawnPosition = t2
+							var/obj/Skills/Projectile/_Projectile/pj = new /obj/Skills/Projectile/_Projectile(caster, HZ, t2, 0.5, 0, 0, get_dir(t2, c) || NORTH)
+							if(pj)
+								pj.Homing = T
+						for(var/d in list(NORTH, EAST, SOUTH, WEST))
+							var/turf/t1 = get_step(c, d)
+							var/turf/t2 = t1 ? get_step(t1, d) : null
+							var/turf/t3 = t2 ? get_step(t2, d) : null
+							if(!t3 || t3.density)
+								continue
+							var/obj/Skills/Projectile/Zone_Attacks/Hellzone_Grenade/HZ2 = new
+							HZ2.SpawnPosition = t3
+							var/obj/Skills/Projectile/_Projectile/pj2 = new /obj/Skills/Projectile/_Projectile(caster, HZ2, t3, 0.5, 0, 0, get_dir(t3, c) || NORTH)
+							if(pj2)
+								pj2.Homing = T
 				Homing_Finisher
 					SignatureTechnique=2
 					EnergyCost=50
@@ -3711,7 +3889,7 @@ obj
 					Piercing=1
 					PiercingBang=1
 					AccMult = 1.175
-					EndRate = 0.5
+					EndEffectiveness = 0.5
 					Dodgeable=-1
 					Deflectable=-1
 					Speed=0
@@ -3723,26 +3901,27 @@ obj
 					ActiveMessage="invokes: <font size=+1>ERASE!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						var/asc = p.AscensionsAcquired
 						if(!altered)
-							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 								if(p.passive_handler.Get("HotHundred") || p.passive_handler.Get("Warping"))
-									EndRate = 0.5
+									EndEffectiveness = 0.5
 									Radius=1
 									MultiShot=0
 									Distance = 50
 									DamageMult=6
 								else
-									EndRate = 0.25
+									EndEffectiveness = 0.25
 									Radius = 2
 									MultiShot = 2 + asc
 									Distance = 5
 									DamageMult = 3 + asc
 									DamageMult /= MultiShot
 							else
-								EndRate = 0.5
+								EndEffectiveness = 0.5
 								Radius=1
 								MultiShot=0
 								Distance = 50
@@ -3763,7 +3942,7 @@ obj
 					Dodgeable=-1
 					AccMult = 1.175
 					Speed=2
-					EndRate = 0.5
+					EndEffectiveness = 0.5
 					ManaCost=15
 					Cooldown=60
 					IconLock='Boulder Normal.dmi'
@@ -3787,10 +3966,11 @@ obj
 					ActiveMessage="invokes: <font size=+1>METEO!</font size>"
 					verb/Disable_Innovate()
 						set category = "Other"
+						set hidden = 1
 						disableInnovation(usr)
 					adjust(mob/p)
 						if(!altered)
-							if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+							if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 								var/asc = p.AscensionsAcquired
 								ManaCost = clamp(p.ManaAmount, 15,100)
 								Blasts = ManaCost/(4+asc)
@@ -3801,7 +3981,7 @@ obj
 								LosesHoming=75
 								HyperHoming=1
 								Speed=1.25
-								EndRate=0.75
+								EndEffectiveness=0.75
 								IconSize=randValue(0.8,1.5)
 								DamageMult = 7 + (asc)
 								DamageMult/=Blasts
@@ -3848,6 +4028,8 @@ obj
 						LockY=-17
 						adjust(mob/p)
 							DamageMult = initial(DamageMult)
+							HitboxW = 0 //masks supersede
+							HitboxH = 0
 						verb/Titan_Slayer()
 							set category="Skills"
 							adjust(usr)
@@ -3909,9 +4091,9 @@ obj
 
 			Sword
 				NeedsSword=1
-				StrRate=1
-				ForRate=0
-				EndRate=1
+				StrScaling=1
+				ForScaling=0
+				EndEffectiveness=1
 				Slashing=1
 				ChargeIcon='BLANK.dmi'
 				ChargeMessage="grips the handle of their blade strongly!"
@@ -3948,7 +4130,7 @@ obj
 					IconLock='Air Render.dmi'
 					Radius=2
 					IconSize=3
-					StrRate=1
+					StrScaling=1
 					Charge=0.5
 					Stunner=3
 					ManaCost=10;
@@ -3993,7 +4175,7 @@ obj
 					Piercing=1
 					EnergyCost=1
 					IconLock='Air Render.dmi'
-					EndRate=1
+					EndEffectiveness=1
 					Cooldown=0.5
 					verb/Boundless_Cut()
 						set category="Skills"
@@ -4026,7 +4208,7 @@ obj
 					SkillCost=TIER_4_COST
 					Copyable=5
 					Distance=120
-					DamageMult=0.95
+					DamageMult=1.05
 					AccMult = 1.5
 					Radius=1
 					ZoneAttack=1
@@ -4036,11 +4218,10 @@ obj
 					FireFromEnemy=0
 					Blasts=5
 					Delay=1
-					MultiHit=3
 					Knockback=1
 					Charge=1
 					EnergyCost=5
-					Cooldown=75
+					Cooldown=18
 					IconSize=2
 					Variation=8
 					IconLock='Air Render.dmi'
@@ -4051,7 +4232,7 @@ obj
 					SkillCost=TIER_4_COST
 					Copyable=5
 					Distance=30
-					DamageMult=1.2
+					DamageMult=2.0
 					AccMult = 1.5
 					Radius=1
 					ZoneAttack=1
@@ -4059,11 +4240,11 @@ obj
 					ZoneAttackY=0
 					FireFromSelf=1
 					FireFromEnemy=0
-					MultiHit=10
+					MultiHit=2
 					Devour=1
 					Knockback=1
-					EnergyCost=3
-					Cooldown=75
+					EnergyCost=5
+					Cooldown=18
 					IconLock='TornadoDirected.dmi'
 					IconSize=2
 					LockX=-8
@@ -4075,18 +4256,25 @@ obj
 					TrailY=-8
 					verb/Backlash_Wave()
 						set category="Skills"
+						if(world.time - usr.last_ranged_hit_time > 15)
+							usr << "<font color='red'>There is nothing to turn back - Backlash Wave answers only a ranged attack that just struck you.</font>"
+							return
+						DamageMult = 2.0 + min(usr.last_ranged_hit_power, 4) / 3
+						usr.last_ranged_hit_power = 0
 						usr.UseProjectile(src)
 				Air_Carve
 					SkillCost=TIER_4_COST
 					Copyable=5
 					Distance=20
-					DamageMult=2.4
+					DamageMult=1.6
 					AccMult = 1.5
-					MultiShot=5
+					MultiShot=3
 					Knockback=1
-					EnergyCost=3
-					Cooldown=75
+					EnergyCost=5
+					Cooldown=18
 					Homing=1
+					Hover=15
+					DartAtAttacker=1
 					IconLock='Scarring Breeze.dmi'
 					IconSize=0.35
 					LockX=-32
@@ -4099,7 +4287,7 @@ obj
 					SkillCost=TIER_4_COST
 					Copyable=5
 					Distance=20
-					DamageMult=2.2
+					DamageMult=4.75
 					AccMult = 1.25
 					Radius=1
 					ZoneAttack=1
@@ -4107,23 +4295,22 @@ obj
 					ZoneAttackY=0
 					FireFromSelf=1
 					FireFromEnemy=0
-					MultiHit=5
 					Knockback=1
 					Charge=0.5
-					EnergyCost=2
-					Cooldown=75
+					EnergyCost=5
+					Cooldown=18
+					EnergyBurn=6
 					IconSize=2
 					Variation=0
 					IconLock='Air Render.dmi'
-					Feint=1
 					verb/Phantom_Howl()
 						set category="Skills"
 						usr.UseProjectile(src)
 
 				Bard
-					StrRate=1
-					ForRate=1
-					EndRate=1
+					StrScaling=1
+					ForScaling=1
+					EndEffectiveness=1
 					IconLock='Soundwave.dmi'
 					LockX=0
 					LockY=0
@@ -4169,12 +4356,27 @@ obj
 				Distance=50
 				density=0
 				BeamTime=50
+				OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+					if(!HeldBeam || !p)
+						return
+					if(p.Beaming)
+						return
+					src.Charging = 1
+					p.Beaming = 1
+					p.BeamCharging = 0.5 + max(benefit, 0) * glob.HELD_BEAM_FULL_SPAN
+					p.UseProjectile(src)
+					if(p.Beaming == 1)
+						p.Beaming = 0
+						p.BeamFiringVolley = 0
+						src.Charging = 0
+						p.BeamCharging = 0.5
 				//Racial ish if it ever works
 				MysticAttack
+					CritEffectiveness=0
 					density=1
-					StrRate=1
-					ForRate=0
-					DamageMult=1
+					StrScaling=1
+					ForScaling=0
+					DamageMult=0.0286
 					AccMult=2
 					BeamTime=5
 					Distance=5
@@ -4190,7 +4392,8 @@ obj
 						usr.UseProjectile(src)
 				//relic
 				BeamPunchProjectile
-					DamageMult=1
+					CritEffectiveness=0
+					DamageMult=0.0286
 					Dodgeable=0
 					Knockback=2
 					BeamTime=20
@@ -4202,10 +4405,11 @@ obj
 //T2 is up above
 //T3 has damage mult 3 - 5.
 				Ray
+					CritEffectiveness=0
 					SkillCost=120
 					Copyable=3
 					Distance=30
-					DamageMult=3
+					DamageMult=0.0857
 					ChargeRate=1.5
 					Knockback=1
 					BeamTime=20
@@ -4220,74 +4424,104 @@ obj
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
+					MenuIcon="EraserGun"
 					Distance=50
-					DamageMult=12
-					ChargeRate=2.5
+					DamageMult=0.55
+					ChargeRate=0.2
+					HeldVulnerability=0.25
 					Knockback=1
-					BeamTime=50
+					BeamTime=10
 					IconLock='Beam20.dmi'
-					Cooldown=45
-					EnergyCost=1.5
+					Cooldown=18
+					EnergyCost=2
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2.5
+					CritEffectiveness=0
 					verb/Eraser_Gun()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Shine_Ray
 					NewCost = TIER_2_COST
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
 					Distance=15
-					DamageMult=8
-					ChargeRate=0.5
+					MenuIcon="ShineRay"
+					DamageMult=0.2
+					ChargeRate=0.2
 					Knockback=0
-					BeamTime=20
+					BeamTime=10
 					IconLock='Beam8.dmi'
-					Cooldown=45
-					EnergyCost=1.5
-					Immediate=1
+					Cooldown=12
+					EnergyCost=2
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=1.5
+					CritEffectiveness=0
 					verb/Shine_Ray()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
+				Shine_Ray_Prism
+					Copyable=0
+					Distance=6
+					DamageMult=0.17
+					Knockback=0
+					Cooldown=0
+					EnergyCost=0
+					IconLock='Beam8.dmi'
+					CritEffectiveness=0
 				Gamma_Ray
 					NewCost = TIER_2_COST
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
-					DamageMult=10
-					ChargeRate=1
+					DamageMult=0.3
+					MenuIcon="GammaRay"
+					ChargeRate=0.2
 					Distance=50
 					Knockback=1
-					BeamTime=20
+					BeamTime=10
 					IconLock='Beam17Dark.dmi'
-					Cooldown=45
-					EnergyCost=1.5
+					Cooldown=10
+					EnergyCost=2
+					CritChanceBonus=15
+					CritEffectiveness=1
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=1
 					verb/Gamma_Ray()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Piercer_Ray
 					NewCost = TIER_2_COST
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
-					DamageMult=5
+					DamageMult=0.55
+					MenuIcon="PiercerRay"
 					Distance=50
-					ChargeRate=1
+					ChargeRate=0.2
 					Knockback=0
-					BeamTime=30
+					BeamTime=10
 					IconLock='Makkankosappo.dmi'
-					Cooldown=45
-					EnergyCost=1.5
+					Cooldown=25
+					EnergyCost=2
 					Piercing=1
-					Instinct=1
+					EndEffectiveness=0.75
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=3
+					CritEffectiveness=0
 					verb/Piercer()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 //T4 is above and also in Autohits.
 
 //T5 has damage mult 5, usually. Divine_Atonement moved to Races/Makaioshins/MakaioshinRacials.dm
 				The_Original_Kamehameha
-					AdaptRate = 1
-					DamageMult=2
+					CritEffectiveness=0
+					DamageMult=0.0571
 					ChargeRate = 8
 					Dodgeable = 0
 					IconLock='BeamKHH.dmi'
@@ -4298,94 +4532,146 @@ obj
 					Immediate=1
 				Kamehameha//Well rounded
 					SignatureTechnique=1
-					AdaptRate=1
-					DamageMult=12
-					ChargeRate=1
+					DamageMult=0.3
+					ChargeRate=0.2
 					Dodgeable=0
 					IconLock='BeamKHH.dmi'
-					Cooldown=150
-					EnergyCost=5
+					Cooldown=12
+					EnergyCost=3
 					Instinct=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2
+					CritEffectiveness=0
+					ClashBonus=0.15
 					verb/Kamehameha()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Motionless_Kamehameha//Well rounded
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Kamehameha")
 					SignatureTechnique=1
-					AdaptRate=1
-					DamageMult=16
-					Immediate=1
+					DamageMult=0.4
+					ChargeRate=0.2
 					Dodgeable=0
 					IconLock='BeamKHH.dmi'
-					Cooldown=150
-					EnergyCost=5
+					Cooldown=15
+					EnergyCost=4
 					Instinct=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2.5
+					CritEffectiveness=0
+					OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+						if(p && p.last_ranged_hit_time && world.time - p.last_ranged_hit_time <= 15)
+							benefit = 1
+						..(p, benefit, sweet_spot_hit)
 					verb/Motionless_Kamehameha()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 
 				Galic_Gun
 					SignatureTechnique=1
-					AdaptRate=1
-					DamageMult=10
-					ChargeRate=0.5
+					DamageMult=0.5
+					ChargeRate=0.2
 					Dodgeable=0
 					IconLock='BeamGG.dmi'
-					Cooldown=150
-					EnergyCost=5
+					Cooldown=15
+					EnergyCost=4
 					Instinct=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2.5
+					CritEffectiveness=0
+					OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+						if(!p)
+							return
+						var/b = min(max(benefit, 0), 1)
+						var/efrac = p.EnergyMax > 0 ? min(p.Energy / p.EnergyMax, 1) : 0
+						var/spend = p.Energy * 0.25 * b
+						if(spend > 0)
+							p.LoseEnergy(spend)
+						..(p, b * efrac, sweet_spot_hit)
 					verb/Galic_Gun()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Final_Crash
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Galic_Gun")
 					SignatureTechnique=1
-					DamageMult=5
-					Immediate=1
+					DamageMult=0.35
+					ChargeRate=0.2
 					Dodgeable=0
 					IconLock='BeamGG.dmi'
-					Cooldown=150
-					EnergyCost=5
+					Cooldown=12
+					EnergyCost=3
 					Instinct=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=1
+					CritEffectiveness=0
 					verb/Final_Crash()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 
 				Dodompa//Penetrate, high charge and low distance
 					SignatureTechnique=1
-					DamageMult=10
-					ChargeRate=3
-					EndRate=0.75
+					DamageMult=0.25
+					ChargeRate=0.2
+					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
 					IconLock='BeamDodon.dmi'
-					Cooldown=150
-					EnergyCost=5
+					Cooldown=12
+					EnergyCost=3
 					Instinct=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2
+					CritEffectiveness=0
+					OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+						..(p, 0.9 + min(max(benefit, 0), 1) * 0.1, sweet_spot_hit)
 					verb/Dodompa()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Killer_Shine
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 					SignatureTechnique=1
-					DamageMult=5
-					ChargeRate=0
-					EndRate=0.75
+					var/tmp/feint_last = 0
+					DamageMult=0.3
+					ChargeRate=0.2
+					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
 					IconLock='BeamDodon.dmi'
-					Cooldown=150
-					EnergyCost=7.5
+					Cooldown=12
+					EnergyCost=3
 					Instinct=1
-					Immediate=1
+					BeamTime=10
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2
+					CritEffectiveness=0
+					OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+						if(p && benefit < 0.25)
+							if(world.time - feint_last >= 10)
+								feint_last = world.time
+								KenShockwave(p, icon='KenShockwaveFocus.dmi', Size=0.5, Blend=2, Time=2)
+								OMsg(p, "<b>[p] flashes a blinding feint!</b>")
+							return
+						..(p, benefit, sweet_spot_hit)
 					verb/Killer_Shine()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 //T6 will be in Big Beams.
 
 //FUSION TECH
 				Galic_Kamehameha
-					DamageMult=8
+					CritEffectiveness=0
+					DamageMult=0.2286
 					ChargeRate=3
 					IconLock='BeamGKH.dmi'
 					ChargeIcon=1
@@ -4399,11 +4685,11 @@ obj
 //SAINT SEIYA
 				Saint_Seiya
 					Soaring_Mountain_Dragon
+						CritEffectiveness=0
 						AttackReplace=1
 						CosmoPowered=1
-						AdaptRate=1
-						EndRate=0.25
-						DamageMult=21
+						EndEffectiveness=0.25
+						DamageMult=0.6
 						MultiHit=4
 						BeamTime=7
 						Immediate=1
@@ -4425,10 +4711,11 @@ obj
 							set name="Rozan Ryu Hishou"
 							usr.UseProjectile(src)
 					Soaring_Dragon_Lord
+						CritEffectiveness=0
 						CosmoPowered=1
-						StrRate=1
-						EndRate=0.25
-						DamageMult=21
+						StrScaling=1
+						EndEffectiveness=0.25
+						DamageMult=0.6
 						BeamTime=15
 						Dodgeable=0
 						Deflectable=0
@@ -4450,11 +4737,12 @@ obj
 							set name="Rozan Ryu Hishou"
 							usr.UseProjectile(src)
 					Nebula_Chain
+						CritEffectiveness=0
 						NeedsSword=1
 						density=1
-						StrRate=0.75
-						ForRate=0.75
-						DamageMult=6
+						StrScaling=0.75
+						ForScaling=0.75
+						DamageMult=0.1714
 						Speed=1
 						AccMult = 1.15
 						Crippling = 5
@@ -4480,72 +4768,95 @@ obj
 					Super_Dodompa//Penetrate, high charge and low distance
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 						SignatureTechnique=2
-						DamageMult=15
-						ChargeRate=4
+						DamageMult=1.35
+						ChargeRate=0.2
 						Distance=15
 						IconLock='BeamDodon.dmi'
 						IconSize=1.5
-						Cooldown=180
+						Cooldown=45
 						EnergyCost=10
+						BeamTime=10
+						HeldSkill=TRUE
+						HeldBeam=TRUE
+						ChargePeriod=3
+						HomingBeam=1
+						CritEffectiveness=0
 						verb/Super_Dodompa()
 							set category="Skills"
-							usr.UseProjectile(src)
+							usr.BeginHeldSkill(src)
 
 					Super_Kamehameha
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Kamehameha")
-						StrRate = 0
-						ForRate = 1
+						StrScaling = 0
+						ForScaling = 1
 						SignatureTechnique=2
-						DamageMult=15
-						ChargeRate=2
+						DamageMult=2
+						ChargeRate=0.2
 						Distance=60
 						IconLock='BeamKHH.dmi'
 						IconSize=2
-						Cooldown=180
-						BeamTime=50
-						EnergyCost=10
+						Cooldown=60
+						BeamTime=10
+						EnergyCost=12
+						HeldSkill=TRUE
+						HeldBeam=TRUE
+						ChargePeriod=4
+						SustainPour=10
+						CritEffectiveness=0
 						verb/Super_Kamehameha()
 							set category="Skills"
-							usr.UseProjectile(src)
+							usr.BeginHeldSkill(src)
 					True_Kamehameha
 						AttackReplace=1
-						StrRate = 1
-						ForRate = 0
-						DamageMult=9
+						StrScaling = 0
+						ForScaling = 1
+						DamageMult=2.95
 						Distance=60
 						IconLock='BeamKHH.dmi'
 						IconSize=2
-						EnergyCost=15
+						EnergyCost=0
 						Cooldown=0
-						BeamTime=50
+						BeamTime=10
+						CritEffectiveness=0
+						ClashBonus=0.3
 
 					Final_Flash
 						SignatureTechnique=2
-						DamageMult=20
-						ChargeRate=5
+						DamageMult=2
+						ChargeRate=0.2
 						Distance=60
 						IconLock='BeamDodon.dmi'
 						IconSize=2
-						EnergyCost=20
-						Cooldown=180
-						BeamTime=50
+						EnergyCost=12
+						Cooldown=60
+						BeamTime=10
+						HeldSkill=TRUE
+						HeldBeam=TRUE
+						HeldBeamUncapped=TRUE
+						ChargePeriod=5
+						CritEffectiveness=0
 						verb/Final_Flash()
 							set category="Skills"
-							usr.UseProjectile(src)
+							usr.BeginHeldSkill(src)
 					Final_Shine
-						DamageMult=9
+						DamageMult=2.8
 						Distance=60
+						StrScaling = 1
+						ForScaling = 0
 						IconLock='BeamFS.dmi'
 						IconSize=2
-						EnergyCost=15
+						EnergyCost=0
 						Cooldown=0
-						BeamTime=50
+						BeamTime=10
+						HomingBeam=1
+						CritEffectiveness=0
 
 					Super_Dragon_Beam
+						CritEffectiveness=0
 						AttackReplace=1
-						StrRate=1
-						ForRate=1
-						DamageMult=12
+						StrScaling=1
+						ForScaling=1
+						DamageMult=0.3429
 						BeamTime=50
 						Immediate=1
 						ComboMaster=0
@@ -4560,7 +4871,8 @@ obj
 
 //FUSION TECHS
 					Final_Kamehameha
-						DamageMult=15
+						CritEffectiveness=0
+						DamageMult=0.4286
 						ChargeRate=4
 						Distance=150
 						IconLock='BeamKHH.dmi'
@@ -4576,7 +4888,7 @@ obj
 						AttackReplace=1
 						Area="Blast"
 						Charge=1
-						DamageMult=16
+						DamageMult=0.4571
 						Speed=0
 						Knockback=30
 						Piercing=1
@@ -4599,13 +4911,12 @@ obj
 							CosmoPowered=1
 							GodPowered=0.25
 							Stream=2
-							EndRate=1
-							DamageMult=10
+							EndEffectiveness=1
+							DamageMult=0.2857
 							ChargeRate=2.5
 							Knockback=0
 							Radius=0
 							Piercing=1
-							AbsoluteZero=1
 							Stunner=4
 							Freezing=4
 							Distance=50
@@ -4624,17 +4935,17 @@ obj
 							Cooldown=150
 							verb/Aurora_Execution()
 								set category="Skills"
-								if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+								if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 									usr << "You can't use this technique except when in a dire pinch!"
 									return
 								usr.UseProjectile(src)
 						Beam_of_Libra
 							UnarmedOnly=1
 							GodPowered=0.25
-							DamageMult=9
-							StrRate=1
-							ForRate=0
-							EndRate=1
+							DamageMult=0.2571
+							StrScaling=1
+							ForScaling=0
+							EndEffectiveness=1
 							Dodgeable=-1
 							Radius=1
 							density=1
@@ -4653,11 +4964,11 @@ obj
 								usr.UseProjectile(src)
 					Weapon_Soul
 						Excalibur
-							DamageMult=9
+							DamageMult=0.2571
 							ChargeRate=5
-							StrRate=1
-							ForRate=1
-							EndRate=1
+							StrScaling=1
+							ForScaling=1
+							EndEffectiveness=1
 							Distance=40
 							Dodgeable=-1
 							Deflectable=-1
@@ -4669,11 +4980,11 @@ obj
 								usr.UseProjectile(src)
 					Jagan
 						Dragon_of_the_Darkness_Flame
-							DamageMult=7
+							DamageMult=0.2
 							ChargeRate=3
-							StrRate=1
-							ForRate=1
-							EndRate=1
+							StrScaling=1
+							ForScaling=1
+							EndEffectiveness=1
 							Distance=40
 							Dodgeable=-1
 							WoundCost=5
@@ -4690,7 +5001,7 @@ obj
 								usr.UseProjectile(src)
 					Vaizard
 						Cero
-							DamageMult=15
+							DamageMult=0.4286
 							ChargeRate=0.5
 							Cooldown=150
 							ManaCost=10
@@ -4706,10 +5017,10 @@ obj
 					Eight_Gates
 						Daytime_Tiger
 							UnarmedOnly=1
-							DamageMult=4
-							StrRate=1
-							ForRate=0
-							EndRate=1
+							DamageMult=0.1143
+							StrScaling=1
+							ForScaling=0
+							EndEffectiveness=1
 							BeamTime=10
 							Immediate=1
 							GateNeeded=7
@@ -4721,7 +5032,7 @@ obj
 							LockY=-16
 							Cooldown=10800
 							adjust(mob/p)
-								DamageMult = 4 + (p.SagaLevel * 1)
+								DamageMult = (4 + (p.SagaLevel * 1)) / 35
 								Cooldown = 240 - (p.SagaLevel * 15)
 							verb/Daytime_Tiger()
 								set category="Skills"
@@ -4730,11 +5041,11 @@ obj
 						Denjin_Hadookie
 							ManaCost=100
 							UnarmedOnly=1
-							DamageMult=6
+							DamageMult=0.1714
 							ChargeRate=3
-							StrRate=1
-							ForRate=1
-							EndRate=1
+							StrScaling=1
+							ForScaling=1
+							EndEffectiveness=1
 							Distance=60
 							Dodgeable=-1
 							Deflectable=-1
@@ -4769,7 +5080,7 @@ obj
 
 //Moonlight Greatsword
 				Moonlight_Wave
-					ForRate=1.5
+					ForScaling=1.5
 					Blasts=1
 					DamageMult=5
 					AccMult=1
@@ -4782,9 +5093,15 @@ obj
 
 mob
 	proc
-		UseProjectile(var/obj/Skills/Projectile/Z)
+		UseProjectile(var/obj/Skills/Projectile/Z, noGCD = FALSE)
 			. = TRUE
 			if(HeldSkillBlocksAction(Z)) return FALSE
+			if(Z.Continuous && Z.ContinuousOn)
+				Z.ContinuousOn = 0
+				src.ContinuousAttacking = 0
+				Z.Cooldown()
+				return TRUE
+			if(!noGCD && GCDBlocked(Z)) return FALSE
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Z] you are silenced!"
 				return FALSE
@@ -4814,14 +5131,6 @@ mob
 			if(istype(check))
 				check.ObjectUse(src)
 				src << "You are knocked off your flying device!"
-			if(Z.Continuous&&Z.ContinuousOn)
-				Z.ContinuousOn=0
-
-				src.ContinuousAttacking=0
-				if(src.TomeSpell(Z))
-					Z.Cooldown()
-				else
-					Z.Cooldown()
 			if(Z.PartyReq) //I'll throw this into a PartyReqCheck() proc when I have more things use this
 				var/HeroPresent = 0
 				for(var/mob/player in src.party.members)
@@ -4833,16 +5142,6 @@ mob
 					src<<"You lack the required party member to use this."
 					return
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
-				// find people in a zone, if the person in the zone has counterspell up and is not in the party, then return and go on cooldown
-				for(var/mob/x in orange(5, src))
-					if(x in party)
-						continue
-					if(x.client)
-						if(x.passive_handler.Get("CounterSpell"))
-							if(x.Target==src)
-								src << "Your [Z] was countered!"
-								Z.Cooldown()
-								return 0
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
 					src << "You lack the ability to use magic!"
 					return
@@ -4889,7 +5188,7 @@ mob
 				if(Z.MultiShots==0)
 					if(!Z.AllOutAttack)
 						if(Z.HealthCost)
-							if(src.Health<Z.HealthCost*glob.WorldDamageMult)
+							if(src.HealthPct()<Z.HealthCost*glob.WorldDamageMult)
 								return 0
 						if(Z.WoundCost)
 							if(src.TotalInjury+Z.WoundCost*glob.WorldDamageMult>99)
@@ -4903,7 +5202,8 @@ mob
 							if(src.TotalFatigue+Z.FatigueCost>99)
 								return 0
 						if(Z.ManaCost && !src.HasDrainlessMana())
-							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							var/drain = Z.ManaCost
+							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(!src.TomeSpell(Z))
@@ -4923,7 +5223,7 @@ mob
 								return FALSE
 
 			if(Z.NeedsHealth)
-				if(src.Health > Z.NeedsHealth*(1-src.HealthCut))
+				if(src.HealthPct() > Z.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Z] before you're below [Z.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Z.NeedsSword)
@@ -4931,6 +5231,9 @@ mob
 					if(!src.HasBladeFisting()&& !src.UsingBattleMage())
 						src << "You need a sword to use this technique!"
 						return
+
+			if(Z.FocusShifter)
+				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
 
 			if(Z.UnarmedOnly)
 				if(src.EquippedSword())
@@ -5042,12 +5345,8 @@ mob
 							copy = Z.NewCopyable
 						else
 							copy = Z.Copyable
-						if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-							if(copyLevel < copy)
-								continue
-						else
-							if(copyLevel <= copy)
-								continue
+						if(copyLevel < copy)
+							continue
 						if(m.client&&m.client.address==src.client.address)
 							continue
 						if(!locate(Z.type, m))
@@ -5203,7 +5502,7 @@ mob
 					src << "<b>You drop [src.AttackQueue.name] from your queue.</b>"
 					src.QueueOverlayRemove()
 					src.ClearQueue()
-				if(!Z.Charging&&!src.Beaming&&!Z.Immediate)
+				if(!src.Beaming&&!Z.Immediate)
 					src.BeamCharge(Z)
 					if(Z.CustomCharge)
 						OMsg(src, "[Z.CustomCharge]")
@@ -5215,7 +5514,9 @@ mob
 						Z.Charging=1
 						src.BeamCharging=1
 					if(Z.BeamTime)
-						Z.BeamTimeUsed=0
+						Z.BeamTimeUsed = -round(Z.sustain_pour_bank)
+						Z.sustain_clash = round(Z.sustain_pour_bank)
+						Z.sustain_pour_bank = 0
 					src.BeamVolleyHitPlayer=0
 					src.BeamFiringVolley=1
 					src.Beaming=2
@@ -5235,9 +5536,23 @@ mob
 						fire_directions = list(NORTH, NORTHEAST, NORTHWEST, EAST, WEST, SOUTHEAST, SOUTHWEST, SOUTH) - list(src.dir)
 					else if(Z.FixedDirections && Z.FixedDirections.len)
 						fire_directions = Z.FixedDirections
-					while(src.Beaming==2)
-						src.BeamTurnDir()
+					var/v2 = (glob.BEAM_V2 && Z.Area == "Beam" && !Z.Stream)
+					if(v2)
 						if(fire_directions && fire_directions.len)
+							for(var/d in fire_directions)
+								var/datum/beam/VB = new(src, Z, d)
+								VB.fixed_dir = 1 //a volley arm keeps its own heading
+						else
+							new/datum/beam(src, Z, src.dir)
+					while(src.Beaming==2)
+						if(src.beam_clash) //struggling: hold the pour, no new segments, BeamTime paused
+							sleep(Z.Speed)
+							if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5)
+								src.UseProjectile(Z)
+							continue
+						if(v2)
+							; //the datum grows itself; the pour spawns nothing
+						else if(fire_directions && fire_directions.len)
 							for(var/d in fire_directions)
 								src.Blast(Z, Origin, DirOverride=d)
 						else
@@ -5251,15 +5566,20 @@ mob
 						if(Z.BeamTime)
 							Z.BeamTimeUsed++
 						if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5||(Z.BeamTime>0&&Z.BeamTimeUsed>=Z.BeamTime))
-							src.UseProjectile(Z)
+							src.BeamStop(Z)
+					if(Z.Charging)
+						src.BeamStop(Z)
 					src.BeamCharging=0
 				else if(src.Beaming==2)
+					if(src.beam_clash && !src.beam_clash.done) //no voluntary bail-out mid-struggle
+						return FALSE
 					src.BeamStop(Z)
 					if(Z.EnergyCost)
 						var/drain = passive_handler["Drained"] ? Z.EnergyCost * (1 + passive_handler["Drained"]/10) : Z.EnergyCost
 						src.LoseEnergy((drain)/Drain)
 					if(Z.ManaCost)
-						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						var/drain = Z.ManaCost
+						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5284,6 +5604,8 @@ mob
 					BlastCount = floor(BlastCount)
 				for(var/i=0, i<BlastCount, i++)
 					BlastAgain
+					if(Z.Continuous && !Z.ContinuousOn && i > 0)
+						break
 				//	if(!src.Target) break
 					if(Z.Homing||Z.LosesHoming)
 						if(Target)
@@ -5320,7 +5642,8 @@ mob
 								src.LoseEnergy(drain/10/Drain)
 							if(Z.ManaCost)
 								if(Z.ManaCost)
-									var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+									var/drain = Z.ManaCost
+									drain *= src.ChakraCostMult(Z)
 									if(drain <= 0)
 										drain = 0.5
 									if(src.TomeSpell(Z))
@@ -5348,6 +5671,7 @@ mob
 								Z.BlastsShot++
 							if(src.KO||Z.ManaCost>=src.ManaAmount||Z.EnergyCost>=src.Energy||Z.BlastsShot>=Z.Blasts)
 								src.UseProjectile(Z)//turn off
+								break
 							else
 								flick("Blast", src)
 								src.ContinuousAttacking=1
@@ -5376,7 +5700,7 @@ mob
 					if(Z.TempSize)
 						Z.TempSize=0
 					if(Z.HealthCost)
-						src.DoDamage(src, Z.HealthCost*glob.WorldDamageMult/Drain)
+						src.DoDamage(src, src.PctToHP(Z.HealthCost*glob.WorldDamageMult/Drain))
 					if(Z.WoundCost)
 						src.WoundSelf(Z.WoundCost*glob.WorldDamageMult/Drain)
 					if(Z.EnergyCost)
@@ -5385,7 +5709,8 @@ mob
 					if(Z.FatigueCost)
 						src.GainFatigue(Z.FatigueCost/Drain)
 					if(Z.ManaCost)
-						var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+						var/drain = Z.ManaCost
+						drain *= src.ChakraCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5419,7 +5744,7 @@ mob
 				else
 					if(Z.Charging==0&&src.BeamCharging==0)
 						if(Z.HealthCost)
-							src.DoDamage(src, Z.HealthCost*glob.WorldDamageMult/Drain)
+							src.DoDamage(src, src.PctToHP(Z.HealthCost*glob.WorldDamageMult/Drain))
 						if(Z.WoundCost)
 							src.WoundSelf(Z.WoundCost*glob.WorldDamageMult/Drain)
 						if(Z.EnergyCost)
@@ -5428,7 +5753,8 @@ mob
 						if(Z.FatigueCost)
 							src.GainFatigue(Z.FatigueCost/Drain)
 						if(Z.ManaCost)
-							var/drain = src.passive_handler.Get("MasterfulCasting") ? Z.ManaCost - (Z.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Z.ManaCost
+							var/drain = Z.ManaCost
+							drain *= src.ChakraCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(src.TomeSpell(Z))
@@ -5456,8 +5782,8 @@ mob
 									if(Z.AssociatedGear.Uses<=0)
 										src << "[Z] is out of power!"
 
-		Blast(var/obj/Skills/Projectile/Z, var/atom/Origin, var/GivesMessage, var/IconUsed, var/DirOverride=0)
-			new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride)
+		Blast(var/obj/Skills/Projectile/Z, var/atom/Origin, var/GivesMessage, var/IconUsed, var/DirOverride=0, var/datum/beam/BeamOwner=null)
+			return new/obj/Skills/Projectile/_Projectile(src, Z, Origin, src.BeamCharging, GivesMessage, IconUsed, DirOverride, BeamOwner)
 
 
 mob/var/tmp/list/active_projectiles = list()
@@ -5482,16 +5808,17 @@ obj
 				Grabbable=0
 				Health=1#INF
 				MultiTrail = 0
-				New(var/mob/m, var/obj/Skills/Projectile/Z, var/atom/Origin, var/BeamCharging=0.5, var/GivesMessage, var/IconUsed=0, var/DirOverride=0)
+				New(var/mob/m, var/obj/Skills/Projectile/Z, var/atom/Origin, var/BeamCharging=0.5, var/GivesMessage, var/IconUsed=0, var/DirOverride=0, var/datum/beam/BeamOwner=null)
 					if(m==null||Origin==null)
 						endLife()
 					AlreadyHit = list()
 					animate_movement=SLIDE_STEPS
-					if(BeamCharging<0.9999)
+					if(BeamCharging<0.5)
 						BeamCharging=0.5
 					src.Owner=m
+					src.beam_owner=BeamOwner
 					src.SkillPath=Z.type
-					src.DirOverride=Z.DirOverride
+					src.DirOverride=DirOverride ? DirOverride : Z.DirOverride
 					if(Owner)
 						Owner.active_projectiles |= src
 					if(istype(Origin, /turf))
@@ -5536,6 +5863,12 @@ obj
 					src.DamageMult=Z.DamageMult
 					if(Z.TempDamage)
 						src.DamageMult=Z.TempDamage
+					if(Z.BlastRamp)
+						src.DamageMult *= Z.BlastRampFloor + Z.BlastRamp * Z.BlastsShot
+					src.PushBack=Z.PushBack
+					src.FollowFacing=Z.FollowFacing
+					src.ArcShot=Z.ArcShot
+					src.ClashBonus = Z.ClashBonus + (Z.sustain_clash ? 0.03 * Z.sustain_clash : 0)
 					if(Owner)
 						src.DamageMult *= Owner.GetDisarmedProjectileDamageFactor(Z)
 					if(Z.while_warping)
@@ -5556,9 +5889,19 @@ obj
 					src.Dodgeable=Z.Dodgeable
 					src.Speed=Z.Speed
 					src.Static=Z.Static
-					src.StrRate=Z.StrRate
-					src.ForRate=Z.ForRate
-					src.EndRate=Z.EndRate
+					src.StrScaling=Z.StrScaling
+					src.ForScaling=Z.ForScaling
+					src.SpdScaling=Z.SpdScaling
+					src.OffScaling=Z.OffScaling
+					src.DefScaling=Z.DefScaling
+					src.EndScaling=Z.EndScaling
+					src.UsesStr=Z.UsesStr
+					src.UsesFor=Z.UsesFor
+					src.UsesSpd=Z.UsesSpd
+					src.UsesEnd=Z.UsesEnd
+					src.UsesDef=Z.UsesDef
+					src.UsesOff=Z.UsesOff
+					src.EndEffectiveness=Z.EndEffectiveness
 					src.SpellElement=Z.SpellElement
 					src.MaxMultiHit=Z.MultiHit
 					src.MultiHit=Z.MultiHit
@@ -5569,6 +5912,8 @@ obj
 					src.ComboMaster=Z.ComboMaster
 					src.Launcher=Z.Launcher
 					src.Knockback=Z.Knockback
+					if(Z.KBRamp)
+						src.Knockback = Z.Knockback + Z.KBRamp * Z.BlastsShot
 					src.MiniDivide=Z.MiniDivide
 					src.CorruptionGain = Z.CorruptionGain
 					src.RuinOnHit = Z.RuinOnHit
@@ -5590,7 +5935,6 @@ obj
 					src.TrailY=Z.TrailY
 					src.TrailSize=Z.TrailSize
 					src.TrailDuration=Z.TrailDuration
-					src.TrailVariance=Z.TrailVariance
 					src.Explode=Z.Explode
 					src.ExplodeIcon=Z.ExplodeIcon
 					src.Striking=Z.Striking
@@ -5601,12 +5945,13 @@ obj
 					src.ClusterCount=Z.ClusterCount
 					src.ClusterAdjust=Z.ClusterAdjust
 					src.ClusterDelay=Z.ClusterDelay
+					src.EmitChild=Z.EmitChild
+					src.EmitCount=Z.EmitCount
+					src.EmitEvery=Z.EmitEvery
 					src.SurroundBurst=Z.SurroundBurst
-					src.SurroundBurstRange=Z.SurroundBurstRange
 					src.Stream=Z.Stream
 					src.Burning=Z.Burning
 					src.Scorching=Z.Scorching
-					src.CriticalChance=Z.CriticalChance
 					src.Combustion=Z.Combustion
 					src.Disarm=Z.Disarm
 					src.Chilling=Z.Chilling
@@ -5617,10 +5962,16 @@ obj
 					src.Paralyzing=Z.Paralyzing
 					src.Poisoning=Z.Poisoning
 					src.Silencing=Z.Silencing
+					src.EnergyBurn=Z.EnergyBurn
+					src.DrainToSelf=Z.DrainToSelf
+					src.WarpResetCD=Z.WarpResetCD
 					src.Toxic=Z.Toxic
 					src.HolyMod=Z.HolyMod
 					src.AbyssMod=Z.AbyssMod
 					src.SlayerMod=Z.SlayerMod
+					src.CritEffectiveness=Z.CritEffectiveness
+					src.BlockEffectiveness=Z.BlockEffectiveness
+					src.CritChanceBonus=Z.CritChanceBonus
 					src.AngelMagicCompatible=Z.AngelMagicCompatible
 					src.Devour=Z.Devour
 					src.Overpowering=Z.Overpowering
@@ -5641,7 +5992,7 @@ obj
 					src.WarpUserBehind=Z.WarpUserBehind
 					src.WarpUserFlashChange=Z.WarpUserFlashChange
 					src.LingeringTornado=Z.LingeringTornado
-					src.Backfire=0
+					src.Backfire=Z.BackfireShot
 					src.FadeOut=Z.FadeOut
 					src.GoldScatter = Z.GoldScatter
 					src.Primordial = Z.Primordial
@@ -5676,19 +6027,20 @@ obj
 						if(src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 					else
-						if(!Z.ignoreBetterAim&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
+						if(!Z.ignoreBetterAim&&Z.Area!="Beam"&&src.Owner.HasBetterAim()&&src.Owner.Target!=src.Owner)
 							src.Homing=src.Owner.Target
 							src.LosesHoming=src.Owner.GetBetterAim()
 					src.HyperHoming=Z.HyperHoming
 					if(Z.StormFall)
-						src.pixel_z=8*Z.StormFall
+						src.pixel_z = Z.Hover ? 180 : 8*Z.StormFall
 					if(!IconUsed)
 						src.icon=Z.IconLock
 						src.pixel_x=Z.LockX
 						src.pixel_y=Z.LockY
 						if(Z.IconVariance)
 							src.icon_state="[rand(1,Z.IconVariance)]"
-							src.transform*=GoCrand(0.75,1.25)
+							src.icon_var_scale=GoCrand(0.75,1.25)//so the pixel hitbox scales with the random art
+							src.transform*=src.icon_var_scale
 						if(Z.takeAppearance)
 							appearance = m.appearance
 					else
@@ -5701,6 +6053,9 @@ obj
 						else
 							src.transform*=Z.IconSize
 					src.ProjectileSpin=Z.ProjectileSpin
+					src.UsesPixelCollision = TRUE
+					if(src.UsesPixelCollision)
+						src.SetupPixelHitbox(Z, DirOverride)
 
 					if(src.Owner.RippleActive())
 						BreathCost=1*src.DamageMult
@@ -5713,7 +6068,8 @@ obj
 							src.Owner.Oxygen=0
 
 					if(Z.IconChargeOverhead)//Raise it above ya head like ya just dont caaaahhh
-						src.Owner.Beaming=0.5
+						var/mob/overhead_caster = src.Owner
+						overhead_caster.Beaming=0.5
 						var/T
 						if(src.Owner.HasQuickCast())
 							T=10*Z.Charge/(src.Owner.GetQuickCast()*(1+(src.Owner.GetKiControlMastery()*0.1)))*(1/(src.Owner.GetRecov()**(1/2)))
@@ -5725,14 +6081,22 @@ obj
 							if(src.ChargeMessage)
 								OMsg(src.Owner, "<b><font color='[src.ChargeColor]'>[src.Owner] [src.ChargeMessage]</font color></b>")
 						src.loc=locate(src.Owner.x, src.Owner.y, src.Owner.z)
+						if(PmActive() && src.Owner) //the re-place wiped the spawn-copied step offsets
+							src.step_x = src.Owner.step_x
+							src.step_y = src.Owner.step_y
 						if(Z.IconSizeGrowTo)
 							spawn()animate(src, transform=matrix()*Z.IconSizeGrowTo, pixel_z=((Z.IconChargeOverhead*32)-1), time=T, easing=CUBIC_EASING)
 						else
 							src.pixel_z=(Z.IconChargeOverhead*32)-1
 						sleep(T)
+						if(overhead_caster)
+							overhead_caster.Beaming=0
 						if(src.Owner && src)
-							src.Owner.Beaming=0
 							src.dir=src.Owner.dir
+						if(Z.Static && istype(Origin, /turf) && src.loc)
+							src.loc = Origin
+							src.step_x = 0
+							src.step_y = 0
 					if(src.CustomActive&&GivesMessage&&!Z.Continuous)
 						OMsg(src.Owner, "[src.CustomActive]")
 					else
@@ -5742,7 +6106,19 @@ obj
 						if(Z.Hover || Hover)
 							if(Z.Hover) sleep(Z.Hover)
 							else sleep(Hover)
+						if(Z.DartAtAttacker && src.Owner && src.Owner.last_attacker && ismob(src.Owner.last_attacker) && src.Owner.last_attacker != src.Owner && !src.Owner.last_attacker.KO && src.Owner.last_attacker.z == src.z && world.time - src.Owner.last_damaged_time <= 100)
+							src.Homing = src.Owner.last_attacker
+							src.forcedTarget = src.Owner.last_attacker
+						if(src.StormFall && src.pixel_z > 0)
+							src.storm_dropped = 1
+							spawn()
+								while(src && src.loc && src.pixel_z > 0 && !src.Killed)
+									src.pixel_z = max(0, src.pixel_z - 15)
+									sleep(1)
 						if(Z.Variation)
+							if(src.UsesPixelCollision)//record the jitter so dir refits re-apply it (art only, not the box)
+								src.vhb_varx = src.VariationX
+								src.vhb_vary = src.VariationY
 							animate(src, pixel_x=src.pixel_x+src.VariationX, pixel_y=src.pixel_y+src.VariationY, time=3)
 						walk(src,0)
 						if(src.DirOverride)
@@ -5762,6 +6138,8 @@ obj
 								animate(src,transform=matrix()*Z.IconSizeGrowTo, time=10, easing=CUBIC_EASING)
 						if(Z.takeAppearance)
 							appearance = m.appearance
+						if(src.Area != "Beam") //beam heads glow via the chain/BeamGraphics hooks
+							FxAttachLight(src, Z)
 						src.Life()
 					if(FollowUp)
 						if(FollowUpDelay != -1)
@@ -5775,8 +6153,12 @@ obj
 					Hit(a)
 					..()
 				proc/endLife()
+					if(clash_lock && !clash_lock.ended) return //frozen mid-struggle: a death here is a hole in the beam
 					try
 						Distance = 0
+						if(chain)
+							chain.Unregister(src)
+							chain = null
 						animate(src)
 						if(Homing)
 							Homing = null
@@ -5793,7 +6175,7 @@ obj
 							Owner = null
 						loc = null
 						for(var/i in vis_contents)
-							vis_contents -= i
+							vis_contents -= i //never del fx children, del scans the whole world
 						for(var/obj/i in vis_locs)
 							i.vis_contents -= src
 						AlreadyHit = null
@@ -5805,16 +6187,28 @@ obj
 						AssociatedGear = null
 						loc = null
 					catch()
-					sleep(50)
-					del src
+					return
 				proc/Hit(atom/a, MultDamage=1)
 					if(istype(a, /obj/Skills/Projectile/_Projectile))
 						if(a.Owner==src.Owner)
 							src.loc=a.loc
 							return
 						else
+							if(src.clash_victor&&src.clash_pierce&&a:Owner==src.clash_pierce) //breakthrough: sweep the loser's remnants aside
+								if(a:Area=="Beam")
+									a:Distance=0
+									a:endLife()
+								else
+									a:ProjectileFinish()
+								return
+							if(BeamClashTry(src, a)) //struggle entry + frozen-beam swallow, BEFORE any relabel/quake runs
+								return
 							if(src.Area=="Beam")
-								src.BeamGraphics()
+								if(UsesPixelCollision)
+									if(chain)
+										chain.UpdateStates(TRUE)
+								else
+									src.BeamGraphics()
 								if(a:Area=="Beam")
 									if(src.Owner)
 										spawn()
@@ -5830,6 +6224,8 @@ obj
 								else
 									a:ProjectileFinish()
 								return
+							if(isnull(src.Damage)) src.Damage = src.DamageMult * max(src.BeamCharge, 0.5)
+							if(isnull(a:Damage)) a:Damage = a:DamageMult * max(a:BeamCharge, 0.5)
 							if(src.Devour&&!a:Devour)
 								src.Damage+=a:Damage
 								a:Damage=0
@@ -5839,12 +6235,19 @@ obj
 							else
 								src.Damage-=a:Damage
 
+							if(a:PushBack && a:Damage > 0 && (src.Area == "Beam" || src.DamageMult >= 1))
+								ProjectilePushBack(a, src)
+							if(src.PushBack && src.Damage > 0 && (a:Area == "Beam" || a:DamageMult >= 1))
+								ProjectilePushBack(src, a)
+
 							if(src.Damage<=0)
 								ProjectileFinish()
 								return
 					else if(istype(a, /mob))
 						var/mob/m = a;
+						if(src.Area=="Beam") BeamDbg("enter [src.SkillPath] vs [m] ([m.type]) dens=[m.density] air=[m.Airborne] stasis=[m.Stasis] ko=[m.KO] pimm=[m.proj_immune_until>world.time]")
 						if(Owner && Owner in m.ai_followers)
+							if(src.Area=="Beam") BeamDbg("BAIL ai_followers")
 							return 1
 						if(istype(Owner, /mob/Player/AI) && Owner != m)
 							var/mob/Player/AI/ai = Owner
@@ -5853,22 +6256,35 @@ obj
 
 						if(src.HyperHoming&&src.Homing)
 							if(a!=src.Owner.Target)
-								if(forcedTarget)
+								if(UsesPixelCollision) //no tile snaps; pass through non-targets
+									if(!forcedTarget)
+										return
+								else if(forcedTarget)
 									src.loc = forcedTarget?:loc
 								else
 									src.loc=a.loc
 									return
 						if(a==src.Owner&&!src.Backfire)
-							src.loc=a.loc
+							if(!UsesPixelCollision)
+								src.loc=a.loc
 							return
 						if(istype(a, /mob) && a:Airborne)
+							if(src.Area=="Beam") BeamDbg("BAIL Airborne")
 							return
-						if(!src.Radius&&src.loc!=a.loc)
-							src.loc=a.loc
+						if(istype(a, /mob) && a:proj_immune_until > world.time)
+							if(src.Area=="Beam") BeamDbg("BAIL proj_immune")
 							return
+						if(!UsesPixelCollision)
+							if(!src.Radius&&src.loc!=a.loc)
+								src.loc=a.loc
+								return
 
 						if(src.Area=="Beam")
-							src.BeamGraphics()
+							if(UsesPixelCollision)
+								if(chain)
+									chain.UpdateStates(TRUE)
+							else
+								src.BeamGraphics()
 
 						if(src.Area!="Beam")
 							if(a:HasBulletKill()&&a:dir==turn(src.dir, 180))
@@ -5901,47 +6317,12 @@ obj
 						itemMods = Owner.getItemDamage(list(sord,FALSE,FALSE,staf), 0, AccMult, FALSE, FALSE, issord, isproj )
 						if(itemMods[2]>0)
 							accmult *= itemMods[2]
+						var/deflectMult = 1
 						if(!a:Stasis)
-							var/mob/p = a
-							if(p.passive_handler["Neo"]&&!p.HasNoDodge()&&src.Dodgeable>0)
+							if(a:aisArmed()&&src.Dodgeable>0&&src.Area!="Beam")
+								if(src.Area=="Beam") BeamDbg("BAIL ais dodge")
 								var/dir=get_dir(src,a)
-								if(prob(p.passive_handler["Neo"]*glob.NEO_DODGERATE))
-									src.loc = a.loc
-									StunClear(a)
-									AfterImageStrike(a, src.Owner)
-									if(src.Homing)
-										src.dir=dir
-										src.Homing=0
-										if(src.Area!="Beam")
-											src.Backfire=1
-									return
-							if(m.HasFlow()&&!m.HasNoDodge()&&src.Dodgeable>0)
-								if(prob(getFlowCalc(Owner, m )) )
-									var/dir=get_dir(src,a)
-									AfterImage(a)
-									if(src.Area=="Beam")
-										for(var/obj/Skills/Projectile/Beams/Z in src.Owner)
-											if(Z.Charging)
-												src.Owner.BeamStop(Z)
-
-									if(istype(src.Owner, /mob/Player/AI/Nympharum))
-										return //Flow should work against them. But it's awkward to warp to them.
-									a:Move(get_step(src.Owner,turn(dir,pick(-45,45,-90,90,180))))
-									StunClear(a)
-									WildSense(a, src.Owner,0)
-									if(src.Homing)
-										src.dir=dir
-										src.Homing=0
-										if(src.Area!="Beam")
-											src.Backfire=1
-									if(a:CheckSlotless("Combat CPU"))
-										a:LoseMana(1)
-									return
-							if(a:AfterImageStrike&&src.Dodgeable>0)
-								var/dir=get_dir(src,a)
-								a:AfterImageStrike-=1
-								if(a:AfterImageStrike<0)
-									a:AfterImageStrike=0
+								a:aisConsume()
 								if(!m.HasNoDodge())
 									AfterImage(a)
 									if(src.Area=="Beam")
@@ -5971,7 +6352,9 @@ obj
 									var/RipplePower=(1+(0.125*src.Owner.GetRipple()*max(1,src.Owner.PoseEnhancement*2)))
 									accmult*=RipplePower
 							if(Accuracy_Formula(src.Owner, a, accmult*(src.MultiHit+1), BaseChance=glob.WorldDefaultAcc, Backfire=src.Backfire) == MISS &&!a:KO&&!src.Radius&&src.Dodgeable>=0)
-								src.loc = a.loc
+								if(src.Area=="Beam") BeamDbg("BAIL accuracy MISS acc=[accmult] dodgeable=[src.Dodgeable] radius=[src.Radius]")
+								if(!UsesPixelCollision)
+									src.loc = a.loc
 								var/dir=get_dir(src,a)
 								if(src.Area!="Beam")
 									spawn()Prediction(a)
@@ -6014,20 +6397,8 @@ obj
 										KenShockwave(def, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
 										return
 								var/Deflect=0
-								/*var/defIntim = m.GetIntimidation()
-								var/atkIntim = Owner.GetIntimidation()
-								var/atkIntimIgnore = Owner.GetIntimidationIgnore(m)
-								var/defIntimIgnore = m.GetIntimidationIgnore(Owner)
-								// the difference between the two intims
-								var/Rate = ( atkIntim - (atkIntim * (defIntimIgnore))) - (defIntim - (defIntim * (atkIntimIgnore))) * 0.75
-								if(Rate < 0)
-									Rate = abs(Rate)/10*/
-								if(src.Deflectable&&!a:KO)
+								if(src.Deflectable>0&&!a:KO)
 									if(istype(a, /mob)) m = a;
-									/*if(m && m.hasMagmicShield())
-										Deflect = 1;
-										Stun(m, 3);
-										m.MagmicShieldOff();*/
 									if(a:HasDeflection())
 										if(!Deflection_Formula(src.Owner, a, (accmult /** Rate*/ * ( min(0.1,1 - (src.MultiHit * 0.025) ) ) /(1+a:GetDeflection())), BaseChance=(glob.WorldDefaultAcc), Backfire=src.Backfire))
 											Deflect=1
@@ -6076,9 +6447,9 @@ obj
 												a:Shielding=1
 												spawn()
 													a:ForceField()
-										Damage*=max(1-(glob.DEFLECTION_DAMAGE_MULT*a:GetDeflection()),0.25)
-									else if(!Deflection_Formula(src.Owner, a, accmult*(src.MultiHit+1)/**(max(atkIntim, 1)/max(defIntim,1))*/, BaseChance=(100-glob.WorldWhiffRate), Backfire=src.Backfire))
-										Damage*=0.5
+										deflectMult = clamp(1 - (glob.DEFLECTION_DAMAGE_MULT*a:GetDeflection()) - a:GetDef(glob.DEF_DEFLECT_RATE) + Owner.GetFor(glob.FOR_BLAST_DENSITY_MIT), 0.25, 1)
+									else if(!Deflection_Formula(src.Owner, a, accmult*(src.MultiHit+1)/**(max(atkIntim, 1)/max(defIntim,1))*/, BaseChance=glob.WorldDeflectBase, Backfire=src.Backfire))
+										deflectMult = 0.5
 
 
 
@@ -6087,53 +6458,46 @@ obj
 						if(CosmoPowered)
 							if(!src.Owner.SpecialBuff)
 								src.DamageMult*=1+(src.Owner.SenseUnlocked-5)
-						var/str = StrRate ? Owner.GetStr(StrRate) : 0
-						var/force = ForRate ? Owner.GetFor(ForRate) : 0
-						if(AdaptRate)
-							if(Owner.GetStr(1) > Owner.GetFor(1))
-								str = Owner.GetStr(AdaptRate)
-							else
-								force = Owner.GetStr(AdaptRate)
+						var/pIdnt = FocusStatIdentity()
+						var/strScale = Owner.FocusShiftScaling(pIdnt, "STR", StrScaling)
+						var/forScale = Owner.FocusShiftScaling(pIdnt, "FOR", ForScaling)
+						var/str = strScale ? Owner.GetStr(strScale) : 0
+						var/force = forScale ? Owner.GetFor(forScale) : 0
 						var/powerDif = Owner.Power / a:Power
 						// + Owner.getIntimDMGReduction(m)
 						if(glob.CLAMP_POWER)
-							if(!Owner.ignoresPowerClamp())
+							if(!Owner.ignoresPowerClamp(a))
 								powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-						var/atk = 0
+						var/atk = BaseStatOverride(Owner) || Owner.GetFor(1)
+						var/endScale = EndEffectiveness
 						if(Owner.isSuperCharged(Owner))
-							EndRate -=  clamp(glob.SUPERCHARGERATE * Owner.passive_handler["SuperCharge"], 0, 1)
+							endScale -= clamp(glob.SUPERCHARGERATE * Owner.passive_handler["SuperCharge"], 0, 1)
 							Owner.StyleBuff.last_super_charge = world.time
 						if(Owner.passive_handler["Atomizer"])
-							EndRate = clamp(EndRate - (EndRate * (Owner.passive_handler["Atomizer"] * glob.ATOMIZERRATE)), 0.0001, 2)
-						var/def = a:getEndStat(1) * EndRate
-						var/pride = Owner.HasPridefulRage();
-						if(pride) def = clamp(a:GetEnd(EndRate)/2, 1, a:GetEnd(EndRate));
-						if(pride >= 2) def = 1;
+							endScale = clamp(endScale - (endScale * (Owner.passive_handler["Atomizer"] * glob.ATOMIZERRATE)), 0.0001, 2)
+						var/def = a:getEndStat(1) * endScale
 						if(force)
 							atk += force
 						if(str)
 							atk += str
+						if(SpdScaling)
+							atk += Owner.GetSpd(SpdScaling)
+						if(OffScaling)
+							atk += Owner.GetOff(OffScaling)
+						if(DefScaling)
+							atk += Owner.GetDef(DefScaling)
+						if(EndScaling)
+							atk += Owner.GetEnd(EndScaling)
 						if(SpellElement)
 							//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the projectile is a spell (SpellElement is set).
-							atk += Owner.getPowerfulCastingBonus()
-							atk += Owner.getForcefulCastingBonus()
-							atk += Owner.getAgileCastingBonus()
-							atk += Owner.getStalwartCastingBonus()
 							//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
 							//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
 							var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
 							if(elem_dmg_bonus)
 								atk *= (1 + elem_dmg_bonus)
-						if(Owner.HasSpiritFlow())
-							var/sf = Owner.GetSpiritFlow() / glob.SPIRIT_FLOW_DIVISOR
-							atk += Owner.GetFor(sf)
-
-						if(atk<1)
-							atk=1
-						if(glob.DMG_CALC_2)
-							Damage = (powerDif**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.PROJECTILE_EFFECTIVNESS) ** -(def**glob.DMG_END_EXPONENT / atk**glob.DMG_STR_EXPONENT)
-						else
-							Damage = ((atk * powerDif)*glob.CONSTANT_DAMAGE_EXPONENT)** -( def / atk)
+						Damage = strikeCoreDamage(powerDif, atk, def)
+						if(src.Area=="Beam") BeamDbg("core pdif=[powerDif] atk=[atk] def=[def] endScale=[endScale] raw=[Damage] deflect=[deflectMult] dmgmult=[DamageMult] bcharge=[BeamCharge]")
+						Damage *= deflectMult
 						#if DEBUG_PROJECTILE
 						Owner.log2text("PROJ Damage after", Damage, "damageDebugs.txt", Owner.ckey)
 						#endif
@@ -6152,7 +6516,7 @@ obj
 						if(Bounce)
 							Damage *= max(1-glob.BOUNCE_REDUCTION * CurrentBounce, 0.25)
 						if(Primordial)
-							var/missingHealth = 100-a:Health
+							var/missingHealth = 100-a:HealthPct()
 							Damage *= 1 + (((Primordial*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 						if(src.Owner.RippleActive())
 							if(src.Owner.Oxygen>=BreathCost)
@@ -6179,9 +6543,12 @@ obj
 							src.AccMult*=5
 
 						var/EffectiveDamage=Damage
-						if(a:Launched||a:Stunned)
-							if(!(src.ComboMaster || Owner.HasComboMaster() || m.passive_handler.Get("Staggered!")))
-								EffectiveDamage *= glob.CCDamageModifier
+						EffectiveDamage *= a:ccProrationMult(Owner, 0, src.ComboMaster)
+						if(src.Area=="Beam") BeamDbg("final dmg=[Damage] eff=[EffectiveDamage] proration=[a:ccProrationMult(Owner, 0, src.ComboMaster)] toStrike=[EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR] kb=[src.Knockback*EffectiveDamage*glob.WorldDamageMult]")
+						if(src.clash_victor == 1 && (!src.beam_owner || src.beam_owner.victor == 1))
+							src.clash_victor = 2
+							if(src.beam_owner) src.beam_owner.victor = 2
+							m.Knockback(glob.CLASH_WIN_KB, src.Owner, src.dir, 1, 1)
 
 						if(GoldScatter||Owner.CheckSlotless("Hoarders Riches"))
 							for(var/obj/Money/money in a.contents)
@@ -6207,6 +6574,11 @@ obj
 							a:AddShearing(Shearing, src.Owner)
 						if(istype(a, /mob))
 							var/mob/spellTarget = a
+							if(src.Owner && src.Owner != spellTarget && src.DamageMult >= 0.5)
+								spellTarget.last_ranged_hit_time = world.time
+								spellTarget.last_ranged_hit_power = min(EffectiveDamage, 4)
+							if(src.Owner)
+								spellTarget.NoteSkillHit(src.Owner, src.SkillPath)
 							if(NerveOverload)
 								spellTarget.AddShock(NerveOverload, src.Owner)
 							if(CriticalParalyze && prob(CriticalParalyze))
@@ -6233,14 +6605,6 @@ obj
 							a:LoseMana(heal/2)
 							Owner.HealEnergy(heal/2)
 							Owner.HealMana(heal/2)
-						if(a:passive_handler.Get("Siphon")&&src.ForRate)
-							var/Heal=EffectiveDamage*(a:passive_handler.Get("Siphon")/10)*src.ForRate//Energy siphon is a value from 0.1 to 1 which reduces damage and heals energy.
-							if(Owner.passive_handler.Get("Determination(Black)"))
-								Heal *= 0.5
-							if(Owner.passive_handler.Get("Determination(White)"))
-								Heal *= 0.15
-							EffectiveDamage-=Heal*0.15//negated
-							a:HealEnergy(Heal)//and transfered into energy.
 						if(src.Burning&&!src.Owner.HasBurning())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Fire"), damageOnly = 1))/10)
 						if(src.Scorching&&!src.Owner.HasScorching())
@@ -6296,22 +6660,7 @@ obj
 										found=1
 								if(!found)//If you don't find what you're supposed to hunt
 									goto SkipDamage
-						var/list/specDmgTypes = list();
-						var/holy = 0
-						if(HolyMod)
-							holy += HolyMod
-						if(Sanctify)
-							holy += Sanctify * glob.SANCTIFY_EFFECTIVENESS
-						if(holy > 0) specDmgTypes["Holy"] = holy
-						if(AbyssMod) specDmgTypes["Abyss"] = AbyssMod;
-						if(SlayerMod) specDmgTypes["Slayer"] = SlayerMod;
-						if(specDmgTypes.len) EffectiveDamage *= 1 + ((Owner.attackModifiers(m, specDmgTypes)/10) * glob.PURE_MODIFIER)
-						//Technically these are going to get doubletapped for projectiles
-						//because attackModifiers is called here as well as in dodamage
-						//which will be run further below
-						//but projectiles are kind of weak
-						//so we let it slide
-						//(i do not want to do that rework)
+						var/list/specDmgTypes = buildSpecDmgTypes(HolyMod, Sanctify, AbyssMod, SlayerMod)
 						if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 							EffectiveDamage *= 1.25
 						if(src.WarpUser)
@@ -6326,6 +6675,10 @@ obj
 								src.Owner.warp_strike_restore_color()
 							if(SkillPath == /obj/Skills/Projectile/Warp_Strike_MasterOfArms && Owner)
 								Owner.buffSelf(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/WarpPoint_Buff)
+							if(src.WarpResetCD && src.Owner)
+								var/obj/Skills/WRS = locate(src.SkillPath) in src.Owner
+								if(WRS)
+									WRS.RefundCooldown(1)
 						if(istype(src.Owner, /mob/Player/AI))
 							if(istype(a, /mob/Player/AI))
 								for(var/x in src.Owner:ai_alliances)
@@ -6333,23 +6686,26 @@ obj
 										EffectiveDamage=0
 										break//cancel allied damage
 						if(EffectiveDamage>0)
+							if(src.SkillPath == /obj/Skills/Projectile/Big_Bang_Attack && ismob(m) && m.HealthPct() < 25)
+								EffectiveDamage *= 1.25
 							if(src.MortalBlow)
 
 								if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !m.MortallyWounded)
 									var/mortalDmg = m.Health * 0.05 // 5% of current
 									m.LoseHealth(mortalDmg)
-									m.WoundSelf(mortalDmg)
+									m.WoundSelf(m.HPToPct(mortalDmg))
 									m.MortallyWounded += 1
 									OMsg(m, "<b><font color=#ff0000>[src] has dealt a mortal blow to [m]!</font></b>")
 
 							if(src.Area=="Beam")
+								if(src.SkillPath == /obj/Skills/Projectile/Beams/Eraser_Gun && ismob(m))
+									if(m.ccActive() || m.HealthPct() <= 30)
+										EffectiveDamage *= 1.75
+								if(src.SkillPath == /obj/Skills/Projectile/Beams/Final_Crash && ismob(m) && src.Owner && get_dist(src.Owner, m) <= 1)
+									EffectiveDamage *= 1.5
 								if((istype(m, /mob/Players) || istype(m, /mob/Player/AI)) && m != src.Owner)
 									src.Owner.BeamVolleyHitPlayer = 1
-								// Skill-level CriticalChance/Combustion: temporary attacker bump.
-								var/_skillCritDmgB = src.CriticalChance * 0.01
-								if(src.CriticalChance)
-									src.Owner.passive_handler.Increase("CriticalChance", src.CriticalChance)
-									src.Owner.passive_handler.Increase("CriticalDamage", _skillCritDmgB)
+								// Skill-level Combustion: temporary attacker bump.
 								if(src.Combustion)
 									src.Owner.passive_handler.Increase("Combustion", src.Combustion)
 								// Elemental absorb: if target absorbs this element, heal instead
@@ -6371,19 +6727,24 @@ obj
 										savedBA_b = m.BioArmor
 										m.VaizardHealth = 0
 										m.BioArmor = 0
-									if(src.SkillDeicide)
-										src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 									src.Owner.ProjectileAttacking = TRUE
-									src.Owner.DoDamage(a, (EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR), SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+									if(a:isCommitted())
+										CounterHitReward(src.Owner, a, min(EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR, 14))
+									var/strike/S = new(src.Owner, a, EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR)
+									BeamDbg("strike in=[S.val] hp_before=[a:Health]")
+									S.spirit = 1
+									S.destructive = src.Destructive
+									S.element = src.SpellElement
+									S.dmgTypes = specDmgTypes
+									S.critEff = CritEffectiveness
+									S.blockEff = BlockEffectiveness
+									S.critBonus = CritChanceBonus
+									S.resolve()
+									a:ccCountHit()
 									src.Owner.ProjectileAttacking = FALSE
-									if(src.SkillDeicide)
-										src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 									if(src.BypassTempHP)
 										m.VaizardHealth = savedVH_b
 										m.BioArmor = savedBA_b
-								if(src.CriticalChance)
-									src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
-									src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmgB)
 								if(src.Combustion && m && !_beamAbsorb)
 									var/combThresh = src.Owner.passive_handler["Combustion"]
 									if(combThresh <= 80)
@@ -6423,11 +6784,7 @@ obj
 									if(src.SpellElement == "Water")
 										EffectiveDamage *= m.getWaterResistValue()
 
-									// Skill-level CriticalChance/Combustion: temporary attacker bump.
-									var/_skillCritDmgS = src.CriticalChance * 0.01
-									if(src.CriticalChance)
-										src.Owner.passive_handler.Increase("CriticalChance", src.CriticalChance)
-										src.Owner.passive_handler.Increase("CriticalDamage", _skillCritDmgS)
+									// Skill-level Combustion: temporary attacker bump.
 									if(src.Combustion)
 										src.Owner.passive_handler.Increase("Combustion", src.Combustion)
 									// Elemental absorb: if target absorbs this element, heal instead
@@ -6449,19 +6806,23 @@ obj
 											savedBA = m.BioArmor
 											m.VaizardHealth = 0
 											m.BioArmor = 0
-										if(src.SkillDeicide)
-											src.Owner.passive_handler.Increase("Deicide", src.SkillDeicide)
 										src.Owner.ProjectileAttacking = TRUE
-										src.Owner.DoDamage(a, EffectiveDamage, SpiritAttack=1, Destructive=src.Destructive, atkSpellElem=src.SpellElement)
+										if(a:isCommitted())
+											CounterHitReward(src.Owner, a, min(EffectiveDamage, 14))
+										var/strike/S = new(src.Owner, a, EffectiveDamage)
+										S.spirit = 1
+										S.destructive = src.Destructive
+										S.element = src.SpellElement
+										S.dmgTypes = specDmgTypes
+										S.critEff = CritEffectiveness
+										S.blockEff = BlockEffectiveness
+										S.critBonus = CritChanceBonus
+										S.resolve()
+										a:ccCountHit()
 										src.Owner.ProjectileAttacking = FALSE
-										if(src.SkillDeicide)
-											src.Owner.passive_handler.Decrease("Deicide", src.SkillDeicide)
 										if(src.BypassTempHP)
 											m.VaizardHealth = savedVH
 											m.BioArmor = savedBA
-									if(src.CriticalChance)
-										src.Owner.passive_handler.Decrease("CriticalChance", src.CriticalChance)
-										src.Owner.passive_handler.Decrease("CriticalDamage", _skillCritDmgS)
 									if(src.Combustion && m && !_stdAbsorb)
 										var/combThresh = src.Owner.passive_handler["Combustion"]
 										if(combThresh <= 80)
@@ -6484,7 +6845,7 @@ obj
 									if(m)
 										AlreadyHit["[m.ckey]"]++
 									if(Piercing && PiercingBang)
-										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX, PY=src.VariationY, icon_override = ExplodeIcon)
+										Bang(src.loc, Size=src.PiercingBang, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 								if(src.Owner.UsingAnsatsuken())
 									src.Owner.HealMana(src.Owner.SagaLevel/15)
 								if(src.Owner.SagaLevel>1&&src.Owner.Saga=="Path of a Hero: Rebirth")
@@ -6535,7 +6896,10 @@ obj
 							m:applyStarCrossed()
 
 						if(Deport)
-							m:applyDeport(Deport)
+							var/depdir = src.dir
+							if(!depdir && src.Owner)
+								depdir = get_dir(src.Owner, m)
+							m:applyDeport(Deport, depdir)
 
 						if(Enshrine)
 							m:applyEnshrine(Enshrine)
@@ -6560,19 +6924,19 @@ obj
 								animate(a:client, color = list(-1,-1,-1, -1,-1,-1, -1,-1,-1, 1,1,1), time = 5)
 								spawn(10*(src.Stunner-1))
 									animate(a:client, color = null, time = 5)
-						if(src.Launcher)
+						if(src.Launcher && (!src.HomingCharge || src.HomingChargeSpent >= src.HomingCharge))
 							spawn()
 								LaunchEffect(src.Owner, a, Launcher )
 						if(src.Stasis&&!a:StasisFrozen)
 							a:SetStasis(src.Stasis * world.tick_lag)
 
 						if(src.Silencing)
-							a:passive_handler.Increase("Silenced", 1)
-							var/dur = src.Silencing
-							var/mob/target_sil = a
-							spawn(dur)
-								if(target_sil && target_sil.passive_handler)
-									target_sil.passive_handler.Decrease("Silenced", 1)
+							applySilence(a, src.Silencing * 10)
+
+						if(src.EnergyBurn)
+							a:LoseEnergy(src.EnergyBurn)
+							if(src.DrainToSelf && src.Owner)
+								src.Owner.HealEnergy(src.EnergyBurn)
 
 						if(src.Striking)
 							src.Owner.HitEffect(a)
@@ -6605,10 +6969,17 @@ obj
 									src.Owner.Knockback(src.Knockback, a, src.dir, Ki=1)
 						//						NoKB
 
+						if(src.beam_owner)
+							return
 						if(!src.Piercing)
 							if(src.MultiHit)
 								src.MultiHit--
 								src.Distance++
+								if(UsesPixelCollision && src.Homing && a == src.Homing)
+									//re-center on the homing target so multi-hit hovers instead of orbiting
+									src.loc = a.loc
+									src.step_x = a:step_x
+									src.step_y = a:step_y
 								if(src.MultiHit<0)
 									src.MultiHit=0
 									ProjectileFinish()
@@ -6648,6 +7019,28 @@ obj
 							ProjectileFinish()
 							return
 				Move()
+					var/turf/gfx_water_before = get_turf(src)
+					if(pm_substep) //per-tile effects only when a tile line is crossed
+						if(src.EdgeOfMapProjectile())
+							ProjectileFinish()
+							return
+						var/turf/pre = loc
+						. = ..()
+						if(loc == pre) return
+						GfxProjectileWaterMove(src, gfx_water_before)
+						if(src.MiniDivide)
+							if(istype(pre, /turf))
+								Destroy(pre, 9001)
+						if(src.Divide)
+							for(var/turf/t in view(src.Divide, src))
+								Destroy(t, 9001)
+						if(src.Trail)
+							if(src.MultiTrail)
+								WaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+							else
+								LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
+						src.Distance--
+						return
 					if(src.EdgeOfMapProjectile())
 						ProjectileFinish()
 						return
@@ -6664,7 +7057,8 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 
 					src.Distance--
-					..()
+					. = ..() //pixel movers need the real px-moved return for glide hints
+					GfxProjectileWaterMove(src, gfx_water_before)
 				var/tmp/mob/forcedTarget
 				proc/findNextTarget(mob/p, mob/o)
 					for(var/mob/a in view(Bounce, p))
@@ -6674,13 +7068,27 @@ obj
 					return 0
 				proc/ProjectileFinish() //This function should allow the garbage collector to take care of projectiles. For this to work, make sure all references TOWARD the projectile are cleansed.
 					//Or it will persist even in the void
+					if(clash_lock && !clash_lock.ended) return
 					walk(src, 0)
 					if(0 > Distance) return
 					Distance=-1
 
 					if(!Killed && (MultiHit > 0) && Area != "Beam")
-						for(var/mob/m in view(max(1, Radius), src))
-							Hit(m, MultDamage = MultiHit)
+						if(UsesPixelCollision)
+							if(src.Explode)
+								var/pr = 16*src.Explode
+								var/pcx = LowerX() + Width()/2 + vhb_ax //FireOffset skills detonate where the art died
+								var/pcy = LowerY() + Height()/2 + vhb_ay
+								if(glob.PIXEL_DEBUG) world.log << "PXC: [src] endpoint blast at ([x],[y]) r=[pr]"
+								for(var/mob/m in view(round(pr/32)+2, src))
+									if(src.Killed || !src.Owner)
+										break
+									if(CircleHitsBody(pcx, pcy, pr, m))
+										if(glob.PIXEL_DEBUG) world.log << "PXC: [src] blast hit -> [m] at ([m.x],[m.y])"
+										Hit(m, MultDamage = MultiHit)
+						else
+							for(var/mob/m in view(max(1, Radius), src))
+								Hit(m, MultDamage = MultiHit)
 
 					if(Owner)
 						Owner.Frozen = 0
@@ -6696,37 +7104,56 @@ obj
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 					if(!src.Killed && src.Owner)
 						if(src.Explode)
-							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX, PY=src.VariationY, icon_override = ExplodeIcon)
+							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 						if(src.Cluster)
 							for(var/c=src.ClusterCount, c>0, c--)
+								var/obj/Skills/Projectile/_Projectile/cb
 								if(src.ClusterAdjust)
-									src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0, src.icon)
 								else
-									src.Owner.Blast(src.Cluster, src.loc, 0)
+									cb = src.Owner.Blast(src.Cluster, src.loc, 0)
+								if(PmActive() && cb && cb.loc == src.loc)//inherit the impact point's mid-tile offset
+									cb.step_x = src.step_x
+									cb.step_y = src.step_y
 								sleep(src.ClusterDelay)
 						if(src.SurroundBurst)
 							var/list/burst_dirs = list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST)
 							for(var/d in burst_dirs)
 								var/turf/T = get_step(src, d)
 								if(T)
-									src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									var/obj/Skills/Projectile/_Projectile/sb = src.Owner.Blast(src.SurroundBurst, T, 0, 0, d)
+									if(PmActive() && sb && sb.loc == T)//center the ring on the impact sprite
+										sb.step_x = src.step_x
+										sb.step_y = src.step_y
 						if(!src.MaxMultiHit&&!src.Piercing&&!src.Striking&&!src.Slashing&&!src.Explode&&!src.Cluster&&src.Area!="Beam")
 							if(!src.Trail)
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX, PY=src.VariationY)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, color_override = FxBlastTint(src))
 							else
-								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX, PY=src.VariationY+src.TrailY)
+								Bang(src.loc, Size=0.5, Offset=0, PX=src.VariationX+src.TrailX+vhb_ax+step_x, PY=src.VariationY+src.TrailY+vhb_ay+step_y, color_override = FxBlastTint(src))
 					endLife()
 				proc
 					Life()
+						if(UsesPixelCollision)
+							return PixelLife()
+						if(beam_owner)
+							return
 						Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
-						while(src.Distance>0)
+						//locked segments must never exit this loop - see projectile_pixel.dm
+						while(src.Distance>0 || (src.clash_lock && !src.clash_lock.ended))
+							if(src.clash_lock)
+								if(src.clash_lock.ended) //struggle over and never cleared us: self-heal
+									src.clash_lock = null
+								else //frozen: hold position, no scans, no walk
+									walk(src, 0)
+									sleep(world.tick_lag) //tick-rate poll: the column resumes together
+									continue
 							if(src.Area=="Beam")
 								src.BeamGraphics()
 							if(src.EdgeOfMapProjectile())
 								Distance=0
 								break
 							if(src.Homing)
-								if(!src.Owner.Target)
+								if(!src.Owner.Target && !forcedTarget)
 									Distance=0
 								if(forcedTarget)
 									Homing = forcedTarget
@@ -6757,10 +7184,8 @@ obj
 							if(src.HyperHoming&&src.Homing||src.HomingCharge&&!src.Homing)
 								if(src.Owner)
 
-									if(src.Owner.Target&&ismob(src.Owner.Target))
-										var/target = src.Owner.Target
-										if(forcedTarget)
-											target = forcedTarget
+									if(forcedTarget || (src.Owner.Target&&ismob(src.Owner.Target)))
+										var/target = forcedTarget ? forcedTarget : src.Owner.Target
 										if(target in view(src.Radius, src))
 											src.Bump(target)
 							else
@@ -6808,9 +7233,9 @@ obj
 									step(src, src.dir)
 								else//for statics
 									src.Distance--
-									if(src.StormFall)
+									if(src.StormFall && !src.storm_dropped)
 										animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
-							if(src.Area=="Beam")
+							if(src.Area=="Beam"&&!src.clash_lock) //a clash formed mid-iteration: no extra step
 								walk(src, src.dir, src.Speed)
 						if(Owner) Owner.active_projectiles -= src
 						ProjectileFinish()
@@ -6818,9 +7243,6 @@ obj
 
 mob
 	proc
-		BeamTurnDir()
-			return
-
 		BeamCharge(var/obj/Skills/Projectile/Z)
 			set waitfor=0
 			src.BeamFiringVolley=0
@@ -6839,6 +7261,7 @@ mob
 			src.icon_state=""
 			src.Beaming=0
 			Z.Charging=0
+			src.BeamsRelease(Z) //V2: the beam detaches and flies on; it is never orphaned
 			if(src.BeamFiringVolley && !src.BeamVolleyHitPlayer && Z.Cooldown > 0 && Z.Area=="Beam")
 				Z.halve_next_cd=1
 			src.BeamFiringVolley=0
@@ -6878,3 +7301,10 @@ obj
 							if(!locate(src.type, get_step(src, turn(src.dir, 180))))
 								src.icon_state="end"
 								src.layer=5
+					if(src.icon_state == "head")
+						if(!src._fx_glowed)
+							src._fx_glowed = 1
+							FxAttachLight(src, null)
+					else if(src._fx_glowed)
+						src._fx_glowed = 0
+						FxDetachLight(src)

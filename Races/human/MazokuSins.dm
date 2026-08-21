@@ -21,8 +21,8 @@ mob
 				mult += ApathyDamageBonus
 
 			// HopeFactor
-			if(passive_handler && passive_handler.Get("HopeFactor") && Health < 50)
-				var/hope_bonus = ((50 - Health) / 40.0) * 3 * passive_handler.Get("HopeFactor")
+			if(passive_handler && passive_handler.Get("HopeFactor") && HealthPct() < 50)
+				var/hope_bonus = ((50 - HealthPct()) / 40.0) * 3 * passive_handler.Get("HopeFactor")
 				mult += hope_bonus
 
 			if(mult < 0)
@@ -48,7 +48,7 @@ mob
 	revertToTrans = 0
 	form_aura_icon = 'Amazing Super Demon Aura.dmi'
 	form_aura_x = -32
-	autoAnger = 1
+	angerFloor = 60
 	strength = 1
 	force = 1
 	speed = 1
@@ -57,7 +57,7 @@ mob
 	endurance = 1
 	transformation_message = "usrName becomes a Devil!"
 	mastery_boons(mob/user)
-		passives = list("GodKi" = 0.25+((user.AscensionsAcquired-3)/10), "HellRisen" = user.AscensionsAcquired/10, "DemonicDurability" = user.AscensionsAcquired/4, "Brutalize" = user.AscensionsAcquired/6, "PureDamage" = user.AscensionsAcquired, "PureReduction" = user.AscensionsAcquired, "MovementMastery" = user.AscensionsAcquired, "BuffMastery"=user.AscensionsAcquired/2)
+		passives = list("GodKi" = 0.25+((user.AscensionsAcquired-3)/10), "HellRisen" = user.AscensionsAcquired/10,   "PureDamage" = user.AscensionsAcquired, "PureReduction" = user.AscensionsAcquired)
 		strength = 1 // to clear out people who already have it
 		force = 1
 		speed = 1
@@ -84,8 +84,8 @@ mob
 		"PureDamage" = 2,\
 		"TensionPowered" = 0.25,\
 		"TechniqueMastery" = 1,\
-		"BuffMastery" = 2,\
-		"Underdog" = 0.3,\
+		\
+		"UnderDog" = 0.3,\
 		"Tenacity" = 2\
 	)
 	transformation_message = "usrName reignites their humanity!"
@@ -111,8 +111,8 @@ mob
 		"HighTension" = -0.125,\
 		"TensionPowered" = 0.375,\
 		"TechniqueMastery" = 1,\
-		"StyleMastery" = 2,\
-		"Underdog" = 0.3,\
+		\
+		"UnderDog" = 0.3,\
 		"Tenacity" = 2\
 	)
 	transformation_message = "usrName hits their original ceiling!"
@@ -141,9 +141,9 @@ mob
 		"PureDamage" = 3,\
 		"TensionPowered" = 0.25,\
 		"TechniqueMastery" = 3,\
-		"StyleMastery" = 2,\
-		"BuffMastery" = 2,\
-		"Underdog" = 0.4,\
+		\
+		\
+		"UnderDog" = 0.4,\
 		"Tenacity" = 3,\
 		"SuperHighTension" = 1\
 	)
@@ -169,9 +169,9 @@ mob
 		"DoubleHelix" = 1,\
 		"TensionPowered" = 0.375,\
 		"TechniqueMastery" = 5,\
-		"StyleMastery" = 2,\
-		"BuffMastery" = 2,\
-		"Underdog" = 1,\
+		\
+		\
+		"UnderDog" = 1,\
 		"Tenacity" = 10,\
 		"SuperHighTension" = 1\
 	)
@@ -222,7 +222,7 @@ mob
 	form_glow_icon = 'Ripple Radiance.dmi'
 	form_glow_x = -32
 	form_glow_y = -32
-	autoAnger = 1
+	angerFloor = 90
 	pot_trans = 15
 	enduranceadd = 2
 	offenseadd = 2
@@ -234,21 +234,21 @@ mob
 		"HighTension" = 0.75,\
 		"TensionPowered" = 1.25,\
 		"TechniqueMastery" = 16,\
-		"BuffMastery" = 14,\
+		\
 		"PureReduction" = 11,\
 		"PureDamage" = 11,\
 		"UnderDog" = 2,\
 		"Tenacity" = 17,\
-		"StyleMastery" = 6,\
+		\
 		"SuperHighTension" = 1,\
 		"DoubleHelix" = 1,\
 		"UnlimitedHighTension" = 1,\
 		"CreateTheHeavens" = 1,\
 		"GodKi" = 1,\
 		"HellRisen" = 1,\
-		"DemonicDurability" = 6,\
-		"Brutalize" = 6,\
-		"MovementMastery" = 6,\
+		\
+		\
+		\
 	)
 	transformation_message = "usrName awakens their Sacred Energy Aura!"
 	transform_animation(mob/user)
@@ -348,11 +348,11 @@ obj/Skills/Queue/Kibou_ou_Hope
 		if(usr.isInMazokuDT())
 			usr << "You cannot use this in Mazoku DT."
 			return
-		if(usr.Health >= 40)
+		if(usr.HealthPct() >= 40)
 			usr << "You cannot use this until your health is low."
 			return
 		var/healthDiff = 0
 		if(usr.Target && istype(usr.Target, /mob/Players) && usr.Target != usr)
-			healthDiff = max(0, usr.Target:Health - usr.Health)
+			healthDiff = max(0, usr.Target:HealthPct() - usr.HealthPct())
 		src.DamageMult = 20 + (healthDiff * 2)
 		usr.SetQueue(src)

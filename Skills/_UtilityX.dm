@@ -8,11 +8,13 @@
 /mob/proc/FullRestore()
 	if(KO)
 		Conscious()
-	Health=100
+	SetHealthPct(100)
 	Energy=EnergyMax
 	ManaAmount=ManaMax*GetManaCapMult()
 	Burn=0
 	Poison=0
+	Bleed=0
+	Frenzy=0
 	Slow=0
 	Shock=0
 	Shatter=0
@@ -34,6 +36,7 @@
 	GatesNerf=0
 
 obj/Skills/Utility
+	canBeShortcut=0 //menu tools
 //General
 
 	Teachz
@@ -41,6 +44,7 @@ obj/Skills/Utility
 		var/LastTeach//holds a realtime
 		verb/Teach()
 			set category="Utility"
+			set hidden = 1
 			set name="Train Student"
 			if(src.Using)
 				return
@@ -77,13 +81,12 @@ obj/Skills/Utility
 					return
 			Choice.RPPSpendable+=(Amount*Choice.GetRPPMult())
 			usr.RPPDonate-=Amount
-			if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-				usr.potential_gain(Amount/glob.progress.RPPDaily*50)//kais have a 0.1 potential rate so this is only x5 potential in reality and i really dont think the fuckers are gonna be out there slaying npcs
 			OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 			Choice.LastTeach=world.realtime+Day(1)
 			src.Using=0
 		verb/Teach_Skill()
 			set category="Utility"
+			set hidden = 1
 			set name="Teach Student"
 			if(src.Using)
 				return
@@ -134,8 +137,6 @@ obj/Skills/Utility
 				if(Choice.SpendRPP((Choice2.SkillCost*0.5/Choice.GetRPPMult()), Choice2, Training=1))
 					Choice.AddSkill( new Choice2.type )
 					usr.RPPDonate-=Choice2.SkillCost*0.5
-					if(usr.isRace(SHINJIN)&&usr.ShinjinAscension=="Kai")
-						usr.potential_gain(Choice2.SkillCost*0.5/glob.progress.RPPDaily*50)//kai only have 0.1 potential rate so this is only x5
 					OMsg(usr, "[usr] passes some of their knowledge to [Choice]!")
 					Choice.LastTeach=world.realtime+Day(1)
 					src.Using=0
@@ -159,6 +160,7 @@ obj/Skills/Utility
 		desc="Cook up a feast!"
 		verb/Cooking()
 			set category="Utility"
+			set hidden = 1
 			var/option = input(usr, "What do you want to do? Your current meal is [currentMeal]", "Cooking") in list("Cook Meal", "Set Current Meal","Make Recipe", "Alter Recipe", "Delete Recipe", "Share Recipe", "Cancel")
 			switch(option)
 				if("Cook Meal")
@@ -171,7 +173,7 @@ obj/Skills/Utility
 					if(src.Using)
 						usr << "You're already preparing a meal!"
 						return
-					if(usr.passive_handler.Get("Piloting")||usr.HasPossessive())
+					if(usr.passive_handler.Get("Piloting"))
 						usr << "You're not capable of necessary precision!"
 						return
 					if(usr.TotalFatigue>=90)
@@ -372,6 +374,7 @@ obj/Skills/Utility
 		var/NonAlcoholic=0
 		verb/Toggle_Alcohol()
 			set category="Utility"
+			set hidden = 1
 			src.NonAlcoholic=!src.NonAlcoholic
 			if(src.NonAlcoholic)
 				usr << "You <font color='red'>WILL NOT</font color> make drinks with alcohol in them!"
@@ -379,6 +382,7 @@ obj/Skills/Utility
 				usr << "You <font color='green'>WILL</font color> make drinks with alcohol in them!"
 		verb/Set_Drink()
 			set category="Utility"
+			set hidden = 1
 			src.suffix=input(usr, "What are you brewing?", "Brewing") as text|null
 			if(src.suffix==null || src.suffix=="")
 				src.suffix="Booze"
@@ -388,10 +392,11 @@ obj/Skills/Utility
 			src.pixel_y=input("Pixel Y?") as num|null
 		verb/Brew_Drink()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing a meal!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -465,12 +470,12 @@ obj/Skills/Utility
 
 	Sense
 		SkillCost=100
-		Teachable=0
 		Level=0
 		Cooldown=5
 		desc="Focus your thoughts to detect nearby entities."
 		verb/Sense()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasRestriction("Senses"))
 				return
 			if(Using) return
@@ -515,6 +520,7 @@ obj/Skills/Utility
 		verb/GodTransformationToggle()
 			set name = "God Form Toggle"
 			set category = "Utility"
+			set hidden = 1
 			if (usr.transActive >= 1)
 				usr << "You can't wield this power while wielding another."
 				return
@@ -563,7 +569,6 @@ obj/Skills/Utility
 								ordered += T
 					usr.race.transformations = ordered
 					usr.removed_ssj_forms.Cut()
-			usr.SkillX("GodTransToggle", usr)
 
 	Telepathy
 		Learn=list("energyreq"=1000)
@@ -573,6 +578,7 @@ obj/Skills/Utility
 		var/anonymous = FALSE
 		verb/Filter_Thoughts()//why was this not a part of telepathy ??
 			set category="Utility"
+			set hidden = 1
 			if(usr.HearThoughts)
 				usr.HearThoughts=0
 				usr << "You toggle thought hearing <font color='red'>OFF</font color>."
@@ -581,6 +587,7 @@ obj/Skills/Utility
 				usr << "You toggle thought hearing <font color='green'>ON</FONT COLOR>."
 		verb/Toggle_Anonymous()
 			set category = "Utility"
+			set hidden = 1
 			if(src.anonymous)
 				src.anonymous=0
 				usr << "You toggle anonymous telepathy <font color='red'>OFF</font color>."
@@ -589,6 +596,7 @@ obj/Skills/Utility
 				usr << "You toggle anonymous telepathy <font color='green'>ON</font color>."
 		verb/Telepathic_Link()
 			set category="Utility"
+			set hidden = 1
 			if(MasteryCheck==0)
 				usr << "Applying race-based increase on your Mastery!"
 				MasteryCheck=1
@@ -611,17 +619,16 @@ obj/Skills/Utility
 					if(A == usr) continue
 					who.Add(A)
 			for(var/mob/Players/W in who)
-				if(!usr.isRace(SHINJIN))
-					if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
-						if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
-							if(!(W in hearers(50,usr)))
-								who.Remove(W)
-						if(!W.EnergySignature)
+				if(!usr.passive_handler.Get("SpiritPower")||Mastery<2)
+					if(!(locate(W.EnergySignature) in usr.EnergySignaturesKnown))
+						if(!(W in hearers(50,usr)))
 							who.Remove(W)
-						if(W.Dead)
-							who.Remove(W)
-					if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					if(!W.EnergySignature)
 						who.Remove(W)
+					if(W.Dead)
+						who.Remove(W)
+				if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
+					who.Remove(W)
 			var/mob/Players/selector=input("Select a player to telepath.") in who||null
 			if(selector=="Cancel")
 				return
@@ -629,11 +636,11 @@ obj/Skills/Utility
 
 	Send_Energy
 		SignatureTechnique=1
-		Teachable=0
 		Level=100
 		desc="Can continually transfer energy to someone at the cost of your own life force."
 		verb/Share_Energy()
 			set category="Utility"
+			set hidden = 1
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in oview(5,usr))
 				who.Add(M)
@@ -655,6 +662,7 @@ obj/Skills/Utility
 		desc="This allows you to heal people you are facing."
 		verb/Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Heal",src)
 	Refresh
 		Cooldown=-1
@@ -662,6 +670,7 @@ obj/Skills/Utility
 		desc="This allows you to heal people you are facing."
 		verb/Heal()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Refresh",src)
 
 	Observe
@@ -671,6 +680,7 @@ obj/Skills/Utility
 		Level=100
 		verb/Observe()
 			set category="Utility"
+			set hidden = 1
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in players)
 				who.Add(M)
@@ -692,8 +702,6 @@ obj/Skills/Utility
 						who.Remove(W)
 				if(W.HasGodKi() && !usr.HasGodKi())
 					who.Remove(W)
-				if(W.HasMaouKi())
-					who.Remove(W)
 				if(W.invisibility)
 					who.Remove(W)
 				if(W.isRace(ELDRITCH)||W.isRace(NOBODY))
@@ -708,15 +716,13 @@ obj/Skills/Utility
 			else
 				if(selector.passive_handler.Get("Anti-Scrying"))
 					var/antiscry = 1
-					if(usr.passive_handler.Get("God's Gaze"))
-						antiscry = 0
-					else if(usr.HasGodKi())
+					if(usr.HasGodKi())
 						if(usr.passive_handler.Get("GodKi") > selector.passive_handler.Get("GodKi"))
 							antiscry = 0
 					if(antiscry)
 						usr << "<b><font color=[selector.Text_Color]><font size=+1>[selector] reflects your attempt at Scrying-- You feel yourself struck with retribution!</b></font color></font size>"
 						selector << "<b>[usr] has attempted to observe you!</b>"
-						usr.DoDamage(usr, 25)
+						usr.DoDamage(usr, usr.PctToHP(25))
 						if (usr.Health <= 0)
 							usr.Unconscious(null, "scrying disruption!")
 						return
@@ -731,6 +737,7 @@ obj/Skills/Utility
 		desc="Rip out your own eye to give to someone else."
 		verb/Bestow_Jagan_Eye()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Maimed)
 				usr << "You are not sufficiently whole to bestow an eye."
 				return
@@ -784,6 +791,7 @@ obj/Skills/Utility
 		desc="Pull a soul out of the cycle of reincarnation."
 		verb/Keep_Body()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("KeepBody", src)
 
 	Travel_To_Plane
@@ -791,7 +799,9 @@ obj/Skills/Utility
 		desc="Warp anywhere without cost."
 		verb/Travel_To_Plane()
 			set category="Utility"
+			set hidden = 1
 			if(usr.Stasis)return
+			if(Using) return
 			var/blah=input("Options")in list("Person","Cordinates","Cancel")
 			switch(blah)
 				if("Person")
@@ -803,6 +813,7 @@ obj/Skills/Utility
 						return
 					for(var/mob/m in view(1, usr))
 						m.loc=whoto.loc
+					src.Cooldown()
 
 				if("Cordinates")
 					var/blahx=input("x")as num
@@ -810,12 +821,15 @@ obj/Skills/Utility
 					var/blahz=input("z")as num
 					for(var/mob/m in view(1, usr))
 						m.loc=locate(blahx+rand(-1,1), blahy+rand(-1,1), blahz)
+					src.Cooldown()
 
 	Bind_To_Plane
 		Cooldown=600
 		desc="Bind someone to a particular plane."
 		verb/Bind_To_Plane()
 			set category="Utility"
+			set hidden = 1
+			if(Using) return
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(3, usr))
 				if(M==usr)
@@ -828,10 +842,13 @@ obj/Skills/Utility
 				Choice.Binding=list(Choice.x,Choice.y,Choice.z)
 				Choice.BindingTimer = Day(3)
 				OMsg(usr, "[usr] has bound [Choice] to this plane of existence!!")
+				src.Cooldown()
 			else
 				usr << "They aren't weak enough to bind!"
 		verb/Call_To_Plane()
 			set category="Skills"
+			set hidden = 1
+			if(Using) return
 			var/list/mob/m=list("Cancel")
 			for(var/mob/M in view(10, usr))
 				if(M.Binding)
@@ -841,12 +858,12 @@ obj/Skills/Utility
 				return
 			OMsg(usr, "[usr] has forced [Choice]'s binding to take them back to their plane!")
 			Choice.TriggerBinding()
+			src.Cooldown()
 
 //Knowledge
 
 	Make_Equipment
 		Level=100
-		Teachable=0
 		desc="Forge a basic blade."
 		proc/getDropDir()
 			var/norSouth = 0
@@ -862,6 +879,7 @@ obj/Skills/Utility
 			return list(eastWest, norSouth)
 		verb/Materialize_Equipment()
 			set category="Utility"
+			set hidden = 1
 			var/Choice=input(usr, "What kind of item will you make?", "Make Sword") in list("Weapon", "Armor", "Weights")
 			if(Choice=="Weapon")
 				if(usr.HasManaCapacity(5))
@@ -908,10 +926,11 @@ obj/Skills/Utility
 					usr.TakeManaCapacity(25)
 					var/obj/Items/WeightedClothing/Weights/w=new
 					w.Cost=0
-					usr.contents+=w
+					usr.GiveOrDrop(w)
 					OMsg(usr, "[usr] creates a set of weighted clothing!", "[usr] materialized some weights.")
 		verb/Clothes_Beam()
 			set category="Skills"
+			set hidden = 1
 			for(var/mob/Target in get_step(usr,usr.dir))
 				var/obj/Items/Wearables/c=new
 				var/Z=input(usr,"Choose an icon for the conjured clothes!","Clothes Beam")as icon|null
@@ -930,525 +949,18 @@ obj/Skills/Utility
 				OMsg(usr, "[usr] conjures clothing!", "[usr] materialized some clothes.")
 	Enchant_Equipment
 		Level=100
-		Teachable=0
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
-		verb/Enchant_Equipment()
-			set category="Utility"
-			var/list/swords=list("Cancel")
-			var/list/staves=list("Cancel")
-			var/list/armors=list("Cancel")
-			var/Chosen
-			if(usr.TotalFatigue>50)
-				usr << "You're too tired to upgrade anything."
-				return
-			if(usr.TotalCapacity>90)
-				usr << "You're too drained to upgrade anything."
-				return
-			for(var/obj/Items/Sword/S in usr.contents)
-				if(!S.suffix)
-					if(!S.LegendaryItem)
-						if(!S.Conjured)
-							swords.Add(S)
-			for(var/obj/Items/Enchantment/Staff/S in usr.contents)
-				if(!S.suffix)
-					if(!S.LegendaryItem)
-						if(!S.Conjured)
-							staves.Add(S)
-			for(var/obj/Items/Armor/A in usr.contents)
-				if(!A.suffix)
-					if(!A.LegendaryItem)
-						if(!A.Conjured)
-							armors.Add(A)
-			var/Type=alert(usr, "What type of equipment do you wish to refine?", "Upgrade Equipment", "Sword", "Staff", "Armor")
-			switch(Type)
-				if("Sword")
-					if(swords.len<2)
-						usr << "You don't have any swords to upgrade!"
-						return
-					Chosen=input("What sword do you wish to upgrade?", "Upgrade Equipment")in swords
-				if("Staff")
-					if(staves.len<2)
-						usr << "You don't have any staves to upgrade!"
-						return
-					Chosen=input("What staff do you wish to upgrade?", "Upgrade Equipment")in staves
-				if("Armor")
-					if(armors.len<2)
-						usr << "You don't have any armors to upgrade!"
-						return
-					Chosen=input("What armor do you wish to upgrade?", "Upgrade Equipment")in armors
-			var/Cost=glob.progress.EconomyCost
-
-			var/list/Upgrades=list("Cancel")
-			if(Type=="Sword"||Type=="Staff")
-				Upgrades.Add("Reinforce") // so it's at the top of the list and also not given to armors
-			if(Type=="Sword"&&Chosen:Class!="Wooden"&&!Chosen:ExtraClass)
-				Upgrades.Add("Refine")
-			Upgrades.Add("Fire")
-			Upgrades.Add("Water")
-			Upgrades.Add("Earth")
-			Upgrades.Add("Wind")
-			Upgrades.Add("Light")
-			Upgrades.Add("Dark")
-			if(Type=="Sword"||Type=="Staff")
-				Upgrades.Add("Poison")
-				Upgrades.Add("Silver")
-				Upgrades.Add("Ultima!?")
-				Upgrades.Add("Ultima (True)")
-			if(Type=="Sword"||Type=="Armor")
-				Upgrades.Add("Magic")
-
-			if(Chosen:HighFrequency>=1)
-				Upgrades.Remove("Fire")
-				Upgrades.Remove("Water")
-				Upgrades.Remove("Earth")
-				Upgrades.Remove("Wind")
-				Upgrades.Remove("Light")
-				Upgrades.Remove("Dark")
-				Upgrades.Remove("Ultima!?")
-				Upgrades.Remove("Ultima (True)")
-				Upgrades.Remove("Poison")
-				Upgrades.Remove("Silver")
-			var/Choice2=input("What type of Enchantment will you apply? Mind, the process is extremely exhausting.") in Upgrades
-			switch(Choice2)
-				//T1
-				if("Reinforce")
-					var/enchantmentType = 5
-					// if they have master crafts left, they can upgrade to 6
-					// if not they can only upgrade to their max enchantment type level
-					// the cost is 5* base and 4 ** ascended
-					if(!usr.MasterCrafts)
-						if(Chosen:Ascended>=5||Chosen:Ascended>round(enchantmentType,1))
-							usr<<"Ascending [Chosen] is beyond your abilities."
-							return
-					if(Chosen:Ascended + 1 > glob.progress.maxAscension && !usr.MasterCrafts)
-						usr<<"Ascending [Chosen] is beyond your abilities."
-						return
-					Cost*=5*(2**Chosen:Ascended)
-
-				//T2
-				if("Poison")
-					Cost*=5
-				if("Silver")
-					Cost*=5
-				//T3
-				if("Dark")
-					Cost*=10
-				if("Light")
-					Cost*=10
-				//T4
-				if("Refine")
-					Cost*=10
-				//T5
-				if("Ultima!?")
-					Cost*=100
-				if("Magic")
-					Cost*=400
-					if(Type=="Armor")
-						Cost*=1.5
-				//T6?!
-				if("Ultima (True)")
-					Cost*=400
-				if("Cancel")
-					return
-			if(!usr.HasMoney(Cost))
-				usr<<"You need at least [Cost] to upgrade equipment!"
-				return
-			if(Choice2!="Cancel")
-				var/Confirm2=alert(usr, "It will cost [Cost] to ascend [Chosen].  Do you wish to ascend the weapon?", "Ascend Weapon", "Yes", "No")
-				switch(Confirm2)
-					if("No")
-						OMsg(usr, "[usr] decided to not ascend [Chosen].")
-						return
-					if("Yes")
-						switch(Choice2)
-							if("Reinforce")
-								usr<<"[Chosen] ascends under your careful effort."
-								Chosen:Ascended++
-								if(usr.MasterCrafts && Chosen:Ascended > 5)
-									usr.MasterCrafts--
-									if(usr.MasterCrafts<0)
-										usr.MasterCrafts=0
-									Chosen:name = "Master Crafted [Chosen:name]"
-									Chosen:name = input(usr, "You have worked tirelessly to create a Mythical grade item, you must name it.") as text
-							if("Fire")
-								usr<<"[Chosen] glows a vibrant red for a few moments, and now feels eternally warm to the touch."
-								Chosen:Element="Fire"
-							if("Wind")
-								usr<<"[Chosen] glows a bright green for a few moments. It feels like wind is slowly swirling around it."
-								Chosen:Element="Wind"
-							if("Earth")
-								usr<<"[Chosen] glows a dull yellow for a few moments. It feels heavier for some reason."
-								Chosen:Element="Earth"
-							if("Water")
-								usr<<"[Chosen] glows a deep blue for a few moments. Moisture seems to gather about [Chosen]."
-								Chosen:Element="Water"
-							if("Poison")
-								usr << "[Chosen] glows with a dark green for a few moments.  It feels nauseating to hold..."
-								Chosen:Element="Poison"
-							if("Silver")
-								usr << "[Chosen] is reforged with a pure silver edge.  It feels heavier and more brittle..."
-								Chosen:Element="Silver"
-								Chosen:ShatterTier+=1
-								if(Chosen:ShatterTier>4)
-									Chosen:ShatterTier=4
-							if("Dark")
-								usr<<"[Chosen] glows a deep purple for a few moments. Grasping [Chosen] seems to fill you with anger..."
-								Chosen:Element="Dark"
-							if("Light")
-								usr<<"[Chosen] glows a bright silver for a few moments. Grasping [Chosen] seems to calm you down..."
-								Chosen:Element="Light"
-							if("Refine")
-								usr<<"[Chosen] has its class traits magnified through steady effort..."
-								Chosen:ExtraClass=1
-							if("Magic")
-								usr<<"[Chosen] has blessed their equipment with magic, turning it into a focus."
-								if(Type=="Sword")
-									Chosen:MagicSword=1
-								if(Type=="Armor")
-									Chosen:MagicArmor=1
-							if("Ultima!?")
-								usr << "[Chosen] glows a chaotic rainbow for a few moments.  Grasping [Chosen] makes you feel unstoppable..."
-								Chosen:Element="Chaos"
-								if(Type=="Sword")
-									usr << "...yet the blade itself seems to become painfully brittle under the powerful infusion..."
-									Chosen:ShatterTier+=rand(1,4)
-									if(Chosen:ShatterTier>4)
-										Chosen:ShatterTier=4
-									Chosen:ShatterMax/=2
-									if(Chosen:ShatterCounter>Chosen:ShatterMax)
-										Chosen:ShatterCounter=Chosen:ShatterMax
-								if(Type=="Staff")
-									usr << "...yet it becomes much harder to properly channel power through it..."
-									Chosen:SpeedEffectiveness/=5//Lower drain mult means higher cost
-							if("Ultima (True)")
-								if(Chosen:Ascended>=5&&!Chosen:Glass)
-									if(Chosen:Element=="Chaos")
-										usr << "[Chosen] glows a flourescent rainbow for a few moments.  Grasping [Chosen] makes you feel like a force of nature..."
-										Chosen:Element="Ultima"
-										Chosen:Destructable=0
-										Chosen:ShatterTier=0
-										Chosen:Ascended=6
-									else
-										usr << "[Chosen] glows a diminished rainbow for a few moments.  Grasping [Chosen] makes you feel somewhat restrained..."
-										Chosen:Element="Chaos"
-								else
-									usr << "[Chosen] cannot handle the strain of power being infused into it and explodes into million pieces!"
-									del Chosen
-							//:o
-						usr.TakeMoney(Cost)
-			if(Choice2 != "Ultima (True)" && Choice2 != "Ultima!?")
-				usr << "You feel exhausted."
-				usr.GainFatigue(50/max(1,usr.ArmamentEnchantmentUnlocked))
-			if(Choice2=="Ultima!?")
-				usr << "You feel physically and mentally drained."
-				usr.GainFatigue(200/max(1,usr.ArmamentEnchantmentUnlocked))
-				usr.LoseCapacity(200/max(1,usr.ArmamentEnchantmentUnlocked))
-			if(Choice2=="Ultima (True)")
-				usr << "You sacrificed part of your soul for the sake of this project..."
-				usr.EconomyMult/=2
-				usr.Intelligence/=2
-				usr.Imagination/=2
-				if(prob(50))
-					for(var/obj/Items/i in usr)
-						i.loc=usr.loc
-					var/obj/Money/m=new
-					m.loc=usr.loc
-					m.Level=usr.GetMoney()
-					usr.TakeMoney(m.Level)
-					usr.NoSoul=1
-					usr.DeathKilled=1
-					usr.Death(null, "sacrificing everything for their final project!!", SuperDead=99)
-			if(Type=="Sword"&&Choice2!="Reinforce"&&Choice2!="Refine")
-				if(Chosen:Class=="Light")
-					Chosen:name="[Chosen:Element] Bastard Sword"
-				if(Chosen:Class=="Medium")
-					Chosen:name="[Chosen:Element] Longsword"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="[Chosen:Element] Greatsword"
-			if(Type=="Sword"&&Choice2=="Refine")
-				if(Chosen:Class=="Light")
-					Chosen:name="Extra-Light Bastard Sword"
-				if(Chosen:Class=="Medium")
-					Chosen:name="Perfectly-Balanced Longsword"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="Ultra-Heavy Greatsword"
-			if(Type=="Staff"&&Choice2!="Reinforce")
-				if(Chosen:Class=="Wand")
-					Chosen:name="[Chosen:Element] Wand"
-				if(Chosen:Class=="Rod")
-					Chosen:name="[Chosen:Element] Rod"
-				if(Chosen:Class=="Staff")
-					Chosen:name="[Chosen:Element] Staff"
-			if(Type=="Armor")
-				if(Chosen:Class=="Light")
-					Chosen:name="[Chosen:Element] Armored Vest"
-				if(Chosen:Class=="Medium")
-					Chosen:name="[Chosen:Element] Standard Armor"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="[Chosen:Element] Plated Armor"
-			Chosen:Update_Description()
+		// verb removed
 	Upgrade_Equipment
 		Level=100
-		Teachable=0
 		desc="A progressive knowledge of fine equipment leads to increasing quality."
-		verb/Upgrade_Equipment()
-			set category="Utility"
-			var/list/swords=list("Cancel")
-			var/list/staves=list("Cancel")
-			var/list/armors=list("Cancel")
-			var/Chosen
-			if(usr.TotalFatigue>50)
-				usr << "You're too tired to upgrade anything."
-				return
-			if(usr.TotalCapacity>90)
-				usr << "You're too drained to upgrade anything."
-				return
-			for(var/obj/Items/Sword/S in usr.contents)
-				if(!S.suffix)
-					if(!S.LegendaryItem)
-						if(!S.Conjured)
-							swords.Add(S)
-			for(var/obj/Items/Enchantment/Staff/S in usr.contents)
-				if(!S.suffix)
-					if(!S.LegendaryItem)
-						if(!S.Conjured)
-							staves.Add(S)
-			for(var/obj/Items/Armor/A in usr.contents)
-				if(!A.suffix)
-					if(!A.LegendaryItem)
-						if(!A.Conjured)
-							armors.Add(A)
-			var/Type=alert(usr, "What type of equipment do you wish to refine?", "Upgrade Equipment", "Sword", "Staff", "Armor")
-			switch(Type)
-				if("Sword")
-					if(swords.len<2)
-						usr << "You don't have any swords to upgrade!"
-						return
-					Chosen=input("What sword do you wish to upgrade?", "Upgrade Equipment")in swords
-				if("Staff")
-					if(staves.len<2)
-						usr << "You don't have any staves to upgrade!"
-						return
-					Chosen=input("What staff do you wish to upgrade?", "Upgrade Equipment")in staves
-				if("Armor")
-					if(armors.len<2)
-						usr << "You don't have any armors to upgrade!"
-						return
-					Chosen=input("What armor do you wish to upgrade?", "Upgrade Equipment")in armors
-			var/Cost=glob.progress.EconomyCost
-
-			var/list/Upgrades=list("Cancel")
-			if(Type=="Sword"||Type=="Staff")//armors don't get reinforced
-				Upgrades.Add("Reinforce")
-			if(usr.ArmamentEnchantmentUnlocked>=4||usr.ForgingUnlocked>=5||"Magical Forging" in usr.knowledgeTracker.learnedMagic||"Modular Weaponry" in usr.knowledgeTracker.learnedKnowledge)
-				if(Type=="Sword"&&Chosen:Class!="Wooden"&&!Chosen:ExtraClass)
-					Upgrades.Add("Refine")
-			if(usr.ArmamentEnchantmentUnlocked>=1||usr.RepairAndConversionUnlocked>=3||"ArmamentEnchantment" in usr.knowledgeTracker.learnedMagic||"Enhancement" in usr.knowledgeTracker.learnedKnowledge)
-				Upgrades.Add("Fire")
-				Upgrades.Add("Water")
-				Upgrades.Add("Earth")
-				Upgrades.Add("Wind")
-			if(usr.ArmamentEnchantmentUnlocked>=2||usr.RepairAndConversionUnlocked>=1||"Door to Darkness" in usr.knowledgeTracker.learnedMagic||"Modular Weaponry" in usr.knowledgeTracker.learnedKnowledge)
-				if(Type=="Sword"||Type=="Staff")
-					Upgrades.Add("Poison")
-					Upgrades.Add("Silver")
-			if(usr.ArmamentEnchantmentUnlocked>=3||"Magical Forging" in usr.knowledgeTracker.learnedMagic)
-				Upgrades.Add("Light")
-				Upgrades.Add("Dark")
-			if(usr.ArmamentEnchantmentUnlocked>=5||"Soul Infusion" in usr.knowledgeTracker.learnedMagic)
-				if(Type=="Sword"||Type=="Staff")
-					Upgrades.Add("Ultima!?")
-			if(usr.ArmamentEnchantmentUnlocked==5&&usr.ForgingUnlocked==5&&usr.RepairAndConversionUnlocked==5&&usr.AlchemyUnlocked==5&&usr.ImprovedAlchemyUnlocked==5&&usr.ToolEnchantmentUnlocked==5)
-				if(Type=="Sword"||Type=="Staff")
-					Upgrades.Add("Ultima (True)")
-			if("Soul Infusion" in usr.knowledgeTracker.learnedMagic)
-				if(Type=="Sword"||Type=="Staff")
-					Upgrades.Add("Ultima (True)")
-			if(Chosen:HighFrequency>=1)
-				Upgrades.Remove("Fire")
-				Upgrades.Remove("Water")
-				Upgrades.Remove("Earth")
-				Upgrades.Remove("Wind")
-				Upgrades.Remove("Light")
-				Upgrades.Remove("Dark")
-				Upgrades.Remove("Ultima!?")
-				Upgrades.Remove("Ultima (True)")
-				Upgrades.Remove("Poison")
-				Upgrades.Remove("Silver")
-			var/Choice2=input("What type of Enchantment will you apply? Mind, the process is extremely exhausting.") in Upgrades
-			switch(Choice2)
-				//T1
-				if("Reinforce")
-					var/enchantmentType = usr.ArmamentEnchantmentUnlocked > usr.ForgingUnlocked ? usr.ArmamentEnchantmentUnlocked : usr.ForgingUnlocked
-					// if they have master crafts left, they can upgrade to 6
-					// if not they can only upgrade to their max enchantment type level
-					// the cost is 5* base and 4 ** ascended
-					if(!usr.MasterCrafts)
-						if(Chosen:Ascended>=5||Chosen:Ascended>round(enchantmentType,1))
-							usr<<"Ascending [Chosen] is beyond your abilities."
-							return
-					if(Chosen:Ascended + 1 > glob.progress.maxAscension && !usr.MasterCrafts)
-						usr<<"Ascending [Chosen] is beyond your abilities."
-						return
-					Cost*=5*(2**Chosen:Ascended)
-
-				//T2
-				if("Poison")
-					Cost*=5
-				if("Silver")
-					Cost*=5
-				//T3
-				if("Dark")
-					Cost*=10
-				if("Light")
-					Cost*=10
-				//T4
-				if("Refine")
-					Cost*=10
-				//T5
-				if("Ultima!?")
-					Cost*=100
-				//T6?!
-				if("Ultima (True)")
-					Cost*=400
-				if("Cancel")
-					return
-			if(!usr.HasMoney(Cost))
-				usr<<"You need at least [Cost] to upgrade equipment!"
-				return
-			if(Choice2!="Cancel")
-				var/Confirm2=alert(usr, "It will cost [Cost] to ascend [Chosen].  Do you wish to ascend the weapon?", "Ascend Weapon", "Yes", "No")
-				switch(Confirm2)
-					if("No")
-						OMsg(usr, "[usr] decided to not ascend [Chosen].")
-						return
-					if("Yes")
-						switch(Choice2)
-							if("Reinforce")
-								usr<<"[Chosen] ascends under your careful effort."
-								Chosen:Ascended++
-								if(usr.MasterCrafts && Chosen:Ascended > 5)
-									usr.MasterCrafts--
-									if(usr.MasterCrafts<0)
-										usr.MasterCrafts=0
-									Chosen:name = "Master Crafted [Chosen:name]"
-									Chosen:name = input(usr, "You have worked tirelessly to create a Mythical grade item, you must name it.") as text
-							if("Fire")
-								usr<<"[Chosen] glows a vibrant red for a few moments, and now feels eternally warm to the touch."
-								Chosen:Element="Fire"
-							if("Wind")
-								usr<<"[Chosen] glows a bright green for a few moments. It feels like wind is slowly swirling around it."
-								Chosen:Element="Wind"
-							if("Earth")
-								usr<<"[Chosen] glows a dull yellow for a few moments. It feels heavier for some reason."
-								Chosen:Element="Earth"
-							if("Water")
-								usr<<"[Chosen] glows a deep blue for a few moments. Moisture seems to gather about [Chosen]."
-								Chosen:Element="Water"
-							if("Poison")
-								usr << "[Chosen] glows with a dark green for a few moments.  It feels nauseating to hold..."
-								Chosen:Element="Poison"
-							if("Silver")
-								usr << "[Chosen] is reforged with a pure silver edge.  It feels heavier and more brittle..."
-								Chosen:Element="Silver"
-								Chosen:ShatterTier+=1
-								if(Chosen:ShatterTier>4)
-									Chosen:ShatterTier=4
-							if("Dark")
-								usr<<"[Chosen] glows a deep purple for a few moments. Grasping [Chosen] seems to fill you with anger..."
-								Chosen:Element="Dark"
-							if("Light")
-								usr<<"[Chosen] glows a bright silver for a few moments. Grasping [Chosen] seems to calm you down..."
-								Chosen:Element="Light"
-							if("Refine")
-								usr<<"[Chosen] has its class traits magnified through steady effort..."
-								Chosen:ExtraClass=1
-							if("Ultima!?")
-								usr << "[Chosen] glows a chaotic rainbow for a few moments.  Grasping [Chosen] makes you feel unstoppable..."
-								Chosen:Element="Chaos"
-								if(Type=="Sword")
-									usr << "...yet the blade itself seems to become painfully brittle under the powerful infusion..."
-									Chosen:ShatterTier+=rand(1,4)
-									if(Chosen:ShatterTier>4)
-										Chosen:ShatterTier=4
-									Chosen:ShatterMax/=2
-									if(Chosen:ShatterCounter>Chosen:ShatterMax)
-										Chosen:ShatterCounter=Chosen:ShatterMax
-								if(Type=="Staff")
-									usr << "...yet it becomes much harder to properly channel power through it..."
-									Chosen:SpeedEffectiveness/=5//Lower drain mult means higher cost
-							if("Ultima (True)")
-								if(Chosen:Ascended>=5&&!Chosen:Glass)
-									if(Chosen:Element=="Chaos")
-										usr << "[Chosen] glows a flourescent rainbow for a few moments.  Grasping [Chosen] makes you feel like a force of nature..."
-										Chosen:Element="Ultima"
-										Chosen:Destructable=0
-										Chosen:ShatterTier=0
-										Chosen:Ascended=6
-									else
-										usr << "[Chosen] glows a diminished rainbow for a few moments.  Grasping [Chosen] makes you feel somewhat restrained..."
-										Chosen:Element="Chaos"
-								else
-									usr << "[Chosen] cannot handle the strain of power being infused into it and explodes into million pieces!"
-									del Chosen
-							//:o
-						usr.TakeMoney(Cost)
-			if(Choice2 != "Ultima (True)" && Choice2 != "Ultima!?")
-				usr << "You feel exhausted."
-				usr.GainFatigue(50/max(1,usr.ArmamentEnchantmentUnlocked))
-			if(Choice2=="Ultima!?")
-				usr << "You feel physically and mentally drained."
-				usr.GainFatigue(200/max(1,usr.ArmamentEnchantmentUnlocked))
-				usr.LoseCapacity(200/max(1,usr.ArmamentEnchantmentUnlocked))
-			if(Choice2=="Ultima (True)")
-				usr << "You sacrificed part of your soul for the sake of this project..."
-				usr.EconomyMult/=2
-				usr.Intelligence/=2
-				usr.Imagination/=2
-				if(prob(50))
-					for(var/obj/Items/i in usr)
-						i.loc=usr.loc
-					var/obj/Money/m=new
-					m.loc=usr.loc
-					m.Level=usr.GetMoney()
-					usr.TakeMoney(m.Level)
-					usr.NoSoul=1
-					usr.DeathKilled=1
-					usr.Death(null, "sacrificing everything for their final project!!", SuperDead=99)
-			if(Type=="Sword"&&Choice2!="Reinforce"&&Choice2!="Refine")
-				if(Chosen:Class=="Light")
-					Chosen:name="[Chosen:Element] Bastard Sword"
-				if(Chosen:Class=="Medium")
-					Chosen:name="[Chosen:Element] Longsword"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="[Chosen:Element] Greatsword"
-			if(Type=="Sword"&&Choice2=="Refine")
-				if(Chosen:Class=="Light")
-					Chosen:name="Extra-Light Bastard Sword"
-				if(Chosen:Class=="Medium")
-					Chosen:name="Perfectly-Balanced Longsword"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="Ultra-Heavy Greatsword"
-			if(Type=="Staff"&&Choice2!="Reinforce")
-				if(Chosen:Class=="Wand")
-					Chosen:name="[Chosen:Element] Wand"
-				if(Chosen:Class=="Rod")
-					Chosen:name="[Chosen:Element] Rod"
-				if(Chosen:Class=="Staff")
-					Chosen:name="[Chosen:Element] Staff"
-			if(Type=="Armor")
-				if(Chosen:Class=="Light")
-					Chosen:name="[Chosen:Element] Armored Vest"
-				if(Chosen:Class=="Medium")
-					Chosen:name="[Chosen:Element] Standard Armor"
-				if(Chosen:Class=="Heavy")
-					Chosen:name="[Chosen:Element] Plated Armor"
-			Chosen:Update_Description()
+		// verb removed
 	Transmute//PHILOSTONES
 		desc="Rip out the mana circuits of an incapacitated individual to forge them into a stone of mana."
 		var/LastTransmute//holds realtime
 		verb/Transmute()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(src.LastTransmute)
@@ -1516,6 +1028,7 @@ obj/Skills/Utility
 	Concoct_Flask
 		verb/Concoct_Flask()
 			set category = "Utility"
+			set hidden = 1
 			var/choice = input(usr, "Choose an option", "Concoct Flask Options") in list("Create New Flask", "Alter Equipped Flask Concoction", "Reset Flask Concoction" ,"Upgrade Existing Flask", "Cancel")
 			if(choice == "Cancel") return
 			if(choice == "Create New Flask")
@@ -1536,7 +1049,7 @@ obj/Skills/Utility
 			else if(P.GetMineral() >= SpecificCost) // If we have enough... (20k)
 				var/obj/Items/Flask/f = new /obj/Items/Flask();
 				f.Slots = P.GetMaxFlaskSlots();
-				P.contents += f;
+				P.GiveOrDrop(f);
 				P << "You have created a new Flask!"
 				P.TakeMineral(SpecificCost) //(20k)
 		// Edits which herbs are set to 1 in the flask object
@@ -1621,8 +1134,81 @@ obj/Skills/Utility
 		// This gives us an Inkwork
 		verb/Bestow_Inkwork()
 			set category = "Utility"
-			var/choice = input(usr, "Choose an Option", "Bestow Inkwork") in list("Cancel")
-			if(choice == "Cancel") return
+			set hidden = 1
+			if (Using == 1) // Guard Rails to prevent people spamming this verb (looks @ jumpy)
+				return
+			else (Using = 1)
+			var/list/Options = list("Cancel") // List of Players we can use this on
+			for(var/mob/Players/P in view(1, usr))
+				Options.Add(P)
+			var/mob/Choice = input(usr, "Choose a Player", "Bestow Inkwork") in Options // The Menu that chooses the player
+			if(Choice == "Cancel") 
+				Using = 0 // If you're not doing anything, set this back to 0
+				return
+			else
+				if(Choice.isRace(ANDROID)) // I'm sorry android players...
+					usr << "This Vessel cannot support Inkworks"
+					Using = 0 
+					return
+				if(Choice.hasSecret("Heavenly Restriction") && Choice.secretDatum?:hasRestriction("Magic"))
+					usr << "This Vessel's Heavenly Restriction rejects your feeble Magic."
+					Using = 0
+					return
+				if(!Choice.CyberCancel == 0)
+					usr << "This Vessel's Mechanical Augments are incompatible with magic."
+					Using = 0
+					return
+				var/inkchoice = input(usr, "Choose an Inkwork to Bestow on [Choice]", "Bestow Inkwork") in usr.InkworksTypes
+				InkworksIfWall(inkchoice, Choice)
+				Using = 0
+
+		proc/InkworksIfWall(inkchoice, mob/Choice) // I hate this I hate this I hate this I hate this
+		// In a mob's inkworksdatum there is a list called Applied, if the inkchoice (which takes from a list tied to knowledgeunlock.dm)
+		// already exists in the mob's specific Applied list, it will return. Otherwise it will add to this list.
+			if (Choice.InkworksDatum.Slots == 0)
+				Using = 0
+				usr << "This Vessel cannot support any more Inkworks."
+				return
+			if (inkchoice in Choice.InkworksDatum.Applied)
+				usr << "This vessel already had this Inkwork applied to them."
+				Using = 0 
+				return
+			if (inkchoice == "Match Girl")
+				Choice.InkworksDatum.Applied = "Match Girl"
+				Choice.InkworksDatum.MatchGirl = 1
+				usr << "The Story of the Match Girl has been successfully inked onto this vessel."
+			if (inkchoice == "Ice Queen")
+				Choice.InkworksDatum.Applied = "Ice Queen"
+				Choice.InkworksDatum.IceQueen = 1
+				usr << "The Story of the Ice Queen has been successfully inked onto this vessel."
+			if(inkchoice == "Erlking")
+				Choice.InkworksDatum.Applied = "Erlking"
+				Choice.InkworksDatum.Erlking = 1
+				usr << "The Story of the Erlking has been successfully inked onto this vessel."
+			if(inkchoice == "Fox Spirit")
+				Choice.InkworksDatum.Applied = "Fox Spirit"
+				Choice.InkworksDatum.Fox = 1
+				usr << "The Fox Spirit has been successfully inked onto this vessel."
+			if(inkchoice == "Bear Spirit")
+				Choice.InkworksDatum.Applied = "Bear Spirit"
+				Choice.InkworksDatum.Bear = 1
+				usr << "The Bear Spirit has been succesfully inked onto this vessel."
+			if(inkchoice == "Wolf Spirit")
+				Choice.InkworksDatum.Applied = "Wolf Spirit"
+				Choice.InkworksDatum.Wolf = 1
+				usr << "The Wolf Spirit has been succesfully inked onto this vessel."
+			if(inkchoice == "Dragon Spirit")
+				Choice.InkworksDatum.Applied = "Dragon Spirit"
+				Choice.InkworksDatum.Dragon = 1
+				usr << "The Dragon Spirit has been successfully inked onto this vessel."
+			if(inkchoice == "Lion Spirit")
+				Choice.InkworksDatum.Applied = "Lion Spirit"
+				Choice.InkworksDatum.Lion = 1
+				usr << "The Lion Spirit has been succesfully inked onto this vessel" 
+				// The Lion does concern himself with inkworks
+			Choice.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Inscribed_Ink)
+			Choice.InkworksDatum.calculateSlots()
+			return
 
 // 	Summon_Spirit
 // 		desc="Summon a spirit!  Doesn't work on those with contracts already established."
@@ -1778,6 +1364,7 @@ obj/Skills/Utility
 		desc="Seal a turf so that only you can move through it!"
 		verb/Seal_Turf()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1809,6 +1396,7 @@ obj/Skills/Utility
 		desc="Seal an object so that only you can harm or pick it up!"
 		verb/Seal_Object()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1851,6 +1439,7 @@ obj/Skills/Utility
 		desc="Seal a fallen foe's power!!"
 		verb/Seal_Power()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1907,6 +1496,7 @@ obj/Skills/Utility
 		desc="Seal a fallen foe's ability to leave a particular area!"
 		verb/Seal_Movement()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1973,6 +1563,7 @@ obj/Skills/Utility
 		desc="Crystalize an absolute order in form of a Seal! They'll provide additional options of interacting with your contracts."
 		verb/Crystalize_Command_Seal()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -1998,6 +1589,7 @@ obj/Skills/Utility
 		desc="Test your imagination, intelligence, and ability at seal magic against an existing seal to try to break it!"
 		verb/Seal_Break()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2047,6 +1639,7 @@ obj/Skills/Utility
 		desc="Deployment of a magical circle which will cut all capacity costs by 25%."
 		verb/Create_Magic_Circle()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2064,6 +1657,7 @@ obj/Skills/Utility
 		desc="Forge a collection of magical circuits that can be passed down and teaches the skills possessed within it."
 		verb/Create_Magic_Crest()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(usr.EquippedCrest())
@@ -2091,6 +1685,7 @@ obj/Skills/Utility
 			PortalID//this will determine where it leads to...
 		verb/Pocket_Dimension()
 			set category="Utility"
+			set hidden = 1
 			if(usr.KO)return
 			if(usr.InMagitekRestrictedRegion())
 				usr << "The pocket dimensons refuses to function."
@@ -2110,6 +1705,7 @@ obj/Skills/Utility
 		var/Operating//Don't spam this.
 		verb/Grimoire_Arcana()
 			set category="Utility"
+			set hidden = 1
 			var/Economy=glob.progress.EconomyMana//Now based on MANA!
 			var/mob/M//Who's getting the grimgrim?
 			var/GrimoireChoice//What grim is m getting grimmed?
@@ -2586,6 +2182,7 @@ obj/Skills/Utility
 		desc="Smelt an item to refund 50% of its cost."
 		verb/Recycle_Items()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -2627,6 +2224,7 @@ obj/Skills/Utility
 		verb
 			Copy_Key()
 				set category="Utility"
+				set hidden = 1
 				var/obj/Items/Choice
 				var/Confirm
 				var/Cost
@@ -2671,17 +2269,17 @@ obj/Skills/Utility
 
 				var/obj/Items/Tech/Door_Pass/kc=new
 				kc.Password=Choice.Password
-				usr.contents+=kc
+				usr.GiveOrDrop(kc)
 
 	Reforge
 		var/Repairing//Don't spam this.
 		verb
 			Reforge()
 				set category="Utility"
+				set hidden = 1
 				var/obj/Items/Choice
 				var/Confirm
 				var/Cost
-				var/CostMultiplier=1
 
 				if(src.Repairing)
 					usr << "You're already using this."
@@ -2736,51 +2334,21 @@ obj/Skills/Utility
 					src.Repairing=0
 					return
 
-				Cost=0.5*Technology_Price(usr,Choice)
+				Cost=ReforgeCostFor(usr,Choice)
 
-				if(Category=="Staff")
-					Cost/=100
-
-				if(Choice:Element)
-					if(Choice:Element=="Silver"||Choice:Element=="Poison")
-						CostMultiplier*=5
-					if(Choice:Element=="Dark"||Choice:Element=="Light")
-						CostMultiplier*=10
-					if(Choice:Element=="Chaos")
-						CostMultiplier*=15
-					if(Choice:Element=="Ultima")
-						CostMultiplier*=30
-
-				if(Choice:ExtraClass)
-					if(CostMultiplier>1)
-						CostMultiplier+=10
-					else
-						CostMultiplier+=9
-
-				if(Choice:Ascended)
-					if(CostMultiplier>1)
-						CostMultiplier+=3*(4**Choice:Ascended)
-					else
-						CostMultiplier+=(3*(4**Choice:Ascended))-1
-
-				if(usr.ArmamentEnchantmentUnlocked)
-					Cost/=max(usr.RepairAndConversionUnlocked+usr.ForgingUnlocked,1)
-				if(Choice:Glass&&Choice:HighFrequency)
-					Cost*=50
-
-				Confirm=alert(usr, "It will cost [Commas(Cost*CostMultiplier)] to repair [Choice].  Do you wish to repair the [Category]?", "Reforge", "No", "Yes")
+				Confirm=alert(usr, "It will cost [Commas(Cost)] to repair [Choice].  Do you wish to repair the [Category]?  (Smiths can repair cheaper at an anvil.)", "Reforge", "No", "Yes")
 
 				if(Confirm=="No")
 					src.Repairing=0
 					return
 
 				for(var/obj/Money/m in usr)
-					if(m.Level<Cost*CostMultiplier)
-						usr << "You don't have enough money to reforge [Choice]. ([Commas(m.Level)] / [Commas(Cost*CostMultiplier)])"
+					if(m.Level<Cost)
+						usr << "You don't have enough money to reforge [Choice]. ([Commas(m.Level)] / [Commas(Cost)])"
 						src.Repairing=0
 						return
 					else
-						m.Level-=Cost*CostMultiplier
+						m.Level-=Cost
 
 				Choice:ShatterCounter=Choice:ShatterMax
 				Choice:Broken=0
@@ -2794,13 +2362,14 @@ obj/Skills/Utility
 		var/Cost
 		verb/Surgery()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing to perform surgery!"
 				return
 			if(usr.KO)
 				usr << "You can't perform surgery while knocked out!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2851,10 +2420,11 @@ obj/Skills/Utility
 		var/Cost
 		verb/Revival_Protocol()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				usr << "You're already preparing to perform the recovery!"
 				return
-			if(usr.HasPiloting()||usr.HasPossessive())
+			if(usr.HasPiloting())
 				usr << "You're not capable of necessary precision!"
 				return
 			if(usr.TotalFatigue>=90)
@@ -2975,6 +2545,7 @@ obj/Skills/Utility
 
 		verb/Toggle_Internal_Scouter()
 			set category="Utility"
+			set hidden = 1
 			if(usr.InternalScouter)
 				usr.InternalScouter=0
 				usr << "You deactivate your internal scouter."
@@ -2983,6 +2554,7 @@ obj/Skills/Utility
 				usr << "You activate your internal scouter."
 		verb/CommunicatorTransmit(A as text)
 			set category="Utility"
+			set hidden = 1
 			set name="Communicator Transmit"
 			set src in usr
 			if(usr.CheckSlotless("Camouflage"))
@@ -3038,6 +2610,7 @@ obj/Skills/Utility
 									break
 		verb/ICFrequency()
 			set category="Utility"
+			set hidden = 1
 			set name="Communicator Frequency"
 			set src in usr
 			var/previousFreq = src.ICFrequency
@@ -3050,6 +2623,7 @@ obj/Skills/Utility
 				addToGlobalListenerOnFreq(src, newFreq)
 		verb/MonitorFrequency()
 			set category="Utility"
+			set hidden = 1
 			set name="Monitoring Frequency"
 			set src in usr
 			var/previousFreq = src.MonitoringFrequency
@@ -3083,6 +2657,7 @@ obj/Skills/Utility
 		desc="Look someone over for wiretaps and remove them if desired."
 		verb/Scan(var/mob/Players/p in view(1,usr))
 			set category="Utility"
+			set hidden = 1
 			var/found=0
 			for(var/obj/Items/Tech/Planted_Wiretap/t in p)
 				if(t.Revealed<=0)
@@ -3108,6 +2683,7 @@ obj/Skills/Utility
 		var/list/ZPlanes=list()
 		verb/Satellite_Network()
 			set category="Utility"
+			set hidden = 1
 			usr << "Not this wipe, chief."
 			return
 			var/list/Choices=list("Cancel", "Launch", "Track")
@@ -3159,6 +2735,7 @@ obj/Skills/Utility
 		desc="Integrate gear into yourself!"
 		verb/Android_Integration()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				return
 			if(usr.GetAndroidIntegrated()<3+usr.AscensionsAcquired)
@@ -3239,6 +2816,7 @@ obj/Skills/Utility
 		desc="Modify your metal babies."
 		verb/Augmentation()
 			set category="Utility"
+			set hidden = 1
 
 			if(usr.Secret=="Heavenly Restriction" && (usr.secretDatum?:hasRestriction("Science") || usr.secretDatum?:hasRestriction("Cybernetics")))
 				return
@@ -3396,7 +2974,6 @@ obj/Skills/Utility
 				ModChoices.Remove("Armstrong Augmentation")
 				ModChoices.Remove("Ray Gear")
 				ModChoices.Remove("Hilbert Effect")
-				ModChoices.Remove("Overdrive")
 
 			if(M.isRace(ANDROID)||M.CyberneticMainframe)
 				if(M.Maimed||M.HealthCut)
@@ -3808,10 +3385,9 @@ obj/Skills/Utility
 		desc="Call for assistance of your Zodiacal guardian."
 		verb/Zodiac_Invocation()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.ClothGold)
 				usr.PickGoldCloth()
-				if(!glob.infConstellations)
-					glob.takeLimited("GoldConstellation", usr.ClothGold)
 			if(!usr.ZodiacCharges)
 				usr<<"You have no charges of Zodiac Invocation left!"
 				return
@@ -3833,11 +3409,13 @@ obj/Skills/Utility
 		desc="Return your legendary blade to where it belongs."
 		verb/Call_Blade()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.BoundLegend)
 				return
 			if(usr.Dead && !usr.KeepBody)
 				usr << "You cannot call blade while dead."
 				return
+			if(Using) return
 			switch(usr.BoundLegend)
 				if("Green Dragon Crescent Blade")
 					if(!locate(/obj/Items/Sword/Heavy/Legendary/WeaponSoul/Spear_of_War, usr))
@@ -3912,11 +3490,13 @@ obj/Skills/Utility
 								usr.contents+=S
 								break
 			OMsg(usr, "[usr] summons forth their legendary blade!")
+			src.Cooldown()
 
 	Death_Killer
 		desc="Kill death."
 		verb/Death_Killer()
 			set category="Utility"
+			set hidden = 1
 			if(src.Using)
 				src << "You're already killing death."
 				return
@@ -3969,144 +3549,3 @@ obj/Skills/Utility
 						del b
 			src.Using=0
 
-
-	Necromancy
-		desc="Commune with the dead."
-		var/PenaltyCD//holds a realtime
-		verb/Bind_Soul()
-			set category="Utility"
-			if(src.Using)
-				return
-			if(!usr.Move_Requirements()||usr.KO)
-				return
-			src.Using=1
-			var/list/mob/Players/Options=list("Cancel")
-			for(var/mob/Players/P in players)
-				if(P.Dead&&!P.SummonContract&&!locate(/obj/Skills/Soul_Contract, P)&&P.z==glob.DEATH_LOCATION[3]&&P!=usr)
-					Options.Add(P)
-			if(Options.len<1)
-				usr << "There are no available souls to invoke!"
-				src.Using=0
-				return
-			//var/Cost=0.75*global.EconomyMana//75 capacity
-			var/Cost=0.25*glob.progress.EconomyMana
-
-			if(!usr.HasManaCapacity(Cost))
-				usr << "You don't have enough capacity to summon a spirit!  It takes [Commas(Cost)] capacity."
-				src.Using=0
-				return
-			var/mob/Players/Choice=input(usr, "What soul do you want to bind?  They won't necessarily be friendly!", "Bind Soul") in Options
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-
-			if(Choice.z != src.z)
-				switch(input(usr, "Bind this soul will cost [Cost] mana. Are you sure you want to do it?", "Bind Soul") in list("Yes","No"))
-					if("No")
-						src.Using=0
-						return
-			var/FailChance=20*((Choice.Power*Choice.EnergyUniqueness)/(usr.Power*usr.EnergyUniqueness))/(usr.SummoningMagicUnlocked+1)
-
-			usr.TakeManaCapacity(Cost)
-			if(prob(FailChance)&&!usr.passive_handler.Get("SpiritPower"))
-				OMsg(usr, "[usr] fails their ritual!")
-				src.Using=0
-				return
-			else
-				Choice.PrevX=Choice.x
-				Choice.PrevY=Choice.y
-				Choice.PrevZ=Choice.z
-				Choice.loc=locate(usr.x, usr.y-1, usr.z)
-				OMsg(usr, "[usr] summons forth a dead soul!")
-				spawn()
-					LightningBolt(Choice,3)
-				Choice.SummonReturnTimer=RawDays(1)
-				Choice.Password=usr.ckey
-				if(!Choice.SummonContract)
-					Choice.SummonContract=1
-				src.Using=0
-				return
-		verb/Raise_Dead()
-			set category="Utility"
-			if(src.Using)
-				src << "You're already raising the dead."
-				return
-			if(!usr.Move_Requirements()||usr.KO)
-				return
-			src.Using=1
-			var/list/valid=list("Cancel")
-			var/list/Bodies=list()
-			var/list/Souls=list()
-			for(var/mob/Body/m in view(usr, 3))
-				if(m.TrulyDead)
-					Bodies+=m
-			for(var/mob/m in players)
-				if(m.Dead&&m!=usr)
-					Souls+=m
-			for(var/mob/m in Souls)
-				for(var/mob/Body/b in Bodies)
-					if(b.DeathKillerTargets==m.key)
-						valid+=m
-			if(valid.len <= 1)
-				usr << "The bodies present don't belong to any wandering soul..."
-				src.Using=0
-				return
-			var/mob/Choice=input(usr, "You can raise these people as zombies.", "Necromancy") in valid
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			Choice.Dead=0
-			for(var/mob/Body/b in view(usr, 3))
-				if(b.DeathKillerTargets==Choice.key)
-					b.Unholy_Alive(Choice)
-			Choice.Password=usr.ckey
-			OMsg(usr, "[usr] raises [Choice] as a loyal zombie!")
-			src.Using=0
-		verb/Drop_Dead()
-			set category="Utility"
-			if(src.Using)
-				src << "You're already punishing your servants."
-				return
-			if(!usr.Move_Requirements()||usr.KO)
-				return
-			src.Using=1
-			var/list/Zombies=list("Cancel")
-			for(var/mob/m in view(usr, 10))
-				if((m.Secret=="Zombie"&&!m.KO))
-					Zombies+=m
-				if(m.Dead)
-					Zombies+=m
-			if(Zombies.len <= 1)
-				usr << "There are no undead to punish."
-				src.Using=0
-				return
-			var/mob/Choice=input(usr, "You can punish these undead.", "Necromancy") in Zombies
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			OMsg(usr, "[usr] focuses their necrotic energy to punish [Choice]!")
-			sleep(10)
-			if(Choice.Secret=="Zombie"&&Choice.Password==usr.ckey)
-				if(!Choice.HasEnlightenment())
-					Choice.Unconscious(usr)
-					OMsg(usr, "[usr] punishes [Choice] with further degeneration!")
-				else
-					OMsg(usr, "[usr] is unable to punish [Choice]!")
-			else if(Choice.Dead&&Choice.Password==usr.ckey)
-				if(!Choice.HasEnlightenment())
-					Choice.SummonReturnTimer=1
-					OMsg(usr, "[usr] severs the [Choice]'s binding with the physical world!")
-				else
-					OMsg(usr, "[usr] is unable to punish [Choice]!")
-			else
-				if(!Choice.HasEnlightenment())
-					if(world.realtime<src.PenaltyCD)
-						usr << "It's too soon to use this!  ([round(src.PenaltyCD-world.realtime/Hour(1), 0.1)] hours)"
-						src.Using=0
-						return
-					Choice.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Disturbed)
-					OMsg(usr, "[usr] disturbs the necrotic energies animating [Choice]!")
-					src.PenaltyCD=world.realtime+Hour(1)
-				else
-					OMsg(usr, "[usr] is unable to punish [Choice]!")
-			src.Using=0

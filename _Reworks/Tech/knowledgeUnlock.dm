@@ -36,7 +36,6 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			CyberEngineeringUnlocked=0
 		if("Engineering")
 			EngineeringUnlocked=0
-			ForgingUnlocked--
 		if("MilitaryTechnology")
 			MilitaryTechnologyUnlocked=0
 		if("AdvancedTransmissionTechnology")
@@ -49,25 +48,8 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			ImprovedMedicalTechnologyUnlocked=0
 			for(var/obj/Skills/Utility/Surgery/s in src)
 				del s
-		if("Repair")
-			RepairAndConversionUnlocked=0
-			for(var/obj/Skills/Utility/Reforge/r in src)
-				del r
 		if("MilitaryEngineering")
 			MilitaryEngineeringUnlocked=0
-			ForgingUnlocked--
-		if("Forge")
-			ForgingUnlocked--
-		if("Enhancement")
-			for(var/obj/Skills/Utility/Upgrade_Equipment/ue in src)
-				del ue
-				ForgingUnlocked--
-		if("Locksmithing")
-			for(var/obj/Skills/Utility/Copy_Key/ck in src)
-				del ck
-		if("Smelting")
-			for(var/obj/Skills/Utility/Smelt/s in src)
-				del s
 		if("Cyber Augmentations")
 			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
 				del ca
@@ -85,7 +67,14 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 
 /mob/verb/learnTech()
 	set category = "Utility"
+	set hidden = 1
 	set name = "Technology"
+	// Now opens the node-based Tech menu
+	if(length(TechnologyTree) < 1)
+		fillOutTechTree()
+	if(client)
+		client.OpenTechMenu("tree")
+	return
 	var/int = Intelligence
 	if(passive_handler["Spiritual Tactician"])
 		if(Imagination > Intelligence)
@@ -180,24 +169,19 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		// ENHANCEMENT SHIT //
 		if("ArmamentEnchantment")
 			ArmamentEnchantmentUnlocked=1
-			if(!locate(/obj/Skills/Utility/Upgrade_Equipment, src))
-				src << "You learn the Upgrade Equipment skill, which can enchant swords and staves!"
-				src.AddSkill(new/obj/Skills/Utility/Upgrade_Equipment)
-			src<< "You learn how to enchant weapons with fire, water, wind or earth elements and reinforce their basic functions!"
+			src<< "You learn how to enchant weapons with fire, water, wind or earth elements and reinforce their basic functions! <font color=#8d99a8>(Enchanting is dormant until the Thaumaturgy update.)</font>"
 		if("Coating Enchantment")
 			ArmamentEnchantmentUnlocked=2
-			src << "You learn how to coat weapons with poison or pure silver!"
+			src << "You learn how to coat weapons with poison or pure silver! <font color=#8d99a8>(Enchanting is dormant until the Thaumaturgy update.)</font>"
 		if("Door to Darkness")
 			ArmamentEnchantmentUnlocked=3
-			src << "You learn how to enchant weapons with pacifying light or enraging darkness and ascend the weapons into unique status!"
+			src << "You learn how to enchant weapons with pacifying light or enraging darkness and ascend the weapons into unique status! <font color=#8d99a8>(Enchanting is dormant until the Thaumaturgy rework.)</font>"
 		if("Magical Forging")
 			ArmamentEnchantmentUnlocked=4
-			src << "You learn how to magnify the traits of a weapon class with magic!"
+			src << "You learn how to magnify the traits of a weapon class with magic! <font color=#8d99a8>(Enchanting is dormant until the Thaumaturgy update.)</font>"
 		if("Soul Infusion")
 			ArmamentEnchantmentUnlocked=5
-			src << "You learn how to enchant weapons with the forces of chaos and make them rival arms of legend!"
-			if(!locate(/obj/Skills/Utility/Enchant_Equipment, src))
-				src.AddSkill(new/obj/Skills/Utility/Enchant_Equipment)
+			src << "You learn how to enchant weapons with the forces of chaos and make them rival arms of legend! <font color=#8d99a8>(Enchanting is dormant until the Thaumaturgy update.)</font>"
 		// END ENHANCEMENT SHIT //
 		// TOME START //
 		if("TomeCreation")
@@ -291,13 +275,28 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			TimeMagicUnlocked++
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds, src))
 				src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Reverse_Wounds)
-
+		// CREST END // 
+		// INKWORKS START //
+		if("Inkworks")
+			InkworksDatum.Tier = 0 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+			src.contents += new /obj/Skills/Utility/Bestow_Inkwork
+		if("Advanced Inkworks")
+			InkworksDatum.Tier = 1 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Master Inkworks")
+			InkworksDatum.Tier = 2 // Sets your tier
+			InkworksDatum.calculateSlots() // Updates the Slots variable in the datum
+		if("Tales of The Living")
+			InkworksTypes.Add("Match Girl", "Ice Queen", "Erlking")
+		if("Tales of The Spirits")
+			InkworksTypes.Add("Fox Spirit", "Bear Spirit", "Wolf Spirit", "Dragon Spirit", "Lion Spirit")
+		// INKWORKS END //
 		// TECH SHIT //
 		if("CyberEngineering")
 			CyberEngineeringUnlocked=1
 		if("Engineering")
 			EngineeringUnlocked=1
-			ForgingUnlocked++
 		if("MilitaryTechnology")
 			MilitaryTechnologyUnlocked=1
 		if("AdvancedTransmissionTechnology")
@@ -311,30 +310,9 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			if(!locate(/obj/Skills/Utility/Surgery, src))
 				src.AddSkill(new/obj/Skills/Utility/Surgery)
 				src << "You learn how to treat crippling long-term injuries!"
-		if("Repair")
-			RepairAndConversionUnlocked=1
-			if(!locate(/obj/Skills/Utility/Reforge, src))
-				src.AddSkill(new/obj/Skills/Utility/Reforge)
-				src << "You learn how to reforge weapons, armor, and staves!"
 		if("MilitaryEngineering")
 			MilitaryEngineeringUnlocked=1
-			ForgingUnlocked++
-
-		if("Forge")
-			ForgingUnlocked++
-		if("Enhancement")
-			if(!locate(/obj/Skills/Utility/Upgrade_Equipment, src))
-				src.AddSkill(new/obj/Skills/Utility/Upgrade_Equipment)
-				src << "You learn the Upgrade Equipment skill, enhance Weapons and Armor!"
-				ForgingUnlocked++
-		if("Locksmithing")
-			if(!locate(/obj/Skills/Utility/Copy_Key, src))
-				src.AddSkill(new/obj/Skills/Utility/Copy_Key)
-				src << "You learn how to make identical copies of keys!"
-		if("Smelting")
-			if(!locate(/obj/Skills/Utility/Smelt, src))
-				src.AddSkill(new/obj/Skills/Utility/Smelt)
-				src << "You learn how to smelt tech items down for a return of 50% of their cost!"
+		// Repair/Forge/Enhancement/Locksmithing/Smelting grants live in Smithing ranks now
 		if("Cyber Augmentations")
 			src.AddSkill(new/obj/Skills/Utility/Cybernetic_Augmentation)
 			src << "You learn how to operate with cybernetics!"
@@ -536,7 +514,6 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			CyberEngineeringUnlocked--
 		if("Engineering")
 			EngineeringUnlocked--
-			ForgingUnlocked--
 		if("MilitaryTechnology")
 			MilitaryTechnologyUnlocked--
 		if("AdvancedTransmissionTechnology")
@@ -550,30 +527,8 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			if(locate(/obj/Skills/Utility/Surgery, src))
 				for(var/obj/Skills/Utility/Surgery/s in src)
 					del s
-		if("Repair")
-			RepairAndConversionUnlocked--
-			if(locate(/obj/Skills/Utility/Reforge, src))
-				for(var/obj/Skills/Utility/Reforge/r in src)
-					del r
 		if("MilitaryEngineering")
 			MilitaryEngineeringUnlocked--
-			ForgingUnlocked--
-		if("Forge")
-			ForgingUnlocked--
-		if("Enhancement")
-			if(locate(/obj/Skills/Utility/Upgrade_Equipment, src))
-				for(var/obj/Skills/Utility/Upgrade_Equipment/ue in src)
-					del ue
-
-				ForgingUnlocked--
-		if("Locksmithing")
-			if(locate(/obj/Skills/Utility/Copy_Key, src))
-				for(var/obj/Skills/Utility/Copy_Key/ck in src)
-					del ck
-		if("Smelting")
-			if(locate(/obj/Skills/Utility/Smelt, src))
-				for(var/obj/Skills/Utility/Smelt/sm in src)
-					del sm
 		if("Cyber Augmentations")
 			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
 				del ca

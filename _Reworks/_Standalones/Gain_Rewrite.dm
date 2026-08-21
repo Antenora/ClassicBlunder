@@ -37,7 +37,7 @@
 			HandleBuffDeactivation(source)
 			return
 
-	if (TooMuchHealth && source.Health >= TooMuchHealth)
+	if (TooMuchHealth && source.HealthPct() >= TooMuchHealth)
 		HandleBuffDeactivation(source)
 		return
 
@@ -65,9 +65,9 @@
 	if (drain)
 		switch(drainType)
 			if("Health")
-				target.DoDamage(target, TrueDamage(HealthDrain))
+				target.DoDamage(target, target.PctToHP(TrueDamage(HealthDrain)))
 			if ("Wound")
-				target.DoDamage(target, TrueDamage(drain))
+				target.DoDamage(target, target.PctToHP(TrueDamage(drain)))
 			if ("Energy")
 				target.LoseEnergy(drain)
 			if ("Fatigue")
@@ -78,7 +78,7 @@
 				target.LoseMana(drain)
 	switch(drainType)
 		if("Health")
-			currentValue = target.Health + target.TotalInjury
+			currentValue = target.HealthPct() + target.TotalInjury
 		if ("Wound")
 			currentValue = target.TotalInjury
 			flipsign = TRUE
@@ -116,7 +116,7 @@
 	if (CapacityHeal)
 		target.HealCapacity(CapacityHeal / 10)
 	if (HealthHeal)
-		var/healTarget = (target.Health + target.TotalInjury >= 100 || (target.TotalInjury && target.icon_state == "Meditate"))
+		var/healTarget = (target.HealthPct() + target.TotalInjury >= 100 || (target.TotalInjury && target.icon_state == "Meditate"))
 		if (healTarget)
 			target.HealWounds(HealthHeal / 10)
 		else
@@ -190,19 +190,6 @@
 
 turf/proc/GainLoop(mob/source)
 	if(effectApplied)
-		switch(effectApplied)
-			if("Stellar")
-				if(!source.passive_handler.Get("Constellation"))
-				// start draining or somethin
-					if(source.Energy > 1)
-						source.Energy -= 0.015
-					if(source.TotalFatigue < 99)
-						source.TotalFatigue += 0.015
-				else
-					if(source.Energy < 99)
-						source.Energy += 0.015
-					if(source.TotalFatigue > 0)
-						source.TotalFatigue -= 0.015
 		if(isdatum(effectApplied))
 			if((istype(effectApplied, /datum/DemonRacials)))
 				if(source != ownerOfEffect)
@@ -247,7 +234,7 @@ mob/proc/loseOxygen(mult = 1)
 			src.LoseEnergy(2.0)
 			if(src.TotalFatigue>=95)
 				src.DamageSelf(TrueDamage(0.1))
-				if(src.Health<-300)
+				if(src.Health < -3*src.MaxHP())
 					if(prob(20)&&!src.StabilizeModule)
 						src.Death(null,"oxygen deprivation!")
 	else if(BreathingMaskOn)
@@ -261,11 +248,19 @@ mob/proc/loseOxygen(mult = 1)
 			src.LoseEnergy(2)
 			if(src.TotalFatigue>=95)
 				src.DamageSelf(TrueDamage(0.1))
-				if(src.Health<-300)
+				if(src.Health < -3*src.MaxHP())
 					if(prob(20)&&!src.StabilizeModule)
 						src.Death(null,"oxygen deprivation!")
 
 mob/proc/Swim()
+	var/turf/water_turf = GfxGroundTurf(src)
+	if(!water_turf) return
+	if(!(water_turf.Deluged || istype(water_turf,/turf/Waters) || istype(water_turf,/turf/Special/Ichor_Water) || istype(water_turf,/turf/Special/Midgar_Ichor)))
+		if(src.Swim)
+			src.RemoveWaterOverlay()
+			src.Swim = 0
+			if(isplayer(src)) src:move_speed = MovementSpeed()
+		return
 	var/IgnoresWater=0
 	var/BreathingMaskOn = 0
 	if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,WILDER))
@@ -291,60 +286,60 @@ mob/proc/Swim()
 			if((src.PoseEnhancement&&!src.Flying&&!(passive_handler.Get("Skimming"))+is_dashing))
 				src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 	if(!IgnoresWater)
-		if(istype(loc,/turf/Waters/Water7))
-			if(!HasWalkThroughHell())
-				if(!isRace(DEMON)&&!GetHellPower())
-					AddBurn(10)
+		if(istype(water_turf,/turf/Waters/Water7))
+			if(!src.HasWalkThroughHell())
+				if(!isRace(DEMON)&&!src.GetHellPower())
+					src.AddBurn(10)
 		else
 			if(src.Burn)
 				src.Burn-=(src.Burn/2)
 				if(src.Burn<0)
 					src.Burn=0
-		if(istype(loc,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Ichor_Water) && !src.HasVenomImmune())
 			src.AddPoison(2)
-		if(istype(loc,/turf/Waters/WaterD) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Waters/WaterD) && !src.HasVenomImmune())
 			src.AddPoison(2)
-		if(istype(loc,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Midgar_Ichor) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/Midgar_IchorWall) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorW) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorE) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorN) && !src.HasVenomImmune())
 			src.AddPoison(1)
-		if(istype(loc,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
+		if(istype(water_turf,/turf/Special/MidgarIchorS) && !src.HasVenomImmune())
 			src.AddPoison(1)
 		if(Swim==0)
 			src.RemoveWaterOverlay()
 			spawn()
-				if(loc:Deluged)
+				if(water_turf.Deluged)
 					src.overlays+=image('WaterOverlay.dmi',"Deluged")
-					var/mob/p = loc:ownerOfEffect
+					var/mob/p = water_turf.ownerOfEffect
 					if(p!= src)
 
 						src.AddSlow(1 + (0.5 * p.AscensionsAcquired))
 						src.AddShock(1 + (0.5 * p.AscensionsAcquired))
 				else if(src.PoseEnhancement&&src.Secret=="Hamon")
 					src.underlays+=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
-				else if(loc.type==/turf/Waters/Water7/LavaTile)
+				else if(water_turf.type==/turf/Waters/Water7/LavaTile)
 					src.overlays+=image('LavaTileOverlay.dmi')
 				else
-					src.overlays+=image('WaterOverlay.dmi',"[loc.icon_state]")
+					src.overlays+=image('WaterOverlay.dmi',"[water_turf.icon_state]")
 		if(!Swim)
 			Swim=1
 			if(isplayer(src))
 				src:move_speed = MovementSpeed()
 		if(!src.KO)
 			var/amounttaken=glob.OXYGEN_DRAIN/glob.OXYGEN_DRAIN_DIVISOR
-			if(loc:Shallow==1)
+			if(water_turf.Shallow==1)
 				amounttaken=0
 			if(src.PoseEnhancement&&src.Secret=="Hamon")
 				amounttaken=0
 			if(BreathingMaskOn)
 				amounttaken=0
-			if(loc:Deluged==1)
+			if(water_turf.Deluged==1)
 				amounttaken=4
 			if(isRace(WILDER))
 				amounttaken=0
@@ -365,7 +360,7 @@ mob/proc/Swim()
 				if(BreathingMaskOn==0)
 					src.Oxygen=0
 					src.DamageSelf(TrueDamage(0.1))
-					if(src.Health<-300)
+					if(src.Health < -3*src.MaxHP())
 						if(prob(20)&&!src.StabilizeModule)
 							src.Death(null,"oxygen deprivation!")
 				else
@@ -375,6 +370,6 @@ mob/proc/Swim()
 						src.LoseEnergy(2)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")

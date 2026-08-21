@@ -14,7 +14,7 @@
         return 1;
 
     gainTension(val)
-        var/maxTension = src.getMaxTensionValue();
+        var/maxTension = src.getTensionCap();
         var/ants = passive_handler.Get("Antsy")/10;
 
         var/tensionGain = val * glob.TENSION_MULTIPLIER;
@@ -45,6 +45,12 @@
     getMaxTensionValue()
         var/conductor = 0 + src.passive_handler.Get("Conductor");
         . = max(glob.MIN_TENSION, 100 - conductor);
+    getTensionCap()
+        // total storable tension
+        var/stages = 1;
+        if(src.StyleBuff && src.StyleBuff.FinisherStage > 1)
+            stages = src.StyleBuff.FinisherStage;
+        . = src.getMaxTensionValue() * stages;
     tryIncreaseTension()
         if(!isRace(HUMAN) && !isRace(CELESTIAL)) return 0;
         //they have to be human or celestial to get this far

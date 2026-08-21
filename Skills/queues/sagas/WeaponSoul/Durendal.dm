@@ -1,14 +1,14 @@
 obj/Skills/Queue/Blazing_Slash
 	ActiveMessage="channels the might of ancient saints into a slash worthy of a pyre!"
-	DamageMult=2.5
+	DamageMult=1.2
 	AccuracyMult=3
 	KBMult=3
 	SweepStrike=1
 	Burning = 25
 	Duration = 5
-	Cooldown=30
+	Cooldown=8
 	NeedsSword=1
-	EnergyCost=5
+	EnergyCost=2
 	FollowUp = "/obj/Skills/Queue/Blazing_Slash_Part_2"
 	Launcher = 3
 	HitSparkIcon='Fire Slash.dmi'
@@ -21,8 +21,9 @@ obj/Skills/Queue/Blazing_Slash
 
 obj/Skills/Queue/Blazing_Slash_Part_2
 	SagaSignature=1
-	DamageMult=0.75
+	DamageMult=0.36
 	Dunker=1
+	NoGCD=1
 	AccuracyMult=5
 	KBMult=0.00001
 	Shining=1
@@ -48,12 +49,12 @@ obj/Skills/Projectile/BlazingSlashProjectile
 	FireFromEnemy=0
 	Variation=0
 	Speed=0.75
-	StrRate=1
-	ForRate=0
-	EndRate=1
+	StrScaling=1
+	ForScaling=0
+	EndEffectiveness=1
 	Knockback=1
 	MultiHit=8
-	DamageMult=0.5
+	DamageMult=0.24
 	AccMult=2
 	Deflectable=0
 	Distance=10

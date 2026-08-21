@@ -11,7 +11,7 @@
 		Instinct=1
 		Crushing=3
 		SpecialAttack=1
-		StrOffense=1
+		StrScaling=1
 		CanBeDodged=1
 		CanBeBlocked=0
 		FlickAttack=1
@@ -28,7 +28,7 @@
 		adjust(mob/p)
 			if(!altered)
 				DamageMult=7.5
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					DamageMult=11
 					Distance=6
 					ActiveMessage="invokes a powerful: <font size=+1>SEISMIC ENTRY!</font size>"
@@ -53,7 +53,7 @@
 		adjust(mob/p)
 			if(!altered)
 				passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 5)
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=40
 					Cooldown=70
 					EndMult=1.25
@@ -77,7 +77,7 @@
 		OffMessage="releases the curse!"
 		adjust(mob/p)
 			if(!altered)
-				if(p.isInnovative(FAE, "Any") && !isInnovationDisable(p))
+				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=15
 					Cooldown=55
 					ShatterAffected=4

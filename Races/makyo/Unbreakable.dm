@@ -54,13 +54,13 @@
 
 		var/obj/Skills/AutoHit/Unbreakable_Release/atk = new()
 		atk.DamageMult = ampBonus
-		user.Activate(atk)
+		user.Activate(atk, noGCD = TRUE)
 
 		KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=1, Time=8)
 
 		// Deactivate the buff after the release fires
 		if(SlotlessOn)
-			Trigger(user)
+			Trigger(user, 1)
 
 	verb/Unbreakable()
 		set category="Skills"

@@ -69,9 +69,9 @@
 					return
 	proc/getImprovements()
 	Lightsaber
-		SpiritSword=0.15
+		SummonSwordVisual=0.15
 		MakesSword=1
-		passives = list("Deflection" = 1, "SpiritSword" = 0.25, "SwordAscension" = 1)
+		passives = list("Deflection" = 1,  "SwordAscension" = 1)
 		FlashDraw=1
 		Deflection=1
 		SwordAscension=1
@@ -89,7 +89,7 @@
 			getImprovements()
 			src.Trigger(usr)
 	Double_Lightsaber
-		SpiritSword=0.25
+		SummonSwordVisual=0.25
 		MakesSword=1
 		FlashDraw=1
 		Deflection=1
@@ -104,9 +104,9 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list("SpiritSword" = 0.25 + (0.25*improvementLevel), "Deflection" = 1 + (0.2*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "DoubleStrike" = 0.75+(improvementLevel*0.25))
+			passives = list( "Deflection" = 1 + (0.2*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "DoubleStrike" = 0.75+(improvementLevel*0.25))
 			if(improvementLevel)
-				SpiritSword = 0.25 + (0.25 * improvementLevel)
+				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.2 * improvementLevel)
 				SwordAscension = 1 + (improvementLevel-1)
 				DoubleStrike = 1 + (improvementLevel * 0.25)
@@ -117,7 +117,7 @@
 			getImprovements()
 			src.Trigger(usr)
 	Great_Lightsaber
-		SpiritSword=0.25
+		SummonSwordVisual=0.25
 		MakesSword=1
 		FlashDraw=1
 		Deflection=1
@@ -135,9 +135,9 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list("SpiritSword" = 0.25 + (0.25*improvementLevel), "Extend"= 1, "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "SwordDamage" = 0.5+(improvementLevel*0.25))
+			passives = list( "Extend"= 1, "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "Sword Mastery" = 0.5+(improvementLevel*0.25))
 			if(improvementLevel)
-				SpiritSword = 0.25 + (0.25 * improvementLevel)
+				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.2 * improvementLevel)
 				SwordAscension = 1 + (improvementLevel-1)
 				SwordDamage = 1 + (0.25 * improvementLevel)
@@ -148,7 +148,7 @@
 			getImprovements()
 			src.Trigger(usr)
 	Crossguard_Lightsaber
-		SpiritSword=0.25
+		SummonSwordVisual=0.25
 		MakesSword=1
 		FlashDraw=1
 		Deflection=1
@@ -163,9 +163,9 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list("SpiritSword" = 0.25 + (0.25*improvementLevel), "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "Instinct" = 0.75+(improvementLevel*0.25))
+			passives = list( "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1))
 			if(improvementLevel)
-				SpiritSword = 0.25 + (0.25 * improvementLevel)
+				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.4 * improvementLevel)
 				SwordAscension = 1 + (improvementLevel-1)
 				Instinct = 1 + (0.25 * improvementLevel)
@@ -176,12 +176,11 @@
 			getImprovements()
 			src.Trigger(usr)
 	Shoto_Lightsaber
-		SpiritSword=0.25
+		SummonSwordVisual=0.25
 		MakesSword=1
 		FlashDraw=1
 		Deflection=1
 		SwordAscension=1
-		Flow = 1
 		SwordClass="Light"
 		SwordIcon='SLightsaberBlue.dmi'
 		SwordX=-32
@@ -191,12 +190,11 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list("SpiritSword" = 0.25 + (0.25*improvementLevel), "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "Flow" = 0.75+(improvementLevel*0.25))
+			passives = list( "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1))
 			if(improvementLevel)
-				SpiritSword = 0.25 + (0.25 * improvementLevel)
+				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.75 * improvementLevel)
 				SwordAscension = 1 + (improvementLevel-1)
-				Flow = 1 + (0.5 * improvementLevel)
 		verb/Shoto_Lightsaber()
 			set category="Skills"
 			if(!altered)

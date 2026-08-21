@@ -53,7 +53,7 @@ obj/Stars
 			if(glob.GameStarted==0)
 				usr << "You cannot stake stars right now."
 				return
-			if(usr.Health<99*(1-usr.HealthCut))
+			if(usr.HealthPct()<99*(1-usr.HealthCut))
 				usr << "You can only stake stars at [100*(1-usr.HealthCut)]% health."
 				return
 			var/Stakes=input(usr, "Stake how many? (1-[src.Level])") as num
@@ -94,10 +94,12 @@ obj/Stars
 	var/tallyText
 	verb/StarAmount()
 		set category="Utility"
+		set hidden = 1
 		set name="Star Amount"
 		GiveAmount=input(usr, "Give how many?") as num
 	verb/GiveStars()
 		set category="Utility"
+		set hidden = 1
 		set name="Give Stars"
 		for(var/mob/Players/P in get_step(src,usr.dir))
 			if(!locate(/obj/Stars, P))
@@ -106,6 +108,7 @@ obj/Stars
 				glob.StarTally.Add("[P.name]"=GiveAmount)
 	verb/RevokeStars()
 		set category="Utility"
+		set hidden = 1
 		set name="Revoke Stars"
 		for(var/mob/Players/P in get_step(src,usr.dir))
 			if(locate(/obj/Stars, P))
@@ -113,20 +116,24 @@ obj/Stars
 				glob.StarTally.Remove("[P.name]")
 	verb/StartGame()
 		set category="Utility"
+		set hidden = 1
 		set name="Start Game"
 		glob.GameEnded=0
 		glob.GameStarted=1
 	verb/PauseGame()
 		set category="Utility"
+		set hidden = 1
 		set name="Pause Game"
 		glob.GameStarted=0
 	verb/EndGame()
 		set category="Utility"
+		set hidden = 1
 		set name="End Game"
 		glob.GameStarted=0
 		glob.GameEnded=1
 	verb/ShowTally()
 		set category="Utility"
+		set hidden = 1
 		set name="Show Tally"
 		for(var/name,score in glob.StarTally)
 			usr << "[name]: [score] Stars"

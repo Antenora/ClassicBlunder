@@ -1,12 +1,12 @@
 /mob/proc/throwSkill(obj/Skills/s)
     if(istype(s, /obj/Skills/AutoHit))
-        Activate(s, TRUE)
+        Activate(s, TRUE, noGCD = TRUE)
     else if(istype(s, /obj/Skills/Projectile))
-        UseProjectile(s)
+        UseProjectile(s, TRUE)
     else if(istype(s, /obj/Skills/Queue))
-        SetQueue(s)
+        SetQueue(s, TRUE)
     else if(istype(s, /obj/Skills/Grapple))
-        s:Activate(src)
+        s:Activate(src, TRUE)
 
 /mob/proc/findOrAddSkill(path) // find it, regardless
     var/obj/Skills/s = null
@@ -30,7 +30,7 @@
     var/obj/Skills/s = findOrAddSkill(path)
     s.adjust(src)
     if(istype(s, /obj/Skills/AutoHit))
-        Activate(s, TRUE, TRUE)
+        Activate(s, TRUE, TRUE, TRUE)
     else
         throwSkill(s)
 
@@ -79,6 +79,8 @@ mob/proc/UsingHotnCold()
 /mob/proc/applySnare(limit, _icon, force = FALSE)
 	if(passive_handler.Get("Trample") && is_dashing)
 		return
+	if(cc_immune_until > world.time && !force)
+		return
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare/s = findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare) // try to find it
 	if(force)
 		if(BuffOn(s))
@@ -121,7 +123,7 @@ mob/proc/UsingHotnCold()
 /mob/proc/getPower(mob/def)
     var/powerDif = Power / def.Power
     if(glob.CLAMP_POWER)
-        if(!ignoresPowerClamp())
+        if(!ignoresPowerClamp(def))
             powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
     return powerDif
 

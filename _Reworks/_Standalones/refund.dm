@@ -59,6 +59,7 @@ mob/proc/refund_skill(obj/Skills/refunded_skill)
 
 mob/verb/Refund()
 	set category="Other"
+	set hidden = 1
 	if(refund_banned) return
 	if(refunding)
 		usr << "You're already trying to refund something!"
@@ -94,6 +95,7 @@ mob/verb/Refund()
 
 // im going to sin below
 /mob/Admin3/verb/refund_all_old_value(mob/p in world)
+	if(!src.Alert("Are you sure you want to refund all copyables for all players?")) return
 	p.refund_all_copyables()
 
 mob/proc/refund_skil_old(obj/Skills/refunded_skill)

@@ -25,7 +25,7 @@
 		IgnoreWindUpReduction=1
 		WindupMessage="gathers all the stored power into a brutal strike..."
 		DamageMult=1
-		StrOffense=1
+		StrScaling=1
 		ActiveMessage="releases all gathered might into a single blow!"
 		Area="Circle"
 		GuardBreak=1

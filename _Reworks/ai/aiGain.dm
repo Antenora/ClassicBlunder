@@ -28,7 +28,7 @@ mob/Player/AI/proc/aiGain()
 
     // Move meditating to Rest proc vs in update
 
-    if(Health < 10 && !HealthAnnounce10)
+    if(HealthPct() < 10 && !HealthAnnounce10)
         HealthAnnounce10 = 1
         OMessage(10, "[src] is barely standing!" )
 
@@ -123,14 +123,14 @@ mob/Player/AI/proc/scrollSlotless()
     for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/A in src)
         if(!A.SlotlessOn)
             if(A.NeedsHealth && !A.Using && !KO)
-                if(Health<=A.NeedsHealth*(1-HealthCut))
+                if(HealthPct()<=A.NeedsHealth*(1-HealthCut))
                     A.Trigger(src)
             if(A.AlwaysOn)
                 if(!A.Using)
                     A.Trigger(src)
         else
             if(A.TooMuchHealth)
-                if(Health>A.TooMuchHealth)
+                if(HealthPct()>A.TooMuchHealth)
                     A.Trigger(src)
             if(KO)
                 A.Trigger(src, Override=1)

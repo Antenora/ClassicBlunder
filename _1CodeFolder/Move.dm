@@ -102,11 +102,12 @@ proc
 				B.Open()
 globalTracker/var/SPEED_DELAY = 3
 globalTracker/var/GOD_SPEED_MULT = 0.4
-globalTracker/var/TOTAL_SPEED_BONUS = 0.4
+globalTracker/var/TOTAL_SPEED_BONUS = 0.031
+globalTracker/var/MOVE_STAT_BASE = 19
 globalTracker/var/SPEED_DELAY_LOWEST = 1.75
 mob/proc/MovementSpeed()
-	var/Spd=max(0.1,round(sqrt(src.GetSpd(glob.TOTAL_SPEED_BONUS)),0.1))
-	var/SpdMin=max(0.1,round(sqrt(passive_handler.Get("Skimming")*2*glob.TOTAL_SPEED_BONUS),0.1))
+	var/Spd=max(0.1,round(sqrt((src.GetSpd()+glob.MOVE_STAT_BASE)*glob.TOTAL_SPEED_BONUS),0.1))
+	var/SpdMin=max(0.1,round(sqrt((passive_handler.Get("Skimming")*2+glob.MOVE_STAT_BASE)*glob.TOTAL_SPEED_BONUS),0.1))
 	if(passive_handler.Get("Skimming") + is_dashing)
 		if(Spd<SpdMin)
 			Spd=SpdMin
@@ -127,7 +128,7 @@ mob/proc/MovementSpeed()
 	if(src.HasBlastShielding())
 		Delay*=3
 	if(src.CanBeSlowed())
-		var/CombatSlow=10/max(src.Health,1)
+		var/CombatSlow=glob.COMBAT_SLOW_THRESHOLD/max(src.HealthPct(),1)
 		if(CombatSlow>1 && !passive_handler["Undying Rage"])
 			var/Adren = passive_handler.Get("Adrenaline")
 			if(Adren)
@@ -142,9 +143,10 @@ mob/proc/MovementSpeed()
 			Delay=50
 		if(Delay<glob.SPEED_DELAY_LOWEST)
 			Delay=glob.SPEED_DELAY_LOWEST
-	if(src.Afterimages())
-		if(prob(40*Afterimages()))
-			FlashImage(src)
+	if(!PmActive()) //pixel build does afterimages per tile-crossing in PmMovementTick instead
+		if(src.Afterimages())
+			if(prob(40*Afterimages()))
+				FlashImage(src)
 	if(Swim)
 		if(passive_handler.Get("Fishman"))
 			Delay/=2
@@ -169,7 +171,7 @@ mob/Move()
 	var/turf/Former_Location = loc
 	if(src.Incorporeal)
 		src.density=0
-	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
+	if(!src.Incorporeal&&!src.passive_handler?.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
 			if((A.dir in list(dir,turn(dir,45),turn(dir,-45))))
 				return
@@ -178,13 +180,19 @@ mob/Move()
 				return
 	..()
 
+	//turn the world-shadow with the mob instead of waiting on the 3ds loop
+	if(shadow_pool && length(shadow_pool) && glob && glob.WORLD_SHADOWS)
+		for(var/obj/fx_worldshadow/s in shadow_pool)
+			s.RebuildSilhouette()
+
+
 	if(passive_handler.Get("ForceFielded"))
 		for(var/mob/m in oview(glob.FORCEFIELD_RANGE, src))
 			if(passive_handler.Get("ForceFielded") == m.ckey)
 				loc = Former_Location
 				break
 
-	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
+	if(!src.Incorporeal&&!src.passive_handler?.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
 			if(!(A.dir in list(dir,turn(dir,90),turn(dir,-90),turn(dir,45),turn(dir,-45))))
 				loc=Former_Location
@@ -198,10 +206,10 @@ mob/Move()
 		for(var/mob/M in oview(range, src))
 			if(M != src && M.density)
 				src.Melee1(dmgmulti =(0.15), forcedTarget = M)*/
-	if(Bleed > 0 && !Knockback && !is_dashing && client)
+	if(Bleed > 0 && !Knockback && !is_dashing && client && (!PmActive() || loc != Former_Location)) //micro-steps bleed per tile, not per slide
 		WoundSelf(0.01)
 
-	if(src.Grab)
+	if(src.Grab && (!PmActive() || loc != Former_Location))
 		src.Grab_Update()
 
 	if(MapperWalk&&!Knockback&&Target&&istype(Target,/obj/Others/Build))
@@ -211,7 +219,6 @@ mob/Move()
 		overlays-=AFKIcon
 	AFKTimer=AFKTimeLimit
 
-	// SlothFactor tracking: reset stationary bonus on any movement
 	if(istype(src, /mob/Players))
 		var/mob/Players/P = src
 		P.resetSlothTracking()

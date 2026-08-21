@@ -77,6 +77,7 @@ obj/Admin_Help_Object/
 mob/verb/AdminHelp(var/txt as message)
 	set name = "Admin Help"
 	set category="Other"
+	set hidden = 1
 	if(!(world.time > verb_delay)) return
 	verb_delay=world.time+1
 	if(!txt || length(txt) <= 0) return

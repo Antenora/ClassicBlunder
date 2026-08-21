@@ -14,8 +14,39 @@ Options/
     var/CombatMessagesInIC = FALSE
     var/autoAttacking = FALSE
     var/oldZanzo = FALSE
+    var/soundOn = 1
+    var/zoom2x = 0          // off = 1x (default), on = 2x map zoom
+    var/graphicsQuality = "High"
+    var/reducedMotion = 0
+    var/reducedFlashes = 0
+    var/foregroundFade = 1
+    var/reflections = 1
+    var/lightShafts = 1
+    var/farBlur = 0         // far-field blur, opt-in
+    var/vignette = 1
+    var/experimentalCamera = 0 // opt-in for now
+    var/cmPanX = 0          // saved menu drag offsets (px) from each panel's default anchor
+    var/cmPanY = 0
+    var/optPanX = 0
+    var/optPanY = 0
+    var/invPanX = 0
+    var/invPanY = 0
+    var/skPanX = 0
+    var/skPanY = 0
+    var/ppPanX = 0          // right-click player/admin panel
+    var/ppPanY = 0
+    var/ttPanX = 0          // tech tree
+    var/ttPanY = 0
+    var/descPanX = 0        // inventory item-description popup
+    var/descPanY = 0
+    var/aqPanX = 0          // acquire skills menu
+    var/aqPanY = 0
+    var/lsPanX = 0          // life skills menu
+    var/lsPanY = 0
+    var/stPanX = 0          // forge/anvil station menu
+    var/stPanY = 0
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)
@@ -56,5 +87,21 @@ Options/
 
 /client/proc/getPref(pref)
     return prefs.vars["[pref]"]
+
+/client/proc/ApplyAudioPref()
+    winset(src, null, list("command" = ".configure sound [prefs.soundOn ? "on" : "off"]"))
+
+/mob/verb/Gamepad_Mapping()
+    set category = "Utility"
+    set hidden = 1
+    set name = "Gamepad Mapping"
+    winset(src, null, list("command" = ".gamepad-mapping"))
+
+// this fires the same client command that control freak got rid of
+/mob/verb/Reconnect()
+    set category = "Utility"
+    set hidden = 1
+    set name = "Reconnect"
+    winset(src, null, list("command" = ".reconnect"))
 
 

@@ -58,13 +58,13 @@ mob/tierUpSaga(path)
 
 /obj/Skills/AutoHit/Giga_Drill_Breaker
 	Area="Circle"
-	DamageMult=2
+	DamageMult=1.5
 	Rounds=10
 	Knockback = 1
 	ComboMaster=1
-	Cooldown=180
+	Cooldown=45
 	Size=1
-	EnergyCost=7
+	EnergyCost=8
 	GuardBreak=1
 	SpecialAttack=1
 	Rush=5
@@ -87,16 +87,15 @@ mob/tierUpSaga(path)
 			var/dr = sl + sp
 			var/se = p.passive_handler.Get("SpiralPowerUnlocked")
 			ControlledRush = 5 + dr
-			AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = (1 + (round((dr+(se/2))/3)))
+			DamageMult = 0.25 * (1 + (round((dr+(se/2))/3)))
 			Rounds = 20
 			PullIn = dr + (se/2)
 			Primordial = round(dr/4)
 			Executor = max(dr, 3)
-			EnergyCost = 1 + (3 * dr)
+			EnergyCost = 0.2 * (1 + (3 * dr))
 			switch(se)
 				if(0 to 2)
 					ActiveMessage="yells: <b>GIGA DRILL BREAKEEEEEERRRRR!!!!</b>"
@@ -139,7 +138,6 @@ mob/tierUpSaga(path)
 		var/sp = p.AscensionsAcquired
 		var/dr = sl + sp
 		ControlledRush = 5 + dr
-		AdaptRate = 1.1 + (0.1 * sl) + (0.1 * sp)
 		Size = 1 + dr
 		TurfStrike = Size
 		WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)

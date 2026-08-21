@@ -4,6 +4,7 @@ race
 		desc = "Empty shells left behind when someone with a strong heart passes on. They lack hearts and emotions, but possess undeniable strength."
 		visual = 'Makaioshins.png'
 		locked = TRUE
+		power = 3;
 		strength = 1
 		endurance = 1
 		speed = 1
@@ -23,19 +24,20 @@ race
 
 			user.race.transformations.Cut()
 			if(user.Class=="Samurai")
-				passives = list("BlurringStrikes" = 1, "SwordAscension" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1, "Flicker"=1, "EmptyFlashStep" = 1)
+				passives = list( "SwordAscension" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1, "Flicker"=1, "EmptyFlashStep" = 1)
 				user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Racial/Void_Blade)
 				user.AddSkill(new /obj/Skills/AutoHit/Desperation/FatalEnding)
 				user.NobodyOrigin()
 			if(user.Class=="Sorcerer")
-				passives = list("MovingCharge" = 1, "QuickCast" = 1, "Superglide" = 1, "FullyEffecient" = 1, "Tossing" = 1, "Extra Secret Knives" = "UltimaLaser", "SpiritFlow" = 4)
+				passives = list("MovingCharge" = 1, "QuickCast" = 1,   "Tossing" = 1, "Extra Secret Knives" = "UltimaLaser")
 				user.AddSkill(new /obj/Skills/Projectile/Zone_Attacks/Desperation/UltimaLasers)
 				user.NobodyOrigin()
 			if(user.Class=="Berserker")
 				user.ManaAmount=0
+				user.AngerMax=2
 				user.AddSkill(new /obj/Skills/Queue/Desperation/LunarRave)
 				user.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Nobody/Lunar_Wrath)
-				passives = list("LunarDurability" = 1, "LunarWrath" = 1,"RenameMana" = "WRATH","LunarAnger"=1)
+				passives = list( "LunarWrath" = 1, "EndlessAnger" = 1)
 				user.NobodyOrigin()
 			if(user.Class=="Imaginary")
 				user.AddSkill(new /obj/Skills/Projectile/Zone_Attacks/Desperation/MagicHour)
@@ -43,7 +45,7 @@ race
 				user.NobodyOrigin()
 				passives = list("ImbuedSoul" = 1, , "EnergyGeneration" = 2, "ManaGeneration" = 2, "DrainlessPUSpike" = 1)
 			if(user.Class=="Reaper")
-				passives = list( "SlayerMod" = 1, "FavoredPrey" = "Mortal", "Extend" = 1, "Gum Gum" = 1, "CriticalChance" = 15, "CriticalDamage" = 0.25, "Instinct" = 1 )
+				passives = list( "SlayerMod" = 1, "FavoredPrey" = "Mortal", "Extend" = 1, "Gum Gum" = 1, "CriticalDamage" = 0.25 )
 				user.AddSkill(new /obj/Skills/AutoHit/Desperation/Deathscythe)
 				user.NobodyOrigin()
 			passives += list("Emptiness" = 1, "Longing" = 1)

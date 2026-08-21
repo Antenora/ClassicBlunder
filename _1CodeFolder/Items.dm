@@ -30,6 +30,18 @@ obj/Money
 				src.loc:TakeMoney(Amount)
 				OMsg(usr, "[usr] steals [Commas(round(Amount))] [glob.progress.MoneyName] from [src.loc]!")
 				usr.GiveMoney(Amount)
+			else if(isturf(src.loc))
+				if(get_dist(usr, src) > 1)
+					usr << "You're too far away to pick that up."
+					return
+				if(locate(/obj/Money) in usr)
+					usr.GiveMoney(src.Level)
+					del src
+				else
+					src.loc = usr
+					src.name = "[Commas(round(src.Level))] [glob.progress.MoneyName]"
+					usr << "You pick up [src]."
+				if(usr.client) usr.client.BuildInvPage()
 
 	proc/checkDuplicate(mob/p)
 		var/counter = 0
@@ -46,6 +58,7 @@ obj/Money
 obj/Items
 	Pickable=1
 	Stealable=1
+	var/invSlot = 0 // persistent inventory grid order (0 = unassigned); set via drag-to-swap
 	// Flat additive stats while this item is equipped as a weapon
 	var/strAdd = 0
 	var/endAdd = 0
@@ -108,7 +121,6 @@ obj/Items
 	var/BoundEquip//defines true owner
 	var/LegendaryItem//Does this have verbs associated with it / a Tier S?
 	var/SpiritPower//gives spirit power
-	var/Mythical//gives legendary power
 	var/HellPower //gives hell power
 	var/ShonenPower //makes you into a shonen protagonist
 	var/TrueLegend //flagged so that a bunch of legendaries don't spawn when you boot up the world...
@@ -159,6 +171,7 @@ obj/Items
 
 
 	proc/setStatLine()
+		var/reset = TRUE
 		switch(Class)
 			if("Light")
 				DamageEffectiveness=1.025
@@ -172,11 +185,15 @@ obj/Items
 				DamageEffectiveness=1.1
 				AccuracyEffectiveness=0.8
 				SpeedEffectiveness=0.8
+			else
+				reset = FALSE
+		if(reset && metal_id)
+			ApplyGearMetalStats(src, metal_id, craft_shape_w)   // don't let buffs wipe the smith's work
 
 	proc/startBreaking(dmg, val, mob/owner, mob/attacker, type)
 		if(val > glob.MAX_BREAK_MULT)
 			val = glob.MAX_BREAK_MULT
-		var/breakVal = (dmg * val) * (attacker.GetOff(0.3)+(attacker.GetStr(0.3) * glob.DMG_STR_EXPONENT))
+		var/breakVal = (dmg * val) * (attacker.GetOff(0.3)+(attacker.GetStr(0.3) * 0.4))
 
 		if(breakVal > glob.MAX_BREAK_VAL)
 			breakVal = glob.MAX_BREAK_VAL
@@ -273,9 +290,18 @@ obj/Items
 			if(Drop>0&&Drop)
 				if(Drop>src.TotalStack)
 					Drop=src.TotalStack
-				var/Drop2=new src.type(get_step(usr, usr.dir))
-				Drop2:TotalStack=Drop
-				Drop2:suffix="[Drop2:TotalStack]"
+				var/obj/Items/Drop2=new src.type(get_step(usr, usr.dir))
+				Drop2.TotalStack=Drop
+				Drop2.CraftQuality=src.CraftQuality   // the split keeps its full forged identity
+				Drop2.name=src.name
+				Drop2.metal_id=src.metal_id
+				Drop2.craft_ingots=src.craft_ingots
+				Drop2.craft_shape_w=src.craft_shape_w
+				Drop2.color=src.color
+				Drop2.CreatorKey=src.CreatorKey
+				Drop2.CreatorName=src.CreatorName
+				Drop2.CreatorSignature=src.CreatorSignature
+				Drop2.suffix="[Drop2.TotalStack]"
 				src.TotalStack-=Drop
 				src.suffix="[src.TotalStack]"
 				if(src.TotalStack==0)
@@ -342,7 +368,7 @@ obj/Items
 					if(ItemMade:Stackable)
 						var/stacktype=ItemMade.type
 						for(var/obj/Items/o in usr)
-							if(o.type==stacktype)
+							if(o.type==stacktype && o.TotalStack < INV_STACK_MAX)
 								o.TotalStack++
 								usr << "You stack a new [ItemMade]."
 								del ItemMade
@@ -462,6 +488,9 @@ obj/Items
 				A.icon=newIcon
 				usr.contents+=A
 		else
+			if(isturf(src.loc))
+				usr.GroundPickup(src)
+				return
 			if(!usr.Saga||(usr.Saga&&!src.NoSaga)||(usr.Saga&&src.NoSaga&&src.suffix=="*Equipped*"))
 				src.ObjectUse()
 			else
@@ -560,7 +589,7 @@ obj/Items
 					usr.AddPoison(4*src.EatToxicity)
 				if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You feel aggressive!</font>"
-					usr.Anger()
+					usr.ForceAngered()
 				else if(prob(5*src.EatToxicity))
 					usr << "<font color='red'>You grow mellow!</font>"
 					usr.AddPacifying(20*src.EatToxicity)
@@ -688,15 +717,13 @@ obj
 
 		Click()
 			..()
-			if(usr.CheckInventoryFull())
-				return
 			var/obj/Items/Wearables/w = new wearable_path
 			var/Color=input(usr,"Choose color") as color|null
 			if(Color && Color != "#000000")
 				var/icon/newIcon = new(w.icon)
 				newIcon.Blend(Color, ICON_MULTIPLY)
 				w.icon = newIcon
-			usr.contents += w
+			usr.GiveOrDrop(w)
 
 mob/proc/CheckWeightsTraining()
 	var/obj/Items/WeightedClothing/w=EquippedWeights()
@@ -721,8 +748,8 @@ obj/Items/WeightedClothing//we are now a DBZ rip ... or is it pokemon?
 		verb/Apply_Plating()
 			set category=null
 			set src in usr
-			if(!("Advanced Plating" in usr.knowledgeTracker.learnedKnowledge))
-				usr << "You don't know how to add plating to things!"
+			if(usr.LifeRank("Smithing") < 6)
+				usr << "You don't know how to add plating to things! (Smithing rank 6)"
 				return
 			if(src.suffix=="*Equipped*")
 				usr << "Take off the armor if you're going to fiddle with it!"
@@ -860,7 +887,6 @@ obj/Items/Sword
 	Health=10
 	Unobtainable=1
 	var/Conjured=0
-	var/SpiritStrike
 	var/SwordIconSelected=0
 	var/ImprovedStat
 	var/ProjectionBlade=0//Dissolves on drop
@@ -869,14 +895,12 @@ obj/Items/Sword
 	var/WeaponBreaker=0
 	var/Shearing=0//shears stuff
 	var/ElementallyInfused
-	var/SpiritSword=0
-	var/CalmAnger=0
+	var/SummonSwordVisual=0
 	var/SweepingStrike
 	var/BulletKill=0
 	var/Extend=0
 
 	// New Vars //
-	var/Steady = 0
 	// End New Vars //
 
 
@@ -885,7 +909,6 @@ obj/Items/Sword
 	var/HitSparkY
 	var/HitSparkSize=1
 	var/Purity //waifu swords
-	var/ManaGeneration=0
 	var/iconAlt=null
 	var/iconAltX=0
 	var/iconAltY=0
@@ -995,11 +1018,10 @@ obj/Items/Sword
 				pixel_x=-16
 				pixel_y=-16
 				NoSaga=1
-				CalmAnger=1
 				MagicSword=1
 				Element="Water"
 				unsheatheIcon = 'Yukianesa.dmi'
-				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalChance"=20, "CriticalDamage"=0.15, "IceHerald"=1, "Freezing"=5, "SpiritFlow"=2, "WaveDancer"=2, "RenameMana"="HEAT")
+				passives = list("CalmAnger" = 1, "MagicSword" = 1, "ManaGeneration" = 5, "CriticalDamage"=0.15,  "Freezing"=5,  "WaveDancer"=2)
 				Destructable=0
 				ShatterTier=0
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Frost_End", "/obj/Skills/AutoHit/FrostBite", "/obj/Skills/Projectile/Sword/TougaHyoujin", "/obj/Skills/Queue/KokujinYukikaze")
@@ -1021,6 +1043,7 @@ obj/Items/Sword
 		unsheatheOffsetX = -16
 		unsheatheOffsetY = -16
 		Legendary
+			icon = 'LightSword.dmi'
 			LegendaryItem=1
 			Unobtainable=1
 			Ascended=3
@@ -1042,6 +1065,7 @@ obj/Items/Sword
 				var/SEType="Sword"
 				verb/ChooseForm()
 					set category="Other"
+					set hidden = 1
 					if(usr.StyleActive)
 						usr<<"You cannot use this with a style active!"
 						return
@@ -1085,7 +1109,7 @@ obj/Items/Sword
 				NoSaga = 1
 				Unobtainable = 1
 				Element = "Ultima"
-				passives = list("PureDamage"=5, "PridefulRage"=1, "SpiritSword"=2, "SweepingStrike"=1, "Extend"=2)
+				passives = list("PureDamage"=5,   "SweepingStrike"=1, "Extend"=2)
 
 				// Ea can only be dismissed via the Summon Ea skill
 				AlignEquip(mob/A, dontUnEquip = FALSE)
@@ -1144,14 +1168,12 @@ obj/Items/Sword
 				pixel_x=-32
 				pixel_y=-32
 				NoSaga=1
-				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5, "RenameMana"="HEAT", "BlockChance"=20, "CriticalBlock"=0.15, "Brutalize"=2, "Deflection"=2)
+				passives = list("CalmAnger" = 1,"MagicSword" = 1, "Extend" = 1, "BulletKill" = 1, "ManaGeneration" = 5,  "CriticalBlock"=0.15,  "Deflection"=2)
 				Destructable=0
 				ShatterTier=0
-				CalmAnger=1
 				MagicSword=1
 				Extend=1
 				BulletKill=1
-				ManaGeneration=3
 				Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Grimoire/OverDrive/Fierce_God", "/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Slaying_God", "/obj/Skills/Projectile/Sword/KokujinShippu", "/obj/Skills/Queue/KokujinYukikaze")
 
 			WeaponSoul
@@ -1422,7 +1444,7 @@ obj/Items/proc/Equip(mob/A)
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
-	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff))
+	if(istype(src,/obj/Items/Wearables) || istype(src,/obj/Items/Sword) || istype(src,/obj/Items/Enchantment/Staff) || istype(src,/obj/Items/Armor))
 		if(src.IsHat)
 			placement=FLOAT_LAYER-1
 	if(A==src.loc)
@@ -1433,7 +1455,6 @@ obj/Items/proc/Equip(mob/A)
 					var/confirm = input(A, "Are you sure you want to draw Dainsleif?") in list("Yes", "No")
 					if(confirm == "No") return
 					s.drawDainsleif(A)
-				spawn(-1) s.dainsleifDrain(A)
 			if(A.NeedsSecondSword() && A.EquippedSword() && !A.EquippedSecondSword())
 				var/found = 0
 				for(var/obj/Items/Sword/s in A)
@@ -1689,8 +1710,8 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					if(a.WoundIntent || a.Lethal)
 						User << "You cannot use a magical vehicle in the presence of hostiles!"
 						return
-				if(User.Health<75*(1-User.HealthCut))
-					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)] health!"
+				if(User.HealthPct()<75*(1-User.HealthCut))
+					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)]% health!"
 					return
 			var/obj/Items/Enchantment/Flying_Device/W=src
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Skating, User))
@@ -1724,8 +1745,8 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					if(a.WoundIntent || a.Lethal)
 						User << "You cannot use a magical vehicle in the presence of hostiles!"
 						return
-				if(User.Health<75*(1-User.HealthCut))
-					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)] health!"
+				if(User.HealthPct()<75*(1-User.HealthCut))
+					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)]% health!"
 					return
 			var/obj/Items/Enchantment/Surfing_Device/W=src
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Surfing, User))
@@ -2001,7 +2022,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					User << "You are still experiencing the effects of previous training!"
 					return
 				if(W.suffix=="*Equipped*")
-					if(User.Health<=75&&(W.InternalTimer<world.realtime)||User.CyberCancel)
+					if(User.HealthPct()<=75&&(W.InternalTimer<world.realtime)||User.CyberCancel)
 						var/Choice=alert(User, "Are you ready to unleash the power gained from your weight training!? With your body used to the weights, they'll be abandoned.", "Weight Boost!", "No", "Yes")
 						if(Choice=="Yes")
 							W.AlignEquip(User)
@@ -2315,8 +2336,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 			if(suffix=="*Equipped*")
 				current_passives = passives
 				User.passive_handler.increaseList(passives)
-				if("RenameMana" in passives)
-					User.ManaAmount = 0
 			else if(suffix == null)
 				User.passive_handler.decreaseList(current_passives)
 

@@ -2,7 +2,6 @@ ascension
 	majin
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			intimidation = 15
 			anger = 0.1
 			imaginationAdd = 0.2
 			endurance = 0.75
@@ -21,9 +20,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 2, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -31,7 +30,6 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			intimidation = 15
 			anger = 0.1
 			imaginationAdd = 0.25
 			endurance = 0.75
@@ -47,9 +45,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -57,7 +55,6 @@ ascension
 
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			intimidationMult = 0.5
 			anger = 0.1
 			endurance = 0.75
 			defense = 0.75
@@ -72,9 +69,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -82,7 +79,6 @@ ascension
 
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			intimidation = 10
 			anger = 0.15
 			imaginationAdd = 0.2
 			endurance = 1
@@ -98,9 +94,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -108,7 +104,6 @@ ascension
 
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			intimidation = 10
 			anger = 0.15
 			endurance = 1
 			defense = 1
@@ -123,9 +118,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0
@@ -133,7 +128,6 @@ ascension
 
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			intimidation = 15
 			anger = 0.2
 			imaginationAdd = 0.25
 			endurance = 1.25
@@ -149,9 +143,9 @@ ascension
 					if("Innocent")
 						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "Blubber" = 1, "PureReduction" = 1)
 					if("Super")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "Adaptation" = 1, "Duelist" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1,  "Duelist" = 1)
 					if("Unhinged")
-						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "CriticalChance" = 5, "CriticalDamage" = 0.05, "PureDamage" = 1)
+						passives = list("Gum Gum" = 0.5, "PUSpike" = 25, "KiControlMastery" = 1, "Unstoppable" = 1, "CriticalDamage" = 0.05, "PureDamage" = 1)
 				if(owner.majinAbsorb)
 					owner.majinAbsorb.updateVariables(owner)
 				owner.majinCheatDeathUsed = 0

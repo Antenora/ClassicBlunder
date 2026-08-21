@@ -49,12 +49,13 @@ var/global/list/MAJIN_PENDING_DIGEST_CREDITS = list()
     if(!verbs) return
     if(/mob/verb/Observe_Majin in verbs)
         verbs -= /mob/verb/Observe_Majin
-    if(client && client.eye != src && !absorbedBy)
+    if(client && !GfxClientEyeIsMob(client, src) && !absorbedBy)
         Observify(src, src)
         Observing = 0
 
 /mob/verb/Observe_Majin()
     set category = "Other"
+    set hidden = 1
     set name = "Observe Majin"
     if(!absorbedBy)
         src << "You are not currently absorbed by a Majin."
@@ -307,7 +308,7 @@ majinAbsorb/proc/doAbsorb(mob/absorber, mob/absorbee)
         permanentAbsorbPower += halfPeak
         absorber << "<font color='purple'>[absorbee]'s essence slips through your fingers and is lost to the Void! You drag a fraction of their power back with you.</font>"
         OMsg(absorber, "[absorber] tries to absorb [absorbee], but their soul is dragged into the Void!")
-        absorbee.Void(0, 0, 1)
+        absorbee.Void(0, 1)
         return
 
     if(absorbed.len >= absorbLimit)

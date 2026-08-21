@@ -92,11 +92,18 @@ mob/var
 	EconomyMult=1
 	Intelligence=1//technology modifier
 	Imagination=1//enchantment modifier
-	Intimidation=1//Adding this here for ezpz stuff.
+	GrowthRate=1//asc growth rate
 	HealthCut=0
 	EnergyMax=100
 	Energy=100
 	EnergyCut=0
+	//FocusShift variables
+	FocusShiftActive= FALSE
+	FocusShiftType= "None" // Variables are STR, FOR
+	FocusShiftBoost= 1.5 // Defaults to 1.5. This is a multiplier!
+	FocusShiftTimer = 0 // Cancels out if the timer hits 0.
+	FocusShiftCooldown = 0 // Defaults to 30. How long until you can use it again.
+	//
 	EnergyExpenditure=1//Crank that drain if higher than 1
 	EnergyUniqueness=1//EVERYONE'S A SNOWFLAKE
 	EnergySignature//holds your unique energy signature
@@ -134,7 +141,7 @@ mob/var
 	EndTransMult=1
 	EndChaos=1
 	EndAscension=0
-	tmp/StaggerMeter=0 // Boss Stun
+	StaggerMeter=0 // Boss Stun
 	StaggerMult=1
 	MaimKOGetups=0
 	EndReplace=0
@@ -180,6 +187,7 @@ mob/var
 	RecovMultTotal=1
 	RecovChaos=1
 	RecovAscension=0
+	VitAscension=0
 	RecovReplace
 	RecovTax=0
 	RecovCut=0
@@ -187,7 +195,6 @@ mob/var
 	AngerPoint=50//get angry with this percent of health left
 	AngerMessage//custom anger messages
 	AngerColor
-	HiddenAnger //hide BP from anger
 	CalmAnger //Never get angry unless something forces you to.  Like maki.
 	ExhaustedMessage
 	NanoBoostMessage = "'s nanites respond to their physical trauma, bolstering their cybernetic power!"
@@ -224,7 +231,6 @@ mob/var
 	VanishDuration
 
 	//Battle Variables
-	NoAnger //Can't get angry when this is flagged.
 	NoRevert=0 //Transformations don't revert.
 	NoVoid //YOU THOUGHT YOU WERE GONNA VOID, BITCH?!
 	NoDeath=0 //it means no worries...for the rest of your daaaays
@@ -265,8 +271,6 @@ mob/var
 	list/Binding//Holds the zplane of binding
 	BindingTimer//Every time this goes off, the person is returned to their zplane.
 	HearThoughts=1
-	Phylactery//if 1, make sure their phylactery is in the world
-	PhylacteryNerf=0//take this percent out of anger
 
 	Immortal //Not timeless, but won't die from age
 	Spiritual//Demons and shinjin and yokai, o mai
@@ -312,6 +316,7 @@ mob/var
 	//Knowledge Variables
 	list/UnlockedTechnology=list()//this will hold the types of unlocked technology AND enchantment
 	list/PotionTypes=list()//determines what herbs you can use
+	list/InkworksTypes=list() // Determines what Inkworks you can inscribe
 
 	GrimoiresMade//Holds how many Grimoire types you've made total
 
@@ -337,7 +342,6 @@ mob/var
 	SureDodgeTimerLimit
 	tmp/CounterMasterTimer
 	Afterimages//Jitters effect.
-	EnergySiphon//(not) Raiju skill.
 
 	obj/Skills/Buffs/ActiveBuff//New buff variable.
 	obj/Skills/Buffs/SpecialBuff//New buff variable.
@@ -427,11 +431,19 @@ mob/var
 	PowerEroded=0
 	Base=1
 	StrMod=1
+	StrengthInvest=0
 	EndMod=1
+	EnduranceInvest=0
+	VitMod=1
+	VitalityInvest=0
 	ForMod=1
+	ForceInvest=0
 	OffMod=1
+	OffenseInvest=0
 	DefMod=1
+	DefenseInvest=0
 	SpdMod=1
+	SpeedInvest=0
 
 	TrueName//Holds true name for otherworldly beings
 	RPPower=1 //Multiplies overall power, edited by admins to increase power when it is suited to do so.
@@ -447,7 +459,11 @@ mob/var
 	SpecialSlot=0
 	Anger=0
 	AngerMax=1
-	AngerStorage=1
+	AngerTier=0//ratcheted curve tier, Calm() resets it
+	AngerRush=0//event fuel - evaluates you as if you were this much lower hp
+	AngerCalmHigh=0//composure highwater - calm anger doesn't recede until a real calm
+	tmp/AngerManaLast=0//berserker watcher - last seen mana, drops feed the rage
+	tmp/AngerCCWindow=0//repeat-cc tracker for the anger event
 
 	Tail
 	TailIcon='Tail.dmi'
@@ -508,14 +524,9 @@ mob/var
 	StyleActive
 	Confused//The amount of time you have reversed movement for.
 	AngerMult//allows anger multipliers to stack. oh my god
-	AngerThreshold//if you're not angry enough, this will make you angry enough
 	AngerAdd //just adds anger
 	AngerCD=0
 	CyberCancel//Basically the same, but for cyber stuffs.
-	CyberPowerAngerNerf
-	CyberPassiveAngerNerf
-	CyberActiveAngerNerf
-	CyberStatAngerNerf
 	EnhancedHearing=0
 	//New variables; Advanced Stances and Staves give offense and defense.  Swords give offense.  Armor gives defense.
 	ElementalOffense
@@ -535,8 +546,8 @@ mob/var
 	Crippled=0
 	Attracting=0
 	Attracted=0
+	tmp/AttractingCooldown=0
 	tmp/mob/AttractedTo=0
-	Terrifying=0
 	Terrified=0
 	tmp/mob/TerrifiedOf=0
 	PotionCD=0
@@ -637,7 +648,6 @@ mob/var
 	WillPower
 	Regenerating
 	Judgment
-	PridefulRage
 	Defiance
 	DefianceCounter=0
 	DefianceRetaliate
@@ -673,8 +683,6 @@ mob/var
 	PrayerMute = FALSE
 
 	tension = 0
-
-	ShinjinAscension
 
 	AngelAscension
 

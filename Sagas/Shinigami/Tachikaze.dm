@@ -1,10 +1,10 @@
 /obj/Skills/Projectile/Air_Blades
 	name = "Air Blades"
-	ManaCost = 5
+	ManaCost = 1
 	Cooldown = 5
-	StrRate = 2
-	ForRate = 0
-	DamageMult = 10
+	StrScaling = 2
+	ForScaling = 0
+	DamageMult = 1.05
 	AccMult = 1.2
 	Homing = 0
 	Instinct = 2
@@ -31,9 +31,6 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"        = 1 + SL,
-			"BlurringStrikes" = 0.5 + (SL * 0.5),
-			"Flow"            = 1 + SL,
 			"BladeFisting"    = 1,
 			"Momentum"        = 0.5 + (0.5 * SL),
 			"Fury"            = 0.5 + (0.5 * SL),
@@ -81,11 +78,11 @@
 /obj/Skills/Projectile/Bakudantsuki
 	name = "Bakudantsuki"
 	Distance = 20
-	DamageMult = 15
+	DamageMult = 2.05
 	AccMult = 1.15
 	Blasts = 1
-	ManaCost = 15
-	Cooldown = 30
+	ManaCost = 2
+	Cooldown = 8
 	Radius = 2
 	Charge = 2
 	Explode = 1
@@ -117,10 +114,8 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"LikeWater"       = 1 + SL,
-			"BlurringStrikes" = 2.5 + (SL * 0.5),
 			"Fa Jin"          = 1.25 + (0.25 * SL),
-			"SpiritHand"      = 4 + (1.25 * SL),
+			
 			"Momentum"        = 0.5 + (0.5 * SL),
 			"Fury"            = 0.5 + (0.5 * SL),
 			"Scorching"       = 1 + SL,
@@ -192,15 +187,15 @@
 
 /obj/Skills/Queue/Enhanced_Sandbag_Beat
 	name = "Enhanced Sandbag Beat"
-	DamageMult = 1.5
+	DamageMult = 0.3
 	AccuracyMult = 1.3
 	Warp = 5
 	Combo = 25
 	Rapid = 1
 	Instinct = 2
 	Duration = 10
-	Cooldown = 60
-	ManaCost = 20
+	Cooldown = 15
+	ManaCost = 3
 
 	verb/Enhanced_Sandbag_Beat()
 		set name = "Enhanced Sandbag Beat"

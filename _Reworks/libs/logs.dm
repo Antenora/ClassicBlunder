@@ -5,14 +5,7 @@
 
 
 proc/getSharCopyLevel(sagaLevel)
-    if(glob.SHAR_COPY_ALL)
-        return 10
-    if(glob.SHAR_COPY_MANUAL)
-        return glob.SHAR_COPY_MANUAL
-    if(glob.SHAR_COPY_PLUS)
-        return sagaLevel + glob.SHAR_COPY_PLUS
-    if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-        return sagaLevel
+    return sagaLevel
 
 
 

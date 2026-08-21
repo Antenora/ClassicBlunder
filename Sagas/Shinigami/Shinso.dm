@@ -10,11 +10,10 @@ mob/var/tmp/ButouActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"SweepingStrike"  = 3 + SL,
-			"GiantSwings"     = 3 + SL,
+			"SweepingStrike"     = 4 + SL,
 			"Sniper"          = 1 + SL,
-			"Brutalize"       = 0.5 + (0.5 * SL),
-			"BlurringStrikes" = 0.5 + (0.5 * SL),
+			
+			
 			"Extend"          = 1.5 + (0.5 * SL)
 		)
 		if(SL < 3)
@@ -67,11 +66,10 @@ mob/var/tmp/ButouActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"SweepingStrike"  = 5 + SL,
-			"GiantSwings"     = 5 + SL,
+			"SweepingStrike"     = 6 + SL,
 			"Sniper"          = 1 + SL,
-			"Brutalize"       = 1.5 + (0.5 * SL),
-			"BlurringStrikes" = 2.5 + (0.5 * SL),
+			
+			
 			"Extend"          = 3 + (0.5 * SL)
 		)
 		if(SL < 5)
@@ -134,6 +132,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Butou()
 		set name = "Butou"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Butou in Bankai."
 			return
@@ -156,6 +155,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Butou_Renjin()
 		set name = "Butou: Renjin"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Butou: Renjin in Bankai."
 			return
@@ -184,6 +184,7 @@ mob/var/tmp/ButouActive = FALSE
 	verb/Korose()
 		set name = "Korose"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.CheckSlotless("Kamishini no Yari"))
 			usr << "You can only use Korose in Bankai."
 			return
@@ -204,6 +205,6 @@ mob/var/tmp/ButouActive = FALSE
 		OMsg(usr, "<b>[usr] activates the poison hidden within [target].</b>")
 		target.Poison = 0
 		target.SilentPoisonAmount = 0
-		target.Health -= damage
+		target.Health -= target.PctToHP(damage)
 		if(target.Health <= 0 && !target.KO)
 			target.Unconscious(usr, "having their body eaten away at from within by [usr]'s poison!")

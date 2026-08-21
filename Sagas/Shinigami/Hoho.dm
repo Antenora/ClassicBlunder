@@ -11,6 +11,7 @@
 	verb/Shunpo()
 		set name = "Shunpo"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		src.ShunpoToggle = !src.ShunpoToggle
 		if(src.ShunpoToggle)
@@ -37,13 +38,13 @@
 	NeedsSword = 1
 	Area = "Target"
 	GuardBreak = 1
-	StrOffense = 1
+	StrScaling = 1
 	MortalBlow = 0.25
-	DamageMult = 10
+	DamageMult = 2.55
 	Distance = 10
 	PassThrough = 1
-	Cooldown = 30
-	ManaCost = 5
+	Cooldown = 8
+	ManaCost = 2
 	ActiveMessage = "vanishes and reappears with a decisive strike Senka!"
 
 	verb/Senka()
@@ -61,6 +62,7 @@
 	verb/Utsusemi()
 		set name = "Utsusemi"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(src.ManaCost && User.ManaAmount < src.ManaCost)
@@ -111,6 +113,7 @@
 	verb/Speed_Clones()
 		set name = "Speed Clones"
 		set category = "Skills"
+		set hidden = 1
 		var/mob/User = usr
 		if(cooldown_remaining) return
 		if(clones_active)
@@ -211,11 +214,11 @@ mob/Player/HohoClone
 		src.name = User.name
 		src.dir = User.dir
 		src.owner = User
-		src.Health = User.Health
+		src.SetHealthPct(User.HealthPct())
 		src.VaizardHealth = User.VaizardHealth
 		spawn(0)
 			while(src && src.loc && !fading && owner && owner.loc)
-				src.Health = owner.Health
+				src.SetHealthPct(owner.HealthPct())
 				src.VaizardHealth = owner.VaizardHealth
 				sleep(1)
 

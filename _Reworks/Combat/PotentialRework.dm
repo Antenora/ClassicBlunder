@@ -1,3 +1,5 @@
+//TODO: Determine what the fuck is going on here because i dont think we want it
+
 ///var/list/POWER_TIERS = list("F", "E", "D", "C", "B", "A", "S", "SS", "SSS", "LEGENDARY", "DIVINE", "GODLY", "OMNI", "INFINITE")
 
 /var/MAX_MULT = 250
@@ -12,6 +14,7 @@
 	set category = "Admin"
 	set desc = "Changes the base mod for power"
 	set name = "Change Global Base"
+	if(!src.Alert("Are you sure you want to change global base mod?")) return
 	var/previous = BASE_MOD
 	var/newMod = input(src, "Enter a new base mod for power") as num
 	if(newMod)

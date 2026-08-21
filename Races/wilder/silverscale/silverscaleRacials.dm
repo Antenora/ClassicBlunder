@@ -39,7 +39,6 @@
 /obj/Skills/AutoHit/Mist_Form
     Area="Circle"
     ComboMaster=1
-    AdaptRate=1
     DamageMult=0.025
     Rounds=10
     Cooldown=180
@@ -80,7 +79,6 @@
 
 /obj/Skills/AutoHit/Oceanic_Wrath
     ElementalClass="Water"
-    ForOffense=1.5
     SpecialAttack=1
     DamageMult=15
     Chilling=150
@@ -98,7 +96,6 @@
         Cooldown = 60 - (5 * asc)
         Distance = 10 + (5 * asc)
         Stasis = 5 + (2.5 * asc)
-        ForOffense = 1 + (0.25 * asc)
     verb/Oceanic_Wrath()
         set category="Skills"
         adjust(usr);
@@ -106,7 +103,6 @@
 /obj/Skills/AutoHit/Ocean_Roar
     Area="Circle"
     ElementalClass="Water"
-    AdaptRate=1
     DamageMult=0.1
     Rounds=1
     TurfDirt=1

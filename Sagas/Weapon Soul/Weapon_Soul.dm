@@ -4,10 +4,6 @@ mob/proc/gainWeaponSoul()
 	src.SagaLevel=1
 	src.AddSkill(new/obj/Skills/Buffs/ActiveBuffs/Weapon_Soul)
 	var/list/openSwords = glob.WeaponSoulNames
-	if(!glob.infWeaponSoul)
-		openSwords = glob.getOpen("WeaponSoul")
-		if(openSwords.len<1)
-			glob.ResetSwords()
 	WeaponSoulType = input("Which sword resonates with your soul?") in openSwords
 	BoundLegend = WeaponSoulType
 	src << "[WeaponSoulType] manifests within your grip, peerless and refined..."
@@ -94,7 +90,6 @@ mob/tierUpSaga(Path)
 
 					if("Muramasa")
 						src << "The blade of assured Death whispers the arts of Death to you..."
-						passive_handler.Increase("CriticalChance", 5)
 						passive_handler.Increase("CriticalDamage", 0.2)
 						AddSkill(new/obj/Skills/AutoHit/Masterful_Death)
 
@@ -123,8 +118,6 @@ mob/tierUpSaga(Path)
 
 					if("Green Dragon Crescent Blade")
 						src << "The Green Dragon Crescent Blade unveils the secrets to an unstoppable rush..."
-						passive_handler.Increase("Flow", 2)
-						passive_handler.Increase("Instinct", 2)
 						AddSkill(new/obj/Skills/AutoHit/Crushing_Dragon_Strike)
 						AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Gong_Bu)
 						// SagaThreshold("Spd",2)
@@ -183,7 +176,6 @@ mob/tierUpSaga(Path)
 
 					if("Green Dragon Crescent Blade")
 						src << "The Green Dragon Crescent Blade shows how to counter any attack..."
-						passive_handler.Increase("Adaptation")
 						passive_handler.Increase("Extend", 1)
 						// SagaThreshold("Spd",0.5)
 						// SagaThreshold("Str",0.5)
@@ -241,7 +233,6 @@ mob/tierUpSaga(Path)
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi/kusa in src.Buffs)
 							kusa.passives["Godspeed"] = 2
 							kusa.passives["Skimming"] = 2
-							kusa.passives["HybridStrike"] = 1
 							kusa.passives["SwordAscension"] = 1
 							kusa.passives["ManaGeneration"] = 15
 
@@ -254,7 +245,6 @@ mob/tierUpSaga(Path)
 
 					if("Dainsleif")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif/dainsleif in src.Buffs)
-							dainsleif.passives["Instinct"] = 4
 							dainsleif.passives["Adrenaline"] = 1
 							dainsleif.passives["AbyssMod"] = 4
 							dainsleif.passives["SwordAscension"] = 1
@@ -262,14 +252,11 @@ mob/tierUpSaga(Path)
 					if("Caledfwlch")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch/caled in src.Buffs)
 							caled.passives["Xenobiology"] = 1
-							caled.passives["CriticalChance"] = 10
 							caled.passives["CriticalDamage"] = 0.5
 							caled.passives["Pursuer"] = 2
 
 					if("Muramasa")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa/muramasa in src.Buffs)
-							muramasa.passives["KillerInstinct"] = 0.3
-							muramasa.passives["DemonicDurability"] = 2
 							muramasa.passives["TechniqueMastery"] = 2
 
 					if("Masamune")
@@ -285,7 +272,6 @@ mob/tierUpSaga(Path)
 							SE.passives["Burning"] = 2
 							SE.passives["BurningShot"] = 1
 							SE.passives["BurnHit"] = 15
-							SE.passives["AngerAdaptiveForce"] = 0.15
 						src << "Soul Edge's conquering chaos takes form as a wave of ruin, Dark Reconquista: Triumph."
 						AddSkill(new/obj/Skills/AutoHit/Dark_Reconquista_Triumph)
 
@@ -296,13 +282,11 @@ mob/tierUpSaga(Path)
 
 					if("Ryui Jingu Bang")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang/Ryui in src.Buffs)
-							Ryui.passives["FluidForm"] = 1
 							Ryui.passives["StunningStrike"] = 1
 
 					if("Green Dragon Crescent Blade")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu/GuanYu in src.Buffs)
 							GuanYu.passives["Iaijutsu"] = 2
-							GuanYu.passives["Zornhau"] = 2
 							GuanYu.passives["TechniqueMastery"] = 2
 							GuanYu.passives["SwordAscension"] = 1
 							GuanYu.passives["LifeGeneration"] = 1
@@ -374,7 +358,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=2
 		EndMult=1.5
 		OffMult=1.25
-		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1, "AngelicInfusion"= 3, "DebuffReversal" = 1)
+		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1,  "DebuffReversal" = 1)
 		ActiveMessage= "invokes the Origin of Hope, embracing the Conviction of a Saint!"
 		OffMessage= "casts aside the Origin of Hope..."
 		verb/Fundament_Conviction()
@@ -400,7 +384,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		OffMult=1.25
 		ActiveMessage= "invokes the Origin of Ruin, stewing in Primordial Hate!"
 		OffMessage= "casts aside the Origin of Ruin..."
-		passives= list("DeathField" = 5, "MaimStrike" = 1, "Duelist" = 3)
+		passives= list("DeathField" = 5,  "Duelist" = 3)
 		verb/Fundament_Hatred()
 			set category="Skills"
 			src.Trigger(usr)

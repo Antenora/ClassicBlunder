@@ -2,56 +2,50 @@ ascension
 	makyo
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			passives = list("Juggernaut" = 0.5, "DemonicDurability" = 1, "HeavyHitter" = 0.5, "Trample" = 1, "Adrenaline" = 1)
+			passives = list("Juggernaut" = 0.5,  "HeavyHitter" = 0.5, "Trample" = 1, "Adrenaline" = 1)
 			skills = list(/obj/Skills/Buffs/SlotlessBuffs/Makyo/Expand)
 			strength = 1
 			endurance = 1
 			offense = 0.25
 			force = 0.25
-			intimidation = 25
 			anger = 0.15
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("Pressure" = 1, "DemonicDurability" = 1, "HeavyHitter" = 0.5, "Adrenaline" = 2)
+			passives = list(  "HeavyHitter" = 0.5, "Adrenaline" = 2)
 			endurance = 1.25
 			strength = 1.25
 			force = 0.5
 			offense = 0.5
-			intimidation = 50
 			anger = 0.15
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
-			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 0.5, "Pressure" = 1, "SweepingStrike" = 1)
+			passives = list("Juggernaut" = 1,  "HeavyHitter" = 0.5,  "SweepingStrike" = 1)
 			strength = 1.75
 			endurance = 1.75
 			force = 1.25
 			offense = 1.25
-			intimidation = 50
 			anger = 0.15
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
-			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 1, "Pressure" = 1, "Adrenaline" = 2)
+			passives = list("Juggernaut" = 1,  "HeavyHitter" = 1,  "Adrenaline" = 2)
 			strength = 2.5
 			endurance = 2.5
 			force = 1.5
 			offense = 1.5
-			intimidation = 25
 			anger = 0.15
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
-			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 2, "Pressure" = 1)
+			passives = list("Juggernaut" = 1,  "HeavyHitter" = 2)
 			strength = 2.75
 			endurance = 2.75
 			force = 1.75
-			intimidation = 25
 
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
-			passives = list("Juggernaut" = 1, "DemonicDurability" = 1, "HeavyHitter" = 2, "Pressure" = 2, "GiantSwings" = 1)
+			passives = list("Juggernaut" = 1,  "HeavyHitter" = 2,  "SweepingStrike" = 1)
 			strength = 3
 			endurance = 3
 			offense = 3
-			intimidation = 25
 
 /*ascension
 	makyo
@@ -84,7 +78,7 @@ ascension
 					strength = 0.25
 					speed = 0.25
 					defense = 0.25
-					passives+= list("Godspeed" = 1, "BlurringStrikes"=1)
+					passives+= list("Godspeed" = 1)
 				..()
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
@@ -136,7 +130,7 @@ ascension
 					strength = 0.25
 					speed = 0.25
 					defense = 0.25
-					passives+= list("Godspeed" = 1, "BlurringStrikes"=1)
+					passives+= list("Godspeed" = 1)
 				..()
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
@@ -204,7 +198,6 @@ ascension
 				force = 0.5
 				endurance = 0.5
 				offense = 0.5
-				passives= list("ManaStats" = 1)
 
 				onAscension(mob/owner)
 					owner.Class = "Fall"

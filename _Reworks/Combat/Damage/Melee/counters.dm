@@ -13,7 +13,26 @@
 	if( ((q && counter) || buster) && !ccd &&!ignore)
 		enemy.dir = get_dir(enemy, src)
 		if(buster)
-			enemy.UseProjectile(enemy.BusterTech)
+			if(enemy.BusterTech.CounterNova)
+				var/obj/Skills/Projectile/CB = enemy.BusterTech
+				var/turf/nt = get_step(enemy, 0)
+				for(var/d in list(NORTH, SOUTH, EAST, WEST, NORTHEAST, NORTHWEST, SOUTHEAST, SOUTHWEST))
+					var/obj/Skills/Projectile/nb = new CB.type
+					nb.TempDamage = CB.DamageMult
+					nb.SpawnPosition = nt
+					new /obj/Skills/Projectile/_Projectile(enemy, nb, nt, 0.5, 0, 0, d)
+				CB.Cooldown(1, null, enemy)
+				CB.Charging = 0
+				enemy.BusterTech = null
+				enemy.BusterCharging = 0
+				enemy.Chargez("Remove")
+				if(enemy.held_skill == CB)
+					enemy.ForceClearHeldChargeState()
+			else
+				var/obj/Skills/Projectile/CB2 = enemy.BusterTech
+				enemy.UseProjectile(CB2, noGCD = TRUE)
+				if(enemy.held_skill == CB2)
+					enemy.ForceClearHeldChargeState()
 		else
 			if(!AttackQueue || (!AttackQueue && (AttackQueue.Counter|| AttackQueue.CounterTemp )))
 				#if DEBUG_DAMAGE

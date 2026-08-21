@@ -8,16 +8,17 @@ var/datum/sandstorm_controller/admin_sandstorm_active = null
 	spawning = 60
 	lifespan = 70
 	fade = 3
+	fadein = 3
 	grow = 0.015
-	scale = generator("num", 1.0, 2.2)
+	scale = generator("num", 1.0, 2.2, NORMAL_RAND)
 	gravity = list(-0.6, 0)
 	position = generator("box", list(-500, -380, 0), list(500, 380, 0))
 	spin = 0
 	color = "#5a2808"
 
-// Screen tint overlay
 /obj/screen/sandstorm_tint
 	screen_loc = "CENTER"
+	plane = FX_RELAY_PLANE
 	layer = 19
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
@@ -28,13 +29,11 @@ var/datum/sandstorm_controller/admin_sandstorm_active = null
 		var/icon/I = new('sandstorm.dmi')
 		I.DrawBox("#c49848", 1, 1, 32, 32)
 		icon = I
-		var/matrix/M = matrix()
-		M.Scale(42, 32)
-		transform = M
+		GfxFitSharedScreenOverlay(src)
 
-// Screen emitter for the sweeping dots
 /obj/screen/sandstorm_dots_emitter
 	screen_loc = "CENTER"
+	plane = FX_RELAY_PLANE
 	layer = 20
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE

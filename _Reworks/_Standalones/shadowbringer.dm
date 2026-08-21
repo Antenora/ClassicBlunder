@@ -2,9 +2,10 @@
 // Reworked to objs to play nicely with Katen Kyokotsu 
 
 mob/proc/ShadowbringerPassiveActive()
-	if(passive_handler)
-		if(passive_handler.passives["Shadowbringer"] || passive_handler.tmp_passives["Shadowbringer"])
-			return TRUE
+	for(var/obj/Skills/Buffs/SlotlessBuffs/Katen_Kyokotsu/K in src)
+		if(K.SlotlessOn) return TRUE
+	for(var/obj/Skills/Buffs/SlotlessBuffs/Karamatsu_Shinju/B in src)
+		if(B.SlotlessOn) return TRUE
 	return FALSE
 
 mob/Players/proc/Shadowbringer_ShouldCastShadow()

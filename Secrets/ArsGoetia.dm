@@ -32,7 +32,7 @@
 				usr.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic)
 				usr.AddSkill(new/obj/Skills/Teleport/Traverse_Depths)
 				usr.AddSkill(new/obj/Skills/Utility/Imitate)
-				usr.passive_handler.Increase("Hellpower" = 0.5)
+				usr.passive_handler.Increase("HellPower", 0.5)
 				usr.client.updateCorruption()
 				usr.demon.selectPassive(usr, "CORRUPTION_PASSIVES", "Buff", TRUE)
 				usr.demon.selectPassive(usr, "CORRUPTION_DEBUFFS", "Debuff")
@@ -58,7 +58,7 @@
 				usr.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic)
 				usr.AddSkill(new/obj/Skills/Teleport/Traverse_Depths)
 				usr.AddSkill(new/obj/Skills/Utility/Imitate)
-				usr.passive_handler.Increase("Hellpower" = 0.5)
+				usr.passive_handler.Increase("HellPower", 0.5)
 				usr.client.updateCorruption()
 				usr.demon.selectPassive(usr, "CORRUPTION_PASSIVES", "Buff", TRUE)
 				usr.demon.selectPassive(usr, "CORRUPTION_DEBUFFS", "Debuff")
@@ -76,7 +76,7 @@
 			src.BloodSacrifice+= 1
 			M.BPPoison=0.5
 			M.MortallyWounded+=1
-			M.DoDamage(M, 100)
+			M.DoDamage(M, M.PctToHP(100))
 			M.TotalInjury+=85
 			M.AddHealthCut(0.1)
 			OMsg(usr, "[usr] sacrifices the blood of [M], inflicting a brutal injury and leaving them on the brink of death. [M] loses 10% of their max health.")
@@ -120,7 +120,7 @@
 					if(m.isRace(MAKAIOSHIN))
 						usr<<"They are outside of your authority."
 						OMsg(usr, "[usr] attempted to invoke the True Name of something they have no authority over, causing magical backlash.")
-						usr.DoDamage(usr, 25)
+						usr.DoDamage(usr, usr.PctToHP(25))
 						src.Using=0
 						return
 					if(m.isRace(CELESTIAL))
@@ -251,7 +251,7 @@
 
 	verb/Activate_Void()
 		set category = "Ars Goetia"
-		usr.passive_handler.Set("Void", !usr.passive_handler.passives["Void"])
+		usr.passive_handler.Set("Void", !usr.passive_handler.Get("Void"))
 		usr << "Void is [usr.passive_handler["Void"] ? "on" : "off"]."
 
 

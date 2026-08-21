@@ -1,11 +1,12 @@
 transformation
 	makaioshin
 		falldown_mode
-			passives = list("HellPower" = 0.1, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "Juggernaut" = 0.5)
-			autoAnger = 1
+			passives = list("HellPower" = 0.1,  "TechniqueMastery" = 2, "Juggernaut" = 0.5)
+			angerFloor = 60
 			unlock_potential = 50
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
+			form_ki_rays = 1 //light rays
 			strength = 1 //will clean this up in between wipes
 			speed = 1
 			offense = 1
@@ -65,7 +66,7 @@ transformation
 				if(user.Potential>=80&&mastery<100)
 					mastery=100
 				if(mastery >= 25)
-					passives = list("GodKi" = 0.15, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "Juggernaut" = 1, "HellRisen" = 0.25)
+					passives = list("GodKi" = 0.15,  "TechniqueMastery" = 2, "Juggernaut" = 1, "HellRisen" = 0.25)
 					enduranceadd = 0.35
 					offenseadd = 0.35
 					defenseadd = 0.35
@@ -73,7 +74,7 @@ transformation
 					forceadd = 0.35
 					speedadd = 0.35
 				if(mastery >= 50)
-					passives = list("GodKi" = 0.25, "AngerAdaptiveForce" = 0.5,"TechniqueMastery" = 4, "FluidForm" = 1, "Juggernaut" = 1.5, "HellRisen" = 0.5)
+					passives = list("GodKi" = 0.25, "TechniqueMastery" = 4, "Juggernaut" = 1.5, "HellRisen" = 0.5)
 					enduranceadd = 0.5
 					offenseadd = 0.5
 					defenseadd = 0.5
@@ -81,7 +82,7 @@ transformation
 					forceadd = 0.5
 					speedadd = 0.5
 				if(mastery >= 75)
-					passives = list("GodKi" = 0.35, "AngerAdaptiveForce" = 0.75,"TechniqueMastery" = 6, "FluidForm" = 1.5, "Juggernaut" = 2,"HellRisen" = 0.75)
+					passives = list("GodKi" = 0.35, "TechniqueMastery" = 6, "Juggernaut" = 2,"HellRisen" = 0.75)
 					enduranceadd = 0.5
 					offenseadd = 0.5
 					defenseadd = 0.5
@@ -89,7 +90,7 @@ transformation
 					forceadd = 0.5
 					speedadd = 0.5
 				if(mastery >= 100)
-					passives = list("GodKi" = 0.5, "AngerAdaptiveForce" = 1,"TechniqueMastery" = 8, "FluidForm" = 2, "Juggernaut" = 3,"HellRisen" = 1)
+					passives = list("GodKi" = 0.5, "TechniqueMastery" = 8, "Juggernaut" = 3,"HellRisen" = 1)
 					enduranceadd = 1
 					offenseadd = 1
 					defenseadd = 1
@@ -102,11 +103,15 @@ transformation
 					KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=ShockSize, Blend=2, Time=8)
 					ShockSize/=2
 		satan_mode
-			passives = list("GodKi" = 0.75, "HolyMod" = 10, "AbyssMod" = 10, "SpiritPower" = 2, "PhysPleroma" = 3, "Purity" = 1, "BeyondPurity" = 1)
-			autoAnger = 1
+			passives = list("GodKi" = 0.75, "HolyMod" = 10, "AbyssMod" = 10, "SpiritPower" = 2,  "Purity" = 1, "BeyondPurity" = 1)
+			angerFloor = 90
 			unlock_potential = 90
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32
+			form_ki_rays = 1 
+			form_ray_density = 14
+			form_ray_threshold = 0.6
+			form_ray_size = 16
 			enduranceadd = 1
 			offenseadd = 1
 			defenseadd = 1

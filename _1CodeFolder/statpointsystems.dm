@@ -6,15 +6,23 @@ mob/proc/RacialStats(statsinquestion)
 		statArchive.reset(race)
 	displayStats()
 mob/proc/displayStats()
-	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))
+	var/StatDisplay=1//statArchive.calc_stat(statArchive.vars[x])
+	var/InvestedPoints=1//statArchive.calc_invested(statArchive.vars[x])
+	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality"))
 		winset(src, "Finalize_Screen.[x]", "text=[statArchive.calc_stat(statArchive.vars[x])]")
+		StatDisplay=src.statArchive.calc_stat(statArchive.vars[x])
+		InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[x])*glob.progress.STAT_PER_POINT)
+		var/TotalDisplay=StatDisplay+InvestedPoints
+		winset(src, "Finalize_Screen.[x]", "text=[TotalDisplay]")
+
 
 /mob/proc/setAllStats()
-	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))
+	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality"))
 		var/org = x
 		if(x == "Speed")
 			x = "Spd"
 		vars["[copytext(x,1,4)]Mod"] = statArchive.calc_stat(statArchive.vars[org])
+		vars["[org]Invest"] = statArchive.calc_invested(statArchive.vars[org])
 
 mob/verb/Skill_Points(type as text,skill as text)
 	set name=".Skill_Points"
@@ -23,6 +31,9 @@ mob/verb/Skill_Points(type as text,skill as text)
 	verb_delay=world.time+1
 	if(race_selecting) return
 	var/Increase=1
+	var/StatDisplay=src.statArchive.calc_stat(statArchive.vars[skill])
+	var/InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[skill])*glob.progress.STAT_PER_POINT)
+	var/TotalDisplay=StatDisplay+InvestedPoints
 	if(type == "-")
 		if(Points==Max_Points) return
 		Increase = -1
@@ -30,11 +41,14 @@ mob/verb/Skill_Points(type as text,skill as text)
 		if(type == "+")
 			Increase = 1
 			if(Points==0) return
-	if(!(skill in list("Strength","Endurance","Force","Offense","Defense","Speed")))return
+	if(!(skill in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality")))return
 	if(!statArchive.adjust(type, skill))
 		src << "You can't."
 	else
-		winset(src,"Finalize_Screen.[skill]","text=[statArchive.calc_stat(statArchive.vars[skill])]")
+		StatDisplay=src.statArchive.calc_stat(statArchive.vars[skill])
+		InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[skill])*glob.progress.STAT_PER_POINT)
+		TotalDisplay=StatDisplay+InvestedPoints
+		winset(src,"Finalize_Screen.[skill]","text=[TotalDisplay]")
 		Points-=Increase
 		winset(src,"Finalize_Screen.Points Remaining","text=[Points]")
 	setAllStats()
@@ -47,11 +61,13 @@ obj/Redo_Stats
 		del src
 	verb/Redo_Stats()
 		set category="Other"
+		set hidden = 1
 		RedoStats(usr)
 
 
 proc/Define_Average(var/i=1)
-	if(i<1)
+	return i
+/*	if(i<1)
 		return "Low"
 	else if(i>=1&&i<1.5)
 		return "Average"
@@ -60,10 +76,11 @@ proc/Define_Average(var/i=1)
 	else if(i>=2&&i<2.5)
 		return "Genius"
 	else if(i>=2.5)
-		return "Absurd"
+		return "Absurd"*/
 
 mob/proc/Redo_Stats()
 	set category="Other"
+	set hidden = 1
 	Redoing_Stats=1
 	RacialStats()
 	UpdateBio()
@@ -84,10 +101,10 @@ mob/proc/Redo_Stats()
 
 mob/proc/PerkDisplay()
 	winset(src,"Finalize_Screen.Points Remaining","text=[Points]")
-	winset(src,"RaceBP","text=\"[Define_Average(PotentialRate)] Power Rate\"")
-	winset(src,"Race RPP","text=\"[Define_Average(RPPMult)] RPP Mult\"")
-	winset(src,"Race Intellect", "text=\"[Define_Average(Intelligence)] Intellect\"")
-	winset(src,"Race Imagination", "text=\"[Define_Average(Intelligence*Imagination)] Enchanting\"")
+	winset(src,"RaceBP","text=\"[Define_Average(PotentialRate)]x Power Rate\"")
+	winset(src,"Race RPP","text=\"[Define_Average(RPPMult)]x RPP Mult\"")
+	winset(src,"Race Intellect", "text=\"[Define_Average(Intelligence)]x Intellect\"")
+	winset(src,"RaceGrowthRate", "text=\"[Define_Average(GrowthRate)]x Growth Rate\"")
 	displayStats()
 	winset(src,"Anger","text=[AngerMax*100]%")
 
@@ -112,6 +129,8 @@ mob/proc/SetStat(Stat,Amount=1)
 		StrMod=Amount
 	if(Stat=="Endurance")
 		EndMod=Amount
+	if(Stat=="Vitality")
+		VitMod=Amount
 	if(Stat=="Force")
 		ForMod=Amount
 	if(Stat=="Offense")
@@ -128,6 +147,8 @@ mob/proc/SetStat(Stat,Amount=1)
 		Intelligence=Amount
 	if(Stat=="Imagination")
 		Imagination=Amount
+	if(Stat=="Growth")
+		GrowthRate=Amount
 
 mob/verb/Skill_Points_Done()
 	set name=".Skill_Points_Done"
@@ -145,5 +166,6 @@ mob/verb/Skill_Points_Done()
 		stat_redoing = FALSE
 		race_selecting = TRUE
 	winshow(src,"Finalize_Screen",0)
+	Health=MaxHP()
 	if(!usr.Savable)
 		usr.NewMob()

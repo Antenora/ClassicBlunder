@@ -13,7 +13,6 @@
 /obj/Skills/AutoHit/Crown_Radiation//called by swapping into phoenix form
     Area="Circle"
     ElementalClass="Light"
-    AdaptRate=1
     Rounds=1
     TurfDirt=1
     TurfErupt=1
@@ -75,7 +74,6 @@
     NoAttackLock = 1;
     Rounds = 4;
     DamageMult = 1.5;
-    AdaptRate = 1;
     Area = "Circle"
     Size=4;
     Distance = 4;
@@ -217,9 +215,6 @@
 
 
 /obj/Skills/Projectile/Consuming_Light
-    StrRate=0.5
-    EndRate=1.5
-    ForRate=0
     Distance=20
     Stream=1
     MultiHit=2

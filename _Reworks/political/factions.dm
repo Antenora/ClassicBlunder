@@ -2,6 +2,7 @@
 /mob/proc/RegisterMember()
     set name = "Register Member"
     set category = "Roleplay"
+    set hidden = 1
     // get the person targetted
     if(!Target)
         src<< "You need a target"
@@ -32,7 +33,6 @@ characterInformation
     var/factionColor = "#6c0303d7"
     var/job = "BROKE BOY"
     var/jobColor = "#0ba800ff"
-    var/showGuild = FALSE
     var/showFaction = TRUE
     proc/assignJob(mob/admin, mob/target)
         var/choice = input(admin, "Pick a job", "Job") in JOBS

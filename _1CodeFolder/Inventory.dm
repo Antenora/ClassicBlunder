@@ -1,37 +1,149 @@
-// Inventory System - 60 item limit, 2 pages of 30, grid-based display
+// 30 held items per HUD category (Misc / Consumables / Gear). Materials live in the Collection Log.
 
-#define MAX_INVENTORY 60
+#define MAX_INVENTORY 60          // this will be phased out soonish
 #define INV_PAGE_SIZE 30
 
 mob/var/tmp/inv_page = 1
 
-// Count physical items (not Money, not Skills)
+// Count all physical items (not Money, not Skills)
 mob/proc/GetItemCount()
 	var/count = 0
 	for(var/obj/Items/I in src)
 		count++
 	return count
 
-// Check if inventory has room
+// Count held items in one HUD category. Currency (mineral) and materials (Collection Log) don't count.
+mob/proc/GetCategoryCount(cat)
+	var/count = 0
+	for(var/obj/Items/I in src)
+		if(istype(I, /obj/Items/mineral) || istype(I, /obj/Items/Material)) continue
+		if(InvClassify(I) == cat) count++
+	return count
+
+mob/proc/CategoryFull(cat)
+	return GetCategoryCount(cat) >= INV_CATEGORY_CAP
+
 mob/proc/InventoryFull()
 	return GetItemCount() >= MAX_INVENTORY
 
-// Check and print message if full. Returns 1 if full, 0 if space available.
-mob/proc/CheckInventoryFull()
-	if(!InventoryFull()) return 0
-	src << "<b><font color=red>Your inventory is full! ([GetItemCount()]/[MAX_INVENTORY])</font></b>"
+// item-aware fullness message
+mob/proc/CheckInventoryFull(var/obj/Items/item = null)
+	if(item)
+		if(istype(item, /obj/Items/mineral) || istype(item, /obj/Items/Material)) return 0
+		var/cat = InvClassify(item)
+		if(!CategoryFull(cat)) return 0
+		src << "<b><font color=red>Your [cat] inventory is full! ([INV_CATEGORY_CAP] max)</font></b>"
+		return 1
+	if(!CategoryFull("Misc") || !CategoryFull("Consumables") || !CategoryFull("Gear")) return 0
+	src << "<b><font color=red>Your inventory is full!</font></b>"
 	return 1
 
-// Check if a specific item can be picked up (handles stackables)
 mob/proc/CanPickupItem(var/obj/Items/item)
 	if(!item) return 0
 	if(item.Stackable)
 		for(var/obj/Items/existing in src)
-			if(existing.type == item.type && existing.Stackable)
-				return 1
-	if(CheckInventoryFull())
+			if(existing.type == item.type && existing.Stackable && existing.CraftQuality == item.CraftQuality && existing.metal_id == item.metal_id)
+				if(existing.TotalStack < INV_STACK_MAX) return 1
+	if(istype(item, /obj/Items/mineral) || istype(item, /obj/Items/Material)) return 1   // currency / log, uncapped here
+	return !CategoryFull(InvClassify(item))
+
+// hand an item to a player, or drop it at their feet if that category is full. returns 1 if held.
+mob/proc/GiveOrDrop(var/obj/Items/I, var/quiet = 0)
+	if(!I) return 0
+	if(I.Stackable)
+		for(var/obj/Items/e in src)
+			if(e.type == I.type && e.Stackable && e.CraftQuality == I.CraftQuality && e.metal_id == I.metal_id)
+				if(e.TotalStack < INV_STACK_MAX)
+					StackInto(e, I.TotalStack)
+					del I
+					if(client) client.BuildInvPage()
+					return 1
+				break   // matching stack is maxed
+	if(CanPickupItem(I))
+		I.loc = src
+		if(client) client.BuildInvPage()
+		return 1
+	var/turf/T = get_step(src, dir)
+	I.loc = T ? T : loc
+	if(!quiet) src << "<b><font color=red>Your [InvClassify(I)] pack is full - [I.name] drops at your feet.</font></b>"
+	if(client) client.BuildInvPage()
+	return 0
+
+// add `amount` onto an existing stack, capped at 999; overflow drops a fresh stack at the owner's feet. returns amount merged.
+mob/proc/StackInto(var/obj/Items/existing, var/amount)
+	if(!existing || amount <= 0) return 0
+	var/room = INV_STACK_MAX - existing.TotalStack
+	if(room <= 0)
+		DropStackRemainder(existing, amount)
 		return 0
-	return 1
+	var/merged = min(amount, room)
+	existing.TotalStack += merged
+	existing.suffix = "[existing.TotalStack]"
+	if(amount > merged)
+		DropStackRemainder(existing, amount - merged)
+	return merged
+
+mob/proc/DropStackRemainder(var/obj/Items/proto, var/amount)
+	if(!proto || amount <= 0) return
+	var/turf/T = get_step(src, dir)
+	var/obj/Items/o = new proto.type(T ? T : loc)
+	o.TotalStack = min(amount, INV_STACK_MAX)
+	o.CraftQuality = proto.CraftQuality
+	o.metal_id = proto.metal_id
+	o.name = proto.name
+	o.suffix = "[o.TotalStack]"
+	src << "<b><font color=red>[proto.name] is capped at [INV_STACK_MAX] - [amount] more drop at your feet.</font></b>"
+
+mob/proc/GroundPickup(var/obj/Items/I)
+	if(!I || !isturf(I.loc)) return
+	if(get_dist(src, I) > 1)
+		src << "You're too far away to pick that up."
+		return
+	if(!I.Grabbable && I.CreatorKey && I.CreatorKey != src.ckey)
+		src << "That doesn't belong to you."
+		return
+	if(istype(I, /obj/Items/Material))
+		// materials live in the Collection Log
+		var/obj/Items/Material/mat = I
+		if(mat.MaterialClass && mat.MaterialClass != "Scrap")
+			var/banked = MatLogAdd(mat.MaterialClass, mat.CraftQuality, mat.TotalStack)
+			src << "<font color=#78eb78>You bank [banked]x [mat.name] in your Collection Log.</font>"
+			del I
+			return
+	if(istype(I, /obj/Items/mineral))
+		var/obj/Items/mineral/gi = I
+		var/obj/Items/mineral/have = locate() in src
+		if(have && have != gi)
+			have.Add(gi.value)
+			del gi
+			if(client) client.BuildInvPage()
+			return
+	if(I.Stackable)
+		for(var/obj/Items/e in src)
+			if(e.type == I.type && e.Stackable && e.CraftQuality == I.CraftQuality && e.metal_id == I.metal_id)
+				var/room = INV_STACK_MAX - e.TotalStack
+				if(room <= 0)
+					src << "That stack is already full ([INV_STACK_MAX])."
+					return
+				var/take = min(I.TotalStack, room)
+				e.TotalStack += take
+				e.suffix = "[e.TotalStack]"
+				I.TotalStack -= take
+				src << "You pick up [take]x [e.name]. ([e.TotalStack] total)"
+				if(I.TotalStack <= 0)
+					del I
+				else
+					I.suffix = "[I.TotalStack]"
+					src << "Stack full - [I.TotalStack]x stay on the ground."
+				if(client) client.BuildInvPage()
+				return
+	if(CheckInventoryFull(I)) return
+	I.loc = src
+	if(I.Stackable && I.TotalStack > 1)
+		src << "You pick up [I.TotalStack]x [I.name]."
+	else
+		src << "You pick up [I]."
+	if(client) client.BuildInvPage()
 
 // Open inventory window
 mob/verb/Open_Inventory()

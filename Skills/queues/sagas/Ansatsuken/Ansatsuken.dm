@@ -112,6 +112,7 @@ obj
 				Finisher = 8
 				Duration = 5
 				Dunker = 5
+				NoGCD = 1
 
 
 			Messatsu_Goshoryu

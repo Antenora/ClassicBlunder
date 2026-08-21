@@ -24,6 +24,7 @@
 
 		for(var/obj/Skills/Projectile/_Projectile/p in view(User))
 			if(p in feast_projectiles) continue
+			if(p.clash_lock && !p.clash_lock.ended) continue //beams locked in a struggle are untouchable
 			neutralize_projectile(p, User)
 			feast_projectiles += p
 
@@ -33,6 +34,7 @@
 		pull_in_and_consume(User)
 
 	proc/neutralize_projectile(obj/Skills/Projectile/_Projectile/p, mob/User)
+		if(p.clash_lock && !p.clash_lock.ended) return //never strip a clash-locked segment out of its beam
 		// Flag as killed so ProjectileFinish skips explosions/clusters/trails
 		p.Killed = 1
 		// Set distance to -1 so the Life/homingLoop exits

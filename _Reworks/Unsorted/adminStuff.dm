@@ -21,6 +21,7 @@
 
 	for(var/x in lol)
 		src<<"[x] = [lol[x]]"
+
 var/GlobalStorage/globalStorage
 
 GlobalStorage
@@ -65,10 +66,10 @@ GlobalStorage
 
 /mob/verb/changeClientFPS()
 	set category = "Other"
+	set hidden = 1
 	set name = "Change Client FPS"
-	client.fps = input(src, "ssss") as num
-	src.ChosenFPS=client.fps
-	src.client<<"[client.fps]"
+	var/n = input(src, "ssss") as num
+	src.client<<"[SetClientFPS(n)]"
 
 /mob/Admin3/verb/Copy(obj/O in world)
 	set category = "Admin"

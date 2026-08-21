@@ -18,9 +18,9 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
 /mob/proc/ClaimMajinRoom()
     if(majinOwnedRoom >= 1 && majinOwnedRoom <= MAJIN_ROOM_COUNT)
         if(MAJIN_ROOM_OWNERS[majinOwnedRoom] == ckey)
-            return majinOwnedRoom 
+            return majinOwnedRoom
         if(!MAJIN_ROOM_OWNERS[majinOwnedRoom])
-            MAJIN_ROOM_OWNERS[majinOwnedRoom] = ckey 
+            MAJIN_ROOM_OWNERS[majinOwnedRoom] = ckey
             return majinOwnedRoom
         majinOwnedRoom = 0
     for(var/i = 1, i <= MAJIN_ROOM_COUNT, i++)
@@ -28,7 +28,7 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
             MAJIN_ROOM_OWNERS[i] = ckey
             majinOwnedRoom = i
             return i
-    return 0 
+    return 0
 
 /mob/proc/ReleaseMajinRoom()
     if(!majinOwnedRoom) return
@@ -167,6 +167,7 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     var/mob/Players/admin = usr
     if(!istype(admin)) return
     if(!admin.Admin) return
+    if(!src.Alert("Are you sure you want to check majin rooms?")) return
     var/list/menu = list()
     var/list/menu_lookup = list()
     for(var/i = 1, i <= MAJIN_ROOM_COUNT, i++)
@@ -203,7 +204,7 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     var/mob/Players/admin = usr
     if(!istype(admin)) return
     if(!admin.Admin) return
-
+    if(!src.Alert("Are you sure you want to assign a Majin Room?")) return
     var/list/menu = list()
     var/list/menu_lookup = list()
     for(var/mob/Players/M in players)

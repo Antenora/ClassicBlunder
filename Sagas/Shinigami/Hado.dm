@@ -2,13 +2,13 @@
 
 /obj/Skills/Projectile/Hado/Sho
 	name = "Sho"
-	DamageMult = 5
+	DamageMult = 1.3
 	Knockback = 5
 	Homing = 0
 	Distance = 10
 	IconLock = 'ArcaneDischarge.dmi'
-	ManaCost = 3
-	Cooldown = 15
+	ManaCost = 1
+	Cooldown = 5
 
 	verb/Sho()
 		set name = "Sho"
@@ -16,15 +16,15 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/Hado/Byakurai
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Byakurai"
 	Area = "Beam"
 	ChargeRate = 0.5
-	BeamTime = 50
-	DamageMult = 10
+	BeamTime = 10
+	DamageMult = 0.15
 	Shocking = 10
 	Piercing = 1
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 0
@@ -33,8 +33,8 @@
 	IconLock = 'LightningWave.dmi'
 	LockY = -24
 	LockX = -24
-	ManaCost = 5
-	Cooldown = 30
+	ManaCost = 2
+	Cooldown = 8
 
 	verb/Byakurai()
 		set name = "Byakurai"
@@ -50,7 +50,7 @@
 	ManaCost = 5
 	ElementalOffense = "Wind"
 	ElementalDefense = "Wind"
-	passives = list("Shocking"=3, "ThunderHerald"=1, "CriticalChance"=5, "CriticalDamage"=0.05)
+	passives = list("Shocking"=3, "ThunderHerald"=1, "CriticalDamage"=0.05)
 	ActiveMessage = "conducts lightning through their body — Tsuzuri Raiden!"
 	OffMessage = "releases the conducted lightning."
 
@@ -66,10 +66,10 @@
 	HeldSkill = TRUE
 	InfiniteHold = TRUE
 	FireRate = 15
-	ManaCost = 10
+	ManaCost = 2
 	Homing = 1
-	Cooldown = 45
-	DamageMult = 6
+	Cooldown = 10
+	DamageMult = 0.41
 	Distance = 20
 	Explode = 1
 	Instinct = 1
@@ -85,22 +85,22 @@
 	OnHeldTick(mob/p)
 		if(ChantNumber == 0)
 			src.ActiveMessage = "chants: <b>Ye lord!</b>"
-			src.DamageMult = 8
+			src.DamageMult = 0.55
 		if(ChantNumber == 1)
 			src.ActiveMessage = "chants: <b>Mask of blood and flesh, all creation, flutter of wings...</b>"
-			src.DamageMult = 10
+			src.DamageMult = 0.68
 		if(ChantNumber == 2)
 			src.ActiveMessage = "chants: <b>...ye who bears the name of Man!</b>"
-			src.DamageMult = 12
+			src.DamageMult = 0.82
 		if(ChantNumber == 3)
 			src.ActiveMessage = "chants: <b>Inferno and pandemonium...</b>"
-			src.DamageMult = 14
+			src.DamageMult = 0.96
 		if(ChantNumber == 4)
 			src.ActiveMessage = "chants: <b>The sea barrier surges, march on to the south!</b>"
-			src.DamageMult = 20
+			src.DamageMult = 1.37
 		if(ChantNumber == 5)
 			src.ActiveMessage = "chants: <b>Hadō Number 31...</b>"
-			src.DamageMult = 30
+			src.DamageMult = 2.05
 		if(ChantNumber <= 5)
 			src.IconSize = 1 + (0.05 * (ChantNumber + 1))
 			OMsg(p, "<b>[p] [src.ActiveMessage]</b>")
@@ -109,41 +109,38 @@
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ActiveMessage = "chants: <b><font size=+1>Shakkahō!</font></b>"
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 6
+		src.DamageMult = 0.41
 		src.IconSize = 1
 
 	OnHeldFizzle(mob/p)
 		ChantNumber = 0
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 6
+		src.DamageMult = 0.41
 		src.IconSize = 1
 
 	verb/Shakkahou()
 		set name = "Shakkahou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Oukasen
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Oukasen"
 	Area = "Beam"
 	ChargeRate = 1
-	BeamTime = 50
-	DamageMult = 15
+	BeamTime = 10
+	DamageMult = 0.25
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1
 	Deflectable = -1
 	density = 0
 	IconLock = 'BeamFKH.dmi'
-	ManaCost = 10
-	Cooldown = 45
+	ManaCost = 2
+	Cooldown = 10
 	ActiveMessage = "releases a burst of golden energy with Hadō #32: Ōkasen!"
 	verb/Oukasen()
 		set name = "Oukasen"
@@ -156,9 +153,9 @@
 	InfiniteHold = TRUE
 	FireRate = 15
 	Homing = 0
-	ManaCost = 10
-	Cooldown = 45
-	DamageMult = 5
+	ManaCost = 2
+	Cooldown = 10
+	DamageMult = 0.68
 	Scorching = 10
 	Combustion = 0
 	Distance = 20
@@ -172,23 +169,23 @@
 	OnHeldTick(mob/p)
 		if(ChantNumber == 0)
 			src.ActiveMessage = "chants: <b>Ye lord!</b>"
-			src.DamageMult = 7
+			src.DamageMult = 0.95
 			src.Scorching = 13
 		if(ChantNumber == 1)
 			src.ActiveMessage = "chants: <b>Mask of flesh and bone, all creation, flutter of wings...</b>"
-			src.DamageMult = 10
+			src.DamageMult = 1.35
 			src.Scorching = 16
 		if(ChantNumber == 2)
 			src.ActiveMessage = "chants: <b>...ye who bears the name of Man!</b>"
-			src.DamageMult = 14
+			src.DamageMult = 1.89
 			src.Scorching = 19
 		if(ChantNumber == 3)
 			src.ActiveMessage = "chants: <b>Truth and temperance...</b>"
-			src.DamageMult = 17
+			src.DamageMult = 2.30
 			src.Scorching = 22
 		if(ChantNumber == 4)
 			src.ActiveMessage = "chants: <b>...upon this sinless wall of dreams, unleash but slightly the wrath of your claws!!</b>"
-			src.DamageMult = 20
+			src.DamageMult = 2.7
 			src.Scorching = 25
 			src.Combustion = 30
 		if(ChantNumber == 5)
@@ -203,9 +200,9 @@
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ActiveMessage = "chants: <b><font size=+1>Sōkatsui!</font></b>"
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 5
+		src.DamageMult = 0.68
 		src.Scorching = 10
 		src.Combustion = 0
 		src.IconSize = 1
@@ -213,7 +210,7 @@
 	OnHeldFizzle(mob/p)
 		ChantNumber = 0
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 5
+		src.DamageMult = 0.68
 		src.Scorching = 10
 		src.Combustion = 0
 		src.IconSize = 1
@@ -221,9 +218,6 @@
 	verb/Soukatsui()
 		set name = "Soukatsui"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 // TIER 3
@@ -231,13 +225,13 @@
 /obj/Skills/Projectile/Hado/Haien
 	name = "Haien"
 	Homing = 1
-	DamageMult = 20
+	DamageMult = 3.9
 	Scorching = 20
 	Combustion = 40
 	Distance = 20
 	IconLock = 'Blast8.dmi'
-	ManaCost = 15
-	Cooldown = 60
+	ManaCost = 3
+	Cooldown = 15
 	ActiveMessage = "hurls a violet blast of flames with Hadō #54: Haien!"
 	verb/Haien()
 		set name = "Haien"
@@ -245,21 +239,21 @@
 		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/Hado/Tenran
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Tenran"
 	Area = "Beam"
 	ChargeRate = 1
-	BeamTime = 50
-	DamageMult = 25
+	BeamTime = 10
+	DamageMult = 0.35
 	Distance = 50
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1
 	Deflectable = -1
 	density = 0
 	IconLock = 'Tenran.dmi'
-	ManaCost = 20
-	Cooldown = 60
+	ManaCost = 3
+	Cooldown = 15
 	ActiveMessage = "calls forth a fierce tempest with Hadō #58: Tenran!"
 	verb/Tenran()
 		set name = "Tenran"
@@ -275,8 +269,8 @@
 	FireRate = 15
 	Area = "Target"
 	Distance = 20
-	DamageMult = 30
-	ForOffense = 1
+	DamageMult = 7.23
+	ForScaling = 1
 	Bolt = 4
 	BoltOffset = 0
 	Paralyzing = 10
@@ -284,8 +278,8 @@
 	HitSparkIcon = 'BLANK.dmi'
 	HitSparkX = 0
 	HitSparkY = 0
-	ManaCost = 30
-	Cooldown = 90
+	ManaCost = 5
+	Cooldown = 25
 	ActiveMessage = "starts chanting..."
 
 	var/tmp/ChantNumber = 0
@@ -295,23 +289,23 @@
 	OnHeldTick(mob/p)
 		if(ChantNumber == 0)
 			src.ActiveMessage = "chants: <b>Sprinkled on the bones of the beast!</b>"
-			src.DamageMult = 36
+			src.DamageMult = 8.67
 			src.Paralyzing = 18
 		if(ChantNumber == 1)
 			src.ActiveMessage = "chants: <b>Sharp tower, red crystal, steel ring.</b>"
-			src.DamageMult = 43
+			src.DamageMult = 10.36
 			src.Paralyzing = 25
 		if(ChantNumber == 2)
 			src.ActiveMessage = "chants: <b>Move and become the wind, stop and become the calm.</b>"
-			src.DamageMult = 46
+			src.DamageMult = 11.08
 			src.Paralyzing = 33
 		if(ChantNumber == 3)
 			src.ActiveMessage = "chants: <b>The sound of warring spears fills the empty castle!</b>"
-			src.DamageMult = 49
+			src.DamageMult = 11.80
 			src.Paralyzing = 40
 		if(ChantNumber == 4)
 			src.ActiveMessage = "chants: <b>Hadō Number 63...</b>"
-			src.DamageMult = 52
+			src.DamageMult = 12.53
 			src.Paralyzing = 45
 		if(ChantNumber <= 4)
 			OMsg(p, "<b>[p] [src.ActiveMessage]</b>")
@@ -327,7 +321,7 @@
 		sleep(8)
 
 		// Fire at the apex
-		p.Activate(src)
+		p.Activate(src, noGCD = TRUE)
 
 		// Quick descent
 		animate(p, pixel_z = saved_pz, time = 4, easing = QUAD_EASING|EASE_IN)
@@ -337,27 +331,24 @@
 		spawn(1) p.animate_movement = old_am
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
-		src.DamageMult = 55
+		src.DamageMult = 13.25
 		src.Paralyzing = 50
 		src.ActiveMessage = "chants: <b><font size=+2>Raikōhō!</font></b>"
 		ChantNumber = 0
 		RaikouhouJump(p)
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 30
+		src.DamageMult = 7.23
 		src.Paralyzing = 10
 
 	OnHeldFizzle(mob/p)
 		ChantNumber = 0
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 30
+		src.DamageMult = 7.23
 		src.Paralyzing = 10
 
 	verb/Raikouhou()
 		set name = "Raikouhou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Souren_Soukatsui
@@ -365,9 +356,9 @@
 	HeldSkill = TRUE
 	InfiniteHold = TRUE
 	FireRate = 15
-	ManaCost = 40
-	Cooldown = 90
-	DamageMult = 30
+	ManaCost = 5
+	Cooldown = 25
+	DamageMult = 4.65
 	Scorching = 50
 	Combustion = 0
 	Radius = 0
@@ -382,27 +373,27 @@
 	OnHeldTick(mob/p)
 		if(ChantNumber == 0)
 			src.ActiveMessage = "chants: <b>Ye lord!</b>"
-			src.DamageMult = 34
+			src.DamageMult = 5.27
 			src.Scorching = 60
 			src.Radius = 1
 		if(ChantNumber == 1)
 			src.ActiveMessage = "chants: <b>Mask of blood and flesh, all creation, flutter of wings...</b>"
-			src.DamageMult = 38
+			src.DamageMult = 5.89
 			src.Scorching = 70
 			src.Radius = 2
 		if(ChantNumber == 2)
 			src.ActiveMessage = "chants: <b>...ye who bears the name of Man!</b>"
-			src.DamageMult = 42
+			src.DamageMult = 6.51
 			src.Scorching = 80
 			src.Radius = 3
 		if(ChantNumber == 3)
 			src.ActiveMessage = "chants: <b>On the wall of blue flame, inscribe a twin lotus.</b>"
-			src.DamageMult = 46
+			src.DamageMult = 7.13
 			src.Scorching = 90
 			src.Radius = 4
 		if(ChantNumber == 4)
 			src.ActiveMessage = "chants: <b>In the abyss of conflagration, wait at the far heavens.</b>"
-			src.DamageMult = 50
+			src.DamageMult = 7.75
 			src.Scorching = 100
 			src.Radius = 5
 			src.Combustion = 60
@@ -420,9 +411,9 @@
 		src.Radius = 7
 		src.Combustion = 100
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 30
+		src.DamageMult = 4.65
 		src.Scorching = 50
 		src.Combustion = 0
 		src.Radius = 0
@@ -431,7 +422,7 @@
 	OnHeldFizzle(mob/p)
 		ChantNumber = 0
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 30
+		src.DamageMult = 4.65
 		src.Scorching = 50
 		src.Combustion = 0
 		src.Radius = 0
@@ -440,16 +431,17 @@
 	verb/Souren_Soukatsui()
 		set name = "Souren Soukatsui"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/AutoHit/Hado/Zangerin
+	parent_type = /obj/Skills/AutoHit/Wave
 	name = "Zangerin"
-	StrOffense = 2
-	ManaCost = 30
-	Cooldown = 75
+	StrScaling = 2
+	ManaCost = 5
+	Cooldown = 18
+	DamageMult = 9
+	WaveIcon = 'KenShockwaveGold.dmi'
+	WaveHitBurstIcon = null
 
 	verb/Zangerin()
 		set name = "Zangerin"
@@ -458,114 +450,17 @@
 		if(src.cooldown_remaining > 0)
 			User << "[src] is on cooldown."
 			return
-		var/obj/Effects/ZangerinWave/W = new(User.loc)
-		W.owner = User
-		W.DamageMult = 40
-		W.StrOffense = 2
+		spawnWave(User)
 		User.OMessage(1, null, "[User] sweeps their blade in a crescent arc with Hadō #78: Zangerin!")
 		src.Cooldown(1, null, User)
-
-/obj/Effects/ZangerinWave
-	icon = 'KenShockwaveGold.dmi'
-	pixel_x = -105
-	pixel_y = -105
-	Grabbable = 0
-	mouse_opacity = 0
-	layer = EFFECTS_LAYER
-	var/max_size = 4.0
-	var/wave_lifetime = 20
-	var/tmp/mob/Players/owner
-	var/DamageMult = 7
-	var/StrOffense = 2
-	var/EndRes = 1
-	var/list/hitList = list()
-
-	New()
-		animate(src)
-		transform = matrix() * 0.1
-		alpha = 255
-		spawn(0)
-			hitDetectLoop()
-
-	proc/hitDetectLoop()
-		set waitfor = FALSE
-		var/start_time = world.time
-		var/prev_radius_tiles = 0.0
-		var/list/outsideSet = list()
-		while(src)
-			var/tick_begin = world.time
-			if(!owner || !owner.loc) break
-			if(owner.PureRPMode)
-				sleep(1)
-				start_time += (world.time - tick_begin)
-				continue
-
-			var/elapsed = world.time - start_time
-			if(elapsed >= wave_lifetime)
-				EffectFinish()
-				break
-
-			var/t = elapsed / wave_lifetime
-			var/scale = 0.1 + (max_size - 0.1) * t
-			var/curr_radius_tiles = (scale * 121.0) / 32.0
-			src.transform = matrix() * scale
-			src.alpha = round(255 * (1 - t))
-
-			for(var/mob/Players/P in players)
-				if(!P.client) continue
-				if(P == owner) continue
-				if(P.z != owner.z) continue
-				if(owner.inParty(P.ckey)) continue
-
-				var/dx = P.x - owner.x
-				var/dy = P.y - owner.y
-				var/dist = sqrt(dx * dx + dy * dy)
-
-				if(dist > curr_radius_tiles)
-					if(!(P in outsideSet))
-						outsideSet += P
-				else
-					if(P in outsideSet)
-						outsideSet -= P
-						if(!(P in hitList))
-							if(dist > prev_radius_tiles)
-								hitList += P
-								dealWaveDamage(P)
-
-			prev_radius_tiles = curr_radius_tiles
-			sleep(1)
-
-	proc/dealWaveDamage(mob/Players/target)
-		if(!owner || !target) return
-		if(owner.PureRPMode) return
-
-		var/powerDif = owner.Power / target.Power
-		if(glob.CLAMP_POWER && !owner.ignoresPowerClamp())
-			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
-
-		var/atk = owner.GetStr(StrOffense)
-		if(atk <= 0) atk = 0.01
-
-		var/def = target.getEndStat(1) * EndRes
-		if(def <= 0) def = 0.01
-
-		var/FinalDmg = (clamp(powerDif, 0.1, 100000) ** glob.DMG_POWER_EXPONENT) * \
-		               (glob.CONSTANT_DAMAGE_EXPONENT + glob.AUTOHIT_EFFECTIVNESS) ** \
-		               -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
-		FinalDmg *= DamageMult
-		FinalDmg *= owner.GetDamageMod()
-		FinalDmg *= glob.AUTOHIT_GLOBAL_DAMAGE
-
-		if(FinalDmg <= 0) return
-		target.LoseHealth(FinalDmg)
 
 // TIER 5
 
 /obj/Skills/Projectile/Hado/Hiryu
+	parent_type = /obj/Skills/Projectile/Beams
 	name = "Hiryu Gekizoku Shinten Raihou"
 	Area = "Beam"
 	Radius = 1
-	Variation = 0
 	IconSize = 1
 	AccMult = 1.175
 	Knockback = 1
@@ -575,12 +470,12 @@
 	ComboMaster = 1
 	density = 0
 	ChargeRate = 1
-	BeamTime = 50
-	DamageMult = 50
+	BeamTime = 10
+	DamageMult = 0.65
 	Distance = 50
 	IconLock = 'BeamBig5.dmi'
-	ManaCost = 50
-	Cooldown = 120
+	ManaCost = 8
+	Cooldown = 30
 
 	verb/Hiryu()
 		set name = "Hiryu Gekizoku Shinten Raihou"
@@ -592,9 +487,9 @@
 	HeldSkill = TRUE
 	InfiniteHold = TRUE
 	FireRate = 15
-	ManaCost = 60
-	Cooldown = 120
-	DamageMult = 6
+	ManaCost = 8
+	Cooldown = 30
+	DamageMult = 0.5
 	Blasts = 10
 	Homing = 3
 	Explode = 1
@@ -614,57 +509,54 @@
 	OnHeldTick(mob/p)
 		if(ChantNumber == 0)
 			src.ActiveMessage = "chants: <b>Limit of the thousands hands, respectful hands, unable to touch the darkness.</b>"
-			src.DamageMult = 7.5
+			src.DamageMult = 0.62
 		if(ChantNumber == 1)
 			src.ActiveMessage = "chants: <b>Shooting hands unable to reflect the blue sky.</b>"
-			src.DamageMult = 8
+			src.DamageMult = 0.67
 		if(ChantNumber == 2)
 			src.ActiveMessage = "chants: <b>The road that basks in light, the wind that ignited the embers...</b>"
-			src.DamageMult = 8.5
+			src.DamageMult = 0.71
 		if(ChantNumber == 3)
 			src.ActiveMessage = "chants: <b>...time that gathers when both are together, there is no need to be hesitant, obey my orders.</b>"
-			src.DamageMult = 10
+			src.DamageMult = 0.83
 		if(ChantNumber == 4)
 			src.ActiveMessage = "chants: <b>Light bullets, eight bodies, nine items, book of heaven, diseased treasure, great wheel, grey fortress tower.</b>"
-			src.DamageMult = 10.5
+			src.DamageMult = 0.87
 		if(ChantNumber == 5)
 			src.ActiveMessage = "chants: <b>Aim far away, scatter brightly and cleanly when fired.</b>"
-			src.DamageMult = 11
+			src.DamageMult = 0.92
 		if(ChantNumber == 6)
 			src.ActiveMessage = "chants: <b>Hadō Number 91...</b>"
-			src.DamageMult = 11.5
+			src.DamageMult = 0.96
 		if(ChantNumber <= 6)
 			OMsg(p, "<b>[p] [src.ActiveMessage]</b>")
 		ChantNumber += 1
 
 	OnHeldRelease(mob/p, benefit, sweet_spot_hit)
 		src.ActiveMessage = "chants: <b><font size=+2>Senju Kōten Taihō!</font></b>"
-		src.DamageMult = 12
+		src.DamageMult = 1
 		ChantNumber = 0
-		p.UseProjectile(src)
+		p.UseProjectile(src, noGCD = TRUE)
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 6
+		src.DamageMult = 0.5
 
 	OnHeldFizzle(mob/p)
 		ChantNumber = 0
 		src.ActiveMessage = "starts chanting..."
-		src.DamageMult = 6
+		src.DamageMult = 0.5
 
 	verb/Senju_Kouten_Taihou()
 		set name = "Senju Kouten Taihou"
 		set category = "Skills"
-		if(src.ManaCost && usr.ManaAmount < src.ManaCost)
-			usr << "You don't have enough mana to use [src.name]."
-			return
 		usr.BeginHeldSkill(src)
 
 /obj/Skills/AutoHit/Hado/Itto_Kaso
 	name = "Itto Kaso"
 	WoundCost = 25
 	Cooldown = -1
-	DamageMult = 75
-	StrOffense = 0
-	ForOffense = 1
+	DamageMult = 38.25
+	StrScaling = 0
+	ForScaling = 1
 	Area = "Circle"
 	Distance = 10
 	TurfErupt = 2

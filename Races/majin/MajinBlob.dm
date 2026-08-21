@@ -42,7 +42,7 @@ blobDropper/proc/dropBlob(mob/Players/p, override = 0)
 blobDropper/proc/canDropBlob(mob/Players/p)
     if(numBlobs >= numBlobsMax)
         return 0
-    if(p.Health < dropThreshold)
+    if(p.HealthPct() < dropThreshold)
         return 1
     return 0
 
@@ -100,10 +100,10 @@ blobDropper/proc/resetVariables(mob/Players/p)
     var/powerFloor = max(p.Power, 1)
     if(roll <= 10 || override)
         icon_state = "superheal"
-        val = 1 + (0.1 * ascen) + (0.05 * (100 - p.Health)) + (powerFloor * INNOCENT_BLOB_HEAL_FRAC)
+        val = 1 + (0.1 * ascen) + (0.05 * (100 - p.HealthPct())) + (powerFloor * INNOCENT_BLOB_HEAL_FRAC)
     else
-        buff = pick("PureReduction","Juggernaut","GiantForm","DemonicDurability")
-        val = 0.1 + (0.1 * ascen) + (0.05 * ((100 - p.Health)/2)) + (powerFloor * INNOCENT_BLOB_BUFF_FRAC)
+        buff = pick("PureReduction","Juggernaut","GiantForm")
+        val = 0.1 + (0.1 * ascen) + (0.05 * ((100 - p.HealthPct())/2)) + (powerFloor * INNOCENT_BLOB_BUFF_FRAC)
     heldBuff = new(p, val, buff)
 
 /obj/blob/Cross(atom/obstacle)

@@ -1,5 +1,7 @@
 proc/log_func(x, a, b)
 	return a * (log(x) / log(10) - b )
+#define HUD_PLANE 100
+
 #define TIER_1_COST 30
 #define TIER_2_COST 60
 #define TIER_3_COST 90
@@ -58,21 +60,17 @@ proc/log_func(x, a, b)
 #define MAJIN_UNHINGED_POWER_MULT 2
 #define MAKYO /race/makyo
 #define DRAGON /race/dragon
-#define ELF /race/high_faoroan
 #define ELDRITCH /race/eldritch
-#define GAJALAKA /race/gajalaka
 #define CHANGELING /race/changeling
 #define ANDROID /race/android
-#define SHINJIN /race/shinjin
 #define MAKAIOSHIN /race/makaioshin
 #define ANGEL /race/angel
 #define POPO /race/popo
 #define CELESTIAL /race/celestial
 #define NOBODY /race/nobody
-#define FAE /race/fae
 #define DEMIFIEND /race/demi_fiend
 #define WILDER /race/wilder
-
+#define KEYBLADE_MAGIC "KeybladeMagic"
 #define DEBUG_DAMAGE 0
 #define DEBUG_ITEM_DAMAGE 0
 #define DEBUG_MELEE 0
@@ -151,3 +149,14 @@ var/regex/yellSlashRegex = new(@"^/y\s")
 
 #define YELL_NOUNS list("shouts:", "yells:", "screams:")
 #define QUESTION_NOUNS list("questions:", "queries:", "asks:")
+
+// item quality tiers (used by tech crafting + life skills)
+#define QUAL_POOR      1
+#define QUAL_NORMAL    2
+#define QUAL_GOOD      3
+#define QUAL_EPIC      4
+#define QUAL_LEGENDARY 5
+
+// inventory: 30 held items per HUD category, 999 per stack / per material-quality in the log
+#define INV_CATEGORY_CAP 30
+#define INV_STACK_MAX 999

@@ -1,5 +1,5 @@
 obj/Skills/Grapple
-	canBeShortcut = 1;
+	NoGCD = 1
 	var
 		removeAfter = FALSE
 
@@ -7,11 +7,6 @@ obj/Skills/Grapple
 		DamageMult=1
 		MultiHit=1//hit multiple times durr
 		EnergyDamage=0//do damage to energy+fatigue and heal self mana
-		GrabMaster=1
-
-		StrRate=1
-		ForRate=0
-		EndRate=1
 
 		UnarmedOnly=1
 		SpecialAttack=0//staves n shiet
@@ -33,6 +28,7 @@ obj/Skills/Grapple
 		DrainBlood // for vampire
 		MortalBlow=0
 		DashAfter = FALSE
+		LandingSplash=0
 ////BASIC
 	skillDescription()
 		..()
@@ -40,12 +36,12 @@ obj/Skills/Grapple
 			description += "DamageMult: [DamageMult]\n"
 		if(MultiHit)
 			description += "Hits [MultiHit] times.\n"
-		if(StrRate)
-			description += "Strength Damage %: [StrRate*100]\n"
-		if(ForRate)
-			description += "Force Damage %: [ForRate*25]\n"
-		if(EndRate<1)
-			description += "Endurance Ignoring: [1-EndRate]%\n"
+		if(StrScaling)
+			description += "Strength Damage %: [StrScaling*100]\n"
+		if(ForScaling)
+			description += "Force Damage %: [ForScaling*25]\n"
+		if(EndEffectiveness<1)
+			description += "Endurance Ignoring: [1-EndEffectiveness]%\n"
 		if(UnarmedOnly)
 			description += "Unarmed Only.\n"
 		if(Reversal)
@@ -69,13 +65,14 @@ obj/Skills/Grapple
 			Effect = initial(Effect)
 			EffectMult = initial(EffectMult)
 			DamageMult = initial(DamageMult)
-			StrRate = initial(StrRate)
+			StrScaling = initial(StrScaling)
 			ThrowMult = initial(ThrowMult)
 			ThrowAdd = initial(ThrowAdd)
 			ThrowSpeed = initial(ThrowSpeed)
 			DashAfter = FALSE
 		verb/Toss()
 			set category="Skills"
+			set hidden = 1
 			if(!usr.Grab && !src.Using)
 				if(usr.Saga=="Unlimited Blade Works"&&usr.GetSlotless("GaeBolg"))
 					for(var/obj/Skills/Buffs/SlotlessBuffs/GaeBolg/GB in usr)
@@ -96,7 +93,7 @@ obj/Skills/Grapple
 					var/secretLevel = usr.getSecretLevel()
 					DamageMult = (6 + secretLevel) * (1 + usr.secretDatum:getBloodPowerRatio())
 					Cooldown = 20
-					StrRate = 0.8 * (1 + usr.secretDatum:getBloodPowerRatio())
+					StrScaling = 0.8 * (1 + usr.secretDatum:getBloodPowerRatio())
 					var/boon = 0// check to see if in wassail or in rotschreck
 					if(usr.CheckSlotless("Wassail"))
 						boon = 1
@@ -129,15 +126,14 @@ obj/Skills/Grapple
 		OneAndDone = 1
 		Effect = "Shockwave"
 		EffectMult=1
-		DamageMult=2
-		AdaptRate = 1
+		DamageMult=1
 		ThrowAdd=15
 		TriggerMessage = "stabs their lightning infused hand into"
 
 
 	Muscle_Buster
 		DamageMult = 2
-		StrRate = 1.5
+		StrScaling = 1.5
 		EffectMult=3
 		OneAndDone=1
 		HarderTheyFall = 2
@@ -146,7 +142,7 @@ obj/Skills/Grapple
 
 	Giant_Swing
 		DamageMult = 4
-		StrRate = 1.25
+		StrScaling = 1.25
 		EffectMult=2
 		OneAndDone=1
 		Effect="MuscleBuster"
@@ -155,8 +151,8 @@ obj/Skills/Grapple
 
 	Heavenly_Potemkin_Buster
 		DamageMult = T2_DMG_MULT / 2;
-		StrRate=1
-		EndRate=0.75
+		StrScaling=1
+		EndEffectiveness=0.75
 		OneAndDone = 1
 		EffectMult=3
 		HarderTheyFall = 4
@@ -165,16 +161,16 @@ obj/Skills/Grapple
 	Tombstone_Piledriver
 		DamageMult = T3_DMG_MULT/2;
 		HarderTheyFall = 6
-		StrRate=1.5
-		EndRate=0.75
+		StrScaling=1.5
+		EndEffectiveness=0.75
 		EffectMult=3
 		Effect="PotemkinBuster" //TODO: MAKE ANIMATION LATER
 		TriggerMessage = "is dropping the tombstone on"
 	Throw_Shit_At_The_Wall
 		DamageMult = 8
 		HarderTheyFall = 4
-		StrRate=1.5
-		EndRate=0.75
+		StrScaling=1.5
+		EndEffectiveness=0.75
 		EffectMult=3
 		Effect="MuscleBuster"
 		TriggerMessage = "aims and throws"
@@ -185,13 +181,13 @@ obj/Skills/Grapple
 		EffectMult=1.5
 		Effect="Lotus"
 		OneAndDone = 1
-		EndRate=0.75
-		StrRate=0.75
+		EndEffectiveness=0.75
+		StrScaling=0.75
 
 
 	Lotus_Drop
 		DamageMult=5
-		StrRate=1
+		StrScaling=1
 		TriggerMessage="spins into a vicious lotus drop to crack the skull of"
 		Effect="Lotus"
 		EffectMult=3
@@ -201,7 +197,7 @@ obj/Skills/Grapple
 		//Set from other queues
 	True_Lotus
 		DamageMult=8
-		StrRate=1
+		StrScaling=1
 		TriggerMessage="embraces the full power of their youth to spiral into a lotus drop to crack the skull of"
 		Effect="Lotus"
 		EffectMult=4
@@ -213,8 +209,8 @@ obj/Skills/Grapple
 		Reversal = 1
 		OneAndDone = 1
 		DamageMult = 2.5
-		StrRate = 1
-		EndRate = 0.9
+		StrScaling = 1
+		EndEffectiveness = 0.9
 		ThrowAdd = 2
 		ThrowMult = 1.25
 		ThrowSpeed = 1.25
@@ -226,8 +222,8 @@ obj/Skills/Grapple
 	Snake_Fang_Bites
 		MultiHit=2
 		DamageMult=2
-		StrRate=1
-		ForRate=4
+		StrScaling=1
+		ForScaling=4
 		ThrowAdd=5
 		TriggerMessage="drives two fang-hands into"
 		Effect="Strike"
@@ -235,8 +231,8 @@ obj/Skills/Grapple
 	Hammer_Crush
 		Stunner=3
 		DamageMult=4
-		StrRate=1
-		ForRate=0
+		StrScaling=1
+		ForScaling=0
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="presses down fiercely on"
@@ -244,8 +240,8 @@ obj/Skills/Grapple
 	Imperial_Disgust
 		Stunner=5
 		DamageMult=10
-		StrRate=1
-		ForRate=4
+		StrScaling=1
+		ForScaling=4
 		ThrowMult=0
 		ThrowAdd=10
 		TriggerMessage="casts all of their disgust upon"
@@ -259,7 +255,7 @@ obj/Skills/Grapple
 		SkillCost=TIER_3_COST
 		Copyable=3
 		DamageMult=2
-		StrRate=1
+		StrScaling=1
 		ThrowAdd=5
 		ThrowMult=1.5
 		TriggerMessage="violently throws"
@@ -271,33 +267,41 @@ obj/Skills/Grapple
 	Judo_Throw
 		SkillCost=TIER_3_COST
 		Copyable=4
-		DamageMult=7
+		DamageMult=3.2
 		Reversal=1
-		Stunner=2
-		StrRate=1
+		MenuIcon="JudoThrow"
+		Stunner=1
+		StrScaling=1
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="performs a judo throw on"
 		Effect="Shockwave"
-		Cooldown=60
+		Cooldown=12
+		EnergyCost=3
 		verb/Judo_Throw()
 			set category="Skills"
 			src.Activate(usr)
 	Izuna_Drop
 		SkillCost=TIER_3_COST
 		Copyable=4
-		DamageMult=7
-		EndRate = 0.8
-		StrRate=1
+		DamageMult=3.45
+		EndEffectiveness = 0.8
+		StrScaling=1
+		MenuIcon="IzunaDrop"
 		ThrowAdd=0
 		ThrowMult=0
 		TriggerMessage="goes on a short flight with"
 		Effect="Lotus"
 		EffectMult=2
 		OneAndDone=1
-		Cooldown=45
+		Cooldown=12
+		EnergyCost=3
 		verb/Izuna_Drop()
 			set category="Skills"
+			var/mob/g = usr.Grab
+			if(g && !g.Launched)
+				usr << "<font color='red'>[g] must be airborne to be dropped with [src]!</font>"
+				return
 			src.Activate(usr)
 	Suplex
 		NewCost = TIER_2_COST
@@ -305,52 +309,55 @@ obj/Skills/Grapple
 		SkillCost=120
 		Copyable=4
 		AlwaysAnnounceCooldown = 1
-		DamageMult=5.5
-		Stunner=3
-		StrRate=1
+		DamageMult=3.55
+		Stunner=0.3
+		StrScaling=1
+		MenuIcon="Suplex"
 		ThrowAdd=1
 		ThrowMult=0
 		TriggerMessage="suplexes"
 		Effect="Suplex"
 		EffectMult=1
-		Cooldown=60
+		Cooldown=8
+		EnergyCost=2
 		verb/Disable_Innovate()
 			set category = "Other"
+			set hidden = 1
 			disableInnovation(usr)
 		adjust(mob/p)
 			if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))
 				Effect="SuperSuplex"
 				TriggerMessage="starts freakifying"
 				EffectMult=0.5
-				Stunner=5
+				Stunner=0.8
 				OneAndDone=1
-				StrRate=1
-				DamageMult = 2.5 + (p.Potential / 50)
+				StrScaling=1
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=0
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
 				Effect="DarkSuplex"
 				TriggerMessage="channels dark energy into"
 				EffectMult=0.5
-				Stunner=5
+				Stunner=0.8
 				OneAndDone=1
-				StrRate=1
-				DamageMult = 2.5 + (p.Potential / 50)
+				StrScaling=1
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=1
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption))
 				Effect="CorruptSuplex"
 				TriggerMessage="curses with ruinous energy and slams"
 				EffectMult=0.5
-				Stunner=5
+				Stunner=0.8
 				OneAndDone=1
-				StrRate=1
-				DamageMult = 2.5 + (p.Potential / 50)
+				StrScaling=1
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=0
 			else
 				Effect="Suplex"
-				DamageMult=5.5
+				DamageMult=3.55
 				EffectMult=1
-				Stunner=3
-				StrRate=1
+				Stunner=0.3
+				StrScaling=1
 				EnergyDamage=0
 		verb/Suplex()
 			set category="Skills"
@@ -363,15 +370,17 @@ obj/Skills/Grapple
 		NewCopyable = 3
 		SkillCost=120
 		Copyable=4
-		DamageMult=5
-		ForRate=2
-		StrRate=0.5
+		DamageMult=4.5
+		MenuIcon="BurningFinger"
+		ForScaling=2
+		StrScaling=0.5
 		TriggerMessage="shoves their burning red hand through"
 		Effect="Bang"
 		EffectMult=2
 		ThrowMult=0
 		ThrowAdd=5
-		Cooldown=45
+		Cooldown=8
+		EnergyCost=2
 		verb/Burning_Finger()
 			set category="Skills"
 			src.Activate(usr)
@@ -381,15 +390,18 @@ obj/Skills/Grapple
 		UnarmedOnly=0
 		NeedsSword=0
 		SignatureTechnique=1
-		DamageMult=12
-		StrRate=1
-		ForRate=0.5
+		DamageMult=4.05
+		MenuIcon="BurningFinger"
+		StrScaling=1
+		ForScaling=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
 		Effect="Bang"
 		EffectMult=5
 		ThrowMult=0
 		ThrowAdd=15
-		Cooldown=150
+		LandingSplash=0.35
+		Cooldown=12
+		EnergyCost=3
 		verb/Erupting_Burning_Finger()
 			set category="Skills"
 			src.Activate(usr)
@@ -399,15 +411,17 @@ obj/Skills/Grapple
 		UnarmedOnly=0
 		NeedsSword=0
 		SignatureTechnique=1
-		DamageMult=12
-		ForRate=1
-		StrRate=0.5
+		RootRider=2
+		DamageMult=3.7
+		ForScaling=1
+		StrScaling=0.5
 		TriggerMessage="fills their grasp with lightning and takes hold of"
 		Effect="Lightning"
 		EffectMult=5
 		ThrowMult=0
 		ThrowAdd=15
-		Cooldown=150
+		Cooldown=15
+		EnergyCost=4
 		verb/Lightning_Stake()
 			set category="Skills"
 			src.Activate(usr)
@@ -418,8 +432,8 @@ obj/Skills/Grapple
 	Energy_Drain
 		DamageMult=0.75
 		EnergyDamage=2
-		ForRate=3
-		StrRate=0.25
+		ForScaling=3
+		StrScaling=0.25
 		TriggerMessage="drains energy from"
 		Effect="Drain"
 		EffectMult=1
@@ -436,7 +450,7 @@ obj/Skills/Grapple
 		Butterfly_Souffle
 			DamageMult=2
 			MultiHit=5
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=1
 			TriggerMessage="rips and tears into"
@@ -447,7 +461,7 @@ obj/Skills/Grapple
 			Copyable=3
 			SkillCost=120
 			DamageMult=4
-			StrRate=1.5
+			StrScaling=1.5
 			TriggerMessage="impales"
 			Effect="Strike"
 			EffectMult=2
@@ -457,8 +471,8 @@ obj/Skills/Grapple
 				set category="Skills"
 				src.Activate(usr)
 		Blade_Drive//run through pt 2
-			DamageMult=5
-			StrRate=1
+			DamageMult=1.25
+			StrScaling=1
 			ThrowMult=2
 			TriggerMessage="drives their weapon through the guts of"
 			Effect="Shockwave"
@@ -466,7 +480,7 @@ obj/Skills/Grapple
 			//set from other queues
 		Shank
 			DamageMult=1
-			StrRate=1
+			StrScaling=1
 			ThrowMult=3
 			ThrowAdd=1
 			Effect="Shockwave"
@@ -474,42 +488,46 @@ obj/Skills/Grapple
 		Eviscerate
 			Copyable=4
 			SkillCost=TIER_3_COST
-			DamageMult=1.1
+			DamageMult=0.45
+			WoundRider=0.15
 			MultiHit=8
-			StrRate=1
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=0
 			TriggerMessage="eviscerates"
 			Effect="Strike"
 			EffectMult=5
-			Cooldown=60
+			Cooldown=12
+			EnergyCost=3
 			verb/Eviscerate()
 				set category="Skills"
 				src.Activate(usr)
 		Hacksaw
 			Copyable=4
 			SkillCost=TIER_3_COST
-			DamageMult=11
-			StrRate=1
+			DamageMult=3.05
+			ShatterRider=10
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=0
 			TriggerMessage="hacks their weapon cruelly into"
 			Effect="Strike"
 			EffectMult=3
 			MortalBlow=1
-			Cooldown=60
+			Cooldown=12
+			EnergyCost=3
 			verb/Hacksaw()
 				set category="Skills"
 				src.Activate(usr)
 			Cancer_Snap
 				NeedsSword=0
 				TriggerMessage="uses their legs to crush"
-				Cooldown=0
+				Cooldown=12
 				//set from Acubens
 		No_Worries
 			Copyable = 0
 			DamageMult=8
-			StrRate=1.5
+			StrScaling=1.5
 			Stunner=3
 			Effect="Shockwave"
 			EffectMult=1
@@ -519,7 +537,7 @@ obj/Skills/Grapple
 			Copyable = 0
 			NeedsSword = 1
 			DamageMult=8
-			StrRate=1.5
+			StrScaling=1.5
 			Stunner=4
 			EnergyDamage=1
 			Effect="DarkSuplex"
@@ -529,15 +547,15 @@ obj/Skills/Grapple
 		Form_Ataru
 			Copyable=4
 			SkillCost=TIER_3_COST
-			DamageMult=10
-			Reversal=1
-			StrRate=1
+			DamageMult=3.55
+			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=1
 			TriggerMessage="does a slashing flip to break free of"
-			Effect="Strike"
+			Effect="Vault"
 			EffectMult=2
-			Cooldown=60
+			Cooldown=12
+			EnergyCost=3
 			verb/Form_Ataru()
 				set category="Skills"
 				set name="Form: Ataru"
@@ -546,11 +564,17 @@ obj/Skills/Grapple
 
 
 	proc
-		Activate(var/mob/User)
+		Activate(var/mob/User, noGCD = FALSE)
 			src.ThrowDir=User.dir
+			var/hd = User.heldDir()
+			if(hd) src.ThrowDir = hd
 			if(src.Using)
 				return
 			if(User.HeldSkillBlocksAction(src))
+				return
+			if(!noGCD && User.GCDBlocked(src))
+				return
+			if(!noGCD && User.Grab && world.time <= User.GrabTime + glob.TIMING_WINDOW)
 				return
 			if(User.Airborne)
 				return
@@ -600,6 +624,9 @@ obj/Skills/Grapple
 							step(Q, src.ThrowDir)
 							sleep(1)
 						Q.transform=matrix()
+						if(PmActive()) //snap the tossed object back to tile center
+							Q.step_x=0
+							Q.step_y=0
 						return//dont trigger cd for object interacts
 
 			if(ismob(User.Grab))
@@ -607,25 +634,15 @@ obj/Skills/Grapple
 				var/mob/Trg=User.Grab
 				// Trg.isGrabbed = TRUE
 				User.Grab=null
-				var/dmgRoll = User.GetDamageMod()
-				#if DEBUG_GRAPPLE
-				User.log2text("Grapple dmg roll ", dmgRoll, "damageDebugs.txt", User.ckey)
-				#endif
-				// get their damage roll, they don't get to ignore it cause its a grapple
 				var/userPower = User.getPower(Trg)
-				var/statPower = 1
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
 				var/itemDmg = 1
-				if(src.StrRate)
-					if(src.ForRate)
-						statPower = User.getStatDmg2(unarmed = !NeedsSword, sword = NeedsSword, spirithand = ForRate) * StrRate
-					else
-						statPower = User.getStatDmg2(unarmed = !NeedsSword, sword = NeedsSword,) * StrRate
-				else
-					if(src.ForRate)
-						statPower += User.GetFor(src.ForRate,)
+				var/gIdnt = FocusStatIdentity()
+				var/gStr = User.FocusShiftScaling(gIdnt, "STR", StrScaling)
+				var/gFor = User.FocusShiftScaling(gIdnt, "FOR", ForScaling)
+				var/statPower = (BaseStatOverride(User) || User.getStatDmg2(autohit = TRUE)) + (gStr ? User.GetStr(gStr) : 0) + (gFor ? User.GetFor(gFor) : 0) + (SpdScaling ? User.GetSpd(SpdScaling) : 0) + (OffScaling ? User.GetOff(OffScaling) : 0) + (DefScaling ? User.GetDef(DefScaling) : 0) + (EndScaling ? User.GetEnd(EndScaling) : 0)
 				if(HarderTheyFall)
 					var/enemyEnd = Trg.GetEnd(1)
 					statPower += enemyEnd * (HarderTheyFall/10)
@@ -646,10 +663,7 @@ obj/Skills/Grapple
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple Item Damage", itemDmg, "damageDebugs.txt", User.ckey)
 				#endif
-				var/endFactor = Trg.getEndStat(EndRate)
-				var/pride = User.HasPridefulRage();
-				if(pride) endFactor = clamp(Trg.getEndStat(1)/2, 1, Trg.getEndStat(1));
-				if(pride >= 2) endFactor = 1;
+				var/endFactor = Trg.getEndStat(1) * EndEffectiveness
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple End Factor", endFactor, "damageDebugs.txt", User.ckey)
 				#endif
@@ -658,12 +672,12 @@ obj/Skills/Grapple
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
 				#endif
-				Damage = (userPower**glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT+glob.GRAPPLE_EFFECTIVNESS) ** -(endFactor**glob.DMG_END_EXPONENT / statPower**glob.DMG_STR_EXPONENT)
+				Damage = strikeCoreDamage(userPower, statPower, endFactor)
 
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 				#endif
-				Damage *= dmgRoll
+				Damage *= User.strikeJudgmentMult()
 				var/extra = User.passive_handler.Get("Muscle Power") / glob.MUSCLE_POWER_DIVISOR
 				Damage *= DamageMult
 				if(HarderTheyFall && Trg.BioArmor)
@@ -685,6 +699,9 @@ obj/Skills/Grapple
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple Whiff Reduc", Damage, "damageDebugs.txt", User.ckey)
 				#endif
+				if(src.LedgerCashoutPer)
+					Damage *= 1 + src.LedgerCashoutPer * min(Trg.DistinctRecentSkillHitsBy(User, 80), src.LedgerCashoutCap)
+				Trg.NoteSkillHit(User, src.type)
 				var/Hits=src.MultiHit
 
 				while(Hits)
@@ -692,7 +709,22 @@ obj/Skills/Grapple
 						#if DEBUG_GRAPPLE
 						User.log2text("Before do damage Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 						#endif
-						User.DoDamage(Trg, Damage, src.UnarmedOnly, src.NeedsSword, SpiritAttack=src.SpecialAttack)
+						var/strike/S = new(User, Trg, Damage)
+						S.unarmed = src.UnarmedOnly
+						S.sword = src.NeedsSword
+						S.spirit = src.SpecialAttack
+						S.dmgTypes = buildSpecDmgTypes(src.HolyMod, src.Sanctify, src.AbyssMod, src.SlayerMod)
+						S.critEff = src.CritEffectiveness
+						S.blockEff = src.BlockEffectiveness
+						S.critBonus = src.CritChanceBonus
+						var/dealt = S.resolve()
+						if(dealt > 0)
+							if(src.WoundRider)
+								User.DealWounds(Trg, dealt * src.WoundRider)
+							if(src.ShatterRider)
+								Trg.AddShatter(src.ShatterRider, User)
+							if(src.RootRider)
+								Trg.applySnare(src.RootRider)
 						if(DrainBlood)
 							User.secretDatum:gainBloodPower(Damage*src.DrainBlood)
 							User.vampireBlood.fillGauge(clamp(User.secretDatum.secretVariable["BloodPower"]/4, 0, 1), 10)
@@ -708,11 +740,11 @@ obj/Skills/Grapple
 						if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !Trg.MortallyWounded)
 							var/mortalDmg = Trg.Health * 0.05 // 5% of current
 							Trg.LoseHealth(mortalDmg)
-							Trg.WoundSelf(mortalDmg)
+							Trg.WoundSelf(Trg.HPToPct(mortalDmg))
 							Trg.MortallyWounded += 1
 							OMsg(User, "<b><font color=#ff0000>[User] has dealt a mortal blow to [Trg]!</font></b>")
 				OMsg(User, "[User] [src.TriggerMessage] [Trg]!")
-				if(src.Effect in list("Suplex", "Drain", "Lotus", "SuperSuplex", "DarkSuplex", "CorruptSuplex"))
+				if(src.Effect in list("Suplex", "Drain", "Lotus", "SuperSuplex", "DarkSuplex", "CorruptSuplex", "Vault"))
 					src.OneAndDone=1
 				var/Times=src.EffectMult
 				if(src.OneAndDone)
@@ -733,17 +765,34 @@ obj/Skills/Grapple
 							PotemkinBusterEffect(User, Trg, EffectMult)
 						if("Suplex")
 							SuplexEffect(User, Trg)
+							SuplexSwap(User, Trg)
+						if("Vault")
+							var/turf/vt = get_step(Trg, turn(Trg.dir, 180))
+							if(vt && !vt.density)
+								var/vblocked = 0
+								for(var/atom/movable/vo in vt)
+									if(vo.density && vo != User)
+										vblocked = 1
+										break
+								if(!vblocked)
+									User.loc = vt
+									User.step_x = 0
+									User.step_y = 0
+									User.dir = get_dir(User, Trg)
 						if("SuperSuplex")
 							LotusEffect(User, Trg, src.EffectMult)
 							SuplexEffect(User, Trg)
+							SuplexSwap(User, Trg)
 						if("DarkSuplex")
 							SuplexEffect(User, Trg)
+							SuplexSwap(User, Trg)
 							animate(Trg, color=list(0.5,0,0.5, 0,0,0, 0.5,0,0.5, 0,0,0), time=10, flags=ANIMATION_RELATIVE)
 							sleep(10)
 							animate(Trg, color=Trg.MobColor, time=10, flags=ANIMATION_RELATIVE)
 							sleep(10)
 						if("CorruptSuplex")
 							SuplexEffect(User, Trg)
+							SuplexSwap(User, Trg)
 							var/obj/Skills/Buffs/SlotlessBuffs/Ruin/ruin = Trg.SlotlessBuffs["Ruin"]
 							if(!ruin)
 								ruin = new/obj/Skills/Buffs/SlotlessBuffs/Ruin()
@@ -764,7 +813,24 @@ obj/Skills/Grapple
 							Stomp(User, Trg, 2, EffectMult)
 					sleep(world.tick_lag)
 					Times--
-				User.Knockback((dmgRoll*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed)
+				User.Knockback((0.6*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed)
+				if(src.LandingSplash)
+					var/mob/lu = User
+					var/mob/lt = Trg
+					var/lsdm = src.LandingSplash
+					spawn()
+						var/waited = 0
+						while(lt && lt.loc && lt.Knockbacked && waited < 60)
+							sleep(1)
+							waited++
+						if(lt && lt.loc && lu)
+							var/turf/lturf = get_turf(lt)
+							if(lturf)
+								Bang(lturf, 3, Offset=0)
+								var/obj/Skills/Projectile/EBF_Splash/SZ = new
+								SZ.TempDamage = lsdm
+								SZ.SpawnPosition = lturf
+								new /obj/Skills/Projectile/_Projectile(lu, SZ, lturf, 0.5, 0, 0, lu.dir)
 				if(src.Stunner)
 					Stun(Trg, src.Stunner)
 					// sleep(5)//final effects
@@ -813,6 +879,7 @@ obj/Skills/Grapple
 				PotemkinBusterEffect(User, Trg, EffectMult)
 			if("Suplex")
 				SuplexEffect(User, Trg)
+				SuplexSwap(User, Trg)
 			if("SuperSuplex")
 				LotusEffect(User, Trg, src.EffectMult)
 				SuplexEffect(User, Trg)

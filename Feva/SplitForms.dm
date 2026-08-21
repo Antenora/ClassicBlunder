@@ -85,7 +85,6 @@ mob/proc/SpawnHostileCopy(var/ClOwner, var/CloneHP=50, var/ClonePower=1, var/Clo
 	FS.overlays=src.overlays
 	FS.NextAttack=0
 
-	FS.Health=CloneHP
 	FS.Power=(usr.Power/usr.GetPowerUpRatio())*ClonePower
 
 	FS.EnergyMax=100
@@ -95,6 +94,8 @@ mob/proc/SpawnHostileCopy(var/ClOwner, var/CloneHP=50, var/ClonePower=1, var/Clo
 
 	FS.EndMod=src.GetEnd()
 
+	FS.VitMod=src.GetVit()
+	FS.SetHealthPct(CloneHP)
 	FS.SpdMod=src.GetSpd()
 
 	FS.ForMod=src.GetFor()
@@ -115,6 +116,7 @@ obj/Skills/Feva
 
 		verb/SplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return
@@ -133,7 +135,6 @@ obj/Skills/Feva
 				FS.overlays=usr.overlays
 				FS.NextAttack=0
 
-				FS.Health=src.SplitHealth
 				FS.Power=usr.Power*src.SplitPower
 
 				FS.EnergyMax=usr.EnergyMax
@@ -143,6 +144,8 @@ obj/Skills/Feva
 
 				FS.EndMod=usr.GetEnd()
 
+				FS.VitMod=usr.GetVit()
+				FS.SetHealthPct(src.SplitHealth)
 				FS.SpdMod=usr.GetSpd()
 
 				FS.ForMod=usr.GetFor()
@@ -171,6 +174,7 @@ obj/Skills/Feva
 
 		verb/MassSplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return
@@ -190,7 +194,6 @@ obj/Skills/Feva
 				FS.overlays=usr.overlays
 				FS.NextAttack=0
 
-				FS.Health=10
 				FS.Power=(usr.Power/usr.GetPowerUpRatio())*0.1
 
 				FS.EnergyMax=usr.EnergyMax
@@ -200,6 +203,8 @@ obj/Skills/Feva
 
 				FS.EndMod=usr.GetEnd()
 
+				FS.VitMod=usr.GetVit()
+				FS.SetHealthPct(10)
 				FS.SpdMod=usr.GetSpd()
 
 				FS.ForMod=usr.GetFor()
@@ -223,6 +228,7 @@ obj/Skills/Feva
 
 		verb/SuperMassSplitForm()
 			set category="Skills"
+			set hidden = 1
 			if(usr.KO)return
 			if(src.Using)
 				return
@@ -242,7 +248,6 @@ obj/Skills/Feva
 				FS.overlays=usr.overlays
 				FS.NextAttack=0
 
-				FS.Health=5
 				FS.Power=(usr.Power/usr.GetPowerUpRatio())*0.05
 
 				FS.EnergyMax=usr.EnergyMax
@@ -252,6 +257,8 @@ obj/Skills/Feva
 
 				FS.EndMod=usr.GetEnd()
 
+				FS.VitMod=usr.GetVit()
+				FS.SetHealthPct(5)
 				FS.SpdMod=usr.GetSpd()
 
 				FS.ForMod=usr.GetFor()

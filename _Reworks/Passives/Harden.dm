@@ -1,6 +1,5 @@
 globalTracker/var/
     HARDEN_MAX_ADD = 0.5;
-    HARDEN_MAX_STACKS = 20;
     HARDEN_MIN = 0;
     HARDEN_MAX = 5;
     BASE_HARDEN_CHANCE = 50

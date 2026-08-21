@@ -2,6 +2,7 @@ mob
 	verb
 		Skill_Descriptions()
 			set category = "Other"
+			set hidden = 1
 			var/which = input(usr,"Which skill would you like to see the description for?","Skill Description") as null|anything in usr.Skills
 			if(!which) return
 			var/obj/Skills/s = which
@@ -15,8 +16,39 @@ obj/Skills
 	var/Copied = FALSE
 	var/Sealed = FALSE
 	var/Temporary = FALSE
+	var/altered = FALSE
 	var/description
-	var/AdaptRate
+	var/StrScaling=0 //attacker stats feeding atk
+	var/ForScaling=0
+	var/EndScaling=0
+	var/SpdScaling=0
+	var/OffScaling=0
+	var/DefScaling=0
+	var/UsesStr=0 //base-stat override: 1 = base damage uses this stat instead of the path default (Str melee-side, For projectiles)
+	var/UsesFor=0
+	var/UsesSpd=0
+	var/UsesEnd=0
+	var/UsesDef=0
+	var/UsesOff=0
+	proc/BaseStatOverride(mob/M)
+		if(UsesStr) return M.GetStr(1)
+		if(UsesFor) return M.GetFor(1)
+		if(UsesSpd) return M.GetSpd(1)
+		if(UsesEnd) return M.GetEnd(1)
+		if(UsesDef) return M.GetDef(1)
+		if(UsesOff) return M.GetOff(1)
+		return 0
+	var/BaseStatDefault="STR" //path-default base stat identity; Projectile overrides to "FOR"
+	proc/FocusStatIdentity()
+		//null = non str/for base, outside FocusShift entirely.
+		if(UsesStr) return "STR"
+		if(UsesFor) return "FOR"
+		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
+		return BaseStatDefault
+	var/EndEffectiveness=1 //DEFENDER'S End vs this skill. 1 = normal mitigation, 0 = pierces End entirely
+	var/CritEffectiveness=0 //multiplies crit chance vs this skill's hits. 0 = can't crit
+	var/BlockEffectiveness=1 //multiplies the defender's block chance. 0 = unblockable
+	var/CritChanceBonus=0 //flat crit-chance points on top of the Off curve
 	var/MultiTrail = 0
 	var/SignatureTechnique
 	var/SignatureName //lets you label things by a string other than the object name e.g. "Advanced White Magic"
@@ -24,8 +56,7 @@ obj/Skills
 	var/CyberSignature=0 //lets cybernetic mainframes keep the signature
 
 	var/Cooldown
-	/// When set, Cooldown() always prints the on-cooldown line (if announce_cd and cooldownAnnounce), even for short timers.
-	var/AlwaysAnnounceCooldown = 0
+	var/AlwaysAnnounceCooldown = 0 //print the on-cooldown line even for short timers
 	var/CooldownStatic=0
 	var/CooldownScaling=0
 	var/CooldownScalingCounter=0
@@ -33,16 +64,13 @@ obj/Skills
 	var/Charges=0
 	var/ChargeRefresh=30
 	var/Mastery=1
-	var/BeamUsing
 	var/BuffUsing
 	var/SkillCost=1
-	var/RevNum = 0
 
 	var/sicon
 	var/sicon_state
+	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
 	var/list/Learn=new
-
-	var/ZanzoAmount=0
 
 	var/PureDamage=0
 	var/PureReduction=0
@@ -62,33 +90,20 @@ obj/Skills
 
 	var/NoStaff
 	var/NeedsStaff
-	var/StaffClassNeeded //just in case
 
 	var/Instinct  //Penetrate AIS and WS
 	var/NoForcedWhiff  //Super anti whiff
 	var/MaimStrike  //if it does 25+ damage, maim.
 
-	var/DeathField  //get this NONstatic amount of wounds just for slapping someone.
-	var/VoidField  //get this NONstatic amount of fatigue just for slapping someone.
 	var/SoftStyle
 	var/HardStyle
-	var/CyberStigma //Like Soft/HardStyles, but for cybernetics
 
-	var/LifeStealTrue //Applies health cuts and heals your health cuts
-	var/SoulSteal //Adds stolen health to vaizard health.
 	var/LifeSteal
 	var/LifeGeneration
 	var/EnergySteal
-	var/EnergyGeneration
-	var/ManaSteal
-	var/ManaGeneration
-
-	var/NoDodge //can always touch this
-	var/NoMiss //cant stop touching that
 
 	var/HealthCost=0 //Cost of health; pretty much just used for kikohohohoho.
 	var/WoundCost=0 //ya...
-	var/HeavyStrain=0 //as above, though it may include some other finishers
 	var/EnergyCost=0 //Cost of energy.
 	var/FatigueCost=0 //Cost of fatigue.  Additional to energy.
 	var/ManaCost=0
@@ -115,10 +130,7 @@ obj/Skills
 	var/SlayerMod //mortal dmg
 	var/ShonenPower  // become MC
 	var/SpiritPower //become medium
-	var/Mythical //become giant
 	var/HellPower //become satan
-	var/Disorienting  //rolls for confuse
-	var/Confusing  //adds confuse
 	var/Stunner=0 //Stuns for this amount of time
 	var/Shearing //Debuffs regen
 	var/Crippling //Cripples movement
@@ -139,21 +151,15 @@ obj/Skills
 	var/TurfBurn=0 //Fire Ashfield: adds Burn per hit
 	var/Excruciating //fucks up senses
 	var/Attracting //Makes you follow someone, probably.
-	var/Terrifying //Makes them chicken out instead!
-	var/Pacifying  //Divides power by AngerMax for this length of time
 	var/Silencing=0 //Applies Silenced passive for this many seconds on hit
-	var/Enraging  //Triggers anger for this amount of time
 	var/CursedWounds
 	var/SoulFire
 	var/DarknessFlame  //It does darkness flame things!
-	var/AbsoluteZero  //It does absolute zero things!
 	var/CosmoPowered
 	var/GodPowered  //this makes the technique add Transcendant buff and use GodPowered as god ki.
 	var/Destructive
-	var/DashMaster  //spam ddash. should be limited.
 
 	var/DoubleStrike
-	var/TripleStrike
 
 	var/MasteryCheck=0
 	 //only projectiles have this function rn
@@ -161,7 +167,6 @@ obj/Skills
 	var/FollowUpDelay = 0  //after waiting this amt of time
 	var/OnMobHit = null
 	var/ThrowOnCounter
-	var/Controlling //Love potion effects TODO: Remove/discontinue for...
 	var/BuffSelf
 	var/BuffSelfDelay = 0
 	var/BuffAffected
@@ -253,39 +258,39 @@ obj/Skills
 				description = replacetext(description, ", ", -1, -3)
 				description += "\n"
 
-				if(NeedsSword)
-					description += "Requires Sword.\n"
-				if(HeavyOnly)
-					description += "Heavy Sword Only.\n"
-				if(NoSword)
-					description += "Unarmed Only.\n"
-				if(BuffSelf)
-					description += "Applies a buff to self: [BuffSelf]\n"
-				if(BuffAffected)
-					description += "Applies a buff to effected: [BuffAffected]\n"
+			if(NeedsSword)
+				description += "Requires Sword.\n"
+			if(HeavyOnly)
+				description += "Heavy Sword Only.\n"
+			if(NoSword)
+				description += "Unarmed Only.\n"
+			if(BuffSelf)
+				description += "Applies a buff to self: [BuffSelf]\n"
+			if(BuffAffected)
+				description += "Applies a buff to effected: [BuffAffected]\n"
 
-				if(HealthCost)
-					description += "Health Cost: [HealthCost]\n"
-				if(WoundCost)
-					description += "Wound Cost: [WoundCost]\n"
-				if(EnergyCost)
-					description += "Energy Cost: [EnergyCost]\n"
-				if(FatigueCost)
-					description += "Fatigue Cost: [FatigueCost]\n"
-				if(ManaCost)
-					description += "Mana Cost: [ManaCost]\n"
-				if(CapacityCost)
-					description += "Capacity Cost: [CapacityCost]\n"
-				if(Instinct)
-					description += "Instinct: [Instinct]\n"
+			if(HealthCost)
+				description += "Health Cost: [HealthCost]\n"
+			if(WoundCost)
+				description += "Wound Cost: [WoundCost]\n"
+			if(EnergyCost)
+				description += "Energy Cost: [EnergyCost]\n"
+			if(FatigueCost)
+				description += "Fatigue Cost: [FatigueCost]\n"
+			if(ManaCost)
+				description += "Mana Cost: [ManaCost]\n"
+			if(CapacityCost)
+				description += "Capacity Cost: [CapacityCost]\n"
+			if(Instinct)
+				description += "Instinct: [Instinct]\n"
 
 	icon='Skillz.dmi'
-	var/Teachable
 
 	var/delay = 0
 	verb/Set_Cooldown_Note()
 		set src in usr
 		set category="Other"
+		set hidden = 1   // removed from the UI
 		var/Note=input(usr, "What do you want to be displayed after [src] comes off cooldown?", "Cooldown Note") as message|null
 		src.CooldownNote=Note
 		usr << "[src]'s cooldown note set to: ([src.CooldownNote])"
@@ -310,6 +315,7 @@ obj/Skills
 		Cooldown=5
 		verb/Target_Switch()
 			set category="Skills"
+			set hidden = 1
 			if(!src.Using)
 				usr.TargetSkillX("TargetSwitch", src)
 
@@ -317,6 +323,7 @@ obj/Skills
 		name="Aerial Payback"
 		Cooldown=40
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Cancel knockback and dash towards your target!"
 		Level=100
@@ -324,24 +331,28 @@ obj/Skills
 		name="Aerial Recovery"
 		Cooldown=20
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Cancel knockback!"
 	Dragon_Dash
 		Cooldown=30
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Dash towards your target!"
 		Level=100
 		verb/DragonDash()
 			set name="Dragon Dash"
 			set category="Skills"
-			if(usr.HasDashMaster())
-				src.Using=0
+			set hidden = 1
 			if(usr.Knockback)
 				for(var/obj/Skills/Aerial_Payback/x in usr.Skills)
 					if(!x.Using)
 						usr.SkillX("Aerial Payback",x)
 			else
+				if(src.Using)
+					usr << "[src] is still on cooldown."
+					return
 				usr.SkillX("DragonDash",src)
 	Transformation
 		Cooldown=1
@@ -349,12 +360,14 @@ obj/Skills
 		verb/Transform()
 			set name="Transform!"
 			set category="Utility"
+			set hidden = 1
 			if(usr.StandardTransformRequirements()&&!usr.isRace(HUMAN))
 				usr.Transform()
 		verb/Revert()
 			set name="Revert!"
 			set category="Utility"
-			if(usr.transActive&&!usr.HasNoRevert()&&!usr.isMazokuHuman())
+			set hidden = 1
+			if(usr.transActive&&!usr.isMazokuHuman())
 				for(var/obj/Skills/Buffs/B in usr)
 					if(usr.BuffOn(B)&&B.Transform&&!B.AlwaysOn)
 						B.Trigger(usr)
@@ -365,6 +378,7 @@ obj/Skills
 		verb/TogglePCTrans()
 			set name="Toggle PC Transformations"
 			set category="Utility"
+			set hidden = 1
 			if(usr.PCTransToggle)
 				usr.PCTransToggle=0
 				usr<< "You will now transform through use of Power Control."
@@ -376,6 +390,7 @@ obj/Skills
 	Reverse_Dash
 		Cooldown=30
 		CooldownStatic=1
+		NoGCD=1
 		Learn=list("energyreq"=10000,"difficulty"=50000)
 		desc="Quickly dash away!"
 		Level=100
@@ -383,9 +398,8 @@ obj/Skills
 		verb/ReverseDash()
 			set name="Reverse Dash"
 			set category="Skills"
+			set hidden = 1
 			if(AntiMash) return
-			if(usr.HasDashMaster())
-				src.Using=0
 			if(usr.Knockback)
 				for(var/obj/Skills/Aerial_Recovery/x in usr)
 					if(!x.Using)
@@ -401,8 +415,10 @@ obj/Skills
 	Grab
 		Cooldown=5
 		CooldownStatic=1
+		NoGCD=1
 		verb/Grab()
 			set category="Skills"
+			set hidden = 1
 			set name="Grab"
 			usr:key1=0
 			usr:key2=0
@@ -424,9 +440,11 @@ obj/Skills
 		desc="Allows you to highten or lower your energy level."
 		verb/Power_Up()
 			set category="Skills"
+			set hidden = 1
 			usr.PowerUp() // This proc is in Skills\basics\PowerControl.dm
 		verb/Power_Down()
 			set category="Skills"
+			set hidden = 1
 			usr.PowerDown() // This proc is in Skills\basics\PowerControl.dm
 	Rank_Up_Magic_Limit_Over_Force
 		icon='Skillz.dmi'
@@ -437,10 +455,12 @@ obj/Skills
 		desc="Allows you to highten or lower your energy level."
 		verb/Rank_Up_Magic_Limit_Over_Force()
 			set category="Utility"
+			set hidden = 1
 			set name="Rank Up Magic: Limit Over Force"
 			usr.SkillX("LimitOverForce",src)
 		verb/Give_The_Fourth_Fate()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("GiveFourthFate",src)
 	Telekinesis
 		Cooldown=120
@@ -555,6 +575,7 @@ obj/Skills
 								m.Flying=0
 			Telekinesis()
 				set category="Skills"
+				set hidden = 1
 				if(!src:Choosing)
 					src:Choosing=1
 					var/Choice=input(usr, "What telekinetic power are you using?", "Improved Telekinesis") in list("Lift and Hold", "Lift and Throw", "Pull", "Push", "Throw Around", "Blast Away", "Cancel")
@@ -656,31 +677,31 @@ obj/Skills
 					src:Choosing=0
 
 	Absorb
-		Teachable=0
 		Cooldown=30
 		icon_state=""
 		desc="Allows you to absorb people for their power."
 		verb/Absorb()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Absorb",src)
 
 	Release_Absorb
-		Teachable=0
 		Cooldown=5
 		icon_state=""
 		name="Release Absorb"
 		desc="Forcibly expel a victim currently held inside your stomach."
 		verb/Release_Absorb()
 			set category="Skills"
+			set hidden = 1
 			set name="Release Absorb"
 			usr.SkillX("Release Absorb",src)
 
 	Clairvoyance
-		Teachable=0
 		Level=0
 		desc="Enhances senses greatly."
 		verb/Clairvoyance()
 			set category="Skills"
+			set hidden = 1
 			set name="Clairvoyance"
 			usr.SkillX("Clairvoyance",src)
 
@@ -690,6 +711,7 @@ obj/Skills
 		verb/Finalize_Fate()
 			var/mob/Target=usr.Target
 			set category="Skills"
+			set hidden = 1
 			if(src.Using)
 				return
 			src.Using=1
@@ -718,6 +740,7 @@ obj/Skills
 		verb/Hakai()
 			var/mob/Target=usr.Target
 			set category="Skills"
+			set hidden = 1
 			switch(input(usr,"Delete [Target]?") in list("No","Yes"))
 				if("Yes")
 					spawn()RecoverImage(Target)
@@ -728,10 +751,6 @@ obj/Skills
 						if(Target.passive_handler.Get("Emptiness")||Target.isRace(ELDRITCH))
 							sleep(30)
 							OMsg(usr, "...but there is no existence for [usr] to destroy.", "[usr] FAILED TO DESTROY [Target].")
-							return
-						if(Target.passive_handler.Get("EndlessNine"))
-							sleep(30)
-							OMsg(usr, "...but [Target] rejects the legitimacy of the divine, rendering [usr]'s attempts fruitless.", "[usr] FAILED TO DESTROY [Target].")
 							return
 						Target.Savable=0
 						if(istype(Target, /mob/Players))
@@ -754,7 +773,6 @@ obj/Skills
 			Teleported=0
 			Summoned=0
 			Powerz
-		Teachable=0
 		Level=100
 		icon_state="Majin"
 		desc="You've been contracted by a powerful entity.."
@@ -765,6 +783,7 @@ obj/Skills
 		desc="This allows you to fly while it constantly drains your energy."
 		verb/Fly()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Fly",src)
 			sleep()
 
@@ -774,19 +793,19 @@ obj/Skills
 		desc="Meditation allows you to recover energy faster then standing, as well as Health and Mana. You are far more likely to be hit in Meditation."
 		verb/Meditation()
 			set category="Skills"
+			set hidden = 1
 			if(usr.ActiveZanzo)
 				usr.ActiveZanzo=0
-			for(var/obj/Skills/Zanzoken/z in usr)
-				z.ZanzoAmount=0
 			usr.SkillX("Meditate",src)
 			sleep(10)
 
-	False_Moon
+	AutoHit/False_Moon
 		Cooldown=-1
 		desc="Create a false moon."
-		verb/FalseMoon()
+		verb/False_Moon()
 			set name="False Moon"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("FalseMoon",src)
 
 	True_Sun
@@ -795,6 +814,7 @@ obj/Skills
 		verb/TrueSun()
 			set name="True Sun"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("TrueSun",src)
 
 	Celestial_Invocation
@@ -804,6 +824,7 @@ obj/Skills
 		verb/Celestial_Invocation()
 			set name="Celestial Invocation"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("CallStar",src)
 
 	Give_Power
@@ -817,6 +838,7 @@ obj/Skills
 		verb/GivePower()
 			set name="Give Power"
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("GivePower",src)
 
 
@@ -829,6 +851,7 @@ obj/Skills
 		Level=100
 		Cooldown=10
 		CooldownStatic=1
+		NoGCD=1
 		desc="Allows you to move at high velocities."
 		icon_state="Zanzoken"
 		name="After Image Strike"
@@ -836,12 +859,14 @@ obj/Skills
 		var/ZanzoArea
 		verb/Zanzoken()
 			set category="Skills"
+			set hidden = 1
 			if(usr.MovementCharges>=1 && !usr.ActiveZanzo)
 				usr.SkillX("Zanzoken",src)
 		verb/Zanzoken2()
 			set category="Skills"
+			set hidden = 1
 			set name="After Image Strike"
-			if(usr.MovementCharges>=1 && !usr.AfterImageStrike && !src.Using)
+			if(usr.MovementCharges>=1 && !usr.aisArmed() && !src.Using)
 				usr.SkillStunX("After Image Strike",src)
 
 	Walking
@@ -851,12 +876,14 @@ obj/Skills
 		icon_state="Zanzoken"
 		verb/Walking()
 			set category="Skills"
+			set hidden = 1
 			usr.SkillX("Walking",src)
 	Blink
 		desc="Teleport through space."
 		icon_state="SI"
 		verb/Blink()
 			set category="Utility"
+			set hidden = 1
 			usr.SkillX("Blink",src)
 
 	Six_Paths_of_Pain
@@ -914,14 +941,8 @@ obj/Skills
 				var/obj/Skills/weapon
 				weapon = text2path(pick(arsenal))
 				weapon = new weapon
-				if(istype(weapon, /obj/Skills/Queue))
-					usr.SetQueue(weapon)
-					src.Cooldown(1/12)
-				else if(istype(weapon, /obj/Skills/AutoHit))
-					usr.Activate(weapon)
-					src.Cooldown(1/12)
-				else if(istype(weapon, /obj/Skills/Projectile))
-					usr.UseProjectile(weapon)
+				if(istype(weapon, /obj/Skills/Queue) || istype(weapon, /obj/Skills/AutoHit) || istype(weapon, /obj/Skills/Projectile))
+					weapon.Use(usr)
 					src.Cooldown(1/12)
 		verb/Human_Path()
 			set hidden=1
@@ -1033,7 +1054,33 @@ turf/Click(turf/T)
 
 	else if(usr.Move_Requirements()&&!usr.KO)
 
-		if(locate(/obj/Skills/Teleport/Instant_Transmission,usr.contents))
+		if(SlamWaveLeapArmed(usr))
+			var/obj/Skills/AutoHit/Slam_Wave/sw = SlamWaveLeapArmed(usr)
+			if(T) if(T.icon)
+				for(var/turf/A in view(0,usr))
+					if(A==src)
+						return
+				if(get_dist(usr, src) > 6 || usr.z != src.z)
+					usr << "<font color='red'>Too far to leap there.</font>"
+					return
+				if(!T.density&&usr.icon_state!="Meditate"&&!usr.Observing&&(usr.Beaming!=2))
+					if(usr.GCDBlocked(sw))
+						return
+					if(sw.EnergyCost && usr.Energy <= sw.EnergyCost)
+						return
+					sw.LeapArmed = 0
+					var/turf/leap_origin = get_step(usr, 0)
+					VanishImage(usr)
+					var/formerdir = usr.dir
+					usr.Move(src)
+					usr.dir = formerdir
+					if(!usr.Activate(sw) || !sw.Using)
+						usr.Move(leap_origin)
+						sw.LeapArmed = world.time + 50
+				else
+					usr << "<font color='red'>You can't leap there.</font>"
+
+		else if(locate(/obj/Skills/Teleport/Instant_Transmission,usr.contents))
 			if(T) if(T.icon)
 				for(var/turf/A in view(0,usr))
 					if(A==src)
@@ -1069,11 +1116,8 @@ turf/Click(turf/T)
 						if(usr.Energy < 1)
 							usr.Energy = 1
 						usr.LoseMana(mana_cost)
-						var/recharge_ticks = max(20, (10 - 2*upgrades) * 10)
-						s.Charges--
-						if(s.Charges <= 0)
-							s.Using = 1
-						s.Recharge(recharge_ticks, usr)
+						s.ChargeRefresh = max(2, 10 - 2*upgrades)
+						s.Cooldown(1, null, usr)
 
 		else if(locate(/obj/Skills/Blink,usr.contents))
 			for(var/obj/Skills/Blink/W in usr.contents)
@@ -1084,11 +1128,11 @@ turf/Click(turf/T)
 								return
 						if(usr.ManaAmount<((usr.ManaMax-usr.TotalCapacity)*usr.GetManaCapMult()*0.8))
 							return
-						if(usr.Health<100)
+						if(usr.HealthPct()<100)
 							return
 						if(usr.Energy<100)
 							return
-						if(usr.client.eye!=usr)
+						if(!GfxClientEyeIsMob(usr.client, usr))
 							return
 						if(!T.density)
 							VanishImage(usr)

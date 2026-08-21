@@ -17,7 +17,6 @@
     Fencing_Style
         StyleSpd=1.15
         StyleOff=1.15
-        StyleActive="Fencing"
         passives = list("Parry" = 1)
         StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Ittoryu_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style",\
         "/obj/Skills/Buffs/NuStyle/SwordStyle/Gladiator_Style"="/obj/Skills/Buffs/NuStyle/SwordStyle/Dardi_Style")

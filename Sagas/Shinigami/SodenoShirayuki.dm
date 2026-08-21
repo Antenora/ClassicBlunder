@@ -26,15 +26,12 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"SpiritSword"    = 0.25 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
-			"CriticalChance" = 5 * SL,
 			"CriticalDamage" = 0.05 * SL,
 			"Shirayuki"      = 1 //This currently does nothing but it's meant to give you Chill Stacks when you power up, and Bonuses based on chill-stacks.
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
 		if(SL > 3)
-			passives["IceHerald"] = 1 // Enhances the potency of the Shikai once you obtain baseline Bankai by giving your crits more OOMPH.
 			passives["IceAge"] = 7.5 * SL // This is Combustion but for Chill. Seems pretty thematic.
 
 		EndMult = 1.1 + (0.1 * SL) // I feel like ICE IS HARD makes a lot of sense here. Someone else can do the stats if they want somethign more thematic.
@@ -87,11 +84,8 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
-			"SpiritSword"    = 0.5 * SL, //Rukia always comes off as a proper hybrid as a Shinigami should be, so give users of her release soem Spirit Sword.
-			"CriticalChance" = 10 * SL,
 			"CriticalDamage" = 0.1 * SL,
 			"AbsoluteZero"   = 1, // This gives other debuffs scaling off Chill stacks.
-			"IceHerald"      = 1, // Lets you use IceHerald in Bankai, Always.
 			"IceAge"         = 10 + (10 * SL), // This is Combustion but for Chill. Seems pretty thematic.
 			"AttackSpeed"    = -5 + (0.5 * SL), //Ice makes you cold. Rukia is shown having difficulty moving in her Bankai, may need it's numbers tweaked.
 			"Godspeed"       = -5 + (0.5 * SL), //Same Reason as above.
@@ -171,6 +165,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 					var/obj/Effects/Dust/D = new/obj/Effects/Dust()
 					D.loc = T
 					D.layer = EFFECTS_LAYER
+					D.alpha = 255 //dust fades itself on spawn, reset alpha or the ring never shows
 					animate(D, transform=matrix()*2, time=4)
 					dusts += D
 					dust_dx += od[1]
@@ -210,6 +205,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 					var/obj/Effects/Dust/E = new/obj/Effects/Dust()
 					E.loc = M.loc
 					E.layer = EFFECTS_LAYER
+					E.alpha = 255 //same deal
 					E.transform = matrix() * 2
 					animate(E, alpha=0, pixel_x=ep[1], pixel_y=ep[2], time=10, easing=SINE_EASING)
 					expel_objs += E
@@ -231,10 +227,10 @@ obj/Skills/AutoHit
 	Tsukishiro
 		SignatureTechnique=3
 		SagaSignature=1
-		StrOffense=0
-		ForOffense=1
+		StrScaling=0
+		ForScaling=1
 		Rounds=10
-		DamageMult=0.5
+		DamageMult=1.4
 		Area="Around Target"
 		ElementalClass="Water"
 		FlickAttack=1
@@ -247,14 +243,14 @@ obj/Skills/AutoHit
 		HitSparkIcon='SnowBurst.dmi'
 		HitSparkX=0
 		HitSparkY=0
-		Cooldown=120
-		ManaCost=10
+		Cooldown=30
+		ManaCost=8
 		TurfStrike=1
 		TurfShift='IceGround.dmi'
 		TurfShiftDuration=3
 		adjust(mob/p)
 			Rounds = 10 + (2 * p.SagaLevel)
-			DamageMult = 0.5 + (0.05 * p.SagaLevel)
+			DamageMult = 0.95 + (0.09 * p.SagaLevel)
 			Chilling = 5 + p.SagaLevel
 		verb/Tsukishiro()
 			set category="Skills"
@@ -266,28 +262,28 @@ obj/Skills/AutoHit
 	Hakuren
 		SignatureTechnique=3
 		SagaSignature=1
-		StrOffense=0
-		ForOffense=1
-		DamageMult=10
+		StrScaling=0
+		ForScaling=1
+		DamageMult=9
 		Area="Wave"
 		ElementalClass="Water"
 		FlickAttack=1
 		Distance=10
 		Freezing=20
-		Stunner=5
+		Stunner=3
 		ComboMaster = 1
 		WindUp = 2
 		ActiveMessage="Tsugi no mai, Hakuren!"
 		HitSparkIcon='SnowRing.dmi'
 		HitSparkX=0
 		HitSparkY=0
-		Cooldown=120
-		ManaCost=10
+		Cooldown=30
+		ManaCost=8
 		TurfStrike=1
 		TurfShift='IceGround.dmi'
 		TurfShiftDuration=3
 		adjust(mob/p)
-			DamageMult = 10 + (0.75 * p.SagaLevel)
+			DamageMult = 6.55 + (0.49 * p.SagaLevel)
 			Freezing = 20 + (5 * p.SagaLevel)
 			WindUp = 2 - (0.25 * p.SagaLevel)
 			if(p.SagaLevel > 3)
@@ -301,8 +297,8 @@ obj/Skills/AutoHit
 				usr.Activate(src)
 	Hakusen // Given at T4, Bankai Exclusive
 		name="Hakusen"
-		ForOffense=1
-		StrOffense=0
+		ForScaling=1
+		StrScaling=0
 		Area="Circle"
 		ElementalClass="Water"
 		TurfShift='SnowFloor.dmi'
@@ -311,7 +307,7 @@ obj/Skills/AutoHit
 		WindUp=2
 		ComboMaster=1
 		GuardBreak=1
-		DamageMult=10
+		DamageMult=25.75
 		SpecialAttack=1
 		Freezing=100
 		HitSparkIcon='SnowBurst.dmi'
@@ -324,9 +320,10 @@ obj/Skills/AutoHit
 		ActiveMessage="drops their surroundings to Absolute Zero!"
 		Slow=1
 		NoLock=1
-		Cooldown=240
+		Cooldown=60
+		EnergyCost=12
 		adjust(mob/p)
-			DamageMult = 10 + (3 * p.SagaLevel)
+			DamageMult = 10.3 + (3.09 * p.SagaLevel)
 			Distance = 12 + (1 * p.SagaLevel)
 		verb/Hakusen()
 			set category="Skills"
@@ -394,8 +391,8 @@ obj/Skills/Buffs/SlotlessBuffs
 	name = "True Getsuga Tenshou"
 	Cooldown = 180
 	NeedsSword = 1
-	StrRate = 1
-	ForRate = 1
+	StrScaling = 1
+	ForScaling = 1
 	DamageMult = 35
 	AccMult = 1.3
 	Distance = 20
@@ -403,7 +400,6 @@ obj/Skills/Buffs/SlotlessBuffs
 	Instinct = 2
 	Explode = 1
 	BypassTempHP = 1
-	SkillDeicide = 20
 
 	IconLock = 'Big Getsuga Shikai.dmi'
 	LockX = -65

@@ -9,18 +9,17 @@ obj/Items/Sword/Heavy/Legendary/WeaponSoul/Sword_of_Hope//Durendal
 obj/Skills/AutoHit/Shockwave_Blows
 	Area="Circle"
 	Distance=5
-	AdaptRate = 1
 	GuardBreak=1
-	DamageMult=1
+	DamageMult=1.2
 	Knockback=2
-	Cooldown=1
+	Cooldown=3
 	Shockwaves=1
 	Shockwave=3
 	HitSparkIcon='BLANK.dmi'
 	HitSparkX=0
 	HitSparkY=0
 	ActiveMessage="swings their blade hard enough to make the air ripple!"
-	EnergyCost=5
+	EnergyCost=1
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 	name = "Heavenly Regalia: The Saint"
@@ -38,7 +37,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Saintlike_Behavior
 		StyleActive="Saintlike Behavior"
-		passives = list("HolyMod" = 1,"Instinct" = 2,"Steady"=0.5)
+		passives = list("HolyMod" = 1)
 		StyleStr=1.25
 		StyleEnd=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Heavenly_Judgement"
@@ -46,8 +45,6 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 			StyleStr = 1.05 + (0.05 * p.SagaLevel)
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 			passives["HolyMod"] = 1 + (p.SagaLevel)
-			passives["Instinct"] = 1 + (p.SagaLevel)
-			passives["Steady"] = 0.5 + (p.SagaLevel*0.5)
 		verb/Saintlike_Behavior()
 			set hidden=1
 			adjust(usr)

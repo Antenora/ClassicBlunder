@@ -30,10 +30,10 @@ obj/Skills/AutoHit/Crystal_Luminescene
 	AllOutAttack=1
 	Area="Circle"
 	Distance=10
-	StrOffense=0
-	ForOffense=1
-	DamageMult=2
-	Flash=35
+	StrScaling=0
+	ForScaling=1
+	DamageMult=16.25
+	Flash=6
 	SpecialAttack=1
 	HitSparkIcon='BLANK.dmi'
 	HitSparkX=0
@@ -44,11 +44,11 @@ obj/Skills/AutoHit/Crystal_Luminescene
 	TurfShiftDurationSpawn=0
 	TurfShiftDurationDespawn=5
 	ActiveMessage="raises Soul Calibur into the air to unleash a blinding glint of light from the crystals!"
-	Cooldown=150
-	EnergyCost=5
+	Cooldown=38
+	EnergyCost=8
 	adjust(mob/p)
-		DamageMult = 2 + p.SagaLevel
-		Flash = 35 + (p.SagaLevel*5)
+		DamageMult = (2 + p.SagaLevel) * 2.3214
+		Flash = (35 + (p.SagaLevel*5)) * 0.1
 	verb/Crystal_Luminescene()
 		set category="Skills"
 		adjust(usr)
@@ -58,7 +58,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 	name = "Heavenly Regalia: Frozen Crystal"
 	DefMult=1.5
 	EndMult=1.5
-	passives = list("Flow" = 3, "VoidField" = 5, "DeathField" = 5, "Void" = 1, "SoftStyle" = 3, "TrueAbsorb"=1)
+	passives = list("VoidField" = 5, "DeathField" = 5, "Void" = 1, "SoftStyle" = 3, "TrueAbsorb"=1)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s orderly treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their orderly luster..."
@@ -68,7 +68,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 /obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
 	Soul_Conviction
 		StyleActive="Soul Conviction"
-		passives = list("LifeSteal" = 5,"Flow" = 2)
+		passives = list("LifeSteal" = 5)
 		StyleEnd=1.25
 		StyleDef=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Geist_Destroyer"
@@ -76,7 +76,6 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
 			StyleDef = 1.05 + (0.05 * p.SagaLevel)
 			passives["LifeSteal"] = 5 + (5*p.SagaLevel)
-			passives["Flow"] = 2 + (p.SagaLevel/2)
 		verb/Soul_Conviction()
 			set hidden=1
 			adjust(usr)

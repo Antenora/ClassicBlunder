@@ -12,18 +12,12 @@
 
 	var/demon_hp = 100
 	var/next_attack_multiplier = 1
-	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, DoDamage uses parent convention (src=attacker)
+	var/tmp/_outgoing_damage = FALSE  // flag: when TRUE, ResolveStrike uses parent convention (src=attacker)
 	var/image/reflect_overlay_self = null
 	var/image/reflect_overlay_owner = null
 
 	// Summoner passive inheritance
 	var/demon_summoner_pure_grant      = 0
-	var/demon_summoner_brutalize_grant = 0   
-	var/demon_summoner_blurring_grant  = 0   
-	var/demon_summoner_hybrid_grant    = 0   
-	var/demon_summoner_spirit_sword    = 0   
-	var/demon_summoner_spirit_hand     = 0   
-	var/demon_summoner_calloused_grant = 0   
 
 	New()
 		..()
@@ -32,21 +26,9 @@
 		if(!ai_owner) return
 		var/f = glob.DEMON_SUMMONER_GRANT_FACTOR
 		demon_summoner_pure_grant      = ai_owner.HasPureDamage()      * f
-		demon_summoner_brutalize_grant = ai_owner.GetBrutalize()       * f
-		demon_summoner_blurring_grant  = ai_owner.GetBlurringStrikes() * f
-		demon_summoner_hybrid_grant    = ai_owner.GetHybridStrike()    * f
-		demon_summoner_spirit_sword    = ai_owner.GetSpiritSword()     * f
-		demon_summoner_spirit_hand     = ai_owner.GetSpiritHand()      * f
-		demon_summoner_calloused_grant = ai_owner.GetCallousedHands()  * f
 
 	proc/RemoveSummonerPassiveGrants()
 		demon_summoner_pure_grant      = 0
-		demon_summoner_brutalize_grant = 0.0
-		demon_summoner_blurring_grant  = 0.0
-		demon_summoner_hybrid_grant    = 0.0
-		demon_summoner_spirit_sword    = 0.0
-		demon_summoner_spirit_hand     = 0.0
-		demon_summoner_calloused_grant = 0.0
 
 	proc/DemonInit(datum/demon_data/dd, mob/owner, datum/party_demon/pd)
 		demon_data = dd
@@ -71,9 +53,11 @@
 		StrMod = max(1, round(dd.demon_str + bonus, 0.01))
 		ForMod = max(1, round(dd.demon_for + bonus, 0.01))
 		EndMod = max(1, round(dd.demon_end + bonus, 0.01))
+		VitMod = EndMod
 		SpdMod = max(1, round(dd.demon_spd + bonus, 0.01))
 		OffMod = max(1, round(dd.demon_off + bonus, 0.01))
 		DefMod = max(1, round(dd.demon_def + bonus, 0.01))
+		Health = MaxHP()
 		potential_power_mult = owner.potential_power_mult
 
 		demon_melee_rate = max(8, 30 - round(dd.demon_spd * 0.7))
@@ -220,11 +204,7 @@
 			powerDif = clamp(powerDif, glob.MIN_POWER_DIFF, glob.MAX_POWER_DIFF)
 		var/atk = max(0.01, atk_val)
 		var/def = max(0.01, target.getEndStat(1))
-		if(demon_summoner_spirit_sword > 0)    atk += ForMod * ForMultTotal * demon_summoner_spirit_sword
-		if(demon_summoner_spirit_hand > 0)     atk += ForMod * ForMultTotal * demon_summoner_spirit_hand / 4
-		if(demon_summoner_calloused_grant > 0) atk += EndMod * EndMultTotal * demon_summoner_calloused_grant
-		if(demon_summoner_brutalize_grant > 0) def = max(0.01, def * (1 - demon_summoner_brutalize_grant))
-		return (powerDif ** glob.DMG_POWER_EXPONENT) * (glob.CONSTANT_DAMAGE_EXPONENT + glob.MELEE_EFFECTIVENESS) ** -(def ** glob.DMG_END_EXPONENT / atk ** glob.DMG_STR_EXPONENT)
+		return strikeCoreDamage(powerDif, atk, def)
 
 	// Visual feedback for demon attacks
 	proc/DemonHitVisual(mob/target)
@@ -235,10 +215,6 @@
 	// Outgoing damage wrapper
 	proc/DemonDealDamage(mob/target, val)
 		if(!isnum(val) || val <= 0) return
-		if(demon_summoner_blurring_grant > 0)
-			val *= clamp(sqrt(1 + SpdMod * demon_summoner_blurring_grant / 15), 1, 3)
-		if(demon_summoner_hybrid_grant > 0)
-			val *= clamp(sqrt(1 + ForMod * demon_summoner_hybrid_grant / 15), 1, 3)
 		val += demon_summoner_pure_grant
 		// Killing blow: finish off a KO'd NPC
 		if(target && target.KO && istype(target, /mob/Player/AI) && !istype(target, /mob/Player/AI/Demon) && !target.client)
@@ -275,7 +251,7 @@
 		if(ai_owner && istype(attacker, /mob))
 			if(attacker == ai_owner) return
 			if(ai_owner.party && ai_owner.party.members && (attacker in ai_owner.party.members)) return
-		var/raw_dmg = raw_val * glob.DevilSummonerDemonDamageTakenMod
+		var/raw_dmg = HPToPct(raw_val) * glob.DevilSummonerDemonDamageTakenMod
 		if(raw_dmg <= 0) return
 		var/resist = DemonGetResistMult("Phys")
 		if(resist == 0)
@@ -286,7 +262,7 @@
 			var/repel_back = raw_dmg * 0.25
 			raw_dmg = raw_dmg * 0.25
 			if(istype(attacker, /mob))
-				DemonDealDamage(attacker, TrueDamage(repel_back))
+				DemonDealDamage(attacker, TrueDamage(PctToHP(repel_back)))
 			if(ai_owner) ai_owner << "<font color='#aaccff'>[name] repels part of the attack!</font>"
 		// Drain: heal 25% of incoming damage, take 25%
 		else if(DemonHasDrain("Phys"))
@@ -315,10 +291,9 @@
 		if(!isnum(val) || val <= 0) return
 		DemonTakeDamage(val, null)
 
-	DoDamage(mob/other, damage)
+	ResolveStrike(strike/S)
 		if(_outgoing_damage)
 			_outgoing_damage = FALSE
-			..(other, damage)
-			return
-		if(isnum(damage) && damage > 0)
-			DemonTakeDamage(damage, other)
+			return ..(S)
+		if(isnum(S.val) && S.val > 0)
+			DemonTakeDamage(S.val, S.defender)

@@ -34,9 +34,16 @@ update_loop
 		Loop()
 			for()
 				for(var/atom/updater in updaters)
-					updater.Update()
+					try
+						updater.Update()
+					catch(var/exception/e)
+						world.log << "update_loop: [updater] ([updater.type]) runtime: [e.name]"
 				for(var/update_loop/updater in updaters)
-					if(world.time >= updater.next_tick) updater.Update()
+					if(world.time >= updater.next_tick)
+						try
+							updater.Update()
+						catch(var/exception/e2)
+							world.log << "update_loop: subloop [updater.type] runtime: [e2.name]"
 				sleep(world.tick_lag)
 
 		UpdateAll()

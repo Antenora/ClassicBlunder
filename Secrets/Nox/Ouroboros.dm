@@ -9,9 +9,8 @@
 	name = "Geminus Anguium: Ouroboros"
 	desc = {"The Snake Pair: Ouroboros (蛇双・ウロボロス Jasō: Uroborosu) is an Arch-Enemy Event Weapon in the shape of a black snake head attached to a never-ending chain.
 Ouroboros is summoned from a special space, and can directly attack the soul or mind of the target."}
-	passives = list("BladeFisting" = 1, "Extend" = 1, "Grippy" = 3, "CalmAnger" = 1, "AngerThreshold" = 1.5, "RenameMana" = "HEAT")
+	passives = list("BladeFisting" = 1, "Extend" = 1, "Grippy" = 3, "CalmAnger" = 1)
 	NoSaga=1
-	CalmAnger=1
 	MagicSword=1
 	icon = 'ouroboros (1).dmi'
 	pixel_x = -32

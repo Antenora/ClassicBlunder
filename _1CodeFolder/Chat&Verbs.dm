@@ -75,88 +75,10 @@ mob
 		return TRUE
 
 atom/proc/Examined(mob/user)
-mob/Players/var/tmp/current_party_target_index = 1
 mob/Players/verb
-	Create_Party()
-		set category="Party"
-		if(src.Class in list("Dance", "Potara"))
-			src << "You can't party with fused characters!"
-			return
-		if(src.party)
-			src << "You are already in a party; you cannot create another one."
-			return
-		var/Party/p=new
-		p.create_party(src)
-
-	Party_Target_Cycle()
-		set category = "Party"
-		if(!src.party)
-			src << "You don't have a party to cycle target on!"
-			return
-		current_party_target_index +=1
-		if(current_party_target_index > party.members.len)
-			current_party_target_index = 1
-		usr.SetTarget(party.members[current_party_target_index])
-		usr << "You target [usr.Target]."
-	Manage_Party()
-		set category="Party"
-		if(!src.party)
-			src << "You don't have a party to manage!"
-			return
-		var/list/options=list("Cancel", "Check Party", "Add Member", "Remove Member", "Pass Leader", "Leave Party")
-		if(src.party.leader!=src)
-			options.Remove("Add Member", "Remove Member", "Pass Leader")
-		switch(input(src, "How do you want to manage your party?", "Manage Party") in options)
-			if("Cancel")
-				return
-			if("Check Party")
-				for(var/mob/m in src.party.members)
-					if(m == src.party.leader)
-						src << "\[LEADER\] - \..."
-					src << "[m.name] - [round(m.Health, 10)]% / [round(m.Energy, 10)]%"
-				return
-			if("Add Member")
-				if(src==src.party.leader)
-					var/list/mob/the_boys=list("Cancel")
-					for(var/mob/m in view(8, src))
-						if(!m.party && !(m.Class in list("Dance", "Potara")))
-							the_boys.Add(m)
-					var/mob/my_boy=input(src, "Who do you want to add to your party?", "Add Member") in the_boys
-					if(my_boy=="Cancel")
-						return
-					if(my_boy.party)
-						return
-					src.party.add_member(my_boy)
-				return
-			if("Remove Member")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/not_my_boy=input(src, "Who do you want to remove from your party?", "Remove Member") in my_boys
-					if(not_my_boy=="Cancel")
-						return
-					if(src.party.members.Find(not_my_boy))
-						src.party.remove_member(not_my_boy)
-				return
-			if("Pass Leader")
-				if(src==src.party.leader)
-					var/list/mob/my_boys=list("Cancel")
-					my_boys.Add(src.party.members)
-					my_boys.Remove(src)
-					var/mob/the_best_boy=input(src, "Who do you want to pass your leadership to?", "Pass Leader") in my_boys
-					if(the_best_boy=="Cancel")
-						return
-					if(src.party.members.Find(the_best_boy))
-						src.party.pass_leader(src, the_best_boy)
-				return
-			if("Leave Party")
-				if(src.party)
-					src.party.remove_member(src)
-				return
-
 	Signature_Check()
 		set category="Other"
+		set hidden = 1
 		src.SignatureCheck=!src.SignatureCheck
 		if(src.SignatureCheck)
 			src<<"You have <font color='green'>ENABLED</font color> signature check."
@@ -168,10 +90,11 @@ mob/Players/verb
 	WatchCombat()
 		set name = "Watch"
 		set category = "Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay+4)) return
 		usr.verb_delay=world.time+1
 
-		if(usr.client.eye == usr) usr.Observing=0
+		if(GfxClientEyeIsMob(usr.client, usr)) usr.Observing=0
 
 		var/mob/m
 
@@ -207,6 +130,7 @@ mob/Players/verb
 	ToggleCombatWatchers()
 		set name = "Toggle Combat Watchers"
 		set category = "Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 
@@ -302,6 +226,7 @@ mob/Players/verb
 
 	AFKToggle()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Toggle"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -312,6 +237,7 @@ mob/Players/verb
 			usr.overlays-=usr.AFKIcon
 	AFKIcon()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Icon"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -328,6 +254,7 @@ mob/Players/verb
 			usr.AFKIcon=Z
 	AFKLimit()
 		set category="Other"
+		set hidden = 1
 		set name="AFK Time Limit"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -338,6 +265,7 @@ mob/Players/verb
 			usr.AFKTimeLimit=75000
 	Custom_Appearance_Skills()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Skills"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -529,6 +457,7 @@ mob/Players/verb
 	Custom_Appearance_Hair(var/mob/A as mob in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Hair"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -551,6 +480,7 @@ mob/Players/verb
 				A.Hairz("Add")
 	Custom_Appearance_Hair_Details()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Hair Details"
 		src.Hairz("Remove")
 		src.HairUnderlay=input(src, "Set a hair underlay.", "Hair Underlay") as file|null
@@ -565,6 +495,7 @@ mob/Players/verb
 	Custom_Appearance_General(var/atom/A as mob|obj in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Icon"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -607,6 +538,7 @@ mob/Players/verb
 	Custom_Appearance_Forms(var/atom/A as mob in view(usr,5))
 		set src=usr.client
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Forms"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -733,6 +665,7 @@ mob/Players/verb
 
 	Custom_Appearance_Charge()
 		set category="Other"
+		set hidden = 1
 		set name="Customize: Ki Charge"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
@@ -742,6 +675,7 @@ mob/Players/verb
 
 	Reset_Multipliers()
 		set category="Other"
+		set hidden = 1
 		set name="Reset Multipliers"
 		if(src.Power_Multiplier==1&&src.StrMultTotal==1&&src.EndMultTotal==1&&src.SpdMultTotal==1&&src.ForMultTotal==1&&src.OffMultTotal==1&&src.DefMultTotal==1&&src.RecovMultTotal==1)
 			src << "Your mults are already at 1!"
@@ -756,92 +690,161 @@ mob/Players/verb
 
 	Reset_Overlays()
 		set category="Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		usr.PurgeHurtboxDebug()
 		usr.AppearanceOff()
 		usr.AppearanceOn()
-	Screen_Size()
-		set category="Other"
-		set hidden=1
-		if(!(world.time > usr.verb_delay)) return
-		usr.verb_delay=world.time+1
-		var/screenmax = 31
-		if(usr.Secret == "Heavenly Restriction" && usr.secretDatum?:hasImprovement("Senses"))
-			screenmax = 71
-		var/screenx=input("Enter the width of the screen, max is [screenmax].") as num
-		screenx=min(max(1,screenx),screenmax)
-		var/screeny=input("Enter the height of the screen, max is [screenmax].") as num
-		screeny=min(max(1,screeny),screenmax)
-		client.view="[screenx]x[screeny]"
-		src.ScreenSize = "[screenx]x[screeny]"
+	Customize_PoweredState_Menu()
+		set category="Utility"
+		set hidden = 1
+		set name="Customize: Powered State"
+		for(var/obj/O in usr)
+			for(var/v in O.verbs)
+				if("[v:name]" == "Customize Powered State")
+					call(O, v)()
+					return
+		usr << "You need Ki Control (use Meditation first) to customize your powered state."
 	Text_Color_Say()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: IC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.Text_Color=input(usr, "Choose a color for Say.") as color
 	Emote_Color()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: Emote"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.Emote_Color=input(usr, "Choose a color for Emote.") as color
 	Text_Color_OOC()
 		set category="Other"
+		set hidden = 1
 		set name="Text Color: OOC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		src.OOC_Color=input(usr, "Choose a color for OOC.") as color
 	Who()
 		set category="Other"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		var/View={"<html><head><title>Who</title><body>
-<font size=3><font color=red>Player Panel:<hr><font size=2><font color=black>"}
 		var/list/people=new
 		for(var/mob/M in players)
 			if(M.client)
 				people.Add(M.key)
 		var/list/sortedpeople=dd_sortedTextList(people,0)
 		var/online=0
+		var/View = {"<html><head><title>Who</title>
+<style>
+body{margin:0;background:#0d1730;color:#d8f6ff;font-family:Verdana,Arial,sans-serif;font-size:12px;}
+.wrap{border:2px solid #45c7e0;margin:8px;padding:10px;background:#132447;}
+h2{margin:0 0 8px 0;color:#8be9ff;font-size:16px;letter-spacing:1px;}
+.summary{color:#55ee55;font-weight:bold;margin-top:8px;}
+table{width:100%;border-collapse:collapse;}
+th{color:#ffd76b;text-align:left;border-bottom:1px solid #45c7e0;padding:4px 6px;}
+td{border-bottom:1px solid #2e6682;padding:4px 6px;vertical-align:top;}
+.num{text-align:right;white-space:nowrap;}
+.row{border-top:1px solid #2e6682;padding:5px 0;}
+.row:first-of-type{border-top:0;}
+a{color:#8be9ff;}
+</style></head><body><div class='wrap'><h2>WHO</h2>"}
 		if(usr.Admin)
 			View+={"
-					<table border=1 cellspacing=6>
+					<table>
 					<tr>
-					<th><font size=2>Key (IC Name)</th>
-					<th><font size=2>Race (Class)</th>
-					<th><font size=2>Location</th>
-					<th><font size=2>Base (BaseMod )/ Age Category</th>
-					<th><font size=2>Reward Points: Spent, Spendable, Total (Race Excluded)</th>
+					<th>Key (IC Name)</th>
+					<th>Race</th>
+					<th>Location</th>
+					<th class='num'>Base</th>
+					<th>Age</th>
+					<th class='num'>Spent</th>
+					<th class='num'>Spendable</th>
+					<th class='num'>Total</th>
+					<th class='num'>Race Excl.</th>
 					</tr>"}
 			for(var/x in sortedpeople)
 				for(var/mob/M in players)
 					if(M.key==x)
 						online++
+						var/race_excluded = round((M.RPPSpent + M.RPPSpendable) / M.RPPMult, 1)
 						View+={"<tr>
-							<td><font size=2>[M.key] ([M.name])/(<a href=?src=\ref[M];action=MasterControl>x</a href>)</td>
-							<td><font size=2>[M.race.name]</td>
-							<td><font size=2>[M.loc] ([M.x],[M.y],[M.z])</td>
-							<td><font size=2>[M.Base]([M.potential_power_mult]) / [M.EraBody]</td>
-							<td><font size=2>[M.RPPSpent], [M.RPPSpendable], [M.RPPSpendable+M.RPPSpent] ([round((M.RPPSpent+M.RPPSpendable)/M.RPPMult,1)])</td>
+							<td>[M.key] ([M.name]) <a href=?src=\ref[M];action=MasterControl>x</a></td>
+							<td>[M.race.name]</td>
+							<td>[M.loc] ([M.x],[M.y],[M.z])</td>
+							<td class='num'>[M.Base] ([M.potential_power_mult])</td>
+							<td>[M.EraBody]</td>
+							<td class='num'>[M.RPPSpent]</td>
+							<td class='num'>[M.RPPSpendable]</td>
+							<td class='num'>[M.RPPSpendable + M.RPPSpent]</td>
+							<td class='num'>[race_excluded]</td>
 							</tr>"}
 						break
-			View+={"</table"><br>"}
+			View+={"</table>"}
 		else
 
 			for(var/x in sortedpeople)
 				online++
-				View+="[x]<br>"
-		View+="<font color=green><b>Online:</b> [online]"
+				View+="<div class='row'>[x]</div>"
+		View+="<div class='summary'>Online: [online]</div></div></body></html>"
 		if(usr.Admin)
 			usr<<browse("[View]","window=Logzk;size=900x450")
 		else
-			usr<<browse("[View]","window=Logzk;size=150x400")
+			usr<<browse("[View]","window=Logzk;size=240x420")
 
+	GetPingSound()
+		set category = "Other"
+		set name = "Toggle Ping Sound"
+		set hidden = 1
+		if(usr.PingSound)
+			usr.PingSound = 0
+			usr << "Ping Sound Disabled."
+		else
+			usr.PingSound = 1
+			usr << "Ping Sound Enabled."
 
+	SetPingVolume()
+		set category = "Other"
+		set name = "Set Ping Volume"
+		set hidden = 1
+		var/n = input(src, "What volume?") as num
+		if(n > 100 || n < 0)
+			src << " too high or low "
+		else
+			PingVolume = n
+
+	CustomizePU()
+		set name = "Customize: PU Charging"
+		set category = "Other"
+		set hidden = 1
+		if(!src.client)
+			return
+		var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
+		if(length(choice)>200)
+			return
+		if(length(choice)<1)
+			return
+		custom_powerup = choice
+		choice = input(src, "Do you want to include your name in the PU charging?") in list("Yes", "No")
+		if(choice == "Yes")
+			customPUnameInclude = TRUE
+		else
+			customPUnameInclude = FALSE
+
+	Admins()
+		set name = "Admins"
+		set category = "Other"
+		set hidden = 1
+		for(var/mob/p in players)
+			if(p.Admin)
+				src<<"[p.DisplayKey ? p.DisplayKey : p.key] (Admin [p.Admin])"
 
 	Character_Description()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/CharProfile=input(src, "Please input a description for your character.", "Character Description", usr.Profile) as message
@@ -851,6 +854,7 @@ mob/Players/verb
 		usr.Profile=CharProfile
 	Countdown()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/time=30*10
@@ -866,6 +870,7 @@ mob/Players/verb
 	WoundIntent()
 		set name="Intent to Injure"
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(usr.WoundIntent)
@@ -881,6 +886,7 @@ mob/Players/verb
 	LethalityToggle()
 		set name="Intent to Kill"
 		set category= "Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(src.Lethal)
@@ -897,12 +903,14 @@ mob/Players/verb
 	ToggleRPMode()
 		set name="Intent to Roleplay"
 		set category= "Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		RPModeSwitch()
 	Force_Heavy_Strike()
 		set name="Force Heavy Strike"
 		set category= "Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(src.ForceHeavyStrike)
@@ -922,8 +930,9 @@ mob/Players/verb
 			var/obj/Skills/s = dm.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				s.Cooldown(modify=1,Time=s.cooldown_remaining, p=src)
 	for(var/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/am in src)
@@ -932,8 +941,9 @@ mob/Players/verb
 			var/obj/Skills/s = am.possible_skills[x]
 			if(!s || !s.cooldown_remaining) continue
 			if(pausing)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 			else
 				s.Cooldown(modify=1,Time=s.cooldown_remaining, p=src)
 
@@ -949,6 +959,10 @@ mob/proc/RPModeSwitch()
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
 				s.Cooldown(modify=1,Time=s.cooldown_remaining)
+			if(s.MaxCharges > 0 && s.Charges < s.MaxCharges)
+				var/missing = s.MaxCharges - s.Charges - length(s.recharge_ends)
+				for(var/i = 1, i <= missing, i++)
+					s.Recharge(s.ChargeRefresh * 10 * src.HasteCDMult(s) * i, src)
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return
@@ -963,8 +977,9 @@ mob/proc/RPModeSwitch()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
 		src.pauseStyleRatingExpiryForRP()
 		return
@@ -979,6 +994,10 @@ mob/proc/CutsceneMode()
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
 				s.Cooldown(modify=1,Time=s.cooldown_remaining)
+			if(s.MaxCharges > 0 && s.Charges < s.MaxCharges)
+				var/missing = s.MaxCharges - s.Charges - length(s.recharge_ends)
+				for(var/i = 1, i <= missing, i++)
+					s.Recharge(s.ChargeRefresh * 10 * src.HasteCDMult(s) * i, src)
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return
@@ -992,8 +1011,9 @@ mob/proc/CutsceneMode()
 		for(var/obj/Skills/s in src)
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
-				s.cooldown_remaining = s.cooldown_remaining - (world.realtime - s.cooldown_start)
+				s.cooldown_remaining = SkillCDRemaining(s)
 				s.cooldown_start = 0
+				s.cooldown_start_wt = 0
 		src.RPMode_AdjustNestedComboSpellCooldowns(1)
 		src.pauseStyleRatingExpiryForRP()
 		return
@@ -1001,6 +1021,7 @@ mob/proc/CutsceneMode()
 mob/Players/verb
 	Roll_Dice()
 		set category="Roleplay"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		var/textstring=""
@@ -1046,12 +1067,19 @@ mob/Players/verb
 
 	Pose()
 		set category="Skills"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		//flourish: pose right after a guard break / wall splat / grab tech for a tension nod
+		if(world.time <= src.flourish_until)
+			src.flourish_until = 0
+			if(src.canGainTension())
+				src.gainTension(glob.FLOURISH_TENSION)
+			KenShockwave(src, icon='KenShockwaveFocus.dmi', Size=0.5, Blend=2, Time=3)
+			OMsg(src, "[src] strikes a pose!")
+			return
 		if(src.icon_state==""&&!src.PoseEnhancement)
-			if(src.CheckSlotless("Half Moon Form")||src.CheckSlotless("Full Moon Form"))
-				OMsg(src, "[src] radiates animalistic bloodlust as they prepare to pounce!")
-			else if(src.Secret=="Hamon")
+			if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")
 			else if(src.Secret=="Vampire")
 				OMsg(src, "[src] begins posing ominously!")
@@ -1089,28 +1117,15 @@ mob/Players/verb
 		if(src.icon_state=="Train")
 			src.icon_state=""
 			if(!src.PoseEnhancement)
-				if(!src.CheckSlotless("Half Moon Form")&&!src.CheckSlotless("Full Moon Form"))
-					if(src.PoseTime>=5&&(src.RippleActive()||src.Secret=="Vampire"||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))||Secret=="Eldritch"||Secret=="Spiral")
-						src.PoseTime=0
-						if(src.RippleActive())
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement/H in src)
-								H.Trigger(src)
-						if(src.Secret=="Vampire")
-							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Restraint_Release)
-						if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
-							src.ManaAmount+=25
-
-				else
-					var/PoseBuff=(src.PoseTime/4)
-					if(PoseBuff<1)
-						PoseBuff=1
+				if(src.PoseTime>=5&&(src.RippleActive()||src.Secret=="Vampire"||src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))||Secret=="Eldritch"||Secret=="Spiral")
 					src.PoseTime=0
-					if(src.Target)
-						src.Comboz(src.Target)
-						src.Melee1(damagemulti=PoseBuff, accmulti=PoseBuff, NoKB=1)
-					src.PoseEnhancement=1
-					spawn(Second(30))
-						src.PoseEnhancement=0
+					if(src.RippleActive())
+						for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement/H in src)
+							H.Trigger(src)
+					if(src.Secret=="Vampire")
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Restraint_Release)
+					if(src.Secret=="Senjutsu"&&src.CheckSlotless("Senjutsu Focus"))
+						src.ManaAmount+=25
 			return
 	Skill_Sheet()
 		set name="Skill Sheet"
@@ -1122,11 +1137,13 @@ mob/Players/verb
 
 	Access_Technology()
 		set category="Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		usr.Grid("Tech")
+		if(usr.client) usr.client.OpenTechMenu("craft")
 	Access_Enchantment()
 		set category="Utility"
+		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		usr.Grid("Enchant")
@@ -1135,6 +1152,7 @@ mob/Players/verb
 
 /*	Admins()
 		set category="Other"
+		set hidden = 1
 		var/list/admins=new
 		admins.Add(Admins,CodedAdmins)
 		for(var/x in admins)

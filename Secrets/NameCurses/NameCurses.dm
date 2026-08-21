@@ -7,7 +7,7 @@
 		EndMult=1.2
 		SpdMult=1.2
 		ForMult=1.2
-		passives = list("Deicide" = 10, "EndlessNine" = 0.2, "MovementMastery" = 8)
+		passives = list()
 		ActiveMessage="claims dominion over names."
 		OffMessage="discards their dominion over names."
 		verb/Monk_of_The_True_Name()
@@ -29,7 +29,6 @@ obj/Skills/AutoHit
 	BlackAnt
 		Area="Target"
 		SignatureTechnique=3
-		AdaptRate = 1
 		Cooldown=-1
 		DamageMult = 5
 		Distance = 15

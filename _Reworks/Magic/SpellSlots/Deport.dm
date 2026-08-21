@@ -1,11 +1,38 @@
 globalTracker/var/DEPORT_CRIPPLE = 30
 
-mob/proc/applyDeport(tileAmt)
+proc/deportStepBlocked(turf/start, turf/end)
+	for(var/obj/Turfs/Edges/E in start)
+		if(E.dir == get_dir(start, end))
+			return TRUE
+	for(var/obj/Turfs/Edges/E in end)
+		if(E.dir == get_dir(end, start))
+			return TRUE
+	if(end.density) return TRUE
+	for(var/obj/i in end)
+		if(i.density && !istype(i, /obj/AutoHitter) && !istype(i, /obj/Skills/Projectile/_Projectile))
+			return TRUE
+	return FALSE
+
+mob/proc/applyDeport(tileAmt, throwdir = 0)
 	if(!tileAmt) return
-	var/turf/deport = randomReachableTurf(tileAmt)
+	var/turf/deport
+	if(throwdir)
+		var/turf/cur = loc
+		if(istype(cur))
+			for(var/i = 1, i <= tileAmt, i++)
+				var/turf/next = get_step(cur, throwdir)
+				if(!next || deportStepBlocked(cur, next))
+					break
+				cur = next
+			if(cur != loc)
+				deport = cur
+	else
+		deport = randomReachableTurf(tileAmt)
 	AddCrippling(glob.DEPORT_CRIPPLE)
 	if(deport)
 		loc = deport
+		step_x = 0
+		step_y = 0
 
 
 mob/proc/randomReachableTurf(range = 10)

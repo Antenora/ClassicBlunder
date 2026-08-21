@@ -32,7 +32,7 @@ TODO: SIX PATHS
         
     Preta
         Absorbtion
-            Vai Health, SpiritHand = pot / 25, EnergySiphon = 1
+            Vai Health, EnergySiphon = 1
     
     Naraka
         King of Hell

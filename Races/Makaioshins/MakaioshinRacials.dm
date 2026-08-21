@@ -1,5 +1,5 @@
 /*/obj/Skills/Buffs/SlotlessBuffs/Falldown_Mode/Makaioshin
-	passives = list("HellPower" = 0.1, "AngerAdaptiveForce" = 0.25, "TechniqueMastery" = 2, "Juggernaut" = 0.5, "FakePeace" = -1, "Incomplete"=-1)
+	passives = list("HellPower" = 0.1,  "TechniqueMastery" = 2, "Juggernaut" = 0.5, "FakePeace" = -1, "Incomplete"=-1)
 	Cooldown = -1
 	TimerLimit = 0
 	BuffName = "Falldown Mode"
@@ -11,29 +11,30 @@
 	HealthThreshold = 0.0001
 	var/current_charges = 1
 	var/last_charge_gain = 0
-/*	var/list/trueFormPerAsc = list( 1 = list("AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 2, "Juggernaut" = 1, "Hellrisen" = 0.25, , "FakePeace" = -1, "Incomplete"=-0.75), \
-									2 = list("AngerAdaptiveForce" = 0.2,"TechniqueMastery" = 3, "FluidForm" = 1, "Juggernaut" = 1.5, "Hellrisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.5), \
-									3 = list("AngerAdaptiveForce" = 0.25,"TechniqueMastery" = 4, "FluidForm" = 1.5, "Juggernaut" = 2,"Hellrisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.25), \
-									4 = list("AngerAdaptiveForce" = 0.5,"TechniqueMastery" = 6, "FluidForm" = 2, "Juggernaut" = 2,"Hellrisen" = 0.5, , "FakePeace" = -1))*/
+/*	var/list/trueFormPerAsc = list( 1 = list( "TechniqueMastery" = 2, "Juggernaut" = 1, "Hellrisen" = 0.25, , "FakePeace" = -1, "Incomplete"=-0.75), \
+									2 = list("TechniqueMastery" = 3, "FluidForm" = 1, "Juggernaut" = 1.5, "Hellrisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.5), \
+									3 = list("TechniqueMastery" = 4, "FluidForm" = 1.5, "Juggernaut" = 2,"Hellrisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.25), \
+									4 = list("TechniqueMastery" = 6, "FluidForm" = 2, "Juggernaut" = 2,"Hellrisen" = 0.5, , "FakePeace" = -1))*/
 	ActiveMessage = "has resolved their contradictory nature!"// Darkness and light, once wandering through creation, gather together and open the door to their truth! <b>Become as one, [usr.name] and [usr.TrueName]!</b></i>"
 
 	adjust(mob/p)
 	//	for(var/passive in trueFormPerAsc[p.AscensionsAcquired])
 	//		passives[passive] = trueFormPerAsc[p.AscensionsAcquired][passive]
 		if(p.AscensionsAcquired==1)
-			passives =list("AngerAdaptiveForce" = 0.1, "TechniqueMastery" = 2, "Juggernaut" = 1, "HellRisen" = 0.25, , "FakePeace" = -1, "Incomplete"=-0.75)
+			passives =list( "TechniqueMastery" = 2, "Juggernaut" = 1, "HellRisen" = 0.25, , "FakePeace" = -1, "Incomplete"=-0.75)
 		if(p.AscensionsAcquired==2)
-			passives = list("AngerAdaptiveForce" = 0.2,"TechniqueMastery" = 3, "FluidForm" = 1, "Juggernaut" = 1.5, "HellRisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.5)
+			passives = list("TechniqueMastery" = 3, "FluidForm" = 1, "Juggernaut" = 1.5, "HellRisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.5)
 		if(p.AscensionsAcquired==3)
-			passives = list("AngerAdaptiveForce" = 0.25,"TechniqueMastery" = 4, "FluidForm" = 1.5, "Juggernaut" = 2,"HellRisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.25)
+			passives = list("TechniqueMastery" = 4, "FluidForm" = 1.5, "Juggernaut" = 2,"HellRisen" = 0.5, , "FakePeace" = -1, "Incomplete"=-0.25)
 		if(p.AscensionsAcquired==4)
-			passives = list("AngerAdaptiveForce" = 0.5,"TechniqueMastery" = 6, "FluidForm" = 2, "Juggernaut" = 2,"HellRisen" = 0.5, , "FakePeace" = -1)
+			passives = list("TechniqueMastery" = 6, "FluidForm" = 2, "Juggernaut" = 2,"HellRisen" = 0.5, , "FakePeace" = -1)
 		var/hellpowerdif = 1 - p.passive_handler.Get("HellPower")
 		if(hellpowerdif < 0)
 			hellpowerdif = 0
 		passives["HellPower"] = hellpowerdif
 	verb/Falldown_Mode()
 		set category = "Skills"
+		set hidden = 1
 		adjust(usr)
 		if(!usr.BuffOn(src))
 			if(current_charges - 1 < 0)
@@ -53,8 +54,8 @@
 /obj/Skills/AutoHit/Purgatorial_Flame
 	Area="Arc"
 	Distance=5
-	StrOffense=1
-	ForOffense=1
+	StrScaling=1
+	ForScaling=1
 	DamageMult=0.7
 	RoundMovement=0
 	ComboMaster=1
@@ -111,7 +112,7 @@
 		usr.Activate(src)
 
 /obj/Skills/Projectile/Beams/Divine_Atonement
-	DamageMult=20
+	DamageMult=0.5714
 	ChargeRate=2
 	Dodgeable=0
 	Distance=30
@@ -162,8 +163,8 @@
 	Cooldown = 300
 	FixedDamage = 10
 	DamageMult = 25
-	StrOffense = 1
-	EndDefense = 1
+	StrScaling = 1
+	EndEffectiveness = 1
 	GuardBreak = 1
 	ActiveMessage = "corrodes their target's existence with chaos!"
 

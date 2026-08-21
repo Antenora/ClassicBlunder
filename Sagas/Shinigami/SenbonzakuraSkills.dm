@@ -47,6 +47,7 @@
 	verb/Goukei()
 		set name = "Goukei"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Goukei can only be used in Bankai."
 			return
@@ -77,7 +78,7 @@
 		bk.setPetalsInactive(TRUE, 255)
 		if(user.client)
 			user.client.senbonzakura_dragging = FALSE
-			winset(user.client, "mapwindow.map", "right-click=0")
+			user.client.petal_drag_locked = TRUE // block drags during convergence
 		bk.convergence_target = target
 
 		src.goukei_active = TRUE
@@ -89,7 +90,7 @@
 				bk.convergence_target = null
 				bk.setPetalsInactive(FALSE, 255)
 				if(user && user.client)
-					winset(user.client, "mapwindow.map", "right-click=1")
+					user.client.petal_drag_locked = FALSE
 				return
 
 			// Hide petals now that they've converged
@@ -131,7 +132,7 @@
 					bk.updatePetalLocFromPixels(p)
 			bk.setPetalsInactive(FALSE, 255)
 			if(user && user.client)
-				winset(user.client, "mapwindow.map", "right-click=1")
+				user.client.petal_drag_locked = FALSE
 
 
 // Saga Level 5
@@ -214,6 +215,7 @@
 	verb/Senkei()
 		set name = "Senkei"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Senkei can only be used in Bankai."
 			return
@@ -275,7 +277,7 @@
 	SpdMult = 1.5
 	OffMult = 1.5
 	DefMult = 1.5
-	passives = list("BleedHit" = 1, "BulletKill" = 1, "SpiritSword" = 2, "HybridStrike" = 3, "SpiritFlow" = 4, "Duelist" = 5, "CriticalChance" = 25, "CriticalDamage" = 0.25)
+	passives = list("BleedHit" = 1, "BulletKill" = 1,    "Duelist" = 5, "CriticalDamage" = 0.25)
 	ActiveMessage = "murmurs quietly... \"Shukei: Hakuteiken.\""
 	OffMessage = "lets the white glow of Hakuteiken fade..."
 
@@ -311,6 +313,7 @@
 	verb/Ikka_Senjinka()
 		set name = "Ikka Senjinka"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Ikka Senjinka can only be used in Bankai."
 			return

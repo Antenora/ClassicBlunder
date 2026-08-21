@@ -146,8 +146,7 @@ Click on the guide(s) pertaining to your curiousity.<br><br>
 <a href=?src=\ref[usr];action=Ranks>Ranks</a><br><hr>
 <a href=?src=\ref[usr];action=Guide>Guide</a><br><hr>
 <a href=?src=\ref[usr];action=Credits>Credits</a><br><hr>
-<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr>
-<a href=?src=\ref[usr];action=magic;page=main>Magic Guide</a><br><hr><br>"})
+<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr><br>"})
 		if("Story")
 			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Story]<br><br>")
 		if("Rules")
@@ -182,10 +181,6 @@ mob/Topic(A,B[])
 				usr.Index("Credits")
 			if("TransformationTiers")
 				usr.Index("TransformationTiers")
-			if("magic")
-				if(B["page"])
-					usr.MagicGuide(B["page"])
-					return
 	.=..()
 
 
@@ -275,7 +270,7 @@ client/Topic(href,href_list[],hsrc)
 					<font size=3><font color=red>[hsrc:name]<hr><font size=2><font color=black>"}
 					View+={"
 
-					\[ <a href=?src=\ref[hsrc];action=MasterControl;do=Adminize>Promote/Demote</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Mute>Mute</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=PM>Admin PM</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Observe>Observe</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=SendToSpawn>Send to Spawn</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Assess>Assess | <a href=?src=\ref[hsrc];action=MasterControl;do=Give>Give</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Kill>Kill</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=KO>Knockout</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Heal>Heal<a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Revive>Revive</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Log>Check Log</a href>  | <a href=?src=\ref[hsrc];action=MasterControl;do=TempLog>Check Temp Log</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=ArchiveLog>Check Archive Log</a href> |<a href=?src=\ref[hsrc];action=MasterControl;do=SkillLog>Check Skill log</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Reward>Reward</a href>  | <a href=?src=\ref[hsrc];action=MasterControl;do=Edit>Edit</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Summon>Summon</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Teleport>Teleport to</a href>  | <a href=?src=\ref[hsrc];action=MasterControl;do=XYZTeleport>XYZ Teleport</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Boot>Boot</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Ban>Ban</a href> \]
+					\[ <a href=?src=\ref[hsrc];action=MasterControl;do=Adminize>Promote/Demote</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Mute>Mute</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=PM>Admin PM</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Observe>Observe</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=SendToSpawn>Send to Spawn</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Assess>Assess | <a href=?src=\ref[hsrc];action=MasterControl;do=Give>Give</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Kill>Kill</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=KO>Knockout</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Heal>Heal<a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Revive>Revive</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Log>Check Log</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Edit>Edit</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Summon>Summon</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Teleport>Teleport to</a href>  | <a href=?src=\ref[hsrc];action=MasterControl;do=XYZTeleport>XYZ Teleport</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Boot>Boot</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Ban>Ban</a href> \]
 					"}
 					src<<browse(View,"window=Person;size=500x135")
 	..()

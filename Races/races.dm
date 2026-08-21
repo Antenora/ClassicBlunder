@@ -59,12 +59,6 @@ proc
 		return null
 
 
-/mob/Admin4/verb/forceCuckRace(mob/Players/P in players)
-	P.race = new()
-
-
-
-
 world
 	New()
 		..()
@@ -232,13 +226,20 @@ race
 		offense = 1
 		defense = 1
 		speed = 1
+		vitality = 1
 		stats_per_class = list() //NIEZAAAAANNNNN
 		secondary_stats_per_class = list()
 		anger_message = "becomes angry!"
 		anger_point = 50
+		growth = 1
 
 		//anger. 1 = 100%, 2 = 200%
 		anger = 1.5
+
+		//curve override for race reworks. list(list(hp, frac, msg), ...) high hp first, null = the default 75/50/25 curve.
+		//anger_curve_angered = which tier is the classic "gets angry" moment (message, anger-locked passives, the works)
+		list/anger_curve
+		anger_curve_angered = 2
 		regeneration = 1
 		recovery = 2
 
@@ -373,7 +374,7 @@ race
 			user.SetStat("Learning", learning)
 			user.SetStat("Intellect", intellect)
 			user.SetStat("Imagination", imagination)
-
+			user.SetStat("Growth", growth)
 			user.EconomyMult = economy
 
 		onFinalization(mob/user)

@@ -1,7 +1,61 @@
+//queue-layer state
+mob/var/tmp
+	queue_tell_aura = 0
+	queue_counter_until = 0
+	hs_key_down = 0
+
+mob/Players/verb/Heavy_Strike_up()
+	set hidden = 1
+	set instant = 1
+	src.hs_key_down = 0
+
+//tension-full finisher dispatch, pulled out of the Heavy Strike verb so tap/hold can reuse it
+//returns 1 when it consumed the press (fired OR full-but-blocked), 0 when tension isn't full
+mob/proc/FireFinisher(force = 0)
+	var/maxTension = getMaxTensionValue()
+	if(Tension < maxTension)
+		return 0
+	if(HasTensionLock())
+		return force ? 0 : 1
+	if(AttackQueue && !force)
+		return 1
+	// firing consumes ALL stored tension regardless of stage reached
+	var/finstage = 1
+	if(StyleBuff && StyleBuff.FinisherStage > 1)
+		finstage = min(round(Tension / maxTension), StyleBuff.FinisherStage)
+	Tension = 0
+	if(Secret=="Spiral"&&CheckSlotless("Evolution Power"))
+		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in src)
+			if(!ae.SlotlessOn)
+				ae.Trigger(src)
+		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in src)
+			if(!sge.SlotlessOn)
+				sge.Trigger(src)
+	tryIncreaseTension()
+	if(StyleBuff?.Finisher)
+		var/path = StyleBuff.Finisher
+		if(finstage >= 2 && StyleBuff.Finisher2)
+			path = StyleBuff.Finisher2
+		if(finstage >= 3 && StyleBuff.Finisher3)
+			path = StyleBuff.Finisher3
+		if(!ispath(path))
+			path = text2path(path)
+		var/obj/Skills/Queue/q
+		if(!locate(path, src))
+			q = new path
+			AddSkill(q)
+		else
+			q = FindSkill(path)
+		q.adjust(src)
+		SetQueue(q, TRUE)
+	else
+		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher, TRUE)
+	return 1
+
 obj
 	Skills
 		Queue//Queued skills like GET DUNKED and Axekick.
-			canBeShortcut=1;
+			CritEffectiveness=1
 			var/Duration=5//This is how long the queue remains up for.
 			var/UnarmedOnly=0//Can't use this with a sword.
 			//var/ClassNeeded//Requires a sword class.
@@ -15,7 +69,6 @@ obj
 			var/HitsUsed//Keeps a tally of how many hits have been used.
 			var/KBAdd//Adds knockback
 			var/KBMult//Multiplies knockback.
-			var/KBDelayed//KBs after the move is finished
 			var/Recoil/*If this is set, it will mark the attackers recoil damage.*/
 			var/Finisher//Passive that makes damage scale.
 			var/Opener//Passive that makes damage higher when health is higher.
@@ -32,10 +85,8 @@ obj
 			var/SweepStrike/*Passive that multiplies damage by enemy's speed.  Reverse Speed Strike!*/
 			var/DrawIn/*Passive that draws people in.  DrawIn value = the amount of tiles drawn in.*/
 			var/PushOut//Passive that pushes people away. PushOut value = the amount of tiles pushed away.
-			var/AntiSunyata
 			var/PushOutWaves=1
 			var/PushOutIcon='fevKiai.dmi'
-			var/Punt
 			var/ComboMessaged//If the combo has displayed a message, flag this
 			var/Combo//Value of combo is how many times it hits.
 			var/ComboPerformed=0//Tracks number of hits done.
@@ -46,7 +97,6 @@ obj
 			var/InstantStrikesDelay//when fass is too fass
 			var/Warp//If this is ticked, it homes onto people.
 			var/NoWarp
-			var/AntiSuyata
 			var/SpecialEffect//shinies
 			var/SpecialEffectRange=3//shinies big or smol
 			var/RozanEffect//super launcher
@@ -54,8 +104,6 @@ obj
 			var/GoshoryukenEffect
 			var/Explosive//Makes explosions, duh.
 			var/Shining//Makes shock effects.
-			var/Bolt//Makes lightning drop effect.
-			var/Darkness//Makes darkness tiles.
 			var/IconLock='BLANK.dmi'
 			var/IconLockUnder=0
 			var/LockX=0
@@ -85,23 +133,21 @@ obj
 			var/SBuffNeeded
 			var/GateNeeded
 
+			//FocusShift
+			var/FocusShifter
+			var/FocusShiftType = "None"
+			var/FocusShiftBoost = 1.5
+			var/FocusShiftTimer = 10
 
 			var/Quaking //Makes screen go shakka shakka
 			var/WarpAway
 
 
 
-			var/SpiritStrike //Targets End with Force
-			var/HybridStrike //For+Str
-			var/SpiritHand //Sunlight stance
-			var/SpiritSword //duh
-			var/KiBlade //duh
-			var/PridefulRage
 
 			var/ManaGain
 
 			//Instinct //Ignore AIS/WS
-			var/Steady //It do what steady do.
 			var/WeaponBreaker //WHAT DO U THINK?!
 			var/MortalBlow //WHHHHHHHHHHHAAAAAAAAAA-
 
@@ -115,8 +161,6 @@ obj
 
 
 			var/RipplePower=1//used to make ripple go higher
-			var/DrainBlood=0// This is used for vampire grab + toss, makes them gain bloodpower
-			var/ForceCost = 0
 			var/WaveHit=0//Applies BYOND wave filter briefly on the hit target
 
 			var/Ooze
@@ -174,7 +218,7 @@ obj
 				Duration=5
 				Instinct=4
 				DamageMult=1
-				AccuracyMult=20
+				AccuracyMult=2
 				KBMult=0.001
 				Decider=1
 				Instinct=4
@@ -377,7 +421,6 @@ obj
 				//tier 1 sig styles
 
 				Behemoth_Typhoon
-					Steady = 4
 					WeaponBreaker = 2
 					Crushing = 20
 					Finisher = 1
@@ -456,7 +499,6 @@ obj
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Maim_Mastery"
 				Sacred_Edge
 					DamageMult=3
-					SpiritStrike=3
 					HitMessage="drives a colossal shard of concentrated mana into the foe point-blank!"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Mana_Break"
 					BuffSelf=0
@@ -511,7 +553,6 @@ obj
 				Impact_Palm
 					KBAdd=10
 					DamageMult=1.5
-					SpiritStrike=1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sure_Shot"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
 					HitMessage="breaks their enemy's defenses by shattering their aura with a swift energized palm!"
@@ -519,7 +560,6 @@ obj
 					KBMult=0.01
 					Crippling=10
 					DamageMult=1.5
-					SpiritStrike=1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Seeking_Spirits"
 					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
 					HitMessage="'s fist surge with power as they plunge into the enemy's aura, halting them in place!"
@@ -675,7 +715,7 @@ obj
 					name="Shoryureppa"
 					HitStep=/obj/Skills/Queue/Finisher/Shoryureppa2
 					ShoryukenEffect=0.5
-					AccuracyMult=20
+					AccuracyMult=2
 					HitMessage=0
 				Shoryureppa2
 					DamageMult=7
@@ -700,7 +740,7 @@ obj
 
 				Rakan_Dantojin
 					DamageMult=2
-					AccuracyMult=20
+					AccuracyMult=2
 					FollowUp="/obj/Skills/AutoHit/Shun_Goku_Satsu"
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Violent_Personality"
 
@@ -773,25 +813,17 @@ obj
 					FollowUp="/obj/Skills/AutoHit/Dark_Blast"
 					HitMessage="unleashes a point-blank blast of darkness!"
 				Ghost_Drive
-					SpiritHand=1
-					SpiritStrike=1
-					PridefulRage=1
 					Combo=10
 					DamageMult=0.1
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ghost_Drive"
 					HitMessage="phases through every defense like a ghost!"
 				Blade_Charge
-					SpiritHand=1
-					SpiritStrike=1
-					PridefulRage=1
 					Crippling=10
 					KBMult=0.001
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Blade_Charge"
 					FollowUp="/obj/Skills/AutoHit/BladeChargeRave"
 					HitMessage="hyper charges their keyblade with mana!"
 				Radiant_Brands
-					SpiritHand=1
-					SpiritStrike=1
 					Crippling=10
 					Warp=20
 					Combo=15
@@ -808,8 +840,6 @@ obj
 					Warp=20
 					Combo=14
 					DamageMult=0.2
-					SpiritStrike=2
-					PridefulRage=2
 					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/The_Fourteenth_One"
 					HitMessage="unleashes a flurry of blows, calling forth beams of light from above!"
 
@@ -843,6 +873,7 @@ obj
 				Finisher=1
 				CursedWounds=1
 				Dunker=1 //Just flashy to end the combo. No extra damage.
+				NoGCD=1
 				Warp=5
 				KBAdd=5
 				KBMult=0.00001
@@ -861,106 +892,86 @@ obj
 				Cooldown=15
 				verb/Heavy_Strike()
 					set category="Skills"
+					set hidden = 1
 					if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Heavy Strike"))
 						return
-					var/maxTension = usr.getMaxTensionValue();
-					if(usr.Tension>=maxTension)
-						if(usr.HasTensionLock())
-							return
-						if(usr.AttackQueue)
-							return
-						usr.Tension=0
-						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
-								if(!ae.SlotlessOn)
-									ae.Trigger(usr)
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
-								if(!sge.SlotlessOn)
-									sge.Trigger(usr)
-						usr.tryIncreaseTension();//2026.01.13 - reverting "only max HT lvl gets unique finisher"
-						if(usr.StyleBuff.Finisher)//there's probably a less clunky version way of ensuring finishers are only used once
-							var/path = usr.StyleBuff.Finisher
-							if(!ispath(usr.StyleBuff.Finisher))
-								path=text2path(usr.StyleBuff.Finisher)
-							var/obj/Skills/Queue/q
-							if(!locate(path, usr))
-								q = new path
-								usr.AddSkill(q)//give it an object type to allow for customizations
-							else
-								q = usr.FindSkill(path)
-							q.adjust(usr)
-							// for(var/obj/Skills/Queue/q in usr.Queues)
-							// 	if(q.type==path)
-							usr.SetQueue(q)
-						else
-							usr.SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher)
+					if(usr.IsGuarding())
+						usr.AlphaCounter()	//heavy strike while guarding = the shove, never a queue
 						return
-					else
-						if(usr.AttackQueue)
-							return // prevent heavy strike from overriding
-						if(usr.passive_handler["Heavy Strike"]&&!usr.ForceHeavyStrike)
-							switch(usr.passive_handler["Heavy Strike"])
-								if("Wrestling")
-									Grapple = 1
-									KBAdd =0
-									KBMult = 0
-									DamageMult = 4
-									AccuracyMult = 2
-									HitMessage = "puts his hands on em'."
-									Duration=7
-									Cooldown = 20
-								if("Inferno")
-									FollowUp = "/obj/Skills/AutoHit/Hyper_Inferno"
-								if("HellfireInferno")
-									FollowUp = "/obj/Skills/AutoHit/HellfireInferno"
-								if("ChaosBlaster")
-									FollowUp = "/obj/Skills/AutoHit/ChaosBlaster"
-								if("GetsugaClad")
-									FollowUp = "/obj/Skills/AutoHit/Getsuga_Followthrough"
-								if("Warp Strike")
-									var/obj/Skills/Projectile/Warp_Strike_MasterOfArms/P = usr.FindSkill(/obj/Skills/Projectile/Warp_Strike_MasterOfArms)
-									if(!P)
-										usr << "You need to be in Master of Arms to use Warp Strike!"
-										return
-									if(P.Using || P.cooldown_remaining)
-										return
-									if(!usr.Target || usr.Target == usr)
-										usr << "You need a target to use Warp Strike!"
-										return
-									var/obj/Items/Sword/sword = usr.EquippedSword()
-									var/obj/Items/Enchantment/Staff/staff = usr.EquippedStaff()
-									if(!sword && !staff)
-										usr << "You need a weapon equipped to use Warp Strike!"
-										return
-									// FlashChange: weapon "disappears" as it's thrown
-									animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=1)
-									spawn(1)
-										if(usr)
-											animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0), time=1)
-									P.IconLock = sword ? sword.icon : staff.icon
-									P.adjust(usr)
-									usr.WarpStrikeHidingWeapon = 1
+					usr.hs_key_down = world.time
+					if(usr.AttackQueue)
+						return // prevent heavy strike from overriding
+					if(usr.passive_handler["Heavy Strike"]&&!usr.ForceHeavyStrike)
+						switch(usr.passive_handler["Heavy Strike"])
+							if("Wrestling")
+								Grapple = 1
+								KBAdd =0
+								KBMult = 0
+								DamageMult = 4
+								AccuracyMult = 2
+								HitMessage = "puts his hands on em'."
+								Duration=7
+								Cooldown = 20
+							if("Inferno")
+								FollowUp = "/obj/Skills/AutoHit/Hyper_Inferno"
+							if("HellfireInferno")
+								FollowUp = "/obj/Skills/AutoHit/HellfireInferno"
+							if("ChaosBlaster")
+								FollowUp = "/obj/Skills/AutoHit/ChaosBlaster"
+							if("GetsugaClad")
+								FollowUp = "/obj/Skills/AutoHit/Getsuga_Followthrough"
+							if("Warp Strike")
+								var/obj/Skills/Projectile/Warp_Strike_MasterOfArms/P = usr.FindSkill(/obj/Skills/Projectile/Warp_Strike_MasterOfArms)
+								if(!P)
+									usr << "You need to be in Master of Arms to use Warp Strike!"
+									return
+								if(P.Using || P.cooldown_remaining)
+									return
+								if(!usr.Target || usr.Target == usr)
+									usr << "You need a target to use Warp Strike!"
+									return
+								var/obj/Items/Sword/sword = usr.EquippedSword()
+								var/obj/Items/Enchantment/Staff/staff = usr.EquippedStaff()
+								if(!sword && !staff)
+									usr << "You need a weapon equipped to use Warp Strike!"
+									return
+								// FlashChange: weapon "disappears" as it's thrown
+								animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=1)
+								spawn(1)
+									if(usr)
+										animate(usr, color=list(1,0,0, 0,1,0, 0,0,1, 0,0,0), time=1)
+								P.IconLock = sword ? sword.icon : staff.icon
+								P.adjust(usr)
+								usr.WarpStrikeHidingWeapon = 1
+								usr.AppearanceOff()
+								usr.AppearanceOn()
+								usr.warp_strike_saved_loc = get_turf(usr)
+								if(!usr.UseProjectile(P))
+									usr.WarpStrikeHidingWeapon = 0
 									usr.AppearanceOff()
 									usr.AppearanceOn()
-									usr.warp_strike_saved_loc = get_turf(usr)
-									if(!usr.UseProjectile(P))
-										usr.WarpStrikeHidingWeapon = 0
-										usr.AppearanceOff()
-										usr.AppearanceOn()
-										usr.warp_strike_saved_loc = null
-									return
+									usr.warp_strike_saved_loc = null
+								return
 
-						else
-							// reset all
-							Grapple = 0
-							FollowUp = null
+					else
+						// reset all
+						Grapple = 0
+						FollowUp = null
 
-						var/obj/Skills/Queue/Secret_Heavy_Strike/hs = usr.getSpecialHeavyStrike();
-						if(hs)
-							if(hs.Using || Using) return;//if heavy strike or secret heavy strike is on cooldown, stop
-							hs.adjust(usr);
-							usr.SetQueue(hs);
-						else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
+					var/obj/Skills/Queue/Secret_Heavy_Strike/hs = usr.getSpecialHeavyStrike();
+					if(hs)
+						if(hs.Using || Using) return;//if heavy strike or secret heavy strike is on cooldown, stop
+						hs.adjust(usr);
+						usr.SetQueue(hs);
+					else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
+					//hold to 0.5s at full tension: armed HS morphs into the finisher
+					if(usr.AttackQueue)
+						var/mob/u = usr
+						var/obj/Skills/Queue/armed = u.AttackQueue
+						spawn(glob.TIMING_WINDOW)
+							if(u && u.hs_key_down && u.AttackQueue == armed)
+								if(u.FireFinisher(force = 1))
+									armed.Using = 0	//SetQueue burned its cd at arm time - refund the swap
 
 			Meteor_Mash
 				name="Meteor Mash"
@@ -979,6 +990,7 @@ obj
 				HitSparkSize=1.2
 				verb/Meteor_Mash()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Steam_Driver
 				name="Steam Driver"
@@ -996,6 +1008,7 @@ obj
 				HitSparkY=-32
 				verb/Steam_Driver()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Crystal_Crumbling
 				name="Crystal Crumbling"
@@ -1013,6 +1026,7 @@ obj
 				PushOutWaves=1
 				verb/Crystal_Crumbling()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 			Cyclone_Kicks
 				name="Cyclone Kicks"
@@ -1030,6 +1044,7 @@ obj
 				PushOutWaves=1
 				verb/Cyclone_Kicks()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Blaze_Burst
@@ -1047,6 +1062,7 @@ obj
 				HitSparkSize=0.8
 				verb/Blaze_Burst()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Winter_Shock
@@ -1064,6 +1080,7 @@ obj
 				HitSparkSize=1.1
 				verb/Winter_Shock()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Terra_Crack
@@ -1081,6 +1098,7 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				verb/Terra_Crack()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Aero_Slash
@@ -1099,6 +1117,7 @@ obj
 				HitSparkTurns=1
 				verb/Aero_Slash()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Sharpnel_Scatter
@@ -1119,6 +1138,7 @@ obj
 				HitSparkSize=1.4
 				verb/Sharpnel_Scatter()
 					set category="Skills"
+					set hidden = 1
 					set name="Shrapnel Scatter"
 					usr.SetQueue(src)
 			Desert_Wind
@@ -1138,6 +1158,7 @@ obj
 				HitSparkSize=1.3
 				verb/Desert_Wind()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Uppercut
@@ -1155,6 +1176,7 @@ obj
 				name="Uppercut"
 				verb/Uppercut()
 					set category="Skills"
+					set hidden = 1
 					set name="Uppercut"
 					usr.SetQueue(src)
 
@@ -1168,13 +1190,13 @@ obj
 				UnarmedOnly=1
 				Instinct=5
 				Stunner=5
-				AntiSunyata=1
 				Projectile="/obj/Skills/Projectile/Beams/Big/Super_Dragon_Beam"
 				ProjectileBeam=1
 				HitMessage="throws a crippling punch into the opponent's midsection!"
 				ActiveMessage="is surrounded by the ki of a full fledged dragon!!"
 				verb/Super_Dragon_Fist()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Dancing_Lights
@@ -1193,6 +1215,7 @@ obj
 				HitSparkY=-32
 				verb/Dancing_Lights()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Counter_Cannon
@@ -1213,6 +1236,7 @@ obj
 				ActiveMessage="takes a defensive stance while charging a blast!"
 				verb/Counter_Cannon()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Camelia_Dance
@@ -1229,6 +1253,7 @@ obj
 				EnergyCost=1
 				verb/Camelia_Dance()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 			Swallow_Reversal
@@ -1248,6 +1273,7 @@ obj
 				EnergyCost=3
 				verb/Swallow_Reversal()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 
@@ -1260,7 +1286,6 @@ obj
 				DamageMult=1
 				AccuracyMult=1
 				Duration=3
-				Pacifying=60
 				//doesn't get a verb because it is set from the tech item
 
 
@@ -1278,6 +1303,7 @@ obj
 				ActiveMessage="'s symbiotic mass takes the shape of a hammer!"
 				verb/Symbiote_Hammer()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 //General app
@@ -1290,8 +1316,6 @@ obj
 				Shearing=10
 				Crippling=10
 				Instinct=4
-				SpiritStrike=1
-				PridefulRage=1
 				MortalBlow=0.5
 				IconLock='Ragna Blade.dmi'
 				LockX=-32
@@ -1307,13 +1331,13 @@ obj
 				Cooldown=10800
 				verb/Ragna_Blade()
 					set category="Skills"
+					set hidden = 1
 					src.MultiHit=round(usr.ManaAmount/100,1)
 					src.ManaCost=max(80, usr.ManaAmount)
 					usr.SetQueue(src)
 
 			Bad_Luck
 				name="Bad Luck"
-				HybridStrike=1
 				DamageMult=4
 				AccuracyMult = 1.1
 				Duration=5
@@ -1322,13 +1346,15 @@ obj
 				HitMessage="whacks their enemy with their instrument with a triumphant twang!!"
 				verb/Bad_Luck()
 					set category="Skills"
+					set hidden = 1
 					usr.SetQueue(src)
 
 
 mob
 	proc
-		SetQueue(var/obj/Skills/Queue/Q)
+		SetQueue(var/obj/Skills/Queue/Q, noGCD = FALSE)
 			if(src.HeldSkillBlocksAction(Q)) return
+			if(!noGCD && GCDBlocked(Q)) return
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Q] you are silenced!"
 				return 0
@@ -1361,7 +1387,7 @@ mob
 				src.AppearanceOff()
 				src.AppearanceOn()
 				src.warp_strike_saved_loc = get_turf(src)
-				if(!src.UseProjectile(P))
+				if(!src.UseProjectile(P, noGCD = TRUE))
 					src.WarpStrikeHidingWeapon = 0
 					src.AppearanceOff()
 					src.AppearanceOn()
@@ -1399,8 +1425,10 @@ mob
 				if(src.GatesActive<Q.GateNeeded)
 					src << "You have to open at least Gate [Q.GateNeeded] to use this skill!"
 					return
+			if(Q.FocusShifter)
+				src.ActivateFocusShift(Q.FocusShiftType, Q.FocusShiftBoost, Q.FocusShiftTimer, Q.FocusStatIdentity())
 			if(Q.NeedsHealth)
-				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
+				if(src.HealthPct()>Q.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Q.MagicNeeded&&!src.HasLimitlessMagic())
@@ -1436,7 +1464,7 @@ mob
 						src << "You need a [Q.ClassNeeded]-class weapon to use this technique."
 						return
 			if(Q.HealthCost)
-				if(src.Health<Q.HealthCost*glob.WorldDamageMult&&!Q.AllOutAttack)
+				if(src.HealthPct()<Q.HealthCost*glob.WorldDamageMult&&!Q.AllOutAttack)
 					return
 			if(Q.EnergyCost)
 				var/drain = passive_handler["Drained"] ? Q.EnergyCost * (1 + passive_handler["Drained"]/10) : Q.EnergyCost
@@ -1444,11 +1472,12 @@ mob
 					if(!src.CheckSpecial("One Hundred Percent Power")&&!src.CheckSpecial("Fifth Form")&&!CheckActive("Eight Gates"))
 						return
 			if(Q.ManaCost && !src.HasDrainlessMana() && !Q.AllOutAttack)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? Q.ManaCost - (Q.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : Q.ManaCost
+				var/drain = Q.ManaCost
 				if(Q.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(Q.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(Q)
 				if(drain <= 0)
 					drain = 0.5
 				if(!src.TomeSpell(Q))
@@ -1527,12 +1556,8 @@ mob
 							copy = Q.NewCopyable
 						else
 							copy = Q.Copyable
-						if(glob.SHAR_COPY_EQUAL_OR_LOWER)
-							if(copyLevel < copy)
-								continue
-						else
-							if(copyLevel <= copy)
-								continue
+						if(copyLevel < copy)
+							continue
 						if(m.client&&m.client.address==src.client.address)
 							continue
 						if(!locate(Q.type, m))
@@ -1552,7 +1577,23 @@ mob
 				Q.CounterTemp = 0.1 * src.HasCounterMaster()
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.3, Blend=2, Time=2)
 				CounterMasterTimer = max(1, 25 - (src.HasCounterMaster()*5))
+			if(Q.QueueWindup)
+				OMsg(src, "<b>[src] winds up [Q.name]...</b>")
+				src.WindingUp = 1
+				sleep(Q.QueueWindup)
+				src.WindingUp = 0
+				if(src.KO || src.Stunned || src.Suspended || src.Stasis > 0)
+					return
 			src.AttackQueue=Q
+			if(Q.CCImmuneCast)
+				src.cc_immune_until = world.time + Q.CCImmuneCast
+			if(Q.WeaveDodge)
+				src.pre_weave_sdtl = src.SureDodgeTimerLimit
+				src.SureDodgeTimerLimit = Q.WeaveDodge
+				src.SureDodgeTimer = Q.WeaveDodge
+			if(Q.DashScaling)
+				src.last_combo_warp_dist = 0
+			src.queue_counter_until = world.time + min(glob.TIMING_WINDOW + src.HasCounterMaster()*glob.QUEUE_COUNTER_CM_BONUS, glob.QUEUE_COUNTER_MAX)
 			src.AttackQueue.RanOut=0
 			src.AttackQueue.Hit=0
 			src.AttackQueue.Missed=0
@@ -1583,32 +1624,32 @@ mob
 			var/Damage=1
 			// this acts as a multiplier, so something like a 5 damage mult will result in insane numbers
 			DEBUGMSG("START DAMAGE: [Damage]")
-			if(AttackQueue.Finisher && P.Health < 50)
-				var/missing = abs(P.Health-50)
+			if(AttackQueue.Finisher && P.HealthPct() < 50)
+				var/missing = abs(P.HealthPct()-50)
 				var/extra = missing * (glob.FINISHERDMG * AttackQueue.Finisher)
 				Damage+=extra // glob (0.5% * finisher) extra damage for every health under 50 )
 			DEBUGMSG("NEW DAMAGE AFTER FINISHER: [Damage]")
-			if(AttackQueue.Opener && P.Health > 50)
-				var/missing = abs(50-P.Health)
+			if(AttackQueue.Opener && P.HealthPct() > 50)
+				var/missing = abs(50-P.HealthPct())
 				var/extra = missing * (glob.OPENERDMG * AttackQueue.Opener)
 				Damage+=extra
 			DEBUGMSG("NEW DAMAGE AFTER OPENER: [Damage]")
 			if(src.AttackQueue.Decider)
 				var/deciderDmg = glob.DECIDERDMG * AttackQueue.Decider // the extra amount of damage to do in the case everyiong = 1
-				var/healthcloseness = abs(Health - P.Health)/100
+				var/healthcloseness = abs(HealthPct() - P.HealthPct())/100
 				deciderDmg *= (1 - healthcloseness)
 				if(deciderDmg > 0)
 					Damage+=deciderDmg
 			DEBUGMSG("NEW DAMAGE AFTER DECIDER: [Damage]")
 			if(AttackQueue.Dominator)
-				if(Health>P.Health)
-					var/ratio = clamp(Health / P.Health, 1, 4)
+				if(HealthPct()>P.HealthPct())
+					var/ratio = clamp(HealthPct() / P.HealthPct(), 1, 4)
 					if(ratio > 0)
 						Damage += (ratio-1) * ( AttackQueue.Dominator / 4)
 			DEBUGMSG("NEW DAMAGE AFTER DOMINATOR: [Damage]")
 			if(AttackQueue.Determinator)
-				if(Health<P.Health&&Health!=0)
-					var/ratio = clamp( P.Health / Health, 1, 4)
+				if(HealthPct()<P.HealthPct()&&Health!=0)
+					var/ratio = clamp( P.HealthPct() / HealthPct(), 1, 4)
 					if(ratio > 0)
 						Damage+= (ratio-1) * (AttackQueue.Determinator / 4)
 			DEBUGMSG("NEW DAMAGE AFTER DETERMINATOR: [Damage]")
@@ -1617,10 +1658,10 @@ mob
 				Damage+=(addDamage)
 			DEBUGMSG("NEW DAMAGE AFTER DELAYER: [Damage]")
 			if(src.AttackQueue.SpeedStrike>0)
-				Damage *= clamp(sqrt( ( 1+ ( src.GetSpd())*( src.AttackQueue.SpeedStrike/glob.SPEEDSTRIKEDIVISOR ) ) ),1 ,3)
+				Damage *= clamp(sqrt( ( 1+ ( src.GetSpd()+glob.LIGHT_ATTACK_SPEED_STAT_BASE)*( src.AttackQueue.SpeedStrike/glob.SPEEDSTRIKEDIVISOR ) ) ),1 ,3)
 			DEBUGMSG("NEW DAMAGE AFTER SPEEDSTRIKE: [Damage]")
 			if(src.AttackQueue.SweepStrike>0)
-				Damage *= clamp(sqrt(( 1+ (P.GetSpd())*(src.AttackQueue.SweepStrike/glob.SWEEPSTRIKEDIVISOR))),1 ,3)
+				Damage *= clamp(sqrt(( 1+ (P.GetSpd()+glob.LIGHT_ATTACK_SPEED_STAT_BASE)*(src.AttackQueue.SweepStrike/glob.SWEEPSTRIKEDIVISOR))),1 ,3)
 			DEBUGMSG("NEW DAMAGE AFTER SWEEPSTRIKE: [Damage]")
 			if(src.AttackQueue.GodPowered)
 				src.transcend(src.AttackQueue.GodPowered)
@@ -1634,6 +1675,14 @@ mob
 					Damage+=(0.5+(src.SenseUnlocked-4))
 			if(Damage<1)
 				Damage = 1
+			if(src.AttackQueue.DashScaling && src.AttackQueue.Warp)
+				Damage *= 0.7 + 0.6 * min(src.last_combo_warp_dist / src.AttackQueue.Warp, 1)
+			if(src.AttackQueue.CrescendoRider)
+				Damage *= 1 + 0.02 * src.AttackQueue.ComboPerformed
+			if(src.AttackQueue.StoredPain)
+				if(world.time - src.pain_stamp > 50)
+					src.pain_amount = 0
+				Damage *= min(0.5 + (src.pain_amount / 30) * 0.8, 1.3)
 			if(src.AttackQueue.DamageMult>=0)
 				var/dmgMult = src.AttackQueue.DamageMult * GetDisarmedQueueDamageFactor(src.AttackQueue)
 				if(passive_handler["Fa Jin"] && canFaJin())
@@ -1677,6 +1726,8 @@ mob
 				src.RecoilDamage=src.AttackQueue.Recoil
 			if(src.AttackQueue.Combo)
 				src.AttackQueue.ComboPerformed=0
+			if(src.AttackQueue.BankedRelease)
+				src.AttackQueue.bank_stacks=0
 		QueuedHitMessage(var/mob/P)
 			if(!AttackQueue) return
 			src.AttackQueue.Hit=1
@@ -1725,6 +1776,8 @@ mob
 							src.OMessage(10, "<font color='[src.AttackQueue.TextColor]'><b>[src] [src.AttackQueue.HitMessage]</b></font color>", "[src]([src.key]) hit with [src.AttackQueue].")
 						else
 							src.OMessage(10, "<font color='red'><b>[src] [src.AttackQueue.HitMessage]</b></font color>", "[src]([src.key]) hit with [src.AttackQueue].")
+			if(src.AttackQueue.DashScaling && src.AttackQueue.Warp && src.last_combo_warp_dist >= src.AttackQueue.Warp - 1)
+				Stun(P, 0.3)
 			if(src.AttackQueue.Stunner)
 				Stun(P, src.AttackQueue.Stunner+src.GetStunningStrike())
 				if(src.AttackQueue.Stunner>5)
@@ -1751,7 +1804,7 @@ mob
 				if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Death_Mark))
 					S.adjust(StyleBuff.SignatureTechnique * 15, StyleBuff.SignatureTechnique/2)
 
-			if(src.AttackQueue.Projectile)
+			if(src.AttackQueue.Projectile && !src.AttackQueue.BankedRelease)
 				var/path=text2path(src.AttackQueue.Projectile)
 				var/x=src.AttackQueue.ProjectileCount
 				if(!locate(path, src))
@@ -1763,9 +1816,9 @@ mob
 								p.Using=0
 							if(!p.AttackReplace)
 								p.AttackReplace=1
-							src.UseProjectile(p)
+							src.UseProjectile(p, noGCD = TRUE)
 							if(src.AttackQueue.ProjectileBeam&&!p.Immediate)
-								src.UseProjectile(p)//Double tap for beaming
+								src.UseProjectile(p, noGCD = TRUE)//Double tap for beaming
 							sleep(1)
 						break
 
@@ -1783,7 +1836,7 @@ mob
 			else
 				if(src.AttackQueue.MissMessage)
 					src.OMessage(10, "<font color='yellow'><b>[src] [src.AttackQueue.MissMessage]</b></font color>", "[src]([src.key]) missed with [src.AttackQueue].")
-			if(src.AttackQueue.Projectile)
+			if(src.AttackQueue.Projectile && !src.AttackQueue.BankedRelease)
 				var/path=text2path(src.AttackQueue.Projectile)
 				if(!locate(path, src))
 					src.AddSkill(new path)
@@ -1794,9 +1847,9 @@ mob
 								p.Using=0
 							if(!p.AttackReplace)
 								p.AttackReplace=1
-							src.UseProjectile(p)
+							src.UseProjectile(p, noGCD = TRUE)
 							if(src.AttackQueue.ProjectileBeam&&!p.Immediate)
-								src.UseProjectile(p)//Double tap for beaming
+								src.UseProjectile(p, noGCD = TRUE)//Double tap for beaming
 							sleep(1)
 						break
 			if(src.AttackQueue.MultiHit)
@@ -1808,6 +1861,14 @@ mob
 
 		ClearQueue()
 			src.QueueOverlayRemove()
+			if(src.AttackQueue.WeaveDodge)
+				src.SureDodgeTimerLimit = src.pre_weave_sdtl
+				src.pre_weave_sdtl = 0
+				if(!src.SureDodgeTimerLimit)
+					src.SureDodgeTimer = 0
+					src.SureDodge = 0
+			if(src.AttackQueue.BankedRelease)
+				src.AttackQueue.bank_stacks = 0
 			src.AttackQueue.CounterTemp=0
 			src.AttackQueue.DelayerTime=0
 			if(src.AttackQueue.ComboMessaged)
@@ -1822,14 +1883,12 @@ mob
 				src.AttackQueue.AccuracyMult/=src.AttackQueue.RipplePower
 				src.AttackQueue.RipplePower=1
 			if(src.AttackQueue.HealthCost)
-				src.DoDamage(src, TrueDamage(src.AttackQueue.HealthCost*glob.WorldDamageMult))
+				src.DoDamage(src, src.PctToHP(TrueDamage(src.AttackQueue.HealthCost*glob.WorldDamageMult)))
 			if(src.AttackQueue.WoundCost)
 				src.WoundSelf(src.AttackQueue.WoundCost*glob.WorldDamageMult)
 			if(src.AttackQueue.EnergyCost)
 				var/drain = passive_handler["Drained"] ? src.AttackQueue.EnergyCost * (1 + passive_handler["Drained"]/10) : src.AttackQueue.EnergyCost
 				src.LoseEnergy(drain)
-			if(src.AttackQueue.ForceCost)
-				src.LoseForce(src.AttackQueue.ForceCost)
 			if(src.AttackQueue.FatigueCost)
 				src.GainFatigue(src.AttackQueue.FatigueCost)
 
@@ -1840,11 +1899,12 @@ mob
 			if(src.AttackQueue.ManaGain)
 				src.HealMana(AttackQueue.ManaGain)
 			if(src.AttackQueue.ManaCost)
-				var/drain = src.passive_handler.Get("MasterfulCasting") ? AttackQueue.ManaCost - (AttackQueue.ManaCost * (passive_handler.Get("MasterfulCasting") * 0.3)) : AttackQueue.ManaCost
+				var/drain = AttackQueue.ManaCost
 				if(src.AttackQueue.SpellElement)
 					var/elem_mana_red = src.getSpellElementManaCostReduction(src.AttackQueue.SpellElement)
 					if(elem_mana_red)
 						drain *= (1 - elem_mana_red)
+				drain *= src.ChakraCostMult(src.AttackQueue)
 				if(drain <= 0)
 					drain = 0.5
 				if(src.TomeSpell(src.AttackQueue))
@@ -1870,7 +1930,7 @@ mob
 					var/grabPath = src.AttackQueue.GrabTrigger
 					for(var/obj/Skills/Grapple/g in src.Skills)
 						if(g.type==text2path(grabPath))
-							g.Activate(src)
+							g.Activate(src, TRUE)
 				if(src.AttackQueue.FollowUp)
 					spawn(AttackQueue.FollowUpDelay) // EWWWW
 						throwFollowUp(AttackQueue.FollowUp)
@@ -1884,25 +1944,36 @@ mob
 					if(src.AttackQueue.MissStep)
 						var/obj/Skills/Queue/S=new src.AttackQueue.MissStep
 						src.AttackQueue=null
-						src.SetQueue(S)
+						src.SetQueue(S, TRUE)
 						return
 				else if(!src.AttackQueue.RanOut&&!src.AttackQueue.Missed&&src.AttackQueue.Hit)
 					if(src.AttackQueue.HitStep)
+						if(src.AttackQueue.ChainBlockStop && src.AttackQueue.chain_victim && src.AttackQueue.chain_victim.IsGuarding())
+							src.AttackQueue=null
+							return
 						var/obj/Skills/Queue/S=new src.AttackQueue.HitStep
 						S.adjust(src)
 						src.AttackQueue=null
-						src.SetQueue(S)
+						src.SetQueue(S, TRUE)
 						return
 				else if(!src.AttackQueue.RanOut&&(src.AttackQueue.Missed||src.AttackQueue.Hit))
 					var/obj/Skills/Queue/S=new src.AttackQueue.Step
 					src.AttackQueue=null//But this triggers either way so long as you didn't just run out of time.
-					src.SetQueue(S)
+					src.SetQueue(S, TRUE)
 					return
 
 				src.AttackQueue=null
 
 
 		QueueOverlayAdd()
+			//tell
+			if(src.AttackQueue.IconLock == 'BLANK.dmi')
+				src.queue_tell_aura = 1	//remove
+				if(!src.AuraLocked&&!src.HasKiControl())
+					src.Auraz("Add")
+				else
+					KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
+				return
 			if(src.AttackQueue.IconLock)
 				if(src.AttackQueue.IconLock!=1)
 					if(src.AttackQueue.IconLockUnder)
@@ -1915,6 +1986,11 @@ mob
 					else
 						KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
 		QueueOverlayRemove()
+			if(src.queue_tell_aura)
+				src.queue_tell_aura = 0
+				if(!src.AuraLocked&&!src.HasKiControl())
+					src.Auraz("Remove")
+				return
 			if(src.AttackQueue.IconLock)
 				if(src.AttackQueue.IconLock!=1)
 					if(src.AttackQueue.IconLockUnder)

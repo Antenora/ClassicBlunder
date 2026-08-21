@@ -36,13 +36,11 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 		var/SL = p.SagaLevel
 		passives = list(
 			"DoubleStrike"     = 1 + SL,
-			"CriticalChance"   = 5 + (5 * SL),
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"Flicker"          = 1 + SL,
 			"Pursuer"          = 1 + SL,
 			"TechniqueMastery" = 1 + SL,
-			"Duelist"          = 1 + SL,
-			"Shadowbringer"    = 1
+			"Duelist"          = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
@@ -90,9 +88,9 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 
 /obj/Skills/Projectile/Bushogoma
 	name = "Bushogoma"
-	ManaCost = 5
-	DamageMult = 10
-	Cooldown = 15
+	ManaCost = 1
+	DamageMult = 1.05
+	Cooldown = 5
 	Launcher = 3
 	Homing = 0
 	Distance = 12
@@ -120,6 +118,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Takaoni()
 		set name = "Takaoni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Takaoni can only be used in Shikai."
 			return
@@ -143,6 +142,9 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 		if(!dest || dest.density)
 			dest = get_turf(target)
 		usr.loc = dest
+		if(PmActive())//land aligned with the foe's mid-tile sprite
+			usr.step_x = target.step_x
+			usr.step_y = target.step_y
 		usr.dir = SOUTH
 		OMsg(usr, "<b>[usr] suddenly appears above their foe with Takaoni!</b>")
 
@@ -154,6 +156,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Kageoni()
 		set name = "Kageoni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Kageoni can only be used in Shikai."
 			return
@@ -185,7 +188,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	HitSparkX=-32
 	HitSparkY=-32
 	ComboMaster = 1
-	StrOffense = 1
+	StrScaling = 1
 	Distance = 2
 	NoLock = 1
 	NoAttackLock = 1
@@ -214,6 +217,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 	verb/Irooni()
 		set name = "Irooni"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Irooni can only be used in Shikai."
 			return
@@ -290,6 +294,7 @@ mob/proc/ClearIrooni()
 	verb/Daruma_san_ga_Koronda()
 		set name = "Daruma-san ga Koronda"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Daruma-san ga Koronda can only be used in Shikai."
 			return
@@ -363,7 +368,7 @@ mob/proc/DarumaMovingToward(turf/dest)
 		src.lastAttack = world.time
 		flick("Attack", src)
 		if(src.target)
-			src.target.LoseHealth(src.damageValue)
+			src.target.LoseHealth(src.target.PctToHP(src.damageValue))
 
 mob/proc/summonShadowClones(dmg, count, lifetimeTicks)
 	var/turf/center = get_turf(src)
@@ -387,6 +392,7 @@ mob/proc/summonShadowClones(dmg, count, lifetimeTicks)
 	verb/Kageokuri()
 		set name = "Kageokuri"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Kageokuri can only be used in Shikai."
 			return
@@ -600,13 +606,12 @@ var/global/list/BG_CONTRAST_HIGH = list(
 		var/SL = p.SagaLevel
 		passives = list(
 			"DoubleStrike"     = 3 + SL,
-			"CriticalChance"   = 5 + (5 * SL),
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"HardStyle"        = 3 + SL,
 			"DeathField"       = 3 + SL,
 			"Duelist"          = 1 + SL,
 			"ManaCapMult"      = 0.2 + (0.15 * SL),
-			"Shadowbringer"    = 1,
+			
 			"Tragedy"          = 1
 		)
 		if(SL < 5)
@@ -717,6 +722,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Ichidanme()
 		set name = "Ichidanme: Tameraikizu no Wakachiai"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -747,6 +753,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Nidanme()
 		set name = "Nidanme: Zanki no Shitone"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -788,6 +795,7 @@ mob/proc/KatenCleanseBankaiState()
 	verb/Sandanme()
 		set name = "Sandanme: Dangyo no Fuchi"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return
@@ -868,7 +876,7 @@ mob/proc/KatenClearWater()
 	Area = "Target"
 	DamageMult = 25
 	ComboMaster = 1
-	StrOffense = 1
+	StrScaling = 1
 	Executing = 1
 	Distance = 10
 	NoLock = 1
@@ -889,6 +897,7 @@ mob/proc/KatenClearWater()
 	verb/Shime_no_Dan()
 		set name = "Shime no Dan: Itokiribasami Chizome no Nodobue"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "This can only be used in Bankai."
 			return

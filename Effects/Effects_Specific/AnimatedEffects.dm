@@ -23,7 +23,7 @@ proc
 		sleep(Time)
 		animate(i, alpha=0, time=2)
 		sleep(2)
-		del i
+		for(var/client/C) C.images -= i //broadcast image: pull from every client, never del (world scan)
 	LeaveDescendingImage(var/mob/Players/User=0, var/Image, var/PX=0, var/PY=0, var/PZ=0, var/Size=1, var/Under=0, var/Time, var/turf/AltLoc=0, var/Dir=SOUTH)
 		var/image/i
 		if(User&&!AltLoc)
@@ -48,7 +48,7 @@ proc
 		sleep(Time)
 		animate(i, alpha=0, time=2)
 		sleep(2)
-		del i
+		for(var/client/C) C.images -= i //broadcast image: pull, never del
 
 	WaveTrail(trail, p_x, p_y, Dir, turf/location, time, size, state)
 		var/image/i=image(trail, pixel_x=p_x, pixel_y=p_y, dir=Dir, icon_state=state)
@@ -94,6 +94,9 @@ proc
 		i.transform*=size
 		i2.transform*=size
 		i3.transform*=size
+		i.plane=1
+		i2.plane=1
+		i3.plane=1
 		world << i
 		world << i2
 		world << i3
@@ -102,9 +105,10 @@ proc
 			animate(i2, alpha=0, time=2)
 			animate(i3, alpha=0, time=2)
 			sleep(2)
-			del i
-			del i2
-			del i3
+			for(var/client/C) //broadcast images: pull from clients, never del (fires per wave segment)
+				C.images -= i
+				C.images -= i2
+				C.images -= i3
 
 
 	LeaveTrail(var/Trail, var/PX=0, var/PY=0, var/Dir, var/turf/Location, var/Time, var/Size, var/State)
@@ -112,12 +116,13 @@ proc
 			State = "[rand(1,25)]"
 		var/image/i=image(Trail, pixel_x=PX, pixel_y=PY, dir=Dir, icon_state=State)
 		i.transform*=Size
+		i.plane=1
 		world << i
 		i.loc=Location
 		spawn(Time)
 			animate(i, alpha=0, time=2)
 			sleep(2)
-			del i
+			for(var/client/C) C.images -= i //broadcast image: pull, never del
 
 	Jump(var/mob/User, var/UpTime=3, var/FloatTime=0, var/DownTime=2)
 		set waitfor = 0
@@ -261,6 +266,9 @@ proc
 		if(!t || !p || p.loc == null || t.loc == null)
 			return
 		p.loc = t.loc
+		if(PmActive())//land on the grapple target's mid-tile sprite, not its tile origin
+			p.step_x = t.step_x
+			p.step_y = t.step_y
 		p.dir = EAST
 		t.dir = WEST
 		p.Frozen = 2
@@ -277,12 +285,15 @@ proc
 		sleep(fallTime)
 		Dust(t.loc,2)
 		spawn()Crater(t,TimeMod/2)
-		animate(t, transform=t.transform.Turn(-315), time=TimeMod/2,flags=ANIMATION_END_NOW||ANIMATION_LINEAR_TRANSFORM||ANIMATION_PARALLEL)
-		animate(t, pixel_z=0, time=TimeMod/2,flags=ANIMATION_LINEAR_TRANSFORM||ANIMATION_PARALLEL)
+		animate(t, transform=t.transform.Turn(-315), time=TimeMod/2,flags=ANIMATION_END_NOW|ANIMATION_LINEAR_TRANSFORM|ANIMATION_PARALLEL)
+		animate(t, pixel_z=0, time=TimeMod/2,flags=ANIMATION_LINEAR_TRANSFORM|ANIMATION_PARALLEL)
 		step(t,WEST)
 		sleep(fallTime)
 		t.transform=turn(t.transform, 90)
 		t.Frozen=0
+		if(PmActive())//snap the co-located attacker back to tile center on exit
+			p.step_x=0
+			p.step_y=0
 		p.Frozen=0
 
 
@@ -290,6 +301,9 @@ proc
 		if(!t || !p || p.loc == null || t.loc == null)
 			return
 		p.loc = t.loc
+		if(PmActive())//land on the grapple target's mid-tile sprite, not its tile origin
+			p.step_x = t.step_x
+			p.step_y = t.step_y
 		p.dir = EAST
 		t.dir = WEST
 		p.Frozen = 2
@@ -314,22 +328,32 @@ proc
 		Dust(t.loc,2)
 		Bang(t.loc, Size = 3, Vanish = 4)
 		spawn()Crater(t,TimeMod/2)
-		animate(t, transform=t.transform.Turn(-90), time=TimeMod/2,flags=ANIMATION_END_NOW||ANIMATION_LINEAR_TRANSFORM||ANIMATION_PARALLEL)
-		animate(t, pixel_z=0, time=TimeMod/2,flags=ANIMATION_LINEAR_TRANSFORM||ANIMATION_PARALLEL)
+		animate(t, transform=t.transform.Turn(-90), time=TimeMod/2,flags=ANIMATION_END_NOW|ANIMATION_LINEAR_TRANSFORM|ANIMATION_PARALLEL)
+		animate(t, pixel_z=0, time=TimeMod/2,flags=ANIMATION_LINEAR_TRANSFORM|ANIMATION_PARALLEL)
 		sleep(fallTime)
 		t.transform=ogTrans
 		t.Frozen=0
+		if(PmActive())//snap the co-located attacker back to tile center on exit
+			p.step_x=0
+			p.step_y=0
 		p.Frozen=0
 
 
 	LotusEffect(var/mob/User, var/mob/Target, var/TimeMod=1)
 		if(!User || !Target || User.loc == null || Target.loc == null)
 			return
+		if(Target.Launched)
+			Target.Launched = 0
+			Target.launch_total = 0
+			launchLoop -= Target
 		User.loc=Target.loc
+		if(PmActive())//co-locate with the target's mid-tile sprite for the clinch
+			User.step_x=Target.step_x
+			User.step_y=Target.step_y
 		User.Frozen=2
 		Target.Frozen=2
-		animate(Target,pixel_z=4*TimeMod*20,time=5)
-		animate(User,pixel_z=4*TimeMod*20,time=5)
+		animate(Target,pixel_z=4*TimeMod*20,time=5,flags=ANIMATION_END_NOW)
+		animate(User,pixel_z=4*TimeMod*20,time=5,flags=ANIMATION_END_NOW)
 		sleep(5)
 		animate(User, transform=turn(User.transform,90), time=5, flags=ANIMATION_LINEAR_TRANSFORM)
 		animate(Target, transform=turn(Target.transform,90), time=5, flags=ANIMATION_LINEAR_TRANSFORM)
@@ -351,14 +375,22 @@ proc
 			spawn()Crater(Target,TimeMod/3)
 		User.transform=turn(User.transform, -180)
 		Target.transform=turn(Target.transform, -180)
+		if(PmActive())//snap the relocated grappler back to tile center on exit
+			User.step_x=0
+			User.step_y=0
 		User.Frozen=0
 		Target.Frozen=0
+		if(!Target.KO && !Target.Knockback && Target.icon_state == "KB")
+			Target.icon_state = ""
 
 
 	SpinTornado(mob/a, mob/d,  time = 5)
 		if(!d || !a || d.loc == null || a.loc == null)
 			return
 		d.loc=a.loc
+		if(PmActive())//stack the defender on the attacker's mid-tile sprite for the spin
+			d.step_x = a.step_x
+			d.step_y = a.step_y
 		d.dir = SOUTH
 		a.Frozen=2
 		d.Frozen=2
@@ -369,6 +401,9 @@ proc
 		a.overlays -= im
 		animate(a, pixel_z = 0, time = 4, flags=ANIMATION_PARALLEL)
 		animate(d, pixel_z = 0, pixel_y = 0, time = 3, flags=ANIMATION_PARALLEL)
+		if(PmActive())//snap the relocated defender back to tile center on exit
+			d.step_x=0
+			d.step_y=0
 		a.Frozen=0
 		d.Frozen=0
 
@@ -381,6 +416,9 @@ proc
 		var/orgdir = atk.dir
 		atk.dir = SOUTH
 		atk.loc=def.loc
+		if(PmActive())//land the stomper on the defender's mid-tile sprite
+			atk.step_x = def.step_x
+			atk.step_y = def.step_y
 		def.icon_state = "KO"
 		def.layer = MOB_LAYER-0.25
 		animate(atk, pixel_z = 26, time=1)
@@ -400,6 +438,9 @@ proc
 		atk.pixel_z = 0
 		def.layer = MOB_LAYER
 		def.pixel_x = 0
+		if(PmActive())//snap the relocated stomper back to tile center on exit
+			atk.step_x = 0
+			atk.step_y = 0
 		atk.Frozen = 0
 		def.Frozen = 0
 
@@ -528,7 +569,7 @@ proc
 		spawn(10+Time)
 			animate(i, alpha=0, time=Despawn)
 			sleep(10)
-			del i
+			for(var/client/C) C.images -= i //broadcast image: unhook from clients, del would world-scan
 
 	InstantTurfShift(var/Shift, var/turf/t, var/Time=30, var/mob/m, var/layer=MOB_LAYER-0.5, var/Spawn=10, var/Despawn=10,var/state, _piX, piY)
 		if(!m) return
@@ -558,7 +599,7 @@ proc
 		spawn(10)
 			animate(i, alpha=0, time=Despawn)
 			sleep(10)
-			del i
+			for(var/client/C) C.images -= i
 
 
 	Crater(atom/A, Size=1)
@@ -566,18 +607,19 @@ proc
 		if(!locate(/obj/Effects/Crater) in A.loc)
 			var/obj/Effects/Crater/C=new
 			C.loc=A.loc
+			FxHeatColumn(C.loc, min(Size, 2)) //impact heat wavers off the fresh crater
 			animate(C, transform=matrix()*Size, time=3)
 			spawn(rand(30,90))  // kill
 				animate(C, transform=matrix(), time = 1)
 				spawn(3)  // me
-					del C
+					C.EffectFinish()
 		else
 			for(var/obj/Effects/Crater/B in A.loc)
 				animate(B, transform=matrix()*Size, time=3)
 				spawn(rand(30,90)) // kill
 					animate(B, transform=matrix(), time = 1)
 					spawn(3) // me
-						del B
+						B.EffectFinish()
 
 
 
@@ -587,7 +629,9 @@ proc
 		var/obj/Effects/Dust/D=new
 		D.loc=A
 		D.layer=Layer
-		animate(D, transform=matrix()*Size, time=2)
+		//New's settle already committed its end state - restage alpha and grow from baked
+		D.alpha = 255
+		animate(D, transform=D.baked*(2*Size), time=2, easing=QUAD_EASING|EASE_OUT)
 		spawn(2)
 			animate(D, alpha = 0, transform=D.transform*2, time = rand(15, 25), pixel_x = rand(-16*Size, 16*Size), pixel_y = rand(-16*Size, 16*Size))
 
@@ -595,13 +639,34 @@ proc
 		set waitfor=0
 		var/obj/Effects/Explosion/E=new
 		E.loc=A
-		if(icon_override) E.icon = icon_override
-		if(color_override) E.color = color_override
+		var/pulse
+		if(icon_override) //already hand-colored, a tint would just muddy it
+			E.icon = icon_override
+			pulse = FxEffectColor(E)
+		else //stock art is grayscale - the ramp matrix paints it, orange by default
+			var/tint = color_override ? color_override : FX_BANG_TINT
+			var/list/ramp = FxRampMatrix(tint)
+			if(!ramp) //unparsable tint
+				tint = FX_BANG_TINT
+				ramp = FxRampMatrix(tint)
+			E.color = ramp
+			pulse = (tint == FX_BANG_TINT) ? FX_BANG_LIGHT : FxRampPulse(tint)
 		if(alpha_override != 255) E.alpha = alpha_override
 		E.layer=Layer
 		E.pixel_x+=PX
 		E.pixel_y+=PY
-		animate(E, transform=matrix()*Size, time=2)
+		//big blasts only, a filter is a render pass per object and barrages fire dozens
+		if(Size >= 3)
+			E.filters += filter(name="blast", type="radial_blur", size=0.12, offset=7)
+			var/bf = E.filters["blast"] //only the attached copy animates, not the filter() return
+			//todo: make negative light actually work 
+			if(bf) animate(bf, size=0, time=2+Vanish, easing=SINE_EASING|EASE_OUT, flags=ANIMATION_PARALLEL)
+		if(FxBangIsDark(icon_override, color_override))
+			FxDarkPulse(A, 1 + Size * 0.8) //black art throws negative light, not a bright flash
+		else
+			FxLightPulse(A, 1 + Size * 0.8, pulse)
+			if(Size >= 2) FxHeatColumn(A, Size) //big hot blast: the air above it wavers
+		animate(E, transform=E.transform*(2*Size), time=2, easing=QUAD_EASING|EASE_OUT)
 		spawn(2)
 			animate(E, alpha = 0, transform=E.transform*2, time = Vanish, pixel_x = rand(-16*Offset*Size, 16*Offset*Size), pixel_y = rand(-16*Offset*Size, 16*Offset*Size))
 			sleep(Vanish)
@@ -617,7 +682,7 @@ mob/proc
 		sleep(10)
 		animate(FF, alpha=0, time=5)
 		sleep(5)
-		del FF
+		for(var/client/C) C.images -= FF
 		src.Shielding=0
 	AvalonField()
 		var/image/FF=image('AvalonMode.dmi',pixel_x=0,pixel_y=0, loc = src)
@@ -628,7 +693,7 @@ mob/proc
 		sleep(10)
 		animate(FF, alpha=0, time=5)
 		sleep(5)
-		del FF
+		for(var/client/C) C.images -= FF
 		src.Shielding=0
 
 	FlickeringGlow(var/mob/m, var/list/Glow = list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0))
@@ -655,11 +720,11 @@ mob/proc
 	WindupGlow(var/mob/m) //Handles shiny transes
 		if(m.WindingUp<1) return
 		for(var/x in 1 to m.WindingUp+1)
-			animate(m, color=list(1,0,0, 0.5,0.5,0, 0.5,0,0.5, 0,0,0), time=2, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			animate(m, color=list(1,0,0, 0.5,0.5,0, 0.5,0,0.5, 0,0,0), time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 			sleep(2)
-			animate(m, color=src.MobColor, time=2, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+			animate(m, color=src.MobColor, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 			sleep(2)
-		animate(m, color=src.MobColor, time=2, flags=ANIMATION_RELATIVE || ANIMATION_PARALLEL)
+		animate(m, color=src.MobColor, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 		return
 
 	Kyoukaken(var/Z)
@@ -706,13 +771,13 @@ mob/proc
 			animate(i, alpha=255)
 			spawn(9)
 				src.overlays+=i2
-				del i
+				for(var/client/C) C.images -= i
 		if(Z=="Thaw")
 			src.overlays-=i2
 			animate(i, alpha=255)
 			i.icon_state="Thaw"
 			spawn(6)
-				del i
+				for(var/client/C) C.images -= i
 				src.StasisFrozen=0
 
 	flash(dur, _color, rampup)
@@ -725,12 +790,12 @@ mob/proc
 	drunkeffect(dur)
 		set waitfor = 0
 		if(!client) return
-		if(!client.client_plane_master)
-			client.client_plane_master = new()
-			client.screen += client.client_plane_master
-		client.client_plane_master.filters = filter(type="blur", size=1)
+		client.cpm_blur_size = 1
+		CpmApply(client)
 		sleep(dur)
-		client.client_plane_master.filters = null
+		if(client)
+			client.cpm_blur_size = 0
+			CpmApply(client)
 
 	Blind(var/duration=1000, startup = 2)
 		if(!src.client) return
@@ -739,6 +804,8 @@ mob/proc
 		animate(src.client, color = null, time=duration)
 
 	Darkness(duration=100, affect = 5)
+		if(!src.client) return
 		animate(src.client, color = list(-1,-1,-1, -1,-1,-1, -1,-1,-1, -1,-1,-1), time=affect)
 		sleep(affect)
+		if(!src.client) return //can disconnect mid-sleep
 		animate(src.client, color = null, time=duration)

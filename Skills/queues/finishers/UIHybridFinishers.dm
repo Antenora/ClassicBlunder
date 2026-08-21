@@ -8,7 +8,6 @@
 		InstantStrikes = 2
 		DamageMult = 1.75
 		KBAdd = 1
-		KBDelayed = 1
 		FollowUp = "/obj/Skills/AutoHit/Flash_Draw"
 		BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Awareness_Resonance"
 		BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Overwhelmed"

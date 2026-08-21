@@ -45,7 +45,7 @@
 		StyleEnd=1.1
 		StyleFor=1.1
 		StyleActive="Turtle"
-		passives = list("Flow" = 1, "Instinct" = 1 )
+		passives = list()
 		Finisher="/obj/Skills/Queue/Finisher/Four_Virtues"
 		verb/Turtle_Style()
 			set hidden=1

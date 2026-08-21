@@ -149,12 +149,12 @@
         if(owner && owner != m)
             if(istype(m, /mob/Players) || istype(m, /mob/Player))
                 if(initial_contact)
-                    m.LoseHealth(tornado_damage)
+                    m.LoseHealth(m.PctToHP(tornado_damage))
                     last_damage_time[m] = world.time
                 else
                     var/last = last_damage_time[m]
                     if(!last || (world.time - last) >= damage_interval)
-                        m.LoseHealth(tornado_damage)
+                        m.LoseHealth(m.PctToHP(tornado_damage))
                         last_damage_time[m] = world.time
     on_tick()
         for(var/mob/m in tick_on)

@@ -17,19 +17,18 @@
 
 /obj/Skills/Projectile/True_Getsuga_Tenshou
 	name = "True Getsuga Tenshou"
-	Cooldown = 180
-	ManaCost=25
+	Cooldown = 45
+	ManaCost=8
 	NeedsSword = 1
-	StrRate = 1
-	ForRate = 1
-	DamageMult = 35
+	StrScaling = 1
+	ForScaling = 1
+	DamageMult = 12.75
 	AccMult = 1.3
 	Distance = 20
 	Homing = 1
 	Instinct = 2
 	Explode = 1
 	BypassTempHP = 1
-	SkillDeicide = 20
 
 	IconLock = 'Big Getsuga Shikai.dmi'
 	LockX = -65
@@ -67,10 +66,9 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Zornhau"        = 1 + SL,
-			"HybridStrike"   = 0.5 + (SL/2),
+			
+			
 			"Half-Sword"     = 1 + SL,
-			"Instinct"       = 1 + SL,
 			"HeavyHitter" 	 = 1 + (0.25 * SL),
 			"PureDamage"     = 1 + SL
 		)
@@ -132,21 +130,17 @@
 		var/SL = p.SagaLevel
 		passives = list(
 			"Flicker"         = 1 + SL,
-			"BlurringStrikes" = 1 + SL,
-			"Afterimages"     = 1,
+			
+			"AfterImages"     = 1,
 			"Godspeed"        = 1 + SL,
 			"Warping"         = 0.5 + (SL/2),
-			"HybridStrike"    = 1.5 + (SL/2),
+			
 			"EmptyFlashStep"  = 1,
 			"PureDamage"      = 1 + SL,
-			"SwordAscension"  = SL,
-			"Steady"          = 1 + SL
+			"SwordAscension"  = SL
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
-		if(SL >= 7)
-			passives["Deicide"]  = 15
-			passives["EndlessNine"]  = 0.5
 		if(SL >= 7)
 			StrMult = 1.4 + (0.15 * SL)
 			ForMult = 1.4 + (0.15 * SL)
@@ -228,6 +222,7 @@
 					var/obj/Effects/Dust/D = new/obj/Effects/Dust()
 					D.loc = T
 					D.layer = EFFECTS_LAYER
+					D.alpha = 255 //dust fades itself on spawn, reset alpha or the ring never shows
 					animate(D, transform=matrix()*2, time=4)
 					dusts += D
 					dust_dx += od[1]
@@ -267,6 +262,7 @@
 					var/obj/Effects/Dust/E = new/obj/Effects/Dust()
 					E.loc = M.loc
 					E.layer = EFFECTS_LAYER
+					E.alpha = 255 //same deal
 					E.transform = matrix() * 2
 					animate(E, alpha=0, pixel_x=ep[1], pixel_y=ep[2], time=10, easing=SINE_EASING)
 					expel_objs += E

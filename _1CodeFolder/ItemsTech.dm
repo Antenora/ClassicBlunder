@@ -1,6 +1,6 @@
 #define INORGANIC_RACES list(ANDROID)
-#define CURSED_RACES list(CELESTIAL, ELF, MAJIN, POPO)
-#define STAGNANT_RACES list(ANGEL, DEMON, ELDRITCH, MAKAIOSHIN, SHINJIN)
+#define CURSED_RACES list(CELESTIAL, MAJIN, POPO)
+#define STAGNANT_RACES list(ANGEL, DEMON, ELDRITCH, MAKAIOSHIN)
 
 mob/proc
 	UpdateTechnologyWindow()
@@ -32,8 +32,6 @@ proc/Add_Technology()
 		if(B.TechType)
 			if(B.TechType=="BasicTechnology")
 				BasicTechnology_List+=B
-			if(B.TechType=="Forge")
-				Forging_List+=B
 			if(B.TechType=="RepairAndConversion")
 				RepairAndConversion_List+=B
 			if(B.TechType=="Medicine")
@@ -55,6 +53,7 @@ proc/Add_Technology()
 			if(B.TechType=="MilitaryEngineering")
 				MilitaryEngineering_List+=B
 
+	// swords/armor/weights/plating craft through Smithing now
 	for(var/C in typesof(/obj/Items/Sword))
 		var/obj/Items/D=new C
 		if(D.Saga) continue
@@ -62,8 +61,8 @@ proc/Add_Technology()
 		if(D.Cost>0)
 			if(D.TechType=="BasicTechnology")
 				BasicTechnology_List+=D
-			else
-				Forging_List+=D
+			else if(D.TechType=="MilitaryTechnology")
+				MilitaryTechnology_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -71,7 +70,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			Forging_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -79,7 +77,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			Forging_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -87,7 +84,6 @@ proc/Add_Technology()
 		var/obj/Items/D=new C
 		D.suffix=null
 		if(D.Cost>0)
-			RepairAndConversion_List+=D
 			Technology_List+=D
 		else
 			del(D)
@@ -1977,7 +1973,6 @@ obj/Items/Tech
 		SubType="Local Range Devices"
 		icon='Binoculars.dmi'
 		Cost=0.2
-		var/viewOld
 		desc="Use this to increase your sight range temporarily."
 		Click()
 			if(!(src in usr))
@@ -1986,11 +1981,9 @@ obj/Items/Tech
 				return
 			else
 				Using=1
-				viewOld=usr.client.view
 				usr.client.view="69x69"
 				spawn(100)
-					usr.client.view=viewOld
-					viewOld=null
+					usr?.client?.FitViewNow()
 					Using=0
 	Doorbell
 		Health=10
@@ -2321,17 +2314,6 @@ obj/Items/Tech
 							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
 								m.Tail=1
 								m.Oozaru(1)
-							if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, m))
-								if(!m.CheckSlotless("FullMoonForm"))
-									if(m.SpecialBuff)
-										m.SpecialBuff.Trigger(m)
-									if(m.SlotlessBuffs.len>0)
-										for(var/sb in m.SlotlessBuffs)
-											var/obj/Skills/Buffs/b = m.SlotlessBuffs[sb]
-											if(b)
-												b.Trigger(m)
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F)
-										F.Trigger(m)
 				if("Ultraviolet")
 					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
 					for(var/turf/t in Turf_Circle(src, 10))
@@ -2396,24 +2378,6 @@ obj/Items/Tech
 							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
 								m.Tail=1
 								m.Oozaru(1)
-							if(locate(/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form, m))
-								if(!m.CheckSlotless("FullMoonForm"))
-									if(m.ActiveBuff)
-										if(m.CheckActive("Eight Gates"))
-											var/obj/Skills/Buffs/ActiveBuffs/Eight_Gates/eg = m.ActiveBuff
-											eg.Stop_Cultivation()
-											m.GatesActive=0
-										else
-											m.ActiveBuff.Trigger(m)
-									if(m.SpecialBuff)
-										m.SpecialBuff.Trigger(m)
-									if(m.SlotlessBuffs.len>0)
-										for(var/sb in m.SlotlessBuffs)
-											var/obj/Skills/Buffs/b = m.SlotlessBuffs[sb]
-											if(b)
-												b.Trigger(m)
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Werewolf/Full_Moon_Form/F)
-										F.Trigger(m)
 				if("Ultraviolet")
 					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
 					for(var/turf/t in Turf_Circle(src, 10))
@@ -3932,7 +3896,7 @@ obj/Items/Gear
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Two)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Three)
 				usr.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/HellbornFury/Stage_Four)
-				usr.AddSkill(new /obj/Skills/False_Moon)
+				usr.AddSkill(new /obj/Skills/AutoHit/False_Moon)
 				usr.passive_handler.Increase("HellPower", 0.1)
 				usr.passive_handler.Increase("Persistence", 2)
 				usr.passive_handler.Increase("MaimMastery", 1)
@@ -4057,6 +4021,7 @@ obj/Items/Gear
 		verb/Pilot()
 			set src in range(1, usr)
 			set category="Utility"
+			set hidden = 1
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
 				OMsg(usr, "[src] shocks [usr]!")
 				usr.AddShock(100,usr)

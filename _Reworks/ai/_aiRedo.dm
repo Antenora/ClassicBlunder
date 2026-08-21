@@ -1,5 +1,5 @@
-#define AI_MOVE_SPEED 1 + ( 0.5 * sqrt(max(1,passive_handler.Get("Godspeed"))))
-#define AI_SPEED_TOTAL SpdMod + SpdAscension + SpdChaos * SpdMultTotal
+#define AI_MOVE_SPEED (1 + ( 0.5 * sqrt(max(1,passive_handler.Get("Godspeed")))))
+#define AI_SPEED_TOTAL (SpdMod + SpdAscension + SpdChaos * SpdMultTotal) // unparenthesized, Godspeed only multiplied the SpdChaos term
 
 mob/Player/AI/var/tmp/last_activity = 0
 mob/Player/AI/var/tmp/reaction_time = 2
@@ -149,10 +149,10 @@ mob/Player/AI/proc/Idle()
 		if(Target)
 			if(!fleeing)
 				Chase()
-			else if(Health <= 5)
+			else if(HealthPct() <= 5)
 				Flee()
 		else //move aboe to something else and keep this as just idling, right now it is handling everything
-			if(Health <= 5 &&!(Health >= 25))
+			if(HealthPct() <= 5 &&!(HealthPct() >= 25))
 				Rest()
 			else if(ai_hostility >= 2)
 				Wander()
@@ -272,12 +272,12 @@ mob/Player/AI/proc/GoAfterTarget()
 		switch(ai_movement_type)
 			if("ranged")
 				if(get_dist(src, Target) >= pick(6,7,8))
-					step_to(src, Target,, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+					step_to(src, Target,, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED)))) //speed arg is literal px under pixel movement, 0 keeps full strides
 				else
-					step_to(src, get_step(src,skimAround(get_dir(src, Target))),, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+					step_to(src, get_step(src,skimAround(get_dir(src, Target))),, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 
 			if("melee")
-				step_to(src, get_step(src, skimOppdir(get_dir(src, Target))),, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+				step_to(src, get_step(src, skimOppdir(get_dir(src, Target))),, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 
 		dir = get_dir(src, Target)
 		next_move = world.time + 1
@@ -390,12 +390,12 @@ mob/Player/AI/proc/Attack(t)
 
 mob/Player/AI/proc/Rest()
 	ai_state = "Rest"
-	if(Health >= 75*(1-src.HealthCut))
+	if(HealthPct() >= 75*(1-src.HealthCut))
 		ai_state = "Idle"
 		Idle()
 	else
 		icon_state = "Meditate"
-		Health += (rand(0,2)/10) * RecovMod
+		HealPct((rand(0,2)/10) * RecovMod)
 
 mob/Player/AI/proc/Flee()
 	ai_state = "Flee"
@@ -408,10 +408,10 @@ mob/Player/AI/proc/Flee()
 		//move away from target
 		last_activity = world.time
 		if(Move_Requirements() && next_move < world.time)
-			step_away(src, Target, 20, 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
+			step_away(src, Target, 20, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 			dir = get_dir(Target,src)
 			next_move = world.time + 1
-	if(!Target.WindingUp&&!Target.AutoHitting&&Health>5)
+	if(!Target.WindingUp&&!Target.AutoHitting&&HealthPct()>5)
 		fleeing = FALSE
 		Chase()
 

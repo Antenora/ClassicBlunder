@@ -18,7 +18,6 @@
 	HitSparkIcon='BLANK.dmi'
 	HitSparkX=0
 	HitSparkY=0
-	AdaptRate = 1
 	Shocking = 10
 	Paralyzing=5
 	SpecialAttack=1
@@ -30,7 +29,6 @@
 	NoAttackLock=1
 	Area="Target"
 	NoLock = 1
-	AdaptRate=1
 	DamageMult=1.5
 	Paralyzing=15
 	Size=1
@@ -48,7 +46,6 @@
 	NoAttackLock=1
 	NoLock = 1
 	Area="Around Target"
-	AdaptRate=1
 	DamageMult=1.25
 	Freezing=15
 	Distance=12
@@ -73,7 +70,6 @@
 	ElementalClass="Hellfire"
 	NoAttackLock=1
 	Area="Around Target"
-	AdaptRate=1
 	NoLock = 1
 	DamageMult=0.5
 	Distance=12
@@ -108,7 +104,6 @@
 	TurfShiftDuration=3*/
 	DamageMult = 0.1
 	SpecialAttack = 1
-	AdaptRate=1
 	CanBeDodged = 0
 	CanBeBlocked = 0
 	Cooldown = 5
@@ -125,7 +120,6 @@
 	NoAttackLock=1
 	Area="Target"
 	NoLock = 1
-	AdaptRate=1
 	DamageMult=5
 	Doom=5
 	Size=2
@@ -177,7 +171,6 @@
 /obj/Skills/AutoHit/Blood_Whips
 	Area="Circle"
 	ComboMaster=1
-	AdaptRate=1
 	DamageMult=0.05
 	Rounds=30
 	Cooldown=30
@@ -197,14 +190,14 @@
 
 /obj/Skills/AutoHit/Getsuga_Followthrough
 	Area="Wide Wave"
-	AdaptRate=1
-	DamageMult=5
+	DamageMult=2.75
 	Distance=10
 	ComboMaster=1
 	NoLock = 1
 	Instinct=2
 	NoAttackLock=1
-	Cooldown=30
+	Cooldown=8
+	EnergyCost=2
 	EndsGetsuga = 1
 	HitSparkIcon='Hit Effect.dmi'
 	HitSparkX=-32
@@ -219,7 +212,6 @@
 
 /obj/Skills/AutoHit/Hyper_Inferno
 	Area="Wave"
-	AdaptRate=1
 	DamageMult=0.15
 	ComboMaster=1
 	NoLock = 1
@@ -266,7 +258,6 @@
 
 /obj/Skills/AutoHit/HellfireInferno
 	Area="Wave"
-	AdaptRate=1
 	DamageMult=0.75
 	NoLock = 1
 	ComboMaster=1
@@ -313,7 +304,6 @@
 	TrailY=-8
 /obj/Skills/AutoHit/ChaosBlaster
 	Area="Wave"
-	AdaptRate=1
 	DamageMult=0.15
 	ComboMaster=1
 	NoLock = 1
@@ -330,10 +320,9 @@
 	WindupMessage="launches a powerful rainbow beam! Hahahahahahaha!!!"
 //	ActiveMessage="bursts forward to deliver a storm of rapid strikes!!"
 /obj/Skills/Projectile/Beams/ChaosBlaster
-	AdaptRate=1
-	DamageMult=12
+	DamageMult=0.3429
 	Immediate=1
 	Dodgeable=0
-	StrRate=1
-	ForRate=1
+	StrScaling=1
+	ForScaling=1
 	IconLock='SuperDuperRainbowBeam.dmi'

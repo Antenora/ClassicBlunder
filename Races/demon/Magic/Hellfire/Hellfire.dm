@@ -5,7 +5,6 @@
     ElementalClass="Fire"
     SpellElement = "Dark"
     DamageMult = 3
-    AdaptRate = 1
     IconLock='Fire Blessing.dmi'
     IconSize=2
     Trail='Aura_Fire_Small.dmi'
@@ -95,7 +94,7 @@
                 if("Damage")
                     static_damage *= scalingValues[x][asc]
                     static_damage /= DefReduction
-                    static_damage = owner.DoDamage(target, static_damage, 0, 0 , 0 , 0 , 0 , 0 , 0)
+                    static_damage = owner.DoDamage(target, static_damage)
                     owner.gainCorruption((static_damage * 2) * glob.CORRUPTION_GAIN)
                 if("DarknessFlame")
                     target.AddPoison(scalingValues["Burning"][asc] * 1 + (scalingValues[x][asc] * 0.33), Attacker=owner)
@@ -114,8 +113,7 @@
         . = GetStr(1)
     else
         . = GetFor(1)
-    var/dmgRoll = GetDamageMod()
-    . *= dmgRoll
+    . *= 0.6 * strikeJudgmentMult()
 
 /obj/Skills/Buffs/SlotlessBuffs/Hellraiser
     name = "Hellraiser"
@@ -227,7 +225,7 @@
                 if("Damage")
                     static_damage *= scalingValues[x][asc]
                     static_damage /= DefReduction
-                    static_damage = owner.DoDamage(target, static_damage, 0, 0 , 0 , 0 , 0 , 0 , 0)
+                    static_damage = owner.DoDamage(target, static_damage)
                     //owner.gainCorruption((static_damage * 2) * glob.CORRUPTION_GAIN)
                 if("Freezing")
                     target.AddSlow(scalingValues[x][asc]) // THIS IS SO FUCKING STUPID WHY IS FREEZING ADDED BY ADDSLOW AND SLOW ADDED BY ADDCRIPPLIGN DIE IN A HOLE

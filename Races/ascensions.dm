@@ -47,13 +47,13 @@ ascension
 		defense = 0
 		speed = 0
 		recovery = 0
+		vitality = 0
 		learning = 0
 		intelligenceAdd = 0
 		imaginationAdd = 0
 		anger = 0
+		growthadd=0
 		unlock_potential = 1
-		intimidation = 0
-		intimidationMult = 1
 		pilotingProwess = 0
 		cyberizeModAdd = 0
 		enhanceChips = 0
@@ -88,6 +88,7 @@ ascension
 			owner.DefAscension -= defense
 			owner.SpdAscension -= speed
 			owner.RecovAscension -=  recovery
+			owner.VitAscension -= vitality
 
 			if(skills.len > 0)
 				for(var/obj/Skills/added_skill in skills)
@@ -108,9 +109,6 @@ ascension
 
 			if(anger != 0)
 				owner.NewAnger(owner.AngerMax-anger)
-
-			owner.Intimidation -= intimidation
-			owner.Intimidation /= intimidationMult
 
 			owner.Intelligence -= intelligenceAdd
 			owner.Imagination -= imaginationAdd
@@ -149,6 +147,7 @@ ascension
 			owner.DefAscension += defense
 			owner.SpdAscension += speed
 			owner.RecovAscension +=  recovery
+			owner.VitAscension += vitality
 
 			if(skills.len > 0)
 				for(var/added_skill in skills)
@@ -167,9 +166,6 @@ ascension
 			if(anger != 0)
 				owner.NewAnger(owner.AngerMax+anger)
 
-			owner.Intimidation += intimidation
-			owner.IntimidationMult += intimidationMult
-
 			owner.Intelligence += intelligenceAdd
 			owner.Imagination += imaginationAdd
 
@@ -179,6 +175,7 @@ ascension
 			owner.EconomyMult += ecoAdd
 			owner.PilotingProwess += pilotingProwess
 			owner.EnhanceChipsMax += enhanceChips
+			owner.GrowthRate += growthadd
 
 			if(!istype(src, /ascension/sub_ascension))
 				owner.AscensionsAcquired+=1
@@ -239,7 +236,6 @@ ascension
 		if("Intellect", "intelligenceAdd", "Intelligence") return "intelligenceAdd"
 		if("Imagination", "imaginationAdd") return "imaginationAdd"
 		if("Anger", "anger") return "anger"
-		if("Intimidation", "intimidation") return "intimidation"
 		if("RPP", "rppAdd") return "rppAdd"
 		if("Economy", "ecoAdd") return "ecoAdd"
 		if("Piloting", "pilotingProwess") return "pilotingProwess"
@@ -339,7 +335,7 @@ ascension
 	ta = max(ta, ca + 1)
 	ta = min(ta, maxTarget)
 
-	var/list/statNames = list("Power","Strength","Endurance","Force","Offense","Defense","Speed","Recovery","Intellect","Imagination","Anger","Intimidation","RPP","Economy","Piloting","Cyberize","EnhanceChips")
+	var/list/statNames = list("Power","Strength","Endurance","Force","Offense","Defense","Speed","Recovery","Intellect","Imagination","Anger","RPP","Economy","Piloting","Cyberize","EnhanceChips")
 	var/html = "<html><head><title>Ascension Preview - [p.key]</title></head><body bgcolor=#111122 text=#e0e0e0 style='font-family:Calibri,sans-serif;font-size:10pt;padding:8px'>"
 	html += "<h2 style='color:#fff;border-bottom:1px solid #444;padding-bottom:4px'>[p.key] &mdash; [p.race.name]</h2>"
 	html += "<p>Class: <b>[p.Class ? p.Class : "None"]</b><br>"

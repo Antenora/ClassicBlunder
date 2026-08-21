@@ -5,7 +5,6 @@
 	var/TotalBounce = 0
 	var/CurrentBounce = 0
 	Feathers
-		AdaptRate=1
 		Blasts=6;
 		DamageMult=0.25
 		AccMult=1
@@ -38,16 +37,15 @@
 			Cooldown = lowestCD;
 			if(p.SlotlessBuffs["Clean Cuts"])
 				DamageMult = dmgMult + (0.1 * p.AscensionsAcquired);
-				EndRate = max(0.5, 1 - (asc*0.05))
+				EndEffectiveness = max(0.5, 1 - (asc*0.05))
 				Distance = 90
 			else
 				DamageMult = dmgMult;
-				EndRate = 1
+				EndEffectiveness = 1
 				Distance = 30 + (p.AscensionsAcquired * 10);
 	GodSlayer
 		AttackReplace=1
 		Distance=30
-		AdaptRate=1
 		Crippling=1
 		Blasts=1
 		DamageMult=0.75
@@ -69,14 +67,13 @@
 		AttackReplace=1
 		Distance=30
 		ZoneAttack=1
-		AdaptRate=1
 		Crippling=20
 		Devour=1
 		Explode=2
 		Blasts=20
 		Dodgeable=-1
 		DamageMult=1
-		EndRate=0.5
+		EndEffectiveness=0.5
 		HyperHoming=1
 		AccMult=2
 		Homing=1
@@ -94,7 +91,6 @@
 		Variation=1
 		FlickBlast=0
 	Atlatl
-		AdaptRate=1
 		Blasts=1
 		DamageMult=5
 		AccMult=2
@@ -119,7 +115,6 @@
 
 
 	Blade_Addition
-		AdaptRate=1
 		Blasts=1
 		DamageMult=5
 		AccMult=2
@@ -144,7 +139,6 @@
 		Cooldown=8
 
 	Stake
-		AdaptRate=1
 		Blasts=8
 		DamageMult=0.33
 		AccMult=1
@@ -168,7 +162,6 @@
 		FlickBlast=0
 		Cooldown=6
 	Secret_Knives
-		AdaptRate=1
 		Blasts=4
 		DamageMult=0.25
 		AccMult=1
@@ -199,7 +192,6 @@
 				DamageMult = rand(0.1 + (p.SagaLevel * 0.05), 0.15 + (p.SagaLevel * 0.05))
 				Cooldown = rand(7,12) - p.SagaLevel
 	Khonshu
-		AdaptRate=1
 		Blasts=4
 		Bounce = 5
 		TotalBounce = 3
@@ -232,7 +224,6 @@
 				DamageMult = rand(0.1 + (p.SagaLevel * 0.05), 0.15 + (p.SagaLevel * 0.05))
 				Cooldown = rand(6,10) - p.SagaLevel
 	FTG
-		AdaptRate=1
 		Blasts=4
 		DamageMult=0.5
 		AccMult=1.5
@@ -258,7 +249,6 @@
 		takeAppearance = TRUE
 		adjust(mob/p)
 	UltimaLaser
-		AdaptRate=1
 		Blasts=4
 		DamageMult=2
 		AccMult=1.5
@@ -282,7 +272,6 @@
 		Cooldown=4
 		adjust(mob/p)
 	ChaosKnife
-		AdaptRate=1
 		Blasts=4
 		DamageMult=2
 		AccMult=1.5
@@ -310,8 +299,8 @@
 		AttackReplace=1
 		ZoneAttack=1
 		Distance=30
-		StrRate=1
-		ForRate=1
+		StrScaling=1
+		ForScaling=1
 		Crippling=0.5
 		Blasts=5
 		DamageMult=0.5
@@ -334,8 +323,8 @@
 	Warsong
 		AttackReplace=1
 		Distance=30
-		StrRate=1
-		ForRate=1
+		StrScaling=1
+		ForScaling=1
 		Crippling=1
 		Blasts=1
 		DamageMult=0.75
@@ -361,8 +350,8 @@
 		FireFromSelf=0
 		FireFromEnemy=1
 		Hover=10
-		StrRate=1
-		ForRate=1
+		StrScaling=1
+		ForScaling=1
 		Blasts=20
 		DamageMult=0.5
 		HyperHoming=1

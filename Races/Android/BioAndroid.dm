@@ -28,33 +28,31 @@
 //
 // EXAMPLE entry once you fill it in:
 //   "Saiyan" = list(
-//       "t1_passives" = list("Brutalize" = 0.05),
+//       "t1_passives" = list("Persistence" = 0.05),
 //       "t1_skills"   = list(),
-//       "t2_passives" = list("Brutalize" = 0.15),
+//       "t2_passives" = list("Persistence" = 0.15),
 //       "t2_skills"   = list(/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
 //   )
 
 var/global/list/BIO_SAMPLE_DEFS = list(
-	"Saiyan"       = list("t1_passives"=list("ZenkaiPower" = 0.1, "Brutalize" =0.5), "t1_skills"=list(), "t2_passives"=list("ZenkaiPower" = 0.65, "Brutalize" =1), "t2_skills"=list()),
-	"Half_Saiyan"  = list("t1_passives"=list("UnderDog" = 3, "KillerInstinct" = 0.1), "t1_skills"=list(), "t2_passives"=list("UnderDog" = 6, "KillerInstinct" = 0.2), "t2_skills"=list()),
-	"Human"        = list("t1_passives"=list("Persistence" = 1, "DemonicDurability" = 0.15), "t1_skills"=list(), "t2_passives"=list("Persistence" = 2, "DemonicDurability" = 0.35), "t2_skills"=list()),
+	"Saiyan"       = list("t1_passives"=list("ZenkaiPower" = 0.1), "t1_skills"=list(), "t2_passives"=list("ZenkaiPower" = 0.65), "t2_skills"=list()),
+	"Half_Saiyan"  = list("t1_passives"=list("UnderDog" = 3), "t1_skills"=list(), "t2_passives"=list("UnderDog" = 6), "t2_skills"=list()),
+	"Human"        = list("t1_passives"=list("Persistence" = 1), "t1_skills"=list(), "t2_passives"=list("Persistence" = 2), "t2_skills"=list()),
 	"Namekian"     = list("t1_passives"=list("TechniqueMastery" = 2, "Duelist" = 1), "t1_skills"=list(), "t2_passives"=list("TechniqueMastery" = 3, "Duelist" = 2), "t2_skills"=list()),
 	"Majin"        = list("t1_passives"=list("ManaCapMult" = 0.5, "ManaGeneration" = 2), "t1_skills"=list(), "t2_passives"=list("Extend" = 1, "Gum Gum" = 1), "t2_skills"=list()),
 	"Demon"        = list("t1_passives"=list("PureDamage" = 2, "AbyssMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureDamage" = 3, "AbyssMod" = 5), "t2_skills"=list()),
 	"Angel"        = list("t1_passives"=list("PureReduction" = 2, "HolyMod" = 2), "t1_skills"=list(), "t2_passives"=list("PureReduction" = 3, "HolyMod" = 5), "t2_skills"=list()),
 	"Celestial"    = list("t1_passives"=list("MartialMagic" = 1), "t1_skills"=list(), "t2_passives"=list("BladeFisting" = 1), "t2_skills"=list()),
-	"Dragon"       = list("t1_passives"=list("AngerAdaptiveForce" = 0.25, "BlurringStrikes" = 0.5, "LikeWater" = 1, "Flow" = 1, "Instinct" = 1), "t1_skills"=list(), "t2_passives"=list("AngerAdaptiveForce" = 0.5, "BlurringStrikes" = 2 , "LikeWater" = 2, "Flow" = 2, "Instinct" = 2), "t2_skills"=list()),
+	"Dragon"       = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Beastkin"     = list("t1_passives"=list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5), "t1_skills"=list(), "t2_passives"=list("Fury" = 2, "Harden" = 2, "Momentum" = 2), "t2_skills"=list()),
-	"Eldritch"     = list("t1_passives"=list("DebuffResistance"=0.1,"BuffMastery"=1), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list("DebuffResistance"=0.3,"BuffMastery"=3), "t2_skills"=list()),
+	"Eldritch"     = list("t1_passives"=list(), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list(), "t2_skills"=list()),
 	"Changeling"   = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Makyo"        = list("t1_passives"=list("Juggernaut" = 0.5), "t1_skills"=list(), "t2_passives"=list("Juggernaut" = 0.5), "t2_skills"=list(/obj/Skills/Buffs/SlotlessBuffs/Makyo/Expand)),
-	"Makaioshin"   = list("t1_passives"=list("SpiritPower" = 0.1, "HybridStrike"=0.5), "t1_skills"=list(), "t2_passives"=list("SpiritPower" = 0.15, "HybridStrike"=0.5), "t2_skills"=list()),
-	"Shinjin"      = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
+	"Makaioshin"   = list("t1_passives"=list("SpiritPower" = 0.1), "t1_skills"=list(), "t2_passives"=list("SpiritPower" = 0.15), "t2_skills"=list()),
 	"Demi-fiend"   = list("t1_passives"=list("ManaGeneration" = 1, "ManaCapMult" = 0.5), "t1_skills"=list(), "t2_passives"=list("ManaGeneration" = 2), "t2_skills"=list()),
-	"High Faoroan" = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Chakardi"     = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
-	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list("MovementMastery" = 4, "CashCow" = 5), "t2_skills"=list()),
-	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalChance" = 10, "CriticalDamage" = 0.15), "t2_skills"=list())
+	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list( "CashCow" = 5), "t2_skills"=list()),
+	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
 )
 
 
@@ -76,14 +74,14 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	ApplyBioSample(race_name, tier)
 	return TRUE
 /mob/proc/RemoveBioSample(race_name, tier)
-	// Returns TRUE if granted, FALSE if collector already had it.
+	// Returns TRUE if removed, FALSE if collector never had it.
 	if(!bio_samples)
-		bio_samples = list()
+		return FALSE
 	var/key = "[race_name]:[tier]"
-	if(key in bio_samples)
+	if(!(key in bio_samples))
 		return FALSE
 	bio_samples -= key
-	ApplyBioSample(race_name, tier)
+	StripBioSample(race_name, tier)
 	return TRUE
 
 /mob/proc/ApplyBioSample(race_name, tier)
@@ -104,6 +102,26 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	if(skills_to_apply && skills_to_apply.len)
 		for(var/skill_path in skills_to_apply)
 			AddSkill(new skill_path)
+
+/mob/proc/StripBioSample(race_name, tier)
+	// Inverse of ApplyBioSample.
+	var/list/def = BIO_SAMPLE_DEFS[race_name]
+	if(!def)
+		return
+	var/passive_key = "t2_passives"
+	var/skill_key = "t2_skills"
+	if(tier == 1)
+		passive_key = "t1_passives"
+		skill_key = "t1_skills"
+	var/list/passives_to_strip = def[passive_key]
+	var/list/skills_to_strip = def[skill_key]
+	if(passives_to_strip && passives_to_strip.len)
+		passive_handler.decreaseList(passives_to_strip)
+	if(skills_to_strip && skills_to_strip.len)
+		for(var/skill_path in skills_to_strip)
+			var/obj/Skills/found = locate(skill_path) in src.contents
+			if(found)
+				DeleteSkill(found)
 
 /mob/proc/RefreshAllBioSamples()
 	// Re-applies every collected sample on src. Useful after editing BIO_SAMPLE_DEFS
@@ -153,6 +171,7 @@ obj/Skills/Utility
 		desc="Request a Tier 1 genetic sample from a nearby player. They must consent. They can only ever donate one Tier 1 sample in their entire life."
 		verb/Collect_Sample()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer extract samples."
 				return
@@ -220,6 +239,7 @@ obj/Skills/Utility
 		desc="Forcibly extract a Tier 2 sample from a KO'd target. Severely wounds them. Grants both the Tier 1 and Tier 2 sample of their race."
 		verb/Force_Extract()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer extract samples."
 				return
@@ -289,6 +309,7 @@ obj/Skills/Utility
 		desc="Install a Tier 2 genetic sample of any race directly. Costs a large amount of Mana Bits. No donor required."
 		verb/Bio_Augmentation()
 			set category="Utility"
+			set hidden = 1
 			if(usr.PerfectForm)
 				usr<<"You can no longer augment yourself."
 				return
@@ -344,6 +365,7 @@ obj/Skills/Utility
 		desc="Sacrifice 3 of your Tier 2 Bio Android samples to unlock your Perfect Form."
 		verb/Bio_Augmentation()
 			set category="Utility"
+			set hidden = 1
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to install samples."
 				return

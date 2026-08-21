@@ -41,13 +41,12 @@ var/list/MiscTree = list()
 				src<< "You do not have a soul. You can't learn magic."
 				return
 			theCost = glob.MAGIC_BASE_COST
-			if(glob.MAGIC_INTELL_MATTERS)
-				if(passive_handler["Spiritual Tactician"])
-					if(Imagination > Intelligence)
-						int = Imagination
-				if(int < 0.5)
-					int = 0.5
-				theCost /= int // can only increase it by half, so majins dont cry
+			if(passive_handler["Spiritual Tactician"])
+				if(Imagination > Intelligence)
+					int = Imagination
+			if(int < 0.5)
+				int = 0.5
+			theCost /= int // can only increase it by half, so majins dont cry
 			if(passive_handler["Spiritual Tactician"])
 				if(Imagination < Intelligence)
 					imag = Intelligence
@@ -96,6 +95,7 @@ var/list/MiscTree = list()
 
 /mob/verb/learnMagic() // Change this to Thaumaturgy next wipe 
 	set category = "Utility"
+	set hidden = 1
 	set name = "Thaumaturgy"
 	var/choice = input(src, "What branch of magic do you wish to learn?", "Thaumaturgy") in list("Alchemy", "Enchanting", "Misc", "Nevermind")
 	if(choice == "Nevermind") return
@@ -123,6 +123,12 @@ var/list/MiscTree = list()
 		p.RPPSpent -= theCost
 		p.knowledgeTracker.learnedMagic -= tech.name
 		p << "You have refunded [tech.name] for [theCost]!"
+		if((tech.name in list("Basic Alchemy", "Flask Accumen", "Flask Mastery")))
+			if(p.AlchemyUnlocked >= 1) // Refund AlchemyUnlocked improving techs IN ORDER. If you do not know which these are, check line 134 onward in knowledgeUnlock.dm
+				p.ReduceAlchemyUnlocked()
+		if((tech.name in list("Inkworks", "Advanced Inkworks", "Mastered Inkworks")))
+			if(p.InkworksDatum.Tier >= 1)
+				p.ReduceInkworksUnlocked() //  Same as AlchemyUnlocked, check line 303 onward instead though.
 	RemoveTech(tech, "Magic")
 
 mob/Admin3/verb/RefundMagic(mob/p in players)
@@ -134,8 +140,7 @@ mob/Admin3/verb/RefundMagic(mob/p in players)
 	var/choice = input(src, "What magic?") in p.generateMagicList() + "Cancel"
 	if(choice != "Cancel")
 		var/the_cost = glob.MAGIC_BASE_COST / p.Imagination
-		if(glob.MAGIC_INTELL_MATTERS)
-			the_cost /= p.Intelligence
+		the_cost /= p.Intelligence
 		p.removeMagicKnowledge(p, choice, the_cost, 0)
 
 /mob/Admin4/verb/RefundALLmagic(mob/p in world)

@@ -210,6 +210,8 @@ proc/
 				return "Heavy"
 			if("Prismatic Dreams")
 				return "Heavy"
+			if("Fairytale Endings")
+				return "Heavy"
 	GetKeychainDamage(var/KC)
 		switch(KC)
 //small
@@ -266,6 +268,8 @@ proc/
 			if("Ebony Slumber")
 				return 2.5
 			if("Prismatic Dreams")
+				return 2.5
+			if("Fairytale Endings")
 				return 2.5
 	GetKeychainAccuracy(var/KC)
 		switch(KC)
@@ -324,6 +328,8 @@ proc/
 				return 1.25
 			if("Prismatic Dreams")
 				return 1.25
+			if("Fairytale Endings")
+				return 1.25
 	GetKeychainDelay(var/KC)
 		switch(KC)
 //small
@@ -381,6 +387,8 @@ proc/
 				return 1
 			if("Prismatic Dreams")
 				return 1
+			if("Fairytale Endings")
+				return 1.
 	GetKeychainElement(var/KC)
 		switch(KC)
 //small
@@ -441,6 +449,8 @@ proc/
 				return "Dark"
 			if("Prismatic Dreams")
 				return "Light"
+			if("Fairytale Endings")
+				return "Fire"
 	GetKeychainIcon(var/KC)
 		switch(KC)
 //small
@@ -498,6 +508,8 @@ proc/
 				return 'Fusion Keyblade - Dark.dmi'
 			if("Prismatic Dreams")
 				return 'Fusion Keyblade - Light.dmi'
+			if("Fairytale Endings")
+				return 'FairytaleEndings.dmi'
 	GetKeychainIconReversed(var/KC)
 		switch(KC)
 //small
@@ -555,6 +567,8 @@ proc/
 				return 'Fusion Keyblade - Dark Sync.dmi'
 			if("Prismatic Dreams")
 				return 'Fusion Keyblade - Light Sync.dmi'
+			if("Fairytale Endings")
+				return 'FairytaleEndings - Sync.dmi'
 
 
 	GetKeybladePassives(var/KC, var/Boost)
@@ -571,13 +585,13 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Combustion" = 60, "Scorching" = 2+Boost)
 				return KeybladePassives
 			if("Wayward Wind")
-				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1,"BlurringStrikes" = 3, "AttackSpeed" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1,"Skimming" = 1+(Boost/2), "Godspeed" = 1, "AttackSpeed" = 2+(Boost/2))
 				return KeybladePassives
 			if("Rainfell")
-				KeybladePassives=list("PULock" = 1, "CriticalChance" = 30+(Boost*5), "ThunderHerald" = 1, "CriticalDamage"= 0.15)
+				KeybladePassives=list("PULock" = 1, "ThunderHerald" = 1, "CriticalDamage"= 0.15)
 				return KeybladePassives
 			if("Oathkeeper")
-				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost,"ManaStats" = 1+Boost)
+				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost)
 				return KeybladePassives
 			if("Way To Dawn")
 				KeybladePassives=list("PULock" = 1, "AbyssMod" = 3+Boost,"HolyMod"=3+Boost,"Controlled Darkness" = 1)
@@ -586,20 +600,20 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Scorching" = 10+(Boost*2), "MeltyBlood" = 1)
 				return KeybladePassives
 			if("Sweetstack")
-				KeybladePassives=list("PULock" = 1, "TechniqueMastery" = Boost, "BuffMastery" = Boost)
+				KeybladePassives=list("PULock" = 1, "TechniqueMastery" = Boost)
 				return KeybladePassives
 			if("Two Become One")
-				KeybladePassives=list("PULock" = 1, "Two Become One" = 1, "BlurringStrikes" = 4, "ManaGeneration" = 2+(Boost/2))
+				KeybladePassives=list("PULock" = 1, "Two Become One" = 1,  "ManaGeneration" = 2+(Boost/2))
 				return KeybladePassives
 			if("Blind Justice")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 3+(Boost/2), "PureReduction" = -3+(Boost/2))
 				return KeybladePassives
 //medium
 			if("Oblivion")
-				KeybladePassives=list("PULock" = 1, "AbyssMod" = 1+Boost,"EnergyGeneration" = 3+Boost, "Momentum" = 2,"SpiritFlow" =1+round(Boost/2))
+				KeybladePassives=list("PULock" = 1, "AbyssMod" = 1+Boost,"EnergyGeneration" = 3+Boost, "Momentum" = 2)
 				return KeybladePassives
 			if("Fenrir")
-				KeybladePassives=list("PULock" = 1, "Steady" = 3, "Brutalize" = Boost/1.5, "Extend" = 1, "Conductor" = -50, "DemonicDurability" = Boost, "AngerAdaptiveForce" = 0.2*Boost)
+				KeybladePassives=list("PULock" = 1,   "Extend" = 1, "Conductor" = -50)
 				return KeybladePassives
 			if("No Name")
 				KeybladePassives=list("PULock" = 1, "HardStyle" = 1)
@@ -608,32 +622,35 @@ proc/
 				KeybladePassives=list("PULock" = 1, "SpiritPower" = round(Boost/5), "Persistence" = 1+(Boost/2), "UnderDog" = 1+Boost)
 				return KeybladePassives
 			if("Spellbinder")
-				KeybladePassives=list("PULock" = 1, "ManaCapMult" = (0.15*Boost),"ManaStats" = 0.5+(Boost/2), "ManaGeneration" = 5)
+				KeybladePassives=list("PULock" = 1, "ManaCapMult" = (0.15*Boost), "ManaGeneration" = 5)
 				return KeybladePassives
 			if("Star Seeker")
 				KeybladePassives=list("PULock" = 1, "UnderDog" = 1+Boost, "Tenacity" = 3+Boost)
 				return KeybladePassives
 			if("Lost Memory")
-				KeybladePassives=list("PULock" = 1, "HybridStrike" = 1, "Flow" = 3, "Instinct" = 3)
+				KeybladePassives=list("PULock" = 1)
 				return KeybladePassives
 			if("Ultima Weapon")
 				KeybladePassives=list("PULock" = 1, "PureDamage" = 10, "PureReduction" = 10, "GodKi" = 0.25)
 				return KeybladePassives
 //heavy
 			if("Earthshaker")
-				KeybladePassives=list("PULock" = 1, "Harden" = 3, "CallousedHands" = Boost/10)
+				KeybladePassives=list("PULock" = 1, "Harden" = 3)
 				return KeybladePassives
 			if("Chaos Ripper")
-				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5, "Zornhau" = 5, "HardStyle" = 1)
+				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5,  "HardStyle" = 1)
 				return KeybladePassives
 			if("One Winged Angel")
-				KeybladePassives=list("PULock" = 1, "CriticalChance" = 5+(Boost*2), "CriticalDamage"= 0.3+(Boost/10))
+				KeybladePassives=list("PULock" = 1, "CriticalDamage"= 0.3+(Boost/10))
 				return KeybladePassives
 			if("Moogle O Glory")
 				KeybladePassives=list("PULock" = 1, "Extend" = 1, "CashCow" = 2, "SoftStyle" = 1, "Blubber" = Boost/4)
 				return KeybladePassives
 			if("Ebony Slumber")
 				KeybladePassives=list("PULock" = 1, "Dreamless Sleep" = 1, "GodKi" = 0.25)
+				return KeybladePassives
+			if("Fairytale Endings")
+				KeybladePassives=list("PULock" = 1, "Extend" = 1, "Ashen One" = 1, "Kindling" = 1, "Combustion" = 30)
 				return KeybladePassives
 			if("Prismatic Dreams")
 				KeybladePassives=list("PULock" = 1, "Dream Within a Dream" =1, "GodKi" = 0.25)

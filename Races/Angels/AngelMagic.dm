@@ -87,7 +87,7 @@
 						if(initName == "DarkMagic" && curName == "Light")
 							var/obj/Skills/AutoHit/Chaos_Degrade/cd = locate(/obj/Skills/AutoHit/Chaos_Degrade) in User
 							if(cd)
-								User.Activate(cd)
+								User.Activate(cd, noGCD = TRUE)
 								spawn(2)
 									if(User.isRace(MAKAIOSHIN) && User.passive_handler && User.passive_handler.Get("Limited Rank-Up"))
 										// Rank-Up

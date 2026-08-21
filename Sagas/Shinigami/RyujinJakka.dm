@@ -44,7 +44,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(!(istype(m, /mob/Players) || istype(m, /mob/Player))) return
 		var/last = last_damage_time[m]
 		if(!last || (world.time - last) >= damage_interval)
-			m.LoseHealth(field_damage)
+			m.LoseHealth(m.PctToHP(field_damage))
 			m.AddBurn(field_damage, owner)
 			last_damage_time[m] = world.time
 
@@ -87,9 +87,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"       = 1 + SL,
 			"MagicSword"     = 1,
-			"HybridStrike"   = 0.5 + (0.5 * SL),
+
 			"Scorching"      = 1 + SL,
 			"Combustion"     = 50 + (SL * 5),
 			"SoulFire"       = 1 + SL
@@ -137,7 +136,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	FlickBlast=0
 	AttackReplace=1
 	Distance=21
-	DamageMult=0.5
+	DamageMult=0.17
 	Dodgeable=0
 	Deflectable=0
 	Instinct=2
@@ -165,14 +164,14 @@ proc/applyAshChoked(mob/target, mob/caster)
 /obj/Skills/AutoHit/Taimatsu
 	name = "Taimatsu"
 	Area="Wave"
-	AdaptRate=1
-	DamageMult=0.15
+	DamageMult=0.05
 	ComboMaster=1
 	NoLock = 1
 	Instinct=2
 	NoAttackLock=1
 	Knockback=3
-	Cooldown=45
+	Cooldown=10
+	EnergyCost=2
 	HitSparkIcon='Hit Effect.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
@@ -243,12 +242,13 @@ proc/applyAshChoked(mob/target, mob/caster)
 		var/last = last_touch[m]
 		if(!last || (world.time - last) >= touch_interval)
 			m.AddBurn(touch_burn, user)
-			m.LoseHealth(touch_damage)
+			m.LoseHealth(m.PctToHP(touch_damage))
 			last_touch[m] = world.time
 
 	verb/Jokaku_Enjo()
 		set name = "Jokaku Enjo"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Jōkaku Enjō can only be used in Shikai."
 			return
@@ -298,11 +298,12 @@ proc/applyAshChoked(mob/target, mob/caster)
 	name = "Ennetsu Jigoku Impact"
 	Area="Target"
 	Distance=20
-	DamageMult=10
-	StrOffense=1
-	ForOffense=1
+	DamageMult=9.25
+	StrScaling=1
+	ForScaling=1
 	Scorching=20
 	Cooldown=0
+	EnergyCost=5
 	WindUp=0
 	NoLock=1
 	NoAttackLock=1
@@ -310,8 +311,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 /obj/Skills/Ennetsu_Jigoku
 	name = "Ennetsu Jigoku"
-	ManaCost = 30
-	Cooldown = 75
+	ManaCost = 5
+	Cooldown = 18
 	var/orb_distance = 8
 
 	proc/orbLaunch(mob/user, mob/target)
@@ -355,6 +356,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	verb/Ennetsu_Jigoku()
 		set name = "Ennetsu Jigoku"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InShikai())
 			usr << "Ennetsu Jigoku can only be used in Shikai."
 			return
@@ -386,12 +388,10 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Instinct"         = 1 + SL,
 			"MagicSword"       = 1,
-			"HybridStrike"     = 2.5 + (0.5 * SL),
+
 			"Scorching"        = 3 + SL,
-			"SoulFire"         = 3 + SL,
-			"FireHerald"       = 1
+			"SoulFire"         = 3 + SL
 		)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
@@ -466,10 +466,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	adjust(mob/p)
 		var/SL = p.SagaLevel
 		passives = list(
-			"PridefulRage" = 1,
-			"PureDamage"   = 1 + SL,
-			"Zornhau"      = 1 + SL,
-			"SpiritSword"   = 2
+			
+			"PureDamage"   = 1 + SL
 		)
 		OffMult = 1.1 + (0.1 * SL)
 		SpdMult = 1.1 + (0.1 * SL)
@@ -567,7 +565,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 /obj/Skills/Queue/Tenchi_Kaijin
 	name = "Kita: Tenchi Kaijin"
-	DamageMult = 15
+	DamageMult = 7.25
 	AccuracyMult = 1.2
 	Ashing   = 1
 	Explosive = 10
@@ -578,8 +576,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	Quaking  = 3
 	Instinct = 2
 	Duration = 10
-	Cooldown = 75
-	ManaCost = 30
+	Cooldown = 18
+	ManaCost = 5
 
 	verb/Tenchi_Kaijin()
 		set name = "Tenchi Kaijin"
@@ -645,7 +643,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		src.lastAttack = world.time
 		flick("Attack", src)
 		if(src.target)
-			src.target.LoseHealth(src.damageValue)
+			src.target.LoseHealth(src.target.PctToHP(src.damageValue))
 			src.target.AddBurn(src.damageValue, src.owner)
 
 mob/proc/summonFlameSoldiers(dmg, count, lifetimeTicks)
@@ -670,6 +668,7 @@ mob/proc/summonFlameSoldiers(dmg, count, lifetimeTicks)
 	verb/Kaka_Jumanokushi_Daisojin()
 		set name = "Kaka Jumanokushi Daisojin"
 		set category = "Skills"
+		set hidden = 1
 		if(!usr.InBankai())
 			usr << "Kaka Jūmanokushi Daisōjin can only be used in Bankai."
 			return

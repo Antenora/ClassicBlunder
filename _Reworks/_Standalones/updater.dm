@@ -17,7 +17,7 @@ proc/generateVersionDatum()
 		glob.currentUpdate = updateversion
 
 globalTracker
-	var/UPDATE_VERSION = 34
+	var/UPDATE_VERSION = 37
 	var/tmp/update/currentUpdate
 
 	proc/updatePlayer(mob/p)
@@ -182,13 +182,8 @@ update
 			if(p.Saga=="Hiten Mitsurugi-Ryuu")
 				if(p.SagaLevel>=2)
 					p.passive_handler.Decrease("SlayerMod", 1)
-					p.passive_handler.Increase("Flow", 1)
-					p.passive_handler.Increase("Instinct", 1)
 				if(p.SagaLevel>=3)
 					p.passive_handler.Decrease("SlayerMod", 1)
-					p.passive_handler.Decrease("Brutalize", 2)
-					p.passive_handler.Increase("Flow", 1)
-					p.passive_handler.Increase("Instinct", 1)
 	version9
 		version = 9;
 		updateMob(mob/p)
@@ -342,6 +337,11 @@ update
 				if(removed_mazoku_dt)
 					p << "A stray Mazoku Devil Trigger has been removed from your transformations. You're a regular Demon. Dummy."
 
+
+	version16
+		version = 16;
+		updateMob(mob/p)
+			. = ..()
 	version17
 		version = 17;
 		updateMob(mob/p)
@@ -410,7 +410,27 @@ update
 					p.DefAscension = 21
 					p.SpdAscension = 24
 					p.RecovAscension = 21
-
+	version25
+		version = 25;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				if(p.AscensionsAcquired>=1)
+					p.passive_handler.Decrease("BuffMastery", 2)
+				if(p.AscensionsAcquired>=2)
+					p.passive_handler.Decrease("BuffMastery", 2)
+				if(p.AscensionsAcquired>=3)
+					p.passive_handler.Decrease("BuffMastery", 2)
+	version26
+		version = 26;
+		updateMob(mob/p)
+			. = ..()
+			if(p.isRace(ELDRITCH))
+				p.passive_handler.Increase("SpaceWalk", 1);
+				p.passive_handler.Increase("StaticWalk", 1);
+				p << "The Space Squids of old look upon you kindly."
+				p << "WHY THE FRIGGLE FRACK DID THEY TAKE SPACEWALK AND STATIC WALK OFF YOU?!"
+				p << "How can you space squid if you can't even go to space...!"
 	version27
 		version = 27;
 		updateMob(mob/p)
@@ -421,16 +441,6 @@ update
 		version = 28;
 		updateMob(mob/p)
 			. = ..()
-			if(p.isRace(HUMAN)&&p.Class=="Heroic")
-				if(p.AscensionsAcquired>=1)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
-				if(p.AscensionsAcquired>=2)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
-				if(p.AscensionsAcquired>=3)
-					p.passive_handler.Increase("Instinct", 2);
-					p.passive_handler.Increase("Flow", 2);
 	version29
 		version = 29;
 		updateMob(mob/p)
@@ -503,7 +513,6 @@ update
 						p.passive_handler.Increase("Steady", 1)
 					if(p.Class=="Zeal")
 						p.passive_handler.Increase("Adaptation", 0.5)
-						p.passive_handler.Increase("LikeWater", 0.5)
 					if(p.Class=="Honor")
 						p.passive_handler.Increase("PureReduction", 0.5)
 						p.passive_handler.Increase("Juggernaut", 1)
@@ -514,28 +523,72 @@ update
 						p.passive_handler.Increase("Steady", 1)
 					if(p.Class=="Zeal")
 						p.passive_handler.Increase("Adaptation", 0.5)
-						p.passive_handler.Increase("LikeWater", 0.5)
 					if(p.Class=="Honor")
 						p.passive_handler.Increase("PureReduction", 1)
 						p.passive_handler.Increase("Adrenaline", 1)
 						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
-
-/globalTracker/var/COOL_GAJA_PLAYERS = list("Thorgigamax", "Gemenilove" )
-/globalTracker/var/GAJA_PER_ASC_CONVERSION = 0.25
-/globalTracker/var/GAJA_MAX_EXCHANGE = 1
-
-/mob/proc/gajaConversionCheck()
-	if(key in glob.COOL_GAJA_PLAYERS)
-		verbs += /mob/proc/ExchangeMinerals
-
-/mob/proc/gajaConversionRateUpdate()
-	if(isRace(GAJALAKA) && key in glob.COOL_GAJA_PLAYERS)
-		var/asc = AscensionsAcquired
-		var/ascRate = 0.5 + (glob.GAJA_PER_ASC_CONVERSION * asc) // 1.25 max
-		for(var/obj/Money/moni in src)
-			if(moni.Level >= 10000)
-				var/boon = round(moni.Level * 0.00001, 0.1)
-				if(boon > glob.GAJA_MAX_EXCHANGE) // so 1.75 total
-					boon = glob.GAJA_MAX_EXCHANGE
-				playerExchangeRate = ascRate + boon
-
+	version35
+		version = 35
+		updateMob(mob/p)
+			. = ..()
+			var/list/gone = list(\
+				"Forge" = list(0, 1),\
+				"Smelting" = list(1, 1),\
+				"Weapons" = list(1, 0),\
+				"Weighted Clothing" = list(1, 0),\
+				"Armor" = list(1, 0),\
+				"Repair" = list(1, 0),\
+				"Enhancement" = list(1, 0),\
+				"Advanced Plating" = list(2, 0),\
+				"Modular Weaponry" = list(2, 0),\
+				"Locksmithing" = list(1, 0))
+			var/refunded = 0
+			for(var/nm in gone)
+				if(!(nm in p.knowledgeTracker.learnedKnowledge)) continue
+				var/list/e = gone[nm]
+				var/theCost = glob.TECH_BASE_COST / p.TechIntFactor()
+				theCost *= 1 + (0.25 * e[1])
+				if(e[2]) theCost /= 4
+				theCost = round(theCost, 1)
+				var/give = min(theCost, p.RPPSpent)
+				p.RPPSpendable += give
+				p.RPPSpent -= give
+				p.knowledgeTracker.learnedKnowledge -= nm
+				refunded += give
+			for(var/obj/Skills/Utility/Smelt/s in p)
+				del s
+			for(var/obj/Skills/Utility/Reforge/r in p)
+				del r
+			for(var/obj/Skills/Utility/Copy_Key/ck in p)
+				del ck
+			if(!(p.ArmamentEnchantmentUnlocked >= 1 || ("ArmamentEnchantment" in p.knowledgeTracker.learnedMagic) || ("Soul Infusion" in p.knowledgeTracker.learnedMagic)))
+				for(var/obj/Skills/Utility/Upgrade_Equipment/ue in p)
+					del ue
+			p.ForgingUnlocked = 0
+			p.RepairAndConversionUnlocked = 0
+			p.GrantLifeRankPerks("Smithing", p.LifeRank("Smithing"))
+			if(refunded)
+				p << "worked"
+	version36
+		version = 36
+		updateMob(mob/p)
+			. = ..()
+			var/had = 0
+			for(var/obj/Skills/Utility/Upgrade_Equipment/ue in p)
+				del ue
+				had = 1
+			for(var/obj/Skills/Utility/Enchant_Equipment/ee in p)
+				del ee
+				had = 1
+			if(had)
+				p << "worked x2"
+	version37
+		version = 37
+		updateMob(mob/p)
+			. = ..()
+			var/before = 0
+			for(var/obj/Items/Material/m in p)
+				if(m.MaterialClass && m.MaterialClass != "Scrap") before++
+			p.MigrateMaterialsToLog()
+			if(before)
+				p << "<b>Materials update</b>"

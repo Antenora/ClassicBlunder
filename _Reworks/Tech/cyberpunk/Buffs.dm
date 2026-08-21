@@ -8,7 +8,7 @@
     ClientTint = 1
     // essentially turn ur screen to grey, enable afterimages, some health drain and go hard
     // scales with pot of course
-    passives = list("CoolerAfterImages" = 4)
+    passives = list("AfterImages" = 4, "AfterImageSkin" = "Cooler")
     TimerLimit = 10
     Cooldown = 60
     HealthDrain = 0.01
@@ -21,14 +21,13 @@
         if(totalPotRounded >= 50)
             // giga mode
             Godspeed = totalPotRounded/25
-            CriticalChance = round(totalPotRounded/5,0.5)
-            CriticalDamage = round(totalPot/100, 0.01)
+            CriticalDamage = round(totalPot/100, 0.01) + totalPotRounded/500
             Crippling = totalPotRounded/10
             SlayerMod = totalPotRounded/12.5 // lol 1 pure damage at 100
             Warping = totalPotRounded/25
-            passives = list("CoolerAfterImages" = 3, "Godspeed" = Godspeed, "CriticalChance" = CriticalChance, \
+            passives = list("AfterImages" = 3, "AfterImageSkin" = "Cooler", "Godspeed" = Godspeed, \
             "CriticalDamage" = CriticalDamage, "Crippling" = Crippling, "SlayerMod" = SlayerMod,\
-            "Warping" = Warping, "CursedWounds" = 1, "MortalStrike" = totalPotRounded/250, "FavoredPrey" = "Mortal")
+            "Warping" = Warping, "CursedWounds" = 1,  "FavoredPrey" = "Mortal")
             Cooldown = 120 - (totalPotRounded)
             TimerLimit = 10 + (totalPotRounded/10)
             if(p.SpecialBuff?:sandevistanUsages >= 0)
@@ -38,10 +37,9 @@
                 Cooldown = usages >= 3 ? Cooldown + (usages * 5) : Cooldown
         else
             Godspeed = 1
-            CriticalChance = round(totalPotRounded/10,0.5)
-            CriticalDamage =  round(totalPot/150, 0.01)
+            CriticalDamage =  round(totalPot/150, 0.01) + totalPotRounded/1000
             Crippling = totalPotRounded/10
-            passives = list("CoolerAfterImages" = 2, "Godspeed" = Godspeed, "CriticalChance" = CriticalChance, \
+            passives = list("AfterImages" = 2, "AfterImageSkin" = "Cooler", "Godspeed" = Godspeed, \
             "CriticalDamage" = CriticalDamage, "Crippling" = Crippling)
             Cooldown = 60 - (totalPotRounded/4)
             TimerLimit = 13 + (totalPotRounded/5)
@@ -79,19 +77,17 @@
             KillerInstinct = round(totalPot/200,0.01)
             HeavyHitter = round(totalPotRounded/25, 0.5)
             HardStyle = round(totalPotRounded/25, 0.5)
-            Steady = round(totalPotRounded/25, 0.5)
             Shattering = round(totalPotRounded/10, 0.5)
-            passives = list("KillerInstinct" = KillerInstinct, "HeavyHitter" = HeavyHitter, "HardStyle" = HardStyle, \
-            "Steady" = Steady, "Shattering" = Shattering)
+            passives = list( "HeavyHitter" = HeavyHitter, "HardStyle" = HardStyle, \
+             "Shattering" = Shattering)
             TimerLimit = 30 + (totalPotRounded/5)
             Cooldown = 90 - (totalPotRounded/5)
         else
             HeavyHitter = round(totalPotRounded/50, 0.5)
             HardStyle = round(totalPotRounded/50, 0.5)
-            Steady = round(totalPotRounded/25, 0.5)
             Shattering = round(totalPotRounded/10, 0.5)
             passives = list("HeavyHitter" = HeavyHitter, "HardStyle" = HardStyle, \
-            "Steady" = Steady, "Shattering" = Shattering)
+             "Shattering" = Shattering)
             TimerLimit = 30 + (totalPotRounded/10)
     verb/GorillaArms()
         set category="Skills"

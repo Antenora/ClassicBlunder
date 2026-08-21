@@ -39,11 +39,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"= 1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -57,7 +57,7 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5)
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
 			onAscension(mob/owner)
@@ -96,11 +96,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -114,7 +114,7 @@ ascension
 							offense=0.5 * SMod
 							speed=0.5 * SMod
 							endurance=0.25 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5)
 		three
 			unlock_potential = ASCENSION_THREE_POTENTIAL
 			onAscension(mob/owner)
@@ -142,17 +142,17 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Steady" = 1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -164,7 +164,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "CriticalChance" = 10, "Instinct" = 1)
+							passives = list("SlayerMod" = 0.5)
 		four
 			unlock_potential = ASCENSION_FOUR_POTENTIAL
 			onAscension(mob/owner)
@@ -194,17 +194,17 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Steady" = 1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5,  "Unstoppable" = 1)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5,  "Unstoppable" = 1)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -216,7 +216,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "Instinct" = 2, "PureDamage" = 1)
+							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			onAscension(mob/owner)
@@ -252,11 +252,11 @@ ascension
 							force=0.5 * SMod
 							offense=0.5 * SMod
 							defense=0.5 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=0.5 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "PridefulRage"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,   "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=0.5 * SMod
 							strength=0.5 * SMod
@@ -268,7 +268,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5,  "Instinct" = 2, "PureDamage" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			onAscension(mob/owner)
@@ -299,11 +299,11 @@ ascension
 							force=1 * SMod
 							offense=1 * SMod
 							defense=1 * SMod
-							passives = list("MovementMastery" = 2, "QuickCast"=1,"TechniqueMastery" = 1, "ManaStats"=1)
+							passives = list( "QuickCast"=1,"TechniqueMastery" = 1)
 						if("Berserker")
 							strength=1 * SMod
 							endurance=1 * SMod
-							passives = list("ManaCapMult" = 0.25, "Brutalize"=1, "Juggernaut" = 0.5)
+							passives = list("ManaCapMult" = 0.25,  "Juggernaut" = 0.5)
 						if("Imaginary")
 							force=1 * SMod
 							strength=1 * SMod
@@ -315,4 +315,4 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5,  "Instinct" = 2, "PureDamage" = 1, "Deicide" = 5)
+							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)

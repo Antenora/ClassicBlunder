@@ -64,17 +64,14 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 	var/desp = clamp(passive_handler.Get("Persistence"), 0.1, glob.MAX_PERSISTENCE_CALCULATED)
 	if(prob(desp)*(glob.PERSISTENCE_CHANCE * 2)&&!src.HasInjuryImmune())
 		desp = clamp(desp, 1, glob.PRESISTENCE_DIVISOR_MAX)
-		if(glob.PERSISTENCE_NEGATES_DAMAGE)
-			src.WoundSelf(dmg/desp)//Take all damage as wounds
-		else
-			WoundSelf(dmg)
+		src.WoundSelf(dmg/desp)//Take all damage as wounds
 		dmg=0//but no health damage.
 	// anger will not reduce debuff damage
 	if(VaizardHealth)
 		reduceVaiHealth(dmg)
 	if(BioArmor)
 		reduceBioArmor(dmg)
-	if(typeOfDebuff == "Burn" && (passive_handler.Get("FireAbsorb") || CheckSlotless("Heat of Passion") && Health <= 15 ))
+	if(typeOfDebuff == "Burn" && (passive_handler.Get("FireAbsorb") || CheckSlotless("Heat of Passion") && HealthPct() <= 15 ))
 		dmg = 0
 	switch(typeOfDebuff)
 		if("Burn")
@@ -86,11 +83,11 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 	if(!src.GetDebuffReversal())
 		if(typeOfDebuff == "Frenzy" && Health <= 0)
 			dmg = 0
-		Health-=dmg
+		Health -= PctToHP(dmg)
 		if(typeOfDebuff == "Frenzy" && !IsDarkDragonPlayer() && dmg > 0)
 			WoundSelf(dmg * 0.5)
 	if(Health<=0 && !KO)
-		if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP)
+		if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
 			return
 		if(typeOfDebuff == "Poison")
 			Unconscious(null, "succumbing to Poison!")
@@ -117,7 +114,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(Cooled)
 				base = 1.5
 			if(Burn>0)
-				var/reduction = base * (1+ (GetDebuffResistance() / 4))
+				var/reduction = base * (1+ (GetStatusResist() / 4))
 				// Reduce Erupting Blows stacks proportionally
 				if(src.SilentBurnAmount > 0)
 					var/silentFrac = min(1.0, src.SilentBurnAmount / Burn)
@@ -127,34 +124,32 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 				Burn = 0
 				src.SilentBurnAmount = 0
 		if("Poison")
-			boon += passive_handler.Get("VenomResistance")
 			if(Antivenomed)
 				base = 1.25
 			if(Poison>0)
-				var/reduction = base * (1 + (GetDebuffResistance() / 4) + boon)
+				var/reduction = base * (1 + (GetStatusResist() / 4) + boon)
 				// Reduce silent stacks proportionally
 				if(src.SilentPoisonAmount > 0)
 					var/silentFrac = min(1.0, src.SilentPoisonAmount / Poison)
 					src.SilentPoisonAmount = max(0, src.SilentPoisonAmount - (reduction * silentFrac))
 				Poison -= reduction
 				if(BlindingVenom && client)
-					if(!client.client_plane_master) // 3 checks lol ! maybe move this to new noob!
-						client.client_plane_master = new()
-						client.screen += client.client_plane_master
-					client.client_plane_master.filters = filter(type="blur", size=BlindingVenom*(Poison/150))
+					client.cpm_blur_size = BlindingVenom*(Poison/150)
+					CpmApply(client)
 			if(Poison<=0)
 				Poison = 0
 				src.SilentPoisonAmount = 0
 				if(BlindingVenom)
 					BlindingVenom=0
-					if(client.client_plane_master)
-						client.client_plane_master.filters = null
+					if(client)
+						client.cpm_blur_size = 0
+						CpmApply(client)
 		if("Frenzy")
 			if(!IsDarkDragonPlayer()) return
-			var/reduction = base * (1 + (GetDebuffResistance() / 4))
+			var/reduction = base * (1 + (GetStatusResist() / 4))
 			if(Frenzy) Frenzy = clamp(Frenzy - (reduction/10), 0, 100);
 		if("Bleed")
-			var/reduction = base * (1 + (GetDebuffResistance() / 4));
+			var/reduction = base * (1 + (GetStatusResist() / 4));
 			if(Bleed) Bleed = clamp(Bleed - reduction, 0, 100);
 			if(KatenBleedLock) Bleed = max(KatenBleedLock, Bleed);
 
@@ -208,15 +203,15 @@ mob/proc/implodeDebuff(n, type)
 	if(src.VaizardHealth<=0)
 		if(src.ActiveBuff)
 			if(src.ActiveBuff.VaizardShatter)
-				src.ActiveBuff.Trigger(src)
+				src.ActiveBuff.Trigger(src,Override=1)
 		if(src.SpecialBuff)
 			if(src.SpecialBuff.VaizardShatter)
-				src.SpecialBuff.Trigger(src)
+				src.SpecialBuff.Trigger(src,Override=1)
 		for(var/sb in src.SlotlessBuffs)
 			var/obj/Skills/Buffs/b = SlotlessBuffs[sb]
 			if(b)
 				if(b.VaizardShatter)
-					b.Trigger(src)
+					b.Trigger(src,Override=1)
 		if(src.VaizardHealth<0)
 			val=((-1)*src.VaizardHealth)
 			src.VaizardHealth=0

@@ -21,9 +21,9 @@
             newSpell.MagicNeeded = 0
             switch(newSpell.parent_type)
                 if(/obj/Skills/AutoHit/Magic)
-                    usr.Activate(newSpell)
+                    usr.Activate(newSpell, noGCD = TRUE)
                 if(/obj/Skills/Projectile/Magic)
-                    usr.UseProjectile(newSpell)
+                    usr.UseProjectile(newSpell, noGCD = TRUE)
                 if(/obj/Skills/Buffs/SlotlessBuffs/Magic)
                     var/obj/Skills/Buffs/SlotlessBuffs/m = newSpell
                     m?:Trigger(usr)

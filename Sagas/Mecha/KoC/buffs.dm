@@ -11,7 +11,6 @@
 		var/mult = clamp((0.05 * piloting) * sLevel, 0.05, 1)
 		OffMult = 1 + mult
 		DefMult = 1 + mult
-		Intimidation = 1 + sLevel/6
 		if(sagaInfo.choicesPaths["1"] == "Endless Evolution" && sLevel>=2)
 			switch(sagaInfo.pathsPicked)
 				if("Overwhelming Force")
@@ -20,20 +19,17 @@
 					EndMult = 1 - (0.066 * sLevel)
 					passives["WeaponBreaker"] = 1
 					passives["HardStyle"] = 0
-					passives["Flow"] = 0
 				if("Unstoppable Strength")
 					StrMult = 1.2 + (0.1 * sLevel)
 					SpdMult = 1.1 + (0.05 * sLevel)
 					EndMult = 1 - (0.033 * sLevel)
 					passives["HardStyle"] = 1
 					passives["WeaponBreaker"] = 0
-					passives["Flow"] = 0
 				if("Peerless Agility")
 					StrMult = 1 + (0.05 * sLevel)
 					ForMult = 1 + (0.05 * sLevel)
 					SpdMult = 1.3 + (0.1 * sLevel)
 					EndMult = 1 - (0.066 * sLevel)
-					passives["Flow"] = 1
 					passives["HardStyle"] = 0
 					passives["WeaponBreaker"] = 0
 	verb/Courageous_Giga_Guard()
@@ -48,7 +44,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Plot_Armor // True Effort + 
 	Copyable=0
 	ManaCost=30
-	passives = list("Instinct" = 1, "Pursuer" = 1, "NoDodge" = 1)
+	passives = list("Pursuer" = 1, "NoDodge" = 1)
 	VaizardHealth = 10
 	TextColor=rgb(63, 241, 111)
 	ActiveMessage="exerts their will power to encase themselves with plot armor!"

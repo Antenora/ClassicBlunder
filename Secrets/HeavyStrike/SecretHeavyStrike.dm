@@ -138,68 +138,11 @@
         HitSparkSize=2;
         HitMessage="rips their opponent to shreds!";
 
-//WEREWOLF
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Rip_and_Tear
-        AccuracyMult=1.1
-        KBAdd=0;
-        KBMult=5;
-        Cooldown=20;
-        HitMessage="digs their claws 🤤 into their opponent to deal crippling wounds!";
-        Crippling=3;
-        HitSparkIcon='WolfFF.dmi'
-        HitSparkX=0
-        HitSparkY=0
-        HitSparkTurns=1
-        HitSparkSize=2
-
-//WITCH
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Soulsap_Strike
-        DamageMult=1.5;
-        AccuracyMult=1.15;
-        KBAdd=0;
-        KBMult=1;
-        Cooldown=20;
-        Freezing=1;
-        Crippling=15;
-        CursedWounds=1;
-        Decider=1;
-        Warp=2;
-        HitSparkIcon='Icons/NSE/spells/debuff/holywaterflow.dmi'
-        HitSparkX=-32
-        HitSparkY=-32
-        HitSparkTurns=1
-        HitSparkSize=1
-        ActiveMessage="weaves their hands towards their enemy's centre!";
-        HitMessage="grasps hold of their opponent's soul to sap away its energy!";
-
-//ZOMBIE
-//why is this so cracked lmao
-/obj/Skills/Queue/Secret_Heavy_Strike
-    Death_Grasp
-        DamageMult=2.5;
-        AccuracyMult=1.15;
-        KBAdd=0;
-        KBMult=1;
-        Cooldown=20;
-        Toxic=25;
-        Shearing=25;
-        Crippling=15;
-        CursedWounds=1;
-        Decider=1;
-        Grapple=1;
-        HitSparkIcon='Hit Effect Wind.dmi'
-        HitSparkX=-32
-        HitSparkY=-32
-        HitSparkTurns=1
-        HitSparkSize=1
-        HitMessage="grasps hold of their opponent with necrotic energy!";
-
 //HEAVENLY RESTRICTION
 #define HEAVENLY_BOON_VARS list("DamageMult"=2, "PushOutWaves"=0, "PushOut"=0, "AccuracyMult"=1, "KBAdd"=5, "KBMult"=1, "Dunker"=0, "Launcher"=0)
 /obj/Skills/Queue/Secret_Heavy_Strike
     Heavenly_Strike
+        NoGCD = 1
         adjust(mob/p)
             var/SecretInformation/HeavenlyRestriction/hs = p.secretDatum;
             var/dunkValue = hs.getBoon(p, "Heavy Strike");
@@ -217,18 +160,20 @@
     Duration=10;
 
     Shin_Strike
-        Cooldown=30;
+        Cooldown=8;
+        EnergyCost=2;
         ActiveMessage="channels Shin into their next strike...";
         HitMessage="delivers a blow radiating with power!";
         adjust(mob/p)
             ManaGain=clamp(p.ShinSecretLevel()*5, 10, 30) // Tier 1/2= 10 tier 3 = 15, Tier 4 = 20 Tier 5 = 25 tier 6 = 30
     Mang_Strike
-        Cooldown=40;
+        Cooldown=9;
+        EnergyCost=2;
         ActiveMessage="concentrates their Mang...";
         KBAdd = 25
         KBMult = 5
         adjust(mob/p)
-            DamageMult=clamp(p.GetMangLevel() * 2, 3, 10);
+            DamageMult=clamp(p.GetMangLevel() * 0.9, 1.35, 4.5);
             HitMessage="strikes with the power of [p.GetMangLevel()] Mang Ring\s!!";
 
 
@@ -240,7 +185,7 @@
     Divergent_Fist
         ActiveMessage="'s own energy lags behind...!"
         HitMessage="'s impact is doubled up from their energy lagging behind!"
-        DamageMult=2
+        DamageMult=6.25
         HitSparkIcon='CE Hitspark.dmi'
         HitSparkTurns=1
         HitSparkSize=1
@@ -251,7 +196,7 @@
         TextColor = "#DC143C";
         ActiveMessage="'s fists sparks black...!"
         HitMessage="lands a <b>BLACK FLASH!!</b>"
-        DamageMult = (2 ** 2.5)
+        DamageMult = 5.25
         AccuracyMult = 10
         KBAdd = 10
         Duration=4
@@ -280,11 +225,12 @@
 //SPIRAL
 /obj/Skills/Queue/Secret_Heavy_Strike/
     Spiral_Drill
-        DamageMult=2
+        DamageMult=2.4
         AccuracyMult=3
         KBMult=0.1
         Shattering=30
-        Cooldown=15
+        Cooldown=5
+        EnergyCost=1
         HitSparkIcon='Spiral_Hitspark.dmi'
         HitSparkX=-32
         HitSparkY=-32
@@ -294,7 +240,7 @@
         adjust(mob/p)
             if(p.secretDatum.currentTier>=5)
                 BuffSelf = "/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution"
-            if(p.passive_handler.Get("SpiralPowerUnlocked")>=2||p.Health<=50)
+            if(p.passive_handler.Get("SpiralPowerUnlocked")>=2||p.HealthPct()<=50)
                 KBMult=3
                 KBAdd=25
                 FollowUp="/obj/Skills/AutoHit/Spiral/Lagann_Impact2"

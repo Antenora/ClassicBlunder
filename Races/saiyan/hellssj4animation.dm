@@ -6,22 +6,8 @@
     mouse_opacity = 0
     layer = BACKGROUND_LAYER
 
-/obj/client_plane_master
-    plane = FLOAT_PLANE
-    appearance_flags = PLANE_MASTER | PIXEL_SCALE
-    screen_loc = "LEFT,BOTTOM"
-    mouse_opacity = 1
-    layer = BACKGROUND_LAYER
-
-//i'm ngl i don't know what it does above but probably best to keep it
-
 /obj/dorkness
     icon = 'blackcutin.dmi'
-    alpha = 0
-    layer = 999
-
-/obj/lightness
-    icon = 'lightcutin.dmi'
     alpha = 0
     layer = 999
 
@@ -54,7 +40,7 @@
 
 
 /mob/proc/HellSSJ4Animation1(appearance1, appearance2, user) // the anim take the appearance before and after the transformation. necessary to make everything show up as it should
-    var/oldview = client.view
+    client.SetupCutsceneDisplay()
     client.eye = locate(99,99,1)
     Quake(30, z)
     // client.perspective = EDGE_PERSPECTIVE
@@ -145,7 +131,7 @@
     sleep(20)
     animate(bleh2, transform = matrix().Scale(4).Translate(-20, 0), time = 2)
     sleep(20)
-    client.view = oldview
+    client?.EndCutsceneDisplay()
     del blankHolder
     del dorkness
     del lightness

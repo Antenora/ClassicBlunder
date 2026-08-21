@@ -1,11 +1,10 @@
 obj/Skills/AutoHit/Blow_The_Horn
 	Area="Circle"
 	Distance=15
-	AdaptRate = 1
 	GuardBreak=1
-	DamageMult=10
+	DamageMult=11.5
 	Knockback=20
-	Cooldown=150
+	Cooldown=38
 	Shockwaves=3
 	Shockwave=6
 	SpecialAttack=1
@@ -14,7 +13,7 @@ obj/Skills/AutoHit/Blow_The_Horn
 	HitSparkX=0
 	HitSparkY=0
 	ActiveMessage="brings the Oilphant up to their lips to blow into it!"
-	EnergyCost=5
+	EnergyCost=8
 	verb/Blow_the_Horn()
 		set category="Skills"
 		usr.Activate(src)
