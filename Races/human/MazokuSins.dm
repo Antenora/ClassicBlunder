@@ -21,8 +21,8 @@ mob
 				mult += ApathyDamageBonus
 
 			// HopeFactor
-			if(passive_handler && passive_handler.Get("HopeFactor") && Health < 50)
-				var/hope_bonus = ((50 - Health) / 40.0) * 3 * passive_handler.Get("HopeFactor")
+			if(passive_handler && passive_handler.Get("HopeFactor") && HealthPct() < 50)
+				var/hope_bonus = ((50 - HealthPct()) / 40.0) * 3 * passive_handler.Get("HopeFactor")
 				mult += hope_bonus
 
 			if(mult < 0)
@@ -348,11 +348,11 @@ obj/Skills/Queue/Kibou_ou_Hope
 		if(usr.isInMazokuDT())
 			usr << "You cannot use this in Mazoku DT."
 			return
-		if(usr.Health >= 40)
+		if(usr.HealthPct() >= 40)
 			usr << "You cannot use this until your health is low."
 			return
 		var/healthDiff = 0
 		if(usr.Target && istype(usr.Target, /mob/Players) && usr.Target != usr)
-			healthDiff = max(0, usr.Target:Health - usr.Health)
+			healthDiff = max(0, usr.Target:HealthPct() - usr.HealthPct())
 		src.DamageMult = 20 + (healthDiff * 2)
 		usr.SetQueue(src)

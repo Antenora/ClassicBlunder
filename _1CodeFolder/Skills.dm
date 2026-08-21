@@ -1128,7 +1128,7 @@ turf/Click(turf/T)
 								return
 						if(usr.ManaAmount<((usr.ManaMax-usr.TotalCapacity)*usr.GetManaCapMult()*0.8))
 							return
-						if(usr.Health<100)
+						if(usr.HealthPct()<100)
 							return
 						if(usr.Energy<100)
 							return

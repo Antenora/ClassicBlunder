@@ -652,7 +652,7 @@ obj/Skills/Utility
 			set hidden = 1
 			set name="Never Too Late (Act 1)"
 			RandomMult=rand(1,25)
-			usr.DoDamage(usr, 10)
+			usr.DoDamage(usr, usr.PctToHP(10))
 			usr.HealHealth(RandomMult)
 			usr.TriggerAwakeningSkill(ActNumber)
 	TheBlueExperience
@@ -934,7 +934,7 @@ obj/Skills/Projectile
 			usr.UseProjectile(src)
 	Beams
 		TasteTheRainbow //Nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan
-			DamageMult=9.25
+			DamageMult=0.2643
 			Immediate=1
 			Dodgeable=0
 			StrScaling=1
@@ -947,7 +947,7 @@ obj/Skills/Projectile
 				set category="Skills"
 				usr.UseProjectile(src)
 		Unbelievable_Rage
-			DamageMult=2
+			DamageMult=0.0571
 			Immediate=1
 			Dodgeable=0
 			IconLock='Pride Beam.dmi'
@@ -959,7 +959,7 @@ obj/Skills/Projectile
 				if(p.passive_handler.Get("Red Hot Rage"))
 					Cooldown=3
 					RedPUSpike=pick(25, 50)
-					DamageMult=2.4
+					DamageMult=0.0686
 					p.passive_handler.Increase("RedPUSpike", RedPUSpike)
 					p.WeirdAngerStuff()
 				else

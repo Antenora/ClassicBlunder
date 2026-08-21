@@ -86,7 +86,7 @@ mob
 				if(_ds_d && _ds_d.demon_hp > 0 && src != _ds_d)
 					var/orig_val = val
 					val = round(val * (1 - defender.demon_soul_dmg_pct))
-					var/demon_takes = max(1, round(orig_val * defender.demon_soul_transfer_pct))
+					var/demon_takes = max(1, round(defender.HPToPct(orig_val) * defender.demon_soul_transfer_pct))
 					_ds_d.demon_hp = max(0, _ds_d.demon_hp - demon_takes)
 					var/datum/party_demon/_ds_pd = _ds_d.DemonGetPartyDemon()
 					if(_ds_pd) _ds_pd.current_hp = _ds_d.demon_hp
@@ -108,7 +108,7 @@ mob
 					defender << "<font color= 'green'>ATTACK PARRIED!</font>"
 					RG.SuccessfulParry = 2
 					var/masteryMult = 1 + ((RG.Mastery - 1) / 100)
-					var/meterGain = max((val * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
+					var/meterGain = max((defender.HPToPct(val) * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
 					RG.RoyalMeter = min(RG.RoyalMeter + meterGain, 100+(RG.Mastery-1))
 					val = 0
 					defender.client.updateRGMeter()
@@ -120,7 +120,7 @@ mob
 					if(defender.IsGuarding())
 						guard_opened = 1
 				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender) && !guard_opened)
-					defender.GuardMeter += glob.GUARD_METER_FLAT + val * glob.GUARD_METER_SCALE
+					defender.GuardMeter += glob.GUARD_METER_FLAT + defender.HPToPct(val) * glob.GUARD_METER_SCALE
 					val *= (1 - glob.GUARD_DR)
 					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)
 					if(defender.GuardMeter >= glob.GUARD_METER_MAX)
@@ -149,27 +149,27 @@ mob
 					return 0
 
 			if(src.isLunaticMode())
-				src.InflictLunacy(val, defender);
+				src.InflictLunacy(defender.HPToPct(val), defender);
 
 			fieldAndDefense(defender, UnarmedAttack, SwordAttack, SpiritAttack, val)
 
 			defender.determinationSoulRegen()
 			if(src.HasSoftStyle())
-				defender.GainFatigue(val*clamp(glob.SOFT_STYLE_RATIO*src.GetSoftStyle(), 0.0001, 0.5))
+				defender.GainFatigue(defender.HPToPct(val)*clamp(glob.SOFT_STYLE_RATIO*src.GetSoftStyle(), 0.0001, 0.5))
 			if(src.HasHardStyle())
 				if(!src.CursedWounds())
 					src.DealWounds(defender, val*clamp(glob.HARD_STYLE_RATIO*src.GetHardStyle(), 0.0001, 0.75))
 			if(src.HasCyberStigma())
 				if(defender.CyberCancel||defender.Mechanized)
-					defender.LoseMana(val*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
+					defender.LoseMana(defender.HPToPct(val)*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
 
 			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", val/2)
+				defender.passive_handler.Increase("Dim Mak", defender.HPToPct(val)/2)
 			handlePostDamage(defender)
 			if(defender.VaizardHealth)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
 					val *= glob.SYMBIOTE_DMG_TEST
-				defender.VaizardHealth-=val
+				defender.VaizardHealth-=defender.HPToPct(val)
 				if(defender.VaizardHealth<=0)
 					if(defender.ActiveBuff)
 						if(defender.ActiveBuff.VaizardShatter)
@@ -183,8 +183,10 @@ mob
 							if(b.VaizardShatter)
 								b.Trigger(defender)
 					if(defender.VaizardHealth<0)
-						val=((-1)*defender.VaizardHealth)
+						val=defender.PctToHP((-1)*defender.VaizardHealth)
 						defender.VaizardHealth=0
+					else
+						val=0
 				else
 					var/PD=src.passive_handler.Get("Piercing") //don't make this over 1. if anyone makes it over 1 i will kill them. hell, if anyone makes it equal to 1 i will also kill you. i swear to go. unless it's me, then it's okay. d
 					if(src.passive_handler.Get("Determination(Black)"))
@@ -195,14 +197,14 @@ mob
 						val=0
 
 			if(defender.BioArmor)
-				defender.BioArmor-=val
+				defender.BioArmor-=defender.HPToPct(val)
 				if(defender.BioArmor<0)
-					val=(-1)*defender.BioArmor
+					val=defender.PctToHP((-1)*defender.BioArmor)
 					defender.BioArmor=0
 				else
 					val=0
 
-			if(defender.AngerAdvance(val))
+			if(defender.AngerAdvance(defender.HPToPct(val)))
 				val/=defender.AngerMax
 
 			if((defender.passive_handler.Get("Persistence") || defender.hasDeterminationDesperation()) && !defender.HasInjuryImmune())
@@ -212,17 +214,17 @@ mob
 					desp += defender.getDeterminationPersistenceBonus()
 					var/woundShare = min(desp*glob.PERSISTENCE_CHANCE, 100) / 100
 					var/despDiv = clamp(desp, 1, glob.PRESISTENCE_DIVISOR_MAX)
-					defender.WoundSelf((val*woundShare)/sqrt(1+despDiv))
+					defender.WoundSelf(defender.HPToPct((val*woundShare)/sqrt(1+despDiv)))
 					val *= (1 - woundShare)
 
 			if(defender.KO&&!src.Lethal)
 				val=0
 
 			if(defender.CheckSpecial("Kamui Unite") && defender.passive_handler.Get("GodKi") < 1)
-				if(defender.Health<=10)
+				if(defender.HealthPct()<=10)
 					defender.TotalInjury=0
 					defender.TotalFatigue=0
-					defender.Health += (50 * (1 - defender.passive_handler.Get("GodKi")))
+					defender.HealPct(50 * (1 - defender.passive_handler.Get("GodKi")))
 					defender.Energy += (50 * (1 - defender.passive_handler.Get("GodKi")))
 					defender.BPPoison=1
 					defender.passive_handler.Increase("GodKi", 0.25)
@@ -251,11 +253,11 @@ mob
 
 
 			if(passive_handler["CoolingDown"])
-				StyleBuff?:hotCold = clamp(StyleBuff?:hotCold - val * glob.HOTNCOLD_MODIFIER, -100, 100)
+				StyleBuff?:hotCold = clamp(StyleBuff?:hotCold - defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
 			else if(passive_handler["HeatingUp"])
-				StyleBuff?:hotCold  = clamp(StyleBuff?:hotCold + val * glob.HOTNCOLD_MODIFIER, -100, 100)
+				StyleBuff?:hotCold  = clamp(StyleBuff?:hotCold + defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
 			if(passive_handler["Grit"])
-				AdjustGrit("add", val*glob.racials.GRITMULT)
+				AdjustGrit("add", HPToPct(val)*glob.racials.GRITMULT)
 			if(passive_handler["BlindingVenom"] && can_use_style_effect("BlindingVenom"))
 				if(client)
 					var/dur = passive_handler["BlindingVenom"]*glob.VENOMBLINDMULT
@@ -327,31 +329,31 @@ mob
 						src.gainTension(val);
 				if(defender && defender.StyleBuff && defender.canGainTension())
 					if(!SecondStrike)
-						defender.gainTension((val*Motivation)*glob.DEFENDER_TENSION_REDUCER);
-						if(defender.Health<src.Health && defender.passive_handler.Get("SpiralPowerUnlocked"))
-							defender.gainTension((val*Motivation*2)*glob.DEFENDER_TENSION_REDUCER);
+						defender.gainTension((defender.HPToPct(val)*Motivation)*glob.DEFENDER_TENSION_REDUCER);
+						if(defender.HealthPct()<src.HealthPct() && defender.passive_handler.Get("SpiralPowerUnlocked"))
+							defender.gainTension((defender.HPToPct(val)*Motivation*2)*glob.DEFENDER_TENSION_REDUCER);
 			if(passive_handler.Get("Corruption"))
-				gainCorruption(val * 1.5 * glob.CORRUPTION_GAIN)
+				gainCorruption(defender.HPToPct(val) * 1.5 * glob.CORRUPTION_GAIN)
 			if(defender.passive_handler.Get("Corruption"))
-				defender.gainCorruption(val * 0.75 * glob.CORRUPTION_GAIN)
+				defender.gainCorruption(defender.HPToPct(val) * 0.75 * glob.CORRUPTION_GAIN)
 
 			if(defender.HasEnergyLeak())
-				defender.LoseEnergy(defender.GetEnergyLeak()*glob.LEAK_DEFENDER_RATE*val)
+				defender.LoseEnergy(defender.GetEnergyLeak()*glob.LEAK_DEFENDER_RATE*defender.HPToPct(val))
 
 			if(src.HasFatigueLeak())
-				src.GainFatigue(src.GetFatigueLeak()*glob.LEAK_ATTACKER_RATE*val)
+				src.GainFatigue(src.GetFatigueLeak()*glob.LEAK_ATTACKER_RATE*defender.HPToPct(val))
 			if(defender.HasFatigueLeak())
-				defender.GainFatigue(defender.GetFatigueLeak()*glob.LEAK_DEFENDER_RATE*val)
+				defender.GainFatigue(defender.GetFatigueLeak()*glob.LEAK_DEFENDER_RATE*defender.HPToPct(val))
 
 			if(src.HasManaLeak())
-				src.LoseMana(src.GetManaLeak()*glob.LEAK_ATTACKER_RATE*val, 1)
+				src.LoseMana(src.GetManaLeak()*glob.LEAK_ATTACKER_RATE*defender.HPToPct(val), 1)
 			if(defender.HasManaLeak())
-				defender.LoseMana(defender.GetManaLeak()*glob.LEAK_DEFENDER_RATE*val, 1)
+				defender.LoseMana(defender.GetManaLeak()*glob.LEAK_DEFENDER_RATE*defender.HPToPct(val), 1)
 
 			if(src.HasBleedHit())
-				src.WoundSelf(src.GetBleedHit()*glob.RECOIL_RATE*val)
+				src.WoundSelf(src.GetBleedHit()*glob.RECOIL_RATE*defender.HPToPct(val))
 			if(src.HasBurnHit())
-				src.AddBurn(src.GetBurnHit()*glob.RECOIL_RATE*val, src)
+				src.AddBurn(src.GetBurnHit()*glob.RECOIL_RATE*defender.HPToPct(val), src)
 			if(src.passive_handler.Get("Ashen One"))
 				src.AddBurn(passive_handler.Get("Kindling"), src)
 			if(src.Kaioken)
@@ -375,7 +377,7 @@ mob
 						defender.WoundSelf(dmg)
 						OMsg(defender, "<font color='red'><font size=+2><b>[src] mortally wounded [defender] with a devistating attack!</b></font size></font color>")
 			if(passive_handler.Get("Gluttony") && FightingSeriously(src, 0))
-				var/amount = val * (passive_handler.Get("Gluttony") * SpecialBuff:hungerMult)
+				var/amount = defender.HPToPct(val) * (passive_handler.Get("Gluttony") * SpecialBuff:hungerMult)
 				defender.LoseMana(amount/2)
 				defender.LoseCapacity(amount/2)
 				SpecialBuff:eatEnergies(amount * 10)
@@ -388,28 +390,28 @@ mob
 			var/soulfire = GetSoulFire();
 			if(soulfire)
 				if(!(defender.CyberCancel || defender.Mechanized))
-					defender.LoseCapacity(val*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
-				defender.LoseMana(val*(soulfire*glob.SOUL_FIRE_MANA_RATIO))
-				defender.TotalFatigue+=(val*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
+					defender.LoseCapacity(defender.HPToPct(val)*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
+				defender.LoseMana(defender.HPToPct(val)*(soulfire*glob.SOUL_FIRE_MANA_RATIO))
+				defender.TotalFatigue+=(defender.HPToPct(val)*soulfire*glob.SOUL_FIRE_FATIGUE_RATIO)
 
 			if(defender.CheckSlotless("Protega"))
 				src.LoseHealth(val/10)
 			if(painShared)
 				applyPainSharedDamage(val)
 			if(defender.passive_handler.Get("MeltyBlood"))
-				if(defender.Health<50*(1-src.HealthCut))
+				if(defender.HealthPct()<50*(1-src.HealthCut))
 					if(FightingSeriously(src,0))
 						if(!defender.MeltyMessage)
 							defender.MeltyMessage=1
 							OMsg(defender, "<font color='red'>[defender]'s blood burns through all it comes in contact with!</font>")
-						src.AddBurn(val * (1 + defender.passive_handler.Get("MeltyBlood")), defender)
+						src.AddBurn(defender.HPToPct(val) * (1 + defender.passive_handler.Get("MeltyBlood")), defender)
 			if(defender.passive_handler.Get("VenomBlood"))
-				if(defender.Health<50*(1-src.HealthCut))
+				if(defender.HealthPct()<50*(1-src.HealthCut))
 					if(FightingSeriously(src,0))
 						if(!defender.VenomMessage)
 							defender.VenomMessage+=1
 							OMsg(defender, "<font color='red'>[defender]'s toxic blood sprays out!</font>")
-						src.AddPoison(val* (1 + defender.passive_handler.Get("VenomBlood")), defender)
+						src.AddPoison(defender.HPToPct(val)* (1 + defender.passive_handler.Get("VenomBlood")), defender)
 
 
 
@@ -451,28 +453,28 @@ mob
 
 					if(s)
 						if(s.Destructable)
-							s.startBreaking(val, breakTicks+shatterTier / ((duraBoon * SwordQuality) + duraBase), defender, src, "sword")
+							s.startBreaking(defender.HPToPct(val), breakTicks+shatterTier / ((duraBoon * SwordQuality) + duraBase), defender, src, "sword")
 					if(st)
 						if(st.Destructable)
-							st.startBreaking(val, breakTicks / ((duraBoon * StaffQuality) + duraBase), defender, src, "staff")
+							st.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * StaffQuality) + duraBase), defender, src, "staff")
 					if(ar)
 						if(ar.Destructable)
-							ar.startBreaking(val, breakTicks / ((duraBoon * ArmorQuality) + duraBase), defender, src, "armor")
+							ar.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * ArmorQuality) + duraBase), defender, src, "armor")
 
 					if(defender.EquippedSecondSword())
 						var/obj/Items/Sword/s2=defender.EquippedSecondSword()
 						var/Sword2Quality=min(s2.Ascended+defender.GetSwordAscension(),6)
 						if(s2&&s2.Destructable)
-							s.startBreaking(val, breakTicks / ((duraBoon * Sword2Quality) + duraBase), defender, src, "sword")
+							s.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * Sword2Quality) + duraBase), defender, src, "sword")
 					if(defender.EquippedThirdSword())
 						var/obj/Items/Sword/s3=defender.EquippedThirdSword()
 						var/Sword3Quality=min(s3.Ascended+defender.GetSwordAscension(),6)
 						if(s3&&s3.Destructable)
-							s.startBreaking(val, breakTicks / ((duraBoon * Sword3Quality) + duraBase), defender, src, "sword")
+							s.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * Sword3Quality) + duraBase), defender, src, "sword")
 
 			if(defender.HasLifeGeneration())
 				defender.HealHealth(defender.GetLifeGeneration()/glob.LIFE_GEN_DIVISOR * val)
-				if(defender.Health>=100-100*defender.HealthCut-defender.TotalInjury)
+				if(defender.Health>=defender.HealthCeiling())
 					defender.HealWounds((defender.GetLifeGeneration() / glob.LIFE_GEN_DIVISOR * glob.WOUND_RECOVERY_REDUCTION * val))
 			if(HasEnergyGeneration())
 				var/gen = GetEnergyGeneration()/glob.ENERGY_GEN_DIVISOR;
@@ -538,12 +540,12 @@ mob
 				if(defender.passive_handler.Get("VenomBlood"))
 					CursedBlood=1
 					Effectiveness+= defender.passive_handler.Get("VenomBlood")
-					src.AddPoison(val*Effectiveness,defender)
+					src.AddPoison(defender.HPToPct(val)*Effectiveness,defender)
 				if(defender.Secret=="Hamon")
-					src.AddBurn(val*Effectiveness*defender.secretDatum.currentTier)
+					src.AddBurn(defender.HPToPct(val)*Effectiveness*defender.secretDatum.currentTier)
 					val/=max(1,defender.secretDatum.currentTier)
 				if(!CursedBlood)
-					var/amtHeal = val*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness/100;
+					var/amtHeal = src.HPToPct(val)*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness/100;
 					if(src.passive_handler.Get("Undying Rage"))
 						src.LifeStolen=0
 					amtHeal*=1*((100-src.LifeStolen)/100)
@@ -558,20 +560,20 @@ mob
 					if(src.LifeStolen>=95)
 						src.LifeStolen=95
 					DEBUGMSG("[amtHeal] was healed by life steal");
-					if(src.Health>=(100-100*src.HealthCut-src.TotalInjury))
-						src.HealWounds(val*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness / 100 * glob.WOUND_RECOVERY_REDUCTION)
+					if(src.Health>=src.HealthCeiling())
+						src.HealWounds(src.HPToPct(val)*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness / 100 * glob.WOUND_RECOVERY_REDUCTION)
 			if(src.HasLifeStealTrue())
-				defender.AddHealthCut(val/200)
+				defender.AddHealthCut(defender.HPToPct(val)/200)
 				if(defender.HealthCut>=0.15)
 					defender.HealthCut=0.15
-				src.HealthCut-=(val/100)
+				src.HealthCut-=(defender.HPToPct(val)/100)
 				if(src.HealthCut<=0)
 					src.HealthCut=0
 			if(src.HasEnergySteal())
-				src.HealEnergy(val*(src.GetEnergySteal() / 100))
-				defender.LoseEnergy(val*(src.GetEnergySteal() / 100))
+				src.HealEnergy(defender.HPToPct(val)*(src.GetEnergySteal() / 100))
+				defender.LoseEnergy(defender.HPToPct(val)*(src.GetEnergySteal() / 100))
 			if(HasManaSteal())
-				var/value = val * (GetManaSteal() / 100)
+				var/value = defender.HPToPct(val) * (GetManaSteal() / 100)
 				HealMana(value)
 				defender.LoseMana(value)
 
@@ -596,35 +598,35 @@ mob
 				var/MRecov=defender.GetRecovMult()
 				var/RecovCap=Erosion
 				if(MPow>0)
-					defender.PowerEroded+=(BPCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.PowerEroded+=(BPCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.PowerEroded>BPCap)
 						defender.PowerEroded=BPCap
 				if(MStr>=1)
-					defender.StrEroded+=(StrCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.StrEroded+=(StrCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.StrEroded>StrCap)
 						defender.StrEroded=StrCap
 				if(MEnd>=1)
-					defender.EndEroded+=(EndCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.EndEroded+=(EndCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.EndEroded>EndCap)
 						defender.EndEroded=EndCap
 				if(MSpd>=1)
-					defender.SpdEroded+=(SpdCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.SpdEroded+=(SpdCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.SpdEroded>SpdCap)
 						defender.SpdEroded=SpdCap
 				if(MFor>=1)
-					defender.ForEroded+=(ForCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.ForEroded+=(ForCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.ForEroded>ForCap)
 						defender.ForEroded=ForCap
 				if(MOff>=1)
-					defender.OffEroded+=(OffCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.OffEroded+=(OffCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.OffEroded>OffCap)
 						defender.OffEroded=OffCap
 				if(MDef>=1)
-					defender.DefEroded+=(DefCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.DefEroded+=(DefCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.DefEroded>DefCap)
 						defender.DefEroded=DefCap
 				if(MRecov>=1)
-					defender.RecovEroded+=(RecovCap/glob.EROSION_RATE_DIVISOR)*val
+					defender.RecovEroded+=(RecovCap/glob.EROSION_RATE_DIVISOR)*defender.HPToPct(val)
 					if(defender.RecovEroded>RecovCap)
 						defender.RecovEroded=RecovCap
 
@@ -642,32 +644,32 @@ mob
 				var/MDef=defender.GetDefMult()
 				if(MStr>1)
 					if(src.StrStolen<(MStr-1))
-						src.StrStolen+=(((MStr-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.StrStolen+=(((MStr-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.StrStolen>(MStr-1))
 							src.StrStolen=(MStr-1)
 				if(MEnd>1)
 					if(src.EndStolen<(MEnd-1))
-						src.EndStolen+=(((MEnd-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.EndStolen+=(((MEnd-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.EndStolen>(MEnd-1))
 							src.EndStolen=(MEnd-1)
 				if(MSpd>1)
 					if(src.SpdStolen<(MSpd-1))
-						src.SpdStolen+=(((MSpd-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.SpdStolen+=(((MSpd-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.SpdStolen>(MSpd-1))
 							src.SpdStolen=(MSpd-1)
 				if(MFor>1)
 					if(src.ForStolen<(MFor-1))
-						src.ForStolen+=(((MFor-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.ForStolen+=(((MFor-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.ForStolen>(MFor-1))
 							src.ForStolen=(MFor-1)
 				if(MOff>1)
 					if(src.OffStolen<(MOff-1))
-						src.OffStolen+=(((MOff-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.OffStolen+=(((MOff-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.OffStolen>(MOff-1))
 							src.OffStolen=(MOff-1)
 				if(MDef>1)
 					if(src.DefStolen<(MDef-1))
-						src.DefStolen+=(((MDef-1)*glob.STAT_STEAL_RATE*Effective)*val)
+						src.DefStolen+=(((MDef-1)*glob.STAT_STEAL_RATE*Effective)*defender.HPToPct(val))
 						if(src.DefStolen>(MDef-1))
 							src.DefStolen=(MDef-1)
 

@@ -148,7 +148,7 @@ mob/proc/enterChrysalis()
 	// 2 OOC days in deciseconds: 2 * 24 * 60 * 60 * 10 = 1728000
 	ChrysalisExpiry = world.realtime + 1728000
 	// Prevent actual death — stabilize at 1 HP
-	Health = 1
+	SetHealthPct(1)
 	KO = 0
 	Dead = 0
 	MortallyWounded = 0
@@ -181,7 +181,7 @@ mob/proc/exitChrysalis(mob/breaker)
 	for(var/obj/ChrysalisShell/shell in src.loc)
 		if(shell.occupant == src)
 			del shell
-	Health = max(Health, 1)
+	SetHealthPct(max(HealthPct(), 1))
 	Conscious()
 	if(breaker)
 		// Breaker pays the cost — handle pacting consequences

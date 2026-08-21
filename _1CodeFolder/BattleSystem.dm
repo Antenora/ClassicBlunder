@@ -84,7 +84,7 @@ mob/proc/AngerFracAt(var/hp)
 	return last[2]
 
 mob/proc/AngerEvalHP(var/incoming=0)
-	return ((Health-incoming)/max(1-HealthCut,0.01))-AngerRush
+	return ((HealthPct()-incoming)/max(1-HealthCut,0.01))-AngerRush
 
 mob/proc/AngerCurveValue()
 	//the live multiplier the power calcs read. 1 = nothing going on
@@ -284,10 +284,10 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(P)
 		var/obj/Skills/Buffs/undying = FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Undying_Rage)
 		if(undying && !undying.Using)
-			Health = 0.1
+			SetHealthPct(0.1)
 			undying.Trigger(src ,TRUE)
 			return
-		if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP) //The Character will refuse to get downed until they reach (global) negative hp! (the global must be a negative variable, like -50)
+		if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP) //The Character will refuse to get downed until they reach (global) negative hp! (the global must be a negative variable, like -50)
 			if(!src.passive_handler.Get("Triple Helix"))
 				src.passive_handler.Set("Triple Helix", 1) // triple helix is just a flavor passive that tells the game to only play the message once
 				src.OMessage(15,"<font color=green><h2><big><b>... but just who the hell do you think they are?!</b></big></h2></font color>")
@@ -295,7 +295,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			return
 		if(!istype(src,/mob/Player/FevaSplits))
 			if(P.passive_handler["Undying Rage"])
-				P.Health += 2.5 + (glob.racials.UNDYINGRAGE_HEAL * P.AscensionsAcquired)
+				P.HealPct(2.5 + (glob.racials.UNDYINGRAGE_HEAL * P.AscensionsAcquired))
 			src.OMessage(15,"[src] is knocked out by [P]!","<font color=red>[src]([src.key]) is knocked out by [P]([P.key])")
 			if(FightingSeriously(P,0)||src.BPPoison<1||src.MortallyWounded)
 				src.KOBrutal=1
@@ -324,7 +324,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.HellspawnTimer=360
 		src.ForcedHellspawn=0
 		src.KO=0
-		src.Health=60
+		src.SetHealthPct(60)
 		src.TotalInjury=40
 		src.VaizardHealth+=30
 		src.OMessage(15,"...you thought it was over? You thought you had hope?","<font color=red>[src]([src.key]) awakens.")
@@ -335,7 +335,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.race.transformations[1].transform(src, TRUE)
 		src.OMessage(15,"<b>HOW INTERESTING THAT YOU CONTINUE TO MISUNDERSTAND WHAT'S AT STAKE HERE.</b>","<font color=red>[src]([src.key]) heralds the end..")
 		src.HellspawnBerserk=1
-		src.Health=30
+		src.SetHealthPct(30)
 		return
 	if((src.oozaru_type=="Demonic" && prob(CalamityOdds)&&src.transUnlocked==1&&!src.TheCalamity&&!src.CalamityCaused&&src.race.transformations[1].mastery==100)||(src.ForcedCalamity&&!src.CalamityCaused))
 		src.Revert()
@@ -346,7 +346,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		src.TheCalamity=1
 		src.CalamityCaused=1
 		sleep(30)
-		src.Health=100
+		src.SetHealthPct(100)
 		src.TotalInjury=0
 		world<<"<font color=red><b>Here, on this one fateful day...</b></font>"
 		src.race.transformations[1].transform(src, TRUE)
@@ -366,7 +366,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(src.GatesActive==8 && src.Gate8Getups<2)
 		src.KO=0
 		src.OMessage(15,"...but [src]'s youth is burning too bright to be stopped!","<font color=red>[src]([src.key]) remains standing in their celebration of youth!")
-		src.Health=1
+		src.SetHealthPct(1)
 		src.VaizardHealth+=30
 		src.HealthAnnounce10++
 		src.Gate8Getups++
@@ -383,7 +383,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		if(src.HealthAnnounce10<=1&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "...but [src] refused, reloading a quicksave.", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-			src.Health=15
+			src.SetHealthPct(15)
 			src.VaizardHealth+=15
 			src.HealthAnnounce10=2
 			return
@@ -391,7 +391,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		if(src.UnstoppableForceCounter<9&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "<b>But [src] is unwavering in their pursuit of victory.</b>", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-			src.Health=10
+			src.SetHealthPct(10)
 			src.HealthAnnounce10=10
 			src.UnstoppableForceCounter+=1
 			return
@@ -400,7 +400,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			if(prob((src.passive_handler.Get("Tenacity")*glob.TENACITY_GETUP_CHANCE)+10))
 				src.KO=0
 				src.OMessage(15, "...but [src] refused.", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
-				src.Health=10
+				src.SetHealthPct(10)
 				src.VaizardHealth+=20
 				src.HealthAnnounce10+=1
 				return
@@ -410,9 +410,9 @@ mob/proc/Unconscious(mob/P,var/text)
 				src.KO=0
 				src.OMessage(15, "...but [src] refuses to go down!", "<font color=red>[src]([src.key]) remains standing despite impossible odds!")
 				if(src.passive_handler.Get("Color of Courage"))
-					src.Health+=5
+					src.HealPct(5)
 				else
-					src.Health=5
+					src.SetHealthPct(5)
 				src.VaizardHealth+=clamp(passive_handler.Get("Tenacity")* glob.TENACITY_VAI_MULT, glob.TENACITY_VAI_MIN, glob.TENACITY_VAI_MAX) //actual clutch now.
 				src.HealthAnnounce10+=1
 				return
@@ -420,7 +420,7 @@ mob/proc/Unconscious(mob/P,var/text)
 		if(src.HealthAnnounce10<=2+RedTenacity&&FightingSeriously(P,src))
 			src.KO=0
 			src.OMessage(15, "[src] saw a world in which they lost, and starts to push just a little bit harder!", "<font color=red>[src]([src.key]) activates The Echo!")
-			src.Health=10
+			src.SetHealthPct(10)
 			src.VaizardHealth+=20
 			src.HealthAnnounce10+=3
 			return
@@ -429,7 +429,7 @@ mob/proc/Unconscious(mob/P,var/text)
 			if(prob(src.passive_handler.Get("Alter the Future")))
 				src.KO=0
 				src.OMessage(15, "...but [src] rewrites the future to prevent their defeat!", "<font color=red>[src]([src.key]) rewrites the future!")
-				src.Health=10
+				src.SetHealthPct(10)
 				src.passive_handler.Decrease("Alter the Future", 25)
 				src.VaizardHealth+=20
 				src.HealthAnnounce10+=1
@@ -437,47 +437,47 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(src.passive_handler.Get("SecondWind") == "Comeback")
 		if(src.HealthAnnounce10<=9)
 			if(prob(1))
-				var/HealthRecovery=P.Health/2
+				var/HealthRecovery=P.HealthPct()/2
 				src.KO=0
 				src.OMessage(15, "[src] reloads their last SAVE!", "<font color=red>[src]([src.key]) stages a miraculous comeback!!")
-				src.Health=HealthRecovery
-				P.Health+=HealthRecovery/2
+				src.SetHealthPct(HealthRecovery)
+				P.HealPct(HealthRecovery/2)
 				src.HealthAnnounce10+=1
 				return
 	if(src.race in list(HUMAN, CELESTIAL) && !src.isMazokuPathHuman())
 		if(src.transActive==1&&src.transUnlocked>=2)
 			src.KO=0
 			src.OMessage(15, "...<b>but [src] evolves one final time, pushing out every last bit of their potential!!!!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-			src.Health=5
+			src.SetHealthPct(5)
 			if(src.isRace(HUMAN))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/1.5
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/1.5
 			if(src.isRace(CELESTIAL))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/2
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/2
 			src.race.transformations[2].transform(src, TRUE)
 			src.Tension=100
 			return
 		if(src.transActive==2&&src.transUnlocked>=3)
 			src.KO=0
 			src.OMessage(15, "...<b>but [src] evolves one final time, pushing out every last bit of their potential!!!!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-			src.Health=5
+			src.SetHealthPct(5)
 			if(src.isRace(HUMAN))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/1.5
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/1.5
 			if(src.isRace(CELESTIAL))
-				src.VaizardHealth+=(P.Health+P.VaizardHealth)/2
+				src.VaizardHealth+=(P.HealthPct()+P.VaizardHealth)/2
 			src.race.transformations[3].transform(src, TRUE)
 			src.Tension=100
 			return
 	if(src.passive_handler.Get("DoubleHelix")&&src.transActive==4&&src.transUnlocked>=5&&src.CelestialAscension=="Demon")
 		src.KO=0
 		src.OMessage(15, "...<b>but [src] evolves one final time, drawing out the full might of their demonic ancestor!</b>", "<font color=red>[src]([src.key]) activates Unlimited High Tension!!!")
-		src.Health=10
+		src.SetHealthPct(10)
 		src.DoubleHelix=5
 		if(src.isRace(CELESTIAL))
 			src.VaizardHealth+=10;
 		src.race.transformations[5].transform(src, TRUE)
 		return
 	if(passive_handler["Undying Rage"])
-		Health = 0.1
+		SetHealthPct(0.1)
 		return
 	if(src.AwakeningSkillUsed)
 		src.AwakeningSkillUsed=0
@@ -497,10 +497,10 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.ChargingEnergy=0
 	src.Auraz("Remove")
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
-	src.DealWounds(src,20/max(src.GetRecov(2), 1))
+	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
 	src.icon_state="KO"
-	src.Health=1
+	src.SetHealthPct(1)
 	src.Energy=1
 	src.PowerControl=100
 	src.ClearFrenzyOnKO()
@@ -549,21 +549,22 @@ mob/proc/Unconscious(mob/P,var/text)
 			GatesActive=0
 	if(src.TotalInjury)
 		if(!src.HasInjuryImmune())
-			if(src.TotalInjury>=35&&src.TotalInjury<60&&src.BPPoison>=0.9)
+			var/inj = src.TotalInjury / (1 + src.GetVit(glob.VIT_INJURY_SOFTEN))
+			if(inj>=35&&inj<60&&src.BPPoison>=0.9)
 				var/Time=RawHours(1)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
 					src.BPPoisonTimer=Time
 				src.BPPoison=0.9
 				src.OMessage(10, "[src] has been lightly wounded!", "[src]([src.key]) has over 35% injury.")
-			if(src.TotalInjury>=60&&src.BPPoison>=0.7)
+			if(inj>=60&&src.BPPoison>=0.7)
 				var/Time=RawHours(3)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
 					src.BPPoisonTimer=Time
 				src.BPPoison=0.7
 				src.OMessage(10, "[src] has been heavily wounded!", "[src]([src.key]) has over 50% injury.")
-			if(src.TotalInjury>=85)
+			if(inj>=85)
 				var/Time=RawHours(4)
 				Time/=src.GetRecov()
 				if(Time > BPPoisonTimer)
@@ -610,21 +611,21 @@ mob/proc/Conscious()
 
 		if(src.KOBrutal)
 			src.KOBrutal=0
-			src.Health=1
+			src.SetHealthPct(1)
 			src.Energy=EnergyMax/100
 		if(src.passive_handler.Get("Our Future"))
 			src.KOBrutal=0
-			src.Health=100
+			src.SetHealthPct(100)
 			src.Energy=src.EnergyMax
 			src.TotalInjury/=2
 			src.TotalFatigue/=2
 			src.OMessage(15,"<font color='green'><b>[src] refuses to let fate get the better of them!!!</b></font color>","<font color=blue>[src]([src.key]) regains consciousness.")
 		else if(src.passive_handler.Get("SecondWind") == "Hope")
-			src.Health=30
+			src.SetHealthPct(30)
 			src.Energy=EnergyMax/2
 			src.OMessage(15,"[src] is ready for another go.","<font color=blue>[src]([src.key]) regains consciousness.")
 		else
-			src.Health=15
+			src.SetHealthPct(15)
 			src.Energy=EnergyMax/5
 
 		if(isplayer(src))
@@ -645,7 +646,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.KO=0
 		src.icon_state=""
 		src.HealWounds(99999)
-		src.Health = 25
+		src.SetHealthPct(25)
 		src.MaxEnergy()
 		src.MaxMana()
 		spawn() src.MajinCheatDeathReformFX()
@@ -661,7 +662,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.TsukiyomiTime=1
 		src.KOTimer=0
 		src.KO=0
-		src.Health=100
+		src.SetHealthPct(100)
 		src.Energy=src.EnergyMax
 		return
 	if(isplayer(src))
@@ -1229,12 +1230,13 @@ mob/proc/Leave_Body(var/SuperDead=0, var/ForceVoid=0)
 	src.Stunned=0
 	A.Body=Body
 	if(1>=ForceVoid)
-		A.Health=1000
+		A.SetHealthPct(1000)
 	A.EnergyMax=src.EnergyMax
 	A.Energy=src.Energy
 	A.Power=src.Power
 	A.StrMod=src.GetStr()
 	A.EndMod=src.GetEnd()
+	A.VitMod=src.GetVit()
 	A.ForMod=src.GetFor()
 	A.Target=src
 	A.icon=src.icon
@@ -1355,7 +1357,7 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 				damageMatrix["[result]"]++
 				if(Target.KO)
 					Target.Conscious()
-				Target.Health=100
+				Target.SetHealthPct(100)
 				Target.Energy=Target.EnergyMax
 				Target.Burn=0
 				Target.SilentBurnAmount=0
@@ -1395,7 +1397,7 @@ The average damage was [average] over [looplength] times.
 			damageMatrix["[result]"]++
 			if(Target.KO)
 				Target.Conscious()
-			Target.Health=100
+			Target.SetHealthPct(100)
 			Target.Energy=Target.EnergyMax
 			Target.Burn=0
 			Target.SilentBurnAmount=0
@@ -1657,10 +1659,10 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 			break
 
 mob/proc/SpeedDelay(var/Modifier=1)
-	var/Spd=src.GetSpd()**glob.ATTACK_DELAY_EXPONENT
+	var/Spd=(src.GetSpd()+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT
 	var/Delay=glob.ATTACK_DELAY_DIVISOR/Spd
 	if(passive_handler["Speed Force"])
-		Delay = glob.ATTACK_DELAY_DIVISOR/(GetSpd()*glob.SPEED_FORCE_DELAYMULT)
+		Delay = glob.ATTACK_DELAY_DIVISOR/((GetSpd()*glob.SPEED_FORCE_DELAYMULT+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT)
 	// Inevitable (Makyo)
 	Delay += passive_handler.Get("Inevitable")
 	if(Delay>=glob.ATTACK_DELAY_MAX)
@@ -1693,7 +1695,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 			continue
 	Distance*=(gatherKBMods())
 	Distance*=1+src.GetStr(glob.STR_KB_RATE) //muscle sends harder
-	Distance/=1+P.GetStr(glob.STR_KB_RATE) //and stays planted
+	Distance/=1+P.GetVit(glob.VIT_KB_RATE) //mass stays planted
 	Distance*=getKnockbackMultiplier(P) // gets the knockback multiplier(reduction) for the target
 	if(!Forced)
 		if(P.is_dashing)

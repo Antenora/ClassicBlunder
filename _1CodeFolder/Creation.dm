@@ -1098,12 +1098,14 @@ mob/proc
 		LOL.setRace(race, TRUE)
 		LOL.StrMod=src.StrMod
 		LOL.EndMod=src.EndMod
+		LOL.VitMod=src.VitMod
 		LOL.SpdMod=src.SpdMod
 		LOL.ForMod=src.ForMod
 		LOL.OffMod=src.OffMod
 		LOL.DefMod=src.DefMod
 		LOL.StrengthInvest=src.StrengthInvest
 		LOL.EnduranceInvest=src.EnduranceInvest
+		LOL.VitalityInvest=src.VitalityInvest
 		LOL.SpeedInvest=src.SpeedInvest
 		LOL.ForceInvest=src.ForceInvest
 		LOL.OffenseInvest=src.OffenseInvest

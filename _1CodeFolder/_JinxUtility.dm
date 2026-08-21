@@ -77,11 +77,11 @@ mob
 				var/clamped = clamp(persistence, glob.PRESISTENCE_DIVISOR_MIN, glob.PRESISTENCE_DIVISOR_MAX)
 				WoundSelf(val/clamped)
 				val = 0
-			src.Health-=val
+			src.Health-=src.PctToHP(val)
 			if(src.CursedWounds())
 				src.WoundSelf(val)
 			if(src.Health<=0&&!src.KO)
-				if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP)
+				if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
 					return
 				if(src.Burn&&src.Poison)
 					src.Unconscious(null, "succumbing to terrible pain!")
@@ -92,6 +92,7 @@ mob
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
+			val = defender.HPToPct(val)
 			if(defender.CyberCancel)
 				val*=(1-defender.CyberCancel)
 			if(defender.BioArmor)
@@ -147,9 +148,9 @@ mob
 			src.MaxHealth()
 			var/Absorb = passive_handler.Get("AbsorbingDamage")
 			if(passive_handler["Grit"])
-				AdjustGrit("add", val*glob.racials.GRITMULT)
+				AdjustGrit("add", HPToPct(val)*glob.racials.GRITMULT)
 			if(Absorb)
-				AbsorbingDamage += val
+				AbsorbingDamage += HPToPct(val)
 			if(isRace(MAJIN))
 				if(majinPassive != null)
 					majinPassive.tryDropBlob(src)
@@ -176,13 +177,13 @@ mob
 					*/
 			var/PrideDrain
 			if(passive_handler.Get("Pride"))
-				PrideDrain=(100-Health)*0.01
+				PrideDrain=(100-HealthPct())*0.01
 				if(PrideDrain>1)
 					PrideDrain=1
 				if(PrideDrain<0.01)
 					PrideDrain=0.01
 				val*=PrideDrain
-				if(src.Health>=85&&!passive_handler.Get("PowerStressed"))
+				if(src.HealthPct()>=85&&!passive_handler.Get("PowerStressed"))
 					val*=0
 			//Mender refunds half the energy as mana - after the reduction mults so it tracks what actually got paid
 			if(val > 0 && src.hasMagePassive(/mage_passive/light/Mender))
@@ -285,9 +286,9 @@ mob
 				if(src.transUnlocked<6)
 					val = 0
 			if(passive_handler["InverseHealing"])
-				DoDamage(src, val)
+				DoDamage(src, src.PctToHP(val))
 				return
-			src.Health+=val
+			src.Health+=src.PctToHP(val)
 			src.MaxHealth()
 			/* This shit is disabled for now because wtf
 			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
@@ -359,11 +360,28 @@ mob
 			if(src.TotalCapacity<=0)
 				src.TotalCapacity=0
 			src.MaxMana()
+		MaxHP()
+			return glob.HP_PER_VIT*(src.GetVit()+glob.HP_STAT_BASE)
+		HealthCeiling()
+			var/HasWounds=1
+			if(src.HasUnstoppable())
+				HasWounds=0
+			return src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)*(1-src.HealthCut)
+		HealthPct()
+			return src.Health/src.MaxHP()*100
+		HPToPct(val)
+			return val/src.MaxHP()*100
+		PctToHP(pct)
+			return pct/100*src.MaxHP()
+		SetHealthPct(pct)
+			src.Health=src.PctToHP(pct)
+		HealPct(pct)
+			src.Health+=src.PctToHP(pct)
 		MaxHealth()
 			var/HasWounds=1
 			if(src.HasUnstoppable())
 				HasWounds=0
-			var/KeyHealth=100-(src.TotalInjury*HasWounds)
+			var/KeyHealth=src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)
 			var/Sub
 			var/Cut
 			if(src.HealthCut)
@@ -626,6 +644,10 @@ mob
 			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
+		BaseVit()
+			var/Ascended=src.VitAscension+src.DetermineAscension("Vitality")
+			var/Invested=src.VitalityInvest*glob.progress.STAT_PER_POINT
+			return src.VitMod+Ascended+Invested
 		HandleEldritchTax()
 			var/TaxVal=glob.racials.FULL_MANIFESTATION_TAX/glob.racials.FULL_MANIFESTATION_TAX_DIVISOR
 			if(passive_handler.Get("Full Manifestation")&&AscensionsAcquired<5)
@@ -733,7 +755,7 @@ mob
 
 			// PrideFactor (uncapped; other sin bonuses stay capped at 3 unless Limited Rank-Up)
 			if(passive_handler && passive_handler.Get("PrideFactor") && Target && istype(Target, /mob/Players))
-				var/healthDiff = Health - Target.Health
+				var/healthDiff = HealthPct() - Target.HealthPct()
 				if(healthDiff > 0)
 					var/steps = round(healthDiff / 10)
 					if(steps > 0) pride_bonus = 0.25 * steps * passive_handler.Get("PrideFactor")
@@ -1007,8 +1029,8 @@ mob
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
-				if(src.Health <= threshold)
-					var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
@@ -1019,7 +1041,7 @@ mob
 					var/den2 = 0 - minhp //normalization of range
 					if(den2 <= 0)
 						den2 = 1
-					var/t2 = (0 - src.Health) / den2
+					var/t2 = (0 - src.HealthPct()) / den2
 					t2 = max(0, min(t2, 1))
 					var/extra_max_bonus = 1.0
 					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
@@ -1189,8 +1211,8 @@ mob
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
-				if(src.Health <= threshold)
-					var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
@@ -1201,7 +1223,7 @@ mob
 					var/den2 = 0 - minhp //normalization of range
 					if(den2 <= 0)
 						den2 = 1
-					var/t2 = (0 - src.Health) / den2
+					var/t2 = (0 - src.HealthPct()) / den2
 					t2 = max(0, min(t2, 1))
 					var/extra_max_bonus = 1.0
 					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
@@ -1352,8 +1374,8 @@ mob
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
-				if(src.Health <= threshold)
-					var/hp_safe = max(src.Health, 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
+				if(src.HealthPct() <= threshold)
+					var/hp_safe = max(src.HealthPct(), 0.001) //this takes either health, or 0.001 to avoid negative values for the first stage
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
@@ -1364,7 +1386,7 @@ mob
 					var/den2 = 0 - minhp //normalization of range
 					if(den2 <= 0)
 						den2 = 1
-					var/t2 = (0 - src.Health) / den2
+					var/t2 = (0 - src.HealthPct()) / den2
 					t2 = max(0, min(t2, 1))
 					var/extra_max_bonus = 1.0
 					Mod += extra_max_bonus * t2 //No cap this time, you get the "full bonus" once you get your ass knocked down, which essentially means you keep getting stronger as you near knockdown
@@ -1817,6 +1839,12 @@ mob
 				Def=0.1
 			return Def
 
+		GetVit(var/Mult=1)
+			var/Vit=src.BaseVit()
+			Vit*=Mult
+			if(Vit<0.1)
+				Vit=0.1
+			return Vit
 		GetRecov(var/Mult=1)
 			var/Recov=src.RecovMod
 			Recov+=src.RecovAscension
@@ -1838,8 +1866,8 @@ mob
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves"))
-				if(src.Health<=25*(1-src.HealthCut))
-					var/thisVar = 10/Health < 0 ? 0.1 : 10/Health
+				if(src.HealthPct()<=25*(1-src.HealthCut))
+					var/thisVar = 10/HealthPct() < 0 ? 0.1 : 10/HealthPct()
 					Mod+=thisVar
 			if(src.RecovEroded)
 				Mod-=src.RecovEroded
@@ -1884,7 +1912,7 @@ mob
 					spawn(100)
 						del s
 			if(src.passive_handler.Get("Determination(Black)"))
-				AngerTotal+=(50*src.SagaLevel)-src.Health
+				AngerTotal+=(50*src.SagaLevel)-src.HealthPct()
 			else
 				AngerTotal=0
 			src.AngerAdd=AngerTotal

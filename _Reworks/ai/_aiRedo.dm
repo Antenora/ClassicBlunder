@@ -149,10 +149,10 @@ mob/Player/AI/proc/Idle()
 		if(Target)
 			if(!fleeing)
 				Chase()
-			else if(Health <= 5)
+			else if(HealthPct() <= 5)
 				Flee()
 		else //move aboe to something else and keep this as just idling, right now it is handling everything
-			if(Health <= 5 &&!(Health >= 25))
+			if(HealthPct() <= 5 &&!(HealthPct() >= 25))
 				Rest()
 			else if(ai_hostility >= 2)
 				Wander()
@@ -390,12 +390,12 @@ mob/Player/AI/proc/Attack(t)
 
 mob/Player/AI/proc/Rest()
 	ai_state = "Rest"
-	if(Health >= 75*(1-src.HealthCut))
+	if(HealthPct() >= 75*(1-src.HealthCut))
 		ai_state = "Idle"
 		Idle()
 	else
 		icon_state = "Meditate"
-		Health += (rand(0,2)/10) * RecovMod
+		HealPct((rand(0,2)/10) * RecovMod)
 
 mob/Player/AI/proc/Flee()
 	ai_state = "Flee"
@@ -411,7 +411,7 @@ mob/Player/AI/proc/Flee()
 			step_away(src, Target, 20, PmActive() ? 0 : 32 * (5 / (AI_SPEED_TOTAL * (AI_MOVE_SPEED))))
 			dir = get_dir(Target,src)
 			next_move = world.time + 1
-	if(!Target.WindingUp&&!Target.AutoHitting&&Health>5)
+	if(!Target.WindingUp&&!Target.AutoHitting&&HealthPct()>5)
 		fleeing = FALSE
 		Chase()
 

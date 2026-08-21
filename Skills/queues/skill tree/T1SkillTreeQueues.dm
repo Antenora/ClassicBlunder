@@ -6,7 +6,7 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				HitMessage="delivers a destructive one handed strike!!"
-				DamageMult=2.35
+				DamageMult=3.9
 				AccuracyMult = 1.1
 				MenuIcon="Ikkotsu"
 				Duration=5
@@ -24,7 +24,7 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				HitMessage="delivers a vicious uppercut!!"
-				DamageMult=2.7
+				DamageMult=4.5
 				AccuracyMult = 1.15
 				Launcher=3
 				QueueWindup=8
@@ -45,7 +45,7 @@ obj
 				ActiveMessage="punches with precisely articulated strikes to create whirlwind-like pull!"
 				name="Dempsey Roll"
 				MenuIcon="DempseyRoll"
-				DamageMult=0.55
+				DamageMult=0.9
 				AccuracyMult = 1.15
 				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Bob_and_Weave"
 				Determinator=1
@@ -71,7 +71,7 @@ obj
 				Copyable=2
 				ActiveMessage="strikes with cyclone power!"
 				name="Corkscrew Blow"
-				DamageMult=2.25
+				DamageMult=3.75
 				WoundRider=0.4
 				MenuIcon="CorkscrewBlow"
 				AccuracyMult = 1.15
@@ -94,7 +94,7 @@ obj
 				AlwaysAnnounceCooldown = 1
 				name="Kinshasa"//Skill name displayed in message.
 				HitMessage="builds up speed and knees their target in the face!!"
-				DamageMult=1.65
+				DamageMult=2.75
 				AccuracyMult = 1.15
 				Duration=6
 				SpeedStrike=3
@@ -129,7 +129,7 @@ obj
 				Copyable=2
 				name="Piston Kick"//Skill name displayed in message.
 				HitMessage="launches a shattering front kick with their heel!"
-				DamageMult=4.25
+				DamageMult=7
 				Shattering = 12
 				MenuIcon="PistonKick"
 				HarderTheyFall=0.5
@@ -151,7 +151,7 @@ obj
 			Cripple
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=2.25
+				DamageMult=3.75
 				AccuracyMult = 1.15
 				Duration=5
 				MenuIcon="Cripple"
@@ -168,7 +168,7 @@ obj
 			Pin
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=1.3
+				DamageMult=2.15
 				AccuracyMult = 1.15
 				Instinct=2
 				Grapple=1
@@ -192,7 +192,7 @@ obj
 				NewCopyable=2
 				SkillCost=80
 				Copyable=3
-				DamageMult=0.5
+				DamageMult=0.85
 				AccuracyMult = 1.175
 				MenuIcon="LightRush"
 				Duration=5
@@ -222,7 +222,7 @@ obj
 				name="Burst Combination"
 				SkillCost=80
 				Copyable=3
-				DamageMult=0.25
+				DamageMult=0.4
 				MenuIcon="BurstCombination"
 				StrScaling=0.5
 				ForScaling=0.5
@@ -245,7 +245,7 @@ obj
 			Sword_Clinch
 				SkillCost=TIER_1_COST
 				Copyable=2
-				DamageMult=1.45
+				DamageMult=2.4
 				AccuracyMult = 1.15
 				Instinct=2
 				Grapple=1

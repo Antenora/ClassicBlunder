@@ -660,7 +660,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 							spawn()animate(B.client, color = null, time = 3)
 					Z.Cooldown()
 				else
-					if(src.Health<20/Z.Mastery)
+					if(src.HealthPct()<20/Z.Mastery)
 						src << "You haven't the vitality to stop time..."
 						return
 					for(var/mob/E in hearers(12,src))
@@ -688,7 +688,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 			if("Chaos Control")
 				if(Z.Using)
 					return
-				if(src.Health<20/max(Z.Mastery,1))
+				if(src.HealthPct()<20/max(Z.Mastery,1))
 					src << "You haven't the vitality to invoke chaos control..."
 					return
 				Z.Using = 1
@@ -747,7 +747,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 						view(src)<<"[src] heals [P]"
 						if(src.Imagination<=1)
 							src.LoseEnergy(50)
-						src.LoseHealth(25)
+						src.LoseHealth(src.PctToHP(25))
 						if(P.KO)
 							P.Conscious()
 						P.Sheared=0
@@ -1168,7 +1168,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					return
 				if(!src.KO)
 					for(var/mob/P in get_step(src,dir))
-						P.HealHealth(src.Health/2*src.Imagination)
+						P.HealHealth(src.HealthPct()/2*src.Imagination)
 						P.HealEnergy(src.Energy/2*src.Imagination)
 						P.BPPoison+=((src.Power/src.GetPowerUpRatio())/(P.Power/P.GetPowerUpRatio()))
 						P.BPPoisonTimer=RawMinutes(5*src.Imagination)

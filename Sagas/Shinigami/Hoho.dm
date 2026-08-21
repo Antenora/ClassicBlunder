@@ -214,11 +214,11 @@ mob/Player/HohoClone
 		src.name = User.name
 		src.dir = User.dir
 		src.owner = User
-		src.Health = User.Health
+		src.SetHealthPct(User.HealthPct())
 		src.VaizardHealth = User.VaizardHealth
 		spawn(0)
 			while(src && src.loc && !fading && owner && owner.loc)
-				src.Health = owner.Health
+				src.SetHealthPct(owner.HealthPct())
 				src.VaizardHealth = owner.VaizardHealth
 				sleep(1)
 

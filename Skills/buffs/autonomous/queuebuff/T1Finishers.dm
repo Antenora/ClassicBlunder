@@ -18,7 +18,7 @@
             damage2do *= clamp((15*Level)/100, 0.1, 1)// applier's style tier
             damage2do /= DefReduction
             OMsg(User, "[User]'s Death Mark implodes!")
-            User.LoseHealth(damage2do)
+            User.LoseHealth(User.PctToHP(damage2do))
         ..()
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher

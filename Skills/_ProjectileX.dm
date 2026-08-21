@@ -404,7 +404,7 @@ obj
 				AttackReplace=1
 				Blasts=1
 				Distance=7
-				DamageMult=0.25
+				DamageMult=0.4
 				AccMult=30
 				Dodgeable=0
 				Speed=0
@@ -1276,7 +1276,7 @@ obj
 				Distance=15
 				MenuIcon="StraightSiege"
 				AccMult=0.75
-				DamageMult=0.15
+				DamageMult=0.2
 				Speed = 0.75
 				Knockback=0
 				KBRamp=0.35
@@ -1296,7 +1296,7 @@ obj
 				FocusShifter=1
 				FocusShiftBoost=1.5
 				MenuIcon="FlareWave"
-				DamageMult=1.4
+				DamageMult=2.35
 				Knockback=3
 				Radius=2
 				NoGCD=1
@@ -1317,7 +1317,7 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=20
-				DamageMult=1.15
+				DamageMult=1.9
 				AccMult=2
 				Crippling=3
 				MenuIcon="DeathBeam"
@@ -1445,7 +1445,7 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=50
-				DamageMult=0.35
+				DamageMult=0.6
 				MultiHit=3
 				AccMult=25
 				Radius=2
@@ -1469,7 +1469,7 @@ obj
 				SkillCost=TIER_1_COST
 				Copyable=2
 				Distance=50
-				DamageMult=0.9 // this shit ass, if u land it u deserve to do damage
+				DamageMult=1.5 // this shit ass, if u land it u deserve to do damage
 				ComboMaster=1
 				EnergyCost=1
 				Deflectable=0
@@ -1529,7 +1529,7 @@ obj
 				Distance=20
 				Stunner=0.8
 				Deflectable = FALSE
-				DamageMult=0.6
+				DamageMult=1
 				WarpUser=1
 				FollowUp="/obj/Skills/AutoHit/Warp_Storm"
 				FollowUpDelay=-1
@@ -1566,7 +1566,7 @@ obj
 				SkillCost=80
 				Copyable=3
 				Blasts=12
-				DamageMult=0.15
+				DamageMult=0.25
 				Radius=1
 				AccMult=3
 				Deflectable=0
@@ -1632,7 +1632,7 @@ obj
 			Stealth_Bomb
 				SkillCost=TIER_2_COST
 				Copyable=3
-				DamageMult=2.15
+				DamageMult=3.05
 				Knockback=3
 				Radius=1
 				AccMult=2
@@ -1660,7 +1660,7 @@ obj
 				SkillCost=TIER_2_COST
 				Copyable=3
 				Launcher=3
-				DamageMult=1.2
+				DamageMult=2.85
 				Knockback=0
 				AccMult=50
 				FocusShifter=1
@@ -2557,7 +2557,7 @@ obj
 				EndEffectiveness=1
 				Knockback=10
 				MultiHit=1
-				DamageMult=0.12
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=1
 				Distance=10
@@ -2580,7 +2580,7 @@ obj
 				ForScaling=0.5
 				Knockback=5
 				MultiHit=1
-				DamageMult=0.12
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=0
 				Distance=8
@@ -2604,7 +2604,7 @@ obj
 				ForScaling=0.5
 				Knockback=5
 				MultiHit=1
-				DamageMult=0.12
+				DamageMult=0.2
 				AccMult = 1.25
 				Deflectable=0
 				Distance=8
@@ -2658,7 +2658,7 @@ obj
 					if(!T || !ismob(T) || T == usr)
 						usr << "<font color='red'>You need a target to execute.</font>"
 						return
-					if(T.Health >= 40)
+					if(T.HealthPct() >= 40)
 						usr << "<font color='red'>[T] is not weakened enough to execute - below 40% health only.</font>"
 						return
 					usr.UseProjectile(src)
@@ -2990,7 +2990,7 @@ obj
 				ActiveMessage="unleashes a storm of stardust channeled from the depths of space!"
 				verb/Stardust_Revolution()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3032,7 +3032,7 @@ obj
 				ActiveMessage="unleashes an eruption of power on galactic scale!"
 				verb/Galaxian_Explosion()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3071,7 +3071,7 @@ obj
 				verb/Praesepe_Demonic_Blue_Flames()
 					set category="Skills"
 					set name="Sekishiki Kisoen"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3151,7 +3151,7 @@ obj
 				Variation=8
 				verb/Scarlet_Needle()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3211,7 +3211,7 @@ obj
 				ActiveMessage="casts a handful of poisonous crimson roses at their target!"
 				verb/Royal_Demon_Rose()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -3249,7 +3249,7 @@ obj
 				ActiveMessage="roars their Cosmos across their wings into a brilliant display of light towards their enemy!"
 				verb/Light_Impulse()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.UseProjectile(src)
@@ -4395,7 +4395,7 @@ obj
 					density=1
 					StrScaling=1
 					ForScaling=0
-					DamageMult=1
+					DamageMult=0.0286
 					AccMult=2
 					BeamTime=5
 					Distance=5
@@ -4412,7 +4412,7 @@ obj
 				//relic
 				BeamPunchProjectile
 					CritEffectiveness=0
-					DamageMult=1
+					DamageMult=0.0286
 					Dodgeable=0
 					Knockback=2
 					BeamTime=20
@@ -4428,7 +4428,7 @@ obj
 					SkillCost=120
 					Copyable=3
 					Distance=30
-					DamageMult=3
+					DamageMult=0.0857
 					ChargeRate=1.5
 					Knockback=1
 					BeamTime=20
@@ -4445,7 +4445,7 @@ obj
 					Copyable=4
 					MenuIcon="EraserGun"
 					Distance=50
-					DamageMult=0.4
+					DamageMult=0.55
 					ChargeRate=0.2
 					HeldVulnerability=0.25
 					Knockback=1
@@ -4467,7 +4467,7 @@ obj
 					Copyable=4
 					Distance=15
 					MenuIcon="ShineRay"
-					DamageMult=0.14
+					DamageMult=0.2
 					ChargeRate=0.2
 					Knockback=0
 					BeamTime=10
@@ -4495,7 +4495,7 @@ obj
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
-					DamageMult=0.2
+					DamageMult=0.3
 					MenuIcon="GammaRay"
 					ChargeRate=0.2
 					Distance=50
@@ -4517,7 +4517,7 @@ obj
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
-					DamageMult=0.4
+					DamageMult=0.55
 					MenuIcon="PiercerRay"
 					Distance=50
 					ChargeRate=0.2
@@ -4540,7 +4540,7 @@ obj
 //T5 has damage mult 5, usually. Divine_Atonement moved to Races/Makaioshins/MakaioshinRacials.dm
 				The_Original_Kamehameha
 					CritEffectiveness=0
-					DamageMult=2
+					DamageMult=0.0571
 					ChargeRate = 8
 					Dodgeable = 0
 					IconLock='BeamKHH.dmi'
@@ -4690,7 +4690,7 @@ obj
 //FUSION TECH
 				Galic_Kamehameha
 					CritEffectiveness=0
-					DamageMult=8
+					DamageMult=0.2286
 					ChargeRate=3
 					IconLock='BeamGKH.dmi'
 					ChargeIcon=1
@@ -4708,7 +4708,7 @@ obj
 						AttackReplace=1
 						CosmoPowered=1
 						EndEffectiveness=0.25
-						DamageMult=21
+						DamageMult=0.6
 						MultiHit=4
 						BeamTime=7
 						Immediate=1
@@ -4734,7 +4734,7 @@ obj
 						CosmoPowered=1
 						StrScaling=1
 						EndEffectiveness=0.25
-						DamageMult=21
+						DamageMult=0.6
 						BeamTime=15
 						Dodgeable=0
 						Deflectable=0
@@ -4761,7 +4761,7 @@ obj
 						density=1
 						StrScaling=0.75
 						ForScaling=0.75
-						DamageMult=6
+						DamageMult=0.1714
 						Speed=1
 						AccMult = 1.15
 						Crippling = 5
@@ -4875,7 +4875,7 @@ obj
 						AttackReplace=1
 						StrScaling=1
 						ForScaling=1
-						DamageMult=12
+						DamageMult=0.3429
 						BeamTime=50
 						Immediate=1
 						ComboMaster=0
@@ -4891,7 +4891,7 @@ obj
 //FUSION TECHS
 					Final_Kamehameha
 						CritEffectiveness=0
-						DamageMult=15
+						DamageMult=0.4286
 						ChargeRate=4
 						Distance=150
 						IconLock='BeamKHH.dmi'
@@ -4907,7 +4907,7 @@ obj
 						AttackReplace=1
 						Area="Blast"
 						Charge=1
-						DamageMult=16
+						DamageMult=0.4571
 						Speed=0
 						Knockback=30
 						Piercing=1
@@ -4931,7 +4931,7 @@ obj
 							GodPowered=0.25
 							Stream=2
 							EndEffectiveness=1
-							DamageMult=10
+							DamageMult=0.2857
 							ChargeRate=2.5
 							Knockback=0
 							Radius=0
@@ -4954,14 +4954,14 @@ obj
 							Cooldown=150
 							verb/Aurora_Execution()
 								set category="Skills"
-								if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+								if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 									usr << "You can't use this technique except when in a dire pinch!"
 									return
 								usr.UseProjectile(src)
 						Beam_of_Libra
 							UnarmedOnly=1
 							GodPowered=0.25
-							DamageMult=9
+							DamageMult=0.2571
 							StrScaling=1
 							ForScaling=0
 							EndEffectiveness=1
@@ -4983,7 +4983,7 @@ obj
 								usr.UseProjectile(src)
 					Weapon_Soul
 						Excalibur
-							DamageMult=9
+							DamageMult=0.2571
 							ChargeRate=5
 							StrScaling=1
 							ForScaling=1
@@ -4999,7 +4999,7 @@ obj
 								usr.UseProjectile(src)
 					Jagan
 						Dragon_of_the_Darkness_Flame
-							DamageMult=7
+							DamageMult=0.2
 							ChargeRate=3
 							StrScaling=1
 							ForScaling=1
@@ -5020,7 +5020,7 @@ obj
 								usr.UseProjectile(src)
 					Vaizard
 						Cero
-							DamageMult=15
+							DamageMult=0.4286
 							ChargeRate=0.5
 							Cooldown=150
 							ManaCost=10
@@ -5036,7 +5036,7 @@ obj
 					Eight_Gates
 						Daytime_Tiger
 							UnarmedOnly=1
-							DamageMult=4
+							DamageMult=0.1143
 							StrScaling=1
 							ForScaling=0
 							EndEffectiveness=1
@@ -5051,7 +5051,7 @@ obj
 							LockY=-16
 							Cooldown=10800
 							adjust(mob/p)
-								DamageMult = 4 + (p.SagaLevel * 1)
+								DamageMult = (4 + (p.SagaLevel * 1)) / 35
 								Cooldown = 240 - (p.SagaLevel * 15)
 							verb/Daytime_Tiger()
 								set category="Skills"
@@ -5060,7 +5060,7 @@ obj
 						Denjin_Hadookie
 							ManaCost=100
 							UnarmedOnly=1
-							DamageMult=6
+							DamageMult=0.1714
 							ChargeRate=3
 							StrScaling=1
 							ForScaling=1
@@ -5285,7 +5285,7 @@ mob
 				if(Z.MultiShots==0)
 					if(!Z.AllOutAttack)
 						if(Z.HealthCost)
-							if(src.Health<Z.HealthCost*glob.WorldDamageMult)
+							if(src.HealthPct()<Z.HealthCost*glob.WorldDamageMult)
 								return 0
 						if(Z.WoundCost)
 							if(src.TotalInjury+Z.WoundCost*glob.WorldDamageMult>99)
@@ -5320,7 +5320,7 @@ mob
 								return FALSE
 
 			if(Z.NeedsHealth)
-				if(src.Health > Z.NeedsHealth*(1-src.HealthCut))
+				if(src.HealthPct() > Z.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Z] before you're below [Z.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Z.NeedsSword)
@@ -5797,7 +5797,7 @@ mob
 					if(Z.TempSize)
 						Z.TempSize=0
 					if(Z.HealthCost)
-						src.DoDamage(src, Z.HealthCost*glob.WorldDamageMult/Drain)
+						src.DoDamage(src, src.PctToHP(Z.HealthCost*glob.WorldDamageMult/Drain))
 					if(Z.WoundCost)
 						src.WoundSelf(Z.WoundCost*glob.WorldDamageMult/Drain)
 					if(Z.EnergyCost)
@@ -5841,7 +5841,7 @@ mob
 				else
 					if(Z.Charging==0&&src.BeamCharging==0)
 						if(Z.HealthCost)
-							src.DoDamage(src, Z.HealthCost*glob.WorldDamageMult/Drain)
+							src.DoDamage(src, src.PctToHP(Z.HealthCost*glob.WorldDamageMult/Drain))
 						if(Z.WoundCost)
 							src.WoundSelf(Z.WoundCost*glob.WorldDamageMult/Drain)
 						if(Z.EnergyCost)
@@ -6416,7 +6416,7 @@ obj
 							accmult *= itemMods[2]
 						var/deflectMult = 1
 						if(!a:Stasis)
-							if(a:aisArmed()&&src.Dodgeable>0)
+							if(a:aisArmed()&&src.Dodgeable>0&&src.Area!="Beam")
 								if(src.Area=="Beam") BeamDbg("BAIL ais dodge")
 								var/dir=get_dir(src,a)
 								a:aisConsume()
@@ -6613,7 +6613,7 @@ obj
 						if(Bounce)
 							Damage *= max(1-glob.BOUNCE_REDUCTION * CurrentBounce, 0.25)
 						if(Primordial)
-							var/missingHealth = 100-a:Health
+							var/missingHealth = 100-a:HealthPct()
 							Damage *= 1 + (((Primordial*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 						if(src.Owner.RippleActive())
 							if(src.Owner.Oxygen>=BreathCost)
@@ -6783,20 +6783,20 @@ obj
 										EffectiveDamage=0
 										break//cancel allied damage
 						if(EffectiveDamage>0)
-							if(src.SkillPath == /obj/Skills/Projectile/Big_Bang_Attack && ismob(m) && m.Health < 25)
+							if(src.SkillPath == /obj/Skills/Projectile/Big_Bang_Attack && ismob(m) && m.HealthPct() < 25)
 								EffectiveDamage *= 1.25
 							if(src.MortalBlow)
 
 								if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !m.MortallyWounded)
 									var/mortalDmg = m.Health * 0.05 // 5% of current
 									m.LoseHealth(mortalDmg)
-									m.WoundSelf(mortalDmg)
+									m.WoundSelf(m.HPToPct(mortalDmg))
 									m.MortallyWounded += 1
 									OMsg(m, "<b><font color=#ff0000>[src] has dealt a mortal blow to [m]!</font></b>")
 
 							if(src.Area=="Beam")
 								if(src.SkillPath == /obj/Skills/Projectile/Beams/Eraser_Gun && ismob(m))
-									if(m.ccActive() || m.Health <= 30)
+									if(m.ccActive() || m.HealthPct() <= 30)
 										EffectiveDamage *= 1.75
 								if(src.SkillPath == /obj/Skills/Projectile/Beams/Final_Crash && ismob(m) && src.Owner && get_dist(src.Owner, m) <= 1)
 									EffectiveDamage *= 1.5

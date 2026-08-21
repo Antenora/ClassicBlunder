@@ -23,7 +23,7 @@ obj/Skills/Queue/Lightning_Plasma_Strike
 	verb/Lightning_Plasma_Strike()
 		set category="Skills"
 		set name="Lightning Plasma (Strike)"
-		if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+		if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 			usr << "You can't use this technique except when in a dire pinch!"
 			return
 		usr.SetQueue(src)

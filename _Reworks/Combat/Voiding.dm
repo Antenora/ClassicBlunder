@@ -186,6 +186,7 @@ mob/proc/StartFresh()
 	corpse.Power=src.Power
 	corpse.StrMod=src.GetStr()
 	corpse.EndMod=src.GetEnd()
+	corpse.VitMod=src.GetVit()
 	corpse.ForMod=src.GetFor()
 	corpse.DeathKillerTargets=src.key//used for Death Killer
 	corpse.Savable=1

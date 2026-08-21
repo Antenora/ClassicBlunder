@@ -256,7 +256,7 @@ mob
 										var/slowCrippleEffect = (1 + (glob.MAX_CRIPPLE_MULT*(Crippled/glob.CRIPPLE_DIVISOR)));
 										delay *= slowCrippleEffect;
 								if(passive_handler["Don't Move"])
-									LoseHealth(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"])
+									LoseHealth(PctToHP(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"]))
 									loop_delay/=2
 									animate(src, color = "#850000")
 									animate(src, color = src.MobColor, time=world.tick_lag * (delay))

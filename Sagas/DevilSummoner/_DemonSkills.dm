@@ -740,7 +740,7 @@ var/global/list/DEMON_UNIQUE_SKILLS = list(
 		if(!DemonValidTarget(target)) return FALSE
 		if(!ai_owner) return FALSE
 		var/max_est = max(100, ai_owner.Potential * 5)
-		var/missing_ratio = clamp(1 - (ai_owner.Health / max_est), 0, 1)
+		var/missing_ratio = clamp(1 - (ai_owner.HealthPct() / max_est), 0, 1)
 		var/atk_val = StrMod * (1 + missing_ratio * 3)
 		var/dmg = DemonComputeKernelDamage(target, atk_val) * glob.DevilSummonerDemonSkillMod
 		dmg *= dmg_mult

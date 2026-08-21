@@ -6,7 +6,7 @@ obj
 				SkillCost=TIER_2_COST
 				Copyable=3
 				ActiveMessage="enters a thoughtful stance!"
-				DamageMult=0.75
+				DamageMult=1.05
 				AccuracyMult = 1.15
 				KBMult=0.00001
 				InstantStrikes=5
@@ -40,7 +40,7 @@ obj
 				SkillCost=TIER_2_COST
 				Copyable=3
 				ActiveMessage="enters a low stance!"
-				DamageMult=2.5
+				DamageMult=3.55
 				AccuracyMult = 1.15
 				KBMult=0.00001
 				SpeedStrike=2
@@ -66,7 +66,7 @@ obj
 				SkillCost=TIER_2_COST
 				Copyable=3
 				ActiveMessage="begins to move fluidly, countering incoming blows!"
-				DamageMult=1.35
+				DamageMult=1.95
 				AccuracyMult = 1.15
 				Duration=8
 				Cooldown=8
@@ -90,7 +90,7 @@ obj
 				Cooldown=8
 				Duration=5
 				ActiveMessage="prepares a chain of giant-toppling attacks!"
-				DamageMult=0.8
+				DamageMult=1.15
 				AccuracyMult=1.1
 				NeedsSword=1
 				EnergyCost=2

@@ -16,7 +16,7 @@ obj
 			HitSparkSize=3
 			TurfStrike=1
 			Slow=1
-			DamageMult=2.1
+			DamageMult=3.5
 			Cooldown=5
 			EnergyCost=1
 			ActiveMessage="thrusts their blade forward, causing a powerful wave of pressure!"
@@ -65,7 +65,7 @@ obj
 					Size = 0
 					WindUp=0
 					Distance = 6
-					DamageMult=2.1
+					DamageMult=3.5
 					Stunner=0
 					Shearing=0
 					HitSparkIcon='Hit Effect Pearl.dmi'
@@ -96,7 +96,7 @@ obj
 			StrScaling=1
 			NoPierce=1
 			Knockback=3
-			DamageMult=2.05
+			DamageMult=3.4
 			Rush=3
 			Cooldown=5
 			EnergyCost=1
@@ -114,7 +114,7 @@ obj
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			StrScaling=1
-			DamageMult=2.1
+			DamageMult=3.5
 			EnergyCost=1
 			Rounds = 1
 			HitSparkIcon='Slash.dmi'
@@ -145,7 +145,7 @@ obj
 			Distance=2
 			StrScaling=1
 			EndEffectiveness=1
-			DamageMult=2.35
+			DamageMult=3.9
 			GuardBreak=1
 			WindUp=1
 			HitSparkIcon='Slash.dmi'
@@ -171,7 +171,7 @@ obj
 			NeedsSword=1
 			Area="Arc"
 			StrScaling=1
-			DamageMult=1.6
+			DamageMult=2.65
 			Shearing=12
 			FocusShifter=1
 			FocusShiftBoost=1.5
@@ -204,7 +204,7 @@ obj
 			Area="Arc"
 			Distance=3
 			StrScaling=1
-			DamageMult=0.8
+			DamageMult=1.35
 			RoundMovement=0
 			FocusShifter=1
 			FocusShiftBoost=1.5
@@ -237,7 +237,7 @@ obj
 			Rush = 2
 			ControlledRush = 1
 			StrScaling=1
-			DamageMult=1.8
+			DamageMult=3
 			Distance=1
 			Crippling=5
 			BonusVsSlowed=0.5
@@ -268,7 +268,7 @@ obj
 			Distance=3
 			Rush=2
 			StrScaling=1
-			DamageMult=2.3
+			DamageMult=3.85
 			Paralyzing=5
 			EnergyCost=1
 			HitSparkIcon='Slash - Zan.dmi'
@@ -294,7 +294,7 @@ obj
 					var/pot = p.Potential
 					Distance = 4 + (round(pot/25))
 					Size = 2 + (round(pot/25))
-					DamageMult = 1.4 + (round(pot/100))*(1.4/1.5)
+					DamageMult = 2.35 + (round(pot/100))*(1.4/1.5)
 					EnergyCost = 2
 					Rush=0
 					HitSparkIcon='Slash - Zan.dmi'
@@ -308,7 +308,7 @@ obj
 					var/pot = p.Potential
 					Distance = 4 + (round(pot/25))
 					Size = 2 + (round(pot/25))
-					DamageMult = 1.4 + (round(pot/100))*(1.4/1.5)
+					DamageMult = 2.35 + (round(pot/100))*(1.4/1.5)
 					EnergyCost = 2
 					Rush=0
 					HitSparkIcon='Slash - Hellfire.dmi'
@@ -325,7 +325,7 @@ obj
 					StepsDamage = 0
 					Rush = 2
 					Rounds = 0
-					DamageMult = 2.3
+					DamageMult = 3.85
 					EnergyCost = 1
 					Launcher = 0
 					ControlledRush = 0

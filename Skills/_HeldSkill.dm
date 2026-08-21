@@ -151,7 +151,7 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 		src << "<font color='red'>You need a sword to use this technique!</font>"
 		return FALSE
 	// resource requirements -- availability only; the cost is deducted when the skill fires
-	if(Z.HealthCost && src.Health < Z.HealthCost * glob.WorldDamageMult)
+	if(Z.HealthCost && src.HealthPct() < Z.HealthCost * glob.WorldDamageMult)
 		src << "<font color='red'>You don't have enough health to use [Z].</font>"
 		return FALSE
 	if(Z.WoundCost && src.TotalInjury + Z.WoundCost * glob.WorldDamageMult > 99)

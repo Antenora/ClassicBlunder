@@ -8,7 +8,7 @@ mob/proc/RacialStats(statsinquestion)
 mob/proc/displayStats()
 	var/StatDisplay=1//statArchive.calc_stat(statArchive.vars[x])
 	var/InvestedPoints=1//statArchive.calc_invested(statArchive.vars[x])
-	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))
+	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality"))
 		winset(src, "Finalize_Screen.[x]", "text=[statArchive.calc_stat(statArchive.vars[x])]")
 		StatDisplay=src.statArchive.calc_stat(statArchive.vars[x])
 		InvestedPoints=(src.statArchive.calc_invested(statArchive.vars[x])*glob.progress.STAT_PER_POINT)
@@ -17,7 +17,7 @@ mob/proc/displayStats()
 
 
 /mob/proc/setAllStats()
-	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed"))
+	for(var/x in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality"))
 		var/org = x
 		if(x == "Speed")
 			x = "Spd"
@@ -41,7 +41,7 @@ mob/verb/Skill_Points(type as text,skill as text)
 		if(type == "+")
 			Increase = 1
 			if(Points==0) return
-	if(!(skill in list("Strength","Endurance","Force","Offense","Defense","Speed")))return
+	if(!(skill in list("Strength","Endurance","Force","Offense","Defense","Speed","Vitality")))return
 	if(!statArchive.adjust(type, skill))
 		src << "You can't."
 	else
@@ -129,6 +129,8 @@ mob/proc/SetStat(Stat,Amount=1)
 		StrMod=Amount
 	if(Stat=="Endurance")
 		EndMod=Amount
+	if(Stat=="Vitality")
+		VitMod=Amount
 	if(Stat=="Force")
 		ForMod=Amount
 	if(Stat=="Offense")
@@ -164,5 +166,6 @@ mob/verb/Skill_Points_Done()
 		stat_redoing = FALSE
 		race_selecting = TRUE
 	winshow(src,"Finalize_Screen",0)
+	Health=MaxHP()
 	if(!usr.Savable)
 		usr.NewMob()

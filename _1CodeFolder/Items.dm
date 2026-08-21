@@ -1710,8 +1710,8 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					if(a.WoundIntent || a.Lethal)
 						User << "You cannot use a magical vehicle in the presence of hostiles!"
 						return
-				if(User.Health<75*(1-User.HealthCut))
-					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)] health!"
+				if(User.HealthPct()<75*(1-User.HealthCut))
+					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)]% health!"
 					return
 			var/obj/Items/Enchantment/Flying_Device/W=src
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Skating, User))
@@ -1745,8 +1745,8 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					if(a.WoundIntent || a.Lethal)
 						User << "You cannot use a magical vehicle in the presence of hostiles!"
 						return
-				if(User.Health<75*(1-User.HealthCut))
-					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)] health!"
+				if(User.HealthPct()<75*(1-User.HealthCut))
+					User << "You cannot use a magical vehicle while below [75*(1-User.HealthCut)]% health!"
 					return
 			var/obj/Items/Enchantment/Surfing_Device/W=src
 			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Surfing, User))
@@ -2022,7 +2022,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					User << "You are still experiencing the effects of previous training!"
 					return
 				if(W.suffix=="*Equipped*")
-					if(User.Health<=75&&(W.InternalTimer<world.realtime)||User.CyberCancel)
+					if(User.HealthPct()<=75&&(W.InternalTimer<world.realtime)||User.CyberCancel)
 						var/Choice=alert(User, "Are you ready to unleash the power gained from your weight training!? With your body used to the weights, they'll be abandoned.", "Weight Boost!", "No", "Yes")
 						if(Choice=="Yes")
 							W.AlignEquip(User)

@@ -25,7 +25,7 @@ transformation
 				if(is_active) return
 				if(!user) return
 				if(user.Potential<45)
-					if(user.Health>=(20+user.Potential/4)) return
+					if(user.HealthPct()>=(20+user.Potential/4)) return
 				if(user.Class=="Demon") return
 				passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), "Pursuer" = round(max(user.AscensionsAcquired/3, 1)),   "PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
 				..()

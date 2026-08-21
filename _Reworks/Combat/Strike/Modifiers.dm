@@ -180,16 +180,16 @@ globalTracker/var/list/IGNORE_POWER_CLAMP_PASSIVES = list("Star Surge")
     for(var/passive in glob.IGNORE_POWER_CLAMP_PASSIVES)
         if(passive_handler.Get(passive))
             return TRUE
-    if(passive_handler.Get("WrathFactor") && Health <= 50 && demonDevilTriggerSinMastery())
+    if(passive_handler.Get("WrathFactor") && HealthPct() <= 50 && demonDevilTriggerSinMastery())
         return TRUE
-    if(passive_handler.Get("Kaioken") && (Health<=20 || Kaioken>=5))
+    if(passive_handler.Get("Kaioken") && (HealthPct()<=20 || Kaioken>=5))
         return TRUE
     if(isRace(POPO) || defender.isRace(POPO))
         return TRUE
     if(isRace(MAKAIOSHIN))
         if(CheckSlotless("Corrupt Self"))
             return TRUE
-        if(Health <= 15 + (AscensionsAcquired*5))
+        if(HealthPct() <= 15 + (AscensionsAcquired*5))
             return TRUE
  /*   var/godKi = !HasNullTarget() ? GetGodKi() : 0;
     var/defenderGodKi = !defender.HasNullTarget() ? defender.GetGodKi() : 0;

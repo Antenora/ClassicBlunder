@@ -79,7 +79,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/ImposedEvoApply
 	MagicNeeded=0
 	passives = list("SpiralPowerUnlocked" = 1)
 	adjust(mob/p)
-		switch(p.Health)
+		switch(p.HealthPct())
 			if(1 to 10)
 				passives = list("SpiralPowerUnlocked" = 7)
 				HealthHeal=25
@@ -106,7 +106,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/Spiral_King
 	MagicNeeded=0
 	passives = list("SpiralPowerUnlocked" = 1)
 	adjust(mob/p)
-		switch(p.Health)
+		switch(p.HealthPct())
 			if(1 to 10)
 				passives = list("SpiralPowerUnlocked" = 7)
 				HealthHeal=25

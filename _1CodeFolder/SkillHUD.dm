@@ -427,7 +427,7 @@ client/proc/ClearSkillHUD()
 mob/proc/UpdateResourceOrbs()
 	if(!client) return
 	var/enp = EnergyMax ? round((Energy / EnergyMax) * 100, 0.01) : 0
-	client.UpdateOrbDisplay(round(Health, 0.01), round(VaizardHealth + BioArmor, 0.01), round(TotalInjury, 0.01), enp, round(TotalFatigue, 0.01))
+	client.UpdateOrbDisplay(round(HealthPct(), 0.01), round(VaizardHealth + BioArmor, 0.01), round(TotalInjury, 0.01), enp, round(TotalFatigue, 0.01))
 
 client/proc/OrbAnimTime(oldval, newval)
 	var/delta = abs(newval - oldval)

@@ -44,7 +44,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(!(istype(m, /mob/Players) || istype(m, /mob/Player))) return
 		var/last = last_damage_time[m]
 		if(!last || (world.time - last) >= damage_interval)
-			m.LoseHealth(field_damage)
+			m.LoseHealth(m.PctToHP(field_damage))
 			m.AddBurn(field_damage, owner)
 			last_damage_time[m] = world.time
 
@@ -242,7 +242,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		var/last = last_touch[m]
 		if(!last || (world.time - last) >= touch_interval)
 			m.AddBurn(touch_burn, user)
-			m.LoseHealth(touch_damage)
+			m.LoseHealth(m.PctToHP(touch_damage))
 			last_touch[m] = world.time
 
 	verb/Jokaku_Enjo()
@@ -643,7 +643,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 		src.lastAttack = world.time
 		flick("Attack", src)
 		if(src.target)
-			src.target.LoseHealth(src.damageValue)
+			src.target.LoseHealth(src.target.PctToHP(src.damageValue))
 			src.target.AddBurn(src.damageValue, src.owner)
 
 mob/proc/summonFlameSoldiers(dmg, count, lifetimeTicks)

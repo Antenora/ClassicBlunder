@@ -323,11 +323,13 @@ globalTracker
 		FINISHERDMG = 0.005
 		OPENERDMG = 0.005
 		DECIDERDMG = 0.2
-		SPEEDSTRIKEDIVISOR = 5
-		SWEEPSTRIKEDIVISOR = 5
+		SPEEDSTRIKEDIVISOR = 20
+		SWEEPSTRIKEDIVISOR = 20
 		LIGHT_ATTACK_SPEED_DMG_EXPONENT = 0.4
-		LIGHT_ATTACK_SPEED_DMG_LOWER = 0.5
-		LIGHT_ATTACK_SPEED_DMG_UPPER = 3
+		LIGHT_ATTACK_SPEED_STAT_BASE = 10
+		LIGHT_ATTACK_SPEED_REF = 20
+		LIGHT_ATTACK_SPEED_DMG_LOWER = 0.75
+		LIGHT_ATTACK_SPEED_DMG_UPPER = 1.5
 
 		ZANZO_SPEED_EXPONENT = 0.25
 		ZANZO_SPEED_HIGHEST_CLAMP = 2
@@ -356,10 +358,12 @@ globalTracker
 		OFF_DEBUFF_PROC_RATE = 0.3 //and nudges elemental proc rolls
 		DEF_DEBUFF_RESIST_RATE = 0.01 //Def is the baseline status res - lags Off on purpose, typed resists stack on top
 		DEF_DEBUFF_PROC_RESIST_RATE = 0.2
-		STR_PHYS_RESIST_RATE = 0.005 //muscle shrugs off Cripple/Shear/Bleed/Shatter
-		FOR_MENTAL_RESIST_RATE = 0.005 //will shrugs off Confuse/Charm/Doom/Frenzy
-		STR_KB_RATE = 0.004 //muscle sends harder and stays planted
-		FOR_BLAST_DENSITY = 0.2 //dense blasts resist deflection (shooter For -> deflect contest)
+		STR_PHYS_RESIST_RATE = 0.009 //muscle shrugs off Cripple/Shear/Bleed/Shatter
+		FOR_MENTAL_RESIST_RATE = 0.009 //will shrugs off Confuse/Charm/Doom/Frenzy
+		STR_KB_RATE = 0.0073 //muscle sends harder
+		VIT_KB_RATE = 0.0067 //mass stays planted
+		VIT_INJURY_SOFTEN = 0.02 //a sturdy body shrugs off what injuries do to it afterwards
+		FOR_BLAST_DENSITY = 0.37 //dense blasts resist deflection (shooter For -> deflect contest)
 		VENOMBLINDMULT = 10
 		CHAOS_CHANCE = 25
 		BASE_DEBUFF_REDUCTION_DIVISOR = 100
@@ -389,10 +393,11 @@ globalTracker
 		GATES_STAT_MULT_DIVISOR = 25
 		SECRET_KNIFE_CHANCE = 100
 
-		ATTACK_DELAY_EXPONENT=0.6
-		ATTACK_DELAY_DIVISOR=12
+		ATTACK_DELAY_STAT_BASE = 10
+		ATTACK_DELAY_EXPONENT = 0.7
+		ATTACK_DELAY_DIVISOR = 40.7
 		ATTACK_DELAY_MAX = 20
-		ATTACK_DELAY_MIN = 1.5 //was 2 - floor-touch moves from Spd~20 to Spd~32 so the real band differentiates
+		ATTACK_DELAY_MIN = 1.5
 		SPEED_FORCE_TRUEMULT = 2
 		SPEED_FORCE_DELAYMULT = 4
 		CYBERIZESAGAS = list("King of Braves")
@@ -414,7 +419,7 @@ globalTracker
 		FA_JIN_BASE_COOLDOWN = 250
 		FA_JIN_COOLDOWN_REDUCTION = 25
 		BASE_WUJUDAMAGE = 0.015
-		GLOBAL_BEAM_DAMAGE_DIVISOR = 35
+		GLOBAL_BEAM_DAMAGE_DIVISOR = 1
 		GLOBAL_QUEUE_DAMAGE = 0.8
 		GIANT_FORM_DMG_MULT = 0.7778	//what the old GiantForm roll clamp worked out to
 		GLOBAL_MELEE_MULT = 0.54	//0.9 with the old 0.6 roll baked in
@@ -588,7 +593,7 @@ globalTracker
 		ACC_OFF_SPD = 0.3
 		ACC_DEF_SPD = 0.3
 		TRUEMULT_POINT_VALUE = 0.1 //one trueMult point = this much damage swing
-		ACC_POINT = 1
+		ACC_POINT = 2
 		WHIFF_BAND = 25 //glancing zone above the hit roll
 		POWER_ACC_POINT = 5 //acc per point of clamped power-advantage gap
 		PERCEPTION_CORRECTION_LEVELS = 2 //Clarity/Intuition each count as this many perception levels
@@ -605,7 +610,7 @@ globalTracker
 		RECOIL_RATE = 0.125 //BleedHit/BurnHit self-recoil
 		WorldDeflectBase = 75 //deflection contest base - deliberately above WorldDefaultAcc
 		DEF_DEFLECT_RATE = 0.004 //Def digs into the deflection pre-empt
-		FOR_BLAST_DENSITY_MIT = 0.002 //shooter For shaves it back
+		FOR_BLAST_DENSITY_MIT = 0.0037 //shooter For shaves it back
 
 		//straight multiplier to how much it breaks.
 		WEAPON_BREAKER_EFFECTIVENESS = 1

@@ -842,7 +842,7 @@ mob/proc/SpawnCrossMarkers(projectile_path, Target, marker_range = 3)
 	stage = "post"
 	fire(strike/S)
 		var/mob/attacker = S.attacker
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if((attacker.Saga=="Path of a Hero: Rebirth") && (attacker.RebirthHeroType=="Prismatic"))
 			var/meterGain = min(max(val,0.1), 0.9)
 			attacker.HyperdeathMeterCurrent=min(attacker.HyperdeathMeterCurrent+meterGain, 100)
@@ -852,7 +852,7 @@ mob/proc/SpawnCrossMarkers(projectile_path, Target, marker_range = 3)
 	stage = "post"
 	fire(strike/S)
 		var/mob/defender = S.defender
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if((defender.Saga=="Path of a Hero: Rebirth") && (defender.RebirthHeroType=="Prismatic"))
 			var/meterGain = min(max(val,0.1), 0.2)
 			defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)

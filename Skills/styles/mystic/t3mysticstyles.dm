@@ -245,8 +245,8 @@
 			if(StyleActive == "Gulus")
 				owner << "You are already in Gulus."
 				return
-			if(owner.Health > 25)
-				owner << "Dark Evolution can only be invoked at 25 Health or less."
+			if(owner.HealthPct() > 25)
+				owner << "Dark Evolution can only be invoked at 25% Health or less."
 				return
 			var/obj/Skills/Gamma_Dark_Evolution_Lock/lock = owner.FindSkill(/obj/Skills/Gamma_Dark_Evolution_Lock)
 			if(!lock)

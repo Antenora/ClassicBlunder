@@ -226,6 +226,7 @@ race
 		offense = 1
 		defense = 1
 		speed = 1
+		vitality = 1
 		stats_per_class = list() //NIEZAAAAANNNNN
 		secondary_stats_per_class = list()
 		anger_message = "becomes angry!"

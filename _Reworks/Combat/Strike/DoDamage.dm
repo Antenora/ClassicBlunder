@@ -38,7 +38,7 @@
 		if(src.hasMagePassive(/mage_passive/dark/Shadowbringer))
 			if(CheckSlotless("Shadow Infusion")) SlotlessBuffs["Shadow Infusion"].Timer = 0;
 			else findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shadow_Infusion);
-		DamageSelf(val)
+		DamageSelf(HPToPct(val))
 		return val
 	else if(defender == null)
 		return 0;
@@ -137,7 +137,7 @@
 			trueMult += relativity_pd
 	// Iconoclast: +1 pure per 20 HP gap, works in both directions
 	if(src.hasMagePassive(/mage_passive/dark/Iconoclast))
-		var/icon_pd = round(abs(defender.Health - src.Health) / 20)
+		var/icon_pd = round(abs(defender.HealthPct() - src.HealthPct()) / 20)
 		if(icon_pd > 0)
 			trueMult += icon_pd
 	#if DEBUG_DAMAGE
@@ -235,7 +235,7 @@
 	#endif
 
 	if(defender.DefianceRetaliate&&!defender.CheckSlotless("Great Ape"))
-		if(Health>defender.Health)
+		if(HealthPct()>defender.HealthPct())
 			trueMult -= defender.DefianceRetaliate
 			#if DEBUG_DAMAGE
 			log2text("trueMult", "After Defiance", "damageDebugs.txt", "[src.ckey]/[src.name]")
@@ -280,9 +280,9 @@
 
 	if(passive_handler.Get("Undying Rage"))
 		val*=0.1
-	var/miraclechance = (100-defender.Health)*0.6
+	var/miraclechance = (100-defender.HealthPct())*0.6
 	if(defender.passive_handler.Get("Miracle"))
-		if(defender.Health<30)
+		if(defender.HealthPct()<30)
 			if( prob(miraclechance))
 				val=0
 	if(HasEmptySeat())

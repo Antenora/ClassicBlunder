@@ -47,6 +47,7 @@ ascension
 		defense = 0
 		speed = 0
 		recovery = 0
+		vitality = 0
 		learning = 0
 		intelligenceAdd = 0
 		imaginationAdd = 0
@@ -87,6 +88,7 @@ ascension
 			owner.DefAscension -= defense
 			owner.SpdAscension -= speed
 			owner.RecovAscension -=  recovery
+			owner.VitAscension -= vitality
 
 			if(skills.len > 0)
 				for(var/obj/Skills/added_skill in skills)
@@ -145,6 +147,7 @@ ascension
 			owner.DefAscension += defense
 			owner.SpdAscension += speed
 			owner.RecovAscension +=  recovery
+			owner.VitAscension += vitality
 
 			if(skills.len > 0)
 				for(var/added_skill in skills)

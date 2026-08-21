@@ -238,7 +238,7 @@ mob
 		GetSwordAscension()
 			var/SwordAsc=passive_handler.Get("SwordAscension")
 			if(passive_handler.Get("VoidBlade"))
-				SwordAsc+=round((100-src.Health)/25,1)
+				SwordAsc+=round((100-src.HealthPct())/25,1)
 			if(SwordAsc>glob.MAX_SWORD_ASCENSION)
 				SwordAsc=glob.MAX_SWORD_ASCENSION
 			return SwordAsc
@@ -821,7 +821,7 @@ mob
 				Return *= 1+(src.Tension/100)
 			return Return
 		HasEnergyLeak()
-			if(passive_handler.Get("Pride")&&Health>=90)
+			if(passive_handler.Get("Pride")&&HealthPct()>=90)
 				return 0
 			if(passive_handler.Get("EnergyLeak"))
 				return 1
@@ -848,7 +848,7 @@ mob
 				if(src.DoubleHelix>=2&&src.transActive<5)
 					Total +=src.DoubleHelix*0.5
 			if(passive_handler.Get("Pride"))
-				PrideDrain=(100-Health)*0.01
+				PrideDrain=(100-HealthPct())*0.01
 				if(PrideDrain>1)
 					PrideDrain=1
 				if(PrideDrain<0.01)
@@ -856,7 +856,7 @@ mob
 
 		//		Total=PrideDrain
 				Total*=PrideDrain
-			if(passive_handler.Get("Pride")&&Health>=90)
+			if(passive_handler.Get("Pride")&&HealthPct()>=90)
 				Total = 0
 			if(src.DoubleHelix<1&&passive_handler.Get("DoubleHelix"))
 				Total = 0
@@ -866,7 +866,7 @@ mob
 				Total += (5-AscensionsAcquired)*0.5
 			return Total
 		HasFatigueLeak()
-			if(passive_handler.Get("Pride")&&Health>=90)
+			if(passive_handler.Get("Pride")&&HealthPct()>=90)
 				return 0
 			if(passive_handler.Get("FatigueLeak"))
 				return 1
@@ -889,7 +889,7 @@ mob
 				if(src.DoubleHelix>=3)
 					Total +=src.DoubleHelix*0.1
 			if(passive_handler.Get("Pride"))
-				PrideDrain=(100-Health)*0.01
+				PrideDrain=(100-HealthPct())*0.01
 				if(PrideDrain>1)
 					PrideDrain=1
 				if(PrideDrain<0.01)
@@ -1027,14 +1027,14 @@ mob
 				return TRUE
 			return FALSE
 		missingHealth()
-			return 100-Health
+			return 100-HealthPct()
 		proportionalHealth(var/Type)
 			var/Amount
 			switch(Type)
 				if("Higher")
-					Amount=src.Health-src.Target.Health
+					Amount=src.HealthPct()-src.Target.HealthPct()
 				if("Lower")
-					Amount=src.Target.Health-src.Health
+					Amount=src.Target.HealthPct()-src.HealthPct()
 			return Amount
 		HasPureDamage(changelingIgnore = 0)
 			var/Return=0
@@ -1050,7 +1050,7 @@ mob
 					Return += sqrt(viewCount)
 				else
 					Return -= sqrt(viewCount)
-			if(passive_handler["Rage"] && Health <= 50)
+			if(passive_handler["Rage"] && HealthPct() <= 50)
 				Return += clamp((missingHealth()) * passive_handler["Rage"]/glob.RAGE_DIVISOR, 0.1, glob.MAX_RAGEPUREDAMAGE)
 			if(passive_handler.Get("CursedSheath"))
 				Return += cursedSheathValue/100
@@ -1068,8 +1068,8 @@ mob
 			if(src.isLunaticMode())
 				Return += (5 / 100 * src.get_potential())
 			Return += GetMangLevel()*1.25
-			if(passive_handler.Get("Compassion")&&Health<=50)
-				if(Target.Health>Health)
+			if(passive_handler.Get("Compassion")&&HealthPct()<=50)
+				if(Target.HealthPct()>HealthPct())
 					Return += 5*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
@@ -1096,7 +1096,7 @@ mob
 				Return+=(DefianceCounter/3)
 			if(src.isRace(MAJIN))
 				Return += AscensionsAcquired * getMajinRates("Reduction")
-			if(passive_handler["Rage"] && Health <= 50)
+			if(passive_handler["Rage"] && HealthPct() <= 50)
 				Return -= clamp((missingHealth()) * passive_handler["Rage"]/glob.RAGE_DIVISOR, 0, glob.MAX_RAGEPUREDAMAGE)
 			if(src.TarotFate=="The Hanged Man")
 				Return-=5
@@ -1105,8 +1105,8 @@ mob
 			if(passive_handler["Rebel Heart"])
 				var/h = (missingHealth()/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"]
 				Return += h
-			if(passive_handler.Get("Compassion")&&Health>51)
-				if(Target.Health>Health)
+			if(passive_handler.Get("Compassion")&&HealthPct()>51)
+				if(Target.HealthPct()>HealthPct())
 					Return += 3*clamp((proportionalHealth("Lower")/10),1,4)
 			if(passive_handler.Get("SpiralPowerUnlocked")&&Target||passive_handler.Get("Longing")&&Target)
 				if(src.Target.HasGodKi())
@@ -1122,7 +1122,7 @@ mob
 				Return=0
 			return Return
 		Hustling()
-			if(passive_handler.Get("Hustle") || (passive_handler["Rage"] && Health <= 25))
+			if(passive_handler.Get("Hustle") || (passive_handler["Rage"] && HealthPct() <= 25))
 				return 1
 		HasWalking()
 			if(locate(/obj/Skills/Walking, src))
@@ -1410,7 +1410,7 @@ mob
 		GetSoulSteal()
 			return passive_handler.Get("SoulSteal")
 		HasLifeSteal()
-			if(passive_handler["Rage"] && Health <= 75)
+			if(passive_handler["Rage"] && HealthPct() <= 75)
 				return 1
 			if(passive_handler.Get("LifeSteal"))
 				return 1
@@ -1421,7 +1421,7 @@ mob
 			return 0
 		GetLifeSteal()
 			var/extra = 0
-			if(passive_handler["Rage"] && Health <= 75)
+			if(passive_handler["Rage"] && HealthPct() <= 75)
 				extra = 5 * passive_handler["Rage"]
 			if(isRace(MAJIN) && Class == "Unhinged")
 				extra += 5 * AscensionsAcquired
@@ -1575,7 +1575,7 @@ mob
 			if(HasZenkaiPower() == 2)
 				Mult*=glob.HELL_SCALING_MULT
 				Mult+=round(src.Potential/100, 0.05)
-			var/HealthLost = abs(src.Health-100)
+			var/HealthLost = abs(src.HealthPct()-100)
 			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
 			return Return
 
@@ -1592,7 +1592,7 @@ mob
 			if(HasHellPower() == 2)
 				Mult*=glob.HELL_SCALING_MULT
 				Mult+=round(src.Potential/100, 0.05)
-			var/HealthLost = abs(src.Health-100)
+			var/HealthLost = abs(src.HealthPct()-100)
 			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
 			return Return
 
@@ -1607,7 +1607,7 @@ mob
 				if(src.SagaLevel<1&&!glob.T4_SAGA_STLYE_GODKI||src.Secret=="Ultra Instinct")
 					Total+=glob.T4_STYLES_GODKI_VALUE
 			if(src.HasSpiritPower()>=1 && FightingSeriously(src, 0))
-				if(src.Health<=(30+src.TotalInjury)*src.GetSpiritPower())
+				if(src.HealthPct()<=(30+src.TotalInjury)*src.GetSpiritPower())
 					if(src.SenseUnlocked<7)//saintz
 						Total+=0.25*src.GetSpiritPower()
 					else
@@ -1631,8 +1631,8 @@ mob
 					else if(passive_handler.Get("Hidden Potential"))
 						Total+=Potential/100
 			if(passive_handler.Get("GodCloth"))
-				if(src.Target&&(Health+VaizardHealth)<(Target.Health+Target.VaizardHealth))
-					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 4)
+				if(src.Target&&(HealthPct()+VaizardHealth)<(Target.HealthPct()+Target.VaizardHealth))
+					Total*=clamp((Target.HealthPct()+Target.VaizardHealth)/(HealthPct()+VaizardHealth),1, 4)
 			if(src.KamuiBuffLock)
 				Total+=0.25
 			if(src.isRace(DRAGON))
@@ -1643,8 +1643,8 @@ mob
 			if(Total>=glob.GOD_KI_CAP)
 				Total=glob.GOD_KI_CAP
 			if(passive_handler.Get("SSJRose"))
-				if(src.Target&&(Health+VaizardHealth)<(Target.Health+Target.VaizardHealth))
-					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 2)
+				if(src.Target&&(HealthPct()+VaizardHealth)<(Target.HealthPct()+Target.VaizardHealth))
+					Total*=clamp((Target.HealthPct()+Target.VaizardHealth)/(HealthPct()+VaizardHealth),1, 2)
 			if(src.DownToEarth>0)
 				Total*=1*((100-src.DownToEarth)/100)
 			return Total
@@ -1668,7 +1668,7 @@ mob
 			if(src.SenseUnlocked>6&&(src.SenseUnlocked>src.SenseRobbed))
 				return 1
 			if(src.HasSpiritPower()>=1 && FightingSeriously(src, 0))
-				if(src.Health<=max(15, (30+src.TotalInjury)*src.GetSpiritPower()) || src.InjuryAnnounce)
+				if(src.HealthPct()<=max(15, (30+src.TotalInjury)*src.GetSpiritPower()) || src.InjuryAnnounce)
 					return 1
 			if(src.KamuiBuffLock)
 				return 1
@@ -1678,7 +1678,7 @@ mob
 			if(passive_handler.Get("Null") || passive_handler.Get("Longing")) return 0;
 			var/Total=passive_handler.Get("GodKi")
 			if(src.HasSpiritPower()>=1 && FightingSeriously(src, 0))
-				if(src.Health<=(30+src.TotalInjury)*src.GetSpiritPower())
+				if(src.HealthPct()<=(30+src.TotalInjury)*src.GetSpiritPower())
 					if(src.SenseUnlocked<7)//saintz
 						Total+=0.25*src.GetSpiritPower()
 					else
@@ -1696,8 +1696,8 @@ mob
 						Total+=glob.SENSE9GODKI
 
 			if(passive_handler.Get("GodCloth"))
-				if(src.Target&&(Health+VaizardHealth)<(Target.Health+Target.VaizardHealth))
-					Total*=clamp((Target.Health+Target.VaizardHealth)/(Health+VaizardHealth),1, 3)
+				if(src.Target&&(HealthPct()+VaizardHealth)<(Target.HealthPct()+Target.VaizardHealth))
+					Total*=clamp((Target.HealthPct()+Target.VaizardHealth)/(HealthPct()+VaizardHealth),1, 3)
 			if(src.KamuiBuffLock)
 				Total+=0.25
 			if(isRace(DRAGON))

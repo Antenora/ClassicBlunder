@@ -112,7 +112,7 @@
 		usr.Activate(src)
 
 /obj/Skills/Projectile/Beams/Divine_Atonement
-	DamageMult=20
+	DamageMult=0.5714
 	ChargeRate=2
 	Dodgeable=0
 	Distance=30

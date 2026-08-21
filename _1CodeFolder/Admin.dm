@@ -1745,10 +1745,10 @@ mob/Admin2/verb
 		var/Damage = input(usr, "Inflict how much [DamageType]? Put in zero to cancel.") as null|num
 		if(Damage == null) return
 		if(istext(A.Health))
-			A.Health = 100
-			Log("Admin", "<font color=red>[A]'s Health variable was text for some reason! Resetting to 100.")
+			A.SetHealthPct(100)
+			Log("Admin", "<font color=red>[A]'s Health variable was text for some reason! Resetting to full.")
 		if(DamageType == "True Damage")
-			A.Health -= Damage
+			A.Health -= A.PctToHP(Damage)
 		else if(DamageType == "Poison")
 			A.AddPoison(Damage)
 		else if(DamageType == "Burning")
@@ -1790,7 +1790,7 @@ mob/Admin2/verb
 			if("Basic (HP/Energy/Mana/Statuses)")
 				if(A.KO)
 					A.Conscious()
-				A.Health = 100
+				A.SetHealthPct(100)
 				A.Energy = A.EnergyMax
 				A.ManaAmount = A.ManaMax * A.GetManaCapMult()
 				A.Burn = 0
@@ -2624,7 +2624,7 @@ mob/Admin4/verb
 					if("Power Level")
 						M.Power += amount
 					if("Health")
-						M.Health += amount
+						M.HealPct(amount)
 					if("Energy (Current)")
 						M.Energy += amount
 					if("Energy (Max)")

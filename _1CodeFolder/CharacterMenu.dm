@@ -654,8 +654,8 @@ client/proc/BuildHeaderOverlays()
 	cm_rpused = new; cm_rpused.maptext_width = 200; cm_rpused.screen_loc = CMloc(136, 75 + CMENU_VY); cmenu_objs += cm_rpused
 
 client/proc/BuildStatsContent()
-	MkAttr("STR", "str", 68);  MkAttr("END", "end", 164); MkAttr("SPD", "spd", 260)
-	MkAttr("FOR", "for", 356); MkAttr("OFF", "off", 452); MkAttr("DEF", "def", 548)
+	MkAttr("STR", "str", 63); MkAttr("END", "end", 145); MkAttr("SPD", "spd", 227); MkAttr("FOR", "for", 309)
+	MkAttr("OFF", "off", 391); MkAttr("DEF", "def", 473); MkAttr("VIT", "vit", 555)
 	var/list/prows = list("Current Power"="power","From Potential"="frompot","From Buffs"="frombuffs","Base"="base","Power Mult"="powermult","Anger (Max)"="angermax","Current Anger"="curanger","Current BP"="bp")
 	var/i = 0
 	for(var/lbl in prows)
@@ -930,7 +930,7 @@ client/proc/UpdateCharacterMenu()
 		var/atom/movable/shud/cmval/v = cmenu_vals[k]
 		v.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff; text-align:[v.text_align]\">[D[k]]</span>"
 	if(cmenu_tab == 0)
-		var/list/fk = list("fstr","fend","fspd","ffor","foff","fdef")
+		var/list/fk = list("fstr","fend","fspd","ffor","foff","fdef","fvit")
 		for(var/i = 1 to cmenu_fills.len)
 			var/atom/movable/shud/cmfill/fl = cmenu_fills[i]
 			var/icon/ic = icon(CMENU_BARFILL_RESOURCE)
@@ -2256,6 +2256,7 @@ mob/proc/GetCharMenuData()
 	D["energy"] = "[Commas(round(EnergyMax))]"
 	D["str"] = "[round(GetStr(), 0.01)] ([round(BaseStr() + GetEquippedWeaponStrAdd(), 0.01)])"
 	D["end"] = "[round(GetEnd(), 0.01)] ([round(BaseEnd() + GetEquippedWeaponEndAdd(), 0.01)])"
+	D["vit"] = "[round(GetVit(), 0.01)] ([round(BaseVit(), 0.01)])"
 	D["spd"] = "[round(GetSpd(), 0.01)] ([round(BaseSpd() + GetEquippedWeaponSpdAdd(), 0.01)])"
 	D["for"] = "[round(GetFor(), 0.01)] ([round(BaseFor() + GetEquippedWeaponForAdd(), 0.01)])"
 	D["off"] = "[round(GetOff(), 0.01)] ([round(BaseOff() + GetEquippedWeaponOffAdd(), 0.01)])"
@@ -2263,15 +2264,15 @@ mob/proc/GetCharMenuData()
 	D["dboost"] = "x[PDam] ([PDam * 100]%)"
 	D["dred"] = "x[PRed] ([PRed * 100]%)"
 	D["recov"] = "[round(GetRecov(), 0.01)] ([BaseRecov()])"
-	D["avg"] = "[round((GetStr() + GetEnd() + GetSpd() + GetFor() + GetOff() + GetDef()) / 6, 0.05)]"
+	D["avg"] = "[round((GetStr() + GetEnd() + GetSpd() + GetFor() + GetOff() + GetDef() + GetVit()) / 7, 0.05)]"
 	D["magic"] = "[getTotalMagicLevel()]"
 	D["transpot"] = "[potential_trans]/100"
 	D["chips"] = "[EnhanceChips]/[EnhanceChipsMax]"
 	D["potential"] = "[Potential]"
 	D["pronouns"] = "[subjectpronoun()] / [objectpronoun()]"
-	var/mx = max(GetStr(), GetEnd(), GetSpd(), GetFor(), GetOff(), GetDef(), 0.0001)
+	var/mx = max(GetStr(), GetEnd(), GetSpd(), GetFor(), GetOff(), GetDef(), GetVit(), 0.0001)
 	D["fstr"] = GetStr() / mx; D["fend"] = GetEnd() / mx; D["fspd"] = GetSpd() / mx
-	D["ffor"] = GetFor() / mx; D["foff"] = GetOff() / mx; D["fdef"] = GetDef() / mx
+	D["ffor"] = GetFor() / mx; D["foff"] = GetOff() / mx; D["fdef"] = GetDef() / mx; D["fvit"] = GetVit() / mx
 	var/list/parts = list()
 	if(race && race.name) parts += race.name
 	if(Secret)

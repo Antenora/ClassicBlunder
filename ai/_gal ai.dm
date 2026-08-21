@@ -668,10 +668,12 @@ mob/Player/AI
 				StrMod = rand(300,600)/100
 				ForMod = rand(300,600)/100
 				EndMod = rand(300,600)/100
+				VitMod = EndMod
 				OffMod = rand(150,300)/100
 				DefMod = rand(150,300)/100
 				SpdMod = rand(150,300)/100
 				RecovMod = rand(2,3)
+				Health = MaxHP()
 
 				if(prob(10)) //fuck with me nigga
 					passive_handler.Increase("GiantForm", 1)
@@ -825,7 +827,7 @@ mob/Player/AI
 		if(src.Health<=0 && !src.KO)
 			Unconscious(null,"?!?!")
 
-		if((src.Health+1 >= 100 - (100*HealthCut)-1) || (src.Energy+1 >= 100 - (100*EnergyCut)-1) || (src.ManaAmount+1 >= 100 - (100*ManaCut)-1))
+		if((src.HealthPct()+1 >= 100 - (100*HealthCut)-1) || (src.Energy+1 >= 100 - (100*EnergyCut)-1) || (src.ManaAmount+1 >= 100 - (100*ManaCut)-1))
 			if(world.time >= ai_next_gainloop)
 				aiGain()
 				ai_next_gainloop = world.time + 10
@@ -1291,7 +1293,7 @@ mob/Player/AI
 		if(icon_state == "Meditate")
 			TotalFatigue = max(0, TotalFatigue - 0.1)
 			TotalInjury = max(0, TotalFatigue - 0.1)
-		if(src.Health < 25*(1-src.HealthCut) && !src.HealthAnnounce25)
+		if(src.HealthPct() < 25*(1-src.HealthCut) && !src.HealthAnnounce25)
 			if(src.CheckSlotless("Genesic Brave"))
 				src.OMessage(10, "<font color=#00FF55>[src] begins fighting fiercely and tenaciously with the power of Courage!", "[src]([src.key]) has 25% health left.</font>")
 			else if(src.SpecialBuff&&src.SpecialBuff.BuffName=="King of Braves")
@@ -1311,7 +1313,7 @@ mob/Player/AI
 						src.OMessage(10, "<font color='[src.ExhaustedColor]'>[src] [src.ExhaustedMessage]</font color>", "[src]([src.key]) has 25% health left.")
 			src.HealthAnnounce25=1
 
-		if(src.Health < 10*(1-src.HealthCut) && !src.HealthAnnounce10)
+		if(src.HealthPct() < 10*(1-src.HealthCut) && !src.HealthAnnounce10)
 			if(src.CheckSlotless("Genesic Brave"))
 				src.OMessage(10, "<b><font color=#00FF55>[src] unites the powers of Destruction and Protection to defy the odds!", "[src]([src.key]) has 10% health left.</font></b>")
 				src.PowerControl+=25*src.SagaLevel
@@ -1338,11 +1340,11 @@ mob/Player/AI
 		if(src.TotalInjury > 50 && !src.InjuryAnnounce)
 			src.OMessage(10, "[src] looks beaten half to death!", "[src]([src.key]) has 50% injury.")
 			src.InjuryAnnounce=1
-		if(src.NanoBoost&&src.Health<=25*(1-src.HealthCut)&&!src.NanoAnnounce)
+		if(src.NanoBoost&&src.HealthPct()<=25*(1-src.HealthCut)&&!src.NanoAnnounce)
 			OMsg(src, "<font color='green'>[src]'s nanites respond to their physical trauma, bolstering their cybernetic power!</font color>")
 			src.NanoAnnounce=1
 
-		if(src.Health>=75*(1-src.HealthCut)&&src.icon_state=="Meditate"&&(src.Anger||src.AngerTier||src.AngerRush||src.AngerCalmHigh))
+		if(src.HealthPct()>=75*(1-src.HealthCut)&&src.icon_state=="Meditate"&&(src.Anger||src.AngerTier||src.AngerRush||src.AngerCalmHigh))
 			calmcounter-=1
 		else
 			calmcounter=5
@@ -1436,10 +1438,10 @@ mob/Player/AI
 		DRAINS_ACTIVE//Label
 		if(src.ActiveBuff)
 			if(src.ActiveBuff.HealthDrain)
-				if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-					src.DoDamage(src, TrueDamage(src.ActiveBuff.HealthDrain))
+				if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+					src.DoDamage(src, src.PctToHP(TrueDamage(src.ActiveBuff.HealthDrain)))
 			if(src.ActiveBuff.HealthThreshold&&!src.ActiveBuff.AllOutAttack)
-				if(src.Health<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+				if(src.HealthPct()<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 					if(src.CheckActive("Eight Gates"))
 						var/obj/Skills/Buffs/ActiveBuffs/Eight_Gates/eg = src.ActiveBuff
 						eg.Stop_Cultivation()
@@ -1530,7 +1532,7 @@ mob/Player/AI
 				if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 					src.HealCapacity(src.ActiveBuff.CapacityHeal)
 			if(src.ActiveBuff.HealthHeal)
-				if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+				if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 						src.HealWounds(src.GetRecov(src.ActiveBuff.HealthHeal))
 				else
@@ -1557,10 +1559,10 @@ mob/Player/AI
 		DRAINS_SPECIAL//Label
 		if(src.SpecialBuff)
 			if(src.SpecialBuff.HealthDrain)
-				if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-					src.DoDamage(src, TrueDamage(src.SpecialBuff.HealthDrain))
+				if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+					src.DoDamage(src, src.PctToHP(TrueDamage(src.SpecialBuff.HealthDrain)))
 			if(src.SpecialBuff.HealthThreshold&&!src.SpecialBuff.AllOutAttack)
-				if(src.Health<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+				if(src.HealthPct()<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 					src.SpecialBuff.Trigger(src)
 					goto DRAINS_SPECIAL
 
@@ -1629,7 +1631,7 @@ mob/Player/AI
 			if(src.SpecialBuff.CapacityHeal)
 				src.HealCapacity(src.SpecialBuff.CapacityHeal)
 			if(src.SpecialBuff.HealthHeal)
-				if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+				if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 					if(src.SpecialBuff.StableHeal)
 						src.HealWounds(src.SpecialBuff.HealthHeal)
 					else
@@ -1661,10 +1663,10 @@ mob/Player/AI
 					if(istype(b, /obj/Skills/Buffs/SlotlessBuffs/Autonomous))
 						continue
 					if(b.HealthDrain)
-						if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-							src.DoDamage(src, TrueDamage(b.HealthDrain))
+						if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+							src.DoDamage(src, src.PctToHP(TrueDamage(b.HealthDrain)))
 					if(b.HealthThreshold&&!b.AllOutAttack)
-						if(src.Health<b.HealthThreshold*(1-src.HealthCut)||src.KO)
+						if(src.HealthPct()<b.HealthThreshold*(1-src.HealthCut)||src.KO)
 							b.Trigger(src)
 
 					if(b.WoundDrain)
@@ -1704,7 +1706,7 @@ mob/Player/AI
 					if(b.CapacityHeal)
 						src.HealCapacity(b.CapacityHeal)
 					if(b.HealthHeal)
-						if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+						if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 							if(b.StableHeal)
 								src.HealWounds(b.HealthHeal)
 							else
@@ -1766,8 +1768,8 @@ mob/Player/AI
 				if(A.FatigueDrain)
 					src.GainFatigue(A.FatigueDrain)
 				if(A.HealthDrain)
-					if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-						src.DoDamage(src, TrueDamage(A.HealthDrain))
+					if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+						src.DoDamage(src, src.PctToHP(TrueDamage(A.HealthDrain)))
 				if(A.WoundDrain)
 					src.WoundSelf(A.WoundDrain)
 				if(A.CapacityDrain)
@@ -1785,7 +1787,7 @@ mob/Player/AI
 					if(src.SpecialBuff.BuffName!=A.SBuffNeeded)
 						continue
 				if(A.NeedsHealth&&!A.SlotlessOn&&!A.Using&&!src.KO)
-					if(src.Health<=A.NeedsHealth*(1-src.HealthCut))
+					if(src.HealthPct()<=A.NeedsHealth*(1-src.HealthCut))
 						A.Trigger(src)
 				if(A.ManaThreshold&&!A.SlotlessOn&&!A.Using&&!src.KO)
 					if(src.ManaAmount>=A.ManaThreshold)
@@ -1820,7 +1822,7 @@ mob/Player/AI
 					if(A.SlotlessOn)
 						A.Trigger(src,Override=1)
 				if(A?.TooMuchHealth)
-					if(src.Health>=A.TooMuchHealth)
+					if(src.HealthPct()>=A.TooMuchHealth)
 						if(A.SlotlessOn)
 							A.Trigger(src,Override=1)
 				if(A.TooLittleMana)
@@ -1938,7 +1940,7 @@ mob/Player/AI
 		EPM+=src.Power_Multiplier-1//effective power multiplier
 		if(src.PowerEroded)
 			EPM-=src.PowerEroded
-		if(src.NanoBoost&&src.Health<25)
+		if(src.NanoBoost&&src.HealthPct()<25)
 			EPM+=0.25
 	/*	if(src.isRace(MAKYO))
 			if(src.ActiveBuff&&!src.HasMechanized())
@@ -2041,7 +2043,7 @@ mob/Player/AI
 		if(prob(99))//Health/Energy Recovery
 			if(GetPowerUpRatio()<=1)
 				if(icon_state=="Meditate")
-					if(Health<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
+					if(HealthPct()<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
 						Recover("Health",1)
 						Recover("Injury",1)
 					if(src.Energy<src.EnergyMax)
@@ -2113,6 +2115,6 @@ mob/Player/AI
 						if(passive_handler.Get("ManaPU"))
 							src.LoseMana(1*PowerDrain*glob.WorldPUDrain)
 						else if(src.HasHealthPU())
-							src.DoDamage(src, TrueDamage(1*PowerDrain*glob.WorldPUDrain))
+							src.DoDamage(src, src.PctToHP(TrueDamage(1*PowerDrain*glob.WorldPUDrain)))
 						else
 							src.LoseEnergy(2*PowerDrain*glob.WorldPUDrain)

@@ -187,6 +187,7 @@ mob/var
 	RecovMultTotal=1
 	RecovChaos=1
 	RecovAscension=0
+	VitAscension=0
 	RecovReplace
 	RecovTax=0
 	RecovCut=0
@@ -433,6 +434,8 @@ mob/var
 	StrengthInvest=0
 	EndMod=1
 	EnduranceInvest=0
+	VitMod=1
+	VitalityInvest=0
 	ForMod=1
 	ForceInvest=0
 	OffMod=1

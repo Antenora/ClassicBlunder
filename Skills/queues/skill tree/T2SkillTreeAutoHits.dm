@@ -24,7 +24,7 @@ obj
 			NoPierce=0
 			StrScaling=1
 			EndEffectiveness=0.9
-			DamageMult=3.2
+			DamageMult=4.5
 			Cooldown=8
 			HitSparkIcon='BLANK.dmi'
 			HitSparkX=0
@@ -50,7 +50,7 @@ obj
 			MenuIcon="ForceStomp"
 			Distance=6
 			StrScaling=1
-			DamageMult=2.5
+			DamageMult=3.55
 			Cooldown=8
 			Stunner=0.8
 			Knockback=12
@@ -80,7 +80,7 @@ obj
 			ComboMaster=1
 			MenuIcon="SlashingHandChop"
 			WindupMessage="relaxes their fist into a straight palm..."
-			DamageMult=3.15
+			DamageMult=4.5
 			StrScaling=1
 			ActiveMessage="uses their hand as a blade, trying to cut down their opponent!"
 			Area="Target"
@@ -113,8 +113,8 @@ obj
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			Shockwaves=2
-			DamageMult=0.3
-			PhantomMark=2.2
+			DamageMult=0.45
+			PhantomMark=3.15
 			Knockback=2
 			Distance=4
 			ActiveMessage="vanishes with a burst of speed to strike at their foe!"
@@ -137,7 +137,7 @@ obj
 			NoAttackLock=1
 			MenuIcon="DragonRush"
 			StrScaling=1
-			DamageMult=3.2
+			DamageMult=4.5
 			DelayTime=0
 			PreShockwave=1
 			PreShockwaveDelay=1
@@ -174,7 +174,7 @@ obj
 			Area="Circle"
 			Distance=1
 			StrScaling=1
-			DamageMult=2.85
+			DamageMult=4
 			Launcher=3
 			MenuIcon="SweepingKick"
 			NoLock=1
@@ -197,7 +197,7 @@ obj
 			UnarmedOnly=1
 			Area="Circle"
 			StrScaling=1
-			DamageMult=0.55
+			DamageMult=0.8
 			Cooldown=8
 			MenuIcon="HelicopterKick"
 			Rounds=5
@@ -220,7 +220,7 @@ obj
 			AlwaysAnnounceCooldown = 1
 			NeedsSword=1
 			Area="Circle"
-			DamageMult=2.75
+			DamageMult=3.95
 			Rounds=1
 			StrScaling=1
 			ChargeTime=0.75
@@ -275,7 +275,7 @@ obj
 				else
 					CorruptionDebuff = 0
 				var/idle_secs = p.last_skill_fire_time ? (world.time - p.last_skill_fire_time) / 10 : 10
-				DamageMult = 2.75 * min(1 + idle_secs * 0.06, 1.6)
+				DamageMult = 3.95 * min(1 + idle_secs * 0.06, 1.6)
 			verb/Three_Thousand_Worlds()
 				set category="Skills"
 				var/can_fire = !(Using || cooldown_remaining)
@@ -309,7 +309,7 @@ obj
 			Rounds=5
 			StrScaling=1
 			EndEffectiveness=0.8
-			DamageMult=0.7
+			DamageMult=1
 			Cooldown=8
 			Knockback=1
 			Size=1
@@ -404,7 +404,7 @@ obj
 			Area="Wave"
 			StrScaling=1
 			ComboMaster = 1
-			DamageMult=3.35
+			DamageMult=4.75
 			Cooldown=8
 			Knockback=0
 			Rounds=1
@@ -434,7 +434,7 @@ obj
 			Area="Circle"
 			StrScaling=1
 			EndEffectiveness=1
-			DamageMult=3.2
+			DamageMult=4.5
 			Cooldown=8
 			Knockback=5
 			Size=2
@@ -471,7 +471,7 @@ obj
 			Distance=8
 			StrScaling=1
 			Cooldown = 8
-			DamageMult=4.5
+			DamageMult=6.5
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			ComboMaster=1

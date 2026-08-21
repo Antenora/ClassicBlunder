@@ -689,7 +689,7 @@ obj/Items/Magatama/Kailash
 	fire(strike/S)
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if(FightingSeriously(attacker, defender) && attacker.isRace(/race/demi_fiend))
 			for(var/obj/Items/Magatama/M in attacker)
 				if(M.suffix == "*Equipped*" && M.mastery < 100)

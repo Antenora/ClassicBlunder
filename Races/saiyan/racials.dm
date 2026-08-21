@@ -26,7 +26,7 @@
             if(Tail)
                 OMessage(10, "<font color=red>[src]'s defiance reaches its peak!","Defiance (10) passive.")
         if(FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Saiyan_Grit).cooldown_remaining < 1)
-            if(Health <= 5) // hasnt been used and they r obligated to get their shit
+            if(HealthPct() <= 5) // hasnt been used and they r obligated to get their shit
             // might make this too easy a mechanic
                 DefianceCounter = 10
 
@@ -36,7 +36,7 @@
 	fire(strike/S)
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
-		var/val = S.dealt
-		if(defender.Health<=defender.AngerPoint*(1-attacker.HealthCut)&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
+		var/val = S.defender.HPToPct(S.dealt)
+		if(defender.HealthPct()<=defender.AngerPoint*(1-attacker.HealthCut)&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
 			if(defender.Anger)
 				defender.DefianceCalcs(val, attacker)

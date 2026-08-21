@@ -16,7 +16,7 @@ mob/proc/GetAssess()
 	var/BaseDisplay = race.power;
 	var/GodKiDisplay
 	var/MaouKiDisplay
-	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef())/6, 0.05)
+	var/StatAverage=round((src.GetStr()+src.GetEnd()+src.GetSpd()+src.GetFor()+src.GetOff()+src.GetDef()+src.GetVit())/7, 0.05)
 	var/EffectiveAnger=AngerCurveValue()
 	var/PDam=1+(src.HasPureDamage()/10)
 	var/PRed=1+(src.HasPureReduction()/10)
@@ -90,6 +90,7 @@ mob/proc/GetAssess()
 	<tr><td>Buffed Stat/True Stat (Mod)</td></tr>
 	<tr><td>Strength:</td><td> [round(src.GetStr(), 0.01)] ([round(src.BaseStr() + src.GetEquippedWeaponStrAdd(), 0.01)])</td></tr>
 	<tr><td>Endurance:</td><td> [round(src.GetEnd(), 0.01)] ([round(src.BaseEnd() + src.GetEquippedWeaponEndAdd(), 0.01)])</td></tr>
+	<tr><td>Vitality:</td><td> [round(src.GetVit(), 0.01)] ([round(src.BaseVit(), 0.01)])</td></tr>
 	<tr><td>Speed:</td><td> [round(src.GetSpd(), 0.01)] ([round(src.BaseSpd() + src.GetEquippedWeaponSpdAdd(), 0.01)])</td></tr>
 	<tr><td>Force:</td><td> [round(src.GetFor(), 0.01)] ([round(src.BaseFor() + src.GetEquippedWeaponForAdd(), 0.01)])</td></tr>
 	<tr><td>Offense:</td><td> [round(src.GetOff(), 0.01)] ([round(src.BaseOff() + src.GetEquippedWeaponOffAdd(), 0.01)])</td></tr>
@@ -128,7 +129,7 @@ mob/proc/GetAssess()
 mob
 	proc
 		GetHealthBPMult()
-			var/Return = min(src.TotalInjury / 100, 0.25) * (-1)
+			var/Return = min(src.TotalInjury / (1 + src.GetVit(glob.VIT_INJURY_SOFTEN)) / 100, 0.25) * (-1)
 			return Return
 		GetEnergyBPMult()
 			var/Return = min(src.TotalFatigue / 100, 0.5) * (-1)
@@ -198,6 +199,7 @@ mob/Players/Stat()
 				stat("Endurance","[round(src.BaseEnd() + src.GetEquippedWeaponEndAdd(), 0.01)]")
 			else
 				stat("Endurance","[round(src.BaseEnd() + src.GetEquippedWeaponEndAdd(), 0.01)] (Tax: [round((src.EndTax+src.EndCut)*100)]%)")
+			stat("Vitality","[round(src.BaseVit(), 0.01)]")
 			if(!src.SpdTax&&!src.SpdCut)
 				stat("Speed","[round(src.BaseSpd() + src.GetEquippedWeaponSpdAdd(), 0.01)]")
 			else
@@ -424,7 +426,7 @@ mob/Players/Stat()
 /mob/var/SpawnDisplay;
 
 /mob/proc/outputVitals()
-	var/healthDisplay = "[Target.Health]([Target.VaizardHealth])%"
+	var/healthDisplay = "[round(Target.HealthPct(), 0.01)]([Target.VaizardHealth])%"
 	SpawnDisplay="[Target.SpawnArea]"
 	if(src.Target.passive_handler.Get("Obfuscated Origin"))
 		SpawnDisplay = "<font color='red'><b>Unknowable</b></font color>"
@@ -539,8 +541,8 @@ mob/proc/Recover(var/blah,Amount=1)
 				Amount*=2
 			if(Swim&&passive_handler.Get("Fishman"))
 				Amount*=2
-			src.HealHealth(Amount*(25/max(Health,1)))
-			if(Health==100&&src.BioArmor<src.BioArmorMax)
+			src.HealHealth(Amount*(25/max(HealthPct(),1)))
+			if(HealthPct()==100&&src.BioArmor<src.BioArmorMax)
 				src.BioArmor+=Amount
 				if(src.BioArmor>=src.BioArmorMax)
 					src.BioArmor=src.BioArmorMax
@@ -604,16 +606,16 @@ mob/proc/Recover(var/blah,Amount=1)
 				src.LifeStolen=0
 			if(src.passive_handler.Get("The Power of Stories"))
 				src.passive_handler.Set("The Power of Stories", 0)
-			if(Health>10*(1-src.HealthCut)&&src.HealthAnnounce10)
+			if(HealthPct()>10*(1-src.HealthCut)&&src.HealthAnnounce10)
 				src.HealthAnnounce10=0
-			if(Health>25*(1-src.HealthCut)&&src.HealthAnnounce25)
+			if(HealthPct()>25*(1-src.HealthCut)&&src.HealthAnnounce25)
 				src.HealthAnnounce25=0
-			if(Health>50*(1-src.HealthCut)&&src.MeltyMessage)
+			if(HealthPct()>50*(1-src.HealthCut)&&src.MeltyMessage)
 				src.MeltyMessage=0
-			if(Health>50*(1-src.HealthCut)&&src.VenomMessage)
+			if(HealthPct()>50*(1-src.HealthCut)&&src.VenomMessage)
 				src.VenomMessage=0
 			if(src.NanoBoost)
-				if(src.Health>=75*(1-src.HealthCut)&&src.NanoAnnounce)
+				if(src.HealthPct()>=75*(1-src.HealthCut)&&src.NanoAnnounce)
 					src.NanoAnnounce=0
 			if(isplayer(src))
 				src:move_speed = MovementSpeed()
@@ -635,9 +637,9 @@ mob/proc/Recover(var/blah,Amount=1)
 			if(TotalInjury>0)
 				var/InjuryRecov
 				if(src.icon_state == "Meditate")
-					InjuryRecov=0.008*(min(src.GetRecov())**2)*Amount*(max(0.1,Health/80))
+					InjuryRecov=0.008*(min(src.GetRecov())**2)*Amount*(max(0.1,HealthPct()/80))
 				else
-					InjuryRecov=0.004*(src.GetRecov()**4)*Amount*(max(0.1,Health/100))
+					InjuryRecov=0.004*(src.GetRecov()**4)*Amount*(max(0.1,HealthPct()/100))
 				src.HealWounds(InjuryRecov)//Injuries last longer for good reason
 			if(TotalInjury<50&&src.InjuryAnnounce)
 				src.InjuryAnnounce=0
@@ -658,7 +660,7 @@ mob/proc/Recover(var/blah,Amount=1)
 			if(src.Secret=="Hamon")
 				Amount*=2
 			Amount*=sqrt(max(1,GetRecov()))
-			src.HealEnergy(Amount*(100/max(Health,1)))
+			src.HealEnergy(Amount*(100/max(HealthPct(),1)))
 		if("Fatigue")
 			if(PureRPMode)
 				return
@@ -818,7 +820,7 @@ mob/proc/
 
 		if(src.PowerEroded)
 			EPM-=src.PowerEroded
-		if(src.NanoBoost&&src.Health<25)
+		if(src.NanoBoost&&src.HealthPct()<25)
 			EPM+=0.25
 
 		if(EPM<=0)
@@ -885,7 +887,7 @@ mob/proc/
 						a=mult+1
 					// WrathFactor
 					if((a>1||src.Anger)&&src.passive_handler.Get("WrathFactor")&&src.demonDevilTriggerSinMastery())
-						var/missing = max(0, 100 - Health)
+						var/missing = max(0, 100 - HealthPct())
 						var/steps = round(missing / 10)
 						if(steps > 0)
 							var/wrathAnger = 0.2 * steps * src.passive_handler.Get("WrathFactor")
@@ -974,11 +976,11 @@ mob/proc/
 			if(icon_state=="Meditate")
 				if(TotalInjury<50&&src.InjuryAnnounce)
 					src.InjuryAnnounce=0
-				if(Health>10*(1-src.HealthCut)&&src.HealthAnnounce10)
+				if(HealthPct()>10*(1-src.HealthCut)&&src.HealthAnnounce10)
 					src.HealthAnnounce10=0
-				if(Health>25*(1-src.HealthCut)&&src.HealthAnnounce25)
+				if(HealthPct()>25*(1-src.HealthCut)&&src.HealthAnnounce25)
 					src.HealthAnnounce25=0
-				if(Health<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
+				if(HealthPct()<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
 					var/Boosted=1
 					if(isRace(MAJIN))
 						Boosted*=getMajinMedRate()
@@ -1084,7 +1086,7 @@ mob/proc/
 				src<<"You are too tired to power up."
 				src.PoweringUp=0
 				if((isRace(HUMAN)||isRace(CELESTIAL)) && !isMazokuPathHuman())
-					if(Health<=30&&src.transActive==4&&src.transUnlocked>=5)
+					if(HealthPct()<=30&&src.transActive==4&&src.transUnlocked>=5)
 						src.race.transformations[5].transform(src, TRUE)
 				if(isRace(SAIYAN)||isRace(HALFSAIYAN))
 					if(src.transActive()>0)
@@ -1337,7 +1339,7 @@ mob/proc/Get_Sense_Reading(mob/A)
 			. = "Much Stronger"
 		if(500 to 1#INF)
 			. = "Massively Stronger"
-	if(A.Health<=25)
+	if(A.HealthPct()<=25)
 		. +=" (Disturbed)"
 	else if(A.KO&&A.MortallyWounded)
 		. +=" (Fading)"
@@ -1353,7 +1355,7 @@ mob/proc/Get_Scouter_Reading(mob/B)
 	var/EPM=B.Power_Multiplier//effective power multiplier
 	if(B.PowerEroded)
 		EPM-=B.PowerEroded
-	if(B.NanoBoost&&B.Health<25)
+	if(B.NanoBoost&&B.HealthPct()<25)
 		EPM+=0.25
 /*	if(B.isRace(MAKYO))
 		if(B.ActiveBuff&&!B.HasMechanized())

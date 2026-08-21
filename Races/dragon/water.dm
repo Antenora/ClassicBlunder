@@ -26,7 +26,7 @@
 
 
 /mob/Players/proc/HasOceanBringer()
-	if(passive_handler.Get("Ocean Bringer") && Health<=15)
+	if(passive_handler.Get("Ocean Bringer") && HealthPct()<=15)
 		return 1
 	return 0
 

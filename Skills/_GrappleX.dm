@@ -309,7 +309,7 @@ obj/Skills/Grapple
 		SkillCost=120
 		Copyable=4
 		AlwaysAnnounceCooldown = 1
-		DamageMult=2.5
+		DamageMult=3.55
 		Stunner=0.3
 		StrScaling=1
 		MenuIcon="Suplex"
@@ -332,7 +332,7 @@ obj/Skills/Grapple
 				Stunner=0.8
 				OneAndDone=1
 				StrScaling=1
-				DamageMult = 2.5 + (p.Potential / 100)
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=0
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
 				Effect="DarkSuplex"
@@ -341,7 +341,7 @@ obj/Skills/Grapple
 				Stunner=0.8
 				OneAndDone=1
 				StrScaling=1
-				DamageMult = 2.5 + (p.Potential / 100)
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=1
 			else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption))
 				Effect="CorruptSuplex"
@@ -350,11 +350,11 @@ obj/Skills/Grapple
 				Stunner=0.8
 				OneAndDone=1
 				StrScaling=1
-				DamageMult = 2.5 + (p.Potential / 100)
+				DamageMult = 3.55 + (p.Potential / 100)
 				EnergyDamage=0
 			else
 				Effect="Suplex"
-				DamageMult=2.5
+				DamageMult=3.55
 				EffectMult=1
 				Stunner=0.3
 				StrScaling=1
@@ -370,7 +370,7 @@ obj/Skills/Grapple
 		NewCopyable = 3
 		SkillCost=120
 		Copyable=4
-		DamageMult=3.15
+		DamageMult=4.5
 		MenuIcon="BurningFinger"
 		ForScaling=2
 		StrScaling=0.5
@@ -740,7 +740,7 @@ obj/Skills/Grapple
 						if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !Trg.MortallyWounded)
 							var/mortalDmg = Trg.Health * 0.05 // 5% of current
 							Trg.LoseHealth(mortalDmg)
-							Trg.WoundSelf(mortalDmg)
+							Trg.WoundSelf(Trg.HPToPct(mortalDmg))
 							Trg.MortallyWounded += 1
 							OMsg(User, "<b><font color=#ff0000>[User] has dealt a mortal blow to [Trg]!</font></b>")
 				OMsg(User, "[User] [src.TriggerMessage] [Trg]!")

@@ -62,7 +62,7 @@ SoldierTracker// i don't think this object is even necessary. it can literally b
             src.lastAttack = world.time
             flick("Attack", src)
             if(src.owner) src.owner.HitEffect(Target, 0, 1)//should definitely have an owner, but making sure
-            src.target.LoseHealth(src.damageValue)
+            src.target.LoseHealth(src.target.PctToHP(src.damageValue))
 
         EndMonkey(mob/m=null)
             if(m) m.MonkeySoldiers.monkeySoldiers.Remove(src);

@@ -368,7 +368,7 @@ mob/proc/DarumaMovingToward(turf/dest)
 		src.lastAttack = world.time
 		flick("Attack", src)
 		if(src.target)
-			src.target.LoseHealth(src.damageValue)
+			src.target.LoseHealth(src.target.PctToHP(src.damageValue))
 
 mob/proc/summonShadowClones(dmg, count, lifetimeTicks)
 	var/turf/center = get_turf(src)

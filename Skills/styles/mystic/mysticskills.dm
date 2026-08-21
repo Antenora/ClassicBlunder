@@ -320,7 +320,7 @@
 	WindupMessage="launches a powerful rainbow beam! Hahahahahahaha!!!"
 //	ActiveMessage="bursts forward to deliver a storm of rapid strikes!!"
 /obj/Skills/Projectile/Beams/ChaosBlaster
-	DamageMult=12
+	DamageMult=0.3429
 	Immediate=1
 	Dodgeable=0
 	StrScaling=1

@@ -2509,7 +2509,7 @@ NEW VARIABLES
 				if(!usr.BuffOn(src))
 					switch(n)
 						if(3)
-							if(usr.Health > 20 && usr.TotalInjury >= 75)
+							if(usr.HealthPct() > 20 && usr.TotalInjury >= 75)
 								usr<<"You have too much health, or too much injuries to use Limit Break 3"
 								return
 							else
@@ -2531,7 +2531,7 @@ NEW VARIABLES
 								OffMult = 1.3
 								OverClock = 0.5
 						if(2)
-							if(usr.Health > 50 && usr.TotalInjury >= 85)
+							if(usr.HealthPct() > 50 && usr.TotalInjury >= 85)
 								usr<<"You have too much health, or too much injuries to use Limit Break 2"
 								return
 							else
@@ -2749,7 +2749,7 @@ NEW VARIABLES
 
 					src.Cooldown()
 				else
-					if(usr.Health>50)
+					if(usr.HealthPct()>50)
 						usr << "You don't feel pressed enough to build up any tension!"
 						return
 					else
@@ -4457,7 +4457,7 @@ NEW VARIABLES
 					else
 						var/raceModifier = getRaceModifier(p)
 						var/asc = p.AscensionsAcquired
-						var/amt = (baseHeal + raceModifier) + ( (((perMissing + (missingPerAsc * asc)) + (raceModifier/raceDivisor))) * (100 - p.Health))
+						var/amt = (baseHeal + raceModifier) + ( (((perMissing + (missingPerAsc * asc)) + (raceModifier/raceDivisor))) * (100 - p.HealthPct()))
 						var/divider = asc * raceModifier > 0 ? asc * raceModifier : 1
 						var/time = 10 / divider
 						HealthHeal = (amt / time) * world.tick_lag
@@ -4962,7 +4962,7 @@ NEW VARIABLES
 				var/healthDiff = 0
 				//scales off how bad your losing
 				if(user.Target && ismob(user.Target))
-					healthDiff = user.Target.Health-user.Health
+					healthDiff = user.Target.HealthPct()-user.HealthPct()
 				switch(healthDiff)
 					if(-100 to 2)
 						PowerMult = 1
@@ -4995,7 +4995,7 @@ NEW VARIABLES
 				var/zenkaiLevel = user.AscensionsAcquired/10
 				passives = list("Adrenaline" = 1)
 				//scales off how low hp is
-				PowerMult = clamp((1+(zenkaiLevel/2))/user.Health,1, 1.5)
+				PowerMult = clamp((1+(zenkaiLevel/2))/user.HealthPct(),1, 1.5)
 			verb/Saiyan_Grit()
 				set category="Skills"
 				if(!usr.BuffOn(src))
@@ -5293,7 +5293,7 @@ NEW VARIABLES
 					var/magicLevel = 1 + p.getTotalMagicLevel()
 					var/base = round(magicLevel / 8)
 					var/perMissing = 0.01
-					var/amount = round(base + (abs(p.Health-100) * perMissing))
+					var/amount = round(base + (abs(p.HealthPct()-100) * perMissing))
 					TimerLimit = 25 * (1 - magicLevel / 40)
 					HealthHeal = (amount / (TimerLimit * world.tick_lag))
 
@@ -9328,10 +9328,10 @@ NEW VARIABLES
 					ForMult= 1.05 + (0.05 * usr.SagaLevel)
 					EndMult= 1.05 + (0.05 * usr.SagaLevel)
 					passives= list("PureReduction" = usr.SagaLevel/2, "PureDamage" = usr.SagaLevel/2)
-				if(usr.SagaLevel<3 && usr.Health>25)
+				if(usr.SagaLevel<3 && usr.HealthPct()>25)
 					usr << "You aren't pressed enough to fuse the powers of Protection and Destruction!"
 					return
-				if(usr.SagaLevel<6 && usr.Health>50)
+				if(usr.SagaLevel<6 && usr.HealthPct()>50)
 					usr << "You aren't pressed enough to fuse the powers of Protection and Destruction!"
 					return
 				if(usr.SagaLevel>=6)
@@ -9892,7 +9892,7 @@ NEW VARIABLES
 						var/secretLevel = p.secretDatum.currentTier
 						var/asc = p.AscensionsAcquired
 						if(p.Target && ismob(p.Target))
-							healthDiff = (p.Target.Health+p.Target.VaizardHealth)-p.Health
+							healthDiff = (p.Target.HealthPct()+p.Target.VaizardHealth)-p.HealthPct()
 						switch(healthDiff)
 							if(-100 to 5)
 								secretLevel += 0
@@ -12497,7 +12497,7 @@ mob
 						var/cost = B.ResourceCost[2]
 						if(resourceName in vars) //AHAHAHA!
 							// the cost associated exists
-							storage = vars[resourceName]
+							storage = (resourceName == "Health") ? HealthPct() : vars[resourceName]
 						else
 							if(passive_handler[resourceName])
 								storage = passive_handler[resourceName]
@@ -12513,7 +12513,7 @@ mob
 						var/resourceName = B.ResourceThreshold[1]
 						if(vars[resourceName])
 							// the cost associated exists
-							var/storage = vars[resourceName]
+							var/storage = (resourceName == "Health") ? HealthPct() : vars[resourceName]
 							var/threshold = B.ResourceThreshold[2]
 							if(resourceName in list("Health","Energy"))
 								if(storage<threshold*(1-vars["[resourceName]Cut"]))
@@ -12528,7 +12528,7 @@ mob
 							src << "You need more corruption"
 							return FALSE
 					if(B.HealthThreshold)
-						if(src.Health<B.HealthThreshold*(1-src.HealthCut))
+						if(src.HealthPct()<B.HealthThreshold*(1-src.HealthCut))
 							if(!B.Autonomous)
 								src << "You don't have enough health to use [B]."
 							return
@@ -12563,7 +12563,7 @@ mob
 								src << "You don't have enough mana capacity to use [B] right now."
 							return
 					if(B.HealthCost)
-						if(src.Health<B.HealthCost)
+						if(src.HealthPct()<B.HealthCost)
 							if(!B.Autonomous)
 								src << "You don't have enough health to activate [B]."
 							return
@@ -12656,7 +12656,7 @@ mob
 						src << "You can't use [B] before you're angry!"
 						return
 				if(B.NeedsHealth)
-					if(src.Health>B.NeedsHealth*(1-src.HealthCut))
+					if(src.HealthPct()>B.NeedsHealth*(1-src.HealthCut))
 						src << "You can't use [B] before you're below [B.NeedsHealth*(1-src.HealthCut)]% health!"
 						return
 				if(length(B.passives) > 0)
@@ -13036,7 +13036,7 @@ mob
 									src.AddSkill(new/obj/Skills/Projectile/Royal_Demon_Rose)
 					if(FightingSeriously(src,0))
 						if(src.SagaLevel>=5 && src.SagaLevel < 7)
-							if(src.Health<=15 || src.InjuryAnnounce)
+							if(src.HealthPct()<=15 || src.InjuryAnnounce)
 								src.ActiveBuff.ActiveMessage="burns their Cosmo with full strength and attains the Seventh Sense!!!"
 						if(src.SagaLevel==7)
 							src.ActiveBuff.ActiveMessage="burns their Cosmo with full strength and attains the Seventh Sense!!!"
@@ -14189,7 +14189,7 @@ mob
 				src.ArcaneBladework=1
 			if(B.WarpZone)
 				B.WarpTarget=src.Target
-				if(src.KO||src.Health<15)
+				if(src.KO||src.HealthPct()<15)
 					src.RemoveSlotlessBuff(B)
 					return
 				else
@@ -14220,7 +14220,7 @@ mob
 					src.Flying=1
 				Flight(src, Start=1)
 			if(B.HealthCost)
-				src.DoDamage(src, TrueDamage(B.HealthCost))
+				src.DoDamage(src, src.PctToHP(TrueDamage(B.HealthCost)))
 			if(B.EnergyCost)
 				var/drain = passive_handler["Drained"] ? B.EnergyCost * (1 + passive_handler["Drained"]/10) : B.EnergyCost
 				src.LoseEnergy(drain)
@@ -14237,7 +14237,10 @@ mob
 				var/cost = B.ResourceCost[2]
 				if(resourceName in vars)
 					// the cost associated exists
-					vars[resourceName] -= cost
+					if(resourceName == "Health")
+						Health -= PctToHP(cost)
+					else
+						vars[resourceName] -= cost
 					if(vars[resourceName] < 0)
 						vars[resourceName] = 0
 				else
@@ -14759,10 +14762,10 @@ mob
 			if(B.Overdrive)
 				if(src.MeditateModule)
 					if(isRace(ANDROID))
-						src.DoDamage(src, TrueDamage(15))
+						src.DoDamage(src, src.PctToHP(TrueDamage(15)))
 					else
 						src.WoundSelf(20)
-						src.DoDamage(src, TrueDamage(20))
+						src.DoDamage(src, src.PctToHP(TrueDamage(20)))
 				if(src.FusionPowered)
 					src.PowerControl=100
 
@@ -14870,11 +14873,11 @@ mob
 				debuffs.Add(B.DebuffCrash)
 				for(var/d in debuffs)
 					if(d=="Poison")
-						src.LoseHealth(src.Poison * 0.05)//5% at 100% poison
+						src.LoseHealth(src.PctToHP(src.Poison * 0.05))//5% at 100% poison
 						src.WoundSelf(src.Poison/20)
 						src.Poison=0
 					if(d=="Fire")
-						src.LoseHealth(src.Burn/20)//5% at 100% burn
+						src.LoseHealth(src.PctToHP(src.Burn/20))//5% at 100% burn
 						src.Burn=0
 
 			if(B.MaimCost)

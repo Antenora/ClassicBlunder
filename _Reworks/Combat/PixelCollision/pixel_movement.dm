@@ -493,7 +493,7 @@ mob/Players
 								if("Cooler") coolerFlashImage(src, ai_count)
 								if("Rainbow") rainbowFlashImage(src, ai_count)
 				if(passive_handler["Don't Move"])
-					LoseHealth(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"])
+					LoseHealth(PctToHP(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"]))
 					animate(src, color = "#850000")
 					animate(src, color = src.MobColor, time = world.tick_lag * delay)
 		else

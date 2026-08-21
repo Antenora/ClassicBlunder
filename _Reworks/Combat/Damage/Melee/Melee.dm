@@ -543,7 +543,7 @@
 						damage *= 0 + (0.25 * passive_handler["Speed Force"])
 					else
 						damage /= max(2,4-adjust)
-					damage *= clamp(GetSpd()**glob.LIGHT_ATTACK_SPEED_DMG_EXPONENT,glob.LIGHT_ATTACK_SPEED_DMG_LOWER,glob.LIGHT_ATTACK_SPEED_DMG_UPPER) // args were swapped - the 3x cap never applied
+					damage *= clamp(((GetSpd() + glob.LIGHT_ATTACK_SPEED_STAT_BASE) / glob.LIGHT_ATTACK_SPEED_REF) ** glob.LIGHT_ATTACK_SPEED_DMG_EXPONENT, glob.LIGHT_ATTACK_SPEED_DMG_LOWER, glob.LIGHT_ATTACK_SPEED_DMG_UPPER)
 					if(!adjust)
 						NoKB=1
 					if(SecondStrike || ThirdStrike || AsuraStrike)
@@ -679,7 +679,7 @@
 										whiffed = FALSE
 
 								if(whiffed)
-									damage /= rand(glob.MIN_WHIFF_DMG, glob.MAX_WHIFF_DMG)
+									damage /= glob.MIN_WHIFF_DMG + rand() * (glob.MAX_WHIFF_DMG - glob.MIN_WHIFF_DMG)
 									enemy.Whiff()
 									#if DEBUG_MELEE
 									log2text("Damage", "After Whiff", "damageDebugs.txt", "[ckey]/[name]")
@@ -748,7 +748,7 @@
 									if(prob(glob.MORTAL_BLOW_CHANCE * AttackQueue.MortalBlow) && !enemy.MortallyWounded)
 										var/mortalDmg = enemy.Health * 0.05 // 5% of current
 										enemy.LoseHealth(mortalDmg)
-										enemy.WoundSelf(mortalDmg/2)
+										enemy.WoundSelf(enemy.HPToPct(mortalDmg)/2)
 										enemy.MortallyWounded += 1
 										OMsg(enemy, "<b><font color=#ff0000>[src] has dealt a mortal blow to [enemy]!</font></b>")
 

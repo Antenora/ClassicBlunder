@@ -205,6 +205,6 @@ mob/var/tmp/ButouActive = FALSE
 		OMsg(usr, "<b>[usr] activates the poison hidden within [target].</b>")
 		target.Poison = 0
 		target.SilentPoisonAmount = 0
-		target.Health -= damage
+		target.Health -= target.PctToHP(damage)
 		if(target.Health <= 0 && !target.KO)
 			target.Unconscious(usr, "having their body eaten away at from within by [usr]'s poison!")

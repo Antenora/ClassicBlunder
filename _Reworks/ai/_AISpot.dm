@@ -179,11 +179,13 @@ obj
 				var/potBoon = 0.5 + p.Potential/200
 				p.StrMod = round(mi.str_mod + potBoon, 0.05)
 				p.EndMod = round(mi.end_mod + potBoon, 0.05)
+				p.VitMod = p.EndMod
 				p.SpdMod = round(mi.spd_mod + potBoon, 0.05)
 				p.ForMod = round(mi.for_mod + potBoon, 0.05)
 				p.OffMod = round(mi.off_mod + potBoon, 0.05)
 				p.DefMod = round(mi.def_mod + potBoon, 0.05)
 				p.RecovMod = round(mi.recov_mod + potBoon, 0.05)
+				p.Health = p.MaxHP()
 
 				p.HealthCut=1-min(1, mi.base_health/100)
 				p.HealthCut=round(p.HealthCut, 0.05)

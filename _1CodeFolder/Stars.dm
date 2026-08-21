@@ -53,7 +53,7 @@ obj/Stars
 			if(glob.GameStarted==0)
 				usr << "You cannot stake stars right now."
 				return
-			if(usr.Health<99*(1-usr.HealthCut))
+			if(usr.HealthPct()<99*(1-usr.HealthCut))
 				usr << "You can only stake stars at [100*(1-usr.HealthCut)]% health."
 				return
 			var/Stakes=input(usr, "Stake how many? (1-[src.Level])") as num

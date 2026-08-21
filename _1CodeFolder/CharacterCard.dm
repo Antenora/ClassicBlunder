@@ -360,7 +360,7 @@ client/proc/UpdateTargetCard()
 	var/intent = showltl ? "<span style=\"color:#ff5050\">LTL</span>&nbsp;&nbsp;" : (showinj ? "<span style=\"color:#ff5050\">INJ</span>&nbsp;&nbsp;" : "")
 	var/rp = T.PureRPMode ? "<span style=\"color:#55ee55\">RP</span>&nbsp;&nbsp;" : ""
 	tcardstatus.maptext = "<center><span style=\"[MCARD_FONT]; color:#bfefff\">[intent][rp][get_dist(mob, T)] Tiles</span></center>"
-	var/hp = min(max(round(T.Health, 0.01), 0), 100)
+	var/hp = min(max(round(T.HealthPct(), 0.01), 0), 100)
 	var/en = T.EnergyMax ? min(max(round((T.Energy / T.EnergyMax) * 100, 0.01), 0), 100) : 0
 	var/gd = 0
 	gd = min(max(round((T.GuardMeter / max(glob.GUARD_METER_MAX, 1)) * 100, 0.01), 0), 100)

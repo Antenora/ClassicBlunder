@@ -57,8 +57,8 @@ Hell Power does what this does but instead of health it's fatigue
 
 proc/ShonenPowerCheck(mob/player)
 	if(!player) return FALSE
-	if(player.Health >= glob.SHONEN_RAMP_START) return FALSE
-	if(player.Health < 1) return FALSE
+	if(player.HealthPct() >= glob.SHONEN_RAMP_START) return FALSE
+	if(player.HealthPct() < 1) return FALSE
 	if(!player.HasShonenPower())
 		return FALSE
 	return player.passive_handler.Get("ShonenPower")
@@ -67,7 +67,7 @@ proc/ShonenPowerCheck(mob/player)
 /mob/proc/getSPPower()
 	var/totalSP = ShonenPowerCheck(src)
 	if(totalSP)
-		var/f = clamp((glob.SHONEN_RAMP_START - Health) / (glob.SHONEN_RAMP_START - glob.SHONEN_RAMP_FLOOR), 0, 1)
+		var/f = clamp((glob.SHONEN_RAMP_START - HealthPct()) / (glob.SHONEN_RAMP_START - glob.SHONEN_RAMP_FLOOR), 0, 1)
 		return totalSP * f * glob.SHONEN_POWER_SCALE
 
 /strikeHook/shonenCounter
@@ -75,9 +75,9 @@ proc/ShonenPowerCheck(mob/player)
 	fire(strike/S)
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if(defender.passive_handler["Shonen"]&&defender.Target)
-			if(defender.Health < defender.Target.Health && attacker.Health < 50 + 5 * defender.AscensionsAcquired)
+			if(defender.HealthPct() < defender.Target.HealthPct() && attacker.HealthPct() < 50 + 5 * defender.AscensionsAcquired)
 				defender.ShonenCounter+=(val * (defender.AscensionsAcquired/40)) * 1 + (defender.passive_handler["Shonen"]/5)
 				if(defender.ShonenCounter>=glob.SHONENCOUNTERLIMIT)
 					defender.ShonenCounter=1
@@ -88,7 +88,7 @@ proc/ShonenPowerCheck(mob/player)
 							s.Trigger(defender, TRUE)
 						defender.ShonenAnnounce=1
 		if(attacker.passive_handler["Shonen"]&&defender==attacker.Target)
-			if(attacker.Health < attacker.Target.Health && attacker.Health < 50 + 5 * attacker.AscensionsAcquired)
+			if(attacker.HealthPct() < attacker.Target.HealthPct() && attacker.HealthPct() < 50 + 5 * attacker.AscensionsAcquired)
 				attacker.ShonenCounter+=(val * (attacker.AscensionsAcquired/40)) * 1 + (attacker.passive_handler["Shonen"]/5)
 				if(attacker.ShonenCounter>=glob.SHONENCOUNTERLIMIT)
 					attacker.ShonenCounter=1
@@ -104,7 +104,7 @@ proc/ShonenPowerCheck(mob/player)
 	fire(strike/S)
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if(!(defender.HasAdaptation()&&attacker==defender.Target||attacker.HasAdaptation()&&defender==attacker.Target))
 			return
 		if(defender.HasAdaptation()&&!defender.CheckSlotless("Great Ape"))

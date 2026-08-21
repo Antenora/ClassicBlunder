@@ -1,8 +1,9 @@
 mob/Player/AI/TestDummy
 	name = "Test Dummy"
+	VitMod = 30
 
 	Update()
-		Health = 100
+		SetHealthPct(100)
 		TotalInjury = 0
 		TotalFatigue = 0
 		if(KO) Conscious()

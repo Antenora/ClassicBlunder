@@ -280,7 +280,7 @@ client/proc/UpdatePartyCards()
 		var/nm = m.name
 		if(length(nm) > 18) nm = copytext(nm, 1, 17) + ".."
 		pc.nametext.maptext = "<center><span style=\"[PCARD_FONT]; color:#ffffff\">[nm]</span></center>"
-		var/hp = min(max(round(m.Health, 0.01), 0), 100)
+		var/hp = min(max(round(m.HealthPct(), 0.01), 0), 100)
 		var/en = m.EnergyMax ? min(max(round((m.Energy / m.EnergyMax) * 100, 0.01), 0), 100) : 0
 		UpdatePCardBars(pc, hp, en)
 

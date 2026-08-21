@@ -61,7 +61,7 @@
 	max_stacks = 4
 	do_effect(mob/defender, mob/attacker)
 		attacker.HealHealth(total_stacks * glob.racials.SOULDRAINHEAL)
-		defender.LoseHealth((total_stacks * glob.racials.SOULDRAINHEAL)/2)
+		defender.LoseHealth(defender.PctToHP((total_stacks * glob.racials.SOULDRAINHEAL)/2))
 		OMsg(defender, "[attacker] drains [defender]'s life force.")
 
 	adjust(mob/attacker)
@@ -106,7 +106,7 @@
 	do_effect(mob/defender, mob/attacker)
 
 	adjust(mob/attacker, mob/defender)
-		var/ratio = clamp(defender.Health / 100, 0.1, 0.9)
+		var/ratio = clamp(defender.HealthPct() / 100, 0.1, 0.9)
 		HealthDrain = glob.SERRATED_DAMAGE * ratio
 		PoisonAffected = 5 * ratio
 		TimerLimit = round(5 + (2.5 * ratio), 1)

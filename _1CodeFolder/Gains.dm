@@ -57,13 +57,13 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		InjuryAnnounce = 1
 
 	// Nanite Check
-	if(NanoBoost && Health<=25*(1-HealthCut)&&!NanoAnnounce)
+	if(NanoBoost && HealthPct()<=25*(1-HealthCut)&&!NanoAnnounce)
 		OMsg(src, "<font color='[src.NanoColor]'>[src][src.NanoBoostMessage]</font color>")
 		NanoAnnounce = 1
 		if(Saga && !(Saga in glob.CYBERIZESAGAS))
 			Unconscious(src, "cybernetic implosion!")
 	// 25% health check
-	if(Health < 25*(1-HealthCut) && !HealthAnnounce25)
+	if(HealthPct() < 25*(1-HealthCut) && !HealthAnnounce25)
 		if(exhaustedMessage)
 			OMessage(10, "<font color=#00FF55>[src] [exhaustedMessage]", "[src]([src.key]) has 25% health left.</font>")
 		else
@@ -79,7 +79,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		HealthAnnounce25 = 1
 
 	// 10% health check
-	if(Health < 10*(1-HealthCut) && !HealthAnnounce10)
+	if(HealthPct() < 10*(1-HealthCut) && !HealthAnnounce10)
 		if(desperateMessage)
 			OMessage(10, "<font color=#00FF55>[src] [desperateMessage]", "[src]([src.key]) has 10% health left.</font>")
 		else
@@ -164,7 +164,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && (Anger||AngerTier||AngerRush||AngerCalmHigh))
+		if(HealthPct()>=75*(1-HealthCut) && (Anger||AngerTier||AngerRush||AngerCalmHigh))
 			calmcounter--
 		else
 			calmcounter=5
@@ -296,7 +296,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	if(TimeStop)
 		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = new
 		book = locate() in src
-		LoseHealth(5/book.Mastery)
+		LoseHealth(PctToHP(5/book.Mastery))
 		book:TimeStopped++
 		if(book:TimeStopped>book.Mastery+1)
 			SkillX("Time Stop",x)
@@ -447,7 +447,7 @@ mob
 			// else
 			// 	MeditateTime=0
 			var/grit_value = passive_handler["Grit"]
-			if (grit_value >= 1 && Health <= clamp(15 + AscensionsAcquired * 10, 15, 75))
+			if (grit_value >= 1 && HealthPct() <= clamp(15 + AscensionsAcquired * 10, 15, 75))
 				HealHealth(grit_value / glob.racials.GRITDIVISOR)
 				if(prob(15*(AscensionsAcquired+1))&&src.icon_state!="Meditate")//penis text
 					src.VaizardHealth += (grit_value / glob.racials.GRITDIVISOR)
@@ -460,7 +460,7 @@ mob
 			Update_Stat_Labels()
 			if(grabbed && grabbed.Grab == src)
 				if(grabbed.passive_handler["Touch of Death"])
-					LoseHealth(glob.racials.TOD_DMG_PER_TICK * grabbed.passive_handler["Touch of Death"])
+					LoseHealth(PctToHP(glob.racials.TOD_DMG_PER_TICK * grabbed.passive_handler["Touch of Death"]))
 				if(grabbed.passive_handler["Cryokenesis"])
 					CryokenesisTime++
 					if(passive_handler["Fishman"])
@@ -473,7 +473,7 @@ mob
 							StunImmune = 0
 						Stun(src, 1+grabbed.passive_handler["Cryokenesis"])
 						passive_handler.Set("Shellshocked", 1)
-						LoseHealth(glob.racials.CRYOKENESISDAMAGE*grabbed.passive_handler["Cryokenesis"])
+						LoseHealth(PctToHP(glob.racials.CRYOKENESISDAMAGE*grabbed.passive_handler["Cryokenesis"]))
 						CryokenesisTime=0
 			else
 				grabbed = null
@@ -487,7 +487,7 @@ mob
 				// find out the cause
 				var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/ts = FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop)
 				if(ts)
-					src.LoseHealth(5/ts.Mastery)
+					src.LoseHealth(src.PctToHP(5/ts.Mastery))
 					ts:TimeStopped++
 					if(ts:TimeStopped>ts.Mastery+1)
 						src.SkillX("Time Stop",x, noGCD = TRUE)
@@ -551,7 +551,7 @@ mob
 				src.Revert()
 			if(passive_handler.Get("LunarWrath")&&PowerControl>100&&!passive_handler.Get("Unrelenting Wrath"))
 				var/ManaRando=rand(6,15)
-				if(src.Health<50)
+				if(src.HealthPct()<50)
 					ManaRando*=2
 				src.ManaAmount+=0.5*(ManaRando/10)
 			if(passive_handler.Get("LunarWrath"))
@@ -572,22 +572,22 @@ mob
 				if(src.canHTM())
 					src.race.transformations[2].transform(src, TRUE)
 			if(src.transActive==1&&src.isRace(NAMEKIAN))
-				if(src.Health<=(20+src.Potential/4))
+				if(src.HealthPct()<=(20+src.Potential/4))
 					src.race.transformations[2].transform(src, TRUE)
 			if(passive_handler.Get("TrueZenkai")&&src.transActive>=4)
-				if(Health>=70&&Health<=90)
+				if(HealthPct()>=70&&HealthPct()<=90)
 					if(passive_handler.Get("TrueZenkaiPower")<0.5)
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
-				if(Health>=50&&Health<=69)
+				if(HealthPct()>=50&&HealthPct()<=69)
 					if(passive_handler.Get("TrueZenkaiPower")<0.6)
 						passive_handler.Increase("TrueZenkaiPower", 0.003)
-				if(Health>=30&&Health<=49)
+				if(HealthPct()>=30&&HealthPct()<=49)
 					if(passive_handler.Get("TrueZenkaiPower")<1)
 						passive_handler.Increase("TrueZenkaiPower", 0.005)
-				if(Health>=15&&Health<=29)
+				if(HealthPct()>=15&&HealthPct()<=29)
 					if(passive_handler.Get("TrueZenkaiPower")<2)
 						passive_handler.Increase("TrueZenkaiPower", 0.008)
-				if(Health<=14)
+				if(HealthPct()<=14)
 					if(passive_handler.Get("TrueZenkaiPower")<3)
 						passive_handler.Increase("TrueZenkaiPower", 0.01)
 			if(passive_handler.Get("Full Manifestation"))
@@ -603,49 +603,49 @@ mob
 			if(passive_handler["LegendarySaiyan"]&&src.Tension>=src.getMaxTensionValue())
 				if(src.transActive==src.transUnlocked||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["GodKi"]||src.passive_handler["LegendarySaiyan"]&&src.passive_handler["SSJ4"])
 					if(!src.Stunned&&!src.Suspended)
-						src.DoDamage(src, (rand(1,5)/30))
+						src.DoDamage(src, src.PctToHP((rand(1,5)/30)))
 			if(passive_handler["Grit"])
 				AdjustGrit("sub", glob.racials.GRITSUBTRACT)
 			if((isRace(HUMAN)||isRace(CELESTIAL)&&CelestialAscension=="Angel") && !isMazokuPathHuman())
-				if(Health<=30)
+				if(HealthPct()<=30)
 					if(transActive==4&&transUnlocked>=5&&DoubleHelix>=4)
 						src.race.transformations[5].transform(src, TRUE)
 			if(isMazokuHuman() && src.icon_state != "Meditate")
 				var/ht_trigger_threshold = isMazokuAscension6() ? 40 : 25
 				// ≤75% HP from base form → activate Devil Trigger (slot 6)
-				if(transActive == 0 && Health <= 75 * (1 - HealthCut) && !src.KO)
+				if(transActive == 0 && HealthPct() <= 75 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// DT to HT drop below threshold
-				if(isInMazokuDT() && Health <= ht_trigger_threshold * (1 - HealthCut) && !src.KO)
+				if(isInMazokuDT() && HealthPct() <= ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// ≤25% HP in HT (Ascension 6 only): revert all HT forms, activate Sacred Energy Aura
-				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && Health <= 25 * (1 - HealthCut) && !src.KO)
+				if(isMazokuAscension6() && transActive >= 1 && !isInMazokuDT() && !isInMazokuSEA() && HealthPct() <= 25 * (1 - HealthCut) && !src.KO)
 					if(race && race.transformations && race.transformations.len >= 7)
 						mazokuRevertAllHT()
 						transActive = 6
 						race.transformations[7].transform(src, TRUE)
 				// HP rising SEA to HT (Ascension 6 only)
-				if(isMazokuAscension6() && isInMazokuSEA() && Health > 25 * (1 - HealthCut) && !src.KO)
+				if(isMazokuAscension6() && isInMazokuSEA() && HealthPct() > 25 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 					mazokuActivateHighestHT()
 				// HP rising HT to DT (revert all HT, re-enter Devil Trigger)
-				if(transActive >= 1 && transActive <= 5 && Health > ht_trigger_threshold * (1 - HealthCut) && !src.KO)
+				if(transActive >= 1 && transActive <= 5 && HealthPct() > ht_trigger_threshold * (1 - HealthCut) && !src.KO)
 					mazokuRevertAllHT()
 					if(race && race.transformations && race.transformations.len >= 6)
 						transActive = 5
 						race.transformations[6].transform(src, TRUE)
 				// HP rising DT to base form
-				if(isInMazokuDT() && Health > 75 * (1 - HealthCut) && !src.KO)
+				if(isInMazokuDT() && HealthPct() > 75 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 			if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive>0)
 				if(HellspawnBerserk)
 					HellspawnTimer-=1
 				if(TheCalamity&&BioArmor)
 					BioArmor-=1
-				if(HellspawnTimer <= 0 && HellspawnBerserk||Health<=50&&TheCalamity)
+				if(HellspawnTimer <= 0 && HellspawnBerserk||HealthPct()<=50&&TheCalamity)
 					HellspawnTimer = 0
 					OMsg(src, "<font color='grey'>[src] is no longer posessed by that thing.</font color>")
 					if(HellspawnBerserk)
@@ -768,7 +768,7 @@ mob
 					var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/Wassail
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Vampire/Wassail/W in src)
 						Wassail = W
-					if(!BuffOn(Wassail) && Health <= 75*(1-HealthCut))
+					if(!BuffOn(Wassail) && HealthPct() <= 75*(1-HealthCut))
 						if(!CheckSlotless("Rotschreck"))
 							Wassail.adjust(src)
 							Wassail.Trigger(src, Override=1)
@@ -1133,10 +1133,10 @@ mob
 				if(safety!=0) break
 				safety++
 				if(src.ActiveBuff.HealthDrain)
-					if(src.passive_handler.Get("ShiningBrightly")&&src.Health>25||!src.passive_handler.Get("ShiningBrightly"))
-						src.DoDamage(src, TrueDamage(src.ActiveBuff.HealthDrain))
+					if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()>25||!src.passive_handler.Get("ShiningBrightly"))
+						src.DoDamage(src, src.PctToHP(TrueDamage(src.ActiveBuff.HealthDrain)))
 				if(src.ActiveBuff.HealthThreshold&&!src.ActiveBuff.AllOutAttack)
-					if(src.Health<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+					if(src.HealthPct()<src.ActiveBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 						if(src.CheckActive("Eight Gates"))
 							var/obj/Skills/Buffs/ActiveBuffs/Eight_Gates/eg = src.ActiveBuff
 							eg.Stop_Cultivation()
@@ -1205,7 +1205,7 @@ mob
 						break
 
 				if(src.ActiveBuff.TooMuchHealth)
-					if(src.Health>=src.ActiveBuff.TooMuchHealth)
+					if(src.HealthPct()>=src.ActiveBuff.TooMuchHealth)
 						src.ActiveBuff.Trigger(src,Override=1)
 						break
 
@@ -1233,7 +1233,7 @@ mob
 					if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 						src.HealCapacity(src.ActiveBuff.CapacityHeal)
 				if(src.ActiveBuff.HealthHeal)
-					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+					if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						if((src.ActiveBuff.InstantAffect&&!src.ActiveBuff.InstantAffected)||!src.ActiveBuff.InstantAffect)
 							src.HealWounds(src.ActiveBuff.HealthHeal)
 					else
@@ -1303,12 +1303,12 @@ mob
 				if(safety!=0) break
 				safety++
 				var/HealthDrainMult=1
-				if(src.passive_handler.Get("ShiningBrightly")&&src.Health<=25)
+				if(src.passive_handler.Get("ShiningBrightly")&&src.HealthPct()<=25)
 					HealthDrainMult=0
 				if(src.SpecialBuff.HealthDrain)
-					src.DoDamage(src, TrueDamage(src.SpecialBuff.HealthDrain*HealthDrainMult))
+					src.DoDamage(src, src.PctToHP(TrueDamage(src.SpecialBuff.HealthDrain*HealthDrainMult)))
 				if(src.SpecialBuff.HealthThreshold&&!src.SpecialBuff.AllOutAttack)
-					if(src.Health<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
+					if(src.HealthPct()<src.SpecialBuff.HealthThreshold*(1-src.HealthCut)||src.KO)
 						src.SpecialBuff.Trigger(src,Override=1)
 						break
 
@@ -1361,7 +1361,7 @@ mob
 						break
 
 				if(src.SpecialBuff.TooMuchHealth)
-					if(src.Health>=src.SpecialBuff.TooMuchHealth)
+					if(src.HealthPct()>=src.SpecialBuff.TooMuchHealth)
 						src.SpecialBuff.Trigger(src,Override=1)
 						break
 
@@ -1382,7 +1382,7 @@ mob
 				if(src.SpecialBuff.CapacityHeal)
 					src.HealCapacity(src.SpecialBuff.CapacityHeal)
 				if(src.SpecialBuff.HealthHeal)
-					if((src.Health+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
+					if((src.HealthPct()+src.TotalInjury)>=100||(src.TotalInjury&&src.icon_state=="Meditate"))
 						src.HealWounds(src.SpecialBuff.HealthHeal)
 					else
 						src.HealHealth(src.SpecialBuff.HealthHeal)
@@ -1539,7 +1539,7 @@ mob
 						if(!src.WoundIntent)
 							continue
 					if(A.NeedsHealth&&!A.Using&&!src.KO&&!AGLock)
-						if(src.Health<=A.NeedsHealth*(1-src.HealthCut))
+						if(src.HealthPct()<=A.NeedsHealth*(1-src.HealthCut))
 							A.Trigger(src,Override=1)
 							if(A.NeedsVary)
 								A.NeedsHealth=rand(10,A.TooMuchHealth-5)
@@ -1661,12 +1661,12 @@ mob
 							A.Trigger(src,Override=1)
 							continue
 					if(A.TooMuchHealth)
-						if(src.Health>=A.TooMuchHealth)
+						if(src.HealthPct()>=A.TooMuchHealth)
 							if(A.SlotlessOn)
 								A.Trigger(src,Override=1)
 								continue
 					if(A.TooLittleHealth)
-						if(src.Health<=A.TooLittleHealth)
+						if(src.HealthPct()<=A.TooLittleHealth)
 							if(A.SlotlessOn)
 								A.Trigger(src,Override=1)
 								continue
@@ -1711,8 +1711,8 @@ mob
 				animate(src.client, color=list(1,0,0, 0.25,0.75,0, 0.25,0,0.75, 0,0,0), time=3) */
 			if(src.KO||src.MortallyWounded>3)
 				if(prob(10*src.MortallyWounded/src.GetRecov()))
-					src.Health-=10/max(src.Health,10)
-					if(src.Health<=-300)
+					src.Health-=src.PctToHP(10/max(src.HealthPct(),10))
+					if(src.Health<=-3*src.MaxHP())
 						if(prob(90/GetRecov())&&!src.StabilizeModule)
 							src.Death(null,"internal injuries!")
 						else
@@ -1738,9 +1738,9 @@ mob
 
 			if(!passive_handler.Get("StaticWalk")&&!src.Dead)
 				if(istype(T,/turf/Special/Static))
-					src.Health-=0.05
+					src.Health-=src.PctToHP(0.05)
 				if(istype(T,/turf/Dirt99))
-					src.Health-=0.05
+					src.Health-=src.PctToHP(0.05)
 			if(istype(T,/turf/Special/Stars)||istype(T,/turf/Special/EventStars))
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
@@ -1754,7 +1754,7 @@ mob
 						src.LoseEnergy(20)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
 				else if(BreathingMaskOn==1)
@@ -1768,7 +1768,7 @@ mob
 						src.LoseEnergy(20)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
 			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
@@ -1869,7 +1869,7 @@ mob
 							if(BreathingMaskOn==0)
 								src.Oxygen=0
 								src.DamageSelf(TrueDamage(1))
-								if(src.Health<-300)
+								if(src.Health < -3*src.MaxHP())
 									if(prob(20)&&!src.StabilizeModule)
 										src.Death(null,"oxygen deprivation!")
 							else
@@ -1879,7 +1879,7 @@ mob
 									src.LoseEnergy(20)
 									if(src.TotalFatigue>=95)
 										src.DamageSelf(TrueDamage(1))
-										if(src.Health<-300)
+										if(src.Health < -3*src.MaxHP())
 											if(prob(20)&&!src.StabilizeModule)
 												src.Death(null,"oxygen deprivation!")
 			else
@@ -1898,7 +1898,7 @@ mob
 					src.LoseEnergy(20)
 					if(src.TotalFatigue>=95)
 						src.DamageSelf(TrueDamage(1))
-						if(src.Health<-300)
+						if(src.Health < -3*src.MaxHP())
 							if(prob(20)&&!src.StabilizeModule)
 								src.Death(null,"oxygen deprivation!")
 

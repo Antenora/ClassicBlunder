@@ -71,7 +71,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 		reduceVaiHealth(dmg)
 	if(BioArmor)
 		reduceBioArmor(dmg)
-	if(typeOfDebuff == "Burn" && (passive_handler.Get("FireAbsorb") || CheckSlotless("Heat of Passion") && Health <= 15 ))
+	if(typeOfDebuff == "Burn" && (passive_handler.Get("FireAbsorb") || CheckSlotless("Heat of Passion") && HealthPct() <= 15 ))
 		dmg = 0
 	switch(typeOfDebuff)
 		if("Burn")
@@ -83,11 +83,11 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 	if(!src.GetDebuffReversal())
 		if(typeOfDebuff == "Frenzy" && Health <= 0)
 			dmg = 0
-		Health-=dmg
+		Health -= PctToHP(dmg)
 		if(typeOfDebuff == "Frenzy" && !IsDarkDragonPlayer() && dmg > 0)
 			WoundSelf(dmg * 0.5)
 	if(Health<=0 && !KO)
-		if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP)
+		if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
 			return
 		if(typeOfDebuff == "Poison")
 			Unconscious(null, "succumbing to Poison!")

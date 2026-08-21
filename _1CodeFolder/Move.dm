@@ -102,11 +102,12 @@ proc
 				B.Open()
 globalTracker/var/SPEED_DELAY = 3
 globalTracker/var/GOD_SPEED_MULT = 0.4
-globalTracker/var/TOTAL_SPEED_BONUS = 0.05 //was 0.4 - floor-touch moves from Spd~7 to Spd~30 so investment shows; the 1.75 cap itself is untouched
+globalTracker/var/TOTAL_SPEED_BONUS = 0.031
+globalTracker/var/MOVE_STAT_BASE = 19
 globalTracker/var/SPEED_DELAY_LOWEST = 1.75
 mob/proc/MovementSpeed()
-	var/Spd=max(0.1,round(sqrt(src.GetSpd(glob.TOTAL_SPEED_BONUS)),0.1))
-	var/SpdMin=max(0.1,round(sqrt(passive_handler.Get("Skimming")*2*glob.TOTAL_SPEED_BONUS),0.1))
+	var/Spd=max(0.1,round(sqrt((src.GetSpd()+glob.MOVE_STAT_BASE)*glob.TOTAL_SPEED_BONUS),0.1))
+	var/SpdMin=max(0.1,round(sqrt((passive_handler.Get("Skimming")*2+glob.MOVE_STAT_BASE)*glob.TOTAL_SPEED_BONUS),0.1))
 	if(passive_handler.Get("Skimming") + is_dashing)
 		if(Spd<SpdMin)
 			Spd=SpdMin
@@ -127,7 +128,7 @@ mob/proc/MovementSpeed()
 	if(src.HasBlastShielding())
 		Delay*=3
 	if(src.CanBeSlowed())
-		var/CombatSlow=glob.COMBAT_SLOW_THRESHOLD/max(src.Health,1)
+		var/CombatSlow=glob.COMBAT_SLOW_THRESHOLD/max(src.HealthPct(),1)
 		if(CombatSlow>1 && !passive_handler["Undying Rage"])
 			var/Adren = passive_handler.Get("Adrenaline")
 			if(Adren)

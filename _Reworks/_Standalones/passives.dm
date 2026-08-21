@@ -4,6 +4,7 @@ mob
 
 mob/New()
 	if(!passive_handler) passive_handler = new
+	Health = MaxHP()
 	..()
 /*	verb
 		GetAllPassives() //test verb, remove later

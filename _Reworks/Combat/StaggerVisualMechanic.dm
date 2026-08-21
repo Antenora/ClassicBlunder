@@ -75,7 +75,7 @@ mob/proc/HideBossStaggerBar()
     fire(strike/S)
         var/mob/attacker = S.attacker
         var/mob/defender = S.defender
-        var/val = S.dealt
+        var/val = S.defender.HPToPct(S.dealt)
         if(!defender.passive_handler.Get("BossStagger") || defender.passive_handler.Get("Staggered!"))
             return
         defender.StaggerMeter+=min(max(val, 0.1), glob.STAGGER_HIT_CAP)*defender.StaggerMult

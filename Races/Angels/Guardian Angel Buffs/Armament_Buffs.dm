@@ -47,7 +47,7 @@
 				if(cooldown_remaining > 0)
 					return
 
-				var/hp_percent = (M.Health)
+				var/hp_percent = (M.HealthPct())
 				if(hp_percent > TooMuchHealth)
 					M << "<font color='#f7da1b'>Your current health prevents invoking the Ten Commandments. (Try again at 35%!)</font>"
 					return

@@ -1767,7 +1767,7 @@ obj
 				SpecialAttack=1
 				ComboMaster=1
 				Rounds=5
-				DamageMult=0.05//1 damage mult is from the projectile itself.
+				DamageMult=0.1//1 damage mult is from the projectile itself.
 				Icon='SweepingKick.dmi'
 				IconX=-32
 				IconY=-32
@@ -4262,7 +4262,7 @@ obj
 				verb/Demon_Pacifier()
 					set category="Skills"
 					set name="Tenma Kofuku"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.Activate(src)
@@ -4369,7 +4369,7 @@ obj
 				ActiveMessage="unleashes the power of the Legendary Exalibur, parting everything before them!"
 				verb/Sacred_Sword_Excalibur()
 					set category="Skills"
-					if(usr.SagaLevel<5 && usr.Health>15 && !usr.InjuryAnnounce)
+					if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 						usr << "You can't use this technique except when in a dire pinch!"
 						return
 					usr.Activate(src)
@@ -5362,7 +5362,7 @@ mob
 					Z.Cooldown(iwtl_cd)
 					return FALSE
 			if(Z.NeedsHealth)
-				if(src.Health>Z.NeedsHealth*(1-src.HealthCut))
+				if(src.HealthPct()>Z.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Z] before you're below [Z.NeedsHealth*(1-src.HealthCut)]% health!"
 					return FALSE
 			if(Z.NeedsSword)
@@ -5424,7 +5424,7 @@ mob
 					src << "You need a [istype(Z.ClassNeeded, /list) ? Z.ClassNeeded[1] : Z.ClassNeeded]-class weapon to use this technique."
 					return FALSE
 			if(Z.HealthCost)
-				if(src.Health<Z.HealthCost*glob.WorldDamageMult&&!Z.AllOutAttack)
+				if(src.HealthPct()<Z.HealthCost*glob.WorldDamageMult&&!Z.AllOutAttack)
 					return FALSE
 			if(Z.EnergyCost)
 				var/drain = passive_handler["Drained"] ? Z.EnergyCost * (1 + passive_handler["Drained"]/10) : Z.EnergyCost
@@ -6062,9 +6062,9 @@ mob
 				src.HitSparkDelay=null
 				src.HitSparkLife=null
 			if(Z.HealthCost)
-				src.DoDamage(src, Z.HealthCost*CostMultiplier*glob.WorldDamageMult)
+				src.DoDamage(src, src.PctToHP(Z.HealthCost*CostMultiplier*glob.WorldDamageMult))
 			if(Z.PlatinumMad)
-				src.DoDamage(src, 9001)
+				src.DoDamage(src, src.PctToHP(9001))
 			if(Z.WoundCost)
 				src.WoundSelf(Z.WoundCost*CostMultiplier*glob.WorldDamageMult)
 			if(Z.EnergyCost)
@@ -6882,7 +6882,7 @@ obj
 					m << "You feel a need to go collect your coins before they're stolen!"
 
 				if(src.SpeedStrike>0)
-					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd())*(src.SpeedStrike/glob.SPEEDSTRIKEDIVISOR))),1,3)
+					FinalDmg *= clamp(sqrt(1+((Owner.GetSpd()+glob.LIGHT_ATTACK_SPEED_STAT_BASE)*(src.SpeedStrike/glob.SPEEDSTRIKEDIVISOR))),1,3)
 				FinalDmg *= m.ccProrationMult(Owner, includeSuspended = 1, skillCM = ComboMaster, dunk = (Dunker||Destroyer))
 				if(m.Stunned && Destroyer)
 					FinalDmg *= 1 + (Destroyer/10)
@@ -6983,9 +6983,9 @@ obj
 						FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
 				if(src.Executor)
 					var/additonal = src.Executor * 0.1
-					if(m.Health<=5)
+					if(m.HealthPct()<=5)
 						additonal *= 2
-					if(m.Health <=25)
+					if(m.HealthPct() <=25)
 						FinalDmg *= 1 + additonal
 				if(FromSkill && FromSkill.BonusVsStunned && m.Stunned)
 					FinalDmg *= 1 + FromSkill.BonusVsStunned
@@ -7012,7 +7012,7 @@ obj
 					// hit multiple targets and the doubling is per-target.
 					if(Owner && Owner.hasMagePassive(/mage_passive/dark/Shadowbringer) && m.Potential >= Owner.Potential + 5)
 						additonal = max(additonal, 2)
-					var/missingHealth = 100-m.Health
+					var/missingHealth = 100-m.HealthPct()
 					FinalDmg *= 1 + (((additonal*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
 				if(Owner && ismob(m) && src.FromSkill)
 					m.NoteSkillHit(Owner, src.FromSkill:type)
@@ -7120,10 +7120,10 @@ obj
 					if(src.MortalBlow<0)
 						m.MortallyWounded+=4
 					else
-						if((prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) || (FromSkill && FromSkill.ExecuteMortal && m.Health < FromSkill.ExecuteMortal)) && !m.MortallyWounded)
+						if((prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) || (FromSkill && FromSkill.ExecuteMortal && m.HealthPct() < FromSkill.ExecuteMortal)) && !m.MortallyWounded)
 							var/mortalDmg = m.Health * 0.05 // 5% of current
 							m.LoseHealth(mortalDmg)
-							m.WoundSelf(mortalDmg)
+							m.WoundSelf(m.HPToPct(mortalDmg))
 							m.MortallyWounded += 1
 							OMsg(m, "<b><font color=#ff0000>[src] has dealt a mortal blow to [m]!</font></b>")
 						if(src.MortalBlow>1)
@@ -7199,7 +7199,7 @@ obj
 									m << "You redirected the force of the attack back at [src.Owner]!"
 									return
 				if(src.DirectWounds)
-					src.Owner.DealWounds(m, src.DirectWounds);
+					src.Owner.DealWounds(m, m.PctToHP(src.DirectWounds));
 				if(SpellElement == "Water" && m.passive_handler.Get("ChillAbsorb"))
 					m.HealHealth(FinalDmg * (0.1 * m.passive_handler.Get("ChillAbsorb")))
 					return
@@ -7218,7 +7218,7 @@ obj
 						fixedAmt *= 1 + Owner.attackModifiers(m, specDmgTypes)
 					var/DefReduction=sqrt(m.BaseDef())
 					fixedAmt/=DefReduction
-					m.LoseHealth(fixedAmt)
+					m.LoseHealth(m.PctToHP(fixedAmt))
 					damageDealt = fixedAmt
 					if(m.Health <= 0 && !m.KO)
 						m.Unconscious(src.Owner)

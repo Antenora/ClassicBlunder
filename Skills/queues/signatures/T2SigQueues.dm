@@ -65,7 +65,7 @@ obj
 				name="Defiance"
 				verb/Defiance()
 					set category="Skills"
-					if(usr.Health >= 35)
+					if(usr.HealthPct() >= 35)
 						usr << "<font color='red'>Defiance only answers desperation - below 35% health.</font>"
 						return
 					usr.SetQueue(src)

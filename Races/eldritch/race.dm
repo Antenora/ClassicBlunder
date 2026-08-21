@@ -46,7 +46,7 @@ race
 	fire(strike/S)
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if(attacker.hasSecret("Eldritch"))
 			if(!S.second)
 				var/SecretInformation/Eldritch/s = attacker.secretDatum

@@ -195,7 +195,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 	stage = "post"
 	fire(strike/S)
 		var/mob/attacker = S.attacker
-		var/val = S.dealt
+		var/val = S.defender.HPToPct(S.dealt)
 		if(attacker.dainsleifDrawn&&attacker.passive_handler.Get("CursedSheath")) // dainsleif passive
 			attacker.cursedSheathValue += val
 			attacker.cursedSheathValue = clamp(0, attacker.cursedSheathValue, attacker.SagaLevel*50)

@@ -7,11 +7,11 @@
 		InjuryAnnounce = 1
 
 	// Nanite Check
-	if(NanoBoost && Health<=glob.gains.NANOHEALTH*(1-HealthCut)&&!NanoAnnounce)
+	if(NanoBoost && HealthPct()<=glob.gains.NANOHEALTH*(1-HealthCut)&&!NanoAnnounce)
 		OMsg(src, "<font color='green'>[src]'s nanites respond to their physical trauma, bolstering their cybernetic power!</font color>")
 		NanoAnnounce = 1
 	// 25% health check
-	if(Health < 25*(1-HealthCut) && !HealthAnnounce25)
+	if(HealthPct() < 25*(1-HealthCut) && !HealthAnnounce25)
 		if(!ExhaustedColor)
 			OMessage(10, "<font color=#F07E1F>[src] [exhaustedMessage]!", "[src]([src.key]) has 25% health left.</font>")
 		else
@@ -23,7 +23,7 @@
 			src.OMessage(10, "<font color=#c3b329>[src]'s will to be a HERO gives them a second wind!</font>", "[src]([src.key]) has triggered plot armor.")
 
 	// 10% health check
-	if(Health < 10*(1-HealthCut) && !HealthAnnounce10)
+	if(HealthPct() < 10*(1-HealthCut) && !HealthAnnounce10)
 		if(!BarelyStandingColor)
 			OMessage(10, "<font color=#F07E1F>[src] [desperateMessage]!", "[src]([src.key]) has 10% health left.</font>")
 		else
@@ -53,7 +53,7 @@
 			var/SecretInformation/Eldritch/s = secretDatum
 			s.releaseMadness(src)
 
-		if(Health>=75*(1-HealthCut) && Anger!=0)
+		if(HealthPct()>=75*(1-HealthCut) && Anger!=0)
 			calmcounter -= tick_second
 		else
 			calmcounter = 5
@@ -162,7 +162,7 @@
 	if(TimeStop)
 		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = new
 		book = locate() in src
-		LoseHealth(0.5/book.Mastery)
+		LoseHealth(PctToHP(0.5/book.Mastery))
 		book:TimeStopped+= world.tick_lag
 		if(book:TimeStopped>book.Mastery+1)
 			SkillX("Time Stop",x)

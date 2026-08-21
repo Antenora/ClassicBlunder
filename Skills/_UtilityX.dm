@@ -8,7 +8,7 @@
 /mob/proc/FullRestore()
 	if(KO)
 		Conscious()
-	Health=100
+	SetHealthPct(100)
 	Energy=EnergyMax
 	ManaAmount=ManaMax*GetManaCapMult()
 	Burn=0
@@ -722,7 +722,7 @@ obj/Skills/Utility
 					if(antiscry)
 						usr << "<b><font color=[selector.Text_Color]><font size=+1>[selector] reflects your attempt at Scrying-- You feel yourself struck with retribution!</b></font color></font size>"
 						selector << "<b>[usr] has attempted to observe you!</b>"
-						usr.DoDamage(usr, 25)
+						usr.DoDamage(usr, usr.PctToHP(25))
 						if (usr.Health <= 0)
 							usr.Unconscious(null, "scrying disruption!")
 						return

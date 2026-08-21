@@ -1057,6 +1057,7 @@ obj/Skills/Companion/arcane_follower
 			a.StrMod = 1
 			a.ForMod = 3 + Mastery/2
 			a.EndMod = 1
+			a.VitMod = a.EndMod
 			a.SpdMod = 5
 			a.OffMod = 3 + Mastery/2
 			a.DefMod = 3 + Mastery/2
@@ -1220,7 +1221,7 @@ mob/Player/AI/Nympharum
 				ai_spammer = 10
 				// TechniqueMastery = 1
 
-		if(src.Health != 100 || src.Energy != 100 || src.ManaAmount != 100)
+		if(src.HealthPct() != 100 || src.Energy != 100 || src.ManaAmount != 100)
 			if(world.time >= ai_next_gainloop)
 				AIGain()
 				ai_next_gainloop = world.time + 10
@@ -1327,7 +1328,7 @@ mob/Player/AI/Nympharum
 							if(loc == ai_owner.loc) step_away(src, src.ai_owner)
 							if(get_dist(src, ai_owner) <= 1) dir = ai_owner.dir
 
-					else if(Health != 100 || (ai_owner && ai_owner.icon_state =="Meditate"))
+					else if(HealthPct() != 100 || (ai_owner && ai_owner.icon_state =="Meditate"))
 						icon_state = "Meditate"
 						if(ai_stall == 0)
 							ai_stall = 10
@@ -1473,7 +1474,7 @@ mob/Player/AI/Nympharum
 	AIGain()
 		set waitfor=0
 		density=0
-		Health = 100
+		SetHealthPct(100)
 		Energy = 100
 		ManaAmount = 100
 		TotalInjury = 0

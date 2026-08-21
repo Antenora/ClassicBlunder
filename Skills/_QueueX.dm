@@ -1428,7 +1428,7 @@ mob
 			if(Q.FocusShifter)
 				src.ActivateFocusShift(Q.FocusShiftType, Q.FocusShiftBoost, Q.FocusShiftTimer, Q.FocusStatIdentity())
 			if(Q.NeedsHealth)
-				if(src.Health>Q.NeedsHealth*(1-src.HealthCut))
+				if(src.HealthPct()>Q.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Q] before you're below [Q.NeedsHealth*(1-src.HealthCut)]% health!"
 					return
 			if(Q.MagicNeeded&&!src.HasLimitlessMagic())
@@ -1464,7 +1464,7 @@ mob
 						src << "You need a [Q.ClassNeeded]-class weapon to use this technique."
 						return
 			if(Q.HealthCost)
-				if(src.Health<Q.HealthCost*glob.WorldDamageMult&&!Q.AllOutAttack)
+				if(src.HealthPct()<Q.HealthCost*glob.WorldDamageMult&&!Q.AllOutAttack)
 					return
 			if(Q.EnergyCost)
 				var/drain = passive_handler["Drained"] ? Q.EnergyCost * (1 + passive_handler["Drained"]/10) : Q.EnergyCost
@@ -1624,32 +1624,32 @@ mob
 			var/Damage=1
 			// this acts as a multiplier, so something like a 5 damage mult will result in insane numbers
 			DEBUGMSG("START DAMAGE: [Damage]")
-			if(AttackQueue.Finisher && P.Health < 50)
-				var/missing = abs(P.Health-50)
+			if(AttackQueue.Finisher && P.HealthPct() < 50)
+				var/missing = abs(P.HealthPct()-50)
 				var/extra = missing * (glob.FINISHERDMG * AttackQueue.Finisher)
 				Damage+=extra // glob (0.5% * finisher) extra damage for every health under 50 )
 			DEBUGMSG("NEW DAMAGE AFTER FINISHER: [Damage]")
-			if(AttackQueue.Opener && P.Health > 50)
-				var/missing = abs(50-P.Health)
+			if(AttackQueue.Opener && P.HealthPct() > 50)
+				var/missing = abs(50-P.HealthPct())
 				var/extra = missing * (glob.OPENERDMG * AttackQueue.Opener)
 				Damage+=extra
 			DEBUGMSG("NEW DAMAGE AFTER OPENER: [Damage]")
 			if(src.AttackQueue.Decider)
 				var/deciderDmg = glob.DECIDERDMG * AttackQueue.Decider // the extra amount of damage to do in the case everyiong = 1
-				var/healthcloseness = abs(Health - P.Health)/100
+				var/healthcloseness = abs(HealthPct() - P.HealthPct())/100
 				deciderDmg *= (1 - healthcloseness)
 				if(deciderDmg > 0)
 					Damage+=deciderDmg
 			DEBUGMSG("NEW DAMAGE AFTER DECIDER: [Damage]")
 			if(AttackQueue.Dominator)
-				if(Health>P.Health)
-					var/ratio = clamp(Health / P.Health, 1, 4)
+				if(HealthPct()>P.HealthPct())
+					var/ratio = clamp(HealthPct() / P.HealthPct(), 1, 4)
 					if(ratio > 0)
 						Damage += (ratio-1) * ( AttackQueue.Dominator / 4)
 			DEBUGMSG("NEW DAMAGE AFTER DOMINATOR: [Damage]")
 			if(AttackQueue.Determinator)
-				if(Health<P.Health&&Health!=0)
-					var/ratio = clamp( P.Health / Health, 1, 4)
+				if(HealthPct()<P.HealthPct()&&Health!=0)
+					var/ratio = clamp( P.HealthPct() / HealthPct(), 1, 4)
 					if(ratio > 0)
 						Damage+= (ratio-1) * (AttackQueue.Determinator / 4)
 			DEBUGMSG("NEW DAMAGE AFTER DETERMINATOR: [Damage]")
@@ -1658,10 +1658,10 @@ mob
 				Damage+=(addDamage)
 			DEBUGMSG("NEW DAMAGE AFTER DELAYER: [Damage]")
 			if(src.AttackQueue.SpeedStrike>0)
-				Damage *= clamp(sqrt( ( 1+ ( src.GetSpd())*( src.AttackQueue.SpeedStrike/glob.SPEEDSTRIKEDIVISOR ) ) ),1 ,3)
+				Damage *= clamp(sqrt( ( 1+ ( src.GetSpd()+glob.LIGHT_ATTACK_SPEED_STAT_BASE)*( src.AttackQueue.SpeedStrike/glob.SPEEDSTRIKEDIVISOR ) ) ),1 ,3)
 			DEBUGMSG("NEW DAMAGE AFTER SPEEDSTRIKE: [Damage]")
 			if(src.AttackQueue.SweepStrike>0)
-				Damage *= clamp(sqrt(( 1+ (P.GetSpd())*(src.AttackQueue.SweepStrike/glob.SWEEPSTRIKEDIVISOR))),1 ,3)
+				Damage *= clamp(sqrt(( 1+ (P.GetSpd()+glob.LIGHT_ATTACK_SPEED_STAT_BASE)*(src.AttackQueue.SweepStrike/glob.SWEEPSTRIKEDIVISOR))),1 ,3)
 			DEBUGMSG("NEW DAMAGE AFTER SWEEPSTRIKE: [Damage]")
 			if(src.AttackQueue.GodPowered)
 				src.transcend(src.AttackQueue.GodPowered)
@@ -1883,7 +1883,7 @@ mob
 				src.AttackQueue.AccuracyMult/=src.AttackQueue.RipplePower
 				src.AttackQueue.RipplePower=1
 			if(src.AttackQueue.HealthCost)
-				src.DoDamage(src, TrueDamage(src.AttackQueue.HealthCost*glob.WorldDamageMult))
+				src.DoDamage(src, src.PctToHP(TrueDamage(src.AttackQueue.HealthCost*glob.WorldDamageMult)))
 			if(src.AttackQueue.WoundCost)
 				src.WoundSelf(src.AttackQueue.WoundCost*glob.WorldDamageMult)
 			if(src.AttackQueue.EnergyCost)

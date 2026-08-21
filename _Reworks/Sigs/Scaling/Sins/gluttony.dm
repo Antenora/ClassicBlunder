@@ -82,7 +82,7 @@
     adjust(mob/p)
         passives = list("Gluttony" = round(p.Potential/100,0.5), "ManaSteal" = p.Potential/4, "EnergySteal" = p.Potential/4, "PureReduction" = p.Potential/25, "LifeSteal" = p.Potential/8)
         var/baseHeal = p.Potential/20
-        var/missingHealth = abs(p.Health - 100)
+        var/missingHealth = abs(p.HealthPct() - 100)
         var/boons = 1 + ((p.SpecialBuff:anAcquiredTaste / 20) + (p.SpecialBuff:gluttonStorage/p.SpecialBuff:maxGluttonStorage) )
         var/perMissing = 0.008
         TimerLimit = 20 + (p.Potential/4)

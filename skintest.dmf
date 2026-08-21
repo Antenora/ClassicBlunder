@@ -3163,9 +3163,9 @@ window "Finalize_Screen"
 		text = "2x Battle Power"
 	elem "Proceed"
 		type = BUTTON
-		pos = 636,212
+		pos = 636,241
 		size = 367x28
-		anchor1 = 63,78
+		anchor1 = 63,87
 		anchor2 = 99,97
 		font-family = "TinyPixie2"
 		font-size = 8
@@ -3176,6 +3176,81 @@ window "Finalize_Screen"
 		saved-params = "is-checked"
 		text = "FINISH"
 		command = ".Skill_Points_Done"
+	elem "button52"
+		type = BUTTON
+		pos = 636,212
+		size = 38x28
+		anchor1 = 63,77
+		anchor2 = 67,87
+		font-size = 15
+		text-color = #ff8040
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "?"
+		command = ".ToggleHelp \"VitalityMod\""
+		is-flat = true
+	elem "minusVIT"
+		type = BUTTON
+		pos = 674,212
+		size = 39x28
+		anchor1 = 67,77
+		anchor2 = 71,87
+		font-family = "Arial Black"
+		font-size = 16
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "-"
+		command = ".Skill_Points \"-\" \"Vitality\""
+		is-flat = true
+	elem "VIT"
+		type = LABEL
+		pos = 713,212
+		size = 153x28
+		anchor1 = 71,77
+		anchor2 = 86,87
+		font-size = 10
+		font-style = "bold"
+		text-color = #ff80ff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		text = "Vitality"
+		image-mode = stretch
+	elem "plusVIT"
+		type = BUTTON
+		pos = 866,212
+		size = 40x28
+		anchor1 = 86,77
+		anchor2 = 90,87
+		font-family = "Arial Black"
+		font-size = 16
+		font-style = "bold"
+		text-color = #ffffff
+		background-color = #000000
+		border = line
+		saved-params = "is-checked"
+		text = "+"
+		command = ".Skill_Points \"+\" \"Vitality\""
+		is-flat = true
+	elem "Vitality"
+		type = LABEL
+		pos = 906,212
+		size = 97x28
+		anchor1 = 90,77
+		anchor2 = 100,87
+		font-family = "Arial"
+		font-size = 10
+		font-style = "bold"
+		text-color = #80ffff
+		background-color = #000000
+		border = line
+		saved-params = ""
+		text = "0"
+		image-mode = stretch
 	elem "Points Remaining"
 		type = LABEL
 		pos = 934,-1

@@ -358,7 +358,7 @@ proc/BeamClashTry(obj/Skills/Projectile/_Projectile/A, obj/Skills/Projectile/_Pr
 		else if(O.HasMagicSword())
 			D *= 1 + (O.GetMagicSwordAscension()/glob.UNARMED_DAMAGE_DIVISOR)
 		if(S.Primordial)
-			D *= 1 + (((S.Primordial*glob.PRIMORDIAL_EFFECTIVENESS) * (100-enemy.Health))/100)
+			D *= 1 + (((S.Primordial*glob.PRIMORDIAL_EFFECTIVENESS) * (100-enemy.HealthPct()))/100)
 		if(O.RippleActive() && O.Oxygen >= S.BreathCost)
 			D *= (1+(0.25*O.GetRipple()*max(1, O.PoseEnhancement*2)))
 		if(S.ClashBonus)

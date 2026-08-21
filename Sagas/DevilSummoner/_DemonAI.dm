@@ -53,9 +53,11 @@
 		StrMod = max(1, round(dd.demon_str + bonus, 0.01))
 		ForMod = max(1, round(dd.demon_for + bonus, 0.01))
 		EndMod = max(1, round(dd.demon_end + bonus, 0.01))
+		VitMod = EndMod
 		SpdMod = max(1, round(dd.demon_spd + bonus, 0.01))
 		OffMod = max(1, round(dd.demon_off + bonus, 0.01))
 		DefMod = max(1, round(dd.demon_def + bonus, 0.01))
+		Health = MaxHP()
 		potential_power_mult = owner.potential_power_mult
 
 		demon_melee_rate = max(8, 30 - round(dd.demon_spd * 0.7))
@@ -249,7 +251,7 @@
 		if(ai_owner && istype(attacker, /mob))
 			if(attacker == ai_owner) return
 			if(ai_owner.party && ai_owner.party.members && (attacker in ai_owner.party.members)) return
-		var/raw_dmg = raw_val * glob.DevilSummonerDemonDamageTakenMod
+		var/raw_dmg = HPToPct(raw_val) * glob.DevilSummonerDemonDamageTakenMod
 		if(raw_dmg <= 0) return
 		var/resist = DemonGetResistMult("Phys")
 		if(resist == 0)
@@ -260,7 +262,7 @@
 			var/repel_back = raw_dmg * 0.25
 			raw_dmg = raw_dmg * 0.25
 			if(istype(attacker, /mob))
-				DemonDealDamage(attacker, TrueDamage(repel_back))
+				DemonDealDamage(attacker, TrueDamage(PctToHP(repel_back)))
 			if(ai_owner) ai_owner << "<font color='#aaccff'>[name] repels part of the attack!</font>"
 		// Drain: heal 25% of incoming damage, take 25%
 		else if(DemonHasDrain("Phys"))

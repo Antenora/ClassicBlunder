@@ -37,7 +37,7 @@
 			HandleBuffDeactivation(source)
 			return
 
-	if (TooMuchHealth && source.Health >= TooMuchHealth)
+	if (TooMuchHealth && source.HealthPct() >= TooMuchHealth)
 		HandleBuffDeactivation(source)
 		return
 
@@ -65,9 +65,9 @@
 	if (drain)
 		switch(drainType)
 			if("Health")
-				target.DoDamage(target, TrueDamage(HealthDrain))
+				target.DoDamage(target, target.PctToHP(TrueDamage(HealthDrain)))
 			if ("Wound")
-				target.DoDamage(target, TrueDamage(drain))
+				target.DoDamage(target, target.PctToHP(TrueDamage(drain)))
 			if ("Energy")
 				target.LoseEnergy(drain)
 			if ("Fatigue")
@@ -78,7 +78,7 @@
 				target.LoseMana(drain)
 	switch(drainType)
 		if("Health")
-			currentValue = target.Health + target.TotalInjury
+			currentValue = target.HealthPct() + target.TotalInjury
 		if ("Wound")
 			currentValue = target.TotalInjury
 			flipsign = TRUE
@@ -116,7 +116,7 @@
 	if (CapacityHeal)
 		target.HealCapacity(CapacityHeal / 10)
 	if (HealthHeal)
-		var/healTarget = (target.Health + target.TotalInjury >= 100 || (target.TotalInjury && target.icon_state == "Meditate"))
+		var/healTarget = (target.HealthPct() + target.TotalInjury >= 100 || (target.TotalInjury && target.icon_state == "Meditate"))
 		if (healTarget)
 			target.HealWounds(HealthHeal / 10)
 		else
@@ -234,7 +234,7 @@ mob/proc/loseOxygen(mult = 1)
 			src.LoseEnergy(2.0)
 			if(src.TotalFatigue>=95)
 				src.DamageSelf(TrueDamage(0.1))
-				if(src.Health<-300)
+				if(src.Health < -3*src.MaxHP())
 					if(prob(20)&&!src.StabilizeModule)
 						src.Death(null,"oxygen deprivation!")
 	else if(BreathingMaskOn)
@@ -248,7 +248,7 @@ mob/proc/loseOxygen(mult = 1)
 			src.LoseEnergy(2)
 			if(src.TotalFatigue>=95)
 				src.DamageSelf(TrueDamage(0.1))
-				if(src.Health<-300)
+				if(src.Health < -3*src.MaxHP())
 					if(prob(20)&&!src.StabilizeModule)
 						src.Death(null,"oxygen deprivation!")
 
@@ -360,7 +360,7 @@ mob/proc/Swim()
 				if(BreathingMaskOn==0)
 					src.Oxygen=0
 					src.DamageSelf(TrueDamage(0.1))
-					if(src.Health<-300)
+					if(src.Health < -3*src.MaxHP())
 						if(prob(20)&&!src.StabilizeModule)
 							src.Death(null,"oxygen deprivation!")
 				else
@@ -370,6 +370,6 @@ mob/proc/Swim()
 						src.LoseEnergy(2)
 						if(src.TotalFatigue>=95)
 							src.DamageSelf(TrueDamage(1))
-							if(src.Health<-300)
+							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")

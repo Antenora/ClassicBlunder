@@ -151,7 +151,7 @@
 	var/my_gen = ++demon_fallen_loop_gen
 	demon_fallen_last_boost = 0
 	while(src && client && demon_racial_fallen_active && my_gen == demon_fallen_loop_gen)
-		var/hp_ratio = clamp(Health / max(1, 100 - (100 * HealthCut) - TotalInjury), 0, 1)
+		var/hp_ratio = clamp(HealthPct() / max(1, 100 - (100 * HealthCut) - TotalInjury), 0, 1)
 		var/bonus = (1 - hp_ratio) * 0.5
 		if(abs(bonus - demon_fallen_last_boost) > 0.01)
 			PowerBoost /= max(0.01, 1 + demon_fallen_last_boost)

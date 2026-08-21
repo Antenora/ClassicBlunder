@@ -17,7 +17,7 @@
     return FALSE
 
 /mob/proc/getHealth()
-    return Health*(1-HealthCut)
+    return HealthPct()*(1-HealthCut)
 
 proc/aboveThreshold(val1, val2, thres)
     if(val1 - val2 >= thres)

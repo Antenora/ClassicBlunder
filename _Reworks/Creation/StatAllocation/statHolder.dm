@@ -5,6 +5,7 @@
     var/datum/stat/Speed = new()
     var/datum/stat/Offense = new()
     var/datum/stat/Defense = new()
+    var/datum/stat/Vitality = new()
     proc/reset(l)
         if(islist(l))
             var/list/stats = l
@@ -14,6 +15,7 @@
             Offense.base = stats[4]
             Defense.base = stats[5]
             Speed.base = stats[6]
+            Vitality.base = stats.len >= 7 ? stats[7] : 1
         else if(isdatum(l))
             var/race/r = l
             Strength.base = r.strength
@@ -22,6 +24,7 @@
             Speed.base = r.speed
             Offense.base = r.offense
             Defense.base = r.defense
+            Vitality.base = r.vitality
         // having these the same case would b easier, but i didnt feel like fucking w. the skin
 
     proc/adjust(option, stat)
