@@ -831,8 +831,9 @@ mob/proc/
 		var/ShonenPower = ShonenPowerCheck(src)
 		if(ShonenPower)
 			Ratio*=GetSPScaling(ShonenPower)
-		if(src.HasHellPower())
-			Ratio*=src.GetHellScaling()
+
+		Ratio *= GetHellScaling();//returns 1 if no hell power
+
 		if(src.HasZenkaiPower())
 			Ratio*=src.GetZenkaiScaling()
 		Ratio*=src.Base()
@@ -1004,10 +1005,11 @@ mob/proc/
 
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
+			var/silverScale = isSilverscale();
 			if(src.ManaDeath)
 				ManaAmount-=5*GetManaCapMult()
-			else if(src.is_arcane_beast || (isRace(BEASTKIN) && Class=="Trickster" && AscensionsAcquired>0 && !src.Mechanized && !src.ActiveBuff))
-				if(Class == "Trickster")
+			else if((is_arcane_beast || silverScale) && !src.Mechanized && !src.ActiveBuff)
+				if(silverScale)
 					Recover("Mana", 1*GetManaCapMult())
 				else
 					Recover("Mana",1)
@@ -1369,14 +1371,14 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 
 	Ratio*=EPM
+	
+	Ratio *= B.GetHellScaling();//returns 1 if no hell power
 
-	if(B.HasHellPower())
-		Ratio*=(B.GetHellScaling() * 1500)
-	if(B.HasZenkaiPower())
-		Ratio*=(B.GetZenkaiScaling() * 1500)
-	Ratio*=B.Base() * 100
+	if(B.HasZenkaiPower()) Ratio *= B.GetZenkaiScaling();
+	
+	Ratio *= B.Base() * 100
 	temp_potential_power(B)//get them potential powers
-	Ratio*=B.potential_power_mult
+	Ratio *= B.potential_power_mult
 	if(passive_handler["LegendarySaiyan"])
 		if(Tension==100&&transActive==transUnlocked)
 			Ratio*=50
@@ -1384,86 +1386,53 @@ mob/proc/Get_Scouter_Reading(mob/B)
 	//BODY CONDITION ADJUSTMENTS
 	if(!B.passive_handler.Get("Piloting"))
 		if(!B.Timeless)
-			var/AgeRate=1
+			B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
+			Ratio*=(1-(0.2*B.MaimsOutstanding))
+			if(B.HasWeights())
+				Ratio*=0.75
+			if(B.Roided)
+				Ratio*=1.15
+			if(B.OverClockNerf)
+				Ratio*=(1-B.OverClockNerf)
+			if(B.GatesNerfPerc)
+				Ratio*=((100-B.GatesNerfPerc)/100)
+			if(B.AngerMax)
+				var/a=1
+				if(B.HasCalmAnger())
+					a=B.AngerMax
+					if(B.AngerMult>1)
+						var/ang=a-1//Usable anger
+						var/mult=ang*B.AngerMult
+						a=mult+1
+				else if(B.Anger&&!B.HasNoAnger())
+					a=B.Anger
+					if(B.AngerMult>1)
+						var/ang=a-1//Usable anger
+						var/mult=ang*B.AngerMult
+						a=mult+1
+					if(B.DefianceCounter)
+						a+=B.DefianceCounter*0.25
+				if(B.CyberCancel>0)
+					var/ang=a-1//Usable anger.
+					var/cancel=ang*B.CyberCancel//1 Cyber Cancel = all of usable anger.
+					a-=cancel//take the anger away.
+					if(a<1)//Only nerf anger.
+						a=1
+				if(a<=0)
+					a=0.01
+				if(B.AngerAdd)
+					a+=B.AngerAdd
+				Ratio *= a
 
-			if((B.EraBody=="Child"||B.EraBody=="Youth")&&B.Aged)
-				AgeRate=1
-			else if(B.EraBody=="Child"||B.EraBody=="Senile")
-				if(B.ParasiteCrest())
-					AgeRate=0.5
-				else
-					AgeRate=0.4
-			else if(B.EraBody=="Youth"||B.EraBody=="Elder")
-				if(B.ParasiteCrest())
-					AgeRate=0.5
-				else
-					AgeRate=0.8
-			else
-				AgeRate=1
+		if(B.PowerBoost) Ratio *= B.PowerBoost
+		if(B.TarotFate == "The Sun") Ratio *= 1.5
 
-			if(B.isRace(BEASTKIN) && B.Class == "Trickster")
-				if(B.EraBody=="Elder"||(B.EraBody=="Adult"&&B.Aged))
-					AgeRate=1.25
-			if(B.isRace(HALFSAIYAN)&&B.Anger)
-				AgeRate=1
-			Ratio*=AgeRate
-		if(locate(/obj/Seal/Power_Seal, B))
-			Ratio*=0.5
-		if(B.CanLoseVitalBP())
-			Ratio*=1+(B.GetHealthBPMult()+B.GetEnergyBPMult())
-		if(B.JaganPowerNerf)
-			Ratio*=B.JaganPowerNerf
-		if(B.BPPoison)
-			if(B.Doped||(B.SagaLevel>=5&&B.AnsatsukenAscension=="Chikara"))
-				Ratio*=1
-			else
-				Ratio*=B.BPPoison
-		if(B.Maimed)
-			var/Ignore=B.HasMaimMastery()
-			if(Ignore || isRace(CHANGELING))
-				Ratio*=1
-			else
-				B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
-				Ratio*=(1-(0.2*B.MaimsOutstanding))
-		if(B.HasWeights())
-			Ratio*=0.75
-		if(B.Roided)
-			Ratio*=1.15
-		if(B.OverClockNerf)
-			Ratio*=(1-B.OverClockNerf)
-		if(B.GatesNerfPerc)
-			Ratio*=((100-B.GatesNerfPerc)/100)
-		if(B.AngerMax)
-			var/a=1
-			if(!B.HasCalmAnger()&&!B.HasNoAnger())
-				a=B.AngerCurveValue()
-				if(B.AngerMult>1)
-					var/ang=a-1
-					var/mult=ang*B.AngerMult
-					a=mult+1
-			if(B.CyberCancel>0)
-				var/ang=a-1
-				var/cancel=ang*B.CyberCancel
-				a-=cancel
-				if(a<1)
-					a=1
-			if(a<=0)
-				a=0.01
-			if(B.AngerAdd)
-				a+=B.AngerAdd
-			Ratio*=a
-
-		if(B.PowerBoost)
-			Ratio*=B.PowerBoost
-		if(B.TarotFate=="The Sun")
-			Ratio*=1.5
-
-	Ratio*=B.GetPowerUpRatioVisble()
+	Ratio *= B.GetPowerUpRatioVisble()
 
 	if(B.Dead&&!B.KeepBody)
-		Ratio*=0.5
+		Ratio *= 0.5
 	else if(B.z==glob.DEATH_LOCATION[3]&&!B.CheckActive("Cancer Cloth")&&B.SenseUnlocked<8&&!B.passive_handler.Get("SpiritPower"))
-		Ratio*=0.1
+		Ratio *= 0.1
 
 	var/Reading=Ratio
 	if(passive_handler.Get("PowerAppearance"))

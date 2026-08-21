@@ -110,8 +110,6 @@ mob/Players
 			if(src.isRace(MAKAIOSHIN))
 				da.name="Devil Arm ([src.TrueName])"
 
-		if(src.isRace(BEASTKIN) && src.race?:Racial == "Monkey King")
-			src.verbs += /mob/proc/change_nimbus_message
 		if(src.isRace(/race/demi_fiend))
 			if(!(/mob/proc/CraftMagatama in src.verbs))
 				src.verbs += /mob/proc/CraftMagatama
@@ -1135,13 +1133,10 @@ mob/proc
 		src:UniqueID = ++glob.IDCounter
 		glob.IDs += src:UniqueID
 		glob.IDs[src:UniqueID] = "[name]"
-		DEBUGMSG("actually we managed to get past the global ids, im shocked")
 		glob.updatePlayer(src);
-		DEBUGMSG("perhaps it is update version that kills the man?")
 		setStartingRPP()
-		DEBUGMSG("or setting starting rpp. did that kill us?")
 		if(!Warped)
-			if(isRace(BEASTKIN))
+			if(isRace(WILDER))
 				var/Choice=input(src, "Do you want to possess animal characteristics?  These options will give you tails and ears.", "Choose your animal traits.") in list("None", "Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull")
 				switch(Choice)
 					if("Cat")
@@ -1166,7 +1161,7 @@ mob/proc
 					src.Hairz("Add")
 
 			if(!src.Timeless)
-				if(!(src.race in list(BEASTKIN,ELDRITCH,SAIYAN)))//these bois spawn in with deathtimers if theyre elder...
+				if(!(src.race in list(WILDER,ELDRITCH,SAIYAN)))//these bois spawn in with deathtimers if theyre elder...
 					var/Age = "Youth"
 					//=alert(src, "Do you want to start as a youth or an elder?  Youths have not yet reached their full potential as fighters. Elders have already passed it, and may teach younger folks.", "Age", "Youth", "Elder")
 					src.EraBody=Age
@@ -1188,9 +1183,7 @@ mob/proc
 				src.EraBody="Adult"
 				src << "You've started as a timeless race. You learn slower than others, but can teach younger beings and always have your full power available."
 
-			DEBUGMSG("we made it through the furry zone");
 			src.EraBirth=glob.progress.Era
-			DEBUGMSG("ok we're going to try to set to spawn");
 			src.ChooseSpawn()
 
 			if(src.Intelligence<=0.25)

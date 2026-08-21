@@ -5,8 +5,8 @@ globalTracker/var/maxFrenzyDamage = 0.015
 globalTracker/var/FrenzyStackDivisor = 5
 globalTracker/var/FrenzyNerf = 1
 
-/mob/proc/IsDarkDragonPlayer()
-	return (istype(src, /mob/Players) && isRace(DRAGON) && Class == "Dark") || passive_handler.Get("Lion Spirit")
+/mob/proc/IsDarkDragonPlayer()//technically inaccurate but Dark Dragons Are Still Cool
+	return istype(src, /mob/Players) && isBlackflame();
 
 /// hostile Frenzy counts like Sheared stacks
 /mob/proc/GetEffectiveShearForStackingEffects()

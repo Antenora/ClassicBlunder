@@ -2347,25 +2347,6 @@ obj
 					set category="Skills"
 					usr.UseProjectile(src)
 
-			A_Pound_of_Gold
-				Distance=20
-				DamageMult=6
-				AccMult = 1.5
-				Knockback=5
-				EnergyCost=3
-				Cooldown=120
-				Homing=1
-				IconLock='GoldPile.dmi'
-				IconSize=0.35
-				LockX=-32
-				LockY=-32
-				Variation=0
-				GoldScatter = 1
-
-				verb/A_Pound_of_Gold()
-					set category="Skills"
-					usr.UseProjectile(src)
-
 			Goblin_Greed
 				Distance=20
 				DamageMult=6
@@ -5081,30 +5062,6 @@ obj
 
 
 ////Racials
-			Static_Stream
-				Dodgeable=0
-				DamageMult=5
-				BeamTime=5
-				Distance=20
-				Paralyzing=2
-				Cooldown=90
-				StrScaling=0.5
-				EndEffectiveness=1
-				ForScaling=0.5
-				Delay=1
-				Blasts=1
-				Stream=1
-				IconLock='LightningWave.dmi'
-				verb/Static_Stream()
-					set category="Skills"
-					if(!altered)
-						DamageMult = 5 + (usr.AscensionsAcquired * 3)
-						Radius = clamp(usr.AscensionsAcquired, 1, 5)
-						Paralyzing = 2 + clamp(usr.AscensionsAcquired*2, 0.5, 2.5)
-						Cooldown = 60 - ( 5 * usr.AscensionsAcquired)
-						BeamTime = 5 + (usr.AscensionsAcquired * 5)
-					usr.UseProjectile(src)
-
 				Ice_Dragon
 					Dodgeable=0
 					BeamTime=5
@@ -5120,60 +5077,6 @@ obj
 					verb/Ice_Dragon()
 						set category="Skills"
 						usr.UseProjectile(src)
-			Shard_Storm
-				StrScaling=1
-				EndEffectiveness=1
-				ForScaling=0
-				Distance=20
-				DamageMult=2.5
-				Blasts=10
-				Stream=1
-				Radius=1
-				MultiHit=2
-				Knockback=1
-				Striking=1
-				Cooldown=160
-				Shattering=5
-				Delay=1
-				IconLock='Crystal.dmi'
-				Variation=24
-				verb/Shard_Storm()
-					set category="Skills"
-					if(!altered)
-						Blasts = 6 + (usr.AscensionsAcquired)
-						DamageMult = 2.5 + (usr.AscensionsAcquired * 1.5)
-						Radius = clamp(usr.AscensionsAcquired, 1, 5)
-						Shattering = 2 + clamp(usr.AscensionsAcquired*2, 0.5, 2.5)
-						DamageMult = DamageMult/Blasts
-						Cooldown = 60 - ( 5 * usr.AscensionsAcquired)
-					usr.UseProjectile(src)
-			Consuming_Light
-				StrScaling=0.5
-				EndEffectiveness=1.5
-				ForScaling=0
-				Distance=20
-				DamageMult=2.5
-				Blasts=10
-				Stream=1
-				Radius=1
-				MultiHit=2
-				Knockback=1
-				Striking=1
-				Cooldown=160
-				Silencing=0.5
-				Delay=1
-				IconLock='AvalonLight.dmi'
-				Variation=24
-				verb/Consuming_Light()
-					set category="Skills"
-					if(!altered)
-						Blasts = 5 + (usr.AscensionsAcquired)
-						DamageMult = 3 + (usr.AscensionsAcquired * 1.5)
-						Radius = clamp(usr.AscensionsAcquired, 1, 5)
-						Silencing = 0.5 + clamp(usr.AscensionsAcquired*0.2, 0.1, 0.8)
-						DamageMult = DamageMult/Blasts
-						Cooldown = 60 - ( 5 * usr.AscensionsAcquired)
-					usr.UseProjectile(src)
 
 //Moonlight Greatsword
 				Moonlight_Wave
@@ -6706,7 +6609,7 @@ obj
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Fire"), damageOnly = 1))/10)
 						if(src.Scorching&&!src.Owner.HasScorching())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Fire"), damageOnly = 1))/10)//Forces debuff
-						if(src.Chilling&&!src.Owner.HasChilling())
+						if(src.Chilling&&!src.Owner.GetChilling())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Water"), damageOnly = 1))/10)
 						if(src.Freezing&&!src.Owner.HasFreezing())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Water"), damageOnly = 1))/10)//Forces debuff

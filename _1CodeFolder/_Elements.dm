@@ -633,7 +633,7 @@ mob
 			Value /= 1 + src.GetStatusResist()
 			Value /= 1 + src.GetPhysResist()
 
-			if(isRace(DRAGON) && Class == "Wind") Value /= 2
+			if(isRace(WILDER) && Class == "Wind") Value /= 2
 			Value *= getCrippleResistValue()
 
 			src.Crippled+=Value

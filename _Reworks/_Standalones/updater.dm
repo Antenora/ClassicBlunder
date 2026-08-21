@@ -83,9 +83,6 @@ update
 		version = 2;
 		updateMob(mob/p)
 			. = ..()//left alone for easy copy pasting
-			if(p.isRace(ELDRITCH))
-				p.race.transformations += new /transformation/eldritch/partial_manifestation()
-				p.race.transformations += new /transformation/eldritch/full_manifestation()
 			if(p.isRace(HUMAN))
 				if(p.Class=="Resourceful")
 					for(var/x in p.knowledgeTracker.learnedKnowledge)
@@ -224,18 +221,7 @@ update
 					p.NewAnger(p.AngerMax+0.1)
 				if(p.AscensionsAcquired>=2)
 					p.NewAnger(p.AngerMax+0.1)
-			if(p.isRace(BEASTKIN))
-				if(p.Class=="Feather Cowl"&&p.AscensionsAcquired>=1)
-					if(p.StrAscension<0)
-						p.StrAscension=0
-	version11
-		version = 11;
-		updateMob(mob/p)
-			. = ..()
-			if(p.isRace(ELDRITCH))
-				p.passive_handler.Increase("Fishman", 1);
-				p << "You have been blessed by the space squids of old."
-				p << "Which is to say, you have the Fishman passive now."
+
 	version12
 		version = 12;
 		updateMob(mob/p)
@@ -356,69 +342,6 @@ update
 		version = 16;
 		updateMob(mob/p)
 			. = ..()
-			if(p.isRace(DRAGON))
-				switch(p.Class)
-					if("Metal")
-						if(p.AscensionsAcquired >= 1)
-							p.StrAscension += 0.25
-							p.EndAscension += 1.25
-							p.OffAscension -= 0.5
-							p.ForAscension += 0.5
-							p.passive_handler.Decrease("DeathField", 1)
-							p.passive_handler.Increase("PureReduction", 1)
-						if(p.AscensionsAcquired >= 2)
-							p.StrAscension += 0.75
-							p.EndAscension += 0.75
-							p.DefAscension -= 0.25
-							p.ForAscension += 0.5
-							p.passive_handler.Decrease("DeathField", 1)
-							p.passive_handler.Increase("PureReduction", 1)
-					if("Fire")
-						if(p.AscensionsAcquired >= 1)
-							p.StrAscension += 0.5
-							p.ForAscension += 0.5
-							p.OffAscension += 0.25
-						if(p.AscensionsAcquired >= 2)
-							p.StrAscension += 0.75
-							p.ForAscension += 0.75
-							p.OffAscension -= 0.25
-					if("Water")
-						if(p.AscensionsAcquired >= 1)
-							p.StrAscension -= 0.25
-							p.ForAscension += 0.25
-							p.DefAscension += 0.5
-							p.SpdAscension += 1
-						if(p.AscensionsAcquired >= 2)
-							p.StrAscension -= 0.25
-							p.ForAscension += 0.25
-							p.DefAscension += 1
-							p.SpdAscension += 0.5
-					if("Wind")
-						if(p.AscensionsAcquired >= 1)
-							p.ForAscension += 0.25
-							p.SpdAscension += 1
-							p.OffAscension -= 0.25
-							p.DefAscension += 0.5
-						if(p.AscensionsAcquired >= 2)
-							p.ForAscension += 0.25
-							p.SpdAscension += 1.25
-							p.OffAscension += 0.25
-					if("Gold")
-						if(p.AscensionsAcquired >= 1)
-							p.EndAscension += 0.5
-							p.SpdAscension += 0.75
-						if(p.AscensionsAcquired >= 2)
-							p.EndAscension += 0.75
-							p.SpdAscension += 1
-					if("Dark")
-						if(p.AscensionsAcquired >= 1)
-							p.StrAscension += 0.65
-							p.SpdAscension += 0.15
-							p.OffAscension += 0.15
-						if(p.AscensionsAcquired >= 2)
-							p.StrAscension += 0.75
-							p.SpdAscension += 0.75
-							p.OffAscension += 0.25
 	version17
 		version = 17;
 		updateMob(mob/p)
@@ -430,36 +353,7 @@ update
 				if(p.AscensionsAcquired >= 3)
 					p.passive_handler.Increase("PureReduction", 2)
 					p.passive_handler.Increase("PureDamage", 2)
-	version18
-		version = 18;
-		updateMob(mob/p)
-			. = ..()
-			var/fixed = p.RestoreSkillDamageMultsAfterDisarmFix()
-			if(fixed)
-				p << "Your skill DamageMults have been restored. Rejoice."
-			if(p.isRace(BEASTKIN))
-				for(var/a=p.AscensionsAcquired, a > 0, a--)
-					var/ascension/asc = p.race.ascensions[a];
-					asc.revertAscension(p);
-					p.AscensionsAcquired--;
-					p << "Reverted Beastkin ascension [a]"
-				p.race.ascensions = list();
-				p.race.fixAscensions();
-				p << "Gave new Beastkin ascension types."
-	version19
-		version = 19;
-		updateMob(mob/p)
-			. = ..()
-			if(p.isRace(BEASTKIN))
-				p.race.ascensions = list();
-				if(p.race.ascensions.len <= 0)
-					p.race.ascensions |= new/ascension/beastkin/one
-					p.race.ascensions |= new/ascension/beastkin/two
-					p.race.ascensions |= new/ascension/beastkin/three
-					p.race.ascensions |= new/ascension/beastkin/four
-					p.race.ascensions |= new/ascension/beastkin/five
-					p.race.ascensions |= new/ascension/beastkin/six
-					p << "You have <b>actually</b> been given new ascensions as a Beastkin now.";
+
 	version20
 		version = 20;
 		updateMob(mob/p)
@@ -516,26 +410,6 @@ update
 					p.DefAscension = 21
 					p.SpdAscension = 24
 					p.RecovAscension = 21
-	version23
-		version = 23;
-		updateMob(mob/p)
-			. = ..()
-			if(p.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit))
-				if(p.Class!="Heart of The Beastkin")
-					p.passive_handler.Set("Grit", 0)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/The_Grit/TG in p)
-						del TG
-	version24
-		version = 24;
-		updateMob(mob/p)
-			. = ..()
-			if(p.isRace(DRAGON)&&p.Class=="Gold")
-				if(p.AscensionsAcquired>=1)
-					p.StrAscension += 0.5
-				if(p.AscensionsAcquired>=2)
-					p.StrAscension += 0.5
-				if(p.AscensionsAcquired>=3)
-					p.StrAscension += 0.75
 	version25
 		version = 25;
 		updateMob(mob/p)
@@ -547,29 +421,6 @@ update
 					p.passive_handler.Decrease("BuffMastery", 2)
 				if(p.AscensionsAcquired>=3)
 					p.passive_handler.Decrease("BuffMastery", 2)
-			if(p.isRace(BEASTKIN))
-				if(p.Class == "Feather Cowl")
-					if(p.AscensionsAcquired>=1)
-						p.passive_handler.Increase("PureReduction", 2);
-						p.passive_handler.Increase("PureDamage", 1);
-						p.passive_handler.Increase("Juggernaut", 1);
-						p.passive_handler.Decrease("CriticalBlock", 0.1);
-						p.passive_handler.Decrease("CriticalDamage", 0.05);
-					if(p.AscensionsAcquired>=2)
-						p.passive_handler.Increase("PureReduction", 2);
-						p.passive_handler.Increase("PureDamage", 1);
-						p.passive_handler.Increase("Juggernaut", 1);
-						p.passive_handler.Decrease("CriticalBlock", 0.1);
-						p.passive_handler.Decrease("CriticalDamage", 0.05);
-				if(p.Class == "Feather Knife")
-					if(p.AscensionsAcquired>=1)
-						p.passive_handler.Increase("PureDamage", 2);
-						p.passive_handler.Increase("PureReduction", 1);
-						p.passive_handler.Decrease("CriticalDamage", 0.25);
-					if(p.AscensionsAcquired>=2)
-						p.passive_handler.Increase("PureDamage", 2);
-						p.passive_handler.Increase("PureReduction", 1);
-						p.passive_handler.Decrease("CriticalDamage", 0.1);
 	version26
 		version = 26;
 		updateMob(mob/p)
@@ -580,33 +431,6 @@ update
 				p << "The Space Squids of old look upon you kindly."
 				p << "WHY THE FRIGGLE FRACK DID THEY TAKE SPACEWALK AND STATIC WALK OFF YOU?!"
 				p << "How can you space squid if you can't even go to space...!"
-			if(p.isRace(BEASTKIN))
-				if(p.Class == "Feather Cowl")
-					if(p.AscensionsAcquired>=1)
-						p.passive_handler.Decrease("PureReduction", 2);
-						p.passive_handler.Decrease("PureDamage", 1);
-						p.passive_handler.Increase("PureReduction", 0.25);
-						p.passive_handler.Increase("PureDamage", 0.125);
-					if(p.AscensionsAcquired>=2)
-						p.passive_handler.Decrease("PureReduction", 2);
-						p.passive_handler.Decrease("PureDamage", 1);
-						p.passive_handler.Increase("PureReduction", 0.25);
-						p.passive_handler.Increase("PureDamage", 0.125);
-					p << "Your pure damage and pure reduction have been reduced."
-					p << "bird down..."
-				if(p.Class == "Feather Knife")
-					if(p.AscensionsAcquired>=1)
-						p.passive_handler.Decrease("PureReduction", 1);
-						p.passive_handler.Decrease("PureDamage", 2);
-						p.passive_handler.Increase("PureReduction", 0.125);
-						p.passive_handler.Increase("PureDamage", 0.25);
-					if(p.AscensionsAcquired>=2)
-						p.passive_handler.Decrease("PureReduction", 1);
-						p.passive_handler.Decrease("PureDamage", 2);
-						p.passive_handler.Increase("PureReduction", 0.125);
-						p.passive_handler.Increase("PureDamage", 0.25);
-					p << "Your pure damage and pure reduction have been reduced."
-					p << "bird down..."
 	version27
 		version = 27;
 		updateMob(mob/p)
@@ -644,16 +468,6 @@ update
 					var/spell_passive/sp = new type;
 					p.acquiredSpellPassives |= sp;
 				p << "You'll need to reapply your spell passives."
-	version31
-		version = 31
-		updateMob(mob/p)
-			. = ..()
-			if(p.isRace(ELDRITCH))
-				p << "You're going to have to redo your ascension choices..."
-				p.race.revertAndFixAllAscensions(p);
-				p << "It is done. Remeditate to have your ascensions granted again!"
-				if(p.passive_handler["Soulfire"] != 0)//this is a typo. we do not use this.
-					p.passive_handler["Soulfire"] = 0;
 
 	version32
 		version = 32
@@ -713,14 +527,6 @@ update
 						p.passive_handler.Increase("PureReduction", 1)
 						p.passive_handler.Increase("Adrenaline", 1)
 						p.passive_handler.Increase("AngerAdaptiveForce", 0.2)
-	version34
-		version = 34
-		updateMob(mob/p)
-			. = ..()
-			if(p.isRace(DRAGON))
-				for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage/dr in p.contents)
-					dr.adjust(p);
-					p << "Your Dragon Rage has been adjusted to scale with health!"
 	version35
 		version = 35
 		updateMob(mob/p)

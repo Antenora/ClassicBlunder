@@ -35,17 +35,14 @@ mob
 			return FALSE
 
 		is_dashing = 0
-		if(src.isRace(BEASTKIN) && src.race?:Racial == "Feather Knife")
-			src.passive_handler.Set("Extra Secret Knives", "Feathers")
-		if(src.isRace(BEASTKIN) && src.race?:Racial == "Fox Fire")
-			src.passive_handler.Set("Heavy Strike", "Fox Fire")
-		if(src.isRace(BEASTKIN) && src.race?:Racial == "Monkey King")
-			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Beastkin/Never_Fall/)
+		if(isCloudhammer()) passive_handler.passives["Extra Secret Knives"] = "Feathers"
+		if(isSilverscale()) passive_handler.passives["Heavy Strike"] = "Fox Fire"
+		if(isMountainheart()) passive_handler.Set("Grit", 1)
+		if(isBrightcrown())
+			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Never_Fall/)
 			if(!s.Using)
 				s.Trigger(src, TRUE)
-
-		if(src.isRace(BEASTKIN) && src.race?:Racial == "Heart of The Beastkin")
-			src.passive_handler.Set("Grit", 1)
+		
 
 		src.verb_delay=world.time+1
 		for(var/b in src.SlotlessBuffs)

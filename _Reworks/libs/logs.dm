@@ -1,18 +1,9 @@
-/*/mob/Admin3/verb/testhellScaling()
-    set category = "Debug"
-    for(var/x in 1 to 8)
-        x /= 4
-        src.passive_handler.Set("HellPower", x)
-        var/f = file("Saves/testLogs/hellPowerTesting.txt")
-        for(var/y in 1 to 100)
-            Health = y
-            setRace(HUMAN)
-            f << "for a human at [y] health, and [x] hell power. hellscaling is [GetHellScaling()]"
-            setRace(DEMON)
-            f << "for a demon at [y] health, and [x] hell power. hellscaling is [GetHellScaling()]"
-            for(var/a in 1 to 50)
-                Potential = a
-                f << "for a demon at [a] pot, [y] health, and [x] hell power. hellscaling is [GetHellScaling()]"*/
+/globalTracker/var/SHAR_COPY_ALL = FALSE // just fuck it
+/globalTracker/var/SHAR_COPY_EQUAL_OR_LOWER = TRUE // 1 tier behind
+/globalTracker/var/SHAR_COPY_MANUAL = FALSE // lol put a gun to ur brain
+/globalTracker/var/SHAR_COPY_PLUS = FALSE // +1 would be tier = tier in terms of saga:skill, +2 higher
+
+
 proc/getSharCopyLevel(sagaLevel)
     return sagaLevel
 

@@ -11330,147 +11330,6 @@ NEW VARIABLES
 				Cooldown=1
 
 //Racial
-			Dragon_Rage
-				NeedsHealth = 50
-				TooMuchHealth = 75
-				TextColor=rgb(95, 60, 95)
-				ActiveMessage="is consumed by a dragon's rage!"
-				OffMessage = "calms their draconic fury..."
-				adjust(mob/p)
-					NeedsHealth = 50 + (p.AscensionsAcquired*5);
-					TooMuchHealth = min(95, 75 + (p.AscensionsAcquired*5));
-
-				Dragons_Tenacity
-
-					ActiveMessage = "forms a draconic shell!!"
-					OffMessage = "loses their draconic shell..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						ElementalOffense = "Earth"
-						ElementalDefense = "Earth"
-						endAdd = 0.15 * asc
-						passives = list("PureReduction" = asc+1, "CriticalBlock" = (0.1*(asc+1)),\
-										 "Harden" = 2 + (asc/2))
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-
-				Heat_Of_Passion
-					// Fire Dragon Racial, mimics Berserk
-					ActiveMessage = "ignites themselves in a blaze of passion!"
-					OffMessage = "calms their fiery passion..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						strAdd = 0.15 * asc
-						ElementalOffense = "Fire"
-						ElementalDefense = "Fire"
-						passives = list("Scorching" = (clamp(asc*0.5, 1, 3)) , "SoulFire" = asc,  \
-										 "PureDamage" = asc+1)
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-
-				Wind_Supremacy
-					// Wind Dragon Racial
-					ActiveMessage = "takes to the skies as the very winds heed their call!"
-					OffMessage = "finally graces the earth once again with their presence..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						spdAdd = 0.15 * asc
-						ElementalOffense = "Wind"
-						ElementalDefense = "Wind"
-						passives = list("DoubleStrike" = asc/2, "TripleStrike" = asc/3, "ThunderHerald" = 1, \
-							"Pursuer" = 1 + (asc/2), "Flicker" = 1 + (asc/2), "CriticalDamage" = asc*0.05, \
-							"Shocking" = (clamp(asc*0.5, 1, 3)))
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-				Frenzy_Mantle
-					ActiveMessage = "adorns themselves in a mantle of dark energy... has your shadow always been this prominent?"
-					OffMessage = "releases their mantle of darkness..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						strAdd = 0.075 * asc
-						spdAdd = 0.075 * asc
-						ElementalOffense = "Dark"
-						ElementalDefense = "Dark"
-						NeedsHealth = 50 + (5*asc);
-						TooMuchHealth = min(95, 75 + (5*asc));
-						passives = list( "AbyssMod" = asc/2, \
-							"HellPower" = asc/6, "HellRisen" = asc/4,  "FrenzyCarrier" = 1)
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-				Radiant_Aegis
-					ActiveMessage = "adorns themselves with a shield of radiant light, you feel your ability to do harm diminished!"
-					OffMessage = "loses their shield of light..."
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						..(p);
-						ElementalOffense = "Light"
-						strAdd = 0.075 * asc
-						endAdd = 0.075 * asc
-						passives = list( "HolyMod" = asc, \
-							"LifeGeneration" = asc+1,   "SoftStyle" = asc/2)
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-				Hoarders_Riches
-					// Gold Dragon Racial. Have money? Be OP.
-					ActiveMessage = "gains the faint glitter of gold in their hues!"
-					OffMessage = "loses some of that sinner's greed..."
-					Cooldown = 120
-					adjust(mob/p)
-						if(altered) return
-						var/asc = p.AscensionsAcquired
-						var/money
-						var/cap=glob.progress.DailyGrindCap*30*3*(asc+1)
-						var/effectivemoney
-						for(var/obj/Money/m in p.contents)
-							money = m.Level
-							effectivemoney=m.Level
-						if(effectivemoney>cap)
-							effectivemoney=cap
-						var/moneyovercap=sqrt(money-cap)
-						var/endmoney=effectivemoney+moneyovercap
-						NeedsHealth = 10 + (7.5 * asc)
-						TooMuchHealth = 20 + (7.5 * asc)
-
-						var/baseMultMod = 1 + max(0,endmoney/glob.racials.GOLD_DRAGON_FORMULA)
-						PowerMult = baseMultMod
-						SpdMult = baseMultMod
-						StrMult = baseMultMod
-						OffMult = baseMultMod
-						DefMult = baseMultMod
-						EndMult = baseMultMod
-						ForMult = baseMultMod
-
-					Trigger(mob/User, Override = FALSE)
-						if(!User.BuffOn(src))
-							adjust(User)
-						..()
-
-
-				Melt_Down
-					// Poison Dragon Racial.
-					ActiveMessage = "begins bubbling"
-					OffMessage = "loses some of that sinner's greed..."
-					Cooldown = 120
-					adjust(mob/p)
 			Berserk
 				NeedsHealth=10
 				TooMuchHealth=15
@@ -13268,8 +13127,8 @@ mob
 
 		AddSlotlessBuff(var/obj/Skills/Buffs/B)
 			if(B.BuffName=="Regeneration")
-				if(src.HasHellPower())
-					B.RegenerateLimbs=1
+				if(GetHellPower())
+					B.RegenerateLimbs = 1;
 			if(B.HitScanIcon)
 				HitScanIcon = B.HitScanIcon
 			if(B.HitScanHitSpark)

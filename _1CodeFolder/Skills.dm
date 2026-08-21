@@ -722,7 +722,7 @@ obj/Skills
 							if(Target.Savable&&!Target.KeepBody)
 								if(Target.HasEnlightenment())
 									Target.KeepBody=1
-								if(Target.HasHellPower())
+								if(Target.GetHellPower())
 									if(prob(25))
 										Target.KeepBody=1
 								if(Target.KeepBody)

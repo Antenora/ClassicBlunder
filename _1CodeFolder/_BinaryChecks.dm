@@ -660,7 +660,7 @@ mob
 			if(Secret == "Vampire")
 				var/secretLevel = getSecretLevel()
 				Return += 1 + (secretLevel / 4) * (1 + (secretDatum.secretVariable["BloodPower"] * 0.25))
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
+			if(isMountainheart() && VaizardHealth>0)
 				Return += 2
 			if(src.passive_handler.Get("Determination(Yellow)")||src.passive_handler.Get("Determination(White)"))
 				Return += round(ManaAmount/25, 1)
@@ -688,48 +688,38 @@ mob
 			if(Target)
 				if(passive_handler.Get("HellRisen")  && isDominating(Target))
 					Return += clamp((passive_handler.Get("HellRisen")*2), 1, 2)
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
+			if(isMountainheart() && VaizardHealth > 0)
 				Return += 5
 			Return += scalingEldritchPower();
 			return Return
 		HasDeathField()
-			if(passive_handler.Get("DeathField"))
-				return 1
-			if(src.KamuiBuffLock)
-				return 1
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				return 1
-			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
-				return 1
+			if(passive_handler.Get("DeathField")) return 1
+			if(KamuiBuffLock) return 1
+			if(isMountainheart() && VaizardHealth>0) return 1
+			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) return 1
 			return 0
 		GetDeathField()
 			var/HeartVal=0
 			var/GreenVal=0
-			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)"))
-				GreenVal=round(ManaAmount/20,1)
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beast" && src.VaizardHealth>0)
-				HeartVal += 5
-			. = passive_handler.Get("DeathField")+(src.KamuiBuffLock*5)+HeartVal + GreenVal
-			if(src.isLunaticMode())
-				. *= (1 + (src.get_potential() / 100))
+			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) GreenVal=round(ManaAmount/20,1)
+			if(isMountainheart() && VaizardHealth > 0) HeartVal += 5
+			. = passive_handler.Get("DeathField") + (KamuiBuffLock * 5) + HeartVal + GreenVal
+			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
 		HasVoidField()
-			if(passive_handler.Get("VoidField"))
-				return 1
-			if(src.CheckSlotless("Drunken Mastery") && src.Drunk)
-				return 1
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				return 1
+			if(isMountainheart() && VaizardHealth > 0) return 1
+			if(CheckSlotless("Drunken Mastery") && Drunk) return 1
+			if(passive_handler.Get("VoidField")) return 1
 			return 0
 		GetVoidField()
 			var/Extra=0
-			if(src.isRace(BEASTKIN) && race?:Racial == "Heart of The Beastkin" && src.VaizardHealth>0)
-				Extra += 5
-
-			if(src.CheckSlotless("Drunken Mastery") && src.Drunk)
-				Extra+=2
-			. = passive_handler.Get("VoidField")+Extra
-			if(src.isLunaticMode())
-				. *= (1 + (src.get_potential() / 100))
+			if(isMountainheart() && VaizardHealth > 0) Extra += 5
+			if(CheckSlotless("Drunken Mastery") && Drunk) Extra+=2
+			. = passive_handler.Get("VoidField") + Extra
+			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
+		HasMaimStrike()
+			return 0
+			if(passive_handler.Get("MaimStrike"))
+				return 1
 		GetMortalStrike()
 			. = 0
 			if(Target)
@@ -953,7 +943,7 @@ mob
 				return 1
 			if(src.isRace(NAMEKIAN)&&src.transActive())
 				return 1
-			if(src.race in list(DEMON, DRAGON, MAKAIOSHIN))
+			if(src.race in list(DEMON, WILDER, MAKAIOSHIN))
 				return 1
 			if(src.race in list(HUMAN, MAKYO)&&src.AscensionsAcquired)
 				return 1
@@ -972,7 +962,7 @@ mob
 				Total += 5
 			if(src.isRace(MAKYO)&&src.AscensionsAcquired)
 				Total+=src.AscensionsAcquired
-			if(isRace(DRAGON)||isRace(DEMON)||isRace(MAKAIOSHIN))
+			if(isRace(WILDER)||isRace(DEMON)||isRace(MAKAIOSHIN))
 				Total+=1
 			if(isRace(HUMAN)&&src.AscensionsAcquired)
 				Total+=(0.5*src.AscensionsAcquired)
@@ -1539,29 +1529,6 @@ mob
 			if(!passive_handler.Get("DormantDemon")) return 0
 			if(passive_handler.Get("DeathDefied")) return 0
 			return 1
-		HasHellPower()
-			if(CheckSlotless("Satsui no Hado") && SagaLevel>=6)
-				return 1
-			if(passive_handler.Get("ZenkaiPower"))
-				return 0
-			if(passive_handler.Get("HellPower"))
-				if(isRace(DEMON)||oozaru_type=="Demonic"||(passive_handler.Get("UnlimitedHighTension")&&isRace(CELESTIAL)))
-					return 2
-				return 1
-			if(passive_handler.Get("SunStricken"))
-				return 0
-			return 0
-		GetHellPower()
-			var/hellpower = passive_handler.Get("HellPower")
-			if(CheckSlotless("Satsui no Hado") && SagaLevel>=6)
-				hellpower++
-			if(passive_handler.Get("ZenkaiPower"))
-				hellpower=0
-			if(hellpower>2)
-				hellpower=2
-			if(passive_handler.Get("SunStricken"))
-				hellpower=0
-			return hellpower
 		HasZenkaiPower()
 			if(passive_handler.Get("ZenkaiPower"))
 				return 2
@@ -1585,16 +1552,6 @@ mob
 			return 0
 		GetPowerReplacement()
 			return src.passive_handler.Get("PowerReplacement")
-
-		GetHellScaling()
-			var/Return=1
-			var/Mult=GetHellPower() / glob.HELL_SCALING_MULT
-			if(HasHellPower() == 2)
-				Mult*=glob.HELL_SCALING_MULT
-				Mult+=round(src.Potential/100, 0.05)
-			var/HealthLost = abs(src.HealthPct()-100)
-			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
-			return Return
 
 		HasMaouKi()
 			return 0
@@ -1635,7 +1592,7 @@ mob
 					Total*=clamp((Target.HealthPct()+Target.VaizardHealth)/(HealthPct()+VaizardHealth),1, 4)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(src.isRace(DRAGON))
+			if(src.isRace(WILDER))
 				if(src.AscensionsAcquired==6 && Total<0.5)
 					Total=0.25//fully ascended dragon
 			if(passive_handler.Get("CreateTheHeavens") && src.DoubleHelix>=5&&isRace(HUMAN))
@@ -1672,7 +1629,7 @@ mob
 					return 1
 			if(src.KamuiBuffLock)
 				return 1
-			if(isRace(DRAGON) && AscensionsAcquired) return 1;
+			if(isRace(WILDER) && AscensionsAcquired) return 1;
 			return 0
 		GetGodKi()
 			if(passive_handler.Get("Null") || passive_handler.Get("Longing")) return 0;
@@ -1700,7 +1657,7 @@ mob
 					Total*=clamp((Target.HealthPct()+Target.VaizardHealth)/(HealthPct()+VaizardHealth),1, 3)
 			if(src.KamuiBuffLock)
 				Total+=0.25
-			if(isRace(DRAGON))
+			if(isRace(WILDER))
 				if(!Total) Total = AscensionsAcquired*0.05;
 				if(Anger || HasCalmAnger())
 					Total *= 2;
@@ -1844,16 +1801,6 @@ mob
 			return 0
 		GetSniper()
 			return passive_handler.Get("Sniper")
-		HasChilling()
-			if(passive_handler.Get("Chilling"))
-				return 1
-			if(src.Attunement=="Water")
-				return 1
-			if(Attunement=="Fox Fire")
-				return 1
-			if(src.InfusionElement=="Water")
-				return 1
-			return 0
 		GetChilling()
 			return passive_handler.Get("Chilling")
 		HasFreezing()
@@ -2547,14 +2494,6 @@ mob
 			if(src.SenseUnlocked>5&&src.SenseUnlocked>src.SenseRobbed)
 				return 0
 			return 1
-		SteadyRace()
-			if(src.race.type in list(MAJIN, MAKYO, NAMEKIAN, BEASTKIN, ELDRITCH, DRAGON, MAKAIOSHIN))
-				return 1
-			return 0
-		TransRace()
-			if(isRace(HUMAN, SAIYAN, DEMON))
-				return 1
-			return 0
 		SureHit()
 			if(src.SureHit)
 				return 1
@@ -2674,7 +2613,7 @@ mob
 					return 1
 			if(usingStyle("MysticStyle") && StyleBuff?.SignatureTechnique>=1)
 				return 1
-			if(src.isRace(DRAGON)&&src.AscensionsAcquired>=3)
+			if(src.isRace(WILDER)&&src.AscensionsAcquired>=3)
 				return 1
 			if(src.isRace(MAJIN))
 				return 1

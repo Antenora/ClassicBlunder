@@ -55,6 +55,9 @@
     speed = 0.5;
     endurance = 0.5;
     force = 0.5;
+    passives = list();
+    //passives were kill: spiritsword, spirithand, spiritflow, callousedhands, blurringstrikes
+    //lmao get fucked
 /ascension/sub_ascension/beastkin/firstlight
     strength = 0.75;
     endurance = 0.75;
@@ -76,7 +79,7 @@
 /ascension/sub_ascension/beastkin/demonsong
     strength = 1.5;
     speed = 0.5;
-    passives = list(  "SweepingStrike" = 1, "LifeSteal" = 10)
+    passives = list("SweepingStrike" = 1, "LifeSteal" = 10)
 /ascension/sub_ascension/beastkin/worldwhisper
     endurance = 1;
     defense = 1;

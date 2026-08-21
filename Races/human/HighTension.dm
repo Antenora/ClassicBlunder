@@ -103,3 +103,6 @@
         if(!isRace(HUMAN) && !isRace(CELESTIAL)) return 0;
         if(transActive <= 0) return 0;
         return 1;
+    isCSDT()
+        if(isRace(CELESTIAL) && CelestialAscension=="Demon" && transActive >= 2) return 1;
+        return 0;

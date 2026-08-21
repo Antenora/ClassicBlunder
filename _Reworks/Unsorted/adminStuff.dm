@@ -5,7 +5,7 @@
 	for(var/mob/x in players)
 		var/race = x.race.name
 		lol["[race]"]++
-		if(x.isRace(BEASTKIN))
+		if(x.isRace(WILDER))
 			lol["[x.Class]"]++
 
 	for(var/x in lol)

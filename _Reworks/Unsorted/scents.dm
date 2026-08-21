@@ -2,16 +2,12 @@
 /var/list/scents = list(
     "HUMAN" = list("Sweat", "Gamer Musk", "Flowery", "Cologne"), \
     "NAMEKIAN" = list("Grass", "Forest", "Spices"), \
-    "Chakardi" = list("Money", "Gold", "Greed"), \
-    "ELVES" = list("Society", "Rich", "Noble","Royalty"), \
     "SAIYAN" = list("Musk", "Animalistic", "Sweaty", "Unbathed"), \
     "MAKYO" = list("Caves", "Mushrooms", "The Woods", "The Sky"), \
-    "Alien" = list("Musk", "Incense", "Exotic"), \
     "ELDRITCH" = list("Ocean", "Alien", "Exotic", "Overwhelming"), \
-    "BEASTKIN" = list("Musk", "Animalistic", "Sweaty", "Unbathed", "Incense", "Alcohol"), \
+    "WILDER" = list("Musk", "Animalistic", "Sweaty", "Unbathed", "Incense", "Alcohol"), \
     "DEMON" = list("Brimstone", "Nothingness", "Blood", "Death", "Overwhelming"), \
     "MAJIN" = list("Gum", "Sweets"), \
-    "DRAGON" = list("Ozone", "Animalistic", "Overwhelming"), \
     "Mechanized" = list("Metal"), \
     "Secret" = list("Grass", "Blood", "Decay"), \
     "Custom" = list("Muk", "Grime", "Magical", ))
@@ -36,24 +32,20 @@ mob/proc/setUpScent()
                 custom_scent="Exotic"
         if(ELDRITCH)
             custom_scent=pick("Ocean", "Alien", "Exotic", "Nothingness")
-        if(BEASTKIN)
-            custom_scent=pick("Musk", "Animalistic", "Sweaty", "Unbathed", "Incense", "Alcohol", "Iron", "Thrill")
+        if(WILDER)
+            custom_scent=pick("Musk", "Animalistic", "Sweaty", "Unbathed", "Incense", "Alcohol", "Iron", "Thrill", "The World")
         if(DEMON)
             custom_scent=pick("Brimstone", "Nothingness", "Blood", "Death")
         if(MAJIN)
             custom_scent=pick("Gum", "Sweets", "Cake", "Vanilla")
-        if(DRAGON)
-            custom_scent=pick("Ozone", "Animalistic", "Power", "The World")
         if(CHANGELING)
             custom_scent=pick("Decay", "Muk", "Grime", "Magical")
         if(HALFSAIYAN)
             custom_scent=pick("Musk", "Animalistic", "Sweaty", "Flowery","Cologne")
         if(ANDROID)
-            custom_scent=pick("Metal", "Ozone", "Spoiled Eggs", "Sterile Cleaner")
-        if(DRAGON)
-            custom_scent=pick("Nature", "Power", "Ozone", "Animalistic")
+            custom_scent=pick("Metal", "Electricity")
     if(custom_scent!="Overwhelming")
-        if(usr.Target.HasHellPower())
+        if(usr.Target.GetHellPower())
             custom_scent=pick("Brimstone", "Nothingness", "Blood", "Death", "Overwhelming")
         if(usr.Target.HasJagan())
             custom_scent="Death"

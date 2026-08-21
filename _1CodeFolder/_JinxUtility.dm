@@ -91,6 +91,7 @@ mob
 					src.Unconscious(null, "succumbing to poison!")
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
+
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
 			val = defender.HPToPct(val)
 			if(defender.CyberCancel)
@@ -247,62 +248,25 @@ mob
 			src.TotalCapacity+=val
 			if(src.TotalCapacity>=100)
 				src.TotalCapacity=100
-		HealHealth(val, _isEcho=0)
-			if(src.GetEffectiveShearForStackingEffects())
-				if(src.HasShearImmunity())
+
+		HealHealth(val)
+			if(GetEffectiveShearForStackingEffects())
+				if(HasShearImmunity())
 					val=val
-					src.Sheared=0
-				if(src.HasHellPower())
-					if(src.Sheared > 0)
-						src.Sheared-=val/(2/src.GetHellPower())
-						if(src.Sheared<0)
-							val+=(-1)*src.Sheared
-							src.Sheared=0
-						else
-							val *= 0.5
-					else if(!IsDarkDragonPlayer() && Frenzy > 0)
-						val *= 0.5
-				else
-					if(src.Sheared > 0)
-						src.Sheared-=val
-						if(src.Sheared<0)
-							val=(-1)*src.Sheared
-							src.Sheared=0
-						else
-							val /= 4
-					else if(!IsDarkDragonPlayer() && Frenzy > 0)
-						val /= 4
+					Sheared=0
+				var/notDDP = !IsDarkDragonPlayer();
+				var/hellP = GetHellPower();
+				if(notDDP && Frenzy > 0) val *= 0.5;
+				if(hellP) val *= 0.5;
+				Sheared = max(0, Sheared - val)
 			if(icon_state == "Meditate")
-				src.Tension=max(0, Tension-(val*1.5))
-			if(passive_handler["Staked"])
-				val = 0
-			if(passive_handler["AshChoked"])
-				val = 0
-			if(src.AwakeningSkillUsed==1)
-				val = 0
-			if(src.VaizardHealth&&!src.passive_handler.Get("HealThroughTempHP"))
-				val = 0
-			if(src.CelestialAscension=="Demon" && src.transActive>=5)
-				if(src.transUnlocked<6)
-					val = 0
+				Tension = max(0, Tension - (val * 1.5))
 			if(passive_handler["InverseHealing"])
 				DoDamage(src, src.PctToHP(val))
 				return
 			src.Health+=src.PctToHP(val)
 			src.MaxHealth()
-			/* This shit is disabled for now because wtf
-			if(!_isEcho && val > 0 && src.hasMagePassive(/mage_passive/light/Warden))
-				var/echo_seed = val
-				spawn(10)
-					if(src)
-						src.HealHealth(echo_seed * 0.5, 1)
-				spawn(20)
-					if(src)
-						src.HealHealth(echo_seed * 0.25, 1)
-				spawn(30)
-					if(src)
-						src.HealHealth(echo_seed * 0.125, 1)
-			*/
+
 		HealEnergy(var/val, var/StableHeal=0)
 			if(!src.FusionPowered&&!StableHeal)
 				val/=src.GetPowerUpRatio()
@@ -968,11 +932,9 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				Str += (0.1*spPower) * Str
-			var/hellPower = src.GetHellPower()
-			if(hellPower == 2)
-				Str += (hellPower/2) * Str
-			else
-				Str += (0.2 * hellPower) * Str
+			
+			Str *= GetHellStats();
+
 			var/zenkaiPower=src.GetZenkaiPower()
 			if(zenkaiPower == 2)
 				Str += (zenkaiPower/2) * Str
@@ -1150,11 +1112,9 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				For += (0.1*spPower) * For
-			var/hellPower = src.GetHellPower()
-			if(hellPower == 2)
-				For += (hellPower/2) * For
-			else
-				For += (0.2 * hellPower) * For
+			
+			For *= GetHellStats();
+
 			var/zenkaiPower=src.GetZenkaiPower()
 			if(zenkaiPower == 2)
 				For += (zenkaiPower/2) * For
@@ -1850,7 +1810,7 @@ mob
 			Recov+=src.RecovAscension
 			if(src.RecovReplace)
 				Recov=src.RecovReplace
-			if(src.HasHellPower()||src.HasZenkaiPower())
+			if(src.GetHellPower()||src.HasZenkaiPower())
 				if(Recov<2)
 					Recov=2
 			if(src.isRace(MAJIN))
@@ -2113,7 +2073,7 @@ mob
 					evil = 1
 				if(src.HasAbyssMod())
 					evil = 1
-			if(src.HasHellPower())
+			if(src.GetHellPower())
 				evil = 1
 			if(istype(src, /mob/Player/AI))
 				evil = 1
@@ -2157,7 +2117,7 @@ mob
 					evil = 1
 			if(src.Secret in EvilSecrets)
 				evil = 1
-			if(src.HasHellPower())
+			if(src.GetHellPower())
 				evil = 1
 			if(src.HasAbyssMod())
 				evil = 1

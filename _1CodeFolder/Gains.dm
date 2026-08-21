@@ -203,7 +203,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 							src << "One or more of your skills will be made available to you again when you stop meditating."
 				if(s.Cooldown<0 && s.Using)
 					src << "One or more of your skills will be made available to you again when you stop meditating."
-				for(var/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Monkey_Gourd/mg in src)
+				for(var/obj/Skills/Buffs/SlotlessBuffs/Wilder/Monkey_Gourd/mg in src)
 					mg.monkeyUsed = 0
 					src << "You have refilled your gourd."
 				break
@@ -1746,7 +1746,7 @@ mob
 					if(SM.suffix)
 						BreathingMaskOn=1
 				if(BreathingMaskOn==0)
-					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN,DRAGON, ELDRITCH)))
+					if(!passive_handler.Get("SpaceWalk")&&!(src.race in list(MAJIN, WILDER, ELDRITCH)))
 						src.Oxygen-=rand(2,4)
 						if(src.Oxygen<0)
 							src.Oxygen=0
@@ -1773,7 +1773,7 @@ mob
 									src.Death(null,"oxygen deprivation!")
 			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
 				var/IgnoresWater=0
-				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN,DRAGON,ELDRITCH))
+				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN, WILDER, ELDRITCH))
 					BreathingMaskOn=1
 				for(var/obj/Items/Tech/SpaceMask/SM in src)
 					if(SM.suffix)
@@ -1798,7 +1798,7 @@ mob
 				if(!IgnoresWater)
 					if(istype(T,/turf/Waters/Water7))
 						if(!src.HasWalkThroughHell())
-							if(!isRace(DEMON)&&!src.HasHellPower())
+							if(!isRace(DEMON)&&!src.GetHellPower())
 								src.AddBurn(10)
 					else
 						if(src.Burn)
@@ -1850,7 +1850,7 @@ mob
 							amounttaken=0
 						if(T.Deluged==1)
 							amounttaken=4
-						if(isRace(DRAGON))
+						if(isRace(WILDER))
 							amounttaken=0
 						if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk"))
 							amounttaken=0
@@ -1865,7 +1865,7 @@ mob
 								if(src.TotalFatigue>=95)
 									src.Unconscious(null,"fatigue due to swimming! They will drown if not rescued!")
 					else
-						if(!isRace(DRAGON))
+						if(!isRace(WILDER))
 							if(BreathingMaskOn==0)
 								src.Oxygen=0
 								src.DamageSelf(TrueDamage(1))

@@ -458,7 +458,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	SweetSpot = 1.5
 	SweetSpotBenefit = 1.5
 	adjust(mob/p)
-		var/tmp/jaboner = pick("rushes down the opponent and shouts 'JARONA'!", "rushes down the opponent and shouts 'JA-Orange'!", "rushes down the opponent and shouts 'JA-st kidding'!")
+		var/jaboner = pick("rushes down the opponent and shouts 'JARONA'!", "rushes down the opponent and shouts 'JA-Orange'!", "rushes down the opponent and shouts 'JA-st kidding'!")
 		ActiveMessage = jaboner
 
 	var/tmp/chain_active = FALSE
