@@ -114,7 +114,12 @@ mob
 					defender.client.updateRGMeter()
 			//guard: front-arc DR + meter chip + corner carry. behind/pierce/self skip it
 			if(defender && val > 0 && src != defender)
-				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender))
+				var/guard_opened = 0
+				if(src.openings_hits > 0 && src.openings_expire > world.time && defender == src.openings_target && !(src.AttackQueue && src.AttackQueue.GrandOpenings))
+					src.openings_hits--
+					if(defender.IsGuarding())
+						guard_opened = 1
+				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender) && !guard_opened)
 					defender.GuardMeter += glob.GUARD_METER_FLAT + val * glob.GUARD_METER_SCALE
 					val *= (1 - glob.GUARD_DR)
 					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)

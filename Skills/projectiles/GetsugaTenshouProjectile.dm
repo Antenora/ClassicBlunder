@@ -1,11 +1,11 @@
 obj/Skills/Projectile/Getsuga_Tenshou
 	name = "Getsuga Tenshou"
-	ManaCost=5
-	Cooldown = 3
+	ManaCost=1
+	Cooldown = 5
 	NeedsSword=1
 	StrScaling = 1
 	ForScaling = 1
-	DamageMult = 5
+	DamageMult = 0.55
 	AccMult = 1.2
 	Distance = 20
 	Homing = 1
@@ -28,7 +28,7 @@ obj/Skills/Projectile/Getsuga_Tenshou
 		HitboxW = 0 //mask supersede
 		HitboxH = 0
 		var/baseDmg = initial(DamageMult)
-		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? 5 : 0
+		var/bonus = p.CheckSlotless("Tensa Zangetsu") ? initial(DamageMult) : 0
 		DamageMult = (baseDmg + bonus) * benefit
 		var/inBankai = p.CheckSlotless("Tensa Zangetsu")
 		if(sweet_spot_hit)
@@ -55,12 +55,12 @@ obj/Skills/Projectile/Getsuga_Tenshou
 
 obj/Skills/Projectile/Getsuga_Jujisho
 	name = "Getsuga Jujisho"
-	Cooldown = 120
-	ManaCost=20
+	Cooldown = 30
+	ManaCost=8
 	NeedsSword=1
 	StrScaling = 1
 	ForScaling = 1
-	DamageMult = 25
+	DamageMult = 8.25
 	AccMult = 1.3
 	Distance = 20
 	Homing = 1

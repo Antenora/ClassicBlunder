@@ -88,9 +88,9 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 
 /obj/Skills/Projectile/Bushogoma
 	name = "Bushogoma"
-	ManaCost = 5
-	DamageMult = 10
-	Cooldown = 15
+	ManaCost = 1
+	DamageMult = 1.05
+	Cooldown = 5
 	Launcher = 3
 	Homing = 0
 	Distance = 12

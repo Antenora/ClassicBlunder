@@ -254,7 +254,7 @@ obj
 			Distance=6
 			Area="Target"
 			ForScaling=1.5
-			DamageMult=6
+			DamageMult=4.75
 			FocusShifter=1
 			FocusShiftBoost=2
 			Paralyzing=5
@@ -265,11 +265,11 @@ obj
 			HitSparkX=0
 			HitSparkY=0
 			WindUp=0.5
-			ManaCost=10
+			ManaCost=2
 			SpecialAttack=1
 			CanBeDodged=1
 			CanBeBlocked=0
-			Cooldown=45
+			Cooldown=10
 			WindupMessage="used <font size=+1>SHOCKER BREAKER!</font size>"
 			verb/Shocker_Breaker()
 				set category="Skills"
@@ -278,9 +278,9 @@ obj
 
 	Skills/Projectile
 		ChaosSaberToss
-			DamageMult=6
+			DamageMult=2.65
 			AccMult=2
-			Cooldown=45
+			Cooldown=10
 			IconSize=1
 			Homing = 1
 			NoGCD=1
@@ -288,7 +288,7 @@ obj
 			FocusShifter=1
 			FocusShiftBoost=2
 			Knockback=3
-			ManaCost=5
+			ManaCost=2
 			Trail='Trail - Flare.dmi'
 			TrailSize=1
 			IconLock='ChaosSaberProjectile.dmi'
@@ -300,7 +300,7 @@ obj
 				if(Using || cooldown_remaining)
 					return FALSE
 				if(usr.CheckSpecial("Hyperdeath Mode"))
-					var/hyper_mana_cost = 15
+					var/hyper_mana_cost = 6
 					if(usr.ManaAmount < hyper_mana_cost)
 						usr << "You need [hyper_mana_cost] mana."
 						return FALSE
@@ -319,7 +319,7 @@ obj
 
 		ChaosSaberWave
 			YSpawnOffset=4
-			DamageMult=20
+			DamageMult=8.83
 			AccMult=2
 			IconSize=1
 			DirOverride=2
@@ -435,7 +435,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	Area = "Target"
 	NeedsSword=0
 	Distance = 16
-	DamageMult = 5
+	DamageMult = 7
 	Knockback = 10
 	StrScaling = 1
 	EndEffectiveness = 1
@@ -445,7 +445,8 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	RushNoFlight = 1
 	StopAtTarget = 1
 	Copyable=6
-	Cooldown = 75
+	Cooldown = 18
+	EnergyCost = 5
 	ComboMaster = 1
 	GuardBreak = 1
 	NoLock = 1
@@ -465,7 +466,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	var/tmp/mob/chain_user = null
 	var/tmp/mob/chain_target = null
 	var/tmp/initial_charge_period = 3
-	var/tmp/saved_cooldown = 75
+	var/tmp/saved_cooldown = 18
 	var/tmp/reengage_deadline = 0
 	var/tmp/window_loop_running = FALSE
 
@@ -482,7 +483,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 		chain_user = user
 		chain_target = target
 		chain_count = 0
-		DamageMult = 10
+		DamageMult = 7
 		ChargePeriod = initial_charge_period
 		SweetSpotWindow = 0.3
 		SweetSpot = RollSweetSpot()
@@ -500,7 +501,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 		chain_user = null
 		chain_target = null
 		chain_count = 0
-		DamageMult = 10
+		DamageMult = 7
 		ChargePeriod = initial_charge_period
 		SweetSpotWindow = 0.3
 		SweetSpot = initial_charge_period / 2
@@ -548,10 +549,10 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			EndChain()
 			return
 		chain_count++
-		DamageMult = 10 * (1.2 ** (chain_count - 1))
+		DamageMult = 7 * min(1.2 ** (chain_count - 1), 2.5)
 		p.Target = chain_target
 		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE)
-		p.judgement_cut_bonus_value = 1.2 ** (chain_count - 1)
+		p.judgement_cut_bonus_value = min(1.2 ** (chain_count - 1), 2.5)
 		p.judgement_cut_bonus_chain_count = chain_count
 		p.judgement_cut_bonus_end_time = world.time + 30
 		ChargePeriod = max(0.6, initial_charge_period - (chain_count * 0.3))

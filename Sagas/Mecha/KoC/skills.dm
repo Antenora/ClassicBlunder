@@ -16,8 +16,8 @@
 	HitSparkDispersion=12
 	Launcher=3
 	DelayedLauncher=1
-	Cooldown=60
-	EnergyCost=5
+	Cooldown=15
+	EnergyCost=3
 	ObjIcon = 1
 	Icon='drill.dmi'
 	IconX = -8
@@ -29,25 +29,24 @@
 // Projectiles
 /obj/Skills/Projectile/Beams/Will_Beam
 	Copyable=0
-	DamageMult=1
+	DamageMult=0.4
 	ChargeRate=5
 	Distance=50
 	Knockback=1
-	BeamTime=10
 	IconLock='BeamBig2.dmi'
 	IconSize=3
-	Cooldown=60
-	BeamTime=15
-	EnergyCost=10
+	Cooldown=15
+	BeamTime=10
+	EnergyCost=3
 	verb/Will_Beam()
 		set category="Skills"
 		usr.UseProjectile(src)
 // Grapple
 /obj/Skills/Grapple/Seismic_Toss
 	Copyable=0
-	DamageMult=4
+	DamageMult=0.95
 	Reversal=0
-	Stunner=2
+	Stunner=0.8
 	StrScaling=0.5
 	ForScaling=0.5
 	ThrowAdd=12
@@ -57,7 +56,8 @@
 	DashAfter=1
 	TriggerMessage="launches a tornado spin throw on"
 	Effect="SpinTornado"
-	Cooldown=1
+	Cooldown=3
+	EnergyCost=1
 	verb/Seismic_Toss()
 		set category="Skills"
 		src.Activate(usr)

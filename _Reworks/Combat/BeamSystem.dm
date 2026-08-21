@@ -3,6 +3,16 @@ globalTracker
 		BEAM_V2 = TRUE //master switch; off = legacy conveyor
 		BEAM_HIT_INTERVAL = 0.5
 		BEAM_MAX_LEN = 60 //hard cap on segments in one beam, whatever the skill asks
+		BEAM_DMG_DEBUG = FALSE
+
+/mob/Admin2/verb/Beam_Damage_Debug()
+	set category = "Admin"
+	set name = "Beam Damage Debug"
+	glob.BEAM_DMG_DEBUG = !glob.BEAM_DMG_DEBUG
+	src << "Beam damage trace: [glob.BEAM_DMG_DEBUG ? "ON (world.log)" : "OFF"]."
+
+proc/BeamDbg(msg)
+	if(glob.BEAM_DMG_DEBUG) world.log << "BEAMDMG: [msg]"
 
 /mob/Admin2/verb/Beam_System_Toggle()
 	set category = "Admin"
@@ -38,6 +48,8 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 		victor = 0 //0 none, 1 armed (breakthrough pending), 2 spent
 		mob/pierce //the defeated caster whose remnants we sweep aside
 		win_mult = 1 //damage bonus carried by every part, including ones spawned later
+		prism_split = 0
+		obj/Skills/Projectile/_Projectile/glow_part
 
 /datum/beam/New(mob/M, obj/Skills/Projectile/Z, d)
 	owner = M
@@ -58,6 +70,10 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 	if(dying) return
 	dying = 1
 	firing = 0
+	if(glow_part)
+		FxDetachLight(glow_part)
+		glow_part._fx_glowed = 0
+		glow_part = null
 	for(var/obj/Skills/Projectile/_Projectile/p in parts)
 		if(p) p.clash_lock = null
 		DropPart(p)
@@ -87,7 +103,10 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 	if(frozen) //a clash owns us; it drives Layout() itself
 		return
 	if(firing)
-		if(!fixed_dir && owner.dir) bdir = owner.dir
+		if(skill && skill.HomingBeam && owner.Target && owner.Target != owner && owner.Target.z == owner.z)
+			bdir = get_dir(owner, owner.Target) || bdir
+		else if(!fixed_dir && owner.dir)
+			bdir = owner.dir
 		anchor = get_step(get_turf(owner), bdir) //stay welded to the muzzle
 		if(PmActive()) //track the muzzle's sub-tile position too, or the beam sits off the caster
 			ox = owner.step_x
@@ -162,6 +181,20 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 		if(i == parts.len && HeadStopped(p, nx)) blocked = 1
 		T = nx
 	laid_dir = bdir //what the hijack check compares against next tick
+	HeadGlow()
+
+/datum/beam/proc/HeadGlow()
+	var/obj/Skills/Projectile/_Projectile/head = parts.len ? parts[parts.len] : null
+	if(head == glow_part) return
+	var/moved = 0
+	if(glow_part)
+		glow_part._fx_glowed = 0
+		moved = head ? FxMoveLight(glow_part, head) : 0
+		if(!moved) FxDetachLight(glow_part)
+	glow_part = head
+	if(!head) return
+	head._fx_glowed = 1
+	if(!moved) FxAttachLight(head, null)
 
 /datum/beam/proc/PartMoved(obj/Skills/Projectile/_Projectile/p, turf/was)
 	if(!p || !p.loc) return
@@ -180,9 +213,7 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 /datum/beam/proc/HeadStopped(obj/Skills/Projectile/_Projectile/head, turf/nx)
 	if(!nx) return 1
 	if(nx.density) return 1
-	if(head && head.loc && !head.Piercing)
-		for(var/mob/m in head.loc)
-			if(m != owner && m.density) return 1
+	if(head && head.loc && !head.Piercing && head.BeamAheadBlocked()) return 1
 	return 0
 
 /datum/beam/proc/PartState(i)
@@ -195,10 +226,10 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 
 /datum/beam/proc/MakePart()
 	if(!owner || !skill) return null
-	var/obj/Skills/Projectile/_Projectile/p = owner.Blast(skill, owner, 0, 0, bdir)
+	var/obj/Skills/Projectile/_Projectile/p = owner.Blast(skill, owner, 0, 0, bdir, BeamOwner = src)
 	if(!p) return null
 	p.beam_owner = src //its own Life loop stands down on this
-	StampPart(p) 
+	StampPart(p)
 	if(p.chain)
 		p.chain.segments -= p
 		p.chain = null
@@ -219,19 +250,53 @@ mob/var/tmp/list/beams //live beam datums this caster owns
 	if(!parts.len || !owner) return
 	var/obj/Skills/Projectile/_Projectile/head = parts[parts.len]
 	if(!head || !head.loc) return
+	var/dbg_cand = 0
+	var/dbg_gated = 0
+	var/dbg_nolap = 0
+	var/dbg_hit = 0
 	for(var/obj/Skills/Projectile/_Projectile/p in parts)
 		if(!p || !p.loc) continue
-		for(var/mob/m in p.loc)
-			if(m == owner || !m.loc) continue
-			if(hit_at[m] && world.time - hit_at[m] < glob.BEAM_HIT_INTERVAL) continue
-			if(!HitboxesOverlap(p, m)) continue
+		for(var/mob/m in range(p.HitboxSweepRange(), p))
+			if(m == owner || !m.loc || !m.density) continue
+			dbg_cand++
+			if(hit_at[m] && world.time - hit_at[m] < glob.BEAM_HIT_INTERVAL)
+				dbg_gated++
+				continue
+			if(!HitboxesOverlap(p, m))
+				dbg_nolap++
+				continue
+			dbg_hit++
 			hit_at[m] = world.time
-			p.Hit(m)
+			try
+				p.Hit(m)
+			catch(var/exception/e)
+				world.log << "BEAM V2: Hit failed on [m] ([m.type]) from [skill] - [e] @ [e.file]:[e.line]"
+				continue
+			if(!prism_split && istype(skill, /obj/Skills/Projectile/Beams/Shine_Ray))
+				prism_split = 1
+				var/turf/pt = get_step(get_turf(m), bdir)
+				if(!pt)
+					pt = get_turf(m)
+				if(pt)
+					for(var/pd in list(turn(bdir, 45), turn(bdir, -45)))
+						var/obj/Skills/Projectile/Beams/Shine_Ray_Prism/PZ = new
+						PZ.SpawnPosition = pt
+						new /obj/Skills/Projectile/_Projectile(owner, PZ, pt, owner.BeamCharging, 0, 0, pd)
+	SweepReport(dbg_cand, dbg_gated, dbg_nolap, dbg_hit)
 	for(var/obj/Skills/Projectile/_Projectile/other in range(2, head))
 		if(other.Owner == owner || other == head) continue
 		if(!HitboxesOverlap(head, other)) continue
-		head.Hit(other)
+		if(glob.BEAM_DMG_DEBUG) BeamDbg("clash [skill] vs [other.SkillPath]")
+		try
+			head.Hit(other)
+		catch(var/exception/e)
+			world.log << "BEAM V2: clash Hit failed from [skill] - [e] @ [e.file]:[e.line]"
 		break
+
+/datum/beam/proc/SweepReport(c, g, n, h)
+	if(!glob.BEAM_DMG_DEBUG) return
+	if(!c && !h) return
+	BeamDbg("sweep [skill] len=[parts.len] blocked=[blocked] cand=[c] gated=[g] nolap=[n] hit=[h] ox=[ox] oy=[oy]")
 
 /datum/beam/proc/PartTouching(mob/m)
 	for(var/obj/Skills/Projectile/_Projectile/p in parts)
@@ -291,6 +356,14 @@ mob/proc/BeamFor(obj/Skills/Projectile/Z, d)
 		if(B.skill == Z && B.bdir == d && B.firing && !B.dying)
 			return B
 	return new/datum/beam(src, Z, d)
+
+mob/proc/BeamChannelLive()
+	if(beams)
+		for(var/datum/beam/B in beams)
+			if(B && !B.dying) return 1
+	for(var/obj/Skills/Projectile/P in src)
+		if(P.Area == "Beam" && P.Charging) return 1
+	return 0
 
 mob/proc/BeamsRelease(obj/Skills/Projectile/Z)
 	if(!beams) return

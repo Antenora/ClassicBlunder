@@ -2,14 +2,16 @@
 /obj/Skills/Grapple/The_Show_Stopper
 	SkillCost=TIER_5_COST
 	Copyable=6
-	Stunner=5
-	DamageMult=12
+	Stunner=1
+	DamageMult=5.5
+	LedgerCashoutPer=0.12
+	LedgerCashoutCap=5
 	HarderTheyFall=5
-	Crippling = 50
 	StrScaling=2
 	ForScaling=0
 	Effect="ShowStopper"
-	Cooldown=150
+	EnergyCost=8
+	Cooldown=30
 	OneAndDone=1
 	verb/The_Show_Stopper()
 		set category="Skills"
@@ -23,10 +25,11 @@
 	Copyable = 6
 	Area = "Around Target"
 	StrScaling = 2
-	DamageMult = 20
+	DamageMult = 10.75
 	Distance = 12
 	DistanceAround = 7
-	Cooldown = 75
+	EnergyCost = 8
+	Cooldown = 30
 	verb/Meteor_Strike()
 		set category = "Skills"
 		MeteorStrike(usr, src)
@@ -51,6 +54,12 @@ proc/MeteorStrike(mob/attacker, obj/Skills/AutoHit/Meteor_Strike/Z)
 	if(get_dist(attacker, attacker.Target) > Z.Distance)
 		attacker << "Your target is not in range!"
 		return
+	if(Z.EnergyCost)
+		var/drain = attacker.passive_handler["Drained"] ? Z.EnergyCost * (1 + attacker.passive_handler["Drained"]/10) : Z.EnergyCost
+		if(attacker.Energy < drain)
+			attacker << "You don't have enough energy to use [Z]!"
+			return
+		attacker.LoseEnergy(drain)
 	Z.adjust(attacker)
 	Z.SpellSlotModification()
 	Z.Cooldown(1, null, attacker)

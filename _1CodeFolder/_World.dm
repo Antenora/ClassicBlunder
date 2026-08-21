@@ -121,8 +121,11 @@ proc/BootWorld(var/blah)
 			Load_Bodies()
 			LoadIRLNPCs()
 			spawn()
-				if(!celestialObjectTicks) celestialObjectTicks = Hour(12)/10
-				CelestialBodiesLoop()
+				if(glob)
+					LoadMoonClock()
+					if(!glob.celestialObjectTicks || glob.celestialObjectTicks < 0)
+						glob.celestialObjectTicks = Hour(12)/10
+					CelestialBodiesLoop()
 			spawn()Add_Builds()
 			spawn()MakeSkillTreeList()
 			spawn()MakeKnowledgeTreeList()

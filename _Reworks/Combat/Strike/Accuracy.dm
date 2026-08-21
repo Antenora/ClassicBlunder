@@ -21,6 +21,11 @@
 		AccMult *= 0.8 //your own blast is awkward to parry
 	if(Defender.SureDodge && !Defender.passive_handler.Get("NoDodge"))
 		Defender.SureDodge = 0
+		if(Defender.AttackQueue && Defender.AttackQueue.RiposteOnDodge && Offender && Defender.CanMeleeReach(Offender))
+			var/rip = Defender.AttackQueue.RiposteOnDodge
+			spawn()
+				if(Defender && Offender && !Defender.KO)
+					Defender.Melee1(dmgmulti = rip, forcedTarget = Offender)
 		if(Offender.SureHit)
 			return deflection ? HIT : WHIFF
 		return MISS

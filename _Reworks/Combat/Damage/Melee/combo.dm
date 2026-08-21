@@ -6,7 +6,13 @@
 				src << "You have no target to combo with."
 				return FALSE
 			if(q.ComboPerformed>0)
-				Comboz(Target)
+				if(get_dist(src, Target) > 1)
+					var/na_save = NextAttack
+					NextAttack = world.time + 100
+					QueueDashTo(Target, max(q.Warp, 3))
+					NextAttack = na_save
+					if(KO || Stunned || (Stasis > 0) || Suspended)
+						return FALSE
 			if(q.ComboPerformed<=q.Combo)
 				q.ComboPerformed++
 			else

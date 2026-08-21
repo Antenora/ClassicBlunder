@@ -336,7 +336,6 @@ NEW VARIABLES
 	var/DualCast//If you have this, your spells pop off once again
 	var/MovingCharge//battlemage
 	var/SuperDash//Longer, more aesthetic dragondash
-	var/TechniqueMastery//Cooldowns are divided by 1.x this value
 	var/SweepingStrike//wingblade style attack zone
 //Staff stuff
 	var/MakesStaff//Does the buff make a staff?
@@ -2769,7 +2768,6 @@ NEW VARIABLES
 				DefMult=1.5
 				passives = list( "TechniqueMastery" = 10, "WeaponBreaker" = 3,  "Reversal" = 1, "MovingCharge" = 1, "MartialMagic" = 1, "SuperDash" = 1, "Pursuer" = 1, "Flicker" = 1, "GodKi" = 1)
 				MovementMastery=10
-				TechniqueMastery=10
 				Instinct=3
 				WeaponBreaker=3
 				Reversal=5
@@ -3625,7 +3623,6 @@ NEW VARIABLES
 					ForMult=1.3
 					EndMult=1.3
 					DefMult=1.4
-					TechniqueMastery=5
 					ArmorIcon='goldsaintaries_armor.dmi'
 					TopOverlayLock='goldsaintaries_helmet.dmi'
 					TopOverlayX=-32
@@ -4013,7 +4010,6 @@ NEW VARIABLES
 			SwordXSecond=-32
 			SwordYSecond=-32
 			PowerMult=1.5
-			TechniqueMastery=5
 			Pursuer=1
 			QuickCast=1
 			Flicker=1
@@ -4071,7 +4067,6 @@ NEW VARIABLES
 			SwordIconSecond='KingdomKey.dmi'
 			SwordXSecond=-32
 			SwordYSecond=-32
-			TechniqueMastery=10
 			GodKi=0.5
 			AngerMult=2
 			QuickCast=2
@@ -7341,7 +7336,6 @@ NEW VARIABLES
 					TimerLimit=30
 					Cooldown=-1
 					passives = list("ComboMaster"=1, "TechniqueMastery" = 10, "EnergyHeal"=3, "ManaHeal"=3)
-					TechniqueMastery=10
 					EnergyHeal=3
 					ManaHeal=3
 					ActiveMessage="overloads their Drive, entering a tireless frenzy - <b>Kishin</b>!"
@@ -7391,7 +7385,6 @@ NEW VARIABLES
 			SpecialSlot=1
 			passives = list( "TechniqueMastery" = 5,  "ManaLeak" = 1)
 			MovementMastery=5
-			TechniqueMastery=5
 			BuffMastery=5
 			ManaThreshold=1
 			ManaLeak=1
@@ -7706,7 +7699,6 @@ NEW VARIABLES
 									passives["QuickCast"] = 2
 									passives["TechniqueMastery"] = 5
 									src.QuickCast=2
-									src.TechniqueMastery=5
 								if(Enhancement=="Sustain")
 									passives["ManaHeal"] = 2
 									passives["CapacityHeal"] = 0.02
@@ -7804,7 +7796,6 @@ NEW VARIABLES
 									passives["QuickCast"] = 2
 									passives["TechniqueMastery"] = 5
 									src.QuickCast=2
-									src.TechniqueMastery=5
 								if(Enhancement=="Sustain")
 									passives["ManaHeal"] = 2
 									passives["CapacityHeal"] = 0.02
@@ -8139,7 +8130,6 @@ NEW VARIABLES
 			MagicSword=1
 			passives = list( "SwordAscension" = 3, "TechniqueMastery" = 5)
 			SwordAscension=3
-			TechniqueMastery=5
 			SwordClass="Medium"
 			SwordIcon='Bass.dmi'
 			SwordX=-3
@@ -10884,6 +10874,12 @@ NEW VARIABLES
 
 
 
+				Bob_and_Weave
+					ActiveMessage="rolls with the punches!"
+					OffMessage="stops weaving."
+					TimerLimit=10
+					DefMult=1.15
+
 				Brolic_Grip
 					ActiveMessage="flexes their arm with brolic strength!"
 					OffMessage="relaxes their vicious power..."
@@ -11203,7 +11199,6 @@ NEW VARIABLES
 				NeedsHealth=50
 				TooMuchHealth=75
 				PowerInvisible=1.5
-				TechniqueMastery=10
 				TextColor=rgb(255, 0, 0)
 				IconTint=list(0.8,0,0, 0.2,0.55,0.05, 0.2,0.02,0.58, 0,0,0)
 				Cooldown=-1
@@ -11651,7 +11646,6 @@ NEW VARIABLES
 			Punishment_of_Beasts
 				AlwaysOn=1
 				passives = list("TechniqueMastery" = -3)
-				TechniqueMastery=-3
 				ActiveMessage="experiences the suffering of Beast Realm - instincts taking away from developing reason!"
 				KenWave=1
 				KenWaveSize=1
@@ -11851,7 +11845,6 @@ NEW VARIABLES
 						"HardStyle" = 1 + (player.SagaLevel*0.5), "TechniqueMastery" = player.SagaLevel)
 						SlayerMod = player.SagaLevel * 0.5
 						HardStyle = 1 + (player.SagaLevel * 0.25)
-						TechniqueMastery = player.SagaLevel
 					..()
 			Kagutsuchi
 				NeedsHealth=50

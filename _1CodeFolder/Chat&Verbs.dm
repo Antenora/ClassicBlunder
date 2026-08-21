@@ -962,6 +962,10 @@ mob/proc/RPModeSwitch()
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
 				s.Cooldown(modify=1,Time=s.cooldown_remaining)
+			if(s.MaxCharges > 0 && s.Charges < s.MaxCharges)
+				var/missing = s.MaxCharges - s.Charges - length(s.recharge_ends)
+				for(var/i = 1, i <= missing, i++)
+					s.Recharge(s.ChargeRefresh * 10 * src.HasteCDMult(s) * i, src)
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return
@@ -993,6 +997,10 @@ mob/proc/CutsceneMode()
 			if(istype(s, /obj/Skills/Grab)) continue
 			if(s.cooldown_remaining)
 				s.Cooldown(modify=1,Time=s.cooldown_remaining)
+			if(s.MaxCharges > 0 && s.Charges < s.MaxCharges)
+				var/missing = s.MaxCharges - s.Charges - length(s.recharge_ends)
+				for(var/i = 1, i <= missing, i++)
+					s.Recharge(s.ChargeRefresh * 10 * src.HasteCDMult(s) * i, src)
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return

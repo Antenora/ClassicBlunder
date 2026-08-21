@@ -150,9 +150,9 @@
 			usr.Tail(1)
 
 mob/proc/Oozaru(Go_Oozaru=1,var/revert, obj/Skills/Buffs/SlotlessBuffs/Oozaru/Buff)
-	if(!src.oozaru_type)
-		src.oozaru_type = input(src, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
 	if(Go_Oozaru)
+		if(!src.oozaru_type)
+			src.oozaru_type = input(src, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
 		if(!src.Tail)return
 		if(src.Dead)return
 		if(transActive)return

@@ -31,15 +31,28 @@ obj/Skills/Projectile/_Projectile
 		pc_lastdir = fitdir
 		if(Area == "Beam" && Owner)
 			animate_movement = NO_STEPS //segments arrive in lockstep, no glide, as old BeamGraphics set
-			//key on the TRUE travel dir - a diagonal volley arm collapsed to a cardinal would share its chain
-			var/truedir = DirOverride || (Owner ? Owner.dir : dir)
-			chain = Owner.BeamChainFor(truedir, SkillPath)
-			chain.Register(src)
+			if(!beam_owner)
+				//key on the TRUE travel dir - a diagonal volley arm collapsed to a cardinal would share its chain
+				var/truedir = DirOverride || (Owner ? Owner.dir : dir)
+				chain = Owner.BeamChainFor(truedir, SkillPath)
+				chain.Register(src)
 
 	proc/OnContact(atom/a)
 		if(Killed || Distance < 0) return
 		if(glob.PIXEL_DEBUG) world.log << "PXC: [src] at ([x],[y]) Bump -> [a] ([a.type]) at ([a.x],[a.y])"
 		src.Bump(a)
+
+	proc/SweepAllySkip(mob/m)
+		if(!Owner || !m || m == Owner) return FALSE
+		if(Owner.inParty(m.ckey)) return TRUE
+		if(Owner in m.ai_followers) return TRUE
+		if(istype(Owner, /mob/Player/AI))
+			var/mob/Player/AI/oai = Owner
+			if(!oai.ai_team_fire && oai.AllianceCheck(m)) return TRUE
+		if(istype(m, /mob/Player/AI))
+			var/mob/Player/AI/mai = m
+			if(!mai.ai_team_fire && mai.AllianceCheck(Owner)) return TRUE
+		return FALSE
 
 	//shared filters for every contact candidate from the sweep
 	proc/TryPixelContact(atom/movable/a)
@@ -63,12 +76,14 @@ obj/Skills/Projectile/_Projectile
 		if(src.StormFall && a.pixel_z != src.pixel_z) return
 		if(ismob(a))
 			var/mob/m = a
+			if(m.proj_immune_until > world.time)
+				return
 			if(!m.density)
 				if(glob.PIXEL_DEBUG) world.log << "PXC: [src] skip [m] (not dense)"
 				return
 			if(!RehitEligible(LastHitAt, m, HitInterval)) return
 			OnContact(m)
-		else if(a.density)
+		else if(a.density && !ArcShot)
 			OnContact(a)
 
 	proc/PixelContactSweep()
@@ -92,7 +107,7 @@ obj/Skills/Projectile/_Projectile
 				continue
 			else if(ismob(a))
 				var/mob/m = a
-				if(m.density && RehitEligible(LastHitAt, m, HitInterval))
+				if(m.density && !SweepAllySkip(m) && RehitEligible(LastHitAt, m, HitInterval))
 					OnContact(m)
 			else if(a.density)
 				OnContact(a)
@@ -109,6 +124,8 @@ obj/Skills/Projectile/_Projectile
 		PixelWallCheck()
 
 	proc/PixelWallCheck()
+		if(ArcShot)
+			return
 		var/turf/t = loc
 		if(istype(t) && t.density)
 			OnContact(t)
@@ -158,7 +175,11 @@ obj/Skills/Projectile/_Projectile
 				Distance=0
 				break
 			if(src.Homing)
-				if(!src.Owner.Target)
+				if(ismob(src.Homing))
+					var/mob/hm = src.Homing
+					if(!hm.loc || hm.z != src.z)
+						Distance=0
+				else if(!src.Owner || !src.Owner.Target)
 					Distance=0
 				if(forcedTarget)
 					Homing = forcedTarget
@@ -189,7 +210,7 @@ obj/Skills/Projectile/_Projectile
 			if((src.HyperHoming && src.Homing) || (src.HomingCharge && !src.Homing))
 				//bump the locked target whenever it sits within Radius tiles
 				var/mob/htgt = forcedTarget || (src.Owner ? src.Owner.Target : null)
-				if(ismob(htgt) && (htgt in view(max(1, src.Radius), src)) && RehitEligible(LastHitAt, htgt, HitInterval))
+				if(ismob(htgt) && !SweepAllySkip(htgt) && (htgt in view(max(1, src.Radius), src)) && RehitEligible(LastHitAt, htgt, HitInterval))
 					OnContact(htgt)
 			if(src.ProjectileSpin)
 				if(!src.transform)
@@ -209,7 +230,9 @@ obj/Skills/Projectile/_Projectile
 			if(0>=Distance)
 				break
 			if(src.Area!="Beam")
-				if(src.Homing)
+				if(src.FollowFacing && src.Owner)
+					src.dir = src.Owner.dir
+				else if(src.Homing)
 					src.dir=get_dir(src, src.Homing)
 				else
 					if(src.RandomPath==2)
@@ -223,11 +246,21 @@ obj/Skills/Projectile/_Projectile
 						PixelStep()
 				else
 					src.Distance--
-					if(src.StormFall)
+					if(src.StormFall && !src.storm_dropped)
 						animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
 			else
 				if(!src.clash_lock) //a clash formed mid-iteration: no extra step into the enemy beam
 					PixelStep() //32px per Speed sleep = old walk() rate
+			if(src.EmitChild && src.EmitCount > 0 && src.Owner && !src.Killed && isturf(src.loc))
+				for(var/e = 0, e < src.EmitEvery && src.EmitCount > 0, e++)
+					var/obj/Skills/Projectile/_Projectile/eb = src.Owner.Blast(src.EmitChild, src.loc, 0)
+					if(eb && eb.loc == src.loc)
+						eb.step_x = src.step_x
+						eb.step_y = src.step_y
+					if(eb && src.Owner.Target && ismob(src.Owner.Target) && src.Owner.Target != src.Owner)
+						eb.Homing = src.Owner.Target
+						eb.forcedTarget = src.Owner.Target
+					src.EmitCount--
 		if(Owner) Owner.active_projectiles -= src
 		ProjectileFinish()
 		return

@@ -464,6 +464,8 @@ mob/Players
 		if(diag)
 			delay *= glob.DIAG_LOOP_DELAY
 		delay += move_speed
+		if(held_skill?.HeldBeam && !HasMovingCharge())
+			delay *= glob.HELD_BEAM_MOVE_PENALTY
 		if(src.Crippled)
 			var/debuffRev = src.GetDebuffReversal()
 			if(debuffRev)

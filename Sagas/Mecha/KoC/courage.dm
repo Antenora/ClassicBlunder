@@ -10,11 +10,11 @@ sagaInfo/courage/Endless_Evolution
 	specificPassives =list("3" = list("Overwhelming Force" = list("MovingCharge" = 1)))
 
 	skillsPerTier = list(	"2" = list("Overwhelming Force" = "/obj/Skills/Projectile/Beams/Will_Beam", "Unstoppable Strength" = "/obj/Skills/Grapple/Seismic_Toss", \
-										"Peerless Agility" = "/obj/Skills/AutoHits/Drill_of_Defiance"), \
+										"Peerless Agility" = "/obj/Skills/AutoHit/Drill_of_Defiance"), \
 
-							"3" = list("Unstoppable Strength" = "/obj/Skills/Buffs/SlotlessBuffs/Plot_Armor", "Peerless Agility" = "/obj/Skills/Projectiles/Drill_Hurricane"), \
+							"3" = list("Unstoppable Strength" = "/obj/Skills/Buffs/SlotlessBuffs/Plot_Armor"), \
 
-							"4" = list("/obj/Skills/Buffs/SlotlessBuffs/Veiled_Reality", "Unstoppable Strength" = "/obj/Skills/AutoHits/Nidan_Gaeshi", \
+							"4" = list("/obj/Skills/Buffs/SlotlessBuffs/Veiled_Reality", \
 										"Peerless Agility" = "/obj/Skills/AutoHit/Giga_Drill_Breaker"), \
 							"5" = "/obj/Skills/Buffs/SlotlessBuffs/Evolve", \
 

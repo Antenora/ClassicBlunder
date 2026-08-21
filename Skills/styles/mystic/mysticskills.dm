@@ -190,13 +190,14 @@
 
 /obj/Skills/AutoHit/Getsuga_Followthrough
 	Area="Wide Wave"
-	DamageMult=5
+	DamageMult=2.75
 	Distance=10
 	ComboMaster=1
 	NoLock = 1
 	Instinct=2
 	NoAttackLock=1
-	Cooldown=30
+	Cooldown=8
+	EnergyCost=2
 	EndsGetsuga = 1
 	HitSparkIcon='Hit Effect.dmi'
 	HitSparkX=-32

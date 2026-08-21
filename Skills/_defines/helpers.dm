@@ -79,6 +79,8 @@ mob/proc/UsingHotnCold()
 /mob/proc/applySnare(limit, _icon, force = FALSE)
 	if(passive_handler.Get("Trample") && is_dashing)
 		return
+	if(cc_immune_until > world.time && !force)
+		return
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare/s = findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare) // try to find it
 	if(force)
 		if(BuffOn(s))

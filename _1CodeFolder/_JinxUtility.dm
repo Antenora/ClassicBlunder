@@ -2288,6 +2288,8 @@ mob
 				OMsg(src, "[src] suddenly appears as a result of their binding!")
 
 		SetStasis(var/StasisTime)
+			if(src.cc_immune_until > world.time)
+				return
 			StasisTime*=glob.STASIS_LENGTH_MODIFIER
 			StasisTime/=clamp(1+src.GetStatusResist(), 1, 1.5)
 			src.Stasis=StasisTime
@@ -2421,8 +2423,9 @@ mob
 						else
 							src.Chargez("Remove")
 					p.Charging=0
-					src.Beaming=0
-					src.BeamCharging=0
+				src.Beaming=0
+				src.BeamCharging=0
+				src.icon_state=""
 				src.BeamsRelease() //V2: detach-and-fly, the legacy behaviour - never orphan the datum
 		ForceCancelBuster()
 			if(BusterTech)

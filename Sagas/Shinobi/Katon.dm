@@ -6,12 +6,12 @@
 	SpellElement = "Fire"
 	Copyable = 1
 	Homing = 0
-	DamageMult = 10
+	DamageMult = 1.25
 	Explode = 2
 	Scorching = 10
 	Speed = 1.25
-	ManaCost = 5
-	Cooldown = 15
+	ManaCost = 1
+	Cooldown = 5
 	LockX = -16
 	LockY = -16
 	ActiveMessage = "kneads chakra into flame and breathes out a great fireball, Katon: Gōkakyū no Jutsu!"
@@ -31,12 +31,12 @@
 	SpellElement = "Fire"
 	Copyable = 1
 	Homing = 0
-	DamageMult = 7
+	DamageMult = 2.7
 	Explode = 1
 	Scorching = 5
 	Combustion = 30
 	Speed = 1
-	ManaCost = 8
+	ManaCost = 2
 	Cooldown = 10
 	IconLock = 'FireBlast.dmi'
 	ActiveMessage = "spits a searing bullet of flame, Katon: Endan!"
@@ -53,12 +53,12 @@
 	Copyable = 1
 	Area = "Arc"
 	Distance = 3
-	DamageMult = 0.5
+	DamageMult = 0.2
 	ForScaling = 1
 	Scorching = 15
 	Rounds = 10
-	ManaCost = 10
-	Cooldown = 15
+	ManaCost = 1
+	Cooldown = 5
 	HitSparkIcon = 'Explosion - Fire.dmi'
 	HitSparkTurns = 1
 	HitSparkSize = 1
@@ -82,7 +82,7 @@
 	Hover = 7
 	Homing = 2
 	Blasts = 10
-	DamageMult = 0.85
+	DamageMult = 0.1
 	AccMult = 1.25
 	Scorching = 5
 	Explode = 1
@@ -90,8 +90,8 @@
 	Variation = 0
 	Speed = 1
 	Distance = 20
-	ManaCost = 10
-	Cooldown = 20
+	ManaCost = 1
+	Cooldown = 6
 	IconLock = 'FireBlast.dmi'
 	ActiveMessage = "scatters a volley of fire, Katon: Hōsenka no Jutsu!"
 

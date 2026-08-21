@@ -203,13 +203,14 @@ obj/Skills/AutoHit
 		Area="Strike"
 		AwakeningSkill=1
 		Cooldown=-1
+		EnergyCost=12
 		ActNumber=3
 		StrScaling=1
 		Rush=10
 		SpecialAttack=1
 		CanBeDodged=0
 		CanBeBlocked=1
-		DamageMult=40
+		DamageMult=22.5
 		Stunner=3
 		Knockback=0
 		WindUp=0.5
@@ -254,7 +255,7 @@ obj/Skills/AutoHit
 	NeverSeeItComing
 		SpecialAttack=1
 		GuardBreak=1
-		DamageMult=1
+		DamageMult=40.5
 		StrScaling=1
 		TurfShift='IceGround.dmi'
 		Distance=15
@@ -263,9 +264,10 @@ obj/Skills/AutoHit
 		HahaWhoops=1
 		ActNumber=1
 		Cooldown=-1
+		EnergyCost=12
 	//	Area="Target"
 		adjust(mob/p)
-			src.DamageMult=rand(1,10)
+			src.DamageMult=rand(7.36,73.64)
 			Cooldown=-1
 		verb/Never_See_It_Coming()
 			set category="Skills"
@@ -276,7 +278,8 @@ obj/Skills/AutoHit
 	PowerWordGenderDysphoria
 		Area="Target"
 		Cooldown=-1
-		DamageMult = 5
+		EnergyCost=12
+		DamageMult = 45
 		Distance = 15
 		DelayTime = 0
 		HitSparkIcon = 'BLANK.dmi'
@@ -297,11 +300,12 @@ obj/Skills/AutoHit
 			usr.Activate(src)
 			usr.TriggerAwakeningSkill(ActNumber)
 	Unleash
-		ManaCost=75
+		ManaCost=5
+		Cooldown=18
 		StrScaling=0
 		ForScaling=1
 		HolyMod=40
-		DamageMult=15
+		DamageMult=8.5
 		Area="Circle"
 		Distance=3
 		TurfErupt=2
@@ -322,22 +326,22 @@ obj/Skills/AutoHit
 		HitSparkY=0
 		adjust(mob/p)
 			if(p.passive_handler.Get("Determination(White)"))
-				src.ManaCost=40
+				src.ManaCost=3
 		verb/Unleash()
 			set category="Skills"
 			adjust(usr)
 			usr.Activate(src)
 	Banish
-		ManaCost=100
+		ManaCost=12
 		ElementalClass="Water"
 		SagaSignature=1
 		SignatureTechnique=2
-		Cooldown=9000
+		Cooldown=120
 		SignatureName="Banish"
 		Area="Target"
 		Distance=15
 		HolyMod=2000
-		DamageMult=30
+		DamageMult=45
 		WindUp=1
 		HitSparkIcon='Hit Effect Pearl.dmi'
 		HitSparkX=-32
@@ -350,8 +354,8 @@ obj/Skills/AutoHit
 		SpecialAttack=1
 		adjust(mob/p)
 			if(p.passive_handler.Get("Shatter Fate"))
-				Cooldown=1
-				ManaCost=20
+				Cooldown=30
+				ManaCost=2
 		verb/Banish()
 			set category="Skills"
 			adjust(usr)
@@ -359,7 +363,7 @@ obj/Skills/AutoHit
 	Burning_Up_Everything
 		StrScaling=0
 		ForScaling=1
-		DamageMult=14
+		DamageMult=34.5
 		HealthCost=3
 		Area="Circle"
 		Distance=8
@@ -380,7 +384,8 @@ obj/Skills/AutoHit
 		HitSparkIcon='BLANK.dmi'
 		HitSparkX=0
 		HitSparkY=0
-		Cooldown=3600
+		Cooldown=120
+		EnergyCost=12
 
 		Earthshaking=15
 		PreQuake=1
@@ -392,9 +397,10 @@ obj/Skills/AutoHit
 		Distance=10
 		RedTechnique=1
 		GuardBreak=1
-		DamageMult=6
+		DamageMult=9
 		PullIn=15
-		Cooldown=120
+		Cooldown=30
+		EnergyCost=8
 		NeedsHealth=50
 		Shockwaves=3
 		Shockwave=4
@@ -407,14 +413,14 @@ obj/Skills/AutoHit
 		adjust(mob/p)
 			if(altered) return
 			if(p.passive_handler.Get("Red Hot Rage"))
-				Cooldown=10
+				Cooldown=12
 				RedPUSpike=pick(25, 50)
-				DamageMult=5
+				DamageMult=7.5
 				ActiveMessage="screams so fucking loud that you start to worry about their mental health. Are they okay?"
 				p.passive_handler.Increase("RedPUSpike", RedPUSpike)
 				p.WeirdAngerStuff()
 			else
-				Cooldown=150
+				Cooldown=38
 				RedPUSpike=0
 		verb/Scream_of_Fury()
 			set category="Skills"
@@ -480,14 +486,14 @@ obj/Skills/AutoHit
 			usr.Activate(src)
 	X_Slash
 		Area="Target"
-		Cooldown=35
+		Cooldown=9
 		StrScaling=1
 		Rush=10
 		SpecialAttack=1
 		CanBeDodged=0
 		CanBeBlocked=1
-		DamageMult=10
-		ManaCost=10
+		DamageMult=3.8
+		ManaCost=2
 		Knockback=0
 		ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
 		HitSparkIcon='Slash_Multi.dmi'
@@ -498,14 +504,14 @@ obj/Skills/AutoHit
 		Instinct=1
 		adjust(mob/p)
 			if(p.passive_handler.Get("OmegaPower"))
-				Cooldown=20
-				ManaCost=20
-				DamageMult=25
+				Cooldown=6
+				ManaCost=4
+				DamageMult=9.5
 				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7500>m</font color><font color=#FFEB00>e</font color><font color=#9CFF00>g</font color><font color=#27FF00>a</font color> <font color=#00FFC4>X</font color><font color=#00C4FF>-</font color><font color=#004EFF>S</font color><font color=#2700FF>l</font color><font color=#9C00FF>a</font color><font color=#FF00EB>s</font color><font color=#FF0075>h</font color></b>!!!!"
 			else
-				Cooldown=35
-				ManaCost=10
-				DamageMult=10
+				Cooldown=9
+				ManaCost=2
+				DamageMult=3.8
 				ActiveMessage="dashes in and swings fiercely with two powerful strikes!"
 		verb/X_Slash()
 			set category="Skills"
@@ -536,8 +542,8 @@ obj/Skills
 obj/Skills/Queue
 	var/RandomMult
 	HoldingOutForAHero
-		ManaCost=100
-		Cooldown=1
+		ManaCost=3
+		Cooldown=15
 		var/buffpicked
 		icon_state="Heal"
 		Copyable=3
@@ -545,7 +551,7 @@ obj/Skills/Queue
 		Opener=1
 		Duration=5
 		ActiveMessage="strikes with a desire for heroism in her heart!"
-		DamageMult=4
+		DamageMult=1.9
 		AccuracyMult=1.1
 		InstantStrikes=4
 		InstantStrikesDelay=1.5
@@ -566,31 +572,32 @@ obj/Skills/Queue
 		ActNumber=1
 		AwakeningSkill=1
 		HitMessage="asks for the strength to shatter fate..."
-		DamageMult=0.1
+		DamageMult=37.5
 		AccuracyMult =10000
 		Duration=5
 		KBMult=0.00001
 		Cooldown=-1
+		EnergyCost=12
 		UnarmedOnly=1
 		Launcher=2
 		name="Never Knows Best"
 		HitSparkIcon='fevExplosion.dmi'
 		HitSparkX=-32
 		HitSparkY=-32
-		Cooldown=-1
 		verb/NeverKnowsBest()
 			set category="Skills"
 			set name="Never Knows Best (Act 1)"
-			RandomMult=rand(1,70)
+			RandomMult=rand(10.56,739.44)
 			DamageMult=RandomMult/10
 			usr.SetQueue(src)
 			usr.TriggerAwakeningSkill(ActNumber)
 	FistOfTheRedStar
 		name="Fist Of The Red Star"
-		DamageMult=7
+		DamageMult=1.55
 		AccuracyMult = 1.75
 		Duration=5
 		Cooldown=-1
+		EnergyCost=1
 		Shattering=3
 		ActNumber=2
 		AwakeningSkill=1
@@ -599,12 +606,12 @@ obj/Skills/Queue
 		PushOutIcon='DarkKiai.dmi'
 		PushOutWaves=3
 		PushOut=1
-		Cooldown=01
+		Cooldown=3
 		HitSparkIcon='BLANK.dmi'
 		adjust(mob/p)
 			if(altered) return
 			if(p.passive_handler.Get("Red Hot Rage"))
-				Cooldown=10
+				Cooldown=12
 				RedPUSpike=pick(25, 50)
 				p.passive_handler.Increase("RedPUSpike", RedPUSpike)
 				p.WeirdAngerStuff()
@@ -833,8 +840,9 @@ obj/Skills/Projectile
 	var/PartyReqType
 	Rude_Buster
 		Distance=40
-		ManaCost=50
-		DamageMult=4
+		Cooldown=8
+		ManaCost=2
+		DamageMult=1.4
 		Shearing=1
 		AccMult=100
 		HyperHoming=1
@@ -848,12 +856,12 @@ obj/Skills/Projectile
 		Homing=1
 		adjust(mob/p)
 			if(p.passive_handler.Get("OmegaPower"))
-				ManaCost=40
-				DamageMult=15
+				ManaCost=2
+				DamageMult=5.25
 				ActiveMessage=", dreams in hand, uses <b><font color=#FF0000>O</font color><font color=#FF7F00>m</font color><font color=#FFFF00>e</font color><font color=#7FFF00>g</font color><font color=#00FF00>a</font color> <font color=#00FEFF>B</font color><font color=#007FFF>u</font color><font color=#0000FF>s</font color><font color=#7F00FF>t</font color><font color=#FF00FE>e</font color><font color=#FF007F>r</font color></b>!!!!"
 			else
-				ManaCost=50
-				DamageMult=4
+				ManaCost=2
+				DamageMult=1.4
 				ActiveMessage="uses Rude Buster!!"
 		verb/Rude_Buster()
 			set category="Skills"
@@ -861,9 +869,10 @@ obj/Skills/Projectile
 			usr.UseProjectile(src)
 	Red_Buster
 		Distance=40
+		Cooldown=12
 		Charge=0.25
-		ManaCost=40
-		DamageMult=8
+		ManaCost=3
+		DamageMult=2.25
 		Shearing=1
 		AccMult=100
 		HyperHoming=1
@@ -900,8 +909,8 @@ obj/Skills/Projectile
 	Burning_Black
 		Distance=40
 		Charge=0.25
-		ManaCost=100
-		DamageMult=40
+		ManaCost=8
+		DamageMult=9.75
 		Shearing=1
 		AccMult=100
 		HyperHoming=1
@@ -913,11 +922,11 @@ obj/Skills/Projectile
 		IconSize=1
 		Radius=3
 		Homing=1
-		Cooldown=180
+		Cooldown=45
 		adjust(mob/p)
 			if(p.passive_handler.Get("Shatter Fate"))
-				Cooldown=1
-				ManaCost=20
+				Cooldown=30
+				ManaCost=2
 		verb/Burning_Black()
 			set category="Skills"
 			set name="Burning Black"
@@ -925,35 +934,36 @@ obj/Skills/Projectile
 			usr.UseProjectile(src)
 	Beams
 		TasteTheRainbow //Nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan nyan
-			DamageMult=12
+			DamageMult=9.25
 			Immediate=1
 			Dodgeable=0
 			StrScaling=1
 			ForScaling=1
 			IconLock='carefully.dmi'
-			Cooldown=120
-			EnergyCost=5
+			Cooldown=30
+			EnergyCost=8
 			Instinct=1
 			verb/Taste_The_Rainbow()
 				set category="Skills"
 				usr.UseProjectile(src)
 		Unbelievable_Rage
-			DamageMult=10
+			DamageMult=2
 			Immediate=1
 			Dodgeable=0
 			IconLock='Pride Beam.dmi'
-			Cooldown=30
+			Cooldown=8
+			EnergyCost=2
 			Instinct=1
 			adjust(mob/p)
 				if(altered) return
 				if(p.passive_handler.Get("Red Hot Rage"))
-					Cooldown=10
+					Cooldown=3
 					RedPUSpike=pick(25, 50)
-					DamageMult=12
+					DamageMult=2.4
 					p.passive_handler.Increase("RedPUSpike", RedPUSpike)
 					p.WeirdAngerStuff()
 				else
-					Cooldown=30
+					Cooldown=8
 					RedPUSpike=0
 			verb/Unbelievable_Rage()
 				set category="Skills"
@@ -964,10 +974,11 @@ obj/Skills/Projectile
 		Final_Chaos
 			Speed = 0.25
 			Cooldown=-1
+			EnergyCost=12
 			Distance=20
 			Blasts=15
 			Charge=1
-			DamageMult=1.3
+			DamageMult=1.4
 			IconLock='Nyan2.dmi'
 			Instinct=1
 			AccMult=2
@@ -1249,7 +1260,7 @@ obj/Skills/Buffs
 		//	JusticeAxe
 obj/Skills/Grapple
 	CHAOS_DUNK
-		DamageMult=10
+		DamageMult=14.5
 		StrScaling=1
 		TriggerMessage="comes on and slams"
 		Effect="Lotus"
@@ -1257,7 +1268,8 @@ obj/Skills/Grapple
 		OneAndDone=1
 		ThrowMult=0
 		ThrowAdd=0
-		Cooldown=120
+		Cooldown=30
+		EnergyCost=8
 		verb/CHAOS_DUNK()
 			set category="Skills"
 			src.Activate(usr)

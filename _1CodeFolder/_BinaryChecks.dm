@@ -1149,21 +1149,6 @@ mob
 			if(src.CheckSlotless("Sage Mode")&&src.StyleActive)
 				return 1
 			return 0
-		HasTechniqueMastery()
-			if(passive_handler.Get("TechniqueMastery"))
-				return 1
-			if(usingStyle("UnarmedStyle"))
-				return 1
-			if(UsingMasteredMartialStyle())
-				return 1
-			if(src.TarotFate=="The World")
-				return 1
-			if(src.passive_handler.Get("Zeal"))
-				return 1
-			if(Target)
-				if(isDominating(Target) && passive_handler.Get("HellRisen"))
-					return 1
-			return 0
 		HasTestMode()
 			if(passive_handler && passive_handler.tmp_passives["TestMode"])
 				return 1
@@ -2129,7 +2114,7 @@ mob
 				return 1
 			if(passive_handler.Get("Kaioken") || passive_handler.Get("Super Kaioken"))
 				return 1
-			if(SpecialBuff.BuffName == "Ripper Mode")
+			if(SpecialBuff && SpecialBuff.BuffName == "Ripper Mode")
 				return 1
 			return 0
 		HasFastRush() // Returns the Rush Delay divisor set in glob.dm
@@ -2139,7 +2124,7 @@ mob
 				return glob.RUSH_DELAY_DIVISOR
 			if(passive_handler.Get("Super Kaioken"))
 				return glob.RUSH_DELAY_DIVISOR
-			if(SpecialBuff.BuffName == "Ripper Mode")
+			if(SpecialBuff && SpecialBuff.BuffName == "Ripper Mode")
 				return glob.RUSH_DELAY_DIVISOR
 			return 0
 		HasWarp()

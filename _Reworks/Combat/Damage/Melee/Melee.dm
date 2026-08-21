@@ -232,6 +232,21 @@
 				IaidoCounter = 0
 		else
 			Comboz(forcewarp)
+	else if(AttackQueue && AttackQueue.Warp && !AttackQueue.NoWarp && !petal_attacking && Target && Target.loc && Target != src && Target.z == z && get_dist(src, Target) > 1)
+		var/inDash
+		if(PmActive())
+			inDash = max(abs((Target.x-x)*32 + (Target.step_x-step_x)), abs((Target.y-y)*32 + (Target.step_y-step_y))) < AttackQueue.Warp*32
+		else
+			inDash = get_dist(Target, src) < AttackQueue.Warp
+		if(inDash)
+			var/na_save = NextAttack
+			NextAttack = world.time + 100
+			QueueDashTo(Target, AttackQueue.Warp)
+			NextAttack = na_save
+			if(KO || Stunned || (Stasis > 0) || Suspended)
+				return
+			if(AttackQueue && AttackQueue.InstantStrikes && AttackQueue.InstantStrikesDelay < 2)
+				AttackQueue.NoWarp = 1
 
 
 		//	WARPING END	//
@@ -401,6 +416,11 @@
 		// 				ARMOR END				//
 
 		// 				QUEUE	 				//
+				if(!AttackQueue && enemy.phantom_mark_by == src && world.time < enemy.phantom_mark_until)
+					damage *= 1 + enemy.phantom_mark_damage
+					enemy.phantom_mark_by = null
+					enemy.phantom_mark_until = 0
+					clearPhantomMarkFX(enemy)
 				var/knockDistance = 0
 				if(AttackQueue)
 					damage *= QueuedDamage(enemy)
@@ -413,6 +433,34 @@
 					if(QueuedKBMult()<1 && !QueuedKBAdd())
 						NoKB=1
 					knockDistance += QueuedKBAdd()
+					if(AttackQueue.PairBonusSkill && enemy.RecentSkillHitBy(src, AttackQueue.PairBonusSkill, AttackQueue.PairBonusWindow))
+						damage *= AttackQueue.PairBonusMult
+					if(AttackQueue.JuggleBonus && enemy.Launched)
+						damage *= AttackQueue.JuggleBonus
+					if(AttackQueue.WeakenRider)
+						enemy.nerve_weaken = min(enemy.nerve_weaken + AttackQueue.WeakenRider, 0.3)
+						enemy.nerve_weaken_until = world.time + 80
+					enemy.NoteSkillHit(src, AttackQueue.type)
+					if(AttackQueue.BankedRelease)
+						AttackQueue.bank_stacks++
+						if(AttackQueue.Combo && AttackQueue.ComboPerformed >= AttackQueue.Combo)
+							var/obj/Skills/Queue/bq = AttackQueue
+							var/bstacks = bq.bank_stacks
+							bq.bank_stacks = 0
+							var/bpath = text2path(bq.Projectile)
+							var/mob/benemy = enemy
+							if(bpath)
+								spawn()
+									var/turf/bt = get_turf(src)
+									if(!bt)
+										return
+									var/obj/Skills/Projectile/BZ = new bpath
+									BZ.TempDamage = initial(BZ.DamageMult) * bstacks / max(1, bq.Combo)
+									BZ.SpawnPosition = bt
+									var/bdir = benemy ? get_dir(src, benemy) : src.dir
+									if(!bdir)
+										bdir = src.dir
+									new /obj/Skills/Projectile/_Projectile(src, BZ, bt, 0.5, 0, 0, bdir)
 
 					if(AttackQueue.Ooze)
 /*						world << "[enemy.x] [enemy.y] [enemy.z]"
@@ -641,17 +689,18 @@
 
 							if(AttackQueue)
 							// 				ONHITS				//
+								AttackQueue.chain_victim = enemy
 								if(AttackQueue.Burning||AttackQueue.Scorching||AttackQueue.Chilling||AttackQueue.Freezing||AttackQueue.Crushing||AttackQueue.Shattering||AttackQueue.Shocking||AttackQueue.Paralyzing||AttackQueue.Poisoning||AttackQueue.Toxic)
 									var/list/addElements = list()
 									if(AttackQueue.Burning||AttackQueue.Scorching)
 										addElements |= "Fire"
-									else if(AttackQueue.Chilling||AttackQueue.Freezing)
+									if(AttackQueue.Chilling||AttackQueue.Freezing)
 										addElements |= "Water"
-									else if(AttackQueue.Crushing||AttackQueue.Shattering)
+									if(AttackQueue.Crushing||AttackQueue.Shattering)
 										addElements |= "Earth"
-									else if(AttackQueue.Shocking||AttackQueue.Paralyzing)
+									if(AttackQueue.Shocking||AttackQueue.Paralyzing)
 										addElements |= "Wind"
-									else if(AttackQueue.Poisoning||AttackQueue.Toxic)
+									if(AttackQueue.Poisoning||AttackQueue.Toxic)
 										addElements |= "Poison"
 									ElementalCheck(src, enemy, 0, glob.DEBUFF_INTENSITY, addElements)
 
@@ -663,6 +712,29 @@
 									enemy.AddDoom(AttackQueue.Doom, src)
 								if(AttackQueue.Ashing)
 									applyAshChoked(enemy, src)
+								if(AttackQueue.BonusVsStunned && enemy.Stunned)
+									damage *= 1 + AttackQueue.BonusVsStunned
+								if(AttackQueue.BonusVsSlowed && (enemy.Slow > 0 || enemy.Crippled > 0 || (enemy.passive_handler && enemy.passive_handler["Snared"])))
+									damage *= 1 + AttackQueue.BonusVsSlowed
+								if(AttackQueue.RootRider)
+									enemy.applySnare(AttackQueue.RootRider, 'root.dmi')
+								if(AttackQueue.ApplySlow)
+									enemy.AddSlow(AttackQueue.ApplySlow, src)
+								if(AttackQueue.SlowPinAt && enemy.Slow >= AttackQueue.SlowPinAt)
+									enemy.applySnare(1, 'root.dmi')
+								if(AttackQueue.EnergyBurn)
+									enemy.LoseEnergy(AttackQueue.EnergyBurn)
+									if(AttackQueue.DrainToSelf)
+										src.HealEnergy(AttackQueue.EnergyBurn)
+								if(AttackQueue.CursedWounds)
+									applyCursedWounds(enemy, AttackQueue.CursedWounds * 10)
+								if(AttackQueue.SplatBonus)
+									enemy.splat_bonus = AttackQueue.SplatBonus
+									enemy.splat_bonus_until = world.time + 30
+								if(AttackQueue.GrandOpenings)
+									openings_hits = AttackQueue.GrandOpenings
+									openings_expire = world.time + 100
+									openings_target = enemy
 
 								if(AttackQueue.Dunker)
 									if(enemy.Launched)
@@ -760,6 +832,8 @@
 								S.critBonus = AttackQueue.CritChanceBonus
 							var/dmgValue = S.resolve()
 							. = dmgValue
+							if(dmgValue > 0 && AttackQueue && AttackQueue.WoundRider && ismob(enemy))
+								src.DealWounds(enemy, dmgValue * AttackQueue.WoundRider)
 							lastHit = world.time
 							if(dash_clash >= 2 || (clash_pursuit == enemy && world.time <= clash_pursuit_until))
 								TryDragonClash(enemy, from_hit = 1)

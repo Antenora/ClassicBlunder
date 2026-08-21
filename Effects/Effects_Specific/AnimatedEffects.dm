@@ -342,14 +342,18 @@ proc
 	LotusEffect(var/mob/User, var/mob/Target, var/TimeMod=1)
 		if(!User || !Target || User.loc == null || Target.loc == null)
 			return
+		if(Target.Launched)
+			Target.Launched = 0
+			Target.launch_total = 0
+			launchLoop -= Target
 		User.loc=Target.loc
 		if(PmActive())//co-locate with the target's mid-tile sprite for the clinch
 			User.step_x=Target.step_x
 			User.step_y=Target.step_y
 		User.Frozen=2
 		Target.Frozen=2
-		animate(Target,pixel_z=4*TimeMod*20,time=5)
-		animate(User,pixel_z=4*TimeMod*20,time=5)
+		animate(Target,pixel_z=4*TimeMod*20,time=5,flags=ANIMATION_END_NOW)
+		animate(User,pixel_z=4*TimeMod*20,time=5,flags=ANIMATION_END_NOW)
 		sleep(5)
 		animate(User, transform=turn(User.transform,90), time=5, flags=ANIMATION_LINEAR_TRANSFORM)
 		animate(Target, transform=turn(Target.transform,90), time=5, flags=ANIMATION_LINEAR_TRANSFORM)
@@ -376,6 +380,8 @@ proc
 			User.step_y=0
 		User.Frozen=0
 		Target.Frozen=0
+		if(!Target.KO && !Target.Knockback && Target.icon_state == "KB")
+			Target.icon_state = ""
 
 
 	SpinTornado(mob/a, mob/d,  time = 5)

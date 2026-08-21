@@ -232,7 +232,6 @@ obj
 						DoubleStrike=1
 						NoStaff=0
 						ArcaneBladework=1
-						TechniqueMastery=5
 						SummonSwordVisual=0.75
 						WeaponBreaker=2
 						StyleActive="Arcane Bladework"
@@ -328,7 +327,6 @@ obj
 						Flicker=3
 						Pursuer=3
 						MovementMastery=8
-						TechniqueMastery=10
 						MartialMagic=1
 						DoubleStrike=1
 						NoSword=1

@@ -15,18 +15,18 @@ obj/Skills/AutoHit/Gale_Slash
 	Area="Circle"
 	Distance=2
 	StrScaling=1
-	DamageMult=2
+	DamageMult=0.5
 	ManaDrain = 2
 	Launcher=1
 	NoLock=1
 	NoAttackLock=1
-	Cooldown=30
+	Cooldown=8
 	Size=2
 	Rounds=5
 	Icon='SweepingKick.dmi'
 	IconX=-32
 	IconY=-32
-	EnergyCost=1
+	EnergyCost=2
 	CanBeDodged=1
 	Knockback = 5
 	ActiveMessage="lets loose a sweeping gale of wind around them!"
@@ -38,7 +38,7 @@ obj/Skills/AutoHit/Gale_Slash
 	ChargeWaveBlend=2
 
 	adjust(mob/p)
-		DamageMult = 3 + (p.SagaLevel/2)
+		DamageMult = (3 + (p.SagaLevel/2)) * 0.0909
 		Launcher = 0.5 + (p.SagaLevel/2)
 
 	OnHeldRelease(mob/p, var/benefit)

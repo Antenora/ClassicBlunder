@@ -230,7 +230,7 @@ obj/Skills/AutoHit
 		StrScaling=0
 		ForScaling=1
 		Rounds=10
-		DamageMult=0.5
+		DamageMult=1.4
 		Area="Around Target"
 		ElementalClass="Water"
 		FlickAttack=1
@@ -243,14 +243,14 @@ obj/Skills/AutoHit
 		HitSparkIcon='SnowBurst.dmi'
 		HitSparkX=0
 		HitSparkY=0
-		Cooldown=120
-		ManaCost=10
+		Cooldown=30
+		ManaCost=8
 		TurfStrike=1
 		TurfShift='IceGround.dmi'
 		TurfShiftDuration=3
 		adjust(mob/p)
 			Rounds = 10 + (2 * p.SagaLevel)
-			DamageMult = 0.5 + (0.05 * p.SagaLevel)
+			DamageMult = 0.95 + (0.09 * p.SagaLevel)
 			Chilling = 5 + p.SagaLevel
 		verb/Tsukishiro()
 			set category="Skills"
@@ -264,26 +264,26 @@ obj/Skills/AutoHit
 		SagaSignature=1
 		StrScaling=0
 		ForScaling=1
-		DamageMult=10
+		DamageMult=9
 		Area="Wave"
 		ElementalClass="Water"
 		FlickAttack=1
 		Distance=10
 		Freezing=20
-		Stunner=5
+		Stunner=3
 		ComboMaster = 1
 		WindUp = 2
 		ActiveMessage="Tsugi no mai, Hakuren!"
 		HitSparkIcon='SnowRing.dmi'
 		HitSparkX=0
 		HitSparkY=0
-		Cooldown=120
-		ManaCost=10
+		Cooldown=30
+		ManaCost=8
 		TurfStrike=1
 		TurfShift='IceGround.dmi'
 		TurfShiftDuration=3
 		adjust(mob/p)
-			DamageMult = 10 + (0.75 * p.SagaLevel)
+			DamageMult = 6.55 + (0.49 * p.SagaLevel)
 			Freezing = 20 + (5 * p.SagaLevel)
 			WindUp = 2 - (0.25 * p.SagaLevel)
 			if(p.SagaLevel > 3)
@@ -307,7 +307,7 @@ obj/Skills/AutoHit
 		WindUp=2
 		ComboMaster=1
 		GuardBreak=1
-		DamageMult=10
+		DamageMult=25.75
 		SpecialAttack=1
 		Freezing=100
 		HitSparkIcon='SnowBurst.dmi'
@@ -320,9 +320,10 @@ obj/Skills/AutoHit
 		ActiveMessage="drops their surroundings to Absolute Zero!"
 		Slow=1
 		NoLock=1
-		Cooldown=240
+		Cooldown=60
+		EnergyCost=12
 		adjust(mob/p)
-			DamageMult = 10 + (3 * p.SagaLevel)
+			DamageMult = 10.3 + (3.09 * p.SagaLevel)
 			Distance = 12 + (1 * p.SagaLevel)
 		verb/Hakusen()
 			set category="Skills"

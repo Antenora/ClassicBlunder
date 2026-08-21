@@ -4,7 +4,7 @@ obj
 			DarkImpulseGrab
 				ActiveMessage="overflows with the power of darkness!"
 				HitMessage="vanishes towards their opponent, smothering them with a malicious claw!"
-				DamageMult=3
+				DamageMult=6.25
 				AccuracyMult = 1.15
 				Duration=5
 				Warp=3
@@ -17,7 +17,7 @@ obj
 				PushOutIcon='DarkKiai.dmi'
 				//No verb since it is set from melee.
 			GhostDriveCombo
-				DamageMult=0.5
+				DamageMult=0.6
 				AccuracyMult = 1.175
 				Instinct=4
 				KBMult=0.00001
@@ -27,15 +27,15 @@ obj
 
 obj/Skills/Queue
 	Ars_Arcanum
-		DamageMult=2
+		DamageMult=2.96
 		AccuracyMult=1.15
 		Duration=5
 		KBMult=0.00001
-		Cooldown=90
+		Cooldown=25
 		Opener=1
 		Stunner=1
 		NeedsSword=1
-		EnergyCost=1
+		EnergyCost=5
 		Quaking=5
 		HitStep=/obj/Skills/Queue/Ars_Arcanum2
 		PushOut=1
@@ -45,8 +45,8 @@ obj/Skills/Queue
 		HitMessage="crushes the opponent's guard with a downward stirke!"
 		adjust(mob/P)
 			if(src.UpgradedKeybladeSkill)
-				src.Cooldown=60
-				src.DamageMult=3
+				src.Cooldown=15
+				src.DamageMult=4.45
 				src.Stunner=2
 				src.Quaking=8
 		verb/Ars_Arcanum()
@@ -55,7 +55,7 @@ obj/Skills/Queue
 			usr.SetQueue(src)
 	Ars_Arcanum2
 		HitMessage="begins to rapidly pile on strikes with their keyblade!"
-		DamageMult=0.5
+		DamageMult=0.74
 		AccuracyMult=5
 		Duration=5
 		KBMult=0.00001
@@ -69,7 +69,7 @@ obj/Skills/Queue
 		HitStep=/obj/Skills/Queue/Ars_Arcanum3
 	Ars_Arcanum3
 		HitMessage="finishes the combo with a powerful jab!"
-		DamageMult=1.5
+		DamageMult=2.22
 		AccuracyMult=10
 		Duration=5
 		KBMult=2

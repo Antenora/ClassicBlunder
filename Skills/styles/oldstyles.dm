@@ -205,7 +205,6 @@
 						Pursuer=3
 						SuperDash=2
 						BladeFisting=1
-						TechniqueMastery=10
 						MovementMastery=8
 						MartialMagic=1
 						MovingCharge=1

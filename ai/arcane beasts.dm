@@ -306,7 +306,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Burst //potential posebuff. not used atm, 
 	name = "Arcane Burst"
 	passives = list("TechniqueMastery" = 10)
 	Instinct=1
-	TechniqueMastery=10
 	ManaThreshold = 100
 
 obj/Skills/Buffs/SlotlessBuffs/Bond_Savior //Nymph power

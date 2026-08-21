@@ -41,10 +41,44 @@ mob/proc/StartGCD(obj/Skills/Z)
 	if(until > gcd_ready)
 		gcd_ready = until
 		gcd_stamp = world.time
+
+mob/proc/GetHaste(obj/Skills/Z)
+	if(!passive_handler) return 0
+	if(Z && Z.CooldownStatic)
+		var/sh = Hustling() ? 100/3 : 0
+		if(istype(Z, /obj/Skills/Dragon_Dash))
+			var/P = min(HasPursuer(), 9)
+			if(P > 0)
+				sh += 100 * P / (10 - P)
+		else if(istype(Z, /obj/Skills/Reverse_Dash))
+			var/M = 1
+			if(Secret == "Haki" && secretDatum && secretDatum.secretVariable["HakiSpecialization"] == "Observation")
+				M += 1
+			if(Saga == "Eight Gates")
+				M += 2
+			if(M > 1)
+				sh += 100 * (M - 1)
+		return sh
+	var/h = passive_handler.Get("Haste")
+	var/tval = passive_handler.tmp_passives["Haste"]
+	if(isnum(tval))
+		h += tval
+	h += GetTechniqueMastery() * 3
+	if(Z)
+		if(Z.ChakraNature && ChakraSpecialization == Z.ChakraNature)
+			h += 18
+		if(Z.SpellElement)
+			h += min(getSpellElementCooldownReduction(Z.SpellElement) * 150, 45)
+	return max(h, -50)
+
+mob/proc/HasteCDMult(obj/Skills/Z)
+	return 100 / (100 + GetHaste(Z))
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
 	if(p)
 		m = p
+	if(ismob(m) && !Time && !istype(src, /obj/Skills/Buffs))
+		m.last_skill_fire_time = world.time
 	if(!Time && ismob(m) && !istype(src, /obj/Skills/Buffs))
 		m.StartGCD(src)
 	if(MaxCharges > 0)
@@ -53,16 +87,7 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		if(Charges <= 0)
 			Using = 1
 		if(!Time && m)
-			if(!CooldownStatic)
-				if(m.HasTechniqueMastery())
-					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
-					if(TM < 0)
-						modify *= clamp(1+abs(TM), 1.1, glob.TECHNIQUE_MASTERY_LIMIT)
-					else if(TM > 0)
-						modify /= clamp((1+TM), 0.1, glob.TECHNIQUE_MASTERY_LIMIT)
-			else
-				if(m.Hustling())
-					modify *= 0.75
+			modify *= m.HasteCDMult(src)
 			Time = src.ChargeRefresh * 10 * modify
 		if(isnull(Time) || Time == 0)
 			Time = src.ChargeRefresh * 10
@@ -85,25 +110,10 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		var/list/lockedoutSkills = list()
 		var/was_fresh = !Time   // a passed Time = an RP-resume re-apply; only a FRESH cast (re)sets cooldown_full
 		if(!Time && src && m)
-			if(!src.CooldownStatic)
-				if(m.HasTechniqueMastery())
-					var/TM = m.GetTechniqueMastery() / glob.TECHNIQUE_MASTERY_DIVISOR
-					if(TM < 0)
-						modify *= clamp(1+abs(TM), 1.1, glob.TECHNIQUE_MASTERY_LIMIT)
-					else if(TM > 0)
-						modify/=clamp((1+(TM)),0.1,glob.TECHNIQUE_MASTERY_LIMIT)
-				if(src.SpellElement)
-					var/elem_cd_red = m.getSpellElementCooldownReduction(src.SpellElement)
-					if(elem_cd_red)
-						modify *= (1 - min(elem_cd_red, 0.80))
-				if(src.ChakraNature && m.ChakraSpecialization == src.ChakraNature)
-					modify *= 0.85
-				if(CooldownDrag>=1)
-					modify *= 1 + (CooldownDrag/100)
-					CooldownDrag--
-			else
-				if(m.Hustling())
-					modify*=0.75
+			modify *= m.HasteCDMult(src)
+			if(!src.CooldownStatic && CooldownDrag>=1)
+				modify *= 1 + (CooldownDrag/100)
+				CooldownDrag--
 			if(LockOut.len>0)
 				for(var/obj/Skills/otherSkills in m.Skills)
 					var/typeString = "[otherSkills.type]"
@@ -144,11 +154,11 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 				return
 			cooldown_start = world.realtime
 			cooldown_start_wt = world.time
-			var/start_time = world.realtime
+			var/start_time = world.time
 			if(announce_cd && m.cooldownAnnounce && Time/10 > 0 && (AlwaysAnnounceCooldown || Time/10 > 5))
 				m << "[src] has gone on Cooldown ([Time/10] Seconds)"
 			spawn(Time)
-				if(cooldown_start != start_time) return //This instance of the CD was canceled.
+				if(cooldown_start_wt != start_time) return //This instance of the CD was canceled.
 				src.Using=0
 				cooldown_remaining = 0
 				cooldown_start = 0
@@ -166,7 +176,13 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 						m << "<font color='white'><b>[src] is off cooldown.</b></font color>"
 
 obj/Skills/proc/Recharge(Time, mob/m)
+	var/end_at = world.time + Time
+	if(!recharge_ends)
+		recharge_ends = list()
+	recharge_ends += end_at
 	spawn(Time)
+		if(recharge_ends)
+			recharge_ends -= end_at
 		Charges = min(Charges + 1, MaxCharges)
 		if(Charges > 0)
 			Using = 0
@@ -316,13 +332,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 
 
 			if("ReverseDash")
-				var/Modifier=1
 				if(hasEldritchPower()) summonEldritchMinion();
-				if(src.Secret=="Haki")
-					if(src.secretDatum.secretVariable["HakiSpecialization"]=="Observation")
-						Modifier+=1
-				if(src.Saga=="Eight Gates")
-					Modifier+=2
 				if(src.Secret=="Haki")
 					if(src.CheckSlotless("Haki Armament"))
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Armament/H in src)
@@ -349,7 +359,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 				if(src.Knockbacked)
 					return
 				//cd only once we're actually dashing - used to burn on dead presses
-				Z.Cooldown(1/Modifier)
+				Z.Cooldown()
 				//launch-break window check has to happen before the dash loop sleeps through it
 				var/perfect_launch = src.Launched && (world.time <= src.startOfLaunch + glob.TIMING_WINDOW)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Reverse Dash"))
@@ -437,8 +447,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 				if(!CanDash())
 					return
 
-				var/Modifier = (src.HasPursuer()/10)
-				Z.Cooldown(clamp(1-Modifier,0.1, 1))
+				Z.Cooldown()
 
 				if(src.hasSecret("Eldritch (Reflected)"))
 					src.HealMana(5)

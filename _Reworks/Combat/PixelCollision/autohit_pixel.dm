@@ -33,7 +33,7 @@ obj/AutoHitter
 		pc_lastdir = dir
 
 	//zone damage as a true circle
-	proc/AH_ZoneDamage(atom/epicenter, R, annulus=FALSE, los=TRUE)
+	proc/AH_ZoneDamage(atom/epicenter, R, annulus=FALSE, los=TRUE, square=FALSE)
 		if(!epicenter || R < 0) return
 		//tile-locked to match the VFX ring, not the caster's mid-tile sprite
 		var/turf/e = get_turf(epicenter)
@@ -42,8 +42,12 @@ obj/AutoHitter
 		var/cy = (e.y-1)*32 + 16
 		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)))
 			if(!hitSelf && m == Owner) continue
-			if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
-			if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
+			if(square)
+				if(!SquareHitsBounds(cx, cy, 32*R, m)) continue
+				if(annulus && R > 1 && SquareHitsBounds(cx, cy, 32*(R-1), m)) continue
+			else
+				if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
+				if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
 			src.Damage(m)
 
 	proc/AH_TryContact(mob/m)

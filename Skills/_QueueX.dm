@@ -55,6 +55,7 @@ mob/proc/FireFinisher(force = 0)
 obj
 	Skills
 		Queue//Queued skills like GET DUNKED and Axekick.
+			CritEffectiveness=1
 			var/Duration=5//This is how long the queue remains up for.
 			var/UnarmedOnly=0//Can't use this with a sword.
 			//var/ClassNeeded//Requires a sword class.
@@ -1576,7 +1577,22 @@ mob
 				Q.CounterTemp = 0.1 * src.HasCounterMaster()
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.3, Blend=2, Time=2)
 				CounterMasterTimer = max(1, 25 - (src.HasCounterMaster()*5))
+			if(Q.QueueWindup)
+				OMsg(src, "<b>[src] winds up [Q.name]...</b>")
+				src.WindingUp = 1
+				sleep(Q.QueueWindup)
+				src.WindingUp = 0
+				if(src.KO || src.Stunned || src.Suspended || src.Stasis > 0)
+					return
 			src.AttackQueue=Q
+			if(Q.CCImmuneCast)
+				src.cc_immune_until = world.time + Q.CCImmuneCast
+			if(Q.WeaveDodge)
+				src.pre_weave_sdtl = src.SureDodgeTimerLimit
+				src.SureDodgeTimerLimit = Q.WeaveDodge
+				src.SureDodgeTimer = Q.WeaveDodge
+			if(Q.DashScaling)
+				src.last_combo_warp_dist = 0
 			src.queue_counter_until = world.time + min(glob.TIMING_WINDOW + src.HasCounterMaster()*glob.QUEUE_COUNTER_CM_BONUS, glob.QUEUE_COUNTER_MAX)
 			src.AttackQueue.RanOut=0
 			src.AttackQueue.Hit=0
@@ -1659,6 +1675,14 @@ mob
 					Damage+=(0.5+(src.SenseUnlocked-4))
 			if(Damage<1)
 				Damage = 1
+			if(src.AttackQueue.DashScaling && src.AttackQueue.Warp)
+				Damage *= 0.7 + 0.6 * min(src.last_combo_warp_dist / src.AttackQueue.Warp, 1)
+			if(src.AttackQueue.CrescendoRider)
+				Damage *= 1 + 0.02 * src.AttackQueue.ComboPerformed
+			if(src.AttackQueue.StoredPain)
+				if(world.time - src.pain_stamp > 50)
+					src.pain_amount = 0
+				Damage *= min(0.5 + (src.pain_amount / 30) * 0.8, 1.3)
 			if(src.AttackQueue.DamageMult>=0)
 				var/dmgMult = src.AttackQueue.DamageMult * GetDisarmedQueueDamageFactor(src.AttackQueue)
 				if(passive_handler["Fa Jin"] && canFaJin())
@@ -1702,6 +1726,8 @@ mob
 				src.RecoilDamage=src.AttackQueue.Recoil
 			if(src.AttackQueue.Combo)
 				src.AttackQueue.ComboPerformed=0
+			if(src.AttackQueue.BankedRelease)
+				src.AttackQueue.bank_stacks=0
 		QueuedHitMessage(var/mob/P)
 			if(!AttackQueue) return
 			src.AttackQueue.Hit=1
@@ -1750,6 +1776,8 @@ mob
 							src.OMessage(10, "<font color='[src.AttackQueue.TextColor]'><b>[src] [src.AttackQueue.HitMessage]</b></font color>", "[src]([src.key]) hit with [src.AttackQueue].")
 						else
 							src.OMessage(10, "<font color='red'><b>[src] [src.AttackQueue.HitMessage]</b></font color>", "[src]([src.key]) hit with [src.AttackQueue].")
+			if(src.AttackQueue.DashScaling && src.AttackQueue.Warp && src.last_combo_warp_dist >= src.AttackQueue.Warp - 1)
+				Stun(P, 0.3)
 			if(src.AttackQueue.Stunner)
 				Stun(P, src.AttackQueue.Stunner+src.GetStunningStrike())
 				if(src.AttackQueue.Stunner>5)
@@ -1776,7 +1804,7 @@ mob
 				if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Death_Mark))
 					S.adjust(StyleBuff.SignatureTechnique * 15, StyleBuff.SignatureTechnique/2)
 
-			if(src.AttackQueue.Projectile)
+			if(src.AttackQueue.Projectile && !src.AttackQueue.BankedRelease)
 				var/path=text2path(src.AttackQueue.Projectile)
 				var/x=src.AttackQueue.ProjectileCount
 				if(!locate(path, src))
@@ -1808,7 +1836,7 @@ mob
 			else
 				if(src.AttackQueue.MissMessage)
 					src.OMessage(10, "<font color='yellow'><b>[src] [src.AttackQueue.MissMessage]</b></font color>", "[src]([src.key]) missed with [src.AttackQueue].")
-			if(src.AttackQueue.Projectile)
+			if(src.AttackQueue.Projectile && !src.AttackQueue.BankedRelease)
 				var/path=text2path(src.AttackQueue.Projectile)
 				if(!locate(path, src))
 					src.AddSkill(new path)
@@ -1833,6 +1861,14 @@ mob
 
 		ClearQueue()
 			src.QueueOverlayRemove()
+			if(src.AttackQueue.WeaveDodge)
+				src.SureDodgeTimerLimit = src.pre_weave_sdtl
+				src.pre_weave_sdtl = 0
+				if(!src.SureDodgeTimerLimit)
+					src.SureDodgeTimer = 0
+					src.SureDodge = 0
+			if(src.AttackQueue.BankedRelease)
+				src.AttackQueue.bank_stacks = 0
 			src.AttackQueue.CounterTemp=0
 			src.AttackQueue.DelayerTime=0
 			if(src.AttackQueue.ComboMessaged)
@@ -1912,6 +1948,9 @@ mob
 						return
 				else if(!src.AttackQueue.RanOut&&!src.AttackQueue.Missed&&src.AttackQueue.Hit)
 					if(src.AttackQueue.HitStep)
+						if(src.AttackQueue.ChainBlockStop && src.AttackQueue.chain_victim && src.AttackQueue.chain_victim.IsGuarding())
+							src.AttackQueue=null
+							return
 						var/obj/Skills/Queue/S=new src.AttackQueue.HitStep
 						S.adjust(src)
 						src.AttackQueue=null

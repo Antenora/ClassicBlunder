@@ -32,7 +32,7 @@ obj/Skills/Queue/Excalibur
 	PushOut=1
 	PushOutWaves=1
 	PushOutIcon='KenShockwaveGold.dmi'
-	DamageMult=3
+	DamageMult=0.53
 	AccuracyMult=1.5
 	KBMult=1
 	Duration=6
@@ -40,8 +40,8 @@ obj/Skills/Queue/Excalibur
 	Projectile="/obj/Skills/Projectile/ExcaliburProjectile"
 	Delayer=0.25//add 1 damage mult every second that this is queued but hasnt been punched yet
 	Warp=0
-	Cooldown=30 // This is probably a 60 second c/d move on a 30 second c/d.
-	EnergyCost=5
+	Cooldown=8 // This is probably a 60 second c/d move on a 30 second c/d.
+	EnergyCost=2
 	IconLock='ExcaliTrail.dmi'
 	verb/Excalibur()
 		set category="Skills"
@@ -50,7 +50,7 @@ obj/Skills/Queue/Excalibur
 obj/Skills/AutoHit/True_Excalibur
 	NeedsSword=1
 	ABuffNeeded="Soul Resonance"
-	EnergyCost=25
+	EnergyCost=5
 	Area="Arc"
 	Distance=10
 	DelayTime=2
@@ -66,8 +66,8 @@ obj/Skills/AutoHit/True_Excalibur
 	Speed=0.5
 	NoForcedWhiff=1
 	Instinct=3
-	DamageMult=8
-	Stunner=5
+	DamageMult=3.65
+	Stunner=2
 	Launcher=6
 	Rounds=2
 	Knockback=30
@@ -75,7 +75,7 @@ obj/Skills/AutoHit/True_Excalibur
 	StrScaling=1
 	EndEffectiveness=0.75
 	ForScaling=1
-	Cooldown=90
+	Cooldown=25
 	HitSparkIcon='Hit Effect Excal.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
@@ -116,7 +116,7 @@ obj/Skills/Projectile/ExcaliburProjectile
 	Knockback=1
 	Trail='ExcaliTrail.dmi'
 	MultiHit=8
-	DamageMult=2
+	DamageMult=0.35
 	AccMult=1.5
 	Deflectable=0
 	Distance=20

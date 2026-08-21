@@ -216,7 +216,7 @@ mob
 							flick("Flight",src)
 					if(key1||key2||key3||key4)
 						//rooted pivot
-						if((IsGuarding() || IsChargingEnergy()) && !dir_locked)
+						if((IsGuarding() || IsChargingEnergy() || wall_cling_until > world.time) && !dir_locked)
 							var/hd = heldDir()
 							if(hd) dir = hd
 							sleep(world.tick_lag)
@@ -243,6 +243,8 @@ mob
 									loop_delay *= glob.DIAG_LOOP_DELAY
 								move_speed = MovementSpeed()
 								var/delay = (loop_delay + move_speed) / glob.PLAYER_SPEED_MULT
+								if(held_skill?.HeldBeam && !HasMovingCharge())
+									delay *= glob.HELD_BEAM_MOVE_PENALTY
 								if(src.Crippled)
 									var/debuffRev = src.GetDebuffReversal();
 									if(debuffRev)

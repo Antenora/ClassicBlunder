@@ -1,44 +1,55 @@
 /obj/Skills/Projectile/Cataclysmic_Orb
 	SkillCost=TIER_5_COST
 	Copyable=6
-	EnergyCost=20
-	Speed = 2
-	Distance=20
-	Blasts=30
+	EnergyCost=8
+	Speed = 3
+	Distance=15
+	Blasts=1
 	Charge=1
-	DamageMult=1
+	DamageMult=0
 	MenuIcon="CataclysmicOrb"
 	ComboMaster=1
-	Stunner= 3
-	Instinct=1
-	AccMult=2
-	Homing=3
+	Piercing=1
 	Explode=1
-	ZoneAttack=1
-	ZoneAttackX=8
-	ZoneAttackY=8
 	IconLock='Plasma.dmi'
 	LockX=0
 	LockY=0
-	Hover=10
+	IconSize=2.5
 	Variation=0
-	Cooldown = 150
-	ActiveMessage="Kicks up a Barrage of Orbs, creating an inescapable trap!"
+	Cooldown = 30
+	EmitChild=new/obj/Skills/Projectile/Cataclysmic_Orb_Bits
+	EmitCount=30
+	EmitEvery=2
+	ActiveMessage="unleashes a slow-rolling cataclysm!"
 	verb/Cataclysmic_Orb()
 		set category="Skills"
 		usr.UseProjectile(src)
 
+/obj/Skills/Projectile/Cataclysmic_Orb_Bits
+	ClusterBit=1
+	Copyable=0
+	Distance=6
+	DamageMult=0.4
+	AccMult=1.5
+	RandomPath=1
+	HomingCharge=1
+	HyperHoming=1
+	Explode=1
+	Variation=0
+	IconLock='Plasma.dmi'
+	IconSize=0.6
+
 /obj/Skills/Projectile/Desperado_Blaster
 	SkillCost = TIER_5_COST
 	Copyable = 6
-	DamageMult = 6
+	DamageMult = 1.15
 	Distance = 20
 	Explode = 1
 	AccMult = 2
 	Speed = 1
 	MenuIcon="DesperadoBlaster"
 	Instinct = 1
-	Cooldown = 75
+	Cooldown = 30
 	Variation = 0
 	IconLock = 'Blast1.dmi'
 	LockX = 0

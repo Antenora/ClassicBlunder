@@ -32,8 +32,8 @@ obj/Skills/AutoHit/Crystal_Luminescene
 	Distance=10
 	StrScaling=0
 	ForScaling=1
-	DamageMult=2
-	Flash=35
+	DamageMult=16.25
+	Flash=6
 	SpecialAttack=1
 	HitSparkIcon='BLANK.dmi'
 	HitSparkX=0
@@ -44,11 +44,11 @@ obj/Skills/AutoHit/Crystal_Luminescene
 	TurfShiftDurationSpawn=0
 	TurfShiftDurationDespawn=5
 	ActiveMessage="raises Soul Calibur into the air to unleash a blinding glint of light from the crystals!"
-	Cooldown=150
-	EnergyCost=5
+	Cooldown=38
+	EnergyCost=8
 	adjust(mob/p)
-		DamageMult = 2 + p.SagaLevel
-		Flash = 35 + (p.SagaLevel*5)
+		DamageMult = (2 + p.SagaLevel) * 2.3214
+		Flash = (35 + (p.SagaLevel*5)) * 0.1
 	verb/Crystal_Luminescene()
 		set category="Skills"
 		adjust(usr)

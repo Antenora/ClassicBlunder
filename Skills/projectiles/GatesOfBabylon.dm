@@ -540,6 +540,7 @@ obj/Skills/AutoHit/Enuma_Elish
 	IconX = -158
 	IconY = -169
 	NeedsSword = 1
+	EraseProjectiles = 1
 	ActiveMessage = "channels the Sword of Rupturing Heaven — Enuma Elish!"
 	var/tmp/enuma_shatter_fired = 0
 	var/tmp/charging_enuma = 0

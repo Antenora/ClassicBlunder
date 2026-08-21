@@ -928,6 +928,7 @@
 #include "Skills\_NuMartialArts.dm"
 #include "Skills\_ProjectileX.dm"
 #include "Skills\_QueueX.dm"
+#include "Skills\_SkillPrimitives.dm"
 #include "Skills\_StanceX.dm"
 #include "Skills\_TeleportX.dm"
 #include "Skills\_UtilityX.dm"

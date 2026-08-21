@@ -10,16 +10,16 @@ obj/Skills/AutoHit/Shockwave_Blows
 	Area="Circle"
 	Distance=5
 	GuardBreak=1
-	DamageMult=1
+	DamageMult=1.2
 	Knockback=2
-	Cooldown=1
+	Cooldown=3
 	Shockwaves=1
 	Shockwave=3
 	HitSparkIcon='BLANK.dmi'
 	HitSparkX=0
 	HitSparkY=0
 	ActiveMessage="swings their blade hard enough to make the air ripple!"
-	EnergyCost=5
+	EnergyCost=1
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 	name = "Heavenly Regalia: The Saint"

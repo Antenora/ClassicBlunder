@@ -170,7 +170,7 @@ mob/Move()
 	var/turf/Former_Location = loc
 	if(src.Incorporeal)
 		src.density=0
-	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
+	if(!src.Incorporeal&&!src.passive_handler?.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
 			if((A.dir in list(dir,turn(dir,45),turn(dir,-45))))
 				return
@@ -191,7 +191,7 @@ mob/Move()
 				loc = Former_Location
 				break
 
-	if(!src.Incorporeal&&!src.passive_handler.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
+	if(!src.Incorporeal&&!src.passive_handler?.Get("Skimming")&&!src.is_dashing&&!isAI(src)&&!Knockback)
 		for(var/obj/Turfs/Edges/A in loc)
 			if(!(A.dir in list(dir,turn(dir,90),turn(dir,-90),turn(dir,45),turn(dir,-45))))
 				loc=Former_Location

@@ -314,8 +314,7 @@ globalTracker
 		BUFF_MASTERY_LOWMULT = 0.1
 		BUFF_MASTERY_HIGHMULT = 0.05
 		RUSTING_RATE = 0.25
-		TECHNIQUE_MASTERY_DIVISOR = 10
-		TECHNIQUE_MASTERY_LIMIT = 2.5 // 1+(techmastery/10) is formula. 2.5 = 15 techmastery before no more does nothing at effectiveness = 1
+		celestialObjectTicks = 43200
 		FAMILIAR_SKILL_CD = 500
 		FAMILIAR_CD_REDUCTION = 30
 		FATIGUEDIVIDE = 10

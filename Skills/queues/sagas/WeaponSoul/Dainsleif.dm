@@ -1,6 +1,6 @@
 obj/Skills/Queue/Cursed_Blade
 	ActiveMessage="channels the ruin of their legendary weapon into each and every attack...!"
-	DamageMult=1
+	DamageMult=0.75
 	AccuracyMult=3
 	Combo = 5
 	Shearing = 20
@@ -8,16 +8,16 @@ obj/Skills/Queue/Cursed_Blade
 	Warp = 1
 	NoWhiff = 1
 	Duration = 5
-	Cooldown=30
+	Cooldown=8
 	NeedsSword=1
-	EnergyCost=5
+	EnergyCost=2
 	HitSparkIcon='Slash - Zero.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
 	HitSparkSize=1.5
 	adjust(mob/p)
 		if(p.cursedSheathValue)
-			DamageMult = 1.5 + p.cursedSheathValue/200
+			DamageMult = (1.5 + p.cursedSheathValue/200) * 0.375
 			Combo = 5 + p.cursedSheathValue/100
 	verb/Cursed_Blade()
 		set category="Skills"

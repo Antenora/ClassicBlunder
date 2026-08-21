@@ -14,7 +14,7 @@ obj/Skills/AutoHit/Soul_Drain
 	Gravity=5
 	WindUp=1
 	WindupMessage="channels the chaos of Soul Edge...."
-	DamageMult=3
+	DamageMult=1.95
 	StrScaling=1
 	ActiveMessage="unleashes a tidal wave of chaos into the area!"
 	Area="Around Target"
@@ -28,11 +28,11 @@ obj/Skills/AutoHit/Soul_Drain
 	TurfShiftDurationSpawn=0
 	TurfShiftDurationDespawn=5
 	TurfShift='Gravity.dmi'
-	Cooldown=30
-	EnergyCost=15
+	Cooldown=8
+	EnergyCost=2
 	Instinct=1
 	adjust(mob/p)
-		DamageMult = 5 + p.SagaLevel
+		DamageMult = (5 + p.SagaLevel) * 0.195
 		WindUp = 1 - p.SagaLevel/10
 	verb/Soul_Drain()
 		set category="Skills"
@@ -47,7 +47,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 	Distance=2
 	StrScaling=1
 	EndEffectiveness=1
-	DamageMult=10
+	DamageMult=4.25
 	HitSparkIcon='Slash - Vampire.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
@@ -57,8 +57,8 @@ obj/Skills/AutoHit/Dark_Reconquista
 	TurfStrike=2
 	TurfShift='Dirt1.dmi'
 	TurfShiftDuration=3
-	EnergyCost=3
-	Cooldown=45
+	EnergyCost=2
+	Cooldown=10
 	ActiveMessage="draws back Soul Edge and drives it forward in a devastating, soul-rending slash!"
 	HeldSkill=TRUE
 	ChargePeriod=3
@@ -69,7 +69,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 	ChargeWaveBlend=2
 
 	adjust(mob/p)
-		DamageMult = 10 + p.SagaLevel
+		DamageMult = (10 + p.SagaLevel) * 0.2833
 
 	OnHeldRelease(mob/p, var/benefit)
 		adjust(p)
@@ -85,7 +85,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 /obj/Skills/AutoHit/Reconquista_Triumph_Strike
 	Area = "Circle"
 	StrScaling = 1
-	DamageMult = 2.5
+	DamageMult = 0.43
 	ComboMaster = 1
 	Rounds = 10
 	ChargeTech = 1
@@ -111,8 +111,8 @@ obj/Skills/AutoHit/Dark_Reconquista
 	Copyable = 2
 	StrScaling = 1
 	EndEffectiveness = 1
-	Cooldown = 120
-	EnergyCost = 3
+	Cooldown = 30
+	EnergyCost = 8
 	HeldSkill = TRUE
 	ChargePeriod = 3
 	SweetSpot = 2
@@ -127,7 +127,7 @@ obj/Skills/AutoHit/Dark_Reconquista
 		if(EnergyCost)   
 			var/drain = p.passive_handler["Drained"] ? EnergyCost * (1 + p.passive_handler["Drained"]/10) : EnergyCost
 			p.LoseEnergy(drain)
-		DamageMult = (15 + p.SagaLevel) * benefit
+		DamageMult = (15 + p.SagaLevel) * benefit * 0.1712
 		spawnWave(p)
 		if(sweet_spot_hit)
 			p.throwFollowUp(/obj/Skills/AutoHit/Reconquista_Triumph_Strike)

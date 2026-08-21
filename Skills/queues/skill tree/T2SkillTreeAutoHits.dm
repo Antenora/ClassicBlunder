@@ -24,12 +24,12 @@ obj
 			NoPierce=0
 			StrScaling=1
 			EndEffectiveness=0.9
-			DamageMult=8
-			Cooldown=45
+			DamageMult=3.2
+			Cooldown=8
 			HitSparkIcon='BLANK.dmi'
 			HitSparkX=0
 			HitSparkY=0
-			EnergyCost=3
+			EnergyCost=2
 			Earthshaking=5
 			WindUp=1
 			Instinct=1
@@ -45,14 +45,14 @@ obj
 			SkillCost=TIER_2_COST
 			Copyable=3
 			UnarmedOnly=1
-			Area="Circle"
+			Area="Wave"
 			ComboMaster=1
 			MenuIcon="ForceStomp"
-			Distance=4
+			Distance=6
 			StrScaling=1
-			DamageMult=5
-			Cooldown=45
-			Stunner=2
+			DamageMult=2.5
+			Cooldown=8
+			Stunner=0.8
 			Knockback=12
 			Size=4
 			HitSparkIcon='BLANK.dmi'
@@ -60,7 +60,7 @@ obj
 			HitSparkY=0
 			Shockwaves=3
 			Shockwave=1
-			EnergyCost=3
+			EnergyCost=2
 			SpecialAttack=1
 			BuffAffected=/obj/Skills/Buffs/SlotlessBuffs/Autonomous/AchillesHeel/Disgruntled
 			Earthshaking=15
@@ -75,25 +75,24 @@ obj
 			SkillCost=TIER_2_COST
 			Copyable=3
 			UnarmedOnly=1
-			Distance=15
+			Distance=2
 			WindUp=1
 			ComboMaster=1
 			MenuIcon="SlashingHandChop"
 			WindupMessage="relaxes their fist into a straight palm..."
-			DamageMult=5
+			DamageMult=3.15
 			StrScaling=1
 			ActiveMessage="uses their hand as a blade, trying to cut down their opponent!"
 			Area="Target"
 			GuardBreak=1
-			PassThrough=1
-			MortalBlow=1
+			Silencing=1.5
 			HitSparkIcon='Slash - Zan.dmi'
 			HitSparkX=-16
 			HitSparkY=-16
 			HitSparkTurns=1
 			HitSparkSize=3
-			Cooldown=45
-			EnergyCost=15
+			Cooldown=8
+			EnergyCost=2
 			Instinct=1
 			verb/Slashing_Hand_Chop()
 				set category="Skills"
@@ -114,15 +113,16 @@ obj
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			Shockwaves=2
-			DamageMult=8.5
+			DamageMult=0.3
+			PhantomMark=2.2
 			Knockback=2
 			Distance=4
 			ActiveMessage="vanishes with a burst of speed to strike at their foe!"
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=3
-			Cooldown=45
-			EnergyCost=6
+			Cooldown=8
+			EnergyCost=2
 			Instinct=1
 			verb/Phantom_Strike()
 				set category="Skills"
@@ -137,7 +137,7 @@ obj
 			NoAttackLock=1
 			MenuIcon="DragonRush"
 			StrScaling=1
-			DamageMult=6.5
+			DamageMult=3.2
 			DelayTime=0
 			PreShockwave=1
 			PreShockwaveDelay=1
@@ -157,8 +157,8 @@ obj
 			HitSparkDispersion=12
 			Launcher=3
 			DelayedLauncher=1
-			Cooldown=45
-			EnergyCost=5
+			Cooldown=8
+			EnergyCost=2
 			ActiveMessage="rushes forward to deliver a flurry of strikes!"
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
@@ -167,25 +167,6 @@ obj
 				set category="Skills"
 				usr.Activate(src)
 
-		Roundhouse_Kick
-			SkillCost=TIER_2_COST
-			Copyable=2
-			UnarmedOnly=1
-			Area="Arc"
-			ComboMaster=1
-			Distance=4
-			StrScaling=1
-			DamageMult=4.8
-			Knockback=3
-			Cooldown=60
-			Icon='roundhouse.dmi'
-			IconX=-16
-			IconY=-16
-			EnergyCost=2
-			ActiveMessage="delivers a roundhouse kick!"
-			verb/Roundhouse_Kick()
-				set category="Skills"
-				usr.Activate(src)
 		Sweeping_Kick
 			SkillCost=TIER_2_COST
 			Copyable=3
@@ -193,23 +174,20 @@ obj
 			Area="Circle"
 			Distance=1
 			StrScaling=1
-			DamageMult=4.75
+			DamageMult=2.85
 			Launcher=3
 			MenuIcon="SweepingKick"
 			NoLock=1
 			NoAttackLock=1
-			Cooldown=45
+			Cooldown=8
 			Size=0.75
-			Rounds=3
+			Stunner=0.8
 			Icon='SweepingKick.dmi'
 			IconX=-32
 			IconY=-32
-			EnergyCost=3
+			EnergyCost=2
 			CanBeDodged=1
 			ActiveMessage="sweeps the legs from under their opponent!"
-			TurfStrike=1
-			TurfShift='Dirt1.dmi'
-			TurfShiftDuration=3
 			verb/Leg_Sweep()
 				set category="Skills"
 				usr.Activate(src)
@@ -219,8 +197,8 @@ obj
 			UnarmedOnly=1
 			Area="Circle"
 			StrScaling=1
-			DamageMult=1.75
-			Cooldown=45
+			DamageMult=0.55
+			Cooldown=8
 			MenuIcon="HelicopterKick"
 			Rounds=5
 			Shattering=1
@@ -232,9 +210,6 @@ obj
 			FlickSpin=1
 			EnergyCost=2
 			ActiveMessage="throws their body into a handstand while delivering numerous spin kick!"
-			TurfStrike=1
-			TurfShift='Dirt1.dmi'
-			TurfShiftDuration=3
 			verb/Helicopter_Kick()
 				set category="Skills"
 				usr.Activate(src)
@@ -245,16 +220,11 @@ obj
 			AlwaysAnnounceCooldown = 1
 			NeedsSword=1
 			Area="Circle"
-			DamageMult=2.5
-			Rounds=2
-			ChargeTech=1
+			DamageMult=2.75
+			Rounds=1
 			StrScaling=1
-			ChargeFlight=1
 			ChargeTime=0.75
-			Grapple=1
-			GrabTrigger="/obj/Skills/AutoHit/Oni_Giri"
-			GrabMaster=1
-			Cooldown=45
+			Cooldown=8
 			Size=1
 			FlickSpin=1
 			EnergyCost=2
@@ -277,33 +247,35 @@ obj
 				disableInnovation(usr)
 			adjust(mob/p)
 				if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))
-					GrabTrigger="/obj/Skills/Grapple/Sword/No_Worries"
-					Rounds = 2 + round(p.Potential/25)
+					GrabTrigger=null
+					Rounds = 1
 					HealthCost=2
 					WoundCost=2
 					ManaCost=0
 					TurfShift=0
 					TurfShiftDuration=0
 				else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
-					GrabTrigger="/obj/Skills/Grapple/Sword/Dark_Binding"
-					Rounds = 2 + round(p.Potential/25)
+					GrabTrigger=null
+					Rounds = 1
 					HealthCost=0
 					WoundCost=0
 					ManaCost=3
 					TurfShift='blackflameaura.dmi'
 					TurfShiftDuration=2
 				else
-					GrabTrigger="/obj/Skills/AutoHit/Oni_Giri"
+					GrabTrigger=null
 					HealthCost=0
 					WoundCost=0
 					ManaCost=0
-					Rounds = 2
+					Rounds = 1
 					TurfShift=0
 					TurfShiftDuration=0
 				if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption))
 					CorruptionDebuff = 1
 				else
 					CorruptionDebuff = 0
+				var/idle_secs = p.last_skill_fire_time ? (world.time - p.last_skill_fire_time) / 10 : 10
+				DamageMult = 2.75 * min(1 + idle_secs * 0.06, 1.6)
 			verb/Three_Thousand_Worlds()
 				set category="Skills"
 				var/can_fire = !(Using || cooldown_remaining)
@@ -324,39 +296,21 @@ obj
 			HitSparkDispersion=1
 			TurfStrike=1
 			GrabTrigger="/obj/Skills/Grapple/Sword/Shank"
-		Hero_Spin
-			SkillCost=80
-			Copyable=2
-			NeedsSword=1
-			Area="Circle"
-			StrScaling=1
-			DamageMult=4.8
-			Cooldown=60
-			Knockback=3
-			Size=1
-			Icon='CircleWind.dmi'
-			IconX=-32
-			IconY=-32
-			EnergyCost=2
-			ActiveMessage="spins with a powerful slash!"
-			verb/Hero_Spin()
-				set category="Skills"
-				usr.Activate(src)
 		Drill_Spin
 			SkillCost= TIER_2_COST
 			Copyable=3
 			AlwaysAnnounceCooldown = 1
 			NeedsSword=1
-			Area="Circle"
-			Shearing=1
+			Area="Strike"
 			ControlledRush=1
 			Rush=3
 			ChargeTech=1
 			ChargeTime=1
 			Rounds=5
 			StrScaling=1
-			DamageMult=1
-			Cooldown=45
+			EndEffectiveness=0.8
+			DamageMult=0.7
+			Cooldown=8
 			Knockback=1
 			Size=1
 			Icon='CircleWind.dmi'
@@ -371,7 +325,7 @@ obj
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=1
-			EnergyCost=5
+			EnergyCost=2
 			Instinct=1
 			ActiveMessage="spins their sword like a drill bit!"
 			verb/Disable_Innovate()
@@ -389,7 +343,7 @@ obj
 					WindUp=0.75
 					Knockback = 0.001
 					PullIn = Size + 4
-					Shearing = 5 + (pot/5)
+					Shearing = 0
 					TurfErupt=0
 					TurfShift=0
 					TurfShiftDuration=0
@@ -406,7 +360,7 @@ obj
 					WindUp=0.75
 					Knockback = 0.001
 					PullIn = Size + 4
-					Shearing = 5 + (pot/5)
+					Shearing = 0
 					TurfErupt=1
 					TurfEruptOffset=4
 					TurfShift='blackflameaura.dmi'
@@ -425,7 +379,7 @@ obj
 					WindUp=0
 					Knockback = 1
 					PullIn = 0
-					Shearing = 1
+					Shearing = 0
 					TurfErupt=0
 					TurfShift='Dirt1.dmi'
 					TurfShiftDuration=1
@@ -447,15 +401,14 @@ obj
 			NeedsSword=1
 			Distance=1
 			PassThrough=1
-			Slow=0.75
 			Area="Wave"
 			StrScaling=1
 			ComboMaster = 1
-			DamageMult=3
-			Cooldown=45
+			DamageMult=3.35
+			Cooldown=8
 			Knockback=0
-			Rounds=4
-			Launcher=2
+			Rounds=1
+			Launcher=5
 			NoLock=1
 			NoAttackLock=1
 			Size=2
@@ -469,7 +422,7 @@ obj
 			HitSparkSize=1
 			HitSparkDispersion=1
 			TurfStrike=1
-			EnergyCost=4
+			EnergyCost=2
 			ActiveMessage="spins upwards with their weapon extended!"
 			verb/Rising_Spire()
 				set category="Skills"
@@ -481,8 +434,8 @@ obj
 			Area="Circle"
 			StrScaling=1
 			EndEffectiveness=1
-			DamageMult=6.5
-			Cooldown=45
+			DamageMult=3.2
+			Cooldown=8
 			Knockback=5
 			Size=2
 			Distance=2
@@ -503,8 +456,9 @@ obj
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=3
-			EnergyCost=10
+			EnergyCost=2
 			Earthshaking=10
+			GuardBreak=1
 			ActiveMessage="releases a hyper destructive slash!"
 			verb/Ark_Brave()
 				set category="Skills"
@@ -513,16 +467,17 @@ obj
 			SkillCost=TIER_2_COST
 			Copyable=3
 			NeedsSword=1
-			Area="Circle"
+			Area="Target"
+			Distance=8
 			StrScaling=1
-			Cooldown = 45
-			DamageMult=0.5
+			Cooldown = 8
+			DamageMult=4.5
 			FocusShifter=1
 			FocusShiftBoost=1.5
-			Rounds=20
 			ComboMaster=1
 			Size=2
-			EnergyCost=5
+			EnergyCost=2
+			var/tmp/verdict_pending = 0
 			Icon='CircleWind.dmi'
 			IconX=-32
 			IconY=-32
@@ -533,7 +488,40 @@ obj
 			HitSparkSize=1
 			HitSparkDispersion=1
 			TurfStrike=1
-			ActiveMessage="spins for glory!"
+			ActiveMessage="passes down Judgment!"
 			verb/Judgment()
 				set category="Skills"
-				usr.Activate(src)
+				var/mob/caster = usr
+				if(Using || cooldown_remaining)
+					caster << "<font color='red'>[name] is on cooldown.</font>"
+					return
+				if(verdict_pending)
+					return
+				var/mob/T = caster.Target
+				if(!T || !ismob(T) || T == caster)
+					caster << "<font color='red'>You need a target to pass Judgment on.</font>"
+					return
+				if(get_dist(caster, T) > Distance)
+					caster << "<font color='red'>They are beyond Judgment's reach.</font>"
+					return
+				if(caster.GCDBlocked(src))
+					return
+				caster.StartGCD(src)
+				verdict_pending = 1
+				OMsg(caster, "<b>[caster] marks [T] - the verdict comes in two seconds!</b>")
+				var/obj/Effects/HE = new(null, 'Slash - Zan.dmi', -16, 16, 0, 1, 20)
+				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
+				HE.Target = T
+				T.vis_contents += HE
+				spawn(20)
+					verdict_pending = 0
+					if(!caster || caster.KO || !T || T.KO || T.Health <= 0)
+						return
+					var/mob/oldT = caster.Target
+					caster.Target = T
+					var/ng = src.NoGCD
+					src.NoGCD = 1
+					if(!caster.Activate(src, noGCD=TRUE))
+						src.Cooldown(1, null, caster)
+					src.NoGCD = ng
+					caster.Target = oldT

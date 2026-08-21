@@ -440,6 +440,7 @@ mob/Players
 				s.Using=0
 				if(s.MaxCharges > 0)
 					s.Charges = s.MaxCharges
+					s.recharge_ends = null
 			for(var/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/dm in src)
 				if(dm.possible_skills)
 					for(var/path in dm.possible_skills)

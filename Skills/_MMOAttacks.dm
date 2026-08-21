@@ -1,3 +1,7 @@
+/obj/Skills/Projectile/ChaosSaberWave/MMOFallbackWave
+	name = "ChaosSaberWave"
+	DamageMult = 20
+
 obj/AttackMarker
 	icon = 'MMOAttackMarker.dmi'
 	icon_state = "WarningBox"
@@ -6,7 +10,7 @@ obj/AttackMarker
 
 	var/mob/owner
 	var/delay = 0
-	var/projectile_type = /obj/Skills/Projectile/ChaosSaberWave
+	var/projectile_type = /obj/Skills/Projectile/ChaosSaberWave/MMOFallbackWave
 	var/fire_dir = null
 	var/x_spawn_offset = 0
 	var/y_spawn_offset = 0
@@ -258,11 +262,12 @@ obj/Skills
 			NewCost = TIER_3_COST
 			NewCopyable = 4
 			Copyable=2
-			DamageMult=35
+			DamageMult=0.7
 			Blasts=4
 			AccMult=10
 			MenuIcon="SwordsOfRevealingLight"
-			Cooldown=45
+			Cooldown=12
+			EnergyCost=3
 			Crippling=10
 			NoGCD=1
 			Piercing=1

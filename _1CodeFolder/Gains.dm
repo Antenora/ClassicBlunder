@@ -871,7 +871,7 @@ mob
 
 			if(src.Beaming || src.HasMovingCharge())
 				for(var/obj/Skills/Projectile/Z in Skills)
-					if(Z.Area=="Beam"&&Z.Charging&&Z.ChargeRate)
+					if(Z.Area=="Beam"&&Z.Charging&&Z.ChargeRate&&!Z.HeldBeam)
 						var/beamChargeCap = Z.ChargeRate * BEAM_CHARGE_CAP_MULT
 						if(src.BeamCharging>=0.5&&src.BeamCharging<=beamChargeCap)
 							src.BeamCharging+=src.GetRecov(0.2)*src.GetBeamChargeSpeedMult()

@@ -40,11 +40,11 @@
 	GuardBreak = 1
 	StrScaling = 1
 	MortalBlow = 0.25
-	DamageMult = 10
+	DamageMult = 2.55
 	Distance = 10
 	PassThrough = 1
-	Cooldown = 30
-	ManaCost = 5
+	Cooldown = 8
+	ManaCost = 2
 	ActiveMessage = "vanishes and reappears with a decisive strike Senka!"
 
 	verb/Senka()

@@ -87,7 +87,7 @@ obj/Skills/AutoHit/Shippu_Rush
 	Area="Circle"
 	StrScaling=1
 	EndEffectiveness=1
-	DamageMult=1
+	DamageMult=0.8
 	GuardBreak=1
 	ChargeTech=1
 	Rounds=10
@@ -96,7 +96,8 @@ obj/Skills/AutoHit/Shippu_Rush
 	Instinct=2
 	ChargeFlight=1
 	Knockback=1
-	Cooldown=90
+	Cooldown=25
+	EnergyCost=5
 	Size=1
 	Rush=7
 	ControlledRush=1

@@ -136,7 +136,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	FlickBlast=0
 	AttackReplace=1
 	Distance=21
-	DamageMult=0.5
+	DamageMult=0.17
 	Dodgeable=0
 	Deflectable=0
 	Instinct=2
@@ -164,13 +164,14 @@ proc/applyAshChoked(mob/target, mob/caster)
 /obj/Skills/AutoHit/Taimatsu
 	name = "Taimatsu"
 	Area="Wave"
-	DamageMult=0.15
+	DamageMult=0.05
 	ComboMaster=1
 	NoLock = 1
 	Instinct=2
 	NoAttackLock=1
 	Knockback=3
-	Cooldown=45
+	Cooldown=10
+	EnergyCost=2
 	HitSparkIcon='Hit Effect.dmi'
 	HitSparkX=-32
 	HitSparkY=-32
@@ -297,11 +298,12 @@ proc/applyAshChoked(mob/target, mob/caster)
 	name = "Ennetsu Jigoku Impact"
 	Area="Target"
 	Distance=20
-	DamageMult=10
+	DamageMult=9.25
 	StrScaling=1
 	ForScaling=1
 	Scorching=20
 	Cooldown=0
+	EnergyCost=5
 	WindUp=0
 	NoLock=1
 	NoAttackLock=1
@@ -309,8 +311,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 /obj/Skills/Ennetsu_Jigoku
 	name = "Ennetsu Jigoku"
-	ManaCost = 30
-	Cooldown = 75
+	ManaCost = 5
+	Cooldown = 18
 	var/orb_distance = 8
 
 	proc/orbLaunch(mob/user, mob/target)
@@ -563,7 +565,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 /obj/Skills/Queue/Tenchi_Kaijin
 	name = "Kita: Tenchi Kaijin"
-	DamageMult = 15
+	DamageMult = 7.25
 	AccuracyMult = 1.2
 	Ashing   = 1
 	Explosive = 10
@@ -574,8 +576,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 	Quaking  = 3
 	Instinct = 2
 	Duration = 10
-	Cooldown = 75
-	ManaCost = 30
+	Cooldown = 18
+	ManaCost = 5
 
 	verb/Tenchi_Kaijin()
 		set name = "Tenchi Kaijin"

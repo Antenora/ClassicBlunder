@@ -229,7 +229,7 @@ obj/Skills/AutoHit/Spiral
 			adjust(usr)
 			usr.Activate(src)
 	Giga_Drill_Maximum
-		DamageMult=18
+		DamageMult=20.75
 		Area="Circle"
 		Distance=8
 		TurfStrike=1
@@ -247,11 +247,12 @@ obj/Skills/AutoHit/Spiral
 		HitSparkDispersion=1
 		Earthshaking=15
 		ComboMaster=1
-		Cooldown=180
+		Cooldown=45
+		EnergyCost=8
 	Lagann_Impact
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		DamageMult=6
+		DamageMult=1.6
 		Rush=20
 		ControlledRush=0
 		WindUp = 0.5
@@ -261,7 +262,8 @@ obj/Skills/AutoHit/Spiral
 		RoundMovement=0
 		NoAttackLock=1
 		NoLock=1
-		Cooldown=2
+		Cooldown=5
+		EnergyCost=1
 		Size=2
 		Distance=2
 		Instinct=10
@@ -278,7 +280,7 @@ obj/Skills/AutoHit/Spiral
 	Lagann_Impact2
 		AlwaysAnnounceCooldown = 1
 		Area="Arc"
-		DamageMult=6
+		DamageMult=1.8
 		Rush=20
 		ControlledRush=0
 		WindUp = 0.5
@@ -287,7 +289,8 @@ obj/Skills/AutoHit/Spiral
 		RoundMovement=0
 		NoAttackLock=1
 		NoLock=1
-		Cooldown=3
+		Cooldown=5
+		EnergyCost=1
 		Size=2
 		Distance=2
 		Instinct=10
@@ -306,7 +309,8 @@ obj/Skills/AutoHit/Spiral
 /obj/Skills/Projectile
 	Spiral
 		Probability_Negation_Missiles
-			Cooldown=180
+			Cooldown=45
+			EnergyCost=8
 			ZoneAttack=1
 			ZoneAttackX=8
 			ZoneAttackY=8
@@ -315,7 +319,7 @@ obj/Skills/AutoHit/Spiral
 			RandomPath=1
 			Speed = 0.75
 			Distance=30
-			DamageMult=0.5
+			DamageMult=0.2
 			Explode=1
 			Dodgeable=0
 			Deflectable=0

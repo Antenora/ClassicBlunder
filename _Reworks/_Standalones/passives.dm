@@ -1,6 +1,10 @@
 mob
 	var
 		passive/passive_handler
+
+mob/New()
+	if(!passive_handler) passive_handler = new
+	..()
 /*	verb
 		GetAllPassives() //test verb, remove later
 			usr << passive_handler.getAll() */

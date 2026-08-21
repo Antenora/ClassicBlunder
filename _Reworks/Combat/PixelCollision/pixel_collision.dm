@@ -584,6 +584,12 @@ proc/CircleHitsBounds(cx, cy, r, atom/A)
 	var/ny = max(A.LowerY(), min(cy, A.LowerY() + A.Height()))
 	return (nx-cx)*(nx-cx) + (ny-cy)*(ny-cy) <= r*r
 
+proc/SquareHitsBounds(cx, cy, r, atom/A)
+	if(!A) return FALSE
+	var/nx = max(A.LowerX(), min(cx, A.LowerX() + A.Width()))
+	var/ny = max(A.LowerY(), min(cy, A.LowerY() + A.Height()))
+	return abs(nx-cx) <= r && abs(ny-cy) <= r
+
 proc/CircleHitsBody(cx, cy, r, mob/m)
 	if(!istype(m)) return CircleHitsBounds(cx, cy, r, m)
 	var/acx = 1 + (m.x-1)*32 + m.step_x

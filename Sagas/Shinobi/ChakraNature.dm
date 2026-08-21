@@ -101,12 +101,12 @@ mob/proc/offerChakraSpecialization()
 	src.ChakraAffinityPending++
 	var/done = FALSE
 	while(!done)
-		var/choice = alert(src, "Your bond with [nature] runs deep, and you may now choose to specialize in it. Specializing PERMANENTLY forsakes all other chakra natures - no further affinities, by chance or training. In exchange, your [nature] jutsu cost half as much, their cooldowns are reduced by 15%, and your Jutsu pick capacity is doubled. This offer will not come again.", "Chakra Specialization", "Specialize", "Decline")
+		var/choice = alert(src, "Your bond with [nature] runs deep, and you may now choose to specialize in it. Specializing PERMANENTLY forsakes all other chakra natures - no further affinities, by chance or training. In exchange, your [nature] jutsu cost half as much, they gain 18 Haste (~15% faster cooldowns, diminishing with other Haste), and your Jutsu pick capacity is doubled. This offer will not come again.", "Chakra Specialization", "Specialize", "Decline")
 		if(choice == "Specialize")
 			if(alert(src, "Specializing in [nature] cannot be undone. Are you certain?", "Chakra Specialization", "Yes", "No") == "Yes")
 				src.ChakraSpecialization = nature
 				src << "You devote yourself wholly to <b>[nature]</b>. Its chakra answers you like a second heartbeat."
-				src << "Your [nature] jutsu now cost half Mana and recover 15% faster, and your Jutsu pick capacity has doubled."
+				src << "Your [nature] jutsu now cost half Mana and carry 18 Haste, and your Jutsu pick capacity has doubled."
 				done = TRUE
 		else
 			src << "You leave your chakra open to other natures."

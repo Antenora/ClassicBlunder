@@ -37,6 +37,7 @@
 
 
 proc/LaunchEffect(mob/player, mob/target, time, delay)
+	if(!player || !target) return
 	if(istype(target, /mob/Body))
 		if(player.Frozen)
 			player.Frozen = 0
@@ -49,15 +50,18 @@ proc/LaunchEffect(mob/player, mob/target, time, delay)
 			continue
 	if(delay)
 		sleep(delay)
+		if(!player) return
 		player.NextAttack=0
 		flick("Attack",player)
-		KenShockwave(target, Size = 1)
+		if(target)
+			KenShockwave(target, Size = 1)
 	// _AutoHitX.dm sets player.Frozen=3 before calling this proc. Always reset
 	// it — the previous code only cleared inside if(delay), so any caller that
 	// passed delay=0 (HitSparkCount or HitSparkDelay being 0) left the user
 	// stuck at Frozen=3 with no recovery. Surfaced via Dragon Rush which has
 	// HitSparkDelay unset (0) by default.
 	player.Frozen = 0
+	if(!target) return
 
 	applyLaunch(target, time)
 

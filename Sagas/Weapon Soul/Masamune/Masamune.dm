@@ -12,9 +12,9 @@ obj/Skills/AutoHit/Divine_Cleansing
 	Slow=0.5
 	StrScaling=1
 	HitSelf = TRUE
-	DamageMult=1//set in adjust code
+	DamageMult=3.15//set in adjust code
 	Cleansing = 1//set in adjust code
-	Cooldown=30
+	Cooldown=8
 	Rounds=1
 	Distance = 5
 	RoundMovement=1
@@ -33,10 +33,10 @@ obj/Skills/AutoHit/Divine_Cleansing
 	HitSparkDispersion = 8;
 	TurfShift='SnowFloor.dmi'
 	TurfShiftDuration = 10
-	EnergyCost=1
+	EnergyCost=2
 	ActiveMessage="cuts through debilitation with the power of Masamune's purity!"
 	adjust(mob/p)
-		DamageMult = p.SagaLevel
+		DamageMult = p.SagaLevel * 0.63
 		Cleansing = p.SagaLevel
 		Size = 5
 	verb/Divine_Cleansing()

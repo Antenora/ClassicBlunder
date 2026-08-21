@@ -1,18 +1,37 @@
-var/global/celestialObjectTicks = Hour(12)/10
 var
 	MoonMessage="The moon shines brightly!"
 	MakyoMessage="A cursed star shines in the sky..."
 	MoonSetMessage="The moon sets!"
 	MakyoSetMessage="A cursed star disappears from the sky..."
 
+proc/SaveMoonClock()
+	if(!glob)
+		return
+	var/savefile/F = new("Saves/MoonClock")
+	F["ticks"] << glob.celestialObjectTicks
+
+proc/LoadMoonClock()
+	if(!glob || !fexists("Saves/MoonClock"))
+		return
+	var/savefile/F = new("Saves/MoonClock")
+	var/t
+	F["ticks"] >> t
+	if(isnum(t) && t > 0)
+		glob.celestialObjectTicks = t
+
 proc/CelestialBodiesLoop()
 	set waitfor = 0
+	var/save_beat = 0
 	while(1)
-		celestialObjectTicks--
-		if(celestialObjectTicks==0)
-			MoonRise() //waits for nightfall, then runs the moon. The admin force stays immediate
+		glob.celestialObjectTicks--
+		if(glob.celestialObjectTicks<=0)
+			spawn() MoonRise() //waits for nightfall, then runs the moon. The admin force stays immediate
 			// CallStar()
-			celestialObjectTicks = Hour(12)/10
+			glob.celestialObjectTicks = Hour(12)/10
+			SaveMoonClock()
+		if(++save_beat >= 60)
+			save_beat = 0
+			SaveMoonClock()
 		sleep(10)
 
 //natural moon only
@@ -79,16 +98,16 @@ proc/CallMoon(var/OnlyZ=null)
 	for(var/mob/Players/P in players)
 		if(OnlyZ)
 			if(P.z==OnlyZ)
-				P.MoonWarning()
+				spawn() P.MoonWarning()
 		else
-			P.MoonWarning()
+			spawn() P.MoonWarning()
 	sleep(Minute(2))
 	for(var/mob/Players/P in players)
 		if(OnlyZ)
 			if(P.z==OnlyZ)
-				P.MoonTrigger()
+				spawn() P.MoonTrigger()
 		else
-			P.MoonTrigger()
+			spawn() P.MoonTrigger()
 
 
 /* var/starActive = FALSE

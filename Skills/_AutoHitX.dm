@@ -74,7 +74,6 @@ obj
 				WindUp//Charge for this number of seconds.
 				IgnoreWindUpReduction=0// keeps WindUp fixed and ignores reduction effects
 				Slow//Makes it so that there is a pause in the movement of autohitters (The technique does not instantly hit all of its related tiles)
-				ApplySlow = 0
 				Icon//Displays icon when used.
 				IconX//Offsets.
 				IconY
@@ -1195,7 +1194,7 @@ obj
 				UnarmedOnly=1
 				Area="Arc"
 				StrScaling=1
-				DamageMult=2.75
+				DamageMult=1.7
 				Rush=5
 				ControlledRush=0
 				Rounds=3
@@ -1204,22 +1203,35 @@ obj
 				NoAttackLock=1
 				NoLock=1
 				MenuIcon="LightningKick"
-				Cooldown=60
+				Cooldown=12
 				Icon='Nest Slash.dmi'
 				IconX=-16
 				IconY=-16
 				Size=2
 				Distance=2
-				EnergyCost=5
+				EnergyCost=3
 				Launcher=2
 				Instinct=1
 				ActiveMessage="delivers a series of flowing kicks!"
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=3
+				DelayTime=3
+				MashExtend=1
 				adjust(mob/p)
 				verb/Lightning_Kicks()
 					set category="Skills"
+					if(src.flurry_live > world.time)
+						var/mob/ext = usr
+						var/ecost = src.mash_extends + 1
+						if(ext.Energy < ecost)
+							ext << "<font color='red'>You're too drained to keep the flurry going!</font>"
+							return
+						ext.LoseEnergy(ecost)
+						ext.GainFatigue(ecost)
+						src.mash_extends++
+						src.mash_pending++
+						return
 					var/can_fire = !(Using || cooldown_remaining)
 					if(!altered)
 						if(usr.isInnovative(HUMAN, "Unarmed"))
@@ -1262,17 +1274,16 @@ obj
 				Rush=8
 				Jump=1
 				ControlledRush=0
-				DamageMult=9
+				RushBounce=1
+				DamageMult=5.0
 				MenuIcon="FlyingKick"
 				Knockback=1
-				Shattering = 15
-				GuardBreak=1
 				Icon='Nest Slash.dmi'
 				IconX=-16
 				IconY=-16
 				Size=2
-				Cooldown=75
-				EnergyCost=4
+				Cooldown=12
+				EnergyCost=3
 				ActiveMessage="goes flying through the air to deliver a graceful kick!"
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
@@ -1312,31 +1323,32 @@ obj
 				Area="Circle"
 				ComboMaster=1
 				StrScaling=1
-				DamageMult=0.55
+				DamageMult=0.35
 				Rounds=20
+				RoundMovement=0
+				RushProjImmune=20
 				Launcher=2
-				Cooldown=60
+				Cooldown=18
 				Size=2
 				Icon='Tornado.dmi'
 				IconX=-8
 				IconY=-8
-				EnergyCost=2.5
+				EnergyCost=5
 				Instinct=1
 				ActiveMessage="spins like a top, crushing anyone caught in their range!"
-				TurfStrike=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=3
 				adjust(mob/p)
 					if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))
-						Rounds= 10 + (p.Potential/10)
-						DamageMult = 1 + (p.Potential/100)
+						Rounds= 10
+						DamageMult = (1 + (p.Potential/100)) * 0.64
 						PullIn = 6
 						Shearing = 0
 						TurfShift = 0
 						TurfShiftDuration = 0
 					else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
-						Rounds = 10 + (p.Potential/10)
-						DamageMult = 1 + (p.Potential/100)
+						Rounds = 10
+						DamageMult = (1 + (p.Potential/100)) * 0.64
 						PullIn = 6
 						Shearing = 2 + (p.Potential/20)
 						TurfShift = 'blackflameaura.dmi'
@@ -1344,7 +1356,7 @@ obj
 					else
 						Size = 2
 						Rounds= 20
-						DamageMult = 0.55
+						DamageMult = 0.35
 						PullIn = 0
 						Shearing = 0
 						TurfShift = 0
@@ -1363,25 +1375,25 @@ obj
 					set hidden = 1
 					disableInnovation(usr)
 			Bullrush
+				RushCarry=1
 				SkillCost=TIER_4_COST
 				Copyable=5
 				UnarmedOnly=1
 				Area="Circle"
 				StrScaling=1
-				DamageMult=1.25
+				DamageMult=0.55
 				ComboMaster = 1
 				GrabMaster = 1
-				Stunner=3
 				Grapple=1
 				Rounds=11
 				ChargeTech=1
 				ChargeTime=1
 				Knockback=1
-				Cooldown=60
+				Cooldown=18
 				WindUp=0.25
 				WindupMessage="lowers their head..."
 				Size=1
-				EnergyCost=1
+				EnergyCost=5
 				ActiveMessage="charges forward, plowing through everyone in their path!"
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
@@ -1403,24 +1415,25 @@ obj
 				PostShockwave=0
 				Shockwave=2
 				Shockwaves=2
-				DamageMult=11
+				DamageMult=6.75
 				WindUp=0.1
 				WindupMessage="crouches into a starting position..."
 				ActiveMessage="blasts forward with a super-sonic dash!"
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=3
-				Cooldown=60
+				Cooldown=18
+				EnergyCost=5
 				adjust(mob/p)
 					if(p.isInnovative(HUMAN, "Unarmed") && !isInnovationDisable(p))
 						Area="Around Target"
 						NoLock=1
 						NoAttackLock=1
 						StrScaling=1
-						DamageMult=1 + p.Potential/200
+						DamageMult=(1 + p.Potential/200) * 0.61
 						Distance=5
 						DistanceAround=4
-						Rounds=10
+						Rounds=4
 						TurfErupt=1.25
 						TurfEruptOffset=6
 						TurfShift=0
@@ -1445,10 +1458,10 @@ obj
 						NoLock=1
 						NoAttackLock=1
 						StrScaling=1
-						DamageMult=1 + p.Potential/200
+						DamageMult=(1 + p.Potential/200) * 0.61
 						Distance=5
 						DistanceAround=4
-						Rounds=10
+						Rounds=4
 						TurfErupt=1.25
 						TurfEruptOffset=6
 						TurfShift='blackflameaura.dmi'
@@ -1473,7 +1486,7 @@ obj
 						NoLock=0
 						NoAttackLock=0
 						StrScaling=1
-						DamageMult=11
+						DamageMult=6.75
 						Distance=10
 						DistanceAround=0
 						Rounds=0
@@ -1517,7 +1530,7 @@ obj
 				StrScaling=1
 				Distance=5
 				PassThrough=1
-				DamageMult=11
+				DamageMult=7.5
 				Knockback=5
 				Jump=1
 				WindUp=0.25
@@ -1526,9 +1539,15 @@ obj
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=3
-				Cooldown=60
+				Cooldown=18
+				EnergyCost=5
+				NoGCD=1
+				NoAttackLock=1
 				verb/Dropkick_Surprise()
 					set category="Skills"
+					if(!usr.is_dashing)
+						usr << "<font color='red'>You can only use [src] while moving at speed!</font>"
+						return
 					usr.Activate(src)
 
 //T5 (Sig 1) has damage mult 5, usually
@@ -1538,8 +1557,10 @@ obj
 				UnarmedOnly=1
 				Area="Circle"
 				StrScaling=1
-				DamageMult=12
+				DamageMult=4
 				TurfDirt=1
+				TurfShift='Dirt1.dmi'
+				TurfShiftDuration=40
 				Distance=8
 				//Size=3
 				Knockback=10
@@ -1553,7 +1574,8 @@ obj
 				//BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Muscle_Expand"
 				//FollowUp="/obj/Skills/Queue/Warping_Fist"
 				//FollowUpDelay=2
-				Cooldown=150
+				Cooldown=12
+				EnergyCost=3
 				WindUp=1
 				Earthshaking=20
 				Instinct=1
@@ -1561,14 +1583,25 @@ obj
 				ActiveMessage="punches the ground!"
 				verb/Cast_Fist()
 					set category="Skills"
-					usr.Activate(src)
+					if(usr.Activate(src) && src.Using)
+						var/mob/caster = usr
+						spawn(10)
+							if(!caster || !caster.loc)
+								return
+							var/turf/epi = get_turf(caster)
+							if(epi)
+								for(var/turf/t in Turf_Circle(epi, src.Distance))
+									if(!t.density)
+										new /obj/leftOver/MudField(t, caster)
+									CHECK_TICK
 
 			Wolf_Fang_Fist
 				SignatureTechnique=1
 				UnarmedOnly=1
 				Area="Circle"
 				StrScaling=1
-				DamageMult=1
+				WoundRider=0.1
+				DamageMult=0.5
 				IgnoreAlreadyHit=TRUE
 				Rounds=10
 				Stunner=0.5
@@ -1578,9 +1611,9 @@ obj
 				GrabMaster = 1
 				ChargeTime=1.5
 				Grapple=1
-				Cooldown=160
+				Cooldown=12
 				// Size=1
-				EnergyCost=5
+				EnergyCost=3
 				TurfShift='Dirt1.dmi'
 				TurfShiftDurationSpawn = 1
 				TurfShiftDuration = 5
@@ -1601,19 +1634,20 @@ obj
 				SignatureTechnique=1
 				UnarmedOnly=1
 				Area="Circle"
-				DamageMult=1.3
+				DamageMult=0.45
 				ComboMaster=1
 				Rounds=10
 				ChargeTech=1
 				ChargeFlight=1
 				ChargeTime=0.75
 				Grapple=1
-				Stunner=1
+				Stunner=0.5
 				Launcher=1
 				GrabMaster=1
-				Cooldown=150
+				RushProjImmune=8
+				Cooldown=12
 				Size=1
-				EnergyCost=13
+				EnergyCost=3
 				Icon='Novabolt.dmi'
 				IconX=-33
 				IconY=-33
@@ -1629,15 +1663,12 @@ obj
 				FlickAttack=1
 				Area="Arc"
 				StrScaling=2
-				DamageMult=12
+				DamageMult=6.25
 				GuardBreak=1
 				ComboMaster=1
 
-				Destroyer = 5 // make it do more dmg if tht guy is stunned or launched, ig this is dunker for stuns
-				Dunker = 3
 				NoGCD = 1
 
-				Rush=1
 				RushDelay=0.1
 				ControlledRush=0
 				Knockback=0
@@ -1651,13 +1682,16 @@ obj
 				ShockBlend=2
 				ShockDiminish=1.15
 				ShockTime=4
-				WindUp=0.5
+				WindUp=0
 				WindupMessage="extends their arm towards the opponent, reaching them with the tips of their fingers..."
 				ActiveMessage="curls up their fingers into a fist and delivers a crushing blow!!!"
-				EnergyCost=5
-				Cooldown=150
+				EnergyCost=4
+				Cooldown=15
 				verb/One_Inch_Punch()
 					set category="Skills"
+					if(!usr.Target || get_dist(usr, usr.Target) > 1)
+						usr << "<font color='red'>You must be adjacent to your target.</font>"
+						return
 					usr.Activate(src)
 
 //T6 (Sig 2) has damage mult 7.5, usually
@@ -1665,15 +1699,16 @@ obj
 			Lariat
 				SignatureTechnique=2
 				Area="Circle"
-				DamageMult=1.5
+				DamageMult=1.75
 				Rounds=10
 				ComboMaster=1
 				ChargeTech=1
 				ChargeTime=0.5
 				Grapple=1
 				GrabMaster = 1
-				Stunner=3
-				Cooldown=180
+				Stunner=1
+				RushCarry=1
+				Cooldown=45
 				Size=2
 				EnergyCost=10
 				// GuardBreak=1
@@ -1692,13 +1727,13 @@ obj
 				Area="Wave"
 				StrScaling=1
 				ForScaling=1
-				DamageMult=8
+				DamageMult=13.25
 				ComboMaster=1
 				ControlledRush=0
 				Rush=7
 				Instinct=2
 				Knockback=15
-				Cooldown=180
+				Cooldown=45
 				HitSparkIcon='Hit Effect.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -1732,7 +1767,7 @@ obj
 				SpecialAttack=1
 				ComboMaster=1
 				Rounds=5
-				DamageMult=0.1//1 damage mult is from the projectile itself.
+				DamageMult=0.05//1 damage mult is from the projectile itself.
 				Icon='SweepingKick.dmi'
 				IconX=-32
 				IconY=-32
@@ -1748,7 +1783,7 @@ obj
 				SpecialAttack=1
 				ComboMaster=1
 				Rounds=3
-				DamageMult=1
+				DamageMult=0.7
 				Icon='SweepingKick.dmi'
 				IconX=-32
 				IconY=-32
@@ -1785,17 +1820,17 @@ obj
 					set category="Skills"
 					usr.Activate(src)
 			Breaker_Wave
+				Knockback=15
 				SkillCost=TIER_4_COST
 				Copyable=5
-				EnergyCost=10
+				EnergyCost=5
 				Area="Wide Wave"
 				FlickAttack=1
 				Distance=15
 				MenuIcon="BreakerWave"
 				ForScaling=1
-				DamageMult=11
+				DamageMult=7.5
 				Scorching = 10
-				Stunner=3
 				TurfErupt=2
 				TurfEruptOffset=0
 				Slow=1
@@ -1808,7 +1843,7 @@ obj
 				ComboMaster = 1
 				WindupMessage="focuses their power into a palm..."
 				ActiveMessage="unleashes an obliterating wave of power from their hand!"
-				Cooldown=75
+				Cooldown=18
 				verb/Breaker_Wave()
 					set category="Skills"
 					usr.Activate(src)
@@ -1819,8 +1854,9 @@ obj
 				MenuIcon="BlazingStorm"
 				ForScaling=1
 				Rounds=10
-				DamageMult=0.9
+				DamageMult=0.8
 				Area="Around Target"
+				FollowTarget=1
 				FlickAttack=1
 				Distance=15
 				DistanceAround=3
@@ -1837,8 +1873,8 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
-				Cooldown=75
-				EnergyCost=10
+				Cooldown=18
+				EnergyCost=5
 				Earthshaking=15
 				verb/Blazing_Storm()
 					set category="Skills"
@@ -1846,18 +1882,17 @@ obj
 			Ghost_Wave
 				SkillCost=TIER_4_COST
 				Copyable=5
-				EnergyCost=10
+				EnergyCost=5
 				Area="Wave"
 				FlickAttack=1
-				Distance=3
+				Distance=5
 				ForScaling=1
-				Rush=8
 				NoLock=1
 				NoAttackLock=1
 				MenuIcon="GhostWave"
 				ControlledRush=0
 				Rounds=3
-				DamageMult=4
+				DamageMult=3.05
 				ComboMaster=1
 				Launcher=4
 				TurfErupt=2
@@ -1869,22 +1904,39 @@ obj
 				SpecialAttack=1
 				Earthshaking=5
 				ActiveMessage="blinks forward before unleashing a wave of power at point-blank range!"
-				Cooldown=75
+				Cooldown=18
 				verb/Ghost_Wave()
 					set category="Skills"
-					usr.Activate(src)
+					var/mob/c = usr
+					if(!src.Using && !src.cooldown_remaining && !c.GCDBlocked(src) && c.CanUseSkill(src) && c.last_autohit + glob.MACROCHECKTIME <= world.time && !(c.Secret=="Heavenly Restriction" && c.secretDatum?:hasRestriction("Autohits")))
+						VanishImage(c)
+						for(var/i = 1 to 3)
+							var/turf/t = get_step(c, c.dir)
+							if(!t || t.density)
+								break
+							var/gblocked = 0
+							for(var/atom/movable/o in t)
+								if(o.density && o != c)
+									gblocked = 1
+									break
+							if(gblocked)
+								break
+							c.loc = t
+						c.step_x = 0
+						c.step_y = 0
+					c.Activate(src)
 			Power_Pillar
 				SkillCost=TIER_4_COST
 				Copyable=5
-				EnergyCost=10
+				EnergyCost=5
 				Area="Circle"
 				FlickAttack=1
 				Distance=3
 				RoundMovement=0
-				Rounds=5
+				Rounds=1
 				MenuIcon="PowerPillar"
 				ForScaling=1
-				DamageMult=3.2
+				DamageMult=6.5
 				NoAttackLock=1
 				NoLock=1
 				Launcher=4
@@ -1899,10 +1951,39 @@ obj
 				WindUp=0.5
 				WindupMessage="grows still..."
 				ActiveMessage="crushes those nearby with their spiritual aura!!"
-				Cooldown=75
+				Cooldown=18
 				verb/Power_Pillar()
 					set category="Skills"
-					usr.Activate(src)
+					var/mob/caster = usr
+					var/mob/T = caster.Target
+					var/can_fire = !(Using || cooldown_remaining)
+					caster.Activate(src)
+					if(can_fire && T && ismob(T))
+						spawn(8)
+							if(!Using || !T || T.KO)
+								return
+							var/turf/c = get_turf(T)
+							if(!c || !caster || caster.z != c.z)
+								return
+							var/back = get_dir(caster, T)
+							if(!back)
+								back = T.dir
+							back = DisplayedCardinal(back, 0)
+							var/turf/base = get_step(c, back)
+							if(!base)
+								return
+							var/d = turn(back, 90)
+							for(var/i = -1, i <= 1, i++)
+								var/turf/t2 = (i == 0) ? base : get_step(base, (i < 0) ? d : turn(d, 180))
+								if(!t2 || t2.density)
+									continue
+								var/blocked = 0
+								for(var/mob/o in t2)
+									if(o.density)
+										blocked = 1
+										break
+								if(!blocked)
+									new /obj/SkillPillar(t2)
 
 
 
@@ -1923,8 +2004,9 @@ obj
 				Size=2
 				StrScaling=0.75
 				ForScaling=0.25
-				DamageMult=12
+				DamageMult=1.45
 				DelayTime=0.25
+				Rounds=3
 				PreShockwave=1
 				PreShockwaveDelay=1
 				PostShockwave=0
@@ -1936,6 +2018,7 @@ obj
 				ShockTime=4
 				GuardBreak=1
 				ComboMaster=1
+				Flash=2
 				Rush=5
 				ControlledRush=0
 				HitSparkIcon='Slash - Future.dmi'
@@ -1946,8 +2029,8 @@ obj
 				HitSparkDispersion=4
 				Launcher=4
 				DelayedLauncher=1
-				Cooldown=150
-				EnergyCost=2.5
+				Cooldown=12
+				EnergyCost=3
 				Instinct=1
 				ActiveMessage="delivers swift justice with a flurry of slashes!"
 				verb/Shining_Sword_Slash()
@@ -1958,12 +2041,12 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrScaling=1
+				NoLock=1
 				Distance=5
-				DamageMult=12
+				DamageMult=1.8
+				Rounds=5
 				Knockback=15
 				WindUp=0.5
-				Slow=1
-				Stunner=2
 				ComboMaster=1;
 				GuardBreak=1;
 				WindupMessage="sheathes their blade..."
@@ -1977,8 +2060,8 @@ obj
 				HitSparkDispersion=16
 				BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/AchillesHeel"
 				TurfStrike=1
-				Cooldown=150
-				EnergyCost=5
+				Cooldown=15
+				EnergyCost=4
 				Instinct=1
 				verb/Massacre()
 					set category="Skills"
@@ -1988,7 +2071,7 @@ obj
 				NeedsSword=1
 				Area="Wider Wave"
 				StrScaling=1.25
-				DamageMult=16
+				DamageMult=4.75
 				TurfDirt=1
 				Distance=12
 				Jump=1
@@ -2001,25 +2084,35 @@ obj
 				Shockwaves=1
 				PostShockwave=1
 				HitSparkIcon='BLANK.dmi'
-				Cooldown=150
-				EnergyCost=5
+				Cooldown=12
+				EnergyCost=3
 				Earthshaking=1
 				Speed=1
 				WindUp=0
 				Instinct=1
 				ActiveMessage="leaps in the air before falling back down, weapon-first!"
+				var/tmp/LeapArmed=0
 				verb/Slam_Wave()
 					set category="Skills"
-					usr.Activate(src)
+					if(src.Using || src.cooldown_remaining)
+						usr << "<font color='red'>[src] is on cooldown.</font>"
+						return
+					if(LeapArmed > world.time)
+						LeapArmed = 0
+						usr.Activate(src)
+					else
+						LeapArmed = world.time + 50
+						usr << "<b>Click a tile within 6 tiles to leap there and slam, or press again to slam in place. (5s)</b>"
 
 			Zantetsuken
 				SignatureTechnique=2
 				NeedsSword=1
+				ExecuteMortal=25
 				Distance=15
 				Gravity=5
 				WindUp=1
 				WindupMessage="prepares to deliver a peerless slash..."
-				DamageMult=18
+				DamageMult=13.75
 				StrScaling=1
 				EndEffectiveness=0.5
 				ActiveMessage="slashes through their enemy in the blink of an eye, aiming to mortally wound them!"
@@ -2033,8 +2126,8 @@ obj
 				HitSparkY=-16
 				HitSparkTurns=1
 				HitSparkSize=3
-				Cooldown=180
-				EnergyCost=15
+				Cooldown=45
+				EnergyCost=10
 				Instinct=1
 				verb/Zantetsuken()
 					set category="Skills"
@@ -2042,13 +2135,14 @@ obj
 			Shadow_Cut
 				SignatureTechnique=2
 				NeedsSword=1
-				Area="Wider Wave"
+				Area="Strike"
+				PassStrikes=1
 				StrScaling=1
 				Distance=7
 				DelayTime=2
 				Rounds=7
 				IgnoreAlreadyHit = 1
-				DamageMult=5
+				DamageMult=4.25
 				Knockback=10
 				SpeedStrike = 2
 				PassThrough=1
@@ -2066,8 +2160,8 @@ obj
 				HitSparkDelay=2
 				HitSparkDispersion=16
 				TurfStrike=1
-				Cooldown=180
-				EnergyCost=5
+				Cooldown=45
+				EnergyCost=10
 				Instinct=1
 				verb/Shadow_Cut()
 					set category="Skills"
@@ -2081,15 +2175,21 @@ obj
 				SpeedStrike=2;
 				Distance=7
 				PassTo=1
-				DamageMult=18
+				KillCounter=1
+				DamageMult=27.25
+				adjust(mob/p)
+					if(world.time - kill_stamp > 900)
+						kill_stacks = 0
+					DamageMult = 27.25 * (1 + 0.0875 * kill_stacks)
+					Size = 1 + 0.25 * kill_stacks
 				WindUp=1
 				GuardBreak=1
 				ComboMaster=1;
 				Knockback=25
 				WindupMessage="lays a hand on their sheathed blade, concentrating for a moment..."
 				ActiveMessage="blasts through surrounding foes with what appears to be a single strike!!"
-				Cooldown=180
-				EnergyCost=10
+				Cooldown=60
+				EnergyCost=12
 				verb/Thousand_Man_Slayer()
 					set category="Skills"
 					usr.Activate(src)
@@ -2098,10 +2198,11 @@ obj
 				SBuffNeeded="Final Getsuga Tenshou"
 				Area="Arc"
 				Distance=30
-				DamageMult=50
+				DamageMult=36.75
 				StrScaling=1
 				ForScaling=1
 				Cooldown=-1
+				EnergyCost=12
 				TurfStrike=1
 				TurfShiftLayer=EFFECTS_LAYER
 				TurfShiftDuration=-10
@@ -2149,19 +2250,19 @@ obj
 				Area="Circle"
 				Distance=10
 				GuardBreak=1
-				DamageMult=8
+				DamageMult=2.55
 				Knockback=15
-				Cooldown=150
+				Cooldown=10
 				Shockwaves=3
 				Shockwave=4
 				BuffAffected = "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Staggered"
 				SpecialAttack=1
-				Stunner=3
+				Stunner=0.5
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
 				ActiveMessage="unleashes a wave of ki!"
-				EnergyCost=5
+				EnergyCost=2
 				verb/Kiai()
 					set category="Skills"
 					usr.Activate(src)
@@ -2171,7 +2272,7 @@ obj
 				AllOutAttack=1
 				Area="Circle"
 				Distance=10
-				DamageMult = 4
+				DamageMult = 3.15
 				Flash=30
 				WindUp=0.75
 				WindupIcon='BLANK.dmi'
@@ -2187,8 +2288,8 @@ obj
 				TurfShiftDurationDespawn=5
 				BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded"
 				ActiveMessage="converts their ki to a wave of blinding light!"
-				Cooldown=150
-				EnergyCost=5
+				Cooldown=12
+				EnergyCost=3
 				verb/Taiyoken()
 					set category="Skills"
 					usr.Activate(src)
@@ -2200,9 +2301,8 @@ obj
 				CanBeDodged=0
 				CanBeBlocked=1
 				ComboMaster=1
-				DamageMult=11
-				Stunner=3
-				MortalBlow=1
+				DamageMult=7
+				Paralyzing=2
 				Knockback=0
 				WindUp=1
 				WindupIcon='Chidori.dmi'
@@ -2213,8 +2313,8 @@ obj
 				HitSparkX=-32
 				HitSparkY=-32
 				HitSparkSize=1
-				Cooldown=150
-				EnergyCost=8
+				Cooldown=15
+				EnergyCost=4
 				Instinct=1
 				proc/reset2default()
 					Area="Strike"
@@ -2222,9 +2322,7 @@ obj
 					SpecialAttack=1
 					CanBeDodged=0
 					CanBeBlocked=1
-					DamageMult=11
-					Stunner=3
-					MortalBlow=1
+					DamageMult=7
 					Knockback=0
 					WindUp=1
 					WindupIcon='Chidori.dmi'
@@ -2235,7 +2333,7 @@ obj
 					HitSparkX=-32
 					HitSparkY=-32
 					HitSparkSize=1
-					EnergyCost=8
+					EnergyCost=4
 					Instinct=1
 					Rounds = 0
 					ChargeTech = 0
@@ -2261,7 +2359,7 @@ obj
 						TurfShiftDurationDespawn = 5
 						Grapple = 1
 						GrabMaster = 1
-						DamageMult = 0.1
+						DamageMult = 0.08
 						Quaking = 10
 						GrabTrigger = "/obj/Skills/Grapple/Lightning_Blade"
 						WindupMessage="begins charging an excessive amount of lightning in their palm!"
@@ -2274,6 +2372,9 @@ obj
 					if(usr.Saga=="Sharingan")
 						src.ControlledRush=1
 					adjust(usr)
+					var/can_fire = !(Using || cooldown_remaining)
+					if(can_fire && !usr.GCDBlocked(src))
+						usr.rush_vuln_until = world.time + 25
 					usr.Activate(src)
 			The_Seventh_Super_Explosive_Wave
 				SignatureTechnique=4
@@ -2311,7 +2412,7 @@ obj
 				SignatureTechnique=1
 				StrScaling=0
 				ForScaling=1
-				DamageMult=12
+				DamageMult=6
 				Area="Circle"
 				Distance=8
 				TurfErupt=2
@@ -2330,7 +2431,8 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
-				Cooldown=150
+				Cooldown=15
+				EnergyCost=4
 
 				Earthshaking=15
 				PreQuake=1
@@ -2342,7 +2444,7 @@ obj
 				AllOutAttack=1
 				StrScaling=0
 				ForScaling=1
-				DamageMult=13
+				DamageMult=5.5
 				WoundCost=5
 				ComboMaster=1
 				Area="Around Target"
@@ -2351,7 +2453,6 @@ obj
 				Divide=1
 				Launcher=2
 				GuardBreak=1
-				Stunner=2
 				WindUp=1.5
 				WindupIcon='Ripple Radiance.dmi'
 				WindupIconUnder=1
@@ -2378,18 +2479,17 @@ obj
 				TurfShiftDurationSpawn=0
 				TurfShiftDurationDespawn=5
 				TurfErupt=2
-				Cooldown=150
+				Cooldown=12
 				Earthshaking=15
 				GuardBreak=1
-				Crippling=3
 				Instinct=1
 				DirectWounds=5
-				Shearing=5
+				SquareArea=1
 				proc/set2default()
 					AllOutAttack=1
 					StrScaling=0
 					ForScaling=1
-					DamageMult=13
+					DamageMult=5.5
 					WoundCost=5
 					ComboMaster=1
 					Area="Around Target"
@@ -2398,7 +2498,6 @@ obj
 					Divide=1
 					Launcher=2
 					GuardBreak=1
-					Stunner=2
 					WindUp=1.5
 					WindupIcon='Ripple Radiance.dmi'
 					WindupIconUnder=1
@@ -2425,30 +2524,26 @@ obj
 					TurfShiftDurationSpawn=0
 					TurfShiftDurationDespawn=5
 					TurfErupt=2
-					Cooldown=150
+					Cooldown=12
 					Earthshaking=15
 					GuardBreak=1
-					Crippling=3
 					Instinct=1
 					DirectWounds=5
-					Shearing=5
 				adjust(mob/p)
 					var/asc= p.AscensionsAcquired
 					if(p.isInnovative(HUMAN, "Any") && !isInnovationDisable(p) && p.Class == "Heroic")
 						AllOutAttack=1
 						StrScaling=1
 						ForScaling=1
-						DamageMult=13 + asc
+						DamageMult=5.5 + (asc*0.5)
 						WoundCost=5 + asc
 						ComboMaster=1
 						Area="Around Target"
-						Rounds= 1 + asc
 						Distance=15
 						DistanceAround=4
 						Divide=1
 						Launcher=2
 						GuardBreak=1
-						Stunner=2
 						WindUp=1.5
 						WindupIcon='Ripple Radiance.dmi'
 						WindupIconUnder=1
@@ -2475,14 +2570,12 @@ obj
 						TurfShiftDurationSpawn=0
 						TurfShiftDurationDespawn=5
 						TurfErupt=2
-						Cooldown=150 + (10 * asc)
+						Cooldown=12 + asc
 						CooldownStatic=1
 						Earthshaking=15
 						GuardBreak=1
-						Crippling=3
 						Instinct=1
 						DirectWounds=5 + asc
-						Shearing=5
 					else
 						set2default()
 				verb/Kikoho()
@@ -2499,11 +2592,10 @@ obj
 				ForScaling=1
 				Launcher=2
 				WoundCost=6.2
-				DamageMult=13
-				Rounds=4
+				DamageMult=19.75
 				DelayTime = 5
 				ComboMaster=1
-				Cooldown=180
+				Cooldown=45
 				Area="Around Target"
 				Distance=15
 				DistanceAround=4
@@ -2536,14 +2628,22 @@ obj
 				TurfErupt=2
 				Earthshaking=15
 				GuardBreak=1
-				Crippling=3
 				Instinct=1
 				DirectWounds=6.2;
-				Shearing=5;
+				SquareArea=1
 				verb/Shin_Kikoho()
 					set category="Skills"
 					src.StrScaling= usr.TotalInjury > 25 ? (usr.TotalInjury/50) : 0;
-					usr.Activate(src)
+					if(world.time >= chain_until)
+						recast_count = 0
+					if(recast_count > 0 && world.time < chain_until)
+						Using = 0
+						cooldown_remaining = 0
+					WoundCost = 6.2 * (1 + recast_count)
+					DirectWounds = WoundCost
+					if(usr.Activate(src))
+						recast_count++
+						chain_until = world.time + 30
 
 ////Racial
 			Oceanic_Wrath
@@ -3420,7 +3520,7 @@ obj
 				Area="Target"
 				GuardBreak=1
 				StrScaling=1
-				DamageMult=10
+				DamageMult=8.5
 				Distance=10
 				PassThrough=1
 				PreShockwave=1
@@ -3428,8 +3528,8 @@ obj
 				Shockwave=2
 				Shockwaves=2
 				ActiveMessage="flickers behind their opponent for an instantaneous slash!"
-				Cooldown=75
-				EnergyCost=3
+				Cooldown=18
+				EnergyCost=5
 				verb/Disable_Innovate()
 					set category = "Other"
 					set hidden = 1
@@ -3446,9 +3546,9 @@ obj
 						PostShockwave=0
 						Shockwave=2
 						Shockwaves=2
-						DamageMult= 5 + (pot/100)
+						DamageMult= (5 + (pot/100)) * 0.71
 						Rounds = 2
-						Stunner=2
+						Stunner=1
 						Distance= 4 + (round(pot/10))
 						HitSparkIcon='Slash.dmi'
 						HitSparkX=-32
@@ -3470,9 +3570,9 @@ obj
 						PostShockwave=0
 						Shockwave=2
 						Shockwaves=2
-						DamageMult= 5 + (pot/100)
+						DamageMult= (5 + (pot/100)) * 0.71
 						Rounds = 2
-						Stunner=3
+						Stunner=1
 						Distance= 4 + (round(pot/10))
 						HitSparkIcon='Slash - Hellfire.dmi'
 						HitSparkX=-32
@@ -3493,7 +3593,7 @@ obj
 						PostShockwave=1
 						Shockwave=2
 						Shockwaves=2
-						DamageMult=12
+						DamageMult=8.5
 						Rounds = 0
 						Stunner=0
 						Distance= 10
@@ -3512,10 +3612,24 @@ obj
 						CorruptionDebuff = 0
 				verb/Jet_Slicer()
 					set category="Skills"
+					var/mob/caster = usr
 					var/can_fire = !(Using || cooldown_remaining)
-					usr.Activate(src)
-					applyDemonInnovationEffect(usr, can_fire)
+					var/turf/origin = get_turf(caster)
+					var/osx = caster.step_x
+					var/osy = caster.step_y
+					caster.Activate(src)
+					applyDemonInnovationEffect(caster, can_fire)
+					if(can_fire)
+						spawn(4)
+							if(!Using || !caster || caster.KO || caster.Stunned || caster.Launched || caster.Suspended || caster.Stasis)
+								return
+							if(!origin || origin.density || caster.z != origin.z)
+								return
+							caster.loc = origin
+							caster.step_x = osx
+							caster.step_y = osy
 			Crowd_Cutter
+				RushTally=0.2
 				SkillCost=TIER_3_COST
 				Copyable=5
 				NeedsSword=1
@@ -3527,7 +3641,7 @@ obj
 				PostShockwave=0
 				Shockwave=2
 				Shockwaves=2
-				DamageMult=12
+				DamageMult=4.0
 				WindUp=0.5
 				WindupMessage="sheathes their blade..."
 				ActiveMessage="blasts through all opposition in a blink of an eye!"
@@ -3540,7 +3654,8 @@ obj
 				TurfStrike=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=3
-				Cooldown=60
+				Cooldown=12
+				EnergyCost=3
 				Instinct=1
 				verb/Crowd_Cutter()
 					set category="Skills"
@@ -3550,16 +3665,15 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				DamageMult=0.5
+				DamageMult=0.35
 				HolyMod=1.15
 				Distance=5
 				DistanceAround=3
-				EnergyCost=10
+				EnergyCost=5
 				Rounds=20
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
-				Stunner=3
 				ComboMaster = 1
 				Icon='SwordHugeHolyJustice.dmi'
 				Size=0.5
@@ -3570,8 +3684,9 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
-				Cooldown=75
+				Cooldown=18
 				Instinct=1
+				Silencing=1
 				adjust(mob/p)
 					HolyMod=1.15
 				verb/Holy_Justice()
@@ -3582,16 +3697,14 @@ obj
 				Copyable=5
 				NeedsSword=1
 				Area="Around Target"
-				DamageMult=0.5
+				DamageMult=8.5
 				AbyssMod=1.15
 				Distance=5
 				DistanceAround=3
-				EnergyCost=10
-				Rounds=20
+				EnergyCost=5
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
-				Stunner=3
 				ComboMaster = 1
 				Icon='SwordHugeDoomofDamocles.dmi'
 				Size=0.5
@@ -3602,13 +3715,62 @@ obj
 				HitSparkIcon='BLANK.dmi'
 				HitSparkX=0
 				HitSparkY=0
-				Cooldown=75
+				Cooldown=18
 				Instinct=1
+				var/tmp/doom_pending = 0
 				adjust(mob/p)
 					AbyssMod=1.15
 				verb/Doom_of_Damocles()
 					set category="Skills"
-					usr.Activate(src)
+					var/mob/caster = usr
+					if(Using || cooldown_remaining)
+						caster << "<font color='red'>[name] is on cooldown.</font>"
+						return
+					if(doom_pending)
+						return
+					var/mob/T = caster.Target
+					if(!T || !ismob(T) || T == caster)
+						caster << "<font color='red'>You need a target to hang the blade over.</font>"
+						return
+					if(get_dist(caster, T) > Distance + 3)
+						caster << "<font color='red'>They are too far away.</font>"
+						return
+					if(caster.GCDBlocked(src))
+						return
+					caster.StartGCD(src)
+					doom_pending = 1
+					OMsg(caster, "<b>An ethereal blade hangs over [T] - it falls the moment they act!</b>")
+					var/obj/Effects/HE = new(null, 'SwordHugeDoomofDamocles.dmi', -159, 24, 0, 1, 40)
+					HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
+					HE.Target = T
+					T.vis_contents += HE
+					var/cast_time = world.time
+					spawn()
+						var/triggered = 0
+						while(world.time < cast_time + 40)
+							if(!caster || caster.KO || !T || T.KO || T.Health <= 0)
+								doom_pending = 0
+								return
+							if(T.last_skill_fire_time > cast_time)
+								triggered = 1
+								break
+							sleep(2)
+						doom_pending = 0
+						if(triggered)
+							var/mob/oldT = caster.Target
+							caster.Target = T
+							var/ng = src.NoGCD
+							src.NoGCD = 1
+							if(!caster.Activate(src, noGCD=TRUE))
+								src.Cooldown(1, null, caster)
+							src.NoGCD = ng
+							caster.Target = oldT
+						else
+							OMsg(caster, "<b>The blade over [T] fades away.</b>")
+							var/ng = src.NoGCD
+							src.NoGCD = 1
+							src.Cooldown(1, null, caster)
+							src.NoGCD = ng
 
 
 
@@ -4261,7 +4423,7 @@ obj
 ///King of Braves
 			Hell_And_Heaven
 				Area="Circle"
-				DamageMult=3
+				DamageMult=2.7
 				Rounds=10
 				ChargeTech=1
 				StrScaling=1
@@ -4287,17 +4449,18 @@ obj
 				HitSparkSize=1
 				HitSparkCount=1
 				Cooldown=-1
+				EnergyCost=12
 				verb/Hell_And_Heaven()
 					set category="Skills"
 					if(usr.SagaLevel>5)
-						src.DamageMult=4
+						src.DamageMult=3.6
 						src.ControlledRush=0
 						WindupMessage="combines the forces of Destruction and Creation with absolute control!"
 					usr.Activate(src)
 			Goldion_Hammer
 				StrScaling=1
 				ForScaling=1
-				DamageMult=21
+				DamageMult=33.75
 				Area="Circle"
 				Distance=5
 				TurfErupt=2
@@ -4315,6 +4478,7 @@ obj
 				HitSparkX=0
 				HitSparkY=0
 				Cooldown=-1
+				EnergyCost=12
 				Earthshaking=15
 				verb/Goldion_Hammer()
 					set category="Skills"
@@ -4658,12 +4822,12 @@ obj
 				Area="Arc"
 				Distance=3
 				StrScaling=1
-				DamageMult=0.8
+				DamageMult=0.55
 				Shearing = 5
 				RoundMovement=0
 				ComboMaster=1
 				Rounds=10
-				Cooldown=60
+				Cooldown=15
 				EnergyCost=2
 				Icon='Nest Slash.dmi'
 				IconX=-16
@@ -4674,7 +4838,7 @@ obj
 				HitSparkSize=1.2
 				HitSparkDispersion=1
 				TurfStrike=1
-				EnergyCost=1
+				EnergyCost=3
 				Instinct=1
 				ActiveMessage="flourishes their blade to cut loose a flood of red fibers!"
 				verb/Life_Fiber_Weave()
@@ -4722,10 +4886,11 @@ obj
 				HitSparkSize=5
 				TurfStrike=1
 				Slow=1
-				DamageMult=2//First step is 1 damage
+				DamageMult=4.5//First step is 1 damage
 				StepsDamage=1//fourth step is 5 damage
 				ActiveMessage="whiffs their swing, causing a powerful wave of pressure!"
 				Cooldown = 10
+				EnergyCost=2
 
 			Crystal_Tomb
 				NeedsSword=1
@@ -4739,12 +4904,12 @@ obj
 				TurfStrike=1
 				TurfShift='IceGround.dmi'
 				TurfShiftDuration=500
-				DamageMult=10
+				DamageMult=22.5
 				HolyMod=5
 				Purity=1
 				StrScaling=1
 				ActiveMessage="encases their target in a tomb of soul-infused crystal!  They are forced into perfect stasis!"
-				Stasis=50
+				Stasis=6
 				HitSparkIcon='Hit Effect Pearl.dmi'
 				HitSparkX=-32
 				HitSparkY=-32
@@ -4753,6 +4918,7 @@ obj
 				HitSparkCount=9
 				HitSparkDispersion=1
 				Cooldown=-1
+				EnergyCost=12
 				verb/Crystal_Tomb()
 					set category="Skills"
 					usr.Activate(src)
@@ -4766,7 +4932,7 @@ obj
 				WindupMessage="prepares to cut through the very space around them in defiance of everything..."
 				DamageMult = 4
 				StrScaling=1
-				Stunner = 3
+				Stunner = 1
 				ActiveMessage="slashes through the very concept of space, breaking reality to force their desires onto the world with the might of War!"
 				Area="Target"
 				GuardBreak=1
@@ -4774,17 +4940,17 @@ obj
 				MortalBlow=2
 				Shattering = 70
 				Shocking = 70
-				Crippling = 40
+				Crippling = 30
 				HitSparkIcon='Slash - Zan.dmi'
 				HitSparkX=-16
 				HitSparkY=-16
 				HitSparkTurns=1
 				HitSparkSize=3
-				Cooldown= 60
-				EnergyCost=15
+				Cooldown= 15
+				EnergyCost=3
 				Instinct=1
 				adjust(mob/p)
-					DamageMult= 7 + p.SagaLevel
+					DamageMult= 2.33 + p.SagaLevel*0.33
 					WindUp = 1
 				verb/WarGodDescent()
 					set name = "War God's Descent"
@@ -4796,7 +4962,7 @@ obj
 				Distance=50
 				WindUp=2
 				WindupMessage="evokes the power of death..."
-				DamageMult=15
+				DamageMult=20.75
 				StrScaling=1
 				ActiveMessage="slashes through their enemy in the blink of an eye, mortally wounding them!"
 				Area="Target"
@@ -4813,7 +4979,8 @@ obj
 				HitSparkY=-32
 				HitSparkTurns=1
 				HitSparkSize=2
-				Cooldown=180
+				Cooldown=45
+				EnergyCost=8
 				verb/Deathbringer()
 					set category="Skills"
 					usr.Activate(src)
@@ -5120,14 +5287,14 @@ mob
 			if(Z.MagicNeeded&&!src.HasLimitlessMagic())
 				if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
 					src << "You lack the ability to use magic!"
-					return
+					return FALSE
 				if(src.HasMagicTaken())
 					src << "Your mana circuits are too damaged to use magic! (until [time2text(src.MagicTaken, "DDD MMM DD hh:mm:ss")])"
-					return;
+					return FALSE
 				if(Z.Copyable>=3||!Z.Copyable)
 					if(!src.HasSpellFocus(Z))
 						src << "You need a spell focus to use [Z]."
-						return
+						return FALSE
 			Z.adjust(src)
 			Z.SpellSlotModification();
 			if(Z.GuardBreak)
@@ -5197,13 +5364,13 @@ mob
 			if(Z.NeedsHealth)
 				if(src.Health>Z.NeedsHealth*(1-src.HealthCut))
 					src << "You can't use [Z] before you're below [Z.NeedsHealth*(1-src.HealthCut)]% health!"
-					return
+					return FALSE
 			if(Z.NeedsSword)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(!s)
 					if(!src.HasBladeFisting() && !src.UsingBattleMage())
 						src << "You need a sword equipped to use [Z]!"
-						return
+						return FALSE
 			if(Z.ResourceCost)
 				var/resourceName = Z.ResourceCost[1]
 				var/storage = 0
@@ -5227,43 +5394,43 @@ mob
 				if(s)
 					if(!HasBladeFisting())
 						src << "You can't have a sword equipped when using [Z]!  It's an unarmed technique!"
-						return
+						return FALSE
 				if(src.UsingBattleMage())
 					src << "You can't use unarmed techniques while using Battle Mage!"
-					return
+					return FALSE
 			if(Z.ABuffNeeded)
 				if(!src.ActiveBuff||src.ActiveBuff.BuffName!=Z.ABuffNeeded)
 					src << "You have to be in [Z.ABuffNeeded] state to use this!"
-					return
+					return FALSE
 			if(Z.SBuffNeeded)
 				if(!src.SpecialBuff||src.SpecialBuff.BuffName!=Z.SBuffNeeded)
 					src << "You have to be in [Z.SBuffNeeded] state to use this!"
-					return
+					return FALSE
 			if(Z.StanceNeeded)
 				if(src.StanceActive!=Z.StanceNeeded)
 					src << "You have to be in [Z.StanceNeeded] stance to use this!"
-					return
+					return FALSE
 			if(Z.StyleNeeded)
 				if(src.StyleActive!=Z.StyleNeeded)
 					src << "You have to be using [Z.StyleNeeded] style to use this!"
-					return
+					return FALSE
 			if(Z.GateNeeded)
 				if(src.GatesActive<Z.GateNeeded)
 					src << "You have to open at least Gate [Z.GateNeeded] to use this skill!"
-					return
+					return FALSE
 			if(Z.ClassNeeded)
 				var/obj/Items/Sword/s=src.EquippedSword()
 				if(s.Class!=Z.ClassNeeded && (istype(Z.ClassNeeded, /list) && !(s.Class in Z.ClassNeeded)))
 					src << "You need a [istype(Z.ClassNeeded, /list) ? Z.ClassNeeded[1] : Z.ClassNeeded]-class weapon to use this technique."
-					return
+					return FALSE
 			if(Z.HealthCost)
 				if(src.Health<Z.HealthCost*glob.WorldDamageMult&&!Z.AllOutAttack)
-					return
+					return FALSE
 			if(Z.EnergyCost)
 				var/drain = passive_handler["Drained"] ? Z.EnergyCost * (1 + passive_handler["Drained"]/10) : Z.EnergyCost
 				if(src.Energy<drain&&!Z.AllOutAttack)
 					if(!src.CheckSpecial("One Hundred Percent Power")&&!src.CheckSpecial("Fifth Form")&&!CheckActive("Eight Gates"))
-						return
+						return FALSE
 			if(Z.ManaCost && !src.HasDrainlessMana() && !Z.AllOutAttack)
 				var/drain = Z.ManaCost
 				if(Z.SpellElement)
@@ -5324,7 +5491,7 @@ mob
 			if(Z.EndsGetsuga)
 				var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/Sword/Getsuga_Tenshou_Clad)
 				var/baseDamageMult = initial(Z.DamageMult)
-				Z.DamageMult = baseDamageMult + ((60 - A.Timer) / 3)
+				Z.DamageMult = baseDamageMult + ((60 - A.Timer) / 5.45)
 				if(src.Oxygen<=0)
 					src.Oxygen=0
 			if(Z.OffTax)
@@ -5351,6 +5518,10 @@ mob
 				Z.Cooldown(1, null, src)
 			else
 				Z.Cooldown(1, null, src)
+			if(Z.RushProjImmune)
+				src.proj_immune_until = world.time + Z.RushProjImmune
+			if(Z.RushTally)
+				Z.rush_passed_mobs = list()
 			if(Z.Copyable)
 				var/copy = Z.Copyable
 				spawn() for(var/mob/m in view(40, src))
@@ -5567,6 +5738,9 @@ mob
 			if(Z.Rush)
 				src.is_dashing++
 				src.WindingUp=1
+				Z.rush_bounced = 0
+				if(Z.RushTally)
+					Z.rush_passed_mobs = list()
 				var/GO=Z.Rush
 				if(passive_handler["Wolf Spirit"])
 					GO=Z.Rush*2
@@ -5580,7 +5754,7 @@ mob
 				if(HasFastRush())
 					Z.RushDelay = min(glob.RUSH_DELAY_MIN, Z.RushDelay / HasFastRush())
 				while(GO>0)
-					if(Z.ControlledRush || HasControlledRush() &&src.Target) // HasControlledRush is in _BinaryChecks.dm
+					if(!Z.RushBounce && src.Target && (Z.ControlledRush || HasControlledRush())) // HasControlledRush is in _BinaryChecks.dm
 					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
@@ -5621,6 +5795,15 @@ mob
 							var/smear = 6 / max(Z.RushDelay, 0.5)
 							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
 						var/moved = 0
+						if(Z.RushCarry)
+							for(var/mob/cm in get_step(src, src.dir))
+								if(cm == src || cm.KO || cm.Stasis || cm.Knockbacked)
+									continue
+								step(cm, src.dir)
+						if(Z.RushTally)
+							for(var/mob/pmb in view(1, src))
+								if(pmb != src && !pmb.KO)
+									Z.rush_passed_mobs |= pmb
 						if(pm) //one glided step per tick
 							moved = src.PmDashStep(null, pm_px)
 						else
@@ -5631,16 +5814,32 @@ mob
 							for(var/atom/a in get_step(src,dir))
 								if(a==src)
 									continue
+								if(Z.RushCarry && ismob(a))
+									continue
 								if(a.density)
-									GO=0
+									if(Z.RushBounce && !Z.rush_bounced)
+										Z.rush_bounced = 1
+										rush_stuck = 0
+										if(!src.RushWallCling())
+											GO=0
+									else
+										GO=0
 						else
 							for(var/atom/a in view(1,src))
 								if(a==src)
 									continue
+								if(Z.RushCarry && ismob(a))
+									continue
 								if(a.density)
 									GO=0
 						if(pm && !moved && ++rush_stuck >= 2)
-							GO = 0 //blocked rush still has to end
+							if(Z.RushBounce && !Z.rush_bounced)
+								Z.rush_bounced = 1
+								rush_stuck = 0
+								if(!src.RushWallCling())
+									GO = 0
+							else
+								GO = 0 //blocked rush still has to end
 						else if(moved)
 							rush_stuck = 0
 						GO-= (pm ? moved/32 : 1)*world.tick_lag //debit actual px moved
@@ -5665,8 +5864,19 @@ mob
 			if(Z.MagicNeeded&&src.HasDualCast())
 				RoundCount*= 1+ src.HasDualCast()
 				RoundCount = floor(RoundCount)
+			if(Z.SequenceStrokes > 1)
+				RoundCount *= Z.SequenceStrokes
+			if(Z.FinaleDouble)
+				Z.strokes_landed = 0
+				Z.finale_rounds = RoundCount
+			if(Z.MashExtend)
+				Z.mash_pending = 0
+				Z.mash_extends = 0
+				Z.flurry_live = world.time + 15
 			while(RoundCount>0)
 				//if(!src.Target) break
+				if(Z.SequenceStrokes > 1 && (src.KO || src.Stunned || src.Stasis))
+					break
 				if(Z.Earthshaking)
 					spawn()
 						src.Quake(Z.Earthshaking)
@@ -5679,6 +5889,55 @@ mob
 						src.icon_state="Attack"
 					else
 						src.icon_state=""
+				if(Z.FollowTarget && src.Target)
+					TrgLoc = src.Target.loc
+				if(Z.PassStrikes && src.Target && src.Target != src && !src.Target.KO && src.Target.z == src.z && get_dist(src, src.Target) <= Z.Distance + 1)
+					var/pdx = src.x - src.Target.x
+					var/pdy = src.y - src.Target.y
+					var/pside
+					if(abs(pdx) >= abs(pdy))
+						pside = (pdx >= 0) ? EAST : WEST
+					else
+						pside = (pdy >= 0) ? NORTH : SOUTH
+					if(RoundCount % 2)
+						pside = turn(pside, 180)
+					var/turf/pt = get_step(src.Target, pside)
+					var/pblocked = !pt || pt.density
+					if(!pblocked)
+						for(var/atom/movable/pa in pt)
+							if(pa.density && pa != src && pa != src.Target)
+								pblocked = 1
+								break
+					if(!pblocked)
+						src.loc = pt
+						src.step_x = 0
+						src.step_y = 0
+						coolerFlashImage(src, 1)
+					var/fdx = src.Target.x - src.x
+					var/fdy = src.Target.y - src.y
+					if(abs(fdx) >= abs(fdy))
+						src.dir = (fdx >= 0) ? EAST : WEST
+					else
+						src.dir = (fdy >= 0) ? NORTH : SOUTH
+				if(Z.EraseProjectiles)
+					var/atom/ecenter = (src.Target && src.Target.z == src.z) ? src.Target : src
+					for(var/obj/Skills/Projectile/_Projectile/ep in view(max(Z.DistanceAround, 3), ecenter))
+						if(ep.Owner == src || ep.Killed || !ep.loc)
+							continue
+						if(ep.Owner && src.inParty(ep.Owner.ckey))
+							continue
+						if(ep.beam_owner)
+							ep.beam_owner.Die()
+						else if(ep.Area == "Beam")
+							ep.Killed = 1
+							ep.Distance = 0
+							ep.clash_lock = null
+							ep.clash_victor = 0
+							ep.clash_pierce = null
+							ep.endLife()
+						else
+							ep.Killed = 1
+							ep.ProjectileFinish()
 				switch(Z.Area)
 					if("Strike")
 						src.Strike(Z)
@@ -5733,6 +5992,15 @@ mob
 					if(DelayRelease>=1)
 						DelayRelease--
 						sleep(1)
+					if(Z.RushCarry)
+						for(var/mob/cm in get_step(src, src.dir))
+							if(cm == src || cm.KO || cm.Stasis || cm.Knockbacked)
+								continue
+							step(cm, src.dir)
+					if(Z.RushTally && Z.rush_passed_mobs)
+						for(var/mob/pmb in view(1, src))
+							if(pmb != src && !pmb.KO)
+								Z.rush_passed_mobs |= pmb
 					if(PmActive()) //glided full-tile step
 						src.PmDashStep(null, 32)
 					else
@@ -5740,9 +6008,23 @@ mob
 				else
 					sleep(Delay)
 				RoundCount--
+				if(Z.MashExtend && Z.mash_pending > 0)
+					RoundCount += Z.mash_pending
+					Z.mash_pending = 0
+					Z.flurry_live = world.time + 15
+				if(Z.MashExtend && RoundCount <= 0)
+					while(world.time < Z.flurry_live && Z.mash_pending <= 0 && !src.KO && !src.Stunned && !(src.Stasis > 0))
+						sleep(1)
+					if(Z.mash_pending > 0)
+						RoundCount += Z.mash_pending
+						Z.mash_pending = 0
+						Z.flurry_live = world.time + 15
 			src.ClearTech(Z)
 
 		ClearTech(var/obj/Skills/AutoHit/Z)//Used to resolve any variable conflicts at the end of an autohit
+			if(Z.MashExtend)
+				Z.flurry_live = 0
+				Z.mash_pending = 0
 			var/CostMultiplier=1
 			var/obj/Items/Sword/sord=src.EquippedSword()
 			var/obj/Items/Enchantment/Staff/staf=src.EquippedStaff()
@@ -6099,6 +6381,7 @@ obj
 			ForceField
 			/// Set for all autohits built from a skill, used for on-hit hooks (currently just Enuma Elish).
 			var/obj/Skills/AutoHit/FromSkill
+			var/finale_tallied = 0
 
 		Update()
 			..()
@@ -6673,6 +6956,7 @@ obj
 
 				ElementalCheck(Owner, m, 0, bonusElements = Elements)
 
+				var/pre_slowed = m.Slow > 0 || m.Crippled > 0 || (m.passive_handler && m.passive_handler["Snared"])
 				if(Crippling)
 					m.AddCrippling(Crippling, Owner)
 				if(Shearing)
@@ -6685,6 +6969,15 @@ obj
 				if(Cleansing && src.Owner.shouldCleanse(m))
 					m.CleanseDebuff(Cleansing*10);
 
+				if(FromSkill && FromSkill.Silencing)
+					applySilence(m, FromSkill.Silencing * 10)
+				if(FromSkill && FromSkill.EnergyBurn)
+					m.LoseEnergy(FromSkill.EnergyBurn)
+					if(FromSkill.DrainToSelf && Owner)
+						Owner.HealEnergy(FromSkill.EnergyBurn)
+				if(FromSkill && FromSkill.CursedWounds)
+					applyCursedWounds(m, FromSkill.CursedWounds * 10)
+
 				if(src.CosmoPowered)
 					if(!src.Owner.SpecialBuff)
 						FinalDmg*=TrueDamage(1+(src.Owner.SenseUnlocked-5))
@@ -6694,6 +6987,16 @@ obj
 						additonal *= 2
 					if(m.Health <=25)
 						FinalDmg *= 1 + additonal
+				if(FromSkill && FromSkill.BonusVsStunned && m.Stunned)
+					FinalDmg *= 1 + FromSkill.BonusVsStunned
+				if(FromSkill && FromSkill.BonusVsSlowed && pre_slowed)
+					FinalDmg *= 1 + FromSkill.BonusVsSlowed
+				if(FromSkill && FromSkill.RushTally && FromSkill.rush_passed_mobs && FromSkill.rush_passed_mobs.len)
+					FinalDmg *= 1 + FromSkill.RushTally * FromSkill.rush_passed_mobs.len
+				if(FromSkill && FromSkill.RushTally && FromSkill.rush_passed_mobs)
+					FromSkill.rush_passed_mobs |= m
+				if(FromSkill && FromSkill.SequenceStrokes > 1)
+					FinalDmg /= FromSkill.SequenceStrokes
 				if(Primordial)
 					var/additonal = Primordial
 					// Dark Shadowbringer mage passive: the Primordial floor doubles from
@@ -6711,6 +7014,13 @@ obj
 						additonal = max(additonal, 2)
 					var/missingHealth = 100-m.Health
 					FinalDmg *= 1 + (((additonal*glob.PRIMORDIAL_EFFECTIVENESS) * missingHealth)/100)
+				if(Owner && ismob(m) && src.FromSkill)
+					m.NoteSkillHit(Owner, src.FromSkill:type)
+					if(src.FromSkill:PhantomMark)
+						m.phantom_mark_by = Owner
+						m.phantom_mark_until = world.time + 40
+						m.phantom_mark_damage = src.FromSkill:PhantomMark
+						applyPhantomMarkFX(m, 40)
 				if(ApplySlow)
 					m.AddSlow(ApplySlow, Owner)
 				if(NerveOverload)
@@ -6738,6 +7048,18 @@ obj
 				if(grabNerf)
 					FinalDmg *= glob.AUTOHIT_GRAB_NERF
 					DEBUGMSG("after grabNerf: [FinalDmg]")
+				if(FromSkill && FromSkill.FinaleDouble && FromSkill.finale_rounds > 1)
+					if(!finale_tallied)
+						finale_tallied = 1
+						FromSkill.strokes_landed++
+					if(FromSkill.strokes_landed >= FromSkill.finale_rounds)
+						FinalDmg *= 2
+				if(FromSkill && FromSkill.KillCounter)
+					if(world.time - FromSkill.kill_stamp > 900)
+						FromSkill.kill_stacks = 0
+					if(FromSkill.kill_stacks < 4)
+						FromSkill.kill_stacks++
+					FromSkill.kill_stamp = world.time
 //TODO: Remove a whole lot of those
 				if(src.Bang)
 					Bang(m.loc, src.Bang, PX=(PmActive() ? m.step_x : 0), PY=(PmActive() ? m.step_y : 0), color_override = FxAutoHitTint(src.FromSkill))
@@ -6798,7 +7120,7 @@ obj
 					if(src.MortalBlow<0)
 						m.MortallyWounded+=4
 					else
-						if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !m.MortallyWounded)
+						if((prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) || (FromSkill && FromSkill.ExecuteMortal && m.Health < FromSkill.ExecuteMortal)) && !m.MortallyWounded)
 							var/mortalDmg = m.Health * 0.05 // 5% of current
 							m.LoseHealth(mortalDmg)
 							m.WoundSelf(mortalDmg)
@@ -6936,6 +7258,8 @@ obj
 					S.critBonus = FromSkill.CritChanceBonus
 					S.dmgTypes = specDmgTypes
 					damageDealt = S.resolve()
+					if(damageDealt > 0 && FromSkill && FromSkill.WoundRider && Owner && ismob(m))
+						Owner.DealWounds(m, damageDealt * FromSkill.WoundRider)
 					m.ccCountHit(1)
 					if(src.Combustion && m)
 						var/combThresh = src.Owner.passive_handler["Combustion"]
@@ -7118,7 +7442,7 @@ obj
 							for(var/Rounds=1, Rounds<=src.DistanceMax, Rounds++)
 								if(src.StepsDamage&&Rounds>1)
 									src.Damage+=src.StepsDamage//add growing damage
-								if(src.DistanceMax>=3)//Greater than 3 distance, use circle
+								if(src.DistanceMax>=3 && !(FromSkill && FromSkill.SquareArea))//Greater than 3 distance, use circle
 									for(var/turf/t in Turf_Circle(src.TargetLoc, Rounds))
 										if(src.Divide)
 											Destroy(t, 9001)
@@ -7160,27 +7484,27 @@ obj
 								else//Less than 3 distance, use square.
 									if(src.TurfErupt)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
 									if(src.TurfIce)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											Bang(t, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, icon_override='SnowBurst2.dmi')
 									if(src.TurfFog)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											Bang(t, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, icon_override='FogBreath.dmi')
 									if(src.TurfDirt)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											Dust(t)
 									if(src.TurfStrike)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											spawn()
 												for(var/s=src.TurfStrike, s>0, s--)
@@ -7189,12 +7513,12 @@ obj
 														sleep(1)
 									if(src.Divide)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))//Don't doublehit people
+											if(t in view(Rounds-1, src.TargetLoc))//Don't doublehit people
 												continue
 											Destroy(t, 9001)
 									if(src.TurfReplace)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											var/image/i=image(icon=src.TurfReplace)
 											t.overlays+=i
@@ -7206,12 +7530,12 @@ obj
 												ticking_turfs+=t
 									if(src.TurfShift)
 										for(var/turf/t in view(Rounds, src.TargetLoc))
-											if(t in view(Rounds, src.TargetLoc))
+											if(t in view(Rounds-1, src.TargetLoc))
 												continue
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 									if(UsesPixelCollision)
-										AH_ZoneDamage(src.TargetLoc, Rounds, annulus=TRUE)
+										AH_ZoneDamage(src.TargetLoc, Rounds, annulus=TRUE, los=!(FromSkill && FromSkill.SquareArea), square=(FromSkill && FromSkill.SquareArea))
 									else
 										for(var/mob/m in view(Rounds, src.TargetLoc))
 											if(m in view(Rounds-1, src.TargetLoc))//Don't doublehit people
@@ -7222,7 +7546,7 @@ obj
 								sleep(src.Slow*world.tick_lag)
 							src.Owner.Frozen=0
 						else
-							if(src.DistanceMax>=3)//If greater than 3 distance...
+							if(src.DistanceMax>=3 && !(FromSkill && FromSkill.SquareArea))//If greater than 3 distance...
 								if(src.TurfErupt)
 									for(var/turf/t in Turf_Circle_Edge(src.TargetLoc, src.Distance))
 										sleep(-1)
@@ -7279,29 +7603,29 @@ obj
 											src.Damage(m)
 							else//If less than 3 distance...
 								if(src.TurfErupt)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
 								if(src.TurfIce)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										Bang(t, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, icon_override='SnowBurst2.dmi')
 								if(src.TurfFog)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										Bang(t, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, icon_override='FogBreath.dmi')
 								if(src.TurfDirt)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										Dust(t)
 								if(src.TurfStrike)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										spawn()
 											for(var/s=src.TurfStrike, s>0, s--)
 												if(Owner)
 													src.Owner.HitEffect(t, src.UnarmedTech, src.SwordTech)
 													sleep(1)
 								if(src.Divide)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										Destroy(t, 9001)
 								if(src.TurfReplace)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										var/image/i=image(icon=src.TurfReplace)
 										t.overlays+=i
 										if(src.Deluge)
@@ -7311,11 +7635,11 @@ obj
 											t.ownerOfEffect=Owner
 											ticking_turfs+=t
 								if(src.TurfShift)
-									for(var/turf/t in view(src.Distance, src.TargetLoc))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.TargetLoc) : view(src.Distance, src.TargetLoc)))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 								if(UsesPixelCollision)
-									AH_ZoneDamage(src.TargetLoc, src.Distance)
+									AH_ZoneDamage(src.TargetLoc, src.Distance, los=!(FromSkill && FromSkill.SquareArea), square=(FromSkill && FromSkill.SquareArea))
 								else
 									for(var/mob/m in view(src.Distance, src.TargetLoc))
 										if(!hitSelf && src.Owner == m) continue
@@ -7329,7 +7653,7 @@ obj
 							for(var/Rounds=1, Rounds<=src.DistanceMax, Rounds++)
 								if(src.StepsDamage&&Rounds>1)
 									src.Damage+=src.StepsDamage//add growing damage
-								if(src.DistanceMax>=3)//Greater than 3 distance, use circle
+								if(src.DistanceMax>=3 && !(FromSkill && FromSkill.SquareArea))//Greater than 3 distance, use circle
 									for(var/turf/t in Turf_Circle(src.Owner, Rounds))
 										if(src.Divide)
 											Destroy(t, 9001)
@@ -7370,27 +7694,27 @@ obj
 								else//Less than 3 distance, use square.
 									if(src.TurfErupt)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
 									if(src.TurfIce)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											Bang(t, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, icon_override='SnowBurst2.dmi')
 									if(src.TurfFog)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											Bang(t, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, icon_override='FogBreath.dmi')
 									if(src.TurfDirt)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											Dust(t)
 									if(src.TurfStrike)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											spawn()
 												for(var/s=src.TurfStrike, s>0, s--)
@@ -7399,12 +7723,12 @@ obj
 														sleep(1)
 									if(src.Divide)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))//Don't doublehit people
+											if(t in view(Rounds-1, src.Owner))//Don't doublehit people
 												continue
 											Destroy(t, 9001)
 									if(src.TurfReplace)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											var/image/i=image(icon=src.TurfReplace)
 											t.overlays+=i
@@ -7416,12 +7740,12 @@ obj
 												ticking_turfs+=t
 									if(src.TurfShift)
 										for(var/turf/t in view(Rounds, src.Owner))
-											if(t in view(Rounds, src.Owner))
+											if(t in view(Rounds-1, src.Owner))
 												continue
 											sleep(-1)
 											TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 									if(UsesPixelCollision)
-										AH_ZoneDamage(src.Owner, Rounds, annulus=TRUE)
+										AH_ZoneDamage(src.Owner, Rounds, annulus=TRUE, los=!(FromSkill && FromSkill.SquareArea), square=(FromSkill && FromSkill.SquareArea))
 									else
 										for(var/mob/m in view(Rounds, src.Owner))
 											if(m in view(Rounds-1, src.Owner))//Don't doublehit people
@@ -7432,7 +7756,7 @@ obj
 								sleep(src.Slow*world.tick_lag)
 							src.Owner.Frozen=0
 						else
-							if(src.DistanceMax>=3)//If greater than 3 distance...
+							if(src.DistanceMax>=3 && !(FromSkill && FromSkill.SquareArea))//If greater than 3 distance...
 								if(src.TurfErupt)
 									for(var/turf/t in Turf_Circle_Edge(src.Owner, src.Distance))
 										sleep(-1)
@@ -7486,29 +7810,29 @@ obj
 											src.Damage(m)
 							else//If less than 3 distance...
 								if(src.TurfErupt)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										Bang(t, Size=src.TurfErupt, Offset=src.TurfEruptOffset, Vanish=4)
 								if(src.TurfIce)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										Bang(t, Size=src.TurfIce, Offset=src.TurfIceOffset, Vanish=4, icon_override='SnowBurst2.dmi')
 								if(src.TurfFog)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										Bang(t, Size=src.TurfFog, Offset=src.TurfFogOffset, Vanish=5, icon_override='FogBreath.dmi')
 								if(src.TurfDirt)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										Dust(t)
 								if(src.TurfStrike)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										spawn()
 											for(var/s=src.TurfStrike, s>0, s--)
 												if(Owner)
 													src.Owner.HitEffect(t, src.UnarmedTech, src.SwordTech)
 													sleep(1)
 								if(src.Divide)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										Destroy(t, 9001)
 								if(src.TurfReplace)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										var/image/i=image(icon=src.TurfReplace)
 										t.overlays+=i
 										if(src.Deluge)
@@ -7518,11 +7842,11 @@ obj
 											t.ownerOfEffect=Owner
 											ticking_turfs+=t
 								if(src.TurfShift)
-									for(var/turf/t in view(src.Distance, src.Owner))
+									for(var/turf/t in ((FromSkill && FromSkill.SquareArea) ? range(src.Distance, src.Owner) : view(src.Distance, src.Owner)))
 										sleep(-1)
 										TurfShift(src.TurfShift,t, src.TurfShiftDuration,src.Owner, src.TurfShiftLayer, src.TurfShiftDurationSpawn, src.TurfShiftDurationDespawn, TurfShiftState,TurfShiftX, TurfShiftY)
 								if(UsesPixelCollision)
-									AH_ZoneDamage(src.Owner, src.Distance)
+									AH_ZoneDamage(src.Owner, src.Distance, los=!(FromSkill && FromSkill.SquareArea), square=(FromSkill && FromSkill.SquareArea))
 								else
 									for(var/mob/m in view(src.Distance, src.Owner))
 										if(!hitSelf&&src.Owner==m) continue
@@ -7639,6 +7963,7 @@ obj
 				src.Distance=src.DistanceMax
 
 				src.Damage=AH.Damage
+				src.FromSkill=AH.FromSkill
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
 				src.SpellElement=AH.SpellElement
@@ -7714,6 +8039,7 @@ obj
 				src.Distance=src.DistanceMax
 
 				src.Damage= AH.Damage / glob.AUTOHIT_WAVE_OFFSHOOT_DAMAGE_DIVISOR
+				src.FromSkill=AH.FromSkill
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
 				src.SpellElement=AH.SpellElement
@@ -7788,6 +8114,7 @@ obj
 				src.Distance=src.DistanceMax
 
 				src.Damage=AH.Damage
+				src.FromSkill=AH.FromSkill
 				src.StepsDamage=AH.StepsDamage
 				src.StrDmg=AH.StrDmg
 				src.ForDmg=AH.ForDmg
@@ -7855,11 +8182,12 @@ obj
 	Area = "Target"
 	NeedsSword=1
 	Distance = 8
-	DamageMult = 5
+	DamageMult = 7.75
 	StrScaling = 1
 	EndEffectiveness = 1
 	Copyable=6
-	Cooldown = 75
+	Cooldown = 30
+	EnergyCost = 8
 	ComboMaster = 1
 	GuardBreak = 1
 	NoLock = 1
@@ -7877,7 +8205,7 @@ obj
 	var/tmp/mob/chain_user = null
 	var/tmp/mob/chain_target = null
 	var/tmp/initial_charge_period = 3
-	var/tmp/saved_cooldown = 75
+	var/tmp/saved_cooldown = 30
 	var/tmp/reengage_deadline = 0
 	var/tmp/window_loop_running = FALSE
 	var/tmp/overlay_loop_running = FALSE
@@ -7894,7 +8222,7 @@ obj
 		chain_user = user
 		chain_target = target
 		chain_count = 0
-		DamageMult = 10
+		DamageMult = 7.75
 		ChargePeriod = initial_charge_period
 		SweetSpotWindow = 0.3
 		SweetSpot = RollSweetSpot()
@@ -7915,7 +8243,7 @@ obj
 		chain_user = null
 		chain_target = null
 		chain_count = 0
-		DamageMult = 10
+		DamageMult = initial(DamageMult)
 		ChargePeriod = initial_charge_period
 		SweetSpotWindow = 0.3
 		SweetSpot = initial_charge_period / 2
@@ -7980,10 +8308,10 @@ obj
 			EndChain()
 			return
 		chain_count++
-		DamageMult = 10 * (1.2 ** (chain_count - 1))
+		DamageMult = 7.75 * min(1.2 ** (chain_count - 1), 2.5)
 		p.Target = chain_target
 		p.Activate(src, ignoreCuck=TRUE, ignoreAttackLock=TRUE, noGCD=TRUE)
-		p.judgement_cut_bonus_value = 1.2 ** (chain_count - 1)
+		p.judgement_cut_bonus_value = min(1.2 ** (chain_count - 1), 2.5)
 		p.judgement_cut_bonus_chain_count = chain_count
 		p.judgement_cut_bonus_end_time = world.time + 30
 		ChargePeriod = max(0.6, initial_charge_period - (chain_count * 0.3))
@@ -8078,7 +8406,7 @@ obj
 	var/ForScaling = 0
 	var/EndScaling = 0
 	var/EndEffectiveness = 1
-	var/CritEffectiveness = 1
+	var/CritEffectiveness = 0
 	var/BlockEffectiveness = 1
 	var/CritChanceBonus = 0
 	var/SpdScaling = 0

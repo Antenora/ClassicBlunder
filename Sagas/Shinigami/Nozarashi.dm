@@ -45,7 +45,7 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 /obj/Skills/Queue/Two_Hands
 	name = "Two Hands"
 	HitMessage = "swings with both hands!"
-	DamageMult = 15
+	DamageMult = 7.25
 	AccuracyMult = 1.175
 	Duration = 15
 	KBMult = 20
@@ -54,8 +54,8 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 	PushOutWaves = 2
 	Finisher = 1
 	Quaking = 5
-	Cooldown = 60
-	EnergyCost = 4
+	Cooldown = 15
+	EnergyCost = 3
 	Determinator = 1
 	Delayer = 0.15
 

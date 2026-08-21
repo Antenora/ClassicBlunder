@@ -160,18 +160,20 @@
     Duration=10;
 
     Shin_Strike
-        Cooldown=30;
+        Cooldown=8;
+        EnergyCost=2;
         ActiveMessage="channels Shin into their next strike...";
         HitMessage="delivers a blow radiating with power!";
         adjust(mob/p)
             ManaGain=clamp(p.ShinSecretLevel()*5, 10, 30) // Tier 1/2= 10 tier 3 = 15, Tier 4 = 20 Tier 5 = 25 tier 6 = 30
     Mang_Strike
-        Cooldown=40;
+        Cooldown=9;
+        EnergyCost=2;
         ActiveMessage="concentrates their Mang...";
         KBAdd = 25
         KBMult = 5
         adjust(mob/p)
-            DamageMult=clamp(p.GetMangLevel() * 2, 3, 10);
+            DamageMult=clamp(p.GetMangLevel() * 0.9, 1.35, 4.5);
             HitMessage="strikes with the power of [p.GetMangLevel()] Mang Ring\s!!";
 
 
@@ -183,7 +185,7 @@
     Divergent_Fist
         ActiveMessage="'s own energy lags behind...!"
         HitMessage="'s impact is doubled up from their energy lagging behind!"
-        DamageMult=2
+        DamageMult=6.25
         HitSparkIcon='CE Hitspark.dmi'
         HitSparkTurns=1
         HitSparkSize=1
@@ -194,7 +196,7 @@
         TextColor = "#DC143C";
         ActiveMessage="'s fists sparks black...!"
         HitMessage="lands a <b>BLACK FLASH!!</b>"
-        DamageMult = (2 ** 2.5)
+        DamageMult = 5.25
         AccuracyMult = 10
         KBAdd = 10
         Duration=4
@@ -223,11 +225,12 @@
 //SPIRAL
 /obj/Skills/Queue/Secret_Heavy_Strike/
     Spiral_Drill
-        DamageMult=2
+        DamageMult=2.4
         AccuracyMult=3
         KBMult=0.1
         Shattering=30
-        Cooldown=15
+        Cooldown=5
+        EnergyCost=1
         HitSparkIcon='Spiral_Hitspark.dmi'
         HitSparkX=-32
         HitSparkY=-32

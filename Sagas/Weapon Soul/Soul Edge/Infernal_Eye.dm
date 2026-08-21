@@ -2,7 +2,7 @@ obj/Skills/AutoHit/Gaze_of_Despair
 	NeedsSword=1
 	Distance=8
 	Gravity=5
-	DamageMult=7
+	DamageMult=1.45
 	DelayTime=5
 	StrScaling=1
 	Rounds = 5
@@ -26,8 +26,8 @@ obj/Skills/AutoHit/Gaze_of_Despair
 	TurfShiftDurationSpawn=0
 	TurfShiftDurationDespawn=5
 	TurfShift='Gravity.dmi'
-	Cooldown=90
-	EnergyCost=15
+	Cooldown=25
+	EnergyCost=5
 	Instinct=1
 	verb/Gaze_of_Despair()
 		set category="Skills"

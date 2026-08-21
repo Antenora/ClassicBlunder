@@ -1641,6 +1641,7 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 			W=ComboLandingClear(M, direction)
 			if(!W)
 				continue //blocked tile; try another dir, don't abort the whole teleport
+			src.last_combo_warp_dist = get_dist(src, M)
 			src.loc=W
 			if(PmActive())//land on the target's sprite, not its tile origin
 				src.step_x=M.step_x
@@ -1765,10 +1766,14 @@ mob
 				if(src.Knockbacked && src.Knockback >= glob.SPLAT_MIN_REMAINING * world.tick_lag && src.splat_stagger_until < world.time)
 					var/remTiles = src.Knockback / world.tick_lag
 					ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)
+					var/splat_mult = 1
+					if(src.splat_bonus_until > world.time && src.splat_bonus)
+						splat_mult = 1 + src.splat_bonus
+						src.splat_bonus_until = 0
 					var/mob/sender = src.kb_sender
 					spawn()
 						if(sender && sender != src)
-							sender.DoDamage(src, remTiles * glob.SPLAT_DMG_PER_TILE)
+							sender.DoDamage(src, remTiles * glob.SPLAT_DMG_PER_TILE * splat_mult)
 							sender.FlourishArm()
 						src.Earthquake(4, -4,4,-4,4, 0, src.Knockbacked)
 						KenShockwave(src, Size = min(remTiles/5, 1.5), Time = 4)

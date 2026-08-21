@@ -46,7 +46,7 @@ obj/Skills
 		if(UsesSpd || UsesEnd || UsesDef || UsesOff) return null
 		return BaseStatDefault
 	var/EndEffectiveness=1 //DEFENDER'S End vs this skill. 1 = normal mitigation, 0 = pierces End entirely
-	var/CritEffectiveness=1 //multiplies crit chance vs this skill's hits. 0 = can't crit
+	var/CritEffectiveness=0 //multiplies crit chance vs this skill's hits. 0 = can't crit
 	var/BlockEffectiveness=1 //multiplies the defender's block chance. 0 = unblockable
 	var/CritChanceBonus=0 //flat crit-chance points on top of the Off curve
 	var/MultiTrail = 0
@@ -1054,7 +1054,33 @@ turf/Click(turf/T)
 
 	else if(usr.Move_Requirements()&&!usr.KO)
 
-		if(locate(/obj/Skills/Teleport/Instant_Transmission,usr.contents))
+		if(SlamWaveLeapArmed(usr))
+			var/obj/Skills/AutoHit/Slam_Wave/sw = SlamWaveLeapArmed(usr)
+			if(T) if(T.icon)
+				for(var/turf/A in view(0,usr))
+					if(A==src)
+						return
+				if(get_dist(usr, src) > 6 || usr.z != src.z)
+					usr << "<font color='red'>Too far to leap there.</font>"
+					return
+				if(!T.density&&usr.icon_state!="Meditate"&&!usr.Observing&&(usr.Beaming!=2))
+					if(usr.GCDBlocked(sw))
+						return
+					if(sw.EnergyCost && usr.Energy <= sw.EnergyCost)
+						return
+					sw.LeapArmed = 0
+					var/turf/leap_origin = get_step(usr, 0)
+					VanishImage(usr)
+					var/formerdir = usr.dir
+					usr.Move(src)
+					usr.dir = formerdir
+					if(!usr.Activate(sw) || !sw.Using)
+						usr.Move(leap_origin)
+						sw.LeapArmed = world.time + 50
+				else
+					usr << "<font color='red'>You can't leap there.</font>"
+
+		else if(locate(/obj/Skills/Teleport/Instant_Transmission,usr.contents))
 			if(T) if(T.icon)
 				for(var/turf/A in view(0,usr))
 					if(A==src)

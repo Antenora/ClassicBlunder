@@ -9,6 +9,8 @@ proc
 			return
 		if(m.StunImmune && !ignoreImmune)
 			return
+		if(m.cc_immune_until > world.time && !ignoreImmune)
+			return
 		if(m.passive_handler.Get("Trample") && m.is_dashing)
 			return
 		if(m.CheckSlotless("Great Ape"))

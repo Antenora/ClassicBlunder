@@ -24,6 +24,13 @@
 	                              // defaults to Z.name if null
 	var/InfiniteHold     = FALSE  // If TRUE, hold continues indefinitely
 	var/FireRate         = 0      // Smaller number = faster
+	var/HeldBeam         = FALSE
+	var/HeldBeamUncapped = FALSE
+	var/HeldVulnerability = 0
+
+globalTracker/var/BEAM_OVERCHARGE_DRAIN = 2
+globalTracker/var/HELD_BEAM_MOVE_PENALTY = 2
+globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 
 /obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 	// Override in individual skills to execute the charged attack.
@@ -182,6 +189,14 @@
 
 	if(held_skill) return  // Already charging something
 	if(!Z || !Z.HeldSkill) return
+	if(Z.HeldBeam && Beaming == 2)
+		UseProjectile(Z)
+		return
+	if(Z.HeldBeam && Beaming == 1 && !BeamChannelLive())
+		Beaming = 0
+		BeamCharging = 0
+	if(Z.HeldBeam && Beaming)
+		return
 	var/client/C = client
 	if(!C) return
 	if(!CanUseSkill(Z)) return
@@ -220,6 +235,7 @@
 	held_skill        = Z
 	held_charge_start = world.time
 	Z.ChargeBenefit   = 0
+	Z.sustain_pour_bank = 0
 
 	if(Z.ChargeOverlay && !held_charge_overlay_ref)
 		var/image/I = image(Z.ChargeOverlay)
@@ -510,6 +526,7 @@
 	held_skill = null
 	held_charge_start = 0
 	held_skill_macro_key = null
+	dir_locked = 0
 
 	if(held_charge_overlay_ref)
 		overlays -= held_charge_overlay_ref
@@ -538,11 +555,22 @@
 	while(held_skill == Z)
 		// Interrupt conditions
 		var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed/charm_skill = locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed) in src
-		if(Stunned || Suspended || Launched || Stasis > 0 || (charm_skill && BuffOn(charm_skill)))
+		if(Stunned || Suspended || Launched || Stasis > 0 || KO || Dead || (charm_skill && BuffOn(charm_skill)))
 			FizzleHeldSkill(Z)
 			return
 
-		if(Z.InfiniteHold)
+		if(Z.HeldBeam)
+			var/raw = HeldBeamBenefit(Z)
+			UpdateHeldChargeBar(min(raw, 1))
+			if(raw >= 1)
+				var/drain = glob.BEAM_OVERCHARGE_DRAIN * 0.2
+				if(src.Energy <= drain)
+					ReleaseHeldSkill()
+					return
+				src.LoseEnergy(drain)
+				if(Z.SustainPour && src.Energy > 20)
+					Z.sustain_pour_bank = min(Z.sustain_pour_bank + 0.2, Z.SustainPour)
+		else if(Z.InfiniteHold)
 			if(Z.FireRate > 0 && world.time - last_tick_fire >= Z.FireRate)
 				Z.OnHeldTick(src)
 				last_tick_fire = world.time
@@ -566,9 +594,23 @@
 
 // ReleaseHeldSkill is called by the Release_Held_Skill verb (KEY+UP macro)
 
+/mob/proc/HeldBeamBenefit(obj/Skills/Z)
+	if(!Z || !held_charge_start) return 0
+	return (world.time - held_charge_start) / max(Z.ChargePeriod * 10, 1) * max(GetBeamChargeSpeedMult(), 0.1)
+
 /mob/proc/ReleaseHeldSkill()
 	var/obj/Skills/Z = held_skill
 	if(!Z) return
+
+	if(Z.HeldBeam)
+		var/raw = HeldBeamBenefit(Z)
+		if(!Z.HeldBeamUncapped)
+			raw = min(raw, 1)
+		Z.ChargeBenefit = raw
+		ClearHeldChargeState()
+		held_skill_last_release = world.time
+		Z.OnHeldRelease(src, raw, FALSE)
+		return
 
 	if(Z.InfiniteHold)
 		Z.ChargeBenefit = 1

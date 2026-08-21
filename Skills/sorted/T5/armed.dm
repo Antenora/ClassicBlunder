@@ -5,7 +5,8 @@
 		NeedsSword=1
 		Area="Arc"
 		StrScaling=1
-		DamageMult=2.5
+		DamageMult=1.45
+		EnergyCost=8
 		ControlledRush=1
 		Rush=10
 		LifeSteal=50
@@ -15,7 +16,7 @@
 		ChargeTech=1
 		ChargeTime=1
 		Knockback=1
-		Cooldown=150
+		Cooldown=30
 		Size=1
 		Icon='reckless.dmi'
 		IconX=-16
@@ -27,7 +28,7 @@
 			usr.Activate(src)
 	Judgment_Cut_End
 		NeedsSword=1
-		DamageMult=16
+		DamageMult=8.5
 		Area="Around Target"
 		Distance=12
 		DistanceAround=12
@@ -57,7 +58,7 @@ obj/Skills/Queue
 		HitMessage="warps through time and space!"
 		name="Judgment Cut End"
 		NeedsSword=1
-		DamageMult=1
+		DamageMult=1.65
 		AccuracyMult = 1.175
 		Duration=15
 		KBMult=0.01
@@ -65,11 +66,11 @@ obj/Skills/Queue
 		Dunker=4
 		NoGCD=1
 		Warp=15
-		Stunner=5
+		Stunner=1
 		NeedsSword=1
-		EnergyCost=4
+		EnergyCost=8
 		FollowUp="/obj/Skills/AutoHit/Judgment_Cut_End"
-		Cooldown=75
+		Cooldown=30
 		verb/Judgment_Cut_End()
 			set category="Skills"
 			set name="Judgment Cut End"

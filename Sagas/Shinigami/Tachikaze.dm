@@ -1,10 +1,10 @@
 /obj/Skills/Projectile/Air_Blades
 	name = "Air Blades"
-	ManaCost = 5
+	ManaCost = 1
 	Cooldown = 5
 	StrScaling = 2
 	ForScaling = 0
-	DamageMult = 10
+	DamageMult = 1.05
 	AccMult = 1.2
 	Homing = 0
 	Instinct = 2
@@ -78,11 +78,11 @@
 /obj/Skills/Projectile/Bakudantsuki
 	name = "Bakudantsuki"
 	Distance = 20
-	DamageMult = 15
+	DamageMult = 2.05
 	AccMult = 1.15
 	Blasts = 1
-	ManaCost = 15
-	Cooldown = 30
+	ManaCost = 2
+	Cooldown = 8
 	Radius = 2
 	Charge = 2
 	Explode = 1
@@ -187,15 +187,15 @@
 
 /obj/Skills/Queue/Enhanced_Sandbag_Beat
 	name = "Enhanced Sandbag Beat"
-	DamageMult = 1.5
+	DamageMult = 0.3
 	AccuracyMult = 1.3
 	Warp = 5
 	Combo = 25
 	Rapid = 1
 	Instinct = 2
 	Duration = 10
-	Cooldown = 60
-	ManaCost = 20
+	Cooldown = 15
+	ManaCost = 3
 
 	verb/Enhanced_Sandbag_Beat()
 		set name = "Enhanced Sandbag Beat"

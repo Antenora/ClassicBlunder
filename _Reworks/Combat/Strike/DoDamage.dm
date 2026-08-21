@@ -61,6 +61,25 @@
 	log2text("Damage", val,"damageDebugs.txt", "[src.ckey]/[src.name]")
 	#endif
 	val *= glob.WorldDamageMult
+	if(defender.held_skill?.HeldVulnerability)
+		val *= 1 + defender.held_skill.HeldVulnerability
+	if(defender.rush_vuln_until > world.time)
+		val *= 1.25
+	if(src.nerve_weaken && world.time < src.nerve_weaken_until)
+		val *= max(1 - src.nerve_weaken, 0.5)
+		src.nerve_weaken = 0
+	if(defender.perfect_guard_until > world.time && defender.AttackQueue && defender.AttackQueue.PerfectGuard)
+		defender.perfect_guard_until = 0
+		var/obj/Skills/pgq = defender.AttackQueue
+		defender.ClearQueue()
+		var/pg_ng = pgq.NoGCD
+		var/pg_fs = defender.last_skill_fire_time
+		pgq.NoGCD = 1
+		pgq.Cooldown(1, null, defender)
+		pgq.NoGCD = pg_ng
+		defender.last_skill_fire_time = pg_fs
+		pgq.RefundCooldown(0.5)
+		return 0
 	if(val <= 0)
 		#if DEBUG_DAMAGE
 		log2text("Damage", "was negative", "damageDebugs.txt", "[src.ckey]/[src.name]")
@@ -310,6 +329,14 @@
 	// to themselves as Injury. Excludes Itokiribasami
 	if(val > 0 && src.TameraikizuActive && src.TameraikizuPartner == defender && !src.ItokiribasamiAttacking)
 		src.WoundSelf(val)
+	if(val > 0 && ismob(defender))
+		defender.last_damaged_time = world.time
+		if(defender != src)
+			defender.last_attacker = src
+		if(world.time - defender.pain_stamp > 50)
+			defender.pain_amount = 0
+		defender.pain_amount += val
+		defender.pain_stamp = world.time
 	return val
 
 

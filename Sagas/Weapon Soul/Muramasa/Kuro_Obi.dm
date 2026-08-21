@@ -3,15 +3,14 @@
 	Area="Arc"
 	Distance=7
 	StrScaling=1
-	DamageMult=1
+	DamageMult=1.15
 	RoundMovement=0
 	ComboMaster=1
 	Rounds=10
-	Cooldown=120
+	Cooldown=30
 	DarknessFlame = 1
 	Toxic = 20
 	Burning = 20
-	EnergyCost=2
 	Icon='MasterSlash.dmi'
 	IconX=-16
 	IconY=-16
@@ -23,11 +22,11 @@
 	HitSparkSize=1
 	HitSparkDispersion=1
 	TurfStrike=1
-	EnergyCost=1
+	EnergyCost=8
 	Instinct=1
 	ActiveMessage="strikes everything with an wave of inevitable, masterful death."
 	adjust(mob/p)
-		DamageMult = 4 + (p.SagaLevel/2)
+		DamageMult = (4 + (p.SagaLevel/2)) * 0.1769
 		Size = 1.5 + p.SagaLevel
 		Toxic = 20 * p.SagaLevel
 		Burning = 20 * p.SagaLevel

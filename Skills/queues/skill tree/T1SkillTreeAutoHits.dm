@@ -16,21 +16,21 @@ obj
 			HitSparkSize=3
 			TurfStrike=1
 			Slow=1
-			DamageMult=2.8
-			Cooldown=30
-			EnergyCost=3
+			DamageMult=2.1
+			Cooldown=5
+			EnergyCost=1
 			ActiveMessage="thrusts their blade forward, causing a powerful wave of pressure!"
 			adjust(mob/p)
 				if(p.isInnovative(HUMAN, "Sword") && !isInnovationDisable(p))
 					Area="Around Target"
 					Slow=3
 					Knockback=0
-					Rounds= 2 + round(p.Potential/25)
+					Rounds= 2
 					Size= 1 + round(p.Potential/50)
 					WindUp=0.5
 					Distance= 12
 					DistanceAround=4
-					DamageMult= 2 + p.Potential/100
+					DamageMult= (1.3 + p.Potential/100*(1.3/2.8)) * 0.8
 					Stunner=0
 					Shearing=0
 					HitSparkIcon='Hit Effect Pearl.dmi'
@@ -43,13 +43,13 @@ obj
 					Area="Around Target"
 					Slow=3
 					Knockback=0
-					Rounds= 2 + round(p.Potential/25)
+					Rounds= 2
 					Size= 1 + round(p.Potential/50)
 					WindUp=0.5
 					Distance= 12
 					DistanceAround=4
-					DamageMult= 2 + p.Potential/100
-					Stunner=1
+					DamageMult= (1.3 + p.Potential/100*(1.3/2.8)) * 0.8
+					Stunner=0.3
 					Shearing=round(p.Potential/25)
 					HitSparkIcon='Hit Effect Dark.dmi'
 					HitSparkX=-32
@@ -65,7 +65,7 @@ obj
 					Size = 0
 					WindUp=0
 					Distance = 6
-					DamageMult=2.8
+					DamageMult=2.1
 					Stunner=0
 					Shearing=0
 					HitSparkIcon='Hit Effect Pearl.dmi'
@@ -96,10 +96,10 @@ obj
 			StrScaling=1
 			NoPierce=1
 			Knockback=3
-			DamageMult=2.2
+			DamageMult=2.05
 			Rush=3
-			Cooldown=30
-			EnergyCost=2
+			Cooldown=5
+			EnergyCost=1
 			ActiveMessage="dashes forward with a jousting strike!"
 			verb/Stinger()
 				set category="Skills"
@@ -114,8 +114,8 @@ obj
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			StrScaling=1
-			DamageMult=1.5
-			EnergyCost=3
+			DamageMult=2.1
+			EnergyCost=1
 			Rounds = 1
 			HitSparkIcon='Slash.dmi'
 			HitSparkX=-32
@@ -131,7 +131,7 @@ obj
 			Shockwave = 1
 			Shockwaves = 1
 			SpeedStrike = 1
-			Cooldown=30
+			Cooldown=5
 			ActiveMessage="bursts forward with a lightning-fast slash!"
 			verb/Light_Step()
 				set category="Skills"
@@ -145,7 +145,9 @@ obj
 			Distance=2
 			StrScaling=1
 			EndEffectiveness=1
-			DamageMult=3.25
+			DamageMult=2.35
+			GuardBreak=1
+			WindUp=1
 			HitSparkIcon='Slash.dmi'
 			HitSparkX=-32
 			HitSparkY=-32
@@ -155,52 +157,28 @@ obj
 			TurfStrike=2
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=3
-			EnergyCost=3
-			Cooldown=30
+			EnergyCost=1
+			Cooldown=5
 			ActiveMessage="brings their weapon down with a powerful overhead swing!"
 			verb/Overhead_Divide()
 				set category="Skills"
 				usr.Activate(src)
 
 
-		Arc_Slash
-			SkillCost=40
-			Copyable=1
-			NeedsSword=1
-			Area="Arc"
-			StrScaling=1
-			DamageMult=2.2
-			Cooldown=30
-			EnergyCost=1
-			Icon='roundhouse.dmi'
-			IconX=-16
-			IconY=-16
-			HitSparkIcon='Slash.dmi'
-			HitSparkX=-32
-			HitSparkY=-32
-			HitSparkTurns=1
-			HitSparkSize=1.5
-			HitSparkDispersion=1
-			TurfStrike=1
-			TurfShift='Dirt1.dmi'
-			TurfShiftDuration=1
-			ActiveMessage="swings their blade in a wide arc!"
-			verb/Arc_Slash()
-				set category="Skills"
-				usr.Activate(src)
 		Vacuum_Render
 			SkillCost= TIER_1_COST
 			Copyable=2
 			NeedsSword=1
 			Area="Arc"
 			StrScaling=1
-			DamageMult=2
+			DamageMult=1.6
 			Shearing=12
 			FocusShifter=1
 			FocusShiftBoost=1.5
-			Cooldown=30
-			EnergyCost=3
+			Cooldown=5
+			EnergyCost=1
 			Distance=3
+			BlockEffectiveness=0.5
 			Size=2.5
 			Icon='roundhouse.dmi'
 			IconX=-16
@@ -214,7 +192,6 @@ obj
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=1
-			EnergyCost=1
 			ActiveMessage="unleashes a vacuum powered slash!"
 			verb/Vacuum_Render()
 				set category="Skills"
@@ -223,17 +200,18 @@ obj
 			SkillCost= TIER_1_COST
 			Copyable=2
 			NeedsSword=1
+			FinaleDouble=1
 			Area="Arc"
 			Distance=3
 			StrScaling=1
-			DamageMult=0.35
+			DamageMult=0.8
 			RoundMovement=0
 			FocusShifter=1
 			FocusShiftBoost=1.5
 			ComboMaster=1
-			Rounds=10
-			Cooldown=30
-			EnergyCost=2
+			Rounds=3
+			Cooldown=5
+			EnergyCost=1
 			Icon='Nest Slash.dmi'
 			IconX=-16
 			IconY=-16
@@ -245,7 +223,6 @@ obj
 			HitSparkSize=1
 			HitSparkDispersion=1
 			TurfStrike=1
-			EnergyCost=1
 			Instinct=1
 			ActiveMessage="flourishes their blade in a series of strokes!"
 			verb/Hack_n_Slash()
@@ -259,11 +236,11 @@ obj
 			Area="Arc"
 			Rush = 2
 			ControlledRush = 1
-			Launcher=2
 			StrScaling=1
-			DamageMult=2.8
+			DamageMult=1.8
 			Distance=1
 			Crippling=5
+			BonusVsSlowed=0.5
 			Icon='roundhouse.dmi'
 			IconX=-16
 			IconY=-16
@@ -276,8 +253,8 @@ obj
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=1
-			EnergyCost=3
-			Cooldown=30
+			EnergyCost=1
+			Cooldown=5
 			ActiveMessage="slashes for their opponent's legs to cripple them!"
 			verb/Hamstring()
 				set category="Skills"
@@ -291,8 +268,9 @@ obj
 			Distance=3
 			Rush=2
 			StrScaling=1
-			DamageMult=1.5
-			EnergyCost=3
+			DamageMult=2.3
+			Paralyzing=5
+			EnergyCost=1
 			HitSparkIcon='Slash - Zan.dmi'
 			HitSparkX=-16
 			HitSparkY=-16
@@ -302,7 +280,8 @@ obj
 			TurfStrike=1
 			TurfShift='Dirt1.dmi'
 			TurfShiftDuration=1
-			Cooldown=30
+			Cooldown=5
+			SequenceStrokes=3
 			ActiveMessage="swings their weapon in a quick pattern!"
 			verb/Disable_Innovate()
 				set category = "Other"
@@ -315,27 +294,30 @@ obj
 					var/pot = p.Potential
 					Distance = 4 + (round(pot/25))
 					Size = 2 + (round(pot/25))
-					DamageMult = 1 + (round(pot/100))
-					EnergyCost = 6 + (round(pot/25))
+					DamageMult = 1.4 + (round(pot/100))*(1.4/1.5)
+					EnergyCost = 2
 					Rush=0
 					HitSparkIcon='Slash - Zan.dmi'
 					HitSparkX=-16
 					HitSparkY=-16
 					FollowUp="/obj/Skills/AutoHit/Cross_Slash_Inno_Follow"
+					SequenceStrokes=1
 				else if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic))
 					Area="Wave"
 					PassThrough = 1
 					var/pot = p.Potential
 					Distance = 4 + (round(pot/25))
 					Size = 2 + (round(pot/25))
-					DamageMult = 1 + (round(pot/100))
-					EnergyCost = 6 + (round(pot/25))
+					DamageMult = 1.4 + (round(pot/100))*(1.4/1.5)
+					EnergyCost = 2
 					Rush=0
 					HitSparkIcon='Slash - Hellfire.dmi'
 					HitSparkX=-16
 					HitSparkY=-16
 					FollowUp="/obj/Skills/AutoHit/Cross_Slash_Demon_Follow"
+					SequenceStrokes=1
 				else
+					Area="Circle"
 					Distance = 3
 					PassThrough = 0
 					Size = 1
@@ -343,8 +325,8 @@ obj
 					StepsDamage = 0
 					Rush = 2
 					Rounds = 0
-					DamageMult = 1.5
-					EnergyCost = 3
+					DamageMult = 2.3
+					EnergyCost = 1
 					Launcher = 0
 					ControlledRush = 0
 					Rush = 1
@@ -352,6 +334,7 @@ obj
 					HitSparkX=-16
 					HitSparkY=-16
 					FollowUp=null
+					SequenceStrokes=3
 				if(p.isInnovative(CELESTIAL, "Any") && !isInnovationDisable(p) && p.isDemonMagicCasting(/obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption))
 					CorruptionDebuff = 1
 				else
@@ -386,11 +369,11 @@ obj
 			adjust(mob/p)
 				var/pot = p.Potential
 				Size = 1 + round(pot/25)
-				DamageMult = 0.5
+				DamageMult = 0.45
 				StepsDamage = 0.1 + round(pot/500)
 				Launcher = 2 + round(pot/25)
 				ComboMaster = 1
-				Rounds = 5
+				Rounds = 2
 
 		Cross_Slash_Demon_Follow
 			name = "Infernal Divide"

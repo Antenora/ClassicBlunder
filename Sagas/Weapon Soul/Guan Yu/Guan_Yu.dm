@@ -68,7 +68,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	ControlledRush = 1
 	MortalBlow=1
 	StrScaling=1
-	DamageMult=12
+	DamageMult=1.95
 	Distance=1
 	Shattering = 30
 	Crippling=20
@@ -86,8 +86,8 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	TurfStrike=1
 	TurfShift='Dirt1.dmi'
 	TurfShiftDuration=1
-	EnergyCost=5
-	Cooldown=30
+	EnergyCost=2
+	Cooldown=8
 	Instinct=1
 	Earthshaking=5
 	ActiveMessage="slams the Green Dragon Crescent Blade directly in front of them with immense might!"
@@ -96,4 +96,4 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 		set category="Skills"
 		usr.Activate(src)
 	adjust(mob/p)
-		DamageMult = 12 + p.SagaLevel
+		DamageMult = (12 + p.SagaLevel) * 0.1147

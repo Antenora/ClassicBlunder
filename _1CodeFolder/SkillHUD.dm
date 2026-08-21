@@ -42,6 +42,14 @@
 	if(!S.cooldown_start || !S.cooldown_start_wt) return S.cooldown_remaining
 	return max(0, S.cooldown_remaining - (world.time - S.cooldown_start_wt))
 
+/proc/SkillNextChargeETA(obj/Skills/S)
+	if(!S || !S.recharge_ends || !S.recharge_ends.len) return 0
+	var/best = 0
+	for(var/t in S.recharge_ends)
+		if(!best || t < best)
+			best = t
+	return max(0, best - world.time)
+
 /atom/movable/shud/slottext
 	mouse_opacity = 0
 	New()
@@ -60,6 +68,7 @@
 	var/atom/movable/shud/orbpart/cdfill
 	var/atom/movable/shud/slottext/keytext
 	var/atom/movable/shud/slottext/cdtext
+	var/atom/movable/shud/slottext/chargetext
 	var/glow_on = FALSE
 	var/glow_busy = FALSE     // a one-shot flash currently owns the glow filter
 	var/glow_seq = 0          // flash token so rapid flashes don't look bad
@@ -82,13 +91,20 @@
 		keytext.maptext_height = 12
 		keytext.maptext_y = 0
 		cdtext = new
-		cdtext.layer = SHUD_LAYER + 0.6       
+		cdtext.layer = SHUD_LAYER + 0.6
 		cdtext.maptext_width = 32
 		cdtext.maptext_height = 14
 		cdtext.maptext_y = 9
+		chargetext = new
+		chargetext.layer = SHUD_LAYER + 0.6
+		chargetext.maptext_width = 8
+		chargetext.maptext_height = 14
+		chargetext.maptext_x = SLOT_ICON_OFF + SLOT_ICON_SZ - 6
+		chargetext.maptext_y = SLOT_ICON_OFF
 		vis_contents += iconpart
 		vis_contents += cdfill
 		vis_contents += keytext
+		vis_contents += chargetext
 	Del()
 		for(var/atom/movable/o in vis_contents)
 			vis_contents -= o
@@ -97,6 +113,7 @@
 		cdfill = null
 		keytext = null
 		cdtext = null
+		chargetext = null
 		..()
 	proc/SetSkill(obj/Skills/S, keylabel)
 		cur = S
@@ -115,6 +132,7 @@
 		else
 			keytext.maptext = ""
 		cdtext.maptext = ""
+		SetChargeText()
 	// replacing the filter stops any running animate, used to freeze on RP-pause
 	proc/SetVeilFrac(frac)
 		cdfill.filters = filter(type="alpha", icon='HUD/cd_mask.png', y = CD_EMPTY_Y + round(CD_H * frac))
@@ -151,6 +169,15 @@
 			return
 		var/r = round(rem)
 		cdtext.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[(r - (r % 10)) / 10].[r % 10]</span></center>"
+	proc/SetChargeText()
+		if(!chargetext) return
+		if(!cur || cur.MaxCharges <= 0)
+			if(chargetext.maptext) chargetext.maptext = ""
+			return
+		var/n = max(cur.Charges, 0)
+		chargetext.maptext_width = 6 * length("[n]") + 2
+		chargetext.maptext_x = SLOT_ICON_OFF + SLOT_ICON_SZ - 6 * length("[n]")
+		chargetext.maptext = "<span style=\"[SHUD_FONT_STYLE]; color:[cur.Charges > 0 ? "#ffd76a" : "#ff5a5a"]\">[n]</span>"
 	proc/UpdateCooldown()
 		if(!cur)
 			SetCDText(0)
@@ -164,6 +191,25 @@
 			on_cd = locked
 			SetCDText(0)
 			return FALSE
+		if(cur.MaxCharges > 0)
+			SetChargeText()
+			var/eta = SkillNextChargeETA(cur)
+			if(cur.Charges <= 0)
+				on_cd = TRUE
+				iconpart.alpha = 120
+				cdfill.alpha = 255
+				var/total = cur.ChargeRefresh * 10
+				SetVeilFrac(total ? min(eta / total, 1) : 1)
+				SetCDText(eta)
+			else
+				if(on_cd)
+					iconpart.alpha = 255
+					cdfill.alpha = 0
+					SetVeilFrac(0)
+					on_cd = FALSE
+				SetCDText(0)
+			anim_key = 0
+			return on_cd
 		var/rem = SkillCDRemaining(cur)
 		if(!((cur.Using || cur.cooldown_remaining > 0) && rem > 0))
 			if(on_cd)
@@ -336,7 +382,15 @@ client/proc/InitSkillHUD()
 	RefreshHotbar()     // paint slots from the saved /shortcut datum
 	hotbar_ticker = new
 	hotbar_ticker.owner = src
-	if(global_loop) global_loop.Add(hotbar_ticker)
+	if(global_loop)
+		global_loop.Add(hotbar_ticker)
+	else
+		spawn()
+			var/obj/hotbar_ticker/t = hotbar_ticker
+			while(t && src && t == src.hotbar_ticker && !global_loop)
+				sleep(10)
+			if(t && src && t == src.hotbar_ticker && global_loop)
+				global_loop.Add(t)
 	// RefreshHotbar above already ran ApplyKeybinds to install the key binds
 
 client/proc/ClearSkillHUD()
