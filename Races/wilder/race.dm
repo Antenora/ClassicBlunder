@@ -3,58 +3,61 @@
 race
     wilder
         name = "Wilder"
-        desc = {"A loose collection of ex-humans, united only in that they were mutated from the remnants of the Lost Artifacts of the Rift.
+        desc = {"A loose collection of ex-humans, united only in that they were mutated from 
+exposure to a foreign energy system, madra.
+Sometimes called sacred artists... Other times, called furries or kemonomimi.
+Their ki inherently bears some properties of magic 
+and is elementally aligned according to their genealogy.
+Later on in development, a proficient wilder will develop an Iron Body, 
+then a Jade Cycling Technique, and finally an inhuman Goldsign.
 Difficulty: ★★★
-(Requires some managing of class and ascension choices, but is not mechanically intensive.)"}
+(Requires some managing of class and ascension choices,
+but is not mechanically rigorous.)"}
         visual = 'Wilder.png'
         classes = list("Mountainheart", "Silverscale", "Cloudhammer", "Brightcrown", "Blackflame");
-        class_info = list("Mountainheart info.", \
-"Silverscale info.", \
-"Cloudhammer info.", \
-"Brightcrown info.", \
-"Blackflame info.");
+        class_info = list("Mountainheart wilders have madra based upon Earth and Space. TKWIP", \
+"Silverscale wilders have madra based upon Water and Time. TKWIP", \
+"Cloudhammer wilders have madra based upon Wind, Earth and Water. TKWIP", \
+"Brightcrown wilders have madra based upon Wind and Light. TKWIP", \
+"Blackflame wilders have madra based upon Fire and Dark. TKWIP. changhuang is my wife and no one else can have her .");
         stats_per_class = list("Mountainheart" = list(1.5, 3, 1, 1.75, 1.75, 0.75), \
 "Silverscale" = list(0.75, 1, 3, 1.75, 1.5, 1.75), \
 "Cloudhammer" = list(1.75, 1.5, 0.75, 1.75, 1, 3), \
 "Brightcrown" = list(1.5, 1.75, 1.5, 1.75, 1.75, 1.5), \
 "Blackflame" = list(1.75, 1, 1.75, 3, 0.75, 1.5));
-        var/Racial = "" // first sub ascension choice
+        var/Racial = ""
         onFinalization(mob/user)
             user.EnhancedSmell=1
             user.EnhancedHearing=1
             Racial = user.Class
             GiveRacial();
-            ..()
+            ..(user)
 
         proc/GiveRacial()
             switch(Racial)
                 if("Mountainheart")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Racial/Wilder/The_Grit, 
-                    /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Heart_of_the_Half_Beast, 
-                    /obj/Skills/Queue/Racial/Wilder/Savagery);
-                    passives = list("Grit" = 1, "DoubleStrike" = 1, "Heavy Strike" = "Unseen Predator");
-                    //passives were kill: steady
+                    passives = list("ElementalTechnique" = list("Earth", "Space"),
+                    "ElementalMastery" = list("Earth", "Space"),
+                    "ElementalLock" = list("Wind", "Time"));
                 if("Silverscale")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Form, /obj/Skills/AutoHit/Mist_Form, 
-                    /obj/Skills/Utility/Imitate, /obj/Skills/Buffs/SlotlessBuffs/Racial/Blend_In, 
-                    /obj/Skills/Projectile/Racial/Fox_Fire_Barrage);
-                    passives = list("ManaGeneration" = 2, "Touch of Death" = 1, "Heavy Strike" = "Fox Fire");
+                    passives = list("ElementalTechnique" = list("Water", "Time"),
+                    "ElementalMastery" = list("Water", "Time"),
+                    "ElementalLock" = list("Fire", "Space"));
                 if("Cloudhammer")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Feather_Cowl,
-                    /obj/Skills/Buffs/SlotlessBuffs/Racial/Beastkin/Clean_Cuts);
-                    passives = list("Harden" = 1, "Pressure" = 1, "Bladefisting" = 1, "Extra Secret Knives" = "Feathers", "Tossing" = 1,
-                    "Momentum" = 1);
+                    passives = list("ElementalTechnique" = list("Wind", "Earth", "Water"),
+                    "ElementalMastery" = list("Wind", "Earth", "Water"));
+                    //No downsides for cloudhammers since they don't get an advanced element
                 if("Brightcrown")
-                    skills = list(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Never_Fall,
-                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Pheonix_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Dragon_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tiger_Form,
-                    /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Tortoise_Form);
-                    passives = list("Nimbus" = 1);
-                    //passives were kill: instinct
+                    passives = list("ElementalTechnique" = list("Wind", "Light"),
+                    "ElementalMastery" = list("Wind", "Light"),
+                    "ElementalLock" = list("Earth", "Dark"));
                 if("Blackflame")
-                    skills = list(/obj/Skills/AutoHit/Wilder/Blackflame_Breath, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Burning_Cloak);
-                    passives = list("Fury" = 1, "Wrathful Tenacity" = 0.15);
+                    passives = list("ElementalTechnique" = list("Fire", "Dark"),
+                    "ElementalMastery" = list("Fire", "Dark"),
+                    "ElementalLock" = list("Water", "Light"));
+            passives["SacredArts"] = 1;
+            passives["SacredBody"] = 1;
+                    
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Dragon_Rage
     NeedsHealth = 50

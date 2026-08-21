@@ -4,11 +4,20 @@
     for(var/passive in passive_handler.passives)
         if(passive_handler.passives[passive])
             if(passive in PassiveInfo)
-                html += "<b><a href=?src=\ref[src];action=GetInfo;passe=[passive]>[passive]</a> : [passive_handler.passives[passive]]</b><br>"
+                html += "<b><a href=?src=\ref[src];action=GetInfo;passe=[passive]>[passive]</a> : [OutputPassiveValue(passive)]</b><br>"
             else
-                html += "<b>[passive] : [passive_handler.passives[passive]]</b><br>"
+                html += "<b>[passive] : [OutputPassiveValue(passive)]</b><br>"
     html += "</body></html>"
     src<<browse(html,"window=[src]'s Passives;size=450x600")
+
+mob/proc/OutputPassiveValue(passive)//the only reason this exists is to output the value of passives that are lists
+    . = "";
+    if(IsList(passive_handler.passives["[passive]"]))
+        var/list/pilk = passive_handler.passives["[passive]"];
+        for(var/p in pilk)
+            . += "[p]"
+            if(p != pilk[pilk.len]) . += ", ";
+    else . = passive_handler.passives["[passive]"];
 
 mob/proc/OutputPassiveInfo(passive)
     var/info="<html><body bgcolor=#000000 text=#339999><br>"

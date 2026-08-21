@@ -377,7 +377,8 @@ race
 			user.EconomyMult = economy
 
 		onFinalization(mob/user)
-			user.passive_handler.increaseList(passives)
+			for(var/x in user.race.passives)
+				user.passive_handler.passives[x] = user.race.passives[x];
 			for(var/s in skills)
 				user.AddSkill(new s)
 
