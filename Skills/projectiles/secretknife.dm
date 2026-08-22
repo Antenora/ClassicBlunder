@@ -286,9 +286,11 @@
 		ZoneAttackX=8
 		ZoneAttackY=8
 		FireFromEnemy=0
+		Trail='Trail - Flare.dmi'
+		TrailSize=1
 		FireFromSelf=1
 		Hover=3
-		IconLock='UltimaLaser.dmi'
+		IconLock='ChaosSaberProjectile.dmi'
 		Explode=1
 		Variation=8
 		FlickBlast=0
