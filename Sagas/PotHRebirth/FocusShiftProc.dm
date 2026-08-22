@@ -11,19 +11,23 @@ obj/Effects/ShiftAuraEffect
 	pixel_y = -16
 	Lifetime = -1
 
-	New()
+	New(var/shift_type)
 		..()
+
+		if(shift_type == "STR")
+			color = "#FF0000"
+
 		filters += filter(
 			type = "drop_shadow",
 			x = 0,
 			y = 0,
 			size = 6,
 			offset = 0,
-			color = "#FFEE83"
+			color = shift_type == "STR" ? "#FF4040" : "#FFEE83"
 		)
 
 
-mob/proc/UpdateShiftAura()
+mob/proc/UpdateShiftAura(type)
 	if(!FocusShiftActive)
 		HideShiftAura()
 		return
@@ -37,7 +41,8 @@ mob/proc/UpdateShiftAura()
 				del B
 
 		if(!shiftAura)
-			shiftAura = new /obj/Effects/ShiftAuraEffect
+
+			shiftAura = new /obj/Effects/ShiftAuraEffect(type)
 			vis_contents += shiftAura
 
 mob/proc/HideShiftAura()
@@ -65,7 +70,7 @@ mob/proc/ActivateFocusShift(type, multiplier, timer, identity)
 	FocusShiftBoost = multiplier + (0 + bonusMult)
 	FocusShiftTimer = timer + (0 + bonusTime*2)
 	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType]. Boost: [FocusShiftBoost])"
-	UpdateShiftAura()
+	UpdateShiftAura(FocusShiftType)
 
 mob/proc/FocusShiftScaling(identity, statType, scale)
 	//active shift + matching skill identity = that stat's scaling is boosted, floored at 1.5. Zero scaling still gets the floor.
