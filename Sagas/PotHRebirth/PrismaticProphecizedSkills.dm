@@ -4,7 +4,7 @@
 		StyleActive = "Fight or Flight"
 		NeedsSword=0
 		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle", "MovingCharge" = 1, "FocusShiftRelease" = 2)
+		passives = list("HybridStyle" = "FreeStyle", "MagicSword" = 1, "MovingCharge" = 1, "FocusShiftRelease" = 2)
 		verb/Fight_or_Flight()
 			set hidden=1
 			src.Trigger(usr)
@@ -13,7 +13,7 @@
 		StyleActive = "Mountain King"
 		NeedsSword=0
 		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle", "MovingCharge" = 1, "DoubleStrike" = 1, "FocusShiftRelease" = 4)
+		passives = list("HybridStyle" = "FreeStyle", "MagicSword" = 1, "MovingCharge" = 1, "DoubleStrike" = 1, "FocusShiftRelease" = 4)
 		verb/Mountain_King()
 			set hidden=1
 			src.Trigger(usr)
@@ -23,7 +23,7 @@
 		NeedsSword=0
 		NeedsStaff=0
 		passives = list("HybridStyle" = "FreeStyle",    \
-		"DoubleStrike" = 2, "MovingCharge" = 1, "Deflection" = 2, "FocusShiftRelease" = 5)
+		"DoubleStrike" = 2, "MagicSword" = 1, "MovingCharge" = 1, "Deflection" = 2, "FocusShiftRelease" = 5)
 		verb/Dreamlike_Savior()
 			set hidden=1
 			src.Trigger(usr)
@@ -33,7 +33,7 @@
 		NeedsSword=0
 		NeedsStaff=0
 		passives = list("HybridStyle" = "FreeStyle",\
-		"DoubleStrike" = 2, "TripleStrike" = 0.5, "MovingCharge" = 1, "Deflection" = 2,  "PUSpike" = 50, "FocusShiftRelease" = 6)
+		"DoubleStrike" = 2, "MagicSword" = 1, "TripleStrike" = 0.5, "MovingCharge" = 1, "Deflection" = 2,  "PUSpike" = 50, "FocusShiftRelease" = 6)
 		verb/Afterlife()
 			set hidden=1
 			src.Trigger(usr)
@@ -42,11 +42,11 @@ obj
 	Skills/Buffs/SpecialBuffs
 		Hyperdeath_Mode
 			BuffName = "Hyperdeath Mode"
-			StrMult = 1.25
-			EndMult = 1.10
-			SpdMult = 1.15
-			ForMult = 1.25
-			RecovMult = 1.10
+			StrMult = 1.5
+			EndMult = 1.5
+			SpdMult = 1.5
+			ForMult = 1.5
+			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
 			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
@@ -61,11 +61,11 @@ obj
 			OffMessage = "returns to their normal self..."
 			adjust(mob/p)
 				var/pLv = p.SagaLevel
-				StrMult = 1.25 + (0.01 * pLv)
-				ForMult = 1.25 + (0.01 * pLv)
-				SpdMult = 1.15 + (0.01 * pLv)
-				EndMult = 1.10 + (0.01 * pLv)
-				RecovMult = 1.10 + (0.01 * pLv)
+				StrMult = 1.5 + (0.1 * pLv)
+				ForMult = 1.5 + (0.1 * pLv)
+				SpdMult = 1.5 + (0.1 * pLv)
+				EndMult = 1.5 + (0.1 * pLv)
+				RecovMult = 1.5 + (0.1 * pLv)
 				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
@@ -103,7 +103,8 @@ obj
 				ForMult = 1.15
 				PowerMult = 1.15
 				EnergyHeal=1
-				passives = list("SwordAscension" = p.SagaLevel, "PUSpike" = 25 + ((p.SagaLevel - 1) * 10), "KiControl" = 1, "DoubleStrike" = 0.5+ ((p.SagaLevel - 1) * 0.25), "CriticalBlock" = 0.05 + ((p.SagaLevel - 1) * 0.025), "ManaGeneration" = 1 + ((p.SagaLevel - 1) * 0.5))
+				passives = list("Parry" = 1+((1-p.SagaLevel) * 0.75), "AttackSpeed" = p.SagaLevel, "SwordAscension" = p.SagaLevel, "PUSpike" = 5 + ((p.SagaLevel - 1) * 10),\
+				 "KiControl" = 1, "DoubleStrike" = 0.5+ ((p.SagaLevel - 1) * 0.25), "CriticalBlock" = 0.05 + ((p.SagaLevel - 1) * 0.025), "ManaGeneration" = 1 + ((p.SagaLevel - 1) * 0.5))
 				if(p.SagaLevel>=3)
 					SwordAscension=p.SagaLevel
 					StrMult=1.50
@@ -123,6 +124,55 @@ obj
 					StrMult=1.65
 					ForMult=1.40
 					PowerMult=1.30
+			verb/Transfigure_Chaos_Saber()
+				set category="Utility"
+				var/Choice
+				if(!usr.BuffOn(src))
+					var/modify_sword_num = 1
+					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in usr) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in usr) || (locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in usr) && usr.SagaLevel >= 4)
+						var/list/options = list("Primary","Secondary")
+						switch(input("Which sword would you like to modify?") in options)
+							if("Secondary") modify_sword_num=2
+					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					if(Lock=="Yes")
+						switch(modify_sword_num)
+							if(1)
+								src.SwordIcon=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordX=input(usr, "Pixel X offset.", "Void Blade Icon") as num
+								src.SwordY=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
+							if(2)
+								src.SwordIconSecond=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordXSecond=input(usr, "Pixel X offset.", "Void Blade Icon") as num
+								src.SwordYSecond=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
+							if(3)
+								src.SwordIconThird=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordXThird=input(usr, "Pixel X offset.", "Void Blade Icon") as num
+								src.SwordYThird=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
+					Choice=input(usr, "What class of blade do you want your Void Blade to be?", "Transfigure Void Blade") in list("Blunt", "Saber", "Longsword", "Greatsword")
+					switch(Choice)
+						if("Blunt")
+							switch(modify_sword_num)
+								if(1) src.SwordClass="Wooden"
+								if(2) src.SwordClassSecond="Wooden"
+								if(3) src.SwordClassThird="Wooden"
+						if("Saber")
+							switch(modify_sword_num)
+								if(1) src.SwordClass="Light"
+								if(2) src.SwordClassSecond="Light"
+								if(3) src.SwordClassThird="Light"
+						if("Longsword")
+							switch(modify_sword_num)
+								if(1) src.SwordClass="Medium"
+								if(2) src.SwordClassSecond="Medium"
+								if(3) src.SwordClassThird="Medium"
+						if("Greatsword")
+							switch(modify_sword_num)
+								if(1) src.SwordClass="Heavy"
+								if(2) src.SwordClassSecond="Heavy"
+								if(3) src.SwordClassThird="Heavy"
+					usr << "Void Blade class set as [Choice]!"
+				else
+					usr << "You can't set this while using Chaos Blade."
 			verb/Chaos_Saber()
 				set category="Skills"
 				if(usr.CheckSlotless("Chaos Buster"))
@@ -146,11 +196,13 @@ obj
 				ForMult=1.35
 				PowerMult = 1.15
 				StaffAscension=2
-				passives = list("KiControl" = 1, "StaffAscension" = min(2 + (p.SagaLevel - 1), 6), "Chaos Buster" = min(1 + (p.SagaLevel - 2), 2), "Godspeed" = 1 + ((p.SagaLevel - 1) * 1), "Skimming" = 1 + ((p.SagaLevel - 1) * 1), "QuickCast" = 1 + ((p.SagaLevel - 1) * 0.5))
+				passives = list("KiControl" = 1, "StaffAscension" = min(2 + (p.SagaLevel - 1), 6), "Chaos Buster" = min(1 + (p.SagaLevel - 2), 2),\
+				 "Godspeed" = 1 + ((p.SagaLevel - 1) * 1), "Skimming" = 1 + ((p.SagaLevel - 1) * 1), "QuickCast" = 1 + ((p.SagaLevel - 1) * 0.5))
 				if(p.SagaLevel>=3)
 					StrMult=1.25
 					ForMult=1.50
 					PowerMult = 1.20
+					passives += list("DualCast" = 1)
 					StaffAscension=3
 				if(p.SagaLevel>=4)
 					StrMult=1.30
@@ -164,7 +216,7 @@ obj
 					StaffAscension=p.SagaLevel
 			verb/Transfigure_Chaos_Buster()
 				set category="Utility"
-				set hidden = 1
+				set hidden = 0
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")

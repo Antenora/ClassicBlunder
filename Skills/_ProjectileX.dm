@@ -4523,6 +4523,7 @@ obj
 					CritEffectiveness=0
 					DamageMult=0.0571
 					ChargeRate = 8
+					MenuIcon = "Kamehameha"
 					Dodgeable = 0
 					IconLock='BeamKHH.dmi'
 					Instinct=4
@@ -4535,6 +4536,7 @@ obj
 					DamageMult=0.3
 					ChargeRate=0.2
 					Dodgeable=0
+					MenuIcon = "Kamehameha"
 					IconLock='BeamKHH.dmi'
 					Cooldown=12
 					EnergyCost=3
