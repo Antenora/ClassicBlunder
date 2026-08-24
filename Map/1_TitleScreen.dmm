@@ -7,7 +7,7 @@
 "g" = (/turf/Special/Static,/area)
 "h" = (/obj/Login/Newz,/turf/Misc1,/area)
 "i" = (/obj/Login/Loadz,/turf/Misc1,/area)
-"j" = (/obj/Login/Screenz,/turf/Misc1,/area)
+"j" = (/obj/Login/Screenz{icon = 'CreationPics/FourthFateTitleScreen.dmi'; icon_state = "Screen2"},/turf/Misc1,/area)
 "k" = (/turf/Misc2,/area)
 "l" = (/turf/Roof3,/area)
 
