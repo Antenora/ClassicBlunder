@@ -6224,6 +6224,7 @@ NEW VARIABLES
 			Resilient_Sphere
 				ElementalClass="Earth"
 				SignatureTechnique=2
+				MenuIcon="ResilientSphere"
 				SignatureName="Advanced Shell Magic"
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/Resilient_SphereApply
 				CastingTime = 4
@@ -6296,6 +6297,7 @@ NEW VARIABLES
 			Protega
 				ElementalClass="Earth"
 				SignatureTechnique=2
+				MenuIcon="Protega"
 				SignatureName="Advanced Defense Magic"
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Protect")
 				CastingTime=3
@@ -6363,6 +6365,7 @@ NEW VARIABLES
 				SagaSignature=1
 				SignatureName="White Magic"
 				AffectTarget=1
+				MenuIcon="Esuna"
 				CastingTime=4
 				EndYourself=1
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/EsunaApply
@@ -6399,6 +6402,7 @@ NEW VARIABLES
 				SignatureName="Advanced White Magic"
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Esuna")
 				EndYourself=1
+				MenuIcon="Esunaga"
 				AffectTarget=1
 				CastingTime=8
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/EsunagaApply
@@ -6430,6 +6434,7 @@ NEW VARIABLES
 				AffectTarget=1
 				CastingTime=5
 				EndYourself = 1
+				MenuIcon="Cure"
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/CureApply
 				Range=7
 				KenWave=1
@@ -6461,6 +6466,7 @@ NEW VARIABLES
 				SignatureName="Advanced White Magic"
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Cure")
 				AffectTarget=1
+				MenuIcon="Curaga"
 				CastingTime=8
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/CuragaApply
 				Range=7
@@ -7914,6 +7920,7 @@ NEW VARIABLES
 			SignatureTechnique=1
 			MakesStaff=1
 			FlashDraw=1
+			MenuIcon="SpiritBow"
 			StaffName="Spirit Bow"
 			StaffIcon='Aether Bow.dmi'
 			ActiveMessage="draws spirit energy into their hand to form a bow!"
@@ -7959,6 +7966,7 @@ NEW VARIABLES
 			SwordIcon='Aether Blade.dmi'
 			SwordX=-32
 			SwordY=-32
+			MenuIcon="SpiritSword"
 			passives = list( "SwordAscension" = 3, "SwordAscensionSecond" = 3, "SwordAscensionThird" = 3)
 			SwordNameSecond="Spirit Sword"
 			SwordIconSecond='Aether Blade Alternate.dmi'

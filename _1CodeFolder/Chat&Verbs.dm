@@ -1088,10 +1088,11 @@ mob/Players/verb
 				var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted/s = usr.Target.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted)
 				if(!BuffOn(s))
 					if(usr.Target.TiltedLast == -1)
-						usr.Target.TiltedLast = 120
+						usr.Target.TiltedLast = 200
 						s.Trigger(usr.Target, TRUE)
 					else
 						src << "Can't taunt them again just yet!! (Cooldown: [usr.Target.TiltedLast/2] seconds.)"
+						usr.Target.AngerEvent(2)
 				else
 					src << "They're already tilted..."
 					usr.Target.AngerEvent(2)

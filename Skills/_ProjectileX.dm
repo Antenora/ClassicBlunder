@@ -1949,6 +1949,7 @@ obj
 				Explode=1
 				Homing=1
 				Knockback=1
+				MenuIcon="BusterBarrage"
 				Charge=1
 				Delay=0.85
 				IconLock='Blast - Rapid.dmi'
@@ -1969,6 +1970,7 @@ obj
 				DamageMult=1.9
 				AccMult = 1.15
 				Blasts=1
+				MenuIcon="Makosen"
 				EnergyCost=3
 				Cooldown=12
 				Radius=2
@@ -2012,6 +2014,7 @@ obj
 				Distance=15
 				DamageMult=0.3
 				Blasts=2
+				MenuIcon="JechtShot"
 				AccMult = 1.15
 				Homing=1
 				HomingDelay=2
@@ -2042,6 +2045,7 @@ obj
 				Deflectable=0
 				AccMult=0.75
 				FollowFacing=1
+				MenuIcon="DeathSaucer"
 				BackfireShot=1
 				Charge=2
 				IconChargeOverhead=1
@@ -2066,6 +2070,7 @@ obj
 				Dodgeable=0
 				Instinct=1
 				ArcShot=1
+				MenuIcon="BlasterShell"
 				MultiShot=3
 				EnergyCost=2
 				Knockback=1
@@ -2092,6 +2097,7 @@ obj
 				Dodgeable=0
 				Deflectable=0
 				AllOutAttack=1
+				MenuIcon="SpiritGun"
 				Charge=0.5
 				StrScaling=1
 				ForScaling=1
@@ -2119,6 +2125,7 @@ obj
 				ComboMaster=1
 				Radius=2
 				Dodgeable=0
+				MenuIcon="SpiritGunMega"
 				Deflectable=0
 				AllOutAttack=1
 				Charge=0.75
@@ -2146,6 +2153,7 @@ obj
 				Charge=1
 				Distance=50
 				DamageMult=2.75
+				MenuIcon="SekihaTenkyoken"
 				AccMult=30
 				MultiHit=9
 				Knockback=1
@@ -2184,6 +2192,7 @@ obj
 				AccMult=30
 				MultiHit=5
 				Knockback=1
+				MenuIcon="BigBangAttack"
 				ZoneAttack=1
 				ZoneAttackX=0
 				ZoneAttackY=0
@@ -2211,6 +2220,7 @@ obj
 				IconSize=0.3
 				IconLock='OmegaBlaster.dmi'
 				LockX=-33
+				MenuIcon="OmegaBlaster"
 				LockY=-33
 				Radius=1
 				ZoneAttack=1
@@ -2284,6 +2294,7 @@ obj
 				Dodgeable=-1
 				Static=1
 				Distance=1
+				MenuIcon="DeathBall"
 				Deflectable=1
 				Cooldown=60
 				Knockback=1
@@ -2320,6 +2331,7 @@ obj
 				PushBack=3
 				Cooldown=60
 				Knockback=1
+				MenuIcon="Supernova"
 				Homing=1
 				HyperHoming=1
 				EndEffectiveness=1
@@ -2621,6 +2633,7 @@ obj
 				StrScaling=1
 				ForScaling=0
 				Radius=1
+				MenuIcon="FlashFistCrush"
 				Distance=20
 				DamageMult=4.05
 				MultiHit=9
@@ -2651,6 +2664,7 @@ obj
 				DamageMult=1.65
 				Speed=0
 				Dodgeable=-1
+				MenuIcon="VoidDragonFist"
 				Deflectable=-1
 				Distance=10
 				Blasts=10
@@ -3612,6 +3626,7 @@ obj
 					DamageMult=0.45
 					Instinct=1
 					AccMult=2
+					MenuIcon="HellzoneGrenade"
 					Homing=3
 					Explode=1
 					Hover=10
@@ -4042,6 +4057,7 @@ obj
 						DamageMult=15
 						Piercing=1
 						Paralyzing=1
+						MenuIcon="LightningSpear"
 						Scorching=1
 						Radius=1
 						IconChargeOverhead=(1/32)
@@ -4067,6 +4083,7 @@ obj
 						Distance=50
 						DamageMult=4
 						MultiHit=5
+						MenuIcon="HellfireNova"
 						Instinct=2
 						Radius=1
 						Knockback=10
@@ -4555,6 +4572,7 @@ obj
 					SignatureTechnique=1
 					DamageMult=0.4
 					ChargeRate=0.2
+					MenuIcon="MotionlessKamehameha"
 					Dodgeable=0
 					IconLock='BeamKHH.dmi'
 					Cooldown=15
@@ -4581,6 +4599,7 @@ obj
 					IconLock='BeamGG.dmi'
 					Cooldown=15
 					EnergyCost=4
+					MenuIcon="GalicGun"
 					Instinct=1
 					BeamTime=10
 					HeldSkill=TRUE
@@ -4609,6 +4628,7 @@ obj
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
+					MenuIcon="FinalCrash"
 					BeamTime=10
 					HeldSkill=TRUE
 					HeldBeam=TRUE
@@ -4629,6 +4649,7 @@ obj
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
+					MenuIcon="Dodompa"
 					BeamTime=10
 					HeldSkill=TRUE
 					HeldBeam=TRUE
@@ -4648,6 +4669,7 @@ obj
 					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
+					MenuIcon="KillerShine"
 					IconLock='BeamDodon.dmi'
 					Cooldown=12
 					EnergyCost=3
@@ -4778,6 +4800,7 @@ obj
 						Cooldown=45
 						EnergyCost=10
 						BeamTime=10
+						MenuIcon="SuperDodompa"
 						HeldSkill=TRUE
 						HeldBeam=TRUE
 						ChargePeriod=3
@@ -4793,6 +4816,7 @@ obj
 						ForScaling = 1
 						SignatureTechnique=2
 						DamageMult=2
+						MenuIcon="SuperKamehameha"
 						ChargeRate=0.2
 						Distance=60
 						IconLock='BeamKHH.dmi'
@@ -4829,6 +4853,7 @@ obj
 						Distance=60
 						IconLock='BeamDodon.dmi'
 						IconSize=2
+						MenuIcon="FinalFlash"
 						EnergyCost=12
 						Cooldown=60
 						BeamTime=10

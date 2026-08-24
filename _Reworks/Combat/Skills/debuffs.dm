@@ -143,7 +143,7 @@
 	// -3 PureReduction, -3 PureDamage, -5 BuffMastery, all stats x0.9
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted
-	TimerLimit = 10
+	TimerLimit = 20
 	NeedsPassword = 0
 	AlwaysOn = 0
 	passives = list("PureReduction" = -2, "PureDamage" = 2)

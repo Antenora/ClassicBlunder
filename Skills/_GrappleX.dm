@@ -391,7 +391,7 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		DamageMult=4.05
-		MenuIcon="BurningFinger"
+		MenuIcon="EruptingBurningFinger"
 		StrScaling=1
 		ForScaling=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
@@ -412,6 +412,7 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		RootRider=2
+		MenuIcon="LightningStake"
 		DamageMult=3.7
 		ForScaling=1
 		StrScaling=0.5
