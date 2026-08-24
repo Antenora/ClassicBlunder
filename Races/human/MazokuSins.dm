@@ -57,7 +57,7 @@ mob
 	endurance = 1
 	transformation_message = "usrName becomes a Devil!"
 	mastery_boons(mob/user)
-		passives = list("GodKi" = 0.25+((user.AscensionsAcquired-3)/10), "HellRisen" = user.AscensionsAcquired/10,   "PureDamage" = user.AscensionsAcquired, "PureReduction" = user.AscensionsAcquired)
+		passives = list("GodKi" = 0.25+((user.AscensionsAcquired-3)/10), "HellRisen" = user.AscensionsAcquired/10)
 		strength = 1 // to clear out people who already have it
 		force = 1
 		speed = 1
@@ -80,8 +80,6 @@ mob
 	passives = list(\
 		"Conductor" = 10,\
 		"HighTension" = 1,\
-		"PureReduction" = 2,\
-		"PureDamage" = 2,\
 		"TensionPowered" = 0.25,\
 		"TechniqueMastery" = 1,\
 		\
@@ -137,8 +135,6 @@ mob
 	passives = list(\
 		"Conductor" = 10,\
 		"HighTension" = -0.125,\
-		"PureReduction" = 3,\
-		"PureDamage" = 3,\
 		"TensionPowered" = 0.25,\
 		"TechniqueMastery" = 3,\
 		\
@@ -235,8 +231,6 @@ mob
 		"TensionPowered" = 1.25,\
 		"TechniqueMastery" = 16,\
 		\
-		"PureReduction" = 11,\
-		"PureDamage" = 11,\
 		"UnderDog" = 2,\
 		"Tenacity" = 17,\
 		\

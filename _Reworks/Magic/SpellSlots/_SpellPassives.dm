@@ -158,7 +158,7 @@
             passives = list("Scorching" = 4);
             autohitOnlyPassives = list("StrScaling" = 0.5, "ForScaling" = 0.5, "DamageMult"=1.2);
             projectileOnlyPassives = list("StrScaling" = 0.5, "ForScaling"=0.5, "DamageMult"=1.2);
-            buffOnlyPassives = list("PureDamage"=2);
+            buffOnlyPassives = list();
         magma
             name="Magma";
             passives = list("MagmicInfusion" = 1, "Scorching" = 2);//magmic infusion is a variable that belongs to all skills and it triggers magmic shield when the skill goes on CD
@@ -222,7 +222,7 @@
         spellElement="Time"
         paradox//temporal echo
             name="Paradox"
-            passives = list("DamageMult" = 1.25, "PureDamage" = 2)
+            passives = list("DamageMult" = 1.25)
             autohitOnlyPassives = list("StrScaling" = 0.5, "ForScaling" = 0.5)
             projectileOnlyPassives = list("Explode" = 1)
         chargeflux

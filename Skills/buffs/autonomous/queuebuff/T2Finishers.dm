@@ -130,7 +130,7 @@
     Indomitable_Will
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("Duelist" = 2, "Half-Sword" = 1,  "LifeGeneration" = 1, \
+        passives = list("Half-Sword" = 1,  "LifeGeneration" = 1, \
                         "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1)
         StrMult=1.35
         EndMult=1.35
@@ -188,7 +188,7 @@
         SpdMult=1.5
         EndMult=0.5
         AngerMult=1.25
-        passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 0.5, \
+        passives = list("Flicker" = 2, "Pursuer" = 2, \
          "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5)
     Ruptured
         IconLock='Bleed.dmi'

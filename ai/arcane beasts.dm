@@ -264,7 +264,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 	Arcane_Empowerment
 		name = "Arcane Empowerment"
 		passives = list("PureReduction" = 1, "Juggernaut" = 1, "Harden" = 2)
-		PureReduction=1
 		Juggernaut=1
 
 		StrMult=1.2
@@ -279,7 +278,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 				if(usr.is_arcane_beast.Mastery>=3)
 					passives["PureReduction"] = 2
 					passives["HardStyle"] = 0.5
-					PureReduction=2
 					HardStyle=0.5
 				if(usr.is_arcane_beast.Mastery>=4)
 					ManaStats=1

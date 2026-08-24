@@ -11,7 +11,7 @@ transformation
 			form_glow_y = -32
 			//Automatically unlocked at 25, intended to be unlocked around 20
 			unlock_potential = 25
-			passives = list("Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = 1,  "SaiyanPower1"=0.4)
+			passives = list("Flicker" = 1, "Pursuer" = 2,  "SaiyanPower1"=0.4)
 			angerPoint = 75
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
@@ -56,7 +56,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
-					passives = list("Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 2, "PureReduction" = 2,  "SaiyanPower1"=0.5)
+					passives = list("Flicker" = 1, "Pursuer" = 2,  "SaiyanPower1"=0.5)
 					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
 							user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor)
@@ -84,7 +84,7 @@ transformation
 					strengthadd = 0.3
 					forceadd = 0.3
 				if(user.Class == "Pride")//user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
-					class_passives = list("PureDamage" = 1.5, "Flicker" = 2, "Pursuer" = 1)
+					class_passives = list("Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.3
 					enduranceadd = 0.3
 					offenseadd = 0.45
@@ -92,7 +92,7 @@ transformation
 					strengthadd = 0.4
 					forceadd = 0.4
 				if(user.Class == "Honor")//user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
-					class_passives = list("PureReduction" = 1.5, "EnergyGeneration" = 3)
+					class_passives = list("EnergyGeneration" = 3)
 					speedadd = 0.3
 					enduranceadd = 0.5
 					offenseadd = 0.3
@@ -100,7 +100,7 @@ transformation
 					strengthadd = 0.3
 					forceadd = 0.3
 				if(user.race.ascensions[1].choiceSelected == istype(choice, /ascension/sub_ascension/half_saiyan/adaptive))
-					class_passives = list("PureReduction" = 1, "KiControlMastery" = 1)
+					class_passives = list("KiControlMastery" = 1)
 					speedadd = 0.4
 					enduranceadd = 0.35
 					offenseadd = 0.4
@@ -108,7 +108,7 @@ transformation
 					strengthadd = 0.3
 					forceadd = 0.3
 				if(user.race.ascensions[1].choiceSelected == istype(choice, /ascension/sub_ascension/half_saiyan/dominating))
-					class_passives = list("PureDamage" = 1, "Flicker" = 2, "Pursuer" = 1)
+					class_passives = list("Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.3
 					enduranceadd = 0.3
 					offenseadd = 0.3
@@ -167,7 +167,7 @@ transformation
 			//Autounlocked at 55, intended to be unlocked around 35
 			unlock_potential = 55
 			angerFloor = 50
-			passives = list("Flicker" = 1, "Pursuer" = 2, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower2"=0.5)
+			passives = list("Flicker" = 1, "Pursuer" = 2, "SaiyanPower2"=0.5)
 			PUSpeedModifier = 1.5
 			speedadd = 0.35
 			enduranceadd = 0.35
@@ -185,7 +185,7 @@ transformation
 				if(user.Potential>=43&&mastery<100)
 					mastery=100
 				if(mastery >= 100)
-					passives = list("Flicker" = 1, "Pursuer" = 2, "PureDamage" = 3, "PureReduction" = 3, "SaiyanPower2"=0.5)
+					passives = list("Flicker" = 1, "Pursuer" = 2, "SaiyanPower2"=0.5)
 				if(user.Potential>=65&&user.transUnlocked<3)
 					if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN)&&user.Class=="Justice"&&(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/half_saiyan/dominating))
 						user.transUnlocked=3
@@ -249,7 +249,7 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
-			passives = list("Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower3"=0.5)
+			passives = list("Flicker" = 1, "Pursuer" = 1, "SaiyanPower3"=0.5)
 			//Autounlocked at 65, intended to be unlocked at 45
 			unlock_potential = 65
 			speedadd = 0.5 //these are additive. base is 1, so 0.3=1.3x
@@ -259,7 +259,7 @@ transformation
 			strengthadd = 0.5
 			forceadd = 0.5
 			mastery_boons(mob/user)
-				passives = list("Flicker" = 1, "Pursuer" = 1, "PureDamage" = 2, "PureReduction" = 2, "SaiyanPower3"=0.5)
+				passives = list("Flicker" = 1, "Pursuer" = 1, "SaiyanPower3"=0.5)
 				if(user.Potential>=52&&mastery<25)
 					mastery=25
 				if(user.Potential>=54&&mastery<50)
@@ -283,7 +283,7 @@ transformation
 					strengthadd = 0.5
 					forceadd = 0.5
 				if(user.Class == "Honor")
-					class_passives = list("PureDamage" = 3, "Flicker" = 2)
+					class_passives = list("Flicker" = 2)
 					speedadd = 0.5
 					enduranceadd = 0.5
 					offenseadd = 0.75
@@ -291,7 +291,7 @@ transformation
 					strengthadd = 0.65
 					forceadd = 0.65
 				if(user.Class == "Pride")
-					class_passives = list("PureReduction" = 3, "EnergyGeneration" = 3)
+					class_passives = list("EnergyGeneration" = 3)
 					speedadd = 0.5
 					enduranceadd = 0.75
 					offenseadd = 0.5
@@ -299,7 +299,7 @@ transformation
 					strengthadd = 0.5
 					forceadd = 0.5
 				if(user.race.ascensions[1].choiceSelected == istype(choice, /ascension/sub_ascension/half_saiyan/adaptive))
-					class_passives = list("PureReduction" = 1, "KiControlMastery" = 1)
+					class_passives = list("KiControlMastery" = 1)
 					speedadd = 0.5
 					enduranceadd = 0.5
 					offenseadd = 0.5
@@ -307,7 +307,7 @@ transformation
 					strengthadd = 0.5
 					forceadd = 0.5
 				if(user.race.ascensions[1].choiceSelected == istype(choice, /ascension/sub_ascension/half_saiyan/dominating))
-					class_passives = list("PureDamage" = 2, "Flicker" = 2, "Pursuer" = 1, "PureReduction" = 2)
+					class_passives = list("Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.5
 					enduranceadd = 0.5
 					offenseadd = 0.5
@@ -459,7 +459,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 5, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -521,7 +521,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -530,10 +530,10 @@ transformation
 
 			mastery_boons(mob/user)
 				passives = list("GiantForm" = 1, "Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
-				 "KiControlMastery" = 3 + (mastery/50), "PureReduction" = 5 + (mastery/10),\
+				 "KiControlMastery" = 3 + (mastery/50),\
 				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
 				"Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), \
-				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 4 + (mastery/10),"SSJ4" = 1,"SaiyanPower4"=2.5)
+				"Flicker" = 5, "Pursuer" = 5, "SSJ4" = 1,"SaiyanPower4"=2.5)
 				angerFloor = 90
 				angerPoint = 99 // funny fix for golden ooz stopping endless anger
 
@@ -617,7 +617,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -627,8 +627,8 @@ transformation
 
 			mastery_boons(mob/user)
 				passives = list( "SweepingStrike" = 1, \
-				"KiControlMastery" = 4, "PureReduction" = 3, "EnergyGeneration" = 5, \
-				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 3,"SSJ4LimitBreaker"=1, "SaiyanPower4"=0.5)
+				"KiControlMastery" = 4, "EnergyGeneration" = 5, \
+				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1, "SaiyanPower4"=0.5)
 
 			transform(mob/user)
 				. = ..()
@@ -695,7 +695,7 @@ transformation
 				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4,"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Pursuer"= 4 , \
 								 "Sunyata" = 1 + round(mastery/20 ,1),"CalmAnger"=1,\
-								"Flicker" = 4, "PureDamage"=2,   "SaiyanPower1"=1)
+								"Flicker" = 4,   "SaiyanPower1"=1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -806,7 +806,7 @@ transformation
 
 			mastery_boons(mob/user)
 				passives = list("GodKi" = 0.75,      \
-								"PureDamage" = 5, "PureReduction" = 4, "CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
+								"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
 				speedadd = 1.75
 				enduranceadd = 1.75
 				offenseadd = 1.75
@@ -815,7 +815,7 @@ transformation
 				forceadd = 1.75
 				if(mastery >= 100)
 					passives = list("GodKi" = 1,      \
-									"PureDamage" = 5, "PureReduction" = 4, "CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
+									"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
 
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -908,7 +908,7 @@ transformation
 				// perfected: sustainable version of the form, strict upgrade over blue
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
 					passives = list("GodKi" = 0.25,    \
-									"EnergyGeneration" = 3,  "PureDamage" = 3, "PureReduction" = 2, \
+									"EnergyGeneration" = 3, \
 									"StunningStrike" = 2, "Sunyata" = 3, "InBlueEvolved" = 1)
 					speedadd = 0.35
 					enduranceadd = 0.35
@@ -919,8 +919,7 @@ transformation
 				//evolved: high risk high reward. glass cannon stage that drains heavily
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
 					passives = list("GodKi" = 0.5,   "EnergyLeak" = 3, "FatigueLeak"=1,\
-							 	"PureDamage" = 9, "PureReduction" = -2, \
-								"Sunyata" = 6, "InBlueEvolved" = 1, "Pursuer" = 2)
+								"Sunyata" = 6, "InBlueEvolved" = 1, "Pursuer" = 2, "PureReduction" = -2)
 					speedadd = 0.5
 					offenseadd = 0.25
 					strengthadd = 0.65
@@ -928,7 +927,7 @@ transformation
 				//enraged: draw out fights, anger makes user stronger but wounds put a limit on it
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/honor)
 					passives = list("GodKi" = 0.25,   \
-							 	"PureDamage" = 2,"PureReduction" = 5, "BleedHit"=0.25, \
+							 	"BleedHit"=0.25, \
 								"Persistence" = 3, "InBlueEvolved" = 1, "UnderDog" = 5, "Flicker" = 3)
 					speedadd = 0.25
 					enduranceadd = 0.75

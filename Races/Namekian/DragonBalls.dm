@@ -104,22 +104,22 @@
 				if(M.AscensionsAcquired>=1)
 					M.StrAscension += 0.35
 					M.EndAscension += 0.35
-					var/passives1 = list("Duelist" = 0.5, "TechniqueMastery" = 0.25, "Tenacity" = 0.5)
+					var/passives1 = list("TechniqueMastery" = 0.25, "Tenacity" = 0.5)
 					M.passive_handler.increaseList(passives1)
 				if(M.AscensionsAcquired>=2)
 					M.StrAscension += 0.35
 					M.EndAscension += 0.35
-					var/passives2 = list("Duelist" = 1, "TechniqueMastery" = 0.5, "Tenacity" = 0.5)
+					var/passives2 = list("TechniqueMastery" = 0.5, "Tenacity" = 0.5)
 					M.passive_handler.increaseList(passives2)
 				if(M.AscensionsAcquired>=3)
 					M.StrAscension += 0.65
 					M.EndAscension += 0.65
 					M.OffAscension += 0.65
 					M.RecovAscension+= 0.65
-					var/passives3 = list ("Duelist" = 2, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+					var/passives3 = list ("Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
 					M.passive_handler.increaseList(passives3)
 				if(M.AscensionsAcquired>=4)
-					var/passives4 = list("Duelist" = 2.5, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+					var/passives4 = list("Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
 					M.passive_handler.increaseList(passives4)
 					M.StrAscension += 1
 					M.EndAscension += 0.35

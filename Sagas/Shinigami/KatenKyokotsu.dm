@@ -39,8 +39,7 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"Flicker"          = 1 + SL,
 			"Pursuer"          = 1 + SL,
-			"TechniqueMastery" = 1 + SL,
-			"Duelist"          = 1 + SL
+			"TechniqueMastery" = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
@@ -609,7 +608,6 @@ var/global/list/BG_CONTRAST_HIGH = list(
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"HardStyle"        = 3 + SL,
 			"DeathField"       = 3 + SL,
-			"Duelist"          = 1 + SL,
 			"ManaCapMult"      = 0.2 + (0.15 * SL),
 			
 			"Tragedy"          = 1

@@ -1182,8 +1182,6 @@ mob
 								if("Strong")
 									// passive_handler.Increase("Desperation")
 									passive_handler.Increase("WeaponBreaker")
-								if("Firm")
-									passive_handler.Increase("PureReduction",2)
 						if(5)
 							Adaptation += 0.5
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Minds_Eye)

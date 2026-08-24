@@ -72,9 +72,6 @@ obj/Skills
 	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
 	var/list/Learn=new
 
-	var/PureDamage=0
-	var/PureReduction=0
-
 	var/list/PreRequisite=list() //Used for skill tree shit.
 	var/list/LockOut=list() //Also used for skill tree shit.
 	var/Copyable //Used to avoid dealing with skill tree shit.

@@ -3,7 +3,7 @@
 		IconLock='SweatDrop.dmi'
 		IconApart=1
 		passives = list("Half-Sword" = 1,  "LifeGeneration" = 3, \
-		                "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1, "PureDamage"=4)
+		                "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1)
 		StrMult=1.5
 		EndMult=1.75
 		VaizardHealth=3
@@ -58,9 +58,9 @@
 		ForMult=1.5
 		EndMult=1.75
 		TimerLimit = 40
-		passives = list(    "PureReduction"=4, "TensionLock" = 1)
+		passives = list(    "TensionLock" = 1)
 	The_Ultimate_Fist
-		passives = list(  "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1, "PureReduction"=4)
+		passives = list(  "Harden" = 3, "Godspeed" = 2, "DoubleStrike" = 2, "TripleStrike" = 1, "TensionLock" = 1)
 		SpdMult=1.5
 		StrMult=1.5
 	Jackpot

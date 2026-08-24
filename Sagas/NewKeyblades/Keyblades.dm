@@ -606,7 +606,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Two Become One" = 1,  "ManaGeneration" = 2+(Boost/2))
 				return KeybladePassives
 			if("Blind Justice")
-				KeybladePassives=list("PULock" = 1, "PureDamage" = 3+(Boost/2), "PureReduction" = -3+(Boost/2))
+				KeybladePassives=list("PULock" = 1, "PureReduction" = min(0, -3+(Boost/2)))
 				return KeybladePassives
 //medium
 			if("Oblivion")
@@ -631,7 +631,7 @@ proc/
 				KeybladePassives=list("PULock" = 1)
 				return KeybladePassives
 			if("Ultima Weapon")
-				KeybladePassives=list("PULock" = 1, "PureDamage" = 10, "PureReduction" = 10, "GodKi" = 0.25)
+				KeybladePassives=list("PULock" = 1, "GodKi" = 0.25)
 				return KeybladePassives
 //heavy
 			if("Earthshaker")

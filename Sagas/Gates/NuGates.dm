@@ -92,12 +92,12 @@
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateSeven
 	GatesNeeded=7
 	BuffName = "Seventh Gate"
-	passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4)
+	passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3,"Godspeed"=4)
 	strAdd=0.4
 	spdAdd=0.75
 	endAdd=0.4
 	adjust(mob/p)
-		passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3, "PureDamage" = 2, "PureReduction"=2,"Godspeed"=4)
+		passives = list("TechniqueMastery"=3, "Pursuer"=4, "Flicker"=3,"Godspeed"=4)
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateEight
 	BuffName = "Eight Inner Gates Released Formation"
 	GatesNeeded=8

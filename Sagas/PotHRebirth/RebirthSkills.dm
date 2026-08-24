@@ -1305,9 +1305,9 @@ obj/Skills/Grapple
 		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
 		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=4,"PureReduction"=4)
+			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=6,"PureReduction"=6)
+				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		verb/Justice_Incarnate()
 			set hidden=1
 			adjust(usr)
@@ -1318,11 +1318,11 @@ obj/Skills/Grapple
 		StyleFor=1.25
 		StyleEnd=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
-		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=3,"PureReduction"=3)
+		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=2,"PureReduction"=2)
+			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=3,"PureReduction"=3)
+				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		verb/Fate_Incarnate()
 			set hidden=1
 			adjust(usr)

@@ -4452,7 +4452,7 @@ obj
 					ChargeRate=0.2
 					Knockback=0
 					BeamTime=10
-					IconLock='Beam8.dmi'
+					IconLock='ShineRay.dmi'
 					Cooldown=12
 					EnergyCost=2
 					HeldSkill=TRUE
@@ -4469,7 +4469,7 @@ obj
 					Knockback=0
 					Cooldown=0
 					EnergyCost=0
-					IconLock='Beam8.dmi'
+					IconLock='ShineRay.dmi'
 					CritEffectiveness=0
 				Gamma_Ray
 					NewCost = TIER_2_COST

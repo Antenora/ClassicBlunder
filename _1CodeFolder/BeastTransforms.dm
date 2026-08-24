@@ -11,7 +11,7 @@
 	TransformX = -32
 	TransformY = -32
 	AuraLock = 'BLANK.dmi'
-	passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
+	passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2)
 	StrMult = 1.3
 	ForMult = 1.2
 	SpdMult = 0.3
@@ -50,7 +50,7 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
-		passives = list("GiantForm" = 1, "NoDodge" = 1, "PureDamage" = 2, "PureReduction" = 2, "SweepingStrike" = 2)
+		passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired
@@ -91,8 +91,6 @@
 					if(SS1pot<5)
 						SS1pot=5
 					passives["Transformation Power"] = SS1pot //MATH COMES LATER
-					passives["PureReduction"] = 2 + p.AscensionsAcquired
-					passives["PureDamage"] = 1 + p.AscensionsAcquired
 					VaizardHealth =25
 		if(p.Potential > OOZARU_POTENTIAL_TRANS&&p.oozaru_type!="Demonic")
 			passives["Transformation Power"] = p.AscensionsAcquired
@@ -118,8 +116,6 @@
 			PowerMult = 1.6
 			if(p.oozaru_type=="Demonic")
 				PowerMult=2.5
-				passives["PureReduction"] = 2 + (p.AscensionsAcquired*1.25)
-				passives["PureDamage"] = 2 + (p.AscensionsAcquired*1.25)
 				SpdMult=1
 				TimerLimit = 4800
 				if(!altered)

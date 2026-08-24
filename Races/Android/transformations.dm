@@ -10,8 +10,7 @@ transformation
 			form_glow_y = -32
 			unlock_potential = 30
 			mastery_boons(mob/user)
-				var/list/chippassives = list("PureDamage" = round((user.EnhancedStrength/3)+(user.EnhancedForce/3),1), "PureReduction" = round(user.EnhancedEndurance/3, 1),\
-				"Godspeed" = round(user.EnhancedSpeed/6, 1))
+				var/list/chippassives = list("Godspeed" = round(user.EnhancedSpeed/6, 1))
 				var/list/basepassives
 				if(locate(/obj/Skills/Buffs/SpecialBuffs/MilitaryFrames/Ripper_Mode, user.contents))
 					basepassives = list("LifeSteal" = 20)

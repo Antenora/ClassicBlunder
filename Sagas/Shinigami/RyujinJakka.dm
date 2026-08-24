@@ -465,10 +465,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 
 	adjust(mob/p)
 		var/SL = p.SagaLevel
-		passives = list(
-			
-			"PureDamage"   = 1 + SL
-		)
+		passives = list()
 		OffMult = 1.1 + (0.1 * SL)
 		SpdMult = 1.1 + (0.1 * SL)
 		DefMult = 1.1 + (0.1 * SL)
@@ -490,8 +487,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 			"ChillImmune" = 1,
 			"WaterResist" = 5,
 			"DeathField"  = 3 + SL,
-			"VoidField"   = 3 + SL,
-			"PureReduction" = 1 + SL
+			"VoidField"   = 3 + SL
 		)
 
 	Trigger(mob/user)

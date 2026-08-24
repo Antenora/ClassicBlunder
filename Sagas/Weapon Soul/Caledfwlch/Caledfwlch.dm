@@ -333,7 +333,7 @@ obj/Skills/AutoHit/False_Excalibur
 	King_Of_Camelot
 		StrMult=1.3
 		ForMult=1.3
-		passives = list( "Duelist" = 1)
+		passives = list()
 
 /mob/Players/verb
 	Excalignment()

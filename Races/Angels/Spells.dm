@@ -137,7 +137,7 @@
 	Cooldown = 60
 	TimerLimit = 60
 	EndMult = 1.25
-	passives = list("PureReduction" = 3)
+	passives = list()
 	ActiveMessage = "shields themselves with divine aegis!"
 	OffMessage = "releases their aegis."
 	Trigger(mob/User, Override = 0)

@@ -149,7 +149,6 @@ Mangekyou_Sharingan
 							src.Flow=2
 							src.Instinct=2
 							src.Deflection= 1 + usr.SagaLevel / 4
-							src.Duelist=1
 							Godspeed= usr.SagaLevel / 4
 				src.Trigger(usr)
 		Rinnegan

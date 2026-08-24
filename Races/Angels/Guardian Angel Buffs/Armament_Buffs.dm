@@ -7,7 +7,7 @@
 		ActiveMessage = "is shrouded in a faint angelic spark, heralding the end of their enemies."
 		OffMessage = "loses their angelic glow..."
 		IconLock='WordOfGodSpark.dmi'
-		passives = list("PureDamage" = 0.5, "PureReduction" = 0.25, "Shearing" = 1)
+		passives = list("Shearing" = 1)
 
 
 /obj/Skills/Buffs/SpecialBuffs

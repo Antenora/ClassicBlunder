@@ -150,9 +150,6 @@
 		var/N = ExpandLevel
 		var/mastered = (N < p.AscensionsAcquired)
 		passives = list(
-			"PureDamage"    =  N,
-			"PureReduction" =  N,
-			
 			"Inevitable"    =  N
 		)
 		if(N >= 3)
@@ -240,7 +237,7 @@
 	TimerLimit=60
 	ManaDrain=5
 	FatigueDrain=5
-	passives= list("PureReduction" = 5, "Blubber" = 3)
+	passives= list("Blubber" = 3)
 	verb/Hibernation_Preparation()
 		set category="Skills"
 		src.Trigger(usr)
