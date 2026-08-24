@@ -10,7 +10,7 @@ ascension
 			return d*/
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			passives = list("HellPower" = 0.25, "ChaosMod" = 0.25, "ChaosReist" = 0.25, "SpiritPower" = 0.25, "HellRisen" = 0.25, "Incomplete" = -0.25)
+			passives = list("HellPower" = 0.25, "ChaosMod" = 0.25, "ChaosResist" = 0.25, "SpiritPower" = 0.25, "HellRisen" = 0.25, "Incomplete" = -0.25)
 			anger = 0.15
 			strength = 0.25
 			endurance = 0.25
@@ -23,7 +23,7 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
-			passives = list("HellPower" = 0.25, "ChaosMod" = 0.75, "ChaosReist" = 0.75, "SpiritPower" = 0.25, "HellRisen" = 0.25, "Incomplete" = -0.25)
+			passives = list("HellPower" = 0.25, "ChaosMod" = 0.75, "ChaosResist" = 0.75, "SpiritPower" = 0.25, "HellRisen" = 0.25, "Incomplete" = -0.25)
 			strength = 0.25
 			force = 0.5
 			defense = 0.25

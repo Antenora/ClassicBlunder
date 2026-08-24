@@ -2054,6 +2054,7 @@ mob
 			return 0
 
 		IsGood()
+			if(src.HasChaosMod() || src.passive_handler.Get("ChaosResist")) return FALSE
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
 			var/list/EvilSecrets=list("Vampire")
@@ -2095,6 +2096,7 @@ mob
 				return FALSE
 			return 0
 		IsEvil()
+			if(src.HasChaosMod() || src.passive_handler.Get("ChaosResist")) return FALSE
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
 			var/list/EvilSecrets=list("Vampire")

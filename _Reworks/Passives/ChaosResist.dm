@@ -6,6 +6,7 @@ globalTracker/var
 passiveInfo/ChaosResist
     setLines()
         lines = list("Reduces the damage you take from attackers aligned Good or Evil, but increases the damage you take from every unaligned source by the same amount.",\
+"Holding any amount also strips your alignment: you count as neither Good nor Evil for every alignment check.",\
 "Each tick of the passive is worth [glob.outputVariableInfo("CHAOS_RESIST_EPT")]% damage reduction against a Good- or Evil-aligned source and [glob.outputVariableInfo("CHAOS_RESIST_EPT")]% extra damage taken from any unaligned source.",\
 "Minimum number of ticks: [glob.outputVariableInfo("CHAOS_RESIST_MIN")]",\
 "Maximum number of ticks: [glob.outputVariableInfo("CHAOS_RESIST_MAX")]");
