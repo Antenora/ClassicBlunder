@@ -1318,6 +1318,7 @@ obj
 				Copyable=5
 				AlwaysAnnounceCooldown = 1
 				UnarmedOnly=1
+				MenuIcon="SpinningClothesline"
 				Area="Circle"
 				ComboMaster=1
 				StrScaling=1
@@ -1387,6 +1388,7 @@ obj
 				ChargeTech=1
 				ChargeTime=1
 				Knockback=1
+				MenuIcon="Bullrush"
 				Cooldown=18
 				WindUp=0.25
 				WindupMessage="lowers their head..."
@@ -1407,6 +1409,7 @@ obj
 				UnarmedOnly = 1
 				StrScaling=1
 				Distance=10
+				MenuIcon="HyperCrash"
 				Knockback=10
 				PassThrough=1
 				PreShockwave=1
@@ -1526,6 +1529,7 @@ obj
 				Copyable=5
 				Area="Target"
 				StrScaling=1
+				MenuIcon="DropkickSurprise"
 				Distance=5
 				PassThrough=1
 				DamageMult=7.5
@@ -1556,6 +1560,7 @@ obj
 				Area="Circle"
 				StrScaling=1
 				DamageMult=4
+				MenuIcon="CastFist"
 				TurfDirt=1
 				TurfShift='Dirt1.dmi'
 				TurfShiftDuration=40
@@ -1602,6 +1607,7 @@ obj
 				DamageMult=0.5
 				IgnoreAlreadyHit=TRUE
 				Rounds=10
+				MenuIcon="WolfFangFist"
 				Stunner=0.5
 				Launcher=2
 				ComboMaster=1
@@ -1634,6 +1640,7 @@ obj
 				Area="Circle"
 				DamageMult=0.45
 				ComboMaster=1
+				MenuIcon="NovaStrike"
 				Rounds=10
 				ChargeTech=1
 				ChargeFlight=1
@@ -1670,6 +1677,7 @@ obj
 				RushDelay=0.1
 				ControlledRush=0
 				Knockback=0
+				MenuIcon="OneInchPunch"
 				Earthshaking=15
 				PreShockwave=1
 				PreShockwaveDelay=1
@@ -1701,6 +1709,7 @@ obj
 				Rounds=10
 				ComboMaster=1
 				ChargeTech=1
+				MenuIcon="Lariat"
 				ChargeTime=0.5
 				Grapple=1
 				GrabMaster = 1
@@ -1729,6 +1738,7 @@ obj
 				ComboMaster=1
 				ControlledRush=0
 				Rush=7
+				MenuIcon="HyperTornado"
 				Instinct=2
 				Knockback=15
 				Cooldown=45
@@ -2005,6 +2015,7 @@ obj
 				DamageMult=1.45
 				DelayTime=0.25
 				Rounds=3
+				MenuIcon="ShiningSwordSlash"
 				PreShockwave=1
 				PreShockwaveDelay=1
 				PostShockwave=0
@@ -2043,6 +2054,7 @@ obj
 				Distance=5
 				DamageMult=1.8
 				Rounds=5
+				MenuIcon="Massacre"
 				Knockback=15
 				WindUp=0.5
 				ComboMaster=1;
@@ -2073,6 +2085,7 @@ obj
 				TurfDirt=1
 				Distance=12
 				Jump=1
+				MenuIcon="SlamWave"
 				Knockback=10
 				FlickAttack=2
 				GuardBreak=1
@@ -2107,6 +2120,7 @@ obj
 				NeedsSword=1
 				ExecuteMortal=25
 				Distance=15
+				MenuIcon="Zantetsuken"
 				Gravity=5
 				WindUp=1
 				WindupMessage="prepares to deliver a peerless slash..."
@@ -2141,6 +2155,7 @@ obj
 				Rounds=7
 				IgnoreAlreadyHit = 1
 				DamageMult=4.25
+				MenuIcon="ShadowCut"
 				Knockback=10
 				SpeedStrike = 2
 				PassThrough=1
@@ -2170,6 +2185,7 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrScaling=1
+				MenuIcon="ThousandManSlayer"
 				SpeedStrike=2;
 				Distance=7
 				PassTo=1
@@ -2249,6 +2265,7 @@ obj
 				Distance=10
 				GuardBreak=1
 				DamageMult=2.55
+				MenuIcon="Kiai"
 				Knockback=15
 				Cooldown=10
 				Shockwaves=3
@@ -2272,6 +2289,7 @@ obj
 				Distance=10
 				DamageMult = 3.15
 				Flash=30
+				MenuIcon="Taiyoken"
 				WindUp=0.75
 				WindupIcon='BLANK.dmi'
 				WindupMessage="brings their hands to their face..."
@@ -2296,6 +2314,7 @@ obj
 				SignatureTechnique=1
 				Rush=20
 				SpecialAttack=1
+				MenuIcon="Chidori"
 				CanBeDodged=0
 				CanBeBlocked=1
 				ComboMaster=1
@@ -2417,6 +2436,7 @@ obj
 				TurfEruptOffset=3
 				Slow=1
 				WindUp=1
+				MenuIcon="SuperExplosiveWave"
 				WindupIcon='Ripple Radiance.dmi'
 				WindupIconUnder=1
 				WindupIconX=-32
@@ -2442,6 +2462,7 @@ obj
 				AllOutAttack=1
 				StrScaling=0
 				ForScaling=1
+				MenuIcon="Kikoho"
 				DamageMult=5.5
 				WoundCost=5
 				ComboMaster=1
@@ -2595,6 +2616,7 @@ obj
 				ComboMaster=1
 				Cooldown=45
 				Area="Around Target"
+				MenuIcon="ShinKikoho"
 				Distance=15
 				DistanceAround=4
 				Divide=1
@@ -3132,6 +3154,7 @@ obj
 					WindUp=1
 					Stunner=5
 					DamageMult=4
+					MenuIcon="Stop"
 					StrScaling=0
 					ForScaling=1
 					GuardBreak=1
@@ -3216,6 +3239,7 @@ obj
 					DistanceAround=4
 					Rounds=20
 					DelayTime=2
+					MenuIcon="Magnetga"
 					WindUp=0.5
 					Launcher=4
 					Icon='LightningBolt.dmi'
@@ -3242,6 +3266,7 @@ obj
 					Area="Circle"
 					Distance=8
 					WindUp=1
+					MenuIcon="Graviga"
 					NoLock=1
 					NoAttackLock=1
 					GuardBreak=1
@@ -3276,6 +3301,7 @@ obj
 					Stunner=5
 					DamageMult=0
 					StrScaling=0
+					MenuIcon="Stopga"
 					ForScaling=1
 					GuardBreak=1
 					NoLock=1
@@ -3301,6 +3327,7 @@ obj
 					Area="Target"
 					Distance=7
 					Purity=1
+					MenuIcon="Holy"
 					DamageMult=18
 					WindUp=1
 					ManaCost=30

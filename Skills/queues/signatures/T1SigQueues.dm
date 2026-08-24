@@ -24,6 +24,7 @@ obj
 				KBMult=5
 				Duration=7
 				Instinct=2
+				MenuIcon="AuraPunch"
 				Warp=5
 				Cooldown=12
 				EnergyCost=3
@@ -49,6 +50,7 @@ obj
 				Duration=5
 				Instinct=2
 				Opener=1
+				MenuIcon="TheClaw"
 				Warp=2
 				Cooldown=12
 				Grapple=1
@@ -92,6 +94,7 @@ obj
 				Duration=5
 				Stunner=0.8
 				Crippling=5
+				MenuIcon="NerveShot"
 				WeakenRider=0.1
 				Combo=5
 				Rapid=1
@@ -107,6 +110,7 @@ obj
 				SignatureTechnique=1
 				DamageMult=0.5//there is 0.5 damage mult 10 multihit on the gale itself
 				AccuracyMult = 1.175
+				MenuIcon="GaleStrike"
 				KBMult=0.00001
 				Duration=5
 				Projectile="/obj/Skills/Projectile/GaleStrikeProjectile"
@@ -122,6 +126,7 @@ obj
 				DamageMult=2.5
 				AccuracyMult = 1.35
 				KBMult=0.00001
+				MenuIcon="VolleyballFist"
 				Stunner=0.8
 				Instinct=2
 				Warp=2
@@ -168,6 +173,7 @@ obj
 			Crescent_Cartwheel
 				SignatureTechnique=1
 				DamageMult=0.8
+				MenuIcon="CrescentCartwheel"
 				SpeedStrike=4
 				AccuracyMult = 2
 				HitStep=/obj/Skills/Queue/Crescent_Cartwheel2
@@ -228,6 +234,7 @@ obj
 				Rapid=1
 				Instinct=1
 				Cooldown=12
+				MenuIcon="BladeDance"
 				EnergyCost=3
 				HitSparkIcon='Slash - Future.dmi'
 				HitSparkX=-32
@@ -279,6 +286,7 @@ obj
 				KBAdd=10
 				Duration=5
 				Instinct=2
+				MenuIcon="NirvanaSlash"
 				Cooldown=12
 				IconLock='EyeFlame.dmi'
 				HitSparkIcon='LightningPlasma.dmi'
@@ -302,6 +310,7 @@ obj
 				KBMult=0.00001
 				Combo=5
 				Warp=5
+				MenuIcon="SoulTearStorm"
 				Duration=5
 				Cooldown=12
 				NeedsSword=1

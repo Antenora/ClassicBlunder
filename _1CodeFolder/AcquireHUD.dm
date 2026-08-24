@@ -3,7 +3,7 @@
 #define AQ_LAYER (FLY_LAYER + 3.8)
 #define AQ_FONT      "font-family:'monogram'; font-size:12pt"          // native 16px
 #define AQ_FONT_BODY "font-family:'Pixel Operator 8'; font-size:6pt"   // native 8px
-#define AQ_ROW_H 26
+#define AQ_ROW_H 38
 #define AQ_VISIBLE 8
 #define AQ_ROWS 9            // one buffer row for smooth scrolling
 #define AQ_ROW_Y0 104        // band top, px from the panel top
@@ -45,7 +45,7 @@ var/list/AQ_ICON16 = list()
 	var/key = "[f]#[st]"
 	if(!AQ_ICON16[key])
 		var/icon/I = icon(f, st)
-		I.Scale(16, 16)
+		I.Scale(32, 32)
 		AQ_ICON16[key] = I
 	return AQ_ICON16[key]
 
@@ -164,7 +164,7 @@ mob/proc/AqMissingPrereqs(obj/Skills/s)
 	var/lock_reason = null
 	var/icon/icn = null
 
-/atom/movable/shud/aqbg                  
+/atom/movable/shud/aqbg
 	layer = AQ_LAYER
 	mouse_opacity = 2
 	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
@@ -199,7 +199,6 @@ mob/proc/AqMissingPrereqs(obj/Skills/s)
 		filters = filter(type="outline", size=1, color="#000000")
 
 /atom/movable/shud/aqrow                 // pooled list row: transparent hit plate + children
-	icon = 'HUD/tt_rowhit.png'
 	layer = AQ_LAYER + 0.35
 	mouse_opacity = 2
 	var/entry_idx = 0
@@ -209,6 +208,9 @@ mob/proc/AqMissingPrereqs(obj/Skills/s)
 	var/atom/movable/shud/aqrowtext/righttext
 	New()
 		..()
+		var/icon/hitplate = icon('HUD/tt_rowhit.png')
+		hitplate.Scale(574, AQ_ROW_H)
+		icon = hitplate
 		band = new
 		band.icon = 'HUD/tt_band.png'
 		band.layer = AQ_LAYER + 0.36
@@ -222,13 +224,13 @@ mob/proc/AqMissingPrereqs(obj/Skills/s)
 		icn.alpha = 0
 		vis_contents += icn
 		nametext = new
-		nametext.maptext_x = 40
-		nametext.maptext_y = 4
+		nametext.maptext_x = 56
+		nametext.maptext_y = 16
 		nametext.maptext_width = 390
 		vis_contents += nametext
 		righttext = new
 		righttext.maptext_x = 430
-		righttext.maptext_y = 4
+		righttext.maptext_y = 16
 		righttext.maptext_width = 120
 		vis_contents += righttext
 	Del()
@@ -870,14 +872,14 @@ client/proc/AqPaintRow(atom/movable/shud/aqrow/r, idx)
 		r.righttext.maptext = ""
 		return
 	r.band.alpha = 0
-	r.nametext.maptext_y = 4
+	r.nametext.maptext_y = 16
 	if(E.icn)
 		r.icn.icon = E.icn
 		r.icn.alpha = 255
 	else
 		r.icn.alpha = 0
-	r.nametext.maptext_x = 40
-	r.nametext.maptext_width = 390
+	r.nametext.maptext_x = 56
+	r.nametext.maptext_width = 374
 	r.nametext.maptext = "<span style=\"[AQ_FONT]; color:[E.name_col]\">[E.name]</span>"
 	r.righttext.maptext = "<span style=\"[AQ_FONT]; color:[E.right_col]; text-align:right\">[E.right]</span>"
 
