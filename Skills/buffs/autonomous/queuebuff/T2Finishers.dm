@@ -141,7 +141,7 @@
     Righteous_Crusade
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("Tossing" = 2, "SlayerMod" = 1, "FavoredPrey" = "All",  "Hit Scan" = 2 , "HolyMod" = 2,  \
+        passives = list("Tossing" = 2, "SlayerMod" = 1, "FavoredPrey" = "Vampire",  "Hit Scan" = 2 , "HolyMod" = 2,  \
         "TensionLock" = 1) // not sure
         StyleOff = 1.2
         StyleStr = 1.2
@@ -171,7 +171,7 @@
         StrMult=1.2
         SpdMult=1.2
         OffMult=1.1
-        passives = list("Backshot" = 2.5, "Flicker" = 4, "Tossing" = 2, "TensionLock" = 1, "SlayerMod" = 2, "FavoredPrey" = "All", \
+        passives = list("Backshot" = 2.5, "Flicker" = 4, "Tossing" = 2, "TensionLock" = 1, \
                         "ComboMaster" = 1)
 
     Time_Freeze

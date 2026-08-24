@@ -296,10 +296,12 @@
 	log2text("Damage", val,"damageDebugs.txt", "[src.ckey]/[src.name]")
 	#endif
 	// Alignment-conditional damage resistance (EvilResist vs Evil attackers, GoodResist vs Good)
-	if(src.IsEvil() && defender.passive_handler.Get("EvilResist"))
-		val *= defender.getEvilResistValue()
-	if(src.IsGood() && defender.passive_handler.Get("GoodResist"))
-		val *= defender.getGoodResistValue()
+	if(defender.passive_handler.Get("EvilResist"))
+		val *= src.IsEvil() ? defender.getEvilResistValue() : defender.getEvilResistVulnValue()
+	if(defender.passive_handler.Get("GoodResist"))
+		val *= src.IsGood() ? defender.getGoodResistValue() : defender.getGoodResistVulnValue()
+	if(defender.passive_handler.Get("ChaosResist"))
+		val *= (src.IsGood() || src.IsEvil()) ? defender.getChaosResistValue() : defender.getChaosResistVulnValue()
 	// Iconoclast: skim 10% of their Power for 30s (they keep theirs), 5s cd per target so multihits dont insta-drain
 	if(val > 0 && src.hasMagePassive(/mage_passive/dark/Iconoclast) && world.time >= src.IconoclastNextSteal)
 		var/stolen = round(defender.Power * 0.10)
@@ -347,8 +349,6 @@
 /mob/proc/checkPurity(mob/defender)
 	if(HasPurity())
 		if(HasHolyMod())
-			if(HasBeyondPurity())
-				return TRUE
 			if(!defender.IsEvil())
 				return FALSE
 	return TRUE

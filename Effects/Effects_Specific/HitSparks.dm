@@ -25,6 +25,9 @@ mob
 			Weight = clamp(Weight, 0, 1)
 			var/wsize = 1 + Weight*0.6 //hit weight: identity at 0, heavies read bigger
 			var/wlife = round(Weight*3)
+			var/obj/Skills/Queue/if_q = src.AttackQueue
+			if((if_q && if_q.ImpactFrame) || Weight >= 0.99)
+				FxHeavyImpact(m, if_q)
 			if(src.AttackQueue&&src.AttackQueue.HitSparkIcon)
 				var/obj/Effects/HE=new(null, src.AttackQueue.HitSparkIcon, src.AttackQueue.HitSparkX, src.AttackQueue.HitSparkY, src.AttackQueue.HitSparkTurns, src.AttackQueue.HitSparkSize*wsize)
 				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM

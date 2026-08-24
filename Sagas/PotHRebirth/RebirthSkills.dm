@@ -304,7 +304,6 @@ obj/Skills/AutoHit
 		Cooldown=18
 		StrScaling=0
 		ForScaling=1
-		HolyMod=40
 		DamageMult=8.5
 		Area="Circle"
 		Distance=3
@@ -340,7 +339,6 @@ obj/Skills/AutoHit
 		SignatureName="Banish"
 		Area="Target"
 		Distance=15
-		HolyMod=2000
 		DamageMult=45
 		WindUp=1
 		HitSparkIcon='Hit Effect Pearl.dmi'
@@ -1092,11 +1090,11 @@ obj/Skills/Buffs
 			PowerMult=1.25
 			Cooldown = 1
 			SwordAscension=6
-			passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+			passives = list("PUSpike"=50, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 			ActiveMessage="materializes the Black Knife."
 			OffMessage="puts the black knife away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+				passives = list("PUSpike"=50, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5

@@ -181,7 +181,6 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
 	Hymn_of_Hjaoningavig
 		StrMult=1.6
-		passives = list( "SlayerMod" = 1, "FavoredPrey" = "All")
 	Lament_of_Hildr
 		IconLock='SweatDrop.dmi'
 		IconApart=1

@@ -371,7 +371,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=2
 		EndMult=1.5
 		OffMult=1.25
-		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1,  "DebuffReversal" = 1)
+		passives= list("HolyMod" = 5, "Purity" = 1,  "DebuffReversal" = 1)
 		ActiveMessage= "invokes the Origin of Hope, embracing the Conviction of a Saint!"
 		OffMessage= "casts aside the Origin of Hope..."
 		verb/Fundament_Conviction()

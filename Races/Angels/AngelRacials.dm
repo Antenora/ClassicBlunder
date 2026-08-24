@@ -109,7 +109,7 @@ obj/Skills/Utility/Recall_Armaments
 	desc = "A shining cuirass that shields the heart with virtue."
 	icon = 'ArmorLight-White.dmi'
 /obj/Items/Wearables/Guardian/Sandals_of_Peace
-	passives = list( "Purity" = 1, "BeyondPurity" = 1)
+	passives = list( "Purity" = 1)
 	Augmented = 1
 	Stealable = 0
 	Destructable = 0

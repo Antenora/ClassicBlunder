@@ -364,8 +364,6 @@ obj
 				NoAttackLock=1
 				StrScaling=1
 				DamageMult = T2_DMG_MULT / 2 / 10;
-				AbyssMod=5
-				HolyMod=5
 				Distance=5
 				DistanceAround=4
 				Rounds=10
@@ -3302,7 +3300,6 @@ obj
 					SignatureName="Holy Magic"
 					Area="Target"
 					Distance=7
-					HolyMod=5
 					Purity=1
 					DamageMult=18
 					WindUp=1
@@ -3586,7 +3583,6 @@ obj
 				NeedsSword=1
 				Area="Around Target"
 				DamageMult=0.35
-				HolyMod=1.15
 				Distance=5
 				DistanceAround=3
 				EnergyCost=5
@@ -3607,8 +3603,6 @@ obj
 				Cooldown=18
 				Instinct=1
 				Silencing=1
-				adjust(mob/p)
-					HolyMod=1.15
 				verb/Holy_Justice()
 					set category="Skills"
 					usr.Activate(src)
@@ -3618,7 +3612,6 @@ obj
 				NeedsSword=1
 				Area="Around Target"
 				DamageMult=8.5
-				AbyssMod=1.15
 				Distance=5
 				DistanceAround=3
 				EnergyCost=5
@@ -3638,8 +3631,6 @@ obj
 				Cooldown=18
 				Instinct=1
 				var/tmp/doom_pending = 0
-				adjust(mob/p)
-					AbyssMod=1.15
 				verb/Doom_of_Damocles()
 					set category="Skills"
 					var/mob/caster = usr
@@ -3820,7 +3811,6 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrScaling=1
-				HolyMod=5
 				DamageMult=0.5
 				Cooldown=300
 				Rounds=30
@@ -3839,7 +3829,6 @@ obj
 				NeedsSword=1
 				Area="Circle"
 				StrScaling=1
-				AbyssMod=5
 				DamageMult=0.4
 				Cooldown=300
 				Rounds=30
@@ -4156,7 +4145,6 @@ obj
 				Area="Circle"
 				GuardBreak=1
 				DamageMult=11
-				HolyMod=5
 				Distance=6
 				Knockback=10
 				DelayTime=5
@@ -4710,7 +4698,6 @@ obj
 				SpecialAttack=1
 				StrScaling=1
 				DamageMult=7.5
-				HolyMod=5
 				Distance=5
 				Rush=5
 				RushDelay=2
@@ -4825,7 +4812,6 @@ obj
 				TurfShift='IceGround.dmi'
 				TurfShiftDuration=500
 				DamageMult=22.5
-				HolyMod=5
 				Purity=1
 				StrScaling=1
 				ActiveMessage="encases their target in a tomb of soul-infused crystal!  They are forced into perfect stasis!"
@@ -6243,7 +6229,6 @@ obj
 
 			DirectWounds
 
-			Sanctify
 			StarCrossed
 			PainShare
 			ChargeDelay
@@ -6388,7 +6373,6 @@ obj
 			src.Punt=Z.Punt
 			src.Divide=Z.Divide
 			src.PainShare=Z.PainShare
-			Sanctify = Z.Sanctify
 			StarCrossed = Z.StarCrossed
 			ChargeDelay = Z.ChargeDelay
 			Deport = Z.Deport
@@ -6421,6 +6405,7 @@ obj
 			src.CanBeBlocked=Z.CanBeBlocked
 			src.CanBeDodged=Z.CanBeDodged
 			src.GuardBreak=Z.GuardBreak
+			src.ImpactFrame=Z.ImpactFrame
 			src.Slow=Z.Slow
 			src.ApplySlow = Z.ApplySlow
 			src.NerveOverload = Z.NerveOverload
@@ -6983,6 +6968,8 @@ obj
 						if(!src.TurfStrike)
 							spawn()
 								src.Owner.HitEffect(loc, src.UnarmedTech, src.SwordTech)
+							if(src.ImpactFrame)
+								FxHeavyImpact(m, src)
 						StunClear(m)
 						AfterImageStrike(m, src.Owner,1)
 						m.aisConsume()
@@ -7014,21 +7001,14 @@ obj
 				if(Owner && FromSkill)
 					if(Owner.HasPurity()||FromSkill.Purity)
 						var/found=0
-						if(Owner.HasBeyondPurity()||FromSkill.BeyondPurity)
-							if(Owner.HasHolyMod()||FromSkill.HolyMod)
-								if(m.IsGood())
-									found=1
-							if(found)
-								skipPureDamage = 1
-						else
-							if(Owner.HasHolyMod()||FromSkill.HolyMod)
-								if(m.IsEvil())
-									found=1
-							if(!found)
-								skipPureDamage = 1
+						if(Owner.HasHolyMod())
+							if(m.IsEvil())
+								found=1
+						if(!found)
+							skipPureDamage = 1
 				var/list/specDmgTypes = null
 				if(!skipPureDamage && Owner && FromSkill)
-					specDmgTypes = buildSpecDmgTypes(FromSkill.HolyMod, FromSkill.Sanctify, FromSkill.AbyssMod, FromSkill.SlayerMod)
+					specDmgTypes = buildSpecDmgTypes(FromSkill.SlayerMod)
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
 				var/reversalChance = m.GetAutoReversal()
@@ -7208,6 +7188,8 @@ obj
 						spawn()
 							if(Owner)
 								src.Owner.HitEffect(m, src.UnarmedTech, src.SwordTech)
+						if(src.ImpactFrame)
+							FxHeavyImpact(m, src)
 
 				if(src.Grapple)
 					if(!src.Owner.Grab)
@@ -8258,7 +8240,7 @@ obj
 		W.UsesEnd = UsesEnd
 		W.UsesDef = UsesDef
 		W.UsesOff = UsesOff
-		W.dmgTypes = buildSpecDmgTypes(HolyMod, Sanctify, AbyssMod, SlayerMod)
+		W.dmgTypes = buildSpecDmgTypes(SlayerMod)
 		return W
 
 /obj/Effects/SkillWave

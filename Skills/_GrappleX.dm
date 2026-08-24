@@ -713,7 +713,7 @@ obj/Skills/Grapple
 						S.unarmed = src.UnarmedOnly
 						S.sword = src.NeedsSword
 						S.spirit = src.SpecialAttack
-						S.dmgTypes = buildSpecDmgTypes(src.HolyMod, src.Sanctify, src.AbyssMod, src.SlayerMod)
+						S.dmgTypes = buildSpecDmgTypes(src.SlayerMod)
 						S.critEff = src.CritEffectiveness
 						S.blockEff = src.BlockEffectiveness
 						S.critBonus = src.CritChanceBonus
@@ -799,6 +799,8 @@ obj/Skills/Grapple
 							ruin.applyStack(Trg)
 						if("Strike")
 							User.HitEffect(Trg)
+							if(src.ImpactFrame)
+								FxHeavyImpact(Trg, src)
 						if("Drain")
 							animate(Trg, color=list(1,1,1, 0,1,0, 1,1,1, 0,0,0), time=10, flags=ANIMATION_RELATIVE)
 							sleep(10)
@@ -897,6 +899,8 @@ obj/Skills/Grapple
 				ruin.applyStack(Trg)
 			if("Strike")
 				User.HitEffect(Trg)
+				if(src.ImpactFrame)
+					FxHeavyImpact(Trg, src)
 			if("Drain")
 				animate(Trg, color=list(1,1,1, 0,1,0, 1,1,1, 0,0,0), time=10, flags=ANIMATION_RELATIVE)
 				sleep(10)

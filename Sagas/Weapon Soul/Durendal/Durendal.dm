@@ -52,7 +52,6 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 /obj/Skills/Queue/Finisher
 	Heavenly_Judgement
 		DamageMult=3
-		HolyMod=3
 		HitSparkIcon='Slash - Zan.dmi'
 		HitSparkX=-32
 		HitSparkY=-32

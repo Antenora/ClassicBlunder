@@ -228,7 +228,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Makyo/Fall/Harvest_Time
 	SpdMult=0.25
 	TimerLimit=60
-	passives= list("SlayerMod"=5, "FavoredPrey"= "Mortal", "GodspeedDisabled"= 1, "Extend" = 1, "Gum Gum" = 1)
+	passives= list("SlayerMod"=5, "FavoredPrey"= "Human", "GodspeedDisabled"= 1, "Extend" = 1, "Gum Gum" = 1)
 	verb/Time_to_Harvest()
 		set category="Skills"
 		src.Trigger(usr)

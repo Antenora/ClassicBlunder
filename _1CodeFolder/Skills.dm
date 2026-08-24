@@ -121,9 +121,6 @@ obj/Skills
 	var/Poisoning //poison chance
 	var/Toxic //poison add
 	var/Purity //You can only hurt what you're meant to
-	var/BeyondPurity //nvm
-	var/HolyMod //holy dmg
-	var/AbyssMod //unholy dmg
 	var/SlayerMod //mortal dmg
 	var/ShonenPower  // become MC
 	var/SpiritPower //become medium
@@ -195,7 +192,6 @@ obj/Skills
 	var/heavenlyRestrictionIgnore = FALSE
 
 	var/CooldownDrag
-	var/Sanctify
 	var/StarCrossed
 
 	var/PainShare

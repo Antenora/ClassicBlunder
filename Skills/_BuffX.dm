@@ -1269,7 +1269,7 @@ NEW VARIABLES
 								src.OffMessage="conceals █████████████.."
 						if("Dainsleif")
 							HealthDrain = 0
-							passives = list("SlayerMod" = usr.SagaLevel/2, "FavoredPrey" = "Mortal",  "AbyssMod" = usr.SagaLevel/2, "LifeSteal" = usr.SagaLevel*5,  "PULock" = 1)
+							passives = list("AbyssMod" = usr.SagaLevel/2, "LifeSteal" = usr.SagaLevel*5,  "PULock" = 1)
 
 							if(!redacted)
 								src.SwordName="Dainsleif"
@@ -1758,7 +1758,7 @@ NEW VARIABLES
 						OffMult=1.55
 					if(rose.mastery >= 100)
 						ActiveMessage="becomes the perfect image of Godhood!"
-						passives = list("HellRisen" = 1, "GodKi" = 1, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "All", "Heavensent" = 4)
+						passives = list("HellRisen" = 1, "GodKi" = 1, "EnergyGeneration" = 5, "SlayerMod" = 5, "FavoredPrey" = "Mortal", "Heavensent" = 4)
 						AngerMult=1.5
 						StrMult=1.7
 						ForMult=1.7
@@ -2246,7 +2246,7 @@ NEW VARIABLES
 			SpdMult=1.3
 			EndMult=0.8
 			DefMult=0.8
-			passives = list("SlayerMod" = 3, "LifeSteal" = 10, "FavoredPrey" = "Depths",  "TechniqueMastery" = 3)
+			passives = list("SlayerMod" = 3, "LifeSteal" = 10, "FavoredPrey" = "Demon",  "TechniqueMastery" = 3)
 			ManaGlowSize=3
 			ManaGlow="#C03434"
 			TextColor=rgb(192, 52, 52)
@@ -3633,8 +3633,6 @@ NEW VARIABLES
 					OffMult=1.2
 					DefMult=1.2
 					BuffMastery=1
-					HolyMod=2
-					AbyssMod=2
 					ArmorIcon='goldsaintgemini_armor.dmi'
 					TopOverlayLock='goldsaintgemini_helmet.dmi'
 					ActiveMessage="dons the Gold Cloth of Gemini, embracing its mystic duality!"
@@ -3646,7 +3644,7 @@ NEW VARIABLES
 						EndMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						OffMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.1 + ((player.SagaLevel-3) * 0.2)
-						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HolyMod" = 2 + player.SagaLevel, "AbyssMod" = 2 + player.SagaLevel, "HellPower" =0.25 * (player.SagaLevel+2),  "SpiritPower" = player.SagaLevel*0.25)
+						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, "Godspeed" = 1+(player.SagaLevel*0.25), "HellPower" =0.25 * (player.SagaLevel+2),  "SpiritPower" = player.SagaLevel*0.25)
 					verb/Don_Cloth()
 						set category="Skills"
 						adjustments(usr)
@@ -3668,7 +3666,7 @@ NEW VARIABLES
 						OffMult = 1.3 + ((player.SagaLevel-3) * 0.2)
 						DefMult = 1.2 + ((player.SagaLevel-3) * 0.2)
 						passives = list("SpaceWalk" =1, "StaticWalk" = 1, "ArmorAscension" = 3, \
-						"Godspeed" = 1+(player.SagaLevel*0.25), "MartialMagic" = 1, "AbyssMod" = player.SagaLevel*2, "SlayerMod" = 3+(player.SagaLevel/2), "FavoredPrey" = "Mortal", "SpiritPower" = player.SagaLevel*0.25)
+						"Godspeed" = 1+(player.SagaLevel*0.25), "MartialMagic" = 1, "AbyssMod" = player.SagaLevel*2, "SpiritPower" = player.SagaLevel*0.25)
 
 					verb/Don_Cloth()
 						set category="Skills"
@@ -4121,7 +4119,7 @@ NEW VARIABLES
 					StrMult=2
 					SpdMult=2.5
 				else if(p.passive_handler.Get("Controlled Darkness"))
-					passives = list("ManaLeak"= 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "TechniqueMastery" = 5, "QuickCast" = 2, "HolyMod" = 3, "AbyssMod" = 3, "SpiritPower" = 0.25)
+					passives = list("ManaLeak"= 1, "Godspeed" = 1, "Pursuer" = 3, "Flicker" = 3, "TechniqueMastery" = 5, "QuickCast" = 2, "SpiritPower" = 0.25)
 					if(p.SagaLevel>=5)
 						ForMult=1.5
 						StrMult=1.5
@@ -4690,7 +4688,7 @@ NEW VARIABLES
 			SpdMult=1.2
 			DefMult=1.2
 			SpecialSlot=1
-			passives = list("GodKi" = 0.25, "DeathField" = 10, "VoidField" = 5,  "Deflection" = 5, "SlayerMod" = 1, "FavoredPrey" = "All", \
+			passives = list("GodKi" = 0.25, "DeathField" = 10, "VoidField" = 5,  "Deflection" = 5, \
 								 "Field of Destruction" = 1, "CursedWounds"=1, "HardStyle"=1)
 			DarkChange=1
 			ActiveMessage="taps into the power of a Destroyer."
@@ -4744,7 +4742,7 @@ NEW VARIABLES
 			ActiveSlot=1
 			SpecialSlot=1
 			passives = list("Aspect of Death"=1, "StunningStrike" = 3, "HardStyle"=1, "SoftStyle"=1, "PUSpike"=400,\
-			"DisableGodKi"=1, "SlayerMod" = 1.5, "FavoredPrey" = "All","Extend"=2, "Gum Gum"=2,"KiControlMastery"=20,"Shearing"=15,"KiControl"=1)
+			"DisableGodKi"=1, "Extend"=2, "Gum Gum"=2,"KiControlMastery"=20,"Shearing"=15,"KiControl"=1)
 			ElementalOffense="Death"
 			PUSpeedModifier=2
 			DarkChange=1
@@ -6957,7 +6955,7 @@ NEW VARIABLES
 					ManaGlowSize = 1
 					TimerLimit = 10 + (mecha.Level * 10)
 					PhysicalHitsLimit = mecha.Level * 5
-					passives = list("Shearing" = mecha.Level/2, "SlayerMod" = mecha.Level/2, "FavoredPrey" = "Mortal",  "Extend" = mecha.Level/2 + 1)
+					passives = list("Shearing" = mecha.Level/2,  "Extend" = mecha.Level/2 + 1)
 					Shearing = mecha.Level/2
 					SlayerMod = mecha.Level/2
 					Extend = mecha.Level/2 + 1
@@ -9611,9 +9609,8 @@ NEW VARIABLES
 		// 		src.Trigger(usr)
 
 		Celestial_Ascension
-			passives = list("Purity" = 1, "BeyondPurity" = 1)
+			passives = list("Purity" = 1)
 			Purity=1
-			BeyondPurity=1
 			ActiveMessage="reveals their true celestial nature!"
 			OffMessage="represses their celestial nature..."
 			verb/Celestial_Ascension()
@@ -9806,7 +9803,6 @@ NEW VARIABLES
 		Ripple
 			Ripple_Breathing
 				passives = list("Purity" = 1, "HolyMod" = 2,  "Ripple" = 1)
-				HolyMod=2
 				PUDrainReduction=2
 				ActiveMessage="begins to channel the power of the Sun!"
 				OffMessage="relaxes their breathing..."
@@ -9818,7 +9814,7 @@ NEW VARIABLES
 				adjust(mob/p)
 					var/secretLevel = p.secretDatum.currentTier
 					if(secretLevel >= 4)
-						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel,  "Ripple" = 1 + (secretLevel / 4), "FavoredPrey" = "Beyond", "SlayerMod" = (secretLevel / 2))
+						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel,  "Ripple" = 1 + (secretLevel / 4), "FavoredPrey" = "Vampire", "SlayerMod" = (secretLevel / 2))
 					else
 						passives = list("Purity" = 1, "HolyMod" = 2 + secretLevel,  "Ripple" = 1 + (secretLevel / 4))
 				verb/Ripple_Breathing()
@@ -11578,7 +11574,7 @@ NEW VARIABLES
 				Cooldown=1//Just in case
 				Trigger(mob/player, Override)
 					if(!altered)
-						passives = list("SlayerMod" = player.SagaLevel * 0.25, "FavoredPrey" = "All", "Godspeed" = floor(player.SagaLevel/2), "Pursuer" = floor(player.SagaLevel/2))
+						passives = list("Godspeed" = floor(player.SagaLevel/2), "Pursuer" = floor(player.SagaLevel/2))
 						SlayerMod = player.SagaLevel * 0.25
 						Godspeed = floor(player.SagaLevel / 2)
 						Pursuer = floor(player.SagaLevel / 2)
@@ -11718,14 +11714,12 @@ NEW VARIABLES
 				AlwaysOn=0
 				BuffName="Sparkling Ripple"
 				IconLock='Ripple Aura.dmi'
-				passives = list("BeyondPurity" = 1)
 				IconLockBlend=2
 				PoseEnhancement=1
 				TimerLimit=30
 				adjust(mob/p)
 					var/secretLevel = p.secretDatum.currentTier
 					TimerLimit= 30 * secretLevel
-					passives = list("BeyondPurity" = 1)
 				Trigger(mob/User, Override = FALSE)
 					if(!User.BuffOn(src))
 						adjust(User)

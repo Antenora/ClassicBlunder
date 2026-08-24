@@ -103,7 +103,7 @@ transformation
 					KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=ShockSize, Blend=2, Time=8)
 					ShockSize/=2
 		satan_mode
-			passives = list("GodKi" = 0.75, "HolyMod" = 10, "AbyssMod" = 10, "SpiritPower" = 2,  "Purity" = 1, "BeyondPurity" = 1)
+			passives = list("GodKi" = 0.75, "ChaosMod" = 10, "SpiritPower" = 2)
 			angerFloor = 90
 			unlock_potential = 90
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'

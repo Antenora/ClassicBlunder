@@ -594,7 +594,7 @@ proc/
 				KeybladePassives=list("PULock" = 1, "ManaGeneration" = 2+Boost, "HolyMod" = 1+Boost, "QuickCast" = 1+Boost)
 				return KeybladePassives
 			if("Way To Dawn")
-				KeybladePassives=list("PULock" = 1, "AbyssMod" = 3+Boost,"HolyMod"=3+Boost,"Controlled Darkness" = 1)
+				KeybladePassives=list("PULock" = 1, "Controlled Darkness" = 1)
 				return KeybladePassives
 			if("Bond of Flame")
 				KeybladePassives=list("PULock" = 1, "Scorching" = 10+(Boost*2), "MeltyBlood" = 1)

@@ -2277,7 +2277,6 @@ obj
 					src.Radius=1*(src.Mastery-1)
 					src.ZoneAttackY=round(2.5*src.Mastery)
 					src.Explode=1*(src.Mastery**2)
-					HolyMod = 3*Mastery
 					usr.UseProjectile(src)
 			Death_Ball
 				SignatureTechnique=2
@@ -3283,7 +3282,6 @@ obj
 					EndEffectiveness=1
 					Dodgeable=-1
 					Deflectable=-1
-					HolyMod=10
 					Distance=100
 					//No verb because set from queue
 				Darkness_Slash
@@ -4038,7 +4036,6 @@ obj
 						ElementalClass="Light"
 						SpellElement="Light"
 						SignatureTechnique=2
-						HolyMod=5
 						DamageMult=15
 						Piercing=1
 						Paralyzing=1
@@ -4347,6 +4344,7 @@ obj
 
 			Beams
 				Area="Beam"
+				NoGCD=1
 				Variation=0
 				IconLock='Beam14.dmi'
 				IconSize=1
@@ -4410,15 +4408,18 @@ obj
 					Copyable=3
 					Distance=30
 					DamageMult=0.0857
-					ChargeRate=1.5
+					ChargeRate=0.2
 					Knockback=1
 					BeamTime=20
 					IconLock='Beam8.dmi'
 					Cooldown=45
 					EnergyCost=1
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=2
 					verb/Ray()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 				Eraser_Gun
 					NewCost = TIER_2_COST
 					NewCopyable = 3
@@ -4674,15 +4675,18 @@ obj
 				Galic_Kamehameha
 					CritEffectiveness=0
 					DamageMult=0.2286
-					ChargeRate=3
+					ChargeRate=0.2
 					IconLock='BeamGKH.dmi'
 					ChargeIcon=1
 					EnergyCost=15
 					Cooldown=300
 					Instinct=2
+					HeldSkill=TRUE
+					HeldBeam=TRUE
+					ChargePeriod=4
 					verb/Galic_Kamehameha()
 						set category="Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
 //TIER S
 //SAINT SEIYA
 				Saint_Seiya
@@ -4875,16 +4879,19 @@ obj
 					Final_Kamehameha
 						CritEffectiveness=0
 						DamageMult=0.4286
-						ChargeRate=4
+						ChargeRate=0.2
 						Distance=150
 						IconLock='BeamKHH.dmi'
 						IconSize=2
 						ChargeIcon=1
 						EnergyCost=30
 						Cooldown=360
+						HeldSkill=TRUE
+						HeldBeam=TRUE
+						ChargePeriod=5
 						verb/Final_Kamehameha()
 							set category="Skills"
-							usr.UseProjectile(src)
+							usr.BeginHeldSkill(src)
 
 					Big_Bang_Kamehameha
 						AttackReplace=1
@@ -4915,7 +4922,7 @@ obj
 							Stream=2
 							EndEffectiveness=1
 							DamageMult=0.2857
-							ChargeRate=2.5
+							ChargeRate=0.2
 							Knockback=0
 							Radius=0
 							Piercing=1
@@ -4935,12 +4942,15 @@ obj
 							ChargeMessage="raises their arms and locks their hands above their head..."
 							ActiveMessage="unleashes the power of Aquarius, flooding their opponent with absolute zero cold!"
 							Cooldown=150
+							HeldSkill=TRUE
+							HeldBeam=TRUE
+							ChargePeriod=4
 							verb/Aurora_Execution()
 								set category="Skills"
 								if(usr.SagaLevel<5 && usr.HealthPct()>15 && !usr.InjuryAnnounce)
 									usr << "You can't use this technique except when in a dire pinch!"
 									return
-								usr.UseProjectile(src)
+								usr.BeginHeldSkill(src)
 						Beam_of_Libra
 							UnarmedOnly=1
 							GodPowered=0.25
@@ -4967,7 +4977,7 @@ obj
 					Weapon_Soul
 						Excalibur
 							DamageMult=0.2571
-							ChargeRate=5
+							ChargeRate=0.2
 							StrScaling=1
 							ForScaling=1
 							EndEffectiveness=1
@@ -4977,13 +4987,16 @@ obj
 							ManaCost=5
 							ABuffNeeded="Soul Resonance"
 							Cooldown=-1
+							HeldSkill=TRUE
+							HeldBeam=TRUE
+							ChargePeriod=3
 							verb/Excalibur()
 								set category="Skills"
-								usr.UseProjectile(src)
+								usr.BeginHeldSkill(src)
 					Jagan
 						Dragon_of_the_Darkness_Flame
 							DamageMult=0.2
-							ChargeRate=3
+							ChargeRate=0.2
 							StrScaling=1
 							ForScaling=1
 							EndEffectiveness=1
@@ -4998,13 +5011,16 @@ obj
 							LockX=0//these are
 							LockY=0//fkcuk
 							Cooldown=300
+							HeldSkill=TRUE
+							HeldBeam=TRUE
+							ChargePeriod=4
 							verb/Dragon_of_the_Darkness_Flame()
 								set category="Skills"
-								usr.UseProjectile(src)
+								usr.BeginHeldSkill(src)
 					Vaizard
 						Cero
 							DamageMult=0.4286
-							ChargeRate=0.5
+							ChargeRate=0.2
 							Cooldown=150
 							ManaCost=10
 							Distance=40
@@ -5013,9 +5029,12 @@ obj
 							LockX=0
 							LockY=0
 							SBuffNeeded="Vaizard Mask"
+							HeldSkill=TRUE
+							HeldBeam=TRUE
+							ChargePeriod=3
 							verb/Cero()
 								set category="Skills"
-								usr.UseProjectile(src)
+								usr.BeginHeldSkill(src)
 					Eight_Gates
 						Daytime_Tiger
 							UnarmedOnly=1
@@ -5556,7 +5575,7 @@ mob
 						sleep(Z.Speed)
 						if(Z.BeamTime)
 							Z.BeamTimeUsed++
-						if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5||(Z.BeamTime>0&&Z.BeamTimeUsed>=Z.BeamTime))
+						if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5||(Z.BeamTime>0&&Z.BeamTimeUsed>=Z.BeamTime*glob.BEAM_TIME_MULT))
 							src.BeamStop(Z)
 					if(Z.Charging)
 						src.BeamStop(Z)
@@ -5957,8 +5976,6 @@ obj
 					src.DrainToSelf=Z.DrainToSelf
 					src.WarpResetCD=Z.WarpResetCD
 					src.Toxic=Z.Toxic
-					src.HolyMod=Z.HolyMod
-					src.AbyssMod=Z.AbyssMod
 					src.SlayerMod=Z.SlayerMod
 					src.CritEffectiveness=Z.CritEffectiveness
 					src.BlockEffectiveness=Z.BlockEffectiveness
@@ -5987,7 +6004,6 @@ obj
 					src.FadeOut=Z.FadeOut
 					src.GoldScatter = Z.GoldScatter
 					src.Primordial = Z.Primordial
-					Sanctify = Z.Sanctify
 					StarCrossed = Z.StarCrossed
 					CooldownDrag = Z.CooldownDrag
 					PainShare = Z.PainShare
@@ -6639,19 +6655,12 @@ obj
 								EffectiveDamage *= 1+src.Owner.passive_handler.Get("TeamHater")
 						if(src.Owner.HasPurity()||src.Purity)//If damager is pure
 							var/found=0//Assume you haven't found a proper target
-							if(src.Owner.HasBeyondPurity()||src.BeyondPurity)//if you can say fuck off to purity...
-								if(src.Owner.HasHolyMod()||src.HolyMod)
-									if(a:IsGood())//good things still heal good people
-										found=1
-								if(found)
-									goto SkipDamage
-							else
-								if(src.Owner.HasHolyMod()||src.HolyMod)//Holy things
-									if(a:IsEvil())//Kill evil things
-										found=1
-								if(!found)//If you don't find what you're supposed to hunt
-									goto SkipDamage
-						var/list/specDmgTypes = buildSpecDmgTypes(HolyMod, Sanctify, AbyssMod, SlayerMod)
+							if(src.Owner.HasHolyMod())//Holy things
+								if(a:IsEvil())//Kill evil things
+									found=1
+							if(!found)//If you don't find what you're supposed to hunt
+								goto SkipDamage
+						var/list/specDmgTypes = buildSpecDmgTypes(SlayerMod)
 						if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 							EffectiveDamage *= 1.25
 						if(src.WarpUser)
@@ -7096,6 +7105,8 @@ obj
 					if(!src.Killed && src.Owner)
 						if(src.Explode)
 							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
+							if(src.loc && src.ImpactFrame)
+								FxHeavyImpact(src.loc, src)
 						if(src.Cluster)
 							for(var/c=src.ClusterCount, c>0, c--)
 								var/obj/Skills/Projectile/_Projectile/cb

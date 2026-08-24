@@ -436,7 +436,7 @@ obj/Items/Magatama/Ankh
 	desc = "A Magatama shaped like the ancient symbol of life. Its restorative power soothes wounds and wards off the touch of darkness."
 	base_passives = list("Godspeed" = 1, "GoodResist" = 1, "LifeGeneration" = 1, "Light Magic Mastery" = 0.2, "HolyMod" = 2)
 	passive_scaling = list("Godspeed" = 0.09, "GoodResist" = 0.04, "LifeGeneration" = 0.04, "Light Magic Mastery" = 0.008, "HolyMod" = 0.08)
-	ascension_passives = list("3" = list("Purity" = 1), "4" = list("BeyondPurity" = 1))
+	ascension_passives = list("3" = list("Purity" = 1))
 	magatama_skills = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Dia)
 	ascension_skills = list("3" = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Media))
 	craft_cost = 5000
@@ -520,7 +520,7 @@ obj/Items/Magatama/Nirvana
 	desc = "A Magatama that embodies the boundless calm of enlightenment. Its radiance pierces all illusion and grants the bearer perfect poise against every darkness."
 	base_passives = list("GoodResist" = 3,  "Light Magic Mastery" = 0.2, "LifeGeneration" = 0.5)
 	passive_scaling = list("GoodResist" = 0.04, "HolyMod" = 0.08, "Light Magic Mastery" = 0.008, "LifeGeneration" = 0.045, "Reversal" = 0.06, "EnergySteal" = 0.25)
-	ascension_passives = list("4" = list("HolyMod" = 2, "Purity" = 1, "BeyondPurity" = 1, "Reversal" = 0.3, "EnergySteal" = 5))
+	ascension_passives = list("4" = list("HolyMod" = 2, "Purity" = 1, "Reversal" = 0.3, "EnergySteal" = 5))
 	magatama_skills = list(/obj/Skills/Projectile/DemiFiend/Divine_Shot)
 	ascension_skills = list("4" = list(/obj/Skills/AutoHit/DemiFiend/Violet_Flash))
 	craft_cost = 15000
@@ -529,8 +529,8 @@ obj/Items/Magatama/Nirvana
 obj/Items/Magatama/Murakumo
 	name = "Murakumo"
 	desc = "The famed cloud-gathering blade, reborn as a Magatama. Legends say it cleaves through any illusion, curse, or chain that binds the soul."
-	base_passives = list("MeleeResist" = 1,  "CrippleResist" = 1, "EvilResist" = 1,  "Harden" = 2, "GoodResist" = 1)
-	passive_scaling = list("MeleeResist" = 0.04,  "CrippleResist" = 0.04, "EvilResist" = 0.04,  "Harden" = 0.08, "GoodResist" = 0.04, "BurnResist" = 0.04, "ChillResist" = 0.04, "ShearResist" = 0.04)
+	base_passives = list("MeleeResist" = 1,  "CrippleResist" = 1, "ChaosResist" = 1,  "Harden" = 2)
+	passive_scaling = list("MeleeResist" = 0.04,  "CrippleResist" = 0.04, "ChaosResist" = 0.04,  "Harden" = 0.08, "BurnResist" = 0.04, "ChillResist" = 0.04, "ShearResist" = 0.04)
 	ascension_passives = list("4" = list("BurnResist" = 1, "ChillResist" = 1, "ShearResist" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Chaos_Blade)
 	ascension_skills = list()
@@ -553,8 +553,8 @@ obj/Items/Magatama/Geis
 obj/Items/Magatama/Djed
 	name = "Djed"
 	desc = "A Magatama shaped like the pillar of stability. Sacred to Osiris, it bears the unshakable spine of order that holds the soul's many bodies aloft."
-	base_passives = list("Harden" = 1, "EvilResist" = 1, "GoodResist" = 1,  "MeleeResist" = 1)
-	passive_scaling = list("Harden" = 0.09,  "EvilResist" = 0.04, "GoodResist" = 0.04,  "MeleeResist" = 0.04)
+	base_passives = list("Harden" = 1, "ChaosResist" = 1,  "MeleeResist" = 1)
+	passive_scaling = list("Harden" = 0.09,  "ChaosResist" = 0.04,  "MeleeResist" = 0.04)
 	ascension_passives = list("4" = list( "DebuffReversal" = 1))
 	magatama_skills = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Tarukaja, /obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Rakukaja)
 	ascension_skills = list("4" = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Sukukaja, /obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makakaja, /obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Dekaja))

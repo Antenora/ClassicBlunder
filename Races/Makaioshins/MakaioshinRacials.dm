@@ -113,7 +113,7 @@
 
 /obj/Skills/Projectile/Beams/Divine_Atonement
 	DamageMult=0.5714
-	ChargeRate=2
+	ChargeRate=0.2
 	Dodgeable=0
 	Distance=30
 	BeamTime=60
@@ -125,12 +125,15 @@
 	InstantDamageChance=1
 	ChargeMessage="begins channeling Divine Atonement..."
 	ActiveMessage="unleashes Divine Atonement!"
+	HeldSkill=TRUE
+	HeldBeam=TRUE
+	ChargePeriod=4
 	verb/Divine_Atonement()
 		set category="Skills"
 		if(usr.transActive != 2 || !istype(usr.race, /race/makaioshin))
 			usr << "You must be in Satan Mode to use this!"
 			return
-		usr.UseProjectile(src)
+		usr.BeginHeldSkill(src)
 
 // Shared 300-second cooldown across all Chaos skills when triggered via combo.
 // Makaioshins with Limited Rank-Up use individual per-skill cooldowns instead.

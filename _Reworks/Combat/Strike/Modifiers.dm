@@ -19,16 +19,16 @@ globalTracker/var/
     MORTAL_VS_GOD_SPEC_DMG_REDUCTION = 0.3;
 
 #define NO_GOD_KI_REDUCTION 1
-#define VALID_SPEC_DMG_TYPE list("Holy", "Abyss", "Slayer")//only slayer is implemented atm
+#define VALID_SPEC_DMG_TYPE list("Slayer")//only slayer is implemented atm
 /mob/proc/attackModifiers(mob/defender, list/forcedDmgList=list())
     var/godKiNerf = NO_GOD_KI_REDUCTION;
     if(defender.HasGodKi() && !HasGodKi() && !HasNull() && !isRace(DEMIFIEND) && !defender.isRace(DEMIFIEND) && !istype(src, /mob/Player/AI/Demon) && !istype(defender, /mob/Player/AI/Demon)) godKiNerf += max(0, (glob.MORTAL_VS_GOD_SPEC_DMG_REDUCTION * defender.GetGodKi()));
-    var/forcedHoly = getForcedDamageType("Holy", forcedDmgList)
-    if(HasHolyMod() || forcedHoly)
-        . += (HolyDamage(defender, forcedHoly) / glob.HOLY_DAMAGE_DIVISOR)
-    var/forcedAbyss = getForcedDamageType("Abyss", forcedDmgList)
-    if(HasAbyssMod() || forcedAbyss)
-        . += (AbyssDamage(defender, forcedAbyss) / glob.ABYSS_DAMAGE_DIVISOR)
+    if(HasHolyMod())
+        . += (HolyDamage(defender) / glob.HOLY_DAMAGE_DIVISOR)
+    if(HasAbyssMod())
+        . += (AbyssDamage(defender) / glob.ABYSS_DAMAGE_DIVISOR)
+    if(HasChaosMod())
+        . += (ChaosDamage(defender) / glob.CHAOS_DAMAGE_DIVISOR)
     . += GetSlayerMod(defender, getForcedDamageType("Slayer", forcedDmgList)) / glob.SLAYER_DAMAGE_DIVISOR; //validates within the GetSlayerMod proc, which does still need to be moved out of _binaryChecks
     . /= max(NO_GOD_KI_REDUCTION, godKiNerf);
 
@@ -41,13 +41,10 @@ globalTracker/var/
     . += isnum(val) ? val : 0;
 
 //one list for every delivery type; null when the skill brings nothing
-/proc/buildSpecDmgTypes(holyMod, sanctify, abyssMod, slayerMod)
-    var/holy = (holyMod ? holyMod : 0) + (sanctify ? sanctify * glob.SANCTIFY_EFFECTIVENESS : 0)
-    if(holy <= 0 && !abyssMod && !slayerMod) return null
+/proc/buildSpecDmgTypes(slayerMod)
+    if(!slayerMod) return null
     . = list()
-    if(holy > 0) .["Holy"] = holy
-    if(abyssMod) .["Abyss"] = abyssMod
-    if(slayerMod) .["Slayer"] = slayerMod
+    .["Slayer"] = slayerMod
 
 /mob/proc/desperationCheck()
 	var/bonus = 1

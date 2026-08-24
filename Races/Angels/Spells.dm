@@ -44,7 +44,6 @@
 	HitSparkSize=1.5
 	HitSparkDispersion=1
 	TurfStrike=1
-	HolyMod = 1.5
 	ManaCost = 6
 	EnergyCost = 8
 	Rounds = 1
@@ -63,7 +62,6 @@
 	Area = "Around Target"
 	SpellElement = "Light"
 	DamageMult = 0.5
-	HolyMod = 2.5
 	Distance = 5
 	DistanceAround = 3
 	EnergyCost = 5
