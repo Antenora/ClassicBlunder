@@ -222,9 +222,11 @@ proc/_CoatFxOn(mob/M, key, i)
 			P.fade = 5
 			P.fadein = 2
 			P.scale = generator("num", 0.3, 0.55)
+			P.gradient = list(0, "#fff8dc", 0.35, "#ffb43c", 0.7, "#e04818", 1, "#78180a")
+			P.color = generator("num", 0, 0.15)
+			P.color_change = 0.11
 			P.spawning = 0
 			D.particles = P
-			D.color = "#ff9a3c"
 		else
 			D.icon = _coat_tex["tendrils"]
 			D.color = "#fff578"
@@ -256,7 +258,6 @@ proc/_CoatFxOff(mob/M)
 	appearance_flags = KEEP_APART
 	plane = 0
 	layer = 5
-	color = "#a01018"
 
 var/list/_coat_drip_pool = list()
 
@@ -280,6 +281,9 @@ proc/_CoatDripOn(mob/M, i)
 			P.lifespan = generator("num", 6, 10)
 			P.fade = 5
 			P.scale = generator("num", 0.35, 0.6)
+			P.gradient = list(0, "#e04858", 0.45, "#a01018", 1, "#500810")
+			P.color = 0
+			P.color_change = 0.12
 			P.spawning = 0
 			D.particles = P
 		M.vis_contents += D
