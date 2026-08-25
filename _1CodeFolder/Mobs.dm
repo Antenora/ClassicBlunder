@@ -89,5 +89,3 @@ mob/Players
 					src.loc=locate(B.x,B.y,B.z)
 					break
 
-		PlanetEnterBump(A,src)
-
