@@ -1,10 +1,10 @@
 /obj/Skills/Buffs/Ki_Control/Cursed_Energy
-	BuffName = "Cursed Energy"
-    passives = list("KiControl" = 1, "PureDamage" = 1, "PureReduction" = 1,    "ManaGeneration" =1. "[selectedPassive]" = 1, "EnergyLeak" = 1)
+    BuffName = "Cursed Energy"
+    passives = list("KiControl" = 1, "PureDamage" = 1, "PureReduction" = 1, "ManaGeneration" =1, "EnergyLeak" = 1)
     ActiveMessage = "enhances their body with Cursed Energy!"
     OffMessage = "loosens the control on their Cursed Energy."
     adjust(mob/P)
-        passives["[selectedPassive]"] = 1
+        passives["[P.selectedPassive]"] = 1
         passives["PureDamage"] = P.SagaLevel * 2
         passives["PureReduction"] = P.SagaLevel
         passives["SpiritPower"] = 0.25 * P.SagaLevel
