@@ -153,20 +153,6 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	if(Z.NeedsSword && !src.EquippedSword() && !src.HasBladeFisting() && !src.UsingBattleMage())
 		src << "<font color='red'>You need a sword to use this technique!</font>"
 		return FALSE
-	var/abn = ("ABuffNeeded" in Z.vars) ? Z.vars["ABuffNeeded"] : null
-	if(abn)
-		if(!src.ActiveBuff || src.ActiveBuff.BuffName != abn)
-			src << "<font color='red'>You have to be in [abn] state to use [Z]!</font>"
-			return FALSE
-	var/sbn = ("SBuffNeeded" in Z.vars) ? Z.vars["SBuffNeeded"] : null
-	if(sbn)
-		if(sbn == -1)
-			if(src.SpecialBuff)
-				src << "<font color='red'>You need to shed your special empowerments to use [Z]!</font>"
-				return FALSE
-		else if(!src.SpecialBuff || src.SpecialBuff.BuffName != sbn)
-			src << "<font color='red'>You have to be in [sbn] state to use [Z]!</font>"
-			return FALSE
 	// resource requirements -- availability only; the cost is deducted when the skill fires
 	if(Z.HealthCost && src.HealthPct() < Z.HealthCost * glob.WorldDamageMult)
 		src << "<font color='red'>You don't have enough health to use [Z].</font>"

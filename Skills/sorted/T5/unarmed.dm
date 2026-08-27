@@ -3,7 +3,6 @@
 	SkillCost=TIER_5_COST
 	Copyable=6
 	Stunner=1
-	MenuIcon="TheShowStopper"
 	DamageMult=5.5
 	LedgerCashoutPer=0.12
 	LedgerCashoutCap=5
@@ -25,7 +24,6 @@
 	SkillCost = TIER_5_COST
 	Copyable = 6
 	Area = "Around Target"
-	MenuIcon="MeteorStrike"
 	StrScaling = 2
 	DamageMult = 10.75
 	Distance = 12

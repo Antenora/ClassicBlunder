@@ -1781,6 +1781,9 @@ mob
 			var/dense=0
 			for(var/atom/a in get_step(src, src.Knockbacked))
 				if(a.density)
+					if(istype(a, /obj/Items/Tech/Door))
+						PlanetEnterBump(a, src)
+						continue
 					if(ismob(a))
 						var/mob/dm = a
 						if(dm == src.kb_sender || (dm.is_dashing && dm.Target == src))

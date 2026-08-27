@@ -1589,7 +1589,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	IconSize = 1
 	Distance = 50
 	DamageMult = 1.1429
-	ChargeRate = 0.2
+	ChargeRate = 0.5
 	BeamTime = 25
 	AccMult = 1.175
 	Knockback = 1
@@ -1597,16 +1597,13 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	Cooldown = 90
 	ChargeMessage = "concentrates an overwhelming surge of almighty power..."
 	ActiveMessage = "fires a devastating beam of almighty force - Freikugel!"
-	HeldSkill = TRUE
-	HeldBeam = TRUE
-	ChargePeriod = 3
 	adjust(mob/p)
 		if(!altered)
 			DamageMult = (40 + (2 * p.AscensionsAcquired)) / 35
 	verb/Freikugel()
 		set category = "Skills"
 		adjust(usr)
-		usr.BeginHeldSkill(src)
+		usr.UseProjectile(src)
 
 /obj/Skills/AutoHit/DemiFiend/Glacial_Blast_Ice
 	name = "Glacial Blast"
@@ -1682,7 +1679,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	Distance = 40
 	DamageMult = 0.5714
 	BeamTime = 20
-	ChargeRate = 0.2
+	ChargeRate = 1
 	AccMult = 1.175
 	Knockback = 1
 	Deflectable = -1
@@ -1690,9 +1687,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	Cooldown = 90
 	ChargeMessage = "ignites the magma within their blade..."
 	ActiveMessage = "fires a blazing Magma Axis!"
-	HeldSkill = TRUE
-	HeldBeam = TRUE
-	ChargePeriod = 3
 	adjust(mob/p)
 		if(!altered)
 			DamageMult = (20 + (2 * p.AscensionsAcquired)) / 35
@@ -1700,7 +1694,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	verb/Magma_Axis()
 		set category = "Skills"
 		adjust(usr)
-		usr.BeginHeldSkill(src)
+		usr.UseProjectile(src)
 
 /obj/Skills/Projectile/DemiFiend/Spiral_Viper_Beam
 	parent_type = /obj/Skills/Projectile/Beams
@@ -1710,7 +1704,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	IconLock = 'BeamFS.dmi'
 	Distance = 50
 	DamageMult = 0.8571
-	ChargeRate = 0.2
+	ChargeRate = 1
 	BeamTime = 15
 	AccMult = 1.175
 	Knockback = 1
@@ -1720,16 +1714,13 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	Cooldown = 120
 	ChargeMessage = "coils their power into a singular lethal strike..."
 	ActiveMessage = "fires Spiral Viper with devastating force!"
-	HeldSkill = TRUE
-	HeldBeam = TRUE
-	ChargePeriod = 3
 	adjust(mob/p)
 		if(!altered)
 			DamageMult = (30 + (1.5 * p.AscensionsAcquired)) / 35
 	verb/Spiral_Viper()
 		set category = "Skills"
 		adjust(usr)
-		usr.BeginHeldSkill(src)
+		usr.UseProjectile(src)
 
 /obj/Skills/AutoHit/DemiFiend/Mamudo_Curse
 	name = "Mamudo"

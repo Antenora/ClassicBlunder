@@ -168,12 +168,12 @@ obj/Skills/Utility/Recall_Celestial_Armaments
 			Class = "Light"
 			spdAdd=1
 			strAdd=1
-			passives = list()
+			passives = list("Duelist" = 1)
 			DamageEffectiveness = 1.025
 			AccuracyEffectiveness = 0.9
 			SpeedEffectiveness = 1.25
 			ObjectUse(mob/Players/User=usr)
-				src.passives = list()
+				src.passives = list("Duelist" = 1 + (User.Potential / 25))
 				..()
 
 		Light_Celestial_Blade_III

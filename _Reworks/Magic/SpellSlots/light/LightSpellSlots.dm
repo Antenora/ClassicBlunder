@@ -11,7 +11,7 @@
 		StableHeal=1
 		HealthHeal=0.05
 		WoundHeal=1
-		passives=list("HolyMod" = 1, "LifeGeneration" = 2)
+		passives=list("HolyMod" = 1, "LifeGeneration" = 2, "PureReduction" = 5)
 		ActiveMessage="channels the light to mend their wounds!"
 		OffMessage="lets the blessing fade..."
 		verb/Bless()

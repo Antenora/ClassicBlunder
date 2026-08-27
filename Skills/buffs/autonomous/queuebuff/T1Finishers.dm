@@ -97,7 +97,7 @@
     Crescent_Blessing
         IconLock='SweatDrop.dmi'
         IconApart=1
-        passives = list("Tossing" = 1.5, "Hit Scan" = 2 , "TensionLock" = 1) // not sure
+        passives = list("Tossing" = 1.5, "SlayerMod" = 1, "FavoredPrey" = "Mortal", "Hit Scan" = 2 , "TensionLock" = 1) // not sure
         StyleOff = 1.2
         StyleStr = 1.2
         StyleSpd = 1.1

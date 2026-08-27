@@ -7,7 +7,7 @@
 		OffMult = 1.15
 		DefMult = 1.1
 		SpdMult = 1.25
-		passives = list("Parry" = 2, "Deflection" = 2, "CounterMaster" = 2, "Momentum" = 2, "TensionLock" = 1)
+		passives = list("Parry" = 2, "Deflection" = 2, "CounterMaster" = 2, "Momentum" = 2, "Duelist" = 1, "TensionLock" = 1)
 		ActiveMessage = "moves in harmony with their sword, beyond thought."
 		OffMessage = "releases their focused awareness."
 

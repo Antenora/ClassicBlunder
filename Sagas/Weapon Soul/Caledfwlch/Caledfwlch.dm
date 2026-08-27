@@ -30,6 +30,7 @@ obj/Skills/Queue/Excalibur
 	HitMessage="unleashes the holy energy with a swing of her blade!"
 	NeedsSword=1
 	ABuffNeeded="Soul Resonance"
+	HolyMod=2
 	PushOut=1
 	PushOutWaves=1
 	PushOutIcon='KenShockwaveGold.dmi'
@@ -84,6 +85,7 @@ obj/Skills/AutoHit/True_Excalibur
 	DelayTime=2
 	ComboMaster=1
 	CursedWounds=1
+	HolyMod=4
 	Quaking=8
 	Divide=1
 	PreShockwave=1
@@ -130,6 +132,7 @@ obj/Skills/Queue/ExcaliburMorgan
 	HitMessage="unleashes the corrupted miasma with a swing of her blade!"
 	NeedsSword=1
 	ABuffNeeded="Soul Resonance"
+	AbyssMod=2
 	PushOut=1
 	PushOutWaves=1
 	PushOutIcon='KenShockwavePurple.dmi'
@@ -185,6 +188,7 @@ obj/Skills/AutoHit/False_Excalibur
 	DelayTime=2
 	ComboMaster=1
 	CursedWounds=1
+	AbyssMod=4
 	Quaking=10
 	Divide=1
 	PreShockwave=1
@@ -249,6 +253,7 @@ obj/Skills/AutoHit/False_Excalibur
 		TrailDuration=1
 		Dodgeable=-1
 		Deflectable=-1
+		HolyMod=5
 		Distance=100
 		Cooldown = 60
 		adjust(mob/p)
@@ -257,6 +262,7 @@ obj/Skills/AutoHit/False_Excalibur
 			IconSize = 1 + p.SagaLevel
 			Homing = 1 + p.SagaLevel
 			LosesHoming = 1 + p.SagaLevel
+			HolyMod = 5 + p.SagaLevel
 		verb/Excalibur()
 			set category = "Skills"
 			adjust(usr)
@@ -327,7 +333,7 @@ obj/Skills/AutoHit/False_Excalibur
 	King_Of_Camelot
 		StrMult=1.3
 		ForMult=1.3
-		passives = list()
+		passives = list( "Duelist" = 1)
 
 /mob/Players/verb
 	Excalignment()

@@ -1109,7 +1109,7 @@ obj/Items/Sword
 				NoSaga = 1
 				Unobtainable = 1
 				Element = "Ultima"
-				passives = list("SweepingStrike"=1, "Extend"=2)
+				passives = list("PureDamage"=5,   "SweepingStrike"=1, "Extend"=2)
 
 				// Ea can only be dismissed via the Summon Ea skill
 				AlignEquip(mob/A, dontUnEquip = FALSE)

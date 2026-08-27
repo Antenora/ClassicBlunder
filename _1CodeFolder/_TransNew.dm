@@ -507,6 +507,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 			if("Soul Calibur")
 				src.ElementalOffense="Water"
 				src.ElementalDefense="Void"
+				passive_handler.Increase("PureReduction", 6)
 				passive_handler.Increase("Unstoppable")
 				passive_handler.Increase("NoWhiff")
 				passive_handler.Increase("AbsoluteZero")
@@ -536,6 +537,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.ElementalDefense="Void"
 				passive_handler.Increase("TechniqueMastery", 5)
 				passive_handler.Increase("Momentum", 4)
+				passive_handler.Increase("PureDamage",6)
 				passive_handler.Increase("HellPower", 1)
 				var/i='LavaTile.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
@@ -684,6 +686,7 @@ mob/proc/RevertWS()
 		if("Soul Calibur")
 			src.ElementalOffense=null
 			src.ElementalDefense=null
+			passive_handler.Decrease("PureReduction", 6)
 			passive_handler.Decrease("Unstoppable", 1)
 			passive_handler.Decrease("NoWhiff")
 			passive_handler.Decrease("AbsoluteZero")
@@ -694,6 +697,7 @@ mob/proc/RevertWS()
 			src.ElementalDefense=null
 			passive_handler.Decrease("TechniqueMastery", 5)
 			passive_handler.Decrease("Momentum", 4)
+			passive_handler.Decrease("PureDamage",6)
 			passive_handler.Decrease("HellPower", 1)
 		if("Muramasa")
 			src.ElementalOffense=null

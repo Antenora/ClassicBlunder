@@ -50,5 +50,6 @@ obj
 					var/secretlevel = p.getSecretLevel()
 					DamageMult= 1 * (secretlevel)
 					Combo=25 + (5 * secretlevel)
+					HolyMod=2.5 * secretlevel
 					Scorching= 5 * secretlevel
 				//set manually so no verb

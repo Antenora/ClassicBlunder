@@ -9,7 +9,7 @@ transformation
 			form_glow_x = -32
 			form_glow_y = -32
 			unlock_potential = 45
-			passives = list("Flicker" = 1, "Pursuer" = 2, "PureReduction" = -4,  "SaiyanPower1"=0.5)
+			passives = list("Flicker" = 1, "Pursuer" = 2,  "PureDamage" = 1, "PureReduction" = -4,  "SaiyanPower1"=0.5)
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
 			offenseadd = 0.3
@@ -26,7 +26,7 @@ transformation
 				if(user.Potential>=43&&mastery<100)
 					mastery=100
 				var/MasteryBoost=round(mastery/25, 1)
-				passives = list("Flicker" = 1+(MasteryBoost/4), "Pursuer" = 2, "PureReduction" = min(0, -2+MasteryBoost),  "SaiyanPower1"=0.8)
+				passives = list("Flicker" = 1+(MasteryBoost/4), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost,  "SaiyanPower1"=0.8)
 				if(user.Potential>=27)
 					if(!locate(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2, user)&&user.isRace(SAIYAN))
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
@@ -38,7 +38,7 @@ transformation
 						user.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanTypeY)
 						user << "You can strain past the limits of your Super Saiyan form! Grade 3 Unlocked!"
 				if(mastery >= 100)
-					passives = list("Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2, "PureReduction" = min(0, -2+MasteryBoost),  "SaiyanPower1"=1.75)
+					passives = list("Flicker" = 1+(MasteryBoost/2), "Pursuer" = 2,  "PureDamage" = 3+(MasteryBoost/2), "PureReduction" = -2+MasteryBoost,  "SaiyanPower1"=1.75)
 				if(user.Potential>=35)
 					if(user.Class == "Zeal")
 						if(!locate(/obj/Skills/Buffs/SpecialBuffs/SaiyanFervor, user))
@@ -65,7 +65,7 @@ transformation
 					strengthadd = 0.4
 					forceadd = 0.4
 				if(user.Class == "Pride")
-					class_passives = list("Flicker" = 2, "Pursuer" = 1)
+					class_passives = list("PureDamage" = 1.5, "Flicker" = 2, "Pursuer" = 1)
 					speedadd = 0.3
 					enduranceadd = 0.1
 					offenseadd = 0.45
@@ -73,7 +73,7 @@ transformation
 					strengthadd = 0.4
 					forceadd = 0.4
 				if(user.Class == "Honor")
-					class_passives = list("EnergyGeneration" = 3)
+					class_passives = list("PureReduction" = 1.5, "EnergyGeneration" = 3)
 					speedadd = 0.3
 					enduranceadd = 0.1
 					offenseadd = 0.45
@@ -161,9 +161,9 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 3, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			mastery_boons(mob/user)
-				passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+				passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "PureDamage" = 3, "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -219,7 +219,7 @@ transformation
 			var/tailIcon = 'saiyantail_ssj4.dmi'
 			var/tailUnderlayIcon = 'saiyantail_ssj4_under.dmi'
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "PureReduction" = 5, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -229,8 +229,8 @@ transformation
 
 			mastery_boons(mob/user)
 				passives = list("Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
-				"KiControlMastery" = 4, "Reversal" = 0.1 + (mastery/200),\
-				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1)
+				"KiControlMastery" = 4, "PureReduction" = 3, "Reversal" = 0.1 + (mastery/200),\
+				"Flicker" = 5, "Pursuer" = 5, "PureDamage"= 3,"SSJ4LimitBreaker"=1)
 				speed = 1.25 + (mastery/400)
 				endurance = 1.25 + (mastery/400)
 				offense = 1.25 + (mastery/400)

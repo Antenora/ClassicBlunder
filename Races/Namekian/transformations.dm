@@ -7,7 +7,7 @@ transformation
 			form_glow_icon = 'Ripple Radiance.dmi'
 			form_glow_x = -32
 			form_glow_y = -32
-			passives = list("Flicker" = 2, "Pursuer" = 3)
+			passives = list("Flicker" = 2, "Pursuer" = 3,  "PureDamage" = 2, "PureReduction" = 2)
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -27,13 +27,14 @@ transformation
 				if(user.Potential<45)
 					if(user.HealthPct()>=(20+user.Potential/4)) return
 				if(user.Class=="Demon") return
-				passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), "Pursuer" = round(max(user.AscensionsAcquired/3, 1)))
+				passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), "Pursuer" = round(max(user.AscensionsAcquired/3, 1)),   "PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
 				..()
 			mastery_boons(mob/user)
 				switch(user.Potential)
 					if(0 to 30)
 						passives = list("Flicker" = round(max(user.AscensionsAcquired, 2)), \
-						"Pursuer" = round(max(user.AscensionsAcquired/3, 1)))
+						"Pursuer" = round(max(user.AscensionsAcquired/3, 1)),  \
+						"PureDamage" = round(max(user.AscensionsAcquired/2, 1)), "PureReduction" = round(max(user.AscensionsAcquired/2, 1)))
 						speedadd = 0.6
 						offenseadd = 0.5
 						defenseadd = 0.5
@@ -43,7 +44,7 @@ transformation
 					if(31 to 60)
 						passives = list("Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
 							"Pursuer" = round(max(user.AscensionsAcquired, 1)),  \
-							"Orange Namekian"=1)
+							"PureDamage" = round(max(user.AscensionsAcquired, 1)), "PureReduction" = round(max(user.AscensionsAcquired, 1)),   "Orange Namekian"=1)
 						speedadd = 0.75
 						offenseadd = 0.75
 						defenseadd = 0.75
@@ -54,7 +55,7 @@ transformation
 					if(61 to 100)
 						passives = list("Flicker" = round(max(user.AscensionsAcquired*1.5, 2)), \
 							"Pursuer" = round(max(user.AscensionsAcquired, 1)),  \
-							"Orange Namekian"=1)
+							"PureDamage" = round(max(user.AscensionsAcquired*1.5, 1)), "PureReduction" = round(max(user.AscensionsAcquired, 1)),   "Orange Namekian"=1)
 						speedadd = 1.5
 						offenseadd = 1.5
 						defenseadd = 1.5

@@ -150,6 +150,9 @@
 		var/N = ExpandLevel
 		var/mastered = (N < p.AscensionsAcquired)
 		passives = list(
+			"PureDamage"    =  N,
+			"PureReduction" =  N,
+			
 			"Inevitable"    =  N
 		)
 		if(N >= 3)
@@ -228,7 +231,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Makyo/Fall/Harvest_Time
 	SpdMult=0.25
 	TimerLimit=60
-	passives= list("SlayerMod"=5, "FavoredPrey"= "Human", "GodspeedDisabled"= 1, "Extend" = 1, "Gum Gum" = 1)
+	passives= list("SlayerMod"=5, "FavoredPrey"= "Mortal", "GodspeedDisabled"= 1, "Extend" = 1, "Gum Gum" = 1)
 	verb/Time_to_Harvest()
 		set category="Skills"
 		src.Trigger(usr)
@@ -237,7 +240,7 @@
 	TimerLimit=60
 	ManaDrain=5
 	FatigueDrain=5
-	passives= list("Blubber" = 3)
+	passives= list("PureReduction" = 5, "Blubber" = 3)
 	verb/Hibernation_Preparation()
 		set category="Skills"
 		src.Trigger(usr)

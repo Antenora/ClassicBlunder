@@ -30,7 +30,7 @@
 /obj/Skills/Projectile/Beams/Will_Beam
 	Copyable=0
 	DamageMult=0.4
-	ChargeRate=0.2
+	ChargeRate=5
 	Distance=50
 	Knockback=1
 	IconLock='BeamBig2.dmi'
@@ -38,12 +38,9 @@
 	Cooldown=15
 	BeamTime=10
 	EnergyCost=3
-	HeldSkill=TRUE
-	HeldBeam=TRUE
-	ChargePeriod=2.5
 	verb/Will_Beam()
 		set category="Skills"
-		usr.BeginHeldSkill(src)
+		usr.UseProjectile(src)
 // Grapple
 /obj/Skills/Grapple/Seismic_Toss
 	Copyable=0

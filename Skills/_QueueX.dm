@@ -634,6 +634,7 @@ obj
 
 				Ashura_Kai
 					DamageMult=1
+					PureDamage=5
 					InstantStrikes=10
 					InstantStrikesDelay=1.5
 					HitSparkIcon='Slash - Ragna.dmi'

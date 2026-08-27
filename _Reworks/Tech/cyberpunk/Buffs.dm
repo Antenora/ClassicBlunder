@@ -27,7 +27,7 @@
             Warping = totalPotRounded/25
             passives = list("AfterImages" = 3, "AfterImageSkin" = "Cooler", "Godspeed" = Godspeed, \
             "CriticalDamage" = CriticalDamage, "Crippling" = Crippling, "SlayerMod" = SlayerMod,\
-            "Warping" = Warping, "CursedWounds" = 1,  "FavoredPrey" = "Cybernetic")
+            "Warping" = Warping, "CursedWounds" = 1,  "FavoredPrey" = "Mortal")
             Cooldown = 120 - (totalPotRounded)
             TimerLimit = 10 + (totalPotRounded/10)
             if(p.SpecialBuff?:sandevistanUsages >= 0)

@@ -22,7 +22,9 @@ ascension
 				if(!first) return
 				var/choice = first.choiceSelected
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
-					passives += list( "Adrenaline" = 1)
+					passives += list( "Adrenaline" = 1, "PureReduction" = 0.5)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
+					passives += list( "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				if(owner.transUnlocked<1)
@@ -41,7 +43,9 @@ ascension
 				if(!first) return
 				var/choice = first.choiceSelected
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
-					passives += list( "Juggernaut" = 1)
+					passives += list( "Juggernaut" = 1, "PureReduction" = 0.5)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
+					passives += list( "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -55,7 +59,9 @@ ascension
 				if(!first) return
 				var/choice = first.choiceSelected
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
-					passives += list( "Adrenaline" = 1)
+					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
+					passives += list( "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -69,7 +75,9 @@ ascension
 				if(!first) return
 				var/choice = first.choiceSelected
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
-					passives += list( "Adrenaline" = 1)
+					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
+					passives += list( "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -83,7 +91,9 @@ ascension
 				if(!first) return
 				var/choice = first.choiceSelected
 				if(istype(choice, /ascension/sub_ascension/saiyan/honor))
-					passives += list( "Adrenaline" = 1)
+					passives += list( "Adrenaline" = 1, "PureReduction" = 1)
+				if(istype(choice, /ascension/sub_ascension/saiyan/pride))
+					passives += list( "PureDamage" = 1)
 			onAscension(mob/owner)
 				simulateChoiceMutation(owner)
 				..()
@@ -93,7 +103,7 @@ ascension
 		saiyan
 			honor
 				skills = list(/obj/Skills/Buffs/SlotlessBuffs/Saiyan_Grit)
-				passives = list("ZenkaiPower" = 1, "Defiance" = 1, "Juggernaut" = 0.5)
+				passives = list("ZenkaiPower" = 1, "Defiance" = 1, "Juggernaut" = 0.5, "PureReduction" = 0.5)
 
 				onAscension(mob/owner)
 					owner.Class = "Honor"
@@ -101,7 +111,7 @@ ascension
 
 			pride
 				skills = list(/obj/Skills/Buffs/SlotlessBuffs/Saiyan_Dominance)
-				passives = list("Pride" = 1)
+				passives = list("Pride" = 1, "PureDamage" = 0.5)
 
 				onAscension(mob/owner)
 					owner.Class = "Pride"

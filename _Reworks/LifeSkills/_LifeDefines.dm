@@ -134,7 +134,7 @@ var/list/LIFE_METAL_TRAITS = list(\
 	"gold"       = list("wDmg" = -0.020, "wAcc" =  0.010, "wSpd" = -0.010, "aAbs" = -0.04, "aAcc" =  0.010, "aSpd" = -0.010, "dura" = 0.5, "adds" = list("Str" = 0.7, "End" = 0.7, "For" = 0.7, "Spd" = 0.7, "Off" = 0.7, "Def" = 0.7)),\
 	"mythril"    = list("wDmg" = -0.005, "wAcc" =  0.015, "wSpd" =  0.045, "aAbs" = -0.01, "aAcc" =  0.015, "aSpd" =  0.040, "dura" = 1.2, "adds" = list("Spd" = 1.3, "Off" = 1.3, "End" = 0.9), "wpass" = list("ManaGeneration" = 2), "apass" = list("ManaGeneration" = 2)),\
 	"adamantite" = list("wDmg" =  0.030, "wAcc" = -0.005, "wSpd" = -0.030, "aAbs" =  0.09, "aAcc" = -0.015, "aSpd" = -0.030, "dura" = 2.0, "adds" = list("Def" = 1.35, "End" = 1.35, "Spd" = 0.75), "apass" = list("ShatterResist" = 5)),\
-	"starmetal"  = list("wDmg" =  0.050, "wAcc" =  0.010, "wSpd" = -0.010, "aAbs" =  0.07, "aAcc" =  0.010, "aSpd" =  0.000, "dura" = 1.4, "adds" = list("Str" = 1.35, "Off" = 1.35, "For" = 1.35, "Def" = 0.9)),\
+	"starmetal"  = list("wDmg" =  0.050, "wAcc" =  0.010, "wSpd" = -0.010, "aAbs" =  0.07, "aAcc" =  0.010, "aSpd" =  0.000, "dura" = 1.4, "adds" = list("Str" = 1.35, "Off" = 1.35, "For" = 1.35, "Def" = 0.9), "wpass" = list("PureDamage" = 1)),\
 	"orichalcum" = list("wDmg" =  0.030, "wAcc" =  0.015, "wSpd" =  0.020, "aAbs" =  0.08, "aAcc" =  0.015, "aSpd" =  0.020, "dura" = 1.7, "adds" = list("Def" = 1.3, "End" = 1.3, "Spd" = 1.1, "Str" = 0.9), "apass" = list("CriticalBlock" = 0.10)))
 
 // every gem gives AND takes. T4-5 give twice. magnitude = gem quality (1..5) on every listed stat.

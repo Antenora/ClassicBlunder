@@ -43,6 +43,9 @@
                     es.ShroudedPassives["Shonen"]=1;
                     es.ShroudedPassives["ShonenPower"]=0.5;
                     es.ShroudedPassives["Persistence"]=1;
+                if("Saiyan")
+                    es.ShroudedPassives["PureDamage"]=1;
+                    es.ShroudedPassives["PureReduction"]=1;
                 if("Namekian")
                     es.ShroudedPassives["TechniqueMastery"]=1;
                     es.ShroudedPassives["Pursuer"]=1;
@@ -81,9 +84,13 @@
                 if("Dogged")
                     es.ShroudedPassives["Motivation"] = 0.25;
                 if("Honor")
+                    es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Juggernaut"] = 2;
+                if("Pride")
+                    es.ShroudedPassives["PureDamage"] = 2;
                 if("Warrior")
                     es.ShroudedPassives["TechniqueMastery"] = 2;
+                    es.ShroudedPassives["Duelist"] = 2;
                     es.ShroudedPassives["Tenacity"] = 2;
                 if("Dragon")
                     es.ShroudedPassives["QuickCast"] = 2;
@@ -110,6 +117,8 @@
                     es.ShroudedPassives["UnderDog"] = 2;
                     es.ShroudedPassives["Tenacity"] = 2;
                 if("Despair")
+                    es.ShroudedPassives["PureDamage"] = 2;
+                    es.ShroudedPassives["PureReduction"] = 2;
                     es.ShroudedPassives["Flicker"] = 2;
                 if("Eternity")
                     es.ShroudedPassives["Pursuer"] = 3;

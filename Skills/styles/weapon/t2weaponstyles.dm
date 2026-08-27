@@ -49,7 +49,7 @@
 	Witch_Hunter
 		SignatureTechnique = 2
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk"="/obj/Skills/Buffs/NuStyle/SwordStyle/Fierce_Deity")
-		passives = list("FavoredPrey" = "Vampire", "SlayerMod" = 2 , "Shearing" = 6, "BladeFisting" = 1, "Secret Knives" = "Stake", \
+		passives = list("FavoredPrey" = "Secret", "SlayerMod" = 2 , "Shearing" = 6, "BladeFisting" = 1, "Secret Knives" = "Stake", \
 						"Tossing" = 2, "Half-Sword" = 2,  "Extend" = 1)
 		BladeFisting=1
 		NeedsSword=0

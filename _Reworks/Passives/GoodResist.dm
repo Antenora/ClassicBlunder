@@ -5,8 +5,8 @@ globalTracker/var
 
 passiveInfo/GoodResist
     setLines()
-        lines = list("Reduces the damage you take from attackers with the Good alignment, but increases the damage you take from every other source by the same amount.",\
-"Each tick of the passive is worth [glob.outputVariableInfo("GOOD_RESIST_EPT")]% damage reduction against a Good-aligned source and [glob.outputVariableInfo("GOOD_RESIST_EPT")]% extra damage taken from any non-Good source.",\
+        lines = list("Reduces the damage you take from attackers with the Good alignment.",\
+"Each tick of the passive is worth [glob.outputVariableInfo("GOOD_RESIST_EPT")]% damage reduction against a Good-aligned source.",\
 "Minimum number of ticks: [glob.outputVariableInfo("GOOD_RESIST_MIN")]",\
 "Maximum number of ticks: [glob.outputVariableInfo("GOOD_RESIST_MAX")]");
 
@@ -16,9 +16,6 @@ mob/proc/
         . = FULL_GOOD_AMT
         . -= (getGoodResist() * glob.GOOD_RESIST_EPT);
         . = clamp(., getMaxGoodResistValue(), getMinGoodResistValue());
-    getGoodResistVulnValue()
-        . = FULL_GOOD_AMT
-        . += (getGoodResist() * glob.GOOD_RESIST_EPT);
     getGoodResist()
         . = 0
         . += passive_handler.Get("GoodResist");

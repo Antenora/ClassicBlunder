@@ -7,7 +7,7 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
-			passives = list("Flicker" = 4, "Pursuer" = 5)
+			passives = list("Flicker" = 4, "Pursuer" = 5,  "PureDamage" = 4, "PureReduction" = 4)
 			unlock_potential = 65
 
 			adjust_transformation_visuals(mob/user)

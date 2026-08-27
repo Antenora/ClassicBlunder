@@ -42,7 +42,7 @@ mob
 			var/obj/Skills/Buffs/s = src.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Wilder/Never_Fall/)
 			if(!s.Using)
 				s.Trigger(src, TRUE)
-
+		
 
 		src.verb_delay=world.time+1
 		for(var/b in src.SlotlessBuffs)
@@ -1077,25 +1077,6 @@ mob/Players/verb
 			KenShockwave(src, icon='KenShockwaveFocus.dmi', Size=0.5, Blend=2, Time=3)
 			OMsg(src, "[src] strikes a pose!")
 			return
-		if(usr.Target && ismob(usr.Target) && usr.Target.Stunned && !usr.Target.passive_handler.Get("Staggered!"))
-			if(usr.Target == usr || (usr.party && usr.party.members && (usr.Target in usr.party.members)))
-				usr << "You can't taunt yourself or your party members!"
-			else
-				OMsg(src, "[src] taunts [usr.Target]!")
-				KenShockwave(usr.Target, icon='KenShockwaveBloodlust.dmi', Size=0.5, Blend=2, Time=3)
-				StunClear(usr.Target)
-				usr.Target.AngerEvent(1)
-				var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted/s = usr.Target.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted)
-				if(!BuffOn(s))
-					if(usr.Target.TiltedLast == -1)
-						usr.Target.TiltedLast = 200
-						s.Trigger(usr.Target, TRUE)
-					else
-						src << "Can't taunt them again just yet!! (Cooldown: [usr.Target.TiltedLast/2] seconds.)"
-						usr.Target.AngerEvent(2)
-				else
-					src << "They're already tilted..."
-					usr.Target.AngerEvent(2)
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")

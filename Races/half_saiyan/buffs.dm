@@ -25,5 +25,5 @@
 
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list( "Persistence" =  0.5 + (0.5 * asc))
+        passives = list( "PureDamage" = 0.5 * asc, "Persistence" =  0.5 + (0.5 * asc))
 

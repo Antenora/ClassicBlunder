@@ -64,7 +64,7 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/25,1),  \
-						"Flicker" = 1, "Pursuer" = 1 )
+						"Flicker" = 1, "Pursuer" = 1, "PureDamage" = 0.5, "PureReduction" = 0.5 )
 		switch(p.oozaru_type)
 			if("Wrathful")
 				StrMult = 1.4
@@ -102,7 +102,7 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/10,1),   \
-						"Powerhouse" = 1 + (p.Potential/75), "Flicker" = 2, "Pursuer" = 2)
+						"Powerhouse" = 1 + (p.Potential/75), "Flicker" = 2, "Pursuer" = 2, "PureDamage" = 1, "PureReduction" = 1)
 		EndMult = 1 + (p.Potential/125)
 		StrMult = 1 + (p.Potential/125)
 		ForMult = 1 + (p.Potential/125)
@@ -127,7 +127,7 @@ scaling with potential as well
 	adjust(mob/p)
 		if(altered) return
 		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/5,1),   \
-						"Powerhouse" = 2 + (p.Potential/25), "Flicker" = 3, "Pursuer" = 3)
+						"Powerhouse" = 2 + (p.Potential/25), "Flicker" = 3, "Pursuer" = 3,  "PureDamage" = 1.5, "PureReduction" = 1.5)
 		EndMult = 1 + (p.Potential/100)
 		StrMult = 1 + (p.Potential/100)
 		ForMult = 1 + (p.Potential/100)

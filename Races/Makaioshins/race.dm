@@ -14,7 +14,7 @@ race
 		regeneration = 3
 		imagination = 3
 		skills = list(/obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2, /obj/Skills/Buffs/SlotlessBuffs/Regeneration, /obj/Skills/Buffs/SlotlessBuffs/DemonMagic/DarkMagic, /obj/Skills/Buffs/SlotlessBuffs/DemonMagic/HellFire, /obj/Skills/Buffs/SlotlessBuffs/DemonMagic/Corruption)
-		passives = list("ChaosMod" = 0.5, , "ChaosResist" = 0.5, "HellPower" = 1, "FakePeace"=1, "StaticWalk" = 1, "SpaceWalk" = 1, "SpiritPower" = 1, "MartialMagic" = 1, "BladeFisting" = 1, "Incomplete" = 1, "Corruption" = 1)
+		passives = list("HolyMod" = 0.5, "AbyssMod" = 0.5, "HellPower" = 1, "FakePeace"=1, "StaticWalk" = 1, "SpaceWalk" = 1, "SpiritPower" = 1, "MartialMagic" = 1, "BladeFisting" = 1, "Incomplete" = 1, "Corruption" = 1)
 		var/devil_arm_upgrades = 1
 		var/sub_devil_arm_upgrades = 0
 		/*proc/findFalldown(mob/p)

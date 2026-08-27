@@ -283,42 +283,17 @@ obj/Items/Tech
 			src.antispam=null
 			..()
 		Click()
-			if(!usr || !usr.client) return
-			if(get_dist(usr, src) > 1) return
-			if(antispam) return
-			var/k = DoorCursorFor(src, usr)
-			if(k == "doorclose")
-				DoorToggle(usr, 0)
-			else if(k == "dooropen" || k == "key")
-				DoorToggle(usr, 1)
-			else if(!GodDoor)
-				var/mob/M = usr
-				spawn()
-					var/Guess = M.HUDTextPrompt("Door Password")
-					if(!src || !M || !M.client) return
-					if(get_dist(M, src) > 1 || !density || antispam) return
-					if(!isnull(Guess) && Guess == Password)
-						DoorToggle(M, 1)
-					else if(!isnull(Guess) && Guess != "" && istype(src, /obj/Items/Tech/Door/LazerDoor))
-						M << "<font color=red><small>The lazer door burns your hand!"
-						M.AddBurn(1)
-		proc/DoorToggle(mob/M, opening)
-			var/dur = 6
-			if(icon == 'Doors.dmi')
-				dur = (istype(src, /obj/Items/Tech/Door/Door2) || istype(src, /obj/Items/Tech/Door/TransparentDoor)) ? 10 : 15
-			antispam = 1
-			spawn(dur) antispam = null
-			if(opening) Open()
-			else Close()
-			if(istype(src, /obj/Items/Tech/Door/LazerDoor) && DoorID)
-				for(var/obj/Items/Tech/Door/LazerDoor/X in world)
-					if(X != src && X.DoorID == DoorID)
-						X.antispam = 1
-						spawn(6) X.antispam = null
-						if(opening) X.Open()
-						else X.Close()
-			if(M && M.client && M.client.cursor_dyn == src)
-				M.client.mouse_pointer_icon = CursorFile(M.client, DoorCursorFor(src, M))
+			..()
+			if(usr in oview(1,src))
+				if(!src.antispam)
+					if(istype(src, /obj/Items/Tech/Door/LazerDoor))
+						oview(10,src)<<"<font color=red><small>The Lazer made a loud buzzing sound!"
+						usr.AddBurn(1)
+					else
+						oview(10,src)<<"<font color=yellow><small>There is a knock on the door!"
+					src.antispam=1
+					spawn(30)
+						src.antispam=null
 		proc/Open()
 			density=0
 			opacity=0
@@ -334,6 +309,7 @@ obj/Items/Tech
 			else
 				flick("Opening",src)
 				icon_state="Open"
+			spawn(50) Close()
 		proc/Close()
 			density=1
 			if(!istype(src, /obj/Items/Tech/Door/TransparentDoor)&&!istype(src, /obj/Items/Tech/Door/LazerDoor))

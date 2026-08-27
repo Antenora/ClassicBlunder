@@ -304,6 +304,7 @@ obj/Skills/AutoHit
 		Cooldown=18
 		StrScaling=0
 		ForScaling=1
+		HolyMod=40
 		DamageMult=8.5
 		Area="Circle"
 		Distance=3
@@ -339,6 +340,7 @@ obj/Skills/AutoHit
 		SignatureName="Banish"
 		Area="Target"
 		Distance=15
+		HolyMod=2000
 		DamageMult=45
 		WindUp=1
 		HitSparkIcon='Hit Effect Pearl.dmi'
@@ -1090,11 +1092,11 @@ obj/Skills/Buffs
 			PowerMult=1.25
 			Cooldown = 1
 			SwordAscension=6
-			passives = list("PUSpike"=50, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+			passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 			ActiveMessage="materializes the Black Knife."
 			OffMessage="puts the black knife away."
 			adjust(mob/p)
-				passives = list("PUSpike"=50, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
+				passives = list("PUSpike"=50, "AbyssMod" = 3,  "HolyMod" = 3, "HellPower"=0.5, "Determination(Black)"=1, "KiControl" = 1)
 				PowerMult=1.25
 				StrMult=1.85
 				SpdMult=1.5
@@ -1303,9 +1305,9 @@ obj/Skills/Grapple
 		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
 		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
 		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=4,"PureReduction"=4)
 			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=6,"PureReduction"=6)
 		verb/Justice_Incarnate()
 			set hidden=1
 			adjust(usr)
@@ -1316,11 +1318,11 @@ obj/Skills/Grapple
 		StyleFor=1.25
 		StyleEnd=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
-		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=3,"PureReduction"=3)
 		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=2,"PureReduction"=2)
 			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
+				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1, "PureDamage"=3,"PureReduction"=3)
 		verb/Fate_Incarnate()
 			set hidden=1
 			adjust(usr)

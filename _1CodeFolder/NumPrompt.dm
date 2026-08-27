@@ -38,23 +38,6 @@
 	MouseUp(location, control, params)
 		if(usr) usr.client.NpPanelEnd()
 
-/atom/movable/shud/npfield
-	layer = NP_LAYER + 0.4
-	mouse_opacity = 1
-	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
-	MouseDown(location, control, params)
-		if(usr)
-			usr.client.NpPanelStart(params)
-			usr.client.NumPromptMacros()
-	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
-		if(usr) usr.client.NpPanelMove(params)
-	MouseUp(location, control, params)
-		if(usr) usr.client.NpPanelEnd()
-	MouseEntered(location, control, params)
-		CursorHover(src, "ibeam")
-	MouseExited(location, control, params)
-		CursorLeave(src)
-
 /atom/movable/shud/npbtn
 	layer = NP_LAYER + 0.5
 	mouse_opacity = 2
@@ -168,8 +151,9 @@ client/proc/NumPromptOpen(title, initial, mode = "num")
 	P.screen_loc = NPloc(0, 0, NP_H)
 	NpAdd(P)
 	NpText(0, 12, NP_W, 16, "<center><span style=\"[NP_FONT]; color:#8be9ff\">[title]</span></center>")
-	var/atom/movable/shud/npfield/F = new
+	var/atom/movable/shud/nppic/F = new
 	F.icon = 'HUD/np_field.png'
+	F.layer = NP_LAYER + 0.4
 	F.screen_loc = NPloc(NP_FIELD_X, NP_FIELD_Y, 34)
 	NpAdd(F)
 	// one glyph per fixed 14px cell
@@ -235,8 +219,6 @@ client/proc/NumPromptClose(confirmed)
 		np_result = (confirmed && np_val != "") ? text2num(np_val) : null
 	np_open = 0
 	NumPromptUnmacros()
-	if(cursor_dyn && np_hud && np_hud.Find(cursor_dyn))
-		CursorNeutral(src)
 	if(np_hud)
 		for(var/atom/movable/o in np_hud)
 			screen -= o

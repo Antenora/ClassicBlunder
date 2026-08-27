@@ -127,13 +127,13 @@ transformation
 				previousTailWrappedIcon = null
 				user.Tail(1)
 /*		high_tension
-			passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.25,"TechniqueMastery"=1)
+			passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.25,"TechniqueMastery"=1,  "PureReduction"=2, "PureDamage"=2)
 			pot_trans = 2
 			transformation_message = "usrName raises their tension!"
 			detrans_message = "usrName lowers their tension to normal..."
 			mastery_boons(mob/user)
 				if(mastery >= 0)
-					passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.375,"TechniqueMastery"=1,  "UnderDog"=0.3,"Tenacity"=2)
+					passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.375,"TechniqueMastery"=1,  "PureReduction"=2, "PureDamage"=2,"UnderDog"=0.3,"Tenacity"=2)
 					pot_trans = 2
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -180,12 +180,12 @@ transformation
 			pot_trans = 3
 			form_aura_icon = 'SpiralAura.dmi'
 			form_aura_x = -32
-			passives = list("Conductor" = 10, "HighTension"=-0.125,"TensionPowered"=0.125, "SuperHighTension" = 1,  "TechniqueMastery"=3)
+			passives = list("Conductor" = 10, "HighTension"=-0.125,"TensionPowered"=0.125, "SuperHighTension" = 1,  "TechniqueMastery"=3, "PureReduction"=2, "PureDamage"=2)
 			transformation_message = "usrName pushes their tension beyond its limits, becoming everything they could ever be!"
 			mastery_boons(mob/user)
 				if(mastery >= 0)
 					pot_trans = 3
-					passives = list("Conductor"= 10, "HighTension"=-0.125, "TensionPowered"=0.125, "SuperHighTension" = 1,  "TechniqueMastery"=3, "UnderDog"=0.4,"Tenacity"=3)
+					passives = list("Conductor"= 10, "HighTension"=-0.125, "TensionPowered"=0.125, "SuperHighTension" = 1,  "TechniqueMastery"=3, "PureReduction"=2, "PureDamage"=2,"UnderDog"=0.4,"Tenacity"=3)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)

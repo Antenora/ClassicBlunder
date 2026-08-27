@@ -112,7 +112,7 @@ sagaTierUpMessages/Rebirth
 				if(src.RebirthHeroType=="Purple")
 					src<<"<font color='#9BFD4D'><b>I see a story hidden in your eyes.</font></b>" //i literally extracted the mod files for gerson's rude buster to make sure this color was as accurate as possible. praise me.
 					src<<"<font color='#9BFD4D'><b>Burnin' bright...</font></b>"
-					src.passive_handler.Increase("HolyMod", 3)
+					src.passive_handler.Increase("HolyMod" = 3)
 					src.AddSkill(new/obj/Skills/Projectile/Burning_Black)
 					src<<"<font color='#9BFD4D'><b>Burnin' black...</font></b>"
 					src.AddSkill(new/obj/Skills/AutoHit/Burning_Up_Everything)

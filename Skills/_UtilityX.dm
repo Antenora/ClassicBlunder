@@ -637,7 +637,6 @@ obj/Skills/Utility
 	Send_Energy
 		SignatureTechnique=1
 		Level=100
-		MenuIcon="SendEnergy"
 		desc="Can continually transfer energy to someone at the cost of your own life force."
 		verb/Share_Energy()
 			set category="Utility"
@@ -658,7 +657,6 @@ obj/Skills/Utility
 	Heal
 		Cooldown=-1
 		SignatureTechnique=2
-		MenuIcon="Heal"
 		PreRequisite = list("/obj/Skills/Utility/Send_Energy")
 		icon_state="Heal"
 		desc="This allows you to heal people you are facing."
@@ -1144,13 +1142,13 @@ obj/Skills/Utility
 			for(var/mob/Players/P in view(1, usr))
 				Options.Add(P)
 			var/mob/Choice = input(usr, "Choose a Player", "Bestow Inkwork") in Options // The Menu that chooses the player
-			if(Choice == "Cancel")
+			if(Choice == "Cancel") 
 				Using = 0 // If you're not doing anything, set this back to 0
 				return
 			else
 				if(Choice.isRace(ANDROID)) // I'm sorry android players...
 					usr << "This Vessel cannot support Inkworks"
-					Using = 0
+					Using = 0 
 					return
 				if(Choice.hasSecret("Heavenly Restriction") && Choice.secretDatum?:hasRestriction("Magic"))
 					usr << "This Vessel's Heavenly Restriction rejects your feeble Magic."
@@ -1173,7 +1171,7 @@ obj/Skills/Utility
 				return
 			if (inkchoice in Choice.InkworksDatum.Applied)
 				usr << "This vessel already had this Inkwork applied to them."
-				Using = 0
+				Using = 0 
 				return
 			if (inkchoice == "Match Girl")
 				Choice.InkworksDatum.Applied = "Match Girl"
@@ -1206,7 +1204,7 @@ obj/Skills/Utility
 			if(inkchoice == "Lion Spirit")
 				Choice.InkworksDatum.Applied = "Lion Spirit"
 				Choice.InkworksDatum.Lion = 1
-				usr << "The Lion Spirit has been succesfully inked onto this vessel"
+				usr << "The Lion Spirit has been succesfully inked onto this vessel" 
 				// The Lion does concern himself with inkworks
 			Choice.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Inscribed_Ink)
 			Choice.InkworksDatum.calculateSlots()

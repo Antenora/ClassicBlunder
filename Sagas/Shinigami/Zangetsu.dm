@@ -69,7 +69,8 @@
 			
 			
 			"Half-Sword"     = 1 + SL,
-			"HeavyHitter" 	 = 1 + (0.25 * SL)
+			"HeavyHitter" 	 = 1 + (0.25 * SL),
+			"PureDamage"     = 1 + SL
 		)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
@@ -135,6 +136,7 @@
 			"Warping"         = 0.5 + (SL/2),
 			
 			"EmptyFlashStep"  = 1,
+			"PureDamage"      = 1 + SL,
 			"SwordAscension"  = SL
 		)
 		if(SL < 5)

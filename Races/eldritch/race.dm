@@ -9,7 +9,7 @@ race
 		desc = "Distant thoughts, either a dream or a nightmare, made manifest within the soul of a living being. They are chaotic and unstable, only able to imitate mortal life and individuality."
 		visual = 'Eldritch.png'
 
-		passives = list("Void" = 1, "Obfuscated Origin" = 1, "SpaceWalk"=1, "StaticWalk"=1, "Fishman"=1)
+		passives = list("Void" = 1, "PureDamage"=1, "PureReduction"=1,  "Obfuscated Origin" = 1, "SpaceWalk"=1, "StaticWalk"=1, "Fishman"=1)
 		locked = TRUE
 
 		power = 1

@@ -175,7 +175,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 /obj/Skills/Buffs/SlotlessBuffs/Life_Fiber_Hybrid
 	Disciplinary_Chair
 		EndMult = 1.25
-		passives = list("Juggernaut" = 1)
+		passives = list("Juggernaut" = 1, "PureReduction" = 2)
 		ActiveMessage="takes up their role as the Disciplinary Chair beneath the banner of an empire!"
 		OffMessage="forsakes their role..."
 		verb/Disciplinary_Chair()
@@ -224,7 +224,7 @@ obj/Skills/Buffs/SpecialBuffs
 		OffMessage="allows their Kamui to rest..."
 		SpdMult=1.3
 		EndMult=1.3
-		passives = list("VoidField" = 1, "Flicker" = 1)
+		passives = list("VoidField" = 1, "PureReduction" = 1, "Flicker" = 1)
 
 		IconLock='junketsu_senpu.dmi'
 		LockX=-20
@@ -257,7 +257,7 @@ obj/Skills/Buffs/SpecialBuffs
 		StrMult=1.25
 		SpdMult=1.3
 		EndMult=1.25
-		passives = list("DeathField" = 1, "HardStyle" = 1, "VoidField" = 1, "Flicker" = 1)
+		passives = list("PureDamage" = 1, "DeathField" = 1, "HardStyle" = 1, "VoidField" = 1, "PureReduction" = 1, "Flicker" = 1)
 		IconLock='junketsu_senpuzenkan.dmi'
 		LockX=-20
 		LockY=-20
@@ -269,7 +269,7 @@ obj/Skills/Buffs/SpecialBuffs
 			OffMult = 1.04 + (p.SagaLevel * 0.04)
 			SpdMult = 1.04 + (p.SagaLevel * 0.04)
 			DefMult = 1.04 + (p.SagaLevel * 0.04)
-			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = round(p.SagaLevel/1.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = round(p.SagaLevel/1.5,1), "PureDamage" = round(p.SagaLevel/2.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
 
 		verb/Kamui_Senpu_Zanken()
 			set category="Skills"

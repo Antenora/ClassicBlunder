@@ -140,7 +140,6 @@ obj/Skills/Projectile
 	var/EmitCount = 0
 	var/EmitEvery = 1
 	var/HomingBeam = 0
-	var/BlendAdd = 0
 	var/FollowFacing = 0
 	var/ArcShot = 0
 	var/BackfireShot = 0

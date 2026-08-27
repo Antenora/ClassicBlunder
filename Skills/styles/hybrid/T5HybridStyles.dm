@@ -11,7 +11,7 @@
 		NoSword=0
 		Finisher="/obj/Skills/Queue/Finisher/Grasp_Tomorrow"
 		passives = list("Determination(Black)" = 1, "Determination(White)" = 1, "BladeFisting" = 1, "MagicSword" = 1, "MartialMagic" = 1, "ManaGeneration" = 5 ,"EnergyGeneration" = 5, \
-		 "SweepingStrike" = 1, "Extend" = 2, "Gum Gum" = 2,  "Skimming" = 3, "Godspeed" = 3, \
+		 "PureDamage"=10, "PureReduction" = 10, "SweepingStrike" = 1, "Extend" = 2, "Gum Gum" = 2,  "Skimming" = 3, "Godspeed" = 3, \
 		"Our Future" = 1, "The Legend of REBIRTH" = 1)
 		StyleActive="The Fourth Fate"
 		verb/The_Fourth_Fate()

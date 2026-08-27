@@ -391,7 +391,7 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		DamageMult=4.05
-		MenuIcon="EruptingBurningFinger"
+		MenuIcon="BurningFinger"
 		StrScaling=1
 		ForScaling=0.5
 		TriggerMessage="shoves their grossly incandescent hand through"
@@ -412,7 +412,6 @@ obj/Skills/Grapple
 		NeedsSword=0
 		SignatureTechnique=1
 		RootRider=2
-		MenuIcon="LightningStake"
 		DamageMult=3.7
 		ForScaling=1
 		StrScaling=0.5
@@ -718,7 +717,7 @@ obj/Skills/Grapple
 						S.unarmed = src.UnarmedOnly
 						S.sword = src.NeedsSword
 						S.spirit = src.SpecialAttack
-						S.dmgTypes = buildSpecDmgTypes(src.SlayerMod)
+						S.dmgTypes = buildSpecDmgTypes(src.HolyMod, src.Sanctify, src.AbyssMod, src.SlayerMod)
 						S.critEff = src.CritEffectiveness
 						S.blockEff = src.BlockEffectiveness
 						S.critBonus = src.CritChanceBonus
@@ -804,8 +803,6 @@ obj/Skills/Grapple
 							ruin.applyStack(Trg)
 						if("Strike")
 							User.HitEffect(Trg)
-							if(src.ImpactFrame)
-								FxHeavyImpact(Trg, src)
 						if("Drain")
 							animate(Trg, color=list(1,1,1, 0,1,0, 1,1,1, 0,0,0), time=10, flags=ANIMATION_RELATIVE)
 							sleep(10)
@@ -904,8 +901,6 @@ obj/Skills/Grapple
 				ruin.applyStack(Trg)
 			if("Strike")
 				User.HitEffect(Trg)
-				if(src.ImpactFrame)
-					FxHeavyImpact(Trg, src)
 			if("Drain")
 				animate(Trg, color=list(1,1,1, 0,1,0, 1,1,1, 0,0,0), time=10, flags=ANIMATION_RELATIVE)
 				sleep(10)

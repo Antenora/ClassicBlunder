@@ -1,7 +1,7 @@
 transformation
 	eldritch
 		partial_manifestation
-			passives = list("Unreality" = 0.1, "Half Manifestation" = 1)
+			passives = list("Unreality" = 0.1, "Half Manifestation" = 1, "PureDamage"=2, "PureReduction"=2)
 			form_icon_1_icon = 'tentacles_overlay.dmi'
 			form_icon_1_x = -32
 			form_icon_1_y = -32
@@ -13,7 +13,7 @@ transformation
 			mastery_boons(mob/user)
 				if(user.AscensionsAcquired < 3)
 					user << "<font color='red'>This vessel strains to hold even half of your true Manifestation. Some boons will be lost to you.</font color>"
-					passives = list("Unreality" = 0.1, "Half Manifestation" = 1)
+					passives = list("Unreality" = 0.1, "Half Manifestation" = 1, "PureDamage"=2, "PureReduction"=2)
 				else
 					passives = list("Unreality" = 0.1, "Half Manifestation" = 1)
 					passives += user.PullAscensionPassives(user.AscensionsAcquired, min(user.AscensionsAcquired+1, 6));
@@ -38,7 +38,7 @@ transformation
 					user.overlays -= image('AntiEyes.dmi');
 
 		full_manifestation
-			passives = list("Unreality" = 0.9, "Full Manifestation" = 1)
+			passives = list("Unreality" = 0.9, "Full Manifestation" = 1, "PureDamage"=3, "PureReduction"=3)
 			transformation_message = "usrName reveals itself to the detriment of all!"
 			detrans_message = "usrName bottles up the unreality... halfway a person..."
 			mastery_boons(mob/user)
@@ -49,7 +49,7 @@ transformation
 					defenseadd = 0
 					strengthadd = 0
 					forceadd = 0
-					passives = list("Unreality" = 0.9, "Full Manifestation" = 1)
+					passives = list("Unreality" = 0.9, "Full Manifestation" = 1, "PureDamage"=3, "PureReduction"=3)
 				else 
 					enduranceadd = 0.1*user.AscensionsAcquired
 					offenseadd = 0.1*user.AscensionsAcquired

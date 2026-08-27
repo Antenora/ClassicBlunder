@@ -568,11 +568,6 @@ mob
 						var/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode/hdm = locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in src.contents
 						hdm.Trigger(src)
 						src << "You tire out of your elevated state!"
-			if(src.TiltedLast > 0)
-				src.TiltedLast = src.TiltedLast-1
-				if(src.TiltedLast == 0)
-					src << "Personal 'Tilted' cooldown is off."
-					src.TiltedLast = -1
 			if(passive_handler["TensionPowered"] && !src.isMazokuPathHuman())
 				if(src.canHTM())
 					src.race.transformations[2].transform(src, TRUE)

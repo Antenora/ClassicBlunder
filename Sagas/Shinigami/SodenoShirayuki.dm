@@ -23,6 +23,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
+			"PureDamage"     = 1 + SL, //I feel all Shikai should get this.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 2 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"CriticalDamage" = 0.05 * SL,
@@ -80,6 +81,7 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
+			"PureDamage"     = 1.5 * SL, //Made this a multiplier instead of an additive, Because Rukia's bankai is INCREDIBLY strong in what it does.
 			"ChillResist"    = 0.5 * SL, // This should make it so that Chill hurts you less.
 			"Freezing"       = 4 * SL, // This should be pretty self-explanatory, Rukia's release is an ice release. Brrr.
 			"CriticalDamage" = 0.1 * SL,

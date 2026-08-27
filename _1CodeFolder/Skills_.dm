@@ -29,13 +29,13 @@ mob/var/GCDMult = 1
 
 mob/proc/GCDBlocked(obj/Skills/Z)
 	if(!client) return FALSE
-	if(Z && (Z.NoGCD || Z.HeldSkill)) return FALSE
+	if(Z && Z.NoGCD) return FALSE
 	if(world.time >= gcd_ready) return FALSE
 	return world.time != gcd_stamp
 
 mob/proc/StartGCD(obj/Skills/Z)
 	if(!client) return
-	if(Z && (Z.NoGCD || Z.HeldSkill)) return
+	if(Z && Z.NoGCD) return
 	if(PureRPMode) return
 	var/until = world.time + glob.GCD_TIME * max(GCDMult, 0) * SlowMoDelayMult(src)
 	if(until > gcd_ready)

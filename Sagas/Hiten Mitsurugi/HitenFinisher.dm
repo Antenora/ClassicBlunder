@@ -57,7 +57,7 @@
             OffMessage="restrains their godspeed..."
         Shunshin_Shin//more buff
             SpdMult=1.5
-            passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2,   "AfterImages"=2, "AfterImageSkin" = "Cooler")
+            passives = list("TensionLock" = 1, "Warping" = 3, "Godspeed"=4, "HotHundred" = 2, "PureDamage" = 2,   "AfterImages"=2, "AfterImageSkin" = "Cooler")
             TimerLimit=15
             ActiveMessage="unleashes their godspeed for a short burst!"
             OffMessage="falls back in step..."

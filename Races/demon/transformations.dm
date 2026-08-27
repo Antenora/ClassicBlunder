@@ -59,7 +59,7 @@ transformation
 				if(user.Potential>=85&&mastery<100)
 					mastery=100
 				if(mastery >= 25)
-					passives = list("HellRisen" = 0.5)
+					passives = list("HellRisen" = 0.5,   "PureDamage" = 3, "PureReduction" = 3)
 					enduranceadd = 0.5
 					offenseadd = 0.5
 					defenseadd = 0.5
@@ -67,7 +67,7 @@ transformation
 					forceadd = 0.5
 					speedadd = 0.5
 				if(mastery >= 50)
-					passives = list("HellRisen" = 0.75)
+					passives = list("HellRisen" = 0.75,   "PureDamage" = 6, "PureReduction" = 6)
 					enduranceadd = 0.75
 					offenseadd = 0.75
 					defenseadd = 0.75
@@ -75,7 +75,7 @@ transformation
 					forceadd = 0.75
 					speedadd = 0.75
 				if(mastery >= 75)
-					passives = list("GodKi" = 0.5, "HellRisen" = 0.75,  "TechniqueMastery" = 3)
+					passives = list("GodKi" = 0.5, "HellRisen" = 0.75,   "PureDamage" = 6, "PureReduction" = 6,  "TechniqueMastery" = 3)
 					enduranceadd = 1
 					offenseadd = 1
 					defenseadd = 1
@@ -83,7 +83,7 @@ transformation
 					forceadd = 1
 					speedadd = 1
 				if(mastery >= 100)
-					passives = list("GodKi" = 0.75, "HellRisen" = 1,  "TechniqueMastery" = 6)
+					passives = list("GodKi" = 0.75, "HellRisen" = 1,   "PureDamage" = 6, "PureReduction" = 6,  "TechniqueMastery" = 6)
 					enduranceadd = 2
 					offenseadd = 2
 					defenseadd = 2

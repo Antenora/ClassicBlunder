@@ -829,7 +829,7 @@
 							S.melee = 1
 							S.element = (AttackQueue ? AttackQueue.SpellElement : null)
 							if(AttackQueue)
-								S.dmgTypes = buildSpecDmgTypes(AttackQueue.SlayerMod)
+								S.dmgTypes = buildSpecDmgTypes(AttackQueue.HolyMod, AttackQueue.Sanctify, AttackQueue.AbyssMod, AttackQueue.SlayerMod)
 								S.critEff = AttackQueue.CritEffectiveness
 								S.blockEff = AttackQueue.BlockEffectiveness
 								S.critBonus = AttackQueue.CritChanceBonus

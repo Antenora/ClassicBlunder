@@ -115,7 +115,7 @@
 	form_aura_x = -32
 	form_aura_y = -32
 	passives = list("GodKi" = 0.25,      \
-					"EnergyLeak" = 3)
+					"PureDamage" = 2, "PureReduction" = 1, "EnergyLeak" = 3)
 	strength = 1.5
 	speed = 1.5
 	force = 1.5
@@ -123,13 +123,13 @@
 	mastery_boons(mob/user)
 		if(mastery<50)
 			passives = list("GodKi" = 0.25,      \
-					"EnergyLeak" = 3)
+					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 3)
 		if(mastery>=50)
 			passives = list("GodKi" = 0.5,      \
-					"EnergyLeak" = 2)
+					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 2)
 		if(mastery==100)
 			passives = list("GodKi" = 0.75,      \
-					"EnergyLeak" = 1)
+					"PureDamage" = 4, "PureReduction" = 1.5, "EnergyLeak" = 1)
 
 		strength = 1.5
 		speed = 1.5

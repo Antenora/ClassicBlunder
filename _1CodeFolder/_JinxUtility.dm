@@ -2054,7 +2054,6 @@ mob
 			return 0
 
 		IsGood()
-			if(src.HasChaosMod() || src.passive_handler.Get("ChaosResist")) return FALSE
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
 			var/list/EvilSecrets=list("Vampire")
@@ -2096,7 +2095,6 @@ mob
 				return FALSE
 			return 0
 		IsEvil()
-			if(src.HasChaosMod() || src.passive_handler.Get("ChaosResist")) return FALSE
 			if(hasEldritchPower()) return 0;
 			var/list/EvilRaces=list(CHANGELING, DEMON, MAKYO, MAJIN)
 			var/list/EvilSecrets=list("Vampire")
@@ -2137,32 +2135,27 @@ mob
 				return FALSE
 			return 0
 
-		HolyDamage(var/mob/P)//Stick this in the DoDamage proc.
+		HolyDamage(var/mob/P, var/Forced=0)//Stick this in the DoDamage proc.
 			//To get to this proc, you have to already have holy damage
-			var/HolyDamageValue = src.GetHolyMod()
+			// holy strength when the attacker has no HolyMod passive.
+			var/HolyDamageValue = Forced ? Forced : src.GetHolyMod()
 			if(P.CheckSlotless("Devil Arm") && !P.isRace(DEMON) && !P.isRace(MAKAIOSHIN))
 				return HolyDamageValue
 			if(P.UsingMuken())
 				return ((-1)*HolyDamageValue);
-			else if(P.IsEvil())
+			else if(P.IsEvil() || HasBeyondPurity())
 				return HolyDamageValue
 			else
-				return ((-1)*HolyDamageValue)
-		AbyssDamage(mob/P)//Stick this in the DoDamage proc.
+				return 0
+		AbyssDamage(mob/P, Forced=0)//Stick this in the DoDamage proc.
 			//yadda yadda gotta have abyss
-			var/AbyssDamageValue = src.GetAbyssMod()
+			// abyss strength when the attacker has no AbyssMod passive.
+			var/AbyssDamageValue = Forced ? Forced : src.GetAbyssMod()
 			if(P.UsingMuken())
 				return (-1)*AbyssDamageValue
 			else if(P.IsGood())
 				return AbyssDamageValue
-			return ((-1)*AbyssDamageValue)
-		ChaosDamage(mob/P)
-			var/ChaosDamageValue = src.GetChaosMod()
-			if(P.UsingMuken())
-				return (-1)*ChaosDamageValue
-			else if(P.IsGood() || P.IsEvil())
-				return ChaosDamageValue
-			return ((-1)*ChaosDamageValue)
+			return 0
 
 		SpiritShift()
 			var/SFStr=src.BaseFor()+(glob.SPIRIT_FORM_BASE_RATE*src.AscensionsAcquired*(src.BaseStr()-src.BaseFor()))

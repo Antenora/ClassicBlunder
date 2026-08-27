@@ -5,7 +5,6 @@
 		SuccessfulParry = 1
 		PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 		KenWave=1
-		MenuIcon="RoyalGuard"
 		Mastery=1
 		KenWaveBlend=2
 		ActiveMessage="puts up their guard!!!"
@@ -22,7 +21,6 @@
 	RoyalRelease
 		SignatureTechnique=2
 		Distance=12
-		MenuIcon="RoyalRelease"
 		WindUp=0.75
 		IgnoreWindUpReduction=1
 		WindupMessage="gathers all the stored power into a brutal strike..."
