@@ -81,7 +81,7 @@ proc/LaunchEnd(mob/player, slam = 0)
 				Landfall(player, clamp(drop, 0.25, 1))
 	if(!player.KO && !player.Knockback)
 		player.icon_state =""
-	if(player.KO && !player.Knockback)
+	if(player.KO && !player.Knockback && !player.ko_falling)
 		player.icon_state = "KO"
 	launchLoop-=player
 

@@ -24,10 +24,14 @@ mob/var/tmp
 	_swing_n = 0
 	_clash_flash_next = 0
 	kb_thrown = 0
+	ko_falling = 0
 	obj/fx_clashlight/_flash_plate
 	obj/fx_clashlight/_flash_arm
 	obj/fx_clashlight/_flash_band
 	obj/fx_clashlight/_flash_hand
+
+client/var/tmp/_ko_pan_until = 0
+client/var/tmp/_ko_pan_lock = 0
 
 obj/Flash_Still
 	Grabbable = 0
@@ -723,51 +727,55 @@ proc/FlashDragonClash(mob/A, mob/B)
 
 proc/KOCameraPan(client/C, turf/T, hold)
 	if(!C || !C.mob) return
+	if(world.time < C._ko_pan_until) return
 	var/turf/E = get_step(C.eye ? C.eye : C.mob, 0)
 	if(!E || E.z != T.z) return
 	var/dx = clamp((T.x - E.x) * 32, -96, 96)
 	var/dy = clamp((T.y - E.y) * 32, -72, 72)
 	if(!dx && !dy) return
-	animate(C, pixel_x = round(dx * 0.4), pixel_y = round(dy * 0.4), time = 4, easing = QUAD_EASING|EASE_OUT)
-	spawn(4 + hold)
-		if(C) animate(C, pixel_x = 0, pixel_y = 0, time = 5, easing = QUAD_EASING)
+	var/ox = round(dx * 0.4)
+	var/oy = round(dy * 0.4)
+	var/out = 5
+	var/rest = max(hold - out, 1)
+	C._ko_pan_lock = world.time + out + rest + 3
+	C._ko_pan_until = C._ko_pan_lock + glob.KO_PAN_BACK_DS
+	animate(C, pixel_x = ox, pixel_y = oy, time = out, easing = QUAD_EASING|EASE_OUT)
+	animate(pixel_x = ox, pixel_y = oy, time = rest)
+	animate(pixel_x = ox + 3, pixel_y = oy - 4, time = 1)
+	animate(pixel_x = ox, pixel_y = oy, time = 2, easing = SINE_EASING)
+	animate(pixel_x = 0, pixel_y = 0, time = glob.KO_PAN_BACK_DS, easing = SINE_EASING)
 
 proc/FlashKOMoment(mob/M)
-	set waitfor = 0
-	if(!M || !glob.FLASH_WORLD) return
+	if(!M || !glob.FLASH_WORLD) return 0
 	var/turf/T = get_step(M, 0)
-	if(!T) return
-	SlowMoZone(M, glob.KO_SLOWMO_RADIUS, glob.KO_SLOWMO_MULT, glob.KO_SLOWMO_DS)
+	if(!T) return 0
+	if(SlowMoCovered(T)) return 0
+	if(!SlowMoZone(M, glob.KO_SLOWMO_RADIUS, glob.KO_SLOWMO_MULT, glob.KO_SLOWMO_DS)) return 0
 	for(var/client/C)
 		var/mob/CM = C.mob
 		if(!CM) continue
 		var/turf/ET = get_step(C.eye ? C.eye : CM, 0)
 		if(!ET || ET.z != T.z || get_dist(ET, T) > 15) continue
 		KOCameraPan(C, T, 10)
+	return 1
 
 proc/FlashKOFall(mob/M)
+	set waitfor = 0
 	if(!M || !glob.FLASH_WORLD) return
-	var/obj/Flash_Still/G = new
-	G.appearance = M.appearance
-	G.dir = M.dir
-	G.loc = M.loc
-	if(PmActive())
-		G.step_x = M.step_x
-		G.step_y = M.step_y
-	G.layer = M.layer + 0.01
-	var/matrix/base = G.transform ? matrix(G.transform) : matrix()
+	if(M.ko_falling) return
+	M.ko_falling = 1
+	M.icon_state = ""
+	var/matrix/base = M.transform ? matrix(M.transform) : matrix()
 	var/matrix/tilted = matrix(base)
 	tilted.Turn(90)
-	M.alpha = 0
-	animate(G, transform = tilted, pixel_y = -4, time = 10, easing = QUAD_EASING|EASE_IN)
-	animate(alpha = 0, time = 3)
-	spawn(10)
-		if(M)
-			Landfall(M, 0.5)
-			M.Earthquake(3, -2,2,-2,2, 0, 0)
-	spawn(11)
-		if(M)
-			animate(M, alpha = 255, time = 2)
-	spawn(14)
-		G.loc = null
-	FlashKOMoment(M)
+	animate(M, transform = tilted, time = 10, easing = QUAD_EASING|EASE_IN)
+	var/featured = FlashKOMoment(M)
+	sleep(10)
+	if(!M) return
+	M.ko_falling = 0
+	M.transform = base
+	if(M.KO)
+		M.icon_state = "KO"
+	Landfall(M, 0.5)
+	if(featured)
+		M.Earthquake(3, -2,2,-2,2, 0, 0)

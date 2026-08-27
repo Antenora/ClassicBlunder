@@ -8,9 +8,11 @@ globalTracker
 		HIT_STOP_GAP_DS = 8 //quiet time after a freeze ends before the next can start
 		HIT_STOP_PIN_FPS = 5
 		SLOWMO = TRUE
+		SLOWMO_MAX_ZONES = 3
 		KO_SLOWMO_RADIUS = 8
 		KO_SLOWMO_MULT = 3
 		KO_SLOWMO_DS = 13
+		KO_PAN_BACK_DS = 16
 
 //whoever pins client.fps owns the hold until this time - Time Skip stamps it too, every restore checks it
 mob/var/tmp/_fps_hold_until = 0
@@ -62,8 +64,21 @@ atom/movable/var/tmp/_smo_acc = 0
 			cy = T.y
 			cz = T.z
 
+proc/SlowMoCovered(turf/T)
+	if(!_slowmo_n || !T) return null
+	for(var/datum/slowmo_zone/S in _slowmo_zones)
+		if(world.time > S.until || !S.center || !S.center.loc) continue
+		S.Pos()
+		if(T.z != S.cz) continue
+		if(max(abs(T.x - S.cx), abs(T.y - S.cy)) > S.radius) continue
+		return S
+	return null
+
 proc/SlowMoZone(atom/center, radius = 7, mult = 3, ds = 12, mob/exempt)
 	if(!center || !glob || !glob.SLOWMO) return null
+	if(_slowmo_zones.len >= glob.SLOWMO_MAX_ZONES)
+		SlowMoPrune()
+		if(_slowmo_zones.len >= glob.SLOWMO_MAX_ZONES) return null
 	var/datum/slowmo_zone/S = new
 	S.center = center
 	S.radius = radius

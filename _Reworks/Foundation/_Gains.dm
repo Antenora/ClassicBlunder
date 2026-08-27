@@ -184,7 +184,7 @@
 	if(!client)
 		gain_loop.Remove(src)
 		return
-	if(KO&&icon_state!="KO")
+	if(KO&&icon_state!="KO"&&!ko_falling)
 		icon_state="KO"
 	if(PureRPMode)
 		if(!Stasis)

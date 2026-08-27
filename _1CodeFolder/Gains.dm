@@ -324,7 +324,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	//unsticks a stale Kamui lock, near-free once it clears
 	if(KamuiBuffLock)
 		AutoClearStaleKamuiLock()
-	if(src.KO&&src.icon_state!="KO")
+	if(src.KO&&src.icon_state!="KO"&&!src.ko_falling)
 		src.icon_state="KO"
 	if(src.PureRPMode)
 		if(!src.Stasis)

@@ -497,7 +497,8 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
 	FlashKOFall(src)
-	src.icon_state="KO"
+	if(!src.ko_falling)
+		src.icon_state="KO"
 	src.SetHealthPct(1)
 	src.Energy=1
 	src.PowerControl=100
@@ -1841,7 +1842,7 @@ mob
 				animate(src.filters["trail"], x = 0, y = 0, time = 2)
 		if(!src.KO)
 			src.icon_state=""
-		else
+		else if(!src.ko_falling)
 			src.icon_state="KO"
 		src.Knockbacked=null
 		src.Knockback=null

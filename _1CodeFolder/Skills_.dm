@@ -1232,6 +1232,7 @@ proc/gauss(a)
 //bakes the chain for one client. sustain = fraction held at full amp before the decay tail
 proc/_CamShakeClient(client/C, amp, duration, ix, iy, sustain = 0)
 	if(!C) return
+	if(world.time < C._ko_pan_lock) return
 	if(GfxReducedMotion(C))
 		animate(C, pixel_x = 0, pixel_y = 0, time = 1, flags = ANIMATION_END_NOW)
 		return
