@@ -3,7 +3,7 @@ ascension
 		one
 			unlock_potential	=	ASCENSION_ONE_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
@@ -15,7 +15,7 @@ ascension
 		two
 			unlock_potential	=	ASCENSION_TWO_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
@@ -25,7 +25,7 @@ ascension
 		three
 			unlock_potential	=	ASCENSION_THREE_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
@@ -35,19 +35,19 @@ ascension
 		four
 			unlock_potential	=	ASCENSION_FOUR_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			choices = list("100% Power" = /ascension/sub_ascension/changeling/hundred_percent, "Fifth Form" = /ascension/sub_ascension/changeling/fifth_form)
 			on_ascension_message = "Your prowess grows!"
 
 		five
 			unlock_potential	=	ASCENSION_FIVE_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			on_ascension_message = "Your prowess grows!"
 		six
 			unlock_potential	=	ASCENSION_SIX_POTENTIAL
 			endurance = 0.25
-			passives = list("PureReduction" = 2)
+			passives = list()
 			on_ascension_message = "Your prowess grows!"
 
 ascension

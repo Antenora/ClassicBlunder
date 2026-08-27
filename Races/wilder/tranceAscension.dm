@@ -34,15 +34,15 @@
     strength = 0.5
     endurance = 0.5
     speed = 1
-    passives = list("AttackSpeed" = 2, "PureDamage" = 2, "Gum Gum" = 1, "Extend" = 1, "Freezing" = 2)
+    passives = list("AttackSpeed" = 2, "Gum Gum" = 1, "Extend" = 1, "Freezing" = 2)
 /ascension/sub_ascension/beastkin/kingsblood
     strength = 0.5
     endurance = 1.5
-    passives = list(  "PureReduction" = 2, "Rage" = 2)
+    passives = list(  "Rage" = 2)
 /ascension/sub_ascension/beastkin/overreach
     endurance = 1;
     defense = 1;
-    passives = list("PureReduction" = 2)
+    passives = list()
 /ascension/sub_ascension/beastkin/matchless
     strength = 1;
     endurance = 1;
@@ -67,7 +67,7 @@
     strength = 0.75;
     offense = 0.75;
     endurance = 0.5;
-    passives = list("PureDamage" = 2, "Fury" = 2,  "Extend"=2, "Sword Mastery"=2)
+    passives = list("Fury" = 2,  "Extend"=2, "Sword Mastery"=2)
 /ascension/sub_ascension/beastkin/phantomflicker
     strength = 1.25;
     offense = 0.375;
@@ -88,7 +88,7 @@
     force = 0.5;
     offense = 0.5;
     defense = 1;
-    passives = list("PureReduction" = 5, "PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Harden" = 2, "Persistence" = 1)
+    passives = list("PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Harden" = 2, "Persistence" = 1)
 
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)

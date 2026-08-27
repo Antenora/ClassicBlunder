@@ -9,8 +9,6 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"PureDamage"     = 1 + SL,
-			"PureReduction"  = 1 + SL,
 			"Persistence"    = 1 + SL,
 			"NoDodge"        = 1,
 
@@ -74,8 +72,6 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"PureDamage"    = 1 + SL,
-			"PureReduction" = 1 + SL,
 			"Persistence"   = 1 + (SL/2),
 			"BulletKill"    = 1,
 			"NoDodge"       = 1,
@@ -222,7 +218,6 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Duelist"           = 0.5 + (SL * 1.5),
 			"Persistence"       = 3 + (SL/2),
 			
 			"BulletKill"        = 1,

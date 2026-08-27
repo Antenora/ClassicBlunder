@@ -441,10 +441,10 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 					m << "Even if broken, you are more than a cage. <b>X-Slash is now Omega X-Slash!</b>"
 					if(m.FinalHeroChoice=="White Pen of Hope")
 						m << "Faint courage blossoms into unwavering determination! <b>Your DF went up!</b>"
-						extraP = list("PureReduction" = 5)
+						extraP = list()
 					if(m.FinalHeroChoice=="Roaring Knight")
 						m << "<i>Hear my voice. Look my way. I'm with you no matter what.</i> <b>Your AT went up!</b>"
-						extraP = list("PureDamage" = 5, "Forever After" = 1)
+						extraP = list("Forever After" = 1)
 				if("Purple")
 					m << "Write what you know, right? <b>Rude Buster is now Omega Buster!</b>"
 			applyBuff.PowerMult=1+(0.05*sl*sl)

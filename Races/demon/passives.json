@@ -12,8 +12,7 @@
 		"Zornhau": [1, 3],
         "DoubleStrike": [1, 3]
     },
-    "SWORD_PASSIVES_III": { 
-        "Duelist": [1, 4],
+    "SWORD_PASSIVES_III": {
         "TripleStrike": [1, 2],
         "BulletKill": [1, 1]
     },
@@ -37,7 +36,6 @@
         "HardStyle": [1, 3]
     },
     "UNARMED_PASSIVES_III": {
-        "Duelist": [1, 4],
         "FluidForm": [1, 2],
         "LifeSteal": [5, 25]
     },

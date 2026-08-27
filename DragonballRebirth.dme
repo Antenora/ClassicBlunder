@@ -1,3 +1,5 @@
+
+
 // BEGIN_INTERNALS
 // END_INTERNALS
 // BEGIN_FILE_DIR
@@ -38,6 +40,7 @@
 #define FILE_DIR "Icons/base/elf"
 #define FILE_DIR "Icons/base/Gaja"
 #define FILE_DIR "Icons/Beams"
+#define FILE_DIR "Icons/Beams/NuBeams"
 #define FILE_DIR "Icons/Blasts"
 #define FILE_DIR "Icons/Buffs"
 #define FILE_DIR "Icons/Buffs/SagaBuffs"
@@ -73,6 +76,8 @@
 #define FILE_DIR "Icons/Clothes/Clothes/bottoms"
 #define FILE_DIR "Icons/Clothes/Clothes/shoes"
 #define FILE_DIR "Icons/Clothes/Clothes/tops"
+#define FILE_DIR "Icons/Cursors"
+#define FILE_DIR "Icons/Cursors/2x"
 #define FILE_DIR "Icons/DevilSummoner"
 #define FILE_DIR "Icons/DevilSummoner/Demon Units (unused)"
 #define FILE_DIR "Icons/DevilSummoner/DemonPortraits128"
@@ -364,6 +369,7 @@
 #include "_Reworks\_Standalones\adminOveriew.dm"
 #include "_Reworks\_Standalones\clientOptions.dm"
 #include "_Reworks\_Standalones\CookingBrewingRecipes.dm"
+#include "_Reworks\_Standalones\cursors.dm"
 #include "_Reworks\_Standalones\fastrefund.dm"
 #include "_Reworks\_Standalones\Gain_Rewrite.dm"
 #include "_Reworks\_Standalones\glob.dm"
@@ -464,9 +470,11 @@
 #include "_Reworks\Environment\fxplane.dm"
 #include "_Reworks\Environment\graphics_core.dm"
 #include "_Reworks\Environment\hd2d.dm"
+#include "_Reworks\Environment\impact_frames.dm"
 #include "_Reworks\Environment\kiaura.dm"
 #include "_Reworks\Environment\lighting.dm"
 #include "_Reworks\Environment\shadows.dm"
+#include "_Reworks\Environment\status_coats.dm"
 #include "_Reworks\Environment\surfaces.dm"
 #include "_Reworks\Environment\weather.dm"
 #include "_Reworks\Foundation\zanzoken.dm"
@@ -563,6 +571,7 @@
 #include "_Reworks\Passives\AngerAdaptiveForce.dm"
 #include "_Reworks\Passives\AttackSpeed.dm"
 #include "_Reworks\Passives\BurnResist.dm"
+#include "_Reworks\Passives\ChaosResist.dm"
 #include "_Reworks\Passives\ChillImmune.dm"
 #include "_Reworks\Passives\ChillResist.dm"
 #include "_Reworks\Passives\CrippleResist.dm"
@@ -875,10 +884,6 @@
 #include "Sagas\Weapon Soul\Soul Edge\Infernal_Eye.dm"
 #include "Sagas\Weapon Soul\Soul Edge\Soul_Edge.dm"
 #include "Sagas\Weapon Soul\Soul Edge\Symbiotic_Connection.dm"
-#include "Sagas\Sorcerer\sorcerer.dm"
-#include "Sagas\Sorcerer\CursedEnergy.dm"
-#include "Sagas\Sorcerer\Techniques\Limitless.dm"
-#include "Sagas\Sorcerer\Portfolio\portfolio.dm"
 #include "Secrets\_ManagementSecret.dm"
 #include "Secrets\ArsGoetia.dm"
 #include "Secrets\Senjutsu.dm"

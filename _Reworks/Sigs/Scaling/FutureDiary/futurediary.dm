@@ -32,7 +32,7 @@
 ////
 // VARIABLES
 /// 
-var/list/randomPassives = list("PureDamage", 
+var/list/randomPassives = list(
 "Godspeed", "Void", "NoWhiff", "HolyMod", "AbyssMod",
 "VenomImmune", "CounterMaster", "TechniqueMastery",
 "Extend",

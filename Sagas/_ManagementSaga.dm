@@ -155,7 +155,7 @@ mob/var
 	JutsuSL6Picks = 0   // max 1, tier cap <=4
 	JutsuSL7Picks = 0   // max 1, tier cap <=5
 
-	Sorcerer
+	// Sorcerer
 	CursedTechnique
 
 
@@ -297,7 +297,7 @@ mob/Admin3/verb
 					P.Saga="Ansatsuken"
 					P.SagaLevel=1
 					P.passive_handler.Increase("SlayerMod", 0.625)
-					P.passive_handler.Set("FavoredPrey", "Mortal")
+					P.passive_handler.Set("FavoredPrey", "Human")
 					if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style, P))
 						var/obj/Skills/Buffs/NuStyle/s=new/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style
 						P.AddSkill(s)
@@ -1182,8 +1182,6 @@ mob
 								if("Strong")
 									// passive_handler.Increase("Desperation")
 									passive_handler.Increase("WeaponBreaker")
-								if("Firm")
-									passive_handler.Increase("PureReduction",2)
 						if(5)
 							Adaptation += 0.5
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Minds_Eye)

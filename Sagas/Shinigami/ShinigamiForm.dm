@@ -208,7 +208,7 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle
 	Zanjutsu
 		StyleActive="Zanjutsu"
-		passives = list("Duelist" = 1, "Parry" = 0.5, "Musoken" = 1)
+		passives = list("Parry" = 0.5, "Musoken" = 1)
 		StyleStr=1.15
 		StyleDef=1.15
 		StyleOff=1.15
@@ -217,7 +217,6 @@
 			StyleStr = 1 + (0.05 * p.SagaLevel)
 			StyleDef = 1 + (0.05 * p.SagaLevel)
 			StyleOff = 1 + (0.05 * p.SagaLevel)
-			passives["Duelist"] = p.SagaLevel
 			passives["Parry"] = (p.SagaLevel/2)
 			passives["Musoken"] = 1
 		verb/Zanjutsu()

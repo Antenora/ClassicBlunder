@@ -692,6 +692,7 @@ client/proc/GetActiveDebuffs()
 	if(m.passive_handler && m.passive_handler.Get("Silenced")) out += list(list('HUD/debuff_silence.png', "Silence", null))
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed)) out += list(list('HUD/debuff_charmed.png', "Charmed", null))
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded)) out += list(list('HUD/debuff_blind.png', "Blind", null))
+	if(m.CheckSlotless("Tilted")) out += list(list('HUD/debuff_tilted.dmi', "Tilted", null))
 	return out
 
 client/proc/UpdateDebuffs()
@@ -771,6 +772,7 @@ client/proc/GetDebuffDesc(name)
 		if("Stun") return "Unable to act, can be cleansed with After Image Strike."
 		if("Disarm") return "Skills that require weapons deal reduced damage."
 		if("Charmed") return "Slowly move towards the charmer, unable to control movement. You can still attack."
+		if("Tilted") return "Lowers endurance and offense, slightly increases attack."
 		if("Stasis") return "Unable to act, immune to most other statuses and damage."
 		if("Silence") return "Cannot use any skills."
 		if("Blind") return "Reduced Flow, Instinct, FluidForm, and Defense stat."

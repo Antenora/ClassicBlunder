@@ -79,6 +79,8 @@ mob
 			val = newDoDamage(defender, val, UnarmedAttack, SwordAttack, SecondStrike, ThirdStrike, TrueMult, SpiritAttack, Destructive, Autohit, dmgTypes = S.dmgTypes, S = S)
 			if(defender == src)
 				return val //DamageSelf already handled it - the tail is for hitting OTHER people
+			if(defender && val > 0 && defender.HPToPct(val) >= 5)
+				spawn(-1) FxHeavyImpact(defender) 
 			DEBUGMSG("val after newDoDamage [val]")
 			// Devil Summoner: Knight/Paladin/Hero Soul redirects part of the damage to the active demon
 			if(defender && defender.demon_active && defender.demon_soul_dmg_pct > 0 && istype(defender.demon_active, /mob/Player/AI/Demon))
@@ -96,8 +98,8 @@ mob
 						_ds_d.DemonDespawn()
 			if(src.HasPurity())//If damager is pure
 				var/found=0//Assume you haven't found a proper target
-				if(defender.IsEvil()||src.HasBeyondPurity())
-					DEBUGMSG("[defender] is evil or [src] has beyond purity")
+				if(defender.IsEvil())
+					DEBUGMSG("[defender] is evil")
 					found=1
 				if(!found)//If you don't find what you're supposed to hunt
 					DEBUGMSG("[src] is attacking a pure target and so value is set to 0")
@@ -686,7 +688,7 @@ mob
 							WoundsInflicted=val/(1+defender.GetEnd(glob.CURSED_WOUNDS_RATE)) // was reading the attacker's End
 						else
 							WoundsInflicted=val/defender.GetEnd(glob.CURSED_WOUNDS_RATE)
-				else if(src.HasPurity()&&defender.IsEvil()||HasPurity()&&HasBeyondPurity())
+				else if(src.HasPurity()&&defender.IsEvil())
 					WoundsInflicted=val
 				else if(s||st)
 					if(((s&&s.Element=="Silver")||(st&&st.Element=="Silver"))&&defender.IsEvil())

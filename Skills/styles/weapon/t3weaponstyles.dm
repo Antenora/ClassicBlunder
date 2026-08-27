@@ -46,7 +46,7 @@
 		StyleStr=1.5
 		StyleEnd=1.25
 		StyleActive="Fierce Diety"
-		passives = list("DisableGodKi" = 1, "Rage" = 2, "Half-Sword" = 2.5,  "FavoredPrey" = "Secret", "SlayerMod" = 4 , "Shearing" = 8, \
+		passives = list("DisableGodKi" = 1, "Rage" = 2, "Half-Sword" = 2.5,  "FavoredPrey" = "Vampire", "SlayerMod" = 4 , "Shearing" = 8, \
 		"BladeFisting" = 1, "Secret Knives" = "Stake", "Tossing" = 3, "Parry" = 3,"Disarm" = 3,\
 		"Harden" = 2, "Deflection" = 1, "Extend" = 2)
 		Finisher="/obj/Skills/Queue/Finisher/Divine_Wrath"

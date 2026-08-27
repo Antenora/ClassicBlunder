@@ -72,9 +72,6 @@ obj/Skills
 	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
 	var/list/Learn=new
 
-	var/PureDamage=0
-	var/PureReduction=0
-
 	var/list/PreRequisite=list() //Used for skill tree shit.
 	var/list/LockOut=list() //Also used for skill tree shit.
 	var/Copyable //Used to avoid dealing with skill tree shit.
@@ -124,9 +121,6 @@ obj/Skills
 	var/Poisoning //poison chance
 	var/Toxic //poison add
 	var/Purity //You can only hurt what you're meant to
-	var/BeyondPurity //nvm
-	var/HolyMod //holy dmg
-	var/AbyssMod //unholy dmg
 	var/SlayerMod //mortal dmg
 	var/ShonenPower  // become MC
 	var/SpiritPower //become medium
@@ -198,7 +192,6 @@ obj/Skills
 	var/heavenlyRestrictionIgnore = FALSE
 
 	var/CooldownDrag
-	var/Sanctify
 	var/StarCrossed
 
 	var/PainShare

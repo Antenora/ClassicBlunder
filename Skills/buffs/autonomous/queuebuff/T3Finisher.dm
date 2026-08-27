@@ -14,13 +14,13 @@
 		StrMult = 1.75
 		EndMult = 1.75
 		passives = list("Muscle Power" = 4, "TechniqueMastery" = 5, "DeathField" = 7, \
-		                "Juggernaut"= 5, "PureReduction" = 2, "GiantForm" = 1,  "TensionLock" = 1)
+		                "Juggernaut"= 5, "GiantForm" = 1,  "TensionLock" = 1)
 
 	Kensei
 		StyleNeeded="Two Heavens As One"
 		ManaGlow=rgb(255, 255, 255)
 		ManaGlowSize=2
-		passives = list("TensionLock" = 1,"CursedWounds" = 1, "PureDamage" = 5, "TechniqueMastery" = 3)
+		passives = list("TensionLock" = 1,"CursedWounds" = 1, "TechniqueMastery" = 3)
 		HitSpark='Slash - Ragna.dmi'
 		HitX=-32
 		HitY=-32
@@ -40,8 +40,8 @@
 		IconLock='EyesSage.dmi'
 		IconLayer=4
 		IconApart=1
-		passives = list("Duelist" = 3, "Half-Sword" = 1,  "LifeGeneration" = 2, \
-		               "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1, "PureDamage"=2)
+		passives = list("Half-Sword" = 1,  "LifeGeneration" = 2, \
+		               "Juggernaut" = 4, "Harden" = 3,   "TensionLock" = 1)
 		StrMult=1.5
 		EndMult=1.5
 		VaizardHealth=2
@@ -84,8 +84,8 @@
 		EndMult=0.5
 		AngerMult=1.25
 		VaizardHealth=10
-		passives = list("Flicker" = 2, "Pursuer" = 2, "PureDamage" = 2, \
-		 "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5,  "PureReduction" = -2)
+		passives = list("Flicker" = 2, "Pursuer" = 2, \
+		 "Speed Force" = 1 , "Sajire Rush" = 1, "Poisoning" = 5, "PureReduction" = -2)
 	Radioactive
 		passives = list("AfterImages" = 4, "Godspeed" = 4, "Speed Force" = 2, "Iaijutsu" = 1, \
 		"SureCrit" = 1, "TensionLock" = 1)

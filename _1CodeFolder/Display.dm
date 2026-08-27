@@ -47,6 +47,8 @@ client/proc/EffectiveZoom(pw = 0)
 client/proc/ApplyMapZoom(z)
 	view_fit_last_zoom = z
 	winset(src, "mapwindow.map", "zoom=[z];zoom-mode=distort;letterbox=true")
+	cursor_2x = (z >= DISPLAY_ZOOM_ON)
+	CursorNeutral(src)
 
 mob/proc/MaxViewCap()
 	return DISPLAY_BASE_MAX_VIEW

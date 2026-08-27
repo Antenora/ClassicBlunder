@@ -142,6 +142,16 @@
 	ActiveMessage = "has been sentenced!"
 	// -3 PureReduction, -3 PureDamage, -5 BuffMastery, all stats x0.9
 
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted
+	TimerLimit = 20
+	NeedsPassword = 0
+	AlwaysOn = 0
+	passives = list("PureReduction" = -2, "PureDamage" = 2)
+	EndMult = 0.9
+	OffMult = 0.7
+	ActiveMessage = "is getting tilted!!"
+	OffMessage = "realizes they're being played and refocuses."
+
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Cornered
 	passives = list("PureReduction" = 0.05)
 	TimerLimit = 10

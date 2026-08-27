@@ -1927,6 +1927,12 @@ mob
 			if(src.TarotFate=="The Lovers")
 				Extra=2.5
 			return (passive_handler.Get("AbyssMod")+Extra-Reduce)
+		HasChaosMod()
+			if(passive_handler.Get("ChaosMod"))
+				return 1
+			return 0
+		GetChaosMod()
+			return passive_handler.Get("ChaosMod")
 
 //----------------------------------------------------------------------
 //TODO Between Wipes: Move this to a separate passive page for SlayerMod
@@ -1934,13 +1940,16 @@ globalTracker/var/
 	SLAYER_DAMAGE_MIN = -10;
 	SLAYER_DAMAGE_MAX = 10;
 	SLAYER_SPEC_MULT = 1.5;
-#define VALID_FAVORED_PREY list("All", "Mortal", "Depths", "Beyond", "Secret", "Saga","Transformations", "ckey","Gender")
-#define DEPTHS_RACES list(ELDRITCH, DEMON)
-#define BEYOND_RACES DEPTHS_RACES+list(MAKAIOSHIN, ANGEL, POPO)
-#define INHERENT_SECRET list(ELDRITCH, ANGEL)
+#define VALID_FAVORED_PREY list("Human", "Saiyan", "Namekian", "Wilder", "Demon", "Cybernetic", "Hollow", "Mortal", "Vampire", "Shinigami", "Quincy", "Gender")
 #define SLAYER_SPEC_SAGAS list("Ansatsuken", "Hiten Mitsurugi-Ryuu")
 mob
 	proc
+		hasSignatureSkill(sigName)
+			var/spaced = replacetext(sigName, "_", " ")
+			for(var/obj/Skills/S in src)
+				if(S.name == sigName || S.name == spaced)
+					return 1
+			return 0
 		invalidPrey(preyType, mob/enemy)
 			var/invalid=0;
 			if(!(preyType in VALID_FAVORED_PREY))
@@ -1951,15 +1960,20 @@ mob
 				options = copytext(options, 1, length(options)-3);//backspace the last bit after the list has been iterated
 				liveDebugMsg(options);
 				invalid++;
-			if(!enemy) invalid++;
-			switch(preyType)//no check for "All" because it will always be valid if there is an enemy
-				if("Secret") if(!enemy.Secret || (enemy.race.type in INHERENT_SECRET)) invalid++;
-				if("Saga") if(!enemy.Saga) invalid++;
-				if("Transformations") if(!enemy.transActive||enemy.transActive!=enemy.transUnlocked) invalid++
+			if(!enemy) return invalid + 1;
+			switch(preyType)
+				if("Human") if(!enemy.isRace(HUMAN)) invalid++;
+				if("Saiyan") if(!enemy.isRace(SAIYAN)) invalid++;
+				if("Namekian") if(!enemy.isRace(NAMEKIAN)) invalid++;
+				if("Wilder") if(!enemy.isRace(WILDER)) invalid++;
+				if("Demon") if(!enemy.isRace(DEMON)) invalid++;
+				if("Cybernetic") if(!(enemy.isRace(ANDROID) || enemy.Mechanized || enemy.CyberCancel)) invalid++;
+				if("Hollow") if(!enemy.isRace("Hollow")) invalid++;
+				if("Mortal") if(!(enemy.isRace(HUMAN) || enemy.isRace(SAIYAN) || enemy.isRace(NAMEKIAN) || enemy.isRace(WILDER) || enemy.isRace(CHANGELING))) invalid++;
+				if("Vampire") if(enemy.Secret != "Vampire") invalid++;
+				if("Shinigami") if(enemy.Saga != "Shinigami") invalid++;
+				if("Quincy") if(!enemy.hasSignatureSkill("Spirit_Weapon")) invalid++;
 				if("Gender") if(enemy.Gender=="Male"||enemy.Gender=="Political") invalid++
-				if("Mortal") if((enemy.race.type in DEPTHS_RACES) || (enemy.race.type in BEYOND_RACES)) invalid++;
-				if("Depths") if(!(enemy.race.type in DEPTHS_RACES)) invalid++;
-				if("Beyond") if(!(enemy.race.type in BEYOND_RACES)) invalid++;
 			return invalid;
 		GetSlayerMod(mob/enemy, forced=0)
 			var/slayer = passive_handler.Get("SlayerMod");
@@ -1975,27 +1989,16 @@ mob
 			if(invalidPrey(prey, enemy)) return 0;
 			. = 0;
 			. += passive_handler.Get("SlayerMod");
-			if(prey != "All") . -= (max(0, enemy.passive_handler.Get("Xenobiology")) * .);
+			. -= (max(0, enemy.passive_handler.Get("Xenobiology")) * .);
 			if(Saga in SLAYER_SPEC_SAGAS) . *= glob.SLAYER_SPEC_MULT;
 			if (. > 0)
 				if(enemy.UsingMuken()) . *= (-1);
-			if(passive_handler.Get("FavoredPrey") == "Transformations")
-				if(. < AscensionsAcquired)
-					. = AscensionsAcquired
 			if(passive_handler.Get("FavoredPrey") == "Gender")
 				. = 0 //All of your violence is structural. You have no power outside of the system that gives it to you.
-			if(passive_handler.Get("FavoredPrey") == "Secret" && Secret)
-				. /= 4
 			if(forced) . = forced; //forced means forced
 			. = clamp(., glob.SLAYER_DAMAGE_MIN, glob.SLAYER_DAMAGE_MAX);
 //----------------------------------------------------------------------
 
-		HasBeyondPurity()
-			if(passive_handler.Get("BeyondPurity"))
-				return 1
-			if(src.SlotlessBuffs["Sparkling Ripple"]&&RippleActive())//Ripple Pure shenanigans
-				return 1
-			return 0
 		HasPurity()
 			if(passive_handler.Get("Purity"))
 				return 1
@@ -3090,7 +3093,7 @@ proc
 			if(Offender.SwordWounds())
 				return 1
 			if(Offender.HasPurity())
-				if(Defender&&Defender.IsEvil()||Offender.HasBeyondPurity())
+				if(Defender&&Defender.IsEvil())
 					return 1
 		if(Defender)
 			if(Defender.Lethal)
@@ -3102,6 +3105,6 @@ proc
 			if(Defender.SwordWounds())
 				return 1
 			if(Defender.HasPurity())
-				if(Offender&&Offender.IsEvil()||Defender.HasBeyondPurity())
+				if(Offender&&Offender.IsEvil())
 					return 1
 		return 0

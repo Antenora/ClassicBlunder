@@ -112,7 +112,6 @@ obj
 						HitSparkSize=1.25
 						KBAdd=10
 						KBMult=2
-						PureDamage=5
 						Cooldown=180
 						ActiveMessage="activates their Power Fist; everyone's in for some pain!"
 						HitMessage="discharges the round in their Power Fist!!"

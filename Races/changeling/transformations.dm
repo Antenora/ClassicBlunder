@@ -9,7 +9,7 @@ transformation
 			offense = 1.25
 			force = 1.5
 			strength = 1.5
-			passives = list("PureDamage" = 1, "Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3)
+			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3)
 			form_base = 'Chilled2.dmi'
 			transformation_message = "usrName cracks their tail, entering their Second Form in a burst of power!"
 
@@ -22,7 +22,7 @@ transformation
 			offense = 1.25
 			force = 1.5
 			strength = 1.5
-			passives = list("PureDamage" = 1, "Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "Juggernaut" = -1)
+			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "Juggernaut" = -1)
 			form_base = 'Chilled3.dmi'
 			transformation_message = "usrName cracks their tail, entering their Third Form in a burst of power!"
 
@@ -35,7 +35,7 @@ transformation
 			offense = 1.25
 			force = 1.5
 			strength = 1.5
-			passives = list("PureDamage" = 3, "Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "CriticalBlock" = -0.25, "CriticalDamage" = 0.25)
+			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "CriticalBlock" = -0.25, "CriticalDamage" = 0.25)
 			form_base = 'Chilled4.dmi'
 			transformation_message = "usrName cracks their tail, entering their Final Form in a burst of power!"
 
@@ -46,7 +46,7 @@ transformation
 			offense = 1.25
 			force = 1.5
 			strength = 1.5
-			passives = list("PureDamage" = 3, "Flicker" = 1, "Godspeed" = 2, "PureReduction" = -3, "Juggernaut" = 1)
+			passives = list("Flicker" = 1, "Godspeed" = 2, "PureReduction" = -3, "Juggernaut" = 1)
 			pot_trans = 5
 			BioArmorMax = -100
 			transformation_message = "usrName cracks their tail, entering their Fifth Form in a burst of destructive power!"

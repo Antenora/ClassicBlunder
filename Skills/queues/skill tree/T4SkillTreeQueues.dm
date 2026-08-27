@@ -9,6 +9,7 @@ obj
 				DamageMult=10.0
 				AccuracyMult = 1.175
 				Duration=15
+				MenuIcon="GetDunked"
 				KBMult=20
 				KBAdd=20
 				PushOut=3
@@ -37,6 +38,7 @@ obj
 				KBAdd=10
 				PushOut=3
 				PushOutWaves=2
+				MenuIcon="Soukotsu"
 				InstantStrikes=2
 				InstantStrikesDelay=1.5
 				Finisher=1
@@ -86,6 +88,7 @@ obj
 				DamageMult=7.25
 				AccuracyMult = 1.175
 				Duration=5
+				MenuIcon="SixGrandOpenings"
 				Counter=1
 				NoWhiff=1
 				Stunner=0.8
@@ -110,6 +113,7 @@ obj
 				InstantStrikesDelay=1.5
 				AccuracyMult = 1.1
 				Duration=5
+				MenuIcon="SkullCrusher"
 				NoGCD=1
 				Stunner=1
 				BonusVsStunned=0.25

@@ -12,6 +12,7 @@ obj
 				Instinct=2
 				Opener=1
 				Stunner=1
+				MenuIcon="MeteorCombination"
 				UnarmedOnly=1
 				EnergyCost=12
 				Quaking=5
@@ -57,6 +58,7 @@ obj
 				MultiHit=4
 				Duration=3
 				KBMult=3
+				MenuIcon="Defiance"
 				Cooldown=60
 				Determinator=1
 				Counter=1
@@ -77,6 +79,7 @@ obj
 				AccuracyMult = 1.175
 				Warp=2
 				Shearing=10
+				MenuIcon="VoidTigerFist"
 				Instinct=4
 				Duration=5
 				KBAdd=2
@@ -100,6 +103,7 @@ obj
 				AccuracyMult = 1.175
 				Determinator=1
 				Duration=5
+				MenuIcon="FinalRevenger"
 				PushOut=5
 				PushOutWaves=5
 				Quaking=20
@@ -124,6 +128,7 @@ obj
 				KBMult=0.00001
 				Combo=25
 				Rapid=1
+				MenuIcon="RedHotHundred"
 				Instinct=2
 				IconLock='Flaming_fists.dmi'
 				HitSparkIcon='Hit Effect Ripple.dmi'
@@ -146,6 +151,7 @@ obj
 				DamageMult=3.05
 				AccuracyMult = 1.175
 				Instinct=5
+				MenuIcon="TrueKamehameha"
 				HitStep=/obj/Skills/Queue/True_Kamehameha2
 				Duration=5
 				Cooldown=60
@@ -180,6 +186,7 @@ obj
 				DamageMult=2.9
 				AccuracyMult = 1.175
 				Instinct=5
+				MenuIcon="FinalShine"
 				HitStep=/obj/Skills/Queue/Final_Shine2
 				Duration=5
 				Cooldown=60
@@ -212,6 +219,7 @@ obj
 				ActiveMessage="begins to glow with limitless bravery!"
 				DamageMult=2.95
 				AccuracyMult = 1.25
+				MenuIcon="OmniSlash"
 				KBMult=0.00001
 				KBAdd=2
 				Combo=11

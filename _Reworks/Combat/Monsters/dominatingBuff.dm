@@ -11,5 +11,4 @@
         TimerLimit = 3 + (asc/2)
         Cooldown = 10 - (asc*2)
         Shattering = 5 + (asc*2.5)
-        PureDamage = 1 + (asc/2)
-        passives = list("Shattering" = Shattering,  "PureDamage" = PureDamage, "HotHundred" = 1, "Warping" = 4)
+        passives = list("Shattering" = Shattering, "PureDamage" = 1 + (asc/2), "HotHundred" = 1, "Warping" = 4)

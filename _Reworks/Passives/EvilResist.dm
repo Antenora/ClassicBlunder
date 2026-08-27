@@ -5,8 +5,8 @@ globalTracker/var
 
 passiveInfo/EvilResist
     setLines()
-        lines = list("Reduces the damage you take from attackers with the Evil alignment.",\
-"Each tick of the passive is worth [glob.outputVariableInfo("EVIL_RESIST_EPT")]% damage reduction against an Evil-aligned source.",\
+        lines = list("Reduces the damage you take from attackers with the Evil alignment, but increases the damage you take from every other source by the same amount.",\
+"Each tick of the passive is worth [glob.outputVariableInfo("EVIL_RESIST_EPT")]% damage reduction against an Evil-aligned source and [glob.outputVariableInfo("EVIL_RESIST_EPT")]% extra damage taken from any non-Evil source.",\
 "Minimum number of ticks: [glob.outputVariableInfo("EVIL_RESIST_MIN")]",\
 "Maximum number of ticks: [glob.outputVariableInfo("EVIL_RESIST_MAX")]");
 
@@ -16,6 +16,9 @@ mob/proc/
         . = FULL_EVIL_AMT
         . -= (getEvilResist() * glob.EVIL_RESIST_EPT);
         . = clamp(., getMaxEvilResistValue(), getMinEvilResistValue());
+    getEvilResistVulnValue()
+        . = FULL_EVIL_AMT
+        . += (getEvilResist() * glob.EVIL_RESIST_EPT);
     getEvilResist()
         . = 0
         . += passive_handler.Get("EvilResist");

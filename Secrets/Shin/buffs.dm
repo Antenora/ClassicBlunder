@@ -3,7 +3,7 @@
 #define MANG_MANA_COST 10 // Determines the cost of activating a Mang Ring/Level
 
 /obj/Skills/Buffs/SlotlessBuffs/Shin_Radiance
-    passives = list("Harden" = 1, "PureReduction" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Skimming" = 1, "DeathField" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
+    passives = list("Harden" = 1, "Godspeed" = 1, "Deflection" = 1, "ManaGeneration" = 1, "Skimming" = 1, "DeathField" = 1) // SOME OF THESE GET CHANGED IN THE ADJUST
     ActiveMessage="radiates a soft, warding glow of Light."
     OffMessage="suppresses the glow of the Light, letting their emotions flow on."
     TextColor=rgb(203, 198, 47)
@@ -21,7 +21,6 @@
         DefMult = 1.2 + (0.05 * secretLevel)
         // Tier Adjusted Passives
         passives["Harden"] = clamp(secretLevel*2, 1, 5) // starts at 1, adds 2 per tier, caps at 5 (tier 3)
-        passives["PureReduction"] = secretLevel // scales up to 6
         passives["Godspeed"] = secretLevel // scales up to 6
         passives["Deflection"] = max(secretLevel, 3) //Scales until t3
         passives["ManaGeneration"] = 4
@@ -59,9 +58,9 @@
         OffMult = 1.2 + (0.1 * p.GetMangLevel())
         SpdMult = 1.2 + (0.1 * p.GetMangLevel())
         // Shin Tier Adjusted Passives - These are your shin passives but divided by 2
-        passives["Harden"] = clamp(secretLevel*2, 1, 5)/2 
+        passives["Harden"] = clamp(secretLevel*2, 1, 5)/2
         passives["PureReduction"] = secretLevel / 2
-        passives["Deflection"] = (0.5 * secretLevel)/2 
+        passives["Deflection"] = (0.5 * secretLevel)/2
         passives["Skimming"] = clamp(secretLevel, 1, 3) // This Operates independent of mang level for now
         passives["CheapShot"] = 5 // This is backend buffed by GetMangLevel() in Modifiers.dm up to 10
    // IconApart = 1

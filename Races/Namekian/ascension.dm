@@ -20,7 +20,7 @@ ascension
 							skills = list(/obj/Skills/Utility/Send_Energy)
 						if("Warrior")
 							//power = 1
-							passives = list("Duelist" = 0.5, "TechniqueMastery" = 0.25, "Tenacity" = 0.5)
+							passives = list("TechniqueMastery" = 0.25, "Tenacity" = 0.5)
 							strength = 0.35
 							endurance = 0.35
 					if(owner.Class=="Dragon")
@@ -50,7 +50,7 @@ ascension
 
 					if("Warrior")
 						//power = 1.5
-						passives = list("Duelist" = 1, "TechniqueMastery" = 0.5, "Tenacity" = 0.5)
+						passives = list("TechniqueMastery" = 0.5, "Tenacity" = 0.5)
 						strength = 0.35
 						endurance = 0.35
 						skills = list(/obj/Skills/Buffs/SpecialBuffs/Giant_Form)
@@ -78,7 +78,7 @@ ascension
 					if("Warrior")
 						//power = 2
 						offense = 0.65
-						passives = list ("Duelist" = 2, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+						passives = list ("Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
 						strength = 0.65
 						recovery = 0.65
 						endurance = 0.65
@@ -96,7 +96,7 @@ ascension
 						passives = list(  "Extend" = 1, "Gum Gum" = 1)
 					if("Warrior")
 						//power = 3
-						passives = list("Duelist" = 2.5, "Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
+						passives = list("Extend" = 1, "Gum Gum" = 1, "TechniqueMastery" = 1, "Tenacity" = 0.5)
 						strength = 1
 						endurance = 0.35
 						recovery = 0.5

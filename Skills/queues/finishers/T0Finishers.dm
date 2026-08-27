@@ -118,7 +118,6 @@
     Grand_Cross
         InstantStrikes = 4
         DamageMult = 0.75
-        HolyMod = 1
         FollowUp="/obj/Skills/AutoHit/Uppercut"
         HitMessage=""
         BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Emperor_Time"

@@ -93,7 +93,6 @@ ascension
 				owner.Class = "Transcendent"
 				if(owner.CelestialAscension=="Angel")
 					owner.passive_handler.Increase("Purity", 1)
-					owner.passive_handler.Increase("BeyondPurity", 1)
 					spawn(5)
 						if(owner && owner.client)
 							owner.ChooseCelestialWeapon()

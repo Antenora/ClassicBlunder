@@ -90,7 +90,7 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
@@ -142,7 +142,7 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
@@ -194,7 +194,7 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1,  "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
@@ -216,7 +216,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)
+							passives = list("SlayerMod" = 0.5)
 		five
 			unlock_potential = ASCENSION_FIVE_POTENTIAL
 			onAscension(mob/owner)
@@ -246,7 +246,7 @@ ascension
 							speed=0.5 * SMod
 							strength=1 * SMod
 							endurance=0.5 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=0.5 * SMod
 							force=0.5 * SMod
@@ -268,7 +268,7 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)
+							passives = list("SlayerMod" = 0.5)
 		six
 			unlock_potential = ASCENSION_SIX_POTENTIAL
 			onAscension(mob/owner)
@@ -293,7 +293,7 @@ ascension
 							speed=1 * SMod
 							strength=1 * SMod
 							endurance=1 * SMod
-							passives = list("SwordAscension" = 1, "Godspeed"=1, "PureDamage"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
+							passives = list("SwordAscension" = 1, "Godspeed"=1, "Persistence"=1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1)
 						if("Sorcerer")
 							endurance=1 * SMod
 							force=1 * SMod
@@ -315,4 +315,4 @@ ascension
 							force=0.25 * SMod
 							offense=0.5 * SMod
 							speed=0.5 * SMod
-							passives = list("SlayerMod" = 0.5, "PureDamage" = 1)
+							passives = list("SlayerMod" = 0.5)

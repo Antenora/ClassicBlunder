@@ -77,7 +77,6 @@ obj/Skills/Queue
 		PushOut=1
 		PushOutWaves=1
 		PushOutIcon='KenShockwaveGold.dmi'
-		HolyMod=2
 		Decider=1
 		NeedsSword=1
 		Quaking=10

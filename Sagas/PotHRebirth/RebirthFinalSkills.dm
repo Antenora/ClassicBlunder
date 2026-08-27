@@ -18,7 +18,7 @@
 	//		if(src.Using)
 
 	Blanket_The_World_In_Darkness
-		passives = list("Heart of Darkness" = 1, "The Roaring" = 1,"HolyMod" = 30, "AbyssMod" = 30, "SpiritPower" = 5)
+		passives = list("Heart of Darkness" = 1, "The Roaring" = 1, "SpiritPower" = 5)
 		verb/Blanket_The_World_In_Darkness()
 			set category="Skills"
 			if(!usr.BuffOn(src))

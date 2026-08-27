@@ -237,7 +237,7 @@
         ElementalOffense = "Earth"
         ElementalDefense = "Earth"
         endAdd = 0.15 * asc
-        passives = list("PureReduction" = asc+1, "BlockChance" = (5*(asc+1)), "CriticalBlock" = (0.1*(asc+1)),\
+        passives = list("BlockChance" = (5*(asc+1)), "CriticalBlock" = (0.1*(asc+1)),\
                         "Harden" = 2 + (asc/2))
         //passives were kill: harden
     Trigger(mob/User, Override = FALSE)

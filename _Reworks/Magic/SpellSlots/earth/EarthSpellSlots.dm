@@ -46,19 +46,17 @@
 		ManaCost=8
 		ManaDrain=0.01
 		EndMult=1.15
-		PureReduction=2
-		passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 5)
+		passives=list("Harden" = 1, "MeleeResist" = 1)
 		ActiveMessage="wraps themselves in a ward of living stone!"
 		OffMessage="lets the stone crumble away..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 5)
+				passives=list("Harden" = 1, "MeleeResist" = 1)
 				if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p))
 					TimerLimit=40
 					Cooldown=70
 					EndMult=1.25
-					PureReduction=3
-					passives=list("Harden" = 1, "MeleeResist" = 1, "PureReduction" = 7)
+					passives=list("Harden" = 1, "MeleeResist" = 1)
 					ActiveMessage="wraps themselves in a barrier of living stone!"
 		verb/Ward_of_Stone()
 			set category="Skills"

@@ -418,7 +418,9 @@ globalTracker
 		FA_JIN_COOLDOWN_REDUCTION = 25
 		BASE_WUJUDAMAGE = 0.015
 		GLOBAL_BEAM_DAMAGE_DIVISOR = 1
+		BEAM_TIME_MULT = 3
 		GLOBAL_QUEUE_DAMAGE = 0.8
+		CHAOS_DAMAGE_DIVISOR = 10
 		GIANT_FORM_DMG_MULT = 0.7778	//what the old GiantForm roll clamp worked out to
 		GLOBAL_MELEE_MULT = 0.54	//0.9 with the old 0.6 roll baked in
 		GLOBAL_POWER_MULT = 1

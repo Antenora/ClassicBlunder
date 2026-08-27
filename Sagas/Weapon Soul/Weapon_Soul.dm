@@ -169,7 +169,6 @@ mob/tierUpSaga(Path)
 						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades/muramasa in contents)
 							muramasa.Element = "Dark"
 							muramasa.passives = list("WeaponBreaker" = 2, "AbyssMod" = 4)
-						passive_handler.Increase("PureDamage",2)
 
 					if("Masamune")
 						src << "The hilt of Masamune glitters in the light, offering it's blessed nature to aid your attacks..."
@@ -372,7 +371,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=2
 		EndMult=1.5
 		OffMult=1.25
-		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1,  "DebuffReversal" = 1)
+		passives= list("HolyMod" = 5, "Purity" = 1,  "DebuffReversal" = 1)
 		ActiveMessage= "invokes the Origin of Hope, embracing the Conviction of a Saint!"
 		OffMessage= "casts aside the Origin of Hope..."
 		verb/Fundament_Conviction()
@@ -384,7 +383,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=1.25
 		ForMult=1.25
 		EndMult=1.5
-		passives= list("PureReduction" = 5, "Miracle" = 1)
+		passives= list("Miracle" = 1)
 		ActiveMessage= "invokes the Origin of Glory, embracing the Honour of a King!"
 		OffMessage= "casts aside the Origin of Glory..."
 		verb/Fundament_Honour()
@@ -398,7 +397,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		OffMult=1.25
 		ActiveMessage= "invokes the Origin of Ruin, stewing in Primordial Hate!"
 		OffMessage= "casts aside the Origin of Ruin..."
-		passives= list("DeathField" = 5,  "Duelist" = 3)
+		passives= list("DeathField" = 5)
 		verb/Fundament_Hatred()
 			set category="Skills"
 			src.Trigger(usr)
