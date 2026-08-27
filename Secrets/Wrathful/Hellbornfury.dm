@@ -120,7 +120,7 @@ scaling with potential as well
 		OffMult = 1.25 + (p.Potential/50)
 		PowerMult = 1.15 + (p.Potential/75)
 		BioArmor=0
-		AngerFloor=90
+		AngerFloor=60
 		Enlarge = 3
 		DarkChange=1
 		IconTint=list(0.15,0,0, 0.05,0.25,0.15, 0.05,0.05,0.35, 0,0,0)

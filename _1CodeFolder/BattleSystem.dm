@@ -50,13 +50,12 @@ mob/proc/GetAngerFloor(var/obj/Skills/Buffs/exclude)
 
 mob/proc/AngerTierList(var/obj/Skills/Buffs/exclude)
 	var/list/curve=GetAngerCurve()
-	var/slide=AngerPoint-50
 	var/list/last=curve[curve.len]
-	var/peak=last[1]+slide
+	var/peak=last[1]
 	var/F=GetAngerFloor(exclude)
 	var/list/out=list()
 	for(var/list/tier in curve)
-		var/t=tier[1]+slide
+		var/t=tier[1]
 		if(F>0&&F>peak&&peak<100)
 			t=100-(100-t)*(100-F)/(100-peak)
 		out+=min(t,99.9)
@@ -490,10 +489,14 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.Guarding=0
 	src.GuardMeter=0
 	src.ChargingEnergy=0
+	src.FlashGuardPlate(0)
+	src.FlashQueueArmEnd()
+	FlashKOGutter(src)
 	src.Auraz("Remove")
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
 	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
+	FlashKOFall(src)
 	src.icon_state="KO"
 	src.SetHealthPct(1)
 	src.Energy=1
@@ -603,6 +606,7 @@ mob/proc/Conscious()
 		src.KOTimer=0
 		src.KO=0
 		src.icon_state=""
+		FlashStandUp(src)
 
 		if(src.KOBrutal)
 			src.KOBrutal=0
@@ -1645,18 +1649,21 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 			if(!W)
 				continue //blocked tile; try another dir, don't abort the whole teleport
 			src.last_combo_warp_dist = get_dist(src, M)
+			var/turf/warp_from = get_step(src, 0)
 			src.loc=W
 			if(PmActive())//land on the target's sprite, not its tile origin
 				src.step_x=M.step_x
 				src.step_y=M.step_y
 			src.dir=ReturnDirection(src,M)
-			if(!LightAttack && get_dist(src,M)>1)
+			if(!LightAttack && src.last_combo_warp_dist>1)
 				if(src.AttackQueue && src.AttackQueue.Rapid)
 					FlashImage(src)
 				else
-					VanishImage(src)
+					VanishImage(src, warp_from)
 			if(M.Beaming!=2 && !(frontOnly && landBehind))
 				M.dir=ReturnDirection(M,src)
+			if(!LightAttack)
+				src.WarpArrive(warp_from)
 			break
 
 mob/proc/SpeedDelay(var/Modifier=1)
@@ -1675,7 +1682,7 @@ mob/proc/SpeedDelay(var/Modifier=1)
 	return max(Delay,glob.ATTACK_DELAY_MIN)
 
 
-mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=0, var/override_speed = 0, trueForced = 0)
+mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=0, var/override_speed = 0, trueForced = 0, Thrown = 0)
 	if(src)
 		if(istype(src,/mob/Player/Afterimage))
 			return
@@ -1713,6 +1720,8 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		Distance=1
 
 	P.kb_sender = src	//splat credit + flourish
+	if(Thrown)
+		FlashThrowRelease(src, P, Direction, Distance)
 	if(P.Knockbacked)
 		var/orgDistance = Distance
 		P.Knockbacked=Direction
@@ -1721,7 +1730,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 		if(Forced>=3)
 			P.Knockback = (orgDistance) * world.tick_lag
 	else
-		P.BeginKB(Direction, Distance, Ki, override_speed = override_speed * world.tick_lag)
+		P.BeginKB(Direction, Distance, Ki, override_speed = override_speed * world.tick_lag, thrown = Thrown)
 		P.previousKnockBack = Distance
 
 mob
@@ -1730,7 +1739,7 @@ mob
 	var/tmp/dash_clash = 0 
 	var/tmp/mob/clash_pursuit 
 	var/tmp/clash_pursuit_until = 0
-	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed)
+	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed, thrown = 0)
 		if(src.Guarding) src.GuardStop()	//hard cc drops guard
 		if(src.ChargingEnergy) src.ChargeStop()
 		if(PmActive()) //tile-quantize before knockback so its get_step wall/edge probes stay accurate and it doesn't rest ~step_x px short
@@ -1740,15 +1749,32 @@ mob
 		src.Knockbacked=Direction
 		src.Knockback=Distance*world.tick_lag
 		src.kb_start_time = world.time	//fresh KB only - extensions keep the anchor
+		if(glob.FLASH_MOVE)
+			if(Direction >= 1 && Direction <= 15)
+				src.dir = opposite_dirs[Direction] || src.dir
+			if(src.filters["trail"])
+				var/list/kbv = FlashDirPx(Direction)
+				animate(src.filters["trail"], x = kbv[1]*7, y = kbv[2]*7, time = 2)
+			if(!Ki && !src.Flying)
+				spawn() Skid(src, min(round(Distance) * 3, 18))
 		//heavy sends pop the victim into a low arc; the world shadow shrinks under them so it reads as airtime
 		var/w = min(Distance / glob.MAX_KB_TIME, 1)
-		if(w >= glob.KB_LOFT_MIN && !src.Flying && !src.Launched && !src.pixel_z)
+		if(thrown && !src.Flying)
+			src.kb_loft = 1
+			src.kb_thrown = 1
+			animate(src, pixel_z = round(6 + glob.KB_LOFT_PX * clamp(w * 2, 0.45, 1)), time = 3, easing = SINE_EASING|EASE_OUT)
+			spawn(3)
+				FlashThrowApex(src)
+		else if(w >= glob.KB_LOFT_MIN && !src.Flying && !src.Launched && !src.pixel_z)
 			src.kb_loft = 1
 			animate(src, pixel_z = round(4 + glob.KB_LOFT_PX * w), time = 3, easing = SINE_EASING|EASE_OUT)
+		else if(glob.FLASH_MOVE && w > 0.1 && !src.Flying && !src.Launched && !src.pixel_z)
+			src.kb_loft = 1
+			animate(src, pixel_z = round(2 + glob.KB_LOFT_PX * w * w), time = 3, easing = SINE_EASING|EASE_OUT)
 		spawn()
 			while(src.Knockback)
 				src.ContinueKB(Ki)
-				sleep(override_speed ? override_speed : (world.tick_lag*2.5))
+				sleep((override_speed ? override_speed : (world.tick_lag*2.5)) * SlowMoDelayMult(src))
 			src.StopKB(Ki)
 	proc/GetKBDir(var/DustBlock=0)
 		spawn()
@@ -1765,7 +1791,12 @@ mob
 				//wall splat: force left in the send = stagger + thud
 				if(src.Knockbacked && src.Knockback >= glob.SPLAT_MIN_REMAINING * world.tick_lag && src.splat_stagger_until < world.time)
 					var/remTiles = src.Knockback / world.tick_lag
+					var/splat_dir = src.Knockbacked
 					ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)
+					if(glob.FLASH_WORLD)
+						if(splat_dir >= 1 && splat_dir <= 15)
+							src.dir = splat_dir
+						FlashWallPress(src, splat_dir, remTiles)
 					var/splat_mult = 1
 					if(src.splat_bonus_until > world.time && src.splat_bonus)
 						splat_mult = 1 + src.splat_bonus
@@ -1775,8 +1806,9 @@ mob
 						if(sender && sender != src)
 							sender.DoDamage(src, remTiles * glob.SPLAT_DMG_PER_TILE * splat_mult)
 							sender.FlourishArm()
-						src.Earthquake(4, -4,4,-4,4, 0, src.Knockbacked)
-						KenShockwave(src, Size = min(remTiles/5, 1.5), Time = 4)
+						src.Earthquake(4, -4,4,-4,4, 0, splat_dir)
+						var/list/spv = FlashDirPx(splat_dir)
+						KenShockwave(src, Size = min(remTiles/5, 1.5), PixelX = glob.FLASH_WORLD ? spv[1]*16 : 0, PixelY = glob.FLASH_WORLD ? spv[2]*16 : 0, Time = 4)
 				src.StopKB(DustBlock)
 	proc/ContinueKB(var/DustBlock=0)
 		set waitfor=0
@@ -1790,8 +1822,10 @@ mob
 			src.StopKB(DustBlock)
 			return
 		step(src, src.Knockbacked)
+		if(glob.FLASH_MOVE && src.Knockbacked >= 1 && src.Knockbacked <= 15)
+			src.dir = opposite_dirs[src.Knockbacked] || src.dir
 		src.Knockback--
-		if(!DustBlock)
+		if(!DustBlock && !glob.FLASH_MOVE)
 			if(prob(5))
 				Dust(src.loc)
 				if(prob(5))
@@ -1803,6 +1837,8 @@ mob
 		var/wasKB = src.Knockbacked
 		if(wasKB)
 			src.kb_recent_until = world.time + glob.TIMING_WINDOW
+			if(src.filters["trail"])
+				animate(src.filters["trail"], x = 0, y = 0, time = 2)
 		if(!src.KO)
 			src.icon_state=""
 		else
@@ -1818,6 +1854,11 @@ mob
 			src.Dunked=0
 		else if(wasKB&&src.pixel_z==0&&!DustBlock)
 			Landfall(src, min(previousKnockBack / glob.MAX_KB_TIME, 1)) //dust scales with how hard you were sent
+		if(src.kb_thrown)
+			src.kb_thrown = 0
+			if(wasKB)
+				KenShockwave(src, Size = min(0.5 + previousKnockBack / glob.MAX_KB_TIME, 1.2), Time = 4)
+				src.Earthquake(5, -3,3,-3,3, 0, wasKB)
 		src.kb_sender = null
 	proc/ClashPxDist(mob/M)
 		if(!ismob(M) || M == src || M.z != z || !isturf(loc) || !isturf(M.loc))
@@ -1852,7 +1893,8 @@ mob
 						if(src.hasSecret("Eldritch (Reflected)"))
 							DC.ManaHeal=3+(src.AscensionsAcquired*2)
 						DC.Trigger(src)
-			src.clash_pursuit = null 
+				FlashDragonClash(src, Trg)
+			src.clash_pursuit = null
 			return 1
 	proc/ClashWatch(mob/Trg, clashable = 0)
 		set waitfor = 0
@@ -1897,6 +1939,8 @@ mob/Bump(atom/A)
 mob/proc/Grab()
 	if(src.Stunned||src.Suspended||src.icon_state=="KB")
 		return
+	if(src.Guarding)
+		return
 	//tech: mash grab the instant you're grabbed to slip it. grab while held = tech, not a chain grab
 	if(src.grabbed && ismob(src.grabbed) && src.grabbed:Grab == src)
 		var/mob/G = src.grabbed
@@ -1927,7 +1971,7 @@ mob/proc/Grab()
 			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
 				src.Grab_Mob(src.Target)
 			else
-				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS)	//whiffed the lunge, punishable
+				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS, pose = 0)	//whiffed the lunge, punishable
 			for(var/obj/Skills/Grab/g in src)
 				g.Cooldown(2)
 		else
@@ -2027,6 +2071,8 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 			if(P.ChargingEnergy) P.ChargeStop()
 			src.GrabTime = world.time
 			src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
+			FlashGrabClinch(src, P)
+			src.FlashGrabBand(1)
 			src.Grab_Update()
 			src.Grab_Effects(P)
 			var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
@@ -2046,6 +2092,8 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(P.ChargingEnergy) P.ChargeStop()
 	src.GrabTime = world.time
 	src.OMessage(10,"[src] grabbed [P]!","[src]([src.key]) grabs [ExtractInfo(P)]")
+	FlashGrabClinch(src, P)
+	src.FlashGrabBand(1)
 	src.Grab_Update()
 	src.Grab_Effects(P)
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted/ns = src.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted)
@@ -2064,9 +2112,11 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 
 
 /mob/var/tmp/mob/Player/grabbed = null
+/mob/var/tmp/grab_ai_spawn_next = 0
 mob/proc/Grab_Release()
 	if(src.Grab)
 	{
+		src.FlashGrabBand(0)
 		src.Grab.grabbed = null
 		sleep(1)
 		src.Grab=null
@@ -2075,17 +2125,25 @@ mob/proc/Grab_Release()
 mob/proc/Grab_Update()
 	if(src.Grab)
 		Grab.grabbed = src
+		if(ismovable(src.Grab))
+			var/atom/movable/gm = src.Grab
+			gm.glide_size = src.glide_size
 		src.Grab.loc=src.loc
 		if(PmActive())//grabbed victim rides the grabber's mid-tile sprite, not the tile origin
 			src.Grab.step_x=src.step_x
 			src.Grab.step_y=src.step_y
 		if(isAI(Grab)&&!Grab.KO)
-			var/grabbing = Grab
-			spawn(60)
-				if(grabbing==Grab)
-					src.Grab_Release()
+			if(world.time >= grab_ai_spawn_next)
+				grab_ai_spawn_next = world.time + 30
+				var/grabbing = Grab
+				spawn(60)
+					if(grabbing==Grab)
+						src.Grab_Release()
 		if(ismob(Grab))
 			if(src.Grab.Grab)
+				if(ismovable(src.Grab.Grab))
+					var/atom/movable/gm2 = src.Grab.Grab
+					gm2.glide_size = src.glide_size
 				src.Grab.Grab.loc=Grab.loc
 				if(PmActive())//chain-grabbed victim rides the middle link's offset (set just above)
 					src.Grab.Grab.step_x=Grab.step_x

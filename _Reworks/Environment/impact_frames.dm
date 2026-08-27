@@ -12,18 +12,19 @@ client
 	var/tmp
 		_if_until = 0
 		_if_bw_on = 0
+		_zoom_until = 0
 
 var/_impact_tick = 0
 var/_impact_n = 0
 
-proc/FxHeavyImpact(atom/m, obj/Skills/Z = null)
+proc/FxHeavyImpact(atom/m, obj/Skills/Z = null, priority = 0)
 	if(!glob || !m) return
 	var/turf/T = get_turf(m)
 	if(!T) return
 	if(_impact_tick != world.time)
 		_impact_tick = world.time
 		_impact_n = 0
-	if(++_impact_n > 3) return
+	if(++_impact_n > 3 && !priority) return
 	if(glob.IMPACT_BURSTS) FxImpactBurst(T, Z)
 	var/fam = prob(50) ? "lines" : "spikes"
 	for(var/client/C)
@@ -153,6 +154,26 @@ proc/FxImpactBurst(turf/T, obj/Skills/Z)
 		if(B)
 			B.loc = null
 			_impact_burst_pool += B
+
+proc/FxZoomPunch(client/C, turf/T, mag = 1.05, hold = 2)
+	if(!C || !C.client_plane_master || !T) return
+	if(C.prefs && C.prefs.reducedFlashes) return
+	if(world.time < C._zoom_until) return
+	C._zoom_until = world.time + max(4, glob.IMPACT_FRAME_CD)
+	var/list/sp = _ImpactScreenPx(C, T)
+	if(!sp) return
+	var/vw = sp[3]
+	var/vh = sp[4]
+	var/fx = clamp(sp[1], vw * 0.3, vw * 0.7)
+	var/fy = clamp(sp[2], vh * 0.3, vh * 0.7)
+	var/matrix/Z = matrix()
+	Z.Translate(-fx, -fy)
+	Z.Scale(mag)
+	Z.Translate(fx, fy)
+	animate(C.client_plane_master, transform = Z, time = 1, easing = QUAD_EASING|EASE_OUT)
+	spawn(1 + max(hold, 0))
+		if(C && C.client_plane_master)
+			animate(C.client_plane_master, transform = matrix(), time = 3, easing = QUAD_EASING|EASE_OUT)
 
 proc/FxImpactRippleClient(client/C, turf/T)
 	if(!C || !C.client_plane_master || !C.mob) return

@@ -99,18 +99,37 @@ proc/BeamTurnState(din, dout)
 		FxDetachLight(glow_part)
 		glow_part._fx_glowed = 0
 		glow_part = null
-	for(var/obj/Skills/Projectile/_Projectile/p in parts)
-		if(p) p.clash_lock = null
-		DropPart(p)
+	var/list/ps = parts.Copy()
 	parts.Cut()
 	if(owner && owner.beams) owner.beams -= src
 	owner = null
 	skill = null
+	if(!glob.FLASH_STATES || ps.len < 3)
+		for(var/obj/Skills/Projectile/_Projectile/p in ps)
+			if(p) p.clash_lock = null
+			DropPart(p)
+		return
+	spawn() DieDrain(ps)
+
+/datum/beam/proc/DieDrain(list/ps)
+	var/n = ps.len
+	for(var/i = 1, i < n, i++)
+		var/obj/Skills/Projectile/_Projectile/p = ps[i]
+		if(!p) continue
+		p.clash_lock = null
+		p.Explode = 0
+		DropPart(p)
+		if(i % 6 == 0)
+			sleep(1)
+	var/obj/Skills/Projectile/_Projectile/h = ps[n]
+	if(h)
+		h.clash_lock = null
+		DropPart(h)
 
 /datum/beam/proc/Loop()
 	set waitfor = 0
 	while(!dying)
-		sleep(speed)
+		sleep(speed * SlowMoDelayMult(owner))
 		if(dying) break
 		try
 			Tick()
@@ -413,6 +432,17 @@ proc/BeamTurnState(din, dout)
 		p.chain.segments -= p
 		p.chain = null
 	walk(p, 0)
+	if(glob.FLASH_STATES)
+		var/wscale = clamp(0.85 + 0.3 * (charge - 0.5), 0.85, 1.3)
+		if(abs(wscale - 1) > 0.02)
+			var/ang = FlashDirAngle(bdir)
+			var/matrix/wm = matrix()
+			wm.Turn(-ang)
+			wm.Scale(wscale, 1)
+			wm.Turn(ang)
+			p.transform = p.transform * wm
+		animate(p, alpha = 235, time = 5, loop = -1, flags = ANIMATION_PARALLEL)
+		animate(alpha = 255, time = 5)
 	return p
 
 /datum/beam/proc/DropPart(obj/Skills/Projectile/_Projectile/p)

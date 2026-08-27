@@ -5574,14 +5574,19 @@ mob
 					var/v2 = (glob.BEAM_V2 && Z.Area == "Beam" && !Z.Stream)
 					if(v2)
 						if(fire_directions && fire_directions.len)
+							var/datum/beam/first_arm
 							for(var/d in fire_directions)
 								var/datum/beam/VB = new(src, Z, d)
 								VB.fixed_dir = 1 //a volley arm keeps its own heading
+								if(!first_arm) first_arm = VB
+							if(first_arm)
+								spawn() FlashBeamIgnite(first_arm, omni = 1)
 						else
-							new/datum/beam(src, Z, src.dir)
+							var/datum/beam/NB = new(src, Z, src.dir)
+							spawn() FlashBeamIgnite(NB)
 					while(src.Beaming==2)
 						if(src.beam_clash) //struggling: hold the pour, no new segments, BeamTime paused
-							sleep(Z.Speed)
+							sleep(Z.Speed * SlowMoDelayMult(src))
 							if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5)
 								src.UseProjectile(Z)
 							continue
@@ -5597,7 +5602,7 @@ mob
 								StreamEffective=Z.TempStream
 							for(var/s=StreamEffective-1, s>0, s--)
 								src.Blast(Z, Origin)//Higher levels of stream shoot more blasts.
-						sleep(Z.Speed)
+						sleep(Z.Speed * SlowMoDelayMult(src))
 						if(Z.BeamTime)
 							Z.BeamTimeUsed++
 						if(src.KO||src.Knockbacked||Z.ManaCost&&src.ManaAmount<=0||Z.EnergyCost&&src.Energy<=5||(Z.BeamTime>0&&Z.BeamTimeUsed>=Z.BeamTime*glob.BEAM_TIME_MULT))
@@ -5637,6 +5642,8 @@ mob
 				if(Z.MagicNeeded&&src.HasDualCast())
 					BlastCount *= 1 + src.HasDualCast()
 					BlastCount = floor(BlastCount)
+				if(BlastCount > 1 || Z.Continuous)
+					FlashVolleyHand(src, Z, 1)
 				for(var/i=0, i<BlastCount, i++)
 					BlastAgain
 					if(Z.Continuous && !Z.ContinuousOn && i > 0)
@@ -5664,6 +5671,8 @@ mob
 						src.Blast(Z, Origin, GivesMessage=1)
 					else
 						src.Blast(Z, Origin, GivesMessage=0)
+					if(i > 0 && i % 4 == 0)
+						FlashVolleyRecoil(src)
 					if(Z.Stream)
 						var/StreamEffective=Z.Stream
 						if(Z.TempStream)
@@ -5710,13 +5719,16 @@ mob
 							else
 								flick("Blast", src)
 								src.ContinuousAttacking=1
-							sleep(1)
+								if(Z.BlastsShot % 4 == 2)
+									FlashVolleyRecoil(src)
+							sleep(SlowMoDelayMult(src))
 							goto BlastAgain
 					if(!Z.Stream)
 						if(Z.FlickBlast)
 							flick("Blast", src)
 					if(BlastCount>1&&!Z.Instant)
-						sleep(Z.Delay)
+						sleep(Z.Delay * SlowMoDelayMult(src))
+				FlashVolleyHand(src, Z, 0)
 			if(Z.Stream&&Z.Area=="Blast")
 				src.Beaming=0
 				src.icon_state=""
@@ -6442,6 +6454,8 @@ obj
 										Dirs.Remove(src.dir)
 										Dirs.Remove(turn(a:dir,180))
 										src.dir=pick(Dirs)
+										if(ismob(a))
+											FlashDeflect(a, src)
 										if(a:CheckSlotless("Deflector Shield"))
 											if(!a:Shielding)
 												a:Shielding=1
@@ -7241,7 +7255,7 @@ obj
 								if(!src.transform)
 									src.transform = matrix()
 								src.transform = src.transform.Turn(src.ProjectileSpin)
-							sleep(src.Speed)
+							sleep(src.Speed * SlowMoDelayMult(src))
 							if(FadeOut && FadeOut>=Distance)
 								animate(src, alpha=0, time=max(1,FadeOut*Speed), flags=ANIMATION_PARALLEL)
 								FadeOut=0

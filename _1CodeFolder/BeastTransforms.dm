@@ -19,7 +19,7 @@
 	DefMult = 0.1
 	PowerMult=1.5
 	HealthThreshold=0.01
-	AngerFloor = 90
+	AngerFloor = 60
 	TimerLimit = 360
 	verb/Ultimate_Form_Toggle()
 		set category="Other"

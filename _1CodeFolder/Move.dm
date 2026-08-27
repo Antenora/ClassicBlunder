@@ -113,7 +113,7 @@ mob/Move()
 	if(Bleed > 0 && !Knockback && !is_dashing && client && (!PmActive() || loc != Former_Location)) //micro-steps bleed per tile, not per slide
 		WoundSelf(0.01)
 
-	if(src.Grab && (!PmActive() || loc != Former_Location))
+	if(src.Grab)
 		src.Grab_Update()
 
 	if(MapperWalk&&!Knockback&&Target&&istype(Target,/obj/Others/Build))

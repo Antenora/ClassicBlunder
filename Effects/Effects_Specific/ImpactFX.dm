@@ -20,6 +20,13 @@ proc
 		if(weight > 2) weight = 2
 		var/n = 4 + round(weight * 4)
 		var/r = 8 + round(weight * 10)
+		var/wind_x = 0
+		var/wind_y = 0
+		if(glob.FLASH_WORLD)
+			var/area/AR = T.loc
+			var/list/wv = EnvWindForArea(AR)
+			wind_x = clamp(round(wv[1] * 2), -6, 6)
+			wind_y = clamp(round(wv[2] * 2), -6, 6)
 		for(var/i = 1, i <= n, i++)
 			var/obj/Effects/Dust/D = new(T)
 			if(PmActive() && ismovable(A)) //mid-tile mobs: mirror the real offsets
@@ -28,7 +35,7 @@ proc
 				D.step_y = M.step_y
 			//PARALLEL so the radial kick layers with the settle from Dust/New
 			var/ang = (i - 1) * (360 / n) + rand(-20, 20)
-			animate(D, pixel_w = round(cos(ang) * r, 1), pixel_z = round(sin(ang) * r, 1), time = 6, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_PARALLEL)
+			animate(D, pixel_w = round(cos(ang) * r, 1) + wind_x, pixel_z = round(sin(ang) * r, 1) + wind_y, time = 6, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_PARALLEL)
 		if(weight >= 0.5)
 			A.Earthquake(4,-2,2,-2,2)
 		if(weight >= 0.8)

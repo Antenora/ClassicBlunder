@@ -91,21 +91,51 @@ proc/DunkSlam(mob/dunker, mob/target)
 	if(!dunker || !target) return
 	var/peak = max(target.pixel_z, 12)
 	animate(dunker, pixel_z = peak, time = 2, easing = BACK_EASING|EASE_OUT, flags = ANIMATION_END_NOW)
-	sleep(4)	//the strike lands up there
+	sleep(2)
+	if(glob.FLASH_MOVE && dunker && target)
+		var/turf/DT = get_turf(dunker)
+		var/turf/TT = get_turf(target)
+		if(DT && TT && DT.z == TT.z)
+			KenShockwave(target, Size = 0.5, PixelX = (DT.x - TT.x) * 16, PixelY = (DT.y - TT.y) * 16 + peak, Blend = 2, Time = 3)
+		_HitStopClient(dunker, 3)
+		_HitStopClient(target, 3)
+	sleep(2)	//the strike lands up there
 	if(!dunker || !target) return
 	LaunchEnd(target, slam = 1)	//clear the float loop first so nothing fights the drop
+	if(glob.FLASH_MOVE)
+		if(dunker.filters["trail"])
+			animate(dunker.filters["trail"], x = 0, y = 8, time = 1)
+		if(target.filters["trail"])
+			animate(target.filters["trail"], x = 0, y = 10, time = 1)
 	animate(target, pixel_z = 0, time = 1, easing = QUAD_EASING|EASE_IN, flags = ANIMATION_END_NOW)
 	animate(dunker, pixel_z = 0, time = 1, easing = QUAD_EASING|EASE_IN, flags = ANIMATION_END_NOW)
 	sleep(1)
+	if(glob.FLASH_MOVE)
+		if(dunker && dunker.filters["trail"])
+			animate(dunker.filters["trail"], x = 0, y = 0, time = 2)
+		if(target && target.filters["trail"])
+			animate(target.filters["trail"], x = 0, y = 0, time = 2)
 	if(target)
 		Landfall(target, 1)
 		target.Earthquake(10, -4,4,-4,4, 0, 0)
+		if(glob.FLASH_MOVE)
+			KenShockwave(target, Size = 1.3, Time = 5)
+			FxHeavyImpact(target, priority = 1)
+			var/turf/ZT = get_turf(target)
+			if(ZT)
+				for(var/client/C)
+					var/mob/CM = C.mob
+					if(!CM || CM.z != ZT.z || get_dist(CM, ZT) > 15) continue
+					FxZoomPunch(C, ZT, 1.05, 3)
 	if(dunker)
 		Landfall(dunker, 0.6)
 		dunker.Earthquake(8, -4,4,-4,4, 0, 0)
 
 /mob/Players/proc/launchLoop()
 	if(PureRPMode) return
+	if(Launched>0 && !SlowMoTickGate(src))
+		icon_state = "KB"
+		return
 	if(Launched>0)
 		icon_state = "KB"
 		//height tracks time left: half the status gone = halfway back down

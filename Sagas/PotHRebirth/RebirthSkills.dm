@@ -143,7 +143,7 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Unwavering_Soul
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Of_Chaos
 	TooMuchHealth = 100
 	NeedsHealth=99
-	AngerPoint=65
+	AngerFloor=60
 	RecovMult=1.75
 	Cooldown = 1
 	passives = list("Controlled Chaos" = 1)

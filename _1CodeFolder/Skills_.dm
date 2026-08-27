@@ -37,7 +37,7 @@ mob/proc/StartGCD(obj/Skills/Z)
 	if(!client) return
 	if(Z && (Z.NoGCD || Z.HeldSkill)) return
 	if(PureRPMode) return
-	var/until = world.time + glob.GCD_TIME * max(GCDMult, 0)
+	var/until = world.time + glob.GCD_TIME * max(GCDMult, 0) * SlowMoDelayMult(src)
 	if(until > gcd_ready)
 		gcd_ready = until
 		gcd_stamp = world.time
@@ -89,6 +89,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		if(!Time && m)
 			modify *= m.HasteCDMult(src)
 			Time = src.ChargeRefresh * 10 * modify
+			if(ismob(m))
+				Time *= SlowMoDelayMult(m)
 		if(isnull(Time) || Time == 0)
 			Time = src.ChargeRefresh * 10
 		if(m && m.HasTestMode())
@@ -139,6 +141,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			if(src.halve_next_cd)
 				Time=max(1, round(Time/2))
 				src.halve_next_cd=0
+			if(ismob(m))
+				Time *= SlowMoDelayMult(m)
 		else
 			forcemessage=1
 		if(isnull(Time) || Time == 0)
@@ -332,6 +336,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 
 
 			if("ReverseDash")
+				if(src.Guarding)
+					return
 				if(hasEldritchPower()) summonEldritchMinion();
 				if(src.Secret=="Haki")
 					if(src.CheckSlotless("Haki Armament"))
@@ -379,6 +385,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 				else if(locate(/obj/Skills/Zanzoken, src)||src.HasSuperDash()&&src.GetSuperDash()<2)
 					AfterImage(src)
 					Delay=0
+				else if(glob.FLASH_MOVE)
+					AfterImage(src)
 				if(is_arcane_beast)
 					for(var/mob/Player/AI/Nympharum/n in ai_followers)
 						n.PlayAction("NymphReverseDashSupport")
@@ -395,7 +403,16 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					src.OMessage(10,"[src] dashes away from [src.Target]!","<font color=red>[src]([src.key]) used  Back Dash.")
 				var/pm = PmActive()
 				var/pm_budget = Distance * 32 //total dash distance in px (pixel path)
-				var/pm_px = Delay > 0 ? round(32 / Delay) : glob.PM_DASH_MAX_PX //per-tick, capped in PmDashStep
+				var/pm_px = src.PmDashPx()
+				var/flash_rd = glob.FLASH_MOVE && src.Target
+				var/turf/rd_from = get_turf(src)
+				if(flash_rd)
+					Footfall(src)
+					Footfall(get_step(src, get_dir(src, src.Target)))
+					KenShockwave(src, Size = 0.3, Blend = 2, Time = 3)
+					if(src.filters["trail"])
+						var/retreat_ang = GetAngle(src.Target, src)
+						animate(src.filters["trail"], x = sin(retreat_ang)*6, y = cos(retreat_ang)*6, time = 2)
 				while(pm ? pm_budget > 0 : Distance>0)
 					if(src.StyleActive == "Crane Style")
 						src.icon_state="KB"
@@ -406,14 +423,15 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					if(src.Secret=="Spiral")
 						src.DashTo(src.Target, 20, 0.5, Clashable=1)
 					else if(pm) //smooth: one glided step away per tick instead of batching them into one tick
-						var/m = src.PmDashStep(src.Target, pm_px, away = 1)
+						var/m = src.PmDashStep(src.Target, max(2, round(pm_px / SlowMoDelayMult(src))), away = 1)
 						if(!m)
 							pm_budget = 0
 						else
 							pm_budget -= m
 					else
 						step_away(src,src.Target,68)
-					for(var/atom/a in get_step(src,dir))
+					var/rd_scan_dir = (flash_rd && src.Target) ? (get_dir(src.Target, src) || dir) : dir
+					for(var/atom/a in get_step(src,rd_scan_dir))
 						if(a==src)
 							continue
 						if(a.density)
@@ -422,6 +440,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					if(src.Secret=="Spiral")
 						Distance=0
 						pm_budget=0
+					if(flash_rd && src.Target)
+						src.dir = get_dir(src, src.Target) || src.dir
 					Distance-=1
 					if(pm)
 						sleep(world.tick_lag) //one glided step already taken this tick
@@ -438,12 +458,21 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 				src.NextAttack=0
 				src.icon_state=""
 				walk(src,0)
+				if(flash_rd)
+					if(src.filters["trail"])
+						animate(src.filters["trail"], x = 0, y = 0, time = 3)
+					FlashRdPart(src, rd_from)
+					var/list/rdv = FlashDirPx(src.dir)
+					animate(src, pixel_x = rdv[1]*2, pixel_y = rdv[2]*2, time = 1, flags = ANIMATION_RELATIVE | ANIMATION_PARALLEL)
+					animate(pixel_x = -rdv[1]*2, pixel_y = -rdv[2]*2, time = 2, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_RELATIVE)
 				if(src.Beaming==1)
 					for(var/obj/Skills/Projectile/Beams/B in src)
 						if(B.Charging)
 							src.UseProjectile(B, noGCD = TRUE)
 
 			if("DragonDash")
+				if(src.Guarding)
+					return
 				if(!CanDash())
 					return
 
@@ -530,7 +559,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					if(src.CheckSlotless("East Strength"))
 						if(!src.AttackQueue)
 							src.SetQueue(new/obj/Skills/Queue/East_Rush)
-					src.Melee1(1, 5, accmulti=1.125+(src.GetSuperDash()/4), BreakAttackRate=1)
+					var/mob/dash_hit = (src.Target && ismob(src.Target) && src.Target.z == src.z && bounds_dist(src, src.Target) <= 20) ? src.Target : null
+					if(dash_hit)
+						FlashDashArrive(src, dash_hit)
+					src.Melee1(1, 5, forcedTarget = dash_hit, accmulti=1.125+(src.GetSuperDash()/4), BreakAttackRate=1)
 
 
 			if("Aerial Recovery")
@@ -1049,6 +1081,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 			if("Zanzoken")
 				if(!src.Move_Requirements())
 					return
+				if(src.Guarding)
+					return
 				if(src.PoweringUp)
 					return
 				if(src.Beaming||src.BusterTech)
@@ -1109,6 +1143,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
 									return
 								else
+									var/turf/zanzo_from = get_turf(src)
 									if(HasGiantForm())
 										var/Wave=2
 										for(var/wav=Wave, wav>0, wav--)
@@ -1118,6 +1153,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 										VanishImage(src)
 									src.Comboz(src.Target, landBehind = passive_handler["Backstabber"], frontOnly = TRUE)
 									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
+									ZanzoBlink(src, zanzo_from)
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
 						src.MovementCharges--
 						if(MovementCharges<0)

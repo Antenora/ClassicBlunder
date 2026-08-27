@@ -48,7 +48,7 @@ mob
 	revertToTrans = 0
 	form_aura_icon = 'Amazing Super Demon Aura.dmi'
 	form_aura_x = -32
-	angerFloor = 60
+	angerFloor = 45
 	strength = 1
 	force = 1
 	speed = 1
@@ -218,7 +218,7 @@ mob
 	form_glow_icon = 'Ripple Radiance.dmi'
 	form_glow_x = -32
 	form_glow_y = -32
-	angerFloor = 90
+	angerFloor = 60
 	pot_trans = 15
 	enduranceadd = 2
 	offenseadd = 2

@@ -67,6 +67,10 @@ mob/proc/ApplyPixelBounds()
 	bound_x = bx
 	bound_y = by
 
+mob/proc/PmDashPx(mult = 1.25)
+	var/delay = glob.BASE_LOOP_DELAY + MovementSpeed()
+	return max(2, round(mult * 32 * glob.PLAYER_SPEED_MULT / max(1, -round(-delay))))
+
 //one glided dash step per tick toward Trg (away=1 flips it); returns px actually stepped, 0 if blocked
 mob/proc/PmDashStep(atom/Trg, px, away = 0)
 	var/d = Trg ? (away ? get_dir(Trg, src) : get_dir(src, Trg)) : dir
@@ -472,6 +476,7 @@ mob/Players
 				delay /= (1 + ((glob.MAX_CRIPPLE_MULT * (Crippled / glob.CRIPPLE_DIVISOR) / 2) * debuffRev))
 			else
 				delay *= (1 + (glob.MAX_CRIPPLE_MULT * (Crippled / glob.CRIPPLE_DIVISOR)))
+		delay *= SlowMoDelayMult(src)
 		pm_owed = min(pm_owed + 32 * glob.PLAYER_SPEED_MULT / max(1, -round(-delay)), 32)
 		var/px = round(pm_owed)
 		if(px < 1) return

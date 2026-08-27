@@ -2,9 +2,16 @@
 /mob/var/customPixelX = 0
 /mob/var/customPixelY = 0
 
-/mob/proc/Whiff()
+/mob/proc/Whiff(mob/attacker = null)
 	set waitfor = FALSE
-	KenShockwave(src, icon='fevKiai.dmi', Size = 0.5)
+	var/px = 0
+	var/py = 0
+	if(attacker)
+		var/list/v = FlashDirPx(get_dir(attacker, src))
+		px = v[1] * 14
+		py = v[2] * 14
+		FlashSwingSmear(attacker, src, 0.5)
+	KenShockwave(src, icon='fevKiai.dmi', Size = 0.5, PixelX = px, PixelY = py)
 
 
 

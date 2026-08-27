@@ -243,6 +243,7 @@ mob
 									loop_delay *= glob.DIAG_LOOP_DELAY
 								move_speed = MovementSpeed()
 								var/delay = (loop_delay + move_speed) / glob.PLAYER_SPEED_MULT
+								delay *= SlowMoDelayMult(src)
 								if(held_skill?.HeldBeam && !HasMovingCharge())
 									delay *= glob.HELD_BEAM_MOVE_PENALTY
 								if(src.Crippled)

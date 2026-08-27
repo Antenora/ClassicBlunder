@@ -57,8 +57,8 @@ obj/Skills/Grapple
 		ObjectEnabled=1
 		CooldownStatic=1
 		Cooldown=20
-		ThrowMult=1.5
-		ThrowAdd=1.5
+		ThrowMult=2
+		ThrowAdd=4
 		TriggerMessage="tosses"
 		proc/resetValues()
 			TriggerMessage = "tosses"
@@ -594,7 +594,9 @@ obj/Skills/Grapple
 					var/mob/Grabber=User.IsGrabbed()
 					if(Grabber)
 						Grabber.Grab=null
+						Grabber.FlashGrabBand(0)
 						User.Grab=Grabber
+						User.FlashGrabBand(1)
 					else
 						return
 				else
@@ -620,6 +622,7 @@ obj/Skills/Grapple
 					if(istype(src, /obj/Skills/Grapple/Toss))
 						var/obj/Q=User.Grab
 						User.Grab=null
+						User.FlashGrabBand(0)
 						for(var/x=5, x>0, x--)
 							Q.transform=turn(Q.transform, 225)
 							step(Q, src.ThrowDir)
@@ -635,6 +638,7 @@ obj/Skills/Grapple
 				var/mob/Trg=User.Grab
 				// Trg.isGrabbed = TRUE
 				User.Grab=null
+				User.FlashGrabBand(0)
 				var/userPower = User.getPower(Trg)
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
@@ -816,7 +820,7 @@ obj/Skills/Grapple
 							Stomp(User, Trg, 2, EffectMult)
 					sleep(world.tick_lag)
 					Times--
-				User.Knockback((0.6*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed)
+				User.Knockback((0.6*src.ThrowMult)+src.ThrowAdd, Trg, Direction=src.ThrowDir, Forced=1, override_speed = ThrowSpeed, Thrown = 1)
 				if(src.LandingSplash)
 					var/mob/lu = User
 					var/mob/lt = Trg

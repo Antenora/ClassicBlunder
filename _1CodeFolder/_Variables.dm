@@ -192,7 +192,6 @@ mob/var
 	RecovTax=0
 	RecovCut=0
 	RecovEroded=0
-	AngerPoint=50//get angry with this percent of health left
 	AngerMessage//custom anger messages
 	AngerColor
 	CalmAnger //Never get angry unless something forces you to.  Like maki.

@@ -123,10 +123,14 @@ proc/turf_tick()
 
 proc/ai_tick()
     for(var/datum/i in ticking_ai)
+        if(ismob(i) && !SlowMoTickGate(i))
+            continue
         i.Update()
 
 
 // im sorry niezan
 proc/companion_tick()
     for(var/datum/i in companion_ais)
+        if(ismob(i) && !SlowMoTickGate(i))
+            continue
         i.Update()

@@ -410,6 +410,7 @@
 #include "_Reworks\Combat\AscensionPower.dm"
 #include "_Reworks\Combat\BeamClash.dm"
 #include "_Reworks\Combat\BeamSystem.dm"
+#include "_Reworks\Combat\Flash.dm"
 #include "_Reworks\Combat\GetandUseSkill.dm"
 #include "_Reworks\Combat\hitstop.dm"
 #include "_Reworks\Combat\Homing.dm"

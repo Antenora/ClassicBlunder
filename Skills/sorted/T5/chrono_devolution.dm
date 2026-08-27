@@ -119,7 +119,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 		"recovery" = 0,
 		"intelligenceAdd" = 0,
 		"imaginationAdd" = 0,
-		"angerPoint" = 0,
 		"pilotingProwess" = 0,
 		"cyberizeModAdd" = 0,
 		"enhanceChips" = 0,
@@ -146,8 +145,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 	snap["recovery"]        += a.recovery
 	snap["intelligenceAdd"] += a.intelligenceAdd
 	snap["imaginationAdd"]  += a.imaginationAdd
-	if(a.angerPoint)
-		snap["angerPoint"]  += a.angerPoint
 	snap["pilotingProwess"] += a.pilotingProwess
 	snap["cyberizeModAdd"]  += a.cyberizeModAdd
 	snap["enhanceChips"]    += a.enhanceChips
@@ -179,8 +176,6 @@ var/global/list/CHRONO_DEV_GREYSCALE_MATRIX = list(
 	EnhanceChipsMax += sign * snap["enhanceChips"]
 	RPPMult         += sign * snap["rppAdd"]
 	EconomyMult     += sign * snap["ecoAdd"]
-	if(snap["angerPoint"])
-		AngerPoint  += sign * snap["angerPoint"]
 	var/list/p = snap["passives"]
 	if(islist(p) && p.len > 0 && passive_handler)
 		if(sign > 0)

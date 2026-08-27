@@ -1353,6 +1353,7 @@ mob
 	proc
 		SetQueue(var/obj/Skills/Queue/Q, noGCD = FALSE)
 			if(src.HeldSkillBlocksAction(Q)) return
+			if(src.Guarding) return
 			if(!noGCD && GCDBlocked(Q)) return
 			if(src.passive_handler.Get("Silenced"))
 				src << "You can't use [Q] you are silenced!"
@@ -1965,6 +1966,7 @@ mob
 
 
 		QueueOverlayAdd()
+			src.FlashQueueArm()
 			//tell
 			if(src.AttackQueue.IconLock == 'BLANK.dmi')
 				src.queue_tell_aura = 1	//remove
@@ -1985,6 +1987,7 @@ mob
 					else
 						KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
 		QueueOverlayRemove()
+			src.FlashQueueArmEnd()
 			if(src.queue_tell_aura)
 				src.queue_tell_aura = 0
 				if(!src.AuraLocked&&!src.HasKiControl())

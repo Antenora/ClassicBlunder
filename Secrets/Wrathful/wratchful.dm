@@ -23,7 +23,7 @@ scaling with potential as well
 	EndMult = 1
 	StrMult = 1
 	GiantForm = 1
-	AngerFloor = 75
+	AngerFloor = 50
 	adjust(mob/p)
 		if(altered) return
 		passives = list("GiantForm" = 1,  "Harden" = round(p.Potential/35,1))
@@ -59,7 +59,7 @@ scaling with potential as well
 	TooMuchHealth = 76
 	HealthThreshold = 50
 	Enlarge = 1.5
-	AngerFloor = 75
+	AngerFloor = 50
 	BuffName = "Wrathful"
 	adjust(mob/p)
 		if(altered) return
@@ -96,7 +96,7 @@ scaling with potential as well
 	NeedsHealth = 50
 	TooMuchHealth = 51
 	HealthThreshold = 15
-	AngerFloor = 85
+	AngerFloor = 55
 	Enlarge = 2
 	BuffName = "Chou Wrathful"
 	adjust(mob/p)
@@ -122,7 +122,7 @@ scaling with potential as well
 	NeedsHealth = 15
 	TooMuchHealth = 16
 	Enlarge = 2
-	AngerFloor = 90
+	AngerFloor = 60
 	BuffName = "Full Power Chou Wrathful"
 	adjust(mob/p)
 		if(altered) return

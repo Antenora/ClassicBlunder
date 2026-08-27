@@ -1136,6 +1136,7 @@ mob/proc/
 				var/before = src.Energy
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
 				if(src.Energy <= before)
+					FlashChargeCap(src)
 					src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
 
 

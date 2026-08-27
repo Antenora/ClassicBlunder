@@ -118,7 +118,7 @@
 	scalingValues = list("LifeGeneration" = list(1,1,1.5,2,2,2.5), \
 	"TechniqueMastery" = list(2,3,5,5,8), "Godspeed" = list(1,2,3,4,5), "Adrenaline" = list(1,2,2,3,3,3),  \
 	 "AfterImages" = list(3,4,4,4,4,4), "CorruptAffected" = list(1,1,1,1,1,1))
-	AngerFloor = 90
+	AngerFloor = 60
 	HealthThreshold = 0.1
 	KenWave=3
 	KenWaveIcon='KenShockwaveDivine.dmi'

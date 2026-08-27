@@ -37,6 +37,7 @@
 		var/mob/attacker = S.attacker
 		var/mob/defender = S.defender
 		var/val = S.defender.HPToPct(S.dealt)
-		if(defender.HealthPct()<=defender.AngerPoint*(1-attacker.HealthCut)&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
+		var/list/dT = defender.AngerTierList()
+		if(defender.AngerEvalHP()<=dT[defender.GetAngeredIndex()]&&defender.passive_handler.Get("Defiance")&&!defender.CheckSlotless("Great Ape"))
 			if(defender.Anger)
 				defender.DefianceCalcs(val, attacker)

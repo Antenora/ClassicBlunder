@@ -56,6 +56,8 @@
 		return
 	if(Airborne)
 		return
+	if(Guarding)
+		return
 	if(judgement_cut_chain_active)
 		return
 	if(SecondStrike || ThirdStrike || AsuraStrike)
@@ -311,7 +313,7 @@
 		var/refresh = passive_handler.Get("RefreshingBlows");
 		if(refresh) src.RefreshBlow(refresh);
 
-		if(!petal_attacking) NextAttack += delay
+		if(!petal_attacking) NextAttack += delay * SlowMoDelayMult(src)
 		var/Disarm = 0
 		if(src.UsingGladiator())
 			if(src.GladiatorCounter >= glob.GLADIATOR_DISARM_MAX / src.UsingGladiator())
@@ -509,7 +511,8 @@
 		// 				ACCURACY END			//
 
 		// 				STATUS 					//
-				if(!src.petal_attacking) flick("Attack",src)
+				var/spent_arm = AttackQueue ? FlashQueueSpend(enemy) : 0
+				if(!src.petal_attacking) SwingEnvelope(enemy, AttackQueue ? clamp(0.2 + 0.2 * AttackQueue.DamageMult, 0.2, 1) : 0.3, spent_arm ? "#ffe9b0" : "#ffffff")
 				if(passive_handler["Hit Scan"]) // this is troublesome
 					new/obj/tracker(locate(x,y,z),enemy, src, HitScanIcon, HitScanHitSpark,HitScanHitSparkX, HitScanHitSparkY)
 				//TODO: come back to this
@@ -680,7 +683,7 @@
 
 								if(whiffed)
 									damage /= glob.MIN_WHIFF_DMG + rand() * (glob.MAX_WHIFF_DMG - glob.MIN_WHIFF_DMG)
-									enemy.Whiff()
+									enemy.Whiff(src)
 									#if DEBUG_MELEE
 									log2text("Damage", "After Whiff", "damageDebugs.txt", "[ckey]/[name]")
 									log2text("Damage", damage, "damageDebugs.txt", "[ckey]/[name]")
@@ -841,7 +844,11 @@
 								enemy.AngerEvent(glob.ANGER_RUSH_FINISHER)
 							//raw damage on purpose - otherDmg doesn't exist yet at spark time
 							var/hitWeight = clamp((damage - glob.HIT_STOP_MIN) / max(1, 14 - glob.HIT_STOP_MIN), 0, 1)
-							enemy?.HitBend(hitWeight, get_dir(src, enemy))
+							var/beat = hitWeight
+							if(glob.FLASH_RALLY)
+								beat = clamp(hitWeight + glob.RALLY_COEF * RallyLevel(), 0, 1)
+								RallyBump()
+							enemy?.HitBend(beat, get_dir(src, enemy))
 					// 										MELEE END																	 //
 							var/shocked=0
 							if((SureKB || AttackQueue && QueuedKBAdd()) && !NoKB)
@@ -871,7 +878,7 @@
 								//	if(swordAtk && HasBladeFisting())
 								//		hitsparkSword = 0
 									//HitEffect args are positional - new ones go on the end, passed named
-									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=hitWeight)
+									HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=beat, RawWeight=hitWeight)
 								if(AttackQueue?.PushOut)
 									var/shockwave = AttackQueue.PushOutWaves
 									var/shockSize = AttackQueue.PushOut
@@ -904,7 +911,7 @@
 						//	if(swordAtk && HasBladeFisting())
 						//		hitsparkSword = 0
 							//double HitEffect with the queue dispatch above is intentional
-							if(!src.petal_attacking) HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=hitWeight)
+							if(!src.petal_attacking) HitEffect(enemy, unarmedAtk, hitsparkSword, SecondStrike, ThirdStrike, AsuraStrike, disperseX, disperseY, Weight=beat, RawWeight=hitWeight)
 
 
 							if(passive_handler.Get("MonkeyKing"))
@@ -950,15 +957,13 @@
 
 							if(otherDmg >= 3 || AttackQueue&&QueuedKBAdd()||SureKB)
 								if(!shocked)
-									KenShockwave(enemy, Size=clamp(otherDmg * randValue(0.001,0.2), 0.0001, 1.5), PixelX = disperseX, PixelY = disperseY, Time=4)
 									var/quakeIntens = otherDmg
 									if(quakeIntens>14)
 										quakeIntens=14
-									HitStop(src, enemy, quakeIntens, counterHit ? glob.COUNTER_HIT_STOP_BONUS : 0)
 									if(counterHit)
 										src.gainTension(glob.COUNTER_HIT_TENSION)
 									//shake lurches the way the hit lands
-									enemy?.Earthquake(quakeIntens, -4,4,-4,4, 0, get_dir(src, enemy))
+									FlashContact(src, enemy, quakeIntens, counterHit, disperseX, disperseY)
 							else if(counterHit)
 								CounterHitReward(src, enemy, otherDmg)
 					else

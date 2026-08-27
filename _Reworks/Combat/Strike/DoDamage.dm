@@ -70,6 +70,7 @@
 		src.nerve_weaken = 0
 	if(defender.perfect_guard_until > world.time && defender.AttackQueue && defender.AttackQueue.PerfectGuard)
 		defender.perfect_guard_until = 0
+		FlashPerfectGuard(src, defender)
 		var/obj/Skills/pgq = defender.AttackQueue
 		defender.ClearQueue()
 		var/pg_ng = pgq.NoGCD

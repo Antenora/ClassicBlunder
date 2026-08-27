@@ -60,7 +60,6 @@ ascension
 		rppAdd = 0
 		ecoAdd = 0
 
-		angerPoint
 		new_anger_message
 
 		list/skills = list()
@@ -97,9 +96,6 @@ ascension
 
 			if(passives.len > 0)
 				owner.passive_handler.decreaseList(passives)
-
-			if(angerPoint)
-				owner.AngerPoint -= angerPoint
 
 			if(new_anger_message)
 				if(owner.race.ascensions[owner.AscensionsAcquired-1].new_anger_message)
@@ -156,9 +152,6 @@ ascension
 
 			if(passives.len > 0)
 				owner.passive_handler.increaseList(passives)
-
-			if(angerPoint)
-				owner.AngerPoint += angerPoint
 
 			if(new_anger_message)
 				owner.AngerMessage = new_anger_message

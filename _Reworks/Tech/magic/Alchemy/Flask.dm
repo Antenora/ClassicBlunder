@@ -94,7 +94,7 @@
             src.EnergyHeal = (glob.POTIONHEAL*(P.equippedFlask.Tier+1)) // I also give up on quantifying this.
 
         if(P.equippedFlask.Hallucinogen == 1) // This gives you immediate anger and anger buffs at expense of defense
-            AngerFloor=75 // makes you hit peak anger way sooner
+            AngerFloor=50 // makes you hit peak anger way sooner
             // Please note: the comments will tell you what the math does
             EndMult = 0.6 + (P.equippedFlask.Tier+1)/10 // T0 = 0.7, T1 = 0.8, T3 = 0.9 endurance mult (DOWNSIDE)
             DefMult = 0.6 + (P.equippedFlask.Tier+1)/10 // T0 = 0.7, T1 = 0.8, T3 = 0.9 Defense mult (DOWNSIDE)

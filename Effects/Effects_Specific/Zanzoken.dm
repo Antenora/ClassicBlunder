@@ -7,6 +7,7 @@ mob
 
 		if(ActiveZanzo)
 			var/Original_Direction=src.dir
+			var/turf/zanzo_from=get_turf(src)
 			//Zanzoken flick() ?
 			if(ActiveZanzo==3)//Safety net, so only one afterimage is produced since the step() proc below calls Move()
 				AfterImage(usr)
@@ -25,6 +26,7 @@ mob
 				step(src,src.dir)
 			step_size = zss
 			src.dir=Original_Direction//Player retains direction after using Zanzo [Blast Kiting?]
+			ZanzoBlink(src, zanzo_from, 1)
 
 		else
 			..()
@@ -68,6 +70,7 @@ proc
 		I.Owner=m
 		if(m.CheckSpecial("Time Alter"))
 			I.appearance_flags+=16
+		return I
 	AfterImageA(mob/m, var/forceloc=0)
 		var/obj/AfterimageA/I = new
 		if(!m) return
@@ -289,6 +292,8 @@ proc
 obj/Vanish
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	density=0
 	var/lifetime=3
 	New()
@@ -300,6 +305,8 @@ obj/Vanish
 obj/Afterimage
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		animate(src,alpha=195,time=4)
 		spawn(4)
@@ -311,6 +318,8 @@ obj/Afterimage
 obj/AfterimageA
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		animate(src,alpha=195,time=4)
 		spawn(4)
@@ -322,6 +331,8 @@ obj/AfterimageA
 obj/AfterimageP
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		spawn()
 			animate(src,alpha=0,time=5)
@@ -332,6 +343,8 @@ obj/AfterimageP
 obj/AfterimageG
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		spawn(20)
 			animate(src,alpha=0,time=10)
@@ -342,6 +355,8 @@ obj/AfterimageG
 obj/RecoveryImage
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		animate(src,alpha=0,transform=matrix()*3,time=8)
 		spawn(8)
@@ -350,6 +365,8 @@ obj/RecoveryImage
 obj/DashImage
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		spawn(2)
 			animate(src,pixel_x=rand(-8,8),pixel_y=rand(-8,8))
@@ -367,6 +384,8 @@ obj/DashImage
 obj/coolImage
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New()
 		spawn(2)
 			animate(src,alpha=0,time=8)
@@ -383,6 +402,8 @@ obj/coolImage
 obj/TrailImage
 	Grabbable=0
 	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
 	New(turf/new_loc, new_icon, new_state, duration=10, alpha=255, rand_x=8, rand_y=8)
 		src.alpha=0
 		src.icon = new_icon
@@ -423,7 +444,6 @@ proc
 			Target.SuppressPowerGlow = 1
 			A.Dodging=1
 			Target.Dodging=1
-			var/Zanzes=4
 			var/StartA=A.loc
 			var/StartT=Target.loc
 			var/clash
@@ -438,33 +458,48 @@ proc
 					if(istype(A, /mob/Players))
 						var/mob/Players/PA = A
 						PA.move_disabled = TRUE
+				A.dir = get_dir(A, Target) || A.dir
+				Target.dir = get_dir(Target, A) || Target.dir
 				animate(A,alpha=0,time=2, flags=ANIMATION_END_NOW )
 				animate(Target,alpha=0,time=2, flags=ANIMATION_END_NOW )
 				sleep(1)
 //				VanishImage(A)
 //				VanishImage(Target)
+				VanishImage(A)
+				VanishImage(Target)
 				sleep(1)
-				while(Zanzes)
-					Zanzes--
-					if(!A || !Target)
-						break
-					if(Zanzes<=0)
-						A.loc=StartA
-						Target.loc=StartT
-						step_away(A,Target,4,256)
-						step_away(Target,A,4,256)
-						A.dir=get_dir(A,Target)
-						Target.dir=get_dir(Target,A)
-						if(Target.AfterImageStrike)
-							Target.AfterImageStrike--
-					else
-						A.Move(locate((A.x+pick(-5,-3,3,5)),(A.y+pick(-5,-3,3,5)),A.z))
-						Target.Move(locate((A.x+pick(-1,1)),(A.y+pick(-1,1)),A.z))
-						A.dir=get_dir(A,Target)
-						AfterImageA(A)
-						AfterImageA(Target)
-						KenShockwave(Target,icon='KenShockwave.dmi',Size=max(GoCrand(0.04,0.4),0.2),PixelX=((Target.x-A.x)*(-16)+pick(-12,-8,8,12)),PixelY=((Target.y-A.y)*(-16)+pick(-12,-8,8,12)), Time=6)
-						sleep(5)
+				var/turf/SA = istype(StartA, /turf) ? StartA : get_step(A, 0)
+				var/turf/ST = istype(StartT, /turf) ? StartT : get_step(Target, 0)
+				if(A && Target && SA && ST && SA.z == ST.z)
+					var/cmx = round((SA.x + ST.x) / 2)
+					var/cmy = round((SA.y + ST.y) / 2)
+					var/cdx = SA.x < ST.x ? 1 : (SA.x > ST.x ? -1 : 0)
+					var/cdy = SA.y < ST.y ? 1 : (SA.y > ST.y ? -1 : 0)
+					if(!cdx && !cdy)
+						cdx = 1
+					var/list/half = list(2, 1, 0)
+					var/list/beat = list(4, 3, 2)
+					for(var/i = 1, i <= 3, i++)
+						if(!A || !Target)
+							break
+						var/h = half[i]
+						var/jx = -cdy * pick(-1, 0, 1)
+						var/jy = cdx * pick(-1, 0, 1)
+						var/turf/PGA = locate(cmx - cdx * h + jx, cmy - cdy * h + jy, SA.z)
+						var/turf/PGT = locate(cmx + cdx * h + jx, cmy + cdy * h + jy, SA.z)
+						if(PGA) AfterImageA(A, PGA)
+						if(PGT) AfterImageA(Target, PGT)
+						KenShockwave(A, icon='KenShockwave.dmi', Size = 0.35 + 0.28 * i, PixelX = (cmx + jx - SA.x) * 32, PixelY = (cmy + jy - SA.y) * 32, Blend = 2, Time = 4)
+						sleep(beat[i])
+					if(A && Target)
+						var/turf/MT = locate(cmx, cmy, SA.z)
+						if(MT)
+							FxHeavyImpact(MT, priority = 1)
+						KenShockwave(A, Size = 1.2, PixelX = (cmx - SA.x) * 32, PixelY = (cmy - SA.y) * 32, Time = 5)
+						HitStop(A, Target, 14)
+						sleep(2)
+				if(Target && Target.AfterImageStrike)
+					Target.AfterImageStrike--
 				if(Target && istype(Target, /mob/Players))
 					var/mob/Players/PT = Target
 					PT.move_disabled = FALSE
@@ -473,19 +508,27 @@ proc
 					PA.move_disabled = FALSE
 				if(A)
 					A.loc = StartA
-					A.alpha = 255
+					animate(A, alpha = 255, time = 3)
 					A.SuppressPowerGlow = 0
 				if(Target)
 					Target.loc = StartT
-					Target.alpha = 255
+					animate(Target, alpha = 255, time = 3)
 					Target.SuppressPowerGlow = 0
+				if(A && Target)
+					A.dir = get_dir(A, Target) || A.dir
+					Target.dir = get_dir(Target, A) || Target.dir
 			else
-				AfterImage(A)
+				var/obj/Afterimage/hold_ghost = AfterImage(A)
+				if(hold_ghost)
+					animate(hold_ghost, alpha = 220, time = 3)
+					animate(alpha = 0, time = 6)
 				A.Comboz(Target, landDir = A.heldDir())	//held key picks the landing side
 				A.dir=get_dir(A,Target)
 				if(Striking)
 					A.NextAttack=0
 					A.Melee1(1, 5, SureKB=1)
+					if(A && Target)
+						FlashCounterMoment(A, Target)
 				if(A)
 					A.alpha = 255
 					A.AfterImageStrike = 0
@@ -507,6 +550,9 @@ proc
 		var/changeY=pick(-8,-4,4,8)
 		if(!A.Dodging)
 			A.Dodging=1
+			if(glob.FLASH_MOVE)
+				spawn() AfterImage(A)
+				Footfall(A)
 			if(A.filters["trail"]) //the motion_blur AppearanceOn puts on every mob - by name, not "whatever's last"
 				animate(A.filters["trail"], x=changeX/4, y=changeY/4, time=2, flags=ANIMATION_RELATIVE | ANIMATION_PARALLEL)
 			animate(A,pixel_x=changeX, pixel_y=changeY, time=2, flags=ANIMATION_RELATIVE)

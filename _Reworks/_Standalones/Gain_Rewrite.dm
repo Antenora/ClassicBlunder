@@ -32,7 +32,7 @@
 		return
 
 	if (TimerLimit)
-		Timer = max(Timer + world.tick_lag / 10, 0)
+		Timer = max(Timer + (world.tick_lag / 10) / SlowMoDelayMult(source), 0)
 		if (Timer >= TimerLimit)
 			HandleBuffDeactivation(source)
 			return

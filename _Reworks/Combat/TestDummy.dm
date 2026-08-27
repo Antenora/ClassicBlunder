@@ -1,6 +1,16 @@
 mob/Player/AI/TestDummy
 	name = "Test Dummy"
-	VitMod = 30
+	density = 1
+
+	New()
+		..()
+		if(!icon)
+			var/race/r = race
+			if(istype(r) && r.icon_male && r.icon_male.len)
+				icon = r.icon_male[1]
+		AppearanceOn()
+		ApplyPixelBounds()
+		ApplyHurtbox()
 
 	Update()
 		SetHealthPct(100)

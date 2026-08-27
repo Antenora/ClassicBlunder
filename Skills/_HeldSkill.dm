@@ -132,6 +132,9 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	if(GCDBlocked(Z)) return FALSE
 	if(!CanAttack(-1)) return FALSE
 	if(src.Airborne) return FALSE
+	if(src.Guarding)
+		src << "<font color='red'>You can't use skills while guarding!</font>"
+		return FALSE
 	if(src.OnMagicalVehicle())
 		src << "<font color='red'>You can't use skills while on a magical vehicle!</font>"
 		return FALSE
@@ -565,8 +568,12 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 
 /mob/proc/ChargeLoop(var/obj/Skills/Z)
 	FxChargeShimmer(src, Z) //heat wavers over the caster while they hold
+	FlashChargeTick(src, 2)
 	var/last_tick_fire = 0
 	while(held_skill == Z)
+		var/hold_smm = SlowMoDelayMult(src)
+		if(hold_smm > 1)
+			held_charge_start += 2 * (1 - 1 / hold_smm)
 		// Interrupt conditions
 		var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed/charm_skill = locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed) in src
 		if(Stunned || Suspended || Launched || Stasis > 0 || KO || Dead || (charm_skill && BuffOn(charm_skill)))
@@ -602,7 +609,12 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 			UpdateHeldChargeBar(progress)
 
 		// closing the visual gap after BeginHeldSkill's initial pulse.
-		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5, Blend=Z.ChargeWaveBlend, Time=8)
+		var/ringp = 0.5
+		if(Z.HeldBeam)
+			ringp = min(HeldBeamBenefit(Z), 1)
+		else if(!Z.InfiniteHold)
+			ringp = clamp((world.time - held_charge_start) / max(Z.ChargePeriod * 10, 1), 0, 1)
+		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.3 + 0.35 * ringp, Blend=Z.ChargeWaveBlend, Time=8)
 
 		sleep(2)
 
@@ -660,6 +672,7 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	ClearHeldChargeState()
 	held_skill_last_release = world.time
 	if(sweet_spot_hit)
+		FlashSweetSpot(src)
 		for(var/mob/m in admins)
 			if(m && m.client && m.Admin && m.client.SweetSpotHeldSkillDebug)
 				m << "<font color='#66ff99'>(SweetSpot Debug) [src] hit [Z.name]'s sweet spot at [round(hold_ticks / 10, 0.1)]s.</font>"

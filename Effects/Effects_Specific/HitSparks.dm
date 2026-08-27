@@ -20,14 +20,20 @@ mob
 	proc
 		//New hit effect proc; src inflicts the effect on m.
 		//src is kept track of to determine if they have a sword, or whatever.
-		HitEffect(var/atom/movable/m, var/UnarmedAttack, var/SwordAttack, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8), var/PX=0, var/PY=0, var/Weight=0)
+		HitEffect(var/atom/movable/m, var/UnarmedAttack, var/SwordAttack, var/SecondStrike, var/ThirdStrike, var/AsuraStrike, var/DisperseX=rand(-8,8), var/DisperseY=rand(-8,8), var/PX=0, var/PY=0, var/Weight=0, var/RawWeight=null)
 			if(!m) return
 			Weight = clamp(Weight, 0, 1)
 			var/wsize = 1 + Weight*0.6 //hit weight: identity at 0, heavies read bigger
 			var/wlife = round(Weight*3)
+			var/gateWeight = isnull(RawWeight) ? Weight : clamp(RawWeight, 0, 1)
 			var/obj/Skills/Queue/if_q = src.AttackQueue
-			if((if_q && if_q.ImpactFrame) || Weight >= 0.99)
+			if((if_q && if_q.ImpactFrame) || gateWeight >= 0.99)
 				FxHeavyImpact(m, if_q)
+			if(glob.FLASH_RALLY && ismob(m) && Weight > 0.05)
+				var/mob/bloomv = m
+				if(world.time >= bloomv._flash_bloom_next)
+					bloomv._flash_bloom_next = world.time + glob.FLASH_BLOOM_CD_DS
+					FlashContactBloom(bloomv, Weight)
 			if(src.AttackQueue&&src.AttackQueue.HitSparkIcon)
 				var/obj/Effects/HE=new(null, src.AttackQueue.HitSparkIcon, src.AttackQueue.HitSparkX, src.AttackQueue.HitSparkY, src.AttackQueue.HitSparkTurns, src.AttackQueue.HitSparkSize*wsize)
 				HE.appearance_flags = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
@@ -208,7 +214,9 @@ mob
 			if(hitdir & WEST)
 				L = -L
 			else if(!(hitdir & EAST))
-				L *= pick(1, -1)
+				_hb_flip = !_hb_flip
+				if(_hb_flip)
+					L = -L
 			_hitbend = 1
 			//feet stay pinned; PARALLEL so the bend doesn't cancel a pending hop or Enlarge
 			var/matrix/bent = M * matrix(1, L/(2*hh), L/2, 0, 1, 0)

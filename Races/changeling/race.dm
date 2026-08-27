@@ -17,7 +17,6 @@ race
 		defense	=	1
 		speed	=	1.75
 		anger	=	1
-		anger_point = 25
 		anger_message = "will not stand for this mockery!!"
 
 		onFinalization(mob/user)

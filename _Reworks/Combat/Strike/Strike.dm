@@ -125,6 +125,7 @@ mob
 					defender.GuardMeter += glob.GUARD_METER_FLAT + defender.HPToPct(val) * glob.GUARD_METER_SCALE
 					val *= (1 - glob.GUARD_DR)
 					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)
+					defender.FlashGuardChip()
 					if(defender.GuardMeter >= glob.GUARD_METER_MAX)
 						defender.GuardStop(broken = 1)
 						src.FlourishArm()

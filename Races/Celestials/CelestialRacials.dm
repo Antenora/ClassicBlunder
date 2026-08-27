@@ -523,6 +523,7 @@ obj/Skills/Grapple/Flashback
 			Target.grabbed = null
 		if(User.Grab == Target)
 			User.Grab = null
+			User.FlashGrabBand(0)
 		// Flash white, teleport, then fade the glow back out - mirroring WarpUserFlashChange
 		animate(User, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=2)
 		sleep(2)

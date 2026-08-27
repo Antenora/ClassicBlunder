@@ -1506,7 +1506,7 @@ NEW VARIABLES
 			StrMult=1.5
 			SpdMult=1.5
 			PowerReplacement=5
-			AngerFloor=75
+			AngerFloor=50
 			passives = list("GiantForm" = 1)
 			GiantForm=1
 			Enlarge=2
@@ -2156,7 +2156,7 @@ NEW VARIABLES
 				LifeGeneration=0.5
 				Deflection=2
 				Reversal=0.1
-				AngerFloor=75
+				AngerFloor=50
 				ActiveMessage="overflows with berserk demon chakra!"
 				OffMessage="can no longer bear the strain of channelling demon chakra..."
 				TextColor="#FF7700"
@@ -2177,7 +2177,7 @@ NEW VARIABLES
 							passives = list("Maki" = 1,  "LifeGeneration" = 2.5, "Deflection" = 2, "Reversal" = Mastery/5,"CalmAnger" = 1)
 							CalmAnger=1
 						else
-							AngerFloor=75
+							AngerFloor=50
 							passives = list("Maki" = 1,  "LifeGeneration" = 1, "Deflection" = 2,  "Reversal" = Mastery/10)
 							CalmAnger=0
 					src.Trigger(usr)
@@ -2188,7 +2188,7 @@ NEW VARIABLES
 				CooldownStatic = 1
 				Cooldown=60
 				passives = list("Maki" = 1, "Pursuer" = 2, "Flicker" = 2)
-				AngerFloor=75
+				AngerFloor=50
 				VaizardHealth=1
 				CooldownScaling = 1
 				ActiveMessage="is taken over by a violent rage as a mask forms on their face!"
@@ -4178,7 +4178,7 @@ NEW VARIABLES
 				if(player.SagaLevel>=1)
 					ActiveMessage="draws power from their courage as they pulse with green light!"
 				if(player.SagaLevel>=2)
-					AngerFloor=75
+					AngerFloor=50
 					passives = list("Tenacity" = player.SagaLevel, "UnderDog" = player.SagaLevel/2, "Persistence" = player.SagaLevel)
 				if(player.SagaLevel>=5)
 					ActiveMessage="roars with a heart full of courage, they are the embodiment of courage itself!"
@@ -4281,7 +4281,7 @@ NEW VARIABLES
 			passives = list("Maki" = 1, "PUSpike" = 10)
 			Maki = 1
 			// CalmAnger = 1
-			AngerPoint = 10
+			AngerFloor = 35
 			PUSpike=10
 			IconLock='SharinganEyes.dmi'
 			LockX=0
@@ -4298,7 +4298,7 @@ NEW VARIABLES
 							src.SureDodgeTimerLimit=40
 							passives = list("Maki" = 1, "PUSpike" = 10)
 							src.Instinct=0
-							AngerPoint = 15
+							AngerFloor = 40
 							ActiveMessage="is filled with cold rage as their eyes turn red and one tomoe appears in their iris!"
 						if(2)
 							src.OffMult=1.2
@@ -4308,7 +4308,7 @@ NEW VARIABLES
 							src.Instinct=1
 							src.FatigueDrain=0.05
 							PUSpike=20
-							AngerPoint = 20
+							AngerFloor = 45
 							ActiveMessage="is filled with cold rage as their eyes turn red and two tomoe appear in their iris!"
 					if(usr.SagaLevel>=3)
 						if(usr.SharinganEvolution=="Resolve")
@@ -4326,7 +4326,7 @@ NEW VARIABLES
 							passives = list("Maki" = 1, "PUSpike" = 15)
 							src.Instinct=2
 							src.FatigueDrain=0
-						AngerPoint = 25
+						AngerFloor = 50
 						ActiveMessage="is filled with blinding hatred as their eyes turn red and three tomoe appear in their iris!"
 				src.Trigger(usr)
 
@@ -4610,7 +4610,7 @@ NEW VARIABLES
 			EndMult=1.5
 			SpdMult=1.5
 			DefMult=1.5
-			AngerFloor=75
+			AngerFloor=50
 			passives = list("GodKi" = 0.75, "EnergyGeneration" = 5, "Godspeed" = 4, \
 								"StunningStrike" = 3, "Sunyata" = 5,  "Flicker" = 5, "Pursuer" = 5,"CalmAnger"=1)
 			PUSpeedModifier=2
@@ -4928,7 +4928,7 @@ NEW VARIABLES
 				return//it triggers when you DIE now
 				src.Trigger(usr)
 		Saiyan_Dominance
-			AngerFloor=75
+			AngerFloor=50
 			TextColor=rgb(230, 230, 100)
 			Cooldown=300
 			NeedsHealth = 75
@@ -7416,7 +7416,7 @@ NEW VARIABLES
 		Mark_of_the_Crone
 			SignatureTechnique=3
 			SpecialSlot=1
-			AngerFloor=75
+			AngerFloor=50
 			IconLock='CroneMajinSparks.gif'
 			LockX=0
 			LockY=0
@@ -7485,7 +7485,7 @@ NEW VARIABLES
 			SignatureTechnique=4
 			SpecialSlot=0
 			Slotless=1
-			AngerFloor=90
+			AngerFloor=60
 			IconLock='AuraMysticBig.dmi'
 			IconLockBlend=4
 			StrMult = 1.5
@@ -7872,7 +7872,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		Majin
-			AngerFloor=75
+			AngerFloor=50
 			IconLock='MajinAura.dmi'
 			LockX=0
 			LockY=0
@@ -9486,7 +9486,7 @@ NEW VARIABLES
 			SBuffNeeded="Sharingan"
 			passives = list( "Deflection" = 1)
 			BuffMastery=5
-			AngerFloor = 90
+			AngerFloor = 60
 			Cooldown=-1
 			Deflection=1
 			ActiveMessage="gives into hatred; their tomoe twist into a kaleidoscope pattern!"
@@ -10597,7 +10597,7 @@ NEW VARIABLES
 						ElementalOffense="Void"
 						passives = list("TensionLock" = 1)
 						AngerMult=1.5
-						AngerFloor=90
+						AngerFloor=60
 						TimerLimit=60
 					Ghost_Drive
 						FlashChange=1
@@ -10617,7 +10617,7 @@ NEW VARIABLES
 						ElementalOffense="Void"
 						passives = list("TensionLock" = 1)
 						AngerMult=1.75
-						AngerFloor=90
+						AngerFloor=60
 						TimerLimit=60
 					The_Fourteenth_One
 						FlashChange=1
@@ -11200,7 +11200,7 @@ NEW VARIABLES
 				OffMult=2
 				PowerMult=2
 				AngerMult=2
-				AngerFloor=90
+				AngerFloor=60
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1)
 				AuraLock='AntiAura.dmi'
 				AuraX=-18
@@ -11356,7 +11356,7 @@ NEW VARIABLES
 				DarkChange=1
 				StrMult=1.5
 				SpdMult=1.5
-				AngerFloor=75
+				AngerFloor=50
 				passives = list("SpecialBuffLock" = 1,  "Pursuer" = 1, "Flicker" = 1, "StunningStrike" = 1, "DoubleStrike" = 3, "TechniqueMastery" = 5,  "QuickCast" = 2, "Godspeed" = 1)
 				Curse=1
 				Pursuer=1
@@ -11484,7 +11484,7 @@ NEW VARIABLES
 				Cooldown=1
 			Punishment_of_Demons
 				AlwaysOn=1
-				AngerFloor=75
+				AngerFloor=50
 				MovementMastery=-3
 				ActiveMessage="experiences the suffering of Demon Realm - boundless fury leading into peril!"
 				KenWave=1
@@ -11518,7 +11518,7 @@ NEW VARIABLES
 				SpdMult=1.5
 				RecovMult=1.5
 				passives = list("ActiveBuffLock" = 1,"SpecialBuffLock" = 1,"Godspeed" = 1,  "ManaLeak" = 2, "MartialMagic" = 1, "BladeFisting" = 1)
-				AngerFloor=75
+				AngerFloor=50
 				TooLittleMana=1
 				AuraLock='AntiAura.dmi'
 				VaizardHealth = 15
@@ -11568,7 +11568,7 @@ NEW VARIABLES
 				TooMuchHealth = 90
 				Godspeed = 1
 				PowerMult=1.25
-				AngerFloor=75
+				AngerFloor=50
 				ManaLeak=0.5
 				TooLittleMana=1
 				Pursuer = 1
@@ -12694,7 +12694,7 @@ mob
 								src.StyleBuff.passives["EnergyGeneration"] = 5
 								src.StyleBuff.passives["ManaGeneration"] = 5
 						if("Satsui")
-							src.StyleBuff.AngerFloor=75
+							src.StyleBuff.AngerFloor=50
 							src.StyleBuff.StyleStr=1.5
 							src.StyleBuff.StyleFor=1.4
 							src.StyleBuff.StyleOff=1.4
@@ -12796,12 +12796,12 @@ mob
 					src.ActiveBuff.passives["Godspeed"] = AscensionsAcquired
 					src.ActiveBuff.AngerFloor=0
 					if(src.passive_handler.Get("StarPower"))
-						src.ActiveBuff.AngerFloor=75
+						src.ActiveBuff.AngerFloor=50
 						src.ActiveBuff.AngerMult=2
 						src.ActiveBuff.passives["Pursuer"] = 2 * AscensionsAcquired
 					else
 						if(AscensionsAcquired)
-							src.ActiveBuff.AngerPoint = 5 * AscensionsAcquired
+							src.ActiveBuff.AngerFloor = min(25 + (5 * AscensionsAcquired), 60)
 						src.ActiveBuff.passives["Pursuer"] = 0.5 * AscensionsAcquired
 						src.ActiveBuff.AngerMult = round(2/(8-AscensionsAcquired), 0.01)
 				if(src.Saga=="Cosmo")
@@ -13873,8 +13873,6 @@ mob
 				src.AngerTier=0
 			if(B.AngerMult)
 				src.AngerMult+=B.AngerMult
-			if(B.AngerPoint)
-				src.AngerPoint += B.AngerPoint
 			if(B.AngerFloor)
 				UpdateAnger()
 			if(B.WaveringAngerLimit)
@@ -14378,8 +14376,6 @@ mob
 				src.SenseUnlocked-=B.SenseUnlocked
 			if(B.Afterimages)
 				src.Afterimages-=B.Afterimages
-			if(B.AngerPoint)
-				src.AngerPoint -= B.AngerPoint
 			if(B.AngerFloor)
 				AngerReclamp(B)
 			if(B.AngerMult)

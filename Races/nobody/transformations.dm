@@ -17,7 +17,7 @@ transformation
 			strengthadd = 0.25
 			forceadd = 0.25
 			passives = list("Flicker" = 1, "Pursuer" = 2,   "SaiyanPowerVoid" = 1, "ZenkaiPower" = 0.5)
-			angerPoint = 75
+			angerFloor = 50
 
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)

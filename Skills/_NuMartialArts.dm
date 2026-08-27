@@ -16,7 +16,6 @@ obj
 				CorruptionGain
 				ResourceCost
 				ResourceThreshold
-				AngerPoint // set an anger point
 				StyleStr=1
 				StyleFor=1
 				StyleEnd=1

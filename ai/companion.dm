@@ -25,7 +25,6 @@ obj/Skills/Companion
 		companion_recovmod = -1
 		companion_regenmod = -1
 		companion_angermax= -1
-		companion_angerpoint= -1
 		companion_potential = -1
 		companion_techmastery = 20
 		companion_skill_aggression = 1
@@ -126,7 +125,6 @@ obj/Skills/Companion
 				a.DefMod = (companion_defmod == -1) ? usr.DefMod : companion_defmod
 				a.RecovMod = (companion_recovmod == -1) ? usr.RecovMod : companion_recovmod
 				a.AngerMax = (companion_angermax == -1) ? usr.AngerMax : companion_angermax
-				a.AngerPoint = (companion_angerpoint == -1) ? usr.AngerPoint : companion_angerpoint
 				a.ai_spammer = companion_skill_aggression
 				a.ko_death = companion_ko_death
 				a.Timeless = 1

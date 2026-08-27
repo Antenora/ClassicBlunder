@@ -44,10 +44,12 @@ mob/proc/GuardStart()
 	if(splat_stagger_until > world.time) return
 	Guarding = 1
 	KenShockwave(src, icon = 'KenShockwaveFocus.dmi', Size = 0.3, Blend = 2, Time = 2)
+	FlashGuardPlate(1)
 
 mob/proc/GuardStop(broken = 0)
 	if(!Guarding && !broken) return
 	Guarding = 0
+	FlashGuardPlate(broken ? 2 : 0)
 	if(broken)
 		guard_broken_until = world.time + glob.GUARD_BREAK_DS
 		GuardMeter = 0	
@@ -66,10 +68,14 @@ mob/proc/AlphaCounter()
 	Tension = max(0, Tension - glob.ALPHA_COUNTER_TENSION)
 	alpha_counter_ready_at = world.time + glob.ALPHA_COUNTER_CD_DS
 	KenShockwave(src, icon = 'fevKiai.dmi', Size = 1, Blend = 2, Time = 4)
+	FlashAlphaCounter(src)
 	src.OMessage(10, "[src] repels their attackers with a burst of ki!", "[src] alpha counters")
 	for(var/mob/m in orange(glob.ALPHA_COUNTER_RANGE, src))
 		if(m == src || m.KO || m.Stasis) continue
 		if(inParty(m.ckey)) continue
+		var/mob/rv = m
+		spawn(clamp(round(bounds_dist(src, rv) / 48), 0, 4))
+			if(rv) KenShockwave(rv, Size = 0.4, Blend = 2, Time = 3)
 		src.Knockback(glob.ALPHA_COUNTER_KB, m, Direction = get_dir(src, m), Forced = 1)
 
 mob/proc/ChargeStart()
@@ -84,6 +90,7 @@ mob/proc/ChargeStart()
 	charge_started_at = world.time
 	charge_hits_taken = 0
 	Auraz("Add")
+	FlashChargeTick(src, 0)
 
 mob/proc/ChargeStop()
 	if(!ChargingEnergy) return
@@ -134,4 +141,5 @@ mob/proc/isCommitted()
 
 proc/CounterHitReward(mob/attacker, mob/victim, weight)
 	attacker.gainTension(glob.COUNTER_HIT_TENSION)
-	HitStop(attacker, victim, max(weight, glob.HIT_STOP_MIN), glob.COUNTER_HIT_STOP_BONUS)
+	var/froze = HitStop(attacker, victim, max(weight, glob.HIT_STOP_MIN), glob.COUNTER_HIT_STOP_BONUS)
+	FlashCounterMoment(attacker, victim, froze)

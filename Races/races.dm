@@ -230,7 +230,6 @@ race
 		stats_per_class = list() //NIEZAAAAANNNNN
 		secondary_stats_per_class = list()
 		anger_message = "becomes angry!"
-		anger_point = 50
 		growth = 1
 
 		//anger. 1 = 100%, 2 = 200%
@@ -357,7 +356,6 @@ race
 			user.icon_state = null
 			user.overlays += overlays
 
-			user.AngerPoint = anger_point
 			user.AngerMessage = anger_message
 			if(!secondtime)
 				user.SetStatPoints(statPoints)

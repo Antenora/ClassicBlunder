@@ -2,7 +2,7 @@ transformation
 	demon
 		devil_trigger
 			passives = list("HellRisen" = 0.25)
-			angerFloor = 75
+			angerFloor = 50
 			unlock_potential = 80
 			form_aura_icon = 'Amazing Super Demon Aura.dmi'
 			form_aura_x = -32

@@ -2561,15 +2561,22 @@ mob
 			if(Delay < 0.1) Delay = 0.1
 			var/pm = PmActive()
 			var/pm_budget = MaxDistance / world.tick_lag * 32 //total dash distance in px (pixel path)
-			var/pm_px = round(64 / Delay) //old per-tick distance; PmDashStep caps it for smoothness
+			var/pm_px = src.PmDashPx()
 			var/stall = 0
+			var/flash_dash = glob.FLASH_MOVE && Trg && get_dist(src, Trg) > 3
+			var/flash_ghost_px = 0
+			var/last_smear_ang = 1000
+			if(flash_dash)
+				FlashDashKickoff(src, Trg)
 			while(pm ? pm_budget > 0 : MaxDistance > 0)
 				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
 					var/travel_angle = GetAngle(src, Trg)
-					var/smear = 6 / max(Delay, 0.5)
-					animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Delay)
+					if(abs(travel_angle - last_smear_ang) > 15)
+						last_smear_ang = travel_angle
+						var/smear = 6 / max(Delay, 0.5)
+						animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Delay)
 				if(pm) //smooth: one glided step per tick instead of batching 32px steps into one tick
-					var/m = src.PmDashStep(Trg, pm_px)
+					var/m = src.PmDashStep(Trg, max(2, round(pm_px / SlowMoDelayMult(src))))
 					if(!m)
 						stall++
 						if(stall > 4 || get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
@@ -2577,8 +2584,18 @@ mob
 					else
 						stall = 0
 						pm_budget -= m
+						if(flash_dash)
+							flash_ghost_px += m
+							if(flash_ghost_px >= 48)
+								flash_ghost_px = 0
+								AfterImage(src)
 				else
 					step_towards(src,Trg)
+					if(flash_dash)
+						flash_ghost_px += 32
+						if(flash_ghost_px >= 48)
+							flash_ghost_px = 0
+							AfterImage(src)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
 				if(get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
@@ -2605,7 +2622,10 @@ mob
 				src.is_dashing=0
 			src.icon_state=""
 			if(src.filters["trail"])
-				animate(src.filters["trail"], x=0, y=0)
+				animate(src.filters["trail"], x=0, y=0, time=2)
+			if(flash_dash)
+				Skid(src, 4)
+				Footfall(get_step(src, src.dir))
 			src.dir=get_dir(src,Trg)
 		Reincarnate()
 			src.Savable=0

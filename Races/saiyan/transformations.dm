@@ -1,4 +1,4 @@
-transformation
+wtransformation
 	saiyan
 		var/tier = 0
 		super_saiyan
@@ -12,7 +12,7 @@ transformation
 			//Automatically unlocked at 25, intended to be unlocked around 20
 			unlock_potential = 25
 			passives = list("Flicker" = 1, "Pursuer" = 2,  "SaiyanPower1"=0.4)
-			angerPoint = 75
+			angerFloor = 50
 			speedadd = 0.3 //these are additive. base is 1, so 0.3=1.3x
 			enduranceadd = 0.3
 			offenseadd = 0.3
@@ -166,7 +166,7 @@ transformation
 			form_icon_2_icon = 'SS2Sparks.dmi'
 			//Autounlocked at 55, intended to be unlocked around 35
 			unlock_potential = 55
-			angerFloor = 50
+			angerFloor = 40
 			passives = list("Flicker" = 1, "Pursuer" = 2, "SaiyanPower2"=0.5)
 			PUSpeedModifier = 1.5
 			speedadd = 0.35
@@ -444,7 +444,7 @@ transformation
 		super_saiyan_4_daima
 			tier = 4
 			unlock_potential = 70 //intended to be unlocked at around 55 potential
-			angerFloor = 75
+			angerFloor = 50
 			speedadd = 0.5
 			enduranceadd = 0.5
 			offenseadd = 0.5
@@ -505,7 +505,7 @@ transformation
 			tier = 4
 			//Autounlocked at 90, intended to be unlocked at around 70 potential
 			unlock_potential = 90
-			angerFloor = 75
+			angerFloor = 50
 			speedadd = 3
 			enduranceadd = 3
 			offenseadd = 3
@@ -534,8 +534,7 @@ transformation
 				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
 				"Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), \
 				"Flicker" = 5, "Pursuer" = 5, "SSJ4" = 1,"SaiyanPower4"=2.5)
-				angerFloor = 90
-				angerPoint = 99 // funny fix for golden ooz stopping endless anger
+				angerFloor = 60
 
 			transform(mob/user)
 				. = ..()
@@ -602,7 +601,7 @@ transformation
 			//Intended to be unlocked at around 80 potential, autounlocked at 100
 			//Probably the in game reason for people going beyond 100 potential. Rolls eyes in seiyn
 			unlock_potential = 100
-			angerFloor = 90
+			angerFloor = 60
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -691,7 +690,7 @@ transformation
 			forceadd = 1.25
 			// at full mastery, give the saiyan beyond god buff, then remove ssjgod, and replace it with ssjgb
 			mastery_boons(mob/user)
-				angerFloor = 75
+				angerFloor = 50
 				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4,"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Pursuer"= 4 , \
 								 "Sunyata" = 1 + round(mastery/20 ,1),"CalmAnger"=1,\
@@ -792,7 +791,7 @@ transformation
 			//Intended for 70 potential, autounlocked at 90.
 			unlock_potential = 90
 			tier = 5
-			angerFloor = 75
+			angerFloor = 50
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
@@ -899,7 +898,7 @@ transformation
 			//Autounlocks at 100 potential
 			unlock_potential = 100
 			tier = 6
-			angerFloor = 90
+			angerFloor = 60
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
@@ -1003,7 +1002,7 @@ transformation
 			//UBuffNeeded
 		super_saiyan_5
 			unlock_potential = 150
-			angerFloor = 90
+			angerFloor = 60
 			form_hair_icon = 'Hair_SSJ5.dmi'
 			form_icon_1_icon = 'Hair_SSJ5.dmi'
 			passives = list("SecondWind" = "Unstoppable", "The Immovable Object" = 1, "To Govern Strength" = 1)

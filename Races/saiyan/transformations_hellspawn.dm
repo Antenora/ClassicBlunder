@@ -146,7 +146,7 @@ transformation
 					..()
 		hellspawn_super_saiyan_2 //now based on daima
 			unlock_potential = 70 //intended to be unlocked at around 55 potential
-			angerFloor = 50
+			angerFloor = 40
 			speedadd = 1.5
 			enduranceadd = 0.5
 			offenseadd = 1.5
@@ -206,7 +206,7 @@ transformation
 		hellspawn_super_full_power_saiyan_2_limit_breaker //it's super saiyan 5
 			tier = 8
 			unlock_potential = 90
-			angerFloor = 90
+			angerFloor = 60
 			speed = 1.5
 			endurance = 1.5
 			offense = 1.5

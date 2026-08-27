@@ -52,12 +52,12 @@
 				passives["Godspeed"] = p.AscensionsAcquired
 				AngerFloor=0
 				if(p.passive_handler.Get("StarPower")||p.AscensionsAcquired>=4)
-					AngerFloor=75
+					AngerFloor=50
 					AngerMult=2
 					passives["Pursuer"] = 2 * p.AscensionsAcquired
 				else
 					if(p.AscensionsAcquired)
-						AngerPoint = 5+ (2 * p.AscensionsAcquired)
+						AngerFloor = 30 + (2 * p.AscensionsAcquired)
 						passives["Pursuer"] = 0.5 * p.AscensionsAcquired
 					AngerMult=1
 			..()

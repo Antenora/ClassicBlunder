@@ -27,7 +27,9 @@ mob/proc/Transform(type)
 			if("Weapon")
 				src.WeaponSoul()
 		return*/
+	FlashTransformMoment(src)
 	race.transformations[transActive+1].transform(src)
+	spawn(1) MobAuraLightRefresh(src)
 
 mob/proc/Revert(type)
 	/*if(type)
@@ -42,6 +44,7 @@ mob/proc/Revert(type)
 		return*/
 
 	race.transformations[transActive].revert(src)
+	spawn(1) MobAuraLightRefresh(src)
 
 transformation
 	var
@@ -130,8 +133,6 @@ transformation
 
 		pot_trans = 0
 
-		priorAngerPoint
-		angerPoint
 		angerFloor = 0//hp% by which this form makes you hit peak anger. replaces autoAnger
 
 		PUSpeedModifier = 1
@@ -185,6 +186,7 @@ transformation
 				user.underlays += form_aura_underlay
 			if(hair)
 				user.Hair = form_hair
+			spawn(1) MobAuraLightRefresh(user)
 
 		remove_visuals(mob/user, aura = 1, hair = 1, extra = 1)
 			if(hair)
@@ -198,6 +200,7 @@ transformation
 			if(aura)
 				user.overlays -= form_aura
 				user.underlays -= form_aura_underlay
+			spawn(1) MobAuraLightRefresh(user)
 
 		transform(mob/user, forceTrans)
 			if(user.passive_handler.Get("Utterly Powerless") >= 1&&!user.passive_handler.Get("Our Future"))
@@ -260,10 +263,6 @@ transformation
 			if(form_profile)
 				stored_profile = user.Profile
 				user.Profile = form_profile
-
-			if(angerPoint)
-				priorAngerPoint = user.AngerPoint
-				user.AngerPoint = angerPoint
 
 			user.PUSpeedModifier *= PUSpeedModifier
 
@@ -336,10 +335,6 @@ transformation
 					user.potential_trans=0
 				if(user.potential_trans<0)
 					user.potential_trans=0
-			if(priorAngerPoint)
-				user.AngerPoint = priorAngerPoint
-				priorAngerPoint = null
-
 			user.PUSpeedModifier /= PUSpeedModifier
 			user.DoubleHelix=0
 

@@ -600,7 +600,7 @@ obj/Items/Enchantment
 					CD+=(src.Hard*MEDIUM_EFFECT_CD)
 				if(src.Hallucinogen)
 					FoundHallucinogen=1
-					PP.AngerFloor=75
+					PP.AngerFloor=50
 					var/buff = 0.25 * src.Hallucinogen
 					PP.AngerMult= 1 + buff
 					PP.DefMult = 1 - buff

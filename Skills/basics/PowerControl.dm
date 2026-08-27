@@ -89,6 +89,7 @@ mob/proc/PowerUp() // Handles Normal (read: Not Kaioken/Shin) power up related c
             else
                 OMsg(src, "[src] begins gathering power!!")
             Auraz("Add")
+            FlashChargeTick(src, 1)
         else
             PowerControl=100
             src << "You return to normal power."

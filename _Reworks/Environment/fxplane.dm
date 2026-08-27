@@ -1429,6 +1429,9 @@ proc/CpmApply(client/C)
 		fl += filter(type="blur", size=C.cpm_blur_size)
 	if(glob && glob.SCREEN_DISTORT && GfxDistortEnabled(C))
 		fl += filter(type="displace", size=glob.DISTORT_SIZE, render_source="*fxdisp")
+	for(var/n in list("if_bw", "fx_ripple"))
+		var/F = C.client_plane_master.filters[n]
+		if(F) fl += F
 	C.client_plane_master.filters = fl.len ? fl : null
 	FxApplyBloom(C) //keep the effects-plane blur mirror in sync
 
