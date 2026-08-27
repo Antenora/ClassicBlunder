@@ -22,6 +22,7 @@ mob/var/tmp
 	_flash_charge_on = 0
 	_hb_flip = 0
 	_swing_n = 0
+	_clash_flash_next = 0
 	kb_thrown = 0
 	obj/fx_clashlight/_flash_plate
 	obj/fx_clashlight/_flash_arm
@@ -599,6 +600,7 @@ proc/FlashBeamIgnite(datum/beam/B, omni = 0)
 
 proc/FlashSweetSpot(mob/M)
 	if(!M || !glob.FLASH_STATES) return
+	GfxWatchdogSnapshot("SWEETSPOT")
 	KenShockwave2(M, Size = 0.9, Time = 4)
 	KenShockwave(M, icon = 'KenShockwaveFocus.dmi', Size = 0.5, Blend = 2, Time = 3)
 	_HitStopClient(M, 1)
@@ -678,6 +680,9 @@ proc/FlashTransformMoment(mob/M)
 proc/FlashDragonClash(mob/A, mob/B)
 	set waitfor = 0
 	if(!glob.FLASH_MOVE || !A || !B) return
+	if(world.time < A._clash_flash_next || world.time < B._clash_flash_next) return
+	A._clash_flash_next = world.time + 30
+	B._clash_flash_next = world.time + 30
 	A.dir = get_dir(A, B) || A.dir
 	B.dir = get_dir(B, A) || B.dir
 	var/turf/TA = get_step(A, 0)
@@ -708,6 +713,7 @@ proc/FlashDragonClash(mob/A, mob/B)
 		spawn(4)
 			if(A) A.vis_contents -= Bulb
 	if(A && B && TA && TB)
+		GfxWatchdogSnapshot("CLASH_BREAK")
 		var/turf/MT = locate(round((TA.x + TB.x) / 2), round((TA.y + TB.y) / 2), TA.z)
 		if(MT)
 			FxHeavyImpact(MT, priority = 1)

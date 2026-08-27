@@ -584,6 +584,7 @@ proc/_GfxWatchdogBoot()
 	spawn(150)
 		GfxWatchdogSnapshot("BOOT")
 		world.log << "GFX WATCHDOG: active; writing [GFX_WATCHDOG_FILE]."
+		_GfxSpikeLoop()
 		_GfxWatchdogLoop()
 	return 1
 
@@ -593,6 +594,19 @@ proc/_GfxWatchdogLoop()
 	while(1)
 		sleep(200)
 		GfxWatchdogSnapshot("HEARTBEAT")
+
+proc/_GfxSpikeLoop()
+	set waitfor = 0
+	set background = 1
+	var/last = world.timeofday
+	while(1)
+		sleep(1)
+		var/now = world.timeofday
+		var/drift = now - last
+		last = now
+		if(drift < 0) continue
+		if(drift > 4)
+			GfxWatchdogSnapshot("SPIKE_[drift]")
 
 client/New()
 	. = ..()

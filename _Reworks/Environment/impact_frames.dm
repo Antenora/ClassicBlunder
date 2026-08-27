@@ -13,6 +13,7 @@ client
 		_if_until = 0
 		_if_bw_on = 0
 		_zoom_until = 0
+		_ripple_until = 0
 
 var/_impact_tick = 0
 var/_impact_n = 0
@@ -31,7 +32,8 @@ proc/FxHeavyImpact(atom/m, obj/Skills/Z = null, priority = 0)
 		var/mob/CM = C.mob
 		if(!CM || CM.z != T.z || get_dist(CM, T) > 15) continue
 		if(glob.IMPACT_FRAMES)
-			FxImpactLinesClient(C, T, fam)
+			if(world.time >= C._if_until)
+				FxImpactLinesClient(C, T, fam)
 			FxImpactFrameClient(C)
 		if(glob.IMPACT_RIPPLES) FxImpactRippleClient(C, T)
 
@@ -69,6 +71,7 @@ proc/FxImpactLinesClient(client/C, turf/T, fam)
 	L.transform = M
 	L.icon_state = "[fam]_a"
 	L.color = "#ffffff"
+	C.screen -= L
 	C.screen += L
 	spawn(1)
 		if(L)
@@ -120,9 +123,16 @@ proc/_ImpactClear(client/C)
 	blend_mode = BLEND_ADD
 
 var/list/_impact_burst_pool = list()
+var/_impact_burst_tick = 0
+var/list/_impact_burst_turfs = list()
 
 proc/FxImpactBurst(turf/T, obj/Skills/Z)
 	if(!_hd2d_ember_icon) return
+	if(_impact_burst_tick != world.time)
+		_impact_burst_tick = world.time
+		_impact_burst_turfs.Cut()
+	if(_impact_burst_turfs[T]) return
+	_impact_burst_turfs[T] = 1
 	var/obj/gfx_impact_burst/B
 	if(_impact_burst_pool.len)
 		B = _impact_burst_pool[_impact_burst_pool.len]
@@ -177,6 +187,8 @@ proc/FxZoomPunch(client/C, turf/T, mag = 1.05, hold = 2)
 
 proc/FxImpactRippleClient(client/C, turf/T)
 	if(!C || !C.client_plane_master || !C.mob) return
+	if(world.time < C._ripple_until) return
+	C._ripple_until = world.time + max(4, glob.IMPACT_FRAME_CD)
 	var/obj/M = C.client_plane_master
 	if(M.filters["fx_ripple"]) return
 	var/list/sp = _ImpactScreenPx(C, T)

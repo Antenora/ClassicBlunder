@@ -6,6 +6,7 @@ globalTracker
 		HIT_STOP_MIN = 5 //min quakeIntens before any freeze
 		HIT_STOP_MAX_DS = 3 //freeze length in deciseconds at full weight (quake 14)
 		HIT_STOP_GAP_DS = 8 //quiet time after a freeze ends before the next can start
+		HIT_STOP_PIN_FPS = 5
 		SLOWMO = TRUE
 		KO_SLOWMO_RADIUS = 8
 		KO_SLOWMO_MULT = 3
@@ -31,7 +32,7 @@ proc/_HitStopClient(mob/M, ds)
 	M._fps_hold_until = world.time + ds
 	spawn()
 		if(!M || !M.client) return
-		M.client.fps = 0.0001
+		M.client.fps = glob.HIT_STOP_PIN_FPS
 		sleep(ds)
 		if(M && M.client && world.time >= M._fps_hold_until)
 			M.client.fps = M.EffectiveClientFPS()
