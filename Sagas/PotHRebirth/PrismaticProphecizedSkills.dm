@@ -61,13 +61,39 @@ obj
 			ActiveMessage = "awakens their Hyperdeath state!"
 			OffMessage = "returns to their normal self..."
 			adjust(mob/p)
+				var/WithYourPowersCombined=0
+				ActiveMessage = "awakens their Hyperdeath state!"
+				if(p.party || p.party.members || p.party.members.len > 0)
+					var/list/party_names = list()
+					for(var/mob/m in p.party.members)
+						if(m == p)
+							continue
+						party_names += "[m]"
+						WithYourPowersCombined+=1
+					if(party_names.len)
+						var/fullparty = ""
+						if(party_names.len == 1)
+							fullparty = party_names[1]
+						else if(party_names.len == 2)
+							fullparty = "[party_names[1]] and [party_names[2]]"
+						else if(party_names.len > 2)
+							for(var/i = 1, i <= party_names.len, i++)
+								if(i == party_names.len)
+									fullparty += "and [party_names[i]]"
+								else
+									fullparty += "[party_names[i]], "
+						ActiveMessage = "calls upon their allies, and with the powers of [fullparty] combined, enters their final state: <b>Omega [p]!</b>"
+					else
+						ActiveMessage = "awakens their Hyperdeath state!"
 				var/pLv = p.SagaLevel
-				StrMult = 1.5 + (0.1 * pLv)
-				ForMult = 1.5 + (0.1 * pLv)
-				SpdMult = 1.5 + (0.1 * pLv)
-				EndMult = 1.5 + (0.1 * pLv)
-				RecovMult = 1.5 + (0.1 * pLv)
+				StrMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
+				ForMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
+				SpdMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
+				EndMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
+				RecovMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
+				if(WithYourPowersCombined)
+					passives += list("OmegaPower" = WithYourPowersCombined)
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)

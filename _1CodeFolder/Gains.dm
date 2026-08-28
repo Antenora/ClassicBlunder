@@ -561,7 +561,8 @@ mob
 				AngerManaLast=ManaAmount
 			if(src.CheckSpecial("Hyperdeath Mode"))
 				if(src.HyperdeathMeterCurrent > 0)
-					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - 1
+					var/omega = src.passive_handler.Get("OmegaPower")
+					src.HyperdeathMeterCurrent = HyperdeathMeterCurrent - (1 / (omega+1))
 					src.HyperMeterUpdate()
 					if(src.HyperdeathMeterCurrent <= 0)
 						src.HyperdeathMeterCurrent = 0
