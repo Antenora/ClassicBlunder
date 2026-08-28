@@ -438,7 +438,7 @@ mob/Move(atom/NewLoc, Dir = 0, sx = 0, sy = 0)
 	if(!dx && !dy) return ..()
 	var/al = HurtL()
 	var/ab = HurtB()
-	var/ash = HurtSolidH(hurt_h) 
+	var/ash = HurtSolidH(hurt_h)
 	var/f = 1
 	var/ink = glob.MOB_INK_COLLIDE
 	for(var/mob/O in range(HURT_REACH_MAX, src))
@@ -488,7 +488,8 @@ mob/Players
 			if(loc != pre)
 				pm_crossed = TRUE
 				if(Afterimages() && prob(40*Afterimages())) //per tile-crossing; the MovementSpeed() getter side-effect is PmActive-gated off
-					FlashImage(src)
+					if(passive_handler.Get("AfterImageSkin") != "Rainbow")
+						FlashImage(src)
 				if(SlotlessBuffs.len > 0)
 					var/ai_skin = passive_handler.Get("AfterImageSkin")
 					if(ai_skin)

@@ -5752,6 +5752,8 @@ mob
 				src.WindingUp=0
 				if(src.filters["trail"]) //only the trail filter has x/y to reset
 					animate(src.filters["trail"], x=0, y=0)
+				if(src.passive_handler.Get("Prismatic"))
+					src.RainbowGlowStuff(TRUE)
 				src.icon_state=""
 			if(Z.FlickAttack==1)
 				flick("Attack",src)

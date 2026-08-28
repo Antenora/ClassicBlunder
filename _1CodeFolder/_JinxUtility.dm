@@ -932,7 +932,7 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				Str += (0.1*spPower) * Str
-			
+
 			Str *= GetHellStats();
 
 			var/zenkaiPower=src.GetZenkaiPower()
@@ -1112,7 +1112,7 @@ mob
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				For += (0.1*spPower) * For
-			
+
 			For *= GetHellStats();
 
 			var/zenkaiPower=src.GetZenkaiPower()
@@ -2554,8 +2554,8 @@ mob
 		DashTo(mob/Trg, MaxDistance=24, Delay=0.75, Clashable=0)
 			var/DelayRelease=0
 			src.Frozen=1
-			src.dash_clash = Clashable ? 2 : 1 
-			src.ClashWatch(Trg, Clashable) 
+			src.dash_clash = Clashable ? 2 : 1
+			src.ClashWatch(Trg, Clashable)
 			src.icon_state="Flight"
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
