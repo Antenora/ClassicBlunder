@@ -48,13 +48,14 @@ obj
 			ForMult = 1.5
 			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
+			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
 			KenWaveSize = 1
 			KenWaveX = 72
 			KenWaveY = 72
+			ManaGlowSize=2
 			KenWaveBlend = 2
 			KenWaveTime = 5
 			ActiveMessage = "awakens their Hyperdeath state!"
@@ -66,7 +67,7 @@ obj
 				SpdMult = 1.5 + (0.1 * pLv)
 				EndMult = 1.5 + (0.1 * pLv)
 				RecovMult = 1.5 + (0.1 * pLv)
-				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
+				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)
@@ -441,10 +442,10 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 					m << "Even if broken, you are more than a cage. <b>X-Slash is now Omega X-Slash!</b>"
 					if(m.FinalHeroChoice=="White Pen of Hope")
 						m << "Faint courage blossoms into unwavering determination! <b>Your DF went up!</b>"
-						extraP = list()
+						extraP = list("PureReduction" = 2)
 					if(m.FinalHeroChoice=="Roaring Knight")
 						m << "<i>Hear my voice. Look my way. I'm with you no matter what.</i> <b>Your AT went up!</b>"
-						extraP = list("Forever After" = 1)
+						extraP = list("PureDamage" = 2, "Forever After" = 1)
 				if("Purple")
 					m << "Write what you know, right? <b>Rude Buster is now Omega Buster!</b>"
 			applyBuff.PowerMult=1+(0.05*sl*sl)

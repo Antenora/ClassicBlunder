@@ -232,10 +232,23 @@ proc
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
-			var/r = rand(80, 255)
-			var/g = rand(80, 255)
-			var/b = rand(80, 255)
-			I.color=rgb(r,g,b)
+			var/r = rand(30, 255) / 255
+			var/g = rand(30, 255) / 255
+			var/b = rand(30, 255) / 255
+
+			var/list/rainbowColor = list(
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 0,
+				0, 0, 0, 1,
+				r, g, b, 0
+			)
+
+			I.color = null
+			I.filters += filter(
+				type = "color",
+				color = rainbowColor
+			)
 
 	blueFlashImage(mob/m, amt)
 		var/baseAmount = amt

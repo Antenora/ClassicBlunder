@@ -728,8 +728,11 @@ mob/var/RainbowColor
 mob/var/HoldOn=0
 mob/proc/RainbowGlowStuff()
 	if(!src.passive_handler.Get("Prismatic"))
+		if(filters["prismatic"])
+			filters -= "prismatic"
+			GlowFilter = null
 		return
-	if(filters["prismatic"]) //cycle already running; rebuilt only after something wipes filters
+	if(filters["prismatic"])
 		return
 	filters -= "trail" //duplicate filter names stack, so pull trail before re-adding it after the glow
 	filters += filter(name="prismatic", type="drop_shadow",x=0,y=0,size=src.passive_handler.Get("Prismatic"), offset=1, color="#ff0000")
@@ -812,6 +815,9 @@ mob/proc/
 			src.PowerControl=rand(101, 600)
 		if(src.passive_handler.Get("Prismatic"))
 			RainbowGlowStuff()
+		if(filters["prismatic"])
+			if(!src.passive_handler.Get("Prismatic"))
+				RainbowGlowStuff()
 		var/EPM=Power_Multiplier;
 		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
 			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
@@ -1370,11 +1376,11 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 
 	Ratio*=EPM
-	
+
 	Ratio *= B.GetHellScaling();//returns 1 if no hell power
 
 	if(B.HasZenkaiPower()) Ratio *= B.GetZenkaiScaling();
-	
+
 	Ratio *= B.Base() * 100
 	temp_potential_power(B)//get them potential powers
 	Ratio *= B.potential_power_mult
