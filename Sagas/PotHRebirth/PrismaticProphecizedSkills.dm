@@ -463,19 +463,34 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 
 
 
+/obj/Skills/AutoHit/Mysterious_Winds
+	Area = "Target"
+	Distance=14
+	Knockback = 10
+	DamageMult=1
+	ForScaling=1
+	StrScaling=0
+	HitSparkIcon='RosePetals.dmi'
+	HitSparkX=-32
+	HitSparkY=-32
+	ActiveMessage="says: 'Mysterious Wind!'"
+	Cooldown=8
+	EnergyCost=2
+	verb/Mysterious_Winds()
+		set category="Skills"
+		usr.Activate(src)
+
 /obj/Skills/AutoHit/Jarona
 	name = "Jarona"
-	Area = "Target"
+	Area = "Wave"
 	NeedsSword=0
 	Distance = 16
 	DamageMult = 7
 	Knockback = 10
 	StrScaling = 1
 	EndEffectiveness = 1
-	PassThrough = 1
-	Rush = 1
-	RushAfterImages = 1
-	RushNoFlight = 1
+	Rush = 16
+	RushAIBlue = 1
 	StopAtTarget = 1
 	Copyable=6
 	Cooldown = 18
@@ -484,6 +499,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	GuardBreak = 1
 	NoLock = 1
 	NoAttackLock = 1
+	ControlledRush = 1
 	ChargeWaveIcon   = 'BLANK.dmi'
 	ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
 	HeldSkill = TRUE
@@ -491,8 +507,32 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	SweetSpot = 1.5
 	SweetSpotBenefit = 1.5
 	adjust(mob/p)
-		var/jaboner = pick("rushes down the opponent and shouts 'JARONA'!", "rushes down the opponent and shouts 'JA-Orange'!", "rushes down the opponent and shouts 'JA-st kidding'!")
-		ActiveMessage = jaboner
+		var/choice = pick(1,2,3)
+		switch(choice)
+			if(1)
+				ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
+				Shattering=10
+				RushAIBlue = 3
+				RushAIOrange = 0
+				StrScaling = 1
+				ForScaling = 0
+				RushAfterImages = 0
+			if(2)
+				ActiveMessage = "rushes down the opponent and shouts 'JA-Orange'!"
+				Shattering=0
+				RushAIBlue = 0
+				RushAIOrange = 3
+				StrScaling = 1.5
+				ForScaling = 0
+				RushAfterImages = 0
+			if(3)
+				ActiveMessage = "rushes down the opponent and shouts 'JA-st kidding'!"
+				Shattering=0
+				RushAIBlue = 0
+				RushAIOrange = 0
+				StrScaling = 0
+				ForScaling = 1.5
+				RushAfterImages = 3
 
 	var/tmp/chain_active = FALSE
 	var/tmp/chain_count = 0
@@ -549,7 +589,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	proc/ScheduleReengageWindow(mob/user)
 		if(window_loop_running) return
 		window_loop_running = TRUE
-		reengage_deadline = world.time + 10
+		reengage_deadline = world.time + 20
 		while(world.time < reengage_deadline)
 			if(!chain_active)
 				window_loop_running = FALSE
@@ -565,7 +605,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			// hold has started again.
 			if(user.held_skill == src)
 				window_loop_running = FALSE
-				reengage_deadline = world.time + 10
+				reengage_deadline = world.time + 20
 				return
 			sleep(1)
 		// Window expired
