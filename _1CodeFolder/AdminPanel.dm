@@ -640,6 +640,13 @@ client/proc/AtomPanelAction(action)
 /atom/movable/shud/stackpanelbg
 	layer = APANEL_LAYER
 	mouse_opacity = 2
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
+	MouseDown(location, control, params)
+		if(usr) usr.client.StackPanelStart(params)
+	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
+		if(usr) usr.client.StackPanelMove(params)
+	MouseUp(location, control, params)
+		if(usr) usr.client.StackPanelEnd()
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HideStackPicker()
@@ -718,6 +725,33 @@ client/proc/RightClickCandidates(turf/T, atom/A)
 		if(RightClickUsable(T)) out += T
 	if(A && !(A in out) && RightClickUsable(A)) out += A
 	return StackSortByLayer(out)
+
+client/proc/StackPanelStart(params)
+	pp_pan_dragged = FALSE
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	pp_pan_mx = m[1]; pp_pan_my = m[2]
+	pp_pan_ox = pp_pan_x; pp_pan_oy = pp_pan_y
+
+client/proc/StackPanelMove(params)
+	if(!stack_panel_objs) return
+	var/list/m = MouseAbs(params)
+	if(!m) return
+	var/list/b = ATPanelBounds()
+	var/wantx = clamp(pp_pan_ox + (m[1] - pp_pan_mx), b[1], b[2])
+	var/wanty = clamp(pp_pan_oy + (m[2] - pp_pan_my), b[3], b[4])
+	var/dx = wantx - pp_pan_x
+	var/dy = wanty - pp_pan_y
+	if(!dx && !dy) return
+	pp_pan_x = wantx; pp_pan_y = wanty
+	pp_pan_dragged = TRUE
+	PanShift(stack_panel_objs, dx, dy)
+
+client/proc/StackPanelEnd()
+	if(!pp_pan_dragged) return
+	pp_pan_dragged = FALSE
+	setPref("ppPanX", pp_pan_x)
+	setPref("ppPanY", pp_pan_y)
 
 client/proc/HideStackPicker()
 	stack_panel_open = FALSE
