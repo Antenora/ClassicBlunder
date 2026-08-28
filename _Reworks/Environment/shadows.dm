@@ -15,7 +15,6 @@ globalTracker
 		LIGHT_SHADOW_RADIUS = 6 //tiles a registered light casts shadows over
 		SHADOW_INTERVAL = 3 //process cadence in ds (mob follows via vis_contents; only re-angles)
 		SHADOW_VIEW_MARGIN = 12
-		SHADOW_KEEP_TIME = 15
 		//full-moon event overrides (ramp driven by MoonEventK in daynight.dm)
 		MOON_EVENT_ALPHA = 150 //full-moon shadow strength, vs the 42 nobody has ever noticed
 		MOON_EVENT_LEN_MIN = 1.05 //event length FLOOR - the only knob that lengthens (see SunShadowParams)
@@ -29,6 +28,7 @@ mob/var/tmp/list/shadow_pool //reusable /obj/fx_worldshadow, [1..N] for sun + li
 mob/var/tmp/shadow_seen_at = 0
 
 var/list/_shadow_objs = list() //every live shadow obj; swept for orphans
+var/_shadow_reap_at = 0
 var/_ws_boot = _WsBoot()
 
 proc/ShadowDisplayedCardinal(d, prev)
@@ -245,6 +245,8 @@ mob/proc/EnsureMobShadows(list/configs)
 		_shadow_objs -= s
 		s.owner = null //ref-drop, never del (del scans the whole world)
 		s.loc = null
+	for(var/obj/fx_worldshadow/s in shadow_pool)
+		if(!(s in vis_contents)) vis_contents += s
 	var/sx = 1
 	var/sy = 1
 	var/matrix/ot = transform
@@ -275,6 +277,14 @@ mob/proc/ClearMobShadows()
 			s.loc = null
 		shadow_pool = null
 
+mob/proc/HideMobShadows()
+	if(!shadow_pool) return
+	for(var/obj/fx_worldshadow/s in shadow_pool)
+		if(!s.alpha && s.snap_next) continue
+		animate(s)
+		s.alpha = 0
+		s.snap_next = 1
+
 //client.view can be a "WxH" string wider than world.view - cover what the player actually sees
 proc/ClientViewRange(client/C)
 	if(!C) return world.view
@@ -293,7 +303,10 @@ proc/ShadowScanRadius(client/C)
 proc/ShadowScanAround(atom/anchor, rng, list/sp, list/seen)
 	for(var/mob/M in range(rng, anchor))
 		if(seen && seen[M]) continue
-		if(!ShadowCastable(M)) continue
+		if(seen) seen[M] = 1
+		if(!ShadowCastable(M))
+			M.HideMobShadows()
+			continue
 		var/list/configs = list()
 		var/turf/mt = get_turf(M)
 		var/area/MA = mt ? mt.loc : null
@@ -302,9 +315,11 @@ proc/ShadowScanAround(atom/anchor, rng, list/sp, list/seen)
 		for(var/lc in ComputeLightShadows(M)) //point lights: anywhere (incl. caves)
 			configs += list(lc)
 		if(!configs.len)
-			M.ClearMobShadows()
+			M.HideMobShadows()
 			continue
-		if(seen) seen[M] = 1
+		if(M.shadow_pool && world.time - M.shadow_seen_at > glob.SHADOW_INTERVAL * 2)
+			for(var/obj/fx_worldshadow/s in M.shadow_pool)
+				s.snap_next = 1
 		M.shadow_seen_at = world.time
 		M.EnsureMobShadows(configs)
 
@@ -324,7 +339,14 @@ proc/ShadowPrewarm(mob/M)
 proc/WorldShadow_Process()
 	if(WorldLoading) return
 	if(!glob || !glob.WORLD_SHADOWS)
-		_ShadowSweep(null)
+		if(_shadow_objs.len)
+			var/list/clear = list()
+			for(var/obj/fx_worldshadow/sh in _shadow_objs)
+				if(sh.owner) clear[sh.owner] = 1
+				else sh.loc = null
+			_shadow_objs.Cut()
+			for(var/mob/o in clear)
+				o.ClearMobShadows()
 		if(_fx_lights.len) _fx_lights.Cut() //master off: stop tracking lights (nothing prunes them here)
 		return
 	FxPruneLights()
@@ -336,26 +358,18 @@ proc/WorldShadow_Process()
 		var/atom/view_anchor = GfxViewAnchor(P.client)
 		if(!get_turf(view_anchor)) view_anchor = P
 		ShadowScanAround(view_anchor, ShadowScanRadius(P.client), sp, seen) //scan the fitted view around the actual camera center
-	_ShadowSweep(seen)
+	if(world.time >= _shadow_reap_at)
+		_shadow_reap_at = world.time + 300
+		_ShadowReapOrphans()
 
-//reap orphans and clear out-of-view mobs; gather first, del scrubs the list mid-loop
-proc/_ShadowSweep(list/seen)
+proc/_ShadowReapOrphans()
 	var/list/reap = list()
-	var/list/clear = list()
 	for(var/obj/fx_worldshadow/sh in _shadow_objs)
-		var/mob/o = sh.owner
-		if(!o)
-			reap += sh
-		else if(!seen)
-			clear |= o
-		else if(!seen[o] && world.time - o.shadow_seen_at > glob.SHADOW_KEEP_TIME)
-			clear |= o
+		if(!sh.owner) reap += sh
+	if(!reap.len) return
+	_shadow_objs -= reap
 	for(var/obj/fx_worldshadow/sh in reap)
-		_shadow_objs -= sh
-		sh.owner = null
-		sh.loc = null //ref-drop, never del
-	for(var/mob/o in clear)
-		o.ClearMobShadows()
+		sh.loc = null
 
 proc/_WsBoot()
 	spawn(90)
