@@ -726,22 +726,47 @@ mob/proc/Recover(var/blah,Amount=1)
 
 mob/var/RainbowColor
 mob/var/HoldOn=0
+mob/var/tmp/rainbow_glow_loop_running = FALSE
+mob/var/tmp/rainbow_glow_index = 1
+
+mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the glow loops in sequence, so if it ever gets stopped due to something, the glow loop resumes shortly after
+	set waitfor = 0
+	if(rainbow_glow_loop_running)
+		return
+	rainbow_glow_loop_running = TRUE
+	var/list/rainbow_colors = list("#ff0000","#ffff00","#00ff00","#00ffff","#0000ff","#ff00ff")
+	while(src)
+		if(!src.passive_handler.Get("Prismatic"))
+			rainbow_glow_index = 1
+			sleep(30)
+			continue
+		var/F = filters["prismatic"]
+		if(!F)
+			RainbowGlowStuff()
+			F = filters["prismatic"]
+		if(F)
+			rainbow_glow_index++
+			if(rainbow_glow_index > rainbow_colors.len)
+				rainbow_glow_index = 1
+			animate(F,color = rainbow_colors[rainbow_glow_index],time = 30)
+		sleep(30)
+
 mob/proc/RainbowGlowStuff()
 	if(!src.passive_handler.Get("Prismatic"))
+		if(filters["prismatic"])
+			filters -= "prismatic"
+			GlowFilter = null
 		return
-	if(filters["prismatic"]) //cycle already running; rebuilt only after something wipes filters
+	if(filters["prismatic"])
+		RainbowGlowLoop()
 		return
-	filters -= "trail" //duplicate filter names stack, so pull trail before re-adding it after the glow
-	filters += filter(name="prismatic", type="drop_shadow",x=0,y=0,size=src.passive_handler.Get("Prismatic"), offset=1, color="#ff0000")
+	filters -= "trail"
+	filters += filter(name = "prismatic",type = "drop_shadow",x = 0,y = 0,size = src.passive_handler.Get("Prismatic"),offset = 1,color = "#ff0000")
 	GlowFilter = filters["prismatic"]
-	filters += filter(name="trail", type="motion_blur", x=0,y=0)
-	//hue wheel: 60 deg legs, full lap 180ds
-	animate(GlowFilter, color="#ffff00", time=30, loop=-1)
-	animate(color="#00ff00", time=30)
-	animate(color="#00ffff", time=30)
-	animate(color="#0000ff", time=30)
-	animate(color="#ff00ff", time=30)
-	animate(color="#ff0000", time=30)
+	filters += filter(name = "trail",type = "motion_blur",x = 0,y = 0)
+	rainbow_glow_index = 1
+	RainbowGlowLoop()
+
 
 mob/proc/
 	Available_Power()
@@ -812,6 +837,9 @@ mob/proc/
 			src.PowerControl=rand(101, 600)
 		if(src.passive_handler.Get("Prismatic"))
 			RainbowGlowStuff()
+		if(filters["prismatic"])
+			if(!src.passive_handler.Get("Prismatic"))
+				RainbowGlowStuff()
 		var/EPM=Power_Multiplier;
 		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
 			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
@@ -1370,11 +1398,11 @@ mob/proc/Get_Scouter_Reading(mob/B)
 
 
 	Ratio*=EPM
-	
+
 	Ratio *= B.GetHellScaling();//returns 1 if no hell power
 
 	if(B.HasZenkaiPower()) Ratio *= B.GetZenkaiScaling();
-	
+
 	Ratio *= B.Base() * 100
 	temp_potential_power(B)//get them potential powers
 	Ratio *= B.potential_power_mult

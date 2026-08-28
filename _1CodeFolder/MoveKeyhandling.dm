@@ -52,7 +52,7 @@ mob/Players
 	//	This will initiate movement whenever a client logs into a /mob/player.
 	Login()
 		..()
-		BeamsKill() 
+		BeamsKill()
 		if(!ChrysalisActive)
 			Frozen = 0
 		// Re-apply chrysalis state on reconnect (timer loop and shell obj are lost on restart)
@@ -421,4 +421,3 @@ mob/Players/heldDir()
 	if(east_held && !west_held) dir_x = EAST
 	else if(west_held && !east_held) dir_x = WEST
 	return dir_x + dir_y
-

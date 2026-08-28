@@ -194,6 +194,8 @@ obj
 				RushDelay=1
 				ControlledRush//as above but you actually know where you're going
 				RushAfterImages//Spawns coolerFlashImage afterimages each step during rush
+				RushAIBlue
+				RushAIOrange
 				RushNoFlight//Skips setting icon_state to Flight during rush
 				MortalBlow//Makes you deal a mortal wound in midcombat.
 				WarpAway//Toss them into a hole
@@ -5654,6 +5656,10 @@ mob
 							step_towards(src,src.Target)
 						if(Z.RushAfterImages)
 							coolerFlashImage(src, Z.RushAfterImages)
+						if(Z.RushAIBlue)
+							blueFlashImage(src, Z.RushAIBlue)
+						if(Z.RushAIOrange)
+							orangeFlashImage(src, Z.RushAIOrange)
 						if(get_dist(src,src.Target)<=1)
 							GO=0
 							src.dir=get_dir(src,src.Target)
@@ -5695,6 +5701,10 @@ mob
 							step(src,src.dir)
 						if(Z.RushAfterImages)
 							coolerFlashImage(src, Z.RushAfterImages)
+						if(Z.RushAIBlue)
+							blueFlashImage(src, Z.RushAIBlue)
+						if(Z.RushAIOrange)
+							orangeFlashImage(src, Z.RushAIOrange)
 						if(Z.Area=="Strike"||Z.Area=="Arc"||Z.Area=="Cone")
 							for(var/atom/a in get_step(src,dir))
 								if(a==src)
@@ -5742,6 +5752,8 @@ mob
 				src.WindingUp=0
 				if(src.filters["trail"]) //only the trail filter has x/y to reset
 					animate(src.filters["trail"], x=0, y=0)
+				if(src.passive_handler.Get("Prismatic"))
+					src.RainbowGlowStuff(TRUE)
 				src.icon_state=""
 			if(Z.FlickAttack==1)
 				flick("Attack",src)

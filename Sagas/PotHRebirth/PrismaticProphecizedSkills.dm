@@ -48,13 +48,14 @@ obj
 			ForMult = 1.5
 			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
+			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
 			KenWaveIcon = 'Unbound.dmi'
 			KenWave = 1
 			KenWaveSize = 1
 			KenWaveX = 72
 			KenWaveY = 72
+			ManaGlowSize=2
 			KenWaveBlend = 2
 			KenWaveTime = 5
 			ActiveMessage = "awakens their Hyperdeath state!"
@@ -66,7 +67,7 @@ obj
 				SpdMult = 1.5 + (0.1 * pLv)
 				EndMult = 1.5 + (0.1 * pLv)
 				RecovMult = 1.5 + (0.1 * pLv)
-				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
+				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)
@@ -441,10 +442,10 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 					m << "Even if broken, you are more than a cage. <b>X-Slash is now Omega X-Slash!</b>"
 					if(m.FinalHeroChoice=="White Pen of Hope")
 						m << "Faint courage blossoms into unwavering determination! <b>Your DF went up!</b>"
-						extraP = list()
+						extraP = list("PureReduction" = 2)
 					if(m.FinalHeroChoice=="Roaring Knight")
 						m << "<i>Hear my voice. Look my way. I'm with you no matter what.</i> <b>Your AT went up!</b>"
-						extraP = list("Forever After" = 1)
+						extraP = list("PureDamage" = 2, "Forever After" = 1)
 				if("Purple")
 					m << "Write what you know, right? <b>Rude Buster is now Omega Buster!</b>"
 			applyBuff.PowerMult=1+(0.05*sl*sl)
@@ -463,19 +464,34 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 
 
 
+/obj/Skills/AutoHit/Mysterious_Winds
+	Area = "Target"
+	Distance=14
+	Knockback = 10
+	DamageMult=1
+	ForScaling=1
+	StrScaling=0
+	HitSparkIcon='RosePetals.dmi'
+	HitSparkX=-32
+	HitSparkY=-32
+	ActiveMessage="says: 'Mysterious Wind!'"
+	Cooldown=8
+	EnergyCost=2
+	verb/Mysterious_Winds()
+		set category="Skills"
+		usr.Activate(src)
+
 /obj/Skills/AutoHit/Jarona
 	name = "Jarona"
-	Area = "Target"
+	Area = "Wave"
 	NeedsSword=0
 	Distance = 16
 	DamageMult = 7
 	Knockback = 10
 	StrScaling = 1
 	EndEffectiveness = 1
-	PassThrough = 1
-	Rush = 1
-	RushAfterImages = 1
-	RushNoFlight = 1
+	Rush = 16
+	RushAIBlue = 1
 	StopAtTarget = 1
 	Copyable=6
 	Cooldown = 18
@@ -484,6 +500,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	GuardBreak = 1
 	NoLock = 1
 	NoAttackLock = 1
+	ControlledRush = 1
 	ChargeWaveIcon   = 'BLANK.dmi'
 	ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
 	HeldSkill = TRUE
@@ -491,8 +508,32 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	SweetSpot = 1.5
 	SweetSpotBenefit = 1.5
 	adjust(mob/p)
-		var/jaboner = pick("rushes down the opponent and shouts 'JARONA'!", "rushes down the opponent and shouts 'JA-Orange'!", "rushes down the opponent and shouts 'JA-st kidding'!")
-		ActiveMessage = jaboner
+		var/choice = pick(1,2,3)
+		switch(choice)
+			if(1)
+				ActiveMessage = "rushes down the opponent and shouts 'JARONA'!"
+				Shattering=10
+				RushAIBlue = 3
+				RushAIOrange = 0
+				StrScaling = 1
+				ForScaling = 0
+				RushAfterImages = 0
+			if(2)
+				ActiveMessage = "rushes down the opponent and shouts 'JA-Orange'!"
+				Shattering=0
+				RushAIBlue = 0
+				RushAIOrange = 3
+				StrScaling = 1.5
+				ForScaling = 0
+				RushAfterImages = 0
+			if(3)
+				ActiveMessage = "rushes down the opponent and shouts 'JA-st kidding'!"
+				Shattering=0
+				RushAIBlue = 0
+				RushAIOrange = 0
+				StrScaling = 0
+				ForScaling = 1.5
+				RushAfterImages = 3
 
 	var/tmp/chain_active = FALSE
 	var/tmp/chain_count = 0
@@ -549,7 +590,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	proc/ScheduleReengageWindow(mob/user)
 		if(window_loop_running) return
 		window_loop_running = TRUE
-		reengage_deadline = world.time + 10
+		reengage_deadline = world.time + 20
 		while(world.time < reengage_deadline)
 			if(!chain_active)
 				window_loop_running = FALSE
@@ -565,7 +606,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			// hold has started again.
 			if(user.held_skill == src)
 				window_loop_running = FALSE
-				reengage_deadline = world.time + 10
+				reengage_deadline = world.time + 20
 				return
 			sleep(1)
 		// Window expired
