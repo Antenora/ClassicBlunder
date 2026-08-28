@@ -418,13 +418,29 @@ mob/proc/FlashQueueSpend(atom/enemy)
 		vis_contents -= G
 	return 1
 
+proc/ChargeMoteColor(mob/M, up = 0)
+	if(up == 2 && istype(M.held_skill, /obj/Skills/Projectile))
+		var/obj/Skills/Projectile/PZ = M.held_skill
+		var/sc = FxBlastTint(PZ)
+		if(sc) return sc
+	var/aicon = MobAuraIcon(M)
+	if(aicon)
+		var/list/cyc = AuraCycleColors()["[aicon]"]
+		if(cyc) return cyc[2]
+		var/ac = FxIconColor(aicon, null)
+		if(ac) return ac
+	return up == 2 ? "#cfe6ff" : (up ? "#ffd9a0" : "#a8e4ff")
+
 proc/FlashChargeTick(mob/M, up = 0)
 	set waitfor = 0
 	if(!M || M._flash_charge_on || !glob.FLASH_STATES) return
 	M._flash_charge_on = 1
 	var/i = 0
+	var/col
 	while(M && (up == 2 ? M.held_skill : (up ? M.PoweringUp : M.ChargingEnergy)))
 		i++
+		if(!col || i % 8 == 1)
+			col = ChargeMoteColor(M, up)
 		var/pct = 0.5
 		var/ramp = 0
 		if(up == 2)
@@ -435,24 +451,25 @@ proc/FlashChargeTick(mob/M, up = 0)
 		else
 			pct = clamp(M.Energy / max(100 - M.TotalFatigue, 1), 0, 1)
 			ramp = min(1, (world.time - M.charge_started_at) / max(glob.CHARGE_RAMP_DS, 1))
-		var/n = 1 + round(2 * max(pct, ramp * 0.8) * GfxBudgetScale())
+		var/drive = max(pct, ramp * 0.8)
+		var/n = 2 + round(5 * drive * GfxBudgetScale())
 		for(var/j = 1, j <= n, j++)
-			var/obj/fx_clashlight/S = FlashGlow(M, up == 2 ? "#cfe6ff" : (up ? "#ffd9a0" : "#a8e4ff"), matrix()*0.22, 0)
+			var/sz = 0.13 + rand(0, 13) / 100
+			var/obj/fx_clashlight/S = FlashGlow(M, col, matrix() * sz, 0)
 			if(!S) continue
 			var/a = rand(0, 359)
-			S.pixel_x += round(sin(a) * 38)
-			S.pixel_y += round(cos(a) * 38)
+			var/r = 30 + rand(0, 18)
+			S.pixel_x += round(sin(a) * r)
+			S.pixel_y += round(cos(a) * r)
 			if(up == 1)
-				animate(S, pixel_x = S.pixel_x - round(sin(a) * 10), pixel_y = S.pixel_y + 40, alpha = 170, time = 4)
-				animate(alpha = 0, transform = matrix()*0.1, time = 3)
+				animate(S, pixel_x = S.pixel_x - round(sin(a) * 10), pixel_y = S.pixel_y + 40, alpha = 150 + rand(0, 60), time = 4)
+				animate(alpha = 0, transform = matrix() * (sz * 0.45), time = 3)
 			else
-				animate(S, pixel_x = S.pixel_x - round(sin(a) * 38), pixel_y = S.pixel_y - round(cos(a) * 38), alpha = 180, time = 5 - round(2 * max(ramp, up == 2 ? pct : 0)), easing = QUAD_EASING|EASE_IN)
-				animate(alpha = 0, transform = matrix()*0.08, time = 2)
+				animate(S, pixel_x = S.pixel_x - round(sin(a) * r), pixel_y = S.pixel_y - round(cos(a) * r), alpha = 160 + rand(0, 60), time = max(2, 5 - round(2 * max(ramp, up == 2 ? pct : 0))), easing = QUAD_EASING|EASE_IN)
+				animate(alpha = 0, transform = matrix() * (sz * 0.35), time = 2)
 			spawn(8)
 				if(M) M.vis_contents -= S
-		if(i % 4 == 2)
-			Footfall(M)
-		sleep(7)
+		sleep(4)
 	if(M) M._flash_charge_on = 0
 
 proc/FlashChargeCap(mob/M)
