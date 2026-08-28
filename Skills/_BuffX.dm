@@ -630,13 +630,14 @@ NEW VARIABLES
 			var/selectedPassive = "None"
 			var/selectedStats = list()
 			proc/init(mob/p)
+				var/herobuff=p.HeroicNum*0.05
 				if(altered) return
 				if(selectedPassive == "None")
 					p.PoweredFormSetup()
 				passives = list("[selectedPassive]" = 1, "KiControl" = 1, "EnergyLeak" = 1)
-				vars["[selectedStats[1]]Mult"] = 1.15
-				vars["[selectedStats[2]]Mult"] = 1.1
-				vars["[selectedStats[3]]Mult"] = 1.05
+				vars["[selectedStats[1]]Mult"] = 1.15+herobuff
+				vars["[selectedStats[2]]Mult"] = 1.1+(herobuff*0.75)
+				vars["[selectedStats[3]]Mult"] = 1.05+(herobuff*0.5)
 			Trigger(var/mob/User, Override=0)
 				init(User)
 				..()
