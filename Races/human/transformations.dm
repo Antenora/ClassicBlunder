@@ -13,6 +13,9 @@ transformation
 			defenseadd = 0.25
 			strengthadd = 0.25
 			forceadd = 0.25
+			mastery_boons(mob/user)
+				if(user.HeroicNum>=2)
+					passives = list("Ultimate" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
