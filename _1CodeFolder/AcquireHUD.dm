@@ -553,7 +553,7 @@ client/proc/AqNote(t)
 	E.kind = "note"
 	E.name = t
 	E.name_col = AQ_C_HINT
-	aq_entries += E
+	aq_entries.Insert(1, E)
 
 client/proc/AqBuildEntries()
 	aq_entries = list()

@@ -14,6 +14,8 @@ globalTracker
 		SHADOW_SUN_TINT = "#0a0a0e"
 		LIGHT_SHADOW_RADIUS = 6 //tiles a registered light casts shadows over
 		SHADOW_INTERVAL = 3 //process cadence in ds (mob follows via vis_contents; only re-angles)
+		SHADOW_VIEW_MARGIN = 12
+		SHADOW_KEEP_TIME = 15
 		//full-moon event overrides (ramp driven by MoonEventK in daynight.dm)
 		MOON_EVENT_ALPHA = 150 //full-moon shadow strength, vs the 42 nobody has ever noticed
 		MOON_EVENT_LEN_MIN = 1.05 //event length FLOOR - the only knob that lengthens (see SunShadowParams)
@@ -24,6 +26,7 @@ globalTracker
 		SHADOW_ALT_FADE = 0.55 //alpha lost at full altitude
 
 mob/var/tmp/list/shadow_pool //reusable /obj/fx_worldshadow, [1..N] for sun + light shadows
+mob/var/tmp/shadow_seen_at = 0
 
 var/list/_shadow_objs = list() //every live shadow obj; swept for orphans
 var/_ws_boot = _WsBoot()
@@ -284,6 +287,40 @@ proc/ClientViewRange(client/C)
 		if(w && h) return clamp(round(max(w, h) / 2) + 1, world.view, 33) //radius that covers the wider dimension, small margin
 	return world.view
 
+proc/ShadowScanRadius(client/C)
+	return min(ClientViewRange(C) + glob.SHADOW_VIEW_MARGIN, 33)
+
+proc/ShadowScanAround(atom/anchor, rng, list/sp, list/seen)
+	for(var/mob/M in range(rng, anchor))
+		if(seen && seen[M]) continue
+		if(!ShadowCastable(M)) continue
+		var/list/configs = list()
+		var/turf/mt = get_turf(M)
+		var/area/MA = mt ? mt.loc : null
+		if(sp[3] >= 8 && MA && MA.sees_sky) //sun/moon shadow: outdoors only
+			configs += list(list("sun", sp[1], -sp[2], sp[3], sp[5])) //shear, -lenK, alpha, tint
+		for(var/lc in ComputeLightShadows(M)) //point lights: anywhere (incl. caves)
+			configs += list(lc)
+		if(!configs.len)
+			M.ClearMobShadows()
+			continue
+		if(seen) seen[M] = 1
+		M.shadow_seen_at = world.time
+		M.EnsureMobShadows(configs)
+
+proc/ShadowPrewarm(mob/M)
+	if(WorldLoading) return
+	if(!glob || !glob.WORLD_SHADOWS) return
+	if(!M || !M.client) return
+	if(!GfxShadowEnabled(M.client)) return
+	var/atom/view_anchor = GfxViewAnchor(M.client)
+	if(!get_turf(view_anchor)) view_anchor = M
+	ShadowScanAround(view_anchor, ShadowScanRadius(M.client), SunShadowParams(), null)
+	var/turf/vt = get_turf(view_anchor)
+	if(vt)
+		for(var/atom/movable/A in GfxMaterialsNear(vt, ShadowScanRadius(M.client) + 2))
+			if(A.z == vt.z && A.gfx_wind_response > 0) GfxApplyMaterialWind(A)
+
 proc/WorldShadow_Process()
 	if(WorldLoading) return
 	if(!glob || !glob.WORLD_SHADOWS)
@@ -298,21 +335,7 @@ proc/WorldShadow_Process()
 		if(!GfxShadowEnabled(P.client)) continue
 		var/atom/view_anchor = GfxViewAnchor(P.client)
 		if(!get_turf(view_anchor)) view_anchor = P
-		for(var/mob/M in view(ClientViewRange(P.client), view_anchor)) //scan the fitted view around the actual camera center
-			if(seen[M]) continue
-			if(!ShadowCastable(M)) continue
-			var/list/configs = list()
-			var/turf/mt = get_turf(M)
-			var/area/MA = mt ? mt.loc : null
-			if(sp[3] >= 8 && MA && MA.sees_sky) //sun/moon shadow: outdoors only
-				configs += list(list("sun", sp[1], -sp[2], sp[3], sp[5])) //shear, -lenK, alpha, tint
-			for(var/lc in ComputeLightShadows(M)) //point lights: anywhere (incl. caves)
-				configs += list(lc)
-			if(!configs.len)
-				M.ClearMobShadows()
-				continue
-			seen[M] = 1
-			M.EnsureMobShadows(configs)
+		ShadowScanAround(view_anchor, ShadowScanRadius(P.client), sp, seen) //scan the fitted view around the actual camera center
 	_ShadowSweep(seen)
 
 //reap orphans and clear out-of-view mobs; gather first, del scrubs the list mid-loop
@@ -323,7 +346,9 @@ proc/_ShadowSweep(list/seen)
 		var/mob/o = sh.owner
 		if(!o)
 			reap += sh
-		else if(!seen || !seen[o])
+		else if(!seen)
+			clear |= o
+		else if(!seen[o] && world.time - o.shadow_seen_at > glob.SHADOW_KEEP_TIME)
 			clear |= o
 	for(var/obj/fx_worldshadow/sh in reap)
 		_shadow_objs -= sh

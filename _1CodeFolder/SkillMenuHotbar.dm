@@ -675,6 +675,8 @@ document.onkeydown=function(e){
 #define BUFF_ROWS 7        // 6 visible + 1 buffer row for smooth scrolling
 #define BUFF_BAND_H 90     // BUFF_VISIBLE * BUFF_RH
 #define BUFF_Y0 201        // SILoc dy of row 1's bottom edge at sub=0
+#define BUFF_CLIP_T 186
+#define BUFF_CLIP_B 276
 #define BUFF_TRACK_X 298   // right of the row band, inside the panel border
 #define BUFF_TRACK_Y 186   // dy of the track top = band top
 #define BUFF_TRACK_H 90    // = BUFF_BAND_H
@@ -1064,7 +1066,7 @@ client/proc/CloseSkillInfo()
 
 /atom/movable/shud/buffpassrow
 	layer = MHUD_LAYER + 2.2
-	mouse_opacity = 2
+	mouse_opacity = 0
 	maptext_height = 15
 	var/pass_name
 	New()
@@ -1209,18 +1211,34 @@ client/proc/RefreshBuffPassRows()
 	var/first = (buff_pass_px - sub) / BUFF_RH
 	for(var/k = 1 to buff_pass_rows.len)
 		var/atom/movable/shud/buffpassrow/r = buff_pass_rows[k]
-		r.screen_loc = SILoc(32, BUFF_Y0 + (k - 1) * BUFF_RH - sub)
+		var/rowdy = BUFF_Y0 + (k - 1) * BUFF_RH - sub
+		r.screen_loc = SILoc(32, rowdy)
 		var/idx = first + k
 		if(idx <= total)
 			var/p = buff_pass_list[idx]
 			var/v = (bb && bb.passives) ? bb.passives[p] : null
+			var/vtxt = (isnull(v) || v == 1) ? "" : " ([v])"
+			var/mid = rowdy - 7
 			r.pass_name = p
-			r.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[p][(isnull(v) || v == 1) ? "" : " ([v])"]</span></center>"
+			r.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">[p][vtxt]</span></center>"
 			r.alpha = 255
+			var/px = length("[p][vtxt]") * 6
+			var/off = max(0, round((SKINFO_W - 64 - RowHitW(px)) / 2))
+			r.icon = RowHitIcon(px)
+			r.pixel_x = off
+			r.maptext_x = -off
+			var/live = (mid >= BUFF_CLIP_T && mid <= BUFF_CLIP_B)
+			r.mouse_opacity = live ? 2 : 0
+			if(!live) r.filters = filter(type="outline", size=1, color="#000000")
 		else
 			r.pass_name = null
 			r.maptext = ""
 			r.alpha = 0
+			r.icon = null
+			r.pixel_x = 0
+			r.maptext_x = 0
+			r.mouse_opacity = 0
+			r.filters = filter(type="outline", size=1, color="#000000")
 	if(buff_thumb)
 		if(maxpx <= 0)
 			buff_thumb.alpha = 80

@@ -40,6 +40,10 @@ var/global/list/MAJIN_PENDING_DIGEST_CREDITS = list()
     if(!islist(MAJIN_ROOM_OWNERS) || MAJIN_ROOM_OWNERS.len != MAJIN_ROOM_COUNT)
         MAJIN_ROOM_OWNERS = new/list(MAJIN_ROOM_COUNT)
 
+/mob/New()
+    ..()
+    if(verbs) verbs -= /mob/verb/Observe_Majin
+
 /mob/proc/GrantObserveMajinVerb()
     if(!verbs) return
     if(!(/mob/verb/Observe_Majin in verbs))

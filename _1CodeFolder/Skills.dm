@@ -1083,6 +1083,7 @@ turf/Click(turf/T)
 					var/formerdir=usr.dir
 					usr.Move(src)
 					usr.dir=formerdir
+					ShadowPrewarm(usr)
 					if(usr.Energy<1)
 						usr.Energy=1
 
@@ -1106,6 +1107,7 @@ turf/Click(turf/T)
 						var/formerdir = usr.dir
 						usr.Move(src)
 						usr.dir = formerdir
+						ShadowPrewarm(usr)
 						if(usr.Energy < 1)
 							usr.Energy = 1
 						usr.LoseMana(mana_cost)
@@ -1133,6 +1135,7 @@ turf/Click(turf/T)
 							usr.Move(src)
 							usr.LoseMana(glob.BLINK_COST)
 							usr.dir=formerdir
+							ShadowPrewarm(usr)
 							if(usr.ManaAmount<1)
 								usr.ManaAmount=0
 

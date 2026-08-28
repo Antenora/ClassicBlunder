@@ -947,6 +947,7 @@ proc/_GfxDepthProcess()
 	if(WorldLoading) return
 	var/list/seen_mobs = list()
 	var/list/seen_materials = list()
+	var/list/seen_wind = list()
 	var/ao_budget = max(80, round(280 * GfxBudgetScale()))
 	while(_gfx_ao_dirty.len && ao_budget > 0)
 		var/turf/dirty = _gfx_ao_dirty[1]
@@ -965,14 +966,17 @@ proc/_GfxDepthProcess()
 		//AO has to cover the fitted view or wide-view clients watch it pop in
 		var/visible_r = ClientViewRange(P.client)
 		var/effect_r = min(visible_r, 18)
+		var/wind_r = min(visible_r + glob.SHADOW_VIEW_MARGIN, 33)
 		var/list/client_seen_mobs = list()
 		for(var/mob/M in view(effect_r, view_anchor))
 			if(M.icon && M.invisibility <= P.see_invisible)
 				seen_mobs[M] = 1
 				client_seen_mobs[M] = 1
-		for(var/atom/movable/A in GfxMaterialsNear(view_turf, effect_r + 2))
+		for(var/atom/movable/A in GfxMaterialsNear(view_turf, wind_r + 2))
 			if(!A || !view_turf || A.z != view_turf.z) continue
-			if(max(abs(A.x - view_turf.x), abs(A.y - view_turf.y)) <= effect_r + 2) seen_materials[A] = 1
+			var/acheb = max(abs(A.x - view_turf.x), abs(A.y - view_turf.y))
+			if(acheb <= effect_r + 2) seen_materials[A] = 1
+			else if(acheb <= wind_r + 2 && A.gfx_wind_response > 0) seen_wind[A] = 1
 		var/needs_ao_scan = P.client.gfx_ao_scan_incomplete || P.client.gfx_ao_scan_x != view_turf.x || P.client.gfx_ao_scan_y != view_turf.y || P.client.gfx_ao_scan_z != view_turf.z || P.client.gfx_ao_scan_radius != visible_r
 		if(needs_ao_scan)
 			P.client.gfx_ao_scan_x = view_turf.x
@@ -994,6 +998,9 @@ proc/_GfxDepthProcess()
 		GfxApplyStructureVisuals(A)
 		GfxEnsureContactShadow(A)
 		GfxRefreshMaterialVisuals(A)
+		GfxApplyMaterialWind(A)
+	for(var/atom/movable/A in seen_wind)
+		if(seen_materials[A]) continue
 		GfxApplyMaterialWind(A)
 	for(var/atom/movable/A in _gfx_highlight_atoms.Copy())
 		if(seen_materials[A] || seen_mobs[A]) continue

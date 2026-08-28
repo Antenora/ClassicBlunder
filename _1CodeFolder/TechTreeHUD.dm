@@ -201,6 +201,7 @@ client
 		atom/movable/shud/ttlabel/tmenu_tab_craft_lbl
 		tmenu_panx = 0
 		tmenu_pany = 0
+		tmenu_pan_init = 0
 		tmenu_lastpanx = 0
 		tmenu_lastpany = 0
 		tmenu_drag_mx = 0
@@ -274,6 +275,9 @@ client/proc/OpenTechMenu(start_tab = "tree")
 	var/list/tb = TTPanBounds()
 	tt_pan_x = clamp(tt_pan_x, tb[1], tb[2])
 	tt_pan_y = clamp(tt_pan_y, tb[3], tb[4])
+	if(!tmenu_pan_init)
+		tmenu_pan_init = 1
+		TechDefaultPan()
 
 	if(btn_tech)
 		btn_tech.icon = 'HUD/ui_slot_unavailable.png'
@@ -451,6 +455,23 @@ client/proc/TechButton(action, arg)
 
 client/proc/TTOriginDx()  return TT_VP_L + TT_MARGIN - tmenu_panx
 client/proc/TTOriginDyT() return TT_VP_T + TT_MARGIN - tmenu_pany
+
+client/proc/TechFirstNode()
+	var/best
+	var/bc = 0
+	var/br = 0
+	for(var/n in TechTreeLayout)
+		var/list/e = TechTreeLayout[n]
+		if(!e) continue
+		if(isnull(best) || e[1] < bc || (e[1] == bc && e[2] < br))
+			best = n; bc = e[1]; br = e[2]
+	return best
+
+client/proc/TechDefaultPan()
+	var/list/e = TechTreeLayout[TechFirstNode()]
+	if(!e) return
+	tmenu_panx = clamp(TT_VP_L + TT_MARGIN + e[1] * TT_COL_W - round((TT_VP_L + TT_VP_R) / 2), 0, TT_CanvasW())
+	tmenu_pany = clamp(TT_VP_T + TT_MARGIN + e[2] * TT_ROW_H - round((TT_VP_T + TT_VP_B) / 2), 0, TT_CanvasH())
 
 client/proc/BuildTree()
 	tmenu_nodes = list()

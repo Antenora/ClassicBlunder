@@ -276,7 +276,16 @@ client/proc/AdminTrackTo(kind, params)
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
 	var/top_py = ADMIN_TRACK_PY + ADMIN_TRACK_H
-	if(kind == "atom")
+	if(kind == "stack")
+		if(!stack_panel_open || !stack_list) return
+		var/maxpx = max(0, stack_list.len * ABTN_RH - ADMIN_BAND_H)
+		if(maxpx <= 0) return
+		var/local_py = (row - 1) * 32 + py - (atomp_row - 1) * 32 - atomp_poff - pp_pan_y
+		var/frac = clamp((top_py - local_py) / ADMIN_TRACK_H, 0, 1)
+		stackp_px = round(frac * maxpx)
+		stackp_target_px = stackp_px
+		RefreshStackBtns()
+	else if(kind == "atom")
 		if(!atom_panel_open || !atom_cmd_list) return
 		var/maxpx = max(0, atom_cmd_list.len * ABTN_RH - ADMIN_BAND_H)
 		if(maxpx <= 0) return
@@ -626,3 +635,222 @@ client/proc/AtomPanelAction(action)
 		if("s_light")    AdminInvoke("Surface_Set_Light", T)
 		if("s_wind")     AdminInvoke("Surface_Set_Wind", T)
 		if("s_clear")    AdminInvoke("Surface_Clear_Overrides", T)
+
+
+/atom/movable/shud/stackpanelbg
+	layer = APANEL_LAYER
+	mouse_opacity = 2
+	Click(location, control, params)
+		if(params && findtext(params, "right=1"))
+			if(usr) usr.client.HideStackPicker()
+
+/atom/movable/shud/adminbtn/stackbtn
+	var/pick_idx = 0
+	Click(location, control, params)
+		if(!usr || !usr.client) return
+		if(params && findtext(params, "right=1"))
+			usr.client.HideStackPicker()
+			return
+		usr.client.StackPick(pick_idx)
+
+client
+	var/tmp
+		list/stack_panel_objs
+		list/stack_btn_objs
+		list/stack_list
+		stack_panel_open = FALSE
+		stackp_px = 0
+		stackp_target_px = 0
+		stackp_anim = FALSE
+		atom/movable/shud/adminthumb/stackp_thumb
+
+client/proc/StackLabel(atom/A)
+	if(!A) return "?"
+	var/n = "[A.name]"
+	if(length(n) > 22) n = "[copytext(n, 1, 20)]..."
+	return html_encode(n)
+
+client/proc/RightClickOpen(atom/A)
+	HideStackPicker()
+	if(!A) return
+	if(istype(A, /mob/Players))
+		ShowPlayerPanel(A)
+		return
+	if(isturf(A) || (isobj(A) && A.loc))
+		ShowAtomPanel(A)
+
+client/proc/RightClickUsable(atom/A)
+	if(!A || !mob) return 0
+	if(istype(A, /mob/Players)) return 1
+	if(isturf(A) || (isobj(A) && A.loc))
+		if(!mob.Admin && !mob.Mapper) return 0
+		return AtomCommandList(A).len ? 1 : 0
+	return 0
+
+client/proc/RightClickTurf(atom/A, atom/location)
+	if(isturf(A)) return A
+	if(isturf(location)) return location
+	if(A && isturf(A.loc)) return A.loc
+	return null
+
+client/proc/StackSortByLayer(list/L)
+	var/list/out = list()
+	for(var/atom/A in L)
+		var/placed = 0
+		for(var/i = 1 to out.len)
+			var/atom/B = out[i]
+			if(A.layer > B.layer)
+				out.Insert(i, A)
+				placed = 1
+				break
+		if(!placed) out += A
+	return out
+
+client/proc/RightClickCandidates(turf/T, atom/A)
+	var/list/out = list()
+	if(!mob) return out
+	if(T)
+		for(var/atom/movable/M in T)
+			if(!M.mouse_opacity) continue
+			if(M.invisibility > mob.see_invisible) continue
+			if(!RightClickUsable(M)) continue
+			out += M
+		if(RightClickUsable(T)) out += T
+	if(A && !(A in out) && RightClickUsable(A)) out += A
+	return StackSortByLayer(out)
+
+client/proc/HideStackPicker()
+	stack_panel_open = FALSE
+	stack_list = null
+	stack_btn_objs = null
+	stackp_thumb = null
+	if(stack_panel_objs)
+		while(stack_panel_objs.len)
+			var/atom/movable/o = stack_panel_objs[stack_panel_objs.len]
+			stack_panel_objs.len--
+			screen -= o
+			del o
+		stack_panel_objs = null
+
+client/proc/ShowStackPicker(list/cands)
+	HideStackPicker()
+	if(!mob || !cands || cands.len < 2) return
+	DismissPopupsOutside(null)
+	if(!ComputeAtomPanelAnchor()) return
+	pp_pan_x = getPref("ppPanX"); if(isnull(pp_pan_x)) pp_pan_x = 0
+	pp_pan_y = getPref("ppPanY"); if(isnull(pp_pan_y)) pp_pan_y = 0
+	var/list/pb = ATPanelBounds()
+	pp_pan_x = clamp(pp_pan_x, pb[1], pb[2])
+	pp_pan_y = clamp(pp_pan_y, pb[3], pb[4])
+	stack_panel_objs = list()
+	stack_btn_objs = list()
+	stack_list = cands.Copy()
+	stack_panel_open = TRUE
+	stackp_px = 0
+	stackp_target_px = 0
+
+	var/atom/movable/shud/stackpanelbg/bg = new
+	bg.icon = 'HUD/admin_panel.png'
+	bg.screen_loc = ATPLoc(0, 0)
+	stack_panel_objs += bg
+
+	var/icon/btnicon = AdminBtnIcon(ABTN_W)
+	for(var/k = 1 to ADMIN_ROWS)
+		var/atom/movable/shud/adminbtn/stackbtn/b = new
+		b.icon = btnicon
+		stack_btn_objs += b
+		stack_panel_objs += b
+
+	var/atom/movable/shud/tcov = new
+	tcov.icon = AdminCoverIcon(136, 30)
+	tcov.mouse_opacity = 0
+	tcov.layer = APANEL_LAYER + 0.2
+	tcov.screen_loc = ATPLoc(12, 276)
+	stack_panel_objs += tcov
+	var/atom/movable/shud/bcov = new
+	bcov.icon = AdminCoverIcon(136, 30)
+	bcov.mouse_opacity = 0
+	bcov.layer = APANEL_LAYER + 0.2
+	bcov.screen_loc = ATPLoc(12, 22)
+	stack_panel_objs += bcov
+
+	var/atom/movable/shud/admintrack/tr = new
+	tr.kind = "stack"
+	tr.icon = 'HUD/scroll_track_224.png'
+	tr.screen_loc = ATPLoc(ADMIN_TRACK_X, ADMIN_TRACK_PY)
+	stack_panel_objs += tr
+	stackp_thumb = new
+	stackp_thumb.kind = "stack"
+	stackp_thumb.icon = 'HUD/scroll_thumb.png'
+	stack_panel_objs += stackp_thumb
+
+	var/atom/movable/shud/adminlbl/nm = new
+	nm.layer = APANEL_LAYER + 0.3
+	nm.maptext_width = 152
+	nm.maptext_height = 30
+	nm.screen_loc = ATPLoc(12, 278)
+	nm.maptext = "<center><span style=\"[APANEL_FONT]; color:#8be9ff\">SELECT TARGET</span></center>"
+	stack_panel_objs += nm
+
+	RefreshStackBtns()
+	for(var/atom/movable/o in stack_panel_objs)
+		screen += o
+	KineticEntrance(stack_panel_objs)
+
+client/proc/RefreshStackBtns()
+	if(!stack_btn_objs || !stack_list) return
+	var/total = stack_list.len
+	var/maxpx = max(0, total * ABTN_RH - ADMIN_BAND_H)
+	stackp_px = clamp(stackp_px, 0, maxpx)
+	var/sub = stackp_px % ABTN_RH
+	var/first = (stackp_px - sub) / ABTN_RH
+	for(var/k = 1 to stack_btn_objs.len)
+		var/atom/movable/shud/adminbtn/stackbtn/b = stack_btn_objs[k]
+		b.screen_loc = ATPLoc(ABTN_X, ADMIN_Y0 - (k - 1) * ABTN_RH + sub)
+		var/idx = first + k
+		if(idx <= total)
+			b.pick_idx = idx
+			b.alpha = 255
+			b.mouse_opacity = 2
+			b.lbl.maptext = "<center><span style=\"[APANEL_FONT]; color:#ffffff\">[StackLabel(stack_list[idx])]</span></center>"
+			b.lbl.alpha = 255
+		else
+			b.pick_idx = 0
+			b.alpha = 0
+			b.mouse_opacity = 0
+			b.lbl.maptext = ""
+			b.lbl.alpha = 0
+	if(stackp_thumb)
+		if(maxpx <= 0)
+			stackp_thumb.alpha = 80
+			stackp_thumb.screen_loc = ATPLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H)
+		else
+			stackp_thumb.alpha = 255
+			var/off = round((stackp_px / maxpx) * (ADMIN_TRACK_H - ADMIN_THUMB_H))
+			stackp_thumb.screen_loc = ATPLoc(ADMIN_TRACK_X + 1, ADMIN_TRACK_PY + ADMIN_TRACK_H - ADMIN_THUMB_H - off)
+
+client/proc/AnimateStackScroll()
+	set waitfor = 0
+	stackp_anim = TRUE
+	while(stack_panel_open && stack_btn_objs && stackp_px != stackp_target_px)
+		var/diff = stackp_target_px - stackp_px
+		var/stepp = round(diff * 0.5)
+		if(!stepp) stepp = (diff > 0) ? 1 : -1
+		stackp_px += stepp
+		RefreshStackBtns()
+		sleep(world.tick_lag)
+	stackp_anim = FALSE
+
+client/proc/StackWheelScroll(delta_y)
+	if(!stack_panel_open || !stack_list || !stack_list.len) return 0
+	var/maxpx = max(0, stack_list.len * ABTN_RH - ADMIN_BAND_H)
+	if(maxpx > 0)
+		var/dir = (delta_y > 0) ? -1 : 1
+		stackp_target_px = clamp(stackp_target_px + dir * ABTN_RH, 0, maxpx)
+		if(!stackp_anim) AnimateStackScroll()
+	return 1
+
+client/proc/StackPick(idx)
+	if(!stack_list || idx < 1 || idx > stack_list.len) return
+	var/atom/A = stack_list[idx]
+	RightClickOpen(A)

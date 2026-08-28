@@ -17,11 +17,27 @@
 
 // verbs kept out of the Options menu. The verbs stay typeable
 /var/list/MENU_VERB_EXCLUDE = list("OOC", "Say", "Emote", "Think", "Whisper", \
-	"Check AI Kills", "Clear Skill Shortcut", "Ping", "Set Skill Shortcuts", "Toggle Channels", "ViewSelfLogs")
+	"Check AI Kills", "Clear Skill Shortcut", "Ping", "Set Skill Shortcuts", "Toggle Channels", "ViewSelfLogs", \
+	"Access Enchantment", "Access Technology", "Acquire Knowledge", "Acquire Skills", "Change Client FPS", \
+	"Show Magic Tree", "Signature Check", "Technology")
 
 // stripped from the mob entirely, handled by the Character menu or other UI now
 /var/list/MENU_VERB_REMOVE = list("Change Pronouns", "Character Sheet", "Enable Old Zanzoken", \
 	"View Current Passives", "Toggle Pronouns", "Skill Descriptions", "Set Catchline", "Hide Information")
+
+/var/list/ROWHIT_ICONS = list('HUD/rowhit_016.png', 'HUD/rowhit_032.png', 'HUD/rowhit_048.png', 'HUD/rowhit_064.png', 'HUD/rowhit_080.png', 'HUD/rowhit_096.png', 'HUD/rowhit_112.png', 'HUD/rowhit_128.png', 'HUD/rowhit_144.png', 'HUD/rowhit_160.png', 'HUD/rowhit_176.png', 'HUD/rowhit_192.png', 'HUD/rowhit_208.png', 'HUD/rowhit_224.png', 'HUD/rowhit_240.png', 'HUD/rowhit_256.png', 'HUD/rowhit_272.png', 'HUD/rowhit_288.png', 'HUD/rowhit_304.png', 'HUD/rowhit_320.png', 'HUD/rowhit_336.png', 'HUD/rowhit_352.png', 'HUD/rowhit_368.png', 'HUD/rowhit_384.png')
+
+/proc/RowHitIndex(px)
+	var/i = round((px + 15) / 16)
+	if(i < 1) i = 1
+	else if(i > ROWHIT_ICONS.len) i = ROWHIT_ICONS.len
+	return i
+
+/proc/RowHitIcon(px)
+	return ROWHIT_ICONS[RowHitIndex(px)]
+
+/proc/RowHitW(px)
+	return RowHitIndex(px) * 16
 
 mob/var/tmp/list/hud_menu_verbs
 mob/var/tmp/list/hud_customize_verbs
@@ -32,14 +48,52 @@ client/Click(atom/A, location, control, params)
 	if(params && findtext(params, "right=1"))
 		if(istype(A, /atom/movable/shud))
 			return ..()
-		if(istype(A, /mob/Players))
-			ShowPlayerPanel(A)
+		var/list/cands = RightClickCandidates(RightClickTurf(A, location), A)
+		if(cands.len > 1)
+			ShowStackPicker(cands)
 			return
-		if(isturf(A) || isobj(A))
-			ShowAtomPanel(A)   // admin/mapper turf+obj command strip, no-op for everyone else
-			return
+		RightClickOpen(cands.len ? cands[1] : null)
 		return
+	if(DismissPopupsOutside(A)) return
 	return ..()
+
+client/proc/DismissPopupsOutside(atom/A)
+	. = 0
+	var/in_buffdesc = (buffdesc_objs && (A in buffdesc_objs))
+	if(buffdesc_objs && !in_buffdesc)
+		CloseBuffPassDesc()
+		. = 1
+	if(skinfo_objs && !in_buffdesc && !(A in skinfo_objs))
+		CloseSkillInfo()
+		. = 1
+	var/in_gearpass = (cmenu_gearpass_objs && (A in cmenu_gearpass_objs))
+	if(cmenu_gearpass_objs && !in_gearpass)
+		HideGearPassiveInfo()
+		. = 1
+	if(cmenu_desc_objs && !in_gearpass && !(A in cmenu_desc_objs))
+		HideDescPanel()
+		. = 1
+	if(inv_desc_objs && !(A in inv_desc_objs))
+		HideItemDesc()
+		. = 1
+	if(craft_desc_objs && !(A in craft_desc_objs))
+		HideCraftDesc()
+		. = 1
+	if(debuff_panel_objs && !(A in debuff_panel_objs))
+		HideDebuffPanel()
+		. = 1
+	if(stack_panel_objs && !(A in stack_panel_objs))
+		HideStackPicker()
+		. = 1
+	if(player_panel_objs || admin_panel_objs || atom_panel_objs)
+		var/list/dock = list()
+		if(player_panel_objs) dock += player_panel_objs
+		if(admin_panel_objs) dock += admin_panel_objs
+		if(atom_panel_objs) dock += atom_panel_objs
+		if(!(A in dock))
+			HidePlayerPanel()
+			HideAtomPanel()
+			. = 1
 
 mob/proc/CollectMenuVerbs()
 	hud_menu_verbs = list()

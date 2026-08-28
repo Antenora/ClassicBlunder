@@ -8,6 +8,8 @@
 #define PASS_Y0 122
 #define PASS_RH 18
 #define PASS_BAND_H 198    // PASS_VISIBLE * PASS_RH
+#define PASS_CLIP_T 116
+#define PASS_CLIP_B 312
 #define PASS_TRACK_Y 120
 #define PASS_TRACK_H 206
 #define PASS_THUMB_H 36
@@ -229,12 +231,28 @@ client/proc/CMloc(dx, dy)
 
 /atom/movable/shud/cmpassrow
 	layer = CMENU_LAYER + 0.3
-	mouse_opacity = 2
+	mouse_opacity = 0
 	maptext_height = 16
 	var/pass_name
+	var/pass_val
+	var/hovered = 0
 	New()
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
+	proc/SyncText()
+		if(!pass_name)
+			maptext = ""
+			return
+		var/vtxt = isnull(pass_val) ? "" : " - [pass_val]"
+		maptext = "<span style=\"[CMENU_FONT]; color:[hovered ? "#8be9ff" : "#ffffff"]\">&#9670; [pass_name]<span style=\"color:#ffd278\">[vtxt]</span></span>"
+	MouseEntered(location, control, params)
+		if(hovered || !pass_name) return
+		hovered = 1
+		SyncText()
+	MouseExited(location, control, params)
+		if(!hovered) return
+		hovered = 0
+		SyncText()
 	Click(location, control, params)
 		if(!usr || !pass_name) return
 		if(params && findtext(params, "right=1"))
@@ -646,7 +664,7 @@ client/proc/BuildHeaderOverlays()
 	var/atom/movable/shud/cmtext/pl = new; pl.maptext_width = 80; pl.screen_loc = CMloc(360, 60 + CMENU_VY)
 	pl.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">POTENTIAL</span>"; cmenu_objs += pl
 	cm_pot = new;   cm_pot.maptext_width = 60;   cm_pot.screen_loc = CMloc(440, 60 + CMENU_VY); cmenu_objs += cm_pot
-	cm_focus = new; cm_focus.maptext_width = 90; cm_focus.screen_loc = CMloc(500, 60 + CMENU_VY); cmenu_objs += cm_focus
+	cm_focus = new; cm_focus.maptext_width = 90; cm_focus.screen_loc = CMloc(458, 60 + CMENU_VY); cmenu_objs += cm_focus
 	var/atom/movable/shud/cmtext/prl = new; prl.maptext_width = 80; prl.screen_loc = CMloc(360, 74 + CMENU_VY)
 	prl.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">PRONOUNS</span>"; cmenu_objs += prl
 	cm_pron = new;  cm_pron.maptext_width = 120; cm_pron.screen_loc = CMloc(440, 74 + CMENU_VY); cmenu_objs += cm_pron
@@ -784,18 +802,28 @@ client/proc/RefreshPassRows()
 	var/first = (cmenu_pass_px - sub) / PASS_RH
 	for(var/j = 1 to cmenu_pass_rows.len)
 		var/atom/movable/shud/cmpassrow/r = cmenu_pass_rows[j]
-		r.screen_loc = CMloc(26, (PASS_Y0 + (j - 1) * PASS_RH - sub) + CMENU_VY)
+		var/rowdy = (PASS_Y0 + (j - 1) * PASS_RH - sub) + CMENU_VY
+		r.screen_loc = CMloc(26, rowdy)
 		var/idx = first + j
 		if(idx <= total)
+			var/mid = rowdy - 8
+			var/live = (mid >= PASS_CLIP_T && mid <= PASS_CLIP_B)
 			r.pass_name = cmenu_pass_list[idx]
-			var/pv = (mob.passive_handler && mob.passive_handler.passives) ? mob.passive_handler.passives[r.pass_name] : null
-			var/vtxt = isnull(pv) ? "" : " - [pv]"
-			r.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff\">&#9670; [r.pass_name]<span style=\"color:#ffd278\">[vtxt]</span></span>"
+			r.pass_val = (mob.passive_handler && mob.passive_handler.passives) ? mob.passive_handler.passives[r.pass_name] : null
+			if(!live) r.hovered = 0
+			r.SyncText()
 			r.alpha = 255
+			var/vtxt = isnull(r.pass_val) ? "" : " - [r.pass_val]"
+			r.icon = RowHitIcon((length("[r.pass_name][vtxt]") + 2) * 6)
+			r.mouse_opacity = live ? 2 : 0
 		else
 			r.pass_name = null
+			r.pass_val = null
+			r.hovered = 0
 			r.maptext = ""
 			r.alpha = 0
+			r.icon = null
+			r.mouse_opacity = 0
 	if(cmenu_thumb)
 		if(maxpx <= 0)
 			cmenu_thumb.alpha = (total > 0) ? 80 : 0
@@ -836,6 +864,8 @@ client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(AdminWheelScroll(delta_y))
 		return
 	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)
+		return
+	if(StackWheelScroll(delta_y))
 		return
 	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
 		return
@@ -945,7 +975,7 @@ client/proc/UpdateCharacterMenu()
 	cm_ident.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">[D["identity"]]</span>"
 	cm_pot.maptext = "<span style=\"[CMENU_FONT]; color:#ffd278\">[D["potential"]]</span>"
 	var/fc = (mob.PotentialStatus == "Focused") ? "#5af078" : "#5bb0ff"
-	cm_focus.maptext = "<span style=\"[CMENU_FONT]; color:[fc]\">[uppertext(mob.PotentialStatus)]</span>"
+	cm_focus.maptext = "<span style=\"[CMENU_FONT]; text-align:right; color:[fc]\">[uppertext(mob.PotentialStatus)]</span>"
 	cm_pron.maptext = "<span style=\"[CMENU_FONT]; color:#8be9ff\">[D["pronouns"]]</span>"
 	cm_rp.maptext = "<span style=\"[CMENU_FONT]; text-align:right; color:#96c3e1\">REWARD POINTS <span style=\"color:#ffffff\">[D["rp"]]</span></span>"
 	cm_rpused.maptext = "<span style=\"[CMENU_FONT]; text-align:right; color:#96c3e1\">REWARD POINTS USED <span style=\"color:#ffffff\">[D["rpused"]]</span></span>"
@@ -1505,6 +1535,10 @@ client/proc/ShowGearDetail(obj/Items/it)
 	lc.maptext_height = 16
 	lc.screen_loc = CMloc(320, ly + CMENU_VY)
 	lc.maptext = gspan("&#8693; Layer: [it.LayerPriority]", "#8be9ff", "right")
+	var/lcpx = (9 + length("[it.LayerPriority]")) * 6
+	lc.icon = RowHitIcon(lcpx)
+	lc.pixel_x = max(0, 164 - RowHitW(lcpx))
+	lc.maptext_x = -lc.pixel_x
 	cmenu_desc_objs += lc
 	ly += 20
 	var/atom/movable/shud/cmgearclick/rn = new
@@ -1514,6 +1548,7 @@ client/proc/ShowGearDetail(obj/Items/it)
 	rn.maptext_height = 16
 	rn.screen_loc = CMloc(140, ly + CMENU_VY)
 	rn.maptext = gspan("&#9998; Rename", "#8be9ff", "left")
+	rn.icon = RowHitIcon(48)
 	cmenu_desc_objs += rn
 	ly += 20
 	if(it.passives && it.passives.len)
@@ -1529,6 +1564,7 @@ client/proc/ShowGearDetail(obj/Items/it)
 			pr.maptext_height = 16
 			pr.screen_loc = CMloc(146, ly + CMENU_VY)
 			pr.maptext = gspan("&#9670; [p] <span style=\"color:#ffd278\">- [it.passives[p]]</span>", "#ffffff", "left")
+			pr.icon = RowHitIcon((5 + length("[p][it.passives[p]]")) * 6)
 			cmenu_desc_objs += pr
 			ly += 16
 			pn++
@@ -1572,8 +1608,10 @@ client/proc/BuildCustomContent()
 	cmenu_custtrack.icon = 'HUD/scroll_track.png'
 	cmenu_custtrack.screen_loc = CMloc(288, CUST_TRACK_Y + CUST_TRACK_H)
 	cmenu_objs += cmenu_custtrack
+	cmenu_custtrack.layer = CMENU_LAYER + 0.55
 	cmenu_custthumb = new
 	cmenu_custthumb.icon = CMENU_R2
+	cmenu_custthumb.layer = CMENU_LAYER + 0.56
 	cmenu_objs += cmenu_custthumb
 	cmenu_custmask_t = new
 	cmenu_custmask_t.icon = 'HUD/custmask_top.png'
