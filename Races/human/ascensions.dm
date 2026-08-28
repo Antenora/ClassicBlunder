@@ -23,6 +23,14 @@
 		if(owner.SaiyanNum==1)
 			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
 			owner.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
+		if(owner.SaiyanNum==2)
+			owner.transUnlocked=1
+		if(owner.SaiyanNum==3)
+			owner.transUnlocked=2
+		if(owner.SaiyanNum==4)
+			owner.transUnlocked=3
+		if(owner.SaiyanNum==5)
+			owner.transUnlocked=4
 		..()
 
 
