@@ -704,6 +704,11 @@ mob/var
 	ObliteratedY
 	ObliteratedZ
 
+	//human rework vars
+	UnderdogNum
+	HeroicNum
+	SaiyanNum
+
 	list/demon_party = null
 	demon_party_cap = 0
 	list/demon_compendium = null

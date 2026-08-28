@@ -1,4 +1,5 @@
 /ascension/sub_ascension/human/heroic
+	passives = list("MovementMastery" = 2)
 	offense = 0.5
 	strength = 0.5
 	force = 0.5
@@ -6,11 +7,23 @@
 	endurance = 0.5
 	speed = 0.5
 	growthadd= 0.25
+	onAscension(mob/owner)
+		owner.HeroicNum++
+		..()
 /ascension/sub_ascension/human/underdog
 	anger = 0.1
-
+	passives = list("Tenacity" = 2, "UnderDog" = 1)
+	onAscension(mob/owner)
+		owner.UnderdogNum++
+		..()
 /ascension/sub_ascension/human/saiyan
-
+	passives = list("ZenkaiPower" = 0.1)
+	onAscension(mob/owner)
+		owner.SaiyanNum++
+		if(owner.SaiyanNum==1)
+			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
+			owner.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
+		..()
 
 
 
@@ -48,7 +61,7 @@ ascension
 
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
-			choices = list("Heroic" = /ascension/sub_ascension/human/heroic, "Underdog" = /ascension/sub_ascension/human/underdog)
+			choices = list("Heroic" = /ascension/sub_ascension/human/heroic, "Underdog" = /ascension/sub_ascension/human/underdog, "Saiyan" = /ascension/sub_ascension/human/saiyan)
 			passives = list("Tenacity" = 1, "Shonen" = 1, "ShonenPower" = 0.15, "UnderDog" = 1,"Persistence" = 1)
 			new_anger_message = "grows desperate!"
 			on_ascension_message = "You learn the meaning of desperation..."
