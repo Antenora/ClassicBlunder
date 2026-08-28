@@ -5,12 +5,13 @@
     TextColor=rgb(255, 0, 0)
     Cooldown=-1
     ActiveMessage="unleashes the anger they keep locked in a cage!"
-    OffMessage="calms their yasai rage..."
+    OffMessage="calms their Saiyan rage..."
 
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        NeedsHealth = clamp(10 + (asc * 5), 10, 25)
-        TooMuchHealth = clamp(15 + (asc * 2.5), 15, 50)
+        var/updog = p.UnderdogNum
+        NeedsHealth = clamp(10 + ((asc * 2.5)+(updog*5)), 10, 40)
+        TooMuchHealth = clamp(15 + ((asc * 2.5)+(updog*5)), 15, 90)
         AngerMult = 1.2 + (asc*0.2)
         passives = list(  "UnderDog" =1  + (2 * asc))
 
