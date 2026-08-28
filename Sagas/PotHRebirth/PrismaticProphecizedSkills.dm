@@ -48,28 +48,35 @@ obj
 			ForMult = 1.5
 			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
+			"AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
-			KenWaveIcon = 'Unbound.dmi'
-			KenWave = 1
-			KenWaveSize = 1
-			KenWaveX = 72
-			KenWaveY = 72
+			KenWave=1
+			KenWaveIcon='SparkleRainbow.dmi'
+			KenWaveSize=4
+			KenWaveX = 116
+			KenWaveY = 116
 			ManaGlowSize=2
 			KenWaveBlend = 2
 			KenWaveTime = 5
 			ActiveMessage = "awakens their Hyperdeath state!"
 			OffMessage = "returns to their normal self..."
 			adjust(mob/p)
+				var/ExP = list()
+				var/fP = list()
 				var/WithYourPowersCombined=0
 				ActiveMessage = "awakens their Hyperdeath state!"
-				if(p.party || p.party.members || p.party.members.len > 0)
+				if(p.party && p.party.members && p.party.members.len > 0)
 					var/list/party_names = list()
 					for(var/mob/m in p.party.members)
 						if(m == p)
 							continue
 						party_names += "[m]"
 						WithYourPowersCombined+=1
+						//Extra Passive Zone
+						if(m.isRace(HUMAN))
+							ExP += list("Tenacity" = 2)
+						if(m.isRace(SAIYAN))
+							ExP += list("ZenkaiPower" = 0.5)
 					if(party_names.len)
 						var/fullparty = ""
 						if(party_names.len == 1)
@@ -85,15 +92,19 @@ obj
 						ActiveMessage = "calls upon their allies, and with the powers of [fullparty] combined, enters their final state: <b>Omega [p]!</b>"
 					else
 						ActiveMessage = "awakens their Hyperdeath state!"
+				if(WithYourPowersCombined > 0)
+					if(ExP)
+						fP += ExP
+					fP += list("OmegaPower" = WithYourPowersCombined)
+				else
+					passives = list()
 				var/pLv = p.SagaLevel
 				StrMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				ForMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				SpdMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				EndMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				RecovMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
-				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
-				if(WithYourPowersCombined)
-					passives += list("OmegaPower" = WithYourPowersCombined)
+				passives = list("TechniqueMastery" = 2, "AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2)) + fP
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)
@@ -455,8 +466,8 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			var/OmegaPower=1
 			var/extraP
 			switch(sl)
-				if(1 to 2)//this will never happen unless the skill is given unnaturally
-					OmegaPower=1//which, i guess, given the subject matter, is more likely than you'd think
+				if(1 to 2)
+					OmegaPower=1
 				if(3)
 					OmegaPower=1
 				if(4)
@@ -494,6 +505,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	Area = "Target"
 	Distance=14
 	Knockback = 10
+	Stunner=2
 	DamageMult=1
 	ForScaling=1
 	StrScaling=0

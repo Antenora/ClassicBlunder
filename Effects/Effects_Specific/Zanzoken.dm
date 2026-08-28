@@ -232,9 +232,9 @@ proc
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
-			var/r = rand(30, 255) / 255
-			var/g = rand(30, 255) / 255
-			var/b = rand(30, 255) / 255
+			var/r = rand(20, 255) / 255
+			var/g = rand(20, 255) / 255
+			var/b = rand(20, 255) / 255
 
 			var/list/rainbowColor = list(
 				0, 0, 0, 0,

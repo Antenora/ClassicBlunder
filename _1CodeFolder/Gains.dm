@@ -647,6 +647,7 @@ mob
 				if(isInMazokuDT() && HealthPct() > 75 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
 			if((isRace(HUMAN) || isRace(HALFSAIYAN))&&transActive>0)
+				var/drain = 0
 				if(race.transformations[transActive].mastery<100)
 					drain = glob.racials.HALFIE_SSJ_BASE_DRAIN
 					if(src.passive_handler.Get("Ultimate")&&transActive<=2)
