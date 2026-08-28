@@ -72,3 +72,12 @@
 			if(usr.canSHTM())
 				usr.race.transformations[4].transform(usr, TRUE)
 				usr.DoubleHelix=0
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human //wip
+	Third_Eye
+		ABuffNeeded=list("Ki Control")
+	High_Tension
+		TimerLimit=10
+	High_Tension_MAX
+		TimerLimit=10
+	Super_High_Tension
+		TimerLimit=10
