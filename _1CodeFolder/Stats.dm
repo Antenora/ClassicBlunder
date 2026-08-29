@@ -1161,18 +1161,42 @@ mob/proc/
 			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
 				src.ChargeStop()
 			else
+				var/isOvercharging = 0
 				var/isTilted = src.CheckSlotless("Tilted")
 				var/ramp_speed = isTilted ? 1.1 : 1
 				var/ramp = min(1, ((world.time - src.charge_started_at) * ramp_speed) / max(glob.CHARGE_RAMP_DS, 1))
 				var/before = src.Energy
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
-				if(src.Energy <= before)
+				if(src.Energy == src.CheckMaxEnergy() && isOvercharging == 0) // Power Stressing block. Enters Power-Stressed State or Super Saiyan Grade 2/3.
+					isOvercharging = 1
+				if(src.Energy <= before || isOvercharging)
+					src.Quake(4)
 					src.charge_power_stress += 1 + isTilted
 					if(charge_power_stress >= max(5 - passiveboost, 2))
 						FlashChargeCap(src)
 						src.ChargeStop()
-						var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/Power_Stressed)
-						A.Trigger(src)
+						if(src.isRace(SAIYAN) && src.transActive==1)
+							if(src.CheckSpecial("Super Saiyan Grade 2"))
+								if(src.race.transformations[src.transActive].mastery>=75) // Upgrade to Grade 3
+									var/obj/Skills/Buffs/SpecialBuffs/B = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+									var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
+									B.OffMessage="goes a step further--!"
+									B.Trigger(src)
+									A.Trigger(src)
+								else // Find self to toggle itself off
+									var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+									A.OffMessage="tires out..."
+									A.Trigger(src)
+							else if(src.CheckSpecial("Super Saiyan Grade 3"))// Find self to toggle itself off
+								var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
+								A.Trigger(src)
+							else if(src.race.transformations[src.transActive].mastery>=50) // Enter Grade 2
+								var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+								A.OffMessage="tires out..."
+								A.Trigger(src)
+						else
+							var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/Power_Stressed)
+							A.Trigger(src)
 				//	FlashChargeCap(src)
 				//	src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
 

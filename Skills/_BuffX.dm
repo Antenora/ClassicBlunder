@@ -1528,6 +1528,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		SuperSaiyanGrade2
+			BuffName="Super Saiyan Grade 2"
 			SignatureTechnique=3
 			SagaSignature=1
 			UnrestrictedBuff=1
@@ -1544,6 +1545,7 @@ NEW VARIABLES
 			adjust(mob/p)
 			verb/Super_Saiyan_Grade2()
 				set category="Skills"
+				set hidden=1
 				if(usr.ExpandBase)
 					IconReplace=1
 					icon=usr.ExpandBase
@@ -1574,6 +1576,7 @@ NEW VARIABLES
 				adjust(usr)
 				src.Trigger(usr)
 		SuperSaiyanGrade3
+			BuffName="Super Saiyan Grade 3"
 			SignatureTechnique=3
 			SagaSignature=1
 			UnrestrictedBuff=1
@@ -1592,6 +1595,7 @@ NEW VARIABLES
 			adjust(mob/p)
 			verb/Super_Saiyan_Grade3()
 				set category="Skills"
+				set hidden=1
 				if(usr.ExpandBase)
 					IconReplace=1
 					icon=usr.ExpandBase

@@ -371,6 +371,23 @@ mob
 					src.Energy=Cut
 			if(src.Energy > KeyEnergy)
 				src.Energy=KeyEnergy
+		CheckMaxEnergy() // making it separate proc because i'm not sure if putting a return there would fuck up things :wilted:
+			var/HasFatigue=1
+			if(src.HasUnstoppable())
+				HasFatigue=0
+			if(src.passive_handler.Get("Anaerobic"))
+				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
+			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/Sub
+			var/Cut
+			if(src.EnergyCut)
+				Sub=KeyEnergy*src.EnergyCut
+				Cut=KeyEnergy-Sub
+				if(src.Energy > Cut)
+					src.Energy=Cut
+			if(src.Energy > KeyEnergy)
+				src.Energy=KeyEnergy
+			return KeyEnergy
 		MaxMana()
 			if(diedFromSenjutsuOverload())
 				return
