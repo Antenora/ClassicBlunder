@@ -1677,6 +1677,56 @@ NEW VARIABLES
 			verb/Saiyan_Fervor()
 				set category="Skills"
 				src.Trigger(usr)
+		Power_Stressed
+			UnrestrictedBuff=1
+			EnergyExpenditure=1.5
+			passives = list("EnergyLeak" = 1, "PowerStressed" = 1, "PureDamage" = 1)
+			AuraLock=1
+			TimerLimit=30
+			FlashChange=1
+			StrMult=1.4
+			ForMult=1.2
+			EndMult=1.1
+			OffMult=0.5
+			DefMult=0.8
+			SpdMult=0.7
+			ProportionShift=matrix(1.2, 0, 0, 0, 1, 0)
+			KenWave=3
+			KenWaveSize=0.5
+			SpecialSlot=0
+			Slotless=1
+			KenWaveIcon='KenShockwaveGold.dmi'
+			ActiveMessage="stresses their power to the utmost!"
+			OffMessage="tires out..."
+			adjust(mob/p)
+				var/boost = p.passive_handler.Get("PowerStressMastery")
+				TimerLimit=30+(boost*5)
+				if(p.isRace(CHANGELING)) // TODO: MAKE IT SO THIS ONLY ACTIVATES ON THE FINAL/FOURTH FORM
+					ActiveMessage="achieves their long-awaited 100% Full Power!"
+					passives = list("EnergyLeak" = 1.5-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 2+(boost/2), "PureReduction" = 2+(boost/2))
+					StrMult=1.2 + (boost*0.05)
+					ForMult=1.1 + (boost*0.05)
+					EndMult=1.4 + (boost*0.05)
+					OffMult=0.5 + (boost*0.05)
+					DefMult=0.8 + (boost*0.05)
+					SpdMult=0.7 + (boost*0.05)
+				else// nothing extra
+					ActiveMessage="stresses their power to the utmost!"
+					passives = list("EnergyLeak" = 1-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 1+(boost/2))
+					StrMult=1.4 + (boost*0.05)
+					ForMult=1.2 + (boost*0.05)
+					EndMult=1.1 + (boost*0.05)
+					OffMult=0.5 + (boost*0.05)
+					DefMult=0.8 + (boost*0.05)
+					SpdMult=0.7 + (boost*0.05)
+			verb/Power_Stressed()
+				set category="Skills"
+				set hidden = 1
+				if(usr.ExpandBase)
+					IconReplace=1
+					icon=usr.ExpandBase
+				adjust(usr)
+				src.Trigger(usr)
 		The_Unbreakable_Fist
 			SignatureTechnique=3
 			Mastery=1

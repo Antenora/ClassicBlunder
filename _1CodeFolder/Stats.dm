@@ -1157,6 +1157,7 @@ mob/proc/
 
 		//active energy channel
 		if(src.ChargingEnergy && !src.PureRPMode)
+			var/passiveboost = src.passive_handler.Get("PowerStressMastery")
 			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
 				src.ChargeStop()
 			else
@@ -1164,8 +1165,14 @@ mob/proc/
 				var/before = src.Energy
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
 				if(src.Energy <= before)
-					FlashChargeCap(src)
-					src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
+					src.charge_power_stress += 1
+					if(charge_power_stress >= max(5 - passiveboost, 2))
+						FlashChargeCap(src)
+						src.ChargeStop()
+						var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/Power_Stressed)
+						A.Trigger(src)
+				//	FlashChargeCap(src)
+				//	src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
 
 
 mob/proc/Update_Stat_Labels()

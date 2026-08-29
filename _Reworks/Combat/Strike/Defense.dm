@@ -5,6 +5,7 @@ mob/var/tmp
 	charge_started_at = 0
 	charge_hits_taken = 0
 	charge_lockout_until = 0
+	charge_power_stress = 0
 
 mob/proc/IsGuarding()
 	return Guarding
@@ -52,7 +53,7 @@ mob/proc/GuardStop(broken = 0)
 	FlashGuardPlate(broken ? 2 : 0)
 	if(broken)
 		guard_broken_until = world.time + glob.GUARD_BREAK_DS
-		GuardMeter = 0	
+		GuardMeter = 0
 		flick("KB", src)
 		KenShockwave(src, Size = 1, Time = 4)
 		src.Earthquake(8, -4,4,-4,4, 0, 0)
@@ -95,6 +96,7 @@ mob/proc/ChargeStart()
 mob/proc/ChargeStop()
 	if(!ChargingEnergy) return
 	ChargingEnergy = 0
+	charge_power_stress = 0
 	Auraz("Remove")
 
 mob/var/tmp/cc_combo_hits = 0

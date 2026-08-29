@@ -346,6 +346,26 @@ obj
 				set category="Skills"
 				adjust(usr)
 				usr.Activate(src)
+	Skills/Projectile/Beams
+		Hyper_Beam//Well rounded
+			DamageMult=0.3
+			ChargeRate=0.2
+			Dodgeable=0
+			ForScaling=1
+			MenuIcon = "Kamehameha"
+			IconLock='HyperBeamRainbow.dmi'
+			Cooldown=12
+			EnergyCost=3
+			Instinct=1
+			BeamTime=10
+			HeldSkill=TRUE
+			HeldBeam=TRUE
+			ChargePeriod=2
+			CritEffectiveness=0
+			ClashBonus=0.15
+			verb/Kamehameha()
+				set category="Skills"
+				usr.BeginHeldSkill(src)
 
 	Skills/Projectile
 		ChaosSaberToss

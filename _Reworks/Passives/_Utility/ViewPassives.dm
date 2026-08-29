@@ -268,3 +268,4 @@ proc/buildPassiveInfoDB()
 	PassiveInfo["FocusShiftMastery"] = "Adds 1 second per tick to how long your FocusShift lasts."
 	PassiveInfo["FocusShiftRelease"] = "Removes 1 second per tick on the cooldown of FocusShift. Caps to 2.5 seconds."
 	PassiveInfo["FocusShiftBurst"] = "Adds the passive's number to the final multiplier used on the scaling. (IE. 1 FocusShiftBurst with a FocusShift holding a x2 boost will instead make it a x3 boost.)"
+	PassiveInfo["PowerStressMastery"] = "Generally bolsters the efficiency of your Power-Stressed form (achieved by charging above your Energy cap for a few moments.)"
