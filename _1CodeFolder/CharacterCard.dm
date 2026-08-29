@@ -772,7 +772,7 @@ client/proc/GetDebuffDesc(name)
 		if("Stun") return "Unable to act, can be cleansed with After Image Strike."
 		if("Disarm") return "Skills that require weapons deal reduced damage."
 		if("Charmed") return "Slowly move towards the charmer, unable to control movement. You can still attack."
-		if("Tilted") return "Lowers endurance and offense, slightly increases attack."
+		if("Tilted") return "Lowers endurance and offense, increases attack and Energy Charge speed."
 		if("Stasis") return "Unable to act, immune to most other statuses and damage."
 		if("Silence") return "Cannot use any skills."
 		if("Blind") return "Reduced Flow, Instinct, FluidForm, and Defense stat."

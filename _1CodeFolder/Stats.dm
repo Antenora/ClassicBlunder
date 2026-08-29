@@ -1161,11 +1161,13 @@ mob/proc/
 			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
 				src.ChargeStop()
 			else
-				var/ramp = min(1, (world.time - src.charge_started_at) / max(glob.CHARGE_RAMP_DS, 1))
+				var/isTilted = src.CheckSlotless("Tilted")
+				var/ramp_speed = isTilted ? 1.1 : 1
+				var/ramp = min(1, ((world.time - src.charge_started_at) * ramp_speed) / max(glob.CHARGE_RAMP_DS, 1))
 				var/before = src.Energy
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
 				if(src.Energy <= before)
-					src.charge_power_stress += 1
+					src.charge_power_stress += 1 + isTilted
 					if(charge_power_stress >= max(5 - passiveboost, 2))
 						FlashChargeCap(src)
 						src.ChargeStop()
