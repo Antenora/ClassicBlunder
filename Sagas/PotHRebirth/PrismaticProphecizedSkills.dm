@@ -347,7 +347,7 @@ obj
 				adjust(usr)
 				usr.Activate(src)
 	Skills/Projectile/Beams
-		Hyper_Beam//Well rounded
+		Hyper_Beam
 			DamageMult=0.3
 			ChargeRate=0.2
 			Dodgeable=0
@@ -363,8 +363,30 @@ obj
 			ChargePeriod=2
 			CritEffectiveness=0
 			ClashBonus=0.15
-			verb/Kamehameha()
+			adjust(mob/p)
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					ChargePeriod=15
+				else
+					IconSize=1
+					ChargePeriod=2
+			OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+				if(!p)
+					return
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					DamageMult=0.6 + (benefit/10)
+					IconSize=1+(benefit*5)
+				else
+					DamageMult=0.3 + (benefit/10)
+					IconSize=1+benefit
+				var/b = min(max(benefit, 0), 1)
+				var/efrac = p.EnergyMax > 0 ? min(p.Energy / p.EnergyMax, 1) : 0
+				var/spend = p.Energy * 0.25 * b
+				if(spend > 0)
+					p.LoseEnergy(spend)
+				..(p, b * efrac, sweet_spot_hit)
+			verb/Hyper_Beam()
 				set category="Skills"
+				adjust(usr)
 				usr.BeginHeldSkill(src)
 
 	Skills/Projectile
