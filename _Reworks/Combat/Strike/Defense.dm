@@ -36,6 +36,9 @@ mob/Players
 			src.ChargeStop()
 
 mob/proc/GuardStart()
+	if(CancelChargingBeam())
+		return
+
 	if(Guarding) return
 	if(KO || Stunned || Launched || Knockbacked || Suspended || Stasis || Frozen || TimeFrozen || Airborne) return
 	if(grabbed || istype(loc, /mob)) return
@@ -145,3 +148,16 @@ proc/CounterHitReward(mob/attacker, mob/victim, weight)
 	attacker.gainTension(glob.COUNTER_HIT_TENSION)
 	var/froze = HitStop(attacker, victim, max(weight, glob.HIT_STOP_MIN), glob.COUNTER_HIT_STOP_BONUS)
 	FlashCounterMoment(attacker, victim, froze)
+
+
+mob/proc/CancelChargingBeam()
+	var/obj/Skills/Z = held_skill
+
+	if(!Z || !Z.HeldBeam)
+		return FALSE
+
+	if(passive_handler.Get("BeamHoldMastery"))
+		FizzleHeldSkill(Z, TRUE)
+	else
+		FizzleHeldSkill(Z, FALSE)
+	return TRUE

@@ -6,6 +6,7 @@ obj
 		var/NewCopyable // sigh
 		Projectile
 			BaseStatDefault="FOR"
+
 			proc
 				EdgeOfMapProjectile()
 					var/turf/t=get_step(src, src.dir)

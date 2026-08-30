@@ -269,3 +269,4 @@ proc/buildPassiveInfoDB()
 	PassiveInfo["FocusShiftRelease"] = "Removes 1 second per tick on the cooldown of FocusShift. Caps to 2.5 seconds."
 	PassiveInfo["FocusShiftBurst"] = "Adds the passive's number to the final multiplier used on the scaling. (IE. 1 FocusShiftBurst with a FocusShift holding a x2 boost will instead make it a x3 boost.)"
 	PassiveInfo["PowerStressMastery"] = "Generally bolsters the efficiency of your Power-Stressed form (achieved by charging above your Energy cap for a few moments.)"
+	PassiveInfo["BeamHoldMastery"] = "When charging a Beam skill, you can now press Guard to halt and keep your stored charge (for this beam only) for a short period of time, though you will drain energy while holding onto the charge this way, and going below a certain threshold will drop the charge. Higher levels of this passive lower the drain rate and extend the time you can hold your charge for."
