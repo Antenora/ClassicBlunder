@@ -2101,12 +2101,10 @@ mob
 				if(SlotlessBuffs[n])
 					return SlotlessBuffs[n]
 		HasMaimMastery()
-			var/Return=0
-			// if(src.Saga=="Ansatsuken" && src.AnsatsukenAscension=="Chikara")
-			// 	Return+=(src.SagaLevel-4)*0.25
-			if(passive_handler.Get("MaimMastery"))
-				Return+=passive_handler.Get("MaimMastery")
-			return Return
+			if(isRace(CHANGELING)) return 1;
+			if(hasCelestialBody()) return 1;
+			if(passive_handler.Get("MaimMastery")) return 1;
+			return 0;
 		CheckKeybladeStyle(var/Style)
 			if(src.StyleActive=="[Style]"&&src.CheckActive("Keyblade"))
 				return 1

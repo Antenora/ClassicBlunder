@@ -1670,6 +1670,7 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 mob/proc/SpeedDelay(var/Modifier=1)
 	var/Spd=(src.GetSpd()+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT
 	var/Delay=glob.ATTACK_DELAY_DIVISOR/Spd
+	var/initialDelay = Delay;
 	if(passive_handler["Speed Force"])
 		Delay = glob.ATTACK_DELAY_DIVISOR/((GetSpd()*glob.SPEED_FORCE_DELAYMULT+glob.ATTACK_DELAY_STAT_BASE)**glob.ATTACK_DELAY_EXPONENT)
 	// Inevitable (Makyo)
@@ -1678,6 +1679,9 @@ mob/proc/SpeedDelay(var/Modifier=1)
 		Delay=glob.ATTACK_DELAY_MAX
 	if(src.HasBlastShielding())
 		Delay*=1.5
+	if(hasPuppeteerBody())
+		if(initialDelay < Delay)
+			return getPuppeteerBodyDelay(initialDelay, Delay);
 	if(passive_handler["Speed Force"])
 		return max(Delay,0.33)
 	return max(Delay,glob.ATTACK_DELAY_MIN)
