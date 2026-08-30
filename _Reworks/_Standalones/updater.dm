@@ -274,11 +274,7 @@ update
 						p.race.transformations -= T
 						del T
 					p << "Also, here, have your normal transformations back. Kthxbye."
-					p.race.transformations += new /transformation/human/high_tension()
-					p.race.transformations += new /transformation/human/high_tension_MAX()
-					p.race.transformations += new /transformation/human/super_high_tension()
-					p.race.transformations += new /transformation/human/super_high_tension_MAX()
-					p.race.transformations += new /transformation/human/unlimited_high_tension()
+
 	version15
 		version = 15;
 		updateMob(mob/p)
@@ -319,14 +315,6 @@ update
 					for(var/transformation/T in p.race.transformations.Copy())
 						p.race.transformations -= T
 						del T
-					p.race.transformations += new /transformation/human/high_tension/mazoku()
-					p.race.transformations += new /transformation/human/high_tension_MAX/mazoku()
-					p.race.transformations += new /transformation/human/super_high_tension/mazoku()
-					p.race.transformations += new /transformation/human/super_high_tension_MAX/mazoku()
-					p.race.transformations += new /transformation/human/unlimited_high_tension/mazoku()
-					p.race.transformations += new /transformation/demon/devil_trigger/mazoku()
-					if(p.AscensionsAcquired >= 6)
-						p.race.transformations += new /transformation/human/sacred_energy_aura()
 					p << "Your Mazoku transformations have been refreshed."
 			else if(p.isRace(DEMON))
 				var/removed_mazoku_dt = 0

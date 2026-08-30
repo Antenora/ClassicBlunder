@@ -282,7 +282,7 @@ mob/proc/isInMazokuSEA()
 	if(!isMazokuHuman()) return FALSE
 	if(!race || !race.transformations || transActive < 1) return FALSE
 	if(transActive > race.transformations.len) return FALSE
-	return istype(race.transformations[transActive], /transformation/human/sacred_energy_aura)
+
 
 // Reverts all active HT forms sequentially (slots 1–5) until transActive reaches 0.
 mob/proc/mazokuRevertAllHT()

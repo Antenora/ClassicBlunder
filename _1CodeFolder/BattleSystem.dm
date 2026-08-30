@@ -824,18 +824,6 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		KenShockwave(src, icon='KenShockwavePurple.dmi', Size=5, Blend=2)
 		src.Quake(20)
 		src.passive_handler.Increase("DeathDefied", 1)
-		if(src.race && src.race.transformations)
-			//slot order matters: 1-5 HT chain, 6 DT, 7 SEA - mazokuActivateHighestHT counts on it
-			src.race.transformations += new /transformation/human/high_tension/mazoku()
-			src.race.transformations += new /transformation/human/high_tension_MAX/mazoku()
-			src.race.transformations += new /transformation/human/super_high_tension/mazoku()
-			src.race.transformations += new /transformation/human/super_high_tension_MAX/mazoku()
-			src.race.transformations += new /transformation/human/unlimited_high_tension/mazoku()
-			src.race.transformations += new /transformation/demon/devil_trigger/mazoku()
-			if(src.AscensionsAcquired >= 6)
-				src.race.transformations += new /transformation/human/sacred_energy_aura()
-			if(src.transUnlocked < 3)
-				src.transUnlocked = 3
 		Conscious()
 		world<<"<font color=red><b>[src] has awakened.</b></font>"
 		if(!locate(/obj/Skills/Projectile/Spirit_Gun_Mega, src))
@@ -1628,7 +1616,7 @@ mob/proc/Comboz(mob/M, LightAttack=0, ignoreTiledistance = FALSE, landBehind = F
 	var/list/dirs = list(NORTH,SOUTH,EAST,WEST,NORTHWEST,SOUTHWEST,NORTHEAST,SOUTHEAST)
 	if(frontOnly && M)
 		var/front = DisplayedCardinal(M.dir, 0)
-		dirs = list(landBehind ? opposite_dirs[front] : front)	
+		dirs = list(landBehind ? opposite_dirs[front] : front)
 	var/limit = 15
 	if(ignoreTiledistance)
 		limit  = 100
@@ -1736,9 +1724,9 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 
 mob
 	var/tmp/kb_loft = 0
-	var/tmp/kb_recent_until = 0 
-	var/tmp/dash_clash = 0 
-	var/tmp/mob/clash_pursuit 
+	var/tmp/kb_recent_until = 0
+	var/tmp/dash_clash = 0
+	var/tmp/mob/clash_pursuit
 	var/tmp/clash_pursuit_until = 0
 	proc/BeginKB(var/Direction, var/Distance, var/Ki, override_speed, thrown = 0)
 		if(src.Guarding) src.GuardStop()	//hard cc drops guard
