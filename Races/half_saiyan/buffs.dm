@@ -10,10 +10,10 @@
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
         var/updog = p.UnderdogNum
-        NeedsHealth = clamp(10 + ((asc * 2.5)+(updog*5)), 10, 40)
-        TooMuchHealth = clamp(15 + ((asc * 2.5)+(updog*5)), 15, 90)
+        NeedsHealth = clamp(25 + ((asc * 2.5)+(updog*5)), 10, 40)
+        TooMuchHealth = clamp(35 + ((asc * 2.5)+(updog*5)), 15, 90)
         AngerMult = 1.2 + (asc*0.2)
-        passives = list(  "UnderDog" =1  + (2 * asc))
+        passives = list(  "UnderDog" =1  + (2 * asc),"ZenkaiPower" = 0.25)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Saiyan_Pride

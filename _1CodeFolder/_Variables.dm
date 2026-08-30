@@ -711,6 +711,10 @@ mob/var
 	UnderdogNum
 	HeroicNum
 	SaiyanNum
+	BeastUnlocked
+
+	//
+	SaiyanFocus= "None"
 
 	list/demon_party = null
 	demon_party_cap = 0

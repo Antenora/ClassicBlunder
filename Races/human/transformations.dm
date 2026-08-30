@@ -55,11 +55,25 @@ transformation
 					form_icon_1.blend_mode=BLEND_MULTIPLY
 					form_icon_1.alpha=125
 					form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
+				if(user.HeroicNum>=2)
+					if(user.Hair_Base && !form_hair_icon)
+						var/icon/x=new(user.Hair_Base)
+						form_hair_icon=x
+						. = ..()
 			transform_animation(mob/user)
-				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=5)
-				spawn(5)
-					animate(user, color = null, time=5)
-				sleep(2)
+				if(user.HeroicNum>=2)
+					KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=70, Time = 45)
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1.5,0.9,0.1), time=5)
+					spawn(5)
+						spawn(50)
+							if(!user.HasKiControl()&&!user.PoweringUp)
+								user.Auraz("Remove")
+						animate(user, color = null, time=5)
+				else
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=5)
+					spawn(5)
+						animate(user, color = null, time=5)
+					sleep(2)
 		super_saiyan_3
 			form_aura_icon = 'AurasBig.dmi'
 			form_aura_icon_state = "SSJ2"
@@ -74,23 +88,42 @@ transformation
 			defenseadd = 0.25
 			strengthadd = 0.25
 			forceadd = 0.25
+			mastery_boons(mob/user)
+				if(user.BeastUnlocked)
+					passives = list("Hidden Potential" = 1, "PowerUpMastery" = 6)
+					speedadd = 0.4
+					enduranceadd = 0.4
+					offenseadd = 0.4
+					defenseadd = 0.4
+					strengthadd = 0.4
+					forceadd = 0.4
 			adjust_transformation_visuals(mob/user)
-				..()
-				form_icon_1 = image(user.Hair_SSJ3)
-				form_icon_1.blend_mode=BLEND_MULTIPLY
-				form_icon_1.alpha=125
-				form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
+				if(user.BeastUnlocked)
+					var/icon/x=new(user.Hair_Base)
+					form_hair_icon=x
+					. = ..()
+				else
+					..()
+					form_icon_1 = image(user.Hair_SSJ3)
+					form_icon_1.blend_mode=BLEND_MULTIPLY
+					form_icon_1.alpha=125
+					form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
 			transform_animation(mob/user)
-				sleep()
-				user.Quake(40)
-				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=10)
-				var/ShockSize=5
-				for(var/wav=5, wav>0, wav--)
-					KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=8)
-					ShockSize/=2
-				spawn(10)
-					animate(user, color = user.MobColor, time=30)
-				sleep(2)
+				if(user.BeastUnlocked)
+					if(first_time)
+						user.CutsceneMode()
+						user.BeastAnimation()
+				else
+					sleep()
+					user.Quake(40)
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=10)
+					var/ShockSize=5
+					for(var/wav=5, wav>0, wav--)
+						KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=8)
+						ShockSize/=2
+					spawn(10)
+						animate(user, color = user.MobColor, time=30)
+					sleep(2)
 		super_saiyan_4
 			pot_trans = 10
 			speedadd = 0.25

@@ -3,6 +3,15 @@ mob/proc/CheckAscCombo()
 		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension, src))
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension)
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension_MAX)
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Super_High_Tension)
+			src<<"You have unlocked High Tension!"
+	if(SaiyanNum>=2&&UnderdogNum>=2)
+		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage, src))
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage)
+			src<<"You have unlocked Super Saiyan Rage!"
+	if(SaiyanNum==3&&HeroicNum==3)
+		transUnlocked=3
+		src<<"You have unlocked Beast Mode!"
 /ascension/sub_ascension/human/heroic
 	passives = list("PowerUpMastery" = 2)
 	offense = 0.5
@@ -26,7 +35,7 @@ mob/proc/CheckAscCombo()
 		owner.CheckAscCombo()
 		..()
 /ascension/sub_ascension/human/saiyan
-	passives = list("ZenkaiPower" = 0.1)
+	passives = list("ZenkaiPower" = 0.25)
 	onAscension(mob/owner)
 		owner.SaiyanNum++
 		if(owner.SaiyanNum==1)

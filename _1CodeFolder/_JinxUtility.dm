@@ -859,23 +859,36 @@ mob
 		GetRecovMult()
 			return src.RecovMultTotal
 		GetStrTransMult()
-			var/STM=src.StrTransMult+src.passive_handler.Get("MagnifiedStr")
+			var/STM=src.StrTransMult+src.passive_handler.Get("MagnifiedStr")+GetUnderdogMult()
 			return STM
 		GetForTransMult()
-			var/FTM=src.ForTransMult+src.passive_handler.Get("MagnifiedFor")
+			var/FTM=src.ForTransMult+src.passive_handler.Get("MagnifiedFor")+GetUnderdogMult()
 			return FTM
 		GetEndTransMult()
-			var/ETM=src.EndTransMult+src.passive_handler.Get("MagnifiedEnd")
+			var/ETM=src.EndTransMult+src.passive_handler.Get("MagnifiedEnd")+GetUnderdogMult()
 			return ETM
 		GetSpdTransMult()
-			var/SpTM=src.SpdTransMult+src.passive_handler.Get("MagnifiedSpd")
+			var/SpTM=src.SpdTransMult+src.passive_handler.Get("MagnifiedSpd")+GetUnderdogMult()
 			return SpTM
 		GetOffTransMult()
-			var/OTM=src.OffTransMult+src.passive_handler.Get("MagnifiedOff")
+			var/OTM=src.OffTransMult+src.passive_handler.Get("MagnifiedOff")+GetUnderdogMult()
 			return OTM
 		GetDefTransMult()
-			var/DTM=src.DefTransMult+src.passive_handler.Get("MagnifiedDef")
+			var/DTM=src.DefTransMult+src.passive_handler.Get("MagnifiedDef")+GetUnderdogMult()
 			return DTM
+		GetUnderdogMult()
+			var/UDN=src.UnderdogNum
+			var/UDM=UDN*glob.racials.UNDERDOG_MULT
+			var/a=1
+			a=src.AngerCurveValue()
+			if(src.AngerMult>1)
+				var/ang=a-1
+				var/mult=ang*src.AngerMult
+				a=mult+1
+			if(src.AngerAdd)
+				a+=src.AngerAdd
+			var/total=a*UDM
+			return total
 
 
 		GetMA(stat)

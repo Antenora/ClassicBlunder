@@ -1,4 +1,26 @@
 /obj/Skills/Buffs/SlotlessBuffs/Racial/Human
+	Super_Saiyan_Rage
+		NeedsSSJ=1
+		ActiveMessage = "explodes with rage, pushing their Super Saiyan to its very limit!"
+		passives = list("EnergyLeak" = 0.25, "ZenkaiPower" = 0.25)
+		AngerMult=1.1
+		EnergyExpenditure=1.5
+		FlashChange=1
+		KenWave=3
+		KenWaveSize=0.5
+		KenWaveIcon='KenShockwaveGold.dmi'
+		adjust(mob/p)
+			passives = list("EnergyLeak" = 0.25, "ZenkaiPower" = 0.25)
+			if(p.SaiyanNum>=3)
+				passives = list("ZenkaiPower" = 0.25)
+				EnergyExpenditure=1
+				NeedsSSJ=null
+				if(!altered)
+					ActiveMessage = "explodes with power, focusing their Super Saiyan fury within their body!"
+			if(p.UnderdogNum>=3)
+				AngerMult=1.25
+		verb/Super_Saiyan_Rage()
+			src.Trigger(usr)
 	Deus_Ex_Machina
 		Cooldown = -1
 		passives = list("You Thought" = 1, "Hopes and Dreams" = 1)
@@ -80,9 +102,9 @@
 		OffMessage="closes their third eye."
 		adjust(mob/p)
 			if(p.CheckActive("Ki Control"))
-				passives = list("EnergyLeak" = -0.5, "PowerUpMastery" = 2)
+				passives = list("EnergyLeak" = -0.5, "PowerUpMastery" = 4)
 			else
-				passives = list("idk" = 1)
+				passives = list("EnergyGeneration" = 3)
 	High_Tension
 		TooMuchHealth = 90
 		HealthThreshold = 75
