@@ -108,7 +108,7 @@
 				passives = list("EnergyGeneration" = 2, "Godspeed" = 2, "Flicker" = 2, "Pursuer" = 2)
 	High_Tension
 		TooMuchHealth = 90
-		HealthThreshold = 75
+		NeedsHealth = 75
 		TimerLimit=10
 		FatigueHeal=5
 		EnergyHeal=50
@@ -118,7 +118,7 @@
 		OffMessage="releases their tremendous focus..."
 	High_Tension_MAX
 		TooMuchHealth = 65
-		HealthThreshold = 50
+		NeedsHealth = 50
 		TimerLimit=10
 		FatigueHeal=5
 		EnergyHeal=50
@@ -128,7 +128,7 @@
 		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 4, "PureDamage" = 2)
 	Super_High_Tension
 		TooMuchHealth = 35
-		HealthThreshold = 25
+		NeedsHealth = 25
 		TimerLimit=10
 		FatigueHeal=5
 		EnergyHeal=50
