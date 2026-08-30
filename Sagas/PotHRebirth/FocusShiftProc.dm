@@ -69,6 +69,9 @@ mob/proc/ActivateFocusShift(type, multiplier, timer, identity)
 		FocusShiftType = identity == "STR" ? "FOR" : "STR"
 	FocusShiftBoost = multiplier + (0 + bonusMult)
 	FocusShiftTimer = timer + (0 + bonusTime*2)
+	if(FocusShiftActive && passive_handler.Get("Fox Spirit")) // Fox Spirit Doubles boost, halves power
+		FocusShiftBoost = (multiplier + (0 + bonusMult)) * 2
+		FocusShiftTimer = (timer + (0 + bonusTime*2)) / 2
 	src << "<b>FocusShift activated!</b> (Type: [FocusShiftType]. Boost: [FocusShiftBoost])"
 	UpdateShiftAura(FocusShiftType)
 
