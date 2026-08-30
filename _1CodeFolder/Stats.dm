@@ -731,7 +731,7 @@ mob/var/tmp/rainbow_afterimage_index=0
 mob/var/tmp/rainbow_glow_from_color="#ff0000"
 mob/var/tmp/rainbow_glow_to_color="#ff0000"
 mob/var/tmp/rainbow_glow_transition_start=0
-mob/var/tmp/rainbow_glow_transition_time=10
+mob/var/tmp/rainbow_glow_transition_time=5
 
 mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the glow loops in sequence, so if it ever gets stopped due to something, the glow loop resumes shortly after
 	set waitfor = 0
@@ -762,7 +762,7 @@ mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the gl
 			rainbow_glow_from_color=currentColor
 			rainbow_glow_to_color=rainbow_colors[rainbow_glow_index]
 			rainbow_glow_transition_start=world.time
-			rainbow_glow_transition_time=10
+			rainbow_glow_transition_time=5
 
 			animate(F,color = rainbow_glow_to_color,time = rainbow_glow_transition_time)
 		sleep(rainbow_glow_transition_time)
@@ -784,7 +784,7 @@ mob/proc/RainbowGlowStuff()
 	rainbow_glow_from_color = "#ff0000"
 	rainbow_glow_to_color = "#ff0000"
 	rainbow_glow_transition_start = world.time
-	rainbow_glow_transition_time = 10
+	rainbow_glow_transition_time = 5
 	RainbowGlowLoop()
 
 mob/proc/CurrentPrismaticGlowColor()
