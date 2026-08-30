@@ -8,7 +8,7 @@
     OffMessage="calms their Saiyan rage..."
 
     adjust(mob/p)
-        var/asc = p.AscensionsAcquired
+        var/asc = p.SaiyanNum
         var/updog = p.UnderdogNum
         NeedsHealth = clamp(25 + ((asc * 2.5)+(updog*5)), 10, 40)
         TooMuchHealth = clamp(35 + ((asc * 2.5)+(updog*5)), 15, 90)
