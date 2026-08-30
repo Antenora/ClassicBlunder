@@ -48,7 +48,7 @@ obj
 			ForMult = 1.5
 			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
+			"AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "PowerUpMastery" = 1 , "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
 			KenWave=1
 			KenWaveIcon='SparkleRainbow.dmi'
@@ -72,11 +72,29 @@ obj
 							continue
 						party_names += "[m]"
 						WithYourPowersCombined+=1
-						//Extra Passive Zone
+						//Extra Passive Zone. Every participant's race give an extra passive for the user. not done yet
 						if(m.isRace(HUMAN))
 							ExP += list("Tenacity" = 2)
 						if(m.isRace(SAIYAN))
 							ExP += list("ZenkaiPower" = 0.5)
+						if(m.isRace(NAMEKIAN))
+							ExP += list("TechniqueMastery" = 1)
+						if(m.isRace(MAJIN))
+							ExP += list("ManaGeneration" = 2)
+						if(m.isRace(DEMON))
+							ExP += list("PureDamage" = 1)
+						if(m.isRace(ANGEL))
+							ExP += list("PureReduction" = 1)
+						if(m.isRace(WILDER))
+							ExP += list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5)
+						if(m.isRace(NOBODY))
+							ExP += list("CriticalDamage" = 0.25)
+						if(m.isRace(CHANGELING))
+							ExP += list("Juggernaut" = 0.5)
+						if(m.isRace(ELDRITCH))
+							ExP += list("Deflection" = 1, "DeathField" = 1)
+						if(m.isRace(POPO))
+							ExP += list("CashCow" = -5) // YOU OWE ME 5$
 					if(party_names.len)
 						var/fullparty = ""
 						if(party_names.len == 1)
@@ -104,7 +122,7 @@ obj
 				SpdMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				EndMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				RecovMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
-				passives = list("TechniqueMastery" = 2, "AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2)) + fP
+				passives = list("TechniqueMastery" = 2, "AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "PowerUpMastery" = 1+(pLv*1), "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2)) + fP
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)

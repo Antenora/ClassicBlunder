@@ -727,6 +727,12 @@ mob/var/HoldOn=0
 mob/var/tmp/rainbow_glow_loop_running = FALSE
 mob/var/tmp/rainbow_glow_index = 1
 
+mob/var/tmp/rainbow_afterimage_index=0
+mob/var/tmp/rainbow_glow_from_color="#ff0000"
+mob/var/tmp/rainbow_glow_to_color="#ff0000"
+mob/var/tmp/rainbow_glow_transition_start=0
+mob/var/tmp/rainbow_glow_transition_time=10
+
 mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the glow loops in sequence, so if it ever gets stopped due to something, the glow loop resumes shortly after
 	set waitfor = 0
 	if(rainbow_glow_loop_running)
@@ -736,18 +742,30 @@ mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the gl
 	while(src)
 		if(!src.passive_handler.Get("Prismatic"))
 			rainbow_glow_index = 1
-			sleep(30)
+			rainbow_glow_from_color = "#ff0000"
+			rainbow_glow_to_color = "#ff0000"
+			sleep(rainbow_glow_transition_time)
 			continue
 		var/F = filters["prismatic"]
 		if(!F)
 			RainbowGlowStuff()
 			F = filters["prismatic"]
 		if(F)
+			var/currentColor=CurrentPrismaticGlowColor()
+			if(!currentColor)
+				currentColor=F:color
+
 			rainbow_glow_index++
 			if(rainbow_glow_index > rainbow_colors.len)
 				rainbow_glow_index = 1
-			animate(F,color = rainbow_colors[rainbow_glow_index],time = 30)
-		sleep(30)
+
+			rainbow_glow_from_color=currentColor
+			rainbow_glow_to_color=rainbow_colors[rainbow_glow_index]
+			rainbow_glow_transition_start=world.time
+			rainbow_glow_transition_time=10
+
+			animate(F,color = rainbow_glow_to_color,time = rainbow_glow_transition_time)
+		sleep(rainbow_glow_transition_time)
 
 mob/proc/RainbowGlowStuff()
 	if(!src.passive_handler.Get("Prismatic"))
@@ -763,7 +781,30 @@ mob/proc/RainbowGlowStuff()
 	GlowFilter = filters["prismatic"]
 	filters += filter(name = "trail",type = "motion_blur",x = 0,y = 0)
 	rainbow_glow_index = 1
+	rainbow_glow_from_color = "#ff0000"
+	rainbow_glow_to_color = "#ff0000"
+	rainbow_glow_transition_start = world.time
+	rainbow_glow_transition_time = 10
 	RainbowGlowLoop()
+
+mob/proc/CurrentPrismaticGlowColor()
+	var/F=filters["prismatic"]
+	if(!F)
+		return null
+	if(!rainbow_glow_from_color || !rainbow_glow_to_color)
+		return F:color
+
+	var/list/fromColor=rgb2num(rainbow_glow_from_color)
+	var/list/toColor=rgb2num(rainbow_glow_to_color)
+	if(!fromColor || !toColor)
+		return F:color
+
+	var/progress=clamp((world.time-rainbow_glow_transition_start)/max(rainbow_glow_transition_time,1),0,1)
+	var/r=round(fromColor[1]+((toColor[1]-fromColor[1])*progress))
+	var/g=round(fromColor[2]+((toColor[2]-fromColor[2])*progress))
+	var/b=round(fromColor[3]+((toColor[3]-fromColor[3])*progress))
+
+	return rgb(r,g,b)
 
 
 mob/proc/
