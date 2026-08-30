@@ -722,15 +722,16 @@ mob
 				var/drain = 1/src.passive_handler.Get("BeamHoldMastery")
 				src.BeamHoldTimer-=1
 				src.LoseEnergy(drain)
+				if(src.BeamHoldTimer == 0)
+					src.BeamHoldID = null
+					src.BeamHoldCharge = 0
+					src << "You can't hold your beam charge any longer!"
 				if(Energy < 20-(src.passive_handler.Get("BeamHoldMastery")*2))
 					src.BeamHoldTimer = 0
 					src.BeamHoldID = null
 					src.BeamHoldCharge = 0
 					src << "You don't have enough energy to keep holding onto your charge!"
-				if(src.BeamHoldTimer == 0)
-					src.BeamHoldID = null
-					src.BeamHoldCharge = 0
-					src << "You can't hold your beam charge any longer!"
+
 
 			//FocusShift stuff
 			if(src.FocusShiftActive)
