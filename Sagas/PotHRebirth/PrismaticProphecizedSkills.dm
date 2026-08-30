@@ -378,6 +378,7 @@ obj
 				else
 					DamageMult=0.3 + (benefit/10)
 					IconSize=1+benefit
+				BeamTailStart=IconSize
 				var/b = min(max(benefit, 0), 1)
 				var/efrac = p.EnergyMax > 0 ? min(p.Energy / p.EnergyMax, 1) : 0
 				var/spend = p.Energy * 0.25 * b

@@ -281,13 +281,17 @@ proc/BeamTurnState(din, dout)
 		p.step_y = oy
 		p.dir = bdir
 		p.bm_laid = bdir
-		p.layer = (i == parts.len) ? 5 : 4
+		p.layer = (i == parts.len) ? 5 : (i == 1 ? 4.5 : 4)
 		p.icon_state = PartState(i)
 		p.Distance = max(1, maxlen - (travelled + i - 1))
 		if(victor || win_mult != 1) StampPart(p) //riders follow whichever part is the head now
 		if(was != T) PartMoved(p, was)
 		if(i != parts.len && p._fx_glowed) p._fx_glowed = 0
-		var/turf/nx = get_step(T, bdir)
+		var/turf/nx = T // modified bit to auto set beam spacing. though this needs to be modified per-beam since different beams have different icon sizes
+		var/spacing = (i == 1 && parts.len > 1) ? max(1, round(skill.BeamTailStart)) : 1
+		for(var/j = 1, j <= spacing, j++)
+			nx = get_step(nx,bdir)
+			if(!nx) break
 		if(i == parts.len && HeadStopped(p, nx)) blocked = 1
 		T = nx
 	laid_dir = bdir //what the hijack check compares against next tick
@@ -316,7 +320,7 @@ proc/BeamTurnState(din, dout)
 		p.step_y = oy
 		p.dir = din
 		p.bm_laid = din
-		p.layer = (i == parts.len) ? 5 : 4
+		p.layer = (i == parts.len) ? 5 : (i == 1 ? 4.5 : 4)
 		p.icon_state = PathState(p, i, din, dout)
 		p.Distance = max(1, maxlen - (travelled + i - 1))
 		if(victor || win_mult != 1) StampPart(p)

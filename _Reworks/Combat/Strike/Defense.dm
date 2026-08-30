@@ -86,7 +86,7 @@ mob/proc/ChargeStart()
 	if(grabbed || istype(loc, /mob)) return
 	if(Beaming || BusterCharging || PoweringUp || Guarding) return
 	if(icon_state == "Meditate") return
-	if(Energy >= 100 - TotalFatigue) return
+	//if(Energy >= 100 - TotalFatigue) return   -- disabling so you can charge even at full energy for the sake of Power Stress activation
 	ChargingEnergy = 1
 	charge_started_at = world.time
 	charge_hits_taken = 0
