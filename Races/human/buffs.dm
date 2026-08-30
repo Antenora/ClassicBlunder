@@ -20,6 +20,7 @@
 			if(p.UnderdogNum>=3)
 				AngerMult=1.25
 		verb/Super_Saiyan_Rage()
+			set category="Skills"
 			src.Trigger(usr)
 	Deus_Ex_Machina
 		Cooldown = -1
