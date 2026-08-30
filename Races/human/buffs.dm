@@ -104,7 +104,7 @@
 			if(p.CheckActive("Ki Control"))
 				passives = list("EnergyLeak" = -0.5, "PowerUpMastery" = 4)
 			else
-				passives = list("EnergyGeneration" = 3)
+				passives = list("EnergyGeneration" = 2, "Godspeed" = 2, "Flicker" = 2, "Pursuer" = 2)
 	High_Tension
 		TooMuchHealth = 90
 		HealthThreshold = 75

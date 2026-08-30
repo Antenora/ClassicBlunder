@@ -9,6 +9,7 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
+			choices = list("Power" = /ascension/sub_ascension/saiyan/power, "Control" =  /ascension/sub_ascension/saiyan/control)
 			anger = 0.25
 			strength = 0.25
 			force = 0.25
