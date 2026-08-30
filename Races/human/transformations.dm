@@ -166,6 +166,75 @@ transformation
 				previousTailUnderlayIcon = null
 				previousTailWrappedIcon = null
 				user.Tail(1)
+		super_full_power_saiyan_4_limit_breaker
+			unlock_potential = 100
+			pot_trans = 15
+			angerFloor = 60
+			speedadd = 0.25
+			enduranceadd = 0.25
+			offenseadd = 0.25
+			defenseadd = 0.25
+			strengthadd = 0.25
+			forceadd = 0.25
+			var/previousTailIcon
+			var/previousTailUnderlayIcon
+			var/previousTailWrappedIcon
+			var/tailIcon = 'saiyantail_ssj4.dmi'
+			var/tailUnderlayIcon = 'saiyantail_ssj4_under.dmi'
+			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
+			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
+			form_icon_1_layer = FLOAT_LAYER-3
+			adjust_transformation_visuals(mob/user)
+				if(!form_hair_icon&&user.Hair_Base)
+					var/icon/x=new(user.Hair_Base)
+					if(x)
+						x.Blend(rgb(150,-10,-10),ICON_ADD)
+				..()
+
+			transform(mob/user)
+				. = ..()
+				previousTailIcon = user.TailIcon
+				previousTailUnderlayIcon = user.TailIconUnderlay
+				previousTailWrappedIcon = user.TailIconWrapped
+				user.TailIcon = tailIcon
+				user.TailIconUnderlay = tailUnderlayIcon
+				user.TailIconWrapped = tailWrappedIcon
+				user.Tail(1)
+
+			revert(mob/user)
+				. = ..()
+				if(!is_active || !user.CanRevert()) return
+				user.TailIcon = previousTailIcon
+				user.TailIconUnderlay = previousTailUnderlayIcon
+				user.TailIconWrapped = previousTailWrappedIcon
+				previousTailIcon = null
+				previousTailUnderlayIcon = null
+				previousTailWrappedIcon = null
+				user.Tail(1)
+
+			transform_animation(mob/user)
+				user.Quake(40)
+				user.Frozen=1
+				KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=10)
+				for(var/turf/t in Turf_Circle(user, 18))
+					if(prob(50))
+						spawn(rand(2,6))
+							var/icon/i = icon('RisingRocks.dmi')
+							t.overlays+=i
+							spawn(rand(20, 60))
+								t.overlays-=i
+				spawn(10)
+					KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=10)
+				user.Frozen=0
+				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=20)
+				sleep(20)
+
+				var/ShockSize = 5
+				for(var/wav=5, wav>0, wav--)
+					KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=10)
+					ShockSize/=2
+				spawn(10)
+					animate(user, color = user.MobColor, time=20)
 /*		high_tension
 			passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.25,"TechniqueMastery"=1)
 			pot_trans = 2

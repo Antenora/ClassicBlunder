@@ -33,6 +33,8 @@ mob/proc/CheckAscCombo()
 	onAscension(mob/owner)
 		owner.UnderdogNum++
 		owner.CheckAscCombo()
+		if(owner.UnderdogNum==4)
+			owner.passive_handler.Increase("EndlessAnger", 1)
 		..()
 /ascension/sub_ascension/human/saiyan
 	passives = list("ZenkaiPower" = 0.25)
@@ -49,6 +51,8 @@ mob/proc/CheckAscCombo()
 			owner.transUnlocked=3
 		if(owner.SaiyanNum==5)
 			owner.transUnlocked=4
+		if(owner.SaiyanNum==6)
+			owner.transUnlocked=5
 		owner.CheckAscCombo()
 		..()
 
