@@ -133,7 +133,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		LockY=-32
 		passives = list("HybridStyle" = "MysticStyle", "Amplify" = 3, "Familiar" = 3, "Harden" = 2, "Godspeed" = 1.5,\
                        "Erosion" = 0.15, "Deterioration" = 1, "WaveDancer" = 2,  "ManaGeneration"=3,\
-                       "Burning" = 2, "Freezing" = 2, "Shocking" = 2, "Shattering" = 2, "PUSpike" = 50)/*This should bridge the gap between grappling/sword/martial without being too bad to fight against.
+                       "Burning" = 2, "Freezing" = 2, "Shocking" = 2, "Shattering" = 2, "PUSpike" = 50, "BeamHoldMastery" = 1)/*This should bridge the gap between grappling/sword/martial without being too bad to fight against.
                                                                                         Should. Might need to finetune it because I'm not super familiar with magic shenanigans*/
 		StyleActive = "Aetherial Flow"
 		StyleFor = 1.5
@@ -164,7 +164,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		LockY=-32
 		passives = list("HybridStyle" = "UnarmedStyle", "Momentum" = 3, "Fa Jin" = 3, "Deflection" = 1.5, \
                        "CounterMaster" = 2.5, "Interception" = 3, "Harden" = 2, "Godspeed" = 2, "Fury" = 2, "Parry" = 2, \
-                       "Sunyata" = 2, "Reversal" = 1, "PUSpike" = 50)//Hey, it's me, goku.
+                       "Sunyata" = 2, "Reversal" = 1, "PUSpike" = 50, "BeamHoldMastery" = 1)//Hey, it's me, goku.
 		StyleActive = "Heavenly Palm"
 		StyleStr = 1.4
 		StyleSpd = 1.6

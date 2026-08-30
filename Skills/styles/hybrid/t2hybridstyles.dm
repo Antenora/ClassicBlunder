@@ -24,11 +24,11 @@
 		StyleComboUnlock = list("/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker" = "/obj/Skills/Buffs/NuStyle/UnarmedStyle/Twin_Dragon_Fire")
 		StyleActive="Ifrit Jambe"
 		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
-						"Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1)
+						"Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1, "BeamHoldMastery" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
-				"Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1)
+				"Combustion" = 40, "Scorching" = 5, "Shattering" = 7,  "SweepingStrike" = 1, "BeamHoldMastery" = 1)
 		verb/Ifrit_Jambe()
 			set hidden=1
 			src.Trigger(usr)
@@ -94,7 +94,7 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle/Art_of_Order// mystic+armed
 	SignatureTechnique=2
 	passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalDamage"= 0.05,  "ThunderHerald" = 1, \
-					"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2)
+					"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BeamHoldMastery" = 1)
 	// crits deal an extra amount based on the enemy's max health
 	StyleSpd = 1.3
 	StyleOff = 1.15
@@ -108,7 +108,7 @@
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi",\
 		"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade")
 		passives = list("HybridStyle" = "MysticStyle", "Wuju" = 1, "CriticalDamage"= 0.05,  "ThunderHerald" = 1, \
-					"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2)
+					"Flicker" = 1, "Fury" = 2.5, "Iaijutsu" = 2, "BeamHoldMastery" = 1)
 
 	verb/Art_of_Order()
 		set hidden=1
@@ -116,7 +116,7 @@
 /obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama// mystic+armed
 	SignatureTechnique=2
 	passives = list("HybridStyle" = "MysticStyle",  "CriticalDamage"= 0.05,  "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
-					"Heavy Strike" = "Inferno", "Persistence" = 0.5, "BurnHit" = 0.5)
+					"Heavy Strike" = "Inferno", "Persistence" = 0.5, "BurnHit" = 0.5, "BeamHoldMastery" = 1)
 	// crits deal an extra amount based on the enemy's max health
 	StyleStr = 1.45
 	StyleFor = 1.3
@@ -136,7 +136,7 @@
 		StyleComboUnlock=list("/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"="/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath",\
 		"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Magma_Walker"="/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi")
 		passives = list("HybridStyle" = "MysticStyle",  "CriticalDamage"= 0.05,  "DemonicInfusion" = 1, "Combustion" = 40, "Scorching" = 5,\
-					"Heavy Strike" = "Inferno", "Persistence" = 0.5, "BurnHit" = 0.5)
+					"Heavy Strike" = "Inferno", "Persistence" = 0.5, "BurnHit" = 0.5, "BeamHoldMastery" = 1)
 	Trigger(mob/User, Override)
 		if(!demonSkill)
 			var/inp = input(User, "What demon skill do you want?") in list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat")
