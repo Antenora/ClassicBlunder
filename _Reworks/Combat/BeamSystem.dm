@@ -288,7 +288,7 @@ proc/BeamTurnState(din, dout)
 		if(was != T) PartMoved(p, was)
 		if(i != parts.len && p._fx_glowed) p._fx_glowed = 0
 		var/turf/nx = T // modified bit to auto set beam spacing. though this needs to be modified per-beam since different beams have different icon sizes
-		var/spacing = (i == 1 && parts.len > 1) ? max(1, round(skill.BeamTailStart)) : 1
+		var/spacing = max(1, round(skill.BeamTailStart))
 		for(var/j = 1, j <= spacing, j++)
 			nx = get_step(nx,bdir)
 			if(!nx) break

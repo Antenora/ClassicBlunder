@@ -374,10 +374,10 @@ obj
 					return
 				if(usr.CheckSpecial("Hyperdeath Mode"))
 					DamageMult=0.6 + (benefit/10)
-					IconSize=1+(benefit*5)
+					IconSize=round(1+(benefit*5))
 				else
 					DamageMult=0.3 + (benefit/10)
-					IconSize=1+benefit
+					IconSize=round(1+benefit)
 				BeamTailStart=IconSize
 				var/b = min(max(benefit, 0), 1)
 				var/efrac = p.EnergyMax > 0 ? min(p.Energy / p.EnergyMax, 1) : 0
