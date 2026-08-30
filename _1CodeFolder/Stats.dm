@@ -479,8 +479,6 @@ atom/proc/CheckDirection(var/mob/M)
 			. = "South East"
 		if(SOUTHWEST)
 			. = "South West"
-
-globalTracker/var/MOVEMENT_MASTERY_DIVISOR = 5//TODO between wipes: move this to MovementMastery.dm
 //actually more of a mult than a divisor nowadays but whatever we don't rename things mid wipe
 
 
@@ -494,7 +492,7 @@ mob/proc/GetPowerUpRatio()
 
 	Ratio += PowerUp
 	if(PowerUp>0)
-		Ratio += GetMovementMastery()
+		Ratio += GetPowerUpMastery()
 
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
@@ -516,7 +514,7 @@ mob/proc/GetPowerUpRatioVisble()
 	if(CheckSpecial("Overdrive")) PowerUp+=1
 	Ratio += PowerUp
 	if(PowerUp)
-		Ratio += GetMovementMastery()
+		Ratio += GetPowerUpMastery()
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
 			Ratio=1
@@ -842,7 +840,7 @@ mob/proc/
 				RainbowGlowStuff()
 		var/EPM=Power_Multiplier;
 		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
-			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
+			EPM += (ActiveBuff.PowerMult-1) * (1+GetPowerUpMastery())
 
 		if(src.PowerEroded)
 			EPM-=src.PowerEroded

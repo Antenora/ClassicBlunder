@@ -1,5 +1,10 @@
+mob/proc/CheckAscCombo()
+	if(HeroicNum>=2&&UnderdogNum>=2)
+		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension, src))
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension)
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension_MAX)
 /ascension/sub_ascension/human/heroic
-	passives = list("MovementMastery" = 2)
+	passives = list("PowerUpMastery" = 2)
 	offense = 0.5
 	strength = 0.5
 	force = 0.5
@@ -9,12 +14,16 @@
 	growthadd= 0.25
 	onAscension(mob/owner)
 		owner.HeroicNum++
+		if(owner.HeroicNum==4)
+			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Third_Eye)
+		owner.CheckAscCombo()
 		..()
 /ascension/sub_ascension/human/underdog
 	anger = 0.1
 	passives = list("Tenacity" = 2, "UnderDog" = 1)
 	onAscension(mob/owner)
 		owner.UnderdogNum++
+		owner.CheckAscCombo()
 		..()
 /ascension/sub_ascension/human/saiyan
 	passives = list("ZenkaiPower" = 0.1)
@@ -22,7 +31,7 @@
 		owner.SaiyanNum++
 		if(owner.SaiyanNum==1)
 			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
-			owner.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
+			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
 		if(owner.SaiyanNum==2)
 			owner.transUnlocked=1
 		if(owner.SaiyanNum==3)
@@ -31,6 +40,7 @@
 			owner.transUnlocked=3
 		if(owner.SaiyanNum==5)
 			owner.transUnlocked=4
+		owner.CheckAscCombo()
 		..()
 
 

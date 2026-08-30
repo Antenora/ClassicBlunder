@@ -301,7 +301,7 @@ NEW VARIABLES
 	var/Vanishing//make invisible and autocombo
 	var/UnarmedDamage
 	var/SpiritualDamage
-	var/MovementMastery//1.x is added to effective PU percent.
+	var/PowerUpMastery//1.x is added to effective PU percent.
 //Defense stuff
 	var/KBMult//Adds KB Mult to everything.
 	var/KBRes//Sets knockback resistance.
@@ -1906,7 +1906,7 @@ NEW VARIABLES
 			ForMult=1.2
 			EndMult=1.3
 			SpdMult=1.3
-			MovementMastery=8
+			PowerUpMastery=8
 			passives = list( "Flicker" = 2)
 			PUSpeedModifier=2
 			Flicker=2
@@ -2806,7 +2806,7 @@ NEW VARIABLES
 				OffMult=1.5
 				DefMult=1.5
 				passives = list( "TechniqueMastery" = 10, "WeaponBreaker" = 3,  "Reversal" = 1, "MovingCharge" = 1, "MartialMagic" = 1, "SuperDash" = 1, "Pursuer" = 1, "Flicker" = 1, "GodKi" = 1)
-				MovementMastery=10
+				PowerUpMastery=10
 				Instinct=3
 				WeaponBreaker=3
 				Reversal=5
@@ -3317,12 +3317,12 @@ NEW VARIABLES
 						src.NoTopOverlay=0
 			Bronze_Cloth
 				PUSpeedModifier=0.5
-				MovementMastery=5
+				PowerUpMastery=5
 				ArmorClass="Light"
 				ArmorAscension=1
 				adjustments(mob/player)
 					if(!altered)
-						MovementMastery = player.SagaLevel * 1.25
+						PowerUpMastery = player.SagaLevel * 1.25
 				Pegasus_Cloth
 					StrMult=1.25
 					SpdMult=1.5
@@ -3452,12 +3452,12 @@ NEW VARIABLES
 						src.Trigger(usr)
 
 			Bronze_Cloth_V2
-				MovementMastery=10
+				PowerUpMastery=10
 				ArmorClass="Medium"
 				ArmorAscension=2
 				HairLock=1
 				adjustments(mob/player)
-					MovementMastery = player.SagaLevel * 2
+					PowerUpMastery = player.SagaLevel * 2
 					// Hustle = 1 + (player.SagaLevel * 0.25)
 				Pegasus_Cloth
 					StrMult=1.5
@@ -3602,7 +3602,7 @@ NEW VARIABLES
 						src.NoTopOverlay=0
 						src.Trigger(usr)
 			Gold_Cloth
-				MovementMastery=20
+				PowerUpMastery=20
 				SpaceWalk=1//gold
 				StaticWalk=1
 				ArmorClass="Heavy"
@@ -7412,7 +7412,7 @@ NEW VARIABLES
 			SignatureTechnique=3
 			SpecialSlot=1
 			passives = list( "TechniqueMastery" = 5,  "ManaLeak" = 1)
-			MovementMastery=5
+			PowerUpMastery=5
 			BuffMastery=5
 			ManaThreshold=1
 			ManaLeak=1
@@ -11540,7 +11540,7 @@ NEW VARIABLES
 			Punishment_of_Demons
 				AlwaysOn=1
 				AngerFloor=50
-				MovementMastery=-3
+				PowerUpMastery=-3
 				ActiveMessage="experiences the suffering of Demon Realm - boundless fury leading into peril!"
 				KenWave=1
 				KenWaveSize=1

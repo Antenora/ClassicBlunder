@@ -74,10 +74,42 @@
 				usr.DoubleHelix=0
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human //wip
 	Third_Eye
-		ABuffNeeded=list("Ki Control")
+		ABBuffer=1
+		Cooldown=10
+		ActiveMessage="opens their third eye!"
+		OffMessage="closes their third eye."
+		adjust(mob/p)
+			if(p.CheckActive("Ki Control"))
+				passives = list("EnergyLeak" = -0.5, "PowerUpMastery" = 2)
+			else
+				passives = list("idk" = 1)
 	High_Tension
+		TooMuchHealth = 90
+		HealthThreshold = 75
 		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 2, "PureDamage" = 1)
+		ActiveMessage="Psyches themselves up! -- Tension Up!"
+		OffMessage="releases their tremendous focus..."
 	High_Tension_MAX
+		TooMuchHealth = 65
+		HealthThreshold = 50
 		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		ActiveMessage="Psyches themselves up! -- Tension Max!"
+		OffMessage="releases their tremendous focus..."
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 4, "PureDamage" = 2)
 	Super_High_Tension
+		TooMuchHealth = 35
+		HealthThreshold = 25
 		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		ActiveMessage="Psyches themselves up! -- Super Tension Up!"
+		OffMessage="releases their tremendous focus..."
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 6, "PureDamage" = 3)

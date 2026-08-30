@@ -7,6 +7,7 @@ transformation
 			form_glow_icon = 'Ripple Radiance.dmi'
 			form_glow_x = -32
 			form_glow_y = -32
+			pot_trans = 5
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -35,6 +36,7 @@ transformation
 			form_aura_icon_state = "SSJ2"
 			form_aura_x = -32
 			form_icon_2_icon = 'SS2Sparks.dmi'
+			pot_trans = 5
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -65,6 +67,7 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
+			pot_trans = 10
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -89,6 +92,7 @@ transformation
 					animate(user, color = user.MobColor, time=30)
 				sleep(2)
 		super_saiyan_4
+			pot_trans = 10
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25

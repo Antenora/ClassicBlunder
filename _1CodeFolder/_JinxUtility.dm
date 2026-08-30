@@ -164,7 +164,7 @@ mob
 				if(src.GetPowerUpRatio()>1)
 
 					var/PowerUpPercent=GetPowerUpRatio()-1
-					PowerUpPercent -= GetMovementMastery();
+					PowerUpPercent -= GetPowerUpMastery();
 
 					if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 						PowerUpPercent=0
@@ -209,7 +209,7 @@ mob
 			val*=src.EnergyExpenditure//*src.Power_Multiplier
 			if(GetPowerUpRatio()>1 && !GatesActive)
 				var/PowerUpPercent=GetPowerUpRatio()-1
-				PowerUpPercent -= GetMovementMastery();
+				PowerUpPercent -= GetPowerUpMastery();
 				if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 					PowerUpPercent=0
 
