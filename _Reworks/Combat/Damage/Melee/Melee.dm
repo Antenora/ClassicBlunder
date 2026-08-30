@@ -581,6 +581,8 @@
 		// 				MELEE COUNTER END		//
 
 		// 				HIT RESOLUTION 			//
+				if(hitResolution == HIT && FocusShiftActive && passive_handler.Get("Fox Spirit"))
+					hitResolution = WHIFF
 
 				if(enemy.Stunned)
 					hitResolution = HIT
