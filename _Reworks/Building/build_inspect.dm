@@ -246,14 +246,9 @@ mob/Mapper/verb/Build_Options()
 			usr.IgnoreFlyOver = !usr.IgnoreFlyOver
 			usr << "Fly through [usr.IgnoreFlyOver ? "ON" : "OFF"]."
 		else if(findtext(choice, "Binoculars"))
-			if(!usr.Bino)
-				usr.client.view = "69x69"
-				usr.Bino = 1
-				usr << "Binoculars ON."
-			else
-				usr.client.FitViewNow()
-				usr.Bino = 0
-				usr << "Binoculars OFF."
+			usr.Bino = !usr.Bino
+			usr.client.FitViewNow()
+			usr << "Binoculars [usr.Bino ? "ON" : "OFF"]."
 		else if(findtext(choice, "Invisibility"))
 			if(usr.AdminInviso)
 				usr << "<font color='red'>You are no longer invisible.</font color>"

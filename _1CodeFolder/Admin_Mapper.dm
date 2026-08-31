@@ -1,18 +1,26 @@
+/proc/MapperRoofSweep(mob/M, onlyCkey)
+	set waitfor = FALSE
+	set background = TRUE
+	var/list/snap = CustomTurfs.Copy()
+	var/n = 0
+	var/hit = 0
+	for(var/turf/CustomTurf/T in snap)
+		n++
+		if(n % 400 == 0)
+			sleep(-1)
+		if(onlyCkey && T.Builder != onlyCkey)
+			continue
+		T.FlyOverAble = T.Roof ? FALSE : TRUE
+		hit++
+	M << "Roof pass done: [hit] custom turfs updated."
+
 /mob/Admin3/verb/ADMINSetallRoofsToDense()
 	set category="Mapper"
-	for(var/turf/CustomTurf/T in world)
-		if(T.Roof)
-			T.FlyOverAble = FALSE
-		else
-			T.FlyOverAble = TRUE
+	MapperRoofSweep(usr, null)
 
 /mob/Mapper/verb/SetallRoofsToDense()
-	for(var/turf/CustomTurf/T in world)
-		if(T.Builder == src.ckey)
-			if(T.Roof)
-				T.FlyOverAble = FALSE
-			else
-				T.FlyOverAble = TRUE
+	set category="Mapper"
+	MapperRoofSweep(usr, usr.ckey)
 
 mob
 	var

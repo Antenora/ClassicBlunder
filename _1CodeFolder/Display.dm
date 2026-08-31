@@ -1,23 +1,21 @@
-#define DISPLAY_ZOOM_ON 2       // zoom when the player's Zoom 2x option is on; off = 1x (native)
+#define DISPLAY_ZOOM_ON 2
 #define DISPLAY_MIN_VIEW 7
 #define DISPLAY_BASE_MAX_VIEW 31
-// bottom HUD's native width in view px: SkillHUD's SHUD_ORB_LEFT_X..SHUD_ORB_RIGHT_X+SHUD_ORB_D
-// (-267..267). Keep in sync if the orb layout moves.
 #define DISPLAY_HUD_SPAN 534
+#define DISPLAY_BINO_TILE_BUDGET 4800
 
 #define FPS_PLAYER_MIN 10
 #define FPS_PLAYER_MAX 240
 
-var/CLIENT_FPS_DEFAULT = 100 //client render rate; server tick stays world.fps
+var/CLIENT_FPS_DEFAULT = 100
 
 mob/proc/EffectiveClientFPS()
 	if(ChosenFPS >= FPS_PLAYER_MIN && ChosenFPS <= FPS_PLAYER_MAX) return ChosenFPS
-	return CLIENT_FPS_DEFAULT // unset or out-of-band save = default
+	return CLIENT_FPS_DEFAULT
 
-// the one place a player FPS choice gets stored. 0 = back to the default
 mob/proc/SetClientFPS(n)
 	ChosenFPS = (n > 0) ? clamp(round(n), FPS_PLAYER_MIN, FPS_PLAYER_MAX) : 0
-	if(client && world.time >= _fps_hold_until) // don't break an active hit-stop freeze
+	if(client && world.time >= _fps_hold_until)
 		client.fps = EffectiveClientFPS()
 	return EffectiveClientFPS()
 
@@ -36,6 +34,14 @@ client/proc/CurrentZoom()
 	return getPref("zoom2x") ? DISPLAY_ZOOM_ON : 1
 
 client/proc/EffectiveZoom(pw = 0)
+	if(mob?.Bino)
+		var/list/bparts = splittext(winget(src, "mapwindow.map", "size"), "x")
+		if(bparts.len >= 2)
+			var/bw = text2num(bparts[1])
+			var/bh = text2num(bparts[2])
+			if(bw && bh)
+				return min(1, sqrt((bw * bh) / (world.icon_size * world.icon_size * DISPLAY_BINO_TILE_BUDGET)))
+		return 0.5
 	var/z = CurrentZoom()
 	if(z <= 1) return 1
 	if(!pw)
@@ -75,11 +81,10 @@ client/proc/ApplyZoomPref()
 	if(!mob) return
 	var/z = EffectiveZoom()
 	ApplyMapZoom(z)
-	if(z < CurrentZoom()) 
+	if(z < CurrentZoom() && !mob?.Bino)
 		src << "Zoom 2x needs a wider game window, showing 1x until there's room for the HUD."
 	FitViewNow()
 
-// alpha-0 plane master blanks the whole HUD plane without touching any element's own state
 /atom/movable/cutscene_hud_hider
 	plane = HUD_PLANE
 	appearance_flags = PLANE_MASTER
@@ -87,7 +92,6 @@ client/proc/ApplyZoomPref()
 	screen_loc = "1,1"
 	mouse_opacity = 0
 
-// cutscenes
 client/proc/SetupCutsceneDisplay()
 	view_fit_enabled = FALSE
 	view_fit_last_zoom = 0
@@ -111,7 +115,6 @@ client/proc/EndCutsceneDisplay()
 	CutsceneApplyFx()
 	FitViewNow()
 
-// turn bloom off for cutscenes
 client/proc/CutsceneApplyFx()
 	if(client_plane_master) CpmApply(src) 
 	else FxApplyBloom(src)                
@@ -128,7 +131,6 @@ client/proc/QueueViewFit()
 		view_fit_queued = FALSE
 		FitViewNow()
 
-// display change fix
 client/proc/StartViewFitWatchdog()
 	if(view_fit_watching) return
 	view_fit_watching = TRUE
@@ -154,21 +156,21 @@ client/proc/FitViewNow()
 	view_fit_last_pw = pw
 	view_fit_last_ph = ph
 	var/z = EffectiveZoom(pw)
-	if(z != view_fit_last_zoom) // pane crossed the width the HUD needs at 2x
+	if(z != view_fit_last_zoom)
 		ApplyMapZoom(z)
 	var/tile = world.icon_size * z
 	var/cap = mob.MaxViewCap()
 	var/pref = mob.UserMaxView()
-	var/zmul = DISPLAY_ZOOM_ON / z          // caps stay in 2x reference tiles
+	var/zmul = DISPLAY_ZOOM_ON / z
 	var/maxtiles = (pref ? min(pref, cap) : cap) * zmul
 	var/tw = min(max(round(pw / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
 	var/th = min(max(round(ph / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
 	view = "[tw]x[th]"
 	GfxResizeScreenOverlays(src, pw, ph)
 	PositionSkillHUD()
-	Hd2dApplyClient(src) // shaft transform + farblur masks re-fit to the new view
-	PositionCharacterCard() // re-anchor card to new view height, no-op if no card
-	if(party_invite_from) ShowPartyInvite(party_invite_from) // re-center an open invite prompt on resize
+	Hd2dApplyClient(src)
+	PositionCharacterCard()
+	if(party_invite_from) ShowPartyInvite(party_invite_from)
 
 var/list/_disp_icon_dims = list()
 proc/_DispIconDims(f)

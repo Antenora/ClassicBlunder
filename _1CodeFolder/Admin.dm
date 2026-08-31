@@ -2784,7 +2784,7 @@ datum/Topic(A, B[])
 		var/list/options = list("Number", "Text", "File", "Null")
 		if(usr.Admin)
 			options += list("Type", "Reference", "List", "New Matrix", "Color Matrix", "New Type")
-		if(istype(src, /datum))
+		if(istype(src, /datum) && hascall(usr, "Edit"))
 			options += "Open Edit Sheet"
 		class = input("[variable]: Select type", "") as null|anything in options
 		if (!class) return
