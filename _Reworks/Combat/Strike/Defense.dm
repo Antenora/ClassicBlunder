@@ -5,6 +5,7 @@ mob/var/tmp
 	charge_started_at = 0
 	charge_hits_taken = 0
 	charge_lockout_until = 0
+	charge_power_stress = 0
 
 mob/proc/IsGuarding()
 	return Guarding
@@ -35,6 +36,9 @@ mob/Players
 			src.ChargeStop()
 
 mob/proc/GuardStart()
+	if(CancelChargingBeam())
+		return
+
 	if(Guarding) return
 	if(KO || Stunned || Launched || Knockbacked || Suspended || Stasis || Frozen || TimeFrozen || Airborne) return
 	if(grabbed || istype(loc, /mob)) return
@@ -52,7 +56,7 @@ mob/proc/GuardStop(broken = 0)
 	FlashGuardPlate(broken ? 2 : 0)
 	if(broken)
 		guard_broken_until = world.time + glob.GUARD_BREAK_DS
-		GuardMeter = 0	
+		GuardMeter = 0
 		flick("KB", src)
 		KenShockwave(src, Size = 1, Time = 4)
 		src.Earthquake(8, -4,4,-4,4, 0, 0)
@@ -85,7 +89,7 @@ mob/proc/ChargeStart()
 	if(grabbed || istype(loc, /mob)) return
 	if(Beaming || BusterCharging || PoweringUp || Guarding) return
 	if(icon_state == "Meditate") return
-	if(Energy >= 100 - TotalFatigue) return
+	//if(Energy >= 100 - TotalFatigue) return   -- disabling so you can charge even at full energy for the sake of Power Stress activation
 	ChargingEnergy = 1
 	charge_started_at = world.time
 	charge_hits_taken = 0
@@ -95,6 +99,7 @@ mob/proc/ChargeStart()
 mob/proc/ChargeStop()
 	if(!ChargingEnergy) return
 	ChargingEnergy = 0
+	charge_power_stress = 0
 	Auraz("Remove")
 
 mob/var/tmp/cc_combo_hits = 0
@@ -143,3 +148,16 @@ proc/CounterHitReward(mob/attacker, mob/victim, weight)
 	attacker.gainTension(glob.COUNTER_HIT_TENSION)
 	var/froze = HitStop(attacker, victim, max(weight, glob.HIT_STOP_MIN), glob.COUNTER_HIT_STOP_BONUS)
 	FlashCounterMoment(attacker, victim, froze)
+
+
+mob/proc/CancelChargingBeam()
+	var/obj/Skills/Z = held_skill
+
+	if(!Z || !Z.HeldBeam)
+		return FALSE
+
+	if(passive_handler.Get("BeamHoldMastery"))
+		FizzleHeldSkill(Z, TRUE)
+	else
+		FizzleHeldSkill(Z, FALSE)
+	return TRUE

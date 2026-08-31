@@ -254,6 +254,14 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	Z.ChargeBenefit   = 0
 	Z.sustain_pour_bank = 0
 
+	if(BeamHoldID && Z.InternalName == BeamHoldID && Z.HeldBeam)
+		var/charge_speed = max(GetBeamChargeSpeedMult(), 0.1)
+		var/stored_ticks = BeamHoldCharge * max(Z.ChargePeriod * 10, 1) / charge_speed
+		held_charge_start = world.time - stored_ticks
+		BeamHoldCharge = 0
+		BeamHoldID = null
+		BeamHoldTimer = 0
+
 	if(Z.ChargeOverlay && !held_charge_overlay_ref)
 		var/image/I = image(Z.ChargeOverlay)
 		I.layer = MOB_LAYER + 0.1
@@ -681,13 +689,22 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 
 // FizzleHeldSkill for skill being overheld, interrupted, or cancelled
 
-/mob/proc/FizzleHeldSkill(var/obj/Skills/Z)
+/mob/proc/FizzleHeldSkill(var/obj/Skills/Z, beamHold = FALSE)
+	var/chargeIn = HeldBeamBenefit(Z)
 	if(held_skill != Z) return
 	ClearHeldChargeState()
 	held_skill_last_release = world.time
 	Z.OnHeldFizzle(src)
-	Z.Cooldown(1, null, src)
-	src << "<font color='red'>Your technique fizzled!</font>"
+
+	if(beamHold)
+		BeamHoldID = Z.InternalName
+		BeamHoldCharge = chargeIn
+		BeamHoldTimer = 20+((passive_handler.Get("BeamHoldMastery")-1)*5)
+		Z.Cooldown(0.3, null, src)
+		src << "<font color='yellow'><b>You're holding onto your current beam charge!!</b>(Hold Timer Limit: [BeamHoldTimer/2] seconds.)</font>"
+	else
+		src << "<font color='red'>Your technique fizzled!</font>"
+		Z.Cooldown(1, null, src)
 
 // Cleanup
 

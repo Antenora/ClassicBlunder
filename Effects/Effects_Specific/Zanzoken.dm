@@ -1,3 +1,6 @@
+
+
+
 mob
 	var
 		ActiveZanzo=0//Is the user using Zanzoken?
@@ -191,7 +194,7 @@ proc
 			var/obj/coolImage/I = new
 			I.appearance_flags=32
 			I.icon=m.icon
-			I.alpha=135
+			I.alpha=230
 			I.overlays=m.overlays
 			I.icon_state=m.icon_state
 			I.color=m.color
@@ -232,9 +235,58 @@ proc
 			I.pixel_z=m.pixel_z
 			I.name=m.name
 			I.Owner=m
-			var/r = rand(30, 255) / 255
-			var/g = rand(30, 255) / 255
-			var/b = rand(30, 255) / 255
+			var/r=1
+			var/g=0.20
+			var/b=0.25
+			var/prismaticColor
+
+			if(m.passive_handler.Get("Prismatic"))
+				prismaticColor=m.CurrentPrismaticGlowColor()
+
+			if(prismaticColor)
+				var/list/currentColor=rgb2num(prismaticColor)
+				if(currentColor && currentColor.len>=3)
+					r=currentColor[1]/255
+					g=currentColor[2]/255
+					b=currentColor[3]/255
+			else
+				m.rainbow_afterimage_index++
+				if(m.rainbow_afterimage_index>8)
+					m.rainbow_afterimage_index=1
+
+				switch(m.rainbow_afterimage_index)
+					if(1)
+						r=1
+						g=0.20
+						b=0.25
+					if(2)
+						r=1
+						g=0.50
+						b=0.15
+					if(3)
+						r=1
+						g=0.95
+						b=0.15
+					if(4)
+						r=0.55
+						g=0.90
+						b=0.20
+					if(5)
+						r=0.10
+						g=0.85
+						b=0.65
+					if(6)
+						r=0.10
+						g=0.60
+						b=1
+					if(7)
+						r=0.20
+						g=0.25
+						b=1
+					if(8)
+						r=0.65
+						g=0.15
+						b=0.85
 
 			var/list/rainbowColor = list(
 				0, 0, 0, 0,
@@ -244,7 +296,7 @@ proc
 				r, g, b, 0
 			)
 
-			I.color = null
+			I.color=null
 			I.filters += filter(
 				type = "color",
 				color = rainbowColor

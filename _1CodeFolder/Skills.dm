@@ -11,7 +11,12 @@ mob
 			usr << "<center>[text]</center>"
 
 obj/Skills
+	New()
+		..()
+		var/list/path_parts = splittext("[type]", "/")
+		InternalName = path_parts[path_parts.len]
 	Level=100
+	var/InternalName
 	var/CorruptionCost
 	var/Copied = FALSE
 	var/Sealed = FALSE

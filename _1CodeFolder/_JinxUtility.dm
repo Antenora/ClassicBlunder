@@ -164,7 +164,7 @@ mob
 				if(src.GetPowerUpRatio()>1)
 
 					var/PowerUpPercent=GetPowerUpRatio()-1
-					PowerUpPercent -= GetMovementMastery();
+					PowerUpPercent -= GetPowerUpMastery();
 
 					if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 						PowerUpPercent=0
@@ -209,7 +209,7 @@ mob
 			val*=src.EnergyExpenditure//*src.Power_Multiplier
 			if(GetPowerUpRatio()>1 && !GatesActive)
 				var/PowerUpPercent=GetPowerUpRatio()-1
-				PowerUpPercent -= GetMovementMastery();
+				PowerUpPercent -= GetPowerUpMastery();
 				if(passive_handler.Get("DrainlessPUSpike")||passive_handler.Get("DoubleHelix"))
 					PowerUpPercent=0
 
@@ -371,6 +371,23 @@ mob
 					src.Energy=Cut
 			if(src.Energy > KeyEnergy)
 				src.Energy=KeyEnergy
+		CheckMaxEnergy() // making it separate proc because i'm not sure if putting a return there would fuck up things :wilted:
+			var/HasFatigue=1
+			if(src.HasUnstoppable())
+				HasFatigue=0
+			if(src.passive_handler.Get("Anaerobic"))
+				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
+			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/Sub
+			var/Cut
+			if(src.EnergyCut)
+				Sub=KeyEnergy*src.EnergyCut
+				Cut=KeyEnergy-Sub
+				if(src.Energy > Cut)
+					src.Energy=Cut
+			if(src.Energy > KeyEnergy)
+				src.Energy=KeyEnergy
+			return KeyEnergy
 		MaxMana()
 			if(diedFromSenjutsuOverload())
 				return
@@ -842,23 +859,36 @@ mob
 		GetRecovMult()
 			return src.RecovMultTotal
 		GetStrTransMult()
-			var/STM=src.StrTransMult+src.passive_handler.Get("MagnifiedStr")
+			var/STM=src.StrTransMult+src.passive_handler.Get("MagnifiedStr")+GetUnderdogMult()
 			return STM
 		GetForTransMult()
-			var/FTM=src.ForTransMult+src.passive_handler.Get("MagnifiedFor")
+			var/FTM=src.ForTransMult+src.passive_handler.Get("MagnifiedFor")+GetUnderdogMult()
 			return FTM
 		GetEndTransMult()
-			var/ETM=src.EndTransMult+src.passive_handler.Get("MagnifiedEnd")
+			var/ETM=src.EndTransMult+src.passive_handler.Get("MagnifiedEnd")+GetUnderdogMult()
 			return ETM
 		GetSpdTransMult()
-			var/SpTM=src.SpdTransMult+src.passive_handler.Get("MagnifiedSpd")
+			var/SpTM=src.SpdTransMult+src.passive_handler.Get("MagnifiedSpd")+GetUnderdogMult()
 			return SpTM
 		GetOffTransMult()
-			var/OTM=src.OffTransMult+src.passive_handler.Get("MagnifiedOff")
+			var/OTM=src.OffTransMult+src.passive_handler.Get("MagnifiedOff")+GetUnderdogMult()
 			return OTM
 		GetDefTransMult()
-			var/DTM=src.DefTransMult+src.passive_handler.Get("MagnifiedDef")
+			var/DTM=src.DefTransMult+src.passive_handler.Get("MagnifiedDef")+GetUnderdogMult()
 			return DTM
+		GetUnderdogMult()
+			var/UDN=src.UnderdogNum
+			var/UDM=UDN*glob.racials.UNDERDOG_MULT
+			var/a=1
+			a=src.AngerCurveValue()
+			if(src.AngerMult>1)
+				var/ang=a-1
+				var/mult=ang*src.AngerMult
+				a=mult+1
+			if(src.AngerAdd)
+				a+=src.AngerAdd
+			var/total=a*UDM
+			return total
 
 
 		GetMA(stat)

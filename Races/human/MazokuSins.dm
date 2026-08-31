@@ -74,7 +74,7 @@ mob
 		for(var/wav = 5, wav > 0, wav--)
 			KenShockwave(user, icon='KenShockwaveBloodlust.dmi', Size=ShockSize, Blend=2, Time=8)
 			ShockSize /= 2
-
+/*
 /transformation/human/high_tension/mazoku
 	pot_trans = 2
 	passives = list(\
@@ -253,7 +253,7 @@ mob
 			KenShockwave(user, icon='KenShockwaveDivine.dmi', Size=ShockSize, Blend=2, Time=8)
 			ShockSize /= 2
 		if(user.client)
-			ScreenShatter(user)
+			ScreenShatter(user)*/
 
 mob/proc/isMazokuHuman()
 	if(!isRace(HUMAN)) return FALSE
@@ -282,7 +282,7 @@ mob/proc/isInMazokuSEA()
 	if(!isMazokuHuman()) return FALSE
 	if(!race || !race.transformations || transActive < 1) return FALSE
 	if(transActive > race.transformations.len) return FALSE
-	return istype(race.transformations[transActive], /transformation/human/sacred_energy_aura)
+
 
 // Reverts all active HT forms sequentially (slots 1–5) until transActive reaches 0.
 mob/proc/mazokuRevertAllHT()

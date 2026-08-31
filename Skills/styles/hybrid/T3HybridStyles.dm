@@ -7,11 +7,11 @@
 		StyleSpd=1.25
 		StyleActive="Twin Dragon Fire"
 		passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
-							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1)
+							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1, "BeamHoldMastery" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Bauf_Burst"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle","Fury" = 2, "Momentum" = 2,  "Harden" = 2, \
-							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1)
+							"Combustion" = 50, "Scorching" = 6, "Shattering" = 5, "Heavy Strike" = "Inferno",  "SweepingStrike" = 1, "BeamHoldMastery" = 1)
 		verb/Twin_Dragon_Fire()
 			set hidden=1
 			adjust(usr)
@@ -45,11 +45,11 @@
 		StyleFor = 1.35
 		StyleEnd = 1.3
 		passives = list("HybridStyle" = "MysticStyle", "Heavy Strike" = "ChaosBlaster", "CriticalDamage"= 0.15,   \
-					"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2)
+					"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2, "BeamHoldMastery" = 1)
 		Finisher="/obj/Skills/Queue/Finisher/Hyper_Goner"
 		adjust(mob/p)
 			passives = list("HybridStyle" = "MysticStyle", "CriticalDamage"= 0.15,   \
-						"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2)
+						"Secret Knives" = "GodSlayer", "MovingCharge"=1, "Tossing"=2, "BeamHoldMastery" = 1)
 
 		verb/God_of_Hyperdeath()
 			set hidden=1

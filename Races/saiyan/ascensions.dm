@@ -9,6 +9,7 @@ ascension
 
 		two
 			unlock_potential = ASCENSION_TWO_POTENTIAL
+			choices = list("Power" = /ascension/sub_ascension/saiyan/power, "Control" =  /ascension/sub_ascension/saiyan/control)
 			anger = 0.25
 			strength = 0.25
 			force = 0.25
@@ -113,4 +114,22 @@ ascension
 
 				onAscension(mob/owner)
 					owner.Class = "Zeal"
+					..()
+			power
+				onAscension(mob/owner)
+					owner.SaiyanFocus = "Power"
+					for(var/transformation/saiyan/ssj in owner.race.transformations)
+						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved)|| istype(ssj, /transformation/saiyan/super_saiyan_4_daima))
+							owner.race.transformations -= ssj
+							del ssj
+					owner.AddSkill(new/obj/Skills/AutoHit/False_Moon)
+					..()
+			control
+				growthadd=1.25
+				onAscension(mob/owner)
+					owner.SaiyanFocus = "Control"
+					for(var/transformation/saiyan/ssj in owner.race.transformations)
+						if(istype(ssj, /transformation/saiyan/super_saiyan_4)||istype(ssj, /transformation/saiyan/super_full_power_saiyan_4_limit_breaker))
+							owner.race.transformations -= ssj
+							del ssj
 					..()

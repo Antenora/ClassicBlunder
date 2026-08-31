@@ -1,4 +1,32 @@
 /obj/Skills/Buffs/SlotlessBuffs/Racial/Human
+	Super_Saiyan_Rage
+		NeedsSSJ=1
+		ActiveMessage = "explodes with rage, pushing their Super Saiyan to its very limit!"
+		passives = list("EnergyLeak" = 0.25, "ZenkaiPower" = 0.25)
+		AngerMult=1.1
+		EnergyExpenditure=1.5
+		FlashChange=1
+		IconLock='SSJAura.dmi'
+		LockX=-32
+		AuraLock='SSJRage.dmi'
+		AuraX=-32
+		AuraUnder=1
+		KenWave=3
+		KenWaveSize=0.5
+		KenWaveIcon='KenShockwaveGold.dmi'
+		adjust(mob/p)
+			passives = list("EnergyLeak" = 0.25, "ZenkaiPower" = 0.25)
+			if(p.SaiyanNum>=3)
+				passives = list("ZenkaiPower" = 0.25)
+				EnergyExpenditure=1
+				NeedsSSJ=null
+				if(!altered)
+					ActiveMessage = "explodes with power, focusing their Super Saiyan fury within their body!"
+			if(p.UnderdogNum>=3)
+				AngerMult=1.25
+		verb/Super_Saiyan_Rage()
+			set category="Skills"
+			src.Trigger(usr)
 	Deus_Ex_Machina
 		Cooldown = -1
 		passives = list("You Thought" = 1, "Hopes and Dreams" = 1)
@@ -72,3 +100,44 @@
 			if(usr.canSHTM())
 				usr.race.transformations[4].transform(usr, TRUE)
 				usr.DoubleHelix=0
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human //wip
+	Third_Eye
+		ABBuffer=1
+		Cooldown=10
+		ActiveMessage="opens their third eye!"
+		OffMessage="closes their third eye."
+		adjust(mob/p)
+			if(p.CheckActive("Ki Control"))
+				passives = list("EnergyLeak" = -0.5, "PowerUpMastery" = 4)
+			else
+				passives = list("EnergyGeneration" = 2, "Godspeed" = 2, "Flicker" = 2, "Pursuer" = 2)
+	High_Tension
+		TooMuchHealth = 90
+		NeedsHealth = 75
+		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 2, "PureDamage" = 1)
+		ActiveMessage="Psyches themselves up! -- Tension Up!"
+		OffMessage="releases their tremendous focus..."
+	High_Tension_MAX
+		TooMuchHealth = 65
+		NeedsHealth = 50
+		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		ActiveMessage="Psyches themselves up! -- Tension Max!"
+		OffMessage="releases their tremendous focus..."
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 4, "PureDamage" = 2)
+	Super_High_Tension
+		TooMuchHealth = 35
+		NeedsHealth = 25
+		TimerLimit=10
+		FatigueHeal=5
+		EnergyHeal=50
+		Cooldown=-1
+		ActiveMessage="Psyches themselves up! -- Super Tension Up!"
+		OffMessage="releases their tremendous focus..."
+		passives = list("Skimming"=2, "Godspeed" = 3, "TechniqueMastery" = 6, "PureDamage" = 3)

@@ -5,7 +5,7 @@ race
 		visual = 'Saiyan.png'
 
 		locked = FALSE
-
+		passives = list("ZenkaiPower" = 0.25)
 		power = 3;
 		strength = 1.5
 		endurance = 1.5

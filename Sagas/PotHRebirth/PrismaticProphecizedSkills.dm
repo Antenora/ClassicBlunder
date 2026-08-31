@@ -48,28 +48,53 @@ obj
 			ForMult = 1.5
 			RecovMult = 1.5
 			passives = list( "TechniqueMastery" = 2,    \
-			"AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
+			"AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1, "Health Obfuscation" = 1, "PowerUpMastery" = 1 , "FocusShiftRelease" = 3, "FocusShiftMastery" = 1, "FocusShiftBurst" = 0.50)
 			FlashChange = 1
-			KenWaveIcon = 'Unbound.dmi'
-			KenWave = 1
-			KenWaveSize = 1
-			KenWaveX = 72
-			KenWaveY = 72
+			KenWave=1
+			KenWaveIcon='SparkleRainbow.dmi'
+			KenWaveSize=4
+			KenWaveX = 116
+			KenWaveY = 116
 			ManaGlowSize=2
 			KenWaveBlend = 2
 			KenWaveTime = 5
 			ActiveMessage = "awakens their Hyperdeath state!"
 			OffMessage = "returns to their normal self..."
 			adjust(mob/p)
+				var/ExP = list()
+				var/fP = list()
 				var/WithYourPowersCombined=0
 				ActiveMessage = "awakens their Hyperdeath state!"
-				if(p.party || p.party.members || p.party.members.len > 0)
+				if(p.party && p.party.members && p.party.members.len > 0)
 					var/list/party_names = list()
 					for(var/mob/m in p.party.members)
 						if(m == p)
 							continue
 						party_names += "[m]"
 						WithYourPowersCombined+=1
+						//Extra Passive Zone. Every participant's race give an extra passive for the user. not done yet
+						if(m.isRace(HUMAN))
+							ExP += list("Tenacity" = 2)
+						if(m.isRace(SAIYAN))
+							ExP += list("ZenkaiPower" = 0.5)
+						if(m.isRace(NAMEKIAN))
+							ExP += list("TechniqueMastery" = 1)
+						if(m.isRace(MAJIN))
+							ExP += list("ManaGeneration" = 2)
+						if(m.isRace(DEMON))
+							ExP += list("PureDamage" = 1)
+						if(m.isRace(ANGEL))
+							ExP += list("PureReduction" = 1)
+						if(m.isRace(WILDER))
+							ExP += list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5)
+						if(m.isRace(NOBODY))
+							ExP += list("CriticalDamage" = 0.25)
+						if(m.isRace(CHANGELING))
+							ExP += list("Juggernaut" = 0.5)
+						if(m.isRace(ELDRITCH))
+							ExP += list("Deflection" = 1, "DeathField" = 1)
+						if(m.isRace(POPO))
+							ExP += list("CashCow" = -5) // YOU OWE ME 5$
 					if(party_names.len)
 						var/fullparty = ""
 						if(party_names.len == 1)
@@ -85,15 +110,19 @@ obj
 						ActiveMessage = "calls upon their allies, and with the powers of [fullparty] combined, enters their final state: <b>Omega [p]!</b>"
 					else
 						ActiveMessage = "awakens their Hyperdeath state!"
+				if(WithYourPowersCombined > 0)
+					if(ExP)
+						fP += ExP
+					fP += list("OmegaPower" = WithYourPowersCombined)
+				else
+					passives = list()
 				var/pLv = p.SagaLevel
 				StrMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				ForMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				SpdMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				EndMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
 				RecovMult = 1.5 + (0.1 * pLv) + (WithYourPowersCombined * 0.1)
-				passives = list("TechniqueMastery" = 2, "AfterImages" = 1, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2))
-				if(WithYourPowersCombined)
-					passives += list("OmegaPower" = WithYourPowersCombined)
+				passives = list("TechniqueMastery" = 2, "AfterImages" = 2, "AfterImageSkin" = "Rainbow", "Prismatic" = 1,  "Health Obfuscation" = 1, "PowerUpMastery" = 1+(pLv*1), "FocusShiftRelease" = 3+(pLv*2), "FocusShiftMastery" = 1+(pLv*2), "FocusShiftBurst" = 0.50+(pLv/2)) + fP
 				if(pLv >= 2)
 					passives += list("SpiritPower" = 0.10 + ((pLv - 2) * 0.225))
 				if(pLv >= 4)
@@ -335,6 +364,49 @@ obj
 				set category="Skills"
 				adjust(usr)
 				usr.Activate(src)
+	Skills/Projectile/Beams
+		Hyper_Beam
+			DamageMult=0.3
+			ChargeRate=0.2
+			Dodgeable=0
+			ForScaling=1
+			MenuIcon = "Kamehameha"
+			IconLock='HyperBeamRainbow.dmi'
+			Cooldown=12
+			EnergyCost=3
+			Instinct=1
+			BeamTime=10
+			HeldSkill=TRUE
+			HeldBeam=TRUE
+			ChargePeriod=2
+			CritEffectiveness=0
+			ClashBonus=0.15
+			adjust(mob/p)
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					ChargePeriod=15
+				else
+					IconSize=1
+					ChargePeriod=2
+			OnHeldRelease(mob/p, benefit, sweet_spot_hit)
+				if(!p)
+					return
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					DamageMult=0.6 + (benefit/10)
+					IconSize=round(1+(benefit*5))
+				else
+					DamageMult=0.3 + (benefit/10)
+					IconSize=round(1+benefit)
+				BeamTailStart=IconSize
+				var/b = min(max(benefit, 0), 1)
+				var/efrac = p.EnergyMax > 0 ? min(p.Energy / p.EnergyMax, 1) : 0
+				var/spend = p.Energy * 0.25 * b
+				if(spend > 0)
+					p.LoseEnergy(spend)
+				..(p, b * efrac, sweet_spot_hit)
+			verb/Hyper_Beam()
+				set category="Skills"
+				adjust(usr)
+				usr.BeginHeldSkill(src)
 
 	Skills/Projectile
 		ChaosSaberToss
@@ -455,8 +527,8 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 			var/OmegaPower=1
 			var/extraP
 			switch(sl)
-				if(1 to 2)//this will never happen unless the skill is given unnaturally
-					OmegaPower=1//which, i guess, given the subject matter, is more likely than you'd think
+				if(1 to 2)
+					OmegaPower=1
 				if(3)
 					OmegaPower=1
 				if(4)
@@ -494,6 +566,7 @@ obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams
 	Area = "Target"
 	Distance=14
 	Knockback = 10
+	Stunner=2
 	DamageMult=1
 	ForScaling=1
 	StrScaling=0

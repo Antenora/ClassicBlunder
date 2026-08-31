@@ -7,12 +7,16 @@ transformation
 			form_glow_icon = 'Ripple Radiance.dmi'
 			form_glow_x = -32
 			form_glow_y = -32
+			pot_trans = 5
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
 			defenseadd = 0.25
 			strengthadd = 0.25
 			forceadd = 0.25
+			mastery_boons(mob/user)
+				if(user.HeroicNum>=2)
+					passives = list("Ultimate" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -32,6 +36,7 @@ transformation
 			form_aura_icon_state = "SSJ2"
 			form_aura_x = -32
 			form_icon_2_icon = 'SS2Sparks.dmi'
+			pot_trans = 5
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -50,11 +55,25 @@ transformation
 					form_icon_1.blend_mode=BLEND_MULTIPLY
 					form_icon_1.alpha=125
 					form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
+				if(user.HeroicNum>=2)
+					if(user.Hair_Base && !form_hair_icon)
+						var/icon/x=new(user.Hair_Base)
+						form_hair_icon=x
+						. = ..()
 			transform_animation(mob/user)
-				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=5)
-				spawn(5)
-					animate(user, color = null, time=5)
-				sleep(2)
+				if(user.HeroicNum>=2)
+					KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=70, Time = 45)
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1.5,0.9,0.1), time=5)
+					spawn(5)
+						spawn(50)
+							if(!user.HasKiControl()&&!user.PoweringUp)
+								user.Auraz("Remove")
+						animate(user, color = null, time=5)
+				else
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=5)
+					spawn(5)
+						animate(user, color = null, time=5)
+					sleep(2)
 		super_saiyan_3
 			form_aura_icon = 'AurasBig.dmi'
 			form_aura_icon_state = "SSJ2"
@@ -62,30 +81,51 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
+			pot_trans = 10
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
 			defenseadd = 0.25
 			strengthadd = 0.25
 			forceadd = 0.25
+			mastery_boons(mob/user)
+				if(user.BeastUnlocked)
+					passives = list("Hidden Potential" = 1, "PowerUpMastery" = 6)
+					speedadd = 0.4
+					enduranceadd = 0.4
+					offenseadd = 0.4
+					defenseadd = 0.4
+					strengthadd = 0.4
+					forceadd = 0.4
 			adjust_transformation_visuals(mob/user)
-				..()
-				form_icon_1 = image(user.Hair_SSJ3)
-				form_icon_1.blend_mode=BLEND_MULTIPLY
-				form_icon_1.alpha=125
-				form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
+				if(user.BeastUnlocked)
+					var/icon/x=new(user.Hair_Base)
+					form_hair_icon=x
+					. = ..()
+				else
+					..()
+					form_icon_1 = image(user.Hair_SSJ3)
+					form_icon_1.blend_mode=BLEND_MULTIPLY
+					form_icon_1.alpha=125
+					form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
 			transform_animation(mob/user)
-				sleep()
-				user.Quake(40)
-				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=10)
-				var/ShockSize=5
-				for(var/wav=5, wav>0, wav--)
-					KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=8)
-					ShockSize/=2
-				spawn(10)
-					animate(user, color = user.MobColor, time=30)
-				sleep(2)
+				if(user.BeastUnlocked)
+					if(first_time)
+						user.CutsceneMode()
+						user.BeastAnimation()
+				else
+					sleep()
+					user.Quake(40)
+					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=10)
+					var/ShockSize=5
+					for(var/wav=5, wav>0, wav--)
+						KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=8)
+						ShockSize/=2
+					spawn(10)
+						animate(user, color = user.MobColor, time=30)
+					sleep(2)
 		super_saiyan_4
+			pot_trans = 10
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -126,6 +166,75 @@ transformation
 				previousTailUnderlayIcon = null
 				previousTailWrappedIcon = null
 				user.Tail(1)
+		super_full_power_saiyan_4_limit_breaker
+			unlock_potential = 100
+			pot_trans = 15
+			angerFloor = 60
+			speedadd = 0.25
+			enduranceadd = 0.25
+			offenseadd = 0.25
+			defenseadd = 0.25
+			strengthadd = 0.25
+			forceadd = 0.25
+			var/previousTailIcon
+			var/previousTailUnderlayIcon
+			var/previousTailWrappedIcon
+			var/tailIcon = 'saiyantail_ssj4.dmi'
+			var/tailUnderlayIcon = 'saiyantail_ssj4_under.dmi'
+			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
+			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
+			form_icon_1_layer = FLOAT_LAYER-3
+			adjust_transformation_visuals(mob/user)
+				if(!form_hair_icon&&user.Hair_Base)
+					var/icon/x=new(user.Hair_Base)
+					if(x)
+						x.Blend(rgb(150,-10,-10),ICON_ADD)
+				..()
+
+			transform(mob/user)
+				. = ..()
+				previousTailIcon = user.TailIcon
+				previousTailUnderlayIcon = user.TailIconUnderlay
+				previousTailWrappedIcon = user.TailIconWrapped
+				user.TailIcon = tailIcon
+				user.TailIconUnderlay = tailUnderlayIcon
+				user.TailIconWrapped = tailWrappedIcon
+				user.Tail(1)
+
+			revert(mob/user)
+				. = ..()
+				if(!is_active || !user.CanRevert()) return
+				user.TailIcon = previousTailIcon
+				user.TailIconUnderlay = previousTailUnderlayIcon
+				user.TailIconWrapped = previousTailWrappedIcon
+				previousTailIcon = null
+				previousTailUnderlayIcon = null
+				previousTailWrappedIcon = null
+				user.Tail(1)
+
+			transform_animation(mob/user)
+				user.Quake(40)
+				user.Frozen=1
+				KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=10)
+				for(var/turf/t in Turf_Circle(user, 18))
+					if(prob(50))
+						spawn(rand(2,6))
+							var/icon/i = icon('RisingRocks.dmi')
+							t.overlays+=i
+							spawn(rand(20, 60))
+								t.overlays-=i
+				spawn(10)
+					KenShockwave2(user, icon='KenShockwaveGold.dmi', Size=10)
+				user.Frozen=0
+				animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=20)
+				sleep(20)
+
+				var/ShockSize = 5
+				for(var/wav=5, wav>0, wav--)
+					KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=10)
+					ShockSize/=2
+				spawn(10)
+					animate(user, color = user.MobColor, time=20)
 /*		high_tension
 			passives = list("Conductor" = 10, "HighTension"=1,"TensionPowered"=0.25,"TechniqueMastery"=1)
 			pot_trans = 2

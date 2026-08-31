@@ -1,5 +1,19 @@
+mob/proc/CheckAscCombo()
+	if(HeroicNum>=2&&UnderdogNum>=2)
+		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension, src))
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension)
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension_MAX)
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Super_High_Tension)
+			src<<"You have unlocked High Tension!"
+	if(SaiyanNum>=2&&UnderdogNum>=2)
+		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage, src))
+			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage)
+			src<<"You have unlocked Super Saiyan Rage!"
+	if(SaiyanNum==3&&HeroicNum==3)
+		transUnlocked=3
+		src<<"You have unlocked Beast Mode!"
 /ascension/sub_ascension/human/heroic
-	passives = list("MovementMastery" = 2)
+	passives = list("PowerUpMastery" = 2)
 	offense = 0.5
 	strength = 0.5
 	force = 0.5
@@ -9,20 +23,26 @@
 	growthadd= 0.25
 	onAscension(mob/owner)
 		owner.HeroicNum++
+		if(owner.HeroicNum==4)
+			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Third_Eye)
+		owner.CheckAscCombo()
 		..()
 /ascension/sub_ascension/human/underdog
 	anger = 0.1
 	passives = list("Tenacity" = 2, "UnderDog" = 1)
 	onAscension(mob/owner)
 		owner.UnderdogNum++
+		owner.CheckAscCombo()
+		if(owner.UnderdogNum==4)
+			owner.passive_handler.Increase("EndlessAnger", 1)
 		..()
 /ascension/sub_ascension/human/saiyan
-	passives = list("ZenkaiPower" = 0.1)
+	passives = list("ZenkaiPower" = 0.25)
 	onAscension(mob/owner)
 		owner.SaiyanNum++
 		if(owner.SaiyanNum==1)
 			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Oozaru)
-			owner.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
+			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/HalfSaiyan/Hidden_Potential)
 		if(owner.SaiyanNum==2)
 			owner.transUnlocked=1
 		if(owner.SaiyanNum==3)
@@ -31,6 +51,9 @@
 			owner.transUnlocked=3
 		if(owner.SaiyanNum==5)
 			owner.transUnlocked=4
+		if(owner.SaiyanNum==6)
+			owner.transUnlocked=5
+		owner.CheckAscCombo()
 		..()
 
 
@@ -207,19 +230,19 @@ ascension
 					owner.transUnlocked=5
 				applyDormantDemonPassives(owner)
 				..()
-				if(owner.isMazokuHuman())
+		/*		if(owner.isMazokuHuman())
 					var/already_has_sea = FALSE
 					for(var/transformation/T in owner.race.transformations)
 						if(istype(T, /transformation/human/sacred_energy_aura))
 							already_has_sea = TRUE
 							break
 					if(!already_has_sea)
-						owner.race.transformations += new /transformation/human/sacred_energy_aura()
-			revertAscension(mob/owner)
+						owner.race.transformations += new /transformation/human/sacred_energy_aura()*/
+/*			revertAscension(mob/owner)
 				if(owner.passive_handler && owner.race && owner.race.transformations)
 					for(var/transformation/T in owner.race.transformations.Copy())
 						if(istype(T, /transformation/human/sacred_energy_aura))
 							owner.race.transformations -= T
 							del T
 							break
-				..()
+				..()*/

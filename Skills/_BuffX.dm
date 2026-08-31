@@ -301,7 +301,7 @@ NEW VARIABLES
 	var/Vanishing//make invisible and autocombo
 	var/UnarmedDamage
 	var/SpiritualDamage
-	var/MovementMastery//1.x is added to effective PU percent.
+	var/PowerUpMastery//1.x is added to effective PU percent.
 //Defense stuff
 	var/KBMult//Adds KB Mult to everything.
 	var/KBRes//Sets knockback resistance.
@@ -630,13 +630,14 @@ NEW VARIABLES
 			var/selectedPassive = "None"
 			var/selectedStats = list()
 			proc/init(mob/p)
+				var/herobuff=p.HeroicNum*0.05
 				if(altered) return
 				if(selectedPassive == "None")
 					p.PoweredFormSetup()
 				passives = list("[selectedPassive]" = 1, "KiControl" = 1, "EnergyLeak" = 1)
-				vars["[selectedStats[1]]Mult"] = 1.15
-				vars["[selectedStats[2]]Mult"] = 1.1
-				vars["[selectedStats[3]]Mult"] = 1.05
+				vars["[selectedStats[1]]Mult"] = 1.15+herobuff
+				vars["[selectedStats[2]]Mult"] = 1.1+(herobuff*0.75)
+				vars["[selectedStats[3]]Mult"] = 1.05+(herobuff*0.5)
 			Trigger(var/mob/User, Override=0)
 				init(User)
 				..()
@@ -1527,6 +1528,7 @@ NEW VARIABLES
 				src.Trigger(usr)
 
 		SuperSaiyanGrade2
+			BuffName="Super Saiyan Grade 2"
 			SignatureTechnique=3
 			SagaSignature=1
 			UnrestrictedBuff=1
@@ -1543,6 +1545,7 @@ NEW VARIABLES
 			adjust(mob/p)
 			verb/Super_Saiyan_Grade2()
 				set category="Skills"
+				set hidden=1
 				if(usr.ExpandBase)
 					IconReplace=1
 					icon=usr.ExpandBase
@@ -1573,6 +1576,7 @@ NEW VARIABLES
 				adjust(usr)
 				src.Trigger(usr)
 		SuperSaiyanGrade3
+			BuffName="Super Saiyan Grade 3"
 			SignatureTechnique=3
 			SagaSignature=1
 			UnrestrictedBuff=1
@@ -1591,6 +1595,7 @@ NEW VARIABLES
 			adjust(mob/p)
 			verb/Super_Saiyan_Grade3()
 				set category="Skills"
+				set hidden=1
 				if(usr.ExpandBase)
 					IconReplace=1
 					icon=usr.ExpandBase
@@ -1675,6 +1680,56 @@ NEW VARIABLES
 					passives = list( "TechniqueMastery" = 4, "EnergyGeneration" = 3, "ZenkaiPower" = 0.5)
 			verb/Saiyan_Fervor()
 				set category="Skills"
+				src.Trigger(usr)
+		Power_Stressed
+			UnrestrictedBuff=1
+			EnergyExpenditure=1.5
+			passives = list("EnergyLeak" = 1, "PowerStressed" = 1, "PureDamage" = 1)
+			AuraLock=1
+			TimerLimit=30
+			FlashChange=1
+			StrMult=1.4
+			ForMult=1.2
+			EndMult=1.1
+			OffMult=0.5
+			DefMult=0.8
+			SpdMult=0.7
+			ProportionShift=matrix(1.2, 0, 0, 0, 1, 0)
+			KenWave=3
+			KenWaveSize=0.5
+			SpecialSlot=0
+			Slotless=1
+			KenWaveIcon='KenShockwaveGold.dmi'
+			ActiveMessage="stresses their power to the utmost!"
+			OffMessage="tires out..."
+			adjust(mob/p)
+				var/boost = p.passive_handler.Get("PowerStressMastery")
+				TimerLimit=30+(boost*5)
+				if(p.isRace(CHANGELING)) // TODO: MAKE IT SO THIS ONLY ACTIVATES ON THE FINAL/FOURTH FORM
+					ActiveMessage="achieves their long-awaited 100% Full Power!"
+					passives = list("EnergyLeak" = 1.5-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 2+(boost/2), "PureReduction" = 2+(boost/2))
+					StrMult=1.2 + (boost*0.05)
+					ForMult=1.1 + (boost*0.05)
+					EndMult=1.4 + (boost*0.05)
+					OffMult=0.5 + (boost*0.05)
+					DefMult=0.8 + (boost*0.05)
+					SpdMult=0.7 + (boost*0.05)
+				else// nothing extra
+					ActiveMessage="stresses their power to the utmost!"
+					passives = list("EnergyLeak" = 1-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 1+(boost/2))
+					StrMult=1.4 + (boost*0.05)
+					ForMult=1.2 + (boost*0.05)
+					EndMult=1.1 + (boost*0.05)
+					OffMult=0.5 + (boost*0.05)
+					DefMult=0.8 + (boost*0.05)
+					SpdMult=0.7 + (boost*0.05)
+			verb/Power_Stressed()
+				set category="Skills"
+				set hidden = 1
+				if(usr.ExpandBase)
+					IconReplace=1
+					icon=usr.ExpandBase
+				adjust(usr)
 				src.Trigger(usr)
 		The_Unbreakable_Fist
 			SignatureTechnique=3
@@ -1851,7 +1906,7 @@ NEW VARIABLES
 			ForMult=1.2
 			EndMult=1.3
 			SpdMult=1.3
-			MovementMastery=8
+			PowerUpMastery=8
 			passives = list( "Flicker" = 2)
 			PUSpeedModifier=2
 			Flicker=2
@@ -2751,7 +2806,7 @@ NEW VARIABLES
 				OffMult=1.5
 				DefMult=1.5
 				passives = list( "TechniqueMastery" = 10, "WeaponBreaker" = 3,  "Reversal" = 1, "MovingCharge" = 1, "MartialMagic" = 1, "SuperDash" = 1, "Pursuer" = 1, "Flicker" = 1, "GodKi" = 1)
-				MovementMastery=10
+				PowerUpMastery=10
 				Instinct=3
 				WeaponBreaker=3
 				Reversal=5
@@ -3262,12 +3317,12 @@ NEW VARIABLES
 						src.NoTopOverlay=0
 			Bronze_Cloth
 				PUSpeedModifier=0.5
-				MovementMastery=5
+				PowerUpMastery=5
 				ArmorClass="Light"
 				ArmorAscension=1
 				adjustments(mob/player)
 					if(!altered)
-						MovementMastery = player.SagaLevel * 1.25
+						PowerUpMastery = player.SagaLevel * 1.25
 				Pegasus_Cloth
 					StrMult=1.25
 					SpdMult=1.5
@@ -3397,12 +3452,12 @@ NEW VARIABLES
 						src.Trigger(usr)
 
 			Bronze_Cloth_V2
-				MovementMastery=10
+				PowerUpMastery=10
 				ArmorClass="Medium"
 				ArmorAscension=2
 				HairLock=1
 				adjustments(mob/player)
-					MovementMastery = player.SagaLevel * 2
+					PowerUpMastery = player.SagaLevel * 2
 					// Hustle = 1 + (player.SagaLevel * 0.25)
 				Pegasus_Cloth
 					StrMult=1.5
@@ -3547,7 +3602,7 @@ NEW VARIABLES
 						src.NoTopOverlay=0
 						src.Trigger(usr)
 			Gold_Cloth
-				MovementMastery=20
+				PowerUpMastery=20
 				SpaceWalk=1//gold
 				StaticWalk=1
 				ArmorClass="Heavy"
@@ -7357,7 +7412,7 @@ NEW VARIABLES
 			SignatureTechnique=3
 			SpecialSlot=1
 			passives = list( "TechniqueMastery" = 5,  "ManaLeak" = 1)
-			MovementMastery=5
+			PowerUpMastery=5
 			BuffMastery=5
 			ManaThreshold=1
 			ManaLeak=1
@@ -11485,7 +11540,7 @@ NEW VARIABLES
 			Punishment_of_Demons
 				AlwaysOn=1
 				AngerFloor=50
-				MovementMastery=-3
+				PowerUpMastery=-3
 				ActiveMessage="experiences the suffering of Demon Realm - boundless fury leading into peril!"
 				KenWave=1
 				KenWaveSize=1

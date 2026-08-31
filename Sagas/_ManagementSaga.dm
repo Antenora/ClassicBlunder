@@ -439,8 +439,10 @@ mob/Admin3/verb
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Heart)
 						if("Rainbow")
 							P.RebirthHeroType="Rainbow"
+							P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Fight_or_Flight)
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero)
 							P.AddSkill(new/obj/Skills/AutoHit/Jarona)
+							P.AddSkill(new/obj/Skills/AutoHit/Mysterious_Winds)
 				//	tierUpSaga("Rebirth")
 
 				if("Devil Summoner")
@@ -963,14 +965,13 @@ mob
 										src<<"You can also attempt to heal people, but the keyword is attempt."
 									if(src.RebirthHeroType=="Rainbow")
 										src.RebirthHeroType="Prismatic"
-										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One. (WIP)"
+										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One."
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
-										src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Fight_or_Flight)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
@@ -998,6 +999,8 @@ mob
 								src<< "Your Chaos Saber can now fire projectiles! These still cost ACT to use."
 								src<< "Your Chaos Buster has been upgraded!"
 								src<< "You can access your Hyperdeath State earlier!"
+								src.AddSkill(new/obj/Skills/Projectile/ChaosSaberToss)
+								src.AddSkill(new/obj/Skills/Projectile/Beams/Hyper_Beam)
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Mountain_King)
 								src.HyperdeathThreshold=75
 						if(4)
@@ -1028,8 +1031,9 @@ mob
 							if(src.RebirthHeroType=="Red")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Burning_Soul)
 							if(src.RebirthHeroType=="Prismatic")
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Dreamlike_Savior)
 								src.HyperdeathThreshold=50
-								src<<"You now wield two Chaos Sabers at once!"
+								src<< "You now wield two Chaos Sabers at once!"
 								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
@@ -1061,11 +1065,10 @@ mob
 							if(src.RebirthHeroType=="Purple")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Justice_Incarnate)
 							if(src.RebirthHeroType=="Prismatic")
+								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "Your happy ending... Your hopes, your dreams..."
 								src<< "It's not just those you're carrying on your back, are they?"
-								src<< "buff goes here"
 								src<< "You can access your Hyperdeath State earlier!"
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Dreamlike_Savior)
 								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
@@ -1083,9 +1086,7 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/All_Hail_The_Crownless_King)
 								src<< "You have become a Fighter of Legend; Glory to the Crownless King."
 							if(src.RebirthHeroType=="Prismatic")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "The Hearts of the World resonate with Yours."
-								src<< "final buff goes here wooo"
 								src<< "You can access your Hyperdeath State earlier!"
 								src.HyperdeathThreshold=10
 				if("Cosmo")

@@ -479,8 +479,6 @@ atom/proc/CheckDirection(var/mob/M)
 			. = "South East"
 		if(SOUTHWEST)
 			. = "South West"
-
-globalTracker/var/MOVEMENT_MASTERY_DIVISOR = 5//TODO between wipes: move this to MovementMastery.dm
 //actually more of a mult than a divisor nowadays but whatever we don't rename things mid wipe
 
 
@@ -494,7 +492,7 @@ mob/proc/GetPowerUpRatio()
 
 	Ratio += PowerUp
 	if(PowerUp>0)
-		Ratio += GetMovementMastery()
+		Ratio += GetPowerUpMastery()
 
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
@@ -516,7 +514,7 @@ mob/proc/GetPowerUpRatioVisble()
 	if(CheckSpecial("Overdrive")) PowerUp+=1
 	Ratio += PowerUp
 	if(PowerUp)
-		Ratio += GetMovementMastery()
+		Ratio += GetPowerUpMastery()
 	if(!src.HasKiControl()&&!src.PoweringUp)
 		if(Ratio>1)
 			Ratio=1
@@ -729,6 +727,12 @@ mob/var/HoldOn=0
 mob/var/tmp/rainbow_glow_loop_running = FALSE
 mob/var/tmp/rainbow_glow_index = 1
 
+mob/var/tmp/rainbow_afterimage_index=0
+mob/var/tmp/rainbow_glow_from_color="#ff0000"
+mob/var/tmp/rainbow_glow_to_color="#ff0000"
+mob/var/tmp/rainbow_glow_transition_start=0
+mob/var/tmp/rainbow_glow_transition_time=5
+
 mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the glow loops in sequence, so if it ever gets stopped due to something, the glow loop resumes shortly after
 	set waitfor = 0
 	if(rainbow_glow_loop_running)
@@ -738,18 +742,30 @@ mob/proc/RainbowGlowLoop()  // pain in the ass to make work but basically the gl
 	while(src)
 		if(!src.passive_handler.Get("Prismatic"))
 			rainbow_glow_index = 1
-			sleep(30)
+			rainbow_glow_from_color = "#ff0000"
+			rainbow_glow_to_color = "#ff0000"
+			sleep(rainbow_glow_transition_time)
 			continue
 		var/F = filters["prismatic"]
 		if(!F)
 			RainbowGlowStuff()
 			F = filters["prismatic"]
 		if(F)
+			var/currentColor=CurrentPrismaticGlowColor()
+			if(!currentColor)
+				currentColor=F:color
+
 			rainbow_glow_index++
 			if(rainbow_glow_index > rainbow_colors.len)
 				rainbow_glow_index = 1
-			animate(F,color = rainbow_colors[rainbow_glow_index],time = 30)
-		sleep(30)
+
+			rainbow_glow_from_color=currentColor
+			rainbow_glow_to_color=rainbow_colors[rainbow_glow_index]
+			rainbow_glow_transition_start=world.time
+			rainbow_glow_transition_time=5
+
+			animate(F,color = rainbow_glow_to_color,time = rainbow_glow_transition_time)
+		sleep(rainbow_glow_transition_time)
 
 mob/proc/RainbowGlowStuff()
 	if(!src.passive_handler.Get("Prismatic"))
@@ -765,7 +781,30 @@ mob/proc/RainbowGlowStuff()
 	GlowFilter = filters["prismatic"]
 	filters += filter(name = "trail",type = "motion_blur",x = 0,y = 0)
 	rainbow_glow_index = 1
+	rainbow_glow_from_color = "#ff0000"
+	rainbow_glow_to_color = "#ff0000"
+	rainbow_glow_transition_start = world.time
+	rainbow_glow_transition_time = 5
 	RainbowGlowLoop()
+
+mob/proc/CurrentPrismaticGlowColor()
+	var/F=filters["prismatic"]
+	if(!F)
+		return null
+	if(!rainbow_glow_from_color || !rainbow_glow_to_color)
+		return F:color
+
+	var/list/fromColor=rgb2num(rainbow_glow_from_color)
+	var/list/toColor=rgb2num(rainbow_glow_to_color)
+	if(!fromColor || !toColor)
+		return F:color
+
+	var/progress=clamp((world.time-rainbow_glow_transition_start)/max(rainbow_glow_transition_time,1),0,1)
+	var/r=round(fromColor[1]+((toColor[1]-fromColor[1])*progress))
+	var/g=round(fromColor[2]+((toColor[2]-fromColor[2])*progress))
+	var/b=round(fromColor[3]+((toColor[3]-fromColor[3])*progress))
+
+	return rgb(r,g,b)
 
 
 mob/proc/
@@ -842,7 +881,7 @@ mob/proc/
 				RainbowGlowStuff()
 		var/EPM=Power_Multiplier;
 		if(ActiveBuff && ActiveBuff.PowerMult > 1 && (GetPowerUpRatio()<=1))
-			EPM += (ActiveBuff.PowerMult-1) * (1+GetMovementMastery())
+			EPM += (ActiveBuff.PowerMult-1) * (1+GetPowerUpMastery())
 
 		if(src.PowerEroded)
 			EPM-=src.PowerEroded
@@ -1157,15 +1196,48 @@ mob/proc/
 
 		//active energy channel
 		if(src.ChargingEnergy && !src.PureRPMode)
+			var/passiveboost = src.passive_handler.Get("PowerStressMastery")
 			if(src.KO||src.Stunned||src.Launched||src.Knockbacked||src.Suspended||src.Guarding||src.PoweringUp||src.Beaming||src.grabbed||src.icon_state=="Meditate")
 				src.ChargeStop()
 			else
-				var/ramp = min(1, (world.time - src.charge_started_at) / max(glob.CHARGE_RAMP_DS, 1))
+				var/isOvercharging = 0
+				var/isTilted = src.CheckSlotless("Tilted")
+				var/ramp_speed = isTilted ? 1.1 : 1
+				var/ramp = min(1, ((world.time - src.charge_started_at) * ramp_speed) / max(glob.CHARGE_RAMP_DS, 1))
 				var/before = src.Energy
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
-				if(src.Energy <= before)
-					FlashChargeCap(src)
-					src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
+				if(src.Energy == src.CheckMaxEnergy() && isOvercharging == 0) // Power Stressing block. Enters Power-Stressed State or Super Saiyan Grade 2/3.
+					isOvercharging = 1
+				if(src.Energy <= before || isOvercharging)
+					src.Quake(4)
+					src.charge_power_stress += 1 + isTilted
+					if(charge_power_stress >= max(5 - passiveboost, 2))
+						FlashChargeCap(src)
+						src.ChargeStop()
+						if(src.isRace(SAIYAN) && src.transActive==1)
+							if(src.CheckSpecial("Super Saiyan Grade 2"))
+								if(src.race.transformations[src.transActive].mastery>=75) // Upgrade to Grade 3
+									var/obj/Skills/Buffs/SpecialBuffs/B = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+									var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
+									B.OffMessage="goes a step further--!"
+									B.Trigger(src)
+									A.Trigger(src)
+								else // Find self to toggle itself off
+									var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+									A.OffMessage="tires out..."
+									A.Trigger(src)
+							else if(src.CheckSpecial("Super Saiyan Grade 3"))// Find self to toggle itself off
+								var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade3)
+								A.Trigger(src)
+							else if(src.race.transformations[src.transActive].mastery>=50) // Enter Grade 2
+								var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/SuperSaiyanGrade2)
+								A.OffMessage="tires out..."
+								A.Trigger(src)
+						else
+							var/obj/Skills/Buffs/SpecialBuffs/A = src.findOrAddSkill(/obj/Skills/Buffs/SpecialBuffs/Power_Stressed)
+							A.Trigger(src)
+				//	FlashChargeCap(src)
+				//	src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
 
 
 mob/proc/Update_Stat_Labels()

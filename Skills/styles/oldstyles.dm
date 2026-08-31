@@ -205,7 +205,7 @@
 						Pursuer=3
 						SuperDash=2
 						BladeFisting=1
-						MovementMastery=8
+						PowerUpMastery=8
 						MartialMagic=1
 						MovingCharge=1
 						HitSpark='Hit Effect Vampire.dmi'

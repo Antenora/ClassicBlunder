@@ -6,6 +6,7 @@ obj
 		var/NewCopyable // sigh
 		Projectile
 			BaseStatDefault="FOR"
+
 			proc
 				EdgeOfMapProjectile()
 					var/turf/t=get_step(src, src.dir)
@@ -110,6 +111,7 @@ obj
 				IconVariance//modfies how the icon appears on generation of projectile
 				ProjectileSpin=0//degrees to rotate per tick while moving (e.g. spinning weapon throw)
 				Variation=8//pixelx/y offsets randomly
+				BeamTailStart = 1 // scaling big fuckoff beams. check BeamSystem
 
 				Blasts=1//Multiple blasts happen at once.
 				BlastsShot=0//only used for continuous

@@ -115,6 +115,15 @@ transformation
 					defenseadd = 0.3
 					strengthadd = 0.45
 					forceadd = 0.45
+				if(user.SaiyanFocus == "Power")
+					class_passives += list("SaiyanPower1" = 0.2)
+				if(user.SaiyanFocus == "Control")
+					speedadd += 0.1
+					enduranceadd += 0.1
+					offenseadd += 0.1
+					defenseadd += 0.1
+					strengthadd += 0.1
+					forceadd += 0.1
 
 			transform_animation(mob/user)
 				if(first_time && mastery<25)
@@ -199,6 +208,22 @@ transformation
 						if(mastery >= 100)
 							user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/SuperSaiyan2Enhanced)
 							user << "You have pushed your Super Saiyian Two form to its absolute limits!"
+			class_boons(mob/user)
+				if(user.SaiyanFocus == "Power")
+					class_passives = list("SaiyanPower2" = 0.2)
+					speedadd = 0.35
+					enduranceadd = 0.35
+					offenseadd = 0.35
+					defenseadd = 0.35
+					strengthadd = 0.35
+					forceadd = 0.35
+				if(user.SaiyanFocus == "Control")
+					speedadd = 0.45
+					enduranceadd = 0.45
+					offenseadd = 0.45
+					defenseadd = 0.45
+					strengthadd = 0.45
+					forceadd = 0.45
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -314,7 +339,15 @@ transformation
 					defenseadd = 0.5
 					strengthadd = 0.65
 					forceadd = 0.65
-
+				if(user.SaiyanFocus == "Power")
+					class_passives = list("SaiyanPower3" = 0.15)
+				if(user.SaiyanFocus == "Control")
+					speedadd += 0.15
+					enduranceadd += 0.15
+					offenseadd += 0.15
+					defenseadd += 0.15
+					strengthadd += 0.15
+					forceadd += 0.15
 			adjust_transformation_visuals(mob/user)
 				..()
 				form_icon_1 = image(user.Hair_SSJ3)

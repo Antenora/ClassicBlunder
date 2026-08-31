@@ -325,7 +325,7 @@ obj
 						passives = list("Flicker" = 3, "Pursuer" = 3,  "TechniqueMastery" = 4, "MartialMagic" = 1)
 						Flicker=3
 						Pursuer=3
-						MovementMastery=8
+						PowerUpMastery=8
 						MartialMagic=1
 						DoubleStrike=1
 						NoSword=1

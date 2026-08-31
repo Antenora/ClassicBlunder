@@ -1534,9 +1534,21 @@ mob
 				return 2
 			return 0
 		GetZenkaiPower()
-			var/ZenkaiPower = (passive_handler.Get("ZenkaiPower")/2)
+			var/ZenkaiPower = (passive_handler.Get("ZenkaiPower"))
 			return ZenkaiPower
 		GetZenkaiScaling()
+			var/Return=1
+			var/HealthLost = abs(src.HealthPct()-100)
+			var/TargetHealthLost=1
+			if(src.Target)
+				TargetHealthLost= abs(src.Target.HealthPct()-100)
+			var/PHL=1//proportional health loss
+			if(HealthLost>10&&TargetHealthLost>1)
+				if(HealthLost>TargetHealthLost)
+					PHL=clamp(HealthLost/TargetHealthLost, 1, 5)
+			Return=1+(((HealthLost/100)*PHL)*GetZenkaiPower())
+			return Return
+/*		GetZenkaiScaling()
 			var/Return=1
 			var/Mult=GetZenkaiPower() / glob.HELL_SCALING_MULT
 			if(HasZenkaiPower() == 2)
@@ -1545,7 +1557,7 @@ mob
 			var/HealthLost = abs(src.HealthPct()-100)
 			Return=1+(((glob.BASE_HELL_SCALING_RATIO * HealthLost) * Mult) ** (1/2))
 			return Return
-
+*/
 		HasPowerReplacement()
 			if(src.passive_handler.Get("PowerReplacement"))
 				return 1

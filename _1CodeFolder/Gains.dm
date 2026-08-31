@@ -646,6 +646,21 @@ mob
 				// HP rising DT to base form
 				if(isInMazokuDT() && HealthPct() > 75 * (1 - HealthCut) && !src.KO)
 					race.transformations[transActive].revert(src)
+			if((isRace(HUMAN) || isRace(HALFSAIYAN))&&transActive>0)
+				var/drain = 0
+				if(race.transformations[transActive].mastery<100)
+					drain = glob.racials.HALFIE_SSJ_BASE_DRAIN
+					if(src.passive_handler.Get("Ultimate")&&transActive<=2)
+						drain = 0
+					if(src.passive_handler.Get("Ultimate")&&transActive>=3)
+						drain /=2
+
+				if(drain>0)
+					src.LoseEnergy(drain)
+					if(Energy < 2 &&!src.Dead&&!passive_handler.Get("Ultimate"))
+						src.Revert()
+						src.LoseEnergy(30)
+						src<<"The strain of Super Saiyan forced you to revert!"
 			if((isRace(SAIYAN) || isRace(HALFSAIYAN))&&transActive>0)
 				if(HellspawnBerserk)
 					HellspawnTimer-=1
@@ -702,6 +717,21 @@ mob
 							missile('SE.dmi', src, M)
 						else
 							src.Transfering=null
+
+			if(src.BeamHoldTimer > 0 && src.BeamHoldID != null)
+				var/drain = 1/src.passive_handler.Get("BeamHoldMastery")
+				src.BeamHoldTimer-=1
+				src.LoseEnergy(drain)
+				if(src.BeamHoldTimer == 0)
+					src.BeamHoldID = null
+					src.BeamHoldCharge = 0
+					src << "You can't hold your beam charge any longer!"
+				if(Energy < 20-(src.passive_handler.Get("BeamHoldMastery")*2))
+					src.BeamHoldTimer = 0
+					src.BeamHoldID = null
+					src.BeamHoldCharge = 0
+					src << "You don't have enough energy to keep holding onto your charge!"
+
 
 			//FocusShift stuff
 			if(src.FocusShiftActive)
