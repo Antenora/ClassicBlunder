@@ -22,6 +22,7 @@ mob/proc/MovementSpeed()
 		Godspeed = min(0, Godspeed-CrippledGod);
 	SpdMult = max(0.1,glob.GOD_SPEED_MULT*sqrt(max(1,Godspeed)))
 	var/Delay=glob.SPEED_DELAY/(Spd*(1+SpdMult))
+	var/initialDelay = Delay;
 	if(src.Flying)
 		Delay=0.25
 		if(src.Attracted)
@@ -67,6 +68,9 @@ mob/proc/MovementSpeed()
 		var/turf/dahead = get_step(src, src.dir)
 		if(dahead && src.DarumaMovingToward(dahead))
 			Delay /= 2
+	if(hasRaindropBody())
+		if(initialDelay < Delay)
+			return initialDelay
 	return Delay
 
 mob/Move()

@@ -6395,6 +6395,8 @@ obj
 								else if(src.Owner.Oxygen>=src.Owner.OxygenMax*0.3)
 									var/RipplePower=(1+(0.125*src.Owner.GetRipple()*max(1,src.Owner.PoseEnhancement*2)))
 									accmult*=RipplePower
+
+
 							if(Accuracy_Formula(src.Owner, a, accmult*(src.MultiHit+1), BaseChance=glob.WorldDefaultAcc, Backfire=src.Backfire) == MISS &&!a:KO&&!src.Radius&&src.Dodgeable>=0)
 								if(src.Area=="Beam") BeamDbg("BAIL accuracy MISS acc=[accmult] dodgeable=[src.Dodgeable] radius=[src.Radius]")
 								if(!UsesPixelCollision)
