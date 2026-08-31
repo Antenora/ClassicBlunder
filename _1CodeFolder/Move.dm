@@ -47,7 +47,7 @@ mob/proc/MovementSpeed()
 			Delay=50
 		if(Delay<glob.SPEED_DELAY_LOWEST)
 			Delay=glob.SPEED_DELAY_LOWEST
-	if(!PmActive()) //pixel build does afterimages per tile-crossing in PmMovementTick instead
+	if(!PmActive())
 		if(src.Afterimages())
 			if(prob(40*Afterimages()))
 				FlashImage(src)
@@ -62,7 +62,6 @@ mob/proc/MovementSpeed()
 		Delay*=4
 	if(src.SenseRobbed>=1&&(src.SenseUnlocked<=src.SenseRobbed&&src.SenseUnlocked>5))
 		Delay*=(2*src.SenseRobbed)
-	// Daruma-san ga Koronda is 2x move speed only when moving towards the target
 	if(src.DarumaActive)
 		var/turf/dahead = get_step(src, src.dir)
 		if(dahead && src.DarumaMovingToward(dahead))
@@ -84,7 +83,6 @@ mob/Move()
 				return
 	..()
 
-	//turn the world-shadow with the mob instead of waiting on the 3ds loop
 	if(shadow_pool && length(shadow_pool) && glob && glob.WORLD_SHADOWS)
 		for(var/obj/fx_worldshadow/s in shadow_pool)
 			s.RebuildSilhouette()
@@ -105,19 +103,17 @@ mob/Move()
 			if(customObject.edge && (customObject.dir in list(dir,turn(dir,90),turn(dir,-90),turn(dir,45),turn(dir,-45))))
 				loc = Former_Location
 				break
-/*	if(src.passive_handler.Get("Skimming"))
-		var/range = passive_handler.Get("GiantSwings") ? passive_handler.Get("GiantSwings") : 1
-		for(var/mob/M in oview(range, src))
-			if(M != src && M.density)
-				src.Melee1(dmgmulti =(0.15), forcedTarget = M)*/
-	if(Bleed > 0 && !Knockback && !is_dashing && client && (!PmActive() || loc != Former_Location)) //micro-steps bleed per tile, not per slide
+	if(Bleed > 0 && !Knockback && !is_dashing && client && (!PmActive() || loc != Former_Location))
 		WoundSelf(0.01)
 
 	if(src.Grab)
 		src.Grab_Update()
 
-	if(MapperWalk&&!Knockback&&Target&&istype(Target,/obj/Others/Build))
-		Build_Lay(Target,src, 0, 0, 0)
+	if(MapperWalk&&!Knockback)
+		if(client?.bsession?.active && client.bsession.brush)
+			client.bsession.WalkPaint()
+		else if(Target&&istype(Target,/obj/Others/Build))
+			Build_Lay(Target,src, 0, 0, 0)
 
 	if(AFKTimer==0)
 		overlays-=AFKIcon

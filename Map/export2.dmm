@@ -1,0 +1,24 @@
+"a" = (/turf/IconsX/Icon7{Destructable = 0},/area/Outside/Studio)
+"b" = (/obj/Turfs/Newturfs/IndustrialProps,/turf/IconsX/Icon7{Destructable = 0},/area/Outside/Studio)
+"c" = (/obj/Turfs/IconsXLBig/Icon16,/turf/IconsX/Icon7{Destructable = 0},/area/Outside/Studio)
+
+(1,1,1) = {"
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaacaaaabaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aacaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaacaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aabaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+aaaaaaaaaaaaaaaaaaaaa
+"}

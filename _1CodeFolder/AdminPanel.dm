@@ -1,20 +1,20 @@
-#define APANEL_W 176                          // widened 160->176 for the scrollbar gutter
+#define APANEL_W 176
 #define APANEL_H 316
-#define APANEL_GAP 8                          // gap between the admin strip and the player panel
+#define APANEL_GAP 8
 #define APANEL_LAYER (FLY_LAYER + 3)
 #define APANEL_FONT "font-family:'monogram'; font-size:12pt" 
 #define ABTN_W 132
-#define ABTN_H 24                             // native pbtn height
-#define ABTN_X 14                             // (160-132)/2, centers the button in the strip
-#define ABTN_RH 28                            // row pitch
+#define ABTN_H 24
+#define ABTN_X 14
+#define ABTN_RH 28
 #define ADMIN_VISIBLE 8
-#define ADMIN_ROWS 9                          // visible + 1 buffer row for smooth scroll
+#define ADMIN_ROWS 9
 #define ADMIN_BAND_H (ADMIN_VISIBLE * ABTN_RH)
-#define ADMIN_Y0 252                          // panel-local py (from bottom) of the top row's bottom edge (AH-40-24)
-#define ADMIN_FILL "#213050"                  // panel interior color, cover strips clip scrolling rows
-#define ADMIN_TRACK_X 148                     // gutter right of the buttons
-#define ADMIN_TRACK_PY 52                     // panel-local py of the track bottom = band bottom
-#define ADMIN_TRACK_H 224                     // = ADMIN_BAND_H
+#define ADMIN_Y0 252
+#define ADMIN_FILL "#213050"
+#define ADMIN_TRACK_X 148
+#define ADMIN_TRACK_PY 52
+#define ADMIN_TRACK_H 224
 #define ADMIN_THUMB_H 36
 
 /atom/movable/shud/adminpanelbg
@@ -22,17 +22,17 @@
 	mouse_opacity = 2
 	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
 	MouseDown(location, control, params)
-		if(usr) usr.client.PPanelStart(params)   // drags the player panel + admin strip together
+		if(usr) usr.client.PPanelStart(params)
 	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
 		if(usr) usr.client.PPanelMove(params)
 	MouseUp(location, control, params)
 		if(usr) usr.client.PPanelEnd()
 	Click(location, control, params)
 		if(params && findtext(params, "right=1"))
-			if(usr) usr.client.HidePlayerPanel()   // right-click either panel closes both
+			if(usr) usr.client.HidePlayerPanel()
 
 /atom/movable/shud/adminlbl
-	mouse_opacity = 0                          // clicks fall through to the button
+	mouse_opacity = 0
 	New()
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
@@ -58,7 +58,6 @@
 	Click(location, control, params)
 		if(usr && action) usr.client.AdminPanelAction(action)
 
-// routes the jump to the admin or atom strip's list
 /atom/movable/shud/admintrack
 	layer = APANEL_LAYER + 0.15
 	mouse_opacity = 2
@@ -79,14 +78,14 @@
 client
 	var/tmp
 		list/admin_panel_objs
-		list/admin_btn_objs                    // the ADMIN_ROWS windowed button objects
-		list/admin_cmd_list                    // ordered list(action, label)
+		list/admin_btn_objs
+		list/admin_cmd_list
 		mob/admin_panel_target
 		admin_panel_open = FALSE
 		admin_px = 0
 		admin_target_px = 0
 		admin_anim = FALSE
-		ap_tile = 1                            // horizontal anchor
+		ap_tile = 1
 		ap_xpix = 0
 		atom/movable/shud/adminthumb/admin_thumb
 
@@ -108,7 +107,7 @@ client
 		list("assess",    "Assess"),
 		list("rename",    "Admin Rename"),
 		list("edit",      "Edit"),
-		list("editph",    "Edit Passives"),   // EditPassiveHandler is abbreviated to fit the thin button at 12pt
+		list("editph",    "Edit Passives"),
 		list("viewp",     "View Passives"),
 		list("dodmg",     "Do Damage")
 	)
@@ -121,7 +120,7 @@ client
 
 /proc/AdminBtnIcon(w)
 	var/cap = 8
-	var/icon/out = icon('HUD/pbtn.png')        // 80 x 24, opaque
+	var/icon/out = icon('HUD/pbtn.png')
 	out.Scale(w, 24)
 	var/icon/pb = icon('HUD/pbtn.png')
 	var/icon/left = icon(pb);  left.Crop(1, 1, cap, 24)
@@ -131,17 +130,14 @@ client
 	return out
 
 client/proc/ComputeAdminPanelAnchor()
-	// anchor off the player panel's already-computed left edge (pp_tile/pp_xpix are plain
-	// vars, so this doesn't depend on PlayerPanel.dm's #defines / include order)
-	var/pleft = (pp_tile - 1) * 32 + pp_xpix           // player panel's left edge in px
-	var/aleft = pleft - APANEL_GAP - APANEL_W          // admin strip sits just left of it
+	var/pleft = (pp_tile - 1) * 32 + pp_xpix
+	var/aleft = pleft - APANEL_GAP - APANEL_W
 	if(aleft < 0) aleft = 0
 	ap_tile = (aleft - aleft % 32) / 32 + 1
 	ap_xpix = aleft % 32
 	return 1
 
 client/proc/APLoc(px, py)
-	// shares the player panel's drag offset so both move as one unit
 	return "[ap_tile]:[ap_xpix + px + pp_pan_x],[pp_row]:[pp_poff + py + pp_pan_y]"
 
 client/proc/HideAdminPanel()
@@ -182,7 +178,6 @@ client/proc/ShowAdminPanel(mob/P)
 		admin_btn_objs += b
 		admin_panel_objs += b
 
-	// interior-colored cover strips clip rows that scroll past the band edges
 	var/atom/movable/shud/tcov = new
 	tcov.icon = AdminCoverIcon(136, 30)
 	tcov.mouse_opacity = 0
@@ -263,7 +258,6 @@ client/proc/AdminWheelScroll(delta_y)
 		if(!admin_anim) AnimateAdminScroll()
 	return 1
 
-// track click/drag jumps the list to the cursor; kind picks which strip's state
 client/proc/AdminTrackTo(kind, params)
 	var/list/pl = params2list(params)
 	var/sl = pl["screen-loc"]
@@ -292,7 +286,7 @@ client/proc/AdminTrackTo(kind, params)
 		var/local_py = (row - 1) * 32 + py - (atomp_row - 1) * 32 - atomp_poff - pp_pan_y
 		var/frac = clamp((top_py - local_py) / ADMIN_TRACK_H, 0, 1)
 		atomp_px = round(frac * maxpx)
-		atomp_target_px = atomp_px           // cancel any running wheel glide
+		atomp_target_px = atomp_px
 		RefreshAtomBtns()
 	else
 		if(!admin_panel_open || !admin_cmd_list) return
@@ -301,7 +295,7 @@ client/proc/AdminTrackTo(kind, params)
 		var/local_py = (row - 1) * 32 + py - (pp_row - 1) * 32 - pp_poff - pp_pan_y
 		var/frac = clamp((top_py - local_py) / ADMIN_TRACK_H, 0, 1)
 		admin_px = round(frac * maxpx)
-		admin_target_px = admin_px           // cancel any running wheel glide
+		admin_target_px = admin_px
 		RefreshAdminBtns()
 
 client/proc/AdminInvoke(ident, atom/T)
@@ -364,7 +358,6 @@ client/proc/AdminPanelAction(action)
 		if(params && findtext(params, "right=1"))
 			if(usr) usr.client.HideAtomPanel()
 
-// adminbtn child so it inherits the label plumbing, only the dispatch differs
 /atom/movable/shud/adminbtn/atombtn
 	Click(location, control, params)
 		if(usr && action) usr.client.AtomPanelAction(action)
@@ -385,7 +378,6 @@ client
 		atomp_poff = 0
 		atom/movable/shud/adminthumb/atomp_thumb
 
-// per-target list. hascall gates by what the mob actually has
 client/proc/AtomCommandList(atom/A)
 	var/list/L = list()
 	if(mob.Admin)
@@ -395,10 +387,6 @@ client/proc/AtomCommandList(atom/A)
 	if(mob.Mapper)
 		if(hascall(mob, "Mapper_Edit")) L += list(list("m_edit", "Mapper Edit"))
 		if(hascall(mob, "Mapper_Fade")) L += list(list("m_fade", "Mapper Fade"))
-		// Mapper_Delete only touches custom build objects
-		if((istype(A, /obj/Turfs) || istype(A, /obj/KatieObj)) && hascall(mob, "Mapper_Delete"))
-			L += list(list("m_delete", "Mapper Delete"))
-	// surface-profile tools (Mapper category), hascall carries the permission
 	if(hascall(mob, "Surface_Inspect"))          L += list(list("s_inspect", "Surface Inspect"))
 	if(hascall(mob, "Surface_Set_Profile"))      L += list(list("s_profile", "Set Profile"))
 	if(hascall(mob, "Surface_Set_Type_Profile")) L += list(list("s_tprofile", "Set Type Profile"))
@@ -409,7 +397,6 @@ client/proc/AtomCommandList(atom/A)
 	return L
 
 client/proc/ComputeAtomPanelAnchor()
-	// same right-margin dock as the player panel, sized for the 160px strip
 	var/list/v = splittext("[view]", "x")
 	if(v.len < 2) return 0
 	var/tw = text2num(v[1]); var/th = text2num(v[2])
@@ -426,7 +413,6 @@ client/proc/ComputeAtomPanelAnchor()
 	return 1
 
 client/proc/ATPLoc(px, py)
-	// shares the player panel's saved drag offset so both dock at the same spot (might change this to be closer to actual right click loc)
 	return "[atomp_tile]:[atomp_xpix + px + pp_pan_x],[atomp_row]:[atomp_poff + py + pp_pan_y]"
 
 client/proc/ATPanelBounds()
@@ -491,10 +477,10 @@ client/proc/HideAtomPanel()
 client/proc/ShowAtomPanel(atom/A)
 	if(!A || !mob) return
 	if(!mob.Admin && !mob.Mapper) return
-	if(!isturf(A) && !(isobj(A) && A.loc)) return   // map atoms only, screen objs keep their own handlers
+	if(!isturf(A) && !(isobj(A) && A.loc)) return
 	var/list/cmds = AtomCommandList(A)
 	if(!cmds.len) return
-	HidePlayerPanel()   // shared dock. also clears the admin strip + any old atom panel
+	HidePlayerPanel()
 	if(!ComputeAtomPanelAnchor()) return
 	pp_pan_x = getPref("ppPanX"); if(isnull(pp_pan_x)) pp_pan_x = 0
 	pp_pan_y = getPref("ppPanY"); if(isnull(pp_pan_y)) pp_pan_y = 0
@@ -521,7 +507,6 @@ client/proc/ShowAtomPanel(atom/A)
 		atom_btn_objs += b
 		atom_panel_objs += b
 
-	// interior-colored cover strips clip rows that scroll past the band edges
 	var/atom/movable/shud/tcov = new
 	tcov.icon = AdminCoverIcon(136, 30)
 	tcov.mouse_opacity = 0
@@ -545,7 +530,6 @@ client/proc/ShowAtomPanel(atom/A)
 	atomp_thumb.icon = 'HUD/scroll_thumb.png'
 	atom_panel_objs += atomp_thumb
 
-	// target readout over the top cover strip so staff can see what they grabbed
 	var/atom/movable/shud/adminlbl/nm = new
 	nm.layer = APANEL_LAYER + 0.3
 	nm.maptext_width = 152
@@ -625,9 +609,6 @@ client/proc/AtomPanelAction(action)
 			HideAtomPanel()
 		if("m_edit")   AdminInvoke("Mapper_Edit", T)
 		if("m_fade")   AdminInvoke("Mapper_Fade", T)
-		if("m_delete")
-			AdminInvoke("Mapper_Delete", T)
-			HideAtomPanel()
 		if("s_inspect")  AdminInvoke("Surface_Inspect", T)
 		if("s_profile")  AdminInvoke("Surface_Set_Profile", T)
 		if("s_tprofile") AdminInvoke("Surface_Set_Type_Profile", T)

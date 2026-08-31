@@ -4,10 +4,10 @@
 #define CMENU_LAYER (FLY_LAYER + 3.6)
 #define CMENU_VY 10
 #define PASS_VISIBLE 11
-#define PASS_ROWS 12       // one extra buffer row for smooth scrolling
+#define PASS_ROWS 12
 #define PASS_Y0 122
 #define PASS_RH 18
-#define PASS_BAND_H 198    // PASS_VISIBLE * PASS_RH
+#define PASS_BAND_H 198
 #define PASS_CLIP_T 116
 #define PASS_CLIP_B 312
 #define PASS_TRACK_Y 120
@@ -23,12 +23,12 @@
 #define GEAR_TRACK_H 200
 #define GEAR_THUMB_H 36
 #define CUST_VISROWS 11
-#define CUST_ROWS 12        // one extra buffer row for smooth scrolling
+#define CUST_ROWS 12
 #define CUST_RH 18
 #define CUST_Y0 122
-#define CUST_BAND_H 198     // CUST_VISROWS * CUST_RH
+#define CUST_BAND_H 198
 #define CUST_TRACK_Y 120
-#define CUST_TRACK_H 206   // scroll_track.png height. 200 left the thumb 6px short
+#define CUST_TRACK_H 206
 #define CUST_THUMB_H 36
 
 /var/CMENU_BARFILL_RESOURCE = 'HUD/bar_fill74.png'
@@ -108,18 +108,17 @@
 /var/list/HAT_TGL_ON  = list('HUD/toggle_on_1.png', 'HUD/toggle_on_2.png', 'HUD/toggle_on_3.png', 'HUD/toggle_on_4.png', 'HUD/toggle_on_5.png')
 
 client/proc/CMloc(dx, dy)
-	// cm_pan_x/cm_pan_y are the player's drag offset (pixels) from the default centered anchor
 	var/py = CMENU_H - dy
 	var/ax = dx + cm_pan_x
 	var/ay = py + cm_pan_y
-	var/axp = ((ax % 32) + 32) % 32   // non-negative pixel remainder (BYOND % keeps the dividend's sign)
+	var/axp = ((ax % 32) + 32) % 32
 	var/ayp = ((ay % 32) + 32) % 32
 	return "[cm_atx + (ax - axp) / 32]:[axp],[cm_aty + (ay - ayp) / 32]:[ayp]"
 
 /atom/movable/shud/cmframe
 	layer = CMENU_LAYER
 	mouse_opacity = 2
-	mouse_drag_pointer = MOUSE_INACTIVE_POINTER   // enable MouseDrag without showing a drag-ghost cursor
+	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
 	MouseDown(location, control, params)
 		if(usr) usr.client.CMPanStart(params)
 	MouseDrag(over_object, src_location, over_location, src_control, over_control, params)
@@ -186,7 +185,6 @@ client/proc/CMloc(dx, dy)
 	Click(location, control, params)
 		if(usr) spawn() usr.ChooseMenuPronouns()
 
-// click to rename yourself
 /atom/movable/shud/cmname
 	layer = CMENU_LAYER + 0.4
 	mouse_opacity = 2
@@ -195,7 +193,7 @@ client/proc/CMloc(dx, dy)
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
 	MouseEntered(location, control, params)
-		filters = filter(type="outline", size=1, color="#8be9ff")   // cyan hint
+		filters = filter(type="outline", size=1, color="#8be9ff")
 	MouseExited(location, control, params)
 		filters = filter(type="outline", size=1, color="#000000")
 	Click(location, control, params)
@@ -205,7 +203,7 @@ client/proc/CMloc(dx, dy)
 	layer = CMENU_LAYER + 0.35
 	mouse_opacity = 2
 	var/buff_name
-	var/menu_dx                                 // menu-local x of the box, for placing the hover label
+	var/menu_dx
 	var/obj/Skills/Buffs/buff
 	proc/SetBuff(obj/Skills/Buffs/b)
 		buff = b
@@ -227,7 +225,7 @@ client/proc/CMloc(dx, dy)
 			if(usr.client.skinfo_skill == buff)
 				usr.client.CloseSkillInfo()
 			else
-				usr.client.ShowBuffInfo(buff)   // dedicated buff panel, boosts + right-clickable passive rows
+				usr.client.ShowBuffInfo(buff)
 
 /atom/movable/shud/cmpassrow
 	layer = CMENU_LAYER + 0.3
@@ -299,7 +297,7 @@ client/proc/CMloc(dx, dy)
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
 	MouseEntered(location, control, params)
-		filters = filter(type="outline", size=1, color="#8be9ff")   // cyan glow on hover. filters affect maptext, color does not
+		filters = filter(type="outline", size=1, color="#8be9ff")
 	MouseExited(location, control, params)
 		filters = filter(type="outline", size=1, color="#000000")
 	Click(location, control, params)
@@ -332,7 +330,7 @@ client/proc/CMloc(dx, dy)
 	layer = CMENU_LAYER + 0.72
 	mouse_opacity = 2
 	var/obj/Items/git
-	var/gact   // "passive" or "layer"
+	var/gact
 	var/pname
 	MouseEntered(location, control, params)
 		filters = filter(type="outline", size=1, color="#8be9ff")
@@ -420,9 +418,6 @@ client/var/tmp/gd_pan_y = 0
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
 
-//////////////////////////////////////////////////////////////////
-// Client state + lifecycle
-//////////////////////////////////////////////////////////////////
 
 client
 	var/tmp
@@ -430,9 +425,9 @@ client
 		cmenu_tab = 0
 		cm_atx = 0
 		cm_aty = 0
-		cm_pan_x = 0          // saved drag offset (px) from the centered anchor, baked into CMloc
+		cm_pan_x = 0
 		cm_pan_y = 0
-		cm_pan_mx = 0         // mouse + pan at grab time
+		cm_pan_mx = 0
 		cm_pan_my = 0
 		cm_pan_ox = 0
 		cm_pan_oy = 0
@@ -441,8 +436,8 @@ client
 		list/cmenu_vals
 		list/cmenu_fills
 		list/cmenu_buffs
-		list/cmenu_buff_all                     // full active-menu-buff list (window of 5 shown in the boxes)
-		cmenu_buff_page = 0                      // 0-based window start when buffs overflow the 5 boxes
+		list/cmenu_buff_all
+		cmenu_buff_page = 0
 		cmenu_buff_anim = FALSE
 		list/cmenu_desc_objs
 		list/cmenu_gearpass_objs
@@ -507,7 +502,7 @@ client
 client/proc/InitCharacterMenuButton()
 	btn_character = new('HUD/ui_icon_profile.png')
 	btn_character.btn_id = "character"
-	btn_character.screen_loc = "EAST:-4,NORTH:-176"   // pushed down, target card sits top-right
+	btn_character.screen_loc = "EAST:-4,NORTH:-176"
 	shud_parts += btn_character
 	btn_character_label = new
 	btn_character_label.maptext_width = 72
@@ -545,18 +540,17 @@ client/proc/ClearCMenuObjs()
 
 client/proc/CloseCharacterMenu()
 	cmenu_open = FALSE
-	CloseSkillInfo()   // close a buff info panel if one is open
+	CloseSkillInfo()
 	ClearCMenuObjs()
 	cmenu_objs = null
 	if(btn_character)
 		btn_character.icon = 'HUD/ui_slot_available.png'
 		btn_character.SetGlyphDimmed(FALSE)
 
-// floating buff-name tooltip above the hovered character-menu buff slot
 client/proc/ShowBuffSlotName(atom/movable/shud/cmbuff/b)
 	if(!cmbuff_hoverlbl || !b || !b.buff_name) return
 	cmbuff_hoverlbl.maptext = "<center><span style=\"[CMENU_FONT]; color:#8be9ff\">[b.buff_name]</span></center>"
-	cmbuff_hoverlbl.screen_loc = CMloc(b.menu_dx - 54, 330)   // centered under the slot
+	cmbuff_hoverlbl.screen_loc = CMloc(b.menu_dx - 54, 330)
 	cmbuff_hoverlbl.alpha = 255
 client/proc/HideBuffSlotName()
 	if(cmbuff_hoverlbl) cmbuff_hoverlbl.alpha = 0
@@ -572,7 +566,6 @@ client/proc/OpenCharacterMenu()
 	CloseStationMenu()
 	cmenu_open = TRUE
 	cmenu_tab = 0
-	// tile-anchor the frame so it stays inside the view
 	var/list/vd = splittext("[view]", "x")
 	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
 	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
@@ -580,7 +573,6 @@ client/proc/OpenCharacterMenu()
 	var/mth = round(CMENU_H / 32); if(mth * 32 < CMENU_H) mth++
 	cm_atx = max(1, round((vw - mtw) / 2) + 1)
 	cm_aty = max(1, round((vh - mth) / 2) + 1)
-	// restore the player's saved menu position, clamped to the current view (zoom/window may have changed)
 	cm_pan_x = getPref("cmPanX"); if(isnull(cm_pan_x)) cm_pan_x = 0
 	cm_pan_y = getPref("cmPanY"); if(isnull(cm_pan_y)) cm_pan_y = 0
 	var/list/pb = CMPanBounds()
@@ -652,7 +644,7 @@ client/proc/BuildCharacterMenu(fade = FALSE)
 		screen += o
 	UpdateCharacterMenu()
 	if(fade)
-		KineticEntrance(cmenu_objs)   // first open only, no fade on tab switch
+		KineticEntrance(cmenu_objs)
 
 client/proc/BuildHeaderOverlays()
 	cm_portrait = new
@@ -691,11 +683,11 @@ client/proc/BuildStatsContent()
 	for(var/j = 1 to 5)
 		var/atom/movable/shud/cmbuff/b = new
 		b.menu_dx = 428 + (j - 1) * 32
-		b.screen_loc = CMloc(b.menu_dx + 1, 313)   // measured + 1px down, seats the 26px icon in the box interior
+		b.screen_loc = CMloc(b.menu_dx + 1, 313)
 		b.alpha = 0
 		cmenu_buffs += b
 		cmenu_objs += b
-	cmbuff_hoverlbl = new /atom/movable/shud/menutext   // floating buff-name tooltip, shown above a slot on hover
+	cmbuff_hoverlbl = new /atom/movable/shud/menutext
 	cmbuff_hoverlbl.layer = CMENU_LAYER + 0.6
 	cmbuff_hoverlbl.maptext_width = 140
 	cmbuff_hoverlbl.maptext_height = 16
@@ -726,10 +718,9 @@ client/proc/BuildPersonalContent()
 		cmenu_objs += L
 		i++
 
-// spawn + output to mob, a direct usr<<browse from the Click silently did not show
 client/proc/PersonalButtonAction(action)
 	if(!mob) return
-	var/mob/Players/p = mob   // these verbs live on /mob/Players
+	var/mob/Players/p = mob
 	switch(action)
 		if("ailogs")  spawn() ShowAIKills()
 		if("selflogs") spawn() ShowSelfLogs()
@@ -762,7 +753,6 @@ client/proc/ShowSelfLogs()
 		return
 	var/sel = input(mob, "Which log do you want to read?", "Self Logs") as null|anything in entries
 	if(!sel) return
-	// logger html_encodes messages, decode so the <font> colors render. light bg suits them
 	var/content = html_decode(file2text(file("[dir][sel]")))
 	mob << browse("<html><head><title>Log: [sel]</title></head><body bgcolor=#f4f1e8 text=#101010 style='font-family:sans-serif;padding:6px'><b style='color:#b00000'>[sel]</b><hr>[content]</body></html>", "window=Log;size=560x600")
 
@@ -837,7 +827,7 @@ client/proc/SetPassPx(px)
 	if(!cmenu_pass_list) return
 	var/maxpx = max(0, cmenu_pass_list.len * PASS_RH - PASS_BAND_H)
 	cmenu_pass_px = clamp(px, 0, maxpx)
-	cmenu_pass_target = cmenu_pass_px   // drag/click cancels any running wheel glide
+	cmenu_pass_target = cmenu_pass_px
 	RefreshPassRows()
 
 client/proc/ScrollTrackTo(params)
@@ -859,28 +849,29 @@ client/proc/ScrollTrackTo(params)
 	frac = clamp(frac, 0, 1)
 	SetPassPx(round(frac * maxpx))
 
-// real sig is 6 args. use only the sign, the OS reports big magnitudes (120/notch)
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
 	if(AdminWheelScroll(delta_y))
 		return
-	if(AtomWheelScroll(delta_y))   // turf/obj right-click strip (AdminPanel.dm)
+	if(AtomWheelScroll(delta_y))
 		return
 	if(StackWheelScroll(delta_y))
 		return
-	if(BuffWheelScroll(delta_y))   // buff info panel (defines live in SkillMenuHotbar.dm)
+	if(BuffWheelScroll(delta_y))
 		return
-	if(AqWheelScroll(delta_y))     // Acquire Skills list (AcquireHUD.dm)
+	if(AqWheelScroll(delta_y))
 		return
-	if(StWheelScroll(delta_y))     // Forge/Anvil station list (StationHUD.dm)
+	if(StWheelScroll(delta_y))
 		return
-	if(LogWheelScroll(delta_y))    // Collection Log grid (LogHUD.dm)
+	if(LogWheelScroll(delta_y))
 		return
-	if(FarmWheelScroll(delta_y))   // Seed stall / seed picker (farming.dm)
+	if(FarmWheelScroll(delta_y))
 		return
-	if(AhWheelScroll(delta_y))     // Auction House rows (AuctionHUD.dm)
+	if(AhWheelScroll(delta_y))
+		return
+	if(BuildWheelScroll(delta_y))
 		return
 	if(cmenu_open && cmenu_tab == 0 && cmenu_buff_all && cmenu_buffs && cmenu_buff_all.len > cmenu_buffs.len)
-		AnimateBuffPage((delta_y > 0) ? -1 : 1)   // page the 5-buff window
+		AnimateBuffPage((delta_y > 0) ? -1 : 1)
 		return
 	if(cmenu_open && cmenu_tab == 1 && cmenu_pass_list)
 		var/maxpx = max(0, cmenu_pass_list.len * PASS_RH - PASS_BAND_H)
@@ -910,13 +901,12 @@ client/proc/AnimatePassScroll()
 	while(cmenu_open && cmenu_tab == 1 && cmenu_pass_list && cmenu_pass_px != cmenu_pass_target)
 		var/diff = cmenu_pass_target - cmenu_pass_px
 		var/stepp = round(diff * 0.5)
-		if(!stepp) stepp = (diff > 0) ? 1 : -1   // always close the last pixels
+		if(!stepp) stepp = (diff > 0) ? 1 : -1
 		cmenu_pass_px += stepp
 		RefreshPassRows()
 		sleep(world.tick_lag)
 	cmenu_pass_anim = FALSE
 
-// character-menu buff boxes: window of 5, snap-paged crossfade when there are more active buffs than boxes
 client/proc/RefreshCmenuBuffs()
 	if(!cmenu_buffs) return
 	var/total = cmenu_buff_all ? cmenu_buff_all.len : 0
@@ -947,7 +937,7 @@ client/proc/AnimateBuffPage(dir)
 	sleep(1.5)
 	cmenu_buff_page = np
 	for(var/i = 1 to cmenu_buffs.len)
-		FillCmenuBuffSlot(i, 0)            // swap icons in, faded out
+		FillCmenuBuffSlot(i, 0)
 	for(var/atom/movable/shud/cmbuff/nb in cmenu_buffs)
 		if(nb.buff) animate(nb, alpha = 255, time = 1.5)
 	sleep(1.5)
@@ -968,7 +958,7 @@ client/proc/UpdateCharacterMenu()
 			fl.icon = ic
 		var/list/buffs = list()
 		for(var/obj/Skills/Buffs/mb in mob.GetMenuBuffs())
-			if(IsMenuBuff(mb)) buffs += mb        // character menu shows active non-timed, non-debuff buffs
+			if(IsMenuBuff(mb)) buffs += mb
 		cmenu_buff_all = buffs
 		if(!cmenu_buff_anim) RefreshCmenuBuffs()
 	cm_name.maptext = "<span style=\"[CMENU_FONT]; color:#ffffff\">[uppertext(mob.name)]</span>"
@@ -980,9 +970,6 @@ client/proc/UpdateCharacterMenu()
 	cm_rp.maptext = "<span style=\"[CMENU_FONT]; text-align:right; color:#96c3e1\">REWARD POINTS <span style=\"color:#ffffff\">[D["rp"]]</span></span>"
 	cm_rpused.maptext = "<span style=\"[CMENU_FONT]; text-align:right; color:#96c3e1\">REWARD POINTS USED <span style=\"color:#ffffff\">[D["rpused"]]</span></span>"
 
-//////////////////////////////////////////////////////////////////
-// Passive description popup
-//////////////////////////////////////////////////////////////////
 
 client/proc/HideDescPanel()
 	HideGearPassiveInfo()
@@ -1021,7 +1008,7 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 	else
 		P = new /atom/movable/shud/cmdesc
 	P.icon = CMENU_R3
-	P.screen_loc = CMloc(92, 322)                 // centered in the 624x344 menu
+	P.screen_loc = CMloc(92, 322)
 	objs += P
 	var/atom/movable/T = MkPDescText(gear)
 	T.maptext_width = 404
@@ -1029,8 +1016,8 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 	T.maptext = gspan(name, "#ffd278", "left")
 	objs += T
 	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
-	var/list/lines = WrapDescLines(d, 66)         // 404px body at 6px/char (monogram 12pt)
-	var/n = min(lines.len, 13)                    // 13 rows fit between title and hint
+	var/list/lines = WrapDescLines(d, 66)
+	var/n = min(lines.len, 13)
 	for(var/i = 1 to n)
 		var/txt = lines[i]
 		if(i == 13 && lines.len > 13) txt += " ..."
@@ -1049,7 +1036,6 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 		screen += o
 	KineticEntrance(objs)
 
-// ctx picks which panel to refresh after, "gear" or "inv"
 client/proc/RenameItem(obj/Items/it, ctx)
 	set waitfor = 0
 	if(!istype(it) || !mob) return
@@ -1079,9 +1065,6 @@ client/proc/ShowPassDesc(name)
 	cmenu_desc_objs = list()
 	BuildPassDescPopup(cmenu_desc_objs, name, FALSE)
 
-//////////////////////////////////////////////////////////////////
-// Gear tab
-//////////////////////////////////////////////////////////////////
 
 client/proc/gspan(txt, col, align = "left")
 	return "<span style=\"[CMENU_FONT]; color:[col]; text-align:[align]\">[txt]</span>"
@@ -1102,8 +1085,6 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 	cmenu_objs += L
 	return L
 
-// fit any item icon into a centered box-px square, ignoring its own size/offsets
-// autocropped icons cached by "[icon]_[state]" so the pixel scan runs once per sprite
 /var/list/CroppedIconCache = list()
 
 /proc/FitIconToBox(atom/movable/disp, atom/source, box)
@@ -1117,7 +1098,6 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 	var/icon/base = CroppedIconCache[ckey]
 	if(!base)
 		base = icon(source.icon, source.icon_state)
-		// trim transparent padding so we center the visible sprite, not the icon box
 		var/w = base.Width()
 		var/h = base.Height()
 		var/minx = 0
@@ -1138,7 +1118,7 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 		if(found)
 			base.Crop(minx, miny, maxx, maxy)
 		CroppedIconCache[ckey] = base
-	var/icon/I = icon(base)   // copy before scaling so the cached base stays intact
+	var/icon/I = icon(base)
 	var/iw = I.Width()
 	var/ih = I.Height()
 	var/m = max(iw, ih)
@@ -1146,7 +1126,6 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 		var/sc = box / m
 		I.Scale(max(1, round(iw * sc)), max(1, round(ih * sc)))
 		iw = I.Width(); ih = I.Height()
-	// center by padding into a box canvas. screen_loc repaints HUD icons here, pixel_x/y does not
 	var/cox = round((box - iw) / 2)
 	var/coy = round((box - ih) / 2)
 	I.Crop(1 - cox, 1 - coy, box - cox, box - coy)
@@ -1190,7 +1169,6 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 	IconVisCache[key] = c
 	return c
 
-// flatten body + overlays into one icon (BYOND has no getFlatIcon). exclude_icon skips one overlay
 /proc/GetFlatIcon(atom/A, exclude_icon)
 	if(!A || !A.icon) return null
 	var/icon/flat = icon(A.icon, A.icon_state, SOUTH)
@@ -1213,7 +1191,6 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 		flat.Blend(oi, ICON_OVERLAY, O.pixel_x + 1, O.pixel_y + 1)
 	return flat
 
-// like FitIconToBox but takes a raw icon ref and RETURNS the centering offsets
 /proc/FitIconToBoxIcon(atom/movable/disp, iconref, state, box, nocache = 0)
 	disp.overlays = null
 	disp.underlays = null
@@ -1258,16 +1235,14 @@ client/proc/MkGLabel(txt, dx, dy, w, col, align)
 	disp.alpha = 255
 	return list(round((box - iw) / 2), round((box - ih) / 2))
 
-// composite a mob look into one flat icon. mob.overlays cant be read, so rebuild from items + hair
 /proc/FlattenCharacter(mob/M, obj/Items/skip_item, skip_hair)
-	var/icon/flat = icon(M.icon, M.icon_state, SOUTH, 1)   // frame 1 only, no walk animation
+	var/icon/flat = icon(M.icon, M.icon_state, SOUTH, 1)
 	if(M.color) flat.Blend(M.color, ICON_MULTIPLY)
 	var/list/worn = list()
 	for(var/obj/Items/I in M)
 		if(!findtext(I.suffix, "Equipped")) continue
 		if(skip_item && I == skip_item) continue
 		if(I.EquipIcon || I.icon) worn += I
-	// higher LayerPriority renders further back, so blend those first
 	var/list/sorted = list()
 	for(var/obj/Items/I in worn)
 		var/placed = 0
@@ -1383,7 +1358,7 @@ client/proc/SelectGearSlot(idx)
 client/proc/UpdateGearEff(idx)
 	if(!mob || !cmenu_gvals) return
 	var/obj/Items/it = mob.GetGearItem(idx)
-	var/a = it ? 255 : 0   // empty slot hides the whole block
+	var/a = it ? 255 : 0
 	if(cmenu_gdmglbl)
 		cmenu_gdmglbl.maptext = gspan((idx == 3) ? "Damage Reduction" : "Damage", "#8be9ff", "left")
 		cmenu_gdmglbl.alpha = a
@@ -1448,7 +1423,7 @@ client/proc/ScrollGearTrack(params)
 	var/row = text2num(yp[1])
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
-	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y   // CMloc bakes the drag offset; undo it or track clicks skew after a vertical drag
+	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y
 	var/frac = ((CMENU_H - GEAR_TRACK_Y) - local_h) / GEAR_TRACK_H
 	frac = clamp(frac, 0, 1)
 	SetGearRow(round(frac * maxrow))
@@ -1484,7 +1459,6 @@ client/proc/ShowGearDetail(obj/Items/it)
 	var/sub = cat
 	if(it.Class in list("Light", "Medium", "Heavy")) sub += " - [it.Class]"
 	AddDescLine(gspan(sub, "#96c3e1", "left"), 140, ly, 344); ly += 22
-	// forged identity + combat effectiveness
 	var/gisw = istype(it, /obj/Items/Sword)
 	if(it.metal_id)
 		var/qn = (it.CraftQuality && it.CraftQuality != QUAL_NORMAL) ? "[QualityName(it.CraftQuality)] " : ""
@@ -1571,7 +1545,6 @@ client/proc/ShowGearDetail(obj/Items/it)
 	AddDescLine(gspan("left-click to equip &#183; right-click to close &#183; drag to move", "#7a9bb5", "center"), 134, 348, 356)
 	for(var/atom/movable/o in cmenu_desc_objs)
 		screen += o
-	// remembered popup offset, clamped to the view
 	gd_pan_x = getPref("gdPanX"); if(isnull(gd_pan_x)) gd_pan_x = 0
 	gd_pan_y = getPref("gdPanY"); if(isnull(gd_pan_y)) gd_pan_y = 0
 	var/list/gdb = PanBounds("geardesc", P)
@@ -1580,13 +1553,9 @@ client/proc/ShowGearDetail(obj/Items/it)
 	PanShift(cmenu_desc_objs, gd_pan_x, gd_pan_y)
 	KineticEntrance(cmenu_desc_objs)
 
-//////////////////////////////////////////////////////////////////
-// Customization tab, scrollable list of customization verbs
-//////////////////////////////////////////////////////////////////
 
 client/proc/BuildCustomContent()
 	cmenu_cust_list = (mob && mob.hud_customize_verbs) ? mob.hud_customize_verbs.Copy() : list()
-	// pin the Reset_* verbs to the bottom of the list
 	if(cmenu_cust_list.len)
 		var/list/resets = list()
 		for(var/vp in cmenu_cust_list.Copy())
@@ -1661,7 +1630,7 @@ client/proc/RefreshCustRows()
 client/proc/SetCustPx(px)
 	if(!cmenu_cust_list) return
 	cust_px = clamp(px, 0, CustMaxPx())
-	cust_scroll_target = cust_px   // drag/click cancels any running wheel glide
+	cust_scroll_target = cust_px
 	RefreshCustRows()
 
 client/proc/AnimateCustScroll()
@@ -1670,7 +1639,7 @@ client/proc/AnimateCustScroll()
 	while(cmenu_open && cmenu_tab == 2 && cmenu_cust_list && cust_px != cust_scroll_target)
 		var/diff = cust_scroll_target - cust_px
 		var/stepp = round(diff * 0.5)
-		if(!stepp) stepp = (diff > 0) ? 1 : -1   // always close the last pixels
+		if(!stepp) stepp = (diff > 0) ? 1 : -1
 		cust_px += stepp
 		RefreshCustRows()
 		sleep(world.tick_lag)
@@ -1689,14 +1658,11 @@ client/proc/ScrollCustTrack(params)
 	var/row = text2num(yp[1])
 	var/py = text2num(yp[2])
 	if(isnull(row) || isnull(py)) return
-	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y   // CMloc bakes the drag offset; undo it or track clicks skew after a vertical drag
+	var/local_h = (row - 1) * 32 + py - (cm_aty - 1) * 32 - cm_pan_y
 	var/frac = ((CMENU_H - CUST_TRACK_Y) - local_h) / CUST_TRACK_H
 	frac = clamp(frac, 0, 1)
 	SetCustPx(round(frac * maxpx))
 
-//////////////////////////////////////////////////////////////////
-// Customization, right-hand panel per selected option
-//////////////////////////////////////////////////////////////////
 
 client/proc/SelectCustOption(idx)
 	if(!cmenu_cust_list || idx < 1 || idx > cmenu_cust_list.len) return
@@ -1705,7 +1671,6 @@ client/proc/SelectCustOption(idx)
 	RefreshCustRows()
 	BuildCustPanel()
 
-// open Customization straight onto an item (inventory right-click shortcut)
 client/proc/CustomizeItem(obj/Items/it)
 	if(!it || !mob || !IsCustomizableItem(it)) return
 	CloseInventory()
@@ -1780,7 +1745,6 @@ client/proc/BuildCustomizeIntro()
 	var/atom/movable/pl = CPanelText("Choose Item...", 380, 218, 150, "#ffffff", "center")
 	pl.layer = CMENU_LAYER + 0.5
 
-// these run instantly, no window, so just a Confirm button
 client/proc/BuildCustConfirm(opt)
 	CPanelText("Run [opt] now?", 314, 158, 284, "#cfe7ff", "center")
 	var/atom/movable/shud/cmcustbtn/b = new
@@ -1809,7 +1773,7 @@ client/proc/BuildCustSprite(cfg)
 	fr.screen_loc = CMloc(404, 128 + 104)
 	cmenu_cust_preview = fr
 	cmenu_cust_panel += fr
-	cmenu_cust_sprite = new   // base passes clicks through to the frame
+	cmenu_cust_sprite = new
 	cmenu_cust_sprite.layer = CMENU_LAYER + 0.46
 	cmenu_cust_sprite.mouse_opacity = 0
 	cmenu_cust_sprite.screen_loc = CMloc(412, 224)
@@ -1819,7 +1783,7 @@ client/proc/BuildCustSprite(cfg)
 	cmenu_cust_elem.mouse_opacity = 0
 	cmenu_cust_elem.screen_loc = CMloc(412, 224)
 	cmenu_cust_panel += cmenu_cust_elem
-	cmenu_cust_hair = new   // hair above the edited piece, only shown when the item sits behind the hair
+	cmenu_cust_hair = new
 	cmenu_cust_hair.layer = CMENU_LAYER + 0.48
 	cmenu_cust_hair.mouse_opacity = 0
 	cmenu_cust_hair.alpha = 0
@@ -1855,7 +1819,6 @@ client/proc/BuildCustSprite(cfg)
 			cmenu_cust_panel += sw
 	if(cfg["apply"] == "item")
 		var/obj/Items/it = cust_target
-		// spaced a full row apart so click regions never overlap (was the Change-item / Layer mix-up)
 		var/atom/movable/shud/cmcustbtn/ci = new
 		ci.maptext_width = 120
 		ci.action = "pickitem"
@@ -1879,14 +1842,13 @@ client/proc/BuildCustSprite(cfg)
 			cmenu_cust_panel += sw
 	RefreshCustPreview()
 
-// re-flatten the character minus the edited piece. discrete edits only
 client/proc/RebuildCustBase()
 	if(!cmenu_cust_sprite || !cust_panel_opt || !mob) return
 	var/list/cfg = CurrentCustCfg()
 	if(!cfg) return
 	var/atom/tgt = cust_target ? cust_target : mob
 	var/obj/Items/edititem = (cfg["apply"] == "item" && istype(tgt, /obj/Items)) ? tgt : null
-	var/itembehind = (edititem && !edititem.IsHat)   // item sits behind the hair, draw hair on its own layer on top
+	var/itembehind = (edititem && !edititem.IsHat)
 	var/icon/base
 	if(cfg["apply"] == "hair")
 		base = FlattenCharacter(mob, null, 1)
@@ -1894,7 +1856,6 @@ client/proc/RebuildCustBase()
 		base = FlattenCharacter(mob, tgt, itembehind ? 1 : 0)
 	else
 		base = FlattenCharacter(mob, null, 0)
-	// autocrop then center the character. FlatVisCenter mis-centers large custom icons, cropping fixes it
 	var/w = base.Width()
 	var/h = base.Height()
 	var/minx = 0
@@ -1918,7 +1879,6 @@ client/proc/RebuildCustBase()
 		base.Crop(minx, miny, maxx, maxy)
 		cust_crop_x = minx - 1
 		cust_crop_y = miny - 1
-	// position via screen_loc not pixel_x. pixel_x does not repaint a live HUD object, screen_loc does
 	cust_base_cox = 412 + round((88 - base.Width()) / 2)
 	cust_base_coy = 224 - round((88 - base.Height()) / 2)
 	cmenu_cust_sprite.icon = base
@@ -1943,7 +1903,6 @@ client/proc/RebuildCustBase()
 		cmenu_cust_elem.icon = elemicon ? icon(elemicon, "", SOUTH, 1) : null
 		cmenu_cust_elem.icon_state = ""
 		cmenu_cust_elem.alpha = (elemicon ? 255 : 0)
-	// when the item sits behind the hair, draw hair on top so the preview matches the real layering
 	if(cmenu_cust_hair)
 		if(itembehind && mob.Hair_Base)
 			cmenu_cust_hair.icon = icon(mob.Hair_Base, "", SOUTH, 1)
@@ -1955,7 +1914,6 @@ client/proc/RebuildCustBase()
 			cmenu_cust_hair.alpha = 0
 	RefreshCustElement()
 
-// just reposition the edited piece. uses screen_loc not pixel_x so the move repaints
 client/proc/RefreshCustElement()
 	if(!cmenu_cust_elem || !cust_panel_opt || !mob) return
 	var/list/cfg = CurrentCustCfg()
@@ -2001,7 +1959,7 @@ client/proc/ToggleHatClick(atom/movable/shud/hattoggle/sw)
 	var/obj/Items/it = sw.item
 	if(!istype(it)) return
 	it.IsHat = !it.IsHat
-	if(findtext(it.suffix, "Equipped"))   // re-equip rebuilds overlays at the new layer
+	if(findtext(it.suffix, "Equipped"))
 		mob.AppearanceOff()
 		mob.AppearanceOn()
 	AnimateHatToggle(sw, it.IsHat)
@@ -2015,7 +1973,6 @@ client/proc/AnimateHatToggle(atom/movable/shud/hattoggle/sw, on)
 		sw.icon = frames[f]
 		sleep(0.8)
 
-// custom draw layer, mainly for gear that cant be slot-ordered
 client/proc/CustSetLayerPriority()
 	set waitfor = 0
 	var/obj/Items/it = cust_target
@@ -2057,7 +2014,7 @@ client/proc/CustOffsetInput()
 	var/cy = tgt.vars[cfg["oy"]]; if(isnull(cy)) cy = 0
 	var/nx = input(mob, "Pixel X offset.", "Offset X", cx) as num|null
 	var/ny = input(mob, "Pixel Y offset.", "Offset Y", cy) as num|null
-	if(cfg["apply"] == "hair") mob.Hairz("Remove")   // remove old hair first so it cant duplicate
+	if(cfg["apply"] == "hair") mob.Hairz("Remove")
 	if(!isnull(nx)) tgt.vars[cfg["ox"]] = nx
 	if(!isnull(ny)) tgt.vars[cfg["oy"]] = ny
 	ApplyCustOption()
@@ -2096,7 +2053,6 @@ client/proc/SetCustColor(col)
 	var/atom/tgt = cust_target ? cust_target : mob
 	if(!cfg || !cfg["col"] || !tgt) return
 	tgt.vars[cfg["col"]] = col
-	// move this color to the front of the recents. stored on the mob so it survives relog
 	if(!mob.cust_recent_colors) mob.cust_recent_colors = CUST_SWATCHES.Copy()
 	mob.cust_recent_colors -= col
 	mob.cust_recent_colors.Insert(1, col)
@@ -2141,7 +2097,7 @@ client/proc/CustDragStart(params)
 	var/list/cfg = CurrentCustCfg()
 	var/atom/tgt = cust_target ? cust_target : mob
 	if(!cfg || !tgt) return
-	if(cfg["apply"] == "hair") mob.Hairz("Remove")   // remove old hair now so it cant duplicate
+	if(cfg["apply"] == "hair") mob.Hairz("Remove")
 	cust_drag_ox = tgt.vars[cfg["ox"]]; if(isnull(cust_drag_ox)) cust_drag_ox = 0
 	cust_drag_oy = tgt.vars[cfg["oy"]]; if(isnull(cust_drag_oy)) cust_drag_oy = 0
 	var/list/m = MouseAbs(params)
@@ -2161,7 +2117,6 @@ client/proc/CustDragMove(params)
 client/proc/CustDragEnd()
 	ApplyCustOption()
 
-// every live menu object across the main list + transient sub-panels
 client/proc/CMLiveObjs()
 	var/list/all = list()
 	if(cmenu_objs) all += cmenu_objs
@@ -2170,7 +2125,6 @@ client/proc/CMLiveObjs()
 	if(cmenu_cust_panel) all += cmenu_cust_panel
 	return all
 
-// shift every live menu object by (dpx, dpy) screen pixels by rewriting screen_loc
 client/proc/CMShiftLive(dpx, dpy)
 	if(!dpx && !dpy) return
 	for(var/atom/movable/o in CMLiveObjs())
@@ -2182,25 +2136,24 @@ client/proc/CMShiftLive(dpx, dpy)
 		var/list/yp = splittext(cm[2], ":")
 		if(xp.len < 2 || yp.len < 2) continue
 		var/xt = text2num(xp[1]); var/yt = text2num(yp[1])
-		if(isnull(xt) || isnull(yt)) continue   // skip anything not in tile:pixel form
+		if(isnull(xt) || isnull(yt)) continue
 		var/ax = (xt - 1) * 32 + text2num(xp[2]) + dpx
 		var/ay = (yt - 1) * 32 + text2num(yp[2]) + dpy
 		var/axp = ((ax % 32) + 32) % 32
 		var/ayp = ((ay % 32) + 32) % 32
 		o.screen_loc = "[(ax - axp) / 32 + 1]:[axp],[(ay - ayp) / 32 + 1]:[ayp]"
 
-// min/max pan (px) that keep the whole menu rectangle inside the current view.
 client/proc/CMPanBounds()
 	var/list/vd = splittext("[view]", "x")
 	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
 	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
-	var/lx = (cm_atx - 1) * 32   // default menu left edge (px) in view space
-	var/by = (cm_aty - 1) * 32   // default menu bottom edge (px)
+	var/lx = (cm_atx - 1) * 32
+	var/by = (cm_aty - 1) * 32
 	var/minx = -lx
 	var/maxx = vw * 32 - CMENU_W - lx
 	var/miny = -by
 	var/maxy = vh * 32 - CMENU_H - by
-	if(maxx < minx) minx = (maxx = 0)   // menu wider than view: pin horizontally
+	if(maxx < minx) minx = (maxx = 0)
 	if(maxy < miny) miny = (maxy = 0)
 	return list(minx, maxx, miny, maxy)
 
@@ -2226,7 +2179,7 @@ client/proc/CMPanMove(params)
 	CMShiftLive(dx, dy)
 
 client/proc/CMPanEnd()
-	if(!cm_pan_dragged) return   // a clean tap (tab click) shouldn't write prefs
+	if(!cm_pan_dragged) return
 	cm_pan_dragged = FALSE
 	setPref("cmPanX", cm_pan_x)
 	setPref("cmPanY", cm_pan_y)
@@ -2344,7 +2297,6 @@ mob/proc/ChooseMenuPronouns()
 	client.UpdateCharacterMenu()
 	src << "Pronouns set to [subj] / [objp]."
 
-// click your name in the Character menu to rename yourself.
 mob/proc/RenameSelf()
 	set waitfor = 0
 	if(!client) return

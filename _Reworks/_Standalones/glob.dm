@@ -1,8 +1,7 @@
-// jesus christ lets get a grip
 #define GODS list("Zhi Xiuling","Indigo","???","Valdiel")
 #define WSNAMES list("Masamune", "Durendal", "Kusanagi", "Caledfwlch", "Muramasa", "Soul Calibur", "Soul Edge", "Dainsleif", "Ryui Jingu Bang")
 #define BRONZECLOTHS list("Pegasus","Dragon","Cygnus","Andromeda","Phoenix","Unicorn")
-#define GOLDCLOTHS list("Aries",/* "Taurus" */,"Gemini","Cancer","Leo","Virgo","Libra","Scorpio", "Sagittarius","Capricorn","Aquarius","Pisces")
+#define GOLDCLOTHS list("Aries",,"Gemini","Cancer","Leo","Virgo","Libra","Scorpio", "Sagittarius","Capricorn","Aquarius","Pisces")
 
 proc/DEBUGMSG(msg)
 	if(DEBUGGING)
@@ -66,7 +65,7 @@ racials
 		GRITMULT = 5
 		GRITDIVISOR = 1000
 		YOKAI_MANA_STATS_BASE_BOON = 0.3
-		MAKYO_TOTAL_TIME = 18000//30 minutes
+		MAKYO_TOTAL_TIME = 18000
 		FEATHERDUR = 5
 		SPIRITTACTMULT = 2
 		CRYOKENESISMAX = 15
@@ -74,12 +73,11 @@ racials
 		TOD_DMG_PER_TICK = 0.05
 		FULL_MANIFESTATION_TAX=0.5
 		FULL_MANIFESTATION_TAX_DIVISOR=100
-		glob.racials.HALFIE_SSJ_BASE_DRAIN = 0.5
+		HALFIE_SSJ_BASE_DRAIN = 0.5
 
 progressTracker
 
 	proc/incrementTotal()
-	//	totalRPPToDate += RPPDaily
 		totalRPPToDate = RPPStarting + (RPPDaily*DaysOfWipe)
 		totalPotentialToDate += PotentialDaily
 		if(totalPotentialToDate > 150)
@@ -88,12 +86,10 @@ progressTracker
 			totalRPPToDate = RPPLimit
 
 	var
-//TODO add a proc that increases total rpp/pot daily, ensuring nothing goes over the rpp limit
 
 		Era = 1
 		FourthFateEndwipe
 
-//economy
 		EconomyIncome = 3000
 		EconomyCost = 3000
 		EconomyMana = 100
@@ -103,14 +99,12 @@ progressTracker
 		MoneyName = "Dollars"
 
 
-//potential
 		PotentialDaily = 1
 		totalPotentialToDate = 1
 		MinPotential = 1
 
 
-// rpp
-		totalRPPToDate = 0 // a dynamic variable, that just gets added to every day tick
+		totalRPPToDate = 0
 		RPPDaily = 10
 		RPPLimit = 1000
 		RPPStarting = 200
@@ -120,7 +114,6 @@ progressTracker
 
 		STAT_PER_POINT = 0.25
 		INVESTED_STAT_PER_POINT = 0.1
-// time
 		WipeStart = 0
 		DaysOfWipe = 1
 
@@ -130,7 +123,6 @@ progressTracker
 		SAGA_T5_POT = 60
 		SAGA_T6_POT = 75
 
-		//unfortunately these must be set through a very dumb proc in _world.dm
 		T1_STYLES = list(10, 20, 25, 35)
 		T2_STYLES = list(25, 35, 45, 55)
 		T3_STYLES = list(50)
@@ -139,10 +131,6 @@ progressTracker
 		T2_SIGS = list(25, 45)
 		T3_SIGS = list(50)
 
-/****************************************************
-  *  *  *  *  *  * * GLOBAL TRACKER  *  *  *  *  *  *
- *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-*****************************************************/
 
 
 globalTracker
@@ -157,7 +145,7 @@ globalTracker
 				admins << "Xoxo Error: parameter [v] was requested by outputVariableInfo (glob.dm). This is not a globally tracked variable.";
 				return;
 			return "<u>([vars[v]])</u>"
-		resetSignaturePotentials()//this is the very dumb proc.
+		resetSignaturePotentials()
 			glob.progress.T1_STYLES = list(10, 20, 25, 35)
 			glob.progress.T2_STYLES = list(25, 35, 45, 55)
 			glob.progress.T3_STYLES = list(50)
@@ -170,19 +158,15 @@ globalTracker
 
 		progressTracker/progress = new()
 		racials/racials = new()
-// TESTER
 		TESTER_MODE = FALSE
 		LIVE_TESTING = FALSE
 		TESTER_WHITE_LIST = list("Digi-Daisuke","RevealingFortune","Zamas2","Niezan", "Etro", "AMajin", "Redsarge", "Gogeto25",\
  "Tilthour", "Sakata Gintoki San", "Hellbante", "FoxMagnus")
-// TARGETING
 		ROOTS_DURATION = 2
 		AVALON_COOLDOWN = 300
 
-//INTIM
 		INTIMRATIO = 500
 		SHONENCOUNTERLIMIT = 1
-//Wipe Specific
 		list/VOID_LOCATION = list(144,140,15)
 		list/currentlyVoidingLoc = list(150,150,1)
 		VoidsAllowed = 1
@@ -204,7 +188,6 @@ globalTracker
 
 		MOB_POTENTIAL_MODIFIER = 99
 
-// - races
 		list/LockedRaces = list()
 		list/CustomCommons = list("Majin","Half-Saiyan", "Android")
 		RAGE_DIVISOR = 200
@@ -216,22 +199,20 @@ globalTracker
 		REBELHEARTMOD=200
 		MYTHICALPUREREDMULT = 3
 		SATSUICHANCE = 10
-// nobody stuff
 		ASHEN_BURN_POWER_DIVISOR = 10
 		ASHEN_TENSION_DIVISOR = 10
 		LONGING_DIVISOR = 1
 		LONGING_MAX_CLAMP = 3
-// globals
 		WorldBaseAmount = 1
 		WorldDamageMult = 1.5
 		WorldDefaultAcc = 50
 		WorldWhiffRate = 25
 		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, WILDER, SAIYAN, ANGEL, MAKAIOSHIN)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
-		T3_STYLES_GODKI_VALUE = 0.15//Would recommend moving this to 0.25
-		T3_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
-		T4_STYLES_GODKI_VALUE = 0.15//Would recommend this also be 0.25 for a cumulative 0.5
-		T4_SAGA_STLYE_GODKI = 0//TODO BETWEEN WIPES: Style. =_=
+		T3_STYLES_GODKI_VALUE = 0.15
+		T3_SAGA_STLYE_GODKI = 0
+		T4_STYLES_GODKI_VALUE = 0.15
+		T4_SAGA_STLYE_GODKI = 0
 		SENSE7GODKI=0.25
 		SENSE8GODKI=0.25
 		SENSE9GODKI=0.25
@@ -242,8 +223,7 @@ globalTracker
 		CUSTOMBUFFADDTOTAL = 3
 		CUSTOMBUFFPASSIVETOTAL = 2
 		TRIPLEHELIX_MAX_NEG_HP = -50
-		GODKI_DIFF_MULT = 1 //For figuring out less swingy values for GodKi DMG/RES. 1 is what we're used to, so try 0.5 or something. Doesn't affect accuracy.
-// combat
+		GODKI_DIFF_MULT = 1
 		HIT_SCAN_DELAY = 5
 		OVERHWELMING_BASE_END_NERF = 0.05
 		OVERHWELMING_SHATTER_APPLY = 150
@@ -288,9 +268,9 @@ globalTracker
 
 		ELEMENTAL_DIVIDER = 1
 
-		DESPERATION_ATK_RATE = 1.5 //trueMult per (UnderDog+Det) point at full Injury, x the flavor ratio
+		DESPERATION_ATK_RATE = 1.5
 		DESPERATION_DEF_RATE = 0.75
-		DESPERATION_CAP = 5 //the whole system tops out at +-50% damage swing
+		DESPERATION_CAP = 5
 
 		GOD_KI_CAP = 1.5
 
@@ -307,7 +287,7 @@ globalTracker
 		STYLE_MASTERY_DIVISOR = 10
 		BASE_STACK_REDUCTION = 0.25
 		REGEN_ASC_ONE_HEAL = 3
-		HEALTH_POTION_NERF = 4 // HAHA YOU FOOLS, THIS WON'T DO ANYTHING TO MY FLASKS!
+		HEALTH_POTION_NERF = 4
 		BUFF_MASTER_HIGHTHRESHOLD = 1.2
 		BUFF_MASTERY_LOWTHRESHOLD = 0.95
 		BUFF_MASTERY_LOWMULT = 0.1
@@ -353,16 +333,16 @@ globalTracker
 		SHATTER_INTENSITY = 1
 		SHOCK_INTENSITY = 1
 		POISON_INTENSITY = 1
-		OFF_DEBUFF_RATE = 0.015 //precision pays: attacker Off scales applied debuff stacks
-		OFF_DEBUFF_PROC_RATE = 0.3 //and nudges elemental proc rolls
-		DEF_DEBUFF_RESIST_RATE = 0.01 //Def is the baseline status res - lags Off on purpose, typed resists stack on top
+		OFF_DEBUFF_RATE = 0.015
+		OFF_DEBUFF_PROC_RATE = 0.3
+		DEF_DEBUFF_RESIST_RATE = 0.01
 		DEF_DEBUFF_PROC_RESIST_RATE = 0.2
-		STR_PHYS_RESIST_RATE = 0.009 //muscle shrugs off Cripple/Shear/Bleed/Shatter
-		FOR_MENTAL_RESIST_RATE = 0.009 //will shrugs off Confuse/Charm/Doom/Frenzy
-		STR_KB_RATE = 0.0073 //muscle sends harder
-		VIT_KB_RATE = 0.0067 //mass stays planted
-		VIT_INJURY_SOFTEN = 0.02 //a sturdy body shrugs off what injuries do to it afterwards
-		FOR_BLAST_DENSITY = 0.37 //dense blasts resist deflection (shooter For -> deflect contest)
+		STR_PHYS_RESIST_RATE = 0.009
+		FOR_MENTAL_RESIST_RATE = 0.009
+		STR_KB_RATE = 0.0073
+		VIT_KB_RATE = 0.0067
+		VIT_INJURY_SOFTEN = 0.02
+		FOR_BLAST_DENSITY = 0.37
 		VENOMBLINDMULT = 10
 		CHAOS_CHANCE = 25
 		BASE_DEBUFF_REDUCTION_DIVISOR = 100
@@ -377,16 +357,14 @@ globalTracker
 		KAIOKEN_TAX_DIVISOR = 1000
 		KAIOKEN_EXPONENT = 2
 
-		RUSH_DELAY_MIN = 0.5 // The minimum rush delay, half of a decisecond.
-		RUSH_DELAY_DIVISOR = 2 // The Default Divisor for rushes.
-//EXTRAS?? //
+		RUSH_DELAY_MIN = 0.5
+		RUSH_DELAY_DIVISOR = 2
 		MORTAL_BLOW_CHANCE = 8
 		MULTIHIT_NERF = FALSE
-		GetUpVar = 1 // how fast u get up ?
+		GetUpVar = 1
 		MAGIC_BASE_COST = 100
 		TECH_BASE_COST = 30
 		WorldPUDrain = 1
-// global mults
 		WHILEWARPINGNERF = 10
 		GATES_PUSPIKE_BASE = 6
 		GATES_STAT_MULT_DIVISOR = 25
@@ -422,13 +400,13 @@ globalTracker
 		BEAM_TIME_MULT = 3
 		GLOBAL_QUEUE_DAMAGE = 0.8
 		CHAOS_DAMAGE_DIVISOR = 10
-		GIANT_FORM_DMG_MULT = 0.7778	//what the old GiantForm roll clamp worked out to
-		GLOBAL_MELEE_MULT = 0.54	//0.9 with the old 0.6 roll baked in
+		GIANT_FORM_DMG_MULT = 0.7778
+		GLOBAL_MELEE_MULT = 0.54
 		GLOBAL_POWER_MULT = 1
 		GLOBAL_ITEM_DAMAGE_MULT = 1
 		PROJ_DAMAGE_MULT = 0.8
-		MMO_PROJ_DAMAGE_MULT = 1 // Specifically for attacks that use a telegraphed marker.
-		AUTOHIT_GLOBAL_DAMAGE = 0.48	//0.8 with the old 0.6 roll baked in
+		MMO_PROJ_DAMAGE_MULT = 1
+		AUTOHIT_GLOBAL_DAMAGE = 0.48
 		SOFT_STYLE_RATIO = 0.2
 		SOFT_STYLE_DMG_BOON_DIVISOR = 2
 		HARD_STYLE_DMG_BOON_DIVISOR = 3
@@ -469,8 +447,7 @@ globalTracker
 		BLINDINGVENOM_CD = 400
 		LINGERCHANCE = 5
 		GRAPPLE_WHIFF_DAMAGE = 3
-// effectiveness (dmg calc  shit)
-		GRAPPLE_DAMAGE_MULT = 0.48	//0.8 with the old 0.6 roll baked in
+		GRAPPLE_DAMAGE_MULT = 0.48
 		MUSCLE_POWER_DIVISOR = 4
 		MAX_PURSUER_BOON = 10
 		DMG_POWER_EXPONENT = 0.3
@@ -493,26 +470,22 @@ globalTracker
 
 		TILE_DURATION_DIVISOR=2
 
-		HARDER_THEY_FALL_BIO_DIVISOR = 100 // if u use this when changie first start it will do big damage
-		HARDER_THEY_FALL_VAI_DIVISOR = 25 // more often no1 has this much vai, in hindsight deus ex machima will give kob more tha nthis, but they will suffer 2x damage ig
+		HARDER_THEY_FALL_BIO_DIVISOR = 100
+		HARDER_THEY_FALL_VAI_DIVISOR = 25
 
 
 		PRIMORDIAL_EFFECTIVENESS = 1
 
 		SANCTIFY_EFFECTIVENESS = 1
-// dmg rolls
-
-//SPEED COOLDOWN SHIT
 
 
-// CC related
+
 		CCDamageModifier = 0.1
 		STUN_IMMUNE_TIMER = 250
 		MAX_STUN_ADDITION = 100
 		MAX_STUN_TIME = 600
 		LAUNCH_LOCKOUT = 200
 		MAX_LAUNCH_TIME = 25
-// acc
 		SWORD_GLOBAL_ACCURACY_NERF = 0.1
 		STAFF_GLOBAL_ACCURACY_NERF = 0.1
 		ARMOR_GLOBAL_ACCURACY_NERF = 0.2
@@ -520,45 +493,32 @@ globalTracker
 
 		AUTOHIT_WHIFF_DAMAGE = 2
 		AUTOHIT_MISS_DAMAGE = 5
-		// Fraction of fully scaled AutoHit FinalDmg dealt to the attacker on auto-reversal
 		AUTOHIT_REVERSAL_DAMAGE_FRAC = 0.28
 
 
 		AUTOHIT_WAVE_OFFSHOOT_DAMAGE_DIVISOR = 1
 
-		//Whiff dmg is now rand between these.
 		MIN_WHIFF_DMG = 1.25
 		MAX_WHIFF_DMG = 1.5
 
 
 
-// TIMING_WINDOW is the one true timing number - touch it and everything moves together
 		TIMING_WINDOW = 5
-// fixed damage roll
-// cc proration - replaces the 0.1x rule when on
 		PRORATION_FLOOR = 0.3
 		PRORATION_DECAY = 0.15
 		PRORATION_CM_FLOOR_BONUS = 0.1
 		PRORATION_CM_DECAY_CUT = 0.03
 		PRORATION_LIGHT_FLOOR_BONUS = 0.2
 		PRORATION_DUNK_FLOOR = 0.6
-// counter-hit
 		COUNTER_HIT_TENSION = 5
 		COUNTER_HIT_STOP_BONUS = 2
 		COUNTER_HIT_STOP_CAP = 5
-// life skills
-		//temporarily off
 		LIFE_NODE_SPAWNS = 0
-// wall splat
 		SPLAT_STAGGER_DS = 10
 		SPLAT_MIN_REMAINING = 3
 		SPLAT_DMG_PER_TILE = 0.5
-// perfect break
 		PERFECT_BREAK_REFUND = 1
-// launch visuals
 		LAUNCH_LIFT_PX = 28
-// grab tech / toss aim / ais
-// guard
 		GUARD_DR = 0.65
 		GUARD_METER_MAX = 100
 		GUARD_METER_FLAT = 6
@@ -571,12 +531,10 @@ globalTracker
 		ALPHA_COUNTER_RANGE = 2
 		ALPHA_COUNTER_KB = 5
 		ALPHA_COUNTER_CD_DS = 50
-// queue layer
 		QUEUE_COUNTER_CM_BONUS = 1
 		QUEUE_COUNTER_MAX = 10
 		FLOURISH_WINDOW_DS = 20
 		FLOURISH_TENSION = 10
-// active energy charge kills idle regen when on
 		CHARGE_BASE = 0.5
 		CHARGE_RAMP_MAX = 2
 		CHARGE_RAMP_DS = 35
@@ -588,41 +546,36 @@ globalTracker
 
 		DEBUG_MESSAGES_ACCURACY = FALSE
 
-		//to-hit contest. base 50, every rating point of (atk - def) moves it by ACC_POINT
 		ACC_OFF = 0.8
 		ACC_DEF = 0.8
 		ACC_OFF_SPD = 0.3
 		ACC_DEF_SPD = 0.3
-		TRUEMULT_POINT_VALUE = 0.1 //one trueMult point = this much damage swing
+		TRUEMULT_POINT_VALUE = 0.1
 		ACC_POINT = 2
-		WHIFF_BAND = 25 //glancing zone above the hit roll
-		POWER_ACC_POINT = 5 //acc per point of clamped power-advantage gap
-		PERCEPTION_CORRECTION_LEVELS = 2 //Clarity/Intuition each count as this many perception levels
-		SHONEN_RAMP_START = 30 //SP Power wakes up below this Health
-		SHONEN_RAMP_FLOOR = 5 //and peaks here
-		SHONEN_POWER_SCALE = 1.25 //trueMult points per ShonenPower at the peak
-		WOUND_RATE = 0.25 //share of a hit that lands as wounds, before the End curve
-		SWORD_WOUND_SCALE = 0.5 //sword damage feeds the wound share
-		STAGGER_HIT_CAP = 5 //per-hit stagger contribution ceiling
+		WHIFF_BAND = 25
+		POWER_ACC_POINT = 5
+		PERCEPTION_CORRECTION_LEVELS = 2
+		SHONEN_RAMP_START = 30
+		SHONEN_RAMP_FLOOR = 5
+		SHONEN_POWER_SCALE = 1.25
+		WOUND_RATE = 0.25
+		SWORD_WOUND_SCALE = 0.5
+		STAGGER_HIT_CAP = 5
 		EROSION_RATE_DIVISOR = 45
 		STAT_STEAL_RATE = 0.025
 		LEAK_ATTACKER_RATE = 0.21
 		LEAK_DEFENDER_RATE = 0.05
-		RECOIL_RATE = 0.125 //BleedHit/BurnHit self-recoil
-		WorldDeflectBase = 75 //deflection contest base - deliberately above WorldDefaultAcc
-		DEF_DEFLECT_RATE = 0.004 //Def digs into the deflection pre-empt
-		FOR_BLAST_DENSITY_MIT = 0.0037 //shooter For shaves it back
+		RECOIL_RATE = 0.125
+		WorldDeflectBase = 75
+		DEF_DEFLECT_RATE = 0.004
+		FOR_BLAST_DENSITY_MIT = 0.0037
 
-		//straight multiplier to how much it breaks.
 		WEAPON_BREAKER_EFFECTIVENESS = 1
 		WEAPON_BREAKER_DIVISOR = 1.5
 		WEAPON_ASC_DURA_BOON = 0.3
-		//straight multiplier at the end; for ubw saga only (self-inflicted break)
 		UBW_BREAK_MULTIPLIER = 10
-		//firm multiplies break by a further x5
 		UBW_FIRM_BREAK_MULTIPLIER = 5
 
-		//how much copy_blade costs.
 		UBW_COPY_COST = 6
 
 		MAX_BREAK_MULT = 6
@@ -638,24 +591,18 @@ globalTracker
 		SPIRIT_FORM_LEAK_VAL = 3
 
 		DEFLECTION_DAMAGE_MULT = 0.075
-// -- items -- //
 
 		JSON_PASSIVES = list()
-// - swords
 		SwordAscDamage= 0.05
 		SwordAscAcc= 0.05
 		SwordAscDelay= 0.05
-// - staffs
 		StaffAscDamage = 0.05
 		StaffAscAcc = 0.05
 		StaffAscDelay = 0.05
-// - armor
 		ArmorAscDamage = 0.05
 		ArmorAscDelay = 0.05
 		ArmorAscAcc = 0.05
-// not sure why he made them all variable, but its more flexibility= FALSE
 
-		/// Dainsleif Drain
 
 
 		WeaponSoulNames = WSNAMES
@@ -677,5 +624,4 @@ globalTracker
 		discordICAnnounceWebhookURL
 		discordOOCAnnounceWebhookURL
 		discordAdminHelpWebhookURL
-// FUNCTIONS
 

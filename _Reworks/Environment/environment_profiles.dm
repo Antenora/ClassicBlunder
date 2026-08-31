@@ -12,7 +12,6 @@
 	position = generator("box", list(-700,-500,-120), list(700,500,120))
 	velocity = generator("box", list(-0.3,-0.1,-0.2), list(0.7,0.25,0.2))
 	color = "#d9e5ee"
-	//depth projection so the motes drift at different apparent speeds
 	transform = list(1,0,0,0, 0,1,0,0, 0,0,1,1/850, 0,0,0,1)
 
 /datum/environment_profile
@@ -30,7 +29,6 @@
 		haze_alpha = 0
 		haze_density = 0
 		haze_depth = 1
-		//zone mood anchors; null falls back to the global GRADE_* knobs
 		grade_gain
 		grade_black
 		grade_warm
@@ -40,7 +38,6 @@
 area
 	var/env_profile_id = "default"
 
-//everything defaults to neutral for now
 
 var/list/_env_profiles = list()
 var/_env_profile_boot = _EnvProfileBoot()
@@ -106,7 +103,6 @@ proc/_EnvProfileBoot()
 	_EnvProfileHaze("void", "#9d8abe", 24, 0.28, 1.3)
 	_EnvProfileHaze("toxic", "#bddb82", 34, 0.48, 1.35)
 	_EnvProfileHaze("corrupted", "#c68aa9", 28, 0.4, 1.25)
-	//starter values, tuned live with Preview Environment Profile
 	_EnvProfileMood("temperate", null, null, null, null, "fireflies")
 	_EnvProfileMood("lush", 1.24, 0.035, 0.02, "leaves", "fireflies")
 	_EnvProfileMood("arid", 1.24, 0.035, 0.16, "dust", null)
@@ -148,20 +144,18 @@ proc/EnvWeatherWetness(area/A)
 
 globalTracker
 	var/tmp
-		WIND_SCALE = 1 //global multiplier over every wind source
-		WIND_AMPLITUDE = 9 //max sway in degrees at full power
-		WIND_MIN_PX = 6 //floor on peak lean, so small plants still visibly move
-		WIND_MAX_PX = 24 //ceiling, so a very tall tree doesn't lean absurdly
-		WIND_OVERRIDE = 0 //1 = ignore profile/weather, use the manual vector below
+		WIND_SCALE = 1
+		WIND_AMPLITUDE = 9
+		WIND_MIN_PX = 6
+		WIND_MAX_PX = 24
+		WIND_OVERRIDE = 0
 		WIND_MAN_X = 0
 		WIND_MAN_Y = 0
-		//per-weather multipliers - tune these instead of editing the switch
 		WIND_WX_STORM = 2.4
 		WIND_WX_BLIZZARD = 3
 		WIND_WX_DUST = 2.6
-		WIND_WX_PRECIP = 1.35 //ordinary rain/snow
+		WIND_WX_PRECIP = 1.35
 
-//single source of truth for the weather multiplier
 proc/EnvWeatherWindMult(area/A)
 	if(!A || !A.wx_kind || !glob) return 1
 	switch(A.wx_kind)
@@ -171,11 +165,10 @@ proc/EnvWeatherWindMult(area/A)
 		if("rain", "snow") return glob.WIND_WX_PRECIP
 	return 1
 
-//client path passes its own resolved profile
 proc/EnvWindForArea(area/A, datum/environment_profile/prof)
 	if(glob && glob.WIND_OVERRIDE) return list(glob.WIND_MAN_X, glob.WIND_MAN_Y)
 	var/datum/environment_profile/P = prof ? prof : EnvProfile(A)
-	var/wx = EnvWeatherWindMult(A) * (glob ? glob.WIND_SCALE : 1)
+	var/wx = EnvWeatherWindMult(A) * (glob ? glob.WIND_SCALE : 1) * (A ? A.zone_wind_mult : 1)
 	return list(P.wind_x * wx, P.wind_y * wx)
 
 proc/EnvAtmosphereFor(datum/environment_profile/P, area/A)
@@ -256,7 +249,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	var/area/A = T ? T.loc : null
 	var/datum/environment_profile/P = EnvProfileForClient(C, A)
 	if(!P) return
-	var/list/wind = EnvWindForArea(A, P) //shared path: weather mult, global scale, manual override
+	var/list/wind = EnvWindForArea(A, P)
 	C.gfx_env_wind_x = wind[1]
 	C.gfx_env_wind_y = wind[2]
 	C.gfx_env_wetness = clamp(max(P.base_wetness, EnvWeatherWetness(A)), 0, 1)
@@ -275,24 +268,24 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 			if("snow", "blizzard") grade_color = DnLerp(grade_color, "#e6f2ff", 0.35)
 			if("dust") grade_color = DnLerp(grade_color, "#d4aa72", 0.4)
 	var/time = immediate ? 0 : 10
-	if(Hd2dWorldBloomOn(C)) _Hd2dScanIndoor(C) //fresh geometry before any lightclass rebuild below
+	if(Hd2dWorldBloomOn(C)) _Hd2dScanIndoor(C)
 	var/lightclass = !A ? "none" : A.sees_sky ? "sky" : A.dark_cave ? "cave" : "bright"
 	var/profile_key = "[P.id]-[A ? A.wx_kind : null]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]-[lightclass]"
 	if(C.gfx_env_profile_id != profile_key)
 		C.gfx_env_profile_id = profile_key
 		animate(C.gfx_env_grade, color = grade_color, alpha = target_alpha, time = time)
-		FxApplyBloom(C) //fx plates snap to the new zone grade; the world plate glides below
+		FxApplyBloom(C)
 		if(C.hd2d_lightclass != lightclass)
 			C.hd2d_lightclass = lightclass
-			CpmApply(C) //stepping indoors is a CUT: bloom presence + day-grade snap together
+			CpmApply(C)
 		else
-			Hd2dGradeShift(C, immediate ? 0 : 40) //outdoor zone-to-zone keeps the crossfade
+			Hd2dGradeShift(C, immediate ? 0 : 40)
 	var/wet_alpha = GfxReflectionEnabled(C) ? round(C.gfx_env_wetness * 10) : 0
 	animate(C.gfx_wet_sheen, alpha = wet_alpha, time = time)
 	GfxConfigureAtmosphere(C, P, A, time)
 	GfxApplyReflectionPass(C, A)
 	GfxUpdateMoonlight(C, A, time)
-	_Hd2dAmbientApply(C, P, A) //self-keyed: zone, dusk/dawn, quality, resize, wind
+	_Hd2dAmbientApply(C, P, A)
 	Hd2dBloomRefresh(C) 
 
 proc/GfxUpdateMoonlight(client/C, area/A, transition_time = 10)
@@ -325,7 +318,6 @@ proc/_EnvProfileLoop()
 	src << "Area [A ? A.name : "none"] uses profile [P.display_name] ([P.id]); wind [round(W[1], 0.1)], [round(W[2], 0.1)], wetness [round(max(P.base_wetness, EnvWeatherWetness(A)), 0.01)], haze [P.haze_alpha]/[round(P.haze_density, 0.01)]."
 	src << "DN: sees_sky [A ? A.sees_sky : "?"] | dn_indoor [A ? A.dn_indoor : "?"] | dark_cave [A ? A.dark_cave : "?"] | icon [A && A.icon ? "[A.icon]" : "none"] | color [A ? A.color : "?"] | bloom_t [client ? client.hd2d_bloom_t : "?"] (0 = off) | indoor_seen [client ? client.hd2d_indoor_seen : "?"] sky_seen [client ? client.hd2d_sky_seen : "?"] shaft_add [client ? client.hd2d_shaft_add : "?"]"
 
-//sets the AREA world-side; the preview verb below only overrides your client
 /mob/Admin2/verb/Set_Area_Environment_Profile()
 	set category = "Mapper"
 	set name = "Set Area Environment Profile"
@@ -340,10 +332,29 @@ proc/_EnvProfileLoop()
 		options["[EP.display_name] ([id])"] = id
 	var/choice = input(src, "Assign a profile to AREA [A.name] ([A.type]). Session-only until pinned in code.", "Area Environment") as null|anything in options
 	if(!choice) return
+	if(istype(A, /area/MapperZone))
+		var/area/MapperZone/MZ = A
+		BuildZonesLoad()
+		var/datum/build_zone_def/ZD = zoneDefsByUid[MZ.zoneKey]
+		if(!ZD)
+			ZD = zoneDefsByName[MZ.zoneKey]
+		if(!ZD)
+			src << "This mapper zone has no registry entry; use Zone_Settings instead."
+			return
+		if(ZD.creator != src.ckey && !src:Admin)
+			src << "Zone \"[ZD.name]\" belongs to [ZD.creator] - only they (or an Admin) can change it."
+			return
+		ZD.profile = options[choice]
+		BuildZoneApply(ZD)
+		BuildZonesSave()
+		src << "Zone \"[ZD.name]\" -> [options[choice]] (persists across reboots)."
+		Log("Admin", "[ExtractInfo(src)] set zone \"[ZD.name]\" env profile to [options[choice]].")
+		return
 	A.env_profile_id = options[choice]
+	BuildZoneProfileRecord(A.type, options[choice])
 	for(var/client/CC)
-		CC.gfx_env_profile_id = null //re-key everyone within a second
-	src << "[A.name] -> [options[choice]] (until reboot - report the area type to pin it)."
+		CC.gfx_env_profile_id = null
+	src << "[A.name] -> [options[choice]] (persists across reboots)."
 	Log("Admin", "[ExtractInfo(src)] set area env profile of [A.type] to [options[choice]].")
 
 /mob/Admin2/verb/Preview_Environment_Profile()
@@ -363,7 +374,6 @@ proc/_EnvProfileLoop()
 	EnvUpdateClient(client, TRUE)
 	src << "Environment preview: [client.gfx_env_preview_id || "map default"]."
 
-// wind controls
 proc/EnvWindRefresh()
 	for(var/client/C)
 		EnvUpdateClient(C, TRUE)

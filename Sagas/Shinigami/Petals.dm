@@ -27,7 +27,7 @@ client
 				var/TSIZE = world.icon_size
 				petal_target_wx = location.x + (text2num(plist["icon-x"]) - TSIZE/2) / TSIZE
 				petal_target_wy = location.y + (text2num(plist["icon-y"]) - TSIZE/2) / TSIZE
-			return
+			return ..()
 		..()
 
 	MouseMove(atom/object, turf/location, control, params)
