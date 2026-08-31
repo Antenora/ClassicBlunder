@@ -153,6 +153,8 @@ transformation
 			form_glow = image(icon=form_glow_icon,icon_state = form_glow_icon_state,pixel_x = form_glow_x, pixel_y = form_glow_y)
 			form_aura = image(icon = form_aura_icon, icon_state = form_aura_icon_state, pixel_x = form_aura_x, pixel_y = form_aura_y)
 			form_aura_underlay = image(icon = form_aura_underlay_icon, icon_state = form_aura_underlay_icon_state, pixel_x = form_aura_underlay_x, pixel_y = form_aura_underlay_y)
+			FxAddWearTint(form_aura, form_aura_icon)
+			FxAddWearTint(form_aura_underlay, form_aura_underlay_icon)
 			form_hair = image(icon = form_hair_icon, pixel_x = form_hair_x, pixel_y = form_hair_y, layer = FLOAT_LAYER-2)
 			form_icon_1 = image(icon = form_icon_1_icon, icon_state = form_icon_1_icon_state, pixel_x = form_icon_1_x, pixel_y = form_icon_1_y, layer = form_icon_1_layer)
 			form_underlay_1 = image(icon = form_underlay_1_icon, icon_state = form_underlay_1_icon_state, pixel_x = form_underlay_1_x, pixel_y = form_underlay_1_y)
@@ -179,11 +181,14 @@ transformation
 				user.overlays += form_glow
 				user.underlays += form_underlay_1;
 				user.underlays += form_underlay_2;
+				user.ShadowExclude(form_glow)
 			if(aura)
 				user.overlays -= form_aura
 				user.underlays -= form_aura_underlay
 				user.overlays += form_aura
 				user.underlays += form_aura_underlay
+				user.ShadowExclude(form_aura)
+				user.ShadowExclude(form_aura_underlay)
 			if(hair)
 				user.Hair = form_hair
 			spawn(1) MobAuraLightRefresh(user)

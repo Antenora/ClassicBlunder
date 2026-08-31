@@ -10,6 +10,7 @@
 		StyleOff = 1.1
 		StyleDef = 1.1
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -29,6 +30,7 @@
 		StyleOff=1.15
 		StyleDef=1.25
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -57,6 +59,7 @@
 		StyleOff = 1.5
 		StyleDef = 1.5
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -85,6 +88,7 @@
 		StyleOff = 1.55
 		StyleDef = 1.6
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32

@@ -7,6 +7,7 @@
 		EnergyExpenditure=1.5
 		FlashChange=1
 		IconLock='SSJAura.dmi'
+		AuraArt=1
 		LockX=-32
 		AuraLock='SSJRage.dmi'
 		AuraX=-32

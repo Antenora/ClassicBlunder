@@ -39,6 +39,11 @@ mob/var
 	KingofBravesHair
 
 
+mob/proc/AuraLockImage()
+	var/image/i = image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+	FxAddWearTint(i, src.AuraLock)
+	return i
+
 mob/proc/Auraz(var/Z)
 	spawn(1) MobAuraLightRefresh(src)
 	var/image/pegasus=image('Cosmo_Pegasus.dmi',pixel_x=-17, pixel_y=-22)
@@ -97,16 +102,17 @@ mob/proc/Auraz(var/Z)
 	if(Z=="Add")
 
 		src.Auraz("Remove")
+		var/list/preo = overlays.Copy()
+		var/list/preu = underlays.Copy()
 
 		if(src.RippleActive())
 			src.underlays+=gold2
 
 		if(src.AuraLocked==1)
 			if(src.AuraLockedUnder==1)
-				src.underlays+=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+				src.underlays+=src.AuraLockImage()
 			else
-				src.overlays+=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
-			return
+				src.overlays+=src.AuraLockImage()
 		else if(passive_handler.Get("Controlled Chaos"))
 			src.overlays+=rainbowaura
 
@@ -158,6 +164,7 @@ mob/proc/Auraz(var/Z)
 				else
 					src.overlays += image(M.sicon,icon_state=M.sicon_state,pixel_x=M.pixel_x,pixel_y=M.pixel_y)
 
+		src.ShadowExcludeDiff(preo, preu)
 
 	if(Z=="Remove")
 		for(var/obj/Skills/Power_Control/M in src.contents)
@@ -215,8 +222,8 @@ mob/proc/Auraz(var/Z)
 		src.underlays-=image(icon=src.Form4Aura, pixel_x=src.Form4AuraX, pixel_y=src.Form4AuraY)
 		src.underlays-=image(icon=src.Form5Aura, pixel_x=src.Form5AuraX, pixel_y=src.Form5AuraY)
 
-		src.overlays-=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
-		src.underlays-=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+		src.overlays-=src.AuraLockImage()
+		src.underlays-=src.AuraLockImage()
 
 		src.underlays-=image('BijuuInitial.dmi',pixel_x=-32, pixel_y=-32)
 		src.underlays-=image('GCAura.dmi',pixel_x=-49, pixel_y=-15)

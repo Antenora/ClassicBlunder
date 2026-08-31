@@ -270,6 +270,7 @@ obj/Skills/Buffs/SlotlessBuffs/Sun_Seared
 	KenWave = 4
 	KenWaveIcon='KenShockwaveGold.dmi'
 	IconLock='FlameGlowHades.dmi'
+	AuraArt=1
 	LockX=-16
 	LockY=-4
 	TimerLimit=60
@@ -285,6 +286,7 @@ obj/Skills/Buffs/SlotlessBuffs/Sun_Stricken
 	KenWave = 4
 	KenWaveIcon='KenShockwaveGold.dmi'
 	IconLock='FlameGlowHerc.dmi'
+	AuraArt=1
 	LockX=-16
 	LockY=-4
 	TimerLimit=60
@@ -301,6 +303,7 @@ obj/Skills/Buffs/SlotlessBuffs/Sun_Blessed
 	KenWaveIcon='KenShockwaveGold.dmi'
 	HitSpark='Star.dmi'
 	IconLock='FlameGlowZeus.dmi'
+	AuraArt=1
 	LockX=-16
 	LockY=-4
 	TimerLimit=60

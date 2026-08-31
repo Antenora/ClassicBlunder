@@ -33,6 +33,9 @@ globalTracker
 		UNI_MASK_BLUR = 6 //softness of the room-mask stamp edges inside each light's composite
 		LIGHT_FILL = 0.16 //indirect bounce: falloff floor inside a light's line-of-sight set (0 = off)
 		LIGHT_SOFTCLIP = TRUE //clustered lights attenuate so overlaps saturate instead of clipping white
+		LIGHT_PAINT_CEILING = 225
+		LIGHT_PAINT_LIFT = 12
+		LIGHT_ART_TARGET = 190
 		GOD_RAYS = TRUE //visible beams: window lights with directional cookies + tagged canopy trees
 		FLICKER_MIN = 95 //flame-glow alpha low (waver floor)
 		FLICKER_MAX = 195 //flame-glow alpha high (waver ceiling)
@@ -82,16 +85,68 @@ proc/LightRenderStrength(turf/T)
 	var/floor = glob ? clamp(glob.LIGHT_DAY_STRENGTH, 0, 0.35) : 0.10
 	return floor + (1 - floor) * eased
 
-proc/LightHeadroomK(turf/T)
-	if(!glob || !glob.MULTIPLY_REVEAL) return 1
+proc/LightAmbientRGB(turf/T)
 	var/area/A = T ? T.loc : null
-	if(A && A.dark_cave) return 1 //cave base #2b2b33: full headroom already
-	var/amb = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
-	if(A && A.dn_indoor) amb = DnIndoorColor(amb)
-	var/list/sk = _FxRGB(amb)
-	if(!sk) return 1
-	var/head = 255 - max(sk[1], max(sk[2], sk[3]))
-	return clamp(head / 107, 0, 1) //107 = deep-night headroom (255 - #566294's blue)
+	if(!A) return list(255, 255, 255)
+	if(A.dark_cave) return _FxRGB(glob ? glob.LIGHT_CAVE_COLOR : "#2b2b33")
+	if(!A.icon) return list(255, 255, 255)
+	if(A.plane != BASE_LIGHTING_PLANE && A.blend_mode != BLEND_MULTIPLY) return list(255, 255, 255)
+	var/list/c = _FxRGB(A.color)
+	return c ? c : list(255, 255, 255)
+
+proc/LightPaintCeiling(list/amb)
+	if(!amb) return 244
+	var/mx = max(amb[1], max(amb[2], amb[3]))
+	var/c = glob ? glob.LIGHT_PAINT_CEILING : 225
+	var/lift = glob ? glob.LIGHT_PAINT_LIFT : 12
+	return min(244, max(c, mx + lift))
+
+proc/LightBudgetAlpha(turf/T, col, want, artlum = 0)
+	if(want <= 0) return want
+	var/list/amb = LightAmbientRGB(T)
+	if(!amb) return want
+	var/list/c = _FxRGB(col)
+	if(!c) c = list(255, 255, 255)
+	var/mx = max(amb[1], max(amb[2], amb[3]))
+	var/ceiling = LightPaintCeiling(amb)
+	if(artlum > 0)
+		var/target = glob ? glob.LIGHT_ART_TARGET : 190
+		ceiling = min(ceiling, max(target * 255 / artlum, mx))
+	var/lim = want
+	for(var/i = 1, i <= 3, i++)
+		if(c[i] <= 0) continue
+		lim = min(lim, (ceiling - amb[i]) * 255 / c[i])
+	return max(0, round(min(want, lim)))
+
+proc/LightStaticPaintAt(turf/T)
+	if(!T || !glob || !glob.LIGHTING) return 0
+	var/tot = 0
+	for(var/datum/lightsource/L in LightsNearTurf(T, 24))
+		var/turf/s = LightSrcTurf(L)
+		if(!s || s.z != T.z) continue
+		var/rr = L.radius + 0.5
+		var/dx = s.x - T.x
+		var/dy = s.y - T.y
+		var/d = sqrt(dx * dx + dy * dy)
+		if(d >= rr) continue
+		var/f = 1 - d / rr
+		tot += LightBudgetAlpha(s, L.lcolor, round(L.maxalpha * LightRenderStrength(s))) * f * f
+	return tot
+
+proc/LightArtTolerance(artlum)
+	if(artlum <= 0) return 255
+	var/target = glob ? glob.LIGHT_ART_TARGET : 190
+	return min(255, target * 255 / artlum)
+
+proc/LightLocalLevel(turf/T)
+	var/list/amb = LightAmbientRGB(T)
+	var/mx = amb ? max(amb[1], max(amb[2], amb[3])) : 255
+	return mx + LightStaticPaintAt(T)
+
+proc/LightGlowBudget(turf/T, col, want, artlum = 0)
+	var/b = LightBudgetAlpha(T, col, want, artlum)
+	if(b <= 0) return 0
+	return max(0, round(b - LightStaticPaintAt(T)))
 
 proc/LightSrcTurf(datum/lightsource/L)
 	if(!L) return null
@@ -565,7 +620,7 @@ proc/_LightOverlapScale(datum/lightsource/L, turf/s)
 		var/d = sqrt(ddx * ddx + ddy * ddy)
 		if(d >= reach) continue
 		o += 1 - d / reach
-	return 1 / (1 + 0.5 * o)
+	return 1 / (1 + o)
 
 //compute + paint a light's occluded footprint
 proc/LightCompute(datum/lightsource/L)
@@ -575,8 +630,10 @@ proc/LightCompute(datum/lightsource/L)
 	if(!s) return
 	LightBucketRegister(L)
 	var/darkFrac = LightDarkFrac(s) //true ambient darkness; retained for cheap repaint detection
-	var/lightStrength = LightRenderStrength(s) * LightHeadroomK(s)
+	var/lightStrength = LightRenderStrength(s)
 	if(glob.LIGHT_SOFTCLIP) lightStrength *= _LightOverlapScale(L, s)
+	if(L.maxalpha > 0)
+		lightStrength = min(lightStrength, LightBudgetAlpha(s, L.lcolor, L.maxalpha) / L.maxalpha)
 	L.painted_dark = darkFrac
 	UpdateFlameGlow(L, lightStrength)
 	L.applied = list()
@@ -765,13 +822,13 @@ proc/UpdateFlameGlow(datum/lightsource/L, lightStrength)
 			F.pixel_y = -16
 			F.transform = matrix() * 0.9
 			F.active = 1
-			F.dark = lightStrength
-			F.alpha = round((glob.FLICKER_MIN + glob.FLICKER_MAX) / 2 * lightStrength) //start at settled brightness, not default 255
+			F.dark = min(lightStrength, LightBudgetAlpha(get_turf(O), L.lcolor, glob.FLICKER_MAX) / max(glob.FLICKER_MAX, 1))
+			F.alpha = round((glob.FLICKER_MIN + glob.FLICKER_MAX) / 2 * F.dark) //start at settled brightness, not default 255
 			O.vis_contents += F
 			L.flame = F
 			FlameFlicker(F)
 		else
-			L.flame.dark = lightStrength //re-tint amplitude as the clock changes
+			L.flame.dark = min(lightStrength, LightBudgetAlpha(get_turf(O), L.lcolor, glob.FLICKER_MAX) / max(glob.FLICKER_MAX, 1)) //re-tint amplitude as the clock changes
 	else
 		KillFlame(L)
 
@@ -960,7 +1017,7 @@ proc/_FxEmissiveLoop()
 				if(!E.halo) continue
 				var/obj/O = _gfx_emissives[E]
 				var/turf/T = O ? get_turf(O) : null
-				animate(E.halo, alpha = T ? round(120 * LightRenderStrength(T)) : 0, time = 10)
+				animate(E.halo, alpha = T ? LightGlowBudget(T, E.halo.color, round(120 * LightRenderStrength(T))) : 0, time = 10)
 		sleep(100)
 
 proc/_FxEmissiveBoot()

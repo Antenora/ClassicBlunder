@@ -199,6 +199,9 @@ transformation
 					user.overlays += form_glow
 					user.overlays += form_aura
 					user.underlays += form_aura_underlay
+					user.ShadowExclude(form_glow)
+					user.ShadowExclude(form_aura)
+					user.ShadowExclude(form_aura_underlay)
 					user.overlays += form_hair
 					var/appearance2 = user.appearance
 					user.HellSSJ4Animation1(appearance1, appearance2)

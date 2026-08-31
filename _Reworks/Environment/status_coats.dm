@@ -237,10 +237,12 @@ proc/_CoatFxOn(mob/M, key, i)
 	M.coat_fx = D
 	if(key == "burn")
 		D.particles.spawning = 0.5 + i * 1.5
+		if(glob.MULTIPLY_REVEAL) D.alpha = LightGlowBudget(get_turf(M), "#ffb43c", 255)
 	else
-		D.alpha = 230
-		animate(D, alpha = 110, time = 2, loop = -1)
-		animate(alpha = 230, time = 2)
+		var/hi = glob.MULTIPLY_REVEAL ? LightGlowBudget(get_turf(M), D.color, 230) : 230
+		D.alpha = hi
+		animate(D, alpha = round(hi * 0.48), time = 2, loop = -1)
+		animate(alpha = hi, time = 2)
 
 proc/_CoatFxOff(mob/M)
 	if(!M.coat_fx) return

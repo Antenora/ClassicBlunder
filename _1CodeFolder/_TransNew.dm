@@ -208,6 +208,10 @@ mob/proc/HighTension(var/x)
 	tensionh.alpha=200
 	tensionhs.blend_mode=BLEND_ADD
 	tensionhs.alpha=130
+	src.ShadowExclude(tensiona)
+	src.ShadowExclude(tension)
+	src.ShadowExclude(tensionh)
+	src.ShadowExclude(tensionhs)
 	sleep()
 	if(x >= 100) x = 100
 	else if(x >= 50) x = 50

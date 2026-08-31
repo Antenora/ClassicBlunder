@@ -168,6 +168,7 @@ obj/Skills/Utility/Recall_Armaments
 		StyleDef=1.15
 		Finisher = "/obj/Skills/Queue/Finisher/Instinct_Palm"
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -192,6 +193,7 @@ obj/Skills/Utility/Recall_Armaments
 		StyleDef=1.45
 		Finisher = "/obj/Skills/Queue/Finisher/Instinct_Palm"
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -216,6 +218,7 @@ obj/Skills/Utility/Recall_Armaments
 		StyleDef=1.75
 		Finisher = "/obj/Skills/Queue/Finisher/Heavenly_Palm_Transcendence"
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -248,6 +251,7 @@ obj/Skills/Utility/Recall_Armaments
 		StyleDef=2
 		Finisher = "/obj/Skills/Queue/Finisher/Heavenly_Palm_Transcendence"
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32

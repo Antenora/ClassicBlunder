@@ -26,6 +26,22 @@ globalTracker
 
 mob/var/tmp/list/shadow_pool //reusable /obj/fx_worldshadow, [1..N] for sun + light shadows
 mob/var/tmp/shadow_seen_at = 0
+mob/var/tmp/list/shadow_excl
+
+mob/proc/ShadowExclude(image/I)
+	if(!I) return
+	if(!shadow_excl) shadow_excl = list()
+	shadow_excl[I.appearance] = 1
+
+mob/proc/ShadowExcludeDiff(list/po, list/pu)
+	for(var/o in overlays)
+		if(po && (o in po)) continue
+		if(!shadow_excl) shadow_excl = list()
+		shadow_excl[o] = 1
+	for(var/u in underlays)
+		if(pu && (u in pu)) continue
+		if(!shadow_excl) shadow_excl = list()
+		shadow_excl[u] = 1
 
 var/list/_shadow_objs = list() //every live shadow obj; swept for orphans
 var/_shadow_reap_at = 0
@@ -149,8 +165,19 @@ proc/ComputeLightShadows(mob/M)
 		icon = owner.icon
 		icon_state = owner.icon_state
 		dir = shown_dir
-		overlays = owner.overlays
-		underlays = owner.underlays
+		var/list/excl = owner.shadow_excl
+		if(excl && excl.len)
+			var/list/keepo = list()
+			for(var/o in owner.overlays)
+				if(!excl[o]) keepo += o
+			overlays = keepo
+			var/list/keepu = list()
+			for(var/u in owner.underlays)
+				if(!excl[u]) keepu += u
+			underlays = keepu
+		else
+			overlays = owner.overlays
+			underlays = owner.underlays
 		appearance_flags = KEEP_TOGETHER
 		vis_flags = VIS_INHERIT_ICON | VIS_INHERIT_ICON_STATE
 		var/new_measure_key = "[owner.icon]-[owner.icon_state]-[shown_dir]"

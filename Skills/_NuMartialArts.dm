@@ -500,6 +500,7 @@ obj
 							StyleStr=1.5
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
+							AuraArt=1
 							IconUnder=1
 							passives = list("Momentum" = 1,  "Piercing" = 0.25)
 							LockX=-32
@@ -567,6 +568,7 @@ obj
 							StyleStr=1.5
 							StyleEnd=1.5
 							IconLock='DarknessGlow.dmi'
+							AuraArt=1
 							IconUnder=1
 							passives = list("Momentum" = 1,  "Tossing" = 3, "Secret Knives" = "FTG","HellPower"=0.5,"AbyssMod"=3)
 							LockX=-32

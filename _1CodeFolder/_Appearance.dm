@@ -21,6 +21,7 @@ mob/proc/AppearanceOn()
 				state = ActiveBuff.IconState
 			var/image/im=image(icon=src.ActiveBuff.IconLock, icon_state = state, pixel_x=src.ActiveBuff.LockX, pixel_y=src.ActiveBuff.LockY, layer=FLOAT_LAYER-src.ActiveBuff.IconLayer)
 			im.blend_mode=src.ActiveBuff.IconLockBlend
+			FxAddWearTint(im, src.ActiveBuff.IconLock)
 			im.transform*=src.ActiveBuff.OverlaySize
 			if(src.CheckActive("Mobile Suit")&&src.ActiveBuff.BuffName!="Mobile Suit")
 				im.transform*=3
@@ -30,6 +31,8 @@ mob/proc/AppearanceOn()
 				src.underlays+=im
 			else
 				src.overlays+=im
+			if(src.ActiveBuff.AuraArt)
+				src.ShadowExclude(im)
 		if(src.ActiveBuff.StripEquip)
 			if(src.ActiveBuff.AssociatedGear)
 				src.overlays-=image(src.ActiveBuff.AssociatedGear.icon, pixel_x=src.ActiveBuff.AssociatedGear.pixel_x, pixel_y=src.ActiveBuff.AssociatedGear.pixel_y, layer=FLOAT_LAYER-3)
@@ -46,6 +49,7 @@ mob/proc/AppearanceOn()
 		if(src.SpecialBuff.IconLock)
 			var/image/im=image(icon=src.SpecialBuff.IconLock, pixel_x=src.SpecialBuff.LockX, pixel_y=src.SpecialBuff.LockY, layer=FLOAT_LAYER-src.SpecialBuff.IconLayer)
 			im.blend_mode=src.SpecialBuff.IconLockBlend
+			FxAddWearTint(im, src.SpecialBuff.IconLock)
 			im.transform*=src.SpecialBuff.OverlaySize
 			if(src.CheckActive("Mobile Suit")&&src.ActiveBuff.BuffName!="Mobile Suit")
 				im.transform*=3
@@ -55,6 +59,8 @@ mob/proc/AppearanceOn()
 				src.underlays+=im
 			else
 				src.overlays+=im
+			if(src.SpecialBuff.AuraArt)
+				src.ShadowExclude(im)
 		if(src.SpecialBuff.StripEquip)
 			if(src.SpecialBuff.AssociatedGear)
 				src.overlays-=image(src.SpecialBuff.AssociatedGear.icon, pixel_x=src.SpecialBuff.AssociatedGear.pixel_x, pixel_y=src.SpecialBuff.AssociatedGear.pixel_y, layer=FLOAT_LAYER-3)
@@ -71,19 +77,23 @@ mob/proc/AppearanceOn()
 		if(src.StanceBuff.IconLock)
 			var/image/im=image(icon=src.StanceBuff.IconLock, pixel_x=src.StanceBuff.LockX, pixel_y=src.StanceBuff.LockY, layer=FLOAT_LAYER-src.StanceBuff.IconLayer)
 			im.blend_mode=src.StanceBuff.IconLockBlend
+			FxAddWearTint(im, src.StanceBuff.IconLock)
 			im.transform*=src.StanceBuff.OverlaySize
 			if(src.CheckActive("Mobile Suit")&&src.ActiveBuff.BuffName!="Mobile Suit")
 				im.transform*=3
-			if(src.SpecialBuff.IconApart)
+			if(src.StanceBuff.IconApart)
 				im.appearance_flags+=70
 			if(src.StanceBuff.IconUnder)
 				src.underlays+=im
 			else
 				src.overlays+=im
+			if(src.StanceBuff.AuraArt)
+				src.ShadowExclude(im)
 	if(src.StyleBuff)
 		if(src.StyleBuff.IconLock)
 			var/image/im=image(icon=src.StyleBuff.IconLock, pixel_x=src.StyleBuff.LockX, pixel_y=src.StyleBuff.LockY, layer=FLOAT_LAYER-src.StyleBuff.IconLayer)
 			im.blend_mode=src.StyleBuff.IconLockBlend
+			FxAddWearTint(im, src.StyleBuff.IconLock)
 			im.transform*=src.StyleBuff.OverlaySize
 			if(src.CheckActive("Mobile Suit")&&src.ActiveBuff.BuffName!="Mobile Suit")
 				im.transform*=3
@@ -93,6 +103,8 @@ mob/proc/AppearanceOn()
 				src.underlays+=im
 			else
 				src.overlays+=im
+			if(src.StyleBuff.AuraArt)
+				src.ShadowExclude(im)
 	if(src.SlotlessBuffs.len>0)
 		for(var/sb in SlotlessBuffs)
 			var/obj/Skills/Buffs/SlotlessBuffs/b = SlotlessBuffs[sb]
@@ -100,6 +112,7 @@ mob/proc/AppearanceOn()
 				if(b.IconLock)
 					var/image/im=image(icon=b.IconLock, pixel_x=b.LockX, pixel_y=b.LockY, layer=FLOAT_LAYER-b.IconLayer)
 					im.blend_mode=b.IconLockBlend
+					FxAddWearTint(im, b.IconLock)
 					im.transform*=b.OverlaySize
 					if(src.CheckActive("Mobile Suit")&&src.ActiveBuff.BuffName!="Mobile Suit")
 						im.transform*=3
@@ -109,6 +122,8 @@ mob/proc/AppearanceOn()
 						src.underlays+=im
 					else
 						src.overlays+=im
+					if(b.AuraArt)
+						src.ShadowExclude(im)
 
 				if(b.ManaGlow)
 					filters = null
@@ -184,6 +199,7 @@ mob/proc/AppearanceOn()
 			if(src.ActiveBuff.IconApart)
 				im.appearance_flags+=70
 			src.overlays+=im
+			src.ShadowExclude(im)
 	if(src.SpecialBuff)
 		if(src.SpecialBuff.TopOverlayLock&&!NH)
 			var/image/im=image(icon=src.SpecialBuff.TopOverlayLock, pixel_x=src.SpecialBuff.TopOverlayX, pixel_y=src.SpecialBuff.TopOverlayY, layer=FLOAT_LAYER-1)
@@ -194,6 +210,7 @@ mob/proc/AppearanceOn()
 			if(src.SpecialBuff.IconApart)
 				im.appearance_flags+=70
 			src.overlays+=im
+			src.ShadowExclude(im)
 	if(src.StanceBuff)
 		if(src.StanceBuff.TopOverlayLock&&!NH)
 			var/image/im=image(icon=src.StanceBuff.TopOverlayLock, pixel_x=src.StanceBuff.TopOverlayX, pixel_y=src.StanceBuff.TopOverlayY, layer=FLOAT_LAYER-1)
@@ -204,6 +221,7 @@ mob/proc/AppearanceOn()
 			if(src.StanceBuff.IconApart)
 				im.appearance_flags+=70
 			src.overlays+=im
+			src.ShadowExclude(im)
 	if(src.StyleBuff)
 		if(src.StyleBuff.TopOverlayLock&&!NH)
 			var/image/im=image(icon=src.StyleBuff.TopOverlayLock, pixel_x=src.StyleBuff.TopOverlayX, pixel_y=src.StyleBuff.TopOverlayY, layer=FLOAT_LAYER-1)
@@ -214,6 +232,7 @@ mob/proc/AppearanceOn()
 			if(src.StyleBuff.IconApart)
 				im.appearance_flags+=70
 			src.overlays+=im
+			src.ShadowExclude(im)
 	if(src.SlotlessBuffs.len>0)
 		for(var/sb in SlotlessBuffs)
 			var/obj/Skills/Buffs/SlotlessBuffs/b = SlotlessBuffs[sb]
@@ -227,6 +246,7 @@ mob/proc/AppearanceOn()
 					if(b.IconApart)
 						im.appearance_flags+=70
 					src.overlays+=im
+					src.ShadowExclude(im)
 
 	if(src.tension)
 		var/image/tension=image('HTAura.dmi',pixel_x=-16, pixel_y=-4)
@@ -239,6 +259,10 @@ mob/proc/AppearanceOn()
 		tensionh.alpha=200
 		tensionhs.blend_mode=BLEND_ADD
 		tensionhs.alpha=130
+		src.ShadowExclude(tension)
+		src.ShadowExclude(tension2)
+		src.ShadowExclude(tensionh)
+		src.ShadowExclude(tensionhs)
 		if(src.tension==5)
 			src.Hairz("Add")
 			src.underlays+=tension

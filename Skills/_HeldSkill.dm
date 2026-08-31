@@ -619,7 +619,7 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 		// closing the visual gap after BeginHeldSkill's initial pulse.
 		var/ringp = 0.5
 		if(Z.HeldBeam)
-			ringp = min(HeldBeamBenefit(Z), 1)
+			ringp = min(HeldBeamBenefit(Z), Z.HeldBeamUncapped ? 2.5 : 1)
 		else if(!Z.InfiniteHold)
 			ringp = clamp((world.time - held_charge_start) / max(Z.ChargePeriod * 10, 1), 0, 1)
 		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.3 + 0.35 * ringp, Blend=Z.ChargeWaveBlend, Time=8)

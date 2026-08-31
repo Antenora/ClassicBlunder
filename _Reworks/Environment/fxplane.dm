@@ -7,13 +7,13 @@ globalTracker
 		BLOOM_THRESHOLD = 190 //0-255 brightness where bloom starts
 		DYNAMIC_LIGHTS = TRUE //light glows on magic/Blast/Special/beam skills
 		LIGHT_SCALE = 2.5 //glow diameter in tiles at full power
-		FX_LIGHT_CROWD = 0.6
-		FX_LIGHT_CROWD_FREE = 0.8
 		LIGHT_ICON_COLOR = TRUE //glow color sampled from the skill's own art; off = element palette
 		DARK_SKILLS = TRUE //predominantly-black skills swap the glow for a darkening blob (negative light)
 		DARKGLOW_ALPHA = 145 //peak strength of that blob
 		CHARGE_LIGHTS = TRUE //aura'd actors (charging, transformed) shed a glow colored from their aura art
 		CHARGE_LIGHT_ALPHA = 150 //peak strength of that glow in full darkness
+		CHARGE_LIGHT_COLOR_CAP = 210
+		AURA_ADD_LUM_CAP = 150
 		ADAPTIVE_EXPLOSIONS = TRUE //explosion tint follows the skill's own art; off = stock orange
 		SCREEN_DISTORT = TRUE //displacement: shockwave rings + fire heat shimmer
 		DISTORT_SIZE = 14 //max displacement in px
@@ -129,6 +129,7 @@ mob/var/tmp/_fx_pulse_t = 0 //autohit cast-pulse debounce (once per tick per cas
 		gy = 0
 		gz = 0
 		anim_driven = 0
+		llevel = -1
 		crowd = 1
 		atom/movable/glow_host
 
@@ -156,6 +157,16 @@ mob/var/tmp/_fx_pulse_t = 0 //autohit cast-pulse debounce (once per tick per cas
 	var/radius = 4
 	var/turf/last_turf
 	var/last_paint = 0
+
+/obj/fx_lightdim
+	gfx_transient_visual = 1
+	Savable = 0
+	blend_mode = BLEND_SUBTRACT
+	plane = LIGHTING_PLANE
+	layer = 6.54
+	mouse_opacity = 0
+	pixel_x = -16
+	pixel_y = -16
 
 /obj/fx_heatblob
 	gfx_transient_visual = 1
@@ -345,9 +356,10 @@ proc/FxConeRayWave(obj/fx_clashlight/O, matrix/base, phase, base_a)
 proc/FxClashLightPair(atom/movable/host, icon/tex, col, matrix/mx, wa = 215, ba = 250)
 	. = list()
 	if(!host || !tex) return
-	var/frac = LightRenderStrength(get_turf(host)) //~0.10 daylight, ~1 at night
+	var/turf/ht = get_turf(host)
+	var/frac = LightRenderStrength(ht) //~0.10 daylight, ~1 at night
 	wa = round(wa * (1 - 0.65 * frac))
-	ba = round(ba * (0.35 + 0.65 * frac))
+	ba = LightGlowBudget(ht, col, round(ba * (0.35 + 0.65 * frac)), FxIconLum(tex))
 	var/list/anc = FxChildAnchor(host)
 	var/ox = anc[1] + (64 - tex.Width()) / 2
 	var/oy = anc[2] + (64 - tex.Height()) / 2
@@ -499,6 +511,15 @@ proc/_FxLift(col)
 	var/list/c = _FxRGB(col)
 	if(!c) return null
 	return rgb(round(c[1] * 0.78 + 255 * 0.22), round(c[2] * 0.78 + 255 * 0.22), round(c[3] * 0.78 + 255 * 0.22))
+
+proc/FxGlowColorCap(col)
+	var/list/c = _FxRGB(col)
+	if(!c) return col
+	var/cap = (glob && glob.CHARGE_LIGHT_COLOR_CAP) ? glob.CHARGE_LIGHT_COLOR_CAP : 210
+	var/mx = max(c[1], max(c[2], c[3]))
+	if(mx <= cap) return col
+	var/k = cap / mx
+	return rgb(round(c[1] * k), round(c[2] * k), round(c[3] * k))
 
 proc/_FxSampleIcon(f, state)
 	var/icon/I = new(f, state)
@@ -725,6 +746,7 @@ proc/FxPruneLights()
 // aura lights
 //aura light: one pooled vis child + a shadow entry riding the actor - follows aura state, not Auraz edges
 mob/var/tmp/obj/fx_lightglow/charge_glow
+mob/var/tmp/obj/fx_lightdim/charge_dim
 mob/var/tmp/datum/fx_light/charge_fxlight
 mob/var/tmp/charge_glow_cycle //icon-file text driving a color cycle, or null
 mob/var/tmp/charge_glow_frac = 0 //darkness the glow was last driven at - drift re-bases alpha
@@ -867,6 +889,53 @@ proc/_FxIconInked(f)
 proc/_AuraGlowScale(inked)
 	return clamp(0.5 + inked * 0.02, 0.6, 3.2)
 
+var/list/_fx_icon_lum = list()
+
+proc/FxIconLum(f)
+	if(!f) return 0
+	var/id = "[f]"
+	if(!length(id) || id == "/icon") id = "[ref(f)]"
+	var/hit = _fx_icon_lum[id]
+	if(hit != null) return hit
+	var/lum = 0
+	var/wsum = 0
+	try
+		var/icon/I = new(f)
+		var/w = I.Width()
+		var/h = I.Height()
+		for(var/py = 1, py <= h, py += 2)
+			for(var/px = 1, px <= w, px += 2)
+				var/c = I.GetPixel(px, py)
+				if(!c) continue
+				var/a = (length(c) >= 9) ? text2num(copytext(c, 8, 10), 16) : 255
+				if(a < 40) continue
+				var/list/p = _FxRGB(c)
+				if(!p) continue
+				lum += (0.299 * p[1] + 0.587 * p[2] + 0.114 * p[3]) * a
+				wsum += a
+	catch
+		wsum = 0
+	var/out = wsum > 0 ? lum / wsum : 0
+	_fx_icon_lum[id] = out
+	return out
+
+proc/FxAddWearScale(f)
+	if(!f) return 1
+	var/lum = FxIconLum(f)
+	if(lum <= 0) return 1
+	var/cap = (glob && glob.AURA_ADD_LUM_CAP) ? glob.AURA_ADD_LUM_CAP : 150
+	return lum > cap ? max(cap / lum, 0.5) : 1
+
+proc/FxAddWearTint(image/im, f)
+	if(!im || !f) return
+	var/lum = FxIconLum(f)
+	var/target = glob ? glob.LIGHT_ART_TARGET : 190
+	if(lum <= target) return
+	var/g = round(255 * target / lum)
+	im.color = rgb(g, g, g)
+	im.layer = FX_SELFLIT_LAYER
+	im.appearance_flags |= KEEP_APART
+
 //single entry point: attach, refresh or drop the light to match the mob's real state
 proc/MobAuraLightRefresh(mob/M)
 	if(!M) return
@@ -881,12 +950,39 @@ proc/_AuraCycleDrive(obj/fx_lightglow/L, list/cyc, frac)
 	var/step_t = max(1, round(cyc[1] / steps))
 	var/aHi = round(glob.CHARGE_LIGHT_ALPHA * frac)
 	var/aLo = round(aHi * 0.8)
-	L.color = cyc[2]
+	L.color = FxGlowColorCap(cyc[2])
 	L.alpha = aHi
-	animate(L, color = cyc[3], alpha = aLo, time = step_t, loop = -1)
+	animate(L, color = FxGlowColorCap(cyc[3]), alpha = aLo, time = step_t, loop = -1)
 	for(var/i = 4, i <= cyc.len, i++)
-		animate(color = cyc[i], alpha = (i % 2) ? aHi : aLo, time = step_t)
-	animate(color = cyc[2], alpha = aHi, time = step_t)
+		animate(color = FxGlowColorCap(cyc[i]), alpha = (i % 2) ? aHi : aLo, time = step_t)
+	animate(color = FxGlowColorCap(cyc[2]), alpha = aHi, time = step_t)
+
+proc/MobArtDimOff(mob/M)
+	if(!M || !M.charge_dim) return
+	M.vis_contents -= M.charge_dim
+	M.charge_dim.loc = null
+	M.charge_dim = null
+
+proc/MobArtDimRefresh(mob/M, turf/t, artlum, ascale)
+	if(!M) return
+	var/over = 0
+	if(artlum > 0 && t && glob && glob.MULTIPLY_REVEAL)
+		over = round(LightLocalLevel(t) - LightArtTolerance(artlum))
+	if(over < 3)
+		MobArtDimOff(M)
+		return
+	if(!_fx_glow_icon) _FxBuildIcons()
+	if(!_fx_glow_icon) return
+	if(!M.charge_dim)
+		var/obj/fx_lightdim/D = new
+		D.icon = _fx_glow_icon
+		var/list/anc = FxChildAnchor(M)
+		D.pixel_x = anc[1]
+		D.pixel_y = anc[2]
+		M.vis_contents += D
+		M.charge_dim = D
+	M.charge_dim.transform = matrix() * max(ascale * 0.8, 0.6)
+	M.charge_dim.alpha = min(over, 120)
 
 proc/MobAuraLightOn(mob/M)
 	if(!M || !glob || !glob.CHARGE_LIGHTS || !glob.LIGHTING || !glob.DYNAMIC_LIGHTS) return
@@ -913,6 +1009,7 @@ proc/MobAuraLightOn(mob/M)
 		cyc = null
 		col = null
 	if(!col) col = "#cfe4ff" //bare ki charge: cool white
+	col = FxGlowColorCap(col)
 	//icon datums all stringify alike - key by ref or two custom auras read as the same
 	var/aid = "[aicon]"
 	var/ikey = aicon ? ((length(aid) && aid != "/icon") ? aid : "[ref(aicon)]") : null
@@ -921,7 +1018,10 @@ proc/MobAuraLightOn(mob/M)
 	var/ascale = _AuraGlowScale(inked)
 	if(M.charge_glow) M.charge_glow.greach = ascale
 	var/crowd = FxGlowCrowdScale(t.x, t.y, t.z, ascale, M.charge_glow)
-	var/efrac = frac * crowd
+	var/artlum = FxIconLum(aicon)
+	var/cap = LightGlowBudget(t, col, round(glob.CHARGE_LIGHT_ALPHA * frac), artlum)
+	var/efrac = (cap / max(glob.CHARGE_LIGHT_ALPHA, 1)) * crowd
+	MobArtDimRefresh(M, t, artlum, ascale)
 	if(M.charge_glow) //already lit: track color/cycle/size/strength in place
 		M.charge_glow.crowd = crowd
 		if(M.charge_fxlight)
@@ -960,7 +1060,7 @@ proc/MobAuraLightOn(mob/M)
 	M.charge_glow_frac = efrac
 	M.charge_glow_ikey = ikey
 	L.crowd = crowd
-	FxGlowRegister(L, M, round(glob.CHARGE_LIGHT_ALPHA * frac), ascale, 1)
+	FxGlowRegister(L, M, cap, ascale, 1)
 	if(cyc)
 		_AuraCycleDrive(L, cyc, efrac)
 	else
@@ -970,6 +1070,7 @@ proc/MobAuraLightOn(mob/M)
 
 proc/MobAuraLightOff(mob/M)
 	if(!M) return
+	MobArtDimOff(M)
 	if(M.charge_glow)
 		M.vis_contents -= M.charge_glow
 		_fx_glow_reg -= M.charge_glow
@@ -1055,9 +1156,8 @@ proc/FxGlowCrowdScale(gx, gy, gz, reach, obj/fx_lightglow/skip)
 		var/d = sqrt(dx * dx + dy * dy)
 		if(d >= r) continue
 		o += 1 - d / r
-	o = max(o - max(glob.FX_LIGHT_CROWD_FREE, 0), 0)
 	if(!o) return 1
-	return 1 / sqrt(1 + max(glob.FX_LIGHT_CROWD, 0) * o)
+	return 1 / (1 + o)
 
 proc/FxGlowRegister(obj/fx_lightglow/L, atom/movable/host, base, reach, anim = 0)
 	if(!L || !host) return
@@ -1127,7 +1227,10 @@ proc/FxGlowCrowdPass()
 		if(!L.anim_driven)
 			L.alpha = round(L.base_alpha * s)
 			continue
-		if(abs(s - L.crowd) <= 0.05) continue
+		var/turf/lt = locate(L.gx, L.gy, L.gz)
+		var/lv = lt ? LightLocalLevel(lt) : 0
+		if(abs(s - L.crowd) <= 0.05 && abs(lv - L.llevel) <= 4) continue
+		L.llevel = lv
 		var/mob/M = L.glow_host
 		if(ismob(M)) MobAuraLightRefresh(M)
 
@@ -1173,13 +1276,14 @@ proc/FxAttachLight(obj/Skills/Projectile/P, obj/Skills/Projectile/Z)
 			var/obj/fx_lightglow/L = new
 			L.icon = _fx_glow_icon
 			L.color = FxGlowColor(P)
-			L.alpha = round(210 * frac)
+			var/pcap = LightGlowBudget(get_turf(P), L.color, round(210 * frac), FxIconLum(P.icon))
+			L.alpha = pcap
 			L.transform = matrix() * glob.LIGHT_SCALE
 			L.pixel_x = cx
 			L.pixel_y = cy
 			if(glob.MULTIPLY_REVEAL) L.plane = LIGHTING_PLANE //add INTO the buffer so the multiply reveals it (else it gets multiplied down)
 			P.vis_contents += L
-			FxGlowRegister(L, P, round(210 * frac), glob.LIGHT_SCALE)
+			FxGlowRegister(L, P, pcap, glob.LIGHT_SCALE)
 			FxRegisterLight(P, null, glob.LIGHT_SHADOW_RADIUS, FxGlowColor(P)) //moving light for shadows
 	if(glob.SCREEN_DISTORT && _fx_heat_icon && FxSkillIsFire(P, Z))
 		var/obj/fx_heatblob/H = new
@@ -1220,7 +1324,7 @@ proc/FxLightPulse(turf/T, size = 1.5, col = null, min_frac = 0)
 	var/obj/fx_lightglow/L = new(T)
 	L.icon = _fx_glow_icon
 	if(col) L.color = col
-	L.alpha = round(230 * frac * FxGlowCrowdScale(T.x, T.y, T.z, size, null))
+	L.alpha = round(LightGlowBudget(T, L.color, round(230 * frac)) * FxGlowCrowdScale(T.x, T.y, T.z, size, null))
 	L.transform = matrix() * 0.4
 	if(glob.MULTIPLY_REVEAL) L.plane = LIGHTING_PLANE //reveal through the multiply instead of being darkened by it
 	animate(L, transform = matrix() * size, alpha = 0, time = 6)
@@ -1338,7 +1442,7 @@ proc/OccLightPaint(obj/fx_occlight/O, turf/s)
 		O.icon = _fx_glow_icon
 		O.transform = matrix() * rr
 		O.color = O.lcolor
-		O.alpha = round(glob.LIGHT_MAX_ALPHA * frac) //match the near-wall peak so no pop when a wall enters radius
+		O.alpha = LightGlowBudget(s, O.lcolor, round(glob.LIGHT_MAX_ALPHA * frac), FxIconLum(O.host ? O.host.icon : null)) //match the near-wall peak so no pop when a wall enters radius
 		O.pixel_x = anc[1]
 		O.pixel_y = anc[2]
 		return
@@ -1360,7 +1464,7 @@ proc/OccLightPaint(obj/fx_occlight/O, turf/s)
 	O.icon = ic //stays N-px: upscaling here would transmit a fresh ~288px resource every repaint
 	O.transform = matrix() * 32 //blow the tiny icon up client-side (PIXEL_SCALE plane + the master blur soften it)
 	O.color = O.lcolor
-	O.alpha = round(glob.LIGHT_MAX_ALPHA * frac)
+	O.alpha = LightGlowBudget(s, O.lcolor, round(glob.LIGHT_MAX_ALPHA * frac), FxIconLum(O.host ? O.host.icon : null))
 	O.pixel_x = anc[1] + 32 - N / 2 //center the N-px icon (scaled about its own center) on the host tile
 	O.pixel_y = anc[2] + 32 - N / 2
 
