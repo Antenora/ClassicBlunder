@@ -988,7 +988,7 @@ mob
 					FuryAccumulated=0
 			if(cursedSheathValue)
 				cursedSheathValue -= 0.5/SagaLevel
-				cursedSheathValue = clamp(0, cursedSheathValue, SagaLevel*50)
+				cursedSheathValue = clamp(0, cursedSheathValue, SagaLevel*100)
 				if(client && hudIsLive("CursedSheath", /obj/Bar))
 					client.hud_ids["CursedSheath"]?:Update()
 

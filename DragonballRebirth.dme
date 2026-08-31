@@ -981,7 +981,6 @@
 #include "Skills\queues\sagas\Saint\Gold\Pisces.dm"
 #include "Skills\queues\sagas\Saint\Gold\Scorpius.dm"
 #include "Skills\queues\sagas\Saint\Gold\Virgo.dm"
-#include "Skills\queues\sagas\WeaponSoul\Dainsleif.dm"
 #include "Skills\queues\sagas\WeaponSoul\Durendal.dm"
 #include "Skills\queues\secrets\Ripple.dm"
 #include "Skills\queues\secrets\SageMode.dm"

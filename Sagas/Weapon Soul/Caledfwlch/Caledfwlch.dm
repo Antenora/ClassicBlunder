@@ -364,7 +364,7 @@ obj/Skills/AutoHit/False_Excalibur
 					excalibur.caledLight = TRUE
 					excalibur.Element = "Light"
 					excalibur.caledFinal = TRUE
-					excalibur.icon= 'Caledfwlch.dmi'
+					excalibur.icon= 'Caledfwlch-True.dmi'
 					usr << "You have been eternally purified into a ruler who protects and shelters!"
 			else
 				usr << "Something went wrong. Contact an admin."

@@ -475,6 +475,12 @@ mob
 						if(s3&&s3.Destructable)
 							s.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * Sword3Quality) + duraBase), defender, src, "sword")
 
+					if(src.WSMuramasa())
+						if(defender.WSCorrupt() || defender.WSHoly() || s.LegendaryItem)
+							src.gainTension(breakTicks)
+
+
+
 			if(defender.HasLifeGeneration())
 				defender.HealHealth(defender.GetLifeGeneration()/glob.LIFE_GEN_DIVISOR * val)
 				if(defender.Health>=defender.HealthCeiling())

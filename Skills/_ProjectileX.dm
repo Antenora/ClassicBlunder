@@ -3276,52 +3276,6 @@ obj
 				verb/Infinity_Break()
 					set category="Skills"
 					usr.UseProjectile(src)
-////Weapon Soul
-			Weapon_Soul
-				Holy_Slash
-					IconLock='Excaliblast.dmi'
-					LockX=-50
-					LockY=-50
-					DamageMult=0.05
-					AccMult=25
-					MultiHit=100
-					Knockback=1
-					Radius=1
-					ZoneAttack=1
-					ZoneAttackX=0
-					ZoneAttackY=0
-					FireFromSelf=1
-					FireFromEnemy=0
-					Explode=3
-					StrScaling=1
-					ForScaling=1
-					EndEffectiveness=1
-					Dodgeable=-1
-					Deflectable=-1
-					Distance=100
-					//No verb because set from queue
-				Darkness_Slash
-					IconLock='DExcaliblast.dmi'
-					LockX=-50
-					LockY=-50
-					DamageMult=0.05
-					AccMult=25
-					MultiHit=100
-					Knockback=1
-					Radius=1
-					ZoneAttack=1
-					ZoneAttackX=0
-					ZoneAttackY=0
-					FireFromSelf=1
-					FireFromEnemy=0
-					Explode=3
-					StrScaling=1
-					ForScaling=1
-					EndEffectiveness=1
-					Dodgeable=-1
-					Deflectable=-1
-					Distance=100
-					//No verb because set from queue.
 
 ////KoB
 
@@ -5001,25 +4955,6 @@ obj
 							verb/Beam_of_Libra()
 								set category="Skills"
 								usr.UseProjectile(src)
-					Weapon_Soul
-						Excalibur
-							DamageMult=0.2571
-							ChargeRate=0.2
-							StrScaling=1
-							ForScaling=1
-							EndEffectiveness=1
-							Distance=40
-							Dodgeable=-1
-							Deflectable=-1
-							ManaCost=5
-							ABuffNeeded="Soul Resonance"
-							Cooldown=-1
-							HeldSkill=TRUE
-							HeldBeam=TRUE
-							ChargePeriod=3
-							verb/Excalibur()
-								set category="Skills"
-								usr.BeginHeldSkill(src)
 					Jagan
 						Dragon_of_the_Darkness_Flame
 							DamageMult=0.2

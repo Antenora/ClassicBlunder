@@ -1309,7 +1309,7 @@ NEW VARIABLES
 								if(istype(usr.EquippedSword(),/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order))
 									light = usr.EquippedSword():caliburLight
 							if(light)
-								passives = list("HolyMod"=usr.SagaLevel, "LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
+								passives = list("HolyMod"=usr.SagaLevel, "DeathField"=usr.SagaLevel*3, "VoidField"=usr.SagaLevel*3, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Purified Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -1319,7 +1319,7 @@ NEW VARIABLES
 									src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 									src.OffMessage="conceals █████████████.."
 							else
-								passives = list("AbyssMod"=usr.SagaLevel, "LifeGeneration"=usr.SagaLevel/8, "PULock" = 1)
+								passives = list("AbyssMod"=usr.SagaLevel, "EnergySteal"=usr.SagaLevel/2, "SoulFire"=usr.SagaLevel*2, "PULock" = 1)
 								if(!redacted)
 									src.ActiveMessage="calls forth the true form of Soul Calibur, the Crystal Blade of Order!"
 									src.OffMessage="restricts Soul Calibur's order..."
@@ -8598,26 +8598,7 @@ NEW VARIABLES
 							usr.SyncAttached="Kingdom Key D"
 						usr << "You can't equip the same keyblade in both hands, so your sync blade has been reset to the default."
 
-		Totsuka_no_Tsurugi//t2
-			NeedsSword=1
-			FlashDraw=1
-			MakesSecondSword=1
-			ABuffNeeded=list("Soul Resonance")
-			SwordNameSecond="Totsuka"
-			SwordIconSecond='Totsuka.dmi'
-			SwordAscensionSecond=3
-			SwordXSecond=-32
-			SwordYSecond=-32
-			SwordElementSecond="Fire"
-			passives = list("SwordAscensionSecond" = 3, "SoulFire" = 1, "DoubleStrike" = 1)
-			SoulFire=1
-			DoubleStrike=1
-			ActiveMessage="manifests the spiritual form of the predecesor of Kusanagi!"
-			OffMessage="releases the blade of Totsuka back into the legend!"
-			Cooldown=-1
-			verb/Manifest_Totsuka()
-				set category="Skills"
-				src.Trigger(usr)
+
 		Eye_of_Chaos
 			NeedsSword=1
 			TaxThreshold=0.5

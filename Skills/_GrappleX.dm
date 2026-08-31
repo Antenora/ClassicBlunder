@@ -29,6 +29,7 @@ obj/Skills/Grapple
 		MortalBlow=0
 		DashAfter = FALSE
 		LandingSplash=0
+		ABuffNeeded = null
 ////BASIC
 	skillDescription()
 		..()

@@ -3,11 +3,12 @@ mob/var/dainsleifDrawn = FALSE
 obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 	name="Blade of Ruin"
 	icon='Dainsleif.dmi'
-	Destructable=0
-	ShatterTier=0
+	Destructable = 0
+	ShatterTier = 0
 	Ascended=6
 	passives = list("Shearing" = 1, "CursedWounds" = 1)
 	var/hasKilled = FALSE
+	var/KillCount = 0
 	proc/drawDainsleif(mob/p)
 		hasKilled = FALSE
 		if(!p.dainsleifDrawn)
@@ -16,11 +17,13 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 		p.dainsleifDrawn = TRUE
 	proc/onKill(mob/atk, mob/defend)
 		hasKilled = TRUE
+		KillCount++
+		passives += list("Vigor" = 1)
 		OMsg(atk, "The Sword of Ruin's blood lust has been sated by [defend.name]'s death!")
 
 	proc/putAway(mob/p)
 		if(!hasKilled)
-			if(p.HealthCut >=0.3)
+			if(p.HealthCut >= 0.3)
 				p << "The blade refuses to be sheathed."
 				return FALSE
 			else
@@ -37,7 +40,11 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 						return FALSE
 		else
 			hasKilled = FALSE
-			p.dainsleifDrawn = TRUE
+			p.dainsleifDrawn = FALSE
+			if(p.HealthCut >= 0)
+				p.HealthCut -= 0.1
+				p << "The blade shares its meal with you, restoring some of your life force."
+				OMsg(p, "The blade shares its meal with [p.name], restoring some of their life force.")
 			return TRUE
 
 
@@ -148,6 +155,32 @@ obj/Skills/AutoHit/Destined_Death
 		set category="Skills"
 		usr.Activate(src)
 
+obj/Skills/Queue/Cursed_Blade
+	ActiveMessage="channels the ruin of their legendary weapon into each and every attack...!"
+	DamageMult=0.75
+	AccuracyMult=3
+	Combo = 5
+	Shearing = 20
+	SweepStrike=1
+	Warp = 1
+	NoWhiff = 1
+	Duration = 5
+	Cooldown=8
+	NeedsSword=1
+	EnergyCost=2
+	HitSparkIcon='Slash - Zero.dmi'
+	HitSparkX=-32
+	HitSparkY=-32
+	HitSparkSize=1.5
+	adjust(mob/p)
+		if(p.cursedSheathValue)
+			DamageMult = (1.5 + p.cursedSheathValue/200) * 0.375
+			Combo = 5 + p.cursedSheathValue/100
+	verb/Cursed_Blade()
+		set category="Skills"
+		adjust(usr)
+		usr.SetQueue(src)
+
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 	passives = list("Maki" = 1,"HardStyle" = 1,  "SuperDash" = 1,)
 	TimerLimit=20
@@ -196,4 +229,4 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 		var/val = S.defender.HPToPct(S.dealt)
 		if(attacker.dainsleifDrawn&&attacker.passive_handler.Get("CursedSheath")) // dainsleif passive
 			attacker.cursedSheathValue += val
-			attacker.cursedSheathValue = clamp(0, attacker.cursedSheathValue, attacker.SagaLevel*50)
+			attacker.cursedSheathValue = clamp(0, attacker.cursedSheathValue, attacker.SagaLevel*100)

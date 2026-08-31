@@ -97,3 +97,37 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 		usr.Activate(src)
 	adjust(mob/p)
 		DamageMult = (12 + p.SagaLevel) * 0.1147
+
+/obj/Skills/AutoHit/War_God_Descent
+	NeedsSword=1
+	ABuffNeeded="Soul Resonance"
+	Distance=15
+	Gravity=5
+	WindUp=1
+	WindupMessage="prepares to cut through the very space around them in defiance of everything..."
+	DamageMult = 2.33
+	StrScaling=1
+	Stunner = 1
+	ActiveMessage="slashes through the very concept of space, breaking reality to force their desires onto the world with the might of War!"
+	Area="Target"
+	GuardBreak=1
+	PassThrough=1
+	MortalBlow=2
+	Shattering = 70
+	Shocking = 70
+	Crippling = 30
+	HitSparkIcon='Slash - Zan.dmi'
+	HitSparkX=-16
+	HitSparkY=-16
+	HitSparkTurns=1
+	HitSparkSize=3
+	Cooldown= 15
+	EnergyCost=3
+	Instinct=1
+	adjust(mob/p)
+		DamageMult= 2.33 + p.SagaLevel*0.33
+		WindUp = 1
+	verb/WarGodDescent()
+		set name = "War God's Descent"
+		set category="Skills"
+		usr.Activate(src)

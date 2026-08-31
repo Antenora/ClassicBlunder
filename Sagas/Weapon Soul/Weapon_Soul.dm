@@ -91,6 +91,7 @@ mob/tierUpSaga(Path)
 					if("Muramasa")
 						src << "The blade of assured Death whispers the arts of Death to you..."
 						passive_handler.Increase("CriticalDamage", 0.2)
+						AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Grimreaper_Endbringer)
 						AddSkill(new/obj/Skills/AutoHit/Masterful_Death)
 
 					if("Masamune")
@@ -109,6 +110,7 @@ mob/tierUpSaga(Path)
 						src << "Soul Calibur's Order becomes far easier to sink into..."
 						AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Defrost)
 						src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Soul_Conviction)
+						AddSkill(new/obj/Skills/Projectile/Crystal_Rose_Glass)
 
 					if("Ryui Jingu Bang")
 						src << "Yeoui unveils the secrets to proper footwork..."
@@ -152,6 +154,7 @@ mob/tierUpSaga(Path)
 							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory/excalibur in contents)
 								excalibur.caledLight = TRUE
 								excalibur.Element = "Light"
+								excalibur.icon= 'Caledfwlch-True.dmi'
 							src << "You stand tall beneath the sun as a righteous king."
 						else
 							src.contents += new/mob/Players/verb/Excalignment
@@ -169,6 +172,7 @@ mob/tierUpSaga(Path)
 						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades/muramasa in contents)
 							muramasa.Element = "Dark"
 							muramasa.passives = list("WeaponBreaker" = 2, "AbyssMod" = 4)
+						AddSkill(new/obj/Skills/Grapple/Executioner)
 
 					if("Masamune")
 						src << "The hilt of Masamune glitters in the light, offering it's blessed nature to aid your attacks..."
@@ -183,7 +187,19 @@ mob/tierUpSaga(Path)
 
 					if("Soul Calibur")
 						src << "The manipulation of Soul Calibur's crystals becomes second nature..."
-						AddSkill(new/obj/Skills/AutoHit/Crystal_Luminescene)
+						AddSkill(new/obj/Skills/AutoHit/Crystal_Luminescence)
+						var/Mode=alert(src, "You feel the Weapon Soul reach into you. Do you accept it?", "Soul Calibur", "Yes", "No")
+						if(Mode == "No")
+							src.contents += new/mob/Players/verb/SoulCalignment
+							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order/soulc in contents)
+								soulc.caliburLight = TRUE
+							src << "You refuse and continue forward as your own master."
+						else
+							src.contents += new/mob/Players/verb/SoulCalignment
+							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order/soulc in contents)
+								soulc.caliburLight = FALSE
+								soulc.icon= 'SoulCalibur-Crystal.dmi'
+							src << "You let the darkness within Soul Calibur dominate your mind."
 
 					if("Ryui Jingu Bang")
 						passive_handler.Increase("MonkeyKing",2) // lets get a little freaky
@@ -191,9 +207,6 @@ mob/tierUpSaga(Path)
 					if("Green Dragon Crescent Blade")
 						src << "The Green Dragon Crescent Blade shows how to counter any attack..."
 						passive_handler.Increase("Extend", 1)
-						// SagaThreshold("Spd",0.5)
-						// SagaThreshold("Str",0.5)
-						// SagaThreshold("End",0.5)
 
 			if(4)
 				src << "The power of Heavenly Regalia becomes avaliable to you by resonating your treasures!"
@@ -268,7 +281,8 @@ mob/tierUpSaga(Path)
 
 					if("Muramasa")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa/muramasa in src.Buffs)
-							muramasa.passives["TechniqueMastery"] = 2
+							muramasa.passives["TechniqueMastery"] = 4
+							muramasa.passives["CriticalDamage"] = 0.2
 
 					if("Masamune")
 						src.AddSkill(new/obj/Skills/Utility/Death_Killer)
@@ -288,8 +302,8 @@ mob/tierUpSaga(Path)
 
 					if("Soul Calibur")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur/SC in src.Buffs)
-							SC.passives["Chilling"] = 2
-							SC.passives["SpiritPower"] = 1
+							SC.passives["Chilling"] = 10
+							SC.passives["Freezing"] = 5
 
 					if("Ryui Jingu Bang")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang/Ryui in src.Buffs)
@@ -371,7 +385,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=2
 		EndMult=1.5
 		OffMult=1.25
-		passives= list("HolyMod" = 5, "Purity" = 1,  "DebuffReversal" = 1)
+		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1,  "DebuffReversal" = 1)
 		ActiveMessage= "invokes the Origin of Hope, embracing the Conviction of a Saint!"
 		OffMessage= "casts aside the Origin of Hope..."
 		verb/Fundament_Conviction()
@@ -383,7 +397,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=1.25
 		ForMult=1.25
 		EndMult=1.5
-		passives= list("Miracle" = 1)
+		passives= list("PureReduction" = 5, "Miracle" = 1)
 		ActiveMessage= "invokes the Origin of Glory, embracing the Honour of a King!"
 		OffMessage= "casts aside the Origin of Glory..."
 		verb/Fundament_Honour()
@@ -397,7 +411,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		OffMult=1.25
 		ActiveMessage= "invokes the Origin of Ruin, stewing in Primordial Hate!"
 		OffMessage= "casts aside the Origin of Ruin..."
-		passives= list("DeathField" = 5)
+		passives= list("DeathField" = 5,  "Duelist" = 3)
 		verb/Fundament_Hatred()
 			set category="Skills"
 			src.Trigger(usr)
@@ -425,7 +439,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=1.5
 		EndMult=0.9
 		SpdMult=1.5
-		passives = list("Erosion" = 0.5, "DeathField" = 5, "AbyssMod" = 3, "Entropic"=1)
+		passives = list("Erosion" = 0.5, "DeathField" = 5, "AbyssMod" = 3, "Entropic" = 1)
 		ActiveMessage= "invokes the Foundation of Death, bringing the End with their blade..:"
 		OffMessage="allows the Entropic energy to fade from their legendary weapon..."
 		verb/Fundament_Entropy()
@@ -434,6 +448,10 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 
 	Oppression
 		name = "Fundament: Oppression"
+		ForMult=2
+		EndMult=1.5
+		DefMult=1.25
+		passives = list("SoftStyle" = 4, "EnergyGeneration" = 10)
 		verb/Fundament_Oppression()
 			set category="Skills"
 			src.Trigger(usr)

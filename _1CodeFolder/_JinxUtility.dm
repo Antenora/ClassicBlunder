@@ -1831,6 +1831,8 @@ mob
 
 		GetVit(var/Mult=1)
 			var/Vit=src.BaseVit()
+			if(passive_handler.Get("Vigor"))
+				Vit+= passive_handler.Get("Vigor")
 			Vit*=Mult
 			if(Vit<0.1)
 				Vit=0.1
