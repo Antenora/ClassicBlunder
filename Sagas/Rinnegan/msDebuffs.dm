@@ -94,6 +94,7 @@ obj/blades
 	EnergyDrain = 0.05
 	TimerLimit = 0
 	IconLock='DarknessFlameAura.dmi'
+	AuraArt=1
 	LockX=-32
 	LockY=-32
 	IconLayer=-1

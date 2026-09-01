@@ -1,7 +1,6 @@
 var/list/PermaKeys=list("Marlin1", "TiltHour", "Dadafas1", "Miscreated", "Toefiejin", "StrangeBanana", "Cool pro", "Ss4toby", "Uwuesketit", "Sarutabaruta", "Pigepic", "WarHorse76", "George Bush Did 911", "Xaithyl", "Yoshima Monomyth", "Naviel", "Greg76", "Sekots", "TienShenhan", "WhatIsOriginality", "Solobb-", "Xerif", "MikaNX", "Tusk Act 4", "Vaina", "ProtoZSX", "Revelution", "Higashikata Josuke", "BDSMLover92", "Justbroli",)
 var/list/PermaIPs=list("143.244.44.185", "73.132.147.113", "74.105.35.124", "81.132.77.65", "64.130.69.214", "65.185.161.235", "108.61.39.115", "75.65.2.4", "24.50.233.176", "50.39.120.226", "135.180.40.74", "86.181.159.231", "45.36.32.84", "198.85.212.230", "74.88.65.98", "76.23.208.95", "66.172.248.64", "185.156.175.35", "136.62.42.182", "68.8.92.94", "109.246.123.195", "24.36.113.151", "67.198.127.237", "82.34.152.124", "121.223.199.102", "174.108.20.140", "179.43.133.139", "174.108.20.140", "73.47.207.244", "71.64.147.189", "70.35.179.6", "69.10.118.103", "86.19.157.156")
 var/list/PermaComps=list("1280524509 ", "566412451", "3488379531", "1990235738", "1662279420", "835666311", "3995897142", "3272450259", "1395820860", "1629772640", "3856341027", "938246607", "975079193", "1526134833", "4102036161", "3446557113", "3878049361", "2311757843", "3649180149", "991955925", "2016627605", "3836126501", "4003197390", "4145629418", "1476716854", "4229503323", "1353023831", "348890025", "308161406", "729772691", "1049091416", "2196626777", "2781360184", "3770567560", "961693842")
-// runtime CID bans auto-captured from PermaKeys logins, persisted in Saves/PermaCompsExtra
 var/list/PermaCompsExtra=list()
 var/tmp/list/players = list()
 var/tmp/list/admins = list()
@@ -40,7 +39,6 @@ world
 		spawn(10)
 			BootWorld("Load")
 
-		// deferred: these need BootWorld's lists (and MakeSkillTreeList) populated first
 		spawn(30)
 			BuildGeneralMagicDatabase()
 			BuildGeneralWeaponryDatabase()
@@ -115,9 +113,14 @@ proc/BootWorld(var/blah)
 			BootFile("All","Load")
 			BuildAIDatabase()
 			BuildSquadDatabase()
+			BuildStudioBootRestore()
 			Load_Turfs()
 			Load_Custom_Turfs()
 			Load_Objects()
+			BuildAreaPaintApplyBoot()
+			BuildZoneProfileApplyBoot()
+			BuildJournalReplay()
+			BuildEdgeBootPass()
 			Load_Bodies()
 			LoadIRLNPCs()
 			spawn()
@@ -134,7 +137,7 @@ proc/BootWorld(var/blah)
 			spawn()Add_Enchantment()
 			spawn()InitializeSigCombos()
 			spawn()initMagicNodes()
-			if(glob.LIFE_NODE_SPAWNS) //temporary off for the sake of making testing not a pain
+			if(glob.LIFE_NODE_SPAWNS)
 				spawn()SeedLifeSkillNodes()
 				spawn()SeedForageNodes()
 				spawn()SeedTrees()
@@ -162,7 +165,6 @@ proc/BootWorld(var/blah)
 			Save_Custom_Turfs()
 			Save_Bodies()
 			SaveIRLNPCs()
-	//	resourceManager.SaveToSavefile()
 			Save_Objects()
 
 
@@ -214,9 +216,8 @@ proc/BootFile(var/file,var/op)
 				globalSave["glob"]<<glob
 				globalSave["globProgress"]<<glob.progress
 				var/savefile/F=new("Saves/Misc")
-				// F["intimRatio"]<<INTIMRATIO
 				if(archive)
-					archive.AGs = list() // this will delete the AGs list, it should just track whatever is in game vs whatever exist period to avoid any issues
+					archive.AGs = list()
 					F["archive"] << archive
 				if(!length(redactedwords) < 1)
 					redactedwords = list()
@@ -262,7 +263,6 @@ proc/BootFile(var/file,var/op)
 client
 	default_verb_category=null
 	perspective=MOB_PERSPECTIVE
-	//ACTUAL LOGOUT
 	Del()
 		prefs.savePrefs(ckey)
 		src.LoginLog("LOGOUT")
@@ -295,7 +295,7 @@ client
 			mob.AppearanceOff()
 			for(var/obj/fa_jin/fa in mob.vis_contents)
 				mob.vis_contents -= fa
-				del fa // hrm
+				del fa
 			if(mob.Savable)
 				mob.client.SaveChar()
 			sleep(10)
@@ -322,7 +322,6 @@ client
 		prefs.loadPrefs(ckey)
 		..()
 		ApplyAudioPref()
-		//src << browse(glob.getMOTD(), "size=600x1000,window=motd" )
 		src.LoginLog("<font color=blue>logged in.</font color>")
 
 
@@ -349,7 +348,7 @@ mob/proc/Allow_Move(D)
 		var/ToD = P.passive_handler["Touch of Death"]
 		if(brolic || grippy || ToD)
 			if(brolic)
-				brolic = 2 // make it 2
+				brolic = 2
 
 			grippy *= glob.GRIPPY_MOD
 			Grab_Escape=Grab_Escape*( ( src.Power*src.GetStr() ) / ( P.Power*(P.GetStr() * (ToD + brolic + grippy)) ) )
@@ -372,7 +371,6 @@ mob/proc/Move_Requirements()
 			return 0
 		return 1
 
-// flag render-only ones and strip them from saves
 obj/var/tmp/gfx_transient_visual = 0
 
 atom/movable/proc/PurgeTransientGraphics()
@@ -411,7 +409,6 @@ mob/Read(savefile/F)
 	. = ..()
 	GfxResetTransientVisuals()
 
-//purge saved-in strays and forget the trackers so every visual system rebuilds clean
 mob/proc/GfxResetTransientVisuals()
 	PurgeTransientGraphics()
 	if(shadow_pool)

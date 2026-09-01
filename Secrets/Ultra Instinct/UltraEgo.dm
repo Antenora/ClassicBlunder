@@ -16,6 +16,7 @@
 		StyleStr = 1.5
 		StyleForce = 1.5
 		IconLock='GODAura.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-48
 		LockY=-16
@@ -36,6 +37,7 @@
 		StyleOff = 1.6
 		StyleFor = 1.55
 		IconLock='GODAura.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-48
 		LockY=-16

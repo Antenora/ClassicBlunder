@@ -6,6 +6,12 @@
 		AngerMult=1.1
 		EnergyExpenditure=1.5
 		FlashChange=1
+		IconLock='SSJAura.dmi'
+		AuraArt=1
+		LockX=-32
+		AuraLock='SSJRage.dmi'
+		AuraX=-32
+		AuraUnder=1
 		KenWave=3
 		KenWaveSize=0.5
 		KenWaveIcon='KenShockwaveGold.dmi'

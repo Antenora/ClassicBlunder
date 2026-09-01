@@ -8,9 +8,9 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 
 #define KB_NORMAL 0
 #define KB_MOVE   1
-#define KB_HOTBAR 2   // +UP release only if the slotted skill is a held skill
-#define KB_INTERACT 3 // +UP always bound so hold-minigames see the release
-#define KB_HOLD   4   // hold-type action: +UP always bound, "-up" suffix like KB_MOVE
+#define KB_HOTBAR 2
+#define KB_INTERACT 3
+#define KB_HOLD   4
 
 /datum/keyaction
 	var/id
@@ -20,7 +20,7 @@ var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image St
 	var/defkey2
 	var/category
 	var/kind = KB_NORMAL
-	var/rep = 0      // command repeats while the key is held (+REP macro)
+	var/rep = 0
 	New(_id, _label, _command, _defkey, _category, _kind = KB_NORMAL, _defkey2 = "", _rep = 0)
 		id = _id; label = _label; command = _command; defkey = _defkey; category = _category; kind = _kind; defkey2 = _defkey2; rep = _rep
 
@@ -64,13 +64,22 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("intentrp",    "Intent to Roleplay", "Intent-to-Roleplay", "", "Communication")
 	R += new/datum/keyaction("intentinjure","Intent to Injure",   "Intent-to-Injure",   "", "Communication")
 	R += new/datum/keyaction("intentkill",  "Intent to Kill",     "Intent-to-Kill",     "", "Communication")
+	R += new/datum/keyaction("buildundo",   "Build Undo",            "Build-Undo",            "CTRL+Z", "Build")
+	R += new/datum/keyaction("buildredo",   "Build Redo",            "Build-Redo",            "CTRL+Y", "Build")
+	R += new/datum/keyaction("buildrotate", "Build Rotate Brush",    "Build-Rotate",          "CTRL+R", "Build")
+	R += new/datum/keyaction("buildcancel", "Build Cancel",          "Build-Cancel",          "CTRL+X", "Build")
+	R += new/datum/keyaction("builddelsel", "Build Delete Selected", "Build-Delete-Selected", "Delete", "Build")
+	R += new/datum/keyaction("buildcopy",   "Build Copy Selection",  "Build-Copy",            "CTRL+C", "Build")
+	R += new/datum/keyaction("buildpaste",  "Build Paste",           "Build-Paste",           "CTRL+V", "Build")
+	R += new/datum/keyaction("buildfillsel", "Build Fill Selection", "Build-Fill-Selection",  "CTRL+F", "Build")
+	R += new/datum/keyaction("buildfav",    "Build Favorite Tile",   "Build-Favorite",        "CTRL+B", "Build")
+	R += new/datum/keyaction("buildinspect", "Build Inspect Tile",   "Build-Inspect",         "CTRL+I", "Build")
 	for(var/i = 1 to HOTBAR_SLOTS)
 		R += new/datum/keyaction("hotbar[i]", "Hotbar Slot [i]", "Skill-Shortcut-[i]", HOTBAR_DEFAULT_KEYS[i], "Hotbar", KB_HOTBAR)
 	for(var/datum/keyaction/a in R)
 		keybind_by_id[a.id] = a
 	return keybind_registry
 
-// slot 1 = primary, 2 = secondary; explicit override wins ("" = unbound), stored as id / id@2
 /mob/proc/KeybindKey(action_id, slot = 1)
 	initShortcuts()
 	var/sk = (slot == 2) ? "[action_id]@2" : action_id
@@ -87,7 +96,6 @@ var/global/list/keybind_by_id = list()
 	var/sk = (slot == 2) ? "[action_id]@2" : action_id
 	shortcuts.keybinds[sk] = key
 
-// pretty-print a stored key. arrow keys store as North/West but should read as Arrow Up/Left
 /proc/KeyDisplay(key)
 	if(!key) return "(unbound)"
 	key = replacetext(key, "North", "Arrow Up")
@@ -101,7 +109,6 @@ var/global/list/keybind_by_id = list()
 		return "\"[key][suffix]\""
 	return "[key][suffix]"
 
-// keydown plus the +UP release for movement and held hotbar skills; empty key parks the macros
 client/proc/MacroCmd(command)
 	return findtext(command, " ") ? "\"[command]\"" : command
 
@@ -125,7 +132,7 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Interact-Release")
 		return
 	if(kind == KB_HOTBAR && regid)
-		var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
+		var/n = text2num(copytext(regid, 7))
 		var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
 		if(s && s.HeldSkill)
 			winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Release-Held-Skill")
@@ -138,7 +145,6 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 		id += "_[text2ascii(key, i)]"
 	return id
 
-// bind one physical key to a command (+ its +UP / +REP siblings, per kind/rep)
 client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
 	var/eid = KbKeyElemId(key)
 	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=[MacroCmd(command)]")
@@ -153,7 +159,7 @@ client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
 		if(KB_INTERACT) up_cmd = "Interact-Release"
 		if(KB_HOTBAR)
 			if(regid)
-				var/n = text2num(copytext(regid, 7))   // "hotbarN" -> N
+				var/n = text2num(copytext(regid, 7))
 				var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
 				if(s && s.HeldSkill) up_cmd = "Release-Held-Skill"
 	if(up_cmd)
@@ -161,14 +167,12 @@ client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
 	else
 		winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=")
 
-// park a key: the element stays, its command goes empty
 client/proc/KbClearKey(set_name, key)
 	var/eid = KbKeyElemId(key)
 	winset(src, eid, "type=macro;parent=[set_name];name=[HotbarMacroName(key)];command=")
 	winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=")
 	winset(src, "[eid]_rep", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+REP")];command=")
 
-// physical keys bound on the last ApplyKeybinds, so newly-freed keys get cleared
 /client/var/tmp/list/kb_live_keys
 
 client/proc/ApplyKeybinds()
@@ -192,9 +196,7 @@ client/proc/ApplyKeybinds()
 	for(var/k in params2list(winget(src, null, "macro")))
 		set_name = k
 		break
-	// collect the desired bind for each physical key (key -> list(command, kind, regid, rep))
 	var/list/desired = list()
-	// diagonals first so a (practically impossible) player collision would still win below
 	for(var/dd in list("Northeast", "Northwest", "Southeast", "Southwest"))
 		desired[dd] = list(lowertext(dd), KB_MOVE, null, 0)
 	for(var/datum/keyaction/a in keybind_registry)
@@ -202,7 +204,6 @@ client/proc/ApplyKeybinds()
 			var/key = mob.KeybindKey(a.id, s)
 			if(!key) continue
 			desired[key] = list(a.command, a.kind, a.id, a.rep)
-	// misc binds: any non-skill verb the player chose, stored as "misc:<command>" with optional @2 for slot 2
 	if(mob.shortcuts.keybinds)
 		for(var/sk in mob.shortcuts.keybinds)
 			if(copytext(sk, 1, 6) != "misc:") continue
@@ -217,13 +218,11 @@ client/proc/ApplyKeybinds()
 		var/list/e = desired[key]
 		KbWriteKey(set_name, key, e[1], e[2], e[3], e[4])
 		newlive[key] = 1
-	// any key bound last time but not this time gets its command cleared so it stops firing
 	if(kb_live_keys)
 		for(var/key in kb_live_keys)
 			if(newlive[key]) continue
 			KbClearKey(set_name, key)
 	kb_live_keys = newlive
-	// an open number prompt re-asserts its key overlay on top of whatever was just written
 	if(np_open) NumPromptMacros()
 
 var/global/datum/keybind_menu/keybind_menu = new()
@@ -236,9 +235,9 @@ var/global/datum/keybind_menu/keybind_menu = new()
 		usr.shortcuts.keybinds = list()
 		usr.client.ApplyKeybinds()
 		usr.client.RefreshHotbar()
-		usr.client.OpenKeybindMenu()   // redraw so every key shows its default
+		usr.client.OpenKeybindMenu()
 		return
-	if(act == "resetone")            // revert one action to its defaults by dropping its overrides
+	if(act == "resetone")
 		var/rid = href_list["id"]
 		if(rid)
 			usr.initShortcuts()
@@ -254,14 +253,13 @@ var/global/datum/keybind_menu/keybind_menu = new()
 	if(act == "rebind")
 		var/key = href_list["key"]
 		if(id && key)
-			usr.ClearKeybindKey(key, id, slot)   // a key only ever drives one action+slot
+			usr.ClearKeybindKey(key, id, slot)
 			usr.SetKeybind(id, slot, key)
 	else if(act == "unbind")
 		if(id) usr.SetKeybind(id, slot, "")
 	usr.client.ApplyKeybinds()
 	usr.client.RefreshHotbar()
 
-// clear a key off every other action+slot (registry and misc) so it never double-fires
 /mob/proc/ClearKeybindKey(key, keepid, keepslot)
 	if(!key) return
 	initShortcuts()
@@ -287,10 +285,9 @@ client/proc/OpenKeybindMenu()
 	if(!mob) return
 	mob << browse(KeybindMenuHTML(), "window=keybinds;size=620x640")
 
-// verbs for the Misc section
 client/proc/MiscVerbs()
 	BuildKeybindRegistry()
-	if(mob) mob.CollectMenuVerbs()   // refresh so newly-granted Other/Utility verbs are bindable too
+	if(mob) mob.CollectMenuVerbs()
 	var/list/reg = list()
 	for(var/datum/keyaction/a in keybind_registry)
 		reg[a.command] = 1
@@ -305,8 +302,8 @@ client/proc/MiscVerbs()
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
 		out[nm] = nm
 	for(var/obj/Skills/Buffs/b in mob.contents)
-		if(b.TimerLimit && !b.MiscBindable) continue   // timed buffs go in the hotbar
-		if(!b.fire_ident) continue   // non-timed buffs are now stripped, their verb name lives in fire_ident
+		if(b.TimerLimit && !b.MiscBindable) continue
+		if(!b.fire_ident) continue
 		var/nm = replacetext(b.fire_ident, "_", " ")
 		if(reg[replacetext(replacetext(nm, " ", "-"), "_", "-")]) continue
 		out[nm] = nm
@@ -333,14 +330,12 @@ client/proc/MiscVerbs()
 			if(v && "[v:name]" == cmd)
 				call(sk, v)()
 				return
-	// fire them by their saved fire_ident
 	var/nc = NormalizeSkillName(cmd)
 	for(var/obj/Skills/sk in contents)
 		if(sk.fire_ident && NormalizeSkillName(sk.fire_ident) == nc && hascall(sk, sk.fire_ident))
 			call(sk, sk.fire_ident)()
 			return
 
-// one table row: label, primary key box, secondary key box. aid is the action id (or misc:<command>).
 client/proc/KeybindRow(aid, label)
 	var/k1 = mob.KeybindKey(aid, 1)
 	var/k2 = mob.KeybindKey(aid, 2)
@@ -428,7 +423,6 @@ document.onkeydown=function(e){
 
 #define SKILL_ICON_FILE 'HUD/SkillIcons.dmi'
 
-// per-type fallback for skills with no MenuIcon
 /proc/SKILL_TYPE_ICON(obj/Skills/S)
 	if(istype(S, /obj/Skills/Projectile)) return 'HUD/skill_projectile.png'
 	if(istype(S, /obj/Skills/Queue))      return 'HUD/skill_queue.png'
@@ -448,7 +442,7 @@ document.onkeydown=function(e){
 
 /proc/SkillHasSkillVerb(obj/Skills/S)
 	if(!S) return 0
-	if(S.fire_ident) return 1   // verb stripped for hotbar-only use, fire_ident is the marker
+	if(S.fire_ident) return 1
 	for(var/v in S.verbs)
 		if(!v) continue
 		if(v:category == "Skills") return 1
@@ -496,10 +490,10 @@ document.onkeydown=function(e){
 /proc/SkillMenuVisible(obj/Skills/S)
 	if(!S) return 0
 	if(istype(S, STYLE_PATH)) return 0
-	if(istype(S, /obj/Skills/Buffs/Styles)) return 0                    // legacy styles
-	if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous)) return 0  // debuffs + autonomous/finisher buffs
-	if(istype(S, /obj/Skills/Buffs/ActiveBuffs/Ki_Control)) return 0    // passive Ki Control
-	if(istype(S, /obj/Skills/Queue/Finisher)) return 0                  // style finishers
+	if(istype(S, /obj/Skills/Buffs/Styles)) return 0
+	if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous)) return 0
+	if(istype(S, /obj/Skills/Buffs/ActiveBuffs/Ki_Control)) return 0
+	if(istype(S, /obj/Skills/Queue/Finisher)) return 0
 	if(IsCoreSkill(S)) return 0
 	if(!SkillMenuType(S)) return 0
 	return SkillHasSkillVerb(S)
@@ -590,16 +584,14 @@ document.onkeydown=function(e){
 
 		L += ftext+pickedText+ttext+pickedText2
 
-	//	L += "Focus Shift: [selected_type] Type, [selected_type]-based skills get x[boost] [selected_type] scaling (min 150%) for [timer/2] secs."
 	return L
 
-// buff classification + info-panel lines
 /proc/IsDebuffBuff(obj/Skills/Buffs/b)
 	return istype(b, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff)
 /proc/IsMenuBuff(obj/Skills/Buffs/b)
-	return istype(b) && !b.TimerLimit && !IsDebuffBuff(b)    // non-timed, non-debuff: usable + shown in the character menu
+	return istype(b) && !b.TimerLimit && !IsDebuffBuff(b)
 /proc/IsStripBuff(obj/Skills/Buffs/b)
-	return istype(b) && b.TimerLimit > 0 && !IsDebuffBuff(b) // timed, non-debuff: shown in the top-left strip
+	return istype(b) && b.TimerLimit > 0 && !IsDebuffBuff(b)
 
 /proc/BuffPct(mult)
 	var/pct = round((mult - 1) * 100, 1)
@@ -610,7 +602,6 @@ document.onkeydown=function(e){
 	if(add) txt += "[txt ? ", " : ""][add > 0 ? "+" : ""][add]"
 	if(txt) L += "[label]: [txt]"
 
-// buff stat boosts (duration + stat changes),
 /obj/Skills/Buffs/proc/BuffBoostLines()
 	var/list/L = list()
 	if(TimerLimit > 0) L += "Duration: [round(TimerLimit)]s"
@@ -646,7 +637,6 @@ document.onkeydown=function(e){
 		L += S
 	return L
 
-// fallback
 /obj/Skills/Buffs/InfoPanelLines()
 	var/list/L = BuffBoostLines()
 	if(passives && passives.len)
@@ -659,30 +649,29 @@ document.onkeydown=function(e){
 #define SKMENU_COLS 5
 #define SKMENU_ROWS 2
 #define SKMENU_PAGE_SIZE (SKMENU_COLS * SKMENU_ROWS)
-#define SKMENU_GRID_X0 -134      // col 0 icon left edge, aligned with leftmost tab
-#define SKMENU_GRID_Y0 -18       // row 0 icon bottom edge, relative CENTER
-#define SKMENU_GRID_PITCH 48     // 32px icon + 16px gap
+#define SKMENU_GRID_X0 -134
+#define SKMENU_GRID_Y0 -18
+#define SKMENU_GRID_PITCH 48
 #define SKMENU_TAB_COLS 3
 #define SKMENU_TAB_W 84
-#define SKMENU_TAB_PITCH 92      // 84 tab + 8px gap
-#define SKMENU_TAB_X0 -134       // col 0 tab left edge
-#define SKMENU_TAB_Y0 64         // row 0 tab bottom edge
+#define SKMENU_TAB_PITCH 92
+#define SKMENU_TAB_X0 -134
+#define SKMENU_TAB_Y0 64
 #define SKMENU_TAB_ROW_PITCH 34
 #define SKINFO_W 336
 #define SKINFO_H 320
 #define BUFF_VISIBLE 6
 #define BUFF_RH 15
-#define BUFF_ROWS 7        // 6 visible + 1 buffer row for smooth scrolling
-#define BUFF_BAND_H 90     // BUFF_VISIBLE * BUFF_RH
-#define BUFF_Y0 201        // SILoc dy of row 1's bottom edge at sub=0
+#define BUFF_ROWS 7
+#define BUFF_BAND_H 90
+#define BUFF_Y0 201
 #define BUFF_CLIP_T 186
 #define BUFF_CLIP_B 276
-#define BUFF_TRACK_X 298   // right of the row band, inside the panel border
-#define BUFF_TRACK_Y 186   // dy of the track top = band top
-#define BUFF_TRACK_H 90    // = BUFF_BAND_H
+#define BUFF_TRACK_X 298
+#define BUFF_TRACK_Y 186
+#define BUFF_TRACK_H 90
 #define BUFF_THUMB_H 36
 
-// tab label -> GetMenuSkills filter key
 var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit")
 
 /atom/movable/shud/skmenu_icon
@@ -705,11 +694,10 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 			if(usr.client.skinfo_skill == skill)
 				usr.client.CloseSkillInfo()
 			else if(istype(skill, /obj/Skills/Buffs))
-				usr.client.ShowBuffInfo(skill)    // buffs get the dedicated panel with right-clickable passive rows
+				usr.client.ShowBuffInfo(skill)
 			else
 				usr.client.ShowSkillInfo(skill)
 			return
-		// non-timed, non-debuff buffs are the only skills usable straight from the menu
 		if(IsMenuBuff(skill))
 			usr.fireShortcut(skill)
 	MouseDrop(atom/over_object, atom/src_location, atom/over_location, src_control, over_control, params)
@@ -717,11 +705,9 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		if(!istype(over_object, /atom/movable/shud/slot)) return
 		usr.initShortcuts()
 		var/atom/movable/shud/slot/tgt = over_object
-		// no same skill in two slots
 		for(var/i = 1 to HOTBAR_SLOTS)
 			if(usr.shortcuts.vars["shortcut[i]"] == skill)
 				usr.shortcuts.vars["shortcut[i]"] = null
-		// can't displace a skill that's on cooldown
 		var/obj/Skills/B = usr.shortcuts.vars["shortcut[tgt.slot_index]"]
 		if(B && (B.Using || B.cooldown_remaining))
 			usr << "<font color='#ff6b6b'>[B.name] is on cooldown.</font>"
@@ -729,7 +715,6 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		usr.shortcuts.vars["shortcut[tgt.slot_index]"] = skill
 		usr.client?.RefreshHotbar()
 
-// type tab. label is a separate transparent child so the outline traces the text, not the frame
 /atom/movable/shud/skmenu_tab
 	icon = 'HUD/ui_tab_idle.png'
 	layer = MHUD_LAYER + 0.3
@@ -744,7 +729,7 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		lbl.layer = MHUD_LAYER + 0.35
 		lbl.maptext_width = SKMENU_TAB_W
 		lbl.maptext_height = 16
-		lbl.maptext_y = 11   // raised ~3px north so descenders clear the bottom of the 32px frame
+		lbl.maptext_y = 11
 		vis_contents += lbl
 	Del()
 		if(lbl)
@@ -753,7 +738,7 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 		..()
 	proc/SetState(hovered = FALSE)
 		icon = active ? 'HUD/ui_tab_active.png' : 'HUD/ui_tab_idle.png'
-		var/c = active ? "#10233f" : (hovered ? "#8be9ff" : "#ffffff")   // dark text on the lit face
+		var/c = active ? "#10233f" : (hovered ? "#8be9ff" : "#ffffff")
 		lbl.maptext = "<center><span style=\"[MHUD_FONT]; color:[c]\">[tablabel]</span></center>"
 	MouseEntered(location, control, params)
 		SetState(TRUE)
@@ -762,7 +747,6 @@ var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="B
 	Click()
 		usr?.client?.SkillMenuSelectTab(tabkey)
 
-// right-click anywhere to dismiss
 /atom/movable/shud/skinfopanel
 	parent_type = /atom/movable/shud/menupanel
 	Click(location, control, params)
@@ -797,7 +781,7 @@ client
 		buff_pass_anim = FALSE
 		atom/movable/shud/buffthumb/buff_thumb
 		obj/Skills/skinfo_skill
-		si_atx = 1              // info panel tile anchor, computed from view
+		si_atx = 1
 		si_aty = 1
 		atom/movable/shud/menubtn/btn_skills
 		atom/movable/shud/menulabel/btn_skills_label
@@ -806,7 +790,7 @@ client
 client/proc/InitSkillMenuButton()
 	btn_skills = new('HUD/ui_icon_skills.png')
 	btn_skills.btn_id = "skills"
-	btn_skills.screen_loc = "EAST:-4,NORTH:-212"   // right-edge strip, below Character
+	btn_skills.screen_loc = "EAST:-4,NORTH:-212"
 	shud_parts += btn_skills
 	btn_skills_label = new
 	btn_skills_label.maptext_width = 48
@@ -852,8 +836,8 @@ client/proc/CloseSkillMenu()
 
 client/proc/OpenSkillMenu()
 	if(skmenu_open || !mob) return
-	mob.DisableSlottableSkillVerbs()   // catch skills learned since login so they're hotbar-only too
-	CloseMenu()           // never two big panels at once
+	mob.DisableSlottableSkillVerbs()
+	CloseMenu()
 	CloseInventory()
 	CloseCharacterMenu()
 	CloseTechMenu()
@@ -873,7 +857,6 @@ client/proc/OpenSkillMenu()
 	var/atom/movable/shud/menupanel/draggable/P = new
 	P.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:[-MHUD_PANEL_H/2]"
 	skmenu_objs += P
-	// restore saved drag position, clamped to the current view
 	sk_pan_x = getPref("skPanX"); if(isnull(sk_pan_x)) sk_pan_x = 0
 	sk_pan_y = getPref("skPanY"); if(isnull(sk_pan_y)) sk_pan_y = 0
 	var/list/sb = PanBounds("skills", null)
@@ -908,7 +891,6 @@ client/proc/OpenSkillMenu()
 	AR.screen_loc = "CENTER:98,CENTER:-104"
 	skmenu_objs += AR
 
-	// footer shows page count or the hovered skill's name (generic icons can't tell two queues apart)
 	skmenu_pagetext = new
 	skmenu_pagetext.maptext_width = 200
 	skmenu_pagetext.maptext_height = 18
@@ -972,7 +954,7 @@ client/proc/BuildSkillMenuGrid(fade = FALSE)
 		screen -= o
 		del o
 	var/list/L = mob.GetMenuSkills(skmenu_tab)
-	skmenu_pages = max(1, -round(-L.len / SKMENU_PAGE_SIZE)) // ceil
+	skmenu_pages = max(1, -round(-L.len / SKMENU_PAGE_SIZE))
 	skmenu_page = min(max(skmenu_page, 1), skmenu_pages)
 	UpdateSkillPageText()
 	var/start = (skmenu_page - 1) * SKMENU_PAGE_SIZE
@@ -993,7 +975,6 @@ client/proc/BuildSkillMenuGrid(fade = FALSE)
 	if(fade)
 		KineticEntrance(skmenu_icon_objs)
 
-// panel-local dx/dy > tile:pixel screen_loc, anchored low to dodge the CENTER HUD-shift bug
 client/proc/SILoc(dx, dy)
 	var/py = SKINFO_H - dy
 	return "[si_atx + round((dx - dx % 32) / 32)]:[dx % 32],[si_aty + round((py - py % 32) / 32)]:[py % 32]"
@@ -1004,7 +985,6 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 	skinfo_objs = list()
 	skinfo_skill = S
 
-	// tile-anchor so the footprint never overhangs the view top (the HUD shift bug)
 	var/list/vd = splittext("[view]", "x")
 	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
 	var/vh = (vd.len >= 2) ? text2num(vd[2]) : 15
@@ -1015,11 +995,11 @@ client/proc/ShowSkillInfo(obj/Skills/S)
 
 	var/atom/movable/shud/skinfopanel/P = new
 	P.icon = 'HUD/skill_info_panel.png'
-	P.layer = MHUD_LAYER + 2.0                   // above the character menu (FLY+4.x) when a buff is right-clicked there
+	P.layer = MHUD_LAYER + 2.0
 	P.screen_loc = SILoc(0, SKINFO_H)
 	skinfo_objs += P
 
-	var/atom/movable/shud/orbpart/ic = new      // mouse-transparent so the panel keeps the clicks
+	var/atom/movable/shud/orbpart/ic = new
 	ic.icon = SkillMenuIcon(S)
 	ic.icon_state = SkillMenuIconState(S)
 	ic.layer = MHUD_LAYER + 2.1
@@ -1081,7 +1061,6 @@ client/proc/CloseSkillInfo()
 		if(params && findtext(params, "right=1"))
 			usr.client.ShowBuffPassDesc(pass_name)
 
-// passive-band scrollbar; click or drag jumps the list to the cursor
 /atom/movable/shud/bufftrack
 	layer = MHUD_LAYER + 2.25
 	mouse_opacity = 2
@@ -1164,12 +1143,11 @@ client/proc/ShowBuffInfo(obj/Skills/Buffs/b)
 		ph.maptext = "<center><span style=\"[MHUD_FONT]; color:#8be9ff\">Passives</span></center>"
 		ph.screen_loc = SILoc(0, 180)
 		skinfo_objs += ph
-		for(var/k = 1 to BUFF_ROWS)             // 6 visible + 1 buffer for smooth scroll
+		for(var/k = 1 to BUFF_ROWS)
 			var/atom/movable/shud/buffpassrow/r = new
 			r.maptext_width = SKINFO_W - 64
 			buff_pass_rows += r
 			skinfo_objs += r
-		// cover strips in the panel-interior color (#29375F) clip rows scrolling past the band edges
 		var/atom/movable/shud/orbpart/tcov = new
 		tcov.icon = BuffCoverIcon(20)
 		tcov.mouse_opacity = 0
@@ -1248,7 +1226,6 @@ client/proc/RefreshBuffPassRows()
 			var/off = round((buff_pass_px / maxpx) * (BUFF_TRACK_H - BUFF_THUMB_H))
 			buff_thumb.screen_loc = SILoc(BUFF_TRACK_X + 1, BUFF_TRACK_Y + off + BUFF_THUMB_H)
 
-// returns 1 if the buff panel is open (and consumed the wheel), so MouseWheel knows to stop
 client/proc/BuffWheelScroll(delta_y)
 	if(!buff_info_open || !buff_pass_list || !buff_pass_list.len) return 0
 	var/bmax = max(0, buff_pass_list.len * BUFF_RH - BUFF_BAND_H)
@@ -1288,7 +1265,7 @@ client/proc/BuffScrollTrackTo(params)
 	var/frac = ((SKINFO_H - BUFF_TRACK_Y) - local_h) / BUFF_TRACK_H
 	frac = clamp(frac, 0, 1)
 	buff_pass_px = round(frac * maxpx)
-	buff_pass_target = buff_pass_px          // cancel any running wheel glide
+	buff_pass_target = buff_pass_px
 	RefreshBuffPassRows()
 
 client/proc/ShowBuffPassDesc(name)
@@ -1308,8 +1285,8 @@ client/proc/ShowBuffPassDesc(name)
 	T.screen_loc = SILoc(0, 44)
 	buffdesc_objs += T
 	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
-	var/list/lines = WrapDescLines(d, 47)   // 288px body at 6px/char (monogram 12pt)
-	var/n = min(lines.len, 14)              // 14 rows fit between title and hint
+	var/list/lines = WrapDescLines(d, 47)
+	var/n = min(lines.len, 14)
 	for(var/i = 1 to n)
 		var/txt = lines[i]
 		if(i == 14 && lines.len > 14) txt += " ..."

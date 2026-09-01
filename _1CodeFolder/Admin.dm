@@ -18,13 +18,13 @@ obj/viewmobcontents
 mob/var
 	tmp/Admin=0
 	tmp/AdminContentsView=0
-	tmp/mob/AdminTrackTarget    // Overwatch: mob currently being auto-followed
-	tmp/AdminFullStealth=0      // Overwatch: hard stealth flag (alpha 0, untargetable)
-	tmp/AdminListenMode=0       // Overwatch: receive all chat broadcasts globally
-	tmp/AdminOverwatchActive=0  // Overwatch: protection mode — immortal, no density, click-teleport
-	list/AdminWatchList         // Overwatch: persistent list of player keys to alert on login/logout
-	tmp/list/AdminSnapshotData  // Overwatch: saved snapshot for compare
-	tmp/list/CombatLog          // Overwatch: per-mob combat event ring buffer (max 30)
+	tmp/mob/AdminTrackTarget
+	tmp/AdminFullStealth=0
+	tmp/AdminListenMode=0
+	tmp/AdminOverwatchActive=0
+	list/AdminWatchList
+	tmp/list/AdminSnapshotData
+	tmp/list/CombatLog
 
 mob
 	var
@@ -78,6 +78,8 @@ mob/Admin3/verb/LoadSwapMap()
 	for(var/swapmap/map in swapmaps_loaded)
 		if(map.UID == whichMap)
 			for(var/mob/m in block(map.x1, map.y1, map.z1, map.x2, map.y2))
+				m.in_tmp_map = null
+				m.usingUBW = FALSE
 				m.x = m.PrevX
 				m.y = m.PrevY
 				m.z = m.PrevZ
@@ -113,18 +115,7 @@ mob/Admin3/verb/LoadSwapMap()
 		sleep(10)
 		world.Reboot()
 
-/*
-/mob/Admin3/verb/Stop_All_AI()
-	for(var/obj/AI_Spot/a in world)
-		a.ai_limit = 0
-	for(var/mob/Player/AI/ai in ticking_ai)
-		ai.EndLife(0)*/
 
-// Read-only browser view of all the potential thresholds for Style and Sig
-// development, with one table per tier listing every type at that tier and the
-// key balance vars on each (Style: Str/For/End/Spd/Off/Def + passives; Sig:
-// Cooldown/ManaCost/EnergyCost/DamageMult). Useful for double-checking pot
-// reqs against the progression curve and for spotting outliers in tier values.
 /mob/Admin3/verb/View_Style_Sig_Reqs()
 	set category = "Admin"
 	set name = "View Style/Sig Reqs"
@@ -138,7 +129,6 @@ mob/Admin3/verb/LoadSwapMap()
 	usr << "  T1 Sig: 1st=[glob.progress.T1_SIGS[1]], 2nd=[glob.progress.T1_SIGS[2]], 3rd=[glob.progress.T1_SIGS[3]]"
 	usr << "  T2 Sig: 1st=[glob.progress.T2_SIGS[1]], 2nd=[glob.progress.T2_SIGS[2]]"
 
-	// Single pass through NuStyle subtypes — bucket by tier
 	var/list/stylesByTier = list("1" = list(), "2" = list(), "3" = list())
 	for(var/T in subtypesof(/obj/Skills/Buffs/NuStyle))
 		if(!ispath(T))
@@ -167,7 +157,6 @@ mob/Admin3/verb/LoadSwapMap()
 			stylesByTier["[sig]"] += list(row)
 		del probe
 
-	// Single pass through Tier1 / Tier2 sig lists — bucket by tier
 	var/list/sigsByTier = list("1" = list(), "2" = list())
 	for(var/tierKey in list("1", "2"))
 		var/list/srcList = (tierKey == "1") ? Tier1 : Tier2
@@ -195,7 +184,6 @@ mob/Admin3/verb/LoadSwapMap()
 				var/list/row = list("name" = k, "path" = "(bundle of [bundle.len] skills)", "cooldown" = null, "manacost" = null, "energycost" = null, "damagemult" = null)
 				sigsByTier[tierKey] += list(row)
 
-	// Chat output of styles
 	for(var/tier in 1 to 3)
 		var/list/rows = stylesByTier["[tier]"]
 		usr << "<font color='#88ccff'>T[tier] Styles ([rows.len]):</font>"
@@ -203,9 +191,8 @@ mob/Admin3/verb/LoadSwapMap()
 			usr << "  (none)"
 		else
 			for(var/list/r in rows)
-				usr << "  [r["name"]] | Str=[r["str"] || "—"] For=[r["for"] || "—"] End=[r["end"] || "—"] Spd=[r["spd"] || "—"] Off=[r["off"] || "—"] Def=[r["def"] || "—"] | [r["passives"] || "no passives"]"
+				usr << "  [r["name"]] | Str=[r["str"] || "-"] For=[r["for"] || "-"] End=[r["end"] || "-"] Spd=[r["spd"] || "-"] Off=[r["off"] || "-"] Def=[r["def"] || "-"] | [r["passives"] || "no passives"]"
 
-	// Chat output of sigs
 	for(var/tierKey in list("1", "2"))
 		var/list/rows = sigsByTier[tierKey]
 		usr << "<font color='#88ccff'>T[tierKey] Sigs ([rows.len]):</font>"
@@ -213,9 +200,8 @@ mob/Admin3/verb/LoadSwapMap()
 			usr << "  (none)"
 		else
 			for(var/list/r in rows)
-				usr << "  [r["name"]] | CD=[r["cooldown"] || "—"] Mana=[r["manacost"] || "—"] Energy=[r["energycost"] || "—"] DmgMult=[r["damagemult"] || "—"]"
+				usr << "  [r["name"]] | CD=[r["cooldown"] || "-"] Mana=[r["manacost"] || "-"] Energy=[r["energycost"] || "-"] DmgMult=[r["damagemult"] || "-"]"
 
-	// Build browser html as bonus (chat output above is the source of truth)
 	var/html = "<html><head><title>Style/Sig Pot Reqs</title><style>"
 	html += "body{background:#1a1a1a;color:#ddd;font-family:monospace;padding:10px;font-size:12px}"
 	html += "h2{color:#ffaa00;border-bottom:1px solid #444;padding-bottom:4px;margin-top:18px}"
@@ -253,13 +239,13 @@ mob/Admin3/verb/LoadSwapMap()
 				html += "<tr>"
 				html += "<td>[r["name"]]</td>"
 				html += "<td class='path'>[r["path"]]</td>"
-				html += r["str"] ? "<td class='val'>[r["str"]]</td>" : "<td class='muted'>—</td>"
-				html += r["for"] ? "<td class='val'>[r["for"]]</td>" : "<td class='muted'>—</td>"
-				html += r["end"] ? "<td class='val'>[r["end"]]</td>" : "<td class='muted'>—</td>"
-				html += r["spd"] ? "<td class='val'>[r["spd"]]</td>" : "<td class='muted'>—</td>"
-				html += r["off"] ? "<td class='val'>[r["off"]]</td>" : "<td class='muted'>—</td>"
-				html += r["def"] ? "<td class='val'>[r["def"]]</td>" : "<td class='muted'>—</td>"
-				html += r["passives"] ? "<td class='passives'>[r["passives"]]</td>" : "<td class='muted'>—</td>"
+				html += r["str"] ? "<td class='val'>[r["str"]]</td>" : "<td class='muted'>-</td>"
+				html += r["for"] ? "<td class='val'>[r["for"]]</td>" : "<td class='muted'>-</td>"
+				html += r["end"] ? "<td class='val'>[r["end"]]</td>" : "<td class='muted'>-</td>"
+				html += r["spd"] ? "<td class='val'>[r["spd"]]</td>" : "<td class='muted'>-</td>"
+				html += r["off"] ? "<td class='val'>[r["off"]]</td>" : "<td class='muted'>-</td>"
+				html += r["def"] ? "<td class='val'>[r["def"]]</td>" : "<td class='muted'>-</td>"
+				html += r["passives"] ? "<td class='passives'>[r["passives"]]</td>" : "<td class='muted'>-</td>"
 				html += "</tr>"
 		html += "</table>"
 	html += "<h2>Sigs by Tier</h2>"
@@ -274,22 +260,16 @@ mob/Admin3/verb/LoadSwapMap()
 				html += "<tr>"
 				html += "<td>[r["name"]]</td>"
 				html += "<td class='path'>[r["path"]]</td>"
-				html += isnum(r["cooldown"]) ? "<td class='val'>[r["cooldown"]]</td>" : "<td class='muted'>—</td>"
-				html += isnum(r["manacost"]) && r["manacost"] ? "<td class='val'>[r["manacost"]]</td>" : "<td class='muted'>—</td>"
-				html += isnum(r["energycost"]) && r["energycost"] ? "<td class='val'>[r["energycost"]]</td>" : "<td class='muted'>—</td>"
-				html += isnum(r["damagemult"]) && r["damagemult"] ? "<td class='val'>[r["damagemult"]]</td>" : "<td class='muted'>—</td>"
+				html += isnum(r["cooldown"]) ? "<td class='val'>[r["cooldown"]]</td>" : "<td class='muted'>-</td>"
+				html += isnum(r["manacost"]) && r["manacost"] ? "<td class='val'>[r["manacost"]]</td>" : "<td class='muted'>-</td>"
+				html += isnum(r["energycost"]) && r["energycost"] ? "<td class='val'>[r["energycost"]]</td>" : "<td class='muted'>-</td>"
+				html += isnum(r["damagemult"]) && r["damagemult"] ? "<td class='val'>[r["damagemult"]]</td>" : "<td class='muted'>-</td>"
 				html += "</tr>"
 		html += "</table>"
 	html += "</body></html>"
 	src << browse(html, "window=StyleSigReqs;size=900x900")
-	usr << "<font color='#aaffaa'>(Browser window also opened — if you don't see it, this chat dump has the same data.)</font>"
+	usr << "<font color='#aaffaa'>(Browser window also opened - if you don't see it, this chat dump has the same data.)</font>"
 
-// Live-tweak a stat var on a T1/T2/T3 Style template or T1/T2 Sig template.
-// Picks a category, lets the admin pick a specific type, then a scalar var on
-// that type, then a new value. Updates the var on every live instance of that
-// type currently in world contents. Note: not persisted across reboots — the
-// compile-time default is restored when the world starts. Re-run after reboot
-// or after balance is finalized in code.
 /mob/Admin3/verb/Tweak_Style_Sig_Var()
 	set category = "Admin"
 	set name = "Tweak Style/Sig Var"
@@ -376,13 +356,9 @@ mob/Admin3/verb/LoadSwapMap()
 			S.vars[varName] = newVal
 			count++
 	Log("Admin", "[ExtractInfo(usr)] tweaked [path].[varName] from [curVal] to [newVal]. [count] live instances updated.")
-	usr << "Set [path].[varName] from [curVal] to [newVal]. Updated [count] live instance\s. Note: change is in-memory only — compile-time default returns on world reboot."
+	usr << "Set [path].[varName] from [curVal] to [newVal]. Updated [count] live instance\s. Note: change is in-memory only - compile-time default returns on world reboot."
 	del probe
 
-// Live-edit potential thresholds for Style/Sig tier unlocks. These live in
-// glob.progress (T1_STYLES, T2_STYLES, T3_STYLES, T1_SIGS, T2_SIGS) and are
-// what req_pot() and styles_available() check against. Note: in-memory only —
-// reverts on world reboot, same as Tweak_Style_Sig_Var.
 /mob/Admin3/verb/Tweak_Pot_Reqs()
 	set category = "Admin"
 	set name = "Tweak Pot Reqs"
@@ -435,7 +411,7 @@ mob/Admin3/verb/LoadSwapMap()
 		return
 	targetList[idx] = newVal
 	Log("Admin", "[ExtractInfo(usr)] tweaked glob.progress.[listName]\[[idx]\] from [curVal] to [newVal] ([pickedKey]).")
-	usr << "Set [pickedKey] from [curVal] to [newVal]. Note: in-memory only — reverts on world reboot."
+	usr << "Set [pickedKey] from [curVal] to [newVal]. Note: in-memory only - reverts on world reboot."
 
 /mob/Admin2/verb/PrivateNarrate(mob/m in players)
 	set category="Admin"
@@ -499,28 +475,7 @@ mob/Admin2/verb
 			return
 		src.Edit(m.passive_handler)
 
-/*	EditPassives(mob/m in world)
-		set category = "Admin"
-		var/variable = m.passive_handler.passive
-		var/list/l = vars[variable]
-		usr.list_view(l, "[variable]")
 
-	EditPassivesTest2(mob/p in world)
-		set category = "Admin"
-		if(p.passive_handler)
-			var/atom/A = p.passive_handler
-			var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-			var/list/B=new
-			Edit+="[A]<br>[A.type]"
-			Edit+="<table width=10%>"
-			for(var/C in A.vars) B+=C
-			B.Remove("Package","bound_x","bound_y","step_x","step_y","Admin","Profile", "GimmickDesc", "NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile", "Form5Profile")
-			for(var/C in B)
-				Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
-				Edit+=C
-				Edit+="<td>[Value(A.vars[C])]</td></tr>"
-			Edit += "</html>"
-			usr<<browse(Edit,"window=[A];size=450x600")*/
 
 	ViewPassives(mob/m in world)
 		set category = "Admin"
@@ -535,27 +490,6 @@ mob/Admin2/verb
 					html += "<b>[skey] : [m.passive_handler.states[skey]]</b><br>"
 		usr<<browse(html,"window=[m]'s Passives;size=450x600")
 
-/*	EditPassivesTest1(mob/A in world)
-		set category = "Admin"
-		A = src.AdminResolveTargetedContent(A)
-		var/list/browserOptions = list()
-		browserOptions.Add("+find");
-		winset(usr, null, list2params(browserOptions));
-		var/Edit = "<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-		Edit += "[A]<br>[A.type]"
-		Edit += "<table width=10%>"
-		//var/list/B = A.passive_handler.passives.vars
-		for (var/C in A.passive_handler.passives)
-			var/value = Value(A.vars[C])
-			var/row = "<tr><td><a href='byond://?src=\ref[A];action=edit;var=[C]'>[C]</a></td>"
-			if (isdatum(A.vars[C]))
-				row += "<td><a href='byond://?src=\ref[A.vars[C]];action=edit;var=[C]'>[value]</a></td></tr>"
-			else
-				row += "<td>[value]</td></tr>"
-			Edit += row
-			CHECK_TICK
-		Edit += "</table></html>"
-		usr << browse(Edit, "window=[A];size=450x600")*/
 
 mob/Admin3/verb
 	RuntimesView()
@@ -594,7 +528,6 @@ mob/Admin3/verb
 				ai_loop.updaters = list()
 				for(var/mob/Player/AI/a in world) ai_loop.Add(a)
 
-		//Run simple cleaning no matter what to remove null entries.
 		ai_loop.updaters = list()
 		for(var/mob/Player/AI/a in world)
 			if(!a.loc)
@@ -746,13 +679,6 @@ mob/proc/Admin(var/blah,var/Z,var/H)
 				src.Admin("Give",Admins[src.key])
 				admins |= src
 			else
-				// Strip stale admin verbs persisted in the mob savefile from a prior
-				// admin session. BYOND saves /verbs/ by default, and the original Check
-				// only added verbs for current admins - it never removed them when a
-				// player was demoted, so right-click menus on other mobs kept showing
-				// admin commands (Admin: Jump To, Admin: Summon, etc.). Calling Remove
-				// is safe for an actual non-admin: CodedAdmin guard on the inside short
-				// circuits coded keys, and the rest are no-ops on a clean mob.
 				src.Admin("Remove")
 			if(src.key in Mappers)
 				src.Admin("GiveMapper")
@@ -794,21 +720,14 @@ mob/proc/CheckPunishment(var/z)
 	for(var/x in Punishments)
 		if(x["Punishment"]=="[z]")
 			if(x["Key"]==src.key || (src.client && (x["IP"]==src.client.address||x["ComputerID"]==src.client.computer_id)))
-			 //	if(text2num(x["Duration"])<world.realtime)
-			//		Punishments.Remove(list(x))
-			//	else
 				if(x["Punishment"]=="Ban")
 					src<<"You are Banned!"
 					spawn()del(src)
 				if(x["Punishment"]=="Mute")
 					src<<"You are Muted!"
-			//	src<<"<br>By: [x["User"]]<br>Reason: [x["Reason"]]<br>TimeStamp: [x["Time"]]<br>Will be lifted in [ConvertTime((text2num(x["Duration"])-world.realtime)/10)]!"
 				src<<"<br>By: [x["User"]]<br>Reason: [x["Reason"]]<br>TimeStamp: [x["Time"]]!"
 				return 1
 
-// Shared admin helpers — called from the consolidated dropdown verbs
-// (AdminKill, Punish) and from the MasterControl popup in Guides.dm.
-// Single source of truth so both entry points stay in sync.
 mob/proc/AdminDoBan(mob/M)
 	set category="Admin"
 	if(!M || !M.client) return
@@ -877,7 +796,6 @@ mob/proc/AdminDoKO(mob/A)
 		A.Unconscious(null, "ADMIN")
 		Log("Admin", "<font color=red>[ExtractInfo(src)] admin-KOed [ExtractInfo(A)].")
 
-// Should fix targeting your own shit if deleting/editing someone else's items/skills in Admin View Contents
 
 mob/proc/AdminResolveTargetedContent(atom/A)
 	if(!A) return null
@@ -932,9 +850,6 @@ client/proc/ShowAdminContents(mob/M)
 	out += "</body></html>"
 	mob << browse(out, "window=admincontents;size=480x560")
 
-// Overwatch helpers — used by /mob/Admin4/verb/Overwatch dropdown.
-// Tier 4 only. Designed for an observer/balance role: silently watch
-// players, follow them, snapshot their state, all without breaking RP.
 mob/proc/AdminFullStealthEnable()
 	src.AdminFullStealth = 1
 	src.AdminInviso = 1
@@ -948,7 +863,6 @@ mob/proc/AdminFullStealthEnable()
 	usr.passive_handler.Increase("StaticWalk", 1)
 	usr.passive_handler.Increase("SpaceWalk", 1)
 	animate(src, alpha = 0, time = 5)
-	// Drop any aggro currently held on us
 	for(var/mob/M in world)
 		if(M.Target == src)
 			M.RemoveTarget()
@@ -1009,8 +923,6 @@ mob/proc/AdminTrackLoop()
 			src.loc = T.loc
 		sleep(5)
 
-// Per-mob combat event ring buffer. Cheap, called from DoDamage hot path.
-// Max 30 entries, FIFO. Used by Overwatch "Combat Log" view.
 mob/proc/RecordCombatEvent(text)
 	if(!src.CombatLog)
 		src.CombatLog = list()
@@ -1018,11 +930,6 @@ mob/proc/RecordCombatEvent(text)
 	while(src.CombatLog.len > 30)
 		src.CombatLog.Cut(1, 2)
 
-// Listen Mode: send a copy of a chat line to every admin with listen on.
-// Hooked into: MSay (helper_procs.dm), sayProc/OOC/Whisper/Think
-// (Chat_Rework/communication_rework.dm), SkinPM2 + AdminHelp
-// (AdminHelp_System.dm). OMessage (combat narration) is deliberately NOT
-// hooked — combat spam drowns real chat.
 proc/AdminListenBroadcast(mob/source, text)
 	if(!source) return
 	for(var/mob/Players/A in admins)
@@ -1031,8 +938,6 @@ proc/AdminListenBroadcast(mob/source, text)
 		if(A == source) continue
 		A << "<font color=#9999ff>\[LISTEN [source.name]\]</font> [text]"
 
-// Watch list helpers — personal per-admin alert list of player keys.
-// Fired by OverwatchNotifyLogin from Creation.dm Login/Logout.
 mob/proc/AdminWatchAdd(targetKey)
 	if(!src.AdminWatchList)
 		src.AdminWatchList = list()
@@ -1057,9 +962,6 @@ proc/OverwatchNotifyLogin(mob/M, status)
 		if(M.key in A.AdminWatchList)
 			A << "<font color=#ffaa00><b>\[WATCH\]</b> [M.key] has [status]."
 
-// Var Inspector — dump filtered vars from any mob to admin chat.
-// Filter is a substring match on var name (case-insensitive).
-// Pass "" to dump all (long, ~300+ entries on a player mob — use carefully).
 mob/proc/AdminVarInspect(mob/M, filter)
 	if(!M)
 		src << "<font color=red>Var Inspector: target is null."
@@ -1080,12 +982,10 @@ mob/proc/AdminVarInspect(mob/M, filter)
 			src << "<font color=white>[v]</font> = [value]"
 		count++
 		if(count >= 200)
-			src << "<font color=red>(Truncated at 200 entries — use a more specific filter.)</font>"
+			src << "<font color=red>(Truncated at 200 entries - use a more specific filter.)</font>"
 			break
 	src << "<font color=cyan><b>=== End Inspector ([count] vars shown) ===</b></font>"
 
-// Snapshot Save/Compare — capture key combat-relevant fields from a target,
-// then on second invocation diff against current values.
 mob/proc/AdminSnapshotSave(mob/M)
 	if(!M)
 		src << "<font color=red>Snapshot Save: target is null."
@@ -1145,23 +1045,21 @@ mob/proc/AdminSnapshotCompareRun(mob/M)
 		src << "<font color=white>[f]:</font> [oldVal] -> [newVal] (<font color=[color]>[sign][round(delta, 0.01)]</font>)"
 	src << "<font color=cyan><b>=== End Diff ===</b></font>"
 
-// AFK Detector — list players with client.inactivity > threshold (minutes).
 mob/proc/AdminAFKCheck(threshold)
 	if(threshold <= 0) threshold = 5
-	var/thresholdTicks = threshold * 600  // 1 minute = 600 deciseconds
+	var/thresholdTicks = threshold * 600
 	src << "<font color=cyan><b>=== AFK Players (> [threshold] min idle) ===</b></font>"
 	var/count = 0
 	for(var/mob/Players/M in players)
 		if(!M.client) continue
 		if(M.client.inactivity >= thresholdTicks)
 			var/idle = round(M.client.inactivity / 600, 0.1)
-			src << "<font color=white>[M.name] ([M.key])</font> — idle [idle] min"
+			src << "<font color=white>[M.name] ([M.key])</font> - idle [idle] min"
 			count++
 	if(!count)
 		src << "<font color=white>(none)</font>"
 	src << "<font color=cyan><b>=== [count] AFK ===</b></font>"
 
-// Display CombatLog ring buffer of any mob to the admin.
 mob/proc/AdminViewCombatLog(mob/M)
 	if(!M)
 		src << "<font color=red>Combat Log: target is null."
@@ -1259,7 +1157,6 @@ mob/proc/ViewList()
 		   					</button></div>
 			 				<div align="center"></div></TD></TR>"}
 
-				//AdminHelps.Remove(p)
 		View+={"</TABLE></DIV>
 				</TD>
 				<TD VALIGN=TOP><div style="height:380px;width:320px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;"><table width="300" border="0"align="Top">
@@ -1291,7 +1188,6 @@ mob/proc/ViewList()
 		usr<<browse("[View]","window=Logrw;size=600x500")
 		View+={"</table"><br>"}
 
-//var/AdminHelps[0]
 
 mob/proc/PM(var/mob/who, var/AhelpMessage, var/AhelpKey)
 	var/whoKey = who.DisplayKey ? who.DisplayKey : who.key
@@ -1497,19 +1393,6 @@ mob/Admin2/verb
 	Observe_(atom/A as mob|obj in world)
 		set category="Admin"
 		set name="AObserve"
-		/*if(istype(A, /mob))
-			var/mob/M = A
-			if(M.passive_handler.Get("Anti-Scrying") && M.passive_handler.Get("Rank-Down Protection"))
-				var/antiscry = 1
-				if(usr.passive_handler.Get("God's Gaze"))
-					antiscry = 0
-				else if(usr.HasGodKi())
-					if(usr.passive_handler.Get("GodKi") > M.passive_handler.Get("GodKi"))
-						antiscry = 0
-				if(antiscry)
-					usr << "<b><font color=[M.Text_Color]><font size=+1>[M] reflects your attempt at Scrying!</b></font color></font size>"
-					M << "<b>A metaphysical entity has attempted to observe you!</b>"
-					return*/
 		Observify(usr,A)
 		if(A!=src)
 			src.Observing=2
@@ -1615,93 +1498,6 @@ mob/Admin2/verb
 		set category="Admin"
 		MoveToSpawn(A)
 		Log("Admin","[ExtractInfo(usr)] sent [ExtractInfo(A)] to spawn.")
-/*	Teleport()
-		set category="Admin"
-		set name="Teleport"
-		var/list/actions = list(
-			"Jump to target",
-			"Summon target to me",
-			"Send target back (Unteleport)",
-			"Teleport target to XYZ",
-			"Send target to spawn"
-		)
-		if(usr.Admin >= 3)
-			actions += "Mass Summon"
-		actions += "Cancel"
-		var/choice = input(usr, "Teleport action:", "Teleport") as null|anything in actions
-		if(!choice || choice == "Cancel") return
-		switch(choice)
-			if("Jump to target")
-				var/atom/M = AdminPickTarget("Jump to whom/what?", "Jump To", 1)
-				if(!M) return
-				usr.PrevX = usr.x
-				usr.PrevY = usr.y
-				usr.PrevZ = usr.z
-				usr.loc = M.loc
-				Log("Admin", "[ExtractInfo(usr)] teleported to [M].")
-			if("Summon target to me")
-				var/atom/movable/M = AdminPickTarget("Summon whom/what?", "Summon", 1)
-				if(!M) return
-				if(istype(M, /mob))
-					var/mob/Mm = M
-					Mm.PrevX = Mm.x
-					Mm.PrevY = Mm.y
-					Mm.PrevZ = Mm.z
-				M.loc = usr.loc
-				Log("Admin", "[ExtractInfo(usr)] summoned [ExtractInfo(M)].")
-			if("Send target back (Unteleport)")
-				var/mob/M = AdminPickTarget("Return whom?", "Send Back", 0)
-				if(!M) return
-				if(!M.PrevX)
-					usr << "This mob/obj has not been teleported or summoned, and thus has no previous XYZ data."
-					return
-				M.x = M.PrevX
-				M.y = M.PrevY
-				M.z = M.PrevZ
-				M.PrevX = null
-				M.PrevY = null
-				M.PrevZ = null
-				usr << "Returned [M] to previous coordinates."
-				M << "You have been returned to your previous coordinates by admins."
-			if("Teleport target to XYZ")
-				var/mob/M = AdminPickTarget("Teleport whom?", "Teleport to XYZ", 0)
-				if(!M) return
-				var/x = input(usr, "x", "[M]") as num|null
-				if(isnull(x)) return
-				var/y = input(usr, "y", "[M]") as num|null
-				if(isnull(y)) return
-				var/z = input(usr, "z", "[M]") as num|null
-				if(isnull(z)) return
-				M.PrevX = M.x
-				M.PrevY = M.y
-				M.PrevZ = M.z
-				M.loc = locate(x, y, z)
-				Log("Admin", "[ExtractInfo(usr)] teleported [ExtractInfo(M)] to [x],[y],[z].")
-			if("Send target to spawn")
-				var/mob/A = input(usr, "Send whom to spawn?", "Teleport") in players
-				if(!A) return
-				MoveToSpawn(A)
-				Log("Admin", "[ExtractInfo(usr)] sent [ExtractInfo(A)] to spawn.")
-			if("Mass Summon")
-				if(usr.Admin < 3) return
-				if(!usr.Alert("You sure you want to mass summon? You require express permission from no one in order to use this.")) return
-				Log("Admin", "<font color=blue>[ExtractInfo(usr)] mass summoned!")
-				var/who = input(usr, "Summon who?", "Mass Summon") as null|anything in list("Players", "Monsters", "Both", "Cancel")
-				if(!who || who == "Cancel") return
-				switch(who)
-					if("Players")
-						for(var/mob/Players/P in world)
-							if(P.z == MAJIN_ABSORB_Z) continue
-							P.loc = locate(usr.x + rand(-10,10), usr.y + rand(-10,10), usr.z)
-					if("Monsters")
-						for(var/mob/P in world)
-							if(P.z == MAJIN_ABSORB_Z) continue
-							if(!P.client)
-								P.loc = locate(usr.x + rand(-10,10), usr.y + rand(-10,10), usr.z)
-					if("Both")
-						for(var/mob/P in world)
-							if(P.z == MAJIN_ABSORB_Z) continue
-							P.loc = locate(usr.x, usr.y, usr.z)*/
 
 	globallyIndestructable()
 		set category = "Admin"
@@ -1951,7 +1747,7 @@ mob/Admin3/verb
 		set name="Punish"
 		var/choice = input(usr, "Punishment action:", "Punish") as null|anything in list(
 			"Ban (target)",
-			"Ban (manual — Key/IP/CID)",
+			"Ban (manual - Key/IP/CID)",
 			"UnBan",
 			"Mute (target)",
 			"UnMute",
@@ -1967,7 +1763,7 @@ mob/Admin3/verb
 				var/mob/M = input(usr, "Mute who?", "Punish") in players
 				if(!M) return
 				usr.AdminDoMute(M)
-			if("Ban (manual — Key/IP/CID)")
+			if("Ban (manual - Key/IP/CID)")
 				var/x = input(usr, "Input the desired Key to manual ban.", "Rebirth") as text|null
 				var/y = input(usr, "Input the desired IP Address to manual ban.", "Rebirth") as text|null
 				var/z = input(usr, "Input the desired Computer ID to manual ban.", "Rebirth") as text|null
@@ -2077,12 +1873,6 @@ mob/Admin3/verb
 		if(M.client)
 			var/blah=input("Unlock to what form?") as num | null
 			if(!blah) return
-	/*		if(isRace(SAIYAN) && blah == 1 && M.oozaru_type=="Demonic")
-				for(var/transformation/saiyan/hellspawn/hellspawn_super_saiyan/ssj in M.race.transformations)
-					race.transformations += ssj
-			if(isRace(SAIYAN) && blah == 2 && M.oozaru_type=="Demonic")
-				for(var/transformation/saiyan/hellspawn/hellspawn_super_saiyan_2/ssj2 in M.race.transformations)
-					race.transformations += ssj2*/
 			if(M.isRace(CELESTIAL) && M.CelestialAscension == "Angel" && blah == 1)
 				if(!locate(/transformation/celestial/Master_of_Arms) in M.race.transformations)
 					M.race.transformations += new/transformation/celestial/Master_of_Arms
@@ -2330,7 +2120,6 @@ mob/Admin3/verb
 			if("Yes")
 				var/reason=input("For what reason?") as text
 				M.Savable=0
-				// Free the Majin's absorb room (and release any victims)
 				if(M.isRace(MAJIN))
 					M.MajinCleanupOnDeletion()
 				if(istype(M, /mob/Players))
@@ -2407,7 +2196,7 @@ mob/Admin4/verb
 			usr.AdminOverwatchActive = 1
 			usr.density = 0
 			usr.NoDeath = 1
-			usr << "<font color=green><b>Overwatch:</b> Protection ON — immortal, no-clip, click-teleport."
+			usr << "<font color=green><b>Overwatch:</b> Protection ON - immortal, no-clip, click-teleport."
 		switch(category)
 			if("Stealth & Movement")
 				var/list/actions = list(
@@ -2570,7 +2359,7 @@ mob/Admin4/verb
 						usr << "<font color=green><b>Overwatch:</b> Cleared combat log of [M]."
 
 			if("Give Resources")
-				var/mob/M = input(usr, "Give resources to whom?", "Overwatch — Give") as null|mob in players
+				var/mob/M = input(usr, "Give resources to whom?", "Overwatch - Give") as null|mob in players
 				if(!M) return
 				var/list/resources = list(
 					"RPP (Spendable)",
@@ -2585,9 +2374,9 @@ mob/Admin4/verb
 					"Saga Level",
 					"Cancel"
 				)
-				var/res = input(usr, "What resource to give to [M]?", "Overwatch — Give") as null|anything in resources
+				var/res = input(usr, "What resource to give to [M]?", "Overwatch - Give") as null|anything in resources
 				if(!res || res == "Cancel") return
-				var/amount = input(usr, "How much [res]?", "Overwatch — Give") as null|num
+				var/amount = input(usr, "How much [res]?", "Overwatch - Give") as null|num
 				if(!amount) return
 				switch(res)
 					if("RPP (Spendable)")
@@ -2614,7 +2403,7 @@ mob/Admin4/verb
 				usr << "<font color=green><b>Overwatch:</b> Gave [amount] [res] to [M]."
 
 			if("Give All Skills")
-				var/mob/M = input(usr, "Give all skills to whom?", "Overwatch — Give All Skills") as null|mob in players
+				var/mob/M = input(usr, "Give all skills to whom?", "Overwatch - Give All Skills") as null|mob in players
 				if(!M) return
 				var/count = 0
 				for(var/T in subtypesof(/obj/Skills))
@@ -2659,7 +2448,6 @@ mob/Admin4/verb
 					if("Hell No")
 						return
 				glob.progress.DaysOfWipe = 1
-			//	glob.progress.totalPotentialToDate = 1
 				glob.progress.WipeStart = world.realtime - world.timeofday
 				Log("Admin", "[ExtractInfo(src)] has set the official start date of the wipe.")
 			if("Restart wipe (to specific day)")
@@ -2772,26 +2560,21 @@ mob/Admin4/verb
 		var/confirm = alert(src, "Place [target] on the True Demon path? Their current Reason passive will be removed and all equipped Magatama will be unequipped.", "Make True Demon", "Yes", "No")
 		if(confirm != "Yes") return
 
-		// Unequip all Magatama before the swap, mostly for Shijima
 		for(var/obj/Items/Magatama/M in target)
 			if(M.suffix == "*Equipped*")
 				M.unequipMagatama(target)
-		// Clear any Shijima-set swap cooldowns
 		target.magatama_cooldown_until = 0
 		target.magatama_allowed_set = list()
 
-		// Revert the existing Reason sub-ascension, if any
 		if(asc_one.choiceSelected)
 			var/ascension/old_asc = new asc_one.choiceSelected
 			old_asc.applied = TRUE
 			old_asc.revertAscension(target)
 
-		// Apply True Demon sub-ascension
 		asc_one.choiceSelected = /ascension/sub_ascension/demi_fiend/true_demon
 		var/ascension/sub_ascension/demi_fiend/true_demon/new_asc = new
 		new_asc.onAscension(target)
 
-		// Recalculate Magatama passives now that the Reason has changed
 		target.refreshMagatama()
 
 		target << "<font color='#cc0000'><b>The chains of Reason have been cast aside. You walk the True Demon path.</b></font>"
@@ -2922,32 +2705,6 @@ mob/Admin3/verb
 		Log("Admin", "[ExtractInfo(src)] set [m]'s [changing] to [changeto] increase per ascension!")
 
 
-	// Nox_Claim()
-	// 	set category="Admin"
-	// 	var/list/Noxes=list("Cancel", "Yukianesa", "Bolverk", "Ookami")
-	// 	var/Choice=input(usr, "Which Nox Nyctores are you toggling the status of?", "Nox Claim") in Noxes
-	// 	switch(Choice)
-	// 		if("Yukianesa")
-	// 			if(global.YukianesaMade)
-	// 				global.YukianesaMade=0
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='green'>Not Made</font color>).")
-	// 			else
-	// 				global.YukianesaMade=1
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='red'>Made</font color>).")
-	// 		if("Bolverk")
-	// 			if(global.BolverkMade)
-	// 				global.BolverkMade=0
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='green'>Not Made</font color>).")
-	// 			else
-	// 				global.BolverkMade=1
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='red'>Made</font color>).")
-	// 		if("Ookami")
-	// 			if(global.OokamiMade)
-	// 				global.OokamiMade=0
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='green'>Not Made</font color>).")
-	// 			else
-	// 				global.OokamiMade=1
-	// 				Log("Admin", "[ExtractInfo(usr)] toggled the status of [Choice] (<font color='red'>Made</font color>).")
 
 	moon_toggle_admin(var/Z as num)
 		set category="Admin"
@@ -2965,22 +2722,6 @@ mob/Admin3/verb
 			return
 		global.MoonSetMessage=NewSetMsg
 		Log("Admin", "[ExtractInfo(usr)] made the moon setting message: ([global.MoonSetMessage])")
-/*	Makyo_Toggle(var/Z as num)
-		set category="Admin"
-		CallStar(Z)
-		Log("Admin", "[ExtractInfo(src)] forced the Makyo Star to shine for z-plane ([Z]).")
-	Makyo_Message()
-		set category="Admin"
-		var/NewMsg=input(usr, "What do you want to make the new Star arrival message?", "Star Arrival", global.MakyoMessage) as message|null
-		if(!NewMsg&&NewMsg==null)
-			return
-		global.MakyoMessage=NewMsg
-		Log("Admin", "[ExtractInfo(usr)] made the Star arrival message: ([global.MakyoMessage])")
-		var/NewSetMsg=input(usr, "What do you want to make the new Star departure message?", "Star Departure", global.MakyoSetMessage) as message|null
-		if(!NewSetMsg&&NewSetMsg==null)
-			return
-		global.MakyoSetMessage=NewSetMsg
-		Log("Admin", "[ExtractInfo(usr)] made the Star departure message: ([global.MakyoSetMessage])") */
 
 
 	AdminLogz()
@@ -3043,7 +2784,7 @@ datum/Topic(A, B[])
 		var/list/options = list("Number", "Text", "File", "Null")
 		if(usr.Admin)
 			options += list("Type", "Reference", "List", "New Matrix", "Color Matrix", "New Type")
-		if(istype(src, /datum))
+		if(istype(src, /datum) && hascall(usr, "Edit"))
 			options += "Open Edit Sheet"
 		class = input("[variable]: Select type", "") as null|anything in options
 		if (!class) return
@@ -3122,107 +2863,9 @@ datum/Topic(A, B[])
 
 
 
-atom/Topic(A,B[])/*
-	if(B["action"]=="edit")
-		if(!usr.Admin&&!usr.Mapper)
-			if(!glob.TESTER_MODE)
-				return
-		var/variable=B["var"]
-		var/oldvariable=vars[variable]
-		var/class
-		if(usr.Mapper && !usr.Admin)
-			class=input("[variable]","") as null|anything in list("Number","Text","File","Null")
-		else if(usr.Admin || glob.TESTER_MODE)
-			class=input("[variable]","") as null|anything in list("Number","Text","File","Type","Reference","Null","List","New Matrix","Color Matrix", "New Type")
-		if(!class) return
-		if(variable=="Admin")
-			return
-		switch(class)
-			if("Null") vars[variable]=null
-			if("Text")
-				if(isnum(vars[variable]))
-					var/confirm=input("This variable is currently a number and probably shouldn't be text. Continue anyways?") in list("No","Yes")
-					if(confirm=="No")
-						return
-				vars[variable]=input("","",vars[variable]) as message
-			if("Number")
-				vars[variable]=input("","",vars[variable]) as num
-			if("File") vars[variable]=input("","",vars[variable]) as file
-			if("Type")
-				vars[variable] = input("Enter type:","Type",vars[variable]) in typesof(/atom)
-			if("Reference")
-				vars[variable] = input("Select reference:","Reference", vars[variable]) as mob|obj|turf|area in world
-			if("List")
-				var/list/l = vars[variable]
-				if(!istype(l, /list))
-					switch(input("Would you like to set [variable] as a list?") in list("Yes","No"))
-						if("Yes")
-							l = new
-							vars[variable]=l
-						if("No") return
-				usr.list_view(l,"[variable]")
-			if("New Matrix")
-				switch(input("Are you sure you would like to set [variable] as a new matrix? a - f components") in list("Yes","No"))
-					if("Yes")
-						var/matrix/m = matrix(
-							input("a") as num,\
-							input("b") as num,\
-							input("c") as num,\
-							input("d") as num,\
-							input("e") as num,\
-							input("f") as num\
-						)
-						vars[variable] = m
-			if("New Type")
-				var/datum/d = input("Enter type:","Type",vars[variable]) in typesof(/datum)
-				vars[variable] = new d
-			if("Color Matrix")
-				switch(input("Are you sure you would like to set [variable] as a new color matrix?") in list("RGB-Only","RGBA","Cancel"))
-					if("RGB-Only")
-						var/list/l = list(
-							input("rr") as num,\
-							input("rg") as num,\
-							input("rb") as num,\
-							input("gr") as num,\
-							input("gg") as num,\
-							input("gb") as num,\
-							input("br") as num,\
-							input("bg") as num,\
-							input("bb") as num,\
-							input("cr") as num,\
-							input("cg") as num,\
-							input("cb") as num\
-						)
-						vars[variable]=l
-					if("RGBA")
-						var/list/l = list(
-							input("rr") as num,\
-							input("rg") as num,\
-							input("rb") as num,\
-							input("ra") as num,\
-							input("gr") as num,\
-							input("gg") as num,\
-							input("gb") as num,\
-							input("ga") as num,\
-							input("br") as num,\
-							input("bg") as num,\
-							input("bb") as num,\
-							input("ba") as num,\
-							input("ar") as num,\
-							input("ag") as num,\
-							input("ab") as num,\
-							input("aa") as num,\
-							input("cr") as num,\
-							input("cg") as num,\
-							input("cb") as num,\
-							input("ca") as num\
-						)
-						vars[variable]=l
+atom/Topic(A,B[])
 
-		if(class!="View List")
 
-			Log("Admin","[ExtractInfo(usr)] EDITED [variable] to [vars[variable]] on [ExtractInfo(src)] from [oldvariable].")
-		usr:Edit(src)*/
 	if(B["action"]=="companionskill")
 		if(usr.Admin<1) return
 		var/variable=B["var"]
@@ -3259,7 +2902,7 @@ atom/Topic(A,B[])/*
 						m.AutoHits.Add(variable)
 					else if(istype(variable, /obj/Skills/Projectile))
 						m.Projectiles.Add(variable)
-					else if(istype(variable, /obj/Skills/Buffs)) //IS TYPE DOESNT DO CHILDREN KILLS NIEZAN
+					else if(istype(variable, /obj/Skills/Buffs))
 						m.Buffs.Add(variable)
 					m.Skills.Add(variable)
 			if("Make Under")
@@ -3312,12 +2955,12 @@ mob/Topic(href,href_list[])
 						if(new_index <= 0 || new_index==old_index || new_index > length(theList)) return
 						var/original_key = theList[old_index]
 						var/original_value = theList[original_key]
-						var/next = old_index<new_index?1:-1 //Either going forward or backward
+						var/next = old_index<new_index?1:-1
 						for(var/i = old_index, i!=new_index, i+= next)
 							var/new_key = theList[i+next]
 							var/new_value = theList[new_key]
 							theList[i] = new_key
-							theList[i+next] = null //So that there aren't two identical keys in the list
+							theList[i+next] = null
 							theList[new_key] = new_value
 						theList[new_index] = original_key
 						theList[original_key] = original_value
@@ -3414,7 +3057,7 @@ proc/Value(A)
 
 mob/proc/list_view(aList,title)
 	if(!aList || !IsList(aList))
-		return//CRASH("List null or incorrect type")
+		return
 	if(!Admin) return
 	var/html = {"<html><body bgcolor=gray text=#CCCCCC link=white vlink=white alink=white>
 	[title]
@@ -3446,7 +3089,6 @@ proc/DetermineVarType(variable)
 	if(isnull(variable)) return "(Null)"
 	return "(Unknown)"
 
-// Right-click admin teleport verbs — only added to admin mobs via typesof() in the admin grant proc
 
 mob/Admin1/verb/Admin_Jump_To()
 	set src in oview()
@@ -3510,8 +3152,6 @@ mob/Admin1/verb/Admin_Send_To_Spawn()
 	admin << "Sent [target] to spawn."
 	Log("Admin", "[ExtractInfo(admin)] sent [ExtractInfo(target)] to spawn.")
 
-// Admin teleport category picker — builds a filtered target list
-// include_objects: if 1, shows the Objects category option
 mob/proc/AdminPickTarget(var/prompt, var/title, var/include_objects = 0)
 	var/list/categories = list("Players", "NPCs")
 	if(include_objects)

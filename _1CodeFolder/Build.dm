@@ -1,4 +1,4 @@
-var/list/worldObjectList = list() // Looped through during the saving of objects
+var/list/worldObjectList = list()
 
 /mob/Admin4/verb/checkworldObjectList()
 	for(var/obj/x in worldObjectList)
@@ -54,18 +54,19 @@ var/list/worldObjectList = list() // Looped through during the saving of objects
 	usr << "<small>Server: Run a world save now."
 
 proc/find_savableObjects()
-	for(var/obj/_object in world) // Find all objects in the world
+	for(var/obj/_object in world)
 		if(!_object.z||_object.z==0) continue
 		if(_object in global.worldObjectList)
 			if(!_object.z||_object.z==0)
 				global.worldObjectList-=_object
 				del(_object)
-			else continue // If it's already in the world object list, skip it.
-		if(_object.Savable==1) global.worldObjectList+=_object // If it's NOT, and we want it saved, add it to the world object list.
+			else continue
+		if(_object.Savable==1) global.worldObjectList+=_object
 
-proc/Save_Custom_Turfs()
+proc/Save_Custom_Turfs(quiet = 0)
 	set background = 1
-	world<<"<small>Server: Saving Custom Turfs..."
+	if(!quiet)
+		world<<"<small>Server: Saving Custom Turfs..."
 	var/Amount=0
 	var/E=1
 	var/savefile/F=new("Saves/Map/CustomTurfs[E]")
@@ -94,9 +95,7 @@ proc/Save_Custom_Turfs()
 			Xs+=A.x
 			Ys+=A.y
 			Zs+=A.z
-			//var/savedIcon = (resourceManager.GetResourceName(A.icon) || resourceManager.GenerateDynResource(A.icon))
 
-			//Icons+=savedIcon
 			Icons += A.icon
 			Icons_States+=A.icon_state
 			Densitys+=A.density
@@ -161,7 +160,8 @@ proc/Save_Custom_Turfs()
 		F["isUnderwater"]<<isUnderwater
 		F["Destructable"]<<Destructable
 
-	world<<"<small>Server: Custom Turfs Saved([Amount])."
+	if(!quiet)
+		world<<"<small>Server: Custom Turfs Saved([Amount])."
 
 proc/Load_Custom_Turfs()
 	set background = 1
@@ -197,7 +197,6 @@ proc/Load_Custom_Turfs()
 			DebugAmount += 1
 			var/turf/CustomTurf/T=new A(locate(Xs[Amount],Ys[Amount],Zs[Amount]))
 			T.icon = Icons[Amount]
-			//T.icon = resourceManager.GetResourceByName(Icons[Amount])
 			T.icon_state= Icons_States[Amount]
 			T.density=Densitys[Amount]
 			T.opacity=Opacitys[Amount]
@@ -209,7 +208,7 @@ proc/Load_Custom_Turfs()
 			T.isOutside=isOutside[Amount]
 			T.isUnderwater=isUnderwater[Amount]
 			T.Destructable=Destructable[Amount]
-			CustomTurfs+=T // Turfs is the global list for all objects placed by players.
+			CustomTurfs+=T
 
 			for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
@@ -224,9 +223,10 @@ proc/Load_Custom_Turfs()
 		end
 		world<<"<small>Server: Custom Turfs Loaded ([DebugAmount] in [E] Files.)"
 
-proc/Save_Turfs()
+proc/Save_Turfs(quiet = 0)
 	set background = 1
-	world<<"<small>Server: Saving Map..."
+	if(!quiet)
+		world<<"<small>Server: Saving Map..."
 	var/Amount=0
 	var/E=1
 	var/savefile/F=new("Saves/Map/File[E]")
@@ -242,7 +242,6 @@ proc/Save_Turfs()
 	var/list/isUnderwater=list()
 	var/list/Destructable=list()
 
-//	debuglog << "[__FILE__]:[__LINE__] We got this far for mapfile[E]"
 
 	for(var/turf/A in Turfs)
 		if(A)
@@ -284,7 +283,6 @@ proc/Save_Turfs()
 				isUnderwater=list()
 				Destructable=list()
 
-//	debuglog << "[__FILE__]:[__LINE__] We got this far for mapfile[E]"
 
 	if(Amount % 20000 != 0)
 		F["Types"]<<Types
@@ -299,9 +297,9 @@ proc/Save_Turfs()
 		F["isUnderwater"]<<isUnderwater
 		F["Destructable"]<<Destructable
 
-//	debuglog << "[__FILE__]:[__LINE__] Map saved mapfile[E] :: Total amount of crap: [Amount]"
 
-	world<<"<small>Server: Map Saved([Amount])."
+	if(!quiet)
+		world<<"<small>Server: Map Saved([Amount])."
 
 proc/Load_Turfs()
 	set background = 1
@@ -340,7 +338,7 @@ proc/Load_Turfs()
 			T.Destructable=Destructable[Amount]
 			if(istype(T,/turf/Special/EventStars))
 				T.icon_state="[rand(1,2500)]"
-			Turfs+=T // Turfs is the global list for all objects placed by players.
+			Turfs+=T
 
 			for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
@@ -354,14 +352,13 @@ proc/Load_Turfs()
 
 		end
 		world<<"<small>Server: Map Loaded ([DebugAmount] in [E] Files.)"
-//	spawn()SpawnMaterial()
 
 
 
 
 
-var/list/Builds=list() // Builds is a list used to display icons in the buildpanel for players. This is NOT the things they have already built!
-var/list/AdminBuilds=list() //This is for /turf/Special, which is (normally) admin accessable only.
+var/list/Builds=list()
+var/list/AdminBuilds=list()
 proc/Add_Builds()
 	var/obj/Turfs/CustomObj1/customobj = new
 	var/obj/Others/Build/E = new
@@ -442,7 +439,7 @@ proc/Add_Builds()
 
 obj/Others/Build
 	var/Creates
-	var/Temp//if this is flagged, deletes the object when target switches
+	var/Temp
 	verb/IndoorOutdoorToggle()
 		set src in world
 		if(usr.Inside==0)
@@ -525,25 +522,6 @@ obj/Others/Build
 	B.name="-[objInQuestion.name]-"
 	return B
 
-/*
-atom/Click(atom/T)
-	if(usr.client.macros.IsPressed("Ctrl"))
-		if(!usr.Mapper)
-			return
-		usr.Target = makeNewBuildObj(T)
-		usr<<"You have selected [T] to build."
-	else
-		if(T)
-			if(usr.Target&&istype(usr.Target,/obj/Others/Build))
-				if(!istype(T,/obj/SkillTreeObj))
-					Build_Lay(usr.Target,usr, T.x, T.y, T.z)
-atom/MouseDrag(atom/T)
-	//Checks to see if it's in the previous build coordinates. This stops mass building.
-	if(T)
-		if(T.x != usr.buildPreviousX || T.y != usr.buildPreviousY || T.z != usr.buildPreviousZ)
-			if(usr.Target&&istype(usr.Target,/obj/Others/Build))
-				Build_Lay(usr.Target,usr, T.x, T.y, T.z)
-*/
 mob/var/buildPreviousX = 0
 mob/var/buildPreviousY = 0
 mob/var/buildPreviousZ = 0
@@ -552,7 +530,7 @@ mob/var/buildPreviousZ = 0
 proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 	if(!P.Admin&&!P.Mapper)
 		if(tmpX>0||tmpY>0||tmpZ>0)
-			return//no clicky for the common man
+			return
 	var/mob/L=P
 	var/atom/C
 	if(tmpX > 0 || tmpY> 0 || tmpZ> 0)
@@ -570,14 +548,15 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 		C.FlyOverAble=1
 	if(L.MakeUngrabbable)
 		C.Grabbable=0
-/*	if(istype(C,/obj/Turfs/Door))
-		C.Password=input(P,"Enter a password or leave blank") as text
-		if(!C) return
-		if(C.Password) if(isobj(C)) C.Grabbable=0*/
-	if(istype(C,/obj/Turfs/Sign)) C.desc=input(P,"What do you want to write on the sign?") as message
+	if(istype(C,/obj/Turfs/Sign))
+		var/obj/Turfs/Sign/sign = C
+		spawn
+			var/t = P.HUDTextPrompt("What do you want to write on the sign?")
+			if(!isnull(t) && sign)
+				sign.desc = t
 	if(istype(C,/turf/Special/EventStars))
 		C.icon_state="[rand(1,2500)]"
-	if(usr.TurfInvincible)
+	if(P.TurfInvincible)
 		C:Destructable=0
 	else
 		C:Destructable=1
@@ -586,7 +565,7 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 		worldObjectList+=C
 		if(istype(C,/obj/Turfs/CustomObj1))
 			var/obj/Turfs/CustomObj1/customObj=C
-			if(usr.useCustomObjSettings)
+			if(P.useCustomObjSettings)
 				if(P.CustomObj1Icon)
 					customObj.icon=P.CustomObj1Icon
 				else
@@ -641,29 +620,29 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 		var/turf/CustomTurf/CT=C
 		if(istype(C,/turf/CustomTurf))
 			C?:InitialType = "/turf/CustomTurf"
-			if(usr.useCustomTurfSettings)
-				if(usr.CustomTurfIcon)
-					CT.icon = usr.CustomTurfIcon
+			if(P.useCustomTurfSettings)
+				if(P.CustomTurfIcon)
+					CT.icon = P.CustomTurfIcon
 				else
 					CT.icon = O.icon
-				if(usr.CustomTurfState)
-					CT.icon_state = usr.CustomTurfState
+				if(P.CustomTurfState)
+					CT.icon_state = P.CustomTurfState
 				else
 					C.icon_state = O.icon_state
-				if(usr.CustomTurfRoof)
-					CT.Roof = usr.CustomTurfRoof
-				if(usr.CustomTurfDensity)
-					CT.density = usr.CustomTurfDensity
+				if(P.CustomTurfRoof)
+					CT.Roof = P.CustomTurfRoof
+				if(P.CustomTurfDensity)
+					CT.density = P.CustomTurfDensity
 				else
 					CT.density = O.density
-				if(usr.CustomTurfOpacity)
-					CT.opacity = usr.CustomTurfOpacity
+				if(P.CustomTurfOpacity)
+					CT.opacity = P.CustomTurfOpacity
 				else
 					CT.opacity = O.opacity
 			else
 				CT.icon = O.icon
 				CT.icon_state = O.icon_state
-				CT.Roof = usr.CustomTurfRoof
+				CT.Roof = P.CustomTurfRoof
 				CT.density = O.density
 				CT.opacity = O.opacity
 		if(P.ShallowMode==1)
@@ -681,7 +660,7 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 			Turfs+=C
 		else
 			CustomTurfs+=CT
-		LightingRecomputeNear(get_step(C, 0)) //AFTER all of C's props are set (CustomTurf density/opacity/icon) so a built occluder re-occludes
+		LightingRecomputeNear(get_step(C, 0))
 	if(ismovable(C))
 		GfxRefreshStructureMetadata(C)
 
@@ -690,9 +669,10 @@ obj/var
 	Saved_Y
 	Saved_Z
 
-proc/Save_Objects()
+proc/Save_Objects(quiet = 0)
 	set background = 1
-	world<<"<small>Server: Saving Objects..."
+	if(!quiet)
+		world<<"<small>Server: Saving Objects..."
 	var/Amount=0
 	var/E=1
 	var/savefile/F=new("Saves/Itemsave/File[E]")
@@ -724,7 +704,11 @@ proc/Save_Objects()
 		fdel("Saves/Itemsave/File[cleanup_file]")
 		world<<"<small>Server: Objects DEBUG system check: extra objects file ([cleanup_file]) deleted!"
 		cleanup_file++
-	world<<"<small>Server: Objects Saved ([Amount])."
+	if(!quiet)
+		world<<"<small>Server: Objects Saved ([Amount])."
+	BuildAreaPaintSave()
+	if(fexists("Saves/BuildJournal.txt"))
+		fdel("Saves/BuildJournal.txt")
 
 proc/Load_Objects()
 	world<<"<small>Server: Loading Items..."
@@ -755,4 +739,3 @@ proc/Load_Objects()
 				AObj.icon=Icons[idx]
 		goto wowza
 	world<<"<small>Server: Items Loaded ([amount])."
-//	spawn()SpawnMaterial()

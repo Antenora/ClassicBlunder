@@ -1,4 +1,3 @@
-// HUD input() replacement: HUDNumPrompt/HUDTextPrompt block and return the value, null on cancel
 
 #define NP_LAYER (FLY_LAYER + 5)
 #define NP_W 224
@@ -7,7 +6,7 @@
 #define NP_FONT_BIG "font-family:'monogram'; font-size:24pt"
 #define NP_FONT_BODY "font-family:'Pixel Operator 8'; font-size:6pt"
 #define NP_MAXLEN 60
-#define NP_VIEW 12   // cells visible at once, longer buffers window like a native field
+#define NP_VIEW 12
 #define NP_FIELD_X 16
 #define NP_FIELD_Y 36
 #define NP_TEXT_X 26
@@ -25,14 +24,14 @@
 		..()
 		filters = filter(type="outline", size=1, color="#000000")
 
-/atom/movable/shud/npdrag          // dialog body: swallows clicks, drags the prompt
+/atom/movable/shud/npdrag
 	layer = NP_LAYER
 	mouse_opacity = 2
 	mouse_drag_pointer = MOUSE_INACTIVE_POINTER
 	MouseDown(location, control, params)
 		if(usr)
 			usr.client.NpPanelStart(params)
-			usr.client.NumPromptMacros()   // clicking the dialog re-arms its key capture
+			usr.client.NumPromptMacros()
 	MouseDrag(over, src_loc, over_loc, src_ctrl, over_ctrl, params)
 		if(usr) usr.client.NpPanelMove(params)
 	MouseUp(location, control, params)
@@ -69,7 +68,7 @@
 client
 	var/tmp
 		np_open = 0
-		np_mode = "num"  // num | text
+		np_mode = "num"
 		np_val = ""
 		np_result
 		list/np_hud
@@ -82,11 +81,11 @@ client
 		np_pan_ox = 0
 		np_pan_oy = 0
 		np_pan_dragged = 0
-		np_cursor = 0    // caret position within the buffer, 0..length
-		np_win = 0       // first buffer index shown (display windowing)
-		list/np_digits   // one maptext slot per visible glyph
+		np_cursor = 0
+		np_win = 0
+		list/np_digits
 		atom/movable/shud/nppic/np_caret
-		np_rep_key       // held-key repeat throttle state
+		np_rep_key
 		np_rep_seen = 0
 		np_rep_since = 0
 		np_rep_last = 0
@@ -113,13 +112,13 @@ client/proc/NpText(dx, dyTop, w, h, txt, lay = 0.6)
 	NpAdd(T)
 	return T
 
-// macros are disabled while any other control holds focus
 client/proc/MapFocus()
 	winset(src, "mapwindow.map", "focus=true")
 
 mob/proc/HUDNumPrompt(title, default = "")
 	if(!client) return null
 	if(client.np_open) return null
+	client.np_result = null
 	client.NumPromptOpen(title, default)
 	while(client && client.np_open)
 		sleep(2)
@@ -128,6 +127,7 @@ mob/proc/HUDNumPrompt(title, default = "")
 mob/proc/HUDTextPrompt(title, default = "")
 	if(!client) return null
 	if(client.np_open) return null
+	client.np_result = null
 	client.NumPromptOpen(title, default, "text")
 	while(client && client.np_open)
 		sleep(2)
@@ -172,7 +172,6 @@ client/proc/NumPromptOpen(title, initial, mode = "num")
 	F.icon = 'HUD/np_field.png'
 	F.screen_loc = NPloc(NP_FIELD_X, NP_FIELD_Y, 34)
 	NpAdd(F)
-	// one glyph per fixed 14px cell
 	np_digits = list()
 	for(var/i = 1 to NP_VIEW)
 		var/atom/movable/shud/nptext/D = new
@@ -182,7 +181,6 @@ client/proc/NumPromptOpen(title, initial, mode = "num")
 		D.screen_loc = NPloc(NP_TEXT_X + (i - 1) * NP_ADV, NP_TEXT_Y, 32)
 		NpAdd(D)
 		np_digits += D
-	// caret is a baked bar
 	np_caret = new
 	np_caret.icon = 'HUD/np_caret.png'
 	np_caret.layer = NP_LAYER + 0.65
@@ -204,7 +202,6 @@ client/proc/NpMkButton(action, label, tcol, dx, dyTop)
 
 client/proc/NumPromptRefresh()
 	if(!np_open) return
-	// slide the window so the cursor stays visible
 	var/L = length(np_val)
 	np_cursor = clamp(np_cursor, 0, L)
 	if(np_cursor < np_win) np_win = np_cursor
@@ -230,7 +227,7 @@ client/proc/NumPromptAction(action)
 client/proc/NumPromptClose(confirmed)
 	if(!np_open) return
 	if(np_mode == "text")
-		np_result = confirmed ? np_val : null   // "" is a real answer, it clears the field
+		np_result = confirmed ? np_val : null
 	else
 		np_result = (confirmed && np_val != "") ? text2num(np_val) : null
 	np_open = 0
@@ -245,7 +242,6 @@ client/proc/NumPromptClose(confirmed)
 	np_digits = null
 	np_caret = null
 
-// dragging
 
 client/proc/NpPanBounds()
 	var/list/vd = splittext("[view]", "x")
@@ -292,16 +288,15 @@ client/proc/NpPanelEnd()
 	setPref("npPanX", np_pan_x)
 	setPref("npPanY", np_pan_y)
 
-// key capture
 
 /proc/NpKeys(text_mode = 0)
-	var/list/L = list("RETURN", "ESCAPE", "BACK", "EAST", "WEST")
+	var/list/L = list("RETURN", "ESCAPE", "BACK", "EAST", "WEST", "DELETE", "CTRL+Z", "CTRL+Y", "CTRL+R", "CTRL+X", "CTRL+C", "CTRL+V", "CTRL+F", "CTRL+B", "CTRL+I")
 	for(var/i = 0 to 9)
 		L += "[i]"
 		L += "NUMPAD[i]"
 	if(text_mode)
 		L += "SPACE"
-		L += "NORTH"   // no walking off mid-word
+		L += "NORTH"
 		L += "SOUTH"
 		for(var/c = 97 to 122)
 			L += uppertext(ascii2text(c))
@@ -333,7 +328,6 @@ client/proc/NpMacroSet()
 
 client/proc/NumPromptMacros()
 	var/set_name = NpMacroSet()
-	// park any player bind sitting on a prompt key
 	var/list/npkeys = NpKeys(np_mode == "text")
 	if(mob)
 		mob.initShortcuts()
@@ -369,7 +363,7 @@ client/proc/NumPromptMacros()
 		ApplyOneBind(set_name, "np_spc", "SPACE", "NumPromptChar space", 0, null, 1)
 	ApplyOneBind(set_name, "np_ret", "RETURN", "NumPromptOk", 0, null)
 	ApplyOneBind(set_name, "np_esc", "ESCAPE", "NumPromptNo", 0, null)
-	MapFocus()   // macros are mute without map focus
+	MapFocus()
 
 client/proc/NumPromptUnmacros()
 	var/set_name = NpMacroSet()
@@ -400,19 +394,17 @@ client/proc/NpRepOk(k)
 		np_rep_since = now
 		np_rep_last = now
 		return 1
-	if(now - np_rep_since < 5) return 0    // initial hold delay
-	if(now - np_rep_last < 1) return 0     // repeat rate
+	if(now - np_rep_since < 5) return 0
+	if(now - np_rep_last < 1) return 0
 	np_rep_last = now
 	return 1
 
-// macro-fired verbs
 mob/verb/NumPromptKey(k as text)
 	set hidden = 1
 	if(!client || !client.np_open) return
 	if(length(k) != 1 || k < "0" || k > "9") return
 	if(!client.NpRepOk("d[k]")) return
 	if(length(client.np_val) >= NP_MAXLEN) return
-	// edit as plain text
 	client.np_val = copytext(client.np_val, 1, client.np_cursor + 1) + k + copytext(client.np_val, client.np_cursor + 1)
 	client.np_cursor++
 	client.NumPromptRefresh()

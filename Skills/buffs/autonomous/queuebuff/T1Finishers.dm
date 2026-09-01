@@ -120,6 +120,7 @@
 
     Zwercopter
         IconLock='Ice_Aura_2.dmi'
+        AuraArt=1
         IconApart=1
         passives = list("Half-Sword" = 0.5,  "Momentum" = 2, "HeavyHitter" = 1, "CheapShot" = 1,\
                      "HardStyle" = 1, "TensionLock" = 1)

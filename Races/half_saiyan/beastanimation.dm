@@ -138,4 +138,5 @@
     client.eye = src
     client?.EndCutsceneDisplay()
     overlays += aura
+    ShadowExclude(aura)
     src.CutsceneMode()

@@ -1,0 +1,2 @@
+Exported 21x18 region (1,1)-(21,18) z2 -> Exports/export2.dmm
+378 cells, 3 unique, 5 objects.

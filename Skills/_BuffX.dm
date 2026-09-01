@@ -203,6 +203,7 @@ NEW VARIABLES
 	var/ProfileChange
 	var/ProfileBase
 	var/IconLock//If this has a value, it is used for the icon always.
+	var/AuraArt
 	var/IconLockBlend=1
 	var/IconLayer=2//customization eventually
 	var/LockX//These are used to make sure the locked icon is always in place.
@@ -1025,6 +1026,7 @@ NEW VARIABLES
 				if(num == 7)
 					passives["PUSpike"] = 300
 					IconLock='FlameGlowHades.dmi'
+					AuraArt=1
 					LockX=-16
 					LockY=-4
 					KenWave=4
@@ -2051,6 +2053,7 @@ NEW VARIABLES
 			HealthThreshold=5
 			passives = list("BurningShot" = 1, "NoWhiff" = 1, "SuperDash" = 1, "Pursuer" = 1)
 			IconLock='SSGAura.dmi'
+			AuraArt=1
 			IconLockBlend=4
 			LockX=-32
 			LockY=-32
@@ -3025,6 +3028,7 @@ NEW VARIABLES
 				StrMult=1.4
 				ForMult=1.4
 				IconLock='GentleDivine.dmi'
+				AuraArt=1
 				IconLockBlend=2
 				LockX=-32
 				LockY=-34
@@ -7195,6 +7199,7 @@ NEW VARIABLES
 				LifeSteal=20
 				MagicFocus=1
 				IconLock='DarknessGlow.dmi'
+				AuraArt=1
 				IconUnder=1
 				IconLockBlend=2
 				LockX=-32
@@ -7542,6 +7547,7 @@ NEW VARIABLES
 			Slotless=1
 			AngerFloor=60
 			IconLock='AuraMysticBig.dmi'
+			AuraArt=1
 			IconLockBlend=4
 			StrMult = 1.5
 			ForMult = 1.5
@@ -7929,6 +7935,7 @@ NEW VARIABLES
 		Majin
 			AngerFloor=50
 			IconLock='MajinAura.dmi'
+			AuraArt=1
 			LockX=0
 			LockY=0
 			FlashChange=1
@@ -10242,6 +10249,7 @@ NEW VARIABLES
 				Finisher
 					Cooldown = -1
 					IconLock='AuraSlowTensionBlue.dmi'
+					AuraArt=1
 					LockX=0
 					LockY=0
 					TensionLock=1
@@ -11710,6 +11718,7 @@ NEW VARIABLES
 				DarknessFlame=1
 				DarkChange=1
 				IconLock='DarknessFlameAura.dmi'
+				AuraArt=1
 				LockX=-32
 				LockY=-32
 				IconLayer=-1
@@ -11758,6 +11767,7 @@ NEW VARIABLES
 				AlwaysOn=0
 				BuffName="Sparkling Ripple"
 				IconLock='Ripple Aura.dmi'
+				AuraArt=1
 				IconLockBlend=2
 				PoseEnhancement=1
 				TimerLimit=30
@@ -13662,6 +13672,7 @@ mob
 
 				var/image/im=image(icon=B.IconLock, pixel_x=B.LockX, pixel_y=B.LockY, icon_state = B.IconState, layer=FLOAT_LAYER-B.IconLayer)
 				im.blend_mode=B.IconLockBlend
+				FxAddWearTint(im, B.IconLock)
 				im.transform*=B.OverlaySize
 				if(B.OverlaySize>=2)
 					im.appearance_flags+=512
@@ -13714,6 +13725,7 @@ mob
 						goto IgnoreRelayer
 				var/image/im=image(icon=B.IconLock, pixel_x=B.LockX, pixel_y=B.LockY, layer=FLOAT_LAYER-B.IconLayer)
 				im.blend_mode=B.IconLockBlend
+				FxAddWearTint(im, B.IconLock)
 				im.transform*=B.OverlaySize
 				if(B.OverlaySize>=2)
 					im.appearance_flags+=512
@@ -14239,6 +14251,7 @@ mob
 			if(B.IconLock)
 				var/image/im=image(icon=B.IconLock, pixel_x=B.LockX, pixel_y=B.LockY, icon_state = B.IconState,layer=FLOAT_LAYER-B.IconLayer)
 				im.blend_mode=B.IconLockBlend
+				FxAddWearTint(im, B.IconLock)
 				im.transform*=B.OverlaySize
 				if(B.OverlaySize>=2)
 					im.appearance_flags+=512

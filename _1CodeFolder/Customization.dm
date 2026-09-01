@@ -14,7 +14,7 @@ mob/Players/verb
 		set hidden = 1
 		usr.Grid("Clothes")
 	Relayer_Hair()
-		set hidden=1//hidden for kkt's ocd
+		set hidden=1
 		usr.Hairz("Add")
 
 mob/var
@@ -38,6 +38,11 @@ mob/var
 	Hair_SHT
 	KingofBravesHair
 
+
+mob/proc/AuraLockImage()
+	var/image/i = image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+	FxAddWearTint(i, src.AuraLock)
+	return i
 
 mob/proc/Auraz(var/Z)
 	spawn(1) MobAuraLightRefresh(src)
@@ -97,16 +102,17 @@ mob/proc/Auraz(var/Z)
 	if(Z=="Add")
 
 		src.Auraz("Remove")
+		var/list/preo = overlays.Copy()
+		var/list/preu = underlays.Copy()
 
 		if(src.RippleActive())
 			src.underlays+=gold2
 
 		if(src.AuraLocked==1)
 			if(src.AuraLockedUnder==1)
-				src.underlays+=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+				src.underlays+=src.AuraLockImage()
 			else
-				src.overlays+=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
-			return
+				src.overlays+=src.AuraLockImage()
 		else if(passive_handler.Get("Controlled Chaos"))
 			src.overlays+=rainbowaura
 
@@ -121,7 +127,7 @@ mob/proc/Auraz(var/Z)
 				src.overlays+=tensionas
 
 		else if(src.ClothBronze)
-			var/list/Gold=list("Aries Cloth", /* "Taurus Cloth" */, "Gemini Cloth", "Cancer Cloth", "Leo Cloth", "Virgo Cloth", "Libra Cloth", "Sagittarius Cloth", "Scorpio Cloth", "Capricorn Cloth", "Aquarius Cloth", "Pisces Cloth")
+			var/list/Gold=list("Aries Cloth", , "Gemini Cloth", "Cancer Cloth", "Leo Cloth", "Virgo Cloth", "Libra Cloth", "Sagittarius Cloth", "Scorpio Cloth", "Capricorn Cloth", "Aquarius Cloth", "Pisces Cloth")
 			if((src.SpecialBuff&&(src.SpecialBuff.BuffName in Gold))||src.ClothBronze==src.ClothGold)
 				src.underlays+=gold2
 				src.underlays+=gold1
@@ -158,6 +164,7 @@ mob/proc/Auraz(var/Z)
 				else
 					src.overlays += image(M.sicon,icon_state=M.sicon_state,pixel_x=M.pixel_x,pixel_y=M.pixel_y)
 
+		src.ShadowExcludeDiff(preo, preu)
 
 	if(Z=="Remove")
 		for(var/obj/Skills/Power_Control/M in src.contents)
@@ -215,8 +222,8 @@ mob/proc/Auraz(var/Z)
 		src.underlays-=image(icon=src.Form4Aura, pixel_x=src.Form4AuraX, pixel_y=src.Form4AuraY)
 		src.underlays-=image(icon=src.Form5Aura, pixel_x=src.Form5AuraX, pixel_y=src.Form5AuraY)
 
-		src.overlays-=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
-		src.underlays-=image(icon=src.AuraLock, pixel_x=src.AuraX, pixel_y=src.AuraY)
+		src.overlays-=src.AuraLockImage()
+		src.underlays-=src.AuraLockImage()
 
 		src.underlays-=image('BijuuInitial.dmi',pixel_x=-32, pixel_y=-32)
 		src.underlays-=image('GCAura.dmi',pixel_x=-49, pixel_y=-15)
@@ -339,11 +346,6 @@ mob/proc/Hairz(var/Z)
 		src.overlays -= image(icon=src.Form4Hair, pixel_x=Form4HairX, pixel_y=Form4HairY, layer=FLOAT_LAYER-2)
 		src.overlays -= image(icon=src.HairLock, pixel_x=HairBX, pixel_y=HairBY, layer=FLOAT_LAYER-2)
 		src.underlays -= image(icon=src.HairUnderlay, pixel_x=src.HairUnderlayX, pixel_y=src.HairUnderlayY, layer=FLOAT_LAYER-2)
-/*		for(var/obj/Items/Wearables/w in src)
-			if(w.IsHat)
-				if(w.suffix)
-					var/image/im=image(icon=w.icon, pixel_x=w.pixel_y, pixel_y=w.pixel_y, layer=FLOAT_LAYER-1)
-					src.overlays-=im*/
 
 proc/Add_Customizations()
 	for(var/A in subtypesof(/obj/Hairs))
@@ -358,7 +360,7 @@ proc/Add_Customizations()
 			continue
 		var/icon/newIcon = new(w.icon)
 		if(w.type in list(/obj/Items/Wearables/Icon_67,/obj/Items/Wearables/Icon_68,/obj/Items/Wearables/Icon_69,/obj/Items/Wearables/Icon_70))
-			w.icon = newIcon // im lazy and dont want to ! the above
+			w.icon = newIcon
 		else
 			newIcon.MapColors(0.2,0.2,0.2, 0.2,0.2,0.2, 0.2,0.2,0.2, 0,0,0)
 		w.icon = newIcon
@@ -567,12 +569,6 @@ mob/proc
 
 
 
-		/*if(X=="Auras")
-			src<<output("Flashy flashy.","SelectedCustomize")
-			if(locate(/obj/Skills/Power_Control,src.contents))
-				for(var/A in Aura_List)
-					Row++
-					src<<output(A,"GridX:1,[Row]")*/
 		if(E=="Charges")
 			for(var/A in Charge_List)
 				Row++
@@ -584,12 +580,6 @@ mob/proc
 				Row++
 				src<<output(A,"GridX:1,[Row]")
 
-		if(Z=="Turfs")
-			src<<output("Tiles everywhere!","SelectedCustomize")
-			for(var/A in Builds)
-				Row++
-				src<<output(A,"GridX:1,[Row]")
-
 		if(Z=="Tech")
 			src<<output("High tech, low prices.","SelectedCustomize")
 			for(var/obj/Money/M in usr)
@@ -597,7 +587,6 @@ mob/proc
 				src<<output(M,"GridX:1,[Row]")
 				src<<output("[Commas(M.Level)]","GridX:2,[Row]")
 
-			//This will always be displayed.
 			Row++
 			src<<output("-Basic Technology-","GridX:1,[Row]")
 			for(var/obj/Items/BT in BasicTechnology_List)
@@ -607,7 +596,6 @@ mob/proc
 				src<<output(BT,"GridX:1,[Row]")
 				src<<output("[Commas(BT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
 
-			// forging + repair&conversion sections retired, that gear comes from Smithing now
 
 			if(usr.MedicineUnlocked)
 				Row++
@@ -844,7 +832,7 @@ mob/proc
 						src<<output(ST,"GridX:1,[Row]")
 						src<<output("[Commas(ST.Cost*(glob.progress.EconomyMana/100))]","GridX:2,[Row]")
 
-			if(usr.SummoningMagicUnlocked)//TODO: Rename this stuff or make actual summoning
+			if(usr.SummoningMagicUnlocked)
 				Row++
 				src<<output("-General Magic Knowledge ;)-","GridX:1,[Row]")
 				for(var/obj/Items/MS in SummoningMagic_List)

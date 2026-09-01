@@ -17,19 +17,16 @@ proc/log_func(x, a, b)
 
 #define TICK_CHECK_LIMIT 75
 
-/// Returns true if tick_usage is above the limit
 #define TICK_CHECK ( TICK_USAGE > TICK_CHECK_LIMIT)
-/// runs stoplag if tick_usage is above the limit
 #define CHECK_TICK ( TICK_CHECK ? stoplag() : 0 )
 
-/// Returns true if tick usage is above 95, for high priority usage
 #define TICK_CHECK_HIGH_PRIORITY ( TICK_USAGE > 95 )
-/// runs stoplag if tick_usage is above 95, for high priority usage
 #define CHECK_TICK_HIGH_PRIORITY ( TICK_CHECK_HIGH_PRIORITY? stoplag() : 0 )
 
-//Key thing that stops lag. Cornerstone of performance in ss13, Just sitting here, in unsorted.dm. Now with dedicated file!
 
 #define BUILD_PAINT "PAINT"
+#define BUILD_CURVE "CURVED LINE"
+#define BUILD_SPRAY "SPRAY"
 #define BUILD_RECT "RECTANGLE"
 #define BUILD_RECT_HOLLOW "HOLLOW RECTANGLE"
 #define BUILD_LINE "LINE"
@@ -55,7 +52,6 @@ proc/log_func(x, a, b)
 #define HALFSAIYAN /race/half_saiyan
 #define DEMON /race/demon
 #define MAJIN /race/majin
-// Majin absorb zone
 #define MAJIN_ABSORB_Z 19
 #define MAJIN_UNHINGED_POWER_MULT 2
 #define MAKYO /race/makyo
@@ -83,7 +79,6 @@ proc/log_func(x, a, b)
 #define T3_DMG_MULT 8
 #define T4_DMG_MULT 10
 
-//pacts in pacts.dm
 #define NO_PENALTY 0
 #define TAX_PENALTY (1 << 1)
 #define HEALTH_PENALTY (1 << 2)
@@ -104,15 +99,15 @@ proc/log_func(x, a, b)
 #define PACT_BROKEN_OWNER_PENALTY 3
 #define PACT_BROKEN_SUBJECT_PENALTY 4
 
-var/list/font_rsc=list('fonts/Gotham Book.otf') // forces it into the rsc.
+var/list/font_rsc=list('fonts/Gotham Book.otf')
 
 proc
 	stoplag()
 		var/tickstosleep = 1
 		do
 			sleep(world.tick_lag*tickstosleep)
-			tickstosleep *= 2 //increase the amount we sleep each time since sleeps are expensive (5-15 proc calls)
-		while(world.tick_usage > 75 && (tickstosleep*world.tick_lag) < 32) //stop if we get to the point where we sleep for seconds at a time
+			tickstosleep *= 2
+		while(world.tick_usage > 75 && (tickstosleep*world.tick_lag) < 32)
 
 atom/proc/onBumped(atom/Obstacle)
 
@@ -150,13 +145,11 @@ var/regex/yellSlashRegex = new(@"^/y\s")
 #define YELL_NOUNS list("shouts:", "yells:", "screams:")
 #define QUESTION_NOUNS list("questions:", "queries:", "asks:")
 
-// item quality tiers (used by tech crafting + life skills)
 #define QUAL_POOR      1
 #define QUAL_NORMAL    2
 #define QUAL_GOOD      3
 #define QUAL_EPIC      4
 #define QUAL_LEGENDARY 5
 
-// inventory: 30 held items per HUD category, 999 per stack / per material-quality in the log
 #define INV_CATEGORY_CAP 30
 #define INV_STACK_MAX 999

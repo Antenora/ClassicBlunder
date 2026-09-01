@@ -7,6 +7,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SagaSignature = 1
 		SignatureTechnique = 4
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -102,6 +103,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SagaSignature = 1
 		SignatureTechnique = 4
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -128,6 +130,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SagaSignature = 1
 		SignatureTechnique = 4
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -159,6 +162,7 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 		SagaSignature = 1
 		SignatureTechnique = 4
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32

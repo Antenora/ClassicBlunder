@@ -11,6 +11,7 @@
 		SpdMult=1.15
 		DefMult=1.15
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -36,6 +37,7 @@
 		OffMult=1.45
 		DefMult=1.45
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -61,6 +63,7 @@
 		OffMult=1.75
 		DefMult=1.75
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -86,6 +89,7 @@
 		OffMult=2
 		DefMult=2
 		IconLock='GentleDivine.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -109,6 +113,7 @@
 		NoSword=0
 		NoStaff=0
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32

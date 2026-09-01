@@ -7,6 +7,7 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 		SagaSignature = 1
 		SignatureTechnique = 1
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -128,6 +129,7 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 		SagaSignature = 1
 		SignatureTechnique = 1
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -184,6 +186,7 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 		SagaSignature = 1
 		SignatureTechnique = 1
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32
@@ -250,6 +253,7 @@ obj/Skills/Buffs/NuStyle/MortalUIStyles// ~~ Angel-taught basic forms ~~  unlock
 		SagaSignature = 1
 		SignatureTechnique = 1
 		IconLock='AuraMysticBig.dmi'
+		AuraArt=1
 		IconLockBlend=4
 		LockX=-32
 		LockY=-32

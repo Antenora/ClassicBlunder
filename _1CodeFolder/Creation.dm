@@ -63,7 +63,6 @@ mob/Players
 		ForceClearHeldChargeState()
 		players += usr
 		OverwatchNotifyLogin(usr, "logged in")
-		//the decay loop dies on disconnect, wipe leftover rating so Stylish doesn't stay stuck
 		if(StyleRating > 0)
 			resetStyleRating()
 		StyleRatingDecaying = FALSE
@@ -120,8 +119,6 @@ mob/Players
 			giveTesterVerbs(src)
 
 
-		// this is ugly, but, I can't bother to search where it's making people have these sticking, prob.. lulz.
-		// feel free to delete, idcr rly.
 		if(src.Stunned)
 			src.Stunned = 0
 		if(src.Meditating && src.icon_state == "Meditating" || src.Meditating)
@@ -138,7 +135,6 @@ mob/Players
 		if(src.KO && !(src.icon_state == "KO"))
 			src.KO = 0
 
-		// Chrono Devolution safeguards
 		for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Chrono_Devolution/cd in src)
 			if(src.BuffOn(cd))
 				cd.Trigger(src, Override=1)
@@ -187,9 +183,8 @@ mob/Players
 			if(e.name=="" || e.name==null || !e.name)
 				e.name="Item"
 
-		src.potential_gain(0, npc=0)//set status message.
+		src.potential_gain(0, npc=0)
 
-		//stop holding zanzo charges
 		if(ActiveZanzo)
 			ActiveZanzo=0
 
@@ -217,16 +212,12 @@ mob/Players
 			move_speed = MovementSpeed()
 
 		GiveJobVerbs()
-		// if(RewardsLastGained > 100)
-		// 	Respec1()
-		// 	quickDirtyRefund()
 		setMaxRPP()
 		if(!client.getPref("oldZanzo"))
 			client.add_hud("Zanzoken", new/obj/bar/zanzo(client, null, 3, 6))
 			client.hud_ids["Zanzoken"].Update(0, MovementCharges)
 
-		//automation
-		src.reward_auto()//checks to see if its been a day
+		src.reward_auto()
 
 		if(RPPSpent<0)
 			src<<"RPPSpent was negative, resetting to 0"
@@ -236,7 +227,7 @@ mob/Players
 			killed_AI = list()
 
 		if(last_online)
-			var regen_time = (world.realtime - last_online) / 10 //Seconds.
+			var regen_time = (world.realtime - last_online) / 10
 			if((TotalInjury + TotalFatigue + TotalCapacity) >= 10)
 				usr << "You have been offline for [round(((world.realtime - last_online)/10)/60)] minutes. Your wound timer, injury, capacity, and fatigue have been restored accordingly."
 			var/purerpmode
@@ -356,8 +347,6 @@ mob/Players
 					Regenerate(R)
 			break
 
-		// mainLoop += src
-	//	ticking_generic.Add(src)
 		gain_loop.Add(src)
 		if(isRace(DEMON) || isRace(MAKAIOSHIN) || (isRace(CELESTIAL) && CelestialAscension == "Demon"))
 			client.updateCorruption()
@@ -404,7 +393,6 @@ mob/Players
 		src.IgnoreFlyOver=0
 
 		if(Secret == "Vampire")
-			//TODO add blood hud here
 			Secret = "Vampire"
 
 
@@ -490,7 +478,6 @@ mob/Players
 			src.alpha = 255
 			src.pixel_z = 0
 			animate(src)
-		// Kageoni safeguard
 		if(istype(src, /mob/Players))
 			var/mob/Players/P = src
 			if(P.HiddenInShadow || P.HideInShadowsActive)
@@ -498,6 +485,7 @@ mob/Players
 			P.Shadowbringer_ClearShadow()
 			P.KatenCleanseBankaiState()
 		ForceClearHeldChargeState()
+		stopUnlimitedBladeWorks()
 		MajinAbsorbOnLogout()
 		DevilSummonerLogout()
 		OverwatchNotifyLogin(src, "logged out")
@@ -507,11 +495,9 @@ mob/Players
 		resetStyleRating()
 		StyleRatingDecaying = FALSE
 		gain_loop.Remove(src)
-		//ticking_generic.Remove(src)
 
 		if(src in admins)
 			admins -= src
-		// mainLoop -= src
 		if(length(savedRoleplay) >= 1)
 			if(fexists("Saved Roleplays/[key].txt"))
 				fdel("Saved Roleplays/[key].txt")
@@ -567,8 +553,8 @@ mob/Players
 		del(usr)
 
 client/Del()
-	if(src.highlightedAtoms && src.highlightedAtoms.len > 0)
-		ClearHighlights()
+	if(bsession?.active)
+		bsession.Deactivate(1)
 	..()
 
 mob/Creation
@@ -663,7 +649,7 @@ mob/Creation/verb
 		usr.screen_loc = "IconUpdate:1,1"
 		client.screen += usr
 		spawn()
-			Namez//label
+			Namez
 			src.name=html_encode(copytext(input(src,"Name your vessel. (25 letter limit)"),1,25))
 			while(sanatizeName(name))
 				src<<"Your name contains illegal characters. Please try again."
@@ -707,7 +693,7 @@ mob/Creation/proc
 		usrr.screen_loc = "IconUpdate:1,1"
 		usrr.client.screen += usr
 		spawn()
-			Namez//label
+			Namez
 			usrr.name=html_encode(copytext(input(usrr,"Name your vessel. (25 letter limit)"),1,25))
 			while(sanatizeName(usrr.name))
 				usrr<<"Your name contains illegal characters. Please try again."
@@ -902,7 +888,6 @@ mob/var/tmp/race_index = 1
 mob/proc/UpdateRaceScreen(change = 1)
 	var/race/r
 
-	//TODO: pretty sure this can cause issues if theres absolutely nothing unlocked. would be smart to have a bail-out.
 	while (1)
 		if(change)
 			if (change > 0)
@@ -946,7 +931,6 @@ obj/Login
 		icon='ArtificalObj.dmi'
 		icon_state="Misc"
 		layer=999
-	//	alpha=0
 		Click()
 			if(WorldLoading)
 				usr<<"Please wait until the world is done loading..."
@@ -972,7 +956,6 @@ obj/Login
 		icon='ArtificalObj.dmi'
 		icon_state="Misc"
 		layer=999
-	//	alpha=0
 		Click()
 			if(WorldLoading)
 				usr<<"Please wait until the world is done loading..."
@@ -1160,17 +1143,14 @@ mob/proc
 			if(src.Imagination<=0.25)
 				src.Imagination=0.25
 
-			// Always set RewardsLastGained for new characters so they don't get catch-up rewards for days before they existed
 			src.RewardsLastGained = glob.progress.DaysOfWipe
 			if(glob.progress.WipeStart)
 				src.PotentialLastDailyGain=glob.progress.WipeStart
-				if(src.Potential==DaysOfWipe())//if its a bad boi who gets free potential
+				if(src.Potential==DaysOfWipe())
 					src.PotentialLastDailyGain=glob.progress.DaysOfWipe-1
 
-				//set these to wipe start so that the login code will give them their rewards and allow them to grind potentialz
 			information.setPronouns(TRUE)
 			killed_AI = list()
-			// information.pickFaction(src)
 			if(key in VuffaKeys)
 				giveVuffaMoment()
 
