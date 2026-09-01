@@ -98,7 +98,10 @@ mob/tierUpSaga(Path)
 						src << "A sheath made of snow itself manifests by your side."
 						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/masamune in contents)
 							masamune.Element = "Light"
+							masamune.Purify += 1
+							masamune.PurifyMax += 1
 						src.AddSkill(new/obj/Skills/AutoHit/Purifying_Frost)
+						src.AddSkill(new/obj/Skills/Utility/Death_Killer)
 
 					if("Soul Edge")
 						src << "Soul Edge's chaotic power crawls up your frame...!"
@@ -134,10 +137,14 @@ mob/tierUpSaga(Path)
 
 					if("Durendal")
 						src << "The relics embedded deep within Durendal's nature become apparent...!"
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Tooth)
+/*						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Tooth)
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Blood)
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment)
-						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Hair)
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Hair)*/
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Tooth)
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Hair)
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Raiment)
+						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Blood)
 
 					if("Dainsleif")
 						src << "Niohoggr's Chains offer themselves to your cause, capable of binding down even the quickest foes..."
@@ -178,6 +185,9 @@ mob/tierUpSaga(Path)
 						src << "The hilt of Masamune glitters in the light, offering it's blessed nature to aid your attacks..."
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Blessed_Guard)
 						passive_handler.Increase("RefreshingBlows")
+						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/masamune in contents)
+							masamune.Purify += 1
+							masamune.PurifyMax += 1
 
 					if("Soul Edge")
 						src << "An eye opens up on Soul Edge's hilt, peering out..."
@@ -234,6 +244,9 @@ mob/tierUpSaga(Path)
 					if("Masamune")
 						src << "The power of Heavenly Regalia: Blessed Blade resonates in your body."
 						src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune)
+						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/masamune in contents)
+							masamune.Purify += 1
+							masamune.PurifyMax += 1
 
 					if("Soul Edge")
 						src << "The power of Heavenly Regalia: Chaos Armament resonates in your body."
@@ -285,11 +298,14 @@ mob/tierUpSaga(Path)
 							muramasa.passives["CriticalDamage"] = 0.2
 
 					if("Masamune")
-						src.AddSkill(new/obj/Skills/Utility/Death_Killer)
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune/masamune in src.Buffs)
 							masamune.passives["Unstoppable"] = 1
-							masamune.passives["LifeSteal"] = 10
+							masamune.passives["CriticalBlock"] = 0.2
 							masamune.passives["HolyMod"] = 2
+							masamune.passives["Heavensent"] = 1
+						for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/darlose in contents)
+							darlose.Purify += 1
+							darlose.PurifyMax += 1
 
 					if("Soul Edge")
 						for(var/obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge/SE in src.Buffs)
@@ -385,7 +401,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=2
 		EndMult=1.5
 		OffMult=1.25
-		passives= list("HolyMod" = 5, "Purity" = 1, "BeyondPurity"= 1,  "DebuffReversal" = 1)
+		passives= list("HolyMod" = 5, "Purity" = 1, "DebuffReversal" = 1)
 		ActiveMessage= "invokes the Origin of Hope, embracing the Conviction of a Saint!"
 		OffMessage= "casts aside the Origin of Hope..."
 		verb/Fundament_Conviction()
@@ -397,7 +413,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		StrMult=1.25
 		ForMult=1.25
 		EndMult=1.5
-		passives= list("PureReduction" = 5, "Miracle" = 1)
+		passives= list("Miracle" = 1)
 		ActiveMessage= "invokes the Origin of Glory, embracing the Honour of a King!"
 		OffMessage= "casts aside the Origin of Glory..."
 		verb/Fundament_Honour()
@@ -427,7 +443,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 		OffMult=1.5
 		DefMult=1.5
 		SpdMult=1.5
-		passives = list("HolyMod"= 4, "LifeGeneration" = 1)
+		passives = list("HolyMod"= 4, "LifeGeneration" = 5, "EnergyGeneration" = 5)
 		ActiveMessage= "invokes the Origin of Purity, putting Life in their Embrace!"
 		OffMessage= "casts aside the Origin of Purity..."
 		verb/Fundament_Life()
@@ -437,7 +453,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia
 	Entropy
 		name = "Fundament: Entropy"
 		StrMult=1.5
-		EndMult=0.9
+		EndMult=0.75
 		SpdMult=1.5
 		passives = list("Erosion" = 0.5, "DeathField" = 5, "AbyssMod" = 3, "Entropic" = 1)
 		ActiveMessage= "invokes the Foundation of Death, bringing the End with their blade..:"

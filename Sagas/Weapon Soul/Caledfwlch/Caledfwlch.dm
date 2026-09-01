@@ -24,6 +24,29 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch
 		set category="Skills"
 		src.Trigger(usr)
 
+obj/Skills/Projectile/Beams/Excalibur
+	DamageMult=0.35
+	ChargeRate=0.2
+	Dodgeable=0
+	Copyable=0
+	Deflectable=0
+	Distance=100
+	IconLock='BeamGG.dmi'
+	Cooldown=45
+	EnergyCost=17
+	Instinct=1
+	MenuIcon="FinalCrash"
+	BeamTime=10
+	Piercing=1
+	HeldSkill=TRUE
+	HeldBeam=TRUE
+	HeldBeamUncapped=TRUE
+	ChargePeriod=5
+	CritEffectiveness=0
+	verb/Excalibur_Beam()
+		set category="Skills"
+			usr.BeginHeldSkill(src)
+
 obj/Skills/Queue/Excalibur
 	SagaSignature=1
 	ActiveMessage="gathers holy energy within her blade..."

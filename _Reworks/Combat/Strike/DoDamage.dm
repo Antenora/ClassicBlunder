@@ -44,9 +44,9 @@
 		return 0;
 	if(!handleAI(defender)) // handles ai
 		return 0;
-	if(!checkPurity(defender))
+/*	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit");
-		return 0
+		return 0 */
 	if(unarmed || sword)
 		triggerLimit("Physical")
 		triggerLimit("Sword")

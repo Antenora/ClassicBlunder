@@ -290,7 +290,7 @@ NEW VARIABLES
 //Offense stuff
 	//HolyMod//Adds holy mod.
 	//AbyssMod//Adds abyss mod.
-	//Purity//Can only damage what it's designed to damage (Abyss for holy, Holy for abyss, humans for slayer)
+	//Purity//Extra wound damage to & always seriously fighting IsEvil
 	var/KiBlade//its fooken ki blade m8
 	var/NoWhiff //Melee attacks won't whiff.
 	//NoForcedWhiff//THEY WON'T WHIFF EVEN HARDER NOW
@@ -1260,7 +1260,7 @@ NEW VARIABLES
 								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 								src.OffMessage="conceals █████████████.."
 						if("Durendal")
-							passives = list("HolyMod" = usr.SagaLevel, "LifeGeneration" = usr.SagaLevel/3, "PULock" = 1)
+							passives = list("HolyMod" = usr.SagaLevel, "Persistence" = usr.SagaLevel, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Durendal"
 								src.ActiveMessage="calls forth the true form of Durendal, the Sword of Hope!"
@@ -1295,7 +1295,7 @@ NEW VARIABLES
 								src.ActiveMessage="calls forth the true form of █████████████, the ███████ of ████████!"
 								src.OffMessage="conceals █████████████.."
 						if("Masamune")
-							passives = list("HolyMod"=usr.SagaLevel*2, "Purity"=1, "PULock" = 1)
+							passives = list("HolyMod"= usr.SagaLevel*2, "Purity"=1, "Vigor"= usr.SagaLevel, "DebuffDurationReduction"= usr.SagaLevel/2, "PULock" = 1)
 							if(!redacted)
 								src.SwordName="Masamune"
 								src.ActiveMessage="calls forth the true form of Masamune, the Sword of Purity!"

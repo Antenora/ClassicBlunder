@@ -455,6 +455,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("HolyMod", 10)
 				passive_handler.Increase("CalmAnger")
 				passive_handler.Increase("SpiritPower")
+				passive_handler.Increase("Heavensent", 3)
 				var/i='brightday2.dmi'
 				sleep(10)
 				for(var/turf/t in Turf_Circle(src, 10))
@@ -678,6 +679,7 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("HolyMod", 10)
 			passive_handler.Decrease("CalmAnger")
 			passive_handler.Decrease("SpiritPower")
+			passive_handler.Decrease("Heavensent", 3)
 		if("Durendal")
 			src.ElementalOffense=null
 			passive_handler.Decrease("Juggernaut")

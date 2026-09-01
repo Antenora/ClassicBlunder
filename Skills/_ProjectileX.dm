@@ -6629,13 +6629,13 @@ obj
 						if(src.Owner.party && src.Owner.passive_handler.Get("TeamHater"))
 							if(m in src.Owner.party.members)
 								EffectiveDamage *= 1+src.Owner.passive_handler.Get("TeamHater")
-						if(src.Owner.HasPurity()||src.Purity)//If damager is pure
+					/*	if(src.Owner.HasPurity()||src.Purity)//If damager is pure
 							var/found=0//Assume you haven't found a proper target
 							if(src.Owner.HasHolyMod())//Holy things
 								if(a:IsEvil())//Kill evil things
 									found=1
 							if(!found)//If you don't find what you're supposed to hunt
-								goto SkipDamage
+								goto SkipDamage*/
 						var/list/specDmgTypes = buildSpecDmgTypes(SlayerMod)
 						if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 							EffectiveDamage *= 1.25
@@ -6855,7 +6855,7 @@ obj
 						if(src.Owner.Grab||a:Grab)
 							src.Owner.Grab_Release()
 							a:Grab_Release()
-						SkipDamage
+					//	SkipDamage
 						if(Snaring)
 							m.applySnare(Snaring, 'root.dmi')
 						if(PainShare)

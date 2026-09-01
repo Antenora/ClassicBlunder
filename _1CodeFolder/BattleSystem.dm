@@ -1161,6 +1161,7 @@ mob/proc/Leave_Body(var/SuperDead=0, var/ForceVoid=0)
 				A.TrulyDead=0
 			if(!ActuallyDead)
 				Log("Admin", "[ExtractInfo(src)] is voiding.")
+				Admin << "[ExtractInfo(src)] is voiding."
 			if(ForceVoid > 1)
 				Timer=Minute(ForceVoid)
 			else

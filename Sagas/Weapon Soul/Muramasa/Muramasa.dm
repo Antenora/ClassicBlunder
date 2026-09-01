@@ -12,11 +12,13 @@ obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades//Muramasa
 	Grimreaper_Endbringer
 		StyleActive="Grimreaper"
 		passives = list( "GoodResist" = 1)
-		StyleOff=1
-		StyleSpd=1
+		StyleOff=1.3
+		StyleSpd=1.2
+		StyleStr=1.1
 		adjust(mob/p)
-			StyleOff = 1.15 + (0.10 * p.SagaLevel)
-			StyleSpd = 1.10 + (0.10 * p.SagaLevel)
+			StyleOff = 1.3 + (0.2 * p.SagaLevel)
+			StyleSpd = 1.2 + (0.1 * p.SagaLevel)
+			StyleStr = 1.1 + (0.1 * p.SagaLevel)
 			passives["GoodResist"] = 1 + (0.25* p.SagaLevel)
 		verb/Grimreaper_Endbringer()
 			set hidden=1
@@ -27,7 +29,7 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa
 	name = "Heavenly Regalia: The Death"
 	StrMult=1.3
 	OffMult=1.3
-	DefMult=1.3
+	SpdMult=1.3
 	passives = list("Shearing" = 4, "Serrated" = 2, "CheapShot" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s deadly treasures ring in resonance: Heavenly Regalia!"
@@ -92,3 +94,41 @@ obj/Skills/Grapple/Executioner
 		set category="Skills"
 		adjust(usr)
 		src.Activate(usr)
+
+/obj/Skills/AutoHit/Masterful_Death
+	NeedsSword=1
+	Area="Arc"
+	Distance=7
+	StrScaling=1
+	DamageMult=1.15
+	RoundMovement=0
+	ComboMaster=1
+	Rounds=10
+	Cooldown=30
+	DarknessFlame = 1
+	Toxic = 20
+	Burning = 20
+	Icon='MasterSlash.dmi'
+	IconX=-16
+	IconY=-16
+	Size=1.5
+	HitSparkIcon='Slash - Zero.dmi'
+	HitSparkX=-32
+	HitSparkY=-32
+	HitSparkTurns=1
+	HitSparkSize=1
+	HitSparkDispersion=1
+	TurfStrike=1
+	EnergyCost=8
+	Instinct=1
+	ActiveMessage="strikes everything with an wave of inevitable, masterful death."
+	adjust(mob/p)
+		DamageMult = (4 + (p.SagaLevel/2)) * 0.1769
+		Size = 1.5 + p.SagaLevel
+		Toxic = 20 * p.SagaLevel
+		Burning = 20 * p.SagaLevel
+		Cooldown = 90 - (p.SagaLevel * 5)
+	verb/Masterful_Death()
+		set category="Skills"
+		adjust(usr)
+		usr.Activate(src)
