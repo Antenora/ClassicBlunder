@@ -135,14 +135,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 	Soul_Conviction
 		StyleActive="Soul Conviction"
 		passives = list("Crippling" = 5, "Chilling" = 5)
-		StyleEnd=1.25
-		StyleFor=1.25
-		StyleDef=1.25
+		StyleEnd=1.15
+		StyleFor=1.15
+		StyleDef=1.15
 		Finisher="/obj/Skills/Queue/Finisher/Geist_Destroyer"
 		adjust(mob/p)
-			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
-			StyleFor = 1.05 + (0.05 * p.SagaLevel)
-			StyleDef = 1.05 + (0.05 * p.SagaLevel)
+			StyleEnd = 1.15 + (0.15 * p.SagaLevel)
+			StyleFor = 1.15 + (0.15 * p.SagaLevel)
+			StyleDef = 1.15 + (0.15 * p.SagaLevel)
 			passives["Crippling"] = 5 + (5*p.SagaLevel)
 			passives["Chilling"] = 5 + (5*p.SagaLevel)
 		verb/Soul_Conviction()

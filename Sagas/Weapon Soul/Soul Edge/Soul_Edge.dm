@@ -158,8 +158,8 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
 		adjust(mob/p)
-			StyleStr = 1.05 + (0.05 * p.SagaLevel)
-			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
+			StyleStr = 1.15 + (0.15 * p.SagaLevel)
+			StyleEnd = 1.15 + (0.15 * p.SagaLevel)
 			passives["Shearing"] = 2+p.SagaLevel
 		verb/Stained_Memories()
 			set hidden=1

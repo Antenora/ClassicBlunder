@@ -27,7 +27,7 @@ mob/proc/gainWeaponSoul()
 		if("Caledfwlch")
 			new/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory(src)
 			src << "You feel the ability to invoke an almighty beam rise up, shooting through your veins with a cry of Excalibur!"
-			AddSkill(new/obj/Skills/Queue/Excalibur)
+			AddSkill(new/obj/Skills/Queue/Amplification)
 
 		if("Muramasa")
 			new/obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades(src)
@@ -157,7 +157,8 @@ mob/tierUpSaga(Path)
 						var/Mode=alert(src, "What is the path to kingship?", "Caledfwlch", "Sacrifice", "Legacy")
 						if(Mode == "Sacrifice")
 							src.contents += new/mob/Players/verb/Excalignment
-							AddSkill(new/obj/Skills/AutoHit/True_Excalibur)
+							AddSkill(new/obj/Skills/AutoHit/Divine_Light)
+							AddSkill(new/obj/Skills/Projectile/Beams/Excalibur)
 							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory/excalibur in contents)
 								excalibur.caledLight = TRUE
 								excalibur.Element = "Light"
@@ -165,9 +166,10 @@ mob/tierUpSaga(Path)
 							src << "You stand tall beneath the sun as a righteous king."
 						else
 							src.contents += new/mob/Players/verb/Excalignment
-							DeleteSkill(new/obj/Skills/Queue/Excalibur)
-							AddSkill(new/obj/Skills/AutoHit/False_Excalibur)
-							AddSkill(new/obj/Skills/Queue/ExcaliburMorgan)
+							DeleteSkill(new/obj/Skills/Queue/Amplification)
+							AddSkill(new/obj/Skills/AutoHit/Horrific_Darkness)
+							AddSkill(new/obj/Skills/Queue/Obliteration)
+							AddSkill(new/obj/Skills/Projectile/Beams/Excalibur_Morgan)
 							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Glory/excalibur in contents)
 								excalibur.caledLight = FALSE
 								excalibur.Element = "Dark"

@@ -85,12 +85,12 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 	Saintlike_Behavior
 		StyleActive="Saintlike Behavior"
 		passives = list("HolyMod" = 1)
-		StyleStr=1.25
-		StyleEnd=1.25
+		StyleDef=1.25
+		StyleSpd=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Heavenly_Judgement"
 		adjust(mob/p)
-			StyleStr = 1.05 + (0.05 * p.SagaLevel)
-			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
+			StyleDef = 1.15 + (0.15 * p.SagaLevel)
+			StyleSpd = 1.15 + (0.15 * p.SagaLevel)
 			passives["HolyMod"] = 1 + (p.SagaLevel)
 		verb/Saintlike_Behavior()
 			set hidden=1

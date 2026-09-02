@@ -123,8 +123,8 @@ obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment
 		if(altered) return
 		passives = list("HolyMod" = 1, "Rage" = 1)
 		StrMult = 1.15 + (p.SagaLevel/30)
-		ForMult = 1.15 + (p.SagaLevel/30)
 		OffMult = 1.15 + (p.SagaLevel/30)
+		EndMult = 1.15 + (p.SagaLevel/30)
 		PowerMult = 1.05 + (p.SagaLevel/30)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
@@ -144,8 +144,8 @@ obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment
 		if(altered) return
 		passives = list("Flicker" = 1 + round(p.SagaLevel/3,1), "Pursuer" = 1 + round(p.SagaLevel/3,1), "HolyMod" = 2, "Rage" = 2)
 		StrMult = 1.2 + (p.SagaLevel/25)
-		ForMult = 1.2 + (p.SagaLevel/25)
 		OffMult = 1.2 + (p.SagaLevel/25)
+		EndMult = 1.2 + (p.SagaLevel/25)
 		PowerMult = 1.075 + (p.SagaLevel/25)
 	Trigger(mob/User, Override=FALSE)
 		adjust(User)
@@ -164,8 +164,8 @@ obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment
 		if(altered) return
 		passives = list("Powerhouse" = 1 + (p.SagaLevel/3), "Flicker" = 1 + round(p.SagaLevel/2,1), "Pursuer" = 1 + round(p.SagaLevel/2,1), "HolyMod" = 3, "Rage" = 3)
 		StrMult = 1.25 + (p.SagaLevel/20)
-		ForMult = 1.25 + (p.SagaLevel/20)
 		OffMult = 1.25 + (p.SagaLevel/20)
+		EndMult = 1.25 + (p.SagaLevel/20)
 		PowerMult = 1.1 + (p.SagaLevel/20)
 		EnergyHeal = 0.005 * p.SagaLevel
 	Trigger(mob/User, Override=FALSE)
@@ -185,9 +185,9 @@ obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment
 	adjust(mob/p)
 		if(altered) return
 		passives = list("Powerhouse" = 2 + (p.SagaLevel/2), "Flicker" = 1 + p.SagaLevel, "Pursuer" = 1 + p.SagaLevel, "HolyMod" = 4, "Rage" = 4)
-		StrMult = 1.25 + (p.SagaLevel/10)
-		ForMult = 1.25 + (p.SagaLevel/10)
-		OffMult = 1.25 + (p.SagaLevel/10)
+		StrMult = 1.3 + (p.SagaLevel/10)
+		OffMult = 1.3 + (p.SagaLevel/10)
+		EndMult = 1.3 + (p.SagaLevel/10)
 		PowerMult = 1.15 + (p.SagaLevel/10)
 		EnergyHeal = 0.01 * p.SagaLevel
 	Trigger(mob/User, Override=FALSE)

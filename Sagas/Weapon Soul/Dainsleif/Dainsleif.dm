@@ -192,12 +192,12 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
 	Might_of_Dainn
 		StyleActive="Might of Dáinn"
 		passives = list()
-		StyleOff=1
-		StyleStr=1.30
+		StyleOff=1.2
+		StyleStr=1.1
 		Finisher="/obj/Skills/Queue/Finisher/Wrath_of_Hogni"
 		adjust(mob/p)
-			StyleStr = 1.10 + (0.05 * p.SagaLevel)
-			StyleOff = 1 + (0.05 * p.SagaLevel)
+			StyleStr = 1.1 + (0.1 * p.SagaLevel)
+			StyleOff = 1.2 + (0.1 * p.SagaLevel)
 		verb/Might_of_Dainn()
 			set hidden=1
 			adjust(usr)

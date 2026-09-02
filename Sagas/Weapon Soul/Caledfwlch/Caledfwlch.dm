@@ -25,29 +25,62 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch
 		src.Trigger(usr)
 
 obj/Skills/Projectile/Beams/Excalibur
-	DamageMult=0.35
-	ChargeRate=0.2
+	SagaSignature=1
+	DamageMult=3
+	StrScaling=1
 	Dodgeable=0
 	Copyable=0
 	Deflectable=0
 	Distance=100
-	IconLock='BeamGG.dmi'
-	Cooldown=45
-	EnergyCost=17
-	Instinct=1
-	MenuIcon="FinalCrash"
+	Knockback=1
 	BeamTime=10
-	Piercing=1
+	MenuIcon="Excalibur"
+	IconLock='BeamBig3.dmi'
+	IconSize=2
+	Cooldown=30
+	EnergyCost=24
+	Instinct=1
+	MenuIcon="Excalibur"
 	HeldSkill=TRUE
 	HeldBeam=TRUE
 	HeldBeamUncapped=TRUE
-	ChargePeriod=5
+	BypassTempHP=1
+	ChargePeriod=3
 	CritEffectiveness=0
+	ChargeMessage="says: Ex..."
+	ActiveMessage="says: CALIBUR!!!"
+	ABuffNeeded="Soul Resonance"
 	verb/Excalibur_Beam()
 		set category="Skills"
-			usr.BeginHeldSkill(src)
+		usr.BeginHeldSkill(src)
 
-obj/Skills/Queue/Excalibur
+obj/Skills/Projectile/Beams/Excalibur_Morgan
+	SagaSignature=1
+	DamageMult=3
+	StrScaling=1
+	Dodgeable=0
+	Copyable=0
+	Deflectable=0
+	Distance=100
+	Knockback=1
+	BeamTime=10
+	MenuIcon="ExcaliburMorgan"
+	IconLock='BeamBig3D.dmi'
+	IconSize=2
+	Cooldown=10
+	EnergyCost=24
+	HeldSkill=TRUE
+	HeldBeam=TRUE
+	HeldBeamUncapped=TRUE
+	ChargePeriod=1
+	ChargeMessage="says: Ex..."
+	ActiveMessage="says: CALIBUR!!!"
+	ABuffNeeded="Soul Resonance"
+	verb/Excalibur_Morgan_Beam()
+		set category="Skills"
+		usr.BeginHeldSkill(src)
+
+obj/Skills/Queue/Amplification
 	SagaSignature=1
 	ActiveMessage="gathers holy energy within her blade..."
 	HitMessage="unleashes the holy energy with a swing of her blade!"
@@ -64,10 +97,10 @@ obj/Skills/Queue/Excalibur
 	Projectile="/obj/Skills/Projectile/ExcaliburProjectile"
 	Delayer=0.25//add 1 damage mult every second that this is queued but hasnt been punched yet
 	Warp=0
-	Cooldown=8 // This is probably a 60 second c/d move on a 30 second c/d.
+	Cooldown=8
 	EnergyCost=2
 	IconLock='ExcaliTrail.dmi'
-	verb/Excalibur()
+	verb/Amplification()
 		set category="Skills"
 		usr.SetQueue(src)
 
@@ -98,7 +131,8 @@ obj/Skills/Projectile/ExcaliburProjectile
 	LockY=-46
 	LockX=-32
 
-obj/Skills/AutoHit/True_Excalibur
+obj/Skills/AutoHit/Divine_Light
+	SagaSignature=1
 	NeedsSword=1
 	ABuffNeeded="Soul Resonance"
 	EnergyCost=5
@@ -143,11 +177,12 @@ obj/Skills/AutoHit/True_Excalibur
 	GuardBreak=1//Can't be dodged or blocked
 	WindupMessage="raises their blade overhead as holy energy takes shape around them..."
 	ActiveMessage="releases a holy slash that mows the area before them in a wave of light!"
-	verb/True_Excalibur()
+	verb/Divine_Light()
+		set name="Divine Light"
 		set category="Skills"
 		usr.Activate(src)
 
-obj/Skills/Queue/ExcaliburMorgan
+obj/Skills/Queue/Obliteration
 	SagaSignature=1
 	ActiveMessage="forces corrupted miasma through her blade..."
 	HitMessage="unleashes the corrupted miasma with a swing of her blade!"
@@ -167,8 +202,8 @@ obj/Skills/Queue/ExcaliburMorgan
 	Cooldown=30
 	EnergyCost=10
 	IconLock='ExcaliTrail.dmi'
-	verb/ExcaliburMorgan()
-		set name="Excalibur Morgan"
+	verb/Obliteration()
+		set name="Obliteration"
 		set category="Skills"
 		usr.SetQueue(src)
 
@@ -199,7 +234,8 @@ obj/Skills/Projectile/ExcaliburMProjectile
 	LockY=-46
 	LockX=-32
 
-obj/Skills/AutoHit/False_Excalibur
+obj/Skills/AutoHit/Horrific_Darkness
+	SagaSignature=1
 	NeedsSword=1
 	ABuffNeeded="Soul Resonance"
 	EnergyCost=35
@@ -244,7 +280,8 @@ obj/Skills/AutoHit/False_Excalibur
 	GuardBreak=1//Can't be dodged or blocked
 	WindupMessage="raises their blade overhead as corrupted miasma heeds their call..."
 	ActiveMessage="releases an unholy strike that mows the area before them in a torrent of darkness!"
-	verb/False_Excalibur()
+	verb/Horrific_Darkness()
+		set name="Horrific Darkness"
 		set category="Skills"
 		usr.Activate(src)
 
@@ -329,8 +366,8 @@ obj/Skills/AutoHit/False_Excalibur
 		StyleStr=1.25
 		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
 		adjust(mob/p)
-			StyleStr = 1.05 + (0.05 * p.SagaLevel)
-			StyleEnd = 1.05 + (0.05 * p.SagaLevel)
+			StyleStr = 1.15 + (0.15 * p.SagaLevel)
+			StyleEnd = 1.15 + (0.15 * p.SagaLevel)
 			passives["Harden"] = 0.25*p.SagaLevel
 		verb/Knight_Of_Camelot()
 			set hidden=1
@@ -339,7 +376,7 @@ obj/Skills/AutoHit/False_Excalibur
 
 /obj/Skills/Queue/Finisher
 	Right_To_Rule
-		DamageMult=8
+		DamageMult=18
 		HitSparkIcon='Slash - Zan.dmi'
 		HitSparkX=-32
 		HitSparkY=-32
@@ -368,10 +405,12 @@ obj/Skills/AutoHit/False_Excalibur
 				return
 			if(excalibur.caledLight == TRUE)
 				if(alert("Are you finally tired of endlessly serving others? Are you ready to fight for only yourself?"))
-					DeleteSkill(new/obj/Skills/AutoHit/True_Excalibur)
-					DeleteSkill(new/obj/Skills/Queue/Excalibur)
-					AddSkill(new/obj/Skills/AutoHit/False_Excalibur)
-					AddSkill(new/obj/Skills/Queue/ExcaliburMorgan)
+					DeleteSkill(new/obj/Skills/AutoHit/Divine_Light)
+					DeleteSkill(new/obj/Skills/Queue/Amplification)
+					DeleteSkill(new/obj/Skills/Projectile/Beams/Excalibur)
+					AddSkill(new/obj/Skills/AutoHit/Horrific_Darkness)
+					AddSkill(new/obj/Skills/Queue/Obliteration)
+					DeleteSkill(new/obj/Skills/Projectile/Beams/Excalibur_Morgan)
 					excalibur.caledLight = FALSE
 					excalibur.Element = "Dark"
 					excalibur.caledFinal = TRUE
@@ -380,10 +419,12 @@ obj/Skills/AutoHit/False_Excalibur
 					return
 			else if(excalibur.caledLight == FALSE)
 				if(alert("Don't you hear their cries and see their tears? Won't you fight for their salvation?"))
-					DeleteSkill(new/obj/Skills/AutoHit/False_Excalibur)
-					DeleteSkill(new/obj/Skills/Queue/ExcaliburMorgan)
-					AddSkill(new/obj/Skills/AutoHit/True_Excalibur)
-					AddSkill(new/obj/Skills/Queue/Excalibur)
+					DeleteSkill(new/obj/Skills/AutoHit/Horrific_Darkness)
+					DeleteSkill(new/obj/Skills/Queue/Obliteration)
+					DeleteSkill(new/obj/Skills/Projectile/Beams/Excalibur_Morgan)
+					AddSkill(new/obj/Skills/AutoHit/Divine_Light)
+					AddSkill(new/obj/Skills/Queue/Amplification)
+					AddSkill(new/obj/Skills/Projectile/Beams/Excalibur)
 					excalibur.caledLight = TRUE
 					excalibur.Element = "Light"
 					excalibur.caledFinal = TRUE
