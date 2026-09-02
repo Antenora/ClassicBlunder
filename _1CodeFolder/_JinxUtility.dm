@@ -2762,7 +2762,10 @@ mob
 			//basics come from addMissingSkills; Ki Control still needs its first-use setup
 			if(locate(/obj/Skills/Power_Control, src) && !locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, src))
 				src.PoweredFormSetup()
-
+			if(src.isRace(SAIYAN))
+				if(src.Potential>=src.SaiyanFormUnlock["SSJ1"] && src.transUnlocked<1)
+					src.transUnlocked=1
+					src<<"You have unlocked the first Super Saiyan form!"
 			if(!src.SignatureCheck)
 				return
 			if(src.Saga)

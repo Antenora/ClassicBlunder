@@ -6,7 +6,7 @@
 	var/Looking = 1
 	var/Controlled = TRUE // if we ever want 'uncontrolled oozaru'
 	BuffName = "Great Ape"
-	IconTransform = 'Oozonew.dmi'
+	IconTransform = 'DBR Oozaru.dmi'
 	Enlarge = 1.5
 	TransformX = -32
 	TransformY = -32
@@ -17,7 +17,6 @@
 	SpdMult = 0.3
 	EndMult = 1.2
 	DefMult = 0.1
-	PowerMult=1.5
 	HealthThreshold=0.01
 	AngerFloor = 60
 	TimerLimit = 360
@@ -50,7 +49,7 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
-		passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2)
+		passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2, "SaiyanPower1"=0.5)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired
@@ -75,8 +74,8 @@
 			if("Demonic")
 				if(!altered)
 					IconTransform = 'DTRed.dmi'
-				TransformX = 0
-				TransformY = 0
+					TransformX = 0
+					TransformY = 0
 				StrMult = 1.35
 				ForMult = 1.35
 				OffMult = 1.5
@@ -92,17 +91,26 @@
 						SS1pot=5
 					passives["Transformation Power"] = SS1pot //MATH COMES LATER
 					VaizardHealth =25
+		switch(p.SaiyanFocus)
+			if("Power")
+				passives["SaiyanPower1"] = 1.5
+				VaizardHealth =50
+			if("Control")
+				passives["SaiyanPower1"] = 0.75
+				DefMult=0.5
+				passives["NoDodge"] = 0
 		if(p.Potential > OOZARU_POTENTIAL_TRANS&&p.oozaru_type!="Demonic")
 			passives["Transformation Power"] = p.AscensionsAcquired
 		if(length(p.race.transformations) >= 4 && p.race.transformations[4].type == /transformation/saiyan/super_saiyan_4 && p.Potential>=55||length(p.race.transformations) >= 2 && p.race.transformations[2].type == /transformation/saiyan/hellspawn_super_saiyan_2 && p.Potential>=55)
 			if(!altered)
-				IconTransform = 'SSJOozaru.dmi'
+				IconTransform = 'DBR Golden Oozaru.dmi'
 			passives["Transformation Power"] = clamp(p.AscensionsAcquired * 6, 1, 40)
 			passives["Juggernaut"] = 1 + (p.AscensionsAcquired / 2)
 			passives["DisableGodKi"] = 1
 			passives["Unstoppable"] = 1
 			passives["PUSpike"] = 50
 			passives["KiControl"] = 1
+			passives["SaiyanPower1"] = 2.5
 			AngerFloor = 0
 			VaizardShatter=0
 			StrMult = 1.5
@@ -113,7 +121,6 @@
 			EnergyHeal = 1
 			TimerLimit = 2400
 			VaizardHealth = 10 + (p.AscensionsAcquired*5)
-			PowerMult = 1.6
 			if(p.oozaru_type=="Demonic")
 				PowerMult=2.5
 				SpdMult=1

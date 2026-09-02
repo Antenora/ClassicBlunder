@@ -15,7 +15,7 @@ transformation
 			strengthadd = 0.25
 			forceadd = 0.25
 			mastery_boons(mob/user)
-				if(user.HeroicNum>=2)
+				if(user.HeroicNum>=1)
 					passives = list("Ultimate" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
@@ -36,7 +36,7 @@ transformation
 			form_aura_icon_state = "SSJ2"
 			form_aura_x = -32
 			form_icon_2_icon = 'SS2Sparks.dmi'
-			pot_trans = 5
+			pot_trans = 10
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -81,7 +81,7 @@ transformation
 			form_icon_2_icon = 'SS3Sparks.dmi'
 			form_hair_icon = 'Hair_SSj3.dmi'
 			form_icon_1_icon = 'Hair_SSj3.dmi'
-			pot_trans = 10
+			pot_trans = 15
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -125,7 +125,7 @@ transformation
 						animate(user, color = user.MobColor, time=30)
 					sleep(2)
 		super_saiyan_4
-			pot_trans = 10
+			pot_trans = 20
 			speedadd = 0.25
 			enduranceadd = 0.25
 			offenseadd = 0.25
@@ -168,7 +168,7 @@ transformation
 				user.Tail(1)
 		super_full_power_saiyan_4_limit_breaker
 			unlock_potential = 100
-			pot_trans = 15
+			pot_trans = 20
 			angerFloor = 60
 			speedadd = 0.25
 			enduranceadd = 0.25
