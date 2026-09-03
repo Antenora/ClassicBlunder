@@ -838,6 +838,7 @@
 #include "Sagas\PotHRebirth\RebirthFinalSkills.dm"
 #include "Sagas\PotHRebirth\RebirthSkills.dm"
 #include "Sagas\PotHRebirth\RebirthTier.dm"
+#include "Sagas\PotHRebirth\RoaringSkills.dm"
 #include "Sagas\Rinnegan\msDebuffs.dm"
 #include "Sagas\Rinnegan\rinneganBuff.dm"
 #include "Sagas\Rinnegan\rinneganSkills.dm"

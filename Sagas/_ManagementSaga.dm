@@ -965,12 +965,13 @@ mob
 										src<<"You can also attempt to heal people, but the keyword is attempt."
 									if(src.RebirthHeroType=="Rainbow")
 										src.RebirthHeroType="Prismatic"
-										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One."
+										src<<"You are now the Prismatic Hero of Dreams, ready to show the world your flame."
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
+										src.AddSkill(new/obj/Skills/Projectile/Royal_Flames)
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
@@ -1067,7 +1068,7 @@ mob
 							if(src.RebirthHeroType=="Prismatic")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "Your happy ending... Your hopes, your dreams..."
-								src<< "It's not just those you're carrying on your back, are they?"
+								src<< "You know what you carry onwards. Make the future your own."
 								src<< "You can access your Hyperdeath State earlier!"
 								src.HyperdeathThreshold=25
 						if(6)

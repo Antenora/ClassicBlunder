@@ -1688,6 +1688,9 @@ NEW VARIABLES
 			EnergyExpenditure=1.5
 			passives = list("EnergyLeak" = 1, "PowerStressed" = 1, "PureDamage" = 1)
 			AuraLock=1
+			IconLock='Electricity SSJ2 -1.dmi'
+			LockX=0
+			LockY=0
 			TimerLimit=30
 			FlashChange=1
 			StrMult=1.4
@@ -1708,6 +1711,7 @@ NEW VARIABLES
 				var/boost = p.passive_handler.Get("PowerStressMastery")
 				TimerLimit=30+(boost*5)
 				if(p.isRace(CHANGELING)) // TODO: MAKE IT SO THIS ONLY ACTIVATES ON THE FINAL/FOURTH FORM
+					IconLock= null
 					ActiveMessage="achieves their long-awaited 100% Full Power!"
 					passives = list("EnergyLeak" = 1.5-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 2+(boost/2), "PureReduction" = 2+(boost/2))
 					StrMult=1.2 + (boost*0.05)
@@ -1717,6 +1721,7 @@ NEW VARIABLES
 					DefMult=0.8 + (boost*0.05)
 					SpdMult=0.7 + (boost*0.05)
 				else// nothing extra
+					IconLock='Electricity SSJ2 -1.dmi'
 					ActiveMessage="stresses their power to the utmost!"
 					passives = list("EnergyLeak" = 1-(boost*0.1), "PowerStressed" = 1, "PureDamage" = 1+(boost/2))
 					StrMult=1.4 + (boost*0.05)
@@ -1726,13 +1731,40 @@ NEW VARIABLES
 					DefMult=0.8 + (boost*0.05)
 					SpdMult=0.7 + (boost*0.05)
 			verb/Power_Stressed()
-				set category="Skills"
 				set hidden = 1
 				if(usr.ExpandBase)
 					IconReplace=1
 					icon=usr.ExpandBase
 				adjust(usr)
 				src.Trigger(usr)
+			verb/Customize_Power_Stressed()
+				set category="Utility"
+				var/Choice
+				if(!usr.BuffOn(src))
+					var/list/options = list("Enlarge","Effects (Iconlock)")
+					switch(input("Which aspect of Power Stressing would you like to modify?") in options)
+						if("Enlarge") Choice=1
+						if("Effects (Iconlock)") Choice=2
+					switch(Choice)
+						if(1)
+							var/W=input(usr, "Pick an Enlarge width to use. (Default is 1.2, minimum 1.0 which is none.)", "Enlarge Width", 1.2) as num
+							W = min(max(W, 1.0), 3.0)
+							ProportionShift=matrix(W, 0, 0, 0, 1, 0)
+						if(2)
+							switch(alert(usr, "Do you want Power Stressing to have a visible effect (like sparks)?", "PS Icon", "No", "Yes", "Use Default"))
+								if("No")
+									IconLock = null
+								if("Yes")
+									IconLock=input(usr, "Which effect?", "PS Effect Icon") as icon|null
+									LockX=input(usr, "Pixel X offset.", "PS Effect Icon") as num
+									LockY=input(usr, "Pixel Y offset.", "PS Effect Icon") as num
+								if("Use Default")
+									IconLock='Electricity SSJ2 -1.dmi'
+									LockX=0
+									LockY=0
+				else
+					src << "You can't modify your PS state while in it."
+
 		The_Unbreakable_Fist
 			SignatureTechnique=3
 			Mastery=1
