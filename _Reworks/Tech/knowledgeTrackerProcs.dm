@@ -9,10 +9,6 @@
 
 /mob/proc/addUnlockedTech(n, ty)
     switch(ty)
-        if("Magic")
-            if(n in knowledgeTracker.learnedMagic)
-                return
-            knowledgeTracker.learnedMagic += n
         if("Technology")
             if(n in knowledgeTracker.learnedKnowledge)
                 return
@@ -20,9 +16,6 @@
 
 /mob/proc/removeUnlockedTech(n, ty)
     switch(ty)
-        if("Magic")
-            if(n in knowledgeTracker.learnedMagic)
-                knowledgeTracker.learnedMagic -= n
         if("Technology")
             if(n in knowledgeTracker.learnedKnowledge)
                 knowledgeTracker.learnedKnowledge -= n

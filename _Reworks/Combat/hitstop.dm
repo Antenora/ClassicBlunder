@@ -55,6 +55,7 @@ atom/movable/var/tmp/_smo_acc = 0
 		mult = 3
 		until = 0
 		mob/exempt
+		proj_only = 0
 
 /datum/slowmo_zone/proc/Pos()
 	if(center && center.loc)
@@ -74,7 +75,7 @@ proc/SlowMoCovered(turf/T)
 		return S
 	return null
 
-proc/SlowMoZone(atom/center, radius = 7, mult = 3, ds = 12, mob/exempt)
+proc/SlowMoZone(atom/center, radius = 7, mult = 3, ds = 12, mob/exempt, proj_only = 0)
 	if(!center || !glob || !glob.SLOWMO) return null
 	if(_slowmo_zones.len >= glob.SLOWMO_MAX_ZONES)
 		SlowMoPrune()
@@ -85,6 +86,7 @@ proc/SlowMoZone(atom/center, radius = 7, mult = 3, ds = 12, mob/exempt)
 	S.mult = max(mult, 1)
 	S.until = world.time + ds
 	S.exempt = exempt
+	S.proj_only = proj_only
 	S.Pos()
 	_slowmo_zones += S
 	_slowmo_n = _slowmo_zones.len
@@ -115,6 +117,10 @@ proc/SlowMoDelayMult(atom/A)
 			stale = 1
 			continue
 		if(actor && S.exempt == actor)
+			continue
+		if(S.proj_only && ismob(A))
+			continue
+		if(actor && S.exempt && S.exempt.inParty(actor.ckey))
 			continue
 		S.Pos()
 		if(T.z != S.cz) continue

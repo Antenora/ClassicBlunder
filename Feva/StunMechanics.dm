@@ -13,6 +13,8 @@ proc
 			return
 		if(m.passive_handler.Get("Trample") && m.is_dashing)
 			return
+		if(!ignoreImmune && m.TryDisableBreak("stun"))
+			return
 		if(m.CheckSlotless("Great Ape"))
 			amount *= 0.75
 		if(m.passive_handler.Get("Juggernaut"))

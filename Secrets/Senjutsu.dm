@@ -3,7 +3,7 @@ var/senjutsuOverloadAlert = FALSE
 /mob/proc/diedFromSenjutsuOverload()
     if(Secret == "Senjutsu" && (CheckSlotless("Senjutsu Focus") || CheckSlotless("Sage Mode")))
         if(icon_state == "Meditate") return
-        var/maxMana = ((ManaMax) * GetManaCapMult())
+        var/maxMana = ((ManaMax) * GetManaCapMult()) + MageManaBonus()
         if(ManaAmount > maxMana)
             if(senjutsuOverloadAlert == FALSE)
                 senjutsuOverloadAlert = TRUE

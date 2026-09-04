@@ -4,7 +4,6 @@
 		if(ElementalOffense) l |= ElementalOffense;
 		if(Infusion && InfusionElement) l |= InfusionElement;
 		if(StyleBuff && StyleBuff.ElementalOffense) l |= StyleBuff.ElementalOffense;
-		if(Class=="Reaper") l += "Death";
 		return l;
 	getElementalDefense()
 		var/list/l = list();
@@ -26,18 +25,10 @@ proc
 	ElementalCheck(var/mob/Attacker, var/mob/Defender, var/ForcedDebuff=0, var/DebuffIntensity=glob.DEBUFF_INTENSITY, list/bonusElements,damageOnly = FALSE, list/onlyTheseElements)
 		var/list/attackElements = list()
 		var/list/defenseElements = list()
-		var/list/forcedDebuffs = list("Scorching", "Freezing", "Shattering", "Paralyzing", "Toxic", "Bloodletting")
-		var/burningBonus = max(0, Attacker.passive_handler.Get("Burning"))
-		var/scorchingBonus = max(0, Attacker.passive_handler.Get("Scorching"))
-		var/chillingBonus = max(0, Attacker.passive_handler.Get("Chilling"))
-		var/freezingBonus = max(0, Attacker.passive_handler.Get("Freezing"))
-		var/crushingBonus = max(0, Attacker.passive_handler.Get("Crushing"))
-		var/shatteringBonus = max(0, Attacker.passive_handler.Get("Shattering"))
-		var/shockingBonus = max(0, Attacker.passive_handler.Get("Shocking"))
-		var/paralyzingBonus = max(0, Attacker.passive_handler.Get("Paralyzing"))
-		var/poisoningBonus = max(0, Attacker.passive_handler.Get("Poisoning"))
-		var/toxicBonus = max(0, Attacker.passive_handler.Get("Toxic"))
-		var/bloodlettingBonus = max(0, Attacker.passive_handler.Get("Bloodletting"))
+		var/list/forcedDebuffs = list("Scorching", "Freezing", "Shattering", "Paralyzing", "Soaking", "Shredding", "Toxic", "Bloodletting")
+		var/list/bonus = list()
+		for(var/debuff in debuffVars)
+			bonus[debuff] = max(0, Attacker.passive_handler.Get("[debuff]"))
 		attackElements = Attacker.getElementalOffense()
 		for(var/debuff in debuffVars)
 			if(Attacker.passive_handler.Get("[debuff]"))
@@ -54,16 +45,16 @@ proc
 		var/obj/Items/Sword/sord2 = Attacker.EquippedSecondSword()
 		var/obj/Items/Sword/sord3 = Attacker.EquippedThirdSword()
 
-		if(staf && staf.Element)
+		if(staf && IsChartElement(staf.Element))
 			attackElements |= staf.Element
 			DebuffIntensity /= glob.ITEM_DEBUFF_APPLY_NERF
-		if(sord && sord.Element)
+		if(sord && IsChartElement(sord.Element))
 			attackElements |= sord.Element
-			DebuffIntensity /= glob.ITEM_DEBUFF_APPLY_NERF // 4
-		if(sord2)
+			DebuffIntensity /= glob.ITEM_DEBUFF_APPLY_NERF
+		if(sord2 && IsChartElement(sord2.Element))
 			attackElements |= sord2.Element
 			DebuffIntensity /= glob.ITEM_DEBUFF_APPLY_NERF * 1.25
-		if(sord3)
+		if(sord3 && IsChartElement(sord3.Element))
 			attackElements |= sord3.Element
 			DebuffIntensity /= glob.ITEM_DEBUFF_APPLY_NERF * 1.5
 
@@ -73,14 +64,18 @@ proc
 		if(armr && armr.Element)
 			defenseElements |= armr.Element
 
-		if(attackElements["Ultima"]||attackElements["Death"])
-			ForcedDebuff+=1
-		if(Attacker.passive_handler.Get("Forever After"))
-			attackElements |= "Love"
+		if(Attacker.passive_handler["Amplify"])
+			DebuffIntensity += Attacker.passive_handler["Amplify"] * glob.AMPLIFY_MODIFIER
+		if(Attacker.UsingHotnCold())
+			DebuffIntensity += abs(Attacker.StyleBuff?:hotCold)/glob.HOTNCOLD_DEBUFF_DIVISOR
 		var/DamageMod=0
+		if(Defender.Drenched > 0 && (("Lightning" in attackElements) || ("Ice" in attackElements)))
+			DamageMod += glob.DRENCHED_AMP * (Defender.Drenched / 100)
 		for(var/element in attackElements)
-			var/DebuffRate=GetDebuffRate(element, defenseElements, ForcedDebuff)
-			var/CelestialDebuffRate=1
+			if(!element) continue
+			DamageMod += ElementMatchupMod(element, defenseElements)
+			if(damageOnly) continue
+			var/DebuffRate = ForcedDebuff ? 100 : ElementProcRate(element, defenseElements)
 			if(Attacker.SenseUnlocked>5&&Attacker.SenseUnlocked>Attacker.SenseRobbed)
 				DebuffRate+=10*(Attacker.SenseUnlocked-5)
 			if(Attacker != Defender)
@@ -89,266 +84,61 @@ proc
 				DebuffRate -= Defender.GetDef(glob.DEF_DEBUFF_PROC_RESIST_RATE)
 			if(DebuffRate<0)
 				DebuffRate=0
-
-			if(Attacker.passive_handler["Amplify"])
-				DebuffIntensity += Attacker.passive_handler["Amplify"] * glob.AMPLIFY_MODIFIER
-			if(Attacker.UsingHotnCold())
-				DebuffIntensity += abs(Attacker.StyleBuff?:hotCold)/glob.HOTNCOLD_DEBUFF_DIVISOR
+			if(!prob(DebuffRate)) continue
 			switch(element)
-				if("Truth")
-					DamageMod+=2
-					if("HellFire" in defenseElements)
-						DamageMod-=1
-					if("Felfire" in defenseElements)
-						DamageMod-=1
-				if("Ultima")
-					DamageMod+=2
-				if("Death")
-					if(Attacker.passive_handler.Get("Aspect of Death"))
-						DamageMod+=3
-				if("Love")
-					DamageMod+=3
-				if("Mirror")
-					DamageMod+=2
-				if("Chaos")
-					DamageMod+=2
-				if("Void")
-					DamageMod+=2
-				if("Felfire")
-					if("Truth" in defenseElements)
-						DamageMod-=1
-					if("Water" in defenseElements)
-						DamageMod += 1.5
-					if("Wind" in defenseElements)
-						DamageMod += 2
-				if("HellFire")
-					DamageMod+=2
-					if("Truth" in defenseElements)
-						DamageMod-=1
-					if("Fire" in defenseElements) // simply consume lesser fire
-						DamageMod+=1
-					if("Wind" in defenseElements)
-						DamageMod+=1
-					if("Water" in defenseElements)
-						DamageMod-=2//Reduced damage
 				if("Fire")
-					if("Water" in defenseElements)
-						DamageMod-=1//Reduced damage
-					if("Wind" in defenseElements)
-						DamageMod+=1//Increased damage mod
+					if(!Defender.DemonicPower())
+						Defender.AddBurn((4*DebuffIntensity*glob.BURN_INTENSITY) + bonus["Burning"] + bonus["Scorching"], Attacker)
 				if("Water")
-					if("Fire" in defenseElements)
-						DamageMod+=1
-					if("Earth" in defenseElements)
-						DamageMod-=1
-				if("Earth")
-					if("Water" in defenseElements)
-						DamageMod+=1
-					if("Wind" in defenseElements)
-						DamageMod-=1
+					Defender.AddDrenched((4*DebuffIntensity*glob.DRENCHED_INTENSITY) + bonus["Drenching"] + bonus["Soaking"], Attacker)
+				if("Ice")
+					Defender.AddSlow((4*DebuffIntensity*glob.SLOW_INTENSITY) + bonus["Chilling"] + bonus["Freezing"], Attacker)
 				if("Wind")
-					if("Fire" in defenseElements)
-						DamageMod-=1
-					if("Earth" in defenseElements)
-						DamageMod+=1
-			if(!damageOnly&&prob(DebuffRate))
-				switch(element)
-					if("HellFire")
-						Defender.AddPoison(2*DebuffIntensity*glob.POISON_INTENSITY*CelestialDebuffRate, Attacker)
-						Defender.AddBurn(3*DebuffIntensity*glob.BURN_INTENSITY*CelestialDebuffRate, Attacker)
-						Defender.AddShearing(4*DebuffIntensity*CelestialDebuffRate, Attacker)
-					if("Felfire")
-						Defender.AddBurn(2*DebuffIntensity*glob.BURN_INTENSITY, Attacker)
-						Defender.AddShatter(2*DebuffIntensity*glob.SHATTER_INTENSITY, Attacker)
-					if("Truth")
-						var/whoa = prob(50)
-						if(whoa)
-							Defender.AddBurn(2*DebuffIntensity*glob.BURN_INTENSITY, Attacker)
-							Defender.AddPoison(2*DebuffIntensity*glob.POISON_INTENSITY, Attacker)
-						else
-							Defender.AddSlow(3*DebuffIntensity*glob.SLOW_INTENSITY, Attacker)
-							Defender.AddShatter(3*DebuffIntensity*glob.SHATTER_INTENSITY, Attacker)
-							Defender.AddShock(3*DebuffIntensity*glob.SHOCK_INTENSITY, Attacker)
-
-					if("Chaos")
-						if(prob(glob.CHAOS_CHANCE))
-							Defender.AddBurn(2*DebuffIntensity*glob.BURN_INTENSITY, Attacker)
-						if(prob(glob.CHAOS_CHANCE))
-							Defender.AddSlow(2*DebuffIntensity*glob.SLOW_INTENSITY, Attacker)
-						if(prob(glob.CHAOS_CHANCE))
-							Defender.AddShatter(2*DebuffIntensity*glob.SHATTER_INTENSITY, Attacker)
-						if(prob(glob.CHAOS_CHANCE))
-							Defender.AddShock(2*DebuffIntensity*glob.SHOCK_INTENSITY, Attacker)
-						if(prob(glob.CHAOS_CHANCE))
-							Defender.AddPoison(2*DebuffIntensity*glob.POISON_INTENSITY, Attacker)
-					if("Ultima")
-						Defender.AddBurn(2*DebuffIntensity*glob.BURN_INTENSITY, Attacker)
-						Defender.AddSlow(2*DebuffIntensity*glob.SLOW_INTENSITY, Attacker)
-						Defender.AddShatter(2*DebuffIntensity*glob.SHATTER_INTENSITY, Attacker)
-						Defender.AddShock(2*DebuffIntensity*glob.SHOCK_INTENSITY, Attacker)
-					if("Death")
-						if(prob(glob.CHAOS_CHANCE))
-							if(Attacker.passive_handler.Get("Aspect of Death"))
-								Defender.AddDoom(1, Attacker, 1)
-							else
-								Defender.AddDoom(1, Attacker, 0)
-					if("Rain")
-						Defender.AddSlow(4*DebuffIntensity*glob.SLOW_INTENSITY, Attacker)
-						Defender.AddShock(4*DebuffIntensity*glob.SHOCK_INTENSITY, Attacker)
-					if("Poison")
-						if(!Defender.HasVenomImmune() && !("Poison" in defenseElements))
-							Defender.AddPoison((2*DebuffIntensity*glob.POISON_INTENSITY) + poisoningBonus + toxicBonus, Attacker)
-					if("Fire")
-						if(!Defender.DemonicPower())
-							Defender.AddBurn((4*DebuffIntensity*glob.BURN_INTENSITY) + burningBonus + scorchingBonus, Attacker)
-					if("Water")
-						Defender.AddSlow((4*DebuffIntensity*glob.SLOW_INTENSITY) + chillingBonus + freezingBonus, Attacker)
-					if("Earth")
-						Defender.AddShatter((4*DebuffIntensity*glob.SHATTER_INTENSITY) + crushingBonus + shatteringBonus, Attacker)
-					if("Wind")
-						Defender.AddShock((4*DebuffIntensity*glob.SHOCK_INTENSITY) + shockingBonus + paralyzingBonus, Attacker)
-					if("Blade")
-						if(bloodlettingBonus > 0)
-							Defender.AddBleed(bloodlettingBonus, Attacker)
-		for(var/element in defenseElements)
-			switch(element)
-				if("Ultima")
-					DamageMod-=2
-				if("Mirror")
-					DamageMod-=2
-				if("Chaos")
-					DamageMod-=2
-				if("Void")
-					DamageMod-=2
+					Defender.AddExposed((4*DebuffIntensity*glob.EXPOSED_INTENSITY) + bonus["Exposing"] + bonus["Shredding"], Attacker)
+				if("Lightning")
+					Defender.AddShock((4*DebuffIntensity*glob.SHOCK_INTENSITY) + bonus["Shocking"] + bonus["Paralyzing"], Attacker)
+				if("Earth")
+					Defender.AddShatter((4*DebuffIntensity*glob.SHATTER_INTENSITY) + bonus["Crushing"] + bonus["Shattering"], Attacker)
+				if("Light")
+					Defender.applyJudged()
+				if("Dark")
+					Defender.AddDoom(DebuffIntensity*glob.DOOM_INTENSITY, Attacker)
+				if("Poison")
+					if(!Defender.HasVenomImmune() && !("Poison" in defenseElements))
+						Defender.AddPoison((2*DebuffIntensity*glob.POISON_INTENSITY) + bonus["Poisoning"] + bonus["Toxic"], Attacker)
+				if("Blade")
+					if(bonus["Bloodletting"] > 0)
+						Defender.AddBleed(bonus["Bloodletting"], Attacker)
 		return DamageMod/glob.ELEMENTAL_DIVIDER
 
 	GetDebuffRate(var/A, list/D, var/Forced=0)
-		var/Return=0
 		if(Forced)
-			Return=100
-			return Return
-		switch(A)
-			if("Rain")
-				Return=30
+			return 100
+		return ElementProcRate(A, D)
 
-			if("HellFire")
-				Return=50
-				if("Mirror" in D)
-					Return-=20
-				if("Fire" in D)
-					Return+=20
-				if("Water" in D)
-					Return-=35
-				if("Earth" in D)
-					Return-=35
-				if("Wind" in D)//Super effective
-					Return+=20
-				if("Ultima" in D)
-					Return+=10
-
-			if("Fire")//Chance of burn
-				Return=30//Chance of burn on every hit.
-				if("Mirror" in D)
-					Return-=20
-				if("Fire" in D)
-					Return+=10
-				if("Water" in D)
-					Return-=20
-				if("Earth" in D)
-					Return-=10
-				if("Wind" in D)//Super effective
-					Return+=20
-				if("Ultima" in D)
-					Return+=50
-			if("Water")//Chance of freeze
-				Return=30
-				if("Mirror" in D)
-					Return-=20
-				if("Fire" in D)//Super Effective
-					Return+=20
-				if("Water" in D)
-					Return+=10
-				if("Earth" in D)
-					Return-=20
-				if("Wind" in D)
-					Return-=10
-				if("Ultima" in D)
-					Return+=50
-			if("Earth")//Chance of break
-				Return=30
-				if("Mirror" in D)
-					Return-=20
-				if("Fire" in D)
-					Return-=10
-				if("Water" in D)//Super Effective
-					Return+=20
-				if("Earth" in D)
-					Return+=10
-				if("Wind" in D)
-					Return-=20
-				if("Ultima" in D)
-					Return+=50
-			if("Wind")//Chance of off/def reduction
-				Return=30
-				if("Mirror" in D)
-					Return-=20
-				if("Fire" in D)
-					Return-=20
-				if("Water" in D)
-					Return-=10
-				if("Earth" in D)//Super Effective
-					Return+=20
-				if("Wind" in D)
-					Return+=10
-				if("Ultima" in D)
-					Return+=50
-		if(A=="Poison")//Chance to poison.
-			Return=30
-			if("Mirror" in D)
-				Return-=20
-			if("Ultima" in D)
-				Return+=40
-		if(A=="Chaos")//Chance of EVERYTHING GOES TO HELL.
-			Return=30
-			if("Mirror" in D)
-				Return-=20
-			if("Ultima" in D)
-				Return+=40
-		if(A=="Ultima")//Chance of EVERYTHING GOES TO HELL.
-			Return=100
-			if("Mirror" in D)
-				Return-=20
-		if(A=="Death")
-			Return=100
-		return Return
 mob
 	proc
-		AddBurn(var/Value, var/mob/Attacker=null)
+		AddBurn(var/Value, var/mob/Attacker=null, var/raw=0)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src)
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
-			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/fire/BurnMastery))
-				Value *= 2
-			if(Attacker && (Attacker == src ? !src.passive_handler.Get("BurningShot") : 1))
-				if(Attacker.Attunement=="Fire")
-					Value*=1.5
-				else if(Attacker.Attunement=="HellFire")
-					Value*=glob.HELLFIRE_VALUE_MOD
-			// Devil Summoner Vile racial
+			var/burningShot = src.passive_handler.Get("BurningShot")
+			if(!(Attacker == src && burningShot))
+				Value *= AttunementAtkMult("Fire", Attacker)
+			if(!burningShot && raw < 2)
+				Value *= AttunementDefMult("Fire")
 			if(Attacker && Attacker.demon_racial_vile_active)
 				Value *= Attacker.GetDemonVileMult()
-			if(src.Attunement=="Wind")
-				Value*=1.5
-			if(Attunement=="Fire" && !src.passive_handler.Get("BurningShot"))
-				Value/=2
-			if(src.Infusion)
-				if(!src.InfusionElement)
-					src.InfusionElement="Fire"
-				Value/=2
-			if(!src.passive_handler.Get("BurningShot"))
+			Value *= InfuseElement("Fire")
+			if(!burningShot)
 				Value/=1+src.GetStatusResist()
 			Value *= getBurnResistValue()
+			if(src.Drenched > 0 && !(Attacker == src && burningShot) && world.time >= src.burn_dry_until)
+				Value *= 1 - (src.Drenched / 200)
+				src.Drenched -= Value * glob.DRENCHED_DOUSE / 2
+				if(src.Drenched < 0)
+					src.Drenched = 0
 			Value = Value // this makes 100 impossible ?
 			src.Burn+=Value
 
@@ -356,7 +146,7 @@ mob
 			if(Attacker && Attacker.passive_handler.Get("EruptingBlows"))
 				src.SilentBurnAmount += Value
 
-			if(Value >=1 && !src.passive_handler.Get("BurningShot"))
+			if(Value >=1 && !raw && !src.passive_handler.Get("BurningShot"))
 				animate(src, color = "#ff2643")
 				animate(src, color = src.MobColor, time=5)
 			if(Attacker)
@@ -414,18 +204,8 @@ mob
 				return
 			if(Attacker && Attacker != src)
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
-			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/water/ChillMastery))
-				Value *= 2
-			if(Attacker && Attacker.Attunement == "Water")
-				Value*=1.5
-			if(Attunement=="Fire")
-				Value*=1.5
-			if(Attunement=="Water")
-				Value/=2
-			if(src.Infusion)
-				if(!src.InfusionElement)
-					src.InfusionElement="Water"
-				Value/=2
+			Value *= AttunementMult("Ice", Attacker)
+			Value *= InfuseElement("Ice")
 			Value/=1+src.GetStatusResist()
 			Value = Value*(1-(src.Slow/glob.DEBUFF_STACK_RESISTANCE))
 			Value *= getChillResistValue()
@@ -441,6 +221,7 @@ mob
 					src.Shock+=Value/2
 					if(src.Shock>100)
 						src.Shock=100
+					ShockThreshold(Attacker)
 			if(Attacker)
 				if(Attacker.passive_handler["IceAge"] && Slow >= Attacker.passive_handler["IceAge"])
 					implodeDebuff(Attacker.passive_handler["IceAge"], "Chill")
@@ -461,18 +242,8 @@ mob
 				return
 			if(Attacker && Attacker != src)
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
-			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/earth/ShatterMastery))
-				Value *= 2
-			if(Attacker && Attacker.Attunement=="Earth")
-				Value*=1.5
-			if(Attunement=="Water")
-				Value*=1.5
-			if(Attunement=="Earth")
-				Value/=2
-			if(src.Infusion)
-				if(!src.InfusionElement)
-					src.InfusionElement="Earth"
-				Value/=2
+			Value *= AttunementMult("Earth", Attacker)
+			Value *= InfuseElement("Earth")
 			Value/=1+src.GetStatusResist()
 			Value /= 1 + src.GetPhysResist()
 			Value *= getShatterResistValue()
@@ -501,24 +272,18 @@ mob
 					if(!src.Sprayed)
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Sprayed+=100
+		ShockThreshold(mob/Attacker)
+			if(src.Shock < glob.SHOCK_PARALYSIS_AT) return
+			if(!Attacker || Attacker == src) return
+			src.Shock = glob.SHOCK_PARALYSIS_RESET
+			Stun(src, glob.SHOCK_PARALYSIS, FALSE)
 		AddShock(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
 			if(Attacker && Attacker != src)
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
-			if(Attacker && Attacker != src && Attacker.hasMagePassive(/mage_passive/air/ShockMastery))
-				Value *= 2
-			if(Attacker && Attacker.Attunement=="Wind")
-				Value*=1.5
-			if(src.Attunement=="Earth")
-				Value*=1.5
-			if(Attunement=="Wind")
-				Value/=2
-			if(src.Infusion)
-				if(!src.InfusionElement)
-					src.InfusionElement="Wind"
-				Value/=2
-
+			Value *= AttunementMult("Lightning", Attacker)
+			Value *= InfuseElement("Lightning")
 			Value/=1+src.GetStatusResist()
 			Value *= getShockResistValue()
 			Value = Value*(1-(src.Shock/glob.DEBUFF_STACK_RESISTANCE))
@@ -528,8 +293,7 @@ mob
 				animate(src, color = "#fff757")
 				animate(src, color = src.MobColor, time=5)
 
-			if(src.Shock>100)
-				src.Shock=100
+			ShockThreshold(Attacker)
 			if(src.Shock<0)
 				src.Shock=0
 			for(var/obj/Items/Gear/Automated_Aid_Dispenser/AD in src)
@@ -540,6 +304,51 @@ mob
 					if(!src.Stabilized)
 						OMsg(src, "<font color='[rgb(104, 153, 251)]'>[src]'s dispenser deploys a healing mist!!</font color>")
 					src.Stabilized+=100
+		AddDrenched(var/Value, var/mob/Attacker=null)
+			if(src.Stasis || src.AdminOverwatchActive)
+				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value *= AttunementMult("Water", Attacker)
+			Value *= InfuseElement("Water")
+			Value/=1+src.GetStatusResist()
+			Value = Value*(1-(src.Drenched/glob.DEBUFF_STACK_RESISTANCE))
+			src.Drenched+=Value
+
+			if(Value >=1)
+				animate(src, color = "#7ec8ff")
+				animate(src, color = src.MobColor, time=5)
+
+			if(src.Burn > 0 && world.time >= src.burn_dry_until)
+				src.Burn -= Value * glob.DRENCHED_DOUSE
+				if(src.Burn < 0)
+					src.Burn = 0
+				if(src.SilentBurnAmount > src.Burn)
+					src.SilentBurnAmount = src.Burn
+
+			if(src.Drenched>100)
+				src.Drenched=100
+			if(src.Drenched<0)
+				src.Drenched=0
+		AddExposed(var/Value, var/mob/Attacker=null)
+			if(src.Stasis || src.AdminOverwatchActive)
+				return
+			if(Attacker && Attacker != src)
+				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
+			Value *= AttunementMult("Wind", Attacker)
+			Value *= InfuseElement("Wind")
+			Value/=1+src.GetStatusResist()
+			Value = Value*(1-(src.Exposed/glob.DEBUFF_STACK_RESISTANCE))
+			src.Exposed+=Value
+
+			if(Value >=1)
+				animate(src, color = "#d8ffe8")
+				animate(src, color = src.MobColor, time=5)
+
+			if(src.Exposed>100)
+				src.Exposed=100
+			if(src.Exposed<0)
+				src.Exposed=0
 		AddPoison(var/Value, var/mob/Attacker=null)
 			if(src.Stasis || src.AdminOverwatchActive)
 				return
@@ -714,7 +523,7 @@ mob
 globalTracker/var/DEBUFF_STACK_MAX = 100;
 
 /mob/proc/CleanseDebuff(amt)
-	var/list/debuff = list("Poison", "Burn", "Shatter", "Slow", "Shock", "Crippled", "Confused", "Stunned", "Sheared", "Attracted","Doomed");
+	var/list/debuff = list("Poison", "Burn", "Shatter", "Slow", "Shock", "Drenched", "Exposed", "Crippled", "Confused", "Stunned", "Sheared", "Attracted","Doomed");
 	for(var/db in debuff)
 		src.vars["[db]"] -= amt;
 /mob/proc/shouldCleanse(mob/trg)
@@ -779,6 +588,26 @@ mob
 
 				if(src.Shock<0)
 					src.Shock=0
+
+			if(src.Drenched)
+				if(src.Drenched > glob.DEBUFF_STACK_MAX)
+					src.Drenched = glob.DEBUFF_STACK_MAX;
+
+				var/drenchReduction = max(0.1, (src.GetEnd(0.25)+src.GetSpd(0.1))*(1+src.GetStatusResist()));
+				src.Drenched-= drenchReduction;
+
+				if(src.Drenched<0)
+					src.Drenched=0
+
+			if(src.Exposed)
+				if(src.Exposed > glob.DEBUFF_STACK_MAX)
+					src.Exposed = glob.DEBUFF_STACK_MAX;
+
+				var/exposedReduction = max(0.1, (src.GetEnd(0.25)+src.GetDef(0.1))*(1+src.GetStatusResist()));
+				src.Exposed-= exposedReduction;
+
+				if(src.Exposed<0)
+					src.Exposed=0
 
 			if(src.Crippled)
 				if(src.Crippled > glob.DEBUFF_STACK_MAX)

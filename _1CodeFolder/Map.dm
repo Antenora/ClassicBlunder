@@ -3267,10 +3267,12 @@ obj/Turfs
 		icon='Lab.dmi'
 		icon_state="pipes"
 		dir=NORTH
+		name="Pipe"
 	PipeWE
 		icon='Lab.dmi'
 		icon_state="pipes"
 		dir=EAST
+		Buildable=0
 	TechObject1
 		icon='ArtificalObj.dmi'
 		icon_state="Fan"
@@ -4286,158 +4288,198 @@ obj/Turfs/Edges
 		icon='Edges.dmi'
 		icon_state="1"
 		dir=NORTH
+		name="Rock Edge"
 	RockEdgeS
 		icon='Edges.dmi'
 		icon_state="1"
 		dir=SOUTH
+		Buildable=0
 	RockEdgeW
 		icon='Edges.dmi'
 		icon_state="1"
 		dir=WEST
+		Buildable=0
 	RockEdgeE
 		icon='Edges.dmi'
 		icon_state="1"
 		dir=EAST
+		Buildable=0
 	RockEdge2N
 		icon='Edges.dmi'
 		icon_state="2"
 		dir=NORTH
+		name="Rock Edge 2"
 	RockEdge2S
 		icon='Edges.dmi'
 		icon_state="2"
 		dir=SOUTH
+		Buildable=0
 	RockEdge2W
 		icon='Edges.dmi'
 		icon_state="2"
 		dir=WEST
+		Buildable=0
 	RockEdge2E
 		icon='Edges.dmi'
 		icon_state="2"
 		dir=EAST
+		Buildable=0
 	RockGray2N
 		icon='grayrockedges.dmi'
 		dir=NORTH
+		name="Gray Rock Edge"
 	RockGray2S
 		icon='grayrockedges.dmi'
 		dir=SOUTH
+		Buildable=0
 	RockGray2W
 		icon='grayrockedges.dmi'
 		dir=WEST
+		Buildable=0
 	RockGray2E
 		icon='grayrockedges.dmi'
 		dir=EAST
+		Buildable=0
 	Edge3N
 		icon='Edges.dmi'
 		icon_state="3"
 		dir=NORTH
+		name="Edge 3"
 	Edge3S
 		icon='Edges.dmi'
 		icon_state="3"
 		dir=SOUTH
+		Buildable=0
 	Edge3W
 		icon='Edges.dmi'
 		icon_state="3"
 		dir=WEST
+		Buildable=0
 	Edge3E
 		icon='Edges.dmi'
 		icon_state="3"
 		dir=EAST
+		Buildable=0
 	Edge4N
 		icon='Edges.dmi'
 		icon_state="4"
 		dir=NORTH
+		name="Edge 4"
 	Edge4S
 		icon='Edges.dmi'
 		icon_state="4"
 		dir=SOUTH
+		Buildable=0
 	Edge4W
 		icon='Edges.dmi'
 		icon_state="4"
 		dir=WEST
+		Buildable=0
 	Edge4E
 		icon='Edges.dmi'
 		icon_state="4"
 		dir=EAST
+		Buildable=0
 	Edge5N
 		icon='Edges.dmi'
 		icon_state="5"
 		dir=NORTH
+		name="Edge 5"
 	Edge5S
 		icon='Edges.dmi'
 		icon_state="5"
 		dir=SOUTH
+		Buildable=0
 	Edge5W
 		icon='Edges.dmi'
 		icon_state="5"
 		dir=WEST
+		Buildable=0
 	Edge5E
 		icon='Edges.dmi'
 		icon_state="5"
 		dir=EAST
+		Buildable=0
 	Edge6N
 		icon='Edges.dmi'
 		icon_state="6"
 		dir=NORTH
+		name="Edge 6"
 	Edge6S
 		icon='Edges.dmi'
 		icon_state="6"
 		dir=SOUTH
+		Buildable=0
 	Edge6W
 		icon='Edges.dmi'
 		icon_state="6"
 		dir=WEST
+		Buildable=0
 	Edge6E
 		icon='Edges.dmi'
 		icon_state="6"
 		dir=EAST
+		Buildable=0
 	MetalEdgeN
-		icon='Edges.dmi'
-		icon_state="N2"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="metal"
 		dir=NORTH
+		name="Metal Edge"
 	MetalEdgeS
-		icon='Edges.dmi'
-		icon_state="S2"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="metal"
 		dir=SOUTH
+		Buildable=0
 	MetalEdgeE
-		icon='Edges.dmi'
-		icon_state="E2"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="metal"
 		dir=EAST
+		Buildable=0
 	MetalEdgeW
-		icon='Edges.dmi'
-		icon_state="W2"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="metal"
 		dir=WEST
+		Buildable=0
 	DarkEdgeN
-		icon='Edges.dmi'
-		icon_state="N3"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="dark"
 		dir=NORTH
+		name="Dark Edge"
 	DarkEdgeS
-		icon='Edges.dmi'
-		icon_state="S3"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="dark"
 		dir=SOUTH
+		Buildable=0
 	DarkEdgeE
-		icon='Edges.dmi'
-		icon_state="E3"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="dark"
 		dir=EAST
+		Buildable=0
 	DarkEdgeW
-		icon='Edges.dmi'
-		icon_state="W3"
+		icon='Icons/Objects/EdgesDir.dmi'
+		icon_state="dark"
 		dir=WEST
+		Buildable=0
 	GrayEdgeN
 		icon='Edges.dmi'
 		icon_state="7"
 		dir=NORTH
+		name="Gray Edge"
 	GrayEdgeS
 		icon='Edges.dmi'
 		icon_state="7"
 		dir=SOUTH
+		Buildable=0
 	GrayEdgeE
 		icon='Edges.dmi'
 		icon_state="7"
 		dir=EAST
+		Buildable=0
 	GrayEdgeWest
 		icon='Edges.dmi'
 		icon_state="7"
 		dir=WEST
+		Buildable=0
 
 
 obj/Turfs/Surf

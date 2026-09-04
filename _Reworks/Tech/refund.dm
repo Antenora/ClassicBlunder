@@ -81,5 +81,4 @@
 	if(thePath == "Cancel")
 		return
 	if(thePath in p.knowledgeTracker.learnedKnowledge)
-		if(thePath in MagicList) return
 		removeTechKnowledge(p, thePath, theCost, TRUE)

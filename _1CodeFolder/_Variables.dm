@@ -529,9 +529,11 @@ mob/var
 	Frenzy=0
 	Bleed=0
 	Slow=0
+	Drenched=0
 	Shatter=0
 	Harden=0
 	Shock=0
+	Exposed=0
 	Sheared=0
 	Crippled=0
 	Attracting=0

@@ -842,7 +842,7 @@ mob
 			if(src.ManaDeath)
 				src.WoundSelf(0.2*(src.ManaAmount/ManaMax))
 				ManaAmount-=1.5*(src.ManaAmount/ManaMax)
-				if(src.ManaAmount<=ManaMax && src.ManaDeath)
+				if(src.ManaAmount<=ManaMax + MageManaBonus() && src.ManaDeath)
 					src.ManaDeath=0
 					ManaAmount = ManaMax
 					senjutsuOverloadAlert=FALSE
@@ -899,7 +899,7 @@ mob
 
 			if(src.BusterTech && src.BusterCharging<100)
 
-				src.BusterCharging+=((100/RawSeconds(5)) - ChargeDelay) * src.BusterTech.Buster * src.GetRecov()
+				src.BusterCharging+=(100/RawSeconds(5)) * src.BusterTech.Buster * src.GetRecov()
 				if(src.BusterCharging>100)
 					src.BusterCharging=100
 					src << "Your buster technique is fully charged!"
@@ -1161,8 +1161,6 @@ mob
 					src.OverClockTime+=RawHours(1)
 			if(src.Kaioken>=6)
 				src.AddEndTax(0.001)
-			if(ChargeDelay)
-				decreaseChargeDelay()
 
 			var/safety=0
 			while(src.ActiveBuff)
@@ -1586,7 +1584,7 @@ mob
 								A.NeedsInjury=rand(10,A.TooMuchInjury-5)
 
 					if(A.ManaThreshold&&!A.Using&&!src.KO&&!AGLock)//TODO: Align the requirements and variables more sensibly in this area
-						if(src.ManaAmount>max(ManaMax, A.ManaThreshold))//this basically only applies to senjutsu so
+						if(src.ManaAmount>max(ManaMax + MageManaBonus(), A.ManaThreshold))//this basically only applies to senjutsu so
 							if(A.BuffName=="Sage Mode") A.adjust(src);
 							A.Trigger(src,Override=1)
 					if(A.NeedsAnger&&!A.Using&&!src.KO&&!AGLock)
@@ -1625,7 +1623,7 @@ mob
 					if(A.Triggers)
 						A.Triggers.checkTrigger(src, A)
 				if(A.LunarWrath)
-					if(src.ManaAmount>=((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult()))
+					if(src.ManaAmount>=((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult()+src.MageManaBonus()))
 						if(!A.Using&&!A.SlotlessOn)
 							A.Trigger(src,Override=1)
 

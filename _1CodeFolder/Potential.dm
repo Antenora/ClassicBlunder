@@ -98,8 +98,8 @@ mob
 					if(d.evolution_charges < 1)
 						d.last_evo_gain = world.realtime
 						d.evolution_charges++
-			if(Potential>=15 && SagaLevel < 2 && Saga) saga_up_self()
-			if(Potential >= 35 && SagaLevel < 3 && Saga) saga_up_self()
+			if(Potential>=15 && SagaLevel < 2 && Saga && Saga != "Mage") saga_up_self()
+			if(Potential >= 35 && SagaLevel < 3 && Saga && Saga != "Mage") saga_up_self()
 
 globalTracker
 	var/list/POTENTIAL_POWER_VALS = list(1.5,//10 potential

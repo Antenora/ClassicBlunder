@@ -67,8 +67,6 @@ mob/proc/GetHaste(obj/Skills/Z)
 	if(Z)
 		if(Z.ChakraNature && ChakraSpecialization == Z.ChakraNature)
 			h += 18
-		if(Z.SpellElement)
-			h += min(getSpellElementCooldownReduction(Z.SpellElement) * 150, 45)
 	return max(h, -50)
 
 mob/proc/HasteCDMult(obj/Skills/Z)
@@ -81,8 +79,9 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		m.last_skill_fire_time = world.time
 	if(!Time && ismob(m) && !istype(src, /obj/Skills/Buffs))
 		m.StartGCD(src)
+	if(!Time && ismob(m) && src.IsSpell && !src.SilentCast)
+		m.OnSpellCast(src)
 	if(MaxCharges > 0)
-		if(p) hasMagmicInfusion(p)
 		Charges--
 		if(Charges <= 0)
 			Using = 1
@@ -103,7 +102,6 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 			Recharge(Time, m)
 		return
 	if(!src.Using || Time)
-		if(p) hasMagmicInfusion(p);
 		src.Using=1
 		if(Cooldown==-1)
 			src.Using=1
@@ -127,14 +125,6 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 						if(typeString == x)
 							lockedoutSkills+=otherSkills
 							otherSkills.Using=1
-			if(src.SpellElement)
-				if(src.SpellElement == "Time")
-					if(m.hasMagePassive(/mage_passive/time/Present))
-						m.addTension(10, m.getTensionCap())
-				else if(src.SpellElement == "Space")
-					if(m.hasMagePassive(/mage_passive/space/Linearity))
-						if(!m.CheckSlotless("Distorted Space"))
-							m.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Distorted_Space);
 			Time=src.Cooldown*10*modify*(1+0.33*src.CooldownScalingCounter)
 			if(src.CooldownScaling)
 				src.CooldownScalingCounter++
@@ -315,6 +305,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 					if(MeditateTime >= 15)
 						src.Tension=0
 						Momentum = 0
+						src.CinderTollReset()
 						for(var/obj/Skills/s in src)
 							if(length(s.possible_skills) > 0)
 								for(var/t in s.possible_skills)

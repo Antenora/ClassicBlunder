@@ -65,43 +65,66 @@ proc/GetBakedMask(iconFile, d=0)
 
 var/list/RUNTIME_MASKS
 var/list/RUNTIME_RECTS
+var/list/RUNTIME_FRAMES
 var/list/RUNTIME_ICONKEYS //file > md5, computed once per session
 var/list/RUNTIME_SCANS //md5 > 1 while a scan is in flight
+
+#define RUNTIME_CACHE_VER 2
+#define RUNTIME_FRAME_CAP 16
+#define RUNTIME_STATE_CAP 8
 
 proc/RuntimeMasksInit()
 	if(RUNTIME_MASKS) return
 	RUNTIME_MASKS = list()
 	RUNTIME_RECTS = list()
+	RUNTIME_FRAMES = list()
 	RUNTIME_ICONKEYS = list()
 	RUNTIME_SCANS = list()
 	var/savefile/S = new("hitbox_runtime_cache.sav")
+	var/ver
+	S["ver"] >> ver
+	if(ver != RUNTIME_CACHE_VER) return
 	var/list/m
 	var/list/r
+	var/list/fr
 	S["masks"] >> m
 	S["rects"] >> r
+	S["frames"] >> fr
 	if(istype(m)) RUNTIME_MASKS = m
 	if(istype(r)) RUNTIME_RECTS = r
+	if(istype(fr)) RUNTIME_FRAMES = fr
 
 proc/SaveRuntimeMasks()
 	var/savefile/S = new("hitbox_runtime_cache.sav")
+	S["ver"] << RUNTIME_CACHE_VER
 	S["masks"] << RUNTIME_MASKS
 	S["rects"] << RUNTIME_RECTS
+	S["frames"] << RUNTIME_FRAMES
 
-proc/RuntimeIconKey(f)
+proc/GetRuntimeFrames(f, d=0)
+	var/k = RuntimeIconKey(f, 0)
+	if(!k) return null
+	if(d)
+		var/dc = Dir2HitboxChar(d)
+		if(dc && RUNTIME_FRAMES["[k]:[dc]"]) return "[k]:[dc]"
+	return RUNTIME_FRAMES[k] ? k : null
+
+proc/RuntimeIconKey(f, standing = 1)
 	if(!f || (!isfile(f) && !isicon(f))) return null
 	RuntimeMasksInit()
-	var/k = RUNTIME_ICONKEYS[f]
-	if(!k)
-		k = md5(f)
-		if(!k) return null
-		RUNTIME_ICONKEYS[f] = k
-		if(isnull(RUNTIME_RECTS[k]) && !RUNTIME_SCANS[k]) //rect presence marks "scanned"
-			RUNTIME_SCANS[k] = 1
-			spawn(1) ScanIconInk(f, k)
+	var/base = RUNTIME_ICONKEYS[f]
+	if(!base)
+		base = md5(f)
+		if(!base) return null
+		RUNTIME_ICONKEYS[f] = base
+	var/k = standing ? base : "[base]!"
+	if(isnull(RUNTIME_RECTS[k]) && !RUNTIME_SCANS[k]) //rect presence marks "scanned"
+		RUNTIME_SCANS[k] = 1
+		spawn(1) ScanIconInk(f, k, standing)
 	return k
 
-proc/GetRuntimeMask(f, d=0)
-	var/k = RuntimeIconKey(f)
+proc/GetRuntimeMask(f, d=0, standing = 1)
+	var/k = RuntimeIconKey(f, standing)
 	if(!k) return null
 	if(d)
 		var/dc = Dir2HitboxChar(d)
@@ -110,8 +133,8 @@ proc/GetRuntimeMask(f, d=0)
 			if(m) return m
 	return RUNTIME_MASKS[k]
 
-proc/GetRuntimeRect(f, d=0)
-	var/k = RuntimeIconKey(f)
+proc/GetRuntimeRect(f, d=0, standing = 1)
+	var/k = RuntimeIconKey(f, standing)
 	if(!k) return null
 	if(d)
 		var/dc = Dir2HitboxChar(d)
@@ -120,15 +143,90 @@ proc/GetRuntimeRect(f, d=0)
 			if(r) return r
 	return RUNTIME_RECTS[k]
 
-proc/IconPixelSolid(icon/I, x, y, d)
-	var/c = I.GetPixel(x, y, null, d, 1) //first state, frame 1 = standing pose, matching the body rule
+proc/IconPixelSolid(icon/I, x, y, d, st, fr)
+	var/c = I.GetPixel(x, y, st, d, fr)
 	if(!c) return FALSE
 	if(length(c) >= 9) //"#RRGGBBAA": partial alpha reported
 		return text2num(copytext(c, 8, 10), 16) >= 128
 	return TRUE
 
-//background one-time measurement of an unbaked icon; ~2 samples per 4px cell per cardinal dir
-proc/ScanIconInk(f, k)
+proc/IconCellInk(icon/I, cx, cy, w, h, d, st, fr)
+	var/x1 = min(cx*4 + 4, w)
+	var/y1 = min(cy*4 + 4, h)
+	for(var/y = cy*4 + 1, y <= y1, y++)
+		for(var/x = cx*4 + 1, x <= x1, x++)
+			if(IconPixelSolid(I, x, y, d, st, fr)) return TRUE
+	return FALSE
+
+proc/NewMaskGrid(mw, mh, packs)
+	var/datalen = 3 + mh*packs
+	var/list/G = new/list(datalen)
+	G[1] = mw
+	G[2] = mh
+	G[3] = packs
+	for(var/i = 4, i <= datalen, i++)
+		G[i] = 0
+	return G
+
+proc/MaskGridOr(list/D, list/S)
+	for(var/i = 4, i <= D.len, i++)
+		D[i] |= S[i]
+
+proc/MaskGridSame(list/A, list/B)
+	for(var/i = 4, i <= A.len, i++)
+		if(A[i] != B[i]) return FALSE
+	return TRUE
+
+proc/MaskGridEmpty(list/A)
+	for(var/i = 4, i <= A.len, i++)
+		if(A[i]) return FALSE
+	return TRUE
+
+proc/MaskFramePeriod(list/frames)
+	var/n = frames.len
+	for(var/p = 1, p*2 <= n, p++)
+		var/ok = 1
+		for(var/i = p + 1, i <= n, i++)
+			if(!MaskGridSame(frames[i], frames[((i - 1) % p) + 1]))
+				ok = 0
+				break
+		if(ok) return p
+	return n
+
+proc/MaskGridRect(list/G)
+	var/mw = G[1]
+	var/mh = G[2]
+	var/packs = G[3]
+	var/minx = mw
+	var/maxx = -1
+	var/miny = mh
+	var/maxy = -1
+	for(var/r = 0, r < mh, r++)
+		for(var/c = 0, c < mw, c++)
+			if(G[4 + r*packs + round(c / 24)] & (1 << (c % 24)))
+				if(c < minx) minx = c
+				if(c > maxx) maxx = c
+				if(r < miny) miny = r
+				if(r > maxy) maxy = r
+	if(maxx < 0) return null
+	return list(minx*4, miny*4, (maxx - minx + 1)*4, (maxy - miny + 1)*4)
+
+proc/ScanIconGrid(icon/I, list/G, w, h, d, st, fr, list/skip)
+	var/mw = G[1]
+	var/mh = G[2]
+	var/packs = G[3]
+	for(var/cy = 0, cy < mh, cy++)
+		for(var/cx = 0, cx < mw, cx++)
+			var/idx = 4 + cy*packs + round(cx / 24)
+			var/bit = (1 << (cx % 24))
+			if(skip && (skip[idx] & bit))
+				G[idx] |= bit
+				continue
+			if(IconCellInk(I, cx, cy, w, h, d, st, fr))
+				G[idx] |= bit
+		sleep(-1)
+
+proc/ScanIconInk(f, k, standing = 1)
 	set waitfor = 0
 	set background = 1
 	try
@@ -138,40 +236,50 @@ proc/ScanIconInk(f, k)
 		var/mw = -round(-w/4)
 		var/mh = -round(-h/4)
 		var/packs = -round(-mw/24)
-		var/datalen = 3 + mh*packs
-		var/list/union = new/list(datalen)
-		union[1] = mw
-		union[2] = mh
-		union[3] = packs
-		for(var/i = 4, i <= datalen, i++)
-			union[i] = 0
+		var/list/states = I.IconStates()
+		if(!istype(states) || !states.len)
+			states = list(null)
+		else if(standing)
+			states = states.Copy(1, 2)
+		else if(states.len > RUNTIME_STATE_CAP)
+			states = states.Copy(1, RUNTIME_STATE_CAP + 1)
+		var/list/union = NewMaskGrid(mw, mh, packs)
 		var/list/dirdata = list()
+		var/list/framedata = list()
 		for(var/dc in list("S", "N", "E", "W"))
 			var/d = (dc == "S") ? SOUTH : ((dc == "N") ? NORTH : ((dc == "E") ? EAST : WEST))
-			var/list/M = new/list(datalen)
-			M[1] = mw
-			M[2] = mh
-			M[3] = packs
-			for(var/i = 4, i <= datalen, i++)
-				M[i] = 0
-			var/minx = mw
-			var/maxx = -1
-			var/miny = mh
-			var/maxy = -1
-			for(var/cy = 0, cy < mh, cy++)
-				for(var/cx = 0, cx < mw, cx++)
-					if(IconPixelSolid(I, min(cx*4 + 2, w), min(cy*4 + 2, h), d) || IconPixelSolid(I, min(cx*4 + 4, w), min(cy*4 + 4, h), d))
-						var/idx = 4 + cy*packs + round(cx/24)
-						M[idx] |= (1 << (cx % 24))
-						union[idx] |= (1 << (cx % 24))
-						if(cx < minx) minx = cx
-						if(cx > maxx) maxx = cx
-						if(cy < miny) miny = cy
-						if(cy > maxy) maxy = cy
-				if(cy % 8 == 7) sleep(-1)
-			if(maxx >= 0)
-				dirdata[dc] = list(M, list(minx*4, miny*4, (maxx - minx + 1)*4, (maxy - miny + 1)*4))
-		//union rect
+			var/list/M = NewMaskGrid(mw, mh, packs)
+			var/list/frames = list()
+			if(standing)
+				ScanIconGrid(I, M, w, h, d, states[1], 1, null)
+			else
+				for(var/fi = 1, fi <= RUNTIME_FRAME_CAP, fi++)
+					var/list/G = NewMaskGrid(mw, mh, packs)
+					ScanIconGrid(I, G, w, h, d, states[1], fi, null)
+					frames += list(G)
+					if(fi >= 3 && MaskGridSame(G, frames[fi-1]) && MaskGridSame(G, frames[fi-2]))
+						break
+				while(frames.len > 1 && MaskGridEmpty(frames[frames.len]))
+					frames.Cut(frames.len)
+				while(frames.len > 1 && MaskGridSame(frames[frames.len], frames[frames.len-1]))
+					frames.Cut(frames.len)
+				for(var/list/G in frames)
+					MaskGridOr(M, G)
+				var/per = MaskFramePeriod(frames)
+				if(per < frames.len)
+					frames.Cut(per + 1)
+				else if(frames.len >= RUNTIME_FRAME_CAP)
+					frames.Cut(2)
+				for(var/si = 2, si <= states.len, si++)
+					var/list/G = NewMaskGrid(mw, mh, packs)
+					ScanIconGrid(I, G, w, h, d, states[si], 1, M)
+					MaskGridOr(M, G)
+			MaskGridOr(union, M)
+			var/list/r = MaskGridRect(M)
+			if(r)
+				dirdata[dc] = list(M, r)
+				if(frames.len > 1)
+					framedata[dc] = frames
 		var/umnx = mw
 		var/umxx = -1
 		var/umny = mh
@@ -190,6 +298,13 @@ proc/ScanIconInk(f, k)
 				var/list/dd = dirdata[dc]
 				RUNTIME_MASKS["[k]:[dc]"] = dd[1]
 				RUNTIME_RECTS["[k]:[dc]"] = dd[2]
+			for(var/dc in framedata)
+				var/list/frames = framedata[dc]
+				var/list/ends = list(0)
+				for(var/fi = 1, fi <= frames.len, fi++)
+					RUNTIME_MASKS["[k]:[dc]@[fi]"] = frames[fi]
+					ends += fi
+				RUNTIME_FRAMES["[k]:[dc]"] = ends
 		else
 			RUNTIME_RECTS[k] = list(0, 0, w, h) //fully transparent: canvas rect, marks scanned
 		SaveRuntimeMasks()
@@ -235,12 +350,19 @@ atom/movable
 		vhb_ay = 0 //and endpoint blast all shift by this together
 		vhb_varx = 0 //Variation art jitter, visual only - survives dir refits
 		vhb_vary = 0 //box/mask stay unjittered
+		vhb_lastd = 0
+		vhb_funsure = 0
+		vhb_g0 = 0
+		vhb_gdur = 0
+		vhb_gfrom = 0
+		vhb_gto = 0
 
 	//cell-center-on-tile-center anchoring for art, box, and mask
 	proc/ApplySkillHitbox(iconFile, d=0, scale=1, ovW=0, ovH=0, ovX=-1, ovY=-1, offX=0, offY=0)
 		if(iconFile != hb_icon || isnull(vhb_anim0))
 			vhb_anim0 = world.time //new icon = client restarts its animation
 		hb_icon = iconFile
+		vhb_lastd = d
 		hb_scale = scale
 		hb_ovW = ovW
 		hb_ovH = ovH
@@ -266,6 +388,7 @@ atom/movable
 		vhb_mask = null
 		vhb_fmasks = null
 		vhb_fends = null
+		vhb_funsure = 0
 		vhb_ox = 0
 		vhb_oy = 0
 		if(ovW > 0 && ovH > 0) //hand override = rect only, tile-centered; owner's word is final
@@ -289,8 +412,18 @@ atom/movable
 					for(var/i = 1, i <= vhb_fends.len, i++)
 						vhb_fmasks += list(BAKED_MASKS["[mkey]@[i]"])
 			else if(!r) //unbaked = uploaded/custom skill icon: runtime measurement (one-time scan)
-				vhb_mask = GetRuntimeMask(iconFile, d)
-				r = GetRuntimeRect(iconFile, d)
+				vhb_mask = GetRuntimeMask(iconFile, d, 0)
+				r = GetRuntimeRect(iconFile, d, 0)
+				var/rkey = GetRuntimeFrames(iconFile, d)
+				if(rkey)
+					var/list/rfr = RUNTIME_FRAMES[rkey]
+					vhb_floop = rfr[1]
+					vhb_fends = rfr.Copy(2)
+					vhb_fcycle = vhb_fends[vhb_fends.len]
+					vhb_fmasks = list()
+					vhb_funsure = 1
+					for(var/i = 1, i <= vhb_fends.len, i++)
+						vhb_fmasks += list(RUNTIME_MASKS["[rkey]@[i]"])
 			if(!r) r = list(0, 0, cell[1], cell[2]) //unmeasured (or scan pending): full canvas
 			vhb_w = max(2, round(r[3]*scale))
 			vhb_h = max(2, round(r[4]*scale))
@@ -304,6 +437,8 @@ atom/movable
 
 	proc/CurrentFrameMask()
 		var/el = world.time - vhb_anim0
+		if(vhb_funsure && el >= vhb_fcycle)
+			return vhb_mask
 		if(vhb_floop && el >= vhb_fcycle * vhb_floop)
 			return vhb_fmasks[vhb_fmasks.len] //finite animation: holds its last frame
 		el -= vhb_fcycle * round(el / vhb_fcycle)
@@ -334,6 +469,36 @@ atom/movable
 	proc/ReapplyHitboxForDir(ndir)
 		if(!hb_icon && !(hb_ovW > 0)) return
 		ApplySkillHitbox(hb_icon, ndir, hb_scale, hb_ovW, hb_ovH, hb_ovX, hb_ovY, hb_offX, hb_offY)
+
+	proc/ReapplyHitboxScale(ns)
+		if(!hb_icon && !(hb_ovW > 0)) return
+		if(ns <= 0) return
+		if(abs(ns - hb_scale) < max(0.002, hb_scale*0.03)) return
+		ApplySkillHitbox(hb_icon, vhb_lastd, ns, hb_ovW, hb_ovH, hb_ovX, hb_ovY, hb_offX, hb_offY)
+
+	proc/EaseInOutCubic(t)
+		if(t <= 0) return 0
+		if(t >= 1) return 1
+		if(t <= 0.5) return 4*t*t*t
+		var/u = 1 - t
+		return 1 - 4*u*u*u
+
+	proc/BeginHitboxGrow(gfrom, gto, dur)
+		if(dur <= 0 || gto <= 0) return
+		vhb_gfrom = (gfrom > 0) ? gfrom : hb_scale
+		vhb_gto = gto
+		vhb_gdur = dur
+		vhb_g0 = world.time
+		ReapplyHitboxScale(vhb_gfrom)
+
+	proc/RefitGrowScale()
+		if(!vhb_g0 || vhb_gdur <= 0) return
+		var/t = (world.time - vhb_g0) / vhb_gdur
+		if(t >= 1)
+			vhb_g0 = 0
+			ReapplyHitboxScale(vhb_gto)
+			return
+		ReapplyHitboxScale(vhb_gfrom + (vhb_gto - vhb_gfrom) * EaseInOutCubic(t))
 
 	//how many tiles out this box can reach a full-tile mob (off-center boxes reach by offset + half-dim)
 	proc/HitboxSweepRange()
@@ -505,6 +670,7 @@ proc/HitboxesOverlap(atom/movable/F, atom/A)
 	var/aw
 	var/ah
 	var/flyer_vs_flyer = FALSE
+	var/list/P
 	var/atom/movable/M = A
 	if(istype(M) && M.vhb_w > 0)
 		flyer_vs_flyer = TRUE
@@ -512,6 +678,13 @@ proc/HitboxesOverlap(atom/movable/F, atom/A)
 		ab = 1 + (M.y-1)*32 + M.step_y + 16 + M.vhb_oy - M.vhb_h/2
 		aw = M.vhb_w
 		ah = M.vhb_h
+	else if(ismob(A))
+		P = BodyInkProbe(A)
+		var/list/B = BodyInkRectL(P)
+		al = B[1]
+		ab = B[2]
+		aw = B[3]
+		ah = B[4]
 	else
 		al = A.LowerX()
 		ab = A.LowerY()
@@ -521,54 +694,36 @@ proc/HitboxesOverlap(atom/movable/F, atom/A)
 		return FALSE
 	if(flyer_vs_flyer)
 		return TRUE
-	return InkOverlap(F, A, max(fl, al), max(fb, ab), min(fl + F.vhb_w, al + aw), min(fb + F.vhb_h, ab + ah))
+	return InkOverlap(F, A, max(fl, al), max(fb, ab), min(fl + F.vhb_w, al + aw), min(fb + F.vhb_h, ab + ah), P)
 
-proc/InkOverlap(atom/movable/F, atom/A, wl, wb, wr, wt)
+proc/InkOverlap(atom/movable/F, atom/A, wl, wb, wr, wt, list/P = null)
 	var/list/FM = F.vhb_fmasks ? F.CurrentFrameMask() : F.vhb_mask
-	var/list/AM
-	var/acx
-	var/acy
-	var/arl
-	var/arb
-	var/arw = 0
-	var/arh = 0
-	if(ismob(A))
-		var/mob/m = A
-		acx = 1 + (m.x-1)*32 + m.step_x //body anchored at its SW corner + real pixel offset; visual bob never moves the hurtbox
-		acy = 1 + (m.y-1)*32 + m.step_y
-		AM = GetBakedMask(m.icon, m.dir)
-		if(!AM)
-			var/list/br = GetBakedHitbox(m.icon, m.dir)
-			if(!br) //unbaked = player-uploaded custom base: runtime-measured (kicks a one-time scan)
-				AM = GetRuntimeMask(m.icon, m.dir)
-				if(!AM)
-					br = GetRuntimeRect(m.icon, m.dir)
-			if(br) //no silhouette (yet): measured body rect beats the tile box
-				arl = acx + br[1]
-				arb = acy + br[2]
-				arw = br[3]
-				arh = br[4]
-	if(!FM && !AM && !arw)
+	if(!P && ismob(A))
+		P = BodyInkProbe(A)
+	if(!FM && !P)
 		return TRUE
 	var/s = F.hb_scale || 1
-	var/ftcx = 1 + (F.x-1)*32 + F.step_x + 16 + F.vhb_ax //icon center rides the FireOffset with the art
+	var/ftcx = 1 + (F.x-1)*32 + F.step_x + 16 + F.vhb_ax
 	var/ftcy = 1 + (F.y-1)*32 + F.step_y + 16 + F.vhb_ay
 	if(glob.PIXEL_DEBUG)
-		var/aminfo = AM ? "y" : (arw ? "rect" : "n")
-		if(!AM && ismob(A))
-			var/mob/dm = A
-			aminfo += "([dm.icon])" //self-identifies bodies missing from the baked set
+		var/aminfo = "n"
+		if(P)
+			aminfo = P[7] ? "y" : "rect"
+			if(!P[7] && ismob(A))
+				var/mob/dm = A
+				aminfo += "([dm.icon])"
+			if(P[5] != 1 || P[6] != 1)
+				aminfo += " scale=[P[5]]x[P[6]]"
 		world.log << "PXM: [F] window ([wl]..[wr], [wb]..[wt]) fm=[FM ? "y" : "n"] am=[aminfo]"
 	for(var/wy = wb + 1, wy < wt, wy += 2)
 		for(var/wx = wl + 1, wx < wr, wx += 2)
 			if(FM && !MaskBitAt(FM, F.vhb_cw/2 + (wx - ftcx)/s, F.vhb_ch/2 + (wy - ftcy)/s))
 				continue
-			if(AM && !MaskBitAt(AM, wx - acx, wy - acy))
-				continue
-			if(arw && !(wx >= arl && wx < arl + arw && wy >= arb && wy < arb + arh))
+			if(P && !BodyInkHitL(P, wx, wy))
 				continue
 			return TRUE
 	return FALSE
+
 
 //cell-px coords -> mask bit
 proc/MaskBitAt(list/M, cx, cy)
@@ -592,29 +747,23 @@ proc/SquareHitsBounds(cx, cy, r, atom/A)
 
 proc/CircleHitsBody(cx, cy, r, mob/m)
 	if(!istype(m)) return CircleHitsBounds(cx, cy, r, m)
-	var/acx = 1 + (m.x-1)*32 + m.step_x
-	var/acy = 1 + (m.y-1)*32 + m.step_y
-	var/list/AM = GetBakedMask(m.icon, m.dir)
-	var/list/br
-	if(!AM)
-		br = GetBakedHitbox(m.icon, m.dir)
-		if(!br)
-			AM = GetRuntimeMask(m.icon, m.dir)
-			if(!AM)
-				br = GetRuntimeRect(m.icon, m.dir)
-	if(AM)
-		var/wr2 = min(acx + AM[1]*4, cx + r)
-		var/wt2 = min(acy + AM[2]*4, cy + r)
-		for(var/wy = max(acy, round(cy - r)) + 1, wy < wt2, wy += 2)
-			for(var/wx = max(acx, round(cx - r)) + 1, wx < wr2, wx += 2)
-				if((wx-cx)*(wx-cx) + (wy-cy)*(wy-cy) > r*r) continue
-				if(MaskBitAt(AM, wx - acx, wy - acy)) return TRUE
-		return FALSE
-	if(br)
-		var/nx = max(acx + br[1], min(cx, acx + br[1] + br[3]))
-		var/ny = max(acy + br[2], min(cy, acy + br[2] + br[4]))
+	var/list/P = BodyInkProbe(m)
+	var/list/B = BodyInkRectL(P)
+	if(!P[7])
+		var/nx = max(B[1], min(cx, B[1] + B[3]))
+		var/ny = max(B[2], min(cy, B[2] + B[4]))
 		return (nx-cx)*(nx-cx) + (ny-cy)*(ny-cy) <= r*r
-	return CircleHitsBounds(cx, cy, r, m)
+	var/wl = max(B[1], cx - r)
+	var/wb = max(B[2], cy - r)
+	var/wr = min(B[1] + B[3], cx + r)
+	var/wt = min(B[2] + B[4], cy + r)
+	if(wl >= wr || wb >= wt) return FALSE
+	for(var/wy = wb + 1, wy < wt, wy += 2)
+		for(var/wx = wl + 1, wx < wr, wx += 2)
+			if((wx-cx)*(wx-cx) + (wy-cy)*(wy-cy) > r*r) continue
+			if(BodyInkHitL(P, wx, wy)) return TRUE
+	return FALSE
+
 
 //world.time-gated re-hit; marks the timestamp when it passes
 proc/RehitEligible(list/lastHit, key, interval)

@@ -114,6 +114,8 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 					m<<output("<font color=#99FF99><b>(Telepath)</b></font>- <a href=?src=\ref[src];action=MasterControl;do=TPM>[src]</a href> To <a href=?src=\ref[who];action=MasterControl;do=TPM>[who]</a href> :[blah]", "icchat")
 
 mob/proc/SetTarget(atom/target)
+	if(target && world.time < target_lock_block_until)
+		return
 	if(ismob(target))
 		var/mob/_kt = target
 		if(_kt.HiddenInShadow)

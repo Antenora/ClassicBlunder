@@ -564,6 +564,8 @@ client/proc/OpenCharacterMenu()
 	CloseAcquireMenu()
 	CloseLifeSkillsMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	cmenu_open = TRUE
 	cmenu_tab = 0
 	var/list/vd = splittext("[view]", "x")

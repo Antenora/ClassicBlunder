@@ -166,6 +166,7 @@ obj/Skills/Projectile/Getsuga_Jujisho
 			proj.icon_state = "slash3"
 			proj.transform = matrix()
 			animate(proj, transform = matrix() * IconSizeGrowTo, time = 5, easing = CUBIC_EASING)
+			proj.BeginHitboxGrow(1, IconSizeGrowTo, 5)
 
 	verb/Getsuga_Jujisho()
 		set category = "Skills"

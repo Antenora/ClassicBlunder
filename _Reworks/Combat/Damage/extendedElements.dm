@@ -1,10 +1,10 @@
 // TESTED
-var/list/debuffVars = list("Burning", "Scorching", "Chilling","Freezing", "Crushing", \
-    "Shattering", "Shocking", "Paralyzing", "Poisoning","Toxic", "Bloodletting")
+var/list/debuffVars = list("Burning", "Scorching", "Drenching", "Soaking", "Chilling", "Freezing", "Exposing", "Shredding", \
+    "Crushing", "Shattering", "Shocking", "Paralyzing", "Poisoning", "Toxic", "Bloodletting")
 var/list/debuff2Element = list("Burning" = "Fire", "Scorching" = "Fire", \
-    "Chilling" = "Water", "Freezing" = "Water", "Crushing" = "Earth", \
-    "Shattering" = "Earth", "Shocking" = "Wind", "Paralyzing" = "Wind", \
-    "Poisoning" = "Poison", "Toxic" = "Poison", "Bloodletting" = "Blade")
+    "Drenching" = "Water", "Soaking" = "Water", "Chilling" = "Ice", "Freezing" = "Ice", \
+    "Exposing" = "Wind", "Shredding" = "Wind", "Crushing" = "Earth", "Shattering" = "Earth", \
+    "Shocking" = "Lightning", "Paralyzing" = "Lightning", "Poisoning" = "Poison", "Toxic" = "Poison", "Bloodletting" = "Blade")
 
 /mob/proc/addPassivePassives(obj/Skills/Q)
     // my care for clarity is 0

@@ -760,7 +760,7 @@ client/proc/GetDebuffDesc(name)
 		if("Burn") return "Deals damage over time."
 		if("Poison") return "Deals damage over time."
 		if("Shatter") return "Lowers endurance in proportion with stack amount."
-		if("Shock") return "Lowers offense and defense in proportion with stack amount."
+		if("Shock") return "Lowers offense in proportion with stack amount. Paralyzes briefly when it nears full."
 		if("Chill") return "Lowers speed in proportion with stack amount."
 		if("Cripple") return "Reduces movement speed."
 		if("Doom") return "Halves Vaizard Health, quarters mana, and reduces God Ki at max stacks."

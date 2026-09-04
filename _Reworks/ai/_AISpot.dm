@@ -194,6 +194,7 @@ obj
 
 				for(var/x in mi.skilloptions)
 					var/path=text2path(x)
+					if(!ispath(path)) continue
 					var/obj/Skills/s=new path
 					p.AddSkill(s)
 				p.name = "[p.name]"
@@ -206,18 +207,15 @@ obj
 						p.passive_handler.Increase("Skimming", 2)
 					if(p.Attunement=="Water")
 						p.passive_handler.Increase("Fishman")
-					if(p.Attunement=="Chaos")
-						p.passive_handler.Increase("PureDamage", 7)
-						p.passive_handler.Increase("PureReduction", 7)
-						p.passive_handler.Increase("DarknessFlame")
-						p.passive_handler.Increase("AbsoluteZero")
-						p.passive_handler.Increase("Godspeed", 4)
 					if(p.Attunement=="Dark")
 						p.HealthCut=0
 						p.AngerMax=1.5
 
 						p.ai_hostility=2
 						p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Heartless)
+				if(mi.grant_passives)
+					for(var/k in mi.grant_passives)
+						p.passive_handler.Increase(k, mi.grant_passives[k])
 				if(mi.force_offense)
 					p.ElementalOffense=mi.force_offense
 				var/legen = powerModifier == 1 ? 100 : mi.legend_power
@@ -441,6 +439,7 @@ monster_info
 	var/def_mod=0.25
 	var/recov_mod=1
 	var/spammer = 1
+	var/list/grant_passives
 
 	var
 		hell_power=0
@@ -653,7 +652,7 @@ monster_info
 		for_mod=3
 		attunement="Fire"
 		sin=10
-		skilloptions=list("/obj/Skills/Projectile/Magic/Fire", "/obj/Skills/Projectile/Magic/Fira", "/obj/Skills/Projectile/Magic/Firaga", "/obj/Skills/Projectile/Magic/Meteor", "/obj/Skills/Projectile/Magic/Disintegrate", "/obj/Skills/Projectile/Magic/Flare", "/obj/Skills/AutoHit/Magic/Gravity", "/obj/Skills/AutoHit/Magic/Magnet")
+		skilloptions=list("/obj/Skills/Projectile/Magic/Fire", "/obj/Skills/Projectile/Magic/Fira", "/obj/Skills/Projectile/Magic/Firaga", "/obj/Skills/Projectile/Magic/Meteor", "/obj/Skills/Projectile/Magic/Disintegrate", "/obj/Skills/AutoHit/Magic/Flare", "/obj/Skills/AutoHit/Magic/Gravity", "/obj/Skills/AutoHit/Magic/Magnet")
 	hell_wasp
 		name="Wasp"
 		icon='Wasp.dmi'
@@ -748,7 +747,8 @@ monster_info
 		def_mod=2
 		seek_destroy=1
 		crazy_targets=1
-		attunement="Chaos"
+		attunement="Dark"
+		grant_passives=list("PureDamage"=7, "PureReduction"=7, "DarknessFlame"=1, "AbsoluteZero"=1, "Godspeed"=4)
 		skilloptions=list("/obj/Skills/AutoHit/Shadow_Tendril_Strike", "/obj/Skills/AutoHit/Destruction_Wave")
 
 	wild_fire_spirits

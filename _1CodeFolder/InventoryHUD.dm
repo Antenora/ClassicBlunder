@@ -234,6 +234,8 @@ client/proc/OpenInventory()
 	CloseAcquireMenu()
 	CloseLifeSkillsMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	inv_open = TRUE
 	inv_cat_index = 1
 	btn_inv.icon = 'HUD/ui_slot_unavailable.png'

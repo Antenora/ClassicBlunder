@@ -8,6 +8,7 @@
 // Applies the Suspended state to a mob for [duration] ticks, then clears it.
 proc/applySuspend(mob/target, duration, overlay_icon = null)
 	if(!target || !target.loc) return
+	if(target.TryDisableBreak("suspend")) return
 	var/datum/token = new /datum
 	target.Suspended = token
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/SuspendedOverlay/ov = null

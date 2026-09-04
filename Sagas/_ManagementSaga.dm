@@ -165,6 +165,9 @@ mob/Admin3/verb
 		var/Level7=0
 		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
 		if(P.Saga)
+			if(P.Saga=="Mage")
+				src << "[P] is a Mage. Use the Mage Admin verb instead."
+				return
 			if(P.Saga=="Keyblade"||P.Saga=="Weapon Soul"||P.Saga=="Cosmo"||P.Saga=="King of Braves"||P.Saga=="Hiten Mitsurugi-Ryuu"||P.Saga=="Shinigami"||P.Saga=="Shinobi"||P.Saga=="Sorcerer")
 				Level7=1
 			if(P.Saga=="Devil Summoner")
@@ -894,6 +897,8 @@ mob
 mob
 	proc
 		saga_up_self()
+			if(src.Saga == "Mage")
+				return
 			if(!src.SagaAdminPermission)
 				if(src.SagaLevel>=6)
 					return
@@ -1599,6 +1604,8 @@ mob
 								AddSkill(new/obj/Skills/AutoHit/Magic/Blizzara)
 								AddSkill(new/obj/Skills/AutoHit/Magic/Thundara)
 						if(src.KeybladeType=="Shield")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Shell, src))
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Shell)
 							src.ChooseMartialSkill(1)
 
 						if(src.KeybladeType=="Sword")
@@ -1636,6 +1643,8 @@ mob
 							src.AddSkill(new/obj/Skills/AutoHit/Magic/Gravity)
 						if(src.KeybladeType=="Shield")
 							src.AddSkill(new/obj/Skills/AutoHit/Magic/Magnet)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Barrier, src))
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Barrier)
 							src.ChooseMartialSkill(2)
 							src.ChooseMartialSkill(1)
 						if(src.KeybladeType=="Sword")
@@ -1676,15 +1685,23 @@ mob
 							src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Dark_Mode)
 							src << "You can now tap into your inner darkness at will!"
 						switch(src.KeybladePath)
-							if("Magic")
-								AddSkill(new/obj/Skills/AutoHit/Magic/Holy)
-								AddSkill(new/obj/Skills/AutoHit/Magic/Gravity)
+							if("Magical")
+								if(!locate(/obj/Skills/AutoHit/Magic/Holy, src))
+									AddSkill(new/obj/Skills/AutoHit/Magic/Holy)
+								if(!locate(/obj/Skills/AutoHit/Magic/Gravity, src))
+									AddSkill(new/obj/Skills/AutoHit/Magic/Gravity)
 							if("Fire")
 								AddSkill(new/obj/Skills/Projectile/Magic/Firaga)
 							if("Ice")
 								AddSkill(new/obj/Skills/AutoHit/Magic/Blizzaga)
 							if("Thunder")
 								AddSkill(new/obj/Skills/AutoHit/Magic/Thundaga)
+						if(src.KeybladeType=="Staff")
+							if(!locate(/obj/Skills/Projectile/Magic/Meteor, src))
+								src.AddSkill(new/obj/Skills/Projectile/Magic/Meteor)
+						if(src.KeybladeType=="Shield")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Protect, src))
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Protect)
 
 					if(src.SagaLevel==5)
 						if(src.KeybladeColor=="Light")
@@ -1696,6 +1713,12 @@ mob
 							src.Keychains.Add("Ebony Slumber")
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/SyncBlade)
 							src << "You have unlocked the Ebony Slumber keychain, granting you perfect control over your own darkness!"
+						if(src.KeybladeType=="Shield")
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Resilient_Sphere, src))
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Resilient_Sphere)
+						if(src.KeybladeType=="Staff")
+							if(!locate(/obj/Skills/Projectile/Magic/Disintegrate, src))
+								src.AddSkill(new/obj/Skills/Projectile/Magic/Disintegrate)
 /*						var/Choice
 						var/Confirm
 						while(Confirm!="Yes")
@@ -1725,6 +1748,8 @@ mob
 							src.ChooseMartialSkill(3)
 							src.ChooseMartialSkill(2)
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Protega, src))
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Protega)
 						else if(src.KeybladeType=="Staff")
 							src.AddSkill(new/obj/Skills/AutoHit/Magic/Ultima)
 						else if(src.KeybladeType=="Sword")

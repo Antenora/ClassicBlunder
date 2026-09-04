@@ -242,6 +242,8 @@ client/proc/OpenStationMenu(kind, obj/LifeSkills/Station/S)
 	CloseTechMenu()
 	CloseAcquireMenu()
 	CloseLifeSkillsMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	stmenu_open = 1
 	st_kind = kind
 	st_station = S

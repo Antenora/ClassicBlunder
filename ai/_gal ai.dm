@@ -827,7 +827,7 @@ mob/Player/AI
 		if(src.Health<=0 && !src.KO)
 			Unconscious(null,"?!?!")
 
-		if((src.HealthPct()+1 >= 100 - (100*HealthCut)-1) || (src.Energy+1 >= 100 - (100*EnergyCut)-1) || (src.ManaAmount+1 >= 100 - (100*ManaCut)-1))
+		if((src.HealthPct()+1 >= 100 - (100*HealthCut)-1) || (src.Energy+1 >= 100 - (100*EnergyCut)-1) || (src.ManaAmount+1 >= 100 - (100*ManaCut)-1) || src.Burn > 0)
 			if(world.time >= ai_next_gainloop)
 				aiGain()
 				ai_next_gainloop = world.time + 10

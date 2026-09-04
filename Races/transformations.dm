@@ -29,7 +29,6 @@ mob/proc/Transform(type)
 		return*/
 	FlashTransformMoment(src)
 	race.transformations[transActive+1].transform(src)
-	spawn(1) MobAuraLightRefresh(src)
 
 mob/proc/Revert(type)
 	/*if(type)
@@ -44,7 +43,6 @@ mob/proc/Revert(type)
 		return*/
 
 	race.transformations[transActive].revert(src)
-	spawn(1) MobAuraLightRefresh(src)
 
 transformation
 	var
@@ -191,7 +189,6 @@ transformation
 				user.ShadowExclude(form_aura_underlay)
 			if(hair)
 				user.Hair = form_hair
-			spawn(1) MobAuraLightRefresh(user)
 
 		remove_visuals(mob/user, aura = 1, hair = 1, extra = 1)
 			if(hair)
@@ -205,7 +202,7 @@ transformation
 			if(aura)
 				user.overlays -= form_aura
 				user.underlays -= form_aura_underlay
-			spawn(1) MobAuraLightRefresh(user)
+			user.AuraLightSync()
 
 		transform(mob/user, forceTrans)
 			if(user.passive_handler.Get("Utterly Powerless") >= 1&&!user.passive_handler.Get("Our Future"))

@@ -103,58 +103,6 @@ obj/Seal
 		var/Orders
 
 
-obj/Magic_Circle
-	icon='Demon Gate.dmi'
-	pixel_x=-96
-	pixel_y=-96
-	Pickable=0
-	Grabbable=0
-	Destructable=0
-	layer=TURF_LAYER
-	Savable=1
-	var/Creator//holds creator ckey
-	var/Locked=1//only cuts creator mana
-	var/currentRitualID = null
-/*	proc/ritualAnimation()
-
-	verb/triggerRitual()
-		if(!currentRitualID) return
-		var/ritual/ritual
-		for(var/ritual/r in ritualDatabase)
-			if(r.name == currentRitualID)
-				ritual = new r
-		ritual.performRitual(src, usr)
-		ritualAnimation()
-
-	verb/setRitual()
-		var/list/validRituals = list("Cancel")
-		for(var/knowledge in usr.knowledgeTracker.learnedMagic)
-			if(knowledge == "Introductory Ritual Magics")
-				validRituals += list("Sword Enchanting")
-		if(length(validRituals)==1) return
-		var/chosenRitual = input(usr, "Pick a ritual.") in validRituals
-		if(chosenRitual == "Cancel") return
-		currentRitualID = chosenRitual*/
-
-	verb/Toggle()
-		set src in range(1, usr)
-		if(usr.ckey==src.Creator)
-			if(src.Locked)
-				src.Locked=0
-				usr << "You allow your magic circle to be used by others nearby!  But the benefits are reduced."
-			else
-				src.Locked=1
-				usr << "You do not allow others to use your magic circle!"
-		else
-			usr << "This isn't your magical circle!"
-	verb/Erase()
-		set src in range(1, usr)
-		if(usr.ckey==src.Creator)
-			if(!locate(/obj/Skills/Utility/Create_Magic_Circle, usr))
-				usr << "You erase the circle, ready to place it elsewhere."
-				usr.AddSkill(new/obj/Skills/Utility/Create_Magic_Circle)
-			del src
-
 obj/Items/Enchantment
 
 	Limited_Rank_Up_Magic
@@ -2446,75 +2394,6 @@ obj/Items/Enchantment
 					usr.OMessage(15,"[usr] flips open a book, magical energies beginning to flow!","[usr]([usr.key]) is using a Linking Book.")
 					sleep(20)
 					usr.loc=locate(selection.x,selection.y,selection.z)
-
-	PhilosopherStone
-		name="Philosopher Stone"
-		icon='enchantmenticons.dmi'
-		icon_state="PhiloStone"
-		desc="A philosopher's stone is the result of a sapient being transmuted into pure mana.  They regenerate capacity.<br>"
-		suffix = "Will Use."
-		var/CurrentCapacity
-		var/MaxCapacity
-		var/RegenRate
-		var/SoulStrength//regen+recov at moment of stoning
-		var/SoulIdentity//UID of person stoned
-		var/ToggleUse = 1
-		New()
-			..()
-			Update_Description()
-		verb/ToggleStone()
-			set name = "Toggle Stone"
-			ToggleUse = !ToggleUse
-			Update_Description()
-
-		UpdatesDescription=1
-		Fake
-			CurrentCapacity = 200
-			MaxCapacity = 200
-			RegenRate = 1
-			proc/reintegrate(mob/Players/user)
-				if(SoulIdentity==user.UniqueID)
-					user.ManaSealed = 0
-					OMsg(user, "[user] has been reintegrated with their magical circuits!")
-					del src
-				else
-					user << "This stone doesn't belong to your circuits!"
-
-			verb/Reintegrate_Stone()
-				set name = "Reintegrate Stone"
-				reintegrate(usr)
-		True
-			CurrentCapacity=400
-			MaxCapacity=400
-			RegenRate=1
-		Artificial
-			name="Philosopher Stone (Artificial)"
-			CurrentCapacity=200
-			MaxCapacity=200
-			RegenRate=1
-		Magicite
-			name="Magicite Stone"
-			icon_state = "MagiStone"
-			CurrentCapacity=1
-			MaxCapacity=1
-			RegenRate=0
-			SoulStrength=2
-			Update_Description()
-				src.desc="A magicite stone, operating as a source of mana.<br>Your [src] mana storage: [round(src.CurrentCapacity)] / [src.MaxCapacity]"
-				if(ToggleUse)
-					usr << "This stone is now available for enchanting."
-					src.suffix = "[round(src.CurrentCapacity)] / [src.MaxCapacity] (Enabled for Use)"
-				else
-					usr << "This stone will not be used for enchanting."
-					src.suffix = "[round(src.CurrentCapacity)] / [src.MaxCapacity] (Disabled for Use)"
-		proc/Update_Description()
-			src.desc="A philosopher's stone is the result of a sapient being transmuted into pure mana.<br>Your [src] mana storage: [round(src.CurrentCapacity)] / [src.MaxCapacity]"
-			if(ToggleUse)
-				usr << "This stone is now available for enchanting."
-				src.suffix = "[round(src.CurrentCapacity)] / [src.MaxCapacity] (Enabled for Use)"
-			else
-				usr << "This stone will not be used for enchanting."
-				src.suffix = "[round(src.CurrentCapacity)] / [src.MaxCapacity] (Disabled for Use)"
 
 
 obj/Items/Enchantment/Staff

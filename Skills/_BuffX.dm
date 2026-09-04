@@ -609,7 +609,6 @@ NEW VARIABLES
 			User.BuffingUp=0
 			if(!src.BuffName)
 				src.BuffName="[src.name]"
-			spawn(1) MobAuraLightRefresh(User) //aura light follows buff on/off instantly
 			return returnClause
 	ActiveBuffs
 		ActiveSlot=1
@@ -5238,112 +5237,6 @@ NEW VARIABLES
 		Magic
 			MagicNeeded=1
 
-			Magic_Barrier
-				SkillCost=0
-				passives = list("Deflection" = 1)
-				Deflection=1
-				DefMult = 0.4
-				TimerLimit=0
-				Cooldown=30
-				ManaCost = 8
-				IconLock='zekkai.dmi'
-				IconLockBlend=2
-				IconLayer=-1
-				IconApart=1
-				OverlaySize=1.4
-				ActiveMessage="makes a shield of magic!"
-				OffMessage="lowers their shield..."
-				adjust(mob/p)
-					var/magicLevel = p.getTotalMagicLevel()
-					ManaDrain = 1.2 - (0.04 * magicLevel)
-					passives["Deflection"] = 1 + round(magicLevel / 10)
-					if(magicLevel >= 10)
-						passives["BulletKill"] = 1
-				verb/Ki_Shield()
-					set category="Skills"
-					src.Trigger(usr)
-
-			Hold_PersonApply
-				MagicNeeded = 0
-				CrippleAffected = 1
-				StunAffected = 4
-				InstantAffect = 1
-				TimerLimit = 15
-				ActiveMessage="is held in place by magic!"
-				OffMessage="has been released by their magical restraints!"
-				adjust(mob/p)
-					var/magicLevel = p.getTotalMagicLevel()
-					StunAffected = round(1 + (magicLevel / 4))
-					CrippleAffected = round(magicLevel * 2)
-					TimerLimit = round(5 + (magicLevel / 2))
-			Hold_Person
-				Copyable=0
-				ManaCost=15
-				TimerLimit = 15
-				AffectTarget=1
-				Range = 25
-				Cooldown = 120
-				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/Hold_PersonApply
-				ActiveMessage="casts a great magic to hold their target in place!"
-				OffMessage="releases the magic!!"
-				adjust(mob/p)
-					var/magicLevel = p.getTotalMagicLevel()
-					Range = 10 + magicLevel
-					// StunAffected = round(1 + (magicLevel / 4))
-					// CrippleAffected = round(magicLevel * 2)
-					TimerLimit = round(5 + (magicLevel / 2))
-				verb/Hold_Person()
-					set category="Skills"
-					if(!altered)
-						adjust(usr)
-						applyToTarget?:adjust(usr)
-					src.Trigger(usr)
-
-			Haste
-				Cooldown = 120
-				Copyable = 0
-				ManaCost = 10
-				TimerLimit = 10
-				ActiveMessage = "uses magic to push themselves through time!"
-				OffMessage = "slows down to a normal pace..."
-				adjust(mob/p)
-					NoForcedWhiff = 1 // make it so people cant force whiff u
-					var/magicLevel = p.getTotalMagicLevel()
-					passives = list( "Godspeed" = clamp(round(magicLevel/10), 1, 2), "DoubleStrike" = 1)
-					TimerLimit = round(15 + (magicLevel * 1.5))
-					SpdMult = 1 + (magicLevel * 0.01)
-					Godspeed = round(magicLevel / 10)
-					DoubleStrike = 1
-					ManaDrain = 0.01
-					SpdTax = 0.03
-				verb/Haste()
-					set category="Skills"
-					if(!altered)
-						adjust(usr)
-					src.Trigger(usr)
-
-			Reverse_Wounds
-				Copyable = 0
-				ManaCost = 10
-				TimerLimit = 25
-				ActiveMessage = "uses magic to reverse their wounds!"
-				OffMessage = "'s wounds stop healing backwards..."
-				StableHeal = 1
-				Cooldown = -1
-				// this is just regen bro LOL!
-				adjust(mob/p)
-					var/magicLevel = 1 + p.getTotalMagicLevel()
-					var/base = round(magicLevel / 8)
-					var/perMissing = 0.01
-					var/amount = round(base + (abs(p.HealthPct()-100) * perMissing))
-					TimerLimit = 25 * (1 - magicLevel / 40)
-					HealthHeal = (amount / (TimerLimit * world.tick_lag))
-
-				verb/Reverse_Wounds()
-					set category="Skills"
-					if(!altered)
-						adjust(usr)
-					src.Trigger(usr)
 
 
 
@@ -5483,591 +5376,7 @@ NEW VARIABLES
 
 					src.Trigger(usr)
 
-			Water_Walk
-				ElementalClass="Wind"
-				SkillCost=TIER_1_COST
-				Copyable=1
-				ManaCost=5
-				TimerLimit=15
-				passives = list("WaterWalk" = 1)
-				WaterWalk=1
-				TextColor=rgb(0, 255, 255)
-				ActiveMessage="uses a spell to grant themselves the miracle of waterwalk!"
-				OffMessage="dissipates their miraculous walk..."
-				Cooldown=30
-				verb/Water_Walk()
-					set category="Utility"
-					set hidden = 1
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 15+magicLevel
-					src.Trigger(usr)
-			Swift_Walk
-				ElementalClass="Wind"
-				SkillCost=TIER_1_COST
-				Copyable=2
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Water_Walk")
-				ManaCost=3
-				passives = list("WaterWalk" = 1, "Godspeed" = 1)
-				WaterWalk=1
-				Godspeed=1
-				TimerLimit=20
-				KenWave=1
-				KenWaveIcon='Magic Time circle.dmi'
-				KenWaveSize=5
-				KenWaveX=105
-				KenWaveY=105
-				ActiveMessage="casts a spell to become fleet on foot!"
-				OffMessage="dissipates their enchanted speed..."
-				Cooldown=45
-				verb/Swift_Walk()
-					set category="Utility"
-					set hidden = 1
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 20+magicLevel
-					src.Trigger(usr)
-			Wind_Walk
-				ElementalClass="Wind"
-				SkillCost=TIER_1_COST
-				Copyable=3
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Swift_Walk")
-				ManaCost=8
-				TimerLimit=30
-				passives = list("Skimming" = 1, "Godspeed" = 3)
-				Skimming=1
-				Godspeed=3
-				TextColor=rgb(140, 255, 140)
-				KenWave=1
-				KenWaveIcon='Magic Time circle.dmi'
-				KenWaveSize=5
-				KenWaveX=105
-				KenWaveY=105
-				ActiveMessage="uses a spell to give themselves the alacrity of the wind!"
-				OffMessage="dissipates their aerial speed..."
-				Cooldown=60
-				verb/Wind_Walk()
-					set category="Utility"
-					set hidden = 1
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 25+magicLevel
-					src.Trigger(usr)
 
-			Magic_Trick
-				ElementalClass="Water"
-				SkillCost=TIER_1_COST
-				Copyable=1
-				EndYourself=1
-				ActiveMessage="performs a stunning magic trick!"
-				ManaCost=5
-				Cooldown=30
-				verb/Magic_Trick()
-					set category="Utility"
-					set hidden = 1
-					if(!src.Using)
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(20))
-								m.AddConfusing(20)
-								OMsg(m, "[m] tries to work out the logistics of the trick! How can this be?!")
-							else if(prob(10))
-								Stun(m,5)
-								OMsg(m, "[m] is stunned by the trick!")
-							/*else if(prob(5))
-								m.AddPacifying(5)
-								OMsg(m, "[m] is rendered stupified by the trick!")*/
-							else
-								usr << "[m] didn't appear impressed by your trick."
-					src.Trigger(usr)
-			Magic_Act
-				ElementalClass="Water"
-				SkillCost=TIER_1_COST
-				Copyable=2
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Trick")
-				ManaCost=10
-				Cooldown=30
-				verb/Confusing_Act()
-					set hidden=1
-					if(!usr.BuffOn(src))
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=1
-						src.ActiveMessage="performs a confusing act!"
-						src.OffMessage=0
-						src.FakePeace=0
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(30))
-								m.AddConfusing(20)
-								OMsg(m, "[m] tries to work out the logstics of the act! How can this be?!")
-							else
-								OMsg(m, "[m] isn't impressed by [usr]'s act.")
-					src.Trigger(usr)
-				verb/Stunning_Act()
-					set hidden=1
-					if(!usr.BuffOn(src))
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=1
-						src.ActiveMessage="performs a stunning act!"
-						src.OffMessage=0
-						src.FakePeace=0
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(20))
-								Stun(m, 5)
-								OMsg(m, "[m] is stunned by the act!")
-							else
-								OMsg(m, "[m] isn't impressed by [usr]'s act.")
-					src.Trigger(usr)
-				verb/Magic_Act()
-					set category="Utility"
-					set hidden = 1
-					if(!usr.BuffOn(src))
-						var/Choices=list("Cancel", "Confuse", "Stun")
-						var/Mode=input(usr, "What act do you perform?", "Magic Act") in Choices
-						switch(Mode)
-							if("Cancel")
-								return
-							if("Confuse")
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=1
-								src.ActiveMessage="performs a confusing act!"
-								src.OffMessage=0
-								src.FakePeace=0
-								for(var/mob/Players/m in oviewers(5,usr))
-									if(prob(30))
-										m.AddConfusing(20)
-										OMsg(m, "[m] tries to work out the logistics of the act! How can this be?!")
-									else
-										OMsg(m, "[m] isn't impressed by [usr]'s act.")
-							if("Stun")
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=1
-								src.ActiveMessage="performs a stunning act!"
-								src.OffMessage=0
-								src.FakePeace=0
-								for(var/mob/Players/m in oviewers(5,usr))
-									if(prob(20))
-										Stun(m, 5)
-										OMsg(m, "[m] is stunned by the act!")
-									else
-										OMsg(m, "[m] isn't impressed by [usr]'s act.")
-					src.Trigger(usr)
-
-			Magic_Show
-				ElementalClass="Water"
-				SkillCost=TIER_1_COST
-				Copyable=3
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Act")
-				ManaCost=15
-				TextColor=rgb(153, 51, 0)
-				Cooldown=30
-				verb/Disappear()
-					set hidden=1
-					if(!usr.BuffOn(src))
-						src.BuffName="Invisibility"
-
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=0
-						src.Invisible=20
-						src.AllowedPower=0.2
-						src.FakePeace=0
-						ActiveMessage="uses a spell to hide their existence!"
-						OffMessage="dissipates their invisibility..."
-					src.Trigger(usr)
-				verb/Confusing_Show()
-					set hidden=1
-					if(!usr.BuffOn(src))
-
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=1
-						src.Invisible=0
-						src.AllowedPower=0
-						src.FakePeace=0
-						src.ActiveMessage="performs a confusing show!"
-						src.OffMessage=0
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(50))
-								m.AddConfusing(20)
-								OMsg(m, "[m] tries to work out the logistics of the show! How could this be?!")
-							else
-								OMsg(m, "[m] isn't impressed by [usr]'s show.")
-					src.Trigger(usr)
-				verb/Stunning_Show()
-					set hidden=1
-					if(!usr.BuffOn(src))
-
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=1
-						src.Invisible=0
-						src.AllowedPower=0
-						src.FakePeace=0
-						src.ActiveMessage="performs a stunning show!"
-						src.OffMessage=0
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(40))
-								Stun(m, 5)
-								OMsg(m, "[m] is stunned by the show!")
-							else
-								OMsg(m, "[m] isn't impressed by [usr]'s show.")
-					src.Trigger(usr)
-/*				verb/Pacifying_Show()
-					set hidden=1
-					if(!usr.BuffOn(src))
-
-						src.PhysicalHitsLimit=0
-						src.SpiritHitsLimit=0
-						src.EndYourself=1
-						src.Invisible=0
-						src.AllowedPower=0
-						src.FakePeace=0
-						src.ActiveMessage="performs a pacifying show!"
-						src.OffMessage=0
-						for(var/mob/Players/m in oviewers(5,usr))
-							if(prob(30))
-								m.AddPacifying(5)
-								OMsg(m, "[m] is rendered stupified by the show!")
-							else
-								OMsg(m, "[m] isn't impressed by [usr]'s show.")
-					src.Trigger(usr)*/
-				verb/Magic_Show()
-					set category="Utility"
-					set hidden = 1
-					if(!usr.BuffOn(src))
-						var/Choices=list("Cancel", "Disappear", "Confuse", "Stun")
-						var/Mode=input(usr, "What show do you perform?", "Magic Show") in Choices
-						switch(Mode)
-							if("Cancel")
-								return
-							if("Disappear")
-								src.BuffName="Invisibility"
-
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=0
-								src.Invisible=20
-								src.AllowedPower=0.2
-								src.FakePeace=0
-								src.ActiveMessage="uses a spell to hide their existence!"
-								src.OffMessage="dissipates their invisibility..."
-							if("Confuse")
-
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=1
-								src.Invisible=0
-								src.AllowedPower=0
-								src.ActiveMessage="performs a confusing show!"
-								src.OffMessage=0
-								src.FakePeace=0
-								for(var/mob/Players/m in oviewers(5,usr))
-									if(prob(50))
-										m.AddConfusing(20)
-										OMsg(m, "[m] tries to work out the logistics of the show the show! How could this be?!")
-									else
-										OMsg(m, "[m] isn't impressed by [usr]'s show.")
-							if("Stun")
-
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=1
-								src.Invisible=0
-								src.AllowedPower=0
-								src.ActiveMessage="performs a stunning show!"
-								src.OffMessage=0
-								src.FakePeace=0
-								for(var/mob/Players/m in oviewers(5,usr))
-									if(prob(40))
-										Stun(m, 5)
-										OMsg(m, "[m] is stunned by the show!")
-									else
-										OMsg(m, "[m] isn't impressed by [usr]'s show.")
-							if("Pacify")
-
-								src.PhysicalHitsLimit=0
-								src.SpiritHitsLimit=0
-								src.EndYourself=1
-								src.Invisible=0
-								src.AllowedPower=0
-								src.ActiveMessage="performs a pacifying show!"
-								src.OffMessage=0
-								src.FakePeace=0
-								for(var/mob/Players/m in oviewers(5,usr))
-									if(prob(30))
-										m.AddPacifying(5)
-										OMsg(m, "[m] is rendered stupified by the show!")
-									else
-										OMsg(m, "[m] isn't impressed by [usr]'s show.")
-					src.Trigger(usr)
-
-			Stone_Skin
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=3
-				ManaCost=3
-				passives = list("Harden" = 0.5)
-				ActiveMessage="uses a spell to give themselves the endurance of the earth!"
-				OffMessage="dissipates their earth protection..."
-				TextColor=rgb(153, 51, 0)
-				TimerLimit=15
-				Cooldown=60
-				verb/Stone_Skin()
-					set category="Skills"
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 15+magicLevel
-					src.Trigger(usr)
-			True_Effort
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=4
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Stone_Skin")
-				ManaCost=12
-				passives = list("Harden" = 1, "Pursuer" = 1)
-				Instinct=1
-				Pursuer=1
-				TextColor=rgb(255, 0, 0)
-				ActiveMessage="uses a spell to draw out their highest effort!"
-				OffMessage="dissipates their extra effort..."
-				TimerLimit=30
-				Cooldown=100
-				verb/True_Effort()
-					set category="Skills"
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 30+magicLevel
-					src.Trigger(usr)
-			Heroic_Will
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=5
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/True_Effort")
-				ManaCost=10
-				TimerLimit=30
-				passives = list("Harden" = 1.5, "Pursuer" = 1)
-				Instinct=1
-				Pursuer=1
-				TextColor=rgb(255, 0, 0)
-				ActiveMessage="uses a spell to mimic the will of a hero!"
-				OffMessage="dissipates their heroic will..."
-				Cooldown=180
-				verb/Heroic_Will()
-					set category="Skills"
-					var/magicLevel = usr.getTotalMagicLevel()
-					if(magicLevel >= 10)
-						magicLevel = 10
-					TimerLimit = 30+magicLevel
-					src.Trigger(usr)
-
-			Mage_Armor
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=3
-				MakesArmor=1
-				ArmorAscension=1 // maybe somehow a way to make this scale?
-				ArmorIcon='LancelotArmor.dmi'
-				ArmorClass="Light"
-				CastingTime=3
-				ActiveMessage="weaves an aetheric armor around themselves!"
-				OffMessage="releases the invoked armor..."
-				TimerLimit=30
-				ManaCost=10
-				Cooldown=120
-				verb/Mage_Armor()
-					set category="Skills"
-					if(!altered)
-						passives = list("ArmorAscension" = 1)
-						ArmorAscension = 1
-						var/magicLevel = usr.getTotalMagicLevel()
-						if(magicLevel >= 10)
-							magicLevel = 10
-						TimerLimit = 30+magicLevel
-					src.Trigger(usr)
-				verb/Customize_Mage_Armor()
-					set category="Utility"
-					set hidden = 1
-					var/Choice
-					if(!usr.BuffOn(src))
-						var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
-						if(Lock=="Yes")
-							src.ArmorIcon=input(usr, "What icon will your Mage Armor use?", "Mage Armor Icon") as icon|null
-							src.ArmorX=input(usr, "Pixel X offset.", "Mage Armor Icon") as num
-							src.ArmorY=input(usr, "Pixel Y offset.", "Mage Armor Icon") as num
-						Choice=input(usr, "What class of armor do you want your Mage Armor to be?", "Customize Mage Armor") in list("Light", "Medium", "Heavy")
-						switch(Choice)
-							if("Light")
-								src.ArmorClass="Light"
-							if("Medium")
-								src.ArmorClass="Medium"
-							if("Heavy")
-								src.ArmorClass="Heavy"
-						usr << "Mage Armor class set as [Choice]!"
-					else
-						usr << "You can't set this while using Mage Armor."
-			Perfect_Warrior
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=4
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Mage_Armor")
-				StrMult=1
-				EndMult=1
-				DefMult=1 // 0.3
-				passives = list("CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
-				 "NoDodge" = 1)
-				MakesArmor=1
-				ActiveMessage="enters a martial trance, sacrificing their magical abilities!"
-				OffMessage="regains their magicality..."
-				TimerLimit=60
-				ManaCost=15
-				Cooldown=-1
-				verb/Perfect_Warrior()
-					set category="Skills"
-					if(!altered)
-						var/magicLevel = usr.getTotalMagicLevel()
-						if(magicLevel >= 16)
-							DefMult = 0.5
-							StrMult = 1 + (magicLevel * 0.015)
-							EndMult = 1 + (magicLevel * 0.015)
-							passives = list("CriticalDamage" = 0.5, "CriticalBlock" = 0.5, "ArmorAscension" = 1)
-							Cooldown = 240
-							TimerLimit = 60 + magicLevel
-						else
-							passives = list("CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 0.5, \
-							 "NoDodge" = 1)
-							DefMult = 1
-							StrMult = 1
-							EndMult = 1
-							TimerLimit = 60 + magicLevel
-					if(!usr.BuffOn(src))
-						src.ManaAdd=(-1)*(usr.ManaAmount*0.75)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Mage_Armor/MA in usr)
-						src.ArmorIcon=MA.ArmorIcon
-						src.ArmorClass=MA.ArmorClass
-						src.ArmorX=MA.ArmorX
-						src.ArmorY=MA.ArmorY
-					src.Trigger(usr)
-			Golem_Form
-				ElementalClass="Earth"
-				SkillCost=TIER_3_COST
-				Copyable=5
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Perfect_Warrior")
-				Enlarge=2
-				Mechanized=1
-				Xenobiology=1
-				StrMult=1 //1.2
-				EndMult=1 //1.3
-				SpdMult=1 //0.8
-				DefMult=1 //0.3
-				SweepingStrike=1
-				MakesArmor=1
-				ArmorAscension=1
-				IconTint=list(0.3,0.3,0.3, 0.59,0.59,0.59, 0.11,0.11,0.11, 0,0,0)
-				ActiveMessage="channels magic power to force their body to transform into an artifical fighter!"
-				OffMessage="releases the magical transformation..."
-				TimerLimit=90
-				ManaCost=30
-				Cooldown=-1
-				verb/Golem_Form()
-					set category="Skills"
-					set name="Golem Form"
-					if(!altered)
-						var/magicLevel = usr.getTotalMagicLevel()
-						if(magicLevel>=20) // max magic
-							passives = list("Mechanized" = 1, "Xenobiology" = 1, "GiantForm" = 1, \
-						 "SweepingStrike" = 1, "CriticalDamage" = 0.25, "CriticalBlock" = 0.25, "ArmorAscension" = 2)
-							StrMult = 1 + (magicLevel * 0.015)
-							EndMult = 1 + (magicLevel * 0.015)
-							SpdMult = 1 - (magicLevel * 0.015)
-							DefMult = 0.6 - (magicLevel * 0.015)
-							TimerLimit = 120 + magicLevel
-						else
-							passives = list("Mechanized" = 1, "Xenobiology" = 1, \
-						 "SweepingStrike" = 1, "CriticalDamage" = 0.15, "CriticalBlock" = 0.15, "ArmorAscension" = 1, "NoDodge" = 1)
-							TimerLimit = 120 + magicLevel
-					if(!usr.BuffOn(src))
-						src.ManaAdd=(-1)*(usr.ManaAmount*1)
-					for(var/obj/Skills/Buffs/SlotlessBuffs/Magic/Mage_Armor/MA in usr)
-						src.ArmorIcon=MA.ArmorIcon
-						src.ArmorClass=MA.ArmorClass
-						src.ArmorX=MA.ArmorX
-						src.ArmorY=MA.ArmorY
-					src.Trigger(usr)
-
-			Binding
-				ElementalClass="Poison"
-				SkillCost=TIER_3_COST
-				Copyable=3
-				CastingTime=2
-				ManaCost=10
-				EndYourself=1
-				AffectTarget=1
-				Range=10
-				SlowAffected=10
-				CrippleAffected=10
-				TargetOverlay='StormArmor 2.dmi'
-				ActiveMessage="restrains their target's movements with binding magic!"
-				OffMessage="completes their bind..."
-				Cooldown=90
-				verb/Binding()
-					set category="Skills"
-					src.Trigger(usr)
-			Infect
-				ElementalClass="Poison"
-				SkillCost=TIER_3_COST
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Binding")
-				Copyable=4
-				CastingTime=5
-				ManaCost=20
-				EndYourself=1
-				AffectTarget=1
-				Range=10
-				PoisonAffected=2
-				ShearAffected=2
-				SlowAffected=10
-				CrippleAffected=10
-				TargetOverlay='Overdrive.dmi'
-				ActiveMessage="fills their target's veins with a venomous curse!"
-				OffMessage="completes their curse..."
-				Cooldown=120
-				verb/Infect()
-					set category="Skills"
-					src.Trigger(usr)
-			Curse
-				ElementalClass="Poison"
-				SkillCost=TIER_3_COST
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Infect")
-				Copyable=5
-				ManaCost=30
-				CastingTime=10
-				EndYourself=1
-				AffectTarget=1
-				// SpdTaxDrain=0.03
-				// RecovTaxDrain=0.03
-				HealthHeal= -0.5
-				TimerLimit = 5
-				PoisonAffected=2
-				ShearAffected=2
-				SlowAffected=5
-				CrippleAffected=5
-				Range=5
-				TargetOverlay='StormArmor.dmi'
-				ActiveMessage="saps their target's lifeforce with a malicious curse!"
-				OffMessage="finishes the cursing ritual..."
-				Cooldown=120
-				verb/Curse()
-					set category="Skills"
-					if(usr.Target.SpdTax||usr.Target.RecovTax)
-						return
-					src.Trigger(usr)
 
 
 
@@ -6281,6 +5590,7 @@ NEW VARIABLES
 			Resilient_Sphere
 				ElementalClass="Earth"
 				SignatureTechnique=2
+				SagaSignature=1
 				MenuIcon="ResilientSphere"
 				SignatureName="Advanced Shell Magic"
 				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/Resilient_SphereApply
@@ -6354,6 +5664,7 @@ NEW VARIABLES
 			Protega
 				ElementalClass="Earth"
 				SignatureTechnique=2
+				SagaSignature=1
 				MenuIcon="Protega"
 				SignatureName="Advanced Defense Magic"
 				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Protect")
@@ -6405,111 +5716,6 @@ NEW VARIABLES
 					adjust(usr)
 					src.Trigger(usr)
 
-			EsunaApply
-				StableHeal=1
-				FatigueHeal=20
-				BurnAffected=-10
-				SlowAffected=-10
-				ShockAffected=-10
-				ShatterAffected=-10
-				PoisonAffected=-10
-				ShearAffected=-10
-				TimerLimit=4
-				MagicNeeded = 0
-			Esuna
-				ElementalClass="Water"
-				SignatureTechnique=1
-				SagaSignature=1
-				SignatureName="White Magic"
-				AffectTarget=1
-				MenuIcon="Esuna"
-				CastingTime=4
-				EndYourself=1
-				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/EsunaApply
-				Range=7
-				KenWave=1
-				KenWaveIcon='SparkleGreen.dmi'
-				KenWaveSize=3
-				KenWaveX=105
-				KenWaveY=105
-				ActiveMessage="invokes: <font size=+1>ESUNA!</font size>"
-				TimerLimit = 4
-				OffMessage="releases the cure magic..."
-				ManaCost=15
-				Cooldown=150
-				verb/Esuna()
-					set category="Skills"
-					src.Trigger(usr)
-
-			EsunagaApply
-				StableHeal=1
-				FatigueHeal=35
-				BurnAffected=-20
-				SlowAffected=-20
-				ShockAffected=-20
-				ShatterAffected=-20
-				PoisonAffected=-20
-				ShearAffected=-20
-				TimerLimit=4
-				MagicNeeded = 0
-			Esunaga
-				ElementalClass="Water"
-				SignatureTechnique=2
-				SagaSignature=1
-				SignatureName="Advanced White Magic"
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Esuna")
-				EndYourself=1
-				MenuIcon="Esunaga"
-				AffectTarget=1
-				CastingTime=8
-				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/EsunagaApply
-				Range=12
-				KenWave=1
-				KenWaveIcon='SparkleGreen.dmi'
-				KenWaveSize=5
-				KenWaveX=105
-				KenWaveY=105
-				ActiveMessage="invokes: <font size=+1>ESUNAGA!</font size>"
-				OffMessage="releases the potent cure magic..."
-				ManaCost=20
-				TimerLimit=4
-				Cooldown=180
-				verb/Esunaga()
-					set category="Skills"
-					src.Trigger(usr)
-
-			CureApply
-				StableHeal=1
-				HealthHeal=10
-				TimerLimit=10
-				MagicNeeded = 0
-			Cure
-				ElementalClass="Water"
-				SignatureTechnique=1
-				SagaSignature=1
-				SignatureTechnique="White Magic"
-				AffectTarget=1
-				CastingTime=5
-				EndYourself = 1
-				MenuIcon="Cure"
-				applyToTarget = new/obj/Skills/Buffs/SlotlessBuffs/Magic/CureApply
-				Range=7
-				KenWave=1
-				KenWaveIcon='SparkleYellow.dmi'
-				KenWaveSize=3
-				KenWaveX=105
-				KenWaveY=105
-				ActiveMessage="invokes: <font size=+1>CURE!</font size>"
-				OffMessage="completes their spell..."
-				ManaCost=30
-				TimerLimit=10
-				Cooldown=-1
-				verb/Cure()
-					set category="Skills"
-					if(usr.Target==usr&&!altered)
-						usr << "You can't use [name] on yourself!"
-						return
-					src.Trigger(usr)
 
 			CuragaApply
 				StableHeal=1
@@ -6521,7 +5727,6 @@ NEW VARIABLES
 				SignatureTechnique=2
 				SagaSignature=1
 				SignatureName="Advanced White Magic"
-				PreRequisite=list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Cure")
 				AffectTarget=1
 				MenuIcon="Curaga"
 				CastingTime=8
@@ -7298,7 +6503,6 @@ NEW VARIABLES
 				var/tmp/database_synced = 0
 				verb/Crimson_Grimoire()
 					set category="Skills"
-					BuffTechniques = general_magic_database
 					src.Trigger(usr)
 /*			Pure_Grimoire
 				StrMult = 1.15
@@ -8957,7 +8161,7 @@ NEW VARIABLES
 					if(8)
 						SwordElement = "Light"
 					if(9)
-						SwordElement = "Chaos"
+						SwordElement = ""
 					if(10 to 13)
 						SwordElement = ""
 				src.Trigger(usr)
@@ -9047,7 +8251,7 @@ NEW VARIABLES
 					if(8)
 						SwordElement = "Light"
 					if(9)
-						SwordElement = "Chaos"
+						SwordElement = ""
 					if(10 to 13)
 						SwordElement = null
 				SwordAscension = max(0, usr.getAriaCount() / 2)
@@ -9154,9 +8358,9 @@ NEW VARIABLES
 					if(8)
 						SwordElement = "Light"
 					if(9)
-						SwordElement = "Chaos"
+						SwordElement = ""
 					if(10)
-						SwordElement = "HellFire"
+						SwordElement = ""
 					if(11 to 13)
 						SwordElement = null
 				SwordAscension = max(0, usr.getAriaCount() / 2)
@@ -9258,9 +8462,9 @@ NEW VARIABLES
 					if(8)
 						SwordElement = "Light"
 					if(9)
-						SwordElement = "Chaos"
+						SwordElement = ""
 					if(10)
-						SwordElement = "HellFire"
+						SwordElement = ""
 					if(11 to 13)
 						SwordElement = null
 				SwordAscension = max(0, usr.getAriaCount() / 2)
@@ -11843,7 +11047,6 @@ mob
 			if(!Override && !noGCD && GCDBlocked(B)) return
 			if(src.Airborne)
 				return
-			B.SpellSlotModification();
 			if(src.BuffOn(B))
 				if(B.MakesArmor)
 					if(src.ActiveBuff)
@@ -12451,8 +11654,10 @@ mob
 							if(!B.Autonomous)
 								src << "You don't have enough energy to activate [B]."
 							return
+					if(B.IsSpell && !src.SpellPreCast(B))
+						return
 					if(B.ManaCost && !src.HasDrainlessMana())
-						var/drain = B.ManaCost * src.ChakraCostMult(B)
+						var/drain = B.ManaCost * src.ChakraCostMult(B) * src.SpellCostMult(B)
 						if(!src.TomeSpell(B))
 							if(src.ManaAmount<drain)
 								if(!B.Autonomous)
@@ -13703,6 +12908,8 @@ mob
 					src.underlays+=im
 				else
 					src.overlays+=im
+				if(B.AuraArt)
+					src.ShadowExclude(im)
 			IgnoreIcon
 
 			if(B.HairLock==1)
@@ -13758,6 +12965,8 @@ mob
 				else
 					src.overlays-=im
 					src.overlays+=im
+				if(B.AuraArt)
+					src.ShadowExclude(im)
 			IgnoreRelayer
 
 			if(B.MakesSword==2)
@@ -14099,11 +13308,15 @@ mob
 				var/drain = passive_handler["Drained"] ? B.EnergyCost * (1 + passive_handler["Drained"]/10) : B.EnergyCost
 				src.LoseEnergy(drain)
 			if(B.ManaCost)
-				var/drain = B.ManaCost * src.ChakraCostMult(B)
+				var/drain = B.ManaCost * src.ChakraCostMult(B) * src.SpellCostMult(B)
 				if(!src.TomeSpell(B))
 					src.LoseMana(drain)
 				else
 					src.LoseMana(drain*(1-(0.45*src.TomeSpell(B))))
+				if(B.ConsumeSelfCast && B.IsSpell && src.last_struck && ismob(src.last_struck) && B.Consumes && B.Consumes.len)
+					var/mob/_lst = src.last_struck
+					if(_lst.PoolValue(B.Consumes[1]) >= max(1, B.ConsumeMinPool))
+						src.SpendSpellPools(B, _lst)
 				if(B.CorruptionGain)
 					gainCorruption((B.ManaCost / 1.5) * glob.CORRUPTION_GAIN)
 			if(B.ResourceCost)
@@ -14282,6 +13495,7 @@ mob
 					src.underlays-=im
 				else
 					src.overlays-=im
+				src.AuraLightSync()
 			if(B.StripEquip==2)
 				if(B.AssociatedGear)
 					src.overlays+=image(B.AssociatedGear.icon, pixel_x=B.AssociatedGear.pixel_x, pixel_y=B.AssociatedGear.pixel_y, layer=FLOAT_LAYER-3)

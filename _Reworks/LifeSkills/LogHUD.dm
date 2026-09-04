@@ -155,6 +155,8 @@ client/proc/OpenLogMenu(obj/LifeSkills/MaterialBuyer/buyer = null)
 	CloseTechMenu()
 	CloseAcquireMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	CloseLifeSkillsMenu()
 	logmenu_open = 1
 	log_buyer = buyer

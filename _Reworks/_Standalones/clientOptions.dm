@@ -45,8 +45,13 @@ Options/
     var/lsPanY = 0
     var/stPanX = 0          // forge/anvil station menu
     var/stPanY = 0
+    var/arPanX = 0
+    var/arPanY = 0
+    var/acPanX = 0
+    var/acPanY = 0
+    var/arChapter = "Spells"
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)

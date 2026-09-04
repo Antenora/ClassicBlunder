@@ -639,6 +639,10 @@ proc
 		set waitfor=0
 		var/obj/Effects/Explosion/E=new
 		E.loc=A
+		. = E
+		E.fx_t0 = world.time
+		E.fx_size = Size
+		E.fx_vanish = Vanish
 		var/pulse
 		if(icon_override) //already hand-colored, a tint would just muddy it
 			E.icon = icon_override
@@ -655,6 +659,10 @@ proc
 		E.layer=Layer
 		E.pixel_x+=PX
 		E.pixel_y+=PY
+		var/tpx = rand(-16*Offset*Size, 16*Offset*Size)
+		var/tpy = rand(-16*Offset*Size, 16*Offset*Size)
+		E.fx_dx = tpx - E.pixel_x
+		E.fx_dy = tpy - E.pixel_y
 		//big blasts only, a filter is a render pass per object and barrages fire dozens
 		if(Size >= 3)
 			E.filters += filter(name="blast", type="radial_blur", size=0.12, offset=7)
@@ -668,7 +676,7 @@ proc
 			if(Size >= 2) FxHeatColumn(A, Size) //big hot blast: the air above it wavers
 		animate(E, transform=E.transform*(2*Size), time=2, easing=QUAD_EASING|EASE_OUT)
 		spawn(2)
-			animate(E, alpha = 0, transform=E.transform*2, time = Vanish, pixel_x = rand(-16*Offset*Size, 16*Offset*Size), pixel_y = rand(-16*Offset*Size, 16*Offset*Size))
+			animate(E, alpha = 0, transform=E.transform*2, time = Vanish, pixel_x = tpx, pixel_y = tpy)
 			sleep(Vanish)
 			E.EffectFinish()
 

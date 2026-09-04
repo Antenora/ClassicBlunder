@@ -29,8 +29,7 @@
 // Projectiles
 /obj/Skills/Projectile/Beams/Will_Beam
 	Copyable=0
-	DamageMult=0.4
-	ChargeRate=0.2
+	DamageMult=0.45
 	Distance=50
 	Knockback=1
 	IconLock='BeamBig2.dmi'

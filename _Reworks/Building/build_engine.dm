@@ -316,6 +316,21 @@
 		BuildRestoreRec(krec)
 	LightingRecomputeNear(old)
 
+/proc/BuildRotAngle(dirv)
+	switch(dirv)
+		if(WEST)
+			return -90
+		if(NORTH)
+			return -180
+		if(EAST)
+			return -270
+	return 0
+
+/proc/BuildPlacedDir(datum/build_entry/E, dirv)
+	var/base = E.dirBase || SOUTH
+	var/ang = BuildRotAngle(dirv)
+	return ang ? turn(base, ang) : base
+
 /proc/BuildPlaceObj(client/C, turf/T, datum/build_action/A, datum/build_entry/E)
 	var/mob/M = C.mob
 	var/obj/O = new E.Creates(T)
@@ -323,7 +338,7 @@
 		O.icon = E.iconF
 	if(E.icon_state)
 		O.icon_state = E.icon_state
-	O.dir = C.bsession.dirv
+	O.dir = BuildPlacedDir(E, C.bsession.dirv)
 	if(E.isCustom)
 		if(E.cLayer)
 			O.layer = E.cLayer

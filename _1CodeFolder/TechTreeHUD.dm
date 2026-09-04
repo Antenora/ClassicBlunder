@@ -257,6 +257,8 @@ client/proc/OpenTechMenu(start_tab = "tree")
 	if(tmenu_open || !mob) return
 	if(length(TechnologyTree) < 1) fillOutTechTree()
 	CloseMenu(); CloseInventory(); CloseCharacterMenu(); CloseSkillMenu(); CloseAcquireMenu(); CloseLifeSkillsMenu(); CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	tmenu_open = 1
 	tmenu_tab = start_tab
 

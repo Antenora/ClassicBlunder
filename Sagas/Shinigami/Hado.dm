@@ -19,9 +19,11 @@
 	parent_type = /obj/Skills/Projectile/Beams
 	name = "Byakurai"
 	Area = "Beam"
-	ChargeRate = 0.5
+	HeldSkill = TRUE
+	HeldBeam = TRUE
+	ChargePeriod = 1
 	BeamTime = 10
-	DamageMult = 0.15
+	DamageMult = 0.23
 	Shocking = 10
 	Piercing = 1
 	Distance = 50
@@ -39,7 +41,7 @@
 	verb/Byakurai()
 		set name = "Byakurai"
 		set category = "Skills"
-		usr.UseProjectile(src)
+		usr.BeginHeldSkill(src)
 
 /obj/Skills/Buffs/ActiveBuffs/Hado/Tsuzuri_Raiden
 	name = "Tsuzuri Raiden"
@@ -129,9 +131,11 @@
 	parent_type = /obj/Skills/Projectile/Beams
 	name = "Oukasen"
 	Area = "Beam"
-	ChargeRate = 1
+	HeldSkill = TRUE
+	HeldBeam = TRUE
+	ChargePeriod = 2
 	BeamTime = 10
-	DamageMult = 0.25
+	DamageMult = 0.32
 	Distance = 50
 	IconSize = 1
 	AccMult = 1.175
@@ -145,7 +149,7 @@
 	verb/Oukasen()
 		set name = "Oukasen"
 		set category = "Skills"
-		usr.UseProjectile(src)
+		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Soukatsui
 	name = "Soukatsui"
@@ -242,9 +246,11 @@
 	parent_type = /obj/Skills/Projectile/Beams
 	name = "Tenran"
 	Area = "Beam"
-	ChargeRate = 1
+	HeldSkill = TRUE
+	HeldBeam = TRUE
+	ChargePeriod = 2.5
 	BeamTime = 10
-	DamageMult = 0.35
+	DamageMult = 0.39
 	Distance = 50
 	IconSize = 1
 	AccMult = 1.175
@@ -258,7 +264,7 @@
 	verb/Tenran()
 		set name = "Tenran"
 		set category = "Skills"
-		usr.UseProjectile(src)
+		usr.BeginHeldSkill(src)
 
 // TIER 4
 
@@ -469,7 +475,9 @@
 	Dodgeable = -1
 	ComboMaster = 1
 	density = 0
-	ChargeRate = 1
+	HeldSkill = TRUE
+	HeldBeam = TRUE
+	ChargePeriod = 3
 	BeamTime = 10
 	DamageMult = 0.65
 	Distance = 50
@@ -480,7 +488,7 @@
 	verb/Hiryu()
 		set name = "Hiryu Gekizoku Shinten Raihou"
 		set category = "Skills"
-		usr.UseProjectile(src)
+		usr.BeginHeldSkill(src)
 
 /obj/Skills/Projectile/Hado/Senju_Kouten_Taihou
 	name = "Senju Kouten Taihou"

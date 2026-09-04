@@ -26,18 +26,6 @@
 		return 0
 	if(defender == src)
 		DEBUGMSG("Defender was src, and so newDoDamage stopped early")
-		// Survivor: self-damage refunds 20% back as mana+energy
-		if(src.hasMagePassive(/mage_passive/dark/Survivor))
-			var/refund = val * 0.20
-			if(refund > 0)
-				src.ManaAmount += refund
-				src.MaxMana()
-				src.Energy += refund
-				src.MaxEnergy()
-		// Shadowbringer: self-damage grants LifeSteal 10 for 10s, stacks
-		if(src.hasMagePassive(/mage_passive/dark/Shadowbringer))
-			if(CheckSlotless("Shadow Infusion")) SlotlessBuffs["Shadow Infusion"].Timer = 0;
-			else findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Shadow_Infusion);
 		DamageSelf(HPToPct(val))
 		return val
 	else if(defender == null)
@@ -47,6 +35,7 @@
 	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit");
 		return 0
+	MarkCombat(defender)
 	if(unarmed || sword)
 		triggerLimit("Physical")
 		triggerLimit("Sword")
@@ -135,16 +124,6 @@
 	if(lifeFiberRending)
 		if(defender.KamuiType == "Senketsu" || defender.Secret == "Vampire" || defender.GetSlotless("Life Fiber Hybrid"))
 			trueMult += lifeFiberRending
-	// Relativity: their PureReduction feeds my PureDamage
-	if(src.hasMagePassive(/mage_passive/space/Relativity))
-		var/relativity_pd = defender.HasPureReduction() * 0.5
-		if(relativity_pd > 0)
-			trueMult += relativity_pd
-	// Iconoclast: +1 pure per 20 HP gap, works in both directions
-	if(src.hasMagePassive(/mage_passive/dark/Iconoclast))
-		var/icon_pd = round(abs(defender.HealthPct() - src.HealthPct()) / 20)
-		if(icon_pd > 0)
-			trueMult += icon_pd
 	#if DEBUG_DAMAGE
 	log2text("trueMult", "After Puredmg", "damageDebugs.txt", "[src.ckey]/[src.name]")
 	log2text("trueMult", trueMult,"damageDebugs.txt", "[src.ckey]/[src.name]")
@@ -153,11 +132,6 @@
 	if(passive_handler.Get("Aspect of Death"))
 		purered*=0.75
 	trueMult -= purered
-	// Relativity, defender side: my PureDamage feeds their reduction
-	if(defender.hasMagePassive(/mage_passive/space/Relativity))
-		var/relativity_pr = src.HasPureDamage() * 0.5
-		if(relativity_pr > 0)
-			trueMult -= relativity_pr
 	// Unbroken for Makyos
 	var/unbrokenVal = defender.passive_handler.Get("Unbroken")
 	if(unbrokenVal)
@@ -216,7 +190,8 @@
 // END LIGHT VS DARK CALCULATIONS
 //move timestop + world dmg mult to after true mult is applied
 
-	trueMult+=ElementalCheck(src,defender)
+	if(!(S && S.trueDamage))
+		trueMult+=ElementalCheck(src,defender)
 	#if DEBUG_DAMAGE
 	log2text("trueMult", "After ElementalCheck", "damageDebugs.txt", "[src.ckey]/[src.name]")
 	log2text("trueMult", trueMult,"damageDebugs.txt", "[src.ckey]/[src.name]")
@@ -303,15 +278,6 @@
 		val *= src.IsGood() ? defender.getGoodResistValue() : defender.getGoodResistVulnValue()
 	if(defender.passive_handler.Get("ChaosResist"))
 		val *= (src.IsGood() || src.IsEvil()) ? defender.getChaosResistValue() : defender.getChaosResistVulnValue()
-	// Iconoclast: skim 10% of their Power for 30s (they keep theirs), 5s cd per target so multihits dont insta-drain
-	if(val > 0 && src.hasMagePassive(/mage_passive/dark/Iconoclast) && world.time >= src.IconoclastNextSteal)
-		var/stolen = round(defender.Power * 0.10)
-		if(stolen > 0)
-			src.Power += stolen
-			src.IconoclastNextSteal = world.time + 50
-			spawn(300)
-				if(src)
-					src.Power -= stolen
 	// For Irooni, debuff's current color rewards the matching attack type and punishes a wrong
 	// one. Red=Autohit, Blue=Queue, Green=Projectile. Match x1.5 damage, mismatch x0.5.
 	// Normal attacks and grapples and other forms of damage are exempt from this

@@ -110,23 +110,11 @@ update
 		version = 3;
 		updateMob(mob/p)
 			. = ..()//left alone for easy copy pasting
-			var/list/BasicElementPinnacles = list("Alight", "Awash", "Aerde", "Aloft")
-			var/list/AdvancedElementPinnacles = list("Mender", "Survivor", "Future", "Kinematics")
-			for(var/mage_passive/mp in p.acquiredMagePassives)
-				if(mp.name in BasicElementPinnacles)
-					mp.passives["ManaGeneration"] = 1;
-					p.passive_handler.Decrease("ManaGeneration", 2);
-					p << "Your Basic Element Pinnacles have had their Mana Generation reduced. This should only trigger once per element."
-				if(mp.name in AdvancedElementPinnacles)
-					mp.passives["ManaGeneration"] = 2;
-					p.passive_handler.Decrease("ManaGeneration", 3);
-					p << "Your Advanced Element Pinnacles have had their Mana Generation reduced. This should only trigger once per element."
 	version4
 		version = 4;
 		updateMob(mob/p)
 			. = ..()//left alone for easy copy pasting
 			if(p.isRace(NOBODY)||p.isRace(ANDROID))
-				p.refundNewMagicTree()
 				p.RPPMult*=1.25
 				if(p.isRace(NOBODY))
 					p.passive_handler.Set("Longing", 1)
@@ -361,7 +349,6 @@ update
 			if(p.passive_handler.Get("Limited Rank-Up"))
 				p.passive_handler.Set("Limited Rank-Up", 0)
 				p<<"<b>Whoops you weren't supposed to have that lol</b>"
-			p.refundNewMagicTreeOld()
 			if(p.isRace(DEMIFIEND) && p.Saga == "Devil Summoner" && p.SagaLevel > 0)
 				var/effective_level
 				if(p.demon_party_cap >= 12)      effective_level = 6
@@ -444,18 +431,6 @@ update
 		version = 30
 		updateMob(mob/p)
 			. = ..()
-			var/list/giveBack = list()
-			for(var/spell_passive/sp in p.acquiredSpellPassives)
-				if(sp.enchantedIn)
-					p.disenchantSpellWithPassive(sp.enchantedIn, sp)
-				giveBack += sp.type
-				del sp
-			if(length(giveBack))
-				p.acquiredSpellPassives = list()
-				for(var/type in giveBack)
-					var/spell_passive/sp = new type;
-					p.acquiredSpellPassives |= sp;
-				p << "You'll need to reapply your spell passives."
 
 	version32
 		version = 32

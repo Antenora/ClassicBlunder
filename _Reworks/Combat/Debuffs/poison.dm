@@ -23,7 +23,6 @@ globalTracker/var/BleedStackDivisor = BLEED_STACK_DIVISOR
 globalTracker/var/BleedNerf = BLEED_NERF
 //TODO AFTER WIPE: move frenzy here? or split these to their own pages
 globalTracker/var/DEBUFF_STACK_RESISTANCE = 100
-globalTracker/var/HELLFIRE_VALUE_MOD = 2
 globalTracker/var/MAX_DEBUFF_CLAMP = 0.05
 globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 
@@ -54,10 +53,12 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 			if(IsDarkDragonPlayer())
 				return 0
 
-	return clamp(damage, glob.LOWER_DEBUFF_CLAMP, glob.MAX_DEBUFF_CLAMP)
+	return clamp(damage, glob.LOWER_DEBUFF_CLAMP, typeOfDebuff == "Burn" ? glob.BURN_TICK_CAP : glob.MAX_DEBUFF_CLAMP)
 
 /mob/proc/doDebuffDamage(typeOfDebuff)
 	var/dmg = getDebuffDamage(typeOfDebuff)
+	if(typeOfDebuff == "Burn" && Burn >= 5 && last_struck_by && last_struck_by != src && last_struck_by.spirit_dive_on)
+		last_struck_by.RefundMana(0.25)
 	if(dmg < 0)
 		world.log << "[src] Debuff Damage is negative [dmg], [typeOfDebuff]"
 		dmg = 0.001

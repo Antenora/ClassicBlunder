@@ -304,3 +304,4 @@ mob/proc/AppearanceOn()
 mob/proc/AppearanceOff()
 	src.overlays=null
 	src.underlays=null
+	src.AuraLightSync()

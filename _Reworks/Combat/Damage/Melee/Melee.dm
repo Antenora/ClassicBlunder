@@ -695,16 +695,20 @@
 							if(AttackQueue)
 							// 				ONHITS				//
 								AttackQueue.chain_victim = enemy
-								if(AttackQueue.Burning||AttackQueue.Scorching||AttackQueue.Chilling||AttackQueue.Freezing||AttackQueue.Crushing||AttackQueue.Shattering||AttackQueue.Shocking||AttackQueue.Paralyzing||AttackQueue.Poisoning||AttackQueue.Toxic)
+								if(AttackQueue.Burning||AttackQueue.Scorching||AttackQueue.Drenching||AttackQueue.Soaking||AttackQueue.Chilling||AttackQueue.Freezing||AttackQueue.Exposing||AttackQueue.Shredding||AttackQueue.Crushing||AttackQueue.Shattering||AttackQueue.Shocking||AttackQueue.Paralyzing||AttackQueue.Poisoning||AttackQueue.Toxic)
 									var/list/addElements = list()
 									if(AttackQueue.Burning||AttackQueue.Scorching)
 										addElements |= "Fire"
-									if(AttackQueue.Chilling||AttackQueue.Freezing)
+									if(AttackQueue.Drenching||AttackQueue.Soaking)
 										addElements |= "Water"
+									if(AttackQueue.Chilling||AttackQueue.Freezing)
+										addElements |= "Ice"
 									if(AttackQueue.Crushing||AttackQueue.Shattering)
 										addElements |= "Earth"
-									if(AttackQueue.Shocking||AttackQueue.Paralyzing)
+									if(AttackQueue.Exposing||AttackQueue.Shredding)
 										addElements |= "Wind"
+									if(AttackQueue.Shocking||AttackQueue.Paralyzing)
+										addElements |= "Lightning"
 									if(AttackQueue.Poisoning||AttackQueue.Toxic)
 										addElements |= "Poison"
 									ElementalCheck(src, enemy, 0, glob.DEBUFF_INTENSITY, addElements)

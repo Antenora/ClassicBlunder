@@ -81,6 +81,8 @@ mob/proc/UsingHotnCold()
 		return
 	if(cc_immune_until > world.time && !force)
 		return
+	if(!force && TryDisableBreak("snare"))
+		return
 	var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare/s = findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare) // try to find it
 	if(force)
 		if(BuffOn(s))

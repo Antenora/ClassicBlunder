@@ -140,12 +140,18 @@ proc/ApplyGoBElement(obj/Skills/Projectile/_Projectile/proj, element, forced)
 			if(forced) proj.Scorching  = 15
 			else       proj.Burning    = 15
 		if("Water")
+			if(forced) proj.Soaking    = 15
+			else       proj.Drenching  = 15
+		if("Ice")
 			if(forced) proj.Freezing   = 15
 			else       proj.Chilling   = 15
 		if("Earth")
 			if(forced) proj.Shattering = 15
 			else       proj.Crushing   = 15
 		if("Wind")
+			if(forced) proj.Shredding  = 15
+			else       proj.Exposing   = 15
+		if("Lightning")
 			if(forced) proj.Paralyzing = 15
 			else       proj.Shocking   = 15
 		if("Poison")

@@ -63,7 +63,6 @@ proc/MeteorStrike(mob/attacker, obj/Skills/AutoHit/Meteor_Strike/Z)
 			return
 		attacker.LoseEnergy(drain)
 	Z.adjust(attacker)
-	Z.SpellSlotModification()
 	Z.Cooldown(1, null, attacker)
 
 	var/savedColor = attacker.color

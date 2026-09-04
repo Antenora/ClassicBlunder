@@ -1,7 +1,6 @@
 var/list/SkillTreeList=list("BlastT1"=list(),"BlastT2"=list(),"BlastT3"=list(), \
 "BlastT4"=list(),"SwordT1"=list(),"SwordT2"=list(),"SwordT3"=list(),"SwordT4"=list(),"SwordT5"=list(),\
 "BeamT1"=list(),"BeamT2"=list(),"BeamT3"=list(),"BeamT4"=list(),"BlastT5"=list(),\
-"MagicT1"=list(),"MagicT2"=list(),"MagicT3"=list(),"MagicT4"=list(),"MagicT5"=list(),\
 "UnarmedT1"=list(),"UnarmedT2"=list(),"UnarmedT3"=list(),"UnarmedT4"=list(), "UnarmedT5" = list(),\
 "UnarmedStyles"=list(),"UnarmedStylesT1"=list(), "UnarmedStylesT2"=list(),"UnarmedStylesT3"=list(), "UnarmedStylesT4"=list(), \
 "ElementalStyles"=list(),"HybridStyle"=list(),"SwordStyles"=list(), \
@@ -143,65 +142,6 @@ var/list/SkillTree=list(
 "BlastT5"=list(
 			"/obj/Skills/Projectile/Cataclysmic_Orb"=200,
 			"/obj/Skills/Projectile/Desperado_Blaster"=200
-),
-"MagicT1"=list(
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Object"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Broken_Phantasm"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Self"=40,
-
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Trick"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Act"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Show"=40,
-
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Water_Walk"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Swift_Walk"=40,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Wind_Walk"=40
-),
-
-"MagicT2"=list(
-			"/obj/Skills/Projectile/Magic/Fire"=80,
-			"/obj/Skills/Projectile/Magic/Fira"=80,
-			"/obj/Skills/Projectile/Magic/Firaga"=80,
-
-			"/obj/Skills/AutoHit/Magic/Blizzard"=80,
-			"/obj/Skills/AutoHit/Magic/Blizzara"=80,
-			"/obj/Skills/AutoHit/Magic/Blizzaga"=80,
-
-			"/obj/Skills/AutoHit/Magic/Thunder"=80,
-			"/obj/Skills/AutoHit/Magic/Thundara"=80,
-			"/obj/Skills/AutoHit/Magic/Thundaga"=80
-),
-
-"MagicT3"=list(
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Stone_Skin"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/True_Effort"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Heroic_Will"=120,
-
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Mage_Armor"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Perfect_Warrior"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Golem_Form"=120,
-
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Binding"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Infect"=120,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Curse"=120
-),
-
-"MagicT4"=list(
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Shell"=160,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Barrier"=160,
-			"/obj/Skills/Buffs/SlotlessBuffs/Magic/Protect"=160,
-
-			"/obj/Skills/AutoHit/Magic/Magnet"=160,
-			"/obj/Skills/AutoHit/Magic/Gravity"=160,
-			"/obj/Skills/AutoHit/Magic/Stop"=160,
-
-			"/obj/Skills/Projectile/Magic/Disintegrate"=160,
-			"/obj/Skills/Projectile/Magic/Meteor"=160,
-			"/obj/Skills/AutoHit/Magic/Flare"=160
-),
-
-"MagicT5"=list(
-			"/obj/Skills/Projectile/Magic/Meteor_Swarm"=200
 ),
 "SwordT1"=list(
 			"/obj/Skills/AutoHit/Stinger"=40,

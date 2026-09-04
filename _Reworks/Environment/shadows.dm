@@ -32,6 +32,7 @@ mob/proc/ShadowExclude(image/I)
 	if(!I) return
 	if(!shadow_excl) shadow_excl = list()
 	shadow_excl[I.appearance] = 1
+	AuraLightSync()
 
 mob/proc/ShadowExcludeDiff(list/po, list/pu)
 	for(var/o in overlays)
@@ -42,6 +43,7 @@ mob/proc/ShadowExcludeDiff(list/po, list/pu)
 		if(pu && (u in pu)) continue
 		if(!shadow_excl) shadow_excl = list()
 		shadow_excl[u] = 1
+	AuraLightSync()
 
 var/list/_shadow_objs = list() //every live shadow obj; swept for orphans
 var/_shadow_reap_at = 0

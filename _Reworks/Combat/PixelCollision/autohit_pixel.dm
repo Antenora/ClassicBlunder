@@ -20,8 +20,13 @@ obj/AutoHitter
 			s = Z.Size || 1
 		ApplySkillHitbox(fitIcon, dir, s, Z ? Z.HitboxW : 0, Z ? Z.HitboxH : 0, Z ? Z.HitboxX : -1, Z ? Z.HitboxY : -1, Z ? Z.FireOffsetX : 0, Z ? Z.FireOffsetY : 0)
 		pc_lastdir = dir
+		if(!ObjIcon && (ink_kind == 2 || ink_melee))
+			InkNoBox()
+		else if(ObjIcon)
+			AH_ContactSweep()
 
 	proc/AH_InheritPixel(obj/AutoHitter/AH)
+		InkInheritKind(AH)
 		UsesPixelCollision = TRUE
 		density = 0
 		LastHitAt = list()
@@ -31,6 +36,8 @@ obj/AutoHitter
 			step_y = AH.step_y
 		ApplySkillHitbox(AH.hb_icon, dir, AH.hb_scale, AH.hb_ovW, AH.hb_ovH, AH.hb_ovX, AH.hb_ovY, AH.hb_offX, AH.hb_offY)
 		pc_lastdir = dir
+		if(!ObjIcon && ink_kind == 2)
+			InkNoBox()
 
 	//zone damage as a true circle
 	proc/AH_ZoneDamage(atom/epicenter, R, annulus=FALSE, los=TRUE, square=FALSE)
@@ -60,6 +67,7 @@ obj/AutoHitter
 				endLife()
 
 	proc/AH_ContactSweep()
+		if(vhb_w <= 0) return
 		for(var/mob/m in range(HitboxSweepRange(), src))
 			if(!HitboxesOverlap(src, m)) continue
 			AH_TryContact(m)

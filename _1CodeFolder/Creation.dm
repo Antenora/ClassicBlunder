@@ -81,8 +81,6 @@ mob/Players
 		if(!locate(/obj/Money) in src)
 			src.contents += new/obj/Money
 
-		spawn() initPersonalMagicTrees();
-
 		winshow(usr,"StatsWindow",0)
 		winshow(usr,"StatsWindow2",0)
 		for(var/e in list("Power","Mana"))

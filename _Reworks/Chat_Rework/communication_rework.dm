@@ -15,11 +15,6 @@ mob/proc/checkInvisibilityBreaking()
 		if(C.Invisible)
 			C.Trigger(src)
 		src << "Your camouflage is broken!"
-	if(CheckSlotless("Invisibility"))
-		var/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Show/I = GetSlotless("Magic Show")
-		if(I.Invisible)
-			I.Trigger(src)
-		src << "You reveal yourself!"
 
 mob/proc/CheckAFK()
 	if(AFKTimer==0)

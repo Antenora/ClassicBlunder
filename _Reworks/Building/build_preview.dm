@@ -2,6 +2,8 @@
 	proc
 		MakePreviewImage(turf/T)
 			var/image/I = image(brush.iconF, T, brush.icon_state)
+			if(ispath(brush.Creates, /obj))
+				I.dir = BuildPlacedDir(brush, dirv)
 			I.plane = BUILD_PREVIEW_PLANE
 			I.layer = BUILD_PREVIEW_LAYER
 			I.alpha = 150

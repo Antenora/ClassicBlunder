@@ -338,7 +338,7 @@ obj
 	Skills/AutoHit
 		Shocker_Breaker
 			ElementalClass="Wind"
-			SpellElement="Air"
+			SpellElement="Wind"
 			FlickAttack=1
 			Distance=6
 			Area="Target"
@@ -366,8 +366,7 @@ obj
 				usr.Activate(src)
 	Skills/Projectile/Beams
 		Hyper_Beam
-			DamageMult=0.3
-			ChargeRate=0.2
+			DamageMult=0.38
 			Dodgeable=0
 			ForScaling=1
 			MenuIcon = "Kamehameha"
@@ -394,7 +393,7 @@ obj
 					DamageMult=0.6 + (benefit/10)
 					IconSize=round(1+(benefit*5))
 				else
-					DamageMult=0.3 + (benefit/10)
+					DamageMult=0.38 + (benefit*0.12)
 					IconSize=round(1+benefit)
 				BeamTailStart=IconSize
 				var/b = min(max(benefit, 0), 1)

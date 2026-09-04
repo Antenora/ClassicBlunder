@@ -373,8 +373,12 @@ obj/Effects
 			SizeState.Scale(src.Size,src.Size)
 			src.transform = SizeState
 		if(src.Turns)
-			SizeState.Turn(pick(45,-45,0,-90,90,135,-135,180))
+			var/ang = pick(45,-45,0,-90,90,135,-135,180)
+			SizeState.Turn(ang)
+			fx_rot = ang
 			src.transform = SizeState
+		fx_size = src.Size ? src.Size : 1
+		fx_t0 = world.time
 		if(Life)
 			src.Lifetime=Life
 		else if(!Lifetime)
@@ -565,7 +569,9 @@ obj
 				pixel_y=-16
 				pixel_x += rand(-16, 16)
 				pixel_y += rand(-16, 16)
-				transform = turn(matrix()*0.5, pick(0, 45, 90, 135, 180, 225, 270, 315))
+				var/ang = pick(0, 45, 90, 135, 180, 225, 270, 315)
+				fx_rot = ang
+				transform = turn(matrix()*0.5, ang)
 
 
 obj/Effects/KenShockwave
@@ -587,6 +593,7 @@ proc
 		if(Size>5)
 			Size=5
 		var/obj/Effects/KenShockwave/S=new
+		. = S
 		S.icon=icon
 		S.blend_mode=Blend
 		if(isturf(M)&&M.density)

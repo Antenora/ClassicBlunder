@@ -30,7 +30,7 @@
 
 globalTracker/var/BEAM_OVERCHARGE_DRAIN = 2
 globalTracker/var/HELD_BEAM_MOVE_PENALTY = 2
-globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
+globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 
 /obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
 	// Override in individual skills to execute the charged attack.
@@ -182,9 +182,11 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	if(Z.FatigueCost && src.TotalFatigue + Z.FatigueCost > 99)
 		src << "<font color='red'>You're too fatigued to use [Z].</font>"
 		return FALSE
+	if(Z.IsSpell && !src.SpellPreCast(Z, 1))
+		return FALSE
 	if(Z.ManaCost && !src.HasDrainlessMana())
 		var/drain = Z.ManaCost
-		drain *= src.ChakraCostMult(Z)
+		drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 		if(drain <= 0) drain = 0.5
 		var/need = src.TomeSpell(Z) ? drain * (1 - (0.45 * src.TomeSpell(Z))) : drain
 		if(src.ManaAmount < need)
@@ -274,6 +276,8 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 
 	held_skill_macro_key = keys
 
+	if(Z.HeldFreeze)
+		Frozen = 1
 	Z.OnHeldStart(src)
 	spawn() ChargeLoop(Z)
 
@@ -603,14 +607,29 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 			if(Z.FireRate > 0 && world.time - last_tick_fire >= Z.FireRate)
 				Z.OnHeldTick(src)
 				last_tick_fire = world.time
+			if(Z.HeldDrain && world.time - held_charge_start > Z.HeldDrainGrace)
+				Z.held_accrued += Z.HeldDrain * 0.4
+				if(src.ManaAmount < src.SpellManaNeed(Z) + 1)
+					ReleaseHeldSkill()
+					return
 		else
 			// Overheld, fizzle normally, or auto-release if the skill opts out
 			if(world.time - held_charge_start > Z.ChargePeriod * 10)
-				if(Z.NoFizzle)
+				if(Z.OverchargeMaxSteps > 0)
+					if(world.time - held_charge_start - Z.ChargePeriod * 10 >= (Z.overcharge_steps + 1) * Z.OverchargeStepTicks)
+						if(Z.overcharge_steps < Z.OverchargeMaxSteps && src.ManaAmount >= src.SpellManaNeed(Z) + Z.OverchargeManaPerStep)
+							Z.overcharge_steps++
+							Z.held_accrued += Z.OverchargeManaPerStep
+							KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5 + 0.1 * Z.overcharge_steps, Blend=Z.ChargeWaveBlend, Time=6)
+						else
+							ReleaseHeldSkill()
+							return
+				else if(Z.NoFizzle)
 					ReleaseHeldSkill()
+					return
 				else
 					FizzleHeldSkill(Z)
-				return
+					return
 
 			var/hold_ticks = world.time - held_charge_start
 			var/progress = clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1)
@@ -695,6 +714,8 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 	ClearHeldChargeState()
 	held_skill_last_release = world.time
 	Z.OnHeldFizzle(src)
+	if(Z.IsSpell)
+		Z.SpellCastReset()
 
 	if(beamHold)
 		BeamHoldID = Z.InternalName
@@ -709,6 +730,9 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 // Cleanup
 
 /mob/proc/ClearHeldChargeState()
+	if(held_skill && held_skill.HeldFreeze && Frozen == 1)
+		Frozen = 0
+	CloseCastCircle()
 	held_skill        = null
 	held_charge_start = 0
 	held_skill_macro_key = null
@@ -721,7 +745,7 @@ globalTracker/var/HELD_BEAM_FULL_SPAN = 1.5
 // charging and the requested skill would conflict.
 
 /mob/proc/HeldSkillBlocksAction(obj/Skills/Z)
-	if(held_skill && held_skill != Z)
+	if(held_skill && held_skill != Z && !(Z && Z.SilentCast))
 		src << "<font color='red'>You can't do that while charging [held_skill.name].</font>"
 		return TRUE
 	if(judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))

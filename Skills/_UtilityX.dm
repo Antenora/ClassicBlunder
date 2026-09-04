@@ -10,7 +10,7 @@
 		Conscious()
 	SetHealthPct(100)
 	Energy=EnergyMax
-	ManaAmount=ManaMax*GetManaCapMult()
+	ManaAmount=ManaMax*GetManaCapMult()+MageManaBonus()
 	Burn=0
 	Poison=0
 	Bleed=0
@@ -18,6 +18,8 @@
 	Slow=0
 	Shock=0
 	Shatter=0
+	Drenched=0
+	Exposed=0
 	HealthAnnounce25=0
 	HealthAnnounce10=0
 	seventhSenseTriggered = 0
@@ -2564,11 +2566,6 @@ obj/Skills/Utility
 				if(C.Invisible)
 					C.Trigger(usr)
 				usr << "Your camouflage is broken!"
-			if(usr.CheckSlotless("Invisibility"))
-				var/obj/Skills/Buffs/SlotlessBuffs/Magic/Magic_Show/I = usr.GetSlotless("Magic Show")
-				if(I.Invisible)
-					I.Trigger(usr)
-				usr << "You reveal yourself!"
 			for(var/mob/Players/M in players)
 				for(var/obj/Items/Tech/Communicator/Q in M)
 					if(Q.Frequency==src.ICFrequency)

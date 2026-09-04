@@ -4027,53 +4027,6 @@ obj
 					Dodgeable=0
 					Deflectable=0
 					Variation=0
-					Titan_Slayer
-						Knockback=1
-						DamageMult=1
-						Piercing=1
-						Stunner=3
-						Cooldown=600
-						Paralyzing=1
-						IconChargeOverhead=(1/32)
-						IconSize=1
-						IconSizeGrowTo=2
-						Dodgeable=-1
-						IconLock='LightStrike.dmi'
-						LockX=-19
-						LockY=-17
-						adjust(mob/p)
-							DamageMult = initial(DamageMult)
-							HitboxW = 0 //masks supersede
-							HitboxH = 0
-						verb/Titan_Slayer()
-							set category="Skills"
-							adjust(usr)
-							usr.UseProjectile(src)
-					Sunlight_Spear//Holy
-						ElementalClass="Light"
-						SpellElement="Light"
-						SignatureTechnique=2
-						DamageMult=15
-						Piercing=1
-						Paralyzing=1
-						MenuIcon="LightningSpear"
-						Scorching=1
-						Radius=1
-						IconChargeOverhead=(1/32)
-						IconSize=0.5
-						IconSizeGrowTo=1
-						Dodgeable=0
-						IconLock='SunlightSpear.dmi'
-						LockX=-19
-						LockY=-17
-						PiercingBang=1
-						ExplodeIcon='Icons/Effects/Electric.dmi'
-						adjust(mob/p)
-							DamageMult = initial(DamageMult)
-						verb/Sunlight_Spear()
-							set category="Skills"
-							adjust(usr)
-							usr.UseProjectile(src)
 					Hellfire_Nova
 						ElementalClass="Fire"
 						SpellElement="Fire"
@@ -4380,7 +4333,7 @@ obj
 						return
 					src.Charging = 1
 					p.Beaming = 1
-					p.BeamCharging = 0.5 + max(benefit, 0) * glob.HELD_BEAM_FULL_SPAN
+					p.BeamCharging = 0.5 + max(benefit, 0) * glob.HELD_BEAM_SPAN_PER_SEC * ChargePeriod
 					p.UseProjectile(src)
 					if(p.Beaming == 1)
 						p.Beaming = 0
@@ -4427,7 +4380,6 @@ obj
 					Copyable=3
 					Distance=30
 					DamageMult=0.0857
-					ChargeRate=0.2
 					Knockback=1
 					BeamTime=20
 					IconLock='Beam8.dmi'
@@ -4446,8 +4398,7 @@ obj
 					Copyable=4
 					MenuIcon="EraserGun"
 					Distance=50
-					DamageMult=0.55
-					ChargeRate=0.2
+					DamageMult=0.62
 					HeldVulnerability=0.25
 					Knockback=1
 					BeamTime=10
@@ -4468,8 +4419,7 @@ obj
 					Copyable=4
 					Distance=15
 					MenuIcon="ShineRay"
-					DamageMult=0.2
-					ChargeRate=0.2
+					DamageMult=0.28
 					Knockback=0
 					BeamTime=10
 					IconLock='ShineRay.dmi'
@@ -4485,7 +4435,7 @@ obj
 				Shine_Ray_Prism
 					Copyable=0
 					Distance=6
-					DamageMult=0.17
+					DamageMult=0.24
 					Knockback=0
 					Cooldown=0
 					EnergyCost=0
@@ -4496,9 +4446,8 @@ obj
 					NewCopyable = 3
 					SkillCost=120
 					Copyable=4
-					DamageMult=0.3
+					DamageMult=0.46
 					MenuIcon="GammaRay"
-					ChargeRate=0.2
 					Distance=50
 					Knockback=1
 					BeamTime=10
@@ -4521,7 +4470,6 @@ obj
 					DamageMult=0.55
 					MenuIcon="PiercerRay"
 					Distance=50
-					ChargeRate=0.2
 					Knockback=0
 					BeamTime=10
 					IconLock='Makkankosappo.dmi'
@@ -4553,8 +4501,7 @@ obj
 					Immediate=1
 				Kamehameha//Well rounded
 					SignatureTechnique=1
-					DamageMult=0.3
-					ChargeRate=0.2
+					DamageMult=0.38
 					Dodgeable=0
 					MenuIcon = "Kamehameha"
 					IconLock='BeamKHH.dmi'
@@ -4573,8 +4520,7 @@ obj
 				Motionless_Kamehameha//Well rounded
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Kamehameha")
 					SignatureTechnique=1
-					DamageMult=0.4
-					ChargeRate=0.2
+					DamageMult=0.45
 					MenuIcon="MotionlessKamehameha"
 					Dodgeable=0
 					IconLock='BeamKHH.dmi'
@@ -4596,8 +4542,7 @@ obj
 
 				Galic_Gun
 					SignatureTechnique=1
-					DamageMult=0.5
-					ChargeRate=0.2
+					DamageMult=0.56
 					Dodgeable=0
 					IconLock='BeamGG.dmi'
 					Cooldown=15
@@ -4624,8 +4569,7 @@ obj
 				Final_Crash
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Galic_Gun")
 					SignatureTechnique=1
-					DamageMult=0.35
-					ChargeRate=0.2
+					DamageMult=0.54
 					Dodgeable=0
 					IconLock='BeamGG.dmi'
 					Cooldown=12
@@ -4643,8 +4587,7 @@ obj
 
 				Dodompa//Penetrate, high charge and low distance
 					SignatureTechnique=1
-					DamageMult=0.25
-					ChargeRate=0.2
+					DamageMult=0.32
 					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
@@ -4667,8 +4610,7 @@ obj
 					PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 					SignatureTechnique=1
 					var/tmp/feint_last = 0
-					DamageMult=0.3
-					ChargeRate=0.2
+					DamageMult=0.38
 					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
@@ -4699,7 +4641,6 @@ obj
 				Galic_Kamehameha
 					CritEffectiveness=0
 					DamageMult=0.2286
-					ChargeRate=0.2
 					IconLock='BeamGKH.dmi'
 					ChargeIcon=1
 					EnergyCost=15
@@ -4799,7 +4740,6 @@ obj
 						PreRequisite=list("/obj/Skills/Projectile/Beams/Dodompa")
 						SignatureTechnique=2
 						DamageMult=1.35
-						ChargeRate=0.2
 						Distance=15
 						IconLock='BeamDodon.dmi'
 						IconSize=1.5
@@ -4821,9 +4761,8 @@ obj
 						StrScaling = 0
 						ForScaling = 1
 						SignatureTechnique=2
-						DamageMult=2
+						DamageMult=1.56
 						MenuIcon="SuperKamehameha"
-						ChargeRate=0.2
 						Distance=60
 						IconLock='BeamKHH.dmi'
 						IconSize=2
@@ -4854,8 +4793,7 @@ obj
 
 					Final_Flash
 						SignatureTechnique=2
-						DamageMult=2
-						ChargeRate=0.2
+						DamageMult=1.3
 						Distance=60
 						IconLock='BeamDodon.dmi'
 						IconSize=2
@@ -4906,7 +4844,6 @@ obj
 					Final_Kamehameha
 						CritEffectiveness=0
 						DamageMult=0.4286
-						ChargeRate=0.2
 						Distance=150
 						IconLock='BeamKHH.dmi'
 						IconSize=2
@@ -4949,7 +4886,6 @@ obj
 							Stream=2
 							EndEffectiveness=1
 							DamageMult=0.2857
-							ChargeRate=0.2
 							Knockback=0
 							Radius=0
 							Piercing=1
@@ -5004,7 +4940,6 @@ obj
 					Weapon_Soul
 						Excalibur
 							DamageMult=0.2571
-							ChargeRate=0.2
 							StrScaling=1
 							ForScaling=1
 							EndEffectiveness=1
@@ -5023,7 +4958,6 @@ obj
 					Jagan
 						Dragon_of_the_Darkness_Flame
 							DamageMult=0.2
-							ChargeRate=0.2
 							StrScaling=1
 							ForScaling=1
 							EndEffectiveness=1
@@ -5047,7 +4981,6 @@ obj
 					Vaizard
 						Cero
 							DamageMult=0.4286
-							ChargeRate=0.2
 							Cooldown=150
 							ManaCost=10
 							Distance=40
@@ -5203,7 +5136,6 @@ mob
 						if(Z.AssociatedGear.Uses<=0)
 							usr << "Your [Z] is out of power!"
 							return 0
-			Z.SpellSlotModification();
 			if(!Z.Charging)//Only beams get this exception
 				if(!src.CanAttack(3)&&!Z.AttackReplace)
 					return 0
@@ -5238,9 +5170,11 @@ mob
 						if(Z.FatigueCost)
 							if(src.TotalFatigue+Z.FatigueCost>99)
 								return 0
+						if(Z.IsSpell && !src.SpellPreCast(Z))
+							return FALSE
 						if(Z.ManaCost && !src.HasDrainlessMana())
 							var/drain = Z.ManaCost
-							drain *= src.ChakraCostMult(Z)
+							drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(!src.TomeSpell(Z))
@@ -5427,9 +5361,9 @@ mob
 					if(!Z.ChargeIcon)
 						src.Chargez("Add")
 						if(src.HasQuickCast())
-							sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+							sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 						else
-							sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
+							sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
 						src.Chargez("Remove")
 					else
 						if(Z.ChargeIcon!=1)
@@ -5438,9 +5372,9 @@ mob
 							else
 								src.Chargez("Add", image(icon=Z.ChargeIcon, pixel_x=Z.ChargeIconX, pixel_y=Z.ChargeIconY), 0)
 							if(src.HasQuickCast())
-								sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+								sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 							else
-								sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
+								sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
 							src.Chargez("Remove", image(icon=Z.ChargeIcon, pixel_x=Z.ChargeIconX, pixel_y=Z.ChargeIconY))
 						else
 							if(!src.AuraLocked&&!src.HasKiControl())
@@ -5448,9 +5382,9 @@ mob
 							else
 								KenShockwave(src,icon='KenShockwaveFocus.dmi',Size=0.3, Blend=2, Time=2)
 							if(src.HasQuickCast())
-								sleep(10*(Z.Charge+ChargeDelay)/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
+								sleep(10*Z.Charge/(src.GetQuickCast()*(1+(src.GetKiControlMastery()*0.1))))
 							else
-								sleep(10*(Z.Charge+ChargeDelay)/(1+(src.GetKiControlMastery()*0.1)))
+								sleep(10*Z.Charge/(1+(src.GetKiControlMastery()*0.1)))
 
 							if(!src.AuraLocked&&!src.HasKiControl())
 								src.Auraz("Remove")
@@ -5621,7 +5555,7 @@ mob
 						src.LoseEnergy((drain)/Drain)
 					if(Z.ManaCost)
 						var/drain = Z.ManaCost
-						drain *= src.ChakraCostMult(Z)
+						drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5689,7 +5623,7 @@ mob
 							if(Z.ManaCost)
 								if(Z.ManaCost)
 									var/drain = Z.ManaCost
-									drain *= src.ChakraCostMult(Z)
+									drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 									if(drain <= 0)
 										drain = 0.5
 									if(src.TomeSpell(Z))
@@ -5759,7 +5693,7 @@ mob
 						src.GainFatigue(Z.FatigueCost/Drain)
 					if(Z.ManaCost)
 						var/drain = Z.ManaCost
-						drain *= src.ChakraCostMult(Z)
+						drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 						if(drain <= 0)
 							drain = 0.5
 						if(src.TomeSpell(Z))
@@ -5803,7 +5737,7 @@ mob
 							src.GainFatigue(Z.FatigueCost/Drain)
 						if(Z.ManaCost)
 							var/drain = Z.ManaCost
-							drain *= src.ChakraCostMult(Z)
+							drain *= src.ChakraCostMult(Z) * src.SpellCostMult(Z)
 							if(drain <= 0)
 								drain = 0.5
 							if(src.TomeSpell(Z))
@@ -5980,6 +5914,7 @@ obj
 					src.TurfMud = Z.TurfMud
 					src.Reinforcement = Z.Reinforcement
 					src.TurfBurn = Z.TurfBurn
+					src.from_skill = Z
 					src.TrailX=Z.TrailX
 					src.TrailY=Z.TrailY
 					src.TrailSize=Z.TrailSize
@@ -6005,10 +5940,14 @@ obj
 					src.Disarm=Z.Disarm
 					src.Chilling=Z.Chilling
 					src.Freezing=Z.Freezing
+					src.Drenching=Z.Drenching
+					src.Soaking=Z.Soaking
 					src.Crushing=Z.Crushing
 					src.Shattering=Z.Shattering
 					src.Shocking=Z.Shocking
 					src.Paralyzing=Z.Paralyzing
+					src.Exposing=Z.Exposing
+					src.Shredding=Z.Shredding
 					src.Poisoning=Z.Poisoning
 					src.Silencing=Z.Silencing
 					src.EnergyBurn=Z.EnergyBurn
@@ -6043,14 +5982,7 @@ obj
 					src.FadeOut=Z.FadeOut
 					src.GoldScatter = Z.GoldScatter
 					src.Primordial = Z.Primordial
-					StarCrossed = Z.StarCrossed
 					CooldownDrag = Z.CooldownDrag
-					PainShare = Z.PainShare
-					ChargeDelay = Z.ChargeDelay
-					Deport = Z.Deport
-					HealingReverse = Z.HealingReverse
-					Enshrine = Z.Enshrine
-					ForceField = Z.ForceField
 					BeamCharge = BeamCharging
 					var/OldVary=Z.Variation
 					if(Z.TempStream)
@@ -6132,6 +6064,7 @@ obj
 							src.step_y = src.Owner.step_y
 						if(Z.IconSizeGrowTo)
 							spawn()animate(src, transform=matrix()*Z.IconSizeGrowTo, pixel_z=((Z.IconChargeOverhead*32)-1), time=T, easing=CUBIC_EASING)
+							src.BeginHitboxGrow(src.pc_basescale, Z.IconSizeGrowTo, T)
 						else
 							src.pixel_z=(Z.IconChargeOverhead*32)-1
 						sleep(T)
@@ -6182,6 +6115,7 @@ obj
 						if(Z.GrowingLife)
 							spawn()
 								animate(src,transform=matrix()*Z.IconSizeGrowTo, time=10, easing=CUBIC_EASING)
+							src.BeginHitboxGrow(src.pc_basescale, Z.IconSizeGrowTo, 10)
 						if(Z.takeAppearance)
 							appearance = m.appearance
 						if(src.Area != "Beam") //beam heads glow via the chain/BeamGraphics hooks
@@ -6313,6 +6247,10 @@ obj
 						if(a==src.Owner&&!src.Backfire)
 							if(!UsesPixelCollision)
 								src.loc=a.loc
+							return
+						if(istype(a, /mob) && a:guardian && a:guardian.TryIntercept(src))
+							src.Killed = 1
+							src.ProjectileFinish()
 							return
 						if(istype(a, /mob) && a:Airborne)
 							if(src.Area=="Beam") BeamDbg("BAIL Airborne")
@@ -6536,13 +6474,6 @@ obj
 							atk += Owner.GetDef(DefScaling)
 						if(EndScaling)
 							atk += Owner.GetEnd(EndScaling)
-						if(SpellElement)
-							//Casting passives: each tick adds 1 stat point to spell damage. Only applies when the projectile is a spell (SpellElement is set).
-							//Per-element spell damage bonus (Alight/Awash/Aerde/Aloft basics, Mender/Survivor/Future/Kinematics advanced).
-							//Stored as a decimal value on the matching <Element>SpellDamage passive key. 0 means no bonus.
-							var/elem_dmg_bonus = Owner.getSpellElementDamageBonus(SpellElement)
-							if(elem_dmg_bonus)
-								atk *= (1 + elem_dmg_bonus)
 						Damage = strikeCoreDamage(powerDif, atk, def)
 						if(src.Area=="Beam") BeamDbg("core pdif=[powerDif] atk=[atk] def=[def] endScale=[endScale] raw=[Damage] deflect=[deflectMult] dmgmult=[DamageMult] bcharge=[BeamCharge]")
 						Damage *= deflectMult
@@ -6645,8 +6576,15 @@ obj
 								spellTarget.AddSlow(TurfMud, src.Owner)
 							if(Reinforcement && src.Owner)
 								src.Owner.HealHealth(Reinforcement/20)
-							if(TurfBurn)
-								spellTarget.AddBurn(TurfBurn, src.Owner)
+							var/_spellConsumed = 0
+							if(from_skill && from_skill.IsSpell && src.Owner)
+								_spellConsumed = src.Owner.OnSpellHit(from_skill, spellTarget, src)
+								var/obj/Skills/Projectile/_fsp = from_skill
+								if(_fsp.ExtendTiles && !extended && spellTarget.Burn > 0)
+									extended = 1
+									src.Distance += _fsp.ExtendTiles
+							if(TurfBurn && !_spellConsumed)
+								spellTarget.AddBurn(TurfBurn, src.Owner, (from_skill && from_skill.IsSpell) ? 1 : 0)
 						if(Owner.Attunement == "Fox Fire")
 							var/heal = EffectiveDamage * ( (1 + Owner.AscensionsAcquired + (FoxFire))/10)
 							a:LoseEnergy(heal/2)
@@ -6657,18 +6595,26 @@ obj
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Fire"), damageOnly = 1))/10)
 						if(src.Scorching&&!src.Owner.HasScorching())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Fire"), damageOnly = 1))/10)//Forces debuff
-						if(src.Chilling&&!src.Owner.GetChilling())
+						if(src.Drenching&&!src.Owner.HasDrenching())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Water"), damageOnly = 1))/10)
+						if(src.Soaking&&!src.Owner.HasSoaking())
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Water"), damageOnly = 1))/10)
+						if(src.Chilling&&!src.Owner.GetChilling())
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Ice"), damageOnly = 1))/10)
 						if(src.Freezing&&!src.Owner.HasFreezing())
-							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Water"), damageOnly = 1))/10)//Forces debuff
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Ice"), damageOnly = 1))/10)//Forces debuff
 						if(src.Crushing&&!src.Owner.HasCrushing())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Earth"), damageOnly = 1))/10)
 						if(src.Shattering&&!src.Owner.HasShattering())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Earth"), damageOnly = 1))/10)//Forces debuff
-						if(src.Shocking&&!src.Owner.HasShocking())
+						if(src.Exposing&&!src.Owner.HasExposing())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Wind"), damageOnly = 1))/10)
+						if(src.Shredding&&!src.Owner.HasShredding())
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Wind"), damageOnly = 1))/10)
+						if(src.Shocking&&!src.Owner.HasShocking())
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Lightning"), damageOnly = 1))/10)
 						if(src.Paralyzing&&!src.Owner.HasParalyzing())
-							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Wind"), damageOnly = 1))/10)//Forces debuff
+							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, 1, bonusElements=list("Lightning"), damageOnly = 1))/10)//Forces debuff
 						if(src.Poisoning&&!src.Owner.HasPoisoning())
 							EffectiveDamage*=max(1,ProjectileDamage(ElementalCheck(src.Owner, a, bonusElements=list("Poison"), damageOnly = 1))/10)
 						if(src.Toxic&&!src.Owner.HasToxic())
@@ -6676,12 +6622,16 @@ obj
 						var/bonusElement = list()
 						if(Burning||Scorching)
 							bonusElement |= "Fire"
-						if(Chilling||Freezing)
+						if(Drenching||Soaking)
 							bonusElement |= "Water"
+						if(Chilling||Freezing)
+							bonusElement |= "Ice"
 						if(Crushing||Shattering)
 							bonusElement |= "Earth"
-						if(Paralyzing||Shocking)
+						if(Exposing||Shredding)
 							bonusElement |= "Wind"
+						if(Paralyzing||Shocking)
+							bonusElement |= "Lightning"
 						if(Toxic||Poisoning)
 							bonusElement |= "Poison"
 
@@ -6751,7 +6701,7 @@ obj
 									src.Owner.passive_handler.Increase("Combustion", src.Combustion)
 								// Elemental absorb: if target absorbs this element, heal instead
 								var/_beamAbsorb = 0
-								if(src.SpellElement == "Water" && m.passive_handler.Get("ChillAbsorb"))
+								if((src.SpellElement == "Water" || src.SpellElement == "Ice") && m.passive_handler.Get("ChillAbsorb"))
 									_beamAbsorb = 1
 									m.HealHealth((EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR) * (0.1 * m.passive_handler.Get("ChillAbsorb")))
 								else if(src.Shocking && m.passive_handler.Get("ShockAbsorb"))
@@ -6822,15 +6772,18 @@ obj
 								if(!(Piercing && m && (AlreadyHit["[m.ckey]"] >= MultiHit + 1)) || Bounce)
 									if(!AlreadyHit["[m.ckey]"]) AlreadyHit["[m.ckey]"] = 0
 									//EffectiveDamage *= clamp((1 - (0.1 *AlreadyHit["[m.ckey]"])), 0.1, 1)
-									if(src.SpellElement == "Water")
-										EffectiveDamage *= m.getWaterResistValue()
+									var/_elemResist = m.getElementResistFor(src.SpellElement, src.ElementalClass)
+									if(_elemResist != 1)
+										EffectiveDamage *= _elemResist
+									if(from_skill && from_skill.IsSpell && src.Owner)
+										EffectiveDamage *= src.Owner.SpellHitMult(from_skill, m)
 
 									// Skill-level Combustion: temporary attacker bump.
 									if(src.Combustion)
 										src.Owner.passive_handler.Increase("Combustion", src.Combustion)
 									// Elemental absorb: if target absorbs this element, heal instead
 									var/_stdAbsorb = 0
-									if(src.SpellElement == "Water" && m.passive_handler.Get("ChillAbsorb"))
+									if((src.SpellElement == "Water" || src.SpellElement == "Ice") && m.passive_handler.Get("ChillAbsorb"))
 										_stdAbsorb = 1
 										m.HealHealth(EffectiveDamage * (0.1 * m.passive_handler.Get("ChillAbsorb")))
 									else if(src.Shocking && m.passive_handler.Get("ShockAbsorb"))
@@ -6858,6 +6811,14 @@ obj
 										S.critEff = CritEffectiveness
 										S.blockEff = BlockEffectiveness
 										S.critBonus = CritChanceBonus
+										if(from_skill && from_skill.ShieldPierce)
+											S.shieldPierce = 1
+											S.pierce = 1
+										if(blinked)
+											S.pierce = 1
+											if(from_skill && from_skill.last_consumed_total >= 20)
+												S.critEff = 1
+												S.critBonus = 100
 										S.resolve()
 										a:ccCountHit()
 										src.Owner.ProjectileAttacking = FALSE
@@ -6923,36 +6884,9 @@ obj
 						SkipDamage
 						if(Snaring)
 							m.applySnare(Snaring, 'root.dmi')
-						if(PainShare)
-							m:applyPainShare(src.Owner, PainShare)
-						if(ChargeDelay)
-							m:applyChargeDelay(ChargeDelay)
 						if(CooldownDrag)
 							m:addCooldownDrag(CooldownDrag, src.Owner)
 
-						if(HealingReverse)
-							m:applyHealReverse()
-
-						if(SpellElement=="Space"&&m.StarCrossed)
-							m:applyStarCrossed()
-
-						if(Deport)
-							var/depdir = src.dir
-							if(!depdir && src.Owner)
-								depdir = get_dir(src.Owner, m)
-							m:applyDeport(Deport, depdir)
-
-						if(Enshrine)
-							m:applyEnshrine(Enshrine)
-
-						if(ForceField&&Owner)
-							m.applyForceField(Owner)
-
-						if(StarCrossed)
-							m.StarCrossed=TRUE
-							m.StarCrossedX=m.x
-							m.StarCrossedY=m.y
-							m.StarCrossedZ=m.z
 
 						if(src.OnMobHit)
 							call(text2path(src.OnMobHit))(m, src)
@@ -7144,6 +7078,8 @@ obj
 						else
 							LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, src.loc, src.TrailDuration, src.TrailSize)
 					if(!src.Killed && src.Owner)
+						if(from_skill && src.Owner)
+							src.Owner.OnSpellImpact(from_skill, src)
 						if(src.Explode)
 							Bang(src.loc, Size=src.Explode, Offset=0, PX=src.VariationX+vhb_ax+step_x, PY=src.VariationY+vhb_ay+step_y, icon_override = ExplodeIcon, color_override = FxBlastTint(src))
 							if(src.loc && src.ImpactFrame)
@@ -7265,6 +7201,7 @@ obj
 							if(0>=Distance)
 								break
 							if(src.Area!="Beam")
+								if(from_skill) SpellFlightStep()
 								if(src.Homing)
 									src.dir=get_dir(src, src.Homing)
 								else

@@ -496,6 +496,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
 	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
+	FireKOHook(P)
 	FlashKOFall(src)
 	if(!src.ko_falling)
 		src.icon_state="KO"
@@ -593,6 +594,8 @@ mob/proc/Unconscious(mob/P,var/text)
 	Shatter = 0
 	Slow = 0
 	Shock = 0
+	Drenched = 0
+	Exposed = 0
 
 
 
@@ -681,10 +684,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.IsGrabbed().Grab_Release()
 	if(src.Grab)
 		src.Grab_Release()
-	if(StarCrossed)
-		StarCrossed = FALSE
-	if(painShared)
-		turnOffPainShared()
+	FireKillHook(P)
 
 
 	if(istype(src, /mob/Player/AI))
@@ -952,6 +952,8 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.Shatter=0
 		src.HardenAccumulated=0
 		src.Shock=0
+		src.Drenched=0
+		src.Exposed=0
 		src.Sheared=0
 		src.Crippled=0
 		src.HealthCut=0
@@ -1217,6 +1219,8 @@ mob/proc/Leave_Body(var/SuperDead=0, var/ForceVoid=0)
 	src.Slow=0
 	src.Shatter=0
 	src.Shock=0
+	src.Drenched=0
+	src.Exposed=0
 	src.Sheared=0
 	src.Crippled=0
 	src.Confused=0
@@ -1359,6 +1363,8 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 				Target.SilentPoisonAmount=0
 				Target.Slow=0
 				Target.Shock=0
+				Target.Drenched=0
+				Target.Exposed=0
 				Target.Shatter=0
 				Target.TotalFatigue=0
 				Target.TotalInjury=0
@@ -1399,6 +1405,8 @@ The average damage was [average] over [looplength] times.
 			Target.SilentPoisonAmount=0
 			Target.Slow=0
 			Target.Shock=0
+			Target.Drenched=0
+			Target.Exposed=0
 			Target.Shatter=0
 			Target.TotalFatigue=0
 			Target.TotalInjury=0
@@ -2075,6 +2083,9 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 		if(!P.canBeGrabbed())
 			src.OMessage(10,"[src] fails to get a firm hold on [P]!","[src]([src.key]) fails to grab [ExtractInfo(P)]")
 			return
+	if(P.TryDisableBreak("grab"))
+		src.OMessage(10,"[src] reaches for [P] and the flames throw the grip off!","[src]([src.key]) grab refused by [ExtractInfo(P)]")
+		return
 	src.Grab=P
 	P.grabbed = src
 	if(P.Guarding) P.GuardStop()	//grabs beat guard

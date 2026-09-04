@@ -423,7 +423,7 @@ proc/ChargeMoteColor(mob/M, up = 0)
 		var/obj/Skills/Projectile/PZ = M.held_skill
 		var/sc = FxBlastTint(PZ)
 		if(sc) return sc
-	var/aicon = MobAuraIcon(M)
+	var/aicon = M.AuraArtIcon()
 	if(aicon)
 		var/list/cyc = AuraCycleColors()["[aicon]"]
 		if(cyc) return cyc[2]

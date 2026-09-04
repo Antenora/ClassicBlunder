@@ -132,7 +132,7 @@ proc/_CoatStrip(mob/M)
 proc/_CoatApply(mob/M, list/C)
 	var/key = C[7]
 	var/i = C[1]
-	var/aura = MobAuraActive(M)
+	var/aura = M.AuraArtIcon() ? 1 : 0
 	var/skey = aura ? "[key]:a" : key
 	if(aura) i *= 0.5
 	if(M.coat_key == skey && abs(M.coat_i - i) < 0.1 && M.filters["coat_tint"])

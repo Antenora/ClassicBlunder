@@ -44,8 +44,7 @@ mob/proc/AuraLockImage()
 	FxAddWearTint(i, src.AuraLock)
 	return i
 
-mob/proc/Auraz(var/Z)
-	spawn(1) MobAuraLightRefresh(src)
+mob/proc/Auraz(var/Z, var/Sync=1)
 	var/image/pegasus=image('Cosmo_Pegasus.dmi',pixel_x=-17, pixel_y=-22)
 	var/image/dragon=image('Cosmo_Dragon.dmi',pixel_x=-17, pixel_y=-22)
 	var/image/cygnus=image('Cosmo_Cygnus.dmi',pixel_x=-17, pixel_y=-22)
@@ -101,7 +100,7 @@ mob/proc/Auraz(var/Z)
 	flameaura.blend_mode=BLEND_ADD
 	if(Z=="Add")
 
-		src.Auraz("Remove")
+		src.Auraz("Remove", 0)
 		var/list/preo = overlays.Copy()
 		var/list/preu = underlays.Copy()
 
@@ -246,6 +245,7 @@ mob/proc/Auraz(var/Z)
 		src.underlays-=gold1
 		src.underlays-=gold2
 		src.underlays-=spiral
+		if(Sync) src.AuraLightSync()
 
 mob/proc/Chargez(var/Z, var/image/C=new(ChargeIcon), var/Under=0)
 	if(Z=="Add")

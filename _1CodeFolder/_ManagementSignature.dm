@@ -37,10 +37,7 @@ var/list/Tier1 = list(
 	"Soul Tear Storm" = "/obj/Skills/Queue/Soul_Tear_Storm",
 	"Massacre" = "/obj/Skills/AutoHit/Massacre",
 	"Spirit Bow" = "/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow",
-	"Spirit Sword" = "/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword",
-	"Advanced Fire Magic" = list("/obj/Skills/Projectile/Magic/Uber_Shots/Hellfire_Nova"),
-	"Advanced Space Magic" = list("/obj/Skills/AutoHit/Magic/Magnetga", "/obj/Skills/AutoHit/Magic/Graviga", "/obj/Skills/AutoHit/Magic/Stopga"),
-	"White Magic" = list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Cure", "/obj/Skills/Buffs/SlotlessBuffs/Magic/Esuna")
+	"Spirit Sword" = "/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword"
 )
 
 var/list/Tier2 = list(
@@ -65,17 +62,12 @@ var/list/Tier2 = list(
 	"Final Flash" = "/obj/Skills/Projectile/Beams/Big/Final_Flash",
 	"Final Shine" = "/obj/Skills/Queue/Final_Shine",
 	"Super Dodompa" = "/obj/Skills/Projectile/Beams/Big/Super_Dodompa",
-	"Sunlight Spear" = "/obj/Skills/Projectile/Magic/Uber_Shots/Sunlight_Spear",
 	"Shin Kikoho" = "/obj/Skills/AutoHit/Shin_Kikoho",
 	"Zantetsuken" = "/obj/Skills/AutoHit/Zantetsuken",
 	"Shadow Cut" = "/obj/Skills/AutoHit/Shadow_Cut",
 	"Thousand Man Slayer" = "/obj/Skills/AutoHit/Thousand_Man_Slayer",
 	"Omnislash" = "/obj/Skills/Queue/Omnislash",
-	"Royal Guard & Release" = list("/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard", "/obj/Skills/AutoHit/RoyalRelease"),
-	"Advanced Defense Magic" = "/obj/Skills/Buffs/SlotlessBuffs/Magic/Protega",
-	"Advanced Shell Magic" = "/obj/Skills/Buffs/SlotlessBuffs/Magic/Resilient_Sphere",
-	"Advanced White Magic" = list("/obj/Skills/Buffs/SlotlessBuffs/Magic/Curaga", "/obj/Skills/Buffs/SlotlessBuffs/Magic/Esunaga"),
-	"Holy Magic" = "/obj/Skills/AutoHit/Magic/Holy"
+	"Royal Guard & Release" = list("/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard", "/obj/Skills/AutoHit/RoyalRelease")
 )
 
 var/list/Tier3 = list(

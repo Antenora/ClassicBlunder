@@ -38,4 +38,4 @@ mob/verb/Interact_Release()
 mob/proc/InteractKeyName()
 	var/k = KeybindKey("interact", 1)
 	if(!k) k = KeybindKey("interact", 2)
-	return k ? k : "G"
+	return k ? KeyDisplay(k) : "G"

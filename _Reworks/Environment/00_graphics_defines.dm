@@ -6,7 +6,6 @@
 #define SHADOW_PLANE 12
 #define REFLECTION_PLANE 10 //11 is reserved by the Beast transformation cutscene
 #define FX_RELAY_PLANE 6 //(3 = farblur band, 20 = DemonFusion anim)
-#define FX_SELFLIT_LAYER 6.58
 #define MATERIAL_LIGHT_PLANE 14 //13 belongs to the cloud-shadow mask
 #define WEATHER_PRECIP_PLANE 16 //native weather panels are flattened here before the outdoor mask
 #define WEATHER_MASK_PLANE 17 //white outdoor runs used as the precipitation alpha mask

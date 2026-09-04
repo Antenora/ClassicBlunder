@@ -113,7 +113,6 @@
 
 /obj/Skills/Projectile/Beams/Divine_Atonement
 	DamageMult=0.5714
-	ChargeRate=0.2
 	Dodgeable=0
 	Distance=30
 	BeamTime=60

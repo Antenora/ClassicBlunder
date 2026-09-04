@@ -102,6 +102,12 @@ var/global/list/keybind_by_id = list()
 	key = replacetext(key, "South", "Arrow Down")
 	key = replacetext(key, "West", "Arrow Left")
 	key = replacetext(key, "East", "Arrow Right")
+	key = replacetext(key, "Subtract", "Numpad -")
+	key = replacetext(key, "Multiply", "Numpad *")
+	key = replacetext(key, "Divide", "Numpad /")
+	key = replacetext(key, "Decimal", "Numpad .")
+	key = replacetext(key, "Add", "Numpad +")
+	key = replacetext(key, "Back", "Backspace")
 	return key
 
 /proc/HotbarMacroName(key, suffix = "")
@@ -137,6 +143,8 @@ client/proc/ApplyOneBind(set_name, eid, key, command, kind, regid, rep = 0)
 		if(s && s.HeldSkill)
 			winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=Release-Held-Skill")
 			return
+		winset(src, uid, "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[MacroCmd("Hotbar-Key-Up [n]")]")
+		return
 	winset(src, uid, "type=macro;parent=[set_name];name=off_[eid]_up")
 
 /proc/KbKeyElemId(key)
@@ -162,6 +170,7 @@ client/proc/KbWriteKey(set_name, key, command, kind, regid, rep)
 				var/n = text2num(copytext(regid, 7))
 				var/obj/Skills/s = mob.shortcuts.vars["shortcut[n]"]
 				if(s && s.HeldSkill) up_cmd = "Release-Held-Skill"
+				else up_cmd = "Hotbar-Key-Up [n]"
 	if(up_cmd)
 		winset(src, "[eid]_up", "type=macro;parent=[set_name];name=[HotbarMacroName(key, "+UP")];command=[MacroCmd(up_cmd)]")
 	else
@@ -383,7 +392,7 @@ table{width:100%;border-collapse:collapse;}
 <script>
 var ref='[r]';var w=null;
 function go(a){location.href='byond://?src='+ref+a;}
-function dk(k){if(!k)return '(unbound)';k=k.replace('North','Arrow Up');k=k.replace('South','Arrow Down');k=k.replace('West','Arrow Left');k=k.replace('East','Arrow Right');return k;}
+function dk(k){if(!k)return '(unbound)';k=k.replace('North','Arrow Up');k=k.replace('South','Arrow Down');k=k.replace('West','Arrow Left');k=k.replace('East','Arrow Right');k=k.replace('Subtract','Numpad -');k=k.replace('Multiply','Numpad *');k=k.replace('Divide','Numpad /');k=k.replace('Decimal','Numpad .');k=k.replace('Add','Numpad +');k=k.replace('Back','Backspace');return k;}
 function setbtn(el,raw){el.setAttribute('data-k',raw);el.innerHTML=dk(raw);el.style.background='#16263a';el.style.color='#cfe9ff';}
 function rb(eid,aid,slot){
  if(w){var p=document.getElementById(w.eid);if(p)setbtn(p,p.getAttribute('data-k'));}
@@ -403,7 +412,7 @@ function mk(e){
  else if(c>=48&&c<=57)b=String.fromCharCode(c);
  else if(c>=96&&c<=105)b='Numpad'+(c-96);
  else if(c>=112&&c<=123)b='F'+(c-111);
- else{var m={32:'Space',9:'Tab',13:'Return',8:'Backspace',37:'West',38:'North',39:'East',40:'South',45:'Insert',46:'Delete',36:'Home',35:'End',33:'PageUp',34:'PageDown',106:'NumpadStar',107:'NumpadPlus',109:'NumpadMinus',111:'NumpadSlash',110:'NumpadPeriod',186:';',187:'=',188:',',189:'-',190:'.',191:'/',192:'`'};b=m\[c\]||'';}
+ else{var m={32:'Space',9:'Tab',13:'Return',8:'Back',37:'West',38:'North',39:'East',40:'South',45:'Insert',46:'Delete',106:'Multiply',107:'Add',109:'Subtract',111:'Divide',110:'Decimal',186:';',187:'=',188:',',189:'-',190:'.',191:'/',192:'`'};b=m\[c\]||'';}
  if(b=='')return '';
  var p='';if(e.ctrlKey)p+='CTRL+';if(e.shiftKey)p+='SHIFT+';if(e.altKey)p+='ALT+';
  return p+b;
@@ -449,7 +458,7 @@ document.onkeydown=function(e){
 	return 0
 
 /obj/Skills/proc/DisableSkillVerb()
-	if(!SkillMenuVisible(src)) return
+	if(!SkillMenuVisible(src) && !IsSpell) return
 	for(var/v in verbs)
 		if(!v || v:category != "Skills") continue
 		fire_ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
@@ -505,6 +514,7 @@ document.onkeydown=function(e){
 	var/list/out = list()
 	for(var/obj/Skills/S in contents)
 		if(!SkillMenuVisible(S)) continue
+		if(S.IsSpell) continue
 		if(type_filter && type_filter != "All" && SkillMenuType(S) != type_filter)
 			continue
 		out += S
@@ -512,6 +522,7 @@ document.onkeydown=function(e){
 
 /obj/Skills/proc/InfoPanelLines()
 	var/list/L = list()
+	if(Desc) L += WrapDescLines(Desc, 47)
 	if(StrScaling)
 		L += "Strength Scaling: [round(StrScaling * 100)]%"
 	if(ForScaling)
@@ -539,10 +550,14 @@ document.onkeydown=function(e){
 	if(Scorching) els += "Scorching"
 	if(Chilling) els += "Chilling"
 	if(Freezing) els += "Freezing"
+	if(Drenching) els += "Drenching"
+	if(Soaking) els += "Soaking"
 	if(Crushing) els += "Crushing"
 	if(Shattering) els += "Shattering"
 	if(Shocking) els += "Shocking"
 	if(Paralyzing) els += "Paralyzing"
+	if(Exposing) els += "Exposing"
+	if(Shredding) els += "Shredding"
 	if(Poisoning) els += "Poisoning"
 	if(Toxic) els += "Toxic"
 	if(Shearing) els += "Shearing"
@@ -844,6 +859,8 @@ client/proc/OpenSkillMenu()
 	CloseAcquireMenu()
 	CloseLifeSkillsMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	skmenu_open = TRUE
 	skmenu_tab = "All"
 	skmenu_page = 1

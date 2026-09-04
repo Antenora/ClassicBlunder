@@ -186,9 +186,6 @@ mob
 				val*=PrideDrain
 				if(src.HealthPct()>=85&&!passive_handler.Get("PowerStressed"))
 					val*=0
-			//Mender refunds half the energy as mana - after the reduction mults so it tracks what actually got paid
-			if(val > 0 && src.hasMagePassive(/mage_passive/light/Mender))
-				src.HealMana(val * 0.5)
 			src.Energy-=val
 			if(src.Energy<0)
 				src.Energy=0
@@ -202,9 +199,6 @@ mob
 		GainFatigue(var/val)
 			if(src.FusionPowered)
 				return
-			//Linearity halves fatigue gain
-			if(src.hasMagePassive(/mage_passive/space/Linearity))
-				val *= 0.5
 			val/=1+src.GetKiControlMastery()
 			val*=src.EnergyExpenditure//*src.Power_Multiplier
 			if(GetPowerUpRatio()>1 && !GatesActive)
@@ -238,9 +232,6 @@ mob
 			if(src.ManaAmount<=0)
 				src.ManaAmount=0
 		LoseCapacity(var/val)
-			//Linearity halves capacity loss too
-			if(src.hasMagePassive(/mage_passive/space/Linearity))
-				val *= 0.5
 			val/=src.GetManaCapMult()
 			/* if(src.PotionCD)
 				val*=1.25
@@ -250,6 +241,7 @@ mob
 				src.TotalCapacity=100
 
 		HealHealth(val)
+			val *= HealCutMult()
 			if(GetEffectiveShearForStackingEffects())
 				if(HasShearImmunity())
 					val=val
@@ -261,9 +253,6 @@ mob
 				Sheared = max(0, Sheared - val)
 			if(icon_state == "Meditate")
 				Tension = max(0, Tension - (val * 1.5))
-			if(passive_handler["InverseHealing"])
-				DoDamage(src, src.PctToHP(val))
-				return
 			src.Health+=src.PctToHP(val)
 			src.MaxHealth()
 
@@ -402,6 +391,7 @@ mob
 				KeyMana-=src.TotalCapacity
 			if(src.HasManaCapMult())
 				KeyMana*=src.GetManaCapMult()
+			KeyMana += src.MageManaBonus()
 			var/Sub
 			var/Cut
 			if(src.ManaCut)
@@ -1773,12 +1763,12 @@ mob
 						Mod+=0.5*passive_handler.Get("BurningShot")
 					else
 						Mod+=0.75*passive_handler.Get("BurningShot")
-			if(src.Shock)
+			if(src.Exposed)
 				var/debuffRev = src.GetDebuffReversal();
 				if(debuffRev)
-					Mod*=1 + (Shock * glob.DEBUFF_EFFECTIVENESS * debuffRev);
+					Mod*=1 + (Exposed * glob.DEBUFF_EFFECTIVENESS * debuffRev);
 				else
-					Mod*=1 - (Shock * glob.DEBUFF_EFFECTIVENESS)
+					Mod*=1 - (Exposed * glob.DEBUFF_EFFECTIVENESS)
 			if(passive_handler["Rebel Heart"])
 				var/h = (((missingHealth())/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"])/10
 				Mod+=h
@@ -2678,7 +2668,6 @@ mob
 					Count++
 					continue
 			return Count
-#define ADVANCED_ELEMENTS list("Space", "Time", "Light", "Dark")
 		CountSigs(Tier=0)
 			var/Count=0
 			var/list/combo_check=list()
@@ -2703,9 +2692,6 @@ mob
 
 					Count++
 					continue
-			if(Tier==3)
-				for(var/x in accessedMagicTrees)
-					if(x in ADVANCED_ELEMENTS) Count++;
 			return Count
 
 		SagaAscend(var/mod, var/val)
@@ -2763,7 +2749,7 @@ mob
 
 			if(!src.SignatureCheck)
 				return
-			if(src.Saga)
+			if(src.Saga && src.Saga != "Mage")
 				if(src.Potential<glob.progress.SAGA_T2_POT && SagaLevel>=1) // t2
 					return
 				if(src.Potential<glob.progress.SAGA_T3_POT && src.SagaLevel>=2) // t3
@@ -2974,33 +2960,8 @@ proc
 	CounterDamage(Damage)
 		return clamp(Damage,0.25,2)
 
-var/list/general_magic_database = list()
 var/list/general_weaponry_database = list()
 proc
-	BuildGeneralMagicDatabase() // This is a list of generally obtainable magics. For now, it's just used for Crimson grimoire.
-		//needs MakeSkillTreeList to have run first or SkillTree is empty
-		if(!SkillTree || !islist(SkillTree))
-			return
-		general_magic_database = list()
-		if(islist(SkillTree["MagicT1"])) general_magic_database += SkillTree["MagicT1"]
-		if(islist(SkillTree["MagicT2"])) general_magic_database += SkillTree["MagicT2"]
-		if(islist(SkillTree["MagicT3"])) general_magic_database += SkillTree["MagicT3"]
-		if(islist(SkillTree["MagicT4"])) general_magic_database += SkillTree["MagicT4"]
-		general_magic_database = general_magic_database.Copy() //Makes it so we don't reference vars in the SkillTree variable.
-
-		for(var/index in general_magic_database) //remove all spell cost references for now.
-			general_magic_database[index] = null
-
-		//Now a layer of confirmation for the abilities in here.
-		var/obj/Skills/s
-		for(var/index in general_magic_database)
-			s = text2path(index)
-			if(!s) continue
-			s = new s
-			if(s && istype(s))
-				if(!s.MagicNeeded)
-					general_magic_database -= index
-
 	BuildGeneralWeaponryDatabase()
 		var/list/weaponry_queues = list()
 		weaponry_queues += "/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker"

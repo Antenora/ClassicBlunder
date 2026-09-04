@@ -435,12 +435,7 @@ mob
 			if(!Z) return 0
 			if(!Z.MagicNeeded) return 0
 			var/Streamline=0
-			var/obj/Items/Enchantment/Tome/T=src.EquippedTome()
 			var/obj/Items/Enchantment/Magic_Crest/MC=src.EquippedCrest()
-			if(T)
-				for(var/obj/Skills/S in T.Spells)
-					if(Z.type==S.type)
-						Streamline+=1
 			if(is_arcane_beast || CheckSpecial("Wisdom Form") || CheckSpecial("Master Form") || CheckSpecial("Final Form"))
 				Streamline+=1
 			if(passive_handler.Get("SpiritForm"))
@@ -470,13 +465,6 @@ mob
 						return 1
 			return 0
 
-		EquippedTome()
-			var/obj/Items/Enchantment/Tome/T
-			for(var/obj/Items/Enchantment/Tome/Tomes in src)
-				if(Tomes.suffix=="*Equipped*")
-					T=Tomes
-					return T
-			return 0
 		EquippedFlyingDevice()
 			var/obj/Items/Enchantment/Flying_Device/FD
 			for(var/obj/Items/Enchantment/Flying_Device/Fly in src)
@@ -1840,9 +1828,33 @@ mob
 		HasShocking()
 			if(passive_handler.Get("Shocking"))
 				return 1
+			if(src.Attunement=="Lightning")
+				return 1
+			if(src.InfusionElement=="Lightning")
+				return 1
+			return 0
+		HasDrenching()
+			if(passive_handler.Get("Drenching"))
+				return 1
+			if(src.Attunement=="Water")
+				return 1
+			if(src.InfusionElement=="Water")
+				return 1
+			return 0
+		HasSoaking()
+			if(passive_handler.Get("Soaking"))
+				return 1
+			return 0
+		HasExposing()
+			if(passive_handler.Get("Exposing"))
+				return 1
 			if(src.Attunement=="Wind")
 				return 1
 			if(src.InfusionElement=="Wind")
+				return 1
+			return 0
+		HasShredding()
+			if(passive_handler.Get("Shredding"))
 				return 1
 			return 0
 		GetShocking()

@@ -119,10 +119,14 @@ obj/Skills
 	var/Scorching=0 //just adds fucking burns
 	var/Chilling=0 //slow chance
 	var/Freezing=0 //Add slow
+	var/Drenching=0
+	var/Soaking=0
 	var/Crushing=0 //shatter chance
 	var/Shattering=0 //add shatter
 	var/Shocking=0 //shock chance
 	var/Paralyzing=0 //add shock
+	var/Exposing=0
+	var/Shredding=0
 	var/Poisoning //poison chance
 	var/Toxic //poison add
 	var/Purity //You can only hurt what you're meant to
@@ -184,6 +188,7 @@ obj/Skills
 	var/CrestGranted //Flagged as 1 for skills which have only been granted via crest.  This takes them away when the crest is removed.
 	var/NoTransplant //dont let people crest these spells
 	var/ElementalClass //Styles can flag this and allow skills in the same class to be used regardless of tome/crest presence.  Can be a list too.
+	var/SpellElement
 
 	 //words words words
 	var/CustomActive //Totally Custom
@@ -197,22 +202,11 @@ obj/Skills
 	var/heavenlyRestrictionIgnore = FALSE
 
 	var/CooldownDrag
-	var/StarCrossed
-
-	var/PainShare
-
-	var/ChargeDelay
-
-	var/Deport
-
-	var/Enshrine
-	var/HealingReverse
-
-	var/ForceField
 
 	proc
 		skillDescription()
 			description = "[src.name]\n"
+			if(Desc) description += "[Desc]\n"
 			if(MaxCharges > 0)
 				description += "Charges: [Charges]/[MaxCharges] (refreshes every [ChargeRefresh]s)\n"
 			else if(Cooldown!=-1)
@@ -227,7 +221,7 @@ obj/Skills
 				description += "Follow Up Move: [FollowUp]\n"
 			if(Grapple)
 				description += "Grapples.\n"
-			if(Burning || Scorching || Chilling || Freezing || Crushing || Shattering || Shocking || Paralyzing || Poisoning || Toxic || Shearing || Crippling)
+			if(Burning || Scorching || Drenching || Soaking || Chilling || Freezing || Exposing || Shredding || Crushing || Shattering || Shocking || Paralyzing || Poisoning || Toxic || Shearing || Crippling)
 				description += "Elemental Effects: "
 				if(Burning)
 					description += "Burning, "
@@ -237,6 +231,10 @@ obj/Skills
 					description += "Chilling, "
 				if(Freezing)
 					description += "Freezing, "
+				if(Drenching)
+					description += "Drenching, "
+				if(Soaking)
+					description += "Soaking, "
 				if(Crushing)
 					description += "Crushing, "
 				if(Shattering)
@@ -245,6 +243,10 @@ obj/Skills
 					description += "Shocking, "
 				if(Paralyzing)
 					description += "Paralyzing, "
+				if(Exposing)
+					description += "Exposing, "
+				if(Shredding)
+					description += "Shredding, "
 				if(Poisoning)
 					description += "Poisoning, "
 				if(Toxic)

@@ -313,8 +313,6 @@ mob/Players/Stat()
 				if(!(A.PermEquip&&A.suffix&&!A.Stealable))
 					if(istype(A, /obj/Items/Armor) || istype(A, /obj/Items/Sword))
 						if(A:Conjured) continue
-					if(istype(A, /obj/Items/Enchantment/Tome))
-						A.icon_state="Inventory"
 					if(A.Stackable)
 						A.suffix="[A.TotalStack]"
 					stat(A)
@@ -1064,10 +1062,12 @@ mob/proc/
 						var/boon = Secret == "Senjutsu" ? secretDatum.currentTier : 0
 						Recover("Mana",1 + boon)
 				else
-					if(ManaAmount<((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult()))
+					if(ManaAmount<((src.ManaMax-src.TotalCapacity)*src.GetManaCapMult()+src.MageManaBonus()))
 						Recover("Mana",1)
 				Recover("Capacity",2)
 
+		if(IsMage() && icon_state != "Meditate")
+			MageRegenTick()
 		if(src.PowerControl<=25)
 			Recover("Fatigue",0.5)
 			var/silverScale = isSilverscale();
@@ -1091,9 +1091,6 @@ mob/proc/
 		if(src.PoweringUp==1 && !PureRPMode && src.icon_state!="Meditate")
 
 			var/PUGain=src.PUSpeedModifier
-
-			if(ChargeDelay)
-				PUGain *= max(0.1,1-ChargeDelay)
 
 			if(src.HasPULock())
 				PUGain=0
@@ -1263,7 +1260,7 @@ mob/proc/Update_Stat_Labels()
 		else if(src.HasMechanized())
 			src<<output("Battery: [round(ManaAmount/ManaMax*100)]","BarMana")
 		else
-			src<<output("Mana: [round((ManaAmount/100)*100)][ManaMessage]","BarMana")
+			src<<output("Mana: [round(ManaAmount / max(1, (ManaMax - TotalCapacity) * GetManaCapMult() + MageManaBonus()) * 100)][ManaMessage]","BarMana")
 		if(!src.Kaioken&&!src.passive_handler.Get("Red Hot Rage"))
 			if(src.PoweringUp)
 				src<<output("Power: [round((Energy/EnergyMax)*100)*round(src.GetPowerUpRatioVisble(), 0.01)]% (+)","BarPower")

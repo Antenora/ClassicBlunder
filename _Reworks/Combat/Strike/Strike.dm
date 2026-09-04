@@ -36,19 +36,17 @@
 	var/stage = "post" //"crit" fires on critical hits, "post" fires after every resolved strike
 	proc/fire(strike/S)
 
-var/list/strikeHooksCrit
-var/list/strikeHooksPost
+var/list/strikeHooksByStage
 /proc/fireStrikeHooks(stage, strike/S)
-	if(!strikeHooksPost)
-		strikeHooksCrit = list()
-		strikeHooksPost = list()
+	if(!strikeHooksByStage)
+		strikeHooksByStage = list()
 		for(var/T in subtypesof(/strikeHook))
 			var/strikeHook/H = new T
-			if(H.stage == "crit")
-				strikeHooksCrit += H
-			else
-				strikeHooksPost += H
-	for(var/strikeHook/H as anything in (stage == "crit" ? strikeHooksCrit : strikeHooksPost))
+			if(!strikeHooksByStage[H.stage]) strikeHooksByStage[H.stage] = list()
+			strikeHooksByStage[H.stage] += H
+	var/list/L = strikeHooksByStage[stage]
+	if(!L) return
+	for(var/strikeHook/H as anything in L)
 		H.fire(S)
 
 mob
@@ -169,7 +167,7 @@ mob
 			if(defender.passive_handler["Dim Mak"]>0)
 				defender.passive_handler.Increase("Dim Mak", defender.HPToPct(val)/2)
 			handlePostDamage(defender)
-			if(defender.VaizardHealth)
+			if(defender.VaizardHealth && !S.shieldPierce)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
 					val *= glob.SYMBIOTE_DMG_TEST
 				defender.VaizardHealth-=defender.HPToPct(val)
@@ -399,8 +397,6 @@ mob
 
 			if(defender.CheckSlotless("Protega"))
 				src.LoseHealth(val/10)
-			if(painShared)
-				applyPainSharedDamage(val)
 			if(defender.passive_handler.Get("MeltyBlood"))
 				if(defender.HealthPct()<50*(1-src.HealthCut))
 					if(FightingSeriously(src,0))
@@ -484,7 +480,10 @@ mob
 				HealEnergy(gen);
 				HealFatigue(gen/2);
 			if(HasManaGeneration())
-				HealMana(src.GetManaGeneration()/glob.MANA_GEN_DIVISOR);
+				if(S.element)
+					RefundMana(src.GetManaGeneration()/glob.MANA_GEN_DIVISOR)
+				else
+					HealMana(src.GetManaGeneration()/glob.MANA_GEN_DIVISOR);
 			if(defender.DownToEarth)
 				var/gen=5/glob.ENERGY_GEN_DIVISOR;
 				HealEnergy(gen);

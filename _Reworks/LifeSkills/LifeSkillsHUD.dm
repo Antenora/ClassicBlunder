@@ -131,6 +131,8 @@ client/proc/OpenLifeSkillsMenu()
 	CloseTechMenu()
 	CloseAcquireMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	CloseOppMenu()
 	lsmenu_open = 1
 

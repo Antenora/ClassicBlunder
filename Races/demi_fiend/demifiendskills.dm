@@ -255,7 +255,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Media
 		src.Cooldown(1, null, User)
 
 obj/Skills/Projectile/DemiFiend/Tornado
-	SpellElement="Air"
+	SpellElement="Wind"
 	name = "Tornado"
 	IconLock = 'Tornado.dmi'
 	IconSize = 2
@@ -1250,7 +1250,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/AutoHit/DemiFiend/Bolt_Storm
 	ElementalClass="Wind"
-	SpellElement="Air"
+	SpellElement="Wind"
 	Area="Around Target"
 	Distance=12
 	DistanceAround=10
@@ -1283,7 +1283,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/AutoHit/DemiFiend/Tempest
 	ElementalClass="Wind"
-	SpellElement="Air"
+	SpellElement="Wind"
 	Area="Wide Wave"
 	Distance=6
 	DamageMult=12
@@ -1345,7 +1345,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Makajamon
 
 /obj/Skills/Projectile/DemiFiend/Wind_Cutter
 	ElementalClass="Wind"
-	SpellElement="Air"
+	SpellElement="Wind"
 	IconLock='SparkleGreen.dmi'
 	IconSize=1
 	LockX=-16
@@ -1589,7 +1589,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	IconSize = 1
 	Distance = 50
 	DamageMult = 1.1429
-	ChargeRate = 0.2
 	BeamTime = 25
 	AccMult = 1.175
 	Knockback = 1
@@ -1682,7 +1681,6 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 	Distance = 40
 	DamageMult = 0.5714
 	BeamTime = 20
-	ChargeRate = 0.2
 	AccMult = 1.175
 	Knockback = 1
 	Deflectable = -1
@@ -1705,12 +1703,11 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 /obj/Skills/Projectile/DemiFiend/Spiral_Viper_Beam
 	parent_type = /obj/Skills/Projectile/Beams
 	name = "Spiral Viper"
-	SpellElement = "Air"
+	SpellElement = "Wind"
 	Area = "Beam"
 	IconLock = 'BeamFS.dmi'
 	Distance = 50
 	DamageMult = 0.8571
-	ChargeRate = 0.2
 	BeamTime = 15
 	AccMult = 1.175
 	Knockback = 1
@@ -1761,7 +1758,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 /obj/Skills/AutoHit/DemiFiend/Wind_Cutter_Gust
 	name = "Wind Cutter"
 	ElementalClass = "Wind"
-	SpellElement = "Air"
+	SpellElement = "Wind"
 	Area = "Around Target"
 	Distance = 10
 	DistanceAround = 8
@@ -1849,7 +1846,7 @@ obj/Skills/Buffs/SlotlessBuffs/DemiFiend/Mediarahan
 /obj/Skills/AutoHit/DemiFiend/Thunderclap_Storm
 	name = "Thunderclap"
 	ElementalClass = "Wind"
-	SpellElement = "Air"
+	SpellElement = "Wind"
 	Area = "Circle"
 	Distance = 8
 	Bolt = 4

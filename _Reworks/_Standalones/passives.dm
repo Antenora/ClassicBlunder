@@ -159,13 +159,13 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"AfterImages" = 1, "AllOutPU" = 1, "AlphainForce" = 1, "Alter the Future" = 1,\
 	"ApathyFactor" = 1, "ArcaneBladework" = 1, "AshChoked" = 1, "Ashen One" = 1,\
 	"BossStagger" = 1, "CapacityHeal" = 1, "CastingTime" = 1, "Certain Progress" = 1,\
-	"Chaos Buster" = 1, "ChaosQueen" = 1, "ChaosRuler" = 1, "ChargeDelay" = 1,\
+	"Chaos Buster" = 1, "ChaosQueen" = 1, "ChaosRuler" = 1,\
 	"Cleansing" = 1, "Compassion" = 1, "Completely Obliterated" = 1, "ConfuseAffected" = 1,\
 	"ContinuallyStun" = 1, "Controlled Chaos" = 1, "Controlled Darkness" = 1,\
 	"CooldownDrag" = 1, "CoolingDown" = 1, "CorruptAffected" = 1, "Corruption" = 1,\
 	"CreateTheHeavens" = 1, "CriticalParalyze" = 1, "CriticalSpark" = 1, "CursedSheath" = 1,\
 	"DamageMult" = 1, "Death X-Antibody" = 1, "DeathDefied" = 1, "Defiance" = 1,\
-	"DemonicInfluence" = 1, "Deport" = 1, "Desperation" = 1, "Deterioration" = 1,\
+	"DemonicInfluence" = 1, "Desperation" = 1, "Deterioration" = 1,\
 	"Determination" = 1, "Determination(Black)" = 1, "Determination(Green)" = 1, "Determination(Orange)" = 1,\
 	"Determination(Purple)" = 1, "Determination(Red)" = 1, "Determination(White)" = 1, "Determination(Yellow)" = 1,\
 	"Deus Ex Machina" = 1, "Dim Mak" = 1, "Disarmed" = 1, "Disconnected" = 1,\
@@ -173,23 +173,23 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"DormantDemon" = 1, "DoubleHelix" = 1, "Drained" = 1, "DrainlessPUSpike" = 1,\
 	"Dream Within a Dream" = 1, "Dreamless Sleep" = 1, "Duren" = 1, "Emptiness" = 1,\
 	"EmptyFlashStep" = 1, "EndEffectiveness" = 1, "EndlessAnger" = 1,\
-	"EnergyExpenditure" = 1, "EnergyHeal" = 1, "Enshrine" = 1, "EnvyFactor" = 1,\
+	"EnergyExpenditure" = 1, "EnergyHeal" = 1, "EnvyFactor" = 1,\
 	"EruptingBlows" = 1, "Explode" = 1, "Extra Secret Knives" = 1, "Fabled King" = 1,\
 	"FakePeace" = 1, "FatigueDrain" = 1, "FatigueLeak" = 1, "Field of Destruction" = 1,\
 	"Fishman" = 1, "FlashDOT" = 1, "ForScaling" = 1,\
-	"ForceField" = 1, "ForceFielded" = 1, "Fox Spirit" = 1, "FrenzyCarrier" = 1,\
+	"Fox Spirit" = 1, "FrenzyCarrier" = 1,\
 	"Full Manifestation" = 1, "FullTensionLock" = 1, "FutureRewritten" = 1, "Gluttony" = 1,\
 	"GluttonyFactor" = 1, "GodspeedDisabled" = 1, "GreedFactor" = 1, "Grit" = 1,\
-	"Half Manifestation" = 1, "HealThroughTempHP" = 1, "HealingReverse" = 1, "HealthCost" = 1,\
+	"Half Manifestation" = 1, "HealThroughTempHP" = 1, "HealthCost" = 1,\
 	"HealthPU" = 1, "Heart of Darkness" = 1, "HeatingUp" = 1, "Heavy Attack" = 1,\
 	"Heavy Strike" = 1, "Hidden Potential" = 1, "HighTension" = 1, "Holding Back" = 1,\
 	"HopeFactor" = 1, "Hopes and Dreams" = 1, "HybridStyle" = 1, "ImbuedSoul" = 1,\
 	"InBlueEvolved" = 1, "Incomplete" = 1, "Infatuated" = 1, "Innovation" = 1,\
-	"InverseHealing" = 1, "Judged" = 1, "Justice" = 1, "Kaioken" = 1,\
+	"Judged" = 1, "Justice" = 1, "Kaioken" = 1,\
 	"Kaioken Blue" = 1, "Kindling" = 1, "Knight of the Empty Seat" = 1, "LegendarySaiyan" = 1,\
 	"Life Fiber Rending" = 1, "LimitBroken" = 1, "Limited Rank-Up" = 1, "LimitlessMagic" = 1,\
 	"AfterImageSkin" = 1, "LifeStealPierce" = 1, "Lion Spirit" = 1, "TrueBlue" = 1, "VoidBlade" = 1, "Longing" = 1, "LunarWrath" = 1,\
-	"LustFactor" = 1, "MagmicInfusion" = 1, "MagnifiedDef" = 1, "MagnifiedEnd" = 1,\
+	"LustFactor" = 1, "MagnifiedDef" = 1, "MagnifiedEnd" = 1,\
 	"MagnifiedFor" = 1, "MagnifiedOff" = 1, "MagnifiedSSJ1" = 1, "MagnifiedSpd" = 1,\
 	"MagnifiedStr" = 1, "Maki" = 1, "ManaCapMult" = 1, "ManaDrain" = 1,\
 	"ManaHeal" = 1, "ManaLeak" = 1, "ManaPU" = 1, "ManaSeal" = 1,\
@@ -199,7 +199,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"NeedsThirdSword" = 1, "NerveOverload" = 1, "Nightmare" = 1, "Nimbus" = 1,\
 	"NoAnger" = 1, "NoStaff" = 1, "NoSword" = 1, "Obfuscated Origin" = 1,\
 	"Ocean Bringer" = 1, "OmegaPower" = 1, "Omnipotent" = 1, "Orange Namekian" = 1,\
-	"Our Future" = 1, "Overwhelming" = 1, "PULock" = 1, "PainShare" = 1,\
+	"Our Future" = 1, "Overwhelming" = 1, "PULock" = 1,\
 	"Perfect Counter" = 1, "Piloting" = 1, "PowerAppearance" = 1, "PowerPole" = 1,\
 	"PowerReplacement" = 1, "PowerStressed" = 1, "Powerhouse" = 1, "Pride" = 1,\
 	"PrideFactor" = 1, "Primordial" = 1, "Prismatic" = 1, "Rebel Heart" = 1,\
@@ -207,7 +207,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Rekkaken" = 1, "ReturnToSender" = 1, "RoyalGuarding" = 1, "Rust" = 1,\
 	"SSJ4" = 1, "SSJ4LimitBreaker" = 1, "SSJRose" = 1, "Sadist" = 1,\
 	"SaiyanPower1" = 1, "SaiyanPower2" = 1, "SaiyanPower3" = 1, "SaiyanPower4" = 1,\
-	"SaiyanPowerVoid" = 1, "Sajire Rush" = 1, "Sanctify" = 1, "Scarlet-Overdriven" = 1,\
+	"SaiyanPowerVoid" = 1, "Sajire Rush" = 1, "Scarlet-Overdriven" = 1,\
 	"Secret Knives" = 1, "Seki" = 1, "Sekizou" = 1, "Sense Replacement" = 1,\
 	"Shameful Display" = 1, "Shatter Fate" = 1, "Shellshocked" = 1, "Shijima" = 1,\
 	"ShiningBrightly" = 1, "Shirayuki" = 1, "ShockwaveBlows" = 1, "Shonen" = 1,\
@@ -215,7 +215,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Smokin' Sick Style!!!" = 1, "Smokin'!" = 1, "Snared" = 1, "Song of Oblivion" = 1,\
 	"Sparks of Black" = 1, "SpecialBuffLock" = 1, "SpecialStrike" = 1, "SpiralEngine" = 1,\
 	"SpiralImpact" = 1, "SpiritForm" = 1, "Spiritual Tactician" = 1, "Staggered!" = 1,\
-	"Staked" = 1, "Star Surge" = 1, "StarCrossed" = 1, "StarPower" = 1,\
+	"Staked" = 1, "Star Surge" = 1, "StarPower" = 1,\
 	"StealsStats" = 1, "StrScaling" = 1, "Stylish" = 1,\
 	"SunStricken" = 1, "Super Kaioken" = 1, "SuperHighTension" = 1, "SuperMode" = 1,\
 	"SuperSaiyanSignature" = 1, "Sure-Strike Black Flash" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1,\

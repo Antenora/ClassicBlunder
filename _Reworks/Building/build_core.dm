@@ -46,6 +46,7 @@ proc/IsBuildEligible(mob/M)
 		datum/build_zone_def/zoneRef
 		swatchColor = ""
 		famKey = ""
+		dirBase = SOUTH
 
 /proc/BuildEntryFit(datum/build_entry/E)
 	if(!E.iconF)
@@ -92,6 +93,7 @@ proc/IsBuildEligible(mob/M)
 		E.iconF = B.icon
 		E.icon_state = B.icon_state
 		E.Creates = B.Creates
+		E.dirBase = B.dir
 		E.category = BuildCategorize(B.Creates)
 		E.isCustom = ispath(B.Creates, /turf/CustomTurf) || ispath(B.Creates, /obj/Turfs/CustomObj1)
 		BuildEntryFit(E)
@@ -104,6 +106,7 @@ proc/IsBuildEligible(mob/M)
 		E.iconF = B.icon
 		E.icon_state = B.icon_state
 		E.Creates = B.Creates
+		E.dirBase = B.dir
 		E.category = BUILD_CAT_SPECIAL
 		BuildEntryFit(E)
 		buildPalette += E
@@ -386,20 +389,18 @@ client/var/datum/build_session/bsession
 					sprayDensity = 25
 
 		RotateBrush()
-			var/dname = "south"
 			switch(dirv)
 				if(SOUTH)
 					dirv = WEST
-					dname = "west"
 				if(WEST)
 					dirv = NORTH
-					dname = "north"
 				if(NORTH)
 					dirv = EAST
-					dname = "east"
 				else
 					dirv = SOUTH
-			C?.mob << "Brush facing: [dname]."
+			var/ang = -BuildRotAngle(dirv)
+			C?.mob << (ang ? "Brush rotated [ang] degrees clockwise." : "Brush rotation reset.")
+			UpdateGhost()
 
 		CancelPending()
 			dragging = 0

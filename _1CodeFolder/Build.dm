@@ -383,6 +383,7 @@ proc/Add_Builds()
 			C.icon=B.icon
 			C.icon_state=B.icon_state
 			C.Creates=B.type
+			C.dir=B.dir
 			C.name="-[B.name]-"
 			Builds+=C
 	for(var/A in subtypesof(/obj/KatieObj))
@@ -393,6 +394,7 @@ proc/Add_Builds()
 		C.icon=B.icon
 		C.icon_state=B.icon_state
 		C.Creates=B.type
+		C.dir=B.dir
 		C.name="-[B.name]-"
 		Builds+=C
 

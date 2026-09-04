@@ -103,6 +103,7 @@ What shortcut do you want to set?"}
         if(shortcuts)
             var/obj/Skills/attemptedSkill = shortcuts.vars["shortcut[num]"];
             if(attemptedSkill)
+                StampHotbarDown(num)
                 var/was_on_cd = SkillOnCooldown(attemptedSkill)
                 if(attemptedSkill.HeldSkill && num >= 1 && num <= length(HOTBAR_DEFAULT_KEYS))
                     held_skill_pending_key = KeybindKey("hotbar[num]") || KeybindKey("hotbar[num]", 2);

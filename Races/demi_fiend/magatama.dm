@@ -463,8 +463,8 @@ obj/Items/Magatama/Shiranui
 obj/Items/Magatama/Hifumi
 	name = "Hifumi"
 	desc = "A Magatama of howling gales and cutting force. Named for the opening moves of a master strategist, it bends the wind to its host's will."
-	base_passives = list("Air Magic Mastery" = 0.25, "ShearResist" = 1, "QuickCast" = 1)
-	passive_scaling = list("Air Magic Mastery" = 0.0075, "ShearResist" = 0.04,  "AttackSpeed" = 0.008, "QuickCast" = 0.04, "Flicker" = 0.09)
+	base_passives = list("Wind Magic Mastery" = 0.25, "ShearResist" = 1, "QuickCast" = 1)
+	passive_scaling = list("Wind Magic Mastery" = 0.0075, "ShearResist" = 0.04,  "AttackSpeed" = 0.008, "QuickCast" = 0.04, "Flicker" = 0.09)
 	ascension_passives = list("2" = list("AttackSpeed" = 0.2,  "Flicker" = 1))
 	magatama_skills = list(/obj/Skills/Projectile/DemiFiend/Tornado)
 	ascension_skills = list("2" = list(/obj/Skills/Buffs/SlotlessBuffs/DemiFiend/War_Cry))
@@ -485,8 +485,8 @@ obj/Items/Magatama/Kamudo
 obj/Items/Magatama/Narukami
 	name = "Narukami"
 	desc = "A Magatama crackling with divine lightning. It carries the wrath of the thunder god, striking with the fury of the storm."
-	base_passives = list("Air Magic Mastery" = 0.15, "ShockResist" = 1, "Shocking" = 5)
-	passive_scaling = list("Air Magic Mastery" = 0.0085, "ShockResist" = 0.04, "Shocking" = 0.15, "DenkoSekka" = 0.05, "CriticalDamage" = 0.007)
+	base_passives = list("Wind Magic Mastery" = 0.15, "ShockResist" = 1, "Shocking" = 5)
+	passive_scaling = list("Wind Magic Mastery" = 0.0085, "ShockResist" = 0.04, "Shocking" = 0.15, "DenkoSekka" = 0.05, "CriticalDamage" = 0.007)
 	ascension_passives = list("2" = list("ThunderHerald" = 1, "DenkoSekka" = 1), "3" = list("CriticalDamage" = 0.1))
 	ascension_skills = list("2" = list(/obj/Skills/AutoHit/DemiFiend/Shock))
 	craft_cost = 5000
@@ -611,8 +611,8 @@ obj/Items/Magatama/Satan
 obj/Items/Magatama/Adama
 	name = "Adama"
 	desc = "A Magatama shaped from the red clay of the first-formed. Its bearer draws down the storm — thunder surges through their veins, searing any who dare raise a hand against them."
-	base_passives = list("Air Magic Mastery" = 0.2, "ManaCapMult" = 0.35, "DenkoSekka" = 2, "ShockResist" = 1, "Shocking" = 5)
-	passive_scaling = list("Air Magic Mastery" = 0.008, "ManaCapMult" = 0.0065, "ShockAbsorb" = 0.02, "DenkoSekka" = 0.05, "ShockResist" = 0.04, "Shocking" = 0.15, "Fury" = 0.06, "Warping" = 0.03)
+	base_passives = list("Wind Magic Mastery" = 0.2, "ManaCapMult" = 0.35, "DenkoSekka" = 2, "ShockResist" = 1, "Shocking" = 5)
+	passive_scaling = list("Wind Magic Mastery" = 0.008, "ManaCapMult" = 0.0065, "ShockAbsorb" = 0.02, "DenkoSekka" = 0.05, "ShockResist" = 0.04, "Shocking" = 0.15, "Fury" = 0.06, "Warping" = 0.03)
 	ascension_passives = list("6" = list("ThunderHerald" = 1, "ShockAbsorb" = 1, "Fury" = 2, "Warping" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Bolt_Storm)
 	ascension_skills = list()
@@ -636,8 +636,8 @@ obj/Items/Magatama/Vimana
 obj/Items/Magatama/Gundari
 	name = "Gundari"
 	desc = "A Magatama forged in the likeness of the wrathful guardian. It sharpens its bearer into a coiling blade of wind — unblockable, uncatchable, lethal at the first strike."
-	base_passives = list("Air Magic Mastery" = 0.2, "Flicker" = 1, "Pursuer" = 1, "ShearResist" = 1, "QuickCast" = 1)
-	passive_scaling = list("Air Magic Mastery" = 0.008, "ShearResist" = 0.04, "WindAbsorb" = 0.02, "QuickCast" = 0.04, "Speed Force" = 0.03, "Flicker" = 0.09, "Pursuer" = 0.09)
+	base_passives = list("Wind Magic Mastery" = 0.2, "Flicker" = 1, "Pursuer" = 1, "ShearResist" = 1, "QuickCast" = 1)
+	passive_scaling = list("Wind Magic Mastery" = 0.008, "ShearResist" = 0.04, "WindAbsorb" = 0.02, "QuickCast" = 0.04, "Speed Force" = 0.03, "Flicker" = 0.09, "Pursuer" = 0.09)
 	ascension_passives = list("6" = list("WindAbsorb" = 1,  "Speed Force" = 1))
 	magatama_skills = list(/obj/Skills/AutoHit/DemiFiend/Wind_Cutter_Gust)
 	ascension_skills = list("6" = list(/obj/Skills/Projectile/DemiFiend/Spiral_Viper_Beam))

@@ -1588,11 +1588,13 @@ mob/Admin2/verb
 					A.Conscious()
 				A.SetHealthPct(100)
 				A.Energy = A.EnergyMax
-				A.ManaAmount = A.ManaMax * A.GetManaCapMult()
+				A.ManaAmount = A.ManaMax * A.GetManaCapMult() + A.MageManaBonus()
 				A.Burn = 0
 				A.Poison = 0
 				A.Slow = 0
 				A.Shock = 0
+				A.Drenched = 0
+				A.Exposed = 0
 				A.HealthAnnounce25 = 0
 				A.HealthAnnounce10 = 0
 				A.seventhSenseTriggered = 0

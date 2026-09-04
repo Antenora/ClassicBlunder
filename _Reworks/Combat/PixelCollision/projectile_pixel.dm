@@ -6,6 +6,7 @@ obj/Skills/Projectile/_Projectile
 		pc_lastdir = 0
 		pm_substep = 0 //ticks per tile under engine pixel movement; 0 = tile stepping
 		icon_var_scale = 1 //IconVariance random art-scale roll, so the box matches the drawn size
+		pc_basescale = 1
 		beam_chain/chain
 
 	proc/SetupPixelHitbox(obj/Skills/Projectile/Z, DirOverride=0)
@@ -24,6 +25,7 @@ obj/Skills/Projectile/_Projectile
 		if(Z.IconSize != 1)
 			s = Z.TempSize || Z.IconSize
 		s *= icon_var_scale
+		pc_basescale = s
 		if(Z.IconSizeGrowTo) //grow-anim skills
 			s = Z.IconSizeGrowTo
 		var/fitdir = DisplayedCardinal(DirOverride || (Owner ? Owner.dir : dir), SOUTH)
@@ -120,6 +122,7 @@ obj/Skills/Projectile/_Projectile
 		else if(shown != pc_lastdir) //deflects/homing turns re-fit the displayed-dir data
 			ReapplyHitboxForDir(shown)
 		pc_lastdir = shown
+		RefitGrowScale()
 		step(src, src.dir) //runs the Move() override (Trail/Divide/Distance--)
 		PixelWallCheck()
 
@@ -142,6 +145,7 @@ obj/Skills/Projectile/_Projectile
 			else if(shown != pc_lastdir)
 				ReapplyHitboxForDir(shown)
 			pc_lastdir = shown
+			RefitGrowScale()
 			step(src, src.dir) //moves step_size px, set at hitbox setup
 			PixelWallCheck()
 			if(Killed || Distance <= 0) return
@@ -230,6 +234,7 @@ obj/Skills/Projectile/_Projectile
 			if(0>=Distance)
 				break
 			if(src.Area!="Beam")
+				if(from_skill) SpellFlightStep()
 				if(src.FollowFacing && src.Owner)
 					src.dir = src.Owner.dir
 				else if(src.Homing)

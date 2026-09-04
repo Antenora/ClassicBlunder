@@ -159,6 +159,8 @@ mob/proc/StartFresh()
 	Burn = 0
 	Poison = 0
 	Slow = 0
+	Drenched = 0
+	Exposed = 0
 	Shatter = 0
 	Sheared = 0
 	TotalFatigue = 0

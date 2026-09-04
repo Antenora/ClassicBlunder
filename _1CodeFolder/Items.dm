@@ -432,8 +432,6 @@ obj/Items
 			if(usr.HasManaCapacity(manaCost))
 				usr.TakeManaCapacity(manaCost)
 				ItemMade=new src.type
-				if(istype(src, /obj/Items/Enchantment/Tome))
-					ItemMade:init(1, usr)
 				if(ItemMade.Grabbable)
 					if(!usr.CanPickupItem(ItemMade))
 						del ItemMade
@@ -1616,52 +1614,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 		if(istype(src,/obj/Items/Enchantment/Arcane_Mask))
 			var/obj/Items/W=src
 			W.AlignEquip(User)
-		if(istype(src,/obj/Items/Enchantment/Tome))
-			if(User.Secret=="Heavenly Restriction" && User.secretDatum?:hasRestriction("Magic"))
-				return
-			var/obj/Items/Enchantment/Tome/T=User.EquippedTome()
-			if(suffix=="*Equipped*")
-				if(length(T.Spells)>0)
-					for(var/obj/Skills/spell in T.Spells)
-						for(var/obj/Skills/ownerSpells in User)
-							if(ownerSpells.type == spell.type)
-								if(ownerSpells.Temporary)
-									User.contents-=ownerSpells
-									del ownerSpells
-			else
-				if(T && T != src)
-					return
-				T = src
-				if(length(T.Spells)>0)
-					for(var/obj/Skills/spell in T.Spells)
-						var/found = 0
-						for(var/obj/Skills/ownerSpells in User)
-							if(ownerSpells.type == spell.type)
-								found = 1
-								break
-						if(!found)
-							var/obj/Skills/s = copyatom(spell)
-							s.Temporary = TRUE
-							s.Copyable = FALSE
-							User.AddSkill(s)
-
-			if(T)
-				if(T!=src)
-					User << "You already have a tome equipped!"
-					return
-			else
-				for(var/obj/Items/Gear/g in User)
-					if(g.NoSaga || istype(g, /obj/Items/Gear/Prosthetic_Limb))
-						continue
-					else if(g.suffix=="*Equipped*")
-						User << "You cannot equip a tome while you have gear(s) equipped."
-						return
-				if(src.Password)
-					var/PassCheck=input(User, "Enter the password to access this secure knowledge.", "Tome Security") as text
-					if(PassCheck!=src.Password)
-						User << "Incorrect, you can't access the tome with that password."
-						return
-			src.AlignEquip(User)
 
 		if(istype(src,/obj/Items/Enchantment/Magic_Crest))
 			if(User.Secret=="Heavenly Restriction" && User.secretDatum?:hasRestriction("Magic"))
@@ -2125,10 +2077,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				if(get_dist(User, src) > 1)
 					return //Too far.
 
-				if(User.EquippedTome())
-					User << "You can't have any tomes equipped while inside a Mobile Suit!"
-					return
-
 				for(var/obj/Items/Gear/g in User)
 					if(g==src)
 						continue
@@ -2200,10 +2148,6 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				User << "A magical force surrounding your body repels the gear."
 				return
 			if(!src.suffix)
-				if(!src.NoSaga)
-					if(User.EquippedTome())
-						User << "You cannot equip a tome and gears at the same time."
-						return
 				var/GearCount=0
 				for(var/obj/Items/Gear/g in User)
 					if(g==src)

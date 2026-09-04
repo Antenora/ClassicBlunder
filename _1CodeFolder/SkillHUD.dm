@@ -144,7 +144,7 @@
 		glow_on = on
 		if(glow_busy) return                     
 		if(on)
-			GlowSet(SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, SLOT_GLOW_IN)
+			GlowSet(istext(on) ? on : SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, SLOT_GLOW_IN)
 		else if(iconpart.filters && iconpart.filters.len)
 			animate(iconpart.filters[1], size=0, time=SLOT_GLOW_OUT)
 			var/atom/movable/ip = iconpart
@@ -160,7 +160,7 @@
 			if(glow_seq != myseq) return         // a newer flash superseded this one
 			glow_busy = FALSE
 			if(glow_on)
-				GlowSet(SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, 0)   // hand back to the sustained glow
+				GlowSet(istext(glow_on) ? glow_on : SLOT_GLOW_COLOR, SLOT_GLOW_SIZE, 0)   // hand back to the sustained glow
 			else if(iconpart.filters)
 				iconpart.filters = null
 	proc/SetCDText(rem)
@@ -374,10 +374,12 @@ client/proc/InitSkillHUD()
 	InitTechButton()
 	InitAcquireButton()
 	InitLifeSkillsButton()
+	InitArcaneButton()
 	for(var/atom/movable/o in shud_parts)
 		screen += o
 	InitCharacterCard() // top-left card keeps its own object list
 	mob.UpdateResourceOrbs()
+	mob.TomeScrubStale()
 	mob.DisableSlottableSkillVerbs()   // slotted/slottable skills become hotbar-only
 	RefreshHotbar()     // paint slots from the saved /shortcut datum
 	hotbar_ticker = new
@@ -406,6 +408,7 @@ client/proc/ClearSkillHUD()
 	ResetTechHUD()
 	ResetAcquireHUD()
 	ResetLifeSkillsHUD()
+	ResetArcaneHUD()
 	ResetStationHUD()
 	ResetLogHUD()
 	ResetAhHUD()
@@ -495,6 +498,7 @@ client/proc/RefreshHotbar()
 // a slot glows blue while its skill is in an active state
 mob/proc/SkillGlowActive(obj/Skills/S)
 	if(!S) return FALSE
+	if(S.IsSpell && SpellPrimed(S)) return "#ffd86b"
 	if(S == held_skill) return TRUE                                // held skill currently charging
 	if(("Charging" in S.vars) && S.vars["Charging"]) return TRUE   // beam mid-charge
 	if(istype(S, /obj/Skills/Buffs))

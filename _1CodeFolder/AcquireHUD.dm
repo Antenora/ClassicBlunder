@@ -23,7 +23,7 @@
 #define AQ_C_COMBO  "#8be9ff"
 #define AQ_C_HINT   "#7a9bb5"
 
-var/list/AQ_TAB_ORDER = list("Unarmed", "Blast", "Magic", "Sword", "Styles", "Signature")
+var/list/AQ_TAB_ORDER = list("Unarmed", "Blast", "Sword", "Styles", "Signature")
 
 // template cache
 var/list/AQ_TEMPLATES = list()
@@ -367,6 +367,8 @@ client/proc/OpenAcquireMenu()
 	CloseTechMenu()
 	CloseLifeSkillsMenu()
 	CloseStationMenu()
+	CloseArcaneMenu()
+	CloseArcaneAcquire(0)
 	aqmenu_open = 1
 	aq_tab = "Unarmed"
 	aq_scroll_px = 0
@@ -559,7 +561,7 @@ client/proc/AqBuildEntries()
 	aq_entries = list()
 	if(!mob) return
 	switch(aq_tab)
-		if("Unarmed", "Blast", "Magic", "Sword")
+		if("Unarmed", "Blast", "Sword")
 			AqBuildSkillTab(aq_tab)
 		if("Styles")
 			AqBuildStylesTab()

@@ -1174,6 +1174,7 @@ proc/_LightRefreshWorker()
 		LightingClearAll()
 	for(var/client/C) //enable/disable the lighting-plane blur pass to match
 		FxApplyLightBlur(C)
+	AuraLightResyncAll()
 	src << "Dynamic lighting: [glob.LIGHTING ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set lighting to [glob.LIGHTING].")
 

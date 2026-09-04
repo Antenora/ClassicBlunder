@@ -63,6 +63,7 @@
 			var/datum/build_entry/E = new
 			E.name = "-[A.name]-"
 			E.Creates = A.type
+			E.dirBase = A.dir
 			E.iconF = A.icon
 			E.icon_state = A.icon_state
 			E.category = BuildCategorize(A.type)
