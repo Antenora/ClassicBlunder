@@ -350,10 +350,19 @@ obj/Skills
 					if(!x.Using)
 						usr.SkillX("Aerial Payback",x)
 			else
-				if(src.Using)
+				var/tempo_bypass = FALSE
+				if(src.Using && usr.RoaringTempoCurrent)
+					if(usr.RoaringTempoCurrent >= 25)
+						tempo_bypass = TRUE
+				if(src.Using && !tempo_bypass)
 					usr << "[src] is still on cooldown."
 					return
-				usr.SkillX("DragonDash",src)
+				if(tempo_bypass)
+					usr.RoaringTempoCurrent -= 25
+					usr.RoaringTempoUpdate()
+					usr << "Using Tempo to bypass cooldown!"
+				usr.SkillX("DragonDash", src, 0, 0, tempo_bypass)
+
 	Transformation
 		Cooldown=1
 		desc="Transform!"
@@ -406,8 +415,18 @@ obj/Skills
 						usr.SkillX("Aerial Recovery",x)
 			else
 				for(var/obj/Skills/Reverse_Dash/x in usr)
-					if(!x.Using)
-						usr.SkillX("ReverseDash",src,1)
+					var/tempo_bypass = FALSE
+					if(x.Using && usr.RoaringTempoCurrent)
+						if(usr.RoaringTempoCurrent >= 25)
+							tempo_bypass = TRUE
+					if(x.Using && !tempo_bypass)
+						usr << "[src] is still on cooldown."
+						return
+					if(tempo_bypass)
+						usr.RoaringTempoCurrent -= 25
+						usr.RoaringTempoUpdate()
+						usr << "Using Tempo to bypass cooldown!"
+					usr.SkillX("ReverseDash",src,1,0,tempo_bypass)
 			src.AntiMash=1
 			spawn(1)
 				src.AntiMash=0
@@ -843,9 +862,6 @@ obj/Skills
 
 
 
-
-
-
 	Zanzoken
 		SkillCost=50
 		Level=100
@@ -860,14 +876,33 @@ obj/Skills
 		verb/Zanzoken()
 			set category="Skills"
 			set hidden = 1
-			if(usr.MovementCharges>=1 && !usr.ActiveZanzo)
-				usr.SkillX("Zanzoken",src)
+
+			var/TempoBypass = FALSE
+			if(usr.MovementCharges < 1 && usr.RoaringTempoCurrent >= 25)
+				TempoBypass = TRUE
+
+			if(!usr.ActiveZanzo && (usr.MovementCharges >= 1 || TempoBypass))
+				if(TempoBypass)
+					usr.RoaringTempoCurrent -= 25
+					usr.RoaringTempoUpdate()
+					usr << "Using Tempo in place of a Movement Charge!"
+				usr.SkillX("Zanzoken",src,0,0,TempoBypass)
 		verb/Zanzoken2()
 			set category="Skills"
 			set hidden = 1
 			set name="After Image Strike"
-			if(usr.MovementCharges>=1 && !usr.aisArmed() && !src.Using)
-				usr.SkillStunX("After Image Strike",src)
+			var/TempoBypass = FALSE
+			if(usr.RoaringTempoCurrent >= 25)
+				TempoBypass = TRUE
+			if(!usr.aisArmed())
+				if(usr.MovementCharges>=1 && !src.Using)
+					usr.SkillStunX("After Image Strike",src)
+				else if(TempoBypass == TRUE)
+					usr.SkillStunX("After Image Strike",src,0,FALSE,TempoBypass)
+					usr.RoaringTempoCurrent -= 25
+					usr.RoaringTempoUpdate()
+					usr << "Using Tempo in place of a Movement Charge!"
+
 
 	Walking
 		Level=100

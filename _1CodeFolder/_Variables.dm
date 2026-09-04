@@ -717,6 +717,8 @@ mob/var
 
 	//
 	SaiyanFocus= "None"
+	SaiyanPotential="None"
+	list/SaiyanFormUnlock=list("SSJ1" = 20, "SSJ2" = 40, "SSJ3" = 60, "SSJ4" = 75, "SSJ4+" = 90)
 
 	list/demon_party = null
 	demon_party_cap = 0

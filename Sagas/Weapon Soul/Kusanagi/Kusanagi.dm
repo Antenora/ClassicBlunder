@@ -10,6 +10,27 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Faith // Kusanagi
 	MagicSword=1
 	TierTechniques=list(null, null, null, null, null, "/obj/Skills/Buffs/SlotlessBuffs/Totsuka_no_Tsurugi")
 
+/obj/Skills/Buffs/SlotlessBuffs/Totsuka_no_Tsurugi
+	NeedsSword=1
+	FlashDraw=1
+	MakesSecondSword=1
+	ABuffNeeded=list("Soul Resonance")
+	SwordNameSecond="Totsuka"
+	SwordIconSecond='Totsuka.dmi'
+	SwordAscensionSecond=3
+	SwordXSecond=-32
+	SwordYSecond=-32
+	SwordElementSecond="Fire"
+	passives = list("SwordAscensionSecond" = 3, "SoulFire" = 1, "DoubleStrike" = 1)
+	SoulFire=1
+	DoubleStrike=1
+	ActiveMessage="manifests the spiritual form of the predecesor of Kusanagi!"
+	OffMessage="releases the blade of Totsuka back into the legend!"
+	Cooldown=-1
+	verb/Manifest_Totsuka()
+		set category="Skills"
+		src.Trigger(usr)
+
 obj/Skills/AutoHit/Gale_Slash
 	NeedsSword = 1
 	Area="Circle"

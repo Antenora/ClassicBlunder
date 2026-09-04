@@ -1,4 +1,4 @@
-obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics
+/*obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics
 	NeedsSword = 1
 
 obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Tooth
@@ -103,4 +103,93 @@ obj/Skills/Buffs/SlotlessBuffs/Durendal_Relics/Saints_Raiment
 		set category = "Skills"
 		if(!usr.BuffOn(src))
 			adjust(usr)
-		Trigger(usr)
+		Trigger(usr)*/
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics
+	NeedsSword = 1
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Tooth
+	CustomActive = "<b><font color='#dadada'>Your legendary weapon cuts with the Teeth of a Saint!</b></font>"
+	ManaGlow = "#dadada"
+	ManaGlowSize = 1
+	BuffName = "Saint's Tooth"
+	NeedsHealth = 90
+	TooMuchHealth = 91
+	HealthThreshold = 75
+	EndMult = 1
+	StrMult = 1
+	AngerFloor = 50
+	adjust(mob/p)
+		if(altered) return
+		passives = list("HolyMod" = 1, "Rage" = 1)
+		StrMult = 1.15 + (p.SagaLevel/30)
+		OffMult = 1.15 + (p.SagaLevel/30)
+		EndMult = 1.15 + (p.SagaLevel/30)
+		PowerMult = 1.05 + (p.SagaLevel/30)
+	Trigger(mob/User, Override=FALSE)
+		adjust(User)
+		..()
+		// gain oozaru, but in base
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Hair
+	CustomActive = "<b><font color='#486edf'><font size=+1>Your legendary weapon hardens with the Hair of a Saint!</b></font size></font color>"
+	ManaGlow = "#486edf"
+	ManaGlowSize = 1
+	BuffName = "Saint's Hair"
+	NeedsHealth = 75
+	TooMuchHealth = 76
+	HealthThreshold = 50
+	AngerFloor = 60
+	adjust(mob/p)
+		if(altered) return
+		passives = list("Flicker" = 1 + round(p.SagaLevel/3,1), "Pursuer" = 1 + round(p.SagaLevel/3,1), "HolyMod" = 2, "Rage" = 2)
+		StrMult = 1.2 + (p.SagaLevel/25)
+		OffMult = 1.2 + (p.SagaLevel/25)
+		EndMult = 1.2 + (p.SagaLevel/25)
+		PowerMult = 1.075 + (p.SagaLevel/25)
+	Trigger(mob/User, Override=FALSE)
+		adjust(User)
+		..()
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Raiment
+	CustomActive = "<b><font color='#48df66'><font size=+1>Your legendary weapon coils up your arm with the Raiment of a Saint!</b></font size></font color>"
+	ManaGlow = "#48df66"
+	ManaGlowSize = 1
+	BuffName = "Saint's Raiment"
+	NeedsHealth = 50
+	TooMuchHealth = 51
+	HealthThreshold = 15
+	AngerFloor = 70
+	adjust(mob/p)
+		if(altered) return
+		passives = list("Powerhouse" = 1 + (p.SagaLevel/3), "Flicker" = 1 + round(p.SagaLevel/2,1), "Pursuer" = 1 + round(p.SagaLevel/2,1), "HolyMod" = 3, "Rage" = 3)
+		StrMult = 1.25 + (p.SagaLevel/20)
+		OffMult = 1.25 + (p.SagaLevel/20)
+		EndMult = 1.25 + (p.SagaLevel/20)
+		PowerMult = 1.1 + (p.SagaLevel/20)
+		EnergyHeal = 0.005 * p.SagaLevel
+	Trigger(mob/User, Override=FALSE)
+		adjust(User)
+		..()
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Durendal_Relics/Saints_Blood
+	CustomActive = "<b><font color='#cb2323'><font size=+1>Your legendary weapon drips with the Blood of a Saint!</b></font size></font color>"
+	OffMessage = "sets aside the legacy of a Saint, returning to being an ordinary mortal."
+	ManaGlow = "#cb2323"
+	ManaGlowSize = 1	
+	BuffName = "Saint's Blood"
+	NeedsHealth = 15
+	TooMuchHealth = 16
+	Enlarge = 2
+	AngerFloor = 80
+	adjust(mob/p)
+		if(altered) return
+		passives = list("Powerhouse" = 2 + (p.SagaLevel/2), "Flicker" = 1 + p.SagaLevel, "Pursuer" = 1 + p.SagaLevel, "HolyMod" = 4, "Rage" = 4)
+		StrMult = 1.3 + (p.SagaLevel/10)
+		OffMult = 1.3 + (p.SagaLevel/10)
+		EndMult = 1.3 + (p.SagaLevel/10)
+		PowerMult = 1.15 + (p.SagaLevel/10)
+		EnergyHeal = 0.01 * p.SagaLevel
+	Trigger(mob/User, Override=FALSE)
+		adjust(User)
+		..()

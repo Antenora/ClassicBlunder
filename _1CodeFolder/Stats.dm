@@ -1387,7 +1387,7 @@ mob/proc/Update_Stat_Labels()
 					winshow(src,"Hunger", 0)
 	else//using hunger bar for dainsleif
 		if(cursedSheathValue)
-			var/max = SagaLevel*50;
+			var/max = SagaLevel*100;
 			winshow(src, "Hunger", 1)
 			winset(src, "Hunger", "value=[round(cursedSheathValue/max*100)]")
 			src << output("Bloodlust:[round(cursedSheathValue/max*100)]", "Hunger");

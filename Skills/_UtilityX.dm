@@ -3490,6 +3490,13 @@ obj/Skills/Utility
 		verb/Death_Killer()
 			set category="Utility"
 			set hidden = 1
+			for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/egil in contents)
+				if(!egil.Purify && egil.PurifyMax != 5)
+					usr << "Masamune is too impure to kill death any further. You must connect with it deeper first."
+					return
+				if(!egil.Purify && egil.PurifyMax == 5)
+					usr << "Masamune's capacity to kill death has been exhausted. You can no longer use it to kill death."
+					return
 			if(src.Using)
 				src << "You're already killing death."
 				return
@@ -3519,9 +3526,20 @@ obj/Skills/Utility
 			if(Choice=="Cancel")
 				src.Using=0
 				return
+			if(Choice.Saga == "Shinigami")
+				src << "An immense presence prevents you from killing death for [Choice]."
+				src.Using=0
+				return
+/*			if(Choice.Race == "Hollow")
+				src << "[Choice] no longer has a life to return to. You cannot kill death for them."
+				src.Using=0
+				return*/
 			Choice.Revive()
 			Choice.DeathKilled=1
 			OMsg(usr, "[usr] kills death's effects on [Choice], reviving their soul!")
+			for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/egil in contents)
+				if(egil.Purify)
+					egil.Purify--
 			for(var/obj/Items/Enchantment/PhilosopherStone/True/ps in get_step(usr,usr.dir))
 				if(ps)
 					if(ps.SoulIdentity==Choice?:UniqueID)
@@ -3539,6 +3557,8 @@ obj/Skills/Utility
 						if(!b.TrulyDead)
 							Choice.DeathKilled=0
 							OMsg(usr, "... but it feels like it was just an illusion anyway.")
+							for(var/obj/Items/Sword/Light/Legendary/WeaponSoul/Sword_of_Purity/egil in contents)
+								egil.Purify++
 						del b
 			src.Using=0
 

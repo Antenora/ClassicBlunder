@@ -24,6 +24,11 @@ race
 		onFinalization(mob/user)
 			..()
 			user.Tail(1)
+			if(prob(70))
+				user.SaiyanPotential="Average"
+			else
+				user.SaiyanPotential=pick("Early Bird", "Late Bloomer")
+			user.DetermineTransUnlock(user.SaiyanPotential)
 //			user.contents+=new/obj/Oozaru
 
 	/*

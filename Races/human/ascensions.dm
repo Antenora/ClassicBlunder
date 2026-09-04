@@ -1,11 +1,13 @@
 mob/proc/CheckAscCombo()
-	if(HeroicNum>=2&&UnderdogNum>=2)
+	if(HeroicNum>=2&&UnderdogNum>=1)
 		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension, src))
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension)
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/High_Tension_MAX)
-			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Super_High_Tension)
-			src<<"You have unlocked High Tension!"
-	if(SaiyanNum>=2&&UnderdogNum>=2)
+		if(UnderdogNum>=2)
+			if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Super_High_Tension, src))
+				src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Super_High_Tension)
+				src<<"You have unlocked High Tension!"
+	if(SaiyanNum>=2&&UnderdogNum>=1)
 		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage, src))
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Racial/Human/Super_Saiyan_Rage)
 			src<<"You have unlocked Super Saiyan Rage!"
@@ -14,6 +16,7 @@ mob/proc/CheckAscCombo()
 		src<<"You have unlocked Beast Mode!"
 /ascension/sub_ascension/human/heroic
 	passives = list("PowerUpMastery" = 2)
+	choiceMessage = "Increases all of your stats by an extra 0.5 and your invested stat growth rate by 0.25. It buffs your ki control stats as well and grants you 2 PowerUpMastery."
 	offense = 0.5
 	strength = 0.5
 	force = 0.5
@@ -23,21 +26,23 @@ mob/proc/CheckAscCombo()
 	growthadd= 0.25
 	onAscension(mob/owner)
 		owner.HeroicNum++
-		if(owner.HeroicNum==4)
+		if(owner.HeroicNum==3)
 			owner.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Racial/Human/Third_Eye)
 		owner.CheckAscCombo()
 		..()
 /ascension/sub_ascension/human/underdog
 	anger = 0.1
+	choiceMessage = "Increases your Anger by 10%, and you gain an extra 12.5% (depending on world variables) of your current anger in universal stat mults."
 	passives = list("Tenacity" = 2, "UnderDog" = 1)
 	onAscension(mob/owner)
 		owner.UnderdogNum++
 		owner.CheckAscCombo()
-		if(owner.UnderdogNum==4)
+		if(owner.UnderdogNum==3)
 			owner.passive_handler.Increase("EndlessAnger", 1)
 		..()
 /ascension/sub_ascension/human/saiyan
 	passives = list("ZenkaiPower" = 0.25)
+	choiceMessage = "Increases your ZenkaiPower by 0.25 and advances your Saiyan lineage. All picks after the first unlock your next Super Saiyan form."
 	onAscension(mob/owner)
 		owner.SaiyanNum++
 		if(owner.SaiyanNum==1)

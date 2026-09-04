@@ -99,6 +99,9 @@ mob/var
 	HyperdeathMeterCurrent=0
 	HyperdeathThreshold=100
 
+	RoaringTempoCurrent=0
+	RoaringTempoMax=100
+
 	//SHINIGAMI
 	ShinigamiRelease
 	AsauchiName
@@ -970,21 +973,38 @@ mob
 										src<<"You can also attempt to heal people, but the keyword is attempt."
 									if(src.RebirthHeroType=="Rainbow")
 										src.RebirthHeroType="Prismatic"
-										src<<"You are now the Prismatic Hero of Dreams, emboldened by Hearts beating as One."
+										src<<"You are now the Prismatic Hero of Dreams, ready to show the world your flame."
 										src<<"Swap between Chaos Saber and Chaos Buster to fight at close range or at range!"
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Miracle_of_Dreams)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosSaber)
 										src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/ChaosBuster)
 										src.AddSkill(new/obj/Skills/AutoHit/Shocker_Breaker)
+										src.AddSkill(new/obj/Skills/Projectile/Royal_Flames)
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
 							if(src.RebirthHeroType=="Cyan")
-								src<< "You have unlocked the green SOUL color, which reduces the damage you take as you build ACT. You also gain the BlackShard, a small weapon that can hardly be considered one, but carries great power..."
-								src.AddSkill(new/obj/Skills/Utility/SoulShiftGreen)
-								src.AddSkill(new/obj/Skills/Utility/SoulShiftOrange)
-								src.AddSkill(new/obj/Skills/Buffs/Rebirth/BlackShard)
-								src.AddSkill(new/obj/Skills/AutoHit/Unleash)
+								var/list/Choices=list("Roaring Knight", "White Pen of Hope")
+								var/choice
+								var/confirm
+								while(confirm!="Yes")
+									choice=input(src, "Fate wavers, words on the glass falters. Which way will you walk?", "Hero Path") in Choices
+									switch(choice)
+										if("Roaring Knight")
+											confirm=alert(src, "With your heart as the ark, to guide through the dark.", "The Roaring Knight, make with darkened blade.", "Yes", "No")
+										if("White Pen of Hope")
+											confirm=alert(src, "Fate accepted, yet change made possible through others.", "The White Pen of Hope, author of a new story.", "Yes", "No")
+									src.FinalHeroChoice=choice
+								if(src.FinalHeroChoice=="White Pen of Hope")
+									src<< "You have unlocked the green SOUL color, which reduces the damage you take as you build ACT. You also gain the BlackShard, a small weapon that can hardly be considered one, but carries great power..."
+									src.AddSkill(new/obj/Skills/Utility/SoulShiftGreen)
+									src.AddSkill(new/obj/Skills/Utility/SoulShiftOrange)
+									src.AddSkill(new/obj/Skills/Buffs/Rebirth/BlackShard)
+									src.AddSkill(new/obj/Skills/AutoHit/Unleash)
+								if(src.FinalHeroChoice=="Roaring Knight")
+									src.AddSkill(new/obj/Skills/Buffs/Rebirth/BlackKnife)
+									src.AddSkill(new/obj/Skills/Projectile/RoaringCrescentWave)  //needs more
+									src<< "Knock'em dead into the night. You've obtained the Black Knife."
 							if(src.RebirthHeroType=="Purple")
 								src<< "Your story has finally come into its own. You have become the Axe of Justice, with hope crossed on your heart."
 								src.AddSkill(new/obj/Skills/Buffs/Rebirth/JusticeAxe)
@@ -1011,10 +1031,14 @@ mob
 						if(4)
 							src.SagaLevel=4
 							if(src.RebirthHeroType=="Cyan")
-								src<<"The special power you wield grows stronger, heightening the strength of your SOUL colors."
-								src<<"You have gained Banish."
-								src.AddSkill(new/obj/Skills/AutoHit/Banish)
-								src.AddSkill(new/obj/Skills/Utility/SoulShiftPurple)
+								if(src.FinalHeroChoice=="White Pen of Hope")
+									src<<"The special power you wield grows stronger, heightening the strength of your SOUL colors."
+									src<<"You have gained Banish."
+									src.AddSkill(new/obj/Skills/AutoHit/Banish)
+									src.AddSkill(new/obj/Skills/Utility/SoulShiftPurple)
+								if(src.FinalHeroChoice=="Roaring Knight")
+									src<<"You can now manifest an armor of pure darkness around you."
+									src.AddSkill(new/obj/Skills/Buffs/Slotless/Rebirth/RefractiveArmor) //needs more
 							if(src.RebirthHeroType=="Purple")
 								src<<"<font color='#9BFD4D'><b>I see a story hidden in your eyes.</font></b>" //i literally extracted the mod files for gerson's rude buster to make sure this color was as accurate as possible. praise me.
 								src<<"<font color='#9BFD4D'><b>Burnin' bright...</font></b>"
@@ -1049,21 +1073,8 @@ mob
 							if(src.RebirthHeroType=="Rainbow")
 								src.AddSkill(new/obj/Skills/Buffs/Rebirth/ChaosQueen)
 							if(src.RebirthHeroType=="Cyan")
-								var/list/Choices=list("Roaring Knight", "White Pen of Hope")
-								var/choice
-								var/confirm
-								while(confirm!="Yes")
-									choice=input(src, "Will you bring your tragic fate to fruition? Or will you face it with courage?", "Hero Path") in Choices
-									switch(choice)
-										if("Roaring Knight")
-											confirm=alert(src, "A tragedy taken into your own hands. A bringer of the end.", "The Roaring Knight, a bringer of the end.", "Yes", "No")
-										if("White Pen of Hope")
-											confirm=alert(src, "Fate accepted, yet change made possible through others", "The White Pen of Hope, author of a new story..", "Yes", "No")
-									src.FinalHeroChoice=choice
 								if(src.FinalHeroChoice=="Roaring Knight")
-									src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/The_Roaring_Knight)
-									src.AddSkill(new/obj/Skills/Buffs/Rebirth/BlackKnife)
-									src.AddSkill(new/obj/Skills/Buffs/Slotless/Rebirth/RefractiveArmor)
+									src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/The_Roaring_Knight)  //needs more
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/White_Pen_Of_Hope)
 									src.AddSkill(new/obj/Skills/Buffs/Rebirth/White_Pen_of_Hope)
@@ -1072,7 +1083,7 @@ mob
 							if(src.RebirthHeroType=="Prismatic")
 								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "Your happy ending... Your hopes, your dreams..."
-								src<< "It's not just those you're carrying on your back, are they?"
+								src<< "You know what you carry onwards. Make the future your own."
 								src<< "You can access your Hyperdeath State earlier!"
 								src.HyperdeathThreshold=25
 						if(6)

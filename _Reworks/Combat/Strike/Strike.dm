@@ -94,14 +94,14 @@ mob
 						defender << "<font color='#aaccff'>[_ds_d.name] absorbs [demon_takes] damage in your stead!</font>"
 					if(_ds_d.demon_hp <= 0)
 						_ds_d.DemonDespawn()
-			if(src.HasPurity())//If damager is pure
+/*			if(src.HasPurity())//If damager is pure
 				var/found=0//Assume you haven't found a proper target
 				if(defender.IsEvil())
 					DEBUGMSG("[defender] is evil")
 					found=1
 				if(!found)//If you don't find what you're supposed to hunt
 					DEBUGMSG("[src] is attacking a pure target and so value is set to 0")
-					val = 0;
+					val = 0;*/
 			if(defender && defender.passive_handler["RoyalGuarding"])
 				var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in defender.contents
 				if(RG)
@@ -471,6 +471,12 @@ mob
 						if(s3&&s3.Destructable)
 							s.startBreaking(defender.HPToPct(val), breakTicks / ((duraBoon * Sword3Quality) + duraBase), defender, src, "sword")
 
+					if(src.WSMuramasa())
+						if(defender.WSCorrupt() || defender.WSHoly() || s.LegendaryItem)
+							src.gainTension(breakTicks)
+
+
+
 			if(defender.HasLifeGeneration())
 				defender.HealHealth(defender.GetLifeGeneration()/glob.LIFE_GEN_DIVISOR * val)
 				if(defender.Health>=defender.HealthCeiling())
@@ -546,6 +552,12 @@ mob
 				if(defender.Secret=="Hamon")
 					src.AddBurn(defender.HPToPct(val)*Effectiveness*defender.secretDatum.currentTier)
 					val/=max(1,defender.secretDatum.currentTier)
+				if(defender.passive_handler.Get("Purity"))
+					if(Effectiveness < 1)
+						Effectiveness = 1
+					Effectiveness += defender.passive_handler.Get("HolyMod")
+					src.AddBurn(val*Effectiveness)
+					val/=2
 				if(!CursedBlood)
 					var/amtHeal = src.HPToPct(val)*(src.GetLifeSteal() + innateLifeSteal)*Effectiveness/100;
 					if(src.passive_handler.Get("Undying Rage"))

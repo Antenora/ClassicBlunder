@@ -1,3 +1,36 @@
+mob/proc/DetermineTransUnlock(var/pot)
+	switch(pot)
+		if("Early Bird")
+			SaiyanFormUnlock["SSJ1"] = rand(20, 23)
+			SaiyanFormUnlock["SSJ2"] = rand(35, 38)
+			SaiyanFormUnlock["SSJ3"] = rand(56, 60)
+			if(SaiyanFocus=="Control")
+				SaiyanFormUnlock["SSJ4"] = rand(68, 70)
+				SaiyanFormUnlock["SSJ5"] = rand(78, 80)
+			if(SaiyanFocus=="Power")
+				SaiyanFormUnlock["SSJ4"] = rand(65, 69)
+				SaiyanFormUnlock["SSJ5"] = rand(20, 25)
+		if("Average")
+			SaiyanFormUnlock["SSJ1"] = rand(24, 29)
+			SaiyanFormUnlock["SSJ2"] = rand(39, 41)
+			SaiyanFormUnlock["SSJ3"] = rand(51, 55)
+			if(SaiyanFocus=="Control")
+				SaiyanFormUnlock["SSJ4"] = rand(64, 67)
+				SaiyanFormUnlock["SSJ5"] = rand(74, 77)
+			if(SaiyanFocus=="Power")
+				SaiyanFormUnlock["SSJ4"] = rand(65, 69)
+				SaiyanFormUnlock["SSJ5"] = rand(20, 25)
+		if("Late Bloomer")
+			SaiyanFormUnlock["SSJ1"] = rand(30, 35)
+			SaiyanFormUnlock["SSJ2"] = rand(42, 45)
+			SaiyanFormUnlock["SSJ3"] = rand(46, 50)
+			if(SaiyanFocus=="Control")
+				SaiyanFormUnlock["SSJ4"] = rand(60, 63)
+				SaiyanFormUnlock["SSJ5"] = rand(70, 73)
+
+			if(SaiyanFocus=="Power")
+				SaiyanFormUnlock["SSJ4"] = rand(70, 73)
+				SaiyanFormUnlock["SSJ5"] = rand(90, 91)
 transformation
 	saiyan
 		var/tier = 0
@@ -44,7 +77,7 @@ transformation
 					mastery=75
 				if(user.Potential>=35&&mastery<100)
 					mastery=100
-				if(user.Potential>=45&&user.transUnlocked<2)
+				if(user.Potential>=user.SaiyanFormUnlock["SSJ2"]&&user.transUnlocked<2)
 					user.transUnlocked=2
 					user<<"<b>Through your staggering mastery over Super Saiyan, you have naturally unlocked Super Saiyan Two!</b>"
 				if(mastery >= 50)
@@ -195,7 +228,7 @@ transformation
 					mastery=100
 				if(mastery >= 100)
 					passives = list("Flicker" = 1, "Pursuer" = 2, "SaiyanPower2"=0.5)
-				if(user.Potential>=65&&user.transUnlocked<3)
+				if(user.Potential>=user.SaiyanFormUnlock["SSJ3"]&&user.transUnlocked<3)
 					if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN)&&user.Class=="Justice"&&(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/half_saiyan/dominating))
 						user.transUnlocked=3
 						user<<"<b>Through your staggering mastery over Super Saiyan Two, you have naturally unlocked Super Saiyan Three!</b>"
@@ -340,7 +373,9 @@ transformation
 					strengthadd = 0.65
 					forceadd = 0.65
 				if(user.SaiyanFocus == "Power")
-					class_passives = list("SaiyanPower3" = 0.15)
+					class_passives += list("SaiyanPower3" = 0.15)
+					if(user.Potential>=60)
+						class_passives += list("SaiyanPower3" = 0.15)
 				if(user.SaiyanFocus == "Control")
 					speedadd += 0.15
 					enduranceadd += 0.15
@@ -474,16 +509,16 @@ transformation
 						animate(user, color = user.MobColor, time=30)
 					sleep(2)
 
-		super_saiyan_4_daima
+/*		super_saiyan_4_daima
 			tier = 4
 			unlock_potential = 70 //intended to be unlocked at around 55 potential
 			angerFloor = 50
-			speedadd = 0.5
-			enduranceadd = 0.5
-			offenseadd = 0.5
-			defenseadd = 0.5
-			strengthadd = 0.5
-			forceadd = 0.5
+			speedadd = 0.25
+			enduranceadd = 0.25
+			offenseadd = 0.25
+			defenseadd = 0.25
+			strengthadd = 0.25
+			forceadd = 0.25
 			var/previousTailIcon
 			var/previousTailUnderlayIcon
 			var/previousTailWrappedIcon
@@ -492,7 +527,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.25, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -535,19 +570,19 @@ transformation
 					user.overlays += form_hair
 					var/appearance2 = user.appearance
 					user.HellSSJ4Animation1(appearance1, appearance2, user)
-					user.overlays -= form_hair
+					user.overlays -= form_hair*/
 		//Golden Oozaru is intended to be unlocked about 10 potential before SSj4!
 		super_saiyan_4
 			tier = 4
 			//Autounlocked at 90, intended to be unlocked at around 70 potential
 			unlock_potential = 90
 			angerFloor = 50
-			speedadd = 3
-			enduranceadd = 3
-			offenseadd = 3
-			defenseadd = 3
-			strengthadd = 3
-			forceadd = 3
+			speedadd = 2
+			enduranceadd = 2
+			offenseadd = 2
+			defenseadd = 2
+			strengthadd = 2
+			forceadd = 2
 			revertToTrans = 0
 			var/previousTailIcon
 			var/previousTailUnderlayIcon
@@ -569,7 +604,7 @@ transformation
 				 "KiControlMastery" = 3 + (mastery/50),\
 				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
 				"Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), \
-				"Flicker" = 5, "Pursuer" = 5, "SSJ4" = 1,"SaiyanPower4"=2.5)
+				"Flicker" = 5, "Pursuer" = 5, "SSJ4" = 1,"SaiyanPower4"=3)
 				angerFloor = 60
 
 			transform(mob/user)
@@ -638,7 +673,7 @@ transformation
 			//Probably the in game reason for people going beyond 100 potential. Rolls eyes in seiyn
 			unlock_potential = 100
 			angerFloor = 60
-			speedadd = 0.25
+			speedadd = 0.5
 			enduranceadd = 0.25
 			offenseadd = 0.25
 			defenseadd = 0.25
@@ -663,7 +698,7 @@ transformation
 			mastery_boons(mob/user)
 				passives = list( "SweepingStrike" = 1, \
 				"KiControlMastery" = 4, "EnergyGeneration" = 5, \
-				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1, "SaiyanPower4"=0.5)
+				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1, "SaiyanPower4"=1)
 
 			transform(mob/user)
 				. = ..()
@@ -718,12 +753,13 @@ transformation
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
-			speedadd = 1.25
-			enduranceadd = 1.25
-			offenseadd = 1.25
-			defenseadd = 1.25
-			strengthadd = 1.25
-			forceadd = 1.25
+			speedadd = 2
+			enduranceadd = 2
+			offenseadd = 2
+			defenseadd = 2
+			strengthadd = 2
+			forceadd = 2
+			revertToTrans = 0
 			// at full mastery, give the saiyan beyond god buff, then remove ssjgod, and replace it with ssjgb
 			mastery_boons(mob/user)
 				angerFloor = 50
@@ -831,17 +867,17 @@ transformation
 			form_aura_icon = 'SSBGlow.dmi'
 			form_aura_x = -32
 			form_aura_y = -32
-			speedadd = 1.75
-			enduranceadd = 1.75
-			offenseadd = 1.75
-			defenseadd = 1.75
-			strengthadd = 1.75
-			forceadd = 1.75
+			speedadd = 4
+			enduranceadd = 4
+			offenseadd = 4
+			defenseadd = 4
+			strengthadd = 4
+			forceadd = 4
 			revertToTrans = 0
 
 			mastery_boons(mob/user)
 				passives = list("GodKi" = 0.75,      \
-								"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
+								"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1.5)
 				speedadd = 1.75
 				enduranceadd = 1.75
 				offenseadd = 1.75
@@ -850,7 +886,7 @@ transformation
 				forceadd = 1.75
 				if(mastery >= 100)
 					passives = list("GodKi" = 1,      \
-									"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1)
+									"CalmAnger" = 1, "TrueBlue" = 1, "Godspeed" = 4, "Pursuer" = 4,"Flicker"=4,  "SaiyanPower1"=1.5)
 
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)

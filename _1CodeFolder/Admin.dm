@@ -1888,7 +1888,7 @@ mob/Admin3/verb
 				var/godor4 = input("SSJ God or SSJ4?") in list("Daima SSJ4", "GT SSJ4")
 				if(godor4 == "GT SSJ4")
 					for(var/transformation/saiyan/ssj in M.race.transformations)
-						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved)|| istype(ssj, /transformation/saiyan/super_saiyan_4_daima))
+						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved))
 							M.race.transformations -= ssj
 							del ssj
 					M.AddSkill(new/obj/Skills/AutoHit/False_Moon)
@@ -2893,7 +2893,7 @@ atom/Topic(A,B[])
 				var/obj/gaveobj = new variable
 				if(istype(gaveobj, /obj/Items))
 					var/mob/gm = src
-					gm.GiveOrDrop(gaveobj)   
+					gm.GiveOrDrop(gaveobj)
 				else
 					src.contents += gaveobj
 				if(istype(variable, /obj/Skills))

@@ -229,6 +229,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			HyperdeathMeterCurrent=0
 			HyperMeterUpdate()
 			src << "Your Hyperdeath gauge reset to 0."
+		if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent>0)
+			RoaringTempoCurrent=0
+			RoaringTempoUpdate()
+			src << "Your Tempo reset to 0."
 		if(calmcounter<=0)
 			calmcounter=5
 			if(Anger)
@@ -988,7 +992,7 @@ mob
 					FuryAccumulated=0
 			if(cursedSheathValue)
 				cursedSheathValue -= 0.5/SagaLevel
-				cursedSheathValue = clamp(0, cursedSheathValue, SagaLevel*50)
+				cursedSheathValue = clamp(0, cursedSheathValue, SagaLevel*100)
 				if(client && hudIsLive("CursedSheath", /obj/Bar))
 					client.hud_ids["CursedSheath"]?:Update()
 

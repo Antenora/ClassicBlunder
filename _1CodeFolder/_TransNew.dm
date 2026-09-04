@@ -145,8 +145,8 @@ mob/proc/CanTransform()
 				src<<"Your ascended transformation uses too much power to enter another level!"
 				return 0
 	if(isRace(SAIYAN) || isRace(HALFSAIYAN))
-		if(length(race.transformations) >= 5 && race.transformations[5].type == /transformation/saiyan/super_saiyan_god)
-			if(transActive+1 == 5 && race.transformations[5].first_time)
+		if(length(race.transformations) >= 4 && race.transformations[4].type == /transformation/saiyan/super_saiyan_god)
+			if(transActive+1 == 4 && race.transformations[4].first_time)
 				// first time super saiyan god has special conditions
 				var/num_of_saiyans = 0
 				for(var/mob/player in party)
@@ -166,9 +166,9 @@ mob/proc/CanTransform()
 		if(length(race.transformations) >= 4 && race.transformations[4].type == /transformation/saiyan/super_saiyan_4 && transActive+1 == 4)
 			src << "You can't transform into this form like that."
 			return 0
-		if(length(race.transformations) >= 5 && race.transformations[5].type == /transformation/saiyan/super_saiyan_god && transActive==0 && src.SSJ4FromBase && src.transUnlocked>=5)
-			src.transActive = 4
-			src.race.transformations[5].transform(src, TRUE)
+		if(length(race.transformations) >= 4 && race.transformations[5].type == /transformation/saiyan/super_saiyan_god && transActive==0 && src.SSJ4FromBase && src.transUnlocked>=4)
+			src.transActive = 3
+			src.race.transformations[4].transform(src, TRUE)
 			return 0
 	return 1
 
@@ -455,6 +455,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("HolyMod", 10)
 				passive_handler.Increase("CalmAnger")
 				passive_handler.Increase("SpiritPower")
+				passive_handler.Increase("Heavensent", 3)
 				var/i='brightday2.dmi'
 				sleep(10)
 				for(var/turf/t in Turf_Circle(src, 10))
@@ -511,10 +512,11 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 			if("Soul Calibur")
 				src.ElementalOffense="Water"
 				src.ElementalDefense="Void"
-				passive_handler.Increase("Unstoppable")
 				passive_handler.Increase("NoWhiff")
 				passive_handler.Increase("AbsoluteZero")
 				passive_handler.Increase("Erosion", 0.5)
+				passive_handler.Increase("ChillAbsorb")
+				passive_handler.Increase("IceAge", 50)
 				var/i='IceGround.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				animate(w, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
@@ -563,13 +565,13 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.overlays+=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
 				src.OMessage(10,"<b>[src] invokes the spirit of chaos through their own body!</b>")
 			if("Muramasa")
-				src.ElementalOffense="Fire"
-				passive_handler.Increase("LifeSteal", 100)
-				passive_handler.Increase("EnergySteal", 60)
+				src.ElementalOffense="Death"
+				src.ElementalDefense="Fire"
 				passive_handler.Increase("WeaponBreaker")
 				passive_handler.Increase("CursedWounds")
 				passive_handler.Increase("DarknessFlame")
-				passive_handler.Increase("AbyssMod",2)
+				passive_handler.Increase("Aspect of Death")
+				passive_handler.Increase("AbyssMod", 3)
 				var/i='amaterasu.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				animate(w, alpha=0, color=list(0,0,0, 0,0,0, 0,0,0, 0,0,0))
@@ -593,9 +595,9 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.OMessage(10,"<b>[src] invokes the spirit of destruction through their blade!</b>")
 			if("Dainsleif")
 				src.ElementalOffense="Poison" //This already has cursed wounds, so it will become hyper murder poison.
-				passive_handler.Increase("HardStyle", 5)
-				passive_handler.Increase("DeathField", 5)
-				passive_handler.Increase("SoulSteal")
+				passive_handler.Increase("HardStyle", 10)
+				passive_handler.Increase("DeathField", 10)
+				passive_handler.Increase("SoulSteal", 10)
 				passive_handler.Increase("HealThroughTempHP")
 				var/i='Dark.dmi'
 				var/j='BloodRain.dmi'
@@ -677,6 +679,7 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("HolyMod", 10)
 			passive_handler.Decrease("CalmAnger")
 			passive_handler.Decrease("SpiritPower")
+			passive_handler.Decrease("Heavensent", 3)
 		if("Durendal")
 			src.ElementalOffense=null
 			passive_handler.Decrease("Juggernaut")
@@ -688,10 +691,11 @@ mob/proc/RevertWS()
 		if("Soul Calibur")
 			src.ElementalOffense=null
 			src.ElementalDefense=null
-			passive_handler.Decrease("Unstoppable", 1)
 			passive_handler.Decrease("NoWhiff")
 			passive_handler.Decrease("AbsoluteZero")
 			passive_handler.Decrease("Erosion", 0.5)
+			passive_handler.Decrease("ChillAbsorb")
+			passive_handler.Decrease("IceAge", 50)
 			src.overlays-=image(icon='ElysiumMode.dmi')
 		if("Soul Edge")
 			src.ElementalOffense=null
@@ -701,18 +705,18 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("HellPower", 1)
 		if("Muramasa")
 			src.ElementalOffense=null
-			passive_handler.Decrease("LifeSteal", 100)
-			passive_handler.Decrease("EnergySteal", 60)
+			src.ElementalDefense=null
 			passive_handler.Decrease("WeaponBreaker", 1)
 			passive_handler.Decrease("CursedWounds", 1)
-			passive_handler.Decrease("AbyssMod", 2)
+			passive_handler.Decrease("AbyssMod", 3)
+			passive_handler.Decrease("Aspect of Death")
 			src.overlays-=image(icon='DarknessGlow.dmi', pixel_x=-32, pixel_y=-32)
 			src.overlays-=image(icon='DeathbringerMode.dmi')
 		if("Dainsleif")
 			src.ElementalOffense=null
-			passive_handler.Decrease("HardStyle", 5)
-			passive_handler.Decrease("DeathField",5)
-			passive_handler.Decrease("SoulSteal")
+			passive_handler.Decrease("HardStyle", 10)
+			passive_handler.Decrease("DeathField",10)
+			passive_handler.Decrease("SoulSteal", 10)
 			passive_handler.Decrease("HealThroughTempHP")
 			src.overlays-=image(icon='NibelungMode.dmi', pixel_x=-32, pixel_y=-32)
 			src.overlays+=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)

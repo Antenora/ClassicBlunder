@@ -547,6 +547,25 @@ obj/DashImage
 					Owner.vis_contents -= src
 				loc = null
 
+obj/ProjectileAfterimage
+	Grabbable=0
+	Destructable=0
+	Savable=0
+	gfx_transient_visual=1
+	density=0
+	mouse_opacity=0
+	var/FadeDelay=1
+	var/FadeDuration=8
+	proc/BeginFade()
+		set waitfor=0
+		sleep(max(FadeDelay, 0))
+		if(!src || !src.loc)
+			return
+		animate(src, alpha=0, time=max(FadeDuration, 1))
+		sleep(max(FadeDuration, 1))
+		if(src)
+			src.loc=null
+
 
 obj/coolImage
 	Grabbable=0

@@ -202,6 +202,13 @@ obj
 				ActiveMessage//A message to display when fired
 				ActiveColor=rgb(255,0,0)
 
+				ProjectileAfterimages = 0 //Whether this projectile leaves fading visual copies behind as it moves
+				ProjectileAfterimageSpacing = 1 //Number of tiles traveled between each afterimage
+				ProjectileAfterimageAlpha = 160 //Starting opacity of each afterimage, from 0 to 255
+				ProjectileAfterimageDelay = 1 //Delay in deciseconds before an afterimage begins fading
+				ProjectileAfterimageDuration = 8 //Time in deciseconds for an afterimage to fade completely
+
+
 				GoldScatter
 				Snaring
 				AngelMagicCompatible
@@ -3276,52 +3283,6 @@ obj
 				verb/Infinity_Break()
 					set category="Skills"
 					usr.UseProjectile(src)
-////Weapon Soul
-			Weapon_Soul
-				Holy_Slash
-					IconLock='Excaliblast.dmi'
-					LockX=-50
-					LockY=-50
-					DamageMult=0.05
-					AccMult=25
-					MultiHit=100
-					Knockback=1
-					Radius=1
-					ZoneAttack=1
-					ZoneAttackX=0
-					ZoneAttackY=0
-					FireFromSelf=1
-					FireFromEnemy=0
-					Explode=3
-					StrScaling=1
-					ForScaling=1
-					EndEffectiveness=1
-					Dodgeable=-1
-					Deflectable=-1
-					Distance=100
-					//No verb because set from queue
-				Darkness_Slash
-					IconLock='DExcaliblast.dmi'
-					LockX=-50
-					LockY=-50
-					DamageMult=0.05
-					AccMult=25
-					MultiHit=100
-					Knockback=1
-					Radius=1
-					ZoneAttack=1
-					ZoneAttackX=0
-					ZoneAttackY=0
-					FireFromSelf=1
-					FireFromEnemy=0
-					Explode=3
-					StrScaling=1
-					ForScaling=1
-					EndEffectiveness=1
-					Dodgeable=-1
-					Deflectable=-1
-					Distance=100
-					//No verb because set from queue.
 
 ////KoB
 
@@ -4937,24 +4898,6 @@ obj
 							verb/Beam_of_Libra()
 								set category="Skills"
 								usr.UseProjectile(src)
-					Weapon_Soul
-						Excalibur
-							DamageMult=0.2571
-							StrScaling=1
-							ForScaling=1
-							EndEffectiveness=1
-							Distance=40
-							Dodgeable=-1
-							Deflectable=-1
-							ManaCost=5
-							ABuffNeeded="Soul Resonance"
-							Cooldown=-1
-							HeldSkill=TRUE
-							HeldBeam=TRUE
-							ChargePeriod=3
-							verb/Excalibur()
-								set category="Skills"
-								usr.BeginHeldSkill(src)
 					Jagan
 						Dragon_of_the_Darkness_Flame
 							DamageMult=0.2
@@ -5786,6 +5729,7 @@ obj
 					BreathCost
 					LingeringTornadoSpawned=0
 					SkillPath//type path of the skill that created this projectile (for Warp Strike weapon hide)
+					tmp/ProjectileAfterimageCounter=0
 				Savable=0
 				density=1
 				Grabbable=0
@@ -5919,6 +5863,13 @@ obj
 					src.TrailY=Z.TrailY
 					src.TrailSize=Z.TrailSize
 					src.TrailDuration=Z.TrailDuration
+
+					src.ProjectileAfterimages=Z.ProjectileAfterimages
+					src.ProjectileAfterimageSpacing=Z.ProjectileAfterimageSpacing
+					src.ProjectileAfterimageAlpha=Z.ProjectileAfterimageAlpha
+					src.ProjectileAfterimageDelay=Z.ProjectileAfterimageDelay
+					src.ProjectileAfterimageDuration=Z.ProjectileAfterimageDuration
+
 					src.Explode=Z.Explode
 					src.ExplodeIcon=Z.ExplodeIcon
 					src.Striking=Z.Striking
@@ -6168,6 +6119,28 @@ obj
 						loc = null
 					catch()
 					return
+				proc/LeaveProjectileAfterimage(turf/old_loc, old_step_x=0, old_step_y=0)
+					if(!src.ProjectileAfterimages || !old_loc || src.Killed)
+						return
+
+					src.ProjectileAfterimageCounter++
+
+					if(src.ProjectileAfterimageCounter < max(1, src.ProjectileAfterimageSpacing))
+						return
+
+					src.ProjectileAfterimageCounter=0
+
+					var/obj/ProjectileAfterimage/I=new
+					I.appearance=src.appearance
+					I.dir=src.dir
+					I.loc=old_loc
+					I.step_x=old_step_x
+					I.step_y=old_step_y
+					I.alpha=min(src.alpha, src.ProjectileAfterimageAlpha)
+					I.FadeDelay=src.ProjectileAfterimageDelay
+					I.FadeDuration=src.ProjectileAfterimageDuration
+					I.BeginFade()
+
 				proc/Hit(atom/a, MultDamage=1)
 					if(istype(a, /obj/Skills/Projectile/_Projectile))
 						if(a.Owner==src.Owner)
@@ -6644,13 +6617,13 @@ obj
 						if(src.Owner.party && src.Owner.passive_handler.Get("TeamHater"))
 							if(m in src.Owner.party.members)
 								EffectiveDamage *= 1+src.Owner.passive_handler.Get("TeamHater")
-						if(src.Owner.HasPurity()||src.Purity)//If damager is pure
+					/*	if(src.Owner.HasPurity()||src.Purity)//If damager is pure
 							var/found=0//Assume you haven't found a proper target
 							if(src.Owner.HasHolyMod())//Holy things
 								if(a:IsEvil())//Kill evil things
 									found=1
 							if(!found)//If you don't find what you're supposed to hunt
-								goto SkipDamage
+								goto SkipDamage*/
 						var/list/specDmgTypes = buildSpecDmgTypes(SlayerMod)
 						if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 							EffectiveDamage *= 1.25
@@ -6881,7 +6854,7 @@ obj
 						if(src.Owner.Grab||a:Grab)
 							src.Owner.Grab_Release()
 							a:Grab_Release()
-						SkipDamage
+					//	SkipDamage
 						if(Snaring)
 							m.applySnare(Snaring, 'root.dmi')
 						if(CooldownDrag)
@@ -7000,8 +6973,11 @@ obj
 							ProjectileFinish()
 							return
 						var/turf/pre = loc
+						var/pre_step_x = src.step_x
+						var/pre_step_y = src.step_y
 						. = ..()
 						if(loc == pre) return
+						src.LeaveProjectileAfterimage(pre, pre_step_x, pre_step_y)
 						GfxProjectileWaterMove(src, gfx_water_before)
 						if(src.MiniDivide)
 							if(istype(pre, /turf))
@@ -7019,6 +6995,9 @@ obj
 					if(src.EdgeOfMapProjectile())
 						ProjectileFinish()
 						return
+					var/turf/afterimage_loc = src.loc
+					var/afterimage_step_x = src.step_x
+					var/afterimage_step_y = src.step_y
 					if(src.MiniDivide)
 						if(istype(src.loc, /turf))
 							Destroy(src.loc, 9001)
@@ -7033,6 +7012,8 @@ obj
 
 					src.Distance--
 					. = ..() //pixel movers need the real px-moved return for glide hints
+					if(src.loc && src.loc != afterimage_loc)
+						src.LeaveProjectileAfterimage(afterimage_loc, afterimage_step_x, afterimage_step_y)
 					GfxProjectileWaterMove(src, gfx_water_before)
 				var/tmp/mob/forcedTarget
 				proc/findNextTarget(mob/p, mob/o)

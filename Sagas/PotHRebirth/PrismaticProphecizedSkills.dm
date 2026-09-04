@@ -343,6 +343,7 @@ obj
 			Distance=6
 			Area="Target"
 			ForScaling=1.5
+			Rounds=1
 			DamageMult=4.75
 			FocusShifter=1
 			FocusShiftBoost=2
@@ -359,7 +360,12 @@ obj
 			CanBeDodged=1
 			CanBeBlocked=0
 			Cooldown=10
-			WindupMessage="used <font size=+1>SHOCKER BREAKER!</font size>"
+			WindupMessage="readies <font size=+1>SHOCKER BREAKER!</font size>"
+			adjust(mob/p)
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					Rounds=3
+				else
+					Rounds=1
 			verb/Shocker_Breaker()
 				set category="Skills"
 				adjust(usr)
@@ -470,6 +476,47 @@ obj
 				if(usr.CheckSpecial("Hyperdeath Mode"))
 					adjust(usr)
 					usr.UseProjectile(src)
+		Royal_Flames
+			ElementalClass="Fire"
+			SpellElement="Fire"
+			DamageMult=2
+			AccMult = 1.15
+			IconSize=1.5
+			Homing=1
+			ZoneAttack
+			Scorching=1
+			Explode=1.5
+			Distance=20
+			Knockback=1
+			Blasts=3
+			Charge=0
+			ManaCost=7
+			Cooldown=10
+			IconLock='FireballDT.dmi'
+			ActiveMessage="invokes royal flames!"
+			adjust(mob/p)
+				DamageMult = initial(DamageMult)
+				if(usr.CheckSpecial("Hyperdeath Mode"))
+					Blasts=10
+					ZoneAttack=1
+					ZoneAttackX=6
+					ZoneAttackY=6
+					Hover=4
+					StormFall=1
+					FireFromEnemy=1
+					FireFromSelf=0
+				else
+					Blasts=3
+					ZoneAttack=0
+					ZoneAttackX=0
+					ZoneAttackY=0
+					Hover=0
+					FireFromEnemy=0
+					FireFromSelf=0
+			verb/Royal_Flames()
+				set category="Skills"
+				adjust(usr)
+				usr.UseProjectile(src)
 
 
 obj/Skills/Buffs/SlotlessBuffs/Miracle_of_DreamsApply
