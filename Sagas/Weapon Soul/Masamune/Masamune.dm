@@ -81,7 +81,6 @@ obj/Skills/AutoHit/Purifying_Frost
 	DamageMult=2
 	Purity = 1
 	Chilling = 100
-	HealingReverse = 1
 	Cooldown=30
 	Knockback=1
 	Size=1

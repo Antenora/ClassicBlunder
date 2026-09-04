@@ -73,8 +73,9 @@ mob/proc/PmDashPx(mult = 1.25)
 
 //one glided dash step per tick toward Trg (away=1 flips it); returns px actually stepped, 0 if blocked
 mob/proc/PmDashStep(atom/Trg, px, away = 0)
-	var/d = Trg ? (away ? get_dir(Trg, src) : get_dir(src, Trg)) : dir
-	if(!d) return 0
+	var/d = src.PmDashDirection(Trg, away)
+	if(!d)
+		return 0
 	var/use = max(1, min(px, glob.PM_DASH_MAX_PX))
 	if(!away && ismob(Trg))
 		var/gap = ClashPxDist(Trg) - 32
@@ -92,6 +93,46 @@ mob/proc/PmDashStep(atom/Trg, px, away = 0)
 	return max(abs((x-1)*32 + step_x - bx), abs((y-1)*32 + step_y - by))
 
 var/HURT_REACH_MAX = 2 //broad-phase radius, tiles; global because a big body's loc can sit tiles away and still overlap you
+
+//helper for reverse dash, get direction based on pixel position.
+mob/proc/PmDashDirection(atom/Trg, away=0)
+	if(!Trg)
+		return src.dir
+	var/src_px = (src.x-1)*32 + src.step_x
+	var/src_py = (src.y-1)*32 + src.step_y
+	var/trg_px = (Trg.x-1)*32
+	var/trg_py = (Trg.y-1)*32
+	if(istype(Trg, /atom/movable))
+		var/atom/movable/M = Trg
+		trg_px += M.step_x
+		trg_py += M.step_y
+	var/dx = trg_px - src_px
+	var/dy = trg_py - src_py
+	if(away)
+		dx = -dx
+		dy = -dy
+	//favor pure horizontal/vertical movement unless the angle is strongly diagonal
+	var/cardinal_ratio = 0.6
+	var/abs_x = abs(dx)
+	var/abs_y = abs(dy)
+	if(abs_x > abs_y && abs_y <= abs_x * cardinal_ratio)
+		dy = 0
+	else if(abs_y > abs_x && abs_x <= abs_y * cardinal_ratio)
+		dx = 0
+	var/d = 0
+	if(dx > 0)
+		d |= EAST
+	else if(dx < 0)
+		d |= WEST
+	if(dy > 0)
+		d |= NORTH
+	else if(dy < 0)
+		d |= SOUTH
+	//only ambiguous if both actors occupy exactly the same pixel
+	if(!d)
+		return away ? turn(src.dir, 180) : src.dir
+
+	return d
 
 mob
 	var/tmp

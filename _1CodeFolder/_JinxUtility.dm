@@ -1481,6 +1481,8 @@ mob
 			Mod+=(src.SpdMultTotal-1)
 			if(KaiokenBP > 1)
 				Mod += KaiokenBP-0.5
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent>=25)
+				Mod += floor(RoaringTempoCurrent / 25) //+1 SpdMod per Tempo Charge, caps at +4 at 4 full charges.
 			if(src.KamuiBuffLock)
 				Mod+=0.75
 			if(Saga&&src.Saga=="Eight Gates")

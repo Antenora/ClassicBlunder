@@ -35,6 +35,7 @@
 /*	if(!checkPurity(defender))
 		DEBUGMSG("[defender] is too pure to hit");
 		return 0
+*/
 	MarkCombat(defender)
 	if(unarmed || sword)
 		triggerLimit("Physical")
@@ -298,7 +299,7 @@
 			else
 				val *= 0.5
 			src.IroniLastResonateTime = world.time
-	// Ichidanme: Tameraikizu no Wakachiai makes it so whoever deals damage to the other also takes that damage 
+	// Ichidanme: Tameraikizu no Wakachiai makes it so whoever deals damage to the other also takes that damage
 	// to themselves as Injury. Excludes Itokiribasami
 	if(val > 0 && src.TameraikizuActive && src.TameraikizuPartner == defender && !src.ItokiribasamiAttacking)
 		src.WoundSelf(val)

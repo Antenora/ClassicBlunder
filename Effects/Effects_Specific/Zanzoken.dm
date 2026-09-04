@@ -403,6 +403,58 @@ proc
 			I.Owner = m
 			I.color = "#FF8000"
 
+	AntiAfterImage(mob/m, amt)
+		var/baseAmount = amt
+		for(var/x in 1 to baseAmount)
+			var/obj/AntiAfterimage/I = new
+			I.appearance_flags = 32
+			I.icon = m.icon
+			I.alpha = 135
+			I.overlays = m.overlays
+			I.icon_state = m.icon_state
+			I.transform = m.transform
+			var/turf/t = m.loc
+			t.vis_contents += I
+			I.dir = m.dir
+			switch(I.dir)
+				if(NORTH)
+					I.pixel_x = m.pixel_x + rand(-8, 8)
+					I.pixel_y = m.pixel_y - (x * 16)
+				if(NORTHWEST)
+					I.pixel_x = m.pixel_x + (x * 16)
+					I.pixel_y = m.pixel_y - (x * 16)
+				if(NORTHEAST)
+					I.pixel_x = m.pixel_x - (x * 16)
+					I.pixel_y = m.pixel_y - (x * 16)
+				if(SOUTH)
+					I.pixel_x = m.pixel_x + rand(-8, 8)
+					I.pixel_y = m.pixel_y + (x * 16)
+				if(EAST)
+					I.pixel_x = m.pixel_x - (x * 16)
+					I.pixel_y = m.pixel_y + rand(-8, 8)
+				if(SOUTHEAST)
+					I.pixel_x = m.pixel_x - (x * 16)
+					I.pixel_y = m.pixel_y + (x * 16)
+				if(SOUTHWEST)
+					I.pixel_x = m.pixel_x + (x * 16)
+					I.pixel_y = m.pixel_y + (x * 16)
+				if(WEST)
+					I.pixel_x = m.pixel_x + (x * 16)
+					I.pixel_y = m.pixel_y + rand(-8, 8)
+			if(PmActive())
+				I.pixel_x += m.step_x
+				I.pixel_y += m.step_y
+			I.pixel_z = m.pixel_z
+			I.name = m.name
+			I.Owner = m
+			//Black silhouette with a white outer outline.
+			I.color = "#000000"
+			I.filters += filter(
+				type = "outline",
+				size = 1,
+				color = "#FFFFFF"
+			)
+
 
 	FlashImage(mob/m)
 		var/AMT=1
@@ -584,6 +636,9 @@ obj/coolImage
 					Owner.vis_contents -= src
 				loc = null
 
+
+obj/AntiAfterimage
+	parent_type = /obj/coolImage
 
 obj/TrailImage
 	Grabbable=0

@@ -421,13 +421,15 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 							pm_budget -= m
 					else
 						step_away(src,src.Target,68)
-					var/rd_scan_dir = (flash_rd && src.Target) ? (get_dir(src.Target, src) || dir) : dir
-					for(var/atom/a in get_step(src,rd_scan_dir))
-						if(a==src)
+
+					var/rd_scan_dir = src.PmDashDirection(src.Target, 1)
+					for(var/atom/a in get_step(src, rd_scan_dir))
+						if(a == src || a == src.Target)
 							continue
 						if(a.density)
 							Distance=0
 							pm_budget=0
+
 					if(src.Secret=="Spiral")
 						Distance=0
 						pm_budget=0
