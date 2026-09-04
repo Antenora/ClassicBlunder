@@ -229,6 +229,10 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 			HyperdeathMeterCurrent=0
 			HyperMeterUpdate()
 			src << "Your Hyperdeath gauge reset to 0."
+		if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent>0)
+			RoaringTempoCurrent=0
+			RoaringTempoUpdate()
+			src << "Your Tempo reset to 0."
 		if(calmcounter<=0)
 			calmcounter=5
 			if(Anger)

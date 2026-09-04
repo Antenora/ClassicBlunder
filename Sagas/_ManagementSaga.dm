@@ -99,6 +99,9 @@ mob/var
 	HyperdeathMeterCurrent=0
 	HyperdeathThreshold=100
 
+	RoaringTempoCurrent=0
+	RoaringTempoMax=100
+
 	//SHINIGAMI
 	ShinigamiRelease
 	AsauchiName
@@ -983,7 +986,7 @@ mob
 									choice=input(src, "Fate wavers, words on the glass falters. Which way will you walk?", "Hero Path") in Choices
 									switch(choice)
 										if("Roaring Knight")
-											confirm=alert(src, "With your heart as the ark, to guide through the dark.", "The Roaring Knight, to reach your ending no matter what.", "Yes", "No")
+											confirm=alert(src, "With your heart as the ark, to guide through the dark.", "The Roaring Knight, make with darkened blade.", "Yes", "No")
 										if("White Pen of Hope")
 											confirm=alert(src, "Fate accepted, yet change made possible through others.", "The White Pen of Hope, author of a new story.", "Yes", "No")
 									src.FinalHeroChoice=choice

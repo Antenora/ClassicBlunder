@@ -7,7 +7,7 @@ mob/proc/aisArmed()
 mob/proc/aisConsume()
 	ais_window_until = 0
 
-mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE)
+mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE, TempoBypass = FALSE)
 	if(Z)
 		if(!locate(Z) in src)
 			return
@@ -15,7 +15,7 @@ mob/proc/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FALSE
 		switch(Wut)
 			if("After Image Strike")
 				if(src.KO)return
-				if(Z.Using) return
+				if(Z.Using && !TempoBypass) return
 				if(src.passive_handler.Get("Staggered!"))
 					src << "You can't clear Stagger with AIS!!"
 					return

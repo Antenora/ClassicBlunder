@@ -664,6 +664,8 @@ mob
 				Return += 2
 			if(src.passive_handler.Get("Determination(Yellow)")||src.passive_handler.Get("Determination(White)"))
 				Return += round(ManaAmount/25, 1)
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent>=50)
+				Return += (src.SagaLevel/3)*2 // Path starts at SL 3, so default is +2 GodSpeed at +50 Tempo
 			Return += scalingEldritchPower();
 			Return += GetMangLevel()*1.5
 			Return=round(Return)
@@ -696,11 +698,13 @@ mob
 			if(passive_handler.Get("DeathField")) return 1
 			if(KamuiBuffLock) return 1
 			if(isMountainheart() && VaizardHealth>0) return 1
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) return 1
 			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) return 1
 			return 0
 		GetDeathField()
 			var/HeartVal=0
 			var/GreenVal=0
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) HeartVal += 5
 			if(passive_handler.Get("Determination(Green)")||passive_handler.Get("Determination(White)")) GreenVal=round(ManaAmount/20,1)
 			if(isMountainheart() && VaizardHealth > 0) HeartVal += 5
 			. = passive_handler.Get("DeathField") + (KamuiBuffLock * 5) + HeartVal + GreenVal
@@ -709,10 +713,12 @@ mob
 			if(isMountainheart() && VaizardHealth > 0) return 1
 			if(CheckSlotless("Drunken Mastery") && Drunk) return 1
 			if(passive_handler.Get("VoidField")) return 1
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) return 1
 			return 0
 		GetVoidField()
 			var/Extra=0
 			if(isMountainheart() && VaizardHealth > 0) Extra += 5
+			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) Extra += 5
 			if(CheckSlotless("Drunken Mastery") && Drunk) Extra+=2
 			. = passive_handler.Get("VoidField") + Extra
 			if(isLunaticMode()) . *= (1 + (get_potential() / 100))

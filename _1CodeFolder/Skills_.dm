@@ -227,7 +227,7 @@ mob/Players/verb
 		// get step in front, get all stuff on that turf, only use melee if it has more than a turf
 		src.Melee1()
 
-mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
+mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypass=FALSE)
 	if(Z)
 		if(!locate(Z) in src)
 			return  FALSE
@@ -239,7 +239,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 		return  FALSE
 	if(!noGCD && GCDBlocked(Z))
 		return FALSE
-	if(Z.Using && Wut!="Zanzoken")
+	if(Z.Using && !TempoBypass && Wut!="Zanzoken")
 		return FALSE
 	if(Z.MagicNeeded&&!src.HasLimitlessMagic())
 		if(src.HasMechanized()&&src.HasLimitlessMagic()!=1)
@@ -1093,14 +1093,15 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 				//UNTARGETED ZANZO
 				if(!src.Target)
 					src.ActiveZanzo=3
-					src.MovementCharges--
+					if(!TempoBypass)
+						src.MovementCharges--
 
 				//TARGETED ZANZO
 				else
 					if(20 >= get_dist(src.Target,src))
 						if(lastZanzoUsage+2>world.time)
 							return
-						if(MovementCharges<1)
+						if(MovementCharges<1 && !TempoBypass)
 							return
 						if(last_combo >= world.time)
 							return
@@ -1155,7 +1156,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0)
 									src.dir=DisplayedCardinal(get_dir(src,src.Target), src.dir)
 									ZanzoBlink(src, zanzo_from)
 									src.Melee1(1, 5, accmulti=1.1, SureKB=1, BreakAttackRate=1)
-						src.MovementCharges--
+						if(!TempoBypass)
+							src.MovementCharges--
 						if(MovementCharges<0)
 							MovementCharges=0
 
