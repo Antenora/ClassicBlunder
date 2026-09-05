@@ -172,6 +172,8 @@ obj
 				var/FocusShiftBoost = 1.5
 				var/FocusShiftTimer = 10
 
+				ForceRevert = 0 //Chrono Devolution-like effect, just only for transes
+
 				SpecialAttack=0//ignores all of the above
 				Dunker
 				Destroyer
@@ -5919,6 +5921,8 @@ obj
 			ApplySentenced
 			ElementalClass
 			FixedDamage=0
+			ForceRevert=0
+
 
 			GuardBreak//mirror of the skill flag - pierces the guard system's DR
 
@@ -6182,6 +6186,8 @@ obj
 			TurfShiftState = Z.TurfShiftState
 			TurfShiftX = Z.TurfShiftX
 			TurfShiftY = Z.TurfShiftY
+
+			src.ForceRevert = Z.ForceRevert
 
 			src.Flash=Z.Flash
 			src.BlindImmuneDuration=Z.Cooldown
@@ -6948,6 +6954,11 @@ obj
 							KenShockwave(m, Size=min(src.Knockback*max(2*(!src.Owner.HasNullTarget() ? src.Owner.GetGodKi() : 0),1)*GoCrand(0.04,0.4),0.2),PixelX=pick(-12,-8,8,12),PixelY=pick(-12,-8,8,12))
 						if(m!=src.Owner.Grab)
 							src.Owner.Knockback(src.Knockback+extraKnock, m, get_dir(src.Owner, m), extraKnock)
+
+				if(src.ForceRevert)
+					if(m.transActive)
+						m.forceRevertAll()
+					m.ForceDeactivateAllBuffs()
 
 				if(src.Stunner)
 					Stun(m, src.Stunner+src.Owner.GetStunningStrike())

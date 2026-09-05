@@ -14102,3 +14102,21 @@ mob
 				if(SlotlessBuffs["[B.BuffName]"])
 					return 1
 			return 0
+		ForceDeactivateAllBuffs()
+			var/list/buffs_to_remove = list()
+			if(src.ActiveBuff)
+				buffs_to_remove |= src.ActiveBuff
+			if(src.SpecialBuff)
+				buffs_to_remove |= src.SpecialBuff
+			if(src.StanceBuff)
+				buffs_to_remove |= src.StanceBuff
+			if(src.StyleBuff)
+				buffs_to_remove |= src.StyleBuff
+			for(var/buff_name in src.SlotlessBuffs)
+				var/obj/Skills/Buffs/B = src.SlotlessBuffs[buff_name]
+				if(B)
+					buffs_to_remove |= B
+			for(var/obj/Skills/Buffs/B in buffs_to_remove)
+				//another buff's removal may have already deactivated this one
+				if(B && src.BuffOn(B))
+					B.Trigger(src, Override=1)

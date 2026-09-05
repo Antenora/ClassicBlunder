@@ -18,8 +18,12 @@
 	var/SweetSpotBenefit = 1.5    // ChargeBenefit value when the sweet spot window is hit
 	var/ChargeOverlay    = null   // Icon displayed on mob while charging
 	var/ChargeWaveIcon   = 'Icons/Effects/KenShockwave.dmi'  // Icon for periodic charge shockwave
+	var/ChargeWaveInvert = FALSE  // uses KenShockwave2 to Contract the wave instead
 	var/ChargeWaveBlend  = 1      // Blend mode for the periodic charge shockwave
 	var/ChargeBenefit    = 0      // Set on release
+	var/ChargeWaveSize	 = 1      // Size mult for charge wave size
+	var/ChargeWaveInterval = 0    // Interval between each charge wave
+
 	var/HeldVerbName     = null   // Optional override for macro detection;
 	                              // defaults to Z.name if null
 	var/InfiniteHold     = FALSE  // If TRUE, hold continues indefinitely
@@ -582,6 +586,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	FxChargeShimmer(src, Z) //heat wavers over the caster while they hold
 	FlashChargeTick(src, 2)
 	var/last_tick_fire = 0
+	var/last_charge_wave = world.time
 	while(held_skill == Z)
 		var/hold_smm = SlowMoDelayMult(src)
 		if(hold_smm > 1)
@@ -620,7 +625,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 						if(Z.overcharge_steps < Z.OverchargeMaxSteps && src.ManaAmount >= src.SpellManaNeed(Z) + Z.OverchargeManaPerStep)
 							Z.overcharge_steps++
 							Z.held_accrued += Z.OverchargeManaPerStep
-							KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5 + 0.1 * Z.overcharge_steps, Blend=Z.ChargeWaveBlend, Time=6)
+							KenShockwave(src, icon=Z.ChargeWaveIcon, Size=(0.5)+ 0.1 * Z.overcharge_steps, Blend=Z.ChargeWaveBlend, Time=6)
 						else
 							ReleaseHeldSkill()
 							return
@@ -641,7 +646,14 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 			ringp = min(HeldBeamBenefit(Z), Z.HeldBeamUncapped ? 2.5 : 1)
 		else if(!Z.InfiniteHold)
 			ringp = clamp((world.time - held_charge_start) / max(Z.ChargePeriod * 10, 1), 0, 1)
-		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.3 + 0.35 * ringp, Blend=Z.ChargeWaveBlend, Time=8)
+		//ChargeWaveInterval is measured in deciseconds; 0 disables repeating waves.
+		if(Z.ChargeWaveInterval > 0 && world.time-last_charge_wave >= Z.ChargeWaveInterval)
+			if(Z.ChargeWaveInvert)
+				KenShockwave2(src, icon=Z.ChargeWaveIcon, Size=(0.3 + 0.35 * ringp)*Z.ChargeWaveSize, Blend=Z.ChargeWaveBlend, Time=8)
+			else
+				KenShockwave(src, icon=Z.ChargeWaveIcon, Size=(0.3 + 0.35 * ringp)*Z.ChargeWaveSize, Blend=Z.ChargeWaveBlend, Time=8)
+
+			last_charge_wave=world.time
 
 		sleep(2)
 
