@@ -36,6 +36,56 @@ obj/Skills/Projectile
 			usr.UseProjectile(src)
 
 
+obj/Skills/AutoHit
+	Soul_Shattering_Roar
+		SignatureTechnique=1
+		StrScaling=0
+		ForScaling=1
+		DamageMult=6
+		Area="Circle"
+		Distance=10
+		TurfErupt=0
+		TurfEruptOffset=0
+		Slow=1
+		MenuIcon="SuperExplosiveWave"
+		WindupIcon='Ripple Radiance.dmi'
+		Divide=1
+		PullIn=25
+		ActiveMessage="lets out a soul-shattering roar!"
+		HitSparkIcon='BLANK.dmi'
+		HitSparkX=0
+		HitSparkY=0
+		Cooldown=15
+		ForceRevert=1
+		EnergyCost=4
+		Earthshaking=15
+		PreQuake=1
+
+		// Held skill config
+		HeldSkill = TRUE
+		NoFizzle = TRUE
+		ChargePeriod = 10
+		ChargeWaveInvert = TRUE
+		ChargeOverlay = 'DarkShock.dmi'
+		ChargeWaveIcon = 'Icons/Effects/DepthsShockwave.dmi'
+		ChargeWaveBlend = 2
+		ChargeWaveSize = 10
+		ChargeWaveInterval = 5
+
+		adjust(mob/p)
+		OnHeldStart(mob/p)
+			OMsg(p, "[p] draws in dark energies... <b>Something terrible is coming!!!</b>")
+		OnHeldRelease(mob/p, var/benefit)
+			if(benefit == 1)
+				p.Activate(src, noGCD = TRUE)
+				KenShockwave(p, icon=ChargeWaveIcon, Size=10, Blend=ChargeWaveBlend, Time=10)
+				p.RoaringTempoCurrent=0
+		verb/Soul_Shattering_Roar()
+			set category="Skills"
+			if(usr.RoaringTempoCurrent==100)
+				usr.BeginHeldSkill(src)
+			else
+				usr << "You need all charges of Tempo for this!"
 
 
 //Tempo Meter

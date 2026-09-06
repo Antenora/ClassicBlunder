@@ -129,6 +129,7 @@ mob/proc/GetAssess()
 mob
 	proc
 		GetHealthBPMult()
+			if(hasCelestialBody()) return 0;//If Moonheart, ignore this calc and immediately return a neutral value
 			var/Return = min(src.TotalInjury / (1 + src.GetVit(glob.VIT_INJURY_SOFTEN)) / 100, 0.25) * (-1)
 			return Return
 		GetEnergyBPMult()
@@ -912,18 +913,8 @@ mob/proc/
 
 			if(src.JaganPowerNerf)
 				Ratio*=src.JaganPowerNerf
-			if(src.BPPoison)
-				if((src.Doped||(src.SagaLevel>=5&&src.AnsatsukenAscension=="Chikara"))&&src.BPPoison<1)
-					Ratio*=1
-				else
-					Ratio*=src.BPPoison
-			if(src.Maimed)
-				var/Ignore=src.HasMaimMastery()
-				if(Ignore || isRace(CHANGELING))
-					Ratio*=1
-				else
-					src.MaimsOutstanding=max(src.Maimed-(0.5*src.GetProsthetics()), 0)
-					Ratio*=(1-(0.1*src.MaimsOutstanding))
+			if(BPPoison) Ratio *= GetBPPoisonEffect();
+			if(Maimed) Ratio *= GetMaimedEffect();
 			if(src.HasWeights())
 				if(src.Saga!="Eight Gates")
 					Ratio*=0.7
@@ -1038,6 +1029,9 @@ mob/proc/
 
 		if(GetPowerUpRatio()<=1)
 			if(icon_state=="Meditate")
+				var/healthRegen = getHealthRegenRate();
+				var/energyRegen = getEnergyRegenRate();
+
 				if(TotalInjury<50&&src.InjuryAnnounce)
 					src.InjuryAnnounce=0
 				if(HealthPct()>10*(1-src.HealthCut)&&src.HealthAnnounce10)
@@ -1045,18 +1039,14 @@ mob/proc/
 				if(HealthPct()>25*(1-src.HealthCut)&&src.HealthAnnounce25)
 					src.HealthAnnounce25=0
 				if(HealthPct()<(100*(1-src.HealthCut))||src.BioArmor<src.BioArmorMax)
-					var/Boosted=1
-					if(isRace(MAJIN))
-						Boosted*=getMajinMedRate()
-					Recover("Health",1*Boosted)
-					if(isRace(HUMAN))
-						Boosted *= 1 + (TotalInjury/50)
+					Recover("Health", 1 * healthRegen)
 				if(src.Energy<src.EnergyMax)
-					Recover("Energy",1)
-				if(TotalFatigue>0)
-					Recover("Fatigue",1.25)
+					Recover("Energy", 1 * energyRegen)
+					if(hasTaxingRejuvenation()) LoseEnergy(1);//only flagged as having taxing rejuve if your health is less than 100 and your energy is above 10
 				if(TotalInjury>0)
-					Recover("Injury",1)
+					Recover("Injury", 1 * healthRegen)
+				if(TotalFatigue>0)
+					Recover("Fatigue", 1.25 * energyRegen)
 				if(Secret == "Senjutsu")
 					if((CheckSlotless("Senjutsu Focus") || CheckSlotless("Sage Mode")) != 0)
 						var/boon = Secret == "Senjutsu" ? secretDatum.currentTier : 0
@@ -1236,6 +1226,17 @@ mob/proc/
 				//	FlashChargeCap(src)
 				//	src.ChargeStop()	//capped out (fatigue-adjusted) or blocked - drop the aura
 
+mob/proc/GetBPPoisonEffect()
+	if(hasCelestialBody()) return 1;
+	if(Doped) return 1;
+	if(SagaLevel >= 5 && AnsatsukenAscension == "Chikara" && BPPoison < 1) return 1;
+	return BPPoison;
+
+mob/proc/GetMaimedEffect()
+	if(HasMaimMastery()) return 1;
+	else 
+		MaimsOutstanding=max(Maimed - (0.5*GetProsthetics()), 0);
+		return (1 - (0.1 * MaimsOutstanding));
 
 mob/proc/Update_Stat_Labels()
 	set waitfor=0
@@ -1487,18 +1488,8 @@ mob/proc/Get_Scouter_Reading(mob/B)
 			Ratio*=1+(B.GetHealthBPMult()+B.GetEnergyBPMult())
 		if(B.JaganPowerNerf)
 			Ratio*=B.JaganPowerNerf
-		if(B.BPPoison)
-			if(B.Doped||(B.SagaLevel>=5&&B.AnsatsukenAscension=="Chikara"))
-				Ratio*=1
-			else
-				Ratio*=B.BPPoison
-		if(B.Maimed)
-			var/Ignore=B.HasMaimMastery()
-			if(Ignore || isRace(CHANGELING))
-				Ratio*=1
-			else
-				B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
-				Ratio*=(1-(0.2*B.MaimsOutstanding))
+		if(B.BPPoison) Ratio *= B.GetBPPoisonEffect();
+		if(B.Maimed) Ratio *= B.GetMaimedEffect()
 		if(B.HasWeights())
 			Ratio*=0.75
 		if(B.Roided)
