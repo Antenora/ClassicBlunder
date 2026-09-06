@@ -245,39 +245,6 @@ window "AdminHelpWindow"
 		saved-params = ""
 		text = "Character Key"
 
-window "AllChatTab"
-	elem "AllChatTab"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "All"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "output"
-		type = OUTPUT
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		font-family = "Gotham Book"
-		font-size = 8
-		text-color = #0080ff
-		background-color = #000000
-		is-default = true
-		saved-params = "max-lines"
-		link-color = #00d9ff
-		visited-color = #00cccc
-		style = ".system {color:#ff0000;}"
-		legacy-size = false
-
 window "Baby"
 	elem "Baby"
 		type = MAIN
@@ -369,66 +336,6 @@ window "EmoteEditor"
 		anchor1 = 0,10
 		anchor2 = 100,100
 		saved-params = ""
-
-window "ICChatTab"
-	elem "ICChatTab"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "IC"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "icchat"
-		type = OUTPUT
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		font-family = "Gotham Book"
-		text-color = #0080ff
-		background-color = #000000
-		saved-params = "max-lines"
-		link-color = #00d9ff
-		visited-color = #00cccc
-		style = ".system {color:#ff0000;}"
-
-window "LOOCChatTab"
-	elem "LOOCChatTab"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "LOOC"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "loocchat"
-		type = OUTPUT
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		font-family = "Gotham Book"
-		text-color = #0080ff
-		background-color = #000000
-		saved-params = "max-lines"
-		link-color = #00d9ff
-		visited-color = #00cccc
-		style = ".system {color:#ff0000;}"
 
 window "MagicTree"
 	elem "MagicTree"
@@ -542,36 +449,6 @@ window "MagicTree"
 		saved-params = "is-checked"
 		text = ""
 		command = ".ShowWaterTree"
-
-window "OOCChatTab"
-	elem "OOCChatTab"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "OOC"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "oocchat"
-		type = OUTPUT
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		font-family = "Gotham Book"
-		text-color = #0080ff
-		background-color = #000000
-		saved-params = "max-lines"
-		link-color = #00d9ff
-		visited-color = #00cccc
-		style = ".system {color:#ff0000;}"
 
 window "RPWindow"
 	elem "RPWindow"
@@ -1863,54 +1740,13 @@ window "mainwindow"
 		icon = 'CreationPics\\fouthfate.png'
 		image-mode = center
 		macro = "macro"
-		menu = "menu"
 	elem "mainvsplit"
 		type = CHILD
 		pos = 0,0
 		size = 960x735
 		anchor1 = 0,0
 		anchor2 = 100,100
-		saved-params = "splitter"
-		right = "rpane"
 		is-vert = true
-	elem "input"
-		type = INPUT
-		pos = 0,730
-		size = 480x20
-		anchor1 = 0,100
-		anchor2 = 50,100
-		font-family = "@Arial Unicode MS"
-		text-color = #ffffff
-		background-color = #000000
-		is-default = true
-		border = sunken
-		saved-params = ""
-	elem "BarMana"
-		type = LABEL
-		pos = 720,730
-		size = 121x20
-		anchor1 = 75,100
-		anchor2 = 88,100
-		font-family = "Lucida Console,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Mana"
-	elem "BarPower"
-		type = LABEL
-		pos = 841,730
-		size = 119x20
-		anchor1 = 88,100
-		anchor2 = 100,100
-		font-family = "Lucida Console,@Arial Unicode MS"
-		font-size = 8
-		text-color = #00ff00
-		background-color = #000000
-		border = sunken
-		saved-params = ""
-		text = "Power"
 
 window "mapwindow"
 	elem "mapwindow"
@@ -1941,6 +1777,30 @@ window "mapwindow"
 		saved-params = ""
 		on-show = ".winset\"mainwindow.mainvsplit.left=mapwindow\""
 		on-hide = ".winset\"mainwindow.mainvsplit.left=\""
+	elem "chatoverlay"
+		type = BROWSER
+		pos = 320,196
+		size = 352x256
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = ""
+	elem "adminoverlay"
+		type = BROWSER
+		pos = 8,100
+		size = 496x352
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = ""
+	elem "rpoverlay"
+		type = BROWSER
+		pos = 8,40
+		size = 600x440
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = ""
 	elem "BarDoomed"
 		type = LABEL
 		pos = 172,436
@@ -2294,54 +2154,6 @@ window "mapwindow"
 		saved-params = ""
 		text = "Burn"
 
-window "outputwindow"
-	elem "outputwindow"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "label7"
-		type = LABEL
-		pos = 0,0
-		size = 640x28
-		anchor1 = 0,0
-		anchor2 = 100,6
-		background-color = #000000
-		saved-params = ""
-		text = ""
-	elem "chattabs"
-		type = TAB
-		pos = 0,4
-		size = 640x475
-		anchor1 = 0,0
-		anchor2 = 100,100
-		text-color = #ffffff
-		background-color = #000000
-		saved-params = ""
-		tabs = "AllChatTab, ICChatTab, LOOCChatTab, OOCChatTab"
-		current-tab = "AllChatTab"
-	elem "chatSettings"
-		type = BUTTON
-		pos = 616,0
-		size = 24x24
-		anchor1 = 96,0
-		anchor2 = 100,0
-		background-color = #000000
-		saved-params = "is-checked"
-		text = ""
-		image = 'Icons\\wpLnl9g.png'
-		command = "chatSettings"
-		is-flat = true
-
 window "previewrp"
 	elem "previewrp"
 		type = MAIN
@@ -2361,69 +2173,6 @@ window "previewrp"
 		text-color = #0080ff
 		background-color = #080808
 		saved-params = "max-lines"
-
-window "rpane"
-	elem "rpane"
-		type = MAIN
-		pos = 291,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		background-color = #1b1b1b
-		saved-params = "pos;size;is-minimized;is-maximized"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "rpanewindow"
-		type = CHILD
-		pos = 0,0
-		size = 638x470
-		anchor1 = 0,0
-		anchor2 = 100,100
-		background-color = #000000
-		saved-params = "splitter"
-		left = "infowindow"
-		right = "outputwindow"
-		is-vert = false
-	elem "butt4"
-		type = BUTTON
-		pos = 88,0
-		size = 90x20
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Calibri"
-		text-color = #ffff80
-		background-color = #000000
-		saved-params = "is-checked"
-		text = "Practices"
-		command = "Acquire-Skills"
-	elem "butt3"
-		type = BUTTON
-		pos = 0,0
-		size = 90x20
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Calibri"
-		text-color = #ffff80
-		background-color = #000000
-		saved-params = "is-checked"
-		text = "Verbs"
-		command = ".winset \"rpanewindow.left=infowindow\""
-	elem "butt_inv"
-		type = BUTTON
-		pos = 176,0
-		size = 90x20
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		font-family = "Calibri"
-		text-color = #ffff80
-		background-color = #000000
-		saved-params = "is-checked"
-		text = "Inventory"
-		command = ".Open_Inventory"
 
 window "InventoryWindow"
 	elem "InventoryWindow"
@@ -2491,37 +2240,6 @@ window "InventoryWindow"
 		cells = 2x0
 		show-lines = horizontal
 		highlight-color = #2a2a4a
-
-window "infowindow"
-	elem "infowindow"
-		type = MAIN
-		pos = 384,0
-		size = 640x480
-		anchor1 = -1,-1
-		anchor2 = -1,-1
-		saved-params = "pos;size;is-minimized;is-maximized"
-		title = "Info"
-		titlebar = false
-		statusbar = false
-		can-close = false
-		can-minimize = false
-		can-resize = false
-		is-pane = true
-	elem "info"
-		type = INFO
-		pos = 0,0
-		size = 640x480
-		anchor1 = 0,0
-		anchor2 = 100,100
-		text-color = #ffffff
-		background-color = #000000
-		is-default = true
-		saved-params = ""
-		highlight-color = #55aaff
-		tab-text-color = #ffffff
-		tab-background-color = #000000
-		on-show = ".winset\"rpane.rpanewindow.pos=0,30;rpane.rpanewindow.size=0x0;rpane.rpanewindow.left=browserwindow\""
-		on-hide = ".winset\"rpane.rpanewindow.left=infowindow:rpane.rpanewindow.left=textwindow rpane.rpanewindow.pos=0,0 rpane.rpanewindow.size=0x0\""
 
 window "Race_Screen"
 	elem "Race_Screen"

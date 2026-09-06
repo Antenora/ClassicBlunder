@@ -103,7 +103,7 @@ client/proc/LSloc(dx, dyTop, h = 0)
 client/proc/InitLifeSkillsButton()
 	btn_lifeskills = new('HUD/ui_icon_lifeskills.png')
 	btn_lifeskills.btn_id = "lifeskills"
-	btn_lifeskills.screen_loc = "EAST:-4,NORTH:-320"
+	RepositionTopStrip()
 	shud_parts += btn_lifeskills
 	btn_lifeskills_label = new
 	btn_lifeskills_label.maptext_width = 80

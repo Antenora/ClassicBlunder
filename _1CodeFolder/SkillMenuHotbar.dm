@@ -55,6 +55,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "CTRL+Space", "Combat")
 	R += new/datum/keyaction("seetargets",  "See Target's Target", "See-Targets-Target", "`",   "Combat")
 	R += new/datum/keyaction("interact",    "Interact",            "Interact",           "G",   "Combat", KB_INTERACT)
+	R += new/datum/keyaction("chatfocus",   "Chat",               "Chat-Focus",         "Return", "Communication")
 	R += new/datum/keyaction("say",         "Say",                "Say",                "", "Communication")
 	R += new/datum/keyaction("ooc",         "OOC",                "OOC",                "", "Communication")
 	R += new/datum/keyaction("whisper",     "Whisper",            "Whisper",            "", "Communication")
@@ -805,7 +806,7 @@ client
 client/proc/InitSkillMenuButton()
 	btn_skills = new('HUD/ui_icon_skills.png')
 	btn_skills.btn_id = "skills"
-	btn_skills.screen_loc = "EAST:-4,NORTH:-212"
+	RepositionTopStrip()
 	shud_parts += btn_skills
 	btn_skills_label = new
 	btn_skills_label.maptext_width = 48

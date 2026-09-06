@@ -147,9 +147,15 @@ mob/proc/OnSpellCast(obj/Skills/S)
 	if(!S) return
 	MarkCombat()
 	TomeFlip()
-	CloseCastCircle()
-	var/obj/fx_rider/castcircle/C = SpawnCastCircle(S, S.HeldSkill ? 1 : 0)
-	if(S.HeldSkill) held_circle = C
+	var/spawn_now = 1
+	if(S.HeldSkill)
+		if(cast_circles && cast_circles.len) spawn_now = 0
+	else if(WeaveLive(S))
+		spawn_now = 0
+	if(spawn_now)
+		CloseCastCircle()
+		var/obj/fx_rider/castcircle/C = SpawnCastCircle(S, S.HeldSkill ? 1 : 0)
+		if(S.HeldSkill) held_circle = C
 	if(S.SpellElement == "Fire" && guardian && (S.SpellShape == "line" || S.SpellShape == "projectile"))
 		GuardianCommand()
 

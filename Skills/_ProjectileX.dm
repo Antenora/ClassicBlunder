@@ -5218,6 +5218,8 @@ mob
 					last_style_effect = world.time
 			if(Z.StormFall)
 				Z.Homing=0//You can't home if you're just going down, down, in an earlier round...
+			if(Z.IsSpell)
+				src.SpellWeave(Z)
 			if(Z.Blasts<1)
 				Z.Blasts=1
 			if(Z.Area=="Blast"&&(!Z.Continuous))
@@ -5236,6 +5238,8 @@ mob
 						Z.Cooldown()
 					else
 						Z.Cooldown(p = src)
+			if(Z.IsSpell && !Z.HeldSkill && !Z.Continuous)
+				src.CloseCastCircles()
 			if(Z.Copyable)
 				spawn() for(var/mob/m in view(40, src))
 					if(m.CheckSpecial("A - The Almighty"))

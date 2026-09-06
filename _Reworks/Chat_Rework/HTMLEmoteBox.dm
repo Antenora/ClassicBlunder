@@ -1,22 +1,8 @@
 mob/verb/EmoteNew()
 	set category = "Roleplay"
 	set hidden = 1
-	if(usr.rping) return
-
-	usr.rping = TRUE
-	usr.checkInvisibilityBreaking()
 	usr.CheckAFK()
-	var/image/em=new('Emoting.dmi')
-
-	em.appearance_flags=66
-	em.layer=EFFECTS_LAYER
-	em.pixel_x=0
-	em.pixel_y=0
-	usr.emoteBubble = em
-	usr.overlays += usr.emoteBubble
-
-	src.OpenEmoteEditor()
-	usr.RPLoopNew()
+	client?.RPBoxShow()
 
 mob/verb/EmoteEditorClosed()
 	set hidden = 1

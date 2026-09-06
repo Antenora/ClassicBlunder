@@ -266,7 +266,7 @@ client/proc/ARloc(dx, dyTop, h = 0)
 client/proc/InitArcaneButton()
 	btn_arcane = new('HUD/ui_icon_skills.png')
 	btn_arcane.btn_id = "arcane"
-	btn_arcane.screen_loc = "EAST:-4,NORTH:-356"
+	RepositionTopStrip()
 	shud_parts += btn_arcane
 	btn_arcane_label = new
 	btn_arcane_label.maptext_width = 48

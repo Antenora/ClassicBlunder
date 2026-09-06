@@ -377,6 +377,7 @@ client/proc/InitSkillHUD()
 	InitArcaneButton()
 	for(var/atom/movable/o in shud_parts)
 		screen += o
+	AdminPageInitButton()
 	InitCharacterCard() // top-left card keeps its own object list
 	mob.UpdateResourceOrbs()
 	mob.TomeScrubStale()

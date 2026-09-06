@@ -502,7 +502,7 @@ client
 client/proc/InitCharacterMenuButton()
 	btn_character = new('HUD/ui_icon_profile.png')
 	btn_character.btn_id = "character"
-	btn_character.screen_loc = "EAST:-4,NORTH:-176"
+	RepositionTopStrip()
 	shud_parts += btn_character
 	btn_character_label = new
 	btn_character_label.maptext_width = 72

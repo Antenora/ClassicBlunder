@@ -5152,6 +5152,8 @@ mob
 					if(Z.PlatinumMad)
 						for(var/mob/E in hearers(12,src))
 							E << output("<font color=[src.Text_Color]>[src.name]: <b>GOD FUCKING DAMN IIIIIIIIIIIIIIIIT!</b></font>", "output")
+			if(Z.IsSpell)
+				src.SpellWeave(Z)
 			if(src.TomeSpell(Z))
 				Z.Cooldown(1, null, src)
 			else
@@ -5722,6 +5724,7 @@ mob
 				src.ink_cast = null
 			if(Z.IsSpell)
 				Z.OnRoundsDone(src)
+				src.CloseCastCircles()
 			if(Z.MashExtend)
 				Z.flurry_live = 0
 				Z.mash_pending = 0

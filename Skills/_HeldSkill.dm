@@ -219,6 +219,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	var/client/C = client
 	if(!C) return
 	if(!CanUseSkill(Z)) return
+	if(Z.IsSpell)
+		SpellWeave(Z, 1)
 
 	// All guards run before touching any charge state.
 

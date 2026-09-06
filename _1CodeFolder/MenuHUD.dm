@@ -183,6 +183,8 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 				usr?.client?.ToggleLifeSkillsMenu()
 			if("arcane")
 				usr?.client?.ToggleArcaneMenu()
+			if("admin")
+				usr?.client?.AdminPageToggle()
 
 
 /atom/movable/shud/menulabel
@@ -332,6 +334,29 @@ client/proc/OptFpsClick()
 		for(var/atom/movable/shud/menufpsval/v in menu_entry_objs)
 			v.SetVal(f)
 
+/atom/movable/shud/menudispval
+	layer = MHUD_LAYER + 0.5
+	mouse_opacity = 2
+	maptext_width = 96
+	maptext_height = 20
+	New()
+		..()
+		filters = filter(type="outline", size=1, color="#000000")
+	proc/SetVal(t)
+		maptext = "<span style=\"[MHUD_FONT]; color:#ffd86b\">[t]</span>"
+	MouseEntered(location, control, params)
+		filters = filter(type="outline", size=1, color="#8be9ff")
+	MouseExited(location, control, params)
+		filters = filter(type="outline", size=1, color="#000000")
+	Click()
+		if(usr) usr.client.OptDisplayClick()
+
+client/proc/OptDisplayClick()
+	if(menu_open != "options" || !mob) return
+	var/m = CycleDisplayMode()
+	for(var/atom/movable/shud/menudispval/v in menu_entry_objs)
+		v.SetVal(DisplayModeName(m))
+
 // reuses the hat-toggle sprite set, frames 1>5
 client/proc/AnimateOptToggle(atom/movable/sw, on)
 	set waitfor = 0
@@ -374,7 +399,7 @@ client
 client/proc/InitMenuButton()
 	btn_options = new('HUD/ui_icon_gear.png')
 	btn_options.btn_id = "options"
-	btn_options.screen_loc = "EAST:-4,NORTH:-104"   // below the target card's reserved top-right spot
+	RepositionTopStrip()   // below the target card's reserved top-right spot
 	shud_parts += btn_options
 	btn_options_label = new
 	btn_options_label.maptext_width = 48
@@ -393,7 +418,7 @@ client/proc/ResetMenuHUD()
 // hover highlight, dims while that button's own panel is open
 client/proc/BtnHover(atom/movable/shud/menubtn/b, over)
 	if(!b) return
-	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open) || (b.btn_id == "tech" && tmenu_open) || (b.btn_id == "acquire" && aqmenu_open) || (b.btn_id == "lifeskills" && lsmenu_open) || (b.btn_id == "arcane" && armenu_open)
+	var/active = (b.btn_id == "options" && menu_open == "options") || (b.btn_id == "inventory" && inv_open) || (b.btn_id == "character" && cmenu_open) || (b.btn_id == "skills" && skmenu_open) || (b.btn_id == "tech" && tmenu_open) || (b.btn_id == "acquire" && aqmenu_open) || (b.btn_id == "lifeskills" && lsmenu_open) || (b.btn_id == "arcane" && armenu_open) || (b.btn_id == "admin" && adminpage_open)
 	if(active)
 		b.icon = 'HUD/ui_slot_unavailable.png'
 		if(b.label) b.label.alpha = 0
@@ -802,3 +827,15 @@ client/proc/BuildOptionsExtras()
 	fv.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:-24"
 	menu_entry_objs += fv
 	screen += fv
+	var/atom/movable/shud/menutext/dl = new
+	dl.maptext_width = 110
+	dl.maptext_height = 20
+	dl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">Display</span>"
+	dl.screen_loc = "CENTER:[MHUD_COL2_X],CENTER:-24"
+	menu_entry_objs += dl
+	screen += dl
+	var/atom/movable/shud/menudispval/dv = new
+	dv.SetVal(DisplayModeName(getPref("displayMode")))
+	dv.screen_loc = "CENTER:[MHUD_COL2_X + 50],CENTER:-24"
+	menu_entry_objs += dv
+	screen += dv

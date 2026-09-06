@@ -234,7 +234,7 @@ client/proc/TTloc(dx, dyTop, h = 0)
 client/proc/InitTechButton()
 	btn_tech = new('HUD/ui_icon_skills.png')
 	btn_tech.btn_id = "tech"
-	btn_tech.screen_loc = "EAST:-4,NORTH:-248"
+	RepositionTopStrip()
 	shud_parts += btn_tech
 	btn_tech_label = new
 	btn_tech_label.maptext_width = 48

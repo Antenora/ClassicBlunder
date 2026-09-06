@@ -181,7 +181,7 @@ client
 client/proc/InitInventoryButton()
 	btn_inv = new('HUD/ui_icon_backpack.png')
 	btn_inv.btn_id = "inventory"
-	btn_inv.screen_loc = "EAST:-4,NORTH:-140" // below the Options gear (vertical strip, 36px pitch), pushed down for the target card
+	RepositionTopStrip() // below the Options gear (vertical strip, 36px pitch), pushed down for the target card
 	shud_parts += btn_inv
 	btn_inv_label = new
 	btn_inv_label.maptext_width = 64

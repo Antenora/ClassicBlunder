@@ -143,7 +143,7 @@ mob/proc/FixCenterLeak(t as text)
 
 mob
 	proc
-		applyRoleplayParsing(msg)
+		applyRoleplayParsing(msg, decode = 1)
 
 			var/format = "default"
 
@@ -156,6 +156,7 @@ mob
 
 			msg = replacetext(msg, "</center><br>", "</center>")
 			msg = replacetext(msg, "</CENTER><br>", "</CENTER>")
+			msg = replacetext(msg, "</div><br>", "</div>")
 
 			msg = FixCenterLeak(msg)
 
@@ -163,12 +164,13 @@ mob
 			if(findtext(msg, quotationTextColor))
 				msg = quotationTextColor.Replace(msg, "<font color=\"[Text_Color]\">$0</font>")
 
+			var/body = RPSanitize(decode ? html_decode(msg) : msg)
 			var/formattedMessage
 
 			if(format=="default")
-				formattedMessage = "<font color=[Text_Color]>*[name]<font color=[Emote_Color]> [html_decode(msg)]</font>*"
+				formattedMessage = "<font color=[Text_Color]>*[name]<font color=[Emote_Color]> [body]</font>*"
 			else if(format == "thirdperson")
-				formattedMessage = "<font color=[Text_Color]>*<font color=[Emote_Color]>[html_decode(msg)]</font><br><br>([name])*"
+				formattedMessage = "<font color=[Text_Color]>*<font color=[Emote_Color]>[body]</font><br><br>([name])*"
 
 			return formattedMessage
 
@@ -179,14 +181,14 @@ mob
 			winset(src, "previewrp", "is-visible=true")
 			src << output(msg, "rp-preview")
 
-		SubmitRoleplay(msg)
+		SubmitRoleplay(msg, decode = 1)
 			if(length(msg)==0)
 				overlays -= emoteBubble
 				return
 
 			var/log_msg = msg
 
-			msg = applyRoleplayParsing(msg)
+			msg = applyRoleplayParsing(msg, decode)
 
 			var/list/hearers = hearers(20,src)
 

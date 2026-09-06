@@ -3,6 +3,8 @@ globalTracker/var
 	CAST_CIRCLE_DISSOLVE = 10
 	CAST_CIRCLE_LINGER = 4
 	SPELL_EMIT_FWD = 20
+	SPELL_WEAVE_BEAT = 6
+	CAST_CIRCLE_MAX_HOLD = 60
 
 proc/CastCircleFile(el)
 	switch(el)
@@ -181,6 +183,7 @@ obj/fx_rider/castcircle
 		closing = 0
 		holding = 0
 		lock_layer = 0
+		held_kind = 0
 
 	Place()
 		..()
@@ -203,7 +206,12 @@ obj/fx_rider/castcircle
 		sleep(glob.CAST_CIRCLE_FORM)
 		if(closing || gone) return
 		icon_state = "hold"
-		if(holding) return
+		if(holding)
+			if(held_kind) return
+			sleep(glob.CAST_CIRCLE_MAX_HOLD)
+			if(closing || gone) return
+			Close()
+			return
 		sleep(glob.CAST_CIRCLE_LINGER)
 		if(closing || gone || holding) return
 		Close()
@@ -293,6 +301,7 @@ mob/proc/SpawnCastCircle(obj/Skills/S, hold = 0)
 	return first
 
 mob/proc/CutCastCircles()
+	weave_held = 0
 	if(!cast_circles) return
 	for(var/obj/fx_rider/castcircle/C in cast_circles)
 		C.Cut()
@@ -317,13 +326,48 @@ mob/proc/ScrubSpellArt()
 	for(var/obj/fx_rider/spellart/A in L)
 		A.Kill()
 
-mob/proc/CloseCastCircle()
-	if(!held_circle) return
+mob/proc/CloseCastCircles()
 	held_circle = null
 	if(!cast_circles) return
 	for(var/obj/fx_rider/castcircle/C in cast_circles)
 		C.Close()
 
+mob/proc/CloseCastCircle()
+	if(!held_circle) return
+	CloseCastCircles()
+
+mob/proc/WeaveLive(obj/Skills/S)
+	if(!S || weave_for != S || !cast_circles) return 0
+	if(!weave_held && world.time - weave_time > glob.CAST_CIRCLE_MAX_HOLD) return 0
+	for(var/obj/fx_rider/castcircle/C in cast_circles)
+		if(!C.gone && !C.closing) return 1
+	return 0
+
+mob/proc/SpellWeave(obj/Skills/S, held = 0)
+	if(!S || !S.IsSpell || S.SilentCast) return
+	if(S.HeldSkill && !held) return
+	if(WeaveLive(S)) return
+	var/obj/fx_rider/castcircle/first = SpawnCastCircle(S, 1)
+	weave_for = S
+	weave_time = world.time
+	if(held)
+		weave_held = 1
+		held_circle = first
+		for(var/obj/fx_rider/castcircle/C in cast_circles)
+			C.held_kind = 1
+		return
+	var/beat = glob.SPELL_WEAVE_BEAT
+	if(HasQuickCast())
+		beat = round(beat / max(1, GetQuickCast()))
+	if(beat <= 0) return
+	var/was = Frozen
+	if(Frozen < 2) Frozen = 2
+	sleep(beat)
+	if(Frozen == 2 && was < 2) Frozen = was
+
 mob/var/tmp
 	obj/fx_rider/castcircle/held_circle
 	list/cast_circles
+	obj/Skills/weave_for
+	weave_time = 0
+	weave_held = 0

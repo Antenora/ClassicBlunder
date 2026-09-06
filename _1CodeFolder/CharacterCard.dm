@@ -91,8 +91,8 @@ client
 
 #define MCARD_W 264        // card icon width
 #define MCARD_TILES_TALL 3
-#define MCARD_MARGIN_X 6   // px inset from the left edge
-#define MCARD_MARGIN_Y 4   // px down from the top
+#define MCARD_MARGIN_X (6 + hud_ox)   // px inset from the left edge
+#define MCARD_MARGIN_Y (4 + hud_oy)   // px down from the top
 // target card resource bars
 #define TBAR_OUTER_W 160   // track icon width
 #define TBAR_X 23          // card-local x of the track's left edge

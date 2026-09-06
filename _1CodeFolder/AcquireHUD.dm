@@ -339,7 +339,7 @@ client/proc/AQloc(dx, dyTop, h = 0)
 client/proc/InitAcquireButton()
 	btn_acquire = new('HUD/ui_icon_skills.png')
 	btn_acquire.btn_id = "acquire"
-	btn_acquire.screen_loc = "EAST:-4,NORTH:-284"
+	RepositionTopStrip()
 	shud_parts += btn_acquire
 	btn_acquire_label = new
 	btn_acquire_label.maptext_width = 64

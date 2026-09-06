@@ -1,6 +1,5 @@
 #define DISPLAY_ZOOM_ON 2
 #define DISPLAY_MIN_VIEW 7
-#define DISPLAY_BASE_MAX_VIEW 31
 #define DISPLAY_HUD_SPAN 534
 #define DISPLAY_BINO_TILE_BUDGET 4800
 
@@ -21,6 +20,8 @@ mob/proc/SetClientFPS(n)
 
 client
 	var/tmp
+		hud_ox = 0
+		hud_oy = 0
 		view_fit_enabled = FALSE
 		view_fit_queued = FALSE
 		view_fit_watching = FALSE
@@ -56,8 +57,52 @@ client/proc/ApplyMapZoom(z)
 	cursor_2x = (z >= DISPLAY_ZOOM_ON)
 	CursorNeutral(src)
 
-mob/proc/MaxViewCap()
-	return DISPLAY_BASE_MAX_VIEW
+client/proc/ApplyOverscan()
+	var/list/pp = splittext(winget(src, "mapwindow", "size"), "x")
+	if(pp.len < 2) return
+	var/pw = text2num(pp[1])
+	var/ph = text2num(pp[2])
+	if(!pw || !ph) return
+	var/z = EffectiveZoom(pw)
+	if(z != 1 && z != DISPLAY_ZOOM_ON)
+		ClearOverscan(pw, ph)
+		return
+	var/tile = world.icon_size * z
+	var/cw = pw - (pw % tile)
+	if(cw < pw) cw += tile
+	var/ch = ph - (ph % tile)
+	if(ch < ph) ch += tile
+	var/ox = cw - pw
+	var/oy = ch - ph
+	var/left = round(ox / 2)
+	winset(src, "mapwindow.map", "anchor1=none;anchor2=none;pos=[-left],[-oy];size=[cw]x[ch]")
+	hud_ox = round(left / z)
+	hud_oy = round(oy / z)
+
+client/proc/ClearOverscan(pw = 0, ph = 0)
+	if(!pw || !ph)
+		var/list/pp = splittext(winget(src, "mapwindow", "size"), "x")
+		if(pp.len >= 2)
+			pw = text2num(pp[1])
+			ph = text2num(pp[2])
+	if(!pw || !ph) return
+	winset(src, "mapwindow.map", "anchor1=0,0;anchor2=100,100;pos=0,0;size=[pw]x[ph]")
+	hud_ox = 0
+	hud_oy = 0
+
+client/proc/PlaceTopButton(atom/movable/b, n)
+	if(b) b.screen_loc = "EAST:-[4 + hud_ox],NORTH:-[n + hud_oy]"
+
+client/proc/RepositionTopStrip()
+	PlaceTopButton(btn_options, 104)
+	PlaceTopButton(btn_inv, 140)
+	PlaceTopButton(btn_character, 176)
+	PlaceTopButton(btn_skills, 212)
+	PlaceTopButton(btn_tech, 248)
+	PlaceTopButton(btn_acquire, 284)
+	PlaceTopButton(btn_lifeskills, 320)
+	PlaceTopButton(btn_arcane, 356)
+	PlaceTopButton(btn_admin, 392)
 
 mob/proc/UserMaxView()
 	if(!ScreenSize) return 0
@@ -65,8 +110,53 @@ mob/proc/UserMaxView()
 	var/n = text2num(parts[1])
 	return n ? n : 0
 
+var/list/DISPLAY_MODES = list("windowed", "borderless", "fullscreen")
+
+proc/DisplayModeName(m)
+	switch("[m]")
+		if("borderless") return "Borderless"
+		if("fullscreen") return "Full screen"
+	return "Windowed"
+
+client/proc/ApplyDisplayMode(m, refit = TRUE)
+	if(!(m in DISPLAY_MODES)) m = "windowed"
+	switch(m)
+		if("fullscreen")
+			winset(src, "mainwindow", "is-fullscreen=true")
+		if("borderless")
+			winset(src, "mainwindow", "is-fullscreen=false")
+			winset(src, "mainwindow", "titlebar=false")
+			winset(src, "mainwindow", "is-maximized=true")
+		else
+			winset(src, "mainwindow", "is-fullscreen=false")
+			winset(src, "mainwindow", "titlebar=true")
+	if(refit)
+		spawn(3)
+			FitViewNow()
+
+client/proc/SetDisplayMode(m)
+	if(!(m in DISPLAY_MODES)) m = "windowed"
+	setPref("displayMode", m)
+	ApplyDisplayMode(m)
+
+client/proc/CycleDisplayMode()
+	var/i = DISPLAY_MODES.Find(getPref("displayMode"))
+	if(!i) i = 1
+	SetDisplayMode(DISPLAY_MODES[(i % DISPLAY_MODES.len) + 1])
+	return getPref("displayMode")
+
+mob/Players/verb/Display_Mode(mode as anything in list("Windowed", "Borderless", "Full screen"))
+	set name = "Display Mode"
+	set category = "Utility"
+	if(!client) return
+	switch(mode)
+		if("Borderless") client.SetDisplayMode("borderless")
+		if("Full screen") client.SetDisplayMode("fullscreen")
+		else client.SetDisplayMode("windowed")
+
 client/proc/SetupGameDisplay()
 	if(!mob) return
+	ApplyDisplayMode(getPref("displayMode"), FALSE)
 	ApplyMapZoom(EffectiveZoom())
 	view_fit_enabled = TRUE
 	FitViewNow()
@@ -75,6 +165,7 @@ client/proc/SetupGameDisplay()
 client/proc/SetupTitleDisplay()
 	view_fit_enabled = FALSE
 	view_fit_last_zoom = 0
+	ClearOverscan()
 	winset(src, "mapwindow.map", "zoom=0;zoom-mode=normal;letterbox=true")
 
 client/proc/ApplyZoomPref()
@@ -148,6 +239,7 @@ client/proc/StartViewFitWatchdog()
 
 client/proc/FitViewNow()
 	if(!view_fit_enabled || !mob) return
+	ApplyOverscan()
 	var/list/parts = splittext(winget(src, "mapwindow.map", "size"), "x")
 	if(parts.len < 2) return
 	var/pw = text2num(parts[1])
@@ -159,18 +251,25 @@ client/proc/FitViewNow()
 	if(z != view_fit_last_zoom)
 		ApplyMapZoom(z)
 	var/tile = world.icon_size * z
-	var/cap = mob.MaxViewCap()
 	var/pref = mob.UserMaxView()
 	var/zmul = DISPLAY_ZOOM_ON / z
-	var/maxtiles = (pref ? min(pref, cap) : cap) * zmul
-	var/tw = min(max(round(pw / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
-	var/th = min(max(round(ph / tile), DISPLAY_MIN_VIEW * zmul), maxtiles)
+	var/tw = max(round(pw / tile), DISPLAY_MIN_VIEW * zmul)
+	var/th = max(round(ph / tile), DISPLAY_MIN_VIEW * zmul)
+	if(pref)
+		tw = min(tw, pref * zmul)
+		th = min(th, pref * zmul)
 	view = "[tw]x[th]"
 	GfxResizeScreenOverlays(src, pw, ph)
 	PositionSkillHUD()
 	Hd2dApplyClient(src)
 	PositionCharacterCard()
+	RepositionTopStrip()
+	RepositionPartyCards()
 	if(party_invite_from) ShowPartyInvite(party_invite_from)
+	if(chatpanel_open || adminpage_open)
+		spawn(2)
+			if(chatpanel_open) ChatPanelPlace()
+			if(adminpage_open) AdminPagePlace()
 
 var/list/_disp_icon_dims = list()
 proc/_DispIconDims(f)
@@ -241,11 +340,10 @@ mob/verb
 		set hidden = 1
 		if(!(world.time > verb_delay)) return
 		verb_delay = world.time + 1
-		var/cap = MaxViewCap()
-		var/n = input(usr, "Maximum tiles of view ([DISPLAY_MIN_VIEW]-[cap]). Enter 0 to always fill the window (up to [cap]).", "Max View", UserMaxView()) as null|num
+		var/n = input(usr, "Maximum tiles of view (at least [DISPLAY_MIN_VIEW]). Enter 0 to always fill the window.", "Max View", UserMaxView()) as null|num
 		if(isnull(n)) return
 		if(n <= 0)
 			ScreenSize = null
 		else
-			ScreenSize = "[min(max(round(n), DISPLAY_MIN_VIEW), cap)]"
+			ScreenSize = "[max(round(n), DISPLAY_MIN_VIEW)]"
 		client?.FitViewNow()

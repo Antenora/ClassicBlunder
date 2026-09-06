@@ -262,36 +262,8 @@ client/verb/Prayer(T as text)
 client/verb/Emote()
 	set category="Roleplay"
 	set hidden = 1
-
-	if(usr.rping) return
-
-	usr.rping = TRUE
-
-	usr.checkInvisibilityBreaking()
-
 	usr.CheckAFK()
-
-	var/image/em=new('Emoting.dmi')
-	em.appearance_flags=66
-	em.layer=EFFECTS_LAYER
-	em.pixel_x=0
-	em.pixel_y=0
-	usr.emoteBubble = em
-	usr.overlays += usr.emoteBubble
-
-	if(fexists("Saved Roleplays/[usr.key].txt"))
-		var/a = file2text("Saved Roleplays/[usr.key].txt")
-		a = replacetext(a, "\\\"", "\"")
-		a = replacetext(a, "\\'", "\'")
-
-
-		winset(usr, "RPWindow.rpbox","text='[a]'")
-	spawn(5)
-		fdel("Saved Roleplays/[usr.key].txt")
-
-	winset(usr, "RPWindow","is-visible=true")
-	winset(usr, "RPWindow.rpbox","focus=true")
-	usr.RPLoop()
+	RPBoxShow()
 
 obj/Communication
 	var/ShowOOC=1

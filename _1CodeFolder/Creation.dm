@@ -354,6 +354,7 @@ mob/Players
 		client.SetupGameDisplay()
 		client.InitializeGraphics()
 		client.InitSkillHUD()
+		client.ChatPanelBoot()
 
 		client.fps = src.EffectiveClientFPS()
 		client.updateRGMeter()

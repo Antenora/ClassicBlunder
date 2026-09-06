@@ -66,7 +66,7 @@ obj/Skills/AutoHit/Fire/Spiral_Flame
 			FinalStrikeMana = 3
 			RecoveryLock = 10
 			p.LoseMana(2)
-			p.RetargetCastCircles(glob.SPELL_EMIT_FWD, 31, 1, 2, 10)
+			p.RetargetCastCircles(glob.SPELL_EMIT_FWD, 31, 1, 2)
 			KenShockwave(p, Size = 0.6, Time = 5)
 		if(finale_armed && remaining == 1)
 			ThrowArt(p, art_cone, 160, glob.SPELL_EMIT_FWD + 34, 10, 13)
