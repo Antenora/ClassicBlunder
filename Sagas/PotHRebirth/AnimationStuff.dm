@@ -35,5 +35,5 @@ obj/ScreenFX
 		screen_loc = "CENTER-8,CENTER-8"
 		mouse_opacity = 0
 		layer = FLOAT_LAYER
-		plane = FLOAT_PLANE
+		plane = FX_RELAY_PLANE
 		appearance_flags = PIXEL_SCALE

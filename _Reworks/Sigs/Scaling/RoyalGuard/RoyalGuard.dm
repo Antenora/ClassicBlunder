@@ -80,6 +80,8 @@
 		if(rgMeterHolderNorm)
 			if(!(rgMeterHolderNorm in screen))
 				rgMeterHolderNorm.screen_loc = "RIGHT-0.72,BOTTOM+1.40"
+				rgMeterHolderNorm.plane = HUD_PLANE
+				rgMeterHolderOutlines.plane = HUD_PLANE
 
 				screen += rgMeterHolderNorm
 				screen += rgMeterHolderOutlines

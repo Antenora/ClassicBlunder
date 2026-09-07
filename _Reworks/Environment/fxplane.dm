@@ -1417,6 +1417,7 @@ proc/CpmApply(client/C)
 	if(!C.client_plane_master)
 		C.client_plane_master = new()
 		C.screen += C.client_plane_master
+		C.ApplyWorldMag()
 	var/list/fl = list()
 	if(glob && glob.COLOR_GRADE && GfxQualityRank(C) >= GFX_QUALITY_MEDIUM)
 		fl += Hd2dGradeFilter(C) //zone-aware grade: plane-0 master only, the HUD (plane 100) stays clean
@@ -1492,6 +1493,7 @@ proc/FxEnsureMasters(client/C)
 	FxApplyLightBlur(C)
 	FxApplyRelayBlend(C)
 	FxApplyBloom(C)
+	C.ApplyWorldMag()
 
 //classic = ADD the blurred lights; multiply-reveal = MULTIPLY the merged *fxbase
 proc/FxApplyRelayBlend(client/C)

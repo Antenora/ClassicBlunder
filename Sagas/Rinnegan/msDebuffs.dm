@@ -24,6 +24,7 @@ particles/blades
 
 obj/blades
 	layer = FLY_LAYER
+	plane = FX_RELAY_PLANE
 	screen_loc = "CENTER,CENTER"
 	particles = new/particles/blades
 

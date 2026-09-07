@@ -164,6 +164,11 @@ client/proc/NewPBarText(ly)
 	screen += o
 	return o
 
+client/proc/RefreshPartyPortrait(mob/m)
+	if(!party_cards || !m) return
+	for(var/datum/pcard/pc in party_cards)
+		if(pc.member == m && pc.card) pc.card.icon = BuildPCardIcon(m)
+
 client/proc/MakePCard(mob/m)
 	var/datum/pcard/pc = new
 	pc.member = m

@@ -1010,6 +1010,7 @@
 #include "Skills\styles\weapon\t4weaponstyles.dm"
 #include "UI\AdminPage.dm"
 #include "UI\ChatPanel.dm"
+#include "UI\FacePage.dm"
 #include "UI\RPBox.dm"
 #include "UpdateNotes\update.dm"
 #include "Utility\UtilityDebug.dm"

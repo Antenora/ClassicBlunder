@@ -29,6 +29,7 @@
     if(corruptionHolder)
         if(!(corruptionHolder in screen))
             corruptionHolder.screen_loc = "RIGHT-0.25,BOTTOM+0.78"
+            corruptionHolder.plane = HUD_PLANE
             screen += corruptionHolder
 
         corruptionHolder.maptext = "[round(mob.Corruption,1)]/[mob.MaxCorruption]"

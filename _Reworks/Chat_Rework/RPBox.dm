@@ -189,19 +189,22 @@ mob
 			var/log_msg = msg
 
 			msg = applyRoleplayParsing(msg, decode)
+			var/ptag = ChatPortraitTag(src)
 
 			var/list/hearers = hearers(20,src)
 
 			for(var/mob/E as anything in hearers)
 				if(!E.client) continue
 				if(!E.Admin && E.Mapper && E.invisibility) continue
-				E.client.outputToChat("[E.Controlz(src)][msg]", IC_OUTPUT)
+				E.client.EnsurePortrait(src)
+				E.client.outputToChat("[ptag][E.Controlz(src)][msg]", IC_OUTPUT)
 
 				Log(E.ChatLog(),"<font color=red>*[name]([key]) [html_decode(log_msg)]*")
 				Log(E.sanitizedChatLog(),"<font color=red>*[name] [html_decode(log_msg)]*")
 				if(E.BeingObserved.len>0)
 					for(var/mob/m in E.BeingObserved)
-						m.client.outputToChat("[OBSERVE_HEADER][m.Controlz(src)][msg]", IC_OUTPUT)
+						m.client?.EnsurePortrait(src)
+						m.client.outputToChat("[OBSERVE_HEADER][ptag][m.Controlz(src)][msg]", IC_OUTPUT)
 
 			Say_Spark()
 			CheckAFK()

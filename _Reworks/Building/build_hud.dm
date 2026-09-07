@@ -30,10 +30,20 @@
 		atom/movable/shud/bhud/thumbObj
 		atom/movable/shud/bhud/toggleObj
 		atom/movable/shud/bhud/coordObj
+		atom/movable/shud/bhud/sprayDenObj
+		atom/movable/shud/bhud/sprayGapObj
+		list/dropObjs
 		list/toggleObjs
 
 /atom/movable/shud/bhud
 	layer = BUILD_LAYER
+	var/keepDrop = 0
+
+	MouseDown(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.dropOpen && !keepDrop)
+			BuildHUDCloseDrop(S)
+		..()
 
 	MouseEntered(location, control, params)
 		var/datum/build_session/S = usr?.client?.bsession
@@ -101,8 +111,7 @@
 		if(!S?.active)
 			return
 		if(tool == BUILD_SPRAY && S.tool == BUILD_SPRAY)
-			S.CycleSprayDensity()
-			BuildHUDSetSelName(S, "SPRAY DENSITY [S.sprayDensity]%")
+			S.PromptSprayDensity()
 			return
 		S.SetTool(tool)
 
@@ -110,7 +119,7 @@
 		var/datum/build_session/S = usr?.client?.bsession
 		if(S?.active)
 			if(tool == BUILD_SPRAY)
-				BuildHUDSetSelName(S, "SPRAY [S.sprayDensity]%: CLICK AGAIN = DENSITY")
+				BuildHUDSetSelName(S, "SPRAY [S.sprayDensity]%: CLICK AGAIN = SET DENSITY")
 			else
 				BuildHUDSetSelName(S, BuildToolHint(tool))
 		..()
@@ -199,17 +208,28 @@
 /atom/movable/shud/bhud/bdrop
 	icon = 'HUD/build_dropdown.png'
 	mouse_opacity = 1
+	keepDrop = 1
 
 	Click()
 		var/datum/build_session/S = usr?.client?.bsession
 		if(!S?.active)
 			return
-		var/i = buildCategories.Find(S.category)
-		i = (i % buildCategories.len) + 1
-		S.category = buildCategories[i]
-		S.RefreshFiltered()
-		BuildHUDRefreshGrid(S)
-		BuildHUDRefreshDrop(S)
+		if(S.dropOpen)
+			BuildHUDCloseDrop(S)
+		else
+			BuildHUDOpenDrop(S)
+
+	MouseEntered(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, "CATEGORY: CLICK TO OPEN THE LIST")
+		..()
+
+	MouseExited(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, S.brush ? S.brush.name : "")
+		..()
 
 /atom/movable/shud/bhud/bsearch
 	icon = 'HUD/build_search.png'
@@ -294,6 +314,8 @@
 				S.blendEdges = !S.blendEdges
 			if("varied")
 				S.varied = !S.varied
+			if("spacing")
+				S.spraySpace = !S.spraySpace
 		BuildHUDRefreshToggles(S)
 
 	MouseEntered(location, control, params)
@@ -308,6 +330,8 @@
 					BuildHUDSetSelName(S, "BLEND: MELT SAME-FAMILY TILES")
 				if("varied")
 					BuildHUDSetSelName(S, "VARIED: SCATTER TILE VARIANTS")
+				if("spacing")
+					BuildHUDSetSelName(S, "SPACING: KEEP SPRAYED OBJECTS APART")
 		..()
 
 	MouseExited(location, control, params)
@@ -330,6 +354,8 @@
 				on = S.blendEdges
 			if("varied")
 				on = S.varied
+			if("spacing")
+				on = S.spraySpace
 		TG.icon = on ? 'HUD/toggle_on_5.png' : 'HUD/toggle_off_5.png'
 
 /proc/BuildHUDRefreshOverwrite(datum/build_session/S)
@@ -366,6 +392,136 @@
 		if(S?.active)
 			BuildHUDSetSelName(S, S.brush ? S.brush.name : "")
 		..()
+
+/atom/movable/shud/bhud/bdroppanel
+	mouse_opacity = 1
+	keepDrop = 1
+	layer = BUILD_LAYER + 0.4
+
+/atom/movable/shud/bhud/bdroprow
+	icon = 'HUD/build_row.png'
+	mouse_opacity = 1
+	keepDrop = 1
+	layer = BUILD_LAYER + 0.5
+	var/cat = ""
+
+	Click()
+		var/datum/build_session/S = usr?.client?.bsession
+		if(!S?.active)
+			return
+		S.category = cat
+		S.RefreshFiltered()
+		BuildHUDRefreshGrid(S)
+		BuildHUDRefreshDrop(S)
+		BuildHUDCloseDrop(S)
+
+	MouseEntered(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, "CATEGORY: [cat]")
+		..()
+
+	MouseExited(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, S.brush ? S.brush.name : "")
+		..()
+
+/atom/movable/shud/bhud/bsprayden
+	icon = 'HUD/build_btn84.png'
+	mouse_opacity = 1
+
+	Click()
+		var/datum/build_session/S = usr?.client?.bsession
+		if(!S?.active)
+			return
+		S.PromptSprayDensity()
+
+	MouseEntered(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, "SPRAY DENSITY: CLICK TO SET 1-100%")
+		..()
+
+	MouseExited(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, S.brush ? S.brush.name : "")
+		..()
+
+/atom/movable/shud/bhud/bspraygap
+	icon = 'HUD/build_btn52.png'
+	mouse_opacity = 1
+
+	Click()
+		var/datum/build_session/S = usr?.client?.bsession
+		if(!S?.active)
+			return
+		S.PromptSprayGap()
+
+	MouseEntered(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, "GAP: MIN TILES BETWEEN SPRAYED OBJECTS")
+		..()
+
+	MouseExited(location, control, params)
+		var/datum/build_session/S = usr?.client?.bsession
+		if(S?.active)
+			BuildHUDSetSelName(S, S.brush ? S.brush.name : "")
+		..()
+
+/proc/BuildHUDOpenDrop(datum/build_session/S)
+	if(!S?.hudObjs || S.dropOpen)
+		return
+	S.dropOpen = 1
+	S.dropObjs = list()
+	var/mob/M = S.C.mob
+	var/list/cats = list()
+	for(var/cn in buildCategories)
+		if(cn == BUILD_CAT_SPECIAL && !M?.Admin)
+			continue
+		cats += cn
+	var/atom/movable/shud/bhud/bdroppanel/P = new
+	P.icon = (cats.len >= 9) ? 'HUD/build_droplist.png' : 'HUD/build_droplist8.png'
+	P.screen_loc = BuildSL(BD_X + 12, BD_Y + 64, (cats.len >= 9) ? 192 : 172)
+	S.dropObjs += P
+	S.hudObjs += P
+	S.C.screen += P
+	var/i = 0
+	for(var/cn in cats)
+		var/atom/movable/shud/bhud/bdroprow/R = new
+		R.cat = cn
+		R.maptext_width = 96
+		R.maptext_height = 18
+		R.maptext_x = 8
+		R.maptext_y = 7
+		R.maptext = "<span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:[(cn == S.category) ? "#f98e36" : "#e6f0ff"]\">[cn]</span>"
+		if(cn == S.category)
+			R.filters = filter(type = "outline", size = 1, color = "#f98e36")
+		R.screen_loc = BuildSL(BD_X + 19, BD_Y + 70 + i * 20, 20)
+		S.dropObjs += R
+		S.hudObjs += R
+		S.C.screen += R
+		i++
+	if(S.panDX || S.panDY)
+		S.C.PanShift(S.dropObjs, S.panDX, S.panDY)
+
+/proc/BuildHUDCloseDrop(datum/build_session/S)
+	if(!S?.dropOpen)
+		return
+	S.dropOpen = 0
+	for(var/atom/movable/O in S.dropObjs)
+		S.C?.screen -= O
+		if(S.hudObjs)
+			S.hudObjs -= O
+	S.dropObjs = null
+
+/proc/BuildHUDRefreshSpray(datum/build_session/S)
+	if(S?.sprayDenObj)
+		S.sprayDenObj.maptext = "<center><span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#e6f0ff\">DENSITY [S.sprayDensity]%</span></center>"
+	if(S?.sprayGapObj)
+		S.sprayGapObj.maptext = "<center><span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#e6f0ff\">GAP [S.sprayGap]</span></center>"
 
 /proc/BuildHUDAdd(datum/build_session/S, atom/movable/shud/bhud/O, x, d, h)
 	O.screen_loc = BuildSL(x, d, h)
@@ -414,7 +570,7 @@
 	BuildHUDAdd(S, AR, BSLOT_X, ry, 32)
 	O = new/atom/movable/shud/bhud/bpanel
 	O.icon = 'HUD/build_drawer.png'
-	BuildHUDAdd(S, O, BD_X, BD_Y, 472)
+	BuildHUDAdd(S, O, BD_X, BD_Y, 544)
 	O = new
 	O.icon = 'HUD/build_title.png'
 	O.maptext_width = 140
@@ -481,6 +637,33 @@
 	S.coordObj.maptext_width = 110
 	S.coordObj.maptext_height = 14
 	BuildHUDAdd(S, S.coordObj, BD_X + 152, BD_Y + 455, 14)
+	O = new
+	O.icon = 'HUD/build_sprayband.png'
+	BuildHUDAdd(S, O, BD_X + 16, BD_Y + 480, 44)
+	O = new
+	O.maptext_width = 60
+	O.maptext_height = 12
+	O.maptext = "<span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#b9c3cd\">SPRAY</span>"
+	BuildHUDAdd(S, O, BD_X + 24, BD_Y + 484, 12)
+	S.sprayDenObj = new/atom/movable/shud/bhud/bsprayden
+	S.sprayDenObj.maptext_width = 84
+	S.sprayDenObj.maptext_height = 18
+	S.sprayDenObj.maptext_y = 6
+	BuildHUDAdd(S, S.sprayDenObj, BD_X + 24, BD_Y + 500, 18)
+	var/atom/movable/shud/bhud/btoggle/SP = new
+	SP.mode = "spacing"
+	SP.maptext_width = 60
+	SP.maptext_height = 12
+	SP.maptext_x = 28
+	SP.maptext = "<span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#b9c3cd\">SPACING</span>"
+	BuildHUDAdd(S, SP, BD_X + 114, BD_Y + 505, 9)
+	S.toggleObjs += SP
+	S.sprayGapObj = new/atom/movable/shud/bhud/bspraygap
+	S.sprayGapObj.maptext_width = 52
+	S.sprayGapObj.maptext_height = 18
+	S.sprayGapObj.maptext_y = 6
+	BuildHUDAdd(S, S.sprayGapObj, BD_X + 188, BD_Y + 500, 18)
+	BuildHUDRefreshSpray(S)
 	BuildHUDRefreshToggles(S)
 	BuildHUDRefreshTools(S)
 	BuildHUDRefreshHand(S)
@@ -511,6 +694,10 @@
 	S.thumbObj = null
 	S.toggleObj = null
 	S.coordObj = null
+	S.sprayDenObj = null
+	S.sprayGapObj = null
+	S.dropObjs = null
+	S.dropOpen = 0
 	S.toggleObjs = null
 	S.wheelHover = 0
 	S.dragPan = 0
@@ -629,6 +816,8 @@ client/proc/BuildWheelScroll(delta_y)
 	var/datum/build_session/S = bsession
 	if(!S?.active || !S.swatchObjs || !S.wheelHover)
 		return 0
+	if(S.dropOpen)
+		return 1
 	var/rows = -round(-(S.filteredEntries.len / BGRID_COLS))
 	var/maxRow = max(0, rows - BGRID_ROWS)
 	if(maxRow <= 0)

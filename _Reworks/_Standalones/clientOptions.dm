@@ -53,6 +53,7 @@ Options/
     var/chatGeom = null
     var/chatLock = 0
     var/chatFold = 0
+    var/chatFonts = 1
     var/adminGeom = null
     var/adminLock = 0
     var/adminFold = 0
@@ -71,8 +72,9 @@ Options/
     var/rpHistory = null
     var/rpSnippets = null
     var/displayMode = "windowed"
+    var/faceGeom = null
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode", "faceGeom", "chatFonts")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)

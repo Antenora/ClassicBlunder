@@ -1,5 +1,6 @@
 /mob/var/tmp/bloodGauge/vampireBlood
 /obj/basemeter
+    plane = HUD_PLANE
     appearance_flags = KEEP_TOGETHER
     mouse_opacity = 0
     var/width = 0

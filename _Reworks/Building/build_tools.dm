@@ -85,9 +85,29 @@
 			SetBrush(E)
 			C.mob << "Picked [E.name]."
 
+		SprayClear(turf/T)
+			if(!spraySpace || !brush || !ispath(brush.Creates, /obj))
+				return 1
+			var/g = sprayGap
+			var/turf/A = locate(max(1, T.x - g), max(1, T.y - g), T.z)
+			var/turf/B = locate(min(world.maxx, T.x + g), min(world.maxy, T.y + g), T.z)
+			if(!A || !B)
+				return 1
+			for(var/turf/T2 in block(A, B))
+				if(strokeHit && strokeHit[T2])
+					return 0
+				for(var/obj/O in T2)
+					if(O.gfx_transient_visual)
+						continue
+					if(istype(O, /obj/Turfs) || istype(O, /obj/KatieObj))
+						return 0
+			return 1
+
 		HandleDown(object, location, control, params)
 			if(istype(object, /atom/movable/shud))
 				return
+			if(dropOpen)
+				BuildHUDCloseDrop(src)
 			var/list/plist = params2list(params)
 			if(plist["right"] == "1")
 				if(fillPending || dragging || curveStage || pasteMode || exportStage || importStage || smoothStage || warpStage || cpActive)
@@ -299,12 +319,18 @@
 					if(tool == BUILD_SPRAY)
 						strokeSet = list()
 						strokeRolled = list()
+						strokeHit = list()
 						for(var/turf/T2 in SprayDisc(T))
 							strokeRolled[T2] = 1
-							if(prob(sprayDensity))
-								strokeSet += T2
-						if(!strokeSet.len)
+							if(!prob(sprayDensity))
+								continue
+							if(!SprayClear(T2))
+								continue
+							strokeSet += T2
+							strokeHit[T2] = 1
+						if(!strokeSet.len && SprayClear(T))
 							strokeSet += T
+							strokeHit[T] = 1
 					else
 						strokeSet = BrushDisc(T)
 					mouseTurf = T
@@ -360,7 +386,10 @@
 						strokeRolled[T2] = 1
 						if(!prob(sprayDensity))
 							continue
+						if(!SprayClear(T2))
+							continue
 						strokeSet += T2
+						strokeHit[T2] = 1
 						added = 1
 				else
 					for(var/turf/T2 in BrushDisc(T))
@@ -408,6 +437,7 @@
 				todo = T ? ComputeShape(T) : null
 			strokeSet = null
 			strokeRolled = null
+			strokeHit = null
 			ClearPreviews()
 			if(todo && todo.len)
 				BuildCommitSet(C, todo, tname)

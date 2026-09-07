@@ -174,16 +174,17 @@ proc/FxZoomPunch(client/C, turf/T, mag = 1.05, hold = 2)
 	if(!sp) return
 	var/vw = sp[3]
 	var/vh = sp[4]
-	var/fx = clamp(sp[1], vw * 0.3, vw * 0.7)
-	var/fy = clamp(sp[2], vh * 0.3, vh * 0.7)
+	var/fx = clamp(sp[1], vw * 0.3, vw * 0.7) - vw / 2
+	var/fy = clamp(sp[2], vh * 0.3, vh * 0.7) - vh / 2
 	var/matrix/Z = matrix()
 	Z.Translate(-fx, -fy)
 	Z.Scale(mag)
 	Z.Translate(fx, fy)
+	if(C.world_mag != 1) Z.Scale(C.world_mag)
 	animate(C.client_plane_master, transform = Z, time = 1, easing = QUAD_EASING|EASE_OUT)
 	spawn(1 + max(hold, 0))
 		if(C && C.client_plane_master)
-			animate(C.client_plane_master, transform = matrix(), time = 3, easing = QUAD_EASING|EASE_OUT)
+			animate(C.client_plane_master, transform = C.WorldMagMatrix(), time = 3, easing = QUAD_EASING|EASE_OUT)
 
 proc/FxImpactRippleClient(client/C, turf/T)
 	if(!C || !C.client_plane_master || !C.mob) return

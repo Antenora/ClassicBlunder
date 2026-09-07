@@ -222,6 +222,7 @@ transformation
 			adjust_transformation_visuals(user)
 
 			user.transActive++
+			user.PortraitSync()
 			user.passive_handler.increaseList(passives)
 			user.passive_handler.increaseList(class_passives)
 
@@ -300,6 +301,7 @@ transformation
 			user.transActive--
 			if(!isnull(revertToTrans))
 				user.transActive = revertToTrans
+			user.PortraitSync()
 			user.passive_handler.decreaseList(passives)
 			user.passive_handler.decreaseList(class_passives)
 

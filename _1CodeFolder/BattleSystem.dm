@@ -145,6 +145,7 @@ mob/proc/AngerAdvance(var/incoming=0)
 				fired=1
 		else
 			AngerTierMessage(i)
+	PortraitSync()
 	return fired
 
 mob/proc/UpdateAnger()
@@ -182,6 +183,7 @@ mob/proc/ForceAngered(var/Enraged=0)
 		AngerRush=min(AngerRush+need, glob.ANGER_RUSH_CAP)
 	if(AngerTier<ang)
 		AngerTier=ang
+	PortraitSync()
 	if(!Anger)
 		src.Anger(Enraged)
 
@@ -195,6 +197,7 @@ mob/proc/AngerReclamp(var/obj/Skills/Buffs/gone)
 		if(eval<=T[i]) newtier=i
 	if(newtier>=AngerTier) return
 	AngerTier=newtier
+	PortraitSync()
 	if(AngerTier<GetAngeredIndex()&&Anger)
 		Anger=0
 		DefianceCounter=0
@@ -496,6 +499,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	src.KOTimer=(300/(src.GetRecov())*glob.GetUpVar*GetUpOdds)
 	src.DealWounds(src,src.PctToHP(20/max(src.GetRecov(2), 1)))
 	src.KO=1
+	src.PortraitSync()
 	FireKOHook(P)
 	FlashKOFall(src)
 	if(!src.ko_falling)
@@ -610,6 +614,7 @@ mob/proc/Conscious()
 		src.KOTimer=0
 		src.KO=0
 		src.icon_state=""
+		src.PortraitSync()
 		FlashStandUp(src)
 
 		if(src.KOBrutal)
@@ -942,6 +947,7 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.Conscious()
 	else
 		src.Dead=1
+		src.PortraitSync()
 		src.Conscious()
 		src.Poison=0
 		src.SilentPoisonAmount=0
@@ -1288,6 +1294,7 @@ mob/proc/Barely_Alive(mob/P) if(P)
 mob/proc/Revive()
 		overlays-='Halo.dmi'
 		Dead=0
+		PortraitSync()
 		KeepBody=0
 
 

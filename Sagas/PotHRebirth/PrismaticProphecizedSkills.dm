@@ -821,16 +821,16 @@ obj/HyperdeathMeterBarBG
 	icon = 'HyperdeathMeter.dmi'
 	icon_state = "Background"
 	screen_loc = "CENTER-2.5,BOTTOM+3.1"
-	layer = FLOAT_LAYER
-	plane = FLOAT_PLANE
+	layer = FLY_LAYER + 1
+	plane = HUD_PLANE
 	mouse_opacity = 0
 
 obj/HyperdeathMeterBarFill
 	icon = 'HyperdeathMeter.dmi'
 	icon_state = "FillActive"
 	screen_loc = "CENTER-2.5,BOTTOM+3.1"
-	layer = FLOAT_LAYER + 50
-	plane = FLOAT_PLANE
+	layer = FLY_LAYER + 1.5
+	plane = HUD_PLANE
 	mouse_opacity = 0
 
 	var/tmp/last_fill_width = -1

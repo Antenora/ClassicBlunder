@@ -131,6 +131,10 @@ client/proc/AdminPageHTML()
  .dr.hint{color:#b8b8d9;cursor:default}
  .empty{position:absolute;left:8px;top:2px;color:#b8b8d9}
  #grip{position:absolute;right:0;bottom:0;width:20px;height:20px;cursor:nwse-resize}
+ :root{--cur:url('lc_cur_neutral.png') 2 0, auto;--cur-text:url('lc_cur_ibeam.png') 2 5, text;--cur-drag:url('lc_cur_drag.png') 4 5, move}
+ *{cursor:var(--cur) !important}
+ input,textarea,\[contenteditable='true'],#log{cursor:var(--cur-text) !important}
+ #hdr.dragok,#grip{cursor:var(--cur-drag) !important}
  </style></head><body>
  <div id='shell'>
   <div id='frame'></div>
@@ -164,6 +168,9 @@ client/proc/AdminPageHTML()
  var pop=document.getElementById('pop'), popl=document.getElementById('popl');
  var PREVIEW=false;
  var CTL='mapwindow.adminoverlay', MINW=496, MINH=352;
+ function applyCursor(){ var two=(Z>=2); var r=document.documentElement.style; r.setProperty('--cur',two?"url('lc_cur_neutral2.png') 5 1, auto":"url('lc_cur_neutral.png') 2 0, auto"); r.setProperty('--cur-text',two?"url('lc_cur_ibeam2.png') 5 11, text":"url('lc_cur_ibeam.png') 2 5, text"); r.setProperty('--cur-drag',two?"url('lc_cur_drag2.png') 9 11, move":"url('lc_cur_drag.png') 4 5, move"); }
+
+
  var Z=2, OP=0.85, G={x:0,y:0,w:992,h:704}, B=null, collapsed=false, live=false, locked=false, tab='cmd';
  var role={admin:0,mapper:0}, cmds=\[], byId={}, favs={}, recent=\[], players=\[], vals={}, sel={cmd:null,map:null,fav:null}, chip={cmd:'ALL',map:'ALL'}, query={cmd:'',map:''};
  var CHIPS={cmd:\['ALL','PLAYERS','WORLD','EVENTS','ENV','DEBUG'],map:\['ALL','BUILD','ZONES','SURFACES','PREFABS','DEBUG']};
@@ -189,7 +196,7 @@ client/proc/AdminPageHTML()
   G.x=clampNum(G.x,B.x0,B.x1-G.w); G.y=clampNum(G.y,B.y0,B.y1-h);
  }
  function layout(){
-  document.body.style.zoom=Z;
+  document.body.style.zoom=Z; applyCursor();
   shell.style.width=Math.round(G.w/Z)+'px';
   shell.style.height=(collapsed?48:Math.round(G.h/Z))+'px';
   frame.style.opacity=OP;
@@ -198,7 +205,7 @@ client/proc/AdminPageHTML()
   var show=collapsed?'none':'block';
   view.style.display=show; foot.style.display=show; grip.style.display=(collapsed||locked)?'none':'block';
   foldImg.src=collapsed?'lc_up.png':'lc_down.png';
-  lockImg.src=locked?'lc_lock.png':'lc_unlock.png'; hdr.style.cursor=locked?'default':'move';
+  lockImg.src=locked?'lc_lock.png':'lc_unlock.png'; hdr.classList.toggle('dragok',!locked);
   if(collapsed) popClose();
  }
  function setGeom(x,y,w,h,z,op,bx0,by0,bx1,by1,lk,fd){ G={x:+x,y:+y,w:+w,h:+h}; Z=+z; OP=+op; if(bx1!==undefined){ B={x0:+bx0,y0:+by0,x1:+bx1,y1:+by1}; } locked=(+lk)?true:false; var wantFold=(+fd)?true:false; collapsed=false; if(wantFold){ collapsed=true; G.y+=G.h-48*Z; } clampG(); if(collapsed){ flush(); } else { layout(); } }

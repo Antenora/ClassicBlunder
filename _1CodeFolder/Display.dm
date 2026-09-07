@@ -1,6 +1,5 @@
 #define DISPLAY_ZOOM_ON 2
 #define DISPLAY_MIN_VIEW 7
-#define DISPLAY_HUD_SPAN 534
 #define DISPLAY_BINO_TILE_BUDGET 4800
 
 #define FPS_PLAYER_MIN 10
@@ -30,6 +29,8 @@ client
 		view_fit_last_zoom = 0
 		atom/movable/cutscene_hud_hider
 		cutscene_active = FALSE
+		world_mag = 1
+		obj/world_overlay_master/world_overlay_master
 
 client/proc/CurrentZoom()
 	return getPref("zoom2x") ? DISPLAY_ZOOM_ON : 1
@@ -41,21 +42,43 @@ client/proc/EffectiveZoom(pw = 0)
 			var/bw = text2num(bparts[1])
 			var/bh = text2num(bparts[2])
 			if(bw && bh)
-				return min(1, sqrt((bw * bh) / (world.icon_size * world.icon_size * DISPLAY_BINO_TILE_BUDGET)))
+				var/tiles = (bw / world.icon_size) * (bh / world.icon_size)
+				return tiles >= DISPLAY_BINO_TILE_BUDGET * 0.85 ? 1 : 0.5
 		return 0.5
-	var/z = CurrentZoom()
-	if(z <= 1) return 1
-	if(!pw)
-		var/list/parts = splittext(winget(src, "mapwindow.map", "size"), "x")
-		if(parts.len >= 2) pw = text2num(parts[1])
-	if(pw && pw < DISPLAY_HUD_SPAN * z) return 1
-	return z
+	return 1
+
+client/proc/WorldMag()
+	if(mob?.Bino) return 1
+	return CurrentZoom()
 
 client/proc/ApplyMapZoom(z)
 	view_fit_last_zoom = z
 	winset(src, "mapwindow.map", "zoom=[z];zoom-mode=distort;letterbox=true")
-	cursor_2x = (z >= DISPLAY_ZOOM_ON)
+	cursor_2x = (WorldMag() >= DISPLAY_ZOOM_ON)
 	CursorNeutral(src)
+
+/obj/world_overlay_master
+	plane = WORLD_OVERLAY_PLANE
+	appearance_flags = PLANE_MASTER | PIXEL_SCALE
+	screen_loc = "LEFT,BOTTOM"
+	mouse_opacity = 0
+	layer = BACKGROUND_LAYER
+
+client/proc/WorldMagMatrix()
+	var/matrix/M = matrix()
+	if(world_mag != 1) M.Scale(world_mag)
+	return M
+
+client/proc/ApplyWorldMag()
+	world_mag = view_fit_enabled ? WorldMag() : 1
+	var/matrix/M = WorldMagMatrix()
+	if(client_plane_master) client_plane_master.transform = M
+	if(fx_relay) fx_relay.transform = M
+	if(fxnb_relay) fxnb_relay.transform = M
+	if(!world_overlay_master)
+		world_overlay_master = new
+		screen += world_overlay_master
+	world_overlay_master.transform = M
 
 client/proc/ApplyOverscan()
 	var/list/pp = splittext(winget(src, "mapwindow", "size"), "x")
@@ -64,7 +87,7 @@ client/proc/ApplyOverscan()
 	var/ph = text2num(pp[2])
 	if(!pw || !ph) return
 	var/z = EffectiveZoom(pw)
-	if(z != 1 && z != DISPLAY_ZOOM_ON)
+	if(z != 1)
 		ClearOverscan(pw, ph)
 		return
 	var/tile = world.icon_size * z
@@ -164,16 +187,14 @@ client/proc/SetupGameDisplay()
 
 client/proc/SetupTitleDisplay()
 	view_fit_enabled = FALSE
+	ApplyWorldMag()
 	view_fit_last_zoom = 0
 	ClearOverscan()
 	winset(src, "mapwindow.map", "zoom=0;zoom-mode=normal;letterbox=true")
 
 client/proc/ApplyZoomPref()
 	if(!mob) return
-	var/z = EffectiveZoom()
-	ApplyMapZoom(z)
-	if(z < CurrentZoom() && !mob?.Bino)
-		src << "Zoom 2x needs a wider game window, showing 1x until there's room for the HUD."
+	ApplyMapZoom(EffectiveZoom())
 	FitViewNow()
 
 /atom/movable/cutscene_hud_hider
@@ -185,6 +206,7 @@ client/proc/ApplyZoomPref()
 
 client/proc/SetupCutsceneDisplay()
 	view_fit_enabled = FALSE
+	ApplyWorldMag()
 	view_fit_last_zoom = 0
 	winset(src, "mapwindow.map", "zoom=0;zoom-mode=distort;letterbox=true")
 	view = "21x21"
@@ -258,7 +280,13 @@ client/proc/FitViewNow()
 	if(pref)
 		tw = min(tw, pref * zmul)
 		th = min(th, pref * zmul)
+	if(mob.Bino && z < 1)
+		var/k = sqrt(DISPLAY_BINO_TILE_BUDGET / (tw * th))
+		if(k < 1)
+			tw = max(round(tw * k), DISPLAY_MIN_VIEW)
+			th = max(round(th * k), DISPLAY_MIN_VIEW)
 	view = "[tw]x[th]"
+	ApplyWorldMag()
 	GfxResizeScreenOverlays(src, pw, ph)
 	PositionSkillHUD()
 	Hd2dApplyClient(src)
@@ -305,6 +333,7 @@ mob/Admin1/verb/Display_Report()
 	C << "map view-size: [vw]x[vh] (rendered area, no letterbox)"
 	C << "splitter: [winget(C, "mainwindow.mainvsplit", "splitter")]"
 	C << "view [C.view] | zoom pref [C.CurrentZoom()] applied [z] | expected [v.len >= 2 ? text2num(v[1]) * world.icon_size * z : 0]x[v.len >= 2 ? text2num(v[2]) * world.icon_size * z : 0]px"
+	C << "world magnification [C.world_mag] (map control zoom stays [z], the HUD never scales)"
 	C << "padding inside map control: [cw - vw] wide, [ch - vh] tall"
 	C << "control vs pane gap: [pw - cw] wide, [ph - ch] tall (0 = control fills pane)"
 	var/vtw = v.len >= 2 ? text2num(v[1]) : 0

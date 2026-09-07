@@ -1,4 +1,4 @@
-#define BUILD_PREVIEW_PLANE HUD_PLANE
+#define BUILD_PREVIEW_PLANE WORLD_OVERLAY_PLANE
 #define BUILD_PREVIEW_LAYER 1
 #define BUILD_HISTORY_CAP 50
 #define BUILD_SAVE_COOLDOWN 600
@@ -247,6 +247,10 @@ client/var/datum/build_session/bsession
 		datum/build_entry/brush
 		brushSize = 1
 		sprayDensity = 50
+		spraySpace = 0
+		sprayGap = 1
+		dropOpen = 0
+		list/strokeHit
 		dirv = SOUTH
 		dirty = 0
 		list/history = list()
@@ -362,6 +366,7 @@ client/var/datum/build_session/bsession
 			BuildHUDRefreshTools(src)
 
 		SetBrush(datum/build_entry/E)
+			BuildHUDCloseDrop(src)
 			if(fillPending || dragging || curveStage)
 				CancelPending()
 			brush = E
@@ -379,14 +384,23 @@ client/var/datum/build_session/bsession
 			BuildHUDRefreshDigit(src)
 			UpdateGhost()
 
-		CycleSprayDensity()
-			switch(sprayDensity)
-				if(25)
-					sprayDensity = 50
-				if(50)
-					sprayDensity = 75
-				else
-					sprayDensity = 25
+		PromptSprayDensity()
+			spawn
+				var/n = C.mob.HUDNumPrompt("Spray density % (1-100)", "[sprayDensity]")
+				if(isnull(n))
+					return
+				sprayDensity = clamp(round(n), 1, 100)
+				BuildHUDRefreshSpray(src)
+				BuildHUDSetSelName(src, "SPRAY DENSITY [sprayDensity]%")
+
+		PromptSprayGap()
+			spawn
+				var/n = C.mob.HUDNumPrompt("Spacing gap in tiles (1-6)", "[sprayGap]")
+				if(isnull(n))
+					return
+				sprayGap = clamp(round(n), 1, 6)
+				BuildHUDRefreshSpray(src)
+				BuildHUDSetSelName(src, "SPACING GAP: [sprayGap]")
 
 		RotateBrush()
 			switch(dirv)
@@ -403,6 +417,7 @@ client/var/datum/build_session/bsession
 			UpdateGhost()
 
 		CancelPending()
+			BuildHUDCloseDrop(src)
 			dragging = 0
 			curveStage = 0
 			pasteMode = 0
@@ -415,6 +430,7 @@ client/var/datum/build_session/bsession
 			cpStates = null
 			strokeSet = null
 			strokeRolled = null
+			strokeHit = null
 			fillPending = null
 			fillOrigin = null
 			fillBrush = null

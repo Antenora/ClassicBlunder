@@ -51,5 +51,6 @@ when the last three inputs are a combo is will result in a super (?)
 
 
 /obj/orohud
+	plane = HUD_PLANE
 	icon = 'orohud.dmi'
 	screen_loc = "1:1,1:128"

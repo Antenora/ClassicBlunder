@@ -22,10 +22,12 @@ npcInterface
 
 
 /obj/mugshot
+    plane = HUD_PLANE
     New(icon/i)
         icon = i
 
 /obj/speechbubble
+    plane = HUD_PLANE
     icon ='Icons/irlNPCs/speech.dmi'
     New(text)
         maptext="<html><center><small>[text]</font></center></html>"
@@ -36,6 +38,7 @@ npcInterface
         pixel_y = 85
 
 /obj/infoBoxNPC
+    plane = HUD_PLANE
     icon = 'Icons/irlNPCs/infoBox.dmi'
     New(text)
         maptext="<html><center><small>[text]</font></center></html>"

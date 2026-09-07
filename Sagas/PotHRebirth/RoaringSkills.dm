@@ -96,7 +96,7 @@ obj/Skills/AutoHit
 obj/RoaringTempoMeterBase
 	icon = RTEMPO_RSC
 	screen_loc = "CENTER-0.8,BOTTOM+3.9"
-	plane = FLOAT_PLANE
+	plane = HUD_PLANE
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
 
@@ -109,26 +109,26 @@ obj/RoaringTempoMeterBase
 obj/RoaringTempoMeterBG
 	parent_type = /obj/RoaringTempoMeterBase
 	icon_state = "Background"
-	layer = FLOAT_LAYER + 49
+	layer = FLY_LAYER + 1.1
 
 
 obj/RoaringTempoMeterStars
 	parent_type = /obj/RoaringTempoMeterBase
 	icon_state = "Star-1"
-	layer = FLOAT_LAYER + 50
+	layer = FLY_LAYER + 1.2
 
 
 obj/RoaringTempoMeterFlames
 	parent_type = /obj/RoaringTempoMeterBase
 	icon_state = "Flames"
-	layer = FLOAT_LAYER + 48
+	layer = FLY_LAYER + 1
 
 
 obj/RoaringTempoMeterSign
 	parent_type = /obj/RoaringTempoMeterBase
 	icon_state = "UseYourFuckingMeter"
 	screen_loc = "CENTER+1.7,BOTTOM+3.2"
-	layer = FLOAT_LAYER + 51
+	layer = FLY_LAYER + 1.3
 
 
 

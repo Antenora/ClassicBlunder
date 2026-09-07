@@ -1,6 +1,6 @@
 #define CHATPANEL_CTL "mapwindow.chatoverlay"
 
-var/list/CHATCMD_ARGS = list("AObserve" = list("player"), "AddToTesterWhiteList" = list("text"), "Admin-Check-AI-Kills" = list("player"), "Admin-Heal" = list("player"), "Admin-Help" = list("text"), "Admin-Kill/KO" = list("player"), "AdminAssess" = list("player"), "AdminChat" = list("text"), "AdminPM" = list("player"), "AdminRename" = list("choice"), "AdminRevive" = list("player"), "Adminize" = list("player"), "Announce" = list("text"), "Assign-Stat-Redo" = list("player"), "Change-Faction" = list("player"), "Change-Max-Summon" = list("choice"), "Change-Nationalities" = list("player"), "ChangeWipeStartHour" = list("num"), "Clear-Kamui-Buff-Lock" = list("player"), "Coat-Test" = list("text"), "Communicator-Transmit" = list("text"), "Copy" = list("choice"), "Copy-AG" = list("choice"), "Create-AG" = list("player"), "Customize:-Forms" = list("player"), "Customize:-Hair" = list("player"), "Customize:-Icon" = list("player"), "Debuff-Apply" = list("num"), "Delete" = list("choice"), "DeleteSave" = list("player"), "Display-Mode" = list("choice:Windowed/Borderless/Full screen"), "Do-Damage" = list("player"), "Duplicate-Debug" = list("choice"), "Edit" = list("choice"), "Edit-Technology" = list("player"), "EditPassiveHandler" = list("player"), "Event-Character-Setup" = list("player"), "FPSControl" = list("num"), "Fix-SSJ-Transformations" = list("player"), "Flash" = list("text"), "Force-AI-Spawns" = list("choice"), "Give-Currency" = list("player"), "Give-Demon" = list("player"), "Give-Mapper" = list("player"), "Give-Rare-Race" = list("player"), "Give-Wound" = list("player"), "Give/Make" = list("player"), "Head-Start-Setup" = list("player"), "Lock-Send-Back" = list("choice"), "Mage-Admin" = list("player"), "Make-Summon" = list("player"), "Make-True-Demon" = list("player"), "ManuallyRemoveAdmin" = list("text"), "Mapper-Edit" = list("choice"), "Mapper-Fade-Visibility" = list("choice"), "MasteryUp" = list("choice"), "Message-Global" = list("text"), "Message-Z-Plane" = list("text"), "Modify-Companion" = list("choice"), "Narrate" = list("text"), "New-Character-Setup" = list("player"), "OOC" = list("text"), "Offer-Nation-Change" = list("player"), "Ping" = list("player"), "PlayerLog" = list("player"), "Prayer" = list("text"), "Preview-Ascensions" = list("player"), "PrivateNarrate" = list("player"), "ReMeditate" = list("player"), "Refund-All-Technology" = list("player"), "Refund-Technology" = list("player"), "Remove-Mapper" = list("player"), "Respec" = list("player"), "SagaManagement" = list("player"), "SagaRemoval" = list("player"), "Say" = list("text"), "Scan" = list("player"), "SecretManagement" = list("player"), "SecretRemoval" = list("player"), "Send-To-Spawn" = list("player"), "Spawn-Permission-Add" = list("choice"), "Spawn-Permission-Remove" = list("choice"), "Spawn-Race-Add" = list("choice"), "Spawn-Race-Remove" = list("choice"), "Spawn-Swap" = list("player"), "Summon" = list("player"), "Surface-Clear-Overrides" = list("choice"), "Surface-Inspect" = list("choice"), "Surface-Set-Cookie" = list("choice"), "Surface-Set-Light" = list("choice"), "Surface-Set-Occlusion" = list("choice"), "Surface-Set-Profile" = list("choice"), "Surface-Set-Shaft" = list("choice"), "Surface-Set-Type-Profile" = list("choice"), "Surface-Set-Wind" = list("choice"), "Tech-Unlock" = list("player"), "Teleport" = list("player"), "Test-Mode" = list("player"), "Think" = list("text"), "UnlockAscension" = list("player"), "UnlockForm" = list("player"), "Unteleport" = list("player"), "Use" = list("player"), "View-Maim-History" = list("player"), "ViewPassives" = list("player"), "Warper" = list("num", "num", "num"), "Whisper" = list("text"), "Wind-Debug" = list("choice"), "XYZTeleport" = list("player"), "Yell" = list("text"), "ahRemoveListing" = list("num"), "editInformation" = list("player"), "editRace" = list("player"), "editSecretDatum" = list("player"), "hep" = list("num", "num"), "lifeSetRank" = list("text", "num"), "makeFishingSpot" = list("text"), "makeForageNode" = list("text"), "makeOreNode" = list("text"), "makeTree" = list("text"), "moon-toggle-admin" = list("num"), "openBlobdatum" = list("player"), "refund-all-old-value" = list("player"))
+var/list/CHATCMD_ARGS = list("AObserve" = list("player"), "AddToTesterWhiteList" = list("text"), "Admin-Check-AI-Kills" = list("player"), "Admin-Heal" = list("player"), "Admin-Help" = list("text"), "Admin-Kill/KO" = list("player"), "AdminAssess" = list("player"), "AdminChat" = list("text"), "AdminPM" = list("player"), "AdminRename" = list("choice"), "AdminRevive" = list("player"), "Adminize" = list("player"), "Announce" = list("text"), "Assign-Stat-Redo" = list("player"), "Bestow-Inkwork" = list("player"), "Change-Faction" = list("player"), "Change-Max-Summon" = list("choice"), "Change-Nationalities" = list("player"), "ChangeWipeStartHour" = list("num"), "Clear-Kamui-Buff-Lock" = list("player"), "Coat-Test" = list("text"), "Communicator-Transmit" = list("text"), "Copy" = list("choice"), "Copy-AG" = list("choice"), "Create-AG" = list("player"), "Customize:-Forms" = list("player"), "Customize:-Hair" = list("player"), "Customize:-Icon" = list("player"), "Debuff-Apply" = list("num"), "Delete" = list("choice"), "DeleteSave" = list("player"), "Display-Mode" = list("choice:Windowed/Borderless/Full screen"), "Do-Damage" = list("player"), "Duplicate-Debug" = list("choice"), "Edit" = list("choice"), "Edit-Technology" = list("player"), "EditPassiveHandler" = list("player"), "Event-Character-Setup" = list("player"), "FPSControl" = list("num"), "Fix-SSJ-Transformations" = list("player"), "Flash" = list("text"), "Force-AI-Spawns" = list("choice"), "Give-Currency" = list("player"), "Give-Demon" = list("player"), "Give-Mapper" = list("player"), "Give-Rare-Race" = list("player"), "Give-Wound" = list("player"), "Give/Make" = list("player"), "Head-Start-Setup" = list("player"), "Lock-Send-Back" = list("choice"), "Mage-Admin" = list("player"), "Make-Summon" = list("player"), "Make-True-Demon" = list("player"), "ManuallyRemoveAdmin" = list("text"), "Mapper-Edit" = list("choice"), "Mapper-Fade-Visibility" = list("choice"), "MasteryUp" = list("choice"), "Message-Global" = list("text"), "Message-Z-Plane" = list("text"), "Modify-Companion" = list("choice"), "Narrate" = list("text"), "New-Character-Setup" = list("player"), "OOC" = list("text"), "Offer-Nation-Change" = list("player"), "Ping" = list("player"), "PlayerLog" = list("player"), "Prayer" = list("text"), "Preview-Ascensions" = list("player"), "PrivateNarrate" = list("player"), "ReMeditate" = list("player"), "Refund-All-Technology" = list("player"), "Refund-Technology" = list("player"), "Remove-Mapper" = list("player"), "Respec" = list("player"), "SagaManagement" = list("player"), "SagaRemoval" = list("player"), "Say" = list("text"), "Scan" = list("player"), "SecretManagement" = list("player"), "SecretRemoval" = list("player"), "Send-To-Spawn" = list("player"), "Spawn-Permission-Add" = list("choice"), "Spawn-Permission-Remove" = list("choice"), "Spawn-Race-Add" = list("choice"), "Spawn-Race-Remove" = list("choice"), "Spawn-Swap" = list("player"), "Summon" = list("player"), "Surface-Clear-Overrides" = list("choice"), "Surface-Inspect" = list("choice"), "Surface-Set-Cookie" = list("choice"), "Surface-Set-Light" = list("choice"), "Surface-Set-Occlusion" = list("choice"), "Surface-Set-Profile" = list("choice"), "Surface-Set-Shaft" = list("choice"), "Surface-Set-Type-Profile" = list("choice"), "Surface-Set-Wind" = list("choice"), "Tech-Unlock" = list("player"), "Teleport" = list("player"), "Test-Mode" = list("player"), "Think" = list("text"), "UnlockAscension" = list("player"), "UnlockForm" = list("player"), "Unteleport" = list("player"), "Use" = list("player"), "View-Maim-History" = list("player"), "ViewPassives" = list("player"), "Warper" = list("num", "num", "num"), "Whisper" = list("text"), "Wind-Debug" = list("choice"), "XYZTeleport" = list("player"), "Yell" = list("text"), "ahRemoveListing" = list("num"), "editInformation" = list("player"), "editRace" = list("player"), "editSecretDatum" = list("player"), "hep" = list("num", "num"), "lifeSetRank" = list("text", "num"), "makeFishingSpot" = list("text"), "makeForageNode" = list("text"), "makeOreNode" = list("text"), "makeTree" = list("text"), "moon-toggle-admin" = list("num"), "openBlobdatum" = list("player"), "refund-all-old-value" = list("player"))
 
 client/var/chatpanel_zoom = 2
 client/var/chatpanel_opacity = 0.85
@@ -39,10 +39,81 @@ client/proc/ChatPanelSendAssets()
 	src << browse_rsc('HUD/chatpanel/lc_thumb_mid.png', "lc_thumb_mid.png")
 	src << browse_rsc('HUD/chatpanel/lc_thumb_col.png', "lc_thumb_col.png")
 	src << browse_rsc('HUD/monogram.ttf', "monogram.ttf")
+	src << browse_rsc('HUD/chatpanel/lc_cross.png', "lc_cross.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_neutral.png', "lc_cur_neutral.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_neutral2.png', "lc_cur_neutral2.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_ibeam.png', "lc_cur_ibeam.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_ibeam2.png', "lc_cur_ibeam2.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_drag.png', "lc_cur_drag.png")
+	src << browse_rsc('HUD/chatpanel/lc_cur_drag2.png', "lc_cur_drag2.png")
+	src << browse_rsc('HUD/chatpanel/lf_crimson.ttf', "lf_crimson.ttf")
+	src << browse_rsc('HUD/chatpanel/lf_cinzel.ttf', "lf_cinzel.ttf")
+	src << browse_rsc('HUD/chatpanel/lf_caveat.ttf', "lf_caveat.ttf")
+	src << browse_rsc('HUD/chatpanel/lf_elite.ttf', "lf_elite.ttf")
+	src << browse_rsc('HUD/chatpanel/lf_fraktur.ttf', "lf_fraktur.ttf")
+	src << browse_rsc('fonts/Gotham Book.otf', "gotham.otf")
+
+client/proc/ChatPanelFontsPush()
+	src << output(list2params(list(getPref("chatFonts") ? 1 : 0)), "[CHATPANEL_CTL]:setFontsOn")
+
+mob/var/tmp/list/chat_portraits
+mob/var/tmp/chat_portrait_ver = 1
+client/var/list/portraits_sent
+
+mob/proc/ChatPortraitKey(state)
+	var/list/st = PortraitStates()
+	var/i = st.Find(istext(state) ? state : "")
+	return "[i ? i : 1]"
+
+mob/proc/ChatPortraitIcon(state)
+	if(isnull(state)) state = PortraitState()
+	var/key = ChatPortraitKey(state)
+	if(!chat_portraits) chat_portraits = list()
+	var/icon/cached = chat_portraits[key]
+	if(cached) return cached
+	var/icon/canvas = new('HUD/portrait_frame.png')
+	var/icon/p = icon(GetPortraitState(state))
+	p.Blend(icon('HUD/portrait_mask.png'), ICON_MULTIPLY)
+	canvas.Blend(p, ICON_UNDERLAY, 14, 14)
+	canvas.Crop(13, 11, 54, 53)
+	chat_portraits[key] = canvas
+	return canvas
+
+mob/proc/ChatPortraitReset()
+	chat_portraits = null
+	chat_portrait_ver++
+
+proc/ChatPortraitTag(mob/M, state)
+	if(!M || !M.ckey) return ""
+	if(isnull(state)) state = M.PortraitState()
+	return "<img class='pt' src='pt_[M.ckey]_[M.chat_portrait_ver]_[M.ChatPortraitKey(state)].png'>"
+
+client/proc/EnsurePortrait(mob/M, state)
+	if(!M || !M.ckey) return
+	if(isnull(state)) state = M.PortraitState()
+	if(!portraits_sent) portraits_sent = list()
+	var/key = "[M.ckey]_[M.chat_portrait_ver]_[M.ChatPortraitKey(state)]"
+	if(portraits_sent[key]) return
+	portraits_sent[key] = 1
+	src << browse_rsc(M.ChatPortraitIcon(state), "pt_[key].png")
 
 client/proc/ChatPanelHTML()
 	return {"<!DOCTYPE html><html><head><meta charset='utf-8'><style>
  @font-face{font-family:'monogram';src:url('monogram.ttf')}
+ @font-face{font-family:'lfcrimson';src:url('lf_crimson.ttf')}
+ @font-face{font-family:'lfcinzel';src:url('lf_cinzel.ttf')}
+ @font-face{font-family:'lfcaveat';src:url('lf_caveat.ttf')}
+ @font-face{font-family:'lfelite';src:url('lf_elite.ttf')}
+ @font-face{font-family:'lffraktur';src:url('lf_fraktur.ttf')}
+ @font-face{font-family:'lfgotham';src:url('gotham.otf')}
+ font\[face=crimson],#ed.f-crimson{font-family:lfcrimson,serif;font-size:17px;line-height:1.15}
+ font\[face=cinzel],#ed.f-cinzel{font-family:lfcinzel,serif;font-size:13px;line-height:1.3}
+ font\[face=caveat],#ed.f-caveat{font-family:lfcaveat,cursive;font-size:19px;line-height:1.05}
+ font\[face=elite],#ed.f-elite{font-family:lfelite,monospace;font-size:14px;line-height:1.25}
+ font\[face=fraktur],#ed.f-fraktur{font-family:lffraktur,serif;font-size:17px;line-height:1.15}
+ font\[face=gotham],#ed.f-gotham{font-family:lfgotham,sans-serif;font-size:14px;line-height:1.25}
+ font\[face=pixel],#ed.f-pixel{font-family:monogram,monospace;font-size:16px;line-height:1}
+ #log.nofonts font\[face]{font-family:'monogram' !important;font-size:16px !important;line-height:16px !important}
  html,body{margin:0;padding:0;background:transparent;overflow:hidden;width:100%;height:100%}
  body{font:16px/16px 'monogram';color:#eaf5ff;user-select:none;-webkit-user-select:none}
  #shell{position:absolute;left:0;top:0;width:352px;height:256px;image-rendering:pixelated}
@@ -82,6 +153,16 @@ client/proc/ChatPanelHTML()
  .dr span{position:relative}
  .dr .cat{position:absolute;right:8px;top:0;color:#7ec8f0}
  .dr.hint{color:#b8b8d9;cursor:default}
+ :root{--cur:url('lc_cur_neutral.png') 2 0, auto;--cur-text:url('lc_cur_ibeam.png') 2 5, text;--cur-drag:url('lc_cur_drag.png') 4 5, move}
+ *{cursor:var(--cur) !important}
+ input,textarea,\[contenteditable='true'],#log{cursor:var(--cur-text) !important}
+ #hdr.dragok,#grip{cursor:var(--cur-drag) !important}
+ .line.hasp{position:relative;padding-left:48px;min-height:45px;box-sizing:border-box;align-items:flex-end}
+ .line.hasp.show{display:flex}
+ .line.hasp .txt{flex:1 1 auto;min-width:0;white-space:pre-wrap;word-wrap:break-word}
+ .line img.pt{position:absolute;left:0;bottom:1px;width:42px;height:43px}
+ #chpop{position:absolute;left:16px;bottom:46px;width:120px;display:none;z-index:7;border:6px solid transparent;border-image:url('lc_forgesub.png') 6 fill stretch;box-sizing:border-box}
+ #chpopl{position:relative;padding:2px 0}
  </style></head><body>
  <div id='shell'>
   <div id='frame'></div>
@@ -101,6 +182,7 @@ client/proc/ChatPanelHTML()
    <div id='rpchip' title='open the roleplay box'>RP</div>
   </div>
   <div id='dd'><div id='ddl'></div></div>
+  <div id='chpop'><div id='chpopl'></div></div>
   <div id='grip'></div>
  </div>
  <script>
@@ -111,6 +193,9 @@ client/proc/ChatPanelHTML()
  var foldImg=fold.getElementsByTagName('img').item(0);
  var PREVIEW=false;
  var Z=2, OP=0.85, G={x:0,y:0,w:704,h:512}, B=null, tab='all', collapsed=false, ch='say', MAXL=300, live=false, stick=true, locked=false;
+ function applyCursor(){ var two=(Z>=2); var r=document.documentElement.style; r.setProperty('--cur',two?"url('lc_cur_neutral2.png') 5 1, auto":"url('lc_cur_neutral.png') 2 0, auto"); r.setProperty('--cur-text',two?"url('lc_cur_ibeam2.png') 5 11, text":"url('lc_cur_ibeam.png') 2 5, text"); r.setProperty('--cur-drag',two?"url('lc_cur_drag2.png') 9 11, move":"url('lc_cur_drag.png') 4 5, move"); }
+
+
  function clampNum(v,lo,hi){ if(hi<lo) hi=lo; if(v<lo) return lo; if(v>hi) return hi; return v; }
  function clampG(){
   if(!B) return;
@@ -124,7 +209,7 @@ client/proc/ChatPanelHTML()
  function topic(p){ if(window.BYOND) BYOND.topic(p); }
  function focusMap(){ if(window.BYOND) BYOND.winset('mapwindow.map',{focus:true}); }
  function layout(){
-  document.body.style.zoom=Z;
+  document.body.style.zoom=Z; applyCursor();
   shell.style.width=Math.round(G.w/Z)+'px';
   shell.style.height=(collapsed?48:Math.round(G.h/Z))+'px';
   frame.style.opacity=OP; body.style.opacity=OP;
@@ -133,7 +218,7 @@ client/proc/ChatPanelHTML()
   var show=collapsed?'none':'block';
   body.style.display=show; log.style.display=show; inrow.style.display=show; grip.style.display=(collapsed||locked)?'none':'block';
   foldImg.src=collapsed?'lc_up.png':'lc_down.png';
-  lockImg.src=locked?'lc_lock.png':'lc_unlock.png'; hdr.style.cursor=locked?'default':'move';
+  lockImg.src=locked?'lc_lock.png':'lc_unlock.png'; hdr.classList.toggle('dragok',!locked);
   if(stick){ requestAnimationFrame(function(){ log.scrollTop=log.scrollHeight; }); }
  }
  function setGeom(x,y,w,h,z,op,bx0,by0,bx1,by1,lk,fd){ G={x:+x,y:+y,w:+w,h:+h}; Z=+z; OP=+op; if(bx1!==undefined){ B={x0:+bx0,y0:+by0,x1:+bx1,y1:+by1}; } locked=(+lk)?true:false; var wantFold=(+fd)?true:false; collapsed=false; if(wantFold){ collapsed=true; G.y+=G.h-48*Z; } clampG(); if(collapsed){ flush(); } else { layout(); } }
@@ -159,11 +244,13 @@ client/proc/ChatPanelHTML()
  function refilter(){ var ls=log.getElementsByClassName('line'); for(var i=0;i<ls.length;i++){ var el=ls.item(i); el.classList.toggle('show',tab==='all'||el.classList.contains('c_'+tab)); } }
  var counts={};
  function cleanHtml(h){ var out=''; for(var i=0;i<h.length;i++){ var c=h.charCodeAt(i); if(c>=32||c===10||c===9) out+=h.charAt(i); } return out; }
- var BAD_TAGS={script:1,style:1,img:1,iframe:1,object:1,embed:1,svg:1,link:1,meta:1,form:1,input:1,button:1,video:1,audio:1,source:1};
- function scrub(el){ var all=el.querySelectorAll('*'); for(var i=all.length-1;i>=0;i--){ var n=all\[i]; var t=n.tagName.toLowerCase(); if(BAD_TAGS\[t]){ n.parentNode.removeChild(n); continue; } for(var k=n.attributes.length-1;k>=0;k--){ var a=n.attributes\[k]; var an=a.name.toLowerCase(); if(an.indexOf('on')===0||an==='style'&&a.value.indexOf('url')>=0||(an==='href'&&a.value.trim().toLowerCase().indexOf('javascript')===0)){ n.removeAttribute(a.name); } } if(t==='a'){ var h=(n.getAttribute('href')||'').trim().toLowerCase(); if(h.indexOf('http://')!==0&&h.indexOf('https://')!==0) n.removeAttribute('href'); else n.setAttribute('target','_blank'); } } }
+ var BAD_TAGS={script:1,style:1,iframe:1,object:1,embed:1,svg:1,link:1,meta:1,form:1,input:1,button:1,video:1,audio:1,source:1};
+ function okPortrait(n){ var sv=n.getAttribute('src')||''; return n.className==='pt'&&sv.indexOf('pt_')===0&&sv.slice(-4)==='.png'&&sv.indexOf('/')<0&&sv.indexOf(':')<0&&sv.length<80; }
+ function scrub(el){ var all=el.querySelectorAll('*'); for(var i=all.length-1;i>=0;i--){ var n=all\[i]; var t=n.tagName.toLowerCase(); if(BAD_TAGS\[t]||(t==='img'&&!okPortrait(n))){ n.parentNode.removeChild(n); continue; } for(var k=n.attributes.length-1;k>=0;k--){ var a=n.attributes\[k]; var an=a.name.toLowerCase(); if(an.indexOf('on')===0||an==='style'&&a.value.indexOf('url')>=0||(an==='href'&&a.value.trim().toLowerCase().indexOf('javascript')===0)){ n.removeAttribute(a.name); } } if(t==='a'){ var h=(n.getAttribute('href')||'').trim().toLowerCase(); if(h.indexOf('http://')!==0&&h.indexOf('https://')!==0) n.removeAttribute('href'); else n.setAttribute('target','_blank'); } } }
+ function portraitLayout(el){ var img=el.querySelector('img.pt'); if(!img) return; var txt=document.createElement('span'); txt.className='txt'; while(el.firstChild){ var n=el.firstChild; el.removeChild(n); if(n!==img) txt.appendChild(n); } el.appendChild(img); el.appendChild(txt); el.classList.add('hasp'); }
  function addLine(tag,html){
   if(tag!=='ic'&&tag!=='ooc'&&tag!=='combat') tag='all';
-  var el=document.createElement('div'); el.className='line c_'+tag; el.innerHTML=cleanHtml(html); scrub(el); el._raw=html; log.appendChild(el);
+  var el=document.createElement('div'); el.className='line c_'+tag; el.innerHTML=cleanHtml(html); scrub(el); portraitLayout(el); el._raw=html; log.appendChild(el);
   el.classList.toggle('show',tab==='all'||tag===tab);
   counts\[tag]=(counts\[tag]||0)+1;
   if(counts\[tag]>MAXL){ var old=log.getElementsByClassName('c_'+tag); if(old.length){ log.removeChild(old.item(0)); counts\[tag]--; } }
@@ -186,12 +273,21 @@ client/proc/ChatPanelHTML()
  lockBtn.addEventListener('click',function(){ locked=!locked; layout(); topic({chatpanel:'lock',l:locked?1:0}); focusMap(); });
  var CHS=\['say','ooc','think','whisper'];
  function nextCh(){ ch=CHS\[(CHS.indexOf(ch)+1)%CHS.length]; chip.firstChild.nodeValue=ch.toUpperCase(); }
- chip.addEventListener('click',function(){ nextCh(); inp.focus(); });
+ var chpop=document.getElementById('chpop'), chpopl=document.getElementById('chpopl');
+ function setCh(c){ ch=c; chip.firstChild.nodeValue=ch.toUpperCase(); }
+ function chPopOpen(){ var h=''; for(var i=0;i<CHS.length;i++) h+="<div class='dr"+(CHS\[i]===ch?' sel':'')+"' data-c='"+CHS\[i]+"'><div class='pl'></div><span>"+CHS\[i].toUpperCase()+"</span></div>"; chpopl.innerHTML=h; chpop.style.display='block'; }
+ function chPopClose(){ chpop.style.display='none'; }
+ chip.addEventListener('click',function(){ if(chpop.style.display==='block'){ chPopClose(); inp.focus(); return; } chPopOpen(); });
+ chpopl.addEventListener('pointerdown',function(e){ var r=e.target.closest('.dr'); if(!r) return; setCh(r.getAttribute('data-c')); chPopClose(); inp.focus(); e.preventDefault(); });
+ document.addEventListener('pointerdown',function(e){ if(chpop.style.display==='block'&&!e.target.closest('#chpop')&&!e.target.closest('#chip')) chPopClose(); });
  document.getElementById('rpchip').addEventListener('click',function(){ topic({chatpanel:'rp'}); });
  var dd=document.getElementById('dd'), ddl=document.getElementById('ddl');
- var cmds=\[], players=\[], cmdsAt=0, ddItems=\[], ddSel=0, ddMode='', ddCmd=null;
+ var cmds=\[], players=\[], cmdsAt=0, ddItems=\[], ddSel=0, ddMode='', ddCmd=null, faces=\[];
+ function dec(v){ try{ return decodeURIComponent(String(v).split('+').join(' ')); }catch(e){ return String(v); } }
+ function setFaces(s){ faces=\[]; var parts=(s||'').split(';'); for(var i=0;i<parts.length;i++){ var f=parts\[i].split('|'); if(f.length<2) continue; faces.push({name:dec(f\[1]),trig:dec(f\[2]||'')}); } refreshDD(); }
  function setCommands(s){ cmds=\[]; var parts=(s||'').split(';'); for(var i=0;i<parts.length;i++){ var f=parts\[i]; if(!f) continue; var a=f.split('|'); cmds.push({id:a\[0],cat:a\[1]||'',args:(a\[2]?a\[2].split(','):\[])}); } cmdsAt=Date.now(); refreshDD(); }
  function setPlayers(s){ players=(s||'').split('|').filter(function(x){ return x.length>0; }); refreshDD(); }
+ function setFontsOn(on){ log.classList.toggle('nofonts',!(+on)); }
  function ddClose(){ dd.style.display='none'; ddItems=\[]; ddMode=''; ddCmd=null; }
  function splitArgs(rest){ var out=\[], cur='', q=false; for(var i=0;i<rest.length;i++){ var c=rest.charAt(i); if(c==='"'){ q=!q; continue; } if(c===' '&&!q){ if(cur.length){ out.push(cur); cur=''; } continue; } cur+=c; } if(cur.length) out.push(cur); return out; }
  function findCmd(id){ var l=id.toLowerCase(); for(var i=0;i<cmds.length;i++){ if(cmds\[i].id.toLowerCase()===l) return cmds\[i]; } return null; }
@@ -213,6 +309,7 @@ client/proc/ChatPanelHTML()
     var k=c.args\[idx]; ddMode='arg';
     if(k==='player'){ if(!players.length) topic({chatpanel:'players'}); var q2=typedTail.toLowerCase(); for(var j=0;j<players.length&&ddItems.length<8;j++){ if(!q2||players\[j].toLowerCase().indexOf(q2)>=0) ddItems.push({label:players\[j],cat:'PLAYER',fill:true}); } if(!ddItems.length) ddItems.push({label:'player name',cat:'PLAYER',hint:true}); }
     else if(k.indexOf('choice:')===0){ var ch=k.substring(7).split('/'); for(var m=0;m<ch.length&&ddItems.length<8;m++){ if(!typedTail||ch\[m].toLowerCase().indexOf(typedTail.toLowerCase())>=0) ddItems.push({label:ch\[m],cat:'CHOICE',fill:true}); } }
+    else if(k==='face'){ var q3=typedTail.toLowerCase(); for(var fi=0;fi<faces.length&&ddItems.length<8;fi++){ if(!q3||faces\[fi].name.toLowerCase().indexOf(q3)>=0) ddItems.push({label:faces\[fi].name,cat:faces\[fi].trig.length?faces\[fi].trig:'manual',fill:true}); } if(!ddItems.length) ddItems.push({label:'expression name',cat:'FACE',hint:true}); }
     else { ddItems.push({label:k==='num'?'number':'text',cat:k.toUpperCase(),hint:true}); }
    } else { ddClose(); return; }
   }
@@ -237,6 +334,8 @@ client/proc/ChatPanelHTML()
   var bl=body.toLowerCase();
   if(bl==='admin'||bl==='admin-panel'||bl==='mapper'||bl==='mapper-panel'){ topic({chatpanel:'admin',tab:(bl.indexOf('mapper')===0)?'map':'cmd'}); inp.value=''; ddClose(); inp.blur(); focusMap(); return; }
   if(bl==='rp'||bl==='roleplay-box'||bl==='emote'||bl==='emotenew'){ topic({chatpanel:'rp'}); inp.value=''; ddClose(); inp.blur(); return; }
+  if(bl==='face'||bl==='expressions'||bl==='expression'){ topic({chatpanel:'face'}); inp.value=''; ddClose(); inp.blur(); focusMap(); return; }
+  if(bl.indexOf('face ')===0){ var fs=body.substring(5).trim(); topic({chatpanel:'face',s:fs}); inp.value=''; ddClose(); inp.blur(); focusMap(); return; }
   if(bl.indexOf('me ')===0){ var mt=body.substring(3).trim(); if(mt.length) topic({chatpanel:'me',text:mt}); inp.value=''; ddClose(); inp.blur(); focusMap(); return; }
   var sp=body.indexOf(' '); var c=findCmd(sp<0?body:body.substring(0,sp));
   if(c&&c.args.length){ var given=sp<0?\[]:splitArgs(body.substring(sp+1)); if(given.length<c.args.length){ if(inp.value.charAt(inp.value.length-1)!==' ') inp.value+=' '; ddSel=0; refreshDD(); return; } }
@@ -284,7 +383,7 @@ client/proc/ChatPanelHTML()
  function boot(){ live=true; layout(); topic({chatpanel:'ready'}); topic({chatpanel:'cmds'}); }
  if(window.BYOND){ boot(); } else { window.addEventListener('byond-ready',boot); }
  if(PREVIEW) seed();
- if(PREVIEW){ setCommands('Admin-Teleport|Admin|player;Teleport-To|Admin|player;Summon-Player|Admin|player;Set-Spawn-Point|Admin|;Reboot-Warning|Admin|text;Who|Other|;Toggle-Weather|Admin|choice:clear/rain/storm'); setPlayers('Seraphine|Kaidos|Valdiel'); }
+ if(PREVIEW){ setCommands('Admin-Teleport|Admin|player;Teleport-To|Admin|player;Summon-Player|Admin|player;Set-Spawn-Point|Admin|;Reboot-Warning|Admin|text;Who|Other|;Toggle-Weather|Admin|choice:clear/rain/storm;Face|Roleplay|face;Expressions|Roleplay|'); setPlayers('Seraphine|Kaidos|Valdiel'); setFaces('1|blank|;2|happy|;3|smirk|;4|anger1|75%25%20HP'); }
  if(PREVIEW){ setTimeout(function(){ if(!live){ setGeom(600,240,704,512,2,0.85,0,0,4000,3000); } },300); }
  </script></body></html>
 "}
@@ -369,6 +468,7 @@ client/proc/ChatPanelPlace()
 	chatpanel_geom = "[(x - x0) / z],[(y - y0) / z],[w / z],[h / z]"
 	winset(src, CHATPANEL_CTL, "pos=[x],[y];size=[w]x[h]")
 	src << output(list2params(list(x, y, w, h, z, chatpanel_opacity, x0, y0, x1, y1, chatpanel_lock, chatpanel_fold)), "[CHATPANEL_CTL]:setGeom")
+	ChatPanelFontsPush()
 
 client/proc/ChatPanelStoreGeom(gtext)
 	var/list/g = splittext(gtext, ",")
@@ -411,6 +511,7 @@ client/proc/ChatPanelBoot()
 	AdminPageBoot()
 	AdminPageInitButton()
 	RPBoxBoot()
+	FacePageBoot()
 	spawn(10)
 		RPBoxRelogHint()
 
@@ -433,7 +534,19 @@ client/proc/ChatPanelBuildCmds()
 		out += "[id]|[cat]|[islist(a) ? jointext(a, ",") : ""]"
 	if(mob.Admin) out += "Admin-Panel|Admin|"
 	if(mob.Mapper) out += "Mapper-Panel|Mapper|"
+	out += "Face|Roleplay|face"
+	out += "Expressions|Roleplay|"
 	src << output(list2params(list(jointext(out, ";"))), "[CHATPANEL_CTL]:setCommands")
+	ChatPanelFaces()
+
+client/proc/ChatPanelFaces()
+	if(!mob) return
+	src << output(list2params(list(mob.PortraitFaceList())), "[CHATPANEL_CTL]:setFaces")
+
+client/proc/ChatPanelFace(s)
+	if(!mob) return
+	if(istext(s) && length(s)) mob.PortraitSetDefault(s)
+	else FacePageToggle()
 
 client/proc/ChatPanelPlayers(ctl = CHATPANEL_CTL)
 	var/list/names = list()
@@ -526,6 +639,9 @@ client/Topic(href, href_list[], hsrc)
 	if(href_list && href_list["rpbox"])
 		RPBoxTopic(href_list)
 		return
+	if(href_list && href_list["facepage"])
+		FacePageTopic(href_list)
+		return
 	if(href_list && href_list["chatpanel"])
 		switch(href_list["chatpanel"])
 			if("admin")
@@ -534,6 +650,8 @@ client/Topic(href, href_list[], hsrc)
 				RPBoxToggle()
 			if("me")
 				RPBoxQuick(href_list["text"])
+			if("face")
+				ChatPanelFace(href_list["s"])
 			if("ready")
 				ChatPanelPlace()
 			if("cmds")
@@ -579,6 +697,14 @@ mob/Players/verb/ChatPanel_Hide()
 	set category = "Utility"
 	set hidden = 1
 	client?.ChatPanelHide()
+
+mob/Players/verb/ChatPanel_Fonts()
+	set name = "Post Fonts"
+	set category = "Utility"
+	if(!client) return
+	client.togglePref("chatFonts")
+	client.ChatPanelFontsPush()
+	src << "Other players' post fonts are now [client.getPref("chatFonts") ? "shown" : "hidden"]."
 
 mob/Players/verb/ChatPanel_Reset()
 	set name = "Chat Overlay Reset Position"

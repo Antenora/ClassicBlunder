@@ -7,8 +7,204 @@
 
 mob/var/icon/CharPortrait // null = use placeholder, saves with mob
 
+mob/var/PortraitDefault = ""
+mob/var/PortraitHold = 0
+mob/var/tmp/portrait_state = ""
+mob/var/tmp/list/portrait_states
+mob/var/tmp/list/portrait_lookup
+
 mob/proc/GetPortrait()
-	return CharPortrait ? CharPortrait : 'HUD/portrait_default.png'
+	return GetPortraitState(PortraitState())
+
+mob/proc/GetPortraitState(state)
+	if(!CharPortrait) return 'HUD/portrait_default.png'
+	if(!istext(state) || !length(state)) return CharPortrait
+	return icon(CharPortrait, state)
+
+mob/proc/PortraitStates()
+	if(portrait_states) return portrait_states
+	portrait_states = list()
+	portrait_lookup = list()
+	if(CharPortrait)
+		for(var/s in icon_states(CharPortrait))
+			if(!istext(s)) continue
+			portrait_states += s
+			if(length(s)) portrait_lookup[lowertext(s)] = s
+	var/b = portrait_states.Find("")
+	if(!b) portrait_states.Insert(1, "")
+	else if(b > 1)
+		portrait_states.Cut(b, b + 1)
+		portrait_states.Insert(1, "")
+	return portrait_states
+
+mob/proc/PortraitCanon(name)
+	if(!istext(name) || !length(name)) return ""
+	PortraitStates()
+	var/l = lowertext(name)
+	if(l == "blank") return ""
+	var/c = portrait_lookup[l]
+	return istext(c) ? c : null
+
+mob/proc/PortraitNumbered(prefix, n)
+	for(var/i = n, i >= 1, i--)
+		var/c = PortraitCanon("[prefix][i]")
+		if(istext(c) && length(c)) return c
+	return null
+
+mob/proc/PortraitCombo(f, a)
+	for(var/i = f, i >= 1, i--)
+		for(var/j = a, j >= 1, j--)
+			var/c = PortraitCanon("form[i]anger[j]")
+			if(istext(c) && length(c)) return c
+	return null
+
+mob/proc/PortraitAuto()
+	if(!CharPortrait) return null
+	if(KO || Dead)
+		var/k = PortraitCanon("ko")
+		if(istext(k) && length(k)) return k
+	var/f = transActive > 0 ? transActive : 0
+	var/a = AngerTier > 0 ? AngerTier : 0
+	if(f && a)
+		var/c = PortraitCombo(f, a)
+		if(c) return c
+	if(f)
+		var/s = PortraitNumbered("form", f)
+		if(s) return s
+	if(a)
+		var/s2 = PortraitNumbered("anger", a)
+		if(s2) return s2
+	if(HealthPct() <= 25)
+		var/h = PortraitCanon("hurt")
+		if(istext(h) && length(h)) return h
+	return null
+
+mob/proc/PortraitState()
+	if(!CharPortrait) return ""
+	var/d = PortraitCanon(PortraitDefault)
+	if(!istext(d)) d = ""
+	if(PortraitHold) return d
+	var/a = PortraitAuto()
+	return istext(a) ? a : d
+
+mob/proc/PortraitSync(force = 0)
+	if(!CharPortrait && !force) return 0
+	var/s = PortraitState()
+	if(!force && s == portrait_state) return 0
+	portrait_state = s
+	PortraitRefresh()
+	return 1
+
+mob/proc/PortraitRefresh()
+	if(client)
+		client.UpdateCharacterCard()
+		if(client.cm_portrait) client.cm_portrait.icon = GetPortrait()
+		client.FacePageState()
+		client.RPBoxFaceState()
+	if(party)
+		for(var/mob/mm in party.members)
+			if(mm.client) mm.client.RefreshPartyPortrait(src)
+	for(var/client/c)
+		if(c.tcard_last == src) c.BuildTargetComposite(src)
+
+mob/proc/PortraitPictureChanged()
+	portrait_states = null
+	portrait_lookup = null
+	var/d = PortraitCanon(PortraitDefault)
+	if(!istext(d)) PortraitDefault = ""
+	ChatPortraitReset()
+	PortraitSync(1)
+	client?.FacePagePush()
+	client?.ChatPanelFaces()
+	client?.RPBoxFaces()
+	client?.RPBoxFaceState()
+
+mob/proc/PortraitDefaultChanged()
+	if(!PortraitSync())
+		client?.FacePageState()
+		client?.RPBoxFaceState()
+
+mob/proc/PortraitSetDefault(name)
+	var/c = PortraitCanon(name)
+	if(!istext(c))
+		src << "No expression named '[html_encode(name)]'. Yours: [PortraitNameList()]."
+		return 0
+	PortraitDefault = c
+	PortraitDefaultChanged()
+	src << "Expression set to [length(c) ? c : "blank"]."
+	return 1
+
+mob/proc/PortraitPickIndex(i)
+	var/list/st = PortraitStates()
+	if(isnull(i) || i < 1 || i > st.len) return 0
+	PortraitDefault = st[i]
+	PortraitDefaultChanged()
+	return 1
+
+mob/proc/PortraitNameList()
+	var/list/out = list()
+	for(var/s in PortraitStates()) out += length(s) ? s : "blank"
+	return jointext(out, ", ")
+
+mob/proc/PortraitFaceList()
+	var/list/out = list()
+	var/list/st = PortraitStates()
+	for(var/i = 1, i <= st.len, i++)
+		var/s = st[i]
+		out += "[i]|[url_encode(length(s) ? s : "blank")]|[url_encode(PortraitTrigger(s))]"
+	return jointext(out, ";")
+
+mob/proc/PortraitTrigger(s)
+	if(!istext(s) || !length(s)) return ""
+	var/l = lowertext(s)
+	if(l == "ko") return "knocked out"
+	if(l == "hurt") return "below 25% HP"
+	for(var/f = 1, f <= 20, f++)
+		if(l == "form[f]") return PortraitFormName(f)
+		for(var/a = 1, a <= 10, a++)
+			if(l == "form[f]anger[a]") return "[PortraitFormName(f)] at [PortraitAngerName(a)]"
+	for(var/a = 1, a <= 10, a++)
+		if(l == "anger[a]") return PortraitAngerName(a)
+	return ""
+
+mob/proc/PortraitFormName(f)
+	if(race && race.transformations && f <= race.transformations.len)
+		var/transformation/T = race.transformations[f]
+		if(T)
+			var/path = "[T.type]"
+			var/i = findlasttext(path, "/")
+			var/tail = i ? copytext(path, i + 1) : path
+			return PortraitTitleCase(replacetext(tail, "_", " "))
+	return "form [f]"
+
+mob/proc/PortraitAngerName(a)
+	var/list/curve = GetAngerCurve()
+	if(a <= curve.len)
+		var/list/tier = curve[a]
+		if(islist(tier) && tier.len >= 1) return "[tier[1]]% HP"
+	return "anger tier [a]"
+
+proc/PortraitTitleCase(t)
+	var/list/out = list()
+	for(var/w in splittext(t, " "))
+		if(!length(w)) continue
+		out += uppertext(copytext(w, 1, 2)) + copytext(w, 2)
+	return jointext(out, " ")
+
+mob/proc/PortraitSummary()
+	var/list/st = PortraitStates()
+	if(st.len <= 1) return "No icon states were found, so there are no expressions. A .dmi with states named anger1, form1, form1anger1, ko or hurt switches on its own, and any other state name is a manual expression."
+	var/list/auto = list()
+	var/list/manual = list()
+	for(var/s in st)
+		if(!length(s)) continue
+		var/t = PortraitTrigger(s)
+		if(length(t)) auto += "[s] ([t])"
+		else manual += s
+	var/msg = "Expressions found: [st.len]."
+	if(auto.len) msg += " Automatic: [jointext(auto, ", ")]."
+	if(manual.len) msg += " Manual: [jointext(manual, ", ")]."
+	return msg
 
 mob/proc/GetCardPower()
 	if(!EnergyMax) return 0
@@ -18,7 +214,7 @@ mob/proc/GetCardPower()
 
 mob/proc/ChoosePortrait()
 	set waitfor = 0
-	var/chosen = input(usr, "Choose a portrait image. Intended size is [PORTRAIT_SIZE]x[PORTRAIT_SIZE]. Accepts .png, .bmp, .jpg or .dmi.", "Set Portrait") as null|file
+	var/chosen = input(usr, "Choose a portrait image. Intended size is [PORTRAIT_SIZE]x[PORTRAIT_SIZE]. Accepts .png, .bmp, .jpg or .dmi. A .dmi with icon states named anger1, form1, form1anger1, ko or hurt gives you automatic expressions, and any other state name is a manual one.", "Set Portrait") as null|file
 	if(!chosen) return
 	var/icon/I = icon(chosen)
 	if(!I)
@@ -26,8 +222,8 @@ mob/proc/ChoosePortrait()
 		return
 	I.Scale(PORTRAIT_SIZE, PORTRAIT_SIZE)
 	CharPortrait = I
-	client?.UpdateCharacterCard()
-	usr << "Portrait updated."
+	PortraitPictureChanged()
+	usr << "Portrait updated. [PortraitSummary()]"
 
 /atom/movable/shud/cardbg
 	mouse_opacity = 1
@@ -38,7 +234,7 @@ mob/proc/ChoosePortrait()
 		var/ix = text2num(pl["icon-x"])
 		var/iy = text2num(pl["icon-y"])
 		if(ix >= 21 && ix <= 60 && iy >= 29 && iy <= 68)
-			spawn() usr.ChoosePortrait()
+			spawn() usr.client?.FacePageToggle()
 
 /atom/movable/shud/cardtext
 	mouse_opacity = 0

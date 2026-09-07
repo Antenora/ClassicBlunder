@@ -1,7 +1,7 @@
 // Menu HUD. CollectMenuVerbs() removes Other/Utility verbs from the verbs list
 #define MHUD_LAYER (FLY_LAYER+3)
 #define MHUD_PRESS_STEP 1
-#define MHUD_PAGE1_ROWS 4        // page 1 reserves the bottom for the FPS row + Audio switch + CHAT toggles
+#define MHUD_PAGE1_ROWS 3        // page 1 reserves the bottom for the FPS row + Audio switch + CHAT toggles
 #define MHUD_FULL_ROWS 8         // later pages have no fixed footer, so they fill the panel
 #define MHUD_PAGE1_SIZE (MHUD_PAGE1_ROWS * 2)
 #define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
@@ -303,6 +303,7 @@ client/proc/ToggleOptPref(atom/movable/shud/menutoggle/sw)
 	togglePref(sw.pref)
 	if(sw.pref == "soundOn") ApplyAudioPref()
 	if(sw.pref == "zoom2x") ApplyZoomPref()
+	if(sw.pref == "chatFonts") ChatPanelFontsPush()
 	AnimateOptToggle(sw, getPref(sw.pref))
 
 // FPS value in the Options menu - click the gold number to type a new one
@@ -813,6 +814,19 @@ client/proc/BuildOptionsExtras()
 		menu_entry_objs += sw
 		screen += sw
 		ti++
+	var/atom/movable/shud/menutext/pfl = new
+	pfl.maptext_width = 110
+	pfl.maptext_height = 20
+	pfl.maptext = "<span style=\"[MHUD_FONT]; color:#ffffff\">Post fonts</span>"
+	pfl.screen_loc = "CENTER:[MHUD_COL1_X],CENTER:-2"
+	menu_entry_objs += pfl
+	screen += pfl
+	var/atom/movable/shud/menutoggle/pfs = new
+	pfs.pref = "chatFonts"
+	pfs.icon = getPref("chatFonts") ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
+	pfs.screen_loc = "CENTER:[MHUD_COL1_X + 88],CENTER:0"
+	menu_entry_objs += pfs
+	screen += pfs
 	// FPS row takes the verb slot freed by MHUD_PAGE1_ROWS 4: row 4 at -24, above Audio.
 	// -112 is pager territory (arrows at y -122..-90) - nothing else goes down there
 	var/atom/movable/shud/menutext/fl = new

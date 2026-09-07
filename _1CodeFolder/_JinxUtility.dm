@@ -344,6 +344,7 @@ mob
 					src.Health=Cut
 			if(src.Health > KeyHealth)
 				src.Health=KeyHealth
+			src.PortraitSync()
 		MaxEnergy()
 			var/HasFatigue=1
 			if(src.HasUnstoppable())
@@ -414,6 +415,7 @@ mob
 			src.DefianceCounter=0
 			src.Anger=0
 			src.AngerTier=0
+			src.PortraitSync()
 			src.AngerRush=0
 			src.AngerCalmHigh=0
 			race.onCalm(src)

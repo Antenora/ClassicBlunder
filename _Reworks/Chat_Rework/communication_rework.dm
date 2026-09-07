@@ -124,7 +124,7 @@ client/proc/sayProc(T, mode = null)
 			T="---"
 
 	var/list/transmitTo = hearers(radius,usr)
-	var/header = "<font color=[usr.Text_Color]>[usr.name]"
+	var/header = "[ChatPortraitTag(usr)]<font color=[usr.Text_Color]>[usr.name]"
 	var/message = "[html_encode(T)]"
 	var/broadcastMessage = "[usr.name]: [message]"
 
@@ -133,6 +133,7 @@ client/proc/sayProc(T, mode = null)
 
 	for(var/mob/hearer as anything in transmitTo) //hearers always returns a list of mobs; free performance.
 		if(!hearer.client) continue
+		hearer.client.EnsurePortrait(usr)
 		if(!hearer.Admin && sayNoun != "LOOCs:" && hearer.Mapper && hearer.invisibility) continue
 		if(sayNoun == "LOOCs:")
 			hearer?.client.outputToChat("[header][hearer.Controlz(usr)] [sayNoun] [message]", LOOC_OUTPUT)
@@ -145,6 +146,7 @@ client/proc/sayProc(T, mode = null)
 
 		if(hearer.BeingObserved.len>0)
 			for(var/mob/m as anything in hearer.BeingObserved)
+				m?.client?.EnsurePortrait(usr)
 				m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] [sayNoun] [message]", IC_OUTPUT)
 
 		for(var/obj/Items/Tech/Planted_Wiretap/WT in hearer)
@@ -170,7 +172,7 @@ client/verb/Whisper(T as text)
 	set hidden = 1
 
 	var/list/transmitTo = hearers(SAY_RADIUS, usr)
-	var/header = "<font color=[usr.Text_Color]>[usr.name]"
+	var/header = "[ChatPortraitTag(usr)]<font color=[usr.Text_Color]>[usr.name]"
 	var/message = html_encode(T)
 	message = "<i>[message]</i>"
 	if(usr.SenseRobbed>=3)
@@ -181,6 +183,7 @@ client/verb/Whisper(T as text)
 		if(!E.Admin && E.Mapper && E.invisibility) continue
 		if(E.Secret == "Heavenly Restriction" && E.secretDatum?:hasRestriction("Senses"))
 			continue
+		E.client.EnsurePortrait(usr)
 		if(E.EnhancedHearing)
 			E?.client.outputToChat("[header][E.Controlz(usr)] whispers: [message]", IC_OUTPUT)
 			Log(E.ChatLog(),"[header]([usr.key]) WHISPERS: [message]")
@@ -189,6 +192,7 @@ client/verb/Whisper(T as text)
 			if(E.BeingObserved.len>0)
 				for(var/mob/m as anything in E.BeingObserved)
 					if(m in transmitTo) continue
+					m?.client?.EnsurePortrait(usr)
 					m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] whispers: [message]", IC_OUTPUT)
 		else
 			if(get_dist(usr, E) <= WHISPER_RADIUS)
@@ -217,8 +221,9 @@ client/verb/Think(T as text)
 	set category="Roleplay"
 	set hidden = 1
 
-	var/header = "<i><font color=[usr.Text_Color]>[usr.name]</i>"
+	var/header = "[ChatPortraitTag(usr)]<i><font color=[usr.Text_Color]>[usr.name]</i>"
 	var/message = html_encode(T)
+	EnsurePortrait(usr)
 	outputToChat("[header][usr.Controlz(usr)] thinks: [message]", IC_OUTPUT)
 
 	Log(usr.ChatLog(),"<font color=green>[usr.name]([usr.key]) THOUGHT: [message]")
@@ -227,11 +232,13 @@ client/verb/Think(T as text)
 	if(usr.BeingObserved.len>0)
 		for(var/mob/m in usr.BeingObserved)
 			if(m.HearThoughts&&m.HasTelepathy())
+				m?.client?.EnsurePortrait(usr)
 				m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] thinks: [message]", IC_OUTPUT)
 
 	for(var/mob/m as anything in ohearers(20,usr))
 		if(!m.client) continue
 		if(m.HearThoughts&&m.HasTelepathy())
+			m.client.EnsurePortrait(usr)
 			if(usr.Timestamp)
 				m?.client.outputToChat("<font color=red>[time2text(world.timeofday,"(hh:mm:ss)")][header][m.Controlz(usr)] thinks: [message]", IC_OUTPUT)
 
