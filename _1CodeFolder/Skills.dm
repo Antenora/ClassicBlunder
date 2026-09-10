@@ -165,6 +165,14 @@ obj/Skills
 	var/DoubleStrike
 
 	var/MasteryCheck=0
+	var/MasteryGain=0
+	var/MasteryRank1=0
+	var/MasteryRank2=0
+	var/MasteryRank3=0
+	var/MasteryRank1Name
+	var/MasteryRank2Name
+	var/MasteryRank3Name
+
 	 //only projectiles have this function rn
 	var/FollowUp = null //holds a text path of a skill that will be triggered...
 	var/FollowUpDelay = 0  //after waiting this amt of time

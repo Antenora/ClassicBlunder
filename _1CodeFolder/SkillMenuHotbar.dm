@@ -576,6 +576,20 @@ document.onkeydown=function(e){
 	if(ManaCost) L += "Mana Cost: [ManaCost]"
 	if(CapacityCost) L += "Capacity Cost: [CapacityCost]"
 	if(Instinct) L += "Instinct: [Instinct]"
+	if(("MasteryGain" in vars) && vars["MasteryGain"] > 0)
+		L += "Current Mastery: [Mastery]"
+		for(var/rank = 1, rank <= 3, rank++)
+			var/rank_var = "MasteryRank[rank]"
+			var/name_var = "MasteryRank[rank]Name"
+			if(!(rank_var in vars) || !(name_var in vars))
+				continue
+			var/required_mastery = vars[rank_var]
+			var/rank_name = vars[name_var]
+			if(required_mastery > 0 && rank_name)
+				if(Mastery >= required_mastery)
+					L += "<span style=\"color:#ffd86b\">[rank_name]: Unlocked</span>"
+				else
+					L += "[rank_name]: [Mastery]/[required_mastery] Mastery"
 	if(("FocusShifter" in vars) && vars["FocusShifter"] && FocusStatIdentity())
 		var/selected_type = ("FocusShiftType" in vars) ? vars["FocusShiftType"] : "None"
 		var/boost = ("FocusShiftBoost" in vars) ? vars["FocusShiftBoost"] : 1.5

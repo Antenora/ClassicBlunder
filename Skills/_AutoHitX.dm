@@ -172,6 +172,7 @@ obj
 				var/FocusShiftBoost = 1.5
 				var/FocusShiftTimer = 10
 
+
 				ForceRevert = 0 //Chrono Devolution-like effect, just only for transes
 
 				SpecialAttack=0//ignores all of the above
@@ -2778,6 +2779,8 @@ obj
 					HitSparkTurns=0
 					HitSparkSize=1
 					HitSparkDispersion=8
+					var/FirstLevelAchieved
+					var/SecondLevelAchieved
 					TurfStrike=1
 					ManaCost=3
 					Cooldown=1
@@ -2785,8 +2788,25 @@ obj
 					NoGCD=1
 					ChargePeriod=2
 					MaxChargeLevel=2
+					MasteryGain=1
+					MasteryRank1=5200
+					MasteryRank2=13000
+					MasteryRank1Name="Blizzara"
+					MasteryRank2Name="Blizzaga"
 					ActiveMessage="invokes: <font size=+1>BLIZZARD!</font size>"
-
+					adjust(mob/p)
+						if(FightingSeriously(usr, usr.Target))
+							MasteryGain=26
+						else
+							MasteryGain=1
+						if(Mastery >= MasteryRank1 && !FirstLevelAchieved)
+							p << "You've unlocked Blizzara! Charging Blizzard fully will enhance Blizzard into Fira."
+							FirstLevelAchieved=1
+							MaxChargeLevel=1
+						if(Mastery >= MasteryRank2 && !SecondLevelAchieved)
+							p << "You've unlocked Firaga! Charging Blizzara fully will enhance Blizzara into Blizzaga."
+							SecondLevelAchieved=1
+							MaxChargeLevel=2
 					OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit, var/level)
 						//reset anything altered by another tier or an Innovation from the previous cast.
 						Rounds=initial(Rounds)
@@ -2853,6 +2873,7 @@ obj
 						disableInnovation(usr)
 					verb/Blizzard()
 						set category="Skills"
+						adjust(usr)
 						usr.BeginHeldSkill(src)
 				Blizzara
 					ElementalClass="Water"
@@ -2984,13 +3005,32 @@ obj
 					SpecialAttack=1
 					CanBeDodged=1
 					CanBeBlocked=0
-					Cooldown=1
+					Cooldown=4
+					MasteryGain=1
 					HeldSkill=1
 					NoGCD=1
 					ChargePeriod=2
 					MaxChargeLevel=2
 					ActiveMessage="invokes: <font size=+1>THUNDER!</font size>"
-
+					var/FirstLevelAchieved
+					var/SecondLevelAchieved
+					MasteryRank1=5200
+					MasteryRank2=13000
+					MasteryRank1Name="Thundara"
+					MasteryRank2Name="Thundaga"
+					adjust(mob/p)
+						if(FightingSeriously(usr, usr.Target))
+							MasteryGain=26
+						else
+							MasteryGain=1
+						if(Mastery >= MasteryRank1 && !FirstLevelAchieved)
+							p << "You've unlocked Thundara! Charging Fire fully will enhance Fire into Thundara."
+							FirstLevelAchieved=1
+							MaxChargeLevel=1
+						if(Mastery >= MasteryRank2 && !SecondLevelAchieved)
+							p << "You've unlocked Thundaga! Charging Thundara fully will enhance Thundara into Thundaga."
+							SecondLevelAchieved=1
+							MaxChargeLevel=2
 					OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit, var/level)
 						//reset properties that Innovation may have changed during the previous use
 						Rush=initial(Rush)
@@ -3000,7 +3040,6 @@ obj
 						Size=1
 						WindUp=initial(WindUp)
 						NoAttackLock=initial(NoAttackLock)
-
 						switch(level)
 							if(0)
 								ManaCost=3
@@ -3010,7 +3049,7 @@ obj
 								Size=1
 								Paralyzing=2
 								NoGCD=1
-								Cooldown=1
+								Cooldown=4
 
 							if(1)
 								ManaCost=6
@@ -3020,7 +3059,7 @@ obj
 								Size=1.5
 								Paralyzing=3
 								NoGCD=0
-								Cooldown=4
+								Cooldown=12
 
 							if(2)
 								ManaCost=10
@@ -3030,7 +3069,7 @@ obj
 								Size=2
 								Paralyzing=4
 								NoGCD=0
-								Cooldown=8
+								Cooldown=20
 						var/innovated = FALSE
 						if(!altered && !isInnovationDisable(p))
 							if(p.isInnovative(KEYBLADE_MAGIC, "Any") || p.KeybladeType=="Staff")
@@ -6149,6 +6188,8 @@ obj
 			buffAffectedBoon = 0
 			CorruptionDebuff = 0
 
+			MasteryGain = 0
+
 			PullIn
 
 			GoldScatter
@@ -6185,6 +6226,7 @@ obj
 			toDeath = life
 			src.Owner=owner
 			src.FromSkill = Z
+			src.MasteryGain = Z.MasteryGain
 			parentRounds = Z.Rounds
 
 			if(owner.Grab && !Z.GrabMaster)
@@ -6988,6 +7030,14 @@ obj
 						src.Owner.passive_handler.Decrease("IceAge", src.IceAge)
 					if(src.Disarm && m)
 						src.Owner.DisarmTarget(m)
+				//MasteryGain
+				if(damageDealt > 0 && src.Owner && src.FromSkill)
+					if(src.FromSkill in src.Owner.contents)
+						var/gain = src.MasteryGain
+						if(istype(m, /mob/Player/AI))
+							gain = initial(src.FromSkill.MasteryGain)
+						if(gain > 0)
+							src.FromSkill.Mastery += gain
 				DEBUGMSG("FINAL TOTAL DAMAGE DEALT! [damageDealt]")
 				if(!damageDealt)
 					damageDealt = 0

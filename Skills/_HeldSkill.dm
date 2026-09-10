@@ -25,6 +25,9 @@
 	var/ChargeWaveInterval = 0    // Interval between each charge wave
 
 	var/MaxChargeLevel		 = 0	  //Max levels of Charge
+	var/ExtraChargePeriod1	 = 0	  //extra charge period for corresponding charge levels
+	var/ExtraChargePeriod2	 = 0
+
 
 	var/HeldVerbName     = null   // Optional override for macro detection;
 	                              // defaults to Z.name if null
@@ -51,6 +54,15 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	// Called by ChargeLoop, tick based on FireRate, smaller = faster
 
 // This avoids stat changes to skills persisting across use (mostly for projectiles)
+
+/obj/Skills/proc/GetChargePeriodForLevel(var/charge_level)
+	var/period = ChargePeriod
+	switch(charge_level)
+		if(1)
+			period += ExtraChargePeriod1
+		if(2)
+			period += ExtraChargePeriod2
+	return max(period, 0.1)
 
 /obj/Skills/Projectile/proc/ResetHeldConfig()
 	if(!HeldSkill) return
@@ -536,6 +548,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 			fill.icon_state = "Progress2"
 		if(CurrentChargeLevel == 2)
 			fill.icon_state = "Progress3"
+		if(CurrentChargeLevel == 3)
+			fill.icon_state = "Progress4"
 		fill.alpha = i <= filled_segments ? 255 : 0
 
 /mob/proc/HideHeldChargeBar()
@@ -629,9 +643,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 					ReleaseHeldSkill()
 					return
 		else
-
 			var/hold_ticks = world.time - held_charge_start
-			var/charge_ticks = max(Z.ChargePeriod * 10, 1)
+			var/charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
 
 			if(Z.MaxChargeLevel > 0 && CurrentChargeLevel < Z.MaxChargeLevel)
 				if(hold_ticks >= charge_ticks)
@@ -640,12 +653,14 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 					held_charge_start += charge_ticks
 					hold_ticks = world.time - held_charge_start
 
+					charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1) // if the charge period is longer for this level
+
 					UpdateHeldChargeBar(0)
 
 			// Overheld, fizzle normally, or auto-release if the skill opts out
-			if(world.time - held_charge_start > Z.ChargePeriod * 10)
+			if(hold_ticks > charge_ticks)
 				if(Z.OverchargeMaxSteps > 0)
-					if(world.time - held_charge_start - Z.ChargePeriod * 10 >= (Z.overcharge_steps + 1) * Z.OverchargeStepTicks)
+					if(hold_ticks - charge_ticks >= (Z.overcharge_steps + 1) * Z.OverchargeStepTicks)
 						if(Z.overcharge_steps < Z.OverchargeMaxSteps && src.ManaAmount >= src.SpellManaNeed(Z) + Z.OverchargeManaPerStep)
 							Z.overcharge_steps++
 							Z.held_accrued += Z.OverchargeManaPerStep
@@ -660,7 +675,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 					FizzleHeldSkill(Z)
 					return
 
-			var/progress = clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1)
+			var/progress = clamp(hold_ticks / charge_ticks, 0, 1)
 			UpdateHeldChargeBar(progress)
 
 		// closing the visual gap after BeginHeldSkill's initial pulse.
@@ -668,7 +683,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 		if(Z.HeldBeam)
 			ringp = min(HeldBeamBenefit(Z), Z.HeldBeamUncapped ? 2.5 : 1)
 		else if(!Z.InfiniteHold)
-			ringp = clamp((world.time - held_charge_start) / max(Z.ChargePeriod * 10, 1), 0, 1)
+			var/current_charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
+			ringp = clamp((world.time - held_charge_start) / current_charge_ticks, 0, 1)
 		//ChargeWaveInterval is measured in deciseconds; 0 disables repeating waves.
 		if(Z.ChargeWaveInterval > 0 && world.time-last_charge_wave >= Z.ChargeWaveInterval)
 			if(Z.ChargeWaveInvert)
@@ -710,17 +726,18 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 		return
 
 	var/hold_ticks = world.time - held_charge_start
-	UpdateHeldChargeBar(clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1))
+	var/charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
+	UpdateHeldChargeBar(clamp(hold_ticks / charge_ticks, 0, 1))
 
 	// Overheld
-	if(hold_ticks > Z.ChargePeriod * 10)
+	if(hold_ticks > charge_ticks)
 		if(Z.NoFizzle)
-			hold_ticks = Z.ChargePeriod * 10
+			hold_ticks = charge_ticks
 		else
 			FizzleHeldSkill(Z)
 			return
 
-	var/benefit = clamp(hold_ticks / (Z.ChargePeriod * 10), 0.0, 1.0)
+	var/benefit = clamp(hold_ticks / charge_ticks, 0.0, 1.0)
 	var/sweet_spot_hit = FALSE
 
 	// Sweet spot window is SweetSpot to SweetSpot + SweetSpotWindow seconds.
