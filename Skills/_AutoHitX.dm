@@ -3045,7 +3045,6 @@ obj
 							Size*=0.5
 							WindUp=0.25
 							Rounds=max(1, round(magicLevel/5)+asc)
-
 							//innovation converts the spell's damage into a rapid sequence of smaller lightning strikes
 							var/innovation_power=clamp(magicLevel/3+(asc*2), 4, 12)
 							var/tier_power=(level*2)+(benefit*(level+1))
