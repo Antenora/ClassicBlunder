@@ -3782,7 +3782,7 @@ obj
 
 			Magic
 				MagicNeeded=1
-				Fire
+				Fire	// NEW VERSION: DON'T GIVE FIRA/FIRAGA, THEY ARE INCLUDED IN THIS ONE VIA CHARGE LEVELS
 					ElementalClass="Fire"
 					SpellElement="Fire"
 					SkillCost=TIER_2_COST
@@ -3792,15 +3792,52 @@ obj
 					Homing=1
 					Scorching=1
 					Explode=1
-					MultiShot=4
 					Deflectable=1
+					HeldSkill=1
 					ManaCost=1
-					Cooldown=45
+					Cooldown=0.5
+					NoGCD=1
+					ChargePeriod=2
+					MaxChargeLevel=2
 					IconLock='Fireball.dmi'
 					ActiveMessage="invokes: <font size=+1>FIRE!</font size>"
+					OnHeldRelease(mob/p, var/benefit,var/sweet_spot_hit, var/level)
+						switch(level)
+							if(0)
+								ManaCost=1
+								DamageMult=1+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>FIRE!</font size>"
+								IconSize=1
+								Explode=1
+								NoGCD=1
+								Scorching=1
+								Cooldown=0.5
+							if(1)
+								ManaCost=5
+								DamageMult=4+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>FIRA!</font size>"
+								Blasts=2
+								Explode=1.5
+								IconSize=2
+								NoGCD=0
+								Scorching=2
+								Cooldown=4
+							if(2)
+								ManaCost=10
+								ActiveMessage="invokes: <font size=+1>FIRAGA!</font size>"
+								DamageMult=6+(3*benefit)
+								Blasts=3
+								Explode=3
+								IconSize=3
+								NoGCD=0
+								Scorching=3
+								Cooldown=8
+
+						p.UseProjectile(src)
 					verb/Fire()
 						set category = "Skills"
-						usr.UseProjectile(src)
+						usr.BeginHeldSkill(src)
+
 
 				Fira
 					ElementalClass="Fire"

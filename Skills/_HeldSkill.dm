@@ -24,6 +24,8 @@
 	var/ChargeWaveSize	 = 1      // Size mult for charge wave size
 	var/ChargeWaveInterval = 0    // Interval between each charge wave
 
+	var/MaxChargeLevel		 = 0	  //Max levels of Charge
+
 	var/HeldVerbName     = null   // Optional override for macro detection;
 	                              // defaults to Z.name if null
 	var/InfiniteHold     = FALSE  // If TRUE, hold continues indefinitely
@@ -36,7 +38,7 @@ globalTracker/var/BEAM_OVERCHARGE_DRAIN = 2
 globalTracker/var/HELD_BEAM_MOVE_PENALTY = 2
 globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 
-/obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE)
+/obj/Skills/proc/OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit = FALSE, var/charge_level = 0)
 	// Override in individual skills to execute the charged attack.
 
 /obj/Skills/proc/OnHeldFizzle(mob/p)
@@ -87,6 +89,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	var/tmp/held_skill_last_release       = 0
 	var/tmp/held_skill_from_macro         = 0
 	var/tmp/held_skill_pending_key        = null
+	var/tmp/CurrentChargeLevel			  = 0
 
 
 /proc/_normalizeHeldName(s)
@@ -259,6 +262,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 
 	held_skill        = Z
 	held_charge_start = world.time
+	CurrentChargeLevel = 0
 	Z.ChargeBenefit   = 0
 	Z.sustain_pour_bank = 0
 
@@ -528,6 +532,10 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	for(var/image/fill in held_charge_bar_fill_refs)
 		i++
 		if(!fill) continue
+		if(CurrentChargeLevel == 1)
+			fill.icon_state = "Progress2"
+		if(CurrentChargeLevel == 2)
+			fill.icon_state = "Progress3"
 		fill.alpha = i <= filled_segments ? 255 : 0
 
 /mob/proc/HideHeldChargeBar()
@@ -559,6 +567,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 
 /mob/proc/ForceClearHeldChargeState()
 	held_skill = null
+	CurrentChargeLevel = 0
 	held_charge_start = 0
 	held_skill_macro_key = null
 	dir_locked = 0
@@ -620,6 +629,19 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 					ReleaseHeldSkill()
 					return
 		else
+
+			var/hold_ticks = world.time - held_charge_start
+			var/charge_ticks = max(Z.ChargePeriod * 10, 1)
+
+			if(Z.MaxChargeLevel > 0 && CurrentChargeLevel < Z.MaxChargeLevel)
+				if(hold_ticks >= charge_ticks)
+					CurrentChargeLevel++
+
+					held_charge_start += charge_ticks
+					hold_ticks = world.time - held_charge_start
+
+					UpdateHeldChargeBar(0)
+
 			// Overheld, fizzle normally, or auto-release if the skill opts out
 			if(world.time - held_charge_start > Z.ChargePeriod * 10)
 				if(Z.OverchargeMaxSteps > 0)
@@ -638,7 +660,6 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 					FizzleHeldSkill(Z)
 					return
 
-			var/hold_ticks = world.time - held_charge_start
 			var/progress = clamp(hold_ticks / (Z.ChargePeriod * 10), 0, 1)
 			UpdateHeldChargeBar(progress)
 
@@ -669,6 +690,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	var/obj/Skills/Z = held_skill
 	if(!Z) return
 
+	var/release_charge_level = CurrentChargeLevel
+
 	if(Z.HeldBeam)
 		var/raw = HeldBeamBenefit(Z)
 		if(!Z.HeldBeamUncapped)
@@ -676,7 +699,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 		Z.ChargeBenefit = raw
 		ClearHeldChargeState()
 		held_skill_last_release = world.time
-		Z.OnHeldRelease(src, raw, FALSE)
+		Z.OnHeldRelease(src, raw, FALSE, release_charge_level)
 		return
 
 	if(Z.InfiniteHold)
@@ -718,7 +741,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 			if(m && m.client && m.Admin && m.client.SweetSpotHeldSkillDebug)
 				m << "<font color='#66ff99'>(SweetSpot Debug) [src] hit [Z.name]'s sweet spot at [round(hold_ticks / 10, 0.1)]s.</font>"
 
-	Z.OnHeldRelease(src, benefit, sweet_spot_hit)
+	Z.OnHeldRelease(src, benefit, sweet_spot_hit, release_charge_level)
 
 // FizzleHeldSkill for skill being overheld, interrupted, or cancelled
 
@@ -750,6 +773,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	held_skill        = null
 	held_charge_start = 0
 	held_skill_macro_key = null
+	CurrentChargeLevel = 0
 	if(held_charge_overlay_ref)
 		overlays -= held_charge_overlay_ref
 		held_charge_overlay_ref = null
