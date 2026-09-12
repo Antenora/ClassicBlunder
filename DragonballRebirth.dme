@@ -661,6 +661,7 @@
 #include "Feva\StunMechanics.dm"
 #include "Feva\TargetSwitching.dm"
 #include "Items\Jukebox.dm"
+#include "Maps (New)\BleachWipe2026.dmm"
 #include "QuickSort\QuickSort.dm"
 #include "Races\ascensions.dm"
 #include "Races\races.dm"
