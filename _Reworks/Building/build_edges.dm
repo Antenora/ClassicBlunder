@@ -922,9 +922,12 @@ var/global/list/foamPaintMap
 		fresh += FI
 	BuildEdgeApply(T, fresh)
 
+/proc/BuildYieldIfBusy()
+	if(world.tick_usage >= BUILD_YIELD_TICK_USAGE)
+		sleep(world.tick_lag)
+
 /proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1)
 	var/list/seen = list()
-	var/n = 0
 	for(var/turf/T in turfs)
 		for(var/dx = -1 to 1)
 			for(var/dy = -1 to 1)
@@ -933,9 +936,7 @@ var/global/list/foamPaintMap
 					continue
 				seen[T2] = 1
 				BuildEdgeUpdate(T2, doBlend)
-				n++
-				if(n % BUILD_COMMIT_CHUNK == 0)
-					sleep(-1)
+				BuildYieldIfBusy()
 
 /proc/BuildEdgeBootPass()
 	set waitfor = FALSE

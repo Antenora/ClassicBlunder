@@ -773,6 +773,7 @@ proc/GfxClearContactShadow(atom/movable/A)
 proc/GfxAOInvalidateNear(turf/T)
 	if(!T) return
 	Hd2dInvalidateColumn(T) //wall-shadow stack heights go stale on the same edits
+	GfxWaterIndexInvalidate(T)
 	for(var/turf/N in range(1, T))
 		N._gfx_ao_mask = -1
 		_gfx_ao_dirty |= N

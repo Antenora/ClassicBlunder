@@ -26,6 +26,17 @@ var/global/elevWallCtxL = 0
 	elevGeomVer++
 	elevPitVer++
 
+/proc/ElevCoverInvalidate(list/turfs)
+	if(!turfs)
+		return
+	for(var/turf/T in turfs)
+		for(var/dx = -2 to 2)
+			for(var/dy = -(ELEV_MAX + ELEV_DMAX) to ELEV_MAX)
+				var/turf/B = locate(T.x + dx, T.y + dy, T.z)
+				if(B)
+					B.elev_covv = 0
+	elevPitVer++
+
 /proc/ElevFoamTrio(prefix, key, turf/WT, lay, list/fresh)
 	if(!glob || !glob.SHORE_FOAM || !WT || BuildFoamOffAt(WT))
 		return
@@ -311,8 +322,8 @@ var/global/elevWallCtxL = 0
 	var/list/st = list(G)
 	var/esc = 0
 	while(st.len && !esc)
-		var/turf/C = st[st.len]
-		st.len--
+		var/turf/C = st[1]
+		st.Cut(1, 2)
 		for(var/dd in CARDINAL_DIRECTIONS)
 			var/turf/Q = get_step(C, dd)
 			if(!Q)
@@ -474,8 +485,22 @@ var/global/elevWallCtxL = 0
 		return 1
 	return 0
 
+/proc/ElevLipsSkippable(turf/G, gh)
+	for(var/dx = -1 to 1)
+		for(var/dy = -1 to 1)
+			if(!dx && !dy)
+				continue
+			var/turf/N = locate(G.x + dx, G.y + dy, G.z)
+			if(!N)
+				return 0
+			if(ElevAt(N) != gh || ElevCoverOf(N))
+				return 0
+	return 1
+
 /proc/ElevAddLips(turf/G, gh, list/fresh)
 	var/gcov = ElevCoverOf(G) ? 1 : 0
+	if(!gcov && ElevLipsSkippable(G, gh))
+		return
 	elevWallCtxL = gcov ? ElevWallCtxFor(G) : 0
 	var/eside = elevWallCtxL ? ElevEdgeSide(G) : 0
 	for(var/L = max(1, gh), L <= ELEV_MAX, L++)

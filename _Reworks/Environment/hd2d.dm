@@ -177,6 +177,11 @@ proc/_Hd2dBuildIcons()
 turf/var/tmp/_hd2d_wall = 0
 turf/var/tmp/_hd2d_wall_ver = 0
 var/_hd2d_cache_ver = 1
+#define HD2D_CHUNK 16
+#define HD2D_CHUNK_SCANS_PER_SWEEP 4
+var/list/_hd2d_wall_chunks = list()
+var/list/_hd2d_chunk_scanned = list()
+var/_hd2d_wall_serial = 1
 
 /obj/hd2d_wallshadow
 	plane = SHADOW_PLANE //flattened with mob shadows so overlaps never stack
@@ -235,6 +240,32 @@ proc/Hd2dInvalidateColumn(turf/T)
 	for(var/j = 1, j <= 4, j++)
 		var/turf/N = T.y + j <= world.maxy ? locate(T.x, T.y + j, T.z) : null
 		if(N) N._hd2d_wall_ver = 0
+	Hd2dChunkInvalidate(T)
+
+proc/Hd2dChunkInvalidate(turf/T)
+	if(!T) return
+	var/cx = floor((T.x - 1) / HD2D_CHUNK)
+	for(var/oy in list(T.y - 4, T.y, T.y + 4))
+		if(oy < 1 || oy > world.maxy) continue
+		_hd2d_chunk_scanned -= "[T.z]:[cx]:[floor((oy - 1) / HD2D_CHUNK)]"
+	_hd2d_wall_serial++
+
+proc/Hd2dChunkScan(z, cx, cy)
+	var/ckey = "[z]:[cx]:[cy]"
+	var/list/walls = list()
+	var/x0 = cx * HD2D_CHUNK + 1
+	var/y0 = cy * HD2D_CHUNK + 1
+	var/x1 = min(world.maxx, x0 + HD2D_CHUNK - 1)
+	var/y1 = min(world.maxy, y0 + HD2D_CHUNK - 1)
+	for(var/ty = y0, ty <= y1, ty++)
+		for(var/tx = x0, tx <= x1, tx++)
+			var/turf/T = locate(tx, ty, z)
+			if(T && Hd2dWallRows(T) >= 1) walls += T
+	var/list/old = _hd2d_wall_chunks[ckey]
+	if(old && (old.len != walls.len || (old - walls).len)) _hd2d_wall_serial++
+	_hd2d_wall_chunks[ckey] = walls
+	_hd2d_chunk_scanned[ckey] = _hd2d_cache_ver
+	return walls
 
 //an edge cuts the shadow if it fully occludes or carries the drop_edge tag
 proc/Hd2dCutsShadow(turf/T)
@@ -289,6 +320,7 @@ proc/Hd2dShadowAim(obj/hd2d_wallshadow/O, list/sp, anim_time = 0)
 		O.color = sp[5]
 
 proc/Hd2dShadowsClear()
+	_hd2d_wall_serial++
 	for(var/turf/T in _hd2d_shadow_by_turf)
 		var/obj/hd2d_wallshadow/O = _hd2d_shadow_by_turf[T]
 		if(O)
@@ -305,59 +337,104 @@ proc/Hd2dShadowsClear()
 proc/_Hd2dShadowSweep()
 	_hd2d_epoch++
 	var/list/sp = SunShadowParams()
+	var/min_rows = max(1, glob.WALLSHADOW_MIN_ROWS)
 	for(var/mob/Players/P in players)
-		if(!P.client) continue
-		var/atom/anchor = GfxViewAnchor(P.client)
+		var/client/C = P.client
+		if(!C) continue
+		var/atom/anchor = GfxViewAnchor(C)
 		var/turf/center = anchor ? get_turf(anchor) : null
 		if(!center) continue
-		var/list/dims = GfxCameraViewTiles(P.client)
-		var/hw = round(max(dims[1], P.client.gfx_screen_cover_w) / 2) + 3
-		var/hh = round(max(dims[2], P.client.gfx_screen_cover_h) / 2) + 5 //walls above the view cast into it
-		for(var/ty = max(1, center.y - hh), ty <= min(world.maxy, center.y + hh), ty++)
-			for(var/tx = max(1, center.x - hw), tx <= min(world.maxx, center.x + hw), tx++)
-				var/turf/T = locate(tx, ty, center.z)
-				if(!T) continue
-				var/rows = Hd2dWallRows(T)
-				if(rows < max(1, glob.WALLSHADOW_MIN_ROWS)) continue
-				var/area/A = T.loc
-				if(!A || !A.sees_sky) continue //no sun indoors
-				var/turf/S = ty > 1 ? locate(tx, ty - 1, center.z) : null
-				if(!S) continue
-				var/cs = BuildCliffCurveSides(T)
-				if(cs && ElevFaceInfo(T))
-					cs = 0
-				var/obj/hd2d_wallshadow/O = _hd2d_shadow_by_turf[S]
-				if(!O)
-					if(_hd2d_shadow_pool.len)
-						O = _hd2d_shadow_pool[_hd2d_shadow_pool.len]
-						_hd2d_shadow_pool.len--
-					else
-						O = new
-					if(!_hd2d_wallshadow_icon) _Hd2dBuildIcons()
-					O.icon = _hd2d_wallshadow_icon
-					O.rows = rows
-					O.loc = S
-					_hd2d_shadow_by_turf[S] = O
-					Hd2dShadowAim(O, sp)
-				else if(O.rows != rows)
-					O.rows = rows
-					Hd2dShadowAim(O, sp)
-				O.mark = _hd2d_epoch
-				if(cs)
-					var/obj/hd2d_cliffnotch/NO = _hd2d_notch_by_turf[T]
-					if(!NO)
-						if(_hd2d_notch_pool.len)
-							NO = _hd2d_notch_pool[_hd2d_notch_pool.len]
-							_hd2d_notch_pool.len--
+		var/list/dims = GfxCameraViewTiles(C)
+		var/hw = round(max(dims[1], C.gfx_screen_cover_w) / 2) + 3
+		var/hh = round(max(dims[2], C.gfx_screen_cover_h) / 2) + 5 //walls above the view cast into it
+		var/x0 = max(1, center.x - hw)
+		var/x1 = min(world.maxx, center.x + hw)
+		var/y0 = max(1, center.y - hh)
+		var/y1 = min(world.maxy, center.y + hh)
+		var/cx0 = floor((x0 - 1) / HD2D_CHUNK)
+		var/cx1 = floor((x1 - 1) / HD2D_CHUNK)
+		var/cy0 = floor((y0 - 1) / HD2D_CHUNK)
+		var/cy1 = floor((y1 - 1) / HD2D_CHUNK)
+		var/cw = cx1 - cx0 + 1
+		var/cn = cw * (cy1 - cy0 + 1)
+		var/rr = C.hd2d_sweep_rr++ % cn
+		var/rcx = cx0 + rr % cw
+		var/rcy = cy0 + floor(rr / cw)
+		if(_hd2d_chunk_scanned["[center.z]:[rcx]:[rcy]"] == _hd2d_cache_ver)
+			Hd2dChunkScan(center.z, rcx, rcy)
+		var/skey = "[center.x],[center.y],[center.z],[hw],[hh],[min_rows],[_hd2d_cache_ver],[_hd2d_sun_key]"
+		if(C.hd2d_sweep_key == skey && C.hd2d_sweep_serial == _hd2d_wall_serial && C.hd2d_sweep_marks)
+			for(var/obj/M in C.hd2d_sweep_marks)
+				M:mark = _hd2d_epoch
+			continue
+		var/list/marks = list()
+		var/complete = 1
+		var/scans = 0
+		for(var/cy = cy0, cy <= cy1, cy++)
+			for(var/cx = cx0, cx <= cx1, cx++)
+				var/ckey = "[center.z]:[cx]:[cy]"
+				var/list/walls
+				if(_hd2d_chunk_scanned[ckey] == _hd2d_cache_ver)
+					walls = _hd2d_wall_chunks[ckey]
+				else
+					if(scans >= HD2D_CHUNK_SCANS_PER_SWEEP)
+						complete = 0
+						continue
+					scans++
+					walls = Hd2dChunkScan(center.z, cx, cy)
+				if(!walls || !walls.len) continue
+				for(var/turf/T in walls)
+					if(T.x < x0 || T.x > x1 || T.y < y0 || T.y > y1) continue
+					var/rows = Hd2dWallRows(T)
+					if(rows < min_rows) continue
+					var/area/A = T.loc
+					if(!A || !A.sees_sky) continue //no sun indoors
+					var/turf/S = T.y > 1 ? locate(T.x, T.y - 1, center.z) : null
+					if(!S) continue
+					var/cs = BuildCliffCurveSides(T)
+					if(cs && ElevFaceInfo(T))
+						cs = 0
+					var/obj/hd2d_wallshadow/O = _hd2d_shadow_by_turf[S]
+					if(!O)
+						if(_hd2d_shadow_pool.len)
+							O = _hd2d_shadow_pool[_hd2d_shadow_pool.len]
+							_hd2d_shadow_pool.len--
 						else
-							NO = new
-						NO.loc = T
-						_hd2d_notch_by_turf[T] = NO
-					if(NO.csides != cs)
-						Hd2dNotchApply(NO, cs)
-					NO.alpha = round(sp[3] * glob.WALLSHADOW_ALPHA)
-					NO.color = sp[5]
-					NO.mark = _hd2d_epoch
+							O = new
+						if(!_hd2d_wallshadow_icon) _Hd2dBuildIcons()
+						O.icon = _hd2d_wallshadow_icon
+						O.rows = rows
+						O.loc = S
+						_hd2d_shadow_by_turf[S] = O
+						Hd2dShadowAim(O, sp)
+					else if(O.rows != rows)
+						O.rows = rows
+						Hd2dShadowAim(O, sp)
+					O.mark = _hd2d_epoch
+					marks += O
+					if(cs)
+						var/obj/hd2d_cliffnotch/NO = _hd2d_notch_by_turf[T]
+						if(!NO)
+							if(_hd2d_notch_pool.len)
+								NO = _hd2d_notch_pool[_hd2d_notch_pool.len]
+								_hd2d_notch_pool.len--
+							else
+								NO = new
+							NO.loc = T
+							_hd2d_notch_by_turf[T] = NO
+						if(NO.csides != cs)
+							Hd2dNotchApply(NO, cs)
+						NO.alpha = round(sp[3] * glob.WALLSHADOW_ALPHA)
+						NO.color = sp[5]
+						NO.mark = _hd2d_epoch
+						marks += NO
+		if(complete)
+			C.hd2d_sweep_key = skey
+			C.hd2d_sweep_serial = _hd2d_wall_serial
+			C.hd2d_sweep_marks = marks
+		else
+			C.hd2d_sweep_key = null
+			C.hd2d_sweep_marks = null
 	var/list/drop = list()
 	for(var/turf/DT in _hd2d_shadow_by_turf)
 		var/obj/hd2d_wallshadow/DO = _hd2d_shadow_by_turf[DT]
@@ -440,6 +517,10 @@ client
 		obj/hd2d_farblur_relay/hd2d_fb_heavy
 		obj/screen/hd2d_vignette/hd2d_vignette
 		obj/screen/hd2d_ambient/hd2d_ambient
+		hd2d_sweep_key
+		hd2d_sweep_serial = 0
+		hd2d_sweep_rr = 0
+		list/hd2d_sweep_marks
 		hd2d_ambient_key
 		hd2d_lightclass //sky/cave/bright - a change means indoor/outdoor crossing: CpmApply cut
 		hd2d_env_key

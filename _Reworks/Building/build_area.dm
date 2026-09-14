@@ -1,5 +1,6 @@
 #define BUILD_CAT_ZONES "ZONES"
 #define BUILD_COMMIT_CHUNK 400
+#define BUILD_YIELD_TICK_USAGE 50
 #define AREA_PAINT_FILE "Saves/AreaPaint.txt"
 
 var/global/list/areaPaintMap

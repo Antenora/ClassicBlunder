@@ -66,7 +66,7 @@ var/global/elevSavePending = 0
 		elevMap -= k
 	T.elev = h
 	T.elev_ver = elevVer
-	ElevGeomChanged()
+	ElevCoverInvalidate(list(T))
 	ElevMapSaveSoon()
 
 /proc/ElevRaisable(turf/T)
@@ -149,17 +149,14 @@ turf/Enter(atom/movable/O, atom/oldloc)
 /proc/ElevVisualRefresh(list/turfs)
 	if(!turfs || !turfs.len)
 		return
-	ElevGeomChanged()
+	ElevCoverInvalidate(turfs)
 	var/list/blk = ElevTouchedBlock(turfs)
-	var/n = 0
 	for(var/turf/T in blk)
 		Hd2dInvalidateColumn(T)
 		ElevVisualUpdate(T)
 		for(var/mob/M in T)
 			M.UpdateStandingLayer()
-		n++
-		if(n % BUILD_COMMIT_CHUNK == 0)
-			sleep(-1)
+		BuildYieldIfBusy()
 
 /proc/ElevExportSidecar(x1, y1, x2, y2, z, fname)
 	ElevMapLoad()

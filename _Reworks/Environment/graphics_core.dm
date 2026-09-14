@@ -375,6 +375,49 @@ proc/GfxClearWaterMask(client/C)
 	C.gfx_water_mask_images = null
 	C.gfx_water_mask_key = null
 
+#define GFX_WATER_CHUNK 16
+#define GFX_WATER_CHUNK_TTL 300
+var/list/_gfx_water_runs = list()
+var/list/_gfx_water_runs_at = list()
+
+proc/GfxWaterIndexInvalidate(turf/T)
+	if(!T) return
+	_gfx_water_runs -= "[T.z]:[floor((T.x - 1) / GFX_WATER_CHUNK)]:[floor((T.y - 1) / GFX_WATER_CHUNK)]"
+
+proc/GfxWaterIndexClear()
+	_gfx_water_runs = list()
+	_gfx_water_runs_at = list()
+
+proc/GfxWaterChunkRuns(z, cx, cy)
+	var/ckey = "[z]:[cx]:[cy]"
+	var/list/runs = _gfx_water_runs[ckey]
+	if(runs && world.time - _gfx_water_runs_at[ckey] < GFX_WATER_CHUNK_TTL) return runs
+	runs = list()
+	var/x0 = cx * GFX_WATER_CHUNK + 1
+	var/y0 = cy * GFX_WATER_CHUNK + 1
+	var/x1 = min(world.maxx, x0 + GFX_WATER_CHUNK - 1)
+	var/y1 = min(world.maxy, y0 + GFX_WATER_CHUNK - 1)
+	for(var/ty = y0, ty <= y1, ty++)
+		var/tx = x0
+		while(tx <= x1)
+			var/turf/T = locate(tx, ty, z)
+			if(!T || !GfxIsWaterSurface(T) || T.Lava || T.gfx_reflectivity == 0)
+				tx++
+				continue
+			var/turf/run_start = T
+			var/run_len = 1
+			tx++
+			while(tx <= x1)
+				var/turf/N = locate(tx, ty, z)
+				if(!N || !GfxIsWaterSurface(N) || N.Lava || N.gfx_reflectivity == 0) break
+				run_len++
+				tx++
+			runs += list(list(run_start, run_len))
+	_gfx_water_runs[ckey] = runs
+	_gfx_water_runs_at[ckey] = world.time
+	return runs
+
+
 //white runs over water near the view, rebuilt on 4-tile movement buckets
 proc/GfxUpdateWaterMask(client/C)
 	if(!C) return
@@ -398,34 +441,34 @@ proc/GfxUpdateWaterMask(client/C)
 	var/mask_center_y = bucket_y * 4 + 2
 	var/half_w = round(view_w / 2) + 8
 	var/half_h = round(view_h / 2) + 8
+	var/x0 = max(1, mask_center_x - half_w)
+	var/x1 = min(world.maxx, mask_center_x + half_w)
+	var/y0 = max(1, mask_center_y - half_h)
+	var/y1 = min(world.maxy, mask_center_y + half_h)
 	var/list/fresh = list()
-	for(var/ty = max(1, mask_center_y - half_h), ty <= min(world.maxy, mask_center_y + half_h), ty++)
-		var/tx = max(1, mask_center_x - half_w)
-		var/stop_x = min(world.maxx, mask_center_x + half_w)
-		while(tx <= stop_x)
-			var/turf/T = locate(tx, ty, center.z)
-			if(!T || !GfxIsWaterSurface(T) || T.Lava || T.gfx_reflectivity == 0)
-				tx++
-				continue
-			var/turf/run_start = T
-			var/run_len = 1
-			tx++
-			while(tx <= stop_x)
-				var/turf/N = locate(tx, ty, center.z)
-				if(!N || !GfxIsWaterSurface(N) || N.Lava || N.gfx_reflectivity == 0) break
-				run_len++
-				tx++
-			var/image/I = image(EnvWhiteIcon(), run_start)
-			I.plane = WATER_MASK_PLANE
-			I.layer = 1
-			I.appearance_flags = RESET_ALPHA | RESET_COLOR | PIXEL_SCALE
-			if(run_len > 1)
-				var/matrix/M = matrix()
-				M.Scale(run_len, 1)
-				I.transform = M
-				//transforms expand around the icon center; shift east so the west edge holds
-				I.pixel_x = round((run_len - 1) * world.icon_size / 2)
-			fresh += I
+	for(var/cy = floor((y0 - 1) / GFX_WATER_CHUNK), cy <= floor((y1 - 1) / GFX_WATER_CHUNK), cy++)
+		for(var/cx = floor((x0 - 1) / GFX_WATER_CHUNK), cx <= floor((x1 - 1) / GFX_WATER_CHUNK), cx++)
+			for(var/list/run in GfxWaterChunkRuns(center.z, cx, cy))
+				var/turf/rs = run[1]
+				if(rs.y < y0 || rs.y > y1) continue
+				var/sx = rs.x
+				var/ex = sx + run[2] - 1
+				var/cs = max(sx, x0)
+				var/ce = min(ex, x1)
+				if(cs > ce) continue
+				var/turf/run_start = (cs == sx) ? rs : locate(cs, rs.y, center.z)
+				var/run_len = ce - cs + 1
+				var/image/I = image(EnvWhiteIcon(), run_start)
+				I.plane = WATER_MASK_PLANE
+				I.layer = 1
+				I.appearance_flags = RESET_ALPHA | RESET_COLOR | PIXEL_SCALE
+				if(run_len > 1)
+					var/matrix/M = matrix()
+					M.Scale(run_len, 1)
+					I.transform = M
+					//transforms expand around the icon center; shift east so the west edge holds
+					I.pixel_x = round((run_len - 1) * world.icon_size / 2)
+				fresh += I
 	if(C.gfx_water_mask_images)
 		for(var/image/I in C.gfx_water_mask_images)
 			C.images -= I
@@ -586,6 +629,25 @@ proc/GfxReleaseImage(image/I)
 	if(!I) return
 	for(var/client/C)
 		C.images -= I
+
+var/_gfx_icon_warm_boot = _GfxIconWarmBoot()
+
+proc/_GfxIconWarmBoot()
+	spawn(100)
+		GfxWarmProceduralIcons()
+	return 1
+
+proc/GfxWarmProceduralIcons()
+	_Hd2dBuildIcons()
+	_GfxDepthBuildIcons()
+	var/list/icons = list(EnvWhiteIcon(), _hd2d_wallshadow_icon, _hd2d_shaft_icon, _hd2d_ember_icon, _hd2d_vignette_icon, _hd2d_leaf_icon, _hd2d_bubble_icon, _gfx_contact_icon, _gfx_reflection_fade_icon, _gfx_light_reflection_icon)
+	for(var/k in _gfx_ao_icons) icons += _gfx_ao_icons[k]
+	for(var/k in _gfx_direction_masks) icons += _gfx_direction_masks[k]
+	for(var/icon/GI in _hd2d_glint_icons) icons += GI
+	var/obj/warm = new
+	for(var/icon/I in icons)
+		warm.icon = I
+	warm.icon = null
 
 
 //crash-forensics heartbeat log
