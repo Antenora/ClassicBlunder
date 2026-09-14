@@ -203,6 +203,8 @@ obj/Skills
 	var/CustomOff //totally custom
 	var/CustomCharge //totally custom
 
+	var/UICustomDescription //Unique desc blurb in the skill's description, for extra mechanics etc etc
+
 	var/HeavyHitter
 	var/HeavyOnly
 	var/copiedBy

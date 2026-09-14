@@ -576,6 +576,7 @@ document.onkeydown=function(e){
 	if(ManaCost) L += "Mana Cost: [ManaCost]"
 	if(CapacityCost) L += "Capacity Cost: [CapacityCost]"
 	if(Instinct) L += "Instinct: [Instinct]"
+	if(UICustomDescription) L += "[UICustomDescription]"
 	if(("MasteryGain" in vars) && vars["MasteryGain"] > 0)
 		L += "Current Mastery: [Mastery]"
 		for(var/rank = 1, rank <= 3, rank++)
