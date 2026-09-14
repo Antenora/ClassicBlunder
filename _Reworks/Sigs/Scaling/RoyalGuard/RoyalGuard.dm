@@ -7,6 +7,7 @@
 		KenWave=1
 		MenuIcon="RoyalGuard"
 		Mastery=1
+		UICustomDescription="Activate to put up a special guard that nullifies all damage for one second.<br>Damage cancelled this way adds to your Royal Meter, and consumed with Royal Release.<br>Cooldown on failure to parry is 45 seconds, 5 on a success.<br>Mastery increases the maximum of the gauge, from 100% to 200%."
 		KenWaveBlend=2
 		ActiveMessage="puts up their guard!!!"
 		OffMessage="drops their guard."
@@ -34,6 +35,7 @@
 		HitSparkX=-14
 		HitSparkY=-12
 		HitSparkSize=2
+		UICustomDescription="Expend all of your Royal Meter to deal damage.<br>Successfully parrying with Royal Guard, and then immediately using Royal Release before your Guard drops, procs a Perfect Release, which increase your damage by x1.5."
 		Knockback=2
 		HitSparkIcon='Black_Flash_Hitspark_1.dmi'
 		HitSparkTurns=1

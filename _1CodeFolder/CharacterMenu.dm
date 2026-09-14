@@ -49,7 +49,8 @@
 	"Customize: Forms" = "Per-transformation looks",
 	"Customize: Ki Charge" = "Charge-up effect",
 	"Customize: Skills" = "Skill icons, messages & looks",
-	"Customize: PU Charging" = "Custom power-up line"
+	"Customize: PU Charging" = "Custom power-up line",
+	"Customize: Buff Portraits" = "Set portrait tags for your buffs"
 )
 /var/list/CUST_SPRITE_CFG = list(
 	"Customize: Hair" = list("spr" = "Hair_Base", "col" = "Hair_Color", "ox" = "HairX", "oy" = "HairY", "apply" = "hair"),
@@ -1558,6 +1559,7 @@ client/proc/ShowGearDetail(obj/Items/it)
 
 client/proc/BuildCustomContent()
 	cmenu_cust_list = (mob && mob.hud_customize_verbs) ? mob.hud_customize_verbs.Copy() : list()
+	cmenu_cust_list |= /mob/verb/Customize_Buff_Portraits
 	if(cmenu_cust_list.len)
 		var/list/resets = list()
 		for(var/vp in cmenu_cust_list.Copy())
@@ -2312,3 +2314,29 @@ mob/proc/RenameSelf()
 			glob.IDs[UniqueID] = "[name]"
 		client.UpdateCharacterMenu()
 		src << "You are now known as <b>[name]</b>."
+
+
+mob/verb/Customize_Buff_Portraits()
+	set name = "Customize: Buff Portraits"
+	set category = "Other"
+	set hidden = 1
+	var/list/buffs = list()
+	for(var/obj/Skills/Buffs/B in src)
+		buffs += B
+	if(!buffs.len)
+		src << "You have no buffs to customize."
+		return
+	var/obj/Skills/Buffs/B = input(src, "Choose a buff to set its portrait tag.", "Buff Portraits") as null|anything in buffs
+	if(!B || !(B in src)) return
+	var/tag = input(src, "Enter the portrait prefix for this buff.\nExample: Kaioken matches Kaioken, KaiokenForm1 and KaiokenForm1Anger1.\nLeave blank to remove the tag.", "Portrait Tag", B.PortraitTag) as text|null
+	if(isnull(tag) || !B || !(B in src)) return
+	B.PortraitTag = length(tag) ? tag : null
+	PortraitSync(1)
+	client?.FacePagePush()
+	client?.ChatPanelFaces()
+	client?.RPBoxFaces()
+	client?.RPBoxFaceState()
+	if(B.PortraitTag)
+		src << "Portrait tag for [B] set to '[html_encode(B.PortraitTag)]'."
+	else
+		src << "Portrait tag for [B] removed."
