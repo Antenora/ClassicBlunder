@@ -101,6 +101,11 @@ var/list/nonDestroyable_turfs = list("/turf/Special/Blank",
 								"/turf/Special/Stars",
 								"/tuf/Special/EventStars")
 
+proc/ReleaseProp(obj/O)
+	if(!O) return
+	global.worldObjectList -= O
+	GfxReleaseAtom(O)
+
 proc/VoidDestroy(turf/A)
 	if(isturf(A))
 		if(A.type!=/turf/Dirt1&&A.Destructable)
@@ -108,7 +113,7 @@ proc/VoidDestroy(turf/A)
 			LightingRecomputeNear(nt)
 	else if(isobj(A))
 		var/turf/nt = new/turf/Special/Static(locate(A.x,A.y,A.z))
-		del(A)
+		ReleaseProp(A)
 		LightingRecomputeNear(nt)
 	else if(ismob(A))
 		del(A)
@@ -135,7 +140,7 @@ proc/Destroy(turf/A,var/DestroyDamageMulti)
 				Dust(s.loc)
 			else
 				Dust(A.loc)
-				del(A)
+				ReleaseProp(A)
 	else if(ismob(A))
 		del(A)
 

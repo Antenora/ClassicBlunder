@@ -30,7 +30,6 @@ mob/proc/UpdateBossStaggerBar()
                 boss_stagger_back = B
             else
                 vis_contents -= B
-                del(B)
 
         if(!boss_stagger_back)
             boss_stagger_back = new /obj/BossStaggerBack
@@ -42,7 +41,6 @@ mob/proc/UpdateBossStaggerBar()
                 boss_stagger_fill = F
             else
                 vis_contents -= F
-                del(F)
 
         if(!boss_stagger_fill)
             boss_stagger_fill = new /obj/BossStaggerFill
@@ -62,12 +60,10 @@ mob/proc/UpdateBossStaggerBar()
 mob/proc/HideBossStaggerBar()
     if(boss_stagger_back)
         vis_contents -= boss_stagger_back
-        del boss_stagger_back
         boss_stagger_back = null
 
     if(boss_stagger_fill)
         vis_contents -= boss_stagger_fill
-        del boss_stagger_fill
         boss_stagger_fill = null
 
 /strikeHook/bossStagger

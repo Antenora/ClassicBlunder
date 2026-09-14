@@ -295,6 +295,10 @@ client/var/datum/build_session/bsession
 		warpX = 0
 		warpY = 0
 		warpZ = 0
+		cliffStage = 0
+		cliffX1 = 0
+		cliffY1 = 0
+		cliffStyleSel = ""
 		autoEdge = 1
 		blendEdges = 1
 		varied = 0
@@ -320,6 +324,7 @@ client/var/datum/build_session/bsession
 		scrollRow = 0
 		list/filteredEntries = list()
 		busy = 0
+		strokeLower = 0
 
 	New(client/_C)
 		C = _C
@@ -426,6 +431,7 @@ client/var/datum/build_session/bsession
 			importStage = 0
 			smoothStage = 0
 			warpStage = 0
+			cliffStage = 0
 			cpActive = 0
 			cpStates = null
 			strokeSet = null

@@ -78,8 +78,9 @@
     animate(ground, pixel_y=-550, time = 20, easing = SINE_EASING|EASE_IN)
 
     sleep(30) // supposed to pan upwards and out
-    del bleh //Overlook scene
-    del ground
+    if(client) client.screen -= bleh
+    GfxReleaseAtom(bleh) //Overlook scene
+    GfxReleaseAtom(ground)
 
     var/obj/animationobj/overlook = new(i = 'HellSSJ4AnimationRock.dmi', s_loc = "LEFT,BOTTOM", addto = blankHolder.vis_contents, l = MOB_LAYER+0.9)
     overlook.icon_state = "Overlook"
@@ -91,7 +92,7 @@
     animate(lightness, alpha = 255, time = 8)
     sleep(10)
 
-    del overlook
+    GfxReleaseAtom(overlook)
     animate(lightness, alpha = 0, time = 3)
 
     var/obj/animationobj/lightness2 = new(i = 'lightcutin.dmi', s_loc = "LEFT,BOTTOM", addto = blankHolder.vis_contents, l = MOB_LAYER+0.85)
@@ -117,14 +118,14 @@
     animate(i2, pixel_y=-200,time = 60, easing = SINE_EASING|EASE_OUT)
     animate(i3, pixel_y=-200,time = 50, easing = SINE_EASING|EASE_OUT)
     sleep(20)
-    del i2
+    GfxReleaseAtom(i2)
     i3.icon_state = "RockGrab"
     sleep(10)
     animate(bleh2, transform = matrix().Scale(20).Translate(50, -150), time = 50, easing = SINE_EASING|EASE_OUT)
     sleep(20)
     animate(lightness, alpha = 255, time = 10)
     sleep(10)
-    del i3
+    GfxReleaseAtom(i3)
     bleh2.transform = matrix().Scale(20).Translate(-20, 250)
     animate(bleh2, transform = matrix().Scale(20).Translate(-20, 0), time = 20, easing = SINE_EASING|EASE_OUT)
     animate(lightness, alpha = 0, time = 2)
@@ -132,12 +133,15 @@
     animate(bleh2, transform = matrix().Scale(4).Translate(-20, 0), time = 2)
     sleep(20)
     client?.EndCutsceneDisplay()
-    del blankHolder
-    del dorkness
-    del lightness
-    del bleh
-    del bleh2
-    del background
-    del lightness2
+    if(client)
+        client.screen -= blankHolder
+        client.screen -= bleh2
+    GfxReleaseAtom(blankHolder)
+    GfxReleaseAtom(dorkness)
+    GfxReleaseAtom(lightness)
+    GfxReleaseAtom(bleh)
+    GfxReleaseAtom(bleh2)
+    GfxReleaseAtom(background)
+    GfxReleaseAtom(lightness2)
     client.eye = src
     src.CutsceneMode()

@@ -4932,7 +4932,7 @@ NEW VARIABLES
 						spawn(5)
 							usr.overlays-=GG
 							GO.filters=null
-							del GO
+							GfxReleaseImage(GO)
 							usr.appearance_flags-=16
 				adjust(usr)
 				src.Trigger(usr)
@@ -11382,7 +11382,7 @@ mob
 								spawn()
 									animate(si, alpha=0, time=3)
 									sleep(3)
-									del si
+									GfxReleaseImage(si)
 							s.AlignEquip(src)
 						//	s.suffix="*Equipped (Second)*"
 						else
@@ -11519,7 +11519,7 @@ mob
 								spawn()
 									animate(si, alpha=0, time=3)
 									sleep(3)
-									del si
+									GfxReleaseImage(si)
 							s.AlignEquip(src)
 						//	s.suffix="*Equipped (Third)*"
 
@@ -12536,7 +12536,7 @@ mob
 					src.pixel_x=B.TransformX
 					src.pixel_y=B.TransformY
 					src.alpha=255
-					del T
+					GfxReleaseImage(T)
 				sleep(3)
 
 			if(B.DropOverlays)
@@ -12604,7 +12604,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.AlignEquip(src)
 
 			if(B.MakesStaff)
@@ -12647,7 +12647,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.AlignEquip(src)
 
 			if(B.MakesSword==1 || B.MakesSword==3)
@@ -12716,7 +12716,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.AlignEquip(src)
 
 			if(B.MakesSecondSword==1)
@@ -12767,7 +12767,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.AlignEquip(src)
 				s.suffix="*Equipped (Second)*"
 
@@ -12815,7 +12815,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.AlignEquip(src)
 				s.suffix="*Equipped (Third)*"
 
@@ -13027,7 +13027,7 @@ mob
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
-						del si
+						GfxReleaseImage(si)
 				s.Conjured=1
 				s.Stealable=0
 				s.AlignEquip(src)
@@ -13434,7 +13434,7 @@ mob
 					animate(src, alpha=0)
 					animate(src, alpha=255, time=3)
 				spawn(3)
-					del T
+					GfxReleaseImage(T)
 				sleep(3)
 
 			if(B.FlashChange)

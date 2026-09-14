@@ -271,13 +271,24 @@
 			n++
 			if(n % BUILD_COMMIT_CHUNK == 0)
 				sleep(-1)
+	var/elevN = 0
 	if(placedCells)
+		elevN = ElevImportSidecar(fname, ox, oy, oz, cols, rowsN)
 		BuildEdgeSmoothAround(TurfSquare(ox, oy, ox + cols - 1, oy + rowsN - 1, oz, 0), 1)
+		ElevVisualRefresh(TurfSquare(ox, oy, ox + cols - 1, oy + rowsN - 1, oz, 0))
 		BuildCustomRefreshSessions()
 	if(M && placedCells)
 		spawn BuildSaveWorldData()
+	var/cliffN = BuildCliffImportSidecar(fname, ox, oy, oz)
+	var/foamN = BuildFoamImportSidecar(fname, ox, oy, oz)
 	var/list/rep = list()
 	rep += "Imported [fname]: [placedCells] cells, [placedObjs] objects at ([ox],[oy]) z[oz] ([cols]x[rowsN])."
+	if(elevN)
+		rep += "Restored [elevN] raised tiles."
+	if(cliffN)
+		rep += "Restored [cliffN] painted cliff-bottom styles."
+	if(foamN)
+		rep += "Restored [foamN] foam-off water tiles."
 	if(ctx.multiZ)
 		rep += "WARNING: file contains multiple z-level blocks; only the FIRST was imported."
 	for(var/pt in ctx.unknownPaths)

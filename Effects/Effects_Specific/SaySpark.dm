@@ -7,7 +7,7 @@ obj/SaySpark
 		spawn(25)
 			animate(src,alpha=0,time=10)
 			spawn(10)
-				del src
+				GfxReleaseAtom(src)
 	proc
 		Sparky()
 			spawn(1)
@@ -31,7 +31,7 @@ obj/InstinctSpark
 		spawn(25)
 			animate(src,alpha=0,time=10)
 			spawn(10)
-				del src
+				GfxReleaseAtom(src)
 	proc
 		Sparky()
 			spawn(1)

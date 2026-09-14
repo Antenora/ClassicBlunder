@@ -1809,6 +1809,14 @@ window "mapwindow"
 		anchor2 = -1,-1
 		is-visible = false
 		saved-params = ""
+	elem "logoverlay"
+		type = BROWSER
+		pos = 8,60
+		size = 496x420
+		anchor1 = -1,-1
+		anchor2 = -1,-1
+		is-visible = false
+		saved-params = ""
 	elem "BarDoomed"
 		type = LABEL
 		pos = 172,436

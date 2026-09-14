@@ -179,8 +179,8 @@ proc/ShowStopper(mob/attacker, mob/defender, effectMult)
 	var/old = animate_movement
 	animate_movement = 0
 	sleep(jump_time)
-	del(I)
-	del(shadow)
+	GfxReleaseImage(I)
+	GfxReleaseImage(shadow)
 	transform = null
 	pixel_x = 0
 	pixel_y = 0
@@ -220,9 +220,9 @@ proc/ShowStopper(mob/attacker, mob/defender, effectMult)
 	var/old = animate_movement
 	animate_movement = 0
 	sleep(jump_time)
-	del(shadow)
+	GfxReleaseImage(shadow)
 	animate(I, transform = null, time = 1, easing = QUAD_EASING|EASE_IN)
-	del(I)
+	GfxReleaseImage(I)
 
 	transform = null
 	pixel_x = 0

@@ -52,7 +52,7 @@ ai_play_action
 					var/image/i = image(a.ai_owner.is_arcane_beast.dash_effect, loc=a.loc)
 					viewers(a) << i
 					animate(i, alpha=0, time=30)
-					spawn(30) del i
+					spawn(30) GfxReleaseImage(i)
 					a.density=0
 					step_to(a, a.target_position)
 					a.next_move = world.time + 1

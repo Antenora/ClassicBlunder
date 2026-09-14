@@ -293,6 +293,7 @@ var/global/list/buildEdgeMaskLits
 	return BuildEdgeMaskFile("f_[styleId]_[combo]")
 
 var/global/list/buildCliffStyles
+var/global/list/buildCliffStyleNames
 
 /proc/BuildCliffInit()
 	if(buildCliffStyles)
@@ -302,6 +303,55 @@ var/global/list/buildCliffStyles
 	buildCliffStyles["default_end_l"] = 'Mapping/Cliffs/cliff_default_end_l.png'
 	buildCliffStyles["default_end_r"] = 'Mapping/Cliffs/cliff_default_end_r.png'
 	buildCliffStyles["default_end_lr"] = 'Mapping/Cliffs/cliff_default_end_lr.png'
+	buildCliffStyles["wall7"] = 'Mapping/Cliffs/cliff_wall7.png'
+	buildCliffStyles["wall7_end_l"] = 'Mapping/Cliffs/cliff_wall7_end_l.png'
+	buildCliffStyles["wall7_end_r"] = 'Mapping/Cliffs/cliff_wall7_end_r.png'
+	buildCliffStyles["wall7_end_lr"] = 'Mapping/Cliffs/cliff_wall7_end_lr.png'
+	buildCliffStyles["wall12"] = 'Mapping/Cliffs/cliff_wall12.png'
+	buildCliffStyles["wall12_end_l"] = 'Mapping/Cliffs/cliff_wall12_end_l.png'
+	buildCliffStyles["wall12_end_r"] = 'Mapping/Cliffs/cliff_wall12_end_r.png'
+	buildCliffStyles["wall12_end_lr"] = 'Mapping/Cliffs/cliff_wall12_end_lr.png'
+	buildCliffStyles["wall13"] = 'Mapping/Cliffs/cliff_wall13.png'
+	buildCliffStyles["wall13_end_l"] = 'Mapping/Cliffs/cliff_wall13_end_l.png'
+	buildCliffStyles["wall13_end_r"] = 'Mapping/Cliffs/cliff_wall13_end_r.png'
+	buildCliffStyles["wall13_end_lr"] = 'Mapping/Cliffs/cliff_wall13_end_lr.png'
+	buildCliffStyles["wall14"] = 'Mapping/Cliffs/cliff_wall14.png'
+	buildCliffStyles["wall14_end_l"] = 'Mapping/Cliffs/cliff_wall14_end_l.png'
+	buildCliffStyles["wall14_end_r"] = 'Mapping/Cliffs/cliff_wall14_end_r.png'
+	buildCliffStyles["wall14_end_lr"] = 'Mapping/Cliffs/cliff_wall14_end_lr.png'
+	buildCliffStyles["wall15"] = 'Mapping/Cliffs/cliff_wall15.png'
+	buildCliffStyles["wall15_end_l"] = 'Mapping/Cliffs/cliff_wall15_end_l.png'
+	buildCliffStyles["wall15_end_r"] = 'Mapping/Cliffs/cliff_wall15_end_r.png'
+	buildCliffStyles["wall15_end_lr"] = 'Mapping/Cliffs/cliff_wall15_end_lr.png'
+	buildCliffStyles["wall16"] = 'Mapping/Cliffs/cliff_wall16.png'
+	buildCliffStyles["wall16_end_l"] = 'Mapping/Cliffs/cliff_wall16_end_l.png'
+	buildCliffStyles["wall16_end_r"] = 'Mapping/Cliffs/cliff_wall16_end_r.png'
+	buildCliffStyles["wall16_end_lr"] = 'Mapping/Cliffs/cliff_wall16_end_lr.png'
+	buildCliffStyles["wall29"] = 'Mapping/Cliffs/cliff_wall29.png'
+	buildCliffStyles["wall29_end_l"] = 'Mapping/Cliffs/cliff_wall29_end_l.png'
+	buildCliffStyles["wall29_end_r"] = 'Mapping/Cliffs/cliff_wall29_end_r.png'
+	buildCliffStyles["wall29_end_lr"] = 'Mapping/Cliffs/cliff_wall29_end_lr.png'
+	buildCliffStyles["wall36"] = 'Mapping/Cliffs/cliff_wall36.png'
+	buildCliffStyles["wall36_end_l"] = 'Mapping/Cliffs/cliff_wall36_end_l.png'
+	buildCliffStyles["wall36_end_r"] = 'Mapping/Cliffs/cliff_wall36_end_r.png'
+	buildCliffStyles["wall36_end_lr"] = 'Mapping/Cliffs/cliff_wall36_end_lr.png'
+	buildCliffStyles["wall37"] = 'Mapping/Cliffs/cliff_wall37.png'
+	buildCliffStyles["wall37_end_l"] = 'Mapping/Cliffs/cliff_wall37_end_l.png'
+	buildCliffStyles["wall37_end_r"] = 'Mapping/Cliffs/cliff_wall37_end_r.png'
+	buildCliffStyles["wall37_end_lr"] = 'Mapping/Cliffs/cliff_wall37_end_lr.png'
+	buildCliffStyles["wall38"] = 'Mapping/Cliffs/cliff_wall38.png'
+	buildCliffStyles["wall38_end_l"] = 'Mapping/Cliffs/cliff_wall38_end_l.png'
+	buildCliffStyles["wall38_end_r"] = 'Mapping/Cliffs/cliff_wall38_end_r.png'
+	buildCliffStyles["wall38_end_lr"] = 'Mapping/Cliffs/cliff_wall38_end_lr.png'
+	buildCliffStyles["wall56"] = 'Mapping/Cliffs/cliff_wall56.png'
+	buildCliffStyles["wall56_end_l"] = 'Mapping/Cliffs/cliff_wall56_end_l.png'
+	buildCliffStyles["wall56_end_r"] = 'Mapping/Cliffs/cliff_wall56_end_r.png'
+	buildCliffStyles["wall56_end_lr"] = 'Mapping/Cliffs/cliff_wall56_end_lr.png'
+	buildCliffStyles["wall99"] = 'Mapping/Cliffs/cliff_wall99.png'
+	buildCliffStyles["wall99_end_l"] = 'Mapping/Cliffs/cliff_wall99_end_l.png'
+	buildCliffStyles["wall99_end_r"] = 'Mapping/Cliffs/cliff_wall99_end_r.png'
+	buildCliffStyles["wall99_end_lr"] = 'Mapping/Cliffs/cliff_wall99_end_lr.png'
+	buildCliffStyleNames = list("Default (water Wall29, raised terrain Wall38)" = "default", "None - water gets no rock strip" = "none", "Wall 7" = "wall7", "Wall 12" = "wall12", "Wall 13" = "wall13", "Wall 14" = "wall14", "Wall 15" = "wall15", "Wall 16" = "wall16", "Wall 29" = "wall29", "Wall 36" = "wall36", "Wall 37" = "wall37", "Wall 38" = "wall38", "Wall 56" = "wall56", "Wall 99" = "wall99")
 
 /proc/BuildCliffStrip(styleId, variant)
 	BuildCliffInit()
@@ -344,11 +394,302 @@ var/global/list/buildCliffStyles
 			return 'Mapping/EdgeMasks/blend_w_2.png'
 	return 'Mapping/EdgeMasks/blend_w_3.png'
 
+/proc/BuildMatSameH(turf/O, th)
+	return (O && ElevAt(O) == th) ? BuildMaterialFor(O) : null
+
+/proc/BuildIsEdgeObj(obj/O)
+	if(!O || !istype(O, /obj/Turfs))
+		return 0
+	if(O.icon == 'Edges.dmi' || O.icon == 'grayrockedges.dmi' || O.icon == 'Icons/Objects/EdgesDir.dmi')
+		return 1
+	return 0
+
+/proc/BuildEdgeObjOn(turf/T)
+	if(!T)
+		return null
+	for(var/obj/Turfs/O in T)
+		if(BuildIsEdgeObj(O))
+			return O
+	return null
+
+/proc/BuildEdgeObjSideways(turf/T)
+	var/obj/O = BuildEdgeObjOn(T)
+	if(!O)
+		return 0
+	return (O.dir == EAST || O.dir == WEST) ? 1 : 0
+
+/proc/BuildMatFor(turf/T, turf/O, th)
+	if(BuildEdgeObjOn(O))
+		return null
+	return BuildMatSameH(O, th)
+
+var/global/list/buildLipCrawlStates
+
+/proc/BuildLipCrawl(turf/T, obj/EO, list/fresh)
+	if(!T || !EO || !(EO.dir == EAST || EO.dir == WEST))
+		return
+	var/m = BuildMaterialFor(T)
+	if(!m || m == "Water")
+		return
+	if(!buildLipCrawlStates)
+		buildLipCrawlStates = ElevStateSet('Mapping/Elevation/elev_lipcrawl.dmi')
+	var/st = "lc_[BuildEdgeStyleFor(m)]_[(EO.dir == WEST) ? "L" : "R"]_[ElevLipWidth(EO)]"
+	if(!buildLipCrawlStates[st])
+		return
+	var/eh = ElevAt(T)
+	var/image/I = image(ElevTexIcon(T, eh), null, ElevTexState(T, eh))
+	I.layer = EO.layer + 0.01
+	I.filters = filter(type = "alpha", icon = ElevMaskIcon('Mapping/Elevation/elev_lipcrawl.dmi', st))
+	fresh += I
+
 /proc/BuildEdgePiece(turf/src_turf, mask)
-	var/image/I = image(src_turf.icon, null, src_turf.icon_state)
+	var/eh = ElevAt(src_turf)
+	var/image/I = image(ElevTexIcon(src_turf, eh), null, ElevTexState(src_turf, eh))
 	I.layer = 2.9
 	I.filters = filter(type = "alpha", icon = mask)
 	return I
+
+
+var/global/list/buildCliffTurfTypes
+var/global/list/cliffPaintMap
+
+/proc/BuildCliffTypesInit()
+	if(buildCliffTurfTypes)
+		return
+	buildCliffTurfTypes = list()
+	buildCliffTurfTypes[/turf/Wall7] = 1
+	buildCliffTurfTypes[/turf/Wall12] = 1
+	buildCliffTurfTypes[/turf/Wall13] = 1
+	buildCliffTurfTypes[/turf/Wall14] = 1
+	buildCliffTurfTypes[/turf/Wall15] = 1
+	buildCliffTurfTypes[/turf/Wall16] = 1
+	buildCliffTurfTypes[/turf/Wall29] = 1
+	buildCliffTurfTypes[/turf/Wall36] = 1
+	buildCliffTurfTypes[/turf/Wall37] = 1
+	buildCliffTurfTypes[/turf/Wall38] = 1
+	buildCliffTurfTypes[/turf/Wall56] = 1
+	buildCliffTurfTypes[/turf/Wall99] = 1
+
+/proc/BuildIsCliffTurf(turf/T)
+	if(!T)
+		return 0
+	BuildCliffTypesInit()
+	if(buildCliffTurfTypes[T.type])
+		return 1
+	if(istype(T, /turf/CustomTurf))
+		var/datum/build_custom_def/D = BuildCustomDefForIcon(T.icon, T.icon_state)
+		if(D && D.cliff)
+			return 1
+	return 0
+
+/proc/BuildCliffPaintLoad()
+	if(cliffPaintMap)
+		return
+	cliffPaintMap = list()
+	if(!fexists("Saves/CliffPaint.txt"))
+		return
+	var/raw = file2text("Saves/CliffPaint.txt")
+	for(var/line in splittext(raw, "\n"))
+		var/list/f = splittext(line, "\t")
+		if(f.len < 2)
+			continue
+		if(!length(f[1]) || !length(f[2]))
+			continue
+		cliffPaintMap[f[1]] = f[2]
+
+/proc/BuildCliffPaintSave()
+	if(!cliffPaintMap)
+		return
+	var/list/lines = list()
+	for(var/k in cliffPaintMap)
+		lines += "[k]\t[cliffPaintMap[k]]"
+	if(fexists("Saves/CliffPaint.txt"))
+		fdel("Saves/CliffPaint.txt")
+	text2file(jointext(lines, "\n"), "Saves/CliffPaint.txt")
+
+/proc/BuildCliffStyleAt(turf/T)
+	if(!T)
+		return "default"
+	BuildCliffPaintLoad()
+	var/s = cliffPaintMap["[T.x],[T.y],[T.z]"]
+	return s ? s : "default"
+
+/proc/BuildCliffPaintRegion(x1, y1, x2, y2, z, style)
+	BuildCliffPaintLoad()
+	var/list/hit = list()
+	var/n = 0
+	for(var/turf/T in TurfSquare(x1, y1, x2, y2, z, 0))
+		var/k = "[T.x],[T.y],[T.z]"
+		if(style == "default")
+			cliffPaintMap -= k
+		else
+			cliffPaintMap[k] = style
+		hit += T
+		n++
+		if(n % BUILD_COMMIT_CHUNK == 0)
+			sleep(-1)
+	BuildCliffPaintSave()
+	if(hit.len)
+		BuildEdgeSmoothAround(hit, 1)
+		if(elevMap && elevMap.len)
+			ElevVisualRefresh(hit)
+	return n
+
+/proc/BuildCliffExportSidecar(x1, y1, x2, y2, z, fname)
+	BuildCliffPaintLoad()
+	var/cf = "[copytext(fname, 1, -4)]_cliffs.txt"
+	if(fexists(cf))
+		fdel(cf)
+	var/list/out = list()
+	for(var/y = y1 to y2)
+		for(var/x = x1 to x2)
+			var/st = cliffPaintMap["[x],[y],[z]"]
+			if(st)
+				out += "[x - x1]\t[y - y1]\t[st]"
+	if(!out.len)
+		return 0
+	text2file(jointext(out, "\n"), cf)
+	return out.len
+
+/proc/BuildCliffImportSidecar(fname, ox, oy, oz)
+	var/cf = "[copytext(fname, 1, -4)]_cliffs.txt"
+	if(!fexists(cf))
+		return 0
+	BuildCliffPaintLoad()
+	var/raw = file2text(cf)
+	var/n = 0
+	for(var/line in splittext(raw, "\n"))
+		var/list/f = splittext(line, "\t")
+		if(f.len < 3)
+			continue
+		var/dx = text2num(f[1])
+		var/dy = text2num(f[2])
+		if(isnull(dx) || isnull(dy) || !length(f[3]))
+			continue
+		cliffPaintMap["[ox + dx],[oy + dy],[oz]"] = f[3]
+		n++
+	if(n)
+		BuildCliffPaintSave()
+	return n
+
+var/global/list/foamPaintMap
+
+/proc/BuildFoamPaintLoad()
+	if(foamPaintMap)
+		return
+	foamPaintMap = list()
+	if(!fexists("Saves/FoamPaint.txt"))
+		return
+	var/raw = file2text("Saves/FoamPaint.txt")
+	for(var/line in splittext(raw, "\n"))
+		var/k = copytext(line, 1, findtext(line, "\t") || 0)
+		if(length(k))
+			foamPaintMap[k] = "off"
+
+/proc/BuildFoamPaintSave()
+	if(!foamPaintMap)
+		return
+	var/list/lines = list()
+	for(var/k in foamPaintMap)
+		lines += "[k]\toff"
+	if(fexists("Saves/FoamPaint.txt"))
+		fdel("Saves/FoamPaint.txt")
+	text2file(jointext(lines, "\n"), "Saves/FoamPaint.txt")
+
+/proc/BuildFoamOffAt(turf/T)
+	if(!T)
+		return 0
+	BuildFoamPaintLoad()
+	return foamPaintMap["[T.x],[T.y],[T.z]"] ? 1 : 0
+
+/proc/BuildFoamPaintRegion(x1, y1, x2, y2, z, off)
+	BuildFoamPaintLoad()
+	var/list/hit = list()
+	var/n = 0
+	var/cnt = 0
+	for(var/turf/T in TurfSquare(x1, y1, x2, y2, z, 0))
+		var/k = "[T.x],[T.y],[T.z]"
+		if(off)
+			foamPaintMap[k] = "off"
+		else
+			foamPaintMap -= k
+		hit += T
+		if(BuildMaterialFor(T) == "Water")
+			cnt++
+		n++
+		if(n % BUILD_COMMIT_CHUNK == 0)
+			sleep(-1)
+	BuildFoamPaintSave()
+	if(hit.len)
+		BuildEdgeSmoothAround(hit, 1)
+		ElevVisualRefresh(hit)
+	return cnt
+
+/proc/BuildFoamExportSidecar(x1, y1, x2, y2, z, fname)
+	BuildFoamPaintLoad()
+	var/cf = "[copytext(fname, 1, -4)]_foam.txt"
+	if(fexists(cf))
+		fdel(cf)
+	var/list/out = list()
+	for(var/y = y1 to y2)
+		for(var/x = x1 to x2)
+			if(foamPaintMap["[x],[y],[z]"])
+				out += "[x - x1]\t[y - y1]\toff"
+	if(!out.len)
+		return 0
+	text2file(jointext(out, "\n"), cf)
+	return out.len
+
+/proc/BuildFoamImportSidecar(fname, ox, oy, oz)
+	var/cf = "[copytext(fname, 1, -4)]_foam.txt"
+	if(!fexists(cf))
+		return 0
+	BuildFoamPaintLoad()
+	var/raw = file2text(cf)
+	var/n = 0
+	for(var/line in splittext(raw, "\n"))
+		var/list/f = splittext(line, "\t")
+		if(f.len < 2)
+			continue
+		var/dx = text2num(f[1])
+		var/dy = text2num(f[2])
+		if(isnull(dx) || isnull(dy))
+			continue
+		foamPaintMap["[ox + dx],[oy + dy],[oz]"] = "off"
+		n++
+	if(n)
+		BuildFoamPaintSave()
+	return n
+
+/proc/BuildCliffCurveSides(turf/T)
+	if(!BuildIsCliffTurf(T))
+		return 0
+	if(BuildIsCliffTurf(locate(T.x, T.y - 1, T.z)))
+		return 0
+	var/s = 0
+	var/turf/W = locate(T.x - 1, T.y, T.z)
+	var/turf/E = locate(T.x + 1, T.y, T.z)
+	if(W && !BuildIsCliffTurf(W) && !BuildIsCliffTurf(locate(T.x - 1, T.y - 1, T.z)))
+		s |= 1
+	if(E && !BuildIsCliffTurf(E) && !BuildIsCliffTurf(locate(T.x + 1, T.y - 1, T.z)))
+		s |= 2
+	return s
+
+/proc/BuildCliffCurve(turf/T, list/fresh)
+	var/s = BuildCliffCurveSides(T)
+	if(!s || ElevFaceInfo(T))
+		return
+	if(s & 1)
+		fresh += BuildEdgePiece(locate(T.x - 1, T.y, T.z), 'Mapping/EdgeMasks/cc_l.png')
+	if(s & 2)
+		fresh += BuildEdgePiece(locate(T.x + 1, T.y, T.z), 'Mapping/EdgeMasks/cc_r.png')
+
+/proc/BuildEdgeApply(turf/T, list/fresh)
+	if(!fresh || !fresh.len)
+		return
+	for(var/img in fresh)
+		T.overlays += img
+	T.edgeOverlays = fresh
 
 /proc/BuildEdgeUpdate(turf/T, doBlend = 1)
 	if(!T)
@@ -357,27 +698,35 @@ var/global/list/buildCliffStyles
 		for(var/img in T.edgeOverlays)
 			T.overlays -= img
 	T.edgeOverlays = null
+	var/list/fresh = list()
+	var/obj/EO = BuildEdgeObjOn(T)
+	if(EO)
+		BuildLipCrawl(T, EO, fresh)
+		BuildEdgeApply(T, fresh)
+		return
+	BuildCliffCurve(T, fresh)
 	var/m = BuildMaterialFor(T)
 	if(!m)
+		BuildEdgeApply(T, fresh)
 		return
 	var/mp = BuildMaterialPriority(m)
-	var/list/fresh = list()
 	var/turf/N = locate(T.x, T.y + 1, T.z)
 	var/turf/So = locate(T.x, T.y - 1, T.z)
 	var/turf/E = locate(T.x + 1, T.y, T.z)
 	var/turf/W = locate(T.x - 1, T.y, T.z)
-	var/mn = BuildMaterialFor(N)
-	var/ms = BuildMaterialFor(So)
-	var/me = BuildMaterialFor(E)
-	var/mw = BuildMaterialFor(W)
+	var/th = ElevAt(T)
+	var/mn = BuildMatFor(T, N, th)
+	var/ms = BuildMatFor(T, So, th)
+	var/me = BuildMatFor(T, E, th)
+	var/mw = BuildMatFor(T, W, th)
 	var/turf/DNW = locate(T.x - 1, T.y + 1, T.z)
 	var/turf/DNE = locate(T.x + 1, T.y + 1, T.z)
 	var/turf/DSW = locate(T.x - 1, T.y - 1, T.z)
 	var/turf/DSE = locate(T.x + 1, T.y - 1, T.z)
-	var/mdnw = BuildMaterialFor(DNW)
-	var/mdne = BuildMaterialFor(DNE)
-	var/mdsw = BuildMaterialFor(DSW)
-	var/mdse = BuildMaterialFor(DSE)
+	var/mdnw = BuildMatFor(T, DNW, th)
+	var/mdne = BuildMatFor(T, DNE, th)
+	var/mdsw = BuildMatFor(T, DSW, th)
+	var/mdse = BuildMatFor(T, DSE, th)
 	var/cliffTile = (m == "Water" && mn && mn != "Water")
 	var/list/corners = list("nw" = list(N, mn, W, mw, DNW, mdnw), "ne" = list(N, mn, E, me, DNE, mdne), "sw" = list(So, ms, W, mw, DSW, mdsw), "se" = list(So, ms, E, me, DSE, mdse))
 	for(var/c in corners)
@@ -419,6 +768,8 @@ var/global/list/buildCliffStyles
 						if(!sealSide)
 							AFI.filters += filter(type = "alpha", icon = (c == "nw") ? 'Mapping/EdgeMasks/bs_w.png' : 'Mapping/EdgeMasks/bs_e.png', flags = MASK_INVERSE)
 					fresh += AFI
+	if(cliffTile && BuildCliffStyleAt(T) == "none")
+		cliffTile = 0
 	if(cliffTile)
 		var/endL = (!mw) || (mw == "Water" && !(mdnw && mdnw != "Water"))
 		var/endR = (!me) || (me == "Water" && !(mdne && mdne != "Water"))
@@ -429,7 +780,7 @@ var/global/list/buildCliffStyles
 			variant = "end_l"
 		else if(endR)
 			variant = "end_r"
-		var/image/CI = image(BuildCliffStrip("default", variant))
+		var/image/CI = image(BuildCliffStrip(BuildCliffStyleAt(T), variant))
 		CI.layer = 2.9
 		fresh += CI
 	if(m != "Water" && mn == "Water" && N)
@@ -443,6 +794,7 @@ var/global/list/buildCliffStyles
 			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd_r.png')
 		else
 			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd_lr.png')
+	ShoreFoamAdd(T, m, fresh)
 	if(m == "Water" && ms && ms != "Water" && So)
 		var/ucl = (mw == "Water" && mdsw && mdsw != "Water")
 		var/ucr = (me == "Water" && mdse && mdse != "Water")
@@ -518,11 +870,7 @@ var/global/list/buildCliffStyles
 			for(var/tc in tl)
 				FI.filters += filter(type = "alpha", icon = BuildEdgeMaskFile(tc), flags = MASK_INVERSE)
 		fresh += FI
-	if(!fresh.len)
-		return
-	for(var/img in fresh)
-		T.overlays += img
-	T.edgeOverlays = fresh
+	BuildEdgeApply(T, fresh)
 
 /proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1)
 	var/list/seen = list()
@@ -551,6 +899,50 @@ var/global/list/buildCliffStyles
 		return
 	BuildEdgeSmoothAround(all, 1)
 	Log("Mapper", "Auto-edge boot pass smoothed around [all.len] registered turfs.", 1)
+	var/list/cliffs = list()
+	for(var/turf/T in all)
+		if(BuildIsCliffTurf(T))
+			cliffs += T
+	if(cliffs.len)
+		ElevVisualRefresh(cliffs)
+		Log("Mapper", "Cliff boot pass dressed [cliffs.len] placed cliff turfs.", 1)
+
+mob/Mapper/verb/Paint_Cliff_Style()
+	set category = "Mapper"
+	var/datum/build_session/S = usr.client?.bsession
+	if(!S?.active)
+		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
+		return
+	BuildCliffInit()
+	var/pick = input(usr, "Which rock should this region use? Water tiles get it as their cliff-bottom strip, raised terrain gets it as its face.", "Cliff Style") as null|anything in buildCliffStyleNames
+	if(!pick)
+		return
+	S.CancelPending()
+	S.cliffStyleSel = buildCliffStyleNames[pick]
+	S.cliffStage = 1
+	usr << "CLIFF STYLE [pick]: click the FIRST corner of the region. Right-click cancels."
+
+mob/Mapper/verb/Paint_Foam_Off()
+	set category = "Mapper"
+	var/datum/build_session/S = usr.client?.bsession
+	if(!S?.active)
+		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
+		return
+	S.CancelPending()
+	S.cliffStyleSel = "foam:off"
+	S.cliffStage = 1
+	usr << "FOAM OFF: click the FIRST corner of the region. Water tiles inside it lose their shore foam. Right-click cancels."
+
+mob/Mapper/verb/Paint_Foam_On()
+	set category = "Mapper"
+	var/datum/build_session/S = usr.client?.bsession
+	if(!S?.active)
+		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
+		return
+	S.CancelPending()
+	S.cliffStyleSel = "foam:on"
+	S.cliffStage = 1
+	usr << "FOAM ON: click the FIRST corner of the region. Water tiles inside it get their shore foam back. Right-click cancels."
 
 mob/Mapper/verb/Edge_Debug()
 	set category = "Mapper"

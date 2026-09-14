@@ -119,7 +119,9 @@ proc/BootWorld(var/blah)
 			BuildAreaPaintApplyBoot()
 			BuildZoneProfileApplyBoot()
 			BuildJournalReplay()
+			ElevMapLoad()
 			BuildEdgeBootPass()
+			ElevBootPass()
 			Load_Bodies()
 			LoadIRLNPCs()
 			spawn()
@@ -293,7 +295,7 @@ client
 			mob.AppearanceOff()
 			for(var/obj/fa_jin/fa in mob.vis_contents)
 				mob.vis_contents -= fa
-				del fa
+			mob.fa_jin_effect = null
 			if(mob.Savable)
 				mob.client.SaveChar()
 			sleep(10)

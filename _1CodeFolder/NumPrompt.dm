@@ -115,6 +115,24 @@ client/proc/NpText(dx, dyTop, w, h, txt, lay = 0.6)
 client/proc/MapFocus()
 	winset(src, "mapwindow.map", "focus=true")
 
+var/global/list/npOverlayCtls = list("mapwindow.adminoverlay", "mapwindow.logoverlay", "mapwindow.faceoverlay", "mapwindow.rpoverlay", "mapwindow.chatoverlay")
+client/var/tmp/list/np_hidden_ctls
+
+client/proc/NpOverlaysSuspend()
+	np_hidden_ctls = list()
+	for(var/ctl in npOverlayCtls)
+		if(winget(src, ctl, "is-visible") == "true")
+			np_hidden_ctls += ctl
+			winset(src, ctl, "is-visible=false")
+
+client/proc/NpOverlaysRestore()
+	if(!np_hidden_ctls)
+		return
+	for(var/ctl in np_hidden_ctls)
+		winset(src, ctl, "is-visible=true")
+	np_hidden_ctls = null
+	MapFocus()
+
 mob/proc/HUDNumPrompt(title, default = "")
 	if(!client) return null
 	if(client.np_open) return null
@@ -139,6 +157,7 @@ client/proc/NumPromptOpen(title, initial, mode = "num")
 	np_mode = mode
 	np_result = null
 	np_val = ""
+	NpOverlaysSuspend()
 	if(mode == "text")
 		np_val = copytext("[initial]", 1, NP_MAXLEN + 1)
 	else
@@ -241,6 +260,7 @@ client/proc/NumPromptClose(confirmed)
 	np_hud = null
 	np_digits = null
 	np_caret = null
+	NpOverlaysRestore()
 
 
 client/proc/NpPanBounds()

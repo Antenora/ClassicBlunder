@@ -80,13 +80,13 @@
 				M.OMessage(10, "<font color='#f7da1b'><b>[M] summons forth the power to topple nations!!!</b></font>", "<font color=#f7da1b>[M]([M.key]) unleashed The Ten Commandments.")
 				KenShockwave(M, icon='KenShockwaveGold.dmi', Size=0.5, Blend=2, Time=3)
 
-				del w
+				GfxReleaseImage(w)
 				sleep(10)
 				Quake(75)
 				M.OMessage(10, "<font color='#f7da1b'><b>[M] is enshrouded in angelic power; Salvation belongs to He Who Sits on The Throne!</b></font>")
 				animate(i, alpha=0, time=30)
 				spawn(30)
-					del i
+					GfxReleaseImage(i)
 					src.animating = FALSE
 			else
 				var/image/fade = image(icon='CaledfwlchAura.dmi', pixel_x=-32, pixel_y=-2, loc=M)
@@ -97,5 +97,5 @@
 				animate(fade, alpha=255)
 				animate(fade, alpha=0, time=30)
 				spawn(30)
-					del fade
+					GfxReleaseImage(fade)
 					src.animating = FALSE

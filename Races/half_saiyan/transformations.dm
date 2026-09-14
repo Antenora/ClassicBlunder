@@ -42,7 +42,7 @@
 		sleep(5)
 		animate(HF,alpha=210, time=25, flags = ANIMATION_PARALLEL)
 		sleep(40)
-		del HF
+		GfxReleaseImage(HF)
 	// one of these was holding it up
 	mastery_boons(mob/user)
 		// apply scaling passives here

@@ -72,9 +72,11 @@ client/verb/OOC(T as text)
 	var/timestampOOCHeader = "[timestamp][OOCHeader]"
 	var/finalMessage = ": <font color=white>[html_encode(T)]"
 
+	var/list/oocwit = list()
 	for(var/mob/Players/P in players)
 		if(!P.client) continue
 		if(!P.client.getPref("ShowOOC")) continue
+		oocwit += P
 
 		if(P.Timestamp)
 			if(P.client.getPref("AllTabOOC"))
@@ -85,6 +87,7 @@ client/verb/OOC(T as text)
 				P << output("[OOCHeader][P.Controlz(usr)][finalMessage]", "output")
 			P << output("[OOCHeader][P.Controlz(usr)][finalMessage]", "oocchat")
 
+	LogEvent("ooc", usr, html_encode(T), oocwit, null, list("key" = keyjack))
 	// Overwatch Listen Mode — copy OOC to admins regardless of pref/distance.
 	AdminListenBroadcast(usr, "OOC: [keyjack]: [html_encode(T)]")
 
@@ -124,6 +127,7 @@ client/proc/sayProc(T, mode = null)
 			T="---"
 
 	var/list/transmitTo = hearers(radius,usr)
+	var/list/saywit = list()
 	var/header = "[ChatPortraitTag(usr)]<font color=[usr.Text_Color]>[usr.name]"
 	var/message = "[html_encode(T)]"
 	var/broadcastMessage = "[usr.name]: [message]"
@@ -141,19 +145,25 @@ client/proc/sayProc(T, mode = null)
 			if(hearer.SenseRobbed<4)
 				hearer?.client.outputToChat("[header][hearer.Controlz(usr)] [sayNoun] [message]", IC_OUTPUT)
 
-		Log(hearer.ChatLog(),"<font color=green>[usr.name]([usr.key]) [sayNoun] [message]")
-		Log(hearer.sanitizedChatLog(),"<font color=green>[usr.name] [sayNoun] [message]")
+		saywit += hearer
 
 		if(hearer.BeingObserved.len>0)
 			for(var/mob/m as anything in hearer.BeingObserved)
 				m?.client?.EnsurePortrait(usr)
 				m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] [sayNoun] [message]", IC_OUTPUT)
+				saywit += m
 
 		for(var/obj/Items/Tech/Planted_Wiretap/WT in hearer)
 			WT.broadcastToListeners(broadcastMessage)
 
 	for(var/obj/Items/Tech/Security_Camera/F in view(11,usr)) //This for loop detects Security Cameras around those that use the say verb.
 		F.broadcastToListeners(broadcastMessage)
+
+	var/sayty = "say"
+	if(sayNoun == "LOOCs:") sayty = "looc"
+	else if(radius == YELL_RADIUS) sayty = "yell"
+	else if(sayNoun in QUESTION_NOUNS) sayty = "ask"
+	LogEvent(sayty, usr, html_encode(T), saywit, null, list("noun" = sayNoun))
 
 	// Overwatch Listen Mode — copy say/LOOC/yell to admins regardless of distance.
 	AdminListenBroadcast(usr, "[usr.name] [sayNoun] [html_encode(T)]")
@@ -172,8 +182,11 @@ client/verb/Whisper(T as text)
 	set hidden = 1
 
 	var/list/transmitTo = hearers(SAY_RADIUS, usr)
+	var/list/wwit = list()
+	var/list/wmuf = list()
 	var/header = "[ChatPortraitTag(usr)]<font color=[usr.Text_Color]>[usr.name]"
 	var/message = html_encode(T)
+	var/wplain = message
 	message = "<i>[message]</i>"
 	if(usr.SenseRobbed>=3)
 		T="---"
@@ -186,30 +199,34 @@ client/verb/Whisper(T as text)
 		E.client.EnsurePortrait(usr)
 		if(E.EnhancedHearing)
 			E?.client.outputToChat("[header][E.Controlz(usr)] whispers: [message]", IC_OUTPUT)
-			Log(E.ChatLog(),"[header]([usr.key]) WHISPERS: [message]")
-			Log(E.sanitizedChatLog(),"[header] WHISPERS: [message]")
+			wwit += E
 
 			if(E.BeingObserved.len>0)
 				for(var/mob/m as anything in E.BeingObserved)
 					if(m in transmitTo) continue
 					m?.client?.EnsurePortrait(usr)
 					m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] whispers: [message]", IC_OUTPUT)
+					wwit += m
 		else
 			if(get_dist(usr, E) <= WHISPER_RADIUS)
 				E?.client.outputToChat("[header][E.Controlz(usr)] whispers: [message]", IC_OUTPUT)
-				Log(E.ChatLog(),"[header]([usr.key]) WHISPERS: [message]")
-				Log(E.sanitizedChatLog(),"[header] WHISPERS: [message]")
+				wwit += E
 
 				if(E.BeingObserved.len>0)
 					for(var/mob/m as anything in E.BeingObserved)
 						if(get_dist(m, E) <= WHISPER_RADIUS) continue
 						m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] whispers: [message]", IC_OUTPUT)
+						wwit += m
 			else
 				E?.client.outputToChat("[header][E.Controlz(usr)] whispers...", IC_OUTPUT)
+				wmuf += E
 				if(E.BeingObserved.len>0)
 					for(var/mob/m as anything in E.BeingObserved)
 						if(m in transmitTo) continue
 						m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] whispers...", IC_OUTPUT)
+						wmuf += m
+
+	LogEvent("whisper", usr, wplain, wwit, wmuf, null)
 
 	// Overwatch Listen Mode — copy whispers to admins regardless of distance / EnhancedHearing.
 	AdminListenBroadcast(usr, "[usr.name] whispers: [html_encode(T)]")
@@ -226,14 +243,14 @@ client/verb/Think(T as text)
 	EnsurePortrait(usr)
 	outputToChat("[header][usr.Controlz(usr)] thinks: [message]", IC_OUTPUT)
 
-	Log(usr.ChatLog(),"<font color=green>[usr.name]([usr.key]) THOUGHT: [message]")
-	Log(usr.sanitizedChatLog(),"<font color=green>[usr.name] THOUGHT: [message]")
+	var/list/twit = list(usr)
 
 	if(usr.BeingObserved.len>0)
 		for(var/mob/m in usr.BeingObserved)
 			if(m.HearThoughts&&m.HasTelepathy())
 				m?.client?.EnsurePortrait(usr)
 				m?.client.outputToChat("[OBSERVE_HEADER][header][m.Controlz(usr)] thinks: [message]", IC_OUTPUT)
+				twit += m
 
 	for(var/mob/m as anything in ohearers(20,usr))
 		if(!m.client) continue
@@ -244,8 +261,9 @@ client/verb/Think(T as text)
 
 			else
 				m?.client.outputToChat("[header][m.Controlz(usr)] thinks: [message]", IC_OUTPUT)
-			Log(m.ChatLog(),"<font color=green>[usr.name]([usr.key]) THOUGHT: [message]")
-			Log(m.sanitizedChatLog(),"<font color=green>[usr.name] THOUGHT: [message]")
+			twit += m
+
+	LogEvent("think", usr, message, twit, null, null)
 
 	// Overwatch Listen Mode — copy thoughts to admins regardless of telepathy/distance.
 	AdminListenBroadcast(usr, "[usr.name] thinks: [html_encode(T)]")

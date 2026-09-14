@@ -153,6 +153,31 @@ proc/_DnApplyMode()
 			A.layer = A._dn_orig_layer
 			A.blend_mode = BLEND_DEFAULT
 
+proc/DnManageArea(area/A, sky)
+	if(!A)
+		return
+	var/mr = glob && glob.MULTIPLY_REVEAL
+	var/skycol = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff"
+	if(sky)
+		_dn_indoor_areas -= A
+		_dn_sky_areas |= A
+		A.dn_indoor = 0
+		A.color = skycol
+	else
+		_dn_sky_areas -= A
+		_dn_indoor_areas |= A
+		A.dn_indoor = 1
+		A.color = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(skycol) : "#ffffff"
+	A.icon = EnvWhiteIcon()
+	if(mr)
+		A.plane = BASE_LIGHTING_PLANE
+		A.layer = DN_BASE_LAYER
+		A.blend_mode = BLEND_OVERLAY
+	else
+		A.plane = 0
+		A.layer = DN_BLANKET_LAYER
+		A.blend_mode = BLEND_MULTIPLY
+
 proc/DnPhase()
 	var/cyc = max(1, glob ? glob.DN_CYCLE_MINUTES : 120) * 600
 	var/p = ((world.time + _dn_offset) % cyc) / cyc

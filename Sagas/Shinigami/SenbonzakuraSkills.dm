@@ -32,11 +32,11 @@
 					user.petal_attacking = TRUE
 					user.Melee1(forcedTarget=target, BreakAttackRate=1, dmgmulti=0.25)
 					user.petal_attacking = FALSE
-					del src
+					GfxReleaseAtom(src)
 					return
 				step_towards(src, target)
 				sleep(1)
-			if(src) del src
+			if(src) GfxReleaseAtom(src)
 
 // Saga Level 4
 /obj/Skills/SenbonzakuraGoukei
@@ -120,7 +120,7 @@
 			animate(GE, alpha=0, time=5)
 			sleep(5)
 			if(target && GE) target.vis_contents -= GE
-			del GE
+			GfxReleaseAtom(GE)
 			src.goukei_active = FALSE
 			bk.convergence_target = null
 			// Snap petals to user before re-enabling.

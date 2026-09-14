@@ -698,10 +698,7 @@ client/proc/BuildStatsContent()
 
 client/proc/BuildPersonalContent()
 	var/list/btns = list(
-		list("Check AI Kills", "ailogs"),
-		list("View Self Logs", "selflogs"),
-		list("Maim History", "maimhist"),
-		list("Annotate Maim", "annotate")
+		list("Logs", "logs")
 	)
 	var/bx = 237
 	var/i = 0
@@ -724,39 +721,8 @@ client/proc/PersonalButtonAction(action)
 	if(!mob) return
 	var/mob/Players/p = mob
 	switch(action)
-		if("ailogs")  spawn() ShowAIKills()
-		if("selflogs") spawn() ShowSelfLogs()
-		if("maimhist")
-			if(istype(p)) spawn() p.View_Maim_History()
-		if("annotate")
-			if(istype(p)) spawn() p.Annotate_Maim()
-
-client/proc/ShowAIKills()
-	if(!mob) return
-	var/html = "<html><head><title>AI Kills</title></head><body bgcolor=#0a0f1a text=#cfe7ff style='font-family:sans-serif;padding:8px'>"
-	html += "<h3 style='color:#8be9ff;margin:2px 0 8px 0'>AI Kills</h3>"
-	if(mob.killed_AI && mob.killed_AI.len)
-		html += "<table cellspacing=0 cellpadding=2>"
-		for(var/k in mob.killed_AI)
-			html += "<tr><td>[k]</td><td style='color:#ffd278'>&nbsp;&nbsp;[mob.killed_AI[k]]</td></tr>"
-		html += "</table>"
-	else
-		html += "<p style='color:#9bb3c2'>You have no AI kills on record.</p>"
-	html += "</body></html>"
-	mob << browse(html, "window=AIKills;size=320x420")
-
-client/proc/ShowSelfLogs()
-	if(!mob) return
-	var/dir = "Saves/PlayerLogs/[mob.key]/sanitized/"
-	var/list/entries = flist(dir)
-	if(entries) entries -= "sanitized/"
-	if(!entries || !entries.len)
-		mob << browse("<html><body bgcolor=#0a0f1a text=#cfe7ff style='font-family:sans-serif;padding:10px'>You have no logs on record.</body></html>", "window=SelfLogs;size=320x120")
-		return
-	var/sel = input(mob, "Which log do you want to read?", "Self Logs") as null|anything in entries
-	if(!sel) return
-	var/content = html_decode(file2text(file("[dir][sel]")))
-	mob << browse("<html><head><title>Log: [sel]</title></head><body bgcolor=#f4f1e8 text=#101010 style='font-family:sans-serif;padding:6px'><b style='color:#b00000'>[sel]</b><hr>[content]</body></html>", "window=Log;size=560x600")
+		if("logs")
+			if(istype(p)) spawn() LogPageShow()
 
 client/proc/BuildPassivesContent()
 	cmenu_pass_list = mob.GetMenuPassives()

@@ -268,10 +268,19 @@ atom
 			UpdateStandingLayer()
 	proc
 		UpdateStandingLayer()
-			if(!standing || !glob || !glob.DEPTH_SORTING) return
+			if(!standing || !glob) return
 			//flight/cutscene layers own the atom til they put it back
 			if(ismob(src) && abs(layer - MOB_LAYER) > 0.03)
 				if(isnull(gfx_depth_owned_layer) || abs(layer - gfx_depth_owned_layer) > 0.001) return
+			if(ismob(src) && ElevMobUnderFace(src))
+				layer = ELEV_MOB_UNDER_LAYER
+				gfx_depth_owned_layer = layer
+				return
+			if(!glob.DEPTH_SORTING)
+				if(!isnull(gfx_depth_owned_layer))
+					layer = ismob(src) ? MOB_LAYER : initial(layer)
+					gfx_depth_owned_layer = null
+				return
 			var/world_h = max(1, world.maxy * TileHeight)
 			var/depth = clamp(LowerY() / world_h, 0, 1)
 			var/base = ismob(src) ? MOB_LAYER : initial(layer)

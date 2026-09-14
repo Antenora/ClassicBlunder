@@ -8,6 +8,7 @@ proc
 		defender.OMessage(10, "[msg]", "[defender]([defender.key]) used ([msg]).")
 
 mob/proc/OMessage(View=10,Msg,Log)
+	var/list/owit = list()
 	for(var/mob/Players/E in hearers(View,src))
 		if(!E.client) continue
 		if(Msg)
@@ -15,5 +16,6 @@ mob/proc/OMessage(View=10,Msg,Log)
 				E.client.outputToChat("[Msg]", ALL_OUTPUT)
 			else
 				E.client.outputToChat("[Msg]", ALL_NOT_IC_OUTPUT)
-		if(Log)
-			Log(E.ChatLog(),Log)
+		owit += E
+	if(Msg || Log)
+		LogEvent(findtext("[Msg]", "DICE:") ? "roll" : "combat", src, Msg ? Msg : Log, owit, null, Log ? list("note" = Log) : null)

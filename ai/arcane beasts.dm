@@ -1250,7 +1250,7 @@ mob/Player/AI/Nympharum
 				i.alpha = 200
 				viewers(src) << i
 				animate(i, alpha=0, time=10)
-				spawn(10) del i
+				spawn(10) GfxReleaseImage(i)
 
 		if(ai_owner)
 			if(ai_owner.is_arcane_beast.disallow_combat)
@@ -1269,7 +1269,7 @@ mob/Player/AI/Nympharum
 							i.alpha = 200
 							viewers(ai_owner) << i
 							animate(i, alpha=0, time=10)
-							spawn(10) del i
+							spawn(10) GfxReleaseImage(i)
 
 			if(get_dist(src, ai_owner) >= 12)
 				loc=ai_owner.loc

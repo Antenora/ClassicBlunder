@@ -65,14 +65,18 @@ mob/proc/InterceptionStrike(stacks)
         ticking_generic += src
     proc/end_effect()
         ticking_generic -= src
-        del src
+        target = null
+        owner = null
+        GfxReleaseAtom(src)
     Update()
         // get distance, increase speed the further they move, prob
         if(!target || life>= 100)
             end_effect()
+            return
         if(src.loc == target.loc)
             owner.HitEffect(target, null, null, null)
             end_effect()
+            return
         else
             var/distance = get_dist(src, target)
             if(distance >= 6)
@@ -86,4 +90,6 @@ mob/proc/InterceptionStrike(stacks)
                 owner.Comboz(target, 0, TRUE)
                 LightningBolt(target, 1)
             ticking_generic-=src
-            del src
+            target = null
+            owner = null
+            GfxReleaseAtom(src)

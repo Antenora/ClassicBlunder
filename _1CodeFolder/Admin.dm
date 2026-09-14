@@ -424,8 +424,8 @@ mob/Admin3/verb/LoadSwapMap()
 		usr << "You sent: [message]"
 		m << "[message]"
 		m << output("[message]", "icchat")
-		spawn()Log(m.ChatLog(),"<font color=#CC3300>*Cursespeak: [html_decode(message)]*")
-		spawn()TempLog(m.ChatLog(),"<font color=#CC3300>*Cursespeak: [html_decode(message)]*")
+		var/list/nr = LogEvent("narrate", usr, message, list(m), null, list("target" = m.ckey))
+		nr["name"] = "Cursespeak"
 
 mob/Admin2/verb
 	EditAllSpawners()
@@ -1115,7 +1115,7 @@ proc/ExtractInfo(var/atom/x)
 	if(istype(x, /mob))
 		var/mob/mx = x
 		if(mx.client)
-			return "[mx.key]</a href>([mx])"
+			return "[mx.key]([mx])"
 	return "[x]([x.type])"
 
 
@@ -1383,7 +1383,7 @@ mob/Admin2/verb
 
 	AdminChat(c as text)
 		set category = "Admin"
-		Log("Admin", "<b><font color=red>[time2text(world.timeofday,"(hh:mm:ss)")]<font color=cyan>Admin Chat:<font color=white>[usr.DisplayKey ? "[usr.DisplayKey]([usr.key])": "([usr.key])"]:</b><font color=green> [c]", NoPinkText=1)
+		LogAdminAction(usr, "chat", "admin chat", "", html_encode(c))
 		for(var/mob/Players/M in admins)
 			if(M.Timestamp)
 				M<<"<b><font color=red>[time2text(world.timeofday,"(hh:mm:ss)")]<font color=cyan>Admin Chat:<font color=white>[usr.DisplayKey ? "[usr.DisplayKey]([usr.key])": "([usr.key])"]:</b><font color=green> [c]"
@@ -1419,12 +1419,15 @@ mob/Admin2/verb
 
 	Message_Z_Plane(msg as message)
 		set category="Admin"
+		var/list/zwit = list()
 		for(var/mob/Players/p in world)
 			if(p.z==src.z)
 				p << output("<font size=2><font color=red><b>[msg]", "output")
 				p << output("<font size=2><font color=red><b>[msg]", "icchat")
 				p << output("<font size=2><font color=red><b>[msg]", "oocchat")
 				if(p.Admin)p<<"[usr] used message (Z plane)."
+				zwit += p
+		LogEvent("announce", usr, html_encode(msg), zwit, null, list("scope" = "z[src.z]"))
 
 	Message_Global(msg as message)
 		set category="Admin"
@@ -1433,6 +1436,7 @@ mob/Admin2/verb
 		world << output("<font size=2><font color=green><b>[msg]", "output")
 		world << output("<font size=2><font color=green><b>[msg]", "icchat")
 		world << output("<font size=2><font color=green><b>[msg]", "oocchat")
+		LogEvent("announce", usr, html_encode(msg), LogWitnessesOnline(), null, list("scope" = "global"))
 
 		switch(input("Should this message be sent to an Announcements Discord aswell?") in list("Yes","No"))
 			if("Yes")
@@ -1732,11 +1736,13 @@ mob/Admin3/verb
 
 	AdminLogs()
 		set category="Admin"
-		usr.SegmentLogs("Saves/AdminLogs/")
+		set name="Admin Logs"
+		client?.LogPageShow(null, "admin")
 
 	PlayerLog(mob/Players/M in players)
 		set category="Admin"
-		usr.SegmentLogs("Saves/PlayerLogs/[M.key]/")
+		set name="Player Logs"
+		client?.LogPageShow(M ? M.ckey : null, "players")
 
 	Announce(msg as text)
 		set category="Admin"
@@ -2726,9 +2732,6 @@ mob/Admin3/verb
 		Log("Admin", "[ExtractInfo(usr)] made the moon setting message: ([global.MoonSetMessage])")
 
 
-	AdminLogz()
-		set hidden=1
-		usr.SegmentLogs("Saves/AdminLogz/Log")
 	SetWorldPUDrain()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set Global PU Drain?")) return
@@ -2755,19 +2758,8 @@ mob/Admin3/verb
 mob/Admin4/verb
 	PlayerLoginLogs()
 		set category="Admin"
-		var/list/files=new
-		for(var/File in flist("Saves/LoginLogs/"))
-			files.Add(File)
-		files.Add("Cancel")
-		var/lawl=input("What one do you want to read?","Rebirth") in files
-		if(lawl=="Cancel")
-			return
-		var/ISF=file2text(file("Saves/LoginLogs/[lawl]"))
-		var/View={"<html><head><title>Logs</title><body>
-				<font size=3><font color=red>[lawl]<hr><font size=2><font color=black>"}
-		View+=ISF
-		View += "</html>"
-		src<<browse(View,"window=Log;size=500x300")
+		set name="Login Logs"
+		client?.LogPageShow(null, "logins")
 
 	DownloadSaves()
 		set category="Admin"

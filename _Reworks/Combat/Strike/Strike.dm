@@ -312,6 +312,7 @@ mob
 			if(val > 0)
 				src.RecordCombatEvent("Hit [defender] for [round(val,0.1)]")
 				defender.RecordCombatEvent("Hit by [src] for [round(val,0.1)]")
+				LogEvent("hit", src, "[src] hit [defender] for [round(val,0.1)]", list(src, defender), null, list("dmg" = round(val, 0.1), "def" = defender.ckey ? defender.ckey : "", "defname" = "[defender]"))
 
 			ApplyFrenzyCombatHooks(defender, max(0, val), UnarmedAttack, SwordAttack, SpiritAttack)
 

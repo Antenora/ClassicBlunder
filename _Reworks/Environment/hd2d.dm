@@ -187,6 +187,19 @@ var/_hd2d_cache_ver = 1
 	var/tmp/rows = 0
 	var/tmp/mark = 0
 
+/obj/hd2d_cliffnotch
+	plane = SHADOW_PLANE
+	layer = 1.1
+	icon = 'HUD/build_white.png'
+	mouse_opacity = 0
+	Savable = 0
+	gfx_transient_visual = 1
+	var/tmp/csides = -1
+	var/tmp/mark = 0
+
+var/list/_hd2d_notch_by_turf = list()
+var/list/_hd2d_notch_pool = list()
+
 var/_hd2d_grade_bucket = -1 //clock bucket; a change rebuilds the world-plane filters
 
 var/list/_hd2d_shadow_by_turf = list() //ground turf -> live shadow obj
@@ -207,6 +220,9 @@ proc/Hd2dWallRows(turf/T)
 			while(. < glob.WALLSHADOW_MAX_ROWS && N && SurfaceOcclusion(N) == OCCLUDE_FULL)
 				.++
 				N = T.y + . <= world.maxy ? locate(T.x, T.y + ., T.z) : null
+	var/list/efi = ElevFaceInfo(T)
+	if(efi && efi[3] == efi[2])
+		. = max(., min(efi[2], glob.WALLSHADOW_MAX_ROWS))
 	T._hd2d_wall = .
 	T._hd2d_wall_ver = _hd2d_cache_ver
 
@@ -231,6 +247,19 @@ proc/Hd2dCutsShadow(turf/T)
 //pin the strip top to the wall base, scale length, lean by the sun.
 //a 32x128 icon draws its center +48 above the ground tile center and transforms pivot there,
 //so e=k, f=-32-64k holds the top edge on the wall base while the tail stretches south
+proc/Hd2dNotchApply(obj/hd2d_cliffnotch/O, sides)
+	if(!O) return
+	O.csides = sides
+	switch(sides)
+		if(1)
+			O.filters = filter(type = "alpha", icon = 'Mapping/EdgeMasks/cc_l.png')
+		if(2)
+			O.filters = filter(type = "alpha", icon = 'Mapping/EdgeMasks/cc_r.png')
+		if(3)
+			O.filters = filter(type = "alpha", icon = 'Mapping/EdgeMasks/cc_lr.png')
+		else
+			O.filters = null
+
 proc/Hd2dShadowAim(obj/hd2d_wallshadow/O, list/sp, anim_time = 0)
 	if(!O) return
 	var/slope = sp[1] * 0.55 //walls lean less than mobs - they are wide, not just tall
@@ -266,6 +295,12 @@ proc/Hd2dShadowsClear()
 			O.loc = null
 			if(_hd2d_shadow_pool.len < 300) _hd2d_shadow_pool += O
 	_hd2d_shadow_by_turf.Cut()
+	for(var/turf/NT in _hd2d_notch_by_turf)
+		var/obj/hd2d_cliffnotch/NO = _hd2d_notch_by_turf[NT]
+		if(NO)
+			NO.loc = null
+			if(_hd2d_notch_pool.len < 300) _hd2d_notch_pool += NO
+	_hd2d_notch_by_turf.Cut()
 
 proc/_Hd2dShadowSweep()
 	_hd2d_epoch++
@@ -288,6 +323,9 @@ proc/_Hd2dShadowSweep()
 				if(!A || !A.sees_sky) continue //no sun indoors
 				var/turf/S = ty > 1 ? locate(tx, ty - 1, center.z) : null
 				if(!S) continue
+				var/cs = BuildCliffCurveSides(T)
+				if(cs && ElevFaceInfo(T))
+					cs = 0
 				var/obj/hd2d_wallshadow/O = _hd2d_shadow_by_turf[S]
 				if(!O)
 					if(_hd2d_shadow_pool.len)
@@ -305,6 +343,21 @@ proc/_Hd2dShadowSweep()
 					O.rows = rows
 					Hd2dShadowAim(O, sp)
 				O.mark = _hd2d_epoch
+				if(cs)
+					var/obj/hd2d_cliffnotch/NO = _hd2d_notch_by_turf[T]
+					if(!NO)
+						if(_hd2d_notch_pool.len)
+							NO = _hd2d_notch_pool[_hd2d_notch_pool.len]
+							_hd2d_notch_pool.len--
+						else
+							NO = new
+						NO.loc = T
+						_hd2d_notch_by_turf[T] = NO
+					if(NO.csides != cs)
+						Hd2dNotchApply(NO, cs)
+					NO.alpha = round(sp[3] * glob.WALLSHADOW_ALPHA)
+					NO.color = sp[5]
+					NO.mark = _hd2d_epoch
 	var/list/drop = list()
 	for(var/turf/DT in _hd2d_shadow_by_turf)
 		var/obj/hd2d_wallshadow/DO = _hd2d_shadow_by_turf[DT]
@@ -315,6 +368,16 @@ proc/_Hd2dShadowSweep()
 		if(RO)
 			RO.loc = null
 			if(_hd2d_shadow_pool.len < 300) _hd2d_shadow_pool += RO
+	var/list/ndrop = list()
+	for(var/turf/NDT in _hd2d_notch_by_turf)
+		var/obj/hd2d_cliffnotch/NDO = _hd2d_notch_by_turf[NDT]
+		if(!NDO || NDO.mark != _hd2d_epoch) ndrop += NDT
+	for(var/turf/NRT in ndrop)
+		var/obj/hd2d_cliffnotch/NRO = _hd2d_notch_by_turf[NRT]
+		_hd2d_notch_by_turf -= NRT
+		if(NRO)
+			NRO.loc = null
+			if(_hd2d_notch_pool.len < 300) _hd2d_notch_pool += NRO
 
 //plane-0 additive with an area-level sees_sky gate - the capture-chain + mask-filter versions rendered nothing (don't go back)
 

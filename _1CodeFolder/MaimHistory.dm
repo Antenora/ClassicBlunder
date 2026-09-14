@@ -25,6 +25,7 @@
 		MaimHistory += list(entry)
 		if(MaimHistory.len > 20)
 			MaimHistory.Cut(1, 2)
+		LogEvent("maim", src, "[entry["type"]] by [entry["by"]][length(desc) ? ": [desc]" : ""]", list(src, source), null, list("kind" = entry["type"], "by" = entry["by"], "where" = entry["where"]))
 
 	proc/maimHistoryHtml()
 		var/html = "<html><head><title>Maim History</title></head>"

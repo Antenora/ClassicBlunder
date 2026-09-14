@@ -117,7 +117,7 @@ transformation
 					spawn()
 						user.Earthquake(30,16,48,16,48,user.z)
 					animate(user, color = list(1,0,0, 0,1,0, 0,0,1, 1,0.9,0.2), time=10)
-					del HF
+					GfxReleaseImage(HF)
 					var/ShockSize=5
 					for(var/wav=5, wav>0, wav--)
 						KenShockwave(user, icon='KenShockwaveGold.dmi', Size=ShockSize, Blend=2, Time=8)

@@ -505,7 +505,7 @@ mob
 				else if (fa_jin_effect)
 					vis_contents -= fa_jin_effect
 					fa_jin_effect.loc = null
-					del fa_jin_effect
+					fa_jin_effect = null
 
 				var/mystic = UsingMysticStyle()
 				if(length(mystic)&&mystic[1] == TRUE)
@@ -932,7 +932,7 @@ mob
 										spawn(150)
 											animate(i, alpha=0, time=5)
 											sleep(5)
-											del i
+											GfxReleaseImage(i)
 								else
 									for(var/turf/t in Turf_Circle(src, 10))
 										if(prob(5))

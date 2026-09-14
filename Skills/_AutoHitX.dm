@@ -5285,7 +5285,6 @@ mob
 								if(Z.RagingDemonAnimation)
 									Target.vis_contents -= i
 									i.loc = null
-									del i
 								src.Frozen=0
 				if(src.HasQuickCast() && !Z.IgnoreWindUpReduction)
 					if(Z.PreQuake)

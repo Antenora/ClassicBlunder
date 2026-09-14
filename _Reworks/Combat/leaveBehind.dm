@@ -55,7 +55,7 @@
     bound_width = 32
     alpha= 0
     New(turf/T, mob/p, style_value)
-        if(!T) del src
+        if(!T) return
         loc = locate(T.x, T.y, T.z)
         alpha = 0
         lifetime = (5 SECONDS) * style_value
@@ -97,7 +97,7 @@
     bound_width = 64
     alpha = 0
     New(turf/_loc, mob/p, style_value)
-        if(!_loc) del src
+        if(!_loc) return
         loc = locate(_loc.x,_loc.y,_loc.z)
         alpha = 0
         animate(src, transform=matrix().Scale(2))

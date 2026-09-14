@@ -75,9 +75,9 @@
     animate(dorkness, alpha = 255, time = 10)
     sleep(15)
     Quake(30, z)
-    del i
-    del i2
-    del i3
+    GfxReleaseAtom(i)
+    GfxReleaseAtom(i2)
+    GfxReleaseAtom(i3)
     dorkness.alpha = 0
     blankHolder.vis_contents-=dorkness
     // del blankHolder
@@ -104,7 +104,7 @@
     var/matrix/M = matrix().Scale(0.25)
     animate(tester, transform = M, time = 10)
     sleep(8)
-    del tester
+    GfxReleaseAtom(tester)
     lightness.alpha = 255
     sleep(2)
     lightness.alpha = 0
@@ -114,8 +114,8 @@
     dorkness.alpha = 0
     sleep(2)
     lightness.alpha = 0
-    del dorkness
-    del test
+    GfxReleaseAtom(dorkness)
+    GfxReleaseAtom(test)
     plane_master.screen_loc = "CENTER,CENTER"
     animate(plane_master, transform=matrix())
     var/obj/animationobj/aura = new(i = 'Super Amazing Beast Aura.dmi', _px = -32, _py = 32,  appear_flags = PIXEL_SCALE )
@@ -126,15 +126,16 @@
     animate(t.emitters[1], alpha = 255, time = 20)
     sleep(75)
     animate(lightness, alpha = 255, time = 7)
-    del t
+    t.deleteEmitters()
     sleep(8)
     plane_master.vis_contents -= bleh
     bleh.overlays -= aura
-    del bleh
+    GfxReleaseAtom(bleh)
     lightness.alpha = 0
     blankHolder.vis_contents -= lightness
-    del blankHolder
-    del lightness
+    if(client) client.screen -= blankHolder
+    GfxReleaseAtom(blankHolder)
+    GfxReleaseAtom(lightness)
     client.eye = src
     client?.EndCutsceneDisplay()
     overlays += aura

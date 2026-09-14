@@ -371,12 +371,12 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				animate(i, alpha=255, time=20)
 				sleep(10)
 				KenShockwave(src,icon='KenShockwaveGold.dmi',Size=0.5, Blend=2, Time=3)
-				del w
+				GfxReleaseImage(w)
 				sleep(10)
 				animate(i, alpha=0, time=30)
 				src.OMessage(10, "<b><font color=yellow><center>The Monkey King has been released!</center></font></b>")
 				spawn(30)
-					del i
+					GfxReleaseImage(i)
 			if("Caledfwlch")
 				src.ElementalDefense="Ultima"
 				passive_handler.Increase("InjuryImmune")
@@ -402,12 +402,12 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				sleep(10)
 				src.OMessage(10,"<b>Calling upon the name 'AVALON!', they summon forth a legendary lost sheath!!!</b>","<font color=red>[src]([src.key]) used Avalon Mode.")
 				KenShockwave(src,icon='KenShockwaveGold.dmi',Size=0.5, Blend=2, Time=3)
-				del w
+				GfxReleaseImage(w)
 				sleep(10)
 				src.OMessage(10,"<b>[src] becomes infused with innate healing; though they falter, they cannot be stopped!</b>")
 				animate(i, alpha=0, time=30)
 				spawn(30)
-					del i
+					GfxReleaseImage(i)
 			if("Kusanagi")
 				src.ElementalOffense="Mirror"
 				src.ElementalDefense="Mirror"
@@ -441,11 +441,11 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				animate(w2, alpha=255, time=5)
 				sleep(5)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
-				del w
+				GfxReleaseImage(w)
 				sleep(10)
 				src.OMessage(10,"<b>Calling upon the name 'Ame no Murakumo no Tsurugi', they invoke a mighty rainstorm...</b>","<font color=red>[src]([src.key]) used Murakumo Mode.")
 				KenShockwave(src,icon='KenShockwaveGod.dmi',Size=0.5, Blend=2, Time=3)
-				del w2
+				GfxReleaseImage(w2)
 				src.Hairz("Add")
 				src.overlays+=image(icon=src.ActiveBuff.IconLock, pixel_x=src.ActiveBuff.LockX, pixel_y=src.ActiveBuff.LockY)
 				src.OMessage(10,"<b>[src] becomes swift as the wind; their strikes become countless like falling raindrops!</b>")
@@ -488,7 +488,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				Quake(35)
 				src.OMessage(10,"<b>Calling upon the name 'Durendal the Endurer', they cause the earth to tremble...</b>","<font color=red>[src]([src.key]) used Paladin Mode.")
 				KenShockwave(src,icon='KenShockwaveDivine.dmi',Size=0.5, Blend=2, Time=2)
-				del w
+				GfxReleaseImage(w)
 				animate(src, transform=src.transform*=1.5, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=10)
 				sleep(10)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
@@ -530,7 +530,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				sleep(10)
 				src.OMessage(10,"<b>Taking up the name 'Elysium the Virtuous', they invoke absolute stillness...</b>","<font color=red>[src]([src.key]) used Elysium Mode.")
 				KenShockwave(src,icon='KenShockwaveGod.dmi',Size=0.5, Blend=2, Time=3)
-				del w
+				GfxReleaseImage(w)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
 				src.overlays+=image(icon='ElysiumMode.dmi')
 				src.Hairz("Add")
@@ -558,7 +558,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				KenShockwave(src,icon='DarkKiai.dmi',Size=1)
 				KenShockwave(src,icon='DarkKiai.dmi',Size=3)
 				KenShockwave(src,icon='DarkKiai.dmi',Size=5)
-				del w
+				GfxReleaseImage(w)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
 				src.Hairz("Add")
 				sleep(5)
@@ -585,7 +585,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				sleep(10)
 				src.OMessage(10,"<b>Calling upon their insatiable bloodlust, they fill the air with miasma of death...</b>","<font color=red>[src]([src.key]) used Deathbringer Mode.")
 				KenShockwave(src,icon='KenShockwavePurple.dmi',Size=0.5, Blend=2, Time=3)
-				del w
+				GfxReleaseImage(w)
 				src.overlays-=image(icon=src.ActiveBuff.IconLock, pixel_x=src.ActiveBuff.LockX, pixel_y=src.ActiveBuff.LockY)
 				src.overlays+=image(icon='DeathbringerMode.dmi')
 				src.Hairz("Add")
@@ -622,11 +622,11 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				animate(w2, alpha=255, time=5)
 				sleep(5)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
-				del w
+				GfxReleaseImage(w)
 				sleep(10)
 				src.OMessage(10,"<b>Calling upon the names of their ancestors, they vow a bloody vengance against the world...</b>","<font color=red>[src]([src.key]) used Nibelung Mode.")
 				KenShockwave(src,icon='KenShockwaveBloodlust.dmi',Size=0.5, Blend=2, Time=3)
-				del w2
+				GfxReleaseImage(w2)
 				src.Hairz("Add")
 				src.overlays+=image(icon=src.ActiveBuff.IconLock, pixel_x=src.ActiveBuff.LockX, pixel_y=src.ActiveBuff.LockY)
 				src.OMessage(10,"<b>[src] becomes the incarnate of ruin, ready to slay all who oppose!</b>")

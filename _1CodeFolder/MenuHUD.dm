@@ -17,7 +17,7 @@
 
 // verbs kept out of the Options menu. The verbs stay typeable
 /var/list/MENU_VERB_EXCLUDE = list("OOC", "Say", "Emote", "Think", "Whisper", \
-	"Check AI Kills", "Clear Skill Shortcut", "Ping", "Set Skill Shortcuts", "Toggle Channels", "ViewSelfLogs", \
+	"Clear Skill Shortcut", "Ping", "Set Skill Shortcuts", "Toggle Channels", \
 	"Access Enchantment", "Access Technology", "Acquire Knowledge", "Acquire Skills", "Change Client FPS", \
 	"Signature Check", "Technology")
 

@@ -13,7 +13,6 @@ proc/MakeKnowledgeTreeList()
 				var/path=text2path("[i]")
 				var/obj/nameref=new path
 				namez=nameref.name
-				spawn(3)del(nameref)
 			B.path=i
 			B.name="[namez]"
 			KnowledgeTreeList[x]+=B

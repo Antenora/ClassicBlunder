@@ -10,6 +10,8 @@
 	return p
 
 /proc/BuildJournalTurfLine(list/rec, revert)
+	if(rec["elevOnly"])
+		return ""
 	var/pre = revert ? "old" : "new"
 	var/tp = rec["[pre]Type"]
 	if(!tp)
@@ -263,6 +265,9 @@
 
 /proc/BuildReapplyTurf(list/rec)
 	var/turf/T = locate(rec["x"], rec["y"], rec["z"])
+	if(rec["elevOnly"])
+		ElevSet(T, rec["newElev"])
+		return
 	BuildUntrackTurf(T)
 	var/tp = rec["newType"]
 	var/turf/C2 = new tp(T)
@@ -287,9 +292,14 @@
 			O.loc = null
 	rec["newRef"] = C2
 	LightingRecomputeNear(C2)
+	if(!isnull(rec["newElev"]) && rec["oldElev"] != rec["newElev"])
+		ElevSet(C2, rec["newElev"])
 
 /proc/BuildRevertTurf(list/rec)
 	var/turf/T = locate(rec["x"], rec["y"], rec["z"])
+	if(rec["elevOnly"])
+		ElevSet(T, rec["oldElev"])
+		return
 	BuildUntrackTurf(T)
 	var/tp = rec["oldType"]
 	var/turf/old = new tp(T)
@@ -315,6 +325,8 @@
 	for(var/list/krec in rec["killed"])
 		BuildRestoreRec(krec)
 	LightingRecomputeNear(old)
+	if(!isnull(rec["oldElev"]) && rec["oldElev"] != rec["newElev"])
+		ElevSet(old, rec["oldElev"])
 
 /proc/BuildRotAngle(dirv)
 	switch(dirv)
@@ -452,31 +464,59 @@
 			if(fam && fam.len < 2)
 				fam = null
 		var/list/placedTurfs = list()
+		var/list/elevTouched = list()
+		var/elevMode = (toolname == "lower") ? -1 : ((toolname == "walk" || isObj) ? 0 : 1)
 		for(var/turf/T in valid)
 			x1 = min(x1, T.x)
 			y1 = min(y1, T.y)
 			x2 = max(x2, T.x)
 			y2 = max(y2, T.y)
 			zz = T.z
-			if(isObj)
-				BuildPlaceObj(C, T, A, B)
-			else
-				var/list/rec = BuildCaptureTurf(T)
-				rec["killed"] = list()
-				var/datum/build_entry/useE = B
-				if(fam)
-					useE = pick(fam)
-					if(!istype(useE) || ispath(useE.Creates, /obj))
-						useE = B
-				var/turf/NT = BuildApplyTurf(C, rec, useE)
-				A.turfRecs += list(rec)
-				placedTurfs += NT
 			placed++
 			if(placed % BUILD_COMMIT_CHUNK == 0)
 				sleep(-1)
-		did = valid.len
+			var/oh = ElevAt(T)
+			if(elevMode == -1 || (elevMode == 1 && ElevSameKind(T, B, fam) && ElevRaisable(T)))
+				var/nh = clamp(oh + elevMode, 0, ELEV_MAX)
+				if(nh == oh)
+					continue
+				ElevSet(T, nh)
+				A.turfRecs += list(list("x" = T.x, "y" = T.y, "z" = T.z, "elevOnly" = 1, "oldElev" = oh, "newElev" = nh, "killed" = list()))
+				elevTouched += T
+				did++
+				continue
+			if(isObj)
+				BuildPlaceObj(C, T, A, B)
+				did++
+				continue
+			var/list/rec = BuildCaptureTurf(T)
+			rec["killed"] = list()
+			var/datum/build_entry/useE = B
+			if(fam)
+				useE = pick(fam)
+				if(!istype(useE) || ispath(useE.Creates, /obj))
+					useE = B
+			var/turf/NT = BuildApplyTurf(C, rec, useE)
+			rec["oldElev"] = oh
+			if(oh && !ElevRaisable(NT))
+				ElevSet(NT, 0)
+				elevTouched += NT
+			rec["newElev"] = ElevAt(NT)
+			A.turfRecs += list(rec)
+			placedTurfs += NT
+			did++
+		if(!did)
+			if(elevMode == -1)
+				C.mob << "Nothing raised there to lower."
+			else if(elevMode == 1)
+				C.mob << "Those tiles are already at the highest level ([ELEV_MAX])."
+			return
 		if(placedTurfs.len && S.autoEdge)
 			BuildEdgeSmoothAround(placedTurfs, S.blendEdges)
+		if(elevTouched.len)
+			ElevRefreshAround(elevTouched)
+		if(placedTurfs.len)
+			ElevVisualRefresh(placedTurfs)
 	A.count += did
 	if(fresh)
 		BuildClearRedo(S)
@@ -569,7 +609,7 @@
 		if(TT)
 			touched += TT
 	if(touched.len)
-		BuildEdgeSmoothAround(touched, 1)
+		ElevRefreshAround(touched)
 	A.undone = 1
 	S.redoStack += A
 	S.dirty = max(0, S.dirty - A.count)
@@ -618,7 +658,7 @@
 		if(TT)
 			touched += TT
 	if(touched.len)
-		BuildEdgeSmoothAround(touched, 1)
+		ElevRefreshAround(touched)
 	A.undone = 0
 	S.history += A
 	S.dirty += A.count
@@ -713,6 +753,8 @@
 		return
 	if(placedTurfs.len && S.autoEdge)
 		BuildEdgeSmoothAround(placedTurfs, S.blendEdges)
+	if(placedTurfs.len)
+		ElevVisualRefresh(placedTurfs)
 	BuildPushAction(S, A)
 	Log("Mapper", "[C.mob] ([C.ckey]) pasted [placedTurfs.len] tiles + [A.createdObjs.len] objects @ ([ax],[ay]) z[T.z]", 1)
 	BuildJournalAction(A)

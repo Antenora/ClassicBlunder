@@ -14,15 +14,3 @@
 //#endif
 
 var/global/tmp/EventScheduler/LOGscheduler = new()
-
-Event/writeToLog
-	var/text
-	var/destination
-
-	New(var/T, var/D)
-		src.text = T
-		src.destination = D
-
-	fire()
-		..() // let the EventScheduler do its thing first
-		file( src.destination ) << src.text

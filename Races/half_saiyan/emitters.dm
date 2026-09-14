@@ -74,9 +74,10 @@
 		for(var/obj/emitter/x in emitters)
 			if(source)
 				source.vis_contents -= x
-			del x
+			GfxReleaseAtom(x)
+		emitters = list()
+		source = null
 		ticking_generic -= src
-		del src
 	proc/removeEmitters()
 		for(var/obj/emitter/x in emitters)
 			x.fadeOut()

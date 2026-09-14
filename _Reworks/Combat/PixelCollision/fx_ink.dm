@@ -780,9 +780,7 @@ obj/AutoHitter
 		autohitChildren = null
 		Owner = null
 		ticking_generic -= src
-		loc = null
-		sleep(10)
-		del src
+		GfxReleaseAtom(src)
 
 mob/proc/InkWorldX()
 	return 1 + (x-1)*32 + step_x

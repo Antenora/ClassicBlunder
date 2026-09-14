@@ -186,25 +186,26 @@ mob
 				overlays -= emoteBubble
 				return
 
-			var/log_msg = msg
-
 			msg = applyRoleplayParsing(msg, decode)
 			var/ptag = ChatPortraitTag(src)
 
 			var/list/hearers = hearers(20,src)
+			var/list/ewit = list()
 
 			for(var/mob/E as anything in hearers)
 				if(!E.client) continue
 				if(!E.Admin && E.Mapper && E.invisibility) continue
 				E.client.EnsurePortrait(src)
 				E.client.outputToChat("[ptag][E.Controlz(src)][msg]", IC_OUTPUT)
+				ewit += E
 
-				Log(E.ChatLog(),"<font color=red>*[name]([key]) [html_decode(log_msg)]*")
-				Log(E.sanitizedChatLog(),"<font color=red>*[name] [html_decode(log_msg)]*")
 				if(E.BeingObserved.len>0)
 					for(var/mob/m in E.BeingObserved)
 						m.client?.EnsurePortrait(src)
 						m.client.outputToChat("[OBSERVE_HEADER][ptag][m.Controlz(src)][msg]", IC_OUTPUT)
+						ewit += m
+
+			LogEvent("emote", src, msg, ewit, null, null)
 
 			Say_Spark()
 			CheckAFK()

@@ -1,14 +1,6 @@
 
 mob/var/list/killed_AI
 
-mob/Players/verb/CheckAIKills()
-	set name = "Check AI Kills"
-	set category = "Other"
-	set hidden = 1
-	usr << "Your current AI kills are:"
-	for(var/i in killed_AI)
-		usr << "[i] - [killed_AI[i]]"
-
 /mob/Admin3/verb/AdminCheckAIKills(mob/Players/m in players)
 	set name = "Admin Check AI Kills"
 	usr << "[m]'s current AI kills are:"
@@ -1399,7 +1391,7 @@ mob/Player/AI
 									spawn(150)
 										animate(i, alpha=0, time=5)
 										sleep(5)
-										del i
+										GfxReleaseImage(i)
 							else
 								for(var/turf/t in Turf_Circle(src, 10))
 									if(prob(5))

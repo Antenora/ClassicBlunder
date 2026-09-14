@@ -10,6 +10,10 @@ globalTracker
 		DBG_NO_EMISSIVE = FALSE
 		DBG_NO_CONTACT = FALSE
 		DBG_NO_GLINT = FALSE
+		AUTO_PROFILE = TRUE
+		PROFILE_WINDOW = 600
+		PROFILE_JSON_MIN = 30
+		PROFILE_DUMP_GAP = 300
 
 client
 	var/tmp
@@ -509,7 +513,7 @@ client/proc/InitializeGraphics()
 		amb_alive = AP.count
 	src << "Ambient: profile slot [amb_kind] | emitter [client.hd2d_ambient ? "attached a=[client.hd2d_ambient.alpha]" : "NOT attached"] | particle cap [amb_alive] | local darkness [round(_Hd2dLocalDark(client), 0.01)] | fireflies [_hd2d_fireflies_by_turf.len] tiles | area profile [A ? A.env_profile_id : "n/a"][client.gfx_env_preview_id ? " (PREVIEW [client.gfx_env_preview_id])" : ""]"
 	src << "AMBIENT: emitter [client.hd2d_ambient ? "attached a=[client.hd2d_ambient.alpha] particles=[client.hd2d_ambient.particles ? "yes" : "NULL"]" : "none"] | key [client.hd2d_ambient_key] | lightclass [client.hd2d_lightclass] | localdark [round(_Hd2dLocalDark(client), 0.01)] | fireflies [_hd2d_fireflies_by_turf.len] homes | area profile [A ? A.env_profile_id : "none"] (resolved [P ? P.id : "?"])"
-	src << "Watchdog: [_gfx_watchdog_sequence > 0 ? "ACTIVE" : "waiting for first sample"] | samples written: [_gfx_watchdog_sequence] | file: graphics_watchdog.log"
+	src << "Watchdog: [_gfx_watchdog_sequence > 0 ? "ACTIVE" : "waiting for first sample"] | samples written: [_gfx_watchdog_sequence] | file: graphics_watchdog.log | profiler: [_gfx_profile_on ? "ON" : "off"] | profile dumps: [_gfx_profile_dumps]"
 	src << "Standing surface: water [GfxIsWaterSurface(T) ? "YES" : "no"] | reflection edge: [reflection_edge] | target: [reflection_target] | gap: [round(reflection_gap)]px | actor strength [round(GfxActorReflectionStrength(src, reflection_surface, reflection_gap), 0.01)] | actor eligible [reflection_surface ? "YES" : "no"]"
 
 var/_gfx_adaptive_boot = _GfxAdaptiveBoot()
@@ -558,6 +562,32 @@ proc/_GfxAdaptiveLoop()
 	src << "Adaptive graphics budget: [glob.GRAPHICS_ADAPTIVE ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set adaptive graphics to [glob.GRAPHICS_ADAPTIVE].")
 
+proc/GfxReleaseAtom(atom/movable/A)
+	if(!A) return
+	GfxClearMaterialVisuals(A)
+	GfxMaterialBucketUnregister(A)
+	_gfx_material_atoms -= A
+	SurfaceScreenGlowClear(A)
+	CanopyShaftDetach(A)
+	if(isobj(A))
+		var/obj/O = A
+		LightPropDetach(O)
+		FxEmissiveDetach(O)
+	var/list/holders = A.vis_locs
+	if(holders && holders.len)
+		holders = holders.Copy()
+		for(var/turf/t in holders)
+			t.vis_contents -= A
+		for(var/atom/movable/h in holders)
+			h.vis_contents -= A
+	A.loc = null
+
+proc/GfxReleaseImage(image/I)
+	if(!I) return
+	for(var/client/C)
+		C.images -= I
+
+
 //crash-forensics heartbeat log
 
 #define GFX_WATCHDOG_FILE "graphics_watchdog.log"
@@ -584,6 +614,7 @@ proc/_GfxWatchdogBoot()
 	spawn(150)
 		GfxWatchdogSnapshot("BOOT")
 		world.log << "GFX WATCHDOG: active; writing [GFX_WATCHDOG_FILE]."
+		_GfxProfileTick()
 		_GfxSpikeLoop()
 		_GfxWatchdogLoop()
 	return 1
@@ -607,6 +638,9 @@ proc/_GfxSpikeLoop()
 		if(drift < 0) continue
 		if(drift > 4)
 			GfxWatchdogSnapshot("SPIKE_[drift]")
+			GfxProfileDump("SPIKE_[drift]", drift)
+		else
+			_GfxProfileTick()
 
 client/New()
 	. = ..()
@@ -620,5 +654,119 @@ client/Del()
 world/Del()
 	GfxWatchdogSnapshot("WORLD_DEL")
 	. = ..()
+
+#define GFX_PROFILE_FILE "graphics_profile.log"
+#define GFX_PROFILE_RAW_FILE "graphics_profile_raw.log"
+#define GFX_PROFILE_TOP 20
+#define GFX_PROFILE_MAX_DUMPS 500
+#define GFX_PROFILE_MAX_RAW 40
+var/_gfx_profile_on = 0
+var/_gfx_profile_window_wt = 0
+var/_gfx_profile_last_dump_wt = -1000000
+var/_gfx_profile_dumps = 0
+var/_gfx_profile_raw_dumps = 0
+
+proc/GfxProfileStart()
+	if(_gfx_profile_on) return
+	world.Profile(PROFILE_RESTART)
+	_gfx_profile_on = 1
+	_gfx_profile_window_wt = world.time
+	world.log << "GFX PROFILER: active; writing [GFX_PROFILE_FILE]."
+
+proc/GfxProfileStop()
+	if(!_gfx_profile_on) return
+	world.Profile(PROFILE_STOP)
+	_gfx_profile_on = 0
+
+proc/_GfxProfileTick()
+	if(!glob) return
+	if(!glob.AUTO_PROFILE)
+		GfxProfileStop()
+		return
+	if(!_gfx_profile_on)
+		GfxProfileStart()
+		return
+	if(world.time - _gfx_profile_window_wt >= glob.PROFILE_WINDOW)
+		world.Profile(PROFILE_RESTART)
+		_gfx_profile_window_wt = world.time
+
+proc/_GfxProfileTopN(list/rows, col, n)
+	var/list/out = list()
+	for(var/list/r in rows)
+		var/v = r[col]
+		if(!isnum(v) || v <= 0) continue
+		if(out.len >= n)
+			var/list/tail = out[out.len]
+			if(v <= tail[col]) continue
+		var/pos = out.len + 1
+		while(pos > 1)
+			var/list/prev = out[pos - 1]
+			if(prev[col] >= v) break
+			pos--
+		out.Insert(pos, list(r))
+		if(out.len > n) out.Cut(n + 1)
+	return out
+
+proc/GfxProfileDump(reason, stall = 0, force = 0)
+	if(!_gfx_profile_on || !glob) return
+	if(_gfx_profile_dumps >= GFX_PROFILE_MAX_DUMPS) return
+	var/big = stall >= glob.PROFILE_JSON_MIN
+	if(!force && !big && world.time - _gfx_profile_last_dump_wt < glob.PROFILE_DUMP_GAP) return
+	var/window = (world.time - _gfx_profile_window_wt) / 10
+	var/list/P = world.Profile(PROFILE_REFRESH)
+	if(!islist(P) || P.len < 12)
+		world.Profile(PROFILE_RESTART)
+		_gfx_profile_window_wt = world.time
+		return
+	var/list/rows = list()
+	for(var/i = 7, i + 5 <= P.len, i += 6)
+		rows += list(list(P[i], P[i + 1], P[i + 2], P[i + 3], P[i + 4], P[i + 5]))
+	var/client_count = 0
+	for(var/client/C) client_count++
+	var/player_count = islist(players) ? players.len : 0
+	var/stamp = time2text(world.realtime, "YYYY-MM-DD hh:mm:ss")
+	var/head = "[stamp] seq=[_gfx_watchdog_sequence] event=[reason] wt=[world.time] stall=[stall / 10]s window=[round(window, 0.1)]s rows=[rows.len] clients=[client_count] players=[player_count]"
+	var/out = "[head]\n"
+	var/rank = 0
+	for(var/list/r in _GfxProfileTopN(rows, 5, GFX_PROFILE_TOP))
+		out += " over [++rank] [r[1]] self=[r[2]] total=[r[3]] real=[r[4]] over=[r[5]] calls=[r[6]]\n"
+	rank = 0
+	for(var/list/r in _GfxProfileTopN(rows, 2, GFX_PROFILE_TOP))
+		out += " self [++rank] [r[1]] self=[r[2]] total=[r[3]] real=[r[4]] over=[r[5]] calls=[r[6]]\n"
+	if(!text2file(out, GFX_PROFILE_FILE))
+		world.log << "GFX PROFILER: failed to append [GFX_PROFILE_FILE] ([reason])."
+	_gfx_profile_dumps++
+	_gfx_profile_last_dump_wt = world.time
+	if(big && _gfx_profile_raw_dumps < GFX_PROFILE_MAX_RAW)
+		var/json = world.Profile(PROFILE_REFRESH, "json")
+		if(istext(json) && length(json))
+			text2file("[head]\n[json]\n", GFX_PROFILE_RAW_FILE)
+			_gfx_profile_raw_dumps++
+	world.Profile(PROFILE_RESTART)
+	_gfx_profile_window_wt = world.time
+
+/mob/Admin2/verb/Auto_Profile_Toggle()
+	set category = "Admin"
+	set name = "Auto Profile Toggle"
+	glob.AUTO_PROFILE = !glob.AUTO_PROFILE
+	_GfxProfileTick()
+	src << "Auto profiler: [glob.AUTO_PROFILE ? "ON" : "OFF"] (dumps this boot: [_gfx_profile_dumps])."
+	Log("Admin", "[ExtractInfo(src)] set auto profiling to [glob.AUTO_PROFILE].")
+
+/mob/Admin2/verb/Profile_Dump_Now()
+	set category = "Admin"
+	set name = "Profile Dump Now"
+	if(!_gfx_profile_on)
+		src << "Auto profiler is off."
+		return
+	GfxProfileDump("MANUAL", 0, 1)
+	src << "Profile window written to [GFX_PROFILE_FILE] (dump #[_gfx_profile_dumps])."
+	Log("Admin", "[ExtractInfo(src)] dumped the profiler window.")
+
+#undef GFX_PROFILE_FILE
+#undef GFX_PROFILE_RAW_FILE
+#undef GFX_PROFILE_TOP
+#undef GFX_PROFILE_MAX_DUMPS
+#undef GFX_PROFILE_MAX_RAW
 
 #undef GFX_WATCHDOG_FILE

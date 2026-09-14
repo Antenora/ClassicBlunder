@@ -1047,7 +1047,7 @@
 				barrier.domain_hp -= TurfDamage
 				if(barrier.domain_hp <= 0)
 					domainOwner.domainExpansionBarriers -= barrier
-					del(barrier)
+					ReleaseProp(barrier)
 					domainOwner.BreachDomain()
 				return
 			for(var/obj/Seal/S in P)

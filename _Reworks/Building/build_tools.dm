@@ -110,7 +110,7 @@
 				BuildHUDCloseDrop(src)
 			var/list/plist = params2list(params)
 			if(plist["right"] == "1")
-				if(fillPending || dragging || curveStage || pasteMode || exportStage || importStage || smoothStage || warpStage || cpActive)
+				if(fillPending || dragging || curveStage || pasteMode || exportStage || importStage || smoothStage || warpStage || cliffStage || cpActive)
 					CancelPending()
 					UpdateGhost()
 					C.mob << "Cancelled."
@@ -220,6 +220,48 @@
 					C.mob << "Region smoothed."
 					Log("Mapper", "[C.mob] ([C.ckey]) smoothed region ([sx1],[sy1])-([sx2],[sy2]) z[sz].", 1)
 				return
+			if(cliffStage == 1)
+				cliffX1 = T.x
+				cliffY1 = T.y
+				anchorZ = T.z
+				cliffStage = 2
+				ShowHighlightSet(list(T))
+				C.mob << "[copytext(cliffStyleSel, 1, 6) == "foam:" ? "FOAM" : "CLIFF STYLE"]: corner set. Now click the OPPOSITE corner."
+				return
+			if(cliffStage == 2)
+				if(T.z != anchorZ)
+					C.mob << "Both corners must be on the same z level."
+					return
+				cliffStage = 0
+				var/kx1 = min(cliffX1, T.x)
+				var/ky1 = min(cliffY1, T.y)
+				var/kx2 = max(cliffX1, T.x)
+				var/ky2 = max(cliffY1, T.y)
+				var/kz = T.z
+				var/ksel = cliffStyleSel
+				ShowHighlightSet(TurfSquare(kx1, ky1, kx2, ky2, kz, 1))
+				spawn
+					if(busy)
+						C.mob << "Build engine is busy; try again in a moment."
+						ClearPreviews()
+						return
+					busy = 1
+					if(copytext(ksel, 1, 6) == "foam:")
+						var/foff = (ksel == "foam:off")
+						var/fn = BuildFoamPaintRegion(kx1, ky1, kx2, ky2, kz, foff)
+						busy = 0
+						ClearPreviews()
+						UpdateGhost()
+						C.mob << "Shore foam [foff ? "OFF" : "ON"] for [fn] water tiles in that region."
+						Log("Mapper", "[C.mob] ([C.ckey]) set shore foam [foff ? "off" : "on"] over ([kx1],[ky1])-([kx2],[ky2]) z[kz]: [fn] water tiles.", 1)
+						return
+					var/kn = BuildCliffPaintRegion(kx1, ky1, kx2, ky2, kz, ksel)
+					busy = 0
+					ClearPreviews()
+					UpdateGhost()
+					C.mob << "Cliff style set on [kn] tiles."
+					Log("Mapper", "[C.mob] ([C.ckey]) painted cliff style [ksel] over ([kx1],[ky1])-([kx2],[ky2]) z[kz]: [kn] tiles.", 1)
+				return
 			if(warpStage == 1)
 				warpX = T.x
 				warpY = T.y
@@ -315,6 +357,7 @@
 						C.mob << "Pick a tile from the palette first."
 						return
 					dragging = 1
+					strokeLower = (plist["alt"] == "1")
 					anchorZ = T.z
 					if(tool == BUILD_SPRAY)
 						strokeSet = list()
@@ -361,6 +404,7 @@
 						C.mob << "Pick a tile from the palette first."
 						return
 					dragging = 1
+					strokeLower = (plist["alt"] == "1")
 					anchorX = T.x
 					anchorY = T.y
 					anchorZ = T.z
@@ -439,6 +483,9 @@
 			strokeRolled = null
 			strokeHit = null
 			ClearPreviews()
+			if(strokeLower)
+				tname = "lower"
+				strokeLower = 0
 			if(todo && todo.len)
 				BuildCommitSet(C, todo, tname)
 			UpdateGhost()

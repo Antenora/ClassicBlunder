@@ -91,7 +91,7 @@
 					p.alpha = max(0, p.alpha - alpha_step)
 					sleep(1)
 				if(p)
-					del(p)
+					p.endLife()
 					consumed++
 
 			if(consumed && istype(center, /mob/Players))

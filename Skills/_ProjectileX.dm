@@ -6958,7 +6958,7 @@ obj
 						if(isobj(a))
 							if(a:Destructable)
 								if(src.Dodgeable<0||src.MiniDivide||src.Divide)
-									del a
+									ReleaseProp(a)
 									return
 						else if(isturf(a))
 							if(src.HyperHoming&&src.Homing||src.HomingCharge&&!src.Homing||src.MiniDivide)

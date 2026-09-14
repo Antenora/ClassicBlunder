@@ -673,6 +673,11 @@ mob/proc/Death(mob/P,var/text,var/SuperDead=0, var/NoRemains=0, extraChance, fak
 		src.SetHealthPct(100)
 		src.Energy=src.EnergyMax
 		return
+	if(!fakeDeath)
+		if(istype(src, /mob/Player/AI))
+			if(P && P.ckey) LogEvent("kill", P, "[P] killed [src]", list(P), null, list("victim" = "[src]", "ai" = 1))
+		else
+			LogEvent("death", src, "[src] was killed by [text]", list(src, P), null, list("killer" = P ? "[P]" : "", "kkey" = (P && P.ckey) ? P.ckey : ""))
 	if(isplayer(src))
 		for(var/mob/m in viewers(20, src))
 			for(var/b in m.SlotlessBuffs)

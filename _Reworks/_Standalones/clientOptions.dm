@@ -73,8 +73,11 @@ Options/
     var/rpSnippets = null
     var/displayMode = "windowed"
     var/faceGeom = null
+    var/logGeom = null
+    var/logLock = 0
+    var/logFold = 0
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode", "faceGeom", "chatFonts")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode", "faceGeom", "chatFonts", "logGeom", "logLock", "logFold")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)

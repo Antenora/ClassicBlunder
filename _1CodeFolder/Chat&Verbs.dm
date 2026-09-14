@@ -1048,8 +1048,6 @@ mob/Players/verb
 			total+=diemodifer
 			var/msg = "<b><font color=red>DICE:</b></font> [usr] rolled a total of [total] ([oldnum]d[diesides]+[diemodifer]), rolls were [textstring]."
 			usr.OMessage(10,msg)
-			Log(usr.ChatLog(),msg)
-			Log(usr.sanitizedChatLog(),msg)
 			if(usr.BeingObserved.len>0)
 				for(var/mob/m in usr.BeingObserved)
 					m.client.outputToChat("[OBSERVE_HEADER] [msg]", ALL_OUTPUT)
@@ -1058,8 +1056,6 @@ mob/Players/verb
 			var/roll=roll(dice)
 			var/msg = "<b><font color=red>DICE:</b></font> [usr] rolled [roll] ([dienumber]d[diesides]+[diemodifer])."
 			usr.OMessage(10,msg)
-			Log(usr.ChatLog(),msg)
-			Log(usr.sanitizedChatLog(),msg)
 			if(usr.BeingObserved.len>0)
 				for(var/mob/m in usr.BeingObserved)
 					m.client.outputToChat("[OBSERVE_HEADER] [msg]", ALL_OUTPUT)

@@ -19,6 +19,7 @@ var/global/customDefsDirty = 0
 		hash = ""
 		creator = ""
 		material = ""
+		cliff = 0
 		tmp/fhash = ""
 
 /proc/BuildCustomLoad()
@@ -52,6 +53,8 @@ var/global/customDefsDirty = 0
 		D.creator = BuildDmmUnescape(f[13])
 		if(f.len >= 14 && (f[14] in buildMaterialNames))
 			D.material = f[14]
+		if(f.len >= 15)
+			D.cliff = text2num(f[15]) || 0
 		if(!fexists(D.fname))
 			continue
 		customDefs += D
@@ -60,7 +63,7 @@ var/global/customDefsDirty = 0
 /proc/BuildCustomSave()
 	var/list/lines = list()
 	for(var/datum/build_custom_def/D in customDefs)
-		lines += jointext(list(D.kind, BuildDmmEscape(D.name), BuildDmmEscape(D.fname), BuildDmmEscape(D.icon_state), "[D.density]", "[D.opacity]", "[D.roof]", "[D.layerv]", "[D.pixelX]", "[D.pixelY]", "[D.edge]", D.hash, BuildDmmEscape(D.creator), D.material), "\t")
+		lines += jointext(list(D.kind, BuildDmmEscape(D.name), BuildDmmEscape(D.fname), BuildDmmEscape(D.icon_state), "[D.density]", "[D.opacity]", "[D.roof]", "[D.layerv]", "[D.pixelX]", "[D.pixelY]", "[D.edge]", D.hash, BuildDmmEscape(D.creator), D.material, "[D.cliff]"), "\t")
 	if(fexists(CUSTOM_MANIFEST))
 		fdel(CUSTOM_MANIFEST)
 	text2file(jointext(lines, "\n"), CUSTOM_MANIFEST)
@@ -247,9 +250,9 @@ var/global/list/customDefIconCache = list()
 		if(isnull(nm) || !length(nm))
 			M << "Custom creation cancelled."
 			return
-		M << "Flags: D = dense, O = opaque, R = roof. Type any of them, or leave empty."
+		M << "Flags: D = dense, O = opaque, R = roof, C = cliff (auto-curved bottom corners). Type any of them, or leave empty."
 		sleep(5)
-		var/flags = M.HUDTextPrompt("Flags: D O R (or empty)", "")
+		var/flags = M.HUDTextPrompt("Flags: D O R C (or empty)", "")
 		if(isnull(flags))
 			flags = ""
 		flags = uppertext(flags)
@@ -273,6 +276,7 @@ var/global/list/customDefIconCache = list()
 		D.density = findtext(flags, "D") ? 1 : 0
 		D.opacity = findtext(flags, "O") ? 1 : 0
 		D.roof = (kind == "turf" && findtext(flags, "R")) ? 1 : 0
+		D.cliff = (kind == "turf" && findtext(flags, "C")) ? 1 : 0
 		D.hash = uphash
 		D.creator = C.ckey
 		D.material = mat
@@ -327,6 +331,7 @@ mob/Mapper/verb/Edit_Custom_Def()
 	var/o0 = D.opacity
 	var/r0 = D.roof
 	var/m0 = D.material
+	var/k0 = D.cliff
 	while(D)
 		var/list/menu = list()
 		if(D.kind == "turf")
@@ -335,6 +340,7 @@ mob/Mapper/verb/Edit_Custom_Def()
 		menu += "Opaque: [D.opacity ? "ON" : "OFF"]"
 		if(D.kind == "turf")
 			menu += "Roof: [D.roof ? "ON" : "OFF"]"
+			menu += "Cliff: [D.cliff ? "ON" : "OFF"]"
 		menu += "Done"
 		var/choice = input(usr, "Custom \"[D.name]\" - pick a setting.", "Edit Custom") as null|anything in menu
 		if(!choice || choice == "Done")
@@ -352,11 +358,14 @@ mob/Mapper/verb/Edit_Custom_Def()
 			D.opacity = !D.opacity
 		else if(findtext(choice, "Roof"))
 			D.roof = !D.roof
+		else if(findtext(choice, "Cliff"))
+			D.cliff = !D.cliff
 	var/dDens = (D.density != d0)
 	var/dOpac = (D.opacity != o0)
 	var/dRoof = (D.roof != r0)
 	var/matChanged = (D.material != m0)
-	if(!dDens && !dOpac && !dRoof && !matChanged)
+	var/cliffChanged = (D.cliff != k0)
+	if(!dDens && !dOpac && !dRoof && !matChanged && !cliffChanged)
 		return
 	BuildCustomSave()
 	if(buildPalette)
@@ -368,7 +377,8 @@ mob/Mapper/verb/Edit_Custom_Def()
 				break
 	usr << "Saved \"[D.name]\" - new placements use the new settings[D.kind == "turf" ? "; placed tiles are updating in the background" : ""]."
 	Log("Mapper", "[usr] ([usr.ckey]) edited custom def \"[D.name]\" (material [length(D.material) ? D.material : "auto"], D[D.density] O[D.opacity] R[D.roof]).", 1)
-	BuildCustomRetroApply(D, dDens, dOpac, dRoof, matChanged)
+	customDefIconCache = list()
+	BuildCustomRetroApply(D, dDens, dOpac, dRoof, matChanged || cliffChanged)
 
 mob/Admin3/verb/Delete_Custom_Def()
 	set category = "Mapper"

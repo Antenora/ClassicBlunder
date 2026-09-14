@@ -264,6 +264,7 @@
 #define FILE_DIR "Mapping"
 #define FILE_DIR "Mapping/Cliffs"
 #define FILE_DIR "Mapping/EdgeMasks"
+#define FILE_DIR "Mapping/Elevation"
 #define FILE_DIR "Mapping/NewIcons"
 #define FILE_DIR "Races"
 #define FILE_DIR "Races/gajalaka"
@@ -286,7 +287,6 @@
 #define FILE_DIR "Sounds/music"
 #define FILE_DIR "Sounds/music/jukebox"
 #define FILE_DIR "Turfs"
-#define FILE_DIR "UI"
 // END_FILE_DIR
 // BEGIN_PREFERENCES
 #define DEBUG
@@ -376,6 +376,7 @@
 #include "_1CodeFolder\TechTreeHUD.dm"
 #include "__log_system\_main_.dm"
 #include "__log_system\events.dm"
+#include "__log_system\logstore.dm"
 #include "_Reworks\_Standalones\adminOveriew.dm"
 #include "_Reworks\_Standalones\clientOptions.dm"
 #include "_Reworks\_Standalones\CookingBrewingRecipes.dm"
@@ -435,8 +436,11 @@
 #include "_Reworks\Building\build_core.dm"
 #include "_Reworks\Building\build_custom.dm"
 #include "_Reworks\Building\build_edges.dm"
+#include "_Reworks\Building\build_elev.dm"
+#include "_Reworks\Building\build_elev_vis.dm"
 #include "_Reworks\Building\build_engine.dm"
 #include "_Reworks\Building\build_export.dm"
+#include "_Reworks\Building\build_foam.dm"
 #include "_Reworks\Building\build_hud.dm"
 #include "_Reworks\Building\build_import.dm"
 #include "_Reworks\Building\build_inspect.dm"
@@ -1011,6 +1015,7 @@
 #include "UI\AdminPage.dm"
 #include "UI\ChatPanel.dm"
 #include "UI\FacePage.dm"
+#include "UI\LogPage.dm"
 #include "UI\RPBox.dm"
 #include "UpdateNotes\update.dm"
 #include "Utility\UtilityDebug.dm"
