@@ -13,6 +13,7 @@ obj
 			HitSparkX=-32
 			HitSparkY=-32
 			HitSparkTurns=1
+			MenuIcon="SwordPressure"
 			HitSparkSize=3
 			TurfStrike=1
 			Slow=1
@@ -93,6 +94,7 @@ obj
 			Area="Strike"
 			PassThrough=1
 			Distance=4
+			MenuIcon="Stinger"
 			StrScaling=1
 			NoPierce=1
 			Knockback=3
@@ -112,6 +114,7 @@ obj
 			Distance=4
 			PassThrough=1
 			FocusShifter=1
+			MenuIcon="LightStep"
 			FocusShiftBoost=1.5
 			StrScaling=1
 			DamageMult=3.5
@@ -145,6 +148,7 @@ obj
 			Distance=2
 			StrScaling=1
 			EndEffectiveness=1
+			MenuIcon="OverheadDivide"
 			DamageMult=3.9
 			GuardBreak=1
 			WindUp=1
@@ -177,6 +181,7 @@ obj
 			FocusShiftBoost=1.5
 			Cooldown=5
 			EnergyCost=1
+			MenuIcon="VacuumRender"
 			Distance=3
 			BlockEffectiveness=0.5
 			Size=2.5
@@ -204,6 +209,7 @@ obj
 			Area="Arc"
 			Distance=3
 			StrScaling=1
+			MenuIcon="HackNSlash"
 			DamageMult=1.35
 			RoundMovement=0
 			FocusShifter=1
@@ -242,6 +248,7 @@ obj
 			Crippling=5
 			BonusVsSlowed=0.5
 			Icon='roundhouse.dmi'
+			MenuIcon="Hamstring"
 			IconX=-16
 			IconY=-16
 			HitSparkIcon='Slash.dmi'
@@ -270,6 +277,7 @@ obj
 			StrScaling=1
 			DamageMult=3.85
 			Paralyzing=5
+			MenuIcon="CrossSlash"
 			EnergyCost=1
 			HitSparkIcon='Slash - Zan.dmi'
 			HitSparkX=-16

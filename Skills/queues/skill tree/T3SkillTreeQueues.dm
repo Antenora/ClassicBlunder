@@ -12,6 +12,7 @@ obj
 				AccuracyMult = 1.15
 				Duration=5
 				Warp=2
+				MenuIcon="RunThrough"
 				KBMult=0.001
 				Grapple=1
 				GrabTrigger="/obj/Skills/Grapple/Sword/Blade_Drive"

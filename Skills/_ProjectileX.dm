@@ -208,7 +208,6 @@ obj
 				ProjectileAfterimageDelay = 1 //Delay in deciseconds before an afterimage begins fading
 				ProjectileAfterimageDuration = 8 //Time in deciseconds for an afterimage to fade completely
 
-
 				GoldScatter
 				Snaring
 				AngelMagicCompatible
@@ -3782,25 +3781,106 @@ obj
 
 			Magic
 				MagicNeeded=1
-				Fire
+				Fire	// NEW VERSION: DON'T GIVE FIRA/FIRAGA, THEY ARE INCLUDED IN THIS ONE VIA CHARGE LEVELS
 					ElementalClass="Fire"
 					SpellElement="Fire"
 					SkillCost=TIER_2_COST
 					Copyable=2
 					DamageMult=1
 					AccMult=2
-					Homing=1
+					Homing=0
 					Scorching=1
 					Explode=1
-					MultiShot=4
 					Deflectable=1
+					HeldSkill=1
+					MasteryGain=1
+					var/FirstLevelAchieved=0
+					var/SecondLevelAchieved=0
+					var/ThirdLevelAchieved=0
 					ManaCost=1
-					Cooldown=45
+					Cooldown=0.5
+					NoGCD=1
+					ChargePeriod=2
+					MaxChargeLevel=0
+					ExtraChargePeriod2=2
+					MasteryRank1=5200
+					MasteryRank2=13000
+					MasteryRank3=26000
+					MasteryRank1Name="Fira"
+					MasteryRank2Name="Firaga"
+					MasteryRank3Name="Firaza"
 					IconLock='Fireball.dmi'
 					ActiveMessage="invokes: <font size=+1>FIRE!</font size>"
+					adjust(mob/p)
+						if(FightingSeriously(usr, usr.Target))
+							MasteryGain=26
+						else
+							MasteryGain=1
+						if(Mastery >= MasteryRank1 && !FirstLevelAchieved)
+							p << "You've unlocked Fira! Charging Fire fully will enhance Fire into Fira."
+							FirstLevelAchieved=1
+							MaxChargeLevel=1
+						if(Mastery >= MasteryRank2 && !SecondLevelAchieved)
+							p << "You've unlocked Firaga! Charging Fira fully will enhance Fira into Firaga."
+							SecondLevelAchieved=1
+							MaxChargeLevel=2
+						if(Mastery >= MasteryRank3 && !ThirdLevelAchieved)
+							p << "You've unlocked Firaza! Charging Firaga fully will enhance Firaga into Firaza."
+							ThirdLevelAchieved=1
+							MaxChargeLevel=3
+					OnHeldRelease(mob/p, var/benefit,var/sweet_spot_hit, var/level)
+						switch(level)
+							if(0)
+								ManaCost=1
+								DamageMult=1+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>FIRE!</font size>"
+								Homing=0
+								Blasts=1
+								IconSize=1
+								Explode=1
+								NoGCD=1
+								Scorching=1
+								Cooldown=0.5
+							if(1)
+								ManaCost=5
+								DamageMult=4+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>FIRA!</font size>"
+								Blasts=2
+								Homing=0
+								Explode=1.5
+								IconSize=2
+								NoGCD=0
+								Scorching=2
+								Cooldown=4
+							if(2)
+								ManaCost=10
+								ActiveMessage="invokes: <font size=+1>FIRAGA!</font size>"
+								DamageMult=6+(3*benefit)
+								Blasts=3
+								Explode=3
+								Homing=0
+								IconSize=3
+								NoGCD=0
+								Scorching=3
+								Cooldown=12
+							if(3)
+								ManaCost=10
+								ActiveMessage="invokes: <font size=+1>FIRAZA!</font size>"
+								DamageMult=10+(3*benefit)
+								Blasts=3
+								Explode=5
+								Homing=1
+								IconSize=4
+								NoGCD=0
+								Scorching=10
+								Cooldown=30
+
+						p.UseProjectile(src)
 					verb/Fire()
 						set category = "Skills"
-						usr.UseProjectile(src)
+						adjust(usr)
+						usr.BeginHeldSkill(src)
+
 
 				Fira
 					ElementalClass="Fire"
@@ -4141,6 +4221,7 @@ obj
 					DamageMult=1.05
 					AccMult = 1.5
 					Radius=1
+					MenuIcon="WindScar"
 					ZoneAttack=1
 					ZoneAttackX=0
 					ZoneAttackY=0
@@ -4173,6 +4254,7 @@ obj
 					MultiHit=2
 					Devour=1
 					Knockback=1
+					MenuIcon="BacklashWave"
 					EnergyCost=5
 					Cooldown=18
 					IconLock='TornadoDirected.dmi'
@@ -4203,6 +4285,7 @@ obj
 					EnergyCost=5
 					Cooldown=18
 					Homing=1
+					MenuIcon="AirSlash"
 					Hover=15
 					DartAtAttacker=1
 					IconLock='Scarring Breeze.dmi'
@@ -4222,6 +4305,7 @@ obj
 					Radius=1
 					ZoneAttack=1
 					ZoneAttackX=0
+					MenuIcon="PhantomHowl"
 					ZoneAttackY=0
 					FireFromSelf=1
 					FireFromEnemy=0
@@ -5734,6 +5818,7 @@ obj
 					LingeringTornadoSpawned=0
 					SkillPath//type path of the skill that created this projectile (for Warp Strike weapon hide)
 					tmp/ProjectileAfterimageCounter=0
+					mob/MasteryOwner
 				Savable=0
 				density=1
 				Grabbable=0
@@ -5747,6 +5832,7 @@ obj
 					if(BeamCharging<0.5)
 						BeamCharging=0.5
 					src.Owner=m
+					src.MasteryOwner=m // this is so projectiles being deflected/reflected don't re-attribute mastery ownership
 					src.beam_owner=BeamOwner
 					src.SkillPath=Z.type
 					src.DirOverride=DirOverride ? DirOverride : Z.DirOverride
@@ -5908,6 +5994,7 @@ obj
 					src.EnergyBurn=Z.EnergyBurn
 					src.DrainToSelf=Z.DrainToSelf
 					src.WarpResetCD=Z.WarpResetCD
+					src.MasteryGain=Z.MasteryGain
 					src.Toxic=Z.Toxic
 					src.SlayerMod=Z.SlayerMod
 					src.CritEffectiveness=Z.CritEffectiveness
@@ -6121,6 +6208,7 @@ obj
 						AssociatedLegend = null
 						AssociatedGear = null
 						loc = null
+						MasteryOwner = null
 					catch()
 					return
 				proc/LeaveProjectileAfterimage(turf/old_loc, old_step_x=0, old_step_y=0)
@@ -6144,6 +6232,15 @@ obj
 					I.FadeDelay=src.ProjectileAfterimageDelay
 					I.FadeDuration=src.ProjectileAfterimageDuration
 					I.BeginFade()
+				proc/GainProjectileMastery(mob/target)
+					if(!target || src.MasteryGain <= 0 || !src.MasteryOwner || !src.SkillPath)
+						return
+					var/obj/Skills/Projectile/sourceSkill = locate(src.SkillPath) in src.MasteryOwner
+					if(sourceSkill)
+						var/gain = src.MasteryGain
+						if(istype(target, /mob/Player/AI))
+							gain = initial(sourceSkill.MasteryGain)
+						sourceSkill.Mastery += gain
 
 				proc/Hit(atom/a, MultDamage=1)
 					if(istype(a, /obj/Skills/Projectile/_Projectile))
@@ -6710,6 +6807,7 @@ obj
 									S.blockEff = BlockEffectiveness
 									S.critBonus = CritChanceBonus
 									S.resolve()
+									src.GainProjectileMastery(m)
 									a:ccCountHit()
 									src.Owner.ProjectileAttacking = FALSE
 									if(src.BypassTempHP)
@@ -6799,6 +6897,7 @@ obj
 												S.critEff = 1
 												S.critBonus = 100
 										S.resolve()
+										src.GainProjectileMastery(m)
 										a:ccCountHit()
 										src.Owner.ProjectileAttacking = FALSE
 										if(src.BypassTempHP)

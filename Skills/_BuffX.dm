@@ -271,6 +271,7 @@ NEW VARIABLES
 	var/TurfShiftInstant = 0
 	var/TrailImage
 	var/VanishImage
+	var/PortraitTag
 //PU modifiers
 	var/PULock//No PU.
 	var/AllowedPower//declares buffs to be used at low power levels

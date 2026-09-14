@@ -58,13 +58,45 @@ mob/proc/PortraitCombo(f, a)
 			if(istext(c) && length(c)) return c
 	return null
 
+mob/proc/PortraitBuffTag() //Buff Tag, lets you essentially do BuffNameForm1Anger1 and get real silly with it if u want. Picks the first buff that has a tag, so no stacking those, let's be reasonable
+	var/list/active_buffs = list()
+	if(ActiveBuff) active_buffs += ActiveBuff
+	if(SpecialBuff) active_buffs += SpecialBuff
+	if(StanceBuff) active_buffs += StanceBuff
+	if(StyleBuff) active_buffs += StyleBuff
+
+	for(var/buff_name in SlotlessBuffs)
+		var/obj/Skills/Buffs/B = SlotlessBuffs[buff_name]
+		if(B) active_buffs += B
+
+	for(var/obj/Skills/Buffs/B in active_buffs)
+		if(istext(B.PortraitTag) && length(B.PortraitTag))
+			return B.PortraitTag
+	return null
+
+
 mob/proc/PortraitAuto()
 	if(!CharPortrait) return null
+	var/f = transActive > 0 ? transActive : 0
+	var/a = AngerTier > 0 ? AngerTier : 0
+	var/tag = PortraitBuffTag()
+	if(tag)
+		if(f && a)
+			for(var/i = f, i >= 1, i--)
+				for(var/j = a, j >= 1, j--)
+					var/c = PortraitCanon("[tag]form[i]anger[j]")
+					if(istext(c) && length(c)) return c
+		if(f)
+			var/s = PortraitNumbered("[tag]form", f)
+			if(s) return s
+		if(a)
+			var/s2 = PortraitNumbered("[tag]anger", a)
+			if(s2) return s2
+		var/base = PortraitCanon(tag)
+		if(istext(base) && length(base)) return base
 	if(KO || Dead)
 		var/k = PortraitCanon("ko")
 		if(istext(k) && length(k)) return k
-	var/f = transActive > 0 ? transActive : 0
-	var/a = AngerTier > 0 ? AngerTier : 0
 	if(f && a)
 		var/c = PortraitCombo(f, a)
 		if(c) return c
@@ -157,6 +189,18 @@ mob/proc/PortraitFaceList()
 mob/proc/PortraitTrigger(s)
 	if(!istext(s) || !length(s)) return ""
 	var/l = lowertext(s)
+	for(var/obj/Skills/Buffs/B in src) // for buffs
+		if(!istext(B.PortraitTag) || !length(B.PortraitTag)) continue
+		var/tag = lowertext(B.PortraitTag)
+		var/buff_name = B.BuffName ? B.BuffName : B.name
+		if(l == tag) return "while [buff_name] is active"
+		for(var/f = 1, f <= 20, f++)
+			if(l == "[tag]form[f]") return "[PortraitFormName(f)] while [buff_name] is active"
+			for(var/a = 1, a <= 10, a++)
+				if(l == "[tag]form[f]anger[a]") return "[PortraitFormName(f)] at [PortraitAngerName(a)] while [buff_name] is active"
+		for(var/a = 1, a <= 10, a++)
+			if(l == "[tag]anger[a]") return "[PortraitAngerName(a)] while [buff_name] is active"
+
 	if(l == "ko") return "knocked out"
 	if(l == "hurt") return "below 25% HP"
 	for(var/f = 1, f <= 20, f++)

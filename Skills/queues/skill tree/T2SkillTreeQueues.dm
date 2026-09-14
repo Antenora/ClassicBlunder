@@ -13,6 +13,7 @@ obj
 				InstantStrikesDelay=0
 				Warp=2
 				PushOut=1
+				MenuIcon="InfinityTrap"
 				PushOutIcon='BLANK.dmi'
 				Duration=5
 				Cooldown=8
@@ -48,6 +49,7 @@ obj
 				PerfectGuard=1
 				Warp=2
 				Duration=5
+				MenuIcon="ZeroReversal"
 				Cooldown=8
 				NeedsSword=1
 				EnergyCost=2
@@ -72,6 +74,7 @@ obj
 				Cooldown=8
 				Launcher=2
 				NeedsSword=1
+				MenuIcon="WillowDance"
 				MultiHit=3
 				InstantStrikes=2
 				InstantStrikesDelay=1
@@ -89,6 +92,7 @@ obj
 				Opener=1
 				Cooldown=8
 				Duration=5
+				MenuIcon="GravityBlade"
 				ActiveMessage="prepares a chain of giant-toppling attacks!"
 				DamageMult=1.15
 				AccuracyMult=1.1

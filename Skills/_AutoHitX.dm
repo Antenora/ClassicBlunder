@@ -172,6 +172,7 @@ obj
 				var/FocusShiftBoost = 1.5
 				var/FocusShiftTimer = 10
 
+
 				ForceRevert = 0 //Chrono Devolution-like effect, just only for transes
 
 				SpecialAttack=0//ignores all of the above
@@ -2758,7 +2759,7 @@ obj
 ////Magic
 			Magic
 				MagicNeeded=1
-				Blizzard
+				Blizzard // NEW VERSIOn, DON'T GIVE BLIZZARD/BLIZZAGA, THEY'RE IN THIS ONE WITH CHARGE LEVELS
 					ElementalClass="Water"
 					SpellElement="Water"
 					SkillCost=TIER_2_COST
@@ -2778,38 +2779,102 @@ obj
 					HitSparkTurns=0
 					HitSparkSize=1
 					HitSparkDispersion=8
+					var/FirstLevelAchieved
+					var/SecondLevelAchieved
 					TurfStrike=1
 					ManaCost=3
-					Cooldown=45
+					Cooldown=1
+					HeldSkill=1
+					NoGCD=1
+					ChargePeriod=2
+					MaxChargeLevel=2
+					MasteryGain=1
+					MasteryRank1=5200
+					MasteryRank2=13000
+					MasteryRank1Name="Blizzara"
+					MasteryRank2Name="Blizzaga"
 					ActiveMessage="invokes: <font size=+1>BLIZZARD!</font size>"
 					adjust(mob/p)
-						if(!altered)
-							if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
-								Rounds=round(p.getTotalMagicLevel()/5)
-								Knockback=1
-								Distance= 6 + round(p.getTotalMagicLevel()/5)
-								Slow = 3 + p.Potential/10
-								NoLock=1
-								NoAttackLock=1
-								Freezing = 2 + p.Potential/10
-								ManaCost = round(p.getTotalMagicLevel()/3) + 3
-								Slow=0.25
-								ActiveMessage="invokes a powerful: <font size=+1>BLIZZARD!</font size>"
-							else
-								Rounds=initial(Rounds)
-								Knockback=0
-								Distance= 6
-								Slow = 1
-								Freezing = 2
-								ManaCost = 3
+						if(FightingSeriously(usr, usr.Target))
+							MasteryGain=26
+						else
+							MasteryGain=1
+						if(Mastery >= MasteryRank1 && !FirstLevelAchieved)
+							p << "You've unlocked Blizzara! Charging Blizzard fully will enhance Blizzard into Fira."
+							FirstLevelAchieved=1
+							MaxChargeLevel=1
+						if(Mastery >= MasteryRank2 && !SecondLevelAchieved)
+							p << "You've unlocked Firaga! Charging Blizzara fully will enhance Blizzara into Blizzaga."
+							SecondLevelAchieved=1
+							MaxChargeLevel=2
+					OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit, var/level)
+						//reset anything altered by another tier or an Innovation from the previous cast.
+						Rounds=initial(Rounds)
+						Knockback=initial(Knockback)
+						Distance=6
+						Slow=1
+						Freezing=2
+						HitSparkSize=1
+						NoLock=initial(NoLock)
+						NoAttackLock=initial(NoAttackLock)
+						switch(level)
+							if(0)
+								ManaCost=3
+								DamageMult=3+(1*benefit)
+								ActiveMessage="invokes: <font size=+1>BLIZZARD!</font size>"
+								Rounds=1
+								Distance=6
+								Slow=1
+								Freezing=2
+								HitSparkSize=1
+								NoGCD=1
+								Cooldown=1
+							if(1)
+								ManaCost=6
+								DamageMult=5+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>BLIZZARA!</font size>"
+								Rounds=2
+								Distance=7
+								Slow=1.5
+								Freezing=3
+								HitSparkSize=2
+								NoGCD=0
+								Cooldown=4
+							if(2)
+								ManaCost=10
+								DamageMult=7+(3*benefit)
+								ActiveMessage="invokes: <font size=+1>BLIZZAGA!</font size>"
+								Rounds=3
+								Distance=8
+								Slow=2
+								Freezing=4
+								HitSparkSize=3
+								NoGCD=0
+								Cooldown=8
+						var/innovated = FALSE
+						if(!altered && !isInnovationDisable(p))
+							if(p.isInnovative(KEYBLADE_MAGIC, "Any") || p.KeybladeType=="Staff")
+								innovated=TRUE
+						if(innovated)
+							var/magicLevel=p.getTotalMagicLevel()
+							var/magicSteps=round(magicLevel/5)
+							Rounds=max(1, magicSteps+level)
+							Knockback=1
+							Distance=6+magicSteps+level
+							Slow=0.25
+							Freezing=2+(p.Potential/10)+level
+							ManaCost=round(magicLevel/3)+3+(level*2)
+							NoLock=1
+							NoAttackLock=1
+							ActiveMessage="invokes a powerful: <font size=+1>[level == 2 ? "BLIZZAGA" : level == 1 ? "BLIZZARA" : "BLIZZARD"]!</font size>"
+						p.Activate(src)
 					verb/Disable_Innovate()
-						set category = "Other"
-						set hidden = 1
+						set category="Other"
 						disableInnovation(usr)
 					verb/Blizzard()
 						set category="Skills"
 						adjust(usr)
-						usr.Activate(src)
+						usr.BeginHeldSkill(src)
 				Blizzara
 					ElementalClass="Water"
 					SpellElement="Water"
@@ -2920,8 +2985,7 @@ obj
 						set category="Skills"
 						adjust(usr)
 						usr.Activate(src)
-
-				Thunder
+				Thunder // NEW VERSION: DON'T GIVE THUNDARA/THUNDAGA, THEY ARE INCLUDED IN THIS ONE VIA CHARGE LEVELS
 					ElementalClass="Wind"
 					SpellElement="Wind"
 					FlickAttack=1
@@ -2931,52 +2995,113 @@ obj
 					Area="Target"
 					ForScaling=1
 					DamageMult=6
-					Paralyzing=5
+					Paralyzing=2
 					Size=1
 					Bolt=2
 					HitSparkIcon='BLANK.dmi'
 					HitSparkX=0
 					HitSparkY=0
-					WindUp=1
 					ManaCost=3
 					SpecialAttack=1
 					CanBeDodged=1
 					CanBeBlocked=0
-					Cooldown=45
-					WindupMessage="invokes: <font size=+1>THUNDER!</font size>"
-					verb/Disable_Innovate()
-						set category = "Other"
-						set hidden = 1
-						disableInnovation(usr)
+					Cooldown=4
+					MasteryGain=1
+					HeldSkill=1
+					NoGCD=1
+					ChargePeriod=2
+					MaxChargeLevel=2
+					ActiveMessage="invokes: <font size=+1>THUNDER!</font size>"
+					var/FirstLevelAchieved
+					var/SecondLevelAchieved
+					MasteryRank1=5200
+					MasteryRank2=13000
+					MasteryRank1Name="Thundara"
+					MasteryRank2Name="Thundaga"
 					adjust(mob/p)
-						if(!altered)
-							if(p.isInnovative(KEYBLADE_MAGIC, "Any") && !isInnovationDisable(p) || p.KeybladeType=="Staff" && !isInnovationDisable(p))
-								var/asc = p.AscensionsAcquired
-								var/magicLevel = p.getTotalMagicLevel()
-								Rush=5
-								ControlledRush=1
-								Distance = 8
-								Bolt=2
-								Size=0.5
-								WindUp=0.25
-								Rounds= max(1, round(magicLevel/5) + asc)
-								DamageMult = clamp(magicLevel/3 + asc * 2, 4, 12)/(Rounds/2)
-								ManaCost = 5
-								NoAttackLock=1
-								ActiveMessage="invokes a powerful: <font size=+1>THUNDER!</font size>"
-							else
-								Rush=0
-								ControlledRush=0
-								Distance = 6
+						if(FightingSeriously(usr, usr.Target))
+							MasteryGain=26
+						else
+							MasteryGain=1
+						if(Mastery >= MasteryRank1 && !FirstLevelAchieved)
+							p << "You've unlocked Thundara! Charging Fire fully will enhance Fire into Thundara."
+							FirstLevelAchieved=1
+							MaxChargeLevel=1
+						if(Mastery >= MasteryRank2 && !SecondLevelAchieved)
+							p << "You've unlocked Thundaga! Charging Thundara fully will enhance Thundara into Thundaga."
+							SecondLevelAchieved=1
+							MaxChargeLevel=2
+					OnHeldRelease(mob/p, var/benefit, var/sweet_spot_hit, var/level)
+						//reset properties that Innovation may have changed during the previous use
+						Rush=initial(Rush)
+						ControlledRush=initial(ControlledRush)
+						Rounds=initial(Rounds)
+						Distance=6
+						Size=1
+						WindUp=initial(WindUp)
+						NoAttackLock=initial(NoAttackLock)
+						switch(level)
+							if(0)
+								ManaCost=3
+								DamageMult=6+(1*benefit)
+								ActiveMessage="invokes: <font size=+1>THUNDER!</font size>"
+								Distance=6
 								Size=1
-								WindUp=1
-								Rounds= initial(Rounds)
-								DamageMult=4
-								ManaCost = 3
+								Paralyzing=2
+								NoGCD=1
+								Cooldown=4
+
+							if(1)
+								ManaCost=6
+								DamageMult=8+(2*benefit)
+								ActiveMessage="invokes: <font size=+1>THUNDARA!</font size>"
+								Distance=7
+								Size=1.5
+								Paralyzing=3
+								NoGCD=0
+								Cooldown=12
+
+							if(2)
+								ManaCost=10
+								DamageMult=10+(3*benefit)
+								ActiveMessage="invokes: <font size=+1>THUNDAGA!</font size>"
+								Distance=8
+								Size=2
+								Paralyzing=4
+								NoGCD=0
+								Cooldown=20
+						var/innovated = FALSE
+						if(!altered && !isInnovationDisable(p))
+							if(p.isInnovative(KEYBLADE_MAGIC, "Any") || p.KeybladeType=="Staff")
+								innovated=TRUE
+						if(innovated)
+							var/asc=p.AscensionsAcquired
+							var/magicLevel=p.getTotalMagicLevel()
+							Rush=5
+							ControlledRush=1
+							Distance+=2
+							Bolt=2
+							Size*=0.5
+							WindUp=0.25
+							Rounds=max(1, round(magicLevel/5)+asc)
+							//innovation converts the spell's damage into a rapid sequence of smaller lightning strikes
+							var/innovation_power=clamp(magicLevel/3+(asc*2), 4, 12)
+							var/tier_power=(level*2)+(benefit*(level+1))
+							DamageMult=(innovation_power+tier_power)/max(Rounds/2, 0.5)
+
+							ManaCost+=2
+							NoAttackLock=1
+							ActiveMessage="invokes a powerful: <font size=+1>[level == 2 ? "THUNDAGA" : level == 1 ? "THUNDARA" : "THUNDER"]!</font size>"
+
+						p.Activate(src)
+					verb/Disable_Innovate()
+						set category="Other"
+						set hidden=1
+						disableInnovation(usr)
 					verb/Thunder()
 						set category="Skills"
-						adjust(usr)
-						usr.Activate(src)
+						usr.BeginHeldSkill(src)
+
 				Thundara
 					ElementalClass="Wind"
 					SpellElement="Wind"
@@ -3366,6 +3491,7 @@ obj
 				PreShockwave=1
 				PostShockwave=1
 				Shockwave=2
+				MenuIcon="JetSlice"
 				Shockwaves=2
 				ActiveMessage="flickers behind their opponent for an instantaneous slash!"
 				Cooldown=18
@@ -3478,6 +3604,7 @@ obj
 				Distance=10
 				PassThrough=1
 				PreShockwave=1
+				MenuIcon="CrowdCutter"
 				PostShockwave=0
 				Shockwave=2
 				Shockwaves=2
@@ -3510,6 +3637,7 @@ obj
 				DistanceAround=3
 				EnergyCost=5
 				Rounds=20
+				MenuIcon="HolyJustice"
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
@@ -3541,6 +3669,7 @@ obj
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
+				MenuIcon="DoomOfDamocles"
 				ComboMaster = 1
 				Icon='SwordHugeDoomofDamocles.dmi'
 				Size=0.5
@@ -6062,6 +6191,8 @@ obj
 			buffAffectedBoon = 0
 			CorruptionDebuff = 0
 
+			MasteryGain = 0
+
 			PullIn
 
 			GoldScatter
@@ -6098,6 +6229,7 @@ obj
 			toDeath = life
 			src.Owner=owner
 			src.FromSkill = Z
+			src.MasteryGain = Z.MasteryGain
 			parentRounds = Z.Rounds
 
 			if(owner.Grab && !Z.GrabMaster)
@@ -6901,6 +7033,14 @@ obj
 						src.Owner.passive_handler.Decrease("IceAge", src.IceAge)
 					if(src.Disarm && m)
 						src.Owner.DisarmTarget(m)
+				//MasteryGain
+				if(damageDealt > 0 && src.Owner && src.FromSkill)
+					if(src.FromSkill in src.Owner.contents)
+						var/gain = src.MasteryGain
+						if(istype(m, /mob/Player/AI))
+							gain = initial(src.FromSkill.MasteryGain)
+						if(gain > 0)
+							src.FromSkill.Mastery += gain
 				DEBUGMSG("FINAL TOTAL DAMAGE DEALT! [damageDealt]")
 				if(!damageDealt)
 					damageDealt = 0
@@ -7765,6 +7905,7 @@ obj
 	DamageMult = 7.75
 	StrScaling = 1
 	EndEffectiveness = 1
+	MenuIcon="JudgementCut"
 	Copyable=6
 	Cooldown = 30
 	EnergyCost = 8

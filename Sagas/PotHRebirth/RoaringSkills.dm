@@ -14,6 +14,7 @@ obj/Skills/Projectile
 		IconLock='CrescentSlash.dmi'
 		ActiveMessage="fires off a crescent wave!"
 		IconSize=1
+		UICustomDescription="Expends 1 charge of Tempo if available to bolster the next hit, but can be used without."
 		NoGCD=1
 		MaxCharges=3
 		Charges=3
@@ -54,6 +55,7 @@ obj/Skills/AutoHit
 		ActiveMessage="lets out a soul-shattering roar!"
 		HitSparkIcon='BLANK.dmi'
 		HitSparkX=0
+		UICustomDescription="Requires 4 charges of Tempo.<br>Only fires at full charge. Targets hit by the attack will immediately lose all their buffs and transformations."
 		HitSparkY=0
 		Cooldown=15
 		ForceRevert=1

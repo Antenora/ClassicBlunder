@@ -56,6 +56,7 @@ obj
 			KenWaveX = 116
 			KenWaveY = 116
 			ManaGlowSize=2
+			UICustomDescription="Requires Hyper charge to activate.<br>Activating while in a party bolsters self with the power of your friends."
 			KenWaveBlend = 2
 			KenWaveTime = 5
 			ActiveMessage = "awakens their Hyperdeath state!"
@@ -353,6 +354,7 @@ obj
 			BoltOffset=0
 			HitSparkIcon='BLANK.dmi'
 			HitSparkX=0
+			UICustomDescription="Fires three rounds while in Hyperdeath."
 			HitSparkY=0
 			WindUp=0.5
 			ManaCost=2
@@ -379,6 +381,7 @@ obj
 			IconLock='HyperBeamRainbow.dmi'
 			Cooldown=12
 			EnergyCost=3
+			UICustomDescription="Massively increases charge time and possible size in Hyperdeath."
 			Instinct=1
 			BeamTime=10
 			HeldSkill=TRUE
@@ -427,6 +430,7 @@ obj
 			Knockback=3
 			ManaCost=2
 			Trail='Trail - Flare.dmi'
+			UICustomDescription="Becomes 'Chaos Saber Wave' in Hyperdeath."
 			TrailSize=1
 			IconLock='ChaosSaberProjectile.dmi'
 			adjust(mob/p)
@@ -488,6 +492,7 @@ obj
 			Explode=1.5
 			Distance=20
 			Knockback=1
+			UICustomDescription="Becomes a Zone Attack in Hyperdeath."
 			Blasts=3
 			Charge=0
 			ManaCost=7
