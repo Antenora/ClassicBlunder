@@ -393,6 +393,7 @@ proc/WxSet(area/A, kind)
 		A.wx_tint = null
 		A.wx_flash = null
 	A.wx_kind = kind
+	if(old != kind) GfxWindChanged()
 	if(kind)
 		var/list/V = _WxVisuals(kind)
 		A.wx_tint = new()

@@ -43,10 +43,13 @@ var/global/list/buildMaterialTypeOverride
 	buildMaterialTypeOverride[/turf/Waters/WaterU2] = "none"
 	buildMaterialTypeOverride[/turf/Waters/WaterU3] = "none"
 
+var/global/list/buildMaterialByType = list()
+
 /proc/BuildMaterialFor(turf/T)
 	if(!T)
 		return null
-	BuildMaterialTypeInit()
+	if(!buildMaterialTypeOverride)
+		BuildMaterialTypeInit()
 	var/ov = buildMaterialTypeOverride[T.type]
 	if(ov)
 		return (ov == "none") ? null : ov
@@ -58,9 +61,14 @@ var/global/list/buildMaterialTypeOverride
 	if(st && (st in buildMaterialNames))
 		return st
 	var/pt = "[T.type]"
+	var/memo = buildMaterialByType[pt]
+	if(memo)
+		return (memo == "none") ? null : memo
 	for(var/nm2 in buildMaterialNames)
 		if(findtext(pt, "/[nm2]"))
+			buildMaterialByType[pt] = nm2
 			return nm2
+	buildMaterialByType[pt] = "none"
 	return null
 
 /proc/BuildMaterialForType(p)
@@ -923,6 +931,8 @@ var/global/list/foamPaintMap
 	BuildEdgeApply(T, fresh)
 
 /proc/BuildYieldIfBusy()
+	if(WorldLoading)
+		return
 	if(world.tick_usage >= BUILD_YIELD_TICK_USAGE)
 		sleep(world.tick_lag)
 

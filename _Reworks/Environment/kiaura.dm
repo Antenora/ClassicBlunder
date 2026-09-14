@@ -146,6 +146,8 @@ mob/proc/EnsureKiRays(charge01)
 	if(F) animate(F, size = px, time = glob.KIRAY_INTERVAL, flags = ANIMATION_PARALLEL)
 
 //saves serialize vis_contents but kiray_obj is tmp, so a loaded mob can carry an orphan carrier that hazes forever - scrub it. gather then mutate
+mob/var/tmp/kiray_scrubbed = 0
+
 proc/KiRayScrubStale(mob/M)
 	var/list/stale
 	for(var/obj/fx_kiaura/s in M.vis_contents)
@@ -176,17 +178,28 @@ proc/KiRays_Process()
 		_KiRaySweep(null)
 		return
 	//view-scoped: only mobs a client can actually see are candidates
-	var/list/seen = list()
 	var/list/cand = list()
+	var/list/ranges = list()
 	for(var/mob/Players/P in players)
 		if(!P.client) continue
 		var/atom/view_anchor = GfxViewAnchor(P.client)
-		if(!get_turf(view_anchor)) view_anchor = P
-		for(var/mob/M in view(ClientViewRange(P.client), view_anchor))
-			if(seen[M]) continue
-			seen[M] = 1
-			KiRayScrubStale(M) //before the candidate gate: a save-baked carrier can sit on a mob that never powers up
+		var/turf/AT = get_turf(view_anchor)
+		if(!AT) AT = get_turf(P)
+		if(AT) ranges += list(list(AT, ClientViewRange(P.client)))
+	if(ranges.len)
+		for(var/mob/M in world)
+			if(!M.kiray_scrubbed)
+				M.kiray_scrubbed = 1
+				KiRayScrubStale(M) //before the candidate gate: a save-baked carrier can sit on a mob that never powers up
 			if(!KiRayCandidate(M)) continue
+			var/turf/MT = get_turf(M)
+			var/near = 0
+			for(var/list/r in ranges)
+				var/turf/AT = r[1]
+				if(AT.z == MT.z && max(abs(AT.x - MT.x), abs(AT.y - MT.y)) <= r[2])
+					near = 1
+					break
+			if(!near) continue
 			var/c01 = M.KiRayCharge()
 			//charge ranks them; already-lit mobs get a bonus so the set doesn't churn at the cap
 			cand[M] = list(round(c01 * 50) + (M.kiray_obj ? 25 : 0), c01)
@@ -236,7 +249,7 @@ proc/_KrLoop()
 	set background = 1
 	while(1)
 		KiRays_Process()
-		sleep(max(1, glob ? glob.KIRAY_INTERVAL : 3))
+		sleep(max(1, glob ? glob.KIRAY_INTERVAL : 3) * (1 + GfxAdaptiveTier()))
 
 /mob/Admin2/verb/Ki_Rays_Toggle()
 	set category = "Admin"

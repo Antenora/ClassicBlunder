@@ -45,6 +45,7 @@ area/MapperZone/var/zoneKey = ""
 	D.inst.wx_kind = length(D.wx_kind) ? D.wx_kind : null
 	D.inst.env_profile_id = D.profile
 	D.inst.zone_wind_mult = D.windMult
+	GfxWindChanged()
 	DnManageArea(D.inst, D.sees_sky)
 	for(var/client/CC)
 		CC.gfx_env_profile_id = null

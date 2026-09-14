@@ -250,6 +250,38 @@ proc/Hd2dChunkInvalidate(turf/T)
 		_hd2d_chunk_scanned -= "[T.z]:[cx]:[floor((oy - 1) / HD2D_CHUNK)]"
 	_hd2d_wall_serial++
 
+var/list/_hd2d_seed_chunks = list()
+var/list/_hd2d_seed_chunks_at = list()
+
+proc/Hd2dSeedChunkInvalidate(turf/T)
+	if(!T) return
+	_hd2d_seed_chunks -= "[T.z]:[floor((T.x - 1) / HD2D_CHUNK)]:[floor((T.y - 1) / HD2D_CHUNK)]"
+
+proc/Hd2dSeedChunk(z, cx, cy)
+	var/ckey = "[z]:[cx]:[cy]"
+	var/list/seeds = _hd2d_seed_chunks[ckey]
+	if(seeds && world.time - _hd2d_seed_chunks_at[ckey] < 600) return seeds
+	var/list/glints = list()
+	var/list/flies = list()
+	var/gmod = max(2, glob.SPARKLE_SEED_MOD)
+	var/fmod = max(2, glob.FIREFLY_SEED_MOD)
+	var/x0 = cx * HD2D_CHUNK + 1
+	var/y0 = cy * HD2D_CHUNK + 1
+	var/x1 = min(world.maxx, x0 + HD2D_CHUNK - 1)
+	var/y1 = min(world.maxy, y0 + HD2D_CHUNK - 1)
+	for(var/ty = y0, ty <= y1, ty++)
+		for(var/tx = x0, tx <= x1, tx++)
+			var/turf/T = locate(tx, ty, z)
+			if(!T) continue
+			if(!istype(T, /turf/CustomTurf) && !((tx * 73 + ty * 131 + z * 57) % gmod) && GfxIsWaterSurface(T) && !T.Lava && T.gfx_reflectivity != 0) //player builds: never decorate what saves; cluster seeds only
+				glints += T
+			if(!T.density && !((tx * 89 + ty * 41 + z * 23) % fmod)) //open ground and water both host; walls do not
+				flies += T
+	seeds = list(glints, flies)
+	_hd2d_seed_chunks[ckey] = seeds
+	_hd2d_seed_chunks_at[ckey] = world.time
+	return seeds
+
 proc/Hd2dChunkScan(z, cx, cy)
 	var/ckey = "[z]:[cx]:[cy]"
 	var/list/walls = list()
@@ -261,6 +293,7 @@ proc/Hd2dChunkScan(z, cx, cy)
 		for(var/tx = x0, tx <= x1, tx++)
 			var/turf/T = locate(tx, ty, z)
 			if(T && Hd2dWallRows(T) >= 1) walls += T
+		if(world.tick_usage >= 40) sleep(world.tick_lag)
 	var/list/old = _hd2d_wall_chunks[ckey]
 	if(old && (old.len != walls.len || (old - walls).len)) _hd2d_wall_serial++
 	_hd2d_wall_chunks[ckey] = walls
@@ -521,6 +554,10 @@ client
 		hd2d_sweep_serial = 0
 		hd2d_sweep_rr = 0
 		list/hd2d_sweep_marks
+		hd2d_glint_key
+		list/hd2d_glint_marks
+		hd2d_firefly_key
+		list/hd2d_firefly_marks
 		hd2d_ambient_key
 		hd2d_lightclass //sky/cave/bright - a change means indoor/outdoor crossing: CpmApply cut
 		hd2d_env_key
@@ -1022,6 +1059,7 @@ proc/_Hd2dFireflyAim(obj/hd2d_firefly/F)
 	animate(F, transform = M, time = 100, easing = SINE_EASING, flags = ANIMATION_PARALLEL)
 
 proc/Hd2dFirefliesClear()
+	for(var/client/C) C.hd2d_firefly_key = null
 	for(var/turf/T in _hd2d_fireflies_by_turf)
 		for(var/obj/hd2d_firefly/F in _hd2d_fireflies_by_turf[T])
 			animate(F) //cancel loops before pooling
@@ -1033,46 +1071,60 @@ proc/_Hd2dFireflySweep()
 	_hd2d_firefly_epoch++
 	var/dk = DnDarknessFrac()
 	for(var/mob/Players/P in players)
-		if(!P.client) continue
-		var/atom/anchor = GfxViewAnchor(P.client)
+		var/client/C = P.client
+		if(!C) continue
+		var/atom/anchor = GfxViewAnchor(C)
 		var/turf/center = anchor ? get_turf(anchor) : null
 		if(!center) continue
-		var/list/dims = GfxCameraViewTiles(P.client)
-		var/hw = round(max(dims[1], P.client.gfx_screen_cover_w) / 2) + 2
-		var/hh = round(max(dims[2], P.client.gfx_screen_cover_h) / 2) + 2
-		for(var/ty = max(1, center.y - hh), ty <= min(world.maxy, center.y + hh), ty++)
-			for(var/tx = max(1, center.x - hw), tx <= min(world.maxx, center.x + hw), tx++)
-				var/turf/T = locate(tx, ty, center.z)
-				if(!T || T.density) continue //open ground and water both host; walls do not
-				if((T.x * 89 + T.y * 41 + T.z * 23) % max(2, glob.FIREFLY_SEED_MOD)) continue
-				if(!_Hd2dFireflyWanted(T, dk)) continue
-				var/list/fl = _hd2d_fireflies_by_turf[T]
-				if(!fl)
-					if(!_hd2d_ember_icon) _Hd2dBuildIcons()
-					fl = list()
-					var/n = 1 + ((T.x * 7 + T.y * 3) % 5 == 0 ? 1 : 0) //mostly singles, odd pair
-					for(var/i = 1, i <= n, i++)
-						var/obj/hd2d_firefly/F
-						if(_hd2d_firefly_pool.len)
-							F = _hd2d_firefly_pool[_hd2d_firefly_pool.len]
-							_hd2d_firefly_pool.len--
-						else
-							F = new
-						var/h1 = T.x * 19 + T.y * 11 + i * 37
-						F.icon = _hd2d_ember_icon
-						F.gseed = h1
-						F.color = DnLerp("#d8f0a0", "#ffd890", (h1 % 3) / 2) //green-gold spread
-						F.pixel_x = 12 + (h1 % 17) - 8
-						F.pixel_y = 12 + ((h1 * 3) % 15) - 7
-						F.transform = null
-						F.tmax = -1
-						F.loc = T
-						_Hd2dFireflyBlink(F, dk)
-						_Hd2dFireflyAim(F)
-						fl += F
-					_hd2d_fireflies_by_turf[T] = fl
-				for(var/obj/hd2d_firefly/F in fl)
-					F.mark = _hd2d_firefly_epoch
+		var/list/dims = GfxCameraViewTiles(C)
+		var/hw = round(max(dims[1], C.gfx_screen_cover_w) / 2) + 2
+		var/hh = round(max(dims[2], C.gfx_screen_cover_h) / 2) + 2
+		var/fkey = "[center.x],[center.y],[center.z],[hw],[hh],[round(dk * 20)]"
+		if(C.hd2d_firefly_key == fkey && C.hd2d_firefly_marks)
+			for(var/obj/hd2d_firefly/MF in C.hd2d_firefly_marks)
+				MF.mark = _hd2d_firefly_epoch
+			continue
+		var/list/marks = list()
+		var/x0 = max(1, center.x - hw)
+		var/x1 = min(world.maxx, center.x + hw)
+		var/y0 = max(1, center.y - hh)
+		var/y1 = min(world.maxy, center.y + hh)
+		for(var/cy = floor((y0 - 1) / HD2D_CHUNK), cy <= floor((y1 - 1) / HD2D_CHUNK), cy++)
+			for(var/cx = floor((x0 - 1) / HD2D_CHUNK), cx <= floor((x1 - 1) / HD2D_CHUNK), cx++)
+				var/list/seeds = Hd2dSeedChunk(center.z, cx, cy)
+				for(var/turf/T in seeds[2])
+					if(T.x < x0 || T.x > x1 || T.y < y0 || T.y > y1) continue
+					if(!_Hd2dFireflyWanted(T, dk)) continue
+					var/list/fl = _hd2d_fireflies_by_turf[T]
+					if(!fl)
+						if(!_hd2d_ember_icon) _Hd2dBuildIcons()
+						fl = list()
+						var/n = 1 + ((T.x * 7 + T.y * 3) % 5 == 0 ? 1 : 0) //mostly singles, odd pair
+						for(var/i = 1, i <= n, i++)
+							var/obj/hd2d_firefly/F
+							if(_hd2d_firefly_pool.len)
+								F = _hd2d_firefly_pool[_hd2d_firefly_pool.len]
+								_hd2d_firefly_pool.len--
+							else
+								F = new
+							var/h1 = T.x * 19 + T.y * 11 + i * 37
+							F.icon = _hd2d_ember_icon
+							F.gseed = h1
+							F.color = DnLerp("#d8f0a0", "#ffd890", (h1 % 3) / 2) //green-gold spread
+							F.pixel_x = 12 + (h1 % 17) - 8
+							F.pixel_y = 12 + ((h1 * 3) % 15) - 7
+							F.transform = null
+							F.tmax = -1
+							F.loc = T
+							_Hd2dFireflyBlink(F, dk)
+							_Hd2dFireflyAim(F)
+							fl += F
+						_hd2d_fireflies_by_turf[T] = fl
+					for(var/obj/hd2d_firefly/F in fl)
+						F.mark = _hd2d_firefly_epoch
+						marks += F
+		C.hd2d_firefly_key = fkey
+		C.hd2d_firefly_marks = marks
 	var/list/drop = list()
 	for(var/turf/DT in _hd2d_fireflies_by_turf)
 		var/list/dfl = _hd2d_fireflies_by_turf[DT]
@@ -1130,6 +1182,7 @@ proc/_Hd2dGlintTwinkle(obj/hd2d_glint/G, dk, wet, onlychange = 0)
 	animate(alpha = amax, time = t2, easing = SINE_EASING)
 
 proc/Hd2dGlintsClear()
+	for(var/client/C) C.hd2d_glint_key = null
 	for(var/turf/T in _hd2d_glints_by_turf)
 		for(var/obj/hd2d_glint/G in _hd2d_glints_by_turf[T])
 			animate(G) //cancel the loop before pooling
@@ -1141,51 +1194,64 @@ proc/_Hd2dGlintSweep()
 	_hd2d_glint_epoch++
 	var/dk = DnDarknessFrac()
 	for(var/mob/Players/P in players)
-		if(!P.client) continue
-		var/atom/anchor = GfxViewAnchor(P.client)
+		var/client/C = P.client
+		if(!C) continue
+		var/atom/anchor = GfxViewAnchor(C)
 		var/turf/center = anchor ? get_turf(anchor) : null
 		if(!center) continue
-		var/list/dims = GfxCameraViewTiles(P.client)
-		var/hw = round(max(dims[1], P.client.gfx_screen_cover_w) / 2) + 2
-		var/hh = round(max(dims[2], P.client.gfx_screen_cover_h) / 2) + 2
-		for(var/ty = max(1, center.y - hh), ty <= min(world.maxy, center.y + hh), ty++)
-			for(var/tx = max(1, center.x - hw), tx <= min(world.maxx, center.x + hw), tx++)
-				var/turf/T = locate(tx, ty, center.z)
-				if(!T || istype(T, /turf/CustomTurf)) continue //player builds: never decorate what saves
-				if((T.x * 73 + T.y * 131 + T.z * 57) % max(2, glob.SPARKLE_SEED_MOD)) continue //cluster seeds only
-				if(!GfxIsWaterSurface(T) || T.Lava || T.gfx_reflectivity == 0) continue
-				var/list/gl = _hd2d_glints_by_turf[T]
-				if(!gl)
-					if(!_hd2d_glint_icons.len) _Hd2dBuildIcons()
-					gl = list()
-					var/area/A = T.loc
-					var/wet = (A && A.wx_kind) ? 1 : 0
-					var/n = 2 + (T.x * 31 + T.y * 17) % 4 //cluster size 2-5
-					for(var/i = 1, i <= n, i++)
-						var/obj/hd2d_glint/G
-						if(_hd2d_glint_pool.len)
-							G = _hd2d_glint_pool[_hd2d_glint_pool.len]
-							_hd2d_glint_pool.len--
-						else
-							G = new
-						//deterministic scatter: the same water always glitters the same way
-						var/h1 = T.x * 13 + T.y * 7 + i * 29
-						var/h2 = T.x * 5 + T.y * 23 + i * 41
-						G.icon = _hd2d_glint_icons[1 + (h1 + h2) % _hd2d_glint_icons.len]
-						G.gseed = h1 * 3 + h2 * 11 + i
-						G.pixel_x = 10 + (h1 % 25) - 12
-						G.pixel_y = 13 + (h2 % 25) - 12
-						//independent stretch + mirrored half: the icon family multiplies
-						var/sx = (0.65 + (h1 % 8) / 10) * ((h2 % 2) ? 1 : -1)
-						var/sy = 0.65 + (h2 % 7) / 10
-						G.transform = matrix(sx, 0, 0, 0, sy, 0)
-						G.tmax = -1 //force the twinkle to (re)start
-						G.loc = T
-						_Hd2dGlintTwinkle(G, dk, wet)
-						gl += G
-					_hd2d_glints_by_turf[T] = gl
-				for(var/obj/hd2d_glint/G in gl)
-					G.mark = _hd2d_glint_epoch
+		var/list/dims = GfxCameraViewTiles(C)
+		var/hw = round(max(dims[1], C.gfx_screen_cover_w) / 2) + 2
+		var/hh = round(max(dims[2], C.gfx_screen_cover_h) / 2) + 2
+		var/gkey = "[center.x],[center.y],[center.z],[hw],[hh]"
+		if(C.hd2d_glint_key == gkey && C.hd2d_glint_marks)
+			for(var/obj/hd2d_glint/MG in C.hd2d_glint_marks)
+				MG.mark = _hd2d_glint_epoch
+			continue
+		var/list/marks = list()
+		var/x0 = max(1, center.x - hw)
+		var/x1 = min(world.maxx, center.x + hw)
+		var/y0 = max(1, center.y - hh)
+		var/y1 = min(world.maxy, center.y + hh)
+		for(var/cy = floor((y0 - 1) / HD2D_CHUNK), cy <= floor((y1 - 1) / HD2D_CHUNK), cy++)
+			for(var/cx = floor((x0 - 1) / HD2D_CHUNK), cx <= floor((x1 - 1) / HD2D_CHUNK), cx++)
+				var/list/seeds = Hd2dSeedChunk(center.z, cx, cy)
+				for(var/turf/T in seeds[1])
+					if(T.x < x0 || T.x > x1 || T.y < y0 || T.y > y1) continue
+					var/list/gl = _hd2d_glints_by_turf[T]
+					if(!gl)
+						if(!_hd2d_glint_icons.len) _Hd2dBuildIcons()
+						gl = list()
+						var/area/A = T.loc
+						var/wet = (A && A.wx_kind) ? 1 : 0
+						var/n = 2 + (T.x * 31 + T.y * 17) % 4 //cluster size 2-5
+						for(var/i = 1, i <= n, i++)
+							var/obj/hd2d_glint/G
+							if(_hd2d_glint_pool.len)
+								G = _hd2d_glint_pool[_hd2d_glint_pool.len]
+								_hd2d_glint_pool.len--
+							else
+								G = new
+							//deterministic scatter: the same water always glitters the same way
+							var/h1 = T.x * 13 + T.y * 7 + i * 29
+							var/h2 = T.x * 5 + T.y * 23 + i * 41
+							G.icon = _hd2d_glint_icons[1 + (h1 + h2) % _hd2d_glint_icons.len]
+							G.gseed = h1 * 3 + h2 * 11 + i
+							G.pixel_x = 10 + (h1 % 25) - 12
+							G.pixel_y = 13 + (h2 % 25) - 12
+							//independent stretch + mirrored half: the icon family multiplies
+							var/sx = (0.65 + (h1 % 8) / 10) * ((h2 % 2) ? 1 : -1)
+							var/sy = 0.65 + (h2 % 7) / 10
+							G.transform = matrix(sx, 0, 0, 0, sy, 0)
+							G.tmax = -1 //force the twinkle to (re)start
+							G.loc = T
+							_Hd2dGlintTwinkle(G, dk, wet)
+							gl += G
+						_hd2d_glints_by_turf[T] = gl
+					for(var/obj/hd2d_glint/G in gl)
+						G.mark = _hd2d_glint_epoch
+						marks += G
+		C.hd2d_glint_key = gkey
+		C.hd2d_glint_marks = marks
 	var/list/drop = list()
 	for(var/turf/DT in _hd2d_glints_by_turf)
 		var/list/dgl = _hd2d_glints_by_turf[DT]
@@ -1324,6 +1390,7 @@ proc/_Hd2dLoop()
 	set background = 1
 	var/flip = 0
 	while(1)
+		var/tier = GfxAdaptiveTier()
 		if(world.tick_usage < 85)
 			flip = !flip
 			if(glob && glob.WALL_SHADOWS)
@@ -1332,15 +1399,15 @@ proc/_Hd2dLoop()
 				Hd2dShadowsClear()
 			if(flip && glob && glob.RIM_LIGHT)
 				_Hd2dRimSweep()
-			if(!flip && glob && glob.WATER_SPARKLE)
+			if(!flip && glob && glob.WATER_SPARKLE && tier < 2)
 				_Hd2dGlintSweep() //counter-phase to the shadow sweep: same budget, no stacking
-			if((!glob || !glob.WATER_SPARKLE) && _hd2d_glints_by_turf.len)
+			if((!glob || !glob.WATER_SPARKLE || tier >= 2) && _hd2d_glints_by_turf.len)
 				Hd2dGlintsClear()
-			if(!flip && glob && glob.AMBIENT_FX)
+			if(!flip && glob && glob.AMBIENT_FX && tier < 2)
 				_Hd2dFireflySweep()
-			if((!glob || !glob.AMBIENT_FX) && _hd2d_fireflies_by_turf.len)
+			if((!glob || !glob.AMBIENT_FX || tier >= 2) && _hd2d_fireflies_by_turf.len)
 				Hd2dFirefliesClear()
-		sleep(5)
+		sleep(5 * (1 + tier))
 
 
 /mob/Admin2/verb/Wall_Shadows_Toggle()

@@ -14,6 +14,9 @@ globalTracker
 		PROFILE_WINDOW = 600
 		PROFILE_JSON_MIN = 30
 		PROFILE_DUMP_GAP = 300
+		ADAPTIVE_AMBIENT = FALSE
+		ADAPTIVE_AMBIENT_T1 = 16
+		ADAPTIVE_AMBIENT_T2 = 40
 
 client
 	var/tmp
@@ -540,7 +543,7 @@ client/proc/InitializeGraphics()
 		if(O.gfx_material_highlight) highlights++
 	src << "<b>Graphics diagnostics</b>"
 	src << "Preset: [client.prefs.graphicsQuality] | view: [client.view] | client FPS: [client.fps]"
-	src << "Server CPU: [world.cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]%"
+	src << "Server CPU: [world.cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]% | adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON tier [GfxAdaptiveTier()]" : "off"]"
 	src << "Static lights: [_light_sources.len] | dynamic light records: [_fx_lights.len] | shadow objects: [_shadow_objs.len] | shared cloud banks: [_cloud_banks.len] ([GfxCloudChunkCount()] pieces) | weather: [wx]"
 	src << "Environment: [P ? P.display_name : "Neutral"] | haze particles: [client.gfx_haze_emitter && client.gfx_haze_emitter.particles ? client.gfx_haze_emitter.particles.count : 0] | material highlights: [highlights]"
 	src << "Cached light FOV builds: [_light_fov_builds] | average visible cells: [_light_fov_builds ? round(_light_fov_cells / _light_fov_builds, 0.1) : 0] | actor reflections: SCRAPPED | reflection ticks: [_gfx_actor_reflection_ticks] | emissive reflections: [_gfx_emissive_reflection_objs.len] | water mask runs: [client.gfx_water_mask_images ? client.gfx_water_mask_images.len : 0]"
@@ -648,6 +651,21 @@ proc/GfxWarmProceduralIcons()
 	for(var/icon/I in icons)
 		warm.icon = I
 	warm.icon = null
+
+proc/GfxAdaptiveTier()
+	if(!glob || !glob.ADAPTIVE_AMBIENT) return 0
+	var/n = 0
+	for(var/client/C) n++
+	if(n >= glob.ADAPTIVE_AMBIENT_T2) return 2
+	if(n >= glob.ADAPTIVE_AMBIENT_T1) return 1
+	return 0
+
+/mob/Admin2/verb/Adaptive_Ambient_Toggle()
+	set category = "Admin"
+	set name = "Adaptive Ambient Toggle"
+	glob.ADAPTIVE_AMBIENT = !glob.ADAPTIVE_AMBIENT
+	src << "Adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON (tier 1 at [glob.ADAPTIVE_AMBIENT_T1] players, tier 2 at [glob.ADAPTIVE_AMBIENT_T2])" : "OFF"] - current tier [GfxAdaptiveTier()]."
+	Log("Admin", "[ExtractInfo(src)] set adaptive ambient to [glob.ADAPTIVE_AMBIENT].")
 
 
 //crash-forensics heartbeat log

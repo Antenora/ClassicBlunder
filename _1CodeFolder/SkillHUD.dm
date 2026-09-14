@@ -543,9 +543,12 @@ client/proc/RefreshHotbarCooldowns()
 // rides the per-tick global_loop so the veil descends smoothly
 /obj/hotbar_ticker
 	var/client/owner
+	var/tmp/active = 1
 	Update()
 		if(!owner || !owner.mob)
 			global_loop.Remove(src)
 			del src
 			return
-		owner.RefreshHotbarCooldowns()
+		if(!active && (round(world.time * 2) % 2))
+			return
+		active = owner.RefreshHotbarCooldowns()

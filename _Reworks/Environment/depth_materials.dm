@@ -30,6 +30,8 @@ atom/movable
 		obj/gfx_emissive_reflection/gfx_emissive_reflection
 		matrix/gfx_wind_base_transform
 		gfx_wind_phase = 0
+		gfx_wind_loop_key
+		gfx_wind_loop_id = 0
 		gfx_material_bucket_key
 
 turf
@@ -48,6 +50,8 @@ client
 		gfx_ao_scan_z = 0
 		gfx_ao_scan_radius = 0
 		gfx_ao_scan_incomplete = TRUE
+		gfx_depth_key
+		list/gfx_depth_materials
 
 mob
 	casts_contact_shadow = 1
@@ -666,6 +670,50 @@ proc/GfxRefreshMaterialVisuals(atom/movable/A)
 	GfxEnsureMaterialHighlight(A)
 	GfxEnsureEmissiveReflection(A)
 
+var/_gfx_wind_epoch = 1
+
+proc/GfxWindChanged()
+	_gfx_wind_epoch++
+
+proc/GfxWindStamp()
+	if(!glob) return "[_gfx_wind_epoch]"
+	return "[_gfx_wind_epoch]:[glob.WIND_OVERRIDE]:[glob.WIND_MAN_X]:[glob.WIND_MAN_Y]:[glob.WIND_SCALE]:[glob.WIND_AMPLITUDE]:[glob.WIND_MIN_PX]:[glob.WIND_MAX_PX]:[glob.WIND_WX_STORM]:[glob.WIND_WX_BLIZZARD]:[glob.WIND_WX_DUST]:[glob.WIND_WX_PRECIP]"
+
+proc/GfxWindPivotTurn(a, pv2)
+	var/matrix/CM = matrix()
+	if(pv2)
+		CM.Translate(0, -pv2)
+		CM.Turn(a)
+		CM.Translate(0, pv2)
+	else
+		CM.Turn(a)
+	return CM
+
+proc/GfxWindChain(atom/movable/X, list/keys, j, quarter)
+	for(var/s = 1, s <= 4, s++)
+		var/k = ((j + s - 1) % 4) + 1
+		var/ez = SINE_EASING | ((k % 2) ? EASE_OUT : EASE_IN)
+		if(s == 1)
+			animate(X, transform = keys[k], time = quarter, easing = ez, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM, loop = -1)
+		else
+			animate(transform = keys[k], time = quarter, easing = ez, flags = ANIMATION_LINEAR_TRANSFORM)
+
+proc/GfxWindLoop(atom/movable/X, list/keys, f, phase, loop_id, list/kids, list/kidkeys)
+	var/th = world.time * f + phase
+	th = th - 360 * round(th / 360)
+	var/j = round(th / 90) + 1
+	var/t1 = max(1, round((j * 90 - th) / f))
+	var/quarter = max(1, round(90 / f))
+	var/ez1 = SINE_EASING | ((j % 2) ? EASE_OUT : EASE_IN)
+	animate(X, transform = keys[j], time = t1, easing = ez1, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+	for(var/atom/movable/V in kids)
+		animate(V, transform = kidkeys[j], time = t1, easing = ez1, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+	spawn(t1)
+		if(!X || X.gfx_wind_loop_id != loop_id) return
+		GfxWindChain(X, keys, j, quarter)
+		for(var/atom/movable/K in kids)
+			GfxWindChain(K, kidkeys, j, quarter)
+
 proc/GfxApplyMaterialWind(atom/movable/A)
 	if(!A || A.gfx_wind_response <= 0) return
 	if(A.gfx_canopy_obj)
@@ -673,50 +721,62 @@ proc/GfxApplyMaterialWind(atom/movable/A)
 		var/turf/PT = get_turf(A)
 		var/list/PW = EnvWindForArea(PT ? PT.loc : null)
 		var/ppow = clamp(sqrt(PW[1] * PW[1] + PW[2] * PW[2]) / 2, 0, 1)
-		if(!CN.gfx_wind_base_transform)
-			CN.gfx_wind_base_transform = CN.transform ? new/matrix(CN.transform) : matrix()
 		var/pamp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
-		var/pang = sin(world.time * (2.4 + ppow * 2.2) + CN.gfx_wind_phase) * pamp * CN.gfx_wind_response * ppow
-		var/pv2 = CN.sp_wind_pivot ? CN.sp_wind_pivot : 0
-		var/matrix/CM = matrix()
-		if(pv2)
-			CM.Translate(0, -pv2)
-			CM.Turn(pang)
-			CM.Translate(0, pv2)
-		else
-			CM.Turn(pang)
-		animate(CN, transform = CN.gfx_wind_base_transform * CM, time = 10,
-		        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+		var/ckey = "[round(ppow, 0.02)]:[pamp]:[CN.gfx_wind_response]"
+		if(CN.gfx_wind_loop_key != ckey)
+			CN.gfx_wind_loop_key = ckey
+			if(!CN.gfx_wind_base_transform)
+				CN.gfx_wind_base_transform = CN.transform ? new/matrix(CN.transform) : matrix()
+			var/pa = pamp * CN.gfx_wind_response * ppow
+			var/pv2 = CN.sp_wind_pivot ? CN.sp_wind_pivot : 0
+			CN.gfx_wind_loop_id++
+			if(pa <= 0.01)
+				animate(CN, transform = CN.gfx_wind_base_transform, time = 10, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+			else
+				var/list/ckeys = list(CN.gfx_wind_base_transform * GfxWindPivotTurn(pa, pv2), CN.gfx_wind_base_transform, CN.gfx_wind_base_transform * GfxWindPivotTurn(-pa, pv2), CN.gfx_wind_base_transform)
+				GfxWindLoop(CN, ckeys, 2.4 + ppow * 2.2, CN.gfx_wind_phase, CN.gfx_wind_loop_id, null, null)
 		return //trunk never moves
 	var/turf/T = get_turf(A)
 	var/area/AR = T ? T.loc : null
 	var/list/W = EnvWindForArea(AR)
 	var/power = clamp(sqrt(W[1] * W[1] + W[2] * W[2]) / 2, 0, 1)
-	if(!A.gfx_wind_base_transform)
-		A.gfx_wind_base_transform = A.transform ? new/matrix(A.transform) : matrix()
 	var/amp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
-	var/angle = sin(world.time * (2.4 + power * 2.2) + A.gfx_wind_phase) * amp * A.gfx_wind_response * power
-	if(!(A.appearance_flags & KEEP_TOGETHER))
-		A.appearance_flags |= PIXEL_SCALE | KEEP_TOGETHER
-	var/hh = SurfaceIconHeight(A)
-	var/vh = SurfaceVisualHeight(A) //base cell + overlay crown: the palm is 96px, not 32
 	var/mn = (glob && glob.WIND_MIN_PX) ? glob.WIND_MIN_PX : 6
 	var/mx = (glob && glob.WIND_MAX_PX) ? glob.WIND_MAX_PX : 24
-	var/peak = abs(tan(clamp(amp * A.gfx_wind_response * power, -35, 35))) * vh
+	var/list/kids = list()
+	for(var/atom/movable/V in A.vis_contents)
+		if(V == A.gfx_canopy_obj) continue
+		if(V == A.gfx_canopy_shaft_obj) continue //the sun shaft holds its own lean, not the sway
+		kids += V
+	var/wkey = "[round(power, 0.02)]:[amp]:[mn]:[mx]:[A.gfx_wind_response]:[kids.len]"
+	if(A.gfx_wind_loop_key == wkey) return
+	A.gfx_wind_loop_key = wkey
+	if(!A.gfx_wind_base_transform)
+		A.gfx_wind_base_transform = A.transform ? new/matrix(A.transform) : matrix()
+	if(!(A.appearance_flags & KEEP_TOGETHER))
+		A.appearance_flags |= PIXEL_SCALE | KEEP_TOGETHER
+	A.gfx_wind_loop_id++
+	var/aamp = amp * A.gfx_wind_response * power
+	var/matrix/ID = matrix()
+	if(aamp <= 0.01)
+		animate(A, transform = A.gfx_wind_base_transform, time = 10, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+		for(var/atom/movable/V in kids)
+			animate(V, transform = ID, time = 10, flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+		return
+	var/hh = SurfaceIconHeight(A)
+	var/vh = SurfaceVisualHeight(A) //base cell + overlay crown: the palm is 96px, not 32
+	var/peak = abs(tan(clamp(aamp, -35, 35))) * vh
 	var/gain = 1
 	if(peak > 0.01)
 		if(peak < mn) gain = mn / peak
 		else if(peak > mx) gain = mx / peak
-	var/k = tan(clamp(angle, -35, 35)) * gain
+	var/k = tan(clamp(aamp, -35, 35)) * gain
 	//x' = x + k*(y - ybase) with ybase = -h/2, so the bottom row never moves
-	var/matrix/S = matrix(1, k, k * hh / 2, 0, 1, 0)
-	animate(A, transform = A.gfx_wind_base_transform * S, time = 10,
-	        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
-	for(var/atom/movable/V in A.vis_contents)
-		if(V == A.gfx_canopy_obj) continue
-		if(V == A.gfx_canopy_shaft_obj) continue //the sun shaft holds its own lean, not the sway
-		animate(V, transform = S, time = 10,
-		        flags = ANIMATION_END_NOW | ANIMATION_LINEAR_TRANSFORM)
+	var/matrix/SP = matrix(1, k, k * hh / 2, 0, 1, 0)
+	var/matrix/SN = matrix(1, -k, -k * hh / 2, 0, 1, 0)
+	var/list/keys = list(A.gfx_wind_base_transform * SP, A.gfx_wind_base_transform, A.gfx_wind_base_transform * SN, A.gfx_wind_base_transform)
+	var/list/kidkeys = list(SP, ID, SN, ID)
+	GfxWindLoop(A, keys, 2.4 + power * 2.2, A.gfx_wind_phase, A.gfx_wind_loop_id, kids, kidkeys)
 
 proc/GfxClearMaterialVisuals(atom/movable/A)
 	if(!A) return
@@ -774,6 +834,7 @@ proc/GfxAOInvalidateNear(turf/T)
 	if(!T) return
 	Hd2dInvalidateColumn(T) //wall-shadow stack heights go stale on the same edits
 	GfxWaterIndexInvalidate(T)
+	Hd2dSeedChunkInvalidate(T)
 	for(var/turf/N in range(1, T))
 		N._gfx_ao_mask = -1
 		_gfx_ao_dirty |= N
@@ -888,7 +949,7 @@ proc/_GfxActorReflectionLoop()
 			_gfx_actor_reflection_ticks++
 			for(var/client/C)
 				GfxUpdateWaterMask(C)
-		sleep(1)
+		sleep(1 + 2 * GfxAdaptiveTier())
 
 proc/GfxFinishForegroundFade(client/C, atom/A, image/I, token)
 	set waitfor = 0
@@ -949,7 +1010,9 @@ proc/_GfxDepthProcess()
 	var/list/seen_mobs = list()
 	var/list/seen_materials = list()
 	var/list/seen_wind = list()
-	var/ao_budget = max(80, round(280 * GfxBudgetScale()))
+	var/list/held_materials = list()
+	var/wstamp = GfxWindStamp()
+	var/ao_budget = max(80, round(280 * GfxBudgetScale() / (1 + GfxAdaptiveTier())))
 	while(_gfx_ao_dirty.len && ao_budget > 0)
 		var/turf/dirty = _gfx_ao_dirty[1]
 		_gfx_ao_dirty.Cut(1, 2)
@@ -973,11 +1036,23 @@ proc/_GfxDepthProcess()
 			if(M.icon && M.invisibility <= P.see_invisible)
 				seen_mobs[M] = 1
 				client_seen_mobs[M] = 1
-		for(var/atom/movable/A in GfxMaterialsNear(view_turf, wind_r + 2))
-			if(!A || !view_turf || A.z != view_turf.z) continue
-			var/acheb = max(abs(A.x - view_turf.x), abs(A.y - view_turf.y))
-			if(acheb <= effect_r + 2) seen_materials[A] = 1
-			else if(acheb <= wind_r + 2 && A.gfx_wind_response > 0) seen_wind[A] = 1
+		var/area/view_area = view_turf.loc
+		var/dkey = "[view_turf.x],[view_turf.y],[view_turf.z],[visible_r],[round(DnDarknessFrac() * 20)],[_gfx_material_atoms.len],[_light_sources.len],[_fx_lights.len],[view_area ? view_area.wx_kind : null],[wstamp]"
+		if(P.client.gfx_depth_key == dkey && P.client.gfx_depth_materials)
+			for(var/atom/movable/A in P.client.gfx_depth_materials)
+				held_materials[A] = 1
+		else
+			var/list/cm = list()
+			for(var/atom/movable/A in GfxMaterialsNear(view_turf, wind_r + 2))
+				if(!A || !view_turf || A.z != view_turf.z) continue
+				var/acheb = max(abs(A.x - view_turf.x), abs(A.y - view_turf.y))
+				if(acheb <= effect_r + 2)
+					seen_materials[A] = 1
+					cm[A] = 1
+				else if(acheb <= wind_r + 2 && A.gfx_wind_response > 0)
+					seen_wind[A] = 1
+			P.client.gfx_depth_key = dkey
+			P.client.gfx_depth_materials = cm
 		var/needs_ao_scan = P.client.gfx_ao_scan_incomplete || P.client.gfx_ao_scan_x != view_turf.x || P.client.gfx_ao_scan_y != view_turf.y || P.client.gfx_ao_scan_z != view_turf.z || P.client.gfx_ao_scan_radius != visible_r
 		if(needs_ao_scan)
 			P.client.gfx_ao_scan_x = view_turf.x
@@ -1001,23 +1076,23 @@ proc/_GfxDepthProcess()
 		GfxRefreshMaterialVisuals(A)
 		GfxApplyMaterialWind(A)
 	for(var/atom/movable/A in seen_wind)
-		if(seen_materials[A]) continue
+		if(seen_materials[A] || held_materials[A]) continue
 		GfxApplyMaterialWind(A)
 	for(var/atom/movable/A in _gfx_highlight_atoms.Copy())
-		if(seen_materials[A] || seen_mobs[A]) continue
+		if(seen_materials[A] || seen_mobs[A] || held_materials[A]) continue
 		GfxClearMaterialHighlight(A)
 	for(var/obj/gfx_contact_shadow/S in _gfx_contact_objs.Copy())
 		var/atom/movable/A = S.owner
 		if(!A)
 			_gfx_contact_objs -= S
 			S.loc = null
-		else if(!seen_mobs[A] && !seen_materials[A])
+		else if(!seen_mobs[A] && !seen_materials[A] && !held_materials[A])
 			GfxClearContactShadow(A)
 	for(var/obj/gfx_emissive_reflection/R in _gfx_emissive_reflection_objs.Copy())
 		if(!R.owner)
 			_gfx_emissive_reflection_objs -= R
 			R.loc = null
-		else if(!seen_materials[R.owner])
+		else if(!seen_materials[R.owner] && !held_materials[R.owner])
 			GfxClearEmissiveReflection(R.owner)
 
 var/_gfx_depth_boot = _GfxDepthBoot()
@@ -1034,7 +1109,7 @@ proc/_GfxDepthLoop()
 	set background = 1
 	while(1)
 		_GfxDepthProcess()
-		sleep(10)
+		sleep(10 * (1 + GfxAdaptiveTier()))
 
 /mob/Admin2/verb/Depth_Sorting_Toggle()
 	set category = "Admin"

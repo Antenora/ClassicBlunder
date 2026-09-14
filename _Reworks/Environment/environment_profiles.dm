@@ -351,6 +351,7 @@ proc/_EnvProfileLoop()
 		Log("Admin", "[ExtractInfo(src)] set zone \"[ZD.name]\" env profile to [options[choice]].")
 		return
 	A.env_profile_id = options[choice]
+	GfxWindChanged()
 	BuildZoneProfileRecord(A.type, options[choice])
 	for(var/client/CC)
 		CC.gfx_env_profile_id = null
