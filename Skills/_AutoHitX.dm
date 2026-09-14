@@ -3491,6 +3491,7 @@ obj
 				PreShockwave=1
 				PostShockwave=1
 				Shockwave=2
+				MenuIcon="JetSlice"
 				Shockwaves=2
 				ActiveMessage="flickers behind their opponent for an instantaneous slash!"
 				Cooldown=18
@@ -3603,6 +3604,7 @@ obj
 				Distance=10
 				PassThrough=1
 				PreShockwave=1
+				MenuIcon="CrowdCutter"
 				PostShockwave=0
 				Shockwave=2
 				Shockwaves=2
@@ -3635,6 +3637,7 @@ obj
 				DistanceAround=3
 				EnergyCost=5
 				Rounds=20
+				MenuIcon="HolyJustice"
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
@@ -3666,6 +3669,7 @@ obj
 				TurfErupt=1.25
 				TurfEruptOffset=6
 				DelayTime=1
+				MenuIcon="DoomOfDamocles"
 				ComboMaster = 1
 				Icon='SwordHugeDoomofDamocles.dmi'
 				Size=0.5
@@ -7902,6 +7906,7 @@ obj
 	DamageMult = 7.75
 	StrScaling = 1
 	EndEffectiveness = 1
+	MenuIcon="JudgementCut"
 	Copyable=6
 	Cooldown = 30
 	EnergyCost = 8

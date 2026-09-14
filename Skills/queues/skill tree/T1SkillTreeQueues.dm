@@ -250,6 +250,7 @@ obj
 				Instinct=2
 				Grapple=1
 				KBMult=0.001
+				MenuIcon="SwordClinch"
 				Warp=3
 				Crippling=6
 				NeedsSword = 1

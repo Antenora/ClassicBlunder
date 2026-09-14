@@ -4221,6 +4221,7 @@ obj
 					DamageMult=1.05
 					AccMult = 1.5
 					Radius=1
+					MenuIcon="WindScar"
 					ZoneAttack=1
 					ZoneAttackX=0
 					ZoneAttackY=0
@@ -4253,6 +4254,7 @@ obj
 					MultiHit=2
 					Devour=1
 					Knockback=1
+					MenuIcon="BacklashWave"
 					EnergyCost=5
 					Cooldown=18
 					IconLock='TornadoDirected.dmi'
@@ -4283,6 +4285,7 @@ obj
 					EnergyCost=5
 					Cooldown=18
 					Homing=1
+					MenuIcon="AirSlash"
 					Hover=15
 					DartAtAttacker=1
 					IconLock='Scarring Breeze.dmi'
@@ -4302,6 +4305,7 @@ obj
 					Radius=1
 					ZoneAttack=1
 					ZoneAttackX=0
+					MenuIcon="PhantomHowl"
 					ZoneAttackY=0
 					FireFromSelf=1
 					FireFromEnemy=0

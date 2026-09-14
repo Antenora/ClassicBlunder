@@ -12,6 +12,7 @@
 		LifeSteal=50
 		WindUp=1
 		WindupIcon='StormArmor.dmi'
+		MenuIcon="JestOfTheDead"
 		Rounds=10
 		ChargeTech=1
 		ChargeTime=1
@@ -36,6 +37,7 @@
 		CanBeDodged=0
 		CanBeBlocked=0
 		GuardBreak=1
+		MenuIcon="JudgementCutEnd"
 		Divide=1
 		Slow=1
 		WindUp=1
@@ -62,6 +64,7 @@ obj/Skills/Queue
 		AccuracyMult = 1.175
 		Duration=15
 		KBMult=0.01
+		MenuIcon="JudgementCutEnd"
 		Finisher=1
 		Dunker=4
 		NoGCD=1

@@ -230,6 +230,7 @@ obj
 			EnergyCost=2
 			NoLock=1
 			NoAttackLock=1
+			MenuIcon="ThreeThousandWorlds"
 			Icon='CircleWind.dmi'
 			IconX=-32
 			IconY=-32
@@ -303,6 +304,7 @@ obj
 			NeedsSword=1
 			Area="Strike"
 			ControlledRush=1
+			MenuIcon="DrillSpin"
 			Rush=3
 			ChargeTech=1
 			ChargeTime=1
@@ -409,6 +411,7 @@ obj
 			Knockback=0
 			Rounds=1
 			Launcher=5
+			MenuIcon="RisingSpire"
 			NoLock=1
 			NoAttackLock=1
 			Size=2
@@ -441,6 +444,7 @@ obj
 			Distance=2
 			Rush=2
 			ControlledRush=1
+			MenuIcon="ArkBrave"
 			RoundMovement=0
 			WindUp=1
 			WindupMessage="charges their blade with imperial willpower!"
@@ -473,6 +477,7 @@ obj
 			Cooldown = 8
 			DamageMult=6.5
 			FocusShifter=1
+			MenuIcon="Judgment"
 			FocusShiftBoost=1.5
 			ComboMaster=1
 			Size=2

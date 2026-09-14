@@ -495,6 +495,7 @@ obj/Skills/Grapple
 			MultiHit=8
 			StrScaling=1
 			ThrowMult=0
+			MenuIcon="Eviscerate"
 			ThrowAdd=0
 			TriggerMessage="eviscerates"
 			Effect="Strike"
@@ -515,6 +516,7 @@ obj/Skills/Grapple
 			TriggerMessage="hacks their weapon cruelly into"
 			Effect="Strike"
 			EffectMult=3
+			MenuIcon="Hacksaw"
 			MortalBlow=1
 			Cooldown=12
 			EnergyCost=3
@@ -553,6 +555,7 @@ obj/Skills/Grapple
 			StrScaling=1
 			ThrowMult=0
 			ThrowAdd=1
+			MenuIcon="FormAtaru"
 			TriggerMessage="does a slashing flip to break free of"
 			Effect="Vault"
 			EffectMult=2
