@@ -1,4 +1,5 @@
 turf/var/tmp/list/edgeOverlays
+turf/var/EdgeOptOut = 0
 
 var/global/list/buildMaterialPriority = list("Grass" = 20, "Dirt" = 30, "Sand" = 40, "Ice" = 60, "Wood" = 70, "Stone" = 80, "Water" = 100)
 var/global/list/buildMaterialNames = list("Grass", "Dirt", "Sand", "Water", "Stone", "Wood", "Ice")
@@ -419,21 +420,68 @@ var/global/list/buildCliffStyleNames
 	return (O.dir == EAST || O.dir == WEST) ? 1 : 0
 
 /proc/BuildMatFor(turf/T, turf/O, th)
-	if(BuildEdgeObjOn(O))
+	if(!O || O.EdgeOptOut || BuildEdgeObjOn(O))
 		return null
 	return BuildMatSameH(O, th)
 
+/proc/BuildNoEdgeExportSidecar(x1, y1, x2, y2, z, fname)
+	var/cf = "[copytext(fname, 1, -4)]_noedge.txt"
+	if(fexists(cf))
+		fdel(cf)
+	var/list/out = list()
+	for(var/y = y1 to y2)
+		for(var/x = x1 to x2)
+			var/turf/T = locate(x, y, z)
+			if(T && T.EdgeOptOut)
+				out += "[x - x1]\t[y - y1]"
+	if(!out.len)
+		return 0
+	text2file(jointext(out, "\n"), cf)
+	return out.len
+
+/proc/BuildNoEdgeImportSidecar(fname, ox, oy, oz)
+	var/cf = "[copytext(fname, 1, -4)]_noedge.txt"
+	if(!fexists(cf))
+		return 0
+	var/raw = file2text(cf)
+	var/n = 0
+	for(var/line in splittext(raw, "\n"))
+		var/list/f = splittext(line, "\t")
+		if(f.len < 2)
+			continue
+		var/dx = text2num(f[1])
+		var/dy = text2num(f[2])
+		if(isnull(dx) || isnull(dy))
+			continue
+		var/turf/T = locate(ox + dx, oy + dy, oz)
+		if(T)
+			T.EdgeOptOut = 1
+			n++
+	return n
+
 var/global/list/buildLipCrawlStates
 
+/proc/BuildIsRockLip(obj/O)
+	if(!O)
+		return 0
+	if(O.icon == 'grayrockedges.dmi')
+		return 1
+	if(O.icon == 'Edges.dmi' && (O.icon_state in list("1", "2", "3", "4", "5", "6", "7")))
+		return 1
+	return 0
+
 /proc/BuildLipCrawl(turf/T, obj/EO, list/fresh)
-	if(!T || !EO || !(EO.dir == EAST || EO.dir == WEST))
+	if(!T || !EO || !(EO.dir == EAST || EO.dir == WEST) || !BuildIsRockLip(EO))
 		return
 	var/m = BuildMaterialFor(T)
 	if(!m || m == "Water")
 		return
+	var/sty = BuildEdgeStyleFor(m)
+	if(sty != "wispy" && sty != "crumbly" && sty != "soft")
+		return
 	if(!buildLipCrawlStates)
 		buildLipCrawlStates = ElevStateSet('Mapping/Elevation/elev_lipcrawl.dmi')
-	var/st = "lc_[BuildEdgeStyleFor(m)]_[(EO.dir == WEST) ? "L" : "R"]_[ElevLipWidth(EO)]"
+	var/st = "lc_[sty]_[(EO.dir == WEST) ? "L" : "R"]_[ElevLipWidth(EO)]"
 	if(!buildLipCrawlStates[st])
 		return
 	var/eh = ElevAt(T)
@@ -699,6 +747,8 @@ var/global/list/foamPaintMap
 			T.overlays -= img
 	T.edgeOverlays = null
 	var/list/fresh = list()
+	if(T.EdgeOptOut)
+		return
 	var/obj/EO = BuildEdgeObjOn(T)
 	if(EO)
 		BuildLipCrawl(T, EO, fresh)
@@ -955,6 +1005,7 @@ mob/Mapper/verb/Edge_Debug()
 	var/m = BuildMaterialFor(T)
 	usr << "  HERE: [T.type] -> [m ? "[m] (style [BuildEdgeStyleFor(m)], priority [BuildMaterialPriority(m)])" : "NO MATERIAL (will not edge)"]"
 	usr << "  tracked edge overlays on this tile: [T.edgeOverlays ? T.edgeOverlays.len : 0]"
+	usr << "  auto-edging for this tile: [T.EdgeOptOut ? "OFF (placed with auto-edge off; neighbours ignore it)" : "on"][BuildEdgeObjOn(T) ? ", edge object present (no auto pieces, lip crawl only)" : ""]"
 	var/list/dirs = list("N" = list(0, 1), "S" = list(0, -1), "E" = list(1, 0), "W" = list(-1, 0))
 	for(var/d in dirs)
 		var/list/o = dirs[d]

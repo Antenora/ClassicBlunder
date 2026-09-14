@@ -287,6 +287,7 @@
 #define FILE_DIR "Sounds/music"
 #define FILE_DIR "Sounds/music/jukebox"
 #define FILE_DIR "Turfs"
+#define FILE_DIR "UI"
 // END_FILE_DIR
 // BEGIN_PREFERENCES
 #define DEBUG

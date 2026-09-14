@@ -17,7 +17,7 @@
 	if(!tp)
 		return ""
 	var/roof = rec["[pre]Roof"]
-	return jointext(list("TS", "[rec["x"]]", "[rec["y"]]", "[rec["z"]]", "[tp]", BuildJournalIconPath(rec["[pre]Icon"]), BuildDmmEscape("[rec["[pre]State"]]"), "[rec["[pre]Density"] || 0]", "[rec["[pre]Opacity"] || 0]", "[roof || 0]", "[rec["[pre]FlyOver"] || 0]", "[rec["[pre]Destructable"] || 0]", "[rec["[pre]Shallow"] || 0]", BuildDmmEscape("[rec["[pre]Builder"] || ""]")), "\t")
+	return jointext(list("TS", "[rec["x"]]", "[rec["y"]]", "[rec["z"]]", "[tp]", BuildJournalIconPath(rec["[pre]Icon"]), BuildDmmEscape("[rec["[pre]State"]]"), "[rec["[pre]Density"] || 0]", "[rec["[pre]Opacity"] || 0]", "[roof || 0]", "[rec["[pre]FlyOver"] || 0]", "[rec["[pre]Destructable"] || 0]", "[rec["[pre]Shallow"] || 0]", BuildDmmEscape("[rec["[pre]Builder"] || ""]"), "[rec["[pre]EdgeOpt"] || 0]"), "\t")
 
 /proc/BuildJournalObjLine(atom/movable/O, x, y, z, remove)
 	if(!O)
@@ -112,6 +112,8 @@
 			NT.Destructable = text2num(f[12]) || 0
 			NT.Shallow = text2num(f[13]) || 0
 			NT.Builder = BuildDmmUnescape(f[14])
+			if(f.len >= 15)
+				NT.EdgeOptOut = text2num(f[15]) || 0
 			if(NT.Builder)
 				if(istype(NT, /turf/CustomTurf))
 					CustomTurfs += NT
@@ -201,6 +203,7 @@
 	rec["oldShallow"] = T.Shallow
 	rec["oldFlyOver"] = T.FlyOverAble
 	rec["oldDestructable"] = T.Destructable
+	rec["oldEdgeOpt"] = T.EdgeOptOut
 	if(istype(T, /turf/CustomTurf))
 		var/turf/CustomTurf/CT = T
 		rec["oldIcon"] = CT.icon
@@ -241,6 +244,7 @@
 	else
 		C2.FlyOverAble = 1
 	C2.Destructable = M.TurfInvincible ? 0 : 1
+	C2.EdgeOptOut = (C?.bsession && !C.bsession.autoEdge) ? 1 : 0
 	if(M.ShallowMode)
 		C2.Shallow = 1
 	if(istype(C2, /turf/CustomTurf))
@@ -257,6 +261,7 @@
 	rec["newShallow"] = C2.Shallow
 	rec["newFlyOver"] = C2.FlyOverAble
 	rec["newDestructable"] = C2.Destructable
+	rec["newEdgeOpt"] = C2.EdgeOptOut
 	if(istype(C2, /turf/CustomTurf))
 		var/turf/CustomTurf/CT = C2
 		rec["newRoof"] = CT.Roof
@@ -279,6 +284,7 @@
 	C2.Shallow = rec["newShallow"]
 	C2.FlyOverAble = rec["newFlyOver"]
 	C2.Destructable = rec["newDestructable"]
+	C2.EdgeOptOut = rec["newEdgeOpt"] || 0
 	if(istype(C2, /turf/CustomTurf))
 		var/turf/CustomTurf/CT = C2
 		CT.Roof = rec["newRoof"]
@@ -309,6 +315,7 @@
 	old.Shallow = rec["oldShallow"]
 	old.FlyOverAble = rec["oldFlyOver"]
 	old.Destructable = rec["oldDestructable"]
+	old.EdgeOptOut = rec["oldEdgeOpt"] || 0
 	if(istype(old, /turf/CustomTurf))
 		var/turf/CustomTurf/CT = old
 		if(rec["oldIcon"])
@@ -511,7 +518,7 @@
 			else if(elevMode == 1)
 				C.mob << "Those tiles are already at the highest level ([ELEV_MAX])."
 			return
-		if(placedTurfs.len && S.autoEdge)
+		if(placedTurfs.len)
 			BuildEdgeSmoothAround(placedTurfs, S.blendEdges)
 		if(elevTouched.len)
 			ElevRefreshAround(elevTouched)
@@ -751,7 +758,7 @@
 	if(!A.count)
 		C.mob << "Nowhere to paste there."
 		return
-	if(placedTurfs.len && S.autoEdge)
+	if(placedTurfs.len)
 		BuildEdgeSmoothAround(placedTurfs, S.blendEdges)
 	if(placedTurfs.len)
 		ElevVisualRefresh(placedTurfs)

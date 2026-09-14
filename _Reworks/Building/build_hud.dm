@@ -310,8 +310,10 @@
 				M.BuildOverwrite = !M.BuildOverwrite
 			if("autoedge")
 				S.autoEdge = !S.autoEdge
+				S.C?.setPref("autoEdge", S.autoEdge ? 1 : 0)
 			if("blend")
 				S.blendEdges = !S.blendEdges
+				S.C?.setPref("blendEdges", S.blendEdges ? 1 : 0)
 			if("varied")
 				S.varied = !S.varied
 			if("spacing")

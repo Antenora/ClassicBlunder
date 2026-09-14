@@ -328,6 +328,9 @@ client/var/datum/build_session/bsession
 
 	New(client/_C)
 		C = _C
+		if(C && C.prefs)
+			autoEdge = C.getPref("autoEdge") ? 1 : 0
+			blendEdges = C.getPref("blendEdges") ? 1 : 0
 		..()
 
 	proc

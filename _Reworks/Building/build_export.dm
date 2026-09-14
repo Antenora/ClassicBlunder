@@ -202,6 +202,7 @@ var/global/list/buildDmmAlphabet = list("a","b","c","d","e","f","g","h","i","j",
 	text2file(jointext(lines, "\n"), fname)
 	var/cliffN = BuildCliffExportSidecar(x1, y1, x2, y2, z, fname)
 	var/foamN = BuildFoamExportSidecar(x1, y1, x2, y2, z, fname)
+	var/noEdgeN = BuildNoEdgeExportSidecar(x1, y1, x2, y2, z, fname)
 	var/elevN = ElevExportSidecar(x1, y1, x2, y2, z, fname)
 	var/list/rep = list()
 	rep += "Exported [w]x[h] region ([x1],[y1])-([x2],[y2]) z[z] -> [fname]"
@@ -212,6 +213,8 @@ var/global/list/buildDmmAlphabet = list("a","b","c","d","e","f","g","h","i","j",
 		rep += "[cliffN] painted cliff-bottom styles saved beside it as *_cliffs.txt - keep that file with the .dmm."
 	if(foamN)
 		rep += "[foamN] foam-off water tiles saved beside it as *_foam.txt - keep that file with the .dmm."
+	if(noEdgeN)
+		rep += "[noEdgeN] tiles placed with auto-edging off saved beside it as *_noedge.txt - keep that file with the .dmm."
 	if(R.recoveredIcons)
 		rep += "[R.recoveredIcons] unregistered custom icons were extracted into Mapping/Custom/ (rec_*.png) so this file stays complete."
 	if(R.skippedIcons)

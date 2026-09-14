@@ -272,8 +272,10 @@
 			if(n % BUILD_COMMIT_CHUNK == 0)
 				sleep(-1)
 	var/elevN = 0
+	var/noEdgeN = 0
 	if(placedCells)
 		elevN = ElevImportSidecar(fname, ox, oy, oz, cols, rowsN)
+		noEdgeN = BuildNoEdgeImportSidecar(fname, ox, oy, oz)
 		BuildEdgeSmoothAround(TurfSquare(ox, oy, ox + cols - 1, oy + rowsN - 1, oz, 0), 1)
 		ElevVisualRefresh(TurfSquare(ox, oy, ox + cols - 1, oy + rowsN - 1, oz, 0))
 		BuildCustomRefreshSessions()
@@ -289,6 +291,8 @@
 		rep += "Restored [cliffN] painted cliff-bottom styles."
 	if(foamN)
 		rep += "Restored [foamN] foam-off water tiles."
+	if(noEdgeN)
+		rep += "Restored [noEdgeN] tiles placed with auto-edging off."
 	if(ctx.multiZ)
 		rep += "WARNING: file contains multiple z-level blocks; only the FIRST was imported."
 	for(var/pt in ctx.unknownPaths)

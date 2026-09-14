@@ -86,6 +86,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 	var/list/isOutside=list()
 	var/list/isUnderwater=list()
 	var/list/Destructable=list()
+	var/list/EdgeOpt=list()
 	for(var/turf/CustomTurf/A in CustomTurfs)
 		if(A)
 			Types+=A.type
@@ -105,6 +106,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 			isOutside+=A.isOutside
 			isUnderwater+=A.isUnderwater
 			Destructable+=A.Destructable
+			EdgeOpt+=A.EdgeOptOut
 			Amount+=1
 			if(Amount % 20000 == 0)
 				F["Types"]<<Types
@@ -123,6 +125,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				F["isOutside"]<<isOutside
 				F["isUnderwater"]<<isUnderwater
 				F["Destructable"]<<Destructable
+				F["EdgeOpt"]<<EdgeOpt
 				E ++
 				F=new("Saves/Map/CustomTurfs[E]")
 				Types=list()
@@ -141,6 +144,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				isOutside=list()
 				isUnderwater=list()
 				Destructable=list()
+				EdgeOpt=list()
 
 	if(Amount % 20000 != 0)
 		F["Types"]<<Types
@@ -159,6 +163,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 		F["isOutside"]<<isOutside
 		F["isUnderwater"]<<isUnderwater
 		F["Destructable"]<<Destructable
+		F["EdgeOpt"]<<EdgeOpt
 
 	if(!quiet)
 		world<<"<small>Server: Custom Turfs Saved([Amount])."
@@ -191,6 +196,7 @@ proc/Load_Custom_Turfs()
 		var/list/isOutside=F["isOutside"]
 		var/list/isUnderwater=F["isUnderwater"]
 		var/list/Destructable=F["Destructable"]
+		var/list/EdgeOpt=F["EdgeOpt"]
 		Amount = 0
 		for(var/A in Types)
 			Amount+=1
@@ -208,6 +214,7 @@ proc/Load_Custom_Turfs()
 			T.isOutside=isOutside[Amount]
 			T.isUnderwater=isUnderwater[Amount]
 			T.Destructable=Destructable[Amount]
+			T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
 			CustomTurfs+=T
 
 			for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
@@ -241,6 +248,7 @@ proc/Save_Turfs(quiet = 0)
 	var/list/isOutside=list()
 	var/list/isUnderwater=list()
 	var/list/Destructable=list()
+	var/list/EdgeOpt=list()
 
 
 	for(var/turf/A in Turfs)
@@ -256,6 +264,7 @@ proc/Save_Turfs(quiet = 0)
 			isOutside+=A.isOutside
 			isUnderwater+=A.isUnderwater
 			Destructable+=A.Destructable
+			EdgeOpt+=A.EdgeOptOut
 			Amount+=1
 			if(Amount % 20000 == 0)
 				F["Types"]<<Types
@@ -269,6 +278,7 @@ proc/Save_Turfs(quiet = 0)
 				F["isOutside"]<<isOutside
 				F["isUnderwater"]<<isUnderwater
 				F["Destructable"]<<Destructable
+				F["EdgeOpt"]<<EdgeOpt
 				E ++
 				F=new("Saves/Map/File[E]")
 				Types=list()
@@ -282,6 +292,7 @@ proc/Save_Turfs(quiet = 0)
 				isOutside=list()
 				isUnderwater=list()
 				Destructable=list()
+				EdgeOpt=list()
 
 
 	if(Amount % 20000 != 0)
@@ -296,6 +307,7 @@ proc/Save_Turfs(quiet = 0)
 		F["isOutside"]<<isOutside
 		F["isUnderwater"]<<isUnderwater
 		F["Destructable"]<<Destructable
+		F["EdgeOpt"]<<EdgeOpt
 
 
 	if(!quiet)
@@ -324,6 +336,7 @@ proc/Load_Turfs()
 		var/list/isOutside=F["isOutside"]
 		var/list/isUnderwater=F["isUnderwater"]
 		var/list/Destructable=F["Destructable"]
+		var/list/EdgeOpt=F["EdgeOpt"]
 		Amount = 0
 		for(var/A in Types)
 			Amount+=1
@@ -336,6 +349,7 @@ proc/Load_Turfs()
 			T.isOutside=isOutside[Amount]
 			T.isUnderwater=isUnderwater[Amount]
 			T.Destructable=Destructable[Amount]
+			T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
 			if(istype(T,/turf/Special/EventStars))
 				T.icon_state="[rand(1,2500)]"
 			Turfs+=T
