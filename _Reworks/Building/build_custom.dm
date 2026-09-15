@@ -462,7 +462,9 @@ mob/Mapper/verb/Edit_Custom_Def()
 		else if(findtext(choice, "Stairs"))
 			D.stairs = !D.stairs
 		else if(findtext(choice, "Profile"))
-			var/list/ids = SurfaceProfiles().Copy()
+			var/list/ids = list()
+			for(var/pid in SurfaceProfiles())
+				ids += pid
 			ids += "AUTO (classify by type)"
 			var/ppick = input(usr, "Surface profile for \"[D.name]\": tree or foliage sway in the wind and cast soft shadows, wall blocks light, floor does nothing.", "Edit Custom") as null|anything in ids
 			if(!ppick)
