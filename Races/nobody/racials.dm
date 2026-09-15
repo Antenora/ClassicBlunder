@@ -37,7 +37,7 @@
 		SwordUnbreakable=1
 		passives = list("StealsStats" = 1,"VoidBlade" = 1)
 		verb/Transfigure_Void_Blade()
-			set category="Utility"
+			set category="Character Custom"
 			set hidden = 1
 			var/Choice
 			if(!usr.BuffOn(src))

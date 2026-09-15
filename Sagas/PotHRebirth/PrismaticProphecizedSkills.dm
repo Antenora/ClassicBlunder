@@ -182,7 +182,7 @@ obj
 					ForMult=1.40
 					PowerMult=1.30
 			verb/Transfigure_Chaos_Saber()
-				set category="Utility"
+				set category="Character Custom"
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/modify_sword_num = 1
@@ -194,15 +194,15 @@ obj
 					if(Lock=="Yes")
 						switch(modify_sword_num)
 							if(1)
-								src.SwordIcon=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordIcon=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
 								src.SwordX=input(usr, "Pixel X offset.", "Void Blade Icon") as num
 								src.SwordY=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
 							if(2)
-								src.SwordIconSecond=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordIconSecond=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
 								src.SwordXSecond=input(usr, "Pixel X offset.", "Void Blade Icon") as num
 								src.SwordYSecond=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
 							if(3)
-								src.SwordIconThird=input(usr, "What icon will your Void Blade use?", "Void Blade Icon") as icon|null
+								src.SwordIconThird=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
 								src.SwordXThird=input(usr, "Pixel X offset.", "Void Blade Icon") as num
 								src.SwordYThird=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
 					Choice=input(usr, "What class of blade do you want your Void Blade to be?", "Transfigure Void Blade") in list("Blunt", "Saber", "Longsword", "Greatsword")
@@ -227,7 +227,7 @@ obj
 								if(1) src.SwordClass="Heavy"
 								if(2) src.SwordClassSecond="Heavy"
 								if(3) src.SwordClassThird="Heavy"
-					usr << "Void Blade class set as [Choice]!"
+					usr << "Chaos Saber class set as [Choice]!"
 				else
 					usr << "You can't set this while using Chaos Blade."
 			verb/Chaos_Saber()
@@ -272,7 +272,7 @@ obj
 					PowerMult = 1.25
 					StaffAscension=p.SagaLevel
 			verb/Transfigure_Chaos_Buster()
-				set category="Utility"
+				set category="Character Custom"
 				set hidden = 0
 				var/Choice
 				if(!usr.BuffOn(src))

@@ -73,23 +73,68 @@
 			set category="Skills"
 			usr.Activate(src)
 
-/client/var/tmp/obj/rgMeterHolderNorm = new()
-/client/var/tmp/obj/rgMeterHolderOutlines = new()
+
+var/global/list/RGMeterIconCache = list()
+
+proc/RGMeterFillIcon(percent, fill_state = "100")
+	percent = min(max(round(percent), 0), 100)
+	var/key = "[fill_state]-[percent]"
+	if(RGMeterIconCache[key]) return RGMeterIconCache[key]
+	var/icon/I = icon('RoyalGuardMeter.dmi', fill_state)
+	var/w = I.Width()
+	var/h = I.Height()
+	var/cx = (w + 1) / 2
+	var/cy = (h + 1) / 2
+	if(percent <= 0)
+		I.DrawBox(null, 1, 1, w, h)
+	else if(percent < 100)
+		var/fill_angle = percent * 3.6
+		for(var/px = 1, px <= w, px++)
+			for(var/py = 1, py <= h, py++)
+				var/angle = 90 - arctan(px - cx, py - cy)
+				if(angle < 0) angle += 360
+				if(angle >= fill_angle)
+					I.DrawBox(null, px, py)
+	RGMeterIconCache[key] = I
+	return I
+
+obj/RGMeter
+	Click()
+		if(usr && usr.client)
+			usr.client.updateRGMeter() //this was a debug thing to click the meter to update it, need mouse opacity to 2, setting it to 0
+
+/client/var/tmp/obj/RGMeter/rgMeterHolderNorm = new()
+/client/var/tmp/obj/RGMeter/rgMeterHolderOutlines = new()
 
 /client/proc/updateRGMeter()
+	if(!mob) return
 	var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in mob.contents
-	if(RG)
-		if(rgMeterHolderNorm)
-			if(!(rgMeterHolderNorm in screen))
-				rgMeterHolderNorm.screen_loc = "RIGHT-0.72,BOTTOM+1.40"
-				rgMeterHolderNorm.plane = HUD_PLANE
-				rgMeterHolderOutlines.plane = HUD_PLANE
-
-				screen += rgMeterHolderNorm
-				screen += rgMeterHolderOutlines
-				rgMeterHolderOutlines.screen_loc = "RIGHT-0.70,BOTTOM+1.38"
-
-			rgMeterHolderNorm.maptext = "<font color= 'red'>[round(RG.RoyalMeter,0.01)]/[100+RG.Mastery-1]</font>"
-			rgMeterHolderOutlines.maptext = "<font color= 'white'>[round(RG.RoyalMeter,0.01)]/[100+RG.Mastery-1]</font>"
-			rgMeterHolderNorm.maptext_width = 400
-			rgMeterHolderOutlines.maptext_width = 400
+	if(!RG)
+		screen -= rgMeterHolderNorm
+		screen -= rgMeterHolderOutlines
+		return
+	if(!rgMeterHolderNorm) rgMeterHolderNorm = new()
+	if(!rgMeterHolderOutlines) rgMeterHolderOutlines = new()
+	if(!(rgMeterHolderNorm in screen))
+		rgMeterHolderNorm.screen_loc = "CENTER+9,BOTTOM+0.7"
+		rgMeterHolderOutlines.screen_loc = rgMeterHolderNorm.screen_loc
+		rgMeterHolderNorm.plane = HUD_PLANE
+		rgMeterHolderOutlines.plane = HUD_PLANE
+		rgMeterHolderNorm.layer = 2
+		rgMeterHolderOutlines.layer = 1
+		rgMeterHolderNorm.mouse_opacity = 0
+		rgMeterHolderOutlines.mouse_opacity = 0
+		rgMeterHolderNorm.maptext = ""
+		rgMeterHolderOutlines.maptext = ""
+		rgMeterHolderOutlines.icon = 'RoyalGuardMeter.dmi'
+		rgMeterHolderOutlines.icon_state = "Back"
+		screen += rgMeterHolderOutlines
+		screen += rgMeterHolderNorm
+	var/meter = min(max(RG.RoyalMeter, 0), 200)
+	rgMeterHolderOutlines.icon_state = "Back"
+	rgMeterHolderNorm.overlays.Cut()
+	rgMeterHolderNorm.icon = RGMeterFillIcon(min(meter, 100), "100")
+	rgMeterHolderNorm.icon_state = ""
+	if(meter > 100)
+		var/image/overflow = image(icon = RGMeterFillIcon(meter - 100, "200"))
+		rgMeterHolderNorm.overlays += overflow

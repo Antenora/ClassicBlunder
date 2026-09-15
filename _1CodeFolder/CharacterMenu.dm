@@ -1523,9 +1523,22 @@ client/proc/ShowGearDetail(obj/Items/it)
 	KineticEntrance(cmenu_desc_objs)
 
 
+client/var/tmp/list/cmenu_cust_owners
 client/proc/BuildCustomContent()
 	cmenu_cust_list = (mob && mob.hud_customize_verbs) ? mob.hud_customize_verbs.Copy() : list()
 	cmenu_cust_list |= /mob/verb/Customize_Buff_Portraits
+	cmenu_cust_owners = list()
+	if(mob)
+		for(var/vp in mob.verbs)
+			if(vp:category == "Character Custom")
+				cmenu_cust_list |= vp
+				cmenu_cust_owners["[vp]"] = mob
+		for(var/obj/O in mob.contents)
+			for(var/vp in O.verbs)
+				if(vp:category == "Character Custom")
+					if(cmenu_cust_owners["[vp]"]) continue
+					cmenu_cust_list |= vp
+					cmenu_cust_owners["[vp]"] = O
 	if(cmenu_cust_list.len)
 		var/list/resets = list()
 		for(var/vp in cmenu_cust_list.Copy())
@@ -1906,12 +1919,21 @@ client/proc/RefreshCustPreview()
 client/proc/CustButtonAction(action)
 	switch(action)
 		if("open")
-			if(cmenu_cust_list && cust_sel >= 1 && cust_sel <= cmenu_cust_list.len)
+			if(mob && cmenu_cust_list && cust_sel >= 1 && cust_sel <= cmenu_cust_list.len)
 				var/vp = cmenu_cust_list[cust_sel]
-				if("[vp:name]" == "Customize: Forms")
-					spawn() call(usr, vp)(usr)
-				else
-					spawn() call(usr, vp)()
+				var/atom/owner = mob
+				var/registered = FALSE
+				if(cmenu_cust_owners && cmenu_cust_owners["[vp]"])
+					owner = cmenu_cust_owners["[vp]"]
+					registered = TRUE
+				spawn()
+					if(!mob || !owner) return
+					if(owner != mob && !(owner in mob.contents)) return
+					if(registered && !(vp in owner.verbs)) return
+					if("[vp:name]" == "Customize: Forms")
+						call(owner, vp)(mob)
+					else
+						call(owner, vp)()
 		if("browse")
 			CustBrowse()
 		if("colorpick")

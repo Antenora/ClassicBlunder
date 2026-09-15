@@ -21,8 +21,7 @@
 	AngerFloor = 60
 	TimerLimit = 360
 	verb/Ultimate_Form_Toggle()
-		set category="Other"
-		set hidden = 1
+		set category="Character Custom"
 		if(!usr.SSJ4FromBase)
 			usr.SSJ4FromBase=1
 			usr<<"You can now transform straight into your ultimate forms (God or SSj4) from base, replacing your other Super Saiyan transformations."
@@ -30,8 +29,7 @@
 			usr.SSJ4FromBase=0
 			usr<<"You can no longer transform straight into your ultimate form (God or SSj4) from base."
 	verb/Moon_Toggle()
-		set category="Other"
-		set hidden = 1
+		set category="Character Custom"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		Looking=!Looking

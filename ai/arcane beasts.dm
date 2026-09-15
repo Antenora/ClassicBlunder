@@ -337,7 +337,7 @@ obj/Skills/Buffs/SlotlessBuffs/
 		ActiveMessage="draws an arcane weapon from mist!"
 		OffMessage="disperses their arcane weapon into mist!"
 		verb/Transfigure_Nympharum_Armament()
-			set category="Utility"
+			set category="Character Custom"
 			set hidden = 1
 			var/Choice
 			if(!usr.BuffOn(src))
