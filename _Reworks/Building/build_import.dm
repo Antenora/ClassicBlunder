@@ -239,6 +239,8 @@
 					O.Builder = M.ckey
 					O.Savable = 1
 					worldObjectList += O
+				if(istype(O, /obj/Turfs/CustomObj1))
+					BuildCustomObjApplyDef(O)
 				GfxRefreshStructureMetadata(O)
 				placedObjs++
 			if(areaEntry && areaEntry["path"] != /area)
@@ -259,6 +261,10 @@
 								ZD.profile = ov["env_profile_id"]
 							if(isnum(ov["zone_wind_mult"]))
 								ZD.windMult = ov["zone_wind_mult"]
+							if(istext(ov["dn_fixed"]))
+								ZD.dnMode = BuildZoneTimeValid(ov["dn_fixed"])
+							if(isnum(ov["zone_moon"]))
+								ZD.moon = ov["zone_moon"] ? 1 : 0
 							BuildZoneApply(ZD)
 							BuildZonesSave()
 						aid = "/area/MapperZone#[ZD.name]"

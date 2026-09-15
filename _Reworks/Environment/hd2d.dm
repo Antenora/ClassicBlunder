@@ -584,7 +584,8 @@ proc/_Hd2dLocalDark(client/C)
 	var/atom/anchor = C ? GfxViewAnchor(C) : null
 	var/turf/T = anchor ? get_turf(anchor) : null
 	var/area/A = T ? T.loc : null
-	if(!A || A.sees_sky) return DnDarknessFrac()
+	if(!A) return DnDarknessFrac()
+	if(A.sees_sky) return DnAreaDark(A)
 	if(A.dark_cave) return 1
 	if(A.dn_indoor) return DnDarknessFrac() * (glob ? glob.INDOOR_DIM : 0.6)
 	return 0
@@ -670,7 +671,7 @@ proc/WorldBloomThreshold(client/C)
 		if(C && C.hd2d_indoor_seen) amb = DnIndoorColor(sky) 
 		else if(C && C.hd2d_sky_seen) amb = sky
 	else
-		amb = sky
+		amb = (A && A.sees_sky) ? DnAreaSkyColor(A, sky) : sky
 		if(A && A.dn_indoor) amb = DnIndoorColor(amb)
 		else if(C && C.hd2d_indoor_seen) amb = DnIndoorColor(amb) 
 	var/list/sk = _FxRGB(amb)
@@ -820,9 +821,10 @@ proc/Hd2dClientTick(client/C, snap = 0)
 		var/isMoon = sp[4]
 		//day trimmed: additive beams over bright sand stack into blowout at full strength.
 		//moon shafts are a full-moon spectacle only - MoonEventK ramps them with the event
-		var/sa = isMoon ? glob.SHAFT_ALPHA * 0.5 * elev * MoonEventK() : glob.SHAFT_ALPHA * (0.32 + 0.38 * elev) * (1 - DnDarknessFrac() * 0.5)
+		var/sa = isMoon ? glob.SHAFT_ALPHA * 0.5 * elev * MoonKFor(gA) : glob.SHAFT_ALPHA * (0.32 + 0.38 * elev) * (1 - (gA ? DnAreaDark(gA) : DnDarknessFrac()) * 0.5)
 		if(wxA) sa = 0 //overcast kills shafts BY DESIGN - clear-sky test only
 		if(!opensky) sa = 0 //no sky, no shafts - the area gate that replaced pixel masking
+		if(gA && DnAreaSunMismatch(gA, isMoon)) sa = 0
 		if(isMoon && !glob.MOON_SHAFTS) sa = 0
 		C.hd2d_shaft_add = round(165 * sa / 255) //165 = the sheet's brightest streak; feeds the bloom ceiling
 		var/rcol = isMoon ? "#aebfe8" : DnLerp("#fff3d2", "#ffd9a8", 1 - elev)

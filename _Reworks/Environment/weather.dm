@@ -373,6 +373,9 @@ proc/_WxRollLoop()
 	while(1)
 		if(glob && glob.WEATHER)
 			for(var/area/A in _dn_sky_areas)
+				if(istype(A, /area/MapperZone))
+					BuildZoneWxRestore(A)
+					continue
 				if(!A.wx_table) continue
 				var/kind = _WxPickWeighted(A.wx_table)
 				if(kind == "clear") kind = null
@@ -438,7 +441,8 @@ proc/_WxSyncPass()
 		var/cover_h = P.client.gfx_screen_cover_h
 		var/list/vdims = GfxCameraViewTiles(P.client)
 		if(P._wx_key == want_key && P._wx_standing == !!standing && P._wx_tier == tier && P._wx_cover_w == cover_w && P._wx_cover_h == cover_h && P._wx_view_w == vdims[1] && P._wx_view_h == vdims[2])
-			if(want) _WxUpdateOutdoorMask(P, want)
+			if(want_key) _WxUpdateOutdoorMask(P, want)
+			else if(P._wx_mask_images) _WxClearOutdoorMask(P)
 			continue
 		_WxDetachPlayer(P)
 		P._wx_key = want_key
@@ -485,6 +489,9 @@ proc/_WxSyncLoop()
 	glob.WEATHER = !glob.WEATHER
 	src << "Weather: [glob.WEATHER ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set weather to [glob.WEATHER].")
+	if(glob.WEATHER)
+		for(var/area/MapperZone/MZ in _dn_sky_areas)
+			BuildZoneWxRestore(MZ)
 	_WxSyncPass()
 
 /mob/Admin2/verb/Force_Weather()

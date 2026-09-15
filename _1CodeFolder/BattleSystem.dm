@@ -1113,6 +1113,7 @@ proc/Save_Bodies()
 		if(Amount % 250 == 0)
 			F["Types"]<<Types
 			E++
+			sleep(world.tick_lag)
 			F=new("Saves/Bones/File[E]")
 			Types=list()
 	if(Amount % 250 != 0)

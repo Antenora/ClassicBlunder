@@ -140,6 +140,10 @@ var/global/list/buildDmmAlphabet = list("a","b","c","d","e","f","g","h","i","j",
 		parts += "zone_wind_mult = [MZ.zone_wind_mult]"
 		if(MZ.wx_kind)
 			parts += "wx_kind = \"[BuildDmmEscape(MZ.wx_kind)]\""
+		if(length(MZ.dn_fixed))
+			parts += "dn_fixed = \"[MZ.dn_fixed]\""
+		if(MZ.zone_moon)
+			parts += "zone_moon = 1"
 		return "/area/MapperZone{[jointext(parts, "; ")]}"
 	return "[AR.type]"
 

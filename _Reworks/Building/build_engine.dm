@@ -136,6 +136,8 @@
 			O.Builder = BuildDmmUnescape(f[15])
 			O.Savable = 1
 			worldObjectList += O
+			if(istype(O, /obj/Turfs/CustomObj1))
+				BuildCustomObjApplyDef(O)
 			GfxRefreshStructureMetadata(O)
 			applied++
 		else if(f[1] == "OD")
@@ -365,6 +367,8 @@
 		O.opacity = E.cOpacity
 		O.pixel_x = E.cPixelX
 		O.pixel_y = E.cPixelY
+		if(istype(O, /obj/Turfs/CustomObj1))
+			BuildCustomObjApplyDef(O)
 	O.Builder = M.ckey
 	O.Savable = 1
 	worldObjectList += O
@@ -472,6 +476,7 @@
 				fam = null
 		var/list/placedTurfs = list()
 		var/list/elevTouched = list()
+		var/styleStamped = 0
 		var/elevMode = (toolname == "lower") ? -1 : ((toolname == "walk" || isObj) ? 0 : 1)
 		for(var/turf/T in valid)
 			x1 = min(x1, T.x)
@@ -483,11 +488,13 @@
 			if(placed % BUILD_COMMIT_CHUNK == 0)
 				sleep(-1)
 			var/oh = ElevAt(T)
-			if(elevMode == -1 || (elevMode == 1 && ElevSameKind(T, B, fam) && ElevRaisable(T)))
+			if(elevMode == -1 || (elevMode == 1 && ElevSameKind(T, B, fam) && ElevRaisable(T) && !ElevStairTurf(T)))
 				var/nh = clamp(oh + elevMode, 0, ELEV_MAX)
 				if(nh == oh)
 					continue
 				ElevSet(T, nh)
+				if(nh > oh)
+					styleStamped += BuildCliffStyleStamp(T, S.cliffStyleSel)
 				A.turfRecs += list(list("x" = T.x, "y" = T.y, "z" = T.z, "elevOnly" = 1, "oldElev" = oh, "newElev" = nh, "killed" = list()))
 				elevTouched += T
 				did++
@@ -509,6 +516,8 @@
 				ElevSet(NT, 0)
 				elevTouched += NT
 			rec["newElev"] = ElevAt(NT)
+			if(BuildMaterialFor(NT) == "Water")
+				styleStamped += BuildCliffStyleStamp(NT, S.cliffStyleSel)
 			A.turfRecs += list(rec)
 			placedTurfs += NT
 			did++
@@ -518,6 +527,8 @@
 			else if(elevMode == 1)
 				C.mob << "Those tiles are already at the highest level ([ELEV_MAX])."
 			return
+		if(styleStamped)
+			BuildCliffPaintSave()
 		if(placedTurfs.len)
 			BuildEdgeSmoothAround(placedTurfs, S.blendEdges)
 		if(elevTouched.len)
@@ -752,6 +763,8 @@
 		O.Builder = M.ckey
 		O.Savable = 1
 		worldObjectList += O
+		if(istype(O, /obj/Turfs/CustomObj1))
+			BuildCustomObjApplyDef(O)
 		GfxRefreshStructureMetadata(O)
 		A.createdObjs += list(list("obj" = O, "x" = TT.x, "y" = TT.y, "z" = TT.z))
 		A.count++
@@ -795,13 +808,12 @@
 	A.areaRecs = list()
 
 /proc/BuildSaveWorldData()
+	WorldSaveLock()
 	find_savableObjects()
 	Save_Turfs(quiet = 1)
 	Save_Custom_Turfs(quiet = 1)
 	Save_Objects(quiet = 1)
-	BuildAreaPaintSave()
-	if(fexists(BUILD_JOURNAL))
-		fdel(BUILD_JOURNAL)
+	worldSaveBusy = 0
 
 /proc/BuildSaveOrphan(who)
 	set waitfor = FALSE

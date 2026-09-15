@@ -10,7 +10,7 @@ globalTracker
 		DBG_NO_EMISSIVE = FALSE
 		DBG_NO_CONTACT = FALSE
 		DBG_NO_GLINT = FALSE
-		AUTO_PROFILE = TRUE
+		AUTO_PROFILE = FALSE
 		PROFILE_WINDOW = 600
 		PROFILE_JSON_MIN = 30
 		PROFILE_DUMP_GAP = 300
@@ -686,7 +686,13 @@ proc/GfxWatchdogSnapshot(reason = "HEARTBEAT")
 		if(islist(C.screen)) client_screen_count += C.screen.len
 	var/stamp = time2text(world.realtime, "YYYY-MM-DD hh:mm:ss")
 	var/player_count = islist(players) ? players.len : 0
-	var/line = "[stamp] seq=[++_gfx_watchdog_sequence] event=[reason] wt=[world.time] cpu=[world.cpu] tick=[round(world.tick_usage,0.1)] budget=[round(GfxBudgetScale()*100)] clients=[client_count] players=[player_count] images=[client_image_count] screen=[client_screen_count] actor_ref=[reflection_count] ref_filters=[reflection_filter_count] ref_ticks=[_gfx_actor_reflection_ticks] ripples=[_gfx_water_ripple_count]/[_gfx_water_ripple_spawns] materials=[islist(_gfx_material_atoms) ? _gfx_material_atoms.len : 0] contact=[islist(_gfx_contact_objs) ? _gfx_contact_objs.len : 0] emissive_ref=[islist(_gfx_emissive_reflection_objs) ? _gfx_emissive_reflection_objs.len : 0] ao_dirty=[islist(_gfx_ao_dirty) ? _gfx_ao_dirty.len : 0] lights=[islist(_light_sources) ? _light_sources.len : 0] shadows=[islist(_shadow_objs) ? _shadow_objs.len : 0] clouds=[islist(_cloud_banks) ? _cloud_banks.len : 0] cloud_chunks=[GfxCloudChunkCount()]"
+	var/player_mob_count = 0
+	for(var/mob/Players/PM in world)
+		player_mob_count++
+	var/skill_obj_count = 0
+	for(var/obj/Skills/SK in world)
+		skill_obj_count++
+	var/line = "[stamp] seq=[++_gfx_watchdog_sequence] event=[reason] wt=[world.time] cpu=[world.cpu] tick=[round(world.tick_usage,0.1)] budget=[round(GfxBudgetScale()*100)] clients=[client_count] players=[player_count] pmobs=[player_mob_count] skills=[skill_obj_count] images=[client_image_count] screen=[client_screen_count] actor_ref=[reflection_count] ref_filters=[reflection_filter_count] ref_ticks=[_gfx_actor_reflection_ticks] ripples=[_gfx_water_ripple_count]/[_gfx_water_ripple_spawns] materials=[islist(_gfx_material_atoms) ? _gfx_material_atoms.len : 0] contact=[islist(_gfx_contact_objs) ? _gfx_contact_objs.len : 0] emissive_ref=[islist(_gfx_emissive_reflection_objs) ? _gfx_emissive_reflection_objs.len : 0] ao_dirty=[islist(_gfx_ao_dirty) ? _gfx_ao_dirty.len : 0] lights=[islist(_light_sources) ? _light_sources.len : 0] shadows=[islist(_shadow_objs) ? _shadow_objs.len : 0] clouds=[islist(_cloud_banks) ? _cloud_banks.len : 0] cloud_chunks=[GfxCloudChunkCount()]"
 	if(!text2file("[line]\n", GFX_WATCHDOG_FILE))
 		world.log << "GFX WATCHDOG: failed to append [GFX_WATCHDOG_FILE] ([reason])."
 

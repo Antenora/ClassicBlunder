@@ -1,4 +1,10 @@
 var/list/worldObjectList = list()
+var/worldSaveBusy = 0
+
+proc/WorldSaveLock()
+	while(worldSaveBusy && world.time - worldSaveBusy < 3000)
+		sleep(world.tick_lag)
+	worldSaveBusy = max(1, world.time)
 
 /mob/Admin4/verb/checkworldObjectList()
 	for(var/obj/x in worldObjectList)
@@ -54,14 +60,19 @@ var/list/worldObjectList = list()
 	usr << "<small>Server: Run a world save now."
 
 proc/find_savableObjects()
+	var/list/known = list()
+	for(var/o in global.worldObjectList)
+		if(o)
+			known[o] = 1
+	var/chunkCount = 0
 	for(var/obj/_object in world)
+		if(++chunkCount % 5000 == 0)
+			sleep(world.tick_lag)
 		if(!_object.z||_object.z==0) continue
-		if(_object in global.worldObjectList)
-			if(!_object.z||_object.z==0)
-				global.worldObjectList-=_object
-				del(_object)
-			else continue
-		if(_object.Savable==1) global.worldObjectList+=_object
+		if(known[_object]) continue
+		if(_object.Savable==1)
+			global.worldObjectList+=_object
+			known[_object] = 1
 
 proc/Save_Custom_Turfs(quiet = 0)
 	set background = 1
@@ -87,7 +98,11 @@ proc/Save_Custom_Turfs(quiet = 0)
 	var/list/isUnderwater=list()
 	var/list/Destructable=list()
 	var/list/EdgeOpt=list()
-	for(var/turf/CustomTurf/A in CustomTurfs)
+	var/list/turfSnapshot = CustomTurfs.Copy()
+	var/chunkCount = 0
+	for(var/turf/CustomTurf/A in turfSnapshot)
+		if(++chunkCount % 1000 == 0)
+			sleep(world.tick_lag)
 		if(A)
 			Types+=A.type
 			Healths+="[num2text(round(A.Health),100)]"
@@ -108,7 +123,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 			Destructable+=A.Destructable
 			EdgeOpt+=A.EdgeOptOut
 			Amount+=1
-			if(Amount % 20000 == 0)
+			if(Amount % 5000 == 0)
 				F["Types"]<<Types
 				F["Healths"]<<Healths
 				F["Levels"]<<Levels
@@ -127,6 +142,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				F["Destructable"]<<Destructable
 				F["EdgeOpt"]<<EdgeOpt
 				E ++
+				sleep(world.tick_lag)
 				F=new("Saves/Map/CustomTurfs[E]")
 				Types=list()
 				Healths=list()
@@ -146,7 +162,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				Destructable=list()
 				EdgeOpt=list()
 
-	if(Amount % 20000 != 0)
+	if(Amount % 5000 != 0)
 		F["Types"]<<Types
 		F["Healths"]<<Healths
 		F["Levels"]<<Levels
@@ -165,6 +181,10 @@ proc/Save_Custom_Turfs(quiet = 0)
 		F["Destructable"]<<Destructable
 		F["EdgeOpt"]<<EdgeOpt
 
+	var/cleanup_file = E + 1
+	while(fexists("Saves/Map/CustomTurfs[cleanup_file]"))
+		fdel("Saves/Map/CustomTurfs[cleanup_file]")
+		cleanup_file++
 	if(!quiet)
 		world<<"<small>Server: Custom Turfs Saved([Amount])."
 
@@ -251,7 +271,11 @@ proc/Save_Turfs(quiet = 0)
 	var/list/EdgeOpt=list()
 
 
-	for(var/turf/A in Turfs)
+	var/list/turfSnapshot = Turfs.Copy()
+	var/chunkCount = 0
+	for(var/turf/A in turfSnapshot)
+		if(++chunkCount % 1000 == 0)
+			sleep(world.tick_lag)
 		if(A)
 			Types+=A.type
 			Healths+="[num2text(round(A.Health),100)]"
@@ -266,7 +290,7 @@ proc/Save_Turfs(quiet = 0)
 			Destructable+=A.Destructable
 			EdgeOpt+=A.EdgeOptOut
 			Amount+=1
-			if(Amount % 20000 == 0)
+			if(Amount % 5000 == 0)
 				F["Types"]<<Types
 				F["Healths"]<<Healths
 				F["Levels"]<<Levels
@@ -280,6 +304,7 @@ proc/Save_Turfs(quiet = 0)
 				F["Destructable"]<<Destructable
 				F["EdgeOpt"]<<EdgeOpt
 				E ++
+				sleep(world.tick_lag)
 				F=new("Saves/Map/File[E]")
 				Types=list()
 				Healths=list()
@@ -295,7 +320,7 @@ proc/Save_Turfs(quiet = 0)
 				EdgeOpt=list()
 
 
-	if(Amount % 20000 != 0)
+	if(Amount % 5000 != 0)
 		F["Types"]<<Types
 		F["Healths"]<<Healths
 		F["Levels"]<<Levels
@@ -310,6 +335,10 @@ proc/Save_Turfs(quiet = 0)
 		F["EdgeOpt"]<<EdgeOpt
 
 
+	var/cleanup_file = E + 1
+	while(fexists("Saves/Map/File[cleanup_file]"))
+		fdel("Saves/Map/File[cleanup_file]")
+		cleanup_file++
 	if(!quiet)
 		world<<"<small>Server: Map Saved([Amount])."
 
@@ -678,6 +707,8 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 			CustomTurfs+=CT
 		LightingRecomputeNear(get_step(C, 0))
 	if(ismovable(C))
+		if(istype(C, /obj/Turfs/CustomObj1))
+			BuildCustomObjApplyDef(C)
 		GfxRefreshStructureMetadata(C)
 
 obj/var
@@ -694,7 +725,7 @@ proc/Save_Objects(quiet = 0)
 	var/savefile/F=new("Saves/Itemsave/File[E]")
 	var/list/Types=list()
 	var/list/Icons=list()
-	for(var/obj/A in global.worldObjectList)
+	for(var/obj/A in global.worldObjectList.Copy())
 		if(!A)
 			world.log << "null entry"
 			continue
@@ -705,14 +736,15 @@ proc/Save_Objects(quiet = 0)
 			Types+=A
 			Icons+=A.icon
 			Amount+=1
-			if(Amount % 500 == 0)
+			if(Amount % 100 == 0)
 				F["Types"]<<Types
 				F["Icons"]<<Icons
 				E++
+				sleep(world.tick_lag)
 				F=new("Saves/Itemsave/File[E]")
 				Types=list()
 				Icons=list()
-	if(Amount % 500 != 0)
+	if(Amount % 100 != 0)
 		F["Types"]<<Types
 		F["Icons"]<<Icons
 	var/cleanup_file = E + 1

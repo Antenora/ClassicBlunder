@@ -838,9 +838,7 @@ var/global/list/foamPaintMap
 			variant = "end_l"
 		else if(endR)
 			variant = "end_r"
-		var/image/CI = image(BuildCliffStrip(BuildCliffStyleAt(T), variant))
-		CI.layer = 2.9
-		fresh += CI
+		fresh += BuildCliffStripImage(BuildCliffStyleAt(T), variant)
 	if(m != "Water" && mn == "Water" && N)
 		var/dcl = (mw && mw != "Water" && mdnw == "Water")
 		var/dcr = (me && me != "Water" && mdne == "Water")
@@ -930,14 +928,9 @@ var/global/list/foamPaintMap
 		fresh += FI
 	BuildEdgeApply(T, fresh)
 
-/proc/BuildYieldIfBusy()
-	if(WorldLoading)
-		return
-	if(world.tick_usage >= BUILD_YIELD_TICK_USAGE)
-		sleep(world.tick_lag)
-
 /proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1)
 	var/list/seen = list()
+	var/n = 0
 	for(var/turf/T in turfs)
 		for(var/dx = -1 to 1)
 			for(var/dy = -1 to 1)
@@ -946,7 +939,9 @@ var/global/list/foamPaintMap
 					continue
 				seen[T2] = 1
 				BuildEdgeUpdate(T2, doBlend)
-				BuildYieldIfBusy()
+				n++
+				if(n % BUILD_COMMIT_CHUNK == 0)
+					sleep(-1)
 
 /proc/BuildEdgeBootPass()
 	set waitfor = FALSE
@@ -968,20 +963,165 @@ var/global/list/foamPaintMap
 		ElevVisualRefresh(cliffs)
 		Log("Mapper", "Cliff boot pass dressed [cliffs.len] placed cliff turfs.", 1)
 
+var/global/list/buildCliffPickerEntries
+
+/proc/BuildCliffCodeForPath(path)
+	switch(path)
+		if(/turf/Wall7)
+			return "wall7"
+		if(/turf/Wall12)
+			return "wall12"
+		if(/turf/Wall13)
+			return "wall13"
+		if(/turf/Wall14)
+			return "wall14"
+		if(/turf/Wall15)
+			return "wall15"
+		if(/turf/Wall16)
+			return "wall16"
+		if(/turf/Wall29)
+			return "wall29"
+		if(/turf/Wall36)
+			return "wall36"
+		if(/turf/Wall37)
+			return "wall37"
+		if(/turf/Wall38)
+			return "wall38"
+		if(/turf/Wall56)
+			return "wall56"
+		if(/turf/Wall99)
+			return "wall99"
+	return ""
+
+/proc/BuildCliffStyleCodeFor(datum/build_entry/E)
+	if(!E || !E.iconF)
+		return ""
+	var/c = BuildCliffCodeForPath(E.Creates)
+	if(length(c))
+		return c
+	return "i:[E.iconF]|[E.icon_state]"
+
+/proc/BuildCliffPickerEntries()
+	if(buildCliffPickerEntries)
+		return buildCliffPickerEntries
+	BuildPaletteInit()
+	var/list/out = list()
+	var/datum/build_entry/DE = new
+	DE.name = "-DEFAULT ROCK: WALL38 FACES, WALL29 WATER STRIPS-"
+	DE.styleCode = "default"
+	for(var/datum/build_entry/E in buildPalette)
+		if(E.Creates == /turf/Wall38)
+			DE.iconF = E.iconF
+			DE.icon_state = E.icon_state
+			DE.thumb = E.thumb
+			break
+	out += DE
+	var/datum/build_entry/NE = new
+	NE.name = "-NO ROCK STRIP UNDER WATER (FACES: DEFAULT ROCK)-"
+	NE.styleCode = "none"
+	NE.iconF = 'HUD/build_white.png'
+	NE.swatchColor = "#3b7dd8"
+	out += NE
+	for(var/datum/build_entry/E in buildPalette)
+		if(E.isZone || E.category == BUILD_CAT_SPECIAL || !ispath(E.Creates, /turf) || !E.iconF)
+			continue
+		var/take = 0
+		if(E.isCustom)
+			var/datum/build_custom_def/D = BuildCustomDefForIcon(E.iconF, E.icon_state)
+			take = (D && D.cliff) ? 1 : 0
+		else if(findtext(lowertext("[E.Creates]"), "wall") || findtext(lowertext(E.name), "wall"))
+			take = 1
+		if(!take)
+			continue
+		E.styleCode = BuildCliffStyleCodeFor(E)
+		out += E
+	buildCliffPickerEntries = out
+	return out
+
+/proc/BuildCliffStyleLabel(code)
+	if(!length(code) || code == "default")
+		return "DEFAULT ROCK"
+	if(code == "none")
+		return "NO ROCK STRIP UNDER WATER"
+	for(var/datum/build_entry/E in BuildCliffPickerEntries())
+		if(E.styleCode == code)
+			return E.name
+	if(copytext(code, 1, 5) == "wall")
+		return "WALL [copytext(code, 5)]"
+	var/p = findtext(code, "|")
+	return p ? copytext(code, p + 1) : code
+
+/proc/BuildCliffStyleStamp(turf/T, style)
+	if(!T || !length(style))
+		return 0
+	BuildCliffPaintLoad()
+	var/k = "[T.x],[T.y],[T.z]"
+	if(style == "default")
+		if(!cliffPaintMap[k])
+			return 0
+		cliffPaintMap -= k
+		return 1
+	if(cliffPaintMap[k] == style)
+		return 0
+	cliffPaintMap[k] = style
+	return 1
+
+/proc/BuildCliffStripImage(style, variant)
+	var/image/CI
+	if(ElevStyleGeneric(style))
+		var/list/art = ElevStyleArt(style)
+		if(art)
+			CI = image(art[1], null, art[2])
+			CI.filters = filter(type = "alpha", icon = BuildCliffStrip("default", variant))
+	if(!CI)
+		CI = image(BuildCliffStrip(style, variant))
+	CI.layer = 2.9
+	return CI
+
+/proc/BuildCliffPickEnter(datum/build_session/S)
+	if(!S?.active)
+		return
+	S.CancelPending()
+	S.pickPrevCat = S.category
+	S.stylePick = 1
+	S.filter = ""
+	S.RefreshFiltered()
+	BuildHUDRefreshGrid(S)
+	BuildHUDRefreshDrop(S)
+	BuildHUDRefreshSearch(S)
+	BuildHUDSetSelName(S, "CLIFF STYLE: CLICK A WALL (NOW: [BuildCliffStyleLabel(S.cliffStyleSel)])")
+	S.C.mob << "CLIFF STYLE: the drawer now lists every wall. Click one - from then on every tile you raise wears it as its cliff face and water you place gets it as its rock strip, until you pick another. Current: [BuildCliffStyleLabel(S.cliffStyleSel)]. Pick a category from the drop-down to leave without changing it."
+
+/proc/BuildCliffPickExit(datum/build_session/S)
+	if(!S?.stylePick)
+		return
+	S.stylePick = 0
+	if(length(S.pickPrevCat))
+		S.category = S.pickPrevCat
+	S.RefreshFiltered()
+	BuildHUDRefreshGrid(S)
+	BuildHUDRefreshDrop(S)
+
+/proc/BuildCliffPickChoose(datum/build_session/S, datum/build_entry/E)
+	if(!S || !E)
+		return
+	var/code = length(E.styleCode) ? E.styleCode : BuildCliffStyleCodeFor(E)
+	if(!length(code))
+		return
+	S.cliffStyleSel = code
+	S.C?.setPref("cliffStyle", code)
+	BuildCliffPickExit(S)
+	BuildHUDSetSelName(S, "CLIFF STYLE: [BuildCliffStyleLabel(code)]")
+	S.C?.mob << "Cliff style: [BuildCliffStyleLabel(code)]. Raised terrain and placed water use it from now on."
+	Log("Mapper", "[S.C?.mob] ([S.C?.ckey]) set cliff style [code].", 1)
+
 mob/Mapper/verb/Paint_Cliff_Style()
 	set category = "Mapper"
 	var/datum/build_session/S = usr.client?.bsession
 	if(!S?.active)
 		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
 		return
-	BuildCliffInit()
-	var/pick = input(usr, "Which rock should this region use? Water tiles get it as their cliff-bottom strip, raised terrain gets it as its face.", "Cliff Style") as null|anything in buildCliffStyleNames
-	if(!pick)
-		return
-	S.CancelPending()
-	S.cliffStyleSel = buildCliffStyleNames[pick]
-	S.cliffStage = 1
-	usr << "CLIFF STYLE [pick]: click the FIRST corner of the region. Right-click cancels."
+	BuildCliffPickEnter(S)
 
 mob/Mapper/verb/Paint_Foam_Off()
 	set category = "Mapper"
@@ -990,7 +1130,7 @@ mob/Mapper/verb/Paint_Foam_Off()
 		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
 		return
 	S.CancelPending()
-	S.cliffStyleSel = "foam:off"
+	S.regionSel = "foam:off"
 	S.cliffStage = 1
 	usr << "FOAM OFF: click the FIRST corner of the region. Water tiles inside it lose their shore foam. Right-click cancels."
 
@@ -1001,7 +1141,7 @@ mob/Mapper/verb/Paint_Foam_On()
 		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
 		return
 	S.CancelPending()
-	S.cliffStyleSel = "foam:on"
+	S.regionSel = "foam:on"
 	S.cliffStage = 1
 	usr << "FOAM ON: click the FIRST corner of the region. Water tiles inside it get their shore foam back. Right-click cancels."
 

@@ -57,6 +57,9 @@
 			S.wheelHover = 0
 		..()
 
+Options/var/bpanX = 0
+Options/var/bpanY = 0
+
 /atom/movable/shud/bhud/bpanel
 	mouse_opacity = 1
 
@@ -263,6 +266,9 @@
 		var/datum/build_session/S = usr?.client?.bsession
 		if(!S?.active || !entry)
 			return
+		if(S.stylePick)
+			BuildCliffPickChoose(S, entry)
+			return
 		S.SetBrush(entry)
 		BuildHUDRefreshGrid(S)
 
@@ -411,6 +417,7 @@
 		var/datum/build_session/S = usr?.client?.bsession
 		if(!S?.active)
 			return
+		S.stylePick = 0
 		S.category = cat
 		S.RefreshFiltered()
 		BuildHUDRefreshGrid(S)
@@ -756,7 +763,7 @@
 /proc/BuildHUDRefreshDrop(datum/build_session/S)
 	if(!S.dropObj)
 		return
-	S.dropObj.maptext = "<center><span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#f98e36\">[S.category]</span></center>"
+	S.dropObj.maptext = "<center><span style=\"[BFONT_SM]; -dm-text-outline: 1px #000000; color:#f98e36\">[S.stylePick ? "PICK WALL" : S.category]</span></center>"
 
 /proc/BuildHUDRefreshSearch(datum/build_session/S)
 	for(var/atom/movable/shud/bhud/bsearch/O in S.hudObjs)
@@ -794,7 +801,7 @@
 			W.mouse_opacity = 1
 			W.pixel_x = E.pxOff
 			W.pixel_y = E.pyOff
-			if(E == S.brush)
+			if(S.stylePick ? (E.styleCode == (length(S.cliffStyleSel) ? S.cliffStyleSel : "default")) : (E == S.brush))
 				W.filters = filter(type = "outline", size = 1, color = "#f98e36")
 			else
 				W.filters = null

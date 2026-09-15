@@ -76,6 +76,8 @@ area
 	var
 		dn_indoor = 0 //managed interior: follows the clock at INDOOR_DIM strength
 		dn_no_dim = 0 //opt out entirely
+		dn_fixed = ""
+		zone_moon = 0
 var/_dn_offset = 0
 var/_moon_event_from = 0 //world.time the ramp-in started
 var/_moon_event_until = 0 //world.time deadline - the ONLY moon-event state. 0 or past = inactive
@@ -118,7 +120,7 @@ proc/_DnApplyMode()
 	var/skycol = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff" //day/night off -> white base (no-op), not the clock phase
 	for(var/area/A in _dn_sky_areas)
 		A.icon = EnvWhiteIcon()
-		A.color = skycol
+		A.color = DnAreaSkyColor(A, skycol)
 		if(mr)
 			A.plane = BASE_LIGHTING_PLANE //unblurred base plane - blurring it would rim the edges
 			A.layer = DN_BASE_LAYER
@@ -162,7 +164,7 @@ proc/DnManageArea(area/A, sky)
 		_dn_indoor_areas -= A
 		_dn_sky_areas |= A
 		A.dn_indoor = 0
-		A.color = skycol
+		A.color = DnAreaSkyColor(A, skycol)
 	else
 		_dn_sky_areas -= A
 		_dn_indoor_areas |= A
@@ -184,14 +186,16 @@ proc/DnPhase()
 	return p < 0 ? p + 1 : p
 
 //piecewise palette: long day, short dusk, long night, short dawn
-proc/_DnClockColor()
-	var/p = DnPhase()
+proc/DnPhaseColor(p)
 	if(p < 0.42) return "#ffffff"
 	if(p < 0.50) return DnLerp("#ffffff", "#d98f66", (p-0.42)/0.08)
 	if(p < 0.58) return DnLerp("#d98f66", "#566294", (p-0.50)/0.08)
 	if(p < 0.88) return "#566294" //deep moonlit blue (~39% brightness) so warm lights read
 	if(p < 0.94) return DnLerp("#566294", "#e8bfa8", (p-0.88)/0.06)
 	return DnLerp("#e8bfa8", "#ffffff", (p-0.94)/0.06)
+
+proc/_DnClockColor()
+	return DnPhaseColor(DnPhase())
 
 //clock color plus the moon grade; every path that paints the sky goes through here
 proc/DnColorNow()
@@ -200,13 +204,55 @@ proc/DnColorNow()
 	return k > 0 ? DnLerp(c, glob.MOON_GRADE_COLOR, k) : c
 
 //0 = broad daylight, 1 = deep night (used by the light-glow system in fxplane.dm)
-proc/DnDarknessFrac()
-	if(!glob || !glob.DAY_NIGHT) return 0
-	var/p = DnPhase()
+proc/DnDarknessAt(p)
 	if(p < 0.42) return 0
 	if(p < 0.58) return (p - 0.42) / 0.16
 	if(p < 0.88) return 1
 	return max(0, 1 - (p - 0.88) / 0.12)
+
+proc/DnDarknessFrac()
+	if(!glob || !glob.DAY_NIGHT) return 0
+	return DnDarknessAt(DnPhase())
+
+proc/DnFixedPhase(mode)
+	switch(mode)
+		if("day") return 0.2
+		if("dusk") return 0.52
+		if("night") return 0.7
+		if("dawn") return 0.91
+	return -1
+
+proc/DnAreaSkyColor(area/A, skycol)
+	if(!A || !glob || !glob.DAY_NIGHT) return skycol
+	if(A.zone_moon) return glob.MOON_GRADE_COLOR
+	if(A.dn_fixed == "indoor") return "#ffffff"
+	var/p = DnFixedPhase(A.dn_fixed)
+	return (p < 0) ? skycol : DnPhaseColor(p)
+
+proc/MoonKFor(area/A)
+	if(A && A.zone_moon && glob && glob.DAY_NIGHT) return 1
+	return MoonEventK()
+
+proc/DnAreaDark(area/A)
+	if(!glob || !glob.DAY_NIGHT || !A) return 0
+	if(A.zone_moon) return 1 - glob.MOON_LIGHT_DIM
+	if(A.dn_fixed == "indoor") return 0
+	var/p = DnFixedPhase(A.dn_fixed)
+	if(p >= 0) return DnDarknessAt(p)
+	return DnDarknessFrac() * (1 - glob.MOON_LIGHT_DIM * MoonEventK())
+
+proc/DnAreaSunMismatch(area/A, isMoon)
+	if(!A || !glob || !glob.DAY_NIGHT) return 0
+	if(A.zone_moon) return isMoon ? 0 : 1
+	if(A.dn_fixed == "indoor") return 1
+	var/p = DnFixedPhase(A.dn_fixed)
+	if(p < 0) return 0
+	return ((DnDarknessAt(p) >= 0.5) != (isMoon ? 1 : 0)) ? 1 : 0
+
+proc/DnZoneLightingChanged(area/A)
+	if(!A || !glob) return
+	if(glob.LIGHTING) LightingApplyAll()
+	for(var/client/C) EnvUpdateClient(C, TRUE)
 
 //how dark it is where T sits: sky areas follow the clock, baked-dark zones are always dim
 proc/LightDarkFrac(turf/T)
@@ -214,7 +260,7 @@ proc/LightDarkFrac(turf/T)
 	var/area/A = T.loc
 	if(!A) return 0
 	//full moon lifts ambient, so outdoor pools render softer with it
-	if(A.sees_sky) return DnDarknessFrac() * (1 - glob.MOON_LIGHT_DIM * MoonEventK())
+	if(A.sees_sky) return DnAreaDark(A)
 	if(A.dark_cave) return 1 //baked-dark caves: the DARKEST - full light strength (both modes)
 	if(A.dn_indoor) return DnDarknessFrac() * (glob ? glob.INDOOR_DIM : 0.6)
 	if(A.icon) //underwater tints: dark in additive mode, but NOT a multiply-reveal surface
@@ -265,7 +311,7 @@ proc/_DnLoop()
 		if(glob && glob.DAY_NIGHT)
 			var/target = DnColorNow()
 			for(var/area/A in _dn_sky_areas)
-				animate(A, color = target, time = 100)
+				animate(A, color = DnAreaSkyColor(A, target), time = 100)
 			var/intarget = glob.INDOOR_DIM > 0 ? DnIndoorColor(target) : "#ffffff"
 			for(var/area/A in _dn_indoor_areas)
 				animate(A, color = intarget, time = 100)
@@ -303,7 +349,7 @@ proc/_DnLoop()
 	MoonEventBegin(TRUE)
 	var/col = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff" //bare DnColorNow would paint a night sky with day/night OFF
 	for(var/area/A in _dn_sky_areas) //reconcile now instead of waiting out _DnLoop's 10s tick
-		animate(A, color = col, time = 20)
+		animate(A, color = DnAreaSkyColor(A, col), time = 20)
 	var/incol = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(col) : "#ffffff"
 	for(var/area/A in _dn_indoor_areas)
 		animate(A, color = incol, time = 20)
@@ -339,7 +385,7 @@ proc/_DnLoop()
 	_dn_offset = round(target * cyc - (world.time % cyc))
 	var/col = (glob && glob.DAY_NIGHT) ? DnColorNow() : "#ffffff" //bare DnColorNow would paint a night sky with day/night OFF
 	for(var/area/A in _dn_sky_areas)
-		animate(A, color = col, time = 20)
+		animate(A, color = DnAreaSkyColor(A, col), time = 20)
 	var/incol = (glob && glob.DAY_NIGHT && glob.INDOOR_DIM > 0) ? DnIndoorColor(col) : "#ffffff"
 	for(var/area/A in _dn_indoor_areas)
 		animate(A, color = incol, time = 20)

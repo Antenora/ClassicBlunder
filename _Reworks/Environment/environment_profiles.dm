@@ -290,7 +290,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 
 proc/GfxUpdateMoonlight(client/C, area/A, transition_time = 10)
 	if(!C || !C.gfx_moon_fill) return
-	var/k = (A && A.sees_sky) ? MoonEventK() : 0
+	var/k = (A && A.sees_sky) ? MoonKFor(A) : 0
 	var/quality_scale = 1
 	switch(GfxQualityRank(C))
 		if(GFX_QUALITY_LOW) quality_scale = 0.6

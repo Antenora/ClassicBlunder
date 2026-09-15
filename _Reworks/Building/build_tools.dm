@@ -226,7 +226,7 @@
 				anchorZ = T.z
 				cliffStage = 2
 				ShowHighlightSet(list(T))
-				C.mob << "[copytext(cliffStyleSel, 1, 6) == "foam:" ? "FOAM" : "CLIFF STYLE"]: corner set. Now click the OPPOSITE corner."
+				C.mob << "[copytext(regionSel, 1, 6) == "foam:" ? "FOAM" : "CLIFF STYLE"]: corner set. Now click the OPPOSITE corner."
 				return
 			if(cliffStage == 2)
 				if(T.z != anchorZ)
@@ -238,7 +238,7 @@
 				var/kx2 = max(cliffX1, T.x)
 				var/ky2 = max(cliffY1, T.y)
 				var/kz = T.z
-				var/ksel = cliffStyleSel
+				var/ksel = regionSel
 				ShowHighlightSet(TurfSquare(kx1, ky1, kx2, ky2, kz, 1))
 				spawn
 					if(busy)

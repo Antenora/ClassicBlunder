@@ -1952,11 +1952,21 @@ mob
 							E<<"<font color=#D344E3>[src] has gone AFK!"
 							Log(E.ChatLog(),"<font color=green>[src]([src.key]) has gone AFK!")
 
-			if(client&&prob(0.1))
-				src.client.SaveChar()
+			if(client)
+				if(!autosave_at)
+					autosave_at = world.time + (glob ? glob.AUTOSAVE_INTERVAL : 6000) + rand(0, 599)
+				else if(world.time >= autosave_at)
+					autosave_at = world.time + (glob ? glob.AUTOSAVE_INTERVAL : 6000)
+					src.client.SaveChar()
 			if(AFKTimer)
 				Available_Power()
 
+
+globalTracker
+	var/tmp
+		AUTOSAVE_INTERVAL = 6000
+
+mob/var/tmp/autosave_at = 0
 
 /mob/verb/HardSave()
 	client.SaveChar()

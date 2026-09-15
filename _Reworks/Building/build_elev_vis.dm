@@ -139,8 +139,34 @@ var/global/elevWallCtxL = 0
 			return 'Mapping/Elevation/elev_face_wall99.dmi'
 	return 'Mapping/Elevation/elev_face.dmi'
 
+var/global/list/elevStyleArtCache = list()
+
+/proc/ElevStyleGeneric(style)
+	return (length(style) > 2 && copytext(style, 1, 3) == "i:") ? 1 : 0
+
+/proc/ElevStyleArt(style)
+	if(!ElevStyleGeneric(style))
+		return null
+	var/hit = elevStyleArtCache[style]
+	if(hit)
+		return (hit == "none") ? null : hit
+	var/p = findtext(style, "|")
+	var/path = p ? copytext(style, 3, p) : copytext(style, 3)
+	var/st = p ? copytext(style, p + 1) : ""
+	var/list/art = null
+	if(length(path) && fexists(path))
+		art = list(file(path), st)
+	elevStyleArtCache[style] = art ? art : "none"
+	return art
+
+/proc/ElevGenericFace(style, lay)
+	var/list/art = ElevStyleArt(style)
+	if(!art)
+		return null
+	return ElevPlain(art[1], art[2], lay)
+
 /proc/ElevFacePiece(style, st, lay)
-	if(style == "custom" || !elevFaceStates[st])
+	if(style == "custom" || ElevStyleGeneric(style) || !elevFaceStates[st])
 		return null
 	var/ic = ElevFaceFile(style)
 	if(style != "wall38")
@@ -529,11 +555,22 @@ var/global/elevWallCtxL = 0
 
 /proc/ElevAddFaceParts(turf/T, list/fresh)
 	var/list/fi = ElevFaceInfo(T)
-	if(fi)
+	if(fi && !ElevStairTurf(T))
 		var/top = fi[1]
 		var/fst = "f[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]"
 		var/fsty = ElevFaceStyleFor(T, fi[6])
-		var/image/FP = (fsty == "custom") ? ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", ElevLayer(top, 0)) : ElevFacePiece(fsty, fst, ElevLayer(top, 0))
+		var/image/FP
+		if(fsty == "custom")
+			FP = ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", ElevLayer(top, 0))
+		else if(ElevStyleGeneric(fsty))
+			var/image/GA = ElevGenericFace(fsty, ElevLayer(top, 0))
+			if(GA)
+				fresh += GA
+				FP = ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", ElevLayer(top, 0) + 0.0001)
+			else
+				FP = ElevFacePiece("wall38", fst, ElevLayer(top, 0))
+		else
+			FP = ElevFacePiece(fsty, fst, ElevLayer(top, 0))
 		if(FP)
 			fresh += FP
 		ElevAddLipPosts(T, fi, fsty, fst, fresh)
@@ -674,12 +711,14 @@ mob/Mapper/verb/Elev_Debug()
 	usr << "ELEV DEBUG @ ([T.x],[T.y],[T.z]) - height [h], [elevMap.len] raised tiles on record. Piece library: face [elevFaceStates.len], lip [elevLipStates.len], base [elevBaseStates.len], pit [elevPitStates.len], foam [elevFoamStates.len]."
 	var/turf/CV = ElevCoverOf(T)
 	usr << "  covered by: [CV ? "([CV.x],[CV.y]) at level [ElevAt(CV)]" : "nothing"]. material [BuildMaterialFor(T)], cliff turf [BuildIsCliffTurf(T)], pit [ElevIsPit(T)]"
+	if(ElevStairsAt(T))
+		usr << "  stairs: [ElevStairTurf(T) ? "stairs turf - no face drawn here, walkable between heights, repaint never raises it" : "stairs object - walkable between heights"]"
 	var/list/fi = ElevFaceInfo(T)
 	if(fi)
 		var/fst = "f[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]"
 		var/fsty = ElevFaceStyleFor(T, fi[6])
-		var/image/FP = (fsty == "custom") ? ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", 0) : ElevFacePiece(fsty, fst, 0)
-		usr << "  face: top [fi[1]], [fi[2]] rows, this is row [fi[3]], ends [fi[4]]/[fi[5]], wrap ends [ElevWrapEnd(T, fi, -1)]/[ElevWrapEnd(T, fi, 1)], style [fsty], state [fst] [FP ? (("[FP.icon]" == "[ElevFaceFile(fsty)]") ? "OK" : "OK (default rock, style file lacks it)") : "MISSING"]"
+		var/image/FP = (fsty == "custom") ? ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", 0) : (ElevStyleGeneric(fsty) ? ElevGenericFace(fsty, 0) : ElevFacePiece(fsty, fst, 0))
+		usr << "  face: top [fi[1]], [fi[2]] rows, this is row [fi[3]], ends [fi[4]]/[fi[5]], wrap ends [ElevWrapEnd(T, fi, -1)]/[ElevWrapEnd(T, fi, 1)], style [fsty], state [fst] [FP ? (ElevStyleGeneric(fsty) ? "OK (wall art plus shade overlay)" : (("[FP.icon]" == "[ElevFaceFile(fsty)]") ? "OK" : "OK (default rock, style file lacks it)")) : (ElevStyleGeneric(fsty) ? "MISSING (wall art file not found here, default rock used)" : "MISSING")]"
 	var/gcov = CV ? 1 : 0
 	elevWallCtxL = gcov ? ElevWallCtxFor(T) : 0
 	if(elevWallCtxL)

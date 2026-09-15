@@ -8,6 +8,7 @@ turf/var/tmp/elev_ver = 0
 var/global/list/elevMap
 var/global/elevVer = 1
 var/global/elevSavePending = 0
+var/global/list/elevStairTypes
 
 /proc/ElevMapLoad()
 	if(elevMap)
@@ -95,6 +96,36 @@ var/global/elevSavePending = 0
 				return 1
 	return 0
 
+/proc/ElevStairTypesInit()
+	if(elevStairTypes)
+		return
+	elevStairTypes = list()
+	for(var/p in list(/turf/Stairs1, /turf/Stairs2, /turf/Stairs3, /turf/Stairs4, /turf/Stairs5, /turf/Stairs6, /turf/Stairs7, /turf/Stairs8, /turf/Stairs8L, /turf/Stairs8R, /turf/MidgarTiles/MidgarStairs, /turf/KatieTurf/Space/Floors/Floor_11, /turf/KatieTurf/Space/Floors/Floor_12, /turf/KatieTurf/Space/Floors/Floor_13, /turf/KatieTurf/Space/Floors/Floor_14, /turf/KatieTurf/Space/Floors/Floor_15))
+		for(var/q in typesof(p))
+			elevStairTypes[q] = 1
+
+/proc/ElevStairTurf(turf/T)
+	if(!T)
+		return 0
+	ElevStairTypesInit()
+	if(elevStairTypes[T.type])
+		return 1
+	if(istype(T, /turf/CustomTurf))
+		var/datum/build_custom_def/D = BuildCustomDefForIcon(T.icon, T.icon_state)
+		if(D && D.stairs)
+			return 1
+	return 0
+
+/proc/ElevStairsAt(turf/T)
+	if(!T)
+		return 0
+	if(ElevStairTurf(T))
+		return 1
+	for(var/obj/Turfs/IconsX/O in T)
+		if(O.type == /obj/Turfs/IconsX/Icon173 || O.type == /obj/Turfs/IconsX/Icon174)
+			return 1
+	return 0
+
 /proc/ElevFaceTop(turf/G)
 	if(!G || !elevMap || !elevMap.len)
 		return 0
@@ -114,7 +145,9 @@ var/global/elevSavePending = 0
 	var/turf/T = M.loc
 	if(!isturf(T))
 		return 0
-	return ElevCoverOf(T) ? 1 : 0
+	if(!ElevCoverOf(T))
+		return 0
+	return ElevStairsAt(T) ? 0 : 1
 
 turf/Enter(atom/movable/O, atom/oldloc)
 	. = ..()
@@ -125,10 +158,14 @@ turf/Enter(atom/movable/O, atom/oldloc)
 	var/mob/M = O
 	if(ElevMoverExempt(M))
 		return
-	if(ElevAt(src) != ElevAt(oldloc))
-		return 0
-	if(ElevFaceTop(src))
-		return 0
+	var/covered = ElevFaceTop(src) ? 1 : 0
+	if(!covered && ElevAt(src) == ElevAt(oldloc))
+		return
+	if(ElevStairsAt(src))
+		return
+	if(!covered && ElevStairsAt(oldloc))
+		return
+	return 0
 
 /proc/ElevTouchedBlock(list/turfs)
 	var/list/out = list()
@@ -151,12 +188,15 @@ turf/Enter(atom/movable/O, atom/oldloc)
 		return
 	ElevCoverInvalidate(turfs)
 	var/list/blk = ElevTouchedBlock(turfs)
+	var/n = 0
 	for(var/turf/T in blk)
 		Hd2dInvalidateColumn(T)
 		ElevVisualUpdate(T)
 		for(var/mob/M in T)
 			M.UpdateStandingLayer()
-		BuildYieldIfBusy()
+		n++
+		if(n % BUILD_COMMIT_CHUNK == 0)
+			sleep(-1)
 
 /proc/ElevExportSidecar(x1, y1, x2, y2, z, fname)
 	ElevMapLoad()

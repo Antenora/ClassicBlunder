@@ -902,11 +902,11 @@ proc/_CanopyShaftTick()
 				var/turf/t = get_turf(A)
 				var/area/ar = t ? t.loc : null
 				var/a = 0
-				if(glob.GOD_RAYS && ar && ar.sees_sky && !ar.wx_kind)
+				if(glob.GOD_RAYS && ar && ar.sees_sky && !ar.wx_kind && !DnAreaSunMismatch(ar, isMoon))
 					if(isMoon)
-						a = glob.MOON_SHAFTS ? 70 * elev * MoonEventK() : 0 //full-moon spectacle only
+						a = glob.MOON_SHAFTS ? 70 * elev * MoonKFor(ar) : 0 //full-moon spectacle only
 					else
-						a = 110 * (0.35 + 0.65 * elev) * (1 - DnDarknessFrac() * 0.6)
+						a = 110 * (0.35 + 0.65 * elev) * (1 - DnAreaDark(ar) * 0.6)
 				animate(S, alpha = round(clamp(a, 0, 255)), time = 20)
 				S.transform = LM
 				S.color = isMoon ? "#aebfe8" : "#fff0c8"

@@ -23,7 +23,7 @@ mob/verb/Build_Inspect()
 	var/area/AR = T.loc
 	if(istype(AR, /area/MapperZone))
 		var/area/MapperZone/MZ = AR
-		out += "zone \"[MZ.name]\" | sky [MZ.sees_sky] | profile [MZ.env_profile_id] | wind [MZ.zone_wind_mult * 100]%[length(MZ.wx_kind) ? " | weather [MZ.wx_kind]" : ""]"
+		out += "zone \"[MZ.name]\" | sky [MZ.sees_sky] | profile [MZ.env_profile_id] | wind [MZ.zone_wind_mult * 100]%[length(MZ.wx_kind) ? " | weather [MZ.wx_kind]" : ""][length(MZ.dn_fixed) ? " | time [MZ.dn_fixed]" : ""][MZ.zone_moon ? " | full moon" : ""]"
 	else if(AR)
 		out += "area [AR.name] ([AR.type])"
 	var/n = 0

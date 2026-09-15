@@ -84,9 +84,10 @@ proc/GlobalSave()
 	world<< "<b><HTML><FONT COLOR=#FF0000>T</FONT><FONT COLOR=#FF2900>h</FONT><FONT COLOR=#FF5200>e</FONT><FONT COLOR=#FF7B00> </FONT><FONT COLOR=#FFA400>w</FONT><FONT COLOR=#FFCD00>o</FONT><FONT COLOR=#FFF600>r</FONT><FONT COLOR=#FFff00>l</FONT><FONT COLOR=#D6ff00>d</FONT><FONT COLOR=#ADff00> </FONT><FONT COLOR=#84ff00>i</FONT><FONT COLOR=#5Bff00>s</FONT><FONT COLOR=#32ff00> </FONT><FONT COLOR=#09ff00>s</FONT><FONT COLOR=#00ff00>a</FONT><FONT COLOR=#00ff29>v</FONT><FONT COLOR=#00ff52>i</FONT><FONT COLOR=#00ff7B>n</FONT><FONT COLOR=#00ffA4>g</FONT><FONT COLOR=#00ffCD>.</FONT><FONT COLOR=#00ffF6> </FONT><FONT COLOR=#00ffff>P</FONT><FONT COLOR=#00F6ff>r</FONT><FONT COLOR=#00CDff>e</FONT><FONT COLOR=#00A4ff>p</FONT><FONT COLOR=#007Bff>a</FONT><FONT COLOR=#0052ff>r</FONT><FONT COLOR=#0029ff>e</FONT><FONT COLOR=#0000ff> </FONT><FONT COLOR=#0900ff>y</FONT><FONT COLOR=#3200ff>o</FONT><FONT COLOR=#5B00ff>u</FONT><FONT COLOR=#8400ff>r</FONT><FONT COLOR=#AD00ff>s</FONT><FONT COLOR=#D600ff>e</FONT><FONT COLOR=#FF00ff>l</FONT><FONT COLOR=#FF00F6>f</FONT><FONT COLOR=#FF00CD>!</FONT></HTML></b>"
 	world<< "... in 30 seconds.";
 	sleep(300);
-	for(var/mob/Players/Q in players)
+	for(var/mob/Players/Q in players.Copy())
 		if(Q.Savable&&Q.client!=null)
 			Q.client.SaveChar()
+			sleep(world.tick_lag)
 	updatePassiveInfo();
 	BootWorld("Save")
 	.()
@@ -159,6 +160,7 @@ proc/BootWorld(var/blah)
 		if("Save")
 			BootFile("All","Save")
 			Reports("Save")
+			WorldSaveLock()
 			find_savableObjects()
 
 			Save_Turfs()
@@ -166,6 +168,7 @@ proc/BootWorld(var/blah)
 			Save_Bodies()
 			SaveIRLNPCs()
 			Save_Objects()
+			worldSaveBusy = 0
 
 
 proc/BootFile(var/file,var/op)

@@ -515,15 +515,17 @@ mob/Players
 			s.AssociatedLegend = null
 			s.AssociatedGear = null
 			s.loc = null
-			DeleteSkill(s, 1)
+			DeleteSkill(s, 0)
 		for(var/i in vis_contents)
 			vis_contents -= i
 		for(var/obj/Items/ite in src)
-			del ite
+			ite.loc = null
 		if(length(magatamaBeads))
 			for(var/i in magatamaBeads)
 				magatamaBeads -= i
-				del i
+				var/atom/movable/bead = i
+				if(istype(bead))
+					bead.loc = null
 			magatamaBeads.Cut()
 		companion_ais.Remove(src)
 		transform = null

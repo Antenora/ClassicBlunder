@@ -47,6 +47,7 @@ proc/IsBuildEligible(mob/M)
 		swatchColor = ""
 		famKey = ""
 		dirBase = SOUTH
+		styleCode = ""
 
 /proc/BuildEntryFit(datum/build_entry/E)
 	if(!E.iconF)
@@ -299,6 +300,9 @@ client/var/datum/build_session/bsession
 		cliffX1 = 0
 		cliffY1 = 0
 		cliffStyleSel = ""
+		regionSel = ""
+		stylePick = 0
+		pickPrevCat = ""
 		autoEdge = 1
 		blendEdges = 1
 		varied = 0
@@ -331,6 +335,8 @@ client/var/datum/build_session/bsession
 		if(C && C.prefs)
 			autoEdge = C.getPref("autoEdge") ? 1 : 0
 			blendEdges = C.getPref("blendEdges") ? 1 : 0
+			var/cs = C.getPref("cliffStyle")
+			cliffStyleSel = istext(cs) ? cs : ""
 		..()
 
 	proc
@@ -435,6 +441,8 @@ client/var/datum/build_session/bsession
 			smoothStage = 0
 			warpStage = 0
 			cliffStage = 0
+			if(stylePick)
+				BuildCliffPickExit(src)
 			cpActive = 0
 			cpStates = null
 			strokeSet = null
@@ -448,6 +456,13 @@ client/var/datum/build_session/bsession
 
 		RefreshFiltered()
 			filteredEntries = list()
+			if(stylePick)
+				for(var/datum/build_entry/PE in BuildCliffPickerEntries())
+					if(length(filter) && !findtext(PE.name, filter))
+						continue
+					filteredEntries += PE
+				scrollRow = 0
+				return
 			var/mob/M = C?.mob
 			var/list/favKeys
 			if(category == BUILD_CAT_FAVS)

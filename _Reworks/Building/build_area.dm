@@ -1,6 +1,5 @@
 #define BUILD_CAT_ZONES "ZONES"
 #define BUILD_COMMIT_CHUNK 400
-#define BUILD_YIELD_TICK_USAGE 50
 #define AREA_PAINT_FILE "Saves/AreaPaint.txt"
 
 var/global/list/areaPaintMap
@@ -24,6 +23,8 @@ area/MapperZone/var/zoneKey = ""
 		wx_kind = ""
 		profile = "default"
 		windMult = 1
+		dnMode = ""
+		moon = 0
 		area/MapperZone/inst
 
 /proc/BuildZoneUid()
@@ -34,6 +35,21 @@ area/MapperZone/var/zoneKey = ""
 	nm = replacetext(nm, "\n", " ")
 	return trimtext(nm)
 
+/proc/BuildZoneWxWanted(datum/build_zone_def/D)
+	if(!D || !D.sees_sky || !length(D.wx_kind))
+		return null
+	return D.wx_kind
+
+/proc/BuildZoneWxRestore(area/MapperZone/MZ)
+	if(!MZ || !zoneDefsByUid)
+		return
+	var/datum/build_zone_def/D = zoneDefsByUid[MZ.zoneKey]
+	if(!D || D.inst != MZ)
+		return
+	var/wantWx = BuildZoneWxWanted(D)
+	if(MZ.wx_kind != wantWx || (wantWx && !MZ.wx_tint))
+		WxSet(MZ, wantWx)
+
 /proc/BuildZoneApply(datum/build_zone_def/D)
 	if(!length(D.uid))
 		D.uid = BuildZoneUid()
@@ -42,13 +58,56 @@ area/MapperZone/var/zoneKey = ""
 	D.inst.zoneKey = D.uid
 	D.inst.name = D.name
 	D.inst.sees_sky = D.sees_sky
-	D.inst.wx_kind = length(D.wx_kind) ? D.wx_kind : null
 	D.inst.env_profile_id = D.profile
 	D.inst.zone_wind_mult = D.windMult
+	var/dnOld = D.inst.dn_fixed
+	var/moonOld = D.inst.zone_moon
+	D.inst.dn_fixed = D.sees_sky ? D.dnMode : ""
+	D.inst.zone_moon = (D.sees_sky && D.moon) ? 1 : 0
 	GfxWindChanged()
 	DnManageArea(D.inst, D.sees_sky)
+	if(dnOld != D.inst.dn_fixed || moonOld != D.inst.zone_moon)
+		DnZoneLightingChanged(D.inst)
+		if(D.inst.zone_moon && !moonOld)
+			BuildZoneMoonTriggerInside(D.inst)
+	var/wantWx = BuildZoneWxWanted(D)
+	if(D.inst.wx_kind != wantWx || (wantWx && !D.inst.wx_tint))
+		WxSet(D.inst, wantWx)
 	for(var/client/CC)
 		CC.gfx_env_profile_id = null
+
+/proc/BuildZoneTimeValid(m)
+	if(m == "day" || m == "dusk" || m == "night" || m == "dawn" || m == "indoor")
+		return m
+	return ""
+
+/proc/BuildZoneTimeLabel(mode)
+	switch(mode)
+		if("day")
+			return "ALWAYS DAY"
+		if("dusk")
+			return "ALWAYS DUSK"
+		if("night")
+			return "ALWAYS NIGHT"
+		if("dawn")
+			return "ALWAYS DAWN"
+		if("indoor")
+			return "INDOORS (no day-night tint)"
+	return "WORLD CLOCK"
+
+/proc/BuildZoneMoonTriggerInside(area/A)
+	if(!A)
+		return
+	for(var/mob/Players/P in players)
+		var/turf/T = P.loc
+		if(isturf(T) && T.loc == A)
+			spawn P.MoonTrigger()
+
+area/MapperZone/Entered(atom/movable/O, atom/oldloc)
+	..()
+	if(zone_moon && istype(O, /mob/Players))
+		var/mob/Players/P = O
+		spawn P.MoonTrigger()
 
 /proc/BuildZonesLoad()
 	if(zoneDefs)
@@ -75,6 +134,10 @@ area/MapperZone/var/zoneKey = ""
 			D.uid = f[7]
 		else
 			D.uid = D.name
+		if(f.len >= 8)
+			D.dnMode = BuildZoneTimeValid(f[8])
+		if(f.len >= 9)
+			D.moon = text2num(f[9]) || 0
 		BuildZoneApply(D)
 		zoneDefs += D
 		zoneDefsByName[D.name] = D
@@ -86,7 +149,7 @@ area/MapperZone/var/zoneKey = ""
 		return
 	var/list/lines = list()
 	for(var/datum/build_zone_def/D in zoneDefs)
-		lines += jointext(list(BuildDmmEscape(D.name), D.creator, "[D.sees_sky]", BuildDmmEscape(D.wx_kind), BuildDmmEscape(D.profile), "[D.windMult]", D.uid), "\t")
+		lines += jointext(list(BuildDmmEscape(D.name), D.creator, "[D.sees_sky]", BuildDmmEscape(D.wx_kind), BuildDmmEscape(D.profile), "[D.windMult]", D.uid, D.dnMode, "[D.moon]"), "\t")
 	if(fexists("Saves/MapperZones.txt"))
 		fdel("Saves/MapperZones.txt")
 	text2file(jointext(lines, "\n"), "Saves/MapperZones.txt")
@@ -183,8 +246,11 @@ area/MapperZone/var/zoneKey = ""
 	if(!areaPaintMap)
 		return
 	var/list/lines = list()
+	var/chunkCount = 0
 	for(var/k in areaPaintMap)
 		lines += "[k]\t[areaPaintMap[k]]"
+		if(++chunkCount % 5000 == 0)
+			sleep(world.tick_lag)
 	if(fexists(AREA_PAINT_FILE))
 		fdel(AREA_PAINT_FILE)
 	text2file(jointext(lines, "\n"), AREA_PAINT_FILE)
@@ -289,13 +355,24 @@ mob/Mapper/verb/Zone_Settings()
 	while(D)
 		var/sky = D.sees_sky ? "OUTDOOR" : "INDOOR/CAVE"
 		var/wx = length(D.wx_kind) ? D.wx_kind : "clear"
-		var/list/menu = list("Sky: [sky]", "Weather: [wx]", "Profile: [D.profile]", "Wind: [D.windMult * 100]%", "Rename", "Done")
+		var/tm = BuildZoneTimeLabel(D.dnMode)
+		var/fm = D.moon ? "ON" : "OFF"
+		var/list/menu = list("Sky: [sky]", "Time: [tm]", "Full moon: [fm]", "Weather: [wx]", "Profile: [D.profile]", "Wind: [D.windMult * 100]%", "Rename", "Done")
 		var/choice = input(usr, "Zone \"[D.name]\" - pick a setting.", "Zone Settings") as null|anything in menu
 		if(!choice || choice == "Done")
 			break
 		if(choice == "Sky: [sky]")
 			D.sees_sky = !D.sees_sky
 			usr << "\"[D.name]\" is now [D.sees_sky ? "OUTDOOR (sky, day/night, weather)" : "INDOOR/CAVE (no sky effects)"]."
+		else if(choice == "Time: [tm]")
+			var/list/times = list("World clock" = "", "Always day" = "day", "Always dusk" = "dusk", "Always night" = "night", "Always dawn" = "dawn", "Indoors - no day-night tint, keeps weather, wind and profile effects" = "indoor")
+			var/t = input(usr, "Lighting for \"[D.name]\" (only applies while Sky is OUTDOOR).", "Zone Time") as null|anything in times
+			if(!t)
+				continue
+			D.dnMode = times[t]
+		else if(choice == "Full moon: [fm]")
+			D.moon = !D.moon
+			usr << "\"[D.name]\" full moon [D.moon ? "ON - a permanent moonlit night in this zone; Saiyans who look at the moon transform when they enter (needs Sky: OUTDOOR)" : "OFF"]."
 		else if(choice == "Weather: [wx]")
 			var/list/kinds = list("clear", "rain", "storm", "snow", "blizzard", "dust")
 			var/k = input(usr, "Weather in \"[D.name]\" (static for this zone).", "Zone Weather") as null|anything in kinds
@@ -404,7 +481,10 @@ mob/Mapper/verb/Zone_Settings()
 			S.brush = null
 			BuildHUDRefreshHand(S)
 	BuildCustomRefreshSessions()
+	if(D.inst?.wx_kind)
+		WxSet(D.inst, null)
 	_dn_sky_areas -= D.inst
+	_dn_indoor_areas -= D.inst
 	D.inst = null
 	M << "Zone \"[D.name]\" deleted; [moved] tiles rezoned (outdoor-match, Inside fallback)."
 	Log("Mapper", "[M] ([M.ckey]) deleted zone \"[D.name]\" ([moved] tiles rezoned).", 1)
