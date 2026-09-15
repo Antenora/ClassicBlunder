@@ -43,7 +43,7 @@ Inkworks // This should be passed to InkworksDatum which should be to every indi
         if(P.InkworksDatum.Erlking == 1) // Implodes Shattering at 100, making you take more damage(?)
             passives["Shattering"] +=5
             passives["EarthHerald"] += 1 // this is as if it was combustion 100, i don't think there's an Ice Age or Combustion version of this herald passive
-        if(P.InkworksDatum.Fox == 1) // Increases spiritsword scaling by 40%
+        if(P.InkworksDatum.Fox == 1) // Doubles your Focus Shift Bonus, makes all attacks whiff during focus shift, halves focus shift duration.
             passives["Fox Spirit"] += 1
         if(P.InkworksDatum.Bear == 1) // HOPEFULLY, and I do mean HOPEFULLY, counts you as having hot hundred and warping 2 when attacking a stunned/launched target
             passives["Bear Spirit"] += 1
