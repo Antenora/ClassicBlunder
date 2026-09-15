@@ -507,7 +507,6 @@ obj
 					ZoneAttackX=6
 					ZoneAttackY=6
 					Hover=4
-					StormFall=1
 					FireFromEnemy=1
 					FireFromSelf=0
 				else
