@@ -73,17 +73,24 @@
 			set category="Skills"
 			usr.Activate(src)
 
-/client/var/tmp/obj/rgMeterHolderNorm = new()
-/client/var/tmp/obj/rgMeterHolderOutlines = new()
 
-/client/proc/updateRGMeter()
-	var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in mob.contents
-	if(RG)
-		if(rgMeterHolderNorm)
-			if(!(rgMeterHolderNorm in screen))
-				rgMeterHolderNorm.screen_loc = "RIGHT-0.72,BOTTOM+1.40"
-				rgMeterHolderNorm.plane = HUD_PLANE
-				rgMeterHolderOutlines.plane = HUD_PLANE
+var/global/list/RGMeterIconCache = list()
+
+proc/RGMeterFillIcon(percent, fill_state = "100")
+	percent = min(max(round(percent), 0), 100)
+	var/key = "[fill_state]-[percent]"
+	if(RGMeterIconCache[key]) return RGMeterIconCache[key]
+	var/icon/I = icon('RoyalGuardMeter.dmi', fill_state)
+	var/w = I.Width()
+	var/h = I.Height()
+	var/cx = (w + 1) / 2
+	var/cy = (h + 1) / 2
+	if(percent <= 0)
+		I.DrawBox(null, 1, 1, w, h)
+	else if(percent < 100)
+		var/fill_angle = percent * 3.6
+		for(var/px = 1, px <= w, px++)
+			for(var/py = 1, py <= h, py++)
 				var/angle = 90 - arctan(px - cx, py - cy)
 				if(angle < 0) angle += 360
 				if(angle >= fill_angle)
