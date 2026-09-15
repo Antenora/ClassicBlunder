@@ -805,5 +805,7 @@ proc/Load_Objects()
 			AObj.loc=locate(AObj.Saved_X,AObj.Saved_Y,AObj.Saved_Z)
 			if(Icons && idx <= length(Icons) && Icons[idx])
 				AObj.icon=Icons[idx]
+			if(istype(AObj, /obj/Turfs/CustomObj1))
+				BuildCustomObjApplyDef(AObj)
 		goto wowza
 	world<<"<small>Server: Items Loaded ([amount])."
