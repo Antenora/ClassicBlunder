@@ -1192,10 +1192,16 @@ mob/proc/
 				var/ramp_speed = isTilted ? 1.1 : 1
 				var/ramp = min(1, ((world.time - src.charge_started_at) * ramp_speed) / max(glob.CHARGE_RAMP_DS, 1))
 				var/before = src.Energy
+				var/HasHyperdeath = (src.Saga=="Path of a Hero: Rebirth") && (src.RebirthHeroType=="Prismatic") // lets you charge up Hypermeter. Also conditional to help make suer you can't power stress until everything is full
+				if(HasHyperdeath)
+					if(src.HyperdeathMeterCurrent < 100)
+						src.HyperdeathMeterCurrent = min(src.HyperdeathMeterCurrent + (2 * (2 - min(max(src.HealthPct(), 0), 100) / 100)), 100)
+						src.HyperMeterUpdate()
+				var/isHyperFull = !HasHyperdeath || src.HyperdeathMeterCurrent >= 100
 				Recover("Energy", glob.CHARGE_BASE * (1 + glob.CHARGE_RAMP_MAX * ramp))
-				if(src.Energy == src.CheckMaxEnergy() && isOvercharging == 0) // Power Stressing block. Enters Power-Stressed State or Super Saiyan Grade 2/3.
+				if(src.Energy == src.CheckMaxEnergy() && isHyperFull && isOvercharging == 0) // Power Stressing block. Enters Power-Stressed State or Super Saiyan Grade 2/3.
 					isOvercharging = 1
-				if(src.Energy <= before || isOvercharging)
+				if(isHyperFull && (src.Energy <= before || isOvercharging))
 					src.Quake(4)
 					src.charge_power_stress += 1 + isTilted
 					if(charge_power_stress >= max(5 - passiveboost, 2))
@@ -1234,7 +1240,7 @@ mob/proc/GetBPPoisonEffect()
 
 mob/proc/GetMaimedEffect()
 	if(HasMaimMastery()) return 1;
-	else 
+	else
 		MaimsOutstanding=max(Maimed - (0.5*GetProsthetics()), 0);
 		return (1 - (0.1 * MaimsOutstanding));
 
