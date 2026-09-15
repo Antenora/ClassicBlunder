@@ -1,5 +1,29 @@
 var/list/worldObjectList = list()
 var/worldSaveBusy = 0
+var/turfLoadState = 0
+var/turfLoadCount = 0
+var/customTurfLoadState = 0
+var/customTurfLoadCount = 0
+
+proc/MapSaveSafe()
+	if(fexists("Saves/Map/File1") && turfLoadState != 2)
+		Log("Mapper", "MAP SAVE REFUSED: the turf save on disk never finished loading this boot (state [turfLoadState]). Saving now would overwrite it with the compiled map.", 1)
+		world << "<small><font color=red>Server: map save SKIPPED - the saved turfs never finished loading this boot. Tell an admin before anyone saves.</font>"
+		return 0
+	if(turfLoadState == 2 && turfLoadCount > 0 && Turfs.len < turfLoadCount * 0.8)
+		Log("Mapper", "MAP SAVE REFUSED: [Turfs.len] turfs in memory but [turfLoadCount] were loaded from disk; refusing to overwrite the save.", 1)
+		world << "<small><font color=red>Server: map save SKIPPED - far fewer turfs in memory than were loaded from disk. Tell an admin before anyone saves.</font>"
+		return 0
+	if(fexists("Saves/Map/CustomTurfs1") && customTurfLoadState != 2)
+		Log("Mapper", "MAP SAVE REFUSED: the custom turf save on disk never finished loading this boot (state [customTurfLoadState]).", 1)
+		world << "<small><font color=red>Server: map save SKIPPED - the saved custom turfs never finished loading this boot. Tell an admin before anyone saves.</font>"
+		return 0
+	if(customTurfLoadState == 2 && customTurfLoadCount > 0 && CustomTurfs.len < customTurfLoadCount * 0.8)
+		Log("Mapper", "MAP SAVE REFUSED: [CustomTurfs.len] custom turfs in memory but [customTurfLoadCount] were loaded from disk; refusing to overwrite the save.", 1)
+		world << "<small><font color=red>Server: map save SKIPPED - far fewer custom turfs in memory than were loaded from disk. Tell an admin before anyone saves.</font>"
+		return 0
+	return 1
+
 
 proc/WorldSaveLock()
 	while(worldSaveBusy && world.time - worldSaveBusy < 3000)
@@ -76,6 +100,8 @@ proc/find_savableObjects()
 
 proc/Save_Custom_Turfs(quiet = 0)
 	set background = 1
+	if(!MapSaveSafe())
+		return
 	if(!quiet)
 		world<<"<small>Server: Saving Custom Turfs..."
 	var/Amount=0
@@ -192,66 +218,64 @@ proc/Load_Custom_Turfs()
 	set background = 1
 	if(fexists("Saves/Map/CustomTurfs1"))
 		world<<"<small>Server: Loading Custom Turfs..."
-		var/Amount=0
+		customTurfLoadState = 1
 		var/DebugAmount= 0
 		var/E=1
-		load
-		if(!fexists("Saves/Map/CustomTurfs[E]"))
-			goto end
-		var/savefile/F=new("Saves/Map/CustomTurfs[E]")
-		sleep(1)
-		var/list/Types=F["Types"]
-		var/list/Healths=F["Healths"]
-		var/list/Levels=F["Levels"]
-		var/list/Builders=F["Builders"]
-		var/list/Xs=F["Xs"]
-		var/list/Ys=F["Ys"]
-		var/list/Zs=F["Zs"]
-		var/list/Icons=F["Icons"]
-		var/list/Icons_States=F["Icons_States"]
-		var/list/Densitys=F["Densitys"]
-		var/list/isRoof=F["isRoof"]
-		var/list/Opacitys=F["Opacitys"]
-		var/list/FlyOver=F["FlyOver"]
-		var/list/isOutside=F["isOutside"]
-		var/list/isUnderwater=F["isUnderwater"]
-		var/list/Destructable=F["Destructable"]
-		var/list/EdgeOpt=F["EdgeOpt"]
-		Amount = 0
-		for(var/A in Types)
-			Amount+=1
-			DebugAmount += 1
-			var/turf/CustomTurf/T=new A(locate(Xs[Amount],Ys[Amount],Zs[Amount]))
-			T.icon = Icons[Amount]
-			T.icon_state= Icons_States[Amount]
-			T.density=Densitys[Amount]
-			T.opacity=Opacitys[Amount]
-			T.Roof=isRoof[Amount]
-			T.Health=text2num(Healths[Amount])
-			T.Level=text2num(Levels[Amount])
-			T.Builder=Builders[Amount]
-			T.FlyOverAble=FlyOver[Amount]
-			T.isOutside=isOutside[Amount]
-			T.isUnderwater=isUnderwater[Amount]
-			T.Destructable=Destructable[Amount]
-			T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
-			CustomTurfs+=T
+		while(fexists("Saves/Map/CustomTurfs[E]"))
+			var/savefile/F=new("Saves/Map/CustomTurfs[E]")
+			sleep(1)
+			var/list/Types=F["Types"]
+			var/list/Healths=F["Healths"]
+			var/list/Levels=F["Levels"]
+			var/list/Builders=F["Builders"]
+			var/list/Xs=F["Xs"]
+			var/list/Ys=F["Ys"]
+			var/list/Zs=F["Zs"]
+			var/list/Icons=F["Icons"]
+			var/list/Icons_States=F["Icons_States"]
+			var/list/Densitys=F["Densitys"]
+			var/list/isRoof=F["isRoof"]
+			var/list/Opacitys=F["Opacitys"]
+			var/list/FlyOver=F["FlyOver"]
+			var/list/isOutside=F["isOutside"]
+			var/list/isUnderwater=F["isUnderwater"]
+			var/list/Destructable=F["Destructable"]
+			var/list/EdgeOpt=F["EdgeOpt"]
+			var/Amount = 0
+			for(var/A in Types)
+				Amount+=1
+				DebugAmount += 1
+				var/turf/CustomTurf/T=new A(locate(Xs[Amount],Ys[Amount],Zs[Amount]))
+				T.icon = Icons[Amount]
+				T.icon_state= Icons_States[Amount]
+				T.density=Densitys[Amount]
+				T.opacity=Opacitys[Amount]
+				T.Roof=isRoof[Amount]
+				T.Health=text2num(Healths[Amount])
+				T.Level=text2num(Levels[Amount])
+				T.Builder=Builders[Amount]
+				T.FlyOverAble=FlyOver[Amount]
+				T.isOutside=isOutside[Amount]
+				T.isUnderwater=isUnderwater[Amount]
+				T.Destructable=Destructable[Amount]
+				T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
+				CustomTurfs+=T
 
-			for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
+				for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
-			if(Amount == 20000)
-				sleep(1)
-				break
-
-		if(Amount == 20000)
+				if(Amount % 5000 == 0)
+					sleep(1)
 			E ++
-			goto load
-
-		end
-		world<<"<small>Server: Custom Turfs Loaded ([DebugAmount] in [E] Files.)"
+		customTurfLoadCount = DebugAmount
+		customTurfLoadState = 2
+		world<<"<small>Server: Custom Turfs Loaded ([DebugAmount] in [E - 1] Files.)"
+	else
+		customTurfLoadState = 2
 
 proc/Save_Turfs(quiet = 0)
 	set background = 1
+	if(!MapSaveSafe())
+		return
 	if(!quiet)
 		world<<"<small>Server: Saving Map..."
 	var/Amount=0
@@ -346,55 +370,51 @@ proc/Load_Turfs()
 	set background = 1
 	if(fexists("Saves/Map/File1"))
 		world<<"<small>Server: Loading Map..."
-		var/Amount=0
+		turfLoadState = 1
 		var/DebugAmount= 0
 		var/E=1
-		load
-		if(!fexists("Saves/Map/File[E]"))
-			goto end
-		var/savefile/F=new("Saves/Map/File[E]")
-		sleep(1)
-		var/list/Types=F["Types"]
-		var/list/Healths=F["Healths"]
-		var/list/Levels=F["Levels"]
-		var/list/Builders=F["Builders"]
-		var/list/Xs=F["Xs"]
-		var/list/Ys=F["Ys"]
-		var/list/Zs=F["Zs"]
-		var/list/FlyOver=F["FlyOver"]
-		var/list/isOutside=F["isOutside"]
-		var/list/isUnderwater=F["isUnderwater"]
-		var/list/Destructable=F["Destructable"]
-		var/list/EdgeOpt=F["EdgeOpt"]
-		Amount = 0
-		for(var/A in Types)
-			Amount+=1
-			DebugAmount += 1
-			var/turf/T=new A(locate(Xs[Amount],Ys[Amount],Zs[Amount]))
-			T.Health=text2num(Healths[Amount])
-			T.Level=text2num(Levels[Amount])
-			T.Builder=Builders[Amount]
-			T.FlyOverAble=FlyOver[Amount]
-			T.isOutside=isOutside[Amount]
-			T.isUnderwater=isUnderwater[Amount]
-			T.Destructable=Destructable[Amount]
-			T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
-			if(istype(T,/turf/Special/EventStars))
-				T.icon_state="[rand(1,2500)]"
-			Turfs+=T
+		while(fexists("Saves/Map/File[E]"))
+			var/savefile/F=new("Saves/Map/File[E]")
+			sleep(1)
+			var/list/Types=F["Types"]
+			var/list/Healths=F["Healths"]
+			var/list/Levels=F["Levels"]
+			var/list/Builders=F["Builders"]
+			var/list/Xs=F["Xs"]
+			var/list/Ys=F["Ys"]
+			var/list/Zs=F["Zs"]
+			var/list/FlyOver=F["FlyOver"]
+			var/list/isOutside=F["isOutside"]
+			var/list/isUnderwater=F["isUnderwater"]
+			var/list/Destructable=F["Destructable"]
+			var/list/EdgeOpt=F["EdgeOpt"]
+			var/Amount = 0
+			for(var/A in Types)
+				Amount+=1
+				DebugAmount += 1
+				var/turf/T=new A(locate(Xs[Amount],Ys[Amount],Zs[Amount]))
+				T.Health=text2num(Healths[Amount])
+				T.Level=text2num(Levels[Amount])
+				T.Builder=Builders[Amount]
+				T.FlyOverAble=FlyOver[Amount]
+				T.isOutside=isOutside[Amount]
+				T.isUnderwater=isUnderwater[Amount]
+				T.Destructable=Destructable[Amount]
+				T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
+				if(istype(T,/turf/Special/EventStars))
+					T.icon_state="[rand(1,2500)]"
+				Turfs+=T
 
-			for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
+				for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
-			if(Amount == 20000)
-				sleep(1)
-				break
-
-		if(Amount == 20000)
+				if(Amount % 5000 == 0)
+					sleep(1)
 			E ++
-			goto load
-
-		end
-		world<<"<small>Server: Map Loaded ([DebugAmount] in [E] Files.)"
+		turfLoadCount = DebugAmount
+		turfLoadState = 2
+		world<<"<small>Server: Map Loaded ([DebugAmount] in [E - 1] Files.)"
+	else
+		turfLoadState = 2
 
 
 
@@ -755,7 +775,7 @@ proc/Save_Objects(quiet = 0)
 	if(!quiet)
 		world<<"<small>Server: Objects Saved ([Amount])."
 	BuildAreaPaintSave()
-	if(fexists("Saves/BuildJournal.txt"))
+	if(MapSaveSafe() && fexists("Saves/BuildJournal.txt"))
 		fdel("Saves/BuildJournal.txt")
 
 proc/Load_Objects()
