@@ -108,6 +108,7 @@
 				var/turf/CustomTurf/CT = NT
 				CT.Roof = text2num(f[10]) || 0
 				CT.InitialType = "/turf/CustomTurf"
+				BuildCustomDefForTurf(CT)
 			NT.FlyOverAble = text2num(f[11]) || 0
 			NT.Destructable = text2num(f[12]) || 0
 			NT.Shallow = text2num(f[13]) || 0
@@ -237,6 +238,10 @@
 		CT.Roof = E.cRoof
 		CT.density = E.cDensity
 		CT.opacity = E.cOpacity
+		var/datum/build_custom_def/PD = BuildCustomDefForIcon(E.iconF, E.icon_state)
+		CT.custom_def = PD ? PD.name : ""
+		if(PD)
+			CT.surface_profile = length(PD.profile) ? PD.profile : null
 	if(istype(C2, /turf/Special/EventStars))
 		C2.icon_state = "[rand(1, 2500)]"
 	C2.Builder = M.ckey

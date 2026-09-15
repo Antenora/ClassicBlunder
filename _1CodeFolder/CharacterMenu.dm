@@ -819,6 +819,8 @@ client/proc/ScrollTrackTo(params)
 	SetPassPx(round(frac * maxpx))
 
 client/MouseWheel(object, delta_x, delta_y, location, control, params)
+	if(SignWheelScroll(delta_y))
+		return
 	if(AdminWheelScroll(delta_y))
 		return
 	if(AtomWheelScroll(delta_y))

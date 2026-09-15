@@ -56,7 +56,7 @@ var/global/list/buildMaterialByType = list()
 	if(istype(T, /turf/Waters) || istype(T, /turf/Waterfall))
 		return "Water"
 	if(istype(T, /turf/CustomTurf))
-		return BuildCustomMaterial(T.icon, T.icon_state)
+		return BuildCustomMaterialForTurf(T)
 	var/st = T.SecondaryTurfType
 	if(st && (st in buildMaterialNames))
 		return st
@@ -533,7 +533,7 @@ var/global/list/cliffPaintMap
 	if(buildCliffTurfTypes[T.type])
 		return 1
 	if(istype(T, /turf/CustomTurf))
-		var/datum/build_custom_def/D = BuildCustomDefForIcon(T.icon, T.icon_state)
+		var/datum/build_custom_def/D = BuildCustomDefForTurf(T)
 		if(D && D.cliff)
 			return 1
 	return 0

@@ -3017,7 +3017,9 @@ obj/Turfs
 		icon='Objects.dmi'
 		icon_state="Sign"
 		density=1
-		Click() if(desc) usr<<desc
+		Click()
+			if(usr && usr.client)
+				usr.client.SignReaderOpen(src)
 		Information_Panel
 			icon='Objects.dmi'
 			icon_state="Sign2"
@@ -3050,9 +3052,15 @@ obj/Turfs
 	SignTech1
 		icon='Lab2.dmi'
 		icon_state="WallDisplayA"
+		Click()
+			if(usr && usr.client)
+				usr.client.SignReaderOpen(src)
 	SignTech2
 		icon='Lab2.dmi'
 		icon_state="WallDisplayB"
+		Click()
+			if(usr && usr.client)
+				usr.client.SignReaderOpen(src)
 	VineWallOL1
 		icon='TurfOverlays.dmi'
 		icon_state="vinewall1"

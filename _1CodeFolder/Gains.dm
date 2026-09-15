@@ -1809,7 +1809,7 @@ mob
 							if(src.Health < -3*src.MaxHP())
 								if(prob(20)&&!src.StabilizeModule)
 									src.Death(null,"oxygen deprivation!")
-			else if(T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor))
+			else if((T.Deluged||istype(T,/turf/Waters)||istype(T,/turf/Special/Ichor_Water)||istype(T,/turf/Special/Midgar_Ichor)) && !BuildBridgeAt(T))
 				var/IgnoresWater=0
 				if(passive_handler.Get("Fishman")||passive_handler.Get("SpaceWalk")||src.race in list(MAJIN, WILDER, ELDRITCH))
 					BreathingMaskOn=1

@@ -223,6 +223,7 @@
 				if(istype(NT, /turf/CustomTurf))
 					var/turf/CustomTurf/CT = NT
 					CT.InitialType = "/turf/CustomTurf"
+					BuildCustomDefForTurf(CT)
 				if(M)
 					NT.Builder = M.ckey
 					if(istype(NT, /turf/CustomTurf))

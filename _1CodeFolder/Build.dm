@@ -124,6 +124,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 	var/list/isUnderwater=list()
 	var/list/Destructable=list()
 	var/list/EdgeOpt=list()
+	var/list/Defs=list()
 	var/list/turfSnapshot = CustomTurfs.Copy()
 	var/chunkCount = 0
 	for(var/turf/CustomTurf/A in turfSnapshot)
@@ -148,6 +149,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 			isUnderwater+=A.isUnderwater
 			Destructable+=A.Destructable
 			EdgeOpt+=A.EdgeOptOut
+			Defs+=A.custom_def
 			Amount+=1
 			if(Amount % 5000 == 0)
 				F["Types"]<<Types
@@ -167,6 +169,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				F["isUnderwater"]<<isUnderwater
 				F["Destructable"]<<Destructable
 				F["EdgeOpt"]<<EdgeOpt
+				F["Defs"]<<Defs
 				E ++
 				sleep(world.tick_lag)
 				F=new("Saves/Map/CustomTurfs[E]")
@@ -187,6 +190,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 				isUnderwater=list()
 				Destructable=list()
 				EdgeOpt=list()
+				Defs=list()
 
 	if(Amount % 5000 != 0)
 		F["Types"]<<Types
@@ -206,6 +210,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 		F["isUnderwater"]<<isUnderwater
 		F["Destructable"]<<Destructable
 		F["EdgeOpt"]<<EdgeOpt
+		F["Defs"]<<Defs
 
 	var/cleanup_file = E + 1
 	while(fexists("Saves/Map/CustomTurfs[cleanup_file]"))
@@ -241,6 +246,7 @@ proc/Load_Custom_Turfs()
 			var/list/isUnderwater=F["isUnderwater"]
 			var/list/Destructable=F["Destructable"]
 			var/list/EdgeOpt=F["EdgeOpt"]
+			var/list/Defs=F["Defs"]
 			var/Amount = 0
 			for(var/A in Types)
 				Amount+=1
@@ -259,6 +265,8 @@ proc/Load_Custom_Turfs()
 				T.isUnderwater=isUnderwater[Amount]
 				T.Destructable=Destructable[Amount]
 				T.EdgeOptOut=(EdgeOpt && EdgeOpt.len>=Amount) ? EdgeOpt[Amount] : 0
+				T.custom_def=(Defs && Defs.len>=Amount && istext(Defs[Amount])) ? Defs[Amount] : ""
+				BuildCustomDefForTurf(T)
 				CustomTurfs+=T
 
 				for(var/obj/Turfs/B in T) if(!B.Builder) del(B)

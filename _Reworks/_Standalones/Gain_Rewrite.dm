@@ -255,7 +255,7 @@ mob/proc/loseOxygen(mult = 1)
 mob/proc/Swim()
 	var/turf/water_turf = GfxGroundTurf(src)
 	if(!water_turf) return
-	if(!(water_turf.Deluged || istype(water_turf,/turf/Waters) || istype(water_turf,/turf/Special/Ichor_Water) || istype(water_turf,/turf/Special/Midgar_Ichor)))
+	if(!(water_turf.Deluged || istype(water_turf,/turf/Waters) || istype(water_turf,/turf/Special/Ichor_Water) || istype(water_turf,/turf/Special/Midgar_Ichor)) || BuildBridgeAt(water_turf))
 		if(src.Swim)
 			src.RemoveWaterOverlay()
 			src.Swim = 0
