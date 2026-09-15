@@ -1878,7 +1878,7 @@ NEW VARIABLES
 					if(6)
 						passives = list("BladeFisting" = 1,  "Extend" = 1, "SwordAscension" = 6, "SwordAscensionSecond" = 6, "SwordAscensionThird" = 6, "MonkeyKing" = 2)
 			verb/Transfigure_Sickle_of_Sorrow()
-				set category="Utility"
+				set category="Character Custom"
 				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
@@ -7226,7 +7226,7 @@ NEW VARIABLES
 			SpecialStrike=1
 			StaffAscension=2
 			verb/Transfigure_Spirit_Bow()
-				set category="Utility"
+				set category="Character Custom"
 				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
@@ -7275,7 +7275,7 @@ NEW VARIABLES
 			adjust(mob/p)
 				passives = list( "SwordAscension" = max(3, p.AscensionsAcquired), "SwordAscensionSecond" = max(3, p.AscensionsAcquired), "SwordAscensionThird" = max(3, p.AscensionsAcquired), "Extend" = round(p.AscensionsAcquired/3))
 			verb/Transfigure_Spirit_Sword()
-				set category="Utility"
+				set category="Character Custom"
 				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
@@ -7338,7 +7338,7 @@ NEW VARIABLES
 			ActiveMessage="draws spirit energy into their hand to form a spacetime-rending blade!"
 			OffMessage="dispels their Dimension Sword!"
 			verb/Transfigure_Dimension_Sword()
-				set category="Utility"
+				set category="Character Custom"
 				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
