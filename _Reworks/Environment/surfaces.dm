@@ -1140,22 +1140,19 @@ alpha=[V.alpha] px=[V.pixel_x],[V.pixel_y] visflags=[V.vis_flags] xf=[V.transfor
 /mob/Admin2/verb/Duplicate_Purge()
 	set category = "Mapper"
 	set name = "Duplicate Purge"
-	var/kill = 0
-	for(var/turf/G in view(10, usr))
-		var/list/keep = list()
-		var/list/doomed = list()
-		for(var/obj/O in G)
-			if(!O.icon || O.gfx_transient_visual) continue
-			var/key = "[O.type]:[O.icon_state]:[O.pixel_x],[O.pixel_y]"
-			if(keep[key]) doomed += O //an exact stacked twin - keep the first only
-			else keep[key] = O
-		for(var/obj/O in doomed)
-			LightPropDetach(O)
-			FxEmissiveDetach(O)
-			O.loc = null //refcount-free, never del
-			kill++
-	src << "Purged [kill] stacked duplicate prop\s in view(10). Save the map to make it stick."
-	Log("Admin", "[ExtractInfo(src)] purged [kill] stacked duplicate props.")
+	var/list/keep = list()
+	var/list/doomed = list()
+	for(var/obj/O in world)
+		if(!O.icon || O.gfx_transient_visual || !isturf(O.loc)) continue
+		var/key = "\ref[O.loc]:[O.type]:[O.icon_state]:[O.pixel_x],[O.pixel_y]"
+		if(keep[key]) doomed += O //an exact stacked twin - keep the first only
+		else keep[key] = 1
+	for(var/obj/O in doomed)
+		LightPropDetach(O)
+		FxEmissiveDetach(O)
+		O.loc = null //refcount-free, never del
+	src << "Purged [doomed.len] stacked duplicate prop\s across the whole map (every z level). Save the map to make it stick."
+	Log("Admin", "[ExtractInfo(src)] purged [doomed.len] stacked duplicate props map-wide.")
 
 obj/Turfs/IconsXLBig
 	Icon72/surface_profile = "tree" //snow pine

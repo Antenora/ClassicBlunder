@@ -19,6 +19,9 @@ var/global/list/shoreFoamOffs = list(list(0, 1), list(1, 1), list(1, 0), list(1,
 /proc/ShoreFoamWater(turf/W)
 	if(!W || W.Lava)
 		return 0
+	BuildMaterialTypeInit()
+	if(buildNoFoamTypes && buildNoFoamTypes[W.type])
+		return 0
 	if(istype(W, /turf/Waterfall) || istype(W, /turf/Waters/WaterFall))
 		return 0
 	return 1
