@@ -263,3 +263,4 @@ proc/buildPassiveInfoDB()
 	PassiveInfo["PowerStressMastery"] = "Generally bolsters the efficiency of your Power-Stressed form (achieved by charging above your Energy cap for a few moments.)"
 	PassiveInfo["BeamHoldMastery"] = "When charging a Beam skill, you can now press Guard to halt and keep your stored charge (for this beam only) for a short period of time, though you will drain energy while holding onto the charge this way, and going below a certain threshold will drop the charge. Higher levels of this passive lower the drain rate and extend the time you can hold your charge for."
 	PassiveInfo["Vigor"] = "Increases your Vitality stat additively."
+	PassiveInfo["RoyalGuarding"] = "When Royal Guard is active, attacks against you are nullified. Successfully getting hit by an attack will set the cooldown for RG to 5, but failure will set it to 45 seconds. Damage blocked this way converts to Royal Meter, useable with Royal Release."

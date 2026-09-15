@@ -78,7 +78,7 @@ mob
 			if(defender == src)
 				return val //DamageSelf already handled it - the tail is for hitting OTHER people
 			if(defender && val > 0 && defender.HPToPct(val) >= 5)
-				spawn(-1) FxHeavyImpact(defender) 
+				spawn(-1) FxHeavyImpact(defender)
 			DEBUGMSG("val after newDoDamage [val]")
 			// Devil Summoner: Knight/Paladin/Hero Soul redirects part of the damage to the active demon
 			if(defender && defender.demon_active && defender.demon_soul_dmg_pct > 0 && istype(defender.demon_active, /mob/Player/AI/Demon))
