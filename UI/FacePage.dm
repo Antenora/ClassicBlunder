@@ -265,3 +265,143 @@ mob/Players/verb/FacePage_Open()
 	set category = "Roleplay"
 	set hidden = 1
 	client?.FacePageToggle()
+
+#define SIGNPAGE_CTL "mapwindow.signoverlay"
+
+client/var/signpage_open = 0
+client/var/signpage_made = 0
+client/var/signpage_assets = 0
+client/var/signpage_loaded = 0
+client/var/signpage_title = ""
+client/var/signpage_body = ""
+
+client/proc/SignPageEnsureControl()
+	if(signpage_made)
+		return 1
+	winset(src, "signoverlay", "parent=mapwindow;type=browser;pos=0,0;size=672x480;anchor1=-1,-1;anchor2=-1,-1;is-visible=false")
+	if(!length(winget(src, SIGNPAGE_CTL, "type")))
+		return 0
+	signpage_made = 1
+	return 1
+
+client/proc/SignPageSendAssets()
+	if(signpage_assets)
+		return
+	signpage_assets = 1
+	ChatPanelSendAssets()
+	src << browse_rsc('HUD/chatpanel/lc_tabw_on.png', "lc_tabw_on.png")
+	src << browse_rsc('HUD/chatpanel/lc_band.png', "lc_band.png")
+
+client/proc/SignPageHTML()
+	return {"<!DOCTYPE html><html><head><meta charset='utf-8'><style>
+ @font-face{font-family:'monogram';src:url('monogram.ttf')}
+ html,body{margin:0;padding:0;background:transparent;overflow:hidden;width:100%;height:100%}
+ body{font:16px/16px 'monogram';color:#eaf5ff;user-select:none;-webkit-user-select:none}
+ #shell{position:absolute;left:0;top:0;width:336px;height:240px;image-rendering:pixelated}
+ #frame{position:absolute;left:0;top:0;right:0;bottom:0;border:16px solid transparent;border-image:url('lc_cover.png') 16 fill stretch;pointer-events:none}
+ #hdr{position:absolute;left:0;top:0;right:0;height:44px}
+ .tabw{position:absolute;top:8px;left:16px;width:84px;height:32px;background:url('lc_tabw_on.png') no-repeat;line-height:32px;text-align:center;color:#06283b}
+ #ttl{position:absolute;left:108px;right:56px;top:16px;height:16px;color:#bfe6ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .btn{position:absolute;top:8px;right:16px;width:32px;height:32px;background:url('lc_slot.png') no-repeat;cursor:pointer}
+ .btn img{position:absolute;left:0;top:0;width:32px;height:32px}
+ #body{position:absolute;left:16px;right:16px;top:44px;bottom:38px;border:6px solid transparent;border-image:url('lc_forgesub.png') 6 fill stretch;box-sizing:border-box}
+ #text{position:absolute;left:22px;right:26px;top:50px;bottom:44px;overflow-y:scroll;overflow-x:hidden;box-sizing:border-box;padding:2px 6px 6px 4px;white-space:pre-wrap;word-wrap:break-word}
+ #text::-webkit-scrollbar{width:14px}
+ #text::-webkit-scrollbar-track{background:url('lc_track.png') no-repeat;background-size:100% 100%;margin:6px 0}
+ #text::-webkit-scrollbar-thumb{border-left:1px solid transparent;border-right:1px solid transparent;background-clip:padding-box;background-origin:padding-box;background:url('lc_thumb_top.png') left top no-repeat,url('lc_thumb_bot.png') left bottom no-repeat,url('lc_thumb_mid.png') left center no-repeat,url('lc_thumb_col.png') left top repeat-y;background-size:12px 6px,12px 6px,12px 11px,12px 1px;min-height:24px}
+ #foot{position:absolute;left:16px;right:16px;bottom:14px;height:18px;white-space:nowrap;overflow:hidden}
+ #foot .bg{position:absolute;left:0;top:0;right:0;bottom:0;border:6px solid transparent;border-image:url('lc_band.png') 6 fill stretch;box-sizing:border-box;pointer-events:none}
+ #foot .t{position:absolute;left:8px;top:2px}
+ #foot .k{color:#7ec8f0}
+ #foot .dv{display:inline-block;width:1px;height:8px;background:#6096c8;margin:0 9px 0 8px;vertical-align:top;position:relative;top:4px}
+ :root{--cur:url('lc_cur_neutral.png') 2 0, auto}
+ *{cursor:var(--cur) !important}
+ </style></head><body>
+ <div id='shell'>
+  <div id='frame'></div>
+  <div id='hdr'><div class='tabw'>SIGN</div><div id='ttl'></div><div class='btn' id='close' title='close'><img src='lc_cross.png' alt=''></div></div>
+  <div id='body'></div>
+  <div id='text'></div>
+  <div id='foot'><div class='bg'></div><div class='t'><span class='k'>WHEEL</span> scroll<span class='dv'></span><span class='k'>ESC</span> or <span class='k'>X</span> close</div></div>
+ </div>
+ <script>
+ var shell=document.getElementById('shell'), frame=document.getElementById('frame'), ttl=document.getElementById('ttl'), text=document.getElementById('text');
+ var CTL='mapwindow.signoverlay', PW=336, PH=240, Z=2, OP=0.85, live=false;
+ function applyCursor(){ var two=(Z>=2); document.documentElement.style.setProperty('--cur',two?"url('lc_cur_neutral2.png') 5 1, auto":"url('lc_cur_neutral.png') 2 0, auto"); }
+ function dec(v){ try{ return decodeURIComponent(String(v).split('+').join(' ')); }catch(e){ return String(v); } }
+ function topic(p){ p.signpage=p.signpage||''; if(window.BYOND) BYOND.topic(p); }
+ function focusMap(){ if(window.BYOND) BYOND.winset('mapwindow.map',{focus:true}); }
+ function layout(){ document.body.style.zoom=Z; applyCursor(); shell.style.width=PW+'px'; shell.style.height=PH+'px'; frame.style.opacity=OP; }
+ function setGeom(x,y,w,h,z,op){ Z=+z; OP=+op; layout(); }
+ function setSign(t,b){ ttl.textContent=dec(t); text.textContent=dec(b); text.scrollTop=0; }
+ function closeIt(){ topic({signpage:'close'}); focusMap(); }
+ document.getElementById('close').addEventListener('click',closeIt);
+ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeIt(); e.preventDefault(); } });
+ document.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+ function boot(){ live=true; layout(); topic({signpage:'ready'}); }
+ if(window.BYOND){ boot(); } else { window.addEventListener('byond-ready',boot); }
+ </script></body></html>
+"}
+
+client/proc/SignPagePlace()
+	var/list/r = PanelViewRect()
+	if(!r)
+		return
+	var/x0 = r[1]
+	var/y0 = r[2]
+	var/x1 = r[3]
+	var/y1 = r[4]
+	var/z = r[5]
+	var/w = 336 * z
+	var/h = 240 * z
+	var/x = x0 + round(((x1 - x0) - w) / 2)
+	var/y = y0 + round(((y1 - y0) - h) / 2)
+	if(x + w > x1) x = x1 - w
+	if(y + h > y1) y = y1 - h
+	if(x < x0) x = x0
+	if(y < y0) y = y0
+	winset(src, SIGNPAGE_CTL, "pos=[x],[y];size=[w]x[h]")
+	src << output(list2params(list(x, y, w, h, z, chatpanel_opacity)), "[SIGNPAGE_CTL]:setGeom")
+
+client/proc/SignPagePush()
+	src << output(list2params(list(url_encode(signpage_title), url_encode(signpage_body))), "[SIGNPAGE_CTL]:setSign")
+
+client/proc/SignReaderOpen(atom/S)
+	if(!mob || !S)
+		return
+	var/body = length(S.desc) ? S.desc : "There is nothing written here."
+	if(!SignPageEnsureControl())
+		mob << "<b>[html_encode(S.name)]</b>: [html_encode(body)]"
+		return
+	SignPageSendAssets()
+	signpage_title = "[S.name]"
+	signpage_body = body
+	if(!signpage_loaded)
+		signpage_loaded = 1
+		winset(src, SIGNPAGE_CTL, "inner-background-color=transparent")
+		src << browse(SignPageHTML(), "window=[SIGNPAGE_CTL]")
+	else
+		SignPagePush()
+	signpage_open = 1
+	SignPagePlace()
+	winset(src, SIGNPAGE_CTL, "is-visible=true;focus=true")
+
+client/proc/SignReaderClose()
+	if(!signpage_open)
+		return
+	signpage_open = 0
+	winset(src, SIGNPAGE_CTL, "is-visible=false")
+	winset(src, "mapwindow.map", "focus=true")
+
+client/proc/SignPageTopic(list/href_list)
+	switch(href_list["signpage"])
+		if("ready")
+			SignPagePlace()
+			SignPagePush()
+		if("close")
+			SignReaderClose()
+
+client/Click(atom/A, location, control, params)
+	if(signpage_open && control == "mapwindow.map")
+		SignReaderClose()
+	. = ..()

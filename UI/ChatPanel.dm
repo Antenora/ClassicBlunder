@@ -644,6 +644,9 @@ client/Topic(href, href_list[], hsrc)
 	if(href_list && href_list["facepage"])
 		FacePageTopic(href_list)
 		return
+	if(href_list && href_list["signpage"])
+		SignPageTopic(href_list)
+		return
 	if(href_list && href_list["logpage"])
 		LogPageTopic(href_list)
 		return
