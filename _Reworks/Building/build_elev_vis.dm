@@ -652,7 +652,8 @@ var/global/list/elevStyleArtCache = list()
 			if(!fi && elevBaseStates["tk[side]"])
 				fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "tk[side]", ElevLayer(ntop, 4))
 			if(!fi && ElevStyleCode(T) == "a")
-				ElevFoamTrio((nf[3] == 1) ? "k" : "m", "a[T.x % 3][side]", T, ElevLayer(ntop, 9), fresh)
+				var/inr = ElevBelowFoot(T)
+				ElevFoamTrio(inr ? ((nf[3] == 1) ? "g" : "h") : ((nf[3] == 1) ? "k" : "m"), "a[T.x % 3][side]", T, ElevLayer(ntop, 9), fresh)
 			continue
 		var/turf/S2 = locate(T.x, T.y - 1, T.z)
 		if(!S2)
@@ -666,7 +667,8 @@ var/global/list/elevStyleArtCache = list()
 		if(!fi && elevBaseStates["td[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "td[tkey]", ElevLayer(ntop, 4))
 		if(!fi && copytext(tkey, 1, 2) == "a")
-			ElevFoamTrio((nf[2] == 1) ? "t" : "s", tkey, WS2, ElevLayer(ntop, 9), fresh)
+			var/inb = ElevBelowFoot(T)
+			ElevFoamTrio(inb ? ((nf[2] == 1) ? "i" : "j") : ((nf[2] == 1) ? "t" : "s"), tkey, WS2, ElevLayer(ntop, 9), fresh)
 	for(var/side in list("R", "L"))
 		var/turf/DF = locate(T.x + (side == "R" ? 1 : -1), T.y - 1, T.z)
 		var/list/df = ElevFaceInfo(DF)
@@ -678,6 +680,24 @@ var/global/list/elevStyleArtCache = list()
 		var/image/WP = ElevFacePiece(dsty, "u[df[2]][side]", ElevLayer(df[1], 0))
 		if(WP)
 			fresh += WP
+
+/proc/ElevBelowFoot(turf/T)
+	if(!T)
+		return 0
+	var/list/af = ElevFaceInfo(locate(T.x, T.y + 1, T.z))
+	return (af && af[3] == af[2]) ? 1 : 0
+
+/proc/ElevInnerCorner(turf/T)
+	if(!T || ElevFaceInfo(T))
+		return 0
+	for(var/side in list("R", "L"))
+		var/turf/NB = locate(T.x + ((side == "R") ? 1 : -1), T.y, T.z)
+		var/list/nf = ElevFaceInfo(NB)
+		if(!nf || nf[(side == "R") ? 4 : 5] != "x")
+			continue
+		if(!ElevFaceFlat(nf[6], ElevFaceStyleFor(NB, nf[6])))
+			return 1
+	return 0
 
 /proc/ElevAddUnder(turf/T, list/fresh)
 	var/turf/N = locate(T.x, T.y + 1, T.z)
@@ -692,7 +712,7 @@ var/global/list/elevStyleArtCache = list()
 		var/ww = (BuildMaterialFor(WS) == "Water")
 		var/ukey = "[ElevStyleCode(WS)][N.x % 3][ElevWrapEnd(N, fn, -1)][ElevWrapEnd(N, fn, 1)]"
 		if(ww)
-			if(tw)
+			if(tw && !ElevInnerCorner(T))
 				ElevFoamTrio("x", ukey, T, ELEV_FOAM_LAYER, fresh)
 		else if(!pit && elevBaseStates["bu[ukey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "bu[ukey]", ElevLayer(fn[1], 4))
