@@ -768,7 +768,7 @@ client/proc/RefreshPassRows()
 			var/mid = rowdy - 8
 			var/live = (mid >= PASS_CLIP_T && mid <= PASS_CLIP_B)
 			r.pass_name = cmenu_pass_list[idx]
-			r.pass_val = (mob.passive_handler && mob.passive_handler.passives) ? mob.passive_handler.passives[r.pass_name] : null
+			r.pass_val = mob.OutputPassiveValue(r.pass_name);
 			if(!live) r.hovered = 0
 			r.SyncText()
 			r.alpha = 255

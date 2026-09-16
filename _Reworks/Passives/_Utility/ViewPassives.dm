@@ -12,13 +12,15 @@
     src<<browse(html,"window=[src]'s Passives;size=450x600")
 
 mob/proc/OutputPassiveValue(passive)//the only reason this exists is to output the value of passives that are lists
-    . = "";
-    if(IsList(passive_handler.passives["[passive]"]))
-        var/list/pilk = passive_handler.passives["[passive]"];
-        for(var/p in pilk)
-            . += "[p]"
-            if(p != pilk[pilk.len]) . += ", ";
-    else . = passive_handler.passives["[passive]"];
+	if(!passive_handler) return null//safety
+	if(!passive_handler.passives) return null//safety
+	. = "";
+	if(IsList(passive_handler.passives["[passive]"]))
+		var/list/pilk = passive_handler.passives["[passive]"];
+		for(var/p in pilk)
+			. += "[p]"
+			if(p != pilk[pilk.len]) . += ", ";
+	else . = passive_handler.passives["[passive]"];
 
 mob/proc/OutputPassiveInfo(passive)
     var/info="<html><body bgcolor=#000000 text=#339999><br>"
