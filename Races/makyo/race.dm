@@ -4,6 +4,7 @@ race
 		desc = "A mortal race said to have blood ties to the demonic."
 		visual = 'Makyos.png'
 		locked = FALSE
+		removed = TRUE;
 		strength = 2
 		endurance = 2
 		speed = 1
