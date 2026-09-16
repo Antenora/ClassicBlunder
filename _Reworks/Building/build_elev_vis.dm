@@ -175,12 +175,6 @@ var/global/list/elevStyleArtCache = list()
 	elevStyleArtCache[style] = art ? art : "none"
 	return art
 
-/proc/ElevGenericFace(style, lay)
-	var/list/art = ElevStyleArt(style)
-	if(!art)
-		return null
-	return ElevPlain(art[1], art[2], lay)
-
 /proc/ElevFacePiece(style, st, lay)
 	if(style == "custom" || ElevStyleGeneric(style) || !elevFaceStates[st])
 		return null
@@ -209,6 +203,26 @@ var/global/list/elevStyleArtCache = list()
 	if(!elevShadeStates || !elevShadeStates[st])
 		return null
 	return ElevPlain('Mapping/Elevation/elev_face_shade.dmi', st, lay)
+
+/proc/ElevNaturalTop(turf/CT)
+	if(!CT)
+		return 1
+	var/m = BuildMaterialFor(CT)
+	return (m == "Grass" || m == "Dirt" || m == "Water" || m == "Sand" || m == "Stone" || m == "Wood" || m == "Ice") ? 1 : 0
+
+/proc/ElevFaceFlat(turf/CT, fsty)
+	if(fsty == "custom")
+		return 0
+	if(ElevStyleGeneric(fsty))
+		return 1
+	return ElevNaturalTop(CT) ? 0 : 1
+
+/proc/ElevFlatArt(style)
+	if(ElevStyleGeneric(style))
+		return ElevStyleArt(style)
+	if(length(style) > 4 && copytext(style, 1, 5) == "wall")
+		return list('Icons/Turfs/Walls.dmi', "Wall[copytext(style, 5)]")
+	return null
 
 /proc/ElevCliffTurfStyle(turf/T)
 	if(!T)
@@ -590,13 +604,14 @@ var/global/list/elevStyleArtCache = list()
 		var/top = fi[1]
 		var/fst = "f[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]"
 		var/fsty = ElevFaceStyleFor(T, fi[6])
+		var/flat = ElevFaceFlat(fi[6], fsty)
 		var/image/FP
 		if(fsty == "custom")
 			FP = ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", ElevLayer(top, 0))
-		else if(ElevStyleGeneric(fsty))
-			var/image/GA = ElevGenericFace(fsty, ElevLayer(top, 0))
-			if(GA)
-				fresh += GA
+		else if(flat)
+			var/list/art = ElevFlatArt(fsty)
+			if(art)
+				fresh += ElevPlain(art[1], art[2], ElevLayer(top, 0))
 				FP = ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", ElevLayer(top, 0) + 0.0001)
 			else
 				FP = ElevFacePiece("wall38", fst, ElevLayer(top, 0))
@@ -604,7 +619,8 @@ var/global/list/elevStyleArtCache = list()
 			FP = ElevFacePiece(fsty, fst, ElevLayer(top, 0))
 		if(FP)
 			fresh += FP
-		ElevAddLipPosts(T, fi, fsty, fst, fresh)
+		if(!flat)
+			ElevAddLipPosts(T, fi, fsty, fst, fresh)
 		if(fi[3] == fi[2])
 			var/turf/S = locate(T.x, T.y - 1, T.z)
 			if(S)
@@ -623,9 +639,12 @@ var/global/list/elevStyleArtCache = list()
 		var/list/nf = ElevFaceInfo(NB)
 		if(!nf || nf[(side == "R") ? 4 : 5] != "x")
 			continue
+		var/nsty = ElevFaceStyleFor(NB, nf[6])
+		if(ElevFaceFlat(nf[6], nsty))
+			continue
 		var/ntop = nf[1]
 		var/sst = "s[nf[2]]_[nf[3]][side]"
-		var/image/SP = ElevFacePiece(ElevFaceStyleFor(NB, nf[6]), sst, ElevLayer(ntop, 0))
+		var/image/SP = ElevFacePiece(nsty, sst, ElevLayer(ntop, 0))
 		if(SP)
 			fresh += SP
 		if(nf[3] != nf[2])
@@ -643,12 +662,17 @@ var/global/list/elevStyleArtCache = list()
 			fresh += ElevTexPiece(WS2, 'Mapping/Elevation/elev_base.dmi', "tb[tkey]", ElevLayer(ntop, 3), 1)
 		if(!fi && elevBaseStates["td[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "td[tkey]", ElevLayer(ntop, 4))
+		if(copytext(tkey, 1, 2) == "a")
+			ElevFoamTrio("t", tkey, WS2, ElevLayer(ntop, 9), fresh)
 	for(var/side in list("R", "L"))
 		var/turf/DF = locate(T.x + (side == "R" ? 1 : -1), T.y - 1, T.z)
 		var/list/df = ElevFaceInfo(DF)
 		if(!df || df[3] != 1 || df[(side == "R") ? 4 : 5] != "x" || ElevAt(df[6]) <= 0)
 			continue
-		var/image/WP = ElevFacePiece(ElevFaceStyleFor(DF, df[6]), "u[df[2]][side]", ElevLayer(df[1], 0))
+		var/dsty = ElevFaceStyleFor(DF, df[6])
+		if(ElevFaceFlat(df[6], dsty))
+			continue
+		var/image/WP = ElevFacePiece(dsty, "u[df[2]][side]", ElevLayer(df[1], 0))
 		if(WP)
 			fresh += WP
 
@@ -677,11 +701,14 @@ var/global/list/elevStyleArtCache = list()
 		var/list/nf = ElevFaceInfo(NB)
 		if(!nf || nf[(side == "R") ? 4 : 5] != "x" || nf[3] != nf[2])
 			continue
+		if(ElevFaceFlat(nf[6], ElevFaceStyleFor(NB, nf[6])))
+			continue
 		var/turf/WS2 = ElevWrapSrc(N, T)
 		var/ww2 = (BuildMaterialFor(WS2) == "Water")
 		var/tkey = "[ElevStyleCode(WS2)][N.x % 3][side]"
 		if(ww2)
-			continue
+			if(tw)
+				ElevFoamTrio("y", tkey, T, ELEV_FOAM_LAYER, fresh)
 		else if(!pit && elevBaseStates["tu[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "tu[tkey]", ElevLayer(nf[1], 4))
 
@@ -745,8 +772,10 @@ mob/Mapper/verb/Elev_Debug()
 	if(fi)
 		var/fst = "f[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]"
 		var/fsty = ElevFaceStyleFor(T, fi[6])
-		var/image/FP = (fsty == "custom") ? ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", 0) : (ElevStyleGeneric(fsty) ? ElevGenericFace(fsty, 0) : ElevFacePiece(fsty, fst, 0))
-		usr << "  face: top [fi[1]], [fi[2]] rows, this is row [fi[3]], ends [fi[4]]/[fi[5]], wrap ends [ElevWrapEnd(T, fi, -1)]/[ElevWrapEnd(T, fi, 1)], style [fsty], state [fst] [FP ? (ElevStyleGeneric(fsty) ? "OK (wall art plus shade overlay)" : (("[FP.icon]" == "[ElevFaceFile(fsty)]") ? "OK" : "OK (default rock, style file lacks it)")) : (ElevStyleGeneric(fsty) ? "MISSING (wall art file not found here, default rock used)" : "MISSING")]"
+		var/flat = ElevFaceFlat(fi[6], fsty)
+		var/list/fart = flat ? ElevFlatArt(fsty) : null
+		var/image/FP = (fsty == "custom") ? ElevShadePiece("fs[fi[2]]_[fi[3]][ElevFaceEnd(fi[4])][ElevFaceEnd(fi[5])]", 0) : (flat ? (fart ? ElevPlain(fart[1], fart[2], 0) : null) : ElevFacePiece(fsty, fst, 0))
+		usr << "  face: top [fi[1]], [fi[2]] rows, this is row [fi[3]], ends [fi[4]]/[fi[5]], wrap ends [ElevWrapEnd(T, fi, -1)]/[ElevWrapEnd(T, fi, 1)], style [fsty], state [fst] [flat ? (FP ? "OK (flat wall art plus bottom shade - the raised tile has no natural material)" : "MISSING (wall art not found here, default rock used)") : (FP ? (("[FP.icon]" == "[ElevFaceFile(fsty)]") ? "OK" : "OK (default rock, style file lacks it)") : "MISSING")]"
 	var/gcov = CV ? 1 : 0
 	elevWallCtxL = gcov ? ElevWallCtxFor(T) : 0
 	if(elevWallCtxL)
