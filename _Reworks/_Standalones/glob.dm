@@ -196,7 +196,7 @@ globalTracker
 		WorldDamageMult = 1.5
 		WorldDefaultAcc = 50
 		WorldWhiffRate = 25
-		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, WILDER, SAIYAN, ANGEL, MAKAIOSHIN)
+		NoSagaRaces = list(ELDRITCH, NOBODY, DEMON, SAIYAN, ANGEL, MAKAIOSHIN)
 		WILL_NOT_TARP_LIST = list("JustLat", "TheUltimateHope")
 		T3_STYLES_GODKI_VALUE = 0.15
 		T3_SAGA_STLYE_GODKI = 0
