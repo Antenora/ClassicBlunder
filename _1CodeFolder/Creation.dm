@@ -887,7 +887,7 @@ mob/var/Tin=1
 
 mob/var/tmp/race_index = 1
 
-mob/proc/UpdateRaceScreen(change = 1)
+mob/proc/UpdateRaceScreen(change = 0)
 	var/race/r
 
 	while (1)

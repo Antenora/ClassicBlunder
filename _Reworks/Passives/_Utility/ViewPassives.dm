@@ -4,13 +4,15 @@
     ShowPassives(src, 0)
 
 mob/proc/OutputPassiveValue(passive)//the only reason this exists is to output the value of passives that are lists
-    . = "";
-    if(IsList(passive_handler.passives["[passive]"]))
-        var/list/pilk = passive_handler.passives["[passive]"];
-        for(var/p in pilk)
-            . += "[p]"
-            if(p != pilk[pilk.len]) . += ", ";
-    else . = passive_handler.passives["[passive]"];
+	if(!passive_handler) return null//safety
+	if(!passive_handler.passives) return null//safety
+	. = "";
+	if(IsList(passive_handler.passives["[passive]"]))
+		var/list/pilk = passive_handler.passives["[passive]"];
+		for(var/p in pilk)
+			. += "[p]"
+			if(p != pilk[pilk.len]) . += ", ";
+	else . = passive_handler.passives["[passive]"];
 
 mob/proc/ShowPassives(mob/viewer, admin = 0)
     if(!viewer || !viewer.client || !passive_handler)
