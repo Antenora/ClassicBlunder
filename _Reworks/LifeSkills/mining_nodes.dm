@@ -142,8 +142,10 @@ proc/SeedLifeSkillNodes()
 		sleep(-1)
 	world.log << "//\[info]: Seeded [seeded] ore nodes."
 
-mob/Admin4/verb/makeOreNode(id as text)
+mob/Admin4/verb/makeOreNode()
 	set category = "Admin"
+	var/id = PromptArgValue(usr, args, 1, "makeOreNode", "text")
+	if(isnull(id)) return
 	InitLifeOreDefs()
 	if(!LifeOreDefs[id])
 		src << "No such ore. Valid: [jointext(LifeOreDefs, ", ")]"

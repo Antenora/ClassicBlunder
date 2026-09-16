@@ -363,8 +363,10 @@ proc/SeedFishSpots()
 		sleep(-1)
 	world.log << "//\[info]: Seeded [seeded] fishing spots."
 
-mob/Admin4/verb/makeFishingSpot(id as text)
+mob/Admin4/verb/makeFishingSpot()
 	set category = "Admin"
+	var/id = PromptArgValue(usr, args, 1, "makeFishingSpot", "text")
+	if(isnull(id)) return
 	RegisterFishSpots()
 	if(!LifeSpotDefs[id])
 		src << "No such spot. Valid: [jointext(LifeSpotDefs, ", ")]"

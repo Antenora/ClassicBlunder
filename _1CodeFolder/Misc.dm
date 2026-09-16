@@ -77,7 +77,7 @@ mob/Click()
 
 
 mob/proc/TwoWayTelepath(var/mob/who, anon)
-	var/blah=input("What do you want to say to [who]?") as text|null
+	var/blah=Ask(usr, "What do you want to say to [who]?", "", null, "text", null, 1)
 	if(!anon)
 		for(var/obj/Skills/Utility/Telepathy/t in src)
 			if(t.anonymous)

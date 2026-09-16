@@ -55,14 +55,14 @@ race
 	var/choice
 	var/confirm
 	while(confirm!="Yes")
-		choice=input(src, "Nobodies are born from those with a powerful Heart passing away. To whom did it belong?", "Nobody Origin") in Choices
+		choice=Ask(src, "Nobodies are born from those with a powerful Heart passing away. To whom did it belong?", "Nobody Origin", null, "pick", Choices, 0)
 		switch(choice)
 			if("Prideful Heart")
-				confirm=alert(src, "Of a Saiyan, in spite of your lack of emotions, your body still resonates with your originator's Pride.", "You may, too, be able to call upon the legend...", "Yes", "No")
+				confirm=Ask(src, "Of a Saiyan, in spite of your lack of emotions, your body still resonates with your originator's Pride.", "You may, too, be able to call upon the legend...", null, "confirm", null, 1, "Yes", "No")
 			if("Spirited Heart")
-				confirm=alert(src, "Of a Human, in spite of your lack of emotions, your body remains driven with hands able to reach the heavens.", "You may, too, be able to raise your battle tension in dire straits...", "Yes", "No")
+				confirm=Ask(src, "Of a Human, in spite of your lack of emotions, your body remains driven with hands able to reach the heavens.", "You may, too, be able to raise your battle tension in dire straits...", null, "confirm", null, 1, "Yes", "No")
 			if("Simple and Clean")
-				confirm=alert(src, "You do not know, and it does not matter. Frivolous things such as Pride or Spirit do not matter to a Nobody.", "Simplicity will lead to a stronger base.", "Yes", "No")
+				confirm=Ask(src, "You do not know, and it does not matter. Frivolous things such as Pride or Spirit do not matter to a Nobody.", "Simplicity will lead to a stronger base.", null, "confirm", null, 1, "Yes", "No")
 	switch(choice)
 		if("Prideful Heart")
 			src.NobodyOriginType="Pride"
@@ -75,14 +75,14 @@ race
 	var/choice
 	var/confirm
 	while(confirm!="Yes")
-		choice=input(src, "A weapon is engraved upon every heart.  What lies within yours?", "Keyblade Awakening") in Choices
+		choice=Ask(src, "A weapon is engraved upon every heart.  What lies within yours?", "Keyblade Awakening", null, "pick", Choices, 0)
 		switch(choice)
 			if("A Sword of Courage")
-				confirm=alert(src, "With this, your heart will be dedicated and impulsive.", "A Sword who's strength is Courage. Bravery to stand against anything.", "Yes", "No")
+				confirm=Ask(src, "With this, your heart will be dedicated and impulsive.", "A Sword who's strength is Courage. Bravery to stand against anything.", null, "confirm", null, 1, "Yes", "No")
 			if("A Staff of Spirit")
-				confirm=alert(src, "With this, your heart will be flexible and unrestrained.", "A Staff who's strenth is Spirit. Power the eye cannot see.", "Yes", "No")
+				confirm=Ask(src, "With this, your heart will be flexible and unrestrained.", "A Staff who's strenth is Spirit. Power the eye cannot see.", null, "confirm", null, 1, "Yes", "No")
 			if("A Shield of Kindness")
-				confirm=alert(src, "With this, your heart will be able to endure anything for the sake of those you love.", "A Shield who's strength is Kindness. The desire to help one's friends.", "Yes", "No")
+				confirm=Ask(src, "With this, your heart will be able to endure anything for the sake of those you love.", "A Shield who's strength is Kindness. The desire to help one's friends.", null, "confirm", null, 1, "Yes", "No")
 	switch(choice)
 		if("A Sword of Courage")
 			src.KeybladeType="Sword"
@@ -90,7 +90,7 @@ race
 			src.KeybladeType="Staff"
 		if("A Shield of Kindness")
 			src.KeybladeType="Shield"
-	var/Color=alert(src, "Light or Darkness?", "Keyblade", "Light", "Darkness")
+	var/Color=Ask(src, "Light or Darkness?", "Keyblade", null, "confirm", null, 1, "Light", "Darkness")
 	src.AddSkill(new/obj/Skills/Buffs/ActiveBuffs/Keyblade)
 	src<<"You awaken the [src.KeybladeType] of your heart!"
 	src.Saga="Keyblade"
@@ -99,7 +99,7 @@ race
 	if(src.KeybladeType=="Sword")
 		src.ChooseMartialSkill(1)
 	if(src.KeybladeType=="Shield")
-		var/inp = input(src, "What path of magic will you fall under?") in list("Fire", "Ice", "Thunder")
+		var/inp = Ask(src, "What path of magic will you fall under?", "", null, "pick", list("Fire", "Ice", "Thunder"), 0)
 		src.KeybladePath = inp
 		switch(src.KeybladePath)
 			if("Fire")

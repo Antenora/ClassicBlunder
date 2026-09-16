@@ -15,7 +15,7 @@ mob/verb/SkinPM2()
 	verb_delay=world.time+1
 	var/mobIntendedKey = winget(usr,"Help_Character_Key","text")
 	var/mob/target
-	var/UserInput = input("What do you want to say to [mobIntendedKey]?") as text|null
+	var/UserInput = Ask(usr, "What do you want to say to [mobIntendedKey]?", "", null, "text", null, 1)
 	if(UserInput)
 		for(var/mob/Q in players)
 			if(Q.key == mobIntendedKey)
@@ -55,13 +55,9 @@ mob/verb/AdminHelpAction()
 		for(var/mob/Q in players)
 				if(Q.key == mobIntendedKey)
 						target = Q
-		var/View={"<html><head><title>Player Control [target.key]</title><body>
-					<font size=3><font color=red>[target.name]<hr><font size=2><font color=black>"}
-		View+={"
-
-			\[ <a href=?src=\ref[target];action=MasterControl;do=Adminize>Promote/Demote Admin</a href> | <a href=?src=\ref[target];action=MasterControl;do=Cursespeak>CurseSpeak</a href> |<a href=?src=\ref[target];action=MasterControl;do=Mute>Mute</a href> | <a href=?src=\ref[target];action=MasterControl;do=PM>Admin PM</a href> | <a href=?src=\ref[target];action=MasterControl;do=Observe>Observe</a href> | <a href=?src=\ref[target];action=MasterControl;do=SendToSpawn>Send to Spawn</a href> | <a href=?src=\ref[target];action=MasterControl;do=Assess>Assess | <a href=?src=\ref[target];action=MasterControl;do=Give>Give</a href> | <a href=?src=\ref[target];action=MasterControl;do=Kill>Kill</a href> | <a href=?src=\ref[target];action=MasterControl;do=KO>Knockout</a href> | <a href=?src=\ref[target];action=MasterControl;do=Heal>Heal<a href> | <a href=?src=\ref[target];action=MasterControl;do=Revive>Revive</a href> | <a href=?src=\ref[target];action=MasterControl;do=Log>Check Log</a href> | <a href=?src=\ref[target];action=MasterControl;do=Reward>Reward</a href>  | <a href=?src=\ref[target];action=MasterControl;do=Edit>Edit</a href> | <a href=?src=\ref[target];action=MasterControl;do=Summon>Summon</a href> | <a href=?src=\ref[target];action=MasterControl;do=Teleport>Teleport to</a href>  | <a href=?src=\ref[target];action=MasterControl;do=XYZTeleport>XYZ Teleport</a href> | <a href=?src=\ref[target];action=MasterControl;do=Boot>Boot</a href> | <a href=?src=\ref[target];action=MasterControl;do=Ban>Ban</a href> \]
-					</html>"}
-		usr<<browse(View,"window=Person;size=500x135")
+		if(!target)
+				return
+		usr.client?.ShowPlayerControls(target)
 
 obj/Admin_Help_Object/
 	name = "Test Name"
@@ -74,12 +70,13 @@ obj/Admin_Help_Object/
 		usr.submitAhelp(src)
 
 
-mob/verb/AdminHelp(var/txt as message)
+mob/verb/AdminHelp()
 	set name = "Admin Help"
 	set category="Other"
 	set hidden = 1
 	if(!(world.time > verb_delay)) return
 	verb_delay=world.time+1
+	var/txt = (args.len && !isnull(args[1])) ? args[1] : Ask(usr, "Describe what you need help with.", "Admin Help", null, "message", null, 1)
 	if(!txt || length(txt) <= 0) return
 	//var/obj/Admin_Help_Object/A_Apply = new()
 	var/obj/Admin_Help_Object/AHelp = new()
@@ -177,5 +174,11 @@ mob/verb/RefreshListAhelp()
 		usr << output(O, "Help_OutPutMessages")
 	winset(src, "Help_OutPutMessages", "cells=[items]")
 
-
-
+client/proc/ShowPlayerControls(mob/T)
+	if(!T || !mob)
+		return
+	var/list/acts = list("Promote/Demote Admin" = "Adminize", "CurseSpeak" = "Cursespeak", "Mute" = "Mute", "Admin PM" = "PM", "Observe" = "Observe", "Send to Spawn" = "SendToSpawn", "Assess" = "Assess", "Give" = "Give", "Kill" = "Kill", "Knockout" = "KO", "Heal" = "Heal", "Revive" = "Revive", "Check Log" = "Log", "Edit" = "Edit", "Summon" = "Summon", "Teleport to" = "Teleport", "XYZ Teleport" = "XYZTeleport", "Boot" = "Boot", "Ban" = "Ban")
+	var/list/rows = list()
+	for(var/label in acts)
+		rows[++rows.len] = list("n" = "[label]", "v" = "", "nh" = "?src=\ref[T];action=MasterControl;do=[acts[label]]")
+	SheetShow("controls:\ref[T]", "PLAYER", "[T.key]", "[T.name]", rows, "an action")

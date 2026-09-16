@@ -79,7 +79,7 @@ mob/proc/ChooseCelestialWeapon()
 		if(!available.len)
 			src << "<font color='#ffe4b5'>You have already obtained all celestial armaments.</font>"
 			return
-		var/choice = input(src, "Choose a celestial weapon to manifest.", "Master of Arms") as null|anything in available
+		var/choice = Ask(src, "Choose a celestial weapon to manifest.", "Master of Arms", null, "pick", available, 1)
 		if(!choice) return
 		var/chosen_path = available[choice]
 		if(!chosen_path) continue

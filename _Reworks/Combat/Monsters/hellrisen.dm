@@ -42,7 +42,7 @@ proc/aboveThreshold(val1, val2, thres)
 var/GLOBAL_AI_DAMAGE = 2
 
 /mob/Admin3/verb/Change_AI_Damage()
-    var/num = input("Enter a number ") as num
+    var/num = Ask(usr, "Enter a number ", "", null, "num", null, 0)
     if(num)
         GLOBAL_AI_DAMAGE = num
         src << "AI damage is now set to [num]"

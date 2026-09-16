@@ -70,9 +70,13 @@
 	Cooldown=1
 
 
-/mob/Admin3/verb/hep(n as num, r as num)
+/mob/Admin3/verb/hep()
 	set hidden = 1
 	set category = "Admin"
+	var/n = PromptArgValue(usr, args, 1, "hep", "num")
+	if(isnull(n)) return
+	var/r = PromptArgValue(usr, args, 2, "hep", "num")
+	if(isnull(r)) return
 	if(!src.Alert("Are you sure you want to teabag someone?")) return
 	if(!Target)
 		return

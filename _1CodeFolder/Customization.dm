@@ -378,7 +378,7 @@ obj/Hairs
 	proc/Hair_Click(mob/A)
 		if(A.IconClicked==0)
 			A.IconClicked=1
-			var/Color=input(A,"Choose color") as color|null
+			var/Color=Ask(A, "Choose color", "", null, "color", null, 1)
 			if(Color) src.icon+=Color
 			A.Hair_Base=initial(icon)
 			A.Hair_Color=Color
@@ -1174,7 +1174,7 @@ obj/Aura_Icons
 	proc/Aura_Click(mob/A)
 		if(A.IconClicked==0)
 			A.IconClicked=1
-			var/Aura_Color=input(A,"Choose color") as color|null
+			var/Aura_Color=Ask(A, "Choose color", "", null, "color", null, 1)
 			if(Aura_Color)
 				icon+=Aura_Color
 			A.Auraz("Remove")
@@ -1212,7 +1212,7 @@ obj/Charge_Icons
 	proc/Charge_Click(mob/A)
 		if(A.IconClicked==0)
 			A.IconClicked=1
-			var/Blast_Color=input(A,"Choose color") as color|null
+			var/Blast_Color=Ask(A, "Choose color", "", null, "color", null, 1)
 			if(Blast_Color) icon+=Blast_Color
 			A.ChargeIcon=image(src.icon,src.icon_state)
 			A.IconClicked=0
@@ -1252,14 +1252,14 @@ obj/Blast_Icons
 	proc/Blast_Click(mob/A)
 		if(A.IconClicked==0)
 			A.IconClicked=1
-			var/Blast_Color=input(A,"Choose color") as color|null
+			var/Blast_Color=Ask(A, "Choose color", "", null, "color", null, 1)
 			if(Blast_Color) icon+=Blast_Color
-			switch(input(A,"Are you sure?") in list("Yes","No"))
+			switch(Ask(A, "Are you sure?", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
 					var/list/Skills=new
 					Skills+="Cancel"
 					for(var/obj/Skills/Projectile/B in A) Skills+=B
-					var/obj/B=input(A,"Add icon to which skill?") in Skills
+					var/obj/B=Ask(A, "Add icon to which skill?", "", null, "pick", Skills, 0)
 					if(istype(B, /obj/Skills/Projectile))
 						if(istype(B, /obj/Skills/Projectile/Beams))
 							B:IconLock=icon

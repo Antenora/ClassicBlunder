@@ -24,21 +24,15 @@
 		return 1;
 
 
-/mob/Admin4/verb/editSecretDatum(mob/p in players)
+/mob/Admin4/verb/editSecretDatum()
+	var/mob/p = PromptArg(usr, args, 1, "editSecretDatum", "players")
+	if(isnull(p)) return
 	if(p.secretDatum)
 		var/atom/A = p.secretDatum
-		var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-		var/list/B=new
-		Edit+="[A]<br>[A.type]"
-		Edit+="<table width=10%>"
-		for(var/C in A.vars) B+=C
+		var/list/B = list()
+		for(var/C in A.vars) B += C
 		B.Remove("Package","bound_x","bound_y","step_x","step_y","Admin","Profile", "GimmickDesc", "NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile", "Form5Profile")
-		for(var/C in B)
-			Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
-			Edit+=C
-			Edit+="<td>[Value(A.vars[C])]</td></tr>"
-		Edit += "</html>"
-		usr<<browse(Edit,"window=[A];size=450x600")
+		usr.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, B), "a name to edit")
 
 /mob/proc/getSecretLevel()
 	if(secretDatum)
@@ -156,7 +150,7 @@ SecretInformation
 			if(secretVariable["ConquerorsHaki"] == 1)
 				switch(currentTier)
 					if(4)
-						var/path = input(p, "Which path of Conqueror's Haki do you wish to follow?", "Conqueror's Haki") in list("Unarmed", "Armed")
+						var/path = Ask(p, "Which path of Conqueror's Haki do you wish to follow?", "Conqueror's Haki", null, "pick", list("Unarmed", "Armed"), 0)
 						if(path == "Unarmed")
 							p.AddSkill(new/obj/Skills/Queue/Haki/Galaxy_Impact)
 						else
@@ -173,7 +167,7 @@ SecretInformation
 					conQHaki(p)
 					conqPaths(p)
 					if(!secretVariable["HakiSpecialization"])
-						var/path = input(p, "Which path of Haki do you wish to follow?", "Haki") in list("Armament", "Observation")
+						var/path = Ask(p, "Which path of Haki do you wish to follow?", "Haki", null, "pick", list("Armament", "Observation"), 0)
 						secretVariable["HakiSpecialization"] = path
 					nextTierUp = 2
 				if(3)
@@ -670,14 +664,16 @@ mob
 			secret.init(src)
 
 mob/Admin3/verb
-	SecretManagement(var/mob/P in players)
+	SecretManagement()
 		set category="Admin"
+		var/mob/P = PromptArg(usr, args, 1, "SecretManagement", "players")
+		if(isnull(P)) return
 		if(!P.client) return
 		if(P.Secret)
 			if(P.Secret == "Rare Variant")
 				src << "[P] is a Rare Saiyan or Human and cannot have a Secret."
 				return
-			var/confirm = alert(usr, "Are you sure you want to tier up [P]'s [P.secretDatum.name]?",,"Yes","No")
+			var/confirm = Ask(usr, "Are you sure you want to tier up [P]'s [P.secretDatum.name]?", , null, "confirm", null, 1, "Yes", "No")
 			if(confirm == "No") return
 			P.secretDatum.tierUp(P.secretDatum.currentTier+1, P)
 			P << "Your [P.secretDatum.name] has been tiered up."
@@ -689,7 +685,7 @@ mob/Admin3/verb
 		var/list/validSecrets = list("Cancel");
 		validSecrets |= VALID_SECRET_LIST;
 		validSecrets.Remove(RACIAL_SECRETS);
-		var/Selection=input(src, "Which aspect of power does [P] awaken to?", "Secret Management") in validSecrets;
+		var/Selection=Ask(src, "Which aspect of power does [P] awaken to?", "Secret Management", null, "pick", validSecrets, 0);
 		if(Selection=="Cancel") return;
 		switch(Selection)
 			if("Heavenly Restriction")
@@ -724,9 +720,11 @@ mob/Admin3/verb
 				P.Secret="Spiral"
 				P.giveSecret("Spiral")
 
-	SecretRemoval(mob/Players/P in players)
+	SecretRemoval()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to remove [P]'s secret?", "Secret Decision") in list("Yes", "No")
+		var/mob/Players/P = PromptArg(usr, args, 1, "SecretRemoval", "players")
+		if(isnull(P)) return
+		var/Choice=Ask(usr, "Are you sure you want to remove [P]'s secret?", "Secret Decision", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		var/OldSecret = P.secretDatum.name
 		P.Secret=null

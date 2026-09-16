@@ -13,8 +13,10 @@
 )
 
 
-/mob/Admin3/verb/AddToTesterWhiteList(name as text)
+/mob/Admin3/verb/AddToTesterWhiteList()
     set category = "Admin"
+    var/name = (args.len && !isnull(args[1])) ? args[1] : PromptKnownKey(usr, "AddToTesterWhiteList", 0)
+    if(isnull(name) || !length("[name]")) return
     glob.TESTER_WHITE_LIST += name
     world<< "Added [name] to the tester white list"
 
@@ -42,7 +44,7 @@ var/allSkills = list()
 
 /mob/proc/giveAllSkillTree(tier)
     set name = "Give all SkillTree"
-    tier = input("What tier do you want to give?") as num
+    tier = Ask(usr, "What tier do you want to give?", "", null, "num", null, 0)
     if(tier > 4 || tier == 0 || tier < -1)
         return src<< "Invalid tier"
     if(length(allSkills) < 1)
@@ -65,7 +67,7 @@ var/allSkills = list()
 
 /mob/proc/giveAllSigs(tier)
     set name = "Give all SIG"
-    tier = input("What tier do you want to give?") as num
+    tier = Ask(usr, "What tier do you want to give?", "", null, "num", null, 0)
     if(tier > 4 || tier < 1)
         return src<< "Invalid tier"
     if(length(allSkills) < 1)

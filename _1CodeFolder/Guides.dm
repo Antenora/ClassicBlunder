@@ -136,7 +136,7 @@ mob/proc/Index(var/blah)
 <font face="calibri" style="font-size: 9pt"> <center><big><b>[blah]</b></big></center><br>"}
 	switch(blah)
 		if("Index")
-			src<<browse({"[htmlz]
+			src.client?.DocShow("guide:index", "GUIDE", "Index", {"[htmlz]
 <b>Welcome to [world.name]!</b><br>
 Click on the guide(s) pertaining to your curiousity.<br><br>
 <font color=red>Be <i>SURE</i> to read the Rules and if you're new I suggest the Guide!<font color=white><br><br>
@@ -146,21 +146,21 @@ Click on the guide(s) pertaining to your curiousity.<br><br>
 <a href=?src=\ref[usr];action=Ranks>Ranks</a><br><hr>
 <a href=?src=\ref[usr];action=Guide>Guide</a><br><hr>
 <a href=?src=\ref[usr];action=Credits>Credits</a><br><hr>
-<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr><br>"})
+<a href=?src=\ref[usr];action=TransformationTiers>Transformation Tiers</a><br><hr><br>"}, "theme")
 		if("Story")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Story]<br><br>")
+			src.client?.DocShow("guide:story", "GUIDE", "Story", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Story]<br><br>")
 		if("Rules")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Rules]<br><br>")
+			src.client?.DocShow("guide:rules", "GUIDE", "Rules", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Rules]<br><br>")
 		if("Ranks")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Ranks]<br><br>")
+			src.client?.DocShow("guide:ranks", "GUIDE", "Ranks", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Ranks]<br><br>")
 		if("Updates")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Updates]<br><br>")
+			src.client?.DocShow("guide:updates", "GUIDE", "Updates", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Updates]<br><br>")
 		if("Guide")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Guide]<br><br>")
+			src.client?.DocShow("guide:guide", "GUIDE", "Guide", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Guide]<br><br>")
 		if("Credits")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Credits]<br><br>")
+			src.client?.DocShow("guide:credits", "GUIDE", "Credits", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[Credits]<br><br>")
 		if("TransformationTiers")
-			src<<browse("[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[TransTiers]<br><br>")
+			src.client?.DocShow("guide:transtiers", "GUIDE", "Transformation Tiers", "[htmlz]<a href=?src=\ref[usr];action=Index>Return to Index</a><br><hr>[TransTiers]<br><br>")
 
 mob/Topic(A,B[])
 	if(B["action"]!="edit")
@@ -236,11 +236,11 @@ client/Topic(href,href_list[],hsrc)
 							Log("Admin", "[ExtractInfo(adminM)] teleported to [targetM].")
 						if("XYZTeleport")
 							var/mob/targetM = hsrc
-							var/x = input("x", "[targetM]") as num|null
+							var/x = Ask(usr, "x", "[targetM]", null, "num", null, 1)
 							if(isnull(x)) return
-							var/y = input("y", "[targetM]") as num|null
+							var/y = Ask(usr, "y", "[targetM]", null, "num", null, 1)
 							if(isnull(y)) return
-							var/z = input("z", "[targetM]") as num|null
+							var/z = Ask(usr, "z", "[targetM]", null, "num", null, 1)
 							if(isnull(z)) return
 							targetM.PrevX = targetM.x
 							targetM.PrevY = targetM.y
@@ -250,7 +250,7 @@ client/Topic(href,href_list[],hsrc)
 						if("Log")
 							usr:PlayerLog(hsrc)
 						if("Assess")
-							usr<<browse(hsrc:GetAssess(),"window=Assess;size=275x650")
+							hsrc:ShowAssess(usr)
 						if("Boot")
 							usr:Delete(hsrc)
 						if("KO")
@@ -266,13 +266,7 @@ client/Topic(href,href_list[],hsrc)
 							MoveToSpawn(targetM)
 							Log("Admin", "[ExtractInfo(usr)] sent [ExtractInfo(targetM)] to spawn.")
 				else
-					var/View={"<html><head><title>Player Control [hsrc:key]</title><body>
-					<font size=3><font color=red>[hsrc:name]<hr><font size=2><font color=black>"}
-					View+={"
-
-					\[ <a href=?src=\ref[hsrc];action=MasterControl;do=Adminize>Promote/Demote</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Mute>Mute</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=PM>Admin PM</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Observe>Observe</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=SendToSpawn>Send to Spawn</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Assess>Assess | <a href=?src=\ref[hsrc];action=MasterControl;do=Give>Give</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Kill>Kill</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=KO>Knockout</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Heal>Heal<a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Revive>Revive</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Log>Check Log</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Edit>Edit</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Summon>Summon</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Teleport>Teleport to</a href>  | <a href=?src=\ref[hsrc];action=MasterControl;do=XYZTeleport>XYZ Teleport</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Boot>Boot</a href> | <a href=?src=\ref[hsrc];action=MasterControl;do=Ban>Ban</a href> \]
-					"}
-					src<<browse(View,"window=Person;size=500x135")
+					ShowPlayerControls(hsrc)
 	..()
 
 

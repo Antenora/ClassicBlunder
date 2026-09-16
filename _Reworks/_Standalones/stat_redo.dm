@@ -83,7 +83,9 @@ mob/proc/stat_retwo()
 	src.passive_handler = null
 	race_selecting = FALSE
 
-mob/Admin3/verb/Assign_Stat_Redo(mob/m in players)
+mob/Admin3/verb/Assign_Stat_Redo()
+	var/mob/m = PromptArg(usr, args, 1, "Assign Stat Redo", "players")
+	if(isnull(m)) return
 	if(!m) return
 	if(!src.Alert("Are you sure you want to assign a stat redo?")) return
 	m << "You've been assigned a stat redo!"

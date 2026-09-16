@@ -191,6 +191,7 @@ proc/GfxResizeScreenOverlays(client/C, pixel_width = 0, pixel_height = 0)
 	if(!C) return
 	if(pixel_width <= 0 || pixel_height <= 0)
 		var/list/parts = splittext(winget(C, "mapwindow.map", "size"), "x")
+		if(!C) return
 		if(parts.len >= 2)
 			pixel_width = text2num(parts[1])
 			pixel_height = text2num(parts[2])
@@ -506,11 +507,11 @@ client/proc/InitializeGraphics()
 	set name = "Graphics Settings"
 	set hidden = 1
 	if(!client || !client.prefs) return
-	var/choice = input(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings") in list(
-		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close")
+	var/choice = Ask(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings", null, "pick", list(
+		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close"), 0)
 	switch(choice)
 		if("Quality Preset")
-			var/q = input(src, "Higher presets enable more particles, soft shadows, bloom, distortion, and reflections.", "Graphics Quality", client.prefs.graphicsQuality) in list("Low", "Medium", "High", "Ultra", "Cancel")
+			var/q = Ask(src, "Higher presets enable more particles, soft shadows, bloom, distortion, and reflections.", "Graphics Quality", client.prefs.graphicsQuality, "pick", list("Low", "Medium", "High", "Ultra", "Cancel"), 0)
 			if(q != "Cancel") client.prefs.graphicsQuality = q
 		if("Reduced Motion") client.prefs.reducedMotion = !client.prefs.reducedMotion
 		if("Reduced Flashes") client.prefs.reducedFlashes = !client.prefs.reducedFlashes

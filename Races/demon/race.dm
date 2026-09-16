@@ -31,7 +31,7 @@ race
 				del T
 			user.EnhancedSmell = 1
 			user.EnhancedHearing = 1
-			user.TrueName=input(user, "As a demon, you have a True Name. It should be kept secret. What is your True Name?", "Get True Name") as text
+			user.TrueName=Ask(user, "As a demon, you have a True Name. It should be kept secret. What is your True Name?", "Get True Name", null, "text", null, 0)
 			user << "The name by which you can be conjured is <b>[user.TrueName]</b>."
 			user << "Please set macros for (Dark Magic), (Hell Fire) and (Corruption), your 3 demon magics."
 			glob.trueNames.Add(user.TrueName)

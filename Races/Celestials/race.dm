@@ -25,7 +25,7 @@ race
 		onFinalization(mob/user)
 			var/Choice
 			..()
-			Choice=input(user, "Have you gained the powers of Angels (Master of Arms) or Demons (Demon Magic)?", "Celestial Type") in list("Angel", "Demon")
+			Choice=Ask(user, "Have you gained the powers of Angels (Master of Arms) or Demons (Demon Magic)?", "Celestial Type", null, "pick", list("Angel", "Demon"), 0)
 			user.CelestialAscension = Choice
 			GiveRacial(user)
 		proc/GiveRacial(mob/p)
@@ -37,7 +37,7 @@ race
 				if("Demon")
 					transformations += new/transformation/celestial/Celestial_Devil_Trigger
 					transformations += new/transformation/celestial/Celestial_Sin_Devil_Trigger
-					p.TrueName=input(p, "What is the name of the Demon within?", "Get True Name") as text
+					p.TrueName=Ask(p, "What is the name of the Demon within?", "Get True Name", null, "text", null, 0)
 					p.passive_handler.Set("Innovation", 1)
 					p.passive_handler.Set("MartialMagic", 1)
 					p.passive_handler.Set("BladeFisting", 1)

@@ -1,18 +1,18 @@
 /mob/Admin3/verb/changeStrikeFormula()
 	if(!src.Alert("Live-tune the strike formula?")) return
-	switch(input(src, "What one?") in list("Strike K", "Strike Scale", "DMG Power", "Atk Base", "HP per Vit", "HP Stat Base"))
+	switch(Ask(src, "What one?", "", null, "pick", list("Strike K", "Strike Scale", "DMG Power", "Atk Base", "HP per Vit", "HP Stat Base"), 0))
 		if("Strike K")
-			glob.STRIKE_MITIGATION_K = input(src, "What value?") as num
+			glob.STRIKE_MITIGATION_K = Ask(src, "What value?", "", null, "num", null, 0)
 		if("Strike Scale")
-			glob.STRIKE_DAMAGE_SCALE = input(src, "What value?") as num
+			glob.STRIKE_DAMAGE_SCALE = Ask(src, "What value?", "", null, "num", null, 0)
 		if("DMG Power")
-			glob.DMG_POWER_EXPONENT = input(src, "What value?") as num
+			glob.DMG_POWER_EXPONENT = Ask(src, "What value?", "", null, "num", null, 0)
 		if("Atk Base")
-			glob.STRIKE_ATK_BASE = input(src, "What value?") as num
+			glob.STRIKE_ATK_BASE = Ask(src, "What value?", "", null, "num", null, 0)
 		if("HP per Vit")
-			glob.HP_PER_VIT = input(src, "What value?") as num
+			glob.HP_PER_VIT = Ask(src, "What value?", "", null, "num", null, 0)
 		if("HP Stat Base")
-			glob.HP_STAT_BASE = input(src, "What value?") as num
+			glob.HP_STAT_BASE = Ask(src, "What value?", "", null, "num", null, 0)
 
 /mob/proc/getStatDmg2(damage, unarmed, sword, sunlight, spirithand, autohit = FALSE)
 	// ABILITY and DAMAGE roll should be first

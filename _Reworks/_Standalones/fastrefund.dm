@@ -1,5 +1,7 @@
 // this is anything but fast
-/mob/Admin3/verb/Respec(mob/P in players)
+/mob/Admin3/verb/Respec()
+    var/mob/P = PromptArg(usr, args, 1, "Respec", "players")
+    if(isnull(P)) return
     if(!src.Alert("Are you sure you want to respec a player?")) return
     for(var/obj/Skills/Choice in P)
         if(Choice.Copyable)

@@ -34,32 +34,32 @@ mob/proc/
 			if(4)
 				Choices+=LV4
 		while(confirm!="Yes")
-			choice=input(src, "What skill do you want?", "Martial Keyblade Skill") in Choices
+			choice=Ask(src, "What skill do you want?", "Martial Keyblade Skill", null, "pick", Choices, 0)
 			switch(choice)
 				if("Sonic Blade")
-					confirm=alert(src, "Quickly dash towards your opponent three times.", "Choice","Yes", "No")
+					confirm=Ask(src, "Quickly dash towards your opponent three times.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Strike Raid")
-					confirm=alert(src, "Throw your Keyblade at your opponent in the form of an autohit wave.", "Choice","Yes", "No")
+					confirm=Ask(src, "Throw your Keyblade at your opponent in the form of an autohit wave.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Magnet Burst")
-					confirm=alert(src, "A weak Area-Of-Effect move that pulls in everyone nearby and stuns.", "Choice","Yes", "No")
+					confirm=Ask(src, "A weak Area-Of-Effect move that pulls in everyone nearby and stuns.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Ripple Drive")
-					confirm=alert(src, "Release a powerful wave of energy with a strong knockback.", "Choice","Yes", "No")
+					confirm=Ask(src, "Release a powerful wave of energy with a strong knockback.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Stun Impact")
-					confirm=alert(src, "Queues up a stunning attack.", "Choice", "Yes", "No")
+					confirm=Ask(src, "Queues up a stunning attack.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Explosion")
-					confirm=alert(src, "Queue up a weak hit that follows up with a powerful explosive one.", "Choice","Yes", "No")
+					confirm=Ask(src, "Queue up a weak hit that follows up with a powerful explosive one.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Fire Surge")
-					confirm=alert(src, "Dash forward surrounded by flames, burning everything in your path.", "Choice","Yes", "No")
+					confirm=Ask(src, "Dash forward surrounded by flames, burning everything in your path.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Thunder Surge")
-					confirm=alert(src, "Dash forward surrounded by lightning, shocking everything in your path.", "Choice","Yes", "No")
+					confirm=Ask(src, "Dash forward surrounded by lightning, shocking everything in your path.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Ars Arcanum")
-					confirm=alert(src, "Queues a multi-hit combo finisher.", "Choice","Yes", "No")
+					confirm=Ask(src, "Queues a multi-hit combo finisher.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Ragnarok")
-					confirm=alert(src, "Unleash a flurry of strikes that ends in a magical blast.", "Choice","Yes", "No")
+					confirm=Ask(src, "Unleash a flurry of strikes that ends in a magical blast.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Salvation")
-					confirm=alert(src, "A bright flash of light that damages foes and heals the caster.", "Choice","Yes", "No")
+					confirm=Ask(src, "A bright flash of light that damages foes and heals the caster.", "Choice", null, "confirm", null, 1, "Yes", "No")
 				if("Raging Storm")
-					confirm=alert(src, "Spin in place, surrounding yourself with a storm of strikes.", "Choice","Yes", "No")
+					confirm=Ask(src, "Spin in place, surrounding yourself with a storm of strikes.", "Choice", null, "confirm", null, 1, "Yes", "No")
 			switch(choice)
 				if("Sonic Blade")
 					if(!locate(/obj/Skills/AutoHit/Sonic_Blade, src))
@@ -140,7 +140,7 @@ mob/proc/
 		while(keybladedecision!="Yes")
 			for(var/o in src.Keychains)
 				Options.Remove(o)
-			Choice=input(usr, "You've gained the ability to change your keychain.  Which one do you choose?", "Keychain Ascension") in Options
+			Choice=Ask(usr, "You've gained the ability to change your keychain.  Which one do you choose?", "Keychain Ascension", null, "pick", Options, 0)
 			var/list/KBPassives=GetKeybladePassives(Choice,src.SagaLevel)
 			src<<"<b>Note, some of these passives may scale based on your SagaLevel. Most of the ones that would have scaling effects do.</b>"
 			var/description= "Passives:"
@@ -148,7 +148,7 @@ mob/proc/
 				for(var/i in KBPassives)
 					description += "[i] - [KBPassives[i]]\n"
 			src<<"<b>Passives:</b>[description]"
-			keybladedecision=alert(src, "Is [Choice] the keychain you want?", "Choice","Yes", "No")
+			keybladedecision=Ask(src, "Is [Choice] the keychain you want?", "Choice", null, "confirm", null, 1, "Yes", "No")
 		src.Keychains.Add(Choice)
 		if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Attach_Keychain, src))
 			src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Attach_Keychain)
@@ -693,7 +693,7 @@ proc/
 	var/list/Options=glob.Keychains
 	for(var/o in src.Keychains)
 		Options.Remove(o)
-	var/Choice=input(usr, "What keychain do you want?", "Heart Share") in Options
+	var/Choice=Ask(usr, "What keychain do you want?", "Heart Share", null, "pick", Options, 0)
 	if(Choice=="Cancel")
 		return
 	src.Keychains.Add(Choice)

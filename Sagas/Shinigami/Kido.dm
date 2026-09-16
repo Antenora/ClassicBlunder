@@ -175,7 +175,7 @@ proc/getKidoPicksRemaining(mob/User)
 			KidoSelecting = FALSE
 			return
 
-		var/choice = input(User, "Select a Hadō spell to learn. (Tier [tierCap] cap)", "Learn Hadō") as null|anything in options
+		var/choice = Ask(User, "Select a Hadō spell to learn. (Tier [tierCap] cap)", "Learn Hadō", null, "pick", options, 1)
 		if(!choice)
 			KidoSelecting = FALSE
 			return
@@ -237,7 +237,7 @@ proc/getKidoPicksRemaining(mob/User)
 			KidoSelecting = FALSE
 			return
 
-		var/choice = input(User, "Select a Bakudō spell to learn. (Tier [tierCap] cap)", "Learn Bakudō") as null|anything in options
+		var/choice = Ask(User, "Select a Bakudō spell to learn. (Tier [tierCap] cap)", "Learn Bakudō", null, "pick", options, 1)
 		if(!choice)
 			KidoSelecting = FALSE
 			return
@@ -299,7 +299,7 @@ proc/getKidoPicksRemaining(mob/User)
 			KidoSelecting = FALSE
 			return
 
-		var/choice = input(User, "Select a Hohō skill to learn. (Tier [tierCap] cap)", "Learn Hohō") as null|anything in options
+		var/choice = Ask(User, "Select a Hohō skill to learn. (Tier [tierCap] cap)", "Learn Hohō", null, "pick", options, 1)
 		if(!choice)
 			KidoSelecting = FALSE
 			return

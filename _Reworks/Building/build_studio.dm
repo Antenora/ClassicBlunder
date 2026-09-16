@@ -140,15 +140,18 @@ mob/Mapper/verb/Leave_Studio()
 mob/Admin3/verb/Free_Studio()
 	set category = "Mapper"
 	spawn
-		var/ck = usr.HUDTextPrompt("Free whose studio? (ckey)", "")
-		if(isnull(ck) || !length(ck))
-			return
-		ck = ckey(ck)
 		BuildStudioLoad()
+		var/list/menu = list()
+		for(var/k in studioAssign)
+			menu["[k] (z[studioAssign[k]])"] = k
+		if(!menu.len)
+			usr << "No studios are assigned."
+			return
+		var/pick = Ask(usr, "Free whose studio?", "Free Studio", null, "pick", menu, 1)
+		if(isnull(pick))
+			return
+		var/ck = menu[pick]
 		if(!studioAssign[ck])
-			usr << "No studio assigned to [ck]. Assigned: [studioAssign.len]."
-			for(var/k in studioAssign)
-				usr << "  [k] -> z[studioAssign[k]]"
 			return
 		var/z = studioAssign[ck]
 		studioAssign -= ck

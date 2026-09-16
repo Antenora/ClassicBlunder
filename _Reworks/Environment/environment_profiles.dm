@@ -245,6 +245,7 @@ proc/GfxConfigureAtmosphere(client/C, datum/environment_profile/P, area/A, trans
 proc/EnvUpdateClient(client/C, immediate = FALSE)
 	if(!C || !C.mob) return
 	GfxEnsureClient(C)
+	if(!C || !C.mob) return
 	var/turf/T = get_turf(C.mob)
 	var/area/A = T ? T.loc : null
 	var/datum/environment_profile/P = EnvProfileForClient(C, A)
@@ -330,7 +331,7 @@ proc/_EnvProfileLoop()
 	for(var/id in _env_profiles)
 		var/datum/environment_profile/EP = _env_profiles[id]
 		options["[EP.display_name] ([id])"] = id
-	var/choice = input(src, "Assign a profile to AREA [A.name] ([A.type]). Session-only until pinned in code.", "Area Environment") as null|anything in options
+	var/choice = Ask(src, "Assign a profile to AREA [A.name] ([A.type]). Session-only until pinned in code.", "Area Environment", null, "pick", options, 1)
 	if(!choice) return
 	if(istype(A, /area/MapperZone))
 		var/area/MapperZone/MZ = A
@@ -366,7 +367,7 @@ proc/_EnvProfileLoop()
 	for(var/id in _env_profiles)
 		var/datum/environment_profile/P = _env_profiles[id]
 		options["[P.display_name] ([id])"] = id
-	var/choice = input(src, "Preview a generic profile for your client only. This does not assign or alter the current area.", "Environment Preview") in options + "Cancel"
+	var/choice = Ask(src, "Preview a generic profile for your client only. This does not assign or alter the current area.", "Environment Preview", null, "pick", (options + "Cancel"), 0)
 	if(choice == "Cancel") return
 	client.gfx_env_preview_id = choice == "Map Default" ? null : options[choice]
 	client.gfx_env_profile_id = null
@@ -392,23 +393,23 @@ proc/EnvWindReport(area/A)
 	var/area/A = T ? T.loc : null
 	var/list/opts = list("Global scale", "Sway amplitude", "Manual wind (override)",
 	                     "Clear override (back to auto)", "Weather multipliers", "Show current wind")
-	var/pick = input(src, "Wind here: [EnvWindReport(A)]") as null|anything in opts
+	var/pick = Ask(src, "Wind here: [EnvWindReport(A)]", "", null, "pick", opts, 1)
 	if(!pick) return
 	switch(pick)
 		if("Global scale")
-			var/s = input(src, "Global wind scale (1 = normal, 0 = still, 3 = gale)?") as num|null
+			var/s = Ask(src, "Global wind scale (1 = normal, 0 = still, 3 = gale)?", "", null, "num", null, 1)
 			if(s == null) return
 			glob.WIND_SCALE = clamp(s, 0, 10)
 			src << "Global wind scale -> [glob.WIND_SCALE]."
 		if("Sway amplitude")
-			var/amp = input(src, "Max foliage sway in degrees (current [glob.WIND_AMPLITUDE]; 0 = still, 9 = default, 25 = wild)?") as num|null
+			var/amp = Ask(src, "Max foliage sway in degrees (current [glob.WIND_AMPLITUDE]; 0 = still, 9 = default, 25 = wild)?", "", null, "num", null, 1)
 			if(amp == null) return
 			glob.WIND_AMPLITUDE = clamp(amp, 0, 45)
 			src << "Sway amplitude -> [glob.WIND_AMPLITUDE] degrees."
 		if("Manual wind (override)")
-			var/mag = input(src, "Wind strength (0-10; profile values are ~0.5-3)?") as num|null
+			var/mag = Ask(src, "Wind strength (0-10; profile values are ~0.5-3)?", "", null, "num", null, 1)
 			if(mag == null) return
-			var/dir = input(src, "Direction in degrees (0 = east, 90 = north)?") as num|null
+			var/dir = Ask(src, "Direction in degrees (0 = east, 90 = north)?", "", null, "num", null, 1)
 			if(dir == null) return
 			mag = clamp(mag, 0, 10)
 			glob.WIND_MAN_X = mag * cos(dir)
@@ -419,11 +420,11 @@ proc/EnvWindReport(area/A)
 			glob.WIND_OVERRIDE = 0
 			src << "Manual wind OFF - profile + weather again: [EnvWindReport(A)]."
 		if("Weather multipliers")
-			var/k = input(src, "Which weather?") as null|anything in list("storm", "blizzard", "dust", "rain/snow")
+			var/k = Ask(src, "Which weather?", "", null, "pick", list("storm", "blizzard", "dust", "rain/snow"), 1)
 			if(!k) return
 			var/cur = k == "storm" ? glob.WIND_WX_STORM : k == "blizzard" ? glob.WIND_WX_BLIZZARD : \
 			          k == "dust" ? glob.WIND_WX_DUST : glob.WIND_WX_PRECIP
-			var/v = input(src, "[k] wind multiplier (current [cur])?") as num|null
+			var/v = Ask(src, "[k] wind multiplier (current [cur])?", "", null, "num", null, 1)
 			if(v == null) return
 			v = clamp(v, 0, 10)
 			switch(k)

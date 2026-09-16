@@ -41,7 +41,7 @@
                 src << "You can slay even inhuman foes!"
                 src << "You have refined your finishing technique into: <b>True Flash Strike!</b>"
                 src << "The next time you turn your Hiten Mitsurugi Style on, the finisher will be enhanced."
-                var/Choice=alert(src, "Hiten Mitsurugi can follow the path of tradition, embracing the code of a hermit and honorable warrior or can truly become an ultimate tool of murder. What is the mantle you will bear?", "Hiten Path", "Tradition", "Slaughter")
+                var/Choice=Ask(src, "Hiten Mitsurugi can follow the path of tradition, embracing the code of a hermit and honorable warrior or can truly become an ultimate tool of murder. What is the mantle you will bear?", "Hiten Path", null, "confirm", null, 1, "Tradition", "Slaughter")
                 if(Choice=="Tradition")
                     src<<"You embrace the path of tradition, sharpening your art and making it a constant presence in your life!"
                     findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Dance_Of_The_Full_Moon);

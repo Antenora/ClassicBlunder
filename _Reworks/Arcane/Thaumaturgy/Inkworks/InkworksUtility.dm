@@ -1,14 +1,16 @@
 
-verb/Bestow_Inkwork(mob/P)
+verb/Bestow_Inkwork()
     set category = "Utility"
     set hidden = 1
+    var/mob/P = PromptArg(usr, args, 1, "Bestow Inkwork", "view::mob")
+    if(isnull(P)) return
     if (P.Using == 1) // Guard Rails to prevent people spamming this verb (looks @ jumpy)
         return
     else (P.Using = 1)
     var/list/Options = list("Cancel") // List of Players we can use this on
     for(var/mob/Players/M in view(1, usr))
         Options.Add(M)
-    var/mob/Choice = input(usr, "Choose a Player", "Bestow Inkwork") in Options // The Menu that chooses the player
+    var/mob/Choice = Ask(usr, "Choose a Player", "Bestow Inkwork", null, "pick", Options, 0) // The Menu that chooses the player
     if(Choice == "Cancel")
         P.Using = 0 // If you're not doing anything, set this back to 0
         return
@@ -25,7 +27,7 @@ verb/Bestow_Inkwork(mob/P)
             usr << "This Vessel's Mechanical Augments are incompatible with magic."
             P.Using = 0
             return
-        var/inkchoice = input(usr, "Choose an Inkwork to Bestow on [Choice]", "Bestow Inkwork") in usr.InkworksTypes
+        var/inkchoice = Ask(usr, "Choose an Inkwork to Bestow on [Choice]", "Bestow Inkwork", null, "pick", usr.InkworksTypes, 0)
         InkworksIfWall(inkchoice, Choice)
         P.Using = 0
 

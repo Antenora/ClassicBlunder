@@ -1,11 +1,11 @@
 /mob/Admin3/verb/Give_Sin()
     set category = "Admin"
     if(!src.Alert("Are you sure you want to give a Demon a Sin?")) return
-    var/mob/P = input(src, "Give sin to who?") in players
+    var/mob/P = Ask(src, "Give sin to who?", "", null, "pick", players, 0)
     if(!P.isRace(/race/demon))
         src << "<font color=red>[P] is not a Demon.</font>"
         return
-    var/sinToGive = input(src, "What sin to give?") in list("Gluttony", "Greed", "Lust", "Pride", "Sloth", "Wrath", "Envy")
+    var/sinToGive = Ask(src, "What sin to give?", "", null, "pick", list("Gluttony", "Greed", "Lust", "Pride", "Sloth", "Wrath", "Envy"), 0)
     switch(sinToGive)
         if("Gluttony")
             P.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Sin/Gluttony)

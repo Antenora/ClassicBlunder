@@ -4,7 +4,7 @@
 var/list/redactedwords = list()
 
 /mob/Admin4/verb/RedactWord()
-    var/word = input("Word to redact: ") as text
+    var/word = Ask(usr, "Word to redact: ", "", null, "text", null, 0)
     if(!length(redactedwords) < 1)
         redactedwords = list()
     if(word in redactedwords)

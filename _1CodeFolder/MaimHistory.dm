@@ -64,7 +64,7 @@
 		set category = "Roleplay"
 		set hidden = 1
 		set name = "Maim History"
-		usr << browse(usr.maimHistoryHtml(), "window=MaimHistory;size=620x520")
+		usr.client?.DocShow("maim:\ref[usr]", "MAIMS", "Maim History", usr.maimHistoryHtml(), "safe", "", 620, 520)
 
 	Annotate_Maim()
 		set category = "Roleplay"
@@ -80,7 +80,7 @@
 				continue
 			labels += "[i]: [e["when"]] - [e["type"]] (by [e["by"]])"
 		labels += "Cancel"
-		var/picked = input(usr, "Pick a maim entry to annotate:", "Annotate Maim") in labels
+		var/picked = Ask(usr, "Pick a maim entry to annotate:", "Annotate Maim", null, "pick", labels, 0)
 		if(!picked || picked == "Cancel")
 			return
 		var/colon = findtext(picked, ":")
@@ -92,16 +92,18 @@
 		var/list/entry = MaimHistory[idx]
 		if(!istype(entry))
 			return
-		var/note = input(usr, "Brief IC description for this maim. Keep it short — what happened in-character.", "Annotate Maim", entry["desc"]) as message|null
+		var/note = Ask(usr, "Brief IC description for this maim. Keep it short — what happened in-character.", "Annotate Maim", entry["desc"], "message", null, 1)
 		if(isnull(note))
 			return
 		entry["desc"] = "[note]"
 		usr << "Annotation saved."
 
 /mob/Admin1/verb
-	View_Player_Maim_History(mob/Players/p in players)
+	View_Player_Maim_History()
 		set category = "Admin"
 		set name = "View Maim History"
+		var/mob/Players/p = PromptArg(usr, args, 1, "View Maim History", "players")
+		if(isnull(p)) return
 		if(!p)
 			return
-		usr << browse(p.maimHistoryHtml(), "window=MaimHistory_[p.key];size=620x520")
+		usr.client?.DocShow("maim:\ref[p]", "MAIMS", "[p.key]", p.maimHistoryHtml(), "safe", "", 620, 520)

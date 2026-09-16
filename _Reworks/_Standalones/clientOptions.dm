@@ -52,6 +52,14 @@ Options/
     var/arPanY = 0
     var/acPanX = 0
     var/acPanY = 0
+    var/npPanX = 0
+    var/npPanY = 0
+    var/npMsgW = 0
+    var/npMsgH = 0
+    var/npRecentColors = ""
+    var/shPanX = 0
+    var/shPanY = 0
+    var/shSizes = ""
     var/arChapter = "Spells"
     var/chatGeom = null
     var/chatLock = 0
@@ -80,7 +88,7 @@ Options/
     var/logLock = 0
     var/logFold = 0
     var/list/disableInnovate = list()
-    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode", "faceGeom", "chatFonts", "logGeom", "logLock", "logFold", "autoEdge", "blendEdges", "cliffStyle")
+    var/list/savableVars = list("oldZanzo","soundOn","zoom2x","graphicsQuality","reducedMotion","reducedFlashes","foregroundFade","reflections","lightShafts","farBlur","vignette","experimentalCamera","cmPanX","cmPanY","optPanX","optPanY","invPanX","invPanY","skPanX","skPanY","ppPanX","ppPanY","ttPanX","ttPanY","descPanX","descPanY","aqPanX","aqPanY","lsPanX","lsPanY","stPanX","stPanY","arPanX","arPanY","acPanX","acPanY","arChapter","seePronouns", "usePronouns", "useSupporter", "useDonator", "disableLoginAlert", "currentFontFamily", "currentFontSize", "ShowOOC", "LOOCinIC", "AllTabOOC", "LOOCinAll", "AdminAlerts", "CombatMessagesInIC", "disableInnovate", "chatGeom", "chatLock", "chatFold", "adminGeom", "adminLock", "adminFold", "adminTab", "adminFavs", "adminRecent", "rpGeom", "rpLock", "rpFold", "rpMode", "rpKeep", "rpThird", "rpSlot", "rpColors", "rpDrafts", "rpHistory", "rpSnippets", "displayMode", "faceGeom", "chatFonts", "logGeom", "logLock", "logFold", "autoEdge", "blendEdges", "cliffStyle", "npPanX", "npPanY", "npMsgW", "npMsgH", "npRecentColors", "shPanX", "shPanY", "shSizes")
     proc/savePrefs(ckey)
         . = list()
         for(var/opt in savableVars - autoAttacking)
@@ -116,10 +124,14 @@ Options/
         setPref(pref, !getPref(pref))
 
 /client/proc/setPref(pref, value)
+    if(!prefs || !("[pref]" in prefs.vars))
+        return
     prefs.vars["[pref]"] = value
     prefs.savePrefs(mob.ckey)
 
 /client/proc/getPref(pref)
+    if(!prefs || !("[pref]" in prefs.vars))
+        return null
     return prefs.vars["[pref]"]
 
 /client/proc/ApplyAudioPref()

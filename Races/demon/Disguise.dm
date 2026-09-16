@@ -43,7 +43,7 @@
 		if(identities.len >= 5)
 			usr << "You can only maintain up to 5 disguise identities. Delete one first."
 			return
-		var/new_name = input(usr, "What name will this identity go by?", "Create Identity") as text|null
+		var/new_name = Ask(usr, "What name will this identity go by?", "Create Identity", null, "text", null, 1)
 		if(!new_name) return
 		for(var/datum/demon_identity/existing in identities)
 			if(existing.identity_name == new_name)
@@ -53,14 +53,14 @@
 		id.identity_name = new_name
 		id.identity_icon = input(usr, "What icon will this identity use? (Cancel for no icon change)", "Create Identity") as icon|null
 		if(id.identity_icon)
-			id.identity_icon_x = input(usr, "Pixel X offset.", "Create Identity") as num
-			id.identity_icon_y = input(usr, "Pixel Y offset.", "Create Identity") as num
-		id.identity_profile = input(usr, "Write a profile description for this identity. (Cancel for none)", "Create Identity") as message|null
-		id.identity_text_color = input(usr, "Pick a text color for this identity. (Cancel for default)", "Create Identity") as color|null
-		var/pick_scent = input(usr, "Choose a scent for this identity?", "Create Identity") in list("Yes", "No")
+			id.identity_icon_x = Ask(usr, "Pixel X offset.", "Create Identity", null, "num", null, 0)
+			id.identity_icon_y = Ask(usr, "Pixel Y offset.", "Create Identity", null, "num", null, 0)
+		id.identity_profile = Ask(usr, "Write a profile description for this identity. (Cancel for none)", "Create Identity", null, "message", null, 1)
+		id.identity_text_color = Ask(usr, "Pick a text color for this identity. (Cancel for default)", "Create Identity", null, "color", null, 1)
+		var/pick_scent = Ask(usr, "Choose a scent for this identity?", "Create Identity", null, "pick", list("Yes", "No"), 0)
 		if(pick_scent == "Yes")
-			var/category = input(usr, "What scent category?") in scents
-			id.identity_scent = input(usr, "What scent?") in scents[category]
+			var/category = Ask(usr, "What scent category?", "", null, "pick", scents, 0)
+			id.identity_scent = Ask(usr, "What scent?", "", null, "pick", scents[category], 0)
 		identities += id
 		active_identity = id
 		usr << "Identity <b>[new_name]</b> created and selected."
@@ -79,7 +79,7 @@
 		var/list/names = list()
 		for(var/datum/demon_identity/id in identities)
 			names += id.identity_name
-		var/choice = input(usr, "Which identity do you want to use?", "Select Identity") in names + list("Cancel")
+		var/choice = Ask(usr, "Which identity do you want to use?", "Select Identity", null, "pick", (names + list("Cancel")), 0)
 		if(choice == "Cancel") return
 		for(var/datum/demon_identity/id in identities)
 			if(id.identity_name == choice)
@@ -98,7 +98,7 @@
 		var/list/names = list()
 		for(var/datum/demon_identity/id in identities)
 			names += id.identity_name
-		var/choice = input(usr, "Which identity do you want to delete?", "Delete Identity") in names + list("Cancel")
+		var/choice = Ask(usr, "Which identity do you want to delete?", "Delete Identity", null, "pick", (names + list("Cancel")), 0)
 		if(choice == "Cancel") return
 		for(var/datum/demon_identity/id in identities)
 			if(id.identity_name == choice)
@@ -201,7 +201,7 @@
 		if(egos.len >= 1)
 			usr << "You can only maintain up to one ego. Delete one first."
 			return
-		var/new_name = input(usr, "What name will this ego go by?", "Create Ego") as text|null
+		var/new_name = Ask(usr, "What name will this ego go by?", "Create Ego", null, "text", null, 1)
 		if(!new_name) return
 		for(var/datum/demon_ego/existing in egos)
 			if(existing.ego_name == new_name)
@@ -211,15 +211,15 @@
 		id.ego_name = new_name
 		id.ego_icon = input(usr, "What icon will this ego use? (Cancel for no icon change)", "Create Ego") as icon|null
 		if(id.ego_icon)
-			id.ego_icon_x = input(usr, "Pixel X offset.", "Create Ego") as num
-			id.ego_icon_y = input(usr, "Pixel Y offset.", "Create Ego") as num
-		id.ego_profile = input(usr, "Write a profile description for this ego. (Cancel for none)", "Create Ego") as message|null
-		id.ego_text_color = input(usr, "Pick a text color for this ego. (Cancel for default)", "Create Ego") as color|null
-		var/pick_scent = input(usr, "Choose a scent for this ego?", "Create Ego") in list("Yes", "No")
+			id.ego_icon_x = Ask(usr, "Pixel X offset.", "Create Ego", null, "num", null, 0)
+			id.ego_icon_y = Ask(usr, "Pixel Y offset.", "Create Ego", null, "num", null, 0)
+		id.ego_profile = Ask(usr, "Write a profile description for this ego. (Cancel for none)", "Create Ego", null, "message", null, 1)
+		id.ego_text_color = Ask(usr, "Pick a text color for this ego. (Cancel for default)", "Create Ego", null, "color", null, 1)
+		var/pick_scent = Ask(usr, "Choose a scent for this ego?", "Create Ego", null, "pick", list("Yes", "No"), 0)
 		if(pick_scent == "Yes")
-			var/category = input(usr, "What scent category?") in scents
-			id.ego_scent = input(usr, "What scent?") in scents[category]
-		id.ego_circle = input(usr, "What Origin will this ego go by?", "Create Ego") as text|null
+			var/category = Ask(usr, "What scent category?", "", null, "pick", scents, 0)
+			id.ego_scent = Ask(usr, "What scent?", "", null, "pick", scents[category], 0)
+		id.ego_circle = Ask(usr, "What Origin will this ego go by?", "Create Ego", null, "text", null, 1)
 		egos += id
 		active_ego = id
 		usr << "Ego <b>[new_name]</b> created and selected."
@@ -238,7 +238,7 @@
 		var/list/names = list()
 		for(var/datum/demon_ego/id in egos)
 			names += id.ego_name
-		var/choice = input(usr, "Which ego do you want to use?", "Select Ego") in names + list("Cancel")
+		var/choice = Ask(usr, "Which ego do you want to use?", "Select Ego", null, "pick", (names + list("Cancel")), 0)
 		if(choice == "Cancel") return
 		for(var/datum/demon_ego/id in egos)
 			if(id.ego_name == choice)
@@ -257,7 +257,7 @@
 		var/list/names = list()
 		for(var/datum/demon_ego/id in egos)
 			names += id.ego_name
-		var/choice = input(usr, "Which ego do you want to delete?", "Delete Ego") in names + list("Cancel")
+		var/choice = Ask(usr, "Which ego do you want to delete?", "Delete Ego", null, "pick", (names + list("Cancel")), 0)
 		if(choice == "Cancel") return
 		for(var/datum/demon_ego/id in egos)
 			if(id.ego_name == choice)

@@ -29,7 +29,7 @@ obj
 						if(usr.Saga != "Kamui")
 							usr << "You don't know how to modify the scissor blade!"
 							return
-						Class = input("What class would you like to set the Scissor Blade to?") in list("Light", "Medium", "Heavy")
+						Class = Ask(usr, "What class would you like to set the Scissor Blade to?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
 						setStatLine()
 
 					verb/Set_Alternate_Sword_Class()
@@ -39,10 +39,10 @@ obj
 						if(usr.Saga != "Kamui" || !usr.Saga)
 							usr << "You don't know how to modify the scissor blade!"
 							return
-						ClassAlt = input("What class would you like to set the Scissor Blade to?") in list("Light", "Medium", "Heavy")
+						ClassAlt = Ask(usr, "What class would you like to set the Scissor Blade to?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
 
 					verb/Restyle_Scissor_Blade_Case()
-						var/caseType = input("What type of Case would you like?") in list("Slanted", "Straight")
+						var/caseType = Ask(usr, "What type of Case would you like?", "", null, "pick", list("Slanted", "Straight"), 0)
 						if(caseType == "Slanted")
 							UnderlayIcon = 'scissorcasetilted_under.dmi'
 							icon = 'scissorcasetilted.dmi'

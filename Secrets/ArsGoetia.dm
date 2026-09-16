@@ -15,12 +15,12 @@
 			usr<<"You already own this and have no need to claim it."
 			return
 		if(!src.OwnerPassword)
-			var/Confirm=alert(usr, "You can choose to sell your soul to the Ars Goetia in exchange for incredible demonic magic, as well as a demonic True Name that will function as a password. However, should anyone else claim ownership over it, you will die, and if it's stolen from you, they will be know your true name. Do you wish to sign this pact? This is not required to summon or revive Demons.", "Claim Ownership", "Yes", "No")
+			var/Confirm=Ask(usr, "You can choose to sell your soul to the Ars Goetia in exchange for incredible demonic magic, as well as a demonic True Name that will function as a password. However, should anyone else claim ownership over it, you will die, and if it's stolen from you, they will be know your true name. Do you wish to sign this pact? This is not required to summon or revive Demons.", "Claim Ownership", null, "confirm", null, 1, "Yes", "No")
 			if(Confirm=="Yes")
 				if(usr.isRace(DEMON)||usr.isRace(ELDRITCH))
 					usr<<"Races native to the Depths cannot utilize or claim ownership over the Ars Goetia."
 					return
-				usr.TrueName=input(usr, "As the owner of the Ars Goetia, you have a True Name that functions as the password to open the book. It should be kept secret. What is your True Name?", "Get True Name") as text
+				usr.TrueName=Ask(usr, "As the owner of the Ars Goetia, you have a True Name that functions as the password to open the book. It should be kept secret. What is your True Name?", "Get True Name", null, "text", null, 0)
 				src.GoetiaOwner=usr.TrueName
 				usr.ArsGoetiaOwner=1
 				src.OwnerPassword=usr.TrueName
@@ -37,7 +37,7 @@
 				usr.demon.selectPassive(usr, "CORRUPTION_PASSIVES", "Buff", TRUE)
 				usr.demon.selectPassive(usr, "CORRUPTION_DEBUFFS", "Debuff")
 		else
-			var/AGPass=input(usr,"You must know the True Name of the original owner to claim ownership.") as text
+			var/AGPass=Ask(usr, "You must know the True Name of the original owner to claim ownership.", "", null, "text", null, 0)
 			if(AGPass==src.OwnerPassword)
 				if(usr.isRace(DEMON)||usr.isRace(ELDRITCH))
 					usr<<"Races native to the Depths cannot claim ownership over the Ars Goetia."
@@ -46,7 +46,7 @@
 					if(AGPass==M.TrueName)
 						M.Death(src, "the Ars Goetia claiming their soul.")
 						src.BloodSacrifice++
-				usr.TrueName=input(usr, "As the owner of the Ars Goetia, you have a True Name that functions as the password to open the book. It should be kept secret. What is your True Name?", "Get True Name") as text
+				usr.TrueName=Ask(usr, "As the owner of the Ars Goetia, you have a True Name that functions as the password to open the book. It should be kept secret. What is your True Name?", "Get True Name", null, "text", null, 0)
 				src.GoetiaOwner=usr.TrueName
 				usr.ArsGoetiaOwner=1
 				src.OwnerPassword=usr.TrueName
@@ -66,9 +66,11 @@
 				usr<<"You guessed incorrectly. The Ars Goetia doesn't appreciate intrusion."
 				return
 
-	verb/Blood_Sacrifice(mob/M in get_step(usr, usr.dir))
+	verb/Blood_Sacrifice()
 		set name = "Ars Goetia: Blood Sacrifice"
 		set category = "Ars Goetia"
+		var/mob/M = PromptArgList(usr, args, 1, "Ars Goetia: Blood Sacrifice", PromptOf(get_step(usr, usr.dir), "mob"))
+		if(isnull(M)) return
 		if(!M.KO)
 			usr << "[M] needs to be KO'd!"
 			return
@@ -106,13 +108,13 @@
 			src.Using=0
 			return
 
-		switch(input(usr, "Summoning this otherworldly entity requires you to inflict or take a mortal wound. Are you sure you want to do it?", "Summon Demon") in list("Yes","No"))
+		switch(Ask(usr, "Summoning this otherworldly entity requires you to inflict or take a mortal wound. Are you sure you want to do it?", "Summon Demon", null, "pick", list("Yes","No"), 0))
 			if("No")
 				src.Using=0
 				return
 
 		var/Failure=0
-		var/Invocation=input(usr, "What True Name do you attempt to invoke?", "Summon Demon") as text
+		var/Invocation=Ask(usr, "What True Name do you attempt to invoke?", "Summon Demon", null, "text", null, 0)
 		if(Invocation in glob.trueNames)
 			var/Found=0
 			for(var/mob/Players/m in players)
@@ -161,9 +163,11 @@
 		src.DemonSummonCD=world.realtime+Day(1)
 		src.Using=0
 		return
-	verb/Revive_Demon(mob/A in players)
+	verb/Revive_Demon()
 		set name= "Ars Goetia: Revive Demon/Eldritch"
 		set category = "Ars Goetia"
+		var/mob/A = PromptArg(usr, args, 1, "Ars Goetia: Revive Demon/Eldritch", "players")
+		if(isnull(A)) return
 		if(usr.isRace(DEMON)||usr.isRace(ELDRITCH))
 			usr<<"Races native to the Depths cannot utilize or claim ownership over the Ars Goetia."
 			return
@@ -207,7 +211,7 @@
 
 
 		var/Failure=0
-		var/Invocation=input(usr, "What True Name do you attempt to contact?", "Contact Demon") as text
+		var/Invocation=Ask(usr, "What True Name do you attempt to contact?", "Contact Demon", null, "text", null, 0)
 		if(Invocation in glob.trueNames)
 			var/Found=0
 			for(var/mob/Players/m in players)
@@ -238,7 +242,7 @@
 			src.Using=0
 			var/list/who=list("Cancel")
 			who.Add(Choice)
-			var/mob/Players/selector=input("Select a demon to contact.") in who||null
+			var/mob/Players/selector=Ask(usr, "Select a demon to contact.", "", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				return
 			usr.TwoWayTelepath(selector, 0)

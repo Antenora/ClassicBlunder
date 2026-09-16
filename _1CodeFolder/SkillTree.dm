@@ -345,9 +345,9 @@ obj/SkillTreeObj
 		text += "\n"
 		var/Confirm
 		if(length(text)>5)
-			Confirm=alert(usr, "[text]Are you sure you wish to buy [src] for [src.cost] RPP?", "Buy [s.name]?", "No", "Yes")
+			Confirm=Ask(usr, "[text]Are you sure you wish to buy [src] for [src.cost] RPP?", "Buy [s.name]?", null, "confirm", null, 1, "No", "Yes")
 		else
-			Confirm=alert(usr, "Are you sure you wish to buy [src] for [src.cost] RPP?", "Buy [s.name]?", "No", "Yes")
+			Confirm=Ask(usr, "Are you sure you wish to buy [src] for [src.cost] RPP?", "Buy [s.name]?", null, "confirm", null, 1, "No", "Yes")
 		if(Confirm=="No")
 			del(s)
 			return
@@ -451,10 +451,10 @@ mob/proc
 	PoweredFormSetup()
 		src << "Powering up to a certain level will activate your Powered Form which will provide a sharp increase in your fighting prowess!"
 		var/obj/Skills/Buffs/ActiveBuffs/Ki_Control/KC=new
-		KC.selectedPassive = input(src, "Pick a focus") in glob.KI_CONTROL_PASSIVES
+		KC.selectedPassive = Ask(src, "Pick a focus", "", null, "pick", glob.KI_CONTROL_PASSIVES, 0)
 		var/list/stats = list("Str", "For", "Spd", "End", "Off","Def")
 		while(length(KC.selectedStats)<3)
-			KC.selectedStats += input(src, "Pick a stat") in stats
+			KC.selectedStats += Ask(src, "Pick a stat", "", null, "pick", stats, 0)
 			stats -= KC.selectedStats[length(KC.selectedStats)]
 		KC.init(src)
 		src.AddSkill(KC)

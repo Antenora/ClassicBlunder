@@ -14,7 +14,7 @@ ascension
 
 			onAscension(mob/owner)
 				if(!owner.Class || (owner.Class != "Innocent" && owner.Class != "Super" && owner.Class != "Unhinged"))
-					var/picked = input(owner, "Choose your Majin Class.", "Majin Class") in list("Innocent","Super","Unhinged")
+					var/picked = Ask(owner, "Choose your Majin Class.", "Majin Class", null, "pick", list("Innocent","Super","Unhinged"), 0)
 					owner.Class = picked
 				switch(owner.Class)
 					if("Innocent")

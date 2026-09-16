@@ -1,8 +1,10 @@
 
 mob/var/list/killed_AI
 
-/mob/Admin3/verb/AdminCheckAIKills(mob/Players/m in players)
+/mob/Admin3/verb/AdminCheckAIKills()
 	set name = "Admin Check AI Kills"
+	var/mob/Players/m = PromptArg(usr, args, 1, "Admin Check AI Kills", "players")
+	if(isnull(m)) return
 	usr << "[m]'s current AI kills are:"
 	for(var/i in m.killed_AI)
 		usr << "[i] - [m.killed_AI[i]]"
@@ -51,32 +53,24 @@ update_loop/special_loop/ai_tracker_loop
 		ai_limit = 15
 		ai_options=list("wild monster")*/
 
-mob/Admin2/verb/ModifyCompanion(obj/Skills/Companion/A in world)
+mob/Admin2/verb/ModifyCompanion()
 	set category=null
 	set name="Modify Companion"
+	var/obj/Skills/Companion/A = PromptArg(usr, args, 1, "Modify Companion", "world:/obj/Skills/Companion")
+	if(isnull(A)) return
 	var/list/options = list("Add Companion Skill")
 
 	if(istype(A, /obj/Skills/Companion/PlayerCompanion/Squad))
 		options += "Add Squad Member"
 		options += "Remove Squad Member"
 
-	var/choice = input("??") as null|anything in options
+	var/choice = Ask(usr, "??", "", null, "pick", options, 1)
 	switch(choice)
 		if("Add Companion Skill")
-			var/blah={"<html><Magic><body bgcolor=#000000 text="white" link="red">"}
-			var/list/B=new
-			blah+="[A]<br>[A.type]"
-			blah+="<table width=10%>"
-			if("Skills") B.Add(typesof(/obj/Skills))
-			for(var/C in B)
-				blah+="<td><a href=byond://?src=\ref[A];action=companionskill;var=[C]>"
-				blah+="[C]"
-				blah+="<td></td></tr>"
-			blah += "</html>"
-			usr<<browse(blah,"window=[A];size=450x600")
+			usr.client?.SheetShow("cskill:\ref[A]", "SKILL", "[A]", "Click a skill to add it to [A].", SheetTypeRows(typesof(/obj/Skills), "byond://?src=\ref[A];action=companionskill;var="), "a skill to add")
 		if("Add Squad Member")
 			for()
-				var/index = input("Which AI would you like to grant to the squad?") as null|anything in squad_database
+				var/index = Ask(usr, "Which AI would you like to grant to the squad?", "", null, "pick", squad_database, 1)
 				if(index)
 					var/obj/Skills/Companion/PlayerCompanion/Squad/s = A
 					s.AddNewMember(index)
@@ -85,7 +79,7 @@ mob/Admin2/verb/ModifyCompanion(obj/Skills/Companion/A in world)
 		if("Remove Squad Member")
 			for()
 				var/obj/Skills/Companion/PlayerCompanion/Squad/s = A
-				var/index = input("Which AI would you like to grant to the squad?") as null|anything in s.squad
+				var/index = Ask(usr, "Which AI would you like to grant to the squad?", "", null, "pick", s.squad, 1)
 				if(index)
 					s.RemoveMember(index)
 				else

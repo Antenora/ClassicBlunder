@@ -180,7 +180,7 @@
 			result_names += res
 	SendDemonPortraitResources(result_names)
 
-	src << browse(BuildFusionHTML(pairs, demon_fusion_page, src), "window=DemonFusion;size=440,460")
+	client?.DocShow("demon:fusion", "FUSION", "Fusion Laboratory", BuildFusionHTML(pairs, demon_fusion_page, src), "game", "", 440, 460, null, "read", "", "byond://?src=\ref[world];demon_window_close=fusion")
 
 /proc/BuildFusionHTML(list/pairs, page, mob/viewer)
 	var/total_pages = max(1, ceil(pairs.len / 5))
@@ -292,11 +292,18 @@
 	html += "</body></html>"
 	return html
 
+/mob/var/tmp/list/demon_inherit_picks = null
+
 /mob/proc/ShowSkillInheritanceUI(result_name, list/base_skills, list/pool, max_picks)
 	if(demon_inherit_open) return
 	demon_inherit_open = TRUE
+	demon_inherit_picks = list()
 	SendDemonPortraitResources(list(result_name))
+	RenderSkillInheritanceUI(result_name, base_skills, pool, max_picks)
 
+/mob/proc/RenderSkillInheritanceUI(result_name, list/base_skills, list/pool, max_picks)
+	if(!demon_inherit_picks)
+		demon_inherit_picks = list()
 	var/datum/demon_data/dd = DEMON_DB[result_name]
 
 	var/html = "<html><head><style>"
@@ -307,33 +314,10 @@
 	html += ".innate {background:#1a1a4e;color:#8888cc;border:1px solid #4444aa;}"
 	html += ".pick {background:#1a3a1e;color:#80ff80;border:1px solid #3a8a3e;cursor:pointer;text-decoration:none;}"
 	html += ".pick:hover {background:#2a5a2e;}"
-	html += ".picked {background:#3a6a3e;color:#ffffff;border:2px solid #80ff80;}"
+	html += ".picked {background:#3a6a3e;color:#ffffff;border:2px solid #80ff80;cursor:pointer;text-decoration:none;}"
 	html += ".confirmBtn {[DS_BTN_VALID] display:block;margin-top:12px;padding:8px 16px;font-size:13px;text-align:center;}"
 	html += ".skipBtn {[DS_BTN_STYLE] display:block;margin-top:6px;padding:6px 12px;font-size:11px;text-align:center;}"
-	html += "</style>"
-
-	html += "<script>"
-	html += "var maxPicks = [max_picks];"
-	html += "var picked = {};"
-	html += "function toggleSkill(name) {"
-	html += "  if(picked\[name\]) { delete picked\[name\]; }"
-	html += "  else { if(Object.keys(picked).length >= maxPicks) return; picked\[name\] = true; }"
-	html += "  var els = document.querySelectorAll('.pick');"
-	html += "  for(var i=0;i<els.length;i++) {"
-	html += "    var el = els\[i\]; if(picked\[el.getAttribute('data-skill')\]) el.className='skill-tag picked';"
-	html += "    else el.className='skill-tag pick';"
-	html += "  }"
-	html += "}"
-	html += "function confirmInherit() {"
-	html += "  var bsrc = document.body.getAttribute('data-src');"
-	html += "  var skills = Object.keys(picked).join(',');"
-	html += "  window.location = 'byond://?src=' + bsrc + ';demon_inherit_confirm=' + encodeURIComponent(skills);"
-	html += "}"
-	html += "function skipInherit() {"
-	html += "  var bsrc = document.body.getAttribute('data-src');"
-	html += "  window.location = 'byond://?src=' + bsrc + ';demon_inherit_confirm=';"
-	html += "}"
-	html += "</script></head><body data-src='\ref[world]' onunload=\"var s=document.body.getAttribute('data-src');window.location='byond://?src='+s+';demon_window_close=inherit';\">"
+	html += "</style></head><body>"
 
 	html += "<div class='header'>SKILL INHERITANCE -- [result_name]</div>"
 
@@ -344,16 +328,18 @@
 		html += "<span class='skill-tag innate'>[s]</span>"
 	html += "</div>"
 
-	html += "<div class='section'><b style='color:#80ff80;'>Choose up to [max_picks] skill(s) to inherit:</b><br>"
+	html += "<div class='section'><b style='color:#80ff80;'>Choose up to [max_picks] skill(s) to inherit:</b> <span style='color:#9a88cc;'>([demon_inherit_picks.len]/[max_picks] picked)</span><br>"
 	for(var/s in pool)
-		html += "<span class='skill-tag pick' data-skill='[s]' onclick='toggleSkill(\"[s]\")'>[s]</span>"
+		var/tagclass = (s in demon_inherit_picks) ? "picked" : "pick"
+		html += "<a class='skill-tag [tagclass]' href='byond://?src=\ref[world];demon_inherit_toggle=[url_encode("[s]")]'>[s]</a>"
 	html += "</div>"
 
-	html += "<a class='confirmBtn' href='#' onclick='confirmInherit();return false;'>CONFIRM INHERITANCE</a>"
-	html += "<a class='skipBtn' href='#' onclick='skipInherit();return false;'>Skip (No Inheritance)</a>"
+	var/picked = url_encode(jointext(demon_inherit_picks, ","))
+	html += "<a class='confirmBtn' href='byond://?src=\ref[world];demon_inherit_confirm=[picked]'>CONFIRM INHERITANCE</a>"
+	html += "<a class='skipBtn' href='byond://?src=\ref[world];demon_inherit_confirm='>Skip (No Inheritance)</a>"
 
 	html += "</body></html>"
-	src << browse(html, "window=DemonInherit;size=360,400")
+	client?.DocShow("demon:inherit", "INHERIT", "Skill Inheritance", html, "game", "", 360, 400, null, "read", "", "byond://?src=\ref[world];demon_window_close=inherit")
 
 
 /mob/proc/ShowDemonSkillManagerUI(datum/party_demon/pd)
@@ -436,7 +422,7 @@
 	html += "<a class='btn' href='byond://?src=\ref[world];demon_skilllearn_close=1' style='display:block;text-align:center;margin-top:8px;'>Close</a>"
 
 	html += "</body></html>"
-	src << browse(html, "window=DemonSkillLearn;size=420,460")
+	client?.DocShow("demon:skilllearn", "SKILLS", "[pd.demon_name]", html, "game", "", 420, 460, null, "read", "", "byond://?src=\ref[world];demon_window_close=skilllearn")
 
 
 /mob/proc/OpenCompendiumUI()
@@ -448,7 +434,7 @@
 	var/list/comp_names = list()
 	for(var/dname in demon_compendium) comp_names += dname
 	SendDemonPortraitResources(comp_names)
-	src << browse(BuildCompendiumHTML(src), "window=DemonCompendium;size=480,420")
+	client?.DocShow("demon:compendium", "COMPENDIUM", "Demon Compendium", BuildCompendiumHTML(src), "game", "", 480, 420, null, "read", "", "byond://?src=\ref[world];demon_window_close=compendium")
 
 /proc/BuildCompendiumHTML(mob/player)
 	var/html = "<html><head><style>"
@@ -539,7 +525,7 @@
 			html += "<div style='font-size:9px;color:#80ff80;margin-top:2px;'>Skills: [jointext(cd.recorded_skills, ", ")]</div>"
 
 	html += "</body></html>"
-	src << browse(html, "window=DemonWithdraw;size=240,360")
+	client?.DocShow("demon:withdraw", "WITHDRAW", "[demon_name]", html, "game", "", 240, 360, null, "read", "", "byond://?src=\ref[world];demon_window_close=withdraw")
 
 /mob/proc/OpenRecordDemonUI()
 	if(!demon_party || !demon_party.len)
@@ -550,7 +536,7 @@
 	var/list/record_names = list()
 	for(var/datum/party_demon/pd in demon_party) record_names += pd.demon_name
 	SendDemonPortraitResources(record_names)
-	src << browse(BuildRecordDemonHTML(src), "window=DemonRecord;size=400,280")
+	client?.DocShow("demon:record", "RECORD", "Record Demon", BuildRecordDemonHTML(src), "game", "", 400, 280, null, "read", "", "byond://?src=\ref[world];demon_window_close=record")
 
 /proc/BuildRecordDemonHTML(mob/player)
 	var/html = "<html><head><style>"
@@ -599,6 +585,18 @@
 		var/name_b = href_list["demon_fuse_b"]
 		user.demon_fusion_open = FALSE
 		user.ExecuteFusion(name_a, name_b)
+		return
+
+	if(href_list["demon_inherit_toggle"])
+		var/sk = href_list["demon_inherit_toggle"]
+		if(user.demon_inherit_open && user.demon_pending_fuse_result && islist(user.demon_pending_fuse_pool) && (sk in user.demon_pending_fuse_pool))
+			if(!user.demon_inherit_picks)
+				user.demon_inherit_picks = list()
+			if(sk in user.demon_inherit_picks)
+				user.demon_inherit_picks -= sk
+			else if(user.demon_inherit_picks.len < user.demon_pending_fuse_open_slots)
+				user.demon_inherit_picks += sk
+			user.RenderSkillInheritanceUI(user.demon_pending_fuse_result, user.demon_pending_fuse_base_skills, user.demon_pending_fuse_pool, user.demon_pending_fuse_open_slots)
 		return
 
 	if("demon_inherit_confirm" in href_list)
@@ -663,7 +661,7 @@
 		return
 
 	if(href_list["demon_skilllearn_close"])
-		user << browse(null, "window=DemonSkillLearn")
+		user.client?.PanelClose("demon:skilllearn")
 		user.demon_skilllearn_open = FALSE
 		user.demon_skilllearn_target = ""
 		return

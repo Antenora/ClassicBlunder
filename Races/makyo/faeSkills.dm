@@ -92,12 +92,12 @@
 	verb/Modify_Sword_of_Sunlight()
 		set category="Skills"
 		src.SwordIcon=input(usr, "What icon will your Sword of Sunlight use?", "Sword of Sunlight Icon") as icon|null
-		src.SwordX=input(usr, "Pixel X offset.", "Sword of Sunlight Icon") as num
-		src.SwordY=input(usr, "Pixel Y offset.", "Sword of Sunlight Icon") as num
-		src.SwordClass=input(usr, "What class will your Sword of Sunlight be?", "Sword of Sunlight Icon") in list("Heavy", "Medium", "Light", "Wooden")
+		src.SwordX=Ask(usr, "Pixel X offset.", "Sword of Sunlight Icon", null, "num", null, 0)
+		src.SwordY=Ask(usr, "Pixel Y offset.", "Sword of Sunlight Icon", null, "num", null, 0)
+		src.SwordClass=Ask(usr, "What class will your Sword of Sunlight be?", "Sword of Sunlight Icon", null, "pick", list("Heavy", "Medium", "Light", "Wooden"), 0)
 		saved_icon = input(usr, "What do you want your unarmed variant icon to be?") as icon|null
-		LockX = input(usr, "Pixel X offset.", "Unarmed Variant Icon") as num
-		LockY = input(usr, "Pixel Y offset.", "Unarmed Variant Icon") as num
+		LockX = Ask(usr, "Pixel X offset.", "Unarmed Variant Icon", null, "num", null, 0)
+		LockY = Ask(usr, "Pixel Y offset.", "Unarmed Variant Icon", null, "num", null, 0)
 	verb/Sword_of_Summer()
 		set category="Skills"
 		if(!usr.BuffOn(src))
@@ -122,9 +122,9 @@
 	verb/Mould_Crown()
 		set category="Skills"
 		src.ArmorIcon=input(usr, "What icon will your Crown of Rhime use?", "Crown of Rhime Icon") as icon|null
-		src.ArmorX=input(usr, "Pixel X offset.", "Crown of Rhime Icon") as num
-		src.ArmorY=input(usr, "Pixel Y offset.", "Crown of Rhime Icon") as num
-		src.ArmorClass=input(usr, "What class will your Crown of Rhime be?", "Crown of Rhime Class") in list("Heavy", "Medium", "Light")
+		src.ArmorX=Ask(usr, "Pixel X offset.", "Crown of Rhime Icon", null, "num", null, 0)
+		src.ArmorY=Ask(usr, "Pixel Y offset.", "Crown of Rhime Icon", null, "num", null, 0)
+		src.ArmorClass=Ask(usr, "What class will your Crown of Rhime be?", "Crown of Rhime Class", null, "pick", list("Heavy", "Medium", "Light"), 0)
 	verb/Crown_of_Rime()
 		set category="Skills"
 		if(!usr.BuffOn(src))
@@ -145,7 +145,7 @@
 		var/list/levelList = list()
 		for(var/i = 1 to maxLevel)
 			levelList += i
-		ExpandLevel = input(p, "Choose Expand level (max [maxLevel]):", "Expand") in levelList
+		ExpandLevel = Ask(p, "Choose Expand level (max [maxLevel]):", "Expand", null, "pick", levelList, 0)
 
 		var/N = ExpandLevel
 		var/mastered = (N < p.AscensionsAcquired)

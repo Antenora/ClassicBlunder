@@ -262,23 +262,23 @@ obj/Skills/Companion
 		CustomizeCompanion()
 			set category="Companion"
 			set name = "Customize: Companion"
-			switch(input("Customize") in list("Set Companion Icon","Set Companion Name","Cancel"))
+			switch(Ask(usr, "Customize", "", null, "pick", list("Set Companion Icon","Set Companion Name","Cancel"), 0))
 				if("Set Companion Name")
 					companion_name = null
 					while(!companion_name)
-						companion_name = input("Name?") as text
+						companion_name = Ask(usr, "Name?", "", null, "text", null, 0)
 				if("Set Companion Icon")
-					switch(input("Default Icon set or Custom?") in list("Default", "Custom"))
+					switch(Ask(usr, "Default Icon set or Custom?", "", null, "pick", list("Default", "Custom"), 0))
 						if("Default")
-							switch(input("Reset current companion icon?") in list("Yes","No"))
+							switch(Ask(usr, "Reset current companion icon?", "", null, "pick", list("Yes","No"), 0))
 								if("Yes") companion_icon = null
 							for()
 								var/option
 								if(!companion_icon) option = "Add"
-								else option = input("Add another?") in list("Add","Cancel")
+								else option = Ask(usr, "Add another?", "", null, "pick", list("Add","Cancel"), 0)
 								switch(option)
 									if("Add")
-										var/icon/i = input("Which?") in ai_icon_database
+										var/icon/i = Ask(usr, "Which?", "", null, "pick", ai_icon_database, 0)
 										i = ai_icon_database[i]
 										if(!companion_icon)
 											companion_icon = i
@@ -292,12 +292,12 @@ obj/Skills/Companion
 												companion_icon += i
 								break
 						if("Custom")
-							switch(input("Reset current companion icon?") in list("Yes","No"))
+							switch(Ask(usr, "Reset current companion icon?", "", null, "pick", list("Yes","No"), 0))
 								if("Yes") companion_icon = null
 							for()
 								var/option
 								if(!companion_icon) option = "Add"
-								else option = input("Add another?") in list("Add","Cancel")
+								else option = Ask(usr, "Add another?", "", null, "pick", list("Add","Cancel"), 0)
 								switch(option)
 									if("Add")
 										var/icon/i = input("Which?") as icon
@@ -348,14 +348,14 @@ obj/Skills/Companion
 				if(!usr.Admin && !unrestricted_controls) return
 
 
-				switch(input("Are you should you would like to release all your followers from your control?") in list("Yes", "No"))
+				switch(Ask(usr, "Are you should you would like to release all your followers from your control?", "", null, "pick", list("Yes", "No"), 0))
 					if("No") return
 
 				var force_hostility
-				switch(input("Would you like to force AI hostility?") in list("Yes", "No"))
+				switch(Ask(usr, "Would you like to force AI hostility?", "", null, "pick", list("Yes", "No"), 0))
 					if("Yes") force_hostility = 1
 					if("No") force_hostility = 0
-				switch(input("Would you like to force AIs to guard you position?") in list("Yes", "No"))
+				switch(Ask(usr, "Would you like to force AIs to guard you position?", "", null, "pick", list("Yes", "No"), 0))
 					if("Yes") CompanionGuardPosition()
 				for(var/mob/Player/AI/a in usr.ai_followers)
 					a.ai_owner = null
@@ -396,7 +396,7 @@ obj/Skills/Companion
 						holding = 1
 
 				if(holding)
-					holding = input("Scope?") as num
+					holding = Ask(usr, "Scope?", "", null, "num", null, 0)
 					if(holding >= 10) holding = 10
 					if(holding < 1) holding = 1
 					for(var/mob/Player/AI/a in usr.ai_followers) a.max_hold_distance = rand(1, holding)
@@ -407,10 +407,23 @@ obj/Skills/Companion
 				set category = "Companion"
 				set name = "Add Companion Alliance"
 
-				var/new_alliance = input("Who would you like your companion to ally with?") as text | null
-				if(new_alliance)
-					for(var/mob/Player/AI/a in usr.ai_followers) a.ai_alliances |= new_alliance
-					usr << "You have added [new_alliance] to your companions alliances."
+				var/list/pl = list()
+				for(var/mob/Players/P in players)
+					if(P != usr && P.ckey)
+						pl += P
+				if(!pl.len)
+					usr << "There is no one online to ally with."
+					return
+				var/list/lab = PromptLabelAtoms(pl, 1)
+				var/pick = Ask(usr, "Who would you like your companion to ally with?", "Add Companion Alliance", null, "pick", lab, 1)
+				if(isnull(pick))
+					return
+				var/mob/Players/ally = lab[pick]
+				if(!ally)
+					return
+				var/new_alliance = "[ally.ckey]"
+				for(var/mob/Player/AI/a in usr.ai_followers) a.ai_alliances |= new_alliance
+				usr << "You have added [ally] to your companions alliances."
 			RemoveCompanionAlliance()
 				set src in usr
 				set category = "Companion"
@@ -419,7 +432,7 @@ obj/Skills/Companion
 				for(var/mob/Player/AI/a in usr.ai_followers)
 					options = a.ai_alliances
 					break
-				var/remove_alliance = input("Which alliance would you like to remove?") in options | null
+				var/remove_alliance = Ask(usr, "Which alliance would you like to remove?", "", null, "pick", options, 1)
 				if(remove_alliance)
 					for(var/mob/Player/AI/a in usr.ai_followers) a.ai_alliances -= remove_alliance
 					usr << "You have removed [remove_alliance] from your followers alliances."
@@ -441,28 +454,30 @@ obj/Skills/Companion/Pet
 		var/list/options = list("Set Pet Icon","Set Pet Name","Set IC Color")
 
 		options += "Cancel"
-		switch(input("What would you like to do?") in options)
+		switch(Ask(usr, "What would you like to do?", "", null, "pick", options, 0))
 			if("Set Pet Icon")
 				var/icon/i = input("What would you like to set your companion's icon to?") as icon|null
 				if(i)
 					companion_icon = i
 					usr << "Companion Icon Set"
 			if("Set Pet Name")
-				var new_name = input("What would you like to set your companion's name to?","Companion Name",companion_name) as text|null
+				var new_name = Ask(usr, "What would you like to set your companion's name to?", "Companion Name", companion_name, "text", null, 1)
 				if(new_name)
 					companion_name = new_name
 
 			if("Set IC Color")
-				var/new_color = input("What color?") as color | null
+				var/new_color = Ask(usr, "What color?", "", null, "color", null, 1)
 				if(new_color)
 					text_color = new_color
 					usr << "You've set your Companion's text color to [text_color]"
 
 
 
-	verb/Companion_Say(var/message as text)
+	verb/Companion_Say()
 		set category = "Companion"
 		set name = "Say Pet"
+		var/message = PromptArgValue(usr, args, 1, "Say Pet", "text")
+		if(isnull(message)) return
 		if(message)
 			var replace_name
 			if(findtext(message, "/", 1,2))
@@ -483,7 +498,7 @@ obj/Skills/Companion/Pet
 			em.appearance_flags=66
 			em.layer=EFFECTS_LAYER
 			a.overlays+=em
-			var/T=input("Emotes here!")as message|null
+			var/T=Ask(usr, "Emotes here!", "", null, "message", null, 1)
 			if(T==null)
 				a.overlays-=em
 				return

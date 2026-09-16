@@ -950,7 +950,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 			if("LimitOverForce")
 				if(Z.Using)
 					return
-				var/Select=input("Do you really want to end the wipe...?") in list ("Yes", "No")
+				var/Select=Ask(usr, "Do you really want to end the wipe...?", "", null, "pick", list ("Yes", "No"), 0)
 				switch(Select)
 					if("Yes")
 						src.OMessage(10,"<font color=red><b>[src] raises their hand up...</font color></b>","<font color=red>[src]([src.key]) activated complete obliteration.")
@@ -993,7 +993,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 			if("GiveFourthFate")
 				if(Z.Using)
 					return
-				var/Select=input("Do you really want to end the wipe...?") in list ("Yes", "No")
+				var/Select=Ask(usr, "Do you really want to end the wipe...?", "", null, "pick", list ("Yes", "No"), 0)
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
@@ -1005,7 +1005,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 			if("EndWipe")
 				if(Z.Using)
 					return
-				var/Select=input("Do you really want to end the wipe...?") in list ("Yes", "No")
+				var/Select=Ask(usr, "Do you really want to end the wipe...?", "", null, "pick", list ("Yes", "No"), 0)
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
@@ -1024,10 +1024,10 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 							who.Remove(W)
 					if(!W.EnergySignature&&!usr.passive_handler.Get("SpiritPower"))
 						who.Remove(W)
-				var/mob/Players/selector=input("Select a player to telepath.") in who||null
+				var/mob/Players/selector=Ask(usr, "Select a player to telepath.", "", null, "pick", who||null, 0)
 				if(selector=="Cancel")
 					return
-				var/message=input(src,"What do you want to telepath?") as text|null
+				var/message=Ask(src, "What do you want to telepath?", "", null, "text", null, 1)
 				if(message==null)
 					return
 				message=copytext(message,1,500)

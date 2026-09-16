@@ -12,7 +12,7 @@ obj/Items/mineral
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay = world.time+1
 		if((src in usr))
-			var/Amount = input("Drop how much? (1-[src.value])") as num
+			var/Amount = Ask(usr, "Drop how much? (1-[src.value])", "", null, "num", null, 0)
 			Amount = round(Amount)
 			if(Amount>value) Amount = value
 			if(Amount<1) Amount = 1
@@ -41,7 +41,7 @@ obj/Items/mineral
 				counter ++
 				mineralList.Add(minerals)
 			while(counter > 1)
-				var/obj/choice = input(p, "You have duplicate's of Minerals, please select which one to delete", "Money") in mineralList
+				var/obj/choice = Ask(p, "You have duplicate's of Minerals, please select which one to delete", "Money", null, "pick", mineralList, 0)
 				mineralList.Remove(choice)
 				counter --
 				del choice
@@ -66,7 +66,7 @@ globalTracker/var/NPC_EXCHANGE_RATE  = 0.75
 mob/Admin4/verb/GiveExchangeVerb()
 	set category = "Admin"
 	set name = "Give Exchange Verb"
-	var/mob/p = input(src, "Pick a player", "Player") in players
+	var/mob/p = Ask(src, "Pick a player", "Player", null, "pick", players, 0)
 	p.verbs += /mob/proc/ExchangeMinerals
 	Log("Admin","<font color=red>[ExtractInfo(usr)] gave [ExtractInfo(p)] the Exchange Minerals verb.")
 
@@ -115,7 +115,7 @@ proc/exchangeMineral(obj/Items/mineral/mineral, mob/p, obj/Exchange/npc/npc)
 	if(p.isRace(POPO))
 		PopoRate*=p.GetPowerUpRatio()
 	p << "Your rate of conversion is [p.playerExchangeRate]"
-	var/howMany = input(p, "How many would you like to exchange?") as num
+	var/howMany = Ask(p, "How many would you like to exchange?", "", null, "num", null, 0)
 	if(howMany > mineral.value) howMany = mineral.value
 	if(howMany < 1) howMany = 1
 	if(npc)

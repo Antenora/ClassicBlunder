@@ -92,7 +92,7 @@ obj/readPrayers // we hand this out to the dead instead of a typesof(verb) so th
 		"}
 
 		prayerHTML += "</html>"
-		usr << browse(prayerHTML ,"size=600x600,window=Title")
+		usr.client?.DocShow("prayers:self", "PRAYERS", "Prayers", prayerHTML, "author", "", 600, 600)
 
 
 mob/proc/gatherNames()
@@ -169,7 +169,7 @@ mob/proc/returnNames()
 	for(var/name in names)
 		nameList4Name += name["name"]
 
-	var/who = input(usr, "Who is it you wish to pray to?", "Select") in nameList4Name + "------------" + "Cancel"
+	var/who = Ask(usr, "Who is it you wish to pray to?", "Select", null, "pick", (nameList4Name + "------------" + "Cancel"), 0)
 	if(who == "Cancel" || who == "------------" || who == "-----------")
 		return
 
@@ -180,7 +180,7 @@ mob/proc/returnNames()
 	if(KeyForWhoThePrayerIs == null)
 		KeyForWhoThePrayerIs = "Nolies"
 
-	var/prayer = input(usr, "What do you wish to say to [who]?", "Prayer") as message
+	var/prayer = Ask(usr, "What do you wish to say to [who]?", "Prayer", null, "message", null, 0)
 	if (!prayer) return
 	var/newAddition = list(
 		list(
@@ -292,7 +292,7 @@ mob/proc/returnNames()
 		"}
 
 	prayerHTML += "</html>"
-	M << browse(prayerHTML ,"size=600x600,window=Title")
+	M.client?.DocShow("prayers:read", "PRAYERS", "Prayers", prayerHTML, "author", "", 600, 600)
 
 /mob/Admin2/verb/ReadAllPlayerPrayers()
 	set name = "Read All Prayers"
@@ -374,7 +374,7 @@ mob/proc/returnNames()
 	"}
 
 	prayerHTML += "</html>"
-	usr << browse(prayerHTML ,"size=600x600,window=Title")
+	usr.client?.DocShow("prayers:all", "PRAYERS", "All Player Prayers", prayerHTML, "author", "", 600, 600)
 
 /mob/Admin2/verb/CheckOnlyGodPrayers()
 	set name = "Read All God Prayers"
@@ -456,4 +456,4 @@ mob/proc/returnNames()
 
 		"}
 
-	usr << browse(prayerHTML ,"size=600x600,window=Title")
+	usr.client?.DocShow("prayers:gods", "PRAYERS", "Prayers to the Gods", prayerHTML, "author", "", 600, 600)

@@ -25,10 +25,10 @@ race
 			var/Choice
 			var/Confirm
 			while(Confirm!="Yes")
-				Choice=input(user, "Are you a Guardian (insert biblically accurate meme here) or a Mentor (adhere more closely to Dragon Ball Canon)?", "Angel Ascension") in list("Guardian", "Mentor")
+				Choice=Ask(user, "Are you a Guardian (insert biblically accurate meme here) or a Mentor (adhere more closely to Dragon Ball Canon)?", "Angel Ascension", null, "pick", list("Guardian", "Mentor"), 0)
 				switch(Choice)
 					if("Guardian")
-						Confirm=alert(user, "Do you wish to guard the gates to the world beyond?", "Angel Ascension", "Yes", "No")
+						Confirm=Ask(user, "Do you wish to guard the gates to the world beyond?", "Angel Ascension", null, "confirm", null, 1, "Yes", "No")
 						if(Confirm=="Yes")
 							user.Class = "Guardian"
 							user.AddSkill(/obj/Skills/Utility/Recall_Armaments)
@@ -38,7 +38,7 @@ race
 							user.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/AngelMagic/Order)
 							user << "Please set macros for (Light), (Divinity), and (Order), your 3 angel magics."
 					if("Mentor")
-						Confirm=alert(user, "Do you wish to mentor humanity and ensure the spiritual arts remain unforgotten?", "Angel  Ascension", "Yes", "No")
+						Confirm=Ask(user, "Do you wish to mentor humanity and ensure the spiritual arts remain unforgotten?", "Angel  Ascension", null, "confirm", null, 1, "Yes", "No")
 						if(Confirm=="Yes")
 							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Divine_Instinct, user))
 								user.Class = "Mentor"

@@ -374,7 +374,7 @@ proc/_DnLoop()
 /mob/Admin2/verb/Set_Time_Of_Day()
 	set category = "Admin"
 	set name = "Set Time Of Day"
-	var/pick = input(src, "Jump the clock to:") in list("Day","Dusk","Night","Dawn","Cancel")
+	var/pick = Ask(src, "Jump the clock to:", "", null, "pick", list("Day","Dusk","Night","Dawn","Cancel"), 0)
 	if(pick == "Cancel") return
 	var/cyc = max(1, glob.DN_CYCLE_MINUTES) * 600
 	var/target = 0.2

@@ -37,8 +37,8 @@
     verb/Shin_Colour()
         set category = "Utility"
         set hidden = 1
-        var/colour = input(usr, "Select your Shin Colour", "Shin Colour Selection", rgb(203, 198, 47)) as color | null ;
-        ManaGlow = colour
+        var/shinColor = Ask(usr, "Select your Shin Color", "Shin Color Selection", rgb(203, 198, 47), "color", null, 1) ;
+        ManaGlow = shinColor
 
 /obj/Skills/Buffs/SlotlessBuffs/Mang_Resonance // FAIL TO READ BELOW THIS UNDER PENALTY OF DEATH
     ActiveMessage="fills the emptiness with their most intense emotion, creating rings that hum with power."

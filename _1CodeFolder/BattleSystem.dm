@@ -1334,31 +1334,31 @@ proc/getBackSide(mob/offender, mob/defender, diags = FALSE)
 				if(resultingDir in list(SOUTHEAST, SOUTH, EAST))
 					return 1
 /mob/Admin3/verb/simulateAttacks()
-	var/self = input(src, "Use on self?") in list("Yes", "No")
+	var/self = Ask(src, "Use on self?", "", null, "pick", list("Yes", "No"), 0)
 	var/mob/Player/p1 = src
 	if(self == "No")
-		p1 = input(src, "who") in players
-		Target = input(src, "who") in players
+		p1 = Ask(src, "who", "", null, "pick", players, 0)
+		Target = Ask(src, "who", "", null, "pick", players, 0)
 	if(!Target)
 		src<< "get an enemy"
 		return
-	var/looplength = input(src, "How many attempts") as num
+	var/looplength = Ask(src, "How many attempts", "", null, "num", null, 0)
 	var/list/damageMatrix = list()
-	var/_range = input(src, "Do you want to do a range?") in list(1,0)
+	var/_range = Ask(src, "Do you want to do a range?", "", null, "pick", list(1,0), 0)
 	var/min_range
 	var/max_range
 	var/per_change
 	if(_range)
-		min_range = input(src, "min_range") as num
-		max_range = input(src, "max_range") as num
-		per_change = input(src, "per_change") as num
+		min_range = Ask(src, "min_range", "", null, "num", null, 0)
+		max_range = Ask(src, "max_range", "", null, "num", null, 0)
+		per_change = Ask(src, "per_change", "", null, "num", null, 0)
 	if(_range)
 		var/total_iteration = (max_range-min_range)/per_change
-		var/statInQuestion = input(src, "what stat") in list("Str", "End")
+		var/statInQuestion = Ask(src, "what stat", "", null, "pick", list("Str", "End"), 0)
 		if(statInQuestion == "End")
-			StrReplace = input(src, "What srt do u want") as num
+			StrReplace = Ask(src, "What srt do u want", "", null, "num", null, 0)
 		else
-			Target.EndReplace = input(src, "What end do u want") as num
+			Target.EndReplace = Ask(src, "What end do u want", "", null, "num", null, 0)
 		for(var/i in 0 to total_iteration)
 			if(statInQuestion == "End")
 				Target.EndReplace = min_range + (per_change * i)
@@ -1446,16 +1446,16 @@ The average damage was [average] over [looplength] times.
 		src << msg
 /mob/Admin3/verb/SimulateAccuracyNOSTATCHANGE()
 	set category = "Debug"
-	var/self = input(src, "Use on self?") in list("Yes", "No")
+	var/self = Ask(src, "Use on self?", "", null, "pick", list("Yes", "No"), 0)
 	var/mob/Player/p1 = src
 	if(self == "No")
-		p1 = input(src, "who") in players
-		Target = input(src, "who") in players
+		p1 = Ask(src, "who", "", null, "pick", players, 0)
+		Target = Ask(src, "who", "", null, "pick", players, 0)
 	if(!Target)
 		src<< "get an enemy"
 		return
-	var/accmult = input(src, "What accmult do u want") as num
-	var/looplength = input(src, "How many attempts") as num
+	var/accmult = Ask(src, "What accmult do u want", "", null, "num", null, 0)
+	var/looplength = Ask(src, "How many attempts", "", null, "num", null, 0)
 	var/hits = 0
 	var/misses = 0
 	var/whiffs = 0
@@ -1522,21 +1522,21 @@ mob/var/minhitroll = 0
 	if(!Target)
 		src<< "get an enemy"
 		return
-	var/off = input(src, "What off do u want") as num
+	var/off = Ask(src, "What off do u want", "", null, "num", null, 0)
 	OffMod = off
-	var/spd = input(src, "What spd do u want") as num
+	var/spd = Ask(src, "What spd do u want", "", null, "num", null, 0)
 	SpdMod = spd
-	var/def = input(src, "What def do u want") as num
+	var/def = Ask(src, "What def do u want", "", null, "num", null, 0)
 	DefMod = def
-	var/accmult = input(src, "What accmult do u want") as num
-	var/enemyoff = input(src, "What off do u want enemy to have") as num
+	var/accmult = Ask(src, "What accmult do u want", "", null, "num", null, 0)
+	var/enemyoff = Ask(src, "What off do u want enemy to have", "", null, "num", null, 0)
 	Target.OffMod = enemyoff
-	var/enemydef = input(src, "What def do u want enemy to have") as num
+	var/enemydef = Ask(src, "What def do u want enemy to have", "", null, "num", null, 0)
 	Target.DefMod = enemydef
-	var/enemyspd = input(src, "What spd do u want enemy to have") as num
+	var/enemyspd = Ask(src, "What spd do u want enemy to have", "", null, "num", null, 0)
 	Target.SpdReplace = enemyspd
-	var/looplength = input(src, "How many attempts") as num
-	var/randomizeAccMult = input(src, "randomize acc mult between 1 and accmult?") in list(TRUE, FALSE)
+	var/looplength = Ask(src, "How many attempts", "", null, "num", null, 0)
+	var/randomizeAccMult = Ask(src, "randomize acc mult between 1 and accmult?", "", null, "pick", list(TRUE, FALSE), 0)
 	var/hits = 0
 	var/misses = 0
 	var/whiffs = 0
@@ -1998,7 +1998,7 @@ mob/proc/Grab()
 					var/obj/Seal/s = (locate(/obj/Seal) in O.contents)
 					if(s && (s.Creator != src.ckey))
 						Choices-=O
-			var/mob/P=input(src,"Grab what?") in Choices
+			var/mob/P=Ask(src, "Grab what?", "", null, "pick", Choices, 0)
 			if(!(locate(P) in get_step(src,dir)))
 				return
 			else if(istype(P,/obj/Items))
@@ -2205,7 +2205,7 @@ mob/proc/Grab_Effects(var/mob/P)
 					src << "[P] is an AI!"
 					return
 				//TODO VAMPIRE LETHAL
-				var/Choice=alert(src, "Do you wish to convert [P] to a vampire?", "Vampire Grab", "Yes", "No")
+				var/Choice=Ask(src, "Do you wish to convert [P] to a vampire?", "Vampire Grab", null, "confirm", null, 1, "Yes", "No")
 				if(P in range(1, src))
 					if(Choice=="Yes")
 						src.Grab=null

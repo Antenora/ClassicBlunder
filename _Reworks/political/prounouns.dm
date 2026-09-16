@@ -31,7 +31,7 @@ characterInformation
 	var/catchline = "I am not a broke boy..."
 	proc/setCatchLine()
 		var/max_length = glob.MAXCATCHLINELENGTH
-		var/inP = input(usr, "What is your catchline?") as text | null
+		var/inP = Ask(usr, "What is your catchline?", "", null, "text", null, 1)
 		if(length(inP) > max_length)
 			usr << "too long, try again"
 		else
@@ -47,7 +47,7 @@ characterInformation
 	proc/setPronouns(firsttime)
 		if(usr.client.getPref("usePronouns") == 1)
 			if(firsttime)
-				var/yesno = input(usr, "Do you want different pronouns than your selected sex?") in list("Yes", "No", "Never Ask Me")
+				var/yesno = Ask(usr, "Do you want different pronouns than your selected sex?", "", null, "pick", list("Yes", "No", "Never Ask Me"), 0)
 				if(yesno == "No")
 					switch(usr.Gender)
 						if("Male")
@@ -58,18 +58,18 @@ characterInformation
 							pronouns = list("It","It")
 				else
 					if(yesno == "Yes")
-						var/subject = input(usr,"What is your subject pronoun? (He, She, They, It)") in SUBJECT_PRONOUNS
-						var/object = input(usr,"What is your object pronoun? (Him, Her, Them, It)") in OBJECT_PRONOUNS
+						var/subject = Ask(usr, "What is your subject pronoun? (He, She, They, It)", "", null, "pick", SUBJECT_PRONOUNS, 0)
+						var/object = Ask(usr, "What is your object pronoun? (Him, Her, Them, It)", "", null, "pick", OBJECT_PRONOUNS, 0)
 						pronouns = list(subject, object)
 					if(yesno == "Never Ask Me")
 						usr.client.setPref("usePronouns", 0)
 				if(usr.client.getPref("seePronouns") == null)
-					yesno = input(usr,"Do you want to see other's pronouns?") in list("Yes", "No")
+					yesno = Ask(usr, "Do you want to see other's pronouns?", "", null, "pick", list("Yes", "No"), 0)
 					yesno = yesno == "Yes" ? TRUE : FALSE
 					usr.client.setPref("seePronouns", yesno)
 			else
-				var/subject = input(usr,"What is your subject pronoun? (He, She, They, It)") in SUBJECT_PRONOUNS
-				var/object = input(usr,"What is your object pronoun? (Him, Her, Them, It)") in OBJECT_PRONOUNS
+				var/subject = Ask(usr, "What is your subject pronoun? (He, She, They, It)", "", null, "pick", SUBJECT_PRONOUNS, 0)
+				var/object = Ask(usr, "What is your object pronoun? (Him, Her, Them, It)", "", null, "pick", OBJECT_PRONOUNS, 0)
 				pronouns = list(subject, object)
 		else
 			switch(usr.Gender)

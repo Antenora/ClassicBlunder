@@ -107,12 +107,12 @@
         else
             usr<<"Unsheathe icon not set."
             return
-        unsheatheOffsetX = input(usr, "Set unsheathe icon offset X", "Set unsheathe icon offset X for this sword.") as num
-        unsheatheOffsetY = input(usr, "Set unsheathe icon offset Y", "Set unsheathe icon offset Y for this sword.") as num
-        unsheatheState = input(usr, "Set unsheathe icon state", "Yes") as text
+        unsheatheOffsetX = Ask(usr, "Set unsheathe icon offset X", "Set unsheathe icon offset X for this sword.", null, "num", null, 0)
+        unsheatheOffsetY = Ask(usr, "Set unsheathe icon offset Y", "Set unsheathe icon offset Y for this sword.", null, "num", null, 0)
+        unsheatheState = Ask(usr, "Set unsheathe icon state", "Yes", null, "text", null, 0)
         if(!unsheatheState)
             unsheatheState = ""
-        removeSheathedOnUnSheathe = input(usr, "Remove sheathed state on unsheathe?", "Yes") in list(TRUE, FALSE)
+        removeSheathedOnUnSheathe = Ask(usr, "Remove sheathed state on unsheathe?", "Yes", null, "pick", list(TRUE, FALSE), 0)
         if(!removeSheathedOnUnSheathe)
             sheatheIcon = input(usr, "Set sheathe icon", "Set sheathe icon for this sword.") as icon|null 
             org_icon = icon

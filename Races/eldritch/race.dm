@@ -30,7 +30,7 @@ race
 			..()
 			var/obj/Skills/Buffs/regen = user.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Regeneration);
 			regen.RegenerateLimbs=1;
-			var/eldType = alert(user, "Is your true eldritch nature Reflected from the Greater Depths, or are you Shrouded in the haze of the Sea of Darkness?", "Eldritch Type", "Reflected", "Shrouded");
+			var/eldType = Ask(user, "Is your true eldritch nature Reflected from the Greater Depths, or are you Shrouded in the haze of the Sea of Darkness?", "Eldritch Type", null, "confirm", null, 1, "Reflected", "Shrouded");
 			user.Secret="Eldritch ([eldType])"
 			user.giveSecret("Eldritch[eldType]")
 			user.secretDatum.nextTierUp = 999

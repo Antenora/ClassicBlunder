@@ -63,8 +63,10 @@ client/proc/LogPageHTML()
  .btn{position:absolute;top:8px;width:32px;height:32px;background:url('lc_slot.png') no-repeat;cursor:pointer}
  .btn img.ic{position:absolute;left:8px;top:8px;width:16px;height:16px}
  .btn img.ar{position:absolute;left:9px;top:8px;width:13px;height:15px}
- #lock{right:52px}
- #fold{right:16px}
+ #lock{right:88px}
+ #fold{right:52px}
+ #xclose{right:16px}
+ .btn img.x{position:absolute;left:0;top:0;width:32px;height:32px}
  .row3{position:absolute;left:16px;right:16px;height:30px}
  .lab{position:absolute;top:8px;color:#7ec8f0}
  .fld{position:absolute;height:30px;border:8px solid transparent;border-image:url('lc_field.png') 8 fill stretch;box-sizing:border-box}
@@ -219,6 +221,7 @@ client/proc/LogPageHTML()
    <div id='tabs'></div>
    <div class='btn' id='lock'><img class='ic' src='lc_unlock.png' alt=''></div>
    <div class='btn' id='fold'><img class='ar' src='lc_arrow_d.png' alt=''></div>
+   <div class='btn' id='xclose' title='close'><img class='x' src='lc_cross.png' alt=''></div>
   </div>
   <div class='row3' id='trow' style='display:none'>
    <span class='lab' style='left:0'>TARGET</span>
@@ -317,6 +320,7 @@ client/proc/LogPageHTML()
  grip.addEventListener('pointerdown',function(e){ if(e.button!==0||locked) return; rs={sx:e.screenX,sy:e.screenY,w:G.w,h:G.h}; try{ grip.setPointerCapture(e.pointerId); }catch(err){} e.preventDefault(); e.stopPropagation(); });
  grip.addEventListener('pointermove',function(e){ if(!rs) return; var mw=B?B.x1-G.x:1e9, mh=B?B.y1-G.y:1e9; G.w=clampNum(rs.w+(e.screenX-rs.sx),MINW*Z,mw); G.h=clampNum(rs.h+(e.screenY-rs.sy),MINH*Z,mh); sched(); });
  grip.addEventListener('pointerup',function(e){ if(!rs) return; rs=null; flush(); report(); render(); focusMap(); });
+ document.getElementById('xclose').addEventListener('click',function(){ topic({logpage:'close'}); focusMap(); });
  fold.addEventListener('click',function(){ var d=G.h-48*Z; if(!collapsed){ collapsed=true; G.y+=d; } else { collapsed=false; G.y=G.y-d; } clampG(); flush(); report(); topic({logpage:'fold',f:collapsed?1:0}); focusMap(); });
  lockBtn.addEventListener('click',function(){ locked=!locked; layout(); topic({logpage:'lock',l:locked?1:0}); focusMap(); });
  function tabList(){ if(adminMode()) return \['players','world','admin','logins']; return \['log','scenes','pinned']; }

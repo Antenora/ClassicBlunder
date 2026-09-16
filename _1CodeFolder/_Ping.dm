@@ -1,11 +1,13 @@
 mob
 	var/tmp/PingCooldown
 	verb
-		Ping(var/mob/m in view(15, src))
+		Ping()
 			set category="Other"
 			set hidden = 1
 			if(!(world.time > usr.verb_delay)) return
 			usr.verb_delay=world.time+1
+			var/mob/m = PromptArg(usr, args, 1, "Ping", "view:15:mob", 1)
+			if(isnull(m)) return
 			if(!src.PingCooldown)
 				if(m.client)
 					winset(m, "mainwindow", "flash=-1")

@@ -44,7 +44,7 @@
     var/correct = FALSE
     var/attempts = 0
     while(correct == FALSE)
-        var/input = input(p, "What do you want to add to your [option] passives?") in choices
+        var/input = Ask(p, "What do you want to add to your [option] passives?", "", null, "pick", choices, 0)
         if(attempts >=3)
             p << "You tried too many times, alert an admin"
             break

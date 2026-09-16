@@ -12,7 +12,7 @@ mob/verb/
 	EmoteColorPicker()
 		set hidden = 1
 		var/msg = winget(usr, "RPWindow.rpbox", "text")
-		var/color = input(src, "Choose a text color.", "Text Color") as color|null
+		var/color = Ask(src, "Choose a text color.", "Text Color", null, "color", null, 1)
 		if(!color)
 			return
 		msg += "<font color=[color]></color>"

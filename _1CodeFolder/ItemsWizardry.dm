@@ -155,7 +155,7 @@ obj/Items/Enchantment
 				var/list/Modes=list("Cancel", "Brew Potion","Transmute Lifeforce", "Enhance Potion")
 				if(("Distillation Process" in usr.knowledgeTracker.learnedMagic) && ("CrestCreation" in usr.knowledgeTracker.learnedMagic))
 					Modes.Add("Transmute Philosopher Stone")
-				var/Mode=input(usr, "What do you want to do with this cauldron?", "Cauldron") in Modes
+				var/Mode=Ask(usr, "What do you want to do with this cauldron?", "Cauldron", null, "pick", Modes, 0)
 				if(Mode=="Cancel")
 					src.Using=0
 					return
@@ -170,14 +170,14 @@ obj/Items/Enchantment
 								if(PS.CurrentCapacity<PS.MaxCapacity)
 									Choices.Add(PS)
 							if(Choices.len>2)
-								Choice=input(usr, "What do you want to restore capacity to?", "Select Vessel") in Choices
+								Choice=Ask(usr, "What do you want to restore capacity to?", "Select Vessel", null, "pick", Choices, 0)
 							if(Choice=="Self"||Choices.len<=2)
-								var/Amt=input(usr, "How much capacity do you want to restore through spirit transmutation?", "Restore Capacity (1-[round(usr.TotalCapacity)])") as num|null
+								var/Amt=Ask(usr, "How much capacity do you want to restore through spirit transmutation?", "Restore Capacity (1-[round(usr.TotalCapacity)])", null, "num", null, 1)
 								if(Amt>usr.TotalCapacity)
 									Amt=usr.TotalCapacity
 								if(Amt&&Amt>0)
 									var/Cost=Amt*(glob.progress.EconomyCost/10)
-									var/Confirm=alert(usr, "Restoring [round(Amt)] capacity will cost [Commas(round(Cost))] [glob.progress.MoneyName].  Do you want to spend it?", "Restore Capacity", "No", "Yes")
+									var/Confirm=Ask(usr, "Restoring [round(Amt)] capacity will cost [Commas(round(Cost))] [glob.progress.MoneyName].  Do you want to spend it?", "Restore Capacity", null, "confirm", null, 1, "No", "Yes")
 									if(Confirm=="No")
 										src.Using=0
 										return
@@ -195,12 +195,12 @@ obj/Items/Enchantment
 								return
 							else
 								var/obj/Items/Enchantment/PhilosopherStone/PS=Choice
-								var/Amt=input(usr, "How much capacity do you want to restore through spirit transmutation?", "Restore Capacity (1-[round(PS.MaxCapacity-PS.CurrentCapacity)])") as num|null
+								var/Amt=Ask(usr, "How much capacity do you want to restore through spirit transmutation?", "Restore Capacity (1-[round(PS.MaxCapacity-PS.CurrentCapacity)])", null, "num", null, 1)
 								if(Amt>(PS.MaxCapacity-PS.CurrentCapacity))
 									Amt=(PS.MaxCapacity-PS.CurrentCapacity)
 								if(Amt&&Amt>0)
 									var/Cost=Amt*(glob.progress.EconomyCost*1.25)
-									var/Confirm=alert(usr, "Restoring [round(Amt)] capacity will cost [Commas(round(Cost))] [glob.progress.MoneyName].  Do you want to spend it?", "Restore Capacity", "No", "Yes")
+									var/Confirm=Ask(usr, "Restoring [round(Amt)] capacity will cost [Commas(round(Cost))] [glob.progress.MoneyName].  Do you want to spend it?", "Restore Capacity", null, "confirm", null, 1, "No", "Yes")
 									if(Confirm=="No")
 										src.Using=0
 										return
@@ -234,39 +234,39 @@ obj/Items/Enchantment
 							var/Cost // see line 288
 							Option.Add(usr.PotionTypes)
 							while(Confirm!="Yes")
-								Effect=input(usr, "Brewing a potion.  Assign the first effect.", "Create Potion") in Option
+								Effect=Ask(usr, "Brewing a potion.  Assign the first effect.", "Create Potion", null, "pick", Option, 0)
 								Cost = HerbDictionary[Effect] // This takes the 'effect' var that was chosen earlier, and runs it through the dictionary.
 								switch(Effect)
 									if("Cancel")
 										src.Using=0
 										return
 									if("Wild Herb")
-										Confirm=alert(usr, "Wild Herbs are entirely for flavour, they do not take a potion enhancement slot. Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Wild Herbs are entirely for flavour, they do not take a potion enhancement slot. Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Healing Herb")
-										Confirm=alert(usr, "Healing Herbs grant the drinker a sudden spike of health, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Healing Herbs grant the drinker a sudden spike of health, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Refreshment Herb")
-										Confirm=alert(usr, "Refreshment Herbs grant the drinker a sudden spike of energy, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Refreshment Herbs grant the drinker a sudden spike of energy, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Magic Herb")
-										Confirm=alert(usr, "Magic Herbs grant the drinker a sudden spike of mana, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Magic Herbs grant the drinker a sudden spike of mana, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Toxic Herb")
-										Confirm=alert(usr, "Toxic Herbs poison the drinker, but halve the potion cooldown They cost [Cost] Mana Bits. Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Toxic Herbs poison the drinker, but halve the potion cooldown They cost [Cost] Mana Bits. Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Hallucinogen Herb")
-										Confirm=alert(usr, "Hallucinogen Herbs make you angrier but reduce your defense, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Hallucinogen Herbs make you angrier but reduce your defense, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Philter Herb")
-										Confirm=alert(usr, "Philter Herbs out you as a freak to whomever drinks them, making them so disgusted at you that you take less damage from them They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Philter Herbs out you as a freak to whomever drinks them, making them so disgusted at you that you take less damage from them They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Stimulant Herb")
-										Confirm=alert(usr, "Stimulant Herbs grant the Pure Damage passive, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Stimulant Herbs grant the Pure Damage passive, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Relaxant Herb")
-										Confirm=alert(usr, "Releaxant herbs grant the flow passive", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Releaxant herbs grant the flow passive", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Numbing Herb")
-										Confirm=alert(usr, "Numbing Herbs grant the Hardening passive", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Numbing Herbs grant the Hardening passive", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Mutagenic Herb")
-										Confirm=alert(usr, "Mutagenic Herbs allow you to transform yourself in ways I can't be bothered to doccument, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Mutagenic Herbs allow you to transform yourself in ways I can't be bothered to doccument, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 							if(usr.GetMineral() > Cost)
 								var/obj/Items/Enchantment/Potion/p=new
 								switch(Effect)
 									if("Wild Herb")
-										p.Gimmick=input(usr, "Write out the message that will be added to the drinker's description.", "Create Gimmick Potion") as message
+										p.Gimmick=Ask(usr, "Write out the message that will be added to the drinker's description.", "Create Gimmick Potion", null, "message", null, 0)
 										p.name="Magic Potion"
 									if("Healing Herb")
 										p.Heal=1
@@ -297,20 +297,20 @@ obj/Items/Enchantment
 										p.Hard=1
 										p.name="Numbing Potion"
 									if("Mutagenic Herb")
-										p.Transform=alert(usr,"Should the form entered be weak or strong?","Polymorph","Weak","Strong")
+										p.Transform=Ask(usr, "Should the form entered be weak or strong?", "Polymorph", null, "confirm", null, 1, "Weak", "Strong")
 										p.TransformIcon=input(usr, "What icon will the polymorphed being use?", "Polymorph") as icon
 										p.name="Mutagen"
 								usr.TakeMineral(Cost)
 								if(!(Effect in list("Wild Herb", "Toxic Herb")))
 									p.Slots--
 								usr << "You've created \an [p]!"
-								var/Custom=alert(usr, "Do you want to give [p] a custom name and drink message?", "Custom Potion", "No", "Yes")
+								var/Custom=Ask(usr, "Do you want to give [p] a custom name and drink message?", "Custom Potion", null, "confirm", null, 1, "No", "Yes")
 								if(Custom=="Yes")
-									var/Name=input(usr, "Input custom potion name.", "Potion Name") as text
+									var/Name=Ask(usr, "Input custom potion name.", "Potion Name", null, "text", null, 0)
 									if(!(Name==""||!Name||Name==null))
 										p.name=Name
-									p.DrinkMessage=input(usr, "Input message for when potion is consumed.", "Potion Active") as text
-									p.OffMessage=input(usr, "Input message for when potion wears off.", "Potion Off") as text
+									p.DrinkMessage=Ask(usr, "Input message for when potion is consumed.", "Potion Active", null, "text", null, 0)
+									p.OffMessage=Ask(usr, "Input message for when potion wears off.", "Potion Off", null, "text", null, 0)
 								usr.GiveOrDrop(p)
 							else
 								usr << "You don't have enough capacity to brew this potion!"
@@ -325,7 +325,7 @@ obj/Items/Enchantment
 								usr << "You don't have any potions capable of having more added to them!"
 								src.Using=0
 								return
-							var/obj/Items/Enchantment/Potion/Choice=input(usr, "What potion do you want to add further effects to?", "Add Effect") in Pots
+							var/obj/Items/Enchantment/Potion/Choice=Ask(usr, "What potion do you want to add further effects to?", "Add Effect", null, "pick", Pots, 0)
 							if(Choice=="Cancel")
 								src.Using=0
 								return
@@ -373,38 +373,38 @@ obj/Items/Enchantment
 							HerbDictionary["Mutagenic Herb"] = 150;
 							var/Cost
 							while(Confirm!="Yes")
-								Effect=input(usr, "What effect do you want to add to your potion?", "Add Effect") in Effects
+								Effect=Ask(usr, "What effect do you want to add to your potion?", "Add Effect", null, "pick", Effects, 0)
 								Cost = HerbDictionary[Effect]
 								switch(Effect)
 									if("Cancel")
 										src.Using=0
 										return
 									if("Wild Herb")
-										Confirm=alert(usr, "Wild Herbs are entirely for flavour, they do not take a potion enhancement slot. Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Wild Herbs are entirely for flavour, they do not take a potion enhancement slot. Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Healing Herb")
-										Confirm=alert(usr, "Healing Herbs grant the drinker a sudden spike of health, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Healing Herbs grant the drinker a sudden spike of health, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Refreshment Herb")
-										Confirm=alert(usr, "Refreshment Herbs grant the drinker a sudden spike of energy, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Refreshment Herbs grant the drinker a sudden spike of energy, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Magic Herb")
-										Confirm=alert(usr, "Magic Herbs grant the drinker a sudden spike of mana, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Magic Herbs grant the drinker a sudden spike of mana, They cost [Cost] Mana Bits.  Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Toxic Herb")
-										Confirm=alert(usr, "Toxic Herbs poison the drinker, but halve the potion cooldown They cost [Cost] Mana Bits. Do you want to add them to your potion?", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Toxic Herbs poison the drinker, but halve the potion cooldown They cost [Cost] Mana Bits. Do you want to add them to your potion?", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Hallucinogen Herb")
-										Confirm=alert(usr, "Hallucinogen Herbs make you angrier but reduce your defense, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Hallucinogen Herbs make you angrier but reduce your defense, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Philter Herb")
-										Confirm=alert(usr, "Philter Herbs out you as a freak to whomever drinks them, making them so disgusted at you that you take less damage from them They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Philter Herbs out you as a freak to whomever drinks them, making them so disgusted at you that you take less damage from them They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Stimulant Herb")
-										Confirm=alert(usr, "Stimulant Herbs grant the Pure Damage passive, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Stimulant Herbs grant the Pure Damage passive, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Relaxant Herb")
-										Confirm=alert(usr, "Releaxant herbs grant the flow passive", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Releaxant herbs grant the flow passive", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Numbing Herb")
-										Confirm=alert(usr, "Numbing Herbs grant the Hardening passive", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Numbing Herbs grant the Hardening passive", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 									if("Mutagenic Herb")
-										Confirm=alert(usr, "Mutagenic Herbs allow you to transform yourself in ways I can't be bothered to doccument, They cost [Cost] Mana Bits.", "Add Effect", "No", "Yes")
+										Confirm=Ask(usr, "Mutagenic Herbs allow you to transform yourself in ways I can't be bothered to doccument, They cost [Cost] Mana Bits.", "Add Effect", null, "confirm", null, 1, "No", "Yes")
 							if(usr.GetMineral() > Cost)
 								switch(Effect)
 									if("Wild Herb")
-										Choice.Gimmick=input(usr, "Write out the message that will be added to the drinker's description.", "Create Gimmick Potion") as message
+										Choice.Gimmick=Ask(usr, "Write out the message that will be added to the drinker's description.", "Create Gimmick Potion", null, "message", null, 0)
 										Choice.name="Augmented [Choice.name]"
 									if("Healing Herb")
 										Choice.Heal+=1
@@ -435,7 +435,7 @@ obj/Items/Enchantment
 										Choice.Hard+=1
 										Choice.name="Numbing [Choice.name]"
 									if("Mutagenic Herb")
-										Choice.Transform=alert(usr,"Should the form entered be weak or strong?","Polymorph","Weak","Strong")
+										Choice.Transform=Ask(usr, "Should the form entered be weak or strong?", "Polymorph", null, "confirm", null, 1, "Weak", "Strong")
 										Choice.TransformIcon=input(usr, "What icon will the polymorphed being use?", "Polymorph") as icon
 										Choice.name="Polymorphic [Choice.name]"
 								usr.TakeMineral(Cost)
@@ -450,7 +450,7 @@ obj/Items/Enchantment
 							return
 						if("Transmute Philosopher Stone")
 							var/Cost=(glob.progress.EconomyCost*100*(glob.progress.EconomyMana/100))
-							var/Confirm=alert(usr, "Do you want to create an artificial Philosopher Stone?  This will cost [Commas(Cost)] resources!", "Create Artificial Philosopher Stone", "No", "Yes")
+							var/Confirm=Ask(usr, "Do you want to create an artificial Philosopher Stone?  This will cost [Commas(Cost)] resources!", "Create Artificial Philosopher Stone", null, "confirm", null, 1, "No", "Yes")
 							if(Confirm=="Yes")
 								if(usr.HasMoney(Cost))
 									usr.TakeMoney(Cost)
@@ -641,7 +641,7 @@ obj/Items/Enchantment
 				if(src.Using)
 					return
 				src.Using=1
-				var/Confirm=alert(usr, "Are you sure you want to draw a tarot card?  This will have a permanent effect!", "Tarot Deck", "No", "Yes")
+				var/Confirm=Ask(usr, "Are you sure you want to draw a tarot card?  This will have a permanent effect!", "Tarot Deck", null, "confirm", null, 1, "No", "Yes")
 				var/DeckDraw
 				if(Confirm=="Yes")
 					if(!usr.TarotFate)
@@ -906,7 +906,7 @@ obj/Items/Enchantment
 				if(src.Using)
 					return
 				src.Using=1
-				var/Confirm=alert(usr, "Are you sure you want to draw a card...?", "You Could Die", "No", "Yes")
+				var/Confirm=Ask(usr, "Are you sure you want to draw a card...?", "You Could Die", null, "confirm", null, 1, "No", "Yes")
 				var/DeckDraw
 				if(Confirm=="Yes")
 					if(!usr.TarotFate)
@@ -1014,7 +1014,7 @@ obj/Items/Enchantment
 			set src in usr
 			set name="Activate Orb"
 			if(src.Password)
-				var/Passcheck=input("This orb has an arcane signature.  Enter it to complete the activation.")as text
+				var/Passcheck=Ask(usr, "This orb has an arcane signature.  Enter it to complete the activation.", "", null, "text", null, 0)
 				if(Passcheck!=src.Password)
 					usr << "Incorrect signature."
 					return
@@ -1030,7 +1030,7 @@ obj/Items/Enchantment
 			if(src.Password)
 				usr << "This orb already has a signature."
 				return
-			src.Password=input("Enter the desired signature.")as text
+			src.Password=Ask(usr, "Enter the desired signature.", "", null, "text", null, 0)
 			usr<<"The orb glows as you cast a tuning spell on it."
 		verb/ViewEye()
 			set src in usr
@@ -1041,7 +1041,7 @@ obj/Items/Enchantment
 					if(B.LinkTag in src.LinkedMasks)
 						if(B.suffix)
 							ValidEyes+=A
-			var/obj/pickeye=input("")in ValidEyes
+			var/obj/pickeye=Ask(usr, "", "", null, "pick", ValidEyes, 0)
 			if(pickeye=="Cancel")
 				usr.client.eye=usr
 				usr.client.perspective=MOB_PERSPECTIVE
@@ -1058,10 +1058,10 @@ obj/Items/Enchantment
 					if(B.LinkTag in src.LinkedMasks)
 						if(B.suffix)
 							ValidTongues+=A
-			var/mob/picktongue=input("")in ValidTongues
+			var/mob/picktongue=Ask(usr, "", "", null, "pick", ValidTongues, 0)
 			if(picktongue!="Cancel")
-				var/voiceselect=input("Use your voice, or the holder of the tongue's?")in list("Your Voice","Tongue Holder")
-				var/texttosay=input("Say stuffs.")as text|null
+				var/voiceselect=Ask(usr, "Use your voice, or the holder of the tongue's?", "", null, "pick", list("Your Voice","Tongue Holder"), 0)
+				var/texttosay=Ask(usr, "Say stuffs.", "", null, "text", null, 1)
 				if(texttosay==null)
 					return
 				if(voiceselect=="Your Voice")
@@ -1124,7 +1124,7 @@ obj/Items/Enchantment
 			for(var/obj/Items/Enchantment/ArcanicOrb/orbz in usr)
 				if(!(src.LinkTag in orbz.LinkedMasks))
 					OwnedOrbs.Add(orbz)
-			AO=input(usr, "What orb do you want to link with this mask?", "Arcane Link") in OwnedOrbs
+			AO=Ask(usr, "What orb do you want to link with this mask?", "Arcane Link", null, "pick", OwnedOrbs, 0)
 			if(AO=="Cancel")
 				return
 			AO.LinkedMasks.Add(src.LinkTag)
@@ -1139,7 +1139,7 @@ obj/Items/Enchantment
 				if(p.Secret=="Heavenly Restriction" && p.secretDatum?:hasRestriction("Magic"))
 					continue
 				Peeps.Add(p)
-			Trg=input(usr, "Who do you want to place this arcane mask on?", "Place Mask") in Peeps
+			Trg=Ask(usr, "Who do you want to place this arcane mask on?", "Place Mask", null, "pick", Peeps, 0)
 			if(Trg.KO)
 				src.Forced=1
 				src.loc=Trg
@@ -1147,7 +1147,7 @@ obj/Items/Enchantment
 				OMsg(Trg, "[usr] forces a  plain mask onto [Trg]'s face ... it melds with their face and leaves rune etchings on [Trg]'s eyes!")
 				return
 			else
-				var/Confirm=alert(Trg, "Do you want to allow [usr] to place an arcane mask on you?", "Place Mask", "No", "Yes")
+				var/Confirm=Ask(Trg, "Do you want to allow [usr] to place an arcane mask on you?", "Place Mask", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					OMsg(Trg, "[Trg] refuses the mask!")
 					return
@@ -1172,7 +1172,7 @@ obj/Items/Enchantment
 		verb/Set_Flying_State()
 			set category=null
 			set src in usr
-			src.CustomState=input(usr, "What icon state should your Magical Skateboard set you in?", "Set Flying State") as text|null
+			src.CustomState=Ask(usr, "What icon state should your Magical Skateboard set you in?", "Set Flying State", null, "text", null, 1)
 			usr << "Flying state for [src] set to [src.CustomState]."
 	Surfing_Device
 		name = "Magical Surfboard"
@@ -1190,7 +1190,7 @@ obj/Items/Enchantment
 		verb/Set_State()
 			set category=null
 			set src in usr
-			src.CustomState=input(usr, "What icon state should your Magical Surfboard set you in?", "Set Flying State") as text|null
+			src.CustomState=Ask(usr, "What icon state should your Magical Surfboard set you in?", "Set Flying State", null, "text", null, 1)
 			usr << "Flying state for [src] set to [src.CustomState]."
 
 	Tome111
@@ -1222,7 +1222,7 @@ obj/Items/Enchantment
 				usr << "You don't know any magic to be scribed to [src]!"
 				src.Using=0
 				return
-			var/obj/Skills/Choice=input(usr, "What spell do you want to inscribe on your [src]?  This will make it cost less mana and take less time to cast again.", "Scribe [src]") in MagicKnown
+			var/obj/Skills/Choice=Ask(usr, "What spell do you want to inscribe on your [src]?  This will make it cost less mana and take less time to cast again.", "Scribe [src]", null, "pick", MagicKnown, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -1268,13 +1268,13 @@ obj/Items/Enchantment
 				usr << "You don't know how to interact further with [src]."
 				src.Using=0
 				return
-			var/Mode=input(usr, "How do you wish to interact with [src]?", "[src] Enchantment") in Options
+			var/Mode=Ask(usr, "How do you wish to interact with [src]?", "[src] Enchantment", null, "pick", Options, 0)
 			if(Mode=="Cancel")
 				src.Using=0
 				return
 			switch(Mode)
 				if("Expand")
-					var/MultiMake=input("How much spell level space do you wish to add?")as num|null
+					var/MultiMake=Ask(usr, "How much spell level space do you wish to add?", "", null, "num", null, 1)
 					if(MultiMake==null||MultiMake<=0)
 						src.Using=0
 						return
@@ -1333,7 +1333,7 @@ obj/Items/Enchantment
 					var/list/Delete=list("Cancel")
 					for(var/obj/Skills/S in src.Spells)
 						Delete.Add(S)
-					var/Choice=input(usr, "What spell do you want to erase from [src]?", "Cleanse [src]") in Delete
+					var/Choice=Ask(usr, "What spell do you want to erase from [src]?", "Cleanse [src]", null, "pick", Delete, 0)
 					if(Choice=="Cancel")
 						src.Using=0
 						return
@@ -1343,10 +1343,10 @@ obj/Items/Enchantment
 					return
 				if("Secure")
 					if(src.Password)
-						var/PassCheck=input(usr, "[src] already has a password.  Enter it now if you wish to change it.", "Secure Tome") as text|null
+						var/PassCheck=Ask(usr, "[src] already has a password.  Enter it now if you wish to change it.", "Secure Tome", null, "text", null, 1)
 						if(PassCheck)
 							if(PassCheck==src.Password)
-								src.Password=input(usr, "Correct.  Enter the new password you wish to secure this tome with.", "Secure Tome") as text|null
+								src.Password=Ask(usr, "Correct.  Enter the new password you wish to secure this tome with.", "Secure Tome", null, "text", null, 1)
 								src.Using=0
 								return
 							else
@@ -1356,7 +1356,7 @@ obj/Items/Enchantment
 					else
 						var/Cost=glob.progress.EconomyMana/4
 						if(usr.HasManaCapacity(Cost))
-							src.Password=input(usr, "Enter the password you wish to secure this tome with.", "Secure Tome") as text|null
+							src.Password=Ask(usr, "Enter the password you wish to secure this tome with.", "Secure Tome", null, "text", null, 1)
 							usr.TakeManaCapacity(Cost)
 							usr << "[src] has now been secured with the password '[src.Password]'."
 							src.Using=0
@@ -1377,7 +1377,7 @@ obj/Items/Enchantment
 						src.Using=0
 						return
 					var/Cost=glob.progress.EconomyMana/4
-					var/obj/Skills/Learn=input(usr, "What spell do you want to learn from [src]?", "Study Tome") in Scribed
+					var/obj/Skills/Learn=Ask(usr, "What spell do you want to learn from [src]?", "Study Tome", null, "pick", Scribed, 0)
 					if(Learn=="Cancel")
 						src.Using=0
 						return
@@ -1458,14 +1458,10 @@ obj/Items/Enchantment
 		var/Parasite=0//makes bad thing happen
 		var/CrestMadeAge=0//the era that the crest was made on
 		verb/Examine()
-			var/head="<html><title>[src]</title><body bgcolor=#000000 text=#339999>"
-			var/close="</body></html>"
-			var/content="<table>"
+			var/list/rows = list()
 			for(var/obj/Skills/x in src.Spells)
-				content+="<tr><td>[x]</td></tr>"
-			content+="</table>"
-			var/HTML="[head][content][close]"
-			usr << browse(HTML,"window=[src];size=450x600")
+				rows[++rows.len] = list("t" = "[x]")
+			usr.client?.TableShow("crest:\ref[src]", "CREST", "[src]", "[rows.len] spell[rows.len == 1 ? "" : "s"]", list(list("l" = "SPELL", "a" = "l")), rows, "", null, list("nohead" = 1))
 		verb
 			Transplant_Crest()
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Magic"))
@@ -1485,7 +1481,7 @@ obj/Items/Enchantment
 						usr << "There's no one here to transplant your [src] into."
 						src.Using=0
 						return
-					var/mob/Players/Choice=input(usr, "Who do you want to transplant your [src] into?", "Transplant [src]") in Options
+					var/mob/Players/Choice=Ask(usr, "Who do you want to transplant your [src] into?", "Transplant [src]", null, "pick", Options, 0)
 					if(Choice=="Cancel")
 						src.Using=0
 						return
@@ -1514,7 +1510,7 @@ obj/Items/Enchantment
 							usr.Reincarnate()
 				else
 					if(usr.CrestCreationUnlocked>=4)
-						var/Choice=alert(usr, "Do you want to expend capacity to force this Magic Crest to accept you?", "Steal Crest", "No", "Yes")
+						var/Choice=Ask(usr, "Do you want to expend capacity to force this Magic Crest to accept you?", "Steal Crest", null, "confirm", null, 1, "No", "Yes")
 						if(Choice=="No")
 							return
 						var/Cost=glob.progress.EconomyMana/2
@@ -1553,7 +1549,7 @@ obj/Items/Enchantment
 				if(src.Using)
 					return
 				src.Using=1
-				var/Choice=alert(usr, "Who do you want to turn your [src] into a parasitic entity?", "Malform [src]", "No", "Yes")
+				var/Choice=Ask(usr, "Who do you want to turn your [src] into a parasitic entity?", "Malform [src]", null, "confirm", null, 1, "No", "Yes")
 				if(Choice=="No")
 					src.Using=0
 					return
@@ -1593,7 +1589,7 @@ obj/Items/Enchantment
 					usr << "You don't know any magic to add to your [src]!"
 					src.Using=0
 					return
-				var/obj/Skills/Choice=input(usr, "What spell do you want to implant into [src]?", "Implant Spell") in MagicKnown
+				var/obj/Skills/Choice=Ask(usr, "What spell do you want to implant into [src]?", "Implant Spell", null, "pick", MagicKnown, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
@@ -1884,20 +1880,20 @@ obj/Items/Enchantment
 			set category=null
 			set src in view(1, usr)
 			if(src.Password)
-				var/PassCheck=input(usr, "Enter the nexus' current password in order to reset it.", "Reset Password") as text
+				var/PassCheck=Ask(usr, "Enter the nexus' current password in order to reset it.", "Reset Password", null, "text", null, 0)
 				if(PassCheck==src.Password)
-					src.Password=input(usr, "Correct.  Enter the new password you'd like for this nexus.", "Reset Password") as text
+					src.Password=Ask(usr, "Correct.  Enter the new password you'd like for this nexus.", "Reset Password", null, "text", null, 0)
 				else
 					usr << "That was not the correct password."
 					return
 			else
-				src.Password=input(usr, "Enter a password for the nexus.", "Set Password") as text
+				src.Password=Ask(usr, "Enter a password for the nexus.", "Set Password", null, "text", null, 0)
 		verb/Nexus_Summon()
 			set category=null
 			set src in view(1, usr)
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Magic"))
 				return
-			var/PassCheck=input(usr, "Enter the nexus' password to summon one of those with a teleport amulet assigned to this nexus.", "Rally") as text
+			var/PassCheck=Ask(usr, "Enter the nexus' password to summon one of those with a teleport amulet assigned to this nexus.", "Rally", null, "text", null, 0)
 			if(PassCheck==src.Password)
 				var/obj/Skills/Teleport/Nexus_Summon/ns=new
 				ns.FocalPassword=src.Password
@@ -1912,7 +1908,7 @@ obj/Items/Enchantment
 			set src in view(1, usr)
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Magic"))
 				return
-			var/PassCheck=input(usr, "Enter the nexus' password to summon those with a teleport amulet assigned to this nexus.", "Rally") as text
+			var/PassCheck=Ask(usr, "Enter the nexus' password to summon those with a teleport amulet assigned to this nexus.", "Rally", null, "text", null, 0)
 			if(PassCheck==src.Password)
 				var/obj/Skills/Teleport/Nexus_Summon/Nexus_Rally/ns=new
 				ns.FocalPassword=src.Password
@@ -1934,14 +1930,14 @@ obj/Items/Enchantment
 			set category=null
 			set src in usr
 			if(src.Password)
-				var/PassCheck=input(usr, "Enter the teleport necklace's current password to reset it.", "Reset Password") as text
+				var/PassCheck=Ask(usr, "Enter the teleport necklace's current password to reset it.", "Reset Password", null, "text", null, 0)
 				if(src.Password==PassCheck)
-					src.Password=input(usr, "Enter a new password for the teleport necklace.", "Reset Password") as text
+					src.Password=Ask(usr, "Enter a new password for the teleport necklace.", "Reset Password", null, "text", null, 0)
 				else
 					usr << "That is not [src]'s current password."
 					return
 			else
-				src.Password=input(usr, "Set the teleport necklace's password.", "Set Password") as text
+				src.Password=Ask(usr, "Set the teleport necklace's password.", "Set Password", null, "text", null, 0)
 		verb/Necklace_Teleport()
 			set category=null
 			set src in usr
@@ -2031,13 +2027,13 @@ obj/Items/Enchantment
 			set src in view(1, usr)
 			set name="Set Password"
 			if(src.Password)
-				var/PassCheck=input(usr, "Enter the current password in order to reset.", "Reset Password") as text
+				var/PassCheck=Ask(usr, "Enter the current password in order to reset.", "Reset Password", null, "text", null, 0)
 				if(PassCheck==src.Password)
-					src.Password=input(usr, "Enter the new password you'd like.", "Reset Password") as text
+					src.Password=Ask(usr, "Enter the new password you'd like.", "Reset Password", null, "text", null, 0)
 				else
 					usr << "Incorrect password."
 			else
-				src.Password=input(usr, "Enter the password you'd like.", "Set Password") as text
+				src.Password=Ask(usr, "Enter the password you'd like.", "Set Password", null, "text", null, 0)
 		verb/TogglePortal()
 			set src in oview(1)
 			set name="Toggle Portal"
@@ -2069,7 +2065,7 @@ obj/Items/Enchantment
 				usr << "The dimension type of this generator is no longer found in the world!  Contact the admins to try to find your pocket dimension."
 				return
 			if(src.Password)
-				var/PassCheck=input("Enter the password to toggle this generator.") as text
+				var/PassCheck=Ask(usr, "Enter the password to toggle this generator.", "", null, "text", null, 0)
 				if(PassCheck==src.Password)
 					if(src.PortalStatus=="Off")
 						var/obj/Effects/PocketPortal/PP=new(src.x, src.y+2, src.z)
@@ -2140,9 +2136,9 @@ obj/Items/Enchantment
 				src.ConcentrationCheck=usr.Health
 				var/Confirm
 				if(!src.ReturnX&&!src.ReturnY&&!src.ReturnZ)
-					Confirm=alert(usr, "You are about to use your [src] to return to spawn!  Are you sure you want to do this?", "Crystal of Recall", "No", "Yes")
+					Confirm=Ask(usr, "You are about to use your [src] to return to spawn!  Are you sure you want to do this?", "Crystal of Recall", null, "confirm", null, 1, "No", "Yes")
 				else
-					Confirm=alert(usr, "You are about to use your [src] to return to [src.ReturnX], [src.ReturnY], [src.ReturnZ]!  Are you sure you want to do this?", "Crystal of Recall", "No", "Yes")
+					Confirm=Ask(usr, "You are about to use your [src] to return to [src.ReturnX], [src.ReturnY], [src.ReturnZ]!  Are you sure you want to do this?", "Crystal of Recall", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					src.Using=0
 					return
@@ -2183,16 +2179,16 @@ obj/Items/Enchantment
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Magic"))
 					return
 				if(Signature)
-					var/PassCheck=input(usr, "Enter the password protecting this crystal if you want to change who it is attuned to.", "Change Signature") as text
+					var/PassCheck=Ask(usr, "Enter the password protecting this crystal if you want to change who it is attuned to.", "Change Signature", null, "text", null, 0)
 					if(PassCheck==src.Password)
-						src.Password=input(usr, "Enter a new password.", "Change Signature") as text
+						src.Password=Ask(usr, "Enter a new password.", "Change Signature", null, "text", null, 0)
 						src.Signature=usr.ckey
 						usr << "[src] has accepted your magical signature!"
 						return
 					else
 						usr << "Incorrect."
 				else
-					src.Password=input(usr, "Enter a password to safeguard your signature.", "Assign Signature") as text
+					src.Password=Ask(usr, "Enter a password to safeguard your signature.", "Assign Signature", null, "text", null, 0)
 					src.Signature=usr.ckey
 					usr << "Your magical signature has been accepted by [src]!"
 					src.icon_state="Active"
@@ -2216,7 +2212,7 @@ obj/Items/Enchantment
 			var/validkitters=list("Cancel")
 			for(var/mob/Players/A in view(1,usr))
 				validkitters+=A
-			var/mob/selection=input("Select a target to use the age-deceiving pills on.") in validkitters
+			var/mob/selection=Ask(usr, "Select a target to use the age-deceiving pills on.", "", null, "pick", validkitters, 0)
 			if(selection=="Cancel")
 				return
 			if(selection.Aged)
@@ -2345,7 +2341,7 @@ obj/Items/Enchantment
 			if(src.Password)
 				usr<<"This portal is already configured."
 				return
-			PasswordCheck=input("Input the desired password. This won't work if two portals already share the same password!")as text
+			PasswordCheck=Ask(usr, "Input the desired password. This won't work if two portals already share the same password!", "", null, "text", null, 0)
 			var/PortalChecker=0
 			for(var/obj/Items/Enchantment/Portal/A in world)
 				if(A.Password==PasswordCheck)
@@ -2371,7 +2367,7 @@ obj/Items/Enchantment
 		verb/SetPassword()
 			set src in usr
 			set name="Infuse Magical Signature"
-			src.Password=input("Input a password.",src.Password)as text
+			src.Password=Ask(usr, "Input a password.", src.Password, null, "text", null, 0)
 			usr<<"The book has been aligned with a magical frequency ([src.Password])."
 		verb/GoToPortal()
 			if(src.Password==null)
@@ -2387,7 +2383,7 @@ obj/Items/Enchantment
 				usr<<"There's no portals to go to!"
 				return
 			else
-				var/obj/selection=input("")in PortalsFound
+				var/obj/selection=Ask(usr, "", "", null, "pick", PortalsFound, 0)
 				if(selection=="Cancel")
 					return
 				else

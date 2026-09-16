@@ -502,10 +502,10 @@ proc/_WxSyncLoop()
 	var/list/zones = list()
 	for(var/area/A in _dn_sky_areas)
 		zones["[A.name]"] = A
-	var/zn = input(src, "Which planet?") in zones + "Cancel"
+	var/zn = Ask(src, "Which planet?", "", null, "pick", (zones + "Cancel"), 0)
 	if(zn == "Cancel") return
 	var/area/A = zones[zn]
-	var/kind = input(src, "Which weather?") in list("clear","rain","storm","snow","blizzard","dust","Cancel")
+	var/kind = Ask(src, "Which weather?", "", null, "pick", list("clear","rain","storm","snow","blizzard","dust","Cancel"), 0)
 	if(kind == "Cancel") return
 	WxSet(A, kind == "clear" ? null : kind)
 	src << "Weather on [zn]: [kind]."

@@ -32,34 +32,34 @@ mob
 
 /mob/Admin3/verb/CreateSwapMap()
 	set hidden = 1
-	var/Choice=input(usr, "Are you sure you want to create a swap map?", "Swap Map") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to create a swap map?", "Swap Map", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/whichMap = input(usr, "What would you like to call it?") as null|text
+	var/whichMap = Ask(usr, "What would you like to call it?", "", null, "text", null, 1)
 	if(!whichMap) return
 	if(fexists("Maps/map_[whichMap].sav"))
-		var/overwrite = alert(usr, "A map already exists with the name [whichMap]! Do you want to override it?",, "Yes", "No")
+		var/overwrite = Ask(usr, "A map already exists with the name [whichMap]! Do you want to override it?", , null, "confirm", null, 1, "Yes", "No")
 		if(overwrite!="Yes") return
-	var/firstX = input(usr, "X1?") as null|num
-	var/firstY = input(usr, "Y1?") as null|num
-	var/secondX = input(usr, "X2?") as null|num
-	var/secondY = input(usr, "Y2?") as null|num
-	var/Z = input(usr, "Z?") as null|num
+	var/firstX = Ask(usr, "X1?", "", null, "num", null, 1)
+	var/firstY = Ask(usr, "Y1?", "", null, "num", null, 1)
+	var/secondX = Ask(usr, "X2?", "", null, "num", null, 1)
+	var/secondY = Ask(usr, "Y2?", "", null, "num", null, 1)
+	var/Z = Ask(usr, "Z?", "", null, "num", null, 1)
 	SwapMaps_SaveChunk(whichMap, locate(firstX,firstY,Z), locate(secondX, secondY,Z))
 	SwapMaps_Save(whichMap)
 	usr << "Saved!"
 
 mob/Admin3/verb/LoadSwapMap()
 	set hidden = 1
-	var/Choice=input(usr, "Are you sure you want to load a swap map?", "Swap Map") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to load a swap map?", "Swap Map", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/whichMap = input(usr, "What would you like to call it?") as null|text
+	var/whichMap = Ask(usr, "What would you like to call it?", "", null, "text", null, 1)
 	if(!whichMap) return
 	if(!fexists("Maps/map_[whichMap].sav"))
 		usr << "[whichMap] doesn't exist."
 		return
 	var/swapmap/newMap = SwapMaps_CreateFromTemplate(whichMap)
 	var/turf/center = newMap.CenterTile()
-	var/goToCenter = alert(usr, "Would you like to teleport to the center of the loaded map?",,"Yes","No")
+	var/goToCenter = Ask(usr, "Would you like to teleport to the center of the loaded map?", , null, "confirm", null, 1, "Yes", "No")
 	if(goToCenter=="Yes")
 		usr.PrevX = usr.x
 		usr.PrevY = usr.y
@@ -71,9 +71,9 @@ mob/Admin3/verb/LoadSwapMap()
 
 /mob/Admin3/verb/ForceCloseSwapMap()
 	set hidden = 1
-	var/Choice=input(usr, "Are you sure you want to force close a swap map?", "Swap Map") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to force close a swap map?", "Swap Map", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/whichMap = input(usr, "Input a map UID.") as null|num
+	var/whichMap = Ask(usr, "Input a map UID.", "", null, "num", null, 1)
 	if(!whichMap) return
 	for(var/swapmap/map in swapmaps_loaded)
 		if(map.UID == whichMap)
@@ -91,16 +91,16 @@ mob/Admin3/verb/LoadSwapMap()
 
 /mob/Admin3/verb/ForceSaveSwapMap()
 	set hidden = 1
-	var/Choice=input(usr, "Are you sure you want to force save a swap map?", "Swap Map") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to force save a swap map?", "Swap Map", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/whichMap = input(usr, "Which map?") as null|text
+	var/whichMap = Ask(usr, "Which map?", "", null, "text", null, 1)
 	if(!whichMap) return
 	SwapMaps_Save(whichMap)
 
 
 /mob/Admin3/verb/Reboot()
 	if(Alert("You sure you want to shutdown the server?"))
-		var/skip = input(src, "Do you want to skip saving?") in list("Yes", "No")
+		var/skip = Ask(src, "Do you want to skip saving?", "", null, "pick", list("Yes", "No"), 0)
 		if(skip == "No")
 			sleep(1)
 			for(var/mob/Players/Q in players)
@@ -267,16 +267,16 @@ mob/Admin3/verb/LoadSwapMap()
 				html += "</tr>"
 		html += "</table>"
 	html += "</body></html>"
-	src << browse(html, "window=StyleSigReqs;size=900x900")
-	usr << "<font color='#aaffaa'>(Browser window also opened - if you don't see it, this chat dump has the same data.)</font>"
+	src.client?.DocShow("reqs", "REQS", "Style and Sig Requirements", html, "theme", "", 900, 900)
+	usr << "<font color='#aaffaa'>(A panel also opened - if you don't see it, this chat dump has the same data.)</font>"
 
 /mob/Admin3/verb/Tweak_Style_Sig_Var()
 	set category = "Admin"
 	set name = "Tweak Style/Sig Var"
 	set desc = "Edit a scalar var on a T1/T2/T3 Style or T1/T2 Sig template + propagate to live instances."
-	var/Choice=input(usr, "Are you sure you want to tweak style sig vars?", "Tweak") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to tweak style sig vars?", "Tweak", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/category = input(usr, "Pick a category to tweak.", "Tweak Style/Sig") as null|anything in list("T1 Style", "T2 Style", "T3 Style", "T1 Sig", "T2 Sig")
+	var/category = Ask(usr, "Pick a category to tweak.", "Tweak Style/Sig", null, "pick", list("T1 Style", "T2 Style", "T3 Style", "T1 Sig", "T2 Sig"), 1)
 	if(!category)
 		return
 	var/list/typeChoices = list()
@@ -310,7 +310,7 @@ mob/Admin3/verb/LoadSwapMap()
 	if(!typeChoices.len)
 		usr << "No types found in [category]."
 		return
-	var/pickedKey = input(usr, "Pick a type from [category].", "Tweak Type") as null|anything in typeChoices
+	var/pickedKey = Ask(usr, "Pick a type from [category].", "Tweak Type", null, "pick", typeChoices, 1)
 	if(!pickedKey)
 		return
 	var/path = typeChoices[pickedKey]
@@ -336,7 +336,7 @@ mob/Admin3/verb/LoadSwapMap()
 		usr << "No editable scalar vars found on [pickedKey]."
 		del probe
 		return
-	var/varKey = input(usr, "Which var to edit on [pickedKey]?", "Tweak Var") as null|anything in varChoices
+	var/varKey = Ask(usr, "Which var to edit on [pickedKey]?", "Tweak Var", null, "pick", varChoices, 1)
 	if(!varKey)
 		del probe
 		return
@@ -344,9 +344,9 @@ mob/Admin3/verb/LoadSwapMap()
 	var/curVal = probe.vars[varName]
 	var/newVal
 	if(isnum(curVal))
-		newVal = input(usr, "Current [varName] = [curVal]. New numeric value?", "Tweak", curVal) as null|num
+		newVal = Ask(usr, "Current [varName] = [curVal]. New numeric value?", "Tweak", curVal, "num", null, 1)
 	else
-		newVal = input(usr, "Current [varName] = \"[curVal]\". New text value?", "Tweak", curVal) as null|text
+		newVal = Ask(usr, "Current [varName] = \"[curVal]\". New text value?", "Tweak", curVal, "text", null, 1)
 	if(isnull(newVal))
 		del probe
 		return
@@ -363,7 +363,7 @@ mob/Admin3/verb/LoadSwapMap()
 	set category = "Admin"
 	set name = "Tweak Pot Reqs"
 	set desc = "Edit potential threshold for a Style/Sig tier unlock slot in glob.progress."
-	var/Choice=input(usr, "Are you sure you want to tweak pot reqs?", "Tweak") in list("Yes", "No")
+	var/Choice=Ask(usr, "Are you sure you want to tweak pot reqs?", "Tweak", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
 	var/list/slots = list(
 		"1st T1 Style" = list("T1_STYLES", 1),
@@ -391,7 +391,7 @@ mob/Admin3/verb/LoadSwapMap()
 		var/list/targetList = glob.progress.vars[listName]
 		var/curVal = (targetList && idx <= targetList.len) ? targetList[idx] : "?"
 		labels["[k] (current: [curVal])"] = k
-	var/pickedLabel = input(usr, "Pick a threshold to tweak.", "Tweak Pot Reqs") as null|anything in labels
+	var/pickedLabel = Ask(usr, "Pick a threshold to tweak.", "Tweak Pot Reqs", null, "pick", labels, 1)
 	if(!pickedLabel)
 		return
 	var/pickedKey = labels[pickedLabel]
@@ -406,18 +406,20 @@ mob/Admin3/verb/LoadSwapMap()
 		usr << "Index [idx] out of range for [listName] (len=[targetList.len])."
 		return
 	var/curVal = targetList[idx]
-	var/newVal = input(usr, "Current [pickedKey] = [curVal]. New potential value?", "Tweak Pot Req", curVal) as null|num
+	var/newVal = Ask(usr, "Current [pickedKey] = [curVal]. New potential value?", "Tweak Pot Req", curVal, "num", null, 1)
 	if(isnull(newVal))
 		return
 	targetList[idx] = newVal
 	Log("Admin", "[ExtractInfo(usr)] tweaked glob.progress.[listName]\[[idx]\] from [curVal] to [newVal] ([pickedKey]).")
 	usr << "Set [pickedKey] from [curVal] to [newVal]. Note: in-memory only - reverts on world reboot."
 
-/mob/Admin2/verb/PrivateNarrate(mob/m in players)
+/mob/Admin2/verb/PrivateNarrate()
 	set category="Admin"
-	var/Choice=input(usr, "Are you sure you want to privately narrate to this player?", "Private Narrate") in list("Yes", "No")
+	var/mob/m = PromptArg(usr, args, 1, "PrivateNarrate", "players")
+	if(isnull(m)) return
+	var/Choice=Ask(usr, "Are you sure you want to privately narrate to this player?", "Private Narrate", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/message = input(usr,"What do you want to whisper to them?","Cursespeak") as message | null
+	var/message = Ask(usr, "What do you want to whisper to them?", "Cursespeak", null, "message", null, 1)
 	if(message)
 		message = "<i><font color='#F82D2D'>[message]</font></i>"
 		Log("Admin","[ExtractInfo(usr)] cursespeaked [m] the following: [message]", 0, 3)
@@ -429,17 +431,19 @@ mob/Admin3/verb/LoadSwapMap()
 
 mob/Admin2/verb
 	EditAllSpawners()
-		var/Choice=input(usr, "Are you sure you want to edit all AI spawners?", "AI") in list("Yes", "No")
+		var/Choice=Ask(usr, "Are you sure you want to edit all AI spawners?", "AI", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		for(var/obj/AI_Spot/ai in world)
 			Edit(ai)
 
-	GiveWound(var/mob/m in players)
+	GiveWound()
 		set category="Admin"
 		set name="Give Wound"
-		var/Choice=input(usr, "Are you sure you want to give this person wounds?", "Wound") in list("Yes", "No")
+		var/mob/m = PromptArg(usr, args, 1, "Give Wound", "players")
+		if(isnull(m)) return
+		var/Choice=Ask(usr, "Are you sure you want to give this person wounds?", "Wound", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
-		var/choice = input(usr, "What kind of wound for [m]?", "Give Wound") as null|anything in list("Light", "Heavy", "Maim", "Cancel")
+		var/choice = Ask(usr, "What kind of wound for [m]?", "Give Wound", null, "pick", list("Light", "Heavy", "Maim", "Cancel"), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Light")
@@ -468,8 +472,10 @@ mob/Admin2/verb
 				Log("Admin", "[ExtractInfo(usr)] gave [ExtractInfo(m)] a maim wound.")
 				m << "You have been maimed!"
 
-	EditPassiveHandler(mob/m in world)
+	EditPassiveHandler()
 		set category = "Admin"
+		var/mob/m = PromptArg(usr, args, 1, "EditPassiveHandler", "world:/mob")
+		if(isnull(m)) return
 		if(m.passive_handler.Get("Rank-Down Protection") && !usr.passive_handler.Get("True Edit"))
 			m.OMessage(15, "<b><font color=[m.Text_Color]><font size=+1>[m] was protected from the effects of Rank Magic!</b></font color></font size>", "<font color=blue>[m]([m.key]) cannot be Edited.")
 			return
@@ -477,27 +483,22 @@ mob/Admin2/verb
 
 
 
-	ViewPassives(mob/m in world)
+	ViewPassives()
 		set category = "Admin"
-		var/html = "<body bgcolor=#000000 text=#339999><b>Current Passives:</b><br>"
-		for(var/passive in m.passive_handler.passives)
-			if(m.passive_handler.passives[passive])
-				html += "<b>[passive] : [m.passive_handler.passives[passive]]</b><br>"
-		if(m.passive_handler.states && m.passive_handler.states.len)
-			html += "<br><b>Internal state:</b><br>"
-			for(var/skey in m.passive_handler.states)
-				if(m.passive_handler.states[skey])
-					html += "<b>[skey] : [m.passive_handler.states[skey]]</b><br>"
-		usr<<browse(html,"window=[m]'s Passives;size=450x600")
+		var/mob/m = PromptArg(usr, args, 1, "ViewPassives", "world:/mob")
+		if(isnull(m)) return
+		m.ShowPassives(usr, 1)
 
 
 mob/Admin3/verb
 	RuntimesView()
-		var/View={"<html><head><title>Logs</title><body>
-<font size=3><font color=red>Runtime Errors<hr><font size=2><font color=black>"}
-		var/ISF=file2text("debug_log.txt")
-		View+=ISF
-		usr<<browse(View,"window=Log;size=500x350")
+		var/ISF = "[file2text("debug_log.txt")]"
+		var/note = ""
+		var/total = length_char(ISF)
+		if(total > 500000)
+			ISF = copytext_char(ISF, total - 500000 + 1)
+			note = "Showing the last 500,000 characters"
+		usr.client?.DocShow("runtimes", "LOG", "Runtime Errors", ISF, "text", note, 500, 350, null, "mono")
 	RuntimesDelete()
 		world.log=file("RuntimesTEMP.log")
 		fdel("debug_log.txt")
@@ -519,7 +520,7 @@ mob/Admin3/verb
 		for(var/mob/Player/AI/a in world)
 			if(!istype(a, /mob/Player/AI/Nympharum)) active_ais += a
 
-		switch(input("There are currently [active_ais.len] active ai in the world. Would you like to delete them all?") in list("Yes","No"))
+		switch(Ask(usr, "There are currently [active_ais.len] active ai in the world. Would you like to delete them all?", "", null, "pick", list("Yes","No"), 0))
 			if("Yes")
 				var/len=active_ais.len
 				for(var/mob/Player/AI/a in active_ais)
@@ -542,9 +543,13 @@ mob/Admin3/verb
 		if(AdminContentsView) usr << "You will now view the contents of any mob you have selected."
 		else usr << "You will no longer view the contents of any mob you have selected."
 
-	Potential_Boost(mob/m in players, val as num)
+	Potential_Boost()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to boost this person's potential?", "Potential Boost") in list("Yes", "No")
+		var/mob/m = PromptArg(usr, args, 1, "Potential Boost", "players")
+		if(isnull(m)) return
+		var/val = PromptArgValue(usr, args, 2, "Potential Boost", "num")
+		if(isnull(val)) return
+		var/Choice=Ask(usr, "Are you sure you want to boost this person's potential?", "Potential Boost", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		if(val&&m)
 			m.Potential+=val
@@ -556,12 +561,12 @@ mob/Admin3/verb
 
 	SetDeadSpawn()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to set dead spawn?", "Dead Spawn") in list("Yes", "No")
+		var/Choice=Ask(usr, "Are you sure you want to set dead spawn?", "Dead Spawn", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		var/turf/NewLoc
-		var/X=input(src, "New X for dead spawn?", "Set Dead Spawn X") as num|null
-		var/Y=input(src, "New Y for dead spawn?", "Set Dead Spawn Y") as num|null
-		var/Z=input(src, "New Z for dead spawn?", "Set Dead Spawn Z") as num|null
+		var/X=Ask(src, "New X for dead spawn?", "Set Dead Spawn X", null, "num", null, 1)
+		var/Y=Ask(src, "New Y for dead spawn?", "Set Dead Spawn Y", null, "num", null, 1)
+		var/Z=Ask(src, "New Z for dead spawn?", "Set Dead Spawn Z", null, "num", null, 1)
 		if(X<0)
 			X=0
 		if(Y<0)
@@ -580,10 +585,10 @@ mob/Admin3/verb
 			src << "That tile doesn't exist."
 	SetStartingProgressValues()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to set starting potential and RPP?", "Set Starting Pot/RPP") in list("Yes", "No")
+		var/Choice=Ask(usr, "Are you sure you want to set starting potential and RPP?", "Set Starting Pot/RPP", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
-		var/X=input(src, "Starting RPP", "Set spawn RPP") as num|null
-		var/Y=input(src, "Starting Potential", "Set spawn Potential") as num|null
+		var/X=Ask(src, "Starting RPP", "Set spawn RPP", null, "num", null, 1)
+		var/Y=Ask(src, "Starting Potential", "Set spawn Potential", null, "num", null, 1)
 		if(X<0)
 			X=0
 		if(Y<0)
@@ -596,7 +601,7 @@ mob/Admin3/verb
 
 	ForceResetMultis()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to force reset all mults?", "Force Reset Mults") in list("Yes", "No")
+		var/Choice=Ask(usr, "Are you sure you want to force reset all mults?", "Force Reset Mults", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		for(var/mob/Players/m in players)
 			if(m.ActiveBuff)
@@ -613,21 +618,23 @@ mob/Admin3/verb
 					b.Trigger(m)
 			m.Reset_Multipliers()
 
-	FormMastery(mob/p in players)
-		var/Choice=input(usr, "Are you sure you want to change Form Mastery for someone?", "Form Mastery") in list("Yes", "No")
+	FormMastery()
+		var/mob/p = PromptArg(usr, args, 1, "FormMastery", "players")
+		if(isnull(p)) return
+		var/Choice=Ask(usr, "Are you sure you want to change Form Mastery for someone?", "Form Mastery", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		if(!length(p.race.transformations))
 			usr << "[p] doesn't have any transformations!"
 			return
-		var/transformation/chosenTrans = input(usr, "Pick a transformation to boost the mastery of!") in p.race.transformations
+		var/transformation/chosenTrans = Ask(usr, "Pick a transformation to boost the mastery of!", "", null, "pick", p.race.transformations, 0)
 		if(!chosenTrans) return
-		var/chosenMastery = input(usr, "What mastery level do you want [chosenTrans] at? Currently [chosenTrans.mastery] out of 100.") as num|null
+		var/chosenMastery = Ask(usr, "What mastery level do you want [chosenTrans] at? Currently [chosenTrans.mastery] out of 100.", "", null, "num", null, 1)
 		if(isnull(chosenMastery)) return
 		chosenTrans.mastery = chosenMastery
 
 	Wound_Remove_Mass()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to remove everyone's wounds?", "Mass Wound") in list("Yes", "No")
+		var/Choice=Ask(usr, "Are you sure you want to remove everyone's wounds?", "Mass Wound", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		for(var/mob/m in players)
 			if(m.BPPoison<1)
@@ -664,7 +671,7 @@ mob/Admin3/verb
 			usr<<"[y] | Mapper<font color=red> (Offline)</font color>"
 
 mob/proc/Alert(var/blah)
-	switch(alert(src,blah,"Alert","Yes","No"))
+	switch(Ask(src, blah, "Alert", null, "confirm", null, 1, "Yes", "No"))
 		if("Yes")
 			return 1
 
@@ -719,7 +726,7 @@ mob/proc/CheckPunishment(var/z)
 	if(!Punishments) return 0
 	for(var/x in Punishments)
 		if(x["Punishment"]=="[z]")
-			if(x["Key"]==src.key || (src.client && (x["IP"]==src.client.address||x["ComputerID"]==src.client.computer_id)))
+			if((length("[x["Key"]]") && ckey("[x["Key"]]")==src.ckey) || (src.client && (x["IP"]==src.client.address||x["ComputerID"]==src.client.computer_id)))
 				if(x["Punishment"]=="Ban")
 					src<<"You are Banned!"
 					spawn()del(src)
@@ -731,8 +738,8 @@ mob/proc/CheckPunishment(var/z)
 mob/proc/AdminDoBan(mob/M)
 	set category="Admin"
 	if(!M || !M.client) return
-	var/Reason = input(src, "Why are you banning [M]?") as text
-	var/Duration = input(src, "Ban Duration?(IN HOURS)", "Rebirth") as num
+	var/Reason = Ask(src, "Why are you banning [M]?", "", null, "text", null, 0)
+	var/Duration = Ask(src, "Ban Duration?(IN HOURS)", "Rebirth", null, "num", null, 0)
 	if(!src.Alert("Are you sure you want to ban [M] for [Duration] Hours?")) return
 	Duration = Value(world.realtime + (Duration * 600 * 60))
 	Punishment("Action=Add&Punishment=Ban&Key=[M.key]&IP=[M.client.address]&ComputerID=[M.client.computer_id]&Duration=[Duration]&User=[src.key]&Reason=[Reason]&Time=[TimeStamp()]")
@@ -741,8 +748,8 @@ mob/proc/AdminDoBan(mob/M)
 
 mob/proc/AdminDoMute(mob/M)
 	if(!M || !M.client) return
-	var/Reason = input(src, "Why are you muting [M]?") as text
-	var/Duration = input(src, "Mute Duration?(IN MINUTES)", "Rebirth") as num
+	var/Reason = Ask(src, "Why are you muting [M]?", "", null, "text", null, 0)
+	var/Duration = Ask(src, "Mute Duration?(IN MINUTES)", "Rebirth", null, "num", null, 0)
 	if(!src.Alert("Are you sure you want to mute [M] for [Duration] Minutes?")) return
 	Duration = Value(world.realtime + (Duration * 600))
 	Punishment("Action=Add&Punishment=Mute&Key=[M.key]&IP=[M.client.address]&ComputerID=[M.client.computer_id]&Duration=[Duration]&User=[src.key]&Reason=[Reason]&Time=[TimeStamp()]")
@@ -750,9 +757,9 @@ mob/proc/AdminDoMute(mob/M)
 
 mob/proc/AdminDoKill(mob/A)
 	if(!A) return
-	var/confirm = alert(src, "Are you sure you wanna admin kill [A.name]?",, "Yes", "No")
+	var/confirm = Ask(src, "Are you sure you wanna admin kill [A.name]?", , null, "confirm", null, 1, "Yes", "No")
 	if(confirm == "No") return
-	var/customDeath = input(src, "What do you want the death message to say? The format is 'name has been killed by INPUT', where input is what you put here. Entering nothing defaults to ADMIN.") as text|null
+	var/customDeath = Ask(src, "What do you want the death message to say? The format is 'name has been killed by INPUT', where input is what you put here. Entering nothing defaults to ADMIN.", "", null, "text", null, 1)
 	if(!customDeath)
 		customDeath = "ADMIN"
 	A.Death(null, customDeath, SuperDead=1)
@@ -823,32 +830,15 @@ mob/proc/AdminEditAtom(atom/A)
 		A?:EditAI(src)
 	var/list/exclude = list("Package","bound_x","bound_y","step_x","step_y","Admin","Profile","GimmickDesc","NoVoid","BaseProfile","Form1Profile","Form2Profile","Form3Profile","Form4Profile","Form5Profile","ai_owner")
 	if(src.Admin <= 3) exclude += list("passive_handler","race")
-	var/out = "<html><body bgcolor=#000000 text=#339999 link=#99FFFF>[A]<br>[A.type]<table width=10%>"
-	for(var/C in A.vars)
-		if(C in exclude) continue
-		var/value = Value(A.vars[C])
-		out += "<tr><td><a href='byond://?src=\ref[A];action=edit;var=[C]'>[C]</a></td>"
-		if(isdatum(A.vars[C]))
-			out += "<td><a href='byond://?src=\ref[A.vars[C]];action=edit;var=[C]'>[value]</a></td></tr>"
-		else
-			out += "<td>[value]</td></tr>"
-		CHECK_TICK
-	out += "</table></body></html>"
-	src << browse(out, "window=[A];size=450x600")
+	src.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, A.vars, exclude), "a name to edit")
 
 client/proc/ShowAdminContents(mob/M)
 	if(!M || !mob || !(mob.Admin || glob.TESTER_MODE)) return
-	var/out = "<html><head><style>body{background:#0b0f17;color:#cfe7ff;font-family:Verdana;font-size:11px;margin:8px;} a{color:#8be9ff;text-decoration:none;} a:hover{text-decoration:underline;} .hd{color:#ffffff;font-size:13px;font-weight:bold;} .row{padding:3px 2px;border-bottom:1px solid #16273a;} .ty{color:#5d7a90;font-size:10px;} .del{color:#ff6b6b;}</style></head><body>"
-	out += "<div class='hd'>Contents of [M] <span class='ty'>([M.key ? M.key : "no key"])</span></div>"
-	out += "<a href='byond://?src=\ref[mob];action=ac_refresh;m=\ref[M]'>Refresh</a><hr>"
-	var/cnt = 0
+	var/list/rows = list()
 	for(var/obj/O in M.contents)
 		if(O.AdminInviso) continue
-		cnt++
-		out += "<div class='row'><a href='byond://?src=\ref[mob];action=ac_edit;it=\ref[O];m=\ref[M]'>[O.name]</a> <span class='ty'>[O.type]</span> &mdash; <a class='del' href='byond://?src=\ref[mob];action=ac_del;it=\ref[O];m=\ref[M]'>delete</a></div>"
-	if(!cnt) out += "<div class='ty'>(empty)</div>"
-	out += "</body></html>"
-	mob << browse(out, "window=admincontents;size=480x560")
+		rows[++rows.len] = list("n" = "[O.name]", "v" = "[O.type]", "nh" = "byond://?src=\ref[mob];action=ac_edit;it=\ref[O];m=\ref[M]", "x" = list(list("delete", "byond://?src=\ref[mob];action=ac_del;it=\ref[O];m=\ref[M]", "del")))
+	SheetShow("contents:\ref[M]", "CONTENTS", "[M]", "Contents of [M] ([M.key ? M.key : "no key"])", rows, "a name to edit", list(list("REFRESH", "byond://?src=\ref[mob];action=ac_refresh;m=\ref[M]")))
 
 mob/proc/AdminFullStealthEnable()
 	src.AdminFullStealth = 1
@@ -1191,7 +1181,7 @@ mob/proc/ViewList()
 
 mob/proc/PM(var/mob/who, var/AhelpMessage, var/AhelpKey)
 	var/whoKey = who.DisplayKey ? who.DisplayKey : who.key
-	var/UserInput=input("What do you want to say to [whoKey]?") as text|null
+	var/UserInput=Ask(usr, "What do you want to say to [whoKey]?", "", null, "text", null, 1)
 	var/key = DisplayKey ? DisplayKey : src.key
 	if(UserInput)
 		for(var/mob/Players/Q in admins)
@@ -1207,7 +1197,7 @@ mob/proc/PM(var/mob/who, var/AhelpMessage, var/AhelpKey)
 
 mob/proc/PM2(var/mob/who)
 	var/whoKey = who.DisplayKey ? who.DisplayKey : who.key
-	var/UserInput=input("What do you want to say to [whoKey]?") as text|null
+	var/UserInput=Ask(usr, "What do you want to say to [whoKey]?", "", null, "text", null, 1)
 	var/key = DisplayKey ? DisplayKey : src.key
 	if(UserInput&&who)
 		for(var/mob/Players/Q in admins)
@@ -1232,20 +1222,26 @@ mob/proc/PM2(var/mob/who)
 
 
 mob/Admin3/verb
-	editRace(mob/Players/m in players)
+	editRace()
 		set category = "Admin"
+		var/mob/Players/m = PromptArg(usr, args, 1, "editRace", "players")
+		if(isnull(m)) return
 		var/mob/Admin2/adminSelf = usr
 		adminSelf.Edit(m.race)
 		for(var/ascension/a in m.race.ascensions)
 			adminSelf.Edit(a)
-	editInformation(mob/Players/m in players)
+	editInformation()
 		set category = "Admin"
+		var/mob/Players/m = PromptArg(usr, args, 1, "editInformation", "players")
+		if(isnull(m)) return
 		var/mob/Admin2/adminSelf = usr
 		adminSelf.Edit(m.information)
 
-	Tech_Unlock(mob/Players/m in players)
+	Tech_Unlock()
 		set category="Admin"
-		var/Mode=input(usr, "Are you adding, removing, or viewing [m]'s unlocked technology?", "Tech Unlock") in list("Cancel", "Add", "Remove", "View")
+		var/mob/Players/m = PromptArg(usr, args, 1, "Tech Unlock", "players")
+		if(isnull(m)) return
+		var/Mode=Ask(usr, "Are you adding, removing, or viewing [m]'s unlocked technology?", "Tech Unlock", null, "pick", list("Cancel", "Add", "Remove", "View"), 0)
 		if(Mode=="Cancel")
 			return
 		switch(Mode)
@@ -1270,7 +1266,7 @@ mob/Admin3/verb
 				"Transmigration", "Lifespan Extension", "Temporal Displacement", "Temporal Acceleration", "Temporal Rewinding", "Ritual Magic", "Introductory Ritual Magics")
 				for(var/o in m.knowledgeTracker.learnedKnowledge)
 					Options.Remove(o)
-				var/Choice=input(usr, "What breakthrough do you want to grant to [m]?", "Tech Unlock") in Options
+				var/Choice=Ask(usr, "What breakthrough do you want to grant to [m]?", "Tech Unlock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
 				m.knowledgeTracker.learnedKnowledge.Add(Choice)
@@ -1282,7 +1278,7 @@ mob/Admin3/verb
 				if(Options.len<2)
 					src << "[m] doesn't have any technology unlocks to remove!"
 					return
-				var/Choice=input(src, "What breakthrough are you removing from [m]?", "Tech Lock") in Options
+				var/Choice=Ask(src, "What breakthrough are you removing from [m]?", "Tech Lock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
 				m.knowledgeTracker.learnedKnowledge.Remove(Choice)
@@ -1292,9 +1288,11 @@ mob/Admin3/verb
 				for(var/o in m.knowledgeTracker.learnedKnowledge)
 					src << "[o]"
 
-	FPSControl(fpsadjust as num)
+	FPSControl()
 		set category="Admin"
 		set hidden = 1
+		var/fpsadjust = PromptArgValue(usr, args, 1, "FPSControl", "num")
+		if(isnull(fpsadjust)) return
 		world.fps=fpsadjust
 		Log("Admin","World FPS adjusted to [fpsadjust] by [ExtractInfo(usr)].")
 
@@ -1346,9 +1344,11 @@ mob/Admin2/verb
 			usr.Grabbable=0
 			animate(src,alpha=50,time=10)
 
-	AdminAssess(var/mob/M in world)
+	AdminAssess()
 		set category="Admin"
-		usr<<browse(M.GetAssess(),"window=Assess;size=275x650")
+		var/mob/M = PromptArg(usr, args, 1, "AdminAssess", "world:/mob")
+		if(isnull(M)) return
+		M.ShowAssess(usr)
 
 
 	Alerts()
@@ -1357,15 +1357,19 @@ mob/Admin2/verb
 		usr.client.togglePref("AdminAlerts")
 		usr << "Admin Alerts will now[usr.client.getPref("AdminAlerts") ? "" : " not"] show."
 
-	AdminPM(mob/M in players)
+	AdminPM()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "AdminPM", "players")
+		if(isnull(M)) return
 		usr.PM(M)
 
 
-	Test_Mode(mob/M in players)
+	Test_Mode()
 		set category = "Admin"
 		set name = "Test Mode"
 		set desc = "Toggle off skill cooldowns on a player (applies TestMode passive)."
+		var/mob/M = PromptArg(usr, args, 1, "Test Mode", "players")
+		if(isnull(M)) return
 		if(!M.passive_handler)
 			M.passive_handler = new
 		if(M.HasTestMode())
@@ -1381,8 +1385,10 @@ mob/Admin2/verb
 			if(M.client)
 				M << "Admin Test Mode is now ON. Your skill cooldowns are effectively zero."
 
-	AdminChat(c as text)
+	AdminChat()
 		set category = "Admin"
+		var/c = PromptArgValue(usr, args, 1, "AdminChat", "text")
+		if(isnull(c)) return
 		LogAdminAction(usr, "chat", "admin chat", "", html_encode(c))
 		for(var/mob/Players/M in admins)
 			if(M.Timestamp)
@@ -1390,9 +1396,11 @@ mob/Admin2/verb
 			else
 				M<<"<b><font color=cyan>Admin Chat:<font color=white>[usr.DisplayKey ? "[usr.DisplayKey]([usr.key])": "([usr.key])"]:</b><font color=green> [c]"
 
-	Observe_(atom/A as mob|obj in world)
+	Observe_()
 		set category="Admin"
 		set name="AObserve"
+		var/atom/A = PromptArg(usr, args, 1, "AObserve", "world:mob|obj")
+		if(isnull(A)) return
 		Observify(usr,A)
 		if(A!=src)
 			src.Observing=2
@@ -1400,8 +1408,10 @@ mob/Admin2/verb
 		else
 			src.Observing=0
 
-	Delete(atom/A in world)
+	Delete()
 		set category="Admin"
+		var/atom/A = PromptArg(usr, args, 1, "Delete", "worldview:mob|obj:turf")
+		if(isnull(A)) return
 		A = src.AdminResolveTargetedContent(A)
 		if(!src.Alert("Are you sure you want to delete this?")) return
 		if(istype(A,/area/))
@@ -1417,8 +1427,10 @@ mob/Admin2/verb
 		del(A)
 
 
-	Message_Z_Plane(msg as message)
+	Message_Z_Plane()
 		set category="Admin"
+		var/msg = PromptArgValue(usr, args, 1, "Message Z Plane", "message")
+		if(isnull(msg)) return
 		var/list/zwit = list()
 		for(var/mob/Players/p in world)
 			if(p.z==src.z)
@@ -1429,8 +1441,10 @@ mob/Admin2/verb
 				zwit += p
 		LogEvent("announce", usr, html_encode(msg), zwit, null, list("scope" = "z[src.z]"))
 
-	Message_Global(msg as message)
+	Message_Global()
 		set category="Admin"
+		var/msg = PromptArgValue(usr, args, 1, "Message Global", "message")
+		if(isnull(msg)) return
 		var discord_output = msg
 		msg = replacetext(msg, "```","")
 		world << output("<font size=2><font color=green><b>[msg]", "output")
@@ -1438,13 +1452,13 @@ mob/Admin2/verb
 		world << output("<font size=2><font color=green><b>[msg]", "oocchat")
 		LogEvent("announce", usr, html_encode(msg), LogWitnessesOnline(), null, list("scope" = "global"))
 
-		switch(input("Should this message be sent to an Announcements Discord aswell?") in list("Yes","No"))
+		switch(Ask(usr, "Should this message be sent to an Announcements Discord aswell?", "", null, "pick", list("Yes","No"), 0))
 			if("Yes")
 				discord_output = replacetext(discord_output, "<b>","**")
 				discord_output = replacetext(discord_output, "</b>","**")
 				discord_output = replacetext(discord_output, "<br>","")
 				discord_output = "<@&1455270598635950333> [discord_output]"
-				switch(input("IC Announcement or OOC Announcement?") in list("IC", "OOC"))
+				switch(Ask(usr, "IC Announcement or OOC Announcement?", "", null, "pick", list("IC", "OOC"), 0))
 					if("IC")
 						if(glob.discordICAnnounceWebhookURL)
 							for(var/mob/M in admins) M<<"[usr] used message (global)."
@@ -1457,23 +1471,29 @@ mob/Admin2/verb
 							world.Export("[glob.discordOOCAnnounceWebhookURL]", list("content" = discord_output), 0, null, "POST")
 						else
 							usr << "The OOCAnnounce webhook wasn't set up!"
-	Teleport(mob/M as mob|obj in world)
+	Teleport()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "Teleport", "world:mob|obj")
+		if(isnull(M)) return
 		usr.PrevX=usr.x
 		usr.PrevY=usr.y
 		usr.PrevZ=usr.z
 		loc=M.loc
 		Log("Admin","[ExtractInfo(usr)] teleported to [M].")
-	Summon(mob/M as mob|obj in world)
+	Summon()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "Summon", "world:mob|obj")
+		if(isnull(M)) return
 		if(istype(M, /mob))
 			M.PrevX=M.x
 			M.PrevY=M.y
 			M.PrevZ=M.z
 		M.loc=loc
 		Log("Admin","[ExtractInfo(usr)] summoned [ExtractInfo(M)].")
-	Unteleport(mob/M as mob|obj in world)
+	Unteleport()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "Unteleport", "world:mob|obj")
+		if(isnull(M)) return
 		if(!M.PrevX)
 			usr<<"This mob/obj has not been teleported or summoned, and thus has no previous XYZ data."
 			return
@@ -1486,20 +1506,24 @@ mob/Admin2/verb
 			M.PrevZ=null
 			usr<<"Returned [M] to previous coordinates."
 			M<<"You have been returned to your previous coordinates by admins."
-	XYZTeleport(var/mob/M in world)
+	XYZTeleport()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "XYZTeleport", "world:/mob")
+		if(isnull(M)) return
 		if(!src.Alert("Are you sure you want to XYZ Teleport?")) return
-		var/x=input("x","[M]") as num
-		var/y=input("y","[M]") as num
-		var/z=input("z","[M]") as num
+		var/x=Ask(usr, "x", "[M]", null, "num", null, 0)
+		var/y=Ask(usr, "y", "[M]", null, "num", null, 0)
+		var/z=Ask(usr, "z", "[M]", null, "num", null, 0)
 		M.PrevX=M.x
 		M.PrevY=M.y
 		M.PrevZ=M.z
 		M.loc=locate(x,y,z)
 		Log("Admin","[ExtractInfo(usr)] teleported [ExtractInfo(M)] to [x],[y],[z].")
-	SendToSpawnz(mob/A in players)
+	SendToSpawnz()
 		set name="Send To Spawn"
 		set category="Admin"
+		var/mob/A = PromptArg(usr, args, 1, "Send To Spawn", "players")
+		if(isnull(A)) return
 		MoveToSpawn(A)
 		Log("Admin","[ExtractInfo(usr)] sent [ExtractInfo(A)] to spawn.")
 
@@ -1510,39 +1534,51 @@ mob/Admin2/verb
 			t.Destructable = FALSE
 			t.Grabbable = FALSE
 
-	AdminRename(atom/A in world)
+	AdminRename()
 		set category="Admin"
+		var/atom/A = PromptArg(usr, args, 1, "AdminRename", "worldview:mob|obj:turf")
+		if(isnull(A)) return
 		var/Old_Name=A.name
-		A.name=input("Renaming [A]") as text
+		A.name=Ask(usr, "Renaming [A]", "", null, "text", null, 0)
 		if(!A.name)
 			A.name=Old_Name
 		else
 			Log("Admin","[ExtractInfo(usr)] renamed [ExtractInfo(A)] from [Old_Name].")
 			if(isplayer(A))
 				var/mob/Players/pa = A
-				glob.IDs[pa.UniqueID] = "[A.name]"
+				setPlayerNameByUID(pa.UniqueID, A.name)
 
 
-	Warper(_x as num,_y as num,_z as num)
+	Warper()
 		set category="Admin"
+		var/_x = PromptArgValue(usr, args, 1, "Warper", "num")
+		if(isnull(_x)) return
+		var/_y = PromptArgValue(usr, args, 2, "Warper", "num")
+		if(isnull(_y)) return
+		var/_z = PromptArgValue(usr, args, 3, "Warper", "num")
+		if(isnull(_z)) return
 		src.MakeWarper(_x, _y, _z)
 
-	AdminKill(mob/A in world)
+	AdminKill()
 		set category="Admin"
 		set name="Admin Kill/KO"
-		var/choice = input(usr, "Action on [A]:", "Admin Kill") as null|anything in list("Kill", "KO", "Cancel")
+		var/mob/A = PromptArg(usr, args, 1, "Admin Kill/KO", "world:/mob")
+		if(isnull(A)) return
+		var/choice = Ask(usr, "Action on [A]:", "Admin Kill", null, "pick", list("Kill", "KO", "Cancel"), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Kill")
 				usr.AdminDoKill(A)
 			if("KO")
 				usr.AdminDoKO(A)
-	AdminDoDamage(mob/A in world)
+	AdminDoDamage()
 		set category="Admin"
 		set name="Do Damage"
-		var/DamageType = input(usr, "What type of damage? Be careful with poison and burning due to their nature.") in list("Cancel", "True Damage", "Poison", "Burning", "Normal Damage")
+		var/mob/A = PromptArg(usr, args, 1, "Do Damage", "world:/mob")
+		if(isnull(A)) return
+		var/DamageType = Ask(usr, "What type of damage? Be careful with poison and burning due to their nature.", "", null, "pick", list("Cancel", "True Damage", "Poison", "Burning", "Normal Damage"), 0)
 		if(DamageType == "Cancel") return
-		var/Damage = input(usr, "Inflict how much [DamageType]? Put in zero to cancel.") as null|num
+		var/Damage = Ask(usr, "Inflict how much [DamageType]? Put in zero to cancel.", "", null, "num", null, 1)
 		if(Damage == null) return
 		if(istext(A.Health))
 			A.SetHealthPct(100)
@@ -1556,8 +1592,10 @@ mob/Admin2/verb
 		else if(DamageType == "Normal Damage")
 			usr.DoDamage(A, Damage)
 		Log("Admin", "<font color=red>[ExtractInfo(usr)] did [Damage] [DamageType] to [ExtractInfo(A)].")
-	ReMeditate(mob/A in players)
+	ReMeditate()
 		set category="Admin"
+		var/mob/A = PromptArg(usr, args, 1, "ReMeditate", "players")
+		if(isnull(A)) return
 		if(A.icon_state!="Meditate")
 			A << "You've been made to meditate by a admin."
 			A.icon_state = "Meditate"
@@ -1572,10 +1610,12 @@ mob/Admin2/verb
 			return
 
 
-	AdminHeal(mob/A in world)
+	AdminHeal()
 		set category="Admin"
 		set name="Admin Heal"
-		var/choice = input(usr, "Heal what on [A]?", "Admin Heal") as null|anything in list(
+		var/mob/A = PromptArg(usr, args, 1, "Admin Heal", "world:/mob")
+		if(isnull(A)) return
+		var/choice = Ask(usr, "Heal what on [A]?", "Admin Heal", null, "pick", list(
 			"Basic (HP/Energy/Mana/Statuses)",
 			"Full Restore",
 			"Reset Capacity",
@@ -1584,7 +1624,7 @@ mob/Admin2/verb
 			"Remove Wounds",
 			"Remove 1 Maim",
 			"Cancel"
-		)
+		), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Basic (HP/Energy/Mana/Statuses)")
@@ -1627,15 +1667,19 @@ mob/Admin2/verb
 					A.Maimed = 0
 				Log("Admin", "[ExtractInfo(usr)] repaired [ExtractInfo(A)]'s maim wound.")
 				A << "Your maim wound has been repaired!"
-	AdminRevive(mob/A in players)
+	AdminRevive()
 		set category="Admin"
+		var/mob/A = PromptArg(usr, args, 1, "AdminRevive", "players")
+		if(isnull(A)) return
 		if(!src.Alert("Are you sure you want to revive someone?")) return
 		Log("Admin","[usr.key] revived [A.key].")
 		A.Revive()
 
 
-	Narrate(msg as message)
+	Narrate()
 		set category="Admin"
+		var/msg = PromptArgValue(usr, args, 1, "Narrate", "message")
+		if(isnull(msg)) return
 		view(20)<< output("<font color=yellow>[msg]", "output")
 		view(20)<< output("<font color=yellow>[msg]", "icchat")
 		for(var/mob/m in view(20))
@@ -1646,24 +1690,28 @@ mob/Admin2/verb
 
 		Log("Admin", "[ExtractInfo(usr)] narrated ([msg]).", 0, 3)
 
-	Event_Character_Setup(mob/Players/M in players)
+	Event_Character_Setup()
 		set category="Admin"
+		var/mob/Players/M = PromptArg(usr, args, 1, "Event Character Setup", "players")
+		if(isnull(M)) return
 		if(!src.Alert("Are you sure you want to EC Setup someone?")) return
 		var/EMult=glob.progress.RPPBaseMult
 		EMult*=M.GetRPPMult()
 		M.RPPSpendable=getMaxPlayerRPP()
 		M.PotentialRate=0
-		M.Potential=input(src, "What potential do you want to set [M] to?", "Set Potential") as num
+		M.Potential=Ask(src, "What potential do you want to set [M] to?", "Set Potential", null, "num", null, 0)
 		if(M.isRace(/race/demi_fiend))
 			M.refreshMagatama()
 		M.ECCHARACTER=TRUE
 		Log("Admin", "[ExtractInfo(src)] triggered [ExtractInfo(M)]'s event character setup!")
-	Head_Start_Setup(mob/Players/M in players)
+	Head_Start_Setup()
 		set category="Admin"
+		var/mob/Players/M = PromptArg(usr, args, 1, "Head Start Setup", "players")
+		if(isnull(M)) return
 		if(!src.Alert("Are you sure you want to Head Start Setup someone?")) return
-		M.PotentialHeadStart=input(src, "What potential do you want to set [M] to?", "Set Head Start Potential") as num
+		M.PotentialHeadStart=Ask(src, "What potential do you want to set [M] to?", "Set Head Start Potential", null, "num", null, 0)
 		M.Potential=M.PotentialHeadStart
-		M.RPPHeadStart=input(src, "What RPP cap do you want to set [M] to?", "Set Head RPP ") as num
+		M.RPPHeadStart=Ask(src, "What RPP cap do you want to set [M] to?", "Set Head RPP ", null, "num", null, 0)
 		M.RPPHeadStart*=src.RPPMult
 		M.RPPCurrent=M.RPPHeadStart
 		if(M.isRace(/race/demi_fiend))
@@ -1672,8 +1720,10 @@ mob/Admin2/verb
 
 
 
-	Edit(atom/A in world)
+	Edit()
 		set category = "Admin"
+		var/atom/A = PromptArg(usr, args, 1, "Edit", "worldview:mob|obj:turf")
+		if(isnull(A)) return
 		A = src.AdminResolveTargetedContent(A)
 		if(istype(A, /mob))
 			var/mob/M = A
@@ -1693,36 +1743,13 @@ mob/Admin2/verb
 		else if (istype(A, /obj/AI_Spot))
 			A?:EditAI(src)
 
-		var/Edit = "<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-		Edit += "[A]<br>[A.type]"
-		Edit += "<table width=10%>"
-
-		var/list/B = A.vars
 		var/list/exclude = list("Package", "bound_x", "bound_y", "step_x", "step_y", "Admin", "Profile", "GimmickDesc",
 								"NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile",
 								"Form5Profile", "ai_owner")
 
 		if (usr.Admin <= 3)
 			exclude += list("passive_handler", "race")
-
-		for (var/C in B)
-			if (C in exclude)
-				continue
-
-			var/value = Value(A.vars[C])
-			var/row = "<tr><td><a href='byond://?src=\ref[A];action=edit;var=[C]'>[C]</a></td>"
-			if (isdatum(A.vars[C]))
-				row += "<td><a href='byond://?src=\ref[A.vars[C]];action=edit;var=[C]'>[value]</a></td></tr>"
-			else
-				row += "<td>[value]</td></tr>"
-
-			Edit += row
-
-			CHECK_TICK
-
-		Edit += "</table></html>"
-
-		usr << browse(Edit, "window=[A];size=450x600")
+		usr.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, A.vars, exclude), "a name to edit")
 
 mob/Admin3/verb
 	ToggleOOCWorld()
@@ -1739,13 +1766,17 @@ mob/Admin3/verb
 		set name="Admin Logs"
 		client?.LogPageShow(null, "admin")
 
-	PlayerLog(mob/Players/M in players)
+	PlayerLog()
 		set category="Admin"
 		set name="Player Logs"
+		var/mob/Players/M = PromptArg(usr, args, 1, "Player Logs", "players")
+		if(isnull(M)) return
 		client?.LogPageShow(M ? M.ckey : null, "players")
 
-	Announce(msg as text)
+	Announce()
 		set category="Admin"
+		var/msg = PromptArgValue(usr, args, 1, "Announce", "text")
+		if(isnull(msg)) return
 		var/display = usr.key
 		if(DisplayKey)
 			display = DisplayKey
@@ -1753,29 +1784,29 @@ mob/Admin3/verb
 	Punish()
 		set category="Admin"
 		set name="Punish"
-		var/choice = input(usr, "Punishment action:", "Punish") as null|anything in list(
+		var/choice = Ask(usr, "Punishment action:", "Punish", null, "pick", list(
 			"Ban (target)",
 			"Ban (manual - Key/IP/CID)",
 			"UnBan",
 			"Mute (target)",
 			"UnMute",
 			"Cancel"
-		)
+		), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Ban (target)")
-				var/mob/M = input(usr, "Ban who?", "Punish") in players
+				var/mob/M = Ask(usr, "Ban who?", "Punish", null, "pick", players, 0)
 				if(!M) return
 				usr.AdminDoBan(M)
 			if("Mute (target)")
-				var/mob/M = input(usr, "Mute who?", "Punish") in players
+				var/mob/M = Ask(usr, "Mute who?", "Punish", null, "pick", players, 0)
 				if(!M) return
 				usr.AdminDoMute(M)
 			if("Ban (manual - Key/IP/CID)")
-				var/x = input(usr, "Input the desired Key to manual ban.", "Rebirth") as text|null
-				var/y = input(usr, "Input the desired IP Address to manual ban.", "Rebirth") as text|null
-				var/z = input(usr, "Input the desired Computer ID to manual ban.", "Rebirth") as text|null
-				var/Reason = input(usr, "Why are you banning them?") as text
+				var/x = PromptKnownKey(usr, "Manual Ban - Key")
+				var/y = PromptLoginValue(usr, x, "ip", "Manual Ban - IP Address")
+				var/z = PromptLoginValue(usr, x, "cid", "Manual Ban - Computer ID")
+				var/Reason = Ask(usr, "Why are you banning them?", "", null, "text", null, 0)
 				var/Duration = 10000000000
 				if(!usr.Alert("Are you sure you want to ban them for [Duration] Hours?")) return
 				Duration = Value(world.realtime + (Duration * 600 * 60))
@@ -1783,13 +1814,13 @@ mob/Admin3/verb
 				Log("Admin", "[ExtractInfo(usr)] banned(manually) [x]|[y]|[z] for [Reason].")
 			if("UnBan")
 				var/list/people = list("Cancel")
-				var/blah = input(usr, "What do you want to unban?", "Rebirth") in list("Entire List", "Key", "IP", "ComputerID", "Cancel")
+				var/blah = Ask(usr, "What do you want to unban?", "Rebirth", null, "pick", list("Entire List", "Key", "IP", "ComputerID", "Cancel"), 0)
 				if(blah == "Cancel") return
 				if(blah == "Entire List")
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Ban")
 							people.Add(x["Key"])
-					var/person = input(usr, "Completely Unban who?", "Rebirth") in people
+					var/person = Ask(usr, "Completely Unban who?", "Rebirth", null, "pick", people, 0)
 					if(person == "Cancel") return
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Ban")
@@ -1800,19 +1831,19 @@ mob/Admin3/verb
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Ban")
 							people.Add(x["[blah]"])
-					var/person = input(usr, "[blah] Unban who?", "Rebirth") in people
+					var/person = Ask(usr, "[blah] Unban who?", "Rebirth", null, "pick", people, 0)
 					if(person == "Cancel") return
 					Punishment("Action=Remove&Punishment=Ban&[blah]=[person]")
 					Log("Admin", "[ExtractInfo(usr)] unbanned [person].")
 			if("UnMute")
 				var/list/people = list("Cancel")
-				var/blah = input(usr, "What do you want to unmute?", "Rebirth") in list("Entire List", "Key", "IP", "ComputerID", "Cancel")
+				var/blah = Ask(usr, "What do you want to unmute?", "Rebirth", null, "pick", list("Entire List", "Key", "IP", "ComputerID", "Cancel"), 0)
 				if(blah == "Cancel") return
 				if(blah == "Entire List")
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Mute")
 							people.Add(x["Key"])
-					var/person = input(usr, "Completely Unmute who?", "Rebirth") in people
+					var/person = Ask(usr, "Completely Unmute who?", "Rebirth", null, "pick", people, 0)
 					if(person == "Cancel") return
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Mute")
@@ -1823,19 +1854,21 @@ mob/Admin3/verb
 					for(var/x in Punishments)
 						if(x["Punishment"] == "Mute")
 							people.Add(x["[blah]"])
-					var/person = input(usr, "[blah] Unmute who?", "Rebirth") in people
+					var/person = Ask(usr, "[blah] Unmute who?", "Rebirth", null, "pick", people, 0)
 					if(person == "Cancel") return
 					Punishment("Action=Remove&Punishment=Mute&[blah]=[person]")
 					Log("Admin", "[ExtractInfo(usr)] unmuted [person].")
-	FixSSJTransformations(mob/M in players)
+	FixSSJTransformations()
 		set category="Admin"
 		set name="Fix SSJ Transformations"
+		var/mob/M = PromptArg(usr, args, 1, "Fix SSJ Transformations", "players")
+		if(isnull(M)) return
 		if(!M.client)
 			return
 		if(!M.isRace(/race/saiyan))
 			src << "<font color=red>[M] is not a Saiyan.</font>"
 			return
-		var/choice = input(usr, "Which transformation set to apply to [M]?", "Fix SSJ Transformations") as null|anything in list("SSJ1-4 + Limit Breaker", "SSJ1-3 + God + Blue", "Add SSJ5", "Cancel")
+		var/choice = Ask(usr, "Which transformation set to apply to [M]?", "Fix SSJ Transformations", null, "pick", list("SSJ1-4 + Limit Breaker", "SSJ1-3 + God + Blue", "Add SSJ5", "Cancel"), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("SSJ1-4 + Limit Breaker")
@@ -1865,21 +1898,25 @@ mob/Admin3/verb
 					del ssj
 				M.race.transformations += new /transformation/saiyan/super_saiyan_5()
 				M << "You have been granted Super Saiyan 5."
-	UnlockAscension(var/mob/m in players)
+	UnlockAscension()
 		set category="Admin"
+		var/mob/m = PromptArg(usr, args, 1, "UnlockAscension", "players")
+		if(isnull(m)) return
 		if(!src.Alert("Are you sure you want to unlock ascension on someone?")) return
 		if(m.passive_handler.Get("Piloting"))
-			m.findMecha().Level = input("Unlock what level? (This is for their mech.)", "([m.findMecha().Level] unlocked)") as num
+			m.findMecha().Level = Ask(usr, "Unlock what level? (This is for their mech.)", "([m.findMecha().Level] unlocked)", null, "num", null, 0)
 			Log("Admin","[ExtractInfo(usr)] unlocked [ExtractInfo(m)]'s mecha([m.findMecha().Level])")
 			return
 		if(m.client)
-			m.AscensionsUnlocked=input("Unlock what ascension?", "([m.AscensionsUnlocked] unlocked)") as num
+			m.AscensionsUnlocked=Ask(usr, "Unlock what ascension?", "([m.AscensionsUnlocked] unlocked)", null, "num", null, 0)
 			Log("Admin","[ExtractInfo(usr)] unlocked [ExtractInfo(m)]'s ascension([m.AscensionsUnlocked])")
-	UnlockForm(var/mob/M in players)
+	UnlockForm()
 		set category="Admin"
+		var/mob/M = PromptArg(usr, args, 1, "UnlockForm", "players")
+		if(isnull(M)) return
 		if(!src.Alert("Are you sure you want to unlock form on someone?")) return
 		if(M.client)
-			var/blah=input("Unlock to what form?") as num | null
+			var/blah=Ask(usr, "Unlock to what form?", "", null, "num", null, 1)
 			if(!blah) return
 			if(M.isRace(CELESTIAL) && M.CelestialAscension == "Angel" && blah == 1)
 				if(!locate(/transformation/celestial/Master_of_Arms) in M.race.transformations)
@@ -1891,7 +1928,7 @@ mob/Admin3/verb
 				if(!locate(/transformation/celestial/Celestial_Sin_Devil_Trigger) in M.race.transformations)
 					M.race.transformations += new/transformation/celestial/Celestial_Sin_Devil_Trigger
 			if(M.isRace(SAIYAN) && blah == 4)
-				var/godor4 = input("SSJ God or SSJ4?") in list("Daima SSJ4", "GT SSJ4")
+				var/godor4 = Ask(usr, "SSJ God or SSJ4?", "", null, "pick", list("Daima SSJ4", "GT SSJ4"), 0)
 				if(godor4 == "GT SSJ4")
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/saiyan/super_saiyan_god) || istype(ssj, /transformation/saiyan/super_saiyan_blue)|| istype(ssj, /transformation/saiyan/super_saiyan_blue_evolved))
@@ -1904,7 +1941,7 @@ mob/Admin3/verb
 							M.race.transformations -= ssj
 							del ssj
 			if(M.isRace(HALFSAIYAN) && blah == 4)
-				var/godor4 = input("SSJ Rage or SSJ4?") in list("SSJ Rage/Beast", "SSJ4")
+				var/godor4 = Ask(usr, "SSJ Rage or SSJ4?", "", null, "pick", list("SSJ Rage/Beast", "SSJ4"), 0)
 				if(godor4 == "SSJ4")
 					for(var/transformation/saiyan/ssj in M.race.transformations)
 						if(istype(ssj, /transformation/half_saiyan/human/beast_mode))
@@ -1939,23 +1976,23 @@ mob/Admin3/verb
 				"Set daily RPP increment (Owner)"
 			)
 		actions += "Cancel"
-		var/choice = input(usr, "RPP action:", "RPP") as null|anything in actions
+		var/choice = Ask(usr, "RPP action:", "RPP", null, "pick", actions, 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Set target's total RPP")
-				var/mob/Players/P = input(usr, "Set whose RPP?", "RPP") in players
+				var/mob/Players/P = Ask(usr, "Set whose RPP?", "RPP", null, "pick", players, 0)
 				if(!P) return
 				var/EMult = glob.progress.RPPBaseMult
 				EMult *= P.GetRPPMult()
 				var/OldRPP = P.RPPSpent + P.GetRPPSpendable()
-				var/NewRPP = input(usr, "Set the value that [P]'s RPP should be at.  They currently have [Commas(P.GetRPPSpendable())] with [Commas(P.RPPSpent)] RPP spent for [Commas(OldRPP)] total. (x[EMult] RPP Mult)") as num|null
+				var/NewRPP = Ask(usr, "Set the value that [P]'s RPP should be at.  They currently have [Commas(P.GetRPPSpendable())] with [Commas(P.RPPSpent)] RPP spent for [Commas(OldRPP)] total. (x[EMult] RPP Mult)", "", null, "num", null, 1)
 				NewRPP *= EMult
 				NewRPP -= P.RPPSpent
 				if(NewRPP >= 0)
 					P.RPPSpendable = NewRPP
 					Log("Admin", "[ExtractInfo(usr)] set [ExtractInfo(P)]'s total RPP (Spent and Unused) from [Commas(OldRPP)] to [Commas(NewRPP)]. (RPP mult of x[EMult])")
 			if("Refund target's skill")
-				var/mob/Players/P = input(usr, "Refund whose skill?", "RPP") in players
+				var/mob/Players/P = Ask(usr, "Refund whose skill?", "RPP", null, "pick", players, 0)
 				if(!P) return
 				if(P.refunding)
 					usr << "Something is already being refunded!"
@@ -1968,7 +2005,7 @@ mob/Admin3/verb
 				P.refund_skill(refunding_skill)
 				P.refunding = FALSE
 			if("Trigger routine gain for target")
-				var/mob/Players/P = input(usr, "Routine gain for whom?", "RPP") in players
+				var/mob/Players/P = Ask(usr, "Routine gain for whom?", "RPP", null, "pick", players, 0)
 				if(!P) return
 				var/AddRPP = glob.progress.RPPDaily
 				var/YourRPP = AddRPP
@@ -1983,9 +2020,9 @@ mob/Admin3/verb
 					P.GiveMoney(round(glob.progress.EconomyIncome * P.EconomyMult * P.Intelligence))
 				Log("Admin", "[ExtractInfo(src)] triggered [ExtractInfo(P)]'s routine RPP gains of [Commas(AddRPP)].")
 			if("Equalize target to value")
-				var/mob/Players/P = input(usr, "Equalize whose RPP?", "RPP") in players
+				var/mob/Players/P = Ask(usr, "Equalize whose RPP?", "RPP", null, "pick", players, 0)
 				if(!P) return
-				var/Cap = input(usr, "Input the RPP value target will be brought to.") as num
+				var/Cap = Ask(usr, "Input the RPP value target will be brought to.", "", null, "num", null, 0)
 				var/YourRPP = Cap
 				if(YourRPP > 0)
 					if(locate(/obj/Skills/Utility/Teachz, P))
@@ -2012,7 +2049,7 @@ mob/Admin3/verb
 				glob.progress.RPPStarting += AddRPP
 				Log("Admin", "[ExtractInfo(src)] triggered routine RPP gains of [Commas(AddRPP)].")
 			if("Equalize EVERYONE to value")
-				var/Cap = input(usr, "Input the RPP value everyone will be brought to.") as num
+				var/Cap = Ask(usr, "Input the RPP value everyone will be brought to.", "", null, "num", null, 0)
 				for(var/mob/Players/P in players)
 					var/YourRPP = Cap
 					if(YourRPP > 0)
@@ -2026,35 +2063,37 @@ mob/Admin3/verb
 				glob.progress.RPPStarting = Cap
 				Log("Admin", "[ExtractInfo(src)] triggered RPP equalization.")
 			if("Set starting RPP value (new chars)")
-				var/val = input(usr, "What is the starting RPP value?", "Starting RPP") as num|null
+				var/val = Ask(usr, "What is the starting RPP value?", "Starting RPP", null, "num", null, 1)
 				if(val <= 0 || val == null) return
 				glob.progress.RPPStarting = val
 				Log("Admin", "[ExtractInfo(usr)] set the global RPP starting value to [glob.progress.RPPStarting]. It will be acquired in [glob.progress.RPPStartingDays] days after making a new character.")
 			if("Set starting RPP days (new chars)")
-				var/val = input(usr, "What is the number of days it takes to reach the starting RPP value?", "Starting RPP Days") as num|null
+				var/val = Ask(usr, "What is the number of days it takes to reach the starting RPP value?", "Starting RPP Days", null, "num", null, 1)
 				if(val <= 0 || val == null) return
 				glob.progress.RPPStartingDays = val
 				Log("Admin", "[ExtractInfo(usr)] set the global RPP starting value to [glob.progress.RPPStarting]. It will be acquired in [glob.progress.RPPStartingDays] days after making a new character.")
 			if("Set RPP limit (Owner)")
 				if(usr.Admin < 4) return
-				var/val = input(usr, "RPP limit?", "RPP Limit") as num|null
+				var/val = Ask(usr, "RPP limit?", "RPP Limit", null, "num", null, 1)
 				if(isnull(val)) return
 				glob.progress.RPPLimit = val
 			if("Set RPP base multiplier (Owner)")
 				if(usr.Admin < 4) return
-				var/val = input(usr, "RPP base multiplier?", "RPP Base Mult") as num|null
+				var/val = Ask(usr, "RPP base multiplier?", "RPP Base Mult", null, "num", null, 1)
 				if(isnull(val)) return
 				glob.progress.RPPBaseMult = val
 				Log("Admin", "[ExtractInfo(src)] set the RPP Base Mult to [glob.progress.RPPBaseMult]x.")
 			if("Set daily RPP increment (Owner)")
 				if(usr.Admin < 4) return
-				var/val = input(usr, "Daily RPP increment?", "Daily RPP") as num|null
+				var/val = Ask(usr, "Daily RPP increment?", "Daily RPP", null, "num", null, 1)
 				if(isnull(val)) return
 				glob.progress.RPPDaily = val
 				Log("Admin", "[ExtractInfo(src)] set the daily RPP increment to [Commas(glob.progress.RPPDaily)].")
 
-	New_Character_Setup(mob/Players/M in players)
+	New_Character_Setup()
 		set category="Admin"
+		var/mob/Players/M = PromptArg(usr, args, 1, "New Character Setup", "players")
+		if(isnull(M)) return
 		if(!src.Alert("Are you sure you want to New Character Setup someone?")) return
 		if(locate(/obj/Skills/Utility/Teachz, M))
 			M.RPPDonate+=(glob.progress.RPPStarting*M.RPPMult*glob.progress.RPPBaseMult)
@@ -2069,27 +2108,33 @@ mob/Admin3/verb
 		Log("Admin", "[ExtractInfo(src)] triggered [ExtractInfo(M)]'s starter rewards!")
 
 
-	Give_Mapper(var/mob/m in players)
+	Give_Mapper()
 		set category="Admin"
+		var/mob/m = PromptArg(usr, args, 1, "Give Mapper", "players")
+		if(isnull(m)) return
 		if(!src.Alert("Are you sure you want to give this person mapper?")) return
 		m.Admin("GiveMapper")
 		Log("Admin", "[ExtractInfo(usr)] has made [ExtractInfo(m)] into a mapper!")
 
-	Remove_Mapper(var/mob/m in players)
+	Remove_Mapper()
 		set category="Admin"
+		var/mob/m = PromptArg(usr, args, 1, "Remove Mapper", "players")
+		if(isnull(m)) return
 		if(!src.Alert("Are you sure you want to remove mapper from this person?")) return
 		m.Admin("RemoveMapper")
 		Log("Admin", "[ExtractInfo(usr)] has removed [ExtractInfo(m)]'s mapper powers!")
 
-	Give_Currency(mob/p in players)
+	Give_Currency()
 		set name="Give Currency"
 		set category="Admin"
+		var/mob/p = PromptArg(usr, args, 1, "Give Currency", "players")
+		if(isnull(p)) return
 		if(!src.Alert("Are you sure you want to give currency to someone?")) return
-		var/choice = input(usr, "Give what to [p]?", "Give Currency") as null|anything in list("Money", "Fragments", "Cancel")
+		var/choice = Ask(usr, "Give what to [p]?", "Give Currency", null, "pick", list("Money", "Fragments", "Cancel"), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Money")
-				var/num = input(usr, "How much money?", "Give Money") as num|null
+				var/num = Ask(usr, "How much money?", "Give Money", null, "num", null, 1)
 				if(isnull(num)) return
 				var/Highest = glob.progress.EconomyMult
 				if(p.EconomyMult > Highest)
@@ -2103,16 +2148,18 @@ mob/Admin3/verb
 					m = new()
 					m.Move(p)
 				m.checkDuplicate(p)
-				var/num = input(usr, "How many fragments?", "Give Fragments") as num|null
+				var/num = Ask(usr, "How many fragments?", "Give Fragments", null, "num", null, 1)
 				if(isnull(num)) return
 				m.value += num
 				m.assignState(num)
 				Log("Admin", "[ExtractInfo(usr)] gave [p] [num] mineral fragments.")
 
-	Adminize(mob/z in players)
+	Adminize()
 		set category="Admin"
+		var/mob/z = PromptArg(usr, args, 1, "Adminize", "players")
+		if(isnull(z)) return
 		if(!src.Alert("Are you sure you want to adminize someone?")) return
-		var/x=input("What level?(0-3)","0-3",z.Admin)as num
+		var/x=Ask(usr, "What level?(0-3)", "0-3", z.Admin, "num", null, 0)
 		if(x>=0&&x<=3)
 			Log("Admin","[ExtractInfo(usr)] set [ExtractInfo(z)]'s admin level to [x].")
 			if(x==0)
@@ -2122,11 +2169,13 @@ mob/Admin3/verb
 
 
 
-	DeleteSave(mob/Players/M in players)
+	DeleteSave()
 		set category="Admin"
-		switch(input(usr,"Delete [M]'s save?") in list("No","Yes"))
+		var/mob/Players/M = PromptArg(usr, args, 1, "DeleteSave", "players")
+		if(isnull(M)) return
+		switch(Ask(usr, "Delete [M]'s save?", "", null, "pick", list("No","Yes"), 0))
 			if("Yes")
-				var/reason=input("For what reason?") as text
+				var/reason=Ask(usr, "For what reason?", "", null, "text", null, 0)
 				M.Savable=0
 				if(M.isRace(MAJIN))
 					M.MajinCleanupOnDeletion()
@@ -2168,7 +2217,7 @@ mob/Admin3/verb
 	Set_Base()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set battle power?")) return
-		var/NewBase=input(usr,"Set base battle power to what?  Currently [Commas(glob.WorldBaseAmount)]") as num
+		var/NewBase=Ask(usr, "Set base battle power to what?  Currently [Commas(glob.WorldBaseAmount)]", "", null, "num", null, 0)
 		glob.WorldBaseAmount=NewBase
 		for(var/mob/Players/P in players)
 			P.Base=glob.WorldBaseAmount
@@ -2178,7 +2227,7 @@ mob/Admin3/verb
 	SetGetUpSpeed()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set GetUpVar?")) return
-		var/Speedz=input("Current: [glob.GetUpVar]x") as null|num
+		var/Speedz=Ask(usr, "Current: [glob.GetUpVar]x", "", null, "num", null, 1)
 		if(Speedz)
 			glob.GetUpVar=Speedz
 			Log("Admin","<font color=blue>[ExtractInfo(usr)] adjusted the GetUpVar to [Speedz]x.")
@@ -2198,7 +2247,7 @@ mob/Admin4/verb
 			"Restore all defaults",
 			"Cancel"
 		)
-		var/category = input(usr, "Overwatch category:", "Overwatch") as null|anything in categories
+		var/category = Ask(usr, "Overwatch category:", "Overwatch", null, "pick", categories, 1)
 		if(!category || category == "Cancel") return
 		if(!usr.AdminOverwatchActive && category != "Restore all defaults")
 			usr.AdminOverwatchActive = 1
@@ -2214,7 +2263,7 @@ mob/Admin4/verb
 					"Stop tracking",
 					"Cancel"
 				)
-				var/choice = input(usr, "Stealth & Movement:", "Overwatch") as null|anything in actions
+				var/choice = Ask(usr, "Stealth & Movement:", "Overwatch", null, "pick", actions, 1)
 				if(!choice || choice == "Cancel") return
 				switch(choice)
 					if("Toggle Full Stealth")
@@ -2223,7 +2272,7 @@ mob/Admin4/verb
 						else
 							usr.AdminFullStealthEnable()
 					if("Quick Jump to player")
-						var/mob/M = input(usr, "Jump to whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Jump to whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						if(!M.loc)
 							usr << "<font color=red>[M] has no location."
@@ -2232,7 +2281,7 @@ mob/Admin4/verb
 						usr << "<font color=green><b>Overwatch:</b> Jumped to [M]'s location."
 						Log("Admin", "[ExtractInfo(usr)] Overwatch-jumped to [ExtractInfo(M)].")
 					if("Track player (auto-follow)")
-						var/mob/M = input(usr, "Track whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Track whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						if(!M.client)
 							usr << "<font color=red>[M] has no client."
@@ -2254,11 +2303,11 @@ mob/Admin4/verb
 					"Return camera to self",
 					"Cancel"
 				)
-				var/choice = input(usr, "View & Observe:", "Overwatch") as null|anything in actions
+				var/choice = Ask(usr, "View & Observe:", "Overwatch", null, "pick", actions, 1)
 				if(!choice || choice == "Cancel") return
 				switch(choice)
 					if("Silent Observe (view target's screen)")
-						var/mob/M = input(usr, "Whose screen do you want to view?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Whose screen do you want to view?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						if(!M.client)
 							usr << "<font color=red>[M] has no client."
@@ -2282,28 +2331,28 @@ mob/Admin4/verb
 					"AFK Check",
 					"Cancel"
 				)
-				var/choice = input(usr, "Inspection:", "Overwatch") as null|anything in actions
+				var/choice = Ask(usr, "Inspection:", "Overwatch", null, "pick", actions, 1)
 				if(!choice || choice == "Cancel") return
 				switch(choice)
 					if("Player Snapshot")
-						var/mob/M = input(usr, "Snapshot whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Snapshot whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						usr.AdminPlayerSnapshot(M)
 					if("Var Inspector (filtered)")
-						var/mob/M = input(usr, "Inspect whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Inspect whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
-						var/filter = input(usr, "Filter substring (e.g. 'health', 'mana', or empty for all):", "Overwatch") as text|null
+						var/filter = Ask(usr, "Filter substring (e.g. 'health', 'mana', or empty for all):", "Overwatch", null, "text", null, 1)
 						usr.AdminVarInspect(M, filter ? filter : "")
 					if("Snapshot Save (capture state)")
-						var/mob/M = input(usr, "Save snapshot of whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Save snapshot of whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						usr.AdminSnapshotSave(M)
 					if("Snapshot Compare (diff vs saved)")
-						var/mob/M = input(usr, "Compare against current state of whom?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Compare against current state of whom?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						usr.AdminSnapshotCompareRun(M)
 					if("AFK Check")
-						var/threshold = input(usr, "AFK threshold in minutes (default 5):", "Overwatch") as num|null
+						var/threshold = Ask(usr, "AFK threshold in minutes (default 5):", "Overwatch", null, "num", null, 1)
 						usr.AdminAFKCheck(threshold ? threshold : 5)
 
 			if("Watch & Listen")
@@ -2315,7 +2364,7 @@ mob/Admin4/verb
 					"Clear watchlist",
 					"Cancel"
 				)
-				var/choice = input(usr, "Watch & Listen:", "Overwatch") as null|anything in actions
+				var/choice = Ask(usr, "Watch & Listen:", "Overwatch", null, "pick", actions, 1)
 				if(!choice || choice == "Cancel") return
 				switch(choice)
 					if("Toggle Listen Mode (all chat)")
@@ -2326,14 +2375,14 @@ mob/Admin4/verb
 							usr.AdminListenMode = 1
 							usr << "<font color=green><b>Overwatch:</b> Listen Mode ON. You will receive a copy of all OMessage and MSay broadcasts globally."
 					if("Add player to watchlist")
-						var/mob/M = input(usr, "Add whom to watchlist?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Add whom to watchlist?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						usr.AdminWatchAdd(M.key)
 					if("Remove player from watchlist")
 						if(!usr.AdminWatchList || !usr.AdminWatchList.len)
 							usr << "<font color=red>Your watchlist is empty."
 							return
-						var/targetKey = input(usr, "Remove which key?", "Overwatch") as null|anything in usr.AdminWatchList
+						var/targetKey = Ask(usr, "Remove which key?", "Overwatch", null, "pick", usr.AdminWatchList, 1)
 						if(!targetKey) return
 						usr.AdminWatchRemove(targetKey)
 					if("Show watchlist")
@@ -2353,21 +2402,21 @@ mob/Admin4/verb
 					"Clear player combat log",
 					"Cancel"
 				)
-				var/choice = input(usr, "Combat Log:", "Overwatch") as null|anything in actions
+				var/choice = Ask(usr, "Combat Log:", "Overwatch", null, "pick", actions, 1)
 				if(!choice || choice == "Cancel") return
 				switch(choice)
 					if("View player combat log")
-						var/mob/M = input(usr, "View whose combat log?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "View whose combat log?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						usr.AdminViewCombatLog(M)
 					if("Clear player combat log")
-						var/mob/M = input(usr, "Clear whose combat log?", "Overwatch") as null|mob in players
+						var/mob/M = Ask(usr, "Clear whose combat log?", "Overwatch", null, "pick", PromptOf(players, "mob"), 1)
 						if(!M) return
 						M.CombatLog = list()
 						usr << "<font color=green><b>Overwatch:</b> Cleared combat log of [M]."
 
 			if("Give Resources")
-				var/mob/M = input(usr, "Give resources to whom?", "Overwatch - Give") as null|mob in players
+				var/mob/M = Ask(usr, "Give resources to whom?", "Overwatch - Give", null, "pick", PromptOf(players, "mob"), 1)
 				if(!M) return
 				var/list/resources = list(
 					"RPP (Spendable)",
@@ -2382,9 +2431,9 @@ mob/Admin4/verb
 					"Saga Level",
 					"Cancel"
 				)
-				var/res = input(usr, "What resource to give to [M]?", "Overwatch - Give") as null|anything in resources
+				var/res = Ask(usr, "What resource to give to [M]?", "Overwatch - Give", null, "pick", resources, 1)
 				if(!res || res == "Cancel") return
-				var/amount = input(usr, "How much [res]?", "Overwatch - Give") as null|num
+				var/amount = Ask(usr, "How much [res]?", "Overwatch - Give", null, "num", null, 1)
 				if(!amount) return
 				switch(res)
 					if("RPP (Spendable)")
@@ -2411,7 +2460,7 @@ mob/Admin4/verb
 				usr << "<font color=green><b>Overwatch:</b> Gave [amount] [res] to [M]."
 
 			if("Give All Skills")
-				var/mob/M = input(usr, "Give all skills to whom?", "Overwatch - Give All Skills") as null|mob in players
+				var/mob/M = Ask(usr, "Give all skills to whom?", "Overwatch - Give All Skills", null, "pick", PromptOf(players, "mob"), 1)
 				if(!M) return
 				var/count = 0
 				for(var/T in subtypesof(/obj/Skills))
@@ -2441,16 +2490,16 @@ mob/Admin4/verb
 	Wipe()
 		set category="Admin"
 		set name="Wipe"
-		var/choice = input(usr, "Wipe action:", "Wipe") as null|anything in list(
+		var/choice = Ask(usr, "Wipe action:", "Wipe", null, "pick", list(
 			"Start wipe (set today as Day 1)",
 			"Restart wipe (to specific day)",
 			"Push forward 24h",
 			"Cancel"
-		)
+		), 1)
 		if(!choice || choice == "Cancel") return
 		switch(choice)
 			if("Start wipe (set today as Day 1)")
-				switch(alert(usr, "Are you sure you want to set the start time of the wipe to midnight today?", "Are you sure you want to suffer through another wipe?", "Yes", "Hell Fucking Yes", "No"))
+				switch(Ask(usr, "Are you sure you want to set the start time of the wipe to midnight today?", "Are you sure you want to suffer through another wipe?", null, "confirm", null, 1, "Yes", "Hell Fucking Yes", "No"))
 					if("No")
 						return
 					if("Hell No")
@@ -2459,7 +2508,7 @@ mob/Admin4/verb
 				glob.progress.WipeStart = world.realtime - world.timeofday
 				Log("Admin", "[ExtractInfo(src)] has set the official start date of the wipe.")
 			if("Restart wipe (to specific day)")
-				var/val = input(src, "What day of the wipe are you currently on?", "Wipe Restart") as num|null
+				var/val = Ask(src, "What day of the wipe are you currently on?", "Wipe Restart", null, "num", null, 1)
 				if(val && val > 0)
 					glob.progress.DaysOfWipe = 0
 					glob.progress.WipeStart = Today() - Day(val)
@@ -2471,29 +2520,29 @@ mob/Admin4/verb
 	Potential_Daily_Set()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set daily potential gain?")) return
-		var/val=input(src, "How much potential is gained daily?", "Potential Daily") as num|null
+		var/val=Ask(src, "How much potential is gained daily?", "Potential Daily", null, "num", null, 1)
 		if(val&&val>0)
 			glob.progress.PotentialDaily=val
 			Log("Admin", "[ExtractInfo(src)] has set the daily potential rate to [glob.progress.PotentialDaily].")
 	Rename_Money()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to rename all money?")) return
-		var/NewMoney=input(usr, "What should money be called?  Currently known as: [glob.progress.MoneyName]", "Rename Money") as text|null
+		var/NewMoney=Ask(usr, "What should money be called?  Currently known as: [glob.progress.MoneyName]", "Rename Money", null, "text", null, 1)
 		if(NewMoney)
 			Log("Admin", "[ExtractInfo(usr)] renamed the currency from [glob.progress.MoneyName] to [NewMoney].")
 			glob.progress.MoneyName=NewMoney
 	Common_Toggle()
 		set category="Admin"
 		var/list/Races=list("Cancel", "Half Saiyan", "Demon", "Majin", "Dragon", "Makyo", "Changeling")
-		var/Mode=alert(usr, "You can set a normally rare race to be common, or strip that same status with this verb.  Which do you want to do?", "Common Toggle", "Make Common", "Make Rare")
+		var/Mode=Ask(usr, "You can set a normally rare race to be common, or strip that same status with this verb.  Which do you want to do?", "Common Toggle", null, "confirm", null, 1, "Make Common", "Make Rare")
 		if(Mode=="Make Common")
 			var/list/Choices=Races
 			for(var/x in Choices)
 				if(x in glob.CustomCommons)
 					Races.Remove(x)
-			var/Choice=input(usr, "Which rare do you want to designate as common?", "Make Common") in Races
+			var/Choice=Ask(usr, "Which rare do you want to designate as common?", "Make Common", null, "pick", Races, 0)
 			if(Choice!="Cancel")
-				var/Confirm=alert(usr, "Are you sure you want to make [Choice] common?", "Make Common", "Yes", "No")
+				var/Confirm=Ask(usr, "Are you sure you want to make [Choice] common?", "Make Common", null, "confirm", null, 1, "Yes", "No")
 				if(Confirm=="Yes")
 					glob.CustomCommons.Add(Choice)
 					Log("Admin", "[ExtractInfo(usr)] made [Choice] common!")
@@ -2501,15 +2550,17 @@ mob/Admin4/verb
 			var/list/Choices=list()
 			for(var/x in glob.CustomCommons)
 				Choices.Add(x)
-			var/Choice=input(usr, "Which rare do you want to strip common status from?", "Make Rare") in Choices
+			var/Choice=Ask(usr, "Which rare do you want to strip common status from?", "Make Rare", null, "pick", Choices, 0)
 			if(Choice!="Cancel")
-				var/Confirm=alert(usr, "Are you sure you want to make [Choice] rare again?", "Make Rare", "Yes", "No")
+				var/Confirm=Ask(usr, "Are you sure you want to make [Choice] rare again?", "Make Rare", null, "confirm", null, 1, "Yes", "No")
 				if(Confirm=="Yes")
 					glob.CustomCommons.Remove(Choice)
 					Log("Admin", "[ExtractInfo(usr)] made [Choice] rare again!")
-	Give_Rare_Race(mob/Players/P in players)
+	Give_Rare_Race()
 		set category="Admin"
 		set name="Give Rare Race"
+		var/mob/Players/P = PromptArg(usr, args, 1, "Give Rare Race", "players")
+		if(isnull(P)) return
 		if(!src.Alert("Are you sure you want to give someone access to a rare race?")) return
 		if(!P || !P.ckey)
 			usr << "<font color=red>Invalid target."
@@ -2523,7 +2574,7 @@ mob/Admin4/verb
 		if(!rares.len)
 			usr << "<font color=red>No rare races are currently marked as locked."
 			return
-		var/Choice = input(usr, "Which rare race do you want to give [P]?", "Give Rare Race") as null|anything in rares
+		var/Choice = Ask(usr, "Which rare race do you want to give [P]?", "Give Rare Race", null, "pick", rares, 1)
 		if(!Choice) return
 		var/race/selected
 		for(var/race/r in races)
@@ -2533,16 +2584,18 @@ mob/Admin4/verb
 		if(!selected)
 			usr << "<font color=red>Could not resolve race [Choice]."
 			return
-		var/Confirm = alert(usr, "Change [P]'s race to [Choice] and unlock it for their key?", "Give Rare Race", "Yes", "No")
+		var/Confirm = Ask(usr, "Change [P]'s race to [Choice] and unlock it for their key?", "Give Rare Race", null, "confirm", null, 1, "Yes", "No")
 		if(Confirm != "Yes") return
 		glob.LockedRaces[P.ckey] = Choice
 		P.setRace(selected.type, FALSE)
 		P << "<font color=yellow>An admin has changed your race to [Choice]."
 		Log("Admin", "[ExtractInfo(usr)] changed [ExtractInfo(P)]'s race to [Choice].")
 
-	Make_True_Demon(mob/Players/target in players)
+	Make_True_Demon()
 		set category = "Admin"
 		set name = "Make True Demon"
+		var/mob/Players/target = PromptArg(usr, args, 1, "Make True Demon", "players")
+		if(isnull(target)) return
 
 		if(!target || !target.ckey)
 			src << "<font color=red>Invalid target.</font>"
@@ -2565,7 +2618,7 @@ mob/Admin4/verb
 			src << "<font color=orange>[target] is already on the True Demon path.</font>"
 			return
 
-		var/confirm = alert(src, "Place [target] on the True Demon path? Their current Reason passive will be removed and all equipped Magatama will be unequipped.", "Make True Demon", "Yes", "No")
+		var/confirm = Ask(src, "Place [target] on the True Demon path? Their current Reason passive will be removed and all equipped Magatama will be unequipped.", "Make True Demon", null, "confirm", null, 1, "Yes", "No")
 		if(confirm != "Yes") return
 
 		for(var/obj/Items/Magatama/M in target)
@@ -2589,9 +2642,11 @@ mob/Admin4/verb
 		Log("Admin", "[ExtractInfo(src)] placed [ExtractInfo(target)] on the True Demon path.")
 		src << "<font color=yellow>[target] is now on the True Demon path.</font>"
 
-	Give_Demon(mob/Players/target in players)
+	Give_Demon()
 		set category = "Admin"
 		set name = "Give Demon"
+		var/mob/Players/target = PromptArg(usr, args, 1, "Give Demon", "players")
+		if(isnull(target)) return
 
 		if(!target || !target.ckey)
 			src << "<font color=red>Invalid target.</font>"
@@ -2615,7 +2670,7 @@ mob/Admin4/verb
 			src << "<font color=red>No valid demons found in the database.</font>"
 			return
 
-		var/choice = input(src, "Select a demon to give [target]. If their party is full, it will be recorded in their Compendium instead.", "Give Demon") as null|anything in demon_choices
+		var/choice = Ask(src, "Select a demon to give [target]. If their party is full, it will be recorded in their Compendium instead.", "Give Demon", null, "pick", demon_choices, 1)
 		if(!choice) return
 
 		var/demon_name = demon_choices[choice]
@@ -2639,21 +2694,21 @@ mob/Admin3/verb
 		set category="Admin"
 		set name = "Set global "
 		if(!src.Alert("Are you sure you want to change Global Damage mult?")) return
-		var/m=input(src, "What do you want to set the global damage multiplier to? (currently x[glob.WorldDamageMult])", "World Damage Multiplier") as num
+		var/m=Ask(src, "What do you want to set the global damage multiplier to? (currently x[glob.WorldDamageMult])", "World Damage Multiplier", null, "num", null, 0)
 		glob.WorldDamageMult=m
 		Log("Admin", "[ExtractInfo(src)] set Global Damage Mult to [m]!")
 	SetDefaultAccuracy()
 		set category="Admin"
 		set name = "World Accuracy"
 		if(!src.Alert("Are you sure you want to change Default Accuracy?")) return
-		var/m=input(src, "What do you want to set the default accuracy to? (currently [glob.WorldDefaultAcc]%)", "World Default Accuracy") as num
+		var/m=Ask(src, "What do you want to set the default accuracy to? (currently [glob.WorldDefaultAcc]%)", "World Default Accuracy", null, "num", null, 0)
 		glob.WorldDefaultAcc=m
 		Log("Admin", "[ExtractInfo(src)] set default accuracy to [m]%!")
 	SetWhiffRate()
 		set category="Admin"
 		set name = "Whiff Rate"
 		if(!src.Alert("Are you sure you want to change Whiff Rate?")) return
-		var/m=input(src, "What do you want the amount of full-powered strikes to be? (currently [glob.WorldWhiffRate]%)", "World Whiff Rate") as num
+		var/m=Ask(src, "What do you want the amount of full-powered strikes to be? (currently [glob.WorldWhiffRate]%)", "World Whiff Rate", null, "num", null, 0)
 		glob.WorldWhiffRate=m
 		Log("Admin", "[ExtractInfo(src)] set whiff rate to [m]%!")
 
@@ -2661,7 +2716,7 @@ mob/Admin3/verb
 		set category="Admin"
 		set name = "CC Damage Modifier"
 		if(!src.Alert("Are you sure you want to change damage reduction while stunned/launched?")) return
-		var/m=input(src, "What do you want the damage reduction on damage while stunned/launched to be? (currently [glob.CCDamageModifier]x)", "CC Damage Modifier") as num
+		var/m=Ask(src, "What do you want the damage reduction on damage while stunned/launched to be? (currently [glob.CCDamageModifier]x)", "CC Damage Modifier", null, "num", null, 0)
 		glob.CCDamageModifier=m
 		Log("Admin", "[ExtractInfo(src)] set CC Damage Modifier to [m]x!")
 
@@ -2670,19 +2725,19 @@ mob/Admin3/verb
 		set category="Admin"
 		set name = "Item Ascension Scaling"
 		if(!src.Alert("Are you sure you want to adjust item ascension scaling?")) return
-		var/m=input(src, "What do you want to adjust?(0.05 = 5% 'better') \n\n Staff: \nDamage per Ascension:[glob.StaffAscDamage]\nAccuracy per Ascension: [glob.StaffAscAcc]\nDrain per Ascension: [glob.StaffAscDelay]\n\nSword: \nDamage per Ascension:[glob.SwordAscDamage]\nAccuracy per Ascension: [glob.SwordAscAcc]\nDelay per Ascension: [glob.SwordAscDelay]\n\nArmor: \nDamage Reduc per Ascension:[glob.ArmorAscDamage]\nAccuracy per Ascension: [glob.ArmorAscAcc]\nDrain per Ascension: [glob.ArmorAscDelay]", "Item Ascension Scaling") in list("Staff","Sword","Armor", "Cancel")
+		var/m=Ask(src, "What do you want to adjust?(0.05 = 5% 'better') \n\n Staff: \nDamage per Ascension:[glob.StaffAscDamage]\nAccuracy per Ascension: [glob.StaffAscAcc]\nDrain per Ascension: [glob.StaffAscDelay]\n\nSword: \nDamage per Ascension:[glob.SwordAscDamage]\nAccuracy per Ascension: [glob.SwordAscAcc]\nDelay per Ascension: [glob.SwordAscDelay]\n\nArmor: \nDamage Reduc per Ascension:[glob.ArmorAscDamage]\nAccuracy per Ascension: [glob.ArmorAscAcc]\nDrain per Ascension: [glob.ArmorAscDelay]", "Item Ascension Scaling", null, "pick", list("Staff","Sword","Armor", "Cancel"), 0)
 		var/changing
 		switch(m)
 			if("Staff")
-				changing=input(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Staff: \nDamage per Ascension:[glob.StaffAscDamage]\nAccuracy per Ascension: [glob.StaffAscAcc]\nDrain per Ascension: [glob.StaffAscDelay]", "Item Ascension Scaling") in list("Damage", "Accuracy", "Drain", "Cancel")
+				changing=Ask(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Staff: \nDamage per Ascension:[glob.StaffAscDamage]\nAccuracy per Ascension: [glob.StaffAscAcc]\nDrain per Ascension: [glob.StaffAscDelay]", "Item Ascension Scaling", null, "pick", list("Damage", "Accuracy", "Drain", "Cancel"), 0)
 			if("Armor")
-				changing=input(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Armor: \nDamage per Ascension:[glob.ArmorAscDamage]\nAccuracy per Ascension: [glob.ArmorAscAcc]\nDrain per Ascension: [glob.ArmorAscDelay]", "Item Ascension Scaling") in list("Damage", "Accuracy", "Drain", "Cancel")
+				changing=Ask(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Armor: \nDamage per Ascension:[glob.ArmorAscDamage]\nAccuracy per Ascension: [glob.ArmorAscAcc]\nDrain per Ascension: [glob.ArmorAscDelay]", "Item Ascension Scaling", null, "pick", list("Damage", "Accuracy", "Drain", "Cancel"), 0)
 			if("Sword")
-				changing=input(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Sword: \nDamage per Ascension:[glob.SwordAscDamage]\nAccuracy per Ascension: [glob.SwordAscAcc]\nDelay per Ascension: [glob.SwordAscDelay]", "Item Ascension Scaling") in list("Damage", "Accuracy", "Delay", "Cancel")
+				changing=Ask(src, "What do you want to adjust?(0.05 = 5% increase) \n\n Sword: \nDamage per Ascension:[glob.SwordAscDamage]\nAccuracy per Ascension: [glob.SwordAscAcc]\nDelay per Ascension: [glob.SwordAscDelay]", "Item Ascension Scaling", null, "pick", list("Damage", "Accuracy", "Delay", "Cancel"), 0)
 			if("Cancel")
 				return
 		if(changing=="Cancel") return
-		var/changeto = input(src, "What do you want to change [m]'s [changing] ascension scaling to?") as num|null
+		var/changeto = Ask(src, "What do you want to change [m]'s [changing] ascension scaling to?", "", null, "num", null, 1)
 		if(changeto == null) return
 		switch(m)
 			if("Staff")
@@ -2714,18 +2769,20 @@ mob/Admin3/verb
 
 
 
-	moon_toggle_admin(var/Z as num)
+	moon_toggle_admin()
 		set category="Admin"
+		var/Z = PromptArgValue(usr, args, 1, "moon toggle admin", "num")
+		if(isnull(Z)) return
 		CallMoon(Z)
 		Log("Admin", "[ExtractInfo(src)] forced the moon to shine for z-plane ([Z]).")
 	Moon_Message()
 		set category="Admin"
-		var/NewMsg=input(usr, "What do you want to make the new moon message?", "Moon Message", global.MoonMessage) as message|null
+		var/NewMsg=Ask(usr, "What do you want to make the new moon message?", "Moon Message", global.MoonMessage, "message", null, 1)
 		if(!NewMsg&&NewMsg==null)
 			return
 		global.MoonMessage=NewMsg
 		Log("Admin", "[ExtractInfo(usr)] made the moon message: ([global.MoonMessage])")
-		var/NewSetMsg=input(usr, "What do you want to make the new moon setting message?", "Moon Set Message", global.MoonSetMessage) as message|null
+		var/NewSetMsg=Ask(usr, "What do you want to make the new moon setting message?", "Moon Set Message", global.MoonSetMessage, "message", null, 1)
 		if(!NewSetMsg&&NewSetMsg==null)
 			return
 		global.MoonSetMessage=NewSetMsg
@@ -2735,14 +2792,16 @@ mob/Admin3/verb
 	SetWorldPUDrain()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set Global PU Drain?")) return
-		var/Speedz=input("Current: [glob.WorldPUDrain]x") as null|num
+		var/Speedz=Ask(usr, "Current: [glob.WorldPUDrain]x", "", null, "num", null, 1)
 		if(Speedz)
 			glob.WorldPUDrain=Speedz
 			Log("Admin","<font color=blue>[ExtractInfo(usr)] ajusted the WorldPUDrain to [glob.WorldPUDrain].")
 
 
-	ManuallyRemoveAdmin(var/x as text)
+	ManuallyRemoveAdmin()
 		set category="Admin"
+		var/x = PromptArgList(usr, args, 1, "ManuallyRemoveAdmin", Admins)
+		if(isnull(x)) return
 		if(Admins)
 			if(Admins.Find(x))
 				Admins.Remove(x)
@@ -2750,7 +2809,7 @@ mob/Admin3/verb
 	TickLag()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to set Tick Lag?")) return
-		var/Speedz=input("Current Tick Lag [world.tick_lag]") as null|num
+		var/Speedz=Ask(usr, "Current Tick Lag [world.tick_lag]", "", null, "num", null, 1)
 		if(Speedz)
 			world.tick_lag=Speedz
 			Log("Admin","<font color=blue>[ExtractInfo(usr)] adjusted the Tick Lag to [Speedz]%.")
@@ -2780,7 +2839,7 @@ datum/Topic(A, B[])
 			options += list("Type", "Reference", "List", "New Matrix", "Color Matrix", "New Type")
 		if(istype(src, /datum) && hascall(usr, "Edit"))
 			options += "Open Edit Sheet"
-		class = input("[variable]: Select type", "") as null|anything in options
+		class = Ask(usr, "[variable]: Select type", "", null, "pick", options, 1)
 		if (!class) return
 		if(class == "Open Edit Sheet")
 			adminSelf.Edit(src)
@@ -2788,58 +2847,58 @@ datum/Topic(A, B[])
 		var/old_value = vars[variable]
 		if (class == "Null")
 			if(!isnull(vars[variable]))
-				var/confirm = input("This variable is currently NOT null. Continue?") in list("No", "Yes")
+				var/confirm = Ask(usr, "This variable is currently NOT null. Continue?", "", null, "pick", list("No", "Yes"), 0)
 				if (confirm == "No") return
 			vars[variable] = null
 		else if (class == "Text")
 			if (isnum(vars[variable]))
-				var/confirm = input("This variable is currently a number. Continue?") in list("No", "Yes")
+				var/confirm = Ask(usr, "This variable is currently a number. Continue?", "", null, "pick", list("No", "Yes"), 0)
 				if (confirm == "No") return
-			vars[variable] = input("Enter text", "", vars[variable]) as text
+			vars[variable] = Ask(usr, "Enter text", "", vars[variable], "text", null, 0)
 		else if (class == "Number")
 			if(!isnum(vars[variable]))
-				var/confirm = input("This variable is currently not a number. Continue?") in list("No", "Yes")
+				var/confirm = Ask(usr, "This variable is currently not a number. Continue?", "", null, "pick", list("No", "Yes"), 0)
 				if (confirm == "No") return
-			vars[variable] = input("Enter number", "", vars[variable]) as num
+			vars[variable] = Ask(usr, "Enter number", "", vars[variable], "num", null, 0)
 		else if (class == "File")
 			vars[variable] = input("Select file", "", vars[variable]) as file
 		else if (class == "Type")
-			vars[variable] = input("Enter type", "Type", vars[variable]) in typesof(/atom)
+			vars[variable] = Ask(usr, "Enter type", "Type", vars[variable], "pick", typesof(/atom), 0)
 		else if (class == "Reference")
-			vars[variable] = input("Select reference", "Reference", vars[variable]) as mob|obj|turf|area in world
+			vars[variable] = Ask(usr, "Select reference", "Reference", vars[variable], "pick", PromptWorld("area|mob|obj|turf"), 0)
 		else if (class == "List")
 			var/list/l = vars[variable]
 			if (!istype(l, /list))
-				if (input("Convert [variable] to a list?") in list("No", "Yes") == "Yes")
+				if (Ask(usr, "Convert [variable] to a list?", "", null, "pick", list("No", "Yes"), 0) == "Yes")
 					l = new
 					vars[variable] = l
 				else return
 			usr.list_view(l, "[variable]")
 		else if (class == "New Matrix")
-			if (input("Set [variable] as a new matrix? (a-f components)") in list("Yes", "No") == "Yes")
+			if (Ask(usr, "Set [variable] as a new matrix? (a-f components)", "", null, "pick", list("Yes", "No"), 0) == "Yes")
 				vars[variable] = matrix(
-					input("a") as num, input("b") as num, input("c") as num,
-					input("d") as num, input("e") as num, input("f") as num
+					Ask(usr, "a", "", null, "num", null, 0), Ask(usr, "b", "", null, "num", null, 0), Ask(usr, "c", "", null, "num", null, 0),
+					Ask(usr, "d", "", null, "num", null, 0), Ask(usr, "e", "", null, "num", null, 0), Ask(usr, "f", "", null, "num", null, 0)
 				)
 		else if (class == "Color Matrix")
-			var/mode = input("Set [variable] as a color matrix?") in list("RGB-Only", "RGBA", "Cancel")
+			var/mode = Ask(usr, "Set [variable] as a color matrix?", "", null, "pick", list("RGB-Only", "RGBA", "Cancel"), 0)
 			if (mode == "RGB-Only")
 				vars[variable] = list(
-					input("rr") as num, input("rg") as num, input("rb") as num,
-					input("gr") as num, input("gg") as num, input("gb") as num,
-					input("br") as num, input("bg") as num, input("bb") as num,
-					input("cr") as num, input("cg") as num, input("cb") as num
+					Ask(usr, "rr", "", null, "num", null, 0), Ask(usr, "rg", "", null, "num", null, 0), Ask(usr, "rb", "", null, "num", null, 0),
+					Ask(usr, "gr", "", null, "num", null, 0), Ask(usr, "gg", "", null, "num", null, 0), Ask(usr, "gb", "", null, "num", null, 0),
+					Ask(usr, "br", "", null, "num", null, 0), Ask(usr, "bg", "", null, "num", null, 0), Ask(usr, "bb", "", null, "num", null, 0),
+					Ask(usr, "cr", "", null, "num", null, 0), Ask(usr, "cg", "", null, "num", null, 0), Ask(usr, "cb", "", null, "num", null, 0)
 				)
 			else if (mode == "RGBA")
 				vars[variable] = list(
-					input("rr") as num, input("rg") as num, input("rb") as num, input("ra") as num,
-					input("gr") as num, input("gg") as num, input("gb") as num, input("ga") as num,
-					input("br") as num, input("bg") as num, input("bb") as num, input("ba") as num,
-					input("ar") as num, input("ag") as num, input("ab") as num, input("aa") as num,
-					input("cr") as num, input("cg") as num, input("cb") as num, input("ca") as num
+					Ask(usr, "rr", "", null, "num", null, 0), Ask(usr, "rg", "", null, "num", null, 0), Ask(usr, "rb", "", null, "num", null, 0), Ask(usr, "ra", "", null, "num", null, 0),
+					Ask(usr, "gr", "", null, "num", null, 0), Ask(usr, "gg", "", null, "num", null, 0), Ask(usr, "gb", "", null, "num", null, 0), Ask(usr, "ga", "", null, "num", null, 0),
+					Ask(usr, "br", "", null, "num", null, 0), Ask(usr, "bg", "", null, "num", null, 0), Ask(usr, "bb", "", null, "num", null, 0), Ask(usr, "ba", "", null, "num", null, 0),
+					Ask(usr, "ar", "", null, "num", null, 0), Ask(usr, "ag", "", null, "num", null, 0), Ask(usr, "ab", "", null, "num", null, 0), Ask(usr, "aa", "", null, "num", null, 0),
+					Ask(usr, "cr", "", null, "num", null, 0), Ask(usr, "cg", "", null, "num", null, 0), Ask(usr, "cb", "", null, "num", null, 0), Ask(usr, "ca", "", null, "num", null, 0)
 				)
 		else if (class == "New Type")
-			vars[variable] = new (input("Enter type:", "Type", vars[variable]) in typesof(/datum))
+			vars[variable] = new (Ask(usr, "Enter type:", "Type", vars[variable], "pick", typesof(/datum), 0))
 
 		if (vars[variable] != old_value)
 			Log("Admin", "[ExtractInfo(usr)] EDITED [variable] to [vars[variable]] on [ExtractInfo(src)] (was [old_value]).")
@@ -2848,7 +2907,7 @@ datum/Topic(A, B[])
 	else if (B["action"] == "companionskill")
 		if (usr.Admin < 1) return
 		var/variable = B["var"]
-		if (input("Give [variable]?") in list("Yes", "No") == "Yes" && istype(src, /obj/Skills/Companion))
+		if (Ask(usr, "Give [variable]?", "", null, "pick", list("Yes", "No"), 0) == "Yes" && istype(src, /obj/Skills/Companion))
 			var/obj/Skills/Companion/c = src
 			c.companion_techniques += "[variable]"
 			Log("Admin", "[ExtractInfo(usr)] created a [variable] and assigned it to [ExtractInfo(src)].")
@@ -2860,16 +2919,6 @@ datum/Topic(A, B[])
 atom/Topic(A,B[])
 
 
-	if(B["action"]=="companionskill")
-		if(usr.Admin<1) return
-		var/variable=B["var"]
-		switch(input("Give [variable]?") in list("Yes","No"))
-			if("No") return
-			if("Yes")
-				if(istype(src, /obj/Skills/Companion))
-					var/obj/Skills/Companion/c = src
-					c.companion_techniques += "[variable]"
-					Log("Admin","[ExtractInfo(usr)] created a [variable], and gave to/placed under/near [ExtractInfo(src)].")
 	if(B["action"]=="giveobj")
 		if(usr.Admin<1 && !glob.TESTER_MODE) return
 
@@ -2877,7 +2926,7 @@ atom/Topic(A,B[])
 		var/MagicY
 		var/MagicZ
 		var/variable=B["var"]
-		var/class=input("[variable]","") as null|anything in list("Give To","Make Under","Independant XYZ","Cancel")
+		var/class=Ask(usr, "[variable]", "", null, "pick", list("Give To","Make Under","Independant XYZ","Cancel"), 1)
 		if(class=="Cancel"||class==null||!class)
 			return
 		switch(class)
@@ -2900,20 +2949,20 @@ atom/Topic(A,B[])
 						m.Buffs.Add(variable)
 					m.Skills.Add(variable)
 			if("Make Under")
-				var/XYZMode=input("Would you like to place this object relative to the person it's being placed under?","") as null|anything in list("Yes","No")
+				var/XYZMode=Ask(usr, "Would you like to place this object relative to the person it's being placed under?", "", null, "pick", list("Yes","No"), 1)
 				switch(XYZMode)
 					if("No")
 						new variable(src.loc)
 					if("Yes")
-						MagicX=input("Input Relative X.") as num
-						MagicY=input("Input Relative Y.") as num
+						MagicX=Ask(usr, "Input Relative X.", "", null, "num", null, 0)
+						MagicY=Ask(usr, "Input Relative Y.", "", null, "num", null, 0)
 						var/RelativeX=(src.x+MagicX)
 						var/RelativeY=(src.y+MagicY)
 						new variable(locate(RelativeX,RelativeY,src.z))
 			if("Independant XYZ")
-				MagicX=input("Input X.") as num
-				MagicY=input("Input Y.") as num
-				MagicZ=input("Input Z.") as num
+				MagicX=Ask(usr, "Input X.", "", null, "num", null, 0)
+				MagicY=Ask(usr, "Input Y.", "", null, "num", null, 0)
+				MagicZ=Ask(usr, "Input Z.", "", null, "num", null, 0)
 				new variable(locate(MagicX,MagicY,MagicZ))
 		Log("Admin","[ExtractInfo(usr)] created a [variable], and gave to/placed under/near [ExtractInfo(src)].")
 	.=..()
@@ -2945,7 +2994,7 @@ mob/Topic(href,href_list[])
 				var/old_index = text2num(href_list["value"])
 				switch(href_list["part"])
 					if("indexnum")
-						var/new_index = input("Enter new index") as num
+						var/new_index = Ask(usr, "Enter new index", "", null, "num", null, 0)
 						if(new_index <= 0 || new_index==old_index || new_index > length(theList)) return
 						var/original_key = theList[old_index]
 						var/original_value = theList[original_key]
@@ -2963,23 +3012,20 @@ mob/Topic(href,href_list[])
 						var/list/options = list("text","num","type","reference","icon","file","list","restore to default")
 						if(istype(theList[old_index], /datum))
 							options += "Open Edit Sheet"
-						var/class = input(usr,"Change [theList[old_index]] to what?","Variable Type") as null|anything \
-							in options
+						var/class = Ask(usr, "Change [theList[old_index]] to what?", "Variable Type", null, "pick", options, 1)
 						if(!class) return
 
 						switch(class)
 							if("restore to default")
 								theList[old_index] = initial(theList[old_index])
 							if("text")
-								theList[old_index] = input("Enter new text:","Text",theList[old_index]) as text
+								theList[old_index] = Ask(usr, "Enter new text:", "Text", theList[old_index], "text", null, 0)
 							if("num")
-								theList[old_index] = input("Enter new number:","Num",theList[old_index]) as num
+								theList[old_index] = Ask(usr, "Enter new number:", "Num", theList[old_index], "num", null, 0)
 							if("type")
-								theList[old_index] = input("Enter type:","Type",theList[old_index]) \
-									in typesof(/atom)
+								theList[old_index] = Ask(usr, "Enter type:", "Type", theList[old_index], "pick", typesof(/atom), 0)
 							if("reference")
-								theList[old_index] = input("Select reference:","Reference", \
-									theList[old_index]) as mob|obj|turf|area in world
+								theList[old_index] = Ask(usr, "Select reference:", "Reference", theList[old_index], "pick", PromptWorld("area|mob|obj|turf"), 0)
 							if("file")
 								theList[old_index] = input("Pick file:","File",theList[old_index]) \
 									as file
@@ -3004,23 +3050,20 @@ mob/Topic(href,href_list[])
 							var/datum/d = theList[old_index]
 							if(d && d.type)
 								options += "Open Edit Sheet"
-						var/class = input(usr,"Change [theList[old_index]] to what?","Variable Type") as null|anything \
-							in options
+						var/class = Ask(usr, "Change [theList[old_index]] to what?", "Variable Type", null, "pick", options, 1)
 						if(!class) return
 						switch(class)
 
 							if("restore to default")
 								theList[old_key] = initial(theList[old_key])
 							if("text")
-								theList[old_key] = input("Enter new text:","Text",theList[old_key]) as text
+								theList[old_key] = Ask(usr, "Enter new text:", "Text", theList[old_key], "text", null, 0)
 							if("num")
-								theList[old_key] = input("Enter new number:","Num",theList[old_key]) as num
+								theList[old_key] = Ask(usr, "Enter new number:", "Num", theList[old_key], "num", null, 0)
 							if("type")
-								theList[old_key] = input("Enter type:","Type",theList[old_key]) \
-									in typesof(/atom)
+								theList[old_key] = Ask(usr, "Enter type:", "Type", theList[old_key], "pick", typesof(/atom), 0)
 							if("reference")
-								theList[old_key] = input("Select reference:","Reference", \
-									theList[old_key]) as mob|obj|turf|area in world
+								theList[old_key] = Ask(usr, "Select reference:", "Reference", theList[old_key], "pick", PromptWorld("area|mob|obj|turf"), 0)
 							if("file")
 								theList[old_key] = input("Pick file:","File",theList[old_key]) \
 									as file
@@ -3053,20 +3096,23 @@ mob/proc/list_view(aList,title)
 	if(!aList || !IsList(aList))
 		return
 	if(!Admin) return
-	var/html = {"<html><body bgcolor=gray text=#CCCCCC link=white vlink=white alink=white>
-	[title]
-	<table><tr><td><u>Index #</u></td><td><u>Index</u></td><td><u>Value</u></td><td><u>Delete</u></td></tr>"}
+	var/list/rows = list()
+	var/etitle = url_encode("[title]")
+	var/base = "byond://?src=\ref[src];title=[etitle];action=listedit;list=\ref[aList]"
 	for(var/i=1,i<=length(aList),i++)
-		#define LISTEDIT_LINK "href=byond://?src=\ref[src];title=[title];action=listedit;list=\ref[aList]"
-		html += "<tr><td><a [LISTEDIT_LINK];part=indexnum;value=[i]>[i]</a></td>"
-		html += "<td><a [LISTEDIT_LINK];part=key;value=[i]>[aList[i]]([DetermineVarType(aList[i])][AddListLink(aList[i],title,i)])</td>"
-		html += "<td><a [LISTEDIT_LINK];part=value;value=[i]>[aList[aList[i]]]([DetermineVarType(aList[aList[i]])][AddListLink(aList[aList[i]],title,i)])</a></td>"
-		html += "<td><a [LISTEDIT_LINK];part=delete;value=[i]><font color=red>X</font></a></td></tr>"
-	html += "</table><br><br><a [LISTEDIT_LINK];part=add>\[Add]</a></body></html>"
-	if(title)
-		src << browse(html,"window=[title]")
-	else
-		src << browse(html)
+		var/k = aList[i]
+		var/v = (isnum(k) || isnull(k)) ? null : aList[k]
+		var/list/x = list(list("#[i]", "[base];part=indexnum;value=[i]", ""))
+		var/subtitle = "[title]\[[i]]"
+		subtitle = url_encode(subtitle)
+		if(IsList(k))
+			x[++x.len] = list("(V)", "byond://?src=\ref[src];action=listview;list=\ref[k];title=[subtitle]", "sub")
+		if(IsList(v))
+			x[++x.len] = list("(V)", "byond://?src=\ref[src];action=listview;list=\ref[v];title=[subtitle]", "sub")
+		x[++x.len] = list("X", "[base];part=delete;value=[i]", "del")
+		rows[++rows.len] = list("n" = "[k] ([DetermineVarType(k)])", "v" = "[v] ([DetermineVarType(v)])", "nh" = "[base];part=key;value=[i]", "vh" = "[base];part=value;value=[i]", "x" = x)
+	var/count = (length(aList) == 1) ? "1 entry" : "[length(aList)] entries"
+	client?.SheetShow("list:\ref[aList]", "LIST", "[title]", count, rows, "an entry to edit", list(list("ADD", "[base];part=add")))
 mob/proc/AddListLink(variable,listname,index)
 	if(!Admin) return
 	if(IsList(variable))
@@ -3151,7 +3197,7 @@ mob/proc/AdminPickTarget(var/prompt, var/title, var/include_objects = 0)
 	if(include_objects)
 		categories += "Objects"
 	categories += "Cancel"
-	var/category = input(src, "Category:", title) as null|anything in categories
+	var/category = Ask(src, "Category:", title, null, "pick", categories, 1)
 	if(!category || category == "Cancel") return null
 	var/list/targets = list()
 	switch(category)
@@ -3170,5 +3216,5 @@ mob/proc/AdminPickTarget(var/prompt, var/title, var/include_objects = 0)
 	if(!targets.len)
 		src << "No targets found in that category."
 		return null
-	var/atom/target = input(src, prompt, title) as null|anything in targets
+	var/atom/target = Ask(src, prompt, title, null, "pick", targets, 1)
 	return target

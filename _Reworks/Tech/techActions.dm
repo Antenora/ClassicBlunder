@@ -40,7 +40,7 @@
 	var/datum/craft_recipe/r = GetTechRecipe(catalog)
 
 	if(istype(catalog, /obj/Items/Tech/Power_Pack))
-		var/qty = input(src, "How many packs would you like to make?", "Power Packs") as num|null
+		var/qty = Ask(src, "How many packs would you like to make?", "Power Packs", null, "num", null, 1)
 		if(isnull(qty) || qty <= 0) return 0
 		var/unit = r.MoneyCost(src, catalog)
 		var/total = unit * qty
@@ -95,7 +95,7 @@
 	if(!S) return
 	if(S.ScouterIcon == 1) return
 	S.ScouterIcon = 1
-	var/Choice = input(src, "What icon would you like for the scouter?") in list("Green", "Blue", "Red", "Purple")
+	var/Choice = Ask(src, "What icon would you like for the scouter?", "", null, "pick", list("Green", "Blue", "Red", "Purple"), 0)
 	switch(Choice)
 		if("Green") S.icon = 'GreenScouter.dmi'
 		if("Blue")  S.icon = 'BlueScouter.dmi'

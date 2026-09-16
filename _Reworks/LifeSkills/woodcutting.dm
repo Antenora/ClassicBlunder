@@ -250,8 +250,10 @@ proc/SeedTrees()
 		sleep(-1)
 	world.log << "//\[info]: Seeded [seeded] trees."
 
-mob/Admin4/verb/makeTree(id as text)
+mob/Admin4/verb/makeTree()
 	set category = "Admin"
+	var/id = PromptArgValue(usr, args, 1, "makeTree", "text")
+	if(isnull(id)) return
 	RegisterTrees()
 	if(!LifeTreeDefs[id])
 		src << "No such tree. Valid: [jointext(LifeTreeDefs, ", ")]"

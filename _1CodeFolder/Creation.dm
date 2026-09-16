@@ -563,9 +563,10 @@ mob/Creation
 		winset(usr, null, "browser-options=find")
 		client.perspective=MOB_PERSPECTIVE | EDGE_PERSPECTIVE
 		client.SetupTitleDisplay()
+		client.PromptPageBoot()
 		client.ClearSkillHUD()
 		usr.client.view=18
-		usr<<browse("[basehtml][Notes]")
+		usr.client?.DocShow("guide:notes", "NOTES", "Notes", "[basehtml][Notes]", "theme")
 		winshow(usr, "HungerLabel", 0)
 		winshow(usr, "Hunger", 0)
 		if(copytext(usr.key,1,6)=="Guest")
@@ -651,10 +652,10 @@ mob/Creation/verb
 		client.screen += usr
 		spawn()
 			Namez
-			src.name=html_encode(copytext(input(src,"Name your vessel. (25 letter limit)"),1,25))
+			src.name=html_encode(copytext(Ask(src, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			while(sanatizeName(name))
 				src<<"Your name contains illegal characters. Please try again."
-				src.name=html_encode(copytext(input(src,"Name your vessel. (25 letter limit)"),1,25))
+				src.name=html_encode(copytext(Ask(src, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			if(!src.name)
 				goto Namez
 				return
@@ -695,10 +696,10 @@ mob/Creation/proc
 		usrr.client.screen += usr
 		spawn()
 			Namez
-			usrr.name=html_encode(copytext(input(usrr,"Name your vessel. (25 letter limit)"),1,25))
+			usrr.name=html_encode(copytext(Ask(usrr, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			while(sanatizeName(usrr.name))
 				usrr<<"Your name contains illegal characters. Please try again."
-				usrr.name=html_encode(copytext(input(usrr,"Name your vessel. (25 letter limit)"),1,25))
+				usrr.name=html_encode(copytext(Ask(usrr, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			if(!usrr.name)
 				goto Namez
 				return
@@ -718,7 +719,7 @@ mob/Players/verb
 		verb_delay=world.time+1
 		if(blah=="Name")
 			Namez
-			src.name=html_encode(copytext(input(src,"Name your vessel. (25 letter limit)"),1,25))
+			src.name=html_encode(copytext(Ask(src, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			if(!src.name)
 				goto Namez
 				return
@@ -781,7 +782,7 @@ mob/Creation/verb
 		verb_delay=world.time+1
 		if(blah=="Name")
 			Namez
-			src.name=html_encode(copytext(input(src,"Name your vessel. (25 letter limit)"),1,25))
+			src.name=html_encode(copytext(Ask(src, "Name your vessel. (25 letter limit)", "", null, "text", null, 0),1,25))
 			if(!src.name)
 				goto Namez
 				return
@@ -827,50 +828,50 @@ mob/Creation/verb
 			return
 		verb_delay=world.time+1
 		if(blah=="Name")
-			alert("The name of your vessel, that others will address you by. Treat it with respect.")
+			Ask(usr, "The name of your vessel, that others will address you by. Treat it with respect.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="Class")
 			if(race.current_class > length(race.class_info))
-				alert("There is no information on this class...")
+				Ask(usr, "There is no information on this class...", "", null, "confirm", null, 1, "Ok")
 			else
-				alert("[race.class_info[race.current_class]]")
+				Ask(usr, "[race.class_info[race.current_class]]", "", null, "confirm", null, 1, "Ok")
 		if(blah=="Sex")
-			alert("not used at all btw")
+			Ask(usr, "not used at all btw", "", null, "confirm", null, 1, "Ok")
 		if(blah=="Race")
-			alert("Odds are you already read the blurb.")
+			Ask(usr, "Odds are you already read the blurb.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="Battle Power")
-			alert("This determines how fast (or slow) you gain Battle Power (BP).")
+			Ask(usr, "This determines how fast (or slow) you gain Battle Power (BP).", "", null, "confirm", null, 1, "Ok")
 		if(blah=="Zenkai")
-			alert("This determines how fast (or slow) you gain BP though being injured.")
+			Ask(usr, "This determines how fast (or slow) you gain BP though being injured.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="TrainRate")
-			alert("This determines various gain rates. Training typically is used for gains related to the Train verb.")
+			Ask(usr, "This determines various gain rates. Training typically is used for gains related to the Train verb.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="MedRate")
-			alert("This determines various gain rates. Meditation typically is used for gains related to Meditating.")
+			Ask(usr, "This determines various gain rates. Meditation typically is used for gains related to Meditating.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="IntelMod")
-			alert("This determines how fast (or slow) you gain Intelligence Experience. Intelligence is used to make Technology.")
+			Ask(usr, "This determines how fast (or slow) you gain Intelligence Experience. Intelligence is used to make Technology.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="EnchantMod")
-			alert("This determines how fast (or slow) you gain Enchantment Experience. Enchantment is used to make Magical Items.")
+			Ask(usr, "This determines how fast (or slow) you gain Enchantment Experience. Enchantment is used to make Magical Items.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="EnergyMod")
-			alert("This determines how fast (or slow) you gain Maximum Energy. Energy is used for a wide range of things, including learning new skills, using those skills, and more. If you are low on Energy, many options may become unavailable, and your movement speed will be dramatically reduced.")
+			Ask(usr, "This determines how fast (or slow) you gain Maximum Energy. Energy is used for a wide range of things, including learning new skills, using those skills, and more. If you are low on Energy, many options may become unavailable, and your movement speed will be dramatically reduced.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="StrMod")
-			alert("This determines how fast (or slow) you gain Strength. Strength is used for melee attacks for the most part, though a few ranged attacks do exist.")
+			Ask(usr, "This determines how fast (or slow) you gain Strength. Strength is used for melee attacks for the most part, though a few ranged attacks do exist.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="EndMod")
-			alert("This determines how fast (or slow) you gain Endurance. Endurance is used for melee defense. The more you have, the less damage melee attacks will do to you.")
+			Ask(usr, "This determines how fast (or slow) you gain Endurance. Endurance is used for melee defense. The more you have, the less damage melee attacks will do to you.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="SpdMod")
-			alert("This determines how fast (or slow) you gain Speed. Speed has a range of uses, including Attack Speed (mod), and is a important part of the Accuracy math.")
+			Ask(usr, "This determines how fast (or slow) you gain Speed. Speed has a range of uses, including Attack Speed (mod), and is a important part of the Accuracy math.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="ForMod")
-			alert("This determines how fast (or slow) you gain Force. Force is used for both Ki and Magical attacks, and determines the damage done by those.")
+			Ask(usr, "This determines how fast (or slow) you gain Force. Force is used for both Ki and Magical attacks, and determines the damage done by those.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="OffMod")
-			alert("This determines how fast (or slow) you gain Offense. Offense is extremely important in regards to hitting players.")
+			Ask(usr, "This determines how fast (or slow) you gain Offense. Offense is extremely important in regards to hitting players.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="DefMod")
-			alert("This determines how fast (or slow) you gain Defense. Defense is extremely important in regards to avoiding attacks, both melee and ranged.")
+			Ask(usr, "This determines how fast (or slow) you gain Defense. Defense is extremely important in regards to avoiding attacks, both melee and ranged.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="RegenerationMod")
-			alert("This determines how fast (or slow) you recover Health while Meditating. This cannot be increased at character creation, but various items and abilities may be able to increase it.")
+			Ask(usr, "This determines how fast (or slow) you recover Health while Meditating. This cannot be increased at character creation, but various items and abilities may be able to increase it.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="RecoveryMod")
-			alert("This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.")
+			Ask(usr, "This determines how fast (or slow) you recover Energy and charge Ki attacks. It cannot be trained, but various abilities can increase or decrease it.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="AngerMod")
-			alert("This determines your peak Anger power bonus. Anger builds as you take damage - a quarter of the bonus at 75% health, half at 50% where you properly Anger, and the full bonus at 25%. Some buffs and events can push you along the curve faster.")
+			Ask(usr, "This determines your peak Anger power bonus. Anger builds as you take damage - a quarter of the bonus at 75% health, half at 50% where you properly Anger, and the full bonus at 25%. Some buffs and events can push you along the curve faster.", "", null, "confirm", null, 1, "Ok")
 		if(blah=="GrowthRate")
-			alert("For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.")
+			Ask(usr, "For every point you invest in a certain stat, you gain an extra [glob.progress.INVESTED_STAT_PER_POINT] of that stat every time you reach a new ascension, multiplied by this number.", "", null, "confirm", null, 1, "Ok")
 
 mob/proc/UpdateBio()
 	src.PerkDisplay()
@@ -944,7 +945,7 @@ obj/Login
 				var/cc
 				f["name"] >> cc
 				del f
-				switch(alert("WARNING: You already have a character save on this key ([cc]). Do you wish to forsake them to start anew?","Oh snaps!","Yes","No"))
+				switch(Ask(usr, "WARNING: You already have a character save on this key ([cc]). Do you wish to forsake them to start anew?", "Oh snaps!", null, "confirm", null, 1, "Yes", "No"))
 					if("Yes")
 						winshow(usr,"Race_Screen",1)
 						spawn()usr.UpdateRaceScreen()
@@ -1109,7 +1110,7 @@ mob/proc
 		setStartingRPP()
 		if(!Warped)
 			if(isRace(WILDER))
-				var/Choice=input(src, "Do you want to possess animal characteristics?  These options will give you tails and ears.", "Choose your animal traits.") in list("None", "Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull")
+				var/Choice=Ask(src, "Do you want to possess animal characteristics?  These options will give you tails and ears.", "Choose your animal traits.", null, "pick", list("None", "Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull"), 0)
 				switch(Choice)
 					if("Cat")
 						src.Neko=1
@@ -1126,7 +1127,7 @@ mob/proc
 					if("Bull")
 						src.Bull=1
 				if(Choice!="None")
-					var/Color=input(src,"Choose color") as color|null
+					var/Color=Ask(src, "Choose color", "", null, "color", null, 1)
 					src.Trait_Color=Color
 					src.contents+=new/obj/FurryOptions
 					src.Hairz("Remove")

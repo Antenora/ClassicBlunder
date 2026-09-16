@@ -339,7 +339,7 @@
 		var/list/options = list()
 		for(var/datum/party_demon/pd in demon_party)
 			options["[pd.demon_name] (Lv[pd.demon_potential])"] = pd.demon_name
-		var/choice = input(src, "Pick a demon to view their skills:", "Demon Skills") as null|anything in options
+		var/choice = Ask(src, "Pick a demon to view their skills:", "Demon Skills", null, "pick", options, 1)
 		if(!choice) return
 		var/picked = options[choice]
 		for(var/datum/party_demon/pd in demon_party)
@@ -491,7 +491,7 @@
 		src << "[result_name] is already in your party. You cannot have duplicates."
 		return
 
-	var/confirm = alert(src, "Fuse [name_a] and [name_b] to create [result_name]? Both original demons will be lost.", "Confirm Fusion", "Fuse", "Cancel")
+	var/confirm = Ask(src, "Fuse [name_a] and [name_b] to create [result_name]? Both original demons will be lost.", "Confirm Fusion", null, "confirm", null, 1, "Fuse", "Cancel")
 	if(confirm != "Fuse") return
 
 	if(!DemonInParty(name_a) || !DemonInParty(name_b)) return
@@ -563,9 +563,9 @@
 	if(demon_active_name == name_a || demon_active_name == name_b)
 		DemonUnsummon()
 
-	src << browse(null, "window=DemonFusion")
+	src.client?.PanelClose("demon:fusion")
 	demon_fusion_open = FALSE
-	src << browse(null, "window=DemonInherit")
+	src.client?.PanelClose("demon:inherit")
 	demon_inherit_open = FALSE
 	demon_pending_fuse_a = ""
 	demon_pending_fuse_b = ""
@@ -657,7 +657,7 @@
 		src << "[result_name] is already in your party. You cannot have duplicates."
 		return
 
-	var/confirm = alert(src, "Element Fusion: [target_demon] -> [result_name]? [name_b] (the element) will be consumed.", "Confirm Fusion", "Fuse", "Cancel")
+	var/confirm = Ask(src, "Element Fusion: [target_demon] -> [result_name]? [name_b] (the element) will be consumed.", "Confirm Fusion", null, "confirm", null, 1, "Fuse", "Cancel")
 	if(confirm != "Fuse") return
 
 	// Re-validate
@@ -700,7 +700,7 @@
 	demon_party += result_pd
 
 	src << "<b>Element Fusion!</b> [name_a] became <b>[result_name]</b>!"
-	src << browse(null, "window=DemonFusion")
+	src.client?.PanelClose("demon:fusion")
 	demon_fusion_open = FALSE
 
 
@@ -761,7 +761,7 @@
 	demon_party += pd
 
 	src << "[demon_name] added to your party at level [chosen_level]."
-	src << browse(null, "window=DemonWithdraw")
+	src.client?.PanelClose("demon:withdraw")
 	demon_withdraw_open = FALSE
 	OpenCompendiumUI()
 
@@ -780,7 +780,7 @@
 
 	// Overwrite confirmation if already recorded
 	if(demon_name in demon_compendium)
-		var/confirm = alert(src, "[demon_name] is already recorded. Overwrite the recorded version?", "Confirm Overwrite", "Overwrite", "Cancel")
+		var/confirm = Ask(src, "[demon_name] is already recorded. Overwrite the recorded version?", "Confirm Overwrite", null, "confirm", null, 1, "Overwrite", "Cancel")
 		if(confirm != "Overwrite")
 			demon_record_open = FALSE
 			return
@@ -812,7 +812,7 @@
 		src << "Recorded at Level [cd.recorded_level] (base: [cd.base_level]). Higher withdrawal costs Mana Bits."
 	if(cd.recorded_skills.len > dd.demon_skills.len)
 		src << "Skills recorded: [jointext(cd.recorded_skills, ", ")]"
-	src << browse(null, "window=DemonRecord")
+	src.client?.PanelClose("demon:record")
 	demon_record_open = FALSE
 
 
@@ -995,7 +995,7 @@
 			options -= pd.demon_name
 		if(!options.len) break
 
-		var/choice = input(src, "Choose demon [n] of 2:", "Starter Demon") as null|anything in options
+		var/choice = Ask(src, "Choose demon [n] of 2:", "Starter Demon", null, "pick", options, 1)
 		if(!choice) break
 		picked.Add(choice)
 
@@ -1057,7 +1057,7 @@
 	demon_pending_picks = max(0, demon_pending_picks - 1)
 	demon_sensing = TRUE
 
-	var/choice = input(src, "Choose a demon to claim: ([demon_pending_picks + 1] pick(s) remaining)", "Sense Demons") as null|anything in display_options
+	var/choice = Ask(src, "Choose a demon to claim: ([demon_pending_picks + 1] pick(s) remaining)", "Sense Demons", null, "pick", display_options, 1)
 
 	demon_sensing = FALSE
 

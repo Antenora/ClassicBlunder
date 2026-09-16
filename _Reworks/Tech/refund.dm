@@ -55,8 +55,10 @@
 			src << "You have refunded [tech.name]!"
 
 
-/mob/Admin3/verb/RemoveAllTech(mob/p in players)
+/mob/Admin3/verb/RemoveAllTech()
 	set name = "Refund All Technology"
+	var/mob/p = PromptArg(usr, args, 1, "Refund All Technology", "players")
+	if(isnull(p)) return
 	var/int = p.Intelligence
 	if(p.passive_handler["Spiritual Tactician"])
 		if(p.Imagination > p.Intelligence)
@@ -68,8 +70,10 @@
 		removeTechKnowledge(p, x, theCost, FALSE)
 
 
-/mob/Admin3/verb/RefundKnowledge(mob/p in players)
+/mob/Admin3/verb/RefundKnowledge()
 	set name = "Refund Technology"
+	var/mob/p = PromptArg(usr, args, 1, "Refund Technology", "players")
+	if(isnull(p)) return
 	var/int = p.Intelligence
 	if(p.passive_handler["Spiritual Tactician"])
 		if(p.Imagination > p.Intelligence)
@@ -77,7 +81,7 @@
 	if(int < 0.5)
 		int = 0.5
 	var/theCost = glob.TECH_BASE_COST / int
-	var/thePath = input(usr,"What technology would you like to refund?") in p.knowledgeTracker.learnedKnowledge + "Cancel"
+	var/thePath = Ask(usr, "What technology would you like to refund?", "", null, "pick", (p.knowledgeTracker.learnedKnowledge + "Cancel"), 0)
 	if(thePath == "Cancel")
 		return
 	if(thePath in p.knowledgeTracker.learnedKnowledge)

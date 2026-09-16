@@ -38,7 +38,7 @@
 				usr << "You have ran out of true form charges..."
 				return
 			adjust(usr)
-			var/yesno = input(usr, "Are you sure?") in list("Yes", "No")
+			var/yesno = Ask(usr, "Are you sure?", "", null, "pick", list("Yes", "No"), 0)
 			if(yesno == "Yes")
 				current_charges--
 				usr << "You have [current_charges] charges of true form left."

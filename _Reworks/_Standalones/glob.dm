@@ -15,26 +15,13 @@ var/globalTracker/glob = new()
 	set category = "Admin"
 	if(!src.Alert("Are you sure you want to edit global variables?")) return
 	var/atom/A = glob
-	var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-	var/list/B=new
-	Edit+="[A]<br>[A.type]"
-	Edit+="<table width=10%>"
-	for(var/C in A.vars)
-		B+=C
-		CHECK_TICK
-	for(var/C in B)
-		Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
-		Edit+=C
-		if(istype(A.vars[C], /datum) && !istype(A.vars[C], /obj))
-			if(A.vars[C].type in typesof(/datum))
-				Edit+="<td><a href=byond://?src=\ref[A.vars[C]];action=edit;var=[C]>[C]</td></tr>"
-		else
-			Edit+="<td>[Value(A.vars[C])]</td></tr>"
-		CHECK_TICK
-	Edit += "</html>"
-	usr<<browse(Edit,"window=[A];size=450x600")
+	var/list/B = list()
+	for(var/C in A.vars) B += C
+	usr.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, B), "a name to edit")
 
-/mob/Admin3/verb/Debuff_Apply(n as num)
+/mob/Admin3/verb/Debuff_Apply()
+	var/n = PromptArgValue(usr, args, 1, "Debuff Apply", "num")
+	if(isnull(n)) return
 	if(!src.Alert("Are you sure you want to change global debuff intensity?")) return
 	glob.BURN_INTENSITY = n
 	glob.SHOCK_INTENSITY = n

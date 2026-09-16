@@ -159,8 +159,8 @@
 		set category = "Shinigami"
 		var/icon/newIcon = input(usr, "Set Zanpakutō Shikai icon to what?") as icon|null
 		if(isnull(newIcon)) return
-		var/newX = input(usr, "Pixel X offset?") as num
-		var/newY = input(usr, "Pixel Y offset?") as num
+		var/newX = Ask(usr, "Pixel X offset?", "", null, "num", null, 0)
+		var/newY = Ask(usr, "Pixel Y offset?", "", null, "num", null, 0)
 		usr.ShikaiIcon = newIcon
 		usr.ShikaiIconX = newX
 		usr.ShikaiIconY = newY
@@ -170,12 +170,12 @@
 				hasDual = TRUE
 				break
 		if(hasDual)
-			if(alert(usr, "Change your second Zanpakutō's Shikai appearance too?", "Second Zanpakutō", "Yes", "No") == "Yes")
+			if(Ask(usr, "Change your second Zanpakutō's Shikai appearance too?", "Second Zanpakutō", null, "confirm", null, 1, "Yes", "No") == "Yes")
 				var/icon/dualIcon = input(usr, "Set second Zanpakutō Shikai icon to what?") as icon|null
 				if(!isnull(dualIcon))
 					usr.ShikaiIconDual = dualIcon
-					usr.ShikaiIconDualX = input(usr, "Pixel X offset?") as num
-					usr.ShikaiIconDualY = input(usr, "Pixel Y offset?") as num
+					usr.ShikaiIconDualX = Ask(usr, "Pixel X offset?", "", null, "num", null, 0)
+					usr.ShikaiIconDualY = Ask(usr, "Pixel Y offset?", "", null, "num", null, 0)
 		if(usr.InShikai())
 			applyShikaiIcon(usr)
 
@@ -184,8 +184,8 @@
 		set category = "Shinigami"
 		var/icon/newIcon = input(usr, "Set Zanpakutō Bankai icon to what?") as icon|null
 		if(isnull(newIcon)) return
-		var/newX = input(usr, "Pixel X offset?") as num
-		var/newY = input(usr, "Pixel Y offset?") as num
+		var/newX = Ask(usr, "Pixel X offset?", "", null, "num", null, 0)
+		var/newY = Ask(usr, "Pixel Y offset?", "", null, "num", null, 0)
 		usr.BankaiIcon = newIcon
 		usr.BankaiIconX = newX
 		usr.BankaiIconY = newY
@@ -197,8 +197,8 @@
 		set category = "Shinigami"
 		var/icon/newIcon = input(usr, "Set Shihakushō Bankai icon to what?") as icon|null
 		if(isnull(newIcon)) return
-		var/newX = input(usr, "Pixel X offset?") as num
-		var/newY = input(usr, "Pixel Y offset?") as num
+		var/newX = Ask(usr, "Pixel X offset?", "", null, "num", null, 0)
+		var/newY = Ask(usr, "Pixel Y offset?", "", null, "num", null, 0)
 		usr.BankaiShihakushoIcon = newIcon
 		usr.BankaiShihakushoIconX = newX
 		usr.BankaiShihakushoIconY = newY

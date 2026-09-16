@@ -165,7 +165,7 @@ obj/Items/Tech
 		Click()
 			..()
 			if(!(src in usr.contents)) return
-			var/scentChoice = input(usr, "What would you like to smell like?", "Scent Choice") as null|text
+			var/scentChoice = Ask(usr, "What would you like to smell like?", "Scent Choice", null, "text", null, 1)
 			if(!scentChoice) return
 			usr.custom_scent = scentChoice
 			usr << "Your scent is now [usr.custom_scent]"
@@ -180,7 +180,7 @@ obj/Items/Tech
 		Click()
 			..()
 			if(!(src in usr.contents)) return
-			var/confirm = alert(usr, "Are you sure you want to remove your custom scent?", "Remove Custom Scent", "Yes", "No")
+			var/confirm = Ask(usr, "Are you sure you want to remove your custom scent?", "Remove Custom Scent", null, "confirm", null, 1, "Yes", "No")
 			if(confirm == "No") return
 			usr.setUpScent()
 			usr << "Your new scent is [usr.custom_scent]"
@@ -197,7 +197,7 @@ obj/Items/Tech
 			..()
 			if(!(usr in range(1,src))) return
 			if(!Password)
-				Password=input("Shape pattern.")as text
+				Password=Ask(usr, "Shape pattern.", "", null, "text", null, 0)
 			else usr<<"Already shaped!"
 	Door
 		TechType="BasicTechnology"
@@ -355,7 +355,7 @@ obj/Items/Tech
 					if(C.Password==src.Password||C.Password2==src.Password||C.Password3==src.Password)
 						Unlocked=1
 				if(!Unlocked)
-					var/Pass=input(usr, "What is the password of this door?", "Toggle Open") as text
+					var/Pass=Ask(usr, "What is the password of this door?", "Toggle Open", null, "text", null, 0)
 					if(src.Password!=Pass)
 						usr << "That is not the correct password."
 						return
@@ -387,7 +387,7 @@ obj/Items/Tech
 						Choices+=O
 				if(istype(O,/obj/Items/Tech/Door/LazerDoor))
 					Choices-=O
-			var/obj/Items/Tech/Door/P=input(usr,"Lockpick what?") in Choices
+			var/obj/Items/Tech/Door/P=Ask(usr, "Lockpick what?", "", null, "pick", Choices, 0)
 			if(!P)
 				usr << "There's nothing to unlock!"
 				return
@@ -433,7 +433,7 @@ obj/Items/Tech
 					usr << "You don't have any equipment that can be polished."
 					src.Using=0
 					return
-				var/obj/Items/Choice=input(usr, "Select a piece to tend to..", "Conservation Kit") in Bork
+				var/obj/Items/Choice=Ask(usr, "Select a piece to tend to..", "Conservation Kit", null, "pick", Bork, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
@@ -488,12 +488,12 @@ obj/Items/Tech
 					usr << "You don't have any equipment that can be treated!"
 					src.Using=0
 					return
-				var/obj/Items/Choice=input(usr, "Select a piece to tend to.", "Fiber Bonding Agent") in Sharp
+				var/obj/Items/Choice=Ask(usr, "Select a piece to tend to.", "Fiber Bonding Agent", null, "pick", Sharp, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				if(istype(Choice, /obj/Items/Sword)&&!Choice.LegendaryItem)
-					var/Option2=alert(usr, "Do you want to apply a single conversion?", "Fiber Bonding Agent", "No", "Yes")
+					var/Option2=Ask(usr, "Do you want to apply a single conversion?", "Fiber Bonding Agent", null, "confirm", null, 1, "No", "Yes")
 					if(Option2=="No")
 						return
 				usr.Frozen=2
@@ -544,14 +544,14 @@ obj/Items/Tech
 					usr << "You don't have any equipment that can be treated!"
 					src.Using=0
 					return
-				var/obj/Items/Choice=input(usr, "Select a piece to tend to.", "Quicksilver Alloy") in Sharp
+				var/obj/Items/Choice=Ask(usr, "Select a piece to tend to.", "Quicksilver Alloy", null, "pick", Sharp, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				if(istype(Choice, /obj/Items/Sword)&&!Choice.LegendaryItem)
 					if((Choice.Class=="Light"||Choice.Class=="Medium")&&Choice.Destructable)
 						if(src.TotalStack>=10)
-							var/Option=alert(usr, "Do you want to consume 10 alloys to form [Choice] into a Glass Sword?", "Quicksilver Alloy", "No", "Yes")
+							var/Option=Ask(usr, "Do you want to consume 10 alloys to form [Choice] into a Glass Sword?", "Quicksilver Alloy", null, "confirm", null, 1, "No", "Yes")
 							var/image/i
 							if(Option=="Yes")
 								OMsg(usr, "[usr] has transformed [Choice] into a glass sword!")
@@ -565,7 +565,7 @@ obj/Items/Tech
 								if(src.TotalStack<=0)
 									del src
 								return
-						var/Option2=alert(usr, "Do you want to apply a single conversion?", "Quicksilver Coating", "No", "Yes")
+						var/Option2=Ask(usr, "Do you want to apply a single conversion?", "Quicksilver Coating", null, "confirm", null, 1, "No", "Yes")
 						if(Option2=="No")
 							return
 				usr.Frozen=2
@@ -619,17 +619,17 @@ obj/Items/Tech
 					usr << "You don't have any equipment that can be treated!"
 					src.Using=0
 					return
-				var/obj/Items/Choice=input(usr, "Select a piece to tend to.", "Trick Weapon Kit") in Mod
+				var/obj/Items/Choice=Ask(usr, "Select a piece to tend to.", "Trick Weapon Kit", null, "pick", Mod, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				usr.Frozen=2
-				var/Lock=alert(usr, "What icon will the alternate weapon form use?", "Trick Weapon Kit", "Current", "New")
+				var/Lock=Ask(usr, "What icon will the alternate weapon form use?", "Trick Weapon Kit", null, "confirm", null, 1, "Current", "New")
 				if(Lock=="New")
 					Choice:iconAlt=input(usr, "What icon will your Trick Weapon alternate state use?", "Trick Weapon Icon") as icon|null
-					Choice:iconAltX=input(usr, "Pixel X offset.", "Trick Weapon Icon") as num
-					Choice:iconAltY=input(usr, "Pixel Y offset.", "Trick Weapon Icon") as num
-				var/Choice2=input(usr, "What class of weapon do you wish the alternate mode to be?", "Trick Weapon Kit") in list("Light", "Medium", "Heavy")
+					Choice:iconAltX=Ask(usr, "Pixel X offset.", "Trick Weapon Icon", null, "num", null, 0)
+					Choice:iconAltY=Ask(usr, "Pixel Y offset.", "Trick Weapon Icon", null, "num", null, 0)
+				var/Choice2=Ask(usr, "What class of weapon do you wish the alternate mode to be?", "Trick Weapon Kit", null, "pick", list("Light", "Medium", "Heavy"), 0)
 				Choice:ClassAlt="[Choice2]"
 				Choice.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/WeaponSystems/Alternate_Mode")
 				Choice:LegendaryItem=1
@@ -674,13 +674,13 @@ obj/Items/Tech
 					usr << "You don't have any equipment that can be treated!"
 					src.Using=0
 					return
-				var/obj/Items/Choice=input(usr, "Select a piece to tend to.", "Resistant Coating") in Sharp
+				var/obj/Items/Choice=Ask(usr, "Select a piece to tend to.", "Resistant Coating", null, "pick", Sharp, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				if(istype(Choice, /obj/Items/Armor)&&!Choice.LegendaryItem)
 					if(src.TotalStack>=10)
-						var/Option=alert(usr, "Do you want to consume 10 coatings to form [Choice] into Shock-Resistant Armor?", "Resistant Coating", "No", "Yes")
+						var/Option=Ask(usr, "Do you want to consume 10 coatings to form [Choice] into Shock-Resistant Armor?", "Resistant Coating", null, "confirm", null, 1, "No", "Yes")
 						if(Option=="Yes")
 							OMsg(usr, "[usr] has transformed [Choice] into an indestructable armor!")
 							src.TotalStack-=10
@@ -690,7 +690,7 @@ obj/Items/Tech
 							if(src.TotalStack<=0)
 								del src
 							return
-						var/Option2=alert(usr, "Do you want to apply a single conversion?", "Resistant Coating", "No", "Yes")
+						var/Option2=Ask(usr, "Do you want to apply a single conversion?", "Resistant Coating", null, "confirm", null, 1, "No", "Yes")
 						if(Option2=="No")
 							return
 				usr.Frozen=2
@@ -737,7 +737,7 @@ obj/Items/Tech
 					usr << "There's no one nearby."
 					src.Using=0
 					return
-				var/mob/Players/Choice=input("Select a target to use the first aid kit on.") in People
+				var/mob/Players/Choice=Ask(usr, "Select a target to use the first aid kit on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
@@ -793,13 +793,13 @@ obj/Items/Tech
 					usr << "There's no one to use the medkit on."
 					src.Using=0
 					return
-				var/mob/Players/Choice=input("Select a target to use the medkit on.") in People
+				var/mob/Players/Choice=Ask(usr, "Select a target to use the medkit on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use a medkit on you; do you allow this?", "Medkit", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use a medkit on you; do you allow this?", "Medkit", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
@@ -844,9 +844,11 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="AVenom"
 		desc="This is used to decrease poison instantly, and it will also provide resistance for a while longer."
-		verb/Apply(mob/m in view(1))
+		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
+			var/mob/m = PromptArg(usr, args, 1, "Apply", "view:1:mob")
+			if(isnull(m)) return
 			if(m) Use(m)
 		verb/ApplySelf()
 			set name = "Apply Self"
@@ -881,13 +883,13 @@ obj/Items/Tech
 						usr << "There's no one to use the antivenom on."
 						src.Using=0
 						return
-					Choice=input("Select a target to use the antivenom on.") in People
+					Choice=Ask(usr, "Select a target to use the antivenom on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use an antivenom on you; do you allow this?", "Antivenom", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use an antivenom on you; do you allow this?", "Antivenom", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
@@ -910,9 +912,11 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="TRegulator"
 		desc="This is used to decrease burn and chill instantly.  It will also provide some resistance afterwards."
-		verb/Apply(mob/m in view(1))
+		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
+			var/mob/m = PromptArg(usr, args, 1, "Apply", "view:1:mob")
+			if(isnull(m)) return
 			if(m) Use(m)
 		verb/ApplySelf()
 			set name = "Apply Self"
@@ -947,13 +951,13 @@ obj/Items/Tech
 						usr << "There's no one to use the cooling spray on."
 						src.Using=0
 						return
-					Choice=input("Select a target to use the cooling spray on.") in People
+					Choice=Ask(usr, "Select a target to use the cooling spray on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use a cooling spray on you; do you allow this?", "Cooling Spray", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use a cooling spray on you; do you allow this?", "Cooling Spray", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
@@ -976,9 +980,11 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="SSpray"
 		desc="This is used to decrease shatter, shear and cripple instantly.  It will also provide some resistance afterwards."
-		verb/Apply(mob/m in view(1))
+		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
+			var/mob/m = PromptArg(usr, args, 1, "Apply", "view:1:mob")
+			if(isnull(m)) return
 			if(m) Use(m)
 		verb/ApplySelf()
 			set name = "Apply Self"
@@ -1013,13 +1019,13 @@ obj/Items/Tech
 						usr << "There's no one to use the sealing spray on."
 						src.Using=0
 						return
-					Choice=input("Select a target to use the cooling spray on.") in People
+					Choice=Ask(usr, "Select a target to use the cooling spray on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use a sealing spray on you; do you allow this?", "Sealing Spray", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use a sealing spray on you; do you allow this?", "Sealing Spray", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
@@ -1042,9 +1048,11 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="FStabilizer"
 		desc="This is used to decrease shock and confusion instantly.  It will also provide some resistance afterwards."
-		verb/Apply(mob/m in view(1))
+		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
+			var/mob/m = PromptArg(usr, args, 1, "Apply", "view:1:mob")
+			if(isnull(m)) return
 			if(m) Use(m)
 		verb/ApplySelf()
 			set name = "Apply Self"
@@ -1079,13 +1087,13 @@ obj/Items/Tech
 						usr << "There's no one to use the stabilizer on."
 						src.Using=0
 						return
-					Choice=input("Select a target to use the stabilizer on.") in People
+					Choice=Ask(usr, "Select a target to use the stabilizer on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use a focus stabilizer on you; do you allow this?", "Focus Stabilizer", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use a focus stabilizer on you; do you allow this?", "Focus Stabilizer", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
@@ -1108,9 +1116,11 @@ obj/Items/Tech
 		SubType="Enhancers"
 		icon='Steroid.dmi'
 		desc="Steroids will boost your power for a short duration with a crash following afterwards."
-		verb/Apply(mob/m in view(1))
+		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
+			var/mob/m = PromptArg(usr, args, 1, "Apply", "view:1:mob")
+			if(isnull(m)) return
 			if(m) Use(m)
 		verb/ApplySelf()
 			set name = "Apply Self"
@@ -1145,13 +1155,13 @@ obj/Items/Tech
 						usr << "There's no one to use the steroid on."
 						src.Using=0
 						return
-					Choice=input("Select a target to use the steroid on.") in People
+					Choice=Ask(usr, "Select a target to use the steroid on.", "", null, "pick", People, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
 				var/Confirm
 				if(!Choice.KO&&Choice!=usr)
-					Confirm=alert(Choice, "[usr] wants to use a steroid on you; do you allow this?", "Steroid", "No", "Yes")
+					Confirm=Ask(Choice, "[usr] wants to use a steroid on you; do you allow this?", "Steroid", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					usr << "[Choice] rejected the 'assistance'."
 					src.Using=0
@@ -1209,7 +1219,7 @@ obj/Items/Tech
 				if(A.Secret=="Heavenly Restriction" && A.secretDatum?:hasRestriction("Science"))
 					continue
 				validkitters+=A
-			var/mob/selection=input("Select a target to use the pain killers on.") in validkitters
+			var/mob/selection=Ask(usr, "Select a target to use the pain killers on.", "", null, "pick", validkitters, 0)
 			if(selection=="Cancel")
 				return
 			if(selection.Doped)
@@ -1358,7 +1368,7 @@ obj/Items/Tech
 					usr << "You need to be sitting down to use this properly."
 					return
 				src.Using=1
-				var/Confirm=alert(usr, "Are you sure you want to reset all of your stats?", "Genome Warp", "No", "Yes")
+				var/Confirm=Ask(usr, "Are you sure you want to reset all of your stats?", "Genome Warp", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					src.Using=0
 					return
@@ -1371,11 +1381,11 @@ obj/Items/Tech
 					src.Using=0
 					return
 				usr.Finalize(Warped=1)
-				usr.Gender=alert(usr, "What gender do you want to be?", "Genome Warp", "Male", "Female")
+				usr.Gender=Ask(usr, "What gender do you want to be?", "Genome Warp", null, "confirm", null, 1, "Male", "Female")
 				usr.gender = lowertext(usr.Gender)
-				var/Sin=alert(usr, "Do you want to possess animal attributes?", "Genome Warp", "No", "Yes")
+				var/Sin=Ask(usr, "Do you want to possess animal attributes?", "Genome Warp", null, "confirm", null, 1, "No", "Yes")
 				if(Sin=="Yes")
-					var/Choice=input(usr, "What animal do you want the characteristics of?", "Genome Warp") in list("Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull")
+					var/Choice=Ask(usr, "What animal do you want the characteristics of?", "Genome Warp", null, "pick", list("Cat", "Fox", "Racoon", "Wolf", "Lizard", "Crow", "Bull"), 0)
 					switch(Choice)
 						if("Cat")
 							usr.Neko=1
@@ -1391,7 +1401,7 @@ obj/Items/Tech
 							usr.Tengu=1
 						if("Bull")
 							usr.Bull=1
-					var/Color=input(usr,"Choose color") as color|null
+					var/Color=Ask(usr, "Choose color", "", null, "color", null, 1)
 					usr.Trait_Color=Color
 					usr.contents+=new/obj/FurryOptions
 					usr.Hairz("Remove")
@@ -1451,7 +1461,7 @@ obj/Items/Tech
 					usr << "You've used too many revitalization serums"
 					return
 				src.Using=1
-				var/Confirm=alert(usr, "Do you want to inject a revitalization serum?", "Revitalization Serum", "No", "Yes")
+				var/Confirm=Ask(usr, "Do you want to inject a revitalization serum?", "Revitalization Serum", null, "confirm", null, 1, "No", "Yes")
 				if(usr.Maimed<1)
 					usr << "You have no maims!"
 					src.Using=0
@@ -1501,7 +1511,7 @@ obj/Items/Tech
 					usr << "You need to be sitting down to use this properly."
 					return
 				Using=1
-				var/Confirm=alert(usr, "Do you want to inject a super soldier serum?", "Super Soldier Serum", "No", "Yes")
+				var/Confirm=Ask(usr, "Do you want to inject a super soldier serum?", "Super Soldier Serum", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					Using=0
 					return
@@ -1557,8 +1567,10 @@ obj/Items/Tech
 			usr << "[src] is now [toggled_on ? "on" : "off"]."
 			suffix = "[toggled_on ? "On -- Freq: [Frequency]" : "Off -- Freq:[Frequency]"]"
 
-		verb/Communicator_Speak(Z as text)
+		verb/Communicator_Speak()
 			set src in usr
+			var/Z = PromptArgValue(usr, args, 1, "Communicator Speak", "text")
+			if(isnull(Z)) return
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
 				OMsg(usr, "[src] shorts out as [usr] tries to talk into it!")
 				del src
@@ -1578,7 +1590,7 @@ obj/Items/Tech
 		verb/Communicator_Frequency()
 			set src in usr
 			var/previousFreq = Frequency
-			var/newFreq=input(usr,"Change your Communicator frequency to what?","Frequency",Frequency) as num
+			var/newFreq=Ask(usr, "Change your Communicator frequency to what?", "Frequency", Frequency, "num", null, 0)
 			if(previousFreq == newFreq) return
 			removeFromGlobalListeners(src)
 			Frequency = newFreq
@@ -1594,25 +1606,25 @@ obj/Items/Tech
 		verb/EditPDA()
 			set src in usr
 			if(Password)
-				var/passcheck=input("Enter the edit password.") as text
+				var/passcheck=Ask(usr, "Enter the edit password.", "", null, "text", null, 0)
 				if(passcheck==Password)
-					htmlq=input(usr,"Edit!","Edit Notes",htmlq) as message
+					htmlq=Ask(usr, "Edit!", "Edit Notes", htmlq, "message", null, 0)
 				else
 					usr<<"This console is password protected. Access denied."
 			else
-				htmlq=input(usr,"Edit!","Edit Notes",htmlq) as message
+				htmlq=Ask(usr, "Edit!", "Edit Notes", htmlq, "message", null, 0)
 		verb/InputPassword()
 			set src in view(1)
 			if(Password)
 				usr<<"This console already has a password. Disengaging interface."
 			else
-				Password=input("Enter the desired password.") as text
+				Password=Ask(usr, "Enter the desired password.", "", null, "text", null, 0)
 		verb/View()
 			set src in view(1)
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
 				usr << "Your eyes seem to glaze over as you try to read the PDA..."
 				return
-			usr<<browse(htmlq,"window=PDA;size=400x400")
+			usr.client?.DocShow("pda:\ref[src]", "PDA", "[src]", htmlq, "author", "", 400, 400)
 
 	Transmission_Tower
 		TechType="Telecommunications"
@@ -1628,14 +1640,14 @@ obj/Items/Tech
 			if(src.Password)
 				usr << "[src] already has a password set!"
 				return
-			src.Password=input(usr, "Enter the password you'd like [src] to have.", "Password") as text
+			src.Password=Ask(usr, "Enter the password you'd like [src] to have.", "Password", null, "text", null, 0)
 		verb/Set_Frequency()
 			set category=null
 			set src in view(1, usr)
 			if(!src.Password)
 				usr << "Set a password on [src] first."
 				return
-			src.Frequency=input(usr, "Enter the frequency you'd like to tie to broadcasting messages.", "Frequency", src.Frequency) as num
+			src.Frequency=Ask(usr, "Enter the frequency you'd like to tie to broadcasting messages.", "Frequency", src.Frequency, "num", null, 0)
 	Beacon
 		TechType="Telecommunications"
 		SubType="Wide Area Transmissions"
@@ -1648,16 +1660,16 @@ obj/Items/Tech
 		verb/SetPassword()
 			set src in oview(1)
 			if(Password)
-				if((input("You must input the current password to make changes.") as text) != Password)
+				if((Ask(usr, "You must input the current password to make changes.", "", null, "text", null, 0)) != Password)
 					usr << "Wrong Password"
 					return
-			Password = input("What would you like the new password to be for [src]?") as text
+			Password = Ask(usr, "What would you like the new password to be for [src]?", "", null, "text", null, 0)
 			if(Password) usr << "You've set the beacon's password to [Password]"
 			else usr << "You've removed the beacon's password."
 		verb/ToggleBeacon()
 			set src in oview(1)
 			if(Password)
-				if((input("You must input the current password to make changes.") as text) != Password)
+				if((Ask(usr, "You must input the current password to make changes.", "", null, "text", null, 0)) != Password)
 					usr << "Wrong Password"
 					return
 			if(src.BeaconState=="On")
@@ -1679,7 +1691,7 @@ obj/Items/Tech
 		Cost=0.25
 		verb/Set_Frequency()
 			set src in usr
-			src.Frequency=input(usr, "Set the frequency that you will use to spy.", "Frequency", src.Frequency) as num
+			src.Frequency=Ask(usr, "Set the frequency that you will use to spy.", "Frequency", src.Frequency, "num", null, 0)
 		verb/Plant_Wiretap()
 			set src in usr
 			if(src.Using)
@@ -1702,7 +1714,7 @@ obj/Items/Tech
 				usr << "There's no one to plant the wire tap on."
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "Who do you want to plant your wiretap on?  They'll have a chance to notice this depending on their Telecommunications knowledge.", "Plant Wiretap") in peeps
+			var/mob/Players/Choice=Ask(usr, "Who do you want to plant your wiretap on?  They'll have a chance to notice this depending on their Telecommunications knowledge.", "Plant Wiretap", null, "pick", peeps, 0)
 			if(!(Choice in oview(1, usr)))
 				usr << "[Choice] moved away before you could plant the wiretap..."
 				src.Using=0
@@ -1769,7 +1781,7 @@ obj/Items/Tech
 					usr << "There are no objects nearby to hack."
 					src.Using=0
 					return
-				var/obj/Items/Tech/Choice=input(usr, "What object do you want to try to hack?", "Hackerman") in HackedIt
+				var/obj/Items/Tech/Choice=Ask(usr, "What object do you want to try to hack?", "Hackerman", null, "pick", HackedIt, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
@@ -1805,7 +1817,7 @@ obj/Items/Tech
 		verb/Download_Techniques()
 			set src in view(1, usr)
 			if(src.Password)
-				var/PassCheck=input("Enter the display's password to download observed techniques.") as text
+				var/PassCheck=Ask(usr, "Enter the display's password to download observed techniques.", "", null, "text", null, 0)
 				if(PassCheck!=src.Password)
 					usr<<"Incorrect password. Disengaging interface."
 					return
@@ -1819,7 +1831,7 @@ obj/Items/Tech
 			var/list/Passwords=list()
 			var/Current="Go"
 			while(Current!="Begin"&&Current!=null&&Current)
-				Current=input(usr, "Enter the password frequency of the camera(s) you wish to download.  To begin the download, enter 'Begin' or nothing.", "Download Techniques") as text|null
+				Current=Ask(usr, "Enter the password frequency of the camera(s) you wish to download.  To begin the download, enter 'Begin' or nothing.", "Download Techniques", null, "text", null, 1)
 				if(Current!="Begin"&&Current)
 					Passwords.Add(Current)
 			if(Passwords.len>=1)
@@ -1852,7 +1864,7 @@ obj/Items/Tech
 			if(Password)
 				usr<<"This console already has a password. Disengaging interface."
 			else
-				Password=input("Enter the desired password.") as text
+				Password=Ask(usr, "Enter the desired password.", "", null, "text", null, 0)
 		verb/AdjustRange()
 			set name="Adjust Range"
 			set src in view(1)
@@ -1860,9 +1872,9 @@ obj/Items/Tech
 				usr<<"This console is not password protected. Disengaging interface."
 				InputPassword()
 				return
-			var/PassCheck=input("Enter the display's password to adjust range. Range only effects audio.") as text
+			var/PassCheck=Ask(usr, "Enter the display's password to adjust range. Range only effects audio.", "", null, "text", null, 0)
 			if(PassCheck==src.Password)
-				src.AudioRange=input("Enter audio transmission range.") as num
+				src.AudioRange=Ask(usr, "Enter audio transmission range.", "", null, "num", null, 0)
 				if(src.AudioRange>=12)
 					src.AudioRange=12
 				if(src.AudioRange<=3)
@@ -1885,7 +1897,7 @@ obj/Items/Tech
 			for(var/obj/Items/Tech/Security_Camera/F in world)
 				if(F.Password==src.Password)
 					availablecameras.Add(F)
-			var/obj/Items/Tech/Security_Camera/pickcamera=input("")in availablecameras
+			var/obj/Items/Tech/Security_Camera/pickcamera=Ask(usr, "", "", null, "pick", availablecameras, 0)
 			if(pickcamera=="Cancel")
 				if(usr.client.perspective!=MOB_PERSPECTIVE)
 					usr.client.perspective=MOB_PERSPECTIVE
@@ -1902,7 +1914,7 @@ obj/Items/Tech
 		verb/ToggleCamera()
 			set src in view(1)
 			set name="Turn On/Off"
-			var/PassCheck=input("Enter Password.") as text
+			var/PassCheck=Ask(usr, "Enter Password.", "", null, "text", null, 0)
 			if(PassCheck==src.Password)
 				if(src.Active==1)
 					src.Active=0
@@ -1948,11 +1960,11 @@ obj/Items/Tech
 				usr<<"This camera already has a password. Disengaging interface."
 				return
 			else
-				Password=input("Enter the desired password.") as text
+				Password=Ask(usr, "Enter the desired password.", "", null, "text", null, 0)
 		verb/ToggleCamera()
 			set src in view(1)
 			set name="Turn On/Off"
-			var/PassCheck=input("Enter Password.") as text
+			var/PassCheck=Ask(usr, "Enter Password.", "", null, "text", null, 0)
 			if(PassCheck==src.Password)
 				if(src.Active==1)
 					src.Active=0
@@ -1963,7 +1975,7 @@ obj/Items/Tech
 		verb/ChangeFace()
 			set src in view(1)
 			set name="Change Facing"
-			var/Select=input("Which way?") in list("North","North2","East","East2","South","South2","West","West2")
+			var/Select=Ask(usr, "Which way?", "", null, "pick", list("North","North2","East","East2","South","South2","West","West2"), 0)
 			switch(Select)
 				if("North")
 					src.dir=NORTH
@@ -2038,8 +2050,10 @@ obj/Items/Tech
 						Y<<"<font color=cyan><b>([X.name]) </b>: [html_encode(DoorBellMessage)]"
 		verb/DoorbellFrequency()
 			set src in oview(1)
-			Frequency=input(usr,"Change your doorbell frequency to what?","Frequency",Frequency)as num
-		verb/ChangeDoorBellMessage(T as text)
+			Frequency=Ask(usr, "Change your doorbell frequency to what?", "Frequency", Frequency, "num", null, 0)
+		verb/ChangeDoorBellMessage()
+			var/T = PromptArgValue(usr, args, 1, "ChangeDoorBellMessage", "text")
+			if(isnull(T)) return
 			src.DoorBellMessage=T
 	Speaker
 		Health=10
@@ -2055,14 +2069,14 @@ obj/Items/Tech
 		var/AudioRange=6
 		verb/SpeakerFrequency()
 			set src in oview(1)
-			Frequency=input(usr,"Change your Speaker frequency to what?","Frequency",Frequency)as num
+			Frequency=Ask(usr, "Change your Speaker frequency to what?", "Frequency", Frequency, "num", null, 0)
 			disabledFrequency=FALSE
 		verb/InputPassword()
 			set src in view(1)
 			if(Password)
 				usr<<"This [src.name] already has a password. Disengaging interface."
 			else
-				Password=input("Enter the desired password.") as text
+				Password=Ask(usr, "Enter the desired password.", "", null, "text", null, 0)
 		verb/IntercomUpgrade()
 			set src in oview(1)
 			if(Intercom==1)
@@ -2076,7 +2090,7 @@ obj/Items/Tech
 		verb/ToggleIntercom()
 			set src in view(1)
 			set name="Toggle Intercom"
-			var/PassCheck=input("Enter Password.") as text
+			var/PassCheck=Ask(usr, "Enter Password.", "", null, "text", null, 0)
 			if(PassCheck==src.Password)
 				if(src.Active==1)
 					src.Active=0
@@ -2089,9 +2103,9 @@ obj/Items/Tech
 				return
 		verb/AdjustRange()
 			set src in view(1)
-			var/PassCheck=input("Enter the display's password to adjust range.") as text
+			var/PassCheck=Ask(usr, "Enter the display's password to adjust range.", "", null, "text", null, 0)
 			if(PassCheck==src.Password)
-				src.AudioRange=input("Enter audio transmission range.") as num
+				src.AudioRange=Ask(usr, "Enter audio transmission range.", "", null, "num", null, 0)
 				if(src.AudioRange>=12)
 					src.AudioRange=12
 				if(src.AudioRange<=3)
@@ -2147,8 +2161,10 @@ obj/Items/Tech
 					var/D=abs(M.x-usr.x)+abs(M.y-usr.y)
 					if(D<=src.Range*80)
 						usr << "<b>!!!</b> - [usr.CheckDirection(M)] - [Commas(D)] tiles away"
-		verb/Scouter_Speak(Z as text)
+		verb/Scouter_Speak()
 			set src in usr
+			var/Z = PromptArgValue(usr, args, 1, "Scouter Speak", "text")
+			if(isnull(Z)) return
 			if(usr.InMagitekRestrictedRegion())
 				usr << "The scouter buzzes and loses power."
 				return
@@ -2206,7 +2222,7 @@ obj/Items/Tech
 									Log(P.ChatLog(),"<font color=red>(Long-Range Frequency)[usr]([usr.key]) says: [html_encode(Z)]")
 		verb/Scouter_Frequency()
 			set src in usr
-			Frequency=input(usr,"Change your Scouter frequency to what?","Frequency",Frequency)as num
+			Frequency=Ask(usr, "Change your Scouter frequency to what?", "Frequency", Frequency, "num", null, 0)
 		verb
 			Upgrade()
 				set category=null
@@ -2231,7 +2247,7 @@ obj/Items/Tech
 				usr<<"Password already set!"
 				return
 			else
-				Password=input("Set a password.")as text
+				Password=Ask(usr, "Set a password.", "", null, "text", null, 0)
 		verb/Use()
 			set src in usr
 			if(!Password)
@@ -2245,7 +2261,7 @@ obj/Items/Tech
 			for(var/obj/Items/P in get_step(usr,usr.dir))
 				Things.Add(P)
 			if(Things.len>=2)
-				var/obj/Items/Choice=input(usr, "What do you want to install the cloak on?", "Cloak") in Things
+				var/obj/Items/Choice=Ask(usr, "What do you want to install the cloak on?", "Cloak", null, "pick", Things, 0)
 				if(Choice!="Cancel")
 					Choice.PasswordReception=src.Password
 					oview(10)<<"[usr] installed the [src] onto the [Choice]."
@@ -2258,7 +2274,7 @@ obj/Items/Tech
 		Cost=10
 		verb/Set_Passcode()
 			set src in usr
-			Password=input("Set a password.")as text
+			Password=Ask(usr, "Set a password.", "", null, "text", null, 0)
 		verb/Cloak_Objects()
 			set src in usr
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
@@ -2313,7 +2329,7 @@ obj/Items/Tech
 			if(src.WaveType)
 				usr << "[src] was already configured!"
 				return
-			src.WaveType=alert(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", "Blutz Rays", "Ultraviolet")
+			src.WaveType=Ask(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", null, "confirm", null, 1, "Blutz Rays", "Ultraviolet")
 		verb/Activate()
 			set category=null
 			set src in range(1, usr)
@@ -2374,7 +2390,7 @@ obj/Items/Tech
 			if(src.WaveType)
 				usr << "[src] was already configured!"
 				return
-			src.WaveType=alert(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", "Blutz Rays", "Ultraviolet")
+			src.WaveType=Ask(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", null, "confirm", null, 1, "Blutz Rays", "Ultraviolet")
 		verb/Activate()
 			set category=null
 			set src in range(1, usr)
@@ -2433,13 +2449,13 @@ obj/Items/Tech
 			..()
 			if(!(usr.client.mob in view(1,src))) return
 			if(!Password)
-				Password=input("What passcode?")as text|null
+				Password=Ask(usr, "What passcode?", "", null, "text", null, 1)
 			if(!Password2)
-				Password2=input("Enter second password.")as text|null
+				Password2=Ask(usr, "Enter second password.", "", null, "text", null, 1)
 			if(!Password3)
-				Password3=input("Enter third password.")as text|null
+				Password3=Ask(usr, "Enter third password.", "", null, "text", null, 1)
 			else if(Password&&Password2&&Password3)
-				var/PasswordCheck=input("Enter the -first- password if you'd like to reset the Digital Key completely. Useful if you made a mistake.")as text|null
+				var/PasswordCheck=Ask(usr, "Enter the -first- password if you'd like to reset the Digital Key completely. Useful if you made a mistake.", "", null, "text", null, 1)
 				if(PasswordCheck==null)
 					return
 				else if(PasswordCheck==Password)
@@ -2472,7 +2488,7 @@ obj/Items/Tech
 				usr<<"This reinforced door already has a password encoded."
 				return
 			else
-				src.Password=input("Input desired password.") as text
+				src.Password=Ask(usr, "Input desired password.", "", null, "text", null, 0)
 				if(src.Password==null)
 					return
 				else
@@ -2518,18 +2534,18 @@ obj/Items/Tech
 				usr << "You have to use this while it is on your person, or bolted nearby."
 				return
 			if(src.Password)
-				var/Passcheck=input("Input current password to reset this device.") as text
+				var/Passcheck=Ask(usr, "Input current password to reset this device.", "", null, "text", null, 0)
 				if(src.Password!=Passcheck)
 					usr<<"Incorrect password."
 					return
 				else
-					src.Password=input("Input new password. This will be stored in the remote and sent when you use Send Password") as text
+					src.Password=Ask(usr, "Input new password. This will be stored in the remote and sent when you use Send Password", "", null, "text", null, 0)
 					if(src.Password==null)
 						return
 					else
 						usr<<"Password set! Password is [src.Password]."
 			else
-				src.Password=input("Input password.") as text
+				src.Password=Ask(usr, "Input password.", "", null, "text", null, 0)
 				if(src.Password==null)
 					return
 				else
@@ -2556,11 +2572,11 @@ obj/Items/Tech
 					if(A.Password==X.Password||A.Password==X.Password2||A.Password==X.Password3)
 						if(!(A in Doorlist))
 							Doorlist.Add(A)
-			var/BlanketOpener=input("Toggle all accessible doors?") in list("Yes","No")
+			var/BlanketOpener=Ask(usr, "Toggle all accessible doors?", "", null, "pick", list("Yes","No"), 0)
 			if(BlanketOpener=="Yes")
 				src.BlanketOpener(Doorlist)
 			else
-				var/obj/PickDoor=input(usr, "Select the door you wish to toggle.", "Specific Unlock") in Doorlist
+				var/obj/PickDoor=Ask(usr, "Select the door you wish to toggle.", "Specific Unlock", null, "pick", Doorlist, 0)
 				var/obj/Items/Tech/Reinforced_Door/selecteddoor=PickDoor
 				if(PickDoor=="Cancel")
 					return
@@ -2588,7 +2604,7 @@ obj/Items/Tech
 					KeyList+=A
 			if(KeyList.len<2)
 				return
-			var/obj/PickKey=input("Select a key to insert.") in KeyList
+			var/obj/PickKey=Ask(usr, "Select a key to insert.", "", null, "pick", KeyList, 0)
 			if(PickKey=="Cancel")
 				return
 			else
@@ -2614,7 +2630,7 @@ obj/Items/Tech
 			if(!KeyCount)
 				usr << "There aren't any keys to remove!"
 				return
-			var/obj/PickKey=input("Select a key to remove.") in KeyList
+			var/obj/PickKey=Ask(usr, "Select a key to remove.", "", null, "pick", KeyList, 0)
 			if(PickKey=="Cancel")
 				return
 			else
@@ -2675,7 +2691,7 @@ obj/Items/Tech
 			for(var/obj/Items/Gear/G in usr)
 				if(!G.InfiniteUses&&!(G.type in typesof(/obj/Items/Gear/Prosthetic_Limb))&&G.Uses<G.MaxUses)
 					Gears.Add(G)
-			Choice=input(usr, "What Gear do you want to recharge?", "Recharge Gear") in Gears
+			Choice=Ask(usr, "What Gear do you want to recharge?", "Recharge Gear", null, "pick", Gears, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -2755,18 +2771,18 @@ obj/Items/Tech
 			set category=null
 			set src in usr
 			if(src.Password)
-				var/Passcheck=input("Input current password to reset this device.") as text
+				var/Passcheck=Ask(usr, "Input current password to reset this device.", "", null, "text", null, 0)
 				if(src.Password!=Passcheck)
 					usr<<"Incorrect password."
 					return
 				else
-					src.Password=input("Input new password. This will be stored in the remote and sent when you use Send Password") as text
+					src.Password=Ask(usr, "Input new password. This will be stored in the remote and sent when you use Send Password", "", null, "text", null, 0)
 					if(src.Password==null)
 						return
 					else
 						usr<<"Password set! Password is [src.Password]."
 			else
-				src.Password=input("Input password.") as text
+				src.Password=Ask(usr, "Input password.", "", null, "text", null, 0)
 				if(src.Password==null)
 					return
 				else
@@ -2783,7 +2799,7 @@ obj/Items/Tech
 			for(M in range(10,usr))
 				if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Stun_Chip, M))
 					Stunlist.Add(M)
-			var/mob/PickStun=input(usr, "Select the implant you wish to activate.", "Punish") in Stunlist
+			var/mob/PickStun=Ask(usr, "Select the implant you wish to activate.", "Punish", null, "pick", Stunlist, 0)
 			if(PickStun=="Cancel")
 				return
 			else
@@ -2802,7 +2818,7 @@ obj/Items/Tech
 			for(M in range(10,usr))
 				if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Internal_Explosive, M))
 					Bomblist.Add(M)
-			var/mob/PickBomb=input(usr, "Select the implant you wish to activate.", "Punish") in Bomblist
+			var/mob/PickBomb=Ask(usr, "Select the implant you wish to activate.", "Punish", null, "pick", Bomblist, 0)
 			if(PickBomb=="Cancel")
 				return
 			else
@@ -2821,7 +2837,7 @@ obj/Items/Tech
 			for(M in range(10,usr))
 				if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Failsafe_Chip, M))
 					Safelist.Add(M)
-			var/mob/PickSafe=input(usr, "Select the implant you wish to activate.", "Punish") in Safelist
+			var/mob/PickSafe=Ask(usr, "Select the implant you wish to activate.", "Punish", null, "pick", Safelist, 0)
 			if(PickSafe=="Cancel")
 				return
 			else
@@ -2855,7 +2871,7 @@ obj/Items/Tech
 			for(var/obj/Items/Gear/G in usr)
 				if(!G.InfiniteUses&&!(G.type in typesof(/obj/Items/Gear/Prosthetic_Limb))&&G.Uses<G.MaxUses)
 					Gears.Add(G)
-			Choice=input(usr, "What Gear do you want to recharge?", "Recharge Gear") in Gears
+			Choice=Ask(usr, "What Gear do you want to recharge?", "Recharge Gear", null, "pick", Gears, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -2940,7 +2956,7 @@ obj/Items/Gear
 			return
 		src.Using=1
 		var/NuCost=Technology_Price(usr,src)*src.UpgradeMult
-		var/Confirm=alert(usr, "Would you like to upgrade your [src]?  It will cost [Commas(NuCost)].", "Upgrade", "No", "Yes")
+		var/Confirm=Ask(usr, "Would you like to upgrade your [src]?  It will cost [Commas(NuCost)].", "Upgrade", null, "confirm", null, 1, "No", "Yes")
 		if(Confirm=="No")
 			src.Using=0
 			return
@@ -2950,7 +2966,7 @@ obj/Items/Gear
 			return
 		var/obj/Items/I
 		if(islist(src.UpgradePath))
-			var/choice = input(usr, "What would you like to upgrade [src] into?", "Upgrade") in src.UpgradePath + "Cancel"
+			var/choice = Ask(usr, "What would you like to upgrade [src] into?", "Upgrade", null, "pick", (src.UpgradePath + "Cancel"), 0)
 			if(choice=="Cancel")
 				src.Using=0
 				return
@@ -3315,7 +3331,7 @@ obj/Items/Gear
 				usr << "You cannot unintegrate and integrate gear at the same time!"
 				return
 			src.Using=1
-			switch(input("Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!") in list("Yes","No"))
+			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
 					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor")
 					desc="A prototype powered exo-suit that sacrifices mobility and efficiency for bulk! An additional gear can be integrated with it."
@@ -3346,7 +3362,7 @@ obj/Items/Gear
 				usr << "You don't have any gear capable of being integrated into your armor."
 				src.Using=0
 				return
-			Choice=input(usr, "What gear do you want to integrate into your power armor?", "Integrate") in IG
+			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -3420,7 +3436,7 @@ obj/Items/Gear
 				usr << "You cannot unintegrate and integrate gear at the same time!"
 				return
 			src.Using=1
-			switch(input("Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!") in list("Yes","No"))
+			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
 					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burst")
 					desc="A specialized armor that sacrifices bulk in order to unleash hellish firepower! An additional gear can be integrated with it."
@@ -3451,7 +3467,7 @@ obj/Items/Gear
 				usr << "You don't have any gear capable of being integrated into your armor."
 				src.Using=0
 				return
-			Choice=input(usr, "What gear do you want to integrate into your power armor?", "Integrate") in IG
+			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -3527,7 +3543,7 @@ obj/Items/Gear
 				usr << "You cannot unintegrate and integrate gear at the same time!"
 				return
 			src.Using=1
-			switch(input("Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!") in list("Yes","No"))
+			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
 					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burly")
 					desc="A specialized armor that focuses on becoming even more resilient than the prototype! An additional gear can be integrated with it."
@@ -3559,7 +3575,7 @@ obj/Items/Gear
 				usr << "You don't have any gear capable of being integrated into your armor."
 				src.Using=0
 				return
-			Choice=input(usr, "What gear do you want to integrate into your power armor?", "Integrate") in IG
+			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -3633,7 +3649,7 @@ obj/Items/Gear
 				usr << "You cannot unintegrate and integrate gear at the same time!"
 				return
 			src.Using=1
-			switch(input("Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!") in list("Yes","No"))
+			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
 					Techniques = list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Blitz")
 					desc = "A specialized armor that focuses on speedy, offensive manuevering! An additional gear can be integrated with it."
@@ -3664,7 +3680,7 @@ obj/Items/Gear
 				usr << "You don't have any gear capable of being integrated into your armor."
 				src.Using=0
 				return
-			Choice=input(usr, "What gear do you want to integrate into your power armor?", "Integrate") in IG
+			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -3799,7 +3815,7 @@ obj/Items/Gear
 				usr << "You don't have any gear capable of being integrated into your prosthetic."
 				src.Using=0
 				return
-			Choice=input(usr, "What gear do you want to integrate into your prosthetic limb?", "Integrate") in IG
+			Choice=Ask(usr, "What gear do you want to integrate into your prosthetic limb?", "Integrate", null, "pick", IG, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -3867,7 +3883,7 @@ obj/Items/Gear
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in view(3, usr))
 				who.Add(M)
-			var/mob/Players/selector=input("Who do you want to unlock the next Saga tier of?","Awaken Potential")in who||null
+			var/mob/Players/selector=Ask(usr, "Who do you want to unlock the next Saga tier of?", "Awaken Potential", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				src.Using=0
 				return
@@ -3876,7 +3892,7 @@ obj/Items/Gear
 			var/list/who=list("Cancel")
 			for(var/mob/Players/M in view(3, usr))
 				who.Add(M)
-			var/mob/Players/selector=input("Who do you want to unlock the next ascension of?","Awaken Potential")in who||null
+			var/mob/Players/selector=Ask(usr, "Who do you want to unlock the next ascension of?", "Awaken Potential", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				src.Using=0
 				return
@@ -4002,20 +4018,20 @@ obj/Items/Gear
 		Health=1000000000000
 		proc/changeType(mob/player)
 			if(MechType)
-				var/answer = input(player, "Do you want to change your mech's type? Each type has a different boon") in list("Yes","No")
+				var/answer = Ask(player, "Do you want to change your mech's type? Each type has a different boon", "", null, "pick", list("Yes","No"), 0)
 				if(answer == "Yes")
 					if(MechType=="MobileFighter")
 						Augment = "None"
-					MechType = input(player, "What type?") in list("Speed","Tank","Assault", "MobileFighter")
+					MechType = Ask(player, "What type?", "", null, "pick", list("Speed","Tank","Assault", "MobileFighter"), 0)
 					if(MechType=="MobileFighter")
 						Augment = "Super_Mode"
 			else
-				MechType = input(player, "What type of mech do you want to use?", "Mech Type") in list("Speed","Tank","Assault", "MobileFighter")
+				MechType = Ask(player, "What type of mech do you want to use?", "Mech Type", null, "pick", list("Speed","Tank","Assault", "MobileFighter"), 0)
 		proc/setup(mob/player)
 			var/level2 = Level>=2 ? 1 : 0
 			var/level4 = Level>=4 ? 1 : 0
 			if(Drive == "None"&&MechType!="MobileFighter")
-				Drive = input(player, "What type of drive do you want to use?", "Drive") in list("Supersonic","Fortress", "Destroyer")
+				Drive = Ask(player, "What type of drive do you want to use?", "Drive", null, "pick", list("Supersonic","Fortress", "Destroyer"), 0)
 			if(MechType=="MobileFighter")
 				Augment= "Super_Mode"
 			if(level2)
@@ -4057,7 +4073,7 @@ obj/Items/Gear
 			setup(usr)
 			Techniques = list()
 			if(MechType == "None")
-				var/result = input(usr, "What type?") in list("Speed","Tank","Assault", "MobileFighter")
+				var/result = Ask(usr, "What type?", "", null, "pick", list("Speed","Tank","Assault", "MobileFighter"), 0)
 				MechType = result
 			Techniques = list("/obj/Skills/Buffs/ActiveBuffs/Gear/Mobile_Suit/[MechType]")
 			if(Augment != "None")
@@ -4075,13 +4091,13 @@ obj/Items/Gear
 			set src in range(1, usr)
 			set name="Set Password"
 			if(src.Password)
-				var/Passcheck=input(usr,"Input original code.")as text
+				var/Passcheck=Ask(usr, "Input original code.", "", null, "text", null, 0)
 				if(Passcheck==src.Password)
-					Password=input(usr,"Input a code for the suit.")as text
+					Password=Ask(usr, "Input a code for the suit.", "", null, "text", null, 0)
 				else
 					usr<<"Incorrect password."
 			else
-				Password=input(usr,"Input a code for the suit.")as text
+				Password=Ask(usr, "Input a code for the suit.", "", null, "text", null, 0)
 
 
 
@@ -4122,25 +4138,25 @@ obj/Items/Tech
 			set src in oview(1)
 			set name="Set Password"
 			if(src.Password)
-				var/Passcheck=input(usr,"Input original password.")as text
+				var/Passcheck=Ask(usr, "Input original password.", "", null, "text", null, 0)
 				if(Passcheck==src.Password)
-					Password=input(usr,"Input a password for the safe.")as text
+					Password=Ask(usr, "Input a password for the safe.", "", null, "text", null, 0)
 				else
 					usr<<"Incorrect password."
 			else
-				Password=input(usr,"Input a password for the safe.")as text
+				Password=Ask(usr, "Input a password for the safe.", "", null, "text", null, 0)
 		verb/Withdraw()
 			set src in oview(1)
 			set name="Withdraw"
 			if(src.Password)
-				var/Passcheck=input(usr,"Input password.")as text
+				var/Passcheck=Ask(usr, "Input password.", "", null, "text", null, 0)
 				if(Passcheck!=src.Password)
 					usr<<"This isn't the right password..."
 					return
 			if(src.Lvl==0)
 				usr<<"The safe has no resources in it!"
 				return
-			var/Withdrawing=input(usr,"How much would you like to withdraw?","[src.Lvl] resources available")as num
+			var/Withdrawing=Ask(usr, "How much would you like to withdraw?", "[src.Lvl] resources available", null, "num", null, 0)
 			if(Withdrawing==0||Withdrawing==null)
 				return
 			if(Withdrawing>src.Lvl)
@@ -4153,7 +4169,7 @@ obj/Items/Tech
 			set src in oview(1)
 			set name="Deposit"
 			if(src.Password)
-				var/Passcheck=input(usr,"Input password.")as text
+				var/Passcheck=Ask(usr, "Input password.", "", null, "text", null, 0)
 				if(Passcheck!=src.Password)
 					usr<<"This isn't the right password..."
 					return
@@ -4161,7 +4177,7 @@ obj/Items/Tech
 				if(M.Level==0)
 					usr<<"You have no resources to deposit!"
 					return
-				var/Depositing=input(usr,"How much would you like to deposit?","[src.Lvl] resources available")as num
+				var/Depositing=Ask(usr, "How much would you like to deposit?", "[src.Lvl] resources available", null, "num", null, 0)
 				if(Depositing==0||Depositing==null)
 					return
 				if(Depositing>M.Level)
@@ -4184,7 +4200,7 @@ obj/Items/Tech
 		desc="A mask that helps one breathe in enviroments that have low or no oxygen. Has a limited oxygen supply, but it can be replenished and enhanced."
 		verb/RestoreOxygen()
 			var/FuelTotal=src.OxygenMax-src.Oxygen
-			var/RefuelConfirm=input("Would you like to reoxygenate? It'll cost 5 per Oxygen point, for a total of [Commas(FuelTotal*5)].") in list("Yes","No")
+			var/RefuelConfirm=Ask(usr, "Would you like to reoxygenate? It'll cost 5 per Oxygen point, for a total of [Commas(FuelTotal*5)].", "", null, "pick", list("Yes","No"), 0)
 			switch(RefuelConfirm)
 				if("Yes")
 					for(var/obj/Money/Q in usr)

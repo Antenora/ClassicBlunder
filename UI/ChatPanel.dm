@@ -1,6 +1,7 @@
 #define CHATPANEL_CTL "mapwindow.chatoverlay"
 
-var/list/CHATCMD_ARGS = list("AObserve" = list("player"), "AddToTesterWhiteList" = list("text"), "Admin-Check-AI-Kills" = list("player"), "Admin-Heal" = list("player"), "Admin-Help" = list("text"), "Admin-Kill/KO" = list("player"), "AdminAssess" = list("player"), "AdminChat" = list("text"), "AdminPM" = list("player"), "AdminRename" = list("choice"), "AdminRevive" = list("player"), "Adminize" = list("player"), "Announce" = list("text"), "Assign-Stat-Redo" = list("player"), "Bestow-Inkwork" = list("player"), "Change-Faction" = list("player"), "Change-Max-Summon" = list("choice"), "Change-Nationalities" = list("player"), "ChangeWipeStartHour" = list("num"), "Clear-Kamui-Buff-Lock" = list("player"), "Coat-Test" = list("text"), "Communicator-Transmit" = list("text"), "Copy" = list("choice"), "Copy-AG" = list("choice"), "Create-AG" = list("player"), "Customize:-Forms" = list("player"), "Customize:-Hair" = list("player"), "Customize:-Icon" = list("player"), "Debuff-Apply" = list("num"), "Delete" = list("choice"), "DeleteSave" = list("player"), "Display-Mode" = list("choice:Windowed/Borderless/Full screen"), "Do-Damage" = list("player"), "Duplicate-Debug" = list("choice"), "Edit" = list("choice"), "Edit-Technology" = list("player"), "EditPassiveHandler" = list("player"), "Event-Character-Setup" = list("player"), "FPSControl" = list("num"), "Fix-SSJ-Transformations" = list("player"), "Flash" = list("text"), "Force-AI-Spawns" = list("choice"), "Give-Currency" = list("player"), "Give-Demon" = list("player"), "Give-Mapper" = list("player"), "Give-Rare-Race" = list("player"), "Give-Wound" = list("player"), "Give/Make" = list("player"), "Head-Start-Setup" = list("player"), "Lock-Send-Back" = list("choice"), "Mage-Admin" = list("player"), "Make-Summon" = list("player"), "Make-True-Demon" = list("player"), "ManuallyRemoveAdmin" = list("text"), "Mapper-Edit" = list("choice"), "Mapper-Fade-Visibility" = list("choice"), "MasteryUp" = list("choice"), "Message-Global" = list("text"), "Message-Z-Plane" = list("text"), "Modify-Companion" = list("choice"), "Narrate" = list("text"), "New-Character-Setup" = list("player"), "OOC" = list("text"), "Offer-Nation-Change" = list("player"), "Ping" = list("player"), "Player-Logs" = list("player"), "Prayer" = list("text"), "Preview-Ascensions" = list("player"), "PrivateNarrate" = list("player"), "ReMeditate" = list("player"), "Refund-All-Technology" = list("player"), "Refund-Technology" = list("player"), "Remove-Mapper" = list("player"), "Respec" = list("player"), "SagaManagement" = list("player"), "SagaRemoval" = list("player"), "Say" = list("text"), "Scan" = list("player"), "SecretManagement" = list("player"), "SecretRemoval" = list("player"), "Send-To-Spawn" = list("player"), "Spawn-Permission-Add" = list("choice"), "Spawn-Permission-Remove" = list("choice"), "Spawn-Race-Add" = list("choice"), "Spawn-Race-Remove" = list("choice"), "Spawn-Swap" = list("player"), "Summon" = list("player"), "Surface-Clear-Overrides" = list("choice"), "Surface-Inspect" = list("choice"), "Surface-Set-Cookie" = list("choice"), "Surface-Set-Light" = list("choice"), "Surface-Set-Occlusion" = list("choice"), "Surface-Set-Profile" = list("choice"), "Surface-Set-Shaft" = list("choice"), "Surface-Set-Type-Profile" = list("choice"), "Surface-Set-Wind" = list("choice"), "Tech-Unlock" = list("player"), "Teleport" = list("player"), "Test-Mode" = list("player"), "Think" = list("text"), "UnlockAscension" = list("player"), "UnlockForm" = list("player"), "Unteleport" = list("player"), "Use" = list("player"), "View-Maim-History" = list("player"), "ViewPassives" = list("player"), "Warper" = list("num", "num", "num"), "Whisper" = list("text"), "Wind-Debug" = list("choice"), "XYZTeleport" = list("player"), "Yell" = list("text"), "ahRemoveListing" = list("num"), "editInformation" = list("player"), "editRace" = list("player"), "editSecretDatum" = list("player"), "hep" = list("num", "num"), "lifeSetRank" = list("text", "num"), "makeFishingSpot" = list("text"), "makeForageNode" = list("text"), "makeOreNode" = list("text"), "makeTree" = list("text"), "moon-toggle-admin" = list("num"), "openBlobdatum" = list("player"), "refund-all-old-value" = list("player"))
+var/list/CHATCMD_ARGS = list("Admin-Help" = list("text"), "AdminChat" = list("text"), "Announce" = list("text"), "ChangeWipeStartHour" = list("num"), "Coat-Test" = list("text"), "Communicator-Transmit" = list("text"), "Debuff-Apply" = list("num"), "FPSControl" = list("num"), "Message-Global" = list("text"), "Message-Z-Plane" = list("text"), "Narrate" = list("text"), "OOC" = list("text"), "Prayer" = list("text"), "Say" = list("text"), "Think" = list("text"), "Warper" = list("num", "num", "num"), "Whisper" = list("text"), "Yell" = list("text"), "ahRemoveListing" = list("num"), "hep" = list("num", "num"), "lifeSetRank" = list("text", "num"), "makeFishingSpot" = list("text"), "makeForageNode" = list("text"), "makeOreNode" = list("text"), "makeTree" = list("text"), "moon-toggle-admin" = list("num"))
+var/list/CHATCMD_CALL = list("AObserve" = 1, "AddToTesterWhiteList" = 1, "Admin-Check-AI-Kills" = 1, "Admin-Heal" = 1, "Admin-Kill/KO" = 1, "AdminAssess" = 1, "AdminChat" = 1, "AdminPM" = 1, "AdminRevive" = 1, "Adminize" = 1, "Announce" = 1, "Assign-Stat-Redo" = 1, "Bestow-Inkwork" = 1, "ChangeWipeStartHour" = 1, "Clear-Kamui-Buff-Lock" = 1, "Coat-Test" = 1, "Create-AG" = 1, "Debuff-Apply" = 1, "DeleteSave" = 1, "Do-Damage" = 1, "EditPassiveHandler" = 1, "Event-Character-Setup" = 1, "Fix-SSJ-Transformations" = 1, "Flash" = 1, "Give-Currency" = 1, "Give-Demon" = 1, "Give-Mapper" = 1, "Give-Rare-Race" = 1, "Give-Wound" = 1, "Give/Make" = 1, "Head-Start-Setup" = 1, "Mage-Admin" = 1, "Make-Summon" = 1, "Make-True-Demon" = 1, "ManuallyRemoveAdmin" = 1, "Message-Global" = 1, "Message-Z-Plane" = 1, "Narrate" = 1, "New-Character-Setup" = 1, "Player-Logs" = 1, "Preview-Ascensions" = 1, "PrivateNarrate" = 1, "ReMeditate" = 1, "Refund-All-Technology" = 1, "Refund-Technology" = 1, "Remove-Mapper" = 1, "Respec" = 1, "SagaManagement" = 1, "SagaRemoval" = 1, "SecretManagement" = 1, "SecretRemoval" = 1, "Send-To-Spawn" = 1, "Spawn-Swap" = 1, "Summon" = 1, "Tech-Unlock" = 1, "Teleport" = 1, "Test-Mode" = 1, "UnlockAscension" = 1, "UnlockForm" = 1, "Unteleport" = 1, "View-Maim-History" = 1, "ViewPassives" = 1, "Warper" = 1, "XYZTeleport" = 1, "ahRemoveListing" = 1, "editInformation" = 1, "editRace" = 1, "editSecretDatum" = 1, "lifeSetRank" = 1, "makeFishingSpot" = 1, "makeForageNode" = 1, "makeOreNode" = 1, "makeTree" = 1, "moon-toggle-admin" = 1, "openBlobdatum" = 1, "refund-all-old-value" = 1, "Admin-Help" = 1, "hep" = 1, "FPSControl" = 1)
 
 client/var/chatpanel_zoom = 2
 client/var/chatpanel_opacity = 0.85
@@ -285,7 +286,7 @@ client/proc/ChatPanelHTML()
  var cmds=\[], players=\[], cmdsAt=0, ddItems=\[], ddSel=0, ddMode='', ddCmd=null, faces=\[];
  function dec(v){ try{ return decodeURIComponent(String(v).split('+').join(' ')); }catch(e){ return String(v); } }
  function setFaces(s){ faces=\[]; var parts=(s||'').split(';'); for(var i=0;i<parts.length;i++){ var f=parts\[i].split('|'); if(f.length<2) continue; faces.push({name:dec(f\[1]),trig:dec(f\[2]||'')}); } refreshDD(); }
- function setCommands(s){ cmds=\[]; var parts=(s||'').split(';'); for(var i=0;i<parts.length;i++){ var f=parts\[i]; if(!f) continue; var a=f.split('|'); cmds.push({id:a\[0],cat:a\[1]||'',args:(a\[2]?a\[2].split(','):\[])}); } cmdsAt=Date.now(); refreshDD(); }
+ function setCommands(s){ cmds=\[]; var parts=(s||'').split(';'); for(var i=0;i<parts.length;i++){ var f=parts\[i]; if(!f) continue; var a=f.split('|'); cmds.push({id:a\[0],cat:a\[1]||'',args:(a\[2]?a\[2].split(','):\[]),call:(a\[3]==='c')}); } cmdsAt=Date.now(); refreshDD(); }
  function setPlayers(s){ players=(s||'').split('|').filter(function(x){ return x.length>0; }); refreshDD(); }
  function setFontsOn(on){ log.classList.toggle('nofonts',!(+on)); }
  function ddClose(){ dd.style.display='none'; ddItems=\[]; ddMode=''; ddCmd=null; }
@@ -340,7 +341,8 @@ client/proc/ChatPanelHTML()
   if(bl.indexOf('me ')===0){ var mt=body.substring(3).trim(); if(mt.length) topic({chatpanel:'me',text:mt}); inp.value=''; ddClose(); inp.blur(); focusMap(); return; }
   var sp=body.indexOf(' '); var c=findCmd(sp<0?body:body.substring(0,sp));
   if(c&&c.args.length){ var given=sp<0?\[]:splitArgs(body.substring(sp+1)); if(given.length<c.args.length){ if(inp.value.charAt(inp.value.length-1)!==' ') inp.value+=' '; ddSel=0; refreshDD(); return; } }
-  if(window.BYOND) BYOND.command(body);
+  if(c&&c.call&&c.args.length){ var gv=splitArgs(body.substring(sp+1)); var cq={chatpanel:'call',id:c.id}; for(var j=0;j<c.args.length;j++){ var kk=c.args\[j]; cq\['a'+(j+1)]=(j===c.args.length-1&&(kk==='text'||kk==='message'))?gv.slice(j).join(' '):(gv\[j]||''); } topic(cq); }
+  else if(window.BYOND) BYOND.command((c&&!c.args.length&&sp>=0)?body.substring(0,sp):body);
   inp.value=''; ddClose(); inp.blur(); focusMap();
  }
  ddl.addEventListener('pointerdown',function(e){ var row=e.target.closest('.dr'); if(!row||row.classList.contains('hint')) return; ddSel=+row.getAttribute('data-i'); ddAccept(); inp.focus(); e.preventDefault(); });
@@ -513,6 +515,7 @@ client/proc/ChatPanelBoot()
 	AdminPageInitButton()
 	RPBoxBoot()
 	FacePageBoot()
+	PromptPageBoot()
 	spawn(10)
 		RPBoxRelogHint()
 
@@ -532,7 +535,7 @@ client/proc/ChatPanelBuildCmds()
 		if(seen[id]) continue
 		seen[id] = 1
 		var/list/a = CHATCMD_ARGS[id]
-		out += "[id]|[cat]|[islist(a) ? jointext(a, ",") : ""]"
+		out += "[id]|[cat]|[islist(a) ? jointext(a, ",") : ""][CHATCMD_CALL[id] ? "|c" : ""]"
 	if(mob.Admin) out += "Admin-Panel|Admin|"
 	if(mob.Mapper) out += "Mapper-Panel|Mapper|"
 	out += "Face|Roleplay|face"
@@ -647,6 +650,12 @@ client/Topic(href, href_list[], hsrc)
 	if(href_list && href_list["signpage"])
 		SignPageTopic(href_list)
 		return
+	if(href_list && href_list["npage"])
+		PromptPageTopic(href_list)
+		return
+	if(href_list && href_list["sheetpage"])
+		SheetTopic(href_list)
+		return
 	if(href_list && href_list["logpage"])
 		LogPageTopic(href_list)
 		return
@@ -666,6 +675,8 @@ client/Topic(href, href_list[], hsrc)
 				ChatPanelPlace()
 			if("cmds")
 				ChatPanelBuildCmds()
+			if("call")
+				PanelCommandCall(href_list["id"], list(href_list["a1"], href_list["a2"], href_list["a3"]))
 			if("players")
 				ChatPanelPlayers()
 			if("geom")
@@ -739,3 +750,30 @@ mob/Players/verb/ChatPanel_Report()
 	set category = "Utility"
 	set hidden = 1
 	client?.ChatPanelReport()
+
+client/proc/PanelCommandCall(id, list/raw)
+	if(!mob || !istext(id) || !CHATCMD_CALL[id])
+		return
+	var/found = null
+	for(var/v in (mob.verbs + verbs))
+		if(replacetext("[v:name]", " ", "-") == id)
+			found = v
+			break
+	if(!found)
+		return
+	var/list/kinds = CHATCMD_ARGS[id]
+	var/list/vals = list()
+	var/n = islist(kinds) ? kinds.len : 0
+	for(var/i = 1 to n)
+		var/k = kinds[i]
+		var/t = (islist(raw) && raw.len >= i && !isnull(raw[i])) ? "[raw[i]]" : ""
+		vals.len++
+		if(k == "num")
+			vals[vals.len] = text2num(t)
+		else
+			vals[vals.len] = t
+	var/path = "[found]"
+	var/pname = copytext(path, findlasttext(path, "/") + 1)
+	var/target = (findtext(path, "/client/") == 1) ? src : mob
+	spawn()
+		call(target, pname)(arglist(vals))

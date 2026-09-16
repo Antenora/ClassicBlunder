@@ -341,13 +341,13 @@ obj/Skills/Buffs/SlotlessBuffs/
 			set hidden = 1
 			var/Choice
 			if(!usr.BuffOn(src))
-				var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+				var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 				if(Lock=="Yes")
 					src.SwordIcon=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-					src.SwordX=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-					src.SwordY=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+					src.SwordX=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+					src.SwordY=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 
-				Choice=input(usr, "What class of weapon do you want your Nympharum Armament to be?", "Transfigure Nympharum Armament") in list("Light", "Medium", "Heavy")
+				Choice=Ask(usr, "What class of weapon do you want your Nympharum Armament to be?", "Transfigure Nympharum Armament", null, "pick", list("Light", "Medium", "Heavy"), 0)
 				switch(Choice)
 					if("Light")
 						src.SwordClass="Light"
@@ -835,23 +835,23 @@ obj/Skills/Companion/arcane_follower
 			options += "Bond Keeper Icon"
 
 		options += "Cancel"
-		switch(input("What would you like to do?") in options)
+		switch(Ask(usr, "What would you like to do?", "", null, "pick", options, 0))
 			if("Set Nympharum Icon")
 				var/icon/i = input("What would you like to set your companion's icon to?") as icon|null
 				if(i)
 					companion_icon = i
 					usr << "Companion Icon Set"
 			if("Set Nympharum Name")
-				var new_name = input("What would you like to set your companion's name to?","Companion Name",companion_name) as text|null
+				var new_name = Ask(usr, "What would you like to set your companion's name to?", "Companion Name", companion_name, "text", null, 1)
 				if(new_name)
 					companion_name = new_name
 			if("Set Aura Color")
-				var/new_color = input("What color?") as color | null
+				var/new_color = Ask(usr, "What color?", "", null, "color", null, 1)
 				if(new_color)
 					aura_color = new_color
 					usr << "You've set your Companion's aura color to [text_color]"
 			if("Set IC Color")
-				var/new_color = input("What color?") as color | null
+				var/new_color = Ask(usr, "What color?", "", null, "color", null, 1)
 				if(new_color)
 					text_color = new_color
 					usr << "You've set your Companion's text color to [text_color]"
@@ -860,26 +860,28 @@ obj/Skills/Companion/arcane_follower
 				if(i)
 					dash_effect = i
 				else
-					switch(input("Would you like to reset your dash effect icon?") in list("Yes","No"))
+					switch(Ask(usr, "Would you like to reset your dash effect icon?", "", null, "pick", list("Yes","No"), 0))
 						if("Yes") dash_effect = initial(dash_effect)
 
 			if("Combat Messages")
-				var category = input("Which category would you like to add/remove from?") in list("Support Fire","Reverse Dash","Dragon Dash") | null
+				var category = Ask(usr, "Which category would you like to add/remove from?", "", null, "pick", list("Support Fire","Reverse Dash","Dragon Dash"), 1)
 				if(category)
 					switch(category)
-						if("Support Fire") message_support_fire = input("Support Fire Message","Support Fire Message", message_support_fire) as text
-						if("Reverse Dash") message_reverse_dash = input("Reverse Dash Message","Reverse Dash Message", message_reverse_dash) as text
-						if("Dragon Dash") message_dragon_dash = input("Dragon Dash Message","Dragon Dash Message", message_dragon_dash) as text
+						if("Support Fire") message_support_fire = Ask(usr, "Support Fire Message", "Support Fire Message", message_support_fire, "text", null, 0)
+						if("Reverse Dash") message_reverse_dash = Ask(usr, "Reverse Dash Message", "Reverse Dash Message", message_reverse_dash, "text", null, 0)
+						if("Dragon Dash") message_dragon_dash = Ask(usr, "Dragon Dash Message", "Dragon Dash Message", message_dragon_dash, "text", null, 0)
 			if("Bond Keeper Icon")
 				var/new_icon = input("What would you like to set your Nympharum's Bond Keeper icon to?") as icon|null
 				if(new_icon)
 					bondkeeper_icon = new_icon
-					bondkeeper_icon_x = input("X offset?") as num
-					bondkeeper_icon_y = input("Y offset?") as num
+					bondkeeper_icon_x = Ask(usr, "X offset?", "", null, "num", null, 0)
+					bondkeeper_icon_y = Ask(usr, "Y offset?", "", null, "num", null, 0)
 
-	verb/Companion_Say(var/message as text)
+	verb/Companion_Say()
 		set category = "Companion"
 		set name = "Say Nympharum"
+		var/message = PromptArgValue(usr, args, 1, "Say Nympharum", "text")
+		if(isnull(message)) return
 		if(message)
 			for(var/mob/Player/AI/Nympharum/a in usr.ai_followers)
 				a.AISay(message)
@@ -893,7 +895,7 @@ obj/Skills/Companion/arcane_follower
 			em.appearance_flags=66
 			em.layer=EFFECTS_LAYER
 			a.overlays+=em
-			var/T=input("Emotes here!")as message|null
+			var/T=Ask(usr, "Emotes here!", "", null, "message", null, 1)
 			if(T==null)
 				a.overlays-=em
 				return
@@ -988,17 +990,17 @@ obj/Skills/Companion/arcane_follower
 						//Obtains Regrowth, which undoes maims and wounds at the cost of magic capacity.
 						var/which
 						while(!which)
-							switch(input("Which Surge would you like to develop?") in list("Gravitation","Transmutation","Empowerment"))
+							switch(Ask(usr, "Which Surge would you like to develop?", "", null, "pick", list("Gravitation","Transmutation","Empowerment"), 0))
 								if("Gravitation")
-									switch(alert("Gravitation allows one to manipulate forces of gravity, primarily one's own. Those who practice the Gravitation surge make the skies their own, striking their opponents with swiftness and grace.",,"Accept","Decline"))
+									switch(Ask(usr, "Gravitation allows one to manipulate forces of gravity, primarily one's own. Those who practice the Gravitation surge make the skies their own, striking their opponents with swiftness and grace.", , null, "confirm", null, 1, "Accept", "Decline"))
 										if("Accept")
 											which="Gravitation"
 								if("Transmutation")
-									switch(alert("Transmutation is oriented toward dividing and reworkng matter and force. Those who practice Transmutation are individuals who are in control, bending essence to their will.",,"Accept","Decline"))
+									switch(Ask(usr, "Transmutation is oriented toward dividing and reworkng matter and force. Those who practice Transmutation are individuals who are in control, bending essence to their will.", , null, "confirm", null, 1, "Accept", "Decline"))
 										if("Accept")
 											which="Transmutation"
 								if("Empowerment")
-									switch(alert("Empowerment is simplistic in nature, to infuse oneself with power to better their feats. Those who practice Empowerment have chosen a simplistic path, yet one that is just as effective as the other two.",,"Accept","Decline"))
+									switch(Ask(usr, "Empowerment is simplistic in nature, to infuse oneself with power to better their feats. Those who practice Empowerment have chosen a simplistic path, yet one that is just as effective as the other two.", , null, "confirm", null, 1, "Accept", "Decline"))
 										if("Accept")
 											which="Empowerment"
 

@@ -188,7 +188,7 @@ mob/proc/exitChrysalis(mob/breaker)
 		if(!breaker.EldritchPacted)
 			// Non-Pacted breaker becomes Pacted to the chrysalis Eldritch
 			var/list/PactTypes = list("Devotion (Balanced)", "Power (Strength)", "Knowledge (Force)", "Ambition (Speed)", "Survival (Endurance)")
-			var/pactChoice = input(breaker, "Breaking the chrysalis binds you in a pact. What type of pact do you accept?", "Pact Type") as null|anything in PactTypes
+			var/pactChoice = Ask(breaker, "Breaking the chrysalis binds you in a pact. What type of pact do you accept?", "Pact Type", null, "pick", PactTypes, 1)
 			if(!pactChoice)
 				pactChoice = "Devotion (Balanced)"
 			switch(pactChoice)
@@ -243,7 +243,7 @@ obj/ChrysalisShell
 			usr << "This chrysalis has already dissolved."
 			return
 		var/Cost = 10 * glob.progress.EconomyMana
-		var/Confirm = alert(usr, "Breaking this chrysalis will cost [Commas(Cost)] mana fragments and will bind you in a pact. Proceed?", "Break Chrysalis", "Yes", "No")
+		var/Confirm = Ask(usr, "Breaking this chrysalis will cost [Commas(Cost)] mana fragments and will bind you in a pact. Proceed?", "Break Chrysalis", null, "confirm", null, 1, "Yes", "No")
 		if(Confirm == "No")
 			return
 		if(usr.GetMineral() < Cost)
@@ -281,11 +281,11 @@ obj/Skills/Utility
 				usr << "There's nobody nearby to pact!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "Who do you wish to offer a pact to?", "Offer Pact") as null|anything in Options
+			var/mob/Players/Choice=Ask(usr, "Who do you wish to offer a pact to?", "Offer Pact", null, "pick", Options, 1)
 			if(!Choice)
 				src.Using=0
 				return
-			var/Confirm=alert(usr, "Do you wish to offer [Choice] a pact? It will cost [Commas(Cost)] mana fragments.", "Offer Pact", "Yes", "No")
+			var/Confirm=Ask(usr, "Do you wish to offer [Choice] a pact? It will cost [Commas(Cost)] mana fragments.", "Offer Pact", null, "confirm", null, 1, "Yes", "No")
 			if(Confirm=="No")
 				src.Using=0
 				return
@@ -294,7 +294,7 @@ obj/Skills/Utility
 				src.Using=0
 				return
 			//Target must accept
-			var/TargetConfirm=alert(Choice, "[usr] is offering you a pact for power. Do you accept?", "Eldritch Pact", "Accept", "Refuse")
+			var/TargetConfirm=Ask(Choice, "[usr] is offering you a pact for power. Do you accept?", "Eldritch Pact", null, "confirm", null, 1, "Accept", "Refuse")
 			if(!usr || !usr.client)
 				src.Using=0
 				return
@@ -312,7 +312,7 @@ obj/Skills/Utility
 				return
 			OMsg(usr, "[usr] begins weaving a pact to grant [Choice] power...")
 			var/list/PactTypes=list("Devotion (Balanced)", "Power (Strength)", "Knowledge (Force)", "Ambition (Speed)", "Survival (Endurance)")
-			var/choice2=input(Choice, "What type of pact do you wish to accept?", "Pact Type") as null|anything in PactTypes
+			var/choice2=Ask(Choice, "What type of pact do you wish to accept?", "Pact Type", null, "pick", PactTypes, 1)
 			if(!choice2)
 				usr << "[Choice] could not decide on a pact."
 				src.Using=0
@@ -368,7 +368,7 @@ obj/Skills/Utility
 				usr << "You have no active pacts."
 				src.Using=0
 				return
-			var/mob/Players/Target=input(usr, "Whose pact do you wish to revoke?", "Revoke Pact") as null|anything in Pacted
+			var/mob/Players/Target=Ask(usr, "Whose pact do you wish to revoke?", "Revoke Pact", null, "pick", Pacted, 1)
 			if(!Target)
 				src.Using=0
 				return
@@ -403,7 +403,7 @@ obj/Skills/Utility
 					Options.Add(P)
 			var/mob/Players/Target = usr
 			if(Options.len > 1)
-				Target = input(usr, "Whose stat taxes do you wish to cleanse?", "Refresh") as null|anything in Options
+				Target = Ask(usr, "Whose stat taxes do you wish to cleanse?", "Refresh", null, "pick", Options, 1)
 				if(!Target)
 					src.Using=0
 					return
@@ -491,11 +491,11 @@ obj/Skills/Utility
 				usr << "You have no pacted allies to reach."
 				src.Using=0
 				return
-			var/Mode = alert(usr, "Do you wish to teleport to a pacted ally, or summon one to you?", "Dream Realization", "Teleport To", "Summon", "Cancel")
+			var/Mode = Ask(usr, "Do you wish to teleport to a pacted ally, or summon one to you?", "Dream Realization", null, "confirm", null, 1, "Teleport To", "Summon", "Cancel")
 			if(Mode == "Cancel")
 				src.Using=0
 				return
-			var/mob/Players/Target = input(usr, "Choose a pacted ally.", "Dream Realization") as null|anything in Pacted
+			var/mob/Players/Target = Ask(usr, "Choose a pacted ally.", "Dream Realization", null, "pick", Pacted, 1)
 			if(!Target)
 				src.Using=0
 				return
@@ -514,7 +514,7 @@ obj/Skills/Utility
 				usr << "You emerge beside [Target]."
 			else
 				// Summon mode — requires target consent
-				var/Consent = alert(Target, "[usr] wishes to summon you to their location. Do you accept?", "Dream Realization", "Accept", "Refuse")
+				var/Consent = Ask(Target, "[usr] wishes to summon you to their location. Do you accept?", "Dream Realization", null, "confirm", null, 1, "Accept", "Refuse")
 				if(Consent == "Refuse")
 					usr << "[Target] refused your summon."
 					src.Using=0
@@ -557,7 +557,7 @@ obj/Skills/Utility
 				usr << "You have no pacted allies."
 				src.Using=0
 				return
-			var/mob/Players/Target = input(usr, "Choose a pacted ally to enshroud.", "With You in Darkness") as null|anything in Pacted
+			var/mob/Players/Target = Ask(usr, "Choose a pacted ally to enshroud.", "With You in Darkness", null, "pick", Pacted, 1)
 			if(!Target)
 				src.Using=0
 				return
@@ -595,7 +595,7 @@ obj/Skills/Utility
 				usr << "You have no pacted allies eligible to become Bared Souls."
 				src.Using = 0
 				return
-			var/mob/Players/Target = input(usr, "Whose pact do you wish to deepen? They gain power but lose eldritch protection.", "Bared Souls") as null|anything in Options
+			var/mob/Players/Target = Ask(usr, "Whose pact do you wish to deepen? They gain power but lose eldritch protection.", "Bared Souls", null, "pick", Options, 1)
 			if(!Target)
 				src.Using = 0
 				return
@@ -603,7 +603,7 @@ obj/Skills/Utility
 				usr << "[Target] is no longer available."
 				src.Using = 0
 				return
-			var/Consent = alert(Target, "[usr] wishes to deepen your pact, making you a Bared Soul. You will gain additional power but become vulnerable to Pure damage. Accept?", "Bared Souls", "Accept", "Refuse")
+			var/Consent = Ask(Target, "[usr] wishes to deepen your pact, making you a Bared Soul. You will gain additional power but become vulnerable to Pure damage. Accept?", "Bared Souls", null, "confirm", null, 1, "Accept", "Refuse")
 			if(Consent == "Refuse")
 				usr << "[Target] refused to bare their soul."
 				src.Using = 0
@@ -653,7 +653,7 @@ obj/Skills/Utility
 				usr << "You need at least two pacted allies to redistribute passives."
 				src.Using = 0
 				return
-			var/mob/Players/Source = input(usr, "Select the ally to take a passive from.", "Altered Nature - Source") as null|anything in Pacted
+			var/mob/Players/Source = Ask(usr, "Select the ally to take a passive from.", "Altered Nature - Source", null, "pick", Pacted, 1)
 			if(!Source)
 				src.Using = 0
 				return
@@ -669,7 +669,7 @@ obj/Skills/Utility
 				usr << "[Source] has no passives with enough value to transfer."
 				src.Using = 0
 				return
-			var/chosen_passive = input(usr, "Which passive do you wish to transfer from [Source]?", "Altered Nature - Passive") as null|anything in available
+			var/chosen_passive = Ask(usr, "Which passive do you wish to transfer from [Source]?", "Altered Nature - Passive", null, "pick", available, 1)
 			if(!chosen_passive)
 				src.Using = 0
 				return
@@ -679,7 +679,7 @@ obj/Skills/Utility
 				usr << "There is no other pacted ally to receive the passive."
 				src.Using = 0
 				return
-			var/mob/Players/Target = input(usr, "Select the ally to receive [chosen_passive].", "Altered Nature - Target") as null|anything in Targets
+			var/mob/Players/Target = Ask(usr, "Select the ally to receive [chosen_passive].", "Altered Nature - Target", null, "pick", Targets, 1)
 			if(!Target)
 				src.Using = 0
 				return
@@ -721,7 +721,7 @@ obj/Skills/Utility
 				usr << "There are no pacted allies nearby."
 				src.Using = 0
 				return
-			var/mob/Players/Target = input(usr, "Whose inner potential do you wish to unlock?", "Glimpse Inside") as null|anything in Options
+			var/mob/Players/Target = Ask(usr, "Whose inner potential do you wish to unlock?", "Glimpse Inside", null, "pick", Options, 1)
 			if(!Target)
 				src.Using = 0
 				return
@@ -733,7 +733,7 @@ obj/Skills/Utility
 				usr << "[Target] has moved too far away."
 				src.Using = 0
 				return
-			var/Consent = alert(Target, "[usr] wishes to grant you a glimpse of eldritch power. This will affect your secret abilities. Accept?", "Glimpse Inside", "Accept", "Refuse")
+			var/Consent = Ask(Target, "[usr] wishes to grant you a glimpse of eldritch power. This will affect your secret abilities. Accept?", "Glimpse Inside", null, "confirm", null, 1, "Accept", "Refuse")
 			if(Consent == "Refuse")
 				usr << "[Target] refused the glimpse."
 				src.Using = 0
@@ -787,7 +787,7 @@ obj/Skills/Utility
 				usr << "You have no active pacts to reclaim."
 				src.Using = 0
 				return
-			var/mob/Players/Target = input(usr, "Whose pact do you wish to reclaim?", "Reclamation") as null|anything in Pacted
+			var/mob/Players/Target = Ask(usr, "Whose pact do you wish to reclaim?", "Reclamation", null, "pick", Pacted, 1)
 			if(!Target)
 				src.Using = 0
 				return

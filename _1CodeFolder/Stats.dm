@@ -1,7 +1,7 @@
 mob/verb/Character_Sheet()
 	set category = "Other"
 	set hidden = 1
-	src<<browse(src.GetAssess(),"window=Assess;size=275x700")
+	src.ShowAssess(src)
 
 // Unhinged Majins count their Power at MAJIN_UNHINGED_POWER_MULT (2x) in both offense and defense
 mob/proc/GetEffectivePower()
@@ -9,7 +9,9 @@ mob/proc/GetEffectivePower()
 	if(isRace(MAJIN) && Class == "Unhinged")
 		. *= MAJIN_UNHINGED_POWER_MULT
 
-mob/proc/GetAssess()
+mob/proc/ShowAssess(mob/viewer)
+	if(!viewer || !viewer.client)
+		return
 	var/PotentialPowerDisplay
 	var/ReplacementPowerDisplay
 	var/PowerMultiplierDisplay
@@ -58,73 +60,44 @@ mob/proc/GetAssess()
 		GodKiDisplay=0
 		MaouKiDisplay=0
 		PotentialPowerDisplay=1
-	var/blahh={"
-
-			<html>
-	<style type="text/css">
-	<!--
-	body {
-	     color:#449999;
-	     background-color:black;
-	     font-size:12;
-	 }
-	table {
-	     font-size:12;
-	 }
-	//-->
-	</style>
-	<body>
-	[src.name]<br><br>
-	Current Anger:	[(EffectiveAnger+src.AngerAdd)*100]%<br>
-	<table cellspacing="6%" cellpadding="1%">
-	<tr><td>Current Power:</td><td>[Power]</td></tr>
-	<tr><td>Base Power:</td><td>[BaseDisplay*PowerBoost*RPPower*potential_power_mult]]/([BaseDisplay])</td></tr>
-	<tr><td>Power From Potential:</td><td>[PotentialPowerDisplay]</td></tr>
-	[HasPowerReplacement() ? "<tr><td>Power Replacement Value:</td><td>[ReplacementPowerDisplay]</td></tr>" : ""]
-	<tr><td>Power From Buffs:</td> <td>x[PowerMultiplierDisplay]</td></tr>
-	<tr><td>Damage Boost:</td><td>x[PDam] ([PDam*100]%)</td></tr>
-	<tr><td>Damage Reduction:</td><td>x[PRed] ([PRed*100]%)</td></tr>
-	<tr><td>God Ki:</td><td>x[GodKiDisplay]</td></tr>
-	<tr><td>Maou Ki:</td><td>x[MaouKiDisplay]</td></tr>
-	<tr><td>Energy:</td><td>[Commas(round(src.EnergyMax))] (1)</td></tr>
-	<tr><td>Buffed Stat/True Stat (Mod)</td></tr>
-	<tr><td>Strength:</td><td> [round(src.GetStr(), 0.01)] ([round(src.BaseStr() + src.GetEquippedWeaponStrAdd(), 0.01)])</td></tr>
-	<tr><td>Endurance:</td><td> [round(src.GetEnd(), 0.01)] ([round(src.BaseEnd() + src.GetEquippedWeaponEndAdd(), 0.01)])</td></tr>
-	<tr><td>Vitality:</td><td> [round(src.GetVit(), 0.01)] ([round(src.BaseVit(), 0.01)])</td></tr>
-	<tr><td>Speed:</td><td> [round(src.GetSpd(), 0.01)] ([round(src.BaseSpd() + src.GetEquippedWeaponSpdAdd(), 0.01)])</td></tr>
-	<tr><td>Force:</td><td> [round(src.GetFor(), 0.01)] ([round(src.BaseFor() + src.GetEquippedWeaponForAdd(), 0.01)])</td></tr>
-	<tr><td>Offense:</td><td> [round(src.GetOff(), 0.01)] ([round(src.BaseOff() + src.GetEquippedWeaponOffAdd(), 0.01)])</td></tr>
-	<tr><td>Defense:</td><td> [round(src.GetDef(), 0.01)] ([round(src.BaseDef() + src.GetEquippedWeaponDefAdd(), 0.01)])</td></tr>
-	<tr><td>Recovery:</td><td> [round(src.GetRecov(), 0.01)] ([src.BaseRecov()])</td></tr>
-	<tr><td>Anger:</td><td>[(src.AngerMax+src.AngerAdd)*100]%</td></tr>
-	<tr><td>Potential:</td><td>[PotentialDisplay]/150</td></tr>
-	<tr><td>Transformation Potential:</td><td>[potential_trans]/150</td></tr>
-	<tr><td>Average Stats: [StatAverage]</td></tr>
-	<tr><td>Growth Rate: [GrowthRate]</td></tr>
-	<tr><td>Magic Level: [src.getTotalMagicLevel()]</td></tr>
-	<tr><td>Stat Enhancement Chips Installed(Max): [src.EnhanceChips]([src.EnhanceChipsMax])</td></tr>
-			</table></html>"}
+	var/list/cols = list(list("l" = "STAT", "a" = "l"), list("l" = "BUFFED", "a" = "r"), list("l" = "TRUE", "a" = "r", "d" = 1))
+	var/list/rows = list()
+	var/list/opts = list("nosort" = 1, "nofilter" = 1, "nohead" = 1)
 	if(src.passive_handler.Get("Utterly Powerless"))
-		blahh={"
-
-						<html>
-				<style type="text/css">
-				<!--
-				body {
-				     color:#449999;
-				     background-color:black;
-				     font-size:12;
-				 }
-				table {
-				     font-size:12;
-				 }
-				//-->
-				</style>
-				<body>
-				[src.name]<br><br>
-				<font color=#FF0000><b>YOU HAVE NOTHING.</b>
-						</table></html>"}
-	return blahh
+		rows[++rows.len] = list("t" = "YOU HAVE NOTHING.")
+		viewer.client.TableShow("assess:\ref[src]", "ASSESS", "[src.name]", "", cols, rows, "", null, opts)
+		return
+	rows[++rows.len] = list("sec" = "POWER")
+	rows[++rows.len] = list("t" = "Current Anger", "c" = list("[(EffectiveAnger+src.AngerAdd)*100]%"), "w" = 1)
+	rows[++rows.len] = list("t" = "Current Power", "c" = list("[Power]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Base Power", "c" = list("[BaseDisplay*PowerBoost*RPPower*potential_power_mult]/([BaseDisplay])"), "w" = 1)
+	rows[++rows.len] = list("t" = "Power From Potential", "c" = list("[PotentialPowerDisplay]"), "w" = 1)
+	if(HasPowerReplacement())
+		rows[++rows.len] = list("t" = "Power Replacement Value", "c" = list("[ReplacementPowerDisplay]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Power From Buffs", "c" = list("x[PowerMultiplierDisplay]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Damage Boost", "c" = list("x[PDam] ([PDam*100]%)"), "w" = 1)
+	rows[++rows.len] = list("t" = "Damage Reduction", "c" = list("x[PRed] ([PRed*100]%)"), "w" = 1)
+	rows[++rows.len] = list("t" = "God Ki", "c" = list("x[GodKiDisplay]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Maou Ki", "c" = list("x[MaouKiDisplay]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Energy", "c" = list("[Commas(round(src.EnergyMax))] (1)"), "w" = 1)
+	rows[++rows.len] = list("sec" = "STATS", "cl" = list("BUFFED", "TRUE"))
+	rows[++rows.len] = list("t" = "Strength", "c" = list("[round(src.GetStr(), 0.01)]", "[round(src.BaseStr() + src.GetEquippedWeaponStrAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Endurance", "c" = list("[round(src.GetEnd(), 0.01)]", "[round(src.BaseEnd() + src.GetEquippedWeaponEndAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Vitality", "c" = list("[round(src.GetVit(), 0.01)]", "[round(src.BaseVit(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Speed", "c" = list("[round(src.GetSpd(), 0.01)]", "[round(src.BaseSpd() + src.GetEquippedWeaponSpdAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Force", "c" = list("[round(src.GetFor(), 0.01)]", "[round(src.BaseFor() + src.GetEquippedWeaponForAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Offense", "c" = list("[round(src.GetOff(), 0.01)]", "[round(src.BaseOff() + src.GetEquippedWeaponOffAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Defense", "c" = list("[round(src.GetDef(), 0.01)]", "[round(src.BaseDef() + src.GetEquippedWeaponDefAdd(), 0.01)]"))
+	rows[++rows.len] = list("t" = "Recovery", "c" = list("[round(src.GetRecov(), 0.01)]", "[src.BaseRecov()]"))
+	rows[++rows.len] = list("sec" = "PROGRESS")
+	rows[++rows.len] = list("t" = "Anger", "c" = list("[(src.AngerMax+src.AngerAdd)*100]%"), "w" = 1)
+	rows[++rows.len] = list("t" = "Potential", "c" = list("[PotentialDisplay]/150"), "w" = 1)
+	rows[++rows.len] = list("t" = "Transformation Potential", "c" = list("[potential_trans]/150"), "w" = 1)
+	rows[++rows.len] = list("t" = "Average Stats", "c" = list("[StatAverage]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Growth Rate", "c" = list("[GrowthRate]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Magic Level", "c" = list("[src.getTotalMagicLevel()]"), "w" = 1)
+	rows[++rows.len] = list("t" = "Stat Enhancement Chips", "c" = list("[src.EnhanceChips] ([src.EnhanceChipsMax] max)"), "w" = 1)
+	viewer.client.TableShow("assess:\ref[src]", "ASSESS", "[src.name]", "", cols, rows, "", null, opts)
 
 mob
 	proc

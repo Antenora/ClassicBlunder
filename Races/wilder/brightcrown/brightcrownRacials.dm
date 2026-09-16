@@ -137,7 +137,7 @@
 /mob/var/tmp/last_nimbus = -100
 /mob/var/nimbus_message = "player_name rides a cloud towards target_name!"
 /mob/proc/change_nimbus_message()
-    var/inP = input(src, "Use player_name and target_name to swap out for those names.") as text | null
+    var/inP = Ask(src, "Use player_name and target_name to swap out for those names.", "", null, "text", null, 1)
     if(inP >= glob.MAXCATCHLINELENGTH+10 || inP == "" || !inP)
         src << " no too long " 
     else

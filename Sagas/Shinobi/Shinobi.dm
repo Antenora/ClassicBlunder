@@ -4,7 +4,7 @@ mob/proc/gainShinobi()
 	src.SagaLevel = 1
 
 	var/list/Branches = list("Sharingan", "Eight Gates", "Sage Mode")
-	src.ShinobiBranch = input("Which path does [src] receive?", "Shinobi Branch") in Branches
+	src.ShinobiBranch = Ask(usr, "Which path does [src] receive?", "Shinobi Branch", null, "pick", Branches, 0)
 
 	src << "The path of <b>[src.ShinobiBranch]</b> lies before you."
 

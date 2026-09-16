@@ -514,7 +514,7 @@ obj/Spirit
 			usr<<"..Welcome to The Final Realms! You may train, conversate with others...and enjoy the rest of eternity haha! You may talk to me once every month starting next month to see if I qualify you to get out of this dump!"
 			who.Add("[usr.key]"=Year)*/
 
-	verb/Use(var/mob/A in world)
+	verb/Use()
 		set src in oview(1)
 		set category="Other"
 		set hidden = 1

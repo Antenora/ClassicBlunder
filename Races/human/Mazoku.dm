@@ -1,5 +1,5 @@
 /mob/Admin3/verb/GiveMazoku()
-	var/mob/p = input(src, "Who?") in players
+	var/mob/p = Ask(src, "Who?", "", null, "pick", players, 0)
 	if(!p.isRace(HUMAN))
 		src << "[p] is not Human."
 		return
@@ -23,7 +23,7 @@
 	p.passive_handler.Increase("HellPower", 0.25)
 	p.passive_handler.Increase("AbyssMod", 1)
 	p.passive_handler.Increase("DormantDemon", 1)
-	p.TrueName=input(p, "Your lineage can be traced to a Great Demon Lord. Who were they?", "Get True Name") as text
+	p.TrueName=Ask(p, "Your lineage can be traced to a Great Demon Lord. Who were they?", "Get True Name", null, "text", null, 0)
 	p << "The name of your Mazoku Ancestor is <b>[p.TrueName]</b>."
 	p.Secret = "Rare Variant"
 	if(!locate(/obj/Skills/Projectile/Spirit_Gun, p))

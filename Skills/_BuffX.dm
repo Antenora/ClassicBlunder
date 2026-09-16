@@ -650,64 +650,64 @@ NEW VARIABLES
 				set hidden = 1
 				var/list/Options=list("Cancel", "Overlay", "Top Overlay", "Aura", "Hair", "Text")
 				Options.Add("Base")
-				var/Option=input("What aspect do you wish to customize?", "Ki Control Customize") in Options
+				var/Option=Ask(usr, "What aspect do you wish to customize?", "Ki Control Customize", null, "pick", Options, 0)
 				if(Option=="Cancel")
 					return
 				else
 					switch(Option)
 						if("Overlay")
 							src.IconLock=input(usr, "What icon do you want to display when activating Ki Control?", "Ki Control") as icon|null
-							src.LockX=input(usr, "X offset?", "Ki Control") as num|null
-							src.LockY=input(usr, "Y offset?", "Ki Control") as num|null
-							var/Under=alert(usr, "Should this icon be displayed under the base rather than as an overlay?", "Ki Control", "No", "Yes")
+							src.LockX=Ask(usr, "X offset?", "Ki Control", null, "num", null, 1)
+							src.LockY=Ask(usr, "Y offset?", "Ki Control", null, "num", null, 1)
+							var/Under=Ask(usr, "Should this icon be displayed under the base rather than as an overlay?", "Ki Control", null, "confirm", null, 1, "No", "Yes")
 							if(Under=="Yes")
 								src.IconUnder=1
 							else
 								src.IconUnder=0
-							var/Layer=alert(usr, "Should this icon force a relayer to appear under Top Overlays?", "Ki Control", "Yes", "No")
+							var/Layer=Ask(usr, "Should this icon force a relayer to appear under Top Overlays?", "Ki Control", null, "confirm", null, 1, "Yes", "No")
 							if(Layer=="Yes")
 								src.IconRelayer=1
 							else
 								src.IconRelayer=0
 						if("Top Overlay")
 							src.TopOverlayLock=input(usr, "What Top Overlay do you want to display when using Ki Control?", "Ki Control") as icon|null
-							src.TopOverlayX=input(usr, "X offset?", "Ki Control") as num|null
-							src.TopOverlayY=input(usr, "Y offset?", "Ki Control") as num|null
+							src.TopOverlayX=Ask(usr, "X offset?", "Ki Control", null, "num", null, 1)
+							src.TopOverlayY=Ask(usr, "Y offset?", "Ki Control", null, "num", null, 1)
 						if("Aura")
-							var/Lock=alert(usr, "Should the aura displayed be your standard one?", "Ki Control", "No", "Yes")
+							var/Lock=Ask(usr, "Should the aura displayed be your standard one?", "Ki Control", null, "confirm", null, 1, "No", "Yes")
 							if(Lock=="Yes")
 								src.AuraLock=1
 							else
 								src.AuraLock=input(usr, "What aura should be forced to display when using Ki Control?", "Ki Control") as icon|null
-								src.AuraX=input(usr, "X offset?", "Ki Control") as num|null
-								src.AuraY=input(usr, "Y offset?", "Ki Control") as num|null
-							var/Under=alert(usr, "Should this aura be displayed under the base rather than as an overlay?", "Ki Control", "No", "Yes")
+								src.AuraX=Ask(usr, "X offset?", "Ki Control", null, "num", null, 1)
+								src.AuraY=Ask(usr, "Y offset?", "Ki Control", null, "num", null, 1)
+							var/Under=Ask(usr, "Should this aura be displayed under the base rather than as an overlay?", "Ki Control", null, "confirm", null, 1, "No", "Yes")
 							if(Under=="Yes")
 								usr.AuraLockedUnder=1
 							else
 								usr.AuraLockedUnder=0
 						if("Hair")
 							src.HairLock=input(usr, "What hair should be forced to display when using Ki Control?", "Ki Control") as icon|null
-							src.HairX=input(usr, "X offset?", "Ki Control") as num|null
-							src.HairY=input(usr, "Y offset?", "Ki Control") as num|null
+							src.HairX=Ask(usr, "X offset?", "Ki Control", null, "num", null, 1)
+							src.HairY=Ask(usr, "Y offset?", "Ki Control", null, "num", null, 1)
 						if("Text")
-							src.ActiveMessage=input(usr, "What text do you want to display when entering Ki Control? This will always have your character name at the start.", "Ki Control") as text
-							src.OffMessage=input(usr, "What text do you want to display when exiting Ki Control? This will always have your character name at the start.", "Ki Control") as text
-							src.TextColor=input(usr, "What text color do you want to display? Default is #0080FF.", "Ki Control") as text|null
+							src.ActiveMessage=Ask(usr, "What text do you want to display when entering Ki Control? This will always have your character name at the start.", "Ki Control", null, "text", null, 0)
+							src.OffMessage=Ask(usr, "What text do you want to display when exiting Ki Control? This will always have your character name at the start.", "Ki Control", null, "text", null, 0)
+							src.TextColor=Ask(usr, "What text color do you want to display? Default is #0080FF.", "Ki Control", null, "text", null, 1)
 						if("Base")
-							var/HulkOut=alert(usr, "Should the powered up state alter your base?", "Ki Control", "No", "Yes")
+							var/HulkOut=Ask(usr, "Should the powered up state alter your base?", "Ki Control", null, "confirm", null, 1, "No", "Yes")
 							if(HulkOut=="No")
 								src.IconReplace=0
 							else
 								if(usr.isRace(MAKYO))
-									var/Lock=alert(usr, "Should the powered up state use your default expanded state?", "Ki Control", "No", "Yes")
+									var/Lock=Ask(usr, "Should the powered up state use your default expanded state?", "Ki Control", null, "confirm", null, 1, "No", "Yes")
 									if(Lock=="Yes")
 										src.icon=usr.ExpandBase
 										src.IconReplace=1
 										return
 								src.icon=input(usr, "What icon should replace your base when using Ki Control?", "Ki Control") as icon|null
-								src.pixel_x=input(usr, "X offset?", "Ki Control") as num|null
-								src.pixel_y=input(usr, "Y offset?", "Ki Control") as num|null
+								src.pixel_x=Ask(usr, "X offset?", "Ki Control", null, "num", null, 1)
+								src.pixel_y=Ask(usr, "Y offset?", "Ki Control", null, "num", null, 1)
 								src.IconReplace=1
 		Gear
 			PULock=1
@@ -1193,7 +1193,7 @@ NEW VARIABLES
 						vars["[ki.selectedStats[2]]Mult"] = 1.1
 						vars["[ki.selectedStats[3]]Mult"] = 1.05
 						multsSet = TRUE
-					var/Choice = alert(usr, "Do you want to conceal your sword's true nature?", "Concealment", "Yes", "No")
+					var/Choice = Ask(usr, "Do you want to conceal your sword's true nature?", "Concealment", null, "confirm", null, 1, "Yes", "No")
 					if(Choice == "Yes")
 						redacted = TRUE
 					else if(Choice == "No")
@@ -1742,22 +1742,22 @@ NEW VARIABLES
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/list/options = list("Enlarge","Effects (Iconlock)")
-					switch(input("Which aspect of Power Stressing would you like to modify?") in options)
+					switch(Ask(usr, "Which aspect of Power Stressing would you like to modify?", "", null, "pick", options, 0))
 						if("Enlarge") Choice=1
 						if("Effects (Iconlock)") Choice=2
 					switch(Choice)
 						if(1)
-							var/W=input(usr, "Pick an Enlarge width to use. (Default is 1.2, minimum 1.0 which is none.)", "Enlarge Width", 1.2) as num
+							var/W=Ask(usr, "Pick an Enlarge width to use. (Default is 1.2, minimum 1.0 which is none.)", "Enlarge Width", 1.2, "num", null, 0)
 							W = min(max(W, 1.0), 3.0)
 							ProportionShift=matrix(W, 0, 0, 0, 1, 0)
 						if(2)
-							switch(alert(usr, "Do you want Power Stressing to have a visible effect (like sparks)?", "PS Icon", "No", "Yes", "Use Default"))
+							switch(Ask(usr, "Do you want Power Stressing to have a visible effect (like sparks)?", "PS Icon", null, "confirm", null, 1, "No", "Yes", "Use Default"))
 								if("No")
 									IconLock = null
 								if("Yes")
 									IconLock=input(usr, "Which effect?", "PS Effect Icon") as icon|null
-									LockX=input(usr, "Pixel X offset.", "PS Effect Icon") as num
-									LockY=input(usr, "Pixel Y offset.", "PS Effect Icon") as num
+									LockX=Ask(usr, "Pixel X offset.", "PS Effect Icon", null, "num", null, 0)
+									LockY=Ask(usr, "Pixel Y offset.", "PS Effect Icon", null, "num", null, 0)
 								if("Use Default")
 									IconLock='Electricity SSJ2 -1.dmi'
 									LockX=0
@@ -1886,25 +1886,25 @@ NEW VARIABLES
 					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in src) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src))
 						var/list/options = list("Primary","Secondary")
 						if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src)) options += "Tertiary"
-						switch(input("Which sword would you like to modify?") in options)
+						switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 							if("Secondary") modify_sword_num=2
 							if("Tertiary") modify_sword_num=3
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						switch(modify_sword_num)
 							if(1)
 								src.SwordIcon=input(usr, "What icon will your Sickle use?", "Sickle Icon") as icon|null
-								src.SwordX=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordY=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordX=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordY=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(2)
 								src.SwordIconSecond=input(usr, "What icon will your Sickle use?", "Sickle Icon") as icon|null
-								src.SwordXSecond=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYSecond=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordXSecond=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYSecond=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(3)
 								src.SwordIconThird=input(usr, "What icon will your Sickle use?", "Sickle Icon") as icon|null
-								src.SwordXThird=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYThird=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
-					Choice=input(usr, "What class of blade do you want your Sickle to be?", "Transfigure Sickle of Sorrow") in list("Blunt", "Saber", "Longsword", "Greatsword")
+								src.SwordXThird=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYThird=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of blade do you want your Sickle to be?", "Transfigure Sickle of Sorrow", null, "pick", list("Blunt", "Saber", "Longsword", "Greatsword"), 0)
 					switch(Choice)
 						if("Blunt")
 							switch(modify_sword_num)
@@ -2021,7 +2021,7 @@ NEW VARIABLES
 				if(usr.secretDatum.currentTier < 5) who += usr.getShadowEyeTargets();
 				else who += usr.getAdvancedShadowEyeTargets();
 
-				var/mob/Players/selector=input("Who do you want to observe?","Observe")in who
+				var/mob/Players/selector=Ask(usr, "Who do you want to observe?", "Observe", null, "pick", who, 0)
 				if(selector=="Cancel")
 					Observify(usr,usr)
 					usr.Observing=0
@@ -2168,7 +2168,7 @@ NEW VARIABLES
 			verb/Set_Zone_Glow()
 				set category="Utility"
 				set hidden = 1
-				ManaGlow=input(usr, "What colour do you want to set your Zone Glow to?", "Zone Colour", "#3399ff") as color;
+				ManaGlow=Ask(usr, "What color do you want to set your Zone Glow to?", "Zone Color", "#3399ff", "color", null, 0);
 		Adrenaline_Rush
 			SignatureTechnique=3
 			NeedsHealth=50
@@ -2324,7 +2324,7 @@ NEW VARIABLES
 					set category="Skills"
 					if(!usr.BuffOn(src))
 						if(!usr.VaizardType)
-							usr.VaizardType = input(usr, "What type?") in list("Berserker", "Manipulator", "Hellion", "Phantasm")
+							usr.VaizardType = Ask(usr, "What type?", "", null, "pick", list("Berserker", "Manipulator", "Hellion", "Phantasm"), 0)
 						changeVariables(usr)
 						src.Trigger(usr)
 		Mark_of_the_Slayer
@@ -2577,8 +2577,10 @@ NEW VARIABLES
 			Cooldown=-1
 			ActiveMessage="goes beyonds their limits!"
 			OffMessage="cannot push themselves any further..."
-			verb/Limit_Breaker(n as num)
+			verb/Limit_Breaker()
 				set category="Skills"
+				var/n = PromptArgValue(usr, args, 1, "Limit Breaker", "num")
+				if(isnull(n)) return
 				if(n>3) return
 				if(!usr.BuffOn(src))
 					switch(n)
@@ -2667,7 +2669,7 @@ NEW VARIABLES
 					Highest=(usr.SpdMod+usr.SpdAscension)*usr.SpdChaos*/
 				if(!Class)
 					var/list/trances = list("Beast","Knight","Magus","Holy")
-					var/chosen = input("What Trance do you wish to specialise?") in trances
+					var/chosen = Ask(usr, "What Trance do you wish to specialize?", "", null, "pick", trances, 0)
 					Class = chosen
 				if(!usr.SpecialBuff)
 					switch(Class)
@@ -2891,8 +2893,10 @@ NEW VARIABLES
 				DefMult=1.2
 				ActiveMessage="traces their attacks with the force of a fighter's soul!"
 				OffMessage="exhausts their multiplied assault..."
-				verb/Ghost_Install(fightingType in list("Berserker", "Warrior", "Hunter"))
+				verb/Ghost_Install()
 					set category="Skills"
+					var/fightingType = PromptArgList(usr, args, 1, "Ghost Install", list("Berserker", "Warrior", "Hunter"))
+					if(isnull(fightingType)) return
 					if(!altered)
 						if(!usr.BuffOn(src))
 							switch(fightingType)
@@ -4291,10 +4295,10 @@ NEW VARIABLES
 				set hidden = 1
 				if(!usr || src.loc != usr)
 					return
-				var/chosen_color = input(usr,"Choose this skill's glow color.","Edit Bravery's PowerGlow") as color
+				var/chosen_color = Ask(usr, "Choose this skill's glow color.", "Edit Bravery's PowerGlow", null, "color", null, 0)
 				if(!chosen_color)
 					return
-				var/brightness = input(usr,"Set glow brightness.\n1 = normal tint\n1.5 = bright\n2 = very bright","Power Glow Brightness",1.5) as num
+				var/brightness = Ask(usr, "Set glow brightness.\n1 = normal tint\n1.5 = bright\n2 = very bright", "Power Glow Brightness", 1.5, "num", null, 0)
 				brightness = min(max(brightness, 0), 3)
 				var/r = text2num("0x[copytext(chosen_color, 2, 4)]") / 255
 				var/g = text2num("0x[copytext(chosen_color, 4, 6)]") / 255
@@ -5186,8 +5190,8 @@ NEW VARIABLES
 					usr << "You can't customize ki armanent while using it!"
 					return
 				src.IconLock=input(usr, "What armanent icon do you want to use?", "Customize Ki Armanent") as icon|null
-				src.LockX=input(usr, "What pixel x offset do you want to use?", "Customize Ki Armanent") as num|null
-				src.LockY=input(usr, "What pixel y offset do you want to use?", "Customize Ki Armanent") as num|null
+				src.LockX=Ask(usr, "What pixel x offset do you want to use?", "Customize Ki Armanent", null, "num", null, 1)
+				src.LockY=Ask(usr, "What pixel y offset do you want to use?", "Customize Ki Armanent", null, "num", null, 1)
 				if(src.IconLock==null)
 					src.IconLock='Ki-Blade.dmi'
 					src.LockX=0
@@ -5221,8 +5225,8 @@ NEW VARIABLES
 					usr << "You can't customize ki blade while using it!"
 					return
 				src.IconLock=input(usr, "What blade icon do you want to use?", "Customize Ki Blade") as icon|null
-				src.LockX=input(usr, "What pixel x offset do you want to use?", "Customize Ki Blade") as num|null
-				src.LockY=input(usr, "What pixel y offset do you want to use?", "Customize Ki Blade") as num|null
+				src.LockX=Ask(usr, "What pixel x offset do you want to use?", "Customize Ki Blade", null, "num", null, 1)
+				src.LockY=Ask(usr, "What pixel y offset do you want to use?", "Customize Ki Blade", null, "num", null, 1)
 				if(src.IconLock==null)
 					src.IconLock='Ki-Blade.dmi'
 					src.LockX=0
@@ -5258,8 +5262,8 @@ NEW VARIABLES
 					usr << "You can't customize ki shield while using it!"
 					return
 				src.IconLock=input(usr, "What shield icon do you want to use?", "Customize Ki Shield") as icon|null
-				src.LockX=input(usr, "What pixel x offset do you want to use?", "Customize Ki Shield") as num|null
-				src.LockY=input(usr, "What pixel y offset do you want to use?", "Customize Ki Shield") as num|null
+				src.LockX=Ask(usr, "What pixel x offset do you want to use?", "Customize Ki Shield", null, "num", null, 1)
+				src.LockY=Ask(usr, "What pixel y offset do you want to use?", "Customize Ki Shield", null, "num", null, 1)
 			verb/Ki_Shield()
 				set category="Skills"
 				src.Trigger(usr)
@@ -5981,7 +5985,7 @@ NEW VARIABLES
 					OffMessage="extinguishes the plasma of their lightsaber..."
 					verb/Lightsaber_Color()
 						if(!usr.BuffOn(src))
-							var/Choice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red")
+							var/Choice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red"), 0)
 							switch(Choice)
 								if("Blue")
 									SwordIcon='LightsaberBlue.dmi'
@@ -6338,12 +6342,12 @@ NEW VARIABLES
 					if(!mecha) return
 					if(!player.CheckActive("Mobile Suit")) return
 					var/obj/Skills/Buffs/ActiveBuffs/Gear/Mobile_Suit/MSBuff = player.ActiveBuff
-					MSBuff.SwordClass = input(player, "Class?") in list("Light", "Medium", "Heavy")
-					switch(input(player, "Custom Icon?") in list("Yes", "No"))
+					MSBuff.SwordClass = Ask(player, "Class?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
+					switch(Ask(player, "Custom Icon?", "", null, "pick", list("Yes", "No"), 0))
 						if("Yes")
 							MSBuff.SwordIcon = input(player, "Icon?") as icon
-							MSBuff.SwordX = input(player, "X?")
-							MSBuff.SwordY = input(player, "Y?")
+							MSBuff.SwordX = Ask(player, "X?", "", null, "text", null, 0)
+							MSBuff.SwordY = Ask(player, "Y?", "", null, "text", null, 0)
 						if("No")
 							MSBuff.SwordIcon = 'LightsaberRed.dmi'
 							MSBuff.SwordX=-32
@@ -6878,13 +6882,13 @@ NEW VARIABLES
 				if(!usr.BuffOn(src))
 					while(src.Mastery<usr.AscensionsAcquired)
 						if(src.Mastery<=1)
-							switch(input("What type of armament would you like your Devil Arm ([src.Mastery]) to be?") in list("Sword","Staff","Armor"))
+							switch(Ask(usr, "What type of armament would you like your Devil Arm ([src.Mastery]) to be?", "", null, "pick", list("Sword","Staff","Armor"), 0))
 								if("Sword")
 									MakesSword=1
 									MakesArmor=0
 									MakesStaff=0
-									SwordName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of weapon do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Saber", "Longsword", "Greatsword")
+									SwordName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of weapon do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Saber", "Longsword", "Greatsword"), 0)
 									switch(Choice)
 										if("Saber")
 											src.SwordClass="Light"
@@ -6897,8 +6901,8 @@ NEW VARIABLES
 									MakesStaff=1
 									MakesArmor=0
 									MakesSword=0
-									StaffName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of staff do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Wand", "Rod", "Staff")
+									StaffName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of staff do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Wand", "Rod", "Staff"), 0)
 									switch(Choice)
 										if("Wand")
 											src.StaffClass="Wand"
@@ -6911,8 +6915,8 @@ NEW VARIABLES
 									MakesArmor=1
 									MakesSword=0
 									MakesStaff=0
-									ArmorName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of armor do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Light", "Medium", "Heavy")
+									ArmorName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of armor do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Light", "Medium", "Heavy"), 0)
 									switch(Choice)
 										if("Light")
 											src.ArmorClass="Light"
@@ -6921,7 +6925,7 @@ NEW VARIABLES
 										if("Heavy")
 											src.ArmorClass="Heavy"
 									usr << "Devil Arm armor class set as [Choice]!"
-							var/Element=input("What element would you like your Devil Arm to use?") in list("Water","Fire","Wind","Earth")
+							var/Element=Ask(usr, "What element would you like your Devil Arm to use?", "", null, "pick", list("Water","Fire","Wind","Earth"), 0)
 							if(MakesSword)
 								SwordElement = Element
 							else if(MakesStaff)
@@ -6929,11 +6933,11 @@ NEW VARIABLES
 							else if(MakesArmor)
 								ArmorElement = Element
 							usr << "Devil Armor element set as [Element]"
-							var/Lock=alert(usr, "Do you wish to alter the icon used?", "Devil Arm Icon", "No", "Yes")
+							var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Devil Arm Icon", null, "confirm", null, 1, "No", "Yes")
 							if(Lock=="Yes")
 								var dIcon=input(usr, "What icon will your Devil Arm uses?", "Devil Arm Icon") as icon|null
-								var dX=input(usr, "Pixel X offset.", "Devil Arm Icon") as num
-								var dY=input(usr, "Pixel Y offset.", "Devil Arm Icon") as num
+								var dX=Ask(usr, "Pixel X offset.", "Devil Arm Icon", null, "num", null, 0)
+								var dY=Ask(usr, "Pixel Y offset.", "Devil Arm Icon", null, "num", null, 0)
 								if(MakesSword)
 									SwordIcon = dIcon
 									SwordX= dX
@@ -6956,14 +6960,14 @@ NEW VARIABLES
 						src.Mastery++
 						if(src.Mastery==2)
 							if(src.MakesSword)
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either empowering its reach or infusing its slices with your mystic power.", "Devil Arm", "Extend", "Emit")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either empowering its reach or infusing its slices with your mystic power.", "Devil Arm", null, "confirm", null, 1, "Extend", "Emit")
 								if(Enhancement=="Extend")
 									passives["Extend"] = 1
 									src.Extend=1
 								if(Enhancement=="Emit")
 									src.SummonSwordVisual=1
 							if(src.MakesStaff)
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", "Speed", "Sustain")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", null, "confirm", null, 1, "Speed", "Sustain")
 								if(Enhancement=="Speed")
 									passives["QuickCast"] = 2
 									passives["TechniqueMastery"] = 5
@@ -6974,7 +6978,7 @@ NEW VARIABLES
 									src.ManaHeal=2
 									src.CapacityHeal=0.02
 							if(src.MakesArmor)
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", "Fortress", "Fierce")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", null, "confirm", null, 1, "Fortress", "Fierce")
 								if(Enhancement=="Fortress")
 									passives["Juggernaut"] = 1
 									src.Juggernaut=1
@@ -6985,7 +6989,7 @@ NEW VARIABLES
 									src.Godspeed=1
 						if(src.Mastery==3)
 							if(src.MakesSword)
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to deal even more pain to your opponent's body or spirit.", "Devil Arm", "Carve", "Corrupt")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to deal even more pain to your opponent's body or spirit.", "Devil Arm", null, "confirm", null, 1, "Carve", "Corrupt")
 								if(Enhancement=="Carve")
 									passives["HardStyle"] = 2
 									src.HardStyle=2
@@ -6993,12 +6997,12 @@ NEW VARIABLES
 									passives["SoftStyle"] = 2
 									src.SoftStyle=2
 							if(src.MakesStaff)
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", null, "confirm", null, 1, "Soulfire")
 								if(Enhancement=="Soulfire")
 									passives["SoulFire"] = 1
 									src.SoulFire=1
 							if(src.MakesArmor)
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", "Riposte", "Repel")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", null, "confirm", null, 1, "Riposte", "Repel")
 								if(Enhancement=="Riposte")
 									passives["CounterMaster"] = 2
 									src.CounterMaster=2
@@ -7012,12 +7016,12 @@ NEW VARIABLES
 							if(MakesSword) optionsList -= "Sword"
 							if(MakesArmor) optionsList -= "Armor"
 							if(MakesStaff) optionsList -= "Staff"
-							switch(input("What type of armament would you like your second Devil Arm to be?") in optionsList)
+							switch(Ask(usr, "What type of armament would you like your second Devil Arm to be?", "", null, "pick", optionsList, 0))
 								if("Sword")
 									MakesSword=1
 									secondDevilArmPick = "Sword"
-									SwordName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of weapon do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Saber", "Longsword", "Greatsword")
+									SwordName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of weapon do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Saber", "Longsword", "Greatsword"), 0)
 									switch(Choice)
 										if("Saber")
 											src.SwordClass="Light"
@@ -7029,8 +7033,8 @@ NEW VARIABLES
 								if("Staff")
 									MakesStaff=1
 									secondDevilArmPick = "Staff"
-									StaffName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of staff do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Wand", "Rod", "Staff")
+									StaffName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of staff do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Wand", "Rod", "Staff"), 0)
 									switch(Choice)
 										if("Wand")
 											src.StaffClass="Wand"
@@ -7042,8 +7046,8 @@ NEW VARIABLES
 								if("Armor")
 									MakesArmor=1
 									secondDevilArmPick = "Armor"
-									ArmorName=input(usr, "What will it be named?", "Transfigure Devil Arm") as text|null
-									Choice=input(usr, "What class of armor do you want your Devil Arm to be?", "Transfigure Devil Arm") in list("Light", "Medium", "Heavy")
+									ArmorName=Ask(usr, "What will it be named?", "Transfigure Devil Arm", null, "text", null, 1)
+									Choice=Ask(usr, "What class of armor do you want your Devil Arm to be?", "Transfigure Devil Arm", null, "pick", list("Light", "Medium", "Heavy"), 0)
 									switch(Choice)
 										if("Light")
 											src.ArmorClass="Light"
@@ -7053,14 +7057,14 @@ NEW VARIABLES
 											src.ArmorClass="Heavy"
 									usr << "Devil Arm armor class set as [Choice]!"
 							if(secondDevilArmPick=="Sword")
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either empowering its reach or infusing its slices with your mystic power.", "Devil Arm", "Extend", "Emit")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either empowering its reach or infusing its slices with your mystic power.", "Devil Arm", null, "confirm", null, 1, "Extend", "Emit")
 								if(Enhancement=="Extend")
 									passives["Extend"] = 1
 									src.Extend=1
 								if(Enhancement=="Emit")
 									src.SummonSwordVisual=1
 							if(secondDevilArmPick=="Staff")
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", "Speed", "Sustain")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either reinforcing its casting speed or making it an inexhaustible source of mana.", "Devil Arm", null, "confirm", null, 1, "Speed", "Sustain")
 								if(Enhancement=="Speed")
 									passives["QuickCast"] = 2
 									passives["TechniqueMastery"] = 5
@@ -7071,7 +7075,7 @@ NEW VARIABLES
 									src.ManaHeal=2
 									src.CapacityHeal=0.02
 							if(secondDevilArmPick=="Armor")
-								var/Enhancement=alert(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", "Fortress", "Fierce")
+								var/Enhancement=Ask(usr, "You can now coat your weapon with your demonic miasma, either turning yourself into an wicked juggernaut or a frenzied striker.", "Devil Arm", null, "confirm", null, 1, "Fortress", "Fierce")
 								if(Enhancement=="Fortress")
 									passives["Juggernaut"] = 1
 									src.Juggernaut=1
@@ -7082,7 +7086,7 @@ NEW VARIABLES
 									src.Godspeed=1
 						if(Mastery==5)
 							if(secondDevilArmPick=="Sword")
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to deal even more pain to your opponent's body or spirit.", "Devil Arm", "Carve", "Corrupt")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to deal even more pain to your opponent's body or spirit.", "Devil Arm", null, "confirm", null, 1, "Carve", "Corrupt")
 								if(Enhancement=="Carve")
 									passives["HardStyle"] = 2
 									src.HardStyle=2
@@ -7090,12 +7094,12 @@ NEW VARIABLES
 									passives["SoftStyle"] = 2
 									src.SoftStyle=2
 							if(secondDevilArmPick=="Staff")
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", "Soulfire")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to burn away lifeforce from people you strike or dismantle and absorb their own spiritual attacks.", "Devil Arm", null, "confirm", null, 1, "Soulfire")
 								if(Enhancement=="Soulfire")
 									passives["SoulFire"] = 1
 									src.SoulFire=1
 							if(secondDevilArmPick=="Armor")
-								var/Enhancement=alert(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", "Riposte", "Repel")
+								var/Enhancement=Ask(usr, "The miasma infusing your weapon thickens, allowing you to swiftly counter all manner of attacks or simply march through weaker ones.", "Devil Arm", null, "confirm", null, 1, "Riposte", "Repel")
 								if(Enhancement=="Riposte")
 									passives["CounterMaster"] = 2
 									src.CounterMaster=2
@@ -7230,12 +7234,12 @@ NEW VARIABLES
 				set hidden = 1
 				var/Choice
 				if(!usr.BuffOn(src))
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						src.StaffIcon=input(usr, "What icon will your Spirit Bow use?", "Spirit Bow Icon") as icon|null
-						src.StaffX=input(usr, "Pixel X offset.", "Spirit Bow Icon") as num
-						src.StaffY=input(usr, "Pixel Y offset.", "Spirit Bow Icon") as num
-					Choice=input(usr, "What class of bow do you want your Spirit Bow to be?", "Transfigure Spirit Bow") in list("Short", "Recurve", "Long")
+						src.StaffX=Ask(usr, "Pixel X offset.", "Spirit Bow Icon", null, "num", null, 0)
+						src.StaffY=Ask(usr, "Pixel Y offset.", "Spirit Bow Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of bow do you want your Spirit Bow to be?", "Transfigure Spirit Bow", null, "pick", list("Short", "Recurve", "Long"), 0)
 					switch(Choice)
 						if("Short")
 							src.StaffClass="Wand"
@@ -7283,25 +7287,25 @@ NEW VARIABLES
 					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in usr) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in usr) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Acrobat) in usr))
 						var/list/options = list("Primary","Secondary")
 						if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in usr)) options += "Tertiary"
-						switch(input("Which sword would you like to modify?") in options)
+						switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 							if("Secondary") modify_sword_num=2
 							if("Tertiary") modify_sword_num=3
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						switch(modify_sword_num)
 							if(1)
 								src.SwordIcon=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordX=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordY=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordX=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordY=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(2)
 								src.SwordIconSecond=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordXSecond=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYSecond=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordXSecond=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYSecond=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(3)
 								src.SwordIconThird=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordXThird=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYThird=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
-					Choice=input(usr, "What class of blade do you want your Spirit Sword to be?", "Transfigure Spirit Sword") in list("Blunt", "Saber", "Longsword", "Greatsword")
+								src.SwordXThird=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYThird=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of blade do you want your Spirit Sword to be?", "Transfigure Spirit Sword", null, "pick", list("Blunt", "Saber", "Longsword", "Greatsword"), 0)
 					switch(Choice)
 						if("Blunt")
 							switch(modify_sword_num)
@@ -7346,25 +7350,25 @@ NEW VARIABLES
 					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in src) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src))
 						var/list/options = list("Primary","Secondary")
 						if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src)) options += "Tertiary"
-						switch(input("Which sword would you like to modify?") in options)
+						switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 							if("Secondary") modify_sword_num=2
 							if("Tertiary") modify_sword_num=3
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						switch(modify_sword_num)
 							if(1)
 								src.SwordIcon=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordX=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordY=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordX=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordY=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(2)
 								src.SwordIconSecond=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordXSecond=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYSecond=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
+								src.SwordXSecond=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYSecond=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
 							if(3)
 								src.SwordIconThird=input(usr, "What icon will your Spirit Sword use?", "Spirit Sword Icon") as icon|null
-								src.SwordXThird=input(usr, "Pixel X offset.", "Spirit Sword Icon") as num
-								src.SwordYThird=input(usr, "Pixel Y offset.", "Spirit Sword Icon") as num
-					Choice=input(usr, "What class of blade do you want your Spirit Sword to be?", "Transfigure Spirit Sword") in list("Blunt", "Saber", "Longsword", "Greatsword")
+								src.SwordXThird=Ask(usr, "Pixel X offset.", "Spirit Sword Icon", null, "num", null, 0)
+								src.SwordYThird=Ask(usr, "Pixel Y offset.", "Spirit Sword Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of blade do you want your Spirit Sword to be?", "Transfigure Spirit Sword", null, "pick", list("Blunt", "Saber", "Longsword", "Greatsword"), 0)
 					switch(Choice)
 						if("Blunt")
 							switch(modify_sword_num)
@@ -7410,22 +7414,22 @@ NEW VARIABLES
 			OffMessage="drops the bass..."
 			verb/Pick_Instrument()
 				set category="Skills"
-				var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+				var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 				if(Lock=="Yes")
 					src.SwordIcon=input(usr, "What icon will your instrument use?", "Instrument Icon") as icon|null
-					src.SwordX=input(usr, "Pixel X offset.", "Instrument Icon") as num
-					src.SwordY=input(usr, "Pixel Y offset.", "Instrument Icon") as num
+					src.SwordX=Ask(usr, "Pixel X offset.", "Instrument Icon", null, "num", null, 0)
+					src.SwordY=Ask(usr, "Pixel Y offset.", "Instrument Icon", null, "num", null, 0)
 				var/Choice
 				var/Confirm
 				while(Confirm!="Yes")
-					Choice=input("Pick a type.") in list ("Acoustic", "Electric", "Bass")
+					Choice=Ask(usr, "Pick a type.", "", null, "pick", list ("Acoustic", "Electric", "Bass"), 0)
 					switch(Choice)
 						if("Acoustic")
-							Confirm=alert(usr, "Riffs from an acoustic guitar are subtle, but precise in reaching the crowd. Is it your choice?", "Instrument Type", "Yes", "No")
+							Confirm=Ask(usr, "Riffs from an acoustic guitar are subtle, but precise in reaching the crowd. Is it your choice?", "Instrument Type", null, "confirm", null, 1, "Yes", "No")
 						if("Electric")
-							Confirm=alert(usr, "Riffs from an electric guitar are powerful and quick, but harder to control. Is it your choice?", "Instrument Type", "Yes", "No")
+							Confirm=Ask(usr, "Riffs from an electric guitar are powerful and quick, but harder to control. Is it your choice?", "Instrument Type", null, "confirm", null, 1, "Yes", "No")
 						if("Bass")
-							Confirm=alert(usr, "Riffs from a bass guitar are heavy, but easy to miss by most audiences. Is it your choice?", "Instrument Type", "Yes", "No")
+							Confirm=Ask(usr, "Riffs from a bass guitar are heavy, but easy to miss by most audiences. Is it your choice?", "Instrument Type", null, "confirm", null, 1, "Yes", "No")
 				switch(Choice)
 					if("Acoustic")
 						src.SwordClass="Light"
@@ -7691,7 +7695,7 @@ NEW VARIABLES
 				set category="Skills"
 				if(!usr.BuffOn(src))
 					var/list/Options=list("Sword", "Dual Swords", "Spear")
-					var/Choice=input(usr, "What legendary artifact do you draw?", "Libra Armory") in Options
+					var/Choice=Ask(usr, "What legendary artifact do you draw?", "Libra Armory", null, "pick", Options, 0)
 					switch(Choice)
 						if("Sword")
 							MakesSword=1
@@ -7825,10 +7829,10 @@ NEW VARIABLES
 						Chains.Add(usr.Keychains)
 					if(Chains.len<2)
 						return
-					var/Choice=input(usr, "What keychain are you equipping?", "Attach Keychain") in Chains
+					var/Choice=Ask(usr, "What keychain are you equipping?", "Attach Keychain", null, "pick", Chains, 0)
 					var/KeySlot="Main"
 					if(locate(/obj/Skills/Buffs/SpecialBuffs/Valor_Form, usr)||locate(/obj/Skills/Buffs/SpecialBuffs/Master_Form, usr)||locate(/obj/Skills/Buffs/SlotlessBuffs/SyncBlade, usr))
-						KeySlot=alert(usr, "Which Keyblade are you setting this keychain to?", "Attach Keychain", "Main", "Sync")
+						KeySlot=Ask(usr, "Which Keyblade are you setting this keychain to?", "Attach Keychain", null, "confirm", null, 1, "Main", "Sync")
 					if(KeySlot=="Main")
 						usr.KeychainAttached=Choice
 						usr << "[Choice] set to keyblade!"
@@ -8080,10 +8084,10 @@ NEW VARIABLES
 			verb/Customize_Projects()
 				set category = "Other"
 				set hidden = 1
-				var/choice = input(usr, "What icon?") in list("wooden","light","med","heavy")
+				var/choice = Ask(usr, "What icon?", "", null, "pick", list("wooden","light","med","heavy"), 0)
 				vars["[choice]_icon"] = input(usr, "selecting icon for [choice]") as icon|null
-				vars["[choice]_x"] = input(usr, "WHAT X") as num
-				vars["[choice]_y"] = input(usr, "WHAT Y") as num
+				vars["[choice]_x"] = Ask(usr, "WHAT X", "", null, "num", null, 0)
+				vars["[choice]_y"] = Ask(usr, "WHAT Y", "", null, "num", null, 0)
 			verb/Projection()
 				set category="Skills"
 				if(!usr.getAriaCount())
@@ -8615,12 +8619,12 @@ NEW VARIABLES
 			verb/Modify_Armament()
 				set category="Skills"
 				src.SwordIcon=input(usr, "What icon will your Will Knife use?", "Will Knife Icon") as icon|null
-				src.SwordX=input(usr, "Pixel X offset.", "Will Knife Icon") as num
-				src.SwordY=input(usr, "Pixel Y offset.", "Will Knife Icon") as num
-				src.SwordClass=input(usr, "What class will your Will Knife be?", "Will Knife Icon") in list("Heavy", "Medium", "Light", "Wooden")
+				src.SwordX=Ask(usr, "Pixel X offset.", "Will Knife Icon", null, "num", null, 0)
+				src.SwordY=Ask(usr, "Pixel Y offset.", "Will Knife Icon", null, "num", null, 0)
+				src.SwordClass=Ask(usr, "What class will your Will Knife be?", "Will Knife Icon", null, "pick", list("Heavy", "Medium", "Light", "Wooden"), 0)
 				saved_icon = input(usr, "What do you want your unarmed variant icon to be?") as icon|null
-				LockX = input(usr, "Pixel X offset.", "Unarmed Variant Icon") as num
-				LockY = input(usr, "Pixel Y offset.", "Unarmed Variant Icon") as num
+				LockX = Ask(usr, "Pixel X offset.", "Unarmed Variant Icon", null, "num", null, 0)
+				LockY = Ask(usr, "Pixel Y offset.", "Unarmed Variant Icon", null, "num", null, 0)
 			verb/Audacious_Bravery_Armament()
 				set category="Skills"
 				if(!usr.BuffOn(src))
@@ -9340,7 +9344,7 @@ NEW VARIABLES
 
 					if(category == "Money")
 						amtNeeded = moneyMax - (currentStock / 100 * moneyMax);
-						amt = input(usr, "How much money are you going to sacrifice? You have [currentStock]% of your Resource Stock charged right now.") as num|null;
+						amt = Ask(usr, "How much money are you going to sacrifice? You have [currentStock]% of your Resource Stock charged right now.", "", null, "num", null, 1);
 
 						if(!amt || amt <= 0)
 							src.Using=0;
@@ -9360,7 +9364,7 @@ NEW VARIABLES
 
 					if(category == "Mineral")
 						amtNeeded = mineralMax - (currentStock / 100 * mineralMax);
-						amt = input(usr, "How many minerals are you going to sacrifice? You have [currentStock]% of your Resource Stock charged right now.") as num|null;
+						amt = Ask(usr, "How many minerals are you going to sacrifice? You have [currentStock]% of your Resource Stock charged right now.", "", null, "num", null, 1);
 
 						if(!amt || amt <= 0)
 							src.Using=0;
@@ -9386,9 +9390,9 @@ NEW VARIABLES
 					set category = "Secret"
 					IconTransform=input(usr, "What icon will your True Form use?", "True Form Icon") as icon|null
 					if(IconTransform)
-						TransformX=input(usr, "Pixel X offset.", "True Form Icon") as num
-						TransformY=input(usr, "Pixel Y offset.", "True Form Icon") as num
-					NameFake = input(usr, "What will your name be while in True Form?", "True Form Icon") as text
+						TransformX=Ask(usr, "Pixel X offset.", "True Form Icon", null, "num", null, 0)
+						TransformY=Ask(usr, "Pixel Y offset.", "True Form Icon", null, "num", null, 0)
+					NameFake = Ask(usr, "What will your name be while in True Form?", "True Form Icon", null, "text", null, 0)
 					HairLock = input(usr, "What will your hair look like while in True Form?", "True Form Icon") as icon|null
 				verb/Customize_Eldritch_Minion()
 					set category= "Secret"
@@ -9400,8 +9404,8 @@ NEW VARIABLES
 						src.MinionY=0;
 						usr << "Eldritch Minion Icon reset to default."
 						return;
-					src.MinionX = input(usr, "What x offset does your eldritch minion use?", "Eldritch Minion Offset X") as num|null;
-					src.MinionY = input(usr, "What y offset does your eldritch minion use?", "Eldritch Minion Offset Y") as num|null;
+					src.MinionX = Ask(usr, "What x offset does your eldritch minion use?", "Eldritch Minion Offset X", null, "num", null, 1);
+					src.MinionY = Ask(usr, "What y offset does your eldritch minion use?", "Eldritch Minion Offset Y", null, "num", null, 1);
 
 				verb/Customize_Nightmare_Form()
 					set category="Secret"
@@ -9414,8 +9418,8 @@ NEW VARIABLES
 						src.NightmareY = NIGHTMARE_FORM_DEFAULT_Y;
 						usr << "Your Nightmare Form has been reset to the default."
 						return;
-					src.NightmareX = input(usr, "What x offset does your nightmare form use?", "Nightmare Form Offset X") as num|null;
-					src.NightmareY = input(usr, "What y offset does your nightmare form use?", "Nightmare Form Offset Y") as num|null;
+					src.NightmareX = Ask(usr, "What x offset does your nightmare form use?", "Nightmare Form Offset X", null, "num", null, 1);
+					src.NightmareY = Ask(usr, "What y offset does your nightmare form use?", "Nightmare Form Offset Y", null, "num", null, 1);
 
 				verb/Preview_Nightmare_Form()
 					set category="Secret"
@@ -12229,7 +12233,7 @@ mob
 					src.SpecialBuff.passives["LifeGeneration"] = src.SpecialBuff.Mastery*0.25
 					src.SpecialBuff.LifeGeneration=(src.SpecialBuff.Mastery*0.25)
 					if(!src.JinchuuType)
-						src.JinchuuType=input(src,"Choose your Jinchuuriki type!","Jinchuuriki Type") in list("Tyrant", "Catastrophe", "Dominator", "Juggernaut")
+						src.JinchuuType=Ask(src, "Choose your Jinchuuriki type!", "Jinchuuriki Type", null, "pick", list("Tyrant", "Catastrophe", "Dominator", "Juggernaut"), 0)
 					switch(JinchuuType)
 						if("Tyrant")
 							src.SpecialBuff.StrMult=2

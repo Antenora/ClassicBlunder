@@ -269,8 +269,10 @@ proc/SeedForageNodes()
 		sleep(-1)
 	world.log << "//\[info]: Seeded [seeded] foraging nodes."
 
-mob/Admin4/verb/makeForageNode(id as text)
+mob/Admin4/verb/makeForageNode()
 	set category = "Admin"
+	var/id = PromptArgValue(usr, args, 1, "makeForageNode", "text")
+	if(isnull(id)) return
 	InitLifePlantDefs()
 	if(!LifePlantDefs[id])
 		src << "No such plant. Valid: [jointext(LifePlantDefs, ", ")]"

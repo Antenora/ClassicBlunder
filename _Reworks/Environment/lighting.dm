@@ -1184,7 +1184,7 @@ proc/_LightRefreshWorker()
 	if(!glob.LIGHTING)
 		src << "Lighting is OFF - toggle it on first (Lighting Toggle)."
 		return
-	var/r = input(src, "Light radius (tiles, 1-20)?") as num|null
+	var/r = Ask(src, "Light radius (tiles, 1-20)?", "", null, "num", null, 1)
 	if(isnull(r)) return
 	var/datum/lightsource/L = AddLightSource(get_turf(src), r, glob.LIGHT_DEFAULT_COLOR, glob.LIGHT_MAX_ALPHA)
 	src << "Placed a light (radius [L ? L.radius : "?"]) at your feet."
@@ -1248,7 +1248,7 @@ proc/_ProbeStamps(obj/O)
 /mob/Admin2/verb/Light_Fill_Set()
 	set category = "Admin"
 	set name = "Light Fill Set"
-	var/f = input(src, "Indirect fill level 0-0.5 (current [glob.LIGHT_FILL]; 0 = off, 0.16 default)?") as num|null
+	var/f = Ask(src, "Indirect fill level 0-0.5 (current [glob.LIGHT_FILL]; 0 = off, 0.16 default)?", "", null, "num", null, 1)
 	if(f == null) return
 	glob.LIGHT_FILL = clamp(f, 0, 0.5)
 	if(glob.LIGHTING) LightingApplyAll()
@@ -1319,7 +1319,7 @@ proc/_ProbeStamps(obj/O)
 	if(!nearby.len)
 		src << "No props in view."
 		return
-	var/obj/O = input(src, "Toggle emissive on:") as null|anything in nearby
+	var/obj/O = Ask(src, "Toggle emissive on:", "", null, "pick", nearby, 1)
 	if(!O) return
 	if(O.attached_emissive)
 		FxEmissiveDetach(O)

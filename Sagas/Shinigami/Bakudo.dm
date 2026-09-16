@@ -290,7 +290,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 		set hidden = 1
 		var/mob/User = usr
 		var/has_spirit_power = User.passive_handler.Get("SpiritPower")
-		var/mode = input(User, "How would you like to use Tenteikura?", "Tenteikura") as null|anything in list("Direct", "Broadcast")
+		var/mode = Ask(User, "How would you like to use Tenteikura?", "Tenteikura", null, "pick", list("Direct", "Broadcast"), 1)
 		if(!mode) return
 		if(mode == "Direct")
 			var/list/who = list()
@@ -303,9 +303,9 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 			if(!who.len)
 				User << "You have no known energy signatures to contact directly."
 				return
-			var/mob/Players/selector = input(User, "Choose a recipient:", "Tenteikura Direct") as null|anything in who
+			var/mob/Players/selector = Ask(User, "Choose a recipient:", "Tenteikura Direct", null, "pick", who, 1)
 			if(!selector) return
-			var/msg = input(User, "What do you want to say to [selector]?", "Tenteikura Direct") as text|null
+			var/msg = Ask(User, "What do you want to say to [selector]?", "Tenteikura Direct", null, "text", null, 1)
 			if(!msg || !length(msg)) return
 			Log(selector.ChatLog(),"(Tenteikura from [User] to [selector]): [msg]")
 			Log(User.ChatLog(),"(Tenteikura from [User] to [selector]): [msg]")
@@ -325,9 +325,9 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 					if(!M.EnergySignature) continue
 					if(!(M.EnergySignature in User.EnergySignaturesKnown)) continue
 				plane_targets += M
-			var/mob/Players/anchor = input(User, "Select a target to broadcast to their plane (select yourself for your own plane):", "Tenteikura Broadcast") as null|anything in plane_targets
+			var/mob/Players/anchor = Ask(User, "Select a target to broadcast to their plane (select yourself for your own plane):", "Tenteikura Broadcast", null, "pick", plane_targets, 1)
 			if(!anchor) return
-			var/msg = input(User, "Transmit a message to all presences on that plane:", "Tenteikura Broadcast") as text|null
+			var/msg = Ask(User, "Transmit a message to all presences on that plane:", "Tenteikura Broadcast", null, "text", null, 1)
 			if(!msg || !length(msg)) return
 			OMsg(User, "<b>[User] broadcasts telepathically with Bakudō #77: Tenteikura!</b>")
 			for(var/mob/Players/M in players)

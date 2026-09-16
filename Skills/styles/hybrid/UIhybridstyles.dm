@@ -31,13 +31,13 @@ obj/Skills/Buffs/NuStyle/UIHybridStyles// ~~ Angel-taught advanced forms ~~ not 
 			set category = "Utility"
 			set hidden = 1
 			if(!usr.BuffOn(src))
-				var/classChoice = input(usr, "Choose your preferred sword type.") in list("Light", "Medium", "Heavy")
+				var/classChoice = Ask(usr, "Choose your preferred sword type.", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
 				SwordClass = classChoice
-				var/changeIcon = alert(usr, "Would you like to customize your sword icon?", "Instinct Blade", "Yes", "No")
+				var/changeIcon = Ask(usr, "Would you like to customize your sword icon?", "Instinct Blade", null, "confirm", null, 1, "Yes", "No")
 				if(changeIcon == "Yes")
 					SwordIcon = input(usr, "Select an icon for your Instinct Blade.") as icon|null
-					src.SwordX = input(usr, "Pixel X offset.") as num
-					src.SwordY = input(usr, "Pixel Y offset.") as num
+					src.SwordX = Ask(usr, "Pixel X offset.", "", null, "num", null, 0)
+					src.SwordY = Ask(usr, "Pixel Y offset.", "", null, "num", null, 0)
 				usr << "Your instincts favor a [SwordClass]-class weapon."
 			else
 				usr << "You cannot attune your blade while Ultra Instinct Sword is active."

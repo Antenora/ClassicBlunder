@@ -191,7 +191,7 @@ ascension
 			if(!choices) return
 			if(choices.len == 0 || choiceSelected || pickingChoice) return
 			pickingChoice = TRUE
-			var/selected = input(owner, choiceMessage, choiceTitle) in choices
+			var/selected = Ask(owner, choiceMessage, choiceTitle, null, "pick", choices, 0)
 			choiceSelected = choices[selected]
 			pickingChoice = FALSE
 
@@ -307,9 +307,11 @@ ascension
 					AscPassives[p] = (isnum(AscPassives[p]) ? AscPassives[p] : 0) + add
 	return AscPassives
 
-/mob/Admin2/verb/Preview_Ascensions(mob/Players/p in players)
+/mob/Admin2/verb/Preview_Ascensions()
 	set category = "Admin"
 	set name = "Preview Ascensions"
+	var/mob/Players/p = PromptArg(usr, args, 1, "Preview Ascensions", "players")
+	if(isnull(p)) return
 	if(!p || !p.race)
 		src << "That player has no race set."
 		return
@@ -322,41 +324,28 @@ ascension
 	if(ca >= maxTarget)
 		src << "[p] is already at max ascension ([ca]/[maxTarget])."
 		return
-	var/ta = input(src, "Preview ascensions for [p.key] up to which level? (current: [ca], max: [maxTarget])", "Preview Ascensions", maxTarget) as num|null
+	var/ta = Ask(src, "Preview ascensions for [p.key] up to which level? (current: [ca], max: [maxTarget])", "Preview Ascensions", maxTarget, "num", null, 1)
 	if(isnull(ta)) return
 	ta = round(ta)
 	ta = max(ta, ca + 1)
 	ta = min(ta, maxTarget)
 
 	var/list/statNames = list("Power","Strength","Endurance","Force","Offense","Defense","Speed","Recovery","Intellect","Imagination","Anger","RPP","Economy","Piloting","Cyberize","EnhanceChips")
-	var/html = "<html><head><title>Ascension Preview - [p.key]</title></head><body bgcolor=#111122 text=#e0e0e0 style='font-family:Calibri,sans-serif;font-size:10pt;padding:8px'>"
-	html += "<h2 style='color:#fff;border-bottom:1px solid #444;padding-bottom:4px'>[p.key] &mdash; [p.race.name]</h2>"
-	html += "<p>Class: <b>[p.Class ? p.Class : "None"]</b><br>"
-	html += "Current Ascension: <b>[ca]</b> &nbsp;|&nbsp; Preview Target: <b>[ta]</b></p>"
-
-	html += "<h3 style='color:#ffd54f;margin-top:12px'>Stat gains (from asc [ca+1] through asc [ta])</h3>"
-	html += "<table border=0 cellpadding=4 cellspacing=0 style='background:#1a1a2e;width:100%'>"
+	var/list/rows = list()
+	rows[++rows.len] = list("sec" = "STAT GAINS (ASC [ca+1] THROUGH [ta])")
 	var/anyStat = 0
 	for(var/statName in statNames)
 		var/gain = p.PullAscensionStats(ca, ta, statName)
 		if(gain == 0) continue
 		anyStat = 1
-		html += "<tr><td style='border-bottom:1px solid #222;color:#aaa'>[statName]</td><td style='border-bottom:1px solid #222;color:#8fd'><b>+[gain]</b></td></tr>"
+		rows[++rows.len] = list("t" = "[statName]", "c" = list("+[gain]"))
 	if(!anyStat)
-		html += "<tr><td colspan=2 style='color:#888;font-style:italic'>No static stat gains detected in this range.</td></tr>"
-	html += "</table>"
-
-	html += "<h3 style='color:#ffd54f;margin-top:12px'>Passives (aggregated)</h3>"
+		rows[++rows.len] = list("t" = "No static stat gains detected in this range.")
+	rows[++rows.len] = list("sec" = "PASSIVES (AGGREGATED)")
 	var/list/passiveGains = p.PullAscensionPassives(ca, ta)
 	if(!islist(passiveGains) || !passiveGains.len)
-		html += "<p style='color:#888;font-style:italic'>No passives in this range.</p>"
+		rows[++rows.len] = list("t" = "No passives in this range.")
 	else
-		html += "<table border=0 cellpadding=4 cellspacing=0 style='background:#1a1a2e;width:100%'>"
 		for(var/passiveName in passiveGains)
-			var/val = passiveGains[passiveName]
-			html += "<tr><td style='border-bottom:1px solid #222;color:#aaa'>[passiveName]</td><td style='border-bottom:1px solid #222;color:#8fd'><b>+[val]</b></td></tr>"
-		html += "</table>"
-
-	html += "<p style='color:#666;font-size:8pt;margin-top:14px'>Read-only preview. Nothing has been applied to [p.key].</p>"
-	html += "</body></html>"
-	src << browse(html, "window=ascpreview_[p.key];size=520x560;can_resize=1")
+			rows[++rows.len] = list("t" = "[passiveName]", "c" = list("+[passiveGains[passiveName]]"))
+	client?.TableShow("ascpreview:\ref[p]", "ASCENSION", "[p.key]", "[p.race.name] - Class: [p.Class ? p.Class : "None"] - ascension [ca] to [ta] - read-only", list(list("l" = "GAIN", "a" = "l"), list("l" = "VALUE", "a" = "r")), rows, "", null, list("nosort" = 1, "nofilter" = 1, "nohead" = 1))

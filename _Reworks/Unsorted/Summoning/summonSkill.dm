@@ -30,11 +30,13 @@ Summon skill
 
 
 
-/mob/Admin3/verb/changeMaxSummon(obj/Skills/Utility/Summon_Entity/se in world)
+/mob/Admin3/verb/changeMaxSummon()
     set name = "Change Max Summon"
+    var/obj/Skills/Utility/Summon_Entity/se = PromptArg(usr, args, 1, "Change Max Summon", "world:/obj/Skills/Utility/Summon_Entity")
+    if(isnull(se)) return
     if(istype(se, /obj/Skills/Devils_Deal))
         usr << "What would you like to change the max summon to?"
-        var/input = input(usr, "Enter a number.") as num
+        var/input = Ask(usr, "Enter a number.", "", null, "num", null, 0)
         if(input > 0)
             se.maxSummons = input
             usr << "You have changed the max summon to [input]."
@@ -169,7 +171,7 @@ Summon skill
     var/list/listofSummon = list()
     for(var/x in contractor)
         listofSummon += contractor[x][1]
-    var/choice = input(usr, "Who would you like to summon?", "Summon") in listofSummon + "Cancel"
+    var/choice = Ask(usr, "Who would you like to summon?", "Summon", null, "pick", (listofSummon + "Cancel"), 0)
     for(var/mob/m in players)
         if(m.name == choice)
             var/obj/Skills/Devils_Deal/dd = m.findDevilsDeal()
@@ -186,7 +188,7 @@ Summon skill
             summoner << "You have already summoned [p] the maximum amount of times!"
             Using=0
             return
-        var/yesno = input(p, "You have been summoned by your contractor: [summoner.name]!.Do you accept?") in list("Yes","No")
+        var/yesno = Ask(p, "You have been summoned by your contractor: [summoner.name]!.Do you accept?", "", null, "pick", list("Yes","No"), 0)
         if(yesno == "No")
             summoner << "[p] has declined your summon!"
             Using=0

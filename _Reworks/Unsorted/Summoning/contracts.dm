@@ -82,7 +82,7 @@ Contract item
     if(!signed)
         usr << "The contract is not signed"
         return
-    switch((input(usr, "Are you sure you want to break the contract? If there are reprecussions they will happen") in list("Yes","No")))
+    switch((Ask(usr, "Are you sure you want to break the contract? If there are reprecussions they will happen", "", null, "pick", list("Yes","No"), 0)))
         if("Yes")
             usr << "You feel a sharp pain in your chest as the contract breaks!"
             for(var/mob/admin in admins)
@@ -106,7 +106,7 @@ Contract item
         p << "The contract is already signed"
         return
     p << "Please write the description of the contract"
-    description = input(p, "Description: ", "What do you want to make the description?") as message
+    description = Ask(p, "Description: ", "What do you want to make the description?", null, "message", null, 0)
 
 /obj/Items/Contract/proc/setGoal(mob/p)
     if(!usable) return
@@ -117,7 +117,7 @@ Contract item
         p << "The contract is already signed"
         return
     p << "Give an ooc summary of the goal of the contract (Say your summoner wants you to beat somebody up or something like that)"
-    goal = input(p, "Goal: ", "What do you want to make the goal?") as message
+    goal = Ask(p, "Goal: ", "What do you want to make the goal?", null, "message", null, 0)
 
 
 

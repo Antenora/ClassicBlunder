@@ -512,8 +512,10 @@ mob/Admin4/verb/ahListings()
 		if(!L) continue
 		src << "#[L.id] [L.seller_name]: [L.Label()] - [L.is_auction ? "bid $[Commas(L.cur_bid ? L.cur_bid : L.start_bid)][L.cur_bidder_name ? " ([L.cur_bidder_name])" : ""]" : "$[Commas(L.price)]"]"
 
-mob/Admin4/verb/ahRemoveListing(id as num)
+mob/Admin4/verb/ahRemoveListing()
 	set category = "Admin"
+	var/id = PromptArgValue(usr, args, 1, "ahRemoveListing", "num")
+	if(isnull(id)) return
 	AuctionHouseLoad()
 	var/datum/ah_listing/L = AuctionHouse.listings["[round(id)]"]
 	if(!L)

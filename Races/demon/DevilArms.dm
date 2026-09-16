@@ -50,7 +50,7 @@
     var/StaffUnderlayStackDT = 0
     var/ArmorUnderlayStackDT = 0
     proc/Input_Underlay_Stack(mob/m)
-        var/n = input(m, "Depth 0–1000: higher = further back.", "Underlay layer") as num|null
+        var/n = Ask(m, "Depth 0–1000: higher = further back.", "Underlay layer", null, "num", null, 1)
         if(isnull(n))
             return 0
         if(n < 0)
@@ -91,26 +91,25 @@
             applyDTIcons(m)
     verb/Examine_Devil_Arm()
         set src in usr
-        var/devilArmDetail = "<html><head><title>Devil Arm Detail ([src.name])</title></head>"
-        devilArmDetail += "<body bgcolor=black text=white><table cellspacing=6%>"
+        var/list/rows = list()
         for(var/p in src.passives)
-            devilArmDetail += "<tr><td><b>[p]</b></td><td>[src.passives[p]]</td></tr>"
-        devilArmDetail += "<tr><td>Main Passives Used: </td><td>[src.totalEvolvesMain]</td></tr>"
+            rows[++rows.len] = list("t" = "[p]", "c" = list("[src.passives[p]]"))
+        rows[++rows.len] = list("sec" = "EVOLUTION")
+        rows[++rows.len] = list("t" = "Main Passives Used", "c" = list("[src.totalEvolvesMain]"))
         if(usr.isRace(DEMON) || usr.isRace(MAKAIOSHIN))
-            devilArmDetail += "<tr><td>Side Passives Used: </td><td>[src.totalEvolvesSecondary]</td></tr>"
-        devilArmDetail += "</table></body></html>"
-        usr << browse(devilArmDetail, "window=DevilArm;size=350x500");
+            rows[++rows.len] = list("t" = "Side Passives Used", "c" = list("[src.totalEvolvesSecondary]"))
+        usr.client?.TableShow("devilarm:\ref[src]", "DEVIL ARM", "[src.name]", "", list(list("l" = "PASSIVE", "a" = "l"), list("l" = "VALUE", "a" = "r")), rows, "", null, list("nosort" = 1, "nofilter" = 1))
 
     verb/Customize_Devil_Arm()
         set src in usr
         var/options = list("Icon", "Name","ActiveMessage", "OffMessage","TextColor")
-        var/thing = input(usr, "What do you want to customize?") in options
+        var/thing = Ask(usr, "What do you want to customize?", "", null, "pick", options, 0)
         if(thing == "Icon")
-            var/armPick = input(usr, "Sword, Staff, or Armor Icon?") in list("Sword","Armor","Staff")
+            var/armPick = Ask(usr, "Sword, Staff, or Armor Icon?", "", null, "pick", list("Sword","Armor","Staff"), 0)
             var/icon/newIcon = input(usr, "Change to what?") as icon|null
             if(isnull(newIcon)) return
-            var/newX = input(usr, "What is the pixel X?") as num
-            var/newY = input(usr, "What is the pixel y?") as num
+            var/newX = Ask(usr, "What is the pixel X?", "", null, "num", null, 0)
+            var/newY = Ask(usr, "What is the pixel y?", "", null, "num", null, 0)
             switch(armPick)
                 if("Sword")
                     SwordIcon = newIcon
@@ -124,14 +123,14 @@
                     ArmorIcon = newIcon
                     ArmorX = newX
                     ArmorY = newY
-            var/editUnder = alert(usr, "Would you like to edit [armPick]'s Underlay icon too?", "Devil Arm Underlay", "Yes", "No")
+            var/editUnder = Ask(usr, "Would you like to edit [armPick]'s Underlay icon too?", "Devil Arm Underlay", null, "confirm", null, 1, "Yes", "No")
             if(editUnder == "Yes")
-                var/underAction = input(usr, "Underlay action?") in list("Set/Change", "Clear", "Keep Existing")
+                var/underAction = Ask(usr, "Underlay action?", "", null, "pick", list("Set/Change", "Clear", "Keep Existing"), 0)
                 if(underAction == "Set/Change")
                     var/icon/newUnder = input(usr, "Set [armPick] Underlay icon to what?") as icon|null
                     if(newUnder)
-                        var/newUnderX = input(usr, "Underlay pixel X offset?") as num
-                        var/newUnderY = input(usr, "Underlay pixel Y offset?") as num
+                        var/newUnderX = Ask(usr, "Underlay pixel X offset?", "", null, "num", null, 0)
+                        var/newUnderY = Ask(usr, "Underlay pixel Y offset?", "", null, "num", null, 0)
                         var/stackTier = Input_Underlay_Stack(usr)
                         switch(armPick)
                             if("Sword")
@@ -169,8 +168,8 @@
                             ArmorUnderlayStack = 0
                     RefreshConjuredArmAfterUnderChange(usr, armPick)
         else if(thing == "Name")
-            var/armPick = input(usr, "Sword, Staff, or Armor Name?") in list("Sword","Armor","Staff")
-            var/newName = input(usr, "Change to what?") as text
+            var/armPick = Ask(usr, "Sword, Staff, or Armor Name?", "", null, "pick", list("Sword","Armor","Staff"), 0)
+            var/newName = Ask(usr, "Change to what?", "", null, "text", null, 0)
             switch(armPick)
                 if("Sword")
                     SwordName = newName
@@ -179,19 +178,19 @@
                 if("Armor")
                     ArmorName = newName
         else if(thing == "TextColor")
-            TextColor = input(usr, "Change to what?") as text
+            TextColor = Ask(usr, "Change to what?", "", null, "text", null, 0)
         else if(thing == "ActiveMessage")
-            ActiveMessage = input(usr, "Change to what?") as message
+            ActiveMessage = Ask(usr, "Change to what?", "", null, "message", null, 0)
         else if(thing == "OffMessage")
-            OffMessage = input(usr, "Change to what?") as message
+            OffMessage = Ask(usr, "Change to what?", "", null, "message", null, 0)
 
     verb/Customize_Devil_Arm_DT()
         set src in usr
-        var/pick = input(usr, "Which Devil Arm Devil Trigger icon?") in list("Sword","Staff","Armor")
+        var/pick = Ask(usr, "Which Devil Arm Devil Trigger icon?", "", null, "pick", list("Sword","Staff","Armor"), 0)
         var/icon/newDtIcon = input(usr, "Set [pick] Devil Trigger icon to what?") as icon|null
         if(isnull(newDtIcon)) return
-        var/newDtX = input(usr, "Pixel X offset?") as num
-        var/newDtY = input(usr, "Pixel Y offset?") as num
+        var/newDtX = Ask(usr, "Pixel X offset?", "", null, "num", null, 0)
+        var/newDtY = Ask(usr, "Pixel Y offset?", "", null, "num", null, 0)
         switch(pick)
             if("Sword")
                 SwordIconDT = newDtIcon
@@ -213,12 +212,12 @@
             if("Armor") if(ArmorIconUnder) baseUnderExists = TRUE
 
         if(baseUnderExists)
-            var/setUnder = input(usr, "[pick] uses an Under icon. Configure Devil Trigger Under icon?") in list("Set/Change", "Clear", "Keep Existing")
+            var/setUnder = Ask(usr, "[pick] uses an Under icon. Configure Devil Trigger Under icon?", "", null, "pick", list("Set/Change", "Clear", "Keep Existing"), 0)
             if(setUnder == "Set/Change")
                 var/icon/newDtUnder = input(usr, "Set [pick] Devil Trigger Under icon to what?") as icon|null
                 if(newDtUnder)
-                    var/newDtUnderX = input(usr, "Under icon pixel X offset?") as num
-                    var/newDtUnderY = input(usr, "Under icon pixel Y offset?") as num
+                    var/newDtUnderX = Ask(usr, "Under icon pixel X offset?", "", null, "num", null, 0)
+                    var/newDtUnderY = Ask(usr, "Under icon pixel Y offset?", "", null, "num", null, 0)
                     var/dtStackTier = Input_Underlay_Stack(usr)
                     switch(pick)
                         if("Sword")
@@ -412,27 +411,27 @@
         if(secondary)
             var/list/choices = list("Staff", "Sword", "Unarmed","Armor");
             choices.Remove(selection);
-            secondDevilArmPick = input(p, "What thing?") in choices;
+            secondDevilArmPick = Ask(p, "What thing?", "", null, "pick", choices, 0);
             select = secondDevilArmPick;
         else
-            selection = input(p, "What thing?") in list("Staff", "Sword", "Unarmed")
+            selection = Ask(p, "What thing?", "", null, "pick", list("Staff", "Sword", "Unarmed"), 0)
             select = selection
         if(select != "Unarmed")
             vars["Makes[select]"] = 1
             if(select=="Sword") MakesSword = 3;
-        vars["[select]Name"] = input(p, "Change name to what?") as text
+        vars["[select]Name"] = Ask(p, "Change name to what?", "", null, "text", null, 0)
         var/class
         if(select != "Unarmed")
             if(select == "Staff")
-                class = input(p, "What thing?") in list("Wand", "Rod", "Staff")
+                class = Ask(p, "What thing?", "", null, "pick", list("Wand", "Rod", "Staff"), 0)
             else
-                class = input(p, "What thing?") in list("Light", "Medium", "Heavy")
+                class = Ask(p, "What thing?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
             vars["[select]Class"] = class
             var/icon/i = input(p, "Set appearance to what?") as icon|null
             if(!i)
                 return
-            var/iconX = input(p, "What is the pixel X?") as num
-            var/iconY = input(p, "What is the pixel y?") as num
+            var/iconX = Ask(p, "What is the pixel X?", "", null, "num", null, 0)
+            var/iconY = Ask(p, "What is the pixel y?", "", null, "num", null, 0)
             switch(select)
                 if("Sword")
                     SwordIcon = i
@@ -452,7 +451,7 @@
         for(var/d in choices)//hopefully remove passives before they fail
             if(!checkPassiveAmt(mainData, d)) choices.Remove(d);
         while(correct == FALSE)
-            var/passive = input(p, "What passive?  [secondary == FALSE ? "Main Branch - [selection] \n([totalEvolvesMain] / [p.race?:devil_arm_upgrades] passives picked)" : "Side Branch - [secondDevilArmPick] \n([totalEvolvesSecondary] / [p.race?:sub_devil_arm_upgrades] passives picked)"]") in choices
+            var/passive = Ask(p, "What passive?  [secondary == FALSE ? "Main Branch - [selection] \n([totalEvolvesMain] / [p.race?:devil_arm_upgrades] passives picked)" : "Side Branch - [secondDevilArmPick] \n([totalEvolvesSecondary] / [p.race?:sub_devil_arm_upgrades] passives picked)"]", "", null, "pick", choices, 0)
             if(attempts >=3)
                 p << "You tried too many times, alert an admin"
                 break

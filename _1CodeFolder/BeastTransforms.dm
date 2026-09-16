@@ -46,7 +46,7 @@
 
 	adjust(mob/p)
 		if(!p.oozaru_type)
-			p.oozaru_type = input(p, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
+			p.oozaru_type = Ask(p, "What type of Oozaru are you?", "", null, "pick", list("Wrathful", "Enlightened", "Instinctual"), 0)
 		passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2, "SaiyanPower1"=0.5)
 		switch(p.oozaru_type)
 			if("Wrathful")
@@ -153,7 +153,7 @@
 mob/proc/Oozaru(Go_Oozaru=1,var/revert, obj/Skills/Buffs/SlotlessBuffs/Oozaru/Buff)
 	if(Go_Oozaru)
 		if(!src.oozaru_type)
-			src.oozaru_type = input(src, "What type of Oozaru are you?") in list("Wrathful", "Enlightened", "Instinctual")
+			src.oozaru_type = Ask(src, "What type of Oozaru are you?", "", null, "pick", list("Wrathful", "Enlightened", "Instinctual"), 0)
 		if(!src.Tail)return
 		if(src.Dead)return
 		if(transActive)return

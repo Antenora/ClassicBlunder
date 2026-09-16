@@ -272,13 +272,13 @@ obj/Skills
 				if(depthsFocals.len >= usr.AscensionsAcquired)
 					usr << "You have already marked the maximum amount of focals for your ascension level.";
 					return;
-				var/fName = input(usr, "What will you call this focal point?", "Focal Label") as text;
+				var/fName = Ask(usr, "What will you call this focal point?", "Focal Label", null, "text", null, 0);
 				if(!fName) return;
 				for(var/obj/Arcane/ArcaneFocal/f in world)
 					if(f.name == fName)
 						usr << "A focal named [fName] already exists. Pick a different name."
 						return;
-				var/confirm = alert(usr, "Do you want to assign one of your focals to the location [usr.x], [usr.y], [usr.z], with the label [fName]?", "Create Personal Focal Point", "No", "Yes");
+				var/confirm = Ask(usr, "Do you want to assign one of your focals to the location [usr.x], [usr.y], [usr.z], with the label [fName]?", "Create Personal Focal Point", null, "confirm", null, 1, "No", "Yes");
 				if(confirm=="No") return;
 				var/obj/Arcane/ArcaneFocal/newFocal = new()
 				newFocal.loc = usr.loc;
@@ -293,7 +293,7 @@ obj/Skills
 					usr << "You have no marked focals to remove.";
 					return;
 				var/list/options = list("Cancel") + depthsFocals;
-				var/choice = input(usr, "Which of your focals should be removed?", "Remove Personal Focal Point") in options;
+				var/choice = Ask(usr, "Which of your focals should be removed?", "Remove Personal Focal Point", null, "pick", options, 0);
 				if(!choice || choice == "Cancel") return;
 				// Only delete a focal that this player actually owns - guards against
 				// stripping a same-named focal another system may have placed.
@@ -448,7 +448,7 @@ obj/Skills
 				if(Modes.len==2)
 					Modes.Remove("Cancel")
 				var/turf/Destination
-				switch(input(User, "What mode of teleport do you want to use?", "[src]") in Modes)
+				switch(Ask(User, "What mode of teleport do you want to use?", "[src]", null, "pick", Modes, 0))
 					if("Cancel")
 						User << "Cancelling"
 						return
@@ -459,21 +459,21 @@ obj/Skills
 							tx=User.x
 							ty=User.y
 						else
-							tx=input(User, "X coordinate of destination?", "[src]") as num|null
+							tx=Ask(User, "X coordinate of destination?", "[src]", null, "num", null, 1)
 							if(!tx || tx<0)
 								return
-							ty=input(User, "Y coordinate of destination?", "[src]") as num|null
+							ty=Ask(User, "Y coordinate of destination?", "[src]", null, "num", null, 1)
 							if(!ty || ty<0)
 								return
 						var/tz
 						var/turf/t
 						if(src.ZWarp)
 							if(!src.NoXY)//if they cant change xy, then z is the only thing TO change
-								switch(alert(User, "Do you want to change Z planes?", "[src]", "No", "Yes"))
+								switch(Ask(User, "Do you want to change Z planes?", "[src]", null, "confirm", null, 1, "No", "Yes"))
 									if("No")//stay on z plane
 										tz=User.z
 							if(!tz)
-								tz=input(User, "Z coordinate of destination?", "[src]") as num|null
+								tz=Ask(User, "Z coordinate of destination?", "[src]", null, "num", null, 1)
 								if(!tz || tz<0)
 									return
 								if(tz==17)
@@ -501,7 +501,7 @@ obj/Skills
 					if("Depths Focal")
 						var/obj/Skills/Teleport/Traverse_Depths/td = User.findOrAddSkill(/obj/Skills/Teleport/Traverse_Depths);
 						var/list/options = list("Nevermind") + td.depthsFocals;
-						var/choice = input(User, "What focal do you want to teleport to?", "Personal Focal Teleportation") in options;
+						var/choice = Ask(User, "What focal do you want to teleport to?", "Personal Focal Teleportation", null, "pick", options, 0);
 						if(choice=="Nevermind") return;
 						ReturnX = User.x;
 						ReturnY = User.y;
@@ -528,7 +528,7 @@ obj/Skills
 										OMsg(x2, "[x2] is summoned away!")
 										x2.Move(locate(User.x, User.y, User.z))
 							else
-								Focal=input(User, "What focal do you want to bring to you?", "[src]") in Focals
+								Focal=Ask(User, "What focal do you want to bring to you?", "[src]", null, "pick", Focals, 0)
 								if(Focal=="Cancel")
 									return
 								if(src.FocalArcane)
@@ -545,7 +545,7 @@ obj/Skills
 										User << "[tn] is not attached to anyone who can be summoned."
 										return
 						else
-							Focal=input(User, "What focal do you want to move to?", "[src]") in Focals
+							Focal=Ask(User, "What focal do you want to move to?", "[src]", null, "pick", Focals, 0)
 							if(Focal=="Cancel")
 								return
 							if(src.FocalArcane)

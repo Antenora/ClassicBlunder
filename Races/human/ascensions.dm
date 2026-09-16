@@ -158,7 +158,7 @@ ascension
 				..()
 				if(!owner.passive_handler || !owner.passive_handler.Get("DormantDemon")) return
 				if(mazokuSinChosen != "") return
-				var/sinChoice = input(owner, "A dormant power stirs within you. Which path do you walk?", "Dormant Demon Awakening") in list("Apathy", "Hope")
+				var/sinChoice = Ask(owner, "A dormant power stirs within you. Which path do you walk?", "Dormant Demon Awakening", null, "pick", list("Apathy", "Hope"), 0)
 				mazokuSinChosen = sinChoice
 				switch(sinChoice)
 					if("Apathy")

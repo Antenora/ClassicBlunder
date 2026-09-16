@@ -10,9 +10,9 @@ mob/var/currentPoi = 0
 	set category="Admin"
 	if(!(world.time > usr.verb_delay)) return
 	usr.verb_delay=world.time+1
-	var/screenx=input("Enter the width of the screen, max is 999.") as num
+	var/screenx=Ask(usr, "Enter the width of the screen, max is 999.", "", null, "num", null, 0)
 	screenx=min(max(1,screenx),999)
-	var/screeny=input("Enter the height of the screen, max is 999.") as num
+	var/screeny=Ask(usr, "Enter the height of the screen, max is 999.", "", null, "num", null, 0)
 	screeny=min(max(1,screeny),999)
 	client.view="[screenx]x[screeny]"
 	client.view_fit_enabled = FALSE

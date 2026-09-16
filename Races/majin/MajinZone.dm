@@ -180,12 +180,12 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     if(!menu.len)
         admin << "There are no active Majin absorb rooms."
         return
-    var/choice = input(admin, "Active Majin absorb rooms:", "Check Majin Rooms") as null|anything in menu
+    var/choice = Ask(admin, "Active Majin absorb rooms:", "Check Majin Rooms", null, "pick", menu, 1)
     if(!choice) return
     var/roomNum = menu_lookup[choice]
     if(!roomNum) return
     admin.AdminReportMajinRoom(roomNum)
-    var/action = input(admin, "Room [roomNum]: choose an action.", "Check Majin Rooms") as null|anything in list("Trigger Digestion for all victims", "Unassign room from Majin", "Cancel")
+    var/action = Ask(admin, "Room [roomNum]: choose an action.", "Check Majin Rooms", null, "pick", list("Trigger Digestion for all victims", "Unassign room from Majin", "Cancel"), 1)
     if(!action || action == "Cancel") return
     if(action == "Trigger Digestion for all victims")
         admin.AdminDigestMajinRoom(roomNum)
@@ -217,7 +217,7 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     if(!menu.len)
         admin << "There are no online Majins without an assigned room."
         return
-    var/choice = input(admin, "Assign a room to which Majin?", "Assign Majin Room") as null|anything in menu
+    var/choice = Ask(admin, "Assign a room to which Majin?", "Assign Majin Room", null, "pick", menu, 1)
     if(!choice) return
     var/mob/Players/majin = menu_lookup[choice]
     if(!majin || !(majin in players))
@@ -237,7 +237,7 @@ var/global/list/MAJIN_ROOM_OWNERS = list(null, null, null, null, null)
     if(!roomMenu.len)
         admin << "All absorb rooms are currently occupied. Use Check Majin Rooms to free one up first."
         return
-    var/rchoice = input(admin, "Assign which room to [majin]?", "Assign Majin Room") as null|anything in roomMenu
+    var/rchoice = Ask(admin, "Assign which room to [majin]?", "Assign Majin Room", null, "pick", roomMenu, 1)
     if(!rchoice) return
     var/roomNum = roomLookup[rchoice]
     if(!roomNum) return

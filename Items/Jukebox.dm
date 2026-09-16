@@ -136,7 +136,7 @@ obj/Items/Tech/Jukebox/proc/Action(var/action)
 			var/list/available = list()
 			for(var/track/S in songs)
 				available[S.song_name] = S
-			var/selected = input(usr, "Choose your song", "Track:") as null|anything in available
+			var/selected = Ask(usr, "Choose your song", "Track:", null, "pick", available, 1)
 			if(!selected || !istype(available[selected], /track))
 				return
 			selection = available[selected]

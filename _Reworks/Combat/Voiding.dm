@@ -45,22 +45,22 @@ mob/proc/RollVoidForAbsorb()
 			"Change void location (Owner)"
 		)
 	actions += "Cancel"
-	var/choice = input(usr, "Void action:", "Void") as null|anything in actions
+	var/choice = Ask(usr, "Void action:", "Void", null, "pick", actions, 1)
 	if(!choice || choice == "Cancel") return
 	switch(choice)
 		if("Admin-kill with free void")
-			var/mob/A = input(usr, "Auto-void-kill whom?", "Void") in players
+			var/mob/A = Ask(usr, "Auto-void-kill whom?", "Void", null, "pick", players, 0)
 			if(!A) return
 			A.Death(null, "ADMIN", 0, 0, 0, 1)
 			Log("Admin", "<font color=red>[ExtractInfo(usr)] admin-killed [ExtractInfo(A)] (Free Void)")
 		if("Change target's extra void chance")
-			var/mob/A = input(usr, "Change whose void chance?", "Void") in players
+			var/mob/A = Ask(usr, "Change whose void chance?", "Void", null, "pick", players, 0)
 			if(!A) return
-			A.extraVoidChance = input("How much extra void chance do you want to give [ExtractInfo(A)]? (0-100)", A.extraVoidChance, 0, 100) as num
+			A.extraVoidChance = Ask(usr, "How much extra void chance do you want to give [ExtractInfo(A)]? (0-100)", "", A.extraVoidChance, "num", null, 0)
 			Log("Admin", "<font color=red>[ExtractInfo(usr)] changed [ExtractInfo(A)]'s void chance to [A.extraVoidChance]")
 		if("Toggle target's NoVoid flag (Owner)")
 			if(usr.Admin < 4) return
-			var/mob/m = input(usr, "Toggle NoVoid on whom?", "Void") in players
+			var/mob/m = Ask(usr, "Toggle NoVoid on whom?", "Void", null, "pick", players, 0)
 			if(!m) return
 			if(m.NoVoid)
 				m.NoVoid = 0
@@ -70,7 +70,7 @@ mob/proc/RollVoidForAbsorb()
 				usr << "[m] is not gonna void anymore."
 		if("Set global void chance (Owner)")
 			if(usr.Admin < 4) return
-			var/m = input(src, "What do you want to set Void Chance to? (currently [glob.VoidChance]%)", "Void Chance") as num
+			var/m = Ask(src, "What do you want to set Void Chance to? (currently [glob.VoidChance]%)", "Void Chance", null, "num", null, 0)
 			glob.VoidChance = m
 			world << "<font color='green'>Void Chance set to [m]%!</font color>"
 			Log("Admin", "[ExtractInfo(src)] set Void Chance to [m]%!")
@@ -84,9 +84,9 @@ mob/proc/RollVoidForAbsorb()
 				world << "<font color='green'>Voiding from death has been enabled.</font>"
 		if("Change void location (Owner)")
 			if(usr.Admin < 4) return
-			var/x = input(usr, "X for void?") as num|null
-			var/y = input(usr, "Y for void?") as num|null
-			var/z = input(usr, "Z for void?") as num|null
+			var/x = Ask(usr, "X for void?", "", null, "num", null, 1)
+			var/y = Ask(usr, "Y for void?", "", null, "num", null, 1)
+			var/z = Ask(usr, "Z for void?", "", null, "num", null, 1)
 			if(!x || !y || !z) return
 			glob.VOID_LOCATION = list(x, y, z)
 			glob.currentlyVoidingLoc = list(x, y, z)

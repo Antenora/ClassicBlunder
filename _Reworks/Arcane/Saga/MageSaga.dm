@@ -307,14 +307,16 @@ mob/proc/MageClear()
 	MaxMana()
 
 mob/Admin3/verb
-	MageAdmin(mob/Players/P in players)
+	MageAdmin()
 		set category = "Admin"
 		set name = "Mage Admin"
+		var/mob/Players/P = PromptArg(usr, args, 1, "Mage Admin", "players")
+		if(isnull(P)) return
 		var/list/opts = list("Cancel", "Make Mage", "Tier Up (free)", "Set Element", "Set Second Element", "Clear Mage")
-		var/sel = input(src, "Mage debug for [P]: Tier [P.SagaLevel], [P.MageElement ? P.MageElement : "no element"][P.MageElement2 ? " and [P.MageElement2]" : ""]") in opts
+		var/sel = Ask(src, "Mage debug for [P]: Tier [P.SagaLevel], [P.MageElement ? P.MageElement : "no element"][P.MageElement2 ? " and [P.MageElement2]" : ""]", "", null, "pick", opts, 0)
 		switch(sel)
 			if("Make Mage")
-				var/e = input(src, "Starting element") in ELEMENT_PHYSICAL
+				var/e = Ask(src, "Starting element", "", null, "pick", ELEMENT_PHYSICAL, 0)
 				if(P.BecomeMage(e))
 					src << "[P] is now a [e] Mage."
 			if("Tier Up (free)")
@@ -331,7 +333,7 @@ mob/Admin3/verb
 				if(!P.IsMage())
 					src << "[P] is not a Mage."
 					return
-				var/e = input(src, "Primary element") in ELEMENT_LIST
+				var/e = Ask(src, "Primary element", "", null, "pick", ELEMENT_LIST, 0)
 				if(e == P.MageElement2)
 					src << "[P] already commands [e] as their second element."
 					return
@@ -342,7 +344,7 @@ mob/Admin3/verb
 				if(!P.IsMage())
 					src << "[P] is not a Mage."
 					return
-				var/e = input(src, "Second element") in ELEMENT_LIST
+				var/e = Ask(src, "Second element", "", null, "pick", ELEMENT_LIST, 0)
 				if(e == P.MageElement)
 					src << "[P] already commands [e] as their primary."
 					return

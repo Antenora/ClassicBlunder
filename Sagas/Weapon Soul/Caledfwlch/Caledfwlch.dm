@@ -404,7 +404,7 @@ obj/Skills/AutoHit/Horrific_Darkness
 				usr << "You have made up your mind. You won't change your path again."
 				return
 			if(excalibur.caledLight == TRUE)
-				if(alert("Are you finally tired of endlessly serving others? Are you ready to fight for only yourself?"))
+				if(Ask(usr, "Are you finally tired of endlessly serving others? Are you ready to fight for only yourself?", "", null, "confirm", null, 1, "Ok"))
 					DeleteSkill(new/obj/Skills/AutoHit/Divine_Light)
 					DeleteSkill(new/obj/Skills/Queue/Amplification)
 					DeleteSkill(new/obj/Skills/Projectile/Beams/Excalibur)
@@ -418,7 +418,7 @@ obj/Skills/AutoHit/Horrific_Darkness
 					usr << "You have been permanently corrupted into a ruler who destroys and ruins!"
 					return
 			else if(excalibur.caledLight == FALSE)
-				if(alert("Don't you hear their cries and see their tears? Won't you fight for their salvation?"))
+				if(Ask(usr, "Don't you hear their cries and see their tears? Won't you fight for their salvation?", "", null, "confirm", null, 1, "Ok"))
 					DeleteSkill(new/obj/Skills/AutoHit/Horrific_Darkness)
 					DeleteSkill(new/obj/Skills/Queue/Obliteration)
 					DeleteSkill(new/obj/Skills/Projectile/Beams/Excalibur_Morgan)

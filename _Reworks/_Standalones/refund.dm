@@ -11,7 +11,7 @@ mob/proc/pick_refund_skill(mob/target = src)
 			Refundable.Add(S)
 		else if(istype(S, /obj/Skills/Buffs/NuStyle) && !S.Copied  && !S.SignatureTechnique && !S.SignatureTechnique && S.SkillCost > 1)
 			Refundable.Add(S)
-	var/obj/Skills/Choice=input(src, "What skill are you refunding?", "RPP Refund") in Refundable
+	var/obj/Skills/Choice=Ask(src, "What skill are you refunding?", "RPP Refund", null, "pick", Refundable, 0)
 	if(Choice=="Cancel")
 		return
 
@@ -94,7 +94,9 @@ mob/verb/Refund()
 			refund_skill(S)
 
 // im going to sin below
-/mob/Admin3/verb/refund_all_old_value(mob/p in world)
+/mob/Admin3/verb/refund_all_old_value()
+	var/mob/p = PromptArg(usr, args, 1, "refund all old value", "world:/mob")
+	if(isnull(p)) return
 	if(!src.Alert("Are you sure you want to refund all copyables for all players?")) return
 	p.refund_all_copyables()
 

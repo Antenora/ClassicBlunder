@@ -24,7 +24,7 @@ mob/proc/rollChakraAffinity()
 	if(!chance || !prob(chance))
 		return
 	src.ChakraAffinityPending++
-	var/choice = alert(src, "A new chakra nature stirs within you. Will you attune to it?", "Chakra Awakening", "Accept", "Decline")
+	var/choice = Ask(src, "A new chakra nature stirs within you. Will you attune to it?", "Chakra Awakening", null, "confirm", null, 1, "Accept", "Decline")
 	if(choice == "Accept" && !src.ChakraSpecialization)
 		src.pickChakraAffinity()
 	else
@@ -38,12 +38,12 @@ mob/proc/pickChakraAffinity(firstPick = FALSE)
 	if(!remaining.len)
 		return
 	if(firstPick)
-		var/choice = input(src, "Which Chakra Nature do you have an affinity for?", "Chakra Affinity") in remaining
+		var/choice = Ask(src, "Which Chakra Nature do you have an affinity for?", "Chakra Affinity", null, "pick", remaining, 0)
 		src.ChakraAffinities += choice
 		src << "Your chakra flows naturally into <b>[choice]</b>. Jutsu of other natures will cost twice as much to use and double picks to learn."
 	else
 		src << "A new chakra nature is opening itself to you!"
-		var/choice = input(src, "Which Chakra Nature do you attune to?", "New Chakra Affinity") in remaining
+		var/choice = Ask(src, "Which Chakra Nature do you attune to?", "New Chakra Affinity", null, "pick", remaining, 0)
 		src.ChakraAffinities += choice
 		src << "You now hold an affinity for <b>[choice]</b> chakra!"
 		src << "Your broadened chakra expands your Jutsu selections, every pick tier now holds more picks."
@@ -72,7 +72,7 @@ mob/proc/verb_ObtainChakraAffinity()
 		return
 
 	src.ChakraAffinityPending++
-	var/confirm = alert(src, "Invest [cost] RPP to obtain a [owned == 1 ? "second" : "third"] Chakra Affinity?", "Obtain Chakra Affinity", "Yes", "No")
+	var/confirm = Ask(src, "Invest [cost] RPP to obtain a [owned == 1 ? "second" : "third"] Chakra Affinity?", "Obtain Chakra Affinity", null, "confirm", null, 1, "Yes", "No")
 	// Re-validate after the prompt: affinities, specialization, or RPP may have changed while it sat open.
 	if(confirm != "Yes" || src.Saga != "Shinobi" || src.ChakraSpecialization \
 	   || (src.ChakraAffinities ? src.ChakraAffinities.len : 0) != owned \
@@ -101,9 +101,9 @@ mob/proc/offerChakraSpecialization()
 	src.ChakraAffinityPending++
 	var/done = FALSE
 	while(!done)
-		var/choice = alert(src, "Your bond with [nature] runs deep, and you may now choose to specialize in it. Specializing PERMANENTLY forsakes all other chakra natures - no further affinities, by chance or training. In exchange, your [nature] jutsu cost half as much, they gain 18 Haste (~15% faster cooldowns, diminishing with other Haste), and your Jutsu pick capacity is doubled. This offer will not come again.", "Chakra Specialization", "Specialize", "Decline")
+		var/choice = Ask(src, "Your bond with [nature] runs deep, and you may now choose to specialize in it. Specializing PERMANENTLY forsakes all other chakra natures - no further affinities, by chance or training. In exchange, your [nature] jutsu cost half as much, they gain 18 Haste (~15% faster cooldowns, diminishing with other Haste), and your Jutsu pick capacity is doubled. This offer will not come again.", "Chakra Specialization", null, "confirm", null, 1, "Specialize", "Decline")
 		if(choice == "Specialize")
-			if(alert(src, "Specializing in [nature] cannot be undone. Are you certain?", "Chakra Specialization", "Yes", "No") == "Yes")
+			if(Ask(src, "Specializing in [nature] cannot be undone. Are you certain?", "Chakra Specialization", null, "confirm", null, 1, "Yes", "No") == "Yes")
 				src.ChakraSpecialization = nature
 				src << "You devote yourself wholly to <b>[nature]</b>. Its chakra answers you like a second heartbeat."
 				src << "Your [nature] jutsu now cost half Mana and carry 18 Haste, and your Jutsu pick capacity has doubled."

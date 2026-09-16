@@ -3,7 +3,7 @@
 // Was previously in MajinAscensions.dm
 /mob/proc/prompt(message, title, list/options)
 	if(!islist(options)) return null
-	return input(src, message, title) in options
+	return Ask(src, message, title, null, "pick", options, 0)
 
 /globalTracker/var/DEBUFF_EFFECTIVENESS = 0.004
 
@@ -2912,7 +2912,9 @@ mob
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Haki/Haki_Shield_Lite/H in src)
 							H.Trigger(src)
 
-/mob/Admin4/verb/ChangeWipeStartHour(n as num)
+/mob/Admin4/verb/ChangeWipeStartHour()
+	var/n = PromptArgValue(usr, args, 1, "ChangeWipeStartHour", "num")
+	if(isnull(n)) return
 	adjustWipeStartTime(n)
 
 #define MAX_WIPE_DAYS 360

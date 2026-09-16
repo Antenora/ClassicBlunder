@@ -3,7 +3,7 @@ mob
 		Skill_Descriptions()
 			set category = "Other"
 			set hidden = 1
-			var/which = input(usr,"Which skill would you like to see the description for?","Skill Description") as null|anything in usr.Skills
+			var/which = Ask(usr, "Which skill would you like to see the description for?", "Skill Description", null, "pick", usr.Skills, 1)
 			if(!which) return
 			var/obj/Skills/s = which
 			s.skillDescription()
@@ -301,7 +301,7 @@ obj/Skills
 		set src in usr
 		set category="Other"
 		set hidden = 1   // removed from the UI
-		var/Note=input(usr, "What do you want to be displayed after [src] comes off cooldown?", "Cooldown Note") as message|null
+		var/Note=Ask(usr, "What do you want to be displayed after [src] comes off cooldown?", "Cooldown Note", null, "message", null, 1)
 		src.CooldownNote=Note
 		usr << "[src]'s cooldown note set to: ([src.CooldownNote])"
 
@@ -607,7 +607,7 @@ obj/Skills
 				set hidden = 1
 				if(!src:Choosing)
 					src:Choosing=1
-					var/Choice=input(usr, "What telekinetic power are you using?", "Improved Telekinesis") in list("Lift and Hold", "Lift and Throw", "Pull", "Push", "Throw Around", "Blast Away", "Cancel")
+					var/Choice=Ask(usr, "What telekinetic power are you using?", "Improved Telekinesis", null, "pick", list("Lift and Hold", "Lift and Throw", "Pull", "Push", "Throw Around", "Blast Away", "Cancel"), 0)
 					switch(Choice)
 						if("Lift and Hold")
 							if(!usr.CanAttack()) return
@@ -744,7 +744,7 @@ obj/Skills
 			if(src.Using)
 				return
 			src.Using=1
-			switch(input(usr,"Force [Target] to pass on?") in list("No","Yes"))
+			switch(Ask(usr, "Force [Target] to pass on?", "", null, "pick", list("No","Yes"), 0))
 				if("Yes")
 					if(usr.HasGodKi()&&!Target.HasGodKi()&&!Target.HasMaouKi())
 						if(Target.Dead)
@@ -770,7 +770,7 @@ obj/Skills
 			var/mob/Target=usr.Target
 			set category="Skills"
 			set hidden = 1
-			switch(input(usr,"Delete [Target]?") in list("No","Yes"))
+			switch(Ask(usr, "Delete [Target]?", "", null, "pick", list("No","Yes"), 0))
 				if("Yes")
 					spawn()RecoverImage(Target)
 					spawn(2)RecoverImage(Target)
@@ -1041,7 +1041,7 @@ obj/Skills
 				var/summon=0
 				if(usr.Alert("You sure you want to mass revive? It'll cost your own soul."))
 					src.Cooldown()
-					switch(input("Summon them?", "", text) in list ("No", "Yes",))
+					switch(Ask(usr, "Summon them?", "", text, "pick", list ("No", "Yes",), 0))
 						if("No") summon=0
 						if("Yes") summon=1
 					for(var/mob/M)

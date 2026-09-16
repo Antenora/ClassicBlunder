@@ -18,7 +18,7 @@
 	Unobtainable=1
 	verb/Lightsaber_Color()
 		set src in usr
-		lightSaberColorChoice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red")
+		lightSaberColorChoice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red"), 0)
 
 /obj/Items/Gear/
 	verb/Improve()
@@ -41,7 +41,7 @@
 		src.Using = 1
 		usr << "You begin to improve [src]..."
 		var/cost = (Cost * (1 + Improvements)) * glob.progress.EconomyCost
-		var/Confirm = alert("This will cost [cost] credits. Are you sure you want to continue?", "Improvement", "Yes", "No")
+		var/Confirm = Ask(usr, "This will cost [cost] credits. Are you sure you want to continue?", "Improvement", null, "confirm", null, 1, "Yes", "No")
 		if(Confirm == "No")
 			usr << "You decide not to improve [src]."
 			src.Using = 0
@@ -69,7 +69,7 @@
 		Improvable = 1
 		verb/Lightsaber_Color()
 			set src in usr
-			lightSaberColorChoice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red","Yellow")
+			lightSaberColorChoice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red","Yellow"), 0)
 
 	Great_Lightsaber
 		var/lightSaberColorChoice = "Blue"
@@ -84,7 +84,7 @@
 		Improvable = 1
 		verb/Lightsaber_Color()
 			set src in usr
-			lightSaberColorChoice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red")
+			lightSaberColorChoice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red"), 0)
 
 	Crossguard_Lightsaber
 		var/lightSaberColorChoice = "Blue"
@@ -99,7 +99,7 @@
 		Improvable = 1
 		verb/Lightsaber_Color()
 			set src in usr
-			lightSaberColorChoice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red")
+			lightSaberColorChoice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red"), 0)
 
 	Shoto_Lightsaber
 		var/lightSaberColorChoice = "Blue"
@@ -114,4 +114,4 @@
 		Improvable = 1
 		verb/Lightsaber_Color()
 			set src in usr
-			lightSaberColorChoice=input(usr, "What color would you like for your lightsaber?", "Set Color") in list("Blue", "Green", "Purple", "Red")
+			lightSaberColorChoice=Ask(usr, "What color would you like for your lightsaber?", "Set Color", null, "pick", list("Blue", "Green", "Purple", "Red"), 0)

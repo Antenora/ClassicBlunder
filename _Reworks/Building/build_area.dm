@@ -348,7 +348,7 @@ mob/Mapper/verb/Zone_Settings()
 	if(!mine.len)
 		usr << "You have no zones. Create_Zone makes one."
 		return
-	var/pick = input(usr, "Which zone?", "Zone Settings") as null|anything in mine
+	var/pick = Ask(usr, "Which zone?", "Zone Settings", null, "pick", mine, 1)
 	if(!pick)
 		return
 	var/datum/build_zone_def/D = mine[pick]
@@ -358,7 +358,7 @@ mob/Mapper/verb/Zone_Settings()
 		var/tm = BuildZoneTimeLabel(D.dnMode)
 		var/fm = D.moon ? "ON" : "OFF"
 		var/list/menu = list("Sky: [sky]", "Time: [tm]", "Full moon: [fm]", "Weather: [wx]", "Profile: [D.profile]", "Wind: [D.windMult * 100]%", "Rename", "Done")
-		var/choice = input(usr, "Zone \"[D.name]\" - pick a setting.", "Zone Settings") as null|anything in menu
+		var/choice = Ask(usr, "Zone \"[D.name]\" - pick a setting.", "Zone Settings", null, "pick", menu, 1)
 		if(!choice || choice == "Done")
 			break
 		if(choice == "Sky: [sky]")
@@ -366,7 +366,7 @@ mob/Mapper/verb/Zone_Settings()
 			usr << "\"[D.name]\" is now [D.sees_sky ? "OUTDOOR (sky, day/night, weather)" : "INDOOR/CAVE (no sky effects)"]."
 		else if(choice == "Time: [tm]")
 			var/list/times = list("World clock" = "", "Always day" = "day", "Always dusk" = "dusk", "Always night" = "night", "Always dawn" = "dawn", "Indoors - no day-night tint, keeps weather, wind and profile effects" = "indoor")
-			var/t = input(usr, "Lighting for \"[D.name]\" (only applies while Sky is OUTDOOR).", "Zone Time") as null|anything in times
+			var/t = Ask(usr, "Lighting for \"[D.name]\" (only applies while Sky is OUTDOOR).", "Zone Time", null, "pick", times, 1)
 			if(!t)
 				continue
 			D.dnMode = times[t]
@@ -375,7 +375,7 @@ mob/Mapper/verb/Zone_Settings()
 			usr << "\"[D.name]\" full moon [D.moon ? "ON - a permanent moonlit night in this zone; Saiyans who look at the moon transform when they enter (needs Sky: OUTDOOR)" : "OFF"]."
 		else if(choice == "Weather: [wx]")
 			var/list/kinds = list("clear", "rain", "storm", "snow", "blizzard", "dust")
-			var/k = input(usr, "Weather in \"[D.name]\" (static for this zone).", "Zone Weather") as null|anything in kinds
+			var/k = Ask(usr, "Weather in \"[D.name]\" (static for this zone).", "Zone Weather", null, "pick", kinds, 1)
 			if(!k)
 				continue
 			D.wx_kind = (k == "clear") ? "" : k
@@ -384,7 +384,7 @@ mob/Mapper/verb/Zone_Settings()
 			for(var/id in _env_profiles)
 				var/datum/environment_profile/EP = _env_profiles[id]
 				options["[EP.display_name] ([id])"] = id
-			var/p = input(usr, "Environment profile for \"[D.name]\".", "Zone Profile") as null|anything in options
+			var/p = Ask(usr, "Environment profile for \"[D.name]\".", "Zone Profile", null, "pick", options, 1)
 			if(!p)
 				continue
 			D.profile = options[p]
@@ -499,7 +499,7 @@ mob/Mapper/verb/Delete_Zone()
 	if(!mine.len)
 		usr << "You have no zones to delete."
 		return
-	var/pick = input(usr, "Delete which zone?", "Delete Zone") as null|anything in mine
+	var/pick = Ask(usr, "Delete which zone?", "Delete Zone", null, "pick", mine, 1)
 	if(!pick)
 		return
 	var/datum/build_zone_def/D = mine[pick]

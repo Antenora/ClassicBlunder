@@ -144,7 +144,7 @@ proc/spendJutsuPicks(mob/User, cost)
 			JutsuSelecting = FALSE
 			return
 
-		var/choice = input(User, "Select a [Category] skill to learn. (Tier [tierCap] cap, [available] pick\s available. Jutsu outside your Chakra Affinity cost 2 picks and 2x Mana.)", "Learn [Category]") as null|anything in options
+		var/choice = Ask(User, "Select a [Category] skill to learn. (Tier [tierCap] cap, [available] pick\s available. Jutsu outside your Chakra Affinity cost 2 picks and 2x Mana.)", "Learn [Category]", null, "pick", options, 1)
 		if(!choice)
 			JutsuSelecting = FALSE
 			return

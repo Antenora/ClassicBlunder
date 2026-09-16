@@ -1,15 +1,7 @@
 /mob/verb/View_Current_Passives()
     set category = "Other"
     set hidden = 1
-    var/html = "<html><body bgcolor=#000000 text=#339999><b>Current Passives:</b><br>"
-    for(var/passive in passive_handler.passives)
-        if(passive_handler.passives[passive])
-            if(passive in PassiveInfo)
-                html += "<b><a href=?src=\ref[src];action=GetInfo;passe=[passive]>[passive]</a> : [OutputPassiveValue(passive)]</b><br>"
-            else
-                html += "<b>[passive] : [OutputPassiveValue(passive)]</b><br>"
-    html += "</body></html>"
-    src<<browse(html,"window=[src]'s Passives;size=450x600")
+    ShowPassives(src, 0)
 
 mob/proc/OutputPassiveValue(passive)//the only reason this exists is to output the value of passives that are lists
     . = "";
@@ -20,11 +12,34 @@ mob/proc/OutputPassiveValue(passive)//the only reason this exists is to output t
             if(p != pilk[pilk.len]) . += ", ";
     else . = passive_handler.passives["[passive]"];
 
+mob/proc/ShowPassives(mob/viewer, admin = 0)
+    if(!viewer || !viewer.client || !passive_handler)
+        return
+    var/list/rows = list()
+    var/n = 0
+    if(admin)
+        rows[++rows.len] = list("sec" = "PASSIVES")
+    for(var/passive in passive_handler.passives)
+        if(!passive_handler.passives[passive])
+            continue
+        n++
+        var/list/r = list("t" = "[passive]", "c" = list("[OutputPassiveValue(passive)]"))
+        if(passive in PassiveInfo)
+            r["h"] = "?src=\ref[viewer];action=GetInfo;passe=[url_encode("[passive]")]"
+        rows[++rows.len] = r
+    if(admin && passive_handler.states && passive_handler.states.len)
+        rows[++rows.len] = list("sec" = "INTERNAL STATE")
+        for(var/skey in passive_handler.states)
+            if(passive_handler.states[skey])
+                rows[++rows.len] = list("t" = "[skey]", "c" = list("[passive_handler.states[skey]]"))
+    var/list/cols = list(list("l" = "PASSIVE", "a" = "l"), list("l" = "VALUE", "a" = "r"))
+    viewer.client.TableShow("passives:\ref[src]", "PASSIVES", "[src]", "[n] passive[n == 1 ? "" : "s"]", cols, rows, "a passive to read it", null, admin ? list("nosort" = 1) : null)
+
 mob/proc/OutputPassiveInfo(passive)
-    var/info="<html><body bgcolor=#000000 text=#339999><br>"
-    info += "<b><h3>[passive]</h3></b><hr><br> [PassiveInfo[passive]]";
-    info += "</body></html>"
-    src<<browse(info,"window=PassiveInfo;size=400x600")
+    if(!client)
+        return
+    var/held = (passive_handler && passive_handler.passives["[passive]"]) ? "You hold [OutputPassiveValue(passive)]" : ""
+    client.DocShow("passive:[passive]", "PASSIVE", "[passive]", "[PassiveInfo[passive]]", "text", held, 400, 600, null, "pixel")
 
 globalTracker/var
     ANAEROBIC_FATIGUE_BASE = 0.7;

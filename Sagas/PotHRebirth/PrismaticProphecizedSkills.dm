@@ -188,24 +188,24 @@ obj
 					var/modify_sword_num = 1
 					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in usr) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in usr) || (locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in usr) && usr.SagaLevel >= 4)
 						var/list/options = list("Primary","Secondary")
-						switch(input("Which sword would you like to modify?") in options)
+						switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 							if("Secondary") modify_sword_num=2
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						switch(modify_sword_num)
 							if(1)
 								src.SwordIcon=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
-								src.SwordX=input(usr, "Pixel X offset.", "Void Blade Icon") as num
-								src.SwordY=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
+								src.SwordX=Ask(usr, "Pixel X offset.", "Void Blade Icon", null, "num", null, 0)
+								src.SwordY=Ask(usr, "Pixel Y offset.", "Void Blade Icon", null, "num", null, 0)
 							if(2)
 								src.SwordIconSecond=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
-								src.SwordXSecond=input(usr, "Pixel X offset.", "Void Blade Icon") as num
-								src.SwordYSecond=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
+								src.SwordXSecond=Ask(usr, "Pixel X offset.", "Void Blade Icon", null, "num", null, 0)
+								src.SwordYSecond=Ask(usr, "Pixel Y offset.", "Void Blade Icon", null, "num", null, 0)
 							if(3)
 								src.SwordIconThird=input(usr, "What icon will your Chaos Saber use?", "Void Blade Icon") as icon|null
-								src.SwordXThird=input(usr, "Pixel X offset.", "Void Blade Icon") as num
-								src.SwordYThird=input(usr, "Pixel Y offset.", "Void Blade Icon") as num
-					Choice=input(usr, "What class of blade do you want your Void Blade to be?", "Transfigure Void Blade") in list("Blunt", "Saber", "Longsword", "Greatsword")
+								src.SwordXThird=Ask(usr, "Pixel X offset.", "Void Blade Icon", null, "num", null, 0)
+								src.SwordYThird=Ask(usr, "Pixel Y offset.", "Void Blade Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of blade do you want your Void Blade to be?", "Transfigure Void Blade", null, "pick", list("Blunt", "Saber", "Longsword", "Greatsword"), 0)
 					switch(Choice)
 						if("Blunt")
 							switch(modify_sword_num)
@@ -276,12 +276,12 @@ obj
 				set hidden = 0
 				var/Choice
 				if(!usr.BuffOn(src))
-					var/Lock=alert(usr, "Do you wish to alter the icon used?", "Weapon Icon", "No", "Yes")
+					var/Lock=Ask(usr, "Do you wish to alter the icon used?", "Weapon Icon", null, "confirm", null, 1, "No", "Yes")
 					if(Lock=="Yes")
 						src.StaffIcon=input(usr, "What icon will your Chaos Buster use?", "Chaos Buster Icon") as icon|null
-						src.StaffX=input(usr, "Pixel X offset.", "Chaos Buster Icon") as num
-						src.StaffY=input(usr, "Pixel Y offset.", "Chaos Buster Icon") as num
-					Choice=input(usr, "What class of gun do you want your Chaos Buster to be?", "Transfigure Chaos Buster") in list("Light", "Medium", "Heavy")
+						src.StaffX=Ask(usr, "Pixel X offset.", "Chaos Buster Icon", null, "num", null, 0)
+						src.StaffY=Ask(usr, "Pixel Y offset.", "Chaos Buster Icon", null, "num", null, 0)
+					Choice=Ask(usr, "What class of gun do you want your Chaos Buster to be?", "Transfigure Chaos Buster", null, "pick", list("Light", "Medium", "Heavy"), 0)
 					switch(Choice)
 						if("Light")
 							src.StaffClass="Wand"

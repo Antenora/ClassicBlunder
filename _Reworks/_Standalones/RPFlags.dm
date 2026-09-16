@@ -48,13 +48,13 @@ RPFlag
 
 mob/Admin3/verb/CreateRPFlag()
 	if(!src.Alert("Are you sure you want to create an RP Flag?")) return
-	var/nameofFlag = input(usr, "What do you want the flag to be titled?") as text|null
+	var/nameofFlag = Ask(usr, "What do you want the flag to be titled?", "", null, "text", null, 1)
 	if(!nameofFlag)
 		return
 	var/RPFlag/rpflag = new(usr.loc)
-	var/flagNeedsXItem = input(usr, "What item does the flag need?") in list("None") + typesof(/obj/Items)
+	var/flagNeedsXItem = Ask(usr, "What item does the flag need?", "", null, "pick", (list("None") + typesof(/obj/Items)), 0)
 	if(flagNeedsXItem != "None")
-		var/trulyNeed = input(usr, "Does the flag truly need [flagNeedsXItem]?") in list("Yes", "No")
+		var/trulyNeed = Ask(usr, "Does the flag truly need [flagNeedsXItem]?", "", null, "pick", list("Yes", "No"), 0)
 		if(trulyNeed == "Yes")
 			rpflag.trulyRequiresItem = TRUE
 		rpflag.requiresItem = flagNeedsXItem

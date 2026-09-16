@@ -92,7 +92,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 	var/role = "Life Fiber Hybrid"
 	proc/consentCheck(mob/source, mob/consentNeeded)
 		if(!consentNeeded) return TRUE
-		var/confirm = input(consentNeeded, "[source] is offering you a role as [role], do you accept?") in list("Yes", "No")
+		var/confirm = Ask(consentNeeded, "[source] is offering you a role as [role], do you accept?", "", null, "pick", list("Yes", "No"), 0)
 		if(confirm == "No") return FALSE
 		else if(confirm == "Yes") return TRUE
 
@@ -107,7 +107,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 			var/mob/m = usr.Target
 			OMsg(usr, "[usr] extends a singular long red thread towards [m]...")
 			if(consentCheck(usr, m, "Disciplinary Chair"))
-				var/doubleCheck = input(usr, "Are you sure you want to make [m] the Disciplinary Chair?") in list("Yes", "No")
+				var/doubleCheck = Ask(usr, "Are you sure you want to make [m] the Disciplinary Chair?", "", null, "pick", list("Yes", "No"), 0)
 				if(doubleCheck == "Yes")
 					OMsg(usr, "[m]'s body accepts the thread!")
 					m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Life_Fiber_Hybrid/Disciplinary_Chair)
@@ -126,7 +126,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 			var/mob/m = usr.Target
 			OMsg(usr, "[usr] extends a singular long red thread towards [m]...")
 			if(consentCheck(usr, m))
-				var/doubleCheck = input(usr, "Are you sure you want to make [m] the [role]?") in list("Yes", "No")
+				var/doubleCheck = Ask(usr, "Are you sure you want to make [m] the [role]?", "", null, "pick", list("Yes", "No"), 0)
 				if(doubleCheck == "Yes")
 					OMsg(usr, "[m]'s body accepts the thread!")
 					m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Life_Fiber_Hybrid/Athletics_Chair)
@@ -145,7 +145,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 			var/mob/m = usr.Target
 			OMsg(usr, "[usr] extends a singular long red thread towards [m]...")
 			if(consentCheck(usr, m))
-				var/doubleCheck = input(usr, "Are you sure you want to make [m] the [role]?") in list("Yes", "No")
+				var/doubleCheck = Ask(usr, "Are you sure you want to make [m] the [role]?", "", null, "pick", list("Yes", "No"), 0)
 				if(doubleCheck == "Yes")
 					OMsg(usr, "[m]'s body accepts the thread!")
 					m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Life_Fiber_Hybrid/Non_Athletics_Chair)
@@ -164,7 +164,7 @@ obj/Items/Sword/Light/Bakuzan_Koryu
 			var/mob/m = usr.Target
 			OMsg(usr, "[usr] extends a singular long red thread towards [m]...")
 			if(consentCheck(usr, m))
-				var/doubleCheck = input(usr, "Are you sure you want to make [m] the [role]?") in list("Yes", "No")
+				var/doubleCheck = Ask(usr, "Are you sure you want to make [m] the [role]?", "", null, "pick", list("Yes", "No"), 0)
 				if(doubleCheck == "Yes")
 					OMsg(usr, "[m]'s body accepts the thread!")
 					m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Life_Fiber_Hybrid/Information_and_Strategy_Chair)

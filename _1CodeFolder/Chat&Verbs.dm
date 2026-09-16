@@ -118,7 +118,7 @@ mob/Players/verb
 			if(!options.len) return
 			options += "Cancel"
 
-			m = input("Who would you like to observe in combat?") in options
+			m = Ask(usr, "Who would you like to observe in combat?", "", null, "pick", options, 0)
 		if(ismob(m))
 			if(!m.AllowObservers)
 				usr << "[m] does not have combat watching enabled."
@@ -158,7 +158,9 @@ mob/Players/verb
 			return
 		usr.Grid("Loot", Lootee=src)
 		OMsg(usr, "[usr] begins to rifle through [src]'s belongings...")
-	Examine(var/atom/A as mob|obj in view(15, usr))
+	Examine()
+		var/atom/A = PromptArg(usr, args, 1, "Examine", "view:15:mob|obj")
+		if(isnull(A)) return
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if(istype(A,/obj))
@@ -187,20 +189,22 @@ mob/Players/verb
 
 			profileHTML += "</html>"
 
-			usr << browse(profileHTML, "window=[A];size=900x650")
+			usr.client?.DocShow("profile:\ref[A]", "PROFILE", "[A]", profileHTML, "author", "", 900, 650)
 
 			if(A:GimmickDesc!="")
-				usr << browse(A:GimmickDesc, "window=Gimmick;size=325x325")
+				usr.client?.DocShow("gimmick:\ref[A]", "GIMMICK", "[A]", A:GimmickDesc, "author", "", 325, 325)
 
 		A.Examined(src)
 
-	Rename(var/atom/A as mob|obj in view(usr,5))
+	Rename()
 		set src=usr.client
+		var/atom/A = PromptArg(usr, args, 1, "Rename", "view:5:mob|obj")
+		if(isnull(A)) return
 
 		if(A.preventRename)
 			usr << "You cannot rename this."
 			return
-		var/blah=input("") as text
+		var/blah=Ask(usr, "", "", null, "text", null, 0)
 		if(istype(A,/mob))
 			if(A!=usr)
 				usr<<"You cannot rename other people!"
@@ -208,7 +212,7 @@ mob/Players/verb
 		if(blah&&blah!=""&&blah!=" ")
 			A.name=copytext(blah,1,30)
 			if(isplayer(A))
-				glob.IDs[A:UniqueID] = "[A.name]"
+				setPlayerNameByUID(A:UniqueID, A.name)
 
 	SaveVerb()
 		set hidden=1
@@ -258,7 +262,7 @@ mob/Players/verb
 		set name="AFK Time Limit"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		usr.AFKTimeLimit=input(usr,"Enter a time limit in seconds before you'll auto AFK. Minimum of 1000, maximum of 75000.","Timey wimey")as num
+		usr.AFKTimeLimit=Ask(usr, "Enter a time limit in seconds before you'll auto AFK. Minimum of 1000, maximum of 75000.", "Timey wimey", null, "num", null, 0)
 		if(usr.AFKTimeLimit<1000)
 			usr.AFKTimeLimit=1000
 		if(usr.AFKTimeLimit>75000)
@@ -289,7 +293,7 @@ mob/Players/verb
 			Choices.Add(b)
 		for(var/obj/Skills/AutoHit/b in src)
 			Choices.Add(b)
-		var/obj/Skills/S=input(src, "What skill are you modifying?", "Customize Skill") in Choices
+		var/obj/Skills/S=Ask(src, "What skill are you modifying?", "Customize Skill", null, "pick", Choices, 0)
 		if(S=="Cancel")
 			return
 		var/Mode
@@ -299,9 +303,9 @@ mob/Players/verb
 		var/list/ProjectileOptions=list("Charge Message", "Fire Message", "Icon")
 		var/list/AutohitOptions=list("Charge Message", "Fire Message", "Icon")
 		if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Aria_Chant))
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in list("Aria Lines")
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", list("Aria Lines"), 0)
 		else if(istype(S,/obj/Skills/Power_Control))
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in PCOptions
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", PCOptions, 0)
 		else if(istype(S,/obj/Skills/Buffs))
 			if(S:NameFake)
 				BuffOptions += "NameFake"
@@ -315,13 +319,13 @@ mob/Players/verb
 				BuffOptions += "MakesArmor"
 			if(S:makSpace)
 				BuffOptions += "Make Space Icon"
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in BuffOptions
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", BuffOptions, 0)
 		else if(istype(S,/obj/Skills/Queue))
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in QueueOptions
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", QueueOptions, 0)
 		else if(istype(S,/obj/Skills/Projectile))
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in ProjectileOptions
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", ProjectileOptions, 0)
 		else if(istype(S,/obj/Skills/AutoHit))
-			Mode=input(src, "What aspect do you wish to customize on [S]?", "Customize Skill") in AutohitOptions
+			Mode=Ask(src, "What aspect do you wish to customize on [S]?", "Customize Skill", null, "pick", AutohitOptions, 0)
 		else
 			usr << "This skill can't be customized at this time!"
 			return
@@ -332,38 +336,38 @@ mob/Players/verb
 			if("Make Space Icon")
 				S:icon_to_use = input(src, "What icon?") as icon|null
 			if("NameFake")
-				S:NameFake  = input(src, "What fake name?") as text
+				S:NameFake  = Ask(src, "What fake name?", "", null, "text", null, 0)
 			if("MakesSword")
 				S:SwordIcon  = input(src, "What icon?") as icon|null
-				S:SwordX  = input(src, "What x") as num
-				S:SwordY  = input(src, "What y") as num
+				S:SwordX  = Ask(src, "What x", "", null, "num", null, 0)
+				S:SwordY  = Ask(src, "What y", "", null, "num", null, 0)
 			if("MakesStaff")
 				S:StaffIcon  = input(src, "What icon?") as icon|null
-				S:StaffX  = input(src, "What x") as num
-				S:StaffY  = input(src, "What y") as num
+				S:StaffX  = Ask(src, "What x", "", null, "num", null, 0)
+				S:StaffY  = Ask(src, "What y", "", null, "num", null, 0)
 
 
 			if("MakesSecondSword")
 				S:SwordIconSecond  = input(src, "What icon?") as icon|null
-				S:SwordXSecond  = input(src, "What x") as num
-				S:SwordYSecond  = input(src, "What y") as num
+				S:SwordXSecond  = Ask(src, "What x", "", null, "num", null, 0)
+				S:SwordYSecond  = Ask(src, "What y", "", null, "num", null, 0)
 
 			if("MakesArmor")
 				S:ArmorIcon  = input(src, "What icon?") as icon|null
-				S:ArmorX  = input(src, "What x") as num
-				S:ArmorY  = input(src, "What y") as num
+				S:ArmorX  = Ask(src, "What x", "", null, "num", null, 0)
+				S:ArmorY  = Ask(src, "What y", "", null, "num", null, 0)
 
 			if("Lock")
 				var/icon/choice = input("What icon?") as icon|null
-				var/_x=input("Pixel X?") as num|null
-				var/_y=input("Pixel Y?") as num|null
+				var/_x=Ask(usr, "Pixel X?", "", null, "num", null, 1)
+				var/_y=Ask(usr, "Pixel Y?", "", null, "num", null, 1)
 				S.vars["[pre]"] = choice
 				if(pre != "TopOverLayLock")
 					var/rawname = replacetext(pre, "Lock", "")
 					S.vars["[rawname]X"] = _x
 					S.vars["[rawname]Y"] = _y
 				if(pre == "IconLock")
-					var/blend = input(src, "What blend mode?") in list("ADD","SUB", "INSET_OVERLAY", "OVERLAY", "MULTIPLY")
+					var/blend = Ask(src, "What blend mode?", "", null, "pick", list("ADD","SUB", "INSET_OVERLAY", "OVERLAY", "MULTIPLY"), 0)
 					switch(blend)
 						if("ADD")
 							S.vars["IconLockBlend"] = BLEND_ADD
@@ -380,16 +384,16 @@ mob/Players/verb
 			if("Aria Lines")
 				var/list/l = S:Aria
 				l.Add("Cancel")
-				var/LineNum = input(src, "What line do you want to change?") in l
+				var/LineNum = Ask(src, "What line do you want to change?", "", null, "pick", l, 0)
 				l.Remove("Cancel")
 				if(LineNum=="Cancel") return
 				var/linePos = S:Aria.Find(LineNum)
-				var/newLine = input(src, "What would you like the new line to say?") as text|null
+				var/newLine = Ask(src, "What would you like the new line to say?", "", null, "text", null, 1)
 				if(!newLine) return
 				S:Aria[linePos] = newLine
 
 			if("Active Message")
-				S.CustomActive=input(src, "What message do you want [S] to display when activated?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomActive=Ask(src, "What message do you want [S] to display when activated?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomActive=="")
 					S.CustomActive=0
 				if(S.CustomActive)
@@ -397,7 +401,7 @@ mob/Players/verb
 				else
 					src << "[S] custom active message cleared."
 			if("Off Message")
-				S.CustomOff=input(src, "What message do you want [S] to display when deactivated?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomOff=Ask(src, "What message do you want [S] to display when deactivated?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomOff=="")
 					S.CustomOff=0
 				if(S.CustomOff)
@@ -405,7 +409,7 @@ mob/Players/verb
 				else
 					src << "[S] custom off message cleared."
 			if("Charge Message")
-				S.CustomCharge=input(src, "What message do you want [S] to display when charging?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomCharge=Ask(src, "What message do you want [S] to display when charging?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomCharge=="")
 					S.CustomCharge=0
 				if(S.CustomCharge)
@@ -413,7 +417,7 @@ mob/Players/verb
 				else
 					src << "[S] custom charge message cleared."
 			if("Fire Message")
-				S.CustomActive=input(src, "What message do you want [S] to display when fired?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomActive=Ask(src, "What message do you want [S] to display when fired?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomActive=="")
 					S.CustomActive=0
 				if(S.CustomActive)
@@ -421,7 +425,7 @@ mob/Players/verb
 				else
 					src << "[S] custom fire message cleared."
 			if("Hit Message")
-				S.CustomActive=input(src, "What message do you want [S] to display when hit?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomActive=Ask(src, "What message do you want [S] to display when hit?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomActive=="")
 					S.CustomActive=0
 				if(S.CustomActive)
@@ -429,7 +433,7 @@ mob/Players/verb
 				else
 					src << "[S] custom hit message cleared."
 			if("Miss Message")
-				S.CustomOff=input(src, "What message do you want [S] to display when missed?  HTML is allowed.", "Set [Mode]") as text|null
+				S.CustomOff=Ask(src, "What message do you want [S] to display when missed?  HTML is allowed.", "Set [Mode]", null, "text", null, 1)
 				if(S.CustomOff=="")
 					S.CustomOff=0
 				if(S.CustomOff)
@@ -438,9 +442,9 @@ mob/Players/verb
 					src << "[S] custom miss message cleared."
 			if("Icon")
 				S.sicon=input("What icon?") as icon|null
-				S.sicon_state=input("Icon state?") as text|null
-				S.pixel_x=input("Pixel X?") as num|null
-				S.pixel_y=input("Pixel Y?") as num|null
+				S.sicon_state=Ask(usr, "Icon state?", "", null, "text", null, 1)
+				S.pixel_x=Ask(usr, "Pixel X?", "", null, "num", null, 1)
+				S.pixel_y=Ask(usr, "Pixel Y?", "", null, "num", null, 1)
 				if(S.type in typesof(/obj/Skills/Queue))
 					S:IconLock=S.sicon
 					S:LockX=S.pixel_x
@@ -454,13 +458,15 @@ mob/Players/verb
 					S:IconY=S.pixel_y
 					S:Icon=S.sicon
 				usr<<"[S] icon is now changed to: [S.sicon] / [S.sicon_state]"
-	Custom_Appearance_Hair(var/mob/A as mob in view(usr,5))
+	Custom_Appearance_Hair()
 		set src=usr.client
 		set category="Other"
 		set hidden = 1
 		set name="Customize: Hair"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		var/mob/A = PromptArg(usr, args, 1, "Customize: Hair", "view:5:mob", 1)
+		if(isnull(A)) return
 		if(istype(A,/mob))
 			if(usr.Alert("You sure you wanna change [A]'s hair icon?"))
 				var/Z=input(usr,"Choose an icon for [A]!","ChangeIcon")as icon|null
@@ -470,10 +476,10 @@ mob/Players/verb
 					usr <<"This file exceeds the limit of 100KB. It cannot be used."
 					return
 				if(A!=usr)
-					var/hm=input(A,"Do you want to change your hair icon into [Z] which [usr] presented?")in list("No","Yes")
+					var/hm=Ask(A, "Do you want to change your hair icon into [Z] which [usr] presented?", "", null, "pick", list("No","Yes"), 0)
 					if(hm=="No")
 						return
-				var/Color=input(A,"Choose color if needed, otherwise hit cancel.") as color|null
+				var/Color=Ask(A, "Choose color if needed, otherwise hit cancel.", "", null, "color", null, 1)
 				if(Color) Z+=Color
 				A.Hair_Base=Z
 				A.Hair_Color=Color
@@ -485,20 +491,22 @@ mob/Players/verb
 		src.Hairz("Remove")
 		src.HairUnderlay=input(src, "Set a hair underlay.", "Hair Underlay") as file|null
 		if(src.HairUnderlay)
-			src.HairUnderlayX=input(src, "Pixel X for underlay?", "Hair Underlay X") as num|null
-			src.HairUnderlayY=input(src, "Pixel Y for underlay?", "Hair Underlay Y") as num|null
-		if(alert(src, "Do you want to set an x/y offset for your hair overlay?", "Hair Overlay Offset", "Yes", "No")=="Yes")
-			src.HairX=input(src, "Pixel X for overlay?", "Hair Overlay X") as num|null
-			src.HairY=input(src, "Pixel Y for overlay?", "Hair Overlay Y") as num|null
+			src.HairUnderlayX=Ask(src, "Pixel X for underlay?", "Hair Underlay X", null, "num", null, 1)
+			src.HairUnderlayY=Ask(src, "Pixel Y for underlay?", "Hair Underlay Y", null, "num", null, 1)
+		if(Ask(src, "Do you want to set an x/y offset for your hair overlay?", "Hair Overlay Offset", null, "confirm", null, 1, "Yes", "No")=="Yes")
+			src.HairX=Ask(src, "Pixel X for overlay?", "Hair Overlay X", null, "num", null, 1)
+			src.HairY=Ask(src, "Pixel Y for overlay?", "Hair Overlay Y", null, "num", null, 1)
 		src.Hairz("Add")
 		src << "Done."
-	Custom_Appearance_General(var/atom/A as mob|obj in view(usr,5))
+	Custom_Appearance_General()
 		set src=usr.client
 		set category="Other"
 		set hidden = 1
 		set name="Customize: Icon"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		var/atom/A = PromptArg(usr, args, 1, "Customize: Icon", "view:5:mob|obj", 1)
+		if(isnull(A)) return
 		if(istype(A,/obj))
 			if(istype(A,/obj/Planets)||istype(A,/obj/Oozaru)||istype(A,/obj/Login))
 				usr<<"You're not allowed to change these icons."
@@ -512,9 +520,9 @@ mob/Players/verb
 					return
 				A.LastIconChange=usr.key
 				A.icon=Z
-				A.icon_state=input("icon state") as text
-				A.pixel_x=input("X adjustment.") as num
-				A.pixel_y=input("Y adjustment.") as num
+				A.icon_state=Ask(usr, "icon state", "", null, "text", null, 0)
+				A.pixel_x=Ask(usr, "X adjustment.", "", null, "num", null, 0)
+				A.pixel_y=Ask(usr, "Y adjustment.", "", null, "num", null, 0)
 		if(istype(A,/mob))
 			if(usr.Alert("You sure you wanna change [A]'s icon?"))
 				var/Z=input(usr,"Choose an icon for [A]!","ChangeIcon")as icon|null
@@ -524,24 +532,26 @@ mob/Players/verb
 					usr <<"This file exceeds the limit of 100KB. It cannot be used."
 					return
 				if(A!=usr)
-					var/hm=input(A,"Do you want to change your icon into [Z] which [usr] presented?")in list("No","Yes")
+					var/hm=Ask(A, "Do you want to change your icon into [Z] which [usr] presented?", "", null, "pick", list("No","Yes"), 0)
 					if(hm=="No")
 						return
 				A.LastIconChange=usr.key
 				A.icon=Z
-				A.pixel_x=input("X adjustment.") as num
-				A.pixel_y=input("Y adjustment.") as num
+				A.pixel_x=Ask(usr, "X adjustment.", "", null, "num", null, 0)
+				A.pixel_y=Ask(usr, "Y adjustment.", "", null, "num", null, 0)
 				A?:customPixelX= A.pixel_x
 				A?:customPixelY= A.pixel_y
 				A?:client.SaveChar()
 
-	Custom_Appearance_Forms(var/atom/A as mob in view(usr,5))
+	Custom_Appearance_Forms()
 		set src=usr.client
 		set category="Other"
 		set hidden = 1
 		set name="Customize: Forms"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
+		var/atom/A = PromptArg(usr, args, 1, "Customize: Forms", "view:5:mob", 1)
+		if(isnull(A)) return
 		var/list/Options=list("Cancel")
 		var/list/transOptions = list("Cancel")
 		if(istype(A,/mob))
@@ -564,7 +574,7 @@ mob/Players/verb
 				return
 
 			if(transOptions.len>1)
-				var/Choice = input(usr, "Which transformation do you want to edit?", "Change Form Icons") in transOptions
+				var/Choice = Ask(usr, "Which transformation do you want to edit?", "Change Form Icons", null, "pick", transOptions, 0)
 				if(Choice == "Cancel") goto SKIP
 				Choice = text2path(Choice)
 				var/transformation/transSelected
@@ -573,95 +583,95 @@ mob/Players/verb
 						transSelected = t
 						break
 				var/list/transVisualOptions = list("Cancel", "Base", "Hair", "Icon 1", "Underlay 1", "Icon 2", "Underlay 2", "Aura", "Aura Underlay", "Profile")
-				var/aspectPicked=input(usr, "What aspect of your forms do you wish to edit?", "Change Form Icons") in transVisualOptions
+				var/aspectPicked=Ask(usr, "What aspect of your forms do you wish to edit?", "Change Form Icons", null, "pick", transVisualOptions, 0)
 				switch(aspectPicked)
 					if("Base")
 						transSelected.form_base = input(usr, "What base icon would you like to use in this form?", "Base Icon") as icon|null
 						if(transSelected.form_base)
-							transSelected.form_base_x = input(usr, "X offset?", "Base X") as num|null
-							transSelected.form_base_y = input(usr, "Y offset?", "Base Y") as num|null
+							transSelected.form_base_x = Ask(usr, "X offset?", "Base X", null, "num", null, 1)
+							transSelected.form_base_y = Ask(usr, "Y offset?", "Base Y", null, "num", null, 1)
 					if("Hair")
 						transSelected.form_hair_icon = input(usr, "What hair would you like to use in this form?", "Hair") as icon|null
 						if(transSelected.form_hair_icon)
-							transSelected.form_hair_x = input(usr, "X offset?", "Hair X") as num|null
-							transSelected.form_hair_y = input(usr, "Y offset?", "Hair Y") as num|null
+							transSelected.form_hair_x = Ask(usr, "X offset?", "Hair X", null, "num", null, 1)
+							transSelected.form_hair_y = Ask(usr, "Y offset?", "Hair Y", null, "num", null, 1)
 					if("Icon 1")
 						transSelected.form_icon_1_icon = input(usr, "What extra overlay icon would you like to use in this form?", "Icon 1") as icon|null
 						if(transSelected.form_icon_1_icon)
-							transSelected.form_icon_1_icon_state = input(usr, "State?", "State", transSelected.form_icon_1_icon_state) as message|null
-							transSelected.form_icon_1_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_icon_1_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
-							transSelected.form_icon_1_layer = input(usr, "Layer?", "Layer") as num|null
+							transSelected.form_icon_1_icon_state = Ask(usr, "State?", "State", transSelected.form_icon_1_icon_state, "message", null, 1)
+							transSelected.form_icon_1_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_icon_1_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
+							transSelected.form_icon_1_layer = Ask(usr, "Layer?", "Layer", null, "num", null, 1)
 					if("Underlay 1")
 						transSelected.form_underlay_1_icon = input(usr, "What extra underlay icon would you like to use in this form?", "Underlay 1") as icon|null
 						if(transSelected.form_underlay_1_icon)
-							transSelected.form_underlay_1_icon_state = input(usr, "State?", "State", transSelected.form_underlay_1_icon_state) as message|null
-							transSelected.form_underlay_1_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_underlay_1_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
+							transSelected.form_underlay_1_icon_state = Ask(usr, "State?", "State", transSelected.form_underlay_1_icon_state, "message", null, 1)
+							transSelected.form_underlay_1_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_underlay_1_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
 					if("Icon 2")
 						transSelected.form_icon_2_icon = input(usr, "What extra overlay would you like to use in this form?", "Icon 2") as icon|null
 						if(transSelected.form_aura_underlay_icon)
-							transSelected.form_icon_2_icon_state = input(usr, "State?", "State", transSelected.form_icon_2_icon_state) as message|null
-							transSelected.form_icon_2_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_icon_2_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
+							transSelected.form_icon_2_icon_state = Ask(usr, "State?", "State", transSelected.form_icon_2_icon_state, "message", null, 1)
+							transSelected.form_icon_2_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_icon_2_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
 					if("Underlay 2")
 						transSelected.form_underlay_2_icon = input(usr, "What extra underlay icon would you like to use in this form?", "Underlay 2") as icon|null
 						if(transSelected.form_underlay_2_icon)
-							transSelected.form_underlay_2_icon_state = input(usr, "State?", "State", transSelected.form_underlay_2_icon_state) as message|null
-							transSelected.form_underlay_2_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_underlay_2_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
+							transSelected.form_underlay_2_icon_state = Ask(usr, "State?", "State", transSelected.form_underlay_2_icon_state, "message", null, 1)
+							transSelected.form_underlay_2_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_underlay_2_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
 					if("Aura")
 						transSelected.form_aura_icon = input(usr, "What aura would you like to use in this form?", "Aura") as icon|null
 						if(transSelected.form_aura_icon)
-							transSelected.form_aura_icon_state = input(usr, "State?", "State", transSelected.form_aura_icon_state) as message|null
-							transSelected.form_aura_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_aura_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
+							transSelected.form_aura_icon_state = Ask(usr, "State?", "State", transSelected.form_aura_icon_state, "message", null, 1)
+							transSelected.form_aura_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_aura_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
 					if("Aura Underlay")
 						transSelected.form_aura_underlay_icon = input(usr, "What aura underlay would you like to use in this form?", "Aura Underlay") as icon|null
 						if(transSelected.form_aura_underlay_icon)
-							transSelected.form_aura_underlay_icon_state = input(usr, "State?", "State", transSelected.form_aura_underlay_icon_state) as message|null
-							transSelected.form_aura_underlay_x = input(usr, "X offset?", "Aura Underlay X") as num|null
-							transSelected.form_aura_underlay_y = input(usr, "Y offset?", "Aura Underlay Y") as num|null
+							transSelected.form_aura_underlay_icon_state = Ask(usr, "State?", "State", transSelected.form_aura_underlay_icon_state, "message", null, 1)
+							transSelected.form_aura_underlay_x = Ask(usr, "X offset?", "Aura Underlay X", null, "num", null, 1)
+							transSelected.form_aura_underlay_y = Ask(usr, "Y offset?", "Aura Underlay Y", null, "num", null, 1)
 					if("Profile")
-						transSelected.form_profile=input(usr, "What profile would you like to display while in this form?", "Change Form Profile", transSelected.form_profile) as message|null
+						transSelected.form_profile=Ask(usr, "What profile would you like to display while in this form?", "Change Form Profile", transSelected.form_profile, "message", null, 1)
 
 			SKIP
 			if(Options.len>1)
-				var/Choice=input(usr, "What aspect of your forms do you wish to edit?", "Change Form Icons") in Options
+				var/Choice=Ask(usr, "What aspect of your forms do you wish to edit?", "Change Form Icons", null, "pick", Options, 0)
 				switch(Choice)
 					if("Expanded State")
 						usr.ExpandBase=input(usr, "What base do you want to use for your Expanded State?", "Change Form Icon") as icon|null
 					if("Spirit Form Base")
 						usr.Form1Base=input(usr, "What base would you like to use while in Spirit Form?", "Change Form Icon") as icon|null
 						if(usr.Form1Base)
-							usr.Form1BaseX=input(usr, "X offset?", "Change Form Icon") as num|null
-							usr.Form1BaseY=input(usr, "Y offset?", "Change Form Icon") as num|null
+							usr.Form1BaseX=Ask(usr, "X offset?", "Change Form Icon", null, "num", null, 1)
+							usr.Form1BaseY=Ask(usr, "Y offset?", "Change Form Icon", null, "num", null, 1)
 					if("Spirit Form Hair")
 						usr.Form1Hair=input(usr, "What hair would you like to use while in Spirit Form?", "Change Form Icon") as icon|null
 						if(usr.Form1Hair)
-							usr.Form1HairX=input(usr, "X offset?", "Change Form Icon") as num|null
-							usr.Form1HairY=input(usr, "Y offset?", "Change Form Icon") as num|null
+							usr.Form1HairX=Ask(usr, "X offset?", "Change Form Icon", null, "num", null, 1)
+							usr.Form1HairY=Ask(usr, "Y offset?", "Change Form Icon", null, "num", null, 1)
 					if("Spirit Form Overlay")
 						usr.Form1Overlay=input(usr, "What overlay would you like to use while in Spirit Form?", "Change Form Icon") as icon|null
 						if(usr.Form1Overlay)
-							usr.Form1OverlayX=input(usr, "X offset?", "Change Form Icon") as num|null
-							usr.Form1OverlayY=input(usr, "Y offset?", "Change Form Icon") as num|null
+							usr.Form1OverlayX=Ask(usr, "X offset?", "Change Form Icon", null, "num", null, 1)
+							usr.Form1OverlayY=Ask(usr, "Y offset?", "Change Form Icon", null, "num", null, 1)
 					if("Spirit Form Top Overlay")
 						usr.Form1TopOverlay=input(usr, "What Top Overlay would you like to use while in Spirit Form?", "Change Form Icon") as icon|null
 						if(usr.Form1TopOverlay)
-							usr.Form1TopOverlayX=input(usr, "X offset?", "Change Form Icon") as num|null
-							usr.Form1TopOverlayY=input(usr, "Y offset?", "Change Form Icon") as num|null
+							usr.Form1TopOverlayX=Ask(usr, "X offset?", "Change Form Icon", null, "num", null, 1)
+							usr.Form1TopOverlayY=Ask(usr, "Y offset?", "Change Form Icon", null, "num", null, 1)
 					if("Spirit Form Profile")
-						usr.Form1Profile=input(usr, "What profile would you like to display while in Spirit Form?", "Change Form Icon", usr.Form1Profile) as message|null
+						usr.Form1Profile=Ask(usr, "What profile would you like to display while in Spirit Form?", "Change Form Icon", usr.Form1Profile, "message", null, 1)
 					if("Spirit Form Aura")
 						usr.Form1Aura=input(usr, "What aura would you like to use while in Spirit Form?", "Change Form Icon") as icon|null
 						if(usr.Form1Aura)
-							usr.Form1AuraX=input(usr, "X offset?", "Change Form Icon") as num|null
-							usr.Form1AuraY=input(usr, "Y offset?", "Change Form Icon") as num|null
+							usr.Form1AuraX=Ask(usr, "X offset?", "Change Form Icon", null, "num", null, 1)
+							usr.Form1AuraY=Ask(usr, "Y offset?", "Change Form Icon", null, "num", null, 1)
 					if("Spirit Form Active Text")
-						usr.Form1ActiveText=input(usr, "What text would you like to display while entering Spirit Form?  There is no default text.", "Change Form Icon") as text|null
+						usr.Form1ActiveText=Ask(usr, "What text would you like to display while entering Spirit Form?  There is no default text.", "Change Form Icon", null, "text", null, 1)
 					if("Spirit Form Revert Text")
-						usr.Form1RevertText=input(usr, "What text would you like to display while entering Spirit Form?  There is no default text.", "Change Form Icon") as text|null
+						usr.Form1RevertText=Ask(usr, "What text would you like to display while entering Spirit Form?  There is no default text.", "Change Form Icon", null, "text", null, 1)
 
 	Custom_Appearance_Charge()
 		set category="Other"
@@ -712,21 +722,21 @@ mob/Players/verb
 		set name="Text Color: IC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		src.Text_Color=input(usr, "Choose a color for Say.") as color
+		src.Text_Color=Ask(usr, "Choose a color for Say.", "", null, "color", null, 0)
 	Emote_Color()
 		set category="Other"
 		set hidden = 1
 		set name="Text Color: Emote"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		src.Emote_Color=input(usr, "Choose a color for Emote.") as color
+		src.Emote_Color=Ask(usr, "Choose a color for Emote.", "", null, "color", null, 0)
 	Text_Color_OOC()
 		set category="Other"
 		set hidden = 1
 		set name="Text Color: OOC"
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		src.OOC_Color=input(usr, "Choose a color for OOC.") as color
+		src.OOC_Color=Ask(usr, "Choose a color for OOC.", "", null, "color", null, 0)
 	Who()
 		set category="Other"
 		set hidden = 1
@@ -737,62 +747,23 @@ mob/Players/verb
 			if(M.client)
 				people.Add(M.key)
 		var/list/sortedpeople=dd_sortedTextList(people,0)
-		var/online=0
-		var/View = {"<html><head><title>Who</title>
-<style>
-body{margin:0;background:#0d1730;color:#d8f6ff;font-family:Verdana,Arial,sans-serif;font-size:12px;}
-.wrap{border:2px solid #45c7e0;margin:8px;padding:10px;background:#132447;}
-h2{margin:0 0 8px 0;color:#8be9ff;font-size:16px;letter-spacing:1px;}
-.summary{color:#55ee55;font-weight:bold;margin-top:8px;}
-table{width:100%;border-collapse:collapse;}
-th{color:#ffd76b;text-align:left;border-bottom:1px solid #45c7e0;padding:4px 6px;}
-td{border-bottom:1px solid #2e6682;padding:4px 6px;vertical-align:top;}
-.num{text-align:right;white-space:nowrap;}
-.row{border-top:1px solid #2e6682;padding:5px 0;}
-.row:first-of-type{border-top:0;}
-a{color:#8be9ff;}
-</style></head><body><div class='wrap'><h2>WHO</h2>"}
+		var/list/rows = list()
+		for(var/x in sortedpeople)
+			for(var/mob/M in players)
+				if(M.key != x)
+					continue
+				if(usr.Admin)
+					var/spent = M.RPPSpent
+					var/spendable = M.RPPSpendable
+					var/race_excluded = round((spent + spendable) / M.RPPMult, 1)
+					rows[++rows.len] = list("t" = "[M.key]", "tn" = "[M.name]", "t2" = "[M.race ? M.race.name : "No race"] - [M.loc] ([M.x],[M.y],[M.z])", "h" = "?src=\ref[M];action=MasterControl", "c" = list("[M.Base] ([M.potential_power_mult])", Commas(spent), Commas(spendable), Commas(spent + spendable), Commas(race_excluded)), "s" = list(M.Base, spent, spendable, spent + spendable, race_excluded))
+				else
+					rows[++rows.len] = list("t" = "[x]")
+				break
 		if(usr.Admin)
-			View+={"
-					<table>
-					<tr>
-					<th>Key (IC Name)</th>
-					<th>Race</th>
-					<th>Location</th>
-					<th class='num'>Base</th>
-					<th>Age</th>
-					<th class='num'>Spent</th>
-					<th class='num'>Spendable</th>
-					<th class='num'>Total</th>
-					<th class='num'>Race Excl.</th>
-					</tr>"}
-			for(var/x in sortedpeople)
-				for(var/mob/M in players)
-					if(M.key==x)
-						online++
-						var/race_excluded = round((M.RPPSpent + M.RPPSpendable) / M.RPPMult, 1)
-						View+={"<tr>
-							<td>[M.key] ([M.name]) <a href=?src=\ref[M];action=MasterControl>x</a></td>
-							<td>[M.race.name]</td>
-							<td>[M.loc] ([M.x],[M.y],[M.z])</td>
-							<td class='num'>[M.Base] ([M.potential_power_mult])</td>
-							<td class='num'>[M.RPPSpent]</td>
-							<td class='num'>[M.RPPSpendable]</td>
-							<td class='num'>[M.RPPSpendable + M.RPPSpent]</td>
-							<td class='num'>[race_excluded]</td>
-							</tr>"}
-						break
-			View+={"</table>"}
+			usr.client?.TableShow("who:admin", "WHO", "Players online", "[rows.len] online", list(list("l" = "PLAYER", "a" = "l"), list("l" = "BASE", "a" = "r"), list("l" = "SPENT", "a" = "r"), list("l" = "SPENDABLE", "a" = "r"), list("l" = "TOTAL", "a" = "r"), list("l" = "RACE EXCL.", "a" = "r")), rows, "a player for controls", null, list("two" = 1))
 		else
-
-			for(var/x in sortedpeople)
-				online++
-				View+="<div class='row'>[x]</div>"
-		View+="<div class='summary'>Online: [online]</div></div></body></html>"
-		if(usr.Admin)
-			usr<<browse("[View]","window=Logzk;size=900x450")
-		else
-			usr<<browse("[View]","window=Logzk;size=240x420")
+			usr.client?.TableShow("who:players", "WHO", "Players online", "[rows.len] online", list(list("l" = "PLAYER", "a" = "l")), rows, "", null, list("nohead" = 1))
 
 	GetPingSound()
 		set category = "Other"
@@ -809,7 +780,7 @@ a{color:#8be9ff;}
 		set category = "Other"
 		set name = "Set Ping Volume"
 		set hidden = 1
-		var/n = input(src, "What volume?") as num
+		var/n = Ask(src, "What volume?", "", null, "num", null, 0)
 		if(n > 100 || n < 0)
 			src << " too high or low "
 		else
@@ -821,13 +792,13 @@ a{color:#8be9ff;}
 		set hidden = 1
 		if(!src.client)
 			return
-		var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
+		var/choice = Ask(src, "Change PU Charging", "PU Charging Style", null, "text", null, 0)
 		if(length(choice)>200)
 			return
 		if(length(choice)<1)
 			return
 		custom_powerup = choice
-		choice = input(src, "Do you want to include your name in the PU charging?") in list("Yes", "No")
+		choice = Ask(src, "Do you want to include your name in the PU charging?", "", null, "pick", list("Yes", "No"), 0)
 		if(choice == "Yes")
 			customPUnameInclude = TRUE
 		else
@@ -846,7 +817,7 @@ a{color:#8be9ff;}
 		set hidden = 1
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
-		var/CharProfile=input(src, "Please input a description for your character.", "Character Description", usr.Profile) as message
+		var/CharProfile=Ask(src, "Please input a description for your character.", "Character Description", usr.Profile, "message", null, 0)
 		while(sanitizeDesc(CharProfile))
 			src<<"Your profile contains illegal tags. Please try again."
 			return
@@ -1025,18 +996,18 @@ mob/Players/verb
 		usr.verb_delay=world.time+1
 		var/textstring=""
 		var/total=0
-		var/dienumber=input("How many dice?") as num
+		var/dienumber=Ask(usr, "How many dice?", "", null, "num", null, 0)
 		if(dienumber>10)
 			dienumber=10
-		var/diesides=input("How many sides?") as num
+		var/diesides=Ask(usr, "How many sides?", "", null, "num", null, 0)
 		if(diesides>100)
 			diesides=100
-		var/diemodifer=input("Modify the total?") as num
+		var/diemodifer=Ask(usr, "Modify the total?", "", null, "num", null, 0)
 		if(diemodifer>100)
 			diemodifer=100
 		if(diemodifer<-100)
 			diemodifer=-100
-		var/decision=input("Seperate the dice rolls?") in list("Yes","No")
+		var/decision=Ask(usr, "Seperate the dice rolls?", "", null, "pick", list("Yes","No"), 0)
 		if(decision=="Yes")
 			var/oldnum = dienumber
 			while(dienumber>0)

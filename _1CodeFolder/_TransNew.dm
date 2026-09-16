@@ -89,7 +89,9 @@ mob
 		Form5AuraY
 
 mob/Admin3/verb
-	Flash(var/mob/m)
+	Flash()
+		var/mob/m = PromptArg(usr, args, 1, "Flash", "view::mob")
+		if(isnull(m)) return
 		DarknessFlash(m)
 
 proc/DarknessFlash(var/mob/Z, var/SetTime=0)
@@ -296,20 +298,20 @@ mob/proc/ChooseSuperAlien()
 	var/Choice
 	var/Confirm
 	while(Confirm!="Yes")
-		Choice=input(src, "What class of alien do you want to be?", "Alien Class") in list ("Brutality", "Harmony", "Ferocity", "Tenacity", "Equanimity", "Sagacity")
+		Choice=Ask(src, "What class of alien do you want to be?", "Alien Class", null, "pick", list ("Brutality", "Harmony", "Ferocity", "Tenacity", "Equanimity", "Sagacity"), 0)
 		switch(Choice)
 			if("Brutality")
-				Confirm=alert(src, "Brute aliens gain increased strength and agility.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Brute aliens gain increased strength and agility.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 			if("Harmony")
-				Confirm=alert(src, "Harmony aliens gain increase spiritual strength and slight increase in speed.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Harmony aliens gain increase spiritual strength and slight increase in speed.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 			if("Ferocity")
-				Confirm=alert(src, "Ferocious aliens gain increased offensive power in strength, spirit and agility.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Ferocious aliens gain increased offensive power in strength, spirit and agility.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 			if("Tenacity")
-				Confirm=alert(src, "Tenacious aliens gain increased endurance and slight increase in physical strength.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Tenacious aliens gain increased endurance and slight increase in physical strength.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 			if("Equanimity")
-				Confirm=alert(src, "Equanimous aliens gain increased endurance and slight increase in spiritual focus.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Equanimous aliens gain increased endurance and slight increase in spiritual focus.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 			if("Sagacity")
-				Confirm=alert(src, "Sagacious aliens gain increased offensive power in strength, spirit and extra endurance.  Do you want to transform into one?", "Alien Class", "Yes", "No")
+				Confirm=Ask(src, "Sagacious aliens gain increased offensive power in strength, spirit and extra endurance.  Do you want to transform into one?", "Alien Class", null, "confirm", null, 1, "Yes", "No")
 	race.transformations[1].TransClass=Choice
 
 mob/proc/SuperAlienBase(var/x)

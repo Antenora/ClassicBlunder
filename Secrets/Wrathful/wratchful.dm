@@ -145,7 +145,7 @@ scaling with potential as well
 /mob/Admin3/verb/Give_Rare_Saiyan()
 	set category = "Admin"
 	set name = "Give Rare Saiyan"
-	var/mob/p = input(src, "Who?", "Give Rare Saiyan") in players
+	var/mob/p = Ask(src, "Who?", "Give Rare Saiyan", null, "pick", players, 0)
 	if(!p) return
 	if(!p.isRace(/race/saiyan))
 		src << "<font color=red>[p] is not a Saiyan.</font>"
@@ -153,7 +153,7 @@ scaling with potential as well
 	if(p.Secret)
 		src << "[p] has a Secret and cannot become a Rare Variant."
 		return
-	var/choice = input(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan") as null|anything in list("Hellspawn", "Heavenborn", "Legendary", "Wrathful", "Cancel")
+	var/choice = Ask(usr, "Which rare saiyan for [p]?", "Give Rare Saiyan", null, "pick", list("Hellspawn", "Heavenborn", "Legendary", "Wrathful", "Cancel"), 1)
 	if(!choice || choice == "Cancel") return
 	switch(choice)
 		if("Hellspawn")

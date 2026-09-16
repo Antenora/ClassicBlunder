@@ -24,7 +24,7 @@
 			M << "<font color=#77ff77><b>Your inner dragon has not yet awakened. Try again in [time_left] days.</b></font>"
 			return
 
-		var/choice = input(M, "What will you wish for?", "Inner Dragon Wish") in list("Increase Economy", "Unlock Ascension (Warrior only)", "Unlock Orange Namekian (Warrior only)", "Reclass to Warrior")
+		var/choice = Ask(M, "What will you wish for?", "Inner Dragon Wish", null, "pick", list("Increase Economy", "Unlock Ascension (Warrior only)", "Unlock Orange Namekian (Warrior only)", "Reclass to Warrior"), 0)
 		if(!choice) return
 
 		switch(choice)
@@ -46,7 +46,7 @@
 					M << "<font color=#aaaaaa><b>There are no Namekians nearby to bless...</b></font>"
 					return
 
-				var/asc_choice = input(M, "Whose ascension will you awaken?", "Choose Namekian") as anything in namekian_targets
+				var/asc_choice = Ask(M, "Whose ascension will you awaken?", "Choose Namekian", null, "pick", namekian_targets, 0)
 				if(!asc_choice) return
 				var/mob/target = namekian_targets[asc_choice]
 
@@ -84,7 +84,7 @@
 					M << "<font color=#aaaaaa><b>There are no Namekians nearby to bless...</b></font>"
 					return
 
-				var/trans_choice = input(M, "Who will you grant hidden power to?", "Choose Namekian") as anything in namekian_targets
+				var/trans_choice = Ask(M, "Who will you grant hidden power to?", "Choose Namekian", null, "pick", namekian_targets, 0)
 				if(!trans_choice) return
 				var/mob/target = namekian_targets[trans_choice]
 

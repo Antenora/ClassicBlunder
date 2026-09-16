@@ -154,7 +154,7 @@ proc/DevelopSignature(mob/m, Tier, Type)
 			return
 	if (usr.SignatureSelected.len > 0)
 		options.Remove(usr.SignatureSelected)
-	var/obj/Skills/new_skill = input("Tier [Tier] [Type] Development") as null|anything in options
+	var/obj/Skills/new_skill = Ask(usr, "Tier [Tier] [Type] Development", "", null, "pick", options, 1)
 	if (!new_skill) return
 	if (!istype(options[new_skill], /list))
 		if(istext(options[new_skill]))
@@ -184,7 +184,7 @@ proc/DevelopSignature(mob/m, Tier, Type)
 				text = replacetext(text, "_", " ")
 				usr << "You do not meet the requirements for [(check)]. You still need to learn [text]"
 				return
-		switch (input("[textdesc]Would you like to develop [new_skill]?") in list("Yes", "No"))
+		switch (Ask(usr, "[textdesc]Would you like to develop [new_skill]?", "", null, "pick", list("Yes", "No"), 0))
 			if ("Yes")
 				var/path = options[new_skill]
 				var/obj/Skills/s = new path
@@ -197,7 +197,7 @@ proc/DevelopSignature(mob/m, Tier, Type)
 				usr << "You obtained [new_skill]"
 	else
 		var/list/check = options[new_skill]
-		switch (input("Would you like to develop [new_skill]?") in list("Yes", "No"))
+		switch (Ask(usr, "Would you like to develop [new_skill]?", "", null, "pick", list("Yes", "No"), 0))
 			if ("No") return
 		for (var/index in check)
 			var/obj/Skills/s = text2path(index)

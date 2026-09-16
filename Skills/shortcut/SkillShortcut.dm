@@ -141,11 +141,11 @@ What shortcut do you want to set?"}
 /mob/proc/
     setSkillShortcut()
         var/list/choices = getSkillShortcutChoices();
-        var/choice = input(src, SHORTCUT_HELP, "Set Skill Shortcuts") in choices;
+        var/choice = Ask(src, SHORTCUT_HELP, "Set Skill Shortcuts", null, "pick", choices, 0);
         if(choice=="Nevermind") return;
         var/scName = getShortcutName(choice);
         var/list/skills = getPotentialShortcutSkills();
-        var/obj/Skills/sChoice = input(src, SHORTCUT_SKILL_HELP, "Set [choice]") in skills;
+        var/obj/Skills/sChoice = Ask(src, SHORTCUT_SKILL_HELP, "Set [choice]", null, "pick", skills, 0);
         if(sChoice=="Nevermind") return;
         shortcuts.vars[scName]=sChoice;
         src << "<b>[sChoice]</b> has been set as your <b>[choice]</b>!"
@@ -168,7 +168,7 @@ What shortcut do you want to set?"}
 /mob/proc/
     clearSkillShortcut()
         var/list/choices = getFilledSkillShortcuts();
-        var/choice = input(src, SHORTCUT_CLEAR_HELP, "Clear Skill Shortcut") in choices;
+        var/choice = Ask(src, SHORTCUT_CLEAR_HELP, "Clear Skill Shortcut", null, "pick", choices, 0);
         if(choice=="Nevermind") return;
         var/scName = getShortcutName(choice);
         shortcuts.vars[scName] = null;

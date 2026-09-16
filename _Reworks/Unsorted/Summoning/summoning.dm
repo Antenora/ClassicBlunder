@@ -89,15 +89,17 @@ Summon skill
 
 
 
-/mob/Admin4/verb/Make_Summon(mob/p in players)
+/mob/Admin4/verb/Make_Summon()
     set name = "Make Summon"
     set category = "Admin"
+    var/mob/p = PromptArg(usr, args, 1, "Make Summon", "players")
+    if(isnull(p)) return
     if(p == null)
         return
     if(!p.client)
         return
 
-    var/whatTier = input(src, "What tier would you like the summon to be (1-5)?") as num
+    var/whatTier = Ask(src, "What tier would you like the summon to be (1-5)?", "", null, "num", null, 0)
     if(whatTier < 1 || whatTier > 5)
         return
     if(SummonTier < 1)

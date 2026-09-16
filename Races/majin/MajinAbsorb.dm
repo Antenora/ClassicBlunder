@@ -278,7 +278,7 @@ majinAbsorb/proc/StealSkills(mob/absorber, mob/absorbee)
             var/label = "[s.name ? s.name : s.type]"
             menu += label
             menu_lookup[label] = s
-        var/choice = input(absorber, "Pick a skill to absorb ([picks_left] picks left):", "Absorb Skills") in menu
+        var/choice = Ask(absorber, "Pick a skill to absorb ([picks_left] picks left):", "Absorb Skills", null, "pick", menu, 0)
         if(choice == "Cancel" || !choice) break
         var/obj/Skills/picked = menu_lookup[choice]
         if(!picked) continue
@@ -634,7 +634,7 @@ majinAbsorb/proc/StartDigestionLoop(mob/absorber)
         var/label = victim ? "[displayName] ([key])" : "[displayName] ([key]) (offline)"
         menu += label
         menu_lookup[label] = key
-    var/choice = input(src, "Who do you want to spit out?", "Release Absorb") in menu
+    var/choice = Ask(src, "Who do you want to spit out?", "Release Absorb", null, "pick", menu, 0)
     if(!choice || choice == "Cancel") return
     var/targetKey = menu_lookup[choice]
     if(!targetKey) return

@@ -1,11 +1,11 @@
 /mob/Admin3/verb/BreakPact()
-	var/datum/Pact/whichPact = input(usr, "Which pact would you like to break?") in glob.allPacts
-	var/withPenalties = input(usr, "Would you like to break that pact with penalties or without?") in list("With Penalties", "Without Penalties")
+	var/datum/Pact/whichPact = Ask(usr, "Which pact would you like to break?", "", null, "pick", glob.allPacts, 0)
+	var/withPenalties = Ask(usr, "Would you like to break that pact with penalties or without?", "", null, "pick", list("With Penalties", "Without Penalties"), 0)
 	var/penaltiesForWho
 	switch(withPenalties)
 		if("With Penalties")
 			withPenalties = TRUE
-			penaltiesForWho = input(usr, "Who would you like to apply penalties to?") in list("Both", PACT_OWNER, PACT_SUBJECT)
+			penaltiesForWho = Ask(usr, "Who would you like to apply penalties to?", "", null, "pick", list("Both", PACT_OWNER, PACT_SUBJECT), 0)
 		if("Without Penalties")
 			withPenalties = FALSE
 	whichPact.breakPact(withPenalties, penaltiesForWho)
@@ -32,7 +32,7 @@ proc/findPactByID(id)
 		user << "You don't have any pacts set up!"
 		return
 
-	var/datum/Pact/whichPact = input(user, "What pact would you like to view the details and penalty of?") in allPacts
+	var/datum/Pact/whichPact = Ask(user, "What pact would you like to view the details and penalty of?", "", null, "pick", allPacts, 0)
 	whichPact.viewAllDetails(user)
 
 /obj/Pact/proc/getAllPacts()
@@ -72,7 +72,7 @@ proc/findPactByID(id)
 		. += m
 
 /obj/Pact/Pacter/proc/pickTarget(mob/user, list/validTargets)
-	var/target = input(user, "Who would you like to make a pact with?") in validTargets
+	var/target = Ask(user, "Who would you like to make a pact with?", "", null, "pick", validTargets, 0)
 	if(target=="Cancel") return 0
 	return target
 
@@ -122,7 +122,7 @@ proc/findPactByID(id)
 
 /datum/Pact/proc/presentPact(mob/presentingTo)
 	viewDetails(presentingTo)
-	var/accept = input(presentingTo, "Do you accept the pact with the penalties of [translatePenalty(PACT_OWNER)] for the owner([findPlayerByUID(ownerUID)]), and [translatePenalty(PACT_SUBJECT)] for the subject([presentingTo.name]) from [findPlayerByUID(ownerUID)]? The harshness of these penalties are [getHarshnessForDisplay()]% of your values.") in list("Yes", "No")
+	var/accept = Ask(presentingTo, "Do you accept the pact with the penalties of [translatePenalty(PACT_OWNER)] for the owner([findPlayerByUID(ownerUID)]), and [translatePenalty(PACT_SUBJECT)] for the subject([presentingTo.name]) from [findPlayerByUID(ownerUID)]? The harshness of these penalties are [getHarshnessForDisplay()]% of your values.", "", null, "pick", list("Yes", "No"), 0)
 	switch(accept)
 		if("Yes")
 			return 1
@@ -164,21 +164,21 @@ proc/findPactByID(id)
 /datum/Pact/proc/chooseOwnerPenalties(mob/picker)
 	var/choice
 	while(choice != "No Penalty")
-		choice = input(picker, "What penalties would you like to add to the Owner's Penalties, the current penalties are [translatePenalty()] Click No Penalty when done.", "Owner Penalty Selection") in PENALTY_LIST
+		choice = Ask(picker, "What penalties would you like to add to the Owner's Penalties, the current penalties are [translatePenalty()] Click No Penalty when done.", "Owner Penalty Selection", null, "pick", PENALTY_LIST, 0)
 		ownerPenalty |= PENALTY_TRANSLATION_LIST[choice]
 	picker << "The owner penalties are [translatePenalty(PACT_OWNER)]"
 
 /datum/Pact/proc/chooseSubjectPenalties(mob/picker)
 	var/choice
 	while(choice != "No Penalty")
-		choice = input(picker, "What penalties would you like to add to the Subject's Penalties, the current penalties are [translatePenalty()] Click No Penalty when done.", "Subject Penalty Selection") in PENALTY_LIST
+		choice = Ask(picker, "What penalties would you like to add to the Subject's Penalties, the current penalties are [translatePenalty()] Click No Penalty when done.", "Subject Penalty Selection", null, "pick", PENALTY_LIST, 0)
 		subjectPenalty |= PENALTY_TRANSLATION_LIST[choice]
 	picker << "The subject penalties are [translatePenalty(PACT_SUBJECT)]"
 
 /datum/Pact/proc/choosePenaltyHarshness(mob/picker)
 	var/harshness = -1
 	while(harshness == -1)
-		harshness = input(picker, "What amount of harshness do you want the penalty to be? From 1 to 100. 1 being a 1% tax on break, or a 1% health cut and so on. This doesn't impact Death Penalty.", "Penalty Harshness") as num
+		harshness = Ask(picker, "What amount of harshness do you want the penalty to be? From 1 to 100. 1 being a 1% tax on break, or a 1% health cut and so on. This doesn't impact Death Penalty.", "Penalty Harshness", null, "num", null, 0)
 		if(harshness > 100 || harshness < 0)
 			picker << "Invalid harshness!"
 			harshness = -1
@@ -188,14 +188,14 @@ proc/findPactByID(id)
 	return penaltyHarshness*100
 
 /datum/Pact/proc/createDetails(mob/writer)
-	details = input(writer, "What would you like the details to be?") as message
+	details = Ask(writer, "What would you like the details to be?", "", null, "message", null, 0)
 
 /datum/Pact/proc/viewDetails(mob/viewer)
-	viewer << browse(html_encode(details))
+	viewer.client?.DocShow("pact:\ref[src]", "PACT", "Pact Details", details, "text")
 
 /datum/Pact/proc/confirmDetails(mob/owner)
 	viewDetails(owner)
-	var/confirm = input("Are you sure you want to present this pact to [findPlayerByUID(subjectUID)] with the penalties of [translatePenalty()] with a harshness of [getHarshnessForDisplay()]% and the following details?") in list("Yes", "No")
+	var/confirm = Ask(usr, "Are you sure you want to present this pact to [findPlayerByUID(subjectUID)] with the penalties of [translatePenalty()] with a harshness of [getHarshnessForDisplay()]% and the following details?", "", null, "pick", list("Yes", "No"), 0)
 	switch(confirm)
 		if("Yes")
 			return 1
@@ -302,7 +302,7 @@ proc/findPactByID(id)
 	if(PactsTaken + 1 > asc)
 		o <<"You can't make any more pacts."
 		return
-	var/option = input(o, "What do you want to give?") in list("Magic", "Passive","Enchant")
+	var/option = Ask(o, "What do you want to give?", "", null, "pick", list("Magic", "Passive","Enchant"), 0)
 	giveReward(o, p, option)
 
 
@@ -318,8 +318,8 @@ proc/findPactByID(id)
 			var/exit = FALSE
 			var/obj/Skills/newSkill = null
 			while(exit == FALSE)
-				var/category = input(o, "What category") in list("DarkMagic", "HellFire")
-				var/selection = input(o, "What skill?") in skills[category]
+				var/category = Ask(o, "What category", "", null, "pick", list("DarkMagic", "HellFire"), 0)
+				var/selection = Ask(o, "What skill?", "", null, "pick", skills[category], 0)
 				for(var/obj/Skills/x in p)
 					if(x.type == selection)
 						exists = TRUE
@@ -333,7 +333,7 @@ proc/findPactByID(id)
 			p.AddSkill(newSkill)
 
 		if("Passive")
-			var/passive = input(o, "What passive?") in o.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2).passives
+			var/passive = Ask(o, "What passive?", "", null, "pick", o.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Devil_Arm2).passives, 0)
 			if(!passive)
 				o << "You have none"
 				return

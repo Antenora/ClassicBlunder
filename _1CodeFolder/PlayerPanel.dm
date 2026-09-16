@@ -305,4 +305,4 @@ client/proc/ShowProfileWindow(mob/T)
 	if(profileHTML == "<html>")
 		profileHTML += T.Profile
 	profileHTML += "</html>"
-	mob << browse(profileHTML, "window=[T];size=900x650")
+	DocShow("profile:\ref[T]", "PROFILE", "[T]", profileHTML, "author", "", 900, 650)

@@ -28,7 +28,7 @@ mob/Players
 			if(istype(A,/obj/Special/Teleporter2/Depths))
 				if(!src.isRace(DEMON))
 					if(!src.isRace(ELDRITCH))
-						switch(alert(src, "You feel a deathly chill coming from this portal. As you draw closer and closer, you feel a tug on your soul, the barrier between life and death growing more indistinct. You may not survive coming any closer.", "Are you sure you want to enter a portal to the Depths? You will die if you're not a Demon, an Eldritch, or somehow have a power native to the realm (AbyssMod or ChaosMod).", "Yes", "No"))
+						switch(Ask(src, "You feel a deathly chill coming from this portal. As you draw closer and closer, you feel a tug on your soul, the barrier between life and death growing more indistinct. You may not survive coming any closer.", "Are you sure you want to enter a portal to the Depths? You will die if you're not a Demon, an Eldritch, or somehow have a power native to the realm (AbyssMod or ChaosMod).", null, "confirm", null, 1, "Yes", "No"))
 							if("Yes")
 								if(!src.passive_handler.Get("AbyssMod") && !src.passive_handler.Get("ChaosMod"))
 									src.NoVoid=1

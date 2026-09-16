@@ -2,7 +2,7 @@
 verb/Concoct_Flask()
     set category = "Utility"
     set hidden = 1
-    var/choice = input(usr, "Choose an option", "Concoct Flask Options") in list("Create New Flask", "Alter Equipped Flask Concoction", "Reset Flask Concoction" ,"Upgrade Existing Flask", "Cancel")
+    var/choice = Ask(usr, "Choose an option", "Concoct Flask Options", null, "pick", list("Create New Flask", "Alter Equipped Flask Concoction", "Reset Flask Concoction" ,"Upgrade Existing Flask", "Cancel"), 0)
     if(choice == "Cancel") return
     if(choice == "Create New Flask")
         CreateFlask(usr)
@@ -36,14 +36,14 @@ proc/FlaskChoice(mob/P)
     var/list/FlasksInContents = list("Cancel") // We will throw all your flasks in here
     for(var/obj/Items/Flask/f in P.contents)
         FlasksInContents |= f
-    return input(P, "Which Flask do you wish to alter?", "Alter Existing Flask") in FlasksInContents // THIS HAS TO STAY HERE DO NOT MOVE IT
+    return Ask(P, "Which Flask do you wish to alter?", "Alter Existing Flask", null, "pick", FlasksInContents, 0) // THIS HAS TO STAY HERE DO NOT MOVE IT
 
 // Determines what herbs you can add, or if you can put add any at all.
 proc/HerbOptions(mob/P, obj/Items/Flask/ChosenFlask)  // Selects herbs
     ChosenFlask.Slots = P.GetMaxFlaskSlots() // This might be setting it to null
     while(ChosenFlask.Slots > 0) // If you have slots, select them. Cancel
         var/list/Choices = list("Cancel") + P.PotionTypes
-        var/herbchoice = input(P, "Choose an herb.", "Alter Existing Flask") in Choices
+        var/herbchoice = Ask(P, "Choose an herb.", "Alter Existing Flask", null, "pick", Choices, 0)
         if(herbchoice == "Cancel")
             return
         P.TakeMineral(glob.POTIONCOST/5)
@@ -71,7 +71,7 @@ proc/TheEvilAssIfWall(mob/P, herbchoice, obj/Items/Flask/ChosenFlask)  //You hav
         ChosenFlask.Quicksilver = 1
 // Resets Flask Slots
 proc/ResetFlask(mob/P)
-    var/Warning = input(P, "WARNING: By proceeding you will reset this flasks' total slots. You will not be refunded the mana bits you spent to make the current concoction. Proceed?", "WARNING!") in list("Yes", "No")
+    var/Warning = Ask(P, "WARNING: By proceeding you will reset this flasks' total slots. You will not be refunded the mana bits you spent to make the current concoction. Proceed?", "WARNING!", null, "pick", list("Yes", "No"), 0)
     if(Warning == "No") return // No need for an ifstatement if you pick yes, I'd be fucking amazed if you found a way to give a third input.
     var/obj/Items/Flask/Option = FlaskChoice(P)
     Option.Slots = P.GetMaxFlaskSlots() // Set slots to max

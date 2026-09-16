@@ -38,7 +38,7 @@
 		var/obj/Skills/demonSkill = FALSE
 		Trigger(mob/User, Override)
 			if(!demonSkill)
-				var/inp = input(User, "What demon skill do you want?") in list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat")
+				var/inp = Ask(User, "What demon skill do you want?", "", null, "pick", list("/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/Hellstorm", "/obj/Skills/Projectile/Magic/HellFire/Hellpyre", "/obj/Skills/Buffs/SlotlessBuffs/Magic/HellFire/OverHeat"), 0)
 				BuffTechniques = list(inp)
 				demonSkill = inp
 			. = ..()

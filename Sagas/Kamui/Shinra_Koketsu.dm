@@ -59,10 +59,10 @@ obj/Skills/Mental_Refitting
 			return
 		var/mob/m = usr.Target
 		OMsg(usr, "[usr] extends countless long red threads towards [m]...")
-		var/confirm = input(usr, "Are you sure you want to use this on [m], it will confirm after - this is a one time use verb.") in list("Yes", "No")
+		var/confirm = Ask(usr, "Are you sure you want to use this on [m], it will confirm after - this is a one time use verb.", "", null, "pick", list("Yes", "No"), 0)
 		if(confirm == "No") return
 		if(consentCheck(usr, m))
-			var/doubleCheck = input(usr, "Are you sure you want to make [m] into a [role]?") in list("Yes", "No")
+			var/doubleCheck = Ask(usr, "Are you sure you want to make [m] into a [role]?", "", null, "pick", list("Yes", "No"), 0)
 			if(doubleCheck == "Yes")
 				OMsg(usr, "[m]'s body accepts the countless threads, becoming something so - so much more!")
 				m << "Your whole body is now integrated with fibers - you can feel your very existence rewrite itself to accomodate this..."

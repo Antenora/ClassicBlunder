@@ -1,4 +1,6 @@
-/mob/Admin3/verb/MasteryUp(obj/Skills/x in world)
+/mob/Admin3/verb/MasteryUp()
+	var/obj/Skills/x = PromptArg(usr, args, 1, "MasteryUp", "world:/obj/Skills")
+	if(isnull(x)) return
 	if(x.vars["Mastery"])
 		x.Mastery++
 		src<<"[x] is now [x.Mastery]!"
@@ -59,7 +61,7 @@ obj/Skills/Utility
 				usr << "There's no one nearby to train!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "What person do you want to train?  This will help access their potential if they have any latent development, or give them knowledge directly if not.", "Train") in Students
+			var/mob/Players/Choice=Ask(usr, "What person do you want to train?  This will help access their potential if they have any latent development, or give them knowledge directly if not.", "Train", null, "pick", Students, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -67,7 +69,7 @@ obj/Skills/Utility
 				usr << "It's too soon to train this person again!  (Wait [round((Choice.LastTeach-world.realtime)/Hour(1), 0.1)] hours)"
 				src.Using=0
 				return
-			var/Amount=input(usr, "How much donate RPP are you using? You have [usr.RPPDonate].", "Train ([usr.RPPDonate] remaining RPP)") as num|null
+			var/Amount=Ask(usr, "How much donate RPP are you using? You have [usr.RPPDonate].", "Train ([usr.RPPDonate] remaining RPP)", null, "num", null, 1)
 			if(!Amount||Amount==null||Amount<0)
 				src.Using=0
 				return
@@ -77,7 +79,7 @@ obj/Skills/Utility
 				Amount=usr.RPPDonate
 			if(Amount>50)
 				Amount=50
-			switch(input(Choice, "[usr] would like to donate [Amount] RPP to you.", "Teach Consent") in list("Allow","Deny"))
+			switch(Ask(Choice, "[usr] would like to donate [Amount] RPP to you.", "Teach Consent", null, "pick", list("Allow","Deny"), 0))
 				if("Deny")
 					src.Using=0
 					return
@@ -100,7 +102,7 @@ obj/Skills/Utility
 				usr << "There's no one nearby to teach!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "What person do you want to teach?  This will help them learn basic skills that you've already learned.", "Teach") in Students
+			var/mob/Players/Choice=Ask(usr, "What person do you want to teach?  This will help them learn basic skills that you've already learned.", "Teach", null, "pick", Students, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -125,12 +127,12 @@ obj/Skills/Utility
 				src.Using=0
 				return
 
-			var/obj/Skills/Choice2=input(usr, "What skill do you wish to teach?  This will share the costs of learning between you and the student.", "Teach") in SkillsKnown
+			var/obj/Skills/Choice2=Ask(usr, "What skill do you wish to teach?  This will share the costs of learning between you and the student.", "Teach", null, "pick", SkillsKnown, 0)
 			if(Choice2=="Cancel")
 				src.Using=0
 				return
 
-			switch(input(Choice, "[usr] would like to teach you [Choice2] to you.", "Teach Consent") in list("Allow","Deny"))
+			switch(Ask(Choice, "[usr] would like to teach you [Choice2] to you.", "Teach Consent", null, "pick", list("Allow","Deny"), 0))
 				if("Deny")
 					src.Using=0
 					return
@@ -163,7 +165,7 @@ obj/Skills/Utility
 		verb/Cooking()
 			set category="Utility"
 			set hidden = 1
-			var/option = input(usr, "What do you want to do? Your current meal is [currentMeal]", "Cooking") in list("Cook Meal", "Set Current Meal","Make Recipe", "Alter Recipe", "Delete Recipe", "Share Recipe", "Cancel")
+			var/option = Ask(usr, "What do you want to do? Your current meal is [currentMeal]", "Cooking", null, "pick", list("Cook Meal", "Set Current Meal","Make Recipe", "Alter Recipe", "Delete Recipe", "Share Recipe", "Cancel"), 0)
 			switch(option)
 				if("Cook Meal")
 					if(savedRecipes.savedRecipes.len==0)
@@ -190,7 +192,7 @@ obj/Skills/Utility
 					src.Using=1
 
 
-					var/Count=input(usr, "How many [currentMeal.name]s are you cooking?", "Count") as num
+					var/Count=Ask(usr, "How many [currentMeal.name]s are you cooking?", "Count", null, "num", null, 0)
 					if(Count == 0)
 						Using = 0
 						return
@@ -247,23 +249,23 @@ obj/Skills/Utility
 						return
 					var/list/recs = savedRecipes.listRecipes()
 					recs += "Cancel"
-					var/recipe = input(usr, "What recipe do you want to set as your current recipe?", "Current Recipe") in recs
+					var/recipe = Ask(usr, "What recipe do you want to set as your current recipe?", "Current Recipe", null, "pick", recs, 0)
 					if(recipe == "Cancel")
 						return
 					usr << "Current Meal set to [recipe]!"
 					currentMeal = savedRecipes.findByName(recipe)
 				if("Make Recipe")
-					var/mealType = input(usr, "Is the meal a drink, a food, or both?", "Cooking") in list("Drink", "Food")
-					var/name = input(usr, "What's the name of the meal?", "Cooking") as text|null
+					var/mealType = Ask(usr, "Is the meal a drink, a food, or both?", "Cooking", null, "pick", list("Drink", "Food"), 0)
+					var/name = Ask(usr, "What's the name of the meal?", "Cooking", null, "text", null, 1)
 					if(name == null || name == "")
 						return
 					var/selectedIcon = input("What icon for the meal?", "Cooking") as icon|null
-					var/selectedIconState = input("What icon state for the meal?", "Cooking") as text|null
-					var/selectedX = input("Pixel X of the meal?", "Cooking") as num|null
-					var/selectedY = input("Pixel Y of the meal?", "Cooking") as num|null
-					var/selectedeatText = input("What do you want the food to say when it's consumed? Typing usrName will macro it to replace with the eater's name.", "Cooking") as text|null
-					var/selectedpreptext = input("What do you want the meal to say when you're cooking it? Typing usrName will macro it to replace with the maker's name.", "Cooking") as text|null
-					var/selecteddescription = input("What do you want the description to be?", "Cooking") as text|null
+					var/selectedIconState = Ask(usr, "What icon state for the meal?", "Cooking", null, "text", null, 1)
+					var/selectedX = Ask(usr, "Pixel X of the meal?", "Cooking", null, "num", null, 1)
+					var/selectedY = Ask(usr, "Pixel Y of the meal?", "Cooking", null, "num", null, 1)
+					var/selectedeatText = Ask(usr, "What do you want the food to say when it's consumed? Typing usrName will macro it to replace with the eater's name.", "Cooking", null, "text", null, 1)
+					var/selectedpreptext = Ask(usr, "What do you want the meal to say when you're cooking it? Typing usrName will macro it to replace with the maker's name.", "Cooking", null, "text", null, 1)
+					var/selecteddescription = Ask(usr, "What do you want the description to be?", "Cooking", null, "text", null, 1)
 					var/recipe/newRecipe = new(name,selectedIcon,selectedIconState,selectedX,selectedY,selectedeatText,selectedpreptext,selecteddescription, mealType)
 					savedRecipes.addRecipe(newRecipe)
 				if("Alter Recipe")
@@ -272,26 +274,26 @@ obj/Skills/Utility
 						return
 					var/list/recs = savedRecipes.listRecipes()
 					recs += "Cancel"
-					var/recipe = input(usr, "What recipe do you want to alter?", "Altering Recipe") in recs
+					var/recipe = Ask(usr, "What recipe do you want to alter?", "Altering Recipe", null, "pick", recs, 0)
 					if(recipe=="Cancel")
 						return
 					var/recipe/actualRecipe = savedRecipes.findByName(recipe)
 					if(currentMeal == actualRecipe)
 						currentMeal = null
-					var/altering = input("What do you want to alter?" ,"Altering Recipe") in list("Name", "Preperation Text", "Eat Text", "Icon", "Pixel_X", "Pixel_Y", "Description", "Meal Type")
+					var/altering = Ask(usr, "What do you want to alter?", "Altering Recipe", null, "pick", list("Name", "Preperation Text", "Eat Text", "Icon", "Pixel_X", "Pixel_Y", "Description", "Meal Type"), 0)
 					switch(altering)
 						if("Name")
-							var/newName = input("What's the new name? The current name is [actualRecipe.name]", "Altering Name") as text|null
+							var/newName = Ask(usr, "What's the new name? The current name is [actualRecipe.name]", "Altering Name", null, "text", null, 1)
 							if(newName==null || newName == "")
 								return
 							actualRecipe.name = newName
 						if("Preperation Text")
-							var/newprep = input("What's the new prepare text? The current prepare text is [actualRecipe.prepare_text]", "Altering Prepare Text") as text|null
+							var/newprep = Ask(usr, "What's the new prepare text? The current prepare text is [actualRecipe.prepare_text]", "Altering Prepare Text", null, "text", null, 1)
 							if(newprep==null || newprep == "")
 								return
 							actualRecipe.prepare_text = newprep
 						if("Eat Text")
-							var/newprep = input("What's the new eat text? The current eat text is [actualRecipe.eat_text]", "Altering Eat Text") as text|null
+							var/newprep = Ask(usr, "What's the new eat text? The current eat text is [actualRecipe.eat_text]", "Altering Eat Text", null, "text", null, 1)
 							if(newprep==null || newprep == "")
 								return
 							actualRecipe.eat_text = newprep
@@ -301,17 +303,17 @@ obj/Skills/Utility
 								return
 							actualRecipe.icon = newprep
 						if("Pixel_X")
-							var/newprep = input("What's the new pixel x? The current pixel_x is [actualRecipe.pixel_x]", "Altering Pixel X") as num|null
+							var/newprep = Ask(usr, "What's the new pixel x? The current pixel_x is [actualRecipe.pixel_x]", "Altering Pixel X", null, "num", null, 1)
 							if(newprep==null || newprep == "")
 								return
 							actualRecipe.pixel_x = newprep
 						if("Pixel_Y")
-							var/newprep = input("What's the new prepare text? The current pixel_y is [actualRecipe.pixel_y]", "Altering Pixel Y") as num|null
+							var/newprep = Ask(usr, "What's the new prepare text? The current pixel_y is [actualRecipe.pixel_y]", "Altering Pixel Y", null, "num", null, 1)
 							if(newprep==null || newprep == "")
 								return
 							actualRecipe.pixel_y = newprep
 						if("Description")
-							var/newprep = input("What's the new description? The current description is [actualRecipe.description]", "Altering Description") as text|null
+							var/newprep = Ask(usr, "What's the new description? The current description is [actualRecipe.description]", "Altering Description", null, "text", null, 1)
 							if(newprep==null || newprep == "")
 								return
 							actualRecipe.description = newprep
@@ -321,7 +323,7 @@ obj/Skills/Utility
 								typeing = "Meal"
 							if(actualRecipe.drink)
 								typeing = "Drink"
-							var/mealType = input("What's sort of meal is this? The type is currently [typeing]", "Altering Meal Type") in list("Drink", "Food")
+							var/mealType = Ask(usr, "What's sort of meal is this? The type is currently [typeing]", "Altering Meal Type", null, "pick", list("Drink", "Food"), 0)
 							if(mealType=="Food")
 								actualRecipe.meal = TRUE
 								actualRecipe.drink = FALSE
@@ -335,10 +337,10 @@ obj/Skills/Utility
 						return
 					var/list/recs = savedRecipes.listRecipes()
 					recs += "Cancel"
-					var/recipe = input(usr, "What recipe do you want to delete?", "Deleting Recipe") in recs
+					var/recipe = Ask(usr, "What recipe do you want to delete?", "Deleting Recipe", null, "pick", recs, 0)
 					if(recipe=="Cancel")
 						return
-					var/confirm = input("Are you sure you want to delete [recipe]?", "Delete Recipe") in list("Yes","No")
+					var/confirm = Ask(usr, "Are you sure you want to delete [recipe]?", "Delete Recipe", null, "pick", list("Yes","No"), 0)
 					if(confirm=="No")
 						return
 					var/recipe/recc = savedRecipes.findByName(recipe)
@@ -348,7 +350,7 @@ obj/Skills/Utility
 				if("Share Recipe")
 					var/list/recs = savedRecipes.listRecipes()
 					recs += "Cancel"
-					var/recipe = input(usr, "What recipe do you want to share?", "Sharing Recipe") in recs
+					var/recipe = Ask(usr, "What recipe do you want to share?", "Sharing Recipe", null, "pick", recs, 0)
 					if(recipe == "Cancel")
 						return
 					var/list/mobs = list()
@@ -359,10 +361,10 @@ obj/Skills/Utility
 					if(mobs.len == 1)
 						usr << "There's no valid targets near you!"
 						return
-					var/who = input(usr, "Who do you want to share it to?", "Sharing Recipe") in mobs
+					var/who = Ask(usr, "Who do you want to share it to?", "Sharing Recipe", null, "pick", mobs, 0)
 					if(who=="Cancel")
 						return
-					var/confirm = input(who, "Do you want to accept [recipe] from [usr]?", "Sharing Cooking Recipe") in list("Yes", "No")
+					var/confirm = Ask(who, "Do you want to accept [recipe] from [usr]?", "Sharing Cooking Recipe", null, "pick", list("Yes", "No"), 0)
 					if(confirm=="No")
 						return
 					for(var/obj/Skills/Utility/Cooking/c in who)
@@ -385,13 +387,13 @@ obj/Skills/Utility
 		verb/Set_Drink()
 			set category="Utility"
 			set hidden = 1
-			src.suffix=input(usr, "What are you brewing?", "Brewing") as text|null
+			src.suffix=Ask(usr, "What are you brewing?", "Brewing", null, "text", null, 1)
 			if(src.suffix==null || src.suffix=="")
 				src.suffix="Booze"
 			src.icon=input("What icon?") as icon|null
-			src.icon_state=input("Icon state?") as text|null
-			src.pixel_x=input("Pixel X?") as num|null
-			src.pixel_y=input("Pixel Y?") as num|null
+			src.icon_state=Ask(usr, "Icon state?", "", null, "text", null, 1)
+			src.pixel_x=Ask(usr, "Pixel X?", "", null, "num", null, 1)
+			src.pixel_y=Ask(usr, "Pixel Y?", "", null, "num", null, 1)
 		verb/Brew_Drink()
 			set category="Utility"
 			set hidden = 1
@@ -412,7 +414,7 @@ obj/Skills/Utility
 				return
 			src.Using=1
 
-			var/Count=input(usr, "How many [src.suffix] are you brewing?", "Count") as num
+			var/Count=Ask(usr, "How many [src.suffix] are you brewing?", "Count", null, "num", null, 0)
 			if(Count<1)
 				Count=1
 			if(Count>9)
@@ -631,7 +633,7 @@ obj/Skills/Utility
 						who.Remove(W)
 				if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
 					who.Remove(W)
-			var/mob/Players/selector=input("Select a player to telepath.") in who||null
+			var/mob/Players/selector=Ask(usr, "Select a player to telepath.", "", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				return
 			usr.TwoWayTelepath(selector, anonymous)
@@ -651,7 +653,7 @@ obj/Skills/Utility
 				usr<<"You stop transfering your life force."
 				usr.Transfering=null
 				return
-			var/mob/selector=input("Who do you want to transfer energy to?","Energy Transfer")in who||null
+			var/mob/selector=Ask(usr, "Who do you want to transfer energy to?", "Energy Transfer", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				return
 			else if(selector!="Cancel")
@@ -712,7 +714,7 @@ obj/Skills/Utility
 					who.Remove(W)
 				if(usr.Dead&&!usr.HasEnlightenment()&&(W.z!=usr.z))
 					who.Remove(W)
-			var/mob/Players/selector=input("Who do you want to observe?","Observe")in who||null
+			var/mob/Players/selector=Ask(usr, "Who do you want to observe?", "Observe", null, "pick", who||null, 0)
 			if(selector=="Cancel")
 				Observify(usr,usr)
 				usr.Observing=0
@@ -759,7 +761,7 @@ obj/Skills/Utility
 					continue
 				Bad_Boys.Add(m)
 			if(Bad_Boys.len>1)
-				var/mob/Choice=input(usr, "Who do you want to bestow your Jagan Eye to?", "Jagan Grant") in Bad_Boys
+				var/mob/Choice=Ask(usr, "Who do you want to bestow your Jagan Eye to?", "Jagan Grant", null, "pick", Bad_Boys, 0)
 				if(Choice=="Cancel")
 					usr << "You hoard your eye."
 					src.Using=0
@@ -767,7 +769,7 @@ obj/Skills/Utility
 				var/Consent
 				if(Choice.KO)
 					Consent="Yes"
-				Consent=alert(Choice, "Do you want to accept [usr]'s Jagan Eye?", "Jagan Grant", "No", "Yes")
+				Consent=Ask(Choice, "Do you want to accept [usr]'s Jagan Eye?", "Jagan Grant", null, "confirm", null, 1, "No", "Yes")
 				if(Consent=="Yes")
 					usr.Maimed++
 					usr.recordMaim(usr, "Jagan Eye Grant")
@@ -806,13 +808,13 @@ obj/Skills/Utility
 			set hidden = 1
 			if(usr.Stasis)return
 			if(Using) return
-			var/blah=input("Options")in list("Person","Cordinates","Cancel")
+			var/blah=Ask(usr, "Options", "", null, "pick", list("Person","Cordinates","Cancel"), 0)
 			switch(blah)
 				if("Person")
 					var/list/people=list("Cancel")
 					for(var/mob/Players/QQ in players)
 						people.Add(QQ)
-					var/mob/whoto=input("Teleport to who?")in people||null
+					var/mob/whoto=Ask(usr, "Teleport to who?", "", null, "pick", people||null, 0)
 					if(whoto=="Cancel")
 						return
 					for(var/mob/m in view(1, usr))
@@ -820,9 +822,9 @@ obj/Skills/Utility
 					src.Cooldown()
 
 				if("Cordinates")
-					var/blahx=input("x")as num
-					var/blahy=input("y")as num
-					var/blahz=input("z")as num
+					var/blahx=Ask(usr, "x", "", null, "num", null, 0)
+					var/blahy=Ask(usr, "y", "", null, "num", null, 0)
+					var/blahz=Ask(usr, "z", "", null, "num", null, 0)
 					for(var/mob/m in view(1, usr))
 						m.loc=locate(blahx+rand(-1,1), blahy+rand(-1,1), blahz)
 					src.Cooldown()
@@ -839,7 +841,7 @@ obj/Skills/Utility
 				if(M==usr)
 					continue
 				m+=M
-			var/mob/Choice=input(usr, "Who do you wish to bind to this plane?", "Bind to Plane") in m
+			var/mob/Choice=Ask(usr, "Who do you wish to bind to this plane?", "Bind to Plane", null, "pick", m, 0)
 			if(Choice=="Cancel")
 				return
 			if(Choice.KO||(usr.Power>Choice.Power*3))//Either knock them out or be three times as powerful
@@ -857,7 +859,7 @@ obj/Skills/Utility
 			for(var/mob/M in view(10, usr))
 				if(M.Binding)
 					m+=M
-			var/mob/Choice=input(usr, "Whose binding do you wish to call upon?", "Call to Plane") in m
+			var/mob/Choice=Ask(usr, "Whose binding do you wish to call upon?", "Call to Plane", null, "pick", m, 0)
 			if(Choice=="Cancel")
 				return
 			OMsg(usr, "[usr] has forced [Choice]'s binding to take them back to their plane!")
@@ -884,11 +886,11 @@ obj/Skills/Utility
 		verb/Materialize_Equipment()
 			set category="Utility"
 			set hidden = 1
-			var/Choice=input(usr, "What kind of item will you make?", "Make Sword") in list("Weapon", "Armor", "Weights")
+			var/Choice=Ask(usr, "What kind of item will you make?", "Make Sword", null, "pick", list("Weapon", "Armor", "Weights"), 0)
 			if(Choice=="Weapon")
 				if(usr.HasManaCapacity(5))
 					usr.TakeManaCapacity(5)
-					var/ChoiceW=input(usr, "What kind of blade will you make?", "Make Sword") in list("Wooden", "Light", "Medium", "Heavy")
+					var/ChoiceW=Ask(usr, "What kind of blade will you make?", "Make Sword", null, "pick", list("Wooden", "Light", "Medium", "Heavy"), 0)
 					var/obj/Items/Sword/s
 					switch(ChoiceW)
 						if("Wooden")
@@ -910,7 +912,7 @@ obj/Skills/Utility
 			else if(Choice=="Armor")
 				if(usr.HasManaCapacity(5))
 					usr.TakeManaCapacity(5)
-					var/ChoiceA=input(usr, "What kind of armor will you make?", "Make Sword") in list("Light", "Medium", "Heavy")
+					var/ChoiceA=Ask(usr, "What kind of armor will you make?", "Make Sword", null, "pick", list("Light", "Medium", "Heavy"), 0)
 					var/obj/Items/Armor/a
 					switch(ChoiceA)
 						if("Light")
@@ -945,9 +947,9 @@ obj/Skills/Utility
 					return
 				c.LastIconChange=usr.key
 				c.icon=Z
-				c.icon_state=input("icon state") as text
-				c.pixel_x=input("X adjustment.") as num
-				c.pixel_y=input("Y adjustment.") as num
+				c.icon_state=Ask(usr, "icon state", "", null, "text", null, 0)
+				c.pixel_x=Ask(usr, "X adjustment.", "", null, "num", null, 0)
+				c.pixel_y=Ask(usr, "Y adjustment.", "", null, "num", null, 0)
 				Target.contents+=c
 				c.AlignEquip(Target)
 				OMsg(usr, "[usr] conjures clothing!", "[usr] materialized some clothes.")
@@ -978,7 +980,7 @@ obj/Skills/Utility
 						Targets.Add(m)
 			if(Targets.len>0)
 				src.Using=1
-				var/mob/Choice=input(usr, "Who will you transmute into a Philosopher's Stone?", "Transmute") in Targets
+				var/mob/Choice=Ask(usr, "Who will you transmute into a Philosopher's Stone?", "Transmute", null, "pick", Targets, 0)
 				Choice.ManaSealed = 1
 				OMsg(usr, "<font color='red'>[usr] begins the transmutation process on [Choice]!  Red lightning encompasses their form!</font color>")
 				usr.Frozen=2
@@ -1189,7 +1191,7 @@ obj/Skills/Utility
 				return
 			src.Using=1
 			var/Cost=0.2*glob.progress.EconomyMana
-			var/Confirm=alert(usr, "Do you wish to seal your CURRENT LOCATION?  It will cost [Commas(Cost)] capacity.", "Seal Turf", "No", "Yes")
+			var/Confirm=Ask(usr, "Do you wish to seal your CURRENT LOCATION?  It will cost [Commas(Cost)] capacity.", "Seal Turf", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="No")
 				src.Using=0
 				return
@@ -1228,11 +1230,11 @@ obj/Skills/Utility
 				usr << "There are no objects to seal!"
 				src.Using=0
 				return
-			var/obj/Choice=input(usr, "What object do you wish to seal?", "Seal Object") in Options
+			var/obj/Choice=Ask(usr, "What object do you wish to seal?", "Seal Object", null, "pick", Options, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
-			var/Confirm=alert(usr, "Do you wish to seal [Choice]?  It will cost [Commas(Cost)] capacity.", "Seal Object", "No", "Yes")
+			var/Confirm=Ask(usr, "Do you wish to seal [Choice]?  It will cost [Commas(Cost)] capacity.", "Seal Object", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="No")
 				src.Using=0
 				return
@@ -1274,11 +1276,11 @@ obj/Skills/Utility
 				usr << "There are no fallen people to seal!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "What person do you wish to seal?", "Seal Power") in Options
+			var/mob/Players/Choice=Ask(usr, "What person do you wish to seal?", "Seal Power", null, "pick", Options, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
-			var/Confirm=alert(usr, "Do you wish to seal [Choice]'s power?  It will cost [Commas(Cost)] capacity.", "Seal Power", "No", "Yes")
+			var/Confirm=Ask(usr, "Do you wish to seal [Choice]'s power?  It will cost [Commas(Cost)] capacity.", "Seal Power", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="No")
 				src.Using=0
 				return
@@ -1331,11 +1333,11 @@ obj/Skills/Utility
 				usr << "There are no fallen people to seal!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "What person do you wish to seal?", "Seal Movement") in Options
+			var/mob/Players/Choice=Ask(usr, "What person do you wish to seal?", "Seal Movement", null, "pick", Options, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
-			var/Confirm=alert(usr, "Do you wish to seal [Choice]'s movement?  It will cost [Commas(Cost)] capacity.", "Seal Movement", "No", "Yes")
+			var/Confirm=Ask(usr, "Do you wish to seal [Choice]'s movement?  It will cost [Commas(Cost)] capacity.", "Seal Movement", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="No")
 				src.Using=0
 				return
@@ -1353,7 +1355,7 @@ obj/Skills/Utility
 			Choice.overlays+='SparksCoolRed.dmi'
 			sleep(100)
 			if(Choice.KO)
-				var/radius=input(usr, "How many tiles is [Choice] allowed to move from this spot? (min 0, max 500)", "Distance") as num
+				var/radius=Ask(usr, "How many tiles is [Choice] allowed to move from this spot? (min 0, max 500)", "Distance", null, "num", null, 0)
 				if(radius < 0)
 					radius = 0
 				if(radius > 500)
@@ -1392,7 +1394,7 @@ obj/Skills/Utility
 				usr << "You don't have enough capacity to try to form a seal!  It takes [Commas(Cost)] capacity."
 				src.Using=0
 				return
-			var/Confirm=alert(usr, "Are you SURE you want to create a Command Seal? You can only do so once.", "Create Command Seal", "No", "Yes")
+			var/Confirm=Ask(usr, "Are you SURE you want to create a Command Seal? You can only do so once.", "Create Command Seal", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="Yes")
 				usr.TakeManaCapacity(Cost)
 				var/obj/Seal/Command_Seal/CS=new
@@ -1426,7 +1428,7 @@ obj/Skills/Utility
 				usr << "There are no seals in front of you to break!"
 				src.Using=0
 				return
-			var/obj/Seal/Choice=input(usr, "What seal do you wish to attempt to break?", "Seal Break") in Seals
+			var/obj/Seal/Choice=Ask(usr, "What seal do you wish to attempt to break?", "Seal Break", null, "pick", Seals, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -1463,7 +1465,7 @@ obj/Skills/Utility
 			if(src.Using)
 				return
 			src.Using=1
-			var/Confirm=alert(usr, "Are you SURE you want to place your magic circle where you are CURRENTLY STANDING?", "Create Magic Circle", "No", "Yes")
+			var/Confirm=Ask(usr, "Are you SURE you want to place your magic circle where you are CURRENTLY STANDING?", "Create Magic Circle", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="Yes")
 				var/obj/Magic_Circle/MC=new
 				MC.Creator=usr.ckey
@@ -1485,7 +1487,7 @@ obj/Skills/Utility
 				src.Using=0
 				return
 			src.Using=1
-			var/Confirm=alert(usr, "Do you want to create your very own Magic Crest now?  You will only ever be able to make one.", "Make Magic Crest", "No", "Yes")
+			var/Confirm=Ask(usr, "Do you want to create your very own Magic Crest now?  You will only ever be able to make one.", "Make Magic Crest", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="Yes")
 				var/obj/Items/Enchantment/Magic_Crest/MC=new
 				MC.Wielder=usr.ckey
@@ -1594,7 +1596,7 @@ obj/Skills/Utility
 
 			for(var/mob/m in view(usr, 1))
 				Targets+=m
-			M=input(usr, "Who do you want to lecture?", "Grimoire Arcana") in Targets
+			M=Ask(usr, "Who do you want to lecture?", "Grimoire Arcana", null, "pick", Targets, 0)
 
 			if(M=="Cancel")
 				OMsg(usr, "[usr] decides not to research.")
@@ -1605,13 +1607,13 @@ obj/Skills/Utility
 				src.Operating=0
 				return
 			if(M!=usr)
-				Consent=alert(M, "[usr] wishes to lecture you on grimoire magic. Do you consent to the operation?", "Grimoire Arcana", "No", "Yes")
+				Consent=Ask(M, "[usr] wishes to lecture you on grimoire magic. Do you consent to the operation?", "Grimoire Arcana", null, "confirm", null, 1, "No", "Yes")
 			if(Consent=="No")
 				OMsg(usr, "[usr] offered [M] a grimoire and was refused!")
 				src.Operating=0
 				return
 
-			GrimoireChoice=input(usr, "What grimoire would you like to study?", "Grimoire Arcana") in GrimoireChoices
+			GrimoireChoice=Ask(usr, "What grimoire would you like to study?", "Grimoire Arcana", null, "pick", GrimoireChoices, 0)
 			if(GrimoireChoice=="Cancel")
 				OMsg(usr, "[usr] decides not to research.")
 				src.Operating=0
@@ -1668,14 +1670,14 @@ obj/Skills/Utility
 					Cost=Economy*50
 					GrimoireDesc="This Nox Nyctores deconstructs magical formulae, bleaching its wielder into a white void."
 			GrimoireDesc="[GrimoireDesc]  It takes [Commas(Cost)] mana capacity to experiment with this grimoire.  Do you wish to continue?"
-			Confirm=alert(usr, "[GrimoireDesc]", "Grimoire Arcana ([GrimoireChoice])", "Yes", "No")
+			Confirm=Ask(usr, "[GrimoireDesc]", "Grimoire Arcana ([GrimoireChoice])", null, "confirm", null, 1, "Yes", "No")
 			if(Confirm=="No")
 				OMsg(usr, "[usr] decided to not research.")
 				src.Operating=0
 				return
 
 			if(M!=usr)
-				Consent=alert(M, "[usr] wishes to record a [GrimoireChoice] in you.  [GrimoireDesc]  Do you accept this?", "Grimoire Arcana ([GrimoireChoice])", "No", "Yes")
+				Consent=Ask(M, "[usr] wishes to record a [GrimoireChoice] in you.  [GrimoireDesc]  Do you accept this?", "Grimoire Arcana ([GrimoireChoice])", null, "confirm", null, 1, "No", "Yes")
 			if(Consent=="No")
 				OMsg(usr, "[usr] tried to record a [GrimoireChoice] in [M], but [M] backed out at the last minute!")
 				src.Operating=0
@@ -2015,12 +2017,12 @@ obj/Skills/Utility
 				if(SmeltYaLater.Cost>0&&SmeltYaLater.Destructable)
 					if(!(istype(SmeltYaLater,/obj/Items/Enchantment)) && SmeltYaLater.Grabbable)
 						Items.Add(SmeltYaLater)
-			var/obj/Items/Choice=input(usr, "Which item would you like to recycle?", "Smelt") in Items
+			var/obj/Items/Choice=Ask(usr, "Which item would you like to recycle?", "Smelt", null, "pick", Items, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
 			if(Choice.Password)
-				var/Pass=input(usr, "This item is protected by a password; you have to provide it before recycling.", "Remove Safety") as text
+				var/Pass=Ask(usr, "This item is protected by a password; you have to provide it before recycling.", "Remove Safety", null, "text", null, 0)
 				if(Choice.Password!=Pass)
 					usr << "That is not the correct password."
 					src.Using=0
@@ -2065,7 +2067,7 @@ obj/Skills/Utility
 					src.Copying=0
 					return
 				else
-					Choice=input(usr, "What key do you wish to copy?", "Locksmithing") in Keys
+					Choice=Ask(usr, "What key do you wish to copy?", "Locksmithing", null, "pick", Keys, 0)
 
 				if(Choice=="Cancel")
 					src.Copying=0
@@ -2073,7 +2075,7 @@ obj/Skills/Utility
 
 				Cost=Technology_Price(usr,Choice)
 
-				Confirm=alert(usr, "It will cost [Commas(Cost)] to copy [Choice].  Do you wish to copy the key?", "Locksmithing", "No", "Yes")
+				Confirm=Ask(usr, "It will cost [Commas(Cost)] to copy [Choice].  Do you wish to copy the key?", "Locksmithing", null, "confirm", null, 1, "No", "Yes")
 
 				if(Confirm=="No")
 					src.Copying=0
@@ -2106,7 +2108,7 @@ obj/Skills/Utility
 					return
 
 				src.Repairing=1
-				var/Category=input(usr, "What category of item are you reforging?", "Reforge") in list("Cancel", "Weapon", "Armor", "Staff")
+				var/Category=Ask(usr, "What category of item are you reforging?", "Reforge", null, "pick", list("Cancel", "Weapon", "Armor", "Staff"), 0)
 				if(Category=="Cancel")
 					src.Repairing=0
 					return
@@ -2144,11 +2146,11 @@ obj/Skills/Utility
 
 				switch(Category)
 					if("Weapon")
-						Choice=input(usr, "What weapon do you wish to repair?", "Reforge") in Swords
+						Choice=Ask(usr, "What weapon do you wish to repair?", "Reforge", null, "pick", Swords, 0)
 					if("Armor")
-						Choice=input(usr, "What armor do you wish to repair?", "Reforge") in Armors
+						Choice=Ask(usr, "What armor do you wish to repair?", "Reforge", null, "pick", Armors, 0)
 					if("Staff")
-						Choice=input(usr, "What staff do you wish to repair?", "Reforge") in Staves
+						Choice=Ask(usr, "What staff do you wish to repair?", "Reforge", null, "pick", Staves, 0)
 
 				if(Choice=="Cancel")
 					src.Repairing=0
@@ -2156,7 +2158,7 @@ obj/Skills/Utility
 
 				Cost=ReforgeCostFor(usr,Choice)
 
-				Confirm=alert(usr, "It will cost [Commas(Cost)] to repair [Choice].  Do you wish to repair the [Category]?  (Smiths can repair cheaper at an anvil.)", "Reforge", "No", "Yes")
+				Confirm=Ask(usr, "It will cost [Commas(Cost)] to repair [Choice].  Do you wish to repair the [Category]?  (Smiths can repair cheaper at an anvil.)", "Reforge", null, "confirm", null, 1, "No", "Yes")
 
 				if(Confirm=="No")
 					src.Repairing=0
@@ -2207,7 +2209,7 @@ obj/Skills/Utility
 				usr << "There is no one nearby to perform surgery on!"
 				src.Using=0
 				return
-			var/mob/Players/Choice=input(usr, "Who would you like to perform surgery on?", "Surgery") in Peeps
+			var/mob/Players/Choice=Ask(usr, "Who would you like to perform surgery on?", "Surgery", null, "pick", Peeps, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return
@@ -2372,11 +2374,13 @@ obj/Skills/Utility
 			else
 				usr.InternalScouter=1
 				usr << "You activate your internal scouter."
-		verb/CommunicatorTransmit(A as text)
+		verb/CommunicatorTransmit()
 			set category="Utility"
 			set hidden = 1
 			set name="Communicator Transmit"
 			set src in usr
+			var/A = PromptArgValue(usr, args, 1, "Communicator Transmit", "text")
+			if(isnull(A)) return
 			if(usr.CheckSlotless("Camouflage"))
 				var/obj/Skills/Buffs/SlotlessBuffs/Camouflage/C = usr.GetSlotless("Camouflage")
 				if(C.Invisible)
@@ -2429,7 +2433,7 @@ obj/Skills/Utility
 			set name="Communicator Frequency"
 			set src in usr
 			var/previousFreq = src.ICFrequency
-			var/newFreq = input(usr,"Change your Internal Communicator frequency to what?","Frequency",src.ICFrequency) as num
+			var/newFreq = Ask(usr, "Change your Internal Communicator frequency to what?", "Frequency", src.ICFrequency, "num", null, 0)
 			if(previousFreq == newFreq) return
 			if(previousFreq && previousFreq != src.MonitoringFrequency)
 				removeFromGlobalListenerOnFreq(src, previousFreq)
@@ -2442,7 +2446,7 @@ obj/Skills/Utility
 			set name="Monitoring Frequency"
 			set src in usr
 			var/previousFreq = src.MonitoringFrequency
-			var/newFreq = input(usr,"Change your Internal Communicator Monitoring frequency to what?","Monitoring Frequency",src.MonitoringFrequency) as num
+			var/newFreq = Ask(usr, "Change your Internal Communicator Monitoring frequency to what?", "Monitoring Frequency", src.MonitoringFrequency, "num", null, 0)
 			if(previousFreq == newFreq) return
 			if(previousFreq && previousFreq != src.ICFrequency)
 				removeFromGlobalListenerOnFreq(src, previousFreq)
@@ -2470,9 +2474,11 @@ obj/Skills/Utility
 
 	Espionage_Scan
 		desc="Look someone over for wiretaps and remove them if desired."
-		verb/Scan(var/mob/Players/p in view(1,usr))
+		verb/Scan()
 			set category="Utility"
 			set hidden = 1
+			var/mob/Players/p = PromptArg(usr, args, 1, "Scan", "view:1:mob")
+			if(isnull(p)) return
 			var/found=0
 			for(var/obj/Items/Tech/Planted_Wiretap/t in p)
 				if(t.Revealed<=0)
@@ -2502,12 +2508,12 @@ obj/Skills/Utility
 			usr << "Not this wipe, chief."
 			return
 			var/list/Choices=list("Cancel", "Launch", "Track")
-			var/Choice=input(usr, "How do you manipulate your Satellite camera?", "Satellite Surveilance") in Choices
+			var/Choice=Ask(usr, "How do you manipulate your Satellite camera?", "Satellite Surveilance", null, "pick", Choices, 0)
 			switch(Choice)
 				if("Launch")
 					if(!(usr.z in src.ZPlanes))
 						var/Cost=30*glob.progress.EconomyCost
-						var/Confirm=alert(usr, "It will cost [Commas(Cost)] resources to build and launch a satellite camera.  Do you want to do this?", "Satellite Surveilance", "No", "Yes")
+						var/Confirm=Ask(usr, "It will cost [Commas(Cost)] resources to build and launch a satellite camera.  Do you want to do this?", "Satellite Surveilance", null, "confirm", null, 1, "No", "Yes")
 						if(Confirm=="Yes")
 							if(usr.HasMoney(Cost))
 								usr.TakeMoney(Cost)
@@ -2528,14 +2534,14 @@ obj/Skills/Utility
 						return
 					if(src.ZPlanes.len>0)
 						var/list/mob/Players/Bugged=list("Cancel")
-						var/SpyLand=input(usr, "What Z-section would you like to observe?", "Satellite Surveilance") in ZPlanes
+						var/SpyLand=Ask(usr, "What Z-section would you like to observe?", "Satellite Surveilance", null, "pick", ZPlanes, 0)
 						for(var/mob/Players/p in players)
 							if(p.z==SpyLand)
 								Bugged.Add(p)
 							if(p.invisibility)
 								Bugged.Remove(p)
 						if(Bugged.len>1)
-							var/mob/Players/Fly=input(usr, "Which person would you like to focus on?", "Satellite Surveilance") in Bugged
+							var/mob/Players/Fly=Ask(usr, "Which person would you like to focus on?", "Satellite Surveilance", null, "pick", Bugged, 0)
 							Observify(usr,Fly)
 							if(usr==Fly)
 								usr.Observing=0
@@ -2567,7 +2573,7 @@ obj/Skills/Utility
 					usr << "You don't have any gear capable of being integrated into your chasis."
 					src.Using=0
 					return
-				Choice=input(usr, "What gear do you want to integrate into your chasis?", "Integrate") in IG
+				Choice=Ask(usr, "What gear do you want to integrate into your chasis?", "Integrate", null, "pick", IG, 0)
 				if(Choice=="Cancel")
 					src.Using=0
 					return
@@ -2713,7 +2719,7 @@ obj/Skills/Utility
 					return
 
 			if(!M)
-				M=input(usr, "Who do you want to install cybernetics in?", "Cybernetic Augmentation") in Who
+				M=Ask(usr, "Who do you want to install cybernetics in?", "Cybernetic Augmentation", null, "pick", Who, 0)
 			if(M=="Cancel")
 				OMsg(usr, "[usr] decides not to tinker.")
 				src.Using=0
@@ -2800,7 +2806,7 @@ obj/Skills/Utility
 			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30)
 				ModChoices.Remove("Cybernetic Mainframe")
 
-			ModChoice=input(usr, "What modification would you like to install?", "Cybernetic Augmentation") in ModChoices
+			ModChoice=Ask(usr, "What modification would you like to install?", "Cybernetic Augmentation", null, "pick", ModChoices, 0)
 			if(ModChoice=="Cancel")
 				OMsg(usr, "[usr] decides not to tinker.")
 				src.Using=0
@@ -2926,7 +2932,7 @@ obj/Skills/Utility
 
 			if(M!=usr)
 				if(("War Crimes" in usr.knowledgeTracker.learnedKnowledge)&&M.KO) Consent="Yes"//i hate this btw
-				else Consent=alert(M, "[ModDesc]\nDo you want to undergo the augmentation procedure?", "Cybernetic Augmentation", "No", "Yes")//hate hate hate
+				else Consent=Ask(M, "[ModDesc]\nDo you want to undergo the augmentation procedure?", "Cybernetic Augmentation", null, "confirm", null, 1, "No", "Yes")//hate hate hate
 
 				if(Consent!="Yes")
 					OMsg(usr, "[usr] rejects the surgery.")
@@ -2935,7 +2941,7 @@ obj/Skills/Utility
 
 			ModDesc="[ModDesc]  It costs [Commas(Cost)] to install.  Do you wish to install this module into [M]?"
 
-			Confirm=alert(usr, "[ModDesc]", "Cybernetic Augmentation ([ModChoice])", "No", "Yes")
+			Confirm=Ask(usr, "[ModDesc]", "Cybernetic Augmentation ([ModChoice])", null, "confirm", null, 1, "No", "Yes")
 			if(Confirm=="No")
 				OMsg(usr, "[usr] decided to not operate.")
 				src.Using=0
@@ -3083,7 +3089,7 @@ obj/Skills/Utility
 						return
 					M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Implants/Stun_Chip)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Implants/Stun_Chip/A in M)
-						A.Password=input("Input activation code.") as text|null
+						A.Password=Ask(usr, "Input activation code.", "", null, "text", null, 1)
 				if("Failsafe Circuit")
 					if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Failsafe_Chip, M))
 						OMsg(usr, "[usr] tried to force an implant inside [M], but they already had one of that type!")
@@ -3091,7 +3097,7 @@ obj/Skills/Utility
 						return
 					M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Implants/Failsafe_Chip)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Implants/Failsafe_Chip/A in M)
-						A.Password=input("Input activation code.") as text|null
+						A.Password=Ask(usr, "Input activation code.", "", null, "text", null, 1)
 				if("Explosive Implantation")
 					if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Internal_Explosive, M))
 						OMsg(usr, "[usr] tried to force an implant inside [M], but they already had one of that type!")
@@ -3099,7 +3105,7 @@ obj/Skills/Utility
 						return
 					M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Implants/Internal_Explosive)
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Implants/Internal_Explosive/A in M)
-						A.Password=input("Input activation code.") as text|null
+						A.Password=Ask(usr, "Input activation code.", "", null, "text", null, 1)
 
 				if("Ripper Mode")
 					if((M.HasMilitaryFrame()&&!M.isRace(ANDROID))||M.Saga)
@@ -3338,7 +3344,7 @@ obj/Skills/Utility
 				usr << "The bodies present don't belong to any wandering soul..."
 				src.Using=0
 				return
-			var/mob/Choice=input(usr, "You can kill death for these people.", "Death Killer") in valid
+			var/mob/Choice=Ask(usr, "You can kill death for these people.", "Death Killer", null, "pick", valid, 0)
 			if(Choice=="Cancel")
 				src.Using=0
 				return

@@ -546,8 +546,12 @@ mob/Admin4/verb/oppResetDay()
 	OppSettleDay()
 	src << "Opportunity day reset - accepts cleared."
 
-mob/Admin4/verb/lifeSetRank(skill as text, newrank as num)
+mob/Admin4/verb/lifeSetRank()
 	set category = "Admin"
+	var/skill = PromptArgValue(usr, args, 1, "lifeSetRank", "text")
+	if(isnull(skill)) return
+	var/newrank = PromptArgValue(usr, args, 2, "lifeSetRank", "num")
+	if(isnull(newrank)) return
 	if(!(skill in LIFE_SKILL_IDS))
 		src << "No such life skill. ([jointext(LIFE_SKILL_IDS, ", ")])"
 		return

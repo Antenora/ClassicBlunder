@@ -64,7 +64,7 @@ mob/proc/levelUpDiary(mob/M)
 			if(!locate(/obj/Skills/Buffs/SpecialBuffs/FutureDiary, M))
 				M.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/FutureDiary)
 			M << "You feel a connection with your Diary.. It becomes special.. It feels empowered by the powers of the cosmos."
-			switch(input(M, "It has came time to chose your Diary out of the four..", "Chose your Diary") in list("First","Second","Third","Fourth"))
+			switch(Ask(M, "It has came time to chose your Diary out of the four..", "Chose your Diary", null, "pick", list("First","Second","Third","Fourth"), 0))
 				if("First")
 					M.whichDiary = 1
 				if("Second")
@@ -94,7 +94,7 @@ mob/proc/levelUpDiary(mob/M)
 			M << "You feel yourself connect with the Cosmos further with your Diary"
 			M << "You feel you are confident in reading the future!"
 			M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/FutureDiary/FutureRead)
-			var/choice = input(M, "What sort of a Future do you wish to cleave?", "Future Awaits") in list ("Chaos", "Peace")
+			var/choice = Ask(M, "What sort of a Future do you wish to cleave?", "Future Awaits", null, "pick", list ("Chaos", "Peace"), 0)
 			if(choice == "Chaos")
 				M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/FutureDiary/FutureRead)
 			else

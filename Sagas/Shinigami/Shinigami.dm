@@ -4,15 +4,15 @@ mob/proc/gainShinigami()
 	src.SagaLevel = 1
 
 	var/list/Releases = list("Zangetsu", "Senbonzakura", "Shirayuki", "Hozukimaru", "Nozarashi", "Shinso", "Suzumushi", "Tachikaze", "Ryujin Jakka", "Katen Kyokotsu")
-	src.ShinigamiRelease = input("Which Release does [src] receive?", "Zanpakutō Release") in Releases
+	src.ShinigamiRelease = Ask(usr, "Which Release does [src] receive?", "Zanpakutō Release", null, "pick", Releases, 0)
 
-	src.ZanpakutoClass = input(src, "What form does your Zanpakutō take?", "Zanpakutō Class") in list("Light", "Medium", "Heavy")
+	src.ZanpakutoClass = Ask(src, "What form does your Zanpakutō take?", "Zanpakutō Class", null, "pick", list("Light", "Medium", "Heavy"), 0)
 
-	src.ShihakushoClass = input(src, "What weight is your Shihakushō?", "Shihakushō Class") in list("Light", "Medium", "Heavy")
+	src.ShihakushoClass = Ask(src, "What weight is your Shihakushō?", "Shihakushō Class", null, "pick", list("Light", "Medium", "Heavy"), 0)
 
 	if(src.ShinigamiRelease != "Nozarashi")
-		src.AsauchiName = input(src, "What is the name of your Asauchi?", "Asauchi Name") as text
-		src.ShikaiCall = input(src, "What is your call before their name? (for example, \"Scatter\")", "Shikai Call") as text
+		src.AsauchiName = Ask(src, "What is the name of your Asauchi?", "Asauchi Name", null, "text", null, 0)
+		src.ShikaiCall = Ask(src, "What is your call before their name? (for example, \"Scatter\")", "Shikai Call", null, "text", null, 0)
 	else
 		src.AsauchiName = "???"
 
@@ -137,8 +137,8 @@ mob/tierUpSaga(Path)
 				switch(ShinigamiRelease)
 					if("Nozarashi")
 						src << "The spirit within your Zanpakutō finally speaks its name..."
-						src.AsauchiName = input(src, "What is the name of your Asauchi?", "Asauchi Name") as text
-						src.ShikaiCall = input(src, "What is your call before their name? (for example, \"Cut\", \"Devour\")", "Shikai Call") as text
+						src.AsauchiName = Ask(src, "What is the name of your Asauchi?", "Asauchi Name", null, "text", null, 0)
+						src.ShikaiCall = Ask(src, "What is your call before their name? (for example, \"Cut\", \"Devour\")", "Shikai Call", null, "text", null, 0)
 						for(var/obj/Items/i in src)
 							if(i.IsZanpakuto)
 								i.name = "Zanpakutō ([src.AsauchiName])"
@@ -148,36 +148,36 @@ mob/tierUpSaga(Path)
 						src << "The full power of your soul erupts, <b>Bankai</b> is yours."
 						switch(ShinigamiRelease)
 							if("Zangetsu")
-								src.BankaiPrefix = input(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Tensa_Zangetsu)
 							if("Senbonzakura")
-								src.BankaiPrefix = input(src, "Your Bankai takes shape. What suffix comes after your Zanpakutō's name?", "Bankai Suffix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What suffix comes after your Zanpakutō's name?", "Bankai Suffix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Kageyoshi)
 								if(!locate(/obj/Skills/SenbonzakuraGoukei, src))
 									src.AddSkill(new/obj/Skills/SenbonzakuraGoukei)
 									src << "The petals converge at your will. You can now use <b>Goukei</b>."
 							if("Shirayuki")
-								src.BankaiPrefix = input(src, "Your Bankai takes shape. What is your Zanpakutō's true name?", "Bankai Prefix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What is your Zanpakutō's true name?", "Bankai Prefix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanpakuto/Bankai/HakkanoTogame)
 								src.AddSkill(new/obj/Skills/AutoHit/Hakusen)
 							if("Hozukimaru")
-								src.BankaiPrefix = input(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Ryumon_Hozukimaru)
 							if("Shinso")
-								src.BankaiPrefix = input(src, "Your Bankai's true name reveals itself. What is it?", "Bankai True Name") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai's true name reveals itself. What is it?", "Bankai True Name", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Kamishini_no_Yari)
 							if("Suzumushi")
-								src.BankaiPrefix = input(src, "Your Bankai manifests. What suffix comes after your Zanpakutō's name?", "Bankai Suffix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai manifests. What suffix comes after your Zanpakutō's name?", "Bankai Suffix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi)
 							if("Tachikaze")
-								src.BankaiPrefix = input(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Tekken_Tachikaze)
 							if("Ryujin Jakka")
-								src.BankaiPrefix = input(src, "Your Bankai's true name reveals itself. What is it?", "Bankai Prefix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai's true name reveals itself. What is it?", "Bankai Prefix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Zanka_no_Tachi)
 								src << "All the flames of your [src.AsauchiName] condense into your blade. Entering Bankai awakens <b>Higashi: Kyokujitsujin</b>."
 							if("Katen Kyokotsu")
-								src.BankaiPrefix = input(src, "Your Bankai manifests. What suffix comes after your Zanpakutō's name?", "Bankai Suffix") as text
+								src.BankaiPrefix = Ask(src, "Your Bankai manifests. What suffix comes after your Zanpakutō's name?", "Bankai Suffix", null, "text", null, 0)
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Karamatsu_Shinju)
 								src.AddSkill(new/obj/Skills/Ichidanme)
 								src.AddSkill(new/obj/Skills/Nidanme)
@@ -221,7 +221,7 @@ mob/tierUpSaga(Path)
 				switch(ShinigamiRelease)
 					if("Nozarashi")
 						src << "The full power of your soul erupts. <b>Bankai</b> is yours."
-						src.BankaiPrefix = input(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix") as text
+						src.BankaiPrefix = Ask(src, "Your Bankai takes shape. What prefix precedes your Zanpakutō's name?", "Bankai Prefix", null, "text", null, 0)
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Nozarashi_Bankai)
 					else
 						src.passive_handler.Increase("GodKi", 0.1)

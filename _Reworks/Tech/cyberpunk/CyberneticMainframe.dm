@@ -22,7 +22,7 @@
 						usr << "You don't have any gear capable of being integrated into your chasis."
 						src.Using=0
 						return
-					Choice=input(usr, "What gear do you want to integrate into your chasis?", "Integrate") in IG
+					Choice=Ask(usr, "What gear do you want to integrate into your chasis?", "Integrate", null, "pick", IG, 0)
 					if(Choice=="Cancel")
 						src.Using=0
 						return

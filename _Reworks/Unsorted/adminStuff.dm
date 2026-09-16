@@ -27,39 +27,31 @@ var/GlobalStorage/globalStorage
 GlobalStorage
 	var
 		tmp
-			objHTML = ""
-			skillHTML = ""
-			itemHTML = ""
-			mobHTML = ""
-			turfHTML = ""
+			list/objTypes = list()
+			list/skillTypes = list()
+			list/itemTypes = list()
+			list/mobTypes = list()
+			list/turfTypes = list()
 	New()
 		..()
-		var/list/objs = typesof(/obj)
-
-		for(var/x in objs)
+		for(var/x in typesof(/obj))
 			if(ispath(x,/obj/Skills))
-				skillHTML += "<td><a href=byond://?src=INSERTHERE;action=giveobj;var=[x]>[x]<td></td></tr>"
+				skillTypes += x
 				continue
 			else if(ispath(x,/obj/Items))
-				itemHTML += "<td><a href=byond://?src=INSERTHERE;action=giveobj;var=[x]>[x]<td></td></tr>"
+				itemTypes += x
 				continue
-			objHTML += "<td><a href=byond://?src=INSERTHERE;action=giveobj;var=[x]>[x]<td></td></tr>"
-
-		var/list/mobs = typesof(/mob)
-		for(var/x in mobs)
-			mobHTML += "<td><a href=byond://?src=INSERTHERE;action=giveobj;var=[x]>[x]<td></td></tr>"
-
-		var/list/turfs = typesof(/turf)
-		for(var/x in turfs)
-			turfHTML += "<td><a href=byond://?src=INSERTHERE;action=giveobj;var=[x]>[x]<td></td></tr>"
+			objTypes += x
+		mobTypes = typesof(/mob)
+		turfTypes = typesof(/turf)
 
 
 /mob/Admin4/verb/ChangeWorldSettings()
 	set category = "Admin"
 	set name = "Change World Settings"
-	var/i = input(src, "ssss") in list("tick_lag","fps")
+	var/i = Ask(src, "ssss", "", null, "pick", list("tick_lag","fps"), 0)
 	src << "Current [i] is [world.vars[i]]"
-	var/x = input(src, "ssss") as num
+	var/x = Ask(src, "ssss", "", null, "num", null, 0)
 	world.vars[i] = x
 	src << "Changed [i] to [x]"
 	src << "Current [i] is [world.vars[i]]"
@@ -68,38 +60,39 @@ GlobalStorage
 	set category = "Other"
 	set hidden = 1
 	set name = "Change Client FPS"
-	var/n = input(src, "ssss") as num
+	var/n = Ask(src, "ssss", "", null, "num", null, 0)
 	src.client<<"[SetClientFPS(n)]"
 
-/mob/Admin3/verb/Copy(obj/O in world)
+/mob/Admin3/verb/Copy()
 	set category = "Admin"
 	set name = "Copy"
+	var/obj/O = PromptArg(usr, args, 1, "Copy", "world:/obj")
+	if(isnull(O)) return
 	var/obj/O2 = copyatom(O)
 	O2.name = "[O.name]_copy"
 	O2.Move(src)
 
 
-/mob/Admin2/verb/Give_Make(mob/A in world)
+/mob/Admin2/verb/Give_Make()
 	set category="Admin"
 	set name="Give/Make"
-	var/blah={"<html><Magic><body bgcolor=#000000 text="white" link="red">"}
-	blah+="[A]<br>[A.type]"
-	blah+="<table width=10%>"
-	var/info =""
-	switch(input(usr, "What do you want to select?") in list("Skills","Items","Object","Mob","Turf","Cancel"))
+	var/mob/A = PromptArg(usr, args, 1, "Give/Make", "world:/mob")
+	if(isnull(A)) return
+	var/cat = Ask(usr, "What do you want to select?", "", null, "pick", list("Skills","Items","Object","Mob","Turf","Cancel"), 0)
+	var/list/paths = null
+	switch(cat)
 		if("Skills")
-			info = globalStorage.skillHTML
+			paths = globalStorage.skillTypes
 		if("Items")
-			info = globalStorage.itemHTML
+			paths = globalStorage.itemTypes
 		if("Object")
-			info = globalStorage.objHTML
+			paths = globalStorage.objTypes
 		if("Mob")
-			info = globalStorage.mobHTML
+			paths = globalStorage.mobTypes
 		if("Turf")
-			info = globalStorage.turfHTML
-		if("Cancel") return
-	blah += replacetext(info,"INSERTHERE","\ref[A]")
-	blah += "</html>"
-	usr<<browse(blah,"window=[A];size=450x600")
+			paths = globalStorage.turfTypes
+	if(!paths)
+		return
+	usr.client?.SheetShow("give:\ref[A]:[cat]", "GIVE", "[A] - [cat]", "Click a type to give it to [A].", SheetTypeRows(paths, "byond://?src=\ref[A];action=giveobj;var="), "a type to give")
 
 

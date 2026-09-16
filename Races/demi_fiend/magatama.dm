@@ -362,7 +362,7 @@ mob/proc/CraftMagatama()
 		display += "[craft_names[i]] ([Commas(craft_costs[i])] Mana Bits)"
 	display += "Cancel"
 
-	var/choice = input(src, "Select a Magatama to craft.", "Craft Magatama") in display
+	var/choice = Ask(src, "Select a Magatama to craft.", "Craft Magatama", null, "pick", display, 0)
 	if(choice == "Cancel" || !choice) return
 
 	var/idx = display.Find(choice)
@@ -403,7 +403,7 @@ mob/proc/CraftMagatama()
 				skill_paths += S
 				del temp
 		if(skill_options.len)
-			var/skill_choice = input(src, "Your inner world expands. Choose one skill from [M.name] to internalize permanently.", "Internalize Skill") in skill_options
+			var/skill_choice = Ask(src, "Your inner world expands. Choose one skill from [M.name] to internalize permanently.", "Internalize Skill", null, "pick", skill_options, 0)
 			if(skill_choice)
 				var/cidx = skill_options.Find(skill_choice)
 				if(cidx >= 1 && cidx <= skill_paths.len)

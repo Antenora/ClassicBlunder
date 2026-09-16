@@ -112,7 +112,7 @@ mob/proc/ProfileLoad(presetName)
 /mob/verb/Save_Profile()
     set category = "Roleplay"
     set hidden = 1
-    var/pname = input(src, "Name this profile:") as null|text
+    var/pname = Ask(src, "Name this profile:", "", null, "text", null, 1)
     if(!pname) return
     pname = replacetext(pname, "/", "-")   // keep it a valid savefile key
     var/list/existing = ProfileList()
@@ -135,7 +135,7 @@ mob/proc/ProfileLoad(presetName)
         ProfileSave("Default")
         existing = ProfileList()
     if(!existing.len) return
-    var/picked = input(src, "Swap to which profile?", "Swap Profiles") as null|anything in existing
+    var/picked = Ask(src, "Swap to which profile?", "Swap Profiles", null, "pick", existing, 1)
     if(!picked) return
     if(ProfileLoad(picked))
         src << "Swapped to '[picked]'."

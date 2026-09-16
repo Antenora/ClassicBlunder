@@ -159,7 +159,7 @@
 	verb/Adjust_Name()
 		set category = "Utility"
 		set hidden = 1
-		NameFake = input(usr, "What name?") as text
+		NameFake = Ask(usr, "What name?", "", null, "text", null, 0)
 	verb/Impose_Will()
 		set category = "Skills"
 		set desc = "Bring forth your true form without alerting others."

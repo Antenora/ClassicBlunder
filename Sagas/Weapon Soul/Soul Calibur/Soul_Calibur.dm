@@ -11,7 +11,7 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order // SOUL CALIBUR
 		if(usr.Saga != "Weapon Soul")
 			usr << "Your soul does not resonate with Soul Calibur!"
 			return
-		Class = input("What form would you like the Blade of Order to take?") in list("Light", "Medium", "Heavy")
+		Class = Ask(usr, "What form would you like the Blade of Order to take?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
 		usr << "Soul Calibur has transformed into a [Class] weapon!"
 		setStatLine()
 
@@ -179,14 +179,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Calibur
 				usr << "You have made up your mind. You won't change your path again."
 				return
 			if(soulc.caliburLight == TRUE)
-				if(alert("Your Weapon Soul hides a powerful darkness. Do you wish to embrace it?"))
+				if(Ask(usr, "Your Weapon Soul hides a powerful darkness. Do you wish to embrace it?", "", null, "confirm", null, 1, "Ok"))
 					soulc.caliburLight = FALSE
 					soulc.caliburFinal = TRUE
 					soulc.icon= 'SoulCalibur-Crystal.dmi'
 					usr << "You have been permanently subjugated into a thrall of authority!"
 					return
 			else if(soulc.caliburLight == FALSE)
-				if(alert("You have yet to be completely subsumed by your Weapon Soul. Do you wish to live by your own terms again?"))
+				if(Ask(usr, "You have yet to be completely subsumed by your Weapon Soul. Do you wish to live by your own terms again?", "", null, "confirm", null, 1, "Ok"))
 					soulc.caliburLight = TRUE
 					soulc.caliburFinal = TRUE
 					soulc.icon= 'SoulCalibur.dmi'

@@ -1062,7 +1062,9 @@ var/global/list/buildCliffPickerEntries
 	var/c = BuildCliffCodeForPath(E.Creates)
 	if(length(c))
 		return c
-	return "i:[E.iconF]|[E.icon_state]"
+	if(E.isCustom)
+		return "i:[E.iconF]|[E.icon_state]"
+	return "t:[E.Creates]|[E.icon_state]"
 
 /proc/BuildCliffPickerEntries()
 	if(buildCliffPickerEntries)

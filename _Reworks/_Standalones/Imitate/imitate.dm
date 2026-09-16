@@ -103,8 +103,8 @@ imitation_info
     verb/Change_Scent()
         set category = "Roleplay"
         set hidden = 1
-        var/category = input(usr, "What category?") in scents
-        usr.custom_scent = input(usr, "What scent?") in scents[category]
+        var/category = Ask(usr, "What category?", "", null, "pick", scents, 0)
+        usr.custom_scent = Ask(usr, "What scent?", "", null, "pick", scents[category], 0)
         usr << "Scent changed to [usr.custom_scent]"
     
     verb/Activate_Void()

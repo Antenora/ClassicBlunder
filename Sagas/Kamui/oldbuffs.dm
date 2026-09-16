@@ -72,9 +72,11 @@
 // when Senketsu/Junketsu crumbles at the end of the saga arc but no code path
 // resets it, so any character that lost their Kamui is permanently locked out
 // of the Special Buff slot. This verb is the manual override.
-/mob/Admin1/verb/Clear_Kamui_Buff_Lock(mob/M as mob in world)
+/mob/Admin1/verb/Clear_Kamui_Buff_Lock()
 	set category = "Admin"
 	set desc = "Reset KamuiBuffLock=0 on a target mob. Fixes 'Your special buffs are locked out!' caused by stale Kamui state."
+	var/mob/M = PromptArg(usr, args, 1, "Clear Kamui Buff Lock", "world:mob")
+	if(isnull(M)) return
 	if(!M)
 		return
 	if(!M.KamuiBuffLock)

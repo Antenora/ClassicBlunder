@@ -24,7 +24,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 	theCost = round(theCost,  1)
 	var/confirmation = "Yes"
 	if(prompt)
-		confirmation = input(p,"Are you sure you want to refund [tech.name] for [theCost] points?") in list("Yes", "No")
+		confirmation = Ask(p, "Are you sure you want to refund [tech.name] for [theCost] points?", "", null, "pick", list("Yes", "No"), 0)
 	if(confirmation == "Yes")
 		p.RPPSpendable += theCost
 		p.RPPSpent -= theCost
@@ -98,7 +98,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 				continue
 		else
 			thingCanBuy += tech.name
-	var/input = input(src,"What would you like to learn?") in thingCanBuy + "Cancel"
+	var/input = Ask(src, "What would you like to learn?", "", null, "pick", (thingCanBuy + "Cancel"), 0)
 	if(input == "Cancel")
 		return
 	if(input in thingCanBuy)
@@ -108,7 +108,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			if(tech.breakthrough)
 				theCost /= 4
 			theCost = round(theCost,  1)
-			var/confirmation = input(src,"Are you sure you want to learn [tech.name] for [theCost] points?\nUnlocks: [tech.unlocks]\nDescription: [tech.description]") in list("Yes", "No")
+			var/confirmation = Ask(src, "Are you sure you want to learn [tech.name] for [theCost] points?\nUnlocks: [tech.unlocks]\nDescription: [tech.description]", "", null, "pick", list("Yes", "No"), 0)
 			if(confirmation == "Yes")
 				if(SpendRPP(theCost, "[tech.name]"))
 					UnlockTech(tech, "Technology")

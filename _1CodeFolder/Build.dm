@@ -430,7 +430,12 @@ proc/Load_Turfs()
 
 var/list/Builds=list()
 var/list/AdminBuilds=list()
+var/global/buildsInit = 0
+
 proc/Add_Builds()
+	if(buildsInit)
+		return
+	buildsInit = 1
 	var/obj/Turfs/CustomObj1/customobj = new
 	var/obj/Others/Build/E = new
 	E.icon = customobj.icon

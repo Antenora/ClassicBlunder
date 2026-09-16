@@ -990,7 +990,7 @@ client/proc/TechCraftMake(obj/Items/catalog)
 	spawn()
 		var/datum/craft_recipe/rec = GetTechRecipe(catalog)
 		var/cost = rec.MoneyCost(mob, catalog)
-		var/confirm = alert(mob, "Craft [catalog.name] for [Commas(round(cost))]?", "Craft", "Craft", "Cancel")
+		var/confirm = Ask(mob, "Craft [catalog.name] for [Commas(round(cost))]?", "Craft", null, "confirm", null, 1, "Craft", "Cancel")
 		if(confirm != "Craft") return
 		mob.CraftTechItem(catalog)
 		RefreshBalance()

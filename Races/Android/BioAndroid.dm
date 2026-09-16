@@ -199,7 +199,7 @@ obj/Skills/Utility
 				usr.Using = 0
 				return
 
-			var/mob/Players/donor = input(usr, "Whose Tier 1 sample do you want to request?", "Collect Sample") in Targets
+			var/mob/Players/donor = Ask(usr, "Whose Tier 1 sample do you want to request?", "Collect Sample", null, "pick", Targets, 0)
 			if(donor == "Cancel" || !donor)
 				usr.Using = 0
 				return
@@ -209,7 +209,7 @@ obj/Skills/Utility
 				return
 
 			var/race_name = donor.race.name
-			var/answer = alert(donor, "[usr] is requesting a Tier 1 genetic sample of your [race_name] essence. This will not harm you, but you can only ever donate one Tier 1 sample in your entire life. Allow it?", "Bio-Android Sample Request", "Allow", "Deny")
+			var/answer = Ask(donor, "[usr] is requesting a Tier 1 genetic sample of your [race_name] essence. This will not harm you, but you can only ever donate one Tier 1 sample in your entire life. Allow it?", "Bio-Android Sample Request", null, "confirm", null, 1, "Allow", "Deny")
 			if(answer != "Allow")
 				usr << "[donor] declined the sample request."
 				usr.Using = 0
@@ -267,7 +267,7 @@ obj/Skills/Utility
 				usr.Using = 0
 				return
 
-			var/mob/Players/donor = input(usr, "Whose Tier 2 sample do you want to extract?", "Force Extract") in Targets
+			var/mob/Players/donor = Ask(usr, "Whose Tier 2 sample do you want to extract?", "Force Extract", null, "pick", Targets, 0)
 			if(donor == "Cancel" || !donor)
 				usr.Using = 0
 				return
@@ -277,7 +277,7 @@ obj/Skills/Utility
 				return
 
 			var/race_name = donor.race.name
-			var/confirm = alert(usr, "Forcibly extract a Tier 2 [race_name] sample from [donor]? They will be left grievously wounded.", "Confirm Extraction", "Extract", "Cancel")
+			var/confirm = Ask(usr, "Forcibly extract a Tier 2 [race_name] sample from [donor]? They will be left grievously wounded.", "Confirm Extraction", null, "confirm", null, 1, "Extract", "Cancel")
 			if(confirm != "Extract")
 				usr.Using = 0
 				return
@@ -331,7 +331,7 @@ obj/Skills/Utility
 				usr.Using = 0
 				return
 
-			var/race_choice = input(usr, "Which Tier 2 sample do you want to install?", "Bio Augmentation") in Choices
+			var/race_choice = Ask(usr, "Which Tier 2 sample do you want to install?", "Bio Augmentation", null, "pick", Choices, 0)
 			if(race_choice == "Cancel" || !race_choice)
 				usr.Using = 0
 				return
@@ -342,7 +342,7 @@ obj/Skills/Utility
 				usr.Using = 0
 				return
 
-			var/confirm = alert(usr, "Install a Tier 2 [race_choice] sample for [Cost] Mana Bits?", "Confirm Installation", "Install", "Cancel")
+			var/confirm = Ask(usr, "Install a Tier 2 [race_choice] sample for [Cost] Mana Bits?", "Confirm Installation", null, "confirm", null, 1, "Install", "Cancel")
 			if(confirm != "Install")
 				usr.Using = 0
 				return
@@ -376,7 +376,7 @@ obj/Skills/Utility
 			var/Samples
 
 			var/list/Choices = list("Cancel")
-			var/race_choice = input(usr, "Which Tier 2 sample do you want to remove?", "Bio Augmentation") in Choices
+			var/race_choice = Ask(usr, "Which Tier 2 sample do you want to remove?", "Bio Augmentation", null, "pick", Choices, 0)
 			for(var/race_name in BIO_SAMPLE_DEFS)
 				if(usr.HasBioSample(race_name, 2))
 				//	continue

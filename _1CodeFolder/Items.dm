@@ -15,14 +15,14 @@ obj/Money
 		if(!(world.time > usr.verb_delay)) return
 		usr.verb_delay=world.time+1
 		if((src in usr))
-			var/Amount=input("Drop how much money? (1-[src.Level])") as num
+			var/Amount=Ask(usr, "Drop how much money? (1-[src.Level])", "", null, "num", null, 0)
 			Amount=round(Amount)
 			if(Amount>Level) Amount=Level
 			if(Amount<1) return
 			usr.DropMoney(Amount)
 		else
 			if(ismob(src.loc)&&src.loc:KO)
-				var/Amount=input(usr, "Steal how much?") as num|null
+				var/Amount=Ask(usr, "Steal how much?", "", null, "num", null, 1)
 				if(Amount>src.Level)
 					Amount=src.Level
 				if(Amount<1||!Amount)
@@ -51,7 +51,7 @@ obj/Money
 				counter ++
 				moneyList.Add(money)
 			while(counter > 1)
-				var/obj/choice = input(p, "You have duplicate's of Money, please select which one to delete", "Money") in moneyList
+				var/obj/choice = Ask(p, "You have duplicate's of Money, please select which one to delete", "Money", null, "pick", moneyList, 0)
 				moneyList.Remove(choice)
 				counter --
 				del choice
@@ -236,8 +236,8 @@ obj/Items
 			usr << "Underlay icon removed."
 			return
 		src.UnderlayIcon=input(usr, "What icon do you want to display as an underlay?", "Underlay Icon") as icon|null
-		src.UnderlayX=input(usr, "Pixel X?", "Underlay Icon") as num|null
-		src.UnderlayY=input(usr, "Pixel Y?", "Underlay Icon") as num|null
+		src.UnderlayX=Ask(usr, "Pixel X?", "Underlay Icon", null, "num", null, 1)
+		src.UnderlayY=Ask(usr, "Pixel Y?", "Underlay Icon", null, "num", null, 1)
 		usr << "Done."
 
 	verb/Set_Layer()
@@ -247,7 +247,7 @@ obj/Items
 			src.ObjectUse(usr)
 			Equipped=1
 		var/list/Options=list("Standard Overlay", "Low Overlay", "Lower Overlay", "Lowest Overlay")
-		src.LayerPriority=input(usr, "What layer do you want [src] to appear on?  Higher layers are stacked on top of lower layers.", "Set Layer") in Options
+		src.LayerPriority=Ask(usr, "What layer do you want [src] to appear on?  Higher layers are stacked on top of lower layers.", "Set Layer", null, "pick", Options, 0)
 		switch(src.LayerPriority)
 			if("Lowest Overlay")
 				src.LayerPriority=0.3
@@ -286,7 +286,7 @@ obj/Items
 			return
 
 		if(src.Stackable)
-			var/Drop=input(usr, "How many [src]s do you want to drop?", "Drop") as num|null
+			var/Drop=Ask(usr, "How many [src]s do you want to drop?", "Drop", null, "num", null, 1)
 			if(Drop>0&&Drop)
 				if(Drop>src.TotalStack)
 					Drop=src.TotalStack
@@ -329,7 +329,7 @@ obj/Items
 			if(usr.KO)
 				usr << "You cannot create items while KO'd."
 				return
-			var/Mode=alert(usr, "Do you want to buy the item or examine it?", "[src]", "Buy", "Examine")
+			var/Mode=Ask(usr, "Do you want to buy the item or examine it?", "[src]", null, "confirm", null, 1, "Buy", "Examine")
 			if(Mode=="Examine")
 				if(istype(src,/obj/Items))
 					if(src:UpdatesDescription)
@@ -344,7 +344,7 @@ obj/Items
 				return
 			if(1)
 				if(istype(src,/obj/Items/Tech/Power_Pack))
-					var/MultiMake=input("How many packs would you like to make?")as num|null
+					var/MultiMake=Ask(usr, "How many packs would you like to make?", "", null, "num", null, 1)
 					if(MultiMake==null||MultiMake<=0)
 						return
 					var/MultiCost=Technology_Price(usr,src)
@@ -388,7 +388,7 @@ obj/Items
 				if(istype(src,/obj/Items/Tech/Scouter))
 					if(ItemMade:ScouterIcon!=1)
 						ItemMade:ScouterIcon=1
-						var/Choice=input("What icon would you like for the scouter?") in list ("Green","Blue","Red","Purple")
+						var/Choice=Ask(usr, "What icon would you like for the scouter?", "", null, "pick", list ("Green","Blue","Red","Purple"), 0)
 						switch(Choice)
 							if("Green")
 								ItemMade:icon='GreenScouter.dmi'
@@ -401,7 +401,7 @@ obj/Items
 
 		else if(src in Enchantment_List)
 			var/obj/ItemMade
-			var/Mode=alert(usr, "Do you want to buy the item or examine it?", "[src]", "Buy", "Examine")
+			var/Mode=Ask(usr, "Do you want to buy the item or examine it?", "[src]", null, "confirm", null, 1, "Buy", "Examine")
 			if(Mode=="Examine")
 				if(istype(src,/obj/Items))
 					if(src:UpdatesDescription)
@@ -448,12 +448,12 @@ obj/Items
 			usr.UpdateTechnologyWindow()
 			if(istype(src,/obj/Items/Enchantment/Staff))
 				if(ItemMade:StaffIconSelected!=1)
-					var/Choice=input("What icon would you like for the staff?") in list ("Red","Grey","Brown","Red 2","Green","Cyan","Red 3")
+					var/Choice=Ask(usr, "What icon would you like for the staff?", "", null, "pick", list ("Red","Gray","Brown","Red 2","Green","Cyan","Red 3"), 0)
 					switch(Choice)
 						if("Red")
 							ItemMade:icon='MageStaff.dmi'
 							ItemMade:StaffIconSelected=1
-						if("Grey")
+						if("Gray")
 							ItemMade:icon='MageStaff2.dmi'
 							ItemMade:StaffIconSelected=1
 						if("Brown")
@@ -474,7 +474,7 @@ obj/Items
 		else if(src in Clothes_List)
 			if(icon == initial(icon)&&usr.IconClicked==0)
 				usr.IconClicked=1
-				var/Color=input("Choose color") as color|null
+				var/Color=Ask(usr, "Choose color", "", null, "color", null, 1)
 				var/icon/newIcon = new(icon)
 				newIcon+=Color
 				usr.IconClicked=0
@@ -716,7 +716,7 @@ obj
 		Click()
 			..()
 			var/obj/Items/Wearables/w = new wearable_path
-			var/Color=input(usr,"Choose color") as color|null
+			var/Color=Ask(usr, "Choose color", "", null, "color", null, 1)
 			if(Color && Color != "#000000")
 				var/icon/newIcon = new(w.icon)
 				newIcon.Blend(Color, ICON_MULTIPLY)
@@ -756,7 +756,7 @@ obj/Items/WeightedClothing//we are now a DBZ rip ... or is it pokemon?
 				usr << "[src] already has plating applied to it!"
 				return
 			var/PCost=(glob.progress.EconomyCost*0.5)
-			var/Choice=alert(usr, "Do you want to apply refractive and ceramic plating to your weights?  This will apply the effects of both types of plating as well as make the weights much heavier!  It costs [Commas(PCost)] to apply.  Do you want to do this?", "Apply Plating", "No", "Yes")
+			var/Choice=Ask(usr, "Do you want to apply refractive and ceramic plating to your weights?  This will apply the effects of both types of plating as well as make the weights much heavier!  It costs [Commas(PCost)] to apply.  Do you want to do this?", "Apply Plating", null, "confirm", null, 1, "No", "Yes")
 			if(Choice=="No")
 				return
 			if(!usr.HasMoney(PCost))
@@ -1068,7 +1068,7 @@ obj/Items/Sword
 						usr<<"You cannot use this with a style active!"
 						return
 					var/check = 0
-					var/S = input(usr,"Choose the form of your Soul Eater", "Form") in list("Sword","Staff","Shield")
+					var/S = Ask(usr, "Choose the form of your Soul Eater", "Form", null, "pick", list("Sword","Staff","Shield"), 0)
 					switch(S)
 						if("Sword")
 
@@ -1450,7 +1450,7 @@ obj/Items/proc/Equip(mob/A)
 			if(istype(src, /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 				var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin/s = src
 				if(!A.dainsleifDrawn)
-					var/confirm = input(A, "Are you sure you want to draw Dainsleif?") in list("Yes", "No")
+					var/confirm = Ask(A, "Are you sure you want to draw Dainsleif?", "", null, "pick", list("Yes", "No"), 0)
 					if(confirm == "No") return
 					s.drawDainsleif(A)
 			if(A.NeedsSecondSword() && A.EquippedSword() && !A.EquippedSecondSword())
@@ -1570,7 +1570,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				return
 		else
 			if(!Looted)
-				switch(alert(usr, "Are you sure you want to don [ag] willingly? It could be dangerous.", "Don Augmented Gear", "No", "Hell No", "Yes"))
+				switch(Ask(usr, "Are you sure you want to don [ag] willingly? It could be dangerous.", "Don Augmented Gear", null, "confirm", null, 1, "No", "Hell No", "Yes"))
 					if("Yes")
 						ag.Bound=1
 						usr.NoSoul=1
@@ -1972,7 +1972,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 					return
 				if(W.suffix=="*Equipped*")
 					if(User.HealthPct()<=75&&(W.InternalTimer<world.realtime)||User.CyberCancel)
-						var/Choice=alert(User, "Are you ready to unleash the power gained from your weight training!? With your body used to the weights, they'll be abandoned.", "Weight Boost!", "No", "Yes")
+						var/Choice=Ask(User, "Are you ready to unleash the power gained from your weight training!? With your body used to the weights, they'll be abandoned.", "Weight Boost!", null, "confirm", null, 1, "No", "Yes")
 						if(Choice=="Yes")
 							W.AlignEquip(User)
 							if(W.Plated)
@@ -2001,7 +2001,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 								User.equippedWeights = null
 								del W
 					else
-						var/Choice=alert(User, "You haven't completed your weight training, do you still want to take your weights off now...?", "Remove Weights", "No", "Yes")
+						var/Choice=Ask(User, "You haven't completed your weight training, do you still want to take your weights off now...?", "Remove Weights", null, "confirm", null, 1, "No", "Yes")
 						if(Choice=="Yes")
 							W.AlignEquip(User)
 							User.equippedWeights = null
@@ -2010,7 +2010,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				if(User.CyberCancel)
 					User << "Your converted body does not respond to training much."
 					return
-				var/Choice=alert(User, "Do you want to begin your weight training?  It will lower your power, but allow a burst of strength and mobility in a pinch!", "Weight Training", "No", "Yes")
+				var/Choice=Ask(User, "Do you want to begin your weight training?  It will lower your power, but allow a burst of strength and mobility in a pinch!", "Weight Training", null, "confirm", null, 1, "No", "Yes")
 				if(Choice=="Yes")
 					var/obj/Items/WeightedClothing/Dis=src
 					Dis.AlignEquip(User)
@@ -2097,7 +2097,7 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 						if(C.Password==src.Password||C.Password2==src.Password||C.Password3==src.Password)
 							Unlocked=1
 					if(!Unlocked)
-						var/Pass=input(User, "Please enter startup code.", "Enter Code") as text
+						var/Pass=Ask(User, "Please enter startup code.", "Enter Code", null, "text", null, 0)
 						if(src.Password!=Pass)
 							usr << "That is not the correct password."
 							return
@@ -2327,7 +2327,7 @@ obj/Items/verb
 			view(10,usr)<<"[usr] bolted [src]"
 
 			if(istype(src,/obj/Items/Tech/Door))
-				src.Password=input(usr,"Do you wish to install a password lock?") as text
+				src.Password=Ask(usr, "Do you wish to install a password lock?", "", null, "text", null, 0)
 				if(!src)
 					return
 

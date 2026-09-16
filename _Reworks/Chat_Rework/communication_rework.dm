@@ -40,7 +40,7 @@ client/proc/outputToChat(text, list/channels)
 client/verb/Toggle_Channels()
 	set category="Other"
 	set hidden = 1   
-	var/selection=input("Select a toggle option.")in list("Toggle OOC","Toggle All Tab OOC","Toggle IC Tab LOOC","Toggle All Tab LOOC")
+	var/selection=Ask(usr, "Select a toggle option.", "", null, "pick", list("Toggle OOC","Toggle All Tab OOC","Toggle IC Tab LOOC","Toggle All Tab LOOC"), 0)
 	switch(selection)
 		if("Toggle OOC")
 			togglePref("ShowOOC")

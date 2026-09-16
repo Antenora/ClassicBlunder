@@ -31,7 +31,7 @@ mob
 mob
 	proc
 		chatOptions()
-			var/choice = input(src,,"Chat Options") as null|anything in chat_options
+			var/choice = Ask(src, , "Chat Options", null, "pick", chat_options, 1)
 			if(!choice) return
 			switch(choice)
 				if("Font Size")
@@ -47,7 +47,7 @@ mob
 
 		fontSize()
 			var/current_font_size = client.getPref(CURRENTFONTSIZE)
-			var/choice = input(src,"What would you like to change the font size to?\nThe font size is currently: [current_font_size] pt.","Chat Font Size",current_font_size) as null|num
+			var/choice = Ask(src, "What would you like to change the font size to?\nThe font size is currently: [current_font_size] pt.", "Chat Font Size", current_font_size, "num", null, 1)
 			if(!choice) return
 			choice = clamp(choice, 1, 100)
 			client.setFontSize(choice)
@@ -55,7 +55,7 @@ mob
 
 		fontFamily()
 			var/current_font_family = client.getPref(CURRENTFONTFAMILY)
-			var/choice = input(src,"What would you like to change the font to?\nThe current font is: [current_font_family].","Chat Font",current_font_family) as null|anything in valid_chat_fonts
+			var/choice = Ask(src, "What would you like to change the font to?\nThe current font is: [current_font_family].", "Chat Font", current_font_family, "pick", valid_chat_fonts, 1)
 			if(!choice) return
 			client.setFontFamily(choice)
 			client.setPref(CURRENTFONTFAMILY, choice)

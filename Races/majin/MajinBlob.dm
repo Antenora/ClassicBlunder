@@ -128,21 +128,15 @@ blobDropper/proc/resetVariables(mob/Players/p)
     if(toDeath <= 0 || pickedUp)
         blobLoop -= src
         del src
-/mob/Admin3/verb/openBlobdatum(mob/player in players)
+/mob/Admin3/verb/openBlobdatum()
+    var/mob/player = PromptArg(usr, args, 1, "openBlobdatum", "players")
+    if(isnull(player)) return
     if(player.majinPassive)
         var/atom/A = player.majinPassive
-        var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-        var/list/B=new
-        Edit+="[A]<br>[A.type]"
-        Edit+="<table width=10%>"
-        for(var/C in A.vars) B+=C
+        var/list/B = list()
+        for(var/C in A.vars) B += C
         B.Remove("Package","bound_x","bound_y","step_x","step_y","Admin","Profile", "GimmickDesc", "NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile", "Form5Profile")
-        for(var/C in B)
-            Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
-            Edit+=C
-            Edit+="<td>[Value(A.vars[C])]</td></tr>"
-        Edit += "</html>"
-        usr<<browse(Edit,"window=[A];size=450x600")
+        usr.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, B), "a name to edit")
 
 
 

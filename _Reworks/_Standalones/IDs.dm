@@ -17,3 +17,10 @@ proc
 		if(uid > glob.IDs.len || uid < 1)
 			return null
 		return glob.IDs[uid]
+
+	setPlayerNameByUID(uid, name)
+		if(!isnum(uid) || uid < 1 || uid > max(glob.IDs.len, glob.IDCounter))
+			return
+		if(uid > glob.IDs.len)
+			glob.IDs.len = uid
+		glob.IDs[uid] = "[name]"

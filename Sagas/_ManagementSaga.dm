@@ -163,8 +163,10 @@ mob/var
 
 
 mob/Admin3/verb
-	SagaManagement(mob/Players/P in players)
+	SagaManagement()
 		set category="Admin"
+		var/mob/Players/P = PromptArg(usr, args, 1, "SagaManagement", "players")
+		if(isnull(P)) return
 		var/Level7=0
 		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
 		if(P.Saga)
@@ -180,7 +182,7 @@ mob/Admin3/verb
 				return
 			for(var/obj/Items/Enchantment/Crystal_of_Bilocation/CoD in world)
 				if(CoD.Signature==P.ckey)
-					switch(input("This character has a Crystal of Bilocation setup right now. Are you sure you would like to tier them up?") in list("Yes","No"))
+					switch(Ask(usr, "This character has a Crystal of Bilocation setup right now. Are you sure you would like to tier them up?", "", null, "pick", list("Yes","No"), 0))
 						if("No")
 							return
 
@@ -194,7 +196,7 @@ mob/Admin3/verb
 			for(var/x=1, x<math, x++)
 				choices.Add(x)
 
-			var/input=input("This character is currently [P.Saga] Tier [P.SagaLevel]. How many levels do you want to add to them?") in choices
+			var/input=Ask(usr, "This character is currently [P.Saga] Tier [P.SagaLevel]. How many levels do you want to add to them?", "", null, "pick", choices, 0)
 			if(input=="Cancel") return
 			P.SagaAdminPermission=input
 			P << "You've had [input] levels of your Saga unlocked! Meditate to obtain your new powers!"
@@ -206,7 +208,7 @@ mob/Admin3/verb
 				src << "[P] is a [P.race.name], and they are therefore not eligible to receive a Saga."
 				return
 			else
-				selection=input("Select a Tier S to grant. This will set them to T1 in it, granting whatever verbs at that level.") in SagaList
+				selection=Ask(usr, "Select a Tier S to grant. This will set them to T1 in it, granting whatever verbs at that level.", "", null, "pick", SagaList, 0)
 			for(var/obj/Skills/Buffs/NuStyle/s in P)
 				if(P.BuffOn(s))
 					s.Trigger(P, TRUE)
@@ -223,7 +225,7 @@ mob/Admin3/verb
 					P.passive_handler.Increase("KiControlMastery")
 					P.KiControlMastery+=1
 					if(!P.ClothBronze)
-						P.ClothBronze=input(P, "What cloth are you going!?") in glob.BronzeConstellationNames
+						P.ClothBronze=Ask(P, "What cloth are you going!?", "", null, "pick", glob.BronzeConstellationNames, 0)
 					var/path = "/obj/Skills/Buffs/SpecialBuffs/Saint_Cloth/Bronze_Cloth/[P.ClothBronze]_Cloth"
 					P.AddSkill(new path)
 					P<<"Your destiny is defined by the stars of [P.ClothBronze]; you have become a champion of Gods: <b>Saint</b>!"
@@ -366,18 +368,18 @@ mob/Admin3/verb
 					var/choice
 					var/confirm
 					while(confirm!="Yes")
-						choice=alert(P, "What kind of weave do you represent?", "Kamui", "Senketsu", "Junketsu")
+						choice=Ask(P, "What kind of weave do you represent?", "Kamui", null, "confirm", null, 1, "Senketsu", "Junketsu")
 						switch(choice)
 							if("Senketsu")
-								confirm=alert(P, "Senketsu highlights the unity between clothes and humanity, recklessly fighting alongside one another.  Is this your weave?", "Kamui Path", "Yes", "No")
+								confirm=Ask(P, "Senketsu highlights the unity between clothes and humanity, recklessly fighting alongside one another.  Is this your weave?", "Kamui Path", null, "confirm", null, 1, "Yes", "No")
 							if("Junketsu")
-								confirm=alert(P, "Junketsu highlights humanity's superiority over clothing, using them as protective garment subjugated by your will.  Is this your weave?", "Kamui Path", "Yes", "No")
+								confirm=Ask(P, "Junketsu highlights humanity's superiority over clothing, using them as protective garment subjugated by your will.  Is this your weave?", "Kamui Path", null, "confirm", null, 1, "Yes", "No")
 					P.KamuiType=choice
 					if(P.KamuiType=="Senketsu")
 						P.contents+=new/obj/Items/Symbiotic/Kamui/KamuiSenketsu
 						var/obj/Items/Sword/Medium/Scissor_Blade/SB = new()
 						P.AddItem(SB)
-						var/ScissorBladeClass = input(P, "What class would you like to set the Scissor Blade to?") in list("Light", "Medium", "Heavy")
+						var/ScissorBladeClass = Ask(P, "What class would you like to set the Scissor Blade to?", "", null, "pick", list("Light", "Medium", "Heavy"), 0)
 						SB.Class = ScissorBladeClass
 						SB.setStatLine()
 						P << "A sword weaved from fibers finds its way into a case in your care. (Sheath to put it in it's case.)"
@@ -396,7 +398,7 @@ mob/Admin3/verb
 					P.SagaLevel=1
 					P.Saga="Magic Knight"
 					P << "You stake yourself on a code of honor and truthfulness."
-					var/Weapon=alert(P, "As an Magic Knight, you may draw a blade made of Aether or create a bow and arrow.  Which do you choose?", "Aether Weapon", "Blade", "Bow")
+					var/Weapon=Ask(P, "As an Magic Knight, you may draw a blade made of Aether or create a bow and arrow.  Which do you choose?", "Aether Weapon", null, "confirm", null, 1, "Blade", "Bow")
 					switch(Weapon)
 						if("Blade")
 							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword, P))
@@ -407,7 +409,7 @@ mob/Admin3/verb
 								P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow)
 								P << "You take up the path of the Aether Bow!"
 					var/list/Aethers=list("Strength", "Endurance", "Force", "Offense", "Defense")
-					var/Aether=input(P, "As your mastery of Aether grows, it heightens one of your attributes at rest.  Which attribute?", "Aether Ascension") in Aethers
+					var/Aether=Ask(P, "As your mastery of Aether grows, it heightens one of your attributes at rest.  Which attribute?", "Aether Ascension", null, "pick", Aethers, 0)
 					switch(Aether)
 						if("Strength")
 							P.StrAscension+=0.5
@@ -426,14 +428,14 @@ mob/Admin3/verb
 					var/choice
 					var/confirm
 					while(confirm!="Yes")
-						choice=input(P, "What legacy will you take upon yourself?", "Rebirth Hero") in Choices
+						choice=Ask(P, "What legacy will you take upon yourself?", "Rebirth Hero", null, "pick", Choices, 0)
 						switch(choice)
 							if("Blue")
-								confirm=alert(P, "You won't give them the chance to strike. You begin your journey to forge a Legend...", "The Unsung Hero of Glory, the one who will engrave their name into history.", "Yes", "No")
+								confirm=Ask(P, "You won't give them the chance to strike. You begin your journey to forge a Legend...", "The Unsung Hero of Glory, the one who will engrave their name into history.", null, "confirm", null, 1, "Yes", "No")
 							if("Red")
-								confirm=alert(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Unsung Hero of Perseverance, the one who will never bend.", "Yes", "No")
+								confirm=Ask(P, "You'll bleed, but that only makes you stronger. You set out to defy all expectations...", "The Unsung Hero of Perseverance, the one who will never bend.", null, "confirm", null, 1, "Yes", "No")
 							if("Rainbow")
-								confirm=alert(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", "Yes", "No")
+								confirm=Ask(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", null, "confirm", null, 1, "Yes", "No")
 
 					P.SagaLevel=1
 					switch(choice)
@@ -469,14 +471,14 @@ mob/Admin3/verb
 					var/choice
 					var/confirm
 					while(confirm!="Yes")
-						choice=input(P, "A weapon is engraved upon every heart.  What lies within yours?", "Keyblade Awakening") in Choices
+						choice=Ask(P, "A weapon is engraved upon every heart.  What lies within yours?", "Keyblade Awakening", null, "pick", Choices, 0)
 						switch(choice)
 							if("A Sword of Courage")
-								confirm=alert(P, "With this, your heart will be dedicated and impulsive.", "A Sword who's strength is Courage. Bravery to stand against anything.", "Yes", "No")
+								confirm=Ask(P, "With this, your heart will be dedicated and impulsive.", "A Sword who's strength is Courage. Bravery to stand against anything.", null, "confirm", null, 1, "Yes", "No")
 							if("A Staff of Spirit")
-								confirm=alert(P, "With this, your heart will be flexible and unrestrained.", "A Staff who's strenth is Spirit. Power the eye cannot see.", "Yes", "No")
+								confirm=Ask(P, "With this, your heart will be flexible and unrestrained.", "A Staff who's strenth is Spirit. Power the eye cannot see.", null, "confirm", null, 1, "Yes", "No")
 							if("A Shield of Kindness")
-								confirm=alert(P, "With this, your heart will be able to endure anything for the sake of those you love.", "A Shield who's strength is Kindness. The desire to help one's friends.", "Yes", "No")
+								confirm=Ask(P, "With this, your heart will be able to endure anything for the sake of those you love.", "A Shield who's strength is Kindness. The desire to help one's friends.", null, "confirm", null, 1, "Yes", "No")
 					switch(choice)
 						if("A Sword of Courage")
 							P.KeybladeType="Sword"
@@ -484,7 +486,7 @@ mob/Admin3/verb
 							P.KeybladeType="Staff"
 						if("A Shield of Kindness")
 							P.KeybladeType="Shield"
-					var/Color=alert(P, "Light or Darkness?", "Keyblade", "Light", "Darkness")
+					var/Color=Ask(P, "Light or Darkness?", "Keyblade", null, "confirm", null, 1, "Light", "Darkness")
 					P.AddSkill(new/obj/Skills/Buffs/ActiveBuffs/Keyblade)
 					P.AddSkill(new/obj/Skills/Teleport/Dive_To_Heart)
 					P<<"You awaken the [P.KeybladeType] of your heart!"
@@ -494,7 +496,7 @@ mob/Admin3/verb
 					if(P.KeybladeType=="Sword")
 						P.ChooseMartialSkill(1)
 					if(P.KeybladeType=="Shield")
-						var/inp = input(P, "What path of magic will you fall under?") in list("Fire", "Ice", "Thunder")
+						var/inp = Ask(P, "What path of magic will you fall under?", "", null, "pick", list("Fire", "Ice", "Thunder"), 0)
 						P.KeybladePath = inp
 						switch(P.KeybladePath)
 							if("Fire")
@@ -519,12 +521,14 @@ mob/Admin3/verb
 			if(passiveGain.len > 0) passive_handler.increaseList(passiveGain);
 			Log("Admin","[ExtractInfo(usr)] granted [selection] to [P].")
 
-	Keychain_Add(mob/Players/m in players)
+	Keychain_Add()
 		set category="Admin"
+		var/mob/Players/m = PromptArg(usr, args, 1, "Keychain Add", "players")
+		if(isnull(m)) return
 		var/list/Options=glob.Keychains
 		for(var/o in m.Keychains)
 			Options.Remove(o)
-		var/Choice=input(usr, "What keychain do you wish to grant to [m]?", "Heart Share") in Options
+		var/Choice=Ask(usr, "What keychain do you wish to grant to [m]?", "Heart Share", null, "pick", Options, 0)
 		if(Choice=="Cancel")
 			return
 		m.Keychains.Add(Choice)
@@ -925,12 +929,12 @@ mob
 							var/choice
 							var/confirm
 							while(confirm!="Yes")
-								choice=input(src, "Are you the hero spoken of in legends? Or has your story yet to be written?", "Hero Path") in Choices
+								choice=Ask(src, "Are you the hero spoken of in legends? Or has your story yet to be written?", "Hero Path", null, "pick", Choices, 0)
 								switch(choice)
 									if("Unsung Hero")
-										confirm=alert(src, "You remain the hero nobody knows, but one day, your name will be its own legend.", "The Unsung Hero, a story yet to be written.", "Yes", "No")
+										confirm=Ask(src, "You remain the hero nobody knows, but one day, your name will be its own legend.", "The Unsung Hero, a story yet to be written.", null, "confirm", null, 1, "Yes", "No")
 									if("Prophesized Hero")
-										confirm=alert(src, "A story told in glass, a tragedy written into time and space.", "The Hero of Prophecy, chosen by fate.", "Yes", "No")
+										confirm=Ask(src, "A story told in glass, a tragedy written into time and space.", "The Hero of Prophecy, chosen by fate.", null, "confirm", null, 1, "Yes", "No")
 							src.SagaLevel=2
 							src<<"Unwavering courage wells up within you! You have unlocked the ACT meter!"
 							switch(choice)
@@ -988,12 +992,12 @@ mob
 								var/choice
 								var/confirm
 								while(confirm!="Yes")
-									choice=input(src, "Fate wavers, words on the glass falters. Which way will you walk?", "Hero Path") in Choices
+									choice=Ask(src, "Fate wavers, words on the glass falters. Which way will you walk?", "Hero Path", null, "pick", Choices, 0)
 									switch(choice)
 										if("Roaring Knight")
-											confirm=alert(src, "With your heart as the ark, to guide through the dark.", "The Roaring Knight, make with darkened blade.", "Yes", "No")
+											confirm=Ask(src, "With your heart as the ark, to guide through the dark.", "The Roaring Knight, make with darkened blade.", null, "confirm", null, 1, "Yes", "No")
 										if("White Pen of Hope")
-											confirm=alert(src, "Fate accepted, yet change made possible through others.", "The White Pen of Hope, author of a new story.", "Yes", "No")
+											confirm=Ask(src, "Fate accepted, yet change made possible through others.", "The White Pen of Hope, author of a new story.", null, "confirm", null, 1, "Yes", "No")
 									src.FinalHeroChoice=choice
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src<< "You have unlocked the green SOUL color, which reduces the damage you take as you build ACT. You also gain the BlackShard, a small weapon that can hardly be considered one, but carries great power..."
@@ -1132,14 +1136,14 @@ mob
 							var/choice
 							var/confirm
 							while(confirm!="Yes")
-								choice=input(src, "What kind of path do you take on your wretched path of blades?") in list ("Feeble","Strong","Firm")
+								choice=Ask(src, "What kind of path do you take on your wretched path of blades?", "", null, "pick", list ("Feeble","Strong","Firm"), 0)
 								switch(choice)
 									if("Feeble")
-										confirm=alert(src, "The path of Feebleness matters on lurching towards the future, pushing yourself past your limits to achieve your own selfish ideals of protecting those dear to you. Is this your path?", "UBW Path", "Yes", "No")
+										confirm=Ask(src, "The path of Feebleness matters on lurching towards the future, pushing yourself past your limits to achieve your own selfish ideals of protecting those dear to you. Is this your path?", "UBW Path", null, "confirm", null, 1, "Yes", "No")
 									if("Strong")
-										confirm=alert(src, "The path of the Strong strengthens your foundations, letting the user push forward despite all odds with a baseline mastery of their skills the other paths cannot boast. Is this your path?", "UBW Path", "Yes", "No")
+										confirm=Ask(src, "The path of the Strong strengthens your foundations, letting the user push forward despite all odds with a baseline mastery of their skills the other paths cannot boast. Is this your path?", "UBW Path", null, "confirm", null, 1, "Yes", "No")
 									if("Firm")
-										confirm = alert(src, "The path of Firmness is one forged by remaining on your convictions, caring, and yet remaining ever selfless. A amount of durability the other two paths cannot boast due to the amount of steel in your spine. Is this your path?", "UBW Path", "Yes", "No")
+										confirm = Ask(src, "The path of Firmness is one forged by remaining on your convictions, caring, and yet remaining ever selfless. A amount of durability the other two paths cannot boast due to the amount of steel in your spine. Is this your path?", "UBW Path", null, "confirm", null, 1, "Yes", "No")
 							src.UBWPath = choice
 							var/ariaStored
 							for(var/obj/Skills/Buffs/SlotlessBuffs/Aria_Chant/s in src.contents)
@@ -1242,7 +1246,7 @@ mob
 					if(src.SagaLevel==2)
 						src<<"Your Ansatsuken becomes refined enough to use EX versions of your abilities! Remember: every EX version costs 25 Meter."
 						if(!src.AnsatsukenPath)
-							src.AnsatsukenPath=alert(src, "You have refined your abilities to excel in one area of Ansatsuken...But what area?", "Ansatsuken Path", "Hadoken", "Shoryuken", "Tatsumaki")
+							src.AnsatsukenPath=Ask(src, "You have refined your abilities to excel in one area of Ansatsuken...But what area?", "Ansatsuken Path", null, "confirm", null, 1, "Hadoken", "Shoryuken", "Tatsumaki")
 						switch(src.AnsatsukenPath)
 							if("Hadoken")
 								src << "Your Hadoken and EX-Hadoken improve!"
@@ -1275,7 +1279,7 @@ mob
 									src.AddSkill(new/obj/Skills/AutoHit/ShinkuTatsumaki)
 					if(src.SagaLevel==4)
 						if(!src.AnsatsukenAscension)
-							src.AnsatsukenAscension=alert(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", "Satsui", "Chikara")
+							src.AnsatsukenAscension=Ask(src, "The time has come to decide the fate of your soul.  Will you give everything away for victory or hold on to your sanity at the price of becoming a fighting machine?", "Ansatsuken Ascension", null, "confirm", null, 1, "Satsui", "Chikara")
 							src <<"Your Ansatsuken stance is refined to suit your beliefs..."
 							var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI = new()
 							SI = locate() in src
@@ -1356,7 +1360,7 @@ mob
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Mangekyou_Sharingan, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Mangekyou_Sharingan)
 							src << "Your sharingan has matured into a Mangekyou Sharingan!"
-						var/Choice=input(src, "What kind of emotion made it mature into that form?") in list("Resolve", "Sacrifice", "Hatred")
+						var/Choice=Ask(src, "What kind of emotion made it mature into that form?", "", null, "pick", list("Resolve", "Sacrifice", "Hatred"), 0)
 						if(Choice)
 							src.SharinganEvolution=Choice
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Susanoo, src))
@@ -1455,12 +1459,12 @@ mob
 							var/choice
 							var/confirm
 							while(confirm!="Yes")
-								choice=input(src, "You've grown closer to your Kamui than ever before, and now it can take on a new form!  Which one do you choose?", "Kamui Ascension") in list("Kamui Senjin", "Kamui Shippu")
+								choice=Ask(src, "You've grown closer to your Kamui than ever before, and now it can take on a new form!  Which one do you choose?", "Kamui Ascension", null, "pick", list("Kamui Senjin", "Kamui Shippu"), 0)
 								switch(choice)
 									if("Kamui Senjin")
-										confirm=alert(src, "Kamui Senjin makes it so that your Kamui can assume a battle ready form, focused on potent strikes and endurance.  Do you wish to gain this form?", "Kamui Senjin", "Yes", "No")
+										confirm=Ask(src, "Kamui Senjin makes it so that your Kamui can assume a battle ready form, focused on potent strikes and endurance.  Do you wish to gain this form?", "Kamui Senjin", null, "confirm", null, 1, "Yes", "No")
 									if("Kamui Shippu")
-										confirm=alert(src, "Kamui Shippu makes it so that your Kamui can assume a speedy form, focused on evasion and elusive manuevers.  Do you wish to gain this form?", "Kamui Shippu", "Yes", "No")
+										confirm=Ask(src, "Kamui Shippu makes it so that your Kamui can assume a speedy form, focused on evasion and elusive manuevers.  Do you wish to gain this form?", "Kamui Shippu", null, "confirm", null, 1, "Yes", "No")
 
 							switch(choice)
 								if("Kamui Senjin")
@@ -1542,13 +1546,13 @@ mob
 							var/choice
 							var/confirm
 							while(confirm != "Yes")
-								choice = input("Two paths beckon before you; that of Clothes, or that of Rebellion. You may select to see more before confirming.") in list("Clothes", "Rebellion")
+								choice = Ask(usr, "Two paths beckon before you; that of Clothes, or that of Rebellion. You may select to see more before confirming.", "", null, "pick", list("Clothes", "Rebellion"), 0)
 								var/confirmText
 								if(choice == "Clothes")
 									confirmText = "The path of Shinra Koketsu; to devote your existence towards that of subjugating others beneath the glory of Life Fibers. A path that forsakes Junketsu, but enhances the self with all the glory of Life Fibers have to offer."
 								if(choice == "Rebellion")
 									confirmText = "The path of Junketsu; to show that life fibers are just another thing meant to be brought to heel beneath you. A path that will enhance Junketsu further, pushing the Kamui beyond it's usual limits."
-								confirm = input("[confirmText] <br><br>Are you sure about your decision?") in list("Yes", "No")
+								confirm = Ask(usr, "[confirmText] <br><br>Are you sure about your decision?", "", null, "pick", list("Yes", "No"), 0)
 							if(choice == "Clothes")
 								KamuiType = "Shinra Koketsu"
 								passive_handler.Increase("Unstoppable", 1)
@@ -1778,14 +1782,14 @@ mob
 						var/Choice
 						var/Confirm
 						while(Confirm!="Yes")
-							Choice=alert(src, "The greatest power in a heart is the sum of those connected to it. What do your connections mean to you?", "Final Keychain Ascension", "Unity", "Destiny")
+							Choice=Ask(src, "The greatest power in a heart is the sum of those connected to it. What do your connections mean to you?", "Final Keychain Ascension", null, "confirm", null, 1, "Unity", "Destiny")
 							switch(Choice)
 								if("Unity")
-									Confirm=alert(src, "Your friends are your power. They give you strength, and you, them.", "Final Keychain Ascension", "Yes", "No")
+									Confirm=Ask(src, "Your friends are your power. They give you strength, and you, them.", "Final Keychain Ascension", null, "confirm", null, 1, "Yes", "No")
 								if("Destiny")
-									Confirm=alert(src, "Together you can change the world. Together, you can change fate.", "Final Keychain Ascension", "Yes", "No")
+									Confirm=Ask(src, "Together you can change the world. Together, you can change fate.", "Final Keychain Ascension", null, "confirm", null, 1, "Yes", "No")
 								if("Future")//not in yet
-									Confirm=alert(src, "Whatever awaits you, you will challenge together.", "Final Keychain Ascension", "Yes", "No")
+									Confirm=Ask(src, "Whatever awaits you, you will challenge together.", "Final Keychain Ascension", null, "confirm", null, 1, "Yes", "No")
 						switch(Choice)
 							if("Unity")
 								src.Keychains.Add("Ultima Weapon")
@@ -1835,18 +1839,18 @@ mob
 			var/choice
 			var/confirm
 			while(confirm!="Yes")
-				choice=input(src, "What legendary weapon do you wish to take up?") in LegendaryWeapons
+				choice=Ask(src, "What legendary weapon do you wish to take up?", "", null, "pick", LegendaryWeapons, 0)
 				switch(choice)
 					if("Gae Bolg")
-						confirm=alert(src, "Gae Bolg is a cursed weapon, having a limited number of hits with bonus Slayer & Cursed Wounds, before throwing a undodgable homing projectile.Is this the weapon you want?", "Legendary Weapon", "Yes", "No")
+						confirm=Ask(src, "Gae Bolg is a cursed weapon, having a limited number of hits with bonus Slayer & Cursed Wounds, before throwing a undodgable homing projectile.Is this the weapon you want?", "Legendary Weapon", null, "confirm", null, 1, "Yes", "No")
 					if("Rule Breaker")
-						confirm=alert(src, "Rule Breaker gives the user Cyber Stigma & Mana Menace. Additionally has bulletkill & drains summon timers. Is this the weapon you want?", "Legendary Weapon", "Yes", "No")
+						confirm=Ask(src, "Rule Breaker gives the user Cyber Stigma & Mana Menace. Additionally has bulletkill & drains summon timers. Is this the weapon you want?", "Legendary Weapon", null, "confirm", null, 1, "Yes", "No")
 					if("Rho Aias")
-						confirm = alert(src, "Rho Aias gives injury equivalent to it's Vai HP given, but is a very powerful defensive tool. Is this the weapon you want?", "Legendary Weapon", "Yes", "No")
+						confirm = Ask(src, "Rho Aias gives injury equivalent to it's Vai HP given, but is a very powerful defensive tool. Is this the weapon you want?", "Legendary Weapon", null, "confirm", null, 1, "Yes", "No")
 					if("Kanshou & Byakuya")
-						confirm = alert(src, "Kanshou & Byakuya are more shatter resistant then typical projections, as well as having dual wield innately. Is this the weapon you want?", "Legendary Weapon", "Yes", "No")
+						confirm = Ask(src, "Kanshou & Byakuya are more shatter resistant then typical projections, as well as having dual wield innately. Is this the weapon you want?", "Legendary Weapon", null, "confirm", null, 1, "Yes", "No")
 					if("Caladbolg")
-						confirm = alert(src, "Caladbolg is a projectile with homing and a windup, when fired, it tracks hard into your opponent before exploding into a high damage AoE. Is this the weapon you want?", "Legendary Weapon", "Yes", "No")
+						confirm = Ask(src, "Caladbolg is a projectile with homing and a windup, when fired, it tracks hard into your opponent before exploding into a high damage AoE. Is this the weapon you want?", "Legendary Weapon", null, "confirm", null, 1, "Yes", "No")
 			switch(choice)
 				if("Gae Bolg")
 					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/GaeBolg)
@@ -1860,9 +1864,11 @@ mob
 				if("Caladbolg")
 					src.AddSkill(new/obj/Skills/Projectile/Zone_Attacks/Caladbolg)
 mob/Admin3/verb
-	SagaRemoval(mob/Players/P in players)
+	SagaRemoval()
 		set category="Admin"
-		var/Choice=input(usr, "Are you sure you want to remove [P]'s saga?", "Saga Decision") in list("Yes", "No")
+		var/mob/Players/P = PromptArg(usr, args, 1, "SagaRemoval", "players")
+		if(isnull(P)) return
+		var/Choice=Ask(usr, "Are you sure you want to remove [P]'s saga?", "Saga Decision", null, "pick", list("Yes", "No"), 0)
 		if(Choice=="No") return
 		var/list/obj/Skills/SagaSkills = list("/obj/Skills/Buffs/SpecialBuff/King_Of_Courage",\
 "/obj/Skills/AutoHit/Pegasus_Meteor_Fist","/obj/Skills/Queue/Rising_Dragon_Fist",\

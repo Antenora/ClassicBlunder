@@ -131,14 +131,14 @@ obj/Skills/Companion
 					squad -= id
 			verb
 				PlayerEditSquad()
-					var/c = input("Which?") as null|anything in squad
+					var/c = Ask(usr, "Which?", "", null, "pick", squad, 1)
 					if(c)
 						if(istext(squad[c])) //just a id
-							switch(input("Would you like to change [c]'s name?") in list("Yes","No"))
+							switch(Ask(usr, "Would you like to change [c]'s name?", "", null, "pick", list("Yes","No"), 0))
 								if("Yes")
 									var new_name
 									while(!new_name)
-										new_name = input("Name") as text
+										new_name = Ask(usr, "Name", "", null, "text", null, 0)
 									c = new_name
 						else
 							return

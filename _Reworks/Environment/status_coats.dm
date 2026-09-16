@@ -348,9 +348,11 @@ proc/_CoatBoot()
 	src << "Status coats: [glob.STATUS_COATS ? "ON" : "OFF"]."
 	Log("Admin", "[ExtractInfo(src)] set status coats to [glob.STATUS_COATS].")
 
-/mob/Admin2/verb/Coat_Test(t as text)
+/mob/Admin2/verb/Coat_Test()
 	set category = "Admin"
 	set name = "Coat Test"
+	var/t = PromptArgValue(usr, args, 1, "Coat Test", "text")
+	if(isnull(t)) return
 	switch(t)
 		if("chill") Slow = 10
 		if("burn") Burn = 15

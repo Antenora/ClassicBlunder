@@ -52,17 +52,9 @@ archive
         usr<< "Archive not established."
     else
         var/atom/A = archive
-        var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-        var/list/B=new
-        Edit+="[A]<br>[A.type]"
-        Edit+="<table width=10%>"
-        for(var/C in A.vars) B+=C
-        for(var/C in B)
-            Edit+="<td><a href=byond://?src=\ref[A];action=edit;var=[C]>"
-            Edit+=C
-            Edit+="<td>[Value(A.vars[C])]</td></tr>"
-        Edit += "</html>"
-        usr<<browse(Edit,"window=[A];size=450x600")
+        var/list/B = list()
+        for(var/C in A.vars) B += C
+        usr.client?.SheetShow("edit:\ref[A]", "EDIT", "[A]", "[A.type]", SheetVarRows(A, B), "a name to edit")
 
 
 /mob/Admin3/verb/View_Saga_Database()

@@ -323,13 +323,18 @@ mob/Mapper/verb/Import_Map_File()
 	if(!S?.active)
 		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
 		return
-	usr << "IMPORT: type the file name only (it looks in Exports/, no extension)."
+	var/list/names = list()
+	for(var/f in flist("Exports/"))
+		if(copytext(f, length(f) - 3) == ".dmm")
+			names += copytext(f, 1, length(f) - 3)
+	if(!names.len)
+		usr << "No exports saved yet - use Export Map Region to write one into Exports/."
+		return
 	spawn
-		var/nm = HUDTextPrompt("Import which file?", "")
-		if(isnull(nm) || !length(nm))
+		var/nm = Ask(usr, "Import which file from Exports/?", "Import Map File", null, "pick", names, 1)
+		if(isnull(nm))
 			return
-		var/fname = "Exports/[ckey(nm)].dmm"
-		BuildBeginImport(usr, S, fname)
+		BuildBeginImport(usr, S, "Exports/[nm].dmm")
 
 mob/Mapper/verb/Place_Prefab()
 	set category = "Mapper"
@@ -344,12 +349,11 @@ mob/Mapper/verb/Place_Prefab()
 	if(!names.len)
 		usr << "No prefabs saved yet - use Save Prefab to stamp a region into Prefabs/."
 		return
-	usr << "PREFABS: [jointext(names, ", ")]"
 	spawn
-		var/nm = HUDTextPrompt("Place which prefab?", names[1])
-		if(isnull(nm) || !length(nm))
+		var/nm = Ask(usr, "Place which prefab?", "Place Prefab", names[1], "pick", names, 1)
+		if(isnull(nm))
 			return
-		BuildBeginImport(usr, S, "Prefabs/[ckey(nm)].dmm")
+		BuildBeginImport(usr, S, "Prefabs/[nm].dmm")
 
 /proc/BuildBeginImport(mob/M, datum/build_session/S, fname)
 	if(!fexists(fname))

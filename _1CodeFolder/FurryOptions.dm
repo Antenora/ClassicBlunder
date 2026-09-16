@@ -20,7 +20,7 @@ obj
 				if(!(world.time > usr.verb_delay)) return
 				usr.verb_delay=world.time+1
 				var/Choice
-				Choice=alert("Do you want to hide your traits or adjust their color?", "Trait Options", "Ears", "Other Traits", "Trait Color")
+				Choice=Ask(usr, "Do you want to hide your traits or adjust their color?", "Trait Options", null, "confirm", null, 1, "Ears", "Other Traits", "Trait Color")
 				if(Choice=="Ears")
 					if(usr.Lizard||usr.Tengu||usr.Bull)
 						Choice="Other"
@@ -50,7 +50,7 @@ obj
 							else
 								usr << "You <font color='green'>display</font color> your tail."
 					if("Trait Color")
-						var/Color=input(usr,"Choose color") as color|null
+						var/Color=Ask(usr, "Choose color", "", null, "color", null, 1)
 						usr.Trait_Color=Color
 
 				usr.Hairz("Remove")

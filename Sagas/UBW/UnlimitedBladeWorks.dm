@@ -61,7 +61,7 @@ obj/DomainExpansionRoof
 	set category = "Admin"
 	set name = "Give Domain Expansion"
 	if(!src.Alert("Are you sure you want to give someone Domain Expansion?")) return
-	var/demonName = input(src, "What is the name of the Domain? (e.g. 'Malovent Imperium' -> activation says 'X says: Domain Expansion.. Malovent Imperium')", "Domain Expansion - Name") as text|null
+	var/demonName = Ask(src, "What is the name of the Domain? (e.g. 'Malovent Imperium' -> activation says 'X says: Domain Expansion.. Malovent Imperium')", "Domain Expansion - Name", null, "text", null, 1)
 	if(!demonName || !length(demonName))
 		src << "Cancelled. No domain name provided."
 		return
@@ -69,19 +69,19 @@ obj/DomainExpansionRoof
 	if(!customTurfIcon)
 		src << "Cancelled. No custom turf icon provided."
 		return
-	var/rawRange = input(src, "Range of the Domain Expansion (1 to 50).", "Domain Expansion - Range", 10) as num|null
+	var/rawRange = Ask(src, "Range of the Domain Expansion (1 to 50).", "Domain Expansion - Range", 10, "num", null, 1)
 	if(isnull(rawRange))
 		src << "Cancelled. No range provided."
 		return
 	var/finalRange = round(rawRange)
 	if(finalRange < 1) finalRange = 1
 	if(finalRange > 50) finalRange = 50
-	var/shroudChoice = input(src, "Should the Domain use a shroud overlay on top of the floor? (Selecting No leaves only the custom floor.)", "Domain Expansion - Shroud") in list("Yes","No")
+	var/shroudChoice = Ask(src, "Should the Domain use a shroud overlay on top of the floor? (Selecting No leaves only the custom floor.)", "Domain Expansion - Shroud", null, "pick", list("Yes","No"), 0)
 	var/useShroud = (shroudChoice == "Yes")
 	var/icon/customRoofIcon = null
 	if(useShroud)
 		customRoofIcon = input(src, "Upload the custom shroud icon for the Domain (32x32 .dmi, single state). Cancel to fall back to the default Roofs.dmi shroud.", "Domain Expansion - Shroud Icon") as icon|null
-	var/mob/p = input(src, "Who to give this Domain Expansion to?", "Domain Expansion - Recipient") in players
+	var/mob/p = Ask(src, "Who to give this Domain Expansion to?", "Domain Expansion - Recipient", null, "pick", players, 0)
 	if(!p)
 		src << "Cancelled. No recipient."
 		return

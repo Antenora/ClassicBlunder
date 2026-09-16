@@ -1008,7 +1008,7 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 client/proc/RenameItem(obj/Items/it, ctx)
 	set waitfor = 0
 	if(!istype(it) || !mob) return
-	var/nn = input(mob, "Enter a new name for [it.name].", "Rename", it.name) as text|null
+	var/nn = Ask(mob, "Enter a new name for [it.name].", "Rename", it.name, "text", null, 1)
 	if(isnull(nn) || !length(nn)) return
 	it.name = nn
 	if(ctx == "gear")
@@ -1020,7 +1020,7 @@ client/proc/RenameItem(obj/Items/it, ctx)
 client/proc/GearLayerPrompt(obj/Items/it)
 	set waitfor = 0
 	if(!istype(it) || !mob) return
-	var/np = input(mob, "Set the draw layer for [it.name].\n0 = default (front-most). Higher numbers sit further BEHIND other layers.", "Layer Priority", it.LayerPriority) as num|null
+	var/np = Ask(mob, "Set the draw layer for [it.name].\n0 = default (front-most). Higher numbers sit further BEHIND other layers.", "Layer Priority", it.LayerPriority, "num", null, 1)
 	if(isnull(np)) return
 	it.LayerPriority = np
 	if(findtext(it.suffix, "Equipped"))
@@ -1969,7 +1969,7 @@ client/proc/CustSetLayerPriority()
 	set waitfor = 0
 	var/obj/Items/it = cust_target
 	if(!istype(it) || !mob) return
-	var/np = input(mob, "Set the draw layer for [it.name].\n0 = default (front-most). Higher numbers sit further BEHIND other layers.", "Layer Priority", it.LayerPriority) as num|null
+	var/np = Ask(mob, "Set the draw layer for [it.name].\n0 = default (front-most). Higher numbers sit further BEHIND other layers.", "Layer Priority", it.LayerPriority, "num", null, 1)
 	if(isnull(np)) return
 	it.LayerPriority = np
 	if(findtext(it.suffix, "Equipped"))
@@ -1986,7 +1986,7 @@ client/proc/OpenCustItemPicker()
 	if(!items.len)
 		mob << "You have no customizable gear or clothing."
 		return
-	var/obj/Items/pick = input(mob, "Choose an item to customize.", "Customize") as null|anything in items
+	var/obj/Items/pick = Ask(mob, "Choose an item to customize.", "Customize", null, "pick", items, 1)
 	if(!pick) return
 	cust_target = pick
 	BuildCustPanel()
@@ -1994,7 +1994,7 @@ client/proc/OpenCustItemPicker()
 client/proc/CustColorPick()
 	set waitfor = 0
 	if(!cust_panel_opt || !mob) return
-	var/col = input(mob, "Choose a color.", "Color") as color|null
+	var/col = Ask(mob, "Choose a color.", "Color", null, "color", null, 1)
 	if(col) SetCustColor(col)
 
 client/proc/CustOffsetInput()
@@ -2004,8 +2004,8 @@ client/proc/CustOffsetInput()
 	if(!cfg || !tgt) return
 	var/cx = tgt.vars[cfg["ox"]]; if(isnull(cx)) cx = 0
 	var/cy = tgt.vars[cfg["oy"]]; if(isnull(cy)) cy = 0
-	var/nx = input(mob, "Pixel X offset.", "Offset X", cx) as num|null
-	var/ny = input(mob, "Pixel Y offset.", "Offset Y", cy) as num|null
+	var/nx = Ask(mob, "Pixel X offset.", "Offset X", cx, "num", null, 1)
+	var/ny = Ask(mob, "Pixel Y offset.", "Offset Y", cy, "num", null, 1)
 	if(cfg["apply"] == "hair") mob.Hairz("Remove")
 	if(!isnull(nx)) tgt.vars[cfg["ox"]] = nx
 	if(!isnull(ny)) tgt.vars[cfg["oy"]] = ny
@@ -2025,7 +2025,7 @@ client/proc/CustBrowse()
 	switch(cfg["apply"])
 		if("hair")
 			mob.Hair_BaseRaw = Z
-			var/Color = input(mob, "Choose a hair color, or cancel for none.", "Hair Color") as color|null
+			var/Color = Ask(mob, "Choose a hair color, or cancel for none.", "Hair Color", null, "color", null, 1)
 			var/icon/I = icon(Z)
 			if(Color) I += Color
 			mob.Hair_Base = I
@@ -2281,9 +2281,9 @@ mob/proc/GetMenuBuffs()
 mob/proc/ChooseMenuPronouns()
 	set waitfor = 0
 	if(!client) return
-	var/subj = input(src, "Subject pronoun (He/She/They/It):", "Pronouns", subjectpronoun()) as null|anything in list("He", "She", "They", "It")
+	var/subj = Ask(src, "Subject pronoun (He/She/They/It):", "Pronouns", subjectpronoun(), "pick", list("He", "She", "They", "It"), 1)
 	if(!subj) return
-	var/objp = input(src, "Object pronoun (Him/Her/Them/It):", "Pronouns", objectpronoun()) as null|anything in list("Him", "Her", "Them", "It")
+	var/objp = Ask(src, "Object pronoun (Him/Her/Them/It):", "Pronouns", objectpronoun(), "pick", list("Him", "Her", "Them", "It"), 1)
 	if(!objp) return
 	information.pronouns = list(subj, objp)
 	client.UpdateCharacterMenu()
@@ -2295,11 +2295,11 @@ mob/proc/RenameSelf()
 	if(preventRename)
 		src << "You cannot rename this."
 		return
-	var/blah = input(src, "Enter a new name.", "Rename", name) as text|null
+	var/blah = Ask(src, "Enter a new name.", "Rename", name, "text", null, 1)
 	if(blah && blah != "" && blah != " ")
 		name = copytext(blah, 1, 25)
 		if(isplayer(src))
-			glob.IDs[UniqueID] = "[name]"
+			setPlayerNameByUID(UniqueID, name)
 		client.UpdateCharacterMenu()
 		src << "You are now known as <b>[name]</b>."
 
@@ -2314,9 +2314,9 @@ mob/verb/Customize_Buff_Portraits()
 	if(!buffs.len)
 		src << "You have no buffs to customize."
 		return
-	var/obj/Skills/Buffs/B = input(src, "Choose a buff to set its portrait tag.", "Buff Portraits") as null|anything in buffs
+	var/obj/Skills/Buffs/B = Ask(src, "Choose a buff to set its portrait tag.", "Buff Portraits", null, "pick", buffs, 1)
 	if(!B || !(B in src)) return
-	var/tag = input(src, "Enter the portrait prefix for this buff.\nExample: Kaioken matches Kaioken, KaiokenForm1 and KaiokenForm1Anger1.\nLeave blank to remove the tag.", "Portrait Tag", B.PortraitTag) as text|null
+	var/tag = Ask(src, "Enter the portrait prefix for this buff.\nExample: Kaioken matches Kaioken, KaiokenForm1 and KaiokenForm1Anger1.\nLeave blank to remove the tag.", "Portrait Tag", B.PortraitTag, "text", null, 1)
 	if(isnull(tag) || !B || !(B in src)) return
 	B.PortraitTag = length(tag) ? tag : null
 	PortraitSync(1)

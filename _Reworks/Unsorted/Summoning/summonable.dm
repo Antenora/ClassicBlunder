@@ -20,8 +20,10 @@ Summonable skill
 */
 
 
-/mob/Admin3/verb/lockSendBack(obj/Skills/Devils_Deal/dd in world)
+/mob/Admin3/verb/lockSendBack()
     set name = "Lock Send Back"
+    var/obj/Skills/Devils_Deal/dd = PromptArg(usr, args, 1, "Lock Send Back", "world:/obj/Skills/Devils_Deal")
+    if(isnull(dd)) return
     if(istype(dd, /obj/Skills/Devils_Deal))
         if(dd.dontIncrement)
             dd.dontIncrement = FALSE

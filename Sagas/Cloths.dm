@@ -2,7 +2,7 @@
 
 /mob/proc/PickGoldCloth()
 	if(!ClothGold)
-		ClothGold = input(src, "What Constellation do you want to be?") in glob.GoldConstellationNames
+		ClothGold = Ask(src, "What Constellation do you want to be?", "", null, "pick", glob.GoldConstellationNames, 0)
 		src<<"You are now the [ClothGold] Constellation!"
 
 sagaTierUpMessages/Cosmo

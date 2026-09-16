@@ -293,7 +293,23 @@ var/global/datum/keybind_menu/keybind_menu = new()
 
 client/proc/OpenKeybindMenu()
 	if(!mob) return
-	mob << browse(KeybindMenuHTML(), "window=keybinds;size=620x640")
+	BuildKeybindRegistry()
+	var/list/rows = list()
+	var/lastcat = ""
+	for(var/datum/keyaction/a in keybind_registry)
+		if(a.category != lastcat)
+			rows[++rows.len] = list("sec" = "[a.category]")
+			lastcat = a.category
+		rows[++rows.len] = KeybindRowData(a.id, a.label)
+	var/list/misc = MiscVerbs()
+	if(misc.len)
+		rows[++rows.len] = list("sec" = "Misc")
+		for(var/cmd in misc)
+			rows[++rows.len] = KeybindRowData("misc:[cmd]", misc[cmd])
+	PanelShow("keybinds", "keys", "KEYS", "Keybinds", "Click a key box, then press the new key or a combo like CTRL+W. Esc cancels, x clears.", rows, "a key box to rebind", list(list("RESET TO DEFAULTS", "?src=\ref[keybind_menu];action=reset")), list("kref" = "\ref[keybind_menu]"))
+
+client/proc/KeybindRowData(aid, label)
+	return list("t" = "[label]", "id" = "[aid]", "k" = list("[mob.KeybindKey(aid, 1)]", "[mob.KeybindKey(aid, 2)]"))
 
 client/proc/MiscVerbs()
 	BuildKeybindRegistry()
@@ -346,90 +362,7 @@ client/proc/MiscVerbs()
 			call(sk, sk.fire_ident)()
 			return
 
-client/proc/KeybindRow(aid, label)
-	var/k1 = mob.KeybindKey(aid, 1)
-	var/k2 = mob.KeybindKey(aid, 2)
-	var/d1 = k1 ? KeyDisplay(k1) : "(unbound)"
-	var/d2 = k2 ? KeyDisplay(k2) : "(unbound)"
-	var/sid = NormalizeSkillName(aid)
-	var/e1 = "kb_[sid]_1"
-	var/e2 = "kb_[sid]_2"
-	return {"<tr><td class='lbl'>[label]</td><td class='kc'><span class='kb' id='[e1]' data-k="[k1]" onclick='rb("[e1]","[aid]",1)'>[d1]</span><span class='ub' onclick='ub("[e1]","[aid]",1)'>x</span></td><td class='kc'><span class='kb' id='[e2]' data-k="[k2]" onclick='rb("[e2]","[aid]",2)'>[d2]</span><span class='ub' onclick='ub("[e2]","[aid]",2)'>x</span></td><td class='rc'><span class='rl' onclick='ro("[aid]")'>reset</span></td></tr>"}
 
-client/proc/KeybindMenuHTML()
-	BuildKeybindRegistry()
-	var/r = "\ref[keybind_menu]"
-	var/rows = ""
-	var/lastcat = ""
-	for(var/datum/keyaction/a in keybind_registry)
-		if(a.category != lastcat)
-			rows += {"<tr><td colspan='4' class='cat'>[a.category]</td></tr>"}
-			lastcat = a.category
-		rows += KeybindRow(a.id, a.label)
-	var/list/misc = MiscVerbs()
-	if(misc.len)
-		rows += {"<tr><td colspan='4' class='cat'>Misc</td></tr>"}
-		for(var/cmd in misc)
-			rows += KeybindRow("misc:[cmd]", misc[cmd])
-	return {"<html><head><style>
-body{background:#0a1420;color:#cfe9ff;font-family:Verdana,Arial,sans-serif;font-size:12px;margin:0;padding:8px;}
-h1{color:#8be9ff;font-size:15px;margin:2px 0 4px;text-align:center;letter-spacing:2px;}
-.hint{color:#7a9bb5;font-size:10px;text-align:center;margin-bottom:6px;}
-table{width:100%;border-collapse:collapse;}
-.hd{color:#8be9ff;font-size:11px;text-align:center;padding:2px;border-bottom:1px solid #2a4a5a;}
-.lbl{padding:3px 6px;}
-.kc{text-align:center;padding:3px 4px;white-space:nowrap;}
-.kb{display:inline-block;background:#16263a;color:#cfe9ff;border:1px solid #3a5a70;padding:2px 6px;min-width:96px;text-align:center;cursor:pointer;}
-.ub{display:inline-block;color:#ff6b6b;cursor:pointer;padding:0 6px;font-weight:bold;}
-.cat{color:#8be9ff;font-weight:bold;border-bottom:1px solid #2a4a5a;padding:9px 6px 2px;}
-.rs{display:block;width:170px;margin:14px auto 6px;background:#3a1a1a;color:#ffb0b0;border:1px solid #6a2a2a;padding:6px;text-align:center;cursor:pointer;}
-.rc{text-align:center;padding:3px 4px;}
-.rl{color:#7a9bb5;cursor:pointer;font-size:10px;text-decoration:underline;}
-</style></head><body>
-<h1>KEYBINDS</h1>
-<div class='hint'>click a key box then press the new key, or a combo like CTRL+W. esc cancels, x clears.</div>
-<table><tr><th class='hd'>Action</th><th class='hd'>Primary</th><th class='hd'>Secondary</th><th class='hd'></th></tr>[rows]</table>
-<div class='rs' onclick='rst()'>Reset to Defaults</div>
-<script>
-var ref='[r]';var w=null;
-function go(a){location.href='byond://?src='+ref+a;}
-function dk(k){if(!k)return '(unbound)';k=k.replace('North','Arrow Up');k=k.replace('South','Arrow Down');k=k.replace('West','Arrow Left');k=k.replace('East','Arrow Right');k=k.replace('Subtract','Numpad -');k=k.replace('Multiply','Numpad *');k=k.replace('Divide','Numpad /');k=k.replace('Decimal','Numpad .');k=k.replace('Add','Numpad +');k=k.replace('Back','Backspace');return k;}
-function setbtn(el,raw){el.setAttribute('data-k',raw);el.innerHTML=dk(raw);el.style.background='#16263a';el.style.color='#cfe9ff';}
-function rb(eid,aid,slot){
- if(w){var p=document.getElementById(w.eid);if(p)setbtn(p,p.getAttribute('data-k'));}
- w={eid:eid,aid:aid,slot:slot};
- var el=document.getElementById(eid);el.innerHTML='press a key';el.style.background='#8be9ff';el.style.color='#0a1420';
-}
-function ub(eid,aid,slot){var el=document.getElementById(eid);if(el)setbtn(el,'');go(';action=unbind;id='+encodeURIComponent(aid)+';slot='+slot);}
-function rst(){go(';action=reset');}
-function ro(aid){go(';action=resetone;id='+encodeURIComponent(aid));}
-function clr(k,exeid){var s=document.getElementsByTagName('span');for(var i=0;i<s.length;i++){var x=s\[i\];if(x.className=='kb'&&x.id!=exeid&&x.getAttribute('data-k')==k)setbtn(x,'');}}
-function mk(e){
- var c=e.keyCode;
- if(c==16||c==17||c==18||c==91||c==92||c==93||c==20||c==144)return '';
- if(c==27)return 'CANCEL';
- var b='';
- if(c>=65&&c<=90)b=String.fromCharCode(c);
- else if(c>=48&&c<=57)b=String.fromCharCode(c);
- else if(c>=96&&c<=105)b='Numpad'+(c-96);
- else if(c>=112&&c<=123)b='F'+(c-111);
- else{var m={32:'Space',9:'Tab',13:'Return',8:'Back',37:'West',38:'North',39:'East',40:'South',45:'Insert',46:'Delete',106:'Multiply',107:'Add',109:'Subtract',111:'Divide',110:'Decimal',186:';',187:'=',188:',',189:'-',190:'.',191:'/',192:'`'};b=m\[c\]||'';}
- if(b=='')return '';
- var p='';if(e.ctrlKey)p+='CTRL+';if(e.shiftKey)p+='SHIFT+';if(e.altKey)p+='ALT+';
- return p+b;
-}
-document.onkeydown=function(e){
- if(!w)return true;
- e=e||window.event;var k=mk(e);
- if(k=='')return false;
- var ctx=w;w=null;var el=document.getElementById(ctx.eid);
- if(k=='CANCEL'){if(el)setbtn(el,el.getAttribute('data-k'));return false;}
- clr(k,ctx.eid);if(el)setbtn(el,k);
- go(';action=rebind;id='+encodeURIComponent(ctx.aid)+';slot='+ctx.slot+';key='+encodeURIComponent(k));
- return false;
-};
-</script>
-</body></html>"}
 
 #define SKILL_ICON_FILE 'HUD/SkillIcons.dmi'
 

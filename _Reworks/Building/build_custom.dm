@@ -279,10 +279,10 @@ var/global/list/customDefIconCache = list()
 			reuse = D.fname
 			break
 	sleep(5)
-	var/kindT = M.HUDTextPrompt("T = turf, O = object", "T")
+	var/kindT = Ask(M, "Is the new custom a turf or an object?", "New Custom", "Turf", "pick", list("Turf", "Object"), 1)
 	if(isnull(kindT))
 		return
-	var/kind = (uppertext(copytext(kindT, 1, 2)) == "O") ? "obj" : "turf"
+	var/kind = (kindT == "Object") ? "obj" : "turf"
 	var/fname = reuse
 	if(!length(fname))
 		var/stamp = "[world.realtime][rand(100, 999)]"
@@ -325,48 +325,16 @@ var/global/list/customDefIconCache = list()
 		if(isnull(nm) || !length(nm))
 			M << "Custom creation cancelled."
 			return
-		M << "Flags: D = dense, O = opaque, R = roof, C = cliff (auto-curved bottom corners), S = stairs (climbs raised terrain, shows over cliff faces), L = ladder (walk over walls and cliffs), B = bridge (walk over water). Type any of them, or leave empty."
-		sleep(5)
-		var/flags = M.HUDTextPrompt("Flags: D O R C S L B (or empty)", "")
-		if(isnull(flags))
-			flags = ""
-		flags = uppertext(flags)
-		var/mat = ""
-		if(kind == "turf")
-			M << "Material family makes this turf edge-blend like real terrain (cliffs and banks included for Water). Leave empty to keep it its own material."
-			sleep(5)
-			var/matIn = M.HUDTextPrompt("Material: Grass Dirt Sand Water Stone Wood Ice (or empty)", "")
-			if(isnull(matIn))
-				matIn = ""
-			matIn = trimtext(matIn)
-			for(var/nm2 in buildMaterialNames)
-				if(cmptext(nm2, matIn))
-					mat = nm2
-					break
-		M << "Surface profile decides light, shadow and wind: tree or foliage sway in the wind and cast soft shadows, wall blocks light, floor does nothing. Leave empty to classify automatically."
-		sleep(5)
-		var/profIn = M.HUDTextPrompt("Profile: tree foliage canopy wall floor prop_low prop_medium prop_tall fence (or empty)", "")
-		if(isnull(profIn))
-			profIn = ""
-		profIn = lowertext(trimtext(profIn))
-		var/prof = (profIn in SurfaceProfiles()) ? profIn : ""
 		var/datum/build_custom_def/D = new
 		D.kind = kind
 		D.name = nm
 		D.fname = fname
 		D.icon_state = state
-		D.density = findtext(flags, "D") ? 1 : 0
-		D.opacity = findtext(flags, "O") ? 1 : 0
-		D.roof = (kind == "turf" && findtext(flags, "R")) ? 1 : 0
-		D.cliff = (kind == "turf" && findtext(flags, "C")) ? 1 : 0
-		D.fixture = findtext(flags, "L") ? "ladder" : (findtext(flags, "B") ? "bridge" : (findtext(flags, "S") ? "stairs" : ""))
-		D.stairs = (kind == "turf" && D.fixture == "stairs") ? 1 : 0
 		D.hash = uphash
 		D.creator = C.ckey
-		D.material = mat
-		D.profile = prof
+		BuildCustomSettingsMenu(M, D, "New Custom")
 		BuildCustomRegister(D)
-		Log("Mapper", "[M] ([C.ckey]) registered custom [kind] \"[D.name]\" ([D.fname], state \"[state]\", material [length(mat) ? mat : "auto"], profile [length(prof) ? prof : "auto"]).", 1)
+		Log("Mapper", "[M] ([C.ckey]) registered custom [kind] \"[D.name]\" ([D.fname], state \"[state]\", material [length(D.material) ? D.material : "auto"], profile [length(D.profile) ? D.profile : "auto"]).", 1)
 		M << "Registered \"[D.name]\" - it is now in every mapper's CUSTOM palette."
 		S.category = BUILD_CAT_CUSTOM
 		S.RefreshFiltered()
@@ -487,29 +455,8 @@ mob/Mapper/verb/Custom_Registry()
 		var/flags = "[D.density ? "D" : ""][D.opacity ? "O" : ""][D.roof ? "R" : ""][D.cliff ? "C" : ""]"
 		usr << "  [D.name] | [D.kind] by [D.creator] | placed [placed] | fixture [BuildCustomFixtureLabel(D)] | profile [length(D.profile) ? D.profile : "auto"] | material [length(D.material) ? D.material : "auto"] | flags [length(flags) ? flags : "-"] | [D.fname] state \"[D.icon_state]\""
 
-mob/Mapper/verb/Edit_Custom_Def()
-	set category = "Mapper"
-	BuildCustomLoad()
-	var/list/mine = list()
-	for(var/datum/build_custom_def/D in customDefs)
-		if(D.creator == usr.ckey || usr.Admin)
-			mine["[D.name] ([D.kind], by [D.creator])"] = D
-	if(!mine.len)
-		usr << "No customs you can edit. NEW CUSTOM in the build drawer creates one."
-		return
-	var/pick = input(usr, "Edit which custom?", "Edit Custom") as null|anything in mine
-	if(!pick)
-		return
-	var/datum/build_custom_def/D = mine[pick]
-	var/d0 = D.density
-	var/o0 = D.opacity
-	var/r0 = D.roof
-	var/m0 = D.material
-	var/k0 = D.cliff
-	var/s0 = D.stairs
-	var/x0 = D.fixture
-	var/p0 = D.profile
-	while(D)
+/proc/BuildCustomSettingsMenu(mob/M, datum/build_custom_def/D, title = "Edit Custom")
+	while(M && D)
 		var/list/menu = list()
 		if(D.kind == "turf")
 			menu += "Material: [length(D.material) ? D.material : "AUTO (its own)"]"
@@ -521,13 +468,13 @@ mob/Mapper/verb/Edit_Custom_Def()
 		menu += "Fixture: [BuildCustomFixtureLabel(D)]"
 		menu += "Profile: [length(D.profile) ? D.profile : "AUTO (by type)"]"
 		menu += "Done"
-		var/choice = input(usr, "Custom \"[D.name]\" - pick a setting.", "Edit Custom") as null|anything in menu
+		var/choice = Ask(M, "Custom \"[D.name]\" - pick a setting.", title, null, "pick", menu, 1)
 		if(!choice || choice == "Done")
 			break
 		if(findtext(choice, "Material"))
 			var/list/mats = buildMaterialNames.Copy()
 			mats += "AUTO (its own material)"
-			var/mpick = input(usr, "Which family should \"[D.name]\" edge-blend as? Water gets cliffs and banks.", "Edit Custom") as null|anything in mats
+			var/mpick = Ask(M, "Which family should \"[D.name]\" edge-blend as? Water gets cliffs and banks.", title, null, "pick", mats, 1)
 			if(!mpick)
 				continue
 			D.material = (mpick in buildMaterialNames) ? mpick : ""
@@ -541,7 +488,7 @@ mob/Mapper/verb/Edit_Custom_Def()
 			D.cliff = !D.cliff
 		else if(findtext(choice, "Fixture"))
 			var/list/fx = list("None" = "", "Stairs - climbs raised terrain, shows over cliff faces" = "stairs", "Ladder - walk over walls and cliffs" = "ladder", "Bridge - walk over water" = "bridge")
-			var/fpick = input(usr, "What does \"[D.name]\" let players do?", "Edit Custom") as null|anything in fx
+			var/fpick = Ask(M, "What does \"[D.name]\" let players do?", title, null, "pick", fx, 1)
 			if(!fpick)
 				continue
 			D.fixture = fx[fpick]
@@ -551,10 +498,34 @@ mob/Mapper/verb/Edit_Custom_Def()
 			for(var/pid in SurfaceProfiles())
 				ids += pid
 			ids += "AUTO (classify by type)"
-			var/ppick = input(usr, "Surface profile for \"[D.name]\": tree or foliage sway in the wind and cast soft shadows, wall blocks light, floor does nothing.", "Edit Custom") as null|anything in ids
+			var/ppick = Ask(M, "Surface profile for \"[D.name]\": tree or foliage sway in the wind and cast soft shadows, wall blocks light, floor does nothing.", title, null, "pick", ids, 1)
 			if(!ppick)
 				continue
 			D.profile = (ppick in SurfaceProfiles()) ? ppick : ""
+
+mob/Mapper/verb/Edit_Custom_Def()
+	set category = "Mapper"
+	BuildCustomLoad()
+	var/list/mine = list()
+	for(var/datum/build_custom_def/D in customDefs)
+		if(D.creator == usr.ckey || usr.Admin)
+			mine["[D.name] ([D.kind], by [D.creator])"] = D
+	if(!mine.len)
+		usr << "No customs you can edit. NEW CUSTOM in the build drawer creates one."
+		return
+	var/pick = Ask(usr, "Edit which custom?", "Edit Custom", null, "pick", mine, 1)
+	if(!pick)
+		return
+	var/datum/build_custom_def/D = mine[pick]
+	var/d0 = D.density
+	var/o0 = D.opacity
+	var/r0 = D.roof
+	var/m0 = D.material
+	var/k0 = D.cliff
+	var/s0 = D.stairs
+	var/x0 = D.fixture
+	var/p0 = D.profile
+	BuildCustomSettingsMenu(usr, D, "Edit Custom")
 	var/dDens = (D.density != d0)
 	var/dOpac = (D.opacity != o0)
 	var/dRoof = (D.roof != r0)
@@ -577,33 +548,70 @@ mob/Mapper/verb/Edit_Custom_Def()
 	customDefIconCache = list()
 	BuildCustomRetroApply(D, dDens, dOpac, dRoof, matChanged || cliffChanged, cliffChanged || stairsChanged, profChanged, usr)
 
-mob/Mapper/verb/Custom_Adopt(atom/A as obj|turf in view(8, usr))
+mob/Mapper/verb/Custom_Adopt()
 	set category = "Mapper"
+	if(args.len && istype(args[1], /atom))
+		BuildCustomAdoptAtom(usr, args[1])
+		return
+	var/list/seen = list()
+	var/list/reps = list()
+	for(var/atom/C in view(8, usr))
+		var/isobj = istype(C, /obj/Turfs/CustomObj1)
+		if(!isobj && !istype(C, /turf/CustomTurf))
+			continue
+		var/k = "[isobj ? "o" : "t"]|[C.name]|[C.icon_state]"
+		if(seen[k])
+			seen[k]++
+			continue
+		seen[k] = 1
+		reps[k] = C
+	if(!reps.len)
+		usr << "No custom objects or custom tiles in view."
+		return
+	var/list/menu = list()
+	for(var/k in reps)
+		var/atom/C = reps[k]
+		var/base = "[C.name][istype(C, /turf) ? " (tile)" : ""][seen[k] > 1 ? " x[seen[k]]" : ""]"
+		var/label = base
+		var/j = 2
+		while(menu[label])
+			label = "[base] #[j]"
+			j++
+		menu[label] = C
+	var/target = Ask(usr, "Adopt which placed art? Every copy that shares it will be linked to the custom you pick next.", "Custom Adopt", null, "pick", menu, 1)
+	if(!target)
+		return
+	var/atom/A = menu[target]
 	if(!A)
 		return
+	BuildCustomAdoptAtom(usr, A)
+
+/proc/BuildCustomAdoptAtom(mob/M, atom/A)
+	if(!M || !A)
+		return
 	if(istype(A, /turf/CustomTurf))
-		BuildCustomAdoptTurf(usr, A)
+		BuildCustomAdoptTurf(M, A)
 		return
 	if(!istype(A, /obj/Turfs/CustomObj1))
-		usr << "That is not a custom object or custom turf."
+		M << "That is not a custom object or custom turf."
 		return
 	var/obj/Turfs/CustomObj1/O = A
 	BuildCustomLoad()
 	var/list/mine = list()
 	for(var/datum/build_custom_def/D in customDefs)
-		if(D.kind == "obj" && (D.creator == usr.ckey || usr.Admin))
+		if(D.kind == "obj" && (D.creator == M.ckey || M.Admin))
 			mine["[D.name] (by [D.creator])"] = D
 	if(!mine.len)
-		usr << "No custom objects you can edit."
+		M << "No custom objects you can edit."
 		return
 	var/datum/build_custom_def/cur = BuildCustomDefForObj(O)
-	var/pick = input(usr, "Link every placed object that shares this art with which custom? (this one is [cur ? "\"[cur.name]\"" : "not linked to any"])", "Custom Adopt") as null|anything in mine
+	var/pick = Ask(M, "Link every placed object that shares this art with which custom? (this one is [cur ? "\"[cur.name]\"" : "not linked to any"])", "Custom Adopt", null, "pick", mine, 1)
 	if(!pick)
 		return
 	var/datum/build_custom_def/D = mine[pick]
 	var/h = md5(O.icon)
 	if(!h)
-		usr << "That object has no icon to match on."
+		M << "That object has no icon to match on."
 		return
 	var/st = "[O.icon_state]"
 	spawn
@@ -622,8 +630,8 @@ mob/Mapper/verb/Custom_Adopt(atom/A as obj|turf in view(8, usr))
 			linked++
 		if(linked && glob && glob.LIGHTING)
 			LightingApplyAll()
-		usr << "Linked [linked] placed object[linked == 1 ? "" : "s"] to \"[D.name]\" and applied its settings (profile [length(D.profile) ? D.profile : "auto"])."
-		Log("Mapper", "[usr] ([usr.ckey]) adopted [linked] placed objects into custom def \"[D.name]\".", 1)
+		M << "Linked [linked] placed object[linked == 1 ? "" : "s"] to \"[D.name]\" and applied its settings (profile [length(D.profile) ? D.profile : "auto"])."
+		Log("Mapper", "[M] ([M.ckey]) adopted [linked] placed objects into custom def \"[D.name]\".", 1)
 
 /proc/BuildCustomAdoptTurf(mob/M, turf/CustomTurf/T)
 	if(!M || !T)
@@ -637,7 +645,7 @@ mob/Mapper/verb/Custom_Adopt(atom/A as obj|turf in view(8, usr))
 		M << "No custom turfs you can edit."
 		return
 	var/datum/build_custom_def/cur = BuildCustomDefForTurf(T)
-	var/pick = input(M, "Link every placed tile that shares this art with which custom? (this one is [cur ? "\"[cur.name]\"" : "not linked to any"])", "Custom Adopt") as null|anything in mine
+	var/pick = Ask(M, "Link every placed tile that shares this art with which custom? (this one is [cur ? "\"[cur.name]\"" : "not linked to any"])", "Custom Adopt", null, "pick", mine, 1)
 	if(!pick)
 		return
 	var/datum/build_custom_def/D = mine[pick]
@@ -672,15 +680,18 @@ mob/Mapper/verb/Custom_Adopt(atom/A as obj|turf in view(8, usr))
 mob/Admin3/verb/Delete_Custom_Def()
 	set category = "Mapper"
 	spawn
-		var/nm = usr.HUDTextPrompt("Delete which custom?", "")
-		if(isnull(nm) || !length(nm))
-			return
 		BuildCustomLoad()
-		var/datum/build_custom_def/D = BuildCustomFindByName(nm)
-		if(!D)
-			usr << "No custom named \"[nm]\". Registered: [customDefs.len]."
-			for(var/datum/build_custom_def/D2 in customDefs)
-				usr << "  [D2.name] ([D2.kind], by [D2.creator])"
+		var/list/all = list()
+		for(var/datum/build_custom_def/D2 in customDefs)
+			all["[D2.name] ([D2.kind], by [D2.creator])"] = D2
+		if(!all.len)
+			usr << "No customs are registered."
+			return
+		var/nm = Ask(usr, "Delete which custom?", "Delete Custom", null, "pick", all, 1)
+		if(isnull(nm))
+			return
+		var/datum/build_custom_def/D = all[nm]
+		if(!D || !(D in customDefs))
 			return
 		customDefs -= D
 		customDefIconCache = list()

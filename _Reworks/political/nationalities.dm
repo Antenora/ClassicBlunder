@@ -4,7 +4,7 @@ characterInformation
     var/nationality = "Redian"
     var/secondNationality = FALSE
     proc/setNationality(mob/p)
-        nationality = input(p, "What nationality are you?") in glob.NATIONALITIES
+        nationality = Ask(p, "What nationality are you?", "", null, "pick", glob.NATIONALITIES, 0)
         secondNationality = FALSE
 
 

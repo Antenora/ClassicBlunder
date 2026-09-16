@@ -4,7 +4,7 @@
 /mob/Admin3/verb/Change_Extra_Potential_Gain()
 	set category = "Admin"
 	set name = "Change Extra Potential Gain"
-	MAX_POTENTIAL_PER_KILL = input("How much potential should be gained per kill? (Default: 50% of wipe's days)") as num
+	MAX_POTENTIAL_PER_KILL = Ask(usr, "How much potential should be gained per kill? (Default: 50% of wipe's days)", "", null, "num", null, 0)
 	world<< "[src] has changed the potential gain per kill to [MAX_POTENTIAL_PER_KILL] potential."
 
 

@@ -398,9 +398,10 @@ var/_surface_boot = _SurfaceBoot()
 
 // mapper tools
 
-/mob/Admin2/verb/Surface_Inspect(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Inspect()
 	set category = "Mapper"
 	set name = "Surface Inspect"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Inspect", 6)
 	if(!A) return
 	var/pr = SurfaceProfileOf(A)
 	var/occ = SurfaceOcclusion(A)
@@ -412,12 +413,13 @@ var/_surface_boot = _SurfaceBoot()
 	src << "light: [A.sp_light_type ? A.sp_light_type : (pr == "light_source" ? SurfaceDefaultLightType(A) : "none")]"
 	if(A.sp_light_cookie) src << "cookie: [A.sp_light_cookie] (pool falls [A.dir == NORTH ? "north" : A.dir == EAST ? "east" : A.dir == WEST ? "west" : "south"])"
 
-/mob/Admin2/verb/Surface_Set_Profile(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Profile()
 	set category = "Mapper"
 	set name = "Surface Set Profile"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Profile", 6)
 	if(!A) return
 	var/list/ids = SurfaceProfiles()
-	var/p = input(src, "Profile for [A.name]? (current: [SurfaceProfileOf(A)])") as null|anything in ids + "clear (auto)"
+	var/p = Ask(src, "Profile for [A.name]? (current: [SurfaceProfileOf(A)])", "", null, "pick", (ids + "clear (auto)"), 1)
 	if(!p) return
 	A.surface_profile = (p == "clear (auto)") ? null : p
 	SurfaceApply(A)
@@ -425,12 +427,13 @@ var/_surface_boot = _SurfaceBoot()
 	src << "[A.name] profile -> [SurfaceProfileOf(A)]."
 	Log("Admin", "[ExtractInfo(src)] set surface profile of [A.type] to [p].")
 
-/mob/Admin2/verb/Surface_Set_Type_Profile(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Type_Profile()
 	set category = "Mapper"
 	set name = "Surface Set Type Profile"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Type Profile", 6)
 	if(!A) return
 	var/list/ids = SurfaceProfiles()
-	var/p = input(src, "Profile for ALL [A.type]? (current: [SurfaceProfileOf(A)]) Session-only until pinned in code.") as null|anything in ids + "clear (auto)"
+	var/p = Ask(src, "Profile for ALL [A.type]? (current: [SurfaceProfileOf(A)]) Session-only until pinned in code.", "", null, "pick", (ids + "clear (auto)"), 1)
 	if(!p) return
 	if(p == "clear (auto)")
 		_sp_type_cache -= "[A.type]"
@@ -450,32 +453,34 @@ var/_surface_boot = _SurfaceBoot()
 			n++
 		src << "[ttype]: profile re-applied to [n] placed instance\s."
 
-/mob/Admin2/verb/Surface_Set_Occlusion(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Occlusion()
 	set category = "Mapper"
 	set name = "Surface Set Occlusion"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Occlusion", 6)
 	if(!A) return
 	var/list/modes = list("none" = OCCLUDE_NONE, "partial" = OCCLUDE_PARTIAL,
 	                      "dapple (foliage)" = OCCLUDE_DAPPLE, "full" = OCCLUDE_FULL,
 	                      "clear (use profile)" = null)
-	var/k = input(src, "Occlusion for [A.name]?") as null|anything in modes
+	var/k = Ask(src, "Occlusion for [A.name]?", "", null, "pick", modes, 1)
 	if(!k) return
 	A.sp_occlude = modes[k]
 	if(k != "clear (use profile)")
-		var/L = input(src, "Shadow length in tiles (0 = infinite, blank = keep)?") as num|null
+		var/L = Ask(src, "Shadow length in tiles (0 = infinite, blank = keep)?", "", null, "num", null, 1)
 		if(L != null) A.sp_shadow_len = L
 	LightingRecomputeNear(get_turf(A))
 	src << "[A.name] occlusion -> [k]."
 	Log("Admin", "[ExtractInfo(src)] set occlusion of [A.type] to [k].")
 
-/mob/Admin2/verb/Surface_Set_Light(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Light()
 	set category = "Mapper"
 	set name = "Surface Set Light"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Light", 6)
 	if(!A || !isobj(A))
 		if(A) src << "Lights ride objs; use an obj (turf hazards glow via emissives)."
 		return
 	var/obj/O = A
 	var/list/types = LightTypes()
-	var/t = input(src, "Light type for [O.name]? (current: [O.sp_light_type || "none"])") as null|anything in types + "none (remove)"
+	var/t = Ask(src, "Light type for [O.name]? (current: [O.sp_light_type || "none"])", "", null, "pick", (types + "none (remove)"), 1)
 	if(!t) return
 	if(O.attached_light)
 		LightPropDetach(O)
@@ -485,23 +490,24 @@ var/_surface_boot = _SurfaceBoot()
 		src << "[O.name]: light removed."
 		return
 	O.sp_light_type = t
-	var/c = input(src, "Glow colour (blank = profile default [LightTypes()[t]["c"]])?") as text|null
+	var/c = Ask(src, "Glow color (blank = profile default [LightTypes()[t]["c"]])?", "", null, "text", null, 1)
 	if(c && length(c) >= 4) O.sp_light_color = c
-	var/r = input(src, "Radius in tiles (blank = default [LightTypes()[t]["r"]])?") as num|null
+	var/r = Ask(src, "Radius in tiles (blank = default [LightTypes()[t]["r"]])?", "", null, "num", null, 1)
 	if(r != null) O.sp_light_radius = clamp(r, 1, 20)
 	SurfaceAttachLight(O, t)
 	src << "[O.name] -> [t] light."
 	Log("Admin", "[ExtractInfo(src)] made [O.type] a [t] light.")
 
-/mob/Admin2/verb/Surface_Set_Cookie(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Cookie()
 	set category = "Mapper"
 	set name = "Surface Set Cookie"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Cookie", 6)
 	if(!A || !isobj(A))
 		if(A) src << "Cookies shape a light's pool; they ride light objs."
 		return
 	var/obj/O = A
 	var/list/shapes = list("panes", "arch", "slats", "cone", "grate", "dapple", "none (plain pool)")
-	var/t = input(src, "Pool shape for [O.name]? (current: [O.sp_light_cookie || "plain"]) Directional shapes fall off the obj's facing - rotate the obj to aim them.") as null|anything in shapes
+	var/t = Ask(src, "Pool shape for [O.name]? (current: [O.sp_light_cookie || "plain"]) Directional shapes fall off the obj's facing - rotate the obj to aim them.", "", null, "pick", shapes, 1)
 	if(!t) return
 	O.sp_light_cookie = (t == "none (plain pool)") ? null : t
 	if(O.attached_light)
@@ -512,9 +518,10 @@ var/_surface_boot = _SurfaceBoot()
 		src << "[O.name] pool -> [O.sp_light_cookie || "plain"] (takes effect once it has a light - Surface Set Light)."
 	Log("Admin", "[ExtractInfo(src)] set light cookie of [O.type] to [O.sp_light_cookie || "none"].")
 
-/mob/Admin2/verb/Surface_Set_Shaft(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Shaft()
 	set category = "Mapper"
 	set name = "Surface Set Shaft"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Shaft", 6)
 	if(!A || !istype(A, /atom/movable))
 		if(A) src << "Shafts ride objs: a tree gets a canopy sun column, a window light toggles its beam."
 		return
@@ -539,14 +546,15 @@ var/_surface_boot = _SurfaceBoot()
 		src << "[M.name]: canopy shaft attached (shows under open sky, daylight, clear weather; moon shafts if enabled)."
 	Log("Admin", "[ExtractInfo(src)] set canopy shaft of [M.type] to [M.sp_shaft ? "on" : "off"].")
 
-/mob/Admin2/verb/Surface_Set_Wind(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Set_Wind()
 	set category = "Mapper"
 	set name = "Surface Set Wind"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Set Wind", 6)
 	if(!A || !istype(A, /atom/movable))
 		if(A) src << "Wind applies to movable atoms (objs), not turfs."
 		return
 	var/atom/movable/M = A
-	var/w = input(src, "Wind response 0-1 (0 = still; foliage default 0.7)?") as num|null
+	var/w = Ask(src, "Wind response 0-1 (0 = still; foliage default 0.7)?", "", null, "num", null, 1)
 	if(w == null) return
 	M.sp_wind = clamp(w, 0, 1)
 	M.gfx_wind_response = M.sp_wind
@@ -554,9 +562,10 @@ var/_surface_boot = _SurfaceBoot()
 	src << "[M.name] wind -> [M.sp_wind]."
 	Log("Admin", "[ExtractInfo(src)] set wind of [M.type] to [M.sp_wind].")
 
-/mob/Admin2/verb/Surface_Clear_Overrides(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Surface_Clear_Overrides()
 	set category = "Mapper"
 	set name = "Surface Clear Overrides"
+	var/atom/A = PromptVerbAtom(usr, args, "Surface Clear Overrides", 6)
 	if(!A) return
 	A.surface_profile = null
 	A.sp_occlude = null
@@ -1067,9 +1076,10 @@ obj/Turfs/Surf
 	gfx_reflectivity = 0
 
 // reports every gate wind has to pass, in order
-/mob/Admin2/verb/Wind_Debug(atom/A as obj|turf in view(6, usr))
+/mob/Admin2/verb/Wind_Debug()
 	set category = "Mapper"
 	set name = "Wind Debug"
+	var/atom/A = PromptVerbAtom(usr, args, "Wind Debug", 6)
 	if(!A) return
 	src << "<b>[A.name]</b> ([A.type])"
 	src << "profile: [SurfaceProfileOf(A)]"
@@ -1106,9 +1116,10 @@ alpha=[V.alpha] px=[V.pixel_x],[V.pixel_y] visflags=[V.vis_flags] xf=[V.transfor
 	src << "  own transform: [M.transform ? "[M.transform.a],[M.transform.b],[M.transform.c] / [M.transform.d],[M.transform.e],[M.transform.f]" : "none"]"
 
 // duplicate forensics
-/mob/Admin2/verb/Duplicate_Debug(atom/T as obj|turf in view(6, usr))
+/mob/Admin2/verb/Duplicate_Debug()
 	set category = "Mapper"
 	set name = "Duplicate Debug"
+	var/atom/T = PromptVerbAtom(usr, args, "Duplicate Debug", 6)
 	if(!T) return
 	var/turf/G = get_turf(T)
 	if(!G) return

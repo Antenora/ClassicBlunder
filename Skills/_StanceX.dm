@@ -82,7 +82,7 @@ obj
 							usr << "You have no styles to use!"
 							src.Selecting=0
 							return
-						Selected=input(usr, "What style would you like to use?", "Set Style") in Styles
+						Selected=Ask(usr, "What style would you like to use?", "Set Style", null, "pick", Styles, 0)
 						if(Selected=="Cancel")
 							src.Selecting=0
 							return

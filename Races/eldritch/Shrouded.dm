@@ -1,6 +1,6 @@
 /mob/proc/selectShroudedStyle()
     var/list/ShroudedRaces=list("Nevermind", "Saiyan", "Human", "Beastkin", "Namekian");
-    var/choice = input(src, "Every Shrouded Eldritch has a race that they were before they were cast through the Sea of Darkness. What was your vessel's origin?", "Shrouded Style") in ShroudedRaces;
+    var/choice = Ask(src, "Every Shrouded Eldritch has a race that they were before they were cast through the Sea of Darkness. What was your vessel's origin?", "Shrouded Style", null, "pick", ShroudedRaces, 0);
     if(choice=="Nevermind") return;
     src << "You remember your Origin that has been Shrouded: That of a <b>[choice]</b>...";
     switch(choice)
@@ -50,9 +50,9 @@
             if(!es.ShroudedSubtype)
                 switch(es.ShroudedOrigin)
                     if("Beastkin")
-                        es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Feathers", "Heart", "Predator")
+                        es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Feathers", "Heart", "Predator"), 0)
                     if("Human")
-                        es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Heroism", "Resourceful", "Dogged")
+                        es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Heroism", "Resourceful", "Dogged"), 0)
                         switch(es.ShroudedSubtype)
                             if("Resourceful")
                                 AngerMax -= 0.25;
@@ -61,9 +61,9 @@
                             if("Dogged")
                                 AngerMax += 0.5;
                     if("Saiyan")
-                        es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Honor", "Zeal", "Pride")
+                        es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Honor", "Zeal", "Pride"), 0)
                     if("Namekian")
-                        es.ShroudedSubtype = input(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement") in list("Warrior", "Dragon", "Demon")
+                        es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Warrior", "Dragon", "Demon"), 0)
             es.ShroudedPassives = list();
             switch(es.ShroudedSubtype)
                 if("Feathers")
@@ -200,14 +200,14 @@ obj/Skills/Utility
             if(!PactOptions) return;
             Using=1;
             PactOptions.Add("Cancel")
-            var/mob/Players/Choice=input(usr, "Who do you wish to offer a Tethering Pact to?", "Offer Tether Pact") in PactOptions;
+            var/mob/Players/Choice=Ask(usr, "Who do you wish to offer a Tethering Pact to?", "Offer Tether Pact", null, "pick", PactOptions, 0);
             if(Choice=="Cancel")
                 Using=0
                 return
             if(!Choice || !Choice.client)
                 Using=0;
                 return;
-            var/TargetConfirm=alert(Choice, "[usr] is offering you a Tethering Pact, wherein they will always be able to be by your side... Do you accept?", "Eldritch Pact", "Accept", "Refuse")
+            var/TargetConfirm=Ask(Choice, "[usr] is offering you a Tethering Pact, wherein they will always be able to be by your side... Do you accept?", "Eldritch Pact", null, "confirm", null, 1, "Accept", "Refuse")
             if(!usr || !usr.client)
                 Using=0;
                 return;
@@ -230,7 +230,7 @@ obj/Skills/Utility
             if(!WarpOptions) return;
             Using=1;
             WarpOptions.Add("Cancel");
-            var/mob/choice = input(usr, "Who do you want to Warp to?", "Tether Warp") in WarpOptions;
+            var/mob/choice = Ask(usr, "Who do you want to Warp to?", "Tether Warp", null, "pick", WarpOptions, 0);
             if(choice=="Cancel")
                 Using=0;
                 return;

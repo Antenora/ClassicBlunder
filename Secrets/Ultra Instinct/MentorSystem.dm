@@ -22,7 +22,7 @@ obj/Skills/Utility/Mentor_System
 			src.Using = 0
 			return
 
-		var/mob/Players/Choice = input(Mentor, "Select a student to train:", "Teach Ultra Instinct") in Students
+		var/mob/Players/Choice = Ask(Mentor, "Select a student to train:", "Teach Ultra Instinct", null, "pick", Students, 0)
 		if(Choice == "Cancel")
 			src.Using = 0
 			return
@@ -38,7 +38,7 @@ obj/Skills/Utility/Mentor_System
 			src.Using = 0
 			return
 
-		switch(input(Choice, "[Mentor] wishes to train you in Ultra Instinct. Do you accept?", "Mentorship") in list("Allow", "Deny"))
+		switch(Ask(Choice, "[Mentor] wishes to train you in Ultra Instinct. Do you accept?", "Mentorship", null, "pick", list("Allow", "Deny"), 0))
 			if("Deny")
 				Mentor << "[Choice] declined your offer."
 				src.Using = 0
@@ -116,7 +116,7 @@ obj/Skills/Utility/Mentor_System
 			"Mortal Instinct Grappling" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Grappling,
 			"Mortal Instinct Mystic" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Mystic,
 			"Mortal Instinct Martial" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Martial)
-			var/choice = input(Student,"Your mastery of motion takes form, which instinctive discipline calls to you?","Choose Your Mortal Instinct Style") as null|anything in HybridStyleChoices
+			var/choice = Ask(Student, "Your mastery of motion takes form, which instinctive discipline calls to you?", "Choose Your Mortal Instinct Style", null, "pick", HybridStyleChoices, 1)
 			if(!choice)
 				return
 			var/path = HybridStyleChoices[choice]

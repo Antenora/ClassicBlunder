@@ -1,6 +1,8 @@
 
-mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
+mob/Admin3/verb/ForceAISpawn()
 	set name = "Force AI Spawns"
+	var/obj/AI_Spot/AI = PromptArg(usr, args, 1, "Force AI Spawns", "world:/obj/AI_Spot")
+	if(isnull(AI)) return
 	if(!src.Alert("Are you sure you want to force spawns from all AI spawners?")) return
 	var/difference = AI.ai_limit-AI.ai_active.len
 	var/i
@@ -11,22 +13,22 @@ mob/Admin3/verb/ForceAISpawn(obj/AI_Spot/AI in world)
 mob/Admin3/verb/MakeAISpawner()
 	set name = "AI Spawner"
 	if(!src.Alert("Are you sure you want to make an AI spawner?")) return
-	var/n = input(src, "What name") as text
+	var/n = Ask(src, "What name", "", null, "text", null, 0)
 	var/list/monsters = typesof(/monster_info)
-	var/monster = input(src, "What monster") in monsters
-	var/timer = input(src, "How often (30 seconds per whole number)") as num
-	var/ai_limit = input(src, "How many can total exist?") as num
-	var/spawn_range = input(src, "How far can they spawn from this spot?") as num
-	var/boss = input(src, "Is this a boss?") in list("Yes", "No", "Giga?")
+	var/monster = Ask(src, "What monster", "", null, "pick", monsters, 0)
+	var/timer = Ask(src, "How often (30 seconds per whole number)", "", null, "num", null, 0)
+	var/ai_limit = Ask(src, "How many can total exist?", "", null, "num", null, 0)
+	var/spawn_range = Ask(src, "How far can they spawn from this spot?", "", null, "num", null, 0)
+	var/boss = Ask(src, "Is this a boss?", "", null, "pick", list("Yes", "No", "Giga?"), 0)
 	var/power = 0
-	var/potential = input(src, "What level should the monster be?") as num
-	var/scaling = input(src, "Does the monster scale with potenial?") in list("Yes", "No")
+	var/potential = Ask(src, "What level should the monster be?", "", null, "num", null, 0)
+	var/scaling = Ask(src, "Does the monster scale with potenial?", "", null, "pick", list("Yes", "No"), 0)
 	var/icon/i = input(src, "What icon do you want it to be?") as icon
-	var/mins = input(src, "How gorked should the mineral mod be?") as num
-	var/goon = input(src, "Is this a goon?") in list("Yes", "No")
-	var/giga = input(src, "How large should they get?", "Enlarge") as num
+	var/mins = Ask(src, "How gorked should the mineral mod be?", "", null, "num", null, 0)
+	var/goon = Ask(src, "Is this a goon?", "", null, "pick", list("Yes", "No"), 0)
+	var/giga = Ask(src, "How large should they get?", "Enlarge", null, "num", null, 0)
 	if(goon == "Yes")
-		goon = input(src, "How much?") as num
+		goon = Ask(src, "How much?", "", null, "num", null, 0)
 	else
 		goon = FALSE
 	var/monster_info/mon = new monster

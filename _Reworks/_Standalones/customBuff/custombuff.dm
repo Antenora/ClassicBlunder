@@ -115,11 +115,11 @@ augments -
 		var/list/the_list_as_it_stands = list()
 		for(var/x in 0 to p.AscensionsAcquired)
 			var/list/augments_to_pick = list("Timed", "Draining", "Potent Passives", "Potent Stats")
-			var/the_pick = input(p, "What one?") in augments_to_pick
+			var/the_pick = Ask(p, "What one?", "", null, "pick", augments_to_pick, 0)
 			the_list_as_it_stands += the_pick
 			augments_to_pick -= the_pick
 			if(the_pick == "Draining")
-				current_augments[the_pick] = input(p, "What one do you want.") in list("Health","Energy", "Mana")
+				current_augments[the_pick] = Ask(p, "What one do you want.", "", null, "pick", list("Health","Energy", "Mana"), 0)
 
 		selecting_aguments = FALSE
 		return the_list_as_it_stands
@@ -163,7 +163,7 @@ augments -
 		for(var/x in data)
 			choices += "[x]"
 		while(correct == FALSE)
-			var/passive = input(p, "what passive") in choices
+			var/passive = Ask(p, "what passive", "", null, "pick", choices, 0)
 			if(attempts >= 5)
 				p << "tried to omany times, admin can help"
 				break

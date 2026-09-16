@@ -414,7 +414,7 @@ client/proc/DropCurrency(kind)
 		if(total < 1)
 			mob << "You have no [glob.progress.MoneyName] to drop."
 			return
-		var/amt = input(mob, "Drop how much [glob.progress.MoneyName]? (1-[round(total)])", "Drop") as num|null
+		var/amt = Ask(mob, "Drop how much [glob.progress.MoneyName]? (1-[round(total)])", "Drop", null, "num", null, 1)
 		if(isnull(amt)) return
 		amt = round(amt)
 		if(amt < 1) return
@@ -425,7 +425,7 @@ client/proc/DropCurrency(kind)
 		if(!m || m.value < 1)
 			mob << "You have no Mana Bits to drop."
 			return
-		var/amt = input(mob, "Drop how many Mana Bits? (1-[round(m.value)])", "Drop") as num|null
+		var/amt = Ask(mob, "Drop how many Mana Bits? (1-[round(m.value)])", "Drop", null, "num", null, 1)
 		if(isnull(amt)) return
 		amt = round(amt)
 		if(amt < 1) return

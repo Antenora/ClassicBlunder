@@ -56,13 +56,13 @@
     set hidden = 1
     if(!src.client)
         return
-    var/choice = input(src, "Change PU Charging", "PU Charging Style") as text
+    var/choice = Ask(src, "Change PU Charging", "PU Charging Style", null, "text", null, 0)
     if(length(choice)>200)
         return
     if(length(choice)<1)
         return
     custom_powerup = choice
-    choice = input(src, "Do you want to include your name in the PU charging?") in list("Yes", "No")
+    choice = Ask(src, "Do you want to include your name in the PU charging?", "", null, "pick", list("Yes", "No"), 0)
     if(choice == "Yes")
         customPUnameInclude = TRUE
     else

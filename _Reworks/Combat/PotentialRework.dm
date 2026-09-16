@@ -16,7 +16,7 @@
 	set name = "Change Global Base"
 	if(!src.Alert("Are you sure you want to change global base mod?")) return
 	var/previous = BASE_MOD
-	var/newMod = input(src, "Enter a new base mod for power") as num
+	var/newMod = Ask(src, "Enter a new base mod for power", "", null, "num", null, 0)
 	if(newMod)
 		BASE_MOD = newMod
 		world << "Base mod for power changed from [previous] to [newMod]"

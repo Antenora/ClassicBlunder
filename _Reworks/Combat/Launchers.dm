@@ -154,7 +154,7 @@ proc/DunkSlam(mob/dunker, mob/target)
 	set category = "Admin"
 	set name = "Change Launch Lockout"
 	if(!src.Alert("Are you sure you want to change launch lockout time?")) return
-	var/num = input("Enter new Launch Lockout time (in seconds):") as num
+	var/num = Ask(usr, "Enter new Launch Lockout time (in seconds):", "", null, "num", null, 0)
 	if(num>0)
 		glob.LAUNCH_LOCKOUT = num * 10
 		world << "Launch Lockout time set to [num/10] seconds."
@@ -163,7 +163,7 @@ proc/DunkSlam(mob/dunker, mob/target)
 	set category = "Admin"
 	set name = "Change Max Launch Time"
 	if(!src.Alert("Are you sure you want to alter max launch time?")) return
-	var/num = input("Enter new Max Launch time (in seconds):") as num
+	var/num = Ask(usr, "Enter new Max Launch time (in seconds):", "", null, "num", null, 0)
 	if(num>0)
 		glob.MAX_LAUNCH_TIME = num * 10
 		world << "Max Launch time set to [num/10] seconds."

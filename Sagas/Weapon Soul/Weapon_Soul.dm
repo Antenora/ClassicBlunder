@@ -4,7 +4,7 @@ mob/proc/gainWeaponSoul()
 	src.SagaLevel=1
 	src.AddSkill(new/obj/Skills/Buffs/ActiveBuffs/Weapon_Soul)
 	var/list/openSwords = glob.WeaponSoulNames
-	WeaponSoulType = input("Which sword resonates with your soul?") in openSwords
+	WeaponSoulType = Ask(usr, "Which sword resonates with your soul?", "", null, "pick", openSwords, 0)
 	BoundLegend = WeaponSoulType
 	src << "[WeaponSoulType] manifests within your grip, peerless and refined..."
 	switch(WeaponSoulType)
@@ -154,7 +154,7 @@ mob/tierUpSaga(Path)
 						src.contents += new/obj/Items/Armor/Plated_Armor/Noble_Armor
 						AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Noble_Shield)
 						src << "A set of Armor coats your frame, allowing you to weather the strongest of blows."
-						var/Mode=alert(src, "What is the path to kingship?", "Caledfwlch", "Sacrifice", "Legacy")
+						var/Mode=Ask(src, "What is the path to kingship?", "Caledfwlch", null, "confirm", null, 1, "Sacrifice", "Legacy")
 						if(Mode == "Sacrifice")
 							src.contents += new/mob/Players/verb/Excalignment
 							AddSkill(new/obj/Skills/AutoHit/Divine_Light)
@@ -200,7 +200,7 @@ mob/tierUpSaga(Path)
 					if("Soul Calibur")
 						src << "The manipulation of Soul Calibur's crystals becomes second nature..."
 						AddSkill(new/obj/Skills/AutoHit/Crystal_Luminescence)
-						var/Mode=alert(src, "You feel the Weapon Soul reach into you. Do you accept it?", "Soul Calibur", "Yes", "No")
+						var/Mode=Ask(src, "You feel the Weapon Soul reach into you. Do you accept it?", "Soul Calibur", null, "confirm", null, 1, "Yes", "No")
 						if(Mode == "No")
 							src.contents += new/mob/Players/verb/SoulCalignment
 							for(var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Order/soulc in contents)

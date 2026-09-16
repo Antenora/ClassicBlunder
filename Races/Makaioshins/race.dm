@@ -27,7 +27,7 @@ race
 		proc/checkReward(mob/p)
 			p.checkDevilArmUpgrades();
 		onFinalization(mob/user)
-			user.TrueName=input(user, "Your demonic nature has a mind of its own. What name shall you use to call upon it?", "Get True Name") as text
+			user.TrueName=Ask(user, "Your demonic nature has a mind of its own. What name shall you use to call upon it?", "Get True Name", null, "text", null, 0)
 			user << "The name your demonic half goes by is <b>[user.TrueName]</b>."
 			user.EnhancedSmell = 1
 			user.EnhancedHearing = 1

@@ -28,7 +28,7 @@ vuffa/verb/setVuffaMomentMessage()
     set hidden = 1
     usr << "Enter the message you want to display when you're in a Vuffa Moment."
     usr << "Enter \"none\" to disable the message. example: (name is in a Vuffa Moment! They take ) "
-    var/input = input(src, "Enter the message you want to display when you're in a Vuffa Moment.") as text
+    var/input = Ask(src, "Enter the message you want to display when you're in a Vuffa Moment.", "", null, "text", null, 0)
     if(input == "none")
         usr.vuffa.vuffaMessage = null
         usr << "Vuffa Moment message disabled."

@@ -121,7 +121,7 @@ mob/Mapper/verb/Go_To_Bookmark()
 	for(var/nm in marks)
 		var/list/p = marks[nm]
 		menu["[nm] ([p[1]],[p[2]],[p[3]])"] = nm
-	var/pick = input(usr, "Jump where?", "Bookmarks") as null|anything in menu
+	var/pick = Ask(usr, "Jump where?", "Bookmarks", null, "pick", menu, 1)
 	if(!pick)
 		return
 	var/list/p = marks[menu[pick]]
@@ -144,7 +144,7 @@ mob/Mapper/verb/Delete_Bookmark()
 	for(var/nm in marks)
 		var/list/p = marks[nm]
 		menu["[nm] ([p[1]],[p[2]],[p[3]])"] = nm
-	var/pick = input(usr, "Delete which bookmark?", "Bookmarks") as null|anything in menu
+	var/pick = Ask(usr, "Delete which bookmark?", "Bookmarks", null, "pick", menu, 1)
 	if(!pick)
 		return
 	marks -= menu[pick]
@@ -199,7 +199,7 @@ mob/Mapper/verb/Build_Options()
 			"Invisibility: [usr.AdminInviso ? "ON" : "OFF"]",
 			"Teleport to X,Y,Z",
 			"Done")
-		var/choice = input(usr, "Build options - pick one to flip.", "Build Options") as null|anything in menu
+		var/choice = Ask(usr, "Build options - pick one to flip.", "Build Options", null, "pick", menu, 1)
 		if(!choice || choice == "Done")
 			return
 		if(findtext(choice, "Overwrite objs"))

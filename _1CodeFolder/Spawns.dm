@@ -42,11 +42,11 @@ mob
 			var/obj/Special/Spawn/Choice
 
 			while(Confirm!="Yes")
-				Choice=input(src, "What spawn will you choose?") in Choices
+				Choice=Ask(src, "What spawn will you choose?", "", null, "pick", Choices, 0)
 				if(Choices.len<2)
 					Confirm="Yes"
 				else
-					Confirm=alert(src, "[Choice] [Choice.desc] Is this where you want to hail from?", "Choose Spawn ([Choice])", "Yes", "No")
+					Confirm=Ask(src, "[Choice] [Choice.desc] Is this where you want to hail from?", "Choose Spawn ([Choice])", null, "confirm", null, 1, "Yes", "No")
 
 			if(Choice.EconomyChange!=1)
 				src.EconomyMult*=Choice.EconomyChange
@@ -129,38 +129,48 @@ proc
 
 mob
 	Admin3
-		verb/Spawn_Race_Add(var/obj/Special/Spawn/s in glob.Spawns)
+		verb/Spawn_Race_Add()
 			set category="Admin"
+			var/obj/Special/Spawn/s = PromptArgList(usr, args, 1, "Spawn Race Add", glob.Spawns)
+			if(isnull(s)) return
 			if(!src.Alert("Are you sure you want to add a race to spawns?")) return
-			var/newrace=input(src, "What race do you want to add to [s]'s spawns?", "Spawn Race Add") in races
+			var/newrace=Ask(src, "What race do you want to add to [s]'s spawns?", "Spawn Race Add", null, "pick", races, 0)
 			if(newrace)
 				s.DefaultRaces.Add(newrace)
 				Log("Admin", "[ExtractInfo(src)] added [newrace] to [s]'s default race spawns.")
-		verb/Spawn_Race_Remove(var/obj/Special/Spawn/s in glob.Spawns)
+		verb/Spawn_Race_Remove()
 			set category="Admin"
+			var/obj/Special/Spawn/s = PromptArgList(usr, args, 1, "Spawn Race Remove", glob.Spawns)
+			if(isnull(s)) return
 			if(!src.Alert("Are you sure you want to remove a race from spawns?")) return
-			var/newrace=input(src, "What race do you want to remove from [s]'s spawns?", "Spawn Race Add") in s.DefaultRaces
+			var/newrace=Ask(src, "What race do you want to remove from [s]'s spawns?", "Spawn Race Add", null, "pick", s.DefaultRaces, 0)
 			if(newrace)
 				s.DefaultRaces.Remove(newrace)
 				Log("Admin", "[ExtractInfo(src)] removed [newrace] from [s]'s default race spawns.")
-		verb/Spawn_Permission_Add(var/obj/Special/Spawn/s in glob.Spawns)
+		verb/Spawn_Permission_Add()
 			set category="Admin"
+			var/obj/Special/Spawn/s = PromptArgList(usr, args, 1, "Spawn Permission Add", glob.Spawns)
+			if(isnull(s)) return
 			if(!src.Alert("Are you sure you want to add a key to spawns?")) return
-			var/newrace=input(src, "What ckey do you want to add to [s]'s spawns?", "Spawn Ckey Add") as text|null
+			var/newrace=PromptKnownKey(src, "Spawn Ckey Add")
 			if(newrace)
 				s.SpecialPermissions.Add(newrace)
 				Log("Admin", "[ExtractInfo(src)] added ckey [newrace] to [s]'s special permission spawns.")
-		verb/Spawn_Permission_Remove(var/obj/Special/Spawn/s in glob.Spawns)
+		verb/Spawn_Permission_Remove()
 			set category="Admin"
+			var/obj/Special/Spawn/s = PromptArgList(usr, args, 1, "Spawn Permission Remove", glob.Spawns)
+			if(isnull(s)) return
 			if(!src.Alert("Are you sure you want to remove a key from spawnsr?")) return
-			var/newrace=input(src, "What ckey do you want to remove from [s]'s spawns?", "Spwn Ckey Remove") in s.SpecialPermissions
+			var/newrace=Ask(src, "What ckey do you want to remove from [s]'s spawns?", "Spwn Ckey Remove", null, "pick", s.SpecialPermissions, 0)
 			if(newrace)
 				s.SpecialPermissions.Remove(newrace)
 				Log("Admin", "[ExtractInfo(src)] removed [newrace] from [s]'s special permission spawns.")
-		verb/Spawn_Swap(var/mob/m in players)
+		verb/Spawn_Swap()
 			set category="Admin"
+			var/mob/m = PromptArg(usr, args, 1, "Spawn Swap", "players")
+			if(isnull(m)) return
 			if(!src.Alert("Are you sure you want to swap spawns?")) return
-			var/obj/Special/Spawn/s=input(src, "What spawn do you want to change [m] to? They are currently from [m.Spawn].", "Spawn Swap") in glob.Spawns
+			var/obj/Special/Spawn/s=Ask(src, "What spawn do you want to change [m] to? They are currently from [m.Spawn].", "Spawn Swap", null, "pick", glob.Spawns, 0)
 
 			Log("Admin", "[ExtractInfo(src)] swapped [ExtractInfo(m)]'s spawn from [m.Spawn] to [s]!")
 
@@ -192,7 +202,7 @@ mob
 		verb
 			Clear_Error_Log()
 				set category="Admin"
-				switch(input("Are you sure you would like to wipe the errors log?") in list("Yes","No"))
+				switch(Ask(usr, "Are you sure you would like to wipe the errors log?", "", null, "pick", list("Yes","No"), 0))
 					if("Yes")
 						if(fexists("Saves/Errors.log"))
 							fdel("Saves/Errors.log")
@@ -200,18 +210,18 @@ mob
 			Spawn_New()
 				set category="Admin"
 				var/obj/Special/Spawn/NewS=new()
-				var/SName=input(src, "What is the name of the new spawn?", "New Spawn") as text|null
+				var/SName=Ask(src, "What is the name of the new spawn?", "New Spawn", null, "text", null, 1)
 				if(!SName)
 					src << "ERROR: No name given."
 					del NewS
 					return
 				NewS.name=SName
-				var/SDesc=input(src, "What is the description presented when selecting this spawn?", "New Spawn") as text
+				var/SDesc=Ask(src, "What is the description presented when selecting this spawn?", "New Spawn", null, "text", null, 0)
 				NewS.desc=SDesc
 
-				var/lX=input(src, "What is the x coordinate of the new spawn?", "New Spawn") as num|null
-				var/lY=input(src, "What is the y coordinate of the new spawn?", "New Spawn") as num|null
-				var/lZ=input(src, "What is the z coordinate of the new spawn?", "New Spawn") as num|null
+				var/lX=Ask(src, "What is the x coordinate of the new spawn?", "New Spawn", null, "num", null, 1)
+				var/lY=Ask(src, "What is the y coordinate of the new spawn?", "New Spawn", null, "num", null, 1)
+				var/lZ=Ask(src, "What is the z coordinate of the new spawn?", "New Spawn", null, "num", null, 1)
 				if(!locate(lX, lY, lZ))
 					src << "ERROR: Invalid location specified."
 					del NewS
@@ -220,16 +230,16 @@ mob
 				NewS.gotoY=lY
 				NewS.gotoZ=lZ
 
-				var/eC=input(src, "What is the economy change of the new spawn?", "New Spawn") as num
-				var/lC=input(src, "What is the learning change of the new spawn?", "New Spawn") as num
-				var/tC=input(src, "What is the intelligence change of the new spawn?", "New Spawn") as num
-				var/gC=input(src, "What is the imagination change of the new spawn?", "New Spawn") as num
+				var/eC=Ask(src, "What is the economy change of the new spawn?", "New Spawn", null, "num", null, 0)
+				var/lC=Ask(src, "What is the learning change of the new spawn?", "New Spawn", null, "num", null, 0)
+				var/tC=Ask(src, "What is the intelligence change of the new spawn?", "New Spawn", null, "num", null, 0)
+				var/gC=Ask(src, "What is the imagination change of the new spawn?", "New Spawn", null, "num", null, 0)
 				NewS.EconomyChange=eC
 				NewS.LearningChange=lC
 				NewS.IntelligenceChange=tC
 				NewS.ImaginationChange=gC
 
-				switch(input(src, "Is the new spawn going to be in an Afterlife?", "New Spawn") in list("Yes","No"))
+				switch(Ask(src, "Is the new spawn going to be in an Afterlife?", "New Spawn", null, "pick", list("Yes","No"), 0))
 					if("Yes")
 						NewS.Afterlife=1
 					if("No")
@@ -239,7 +249,7 @@ mob
 				var/list/raceList = races.Copy()
 				raceList += "Cancel"
 				while(Enter!="Cancel")
-					Enter=input(src, "Enter the race that will be able to select this spawn. You may add additional races after entering. Enter Cancel to stop entering races.", "New Spawn") in raceList
+					Enter=Ask(src, "Enter the race that will be able to select this spawn. You may add additional races after entering. Enter Cancel to stop entering races.", "New Spawn", null, "pick", raceList, 0)
 					if(Enter!="Cancel")
 						var/racename = splittext("[Enter]", "/race/")
 						NewS.DefaultRaces.Add(racename[1])
@@ -250,8 +260,8 @@ mob
 				src << "Added [NewS] successfully to global list!"
 			Spawn_Delete()
 				set category="Admin"
-				var/obj/Special/Spawn/Chois=input(src, "What spawn do you want to delete?", "Delete Spawn") in glob.Spawns
-				var/Confirm=alert(src, "Are you sure you want to delete [Chois]?", "Delete Spawn", "No", "Yes")
+				var/obj/Special/Spawn/Chois=Ask(src, "What spawn do you want to delete?", "Delete Spawn", null, "pick", glob.Spawns, 0)
+				var/Confirm=Ask(src, "Are you sure you want to delete [Chois]?", "Delete Spawn", null, "confirm", null, 1, "No", "Yes")
 				if(Confirm=="No")
 					src << "You do not delete [Chois]."
 					return
@@ -262,16 +272,8 @@ mob
 
 			Spawn_Edit()
 				set category="Admin"
-				var/obj/Special/Spawn/SC=input("What spawn are you editing?", "Edit Spawn") in glob.Spawns
-				var/Edit="<html><Edit><body bgcolor=#000000 text=#339999 link=#99FFFF>"
-				var/list/B=new
-				Edit+="[SC]<br>[SC.type]"
-				Edit+="<table width=10%>"
-				for(var/C in SC.vars) B+=C
+				var/obj/Special/Spawn/SC=Ask(usr, "What spawn are you editing?", "Edit Spawn", null, "pick", glob.Spawns, 0)
+				var/list/B = list()
+				for(var/C in SC.vars) B += C
 				B.Remove("Package","bound_x","bound_y","step_x","step_y","Admin","Profile", "GimmickDesc", "NoVoid", "BaseProfile", "Form1Profile", "Form2Profile", "Form3Profile", "Form4Profile", "Form5Profile")
-				for(var/C in B)
-					Edit+="<td><a href=byond://?src=\ref[SC];action=edit;var=[C]>"
-					Edit+=C
-					Edit+="<td>[Value(SC.vars[C])]</td></tr>"
-				Edit += "</html>"
-				usr<<browse(Edit,"window=[SC];size=450x600")
+				usr.client?.SheetShow("edit:\ref[SC]", "EDIT", "[SC]", "[SC.type]", SheetVarRows(SC, B), "a name to edit")

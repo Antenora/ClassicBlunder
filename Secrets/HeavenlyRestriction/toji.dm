@@ -73,7 +73,7 @@ var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "L
 		var/mult = modifyRestrictionValues(p,i)
 		modifiedRestrictions[i] = value*mult
 		shownRestrictions += "[i] ([modifiedRestrictions[i]])"
-	var/selection = input(p, "Pick a restriction. They are shown as what they'll restrict and the value in parathenses.") in shownRestrictions
+	var/selection = Ask(p, "Pick a restriction. They are shown as what they'll restrict and the value in parathenses.", "", null, "pick", shownRestrictions, 0)
 	var/list/splitter = splittext(selection, " (")
 	var/list/restrictionValue = list(splitter[1], modifiedRestrictions[splitter[1]])
 	return restrictionValue
@@ -83,7 +83,7 @@ var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "L
 	var/selection
 	var/list/restrictions = getRestrictions() + currentRestricitonChoice + getBoons()
 	while(atLimit)
-		selection = input(p, "Pick an improvement") in heavenly_improvements - restrictions
+		selection = Ask(p, "Pick an improvement", "", null, "pick", (heavenly_improvements - restrictions), 0)
 		if(!(countImprovements(p, selection) >= 3))
 			atLimit = 0
 		else

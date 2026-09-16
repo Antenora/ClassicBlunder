@@ -142,7 +142,19 @@ var/global/elevWallCtxL = 0
 var/global/list/elevStyleArtCache = list()
 
 /proc/ElevStyleGeneric(style)
-	return (length(style) > 2 && copytext(style, 1, 3) == "i:") ? 1 : 0
+	if(length(style) <= 2)
+		return 0
+	var/pre = copytext(style, 1, 3)
+	return (pre == "i:" || pre == "t:") ? 1 : 0
+
+/proc/ElevStyleArtFromBuilds(key, st, byType)
+	if(!Builds || !Builds.len)
+		Add_Builds()
+	for(var/obj/Others/Build/B in Builds)
+		if(byType ? ("[B.Creates]" == key) : ("[B.icon]" == key))
+			if("[B.icon_state]" == "[st]")
+				return list(B.icon, B.icon_state)
+	return null
 
 /proc/ElevStyleArt(style)
 	if(!ElevStyleGeneric(style))
@@ -154,8 +166,12 @@ var/global/list/elevStyleArtCache = list()
 	var/path = p ? copytext(style, 3, p) : copytext(style, 3)
 	var/st = p ? copytext(style, p + 1) : ""
 	var/list/art = null
-	if(length(path) && fexists(path))
+	if(copytext(style, 1, 3) == "t:")
+		art = ElevStyleArtFromBuilds(path, st, 1)
+	else if(length(path) && fexists(path))
 		art = list(file(path), st)
+	else
+		art = ElevStyleArtFromBuilds(path, st, 0)
 	elevStyleArtCache[style] = art ? art : "none"
 	return art
 
@@ -232,9 +248,9 @@ var/global/list/elevStyleArtCache = list()
 
 /proc/ElevFaceStyleAt(turf/G, turf/CT)
 	BuildCliffPaintLoad()
-	var/s = cliffPaintMap["[G.x],[G.y],[G.z]"]
-	if(!s && CT)
-		s = cliffPaintMap["[CT.x],[CT.y],[CT.z]"]
+	var/s = CT ? cliffPaintMap["[CT.x],[CT.y],[CT.z]"] : null
+	if(!s || s == "default" || s == "none")
+		s = cliffPaintMap["[G.x],[G.y],[G.z]"]
 	if(!s || s == "default" || s == "none")
 		return "wall38"
 	return s
@@ -320,10 +336,21 @@ var/global/list/elevStyleArtCache = list()
 		return faceTile
 	return below
 
+/proc/ElevFrays(turf/S)
+	if(!S)
+		return 0
+	var/m = BuildMaterialFor(S)
+	if(!m || m == "Water")
+		return 0
+	var/st = BuildEdgeStyleFor(m)
+	return (st == "wispy" || st == "crumbly" || st == "soft") ? 1 : 0
+
 /proc/ElevStyleCode(turf/T)
 	if(!T)
 		return "w"
 	var/m = BuildMaterialFor(T)
+	if(!m)
+		return ""
 	if(m == "Water")
 		return "a"
 	switch(BuildEdgeStyleFor(m))
@@ -537,17 +564,21 @@ var/global/list/elevStyleArtCache = list()
 			var/key = ElevLipKey(G, gh, L, q, srcs, eside)
 			if(!key)
 				continue
+			var/drew = 0
 			for(var/sn in elevLipSlots)
 				var/turf/S = srcs[sn]
-				if(!S)
+				if(!S || !ElevFrays(S))
 					continue
 				if(elevLipStates["m[sn][key]"])
 					fresh += ElevTexPiece(S, 'Mapping/Elevation/elev_lip.dmi', "m[sn][key]", ElevLayer(L, 6), 0)
+					drew = 1
 				if(elevLipStates["b[sn][key]"])
 					fresh += ElevTexPiece(S, 'Mapping/Elevation/elev_lip.dmi', "b[sn][key]", ElevLayer(L, 7), 1)
-			if(gh == L && elevLipStates["bg[key]"])
+					drew = 1
+			if(gh == L && ElevFrays(G) && elevLipStates["bg[key]"])
 				fresh += ElevTexPiece(G, 'Mapping/Elevation/elev_lip.dmi', "bg[key]", ElevLayer(L, 7), 1)
-			if(elevLipStates["d[key]"])
+				drew = 1
+			if(drew && elevLipStates["d[key]"])
 				fresh += ElevPlain('Mapping/Elevation/elev_lip.dmi', "d[key]", ElevLayer(L, 8))
 			if(copytext(key, 6, 7) == "w")
 				ElevFoamTrio("q", key, G, ELEV_FOAM_LAYER, fresh)
@@ -612,8 +643,6 @@ var/global/list/elevStyleArtCache = list()
 			fresh += ElevTexPiece(WS2, 'Mapping/Elevation/elev_base.dmi', "tb[tkey]", ElevLayer(ntop, 3), 1)
 		if(!fi && elevBaseStates["td[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "td[tkey]", ElevLayer(ntop, 4))
-		if(copytext(tkey, 1, 2) == "a")
-			ElevFoamTrio("t", tkey, WS2, ElevLayer(ntop, 9), fresh)
 	for(var/side in list("R", "L"))
 		var/turf/DF = locate(T.x + (side == "R" ? 1 : -1), T.y - 1, T.z)
 		var/list/df = ElevFaceInfo(DF)
@@ -652,8 +681,7 @@ var/global/list/elevStyleArtCache = list()
 		var/ww2 = (BuildMaterialFor(WS2) == "Water")
 		var/tkey = "[ElevStyleCode(WS2)][N.x % 3][side]"
 		if(ww2)
-			if(tw)
-				ElevFoamTrio("y", tkey, T, ELEV_FOAM_LAYER, fresh)
+			continue
 		else if(!pit && elevBaseStates["tu[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "tu[tkey]", ElevLayer(nf[1], 4))
 

@@ -168,9 +168,11 @@ client/proc/CycleDisplayMode()
 	SetDisplayMode(DISPLAY_MODES[(i % DISPLAY_MODES.len) + 1])
 	return getPref("displayMode")
 
-mob/Players/verb/Display_Mode(mode as anything in list("Windowed", "Borderless", "Full screen"))
+mob/Players/verb/Display_Mode()
 	set name = "Display Mode"
 	set category = "Utility"
+	var/mode = PromptArgList(usr, args, 1, "Display Mode", list("Windowed", "Borderless", "Full screen"))
+	if(isnull(mode)) return
 	if(!client) return
 	switch(mode)
 		if("Borderless") client.SetDisplayMode("borderless")
@@ -369,7 +371,7 @@ mob/verb
 		set hidden = 1
 		if(!(world.time > verb_delay)) return
 		verb_delay = world.time + 1
-		var/n = input(usr, "Maximum tiles of view (at least [DISPLAY_MIN_VIEW]). Enter 0 to always fill the window.", "Max View", UserMaxView()) as null|num
+		var/n = Ask(usr, "Maximum tiles of view (at least [DISPLAY_MIN_VIEW]). Enter 0 to always fill the window.", "Max View", UserMaxView(), "num", null, 1)
 		if(isnull(n)) return
 		if(n <= 0)
 			ScreenSize = null

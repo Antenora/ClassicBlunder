@@ -304,7 +304,8 @@ client/proc/AdminPageHTML()
   var v=vals\[c.id]||\[], parts=\[c.id];
   for(var i=0;i<c.args.length;i++){ var a=(v\[i]||'').trim(); if(!a){ var row=document.querySelector("#l_"+which+" .row\[data-id='"+cssq(c.id)+"']"); if(row){ var inp=row.querySelectorAll('input').item(i); if(inp) inp.focus(); } return; } parts.push(quote(a)); }
   var line=parts.join(' ');
-  if(window.BYOND) BYOND.command(line);
+  if(c.call){ var cp={adminpage:'call',id:c.id}; for(var j=0;j<c.args.length;j++) cp\['a'+(j+1)]=(v\[j]||'').trim(); topic(cp); }
+  else if(window.BYOND) BYOND.command(line);
   var argText=v.slice(0,c.args.length).join(' ');
   recent.unshift({id:c.id,arg:argText,at:Date.now()}); if(recent.length>12) recent.length=12;
   topic({adminpage:'used',id:c.id,arg:argText});
@@ -363,7 +364,7 @@ client/proc/AdminPageHTML()
  function splitArgs(rest){ var out=\[], cur='', q=false; for(var i=0;i<rest.length;i++){ var c=rest.charAt(i); if(c==='"'){ q=!q; continue; } if(c===' '&&!q){ if(cur.length){ out.push(cur); cur=''; } continue; } cur+=c; } if(cur.length) out.push(cur); return out; }
  function setCommands(s){
   cmds=\[]; byId={}; var parts=(s||'').split(';');
-  for(var i=0;i<parts.length;i++){ var f=parts\[i]; if(!f) continue; var a=f.split('|'); var c={id:a\[0],role:a\[1]||'admin',group:a\[2]||'WORLD',args:(a\[3]?a\[3].split(','):\[])}; cmds.push(c); byId\[c.id]=c; }
+  for(var i=0;i<parts.length;i++){ var f=parts\[i]; if(!f) continue; var a=f.split('|'); var c={id:a\[0],role:a\[1]||'admin',group:a\[2]||'WORLD',args:(a\[3]?a\[3].split(','):\[]),call:(a\[4]==='c')}; cmds.push(c); byId\[c.id]=c; }
   renderList('cmd'); renderList('map'); if(tab==='fav') renderFav(); footer();
  }
  function setPlayers(s){ players=(s||'').split('|').filter(function(x){ return x.length>0; }); if(popInp) popFor(popInp); }
@@ -426,7 +427,7 @@ client/proc/AdminPageHTML()
  if(window.BYOND){ boot(); } else { window.addEventListener('byond-ready',boot); }
  if(PREVIEW){
   setRole(4,1);
-  setCommands('Admin-Teleport|admin|PLAYERS|player;Teleport-To|admin|PLAYERS|player;Teleport-Home|admin|PLAYERS|player;Summon-Player|admin|PLAYERS|player;Set-Spawn-Point|admin|WORLD|;Telepathy-Toggle|admin|DEBUG|;Reboot-Warning|admin|EVENTS|text;Toggle-Weather|admin|ENV|choice:clear/rain/storm;Set-Era|admin|WORLD|num;Spawn-Item|admin|WORLD|text;Create-Zone|mapper|ZONES|;Zone-Settings|mapper|ZONES|;Surface-Set-Profile|mapper|SURFACES|choice:grass/stone/wood;Export-Map-Region|mapper|PREFABS|;Edge-Debug|mapper|DEBUG|;Enter-Studio|mapper|BUILD|;Bookmark-Here|mapper|BUILD|');
+  setCommands('Admin-Teleport|admin|PLAYERS|player;Teleport-To|admin|PLAYERS|player;Teleport-Home|admin|PLAYERS|player;Summon-Player|admin|PLAYERS|player;Set-Spawn-Point|admin|WORLD|;Telepathy-Toggle|admin|DEBUG|;Reboot-Warning|admin|EVENTS|text;Toggle-Weather|admin|ENV|choice:clear/rain/storm;Set-Era|admin|WORLD|num;Spawn-Item|admin|WORLD|text;Create-Zone|mapper|ZONES|;Zone-Settings|mapper|ZONES|;Surface-Set-Profile|mapper|SURFACES|:grass/stone/wood;Export-Map-Region|mapper|PREFABS|;Edge-Debug|mapper|DEBUG|;Enter-Studio|mapper|BUILD|;Bookmark-Here|mapper|BUILD|');
   setPlayers('Seraphine|Kaidos|Valdiel');
   setFavs('Admin-Teleport|Summon-Player|Reboot-Warning|Toggle-Weather|Set-Era|Spawn-Item');
   setRecent('Admin-Teleport|Seraphine|2;Toggle-Weather|storm|9;Summon-Player|Kaidos|14');
@@ -556,7 +557,7 @@ client/proc/AdminPageBuildCmds()
 		var/list/a = CHATCMD_ARGS[id]
 		var/g = CHATCMD_GROUP[id]
 		if(!g) g = (role == "mapper") ? "BUILD" : "WORLD"
-		out += "[id]|[role]|[g]|[islist(a) ? jointext(a, ",") : ""]"
+		out += "[id]|[role]|[g]|[islist(a) ? jointext(a, ",") : ""][CHATCMD_CALL[id] ? "|c" : ""]"
 	src << output(list2params(list(jointext(out, ";"))), "[ADMINPAGE_CTL]:setCommands")
 
 client/proc/AdminPageFav(id, on)
@@ -757,6 +758,8 @@ client/proc/AdminPageTopic(list/href_list)
 			ChatPanelPlayers(ADMINPAGE_CTL)
 		if("cmds")
 			AdminPageBuildCmds()
+		if("call")
+			PanelCommandCall(href_list["id"], list(href_list["a1"], href_list["a2"], href_list["a3"]))
 
 mob/Players/verb/AdminPage_Panel()
 	set name = "Admin Panel"

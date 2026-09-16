@@ -27,7 +27,7 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin//Dainsleif
 				p << "The blade refuses to be sheathed."
 				return FALSE
 			else
-				var/choice = input(p, "The blade resists your attempts to sheathe it. Do you wish to sheathe it anyway?") in list("Yes", "No")
+				var/choice = Ask(p, "The blade resists your attempts to sheathe it. Do you wish to sheathe it anyway?", "", null, "pick", list("Yes", "No"), 0)
 				switch(choice)
 					if("Yes")
 						p << "The blade forces itself into your body and you feel your life force being drained away."
