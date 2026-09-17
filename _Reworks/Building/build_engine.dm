@@ -17,7 +17,7 @@
 	if(!tp)
 		return ""
 	var/roof = rec["[pre]Roof"]
-	return jointext(list("TS", "[rec["x"]]", "[rec["y"]]", "[rec["z"]]", "[tp]", BuildJournalIconPath(rec["[pre]Icon"]), BuildDmmEscape("[rec["[pre]State"]]"), "[rec["[pre]Density"] || 0]", "[rec["[pre]Opacity"] || 0]", "[roof || 0]", "[rec["[pre]FlyOver"] || 0]", "[rec["[pre]Destructable"] || 0]", "[rec["[pre]Shallow"] || 0]", BuildDmmEscape("[rec["[pre]Builder"] || ""]"), "[rec["[pre]EdgeOpt"] || 0]"), "\t")
+	return jointext(list("TS", "[rec["x"]]", "[rec["y"]]", "[rec["z"]]", "[tp]", BuildJournalIconPath(rec["[pre]Icon"]), BuildDmmEscape("[rec["[pre]State"]]"), "[rec["[pre]Density"] || 0]", "[rec["[pre]Opacity"] || 0]", "[roof || 0]", "[rec["[pre]FlyOver"] || 0]", "[rec["[pre]Destructable"] || 0]", "[rec["[pre]Shallow"] || 0]", BuildDmmEscape("[rec["[pre]Builder"] || ""]"), "[rec["[pre]EdgeOpt"] || 0]", BuildDmmEscape("[rec["[pre]Def"] || ""]")), "\t")
 
 /proc/BuildJournalObjLine(atom/movable/O, x, y, z, remove)
 	if(!O)
@@ -25,7 +25,7 @@
 	if(remove)
 		return jointext(list("OD", "[x]", "[y]", "[z]", "[O.type]", BuildDmmEscape("[O.icon_state]")), "\t")
 	var/obj/OB = O
-	return jointext(list("OC", "[x]", "[y]", "[z]", "[O.type]", BuildJournalIconPath(O.icon), BuildDmmEscape("[O.icon_state]"), "[O.dir]", "[OB.pixel_x]", "[OB.pixel_y]", "[OB.layer]", "[O.density]", "[O.opacity]", "[OB.Grabbable]", BuildDmmEscape("[OB.Builder || ""]")), "\t")
+	return jointext(list("OC", "[x]", "[y]", "[z]", "[O.type]", BuildJournalIconPath(O.icon), BuildDmmEscape("[O.icon_state]"), "[O.dir]", "[OB.pixel_x]", "[OB.pixel_y]", "[OB.layer]", "[O.density]", "[O.opacity]", "[OB.Grabbable]", BuildDmmEscape("[OB.Builder || ""]"), BuildDmmEscape("[istype(O, /obj/Turfs/CustomObj1) ? O:custom_def : ""]")), "\t")
 
 /proc/BuildJournalAction(datum/build_action/A, revert = 0)
 	if(!A || !A.count)
@@ -108,6 +108,8 @@
 				var/turf/CustomTurf/CT = NT
 				CT.Roof = text2num(f[10]) || 0
 				CT.InitialType = "/turf/CustomTurf"
+				if(f.len >= 16)
+					CT.custom_def = BuildDmmUnescape(f[16])
 				BuildCustomDefForTurf(CT)
 			NT.FlyOverAble = text2num(f[11]) || 0
 			NT.Destructable = text2num(f[12]) || 0
@@ -138,6 +140,8 @@
 			O.Savable = 1
 			worldObjectList += O
 			if(istype(O, /obj/Turfs/CustomObj1))
+				if(f.len >= 16)
+					O:custom_def = BuildDmmUnescape(f[16])
 				BuildCustomObjApplyDef(O)
 			GfxRefreshStructureMetadata(O)
 			applied++
@@ -212,6 +216,7 @@
 		rec["oldIcon"] = CT.icon
 		rec["oldState"] = CT.icon_state
 		rec["oldRoof"] = CT.Roof
+		rec["oldDef"] = BuildCustomNameOf(CT)
 	return rec
 
 /proc/BuildApplyTurf(client/C, list/rec, datum/build_entry/E)
@@ -233,13 +238,14 @@
 		CT.InitialType = "/turf/CustomTurf"
 		if(E.iconF)
 			CT.icon = E.iconF
-		if(E.icon_state)
+			CT.icon_state = E.icon_state || ""
+		else if(E.icon_state)
 			CT.icon_state = E.icon_state
 		CT.Roof = E.cRoof
 		CT.density = E.cDensity
 		CT.opacity = E.cOpacity
-		var/datum/build_custom_def/PD = BuildCustomDefForIcon(E.iconF, E.icon_state)
-		CT.custom_def = PD ? PD.name : ""
+		CT.custom_def = E.cDef || ""
+		var/datum/build_custom_def/PD = BuildCustomDefForTurf(CT)
 		if(PD)
 			CT.surface_profile = length(PD.profile) ? PD.profile : null
 	if(istype(C2, /turf/Special/EventStars))
@@ -272,6 +278,7 @@
 	if(istype(C2, /turf/CustomTurf))
 		var/turf/CustomTurf/CT = C2
 		rec["newRoof"] = CT.Roof
+		rec["newDef"] = CT.custom_def
 	LightingRecomputeNear(C2)
 	return C2
 
@@ -296,6 +303,8 @@
 		var/turf/CustomTurf/CT = C2
 		CT.Roof = rec["newRoof"]
 		CT.InitialType = "/turf/CustomTurf"
+		CT.custom_def = rec["newDef"] || ""
+		BuildCustomDefForTurf(CT)
 		CustomTurfs += C2
 	else
 		Turfs += C2
@@ -330,6 +339,8 @@
 		if(rec["oldState"])
 			CT.icon_state = rec["oldState"]
 		CT.Roof = rec["oldRoof"]
+		CT.custom_def = rec["oldDef"] || ""
+		BuildCustomDefForTurf(CT)
 	if(rec["oldBuilder"])
 		if(istype(old, /turf/CustomTurf))
 			CustomTurfs += old
@@ -362,8 +373,8 @@
 	var/obj/O = new E.Creates(T)
 	if(E.iconF)
 		O.icon = E.iconF
-	if(E.icon_state)
-		O.icon_state = E.icon_state
+	if(E.icon_state || (E.isCustom && E.iconF))
+		O.icon_state = E.icon_state || ""
 	O.dir = BuildPlacedDir(E, C.bsession.dirv)
 	if(E.isCustom)
 		if(E.cLayer)
@@ -373,7 +384,9 @@
 		O.pixel_x = E.cPixelX
 		O.pixel_y = E.cPixelY
 		if(istype(O, /obj/Turfs/CustomObj1))
-			BuildCustomObjApplyDef(O)
+			var/obj/Turfs/CustomObj1/CO = O
+			CO.custom_def = E.cDef || ""
+			BuildCustomObjApplyDef(CO)
 	O.Builder = M.ckey
 	O.Savable = 1
 	worldObjectList += O
@@ -433,6 +446,7 @@
 	if(B.isZone)
 		BuildAreaPaintLoad()
 		var/misses = 0
+		var/blocked = 0
 		if(B.zoneRef)
 			var/datum/build_zone_def/ZD = B.zoneRef
 			if(ZD.creator != C.ckey && !C.mob.Admin)
@@ -447,11 +461,13 @@
 				var/datum/build_zone_def/ZD = B.zoneRef
 				newid = "/area/MapperZone#[ZD.uid]"
 			else if(B.zoneSmart)
-				var/apath = BuildAreaSampleOutdoor(T)
-				if(!apath)
-					misses++
+				newid = BuildAreaSampleOutdoor(T, C.mob)
+				if(!newid)
+					if(isnull(newid))
+						misses++
+					else
+						blocked++
 					continue
-				newid = "[apath]"
 			else
 				newid = "[B.Creates]"
 			var/oldid = BuildAreaIdOf(T.loc)
@@ -468,9 +484,11 @@
 			zz = T.z
 			did++
 		if(misses)
-			C.mob << "[misses] tiles had no outdoor zone within 8 tiles to match; they were left unchanged."
+			C.mob << "[misses] tile[misses == 1 ? "" : "s"] had no area within 8 tiles to match and stayed unchanged. Paint those with -NO ZONE (base)- instead."
+		if(blocked)
+			C.mob << "[blocked] tile[blocked == 1 ? "" : "s"] stayed unchanged because the nearest outdoor zone belongs to another mapper."
 		if(!did)
-			if(!misses)
+			if(!misses && !blocked)
 				C.mob << "Those tiles are already in that zone."
 			return
 	else
@@ -735,6 +753,7 @@
 		E.Creates = rec["type"]
 		E.iconF = rec["icon"]
 		E.icon_state = rec["state"]
+		E.cDef = rec["cDef"] || ""
 		if(!isnull(rec["cRoof"]))
 			E.cRoof = rec["cRoof"]
 			E.cDensity = rec["cDensity"]
@@ -769,6 +788,7 @@
 		O.Savable = 1
 		worldObjectList += O
 		if(istype(O, /obj/Turfs/CustomObj1))
+			O:custom_def = rec["def"] || ""
 			BuildCustomObjApplyDef(O)
 		GfxRefreshStructureMetadata(O)
 		A.createdObjs += list(list("obj" = O, "x" = TT.x, "y" = TT.y, "z" = TT.z))

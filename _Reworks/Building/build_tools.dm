@@ -73,6 +73,9 @@
 				E.cDensity = CT.density
 				E.cOpacity = CT.opacity
 				E.cRoof = CT.Roof
+				E.cDef = BuildCustomNameOf(CT)
+				if(length(E.cDef))
+					E.name = "-[E.cDef]-"
 			else if(istype(A, /obj/Turfs/CustomObj1))
 				var/obj/Turfs/CustomObj1/O = A
 				E.isCustom = 1
@@ -81,6 +84,9 @@
 				E.cLayer = O.layer
 				E.cPixelX = O.pixel_x
 				E.cPixelY = O.pixel_y
+				E.cDef = BuildCustomNameOf(O)
+				if(length(E.cDef))
+					E.name = "-[E.cDef]-"
 			BuildEntryFit(E)
 			SetBrush(E)
 			C.mob << "Picked [E.name]."

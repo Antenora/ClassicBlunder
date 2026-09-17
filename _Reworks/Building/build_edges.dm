@@ -1092,7 +1092,7 @@ var/global/list/buildCliffPickerEntries
 			continue
 		var/take = 0
 		if(E.isCustom)
-			var/datum/build_custom_def/D = BuildCustomDefForIcon(E.iconF, E.icon_state)
+			var/datum/build_custom_def/D = length(E.cDef) ? BuildCustomFindByName(E.cDef) : BuildCustomDefForIcon(E.iconF, E.icon_state)
 			take = (D && D.cliff) ? 1 : 0
 		else if(findtext(lowertext("[E.Creates]"), "wall") || findtext(lowertext(E.name), "wall"))
 			take = 1

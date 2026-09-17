@@ -74,6 +74,7 @@ var/_light_fov_cells = 0
 	var/geometry_key
 	var/bucket_key
 	var/painted_dark = -1 //LightDarkFrac at last paint; the loop re-tints on material change
+	var/turf/painted_at
 	var/last_recompute = 0 //world.time of last wall-change recompute (burst dedup)
 	var/flicker = 0 //flame prop: carry a wavering flame glow at the source
 	var/obj/flamelight/flame //the flame glow obj
@@ -150,7 +151,8 @@ proc/LightGlowBudget(turf/T, col, want, artlum = 0)
 
 proc/LightSrcTurf(datum/lightsource/L)
 	if(!L) return null
-	return L.src_obj ? get_turf(L.src_obj) : locate(L.lx, L.ly, L.lz)
+	if(L.src_obj) return isturf(L.src_obj.loc) ? L.src_obj.loc : null
+	return locate(L.lx, L.ly, L.lz)
 
 proc/LightBucketKey(turf/T)
 	if(!T) return null
@@ -635,6 +637,7 @@ proc/LightCompute(datum/lightsource/L)
 	if(L.maxalpha > 0)
 		lightStrength = min(lightStrength, LightBudgetAlpha(s, L.lcolor, L.maxalpha) / L.maxalpha)
 	L.painted_dark = darkFrac
+	L.painted_at = s
 	UpdateFlameGlow(L, lightStrength)
 	L.applied = list()
 	var/rr = L.radius
@@ -719,8 +722,16 @@ proc/_LightLoop()
 			for(var/datum/lightsource/L in _light_sources.Copy()) //Copy: we sleep mid-pass now
 				if(!(L in _light_sources)) continue
 				var/turf/s = LightSrcTurf(L)
-				if(!s) continue
-				if(abs(LightDarkFrac(s) - L.painted_dark) > 0.02)
+				if(!s)
+					if(L.painted_at)
+						var/turf/was = L.painted_at
+						L.painted_at = null
+						LightClear(L)
+						KillFlame(L)
+						if(glob.LIGHT_SOFTCLIP && _lights_settled) LightingRecomputeNear(was)
+						if(++n % 8 == 0) sleep(1)
+					continue
+				if(s != L.painted_at || abs(LightDarkFrac(s) - L.painted_dark) > 0.02)
 					LightCompute(L)
 					if(++n % 8 == 0) sleep(1) //a clock jump stales EVERY light - never burst one tick
 		sleep(10)
@@ -760,7 +771,7 @@ obj/var/tmp/datum/lightsource/attached_light
 
 proc/LightPropAttach(obj/O, radius, lcolor, maxalpha, flicker = 0, off_x = 0, off_y = 0, cookie = null, cookie_dir = 0, shaft = null)
 	if(!O || O.attached_light) return
-	if(!get_turf(O)) return //build-panel phantom (Add_Builds new()s every prop with no loc) - don't register a dead light
+	if(!isturf(O.loc) || O.gfx_transient_visual) return //build-panel phantom (Add_Builds new()s every prop with no loc) - don't register a dead light
 	PurgeStaleFlameVisuals(O) //old saves can carry baked-in flame visuals - scrub them
 	var/datum/lightsource/L = new
 	L.src_obj = O
@@ -963,7 +974,7 @@ proc/PurgeStaleEmissives(atom/movable/O)
 
 proc/FxEmissiveAttach(obj/O, tier = 0)
 	if(!O || O.attached_emissive) return
-	if(!get_turf(O)) return //build-panel phantom guard, same as the light props
+	if(!isturf(O.loc)) return //build-panel phantom guard, same as the light props
 	if(tier) O.emissive_tier = tier
 	if(!O.emissive_tier) return
 	PurgeStaleEmissives(O)
@@ -1012,6 +1023,9 @@ proc/_FxEmissiveLoop()
 	set waitfor = 0
 	set background = 1
 	while(1)
+		for(var/obj/gfx_emissive/E in _gfx_emissives.Copy())
+			var/obj/O = _gfx_emissives[E]
+			if(!O || (!O.loc && O.gfx_transient_visual)) _gfx_emissives -= E
 		if(glob && glob.EMISSIVES)
 			for(var/obj/gfx_emissive/E in _gfx_emissives)
 				if(!E.halo) continue

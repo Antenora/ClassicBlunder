@@ -255,10 +255,20 @@ area/MapperZone/Entered(atom/movable/O, atom/oldloc)
 		fdel(AREA_PAINT_FILE)
 	text2file(jointext(lines, "\n"), AREA_PAINT_FILE)
 
-/proc/BuildAreaInstance(path)
+/proc/BuildAreaExisting(path)
 	var/area/AR = locate(path)
+	if(AR && AR.type != path)
+		AR = null
+		for(var/area/A2 in world)
+			if(A2.type == path)
+				return A2
+	return AR
+
+/proc/BuildAreaInstance(path)
+	var/area/AR = BuildAreaExisting(path)
 	if(!AR)
 		AR = new path
+		DnRegisterNewArea(AR)
 	return AR
 
 /proc/BuildAreaSet(turf/T, path)
@@ -313,7 +323,7 @@ var/global/list/zoneProfileMap
 		var/tp = text2path(k)
 		if(!tp)
 			continue
-		var/area/A = locate(tp)
+		var/area/A = BuildAreaExisting(tp)
 		if(!A)
 			continue
 		A.env_profile_id = zoneProfileMap[k]
@@ -426,7 +436,20 @@ mob/Mapper/verb/Zone_Settings()
 		BuildZonesSave()
 		Log("Mapper", "[usr] ([usr.ckey]) updated zone \"[D.name]\": [choice].", 1)
 
-/proc/BuildAreaSampleOutdoor(turf/T, excludeZones = 0)
+/proc/BuildZoneCanPaint(area/MapperZone/MZ, mob/M)
+	if(!MZ || !M)
+		return 0
+	if(M.Admin)
+		return 1
+	BuildZonesLoad()
+	var/datum/build_zone_def/D = zoneDefsByUid[MZ.zoneKey]
+	if(!D)
+		D = zoneDefsByName[MZ.zoneKey]
+	return (D && D.inst == MZ && D.creator == M.ckey) ? 1 : 0
+
+/proc/BuildAreaSampleOutdoor(turf/T, mob/painter = null)
+	var/fallback = null
+	var/blocked = 0
 	for(var/r = 1 to 8)
 		for(var/dx = -r to r)
 			for(var/dy = -r to r)
@@ -436,12 +459,20 @@ mob/Mapper/verb/Zone_Settings()
 				if(!T2)
 					continue
 				var/area/A2 = T2.loc
-				if(!A2?.sees_sky)
+				if(!A2 || A2.type == /area/Inside)
 					continue
-				if(excludeZones && istype(A2, /area/MapperZone))
+				if(istype(A2, /area/MapperZone))
+					if(!painter || !A2.sees_sky)
+						continue
+					if(BuildZoneCanPaint(A2, painter))
+						return BuildAreaIdOf(A2)
+					blocked = 1
 					continue
-				return A2.type
-	return null
+				if(A2.sees_sky)
+					return "[A2.type]"
+				if(!fallback)
+					fallback = "[A2.type]"
+	return blocked ? "" : fallback
 
 /proc/BuildZoneDelete(datum/build_zone_def/D, mob/M)
 	set waitfor = FALSE
@@ -458,10 +489,9 @@ mob/Mapper/verb/Zone_Settings()
 		n++
 		if(n % BUILD_COMMIT_CHUNK == 0)
 			sleep(-1)
-		var/apath = BuildAreaSampleOutdoor(T, 1)
-		if(!apath)
-			apath = /area/Inside
-		var/newid = "[apath]"
+		var/newid = BuildAreaSampleOutdoor(T)
+		if(!newid)
+			newid = "/area"
 		if(BuildAreaSetId(T, newid))
 			moved++
 		areaPaintMap["[T.x],[T.y],[T.z]"] = newid
@@ -486,7 +516,7 @@ mob/Mapper/verb/Zone_Settings()
 	_dn_sky_areas -= D.inst
 	_dn_indoor_areas -= D.inst
 	D.inst = null
-	M << "Zone \"[D.name]\" deleted; [moved] tiles rezoned (outdoor-match, Inside fallback)."
+	M << "Zone \"[D.name]\" deleted; [moved] tiles moved to the areas around it."
 	Log("Mapper", "[M] ([M.ckey]) deleted zone \"[D.name]\" ([moved] tiles rezoned).", 1)
 
 mob/Mapper/verb/Delete_Zone()
@@ -507,12 +537,12 @@ mob/Mapper/verb/Delete_Zone()
 	if(D.inst)
 		for(var/turf/T in D.inst)
 			tiles++
-	usr << "Deleting \"[D.name]\" rezones its [tiles] tiles (nearest outdoor zone, Inside as fallback). This is NOT undoable."
+	usr << "Deleting \"[D.name]\" moves its [tiles] tiles to the nearest outdoor area within 8 tiles, else the area around it, else NO ZONE (base). This is NOT undoable."
 	spawn
 		sleep(3)
 		var/confirm = usr.HUDTextPrompt("Type YES to delete the zone", "")
 		if(confirm != "YES")
-			usr << "Zone deletion cancelled."
+			usr << "Zone deletion canceled."
 			return
 		BuildZoneDelete(D, usr)
 
@@ -537,3 +567,208 @@ mob/Mapper/verb/Delete_Zone()
 			applied++
 	if(applied)
 		Log("Mapper", "Area paint restored on [applied] tiles at boot.", 1)
+
+/proc/BuildAreaFindLabel(id)
+	var/h = findtext(id, "#")
+	if(h)
+		BuildZonesLoad()
+		var/key = copytext(id, h + 1)
+		var/datum/build_zone_def/D = zoneDefsByUid[key]
+		if(!D)
+			D = zoneDefsByName[key]
+		return "zone [D ? D.name : key]"
+	var/p = text2path(id)
+	return p ? BuildZoneName(p) : id
+
+/proc/BuildAreaFindCounts()
+	BuildAreaPaintLoad()
+	var/list/counts = list()
+	var/n = 0
+	for(var/k in areaPaintMap)
+		if(++n % 2000 == 0)
+			sleep(-1)
+		var/list/c = splittext(k, ",")
+		if(c.len < 3)
+			continue
+		var/turf/T = locate(text2num(c[1]), text2num(c[2]), text2num(c[3]))
+		if(!T)
+			continue
+		var/id = BuildAreaIdOf(T.loc)
+		if(id == "/area")
+			continue
+		counts[id] = (counts[id] || 0) + 1
+	return counts
+
+/proc/BuildAreaFindGroups(id)
+	BuildAreaPaintLoad()
+	var/list/cells = list()
+	var/n = 0
+	for(var/k in areaPaintMap)
+		if(++n % 2000 == 0)
+			sleep(-1)
+		var/list/c = splittext(k, ",")
+		if(c.len < 3)
+			continue
+		var/turf/T = locate(text2num(c[1]), text2num(c[2]), text2num(c[3]))
+		if(T && BuildAreaIdOf(T.loc) == id)
+			cells["[T.x],[T.y],[T.z]"] = 1
+	var/list/groups = list()
+	for(var/k in cells)
+		if(cells[k] != 1)
+			continue
+		var/list/c0 = splittext(k, ",")
+		var/z = text2num(c0[3])
+		var/x1 = text2num(c0[1])
+		var/y1 = text2num(c0[2])
+		var/x2 = x1
+		var/y2 = y1
+		var/list/members = list()
+		var/list/stack = list(k)
+		cells[k] = 2
+		while(stack.len)
+			var/cur = stack[stack.len]
+			stack.len--
+			members += cur
+			var/list/cc = splittext(cur, ",")
+			var/cx = text2num(cc[1])
+			var/cy = text2num(cc[2])
+			x1 = min(x1, cx)
+			y1 = min(y1, cy)
+			x2 = max(x2, cx)
+			y2 = max(y2, cy)
+			for(var/dx = -1 to 1)
+				for(var/dy = -1 to 1)
+					var/nk = "[cx + dx],[cy + dy],[z]"
+					if(cells[nk] == 1)
+						cells[nk] = 2
+						stack += nk
+			if(++n % 2000 == 0)
+				sleep(-1)
+		var/list/g = list(z, x1, y1, x2, y2, members)
+		var/pos = groups.len + 1
+		for(var/i = 1 to groups.len)
+			var/list/o = groups[i]
+			var/list/om = o[6]
+			if(members.len > om.len)
+				pos = i
+				break
+		groups.Insert(pos, null)
+		groups[pos] = g
+	return groups
+
+/proc/BuildAreaGroupText(list/g)
+	var/list/m = g[6]
+	var/where = (g[2] == g[4] && g[3] == g[5]) ? "([g[2]],[g[3]])" : "([g[2]],[g[3]]) to ([g[4]],[g[5]])"
+	return "z[g[1]] [where], [m.len] tile[m.len == 1 ? "" : "s"]"
+
+/proc/BuildAreaGroupCenter(list/g)
+	var/list/m = g[6]
+	var/cx = (g[2] + g[4]) / 2
+	var/cy = (g[3] + g[5]) / 2
+	var/best = null
+	var/bestD = 1e9
+	for(var/k in m)
+		var/list/c = splittext(k, ",")
+		var/d = abs(text2num(c[1]) - cx) + abs(text2num(c[2]) - cy)
+		if(d < bestD)
+			bestD = d
+			best = c
+	return best ? locate(text2num(best[1]), text2num(best[2]), text2num(best[3])) : null
+
+mob/Mapper/verb/Find_Area()
+	set category = "Mapper"
+	var/list/counts = BuildAreaFindCounts()
+	if(!counts.len)
+		usr << "No painted areas found. The whole map is NO ZONE (base)."
+		return
+	var/list/menu = list()
+	for(var/id in counts)
+		menu["[BuildAreaFindLabel(id)] - [counts[id]] tile[counts[id] == 1 ? "" : "s"]"] = id
+	var/pick = Ask(usr, "Find which area? Only painted areas are listed; everything else is NO ZONE (base).", "Find Area", null, "pick", menu, 1)
+	if(!pick)
+		return
+	var/id = menu[pick]
+	var/label = BuildAreaFindLabel(id)
+	var/list/groups = BuildAreaFindGroups(id)
+	if(!groups.len)
+		usr << "[label] has no tiles left."
+		return
+	usr << "<b>[label]</b>: [groups.len] patch[groups.len == 1 ? "" : "es"], largest first."
+	var/list/jump = list()
+	for(var/list/g in groups)
+		if(jump.len >= 25)
+			usr << "  ...and [groups.len - 25] smaller patch[groups.len - 25 == 1 ? "" : "es"]."
+			break
+		var/txt = BuildAreaGroupText(g)
+		usr << "  [txt]"
+		jump[txt] = g
+	var/go = Ask(usr, "Jump to a patch of [label]?", "Find Area", null, "pick", jump, 1)
+	if(!go)
+		return
+	var/turf/T = BuildAreaGroupCenter(jump[go])
+	if(!T)
+		return
+	usr.loc = T
+	Log("Admin", "[ExtractInfo(usr)] jumped to [label] at ([T.x],[T.y],[T.z]) with Find Area.")
+
+mob/Mapper/verb/Remove_Area()
+	set category = "Mapper"
+	var/list/counts = BuildAreaFindCounts()
+	var/list/menu = list()
+	for(var/id in counts)
+		if(findtext(id, "#"))
+			continue
+		menu["[BuildAreaFindLabel(id)] - [counts[id]] tile[counts[id] == 1 ? "" : "s"]"] = id
+	if(!menu.len)
+		usr << "No painted areas to remove. Zones are removed with Delete Zone."
+		return
+	var/pick = Ask(usr, "Remove which area? Its tiles go back to NO ZONE (base).", "Remove Area", null, "pick", menu, 1)
+	if(!pick)
+		return
+	var/id = menu[pick]
+	var/label = BuildAreaFindLabel(id)
+	var/list/groups = BuildAreaFindGroups(id)
+	if(!groups.len)
+		usr << "[label] has no tiles left."
+		return
+	var/total = 0
+	for(var/list/g in groups)
+		var/list/m = g[6]
+		total += m.len
+	var/list/which = list()
+	which["All of [label], [total] tile[total == 1 ? "" : "s"]"] = 0
+	var/i = 0
+	for(var/list/g in groups)
+		if(++i > 40)
+			break
+		which["Only [BuildAreaGroupText(g)]"] = i
+	var/scope = Ask(usr, "Remove all of [label], or one patch?", "Remove Area", null, "pick", which, 1)
+	if(!scope)
+		return
+	var/idx = which[scope]
+	var/list/keys = list()
+	if(idx)
+		var/list/g = groups[idx]
+		keys += g[6]
+	else
+		for(var/list/g in groups)
+			keys += g[6]
+	var/ok = Ask(usr, "Move [keys.len] tile[keys.len == 1 ? "" : "s"] of [label] to NO ZONE (base)? Their lighting and weather will follow the base area. This is NOT undoable.", "Remove Area", null, "confirm", null, 1, "Remove", "Cancel")
+	if(ok != "Remove")
+		return
+	BuildAreaPaintLoad()
+	var/moved = 0
+	var/n = 0
+	for(var/k in keys)
+		if(++n % BUILD_COMMIT_CHUNK == 0)
+			sleep(-1)
+		var/list/c = splittext(k, ",")
+		var/turf/T = locate(text2num(c[1]), text2num(c[2]), text2num(c[3]))
+		if(!T || BuildAreaIdOf(T.loc) != id)
+			continue
+		if(BuildAreaSetId(T, "/area"))
+			moved++
+			areaPaintMap[k] = "/area"
+	BuildAreaPaintSave()
+	usr << "Moved [moved] tile[moved == 1 ? "" : "s"] of [label] to NO ZONE (base)."
+	Log("Mapper", "[usr] ([usr.ckey]) moved [moved] tiles of [label] to NO ZONE (base) with Remove Area.", 1)

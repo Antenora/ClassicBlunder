@@ -71,6 +71,7 @@ area/Outside/Planet/AlienDesolate/ADUnderground/sees_sky = 0
 var/list/_dn_sky_areas = list()
 var/list/_dn_cave_areas = list()
 var/list/_dn_indoor_areas = list()
+var/_dn_setup_done = 0
 
 area
 	var
@@ -109,6 +110,7 @@ proc/_DnSetup()
 			A.dn_indoor = 1
 			_dn_indoor_areas += A
 	_DnApplyMode()
+	_dn_setup_done = 1
 
 //how dark a managed interior goes relative to the open sky
 proc/DnIndoorColor(skycol)
@@ -179,6 +181,29 @@ proc/DnManageArea(area/A, sky)
 		A.plane = 0
 		A.layer = DN_BLANKET_LAYER
 		A.blend_mode = BLEND_MULTIPLY
+
+proc/DnRegisterNewArea(area/A)
+	if(!A || !_dn_setup_done)
+		return
+	if((A in _dn_sky_areas) || (A in _dn_indoor_areas) || (A in _dn_cave_areas))
+		return
+	if(A.sees_sky)
+		if(!A.icon)
+			DnManageArea(A, 1)
+		return
+	if(A.icon == 'Dark.dmi')
+		A.dark_cave = 1
+		A._dn_orig_layer = A.layer
+		_dn_cave_areas += A
+		if(glob && glob.MULTIPLY_REVEAL)
+			A.icon = EnvWhiteIcon()
+			A.color = glob.LIGHT_CAVE_COLOR
+			A.plane = BASE_LIGHTING_PLANE
+			A.layer = DN_BASE_LAYER
+			A.blend_mode = BLEND_OVERLAY
+		return
+	if(!A.icon && !A.dn_no_dim)
+		DnManageArea(A, 0)
 
 proc/DnPhase()
 	var/cyc = max(1, glob ? glob.DN_CYCLE_MINUTES : 120) * 600

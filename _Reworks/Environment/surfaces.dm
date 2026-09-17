@@ -1252,3 +1252,12 @@ obj/Turfs/MidgarObj
 
 obj/Turfs/Sign
 	Information_Panel/surface_profile = "emissive_screen"
+
+obj/Items/Material/MonsterPart
+	fire_golem_core/surface_profile = "prop_medium"
+	fire_dragon_claw/surface_profile = "prop_medium"
+
+obj/AI_Spot
+	Fire_Spirit/surface_profile = "prop_medium"
+	Fire_Hell_Zone/surface_profile = "prop_medium"
+	Fire_Hell_Advanced_Zone/surface_profile = "prop_medium"

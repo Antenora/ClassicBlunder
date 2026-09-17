@@ -36,6 +36,7 @@ proc/IsBuildEligible(mob/M)
 		cOpacity
 		cRoof
 		cLayer
+		cDef = ""
 		cPixelX = 0
 		cPixelY = 0
 		icon/thumb
@@ -614,7 +615,7 @@ client/var/datum/build_session/bsession
 				miny = min(miny, O.y)
 				maxx = max(maxx, O.x)
 				maxy = max(maxy, O.y)
-				clipboard += list(list("type" = O.type, "icon" = O.icon, "state" = O.icon_state, "dir" = O.dir, "px" = O.pixel_x, "py" = O.pixel_y, "density" = O.density, "opacity" = O.opacity, "layer" = O.layer, "grab" = O.Grabbable, "x" = O.x, "y" = O.y))
+				clipboard += list(list("type" = O.type, "icon" = O.icon, "state" = O.icon_state, "dir" = O.dir, "px" = O.pixel_x, "py" = O.pixel_y, "density" = O.density, "opacity" = O.opacity, "layer" = O.layer, "grab" = O.Grabbable, "def" = BuildCustomNameOf(O), "x" = O.x, "y" = O.y))
 			for(var/list/rec in clipboard)
 				rec["dx"] = rec["x"] - minx
 				rec["dy"] = rec["y"] - miny
@@ -644,6 +645,7 @@ client/var/datum/build_session/bsession
 					rec["cRoof"] = CT.Roof
 					rec["cDensity"] = CT.density
 					rec["cOpacity"] = CT.opacity
+					rec["cDef"] = BuildCustomNameOf(CT)
 				clipboardTurfs += list(rec)
 				for(var/obj/O in T)
 					if(!istype(O, /obj/Turfs) && !istype(O, /obj/KatieObj))
@@ -651,7 +653,7 @@ client/var/datum/build_session/bsession
 					objN++
 					if(objN > BUILD_PREVIEW_ART_CAP)
 						continue
-					clipboard += list(list("type" = O.type, "icon" = O.icon, "state" = O.icon_state, "dir" = O.dir, "px" = O.pixel_x, "py" = O.pixel_y, "density" = O.density, "opacity" = O.opacity, "layer" = O.layer, "grab" = O.Grabbable, "dx" = T.x - minx, "dy" = T.y - miny))
+					clipboard += list(list("type" = O.type, "icon" = O.icon, "state" = O.icon_state, "dir" = O.dir, "px" = O.pixel_x, "py" = O.pixel_y, "density" = O.density, "opacity" = O.opacity, "layer" = O.layer, "grab" = O.Grabbable, "def" = BuildCustomNameOf(O), "dx" = T.x - minx, "dy" = T.y - miny))
 			clipW = maxx - minx
 			clipH = maxy - miny
 			if(objN > BUILD_PREVIEW_ART_CAP)

@@ -1,6 +1,7 @@
 #define CUSTOM_MANIFEST "Mapping/Custom/manifest.txt"
 
 var/global/list/customDefs
+var/global/list/customDefsByName
 var/global/customDefsDirty = 0
 obj/Turfs/CustomObj1/var/custom_def = ""
 
@@ -30,6 +31,7 @@ obj/Turfs/CustomObj1/var/custom_def = ""
 	if(customDefs)
 		return customDefs
 	customDefs = list()
+	customDefsByName = null
 	if(!fexists(CUSTOM_MANIFEST))
 		return customDefs
 	var/t = file2text(CUSTOM_MANIFEST)
@@ -92,6 +94,7 @@ obj/Turfs/CustomObj1/var/custom_def = ""
 	E.cLayer = D.layerv
 	E.cPixelX = D.pixelX
 	E.cPixelY = D.pixelY
+	E.cDef = D.name
 	BuildEntryFit(E)
 	return E
 
@@ -132,6 +135,13 @@ var/global/list/customDefIconCache = list()
 		if("[D.icon_state]" == "[st]")
 			best = D
 			break
+	if(!best && cands.len && length("[st]"))
+		var/list/real = icon_states(ic)
+		if(!real || !("[st]" in real))
+			for(var/datum/build_custom_def/D in cands)
+				if(!length("[D.icon_state]"))
+					best = D
+					break
 	customDefIconCache[ck] = best ? best : "none"
 	return best
 
@@ -157,6 +167,27 @@ var/global/list/customDefIconCache = list()
 			return "BRIDGE"
 	return "NONE"
 
+/proc/BuildCustomStamp(atom/A, datum/build_custom_def/D)
+	if(!A)
+		return
+	var/old = A:custom_def
+	if(D)
+		A:custom_def = D.name
+		if(A.name == initial(A.name) || (length(old) && A.name == old))
+			A.name = D.name
+		return
+	A:custom_def = ""
+	if(length(old) && A.name == old)
+		A.name = initial(A.name)
+
+/proc/BuildCustomNameOf(atom/A)
+	var/datum/build_custom_def/D
+	if(istype(A, /turf/CustomTurf))
+		D = BuildCustomDefForTurf(A)
+	else if(istype(A, /obj/Turfs/CustomObj1))
+		D = BuildCustomDefForObj(A)
+	return D ? D.name : ""
+
 /proc/BuildCustomDefForTurf(turf/CustomTurf/T)
 	if(!T)
 		return null
@@ -165,11 +196,13 @@ var/global/list/customDefIconCache = list()
 	if(length(T.custom_def))
 		D = BuildCustomFindByName(T.custom_def)
 		if(D && D.kind == "turf")
+			if(T.name != D.name && T.name == initial(T.name))
+				T.name = D.name
 			return D
-		T.custom_def = ""
+		BuildCustomStamp(T, null)
 	D = BuildCustomDefForIcon(T.icon, T.icon_state)
 	if(D)
-		T.custom_def = D.name
+		BuildCustomStamp(T, D)
 	return D
 
 /proc/BuildCustomMaterialForTurf(turf/CustomTurf/T)
@@ -188,11 +221,13 @@ var/global/list/customDefIconCache = list()
 	if(length(O.custom_def))
 		D = BuildCustomFindByName(O.custom_def)
 		if(D && D.kind == "obj")
+			if(O.name != D.name && O.name == initial(O.name))
+				O.name = D.name
 			return D
-		O.custom_def = ""
+		BuildCustomStamp(O, null)
 	D = BuildCustomDefForIcon(O.icon, O.icon_state, "obj")
 	if(D)
-		O.custom_def = D.name
+		BuildCustomStamp(O, D)
 	return D
 
 /proc/BuildCustomMaterial(ic, st)
@@ -235,10 +270,15 @@ var/global/list/customDefIconCache = list()
 	return fname
 
 /proc/BuildCustomFindByName(nm)
-	for(var/datum/build_custom_def/D in customDefs)
-		if(D.name == nm)
-			return D
-	return null
+	BuildCustomLoad()
+	if(!customDefsByName)
+		customDefsByName = list()
+		for(var/datum/build_custom_def/D in customDefs)
+			if(!customDefsByName[D.name])
+				customDefsByName[D.name] = D
+	if(!istext(nm) || !length(nm))
+		return null
+	return customDefsByName[nm]
 
 /proc/BuildCustomRefreshSessions()
 	for(var/client/C)
@@ -255,6 +295,7 @@ var/global/list/customDefIconCache = list()
 		D.name = "[base]_[n]"
 		n++
 	customDefs += D
+	customDefsByName = null
 	customDefIconCache = list()
 	BuildCustomSave()
 	if(buildPalette)
@@ -323,7 +364,7 @@ var/global/list/customDefIconCache = list()
 				return
 		var/nm = M.HUDTextPrompt("Name this custom [kind]", "")
 		if(isnull(nm) || !length(nm))
-			M << "Custom creation cancelled."
+			M << "Custom creation canceled."
 			return
 		var/datum/build_custom_def/D = new
 		D.kind = kind
@@ -348,7 +389,7 @@ var/global/list/customDefIconCache = list()
 		D = BuildCustomDefForObj(O)
 	if(!D)
 		return
-	O.custom_def = D.name
+	BuildCustomStamp(O, D)
 	O.surface_profile = length(D.profile) ? D.profile : null
 	if(D.profile == "tree" || D.profile == "foliage")
 		O.gfx_material_id = "foliage"
@@ -372,9 +413,11 @@ var/global/list/customDefIconCache = list()
 		O.transform = null
 	GfxClearMaterialVisuals(O)
 	SurfaceApply(O)
+	if(D.layerv)
+		O.layer = D.layerv
 	GfxRefreshStructureMetadata(O)
 
-/proc/BuildCustomRetroApply(datum/build_custom_def/D, dDens, dOpac, dRoof, reEdge, reElev = 0, reProf = 0, mob/who = null)
+/proc/BuildCustomRetroApply(datum/build_custom_def/D, dDens, dOpac, dRoof, reEdge, reElev = 0, reProf = 0, mob/who = null, dLayer = 0)
 	set waitfor = FALSE
 	set background = TRUE
 	var/list/hit = list()
@@ -395,14 +438,16 @@ var/global/list/customDefIconCache = list()
 				O.density = D.density
 			if(dOpac)
 				O.opacity = D.opacity
-			if(reProf)
+			if(dLayer && !D.layerv)
+				O.layer = initial(O.layer)
+			if(reProf || dLayer)
 				BuildCustomObjApplyDef(O, D)
 			hit += O
 		if(reProf && hit.len && glob && glob.LIGHTING)
 			LightingApplyAll()
-		Log("Mapper", "Custom def \"[D.name]\" retro-applied to [hit.len] placed objects out of [scanned] custom objects checked (dense [dDens ? "yes" : "no"], opaque [dOpac ? "yes" : "no"], profile [reProf ? "yes" : "no"]).", 1)
+		Log("Mapper", "Custom def \"[D.name]\" retro-applied to [hit.len] placed objects out of [scanned] custom objects checked (dense [dDens ? "yes" : "no"], opaque [dOpac ? "yes" : "no"], layer [dLayer ? "yes" : "no"], profile [reProf ? "yes" : "no"]).", 1)
 		if(who)
-			who << "\"[D.name]\": [hit.len] placed cop[hit.len == 1 ? "y" : "ies"] updated ([scanned] custom objects checked).[hit.len ? "" : " None matched this custom's art - stand next to one of them and use Custom_Adopt to link them to it."]"
+			who << "\"[D.name]\": [hit.len] placed cop[hit.len == 1 ? "y" : "ies"] updated ([scanned] custom objects checked).[hit.len ? "" : " None are linked to it. Custom_Registry lists placed copies that are not linked to any custom; stand next to one and use Custom_Adopt."]"
 		return
 	var/list/tsnap = CustomTurfs.Copy()
 	for(var/turf/CustomTurf/T in tsnap)
@@ -429,7 +474,7 @@ var/global/list/customDefIconCache = list()
 		LightingApplyAll()
 	Log("Mapper", "Custom def \"[D.name]\" retro-applied to [hit.len] placed tiles (dense [dDens ? "yes" : "no"], opaque [dOpac ? "yes" : "no"], roof [dRoof ? "yes" : "no"], re-edge [reEdge ? "yes" : "no"], profile [reProf ? "yes" : "no"]).", 1)
 	if(who)
-		who << "\"[D.name]\": [hit.len] placed tile[hit.len == 1 ? "" : "s"] updated."
+		who << "\"[D.name]\": [hit.len] placed tile[hit.len == 1 ? "" : "s"] updated.[hit.len ? "" : " None are linked to it. Custom_Registry lists placed copies that are not linked to any custom; stand next to one and use Custom_Adopt."]"
 
 mob/Mapper/verb/Custom_Registry()
 	set category = "Mapper"
@@ -439,21 +484,40 @@ mob/Mapper/verb/Custom_Registry()
 		return
 	var/list/tcount = list()
 	var/list/ocount = list()
+	var/list/looseT = list()
+	var/list/looseO = list()
 	for(var/turf/CustomTurf/T in CustomTurfs)
 		var/datum/build_custom_def/TD = BuildCustomDefForTurf(T)
 		if(TD)
 			tcount[TD] = (tcount[TD] || 0) + 1
+		else
+			looseT += T
 	for(var/obj/Turfs/CustomObj1/O in worldObjectList)
 		if(!O.loc)
 			continue
 		var/datum/build_custom_def/OD = BuildCustomDefForObj(O)
 		if(OD)
 			ocount[OD] = (ocount[OD] || 0) + 1
+		else
+			looseO += O
 	usr << "CUSTOM REGISTRY - [customDefs.len] entries. Edit_Custom_Def changes one and re-applies the change to every placed copy (creator or Admin)."
 	for(var/datum/build_custom_def/D in customDefs)
 		var/placed = (D.kind == "obj") ? (ocount[D] || 0) : (tcount[D] || 0)
 		var/flags = "[D.density ? "D" : ""][D.opacity ? "O" : ""][D.roof ? "R" : ""][D.cliff ? "C" : ""]"
-		usr << "  [D.name] | [D.kind] by [D.creator] | placed [placed] | fixture [BuildCustomFixtureLabel(D)] | profile [length(D.profile) ? D.profile : "auto"] | material [length(D.material) ? D.material : "auto"] | flags [length(flags) ? flags : "-"] | [D.fname] state \"[D.icon_state]\""
+		usr << "  [D.name] | [D.kind] by [D.creator] | placed [placed] | fixture [BuildCustomFixtureLabel(D)][D.kind == "obj" ? " | layer [D.layerv ? D.layerv : "default"]" : ""] | profile [length(D.profile) ? D.profile : "auto"] | material [length(D.material) ? D.material : "auto"] | flags [length(flags) ? flags : "-"] | [D.fname] state \"[D.icon_state]\""
+	if(looseO.len || looseT.len)
+		usr << "NOT LINKED to any custom: [looseO.len] placed object[looseO.len == 1 ? "" : "s"] and [looseT.len] placed tile[looseT.len == 1 ? "" : "s"]. Stand next to one and use Custom_Adopt to link every copy of that art."
+		var/list/spots = list()
+		for(var/obj/LO in looseO)
+			if(spots.len >= 8)
+				break
+			spots += "object ([LO.x],[LO.y],[LO.z])"
+		var/cap = spots.len + 8
+		for(var/turf/LT in looseT)
+			if(spots.len >= cap)
+				break
+			spots += "tile ([LT.x],[LT.y],[LT.z])"
+		usr << "  For example: [jointext(spots, ", ")]"
 
 /proc/BuildCustomSettingsMenu(mob/M, datum/build_custom_def/D, title = "Edit Custom")
 	while(M && D)
@@ -462,6 +526,8 @@ mob/Mapper/verb/Custom_Registry()
 			menu += "Material: [length(D.material) ? D.material : "AUTO (its own)"]"
 		menu += "Dense: [D.density ? "ON" : "OFF"]"
 		menu += "Opaque: [D.opacity ? "ON" : "OFF"]"
+		if(D.kind == "obj")
+			menu += "Layer: [D.layerv ? D.layerv : "DEFAULT (3, under players)"]"
 		if(D.kind == "turf")
 			menu += "Roof: [D.roof ? "ON" : "OFF"]"
 			menu += "Cliff: [D.cliff ? "ON" : "OFF"]"
@@ -482,6 +548,17 @@ mob/Mapper/verb/Custom_Registry()
 			D.density = !D.density
 		else if(findtext(choice, "Opaque"))
 			D.opacity = !D.opacity
+		else if(findtext(choice, "Layer:"))
+			var/lv = Ask(M, "Layer for \"[D.name]\". Enter 0 for the default (3, under players). Players are at about 4, so 4.1 or higher draws over them. Allowed range: 2.1 to 6.4.[D.profile == "canopy" ? " The canopy profile always keeps it above players." : ""]", title, D.layerv, "num", null, 1)
+			if(isnull(lv))
+				continue
+			if(lv == 0)
+				D.layerv = 0
+				continue
+			var/cl = clamp(lv, 2.1, 6.4)
+			if(cl != lv)
+				M << "Layer [lv] is outside 2.1 to 6.4, so \"[D.name]\" uses [cl]."
+			D.layerv = round(cl, 0.001)
 		else if(findtext(choice, "Roof"))
 			D.roof = !D.roof
 		else if(findtext(choice, "Cliff"))
@@ -525,6 +602,7 @@ mob/Mapper/verb/Edit_Custom_Def()
 	var/s0 = D.stairs
 	var/x0 = D.fixture
 	var/p0 = D.profile
+	var/l0 = D.layerv
 	BuildCustomSettingsMenu(usr, D, "Edit Custom")
 	var/dDens = (D.density != d0)
 	var/dOpac = (D.opacity != o0)
@@ -533,7 +611,8 @@ mob/Mapper/verb/Edit_Custom_Def()
 	var/cliffChanged = (D.cliff != k0)
 	var/stairsChanged = (D.stairs != s0 || D.fixture != x0)
 	var/profChanged = (D.profile != p0)
-	if(!dDens && !dOpac && !dRoof && !matChanged && !cliffChanged && !stairsChanged && !profChanged)
+	var/layerChanged = (D.layerv != l0)
+	if(!dDens && !dOpac && !dRoof && !matChanged && !cliffChanged && !stairsChanged && !profChanged && !layerChanged)
 		return
 	BuildCustomSave()
 	if(buildPalette)
@@ -542,11 +621,12 @@ mob/Mapper/verb/Edit_Custom_Def()
 				E.cDensity = D.density
 				E.cOpacity = D.opacity
 				E.cRoof = D.roof
+				E.cLayer = D.layerv
 				break
 	usr << "Saved \"[D.name]\" - new placements use the new settings; placed copies are updating in the background."
-	Log("Mapper", "[usr] ([usr.ckey]) edited custom def \"[D.name]\" (material [length(D.material) ? D.material : "auto"], D[D.density] O[D.opacity] R[D.roof] C[D.cliff] fixture [BuildCustomFixtureLabel(D)], profile [length(D.profile) ? D.profile : "auto"]).", 1)
+	Log("Mapper", "[usr] ([usr.ckey]) edited custom def \"[D.name]\" (material [length(D.material) ? D.material : "auto"], D[D.density] O[D.opacity] R[D.roof] C[D.cliff] fixture [BuildCustomFixtureLabel(D)], layer [D.layerv ? D.layerv : "default"], profile [length(D.profile) ? D.profile : "auto"]).", 1)
 	customDefIconCache = list()
-	BuildCustomRetroApply(D, dDens, dOpac, dRoof, matChanged || cliffChanged, cliffChanged || stairsChanged, profChanged, usr)
+	BuildCustomRetroApply(D, dDens, dOpac, dRoof, matChanged || cliffChanged, cliffChanged || stairsChanged, profChanged, usr, layerChanged)
 
 mob/Mapper/verb/Custom_Adopt()
 	set category = "Mapper"
@@ -625,7 +705,7 @@ mob/Mapper/verb/Custom_Adopt()
 				continue
 			if(O2 != O && md5(O2.icon) != h)
 				continue
-			O2.custom_def = D.name
+			BuildCustomStamp(O2, D)
 			BuildCustomObjApplyDef(O2, D)
 			linked++
 		if(linked && glob && glob.LIGHTING)
@@ -665,7 +745,7 @@ mob/Mapper/verb/Custom_Adopt()
 				continue
 			if(T2 != T && md5(T2.icon) != h)
 				continue
-			T2.custom_def = D.name
+			BuildCustomStamp(T2, D)
 			T2.density = D.density
 			T2.opacity = D.opacity
 			T2.Roof = D.roof
@@ -694,6 +774,7 @@ mob/Admin3/verb/Delete_Custom_Def()
 		if(!D || !(D in customDefs))
 			return
 		customDefs -= D
+		customDefsByName = null
 		customDefIconCache = list()
 		BuildCustomSave()
 		if(buildPalette)
