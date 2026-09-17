@@ -810,6 +810,40 @@ var/global/list/foamPaintMap
 		T.overlays += img
 	T.edgeOverlays = fresh
 
+var/global/buildBootPassMark = 0
+
+/proc/BuildBootPassYield()
+	var/d = world.timeofday - buildBootPassMark
+	if(d < 0)
+		d += 864000
+	if(d < BUILD_BOOT_PUMP)
+		return 0
+	sleep(world.tick_lag)
+	buildBootPassMark = world.timeofday
+	return 1
+
+/proc/BuildEdgeQuietTile(turf/T)
+	if(istype(T, /turf/CustomTurf))
+		return 0
+	var/tp = T.type
+	var/st = T.SecondaryTurfType
+	var/th = ElevAt(T)
+	var/x = T.x
+	var/y = T.y
+	var/z = T.z
+	for(var/dy = -1 to 1)
+		for(var/dx = -1 to 1)
+			if(!dx && !dy)
+				continue
+			var/turf/O = locate(x + dx, y + dy, z)
+			if(!O || O.type != tp || O.SecondaryTurfType != st || O.EdgeOptOut || ElevAt(O) != th)
+				return 0
+	for(var/dy = -1 to 1)
+		for(var/dx = -1 to 1)
+			if(BuildEdgeObjOn(locate(x + dx, y + dy, z)))
+				return 0
+	return 1
+
 /proc/BuildEdgeUpdate(turf/T, doBlend = 1)
 	if(!T)
 		return
@@ -817,9 +851,9 @@ var/global/list/foamPaintMap
 		for(var/img in T.edgeOverlays)
 			T.overlays -= img
 	T.edgeOverlays = null
-	var/list/fresh = list()
-	if(T.EdgeOptOut)
+	if(T.EdgeOptOut || BuildEdgeQuietTile(T))
 		return
+	var/list/fresh = list()
 	var/obj/EO = BuildEdgeObjOn(T)
 	if(EO)
 		BuildLipCrawl(T, EO, fresh)
@@ -991,7 +1025,7 @@ var/global/list/foamPaintMap
 		fresh += FI
 	BuildEdgeApply(T, fresh)
 
-/proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1)
+/proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1, bootPump = 0)
 	var/list/seen = list()
 	var/n = 0
 	for(var/turf/T in turfs)
@@ -1004,11 +1038,13 @@ var/global/list/foamPaintMap
 				BuildEdgeUpdate(T2, doBlend)
 				n++
 				if(n % BUILD_COMMIT_CHUNK == 0)
-					sleep(-1)
+					if(!bootPump || !BuildBootPassYield())
+						sleep(-1)
 
 /proc/BuildEdgeBootPass()
 	set waitfor = FALSE
 	set background = TRUE
+	var/t0 = world.timeofday
 	var/list/all = list()
 	for(var/turf/T in Turfs)
 		all += T
@@ -1016,15 +1052,20 @@ var/global/list/foamPaintMap
 		all += T
 	if(!all.len)
 		return
-	BuildEdgeSmoothAround(all, 1)
+	buildBootPassMark = world.timeofday
+	BuildEdgeSmoothAround(all, 1, 1)
 	Log("Mapper", "Auto-edge boot pass smoothed around [all.len] registered turfs.", 1)
 	var/list/cliffs = list()
+	var/scanned = 0
 	for(var/turf/T in all)
+		if(++scanned % BUILD_COMMIT_CHUNK == 0)
+			BuildBootPassYield()
 		if(BuildIsCliffTurf(T))
 			cliffs += T
 	if(cliffs.len)
-		ElevVisualRefresh(cliffs)
+		ElevVisualRefresh(cliffs, 1)
 		Log("Mapper", "Cliff boot pass dressed [cliffs.len] placed cliff turfs.", 1)
+	world.log << "BOOT edge pass finished: [BootSeconds(t0)] s ([all.len] registered turfs, [cliffs.len] cliffs)"
 
 var/global/list/buildCliffPickerEntries
 
