@@ -227,7 +227,7 @@ turf/Enter(atom/movable/O, atom/oldloc)
 	ElevVisualRefresh(turfs)
 	BuildEdgeSmoothAround(turfs, 1)
 
-/proc/ElevVisualRefresh(list/turfs, bootPump = 0)
+/proc/ElevVisualRefresh(list/turfs)
 	if(!turfs || !turfs.len)
 		return
 	ElevCoverInvalidate(turfs)
@@ -240,8 +240,7 @@ turf/Enter(atom/movable/O, atom/oldloc)
 			M.UpdateStandingLayer()
 		n++
 		if(n % BUILD_COMMIT_CHUNK == 0)
-			if(!bootPump || !BuildBootPassYield())
-				sleep(-1)
+			sleep(-1)
 
 /proc/ElevExportSidecar(x1, y1, x2, y2, z, fname)
 	ElevMapLoad()
@@ -298,7 +297,6 @@ turf/Enter(atom/movable/O, atom/oldloc)
 /proc/ElevBootPass()
 	set waitfor = FALSE
 	set background = TRUE
-	var/t0 = world.timeofday
 	ElevMapLoad()
 	if(!elevMap.len)
 		return
@@ -310,40 +308,5 @@ turf/Enter(atom/movable/O, atom/oldloc)
 		var/turf/T = locate(text2num(c[1]), text2num(c[2]), text2num(c[3]))
 		if(T)
 			hit += T
-	if(!hit.len)
-		return
-	buildBootPassMark = world.timeofday
-	ElevVisualRefresh(hit, 1)
-	var/list/registered = list()
-	for(var/turf/R in Turfs)
-		registered[R] = 1
-	for(var/turf/R in CustomTurfs)
-		registered[R] = 1
-	var/list/seen = list()
-	var/n = 0
-	var/skipped = 0
-	for(var/turf/T in hit)
-		for(var/dx = -1 to 1)
-			for(var/dy = -1 to 1)
-				var/turf/T2 = locate(T.x + dx, T.y + dy, T.z)
-				if(!T2 || seen[T2])
-					continue
-				seen[T2] = 1
-				if(ElevEdgeCoveredAtBoot(T2, registered))
-					skipped++
-					continue
-				BuildEdgeUpdate(T2, 1)
-				n++
-				if(n % BUILD_COMMIT_CHUNK == 0)
-					if(!BuildBootPassYield())
-						sleep(-1)
+	ElevRefreshAround(hit)
 	Log("Mapper", "Elevation boot pass rebuilt around [hit.len] raised tiles.", 1)
-	world.log << "BOOT elevation pass finished: [BootSeconds(t0)] s ([hit.len] raised tiles, [n] edge updates, [skipped] already covered by the edge pass)"
-
-/proc/ElevEdgeCoveredAtBoot(turf/T, list/registered)
-	for(var/dx = -1 to 1)
-		for(var/dy = -1 to 1)
-			var/turf/R = locate(T.x + dx, T.y + dy, T.z)
-			if(R && registered[R])
-				return 1
-	return 0
