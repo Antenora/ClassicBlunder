@@ -110,21 +110,39 @@ mob/proc/CheckUnlock(race/_race)
 proc/BootWorld(var/blah)
 	switch(blah)
 		if("Load")
+			var/bootStart = world.timeofday
+			var/t = world.timeofday
 			BootFile("All","Load")
 			BuildAIDatabase()
 			BuildSquadDatabase()
 			BuildStudioBootRestore()
+			world.log << "BOOT globals + databases: [BootSeconds(t)] s"
+			t = world.timeofday
 			Load_Turfs()
 			Load_Custom_Turfs()
+			world.log << "BOOT turfs loaded: [BootSeconds(t)] s ([turfLoadCount] turfs, [customTurfLoadCount] custom)"
+			t = world.timeofday
 			Load_Objects()
+			world.log << "BOOT objects loaded: [BootSeconds(t)] s ([objectLoadCount] objects)"
+			sleep(world.tick_lag)
+			t = world.timeofday
 			BuildAreaPaintApplyBoot()
 			BuildZoneProfileApplyBoot()
+			world.log << "BOOT area paint + zones started: [BootSeconds(t)] s"
+			sleep(world.tick_lag)
+			t = world.timeofday
 			BuildJournalReplay()
 			ElevMapLoad()
+			world.log << "BOOT journal replay + elevation map: [BootSeconds(t)] s"
+			sleep(world.tick_lag)
 			BuildEdgeBootPass()
+			sleep(world.tick_lag)
 			ElevBootPass()
+			sleep(world.tick_lag)
+			t = world.timeofday
 			Load_Bodies()
 			LoadIRLNPCs()
+			world.log << "BOOT bodies + NPCs: [BootSeconds(t)] s"
 			spawn()
 				if(glob)
 					LoadMoonClock()
@@ -154,6 +172,7 @@ proc/BootWorld(var/blah)
 				global.travel_loop = new()
 				global.ai_tracker_loop = new()
 			WorldLoading=0
+			world.log << "BOOT load sequence reached WorldLoading=0 after [BootSeconds(bootStart)] s"
 			Reports("Load")
 			WorldSaveLock()
 			find_savableObjects()
@@ -163,13 +182,22 @@ proc/BootWorld(var/blah)
 			BootFile("All","Save")
 			Reports("Save")
 			WorldSaveBegin()
+			var/saveStart = world.timeofday
 			try
+				var/t = world.timeofday
 				find_savableObjects()
+				world.log << "SAVE object sweep: [BootSeconds(t)] s"
+				t = world.timeofday
 				Save_Turfs()
 				Save_Custom_Turfs()
+				world.log << "SAVE turfs: [BootSeconds(t)] s"
+				t = world.timeofday
 				Save_Bodies()
 				SaveIRLNPCs()
+				world.log << "SAVE bodies + NPCs: [BootSeconds(t)] s"
+				t = world.timeofday
 				Save_Objects()
+				world.log << "SAVE objects + area paint: [BootSeconds(t)] s (world save total [BootSeconds(saveStart)] s)"
 			catch(var/exception/e)
 				worldSaveRefused = 1
 				Log("Mapper", "World save runtime error: [e] on [e.file]:[e.line]; the build journal was kept.", 1)

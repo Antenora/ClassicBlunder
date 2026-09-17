@@ -1,8 +1,10 @@
 #define BUILD_CAT_ZONES "ZONES"
 #define BUILD_COMMIT_CHUNK 400
+#define BUILD_BOOT_PUMP 4
 #define AREA_PAINT_FILE "Saves/AreaPaint.txt"
 
 var/global/list/areaPaintMap
+var/global/areaPaintDirty = 0
 var/global/list/zoneDefs
 var/global/list/zoneDefsByName
 var/global/list/zoneDefsByUid
@@ -243,17 +245,18 @@ area/MapperZone/Entered(atom/movable/O, atom/oldloc)
 	return areaPaintMap
 
 /proc/BuildAreaPaintSave()
-	if(!areaPaintMap)
+	if(!areaPaintMap || !areaPaintDirty)
 		return
+	areaPaintDirty = 0
 	var/list/lines = list()
-	var/chunkCount = 0
 	for(var/k in areaPaintMap)
 		lines += "[k]\t[areaPaintMap[k]]"
-		if(++chunkCount % 5000 == 0)
-			sleep(world.tick_lag)
 	if(fexists(AREA_PAINT_FILE))
 		fdel(AREA_PAINT_FILE)
-	text2file(jointext(lines, "\n"), AREA_PAINT_FILE)
+	if(fexists(AREA_PAINT_FILE) || !text2file(jointext(lines, "\n"), AREA_PAINT_FILE))
+		areaPaintDirty = 1
+		worldSaveRefused = 1
+		Log("Mapper", "AREA PAINT SAVE FAILED: could not rewrite [AREA_PAINT_FILE]; it will be retried at the next save and the build journal was kept.", 1)
 
 /proc/BuildAreaExisting(path)
 	var/area/AR = locate(path)
@@ -495,6 +498,7 @@ mob/Mapper/verb/Zone_Settings()
 		if(BuildAreaSetId(T, newid))
 			moved++
 		areaPaintMap["[T.x],[T.y],[T.z]"] = newid
+		areaPaintDirty = 1
 	zoneDefs -= D
 	zoneDefsByName -= D.name
 	zoneDefsByUid -= D.uid
@@ -549,6 +553,7 @@ mob/Mapper/verb/Delete_Zone()
 /proc/BuildAreaPaintApplyBoot()
 	set waitfor = FALSE
 	set background = TRUE
+	var/t0 = world.timeofday
 	BuildZonesLoad()
 	BuildAreaPaintLoad()
 	if(!areaPaintMap.len)
@@ -567,6 +572,7 @@ mob/Mapper/verb/Delete_Zone()
 			applied++
 	if(applied)
 		Log("Mapper", "Area paint restored on [applied] tiles at boot.", 1)
+	world.log << "BOOT area paint pass finished: [BootSeconds(t0)] s ([applied] tiles)"
 
 /proc/BuildAreaFindLabel(id)
 	var/h = findtext(id, "#")
@@ -769,6 +775,7 @@ mob/Mapper/verb/Remove_Area()
 		if(BuildAreaSetId(T, "/area"))
 			moved++
 			areaPaintMap[k] = "/area"
+			areaPaintDirty = 1
 	BuildAreaPaintSave()
 	usr << "Moved [moved] tile[moved == 1 ? "" : "s"] of [label] to NO ZONE (base)."
 	Log("Mapper", "[usr] ([usr.ckey]) moved [moved] tiles of [label] to NO ZONE (base) with Remove Area.", 1)

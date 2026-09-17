@@ -108,6 +108,7 @@
 			if(BuildAreaSetId(T, f[5]))
 				applied++
 			areaPaintMap["[x],[y],[z]"] = f[5]
+			areaPaintDirty = 1
 			continue
 		var/tp = text2path(f[5])
 		if(!tp)
@@ -507,6 +508,7 @@
 			if(!BuildAreaSetId(T, newid))
 				continue
 			areaPaintMap["[T.x],[T.y],[T.z]"] = newid
+			areaPaintDirty = 1
 			A.areaRecs += list(list("x" = T.x, "y" = T.y, "z" = T.z, "oldArea" = oldid, "newArea" = newid))
 			x1 = min(x1, T.x)
 			y1 = min(y1, T.y)
@@ -664,6 +666,7 @@
 		var/turf/T = locate(rec["x"], rec["y"], rec["z"])
 		if(T && BuildAreaSetId(T, rec["oldArea"]))
 			areaPaintMap["[rec["x"]],[rec["y"]],[rec["z"]]"] = rec["oldArea"]
+			areaPaintDirty = 1
 	for(var/list/rec in A.createdObjs)
 		var/atom/movable/O = rec["obj"]
 		if(O)
@@ -712,6 +715,7 @@
 		var/turf/T = locate(rec["x"], rec["y"], rec["z"])
 		if(T && BuildAreaSetId(T, rec["newArea"]))
 			areaPaintMap["[rec["x"]],[rec["y"]],[rec["z"]]"] = rec["newArea"]
+			areaPaintDirty = 1
 	for(var/list/rec in A.createdObjs)
 		var/obj/O = BuildRestoreRec(rec)
 		if(O)
@@ -866,6 +870,7 @@
 
 /proc/BuildSaveWorldData()
 	WorldSaveBegin()
+	var/t0 = world.timeofday
 	try
 		find_savableObjects()
 		Save_Turfs(quiet = 1)
@@ -876,6 +881,7 @@
 		WorldSaveEnd()
 		throw e
 	WorldSaveEnd()
+	world.log << "SAVE map data (build mode or journal recovery): [BootSeconds(t0)] s"
 
 /proc/BuildSaveOrphan(who)
 	set waitfor = FALSE

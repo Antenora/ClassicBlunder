@@ -16,6 +16,12 @@ var/worldObjectLoading = 0
 var/savefile/_objTwinBuffer
 var/regex/_objTwinStrip
 
+proc/BootSeconds(t0)
+	var/d = world.timeofday - t0
+	if(d < 0)
+		d += 864000
+	return round(d) / 10
+
 proc/ObjectSaveSafe()
 	if(fexists("Saves/Itemsave/File1") && objectLoadState != 2)
 		worldSaveRefused = 1
@@ -350,10 +356,7 @@ proc/Save_Custom_Turfs(quiet = 0)
 	var/list/EdgeOpt=list()
 	var/list/Defs=list()
 	var/list/turfSnapshot = CustomTurfs.Copy()
-	var/chunkCount = 0
 	for(var/turf/CustomTurf/A in turfSnapshot)
-		if(++chunkCount % 1000 == 0)
-			sleep(world.tick_lag)
 		if(A)
 			Types+=A.type
 			Healths+="[num2text(round(A.Health),100)]"
@@ -453,7 +456,6 @@ proc/Load_Custom_Turfs()
 		var/E=1
 		while(fexists("Saves/Map/CustomTurfs[E]"))
 			var/savefile/F=new("Saves/Map/CustomTurfs[E]")
-			sleep(1)
 			var/list/Types=F["Types"]
 			var/list/Healths=F["Healths"]
 			var/list/Levels=F["Levels"]
@@ -497,7 +499,7 @@ proc/Load_Custom_Turfs()
 				for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
 				if(Amount % 5000 == 0)
-					sleep(1)
+					sleep(world.tick_lag)
 			E ++
 		customTurfLoadCount = DebugAmount
 		customTurfLoadState = 2
@@ -529,10 +531,7 @@ proc/Save_Turfs(quiet = 0)
 
 
 	var/list/turfSnapshot = Turfs.Copy()
-	var/chunkCount = 0
 	for(var/turf/A in turfSnapshot)
-		if(++chunkCount % 1000 == 0)
-			sleep(world.tick_lag)
 		if(A)
 			Types+=A.type
 			Healths+="[num2text(round(A.Health),100)]"
@@ -609,7 +608,6 @@ proc/Load_Turfs()
 		var/E=1
 		while(fexists("Saves/Map/File[E]"))
 			var/savefile/F=new("Saves/Map/File[E]")
-			sleep(1)
 			var/list/Types=F["Types"]
 			var/list/Healths=F["Healths"]
 			var/list/Levels=F["Levels"]
@@ -642,7 +640,7 @@ proc/Load_Turfs()
 				for(var/obj/Turfs/B in T) if(!B.Builder) del(B)
 
 				if(Amount % 5000 == 0)
-					sleep(1)
+					sleep(world.tick_lag)
 			E ++
 		turfLoadCount = DebugAmount
 		turfLoadState = 2
