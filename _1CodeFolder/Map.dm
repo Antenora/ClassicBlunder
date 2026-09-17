@@ -4159,7 +4159,7 @@ obj/Special
 		var/gotoX
 		var/gotoY
 		var/gotoZ
-		var/obj/Special/Teleporter2/AssociatedWarper
+		var/tmp/obj/Special/Teleporter2/AssociatedWarper
 		var/SeaTransport //Across water
 		var/UndergroundTransport //underground / under sea
 		var/SkyTransport //into sky

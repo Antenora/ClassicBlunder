@@ -1,5 +1,4 @@
 #define BUILD_MERGE_CAP 300
-#define BUILD_JOURNAL "Saves/BuildJournal.txt"
 
 /proc/BuildJournalIconPath(ic)
 	if(!ic || !isfile(ic))
@@ -22,9 +21,9 @@
 /proc/BuildJournalObjLine(atom/movable/O, x, y, z, remove)
 	if(!O)
 		return ""
-	if(remove)
-		return jointext(list("OD", "[x]", "[y]", "[z]", "[O.type]", BuildDmmEscape("[O.icon_state]")), "\t")
 	var/obj/OB = O
+	if(remove)
+		return jointext(list("OD", "[x]", "[y]", "[z]", "[O.type]", BuildJournalIconPath(O.icon), BuildDmmEscape("[O.icon_state]"), "[O.dir]", "[OB.pixel_x]", "[OB.pixel_y]", "[OB.layer]", BuildDmmEscape("[istype(O, /obj/Turfs/CustomObj1) ? O:custom_def : ""]")), "\t")
 	return jointext(list("OC", "[x]", "[y]", "[z]", "[O.type]", BuildJournalIconPath(O.icon), BuildDmmEscape("[O.icon_state]"), "[O.dir]", "[OB.pixel_x]", "[OB.pixel_y]", "[OB.layer]", "[O.density]", "[O.opacity]", "[OB.Grabbable]", BuildDmmEscape("[OB.Builder || ""]"), BuildDmmEscape("[istype(O, /obj/Turfs/CustomObj1) ? O:custom_def : ""]")), "\t")
 
 /proc/BuildJournalAction(datum/build_action/A, revert = 0)
@@ -58,17 +57,37 @@
 		return
 	text2file(jointext(lines, "\n"), BUILD_JOURNAL)
 
+/proc/BuildJournalObjAt(turf/T, tp, iconPath, st, dv, px, py, def)
+	for(var/obj/X in T)
+		if(X.type != tp || X.gfx_transient_visual)
+			continue
+		if("[X.icon_state]" != "[st]" || X.dir != dv || X.pixel_x != px || X.pixel_y != py)
+			continue
+		if(length(iconPath) && "[X.icon]" != iconPath)
+			continue
+		if(istype(X, /obj/Turfs/CustomObj1) && "[X:custom_def]" != "[def]")
+			continue
+		return X
+	return null
+
 /proc/BuildJournalReplay()
-	set waitfor = FALSE
 	set background = TRUE
-	if(!fexists(BUILD_JOURNAL))
-		return
-	var/t = file2text(BUILD_JOURNAL)
-	if(!t || !length(t))
-		fdel(BUILD_JOURNAL)
+	var/t = ""
+	for(var/path in list(BUILD_JOURNAL_SAVING, BUILD_JOURNAL))
+		if(fexists(path))
+			var/part = file2text(path)
+			if(length(part))
+				t += "[part]\n"
+	t = replacetext(t, ascii2text(13), "")
+	if(!length(trimtext(t)))
+		if(fexists(BUILD_JOURNAL))
+			fdel(BUILD_JOURNAL)
+		if(fexists(BUILD_JOURNAL_SAVING))
+			fdel(BUILD_JOURNAL_SAVING)
 		return
 	var/applied = 0
 	var/skipped = 0
+	var/present = 0
 	var/n = 0
 	for(var/line in splittext(t, "\n"))
 		var/list/f = splittext(line, "\t")
@@ -125,6 +144,9 @@
 			LightingRecomputeNear(NT)
 			applied++
 		else if(f[1] == "OC" && f.len >= 15)
+			if(BuildJournalObjAt(T, tp, f[6], BuildDmmUnescape(f[7]), text2num(f[8]) || SOUTH, text2num(f[9]) || 0, text2num(f[10]) || 0, (f.len >= 16) ? BuildDmmUnescape(f[16]) : ""))
+				present++
+				continue
 			var/obj/O = new tp(T)
 			if(length(f[6]) && fexists(f[6]))
 				O.icon = file(f[6])
@@ -146,14 +168,18 @@
 			GfxRefreshStructureMetadata(O)
 			applied++
 		else if(f[1] == "OD")
-			var/st = BuildDmmUnescape(f[6])
-			for(var/obj/O2 in T)
-				if(O2.type == tp && (!length(st) || O2.icon_state == st))
-					if(O2 in worldObjectList)
-						worldObjectList -= O2
-					O2.loc = null
-					applied++
-					break
+			var/obj/O2
+			if(f.len >= 12)
+				O2 = BuildJournalObjAt(T, tp, f[6], BuildDmmUnescape(f[7]), text2num(f[8]) || SOUTH, text2num(f[9]) || 0, text2num(f[10]) || 0, BuildDmmUnescape(f[12]))
+			else
+				var/st = BuildDmmUnescape(f[6])
+				for(var/obj/X in T)
+					if(X.type == tp && (!length(st) || X.icon_state == st))
+						O2 = X
+						break
+			if(O2)
+				ReleaseProp(O2)
+				applied++
 	var/list/touched = list()
 	for(var/line in splittext(t, "\n"))
 		var/list/f = splittext(line, "\t")
@@ -163,11 +189,9 @@
 				touched += TT
 	if(touched.len)
 		BuildEdgeSmoothAround(touched, 1)
-	Log("Mapper", "Build journal replayed after unclean shutdown: [applied] entries applied, [skipped] skipped.", 1)
+	Log("Mapper", "Build journal replayed after unclean shutdown: [applied] entries applied, [present] objects already saved, [skipped] skipped.", 1)
 	world << "<small>Server: recovered [applied] unsaved build edits from the journal."
 	BuildSaveWorldData()
-	if(fexists(BUILD_JOURNAL))
-		fdel(BUILD_JOURNAL)
 
 /datum/build_action
 	var
@@ -187,8 +211,10 @@
 
 /proc/BuildRestoreRec(list/rec)
 	var/atom/movable/O = rec["obj"]
-	if(O)
-		O.loc = locate(rec["x"], rec["y"], rec["z"])
+	if(!O)
+		return null
+	O.loc = locate(rec["x"], rec["y"], rec["z"])
+	return O
 
 /proc/BuildUntrackTurf(turf/T)
 	if(!T || !T.Builder)
@@ -348,7 +374,9 @@
 			Turfs += old
 	rec["newRef"] = null
 	for(var/list/krec in rec["killed"])
-		BuildRestoreRec(krec)
+		var/obj/KO = BuildRestoreRec(krec)
+		if(KO && !(KO in worldObjectList))
+			worldObjectList += KO
 	LightingRecomputeNear(old)
 	if(!isnull(rec["oldElev"]) && rec["oldElev"] != rec["newElev"])
 		ElevSet(old, rec["oldElev"])
@@ -393,6 +421,9 @@
 	if(M.MakeUngrabbable)
 		O.Grabbable = 0
 	GfxRefreshStructureMetadata(O)
+	if(ObjPlacementTwin(O))
+		ReleaseProp(O)
+		return null
 	A.createdObjs += list(list("obj" = O, "x" = T.x, "y" = T.y, "z" = T.z))
 	return O
 
@@ -523,8 +554,8 @@
 				did++
 				continue
 			if(isObj)
-				BuildPlaceObj(C, T, A, B)
-				did++
+				if(BuildPlaceObj(C, T, A, B))
+					did++
 				continue
 			var/list/rec = BuildCaptureTurf(T)
 			rec["killed"] = list()
@@ -640,8 +671,7 @@
 				worldObjectList -= O
 			O.loc = null
 	for(var/list/rec in A.deletedObjs)
-		BuildRestoreRec(rec)
-		var/obj/O = rec["obj"]
+		var/obj/O = BuildRestoreRec(rec)
 		if(O)
 			worldObjectList += O
 	var/list/touched = list()
@@ -683,8 +713,7 @@
 		if(T && BuildAreaSetId(T, rec["newArea"]))
 			areaPaintMap["[rec["x"]],[rec["y"]],[rec["z"]]"] = rec["newArea"]
 	for(var/list/rec in A.createdObjs)
-		BuildRestoreRec(rec)
-		var/obj/O = rec["obj"]
+		var/obj/O = BuildRestoreRec(rec)
 		if(O)
 			worldObjectList += O
 	for(var/list/rec in A.deletedObjs)
@@ -791,6 +820,9 @@
 			O:custom_def = rec["def"] || ""
 			BuildCustomObjApplyDef(O)
 		GfxRefreshStructureMetadata(O)
+		if(ObjPlacementTwin(O))
+			ReleaseProp(O)
+			continue
 		A.createdObjs += list(list("obj" = O, "x" = TT.x, "y" = TT.y, "z" = TT.z))
 		A.count++
 	if(!A.count)
@@ -833,12 +865,17 @@
 	A.areaRecs = list()
 
 /proc/BuildSaveWorldData()
-	WorldSaveLock()
-	find_savableObjects()
-	Save_Turfs(quiet = 1)
-	Save_Custom_Turfs(quiet = 1)
-	Save_Objects(quiet = 1)
-	worldSaveBusy = 0
+	WorldSaveBegin()
+	try
+		find_savableObjects()
+		Save_Turfs(quiet = 1)
+		Save_Custom_Turfs(quiet = 1)
+		Save_Objects(quiet = 1)
+	catch(var/exception/e)
+		worldSaveRefused = 1
+		WorldSaveEnd()
+		throw e
+	WorldSaveEnd()
 
 /proc/BuildSaveOrphan(who)
 	set waitfor = FALSE

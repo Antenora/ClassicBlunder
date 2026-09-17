@@ -1,24 +1,249 @@
+#define BUILD_JOURNAL "Saves/BuildJournal.txt"
+#define BUILD_JOURNAL_SAVING "Saves/BuildJournal.saving.txt"
+#define OBJECT_SAVE_CHUNK 100
+
 var/list/worldObjectList = list()
 var/worldSaveBusy = 0
+var/worldSaveRefused = 0
 var/turfLoadState = 0
 var/turfLoadCount = 0
 var/customTurfLoadState = 0
 var/customTurfLoadCount = 0
+var/objectLoadState = 0
+var/objectLoadCount = 0
+var/objectSaveJournalCut = 0
+var/worldObjectLoading = 0
+var/savefile/_objTwinBuffer
+var/regex/_objTwinStrip
+
+proc/ObjectSaveSafe()
+	if(fexists("Saves/Itemsave/File1") && objectLoadState != 2)
+		worldSaveRefused = 1
+		if(objectLoadState == 3)
+			Log("Mapper", "OBJECT SAVE REFUSED: the object load reported problems this boot (see the Object load lines above). Saving now could make them permanent.", 1)
+			world << "<small><font color=red>Server: object save SKIPPED - the object load reported problems this boot. Tell an admin before anyone saves.</font>"
+		else
+			Log("Mapper", "OBJECT SAVE REFUSED: the object save on disk never finished loading this boot (state [objectLoadState]). Saving now would overwrite it.", 1)
+			world << "<small><font color=red>Server: object save SKIPPED - the saved objects never finished loading this boot. Tell an admin before anyone saves.</font>"
+		return 0
+	return 1
+
+proc/ObjectSaveFailed(reason)
+	worldSaveRefused = 1
+	Log("Mapper", "OBJECT SAVE FAILED: [reason].", 1)
+	world << "<small><font color=red>Server: object save FAILED - [reason]. Tell an admin before anyone saves again.</font>"
+
+proc/ObjectCommitMark(files)
+	if(fexists("Saves/Itemsave/Commit"))
+		fdel("Saves/Itemsave/Commit")
+	text2file("[files]", "Saves/Itemsave/Commit")
+
+proc/ObjectSaveCommit(files)
+	for(var/i = 1 to files)
+		if(fexists("Saves/Itemsave/Stage[i]"))
+			if(!fcopy("Saves/Itemsave/Stage[i]", "Saves/Itemsave/File[i]"))
+				return 0
+			fdel("Saves/Itemsave/Stage[i]")
+	var/cleanup_file = files + 1
+	while(fexists("Saves/Itemsave/File[cleanup_file]"))
+		fdel("Saves/Itemsave/File[cleanup_file]")
+		cleanup_file++
+	fdel("Saves/Itemsave/Commit")
+	return 1
+
+proc/ObjectSaveRecover()
+	if(!fexists("Saves/Itemsave/Commit"))
+		return 1
+	var/n = text2num(trimtext(file2text("Saves/Itemsave/Commit")))
+	if(!isnum(n) || n < 0)
+		fdel("Saves/Itemsave/Commit")
+		return 1
+	Log("Mapper", "Object save: finishing an interrupted commit of [n] file\s.", 1)
+	return ObjectSaveCommit(n)
+
+proc/ObjOnSwapMap(atom/A)
+	if(!A || !swapmaps_loaded || A.z <= swapmaps_compiled_maxz)
+		return 0
+	for(var/swapmap/M in swapmaps_loaded)
+		if(A.z >= M.z1 && A.z <= M.z2)
+			return 1
+	return 0
+
+proc/ObjectSaveSnapshot()
+	var/list/chunks = list()
+	var/list/written = list()
+	var/list/Types = list()
+	for(var/obj/A in global.worldObjectList)
+		if(written[A] || !A.Savable || A.gfx_transient_visual || !isturf(A.loc) || ObjOnSwapMap(A))
+			continue
+		written[A] = 1
+		A.Saved_X = A.x
+		A.Saved_Y = A.y
+		A.Saved_Z = A.z
+		Types += A
+		if(Types.len >= OBJECT_SAVE_CHUNK)
+			chunks += list(Types)
+			Types = list()
+	if(Types.len)
+		chunks += list(Types)
+	objectSaveJournalCut = fexists(BUILD_JOURNAL) ? length(file2text(BUILD_JOURNAL)) : 0
+	return chunks
+
+proc/BuildJournalStripObjectLines(t)
+	var/list/keep = list()
+	for(var/line in splittext(replacetext("[t]", ascii2text(13), ""), "\n"))
+		if(!length(trimtext(line)) || findtext(line, "OC\t") == 1 || findtext(line, "OD\t") == 1)
+			continue
+		keep += line
+	return keep.len ? jointext(keep, "\n") + "\n" : ""
+
+proc/BuildJournalDropObjectLines()
+	if(worldSaveRefused && fexists(BUILD_JOURNAL_SAVING))
+		var/held = BuildJournalStripObjectLines(file2text(BUILD_JOURNAL_SAVING))
+		fdel(BUILD_JOURNAL_SAVING)
+		if(length(held))
+			text2file(held, BUILD_JOURNAL_SAVING)
+	if(objectSaveJournalCut > 0 && fexists(BUILD_JOURNAL))
+		var/t = file2text(BUILD_JOURNAL)
+		var/rawHead = copytext(t, 1, objectSaveJournalCut + 1)
+		if(findtext(rawHead, "OC\t") || findtext(rawHead, "OD\t"))
+			var/head = BuildJournalStripObjectLines(rawHead)
+			var/tail = copytext(t, objectSaveJournalCut + 1)
+			fdel(BUILD_JOURNAL)
+			if(length(head) || length(trimtext(tail)))
+				text2file("[head][tail]", BUILD_JOURNAL)
+	objectSaveJournalCut = 0
+
+proc/ObjTwinDedupable(obj/O)
+	return O && !istype(O, /obj/Items) && !istype(O, /obj/Money)
+
+proc/ObjIconSame(a, b)
+	if(a == b)
+		return 1
+	if(!a || !b)
+		return 0
+	if(!_objTwinBuffer)
+		_objTwinBuffer = new
+	_objTwinBuffer["i"] << a
+	var/ta = _objTwinBuffer.ExportText("i")
+	_objTwinBuffer["i"] << b
+	var/tb = _objTwinBuffer.ExportText("i")
+	_objTwinBuffer.dir.Remove("i")
+	return ta == tb
+
+proc/ObjTwinSignature(obj/O)
+	if(!O)
+		return ""
+	if(!_objTwinBuffer)
+		_objTwinBuffer = new
+	if(!_objTwinStrip)
+		_objTwinStrip = regex(@"(^|\n)\s*(transform|appearance_flags|Saved_X|Saved_Y|Saved_Z) = [^\n]*", "g")
+	_objTwinBuffer["o"] << O
+	var/t = _objTwinBuffer.ExportText("o")
+	_objTwinBuffer.dir.Remove("o")
+	return md5(_objTwinStrip.Replace(t, ""))
+
+proc/ObjTwinOnTurf(obj/O, turf/T, list/sigCache)
+	if(!O || !T)
+		return null
+	var/sig
+	for(var/obj/X in T)
+		if(X == O || X.type != O.type || X.gfx_transient_visual)
+			continue
+		if(X.icon != O.icon || X.icon_state != O.icon_state || X.dir != O.dir || X.pixel_x != O.pixel_x || X.pixel_y != O.pixel_y || X.layer != O.layer)
+			continue
+		if(istype(O, /obj/Turfs/CustomObj1) && X:custom_def != O:custom_def)
+			continue
+		if(!sig)
+			sig = ObjTwinSignature(O)
+		var/xs = sigCache ? sigCache[X] : null
+		if(!xs)
+			xs = ObjTwinSignature(X)
+			if(sigCache)
+				sigCache[X] = xs
+		if(xs == sig)
+			return X
+	if(sig && sigCache)
+		sigCache[O] = sig
+	return null
+
+proc/ObjPlacementTwin(obj/O)
+	var/turf/T = O?.loc
+	if(!isturf(T))
+		return null
+	if(O.sp_recolor)
+		SurfaceApply(O)
+	for(var/obj/X in T)
+		if(X == O || X.type != O.type || X.gfx_transient_visual)
+			continue
+		if(X.icon_state != O.icon_state || X.dir != O.dir)
+			continue
+		if(X.pixel_x != O.pixel_x || X.pixel_y != O.pixel_y || X.layer != O.layer)
+			continue
+		if(X.density != O.density || X.opacity != O.opacity || X.name != O.name || X.desc != O.desc || X.color != O.color || X.alpha != O.alpha)
+			continue
+		if(istype(O, /obj/Turfs/CustomObj1) && X:custom_def != O:custom_def)
+			continue
+		if(istype(O, /obj/Special/Teleporter2) && (X:gotoX != O:gotoX || X:gotoY != O:gotoY || X:gotoZ != O:gotoZ))
+			continue
+		if(!ObjIconSame(X.icon, O.icon))
+			continue
+		return X
+	return null
+
+proc/WorldObjectListPrune()
+	var/list/known = list()
+	var/list/keep = list()
+	for(var/obj/o in global.worldObjectList)
+		if(known[o] || !isturf(o.loc))
+			continue
+		known[o] = 1
+		keep += o
+	global.worldObjectList.Cut()
+	global.worldObjectList += keep
+	return known
+
+proc/WorldSaveBegin()
+	WorldSaveLock()
+	worldSaveRefused = 0
+	objectSaveJournalCut = 0
+	if(fexists(BUILD_JOURNAL))
+		var/t = file2text(BUILD_JOURNAL)
+		if(length(t))
+			text2file(t, BUILD_JOURNAL_SAVING)
+		fdel(BUILD_JOURNAL)
+
+proc/WorldSaveEnd()
+	if(fexists(BUILD_JOURNAL_SAVING))
+		if(!worldSaveRefused)
+			fdel(BUILD_JOURNAL_SAVING)
+		else
+			var/held = file2text(BUILD_JOURNAL_SAVING)
+			var/fresh = fexists(BUILD_JOURNAL) ? file2text(BUILD_JOURNAL) : ""
+			if(fexists(BUILD_JOURNAL))
+				fdel(BUILD_JOURNAL)
+			text2file("[held][fresh]", BUILD_JOURNAL)
+			fdel(BUILD_JOURNAL_SAVING)
+	worldSaveBusy = 0
 
 proc/MapSaveSafe()
 	if(fexists("Saves/Map/File1") && turfLoadState != 2)
+		worldSaveRefused = 1
 		Log("Mapper", "MAP SAVE REFUSED: the turf save on disk never finished loading this boot (state [turfLoadState]). Saving now would overwrite it with the compiled map.", 1)
 		world << "<small><font color=red>Server: map save SKIPPED - the saved turfs never finished loading this boot. Tell an admin before anyone saves.</font>"
 		return 0
 	if(turfLoadState == 2 && turfLoadCount > 0 && Turfs.len < turfLoadCount * 0.8)
+		worldSaveRefused = 1
 		Log("Mapper", "MAP SAVE REFUSED: [Turfs.len] turfs in memory but [turfLoadCount] were loaded from disk; refusing to overwrite the save.", 1)
 		world << "<small><font color=red>Server: map save SKIPPED - far fewer turfs in memory than were loaded from disk. Tell an admin before anyone saves.</font>"
 		return 0
 	if(fexists("Saves/Map/CustomTurfs1") && customTurfLoadState != 2)
+		worldSaveRefused = 1
 		Log("Mapper", "MAP SAVE REFUSED: the custom turf save on disk never finished loading this boot (state [customTurfLoadState]).", 1)
 		world << "<small><font color=red>Server: map save SKIPPED - the saved custom turfs never finished loading this boot. Tell an admin before anyone saves.</font>"
 		return 0
 	if(customTurfLoadState == 2 && customTurfLoadCount > 0 && CustomTurfs.len < customTurfLoadCount * 0.8)
+		worldSaveRefused = 1
 		Log("Mapper", "MAP SAVE REFUSED: [CustomTurfs.len] custom turfs in memory but [customTurfLoadCount] were loaded from disk; refusing to overwrite the save.", 1)
 		world << "<small><font color=red>Server: map save SKIPPED - far fewer custom turfs in memory than were loaded from disk. Tell an admin before anyone saves.</font>"
 		return 0
@@ -31,10 +256,9 @@ proc/WorldSaveLock()
 	worldSaveBusy = max(1, world.time)
 
 /mob/Admin4/verb/checkworldObjectList()
-	for(var/obj/x in worldObjectList)
-		if(x.Savable)
-			if(!x || !x.loc)
-				worldObjectList.Remove(x)
+	var/before = length(worldObjectList)
+	WorldObjectListPrune()
+	usr << "<small>Server: worldObjectList [before] -> [length(worldObjectList)] (dead, off-map and repeated entries removed)."
 
 /mob/Admin4/verb/DeduplicateTurfList()
 	set name = "Dedup Turfs List"
@@ -79,24 +303,24 @@ proc/WorldSaveLock()
 
 	var/turfs_after = length(global.Turfs)
 	var/customturfs_after = length(global.CustomTurfs)
+	if(turfLoadCount > 0)
+		turfLoadCount = max(0, turfLoadCount - (turfs_before - turfs_after))
+	if(customTurfLoadCount > 0)
+		customTurfLoadCount = max(0, customTurfLoadCount - (customturfs_before - customturfs_after))
 	usr << "<small>Server: Turfs:        [turfs_before] -> [turfs_after] (removed [turfs_before - turfs_after]; [turfs_nonturf] were non-turf entries)"
 	usr << "<small>Server: CustomTurfs:  [customturfs_before] -> [customturfs_after] (removed [customturfs_before - customturfs_after]; [customturfs_nonturf] were non-turf entries)"
 	usr << "<small>Server: Run a world save now."
 
 proc/find_savableObjects()
-	var/list/known = list()
-	for(var/o in global.worldObjectList)
-		if(o)
-			known[o] = 1
+	var/list/known = WorldObjectListPrune()
 	var/chunkCount = 0
 	for(var/obj/_object in world)
 		if(++chunkCount % 5000 == 0)
 			sleep(world.tick_lag)
-		if(!_object.z||_object.z==0) continue
-		if(known[_object]) continue
-		if(_object.Savable==1)
-			global.worldObjectList+=_object
-			known[_object] = 1
+		if(known[_object] || _object.Savable != 1 || _object.gfx_transient_visual || !isturf(_object.loc))
+			continue
+		global.worldObjectList += _object
+		known[_object] = 1
 
 proc/Save_Custom_Turfs(quiet = 0)
 	set background = 1
@@ -212,7 +436,8 @@ proc/Save_Custom_Turfs(quiet = 0)
 		F["EdgeOpt"]<<EdgeOpt
 		F["Defs"]<<Defs
 
-	var/cleanup_file = E + 1
+	F = null
+	var/cleanup_file = (Amount % 5000) ? E + 1 : E
 	while(fexists("Saves/Map/CustomTurfs[cleanup_file]"))
 		fdel("Saves/Map/CustomTurfs[cleanup_file]")
 		cleanup_file++
@@ -367,7 +592,8 @@ proc/Save_Turfs(quiet = 0)
 		F["EdgeOpt"]<<EdgeOpt
 
 
-	var/cleanup_file = E + 1
+	F = null
+	var/cleanup_file = (Amount % 5000) ? E + 1 : E
 	while(fexists("Saves/Map/File[cleanup_file]"))
 		fdel("Saves/Map/File[cleanup_file]")
 		cleanup_file++
@@ -743,6 +969,8 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 		if(istype(C, /obj/Turfs/CustomObj1))
 			BuildCustomObjApplyDef(C)
 		GfxRefreshStructureMetadata(C)
+		if(isobj(C) && ObjPlacementTwin(C))
+			ReleaseProp(C)
 
 obj/var
 	Saved_X
@@ -751,74 +979,134 @@ obj/var
 
 proc/Save_Objects(quiet = 0)
 	set background = 1
+	if(!ObjectSaveSafe())
+		return
+	if(!ObjectSaveRecover())
+		ObjectSaveFailed("an earlier interrupted object save could not be finished")
+		return
 	if(!quiet)
 		world<<"<small>Server: Saving Objects..."
-	var/Amount=0
-	var/E=1
-	var/savefile/F=new("Saves/Itemsave/File[E]")
-	var/list/Types=list()
-	var/list/Icons=list()
-	for(var/obj/A in global.worldObjectList.Copy())
-		if(!A)
-			world.log << "null entry"
-			continue
-		if(A.Savable&&A.z)
-			A.Saved_X=A.x
-			A.Saved_Y=A.y
-			A.Saved_Z=A.z
-			Types+=A
-			Icons+=A.icon
-			Amount+=1
-			if(Amount % 100 == 0)
-				F["Types"]<<Types
-				F["Icons"]<<Icons
-				E++
-				sleep(world.tick_lag)
-				F=new("Saves/Itemsave/File[E]")
-				Types=list()
-				Icons=list()
-	if(Amount % 100 != 0)
-		F["Types"]<<Types
-		F["Icons"]<<Icons
-	var/cleanup_file = E + 1
-	while(fexists("Saves/Itemsave/File[cleanup_file]"))
-		fdel("Saves/Itemsave/File[cleanup_file]")
-		world<<"<small>Server: Objects DEBUG system check: extra objects file ([cleanup_file]) deleted!"
-		cleanup_file++
+	var/stale = 1
+	while(fexists("Saves/Itemsave/Stage[stale]"))
+		fdel("Saves/Itemsave/Stage[stale]")
+		stale++
+	var/list/chunks = ObjectSaveSnapshot()
+	if(!islist(chunks))
+		ObjectSaveFailed("the object snapshot failed; nothing was committed")
+		return
+	var/files = 0
+	var/Amount = 0
+	for(var/list/Types in chunks)
+		files++
+		Amount += Types.len
+		SaveObjectChunk("Saves/Itemsave/Stage[files]", Types)
+		if(!fexists("Saves/Itemsave/Stage[files]") || length(file("Saves/Itemsave/Stage[files]")) <= 0)
+			ObjectSaveFailed("could not write Saves/Itemsave/Stage[files]; nothing was committed")
+			return
+		sleep(world.tick_lag)
+	ObjectCommitMark(files)
+	if(text2num(trimtext(file2text("Saves/Itemsave/Commit"))) != files)
+		ObjectSaveFailed("could not write the Saves/Itemsave/Commit marker; nothing was committed")
+		return
+	if(!ObjectSaveCommit(files))
+		ObjectSaveFailed("could not copy the staged files over Saves/Itemsave; the save will be finished at the next boot or save")
+		return
+	BuildJournalDropObjectLines()
 	if(!quiet)
 		world<<"<small>Server: Objects Saved ([Amount])."
 	BuildAreaPaintSave()
-	if(MapSaveSafe() && fexists("Saves/BuildJournal.txt"))
-		fdel("Saves/BuildJournal.txt")
+
+proc/SaveObjectChunk(path, list/Types)
+	var/savefile/F = new(path)
+	F["Types"] << Types
 
 proc/Load_Objects()
 	world<<"<small>Server: Loading Items..."
-	var/amount=0
-	var/filenum=0
-	wowza
-	filenum++
-	if(fexists("Saves/Itemsave/File[filenum]"))
-		var/savefile/F=new("Saves/Itemsave/File[filenum]")
-		var/list/L=list()
-		if(length(F["Types"]) < 1)
-			goto wowza
-		F["Types"]>>L
-		var/list/Icons
-		if(length(F["Icons"]) > 0)
-			F["Icons"]>>Icons
-		var/idx=0
-		for(var/A in L)
-			idx++
-			if(!A||!istype(A,/obj))
-				world.log << "[A] is null"
-				world.log << "[amount] index"
+	objectLoadState = 1
+	var/recoverFailed = !ObjectSaveRecover()
+	if(recoverFailed)
+		Log("Mapper", "Object load: an interrupted object save could not be finished; Itemsave may hold mixed save generations.", 1)
+		world << "<small><font color=red>Server: an interrupted object save could not be finished. Tell an admin before anyone saves.</font>"
+	worldObjectLoading = 1
+	var/amount = 0
+	var/read = 0
+	var/twins = 0
+	var/dropped = 0
+	var/offmap = 0
+	var/list/offmapZ = list()
+	var/unreadable = 0
+	var/list/unreadableFiles = list()
+	var/list/twinTypes = list()
+	var/list/sigCache = list()
+	var/list/customs = list()
+	var/list/warpers = list()
+	var/filenum = 1
+	while(fexists("Saves/Itemsave/File[filenum]"))
+		var/list/L = LoadObjectChunk("Saves/Itemsave/File[filenum]")
+		for(var/entry in L)
+			read++
+			if(!isobj(entry))
+				unreadable++
+				unreadableFiles["File[filenum]"] = 1
 				continue
-			var/obj/AObj=A
-			amount+=1
-			AObj.loc=locate(AObj.Saved_X,AObj.Saved_Y,AObj.Saved_Z)
-			if(Icons && idx <= length(Icons) && Icons[idx])
-				AObj.icon=Icons[idx]
+			var/obj/AObj = entry
+			if(!AObj.Savable || AObj.gfx_transient_visual)
+				dropped++
+				continue
+			var/turf/T = locate(AObj.Saved_X, AObj.Saved_Y, AObj.Saved_Z)
+			if(!T)
+				offmap++
+				offmapZ["z[AObj.Saved_Z]"] = (offmapZ["z[AObj.Saved_Z]"] || 0) + 1
+				continue
+			if(ObjTwinDedupable(AObj) && ObjTwinOnTurf(AObj, T, sigCache))
+				twins++
+				twinTypes["[AObj.type]"] = (twinTypes["[AObj.type]"] || 0) + 1
+				continue
+			AObj.loc = T
+			worldObjectList += AObj
+			amount++
 			if(istype(AObj, /obj/Turfs/CustomObj1))
-				BuildCustomObjApplyDef(AObj)
-		goto wowza
-	world<<"<small>Server: Items Loaded ([amount])."
+				customs += AObj
+			else if(istype(AObj, /obj/Special/Teleporter2))
+				warpers += AObj
+		filenum++
+	for(var/obj/Turfs/CustomObj1/CO in customs)
+		BuildCustomObjApplyDef(CO)
+	for(var/obj/Special/Teleporter2/W in warpers)
+		if(W.AssociatedWarper || isnull(W.gotoZ))
+			continue
+		var/turf/D = locate(W.gotoX, W.gotoY, W.gotoZ)
+		if(!D)
+			continue
+		for(var/obj/Special/Teleporter2/P in D)
+			if(P != W && P.Savable && !P.AssociatedWarper && P.gotoX == W.x && P.gotoY == W.y && P.gotoZ == W.z)
+				W.AssociatedWarper = P
+				P.AssociatedWarper = W
+				break
+	worldObjectLoading = 0
+	objectLoadCount = amount
+	var/suspect = recoverFailed || (offmap >= 50 && offmap * 5 > read)
+	objectLoadState = suspect ? 3 : 2
+	if(twins || dropped)
+		var/list/parts = list()
+		for(var/k in twinTypes)
+			parts += "[k] x[twinTypes[k]]"
+		Log("Mapper", "Object load: [amount] placed, [twins] exact duplicate copies removed[twins ? " ([jointext(parts, ", ")])" : ""], [dropped] non-persistent entries dropped.", 1)
+	if(unreadable || offmap)
+		var/list/names = list()
+		for(var/k in unreadableFiles)
+			names += k
+		var/list/zparts = list()
+		for(var/k in offmapZ)
+			zparts += "[k] x[offmapZ[k]]"
+		Log("Mapper", "Object load: [unreadable] saved entr[unreadable == 1 ? "y" : "ies"] could not be read[unreadable ? " ([jointext(names, ", ")])" : ""], [offmap] saved object\s point at a location that does not exist[offmap ? " ([jointext(zparts, ", ")]; world.maxz is [world.maxz])" : ""].", 1)
+		world << "<small><font color=red>Server: [unreadable + offmap] saved object\s could not be restored (see the Mapper log).</font>"
+	if(suspect)
+		world << "<small><font color=red>Server: object saving is disabled this boot to protect the object save. Tell an admin.</font>"
+	world<<"<small>Server: Items Loaded ([amount][twins ? ", [twins] duplicate copies removed" : ""])."
+
+proc/LoadObjectChunk(path)
+	var/savefile/F = new(path)
+	var/list/L
+	F["Types"] >> L
+	return islist(L) ? L : list()

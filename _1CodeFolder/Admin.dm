@@ -113,6 +113,9 @@ mob/Admin3/verb/LoadSwapMap()
 		world<<"we get past it all"
 		world<<"araki upscale"
 		sleep(10)
+		if(worldSaveBusy)
+			world << "<small>Server: waiting for the world save in progress to finish before restarting..."
+		WorldSaveLock()
 		world.Reboot()
 
 
@@ -2197,6 +2200,9 @@ mob/Admin3/verb
 			sleep(600)
 			world<<"we get past it all"
 			world<<"araki upscale"
+			if(worldSaveBusy)
+				world << "<small>Server: waiting for the world save in progress to finish before shutting down..."
+			WorldSaveLock()
 			shutdown()
 
 	SaveWorld()
@@ -2210,9 +2216,7 @@ mob/Admin3/verb
 	SaveTurfsObjs()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to save turf objects?")) return
-		find_savableObjects()
-		Save_Turfs()
-		Save_Objects()
+		BuildSaveWorldData()
 		Log("Admin","<font color=blue>[ExtractInfo(usr)] has saved turfs and objects in world.")
 	Set_Base()
 		set category="Admin"

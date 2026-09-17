@@ -243,6 +243,9 @@
 				if(istype(O, /obj/Turfs/CustomObj1))
 					BuildCustomObjApplyDef(O)
 				GfxRefreshStructureMetadata(O)
+				if(ObjPlacementTwin(O))
+					ReleaseProp(O)
+					continue
 				placedObjs++
 			if(areaEntry && areaEntry["path"] != /area)
 				var/aid = ""

@@ -6028,6 +6028,7 @@ mob
 			src.AutoHitter(0, 0, 0, 1, null, Z, TrgLoc)
 obj
 	AutoHitter
+		Savable=0
 		density=1//It has to be dense to properly register contact.
 		Destructable=0//Can't be explode
 		var
@@ -7662,6 +7663,9 @@ obj
 				Side//1 for left, 0 for right
 
 			New(var/obj/AutoHitter/AH, var/side, var/FromMob=0)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				src.Side=side
@@ -7745,6 +7749,9 @@ obj
 			var
 				Side//1 for left, 0 for right
 			New(var/obj/AutoHitter/AH, var/side)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				AlreadyHit = list()
@@ -7818,6 +7825,9 @@ obj
 			var
 				Side//1 for left, 2 for back, 0 for right.
 			New(var/obj/AutoHitter/AH, var/side)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				AlreadyHit = list()

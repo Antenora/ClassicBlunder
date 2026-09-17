@@ -456,6 +456,7 @@ proc/GfxRefreshStructureMetadata(atom/movable/A)
 		A.gfx_walk_elevation = max(A.gfx_walk_elevation, 1)
 		A.gfx_directional_response = max(A.gfx_directional_response, 0.4)
 	//wind belongs in this gate: foliage with ONLY a wind response never registered before
+	if(!get_turf(A)) return
 	if(A.casts_contact_shadow || A.gfx_emissive_strength > 0 || A.foreground_occluder || A.gfx_directional_response > 0 || A.gfx_wind_response > 0 || A.gfx_structure_role != GFX_STRUCTURE_NONE)
 		_gfx_material_atoms |= A
 		GfxMaterialBucketRegister(A)

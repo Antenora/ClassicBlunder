@@ -70,8 +70,8 @@ mob/Player
 						step_towards(src,Target)
 					else
 						return
-atom
-	var
+mob
+	var/tmp
 		list/Splits=list()
 mob/proc/SpawnHostileCopy(var/ClOwner, var/CloneHP=50, var/ClonePower=1, var/CloneTarget, var/CopySkills)
 	var/mob/Player/AI/FS=new

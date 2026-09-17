@@ -72,6 +72,9 @@ mob/proc/MovementSpeed()
 			return initialDelay
 	return Delay
 
+mob/var/tmp/MapperWalkLastTurf
+mob/var/tmp/MapperWalkLastBrush
+
 mob/Move()
 	if(src.Suspended || src.ActionLocked)
 		return
@@ -108,9 +111,15 @@ mob/Move()
 		src.Grab_Update()
 
 	if(MapperWalk&&!Knockback)
-		if(client?.bsession?.active && client.bsession.brush)
-			client.bsession.WalkPaint()
-		else if(Target&&istype(Target,/obj/Others/Build))
+		var/datum/build_session/WS = client?.bsession
+		if(WS?.active && WS.brush)
+			if(WS.tool == BUILD_PAINT && !WS.dragging && !WS.fillPending && !WS.busy && (loc!=MapperWalkLastTurf || WS.brush!=MapperWalkLastBrush))
+				MapperWalkLastTurf = loc
+				MapperWalkLastBrush = WS.brush
+				WS.WalkPaint()
+		else if(Target&&istype(Target,/obj/Others/Build) && (loc!=MapperWalkLastTurf || Target!=MapperWalkLastBrush))
+			MapperWalkLastTurf = loc
+			MapperWalkLastBrush = Target
 			Build_Lay(Target,src, 0, 0, 0)
 
 	if(AFKTimer==0)

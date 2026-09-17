@@ -1135,35 +1135,59 @@ alpha=[V.alpha] px=[V.pixel_x],[V.pixel_y] visflags=[V.vis_flags] xf=[V.transfor
 	set name = "Duplicate Scan"
 	var/list/stacks = list()
 	for(var/turf/G in view(10, usr))
-		var/list/seen = list()
+		var/list/byType = list()
 		for(var/obj/O in G)
-			if(!O.icon || O.gfx_transient_visual) continue
-			var/key = "[O.type]@[G.x],[G.y]"
-			seen[key] = (seen[key] || 0) + 1
-		for(var/key in seen)
-			if(seen[key] > 1) stacks[key] = seen[key]
+			if(!O.Savable || O.gfx_transient_visual || !ObjTwinDedupable(O)) continue
+			var/tk = "[O.type]:[O.icon]:[O.icon_state]:[O.dir]:[O.pixel_x],[O.pixel_y]:[O.layer]"
+			if(!byType[tk]) byType[tk] = list()
+			var/list/TL = byType[tk]
+			TL += O
+		for(var/tk in byType)
+			var/list/TL = byType[tk]
+			if(TL.len < 2) continue
+			var/list/seen = list()
+			for(var/obj/O in TL)
+				var/sig = ObjTwinSignature(O)
+				seen[sig] = (seen[sig] || 0) + 1
+			for(var/sig in seen)
+				if(seen[sig] > 1)
+					var/obj/F = TL[1]
+					stacks["[F.type]@[G.x],[G.y]"] = (stacks["[F.type]@[G.x],[G.y]"] || 0) + seen[sig] - 1
 	if(!stacks.len)
-		src << "No stacked same-type props within view(10)."
+		src << "No exact duplicate props within view(10). Same-type pieces that differ in icon, dir, layer, offsets or settings are separate pieces, not duplicates."
 		return
-	src << "<b>Stacked duplicates in view:</b>"
-	for(var/key in stacks) src << "  [key] x[stacks[key]]"
+	src << "<b>Exact duplicate copies in view:</b>"
+	for(var/key in stacks) src << "  [key] +[stacks[key]] extra"
 
 /mob/Admin2/verb/Duplicate_Purge()
 	set category = "Mapper"
 	set name = "Duplicate Purge"
-	var/list/keep = list()
-	var/list/doomed = list()
+	var/list/buckets = list()
 	for(var/obj/O in world)
-		if(!O.icon || O.gfx_transient_visual || !isturf(O.loc)) continue
-		var/key = "\ref[O.loc]:[O.type]:[O.icon_state]:[O.pixel_x],[O.pixel_y]"
-		if(keep[key]) doomed += O //an exact stacked twin - keep the first only
-		else keep[key] = 1
+		if(!O.Savable || O.gfx_transient_visual || !isturf(O.loc) || !ObjTwinDedupable(O)) continue
+		var/key = "\ref[O.loc]:[O.type]:[O.icon]:[O.icon_state]:[O.dir]:[O.pixel_x],[O.pixel_y]:[O.layer]"
+		var/B = buckets[key]
+		if(!B)
+			buckets[key] = O
+		else if(islist(B))
+			var/list/BL = B
+			BL += O
+		else
+			buckets[key] = list(B, O)
+	var/list/doomed = list()
+	for(var/key in buckets)
+		var/list/BL = buckets[key]
+		if(!islist(BL)) continue
+		var/list/seen = list()
+		for(var/obj/O in BL)
+			var/sig = ObjTwinSignature(O)
+			if(seen[sig]) doomed += O //an exact stacked twin - keep the first only
+			else seen[sig] = 1
 	for(var/obj/O in doomed)
-		LightPropDetach(O)
-		FxEmissiveDetach(O)
-		O.loc = null //refcount-free, never del
-	src << "Purged [doomed.len] stacked duplicate prop\s across the whole map (every z level). Save the map to make it stick."
-	Log("Admin", "[ExtractInfo(src)] purged [doomed.len] stacked duplicate props map-wide.")
+		O.Savable = 0
+		ReleaseProp(O) //refcount-free, never del
+	src << "Purged [doomed.len] exact duplicate prop\s across the whole map (every z level). Save the map to make it stick."
+	Log("Admin", "[ExtractInfo(src)] purged [doomed.len] exact duplicate props map-wide.")
 
 obj/Turfs/IconsXLBig
 	Icon72/surface_profile = "tree" //snow pine

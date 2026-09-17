@@ -232,6 +232,8 @@ mob/Mapper/verb/Build_Options()
 				usr << "Mapper Sight OFF."
 		else if(findtext(choice, "Mapper walk"))
 			usr.MapperWalk = !usr.MapperWalk
+			usr.MapperWalkLastTurf = null
+			usr.MapperWalkLastBrush = null
 			usr << "Mapper Walk [usr.MapperWalk ? "ON" : "OFF"]."
 		else if(findtext(choice, "Water walk"))
 			if(!usr.MapperWaterWalk)

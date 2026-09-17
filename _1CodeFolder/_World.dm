@@ -155,20 +155,25 @@ proc/BootWorld(var/blah)
 				global.ai_tracker_loop = new()
 			WorldLoading=0
 			Reports("Load")
+			WorldSaveLock()
 			find_savableObjects()
+			worldSaveBusy = 0
 
 		if("Save")
 			BootFile("All","Save")
 			Reports("Save")
-			WorldSaveLock()
-			find_savableObjects()
-
-			Save_Turfs()
-			Save_Custom_Turfs()
-			Save_Bodies()
-			SaveIRLNPCs()
-			Save_Objects()
-			worldSaveBusy = 0
+			WorldSaveBegin()
+			try
+				find_savableObjects()
+				Save_Turfs()
+				Save_Custom_Turfs()
+				Save_Bodies()
+				SaveIRLNPCs()
+				Save_Objects()
+			catch(var/exception/e)
+				worldSaveRefused = 1
+				Log("Mapper", "World save runtime error: [e] on [e.file]:[e.line]; the build journal was kept.", 1)
+			WorldSaveEnd()
 
 
 proc/BootFile(var/file,var/op)
