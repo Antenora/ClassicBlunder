@@ -22,10 +22,11 @@ proc/FarmDayFrac()
 	var/giantable = 0
 	var/mtype            // /obj/Items/Material/Crop path
 	var/gtype            // giant material path (if giantable)
+	var/canbuy = 1 // set to 0 if you can't buy it from a stall
 
 var/list/FarmCropDefs = list()   // id -> datum, registration order
 
-proc/LifeCropAdd(id, name, tier, base_days, multi, giantable)
+proc/LifeCropAdd(id, name, tier, base_days, multi, giantable, canbuy = 1)
 	var/datum/farm_crop/d = new
 	d.id = id
 	d.name = name
@@ -34,6 +35,7 @@ proc/LifeCropAdd(id, name, tier, base_days, multi, giantable)
 	d.multi = multi
 	d.giantable = giantable
 	d.mtype = text2path("/obj/Items/Material/Crop/[id]")
+	d.canbuy = canbuy
 	if(giantable) d.gtype = text2path("/obj/Items/Material/Crop/giant_[id]")
 	FarmCropDefs[id] = d
 
@@ -73,6 +75,7 @@ proc/RegisterFarmCrops()
 	LifeCropAdd("watermelon", "Watermelon", 5, 6, 0, 0)
 	LifeCropAdd("grapes", "Blue Grapes", 5, 6, 1, 0)
 	LifeCropAdd("artichoke", "Artichoke", 5, 6, 0, 0)
+	LifeCropAdd("senzu", "Senzu Bean", 6, 7, 0, 0, 0) // crafted with thaumaturgy
 
 // crop materials
 
@@ -111,6 +114,7 @@ proc/RegisterFarmCrops()
 /obj/Items/Material/Crop/watermelon { name = "Watermelon"; MaterialClass = "Watermelon"; icon_state = "watermelon"; tier = 5 }
 /obj/Items/Material/Crop/grapes { name = "Blue Grapes"; MaterialClass = "BlueGrapes"; icon_state = "grapes"; tier = 5 }
 /obj/Items/Material/Crop/artichoke { name = "Artichoke"; MaterialClass = "Artichoke"; icon_state = "artichoke"; tier = 5 }
+/obj/Items/Material/Crop/senzubean { name = "Senzu Bean"; MaterialClass = "SenzuBean"; icon_state = "artichoke"; tier = 5 }
 
 /obj/Items/Material/Crop/giant_cabbage { name = "Giant Cabbage"; MaterialClass = "GiantCabbage"; icon_state = "cabbage"; tier = 5 }
 /obj/Items/Material/Crop/giant_cucumber { name = "Giant Cucumber"; MaterialClass = "GiantCucumber"; icon_state = "cucumber"; tier = 5 }
@@ -382,18 +386,24 @@ mob/proc/HarvestPlot(obj/LifeSkills/FarmPlot/P)
 		amt *= 2
 		src << "<font color=#78eb78>A bumper crop!</font>"
 	if(o) amt = max(amt + 1, round(amt * o.mag / 10))   // mag 15/20/30 = x1.5/x2/x3
+	if(P.crop_id == "senzu") amt = rand(1, 3)
 	var/q = QUAL_NORMAL
 	if(prob(2 * rank)) q++
 	if(o && o.id == "mutant_growth") q++
 	q = min(q, LifeQualityCap(rank))
-	GiveMaterial(src, d.mtype, amt, q)
-	LifeLogFind("Farming", d.name)
-	src << "<font color=#78eb78>You harvest [amt]x [QualityName(q)] [d.name].</font>"
-	if(P.will_giant && d.gtype)
-		GiveMaterial(src, d.gtype, 1, min(QUAL_EPIC, LifeQualityCap(rank)))
-		LifeLogFind("Farming", "Giant [d.name]")
-		src << "<font color=#b46bff><b>You heave up a Giant [d.name]!</b></font>"
-	if(prob(30)) FarmGiveSeeds(P.crop_id, 1 + (prob(25) ? 1 : 0))
+	if(P.crop_id == "senzu")
+		for(var/i = 1, i <= amt, i++)
+			new /obj/Items/Edibles/Senzu(src)
+		src << "<font color=#78eb78>You harvest [amt]x [d.name].</font>"
+	else
+		GiveMaterial(src, d.mtype, amt, q)
+		LifeLogFind("Farming", d.name)
+		src << "<font color=#78eb78>You harvest [amt]x [QualityName(q)] [d.name].</font>"
+		if(P.will_giant && d.gtype)
+			GiveMaterial(src, d.gtype, 1, min(QUAL_EPIC, LifeQualityCap(rank)))
+			LifeLogFind("Farming", "Giant [d.name]")
+			src << "<font color=#b46bff><b>You heave up a Giant [d.name]!</b></font>"
+		if(prob(30)) FarmGiveSeeds(P.crop_id, 1 + (prob(25) ? 1 : 0))
 	AddLifeXP("Farming", LifeGatherXP("Farming", d.tier), 1.0)
 	P.harvests_left--
 	if(P.harvests_left > 0)
@@ -563,7 +573,10 @@ client/proc/RefreshFarmPanel()
 	FpText(0, 12, FP_W, 16, "<center><span style=\"[FP_FONT]; color:#8be9ff\">[farm_mode == "shop" ? "SEED STALL" : "PLANT A SEED"]</span></center>")
 	farm_rows = list()
 	if(farm_mode == "shop")
-		for(var/id in FarmCropDefs) farm_rows += id
+		for(var/id in FarmCropDefs)
+			var/datum/farm_crop/d = FarmCropDef(id)
+			if(!d || !d.canbuy) continue
+			farm_rows += id
 	else
 		for(var/id in FarmCropDefs)
 			if(M.FarmSeedCount(id) > 0) farm_rows += id
@@ -620,6 +633,7 @@ client/proc/FarmRowClick(id)
 		M << "<font color=#ff6464>You need Farming rank [LIFE_HUNT_DIFF(d.tier) - 1] for [d.name].</font>"
 		return
 	if(farm_mode == "shop")
+		if(!d.canbuy) return
 		var/price = FarmSeedPrice(d)
 		if(!M.HasMoney(price))
 			M << "<font color=#ff6464>You can't afford [d.name] seeds. ($[Commas(price)])</font>"
