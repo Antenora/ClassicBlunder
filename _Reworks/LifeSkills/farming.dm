@@ -73,6 +73,7 @@ proc/RegisterFarmCrops()
 	LifeCropAdd("watermelon", "Watermelon", 5, 6, 0, 0)
 	LifeCropAdd("grapes", "Blue Grapes", 5, 6, 1, 0)
 	LifeCropAdd("artichoke", "Artichoke", 5, 6, 0, 0)
+	LifeCropAdd("senzu", "Senzu Bean", 6, 7, 0, 0)
 
 // crop materials
 
@@ -111,6 +112,7 @@ proc/RegisterFarmCrops()
 /obj/Items/Material/Crop/watermelon { name = "Watermelon"; MaterialClass = "Watermelon"; icon_state = "watermelon"; tier = 5 }
 /obj/Items/Material/Crop/grapes { name = "Blue Grapes"; MaterialClass = "BlueGrapes"; icon_state = "grapes"; tier = 5 }
 /obj/Items/Material/Crop/artichoke { name = "Artichoke"; MaterialClass = "Artichoke"; icon_state = "artichoke"; tier = 5 }
+/obj/Items/Material/Crop/senzubean { name = "Senzu Bean"; MaterialClass = "SenzuBean"; icon_state = "artichoke"; tier = 5 }
 
 /obj/Items/Material/Crop/giant_cabbage { name = "Giant Cabbage"; MaterialClass = "GiantCabbage"; icon_state = "cabbage"; tier = 5 }
 /obj/Items/Material/Crop/giant_cucumber { name = "Giant Cucumber"; MaterialClass = "GiantCucumber"; icon_state = "cucumber"; tier = 5 }
@@ -382,11 +384,16 @@ mob/proc/HarvestPlot(obj/LifeSkills/FarmPlot/P)
 		amt *= 2
 		src << "<font color=#78eb78>A bumper crop!</font>"
 	if(o) amt = max(amt + 1, round(amt * o.mag / 10))   // mag 15/20/30 = x1.5/x2/x3
+	if(P.crop_id == "senzu") amt = rand(1, 3)
 	var/q = QUAL_NORMAL
 	if(prob(2 * rank)) q++
 	if(o && o.id == "mutant_growth") q++
 	q = min(q, LifeQualityCap(rank))
-	GiveMaterial(src, d.mtype, amt, q)
+	if(P.crop_id == "senzu")
+		for(var/i = 1, i <= amt, i++)
+			new /obj/Items/Edibles/Senzu(src)
+	else
+		GiveMaterial(src, d.mtype, amt, q)
 	LifeLogFind("Farming", d.name)
 	src << "<font color=#78eb78>You harvest [amt]x [QualityName(q)] [d.name].</font>"
 	if(P.will_giant && d.gtype)
