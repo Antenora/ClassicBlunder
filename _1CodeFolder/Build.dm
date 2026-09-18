@@ -25,19 +25,15 @@ proc/BootSeconds(t0)
 proc/ObjectSaveSafe()
 	if(fexists("Saves/Itemsave/File1") && objectLoadState != 2)
 		worldSaveRefused = 1
-		if(objectLoadState == 3)
-			Log("Mapper", "OBJECT SAVE REFUSED: the object load reported problems this boot (see the Object load lines above). Saving now could make them permanent.", 1)
-			world << "<small><font color=red>Server: object save SKIPPED - the object load reported problems this boot. Tell an admin before anyone saves.</font>"
-		else
-			Log("Mapper", "OBJECT SAVE REFUSED: the object save on disk never finished loading this boot (state [objectLoadState]). Saving now would overwrite it.", 1)
-			world << "<small><font color=red>Server: object save SKIPPED - the saved objects never finished loading this boot. Tell an admin before anyone saves.</font>"
+		Log("Mapper", "OBJECT SAVE REFUSED: the object save on disk never finished loading this boot (state [objectLoadState]). Saving now would overwrite it.", 1)
+		world << "<small><font color=red>Server: object save SKIPPED - the saved objects never finished loading this boot. Tell an admin before anyone saves.</font>"
 		return 0
 	return 1
 
 proc/ObjectSaveFailed(reason)
 	worldSaveRefused = 1
 	Log("Mapper", "OBJECT SAVE FAILED: [reason].", 1)
-	world << "<small><font color=red>Server: object save FAILED - [reason]. Tell an admin before anyone saves again.</font>"
+	world << "<small><font color=red>Server: object save FAILED - [reason]. Tell an admin.</font>"
 
 proc/ObjectCommitMark(files)
 	if(fexists("Saves/Itemsave/Commit"))
@@ -980,7 +976,7 @@ proc/Save_Objects(quiet = 0)
 	if(!ObjectSaveSafe())
 		return
 	if(!ObjectSaveRecover())
-		ObjectSaveFailed("an earlier interrupted object save could not be finished")
+		ObjectSaveFailed("an earlier interrupted object save could not be finished; its staged files were kept and the next save will retry")
 		return
 	if(!quiet)
 		world<<"<small>Server: Saving Objects..."
@@ -1021,13 +1017,11 @@ proc/SaveObjectChunk(path, list/Types)
 proc/Load_Objects()
 	world<<"<small>Server: Loading Items..."
 	objectLoadState = 1
-	var/recoverFailed = !ObjectSaveRecover()
-	if(recoverFailed)
-		Log("Mapper", "Object load: an interrupted object save could not be finished; Itemsave may hold mixed save generations.", 1)
-		world << "<small><font color=red>Server: an interrupted object save could not be finished. Tell an admin before anyone saves.</font>"
+	if(!ObjectSaveRecover())
+		Log("Mapper", "Object load: an interrupted object save could not be finished; its staged files were kept and the next object save will retry it.", 1)
+		world << "<small><font color=red>Server: an interrupted object save could not be finished; the next save will retry it. Tell an admin.</font>"
 	worldObjectLoading = 1
 	var/amount = 0
-	var/read = 0
 	var/twins = 0
 	var/dropped = 0
 	var/offmap = 0
@@ -1042,7 +1036,6 @@ proc/Load_Objects()
 	while(fexists("Saves/Itemsave/File[filenum]"))
 		var/list/L = LoadObjectChunk("Saves/Itemsave/File[filenum]")
 		for(var/entry in L)
-			read++
 			if(!isobj(entry))
 				unreadable++
 				unreadableFiles["File[filenum]"] = 1
@@ -1083,8 +1076,7 @@ proc/Load_Objects()
 				break
 	worldObjectLoading = 0
 	objectLoadCount = amount
-	var/suspect = recoverFailed || (offmap >= 50 && offmap * 5 > read)
-	objectLoadState = suspect ? 3 : 2
+	objectLoadState = 2
 	if(twins || dropped)
 		var/list/parts = list()
 		for(var/k in twinTypes)
@@ -1097,10 +1089,8 @@ proc/Load_Objects()
 		var/list/zparts = list()
 		for(var/k in offmapZ)
 			zparts += "[k] x[offmapZ[k]]"
-		Log("Mapper", "Object load: [unreadable] saved entr[unreadable == 1 ? "y" : "ies"] could not be read[unreadable ? " ([jointext(names, ", ")])" : ""], [offmap] saved object\s point at a location that does not exist[offmap ? " ([jointext(zparts, ", ")]; world.maxz is [world.maxz])" : ""].", 1)
+		Log("Mapper", "Object load: [unreadable] saved entr[unreadable == 1 ? "y" : "ies"] could not be read[unreadable ? " ([jointext(names, ", ")])" : ""], [offmap] saved object\s point outside this map and will be dropped at the next object save[offmap ? " ([jointext(zparts, ", ")]; the map is [world.maxx]x[world.maxy]x[world.maxz])" : ""].", 1)
 		world << "<small><font color=red>Server: [unreadable + offmap] saved object\s could not be restored (see the Mapper log).</font>"
-	if(suspect)
-		world << "<small><font color=red>Server: object saving is disabled this boot to protect the object save. Tell an admin.</font>"
 	world<<"<small>Server: Items Loaded ([amount][twins ? ", [twins] duplicate copies removed" : ""])."
 
 proc/LoadObjectChunk(path)

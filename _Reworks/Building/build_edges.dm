@@ -157,23 +157,7 @@ var/global/list/buildMaterialByType = list()
 		return p
 	return 50
 
-/proc/BuildEdgeCutMask(corner)
-	switch(corner)
-		if("nw")
-			return 'Mapping/EdgeMasks/cut_nw.png'
-		if("ne")
-			return 'Mapping/EdgeMasks/cut_ne.png'
-		if("sw")
-			return 'Mapping/EdgeMasks/cut_sw.png'
-	return 'Mapping/EdgeMasks/cut_se.png'
-
-/proc/BuildEdgeCutMask32(corner)
-	if(corner == "nw")
-		return 'Mapping/EdgeMasks/cut32_nw.png'
-	return 'Mapping/EdgeMasks/cut32_ne.png'
-
 var/global/list/buildEdgeStyles = list("Grass" = "wispy", "Dirt" = "crumbly", "Sand" = "soft", "Ice" = "soft", "Stone" = "jagged", "Wood" = "hard", "Water" = "crisp")
-var/global/list/buildEdgeMaskCache = list()
 
 /proc/BuildEdgeStyleFor(id)
 	if(!id)
@@ -183,288 +167,215 @@ var/global/list/buildEdgeMaskCache = list()
 		return s
 	return "wispy"
 
-var/global/list/buildEdgeMaskLits
+var/global/list/buildOrgSheets
 
-/proc/BuildEdgeMaskInit()
-	if(buildEdgeMaskLits)
+/proc/BuildOrgSheetInit()
+	if(buildOrgSheets)
 		return
-	buildEdgeMaskLits = list()
-	buildEdgeMaskLits["f_wispy_n"] = 'Mapping/EdgeMasks/f_wispy_n.png'
-	buildEdgeMaskLits["f_wispy_s"] = 'Mapping/EdgeMasks/f_wispy_s.png'
-	buildEdgeMaskLits["f_wispy_ns"] = 'Mapping/EdgeMasks/f_wispy_ns.png'
-	buildEdgeMaskLits["f_wispy_e"] = 'Mapping/EdgeMasks/f_wispy_e.png'
-	buildEdgeMaskLits["f_wispy_ne"] = 'Mapping/EdgeMasks/f_wispy_ne.png'
-	buildEdgeMaskLits["f_wispy_se"] = 'Mapping/EdgeMasks/f_wispy_se.png'
-	buildEdgeMaskLits["f_wispy_nse"] = 'Mapping/EdgeMasks/f_wispy_nse.png'
-	buildEdgeMaskLits["f_wispy_w"] = 'Mapping/EdgeMasks/f_wispy_w.png'
-	buildEdgeMaskLits["f_wispy_nw"] = 'Mapping/EdgeMasks/f_wispy_nw.png'
-	buildEdgeMaskLits["f_wispy_sw"] = 'Mapping/EdgeMasks/f_wispy_sw.png'
-	buildEdgeMaskLits["f_wispy_nsw"] = 'Mapping/EdgeMasks/f_wispy_nsw.png'
-	buildEdgeMaskLits["f_wispy_ew"] = 'Mapping/EdgeMasks/f_wispy_ew.png'
-	buildEdgeMaskLits["f_wispy_new"] = 'Mapping/EdgeMasks/f_wispy_new.png'
-	buildEdgeMaskLits["f_wispy_sew"] = 'Mapping/EdgeMasks/f_wispy_sew.png'
-	buildEdgeMaskLits["f_wispy_nsew"] = 'Mapping/EdgeMasks/f_wispy_nsew.png'
-	buildEdgeMaskLits["f_crumbly_n"] = 'Mapping/EdgeMasks/f_crumbly_n.png'
-	buildEdgeMaskLits["f_crumbly_s"] = 'Mapping/EdgeMasks/f_crumbly_s.png'
-	buildEdgeMaskLits["f_crumbly_ns"] = 'Mapping/EdgeMasks/f_crumbly_ns.png'
-	buildEdgeMaskLits["f_crumbly_e"] = 'Mapping/EdgeMasks/f_crumbly_e.png'
-	buildEdgeMaskLits["f_crumbly_ne"] = 'Mapping/EdgeMasks/f_crumbly_ne.png'
-	buildEdgeMaskLits["f_crumbly_se"] = 'Mapping/EdgeMasks/f_crumbly_se.png'
-	buildEdgeMaskLits["f_crumbly_nse"] = 'Mapping/EdgeMasks/f_crumbly_nse.png'
-	buildEdgeMaskLits["f_crumbly_w"] = 'Mapping/EdgeMasks/f_crumbly_w.png'
-	buildEdgeMaskLits["f_crumbly_nw"] = 'Mapping/EdgeMasks/f_crumbly_nw.png'
-	buildEdgeMaskLits["f_crumbly_sw"] = 'Mapping/EdgeMasks/f_crumbly_sw.png'
-	buildEdgeMaskLits["f_crumbly_nsw"] = 'Mapping/EdgeMasks/f_crumbly_nsw.png'
-	buildEdgeMaskLits["f_crumbly_ew"] = 'Mapping/EdgeMasks/f_crumbly_ew.png'
-	buildEdgeMaskLits["f_crumbly_new"] = 'Mapping/EdgeMasks/f_crumbly_new.png'
-	buildEdgeMaskLits["f_crumbly_sew"] = 'Mapping/EdgeMasks/f_crumbly_sew.png'
-	buildEdgeMaskLits["f_crumbly_nsew"] = 'Mapping/EdgeMasks/f_crumbly_nsew.png'
-	buildEdgeMaskLits["f_soft_n"] = 'Mapping/EdgeMasks/f_soft_n.png'
-	buildEdgeMaskLits["f_soft_s"] = 'Mapping/EdgeMasks/f_soft_s.png'
-	buildEdgeMaskLits["f_soft_ns"] = 'Mapping/EdgeMasks/f_soft_ns.png'
-	buildEdgeMaskLits["f_soft_e"] = 'Mapping/EdgeMasks/f_soft_e.png'
-	buildEdgeMaskLits["f_soft_ne"] = 'Mapping/EdgeMasks/f_soft_ne.png'
-	buildEdgeMaskLits["f_soft_se"] = 'Mapping/EdgeMasks/f_soft_se.png'
-	buildEdgeMaskLits["f_soft_nse"] = 'Mapping/EdgeMasks/f_soft_nse.png'
-	buildEdgeMaskLits["f_soft_w"] = 'Mapping/EdgeMasks/f_soft_w.png'
-	buildEdgeMaskLits["f_soft_nw"] = 'Mapping/EdgeMasks/f_soft_nw.png'
-	buildEdgeMaskLits["f_soft_sw"] = 'Mapping/EdgeMasks/f_soft_sw.png'
-	buildEdgeMaskLits["f_soft_nsw"] = 'Mapping/EdgeMasks/f_soft_nsw.png'
-	buildEdgeMaskLits["f_soft_ew"] = 'Mapping/EdgeMasks/f_soft_ew.png'
-	buildEdgeMaskLits["f_soft_new"] = 'Mapping/EdgeMasks/f_soft_new.png'
-	buildEdgeMaskLits["f_soft_sew"] = 'Mapping/EdgeMasks/f_soft_sew.png'
-	buildEdgeMaskLits["f_soft_nsew"] = 'Mapping/EdgeMasks/f_soft_nsew.png'
-	buildEdgeMaskLits["f_jagged_n"] = 'Mapping/EdgeMasks/f_jagged_n.png'
-	buildEdgeMaskLits["f_jagged_s"] = 'Mapping/EdgeMasks/f_jagged_s.png'
-	buildEdgeMaskLits["f_jagged_ns"] = 'Mapping/EdgeMasks/f_jagged_ns.png'
-	buildEdgeMaskLits["f_jagged_e"] = 'Mapping/EdgeMasks/f_jagged_e.png'
-	buildEdgeMaskLits["f_jagged_ne"] = 'Mapping/EdgeMasks/f_jagged_ne.png'
-	buildEdgeMaskLits["f_jagged_se"] = 'Mapping/EdgeMasks/f_jagged_se.png'
-	buildEdgeMaskLits["f_jagged_nse"] = 'Mapping/EdgeMasks/f_jagged_nse.png'
-	buildEdgeMaskLits["f_jagged_w"] = 'Mapping/EdgeMasks/f_jagged_w.png'
-	buildEdgeMaskLits["f_jagged_nw"] = 'Mapping/EdgeMasks/f_jagged_nw.png'
-	buildEdgeMaskLits["f_jagged_sw"] = 'Mapping/EdgeMasks/f_jagged_sw.png'
-	buildEdgeMaskLits["f_jagged_nsw"] = 'Mapping/EdgeMasks/f_jagged_nsw.png'
-	buildEdgeMaskLits["f_jagged_ew"] = 'Mapping/EdgeMasks/f_jagged_ew.png'
-	buildEdgeMaskLits["f_jagged_new"] = 'Mapping/EdgeMasks/f_jagged_new.png'
-	buildEdgeMaskLits["f_jagged_sew"] = 'Mapping/EdgeMasks/f_jagged_sew.png'
-	buildEdgeMaskLits["f_jagged_nsew"] = 'Mapping/EdgeMasks/f_jagged_nsew.png'
-	buildEdgeMaskLits["f_hard_n"] = 'Mapping/EdgeMasks/f_hard_n.png'
-	buildEdgeMaskLits["f_hard_s"] = 'Mapping/EdgeMasks/f_hard_s.png'
-	buildEdgeMaskLits["f_hard_ns"] = 'Mapping/EdgeMasks/f_hard_ns.png'
-	buildEdgeMaskLits["f_hard_e"] = 'Mapping/EdgeMasks/f_hard_e.png'
-	buildEdgeMaskLits["f_hard_ne"] = 'Mapping/EdgeMasks/f_hard_ne.png'
-	buildEdgeMaskLits["f_hard_se"] = 'Mapping/EdgeMasks/f_hard_se.png'
-	buildEdgeMaskLits["f_hard_nse"] = 'Mapping/EdgeMasks/f_hard_nse.png'
-	buildEdgeMaskLits["f_hard_w"] = 'Mapping/EdgeMasks/f_hard_w.png'
-	buildEdgeMaskLits["f_hard_nw"] = 'Mapping/EdgeMasks/f_hard_nw.png'
-	buildEdgeMaskLits["f_hard_sw"] = 'Mapping/EdgeMasks/f_hard_sw.png'
-	buildEdgeMaskLits["f_hard_nsw"] = 'Mapping/EdgeMasks/f_hard_nsw.png'
-	buildEdgeMaskLits["f_hard_ew"] = 'Mapping/EdgeMasks/f_hard_ew.png'
-	buildEdgeMaskLits["f_hard_new"] = 'Mapping/EdgeMasks/f_hard_new.png'
-	buildEdgeMaskLits["f_hard_sew"] = 'Mapping/EdgeMasks/f_hard_sew.png'
-	buildEdgeMaskLits["f_hard_nsew"] = 'Mapping/EdgeMasks/f_hard_nsew.png'
-	buildEdgeMaskLits["fw_wispy_n"] = 'Mapping/EdgeMasks/fw_wispy_n.png'
-	buildEdgeMaskLits["fw_wispy_s"] = 'Mapping/EdgeMasks/fw_wispy_s.png'
-	buildEdgeMaskLits["fw_wispy_ns"] = 'Mapping/EdgeMasks/fw_wispy_ns.png'
-	buildEdgeMaskLits["fw_wispy_e"] = 'Mapping/EdgeMasks/fw_wispy_e.png'
-	buildEdgeMaskLits["fw_wispy_ne"] = 'Mapping/EdgeMasks/fw_wispy_ne.png'
-	buildEdgeMaskLits["fw_wispy_se"] = 'Mapping/EdgeMasks/fw_wispy_se.png'
-	buildEdgeMaskLits["fw_wispy_nse"] = 'Mapping/EdgeMasks/fw_wispy_nse.png'
-	buildEdgeMaskLits["fw_wispy_w"] = 'Mapping/EdgeMasks/fw_wispy_w.png'
-	buildEdgeMaskLits["fw_wispy_nw"] = 'Mapping/EdgeMasks/fw_wispy_nw.png'
-	buildEdgeMaskLits["fw_wispy_sw"] = 'Mapping/EdgeMasks/fw_wispy_sw.png'
-	buildEdgeMaskLits["fw_wispy_nsw"] = 'Mapping/EdgeMasks/fw_wispy_nsw.png'
-	buildEdgeMaskLits["fw_wispy_ew"] = 'Mapping/EdgeMasks/fw_wispy_ew.png'
-	buildEdgeMaskLits["fw_wispy_new"] = 'Mapping/EdgeMasks/fw_wispy_new.png'
-	buildEdgeMaskLits["fw_wispy_sew"] = 'Mapping/EdgeMasks/fw_wispy_sew.png'
-	buildEdgeMaskLits["fw_wispy_nsew"] = 'Mapping/EdgeMasks/fw_wispy_nsew.png'
-	buildEdgeMaskLits["fw_crumbly_n"] = 'Mapping/EdgeMasks/fw_crumbly_n.png'
-	buildEdgeMaskLits["fw_crumbly_s"] = 'Mapping/EdgeMasks/fw_crumbly_s.png'
-	buildEdgeMaskLits["fw_crumbly_ns"] = 'Mapping/EdgeMasks/fw_crumbly_ns.png'
-	buildEdgeMaskLits["fw_crumbly_e"] = 'Mapping/EdgeMasks/fw_crumbly_e.png'
-	buildEdgeMaskLits["fw_crumbly_ne"] = 'Mapping/EdgeMasks/fw_crumbly_ne.png'
-	buildEdgeMaskLits["fw_crumbly_se"] = 'Mapping/EdgeMasks/fw_crumbly_se.png'
-	buildEdgeMaskLits["fw_crumbly_nse"] = 'Mapping/EdgeMasks/fw_crumbly_nse.png'
-	buildEdgeMaskLits["fw_crumbly_w"] = 'Mapping/EdgeMasks/fw_crumbly_w.png'
-	buildEdgeMaskLits["fw_crumbly_nw"] = 'Mapping/EdgeMasks/fw_crumbly_nw.png'
-	buildEdgeMaskLits["fw_crumbly_sw"] = 'Mapping/EdgeMasks/fw_crumbly_sw.png'
-	buildEdgeMaskLits["fw_crumbly_nsw"] = 'Mapping/EdgeMasks/fw_crumbly_nsw.png'
-	buildEdgeMaskLits["fw_crumbly_ew"] = 'Mapping/EdgeMasks/fw_crumbly_ew.png'
-	buildEdgeMaskLits["fw_crumbly_new"] = 'Mapping/EdgeMasks/fw_crumbly_new.png'
-	buildEdgeMaskLits["fw_crumbly_sew"] = 'Mapping/EdgeMasks/fw_crumbly_sew.png'
-	buildEdgeMaskLits["fw_crumbly_nsew"] = 'Mapping/EdgeMasks/fw_crumbly_nsew.png'
-	buildEdgeMaskLits["af_wispy_nw"] = 'Mapping/EdgeMasks/af_wispy_nw.png'
-	buildEdgeMaskLits["af_wispy_ne"] = 'Mapping/EdgeMasks/af_wispy_ne.png'
-	buildEdgeMaskLits["af_wispy_sw"] = 'Mapping/EdgeMasks/af_wispy_sw.png'
-	buildEdgeMaskLits["af_wispy_se"] = 'Mapping/EdgeMasks/af_wispy_se.png'
-	buildEdgeMaskLits["af_crumbly_nw"] = 'Mapping/EdgeMasks/af_crumbly_nw.png'
-	buildEdgeMaskLits["af_crumbly_ne"] = 'Mapping/EdgeMasks/af_crumbly_ne.png'
-	buildEdgeMaskLits["af_crumbly_sw"] = 'Mapping/EdgeMasks/af_crumbly_sw.png'
-	buildEdgeMaskLits["af_crumbly_se"] = 'Mapping/EdgeMasks/af_crumbly_se.png'
-	buildEdgeMaskLits["af_soft_nw"] = 'Mapping/EdgeMasks/af_soft_nw.png'
-	buildEdgeMaskLits["af_soft_ne"] = 'Mapping/EdgeMasks/af_soft_ne.png'
-	buildEdgeMaskLits["af_soft_sw"] = 'Mapping/EdgeMasks/af_soft_sw.png'
-	buildEdgeMaskLits["af_soft_se"] = 'Mapping/EdgeMasks/af_soft_se.png'
-	buildEdgeMaskLits["af_jagged_nw"] = 'Mapping/EdgeMasks/af_jagged_nw.png'
-	buildEdgeMaskLits["af_jagged_ne"] = 'Mapping/EdgeMasks/af_jagged_ne.png'
-	buildEdgeMaskLits["af_jagged_sw"] = 'Mapping/EdgeMasks/af_jagged_sw.png'
-	buildEdgeMaskLits["af_jagged_se"] = 'Mapping/EdgeMasks/af_jagged_se.png'
-	buildEdgeMaskLits["af_hard_nw"] = 'Mapping/EdgeMasks/af_hard_nw.png'
-	buildEdgeMaskLits["af_hard_ne"] = 'Mapping/EdgeMasks/af_hard_ne.png'
-	buildEdgeMaskLits["af_hard_sw"] = 'Mapping/EdgeMasks/af_hard_sw.png'
-	buildEdgeMaskLits["af_hard_se"] = 'Mapping/EdgeMasks/af_hard_se.png'
-	buildEdgeMaskLits["afw_wispy_nw"] = 'Mapping/EdgeMasks/afw_wispy_nw.png'
-	buildEdgeMaskLits["afw_wispy_ne"] = 'Mapping/EdgeMasks/afw_wispy_ne.png'
-	buildEdgeMaskLits["afw_wispy_sw"] = 'Mapping/EdgeMasks/afw_wispy_sw.png'
-	buildEdgeMaskLits["afw_wispy_se"] = 'Mapping/EdgeMasks/afw_wispy_se.png'
-	buildEdgeMaskLits["afw_crumbly_nw"] = 'Mapping/EdgeMasks/afw_crumbly_nw.png'
-	buildEdgeMaskLits["afw_crumbly_ne"] = 'Mapping/EdgeMasks/afw_crumbly_ne.png'
-	buildEdgeMaskLits["afw_crumbly_sw"] = 'Mapping/EdgeMasks/afw_crumbly_sw.png'
-	buildEdgeMaskLits["afw_crumbly_se"] = 'Mapping/EdgeMasks/afw_crumbly_se.png'
-	buildEdgeMaskLits["af32_wispy_nw"] = 'Mapping/EdgeMasks/af32_wispy_nw.png'
-	buildEdgeMaskLits["af32_wispy_ne"] = 'Mapping/EdgeMasks/af32_wispy_ne.png'
-	buildEdgeMaskLits["af32_crumbly_nw"] = 'Mapping/EdgeMasks/af32_crumbly_nw.png'
-	buildEdgeMaskLits["af32_crumbly_ne"] = 'Mapping/EdgeMasks/af32_crumbly_ne.png'
-	buildEdgeMaskLits["af32_soft_nw"] = 'Mapping/EdgeMasks/af32_soft_nw.png'
-	buildEdgeMaskLits["af32_soft_ne"] = 'Mapping/EdgeMasks/af32_soft_ne.png'
-	buildEdgeMaskLits["af32_jagged_nw"] = 'Mapping/EdgeMasks/af32_jagged_nw.png'
-	buildEdgeMaskLits["af32_jagged_ne"] = 'Mapping/EdgeMasks/af32_jagged_ne.png'
-	buildEdgeMaskLits["af32_hard_nw"] = 'Mapping/EdgeMasks/af32_hard_nw.png'
-	buildEdgeMaskLits["af32_hard_ne"] = 'Mapping/EdgeMasks/af32_hard_ne.png'
-	buildEdgeMaskLits["afw32_wispy_nw"] = 'Mapping/EdgeMasks/afw32_wispy_nw.png'
-	buildEdgeMaskLits["afw32_wispy_ne"] = 'Mapping/EdgeMasks/afw32_wispy_ne.png'
-	buildEdgeMaskLits["afw32_crumbly_nw"] = 'Mapping/EdgeMasks/afw32_crumbly_nw.png'
-	buildEdgeMaskLits["afw32_crumbly_ne"] = 'Mapping/EdgeMasks/afw32_crumbly_ne.png'
-	buildEdgeMaskLits["sq_nw"] = 'Mapping/EdgeMasks/sq_nw.png'
-	buildEdgeMaskLits["sq_ne"] = 'Mapping/EdgeMasks/sq_ne.png'
-	buildEdgeMaskLits["sq_sw"] = 'Mapping/EdgeMasks/sq_sw.png'
-	buildEdgeMaskLits["sq_se"] = 'Mapping/EdgeMasks/sq_se.png'
-	buildEdgeMaskLits["msq_sw"] = 'Mapping/EdgeMasks/msq_sw.png'
-	buildEdgeMaskLits["msq_se"] = 'Mapping/EdgeMasks/msq_se.png'
-	buildEdgeMaskLits["tc32_nw"] = 'Mapping/EdgeMasks/tc32_nw.png'
-	buildEdgeMaskLits["tc32_ne"] = 'Mapping/EdgeMasks/tc32_ne.png'
-	buildEdgeMaskLits["tc32_sw"] = 'Mapping/EdgeMasks/tc32_sw.png'
-	buildEdgeMaskLits["tc32_se"] = 'Mapping/EdgeMasks/tc32_se.png'
-	buildEdgeMaskLits["tc_nw"] = 'Mapping/EdgeMasks/tc_nw.png'
-	buildEdgeMaskLits["tc_ne"] = 'Mapping/EdgeMasks/tc_ne.png'
-	buildEdgeMaskLits["tc_sw"] = 'Mapping/EdgeMasks/tc_sw.png'
-	buildEdgeMaskLits["tc_se"] = 'Mapping/EdgeMasks/tc_se.png'
+	buildOrgSheets = list()
+	buildOrgSheets["w00"] = 'Mapping/EdgeOrg/om_w00.png'
+	buildOrgSheets["w01"] = 'Mapping/EdgeOrg/om_w01.png'
+	buildOrgSheets["w02"] = 'Mapping/EdgeOrg/om_w02.png'
+	buildOrgSheets["w03"] = 'Mapping/EdgeOrg/om_w03.png'
+	buildOrgSheets["w10"] = 'Mapping/EdgeOrg/om_w10.png'
+	buildOrgSheets["w11"] = 'Mapping/EdgeOrg/om_w11.png'
+	buildOrgSheets["w12"] = 'Mapping/EdgeOrg/om_w12.png'
+	buildOrgSheets["w13"] = 'Mapping/EdgeOrg/om_w13.png'
+	buildOrgSheets["w20"] = 'Mapping/EdgeOrg/om_w20.png'
+	buildOrgSheets["w21"] = 'Mapping/EdgeOrg/om_w21.png'
+	buildOrgSheets["w22"] = 'Mapping/EdgeOrg/om_w22.png'
+	buildOrgSheets["w23"] = 'Mapping/EdgeOrg/om_w23.png'
+	buildOrgSheets["w30"] = 'Mapping/EdgeOrg/om_w30.png'
+	buildOrgSheets["w31"] = 'Mapping/EdgeOrg/om_w31.png'
+	buildOrgSheets["w32"] = 'Mapping/EdgeOrg/om_w32.png'
+	buildOrgSheets["w33"] = 'Mapping/EdgeOrg/om_w33.png'
+	buildOrgSheets["c00"] = 'Mapping/EdgeOrg/om_c00.png'
+	buildOrgSheets["c01"] = 'Mapping/EdgeOrg/om_c01.png'
+	buildOrgSheets["c02"] = 'Mapping/EdgeOrg/om_c02.png'
+	buildOrgSheets["c03"] = 'Mapping/EdgeOrg/om_c03.png'
+	buildOrgSheets["c10"] = 'Mapping/EdgeOrg/om_c10.png'
+	buildOrgSheets["c11"] = 'Mapping/EdgeOrg/om_c11.png'
+	buildOrgSheets["c12"] = 'Mapping/EdgeOrg/om_c12.png'
+	buildOrgSheets["c13"] = 'Mapping/EdgeOrg/om_c13.png'
+	buildOrgSheets["c20"] = 'Mapping/EdgeOrg/om_c20.png'
+	buildOrgSheets["c21"] = 'Mapping/EdgeOrg/om_c21.png'
+	buildOrgSheets["c22"] = 'Mapping/EdgeOrg/om_c22.png'
+	buildOrgSheets["c23"] = 'Mapping/EdgeOrg/om_c23.png'
+	buildOrgSheets["c30"] = 'Mapping/EdgeOrg/om_c30.png'
+	buildOrgSheets["c31"] = 'Mapping/EdgeOrg/om_c31.png'
+	buildOrgSheets["c32"] = 'Mapping/EdgeOrg/om_c32.png'
+	buildOrgSheets["c33"] = 'Mapping/EdgeOrg/om_c33.png'
+	buildOrgSheets["s00"] = 'Mapping/EdgeOrg/om_s00.png'
+	buildOrgSheets["s01"] = 'Mapping/EdgeOrg/om_s01.png'
+	buildOrgSheets["s02"] = 'Mapping/EdgeOrg/om_s02.png'
+	buildOrgSheets["s03"] = 'Mapping/EdgeOrg/om_s03.png'
+	buildOrgSheets["s10"] = 'Mapping/EdgeOrg/om_s10.png'
+	buildOrgSheets["s11"] = 'Mapping/EdgeOrg/om_s11.png'
+	buildOrgSheets["s12"] = 'Mapping/EdgeOrg/om_s12.png'
+	buildOrgSheets["s13"] = 'Mapping/EdgeOrg/om_s13.png'
+	buildOrgSheets["s20"] = 'Mapping/EdgeOrg/om_s20.png'
+	buildOrgSheets["s21"] = 'Mapping/EdgeOrg/om_s21.png'
+	buildOrgSheets["s22"] = 'Mapping/EdgeOrg/om_s22.png'
+	buildOrgSheets["s23"] = 'Mapping/EdgeOrg/om_s23.png'
+	buildOrgSheets["s30"] = 'Mapping/EdgeOrg/om_s30.png'
+	buildOrgSheets["s31"] = 'Mapping/EdgeOrg/om_s31.png'
+	buildOrgSheets["s32"] = 'Mapping/EdgeOrg/om_s32.png'
+	buildOrgSheets["s33"] = 'Mapping/EdgeOrg/om_s33.png'
+	buildOrgSheets["j00"] = 'Mapping/EdgeOrg/om_j00.png'
+	buildOrgSheets["j01"] = 'Mapping/EdgeOrg/om_j01.png'
+	buildOrgSheets["j02"] = 'Mapping/EdgeOrg/om_j02.png'
+	buildOrgSheets["j03"] = 'Mapping/EdgeOrg/om_j03.png'
+	buildOrgSheets["j10"] = 'Mapping/EdgeOrg/om_j10.png'
+	buildOrgSheets["j11"] = 'Mapping/EdgeOrg/om_j11.png'
+	buildOrgSheets["j12"] = 'Mapping/EdgeOrg/om_j12.png'
+	buildOrgSheets["j13"] = 'Mapping/EdgeOrg/om_j13.png'
+	buildOrgSheets["j20"] = 'Mapping/EdgeOrg/om_j20.png'
+	buildOrgSheets["j21"] = 'Mapping/EdgeOrg/om_j21.png'
+	buildOrgSheets["j22"] = 'Mapping/EdgeOrg/om_j22.png'
+	buildOrgSheets["j23"] = 'Mapping/EdgeOrg/om_j23.png'
+	buildOrgSheets["j30"] = 'Mapping/EdgeOrg/om_j30.png'
+	buildOrgSheets["j31"] = 'Mapping/EdgeOrg/om_j31.png'
+	buildOrgSheets["j32"] = 'Mapping/EdgeOrg/om_j32.png'
+	buildOrgSheets["j33"] = 'Mapping/EdgeOrg/om_j33.png'
+	buildOrgSheets["ow"] = 'Mapping/EdgeOrg/ow.png'
+	buildOrgSheets["os"] = 'Mapping/EdgeOrg/os.png'
 
-/proc/BuildEdgeMaskFile(nm)
-	BuildEdgeMaskInit()
-	return buildEdgeMaskLits[nm]
+/proc/BuildOrgStyleCode(mat)
+	switch(BuildEdgeStyleFor(mat))
+		if("crumbly")
+			return "c"
+		if("soft")
+			return "s"
+		if("jagged")
+			return "j"
+		if("hard")
+			return "h"
+		if("crisp")
+			return "a"
+	return "w"
 
-/proc/BuildEdgeFringeMask(styleId, combo, onWater = 0)
-	if(styleId == "crisp")
-		return null
-	if(onWater)
-		var/F = BuildEdgeMaskFile("fw_[styleId]_[combo]")
-		if(F)
-			return F
-	return BuildEdgeMaskFile("f_[styleId]_[combo]")
+/proc/BuildOrgWindowX(turf/T)
+	return T.x % 4
 
-var/global/list/buildCliffStyles
-var/global/list/buildCliffStyleNames
+/proc/BuildOrgWindowY(turf/T)
+	return (4 - (T.y % 4)) % 4
 
-/proc/BuildCliffInit()
-	if(buildCliffStyles)
+/proc/BuildOrgLayerId(turf/O, mat, doBlend)
+	var/ps = "[BuildMaterialPriority(mat)]"
+	while(length(ps) < 3)
+		ps = "0[ps]"
+	if(!doBlend)
+		return "[ps]|[mat]"
+	return "[ps]|[mat]|[O.type]|[O.icon]|[O.icon_state]"
+
+/proc/BuildOrgSheetX(cell)
+	return 496 - 32 * (cell % 32)
+
+/proc/BuildOrgSheetY(cell)
+	return 240 - 32 * round(cell / 32)
+
+/proc/BuildOrgMask(cfg, xm, baseMat, wx, wy, inv = 0)
+	BuildOrgSheetInit()
+	var/cbit = (cfg & 256) ? 1 : 0
+	if(xm == "Wood" || baseMat == "Wood")
+		return inv ? !cbit : cbit
+	var/sheet
+	if(xm == "Water")
+		sheet = buildOrgSheets["ow"]
+	else
+		sheet = buildOrgSheets["[BuildOrgStyleCode(baseMat)][wx][wy]"]
+	if(!sheet)
+		return inv ? !cbit : cbit
+	return filter(type = "alpha", icon = sheet, x = BuildOrgSheetX(cfg), y = BuildOrgSheetY(cfg), flags = inv ? MASK_INVERSE : 0)
+
+/proc/BuildOrgConfig(X, own, list/nb)
+	var/cbit = (own >= X) ? 1 : 0
+	var/cfg = cbit ? 256 : 0
+	for(var/i = 1 to 8)
+		var/nid = nb[i]
+		var/b = nid ? ((nid >= X) ? 1 : 0) : cbit
+		if(b)
+			cfg |= (1 << (i - 1))
+	return cfg
+
+/proc/BuildOrgMaskFor(X, xm, own, list/nb, baseMat, wx, wy, inv = 0)
+	if(xm == "Wood")
+		var/c = (own == X) ? 1 : 0
+		return inv ? !c : c
+	return BuildOrgMask(BuildOrgConfig(X, own, nb), xm, baseMat, wx, wy, inv)
+
+/proc/BuildEdgeImage(turf/S)
+	var/eh = ElevAt(S)
+	var/image/I = image(ElevTexIcon(S, eh), null, ElevTexState(S, eh))
+	I.layer = 2.9
+	return I
+
+/proc/BuildOrgLayers(turf/T, m, th, doBlend, list/present, list/srcs, list/nb)
+	var/own = BuildOrgLayerId(T, m, doBlend)
+	present[own] = m
+	srcs[own] = T
+	var/i = 0
+	for(var/list/o in shoreFoamOffs)
+		i++
+		var/turf/O = locate(T.x + o[1], T.y + o[2], T.z)
+		var/mo = BuildMatFor(T, O, th)
+		if(!mo)
+			continue
+		var/id = BuildOrgLayerId(O, mo, doBlend)
+		nb[i] = id
+		if(!present[id])
+			present[id] = mo
+			srcs[id] = O
+	return own
+
+/proc/BuildOrgOrder(list/present)
+	var/list/order = list()
+	for(var/id in present)
+		var/k = 1
+		while(k <= order.len && order[k] < id)
+			k++
+		order.Insert(k, id)
+	return order
+
+/proc/BuildOrgGround(turf/T, m, th, doBlend, list/fresh)
+	var/list/present = list()
+	var/list/srcs = list()
+	var/list/nb = new/list(8)
+	var/own = BuildOrgLayers(T, m, th, doBlend, present, srcs, nb)
+	if(present.len < 2)
 		return
-	buildCliffStyles = list()
-	buildCliffStyles["default"] = 'Mapping/Cliffs/cliff_default.png'
-	buildCliffStyles["default_end_l"] = 'Mapping/Cliffs/cliff_default_end_l.png'
-	buildCliffStyles["default_end_r"] = 'Mapping/Cliffs/cliff_default_end_r.png'
-	buildCliffStyles["default_end_lr"] = 'Mapping/Cliffs/cliff_default_end_lr.png'
-	buildCliffStyles["wall7"] = 'Mapping/Cliffs/cliff_wall7.png'
-	buildCliffStyles["wall7_end_l"] = 'Mapping/Cliffs/cliff_wall7_end_l.png'
-	buildCliffStyles["wall7_end_r"] = 'Mapping/Cliffs/cliff_wall7_end_r.png'
-	buildCliffStyles["wall7_end_lr"] = 'Mapping/Cliffs/cliff_wall7_end_lr.png'
-	buildCliffStyles["wall12"] = 'Mapping/Cliffs/cliff_wall12.png'
-	buildCliffStyles["wall12_end_l"] = 'Mapping/Cliffs/cliff_wall12_end_l.png'
-	buildCliffStyles["wall12_end_r"] = 'Mapping/Cliffs/cliff_wall12_end_r.png'
-	buildCliffStyles["wall12_end_lr"] = 'Mapping/Cliffs/cliff_wall12_end_lr.png'
-	buildCliffStyles["wall13"] = 'Mapping/Cliffs/cliff_wall13.png'
-	buildCliffStyles["wall13_end_l"] = 'Mapping/Cliffs/cliff_wall13_end_l.png'
-	buildCliffStyles["wall13_end_r"] = 'Mapping/Cliffs/cliff_wall13_end_r.png'
-	buildCliffStyles["wall13_end_lr"] = 'Mapping/Cliffs/cliff_wall13_end_lr.png'
-	buildCliffStyles["wall14"] = 'Mapping/Cliffs/cliff_wall14.png'
-	buildCliffStyles["wall14_end_l"] = 'Mapping/Cliffs/cliff_wall14_end_l.png'
-	buildCliffStyles["wall14_end_r"] = 'Mapping/Cliffs/cliff_wall14_end_r.png'
-	buildCliffStyles["wall14_end_lr"] = 'Mapping/Cliffs/cliff_wall14_end_lr.png'
-	buildCliffStyles["wall15"] = 'Mapping/Cliffs/cliff_wall15.png'
-	buildCliffStyles["wall15_end_l"] = 'Mapping/Cliffs/cliff_wall15_end_l.png'
-	buildCliffStyles["wall15_end_r"] = 'Mapping/Cliffs/cliff_wall15_end_r.png'
-	buildCliffStyles["wall15_end_lr"] = 'Mapping/Cliffs/cliff_wall15_end_lr.png'
-	buildCliffStyles["wall16"] = 'Mapping/Cliffs/cliff_wall16.png'
-	buildCliffStyles["wall16_end_l"] = 'Mapping/Cliffs/cliff_wall16_end_l.png'
-	buildCliffStyles["wall16_end_r"] = 'Mapping/Cliffs/cliff_wall16_end_r.png'
-	buildCliffStyles["wall16_end_lr"] = 'Mapping/Cliffs/cliff_wall16_end_lr.png'
-	buildCliffStyles["wall29"] = 'Mapping/Cliffs/cliff_wall29.png'
-	buildCliffStyles["wall29_end_l"] = 'Mapping/Cliffs/cliff_wall29_end_l.png'
-	buildCliffStyles["wall29_end_r"] = 'Mapping/Cliffs/cliff_wall29_end_r.png'
-	buildCliffStyles["wall29_end_lr"] = 'Mapping/Cliffs/cliff_wall29_end_lr.png'
-	buildCliffStyles["wall36"] = 'Mapping/Cliffs/cliff_wall36.png'
-	buildCliffStyles["wall36_end_l"] = 'Mapping/Cliffs/cliff_wall36_end_l.png'
-	buildCliffStyles["wall36_end_r"] = 'Mapping/Cliffs/cliff_wall36_end_r.png'
-	buildCliffStyles["wall36_end_lr"] = 'Mapping/Cliffs/cliff_wall36_end_lr.png'
-	buildCliffStyles["wall37"] = 'Mapping/Cliffs/cliff_wall37.png'
-	buildCliffStyles["wall37_end_l"] = 'Mapping/Cliffs/cliff_wall37_end_l.png'
-	buildCliffStyles["wall37_end_r"] = 'Mapping/Cliffs/cliff_wall37_end_r.png'
-	buildCliffStyles["wall37_end_lr"] = 'Mapping/Cliffs/cliff_wall37_end_lr.png'
-	buildCliffStyles["wall38"] = 'Mapping/Cliffs/cliff_wall38.png'
-	buildCliffStyles["wall38_end_l"] = 'Mapping/Cliffs/cliff_wall38_end_l.png'
-	buildCliffStyles["wall38_end_r"] = 'Mapping/Cliffs/cliff_wall38_end_r.png'
-	buildCliffStyles["wall38_end_lr"] = 'Mapping/Cliffs/cliff_wall38_end_lr.png'
-	buildCliffStyles["wall56"] = 'Mapping/Cliffs/cliff_wall56.png'
-	buildCliffStyles["wall56_end_l"] = 'Mapping/Cliffs/cliff_wall56_end_l.png'
-	buildCliffStyles["wall56_end_r"] = 'Mapping/Cliffs/cliff_wall56_end_r.png'
-	buildCliffStyles["wall56_end_lr"] = 'Mapping/Cliffs/cliff_wall56_end_lr.png'
-	buildCliffStyles["wall99"] = 'Mapping/Cliffs/cliff_wall99.png'
-	buildCliffStyles["wall99_end_l"] = 'Mapping/Cliffs/cliff_wall99_end_l.png'
-	buildCliffStyles["wall99_end_r"] = 'Mapping/Cliffs/cliff_wall99_end_r.png'
-	buildCliffStyles["wall99_end_lr"] = 'Mapping/Cliffs/cliff_wall99_end_lr.png'
-	buildCliffStyleNames = list("Default (water Wall29, raised terrain Wall38)" = "default", "None - water gets no rock strip" = "none", "Wall 7" = "wall7", "Wall 12" = "wall12", "Wall 13" = "wall13", "Wall 14" = "wall14", "Wall 15" = "wall15", "Wall 16" = "wall16", "Wall 29" = "wall29", "Wall 36" = "wall36", "Wall 37" = "wall37", "Wall 38" = "wall38", "Wall 56" = "wall56", "Wall 99" = "wall99")
-
-/proc/BuildCliffStrip(styleId, variant)
-	BuildCliffInit()
-	var/F
-	if(variant)
-		F = buildCliffStyles["[styleId]_[variant]"]
-		if(F)
-			return F
-		F = buildCliffStyles["default_[variant]"]
-		if(F)
-			return F
-	F = buildCliffStyles[styleId]
-	if(F)
-		return F
-	return buildCliffStyles["default"]
-
-/proc/BuildEdgeBlendMask(side, seed)
-	switch("[side][seed]")
-		if("n1")
-			return 'Mapping/EdgeMasks/blend_n_1.png'
-		if("n2")
-			return 'Mapping/EdgeMasks/blend_n_2.png'
-		if("n3")
-			return 'Mapping/EdgeMasks/blend_n_3.png'
-		if("s1")
-			return 'Mapping/EdgeMasks/blend_s_1.png'
-		if("s2")
-			return 'Mapping/EdgeMasks/blend_s_2.png'
-		if("s3")
-			return 'Mapping/EdgeMasks/blend_s_3.png'
-		if("e1")
-			return 'Mapping/EdgeMasks/blend_e_1.png'
-		if("e2")
-			return 'Mapping/EdgeMasks/blend_e_2.png'
-		if("e3")
-			return 'Mapping/EdgeMasks/blend_e_3.png'
-		if("w1")
-			return 'Mapping/EdgeMasks/blend_w_1.png'
-		if("w2")
-			return 'Mapping/EdgeMasks/blend_w_2.png'
-	return 'Mapping/EdgeMasks/blend_w_3.png'
+	var/list/order = BuildOrgOrder(present)
+	var/baseMat = present[order[1]]
+	var/wx = BuildOrgWindowX(T)
+	var/wy = BuildOrgWindowY(T)
+	var/ownIdx = order.Find(own)
+	if(ownIdx > 1)
+		var/ownInv = BuildOrgMaskFor(own, m, own, nb, baseMat, wx, wy, 1)
+		if(!isnum(ownInv) || ownInv)
+			for(var/k = 1 to ownIdx - 1)
+				var/L = order[k]
+				var/image/PI = BuildEdgeImage(srcs[L])
+				if(k > 1)
+					var/LM = BuildOrgMaskFor(L, present[L], own, nb, baseMat, wx, wy, 0)
+					if(isnum(LM))
+						if(!LM)
+							continue
+					else
+						PI.filters += LM
+				if(!isnum(ownInv))
+					PI.filters += BuildOrgMaskFor(own, m, own, nb, baseMat, wx, wy, 1)
+				fresh += PI
+	for(var/k = ownIdx + 1 to order.len)
+		var/M = order[k]
+		var/MM = BuildOrgMaskFor(M, present[M], own, nb, baseMat, wx, wy, 0)
+		if(isnum(MM))
+			if(!MM)
+				continue
+			fresh += BuildEdgeImage(srcs[M])
+			continue
+		var/image/HI = BuildEdgeImage(srcs[M])
+		HI.filters += MM
+		fresh += HI
 
 /proc/BuildMatSameH(turf/O, th)
 	return (O && ElevAt(O) == th) ? BuildMaterialFor(O) : null
@@ -827,6 +738,8 @@ var/global/buildBootPassMark = 0
 		return 0
 	var/tp = T.type
 	var/st = T.SecondaryTurfType
+	var/ic = T.icon
+	var/ist = T.icon_state
 	var/th = ElevAt(T)
 	var/x = T.x
 	var/y = T.y
@@ -836,7 +749,7 @@ var/global/buildBootPassMark = 0
 			if(!dx && !dy)
 				continue
 			var/turf/O = locate(x + dx, y + dy, z)
-			if(!O || O.type != tp || O.SecondaryTurfType != st || O.EdgeOptOut || ElevAt(O) != th)
+			if(!O || O.type != tp || O.SecondaryTurfType != st || O.icon != ic || O.icon_state != ist || O.EdgeOptOut || ElevAt(O) != th)
 				return 0
 	for(var/dy = -1 to 1)
 		for(var/dx = -1 to 1)
@@ -864,165 +777,9 @@ var/global/buildBootPassMark = 0
 	if(!m)
 		BuildEdgeApply(T, fresh)
 		return
-	var/mp = BuildMaterialPriority(m)
-	var/turf/N = locate(T.x, T.y + 1, T.z)
-	var/turf/So = locate(T.x, T.y - 1, T.z)
-	var/turf/E = locate(T.x + 1, T.y, T.z)
-	var/turf/W = locate(T.x - 1, T.y, T.z)
 	var/th = ElevAt(T)
-	var/mn = BuildMatFor(T, N, th)
-	var/ms = BuildMatFor(T, So, th)
-	var/me = BuildMatFor(T, E, th)
-	var/mw = BuildMatFor(T, W, th)
-	var/turf/DNW = locate(T.x - 1, T.y + 1, T.z)
-	var/turf/DNE = locate(T.x + 1, T.y + 1, T.z)
-	var/turf/DSW = locate(T.x - 1, T.y - 1, T.z)
-	var/turf/DSE = locate(T.x + 1, T.y - 1, T.z)
-	var/mdnw = BuildMatFor(T, DNW, th)
-	var/mdne = BuildMatFor(T, DNE, th)
-	var/mdsw = BuildMatFor(T, DSW, th)
-	var/mdse = BuildMatFor(T, DSE, th)
-	var/cliffTile = (m == "Water" && mn && mn != "Water")
-	var/list/corners = list("nw" = list(N, mn, W, mw, DNW, mdnw), "ne" = list(N, mn, E, me, DNE, mdne), "sw" = list(So, ms, W, mw, DSW, mdsw), "se" = list(So, ms, E, me, DSE, mdse))
-	for(var/c in corners)
-		var/list/info = corners[c]
-		var/turf/o1 = info[1]
-		var/m1 = info[2]
-		var/turf/o2 = info[3]
-		var/m2 = info[4]
-		var/turf/dg = info[5]
-		var/md = info[6]
-		if(!m1 || !m2)
-			continue
-		var/p1 = BuildMaterialPriority(m1)
-		var/p2 = BuildMaterialPriority(m2)
-		if(m1 != m && m2 != m && p1 < mp && p2 < mp)
-			var/turf/src_turf = (p1 >= p2) ? o1 : o2
-			fresh += BuildEdgePiece(src_turf, BuildEdgeCutMask(c))
-			continue
-		if(m1 == m2 && m1 != m && p1 > mp)
-			if(m1 == "Water" && (c == "sw" || c == "se"))
-				continue
-			if(md == m1)
-				var/AF
-				if(m1 == "Water")
-					fresh += BuildEdgePiece(dg, BuildEdgeCutMask32(c))
-					AF = BuildEdgeMaskFile("afw32_[BuildEdgeStyleFor(m)]_[c]")
-					if(!AF)
-						AF = BuildEdgeMaskFile("af32_[BuildEdgeStyleFor(m)]_[c]")
-				else
-					fresh += BuildEdgePiece(dg, BuildEdgeCutMask(c))
-					AF = BuildEdgeMaskFile("af_[BuildEdgeStyleFor(m)]_[c]")
-				if(AF)
-					var/image/AFI = BuildEdgePiece(T, AF)
-					if(m1 == "Water")
-						var/sealTop = (c == "nw") ? (me && me != "Water") : (mw && mw != "Water")
-						var/sealSide = (ms && ms != "Water")
-						if(!sealTop)
-							AFI.filters += filter(type = "alpha", icon = 'Mapping/EdgeMasks/bs_n.png', flags = MASK_INVERSE)
-						if(!sealSide)
-							AFI.filters += filter(type = "alpha", icon = (c == "nw") ? 'Mapping/EdgeMasks/bs_w.png' : 'Mapping/EdgeMasks/bs_e.png', flags = MASK_INVERSE)
-					fresh += AFI
-	if(cliffTile && BuildCliffStyleAt(T) == "none")
-		cliffTile = 0
-	if(cliffTile)
-		var/endL = (!mw) || (mw == "Water" && !(mdnw && mdnw != "Water"))
-		var/endR = (!me) || (me == "Water" && !(mdne && mdne != "Water"))
-		var/variant
-		if(endL && endR)
-			variant = "end_lr"
-		else if(endL)
-			variant = "end_l"
-		else if(endR)
-			variant = "end_r"
-		fresh += BuildCliffStripImage(BuildCliffStyleAt(T), variant)
-	if(m != "Water" && mn == "Water" && N)
-		var/dcl = (mw && mw != "Water" && mdnw == "Water")
-		var/dcr = (me && me != "Water" && mdne == "Water")
-		if(dcl && dcr)
-			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd.png')
-		else if(dcr)
-			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd_l.png')
-		else if(dcl)
-			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd_r.png')
-		else
-			fresh += BuildEdgePiece(N, 'Mapping/EdgeMasks/nfd_lr.png')
+	BuildOrgGround(T, m, th, doBlend, fresh)
 	ShoreFoamAdd(T, m, fresh)
-	if(m == "Water" && ms && ms != "Water" && So)
-		var/ucl = (mw == "Water" && mdsw && mdsw != "Water")
-		var/ucr = (me == "Water" && mdse && mdse != "Water")
-		if(ucl && ucr)
-			fresh += BuildEdgePiece(So, 'Mapping/EdgeMasks/nfu.png')
-		else if(ucr)
-			fresh += BuildEdgePiece(So, 'Mapping/EdgeMasks/nfu_l.png')
-		else if(ucl)
-			fresh += BuildEdgePiece(So, 'Mapping/EdgeMasks/nfu_r.png')
-		else
-			fresh += BuildEdgePiece(So, 'Mapping/EdgeMasks/nfu_lr.png')
-	var/list/sides = list("n" = list(N, mn), "s" = list(So, ms), "e" = list(E, me), "w" = list(W, mw))
-	var/list/fringeCombos = list()
-	var/list/fringeSrc = list()
-	var/list/fringeTapers = list()
-	var/si = 0
-	for(var/sd in sides)
-		si++
-		var/list/info = sides[sd]
-		var/turf/NB = info[1]
-		var/mb = info[2]
-		if(!NB || !mb)
-			continue
-		if(mb != m && BuildMaterialPriority(mb) < mp)
-			if(m == "Water" && sd == "s")
-				continue
-			fringeCombos[mb] = "[fringeCombos[mb]][sd]"
-			if(!fringeSrc[mb])
-				fringeSrc[mb] = NB
-			var/list/tl = fringeTapers[mb]
-			if(!tl)
-				tl = list()
-				fringeTapers[mb] = tl
-			var/wp = (m == "Water")
-			switch(sd)
-				if("n")
-					if(!wp)
-						if(mw == m && mdnw == m)
-							tl += "tc_nw"
-						if(me == m && mdne == m)
-							tl += "tc_ne"
-				if("s")
-					if(mw == m && mdsw == m)
-						tl += wp ? "tc32_sw" : "tc_sw"
-					if(me == m && mdse == m)
-						tl += wp ? "tc32_se" : "tc_se"
-				if("e")
-					if(mn == m && mdne == m)
-						tl += wp ? "tc32_ne" : "tc_ne"
-					if(ms == m && mdse == m)
-						tl += wp ? "msq_se" : "tc_se"
-				if("w")
-					if(mn == m && mdnw == m)
-						tl += wp ? "tc32_nw" : "tc_nw"
-					if(ms == m && mdsw == m)
-						tl += wp ? "msq_sw" : "tc_sw"
-			continue
-		if(!doBlend)
-			continue
-		if(mb != m || NB.type == T.type)
-			continue
-		if("[NB.type]" > "[T.type]")
-			continue
-		var/seed = ((T.x * 7 + T.y * 13 + si) % 3) + 1
-		fresh += BuildEdgePiece(NB, BuildEdgeBlendMask(sd, seed))
-	for(var/fmat in fringeCombos)
-		var/FF = BuildEdgeFringeMask(BuildEdgeStyleFor(fmat), fringeCombos[fmat], m == "Water")
-		if(!FF)
-			continue
-		var/image/FI = BuildEdgePiece(fringeSrc[fmat], FF)
-		var/list/tl = fringeTapers[fmat]
-		if(tl)
-			for(var/tc in tl)
-				FI.filters += filter(type = "alpha", icon = BuildEdgeMaskFile(tc), flags = MASK_INVERSE)
-		fresh += FI
 	BuildEdgeApply(T, fresh)
 
 /proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1, bootPump = 0)
@@ -1172,18 +929,6 @@ var/global/list/buildCliffPickerEntries
 	cliffPaintMap[k] = style
 	return 1
 
-/proc/BuildCliffStripImage(style, variant)
-	var/image/CI
-	if(ElevStyleGeneric(style))
-		var/list/art = ElevStyleArt(style)
-		if(art)
-			CI = image(art[1], null, art[2])
-			CI.filters = filter(type = "alpha", icon = BuildCliffStrip("default", variant))
-	if(!CI)
-		CI = image(BuildCliffStrip(style, variant))
-	CI.layer = 2.9
-	return CI
-
 /proc/BuildCliffPickEnter(datum/build_session/S)
 	if(!S?.active)
 		return
@@ -1257,8 +1002,8 @@ mob/Mapper/verb/Edge_Debug()
 	if(!isturf(T))
 		usr << "Stand on a tile first."
 		return
-	BuildEdgeMaskInit()
-	usr << "EDGE DEBUG @ ([T.x],[T.y],[T.z]) - [buildEdgeMaskLits.len] masks compiled in."
+	BuildOrgSheetInit()
+	usr << "EDGE DEBUG @ ([T.x],[T.y],[T.z]) - [buildOrgSheets.len] organic mask sheets compiled in, window [BuildOrgWindowX(T)],[BuildOrgWindowY(T)]."
 	var/m = BuildMaterialFor(T)
 	usr << "  HERE: [T.type] -> [m ? "[m] (style [BuildEdgeStyleFor(m)], priority [BuildMaterialPriority(m)])" : "NO MATERIAL (will not edge)"]"
 	usr << "  tracked edge overlays on this tile: [T.edgeOverlays ? T.edgeOverlays.len : 0]"
@@ -1271,6 +1016,15 @@ mob/Mapper/verb/Edge_Debug()
 			continue
 		var/m2 = BuildMaterialFor(T2)
 		usr << "  [d]: [T2.type] -> [m2 ? "[m2] (style [BuildEdgeStyleFor(m2)], priority [BuildMaterialPriority(m2)])" : "NO MATERIAL (will not edge)"]"
+	if(m)
+		var/list/present = list()
+		var/list/srcs = list()
+		var/list/nb = new/list(8)
+		var/own = BuildOrgLayers(T, m, ElevAt(T), 1, present, srcs, nb)
+		var/list/order = BuildOrgOrder(present)
+		usr << "  layers in the 3x3 (lowest first, base style [BuildEdgeStyleFor(present[order[1]])]):"
+		for(var/id in order)
+			usr << "    [id == own ? "HERE " : ""][present[id]] config [BuildOrgConfig(id, own, nb)] - [id]"
 
 mob/Mapper/verb/Smooth_Region()
 	set category = "Mapper"
