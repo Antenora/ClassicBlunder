@@ -637,41 +637,49 @@ var/global/list/elevStyleArtCache = list()
 				if(!org && elevBaseStates["bd[bkey]"])
 					fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "bd[bkey]", ElevLayer(top, 4))
 				if(copytext(bkey, 1, 2) == "a")
-					ElevFoamTrio("b", bkey, WS, ElevLayer(top, 9), fresh)
+					if(org)
+						ElevFoamTrio("ob", "[ElevStyleCode(WS)][T.x % 3][ElevOrgWrapEnd(T, fi, -1)][ElevOrgWrapEnd(T, fi, 1)]", WS, ElevLayer(top, 9), fresh)
+					else
+						ElevFoamTrio("b", bkey, WS, ElevLayer(top, 9), fresh)
 	for(var/side in list("R", "L"))
 		var/turf/NB = locate(T.x + (side == "R" ? 1 : -1), T.y, T.z)
 		var/list/nf = ElevFaceInfo(NB)
 		if(!nf || nf[(side == "R") ? 4 : 5] != "x")
 			continue
 		var/nsty = ElevFaceStyleFor(NB, nf[6])
-		if(ElevFaceFlat(nf[6], nsty) || ElevOrgStyle(nf[6]))
+		if(ElevFaceFlat(nf[6], nsty))
 			continue
+		var/norg = ElevOrgStyle(nf[6]) ? 1 : 0
+		var/fpre = norg ? "o" : ""
 		var/ntop = nf[1]
-		var/sst = "s[nf[2]]_[nf[3]][side]"
-		var/image/SP = ElevFacePiece(nsty, sst, ElevLayer(ntop, 0))
-		if(SP)
-			fresh += SP
+		if(!norg)
+			var/sst = "s[nf[2]]_[nf[3]][side]"
+			var/image/SP = ElevFacePiece(nsty, sst, ElevLayer(ntop, 0))
+			if(SP)
+				fresh += SP
 		if(nf[3] != nf[2])
-			if(!fi && elevBaseStates["tk[side]"])
+			if(!norg && !fi && elevBaseStates["tk[side]"])
 				fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "tk[side]", ElevLayer(ntop, 4))
 			if(!fi && ElevStyleCode(T) == "a")
 				var/inr = ElevBelowFoot(T)
-				ElevFoamTrio(inr ? ((nf[3] == 1) ? "g" : "h") : ((nf[3] == 1) ? "k" : "m"), "a[T.x % 3][side]", T, ElevLayer(ntop, 9), fresh)
+				var/rx = (norg && inr) ? ElevOrgInnerSuffix(T, side, ntop, 1) : ""
+				ElevFoamTrio("[fpre][inr ? ((nf[3] == 1) ? "g" : "h") : ((nf[3] == 1) ? "k" : "m")]", "a[T.x % 3][side][rx]", T, ElevLayer(ntop, 9), fresh)
 			continue
 		var/turf/S2 = locate(T.x, T.y - 1, T.z)
 		if(!S2)
 			continue
 		var/turf/WS2 = ElevWrapSrc(T, S2)
 		var/tkey = "[ElevStyleCode(WS2)][T.x % 3][side]"
-		if(elevBaseStates["tm[tkey]"])
+		if(!norg && elevBaseStates["tm[tkey]"])
 			fresh += ElevTexPiece(WS2, 'Mapping/Elevation/elev_base.dmi', "tm[tkey]", ElevLayer(ntop, 2), 0)
-		if(elevBaseStates["tb[tkey]"])
+		if(!norg && elevBaseStates["tb[tkey]"])
 			fresh += ElevTexPiece(WS2, 'Mapping/Elevation/elev_base.dmi', "tb[tkey]", ElevLayer(ntop, 3), 1)
-		if(!fi && elevBaseStates["td[tkey]"])
+		if(!norg && !fi && elevBaseStates["td[tkey]"])
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "td[tkey]", ElevLayer(ntop, 4))
 		if(!fi && copytext(tkey, 1, 2) == "a")
 			var/inb = ElevBelowFoot(T)
-			ElevFoamTrio(inb ? ((nf[2] == 1) ? "i" : "j") : ((nf[2] == 1) ? "t" : "s"), tkey, WS2, ElevLayer(ntop, 9), fresh)
+			var/bx = (norg && inb) ? ElevOrgInnerSuffix(T, side, ntop, (nf[2] == 1) ? 0 : 1) : ""
+			ElevFoamTrio("[fpre][inb ? ((nf[2] == 1) ? "i" : "j") : ((nf[2] == 1) ? "t" : "s")]", "[tkey][bx]", WS2, ElevLayer(ntop, 9), fresh)
 	for(var/side in list("R", "L"))
 		var/turf/DF = locate(T.x + (side == "R" ? 1 : -1), T.y - 1, T.z)
 		var/list/df = ElevFaceInfo(DF)
@@ -1918,6 +1926,14 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 
 /proc/ElevOrgBuild(turf/G, list/fresh)
 	var/hg = ElevAt(G)
+	if(ElevStairTurf(G))
+		var/list/sfi = ElevFaceInfo(G)
+		if(sfi && ElevOrgStyle(sfi[6]))
+			var/image/ST = image(ElevTexIcon(G, hg), null, ElevTexState(G, hg))
+			ST.dir = G.dir
+			ST.layer = ElevLayer(sfi[1], 9) + 0.0004
+			fresh += ST
+			return
 	var/list/levels = list()
 	if(hg > 0 && ElevOrgStyle(G))
 		levels["[hg]"] = G
@@ -1946,6 +1962,25 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/list/af = ElevFaceInfo(locate(T.x, T.y + 1, T.z))
 	return (af && af[3] == af[2]) ? 1 : 0
 
+/proc/ElevOrgWrapEnd(turf/T, list/fi, dx)
+	var/code = ElevWrapEnd(T, fi, dx)
+	if(code != "j")
+		return code
+	var/list/nf = ElevFaceInfo(locate(T.x + dx, T.y, T.z))
+	return (nf && nf[1] == fi[1]) ? "w" : "j"
+
+/proc/ElevOrgInnerSuffix(turf/T, side, top, sameOk)
+	if(!T)
+		return ""
+	var/turf/A = locate(T.x, T.y + 1, T.z)
+	var/list/af = ElevFaceInfo(A)
+	if(!af || af[3] != af[2])
+		return ""
+	var/sfx = (sameOk && af[1] == top) ? "s" : ""
+	if(ElevWrapEnd(A, af, (side == "R") ? -1 : 1) == "x")
+		sfx += "x"
+	return sfx
+
 /proc/ElevInnerCorner(turf/T)
 	if(!T || ElevFaceInfo(T))
 		return 0
@@ -1972,7 +2007,10 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		var/ukey = "[ElevStyleCode(WS)][N.x % 3][ElevWrapEnd(N, fn, -1)][ElevWrapEnd(N, fn, 1)]"
 		if(ww)
 			if(tw && !ElevInnerCorner(T))
-				ElevFoamTrio("x", ukey, T, ELEV_FOAM_LAYER, fresh)
+				if(ElevOrgStyle(fn[6]))
+					ElevFoamTrio("ox", "[ElevStyleCode(WS)][N.x % 3][ElevOrgWrapEnd(N, fn, -1)][ElevOrgWrapEnd(N, fn, 1)]", T, ElevLayer(fn[1], 9), fresh)
+				else
+					ElevFoamTrio("x", ukey, T, ELEV_FOAM_LAYER, fresh)
 		else if(!pit && elevBaseStates["bu[ukey]"] && !ElevOrgStyle(fn[6]))
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "bu[ukey]", ElevLayer(fn[1], 4))
 		return
@@ -1990,7 +2028,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		var/tkey = "[ElevStyleCode(WS2)][N.x % 3][side]"
 		if(ww2)
 			if(tw)
-				ElevFoamTrio("y", tkey, T, ELEV_FOAM_LAYER, fresh)
+				var/yorg = ElevOrgStyle(nf[6]) ? 1 : 0
+				ElevFoamTrio(yorg ? "oy" : "y", tkey, T, yorg ? ElevLayer(nf[1], 9) : ELEV_FOAM_LAYER, fresh)
 		else if(!pit && elevBaseStates["tu[tkey]"] && !ElevOrgStyle(nf[6]))
 			fresh += ElevPlain('Mapping/Elevation/elev_base.dmi', "tu[tkey]", ElevLayer(nf[1], 4))
 

@@ -264,6 +264,7 @@
 #define FILE_DIR "Mapping"
 #define FILE_DIR "Mapping/Cliffs"
 #define FILE_DIR "Mapping/EdgeMasks"
+#define FILE_DIR "Mapping/EdgeOrg"
 #define FILE_DIR "Mapping/Elevation"
 #define FILE_DIR "Mapping/NewIcons"
 #define FILE_DIR "Races"

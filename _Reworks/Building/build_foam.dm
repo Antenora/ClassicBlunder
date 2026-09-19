@@ -64,6 +64,28 @@ var/global/list/stripStates = list()
 			return O
 	return null
 
+var/global/list/shoreStyleOffs = list(list(0, 0), list(0, 1), list(-1, 1), list(1, 1), list(-1, 0), list(1, 0))
+
+/proc/ShoreStyleFor(turf/T, m, th, turf/WT)
+	var/shallow = 0
+	for(var/list/o in shoreStyleOffs)
+		var/own = (!o[1] && !o[2]) ? 1 : 0
+		var/turf/L = own ? T : locate(T.x + o[1], T.y + o[2], T.z)
+		var/lm = own ? m : BuildMatFor(T, L, th)
+		if(!lm || lm == "Water")
+			continue
+		var/turf/W = locate(L.x, L.y - 1, L.z)
+		var/wm = (W == T) ? m : BuildMatFor(T, W, th)
+		if(wm != "Water")
+			continue
+		var/s = BuildCliffStyleAt(W)
+		if(s != "none")
+			return s
+		shallow = 1
+	if(shallow)
+		return "none"
+	return BuildCliffStyleAt(WT)
+
 /proc/ShoreStripFile(style)
 	switch(style)
 		if("wall7")
@@ -131,7 +153,7 @@ var/global/list/stripStates = list()
 	var/turf/WT = ShoreWaterTile(T, m, th)
 	if(!WT)
 		return
-	var/style = BuildCliffStyleAt(WT)
+	var/style = ShoreStyleFor(T, m, th, WT)
 	var/v = (style == "none") ? "s" : "r"
 	if(v == "r")
 		ShoreStripAdd(cfg, style, fresh)
