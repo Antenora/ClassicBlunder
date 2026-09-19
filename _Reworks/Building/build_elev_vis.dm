@@ -596,7 +596,13 @@ var/global/list/elevStyleArtCache = list()
 				fresh += ElevPlain('Mapping/Elevation/elev_lip.dmi', "d[key]", ElevLayer(L, 8))
 			var/hst = copytext(key, 4, 5)
 			if(copytext(key, 6, 7) == "w" && hst != "c" && hst != "k" && hst != "a")
-				ElevFoamTrio("q", key, G, ELEV_FOAM_LAYER, fresh)
+				var/qorg = 0
+				for(var/sq in elevLipSlots)
+					var/turf/QS = srcs[sq]
+					if(QS && ElevOrgStyle(QS))
+						qorg = 1
+						break
+				ElevFoamTrio(qorg ? "oq" : "q", key, G, ELEV_FOAM_LAYER, fresh)
 	elevWallCtxL = 0
 
 /proc/ElevAddFaceParts(turf/T, list/fresh)
@@ -1643,6 +1649,11 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	Tx.Blend(M, ICON_MULTIPLY)
 	F.Blend(Tx, ICON_OVERLAY)
 
+/proc/ElevOrgCutLayer(icon/F, ic, st)
+	var/icon/M = icon(ic, st)
+	M.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 1, 1, 1)
+	F.Blend(M, ICON_MULTIPLY)
+
 /proc/ElevOrgFT(turf/A, turf/S, L, D)
 	if(!A || !S || D < 1)
 		return null
@@ -1678,7 +1689,10 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		if(k == D && WS)
 			var/bkey = "[ElevStyleCode(WS)][v]cc"
 			if(elevBaseStates["bm[bkey]"])
-				ElevOrgTexLayer(F, WS, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]", 0)
+				if(BuildMaterialFor(WS) == "Water")
+					ElevOrgCutLayer(F, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]")
+				else
+					ElevOrgTexLayer(F, WS, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]", 0)
 			if(elevBaseStates["bb[bkey]"])
 				ElevOrgTexLayer(F, WS, 'Mapping/Elevation/elev_base.dmi', "bb[bkey]", 1)
 			if(elevBaseStates["bd[bkey]"])
@@ -1751,6 +1765,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			var/image/GI = ElevOrgTurfImage(GS, ELEV_TOP_LAYER)
 			GI.filters = GF
 			fresh += GI
+			ElevOrgSidePaint(G, L, sty, cfg, GS, fresh)
 	var/list/cl = ElevOrgClassify(G, L, D)
 	var/list/ids = null
 	if(cl)
@@ -1769,6 +1784,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		lim[i] = 31
 	var/open = 32
 	var/list/pieces = list()
+	var/turf/SB = locate(G.x, G.y - 1, G.z)
+	var/nostrip = (mem && SB && ElevStairTurf(SB)) ? 1 : 0
 	for(var/j = 0 to min(ELEV_DMAX, D + 1))
 		if(open <= 0)
 			break
@@ -1779,6 +1796,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		if(!cfgA)
 			continue
 		if(cfgA == 511)
+			break
+		if(ElevOrgMem(A, L) && !ElevOrgStyle(A))
 			break
 		var/list/KA = (j == 0) ? K : ElevOrgKey(sty, BuildOrgWindowX(A), BuildOrgWindowY(A), cfgA)
 		if(!KA)
@@ -1793,7 +1812,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			var/bp = runs[i + 1] - 32 * j
 			var/lo = max(bp, 0)
 			var/hi = min(lim[x + 1], bp + 32 * DA - 1)
-			if(!runs[i + 3] && lo <= hi)
+			if(!runs[i + 3] && lo <= hi && !(nostrip && j == 0))
 				for(var/t = 1 to DA)
 					var/y0 = bp + 32 * (t - 1)
 					if(y0 + 31 < lo || y0 > hi)
@@ -1914,6 +1933,19 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	if(ids && ids[2])
 		ElevOrgDarkPiece(sty, ids[2], cl[4], base, fresh)
 
+/proc/ElevOrgSidePaint(turf/G, L, sty, cfg, turf/GS, list/fresh)
+	for(var/list/o in list(list(0, 1, "gn"), list(1, 0, "ge"), list(-1, 0, "gw"), list(0, -1, "gs")))
+		var/turf/O = locate(G.x + o[1], G.y + o[2], G.z)
+		if(!O || O == GS || ElevAt(O) >= L)
+			continue
+		var/SF = ElevOrgFilter("t", sty, G, cfg, 1)
+		if(!SF)
+			continue
+		var/image/SI = ElevOrgTurfImage(O, ELEV_TOP_LAYER + 0.0001)
+		SI.filters = SF
+		SI.filters += filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', o[3]))
+		fresh += SI
+
 /proc/ElevOrgDarkPiece(sty, id, gs, base, list/fresh)
 	var/DF = ElevOrgCellFilter(elevOrgDark[sty], id)
 	if(!DF)
@@ -1926,14 +1958,6 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 
 /proc/ElevOrgBuild(turf/G, list/fresh)
 	var/hg = ElevAt(G)
-	if(ElevStairTurf(G))
-		var/list/sfi = ElevFaceInfo(G)
-		if(sfi && ElevOrgStyle(sfi[6]))
-			var/image/ST = image(ElevTexIcon(G, hg), null, ElevTexState(G, hg))
-			ST.dir = G.dir
-			ST.layer = ElevLayer(sfi[1], 9) + 0.0004
-			fresh += ST
-			return
 	var/list/levels = list()
 	if(hg > 0 && ElevOrgStyle(G))
 		levels["[hg]"] = G
@@ -1953,6 +1977,13 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		if(!CT || ElevAt(CT) <= hg || levels["[ElevAt(CT)]"] || !ElevOrgStyle(CT))
 			continue
 		levels["[ElevAt(CT)]"] = CT
+	if(ElevStairTurf(G))
+		if(levels.len || ElevCoverOf(G))
+			var/image/ST = image(ElevTexIcon(G, hg), null, ElevTexState(G, hg))
+			ST.dir = G.dir
+			ST.layer = ElevLayer(ELEV_MAX, 9) + 0.0004
+			fresh += ST
+		return
 	for(var/lk in levels)
 		ElevOrgLevel(G, text2num(lk), levels[lk], fresh)
 
@@ -2084,6 +2115,23 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	T.overlays += fresh
 	T.elevOverlays = fresh
 
+/proc/ElevOrgWhyNot(turf/S)
+	if(!S || ElevAt(S) <= 0)
+		return "not raised"
+	var/m = BuildMaterialFor(S)
+	var/pst = ElevFaceStyleAt(S, S)
+	var/info = "type [S.type], material [m ? m : "unflagged"], painted cliff style [pst]"
+	if(!ElevNaturalTop(S))
+		return "top material is not grass, dirt, sand, ice or water, so it keeps the square rim ([info])"
+	if(ElevStairTurf(S))
+		return "stairs or ladder turf ([info])"
+	if(ElevFaceFlat(S, pst))
+		return "painted with custom wall art, so it keeps flat walls and the square rim ([info])"
+	var/turf/B = locate(S.x, S.y - 1, S.z)
+	if(B && ElevAt(B) <= 0 && BuildIsCliffTurf(B))
+		return "a placed cliff turf sits directly below it ([info])"
+	return "edge style [BuildEdgeStyleFor(m)] has no organic set ([info])"
+
 mob/Mapper/verb/Elev_Debug()
 	set category = "Mapper"
 	var/turf/T = usr.loc
@@ -2098,7 +2146,7 @@ mob/Mapper/verb/Elev_Debug()
 	usr << "  covered by: [CV ? "([CV.x],[CV.y]) at level [ElevAt(CV)]" : "nothing"]. material [BuildMaterialFor(T)], cliff turf [BuildIsCliffTurf(T)], pit [ElevIsPit(T)]"
 	if(h > 0)
 		var/osty = ElevOrgStyle(T)
-		usr << "  organic rim: [osty ? "yes (style [osty], config [ElevOrgCfg(T, h)], window [BuildOrgWindowX(T)],[BuildOrgWindowY(T)], depth [ElevOrgDepthAt(T, h)])" : "no (flat top, stairs or custom wall art - square rim)"]"
+		usr << "  organic rim: [osty ? "yes (style [osty], config [ElevOrgCfg(T, h)], window [BuildOrgWindowX(T)],[BuildOrgWindowY(T)], depth [ElevOrgDepthAt(T, h)])" : "no - [ElevOrgWhyNot(T)]"]"
 	if(ElevStairsAt(T))
 		usr << "  stairs: [ElevStairTurf(T) ? "stairs turf - no face drawn here, walkable between heights, repaint never raises it" : "stairs object - walkable between heights"]"
 	var/list/fi = ElevFaceInfo(T)
