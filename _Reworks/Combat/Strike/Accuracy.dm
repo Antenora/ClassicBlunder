@@ -11,6 +11,33 @@
 		return MISS
 	if(Defender.Frozen == 3)
 		return MISS
+	//spirit command block ignored on deflection/self hits
+	if(!deflection && Offender != Defender)
+		if(Offender.SpiritBullseyeReady)
+			// The first outgoing accuracy check starts the ten-second window.
+			if(!Offender.SpiritBullseyeUntil)
+				Offender.SpiritBullseyeUntil = world.time + 100
+
+			if(world.time >= Offender.SpiritBullseyeUntil)
+				Offender.SpiritBullseyeReady = FALSE
+				Offender.SpiritBullseyeUntil = 0
+
+		if(Defender.SpiritFlashReady)
+			//starts the time window for Flash evasion when a hit is about to hit
+			if(!Defender.SpiritFlashUntil)
+				Defender.SpiritFlashUntil = world.time + 20
+
+			//flash beats bullseye, still starts the bullseye timer
+			if(world.time < Defender.SpiritFlashUntil)
+				return MISS
+			else
+				//clear expired flash, continue accuracy check
+				Defender.SpiritFlashReady = FALSE
+				Defender.SpiritFlashUntil = 0
+
+		// bullseye is a guaranteed hit if there's no flash
+		if(Offender.SpiritBullseyeReady && world.time < Offender.SpiritBullseyeUntil)
+			return HIT
 	if(Offender.HasNoMiss())
 		return HIT
 	if((Defender.HasNoDodge() || Defender.IsGuarding()) && !IgnoreNoDodge)

@@ -4394,6 +4394,7 @@ obj
 				GuardBreak=1
 				ComboMaster=1
 				Grapple=1
+				RequiresWill=130
 				GrabTrigger="/obj/Skills/Grapple/Erupting_Burning_Finger/Removeable"
 				Knockback=1
 				WindUp=1
@@ -4412,8 +4413,9 @@ obj
 				EnergyCost=12
 				verb/Hell_And_Heaven()
 					set category="Skills"
+					src.DamageMult=2.7+((usr.Will/130)-1)
 					if(usr.SagaLevel>5)
-						src.DamageMult=3.6
+						src.DamageMult=3.6+((usr.Will/130)-1)
 						src.ControlledRush=0
 						WindupMessage="combines the forces of Destruction and Creation with absolute control!"
 					usr.Activate(src)
@@ -4426,6 +4428,7 @@ obj
 				TurfErupt=2
 				TurfEruptOffset=3
 				Slow=1
+				RequiresWill=150
 				WindUp=2
 				WindupIcon='GGG_Hammer.dmi'
 				WindupIconX=-16
@@ -4440,8 +4443,11 @@ obj
 				Cooldown=-1
 				EnergyCost=12
 				Earthshaking=15
+				adjust(mob/p)
+					DamageMult = 33.75+(((usr.Will/130)-1)*20)
 				verb/Goldion_Hammer()
 					set category="Skills"
+					adjust(usr)
 					usr.Activate(src)
 
 
@@ -5217,6 +5223,10 @@ mob
 					if(src.ManaAmount<drain*(1-(0.45*src.TomeSpell(Z))))
 						src << "You don't have enough mana to activate [Z]."
 						return FALSE
+			if(Z.RequiresWill)
+				if(src.Will < Z.RequiresWill)
+					src << "Your Will isn't high enough to use [Z]!"
+					return FALSE
 
 			if(Z.FocusShifter)
 				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())

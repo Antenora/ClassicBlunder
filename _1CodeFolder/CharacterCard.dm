@@ -856,7 +856,10 @@ client/proc/IntentChipAction(action)
 mob/proc/GetTimedBuffs()
 	var/list/out = list()
 	for(var/obj/Skills/Buffs/b in GetMenuBuffs())
-		if(IsStripBuff(b)) out += b              // timed, non-debuff, currently active
+		if(IsStripBuff(b))
+			out += b
+
+	out += GetActiveSpiritCommands()
 	return out
 
 client/proc/UpdateTimedBuffs()
@@ -881,7 +884,11 @@ client/proc/UpdateTimedBuffs()
 			tbuff_icons += di
 			screen += di
 		if(di.buff != b)                                     // only rebuild the scaled icon when the slot changes
-			var/icon/I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
+			var/icon/I
+			if(istype(b, /obj/Skills/Buffs/SpiritCommands/Instant))
+				I = icon('HUD/spirit_commands.dmi', b.name)
+			else
+				I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
 			I.Scale(TBUFF_ICON, TBUFF_ICON)
 			di.icon = I
 			di.buff = b
@@ -889,11 +896,14 @@ client/proc/UpdateTimedBuffs()
 		var/y = ypix0 - rw * (TBUFF_ICON + TBUFF_GAP)
 		di.screen_loc = "1:[x],[row]:[y]"
 		di.alpha = 255
-		var/rem = b.TimerLimit - b.Timer                     // Timer advances 1.0/sec
-		var/secs = round(rem)
-		if(secs < rem) secs++                                // ceil so it reads as time remaining
-		if(secs < 0) secs = 0
-		di.num.maptext = "<span style=\"[TBUFF_NUM_FONT]; color:#ffffff; text-align:right\">[secs]</span>"
+		if(istype(b, /obj/Skills/Buffs/SpiritCommands/Instant))
+			di.num.maptext = ""
+		else
+			var/rem = b.TimerLimit - b.Timer
+			var/secs = round(rem)
+			if(secs < rem) secs++
+			if(secs < 0) secs = 0
+			di.num.maptext = "<span style=\"[TBUFF_NUM_FONT]; color:#ffffff; text-align:right\">[secs]</span>"
 		di.num.alpha = (di.num.alpha == 255) ? 254 : 255     // nudge to force a maptext flush each tick
 		col++
 		if(col >= TBUFF_PER_ROW)
@@ -911,6 +921,7 @@ client/proc/GetActiveDebuffs()
 	var/list/out = list()
 	if(!mob) return out
 	var/mob/m = mob
+
 	if(m.Bleed > 0) out += list(list('HUD/debuff_bleed.png', "Bleed", "[round(m.Bleed)]"))
 	var/vb = max(0, m.Burn - m.SilentBurnAmount)
 	if(vb > 0) out += list(list('HUD/debuff_burn.png', "Burn", "[round(vb)]"))
@@ -933,6 +944,7 @@ client/proc/GetActiveDebuffs()
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed)) out += list(list('HUD/debuff_charmed.png', "Charmed", null))
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded)) out += list(list('HUD/debuff_blind.png', "Blind", null))
 	if(m.CheckSlotless("Tilted")) out += list(list('HUD/debuff_tilted.dmi', "Tilted", null))
+
 	return out
 
 client/proc/UpdateDebuffs()
@@ -962,6 +974,7 @@ client/proc/UpdateDebuffs()
 			debuff_icons += di
 			screen += di
 		di.icon = d[1]
+		di.icon_state = d.len >= 4 ? d[4] : ""
 		di.debuff_name = d[2]
 		di.num.maptext = numtxt ? "<span style=\"[MDEBUFF_FONT]; color:#ffffff\">[numtxt]</span>" : ""
 		var/icy = (cur_row == 0) ? MDEBUFF_ROW0_Y : (MDEBUFF_ROW1_Y - (cur_row - 1) * MDEBUFF_ROW_H)

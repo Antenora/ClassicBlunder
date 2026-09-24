@@ -531,7 +531,7 @@ mob/Players
 			if(loc != pre)
 				pm_crossed = TRUE
 				if(Afterimages() && prob(40*Afterimages())) //per tile-crossing; the MovementSpeed() getter side-effect is PmActive-gated off
-					if(passive_handler.Get("AfterImageSkin") != "Rainbow")
+					if(!(passive_handler.Get("AfterImageSkin") in list("Rainbow", "Anti")))
 						FlashImage(src)
 				var/ai_skin = passive_handler.Get("AfterImageSkin")
 				if(ai_skin)
@@ -540,6 +540,7 @@ mob/Players
 						switch(ai_skin)
 							if("Cooler") coolerFlashImage(src, ai_count)
 							if("Rainbow") rainbowFlashImage(src, ai_count)
+							if("Anti") AntiAfterImage(src, ai_count)
 				if(passive_handler["Don't Move"])
 					LoseHealth(PctToHP(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"]))
 					animate(src, color = "#850000")

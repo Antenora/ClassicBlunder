@@ -164,10 +164,13 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 					SpiralPower=1//which, i guess, given the subject matter, is more likely than you'd think
 				if(3)
 					SpiralPower=1
+					m.GrantWillMechanic()
 				if(4)
 					SpiralPower=1
+					m.GrantWillMechanic()
 				if(5)
 					SpiralPower=2
+					m.GrantWillMechanic()
 			applyBuff.PowerMult=1+(0.05*secretLevel*secretLevel)
 			applyBuff.StrMult=1.25
 			applyBuff.ForMult=1.25

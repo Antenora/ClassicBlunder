@@ -5124,6 +5124,10 @@ mob
 			if(Z.Sealed)
 				src << "You can't use [Z] it is sealed!"
 				return FALSE
+			if(Z.RequiresWill)
+				if(src.Will < Z.RequiresWill)
+					src << "Your Will isn't high enough to use [Z]!"
+					return FALSE
 			var/obj/Items/check = EquippedFlyingDevice()
 			if(istype(check))
 				check.ObjectUse(src)

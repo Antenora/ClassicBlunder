@@ -153,6 +153,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 
 /mob/proc/meditationChecks()
 	if(icon_state == "Meditate")
+		src.ClearSpiritCommands()
 		MeditateTime++
 		if(isRace(/race/demi_fiend))
 			refreshMagatama()
@@ -253,6 +254,8 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	else
 		MeditateTime=0
 	DemonMeditateCheck()
+	WillMeditateCheck()
+
 //**TESTED AND WORKS **/
 /mob/proc/drainTransformations(trans, transMastery)
 	// TRANS / TRANSMASTERY FOR CHANGIE 4TH FORM

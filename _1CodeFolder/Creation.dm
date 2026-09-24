@@ -467,6 +467,7 @@ mob/Players
 			var/mob/Players/SBP = src
 			SBP.Shadowbringer_ClearShadow()
 		CollectMenuVerbs()
+		client.updateWillMeter()
 		return
 	Logout()
 		PurgeHurtboxDebug()

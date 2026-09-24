@@ -71,6 +71,7 @@ mob/tierUpSaga(path)
 	WindUp = 0.75
 	ControlledRush=1
 	Instinct=1
+	RequiresWill=150
 	TurfStrike=1
 	TurfShift='Dirt1.dmi'
 	TurfShiftDuration=1
@@ -90,7 +91,7 @@ mob/tierUpSaga(path)
 			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = 0.25 * (1 + (round((dr+(se/2))/3)))
+			DamageMult = (0.25 + (p.Will/150)-1) * (1 + (round((dr+(se/2))/3)))
 			Rounds = 20
 			PullIn = dr + (se/2)
 			Primordial = round(dr/4)
@@ -122,6 +123,7 @@ mob/tierUpSaga(path)
 	Rush=5
 	WindUp = 0.75
 	ControlledRush=1
+	RequiresWill=130
 	Instinct=1
 	TurfStrike=1
 	TurfShift='StarPixel.dmi'

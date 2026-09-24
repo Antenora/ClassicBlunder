@@ -504,6 +504,8 @@ client/proc/MiscVerbs()
 	if(BuffAffected) L += "Target Buff: [BuffAffected]"
 	if(HealthCost) L += "Health Cost: [HealthCost]"
 	if(WoundCost) L += "Wound Cost: [WoundCost]"
+	if(RequiresWill) L+= "Requires Will: [RequiresWill]"
+	if(SpiritCost) L+= "Spirit Points Cost: [SpiritCost]"
 	if(EnergyCost) L += "Energy Cost: [EnergyCost]"
 	if(FatigueCost) L += "Fatigue Cost: [FatigueCost]"
 	if(ManaCost) L += "Mana Cost: [ManaCost]"

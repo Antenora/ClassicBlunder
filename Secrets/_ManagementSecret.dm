@@ -512,11 +512,13 @@ SecretInformation
 				if(1) // Unlocks Spiral and get your first buff
 					p << "Your fighting spirit soars throughout you. Unknown to you, this is the beginning of Spiral Energy."
 					giveSkills(p)
+					p.GrantWillMechanic()
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/Clobber)
 				if(2) // Get your main attack
 					p << "You hone your fighting spirit, fueled by the urge to make your dreams real."
 					p.AddSkill(new/obj/Skills/AutoHit/Giga_Drill_Breaker)
 					nextTierUp = 2
+					p.GrantRandomSpiritCommand(1)
 					if(p.passive_handler.Get("SpiralEngine")) // If you're an Android who has installed a Spiral Engine, you get ascension stats so that Evolution Power can buff you
 						p.StrAscension+= 0.1
 						p.EndAscension+= 0.1
@@ -529,6 +531,8 @@ SecretInformation
 					p << "Your body surges with Spiral Energy, the power of evolution driving you forward."
 					p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo)
 					nextTierUp = 2
+					p.GrantRandomSpiritCommand(2)
+					p.GrantRandomSpiritCommand(1)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.15
 						p.EndAscension+= 0.15
@@ -540,6 +544,7 @@ SecretInformation
 				if(4)
 					p << "Your soul burns with Spiral Hope. You refuse to be oppressed by the limitations of others."
 					nextTierUp = 4
+					p.GrantRandomSpiritCommand(2)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.15
 						p.EndAscension+= 0.15
@@ -551,6 +556,8 @@ SecretInformation
 				if(5)
 					p << "Your very DNA resonates with Spiral Power. You climb upwards toward the ceiling of your cage."
 					nextTierUp = 4
+					p.GrantRandomSpiritCommand(2)
+					p.GrantRandomSpiritCommand(3)
 					p.AddSkill(new/obj/Skills/Projectile/Spiral/Probability_Negation_Missiles)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.2
@@ -562,6 +569,8 @@ SecretInformation
 						p << "Your synthetic body evolved!"
 				if(6)
 					p << "You have gone beyond your full potential. You have evolved beyond the person you were before. You are free."
+					p.GrantRandomSpiritCommand(3)
+					p.GrantRandomSpiritCommand(3)
 					if(p.passive_handler.Get("SpiralEngine"))
 						p.StrAscension+= 0.3
 						p.EndAscension+= 0.3

@@ -638,7 +638,6 @@ mob/var
 	HairUnderlay
 	HairUnderlayX=0
 	HairUnderlayY=0
-	WillPower
 	Regenerating
 	Judgment
 	Defiance
@@ -752,6 +751,7 @@ mob/var
 	tmp/demon_pending_fuse_open_slots = 0
 	tmp/demon_fusion_animating = FALSE
 	tmp/list/demon_fusion_anim_images = null
+
 
 /proc/reduceGodKi(mob/player, num)
 	player.GodKi -= num

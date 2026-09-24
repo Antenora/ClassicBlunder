@@ -277,6 +277,7 @@ mob/Admin3/verb
 					P.passive_handler.Increase("PilotingProwess", 1)
 					P.PilotingProwess+=1
 					P.SagaLevel=1
+					P.GrantWillMechanic()
 
 				if("Unlimited Blade Works")
 					P<<"Your whole life is... <b>Unlimited Blade Works</b>!"
@@ -1410,6 +1411,7 @@ mob
 						if(!locate(/obj/Skills/Queue/DrillKnee, src))
 							src.AddSkill(new/obj/Skills/Queue/DrillKnee)
 						src << "You can form an energy drill out of your body, capable of delivering deciding strikes!"
+						GrantRandomSpiritCommand(1)
 					if(src.SagaLevel==3)
 						src.PilotingProwess+=1
 						if(!locate(/obj/Skills/AutoHit/Plasma_Hold, src))
@@ -1417,6 +1419,7 @@ mob
 						if(!locate(/obj/Skills/AutoHit/Hell_And_Heaven, src))
 							src << "You become capable of delivering the ultimate finishing move: Hell and Heaven!"
 							src.AddSkill(new/obj/Skills/AutoHit/Hell_And_Heaven)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==4)
 						src.PilotingProwess+=2
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Dividing_Driver, src))
@@ -1426,6 +1429,8 @@ mob
 						if(!locate(/obj/Skills/AutoHit/Goldion_Hammer, src))
 							src.AddSkill(new/obj/Skills/AutoHit/Goldion_Hammer)
 						src << "You can spawn a set of power tools strong enough to rupture dimensions: Dividing Driver and Goldion Hammer!"
+						GrantRandomSpiritCommand(1)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==5)
 						src.PilotingProwess+=2
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Protect_Wall, src))
@@ -1437,6 +1442,7 @@ mob
 						passive_handler.Increase("SpaceWalk", 1)
 						passive_handler.Increase("PilotingProwess", 1) //2 Piloting Prowess at T5 instead of 1
 						src << "You upgrade your abilities to carry you into the Space Era!"
+						GrantRandomSpiritCommand(3)
 					if(src.SagaLevel==6)
 						src.PilotingProwess+=3
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
@@ -1445,11 +1451,14 @@ mob
 							gb.passives["GodKi"] = 0.5
 						src << "You master using the power of Destruction and Protection simultaneously!"
 						src << "Your Heaven and Hell reaches its perfected form: <b>Genesic Heaven and Hell</b>!"
+						GrantRandomSpiritCommand(3)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==7)
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.passives["Color of Courage"] = 1
 							src << "True courage manifests, when everything is thought to be lost."
 							src << "You are now able to fight past your limits in Genesic!"
+						GrantRandomSpiritCommand(3)
 
 
 

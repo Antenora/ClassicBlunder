@@ -994,6 +994,10 @@ mob
 			if(src.StrStolen)
 				Mod+=src.StrStolen*0.5
 			Mod += (scalingEldritchPower() / 10);
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			var/BM=src.HasBuffMastery()
 			if(BM)
 				if(Mod<=glob.BUFF_MASTERY_LOWTHRESHOLD)
@@ -1191,6 +1195,9 @@ mob
 					else
 						Mod+=0.75*src.passive_handler.Get("BurningShot")
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
 				if(src.HealthPct() <= threshold)
@@ -1353,6 +1360,9 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
 
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
@@ -1534,6 +1544,9 @@ mob
 			if(src.SpdEroded)
 				Mod-=src.SpdEroded
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=((passive_handler.Get("TensionPowered")*2))
 			if(src.RebirthHeroPath=="Red" && src.SagaLevel>=3)
@@ -1632,6 +1645,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)
@@ -1759,6 +1776,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)

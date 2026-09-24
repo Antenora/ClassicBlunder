@@ -35,6 +35,8 @@ obj/Skills
 	var/UsesEnd=0
 	var/UsesDef=0
 	var/UsesOff=0
+	var/RequiresWill=0 // Can't use without enough Will
+	var/SpiritCost = 0 // Only for Spirit Commands
 	proc/BaseStatOverride(mob/M)
 		if(UsesStr) return M.GetStr(1)
 		if(UsesFor) return M.GetFor(1)
