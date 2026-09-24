@@ -1055,14 +1055,24 @@ mob/Players/verb
 				var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted/s = usr.Target.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted)
 				if(!BuffOn(s))
 					if(usr.Target.TiltedLast == -1)
+						if(usr.Target.WillPowered())
+							usr.Target.AdjustWill(-5)
+							usr.Target.client.updateWillMeter()
+							OMsg(src, "[usr.Target]'s will was lowered!")
 						usr.Target.TiltedLast = 200
 						s.Trigger(usr.Target, TRUE)
 					else
 						src << "Can't taunt them again just yet!! (Cooldown: [usr.Target.TiltedLast/2] seconds.)"
 						usr.Target.AngerEvent(2)
+						if(usr.Target.WillPowered())
+							usr.Target.AdjustWill(2)
+							usr.Target.client.updateWillMeter()
 				else
 					src << "They're already tilted..."
 					usr.Target.AngerEvent(2)
+					if(usr.Target.WillPowered())
+						usr.Target.AdjustWill(2)
+						usr.Target.client.updateWillMeter()
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")
