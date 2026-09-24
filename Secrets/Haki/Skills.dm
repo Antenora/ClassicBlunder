@@ -13,19 +13,24 @@
                 extra -= enemy.secretDatum.currentTier
             else
                 extra -= 2
-    switch(thingToCompare)
-        if("Potential")
-            var/difference = Potential - enemy.Potential
-            difference += extra
-            if(difference >= 10)
-                return 4
-            else if(difference >= 4)
-                return 3
-            else if(difference >= 0)
-                return 2
-            else if(difference <= -1)
-                return 1
-            return 1
+	switch(thingToCompare)
+		if("Potential")
+			var/extraWill = 0 // Will-powered (KoB, Spirals, SRW saga eventually) get extra for defense against Haki
+			if(enemy.WillPowered())
+				extraWill = (enemy.Will - 100) / 20 // every 20 will above 100 gives one effective potential in this calculation.
+				// ie: Attacker has 100 Potential, Defender has 90 potential, but 220 Will (the utmost maximum ever), Defender is treated as having 102 potential and so resist it (difference becomes -2 which hits return 1)
+			var/difference = Potential - enemy.Potential
+			difference += extra
+			difference -= extraWill
+			if(difference >= 10)
+				return 4
+			else if(difference >= 4)
+				return 3
+			else if(difference >= 0)
+				return 2
+			else if(difference <= -1)
+				return 1
+			return 1
         if("Power")
             var/difference = (Power + extra*glob.EXTRA_CONQ_HAKI_POWER) / enemy.Power
             if(difference >= 2) // 2x stronger
