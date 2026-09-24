@@ -95,50 +95,50 @@ client/var/tmp
 	willMeterTargetFrame = 0
 	willMeterAnimating = FALSE
 
+	lastWillMeterValue = null
+	lastWillMeterSpirit = null
+	lastWillMeterSpiritMax = null
+	willMeterVisible = FALSE
+
+
 obj/WillMeter
 	mouse_opacity = 0
+	plane = HUD_PLANE
 	var/tmp/last_fill_state = -1
+obj/WillMeter/Back
+	icon = 'willgauge_spiral_back.png'
+	layer = 1
+obj/WillMeter/Fill
+	icon = 'willgauge_spiral_fill.dmi'
+	icon_state = "0"
+	layer = 2
+obj/WillMeter/Rainbow
+	icon = 'willgauge_spiral_fill_rainbow.dmi'
+	icon_state = "1"
+	layer = 3
+	alpha = 0
+
 
 client/var/tmp
 	obj/WillMeter/willMeterBack
 	obj/WillMeter/willMeterFill
 	obj/WillMeter/willMeterRainbow
 
-var/global/list/WillMeterFillCache = list()
-var/global/list/WillMeterRainbowCache = list()
 
-proc/CacheWillMeterIcons()
-	if(WillMeterFillCache.len == 21 && WillMeterRainbowCache.len == 21)
+client/var/tmp/willMeterResourcesLoaded = FALSE
+
+client/proc/LoadWillMeterResources()
+	if(willMeterResourcesLoaded)
 		return
-	for(var/i = 0 to 20)
-		var/state = "[i]"
-		if(!WillMeterFillCache[state])
-			WillMeterFillCache[state] = icon('willgauge_spiral_fill.dmi', state)
-	for(var/i = 1 to 21)
-		var/state = "[i]"
-		if(!WillMeterRainbowCache[state])
-			WillMeterRainbowCache[state] = icon('willgauge_spiral_fill_rainbow.dmi', state)
 
+	willMeterResourcesLoaded = TRUE
 
-client/proc/SetWillMeterFrame(frame)
-	if(!willMeterFill || !willMeterRainbow) return
-
-	var/first_state = clamp(frame, 0, 20)
-	var/second_state = 1 + clamp(frame - 20, 0, 20)
-
-	var/icon/white_icon = WillMeterFillCache["[first_state]"]
-	if(white_icon)
-		if(willMeterFill.icon != white_icon)
-			willMeterFill.icon = white_icon
-		willMeterFill.icon_state = ""
-
-	var/icon/rainbow_icon = WillMeterRainbowCache["[second_state]"]
-	if(rainbow_icon)
-		if(willMeterRainbow.icon != rainbow_icon)
-			willMeterRainbow.icon = rainbow_icon
-		willMeterRainbow.icon_state = ""
-
-	willMeterRainbow.alpha = frame > 20 ? 255 : 0
+	src << load_resource(
+		'willgauge_spiral_back.png',
+		'willgauge_spiral_fill.dmi',
+		'willgauge_spiral_fill_rainbow.dmi',
+		-1
+	)
 
 
 client/proc/AnimateWillMeter()
@@ -149,66 +149,75 @@ client/proc/AnimateWillMeter()
 	while(willMeterShownFrame != willMeterTargetFrame)
 		if(!mob || !mob.WillPowered() || !willMeterFill || !willMeterRainbow)
 			break
-
 		if(willMeterShownFrame < willMeterTargetFrame)
 			willMeterShownFrame++
 		else
 			willMeterShownFrame--
-
 		SetWillMeterFrame(willMeterShownFrame)
 		sleep(1)
-
 	willMeterAnimating = FALSE
 
-client/proc/updateWillMeter()
-	if(!mob || !mob.WillPowered())
-		screen -= willMeterBack
-		screen -= willMeterFill
-		screen -= willMeterRainbow
-		screen -= willMeterText
-		screen -= willMeterSP
+
+client/proc/InitializeWillMeter()
+	LoadWillMeterResources()
+	if(willMeterBack && willMeterFill && willMeterRainbow && willMeterText && willMeterSP)
+		return
+	if(willMeterBack)
 		return
 
-	CacheWillMeterIcons()
-
-	if(!willMeterBack) willMeterBack = new()
-	if(!willMeterFill) willMeterFill = new()
-	if(!willMeterRainbow) willMeterRainbow = new()
-
-	if(!willMeterText)
-		willMeterText = new()
-		var/icon/back_art = icon('willgauge_spiral_back.png')
-		willMeterText.maptext_width = back_art.Width()
-		willMeterText.maptext_y = -10
-	if(!willMeterSP)
-		willMeterSP = new()
-		var/icon/back_art = icon('willgauge_spiral_back.png')
-		willMeterSP.maptext_width = back_art.Width()
-		willMeterSP.maptext_y = -20
-
 	var/meter_loc = "CENTER+9,BOTTOM+0.7"
+
+	willMeterBack = new /obj/WillMeter/Back()
+	willMeterFill = new /obj/WillMeter/Fill()
+	willMeterRainbow = new /obj/WillMeter/Rainbow()
+
+	willMeterText = new()
+	willMeterSP = new()
 
 	willMeterBack.screen_loc = meter_loc
 	willMeterFill.screen_loc = meter_loc
 	willMeterRainbow.screen_loc = meter_loc
+	willMeterText.screen_loc = meter_loc
+	willMeterSP.screen_loc = meter_loc
 
-	willMeterBack.plane = HUD_PLANE
-	willMeterFill.plane = HUD_PLANE
-	willMeterRainbow.plane = HUD_PLANE
+	var/icon/back_art = icon('willgauge_spiral_back.png')
 
-	willMeterBack.layer = 1
-	willMeterFill.layer = 2
-	willMeterRainbow.layer = 3
+	willMeterText.maptext_width = back_art.Width()
+	willMeterText.maptext_y = -10
 
-	willMeterBack.invisibility = 0
-	willMeterFill.invisibility = 0
-	willMeterRainbow.invisibility = 0
+	willMeterSP.maptext_width = back_art.Width()
+	willMeterSP.maptext_y = -20
 
-	willMeterBack.alpha = 255
-	willMeterFill.alpha = 255
 
-	willMeterBack.icon = 'willgauge_spiral_back.png'
-	willMeterBack.icon_state = ""
+
+client/proc/SetWillMeterFrame(frame)
+	if(!willMeterFill || !willMeterRainbow)
+		return
+
+	frame = clamp(round(frame), 0, 40)
+
+	var/first_state = clamp(frame, 0, 20)
+	var/second_state = 1 + clamp(frame - 20, 0, 20)
+
+	if(willMeterFill.last_fill_state != first_state)
+		willMeterFill.last_fill_state = first_state
+		willMeterFill.icon_state = "[first_state]"
+	if(willMeterRainbow.last_fill_state != second_state)
+		willMeterRainbow.last_fill_state = second_state
+		willMeterRainbow.icon_state = "[second_state]"
+
+	var/rainbow_alpha = frame > 20 ? 255 : 0
+	if(willMeterRainbow.alpha != rainbow_alpha)
+		willMeterRainbow.alpha = rainbow_alpha
+
+
+client/proc/updateWillMeter()
+	if(!mob || !mob.WillPowered())
+		HideWillMeter()
+		return
+
+	InitializeWillMeter()
+	ShowWillMeter()
 
 	var/will = clamp(mob.Will, 100, 220)
 
@@ -219,23 +228,43 @@ client/proc/updateWillMeter()
 
 	SetWillMeterFrame(willMeterShownFrame)
 	AnimateWillMeter()
-
-	if(!(willMeterBack in screen))
-		screen += willMeterBack
-	if(!(willMeterFill in screen))
-		screen += willMeterFill
-	if(!(willMeterRainbow in screen))
-		screen += willMeterRainbow
-
-	willMeterText.screen_loc = meter_loc
 	var/display_will = round(mob.Will, 0.1)
-	willMeterText.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[display_will]</span></center>"
 
-	willMeterSP.screen_loc = meter_loc
-	var/display_SP = "[mob.Spirit]/[mob.SpiritMax]"
-	willMeterSP.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[display_SP] SP</span></center>"
+	if(lastWillMeterValue != display_will)
+		lastWillMeterValue = display_will
+		willMeterText.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[display_will]</span></center>"
+	if(lastWillMeterSpirit != mob.Spirit || lastWillMeterSpiritMax != mob.SpiritMax)
+		lastWillMeterSpirit = mob.Spirit
+		lastWillMeterSpiritMax = mob.SpiritMax
+		willMeterSP.maptext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[mob.Spirit]/[mob.SpiritMax] SP</span></center>"
 
-	if(!(willMeterText in screen))
+
+
+client/proc/ShowWillMeter()
+	if(willMeterVisible)
+		return
+
+	if(willMeterBack)
+		screen += willMeterBack
+	if(willMeterFill)
+		screen += willMeterFill
+	if(willMeterRainbow)
+		screen += willMeterRainbow
+	if(willMeterText)
 		screen += willMeterText
-	if(!(willMeterSP in screen))
+	if(willMeterSP)
 		screen += willMeterSP
+
+	willMeterVisible = TRUE
+
+
+client/proc/HideWillMeter()
+	if(!willMeterVisible)
+		return
+	screen -= willMeterBack
+	screen -= willMeterFill
+	screen -= willMeterRainbow
+	screen -= willMeterText
+	screen -= willMeterSP
+
+	willMeterVisible = FALSE
