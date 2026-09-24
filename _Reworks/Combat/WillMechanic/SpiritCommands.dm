@@ -254,7 +254,7 @@ obj/Skills/Buffs/SpiritCommands/Instant/Drive
 obj/Skills/Buffs/SpiritCommands/Instant/Valor
 	name = "Valor"
 	BuffName = "Spirit Command: Valor"
-	Desc = "Upon landing a hit, for two seconds, it and following hits' damage get increased by 2."
+	Desc = "Upon landing a hit, for two seconds, it and following hits' damage get multiplied by 2."
 	SpiritCost = 30
 	Cooldown = 10
 	ActiveMessage = "burns with the will to win!"
@@ -280,7 +280,7 @@ obj/Skills/Buffs/SpiritCommands/Instant/Valor
 obj/Skills/Buffs/SpiritCommands/Instant/Soul
 	name = "Soul"
 	BuffName = "Spirit Command: Soul"
-	Desc = "Upon landing a hit, for two seconds, it and following hits' damage get increased by 2.2. Overrides Valor."
+	Desc = "Upon landing a hit, for two seconds, it and following hits' damage get multiplied by 2.2. Overrides Valor."
 	SpiritCost = 40
 	Cooldown = 10
 	ActiveMessage = "is ready to hit with everything they've got!"
@@ -333,7 +333,7 @@ obj/Skills/Buffs/SpiritCommands/Instant/Flash
 	name = "Flash"
 	BuffName = "Spirit Command: Flash"
 	Desc = "Automatically evade for two seconds upon an attack connecting."
-	SpiritCost = 15
+	SpiritCost = 20
 	Cooldown = 10
 	ActiveMessage = "sees the next hit coming!"
 
