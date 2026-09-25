@@ -6,13 +6,13 @@
 
 
 /mob/proc/compareVariable(mob/enemy, thingToCompare, extraType)
-    var/extra = secretDatum.currentTier
-    if(enemy.Secret == Secret)
-        if(extraType == "Haki") // they arent a king
-            if(enemy.secretDatum.secretVariable["ConquerorsHaki"] == 1)
-                extra -= enemy.secretDatum.currentTier
-            else
-                extra -= 2
+	var/extra = secretDatum.currentTier
+	if(enemy.Secret == Secret)
+		if(extraType == "Haki") // they arent a king
+			if(enemy.secretDatum.secretVariable["ConquerorsHaki"] == 1)
+				extra -= enemy.secretDatum.currentTier
+			else
+				extra -= 2
 	switch(thingToCompare)
 		if("Potential")
 			var/extraWill = 0 // Will-powered (KoB, Spirals, SRW saga eventually) get extra for defense against Haki
@@ -31,16 +31,16 @@
 			else if(difference <= -1)
 				return 1
 			return 1
-        if("Power")
-            var/difference = (Power + extra*glob.EXTRA_CONQ_HAKI_POWER) / enemy.Power
-            if(difference >= 2) // 2x stronger
-                return 4
-            else if(difference >= 1.5) // 1.5x stronger
-                return 3
-            else if(difference >= 1) // 1x stronger
-                return 2
-            else if(difference <= 0.75) // 2x weaker
-                return 1
+		if("Power")
+			var/difference = (Power + extra*glob.EXTRA_CONQ_HAKI_POWER) / enemy.Power
+			if(difference >= 2) // 2x stronger
+				return 4
+			else if(difference >= 1.5) // 1.5x stronger
+				return 3
+			else if(difference >= 1) // 1x stronger
+				return 2
+			else if(difference <= 0.75) // 2x weaker
+				return 1
 
 
 
