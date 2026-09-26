@@ -88,7 +88,7 @@ globalTracker/var/LOWER_DEBUFF_CLAMP = 0.001
 		if(typeOfDebuff == "Frenzy" && !IsDarkDragonPlayer() && dmg > 0)
 			WoundSelf(dmg * 0.5)
 	if(Health<=0 && !KO)
-		if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
+		if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10))
 			return
 		if(typeOfDebuff == "Poison")
 			Unconscious(null, "succumbing to Poison!")

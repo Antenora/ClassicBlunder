@@ -284,7 +284,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(src.KO)
 		return
 	if(P)
-		if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP) //The Character will refuse to get downed until they reach (global) negative hp! (the global must be a negative variable, like -50)
+		if(src.passive_handler.Get("Color of Courage") && src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10)) //The Character will refuse to get downed until they reach (color of courage ticks)x10 negative hp! value must be negative
 			if(!src.passive_handler.Get("Triple Helix"))
 				src.passive_handler.Set("Triple Helix", 1) // triple helix is just a flavor passive that tells the game to only play the message once
 				src.OMessage(15,"<font color=green><h2><big><b>... but just who the hell do you think they are?!</b></big></h2></font color>")

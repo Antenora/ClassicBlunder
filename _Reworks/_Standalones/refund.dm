@@ -7,6 +7,7 @@ mob/var/tmp/refunding = FALSE
 mob/proc/pick_refund_skill(mob/target = src)
 	var/list/Refundable=list("Cancel")
 	for(var/obj/Skills/S in target.Skills)
+		if(S.SagaTreePurchased) continue
 		if(S.Copyable>0&&S.SkillCost>1&&!S.Copied)
 			Refundable.Add(S)
 		else if(istype(S, /obj/Skills/Buffs/NuStyle) && !S.Copied  && !S.SignatureTechnique && !S.SignatureTechnique && S.SkillCost > 1)
@@ -19,6 +20,10 @@ mob/proc/pick_refund_skill(mob/target = src)
 
 mob/proc/refund_skill(obj/Skills/refunded_skill)
 	var/Refund=refunded_skill.SkillCost
+	if(!refunded_skill) return
+	if(refunded_skill.SagaTreePurchased)
+		src << "Refund this skill through its Saga Skill Tree."
+		return
 	if(refunded_skill.NewCost)
 		Refund = refunded_skill.NewCost
 	if(refunded_skill.Mastery>1)
@@ -102,7 +107,10 @@ mob/verb/Refund()
 
 mob/proc/refund_skil_old(obj/Skills/refunded_skill)
 	var/Refund=refunded_skill.SkillCost
-
+	if(!refunded_skill) return
+	if(refunded_skill.SagaTreePurchased)
+		src << "Refund this skill through its Saga Skill Tree."
+		return
 	if(istype(refunded_skill, /obj/Skills/Buffs/NuStyle))
 		if(refunded_skill.SignatureTechnique > 0) Refund = 0
 		else src.SignatureSelected -= refunded_skill.name

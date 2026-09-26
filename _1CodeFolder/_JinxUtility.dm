@@ -81,7 +81,7 @@ mob
 			if(src.CursedWounds())
 				src.WoundSelf(val)
 			if(src.Health<=0&&!src.KO)
-				if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10))
 					return
 				if(src.Burn&&src.Poison)
 					src.Unconscious(null, "succumbing to terrible pain!")
@@ -1022,8 +1022,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1205,8 +1205,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1371,8 +1371,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
