@@ -1,7 +1,7 @@
 
 //THIS IS AN EXAMPLE. THIS WILL BE TAKEN FOR SRW SAGA
-
 /*
+
 datum/saga_skill_tree/KingOfBraves
 	id = "king_of_braves"
 	title = "King of Braves"
@@ -41,6 +41,8 @@ datum/saga_skill_tree_node/KingOfBraves
 		cost = 1
 		tree_x = 822
 		tree_y = 790
+		node_icon = 'HUD/SkillIcons.dmi'
+		node_icon_state = "Kienzan"
 
 datum/saga_skill_tree_node/RankedSkill/KingOfBravesFightingSpirit
 	id = "fighting_spirit"

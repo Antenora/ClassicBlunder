@@ -149,6 +149,23 @@ client/proc/OpenSagaSkillTree(tree_id = null)
 		cursor: pointer;
 	}
 
+	.node-icon {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		image-rendering: pixelated;
+		pointer-events: none;
+	}
+
+	.node .node-icon {
+		opacity: 0.35;
+	}
+
+	.node.learned .node-icon {
+		opacity: 1;
+	}
+
 	.node.available {
 		border-color: #e1e6ff;
 		color: #fff;
@@ -546,7 +563,16 @@ client/proc/OpenSagaSkillTree(tree_id = null)
 			button.type = 'button';
 			button.style.left = node.x + 'px';
 			button.style.top = node.y + 'px';
-			button.textContent = node.title.substring(0, 2);
+			if(node.icon) {
+				var artwork = document.createElement('img');
+				artwork.className = 'node-icon';
+				artwork.src = node.icon;
+				artwork.alt = '';
+				artwork.draggable = false;
+				button.appendChild(artwork);
+			} else {
+				button.textContent = node.title.substring(0, 2);
+			}
 			if(node.maxRank > 1) {
 				var rankLabel = document.createElement('span');
 				rankLabel.className = 'node-rank';

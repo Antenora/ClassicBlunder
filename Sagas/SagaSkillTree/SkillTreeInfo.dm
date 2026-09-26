@@ -52,6 +52,8 @@ datum/saga_skill_tree_node
 	var/required_saga_level = 0
 	var/tree_x = 0
 	var/tree_y = 0
+	var/node_icon = null
+	var/node_icon_state = ""
 	var/visible_if_var = null // show only if this var exists and is above null/0 on player
 	var/visible_if_value = null // show only if the previous var exists and is this Exact value
 

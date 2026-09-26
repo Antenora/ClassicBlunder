@@ -49,6 +49,12 @@ datum/saga_skill_tree_panel
 				for(var/required_id in N.requires)
 					links += required_id
 
+				var/icon_file = ""
+				if(N.node_icon)
+					icon_file = "saga_node_[ckey(tree_id)]_[ckey(N.id)].png"
+					var/icon/node_art = icon(N.node_icon, N.node_icon_state, SOUTH, 1)
+					owner << browse_rsc(node_art, icon_file)
+
 				rows += list(list(
 					"id" = N.id,
 					"title" = N.title,
@@ -65,7 +71,8 @@ datum/saga_skill_tree_panel
 					"canBuy" = rank < limit && !missing.len && player.RPPSpendable >= price,
 					"canRefund" = !refund_block,
 					"refundAmount" = refund_amount,
-					"refundBlock" = refund_block
+					"refundBlock" = refund_block,
+					"icon" = icon_file
 				))
 		else
 			message = "You no longer meet this tree's Saga requirement."
