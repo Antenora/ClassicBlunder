@@ -38,7 +38,10 @@ mob/var/list/SagaSkillTreeHistory = list()
 obj/Skills/var/SagaTreePurchased = FALSE
 
 
+/*********TYPE OF SKILL TREE NODES***********/
+
 datum/saga_skill_tree_node
+
 	var/id
 	var/tree_id
 	var/title
@@ -56,11 +59,25 @@ datum/saga_skill_tree_node
 	var/node_icon_state = ""
 	var/visible_if_var = null // show only if this var exists and is above null/0 on player
 	var/visible_if_value = null // show only if the previous var exists and is this Exact value
+	var/list/skill_paths = list()
+
 
 	//note you can also configure visibility by overriding VisibilityCondition! check srwmain.dm for examples for the time being
 
+	proc/RewardSkillPaths()
+		if(skill_paths.len)
+			return skill_paths
+		if(skill_path)
+			return list(skill_path)
+		return list()
+
 	proc/IsConfigured()
-		return ispath(skill_path, /obj/Skills)
+		var/list/paths = RewardSkillPaths()
+		if(!paths.len) return FALSE
+
+		for(var/path in paths)
+			if(!ispath(path, /obj/Skills)) return FALSE
+		return TRUE
 
 	proc/RankLimit()
 		return 1
@@ -88,10 +105,17 @@ datum/saga_skill_tree_node
 
 	proc/GetRank(mob/M)
 		if(!M) return 0
+
 		var/list/history = GetHistory(M)
 		if(history && history.len) return 1
 
-		return M.FindSkill(skill_path) ? 1 : 0
+		// already owning every reward also satisfies this node
+		var/list/paths = RewardSkillPaths()
+		if(!paths.len) return 0
+
+		for(var/path in paths)
+			if(!M.FindSkill(path)) return 0
+		return 1
 
 	proc/IsLearned(mob/M)
 		return GetRank(M) > 0
@@ -109,19 +133,58 @@ datum/saga_skill_tree_node
 		return 1
 
 	proc/GrantRank(mob/M, list/record)
-		if(!M || M.FindSkill(skill_path)) return FALSE
+		if(!M || GetRank(M)) return FALSE
 
-		M.findOrAddSkill(skill_path)
+		var/list/granted = list()
+		record["skills"] = granted
+		var/success = TRUE
 
-		var/obj/Skills/S = M.FindSkill(skill_path)
-		if(!S) return FALSE
+		try
+			for(var/path in RewardSkillPaths())
+				if(M.FindSkill(path)) continue
 
-		S.SagaTreePurchased = TRUE
-		record["skill"] = S
-		record["skill_path"] = skill_path
+				M.findOrAddSkill(path)
+				var/obj/Skills/S = M.FindSkill(path)
+				if(!S)
+					success = FALSE
+					break
+
+				S.SagaTreePurchased = TRUE
+				granted += S
+
+		catch(var/exception/E)
+			world.log << "Saga Skill Tree grant failed for [id]: [E]"
+			success = FALSE
+
+		if(!success)
+			if(!RemoveRank(M, record))
+				world.log << "Saga Skill Tree rollback failed for [id]."
+			return FALSE
+
 		return TRUE
 
 	proc/RemoveRank(mob/M, list/record)
+		if(!M) return FALSE
+
+		var/list/granted = record["skills"]
+
+		// supports older purchases and RankedSkill records
+		if(!islist(granted))
+			return RemoveSkillReward(M, record)
+
+		// validate every remaining skill before removing anything
+		for(var/obj/Skills/S in granted)
+			if(S && S.loc != M) return FALSE
+
+		for(var/obj/Skills/S in granted.Copy())
+			if(!S) continue
+
+			var/list/skill_record = list("skill" = S)
+			if(!RemoveSkillReward(M, skill_record)) return FALSE
+
+		return TRUE
+
+	proc/RemoveSkillReward(mob/M, list/record)
 		var/obj/Skills/S = record["skill"]
 		if(!S) return TRUE
 		if(S.loc != M) return FALSE
@@ -194,6 +257,7 @@ datum/saga_skill_tree_node
 				return FALSE
 
 		return TRUE
+
 
 datum/saga_skill_tree_node/Passive // this node grants a Passive so the Reward process is different
 	var/passive_name
@@ -285,6 +349,47 @@ datum/saga_skill_tree_node/RankedSkill // this node let you purchase extra skill
 		record["skill"] = S
 		record["skill_path"] = path
 		return TRUE
+
+
+// this node modifies a variable
+datum/saga_skill_tree_node/Variable
+	var/variable_name
+	var/variable_amount = 1
+
+	IsConfigured()
+		return variable_name && isnum(variable_amount) && variable_amount != 0 && max_rank >= 1
+
+	RankLimit()
+		return max(1, round(max_rank))
+
+	GetRank(mob/M)
+		var/list/history = GetHistory(M)
+		return history ? history.len : 0
+
+	GrantRank(mob/M, list/record)
+		if(!M || !(variable_name in M.vars)) return FALSE
+		if(!isnum(M.vars[variable_name])) return FALSE
+
+		M.vars[variable_name] += variable_amount
+
+		record["variable"] = variable_name
+		record["amount"] = variable_amount
+		return TRUE
+
+	RemoveRank(mob/M, list/record)
+		if(!M) return FALSE
+
+		var/target_variable = record["variable"]
+		var/amount = record["amount"]
+
+		if(!target_variable || !(target_variable in M.vars)) return FALSE
+		if(!isnum(M.vars[target_variable]) || !isnum(amount)) return FALSE
+
+		M.vars[target_variable] -= amount
+		return TRUE
+
+/********************/
+
 
 var/global/list/SagaSkillTrees = list()
 var/global/list/SagaSkillTreeNodes = list()
