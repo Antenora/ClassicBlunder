@@ -30,6 +30,7 @@ mob
 				if(MAX_POTENTIAL_PER_KILL <= 0) MAX_POTENTIAL_PER_KILL = 1
 				val = min(val * (1 + PotentialRate), MAX_POTENTIAL_PER_KILL)
 				Potential += val
+				StyleStageRefresh()
 				if(val > 0)
 					if(isRace(ANDROID)) HealthCut += (val / 100)
 					if(isRace(DEMIFIEND))

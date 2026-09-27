@@ -31,6 +31,31 @@
     // Below is The Buff We Pass This Shit To and spends charges
     Techniques = list("/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Flask_Charge")
 
+    BeltUsable = 1
+    BeltConsumes = 0
+    BeltCooldown = 0
+
+    BeltCount()
+        return Charges
+
+    BeltSlotAllowed(mob/user)
+        if(!user) return 0
+        if(user.equippedFlask != src)
+            user << "You have to be wearing that Flask to put it on your belt."
+            return 0
+        return 1
+
+    BeltUse(mob/user)
+        if(!user) return 0
+        if(user.equippedFlask != src)
+            user << "You are not wearing that Flask."
+            return 0
+        var/before = Charges
+        Imbibe_Flask()
+        if(Charges < before) return 1
+        user << "<font color='#ff6b6b'>Your Flask stays at your hip.</font>"
+        return 0
+
     verb/Imbibe_Flask() // We cosnume a charge from the flask!
         set category = "Skills"
         set hidden = 1
@@ -46,6 +71,12 @@
                 if(usedFlask.Using)
                     usr << "You cannot imbibe more right now!"
                     return // FUCK YOU FUCK YOU FUCK YOU 
+                if(usedFlask.cooldown_remaining > 0)
+                    usr << "Your Flask needs more time before its next draught."
+                    return
+                if(usr.GCDBlocked(usedFlask))
+                    usr << "You cannot imbibe that quickly."
+                    return
                 if(!usr.reduceCharge()) return // mob proc that reduces charges
                 usedFlask.adjust(usr); // We can now pass adjust and trigger procs as if we were in the buff (kind of)
                 usedFlask.Trigger(usr);

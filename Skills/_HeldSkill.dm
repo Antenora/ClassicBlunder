@@ -36,6 +36,7 @@
 	var/HeldBeam         = FALSE
 	var/HeldBeamUncapped = FALSE
 	var/HeldVulnerability = 0
+	var/HeldAllowsActions = FALSE
 
 globalTracker/var/BEAM_OVERCHARGE_DRAIN = 2
 globalTracker/var/HELD_BEAM_MOVE_PENALTY = 2
@@ -800,7 +801,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 // charging and the requested skill would conflict.
 
 /mob/proc/HeldSkillBlocksAction(obj/Skills/Z)
-	if(held_skill && held_skill != Z && !(Z && Z.SilentCast))
+	if(held_skill && held_skill != Z && !(Z && Z.SilentCast) && !held_skill.HeldAllowsActions)
 		src << "<font color='red'>You can't do that while charging [held_skill.name].</font>"
 		return TRUE
 	if(judgement_cut_chain_active && !(istype(Z, /obj/Skills/AutoHit/Judgement_Cut) || istype(Z, /obj/Skills/AutoHit/Jarona)))

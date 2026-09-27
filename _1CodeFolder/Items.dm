@@ -55,6 +55,9 @@ obj/Money
 				moneyList.Remove(choice)
 				counter --
 				del choice
+
+/mob/var/tmp/mob/belt_receiver
+
 obj/Items
 	Pickable=1
 	Stealable=1
@@ -135,6 +138,22 @@ obj/Items
 
 	var/Stackable=0//If this is flagged, it will accumulate stacks of the item
 	var/TotalStack=1//Only used if stackable.
+
+	var/BeltUsable=0
+	var/BeltCooldown=0
+	var/BeltHoldTime=10
+	var/BeltAlly=0
+	var/BeltConsumes=1
+	var/mech_slot
+
+	proc/BeltUse(mob/user)
+		return 0
+
+	proc/BeltCount()
+		return Stackable ? TotalStack : 1
+
+	proc/BeltSlotAllowed(mob/user)
+		return 1
 
 	var/UpdatesDescription=0//If this is flagged, runs the Update_Description proc before outputting a desc
 
@@ -324,82 +343,7 @@ obj/Items
 			return
 		Drop()
 	Click()
-		if(src in Technology_List)
-			var/obj/ItemMade
-			if(usr.KO)
-				usr << "You cannot create items while KO'd."
-				return
-			var/Mode=Ask(usr, "Do you want to buy the item or examine it?", "[src]", null, "confirm", null, 1, "Buy", "Examine")
-			if(Mode=="Examine")
-				if(istype(src,/obj/Items))
-					if(src:UpdatesDescription)
-						src:Update_Description()
-				if(src.desc)
-					usr<<src.desc
-				else
-					usr << "[src] has no description."
-				return
-			if(!usr.HasMoney(src.Cost))
-				usr << "You don't have enough money to buy [src]."
-				return
-			if(1)
-				if(istype(src,/obj/Items/Tech/Power_Pack))
-					var/MultiMake=Ask(usr, "How many packs would you like to make?", "", null, "num", null, 1)
-					if(MultiMake==null||MultiMake<=0)
-						return
-					var/MultiCost=Technology_Price(usr,src)
-					for(var/obj/Money/M in usr)
-						if(M.Level>=MultiCost*MultiMake)
-							usr.TakeMoney(MultiCost*MultiMake)
-							var/obj/Items/Tech/Power_Pack/P=new type(usr.loc)
-							P.TotalStack=MultiMake
-							P.suffix="[MultiMake]"
-							if(MultiMake>1)
-								usr<<"You made [MultiMake] [src]."
-						else
-							usr<<"You don't have enough money! You need [Commas(MultiCost*MultiMake)] resources to make [MultiMake] [src]."
-					return
-				if(Can_Afford_Technology(usr, src))
-					usr.TakeMoney(Technology_Price(usr, src))
-					usr.UpdateTechnologyWindow()
-
-
-					ItemMade=new src.type
-					if(ItemMade:Stackable)
-						var/stacktype=ItemMade.type
-						for(var/obj/Items/o in usr)
-							if(o.type==stacktype && o.TotalStack < INV_STACK_MAX)
-								o.TotalStack++
-								usr << "You stack a new [ItemMade]."
-								del ItemMade
-					if(ItemMade)
-						if(ItemMade.Grabbable)
-							if(!usr.CanPickupItem(ItemMade))
-								del ItemMade
-								return
-							ItemMade.loc=usr
-						else
-							ItemMade.loc=usr.loc
-						ItemMade:CreatorKey=usr.ckey
-						ItemMade:CreatorSignature=usr.EnergySignature
-
-					usr << "You made \an [ItemMade]!"
-
-				if(istype(src,/obj/Items/Tech/Scouter))
-					if(ItemMade:ScouterIcon!=1)
-						ItemMade:ScouterIcon=1
-						var/Choice=Ask(usr, "What icon would you like for the scouter?", "", null, "pick", list ("Green","Blue","Red","Purple"), 0)
-						switch(Choice)
-							if("Green")
-								ItemMade:icon='GreenScouter.dmi'
-							if("Blue")
-								ItemMade:icon='BlueScouter.dmi'
-							if("Red")
-								ItemMade:icon='RedScouter.dmi'
-							if("Purple")
-								ItemMade:icon='PurpleScouter.dmi'
-
-		else if(src in Enchantment_List)
+		if(src in Enchantment_List)
 			var/obj/ItemMade
 			var/Mode=Ask(usr, "Do you want to buy the item or examine it?", "[src]", null, "confirm", null, 1, "Buy", "Examine")
 			if(Mode=="Examine")
@@ -494,105 +438,6 @@ obj/Items
 			else
 				usr << "[src] does not resonate with your legendary abilities."
 				return
-
-	Edibles
-		Health=1
-		layer=MOB_LAYER+0.5
-		var/EatText
-		var/EatNutrition
-		var/EatToxicity
-		Booze
-			icon='Foods.dmi'
-			icon_state="Booze"
-			Pickable=1
-		Food
-			icon='Foods.dmi'
-			icon_state="Poor"
-			Pickable=1
-		Senzu
-			icon='Senzu.dmi'
-			icon_state=""
-			Pickable=1
-			EatText="eats the bean; its rejuvenating power heals them fully!"
-			EatNutrition=6
-		Click()
-			if(!(usr in oview(1,src))&&!(src in usr))
-				return
-			var/RacialHunger=1
-			if(usr.race in list(SAIYAN))
-				RacialHunger=5
-			if(usr.race in list(MAJIN,WILDER,DEMON))
-				RacialHunger=20
-			if(usr.EnhancedSmell)
-				RacialHunger*=2
-			if(usr.Satiated>=4000*RacialHunger)
-				usr << "You are completely full!"
-				return
-			if(src.EatNutrition>=6 && usr.icon_state != "Meditate")
-				usr << "You must be meditating to eat this."
-			if(!src.EatToxicity)
-				var/eattingtext=replacetext(EatText, "usrName", "[usr]")
-				OMsg(usr, "[eattingtext]")
-				usr.Satiated+=EatNutrition*1000
-				usr.HealWounds(EatNutrition*2)
-				usr.HealFatigue(EatNutrition*2)
-				if(src.EatNutrition>5)
-					usr.Sheared=0
-					usr.TotalInjury=0
-					usr.TotalFatigue=0
-					usr.TotalCapacity=0
-					usr.HealHealth(100)
-					usr.HealEnergy(100)
-					usr.HealMana(100)
-					usr.StrTax=0
-					usr.ForTax=0
-					usr.EndTax=0
-					usr.SpdTax=0
-					usr.OffTax=0
-					usr.DefTax=0
-					usr.HealthCut=0
-					if(usr.GatesNerf)
-						usr.GatesNerf=1
-					if(usr.OverClockTime)
-						usr.OverClockTime=1
-					if(usr.BPPoison<1)
-						usr.BPPoison=1
-						usr.BPPoisonTimer=0
-					if(usr.Maimed)
-						usr.Maimed--
-						usr << "You recover from a maiming!"
-					if(usr.SenseRobbed)
-						if(usr.SenseRobbed>=5)
-							animate(usr.client, color=null, time=1)
-						usr.SenseRobbed=0
-						usr << "You regain lost senses!"
-			else
-				var/eattingtext=replacetext(EatText, "usrName", "[usr]")
-				OMsg(usr, "[eattingtext]")
-				usr.Satiated+=EatNutrition*1000
-				if(usr.Satiated>=2000 && !usr.Drunk)
-					usr.Drunk=1
-					usr << "You've grown drunk!"
-				if(prob(20*src.EatToxicity))
-					usr << "<font color='red'>You feel dizzy!</font>"
-					Stun(usr, 2*src.EatToxicity)
-				if(prob(20*src.EatToxicity))
-					usr << "<font color='red'>You start to stumble!</font>"
-					usr.AddConfusing(20*src.EatToxicity)
-				if(prob(20*src.EatToxicity))
-					usr << "<font color='red'>Your balance is out of whack!</font>"
-					usr.AddCrippling(20*src.EatToxicity)
-				if(prob(10*src.EatToxicity))
-					usr << "You feel really sick!"
-					usr.AddPoison(4*src.EatToxicity)
-				if(prob(5*src.EatToxicity))
-					usr << "<font color='red'>You feel aggressive!</font>"
-					usr.ForceAngered()
-				else if(prob(5*src.EatToxicity))
-					usr << "<font color='red'>You grow mellow!</font>"
-					usr.AddPacifying(20*src.EatToxicity)
-			del(src)
-
 
 	Wearables
 		Health=1
@@ -797,8 +642,8 @@ obj/Items/Plating
 		desc="Refractive plating is designed to reflect projectile attacks easily, but it is heavy and makes it harder to dodge melee strikes."
 
 obj/Items/BlastShielding
-	TechType="MilitaryTechnology"
-	SubType="Blast Shielding"
+	TechType="Military Technology"
+	SubType="Force Shielding"
 	Cost=5
 	Blast_Shield
 		Unobtainable=0
@@ -984,7 +829,7 @@ obj/Items/Sword
 		Ascended=4
 		ExtraClass=1
 		HighFrequency=1
-		TechType="MilitaryTechnology"
+		TechType="Military Technology"
 		SubType="Melee Weaponry"
 		desc="A specialized form of a light sword that is most effective in the hands of those with cybernetic implants. Responds particularly well to alloys. (Quicksilver Alloy, Resistant Coating, and Fiber Bonding Agents)."
 		unsheatheIcon = 'KATANA SILVER.dmi'
@@ -1725,6 +1570,9 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				if(!User.ArcaneBladework&&!User.isRace(DEMON))
 					User << "You can't use a sword and a staff at the same time!"
 					return
+			if(!src.suffix&&User.EquippedGun())
+				User << "You can't use a staff and a gun at the same time!"
+				return
 			if(User.StanceBuff)
 				if(User.StanceBuff.NeedsStaff||User.StanceBuff.MakesStaff||User.NeedSpellFocii(User.StanceBuff))
 					User << "You can't remove your staff with [User.StanceBuff] active!"
@@ -1802,6 +1650,9 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				if(!User.ArcaneBladework&&!User.isRace(DEMON))
 					User << "You can't use a sword and a staff at the same time!"
 					return
+			if(!src.suffix&&User.EquippedGun())
+				User << "You can't use a sword and a gun at the same time!"
+				return
 			if(User.StyleBuff)
 				if(User.StyleBuff.NeedsSword||User.StyleBuff.MakesSword)
 					User << "You can't remove your sword with [User.StyleBuff] active!"
@@ -1855,6 +1706,32 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 							User << "You can't take off [src] while one of its techniques is being used!"
 							return
 			W.AlignEquip(User)
+
+		if(istype(src,/obj/Items/Gun))
+			if(User.Secret=="Heavenly Restriction" && User.secretDatum?:hasRestriction("Sword"))
+				return
+			var/obj/Items/Gun/G=src
+			var/obj/Items/Gun/heldGun=User.EquippedGun()
+			if(heldGun)
+				if(heldGun!=src)
+					User << "You already have a gun equipped."
+					return
+			if(!src.suffix)
+				if(User.EquippedSword())
+					User << "You can't use a sword and a gun at the same time!"
+					return
+				if(User.EquippedStaff())
+					User << "You can't use a staff and a gun at the same time!"
+					return
+			if(G.GunEquipRefused(User))
+				return
+			G.GunAlignEquip(User)
+			return
+
+		if(istype(src,/obj/Items/Ammo))
+			var/obj/Items/Ammo/AM=src
+			if(User.GunAdoptAmmo(AM))
+				return
 
 		if(istype(src,/obj/Items/Armor))
 			if(User.Secret=="Heavenly Restriction" && User.secretDatum?:hasRestriction("Armor"))
@@ -2076,6 +1953,9 @@ obj/Items/proc/ObjectUse(var/mob/Players/User=usr)
 				var/GearCount=0
 				if(get_dist(User, src) > 1)
 					return //Too far.
+				if(User.EquippedGun())
+					User << "You can't have any weapons equipped while inside a Mobile Suit!"
+					return
 
 				for(var/obj/Items/Gear/g in User)
 					if(g==src)

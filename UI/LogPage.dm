@@ -739,7 +739,7 @@ client/proc/LogPageShow(target, scope)
 	src << browse(LogPageHTML(), "window=[LOGPAGE_CTL]")
 	logpage_open = 1
 	LogPagePlace()
-	winset(src, LOGPAGE_CTL, "is-visible=true")
+	WebOverlayShow(LOGPAGE_CTL)
 
 client/proc/LogPageHide()
 	logpage_open = 0

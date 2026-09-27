@@ -8,6 +8,38 @@ area
 	var/tmp/wx_kind
 	var/tmp/obj/screen/wx_tint/wx_tint
 	var/tmp/obj/screen/wx_flash/wx_flash
+	var/tmp/wx_seeded = 0
+	var/tmp/list/wx_seed_z
+
+#define WX_Z_FILE "Saves/ZWeather.txt"
+#define WX_Z_PICK "Whole Z plane..."
+#define WX_Z_REMOVE "remove - back to normal weather"
+
+var/list/_wx_kinds = list("rain", "storm", "snow", "blizzard", "dust", "clear")
+var/list/_wx_zlevels = list()
+
+/datum/wx_zlevel
+	var/z = 0
+	var/want = "clear"
+	var/tmp/wx_kind
+	var/tmp/obj/screen/wx_tint/wx_tint
+	var/tmp/obj/screen/wx_flash/wx_flash
+
+proc/WxZLevelAt(turf/T)
+	if(!T || T.z > _wx_zlevels.len) return null
+	var/datum/wx_zlevel/ZL = _wx_zlevels[T.z]
+	if(!ZL) return null
+	var/area/A = T.loc
+	if(!A || istype(A, /area/MapperZone) || !(A in _dn_sky_areas)) return null
+	if(A.wx_seed_z && A.wx_seed_z["[T.z]"] > world.time) return null
+	return ZL
+
+proc/WxKindAt(turf/T)
+	if(!isturf(T)) return null
+	var/area/A = T.loc
+	if(!A || !A.sees_sky) return null
+	var/datum/wx_zlevel/ZL = WxZLevelAt(T)
+	return ZL ? ZL.wx_kind : A.wx_kind
 
 area/Outside/Planet/Earth/wx_table = list("clear"=60,"rain"=28,"storm"=12)
 area/Outside/Planet/Namek/wx_table = list("clear"=70,"rain"=30)
@@ -122,6 +154,7 @@ mob
 	mouse_opacity = 0
 	appearance_flags = PIXEL_SCALE
 	alpha = 0
+	var/tmp/wx_live = 1
 	New()
 		..()
 		icon = EnvWhiteIcon()
@@ -162,15 +195,15 @@ proc/_WxParticlePath(kind, tier)
 			return /particles/wx_dust
 	return null
 
-proc/_WxConfigureWind(area/A, obj/screen/wx_emitter/E, kind)
-	if(!A || !E || !E.particles) return
-	var/list/W = EnvWindForArea(A)
+proc/_WxConfigureWind(turf/T, obj/screen/wx_emitter/E, kind)
+	if(!T || !E || !E.particles) return
+	var/list/W = EnvWindAt(T)
 	var/wx = W[1]
 	var/wy = W[2]
 	switch(kind)
 		if("dust") E.particles.velocity = generator("box", list(wx-3,wy-1,-1), list(wx+3,wy+2,1))
 
-proc/_WxConfigureClientEmitter(client/C, area/A, obj/screen/wx_emitter/E, kind)
+proc/_WxConfigureClientEmitter(client/C, turf/T, obj/screen/wx_emitter/E, kind)
 	if(!C || !E || !E.particles) return
 	if(!E.base_particle_count)
 		E.base_particle_count = E.particles.count
@@ -185,7 +218,7 @@ proc/_WxConfigureClientEmitter(client/C, area/A, obj/screen/wx_emitter/E, kind)
 	E.particles.count = max(1, round(E.base_particle_count * coverage_scale))
 	E.particles.spawning = max(1, round(E.base_particle_spawning * coverage_scale))
 	E.particles.position = generator("box", list(-half_w, -half_h, -100), list(half_w, half_h, 100))
-	_WxConfigureWind(A, E, kind)
+	_WxConfigureWind(T, E, kind)
 
 var/list/_wx_row_crops = list() //bottom bands of the 128px sheets, for the row at the view's top edge
 
@@ -236,10 +269,8 @@ proc/_WxClearOutdoorMask(mob/Players/P)
 	P._wx_mask_images = null
 	P._wx_mask_key = null
 
-proc/_WxTurfReceivesWeather(turf/T, area/weather_area)
-	if(!T || !weather_area) return FALSE
-	var/area/A = T.loc
-	return A && A.sees_sky && A.wx_kind == weather_area.wx_kind
+proc/_WxTurfReceivesWeather(turf/T, kind)
+	return kind && WxKindAt(T) == kind
 
 proc/_WxMaskRunImage(turf/start, run_length)
 	if(!start || run_length <= 0) return null
@@ -255,8 +286,8 @@ proc/_WxMaskRunImage(turf/start, run_length)
 		I.pixel_x = round((run_length - 1) * world.icon_size / 2)
 	return I
 
-proc/_WxUpdateOutdoorMask(mob/Players/P, area/weather_area)
-	if(!P || !P.client || !weather_area)
+proc/_WxUpdateOutdoorMask(mob/Players/P, kind)
+	if(!P || !P.client || !kind)
 		_WxClearOutdoorMask(P)
 		return
 	var/atom/anchor = GfxViewAnchor(P.client)
@@ -285,7 +316,7 @@ proc/_WxUpdateOutdoorMask(mob/Players/P, area/weather_area)
 		var/turf/run_start = null
 		for(var/x = min_x, x <= max_x + 1, x++)
 			var/turf/T = x <= max_x ? locate(x, y, center.z) : null
-			if(_WxTurfReceivesWeather(T, weather_area))
+			if(_WxTurfReceivesWeather(T, kind))
 				if(!run_start) run_start = T
 			else if(run_start)
 				var/image/I = _WxMaskRunImage(run_start, x - run_start.x)
@@ -301,7 +332,7 @@ proc/_WxUpdateOutdoorMask(mob/Players/P, area/weather_area)
 			P.client.images -= I
 
 //any outside area with weather up in view: own tile first, then eight samples around the view edge
-proc/_WxNearbyWeatherArea(mob/Players/P)
+proc/_WxNearbyWeatherTurf(mob/Players/P)
 	if(!glob || !glob.WEATHER || !P || !P.client) return null
 	var/atom/anchor = GfxViewAnchor(P.client)
 	var/turf/center = anchor ? get_turf(anchor) : null
@@ -309,8 +340,7 @@ proc/_WxNearbyWeatherArea(mob/Players/P)
 	var/r = min(ClientViewRange(P.client), 12)
 	for(var/list/off in list(list(r,0), list(-r,0), list(0,r), list(0,-r), list(r,r), list(r,-r), list(-r,r), list(-r,-r)))
 		var/turf/S = locate(clamp(center.x + off[1], 1, world.maxx), clamp(center.y + off[2], 1, world.maxy), center.z)
-		var/area/SA = S ? S.loc : null
-		if(SA && SA.sees_sky && SA.wx_kind) return SA
+		if(WxKindAt(S)) return S
 	return null
 
 proc/_WxDetachPlayer(mob/Players/P)
@@ -353,6 +383,7 @@ var/_wx_boot = _WxBoot()
 
 proc/_WxBoot()
 	spawn(60)
+		_WxZLoad()
 		_WxRollLoop()
 	spawn(70)
 		_WxSyncLoop()
@@ -373,6 +404,7 @@ proc/_WxRollLoop()
 	while(1)
 		if(glob && glob.WEATHER)
 			for(var/area/A in _dn_sky_areas)
+				if(A.wx_seeded > world.time) continue
 				if(istype(A, /area/MapperZone))
 					BuildZoneWxRestore(A)
 					continue
@@ -385,45 +417,193 @@ proc/_WxRollLoop()
 			for(var/area/A in _dn_sky_areas)
 				if(A.wx_kind)
 					WxSet(A, null)
+		WxZRestoreAll()
 		sleep(max(1, glob ? glob.WX_ROLL_MINUTES : 15) * 600)
 
+proc/_WxNewTint(kind)
+	var/list/V = _WxVisuals(kind)
+	var/obj/screen/wx_tint/W = new()
+	W.color = V[1]
+	W.alpha = V[2]
+	return W
+
+proc/_WxNewFlash()
+	var/obj/screen/wx_flash/F = new()
+	spawn() _WxStormFlashes(F)
+	return F
+
+proc/_WxDropVisuals(obj/screen/wx_tint/tint, obj/screen/wx_flash/flash)
+	if(flash) flash.wx_live = 0
+	if(!tint && !flash) return
+	for(var/client/C)
+		if(tint) C.screen -= tint
+		if(flash) C.screen -= flash
+
+proc/_WxSnapshot(z, area/A)
+	var/list/S = list()
+	for(var/mob/Players/P in players)
+		var/turf/T = GfxGroundTurf(P)
+		if(!T) continue
+		if(A ? (T.loc == A) : (T.z == z))
+			S[P] = WxKindAt(T) || ""
+	return S
+
+proc/_WxAnnounce(list/before)
+	for(var/mob/Players/P in before)
+		var/was = before[P] || null
+		var/now = WxKindAt(GfxGroundTurf(P))
+		if(now == was) continue
+		var/msg = now ? _WxStartMsg(now) : _WxEndMsg(was)
+		if(msg) P << "<font color=#8be9ff>[msg]</font>"
+
 proc/WxSet(area/A, kind)
+	var/list/before = _WxSnapshot(0, A)
 	var/old = A.wx_kind
-	if(A.wx_tint || A.wx_flash)
-		for(var/client/C)
-			if(A.wx_tint) C.screen -= A.wx_tint
-			if(A.wx_flash) C.screen -= A.wx_flash
-		A.wx_tint = null
-		A.wx_flash = null
+	_WxDropVisuals(A.wx_tint, A.wx_flash)
+	A.wx_tint = null
+	A.wx_flash = null
 	A.wx_kind = kind
 	if(old != kind) GfxWindChanged()
 	if(kind)
-		var/list/V = _WxVisuals(kind)
-		A.wx_tint = new()
-		A.wx_tint.color = V[1]
-		A.wx_tint.alpha = V[2]
+		A.wx_tint = _WxNewTint(kind)
 		if(kind == "storm")
-			A.wx_flash = new()
-			spawn() _WxStormFlashes(A)
+			A.wx_flash = _WxNewFlash()
 	//flavor line to players standing under that sky (skip same-kind re-forces)
-	var/msg = (kind != old) ? (kind ? _WxStartMsg(kind) : _WxEndMsg(old)) : null
-	if(msg)
-		for(var/mob/Players/P in players)
-			var/turf/T = GfxGroundTurf(P)
-			if(T && T.loc == A)
-				P << "<font color=#8be9ff>[msg]</font>"
+	_WxAnnounce(before)
 	_WxSyncPass() //re-attach immediately, no clear-sky gap until the next loop tick
 	LightingRefreshReflectionsForArea(A)
 
-proc/_WxStormFlashes(area/A)
+proc/_WxStormFlashes(obj/screen/wx_flash/F)
 	set waitfor = 0
 	set background = 1
-	var/obj/screen/wx_flash/F = A.wx_flash
-	while(A && A.wx_kind == "storm" && A.wx_flash == F)
+	while(F && F.wx_live)
 		sleep(rand(150, 600))
-		if(!A || A.wx_kind != "storm" || A.wx_flash != F) break
+		if(!F || !F.wx_live) break
 		animate(F, alpha = 150, time = 1)
 		animate(alpha = 0, time = 4)
+
+proc/_WxZOverridden(z)
+	return z >= 1 && z <= _wx_zlevels.len && _wx_zlevels[z]
+
+proc/WxZWanted(datum/wx_zlevel/ZL)
+	if(!ZL || !glob || !glob.WEATHER || ZL.want == "clear") return null
+	return ZL.want
+
+proc/_WxZApply(datum/wx_zlevel/ZL, kind)
+	_WxDropVisuals(ZL.wx_tint, ZL.wx_flash)
+	ZL.wx_tint = null
+	ZL.wx_flash = null
+	ZL.wx_kind = kind
+	if(kind)
+		ZL.wx_tint = _WxNewTint(kind)
+		if(kind == "storm")
+			ZL.wx_flash = _WxNewFlash()
+
+proc/_WxZDirty()
+	GfxWindChanged()
+	for(var/mob/Players/P in players)
+		P._wx_mask_key = null
+	_WxSyncPass()
+
+proc/_WxZRefreshLighting()
+	for(var/area/A in _dn_sky_areas)
+		if(!istype(A, /area/MapperZone))
+			LightingRefreshReflectionsForArea(A)
+
+proc/WxZSet(z, kind)
+	z = round(z)
+	if(z < 1) return
+	var/list/before = _WxSnapshot(z)
+	var/datum/wx_zlevel/ZL = z <= _wx_zlevels.len ? _wx_zlevels[z] : null
+	if(isnull(kind))
+		if(!ZL) return
+		_WxZApply(ZL, null)
+		_wx_zlevels[z] = null
+		while(_wx_zlevels.len && !_wx_zlevels[_wx_zlevels.len])
+			_wx_zlevels.len--
+	else
+		if(!ZL)
+			if(_wx_zlevels.len < z) _wx_zlevels.len = z
+			ZL = new
+			ZL.z = z
+			_wx_zlevels[z] = ZL
+		ZL.want = kind
+		_WxZApply(ZL, WxZWanted(ZL))
+	_WxZSave()
+	_WxZDirty()
+	_WxAnnounce(before)
+	_WxZRefreshLighting()
+
+proc/WxZRestoreAll()
+	for(var/datum/wx_zlevel/ZL in _wx_zlevels)
+		var/want = WxZWanted(ZL)
+		if(ZL.wx_kind == want && (!want || ZL.wx_tint)) continue
+		var/list/before = _WxSnapshot(ZL.z)
+		_WxZApply(ZL, want)
+		_WxZDirty()
+		_WxAnnounce(before)
+		_WxZRefreshLighting()
+
+proc/WxSeedClaim(area/A, z, until)
+	if(!A.wx_seed_z) A.wx_seed_z = list()
+	var/zk = "[z]"
+	var/fresh = !(A.wx_seed_z[zk] > world.time)
+	A.wx_seed_z[zk] = until
+	return fresh && _WxZOverridden(z)
+
+proc/WxSeedRelease(area/A, z)
+	if(!A.wx_seed_z) return 0
+	var/zk = "[z]"
+	var/held = A.wx_seed_z[zk] > world.time
+	A.wx_seed_z -= zk
+	if(!A.wx_seed_z.len) A.wx_seed_z = null
+	return held && _WxZOverridden(z)
+
+proc/WxSeedFlip(area/A)
+	_WxZDirty()
+	LightingRefreshReflectionsForArea(A)
+
+proc/_WxZLoad()
+	if(!fexists(WX_Z_FILE)) return
+	for(var/line in splittext(file2text(WX_Z_FILE), "\n"))
+		var/list/f = splittext(line, "\t")
+		if(f.len < 2) continue
+		var/z = text2num(f[1])
+		var/k = trimtext(f[2])
+		if(!isnum(z) || z < 1 || !(k in _wx_kinds)) continue
+		z = round(z)
+		if(_wx_zlevels.len < z) _wx_zlevels.len = z
+		var/datum/wx_zlevel/ZL = new
+		ZL.z = z
+		ZL.want = k
+		_wx_zlevels[z] = ZL
+
+proc/_WxZSave()
+	var/list/lines = list()
+	for(var/datum/wx_zlevel/ZL in _wx_zlevels)
+		lines += "[ZL.z]\t[ZL.want]"
+	if(fexists(WX_Z_FILE))
+		fdel(WX_Z_FILE)
+	if(lines.len)
+		text2file(jointext(lines, "\n"), WX_Z_FILE)
+
+proc/WxZPrompt(mob/M)
+	if(!M) return null
+	var/turf/here = get_turf(M)
+	var/list/planes = list()
+	for(var/zz = 1 to world.maxz)
+		var/datum/wx_zlevel/ZL = zz <= _wx_zlevels.len ? _wx_zlevels[zz] : null
+		planes["Z [zz][ZL ? " - [ZL.want]" : ""][(here && here.z == zz) ? " (you are here)" : ""]"] = zz
+	var/pick = Ask(M, "Which Z plane? Mapper zones on it keep their own weather.", "Z Weather", null, "pick", planes, 1)
+	if(!pick || !planes[pick]) return null
+	var/z = planes[pick]
+	var/list/kinds = _wx_kinds.Copy()
+	if(_WxZOverridden(z)) kinds += WX_Z_REMOVE
+	var/k = Ask(M, "Weather for all of Z [z]?", "Z Weather", null, "pick", kinds, 1)
+	if(!k || !(k in kinds)) return null
+	WxZSet(z, k == WX_Z_REMOVE ? null : k)
+	M << (k == WX_Z_REMOVE ? "Z [z] is back to normal weather." : "Z [z] weather: [k]. Mapper zones there keep their own weather.")
+	return list(z, k)
 
 proc/_WxSyncPass()
 	for(var/mob/Players/P in players)
@@ -431,17 +611,20 @@ proc/_WxSyncPass()
 			_WxDetachPlayer(P)
 			continue
 		var/turf/T = GfxGroundTurf(P)
-		var/area/A = T ? T.loc : null
-		var/area/standing = (glob && glob.WEATHER && A && A.sees_sky && A.wx_kind) ? A : null
+		var/turf/standing = (glob && glob.WEATHER && WxKindAt(T)) ? T : null
 		//panels stay up for any outside weather in view; only the tint and flashes care where YOU stand
-		var/area/want = standing || _WxNearbyWeatherArea(P)
-		var/obj/screen/wx_tint/want_key = want ? want.wx_tint : null
+		var/turf/want = standing || _WxNearbyWeatherTurf(P)
+		var/datum/wx_zlevel/ZL = WxZLevelAt(want)
+		var/area/WA = want ? want.loc : null
+		var/want_kind = ZL ? ZL.wx_kind : (WA ? WA.wx_kind : null)
+		var/obj/screen/wx_tint/want_key = ZL ? ZL.wx_tint : (WA ? WA.wx_tint : null)
+		var/obj/screen/wx_flash/want_flash = ZL ? ZL.wx_flash : (WA ? WA.wx_flash : null)
 		var/tier = GfxWeatherTier(P.client)
 		var/cover_w = P.client.gfx_screen_cover_w
 		var/cover_h = P.client.gfx_screen_cover_h
 		var/list/vdims = GfxCameraViewTiles(P.client)
 		if(P._wx_key == want_key && P._wx_standing == !!standing && P._wx_tier == tier && P._wx_cover_w == cover_w && P._wx_cover_h == cover_h && P._wx_view_w == vdims[1] && P._wx_view_h == vdims[2])
-			if(want_key) _WxUpdateOutdoorMask(P, want)
+			if(want_key) _WxUpdateOutdoorMask(P, want_kind)
 			else if(P._wx_mask_images) _WxClearOutdoorMask(P)
 			continue
 		_WxDetachPlayer(P)
@@ -455,8 +638,8 @@ proc/_WxSyncPass()
 		if(want_key)
 			P._wx_objs = list(want_key)
 			if(standing) P.client.screen += want_key //the tint grades YOUR sky, not the roof over you
-			var/list/panel_layers = _WxPanelLayers(want.wx_kind)
-			var/particle_path = _WxParticlePath(want.wx_kind, tier)
+			var/list/panel_layers = _WxPanelLayers(want_kind)
+			var/particle_path = _WxParticlePath(want_kind, tier)
 			if(panel_layers || particle_path)
 				var/obj/screen/wx_precip_master/precip_master = new()
 				var/obj/screen/wx_outdoor_mask_master/mask_master = new()
@@ -464,17 +647,17 @@ proc/_WxSyncPass()
 				P._wx_objs += list(precip_master, mask_master, precip_relay)
 				P.client.screen += list(precip_master, mask_master, precip_relay)
 				if(panel_layers)
-					_WxAttachPanelRows(P, want.wx_kind)
+					_WxAttachPanelRows(P, want_kind)
 				else
 					var/obj/screen/wx_emitter/emitter = new()
 					emitter.particles = new particle_path
-					_WxConfigureClientEmitter(P.client, want, emitter, want.wx_kind)
+					_WxConfigureClientEmitter(P.client, want, emitter, want_kind)
 					P._wx_objs += emitter
 					P.client.screen += emitter
-				_WxUpdateOutdoorMask(P, want)
-			if(standing && want.wx_flash && !GfxReducedFlashes(P.client))
-				P._wx_objs += want.wx_flash
-				P.client.screen += want.wx_flash
+				_WxUpdateOutdoorMask(P, want_kind)
+			if(standing && want_flash && !GfxReducedFlashes(P.client))
+				P._wx_objs += want_flash
+				P.client.screen += want_flash
 
 proc/_WxSyncLoop()
 	set waitfor = 0
@@ -492,6 +675,7 @@ proc/_WxSyncLoop()
 	if(glob.WEATHER)
 		for(var/area/MapperZone/MZ in _dn_sky_areas)
 			BuildZoneWxRestore(MZ)
+		WxZRestoreAll()
 	_WxSyncPass()
 
 /mob/Admin2/verb/Force_Weather()
@@ -502,11 +686,23 @@ proc/_WxSyncLoop()
 	var/list/zones = list()
 	for(var/area/A in _dn_sky_areas)
 		zones["[A.name]"] = A
-	var/zn = Ask(src, "Which planet?", "", null, "pick", (zones + "Cancel"), 0)
-	if(zn == "Cancel") return
+	var/zn = Ask(src, "Which planet?", "", null, "pick", (list(WX_Z_PICK) + zones + "Cancel"), 0)
+	if(!zn || zn == "Cancel") return
+	if(zn == WX_Z_PICK)
+		var/list/R = WxZPrompt(src)
+		if(R) Log("Admin", "[ExtractInfo(src)] set Z [R[1]] weather to [R[2]].")
+		return
 	var/area/A = zones[zn]
+	if(!A) return
 	var/kind = Ask(src, "Which weather?", "", null, "pick", list("clear","rain","storm","snow","blizzard","dust","Cancel"), 0)
-	if(kind == "Cancel") return
+	if(!kind || kind == "Cancel") return
 	WxSet(A, kind == "clear" ? null : kind)
 	src << "Weather on [zn]: [kind]."
 	Log("Admin", "[ExtractInfo(src)] forced [kind] weather on [zn].")
+
+mob/Mapper/verb/Z_Weather()
+	set category = "Mapper"
+	if(!glob.WEATHER)
+		usr << "Weather master switch is OFF - an admin must use Weather Toggle or nothing will show."
+	var/list/R = WxZPrompt(usr)
+	if(R) Log("Mapper", "[usr] ([usr.ckey]) set Z [R[1]] weather to [R[2]].", 1)

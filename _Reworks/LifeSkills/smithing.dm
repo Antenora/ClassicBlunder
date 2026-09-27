@@ -282,7 +282,7 @@ proc/ReforgeCostFor(mob/M, obj/Items/I)
 		if(I:Glass && I:HighFrequency)
 			Cost *= 50
 	if(M.ArmamentEnchantmentUnlocked)
-		Cost /= max(M.RepairAndConversionUnlocked + M.SmithingLevel(), 1)
+		Cost /= max(M.SmithingLevel(), 1)
 	return round(Cost * CostMultiplier, 1)
 
 mob/proc/DoSmelt(obj/LifeSkills/Station/S, mid)
@@ -425,14 +425,8 @@ proc/LifeRollGearQuality(mob/M, avgq, perf, mid, hqb = -1)
 	if(hqb < 0)
 		var/obj/Items/LifeTool/hammer = GetBestLifeTool(M, "Hammer")
 		hqb = hammer ? hammer.QualityBonus : 0
-	var/P = 25 * (avgq - 1) + 30 * max(0, perf - 0.5) + hqb + 3 * rank
-	var/roll = P + rand(-15, 15)
-	var/q = QUAL_POOR
 	// legendary sits above every roll but rank 10's best (max P 182 +15 = 197), so it's rank-10-only and tops ~10%
-	if(roll >= 195) q = QUAL_LEGENDARY
-	else if(roll >= 145) q = QUAL_EPIC
-	else if(roll >= 105) q = QUAL_GOOD
-	else if(roll >= 55) q = QUAL_NORMAL
+	var/q = LifeRollCraftQuality(M, "Smithing", avgq, perf, hqb, 0, 1)
 	if(mid == "gold" && prob(8)) q++   // gold's the lucky metal - it can punch a tier up, legendary included
 	return QualityClamp(clamp(q, LIFE_QFLOOR_BY_RANK[clamp(rank, 1, LIFE_MAX_RANK)], LifeQualityCap(rank)))
 

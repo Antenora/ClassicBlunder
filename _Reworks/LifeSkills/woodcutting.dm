@@ -187,6 +187,7 @@ mob/proc/ChopPayout(obj/LifeSkills/Tree/T, datum/tree_def/d, perf, obj/Items/Lif
 	q = QualityClamp(q)
 
 	var/amt = max(1, round(LIFE_WOOD_BASE_YIELD * perf + (tool ? tool.YieldBonus : 0)))
+	amt = LifeBonusRound(amt * LifeYieldMult("Foraging"))
 	var/obj/Items/Material/Wood/ws = new d.wood_type
 	var/wname = ws.name
 	del ws
@@ -197,6 +198,7 @@ mob/proc/ChopPayout(obj/LifeSkills/Tree/T, datum/tree_def/d, perf, obj/Items/Lif
 	// fruit trees also shed some fruit
 	if(d.fruit_type)
 		var/famt = max(1, round(perf))
+		famt = LifeBonusRound(famt * LifeYieldMult("Foraging"))
 		var/obj/Items/Material/Fruit/fs = new d.fruit_type
 		var/fname = fs.name
 		del fs

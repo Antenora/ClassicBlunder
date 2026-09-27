@@ -285,7 +285,7 @@
 		C2.FlyOverAble = 1
 	C2.Destructable = M.TurfInvincible ? 0 : 1
 	C2.EdgeOptOut = (C?.bsession && !C.bsession.autoEdge) ? 1 : 0
-	if(M.ShallowMode)
+	if(M.ShallowMode && (C2.Water || BuildMaterialFor(C2) == "Water"))
 		C2.Shallow = 1
 	if(istype(C2, /turf/CustomTurf))
 		CustomTurfs += C2
@@ -533,7 +533,8 @@
 		var/list/placedTurfs = list()
 		var/list/elevTouched = list()
 		var/styleStamped = 0
-		var/elevMode = (toolname == "lower") ? -1 : ((toolname == "walk" || isObj) ? 0 : 1)
+		var/anyRaise = (toolname == "raise")
+		var/elevMode = (toolname == "lower") ? -1 : (anyRaise ? 1 : ((toolname == "walk" || isObj) ? 0 : 1))
 		for(var/turf/T in valid)
 			x1 = min(x1, T.x)
 			y1 = min(y1, T.y)
@@ -544,7 +545,7 @@
 			if(placed % BUILD_COMMIT_CHUNK == 0)
 				sleep(-1)
 			var/oh = ElevAt(T)
-			if(elevMode == -1 || (elevMode == 1 && ElevSameKind(T, B, fam) && ElevRaisable(T) && !ElevStairTurf(T)))
+			if(elevMode == -1 || (elevMode == 1 && (anyRaise || ElevSameKind(T, B, fam)) && ElevRaisable(T) && !ElevStairTurf(T)))
 				var/nh = clamp(oh + elevMode, 0, ELEV_MAX)
 				if(nh == oh)
 					continue
@@ -554,6 +555,8 @@
 				A.turfRecs += list(list("x" = T.x, "y" = T.y, "z" = T.z, "elevOnly" = 1, "oldElev" = oh, "newElev" = nh, "killed" = list()))
 				elevTouched += T
 				did++
+				continue
+			if(anyRaise)
 				continue
 			if(isObj)
 				if(BuildPlaceObj(C, T, A, B))
@@ -580,6 +583,8 @@
 		if(!did)
 			if(elevMode == -1)
 				C.mob << "Nothing raised there to lower."
+			else if(anyRaise)
+				C.mob << "Nothing there can be raised further. Shift raises any tile except walls, cliffs, stairs, ladders, waterfalls and tiles already at level [ELEV_MAX]."
 			else if(elevMode == 1)
 				C.mob << "Those tiles are already at the highest level ([ELEV_MAX])."
 			return
@@ -613,23 +618,24 @@
 	JA.createdObjs = list()
 	JA.areaRecs = list()
 
-/proc/BuildDeleteObjs(client/C, list/objs)
+/proc/BuildDeleteObjs(client/C, list/objs, anyOwner = 0, via = "build select")
 	var/datum/build_session/S = C?.bsession
 	if(!S?.active || S.busy)
 		return
 	var/mob/M = C.mob
 	var/datum/build_action/A = new
 	A.name = "delete"
+	var/list/gone = list()
 	for(var/obj/O in objs)
-		if(!M.Admin && O.Builder != C.ckey)
+		if(!anyOwner && !M.Admin && O.Builder != C.ckey)
 			continue
-		if(O in worldObjectList)
-			worldObjectList -= O
+		gone += O
 		A.deletedObjs += list(BuildLimboRec(O))
 		A.count++
 	if(!A.count)
 		C.mob << "Nothing deletable selected."
 		return
+	worldObjectList -= gone
 	BuildClearRedo(S)
 	S.history += A
 	if(S.history.len > BUILD_HISTORY_CAP)
@@ -638,7 +644,7 @@
 		BuildReapAction(old)
 	S.dirty += A.count
 	BuildHUDRefreshDirty(S)
-	Log("Mapper", "[C.mob] ([C.ckey]) deleted [A.count] objects via build select.", 1)
+	Log("Mapper", "[C.mob] ([C.ckey]) deleted [A.count] objects via [via].", 1)
 	BuildJournalAction(A)
 
 /proc/BuildUndo(client/C)

@@ -40,6 +40,17 @@ mob/proc/FireFinisher(force = 0)
 			path = StyleBuff.Finisher3
 		if(!ispath(path))
 			path = text2path(path)
+		if(path && !ispath(path, /obj/Skills/Queue))
+			var/obj/Skills/F
+			if(!locate(path, src))
+				F = new path
+				AddSkill(F)
+			else
+				F = FindSkill(path)
+			if(F)
+				F.adjust(src)
+				FinisherFire(F)
+			return 1
 		var/obj/Skills/Queue/q
 		if(!locate(path, src))
 			q = new path
@@ -51,6 +62,13 @@ mob/proc/FireFinisher(force = 0)
 	else
 		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher, TRUE)
 	return 1
+
+mob/proc/FinisherFire(obj/Skills/S)
+	if(istype(S, /obj/Skills/Projectile))
+		return UseProjectile(S, TRUE)
+	if(istype(S, /obj/Skills/AutoHit))
+		return Activate(S, TRUE, TRUE, TRUE)
+	return 0
 
 obj
 	Skills
@@ -897,6 +915,8 @@ obj
 					if(usr.IsGuarding())
 						usr.AlphaCounter()	//heavy strike while guarding = the shove, never a queue
 						return
+					if(usr.EquippedGun() && usr.StyleBuff && usr.StyleBuff.NeedsGun && usr.FireFinisher())
+						return
 					usr.hs_key_down = world.time
 					if(usr.AttackQueue)
 						return // prevent heavy strike from overriding
@@ -1463,6 +1483,14 @@ mob
 					if(s.Class!=Q.ClassNeeded)
 						src << "You need a [Q.ClassNeeded]-class weapon to use this technique."
 						return
+			if(Q.NeedsGun)
+				if(!src.EquippedGun())
+					src << "You must have a gun equipped to use this technique."
+					return
+			if(Q.NoGun || !Q.NeedsGun)
+				if(src.EquippedGun())
+					src << "You can't queue a strike with a gun equipped."
+					return
 			if(Q.HealthCost)
 				if(src.HealthPct()<Q.HealthCost*glob.WorldDamageMult&&!Q.AllOutAttack)
 					return

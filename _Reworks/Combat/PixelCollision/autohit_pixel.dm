@@ -47,14 +47,10 @@ obj/AutoHitter
 		if(!e) return
 		var/cx = (e.x-1)*32 + 16
 		var/cy = (e.y-1)*32 + 16
-		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)))
+		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)) | BigBodiesNear(e, R+1, los))
 			if(!hitSelf && m == Owner) continue
-			if(square)
-				if(!SquareHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && SquareHitsBounds(cx, cy, 32*(R-1), m)) continue
-			else
-				if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
+			if(!ZoneHitsMob(cx, cy, 32*R, m, square)) continue
+			if(annulus && R > 1 && ZoneHitsMob(cx, cy, 32*(R-1), m, square)) continue
 			src.Damage(m)
 
 	proc/AH_TryContact(mob/m)
@@ -68,7 +64,7 @@ obj/AutoHitter
 
 	proc/AH_ContactSweep()
 		if(vhb_w <= 0) return
-		for(var/mob/m in range(HitboxSweepRange(), src))
+		for(var/mob/m in range(HitboxSweepRange(), src) | BigBodiesNear(src, HitboxSweepRange()))
 			if(!HitboxesOverlap(src, m)) continue
 			AH_TryContact(m)
 

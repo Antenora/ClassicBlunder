@@ -2,66 +2,91 @@
 #define TT_SHAPE_ROUND   "round"     // SkillSlotRound 
 #define TT_SHAPE_DIAMOND "diamond"   // SkillSlotSharp  (breakthrough milestone)
 #define TT_SHAPE_LARGE   "large"     // SkillSlotSharp scaled up (start / capstone)
-#define TT_FAM_FORGE     "forge"     
+#define TT_FAM_ENGINEER  "engineer"
+#define TT_FAM_OPERATIVE "operative"
+#define TT_FAM_GUNSMITH  "gunsmith"
+#define TT_FAM_MECHANIST "mechanist"
 #define TT_FAM_CYBER     "cyber"
-#define TT_FAM_MED       "medicine"
-#define TT_FAM_TELE      "telecom"
-#define TT_FAM_MIL       "military"
-#define TT_FAM_MISC      "misc"
+#define TT_FAM_MEDIC     "medic"
 #endif
 
-var/list/TT_CAPSTONES = list("Vehicular Power Armor", "Singularity", "War Crimes")
+#define TECH_PRICE_HUB 2
+#define TECH_PRICE_T1  3
+#define TECH_PRICE_T2  5
+#define TECH_PRICE_T3  6
+#define TECH_PRICE_T4  8
+#define TECH_PRICE_T5  10
+
+var/list/TT_CAPSTONES = list("Teleportation", "Technique Analysis", "Energy Weaponry", "Heavy Ordnance", 	"Vehicular Power Armor", "Singularity", "Core Transplant", "Genetic Manipulation", "Revival Protocol")
+
+var/list/TechBenchFamily = list(
+	"Engineer"      = TT_FAM_ENGINEER,
+	"Operative"     = TT_FAM_OPERATIVE,
+	"Gunsmith"      = TT_FAM_GUNSMITH,
+	"Mechanist"     = TT_FAM_MECHANIST,
+	"Cyberneticist" = TT_FAM_CYBER,
+	"Medic"         = TT_FAM_MEDIC)
 
 var/list/TechTreeLayout = list(
-	// forge family lives in the Smithing life skill now
-	"Engineering"                    = list(0, 4, TT_FAM_CYBER),
-	"Force Shielding"                = list(1, 2, TT_FAM_CYBER),
-	"Power Generators"               = list(1, 4, TT_FAM_CYBER),
-	"Hazard Suits"                   = list(1, 6, TT_FAM_CYBER),
-	"Jet Propulsion"                 = list(2, 4, TT_FAM_CYBER),
-	"CyberEngineering"               = list(3, 4, TT_FAM_CYBER),
-	"Cyber Augmentations"            = list(4, 3, TT_FAM_CYBER),
-	"Neuron Manipulation"            = list(4, 5, TT_FAM_CYBER),
-	"War Crimes"                     = list(5, 3, TT_FAM_CYBER),
-	"Singularity"                    = list(5, 5, TT_FAM_CYBER),
+	"Engineering"                 = list(0, 1,  TT_FAM_ENGINEER),
+	"Fabrication"                 = list(1, 1,  TT_FAM_ENGINEER),
+	"Power Generators"            = list(2, 1,  TT_FAM_ENGINEER),
+	"Hazard Suits"                = list(3, 0,  TT_FAM_ENGINEER),
+	"Field Gadgets"               = list(3, 2,  TT_FAM_ENGINEER),
+	"Force Shielding"             = list(4, 0,  TT_FAM_ENGINEER),
+	"Automated Defenses"          = list(4, 1,  TT_FAM_ENGINEER),
+	"EM Wave Projectors"          = list(4, 2,  TT_FAM_ENGINEER),
+	"Drones"                      = list(4, 3,  TT_FAM_ENGINEER),
+	"Teleportation"               = list(5, 1,  TT_FAM_ENGINEER),
 
-	"Medicine"                       = list(0, 10, TT_FAM_MED),
-	"Medkits"                        = list(1, 9,  TT_FAM_MED),
-	"Fast Acting Medicine"           = list(1, 11, TT_FAM_MED),
-	"Anesthetics"                    = list(2, 9,  TT_FAM_MED),
-	"Automated Dispensers"           = list(2, 11, TT_FAM_MED),
-	"Enhancers"                      = list(3, 10, TT_FAM_MED),
-	"ImprovedMedicalTechnology"      = list(3, 12, TT_FAM_MED),
-	"Regenerative Medicine"          = list(4, 12, TT_FAM_MED),
-	"Regenerator Tanks"              = list(5, 11, TT_FAM_MED),
-	"Genetic Manipulation"           = list(5, 13, TT_FAM_MED),
-	"Revival Protocol"               = list(6, 12, TT_FAM_MED),
-	"Prosthetic Limbs"               = list(6, 14, TT_FAM_MED),
+	"Telecommunications"          = list(0, 6,  TT_FAM_OPERATIVE),
+	"Scouters"                    = list(2, 5,  TT_FAM_OPERATIVE),
+	"Espionage Equipment"         = list(2, 7,  TT_FAM_OPERATIVE),
+	"Wide Area Transmission"      = list(3, 5,  TT_FAM_OPERATIVE),
+	"Intrusion Tools"             = list(3, 7,  TT_FAM_OPERATIVE),
+	"Obfuscation Equipment"       = list(4, 5,  TT_FAM_OPERATIVE),
+	"Combat Scanning"             = list(4, 7,  TT_FAM_OPERATIVE),
+	"Technique Analysis"          = list(5, 6,  TT_FAM_OPERATIVE),
 
-	"Telecommunications"             = list(0, 18, TT_FAM_TELE),
-	"Local Range Devices"            = list(1, 17, TT_FAM_TELE),
-	"Surveilance"                    = list(1, 19, TT_FAM_TELE),
-	"Wide Area Transmission"         = list(2, 17, TT_FAM_TELE),
-	"Espionage Equipment"            = list(2, 20, TT_FAM_TELE),
-	"Drones"                         = list(3, 18, TT_FAM_TELE),
-	"AdvancedTransmissionTechnology" = list(3, 19, TT_FAM_TELE),
-	"Scouters"                       = list(4, 19, TT_FAM_TELE),
-	"Combat Scanning"                = list(6, 19, TT_FAM_TELE),  // cross-links up to Neuron Manipulation
+	"Military Technology"         = list(0, 10, TT_FAM_GUNSMITH),
+	"Assault Weaponry"            = list(2, 9,  TT_FAM_GUNSMITH),
+	"Demolitions"                 = list(2, 11, TT_FAM_GUNSMITH),
+	"Munitions"                   = list(3, 9,  TT_FAM_GUNSMITH),
+	"Weapon Modding"              = list(3, 11, TT_FAM_GUNSMITH),
+	"Heavy Weaponry"              = list(4, 9,  TT_FAM_GUNSMITH),
+	"Electronic Warfare"          = list(4, 11, TT_FAM_GUNSMITH),
+	"Energy Weaponry"             = list(5, 9,  TT_FAM_GUNSMITH),
+	"Heavy Ordnance"              = list(5, 11, TT_FAM_GUNSMITH),
 
-	"MilitaryTechnology"             = list(0, 26, TT_FAM_MIL),
-	"Assault Weaponry"               = list(1, 26, TT_FAM_MIL),
-	"Missile Weaponry"               = list(2, 24, TT_FAM_MIL),
-	"Melee Weaponry"                 = list(2, 26, TT_FAM_MIL),
-	"Thermal Weaponry"               = list(3, 26, TT_FAM_MIL),
-	"Blast Shielding"                = list(4, 24, TT_FAM_MIL),
-	"MilitaryEngineering"            = list(4, 27, TT_FAM_MIL),
-	"Armorpiercing Weaponry"         = list(5, 27, TT_FAM_MIL),
-	"Impact Weaponry"                = list(6, 27, TT_FAM_MIL),
-	"Hydraulic Weaponry"             = list(7, 27, TT_FAM_MIL),
-	"Vehicular Power Armor"          = list(9, 25, TT_FAM_MIL),   // capstone: pulls Military+Telecom+Medicine
+	"Military Engineering"        = list(0, 14, TT_FAM_MECHANIST),
+	"Piloting Foundations"        = list(1, 14, TT_FAM_MECHANIST),
+	"Jet Propulsion"              = list(2, 14, TT_FAM_MECHANIST),
+	"Melee Weaponry"              = list(3, 13, TT_FAM_MECHANIST),
+	"Powered Exoskeletons"        = list(3, 14, TT_FAM_MECHANIST),
+	"Weapon Modules"              = list(3, 15, TT_FAM_MECHANIST),
+	"Powered Armor Specialization"= list(4, 13, TT_FAM_MECHANIST),
+	"Mech Fabrication"            = list(4, 15, TT_FAM_MECHANIST),
+	"Vehicular Power Armor"       = list(5, 14, TT_FAM_MECHANIST),
 
-	"Culinary Basics"                = list(0, 32, TT_FAM_MISC),
-	"Piloting Foundations"           = list(0, 33, TT_FAM_MISC)
+	"Cyber Engineering"           = list(0, 18, TT_FAM_CYBER),
+	"Cyber Augmentations"         = list(1, 18, TT_FAM_CYBER),
+	"Combat Routines"             = list(2, 18, TT_FAM_CYBER),
+	"Neuron Manipulation"         = list(3, 18, TT_FAM_CYBER),
+	"Cybernetic Mainframe"        = list(4, 17, TT_FAM_CYBER),
+	"War Crimes"                  = list(4, 19, TT_FAM_CYBER),
+	"Singularity"                 = list(5, 17, TT_FAM_CYBER),
+	"Core Transplant"             = list(5, 19, TT_FAM_CYBER),
+
+	"Medicine"                    = list(0, 22, TT_FAM_MEDIC),
+	"Fast Acting Medicine"        = list(2, 21, TT_FAM_MEDIC),
+	"Trauma Care"                 = list(2, 22, TT_FAM_MEDIC),
+	"Medkits"                     = list(2, 23, TT_FAM_MEDIC),
+	"Enhancers"                   = list(3, 21, TT_FAM_MEDIC),
+	"Improved Medical Technology" = list(3, 23, TT_FAM_MEDIC),
+	"Regenerative Medicine"       = list(4, 21, TT_FAM_MEDIC),
+	"Regenerator Tanks"           = list(4, 23, TT_FAM_MEDIC),
+	"Genetic Manipulation"        = list(5, 21, TT_FAM_MEDIC),
+	"Revival Protocol"            = list(5, 23, TT_FAM_MEDIC)
 )
 
 
@@ -75,11 +100,23 @@ var/list/TechTreeLayout = list(
 
 /proc/TechNodeFamily(name)
 	var/list/e = TechTreeLayout[name]
-	return e ? e[3] : TT_FAM_MISC
+	return e ? e[3] : TT_FAM_ENGINEER
+
+/proc/TechTierPrice(tier)
+	switch(tier)
+		if(0) return TECH_PRICE_HUB
+		if(1) return TECH_PRICE_T1
+		if(2) return TECH_PRICE_T2
+		if(3) return TECH_PRICE_T3
+		if(4) return TECH_PRICE_T4
+		if(5) return TECH_PRICE_T5
+	return TECH_PRICE_T5
+
+/proc/TechTierRank(tier)
+	return max(1, 2 * tier - 1)
 
 /proc/TechNodeShape(knowledgePaths/tech/t)
 	if(!t) return TT_SHAPE_ROUND
 	if(t.name in TT_CAPSTONES) return TT_SHAPE_LARGE
-	if(length(t.requires) == 0) return TT_SHAPE_LARGE
-	if(t.breakthrough) return TT_SHAPE_DIAMOND
+	if(t.tier <= 0) return TT_SHAPE_LARGE
 	return TT_SHAPE_ROUND

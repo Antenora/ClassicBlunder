@@ -2618,15 +2618,12 @@ obj/Turfs
 			icon_state="90"
 		Icon91
 			icon_state="91"
-			density=1
 		Icon92
 			icon_state="92"
 		Icon93
 			icon_state="93"
-			density=1
 		Icon94
 			icon_state="94"
-			density=1
 		Icon95
 			icon_state="95"
 		Icon96
@@ -2635,7 +2632,6 @@ obj/Turfs
 			icon_state="97"
 		Icon98
 			icon_state="98"
-			density=1
 		Icon99
 			icon_state="99"
 		Icon100
@@ -2666,13 +2662,11 @@ obj/Turfs
 			icon_state="111"
 		Icon112
 			icon_state="112"
-			density=1
 		Icon113
 			icon_state="113"
 			density=1
 		Icon114
 			icon_state="114"
-			density=1
 		Icon115
 			icon_state="115"
 			density=1
@@ -3143,19 +3137,15 @@ obj/Turfs
 	Bush1
 		icon='Gardening.dmi'
 		icon_state="Bush1"
-		density=1
 	Bush2
 		icon='Gardening.dmi'
 		icon_state="Bush2"
-		density=1
 	Bush3
 		icon='Gardening.dmi'
 		icon_state="Bush3"
-		density=1
 	Bush4
 		icon='Gardening.dmi'
 		icon_state="Bush4"
-		density=1
 	Bush5
 		icon='Gardening.dmi'
 		icon_state="Bush5"
@@ -3163,7 +3153,6 @@ obj/Turfs
 	SnowBush
 		icon='Gardening.dmi'
 		icon_state="Bush6"
-		density=1
 	Plant12
 		icon='Gardening.dmi'
 		icon_state="Plant1"

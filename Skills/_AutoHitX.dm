@@ -4812,7 +4812,7 @@ obj
 					TurfErupt=1
 					GuardBreak=1
 					DamageMult=4.5
-					Scorching=4
+					TurfBurn=15
 					Distance=10
 					Cooldown=60
 					StrScaling=0.5
@@ -4834,7 +4834,7 @@ obj
 					TurfShiftDuration=180
 					GuardBreak=1
 					DamageMult=4.5
-					Freezing=10
+					TurfMud=15
 					Stasis=20
 					Distance=10
 					Cooldown=60
@@ -5142,6 +5142,14 @@ mob
 					if(!src.HasBladeFisting() && !src.UsingBattleMage())
 						src << "You need a sword equipped to use [Z]!"
 						return FALSE
+			if(Z.NeedsGun)
+				if(!src.EquippedGun())
+					src << "You need a gun equipped to use [Z]!"
+					return FALSE
+			if(Z.NoGun)
+				if(src.EquippedGun())
+					src << "You can't use a gun with [Z]!"
+					return FALSE
 			if(Z.ResourceCost)
 				var/resourceName = Z.ResourceCost[1]
 				var/storage = 0
@@ -6755,6 +6763,8 @@ obj
 						Owner.HealEnergy(FromSkill.EnergyBurn)
 				if(FromSkill && FromSkill.CursedWounds)
 					applyCursedWounds(m, FromSkill.CursedWounds * 10)
+				if(FromSkill && FromSkill.Bloodletting)
+					m.AddBleed(FromSkill.Bloodletting, Owner)
 
 				if(src.CosmoPowered)
 					if(!src.Owner.SpecialBuff)
@@ -7015,6 +7025,8 @@ obj
 					damageDealt = S.resolve()
 					if(damageDealt > 0 && FromSkill && FromSkill.WoundRider && Owner && ismob(m))
 						Owner.DealWounds(m, damageDealt * FromSkill.WoundRider)
+					if(damageDealt > 0 && FromSkill && Owner && ismob(m))
+						FromSkill.OnSkillHit(Owner, m, src)
 					m.ccCountHit(1)
 					if(src.Combustion && m)
 						var/combThresh = src.Owner.passive_handler["Combustion"]

@@ -7,6 +7,7 @@
 #define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
 #define MHUD_PANEL_W 336
 #define MHUD_PANEL_H 256
+#define SKMENU_PANEL_H 288
 #define MHUD_COL1_X -140
 #define MHUD_COL2_X 22
 // monogram's native grid is 16px = 12pt, other sizes degrade pixel fonts
@@ -211,6 +212,9 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 		if(usr) usr.client.PanelDragMove(params)
 	MouseUp(location, control, params)
 		if(usr) usr.client.PanelDragEnd()
+
+/atom/movable/shud/menupanel/draggable/skills
+	icon = 'HUD/ui_panel_skills.png'
 
 /atom/movable/shud/menutext
 	layer = MHUD_LAYER + 0.4
@@ -504,9 +508,14 @@ client/proc/PanBounds(menu, atom/movable/panel)
 	var/bx = 0   // panel default bottom-left, absolute px
 	var/by = 0
 	switch(menu)
-		if("options", "skills")             // centered panel, 336x256
+		if("options")                       // centered panel, 336x256
 			W = MHUD_PANEL_W
 			H = MHUD_PANEL_H
+			bx = vwpx / 2 - W / 2
+			by = vhpx / 2 - H / 2
+		if("skills")
+			W = MHUD_PANEL_W
+			H = SKMENU_PANEL_H
 			bx = vwpx / 2 - W / 2
 			by = vhpx / 2 - H / 2
 		if("inventory")                     // X tile-anchored at InvXLoc(-144)=6, Y at CENTER:-160

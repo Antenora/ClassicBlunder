@@ -89,7 +89,7 @@ obj/Skills/Projectile/_Projectile
 			OnContact(a)
 
 	proc/PixelContactSweep()
-		for(var/atom/movable/a in range(HitboxSweepRange(), src))
+		for(var/atom/movable/a in range(HitboxSweepRange(), src) | BigBodiesNear(src, HitboxSweepRange()))
 			TryPixelContact(a)
 			if(Killed || Distance < 0) return
 
@@ -151,10 +151,15 @@ obj/Skills/Projectile/_Projectile
 			if(Killed || Distance <= 0) return
 			PixelContactSweep()
 
+	proc/HomingBroken(atom/target)
+		return 0
+
 	proc/PixelLife()
 		Cooldown=-1 //Keeps active projectiles from moving onto the player during their movements.
 		pc_lastdir = DisplayedCardinal(dir, pc_lastdir) //dir is only final once the spawn block ran
 		ReapplyHitboxForDir(pc_lastdir)
+		if(!isnull(FlightAngle))
+			AngleBegin()
 		if(glob.PIXEL_DEBUG) world.log << "PXC: [src] PixelLife start dir=[dir] box=[vhb_w]x[vhb_h] scale=[hb_scale] icon=[icon] mask=[vhb_mask ? "y" : "n"] dist=[Distance]"
 		if(beam_owner)
 			return
@@ -235,17 +240,24 @@ obj/Skills/Projectile/_Projectile
 				break
 			if(src.Area!="Beam")
 				if(from_skill) SpellFlightStep()
+				if(src.Homing && HomingBroken(src.Homing)) src.Homing = 0
 				if(src.FollowFacing && src.Owner)
 					src.dir = src.Owner.dir
 				else if(src.Homing)
-					src.dir=get_dir(src, src.Homing)
+					if(isnull(src.FlightAngle))
+						src.dir=get_dir(src, src.Homing)
+					else
+						src.FlightAngle = src.AngleToward(src.Homing)
+						src.dir = GunAngleDir(src.FlightAngle)
 				else
 					if(src.RandomPath==2)
 						var/ODir=src.dir
 						while(src.dir==ODir)
 							src.dir=pick(NORTH, NORTHEAST, NORTHWEST, EAST, WEST, SOUTHEAST, SOUTHWEST, SOUTH)
 				if(!src.Static&&!src.StormFall)
-					if(pm_substep)
+					if(!isnull(src.FlightAngle))
+						AngleTravel()
+					else if(pm_substep)
 						PmTravel()
 					else
 						PixelStep()

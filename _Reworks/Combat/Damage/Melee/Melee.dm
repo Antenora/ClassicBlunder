@@ -26,7 +26,7 @@
 	return FALSE
 
 
-/mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0)
+/mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0, WhipOnly = 0)
 	if(HeldSkillBlocksAction(null)) return
 	if(!AttackQueue)
 		for(var/a in SlotlessBuffs)
@@ -85,6 +85,20 @@
 	var/damage = 0 // potential will form the basis of the damage, potential is constant, only some things boost it
 	var/delay = SpeedDelay()
 	// 				VARIABLES END			//
+
+	var/obj/Items/Gun/gun = EquippedGun()
+	if(gun)
+		if(!WhipOnly && gun.Loaded > 0)
+			flick("Attack", src)
+			NextAttack = world.time + gun.FireDelay(delay) * SlowMoDelayMult(src)
+			FireGun(gun)
+			return
+		else
+			if(gun.Loaded <= 0 && !gun.DryWarned)
+				gun.DryWarned = 1
+				src << "Your [gun.name] is empty. Hold [KeyDisplay(KeybindKey("reload"))] to reload."
+			if(gun.WhipOverride(src, delay)) return
+			dmgmulti *= gun.PistolWhipMult() * GunMeleeMult()
 
 	// 				MAIN START				//
 
@@ -358,6 +372,7 @@
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()
 					atk += enemyEnd * (AttackQueue.HarderTheyFall/10)
+				def *= MeleeEndMult(enemy)
 				#if DEBUG_MELEE
 				log2text("DamageMod", "newDmgMod", "damageDebugs.txt", "[ckey]/[name]")
 				log2text("DamageMod", damage, "damageDebugs.txt", "[ckey]/[name]")
@@ -423,6 +438,7 @@
 					enemy.phantom_mark_by = null
 					enemy.phantom_mark_until = 0
 					clearPhantomMarkFX(enemy)
+				if(unarmedAtk) damage *= GunSetupPunch(enemy)
 				var/knockDistance = 0
 				if(AttackQueue)
 					damage *= QueuedDamage(enemy)
@@ -713,6 +729,8 @@
 										addElements |= "Poison"
 									ElementalCheck(src, enemy, 0, glob.DEBUFF_INTENSITY, addElements)
 
+								if(AttackQueue.Bloodletting)
+									enemy.AddBleed(AttackQueue.Bloodletting, src)
 								if(AttackQueue.Shearing)
 									enemy.AddShearing(AttackQueue.Shearing,src)
 								if(AttackQueue.Crippling)
@@ -1034,6 +1052,8 @@
 			if(!P.Attackable)
 				continue
 			flick("Attack",src)
+			if(P.StruckByMelee(src, TurfDamage))
+				return
 			if(istype(P, /obj/DomainExpansionBarrier))
 				var/obj/DomainExpansionBarrier/barrier = P
 				var/turf/bTurf = isturf(barrier.loc) ? barrier.loc : null
@@ -1176,3 +1196,9 @@
 		MomentumAccumulate()
 	if(passive_handler["Fury"])
 		FuryAccumulate();
+
+/obj/proc/StruckByMelee(mob/A, dmg)
+	return 0
+
+/mob/proc/MeleeEndMult(mob/enemy)
+	return 1

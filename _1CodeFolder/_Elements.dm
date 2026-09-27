@@ -187,6 +187,7 @@ mob
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			Value /= 1 + src.GetStatusResist()
 			Value /= 1 + src.GetPhysResist()
+			Value *= getBleedResistValue()
 			Value = Value * (1 - (src.Bleed / glob.DEBUFF_STACK_RESISTANCE))
 			src.Bleed += Value
 			if(Value >= 1)
@@ -196,6 +197,9 @@ mob
 				src.Bleed = 100
 			if(src.Bleed < 0)
 				src.Bleed = 0
+
+		getBleedResistValue()
+			return 1
 
 		AddSlow(var/Value, var/mob/Attacker=null)
 			if(src.HasChillImmune())

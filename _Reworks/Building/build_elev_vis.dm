@@ -9,6 +9,7 @@ turf/var/tmp/turf/elev_cov
 turf/var/tmp/elev_covv = 0
 
 var/global/elevPitVer = 1
+var/global/list/elevPitFlips = list()
 var/global/elevGeomVer = 1
 var/global/list/elevTexCache = list()
 var/global/list/elevMaskCache = list()
@@ -36,6 +37,9 @@ var/global/elevWallCtxL = 0
 				if(B)
 					B.elev_covv = 0
 	elevPitVer++
+	elevOrgConvCache = list()
+	elevOrgCtxCache = list()
+	elevOrgFeetCache = list()
 
 /proc/ElevFoamTrio(prefix, key, turf/WT, lay, list/fresh)
 	if(!glob || !glob.SHORE_FOAM || !WT || BuildFoamOffAt(WT))
@@ -72,7 +76,7 @@ var/global/elevWallCtxL = 0
 /proc/ElevTexIcon(turf/T, h)
 	if(!T)
 		return null
-	if(h <= 0)
+	if(h <= 0 || ElevRoofTurf(T))
 		return T.icon
 	var/k = "[T.icon]|[T.icon_state]|[h]"
 	var/icon/I = elevTexCache[k]
@@ -88,7 +92,7 @@ var/global/elevWallCtxL = 0
 	return I
 
 /proc/ElevTexState(turf/T, h)
-	return (h > 0) ? "" : T.icon_state
+	return (h > 0 && !ElevRoofTurf(T)) ? "" : T.icon_state
 
 /proc/ElevMaskIcon(ic, st)
 	var/k = "[ic]|[st]"
@@ -383,14 +387,17 @@ var/global/list/elevStyleArtCache = list()
 		return 0
 	if(G.elev_pitv == elevPitVer)
 		return G.elev_pit
-	var/lim = ElevAt(G)
+	return ElevPitFlood(G, ElevAt(G), null)
+
+/proc/ElevPitFlood(turf/G, lim, list/mark)
 	var/list/seen = list()
 	seen[G] = 1
 	var/list/st = list(G)
+	var/i = 1
 	var/esc = 0
-	while(st.len && !esc)
-		var/turf/C = st[1]
-		st.Cut(1, 2)
+	while(i <= st.len && !esc)
+		var/turf/C = st[i]
+		i++
 		for(var/dd in CARDINAL_DIRECTIONS)
 			var/turf/Q = get_step(C, dd)
 			if(!Q)
@@ -405,10 +412,87 @@ var/global/list/elevStyleArtCache = list()
 			st += Q
 	var/res = esc ? 0 : 1
 	for(var/turf/V in seen)
+		if(mark)
+			mark[V] = 1
 		if(ElevAt(V) == lim)
+			if(V.elev_pitv ? (V.elev_pit != res) : res)
+				elevPitFlips[V] = 1
 			V.elev_pit = res
 			V.elev_pitv = elevPitVer
 	return res
+
+/proc/ElevPitOldAt(turf/T, list/old)
+	var/o = old[T]
+	return isnull(o) ? ElevAt(T) : o
+
+/proc/ElevPitFloodOld(turf/G, lim, list/mark, list/old)
+	var/list/seen = list()
+	seen[G] = 1
+	mark[G] = 1
+	var/list/st = list(G)
+	var/i = 1
+	while(i <= st.len)
+		var/turf/C = st[i]
+		i++
+		for(var/dd in CARDINAL_DIRECTIONS)
+			var/turf/Q = get_step(C, dd)
+			if(!Q)
+				return null
+			if(seen[Q] || ElevPitOldAt(Q, old) > lim)
+				continue
+			seen[Q] = 1
+			mark[Q] = 1
+			if(seen.len > 400)
+				return null
+			st += Q
+	return seen
+
+/proc/ElevPitSweep()
+	if(!elevPitDirty.len)
+		return
+	var/list/old = elevPitDirty
+	elevPitDirty = list()
+	var/list/doneNew = list()
+	var/list/doneOld = list()
+	for(var/L = 0 to ELEV_MAX)
+		doneNew += list(list())
+		doneOld += list(list())
+	for(var/turf/T in old)
+		var/a = old[T]
+		var/b = ElevAt(T)
+		if(a == b)
+			continue
+		var/list/seeds = list(T)
+		for(var/dd in CARDINAL_DIRECTIONS)
+			var/turf/N = get_step(T, dd)
+			if(N)
+				seeds += N
+		for(var/L = min(a, b), L < max(a, b), L++)
+			var/list/dn = doneNew[L + 1]
+			var/list/dol = doneOld[L + 1]
+			for(var/turf/S in seeds)
+				if(!dn[S] && ElevAt(S) <= L)
+					ElevPitFlood(S, L, dn)
+				if(!dol[S] && ElevPitOldAt(S, old) <= L)
+					var/list/oc = ElevPitFloodOld(S, L, dol, old)
+					if(oc)
+						for(var/turf/V in oc)
+							if(!dn[V] && ElevAt(V) == L)
+								ElevPitFlood(V, L, dn)
+
+/proc/ElevPitFlush(list/skip, bootPump = 0)
+	var/n = 0
+	while(elevPitFlips.len)
+		var/list/fl = elevPitFlips
+		elevPitFlips = list()
+		for(var/turf/P in fl)
+			if(skip && skip[P])
+				continue
+			ElevVisualUpdate(P)
+			n++
+			if(n % BUILD_COMMIT_CHUNK == 0)
+				if(!bootPump || !BuildBootPassYield())
+					sleep(-1)
 
 /proc/ElevSurface(turf/G, L)
 	var/list/fi = ElevFaceInfo(G)
@@ -692,7 +776,7 @@ var/global/list/elevStyleArtCache = list()
 		if(!df || df[3] != 1 || df[(side == "R") ? 4 : 5] != "x" || ElevAt(df[6]) <= 0)
 			continue
 		var/dsty = ElevFaceStyleFor(DF, df[6])
-		if(ElevFaceFlat(df[6], dsty) || ElevOrgStyle(df[6]))
+		if(ElevFaceFlat(df[6], dsty) || ElevOrgStyle(df[6]) || !ElevFrays(df[6]))
 			continue
 		var/image/WP = ElevFacePiece(dsty, "u[df[2]][side]", ElevLayer(df[1], 0))
 		if(WP)
@@ -701,16 +785,43 @@ var/global/list/elevStyleArtCache = list()
 var/global/list/elevOrgSheets
 var/global/list/elevOrgShade
 var/global/list/elevOrgDark
+var/global/list/elevOrgLift
+var/global/list/elevOrgBev
+var/global/list/elevOrgBevMid
+var/global/list/elevOrgRing
+var/global/list/elevOrgDrape
+var/global/list/elevOrgUnder
+var/global/list/elevOrgLow
 var/global/list/elevOrgKeyFiles
 var/global/list/elevOrgIndexFiles
+var/global/list/elevOrgIndexYFiles
+var/global/list/elevOrgIndexBFiles
+var/global/list/elevOrgIndexZFiles
+var/global/list/elevOrgRecFiles
 var/global/list/elevOrgClasses
+var/global/list/elevOrgMat
 var/global/list/elevOrgKeyLines = list()
 var/global/list/elevOrgIndexText = list()
+var/global/list/elevOrgRecLines = list()
 var/global/list/elevOrgParsed = list()
 var/global/list/elevOrgFTCache = list()
 var/global/list/elevOrgBotCache = list()
+var/global/list/elevOrgBotShadeCache = list()
+var/global/list/elevOrgStripCache = list()
+var/global/list/elevOrgContactCache = list()
+var/global/list/elevOrgBevCache = list()
+var/global/list/elevOrgPalCache = list()
+var/global/list/elevOrgFTStates = list()
+var/global/list/elevOrgToothRows
+var/global/list/elevOrgMColCache = list()
 var/global/list/elevOrgConvCache = list()
 var/global/elevOrgConvVer = -1
+var/global/list/elevOrgCtxCache = list()
+var/global/list/elevOrgFeetCache = list()
+var/global/elevOrgCtxVer = -1
+var/global/list/elevOrgContactLong = list(0.3, 0.2001, 0.12, 0.0501)
+var/global/list/elevOrgContactShort = list(0.3, 0.165, 0.06)
+var/global/list/elevOrgContactBlur = list(0.00026386508, 0.10645077, 0.78657072, 0.10645077, 0.00026386508)
 var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1, 0), list(1, 1), list(1, -1), list(-1, -1), list(-1, 1))
 
 /proc/ElevOrgSheetInit()
@@ -765,196 +876,237 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		"ts31" = 'Mapping/EdgeOrg/et_s31.png',
 		"ts32" = 'Mapping/EdgeOrg/et_s32.png',
 		"ts33" = 'Mapping/EdgeOrg/et_s33.png',
-		"lw00" = 'Mapping/EdgeOrg/el_w00.png',
-		"lw01" = 'Mapping/EdgeOrg/el_w01.png',
-		"lw02" = 'Mapping/EdgeOrg/el_w02.png',
-		"lw03" = 'Mapping/EdgeOrg/el_w03.png',
-		"lw10" = 'Mapping/EdgeOrg/el_w10.png',
-		"lw11" = 'Mapping/EdgeOrg/el_w11.png',
-		"lw12" = 'Mapping/EdgeOrg/el_w12.png',
-		"lw13" = 'Mapping/EdgeOrg/el_w13.png',
-		"lw20" = 'Mapping/EdgeOrg/el_w20.png',
-		"lw21" = 'Mapping/EdgeOrg/el_w21.png',
-		"lw22" = 'Mapping/EdgeOrg/el_w22.png',
-		"lw23" = 'Mapping/EdgeOrg/el_w23.png',
-		"lw30" = 'Mapping/EdgeOrg/el_w30.png',
-		"lw31" = 'Mapping/EdgeOrg/el_w31.png',
-		"lw32" = 'Mapping/EdgeOrg/el_w32.png',
-		"lw33" = 'Mapping/EdgeOrg/el_w33.png',
-		"lc00" = 'Mapping/EdgeOrg/el_c00.png',
-		"lc01" = 'Mapping/EdgeOrg/el_c01.png',
-		"lc02" = 'Mapping/EdgeOrg/el_c02.png',
-		"lc03" = 'Mapping/EdgeOrg/el_c03.png',
-		"lc10" = 'Mapping/EdgeOrg/el_c10.png',
-		"lc11" = 'Mapping/EdgeOrg/el_c11.png',
-		"lc12" = 'Mapping/EdgeOrg/el_c12.png',
-		"lc13" = 'Mapping/EdgeOrg/el_c13.png',
-		"lc20" = 'Mapping/EdgeOrg/el_c20.png',
-		"lc21" = 'Mapping/EdgeOrg/el_c21.png',
-		"lc22" = 'Mapping/EdgeOrg/el_c22.png',
-		"lc23" = 'Mapping/EdgeOrg/el_c23.png',
-		"lc30" = 'Mapping/EdgeOrg/el_c30.png',
-		"lc31" = 'Mapping/EdgeOrg/el_c31.png',
-		"lc32" = 'Mapping/EdgeOrg/el_c32.png',
-		"lc33" = 'Mapping/EdgeOrg/el_c33.png',
-		"ls00" = 'Mapping/EdgeOrg/el_s00.png',
-		"ls01" = 'Mapping/EdgeOrg/el_s01.png',
-		"ls02" = 'Mapping/EdgeOrg/el_s02.png',
-		"ls03" = 'Mapping/EdgeOrg/el_s03.png',
-		"ls10" = 'Mapping/EdgeOrg/el_s10.png',
-		"ls11" = 'Mapping/EdgeOrg/el_s11.png',
-		"ls12" = 'Mapping/EdgeOrg/el_s12.png',
-		"ls13" = 'Mapping/EdgeOrg/el_s13.png',
-		"ls20" = 'Mapping/EdgeOrg/el_s20.png',
-		"ls21" = 'Mapping/EdgeOrg/el_s21.png',
-		"ls22" = 'Mapping/EdgeOrg/el_s22.png',
-		"ls23" = 'Mapping/EdgeOrg/el_s23.png',
-		"ls30" = 'Mapping/EdgeOrg/el_s30.png',
-		"ls31" = 'Mapping/EdgeOrg/el_s31.png',
-		"ls32" = 'Mapping/EdgeOrg/el_s32.png',
-		"ls33" = 'Mapping/EdgeOrg/el_s33.png')
+		"tn00" = 'Mapping/EdgeOrg/et_n00.png',
+		"tn01" = 'Mapping/EdgeOrg/et_n01.png',
+		"tn02" = 'Mapping/EdgeOrg/et_n02.png',
+		"tn03" = 'Mapping/EdgeOrg/et_n03.png',
+		"tn10" = 'Mapping/EdgeOrg/et_n10.png',
+		"tn11" = 'Mapping/EdgeOrg/et_n11.png',
+		"tn12" = 'Mapping/EdgeOrg/et_n12.png',
+		"tn13" = 'Mapping/EdgeOrg/et_n13.png',
+		"tn20" = 'Mapping/EdgeOrg/et_n20.png',
+		"tn21" = 'Mapping/EdgeOrg/et_n21.png',
+		"tn22" = 'Mapping/EdgeOrg/et_n22.png',
+		"tn23" = 'Mapping/EdgeOrg/et_n23.png',
+		"tn30" = 'Mapping/EdgeOrg/et_n30.png',
+		"tn31" = 'Mapping/EdgeOrg/et_n31.png',
+		"tn32" = 'Mapping/EdgeOrg/et_n32.png',
+		"tn33" = 'Mapping/EdgeOrg/et_n33.png',
+		"ti00" = 'Mapping/EdgeOrg/et_i00.png',
+		"ti01" = 'Mapping/EdgeOrg/et_i01.png',
+		"ti02" = 'Mapping/EdgeOrg/et_i02.png',
+		"ti03" = 'Mapping/EdgeOrg/et_i03.png',
+		"ti10" = 'Mapping/EdgeOrg/et_i10.png',
+		"ti11" = 'Mapping/EdgeOrg/et_i11.png',
+		"ti12" = 'Mapping/EdgeOrg/et_i12.png',
+		"ti13" = 'Mapping/EdgeOrg/et_i13.png',
+		"ti20" = 'Mapping/EdgeOrg/et_i20.png',
+		"ti21" = 'Mapping/EdgeOrg/et_i21.png',
+		"ti22" = 'Mapping/EdgeOrg/et_i22.png',
+		"ti23" = 'Mapping/EdgeOrg/et_i23.png',
+		"ti30" = 'Mapping/EdgeOrg/et_i30.png',
+		"ti31" = 'Mapping/EdgeOrg/et_i31.png',
+		"ti32" = 'Mapping/EdgeOrg/et_i32.png',
+		"ti33" = 'Mapping/EdgeOrg/et_i33.png')
 	elevOrgShade = list(
 		"w" = list(
-			'Mapping/EdgeOrg/es_w_0.png',
-			'Mapping/EdgeOrg/es_w_1.png',
-			'Mapping/EdgeOrg/es_w_2.png',
-			'Mapping/EdgeOrg/es_w_3.png',
-			'Mapping/EdgeOrg/es_w_4.png',
-			'Mapping/EdgeOrg/es_w_5.png',
-			'Mapping/EdgeOrg/es_w_6.png',
-			'Mapping/EdgeOrg/es_w_7.png',
-			'Mapping/EdgeOrg/es_w_8.png',
-			'Mapping/EdgeOrg/es_w_9.png',
-			'Mapping/EdgeOrg/es_w_10.png',
-			'Mapping/EdgeOrg/es_w_11.png',
-			'Mapping/EdgeOrg/es_w_12.png',
-			'Mapping/EdgeOrg/es_w_13.png',
-			'Mapping/EdgeOrg/es_w_14.png',
-			'Mapping/EdgeOrg/es_w_15.png',
-			'Mapping/EdgeOrg/es_w_16.png',
-			'Mapping/EdgeOrg/es_w_17.png',
-			'Mapping/EdgeOrg/es_w_18.png',
-			'Mapping/EdgeOrg/es_w_19.png',
-			'Mapping/EdgeOrg/es_w_20.png',
-			'Mapping/EdgeOrg/es_w_21.png',
-			'Mapping/EdgeOrg/es_w_22.png',
-			'Mapping/EdgeOrg/es_w_23.png',
-			'Mapping/EdgeOrg/es_w_24.png',
-			'Mapping/EdgeOrg/es_w_25.png',
-			'Mapping/EdgeOrg/es_w_26.png',
-			'Mapping/EdgeOrg/es_w_27.png',
-			'Mapping/EdgeOrg/es_w_28.png',
-			'Mapping/EdgeOrg/es_w_29.png',
-			'Mapping/EdgeOrg/es_w_30.png',
-			'Mapping/EdgeOrg/es_w_31.png',
-			'Mapping/EdgeOrg/es_w_32.png',
-			'Mapping/EdgeOrg/es_w_33.png',
-			'Mapping/EdgeOrg/es_w_34.png',
-			'Mapping/EdgeOrg/es_w_35.png',
-			'Mapping/EdgeOrg/es_w_36.png',
-			'Mapping/EdgeOrg/es_w_37.png',
-			'Mapping/EdgeOrg/es_w_38.png',
-			'Mapping/EdgeOrg/es_w_39.png',
-			'Mapping/EdgeOrg/es_w_40.png',
-			'Mapping/EdgeOrg/es_w_41.png',
-			'Mapping/EdgeOrg/es_w_42.png',
-			'Mapping/EdgeOrg/es_w_43.png',
-			'Mapping/EdgeOrg/es_w_44.png',
-			'Mapping/EdgeOrg/es_w_45.png'),
+			'Mapping/EdgeOrg/eh_w_0.png',
+			'Mapping/EdgeOrg/eh_w_1.png',
+			'Mapping/EdgeOrg/eh_w_2.png',
+			'Mapping/EdgeOrg/eh_w_3.png',
+			'Mapping/EdgeOrg/eh_w_4.png',
+			'Mapping/EdgeOrg/eh_w_5.png',
+			'Mapping/EdgeOrg/eh_w_6.png',
+			'Mapping/EdgeOrg/eh_w_7.png',
+			'Mapping/EdgeOrg/eh_w_8.png',
+			'Mapping/EdgeOrg/eh_w_9.png',
+			'Mapping/EdgeOrg/eh_w_10.png',
+			'Mapping/EdgeOrg/eh_w_11.png',
+			'Mapping/EdgeOrg/eh_w_12.png',
+			'Mapping/EdgeOrg/eh_w_13.png',
+			'Mapping/EdgeOrg/eh_w_14.png',
+			'Mapping/EdgeOrg/eh_w_15.png',
+			'Mapping/EdgeOrg/eh_w_16.png',
+			'Mapping/EdgeOrg/eh_w_17.png',
+			'Mapping/EdgeOrg/eh_w_18.png',
+			'Mapping/EdgeOrg/eh_w_19.png',
+			'Mapping/EdgeOrg/eh_w_20.png',
+			'Mapping/EdgeOrg/eh_w_21.png',
+			'Mapping/EdgeOrg/eh_w_22.png',
+			'Mapping/EdgeOrg/eh_w_23.png',
+			'Mapping/EdgeOrg/eh_w_24.png',
+			'Mapping/EdgeOrg/eh_w_25.png',
+			'Mapping/EdgeOrg/eh_w_26.png',
+			'Mapping/EdgeOrg/eh_w_27.png',
+			'Mapping/EdgeOrg/eh_w_28.png',
+			'Mapping/EdgeOrg/eh_w_29.png',
+			'Mapping/EdgeOrg/eh_w_30.png',
+			'Mapping/EdgeOrg/eh_w_31.png',
+			'Mapping/EdgeOrg/eh_w_32.png',
+			'Mapping/EdgeOrg/eh_w_33.png',
+			'Mapping/EdgeOrg/eh_w_34.png',
+			'Mapping/EdgeOrg/eh_w_35.png',
+			'Mapping/EdgeOrg/eh_w_36.png'),
 		"c" = list(
-			'Mapping/EdgeOrg/es_c_0.png',
-			'Mapping/EdgeOrg/es_c_1.png',
-			'Mapping/EdgeOrg/es_c_2.png',
-			'Mapping/EdgeOrg/es_c_3.png',
-			'Mapping/EdgeOrg/es_c_4.png',
-			'Mapping/EdgeOrg/es_c_5.png',
-			'Mapping/EdgeOrg/es_c_6.png',
-			'Mapping/EdgeOrg/es_c_7.png',
-			'Mapping/EdgeOrg/es_c_8.png',
-			'Mapping/EdgeOrg/es_c_9.png',
-			'Mapping/EdgeOrg/es_c_10.png',
-			'Mapping/EdgeOrg/es_c_11.png',
-			'Mapping/EdgeOrg/es_c_12.png',
-			'Mapping/EdgeOrg/es_c_13.png',
-			'Mapping/EdgeOrg/es_c_14.png',
-			'Mapping/EdgeOrg/es_c_15.png',
-			'Mapping/EdgeOrg/es_c_16.png',
-			'Mapping/EdgeOrg/es_c_17.png',
-			'Mapping/EdgeOrg/es_c_18.png',
-			'Mapping/EdgeOrg/es_c_19.png',
-			'Mapping/EdgeOrg/es_c_20.png',
-			'Mapping/EdgeOrg/es_c_21.png',
-			'Mapping/EdgeOrg/es_c_22.png',
-			'Mapping/EdgeOrg/es_c_23.png',
-			'Mapping/EdgeOrg/es_c_24.png',
-			'Mapping/EdgeOrg/es_c_25.png',
-			'Mapping/EdgeOrg/es_c_26.png',
-			'Mapping/EdgeOrg/es_c_27.png',
-			'Mapping/EdgeOrg/es_c_28.png',
-			'Mapping/EdgeOrg/es_c_29.png',
-			'Mapping/EdgeOrg/es_c_30.png',
-			'Mapping/EdgeOrg/es_c_31.png',
-			'Mapping/EdgeOrg/es_c_32.png',
-			'Mapping/EdgeOrg/es_c_33.png',
-			'Mapping/EdgeOrg/es_c_34.png',
-			'Mapping/EdgeOrg/es_c_35.png',
-			'Mapping/EdgeOrg/es_c_36.png',
-			'Mapping/EdgeOrg/es_c_37.png',
-			'Mapping/EdgeOrg/es_c_38.png',
-			'Mapping/EdgeOrg/es_c_39.png',
-			'Mapping/EdgeOrg/es_c_40.png',
-			'Mapping/EdgeOrg/es_c_41.png',
-			'Mapping/EdgeOrg/es_c_42.png',
-			'Mapping/EdgeOrg/es_c_43.png',
-			'Mapping/EdgeOrg/es_c_44.png',
-			'Mapping/EdgeOrg/es_c_45.png'),
+			'Mapping/EdgeOrg/eh_c_0.png',
+			'Mapping/EdgeOrg/eh_c_1.png',
+			'Mapping/EdgeOrg/eh_c_2.png',
+			'Mapping/EdgeOrg/eh_c_3.png',
+			'Mapping/EdgeOrg/eh_c_4.png',
+			'Mapping/EdgeOrg/eh_c_5.png',
+			'Mapping/EdgeOrg/eh_c_6.png',
+			'Mapping/EdgeOrg/eh_c_7.png',
+			'Mapping/EdgeOrg/eh_c_8.png',
+			'Mapping/EdgeOrg/eh_c_9.png',
+			'Mapping/EdgeOrg/eh_c_10.png',
+			'Mapping/EdgeOrg/eh_c_11.png',
+			'Mapping/EdgeOrg/eh_c_12.png',
+			'Mapping/EdgeOrg/eh_c_13.png',
+			'Mapping/EdgeOrg/eh_c_14.png',
+			'Mapping/EdgeOrg/eh_c_15.png',
+			'Mapping/EdgeOrg/eh_c_16.png',
+			'Mapping/EdgeOrg/eh_c_17.png',
+			'Mapping/EdgeOrg/eh_c_18.png',
+			'Mapping/EdgeOrg/eh_c_19.png',
+			'Mapping/EdgeOrg/eh_c_20.png',
+			'Mapping/EdgeOrg/eh_c_21.png',
+			'Mapping/EdgeOrg/eh_c_22.png',
+			'Mapping/EdgeOrg/eh_c_23.png',
+			'Mapping/EdgeOrg/eh_c_24.png',
+			'Mapping/EdgeOrg/eh_c_25.png',
+			'Mapping/EdgeOrg/eh_c_26.png',
+			'Mapping/EdgeOrg/eh_c_27.png',
+			'Mapping/EdgeOrg/eh_c_28.png',
+			'Mapping/EdgeOrg/eh_c_29.png',
+			'Mapping/EdgeOrg/eh_c_30.png',
+			'Mapping/EdgeOrg/eh_c_31.png',
+			'Mapping/EdgeOrg/eh_c_32.png',
+			'Mapping/EdgeOrg/eh_c_33.png',
+			'Mapping/EdgeOrg/eh_c_34.png',
+			'Mapping/EdgeOrg/eh_c_35.png',
+			'Mapping/EdgeOrg/eh_c_36.png',
+			'Mapping/EdgeOrg/eh_c_37.png',
+			'Mapping/EdgeOrg/eh_c_38.png',
+			'Mapping/EdgeOrg/eh_c_39.png',
+			'Mapping/EdgeOrg/eh_c_40.png'),
 		"s" = list(
-			'Mapping/EdgeOrg/es_s_0.png',
-			'Mapping/EdgeOrg/es_s_1.png',
-			'Mapping/EdgeOrg/es_s_2.png',
-			'Mapping/EdgeOrg/es_s_3.png',
-			'Mapping/EdgeOrg/es_s_4.png',
-			'Mapping/EdgeOrg/es_s_5.png',
-			'Mapping/EdgeOrg/es_s_6.png',
-			'Mapping/EdgeOrg/es_s_7.png',
-			'Mapping/EdgeOrg/es_s_8.png',
-			'Mapping/EdgeOrg/es_s_9.png',
-			'Mapping/EdgeOrg/es_s_10.png',
-			'Mapping/EdgeOrg/es_s_11.png',
-			'Mapping/EdgeOrg/es_s_12.png',
-			'Mapping/EdgeOrg/es_s_13.png',
-			'Mapping/EdgeOrg/es_s_14.png',
-			'Mapping/EdgeOrg/es_s_15.png',
-			'Mapping/EdgeOrg/es_s_16.png',
-			'Mapping/EdgeOrg/es_s_17.png',
-			'Mapping/EdgeOrg/es_s_18.png',
-			'Mapping/EdgeOrg/es_s_19.png',
-			'Mapping/EdgeOrg/es_s_20.png',
-			'Mapping/EdgeOrg/es_s_21.png',
-			'Mapping/EdgeOrg/es_s_22.png',
-			'Mapping/EdgeOrg/es_s_23.png',
-			'Mapping/EdgeOrg/es_s_24.png',
-			'Mapping/EdgeOrg/es_s_25.png',
-			'Mapping/EdgeOrg/es_s_26.png',
-			'Mapping/EdgeOrg/es_s_27.png',
-			'Mapping/EdgeOrg/es_s_28.png',
-			'Mapping/EdgeOrg/es_s_29.png',
-			'Mapping/EdgeOrg/es_s_30.png',
-			'Mapping/EdgeOrg/es_s_31.png',
-			'Mapping/EdgeOrg/es_s_32.png',
-			'Mapping/EdgeOrg/es_s_33.png',
-			'Mapping/EdgeOrg/es_s_34.png',
-			'Mapping/EdgeOrg/es_s_35.png',
-			'Mapping/EdgeOrg/es_s_36.png',
-			'Mapping/EdgeOrg/es_s_37.png',
-			'Mapping/EdgeOrg/es_s_38.png',
-			'Mapping/EdgeOrg/es_s_39.png',
-			'Mapping/EdgeOrg/es_s_40.png',
-			'Mapping/EdgeOrg/es_s_41.png',
-			'Mapping/EdgeOrg/es_s_42.png',
-			'Mapping/EdgeOrg/es_s_43.png',
-			'Mapping/EdgeOrg/es_s_44.png',
-			'Mapping/EdgeOrg/es_s_45.png'))
+			'Mapping/EdgeOrg/eh_s_0.png',
+			'Mapping/EdgeOrg/eh_s_1.png',
+			'Mapping/EdgeOrg/eh_s_2.png',
+			'Mapping/EdgeOrg/eh_s_3.png',
+			'Mapping/EdgeOrg/eh_s_4.png',
+			'Mapping/EdgeOrg/eh_s_5.png',
+			'Mapping/EdgeOrg/eh_s_6.png',
+			'Mapping/EdgeOrg/eh_s_7.png',
+			'Mapping/EdgeOrg/eh_s_8.png',
+			'Mapping/EdgeOrg/eh_s_9.png',
+			'Mapping/EdgeOrg/eh_s_10.png',
+			'Mapping/EdgeOrg/eh_s_11.png',
+			'Mapping/EdgeOrg/eh_s_12.png',
+			'Mapping/EdgeOrg/eh_s_13.png',
+			'Mapping/EdgeOrg/eh_s_14.png',
+			'Mapping/EdgeOrg/eh_s_15.png',
+			'Mapping/EdgeOrg/eh_s_16.png',
+			'Mapping/EdgeOrg/eh_s_17.png',
+			'Mapping/EdgeOrg/eh_s_18.png',
+			'Mapping/EdgeOrg/eh_s_19.png',
+			'Mapping/EdgeOrg/eh_s_20.png',
+			'Mapping/EdgeOrg/eh_s_21.png',
+			'Mapping/EdgeOrg/eh_s_22.png',
+			'Mapping/EdgeOrg/eh_s_23.png',
+			'Mapping/EdgeOrg/eh_s_24.png',
+			'Mapping/EdgeOrg/eh_s_25.png',
+			'Mapping/EdgeOrg/eh_s_26.png',
+			'Mapping/EdgeOrg/eh_s_27.png',
+			'Mapping/EdgeOrg/eh_s_28.png',
+			'Mapping/EdgeOrg/eh_s_29.png',
+			'Mapping/EdgeOrg/eh_s_30.png',
+			'Mapping/EdgeOrg/eh_s_31.png',
+			'Mapping/EdgeOrg/eh_s_32.png',
+			'Mapping/EdgeOrg/eh_s_33.png'),
+		"n" = list(
+			'Mapping/EdgeOrg/eh_n_0.png',
+			'Mapping/EdgeOrg/eh_n_1.png',
+			'Mapping/EdgeOrg/eh_n_2.png',
+			'Mapping/EdgeOrg/eh_n_3.png',
+			'Mapping/EdgeOrg/eh_n_4.png',
+			'Mapping/EdgeOrg/eh_n_5.png',
+			'Mapping/EdgeOrg/eh_n_6.png',
+			'Mapping/EdgeOrg/eh_n_7.png',
+			'Mapping/EdgeOrg/eh_n_8.png',
+			'Mapping/EdgeOrg/eh_n_9.png',
+			'Mapping/EdgeOrg/eh_n_10.png',
+			'Mapping/EdgeOrg/eh_n_11.png',
+			'Mapping/EdgeOrg/eh_n_12.png',
+			'Mapping/EdgeOrg/eh_n_13.png',
+			'Mapping/EdgeOrg/eh_n_14.png',
+			'Mapping/EdgeOrg/eh_n_15.png',
+			'Mapping/EdgeOrg/eh_n_16.png',
+			'Mapping/EdgeOrg/eh_n_17.png',
+			'Mapping/EdgeOrg/eh_n_18.png',
+			'Mapping/EdgeOrg/eh_n_19.png',
+			'Mapping/EdgeOrg/eh_n_20.png',
+			'Mapping/EdgeOrg/eh_n_21.png',
+			'Mapping/EdgeOrg/eh_n_22.png',
+			'Mapping/EdgeOrg/eh_n_23.png',
+			'Mapping/EdgeOrg/eh_n_24.png',
+			'Mapping/EdgeOrg/eh_n_25.png',
+			'Mapping/EdgeOrg/eh_n_26.png',
+			'Mapping/EdgeOrg/eh_n_27.png',
+			'Mapping/EdgeOrg/eh_n_28.png',
+			'Mapping/EdgeOrg/eh_n_29.png',
+			'Mapping/EdgeOrg/eh_n_30.png',
+			'Mapping/EdgeOrg/eh_n_31.png',
+			'Mapping/EdgeOrg/eh_n_32.png',
+			'Mapping/EdgeOrg/eh_n_33.png',
+			'Mapping/EdgeOrg/eh_n_34.png',
+			'Mapping/EdgeOrg/eh_n_35.png',
+			'Mapping/EdgeOrg/eh_n_36.png',
+			'Mapping/EdgeOrg/eh_n_37.png',
+			'Mapping/EdgeOrg/eh_n_38.png',
+			'Mapping/EdgeOrg/eh_n_39.png'),
+		"i" = list(
+			'Mapping/EdgeOrg/eh_i_0.png',
+			'Mapping/EdgeOrg/eh_i_1.png',
+			'Mapping/EdgeOrg/eh_i_2.png',
+			'Mapping/EdgeOrg/eh_i_3.png',
+			'Mapping/EdgeOrg/eh_i_4.png',
+			'Mapping/EdgeOrg/eh_i_5.png',
+			'Mapping/EdgeOrg/eh_i_6.png',
+			'Mapping/EdgeOrg/eh_i_7.png',
+			'Mapping/EdgeOrg/eh_i_8.png',
+			'Mapping/EdgeOrg/eh_i_9.png',
+			'Mapping/EdgeOrg/eh_i_10.png',
+			'Mapping/EdgeOrg/eh_i_11.png',
+			'Mapping/EdgeOrg/eh_i_12.png',
+			'Mapping/EdgeOrg/eh_i_13.png',
+			'Mapping/EdgeOrg/eh_i_14.png',
+			'Mapping/EdgeOrg/eh_i_15.png',
+			'Mapping/EdgeOrg/eh_i_16.png',
+			'Mapping/EdgeOrg/eh_i_17.png',
+			'Mapping/EdgeOrg/eh_i_18.png',
+			'Mapping/EdgeOrg/eh_i_19.png',
+			'Mapping/EdgeOrg/eh_i_20.png',
+			'Mapping/EdgeOrg/eh_i_21.png',
+			'Mapping/EdgeOrg/eh_i_22.png',
+			'Mapping/EdgeOrg/eh_i_23.png',
+			'Mapping/EdgeOrg/eh_i_24.png',
+			'Mapping/EdgeOrg/eh_i_25.png',
+			'Mapping/EdgeOrg/eh_i_26.png',
+			'Mapping/EdgeOrg/eh_i_27.png',
+			'Mapping/EdgeOrg/eh_i_28.png',
+			'Mapping/EdgeOrg/eh_i_29.png',
+			'Mapping/EdgeOrg/eh_i_30.png',
+			'Mapping/EdgeOrg/eh_i_31.png',
+			'Mapping/EdgeOrg/eh_i_32.png',
+			'Mapping/EdgeOrg/eh_i_33.png',
+			'Mapping/EdgeOrg/eh_i_34.png',
+			'Mapping/EdgeOrg/eh_i_35.png',
+			'Mapping/EdgeOrg/eh_i_36.png',
+			'Mapping/EdgeOrg/eh_i_37.png',
+			'Mapping/EdgeOrg/eh_i_38.png',
+			'Mapping/EdgeOrg/eh_i_39.png',
+			'Mapping/EdgeOrg/eh_i_40.png'))
 	elevOrgDark = list(
 		"w" = list(
 			'Mapping/EdgeOrg/ed_w_0.png',
@@ -1122,7 +1274,14 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			'Mapping/EdgeOrg/ed_c_79.png',
 			'Mapping/EdgeOrg/ed_c_80.png',
 			'Mapping/EdgeOrg/ed_c_81.png',
-			'Mapping/EdgeOrg/ed_c_82.png'),
+			'Mapping/EdgeOrg/ed_c_82.png',
+			'Mapping/EdgeOrg/ed_c_83.png',
+			'Mapping/EdgeOrg/ed_c_84.png',
+			'Mapping/EdgeOrg/ed_c_85.png',
+			'Mapping/EdgeOrg/ed_c_86.png',
+			'Mapping/EdgeOrg/ed_c_87.png',
+			'Mapping/EdgeOrg/ed_c_88.png',
+			'Mapping/EdgeOrg/ed_c_89.png'),
 		"s" = list(
 			'Mapping/EdgeOrg/ed_s_0.png',
 			'Mapping/EdgeOrg/ed_s_1.png',
@@ -1170,57 +1329,1110 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			'Mapping/EdgeOrg/ed_s_43.png',
 			'Mapping/EdgeOrg/ed_s_44.png',
 			'Mapping/EdgeOrg/ed_s_45.png',
-			'Mapping/EdgeOrg/ed_s_46.png',
-			'Mapping/EdgeOrg/ed_s_47.png',
-			'Mapping/EdgeOrg/ed_s_48.png',
-			'Mapping/EdgeOrg/ed_s_49.png',
-			'Mapping/EdgeOrg/ed_s_50.png',
-			'Mapping/EdgeOrg/ed_s_51.png',
-			'Mapping/EdgeOrg/ed_s_52.png',
-			'Mapping/EdgeOrg/ed_s_53.png',
-			'Mapping/EdgeOrg/ed_s_54.png',
-			'Mapping/EdgeOrg/ed_s_55.png'))
-	elevOrgKeyFiles = list("w" = 'Mapping/EdgeOrg/ek_w.txt', "c" = 'Mapping/EdgeOrg/ek_c.txt', "s" = 'Mapping/EdgeOrg/ek_s.txt')
+			'Mapping/EdgeOrg/ed_s_46.png'),
+		"n" = list(
+			'Mapping/EdgeOrg/ed_n_0.png',
+			'Mapping/EdgeOrg/ed_n_1.png',
+			'Mapping/EdgeOrg/ed_n_2.png',
+			'Mapping/EdgeOrg/ed_n_3.png',
+			'Mapping/EdgeOrg/ed_n_4.png',
+			'Mapping/EdgeOrg/ed_n_5.png',
+			'Mapping/EdgeOrg/ed_n_6.png',
+			'Mapping/EdgeOrg/ed_n_7.png',
+			'Mapping/EdgeOrg/ed_n_8.png',
+			'Mapping/EdgeOrg/ed_n_9.png',
+			'Mapping/EdgeOrg/ed_n_10.png',
+			'Mapping/EdgeOrg/ed_n_11.png',
+			'Mapping/EdgeOrg/ed_n_12.png',
+			'Mapping/EdgeOrg/ed_n_13.png',
+			'Mapping/EdgeOrg/ed_n_14.png',
+			'Mapping/EdgeOrg/ed_n_15.png',
+			'Mapping/EdgeOrg/ed_n_16.png',
+			'Mapping/EdgeOrg/ed_n_17.png',
+			'Mapping/EdgeOrg/ed_n_18.png',
+			'Mapping/EdgeOrg/ed_n_19.png',
+			'Mapping/EdgeOrg/ed_n_20.png',
+			'Mapping/EdgeOrg/ed_n_21.png',
+			'Mapping/EdgeOrg/ed_n_22.png',
+			'Mapping/EdgeOrg/ed_n_23.png',
+			'Mapping/EdgeOrg/ed_n_24.png',
+			'Mapping/EdgeOrg/ed_n_25.png',
+			'Mapping/EdgeOrg/ed_n_26.png',
+			'Mapping/EdgeOrg/ed_n_27.png',
+			'Mapping/EdgeOrg/ed_n_28.png',
+			'Mapping/EdgeOrg/ed_n_29.png',
+			'Mapping/EdgeOrg/ed_n_30.png',
+			'Mapping/EdgeOrg/ed_n_31.png',
+			'Mapping/EdgeOrg/ed_n_32.png',
+			'Mapping/EdgeOrg/ed_n_33.png',
+			'Mapping/EdgeOrg/ed_n_34.png',
+			'Mapping/EdgeOrg/ed_n_35.png',
+			'Mapping/EdgeOrg/ed_n_36.png',
+			'Mapping/EdgeOrg/ed_n_37.png',
+			'Mapping/EdgeOrg/ed_n_38.png',
+			'Mapping/EdgeOrg/ed_n_39.png',
+			'Mapping/EdgeOrg/ed_n_40.png',
+			'Mapping/EdgeOrg/ed_n_41.png',
+			'Mapping/EdgeOrg/ed_n_42.png',
+			'Mapping/EdgeOrg/ed_n_43.png',
+			'Mapping/EdgeOrg/ed_n_44.png',
+			'Mapping/EdgeOrg/ed_n_45.png',
+			'Mapping/EdgeOrg/ed_n_46.png',
+			'Mapping/EdgeOrg/ed_n_47.png',
+			'Mapping/EdgeOrg/ed_n_48.png',
+			'Mapping/EdgeOrg/ed_n_49.png',
+			'Mapping/EdgeOrg/ed_n_50.png',
+			'Mapping/EdgeOrg/ed_n_51.png',
+			'Mapping/EdgeOrg/ed_n_52.png',
+			'Mapping/EdgeOrg/ed_n_53.png',
+			'Mapping/EdgeOrg/ed_n_54.png',
+			'Mapping/EdgeOrg/ed_n_55.png',
+			'Mapping/EdgeOrg/ed_n_56.png',
+			'Mapping/EdgeOrg/ed_n_57.png',
+			'Mapping/EdgeOrg/ed_n_58.png',
+			'Mapping/EdgeOrg/ed_n_59.png',
+			'Mapping/EdgeOrg/ed_n_60.png',
+			'Mapping/EdgeOrg/ed_n_61.png',
+			'Mapping/EdgeOrg/ed_n_62.png',
+			'Mapping/EdgeOrg/ed_n_63.png',
+			'Mapping/EdgeOrg/ed_n_64.png',
+			'Mapping/EdgeOrg/ed_n_65.png',
+			'Mapping/EdgeOrg/ed_n_66.png',
+			'Mapping/EdgeOrg/ed_n_67.png',
+			'Mapping/EdgeOrg/ed_n_68.png'),
+		"i" = list(
+			'Mapping/EdgeOrg/ed_i_0.png',
+			'Mapping/EdgeOrg/ed_i_1.png',
+			'Mapping/EdgeOrg/ed_i_2.png',
+			'Mapping/EdgeOrg/ed_i_3.png',
+			'Mapping/EdgeOrg/ed_i_4.png',
+			'Mapping/EdgeOrg/ed_i_5.png',
+			'Mapping/EdgeOrg/ed_i_6.png',
+			'Mapping/EdgeOrg/ed_i_7.png',
+			'Mapping/EdgeOrg/ed_i_8.png',
+			'Mapping/EdgeOrg/ed_i_9.png',
+			'Mapping/EdgeOrg/ed_i_10.png',
+			'Mapping/EdgeOrg/ed_i_11.png',
+			'Mapping/EdgeOrg/ed_i_12.png',
+			'Mapping/EdgeOrg/ed_i_13.png',
+			'Mapping/EdgeOrg/ed_i_14.png',
+			'Mapping/EdgeOrg/ed_i_15.png',
+			'Mapping/EdgeOrg/ed_i_16.png',
+			'Mapping/EdgeOrg/ed_i_17.png',
+			'Mapping/EdgeOrg/ed_i_18.png',
+			'Mapping/EdgeOrg/ed_i_19.png',
+			'Mapping/EdgeOrg/ed_i_20.png',
+			'Mapping/EdgeOrg/ed_i_21.png',
+			'Mapping/EdgeOrg/ed_i_22.png',
+			'Mapping/EdgeOrg/ed_i_23.png',
+			'Mapping/EdgeOrg/ed_i_24.png',
+			'Mapping/EdgeOrg/ed_i_25.png',
+			'Mapping/EdgeOrg/ed_i_26.png',
+			'Mapping/EdgeOrg/ed_i_27.png',
+			'Mapping/EdgeOrg/ed_i_28.png',
+			'Mapping/EdgeOrg/ed_i_29.png',
+			'Mapping/EdgeOrg/ed_i_30.png',
+			'Mapping/EdgeOrg/ed_i_31.png',
+			'Mapping/EdgeOrg/ed_i_32.png',
+			'Mapping/EdgeOrg/ed_i_33.png',
+			'Mapping/EdgeOrg/ed_i_34.png',
+			'Mapping/EdgeOrg/ed_i_35.png',
+			'Mapping/EdgeOrg/ed_i_36.png',
+			'Mapping/EdgeOrg/ed_i_37.png',
+			'Mapping/EdgeOrg/ed_i_38.png',
+			'Mapping/EdgeOrg/ed_i_39.png',
+			'Mapping/EdgeOrg/ed_i_40.png',
+			'Mapping/EdgeOrg/ed_i_41.png',
+			'Mapping/EdgeOrg/ed_i_42.png',
+			'Mapping/EdgeOrg/ed_i_43.png',
+			'Mapping/EdgeOrg/ed_i_44.png',
+			'Mapping/EdgeOrg/ed_i_45.png',
+			'Mapping/EdgeOrg/ed_i_46.png',
+			'Mapping/EdgeOrg/ed_i_47.png',
+			'Mapping/EdgeOrg/ed_i_48.png',
+			'Mapping/EdgeOrg/ed_i_49.png',
+			'Mapping/EdgeOrg/ed_i_50.png',
+			'Mapping/EdgeOrg/ed_i_51.png',
+			'Mapping/EdgeOrg/ed_i_52.png',
+			'Mapping/EdgeOrg/ed_i_53.png',
+			'Mapping/EdgeOrg/ed_i_54.png',
+			'Mapping/EdgeOrg/ed_i_55.png',
+			'Mapping/EdgeOrg/ed_i_56.png',
+			'Mapping/EdgeOrg/ed_i_57.png',
+			'Mapping/EdgeOrg/ed_i_58.png',
+			'Mapping/EdgeOrg/ed_i_59.png',
+			'Mapping/EdgeOrg/ed_i_60.png',
+			'Mapping/EdgeOrg/ed_i_61.png',
+			'Mapping/EdgeOrg/ed_i_62.png',
+			'Mapping/EdgeOrg/ed_i_63.png',
+			'Mapping/EdgeOrg/ed_i_64.png'))
+	elevOrgLift = list(
+		"w" = list(
+			'Mapping/EdgeOrg/ef_w_0.png',
+			'Mapping/EdgeOrg/ef_w_1.png',
+			'Mapping/EdgeOrg/ef_w_2.png',
+			'Mapping/EdgeOrg/ef_w_3.png',
+			'Mapping/EdgeOrg/ef_w_4.png',
+			'Mapping/EdgeOrg/ef_w_5.png',
+			'Mapping/EdgeOrg/ef_w_6.png',
+			'Mapping/EdgeOrg/ef_w_7.png',
+			'Mapping/EdgeOrg/ef_w_8.png',
+			'Mapping/EdgeOrg/ef_w_9.png',
+			'Mapping/EdgeOrg/ef_w_10.png',
+			'Mapping/EdgeOrg/ef_w_11.png',
+			'Mapping/EdgeOrg/ef_w_12.png',
+			'Mapping/EdgeOrg/ef_w_13.png',
+			'Mapping/EdgeOrg/ef_w_14.png'),
+		"c" = list(
+			'Mapping/EdgeOrg/ef_c_0.png',
+			'Mapping/EdgeOrg/ef_c_1.png',
+			'Mapping/EdgeOrg/ef_c_2.png',
+			'Mapping/EdgeOrg/ef_c_3.png',
+			'Mapping/EdgeOrg/ef_c_4.png',
+			'Mapping/EdgeOrg/ef_c_5.png',
+			'Mapping/EdgeOrg/ef_c_6.png',
+			'Mapping/EdgeOrg/ef_c_7.png',
+			'Mapping/EdgeOrg/ef_c_8.png',
+			'Mapping/EdgeOrg/ef_c_9.png',
+			'Mapping/EdgeOrg/ef_c_10.png',
+			'Mapping/EdgeOrg/ef_c_11.png',
+			'Mapping/EdgeOrg/ef_c_12.png',
+			'Mapping/EdgeOrg/ef_c_13.png',
+			'Mapping/EdgeOrg/ef_c_14.png'),
+		"s" = list(
+			'Mapping/EdgeOrg/ef_s_0.png',
+			'Mapping/EdgeOrg/ef_s_1.png',
+			'Mapping/EdgeOrg/ef_s_2.png',
+			'Mapping/EdgeOrg/ef_s_3.png',
+			'Mapping/EdgeOrg/ef_s_4.png',
+			'Mapping/EdgeOrg/ef_s_5.png',
+			'Mapping/EdgeOrg/ef_s_6.png',
+			'Mapping/EdgeOrg/ef_s_7.png',
+			'Mapping/EdgeOrg/ef_s_8.png',
+			'Mapping/EdgeOrg/ef_s_9.png'),
+		"n" = list(
+			'Mapping/EdgeOrg/ef_n_0.png',
+			'Mapping/EdgeOrg/ef_n_1.png',
+			'Mapping/EdgeOrg/ef_n_2.png',
+			'Mapping/EdgeOrg/ef_n_3.png',
+			'Mapping/EdgeOrg/ef_n_4.png',
+			'Mapping/EdgeOrg/ef_n_5.png',
+			'Mapping/EdgeOrg/ef_n_6.png',
+			'Mapping/EdgeOrg/ef_n_7.png',
+			'Mapping/EdgeOrg/ef_n_8.png',
+			'Mapping/EdgeOrg/ef_n_9.png',
+			'Mapping/EdgeOrg/ef_n_10.png',
+			'Mapping/EdgeOrg/ef_n_11.png',
+			'Mapping/EdgeOrg/ef_n_12.png',
+			'Mapping/EdgeOrg/ef_n_13.png'),
+		"i" = list(
+			'Mapping/EdgeOrg/ef_i_0.png',
+			'Mapping/EdgeOrg/ef_i_1.png',
+			'Mapping/EdgeOrg/ef_i_2.png',
+			'Mapping/EdgeOrg/ef_i_3.png',
+			'Mapping/EdgeOrg/ef_i_4.png',
+			'Mapping/EdgeOrg/ef_i_5.png',
+			'Mapping/EdgeOrg/ef_i_6.png',
+			'Mapping/EdgeOrg/ef_i_7.png',
+			'Mapping/EdgeOrg/ef_i_8.png',
+			'Mapping/EdgeOrg/ef_i_9.png',
+			'Mapping/EdgeOrg/ef_i_10.png',
+			'Mapping/EdgeOrg/ef_i_11.png',
+			'Mapping/EdgeOrg/ef_i_12.png',
+			'Mapping/EdgeOrg/ef_i_13.png',
+			'Mapping/EdgeOrg/ef_i_14.png'))
+	elevOrgBev = list(
+		"wg" = list(
+			'Mapping/EdgeOrg/eb_wg_0.png',
+			'Mapping/EdgeOrg/eb_wg_1.png',
+			'Mapping/EdgeOrg/eb_wg_2.png',
+			'Mapping/EdgeOrg/eb_wg_3.png',
+			'Mapping/EdgeOrg/eb_wg_4.png',
+			'Mapping/EdgeOrg/eb_wg_5.png',
+			'Mapping/EdgeOrg/eb_wg_6.png',
+			'Mapping/EdgeOrg/eb_wg_7.png',
+			'Mapping/EdgeOrg/eb_wg_8.png',
+			'Mapping/EdgeOrg/eb_wg_9.png',
+			'Mapping/EdgeOrg/eb_wg_10.png',
+			'Mapping/EdgeOrg/eb_wg_11.png',
+			'Mapping/EdgeOrg/eb_wg_12.png',
+			'Mapping/EdgeOrg/eb_wg_13.png',
+			'Mapping/EdgeOrg/eb_wg_14.png',
+			'Mapping/EdgeOrg/eb_wg_15.png',
+			'Mapping/EdgeOrg/eb_wg_16.png',
+			'Mapping/EdgeOrg/eb_wg_17.png',
+			'Mapping/EdgeOrg/eb_wg_18.png',
+			'Mapping/EdgeOrg/eb_wg_19.png',
+			'Mapping/EdgeOrg/eb_wg_20.png',
+			'Mapping/EdgeOrg/eb_wg_21.png',
+			'Mapping/EdgeOrg/eb_wg_22.png',
+			'Mapping/EdgeOrg/eb_wg_23.png',
+			'Mapping/EdgeOrg/eb_wg_24.png',
+			'Mapping/EdgeOrg/eb_wg_25.png',
+			'Mapping/EdgeOrg/eb_wg_26.png',
+			'Mapping/EdgeOrg/eb_wg_27.png',
+			'Mapping/EdgeOrg/eb_wg_28.png',
+			'Mapping/EdgeOrg/eb_wg_29.png',
+			'Mapping/EdgeOrg/eb_wg_30.png'),
+		"cd" = list(
+			'Mapping/EdgeOrg/eb_cd_0.png',
+			'Mapping/EdgeOrg/eb_cd_1.png',
+			'Mapping/EdgeOrg/eb_cd_2.png',
+			'Mapping/EdgeOrg/eb_cd_3.png',
+			'Mapping/EdgeOrg/eb_cd_4.png',
+			'Mapping/EdgeOrg/eb_cd_5.png',
+			'Mapping/EdgeOrg/eb_cd_6.png',
+			'Mapping/EdgeOrg/eb_cd_7.png',
+			'Mapping/EdgeOrg/eb_cd_8.png',
+			'Mapping/EdgeOrg/eb_cd_9.png',
+			'Mapping/EdgeOrg/eb_cd_10.png',
+			'Mapping/EdgeOrg/eb_cd_11.png',
+			'Mapping/EdgeOrg/eb_cd_12.png',
+			'Mapping/EdgeOrg/eb_cd_13.png',
+			'Mapping/EdgeOrg/eb_cd_14.png',
+			'Mapping/EdgeOrg/eb_cd_15.png',
+			'Mapping/EdgeOrg/eb_cd_16.png',
+			'Mapping/EdgeOrg/eb_cd_17.png',
+			'Mapping/EdgeOrg/eb_cd_18.png',
+			'Mapping/EdgeOrg/eb_cd_19.png',
+			'Mapping/EdgeOrg/eb_cd_20.png',
+			'Mapping/EdgeOrg/eb_cd_21.png',
+			'Mapping/EdgeOrg/eb_cd_22.png',
+			'Mapping/EdgeOrg/eb_cd_23.png',
+			'Mapping/EdgeOrg/eb_cd_24.png',
+			'Mapping/EdgeOrg/eb_cd_25.png',
+			'Mapping/EdgeOrg/eb_cd_26.png',
+			'Mapping/EdgeOrg/eb_cd_27.png'),
+		"sa" = list(
+			'Mapping/EdgeOrg/eb_sa_0.png',
+			'Mapping/EdgeOrg/eb_sa_1.png',
+			'Mapping/EdgeOrg/eb_sa_2.png',
+			'Mapping/EdgeOrg/eb_sa_3.png',
+			'Mapping/EdgeOrg/eb_sa_4.png',
+			'Mapping/EdgeOrg/eb_sa_5.png',
+			'Mapping/EdgeOrg/eb_sa_6.png',
+			'Mapping/EdgeOrg/eb_sa_7.png',
+			'Mapping/EdgeOrg/eb_sa_8.png',
+			'Mapping/EdgeOrg/eb_sa_9.png',
+			'Mapping/EdgeOrg/eb_sa_10.png',
+			'Mapping/EdgeOrg/eb_sa_11.png',
+			'Mapping/EdgeOrg/eb_sa_12.png',
+			'Mapping/EdgeOrg/eb_sa_13.png',
+			'Mapping/EdgeOrg/eb_sa_14.png',
+			'Mapping/EdgeOrg/eb_sa_15.png',
+			'Mapping/EdgeOrg/eb_sa_16.png',
+			'Mapping/EdgeOrg/eb_sa_17.png'),
+		"nn" = list(),
+		"ii" = list(
+			'Mapping/EdgeOrg/eb_ii_0.png',
+			'Mapping/EdgeOrg/eb_ii_1.png',
+			'Mapping/EdgeOrg/eb_ii_2.png',
+			'Mapping/EdgeOrg/eb_ii_3.png',
+			'Mapping/EdgeOrg/eb_ii_4.png',
+			'Mapping/EdgeOrg/eb_ii_5.png',
+			'Mapping/EdgeOrg/eb_ii_6.png',
+			'Mapping/EdgeOrg/eb_ii_7.png',
+			'Mapping/EdgeOrg/eb_ii_8.png',
+			'Mapping/EdgeOrg/eb_ii_9.png',
+			'Mapping/EdgeOrg/eb_ii_10.png',
+			'Mapping/EdgeOrg/eb_ii_11.png',
+			'Mapping/EdgeOrg/eb_ii_12.png',
+			'Mapping/EdgeOrg/eb_ii_13.png',
+			'Mapping/EdgeOrg/eb_ii_14.png',
+			'Mapping/EdgeOrg/eb_ii_15.png',
+			'Mapping/EdgeOrg/eb_ii_16.png',
+			'Mapping/EdgeOrg/eb_ii_17.png',
+			'Mapping/EdgeOrg/eb_ii_18.png',
+			'Mapping/EdgeOrg/eb_ii_19.png'))
+	elevOrgBevMid = list(
+		"wg" = list(
+			'Mapping/EdgeOrg/ec_wg_0.png',
+			'Mapping/EdgeOrg/ec_wg_1.png',
+			'Mapping/EdgeOrg/ec_wg_2.png',
+			'Mapping/EdgeOrg/ec_wg_3.png',
+			'Mapping/EdgeOrg/ec_wg_4.png',
+			'Mapping/EdgeOrg/ec_wg_5.png',
+			'Mapping/EdgeOrg/ec_wg_6.png',
+			'Mapping/EdgeOrg/ec_wg_7.png',
+			'Mapping/EdgeOrg/ec_wg_8.png',
+			'Mapping/EdgeOrg/ec_wg_9.png',
+			'Mapping/EdgeOrg/ec_wg_10.png',
+			'Mapping/EdgeOrg/ec_wg_11.png',
+			'Mapping/EdgeOrg/ec_wg_12.png',
+			'Mapping/EdgeOrg/ec_wg_13.png',
+			'Mapping/EdgeOrg/ec_wg_14.png',
+			'Mapping/EdgeOrg/ec_wg_15.png',
+			'Mapping/EdgeOrg/ec_wg_16.png',
+			'Mapping/EdgeOrg/ec_wg_17.png',
+			'Mapping/EdgeOrg/ec_wg_18.png',
+			'Mapping/EdgeOrg/ec_wg_19.png',
+			'Mapping/EdgeOrg/ec_wg_20.png',
+			'Mapping/EdgeOrg/ec_wg_21.png',
+			'Mapping/EdgeOrg/ec_wg_22.png',
+			'Mapping/EdgeOrg/ec_wg_23.png',
+			'Mapping/EdgeOrg/ec_wg_24.png',
+			'Mapping/EdgeOrg/ec_wg_25.png',
+			'Mapping/EdgeOrg/ec_wg_26.png',
+			'Mapping/EdgeOrg/ec_wg_27.png',
+			'Mapping/EdgeOrg/ec_wg_28.png',
+			'Mapping/EdgeOrg/ec_wg_29.png',
+			'Mapping/EdgeOrg/ec_wg_30.png'),
+		"cd" = list(
+			'Mapping/EdgeOrg/ec_cd_0.png',
+			'Mapping/EdgeOrg/ec_cd_1.png',
+			'Mapping/EdgeOrg/ec_cd_2.png',
+			'Mapping/EdgeOrg/ec_cd_3.png',
+			'Mapping/EdgeOrg/ec_cd_4.png',
+			'Mapping/EdgeOrg/ec_cd_5.png',
+			'Mapping/EdgeOrg/ec_cd_6.png',
+			'Mapping/EdgeOrg/ec_cd_7.png',
+			'Mapping/EdgeOrg/ec_cd_8.png',
+			'Mapping/EdgeOrg/ec_cd_9.png',
+			'Mapping/EdgeOrg/ec_cd_10.png',
+			'Mapping/EdgeOrg/ec_cd_11.png',
+			'Mapping/EdgeOrg/ec_cd_12.png',
+			'Mapping/EdgeOrg/ec_cd_13.png',
+			'Mapping/EdgeOrg/ec_cd_14.png',
+			'Mapping/EdgeOrg/ec_cd_15.png',
+			'Mapping/EdgeOrg/ec_cd_16.png',
+			'Mapping/EdgeOrg/ec_cd_17.png',
+			'Mapping/EdgeOrg/ec_cd_18.png',
+			'Mapping/EdgeOrg/ec_cd_19.png',
+			'Mapping/EdgeOrg/ec_cd_20.png',
+			'Mapping/EdgeOrg/ec_cd_21.png',
+			'Mapping/EdgeOrg/ec_cd_22.png',
+			'Mapping/EdgeOrg/ec_cd_23.png',
+			'Mapping/EdgeOrg/ec_cd_24.png',
+			'Mapping/EdgeOrg/ec_cd_25.png',
+			'Mapping/EdgeOrg/ec_cd_26.png',
+			'Mapping/EdgeOrg/ec_cd_27.png'),
+		"sa" = list(
+			'Mapping/EdgeOrg/ec_sa_0.png',
+			'Mapping/EdgeOrg/ec_sa_1.png',
+			'Mapping/EdgeOrg/ec_sa_2.png',
+			'Mapping/EdgeOrg/ec_sa_3.png',
+			'Mapping/EdgeOrg/ec_sa_4.png',
+			'Mapping/EdgeOrg/ec_sa_5.png',
+			'Mapping/EdgeOrg/ec_sa_6.png',
+			'Mapping/EdgeOrg/ec_sa_7.png',
+			'Mapping/EdgeOrg/ec_sa_8.png',
+			'Mapping/EdgeOrg/ec_sa_9.png',
+			'Mapping/EdgeOrg/ec_sa_10.png',
+			'Mapping/EdgeOrg/ec_sa_11.png',
+			'Mapping/EdgeOrg/ec_sa_12.png',
+			'Mapping/EdgeOrg/ec_sa_13.png',
+			'Mapping/EdgeOrg/ec_sa_14.png',
+			'Mapping/EdgeOrg/ec_sa_15.png',
+			'Mapping/EdgeOrg/ec_sa_16.png',
+			'Mapping/EdgeOrg/ec_sa_17.png'),
+		"nn" = list(),
+		"ii" = list(
+			'Mapping/EdgeOrg/ec_ii_0.png',
+			'Mapping/EdgeOrg/ec_ii_1.png',
+			'Mapping/EdgeOrg/ec_ii_2.png',
+			'Mapping/EdgeOrg/ec_ii_3.png',
+			'Mapping/EdgeOrg/ec_ii_4.png',
+			'Mapping/EdgeOrg/ec_ii_5.png',
+			'Mapping/EdgeOrg/ec_ii_6.png',
+			'Mapping/EdgeOrg/ec_ii_7.png',
+			'Mapping/EdgeOrg/ec_ii_8.png',
+			'Mapping/EdgeOrg/ec_ii_9.png',
+			'Mapping/EdgeOrg/ec_ii_10.png',
+			'Mapping/EdgeOrg/ec_ii_11.png',
+			'Mapping/EdgeOrg/ec_ii_12.png',
+			'Mapping/EdgeOrg/ec_ii_13.png',
+			'Mapping/EdgeOrg/ec_ii_14.png',
+			'Mapping/EdgeOrg/ec_ii_15.png',
+			'Mapping/EdgeOrg/ec_ii_16.png',
+			'Mapping/EdgeOrg/ec_ii_17.png',
+			'Mapping/EdgeOrg/ec_ii_18.png',
+			'Mapping/EdgeOrg/ec_ii_19.png'))
+	elevOrgRing = list(
+		"wg" = list(
+			'Mapping/EdgeOrg/eg_wg_0.png',
+			'Mapping/EdgeOrg/eg_wg_1.png',
+			'Mapping/EdgeOrg/eg_wg_2.png',
+			'Mapping/EdgeOrg/eg_wg_3.png',
+			'Mapping/EdgeOrg/eg_wg_4.png',
+			'Mapping/EdgeOrg/eg_wg_5.png',
+			'Mapping/EdgeOrg/eg_wg_6.png',
+			'Mapping/EdgeOrg/eg_wg_7.png',
+			'Mapping/EdgeOrg/eg_wg_8.png',
+			'Mapping/EdgeOrg/eg_wg_9.png',
+			'Mapping/EdgeOrg/eg_wg_10.png',
+			'Mapping/EdgeOrg/eg_wg_11.png',
+			'Mapping/EdgeOrg/eg_wg_12.png',
+			'Mapping/EdgeOrg/eg_wg_13.png',
+			'Mapping/EdgeOrg/eg_wg_14.png',
+			'Mapping/EdgeOrg/eg_wg_15.png',
+			'Mapping/EdgeOrg/eg_wg_16.png',
+			'Mapping/EdgeOrg/eg_wg_17.png',
+			'Mapping/EdgeOrg/eg_wg_18.png',
+			'Mapping/EdgeOrg/eg_wg_19.png',
+			'Mapping/EdgeOrg/eg_wg_20.png',
+			'Mapping/EdgeOrg/eg_wg_21.png',
+			'Mapping/EdgeOrg/eg_wg_22.png',
+			'Mapping/EdgeOrg/eg_wg_23.png',
+			'Mapping/EdgeOrg/eg_wg_24.png',
+			'Mapping/EdgeOrg/eg_wg_25.png',
+			'Mapping/EdgeOrg/eg_wg_26.png',
+			'Mapping/EdgeOrg/eg_wg_27.png',
+			'Mapping/EdgeOrg/eg_wg_28.png',
+			'Mapping/EdgeOrg/eg_wg_29.png',
+			'Mapping/EdgeOrg/eg_wg_30.png',
+			'Mapping/EdgeOrg/eg_wg_31.png',
+			'Mapping/EdgeOrg/eg_wg_32.png',
+			'Mapping/EdgeOrg/eg_wg_33.png',
+			'Mapping/EdgeOrg/eg_wg_34.png',
+			'Mapping/EdgeOrg/eg_wg_35.png',
+			'Mapping/EdgeOrg/eg_wg_36.png',
+			'Mapping/EdgeOrg/eg_wg_37.png',
+			'Mapping/EdgeOrg/eg_wg_38.png',
+			'Mapping/EdgeOrg/eg_wg_39.png',
+			'Mapping/EdgeOrg/eg_wg_40.png',
+			'Mapping/EdgeOrg/eg_wg_41.png',
+			'Mapping/EdgeOrg/eg_wg_42.png',
+			'Mapping/EdgeOrg/eg_wg_43.png'),
+		"cd" = list(
+			'Mapping/EdgeOrg/eg_cd_0.png',
+			'Mapping/EdgeOrg/eg_cd_1.png',
+			'Mapping/EdgeOrg/eg_cd_2.png',
+			'Mapping/EdgeOrg/eg_cd_3.png',
+			'Mapping/EdgeOrg/eg_cd_4.png',
+			'Mapping/EdgeOrg/eg_cd_5.png',
+			'Mapping/EdgeOrg/eg_cd_6.png',
+			'Mapping/EdgeOrg/eg_cd_7.png',
+			'Mapping/EdgeOrg/eg_cd_8.png',
+			'Mapping/EdgeOrg/eg_cd_9.png',
+			'Mapping/EdgeOrg/eg_cd_10.png',
+			'Mapping/EdgeOrg/eg_cd_11.png',
+			'Mapping/EdgeOrg/eg_cd_12.png',
+			'Mapping/EdgeOrg/eg_cd_13.png',
+			'Mapping/EdgeOrg/eg_cd_14.png',
+			'Mapping/EdgeOrg/eg_cd_15.png',
+			'Mapping/EdgeOrg/eg_cd_16.png',
+			'Mapping/EdgeOrg/eg_cd_17.png',
+			'Mapping/EdgeOrg/eg_cd_18.png',
+			'Mapping/EdgeOrg/eg_cd_19.png',
+			'Mapping/EdgeOrg/eg_cd_20.png',
+			'Mapping/EdgeOrg/eg_cd_21.png',
+			'Mapping/EdgeOrg/eg_cd_22.png',
+			'Mapping/EdgeOrg/eg_cd_23.png',
+			'Mapping/EdgeOrg/eg_cd_24.png',
+			'Mapping/EdgeOrg/eg_cd_25.png',
+			'Mapping/EdgeOrg/eg_cd_26.png',
+			'Mapping/EdgeOrg/eg_cd_27.png',
+			'Mapping/EdgeOrg/eg_cd_28.png',
+			'Mapping/EdgeOrg/eg_cd_29.png',
+			'Mapping/EdgeOrg/eg_cd_30.png',
+			'Mapping/EdgeOrg/eg_cd_31.png',
+			'Mapping/EdgeOrg/eg_cd_32.png',
+			'Mapping/EdgeOrg/eg_cd_33.png',
+			'Mapping/EdgeOrg/eg_cd_34.png',
+			'Mapping/EdgeOrg/eg_cd_35.png',
+			'Mapping/EdgeOrg/eg_cd_36.png',
+			'Mapping/EdgeOrg/eg_cd_37.png',
+			'Mapping/EdgeOrg/eg_cd_38.png',
+			'Mapping/EdgeOrg/eg_cd_39.png',
+			'Mapping/EdgeOrg/eg_cd_40.png',
+			'Mapping/EdgeOrg/eg_cd_41.png',
+			'Mapping/EdgeOrg/eg_cd_42.png',
+			'Mapping/EdgeOrg/eg_cd_43.png',
+			'Mapping/EdgeOrg/eg_cd_44.png',
+			'Mapping/EdgeOrg/eg_cd_45.png'),
+		"sa" = list(
+			'Mapping/EdgeOrg/eg_sa_0.png',
+			'Mapping/EdgeOrg/eg_sa_1.png',
+			'Mapping/EdgeOrg/eg_sa_2.png',
+			'Mapping/EdgeOrg/eg_sa_3.png',
+			'Mapping/EdgeOrg/eg_sa_4.png',
+			'Mapping/EdgeOrg/eg_sa_5.png',
+			'Mapping/EdgeOrg/eg_sa_6.png',
+			'Mapping/EdgeOrg/eg_sa_7.png',
+			'Mapping/EdgeOrg/eg_sa_8.png',
+			'Mapping/EdgeOrg/eg_sa_9.png',
+			'Mapping/EdgeOrg/eg_sa_10.png',
+			'Mapping/EdgeOrg/eg_sa_11.png',
+			'Mapping/EdgeOrg/eg_sa_12.png',
+			'Mapping/EdgeOrg/eg_sa_13.png',
+			'Mapping/EdgeOrg/eg_sa_14.png',
+			'Mapping/EdgeOrg/eg_sa_15.png',
+			'Mapping/EdgeOrg/eg_sa_16.png',
+			'Mapping/EdgeOrg/eg_sa_17.png',
+			'Mapping/EdgeOrg/eg_sa_18.png',
+			'Mapping/EdgeOrg/eg_sa_19.png',
+			'Mapping/EdgeOrg/eg_sa_20.png',
+			'Mapping/EdgeOrg/eg_sa_21.png',
+			'Mapping/EdgeOrg/eg_sa_22.png',
+			'Mapping/EdgeOrg/eg_sa_23.png',
+			'Mapping/EdgeOrg/eg_sa_24.png',
+			'Mapping/EdgeOrg/eg_sa_25.png',
+			'Mapping/EdgeOrg/eg_sa_26.png',
+			'Mapping/EdgeOrg/eg_sa_27.png',
+			'Mapping/EdgeOrg/eg_sa_28.png',
+			'Mapping/EdgeOrg/eg_sa_29.png',
+			'Mapping/EdgeOrg/eg_sa_30.png',
+			'Mapping/EdgeOrg/eg_sa_31.png',
+			'Mapping/EdgeOrg/eg_sa_32.png',
+			'Mapping/EdgeOrg/eg_sa_33.png',
+			'Mapping/EdgeOrg/eg_sa_34.png',
+			'Mapping/EdgeOrg/eg_sa_35.png',
+			'Mapping/EdgeOrg/eg_sa_36.png',
+			'Mapping/EdgeOrg/eg_sa_37.png',
+			'Mapping/EdgeOrg/eg_sa_38.png'),
+		"nn" = list(
+			'Mapping/EdgeOrg/eg_nn_0.png',
+			'Mapping/EdgeOrg/eg_nn_1.png',
+			'Mapping/EdgeOrg/eg_nn_2.png',
+			'Mapping/EdgeOrg/eg_nn_3.png',
+			'Mapping/EdgeOrg/eg_nn_4.png',
+			'Mapping/EdgeOrg/eg_nn_5.png',
+			'Mapping/EdgeOrg/eg_nn_6.png',
+			'Mapping/EdgeOrg/eg_nn_7.png',
+			'Mapping/EdgeOrg/eg_nn_8.png',
+			'Mapping/EdgeOrg/eg_nn_9.png',
+			'Mapping/EdgeOrg/eg_nn_10.png',
+			'Mapping/EdgeOrg/eg_nn_11.png',
+			'Mapping/EdgeOrg/eg_nn_12.png',
+			'Mapping/EdgeOrg/eg_nn_13.png',
+			'Mapping/EdgeOrg/eg_nn_14.png',
+			'Mapping/EdgeOrg/eg_nn_15.png',
+			'Mapping/EdgeOrg/eg_nn_16.png',
+			'Mapping/EdgeOrg/eg_nn_17.png',
+			'Mapping/EdgeOrg/eg_nn_18.png',
+			'Mapping/EdgeOrg/eg_nn_19.png',
+			'Mapping/EdgeOrg/eg_nn_20.png',
+			'Mapping/EdgeOrg/eg_nn_21.png',
+			'Mapping/EdgeOrg/eg_nn_22.png',
+			'Mapping/EdgeOrg/eg_nn_23.png',
+			'Mapping/EdgeOrg/eg_nn_24.png',
+			'Mapping/EdgeOrg/eg_nn_25.png',
+			'Mapping/EdgeOrg/eg_nn_26.png',
+			'Mapping/EdgeOrg/eg_nn_27.png',
+			'Mapping/EdgeOrg/eg_nn_28.png',
+			'Mapping/EdgeOrg/eg_nn_29.png',
+			'Mapping/EdgeOrg/eg_nn_30.png',
+			'Mapping/EdgeOrg/eg_nn_31.png',
+			'Mapping/EdgeOrg/eg_nn_32.png',
+			'Mapping/EdgeOrg/eg_nn_33.png',
+			'Mapping/EdgeOrg/eg_nn_34.png',
+			'Mapping/EdgeOrg/eg_nn_35.png',
+			'Mapping/EdgeOrg/eg_nn_36.png',
+			'Mapping/EdgeOrg/eg_nn_37.png',
+			'Mapping/EdgeOrg/eg_nn_38.png',
+			'Mapping/EdgeOrg/eg_nn_39.png',
+			'Mapping/EdgeOrg/eg_nn_40.png',
+			'Mapping/EdgeOrg/eg_nn_41.png',
+			'Mapping/EdgeOrg/eg_nn_42.png'),
+		"ii" = list(
+			'Mapping/EdgeOrg/eg_ii_0.png',
+			'Mapping/EdgeOrg/eg_ii_1.png',
+			'Mapping/EdgeOrg/eg_ii_2.png',
+			'Mapping/EdgeOrg/eg_ii_3.png',
+			'Mapping/EdgeOrg/eg_ii_4.png',
+			'Mapping/EdgeOrg/eg_ii_5.png',
+			'Mapping/EdgeOrg/eg_ii_6.png',
+			'Mapping/EdgeOrg/eg_ii_7.png',
+			'Mapping/EdgeOrg/eg_ii_8.png',
+			'Mapping/EdgeOrg/eg_ii_9.png',
+			'Mapping/EdgeOrg/eg_ii_10.png',
+			'Mapping/EdgeOrg/eg_ii_11.png',
+			'Mapping/EdgeOrg/eg_ii_12.png',
+			'Mapping/EdgeOrg/eg_ii_13.png',
+			'Mapping/EdgeOrg/eg_ii_14.png',
+			'Mapping/EdgeOrg/eg_ii_15.png',
+			'Mapping/EdgeOrg/eg_ii_16.png',
+			'Mapping/EdgeOrg/eg_ii_17.png',
+			'Mapping/EdgeOrg/eg_ii_18.png',
+			'Mapping/EdgeOrg/eg_ii_19.png',
+			'Mapping/EdgeOrg/eg_ii_20.png',
+			'Mapping/EdgeOrg/eg_ii_21.png',
+			'Mapping/EdgeOrg/eg_ii_22.png',
+			'Mapping/EdgeOrg/eg_ii_23.png',
+			'Mapping/EdgeOrg/eg_ii_24.png',
+			'Mapping/EdgeOrg/eg_ii_25.png',
+			'Mapping/EdgeOrg/eg_ii_26.png',
+			'Mapping/EdgeOrg/eg_ii_27.png',
+			'Mapping/EdgeOrg/eg_ii_28.png',
+			'Mapping/EdgeOrg/eg_ii_29.png',
+			'Mapping/EdgeOrg/eg_ii_30.png',
+			'Mapping/EdgeOrg/eg_ii_31.png',
+			'Mapping/EdgeOrg/eg_ii_32.png',
+			'Mapping/EdgeOrg/eg_ii_33.png',
+			'Mapping/EdgeOrg/eg_ii_34.png',
+			'Mapping/EdgeOrg/eg_ii_35.png',
+			'Mapping/EdgeOrg/eg_ii_36.png',
+			'Mapping/EdgeOrg/eg_ii_37.png',
+			'Mapping/EdgeOrg/eg_ii_38.png',
+			'Mapping/EdgeOrg/eg_ii_39.png',
+			'Mapping/EdgeOrg/eg_ii_40.png',
+			'Mapping/EdgeOrg/eg_ii_41.png',
+			'Mapping/EdgeOrg/eg_ii_42.png',
+			'Mapping/EdgeOrg/eg_ii_43.png',
+			'Mapping/EdgeOrg/eg_ii_44.png'))
+	elevOrgDrape = list(
+		"c" = list(
+			'Mapping/EdgeOrg/ep_c_0.png',
+			'Mapping/EdgeOrg/ep_c_1.png',
+			'Mapping/EdgeOrg/ep_c_2.png',
+			'Mapping/EdgeOrg/ep_c_3.png',
+			'Mapping/EdgeOrg/ep_c_4.png'),
+		"s" = list(
+			'Mapping/EdgeOrg/ep_s_0.png',
+			'Mapping/EdgeOrg/ep_s_1.png',
+			'Mapping/EdgeOrg/ep_s_2.png'),
+		"n" = list(
+			'Mapping/EdgeOrg/ep_n_0.png',
+			'Mapping/EdgeOrg/ep_n_1.png',
+			'Mapping/EdgeOrg/ep_n_2.png',
+			'Mapping/EdgeOrg/ep_n_3.png'),
+		"i" = list(
+			'Mapping/EdgeOrg/ep_i_0.png',
+			'Mapping/EdgeOrg/ep_i_1.png',
+			'Mapping/EdgeOrg/ep_i_2.png',
+			'Mapping/EdgeOrg/ep_i_3.png',
+			'Mapping/EdgeOrg/ep_i_4.png'))
+	elevOrgUnder = list(
+		"c" = list(
+			'Mapping/EdgeOrg/eu_c_0.png',
+			'Mapping/EdgeOrg/eu_c_1.png',
+			'Mapping/EdgeOrg/eu_c_2.png',
+			'Mapping/EdgeOrg/eu_c_3.png',
+			'Mapping/EdgeOrg/eu_c_4.png',
+			'Mapping/EdgeOrg/eu_c_5.png',
+			'Mapping/EdgeOrg/eu_c_6.png',
+			'Mapping/EdgeOrg/eu_c_7.png',
+			'Mapping/EdgeOrg/eu_c_8.png',
+			'Mapping/EdgeOrg/eu_c_9.png',
+			'Mapping/EdgeOrg/eu_c_10.png',
+			'Mapping/EdgeOrg/eu_c_11.png',
+			'Mapping/EdgeOrg/eu_c_12.png',
+			'Mapping/EdgeOrg/eu_c_13.png',
+			'Mapping/EdgeOrg/eu_c_14.png',
+			'Mapping/EdgeOrg/eu_c_15.png',
+			'Mapping/EdgeOrg/eu_c_16.png',
+			'Mapping/EdgeOrg/eu_c_17.png',
+			'Mapping/EdgeOrg/eu_c_18.png',
+			'Mapping/EdgeOrg/eu_c_19.png',
+			'Mapping/EdgeOrg/eu_c_20.png',
+			'Mapping/EdgeOrg/eu_c_21.png',
+			'Mapping/EdgeOrg/eu_c_22.png',
+			'Mapping/EdgeOrg/eu_c_23.png',
+			'Mapping/EdgeOrg/eu_c_24.png',
+			'Mapping/EdgeOrg/eu_c_25.png',
+			'Mapping/EdgeOrg/eu_c_26.png',
+			'Mapping/EdgeOrg/eu_c_27.png',
+			'Mapping/EdgeOrg/eu_c_28.png',
+			'Mapping/EdgeOrg/eu_c_29.png',
+			'Mapping/EdgeOrg/eu_c_30.png',
+			'Mapping/EdgeOrg/eu_c_31.png',
+			'Mapping/EdgeOrg/eu_c_32.png',
+			'Mapping/EdgeOrg/eu_c_33.png',
+			'Mapping/EdgeOrg/eu_c_34.png',
+			'Mapping/EdgeOrg/eu_c_35.png',
+			'Mapping/EdgeOrg/eu_c_36.png',
+			'Mapping/EdgeOrg/eu_c_37.png',
+			'Mapping/EdgeOrg/eu_c_38.png',
+			'Mapping/EdgeOrg/eu_c_39.png',
+			'Mapping/EdgeOrg/eu_c_40.png',
+			'Mapping/EdgeOrg/eu_c_41.png',
+			'Mapping/EdgeOrg/eu_c_42.png',
+			'Mapping/EdgeOrg/eu_c_43.png',
+			'Mapping/EdgeOrg/eu_c_44.png',
+			'Mapping/EdgeOrg/eu_c_45.png',
+			'Mapping/EdgeOrg/eu_c_46.png',
+			'Mapping/EdgeOrg/eu_c_47.png',
+			'Mapping/EdgeOrg/eu_c_48.png',
+			'Mapping/EdgeOrg/eu_c_49.png',
+			'Mapping/EdgeOrg/eu_c_50.png',
+			'Mapping/EdgeOrg/eu_c_51.png',
+			'Mapping/EdgeOrg/eu_c_52.png',
+			'Mapping/EdgeOrg/eu_c_53.png',
+			'Mapping/EdgeOrg/eu_c_54.png',
+			'Mapping/EdgeOrg/eu_c_55.png',
+			'Mapping/EdgeOrg/eu_c_56.png',
+			'Mapping/EdgeOrg/eu_c_57.png',
+			'Mapping/EdgeOrg/eu_c_58.png',
+			'Mapping/EdgeOrg/eu_c_59.png',
+			'Mapping/EdgeOrg/eu_c_60.png',
+			'Mapping/EdgeOrg/eu_c_61.png',
+			'Mapping/EdgeOrg/eu_c_62.png',
+			'Mapping/EdgeOrg/eu_c_63.png'),
+		"s" = list(
+			'Mapping/EdgeOrg/eu_s_0.png',
+			'Mapping/EdgeOrg/eu_s_1.png',
+			'Mapping/EdgeOrg/eu_s_2.png',
+			'Mapping/EdgeOrg/eu_s_3.png',
+			'Mapping/EdgeOrg/eu_s_4.png',
+			'Mapping/EdgeOrg/eu_s_5.png',
+			'Mapping/EdgeOrg/eu_s_6.png',
+			'Mapping/EdgeOrg/eu_s_7.png',
+			'Mapping/EdgeOrg/eu_s_8.png',
+			'Mapping/EdgeOrg/eu_s_9.png',
+			'Mapping/EdgeOrg/eu_s_10.png',
+			'Mapping/EdgeOrg/eu_s_11.png',
+			'Mapping/EdgeOrg/eu_s_12.png',
+			'Mapping/EdgeOrg/eu_s_13.png',
+			'Mapping/EdgeOrg/eu_s_14.png',
+			'Mapping/EdgeOrg/eu_s_15.png',
+			'Mapping/EdgeOrg/eu_s_16.png',
+			'Mapping/EdgeOrg/eu_s_17.png',
+			'Mapping/EdgeOrg/eu_s_18.png',
+			'Mapping/EdgeOrg/eu_s_19.png',
+			'Mapping/EdgeOrg/eu_s_20.png',
+			'Mapping/EdgeOrg/eu_s_21.png',
+			'Mapping/EdgeOrg/eu_s_22.png',
+			'Mapping/EdgeOrg/eu_s_23.png',
+			'Mapping/EdgeOrg/eu_s_24.png',
+			'Mapping/EdgeOrg/eu_s_25.png',
+			'Mapping/EdgeOrg/eu_s_26.png',
+			'Mapping/EdgeOrg/eu_s_27.png',
+			'Mapping/EdgeOrg/eu_s_28.png',
+			'Mapping/EdgeOrg/eu_s_29.png',
+			'Mapping/EdgeOrg/eu_s_30.png'),
+		"n" = list(
+			'Mapping/EdgeOrg/eu_n_0.png',
+			'Mapping/EdgeOrg/eu_n_1.png',
+			'Mapping/EdgeOrg/eu_n_2.png',
+			'Mapping/EdgeOrg/eu_n_3.png',
+			'Mapping/EdgeOrg/eu_n_4.png',
+			'Mapping/EdgeOrg/eu_n_5.png',
+			'Mapping/EdgeOrg/eu_n_6.png',
+			'Mapping/EdgeOrg/eu_n_7.png',
+			'Mapping/EdgeOrg/eu_n_8.png',
+			'Mapping/EdgeOrg/eu_n_9.png',
+			'Mapping/EdgeOrg/eu_n_10.png',
+			'Mapping/EdgeOrg/eu_n_11.png',
+			'Mapping/EdgeOrg/eu_n_12.png',
+			'Mapping/EdgeOrg/eu_n_13.png',
+			'Mapping/EdgeOrg/eu_n_14.png',
+			'Mapping/EdgeOrg/eu_n_15.png',
+			'Mapping/EdgeOrg/eu_n_16.png',
+			'Mapping/EdgeOrg/eu_n_17.png',
+			'Mapping/EdgeOrg/eu_n_18.png',
+			'Mapping/EdgeOrg/eu_n_19.png',
+			'Mapping/EdgeOrg/eu_n_20.png',
+			'Mapping/EdgeOrg/eu_n_21.png',
+			'Mapping/EdgeOrg/eu_n_22.png',
+			'Mapping/EdgeOrg/eu_n_23.png',
+			'Mapping/EdgeOrg/eu_n_24.png',
+			'Mapping/EdgeOrg/eu_n_25.png',
+			'Mapping/EdgeOrg/eu_n_26.png',
+			'Mapping/EdgeOrg/eu_n_27.png',
+			'Mapping/EdgeOrg/eu_n_28.png',
+			'Mapping/EdgeOrg/eu_n_29.png',
+			'Mapping/EdgeOrg/eu_n_30.png',
+			'Mapping/EdgeOrg/eu_n_31.png',
+			'Mapping/EdgeOrg/eu_n_32.png',
+			'Mapping/EdgeOrg/eu_n_33.png',
+			'Mapping/EdgeOrg/eu_n_34.png',
+			'Mapping/EdgeOrg/eu_n_35.png',
+			'Mapping/EdgeOrg/eu_n_36.png'),
+		"i" = list(
+			'Mapping/EdgeOrg/eu_i_0.png',
+			'Mapping/EdgeOrg/eu_i_1.png',
+			'Mapping/EdgeOrg/eu_i_2.png',
+			'Mapping/EdgeOrg/eu_i_3.png',
+			'Mapping/EdgeOrg/eu_i_4.png',
+			'Mapping/EdgeOrg/eu_i_5.png',
+			'Mapping/EdgeOrg/eu_i_6.png',
+			'Mapping/EdgeOrg/eu_i_7.png',
+			'Mapping/EdgeOrg/eu_i_8.png',
+			'Mapping/EdgeOrg/eu_i_9.png',
+			'Mapping/EdgeOrg/eu_i_10.png',
+			'Mapping/EdgeOrg/eu_i_11.png',
+			'Mapping/EdgeOrg/eu_i_12.png',
+			'Mapping/EdgeOrg/eu_i_13.png',
+			'Mapping/EdgeOrg/eu_i_14.png',
+			'Mapping/EdgeOrg/eu_i_15.png',
+			'Mapping/EdgeOrg/eu_i_16.png',
+			'Mapping/EdgeOrg/eu_i_17.png',
+			'Mapping/EdgeOrg/eu_i_18.png',
+			'Mapping/EdgeOrg/eu_i_19.png',
+			'Mapping/EdgeOrg/eu_i_20.png',
+			'Mapping/EdgeOrg/eu_i_21.png',
+			'Mapping/EdgeOrg/eu_i_22.png',
+			'Mapping/EdgeOrg/eu_i_23.png',
+			'Mapping/EdgeOrg/eu_i_24.png',
+			'Mapping/EdgeOrg/eu_i_25.png',
+			'Mapping/EdgeOrg/eu_i_26.png',
+			'Mapping/EdgeOrg/eu_i_27.png',
+			'Mapping/EdgeOrg/eu_i_28.png',
+			'Mapping/EdgeOrg/eu_i_29.png',
+			'Mapping/EdgeOrg/eu_i_30.png',
+			'Mapping/EdgeOrg/eu_i_31.png',
+			'Mapping/EdgeOrg/eu_i_32.png',
+			'Mapping/EdgeOrg/eu_i_33.png',
+			'Mapping/EdgeOrg/eu_i_34.png',
+			'Mapping/EdgeOrg/eu_i_35.png',
+			'Mapping/EdgeOrg/eu_i_36.png',
+			'Mapping/EdgeOrg/eu_i_37.png',
+			'Mapping/EdgeOrg/eu_i_38.png',
+			'Mapping/EdgeOrg/eu_i_39.png',
+			'Mapping/EdgeOrg/eu_i_40.png',
+			'Mapping/EdgeOrg/eu_i_41.png',
+			'Mapping/EdgeOrg/eu_i_42.png',
+			'Mapping/EdgeOrg/eu_i_43.png'))
+	elevOrgLow = list(
+		"c" = list(),
+		"s" = list(),
+		"n" = list(
+			'Mapping/EdgeOrg/ev_n_0.png',
+			'Mapping/EdgeOrg/ev_n_1.png'),
+		"i" = list())
+	elevOrgKeyFiles = list("w" = 'Mapping/EdgeOrg/ek_w.txt', "c" = 'Mapping/EdgeOrg/ek_c.txt', "s" = 'Mapping/EdgeOrg/ek_s.txt', "n" = 'Mapping/EdgeOrg/ek_n.txt', "i" = 'Mapping/EdgeOrg/ek_i.txt')
 	elevOrgIndexFiles = list(
 		"m1w" = 'Mapping/EdgeOrg/ix_m1_w.txt',
 		"m1c" = 'Mapping/EdgeOrg/ix_m1_c.txt',
 		"m1s" = 'Mapping/EdgeOrg/ix_m1_s.txt',
+		"m1n" = 'Mapping/EdgeOrg/ix_m1_n.txt',
+		"m1i" = 'Mapping/EdgeOrg/ix_m1_i.txt',
 		"m2w" = 'Mapping/EdgeOrg/ix_m2_w.txt',
 		"m2c" = 'Mapping/EdgeOrg/ix_m2_c.txt',
 		"m2s" = 'Mapping/EdgeOrg/ix_m2_s.txt',
+		"m2n" = 'Mapping/EdgeOrg/ix_m2_n.txt',
+		"m2i" = 'Mapping/EdgeOrg/ix_m2_i.txt',
 		"mx1w" = 'Mapping/EdgeOrg/ix_mx1_w.txt',
 		"mx1c" = 'Mapping/EdgeOrg/ix_mx1_c.txt',
 		"mx1s" = 'Mapping/EdgeOrg/ix_mx1_s.txt',
+		"mx1n" = 'Mapping/EdgeOrg/ix_mx1_n.txt',
+		"mx1i" = 'Mapping/EdgeOrg/ix_mx1_i.txt',
 		"mx2w" = 'Mapping/EdgeOrg/ix_mx2_w.txt',
 		"mx2c" = 'Mapping/EdgeOrg/ix_mx2_c.txt',
 		"mx2s" = 'Mapping/EdgeOrg/ix_mx2_s.txt',
+		"mx2n" = 'Mapping/EdgeOrg/ix_mx2_n.txt',
+		"mx2i" = 'Mapping/EdgeOrg/ix_mx2_i.txt',
 		"k1D1w" = 'Mapping/EdgeOrg/ix_k1D1_w.txt',
 		"k1D1c" = 'Mapping/EdgeOrg/ix_k1D1_c.txt',
 		"k1D1s" = 'Mapping/EdgeOrg/ix_k1D1_s.txt',
+		"k1D1n" = 'Mapping/EdgeOrg/ix_k1D1_n.txt',
+		"k1D1i" = 'Mapping/EdgeOrg/ix_k1D1_i.txt',
 		"k2D1w" = 'Mapping/EdgeOrg/ix_k2D1_w.txt',
 		"k2D1c" = 'Mapping/EdgeOrg/ix_k2D1_c.txt',
 		"k2D1s" = 'Mapping/EdgeOrg/ix_k2D1_s.txt',
+		"k2D1n" = 'Mapping/EdgeOrg/ix_k2D1_n.txt',
+		"k2D1i" = 'Mapping/EdgeOrg/ix_k2D1_i.txt',
 		"nD1w" = 'Mapping/EdgeOrg/ix_nD1_w.txt',
 		"nD1c" = 'Mapping/EdgeOrg/ix_nD1_c.txt',
 		"nD1s" = 'Mapping/EdgeOrg/ix_nD1_s.txt',
+		"nD1n" = 'Mapping/EdgeOrg/ix_nD1_n.txt',
+		"nD1i" = 'Mapping/EdgeOrg/ix_nD1_i.txt',
 		"k1D2w" = 'Mapping/EdgeOrg/ix_k1D2_w.txt',
 		"k1D2c" = 'Mapping/EdgeOrg/ix_k1D2_c.txt',
 		"k1D2s" = 'Mapping/EdgeOrg/ix_k1D2_s.txt',
+		"k1D2n" = 'Mapping/EdgeOrg/ix_k1D2_n.txt',
+		"k1D2i" = 'Mapping/EdgeOrg/ix_k1D2_i.txt',
 		"k2D2w" = 'Mapping/EdgeOrg/ix_k2D2_w.txt',
 		"k2D2c" = 'Mapping/EdgeOrg/ix_k2D2_c.txt',
 		"k2D2s" = 'Mapping/EdgeOrg/ix_k2D2_s.txt',
+		"k2D2n" = 'Mapping/EdgeOrg/ix_k2D2_n.txt',
+		"k2D2i" = 'Mapping/EdgeOrg/ix_k2D2_i.txt',
 		"k3D2w" = 'Mapping/EdgeOrg/ix_k3D2_w.txt',
 		"k3D2c" = 'Mapping/EdgeOrg/ix_k3D2_c.txt',
 		"k3D2s" = 'Mapping/EdgeOrg/ix_k3D2_s.txt',
+		"k3D2n" = 'Mapping/EdgeOrg/ix_k3D2_n.txt',
+		"k3D2i" = 'Mapping/EdgeOrg/ix_k3D2_i.txt',
 		"nD2w" = 'Mapping/EdgeOrg/ix_nD2_w.txt',
 		"nD2c" = 'Mapping/EdgeOrg/ix_nD2_c.txt',
 		"nD2s" = 'Mapping/EdgeOrg/ix_nD2_s.txt',
+		"nD2n" = 'Mapping/EdgeOrg/ix_nD2_n.txt',
+		"nD2i" = 'Mapping/EdgeOrg/ix_nD2_i.txt',
 		"i3w" = 'Mapping/EdgeOrg/ix_i3_w.txt',
 		"i3c" = 'Mapping/EdgeOrg/ix_i3_c.txt',
 		"i3s" = 'Mapping/EdgeOrg/ix_i3_s.txt',
+		"i3n" = 'Mapping/EdgeOrg/ix_i3_n.txt',
+		"i3i" = 'Mapping/EdgeOrg/ix_i3_i.txt',
 		"ni3w" = 'Mapping/EdgeOrg/ix_ni3_w.txt',
 		"ni3c" = 'Mapping/EdgeOrg/ix_ni3_c.txt',
-		"ni3s" = 'Mapping/EdgeOrg/ix_ni3_s.txt')
+		"ni3s" = 'Mapping/EdgeOrg/ix_ni3_s.txt',
+		"ni3n" = 'Mapping/EdgeOrg/ix_ni3_n.txt',
+		"ni3i" = 'Mapping/EdgeOrg/ix_ni3_i.txt')
+	elevOrgIndexYFiles = list(
+		"m1w" = 'Mapping/EdgeOrg/iy_m1_w.txt',
+		"m1c" = 'Mapping/EdgeOrg/iy_m1_c.txt',
+		"m1s" = 'Mapping/EdgeOrg/iy_m1_s.txt',
+		"m1n" = 'Mapping/EdgeOrg/iy_m1_n.txt',
+		"m1i" = 'Mapping/EdgeOrg/iy_m1_i.txt',
+		"m2w" = 'Mapping/EdgeOrg/iy_m2_w.txt',
+		"m2c" = 'Mapping/EdgeOrg/iy_m2_c.txt',
+		"m2s" = 'Mapping/EdgeOrg/iy_m2_s.txt',
+		"m2n" = 'Mapping/EdgeOrg/iy_m2_n.txt',
+		"m2i" = 'Mapping/EdgeOrg/iy_m2_i.txt',
+		"mx1w" = 'Mapping/EdgeOrg/iy_mx1_w.txt',
+		"mx1c" = 'Mapping/EdgeOrg/iy_mx1_c.txt',
+		"mx1s" = 'Mapping/EdgeOrg/iy_mx1_s.txt',
+		"mx1n" = 'Mapping/EdgeOrg/iy_mx1_n.txt',
+		"mx1i" = 'Mapping/EdgeOrg/iy_mx1_i.txt',
+		"mx2w" = 'Mapping/EdgeOrg/iy_mx2_w.txt',
+		"mx2c" = 'Mapping/EdgeOrg/iy_mx2_c.txt',
+		"mx2s" = 'Mapping/EdgeOrg/iy_mx2_s.txt',
+		"mx2n" = 'Mapping/EdgeOrg/iy_mx2_n.txt',
+		"mx2i" = 'Mapping/EdgeOrg/iy_mx2_i.txt',
+		"k1D1w" = 'Mapping/EdgeOrg/iy_k1D1_w.txt',
+		"k1D1c" = 'Mapping/EdgeOrg/iy_k1D1_c.txt',
+		"k1D1s" = 'Mapping/EdgeOrg/iy_k1D1_s.txt',
+		"k1D1n" = 'Mapping/EdgeOrg/iy_k1D1_n.txt',
+		"k1D1i" = 'Mapping/EdgeOrg/iy_k1D1_i.txt',
+		"k2D1w" = 'Mapping/EdgeOrg/iy_k2D1_w.txt',
+		"k2D1c" = 'Mapping/EdgeOrg/iy_k2D1_c.txt',
+		"k2D1s" = 'Mapping/EdgeOrg/iy_k2D1_s.txt',
+		"k2D1n" = 'Mapping/EdgeOrg/iy_k2D1_n.txt',
+		"k2D1i" = 'Mapping/EdgeOrg/iy_k2D1_i.txt',
+		"nD1w" = 'Mapping/EdgeOrg/iy_nD1_w.txt',
+		"nD1c" = 'Mapping/EdgeOrg/iy_nD1_c.txt',
+		"nD1s" = 'Mapping/EdgeOrg/iy_nD1_s.txt',
+		"nD1n" = 'Mapping/EdgeOrg/iy_nD1_n.txt',
+		"nD1i" = 'Mapping/EdgeOrg/iy_nD1_i.txt',
+		"k1D2w" = 'Mapping/EdgeOrg/iy_k1D2_w.txt',
+		"k1D2c" = 'Mapping/EdgeOrg/iy_k1D2_c.txt',
+		"k1D2s" = 'Mapping/EdgeOrg/iy_k1D2_s.txt',
+		"k1D2n" = 'Mapping/EdgeOrg/iy_k1D2_n.txt',
+		"k1D2i" = 'Mapping/EdgeOrg/iy_k1D2_i.txt',
+		"k2D2w" = 'Mapping/EdgeOrg/iy_k2D2_w.txt',
+		"k2D2c" = 'Mapping/EdgeOrg/iy_k2D2_c.txt',
+		"k2D2s" = 'Mapping/EdgeOrg/iy_k2D2_s.txt',
+		"k2D2n" = 'Mapping/EdgeOrg/iy_k2D2_n.txt',
+		"k2D2i" = 'Mapping/EdgeOrg/iy_k2D2_i.txt',
+		"k3D2w" = 'Mapping/EdgeOrg/iy_k3D2_w.txt',
+		"k3D2c" = 'Mapping/EdgeOrg/iy_k3D2_c.txt',
+		"k3D2s" = 'Mapping/EdgeOrg/iy_k3D2_s.txt',
+		"k3D2n" = 'Mapping/EdgeOrg/iy_k3D2_n.txt',
+		"k3D2i" = 'Mapping/EdgeOrg/iy_k3D2_i.txt',
+		"nD2w" = 'Mapping/EdgeOrg/iy_nD2_w.txt',
+		"nD2c" = 'Mapping/EdgeOrg/iy_nD2_c.txt',
+		"nD2s" = 'Mapping/EdgeOrg/iy_nD2_s.txt',
+		"nD2n" = 'Mapping/EdgeOrg/iy_nD2_n.txt',
+		"nD2i" = 'Mapping/EdgeOrg/iy_nD2_i.txt',
+		"i3w" = 'Mapping/EdgeOrg/iy_i3_w.txt',
+		"i3c" = 'Mapping/EdgeOrg/iy_i3_c.txt',
+		"i3s" = 'Mapping/EdgeOrg/iy_i3_s.txt',
+		"i3n" = 'Mapping/EdgeOrg/iy_i3_n.txt',
+		"i3i" = 'Mapping/EdgeOrg/iy_i3_i.txt',
+		"ni3w" = 'Mapping/EdgeOrg/iy_ni3_w.txt',
+		"ni3c" = 'Mapping/EdgeOrg/iy_ni3_c.txt',
+		"ni3s" = 'Mapping/EdgeOrg/iy_ni3_s.txt',
+		"ni3n" = 'Mapping/EdgeOrg/iy_ni3_n.txt',
+		"ni3i" = 'Mapping/EdgeOrg/iy_ni3_i.txt')
+	elevOrgIndexBFiles = list(
+		"m1wg" = 'Mapping/EdgeOrg/ib_m1_wg.txt',
+		"m1cd" = 'Mapping/EdgeOrg/ib_m1_cd.txt',
+		"m1sa" = 'Mapping/EdgeOrg/ib_m1_sa.txt',
+		"m1nn" = 'Mapping/EdgeOrg/ib_m1_nn.txt',
+		"m1ii" = 'Mapping/EdgeOrg/ib_m1_ii.txt',
+		"m2wg" = 'Mapping/EdgeOrg/ib_m2_wg.txt',
+		"m2cd" = 'Mapping/EdgeOrg/ib_m2_cd.txt',
+		"m2sa" = 'Mapping/EdgeOrg/ib_m2_sa.txt',
+		"m2nn" = 'Mapping/EdgeOrg/ib_m2_nn.txt',
+		"m2ii" = 'Mapping/EdgeOrg/ib_m2_ii.txt',
+		"mx1wg" = 'Mapping/EdgeOrg/ib_mx1_wg.txt',
+		"mx1cd" = 'Mapping/EdgeOrg/ib_mx1_cd.txt',
+		"mx1sa" = 'Mapping/EdgeOrg/ib_mx1_sa.txt',
+		"mx1nn" = 'Mapping/EdgeOrg/ib_mx1_nn.txt',
+		"mx1ii" = 'Mapping/EdgeOrg/ib_mx1_ii.txt',
+		"mx2wg" = 'Mapping/EdgeOrg/ib_mx2_wg.txt',
+		"mx2cd" = 'Mapping/EdgeOrg/ib_mx2_cd.txt',
+		"mx2sa" = 'Mapping/EdgeOrg/ib_mx2_sa.txt',
+		"mx2nn" = 'Mapping/EdgeOrg/ib_mx2_nn.txt',
+		"mx2ii" = 'Mapping/EdgeOrg/ib_mx2_ii.txt',
+		"k1D1wg" = 'Mapping/EdgeOrg/ib_k1D1_wg.txt',
+		"k1D1cd" = 'Mapping/EdgeOrg/ib_k1D1_cd.txt',
+		"k1D1sa" = 'Mapping/EdgeOrg/ib_k1D1_sa.txt',
+		"k1D1nn" = 'Mapping/EdgeOrg/ib_k1D1_nn.txt',
+		"k1D1ii" = 'Mapping/EdgeOrg/ib_k1D1_ii.txt',
+		"k2D1wg" = 'Mapping/EdgeOrg/ib_k2D1_wg.txt',
+		"k2D1cd" = 'Mapping/EdgeOrg/ib_k2D1_cd.txt',
+		"k2D1sa" = 'Mapping/EdgeOrg/ib_k2D1_sa.txt',
+		"k2D1nn" = 'Mapping/EdgeOrg/ib_k2D1_nn.txt',
+		"k2D1ii" = 'Mapping/EdgeOrg/ib_k2D1_ii.txt',
+		"nD1wg" = 'Mapping/EdgeOrg/ib_nD1_wg.txt',
+		"nD1cd" = 'Mapping/EdgeOrg/ib_nD1_cd.txt',
+		"nD1sa" = 'Mapping/EdgeOrg/ib_nD1_sa.txt',
+		"nD1nn" = 'Mapping/EdgeOrg/ib_nD1_nn.txt',
+		"nD1ii" = 'Mapping/EdgeOrg/ib_nD1_ii.txt',
+		"k1D2wg" = 'Mapping/EdgeOrg/ib_k1D2_wg.txt',
+		"k1D2cd" = 'Mapping/EdgeOrg/ib_k1D2_cd.txt',
+		"k1D2sa" = 'Mapping/EdgeOrg/ib_k1D2_sa.txt',
+		"k1D2nn" = 'Mapping/EdgeOrg/ib_k1D2_nn.txt',
+		"k1D2ii" = 'Mapping/EdgeOrg/ib_k1D2_ii.txt',
+		"k2D2wg" = 'Mapping/EdgeOrg/ib_k2D2_wg.txt',
+		"k2D2cd" = 'Mapping/EdgeOrg/ib_k2D2_cd.txt',
+		"k2D2sa" = 'Mapping/EdgeOrg/ib_k2D2_sa.txt',
+		"k2D2nn" = 'Mapping/EdgeOrg/ib_k2D2_nn.txt',
+		"k2D2ii" = 'Mapping/EdgeOrg/ib_k2D2_ii.txt',
+		"k3D2wg" = 'Mapping/EdgeOrg/ib_k3D2_wg.txt',
+		"k3D2cd" = 'Mapping/EdgeOrg/ib_k3D2_cd.txt',
+		"k3D2sa" = 'Mapping/EdgeOrg/ib_k3D2_sa.txt',
+		"k3D2nn" = 'Mapping/EdgeOrg/ib_k3D2_nn.txt',
+		"k3D2ii" = 'Mapping/EdgeOrg/ib_k3D2_ii.txt',
+		"nD2wg" = 'Mapping/EdgeOrg/ib_nD2_wg.txt',
+		"nD2cd" = 'Mapping/EdgeOrg/ib_nD2_cd.txt',
+		"nD2sa" = 'Mapping/EdgeOrg/ib_nD2_sa.txt',
+		"nD2nn" = 'Mapping/EdgeOrg/ib_nD2_nn.txt',
+		"nD2ii" = 'Mapping/EdgeOrg/ib_nD2_ii.txt',
+		"i3wg" = 'Mapping/EdgeOrg/ib_i3_wg.txt',
+		"i3cd" = 'Mapping/EdgeOrg/ib_i3_cd.txt',
+		"i3sa" = 'Mapping/EdgeOrg/ib_i3_sa.txt',
+		"i3nn" = 'Mapping/EdgeOrg/ib_i3_nn.txt',
+		"i3ii" = 'Mapping/EdgeOrg/ib_i3_ii.txt',
+		"ni3wg" = 'Mapping/EdgeOrg/ib_ni3_wg.txt',
+		"ni3cd" = 'Mapping/EdgeOrg/ib_ni3_cd.txt',
+		"ni3sa" = 'Mapping/EdgeOrg/ib_ni3_sa.txt',
+		"ni3nn" = 'Mapping/EdgeOrg/ib_ni3_nn.txt',
+		"ni3ii" = 'Mapping/EdgeOrg/ib_ni3_ii.txt')
+	elevOrgIndexZFiles = list(
+		"m1c" = 'Mapping/EdgeOrg/iz_m1_c.txt',
+		"m1s" = 'Mapping/EdgeOrg/iz_m1_s.txt',
+		"m1n" = 'Mapping/EdgeOrg/iz_m1_n.txt',
+		"m1i" = 'Mapping/EdgeOrg/iz_m1_i.txt',
+		"m2c" = 'Mapping/EdgeOrg/iz_m2_c.txt',
+		"m2s" = 'Mapping/EdgeOrg/iz_m2_s.txt',
+		"m2n" = 'Mapping/EdgeOrg/iz_m2_n.txt',
+		"m2i" = 'Mapping/EdgeOrg/iz_m2_i.txt',
+		"mx1c" = 'Mapping/EdgeOrg/iz_mx1_c.txt',
+		"mx1s" = 'Mapping/EdgeOrg/iz_mx1_s.txt',
+		"mx1n" = 'Mapping/EdgeOrg/iz_mx1_n.txt',
+		"mx1i" = 'Mapping/EdgeOrg/iz_mx1_i.txt',
+		"mx2c" = 'Mapping/EdgeOrg/iz_mx2_c.txt',
+		"mx2s" = 'Mapping/EdgeOrg/iz_mx2_s.txt',
+		"mx2n" = 'Mapping/EdgeOrg/iz_mx2_n.txt',
+		"mx2i" = 'Mapping/EdgeOrg/iz_mx2_i.txt',
+		"k1D1c" = 'Mapping/EdgeOrg/iz_k1D1_c.txt',
+		"k1D1s" = 'Mapping/EdgeOrg/iz_k1D1_s.txt',
+		"k1D1n" = 'Mapping/EdgeOrg/iz_k1D1_n.txt',
+		"k1D1i" = 'Mapping/EdgeOrg/iz_k1D1_i.txt',
+		"k2D1c" = 'Mapping/EdgeOrg/iz_k2D1_c.txt',
+		"k2D1s" = 'Mapping/EdgeOrg/iz_k2D1_s.txt',
+		"k2D1n" = 'Mapping/EdgeOrg/iz_k2D1_n.txt',
+		"k2D1i" = 'Mapping/EdgeOrg/iz_k2D1_i.txt',
+		"nD1c" = 'Mapping/EdgeOrg/iz_nD1_c.txt',
+		"nD1s" = 'Mapping/EdgeOrg/iz_nD1_s.txt',
+		"nD1n" = 'Mapping/EdgeOrg/iz_nD1_n.txt',
+		"nD1i" = 'Mapping/EdgeOrg/iz_nD1_i.txt',
+		"k1D2c" = 'Mapping/EdgeOrg/iz_k1D2_c.txt',
+		"k1D2s" = 'Mapping/EdgeOrg/iz_k1D2_s.txt',
+		"k1D2n" = 'Mapping/EdgeOrg/iz_k1D2_n.txt',
+		"k1D2i" = 'Mapping/EdgeOrg/iz_k1D2_i.txt',
+		"k2D2c" = 'Mapping/EdgeOrg/iz_k2D2_c.txt',
+		"k2D2s" = 'Mapping/EdgeOrg/iz_k2D2_s.txt',
+		"k2D2n" = 'Mapping/EdgeOrg/iz_k2D2_n.txt',
+		"k2D2i" = 'Mapping/EdgeOrg/iz_k2D2_i.txt',
+		"k3D2c" = 'Mapping/EdgeOrg/iz_k3D2_c.txt',
+		"k3D2s" = 'Mapping/EdgeOrg/iz_k3D2_s.txt',
+		"k3D2n" = 'Mapping/EdgeOrg/iz_k3D2_n.txt',
+		"k3D2i" = 'Mapping/EdgeOrg/iz_k3D2_i.txt',
+		"nD2c" = 'Mapping/EdgeOrg/iz_nD2_c.txt',
+		"nD2s" = 'Mapping/EdgeOrg/iz_nD2_s.txt',
+		"nD2n" = 'Mapping/EdgeOrg/iz_nD2_n.txt',
+		"nD2i" = 'Mapping/EdgeOrg/iz_nD2_i.txt',
+		"i3c" = 'Mapping/EdgeOrg/iz_i3_c.txt',
+		"i3s" = 'Mapping/EdgeOrg/iz_i3_s.txt',
+		"i3n" = 'Mapping/EdgeOrg/iz_i3_n.txt',
+		"i3i" = 'Mapping/EdgeOrg/iz_i3_i.txt',
+		"ni3c" = 'Mapping/EdgeOrg/iz_ni3_c.txt',
+		"ni3s" = 'Mapping/EdgeOrg/iz_ni3_s.txt',
+		"ni3n" = 'Mapping/EdgeOrg/iz_ni3_n.txt',
+		"ni3i" = 'Mapping/EdgeOrg/iz_ni3_i.txt')
+	elevOrgRecFiles = list("w" = 'Mapping/EdgeOrg/er_w.txt', "c" = 'Mapping/EdgeOrg/er_c.txt', "s" = 'Mapping/EdgeOrg/er_s.txt', "n" = 'Mapping/EdgeOrg/er_n.txt', "i" = 'Mapping/EdgeOrg/er_i.txt')
 	elevOrgClasses = list(
 		"m1" = list(0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13),
 		"m2" = list(0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13),
@@ -1235,6 +2447,14 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		"nD2" = list(0, 2, 3, 5, 6, 8, 9, 11, 12, 13, 14),
 		"i3" = list(0, 1, 2, 3, 5, 6, 8, 9, 11, 12, 14),
 		"ni3" = list(0, 2, 3, 5, 6, 8, 9, 11, 12, 13, 14))
+	elevOrgMat = list(
+		"grass" = list("#0e2803", 36, 100, 8, 0, list(0, 0, 0, 0, 0, 0, 0, 0, 622, 0, 0, 0, 798, 529, 0, 0, 1394, 1546, 0, 0, 0, 2125, 0, 0, 1523, 1523, 0, 1618, 0, 2763, 0, 0, 0, 1900, 46, 2455, 1180, 0, 0, 328, 1315, 160, 2292, 0, 0, 2299, 1013, 0, 1752, 536, 0, 0, 0, 1755, 0, 748, 1655, 0, 784, 0, 0, 0, 0, 1245, 0, 0, 0, 2342, 531, 0, 0, 2329, 1115, 0, 0, 155, 1006, 0, 0, 2231, 1269, 0, 992, 1250, 0, 0, 530, 512, 0, 784, 2823, 0, 0, 0, 474, 1011, 0, 0, 889, 0, 0, 0, 2083, 0, 0, 2223, 31, 0, 0, 175, 1818, 0, 0, 752, 1461, 0, 2325, 0, 0, 0, 1940, 610, 0, 0, 1033, 2369, 0, 0, 1179, 1705, 0, 1002, 1577, 0, 0, 0, 2223, 598, 0, 0, 2739, 1114, 0, 429, 1319, 495, 2424, 0, 0, 0, 2698, 901, 0, 49, 1809, 129, 2812, 1579, 0, 0, 65, 1787, 0, 0, 3395, 0, 739, 1910, 0, 0, 650, 368, 0, 32, 3590, 357, 2083, 0, 0, 0, 2821, 0, 163, 1263, 0, 556, 569, 0, 0, 1488, 1790, 0, 1133, 1887, 0, 0, 0, 725, 514, 0, 0, 3046, 0, 222, 1417, 0, 0, 0, 1190, 292, 0, 1082, 1085, 0, 988, 713, 0, 0, 0, 3675, 0, 0, 871, 331, 0, 152, 2465, 0, 2344, 1759, 0, 0, 2381, 510, 0, 1599, 717, 0, 628, 1598, 0, 0, 0, 657, 2230, 0, 0, 612, 264, 689, 836, 0, 0, 3182, 516, 0, 1064, 2216, 0, 0, 0, 3663, 0, 0, 263, 573, 0, 0, 1286, 1241, 0, 0, 1887, 452, 0, 361, 710, 0, 0, 2527, 855, 0, 1239, 468, 0, 0, 975, 711, 0, 0, 1171, 0, 0, 221, 584, 0, 0, 526, 306, 408, 574, 0, 0, 0, 1244, 164, 1666, 1101, 0, 2293, 503, 0, 2227, 856, 728, 2529, 0, 1719, 346, 0, 0, 817, 1180, 0, 0, 1127, 311, 0, 0, 2555, 1055, 143, 1666, 0, 0, 2064, 0, 0, 2231, 323, 0, 206, 1587, 0, 0, 0, 1758, 0, 0, 0, 797, 1133, 0, 293, 760, 0, 1438, 0, 0, 0, 657, 814, 0, 0, 0, 2465, 551, 2257, 620, 1499, 0, 0, 0, 808, 137, 1092, 2526, 0, 0, 3483, 144, 0, 156, 907, 0, 0, 0, 1319, 0, 2169, 11, 0, 1048, 570, 0, 297, 2849, 0, 0, 0, 1086, 479, 192, 231, 0, 1521, 760, 0, 228, 1764, 0, 2932, 11, 0, 530, 868, 0, 2117, 0, 0, 0, 776, 1267, 0, 2817, 0, 0, 0, 56, 1025, 0, 200, 769, 0, 0, 2834, 930, 0, 0, 152, 859, 0, 451, 0, 1000, 740, 0, 1696, 0, 0, 0, 0, 1085, 236, 0, 0, 966, 0, 0, 0, 77, 3260, 0, 1741, 1881, 103, 1292, 0, 0, 1434, 0, 0, 0, 940, 252, 0, 2377, 296, 0, 0, 1069, 858, 0, 0, 970, 1810, 0, 0, 1871, 99, 0, 0, 968, 2712, 0, 0, 2044, 875, 0, 0, 1766, 0, 0, 88, 1161, 0, 1810, 1154, 0, 0, 3336, 0), 1000, 0, 4, 1.2, 0.95, 0.75, 115, 195, 50, 46, 120, 20),
+		"snow" = list("#444a54", 170, 186, 210, 1, list(1000, 1000, 1000, 1000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 3000, 3000, 2000, 2000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 2000, 1000, 1000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 2000, 2000, 2000), 3000, 1, 4, 1.25, 1.05, 0.7, -1, -1, -1, 205, 216, 228),
+		"dirt" = list("#110802", 42, 20, 4, 0, list(1000, 1000, 1000, 1000, 1594, 1939, 2083, 2108, 2188, 2483, 2596, 2569, 2393, 1990, 2558, 2808, 2743, 2318, 1000, 2651, 3301, 3317, 3100, 3347, 3402, 3280, 2947, 2489, 2802, 2713, 2347, 2948, 3223, 3293, 3178, 2843, 2294, 2366, 2348, 2237, 2433, 2839, 3009, 3004, 2824, 2402, 1956, 2020, 1937, 2082, 2552, 2762, 2805, 2696, 2610, 2911, 3022, 2977, 3099, 3330, 3395, 3308, 3049, 2534, 2154, 1951, 2134, 2887, 3082, 2901, 2179, 1000, 2419, 2967, 3023, 2639, 1000, 2025, 2310, 2325, 2082, 1000, 1322, 2017, 2224, 2479, 3019, 3258, 3293, 3134, 3151, 3202, 2993, 2414, 1982, 2217, 2223, 2000, 1028, 2526, 3207, 3441, 3362, 2935, 2413, 3003, 3252, 3275, 3080, 2588, 2304, 2563, 2582, 2371, 2595, 2867, 2979, 2960, 2805, 2981, 3001, 2720, 2002, 2837, 3221, 3384, 3370, 3178, 2749, 2919, 3205, 3093, 2495, 2352, 2920, 3113, 3039, 2664, 2448, 3122, 3282, 3052, 2232, 1306, 1849, 2042, 2091, 2017, 1786, 1876, 2076, 2083, 1943, 2293, 2432, 2423, 2263, 1871, 1000, 2788, 3202, 3165, 2645, 2507, 2704, 2709, 2678, 3327, 3423, 3046, 2638, 2778, 2703, 2938, 3103, 3058, 2788, 2144, 1890, 2077, 2633, 3090, 3312, 3367, 3267, 2988, 2429, 2648, 2892, 2879, 2604, 1840, 1000, 2648, 3023, 2858, 1892, 2062, 2354, 2457, 2414, 2209, 2347, 2716, 2846, 2791, 2530, 2194, 2662, 2829, 2781, 2499, 1780, 2199, 2389, 2443, 2376, 2605, 3133, 3375, 3417, 3271, 2895, 2348, 2443, 2435, 2530, 3174, 3415, 3378, 3049, 2207, 1672, 2332, 2544, 2510, 2694, 3170, 3110, 2448, 2659, 2855, 2562, 1000, 1100, 2272, 2509, 2409, 1862, 1000, 1976, 2249, 2327, 2246, 2800, 3128, 3110, 2734, 1440, 2443, 3322, 3404, 2804, 2808, 3000, 2872, 2334, 2550, 2889, 2787, 2446, 2767, 2854, 2742, 2384, 1276, 2011, 2608, 2706, 2415, 1000, 2854, 3280, 3284, 2869, 1864, 2009, 2038, 1960, 1743, 1417, 2325, 2563, 2622, 3105, 3316, 3328, 3147, 2711, 2863, 3266, 3324, 3067, 2323, 2070, 2002, 2224, 2757, 2874, 2666, 2802, 2967, 2982, 2851, 2536, 2021, 2089, 2058, 1915, 2232, 2610, 2795, 2847, 2778, 2570, 2736, 2755, 2293, 2835, 3384, 3352, 2705, 2257, 2265, 2099, 1636, 1738, 2443, 2666, 2621, 2279, 2131, 2134, 2056, 1879, 2062, 2093, 2527, 2822, 2942, 2922, 2754, 2389, 2575, 2782, 2848, 2789, 2591, 2186, 2441, 2507, 2337, 1789, 1951, 2179, 2243, 2170, 2588, 2883, 2931, 2752, 2254, 1939, 2279, 2267, 1958, 2263, 2390, 2394, 3015, 3265, 3268, 3027, 2421, 2235, 2036, 1222, 1000, 2311, 2602, 2530, 2022, 2311, 2544, 2610, 2531, 2279, 2276, 2407, 2349, 2073, 2061, 3122, 3388, 3175, 2258, 2183, 2123, 1890, 1000, 2557, 2978, 2857, 2014, 1789, 2119, 2244, 2228, 2065, 2057, 2160, 2157, 2315, 3137, 3377, 3229, 2591, 1000, 2791, 3351, 3297, 2566, 2323, 2302, 1982, 2223, 2465, 2526, 2430, 2136, 2262, 2189, 2580, 2924, 3072, 3069, 2912, 2557, 1763, 2544, 2900, 2873, 2442, 2002, 2303, 2982, 3321, 3464, 3446, 3262, 2866, 3039, 3024, 2674, 2164, 2378, 2418, 2300, 1967, 2765, 3210, 3344, 3223, 2799, 2539, 2955, 3108, 3058, 2789, 2153, 1000, 2211, 2515, 2415, 1764, 1000, 1374, 2405, 2625, 2463, 2430, 2969, 3190, 3191, 2974, 2745, 3105, 3256, 3240, 3055, 3081, 3209, 3110, 2747, 2850, 3055, 2917, 2331, 1787, 2608, 2825, 2690), 2500, 1, 4, 0.9, 1.0, 1.1, 172, 120, 62, 62, 34, 10),
+		"sand" = list("#402f1c", 160, 118, 70, 1, list(4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 4000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 4000, 4000, 4000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 1000, 1000, 2000, 3000, 4000, 4000, 4000, 3000, 3000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 4000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 4000, 4000, 4000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 1000, 1000, 1000, 2000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 1000, 1000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 1000, 1000, 1000, 1000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 1000, 1000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 2000, 2000, 2000, 3000, 3000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 2000, 2000, 2000, 2000, 3000, 3000, 3000, 3000, 4000, 4000, 4000, 4000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 3000, 4000, 4000, 3000, 3000, 2000, 1000, 1000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 3000), 3000, 1, 5, 0.85, 1.0, 1.15, 255, 232, 170, 196, 152, 98),
+		"ice" = list("#172844", 58, 100, 170, 0, list(1888, 1839, 1790, 1741, 1692, 1642, 1593, 1753, 1912, 2072, 2231, 2391, 2550, 2710, 2870, 2697, 2525, 2353, 2181, 2009, 1837, 1665, 1778, 1892, 2005, 2119, 2233, 2346, 2468, 2590, 2712, 2833, 2955, 2908, 2861, 2813, 2766, 2554, 2342, 2130, 1918, 1706, 1494, 1282, 1515, 1749, 1982, 2215, 2449, 2682, 2499, 2315, 2131, 1947, 1763, 1862, 1961, 2060, 2159, 2258, 2357, 2169, 1980, 1792, 1603, 1608, 1614, 1619, 1625, 1630, 1636, 1641, 1647, 1819, 1991, 2164, 2336, 2508, 2681, 2645, 2609, 2573, 2537, 2501, 2465, 2430, 2398, 2366, 2335, 2303, 2272, 2240, 2209, 2134, 2060, 1985, 1911, 1836, 1762, 1688, 1683, 1679, 1675, 1670, 1666, 1633, 1600, 1567, 1534, 1502, 1505, 1508, 1511, 1515, 1518, 1459, 1399, 1340, 1280, 1221, 1278, 1336, 1393, 1451, 1509, 1566, 1624, 1597, 1571, 1544, 1518, 1491, 1557, 1623, 1690, 1756, 1771, 1786, 1801, 1816, 1832, 1847, 1862, 1877, 1993, 2109, 2225, 2341, 2457, 2574, 2543, 2512, 2481, 2450, 2420, 2353, 2286, 2220, 2153, 2087, 2020, 1953, 2083, 2212, 2342, 2471, 2446, 2421, 2395, 2370, 2345, 2320, 2294, 2269, 2289, 2310, 2330, 2350, 2371, 2391, 2411, 2432, 2256, 2081, 1906, 1730, 1555, 1379, 1204, 1333, 1462, 1591, 1721, 1850, 1979, 2108, 2204, 2301, 2397, 2493, 2590, 2686, 2693, 2700, 2707, 2714, 2721, 2727, 2734, 2741, 2617, 2494, 2370, 2246, 2122, 1998, 1875, 1906, 1937, 1969, 2000, 2031, 2062, 2094, 2018, 1942, 1867, 1791, 1715, 1639, 1563, 1591, 1618, 1646, 1673, 1701, 1728, 1933, 2138, 2343, 2548, 2587, 2627, 2667, 2707, 2488, 2268, 2049, 1830, 1956, 2083, 2209, 2335, 2461, 2512, 2562, 2613, 2663, 2713, 2764, 2814, 2705, 2595, 2486, 2377, 2267, 2158, 2278, 2398, 2518, 2638, 2759, 2879, 2810, 2741, 2672, 2603, 2534, 2465, 2397, 2328, 2406, 2484, 2562, 2640, 2718, 2796, 2874, 2564, 2254, 1944, 1634, 1324, 1307, 1290, 1273, 1257, 1240, 1223, 1206, 1190, 1396, 1603, 1809, 2016, 2222, 2429, 2351, 2272, 2194, 2115, 2037, 1959, 1880, 1802, 1659, 1516, 1374, 1231, 1088, 1146, 1204, 1263, 1321, 1379, 1580, 1781, 1982, 2183, 2385, 2586, 2605, 2624, 2643, 2663, 2682, 2701, 2566, 2430, 2295, 2160, 2025, 1889, 1754, 1619, 1667, 1716, 1764, 1813, 1852, 1891, 1930, 1970, 2009, 2154, 2299, 2445, 2590, 2500, 2410, 2320, 2230, 2140, 2050, 1960, 2087, 2214, 2341, 2468, 2596, 2723, 2850, 2797, 2745, 2692, 2639, 2587, 2534, 2481, 2429, 2191, 1953, 1714, 1476, 1238, 1000, 1221, 1441, 1662, 1882, 2103, 2323, 2544, 2764, 2759, 2755, 2750, 2745, 2740, 2736, 2731, 2545, 2359, 2174, 1988, 1802, 1973, 2144, 2314, 2485, 2656, 2827, 2997, 2801, 2604, 2407, 2210, 2257, 2304, 2350, 2397, 2444, 2491, 2537, 2584, 2549, 2514, 2480, 2445, 2410, 2467, 2524, 2582, 2639, 2697, 2754, 2740, 2726, 2712, 2698, 2683, 2667, 2652, 2636, 2621, 2606, 2590, 2575, 2498, 2421, 2344, 2267, 2190, 2113, 2036, 1959, 2103, 2248, 2392, 2536, 2680, 2824, 2482, 2140, 1798, 1455, 1113, 1313, 1512, 1712, 1911, 2111, 2239, 2368, 2496, 2624, 2752, 2608, 2463, 2319, 2175, 2030, 1886, 1741, 1811, 1881, 1951, 2021, 2091, 1948, 1806, 1663, 1520, 1377, 1542, 1708, 1873, 2039, 2204, 2369, 2535, 2586, 2637, 2688, 2739, 2791, 2727, 2662, 2598, 2534, 2470, 2406), 1500, 1, 3, 1.2, 1.0, 0.8, 236, 246, 255, 82, 130, 194),
+		"stone" = list("#130d07", 48, 32, 18, 0, list(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000), 0, 1, 1, 1.0, 1.0, 1.05, 186, 166, 132, 70, 54, 36),
+		"none" = list("#000000", -1, -1, -1, 0, list(1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000), 0, 1, 1, 1.0, 1.0, 1.0, -1, -1, -1, -1, -1, -1))
 
 /proc/ElevOrgStyle(turf/S)
 	if(!S || ElevAt(S) <= 0 || !ElevNaturalTop(S) || ElevStairTurf(S))
@@ -1244,6 +2464,11 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/turf/B = locate(S.x, S.y - 1, S.z)
 	if(B && ElevAt(B) <= 0 && BuildIsCliffTurf(B))
 		return ""
+	switch(ElevEdgeMat(S))
+		if("snow")
+			return "n"
+		if("ice")
+			return "i"
 	switch(BuildEdgeStyleFor(BuildMaterialFor(S)))
 		if("wispy")
 			return "w"
@@ -1343,14 +2568,6 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			P = list(runs, deltas, masks, trims)
 	elevOrgParsed[pk] = P
 	return P.len ? P : null
-
-/proc/ElevOrgBit(list/P, m, x)
-	if(!P)
-		return 0
-	var/list/masks = P[3]
-	if(x < 16)
-		return (masks[m * 2 + 1] & (1 << x)) ? 1 : 0
-	return (masks[m * 2 + 2] & (1 << (x - 16))) ? 1 : 0
 
 /proc/ElevOrgKeyAt(turf/A, L, sty)
 	if(!A)
@@ -1637,6 +2854,31 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	elevOrgBotCache[bk] = B
 	return B
 
+/proc/ElevOrgBotShade(D, k)
+	var/bk = "[D]_[k]"
+	var/res = elevOrgBotShadeCache[bk]
+	if(res)
+		return res
+	var/icon/I = icon(ElevOrgBotIcon(D, k))
+	I.MapColors(0, 0, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+	res = fcopy_rsc(I)
+	elevOrgBotShadeCache[bk] = res
+	return res
+
+/proc/ElevStairShade(turf/G, lay, list/fresh)
+	var/list/fi = ElevFaceInfo(G)
+	if(!fi)
+		return
+	var/turf/CT = fi[6]
+	var/fam = ElevFaceFlat(CT, ElevFaceStyleFor(G, CT)) ? "fw" : "fs"
+	var/image/SP = ElevShadePiece("[fam][fi[2]]_[fi[3]]cc", lay + 0.00002)
+	if(SP)
+		fresh += SP
+	if(ElevOrgStyle(CT))
+		var/image/BI = image(ElevOrgBotShade(fi[2], fi[3]))
+		BI.layer = lay + 0.00004
+		fresh += BI
+
 /proc/ElevOrgTexLayer(icon/F, turf/S, ic, st, bright)
 	if(!S)
 		return
@@ -1665,8 +2907,10 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	if(fsty == "custom" || ElevStyleGeneric(fsty))
 		fsty = "wall38"
 	var/turf/WS = ElevWrapSrc(FD, BL)
-	var/v = A.x % 3
-	var/fk = "[fsty]|[D]|[v]|[S.icon]|[S.icon_state]|[S.dir]|[ElevAt(S)]|[WS ? "[WS.icon]|[WS.icon_state]|[WS.dir]|[ElevAt(WS)]|[ElevStyleCode(WS)]" : "-"]"
+	if(WS && BuildMaterialFor(WS) != "Water")
+		WS = null
+	var/v = WS ? A.x % 3 : 0
+	var/fk ="[fsty]|[D]|[v]|[S.icon]|[S.icon_state]|[S.dir]|[ElevAt(S)]|[WS ? "[WS.icon]|[WS.icon_state]|[WS.dir]|[ElevAt(WS)]|[ElevStyleCode(WS)]" : "-"]"
 	var/hit = elevOrgFTCache[fk]
 	if(hit)
 		return hit
@@ -1679,6 +2923,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		if(!ss["f[D]_1cc"])
 			fic = 'Mapping/Elevation/elev_face.dmi'
 	var/icon/R = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+	var/lipk = 0
+	var/list/teeth = ElevOrgToothRows()
 	var/mrow = 16 * D - 1
 	var/mtile = round(mrow / 32) + 1
 	for(var/k = 1 to D)
@@ -1689,16 +2935,14 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		if(k == D && WS)
 			var/bkey = "[ElevStyleCode(WS)][v]cc"
 			if(elevBaseStates["bm[bkey]"])
-				if(BuildMaterialFor(WS) == "Water")
-					ElevOrgCutLayer(F, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]")
-				else
-					ElevOrgTexLayer(F, WS, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]", 0)
+				ElevOrgCutLayer(F, 'Mapping/Elevation/elev_base.dmi', "bm[bkey]")
 			if(elevBaseStates["bb[bkey]"])
 				ElevOrgTexLayer(F, WS, 'Mapping/Elevation/elev_base.dmi', "bb[bkey]", 1)
 			if(elevBaseStates["bd[bkey]"])
 				F.Blend(icon('Mapping/Elevation/elev_base.dmi', "bd[bkey]"), ICON_OVERLAY)
-		if(k == 1 && ElevFrays(S))
+		if(k == 1 && ElevFrays(S) && ElevEdgeMat(S) == "grass")
 			var/drew = 0
+			lipk = 1
 			for(var/q = 0 to 1)
 				if(elevLipStates["mv[q]otctf1"])
 					ElevOrgTexLayer(F, S, 'Mapping/Elevation/elev_lip.dmi', "mv[q]otctf1", 0)
@@ -1716,6 +2960,10 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			var/icon/C = icon(F)
 			C.Blend(icon('Mapping/EdgeOrg/org_cols.dmi', "[x]"), ICON_MULTIPLY)
 			R.Insert(C, "k[k]x[x]")
+			if(k == 1 && lipk && teeth[x + 1] > 0)
+				var/icon/N = icon(C)
+				N.DrawBox(null, 1, 33 - teeth[x + 1], 32, 32)
+				R.Insert(N, "n1x[x]")
 		if(k == mtile)
 			for(var/x = 0 to 31)
 				var/col = F.GetPixel(x + 1, 32 - (mrow % 32))
@@ -1727,6 +2975,297 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/res = fcopy_rsc(R)
 	elevOrgFTCache[fk] = res
 	return res
+
+/proc/ElevOrgConvLedge(turf/A, L, sty, x, y)
+	var/n = 1
+	for(var/sd in list(-1, 1))
+		var/turf/T = A
+		var/cx = x
+		var/list/on = ElevOrgConvOn(T, L, sty)
+		while(n < 3)
+			cx += sd
+			if(cx < 0 || cx > 31)
+				T = locate(T.x + sd, T.y, T.z)
+				if(!T)
+					break
+				on = ElevOrgConvOn(T, L, sty)
+				cx = (cx < 0) ? 31 : 0
+			if(!on || !on["[cx],[y]"])
+				break
+			n++
+	return n
+
+/proc/ElevOrgToothRows()
+	if(elevOrgToothRows)
+		return elevOrgToothRows
+	ElevStatesInit()
+	var/list/t = new/list(32)
+	for(var/x = 1 to 32)
+		t[x] = 0
+	for(var/q = 0 to 1)
+		for(var/pre in list("mv", "bv"))
+			var/st = "[pre][q]otctf1"
+			if(!elevLipStates[st])
+				continue
+			var/icon/I = icon('Mapping/Elevation/elev_lip.dmi', st)
+			for(var/x = 1 to 32)
+				for(var/y = 1 to 32)
+					var/c = I.GetPixel(x, y)
+					if(!c || (length(c) >= 9 && copytext(c, 8) == "00"))
+						continue
+					if(33 - y > t[x])
+						t[x] = 33 - y
+	elevOrgToothRows = t
+	return t
+
+/proc/ElevOrgFTHas(FT, st)
+	var/fk = "\ref[FT]"
+	var/list/ss = elevOrgFTStates[fk]
+	if(!ss)
+		ss = ElevStateSet(FT)
+		elevOrgFTStates[fk] = ss
+	return ss[st] ? 1 : 0
+
+/proc/ElevOrgCellMask(list/sheets, id)
+	if(!sheets || id <= 0)
+		return null
+	var/s = round((id - 1) / 512) + 1
+	if(s > sheets.len)
+		return null
+	var/ci = (id - 1) % 512
+	return BuildBakeMask(sheets[s], BuildOrgSheetX(ci), BuildOrgSheetY(ci), 0, 32, 32)
+
+/proc/ElevOrgRowTile(turf/G, yy)
+	var/dy = (yy < 0) ? 1 : -round(yy / 32)
+	return locate(G.x, G.y + dy, G.z)
+
+/proc/ElevOrgFootFx(turf/G, L, sty, turf/S)
+	var/list/holes = list()
+	var/list/paint = list()
+	var/list/bnc = list()
+	for(var/dy = 0 to 1)
+		var/turf/T = locate(G.x, G.y - dy, G.z)
+		if(!T)
+			continue
+		var/list/ft = ElevOrgFeet(T, L, sty, S)
+		if(!ft || !ft.len)
+			continue
+		var/turf/PS = ElevOrgMem(T, L) ? T : S
+		for(var/list/f in ft)
+			var/x = f[1]
+			var/y = f[2] + dy * 32
+			var/he = f[5]
+			for(var/q = 0 to he - 1)
+				var/yy = y - 1 - q
+				if(yy < 0 || yy > 31)
+					continue
+				if(f[3])
+					paint["[x],[yy]"] = PS
+				else
+					holes["[x],[yy]"] = 1
+			if(he < f[6] && (he || !f[3]))
+				var/yb = y - he
+				var/turf/RT = ElevOrgRowTile(G, yb)
+				var/list/BM = ElevOrgMatInfo(ElevEdgeMat(RT))
+				if(BM[2] >= 0)
+					var/list/BP = ElevOrgPal(RT)
+					var/br = BP ? BP[7] : BM[2]
+					var/bg = BP ? BP[8] : BM[3]
+					var/bb = BP ? BP[9] : BM[4]
+					if(yb - 1 >= 0 && yb - 1 <= 31)
+						bnc["[x],[yb - 1]"] = rgb(br, bg, bb, 77)
+					if(he + 2 <= f[6] && yb - 2 >= 0 && yb - 2 <= 31)
+						bnc["[x],[yb - 2]"] = rgb(br, bg, bb, 36)
+	return list(holes, paint, bnc)
+
+/proc/ElevOrgFaceImages(turf/G, L, sty, list/pieces, list/cpx, list/ctx, list/fx, slay, list/fresh, turf/S)
+	if(!pieces.len && !cpx.len)
+		return
+	var/did = (ctx && ctx.len >= 12) ? ctx[10] : 0
+	var/uid = (ctx && ctx.len >= 12) ? ctx[11] : 0
+	var/vid = (ctx && ctx.len >= 12) ? ctx[12] : 0
+	if(!S || !S.icon)
+		did = 0
+	var/list/holes = fx[1]
+	var/list/paint = fx[2]
+	var/list/bnc = fx[3]
+	var/edid = ctx ? ctx[2] : 0
+	var/lid = ctx ? ctx[3] : 0
+	var/ka = ctx ? max(0, min(255, round(51 * ctx[5] + 0.5))) : 51
+	var/list/kp = list()
+	for(var/list/PC in pieces)
+		kp += "\ref[PC[1]]:[PC[4]]:[PC[2]]:[PC[3]]:[PC[5]]"
+	for(var/pk in cpx)
+		kp += "c[pk]=[cpx[pk]]"
+	kp += "e[edid]:[ka]:l[lid]:g[G.icon]|[G.icon_state]|[G.dir]"
+	kp += "z[did]:[uid]:[vid]:[did ? "[S.icon]|[S.icon_state]|[S.dir]" : "-"]"
+	for(var/hk in holes)
+		kp += "h[hk]"
+	for(var/pk in paint)
+		var/turf/PS = paint[pk]
+		kp += "p[pk]=[PS.icon]|[PS.icon_state]|[PS.dir]"
+	for(var/bk in bnc)
+		kp += "b[bk]=[bnc[bk]]"
+	var/ck = md5(jointext(kp, ";"))
+	var/list/res = elevOrgStripCache[ck]
+	if(!res)
+		var/icon/C = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+		for(var/pi = pieces.len, pi >= 1, pi--)
+			var/list/PC = pieces[pi]
+			var/st = "k[PC[4]]x[PC[2]]"
+			if(PC[5] && ElevOrgFTHas(PC[1], "n1x[PC[2]]"))
+				st = "n1x[PC[2]]"
+			if(ElevOrgFTHas(PC[1], st))
+				C.Blend(icon(PC[1], st), ICON_OVERLAY, 1, 1 - PC[3])
+		for(var/pk in cpx)
+			var/cp = findtext(pk, ",")
+			C.DrawBox(cpx[pk], text2num(copytext(pk, 1, cp)) + 1, 32 - text2num(copytext(pk, cp + 1)))
+		var/icon/CA = icon(C)
+		CA.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0)
+		if(edid > 0 && ka > 0)
+			var/icon/E = ElevOrgCellMask(elevOrgDark[sty], edid)
+			if(E)
+				E.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ka / 255, 0, 0, 0, 0)
+				E.Blend(CA, ICON_MULTIPLY)
+				C.Blend(E, ICON_OVERLAY)
+		if(uid > 0)
+			var/icon/UM = ElevOrgCellMask(elevOrgUnder[sty], uid)
+			if(UM)
+				UM.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+				UM.Blend(CA, ICON_MULTIPLY)
+				C.Blend(UM, ICON_OVERLAY)
+		if(did > 0)
+			var/icon/DMK = ElevOrgCellMask(elevOrgDrape[sty], did)
+			if(DMK)
+				var/icon/DT = icon(S.icon, S.icon_state, S.dir, 1)
+				var/lit = ElevOrgDrapeLit(ElevEdgeMat(S))
+				if(lit != 1)
+					DT.MapColors(lit, 0, 0, 0, lit, 0, 0, 0, lit)
+				DT.Blend(DMK, ICON_MULTIPLY)
+				C.Blend(DT, ICON_OVERLAY)
+		if(vid > 0)
+			var/icon/VM = ElevOrgCellMask(elevOrgLow[sty], vid)
+			if(VM)
+				VM.Blend(rgb(183, 201, 215), ICON_MULTIPLY)
+				VM.MapColors(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0.8, 0, 0, 0, 0)
+				C.Blend(VM, ICON_OVERLAY)
+		if(bnc.len)
+			var/icon/BB = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+			for(var/bk in bnc)
+				var/cp = findtext(bk, ",")
+				BB.DrawBox(bnc[bk], text2num(copytext(bk, 1, cp)) + 1, 32 - text2num(copytext(bk, cp + 1)))
+			BB.Blend(CA, ICON_MULTIPLY)
+			C.Blend(BB, ICON_OVERLAY)
+		var/icon/LM = (lid > 0) ? ElevOrgCellMask(elevOrgLift[sty], lid) : null
+		var/list/cut = list()
+		var/list/srcs = list()
+		for(var/pk in paint)
+			var/turf/PS = paint[pk]
+			var/sk = "[PS.icon]|[PS.icon_state]|[PS.dir]"
+			var/list/grp = srcs[sk]
+			if(!grp)
+				grp = list(PS)
+				srcs[sk] = grp
+			grp += pk
+		for(var/hk in holes)
+			var/lifted = 0
+			if(LM)
+				var/cp = findtext(hk, ",")
+				var/lc = LM.GetPixel(text2num(copytext(hk, 1, cp)) + 1, 32 - text2num(copytext(hk, cp + 1)))
+				if(lc && (length(lc) < 9 || copytext(lc, 8) != "00"))
+					lifted = 1
+			if(!lifted)
+				cut += hk
+				continue
+			var/sk = "[G.icon]|[G.icon_state]|[G.dir]"
+			var/list/grp = srcs[sk]
+			if(!grp)
+				grp = list(G)
+				srcs[sk] = grp
+			grp += hk
+		for(var/sk in srcs)
+			var/list/grp = srcs[sk]
+			var/turf/PS = grp[1]
+			if(!PS.icon)
+				continue
+			var/icon/PM = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+			for(var/gi = 2 to grp.len)
+				var/pk = grp[gi]
+				var/cp = findtext(pk, ",")
+				PM.DrawBox("#ffffff", text2num(copytext(pk, 1, cp)) + 1, 32 - text2num(copytext(pk, cp + 1)))
+			var/icon/TI = icon(PS.icon, PS.icon_state, PS.dir, 1)
+			TI.Blend(PM, ICON_MULTIPLY)
+			C.Blend(TI, ICON_OVERLAY)
+		if(LM)
+			var/icon/CL = icon(C)
+			CL.MapColors(1.25, 0, 0, 0, 1.25, 0, 0, 0, 1.25, 8 / 255, 8 / 255, 8 / 255)
+			CL.Blend(LM, ICON_MULTIPLY)
+			C.Blend(CL, ICON_OVERLAY)
+		if(cut.len)
+			var/icon/HM = icon('Mapping/EdgeOrg/org_cols.dmi', "white")
+			for(var/hk in cut)
+				var/cp = findtext(hk, ",")
+				HM.DrawBox(null, text2num(copytext(hk, 1, cp)) + 1, 32 - text2num(copytext(hk, cp + 1)))
+			C.Blend(HM, ICON_MULTIPLY)
+		var/cres = null
+		if(cpx.len)
+			var/icon/CM = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+			var/icon/NM = icon('Mapping/EdgeOrg/org_cols.dmi', "white")
+			for(var/pk in cpx)
+				var/cp = findtext(pk, ",")
+				var/px = text2num(copytext(pk, 1, cp)) + 1
+				var/py = 32 - text2num(copytext(pk, cp + 1))
+				CM.DrawBox("#ffffff", px, py)
+				NM.DrawBox(null, px, py)
+			var/icon/CC = icon(C)
+			CC.Blend(CM, ICON_MULTIPLY)
+			cres = fcopy_rsc(CC)
+			C.Blend(NM, ICON_MULTIPLY)
+		res = list(pieces.len ? fcopy_rsc(C) : null, cres)
+		elevOrgStripCache[ck] = res
+	if(res[1])
+		var/image/SP = image(res[1])
+		SP.layer = slay
+		fresh += SP
+	if(res[2])
+		var/image/CI = image(res[2])
+		CI.layer = ElevLayer(L, 7)
+		fresh += CI
+
+/proc/ElevOrgPixMap(list/K, list/pieces, list/on, list/trims)
+	var/list/pm = new/list(1024)
+	for(var/i = 1 to 1024)
+		pm[i] = 0
+	for(var/list/PC in pieces)
+		var/x = PC[2]
+		for(var/y = max(0, PC[3]) to min(31, PC[3] + 31))
+			pm[y * 32 + x + 1] = 1
+	if(K)
+		var/list/runs = K[1]
+		for(var/i = 1, i + 6 <= runs.len, i += 7)
+			var/x = runs[i]
+			for(var/y = runs[i + 2] to runs[i + 1] - 1)
+				pm[y * 32 + x + 1] = 2
+	if(on)
+		for(var/pk in on)
+			if(text2ascii(pk, 1) == 114)
+				continue
+			var/cp = findtext(pk, ",")
+			var/x = text2num(copytext(pk, 1, cp))
+			var/y = text2num(copytext(pk, cp + 1))
+			pm[y * 32 + x + 1] = (trims && trims[pk]) ? 0 : 1
+	return pm
+
+/proc/ElevOrgMColor(FT, px)
+	var/mk = "\ref[FT]:[px]"
+	if(mk in elevOrgMColCache)
+		return elevOrgMColCache[mk]
+	var/c = null
+	if(ElevOrgFTHas(FT, "m[px]"))
+		var/icon/M = icon(FT, "m[px]")
+		c = M.GetPixel(px + 1, 1)
+	elevOrgMColCache[mk] = c
+	return c
 
 /proc/ElevOrgGroundSrc(turf/G, L)
 	for(var/list/o in list(list(0, -1), list(1, 0), list(-1, 0), list(0, 1), list(1, -1), list(-1, -1), list(1, 1), list(-1, 1)))
@@ -1766,15 +3305,14 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			GI.filters = GF
 			fresh += GI
 			ElevOrgSidePaint(G, L, sty, cfg, GS, fresh)
-	var/list/cl = ElevOrgClassify(G, L, D)
-	var/list/ids = null
-	if(cl)
-		var/w = ((BuildOrgWindowY(G) - cl[3] + 40) % 4) * 4 + BuildOrgWindowX(G)
-		ids = ElevOrgCtxIds(cl[1], sty, w, cl[2], cl[5])
-	if(ids && ids[1])
-		var/SF = ElevOrgCellFilter(elevOrgShade[sty], ids[1])
+	var/list/ctx = ElevOrgTileCtx(G, L, sty)
+	if(ctx && ctx[1])
+		var/SF = ElevOrgCellFilter(elevOrgShade[sty], ctx[1])
 		if(SF)
-			var/image/SI = image('Mapping/EdgeOrg/black.png')
+			var/list/HM = ElevOrgMatInfo(ElevEdgeMat(G))
+			var/list/HP = ElevOrgPal(G)
+			var/image/SI = image('Mapping/EdgeOrg/org_cols.dmi', null, "white")
+			SI.color = HP ? rgb(round(HP[7] * 0.4 + 0.5), round(HP[8] * 0.4 + 0.5), round(HP[9] * 0.4 + 0.5)) : HM[1]
 			SI.layer = base + 0.0001
 			SI.filters = SF
 			fresh += SI
@@ -1805,6 +3343,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		var/DA = ElevOrgDepthAt(A, L)
 		var/list/runs = KA[1]
 		var/FT = null
+		var/list/onA = ElevOrgConvOn(A, L, sty)
 		for(var/i = runs.len - 6, i >= 1, i -= 7)
 			var/x = runs[i]
 			if(lim[x + 1] < 0)
@@ -1812,6 +3351,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			var/bp = runs[i + 1] - 32 * j
 			var/lo = max(bp, 0)
 			var/hi = min(lim[x + 1], bp + 32 * DA - 1)
+			var/cv = (onA && onA["r[x],[runs[i + 2]]"] && ElevOrgConvLedge(A, L, sty, x, runs[i + 1] - 1) >= 3) ? 1 : 0
 			if(!runs[i + 3] && lo <= hi && !(nostrip && j == 0))
 				for(var/t = 1 to DA)
 					var/y0 = bp + 32 * (t - 1)
@@ -1820,118 +3360,58 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 					if(!FT)
 						FT = ElevOrgFT(A, S, L, DA)
 					if(FT)
-						pieces += list(list(FT, x, y0, t))
+						pieces += list(list(FT, x, y0, t, (cv && t == 1) ? 1 : 0))
 			var/na = runs[i + 2] - 32 * j - 1
+			if(cv)
+				var/list/teeth = ElevOrgToothRows()
+				na = bp + teeth[x + 1] - 1
 			if(na < lim[x + 1])
 				lim[x + 1] = na
 				if(na < 0)
 					open--
-	for(var/pi = pieces.len, pi >= 1, pi--)
-		var/list/PC = pieces[pi]
-		var/image/SP = image(PC[1], null, "k[PC[4]]x[PC[2]]")
-		SP.layer = slay
-		SP.pixel_y = -PC[3]
-		fresh += SP
-	if(!K)
-		if(ids && ids[2])
-			ElevOrgDarkPiece(sty, ids[2], cl[4], base, fresh)
-		return
-	var/list/on = ElevOrgConvOn(G, L, sty)
-	var/list/holes = list()
-	var/list/trims = K[4]
-	for(var/i = 1, i + 3 <= trims.len, i += 4)
-		if(on && on["r[trims[i + 2]],[trims[i + 3]]"])
-			holes["[trims[i]],[trims[i + 1]]"] = 1
-	if(cfg != 511)
-		var/TF = ElevOrgFilter("t", sty, G, cfg)
-		if(TF)
-			var/image/TP = ElevOrgTurfImage(mem ? G : S, ElevLayer(L, 5))
-			TP.filters = TF
-			for(var/hk in holes)
-				var/hc = findtext(hk, ",")
-				var/hx = text2num(copytext(hk, 1, hc))
-				var/hy = text2num(copytext(hk, hc + 1))
-				TP.filters += filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', "lippx"), x = hx, y = 31 - hy, flags = MASK_INVERSE)
-				if(mem)
-					var/turf/HS = ElevOrgGroundSrc(G, L)
-					if(HS)
-						var/image/HG = ElevOrgTurfImage(HS, ELEV_TOP_LAYER)
-						HG.filters = filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', "lippx"), x = hx, y = 31 - hy)
-						fresh += HG
-			fresh += TP
-	if(cfg != 511)
-		var/LF = ElevOrgFilter("l", sty, G, cfg)
-		if(LF)
-			var/image/LI = image('Mapping/EdgeOrg/org_cols.dmi', null, "lip")
-			LI.layer = ElevLayer(L, 6)
-			LI.alpha = 150
-			LI.filters = LF
-			for(var/hk in holes)
-				var/hc = findtext(hk, ",")
-				LI.filters += filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', "lippx"), x = text2num(copytext(hk, 1, hc)), y = 31 - text2num(copytext(hk, hc + 1)), flags = MASK_INVERSE)
-			fresh += LI
-	var/list/lipset = list()
-	var/list/deltas = K[2]
-	for(var/i = 1, i + 3 <= deltas.len, i += 4)
-		if(on && on["r[deltas[i + 2]],[deltas[i + 3]]"])
-			lipset["[deltas[i]],[deltas[i + 1]]"] = 1
-	for(var/side = 1 to 4)
-		var/turf/NB
-		switch(side)
-			if(1)
-				NB = locate(G.x, G.y + 1, G.z)
-			if(2)
-				NB = locate(G.x, G.y - 1, G.z)
-			if(3)
-				NB = locate(G.x - 1, G.y, G.z)
-			if(4)
-				NB = locate(G.x + 1, G.y, G.z)
-		var/list/non = ElevOrgConvOn(NB, L, sty)
-		if(!non || !non.len)
-			continue
-		for(var/pk in non)
-			if(text2ascii(pk, 1) == 114)
-				continue
-			var/cp = findtext(pk, ",")
-			var/px = text2num(copytext(pk, 1, cp))
-			var/py = text2num(copytext(pk, cp + 1))
-			switch(side)
-				if(1)
-					if(py == 31 && ElevOrgBit(K, 1, px))
-						lipset["[px],0"] = 1
-				if(2)
-					if(py == 0 && ElevOrgBit(K, 2, px))
-						lipset["[px],31"] = 1
-				if(3)
-					if(px == 31 && ElevOrgBit(K, 3, py))
-						lipset["0,[py]"] = 1
-				if(4)
-					if(px == 0 && ElevOrgBit(K, 4, py))
-						lipset["31,[py]"] = 1
-	for(var/pk in lipset)
-		if(on && on[pk])
-			continue
-		var/cp = findtext(pk, ",")
-		var/image/LP = image('Mapping/EdgeOrg/org_cols.dmi', null, "lippx")
-		LP.layer = ElevLayer(L, 6)
-		LP.alpha = 150
-		LP.pixel_x = text2num(copytext(pk, 1, cp))
-		LP.pixel_y = 31 - text2num(copytext(pk, cp + 1))
-		fresh += LP
-	if(on && on.len)
-		var/FTG = ElevOrgFT(G, S, L, D)
-		if(FTG)
-			for(var/pk in on)
-				if(text2ascii(pk, 1) == 114 || holes[pk])
-					continue
-				var/cp = findtext(pk, ",")
-				var/px = text2num(copytext(pk, 1, cp))
-				var/image/CPX = image(FTG, null, "m[px]")
-				CPX.layer = ElevLayer(L, 7)
-				CPX.pixel_y = 31 - text2num(copytext(pk, cp + 1))
-				fresh += CPX
-	if(ids && ids[2])
-		ElevOrgDarkPiece(sty, ids[2], cl[4], base, fresh)
+	var/list/cpx = list()
+	var/list/pmap = null
+	if(K)
+		var/list/on = ElevOrgConvOn(G, L, sty)
+		var/list/holes = list()
+		var/list/trims = K[4]
+		for(var/i = 1, i + 3 <= trims.len, i += 4)
+			if(on && on["r[trims[i + 2]],[trims[i + 3]]"])
+				holes["[trims[i]],[trims[i + 1]]"] = 1
+		if(cfg != 511)
+			var/TF = ElevOrgFilter("t", sty, G, cfg)
+			if(TF)
+				var/image/TP = ElevOrgTurfImage(mem ? G : S, ElevLayer(L, 5))
+				TP.filters = TF
+				for(var/hk in holes)
+					var/hc = findtext(hk, ",")
+					var/hx = text2num(copytext(hk, 1, hc))
+					var/hy = text2num(copytext(hk, hc + 1))
+					TP.filters += filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', "lippx"), x = hx, y = 31 - hy, flags = MASK_INVERSE)
+					if(mem)
+						var/turf/HS = ElevOrgGroundSrc(G, L)
+						if(HS)
+							var/image/HG = ElevOrgTurfImage(HS, ELEV_TOP_LAYER)
+							HG.filters = filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', "lippx"), x = hx, y = 31 - hy)
+							fresh += HG
+				fresh += TP
+		if(on && on.len)
+			var/FTG = ElevOrgFT(G, S, L, D)
+			if(FTG)
+				for(var/pk in on)
+					if(text2ascii(pk, 1) == 114 || holes[pk])
+						continue
+					var/cp = findtext(pk, ",")
+					var/c = ElevOrgMColor(FTG, text2num(copytext(pk, 1, cp)))
+					if(c)
+						cpx[pk] = c
+		pmap = ElevOrgPixMap(K, pieces, on, holes)
+	else
+		pmap = ElevOrgPixMap(null, pieces, null, null)
+	var/list/fx = ElevOrgFootFx(G, L, sty, S)
+	ElevOrgFaceImages(G, L, sty, pieces, cpx, ctx, fx, slay, fresh, S)
+	ElevOrgContactImage(G, L, sty, S, pmap, fx, fresh)
+	ElevOrgBevImage(G, L, sty, S, ctx, fresh)
 
 /proc/ElevOrgSidePaint(turf/G, L, sty, cfg, turf/GS, list/fresh)
 	for(var/list/o in list(list(0, 1, "gn"), list(1, 0, "ge"), list(-1, 0, "gw"), list(0, -1, "gs")))
@@ -1946,15 +3426,404 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		SI.filters += filter(type = "alpha", icon = ElevMaskIcon('Mapping/EdgeOrg/org_cols.dmi', o[3]))
 		fresh += SI
 
-/proc/ElevOrgDarkPiece(sty, id, gs, base, list/fresh)
-	var/DF = ElevOrgCellFilter(elevOrgDark[sty], id)
-	if(!DF)
+/proc/ElevEdgeMat(turf/T)
+	if(!T)
+		return "none"
+	switch(BuildMaterialFor(T))
+		if("Grass")
+			if(T.icon_state == "Grass19" || T.icon_state == "Grass20")
+				return "snow"
+			return "grass"
+		if("Dirt")
+			return "dirt"
+		if("Sand")
+			return "sand"
+		if("Ice")
+			return "ice"
+		if("Stone")
+			return "stone"
+		if("Water")
+			return "water"
+	return "none"
+
+/proc/ElevOrgMatInfo(mat)
+	ElevOrgSheetInit()
+	var/list/M = elevOrgMat[mat]
+	return M ? M : elevOrgMat["none"]
+
+/proc/ElevOrgApronH(mat, gx, oq)
+	var/list/A = ElevOrgMatInfo(mat)
+	var/list/tab = A[6]
+	var/v2 = 510 * tab[(gx % tab.len) + 1] + 2 * A[7] * oq - 255 * A[7]
+	v2 = max(A[8] * 510000, min(A[9] * 510000, v2))
+	return round((v2 + 255000) / 510000)
+
+/proc/ElevOrgRecords(sty, rid)
+	if(rid <= 0)
+		return null
+	var/list/lines = elevOrgRecLines[sty]
+	if(!lines)
+		var/f = elevOrgRecFiles[sty]
+		lines = f ? splittext(file2text(f), "\n") : list()
+		elevOrgRecLines[sty] = lines
+	return (rid <= lines.len) ? lines[rid] : null
+
+/proc/ElevOrgCtxIdsY(cls, sty, w, idx, nbits)
+	var/ik = "y[cls][sty]"
+	var/txt = elevOrgIndexText[ik]
+	if(!txt)
+		var/f = elevOrgIndexYFiles["[cls][sty]"]
+		if(!f)
+			return null
+		txt = file2text(f)
+		elevOrgIndexText[ik] = txt
+	var/pos = (w * (1 << nbits) + idx) * 6 + 1
+	if(pos + 5 > length(txt))
+		return null
+	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
+	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	return list(a, b)
+
+/proc/ElevOrgCtxIdsZ(cls, sty, w, idx, nbits)
+	var/ik = "z[cls][sty]"
+	var/txt = elevOrgIndexText[ik]
+	if(!txt)
+		var/f = elevOrgIndexZFiles ? elevOrgIndexZFiles["[cls][sty]"] : null
+		if(!f)
+			return null
+		txt = file2text(f)
+		elevOrgIndexText[ik] = txt
+	var/pos = (w * (1 << nbits) + idx) * 9 + 1
+	if(pos + 8 > length(txt))
+		return null
+	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
+	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	var/c = (text2ascii(txt, pos + 6) - 48) + (text2ascii(txt, pos + 7) - 48) * 64 + (text2ascii(txt, pos + 8) - 48) * 4096
+	return list(a, b, c)
+
+/proc/ElevOrgDrapeLit(mat)
+	switch(mat)
+		if("sand")
+			return 1.05
+		if("snow")
+			return 1.03
+		if("ice")
+			return 1.1
+	return 1
+
+/proc/ElevOrgBevId(cls, sty, bm, w, idx, nbits)
+	var/ik = "b[cls][sty][bm]"
+	var/txt = elevOrgIndexText[ik]
+	if(!txt)
+		var/f = elevOrgIndexBFiles["[cls][sty][bm]"]
+		if(!f)
+			return null
+		txt = file2text(f)
+		elevOrgIndexText[ik] = txt
+	var/pos = (w * (1 << nbits) + idx) * 6 + 1
+	if(pos + 5 > length(txt))
+		return null
+	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
+	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	return list(a, b)
+
+/proc/ElevOrgTileCtx(turf/T, L, sty)
+	if(!T)
+		return null
+	if(elevOrgCtxVer != elevGeomVer)
+		elevOrgCtxCache = list()
+		elevOrgFeetCache = list()
+		elevOrgCtxVer = elevGeomVer
+	var/ck = "[T.x],[T.y],[T.z],[L],[sty]"
+	var/list/hit = elevOrgCtxCache[ck]
+	if(hit)
+		return hit.len ? hit : null
+	var/list/res = list()
+	var/list/cl = ElevOrgClassify(T, L, ElevOrgDepthAt(T, L))
+	if(cl)
+		var/w = ((BuildOrgWindowY(T) - cl[3] + 40) % 4) * 4 + BuildOrgWindowX(T)
+		var/list/a = ElevOrgCtxIds(cl[1], sty, w, cl[2], cl[5])
+		var/list/b = ElevOrgCtxIdsY(cl[1], sty, w, cl[2], cl[5])
+		var/list/z = ElevOrgCtxIdsZ(cl[1], sty, w, cl[2], cl[5])
+		res = list(a ? a[1] : 0, a ? a[2] : 0, b ? b[1] : 0, b ? b[2] : 0, cl[4], cl[1], w, cl[2], cl[5], z ? z[1] : 0, z ? z[2] : 0, z ? z[3] : 0)
+	elevOrgCtxCache[ck] = res
+	return res.len ? res : null
+
+/proc/ElevOrgFeet(turf/T, L, sty, turf/S)
+	var/list/ctx = ElevOrgTileCtx(T, L, sty)
+	if(!ctx || !ctx[4])
+		return null
+	var/mat = ElevEdgeMat(T)
+	if(mat == "water")
+		return null
+	var/mtop = ElevEdgeMat(ElevOrgMem(T, L) ? T : S)
+	var/ck = "[T.x],[T.y],[T.z],[L],[sty],[mat],[mtop]"
+	var/list/hit = elevOrgFeetCache[ck]
+	if(hit)
+		return hit
+	var/list/out = list()
+	var/rs = ElevOrgRecords(sty, ctx[4])
+	if(rs)
+		var/n = length(rs)
+		for(var/i = 1, i + 5 <= n, i += 6)
+			var/c1 = text2ascii(rs, i) - 48
+			var/c2 = text2ascii(rs, i + 1) - 48
+			var/c4 = text2ascii(rs, i + 3) - 48
+			var/oq = (text2ascii(rs, i + 2) - 48) | ((c4 & 3) << 6)
+			var/seg = text2ascii(rs, i + 4) - 48
+			var/top = (c1 >> 5) & 1
+			var/foot = (c2 >> 5) & 1
+			var/he = 0
+			if(foot)
+				he = min(ElevOrgApronH(top ? mtop : mat, T.x * 32 + (c1 & 31), oq), seg)
+			out += list(list(c1 & 31, c2 & 31, top, foot, he, seg, text2ascii(rs, i + 5) - 48, (c4 >> 2) & 3))
+	elevOrgFeetCache[ck] = out
+	return out
+
+/proc/ElevOrgContactImage(turf/G, L, sty, turf/S, list/pm, list/fx, list/fresh)
+	var/list/raw = null
+	for(var/ty = -1 to 1)
+		for(var/tx = -1 to 1)
+			var/turf/T = locate(G.x + tx, G.y + ty, G.z)
+			if(!T)
+				continue
+			var/list/ft = ElevOrgFeet(T, L, sty, S)
+			if(!ft || !ft.len)
+				continue
+			var/xo = tx * 32
+			var/yo = -ty * 32
+			var/mtop = ElevEdgeMat(ElevOrgMem(T, L) ? T : S)
+			for(var/list/f in ft)
+				var/he = f[5]
+				var/top = f[3]
+				if(he >= f[6] || !(f[7] & (1 << he)) || (!he && top))
+					continue
+				var/x = f[1] + xo
+				if(x < -2 || x > 33)
+					continue
+				var/y = f[2]
+				var/yb = y - he
+				if(yb + yo > 31 || yb + yo + 3 < 0)
+					continue
+				var/list/MR = ElevOrgMatInfo((he && top) ? mtop : ElevEdgeMat(ElevOrgRowTile(T, yb + 1)))
+				var/list/prof = MR[5] ? elevOrgContactShort : elevOrgContactLong
+				for(var/q = 0 to prof.len - 1)
+					var/yy = yb + q
+					if(yy == y && top)
+						break
+					if(yy > y + f[8])
+						break
+					var/Y = yy + yo
+					if(Y < 0 || Y > 31)
+						continue
+					if(!raw)
+						raw = new/list(1152)
+						for(var/i = 1 to 1152)
+							raw[i] = 0
+					var/k = Y * 36 + x + 3
+					if(raw[k] < prof[q + 1])
+						raw[k] = prof[q + 1]
+	if(!raw)
 		return
-	var/image/DI = image('Mapping/EdgeOrg/black.png')
-	DI.layer = base + 0.004
-	DI.alpha = max(0, min(255, round(51 * gs, 1)))
-	DI.filters = DF
-	fresh += DI
+	var/list/acc = new/list(1024)
+	for(var/i = 1 to 1024)
+		acc[i] = 0
+	var/any = 0
+	for(var/Y = 0 to 31)
+		for(var/xi = 1 to 36)
+			var/v = raw[Y * 36 + xi]
+			if(v <= 0)
+				continue
+			var/x = xi - 3
+			for(var/d = -2 to 2)
+				var/X = x + d
+				if(X < 0 || X > 31)
+					continue
+				acc[Y * 32 + X + 1] += v * elevOrgContactBlur[d + 3]
+				any = 1
+	if(!any)
+		return
+	var/list/holes = fx[1]
+	var/list/paint = fx[2]
+	var/list/MG = ElevOrgMatInfo(ElevEdgeMat(G))
+	var/list/cells = list()
+	for(var/Y = 0 to 31)
+		for(var/X = 0 to 31)
+			var/v = acc[Y * 32 + X + 1]
+			if(v <= 0)
+				continue
+			var/key = "[X],[Y]"
+			var/turf/PS = paint[key]
+			if(pm[Y * 32 + X + 1] && !PS && !holes[key])
+				continue
+			var/list/M = PS ? ElevOrgMatInfo(ElevEdgeMat(PS)) : MG
+			var/r = max(0, min(255, round(255 * (1 - v * M[10]) + 0.5)))
+			var/g = max(0, min(255, round(255 * (1 - v * M[11]) + 0.5)))
+			var/b = max(0, min(255, round(255 * (1 - v * M[12]) + 0.5)))
+			if(r >= 255 && g >= 255 && b >= 255)
+				continue
+			cells[key] = rgb(r, g, b)
+	if(!cells.len)
+		return
+	var/list/kp = list()
+	for(var/k in cells)
+		kp += "[k]=[cells[k]]"
+	var/ck = md5(jointext(kp, ";"))
+	var/res = elevOrgContactCache[ck]
+	if(!res)
+		var/icon/C = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+		for(var/k in cells)
+			var/cp = findtext(k, ",")
+			C.DrawBox(cells[k], text2num(copytext(k, 1, cp)) + 1, 32 - text2num(copytext(k, cp + 1)))
+		res = fcopy_rsc(C)
+		elevOrgContactCache[ck] = res
+	var/image/I = image(res)
+	I.layer = ElevLayer(L, 4) + 0.0001
+	I.blend_mode = BLEND_MULTIPLY
+	fresh += I
+
+/proc/ElevOrgBevCode(sty, mat)
+	switch(sty)
+		if("w")
+			return (mat == "snow") ? "n" : "g"
+		if("c")
+			return "d"
+		if("s")
+			return (mat == "ice") ? "i" : "a"
+		if("n")
+			return "n"
+		if("i")
+			return "i"
+	return null
+
+/proc/ElevOrgBevMat(bm)
+	switch(bm)
+		if("g")
+			return "grass"
+		if("n")
+			return "snow"
+		if("d")
+			return "dirt"
+		if("a")
+			return "sand"
+		if("i")
+			return "ice"
+	return "none"
+
+/proc/ElevOrgPal(turf/T)
+	if(!T)
+		return null
+	var/mat = ElevEdgeMat(T)
+	var/list/M = ElevOrgMatInfo(mat)
+	if(M[2] < 0)
+		return null
+	if(mat == "snow")
+		return list(M[13], M[14], M[15], M[16], M[17], M[18], M[2], M[3], M[4])
+	if(!T.icon)
+		return null
+	var/pk = "\ref[T.icon]|[T.icon_state]"
+	if(pk in elevOrgPalCache)
+		return elevOrgPalCache[pk]
+	var/list/P = ElevOrgPalDerive(icon(T.icon, T.icon_state, SOUTH, 1))
+	elevOrgPalCache[pk] = P
+	return P
+
+/proc/ElevOrgPalDerive(icon/I)
+	var/list/R = list()
+	var/list/Gn = list()
+	var/list/Bl = list()
+	var/list/Lv = list()
+	for(var/y = I.Height(), y >= 1, y--)
+		for(var/x = 1 to I.Width())
+			var/c = I.GetPixel(x, y)
+			if(!c)
+				continue
+			var/list/v = rgb2num(c)
+			if(v.len > 3 && v[4] <= 0)
+				continue
+			R += v[1]
+			Gn += v[2]
+			Bl += v[3]
+			Lv += 299 * v[1] + 587 * v[2] + 114 * v[3]
+	var/n = Lv.len
+	if(!n)
+		return null
+	var/mi = 1
+	for(var/i = 2 to n)
+		if(Lv[i] < Lv[mi])
+			mi = i
+	var/k = round(n * 95 / 100)
+	var/lo = 0
+	var/hi = 255000
+	while(lo < hi)
+		var/md = round((lo + hi) / 2)
+		var/cnt = 0
+		for(var/lv in Lv)
+			if(lv <= md)
+				cnt++
+		if(cnt > k)
+			hi = md
+		else
+			lo = md + 1
+	var/want = k
+	for(var/lv in Lv)
+		if(lv < lo)
+			want--
+	var/pi = 0
+	for(var/i = 1 to n)
+		if(Lv[i] == lo)
+			if(!want)
+				pi = i
+				break
+			want--
+	if(!pi)
+		return null
+	return list(min(255, R[pi] + 32), min(255, Gn[pi] + 32), min(255, Bl[pi] + 32), R[mi], Gn[mi], Bl[mi], round((R[mi] * 3 + 2) / 4), round((Gn[mi] * 3 + 2) / 4), round((Bl[mi] * 3 + 2) / 4))
+
+/proc/ElevOrgBevImage(turf/G, L, sty, turf/S, list/ctx, list/fresh)
+	if(!ctx)
+		return
+	var/turf/TT = ElevOrgMem(G, L) ? G : S
+	var/bm = ElevOrgBevCode(sty, ElevEdgeMat(TT))
+	if(!bm)
+		return
+	var/list/ids = ElevOrgBevId(ctx[6], sty, bm, ctx[7], ctx[8], ctx[9])
+	if(!ids || (!ids[1] && !ids[2]))
+		return
+	var/list/FM = ElevOrgMatInfo(ElevOrgBevMat(bm))
+	var/list/PT = ElevOrgPal(TT)
+	var/list/PG = ElevOrgPal(G)
+	var/hic = null
+	if(PT && PT[1] >= 0)
+		hic = rgb(PT[1], PT[2], PT[3])
+	else if(!PT && FM[13] >= 0)
+		hic = rgb(FM[13], FM[14], FM[15])
+	var/midc = PT ? rgb(PT[4], PT[5], PT[6]) : rgb(FM[16], FM[17], FM[18])
+	var/gsh = PG ? rgb(PG[7], PG[8], PG[9]) : (PT ? rgb(PT[7], PT[8], PT[9]) : rgb(FM[2], FM[3], FM[4]))
+	var/bk = "[sty][bm]|[ids[1]]|[ids[2]]|[hic]|[midc]|[gsh]"
+	var/res = elevOrgBevCache[bk]
+	if(!res)
+		var/icon/M = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+		if(ids[1] > 0)
+			if(hic)
+				var/icon/H = ElevOrgCellMask(elevOrgBev["[sty][bm]"], ids[1])
+				if(H)
+					H.Blend(hic, ICON_MULTIPLY)
+					M.Blend(H, ICON_OVERLAY)
+			var/icon/D = ElevOrgCellMask(elevOrgBevMid["[sty][bm]"], ids[1])
+			if(D)
+				D.Blend(midc, ICON_MULTIPLY)
+				M.Blend(D, ICON_OVERLAY)
+		if(ids[2] > 0)
+			var/icon/R = ElevOrgCellMask(elevOrgRing["[sty][bm]"], ids[2])
+			if(R)
+				R.Blend(gsh, ICON_MULTIPLY)
+				M.Blend(R, ICON_OVERLAY)
+		res = fcopy_rsc(M)
+		elevOrgBevCache[bk] = res
+	var/image/I = image(res)
+	I.layer = ElevLayer(L, 6)
+	fresh += I
 
 /proc/ElevOrgBuild(turf/G, list/fresh)
 	var/hg = ElevAt(G)
@@ -1983,6 +3852,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			ST.dir = G.dir
 			ST.layer = ElevLayer(ELEV_MAX, 9) + 0.0004
 			fresh += ST
+			ElevStairShade(G, ST.layer, fresh)
 		return
 	for(var/lk in levels)
 		ElevOrgLevel(G, text2num(lk), levels[lk], fresh)
@@ -2093,7 +3963,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/list/fresh = list()
 	var/h = ElevAt(T)
 	if(h > 0)
-		if(!ElevOrgStyle(T))
+		if(!ElevOrgStyle(T) && !ElevRoofTurf(T))
 			var/image/TI = image(ElevTexIcon(T, h), null, "")
 			TI.dir = T.dir
 			TI.layer = ELEV_TOP_LAYER
@@ -2112,6 +3982,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	ElevOrgBuild(T, fresh)
 	if(!fresh.len)
 		return
+	for(var/image/BI in fresh)
+		BuildBakeImage(BI)
 	T.overlays += fresh
 	T.elevOverlays = fresh
 

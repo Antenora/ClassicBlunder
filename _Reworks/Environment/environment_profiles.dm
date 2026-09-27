@@ -133,9 +133,9 @@ proc/EnvProfileForClient(client/C, area/A)
 		if(preview) return preview
 	return EnvProfile(A)
 
-proc/EnvWeatherWetness(area/A)
-	if(!A || !A.wx_kind) return 0
-	switch(A.wx_kind)
+proc/EnvWeatherWetness(wx)
+	if(!wx) return 0
+	switch(wx)
 		if("rain") return 0.65
 		if("storm") return 1
 		if("snow") return 0.25
@@ -156,27 +156,28 @@ globalTracker
 		WIND_WX_DUST = 2.6
 		WIND_WX_PRECIP = 1.35
 
-proc/EnvWeatherWindMult(area/A)
-	if(!A || !A.wx_kind || !glob) return 1
-	switch(A.wx_kind)
+proc/EnvWeatherWindMult(wx)
+	if(!wx || !glob) return 1
+	switch(wx)
 		if("storm") return glob.WIND_WX_STORM
 		if("blizzard") return glob.WIND_WX_BLIZZARD
 		if("dust") return glob.WIND_WX_DUST
 		if("rain", "snow") return glob.WIND_WX_PRECIP
 	return 1
 
-proc/EnvWindForArea(area/A, datum/environment_profile/prof)
+proc/EnvWindAt(turf/T, datum/environment_profile/prof)
 	if(glob && glob.WIND_OVERRIDE) return list(glob.WIND_MAN_X, glob.WIND_MAN_Y)
+	var/area/A = T ? T.loc : null
 	var/datum/environment_profile/P = prof ? prof : EnvProfile(A)
-	var/wx = EnvWeatherWindMult(A) * (glob ? glob.WIND_SCALE : 1) * (A ? A.zone_wind_mult : 1)
+	var/wx = EnvWeatherWindMult(WxKindAt(T)) * (glob ? glob.WIND_SCALE : 1) * (A ? A.zone_wind_mult : 1)
 	return list(P.wind_x * wx, P.wind_y * wx)
 
-proc/EnvAtmosphereFor(datum/environment_profile/P, area/A)
+proc/EnvAtmosphereFor(datum/environment_profile/P, wx)
 	var/color = P ? P.haze_color : "#d9e5ee"
 	var/alpha = P ? P.haze_alpha : 0
 	var/density = P ? P.haze_density : 0
-	if(A && A.wx_kind)
-		switch(A.wx_kind)
+	if(wx)
+		switch(wx)
 			if("rain")
 				color = DnLerp(color, "#aebfd2", 0.4)
 				alpha += 8
@@ -199,9 +200,9 @@ proc/EnvAtmosphereFor(datum/environment_profile/P, area/A)
 				density += 0.34
 	return list(color, clamp(alpha, 0, 72), clamp(density, 0, 1))
 
-proc/GfxConfigureAtmosphere(client/C, datum/environment_profile/P, area/A, transition_time = 10)
+proc/GfxConfigureAtmosphere(client/C, datum/environment_profile/P, weather, transition_time = 10)
 	if(!C || !C.gfx_haze_grade || !C.gfx_haze_emitter) return
-	var/list/H = EnvAtmosphereFor(P, A)
+	var/list/H = EnvAtmosphereFor(P, weather)
 	var/haze_color = H[1]
 	var/haze_alpha = H[2]
 	var/haze_density = H[3]
@@ -213,7 +214,7 @@ proc/GfxConfigureAtmosphere(client/C, datum/environment_profile/P, area/A, trans
 		C.gfx_haze_emitter.particles = new /particles/gfx_haze
 	var/cover_w = max(C.gfx_screen_cover_w, 34)
 	var/cover_h = max(C.gfx_screen_cover_h, 26)
-	var/key = "[P ? P.id : "default"]-[A ? A.wx_kind : null]-q[rank]-[cover_w]x[cover_h]"
+	var/key = "[P ? P.id : "default"]-[weather]-q[rank]-[cover_w]x[cover_h]"
 	var/particle_scale = 0
 	switch(rank)
 		if(GFX_QUALITY_MEDIUM) particle_scale = 0.45
@@ -248,18 +249,19 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	if(!C || !C.mob) return
 	var/turf/T = get_turf(C.mob)
 	var/area/A = T ? T.loc : null
+	var/wx = WxKindAt(T)
 	var/datum/environment_profile/P = EnvProfileForClient(C, A)
 	if(!P) return
-	var/list/wind = EnvWindForArea(A, P)
+	var/list/wind = EnvWindAt(T, P)
 	C.gfx_env_wind_x = wind[1]
 	C.gfx_env_wind_y = wind[2]
-	C.gfx_env_wetness = clamp(max(P.base_wetness, EnvWeatherWetness(A)), 0, 1)
+	C.gfx_env_wetness = clamp(max(P.base_wetness, EnvWeatherWetness(wx)), 0, 1)
 	C.gfx_env_bloom_bias = P.bloom_bias
 	var/qf = GfxQualityRank(C) == GFX_QUALITY_LOW ? 0.55 : 1
 	var/target_alpha = round(P.grade_alpha * qf)
 	var/grade_color = P.grade_color
-	if(A && A.wx_kind)
-		switch(A.wx_kind)
+	if(wx)
+		switch(wx)
 			if("storm")
 				grade_color = DnLerp(grade_color, "#9aaac8", 0.42)
 				target_alpha = min(90, target_alpha + 18)
@@ -271,7 +273,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	var/time = immediate ? 0 : 10
 	if(Hd2dWorldBloomOn(C)) _Hd2dScanIndoor(C)
 	var/lightclass = !A ? "none" : A.sees_sky ? "sky" : A.dark_cave ? "cave" : "bright"
-	var/profile_key = "[P.id]-[A ? A.wx_kind : null]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]-[lightclass]"
+	var/profile_key = "[P.id]-[wx]-q[GfxQualityRank(C)]-preview[C.gfx_env_preview_id]-[lightclass]"
 	if(C.gfx_env_profile_id != profile_key)
 		C.gfx_env_profile_id = profile_key
 		animate(C.gfx_env_grade, color = grade_color, alpha = target_alpha, time = time)
@@ -283,8 +285,8 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 			Hd2dGradeShift(C, immediate ? 0 : 40)
 	var/wet_alpha = GfxReflectionEnabled(C) ? round(C.gfx_env_wetness * 10) : 0
 	animate(C.gfx_wet_sheen, alpha = wet_alpha, time = time)
-	GfxConfigureAtmosphere(C, P, A, time)
-	GfxApplyReflectionPass(C, A)
+	GfxConfigureAtmosphere(C, P, wx, time)
+	GfxApplyReflectionPass(C, T)
 	GfxUpdateMoonlight(C, A, time)
 	_Hd2dAmbientApply(C, P, A)
 	Hd2dBloomRefresh(C) 
@@ -315,8 +317,8 @@ proc/_EnvProfileLoop()
 	var/turf/T = get_turf(src)
 	var/area/A = T ? T.loc : null
 	var/datum/environment_profile/P = EnvProfileForClient(client, A)
-	var/list/W = EnvWindForArea(A)
-	src << "Area [A ? A.name : "none"] uses profile [P.display_name] ([P.id]); wind [round(W[1], 0.1)], [round(W[2], 0.1)], wetness [round(max(P.base_wetness, EnvWeatherWetness(A)), 0.01)], haze [P.haze_alpha]/[round(P.haze_density, 0.01)]."
+	var/list/W = EnvWindAt(T)
+	src << "Area [A ? A.name : "none"] uses profile [P.display_name] ([P.id]); wind [round(W[1], 0.1)], [round(W[2], 0.1)], wetness [round(max(P.base_wetness, EnvWeatherWetness(WxKindAt(T))), 0.01)], haze [P.haze_alpha]/[round(P.haze_density, 0.01)]."
 	src << "DN: sees_sky [A ? A.sees_sky : "?"] | dn_indoor [A ? A.dn_indoor : "?"] | dark_cave [A ? A.dark_cave : "?"] | icon [A && A.icon ? "[A.icon]" : "none"] | color [A ? A.color : "?"] | bloom_t [client ? client.hd2d_bloom_t : "?"] (0 = off) | indoor_seen [client ? client.hd2d_indoor_seen : "?"] sky_seen [client ? client.hd2d_sky_seen : "?"] shaft_add [client ? client.hd2d_shaft_add : "?"]"
 
 /mob/Admin2/verb/Set_Area_Environment_Profile()
@@ -380,8 +382,8 @@ proc/EnvWindRefresh()
 	for(var/client/C)
 		EnvUpdateClient(C, TRUE)
 
-proc/EnvWindReport(area/A)
-	var/list/W = EnvWindForArea(A)
+proc/EnvWindReport(turf/T)
+	var/list/W = EnvWindAt(T)
 	var/mag = sqrt(W[1] * W[1] + W[2] * W[2])
 	var/dir = mag > 0.001 ? round(arctan(W[1], W[2])) : 0
 	return "strength [round(mag, 0.01)] dir [dir]deg (x [round(W[1], 0.01)], y [round(W[2], 0.01)])"
@@ -393,7 +395,7 @@ proc/EnvWindReport(area/A)
 	var/area/A = T ? T.loc : null
 	var/list/opts = list("Global scale", "Sway amplitude", "Manual wind (override)",
 	                     "Clear override (back to auto)", "Weather multipliers", "Show current wind")
-	var/pick = Ask(src, "Wind here: [EnvWindReport(A)]", "", null, "pick", opts, 1)
+	var/pick = Ask(src, "Wind here: [EnvWindReport(T)]", "", null, "pick", opts, 1)
 	if(!pick) return
 	switch(pick)
 		if("Global scale")
@@ -415,10 +417,10 @@ proc/EnvWindReport(area/A)
 			glob.WIND_MAN_X = mag * cos(dir)
 			glob.WIND_MAN_Y = mag * sin(dir)
 			glob.WIND_OVERRIDE = 1
-			src << "Manual wind ON: [EnvWindReport(A)]."
+			src << "Manual wind ON: [EnvWindReport(T)]."
 		if("Clear override (back to auto)")
 			glob.WIND_OVERRIDE = 0
-			src << "Manual wind OFF - profile + weather again: [EnvWindReport(A)]."
+			src << "Manual wind OFF - profile + weather again: [EnvWindReport(T)]."
 		if("Weather multipliers")
 			var/k = Ask(src, "Which weather?", "", null, "pick", list("storm", "blizzard", "dust", "rain/snow"), 1)
 			if(!k) return
@@ -434,7 +436,7 @@ proc/EnvWindReport(area/A)
 				else glob.WIND_WX_PRECIP = v
 			src << "[k] wind multiplier -> [v]."
 		if("Show current wind")
-			src << "Area [A ? A.name : "?"] ([A ? (A.wx_kind || "clear") : "?"]): [EnvWindReport(A)]"
+			src << "Area [A ? A.name : "?"] ([A ? (WxKindAt(T) || "clear") : "?"]): [EnvWindReport(T)]"
 			src << "scale [glob.WIND_SCALE] | override [glob.WIND_OVERRIDE ? "ON" : "off"] | storm [glob.WIND_WX_STORM] blizzard [glob.WIND_WX_BLIZZARD] dust [glob.WIND_WX_DUST] rain/snow [glob.WIND_WX_PRECIP]"
 			return
 	EnvWindRefresh()

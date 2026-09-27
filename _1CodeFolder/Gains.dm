@@ -371,7 +371,8 @@ mob
 		if(client && client.getPref("autoAttacking"))
 			var/mob/Players/p = src
 			if(world.time - lastHit < 3 MINUTES)
-				p.Attack()
+				if(!p.EquippedGun())
+					p.Attack()
 			else
 				p.Auto_Attack()
 		StunCheck(src)
@@ -1029,7 +1030,7 @@ mob
 
 			if(src.BPPoisonTimer)
 				src.BPPoisonTimer--
-				if(src.Satiated&&!Drunk)
+				if(src.Satiated)
 					src.BPPoisonTimer--
 				if(src.BPPoisonTimer<=0)
 					if(src.BPPoison==0.5)
@@ -1043,7 +1044,7 @@ mob
 						src.BPPoisonTimer=0
 			if(src.OverClockNerf)
 				src.OverClockTime--
-				if(src.Satiated&&!Drunk)
+				if(src.Satiated)
 					src.OverClockTime--
 				if(src.OverClockTime<=0)
 					src.OverClockTime=0
@@ -1055,7 +1056,7 @@ mob
 			if(src.GatesNerfPerc)
 				if(src.GatesNerf>0)
 					src.GatesNerf--
-					if(src.Satiated&&!Drunk)
+					if(src.Satiated)
 						src.GatesNerf--
 					if(src.GatesNerf<=0)
 						src.GatesNerfPerc=0
@@ -1121,9 +1122,6 @@ mob
 				src.Satiated--
 				if(src.Satiated<=0)
 					src.Satiated=0
-					if(src.Drunk)
-						src.Drunk=0
-						src << "You recover from your drunkenness."
 					src << "You feel less full."
 			/*
 			if(src.Aged)

@@ -114,13 +114,65 @@ proc/RegisterFarmCrops()
 /obj/Items/Material/Crop/watermelon { name = "Watermelon"; MaterialClass = "Watermelon"; icon_state = "watermelon"; tier = 5 }
 /obj/Items/Material/Crop/grapes { name = "Blue Grapes"; MaterialClass = "BlueGrapes"; icon_state = "grapes"; tier = 5 }
 /obj/Items/Material/Crop/artichoke { name = "Artichoke"; MaterialClass = "Artichoke"; icon_state = "artichoke"; tier = 5 }
-/obj/Items/Material/Crop/senzubean { name = "Senzu Bean"; MaterialClass = "SenzuBean"; icon_state = "artichoke"; tier = 5 }
+/obj/Items/Material/Crop/senzu { name = "Senzu Bean"; MaterialClass = "SenzuBean"; icon_state = "artichoke"; tier = 5 }
 
 /obj/Items/Material/Crop/giant_cabbage { name = "Giant Cabbage"; MaterialClass = "GiantCabbage"; icon_state = "cabbage"; tier = 5 }
 /obj/Items/Material/Crop/giant_cucumber { name = "Giant Cucumber"; MaterialClass = "GiantCucumber"; icon_state = "cucumber"; tier = 5 }
 /obj/Items/Material/Crop/giant_pumpkin { name = "Giant Pumpkin"; MaterialClass = "GiantPumpkin"; icon_state = "pumpkin"; tier = 5 }
 /obj/Items/Material/Crop/giant_tomato { name = "Giant Tomato"; MaterialClass = "GiantTomato"; icon_state = "tomato"; tier = 5 }
 /obj/Items/Material/Crop/giant_zucchini { name = "Giant Zucchini"; MaterialClass = "GiantZucchini"; icon_state = "zucchini"; tier = 5 }
+
+/obj/Items/Edibles/Senzu
+	icon = 'Senzu.dmi'
+	icon_state = ""
+	Pickable = 1
+	Click()
+		if(!(usr in oview(1,src))&&!(src in usr))
+			return
+		var/RacialHunger=1
+		if(usr.race in list(SAIYAN))
+			RacialHunger=5
+		if(usr.race in list(MAJIN,WILDER,DEMON))
+			RacialHunger=20
+		if(usr.EnhancedSmell)
+			RacialHunger*=2
+		if(usr.Satiated>=4000*RacialHunger)
+			usr << "You are completely full!"
+			return
+		OMsg(usr, "eats the bean; its rejuvenating power heals them fully!")
+		usr.Satiated+=6000
+		usr.HealWounds(12)
+		usr.HealFatigue(12)
+		usr.Sheared=0
+		usr.TotalInjury=0
+		usr.TotalFatigue=0
+		usr.TotalCapacity=0
+		usr.HealHealth(100)
+		usr.HealEnergy(100)
+		usr.HealMana(100)
+		usr.StrTax=0
+		usr.ForTax=0
+		usr.EndTax=0
+		usr.SpdTax=0
+		usr.OffTax=0
+		usr.DefTax=0
+		usr.HealthCut=0
+		if(usr.GatesNerf)
+			usr.GatesNerf=1
+		if(usr.OverClockTime)
+			usr.OverClockTime=1
+		if(usr.BPPoison<1)
+			usr.BPPoison=1
+			usr.BPPoisonTimer=0
+		if(usr.Maimed)
+			usr.MaimPeel()
+			usr << "You recover from a maiming!"
+		if(usr.SenseRobbed)
+			if(usr.SenseRobbed>=5)
+				animate(usr.client, color=null, time=1)
+			usr.SenseRobbed=0
+			usr << "You regain lost senses!"
+		del(src)
 
 // farm tools
 
@@ -382,6 +434,7 @@ mob/proc/HarvestPlot(obj/LifeSkills/FarmPlot/P)
 	var/rank = LifeRank("Farming")
 	var/datum/life_opp/o = LifeOppRoll("Farming", d.tier, null, QUAL_NORMAL, "farm_mod")
 	var/amt = rand(3, 5) + round(rank / 3)
+	amt = LifeBonusRound(amt * LifeYieldMult("Farming"))
 	if(prob(2 + rank))
 		amt *= 2
 		src << "<font color=#78eb78>A bumper crop!</font>"

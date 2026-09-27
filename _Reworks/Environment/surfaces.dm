@@ -347,6 +347,17 @@ proc/SurfaceApply(atom/A)
 		if(M.gfx_wind_response <= 0)
 			M.gfx_wind_response = w
 			GfxRefreshStructureMetadata(M)
+	else if(istype(A, /atom/movable) && A.gfx_wind_response > 0)
+		var/atom/movable/S = A
+		S.gfx_wind_response = 0
+		S.gfx_wind_loop_id++
+		S.gfx_wind_loop_key = null
+		animate(S)
+		S.transform = S.gfx_wind_base_transform
+		for(var/atom/movable/V in S.vis_contents)
+			if(V == S.gfx_canopy_obj || V == S.gfx_canopy_shaft_obj) continue
+			animate(V)
+			V.transform = null
 	if(istype(A, /atom/movable))
 		GfxApplyForegroundRole(A) //canopy profile on/off -> FOREGROUND_PLANE routing
 	var/lt = A.sp_light_type
@@ -839,6 +850,7 @@ obj/KatieObj/Wall_Obj
 		surface_profile = "light_source"
 		sp_light_type = "torch"
 		sp_light_off_y = -9
+	WallPaperFlower/surface_profile = "prop_medium"
 
 obj/KatieObj/Door_Obj
 	Door_2/surface_profile = "wall_mounted"
@@ -964,6 +976,15 @@ obj/Turfs
 	Plant10/surface_profile = "prop_low" //actually a rock
 	Plant11/surface_profile = "prop_medium" //potted plant - prop, not foliage
 	Plant12/surface_profile = "prop_medium" //potted plant - prop, not foliage
+	Plant14/surface_profile = "tree"
+	Plant18/surface_profile = "tree"
+	Plant19/surface_profile = "prop_low"
+	Plant2/surface_profile = "prop_medium"
+	Plant20/surface_profile = "prop_low"
+	Plant6/surface_profile = "prop_low"
+	Plant7/surface_profile = "tree"
+	Plant8/surface_profile = "tree"
+	Plant9/surface_profile = "tree"
 	SignTech1/surface_profile = "emissive_hazard" //emissive, flat
 	SignTech2/surface_profile = "emissive_hazard" //emissive, flat
 	Surf/surface_profile = "edge_tile" //water edge; water-like but NO sparkles - too small
@@ -1100,8 +1121,8 @@ obj/Turfs/Surf
 		var/sp = M.icon ? SurfaceCanopySplit(M.icon, M.icon_state) : 0
 		src << "canopy: not split ([sp ? "split row [sp] available - call SurfaceSplitCanopy" : "no usable trunk found in sprite"]); pivot [SurfaceWindPivot(M)]"
 	var/turf/T = get_turf(M)
-	var/list/W = EnvWindForArea(T ? T.loc : null)
-	src << "wind here: [EnvWindReport(T ? T.loc : null)] | amplitude [glob.WIND_AMPLITUDE]"
+	var/list/W = EnvWindAt(T)
+	src << "wind here: [EnvWindReport(T)] | amplitude [glob.WIND_AMPLITUDE]"
 	if(!W[1] && !W[2]) src << "WIND IS ZERO in this area - profile wind_x/y are 0."
 	//every sprite-copy that could render a second tree, and whether it is being swayed
 	src << "--- vis_contents ([M.vis_contents ? M.vis_contents.len : 0]) ---"

@@ -208,7 +208,7 @@ client/proc/FacePageShow()
 	src << browse(FacePageHTML(), "window=[FACEPAGE_CTL]")
 	facepage_open = 1
 	FacePagePlace()
-	winset(src, FACEPAGE_CTL, "is-visible=true")
+	WebOverlayShow(FACEPAGE_CTL)
 
 client/proc/FacePageHide()
 	facepage_open = 0
@@ -384,7 +384,7 @@ client/proc/SignReaderOpen(atom/S)
 		SignPagePush()
 	signpage_open = 1
 	SignPagePlace()
-	winset(src, SIGNPAGE_CTL, "is-visible=true;focus=true")
+	WebOverlayShow(SIGNPAGE_CTL, "is-visible=true;focus=true")
 
 client/proc/SignReaderClose()
 	if(!signpage_open)

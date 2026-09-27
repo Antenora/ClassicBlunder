@@ -92,7 +92,15 @@ mob
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
 
+		MechNoWounds()
+			return 0
+		MechEject()
+			return
+		MechStatMult(stat)
+			return 1
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
+			if(defender.MechNoWounds())
+				return
 			val = defender.HPToPct(val)
 			if(defender.CyberCancel)
 				val*=(1-defender.CyberCancel)
@@ -130,6 +138,8 @@ mob
 				defender.TotalInjury=99
 			defender.MaxHealth()
 		WoundSelf(var/val)
+			if(val > 0 && MechNoWounds())
+				return
 			if(src.BioArmor && val != 0)
 				src.DamageSelf(val)
 				return
@@ -145,6 +155,10 @@ mob
 				TotalInjury = 0
 			src.MaxHealth()
 		LoseHealth(var/val)
+			if(mech && Health - val <= 0)
+				Health = 0
+				MechEject()
+				return
 			src.Health-=val
 			src.MaxHealth()
 			var/Absorb = passive_handler.Get("AbsorbingDamage")
@@ -332,12 +346,12 @@ mob
 			src.Health+=src.PctToHP(pct)
 		MaxHealth()
 			var/HasWounds=1
-			if(src.HasUnstoppable())
+			if(src.HasUnstoppable() || mech)
 				HasWounds=0
 			var/KeyHealth=src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)
 			var/Sub
 			var/Cut
-			if(src.HealthCut)
+			if(src.HealthCut && !mech)
 				Sub=KeyHealth*src.HealthCut
 				Cut=KeyHealth-Sub
 				if(src.Health > Cut)
@@ -352,6 +366,7 @@ mob
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
 			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
 			if(src.EnergyCut)
@@ -368,6 +383,7 @@ mob
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
 			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
 			if(src.EnergyCut)
@@ -431,7 +447,7 @@ mob
 			SubEndTax(100);
 			AddEndCut(-100);
 			SubSpdTax(100);
-			AddSpdTax(-100);
+			AddSpdCut(-100);
 			SubForTax(100);
 			AddForCut(-100);
 			SubOffTax(100);
@@ -480,7 +496,7 @@ mob
 					return
 			StrTax = clamp(StrTax+Val, 0, 1);
 		SubStrTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			StrTax = clamp(StrTax-Val, 0, 1);
 		AddStrCut(Val)
@@ -493,7 +509,7 @@ mob
 					return
 			EndTax=clamp(EndTax+Val, 0, 1);
 		SubEndTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			EndTax=clamp(EndTax-Val, 0, 1);
 		AddEndCut(Val)
@@ -506,7 +522,7 @@ mob
 					return
 			SpdTax=clamp(SpdTax+Val, 0, 1);
 		SubSpdTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			SpdTax=clamp(SpdTax-Val, 0, 1)
 		AddSpdCut(Val)
@@ -519,7 +535,7 @@ mob
 					return
 			ForTax=clamp(ForTax+Val, 0, 1);
 		SubForTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			ForTax=clamp(ForTax-Val, 0, 1);
 		AddForCut(Val)
@@ -532,7 +548,7 @@ mob
 					return
 			OffTax=clamp(OffTax+Val, 0, 1);
 		SubOffTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			OffTax=clamp(OffTax-Val, 0, 1);
 		AddOffCut(Val)
@@ -545,7 +561,7 @@ mob
 					return
 			DefTax=clamp(DefTax+Val, 0, 1);
 		SubDefTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			DefTax=clamp(DefTax-Val, 0, 1);
 		AddDefCut(Val)
@@ -558,7 +574,7 @@ mob
 					return
 			RecovTax = clamp(RecovTax+Val, 0, 1);
 		SubRecovTax(var/Val, var/Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			RecovTax = clamp(RecovTax-Val, 0, 1);
 		AddRecovCut(var/Val)
@@ -908,6 +924,7 @@ mob
 
 
 		GetStr(var/Mult=1)
+			if(mech) return max(0.1, StrReplace * Mult * MechStatMult("Str"))
 			var/Str=src.StrMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -943,8 +960,6 @@ mob
 			//gain double value when Overdive is active, unless the user is Android (then only +50%)
 			Str*=src.StrChaos
 			//tarot shit
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Str = getMechStat(findMecha(), Str)
 			if(src.StrReplace)
 				Str=StrReplace
 			//when you want to ignore all of the above for some reason
@@ -1066,6 +1081,7 @@ mob
 			Str*=STM
 			Str*=Mod
 			Str*=Mult
+			Str*=MaimMult("Str")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Str=src.Target.GetStr()
@@ -1093,6 +1109,7 @@ mob
 			return Str
 
 		GetFor(var/Mult=1)
+			if(mech) return max(0.1, ForReplace * Mult * MechStatMult("For"))
 			var/For=src.ForMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1142,8 +1159,6 @@ mob
 				For += (zenkaiPower/2) * For
 			else
 				For += (0.2 * zenkaiPower) * For
-			if(passive_handler.Get("Piloting")&&findMecha())
-				For = getMechStat(findMecha(), For)
 
 
 			var/Mod=1
@@ -1245,6 +1260,7 @@ mob
 			For*=FTM
 			For*=Mod
 			For*=Mult
+			For*=MaimMult("For")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					For=src.Target.GetFor()
@@ -1275,6 +1291,7 @@ mob
 			return For
 
 		GetEnd(var/Mult=1)
+			if(mech) return max(0.1, EndReplace * Mult * MechStatMult("End"))
 			var/End=src.EndMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1307,8 +1324,6 @@ mob
 			End*=src.EndChaos
 			if(src.EndReplace)
 				End=EndReplace
-			if(passive_handler.Get("Piloting")&&findMecha())
-				End = getMechStat(findMecha(), End)
 
 			if(CheckSlotless("The Grit") && (Anger||HasCalmAnger()))
 				End += End * (glob.DEMONIC_DURA_BASE)
@@ -1409,6 +1424,7 @@ mob
 			End*=ETM
 			End*=Mod
 			End*=Mult
+			End*=MaimMult("End")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					End=src.Target.GetEnd()
@@ -1436,6 +1452,7 @@ mob
 			return End
 
 		GetSpd(Mult=1)
+			if(mech) return max(0.1, SpdReplace * Mult * MechStatMult("Spd"))
 			var/Spd=src.SpdMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1469,8 +1486,6 @@ mob
 
 			if(src.SpdReplace)
 				Spd=SpdReplace
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Spd = getMechStat(findMecha(), Spd)
 			Spd+=SpdAdded
 			if(passive_handler.Get("WarmingUp")) Spd += WarmingUpBonus
 			Spd+=src.GetEquippedWeaponStatAdd("Spd")
@@ -1551,6 +1566,7 @@ mob
 			Spd*=SpTM
 			Spd*=Mod
 			Spd*=Mult
+			Spd*=MaimMult("Spd")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Spd=src.Target.GetSpd()
@@ -1581,6 +1597,7 @@ mob
 			return Spd
 
 		GetOff(var/Mult=1)
+			if(mech) return max(0.1, OffReplace * Mult * MechStatMult("Off"))
 			var/Off=src.OffMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1611,8 +1628,6 @@ mob
 			var/enhanced = getEnhanced("Aggression")
 			Off+=EnhancedAggression ? enhanced : 0
 			Off*=src.OffChaos
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Off = getMechStat(findMecha(), Off)
 			Off+=OffAdded
 			if(passive_handler.Get("WarmingUp")) Off += WarmingUpBonus
 			Off+=src.GetEquippedWeaponStatAdd("Off")
@@ -1673,6 +1688,7 @@ mob
 			Off*=OTM
 			Off*=Mod
 			Off*=Mult
+			Off*=MaimMult("Off")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Off=src.Target.GetOff()
@@ -1703,6 +1719,7 @@ mob
 			return Off
 
 		GetDef(var/Mult=1)
+			if(mech) return max(0.1, DefReplace * Mult * MechStatMult("Def"))
 			var/Def=src.DefMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1733,11 +1750,6 @@ mob
 			var/enhanced = getEnhanced("Reflexes")
 			Def+=EnhancedReflexes ? enhanced : 0
 			Def*=src.DefChaos
-			if(passive_handler.Get("Piloting")&&findMecha())
-				if(PilotingProwess>=7)
-					Def = getMechStat(findMecha(), Def) * 0.25
-				else
-					Def = 0.25
 
 
 			Def+=DefAdded
@@ -1794,6 +1806,7 @@ mob
 			Def*=DTM
 			Def*=Mod
 			Def*=Mult
+			Def*=MaimMult("Def")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Def=src.Target.GetDef()
@@ -1824,6 +1837,7 @@ mob
 			return Def
 
 		GetVit(var/Mult=1)
+			if(mech) return max(0.1, VitReplace * Mult * MechStatMult("Vit"))
 			var/Vit=src.BaseVit()
 			if(passive_handler.Get("Vigor"))
 				Vit+= passive_handler.Get("Vigor")
@@ -2500,64 +2514,6 @@ mob
 		AddItem(var/obj/Items/I, var/AlreadyHere=0)
 			if(!AlreadyHere)
 				GiveOrDrop(I)   // full category drops it at their feet instead of vanishing over the cap
-		AddUnlockedTechnology(var/x)
-			if(x in list("Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing"))
-				src.ForgingUnlocked++
-				if(ForgingUnlocked>=5)
-					src.ForgingUnlocked=5
-			if(x in list("Molecular Technology", "Light Alloys", "Shock Absorbers", "Advanced Plating", "Modular Weaponry"))
-				src.RepairAndConversionUnlocked++
-				if(RepairAndConversionUnlocked>=5)
-					src.RepairAndConversionUnlocked=5
-			if(x in list("Medkits", "Fast Acting Medicine", "Enhancers", "Anesthetics", "Automated Dispensers"))
-				src.MedicineUnlocked++
-				if(MedicineUnlocked>=5)
-					src.MedicineUnlocked=5
-			if(x in list("Regenerator Tanks", "Prosthetic Limbs", "Genetic Manipulation", "Regenerative Medicine", "Revival Protocol"))
-				src.ImprovedMedicalTechnologyUnlocked++
-				if(ImprovedMedicalTechnologyUnlocked>=5)
-					src.ImprovedMedicalTechnologyUnlocked=5
-			if(x in list("Wide Area Transmissions", "Espionage Equipment", "Surveilance", "Drones", "Local Range Devices"))
-				src.TelecommunicationsUnlocked++
-				if(TelecommunicationsUnlocked>=5)
-					src.TelecommunicationsUnlocked=5
-			if(x in list("Scouters", "Obfuscation Equipment", "Satellite Surveilance", "Combat Scanning", "EM Wave Projectors"))
-				src.AdvancedTransmissionTechnologyUnlocked++
-				if(AdvancedTransmissionTechnologyUnlocked>=5)
-					src.AdvancedTransmissionTechnologyUnlocked=5
-			if(x in list("Hazard Suits", "Force Shielding", "Jet Propulsion", "Power Generators"))
-				src.EngineeringUnlocked++
-				if(EngineeringUnlocked>=5)
-					src.EngineeringUnlocked=5
-			if(x in list("Android Creation", "Conversion Modules", "Enhancement Chips", "Involuntary Implantation"))
-				src.CyberEngineeringUnlocked++
-				if(CyberEngineeringUnlocked>=5)
-					src.CyberEngineeringUnlocked=5
-			if(x in list("Assault Weaponry", "Missile Weaponry", "Melee Weaponry", "Thermal Weaponry", "Blast Shielding"))
-				src.MilitaryTechnologyUnlocked++
-				if(MilitaryTechnologyUnlocked>=5)
-					src.MilitaryTechnologyUnlocked=5
-			if(x in list("Powered Armor Specialization", "Armorpiercing Weaponry", "Impact Weaponry", "Hydraulic Weaponry"))
-				src.MilitaryEngineeringUnlocked++
-				if(MilitaryEngineeringUnlocked>=5)
-					src.MilitaryEngineeringUnlocked=5
-
-			if(x in list("Healing Herbs", "Refreshment Herbs", "Magic Herbs", "Toxic Herbs", "Philter Herbs"))
-				src.AlchemyUnlocked++
-			if(x in list("Stimulant Herbs", "Relaxant Herbs", "Numbing Herbs", "Distillation Process", "Mutagenic Herbs"))
-				src.ImprovedAlchemyUnlocked++
-			if(x in list("Spell Focii", "Artifact Manufacturing", "Magical Communication", "Magical Vehicles", "Warding Glyphs"))
-				src.ToolEnchantmentUnlocked++
-			if(x in list("Tome Cleansing", "Tome Security", "Tome Translation", "Tome Binding", "Tome Excerpts"))
-				src.TomeCreationUnlocked++
-			if(x in list("Turf Sealing", "Object Sealing", "Power Sealing", "Mobility Sealing", "Command Sealing"))
-				src.SealingMagicUnlocked++
-			if(x in list("Teleportation", "Retrieval", "Bilocation", "Dimensional Manipulation", "Dimensional Restriction"))
-				src.SpaceMagicUnlocked++
-			if(x in list("Transmigration", "Lifespan Extension", "Temporal Displacement", "Temporal Acceleration", "Temporal Rewinding"))
-				src.TimeMagicUnlocked++
-
-			src.knowledgeTracker.learnedKnowledge.Add(x)
 
 		MakeWarper(var/_x, var/_y, var/_z)
 			var/obj/Special/Teleporter2/q=new(src.loc)

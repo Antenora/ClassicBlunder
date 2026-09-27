@@ -3,7 +3,7 @@
 /obj/Items/Gear/var/Improvements = 0
 /obj/Items/Gear/Lightsaber
 	var/lightSaberColorChoice = "Blue"
-	TechType="MilitaryTechnology"
+	TechType="Military Technology"
 	SubType="Melee Weaponry"
 	icon='ProgressiveHilt.dmi'
 	pixel_x=-32

@@ -274,7 +274,7 @@ var/global/list/buildOrgSheets
 /proc/BuildOrgSheetY(cell)
 	return 240 - 32 * round(cell / 32)
 
-/proc/BuildOrgMask(cfg, xm, baseMat, wx, wy, inv = 0)
+/proc/BuildOrgMaskSpec(cfg, xm, baseMat, wx, wy, inv = 0)
 	BuildOrgSheetInit()
 	var/cbit = (cfg & 256) ? 1 : 0
 	if(xm == "Wood" || baseMat == "Wood")
@@ -286,7 +286,10 @@ var/global/list/buildOrgSheets
 		sheet = buildOrgSheets["[BuildOrgStyleCode(baseMat)][wx][wy]"]
 	if(!sheet)
 		return inv ? !cbit : cbit
-	return filter(type = "alpha", icon = sheet, x = BuildOrgSheetX(cfg), y = BuildOrgSheetY(cfg), flags = inv ? MASK_INVERSE : 0)
+	return list(sheet, cfg, inv)
+
+/proc/BuildOrgSpecFilter(list/s)
+	return filter(type = "alpha", icon = s[1], x = BuildOrgSheetX(s[2]), y = BuildOrgSheetY(s[2]), flags = s[3] ? MASK_INVERSE : 0)
 
 /proc/BuildOrgConfig(X, own, list/nb)
 	var/cbit = (own >= X) ? 1 : 0
@@ -298,11 +301,11 @@ var/global/list/buildOrgSheets
 			cfg |= (1 << (i - 1))
 	return cfg
 
-/proc/BuildOrgMaskFor(X, xm, own, list/nb, baseMat, wx, wy, inv = 0)
+/proc/BuildOrgSpecFor(X, xm, own, list/nb, baseMat, wx, wy, inv = 0)
 	if(xm == "Wood")
 		var/c = (own == X) ? 1 : 0
 		return inv ? !c : c
-	return BuildOrgMask(BuildOrgConfig(X, own, nb), xm, baseMat, wx, wy, inv)
+	return BuildOrgMaskSpec(BuildOrgConfig(X, own, nb), xm, baseMat, wx, wy, inv)
 
 /proc/BuildEdgeImage(turf/S)
 	var/eh = ElevAt(S)
@@ -337,45 +340,520 @@ var/global/list/buildOrgSheets
 		order.Insert(k, id)
 	return order
 
-/proc/BuildOrgGround(turf/T, m, th, doBlend, list/fresh)
+/proc/BuildOrgStack(turf/T, m, th, doBlend)
 	var/list/present = list()
 	var/list/srcs = list()
 	var/list/nb = new/list(8)
 	var/own = BuildOrgLayers(T, m, th, doBlend, present, srcs, nb)
 	if(present.len < 2)
-		return
+		return null
 	var/list/order = BuildOrgOrder(present)
 	var/baseMat = present[order[1]]
 	var/wx = BuildOrgWindowX(T)
 	var/wy = BuildOrgWindowY(T)
 	var/ownIdx = order.Find(own)
+	var/list/entries = list()
 	if(ownIdx > 1)
-		var/ownInv = BuildOrgMaskFor(own, m, own, nb, baseMat, wx, wy, 1)
+		var/ownInv = BuildOrgSpecFor(own, m, own, nb, baseMat, wx, wy, 1)
 		if(!isnum(ownInv) || ownInv)
 			for(var/k = 1 to ownIdx - 1)
 				var/L = order[k]
-				var/image/PI = BuildEdgeImage(srcs[L])
+				var/list/specs = list()
 				if(k > 1)
-					var/LM = BuildOrgMaskFor(L, present[L], own, nb, baseMat, wx, wy, 0)
+					var/LM = BuildOrgSpecFor(L, present[L], own, nb, baseMat, wx, wy, 0)
 					if(isnum(LM))
 						if(!LM)
 							continue
 					else
-						PI.filters += LM
+						specs[++specs.len] = LM
 				if(!isnum(ownInv))
-					PI.filters += BuildOrgMaskFor(own, m, own, nb, baseMat, wx, wy, 1)
-				fresh += PI
+					specs[++specs.len] = ownInv
+				entries[++entries.len] = list(L, srcs[L], specs)
 	for(var/k = ownIdx + 1 to order.len)
 		var/M = order[k]
-		var/MM = BuildOrgMaskFor(M, present[M], own, nb, baseMat, wx, wy, 0)
+		var/MM = BuildOrgSpecFor(M, present[M], own, nb, baseMat, wx, wy, 0)
+		var/list/specs = list()
 		if(isnum(MM))
 			if(!MM)
 				continue
-			fresh += BuildEdgeImage(srcs[M])
+		else
+			specs[++specs.len] = MM
+		entries[++entries.len] = list(M, srcs[M], specs)
+	return list(own, entries)
+
+/proc/BuildOrgGround(turf/T, m, th, doBlend, list/fresh)
+	var/list/S = BuildOrgStack(T, m, th, doBlend)
+	if(!S)
+		return
+	var/list/entries = S[2]
+	var/list/ov = buildOrgOverride ? buildOrgOverride[T] : null
+	for(var/i = 1 to entries.len)
+		var/list/e = entries[i]
+		if(ov)
+			var/image/BI = BuildOrgBitsImage(e[2], ov, i)
+			if(BI)
+				fresh += BI
 			continue
-		var/image/HI = BuildEdgeImage(srcs[M])
-		HI.filters += MM
-		fresh += HI
+		var/image/PI = BuildEdgeImage(e[2])
+		for(var/list/sp in e[3])
+			PI.filters += BuildOrgSpecFilter(sp)
+		fresh += PI
+
+var/global/list/buildOrgBitsCache = list()
+var/global/list/buildOrgMaskIconCache = list()
+var/global/list/buildOrgOverride
+var/global/list/buildOrgFinal = list()
+var/global/list/buildOrgSpecBitsCache = list()
+var/global/list/buildOrgOwnCache = list()
+var/global/list/buildOrgScrVis
+var/global/list/buildOrgScrAnc
+var/global/list/buildOrgScrSeen
+var/global/buildOrgScrStamp = 0
+var/global/buildOrgScrCall = 0
+var/global/buildFleckCap = 48
+
+/proc/BuildOrgBits(sheet, cfg)
+	var/k = "\ref[sheet]|[cfg]"
+	var/list/b = buildOrgBitsCache[k]
+	if(b)
+		return b
+	b = new/list(1024)
+	var/icon/M = BuildBakeMask(sheet, BuildOrgSheetX(cfg), BuildOrgSheetY(cfg), 0, 32, 32)
+	for(var/r = 0 to 31)
+		for(var/x = 0 to 31)
+			var/c = M ? M.GetPixel(x + 1, 32 - r) : null
+			b[r * 32 + x + 1] = (c && (length(c) < 9 || copytext(c, 8) != "00")) ? 1 : 0
+	buildOrgBitsCache[k] = b
+	return b
+
+/proc/BuildOrgSpecsKey(list/specs)
+	var/list/parts = list()
+	for(var/list/sp in specs)
+		parts += "\ref[sp[1]]|[sp[2]]|[sp[3]]"
+	return jointext(parts, ";")
+
+/proc/BuildOrgSpecsBits(list/specs, k)
+	if(isnull(k))
+		k = BuildOrgSpecsKey(specs)
+	var/list/out = buildOrgSpecBitsCache[k]
+	if(out)
+		return out
+	out = new/list(1024)
+	for(var/i = 1 to 1024)
+		out[i] = 1
+	for(var/list/sp in specs)
+		var/list/b = BuildOrgBits(sp[1], sp[2])
+		var/inv = sp[3]
+		for(var/i = 1 to 1024)
+			if(out[i] && (inv ? b[i] : !b[i]))
+				out[i] = 0
+	if(buildOrgSpecBitsCache.len >= 8192)
+		buildOrgSpecBitsCache.Cut()
+	buildOrgSpecBitsCache[k] = out
+	return out
+
+/proc/BuildOrgTileInfo(turf/T, doBlend)
+	var/m = BuildMaterialFor(T)
+	var/list/ids = list(m ? BuildOrgLayerId(T, m, doBlend) : "\ref[T]")
+	var/list/cov = list(null)
+	var/list/own = null
+	var/list/big = null
+	var/list/cand = null
+	if(m && !T.EdgeOptOut && !BuildEdgeQuietTile(T) && !BuildEdgeObjOn(T))
+		var/list/S = BuildOrgStack(T, m, ElevAt(T), doBlend)
+		if(S)
+			var/list/entries = S[2]
+			var/list/keys = list()
+			for(var/e = 1 to entries.len)
+				var/list/en = entries[e]
+				var/k = BuildOrgSpecsKey(en[3])
+				keys += k
+				ids += en[1]
+				cov[++cov.len] = BuildOrgSpecsBits(en[3], k)
+			if(entries.len)
+				var/ok = jointext(keys, "#")
+				var/list/hit = buildOrgOwnCache[ok]
+				if(!hit)
+					own = new/list(1024)
+					for(var/e = 1 to entries.len)
+						var/list/bits = cov[e + 1]
+						for(var/i = 1 to 1024)
+							if(bits[i])
+								own[i] = e
+					var/list/bm = BuildOrgBigMask(own)
+					var/list/cl = list()
+					for(var/i = 1 to 1024)
+						if(own[i] && !(bm && bm[i]))
+							cl += i
+					hit = list(own, bm, cl)
+					if(buildOrgOwnCache.len >= 8192)
+						buildOrgOwnCache.Cut()
+					buildOrgOwnCache[ok] = hit
+				own = hit[1]
+				big = hit[2]
+				cand = hit[3]
+	return list(ids, cov, own, big, cand)
+
+/proc/BuildOrgBigMask(list/own)
+	var/list/big = null
+	var/list/done = new/list(1024)
+	for(var/p = 1 to 1024)
+		var/v = own[p]
+		if(!v || done[p])
+			continue
+		done[p] = 1
+		var/list/comp = list(p)
+		var/list/stk = list(p)
+		while(stk.len)
+			var/q = stk[stk.len]
+			stk.len--
+			var/qx = (q - 1) % 32
+			if(qx > 0 && !done[q - 1] && own[q - 1] == v)
+				done[q - 1] = 1
+				stk += q - 1
+				comp += q - 1
+			if(qx < 31 && !done[q + 1] && own[q + 1] == v)
+				done[q + 1] = 1
+				stk += q + 1
+				comp += q + 1
+			if(q > 32 && !done[q - 32] && own[q - 32] == v)
+				done[q - 32] = 1
+				stk += q - 32
+				comp += q - 32
+			if(q <= 992 && !done[q + 32] && own[q + 32] == v)
+				done[q + 32] = 1
+				stk += q + 32
+				comp += q + 32
+		if(comp.len > buildFleckCap)
+			if(!big)
+				big = new/list(1024)
+			for(var/c in comp)
+				big[c] = 1
+	return big
+
+/proc/BuildOrgLayerCount(turf/T, doBlend)
+	var/m = BuildMaterialFor(T)
+	if(!m || T.EdgeOptOut || BuildEdgeQuietTile(T) || BuildEdgeObjOn(T))
+		return 1
+	var/list/present = list()
+	var/list/srcs = list()
+	var/list/nb = new/list(8)
+	BuildOrgLayers(T, m, ElevAt(T), doBlend, present, srcs, nb)
+	return present.len
+
+/proc/BuildOrgInfoAt(turf/U, list/info, doBlend)
+	var/list/I = info[U]
+	if(!I)
+		I = BuildOrgTileInfo(U, doBlend)
+		info[U] = I
+	return I
+
+/proc/BuildOrgShown(turf/U, list/I, list/cur)
+	var/list/o = cur[U]
+	if(o)
+		return o
+	o = buildOrgFinal[U]
+	if(o)
+		return o
+	return I[3]
+
+/proc/BuildOrgSameFin(list/a, list/b)
+	if(a == b)
+		return 1
+	if(!a || !b)
+		return 0
+	for(var/i = 1 to 1024)
+		if(a[i] != b[i])
+			return 0
+	return 1
+
+/proc/BuildOrgLayerAt(turf/T, gx, gy, list/info, list/cur, doBlend)
+	var/dx = round(gx / 32) - 1
+	var/dy = 1 - round(gy / 32)
+	var/turf/U = locate(T.x + dx, T.y + dy, T.z)
+	if(!U)
+		return null
+	var/list/I = BuildOrgInfoAt(U, info, doBlend)
+	var/list/o = BuildOrgShown(U, I, cur)
+	var/list/ids = I[1]
+	if(!o)
+		return ids[1]
+	var/lx = ((gx % 32) + 32) % 32
+	var/ly = ((gy % 32) + 32) % 32
+	return ids[o[ly * 32 + lx + 1] + 1]
+
+/proc/BuildOrgCleanTile(turf/T, list/info, list/cur, doBlend)
+	var/list/I = info[T]
+	var/list/ids = I[1]
+	var/list/cov = I[2]
+	var/list/o = cur[T]
+	var/list/cand = I[5]
+	if(!cand || !cand.len)
+		return null
+	var/list/res = null
+	var/list/wi = new/list(9)
+	var/list/wo = new/list(9)
+	var/list/wb = new/list(9)
+	for(var/j = 0 to 8)
+		var/turf/U = locate(T.x + (j % 3) - 1, T.y + 1 - round(j / 3), T.z)
+		if(!U)
+			continue
+		var/list/UI = BuildOrgInfoAt(U, info, doBlend)
+		wi[j + 1] = UI[1]
+		wo[j + 1] = BuildOrgShown(U, UI, cur)
+		wb[j + 1] = UI[4]
+	if(!buildOrgScrVis || buildOrgScrStamp > 4000000)
+		buildOrgScrVis = new/list(9216)
+		buildOrgScrAnc = new/list(9216)
+		buildOrgScrSeen = new/list(1024)
+		buildOrgScrStamp = 0
+		buildOrgScrCall = 0
+	var/list/seen = buildOrgScrSeen
+	var/list/vis = buildOrgScrVis
+	var/list/anc = buildOrgScrAnc
+	var/cst = ++buildOrgScrCall
+	var/stamp = 0
+	for(var/p in cand)
+		if(seen[p] == cst || !o[p])
+			continue
+		var/L = ids[o[p] + 1]
+		stamp = ++buildOrgScrStamp
+		var/start = (32 + round((p - 1) / 32)) * 96 + 32 + ((p - 1) % 32)
+		var/list/stk = list(start)
+		var/list/vl = list(start)
+		vis[start + 1] = stamp
+		var/list/mine = list()
+		var/anchored = 0
+		var/count = 0
+		while(stk.len)
+			var/g = stk[stk.len]
+			stk.len--
+			count++
+			var/gx = g % 96
+			var/gy = round(g / 96)
+			if(gx >= 32 && gx < 64 && gy >= 32 && gy < 64)
+				mine += (gy - 32) * 32 + (gx - 32) + 1
+			if(count > buildFleckCap)
+				anchored = 1
+				break
+			for(var/d = 1 to 4)
+				var/nx = gx
+				var/ny = gy
+				switch(d)
+					if(1)
+						nx++
+					if(2)
+						nx--
+					if(3)
+						ny++
+					if(4)
+						ny--
+				if(nx < 0 || nx > 95 || ny < 0 || ny > 95)
+					if(BuildOrgLayerAt(T, nx, ny, info, cur, doBlend) == L)
+						anchored = 1
+					continue
+				var/ng = ny * 96 + nx
+				if(vis[ng + 1] == stamp)
+					continue
+				var/ti = round(ny / 32) * 3 + round(nx / 32) + 1
+				var/list/tids = wi[ti]
+				if(!tids)
+					continue
+				var/list/tow = wo[ti]
+				var/li = (ny % 32) * 32 + (nx % 32) + 1
+				var/e = tow ? tow[li] : 0
+				if(tids[e + 1] != L)
+					continue
+				var/list/tb = wb[ti]
+				if(!e || anc[ng + 1] == cst || (tb && tb[li]))
+					anchored = 1
+				vis[ng + 1] = stamp
+				stk += ng
+				vl += ng
+			if(anchored)
+				break
+		for(var/q in mine)
+			seen[q] = cst
+		if(anchored)
+			for(var/g2 in vl)
+				anc[g2 + 1] = cst
+			continue
+		if(!res)
+			res = o.Copy()
+		for(var/q in mine)
+			var/nk = 0
+			for(var/k = o[q] - 1, k >= 1, k--)
+				var/list/cb = cov[k + 1]
+				if(cb[q])
+					nk = k
+					break
+			res[q] = nk
+	return res
+
+/proc/BuildEdgeCleanFlecks(list/tiles, doBlend = 1, bootPump = 0)
+	var/list/info = list()
+	var/list/fresh = list()
+	var/list/region = list()
+	var/n = 0
+	for(var/turf/T in tiles)
+		fresh[T] = 1
+		buildOrgFinal -= T
+	for(var/turf/T in tiles)
+		for(var/dx = -2 to 2)
+			for(var/dy = -2 to 2)
+				var/turf/U = locate(T.x + dx, T.y + dy, T.z)
+				if(U)
+					region[U] = 1
+		if(++n % BUILD_COMMIT_CHUNK == 0)
+			if(!bootPump || !BuildBootPassYield())
+				sleep(-1)
+	var/list/able = list()
+	var/list/cur
+	var/list/work
+	while(1)
+		work = list()
+		for(var/turf/U in region)
+			var/e = able[U]
+			if(isnull(e))
+				e = 0
+				if(BuildOrgLayerCount(U, doBlend) >= 3)
+					var/list/I = BuildOrgInfoAt(U, info, doBlend)
+					if(I[3])
+						e = 1
+				able[U] = e
+			if(e)
+				work += U
+			if(++n % BUILD_COMMIT_CHUNK == 0)
+				if(!bootPump || !BuildBootPassYield())
+					sleep(-1)
+		if(!work.len)
+			return 0
+		cur = list()
+		for(var/turf/U in work)
+			var/list/I = info[U]
+			var/list/raw = I[3]
+			cur[U] = raw.Copy()
+		var/list/active = work.Copy()
+		for(var/it = 1 to 8)
+			var/list/nxt = list()
+			for(var/turf/T in active)
+				var/list/res = BuildOrgCleanTile(T, info, cur, doBlend)
+				if(res)
+					nxt[T] = res
+				if(++n % BUILD_COMMIT_CHUNK == 0)
+					if(!bootPump || !BuildBootPassYield())
+						sleep(-1)
+			if(!nxt.len)
+				break
+			active = list()
+			for(var/turf/C in nxt)
+				BuildOrgActiveAround(C, cur[C], nxt[C], cur, active)
+			for(var/turf/C in nxt)
+				cur[C] = nxt[C]
+		var/grew = 0
+		for(var/turf/U in work)
+			if(fresh[U])
+				continue
+			var/list/I = info[U]
+			if(BuildOrgSameFin(cur[U], buildOrgFinal[U] ? buildOrgFinal[U] : I[3]))
+				continue
+			for(var/dx = -2 to 2)
+				for(var/dy = -2 to 2)
+					var/turf/V = locate(U.x + dx, U.y + dy, U.z)
+					if(V && !region[V])
+						region[V] = 1
+						grew = 1
+		if(!grew)
+			break
+	var/fixed = 0
+	for(var/turf/U in work)
+		var/list/I = info[U]
+		var/list/raw = I[3]
+		var/list/fin = cur[U]
+		var/isRaw = BuildOrgSameFin(fin, raw)
+		if(fresh[U])
+			if(isRaw)
+				continue
+		else if(BuildOrgSameFin(fin, buildOrgFinal[U] ? buildOrgFinal[U] : raw))
+			continue
+		if(isRaw)
+			buildOrgFinal -= U
+			BuildEdgeUpdate(U, doBlend)
+		else
+			buildOrgFinal[U] = fin
+			buildOrgOverride = list()
+			buildOrgOverride[U] = fin
+			BuildEdgeUpdate(U, doBlend)
+			buildOrgOverride = null
+		fixed++
+	return fixed
+
+/proc/BuildOrgActiveAround(turf/C, list/a, list/b, list/cur, list/active)
+	for(var/dx = -1 to 1)
+		for(var/dy = -1 to 1)
+			var/turf/U = locate(C.x + dx, C.y + dy, C.z)
+			if(U && cur[U])
+				active[U] = 1
+	var/fw = 0
+	var/fe = 0
+	var/fn = 0
+	var/fs = 0
+	for(var/r = 0 to 31)
+		if(a[r * 32 + 1] != b[r * 32 + 1])
+			fw = 1
+		if(a[r * 32 + 32] != b[r * 32 + 32])
+			fe = 1
+		if(a[r + 1] != b[r + 1])
+			fn = 1
+		if(a[993 + r] != b[993 + r])
+			fs = 1
+	for(var/q = -1 to 1)
+		var/turf/U
+		if(fw)
+			U = locate(C.x - 2, C.y + q, C.z)
+			if(U && cur[U])
+				active[U] = 1
+		if(fe)
+			U = locate(C.x + 2, C.y + q, C.z)
+			if(U && cur[U])
+				active[U] = 1
+		if(fn)
+			U = locate(C.x + q, C.y + 2, C.z)
+			if(U && cur[U])
+				active[U] = 1
+		if(fs)
+			U = locate(C.x + q, C.y - 2, C.z)
+			if(U && cur[U])
+				active[U] = 1
+
+/proc/BuildOrgBitsImage(turf/S, list/fin, idx)
+	var/list/runs = list()
+	var/list/sig = list()
+	for(var/r = 0 to 31)
+		var/x = 0
+		while(x < 32)
+			if(fin[r * 32 + x + 1] != idx)
+				x++
+				continue
+			var/x2 = x
+			while(x2 + 1 < 32 && fin[r * 32 + x2 + 2] == idx)
+				x2++
+			runs[++runs.len] = list(r, x, x2)
+			sig += "[r].[x].[x2]"
+			x = x2 + 1
+	if(!runs.len)
+		return null
+	var/k = md5(jointext(sig, ","))
+	var/mi = buildOrgMaskIconCache[k]
+	if(!mi)
+		var/icon/M = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+		for(var/list/rr in runs)
+			M.DrawBox("#ffffff", rr[2] + 1, 32 - rr[1], rr[3] + 1, 32 - rr[1])
+		mi = fcopy_rsc(M)
+		buildOrgMaskIconCache[k] = mi
+	var/image/I = BuildEdgeImage(S)
+	I.filters += filter(type = "alpha", icon = mi)
+	return I
 
 /proc/BuildMatSameH(turf/O, th)
 	return (O && ElevAt(O) == th) ? BuildMaterialFor(O) : null
@@ -549,6 +1027,8 @@ var/global/list/cliffPaintMap
 	var/list/hit = list()
 	var/n = 0
 	for(var/turf/T in TurfSquare(x1, y1, x2, y2, z, 0))
+		if(style == "none" && BuildMaterialFor(T) != "Water")
+			continue
 		var/k = "[T.x],[T.y],[T.z]"
 		if(style == "default")
 			cliffPaintMap -= k
@@ -718,8 +1198,79 @@ var/global/list/foamPaintMap
 	if(!fresh || !fresh.len)
 		return
 	for(var/img in fresh)
+		BuildBakeImage(img)
 		T.overlays += img
 	T.edgeOverlays = fresh
+
+var/global/list/buildBakeCache = list()
+var/global/list/buildBakeAnimCache = list()
+var/global/list/buildBakeMaskSize = list()
+
+/proc/BuildBakeAnimated(ic, st)
+	var/k = "\ref[ic]|[st]"
+	var/a = buildBakeAnimCache[k]
+	if(isnull(a))
+		var/icon/F2 = icon(ic, st, SOUTH, 2)
+		a = length(icon_states(F2)) ? 1 : 0
+		buildBakeAnimCache[k] = a
+	return a
+
+/proc/BuildBakeMask(mi, mx, my, flags, w, h)
+	var/sk = "\ref[mi]"
+	var/list/sz = buildBakeMaskSize[sk]
+	if(!sz)
+		var/icon/S = icon(mi)
+		sz = list(S.Width(), S.Height())
+		buildBakeMaskSize[sk] = sz
+	var/ox = (sz[1] - w) / 2
+	var/oy = (sz[2] - h) / 2
+	if(ox != round(ox) || oy != round(oy))
+		return null
+	var/icon/M = icon('Mapping/EdgeOrg/org_cols.dmi', "blank")
+	if(w != 32 || h != 32)
+		M.Crop(1, 1, w, h)
+	M.Blend(mi, ICON_OVERLAY, 1 + mx - ox, 1 + my - oy)
+	if(flags & MASK_INVERSE)
+		M.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1, 1, 1, 1)
+	else
+		M.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0)
+	return M
+
+/proc/BuildBakeImage(image/I)
+	if(!istype(I) || !length(I.filters))
+		return
+	var/mutable_appearance/MA = new(I)
+	var/list/F = MA.filters
+	if(!F || !F.len)
+		return
+	var/list/specs = list()
+	for(var/f in F)
+		if(f:type != "alpha" || !f:icon || f:render_source || (f:flags & MASK_SWAP))
+			return
+		specs += list(list(f:icon, f:x, f:y, f:flags))
+	var/ic = I.icon
+	if(!ic || BuildBakeAnimated(ic, I.icon_state))
+		return
+	var/list/kp = list("\ref[ic]|[I.icon_state]|[I.dir]")
+	for(var/list/s in specs)
+		kp += "\ref[s[1]]|[s[2]]|[s[3]]|[s[4]]"
+	var/bk = md5(jointext(kp, ";"))
+	var/res = buildBakeCache[bk]
+	if(!res)
+		var/icon/B = icon(ic, I.icon_state, I.dir, 1)
+		var/w = B.Width()
+		var/h = B.Height()
+		for(var/list/s in specs)
+			var/icon/M = BuildBakeMask(s[1], s[2], s[3], s[4], w, h)
+			if(!M)
+				return
+			B.Blend(M, ICON_MULTIPLY)
+		res = fcopy_rsc(B)
+		buildBakeCache[bk] = res
+	I.icon = res
+	I.icon_state = ""
+	I.dir = SOUTH
+	I.filters = null
 
 var/global/buildBootPassMark = 0
 
@@ -797,6 +1348,7 @@ var/global/buildBootPassMark = 0
 				if(n % BUILD_COMMIT_CHUNK == 0)
 					if(!bootPump || !BuildBootPassYield())
 						sleep(-1)
+	BuildEdgeCleanFlecks(seen, doBlend, bootPump)
 
 /proc/BuildEdgeBootPass()
 	set waitfor = FALSE
@@ -917,6 +1469,8 @@ var/global/list/buildCliffPickerEntries
 /proc/BuildCliffStyleStamp(turf/T, style)
 	if(!T || !length(style))
 		return 0
+	if(style == "none" && BuildMaterialFor(T) != "Water")
+		return 0
 	BuildCliffPaintLoad()
 	var/k = "[T.x],[T.y],[T.z]"
 	if(style == "default")
@@ -973,6 +1527,21 @@ mob/Mapper/verb/Paint_Cliff_Style()
 		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
 		return
 	BuildCliffPickEnter(S)
+
+mob/Mapper/verb/Paint_Cliff_Style_Region()
+	set category = "Mapper"
+	var/datum/build_session/S = usr.client?.bsession
+	if(!S?.active)
+		usr << "Turn on Build Mode first (ToggleBuildMode), then run this again."
+		return
+	var/code = length(S.cliffStyleSel) ? S.cliffStyleSel : "default"
+	S.CancelPending()
+	S.regionSel = code
+	S.cliffStage = 1
+	if(code == "none")
+		usr << "CLIFF STYLE REGION ([BuildCliffStyleLabel(code)]): click the FIRST corner of the region. Only water tiles inside it change - they lose their rock strip. Land and cliff faces are left alone. Run Paint Cliff Style first to change the style. Right-click cancels."
+	else
+		usr << "CLIFF STYLE REGION ([BuildCliffStyleLabel(code)]): click the FIRST corner of the region. Water inside it takes this style for its cliff bottom, raised terrain takes it for its face. Run Paint Cliff Style first to change the style. Right-click cancels."
 
 mob/Mapper/verb/Paint_Foam_Off()
 	set category = "Mapper"

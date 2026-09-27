@@ -107,6 +107,7 @@ mob/proc/AqNextPickPot(list/L, used)
 	if(istype(S, /obj/Skills/Buffs/NuStyle/UnarmedStyle)) return /obj/Skills/Buffs/NuStyle/UnarmedStyle
 	if(istype(S, /obj/Skills/Buffs/NuStyle/SwordStyle)) return /obj/Skills/Buffs/NuStyle/SwordStyle
 	if(istype(S, /obj/Skills/Buffs/NuStyle/MysticStyle)) return /obj/Skills/Buffs/NuStyle/MysticStyle
+	if(istype(S, /obj/Skills/Buffs/NuStyle/GunStyle)) return /obj/Skills/Buffs/NuStyle/GunStyle
 	return /obj/Skills/Buffs/NuStyle
 
 /proc/AqStyleCategoryName(cat)
@@ -114,6 +115,7 @@ mob/proc/AqNextPickPot(list/L, used)
 		if(/obj/Skills/Buffs/NuStyle/UnarmedStyle) return "Unarmed"
 		if(/obj/Skills/Buffs/NuStyle/SwordStyle) return "Sword"
 		if(/obj/Skills/Buffs/NuStyle/MysticStyle) return "Elemental"
+		if(/obj/Skills/Buffs/NuStyle/GunStyle) return "Gun"
 	return "Any"
 
 mob/proc/AqT4Ready(obj/Skills/Buffs/NuStyle/T)
@@ -660,6 +662,19 @@ client/proc/AqAddRecipes(obj/Skills/Buffs/NuStyle/T)
 		E.name_col = AQ_C_HINT
 		aq_entries += E
 
+client/proc/AqAddStageLine(pathtext)
+	var/p = text2path("[pathtext]")
+	if(!p) return
+	var/obj/Skills/Buffs/NuStyle/S = locate(p) in mob
+	if(!istype(S) || !length(S.stage_passives)) return
+	var/nxt = S.StageNextPotential(mob)
+	var/datum/aqentry/E = new
+	E.kind = "recipe"
+	E.path = "[pathtext]"
+	E.name = "&#160;&#160;&#160;&#160;Stage [S.StyleStage(mob)] of [length(S.stage_passives)][nxt ? ", next at Potential [nxt]" : ""]"
+	E.name_col = AQ_C_HINT
+	aq_entries += E
+
 client/proc/AqAddComboStyle(pathtext, tier)
 	var/obj/Skills/T = AqTemplate(pathtext)
 	if(!T) return
@@ -730,7 +745,7 @@ client/proc/AqBuildStylesTab()
 	for(var/t = 1 to 4)
 		pline += "  &#183;  T[t] [mob.CountStyles(t)]/[mob.AqSlotsPassed(mob.AqStyleThresholds(t))]"
 	AqHeader(pline)
-	var/list/fams = list("UNARMED" = "UnarmedStyles", "ELEMENTAL" = "ElementalStyles", "SWORD" = "SwordStyles", "HYBRID" = "HybridStyles")
+	var/list/fams = list("UNARMED" = "UnarmedStyles", "ELEMENTAL" = "ElementalStyles", "SWORD" = "SwordStyles", "HYBRID" = "HybridStyles", "GUN" = "GunStyles")
 	for(var/famname in fams)
 		var/basekey = fams[famname]
 		AqHeader("[famname] STYLES")
@@ -738,6 +753,7 @@ client/proc/AqBuildStylesTab()
 		if(base)
 			for(var/pathtext in base)
 				AqAddBuyable(pathtext, SkillTree[basekey][pathtext], "style")
+				AqAddStageLine(pathtext)
 				var/obj/Skills/T = AqTemplate(pathtext)
 				if(istype(T, /obj/Skills/Buffs/NuStyle)) AqAddRecipes(T)
 		for(var/t = 1 to 4)

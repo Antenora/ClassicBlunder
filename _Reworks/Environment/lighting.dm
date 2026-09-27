@@ -913,7 +913,7 @@ proc/_CanopyShaftTick()
 				var/turf/t = get_turf(A)
 				var/area/ar = t ? t.loc : null
 				var/a = 0
-				if(glob.GOD_RAYS && ar && ar.sees_sky && !ar.wx_kind && !DnAreaSunMismatch(ar, isMoon))
+				if(glob.GOD_RAYS && ar && ar.sees_sky && !WxKindAt(t) && !DnAreaSunMismatch(ar, isMoon))
 					if(isMoon)
 						a = glob.MOON_SHAFTS ? 70 * elev * MoonKFor(ar) : 0 //full-moon spectacle only
 					else

@@ -1021,7 +1021,7 @@ mob/proc/Regenerate(var/obj/Regenerate/R in src)
 			if(R.X&&R.Y&&R.Z)
 				loc=locate(R.X,R.Y,R.Z)
 				src.Sheared=0
-				src.Maimed=0
+				src.MaimClearAll()
 				src.MortallyWounded=0
 				src.TotalInjury=0
 				src.TotalFatigue=0
@@ -1691,6 +1691,7 @@ mob/proc/SpeedDelay(var/Modifier=1)
 		Delay=glob.ATTACK_DELAY_MAX
 	if(src.HasBlastShielding())
 		Delay*=1.5
+	Delay*=MaimMult("AttackDelay")
 	if(hasPuppeteerBody())
 		if(initialDelay < Delay)
 			return getPuppeteerBodyDelay(initialDelay, Delay);
@@ -1698,6 +1699,9 @@ mob/proc/SpeedDelay(var/Modifier=1)
 		return max(Delay,0.33)
 	return max(Delay,glob.ATTACK_DELAY_MIN)
 
+
+mob/proc/MechKBMult()
+	return 1
 
 mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=0, var/override_speed = 0, trueForced = 0, Thrown = 0)
 	if(src)
@@ -1722,6 +1726,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	Distance*=1+src.GetStr(glob.STR_KB_RATE) //muscle sends harder
 	Distance/=1+P.GetVit(glob.VIT_KB_RATE) //mass stays planted
 	Distance*=getKnockbackMultiplier(P) // gets the knockback multiplier(reduction) for the target
+	Distance*=P.MechKBMult()
 	if(!Forced)
 		if(P.is_dashing)
 			return

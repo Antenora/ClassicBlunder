@@ -418,7 +418,9 @@ proc/LifeSkillPageBody(mob/M, id)
 			body += "Collection log: [found] crop[found == 1 ? "" : "s"] harvested."
 			if(S.rank >= LIFE_MAX_RANK)
 				body += "<br>Capstone: Green Colossus - your first planting each day is guaranteed giant (when the crop has a giant form)."
-		if("Cooking", "Thaumaturgy", "Technology")
+		if("Cooking")
+			body = LifeCookingPageBody(M)
+		if("Thaumaturgy", "Technology")
 			body = "Coming soon."
 	return "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">[body]</span>"
 

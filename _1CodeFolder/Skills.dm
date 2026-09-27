@@ -68,6 +68,7 @@ obj/Skills
 	var/MaxCharges=0
 	var/Charges=0
 	var/ChargeRefresh=30
+	var/NoChargeRegen=0
 	var/Mastery=1
 	var/BuffUsing
 	var/SkillCost=1
@@ -75,6 +76,7 @@ obj/Skills
 	var/sicon
 	var/sicon_state
 	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
+	var/MenuIconFile
 	var/list/Learn=new
 
 	var/list/PreRequisite=list() //Used for skill tree shit.
@@ -92,6 +94,9 @@ obj/Skills
 
 	var/NoStaff
 	var/NeedsStaff
+
+	var/NoGun
+	var/NeedsGun
 
 	var/Instinct  //Penetrate AIS and WS
 	var/NoForcedWhiff  //Super anti whiff
@@ -129,6 +134,7 @@ obj/Skills
 	var/Shredding=0
 	var/Poisoning //poison chance
 	var/Toxic //poison add
+	var/Bloodletting
 	var/Purity //You can only hurt what you're meant to
 	var/SlayerMod //mortal dmg
 	var/ShonenPower  // become MC
@@ -231,7 +237,7 @@ obj/Skills
 				description += "Follow Up Move: [FollowUp]\n"
 			if(Grapple)
 				description += "Grapples.\n"
-			if(Burning || Scorching || Drenching || Soaking || Chilling || Freezing || Exposing || Shredding || Crushing || Shattering || Shocking || Paralyzing || Poisoning || Toxic || Shearing || Crippling)
+			if(Burning || Scorching || Drenching || Soaking || Chilling || Freezing || Exposing || Shredding || Crushing || Shattering || Shocking || Paralyzing || Poisoning || Toxic || Bloodletting || Shearing || Crippling)
 				description += "Elemental Effects: "
 				if(Burning)
 					description += "Burning, "
@@ -261,6 +267,8 @@ obj/Skills
 					description += "Poisoning, "
 				if(Toxic)
 					description += "Toxic, "
+				if(Bloodletting)
+					description += "Bloodletting, "
 				if(Shearing)
 					description += "Shearing, "
 				if(Crippling)

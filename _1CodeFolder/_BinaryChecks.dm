@@ -699,7 +699,6 @@ mob
 			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
 		HasVoidField()
 			if(isMountainheart() && VaizardHealth > 0) return 1
-			if(CheckSlotless("Drunken Mastery") && Drunk) return 1
 			if(passive_handler.Get("VoidField")) return 1
 			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) return 1
 			return 0
@@ -707,7 +706,6 @@ mob
 			var/Extra=0
 			if(isMountainheart() && VaizardHealth > 0) Extra += 5
 			if((Saga=="Path of a Hero: Rebirth") && (FinalHeroChoice=="Roaring Knight") && RoaringTempoCurrent==100) Extra += 5
-			if(CheckSlotless("Drunken Mastery") && Drunk) Extra+=2
 			. = passive_handler.Get("VoidField") + Extra
 			if(isLunaticMode()) . *= (1 + (get_potential() / 100))
 		HasMaimStrike()
@@ -1086,6 +1084,7 @@ mob
 				Return-=5
 			if(src.TarotFate=="Justice")
 				Return+=5
+			Return+=MaimFlat("PureReduction")
 			if(passive_handler["Rebel Heart"])
 				var/h = (missingHealth()/glob.REBELHEARTMOD) * passive_handler["Rebel Heart"]
 				Return += h
@@ -2980,6 +2979,8 @@ mob
 			if(src.IsGuarding())
 				return 0
 			if(src.IsChargingEnergy())
+				return 0
+			if(src.Reloading)
 				return 0
 			if(src.BusterCharging)
 				return 0

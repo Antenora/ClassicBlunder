@@ -3,7 +3,7 @@ var/list/SkillTreeList=list("BlastT1"=list(),"BlastT2"=list(),"BlastT3"=list(), 
 "BeamT1"=list(),"BeamT2"=list(),"BeamT3"=list(),"BeamT4"=list(),"BlastT5"=list(),\
 "UnarmedT1"=list(),"UnarmedT2"=list(),"UnarmedT3"=list(),"UnarmedT4"=list(), "UnarmedT5" = list(),\
 "UnarmedStyles"=list(),"UnarmedStylesT1"=list(), "UnarmedStylesT2"=list(),"UnarmedStylesT3"=list(), "UnarmedStylesT4"=list(), \
-"ElementalStyles"=list(),"HybridStyle"=list(),"SwordStyles"=list(), \
+"ElementalStyles"=list(),"HybridStyle"=list(),"SwordStyles"=list(),"GunStyles"=list(), \
 "SwordStylesT1"=list(), "SwordStylesT2"=list(),"SwordStylesT3"=list(), "SwordStylesT4"=list(), \
 "ElementalStylesT1"=list(), "ElementalStylesT2"=list(),"ElementalStylesT3"=list(), "ElementalStylesT4"=list(),\
 "HybridStylesT1"=list(), "HybridStylesT2"=list(), "HybridStylesT3"=list(), "HybridStylesT4"=list() )
@@ -11,7 +11,7 @@ proc/MakeSkillTreeList()
 	for(var/x in SkillTree)
 		var/Tier = null
 		if(!(x in list("UnarmedStyles","ElementalStyles", "ElementalStylesT1", "ElementalStylesT2", \
-		"ElementalStylesT3","HybridStyle","SwordStyles", "UnarmedStylesT1", "UnarmedStylesT2", \
+		"ElementalStylesT3","HybridStyle","SwordStyles", "GunStyles", "UnarmedStylesT1", "UnarmedStylesT2", \
 		"UnarmedStylesT3", "UnarmedStylesT4", "SwordStylesT1", "SwordStylesT2", "SwordStylesT3", "SwordStylesT4",\
 		"HybridStylesT1", "HybridStylesT2", "HybridStylesT3", "HybridStylesT4")))
 			Tier = copytext(x,length(x), 0)
@@ -285,6 +285,14 @@ var/list/SkillTree=list(
 			"/obj/Skills/Buffs/NuStyle/SwordStyle/Ulfberht_Style"=0,
 			"/obj/Skills/Buffs/NuStyle/SwordStyle/Gladiator_Style"=0,
 			"/obj/Skills/Buffs/NuStyle/SwordStyle/Chain_Style"=0
+),
+"GunStyles"=list(
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Deadeye"=0,
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Lead_Storm"=0,
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Breacher"=0,
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Gun_Runner"=0,
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Close_Quarters"=0,
+			"/obj/Skills/Buffs/NuStyle/GunStyle/Spellslinger"=0
 ),
 "SwordStylesT1"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Fist_of_Khonshu"=9999,
 					"/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style"=9999,

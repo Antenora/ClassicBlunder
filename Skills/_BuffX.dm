@@ -4564,9 +4564,7 @@ NEW VARIABLES
 							OMsg(usr, "[usr] regains use of their senses!")
 						if(src.RegenerateLimbs)
 							if(usr.Maimed)
-								usr.Maimed-=1
-								if(usr.Maimed<0)
-									usr.Maimed=0
+								usr.MaimPeel()
 								OMsg(usr, "[usr] recovers from being maimed!")
 						if(usr.isRace(MAJIN))
 							if(usr.StrCut||usr.EndCut||usr.SpdCut||usr.ForCut||usr.OffCut||usr.DefCut||usr.HealthCut||usr.EnergyCut||usr.ManaCut)
@@ -8214,7 +8212,7 @@ NEW VARIABLES
 							usr.BPPoison=1
 							usr.BPPoisonTimer=0
 						if(usr.Maimed>0)
-							usr.Maimed--
+							usr.MaimPeel()
 							OMsg(usr, "[src] regrows a maiming as the Fae magics course through them!")
 						last_avalon = world.time
 						usr << "Avalon maim heal will be back in [glob.AVALON_COOLDOWN/10] seconds."
@@ -11313,6 +11311,14 @@ mob
 						if(s.Class != "Heavy")
 							src << "You must use a Heavy Sword with [B]."
 							return
+				if(B.NeedsGun)
+					if(!src.EquippedGun())
+						src << "You must be using a gun to use [B]."
+						return
+				if(B.NoGun || src.GunBlocksWeaponBuff(B))
+					if(src.EquippedGun())
+						src << "You can't use [B] with a gun equipped."
+						return
 				if(B.NeedsSecondSword)
 					var/found=0
 					for(var/obj/Items/Sword/s in src)
@@ -12257,8 +12263,8 @@ mob
 								R.RegenerateLimbs=1
 						if(!locate(/obj/Skills/Projectile/Beams/Big/Vaizard/Cero) in src)
 							src.AddSkill(new/obj/Skills/Projectile/Beams/Big/Vaizard/Cero)
-						while(src.Maimed>0)//regen happens automagically because regeneration wouldnt be in mob's contents yet
-							src.Maimed--
+						if(src.Maimed>0)//regen happens automagically because regeneration wouldnt be in mob's contents yet
+							src.MaimClearAll()
 							OMsg(src, "[src] regrows a maiming at the pleasure of their inner passenger!")
 					if(!src.VaizardType)
 						src.VaizardType=pick(list("Berserker", "Manipulator", "Hellion", "Phantasm"))
@@ -13922,7 +13928,7 @@ mob
 				src.AddDefTax(B.DefTax*TaxIncrease)
 			if("Unbreakable" in B.passives)
 				if(src.StrTax>=0.75||src.ForTax>=0.75||src.EndTax>=0.75||src.SpdTax>=0.75||src.OffTax>=0.75||src.DefTax>=0.75)
-					src.Maimed+=1
+					src.MaimApply("Torso", 1)
 					src.recordMaim(src, "Unbreakable Taxation")
 			if(B.RecovTax)
 				src.AddRecovTax(B.RecovTax)
@@ -13986,7 +13992,7 @@ mob
 						src.Burn=0
 
 			if(B.MaimCost)
-				src.Maimed+=B.MaimCost
+				src.MaimApply("Torso", B.MaimCost)
 				src.recordMaim(src, "Skill Cost: [B]")
 				src << "You have been maimed by using the overwhelming power of [B]!"
 

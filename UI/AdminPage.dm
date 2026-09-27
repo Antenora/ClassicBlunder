@@ -515,7 +515,7 @@ client/proc/AdminPageShow(tab)
 	src << browse(AdminPageHTML(), "window=[ADMINPAGE_CTL]")
 	adminpage_open = 1
 	AdminPagePlace()
-	winset(src, ADMINPAGE_CTL, "is-visible=true")
+	WebOverlayShow(ADMINPAGE_CTL)
 	if(btn_admin) BtnHover(btn_admin, FALSE)
 
 client/proc/AdminPageHide()

@@ -757,6 +757,75 @@ mob/Mapper/verb/Custom_Adopt()
 		M << "Linked [hit.len] placed tile[hit.len == 1 ? "" : "s"] to \"[D.name]\" and applied its settings (fixture [BuildCustomFixtureLabel(D)], material [length(D.material) ? D.material : "auto"])."
 		Log("Mapper", "[M] ([M.ckey]) adopted [hit.len] placed tiles into custom def \"[D.name]\".", 1)
 
+mob/Mapper/verb/Delete_All_Placed_Custom()
+	set category = "Mapper"
+	var/mob/M = usr
+	var/client/C = M.client
+	var/datum/build_session/S = C?.bsession
+	if(!S?.active)
+		M << "Turn build mode on first. The delete goes into your build history, so Ctrl+Z brings every copy back."
+		return
+	BuildCustomLoad()
+	var/list/found = list()
+	var/n = 0
+	for(var/obj/Turfs/CustomObj1/O in worldObjectList.Copy())
+		n++
+		if(n % BUILD_COMMIT_CHUNK == 0)
+			sleep(-1)
+		if(!isturf(O.loc))
+			continue
+		var/datum/build_custom_def/OD = BuildCustomDefForObj(O)
+		if(!OD)
+			continue
+		if(!M.Admin && OD.creator != M.ckey && O.Builder != M.ckey)
+			continue
+		if(!found[OD])
+			found[OD] = list()
+		var/list/FL = found[OD]
+		FL += O
+	if(!found.len)
+		M << "No placed custom objects you can delete. You can clear every copy of a custom you created (Admins: any custom), and only the copies you placed yourself of anyone else's."
+		return
+	var/list/menu = list()
+	for(var/datum/build_custom_def/MD in found)
+		var/list/ML = found[MD]
+		menu["[MD.name] (by [MD.creator]) - [ML.len] placed[(M.Admin || MD.creator == M.ckey) ? "" : " by you"]"] = MD
+	var/pick = Ask(M, "Delete every placed copy of which custom object?", "Delete All Placed", null, "pick", menu, 1)
+	if(!pick)
+		return
+	var/datum/build_custom_def/D = menu[pick]
+	var/list/L = found[D]
+	var/zz = M.z
+	var/zc = 0
+	for(var/obj/ZO in L)
+		if(ZO.z == zz)
+			zc++
+	var/whole = "Whole world ([L.len])"
+	var/zonly = "This z-level ([zc])"
+	var/scope
+	if(zc && zc < L.len)
+		scope = Ask(M, "Delete placed copies of \"[D.name]\": [L.len] across the world, [zc] on this z-level. Ctrl+Z in build mode brings them back.", "Delete All Placed", null, "confirm", null, 1, whole, zonly, "Cancel")
+	else
+		scope = Ask(M, "Delete all [L.len] placed cop[L.len == 1 ? "y" : "ies"] of \"[D.name]\"[zc ? "" : " (none are on this z-level)"]? Ctrl+Z in build mode brings them back.", "Delete All Placed", null, "confirm", null, 1, whole, "Cancel")
+	if(scope != whole && scope != zonly)
+		return
+	var/list/doomed = list()
+	for(var/obj/XO in L)
+		if(isturf(XO.loc) && (scope == whole || XO.z == zz))
+			doomed += XO
+	if(!doomed.len)
+		M << "Those copies of \"[D.name]\" are already gone."
+		return
+	S = C?.bsession
+	if(!S?.active)
+		M << "Build mode was turned off, so nothing was deleted."
+		return
+	if(S.busy)
+		M << "Still applying the previous edit, so nothing was deleted. Run it again in a moment."
+		return
+	BuildDeleteObjs(C, doomed, M.Admin || D.creator == M.ckey, "Delete_All_Placed_Custom \"[D.name]\"[scope == whole ? "" : " z[zz]"]")
+	M << "Deleted [doomed.len] placed cop[doomed.len == 1 ? "y" : "ies"] of \"[D.name]\"[scope == whole ? "" : " on this z-level"]. Ctrl+Z in build mode brings them back."
+
 mob/Admin3/verb/Delete_Custom_Def()
 	set category = "Mapper"
 	spawn

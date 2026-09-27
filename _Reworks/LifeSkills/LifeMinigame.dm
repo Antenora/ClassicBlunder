@@ -22,6 +22,7 @@ proc/RunLifeMinigame(mob/M, id = "timing_bar", difficulty = 1, list/opts)
 		if("rapid_tap") g = new/datum/life_minigame/rapid_tap
 		if("hold_fill") g = new/datum/life_minigame/hold_fill
 		if("drag_saw") g = new/datum/life_minigame/drag_saw
+		if("stir_spiral") g = new/datum/life_minigame/stir_spiral
 		if("fish_bar") g = new/datum/life_minigame/fish_bar
 		if("water_fill") g = new/datum/life_minigame/water_fill
 	if(!g) return -1

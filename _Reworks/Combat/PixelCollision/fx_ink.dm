@@ -84,7 +84,7 @@ proc/BodyInkProbe(mob/m)
 				br = GetRuntimeRect(m.icon, m.dir)
 	if(!AM && !br)
 		br = list(0, 0, 32, 32)
-	return list(1 + (m.x-1)*32 + m.step_x, 1 + (m.y-1)*32 + m.step_y, cw, ch, tx, ty, AM, br)
+	return list(1 + (m.x-1)*32 + m.step_x + m.body_px, 1 + (m.y-1)*32 + m.step_y + m.body_py, cw, ch, tx, ty, AM, br)
 
 proc/BodyInkHitL(list/P, wx, wy)
 	var/ux = P[3]/2 + (wx - (P[1] + P[3]/2)) / P[5]
@@ -742,14 +742,10 @@ obj/AutoHitter
 		if(!e) return out
 		var/cx = (e.x-1)*32 + 16
 		var/cy = (e.y-1)*32 + 16
-		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)))
+		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)) | BigBodiesNear(e, R+1, los))
 			if(!hitSelf && m == Owner) continue
-			if(square)
-				if(!SquareHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && SquareHitsBounds(cx, cy, 32*(R-1), m)) continue
-			else
-				if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
+			if(!ZoneHitsMob(cx, cy, 32*R, m, square)) continue
+			if(annulus && R > 1 && ZoneHitsMob(cx, cy, 32*(R-1), m, square)) continue
 			out += m
 		return out
 
@@ -783,10 +779,10 @@ obj/AutoHitter
 		GfxReleaseAtom(src)
 
 mob/proc/InkWorldX()
-	return 1 + (x-1)*32 + step_x
+	return 1 + (x-1)*32 + step_x + body_px
 
 mob/proc/InkWorldY()
-	return 1 + (y-1)*32 + step_y
+	return 1 + (y-1)*32 + step_y + body_py
 
 mob/proc/InkRushSweep(obj/AutoHitter/r, ox, oy)
 	if(!r || !r.Owner) return

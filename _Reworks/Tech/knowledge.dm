@@ -57,236 +57,417 @@ Fast Actig -> Automed dispensers
     var/name = "Not Obtainable"
     var/breakthrough = FALSE
     var/list/requires = list("Not Obtainable")
+    var/list/requires_any = list()
+    var/tier = 0
+    var/bench
     var/unlocks
     var/description = "This description wasn't filled out."
     tech
         Engineering
             name = "Engineering"
+            bench = "Engineer"
+            tier = 0
             breakthrough = TRUE
-            description = "Allows reinforced doors, laser gates, digital keys, remotes, safes and air masks to be accessed in Access Technology.\nNeeded in order to gain Power Generators, Hazard Suits, and Force Shielding."
+            description = "Unlocks keys, door passes, security and reinforced doors, laser gates, safes, alarms, lamps and the Door Repair Kit."
             requires = list()
+
+        Fabrication
+            name = "Fabrication"
+            bench = "Engineer"
+            tier = 1
+            description = "Unlocks the advanced parts every builder needs: Circuit Board, Servo, Power Cell, Lens, Nanites and the Power Pack."
+            requires = list("Engineering")
 
         Power_Generators
             name = "Power Generators"
-            description = "Allows access to charging stations in Access Technology menu.\nNeeded for Jet Propulsion."
-            requires = list("Engineering")
-
-        Jet_Propulsion
-            name = "Jet Propulsion"
-            description = "Allows access to jet boots in Access Technology menu.\nNeeded for CyberEngineering."
-            requires = list("Power Generators")
-
-        Cyber_Engineering
-            name = "CyberEngineering"
-            breakthrough = TRUE
-            description = "Needed for Cyber Augmentations. Doesn't unlock anything by itself..."
-            requires = list("Jet Propulsion")
-
-        Cyber_Augmentations
-            name = "Cyber Augmentations"
-            description = "Grants the Augmentation object. Unlocks Enhanced Stat Modules for Cyberization.\nNeeded for War Crimes."
-            requires = list("CyberEngineering")
-
-        Neuron_Manipulation
-            name = "Neuron Manipulation"
-            description = "Unlocks a long list of modules for Cyberization. Internal Comms Suite, Blade Mode, Taser Strike, Machine Gun Flurry, Rocket Punch\
-            Stealth Systems, Nano Boost, Combat CPU, Reconstructive Nanobots, Internal Life Support, and Energy Assimilators.\nNeeded for War Crimes."
-            requires = list("CyberEngineering")
-
-        War_Crimes
-            name = "War Crimes"
-            description = "Allows for nonconsensual implantation of cybernetics (yuck). Allows access to Controller Chip in Access Technology. Unlocks a short list of modules for Cyberization. Punishment Chip, Failsafe Circuit, Explosive Implantation. Girlframes, eat your heart out."
-            requires = list("Neuron Manipulation", "Cyber Augmentations")
-
-        Singularity
-            name = "Singularity"
-            description = "Unlocks a number of buff modules for Cyberization. Ripper Mode, Armstrong Augmentation, Ray Gear, Infinity Drive, Overdrive. Only one of these can be installed.\nDoes not unlock any further technology."
-            requires = list("Neuron Manipulation", "Cyber Augmentations")
+            bench = "Engineer"
+            tier = 2
+            description = "Unlocks the Charging Station and the Fuel Cell."
+            requires = list("Fabrication")
 
         Hazard_Suits
             name = "Hazard Suits"
-            description = "Allows access to Hazard Suits in Access Technology menu\nDoesn't unlock any further technology."
-            requires = list("Engineering", "Medicine")
+            bench = "Engineer"
+            tier = 3
+            description = "Unlocks the Hazard Suit and the Sealed Suit."
+            requires = list("Power Generators")
+
+        Field_Gadgets
+            name = "Field Gadgets"
+            bench = "Engineer"
+            tier = 3
+            description = "Unlocks the Auto-Sprinkler, Ore Scanner, Fish Finder and Botanical Analyzer."
+            requires = list("Power Generators")
 
         Force_Shielding
             name = "Force Shielding"
-            description = "Allows access to deflector shields in Access Technology menu.\nDoesn't unlock any further technology."
-            requires = list("Engineering")
-
-        Medicine
-            name = "Medicine"
-            breakthrough = TRUE
-            description = "Allows access to perfume, soap, and first aid kits in Access Technology menu.\nNeeded for Hazard Suits, MedKits, Fast Acting Medicine."
+            bench = "Engineer"
+            tier = 4
+            description = "Unlocks the Deflector Shield, Bubble Shield and Force Field Emitter."
             requires = list()
+            requires_any = list("Hazard Suits", "Field Gadgets")
 
-        MedKits
-            name = "Medkits"
-            description = "Allows access to Medkits in Access Technology... Yep.\nNeeded for Anesthetics."
-            requires = list("Medicine")
+        Automated_Defenses
+            name = "Automated Defenses"
+            bench = "Engineer"
+            tier = 4
+            description = "Unlocks the Sentry Turret."
+            requires = list()
+            requires_any = list("Hazard Suits", "Field Gadgets")
 
-        Fast_Acting_Medicine
-            name = "Fast Acting Medicine"
-            description = "Allows access to antivenom, isothemic spray, sealing spray, and focus stabilizer in Access Technology menu.\nNeeded for Automated Dispensers."
-            requires = list("Medicine")
+        EM_Wave_Projectors
+            name = "EM Wave Projectors"
+            bench = "Engineer"
+            tier = 4
+            description = "Unlocks the Projector Tower, the Portable Projector and its five emitters."
+            requires = list()
+            requires_any = list("Hazard Suits", "Field Gadgets")
 
-        Anesthetics
-            name = "Anesthetics"
-            description = "Allows access to painkillers in Access Technology menu.\nNeeded for Enhancers."
-            requires = list("Medkits")
+        Drones
+            name = "Drones"
+            bench = "Engineer"
+            tier = 4
+            description = "Unlocks the Drone."
+            requires = list()
+            requires_any = list("Hazard Suits", "Field Gadgets")
 
-        Automated_Dispensers
-            name = "Automated Dispensers"
-            description = "Allows access to automated aid dispensers in Access Technology menu.\nNeeded for Enhancers."
-            requires = list("Fast Acting Medicine")
-
-        Enhancers
-            name = "Enhancers"
-            description = "Allows access to steroids in Access Technology menu.\nNo further technology unlocks."
-            requires = list("Automated Dispensers", "Anesthetics")
-
-
-        ImprovedMedicalTechnology
-            name = "ImprovedMedicalTechnology"
-            breakthrough = TRUE
-            description = "Grants the Surgery object for treating long term injuries.\nNeeded for Regenerative Medicine."
-            requires = list("Automated Dispensers")
-
-        Regenerative_Medicine
-            name = "Regenerative Medicine"
-            description = "Allows access to revitalization serum and super soldier serum in Access Technology menu.\nNeeded for Regenerator Tanks, Genetic Medicine, and Revival Protocol."
-            requires = list("ImprovedMedicalTechnology")
-
-        Regenerator_Tanks
-            name = "Regenerator Tanks"
-            description = "Allows access to regenerator tanks in Access Technology. Were you expecting something different?\nNo further technology unlocks."
-            requires = list("Regenerative Medicine")
-
-        Genetic_Manipulation
-            name = "Genetic Manipulation"
-            description = "It unlocks the delusion that this game will one day have a genetic system that rivals SS13. It's not gonna happen. Uh... Also you need it to learn Revival Protocol and Prosthetic Limbs."
-            requires = list("Regenerative Medicine")
-
-        Revial_Protocol
-            name = "Revival Protocol"
-            description = "Grants the Revival Protocol object.\nNo further technology unlocks."
-            requires = list("Genetic Manipulation", "Regenerative Medicine")
-
-        Prosthetic_Limbs
-            name = "Prosthetic Limbs"
-            description = "Allows access to prosthetic limbs in Access Technology menu.\nNeeded for Vehicular Power Armor."
-            requires = list("Genetic Manipulation")
-
+        Teleportation
+            name = "Teleportation"
+            bench = "Engineer"
+            tier = 5
+            description = "Unlocks Teleport Pads."
+            requires = list()
+            requires_any = list("Force Shielding", "Automated Defenses", "EM Wave Projectors", "Drones")
 
         Telecommunications
             name = "Telecommunications"
-            requires = list()
-            description = "Allows access to communicators and PDAs in Access Technology menu.\nNeeded for Local Range Devices and Surveilance."
+            bench = "Operative"
+            tier = 0
             breakthrough = TRUE
+            description = "Unlocks the Communicator, Speaker, Doorbell, Binoculars, PDA and Jukebox."
+            requires = list()
 
-        Local_Range_Devices
-            name = "Local Range Devices"
-            description = "Allows access to binoculars, doorbells, and speakers in Access Technology menu.\nNeeded for Wide Area Transmission."
-            requires = list("Telecommunications")
-
-        Wide_Area_Transmission
-            name = "Wide Area Transmission"
-            description = "Insert funny riff on how this gives nothing. Needed for Drones and Advanced Transmission Technology."
-            requires = list("Local Range Devices")
-
-        Surveilance
-            name = "Surveilance"
-            description = "Makes you think about the state of the world, huh? Nothing else, though. Needed for Espionage Equipment, Drones, and Advanced Transmission Technology."
+        Scouters
+            name = "Scouters"
+            bench = "Operative"
+            tier = 2
+            description = "Unlocks every Scouter tier and the Dragon Radar."
             requires = list("Telecommunications")
 
         Espionage_Equipment
             name = "Espionage Equipment"
-            description = "Grants the Espionage Scan object. Allows access to hacking devices and wiretaps.\nNo further technology unlocks."
-            requires = list("Surveilance")
+            bench = "Operative"
+            tier = 2
+            description = "Unlocks the Wiretap, Tracker Tag and Bug Sweeper."
+            requires = list("Telecommunications")
 
-        Drones
-            name = "Drones"
-            description = "Nope...nothing. No further technology unlocks."
-            requires = list("Surveilance", "Wide Area Transmission")
+        Wide_Area_Transmission
+            name = "Wide Area Transmission"
+            bench = "Operative"
+            tier = 3
+            description = "Unlocks the Transmission Tower and the Beacon."
+            requires = list()
+            requires_any = list("Scouters", "Espionage Equipment")
 
-        AdvancedTransmissionTechnology
-            breakthrough = TRUE
-            name = "AdvancedTransmissionTechnology"
-            description = "Allows you to spend more RPP to buy Scouters! Yay!!"
-            requires = list("Wide Area Transmission", "Surveilance")
+        Intrusion_Tools
+            name = "Intrusion Tools"
+            bench = "Operative"
+            tier = 3
+            description = "Unlocks the Hacking Device and the handheld Jammer."
+            requires = list()
+            requires_any = list("Scouters", "Espionage Equipment")
 
-        Scouters
-            name = "Scouters"
-            description = "At long last, you can do the meme. Allows access to scouters in Access Technology.\nNeeded for Combat Scanning."
-            requires = list("AdvancedTransmissionTechnology")
+        Obfuscation_Equipment
+            name = "Obfuscation Equipment"
+            bench = "Operative"
+            tier = 4
+            description = "Unlocks the Cloak and the Cloak Controls."
+            requires = list()
+            requires_any = list("Wide Area Transmission", "Intrusion Tools")
 
         Combat_Scanning
             name = "Combat Scanning"
-            description = "Allows you a very powerful tool for gaining skills... Except... That part of the tech tree isn't in anymore!\nNeeded for Vehicular Power Armor."
-            requires = list("Scouters", "Neuron Manipulation")
+            bench = "Operative"
+            tier = 4
+            description = "Unlocks the Combat Scanner mode, the Security Camera and its Display."
+            requires = list("Scouters")
 
-
-        MilitaryTechnology
-            name = "MilitaryTechnology"
+        Technique_Analysis
+            name = "Technique Analysis"
+            bench = "Operative"
+            tier = 5
+            description = "Unlocks technique downloads and the discs that carry them."
             requires = list()
-            description = "Allows access to plasma blaster through Access Technology menu.\nNeeded for Assault Weaponry."
+            requires_any = list("Obfuscation Equipment", "Combat Scanning")
+
+        Military_Technology
+            name = "Military Technology"
+            bench = "Gunsmith"
+            tier = 0
             breakthrough = TRUE
+            description = "Unlocks the Handgun, the USP, the Red 9, Pistol rounds and Training Rounds."
+            requires = list()
 
         Assault_Weaponry
             name = "Assault Weaponry"
-            description = "Allows access to plasma rifle though Access Technology menu.\nNeeded for Missile Weaponry, and Melee Weaponry."
-            requires = list("MilitaryTechnology")
+            bench = "Gunsmith"
+            tier = 2
+            description = "Unlocks the SMG, the TMP, the Shotgun, Rifle rounds and Shells."
+            requires = list("Military Technology")
 
-        Missile_Weaponry
-            name = "Missile Weaponry"
-            description = "Allows access to missile launcher through Access Technology menu.\nNo further technology unlocks."
-            requires = list("Assault Weaponry")
+        Demolitions
+            name = "Demolitions"
+            bench = "Gunsmith"
+            tier = 2
+            description = "Unlocks Frag, Smoke, Flash and Gas grenades, plus Caltrops, the Flare and the Bola."
+            requires = list("Military Technology")
+
+        Munitions
+            name = "Munitions"
+            bench = "Gunsmith"
+            tier = 3
+            description = "Unlocks the special round types and the Magnum."
+            requires = list()
+            requires_any = list("Assault Weaponry", "Demolitions")
+
+        Weapon_Modding
+            name = "Weapon Modding"
+            bench = "Gunsmith"
+            tier = 3
+            description = "Unlocks all eight gun mods, Ballistic Weave and the Glock 18C."
+            requires = list()
+            requires_any = list("Assault Weaponry", "Demolitions")
+
+        Heavy_Weaponry
+            name = "Heavy Weaponry"
+            bench = "Gunsmith"
+            tier = 4
+            description = "Unlocks the Missile Launcher, Chemical Mortar, Incinerator, Freeze Ray, Tactical, Dualwield and Punisher."
+            requires = list()
+            requires_any = list("Munitions", "Weapon Modding")
+
+        Electronic_Warfare
+            name = "Electronic Warfare"
+            bench = "Gunsmith"
+            tier = 4
+            description = "Unlocks the EMP grenade, EMP mine, EMP rounds, the Frag mine and the Breaching Charge."
+            requires = list()
+            requires_any = list("Munitions", "Weapon Modding")
+
+        Energy_Weaponry
+            name = "Energy Weaponry"
+            bench = "Gunsmith"
+            tier = 5
+            description = "Unlocks the energy guns and the Heat Sink."
+            requires = list()
+            requires_any = list("Heavy Weaponry", "Electronic Warfare")
+
+        Heavy_Ordnance
+            name = "Heavy Ordnance"
+            bench = "Gunsmith"
+            tier = 5
+            description = "Unlocks the Ultra Laser, Missile Massacre and their mounts."
+            requires = list()
+            requires_any = list("Heavy Weaponry", "Electronic Warfare")
+
+        Military_Engineering
+            name = "Military Engineering"
+            bench = "Mechanist"
+            tier = 0
+            breakthrough = TRUE
+            description = "Unlocks the Hoverboard and the powered tools."
+            requires = list()
+
+        Piloting_Foundations
+            name = "Piloting Foundations"
+            bench = "Mechanist"
+            tier = 1
+            description = "Grants a point of Piloting Prowess and the license to pilot war machines."
+            requires = list("Military Engineering")
+
+        Jet_Propulsion
+            name = "Jet Propulsion"
+            bench = "Mechanist"
+            tier = 2
+            description = "Unlocks Jet Boots and the Jet Pack."
+            requires = list("Piloting Foundations")
 
         Melee_Weaponry
             name = "Melee Weaponry"
-            description = "Allows access to progressive blade through Access technology menu. 🏳‍🌈\nNeeded for Thermal Weaponry."
-            requires = list("Assault Weaponry")
+            bench = "Mechanist"
+            tier = 3
+            description = "Unlocks the Progressive Blade and the Lightsaber forms."
+            requires = list("Jet Propulsion")
 
-        Thermal_Weaponry
-            name = "Thermal Weaponry"
-            description = "Allows access to incinerator and freezing ray through Access Technology menu.\nNeeded for Blast Shielding and Military Engineering."
-            requires = list("Melee Weaponry")
+        Powered_Exoskeletons
+            name = "Powered Exoskeletons"
+            bench = "Mechanist"
+            tier = 3
+            description = "Unlocks the Exosuit and its integration."
+            requires = list("Jet Propulsion")
 
-        Blast_Shielding
-            name = "Blast Shielding"
-            description = "Allows access to blast shield through Access Technology menu.\nNeeded for Vehicular Power Armor."
-            requires = list("Thermal Weaponry")
+        Weapon_Modules
+            name = "Weapon Modules"
+            bench = "Mechanist"
+            tier = 3
+            description = "Unlocks the Blast Fist, Power Fist, Pile Bunker, Chainsaw, Power Claw and Hook Grip Claw."
+            requires = list("Jet Propulsion")
 
-        MilitaryEngineering
-            name = "MilitaryEngineering"
-            breakthrough = TRUE
-            description = "Allows access to powered exoskeleton through Access Technology menu.\nNeeded for Armorpiercing Weaponry."
-            requires = list("Thermal Weaponry")
+        Powered_Armor_Specialization
+            name = "Powered Armor Specialization"
+            bench = "Mechanist"
+            tier = 4
+            description = "Unlocks the Burst, Burly and Blitz armor specializations."
+            requires = list()
+            requires_any = list("Melee Weaponry", "Powered Exoskeletons", "Weapon Modules")
 
-        Armorpiercing_Weaponry
-            name = "Armorpiercing Weaponry"
-            description = "Allows access to pile bunker through Access Technology menu.\nNeeded for Impact Weaponry."
-            requires = list("MilitaryEngineering")
-
-        Impact_Weaponry
-            name = "Impact Weaponry"
-            description = "Allows access to blast fist through Access Technology menu.\nNeeded for Hydraulic Weaponry."
-            requires = list("Armorpiercing Weaponry")
-        Hydraulic_Weaponry
-            name = "Hydraulic Weaponry"
-            description = "Allows access to power claw through Access Technology menu.\nNeeded for Vehicular Power Armor."
-            requires = list("Impact Weaponry")
+        Mech_Fabrication
+            name = "Mech Fabrication"
+            bench = "Mechanist"
+            tier = 4
+            description = "Unlocks mech components, the Mech Bay and Capsules."
+            requires = list()
+            requires_any = list("Melee Weaponry", "Powered Exoskeletons", "Weapon Modules")
 
         Vehicular_Power_Armor
             name = "Vehicular Power Armor"
-            description = "Allows access to mobile suit through Access Technology menu.\nNo further technology unlocks."
-            requires = list("Hydraulic Weaponry", "Blast Shielding", "Combat Scanning", "Prosthetic Limbs" )
+            bench = "Mechanist"
+            tier = 5
+            description = "Unlocks Mobile Suit assembly and the Limit Mode drives."
+            requires = list("Powered Armor Specialization", "Mech Fabrication")
 
-        Culinary_Basics
-            name="Culinary Basics"
-            requires = list();
-            description = "Learn the basics of getting yourself fed. Or drunk."
+        Cyber_Engineering
+            name = "Cyber Engineering"
+            bench = "Cyberneticist"
+            tier = 0
+            breakthrough = TRUE
+            description = "Unlocks the Frame Repair Kit and the Prosthetic Limb."
+            requires = list()
 
-        Piloting_Foundations
-            name="Piloting Foundations"
-            requires = list();
-            description = "Learn how to pilot War Machines,like Powered Armor and Mobile Suits.";
+        Cyber_Augmentations
+            name = "Cyber Augmentations"
+            bench = "Cyberneticist"
+            tier = 1
+            description = "Grants the install skill for non-Androids and unlocks the six Stat chips."
+            requires = list("Cyber Engineering")
+
+        Combat_Routines
+            name = "Combat Routines"
+            bench = "Cyberneticist"
+            tier = 2
+            description = "Unlocks Taser Strike, Rocket Punch, Internal Comms, the Internal Scouter and Machine Gun Flurry."
+            requires = list("Cyber Augmentations")
+
+        Neuron_Manipulation
+            name = "Neuron Manipulation"
+            bench = "Cyberneticist"
+            tier = 3
+            description = "Unlocks Nano Boost, Combat CPU, Stealth Systems, Reconstructive Nanobots, Blade Mode, Life Support, Energy Assimilators, the Targeting CPU and the Maintenance Pod."
+            requires = list("Combat Routines")
+
+        Cybernetic_Mainframe
+            name = "Cybernetic Mainframe"
+            bench = "Cyberneticist"
+            tier = 4
+            description = "Unlocks the Mainframe and its merged integration."
+            requires = list("Neuron Manipulation")
+
+        War_Crimes
+            name = "War Crimes"
+            bench = "Cyberneticist"
+            tier = 4
+            description = "Unlocks the Punishment Chip, Failsafe Circuit, Explosive Implantation and the Chip Controller."
+            requires = list("Neuron Manipulation")
+
+        Singularity
+            name = "Singularity"
+            bench = "Cyberneticist"
+            tier = 5
+            description = "Unlocks the Military Frames."
+            requires = list()
+            requires_any = list("Cybernetic Mainframe", "War Crimes")
+
+        Core_Transplant
+            name = "Core Transplant"
+            bench = "Cyberneticist"
+            tier = 5
+            description = "Unlocks the procedure that changes an Android Core."
+            requires = list()
+            requires_any = list("Cybernetic Mainframe", "War Crimes")
+
+        Medicine
+            name = "Medicine"
+            bench = "Medic"
+            tier = 0
+            breakthrough = TRUE
+            description = "Unlocks bandages, the First Aid Kit and the Medical Scanner."
+            requires = list()
+
+        Fast_Acting_Medicine
+            name = "Fast Acting Medicine"
+            bench = "Medic"
+            tier = 2
+            description = "Unlocks Antivenom, Cooling Spray, Sealing Spray, the Focus Stabilizer, Coagulant Spray, Restorative Salve and Anesthetics."
+            requires = list("Medicine")
+
+        Trauma_Care
+            name = "Trauma Care"
+            bench = "Medic"
+            tier = 2
+            description = "Unlocks the Trauma Kit, Painkillers, the Emergency Autoinjector and the Aid Station."
+            requires = list("Medicine")
+
+        Medkits
+            name = "Medkits"
+            bench = "Medic"
+            tier = 2
+            description = "Unlocks the Medkit and the Defibrillator."
+            requires = list("Medicine")
+
+        Enhancers
+            name = "Enhancers"
+            bench = "Medic"
+            tier = 3
+            description = "Unlocks the Steroid."
+            requires = list()
+            requires_any = list("Fast Acting Medicine", "Trauma Care", "Medkits")
+
+        Improved_Medical_Technology
+            name = "Improved Medical Technology"
+            bench = "Medic"
+            tier = 3
+            description = "Grants the Surgery kit for treating long term injuries."
+            requires = list()
+            requires_any = list("Fast Acting Medicine", "Trauma Care", "Medkits")
+
+        Regenerative_Medicine
+            name = "Regenerative Medicine"
+            bench = "Medic"
+            tier = 4
+            description = "Unlocks the Revitalization, Genome Enhance, Super Soldier and Genome Warp Serums."
+            requires = list()
+            requires_any = list("Enhancers", "Improved Medical Technology")
+
+        Regenerator_Tanks
+            name = "Regenerator Tanks"
+            bench = "Medic"
+            tier = 4
+            description = "Unlocks the Regen Tank and its healing fluid."
+            requires = list()
+            requires_any = list("Enhancers", "Improved Medical Technology")
+
+        Genetic_Manipulation
+            name = "Genetic Manipulation"
+            bench = "Medic"
+            tier = 5
+            description = "Unlocks the Cloning Tank."
+            requires = list()
+            requires_any = list("Regenerative Medicine", "Regenerator Tanks")
+
+        Revival_Protocol
+            name = "Revival Protocol"
+            bench = "Medic"
+            tier = 5
+            description = "Unlocks Revival."
+            requires = list()
+            requires_any = list("Regenerative Medicine", "Regenerator Tanks")

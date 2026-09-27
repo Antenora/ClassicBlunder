@@ -50,9 +50,6 @@ macro "macro"
 	elem 
 		name = "South+REP"
 		command = ".south"
-	elem 
-		name = "F1+REP"
-		command = ".options"
 
 
 menu "menu"

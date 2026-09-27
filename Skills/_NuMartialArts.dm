@@ -34,6 +34,14 @@ obj
 				var/hotColdStorage = 0
 				var/last_storage = 0
 				var/tmp/triggerTension
+				var/list/stage_passives
+				var/list/stage_stats
+				var/list/stage_finisher
+				var/tmp/applied_stage = 0
+				proc/StyleStage(mob/p)
+					return 1
+				proc/StageNextPotential(mob/p)
+					return null
 				proc/turnOff(mob/p)
 					tensionStorage = p.Tension
 					if(p.StyleBuff.StyleActive == "Hot Style" || \
@@ -626,3 +634,9 @@ obj
 					NeedsSword=0
 					NoSword=0
 					NoStaff=0
+
+				GunStyle
+					NeedsGun=1
+
+mob/proc/StyleStageRefresh()
+	return

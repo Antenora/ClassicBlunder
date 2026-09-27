@@ -466,9 +466,10 @@ mob/Admin2/verb
 			if("Maim")
 				var/Time = RawHours(6)
 				Time /= m.GetRecov()
-				m.Maimed += 1
-				if(m.Maimed > 4)
-					m.Maimed = 4
+				var/part = m.MaimPickPart(usr, "Give Wound")
+				if(!part)
+					return
+				m.MaimApply(part, 1)
 				m.BPPoisonTimer = Time
 				m.BPPoison = 0.5
 				m.recordMaim(usr, "Admin")
@@ -556,6 +557,7 @@ mob/Admin3/verb
 		if(Choice=="No") return
 		if(val&&m)
 			m.Potential+=val
+			m.StyleStageRefresh()
 			m.PotentialCap+=val
 			if(m.isRace(/race/demi_fiend))
 				m.refreshMagatama()
@@ -1247,19 +1249,16 @@ mob/Admin3/verb
 		var/Mode=Ask(usr, "Are you adding, removing, or viewing [m]'s unlocked technology?", "Tech Unlock", null, "pick", list("Cancel", "Add", "Remove", "View"), 0)
 		if(Mode=="Cancel")
 			return
+		if(length(TechnologyTree) < 1)
+			fillOutTechTree()
 		switch(Mode)
 			if("Add")
-				var/list/Options=list("Cancel",
-				"Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing",
-				"Molecular Technology", "Light Alloys", "Shock Absorbers", "Advanced Plating", "Modular Weaponry",
-				"Medkits", "Fast Acting Medicine", "Enhancers", "Anesthetics", "Automated Dispensers",
-				"Regenerator Tanks", "Prosthetic Limbs", "Genetic Manipulation", "Regenerative Medicine", "Revival Protocol",
-				"Wide Area Transmissions", "Espionage Equipment", "Surveilance", "Drones", "Local Range Devices",
-				"Scouters", "Obfuscation Equipment", "Satellite Surveilance", "Combat Scanning", "EM Wave Projectors",
-				"Hazard Suits", "Force Shielding", "Jet Propulsion", "Power Generators", "Space Travel",
-				"Android Creation", "Conversion Modules", "Enhancement Chips", "Involuntary Implantation", "Self Augmentation",
-				"Assault Weaponry", "Missile Weaponry", "Melee Weaponry", "Thermal Weaponry", "Blast Shielding",
-				"Powered Armor Specialization", "Armorpiercing Weaponry", "Impact Weaponry", "Hydraulic Weaponry","Vehicular Power Armor",
+				var/list/Options=list("Cancel")
+				for(var/n in TechnologyTree)
+					var/knowledgePaths/tech/node = TechnologyTree[n]
+					if(node && node.name != "Not Obtainable")
+						Options |= node.name
+				Options |= list(
 				"Healing Herbs", "Refreshment Herbs", "Magic Herbs", "Toxic Herbs", "Philter Herbs",
 				"Stimulant Herbs", "Relaxant Herbs", "Numbing Herbs", "Distillation Process", "Mutagenic Herbs",
 				"Spell Focii", "Artifact Manufacturing", "Magical Communication", "Magical Vehicles", "Warding Glyphs",
@@ -1272,7 +1271,11 @@ mob/Admin3/verb
 				var/Choice=Ask(usr, "What breakthrough do you want to grant to [m]?", "Tech Unlock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
-				m.knowledgeTracker.learnedKnowledge.Add(Choice)
+				var/knowledgePaths/tech/grant = TechnologyTree[Choice]
+				if(grant)
+					m.UnlockTech(grant, "Technology")
+				else
+					m.knowledgeTracker.learnedKnowledge.Add(Choice)
 				Log("Admin", "[ExtractInfo(usr)] unlocked [Choice] knowledge breakthrough from [ExtractInfo(m)]!")
 			if("Remove")
 				var/list/Options=list("Cancel")
@@ -1284,7 +1287,11 @@ mob/Admin3/verb
 				var/Choice=Ask(src, "What breakthrough are you removing from [m]?", "Tech Lock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
-				m.knowledgeTracker.learnedKnowledge.Remove(Choice)
+				var/knowledgePaths/tech/lose = TechnologyTree[Choice]
+				if(lose)
+					m.RemoveTech(lose, "Technology")
+				else
+					m.knowledgeTracker.learnedKnowledge.Remove(Choice)
 				Log("Admin", "[ExtractInfo(src)] removed [Choice] knowledge breakthrough from [ExtractInfo(m)]!")
 			if("View")
 				src << "[m]'s Unlocked Breakthroughs:"
@@ -1665,9 +1672,7 @@ mob/Admin2/verb
 				Log("Admin", "[ExtractInfo(usr)] removed [ExtractInfo(A)]'s wounds.")
 				A << "Your wounds have been reduced."
 			if("Remove 1 Maim")
-				A.Maimed -= 1
-				if(A.Maimed < 0)
-					A.Maimed = 0
+				A.MaimPeel()
 				Log("Admin", "[ExtractInfo(usr)] repaired [ExtractInfo(A)]'s maim wound.")
 				A << "Your maim wound has been repaired!"
 	AdminRevive()
@@ -1703,6 +1708,7 @@ mob/Admin2/verb
 		M.RPPSpendable=getMaxPlayerRPP()
 		M.PotentialRate=0
 		M.Potential=Ask(src, "What potential do you want to set [M] to?", "Set Potential", null, "num", null, 0)
+		M.StyleStageRefresh()
 		if(M.isRace(/race/demi_fiend))
 			M.refreshMagatama()
 		M.ECCHARACTER=TRUE
@@ -1714,6 +1720,7 @@ mob/Admin2/verb
 		if(!src.Alert("Are you sure you want to Head Start Setup someone?")) return
 		M.PotentialHeadStart=Ask(src, "What potential do you want to set [M] to?", "Set Head Start Potential", null, "num", null, 0)
 		M.Potential=M.PotentialHeadStart
+		M.StyleStageRefresh()
 		M.RPPHeadStart=Ask(src, "What RPP cap do you want to set [M] to?", "Set Head RPP ", null, "num", null, 0)
 		M.RPPHeadStart*=src.RPPMult
 		M.RPPCurrent=M.RPPHeadStart
@@ -2447,6 +2454,7 @@ mob/Admin4/verb
 						M.GiveMoney(amount)
 					if("Potential")
 						M.Potential += amount
+						M.StyleStageRefresh()
 					if("Power Level")
 						M.Power += amount
 					if("Health")

@@ -118,8 +118,7 @@ proc/GfxMaybeLeaveFootprint(mob/Players/P)
 		return
 	if(world.time - P._gfx_last_footprint < 4 || T == P._gfx_reaction_turf) return
 	P._gfx_reaction_turf = T
-	var/area/A = T.loc
-	var/kind = A ? A.wx_kind : null
+	var/kind = WxKindAt(T)
 	var/exposed = GfxTurfWeatherExposed(T)
 	if(exposed && (kind == "rain" || kind == "storm"))
 		P._gfx_wet_until = world.time + (kind == "storm" ? 140 : 110)
@@ -155,8 +154,8 @@ proc/GfxMaybeLeaveFootprint(mob/Players/P)
 
 proc/GfxSpawnRainSplash(turf/T, strength = 1)
 	if(!T || !GfxTurfWeatherExposed(T) || GfxPrecipitationImpactBlocked(T)) return
-	var/area/A = T.loc
-	if(!A || !(A.wx_kind == "rain" || A.wx_kind == "storm")) return
+	var/kind = WxKindAt(T)
+	if(!(kind == "rain" || kind == "storm")) return
 	if(_gfx_splash_recent[T] && world.time - _gfx_splash_recent[T] < 8) return
 	var/cap = max(12, round(60 * GfxBudgetScale()))
 	if(_gfx_splash_count >= cap) return
@@ -179,8 +178,8 @@ proc/GfxSpawnRainSplash(turf/T, strength = 1)
 
 proc/GfxSpawnSnowSplash(turf/T, strength = 1)
 	if(!T || !GfxTurfWeatherExposed(T) || GfxPrecipitationImpactBlocked(T) || GfxTurfAlreadySnowCovered(T)) return
-	var/area/A = T.loc
-	if(!A || !(A.wx_kind == "snow" || A.wx_kind == "blizzard")) return
+	var/kind = WxKindAt(T)
+	if(!(kind == "snow" || kind == "blizzard")) return
 	if(_gfx_splash_recent[T] && world.time - _gfx_splash_recent[T] < 10) return
 	var/cap = max(12, round(54 * GfxBudgetScale()))
 	if(_gfx_splash_count >= cap) return
@@ -285,9 +284,10 @@ proc/_GfxReactionPass()
 				GfxProjectileWaterPulse(Q)
 		var/turf/PT = GfxGroundTurf(P)
 		var/area/A = PT ? PT.loc : null
-		if(!A || !A.sees_sky || !(A.wx_kind in list("rain", "storm", "snow", "blizzard"))) continue
+		var/kind = WxKindAt(PT)
+		if(!(kind in list("rain", "storm", "snow", "blizzard"))) continue
 		var/tier = GfxWeatherTier(P.client)
-		var/heavy_weather = (A.wx_kind == "storm" || A.wx_kind == "blizzard")
+		var/heavy_weather = (kind == "storm" || kind == "blizzard")
 		if(tier <= GFX_QUALITY_LOW && !prob(heavy_weather ? 55 : 35)) continue
 		if(tier == GFX_QUALITY_MEDIUM && !prob(heavy_weather ? 85 : 65)) continue
 		var/n = (heavy_weather && tier >= GFX_QUALITY_HIGH) ? 2 : 1
@@ -296,10 +296,10 @@ proc/_GfxReactionPass()
 			var/turf/T = locate(clamp(P.x + rand(-8, 8), 1, world.maxx), clamp(P.y + rand(-6, 6), 1, world.maxy), P.z)
 			var/area/TA = T ? T.loc : null
 			if(T && TA == A)
-				if(A.wx_kind == "rain" || A.wx_kind == "storm")
-					GfxSpawnRainSplash(T, A.wx_kind == "storm" ? 1 : 0.7)
+				if(kind == "rain" || kind == "storm")
+					GfxSpawnRainSplash(T, kind == "storm" ? 1 : 0.7)
 				else
-					GfxSpawnSnowSplash(T, A.wx_kind == "blizzard" ? 1 : 0.72)
+					GfxSpawnSnowSplash(T, kind == "blizzard" ? 1 : 0.72)
 	for(var/turf/T in _gfx_splash_recent.Copy())
 		if(world.time - _gfx_splash_recent[T] > 20) _gfx_splash_recent -= T
 	for(var/turf/T in _gfx_water_ripple_recent.Copy())

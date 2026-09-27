@@ -29,6 +29,7 @@ client
 		view_fit_last_zoom = 0
 		atom/movable/cutscene_hud_hider
 		cutscene_active = FALSE
+		game_display_active = FALSE
 		world_mag = 1
 		obj/world_overlay_master/world_overlay_master
 
@@ -181,6 +182,7 @@ mob/Players/verb/Display_Mode()
 
 client/proc/SetupGameDisplay()
 	if(!mob) return
+	game_display_active = TRUE
 	ApplyDisplayMode(getPref("displayMode"), FALSE)
 	ApplyMapZoom(EffectiveZoom())
 	view_fit_enabled = TRUE
@@ -188,6 +190,8 @@ client/proc/SetupGameDisplay()
 	StartViewFitWatchdog()
 
 client/proc/SetupTitleDisplay()
+	game_display_active = FALSE
+	GfxCameraDisable(src)
 	view_fit_enabled = FALSE
 	ApplyWorldMag()
 	view_fit_last_zoom = 0
@@ -207,6 +211,9 @@ client/proc/ApplyZoomPref()
 	mouse_opacity = 0
 
 client/proc/SetupCutsceneDisplay()
+	cutscene_active = TRUE
+	GfxCameraDisable(src)
+	HideWebOverlays()
 	view_fit_enabled = FALSE
 	ApplyWorldMag()
 	view_fit_last_zoom = 0
@@ -217,7 +224,6 @@ client/proc/SetupCutsceneDisplay()
 	if(!cutscene_hud_hider)
 		cutscene_hud_hider = new /atom/movable/cutscene_hud_hider()
 		screen += cutscene_hud_hider
-	cutscene_active = TRUE
 	CutsceneApplyFx()
 
 client/proc/EndCutsceneDisplay()
@@ -229,6 +235,31 @@ client/proc/EndCutsceneDisplay()
 	cutscene_active = FALSE
 	CutsceneApplyFx()
 	FitViewNow()
+	RestoreWebOverlays()
+	GfxCameraSync(src)
+
+client/proc/WebOverlayShow(ctl, params = "is-visible=true")
+	if(!cutscene_active) winset(src, ctl, params)
+
+client/proc/WebOverlayStates()
+	. = list("mapwindow.chatoverlay" = chatpanel_open, "mapwindow.adminoverlay" = adminpage_open, "mapwindow.rpoverlay" = rpbox_open, "mapwindow.faceoverlay" = facepage_open, "mapwindow.logoverlay" = logpage_open)
+	if(signpage_made) .["mapwindow.signoverlay"] = signpage_open
+	for(var/datum/sheetwin/W in sh_wins)
+		.[W.ctl] = W.open
+	if(np_made) .["mapwindow.promptoverlay"] = np_open && np_ready
+
+client/proc/HideWebOverlays()
+	for(var/ctl in WebOverlayStates())
+		winset(src, ctl, "is-visible=false")
+	MapFocus()
+
+client/proc/RestoreWebOverlays()
+	var/list/states = WebOverlayStates()
+	for(var/ctl in states)
+		if(states[ctl]) winset(src, ctl, "is-visible=true")
+	if(np_open && np_ready)
+		winset(src, "mapwindow.promptoverlay", "focus=true")
+		src << output("", "mapwindow.promptoverlay:focusInput")
 
 client/proc/CutsceneApplyFx()
 	if(client_plane_master) CpmApply(src) 

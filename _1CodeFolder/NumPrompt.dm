@@ -190,6 +190,7 @@ client/proc/SheetPush(datum/sheetwin/W)
 	pk["px"] = getPref("shPanX")
 	pk["py"] = getPref("shPanY")
 	pk["sizes"] = getPref("shSizes")
+	pk["hold"] = cutscene_active ? 1 : 0
 	if(isnum(pk["w"]) && pk["w"] > 0)
 		pk["w"] = round(pk["w"] / max(1, z))
 	if(isnum(pk["h"]) && pk["h"] > 0)
@@ -212,7 +213,7 @@ client/proc/SheetPush(datum/sheetwin/W)
 			i = j + 1
 	src << output(list2params(list(url_encode(json_encode(pk)))), "[W.ctl]:setSheet")
 	if(pk["mode"] != "doc")
-		winset(src, W.ctl, W.open ? "is-visible=true" : "is-visible=true;focus=true")
+		WebOverlayShow(W.ctl, W.open ? "is-visible=true" : "is-visible=true;focus=true")
 	W.open = 1
 
 client/proc/SheetHide(datum/sheetwin/W)
@@ -1251,7 +1252,7 @@ client/proc/PromptPagePush()
 	if(np_mode == "confirm" && np_buttons)
 		pk["btns"] = np_buttons
 	src << output(list2params(list(url_encode(json_encode(pk)))), "[PROMPT_CTL]:setPrompt")
-	winset(src, PROMPT_CTL, "is-visible=true;focus=true")
+	WebOverlayShow(PROMPT_CTL, "is-visible=true;focus=true")
 	src << output("", "[PROMPT_CTL]:focusInput")
 
 /proc/PromptCleanText(v)
@@ -1401,18 +1402,18 @@ client/proc/PromptPageTopic(list/href_list)
 
 mob/verb/NumPromptOk()
 	set hidden = 1
-	if(!client || !client.np_open) return
+	if(!client || !client.np_open || client.cutscene_active) return
 	if(client.np_mode == "message") return
 	client << output("", "[PROMPT_CTL]:submitOk")
 
 mob/verb/NumPromptOkCtrl()
 	set hidden = 1
-	if(!client || !client.np_open) return
+	if(!client || !client.np_open || client.cutscene_active) return
 	client << output("", "[PROMPT_CTL]:submitOk")
 
 mob/verb/NumPromptNo()
 	set hidden = 1
-	if(!client || !client.np_open) return
+	if(!client || !client.np_open || client.cutscene_active) return
 	if(client.np_mode == "confirm")
 		client << output("", "[PROMPT_CTL]:submitNo")
 		return
@@ -1597,7 +1598,7 @@ client/proc/SheetPageHTML(id)
  <script>
  var shell=document.getElementById('shell'), hdr=document.getElementById('hdr'), tab=document.getElementById('tab'), ttl=document.getElementById('ttl'), sub=document.getElementById('sub'), nav=document.getElementById('nav'), fin=document.getElementById('fin'), thead=document.getElementById('thead'), list=document.getElementById('list'), lsp=document.getElementById('lsp'), empty=document.getElementById('empty'), docf=document.getElementById('docf'), doc=document.getElementById('doc'), acts=document.getElementById('acts'), ft=document.getElementById('ft'), frame=document.getElementById('frame'), grip=document.getElementById('grip');
  var CTL='mapwindow.sheetoverlay[id]', WID=[id], Z=2, OP=0.85, B=null, P={x:0,y:0}, C={x:0,y:0}, G={x:0,y:0,w:840,h:1000}, KEY='', KIND='', SEQ=0, MODE='rows', HINT='', SW=420, LH=397, SIZED=false, RH=18, rq=false, pend=null, rows=new Array(), lower=new Array(), vis=new Array(), showing=false, live=false, LRM=String.fromCharCode(8206);
- var COLS=new Array(), CW=new Array(), CX=new Array(), TWO=false, NOSORT=false, NOFILT=false, SORT={c:-1,d:1}, DSTYLE='theme', DFONT='read', DOCBUF='', DSEQ=0, DOCY=0, SPANW=0, ONCLOSE='';
+ var COLS=new Array(), CW=new Array(), CX=new Array(), TWO=false, NOSORT=false, NOFILT=false, SORT={c:-1,d:1}, DSTYLE='theme', DFONT='read', DOCBUF='', DSEQ=0, DOCY=0, SPANW=0, ONCLOSE='', HOLD=false;
  var NW=0, VW=0, XW=0, meas=null, MAXW=1200, KREF='', CAP=null, BW=96, RW=40, KX={ro:10,x2:0,b2:0,x1:0,b1:0,c0:40,lw:300};
  var SBCSS="::-webkit-scrollbar{width:14px;height:14px}::-webkit-scrollbar-track{background:url('lc_track.png') no-repeat;background-size:100% 100%;margin:4px 0}::-webkit-scrollbar-thumb{border-left:1px solid transparent;border-right:1px solid transparent;background-clip:padding-box;background-origin:padding-box;background:url('lc_thumb_top.png') left top no-repeat,url('lc_thumb_bot.png') left bottom no-repeat,url('lc_thumb_mid.png') left center no-repeat,url('lc_thumb_col.png') left top repeat-y;background-size:12px 6px,12px 6px,12px 11px,12px 1px;min-height:24px}::-webkit-scrollbar-corner{background:transparent}";
  var THEMECSS="@font-face{font-family:'monogram';src:url('monogram.ttf')}html,body{margin:0;padding:0;background:transparent !important}body{color:#d6ecfa !important;font:15px/19px Calibri,'Segoe UI',Arial,sans-serif;padding:6px 10px 8px 10px;word-wrap:break-word;user-select:text;-webkit-user-select:text}a{color:#8be9ff}a:hover{color:#eaf5ff}h1,h2,h3,h4,h5{font-family:'monogram',monospace;font-weight:normal;font-size:16px;line-height:18px;margin:12px 0 6px 0;color:#7ec8f0}h1{color:#8be9ff;margin-top:4px}hr{border:0;border-top:1px solid #2e6682;margin:8px 0}table{border-collapse:collapse}td,th{padding:2px 6px;vertical-align:top}th{color:#7ec8f0;text-align:left;font-weight:normal}li::marker{color:#7ec8f0}font\[color=black i],font\[color='#000000' i],font\[color='#000' i]{color:#d6ecfa !important}";
@@ -1793,6 +1794,7 @@ client/proc/SheetPageHTML(id)
  function setSheet(pk){
   var o=null; try{ o=JSON.parse(dec(pk)); }catch(e){ o=null; } if(!o) return;
   var same=showing&&(txt(o.key)===KEY);
+  HOLD=!!o.hold;
   KEY=txt(o.key); KIND=txt(o.kind)||'sheet'; SEQ=(+o.seq)||0; Z=(+o.z)||1; OP=+o.op; MODE=txt(o.mode)||'rows'; HINT=txt(o.hint);
   B=null; if((+o.x1)>(+o.x0)&&(+o.y1)>(+o.y0)) B={x0:+o.x0,y0:+o.y0,x1:+o.x1,y1:+o.y1};
   if(!same){ var cs=((+o.cas)||0)*24; P={x:((+o.px)||0)+cs,y:((+o.py)||0)+cs}; var szs=parseSizes(o.sizes), sz=szs\[KIND]; SIZED=!!sz; SW=clampNum(sz?sz.w:((+o.w)||420),360,1200); LH=clampNum(sz?sz.h:((+o.h)||((MODE==='doc')?640:(MODE==='rows'?397:600))),96,1200); SORT={c:-1,d:1}; }
@@ -1841,7 +1843,7 @@ client/proc/SheetPageHTML(id)
   showing=true;
   place();
   if(DOCY){ try{ doc.contentWindow.scrollTo(0,DOCY); }catch(e){} }
-  ws(same?{'is-visible':'true'}:{'is-visible':'true','focus':'true'});
+  if(!HOLD) ws(same?{'is-visible':'true'}:{'is-visible':'true','focus':'true'});
   fontsCheck();
   topic({sheetpage:'shown',seq:SEQ});
  }

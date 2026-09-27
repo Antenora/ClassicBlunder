@@ -22,7 +22,7 @@ mob/proc/ManaBitsTotal()
 	for(var/obj/Items/mineral/m in src) . += m.value
 
 mob/proc/InvClassify(obj/Items/I)
-	if(istype(I, /obj/Items/Sword) || istype(I, /obj/Items/Armor) || istype(I, /obj/Items/Enchantment/Staff))
+	if(istype(I, /obj/Items/Sword) || istype(I, /obj/Items/Armor) || istype(I, /obj/Items/Enchantment/Staff) || istype(I, /obj/Items/Gun) || istype(I, /obj/Items/Ammo))
 		return "Gear"
 	if(istype(I, /obj/Items/Edibles) || istype(I, /obj/Items/Flask))
 		return "Consumables"
@@ -52,6 +52,30 @@ mob/proc/InvItemsFor(cat)
 				break
 		if(!placed) sorted += I
 	return sorted
+
+client/proc/BeltDropTarget(atom/over, obj/Items/I)
+	return 0
+
+client/proc/BeltDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/FieldCraftDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/GunModDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/ExosuitDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/CapsuleDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/MaimDescButton(obj/Items/I, list/objs)
+	return
+
+client/proc/DeviceDropTarget(atom/over, obj/Items/I)
+	return 0
 
 /atom/movable/shud/invitem
 	mouse_opacity = 2 // whole cell clickable even on transparent icon pixels
@@ -85,6 +109,8 @@ mob/proc/InvItemsFor(cat)
 			if(tgt.item && tgt.item != item)
 				usr.client?.SwapInvSlots(item, tgt.item)
 			return
+		if(usr.client?.BeltDropTarget(over_object, item)) return
+		if(usr.client?.DeviceDropTarget(over_object, item)) return
 		if(istype(over_object, /atom/movable/shud)) return // other HUD element, ignore
 		spawn()
 			item.DropItem() // guards equipped/legendary, drops in front by facing
@@ -514,7 +540,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 		mark += "<br><span style=\"color:[QualityColor(I.CraftQuality)]\">[QualityName(I.CraftQuality)] quality</span>"
 	if(I.metal_id && !istype(I, /obj/Items/Material))
 		mark += "<br><span style=\"color:[LIFE_METAL_UI_RGB[I.metal_id]]\">[LIFE_METAL_NAME[I.metal_id]]-forged</span>"
-		if(istype(I, /obj/Items/Sword))
+		if(istype(I, /obj/Items/Sword) || istype(I, /obj/Items/Gun))
 			mark += "<br>[LifeFmtMult("DMG", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
 		else if(istype(I, /obj/Items/Armor))
 			mark += "<br>[LifeFmtMult("ABSORB", I.DamageEffectiveness, I.DamageEffectiveness)] [LifeFmtMult("ACC", I.AccuracyEffectiveness, I.AccuracyEffectiveness)] [LifeFmtMult("SPD", I.SpeedEffectiveness, I.SpeedEffectiveness)]"
@@ -566,6 +592,12 @@ client/proc/ShowItemDesc(obj/Items/I)
 		rb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9998; Rename</span>"
 		rb.screen_loc = "[InvXLoc(252)],CENTER:118"
 		inv_desc_objs += rb
+	BeltDescButton(I, inv_desc_objs)
+	FieldCraftDescButton(I, inv_desc_objs)
+	GunModDescButton(I, inv_desc_objs)
+	ExosuitDescButton(I, inv_desc_objs)
+	CapsuleDescButton(I, inv_desc_objs)
+	MaimDescButton(I, inv_desc_objs)
 
 	// clamp the saved popup offset to the current view, then apply it
 	var/list/db = PanBounds("invdesc", inv_desc_objs.len ? inv_desc_objs[1] : null)

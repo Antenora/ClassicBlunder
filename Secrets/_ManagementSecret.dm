@@ -679,7 +679,7 @@ mob/Admin3/verb
 			P << "Your [P.secretDatum.name] has been tiered up."
 			Log("Admin","<font color=blue>[P] has been given Tier [P.secretDatum.currentTier] [P.secretDatum.name] by [ExtractInfo(usr)]</font>")
 			return
-		if(P.RaceInRareList())
+		if(P.RaceInRareList() || P.isRace(HOLLOW))
 			src << "No."
 			return
 		var/list/validSecrets = list("Cancel");

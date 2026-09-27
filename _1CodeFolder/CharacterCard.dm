@@ -481,6 +481,13 @@ client/proc/ResetTargetCard()
 	tcard_hp_last = 0
 	tcard_en_last = 0
 	tcard_gd_last = 0
+	ScannerCardReset()
+
+client/proc/ScannerCardRows(mob/T)
+	return
+
+client/proc/ScannerCardReset()
+	return
 
 client/proc/BuildTargetComposite(mob/T)
 	if(!tcard || !T) return
@@ -584,6 +591,7 @@ client/proc/UpdateTargetCard()
 	if(!valid)
 		SetTargetCardAlpha(0)
 		tcard_last = null
+		ScannerCardRows(null)
 		return
 	SetTargetCardAlpha(255)
 	var/newtarget = (T != tcard_last) // composite and bar snap only happen on a target swap
@@ -609,6 +617,7 @@ client/proc/UpdateTargetCard()
 	if(tbar_gd_fill) tbar_gd_fill.alpha = showgd ? 255 : 0
 	UpdateTargetBars(hp, en, newtarget, gd)
 	UpdateTargetDebuff(T)
+	ScannerCardRows(T)
 
 client/proc/UpdateTargetDebuff(mob/T)
 	if(!tdebuff_icon || !tdebuff_num) return
@@ -907,10 +916,10 @@ client/proc/UpdateTimedBuffs()
 		spare.screen_loc = null
 	RepositionPartyCards()   // ally cards ride below the buff cluster, whose height just changed
 
-client/proc/GetActiveDebuffs()
+client/proc/GetActiveDebuffs(mob/m)
 	var/list/out = list()
-	if(!mob) return out
-	var/mob/m = mob
+	if(!m) m = mob
+	if(!m) return out
 	if(m.Bleed > 0) out += list(list('HUD/debuff_bleed.png', "Bleed", "[round(m.Bleed)]"))
 	var/vb = max(0, m.Burn - m.SilentBurnAmount)
 	if(vb > 0) out += list(list('HUD/debuff_burn.png', "Burn", "[round(vb)]"))

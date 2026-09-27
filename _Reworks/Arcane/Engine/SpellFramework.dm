@@ -145,6 +145,7 @@ mob/proc/SpellPrimed(obj/Skills/S)
 
 mob/proc/OnSpellCast(obj/Skills/S)
 	if(!S) return
+	GunSpellCast(S)
 	MarkCombat()
 	TomeFlip()
 	var/spawn_now = 1

@@ -5,64 +5,61 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 /proc/fillOutTechTree()
 	. = typesof(/knowledgePaths/tech)
 	for(var/x in .)
-		var/knowledgePaths/tech = new x
-		TechnologyTree[tech.name] += tech
-		for(var/i in TechnologyTree)
-			if(tech.name in TechnologyTree[i].requires)
-				tech.unlocks += "[i], "
-		tech.unlocks = replacetext(tech.unlocks, ", ", "", -1, -4)
-#define BASE_COST 30
+		var/knowledgePaths/tech/node = new x
+		TechnologyTree[node.name] += node
+	for(var/n in TechnologyTree)
+		var/knowledgePaths/tech/parent = TechnologyTree[n]
+		var/list/leads = list()
+		for(var/m in TechnologyTree)
+			if(m == n) continue
+			var/knowledgePaths/tech/child = TechnologyTree[m]
+			if((n in child.requires) || (n in child.requires_any))
+				leads += m
+		parent.unlocks = leads.len ? jointext(leads, ", ") : null
 
 
 /mob/proc/removeTechKnowledge(mob/p, path, cost, prompt)
-	var/theCost = cost
-	var/knowledgePaths/tech = TechnologyTree[path]
-	if(!tech) return
-	theCost *= 1 + (0.25 * length(tech.requires))
-	if(tech.breakthrough)
-		theCost /= 4
-	theCost = round(theCost,  1)
+	var/knowledgePaths/tech/t = TechnologyTree[path]
+	if(!t) return
+	var/theCost = p.TechNodeCost(t)
 	var/confirmation = "Yes"
 	if(prompt)
-		confirmation = Ask(p, "Are you sure you want to refund [tech.name] for [theCost] points?", "", null, "pick", list("Yes", "No"), 0)
+		confirmation = Ask(p, "Are you sure you want to refund [t.name] for [theCost] points?", "", null, "pick", list("Yes", "No"), 0)
 	if(confirmation == "Yes")
 		p.RPPSpendable += theCost
 		p.RPPSpent -= theCost
-		p.knowledgeTracker.learnedKnowledge -= tech.name
-		p << "You have refunded [tech.name] for [theCost]!"
+		p.knowledgeTracker.learnedKnowledge -= t.name
+		p << "You have refunded [t.name] for [theCost]!"
 	switch(path)
-		if("CyberEngineering")
-			CyberEngineeringUnlocked=0
+		if("Cyber Engineering")
+			p.CyberEngineeringUnlocked=0
 		if("Engineering")
-			EngineeringUnlocked=0
-		if("MilitaryTechnology")
-			MilitaryTechnologyUnlocked=0
-		if("AdvancedTransmissionTechnology")
-			AdvancedTransmissionTechnologyUnlocked=0
+			p.EngineeringUnlocked=0
+		if("Military Technology")
+			p.MilitaryTechnologyUnlocked=0
 		if("Telecommunications")
-			TelecommunicationsUnlocked=0
+			p.TelecommunicationsUnlocked=0
+		if("Scouters")
+			p.AdvancedTransmissionTechnologyUnlocked=0
 		if("Medicine")
-			MedicineUnlocked=0
-		if("ImprovedMedicalTechnology")
-			ImprovedMedicalTechnologyUnlocked=0
-			for(var/obj/Skills/Utility/Surgery/s in src)
+			p.MedicineUnlocked=0
+		if("Improved Medical Technology")
+			p.ImprovedMedicalTechnologyUnlocked=0
+			for(var/obj/Skills/Utility/Surgery/s in p)
 				del s
-		if("MilitaryEngineering")
-			MilitaryEngineeringUnlocked=0
+		if("Military Engineering")
+			p.MilitaryEngineeringUnlocked=0
 		if("Cyber Augmentations")
-			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
+			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in p)
 				del ca
 /*		if("Revival Protocol")
 			for(var/obj/Skills/Utility/Revival_Protocol/rp in src)
 				del rp*/
 		if("Espionage Equipment")
-			for(var/obj/Skills/Utility/Espionage_Scan/es in src)
+			for(var/obj/Skills/Utility/Espionage_Scan/es in p)
 				del es
-		if("Culinary Basics")
-			for(var/obj/Skills/Utility/Cooking/cock in src)
-				del cock
 		if("Piloting Foundations")
-			PilotingProwess=0
+			p.PilotingProwess=0
 
 /mob/verb/learnTech()
 	set category = "Utility"
@@ -73,72 +70,30 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 		fillOutTechTree()
 	if(client)
 		client.OpenTechMenu("tree")
-	return
-	var/int = Intelligence
-	if(passive_handler["Spiritual Tactician"])
-		if(Imagination > Intelligence)
-			int = Imagination
-	if(int < 0.5)
-		int = 0.5
-	var/theCost = glob.TECH_BASE_COST / int
-	var/list/thingCanBuy = list()
-	if(length(TechnologyTree) < 1)
-		fillOutTechTree()
-
-	for(var/n in TechnologyTree)
-		var/knowledgePaths/tech = TechnologyTree[n]
-		if(n in knowledgeTracker.learnedKnowledge)
-			continue
-		if(length(tech.requires) > 0)
-			// this means they have requirements
-			if(tech.meetsReqs(knowledgeTracker.learnedKnowledge)) // send the list
-
-				thingCanBuy += tech.name
-			else
-				continue
-		else
-			thingCanBuy += tech.name
-	var/input = Ask(src, "What would you like to learn?", "", null, "pick", (thingCanBuy + "Cancel"), 0)
-	if(input == "Cancel")
-		return
-	if(input in thingCanBuy)
-		var/knowledgePaths/tech = TechnologyTree[input]
-		if(tech.meetsReqs(knowledgeTracker.learnedKnowledge))
-			theCost *= 1 + (0.25 * length(tech.requires))
-			if(tech.breakthrough)
-				theCost /= 4
-			theCost = round(theCost,  1)
-			var/confirmation = Ask(src, "Are you sure you want to learn [tech.name] for [theCost] points?\nUnlocks: [tech.unlocks]\nDescription: [tech.description]", "", null, "pick", list("Yes", "No"), 0)
-			if(confirmation == "Yes")
-				if(SpendRPP(theCost, "[tech.name]"))
-					UnlockTech(tech, "Technology")
-		else
-			src << "You do not meet the requirements to learn [tech.name] ([jointext(tech.requires, " , ")])!"
 
 /mob/proc/UnlockTech(knowledgePaths/t, type)
 	src << " You have unlocked the knowledge of <b><u>[t.name]</u></b>!"
 	addUnlockedTech(t.name, type)
-	// AddUnlockedTechnology(t.name)
 	switch(t.name)
 		// TECH SHIT //
-		if("CyberEngineering")
+		if("Cyber Engineering")
 			CyberEngineeringUnlocked=1
 		if("Engineering")
 			EngineeringUnlocked=1
-		if("MilitaryTechnology")
+		if("Military Technology")
 			MilitaryTechnologyUnlocked=1
-		if("AdvancedTransmissionTechnology")
-			AdvancedTransmissionTechnologyUnlocked=1
 		if("Telecommunications")
 			TelecommunicationsUnlocked=1
+		if("Scouters")
+			AdvancedTransmissionTechnologyUnlocked=1
 		if("Medicine")
 			MedicineUnlocked=1
-		if("ImprovedMedicalTechnology")
+		if("Improved Medical Technology")
 			ImprovedMedicalTechnologyUnlocked=1
 			if(!locate(/obj/Skills/Utility/Surgery, src))
 				src.AddSkill(new/obj/Skills/Utility/Surgery)
 				src << "You learn how to treat crippling long-term injuries!"
-		if("MilitaryEngineering")
+		if("Military Engineering")
 			MilitaryEngineeringUnlocked=1
 		// Repair/Forge/Enhancement/Locksmithing/Smelting grants live in Smithing ranks now
 		if("Cyber Augmentations")
@@ -152,10 +107,6 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			if(!locate(/obj/Skills/Utility/Espionage_Scan, src))
 				src.AddSkill(new/obj/Skills/Utility/Espionage_Scan)
 				src << "You can right click a nearby person to scan them for espionage equipment!"
-		if("Culinary Basics")
-			if(!locate(/obj/Skills/Utility/Cooking, src))
-				src.AddSkill(new/obj/Skills/Utility/Cooking);
-				src << "You have learned the basics of <u>Cooking</u>!"
 		if("Piloting Foundations")
 			PilotingProwess++
 			if(PilotingProwess>7)
@@ -168,7 +119,22 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			continue
 		else
 			return 0
+	if(requires_any && requires_any.len)
+		for(var/req in requires_any)
+			if(req in acquired)
+				return 1
+		return 0
 	return 1
+
+/knowledgePaths/proc/ReqLine()
+	var/list/parts = list()
+	if(requires && requires.len)
+		parts += jointext(requires, ", ")
+	if(requires_any && requires_any.len)
+		var/anyline = jointext(requires_any, " or ")
+		parts += anyline
+	if(!parts.len) return "nothing"
+	return jointext(parts, ", plus ")
 
 
 /mob/proc/RemoveTech(knowledgePaths/t, ty)
@@ -180,24 +146,24 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 	removeUnlockedTech(t.name, ty)
 	switch(t.name)
 		// TECH SHIT //
-		if("CyberEngineering")
+		if("Cyber Engineering")
 			CyberEngineeringUnlocked--
 		if("Engineering")
 			EngineeringUnlocked--
-		if("MilitaryTechnology")
+		if("Military Technology")
 			MilitaryTechnologyUnlocked--
-		if("AdvancedTransmissionTechnology")
-			AdvancedTransmissionTechnologyUnlocked--
 		if("Telecommunications")
 			TelecommunicationsUnlocked--
+		if("Scouters")
+			AdvancedTransmissionTechnologyUnlocked=0
 		if("Medicine")
 			MedicineUnlocked--
-		if("ImprovedMedicalTechnology")
+		if("Improved Medical Technology")
 			ImprovedMedicalTechnologyUnlocked--
 			if(locate(/obj/Skills/Utility/Surgery, src))
 				for(var/obj/Skills/Utility/Surgery/s in src)
 					del s
-		if("MilitaryEngineering")
+		if("Military Engineering")
 			MilitaryEngineeringUnlocked--
 		if("Cyber Augmentations")
 			for(var/obj/Skills/Utility/Cybernetic_Augmentation/ca in src)
@@ -211,10 +177,6 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 			if(locate(/obj/Skills/Utility/Espionage_Scan, src))
 				for(var/obj/Skills/Utility/Espionage_Scan/sc in src)
 					del sc
-		if("Culinary Basics")
-			if(locate(/obj/Skills/Utility/Cooking, src))
-				for(var/obj/Skills/Utility/Cooking/cock in src)
-					del cock
 		if("Piloting Foundations")
 			PilotingProwess--
 			if(PilotingProwess < 0)

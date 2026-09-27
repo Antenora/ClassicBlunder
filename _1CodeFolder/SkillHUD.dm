@@ -3,16 +3,75 @@
 #define SHUD_ROW_LEFT -192
 #define SHUD_ROW_Y 30
 
+#if fexists("../Icons/Private/HotbarOrbs/orb_cut.png") || fexists("Icons/Private/HotbarOrbs/orb_cut.png")
+#define SHUD_PRIVATE_ART 1
+#else
+#define SHUD_PRIVATE_ART 0
+#endif
+
+#if SHUD_PRIVATE_ART
+#define SHUD_SLOT_ICON  'Icons/Private/HotbarOrbs/hud_slot.png'
+#define SHUD_ORB_CUT    'Icons/Private/HotbarOrbs/orb_cut.png'
+#define SHUD_EN_BASE    'Icons/Private/HotbarOrbs/orb_en_base.png'
+#define SHUD_EN_FILL    'Icons/Private/HotbarOrbs/fill_en.png'
+#define SHUD_EN_DRAIN   'Icons/Private/HotbarOrbs/drain_en.png'
+#define SHUD_EN_TOP     'Icons/Private/HotbarOrbs/orb_en_top.png'
+#define SHUD_HP_BASE    'Icons/Private/HotbarOrbs/orb_hp_base.png'
+#define SHUD_HP_FILL    'Icons/Private/HotbarOrbs/fill_hp.png'
+#define SHUD_HP_DRAIN   'Icons/Private/HotbarOrbs/drain_hp.png'
+#define SHUD_HP_TOP     'Icons/Private/HotbarOrbs/orb_hp_top.png'
+#define SHUD_MANA_TRACK 'Icons/Private/HotbarOrbs/mana_track.png'
+#define SHUD_MANA_FILL  'Icons/Private/HotbarOrbs/mana_fill.png'
+#define SHUD_MANA_CUT   'Icons/Private/HotbarOrbs/mana_cut.png'
+
+#define SHUD_ORB_Y 14
+#define SHUD_ORB_LEFT_X -258
+#define SHUD_ORB_RIGHT_X 176
+#define SHUD_ORB_D 76     // orb art width; the row+orbs span SHUD_ORB_LEFT_X to SHUD_ORB_RIGHT_X+this
+#define SHUD_ORB_H 60
+#define SHUD_BALL_D 42
+#define SHUD_FILL_EMPTY_Y -46
+#define SHUD_DRAIN_HIDDEN_Y 56
+#define SHUD_ORB_TEXT_X -7
+#define SHUD_MANA_X -254
+#define SHUD_MANA_Y 24
+#define SHUD_MANA_SPAN 48
+#define SHUD_MANA_EMPTY_Y -49
+#else
+#define SHUD_SLOT_ICON  'HUD/hud_slot.png'
+#define SHUD_ORB_CUT    'HUD/orb_cut.png'
+#define SHUD_EN_BASE    'HUD/orb_energy_base.png'
+#define SHUD_EN_FILL    'HUD/fill_energy.png'
+#define SHUD_EN_DRAIN   'HUD/drain_energy.png'
+#define SHUD_EN_TOP     'HUD/orb_energy_top.png'
+#define SHUD_HP_BASE    'HUD/orb_health_base.png'
+#define SHUD_HP_FILL    'HUD/fill_health.png'
+#define SHUD_HP_DRAIN   'HUD/drain_health.png'
+#define SHUD_HP_TOP     'HUD/orb_health_top.png'
+#define SHUD_MANA_TRACK 'HUD/lifebar_track.png'
+#define SHUD_MANA_FILL  'HUD/lifebar_fill.png'
+#define SHUD_MANA_CUT   'HUD/lifebar_mask.png'
+
 #define SHUD_ORB_Y 12
 #define SHUD_ORB_LEFT_X -267
 #define SHUD_ORB_RIGHT_X 198
-#define SHUD_ORB_D 69     // orb art width; the row+orbs span SHUD_ORB_LEFT_X to SHUD_ORB_RIGHT_X+this
+#define SHUD_ORB_D 69
+#define SHUD_ORB_H 69
 #define SHUD_BALL_D 44
 #define SHUD_FILL_EMPTY_Y -54
 #define SHUD_DRAIN_HIDDEN_Y 59
+#define SHUD_ORB_TEXT_X -13
+#define SHUD_MANA_X -267
+#define SHUD_MANA_Y 12
+#define SHUD_MANA_SPAN 14
+#define SHUD_MANA_EMPTY_Y -14
+#endif
 
 #define SHUD_LAYER (FLY_LAYER+2)
 #define SHUD_FONT_STYLE "font-family:'monogram'; font-size:12pt"
+#define SHUD_TEXT_LINE 16
+#define SHUD_ORB_TEXT_H 56
+#define SHUD_ORB_TEXT_LINE_Y(n) (SHUD_FILL_EMPTY_Y + SHUD_ORB_H + round(SHUD_BALL_D / 2) - SHUD_ORB_TEXT_H + (n) * (SHUD_TEXT_LINE / 2))
 
 /atom/movable/shud
 	plane = HUD_PLANE //off plane 0 so the farblur world capture can't eat or ghost the HUD
@@ -57,7 +116,7 @@
 		filters = filter(type="outline", size=1, color="#000000")
 
 /atom/movable/shud/slot
-	icon = 'HUD/hud_slot.png'
+	icon = SHUD_SLOT_ICON
 	mouse_opacity = 2                          // full box so drag-drops land reliably
 	mouse_drag_pointer = MOUSE_ACTIVE_POINTER
 	var/slot_index
@@ -271,6 +330,7 @@
 	mouse_opacity = 0
 
 /atom/movable/shud/orb
+	layer = SHUD_LAYER - 0.1
 	appearance_flags = KEEP_TOGETHER // so the shield glow outlines the whole orb
 	var/atom/movable/shud/orbpart/fill  // liquid, rises from the bottom
 	var/atom/movable/shud/orbpart/drain // injury/fatigue darkness, descends from the top
@@ -280,10 +340,10 @@
 		base.icon = base_icon
 		fill = new
 		fill.icon = fill_icon
-		fill.filters = filter(type="alpha", icon='HUD/orb_cut.png', y=SHUD_FILL_EMPTY_Y)
+		fill.filters = filter(type="alpha", icon=SHUD_ORB_CUT, y=SHUD_FILL_EMPTY_Y)
 		drain = new
 		drain.icon = drain_icon
-		drain.filters = filter(type="alpha", icon='HUD/orb_cut.png', y=SHUD_DRAIN_HIDDEN_Y)
+		drain.filters = filter(type="alpha", icon=SHUD_ORB_CUT, y=SHUD_DRAIN_HIDDEN_Y)
 		var/atom/movable/shud/orbpart/glass = new
 		glass.icon = top_icon
 		vis_contents += base
@@ -301,9 +361,30 @@
 /atom/movable/shud/orbtext
 	layer = SHUD_LAYER + 0.5
 	maptext_width = 96  // wider than the orb so "100% (100%)" fits on one line
-	maptext_height = 40
-	maptext_x = -13     // recenters the wide text over the orb
-	maptext_y = 4
+	maptext_height = SHUD_ORB_TEXT_H
+	maptext_x = SHUD_ORB_TEXT_X
+	maptext_y = 2
+	proc/SetLines(list/lines)
+		maptext_y = SHUD_ORB_TEXT_LINE_Y(lines.len)
+		maptext = "<center>[jointext(lines, "<br>")]</center>"
+
+/atom/movable/shud/manabar
+	icon = SHUD_MANA_TRACK
+	layer = SHUD_LAYER + 0.3
+	var/atom/movable/shud/orbpart/fill
+	New()
+		..()
+		fill = new
+		fill.icon = SHUD_MANA_FILL
+		fill.layer = SHUD_LAYER + 0.31
+		fill.filters = filter(type="alpha", icon=SHUD_MANA_CUT, y=SHUD_MANA_EMPTY_Y)
+		vis_contents += fill
+	Del()
+		for(var/atom/movable/o in vis_contents)
+			vis_contents -= o
+			del o
+		fill = null
+		..()
 
 client
 	var/tmp
@@ -313,6 +394,7 @@ client
 		atom/movable/shud/orb/orb_energy
 		atom/movable/shud/orbtext/orbtext_health
 		atom/movable/shud/orbtext/orbtext_energy
+		atom/movable/shud/manabar/manabar
 		health_glowing = FALSE
 		obj/hotbar_ticker/hotbar_ticker   // per-tick cooldown updater on the global_loop
 		// last shown values, so fill animations can pace by delta
@@ -320,8 +402,35 @@ client
 		shud_en_last = 0
 		shud_inj_last = 0
 		shud_ftg_last = 0
+		shud_mp_last = 0
+
+client/proc/InitBeltHUD()
+	return
+
+client/proc/PositionBeltHUD()
+	return
+
+client/proc/ResetBeltHUD()
+	return
+
+client/proc/RefreshBeltHUD()
+	return
+
+client/proc/InitAmmoHUD()
+	return
+
+client/proc/PositionAmmoHUD()
+	return
+
+client/proc/ResetAmmoHUD()
+	return
+
+client/proc/RefreshAmmoHUD()
+	return
 
 client/proc/PositionSkillHUD()
+	PositionBeltHUD()
+	PositionAmmoHUD()
 	if(!shud_slots || !shud_slots.len) return
 	var/list/v = splittext("[view]", "x")
 	if(v.len < 2) return
@@ -342,6 +451,7 @@ client/proc/PositionSkillHUD()
 	if(orbtext_energy) orbtext_energy.screen_loc = ll
 	if(orb_health) orb_health.screen_loc = rl
 	if(orbtext_health) orbtext_health.screen_loc = rl
+	if(manabar) manabar.screen_loc = "1:[lx + (SHUD_MANA_X - SHUD_ORB_LEFT_X)],SOUTH:[SHUD_MANA_Y]"
 
 client/proc/InitSkillHUD()
 	ClearSkillHUD()
@@ -358,10 +468,12 @@ client/proc/InitSkillHUD()
 		shud_slots += s
 		shud_parts += s
 		shud_parts += s.cdtext
-	orb_energy = new(null, 'HUD/orb_energy_base.png', 'HUD/fill_energy.png', 'HUD/drain_energy.png', 'HUD/orb_energy_top.png')
+	orb_energy = new(null, SHUD_EN_BASE, SHUD_EN_FILL, SHUD_EN_DRAIN, SHUD_EN_TOP)
 	shud_parts += orb_energy
-	orb_health = new(null, 'HUD/orb_health_base.png', 'HUD/fill_health.png', 'HUD/drain_health.png', 'HUD/orb_health_top.png')
+	orb_health = new(null, SHUD_HP_BASE, SHUD_HP_FILL, SHUD_HP_DRAIN, SHUD_HP_TOP)
 	shud_parts += orb_health
+	manabar = new
+	shud_parts += manabar
 	orbtext_energy = new
 	shud_parts += orbtext_energy
 	orbtext_health = new
@@ -383,6 +495,8 @@ client/proc/InitSkillHUD()
 	mob.TomeScrubStale()
 	mob.DisableSlottableSkillVerbs()   // slotted/slottable skills become hotbar-only
 	RefreshHotbar()     // paint slots from the saved /shortcut datum
+	InitBeltHUD()
+	InitAmmoHUD()
 	hotbar_ticker = new
 	hotbar_ticker.owner = src
 	if(global_loop)
@@ -397,6 +511,8 @@ client/proc/InitSkillHUD()
 	// RefreshHotbar above already ran ApplyKeybinds to install the key binds
 
 client/proc/ClearSkillHUD()
+	ResetBeltHUD()
+	ResetAmmoHUD()
 	if(hotbar_ticker)
 		if(global_loop) global_loop.Remove(hotbar_ticker)
 		del hotbar_ticker
@@ -419,6 +535,7 @@ client/proc/ClearSkillHUD()
 	orb_energy = null
 	orbtext_health = null
 	orbtext_energy = null
+	manabar = null
 	shud_slots = null   // slot objects are freed via shud_parts below
 	if(shud_parts)
 		while(shud_parts.len)
@@ -431,19 +548,22 @@ client/proc/ClearSkillHUD()
 mob/proc/UpdateResourceOrbs()
 	if(!client) return
 	var/enp = EnergyMax ? round((Energy / EnergyMax) * 100, 0.01) : 0
-	client.UpdateOrbDisplay(round(HealthPct(), 0.01), round(VaizardHealth + BioArmor, 0.01), round(TotalInjury, 0.01), enp, round(TotalFatigue, 0.01))
+	var/cap = ManaCap()
+	var/mp = cap > 0 ? round(min(ManaAmount / cap, 1) * 100, 0.01) : 0
+	client.UpdateOrbDisplay(round(HealthPct(), 0.01), round(VaizardHealth + BioArmor, 0.01), round(TotalInjury, 0.01), enp, round(TotalFatigue, 0.01), mp)
 
 client/proc/OrbAnimTime(oldval, newval)
 	var/delta = abs(newval - oldval)
 	if(!delta) return 0
 	return min(16, 8 + delta / 12)
 
-client/proc/UpdateOrbDisplay(hp, shield, inj, enp, ftg)
+client/proc/UpdateOrbDisplay(hp, shield, inj, enp, ftg, mp = 0)
 	if(!orb_health || !orb_energy) return
 	var/hpc = min(max(hp, 0), 100)
 	var/enc = min(max(enp, 0), 100)
 	var/injc = min(max(inj, 0), 100)
 	var/ftgc = min(max(ftg, 0), 100)
+	var/mpc = min(max(mp, 0), 100)
 	var/t = OrbAnimTime(shud_hp_last, hpc)
 	if(t) animate(orb_health.fill.filters[1], y = round(SHUD_BALL_D * hpc / 100) + SHUD_FILL_EMPTY_Y, time = t, easing = SINE_EASING)
 	t = OrbAnimTime(shud_en_last, enc)
@@ -452,10 +572,14 @@ client/proc/UpdateOrbDisplay(hp, shield, inj, enp, ftg)
 	if(t) animate(orb_health.drain.filters[1], y = SHUD_DRAIN_HIDDEN_Y - round(SHUD_BALL_D * injc / 100), time = t, easing = SINE_EASING)
 	t = OrbAnimTime(shud_ftg_last, ftgc)
 	if(t) animate(orb_energy.drain.filters[1], y = SHUD_DRAIN_HIDDEN_Y - round(SHUD_BALL_D * ftgc / 100), time = t, easing = SINE_EASING)
+	if(manabar)
+		t = OrbAnimTime(shud_mp_last, mpc)
+		if(t) animate(manabar.fill.filters[1], y = round(SHUD_MANA_SPAN * mpc / 100) + SHUD_MANA_EMPTY_Y, time = t, easing = SINE_EASING)
 	shud_hp_last = hpc
 	shud_en_last = enc
 	shud_inj_last = injc
 	shud_ftg_last = ftgc
+	shud_mp_last = mpc
 
 	if(shield > 0 && !health_glowing)
 		health_glowing = TRUE
@@ -464,21 +588,18 @@ client/proc/UpdateOrbDisplay(hp, shield, inj, enp, ftg)
 		health_glowing = FALSE
 		orb_health.filters = null
 
-	var/htext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[hp]%"
+	var/list/hl = list("<span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[hp]%</span>")
 	if(shield > 0)
-		htext += " <span style=\"color:#7fc4ff\">([shield]%)</span>"
-	htext += "</span>"
+		hl += "<span style=\"[SHUD_FONT_STYLE]; color:#7fc4ff\">([shield]%)</span>"
 	if(inj > 0)
-		htext += "<br><span style=\"[SHUD_FONT_STYLE]; color:#ff8a5c\">[inj]%</span>"
-	htext += "</center>"
-	orbtext_health.maptext = htext
+		hl += "<span style=\"[SHUD_FONT_STYLE]; color:#ff8a5c\">[inj]%</span>"
+	orbtext_health.SetLines(hl)
 	orbtext_health.filters = filter(type="outline", size=1, color="#000000")
 
-	var/etext = "<center><span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[enp]%</span>"
+	var/list/el = list("<span style=\"[SHUD_FONT_STYLE]; color:#ffffff\">[enp]%</span>")
 	if(ftg > 0)
-		etext += "<br><span style=\"[SHUD_FONT_STYLE]; color:#e8d44d\">[ftg]%</span>"
-	etext += "</center>"
-	orbtext_energy.maptext = etext
+		el += "<span style=\"[SHUD_FONT_STYLE]; color:#e8d44d\">[ftg]%</span>"
+	orbtext_energy.SetLines(el)
 	orbtext_energy.filters = filter(type="outline", size=1, color="#000000")
 
 client/proc/HotbarKeyLabel(n)
@@ -495,6 +616,7 @@ client/proc/RefreshHotbar()
 		s.SetSkill(S, HotbarKeyLabel(s.slot_index))
 	RefreshHotbarCooldowns()
 	ApplyKeybinds()   // re-sync key binds and held-skill +UP releases on every slot change
+	RefreshBeltHUD()
 
 // a slot glows blue while its skill is in an active state
 mob/proc/SkillGlowActive(obj/Skills/S)
@@ -532,6 +654,11 @@ client/proc/FlashSlot(num, color)
 			s.FlashGlow(color)
 			return
 
+client/proc/RefreshHotbarCharges()
+	if(!shud_slots) return
+	for(var/atom/movable/shud/slot/s in shud_slots)
+		s.SetChargeText()
+
 client/proc/RefreshHotbarCooldowns()
 	var/any = FALSE
 	if(shud_slots)
@@ -551,4 +678,5 @@ client/proc/RefreshHotbarCooldowns()
 			return
 		if(!active && (round(world.time * 2) % 2))
 			return
+		owner.RefreshAmmoHUD()
 		active = owner.RefreshHotbarCooldowns()

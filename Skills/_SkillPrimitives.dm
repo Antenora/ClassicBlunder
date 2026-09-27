@@ -135,6 +135,9 @@ obj/Skills
 	var/tmp/chain_until = 0
 	var/tmp/recast_count = 0
 
+obj/Skills/proc/OnSkillHit(mob/caster, mob/m, atom/hitter)
+	return
+
 obj/Skills/Projectile
 	var/EmitChild
 	var/EmitCount = 0

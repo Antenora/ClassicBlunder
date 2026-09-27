@@ -9,6 +9,9 @@
 
 
 
+/mob/proc/MechLoginRemount()
+	return
+
 /mob/Players/proc/addMissingSkills()
 	var/list/missingSkills = list(/obj/Skills/Meditate, /obj/Skills/Queue/Heavy_Strike, \
 	/obj/Skills/Grab, /obj/Skills/Grapple/Toss, /obj/Skills/Dragon_Dash, /obj/Skills/Target_Clear, /obj/Skills/Target_Switch, \
@@ -224,6 +227,10 @@ mob/Players
 		if(!killed_AI)
 			killed_AI = list()
 
+		MaimSettle()
+		MechLoginRemount()
+		AndroidCoreLogin()
+
 		if(last_online)
 			var regen_time = (world.realtime - last_online) / 10
 			if((TotalInjury + TotalFatigue + TotalCapacity) >= 10)
@@ -243,7 +250,6 @@ mob/Players
 			BPPoisonTimer = max(1,BPPoisonTimer - regen_time)
 
 			var/food_time=0
-			var/was_drunk=0
 			if(src.Satiated)
 				if(src.Satiated>=regen_time)
 					src.Satiated-=regen_time
@@ -251,25 +257,21 @@ mob/Players
 				else
 					food_time=src.Satiated
 					src.Satiated=0
-					if(src.Drunk)
-						was_drunk = 1
-						src.Drunk=0
-				if(!was_drunk)
-					BPPoisonTimer = max(1,BPPoisonTimer - food_time)
-					if(src.StrTax)
-						src.SubStrTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.EndTax)
-						src.SubEndTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.SpdTax)
-						src.SubSpdTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.ForTax)
-						src.SubForTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.OffTax)
-						src.SubOffTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.DefTax)
-						src.SubDefTax(1/(1 DAYS)*food_time, Forced=1)
-					if(src.RecovTax)
-						src.SubRecovTax(1/(1 DAYS)*food_time, Forced=1)
+				BPPoisonTimer = max(1,BPPoisonTimer - food_time)
+				if(src.StrTax)
+					src.SubStrTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.EndTax)
+					src.SubEndTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.SpdTax)
+					src.SubSpdTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.ForTax)
+					src.SubForTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.OffTax)
+					src.SubOffTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.DefTax)
+					src.SubDefTax(1/(1 DAYS)*food_time, Forced=1)
+				if(src.RecovTax)
+					src.SubRecovTax(1/(1 DAYS)*food_time, Forced=1)
 			if(regen_time>food_time)
 				regen_time-=food_time
 				if(src.StrTax)
@@ -372,6 +374,14 @@ mob/Players
 				break
 		if(sord)
 			equippedSword = sord
+
+		var/obj/Items/Gun/gunn
+		for(var/obj/Items/Gun/g in src)
+			if(g.suffix=="*Equipped*")
+				gunn=g
+				break
+		if(gunn)
+			equippedGun = gunn
 
 		var/obj/Items/Armor/armr
 		for(var/obj/Items/Armor/s in src)
@@ -1132,6 +1142,9 @@ mob/proc
 					src.contents+=new/obj/FurryOptions
 					src.Hairz("Remove")
 					src.Hairz("Add")
+
+			if(isRace(ANDROID))
+				AndroidCorePick()
 
 			if(src.isRace(SAIYAN)||isRace(HALFSAIYAN))
 				src.Tail(1)

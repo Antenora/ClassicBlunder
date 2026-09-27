@@ -2,12 +2,12 @@
 #define TT_SHAPE_ROUND   "round"
 #define TT_SHAPE_DIAMOND "diamond"
 #define TT_SHAPE_LARGE   "large"
-#define TT_FAM_FORGE     "forge"
+#define TT_FAM_ENGINEER  "engineer"
+#define TT_FAM_OPERATIVE "operative"
+#define TT_FAM_GUNSMITH  "gunsmith"
+#define TT_FAM_MECHANIST "mechanist"
 #define TT_FAM_CYBER     "cyber"
-#define TT_FAM_MED       "medicine"
-#define TT_FAM_TELE      "telecom"
-#define TT_FAM_MIL       "military"
-#define TT_FAM_MISC      "misc"
+#define TT_FAM_MEDIC     "medic"
 #endif
 
 #define TT_W 624
@@ -38,8 +38,8 @@
 #define TT_BAND_H 24
 
 var/list/TT_FAM_COLOR = list(
-	TT_FAM_FORGE = "#ff9a3c", TT_FAM_CYBER = "#b46bff", TT_FAM_MED = "#5bd75b",
-	TT_FAM_TELE = "#37c4ff", TT_FAM_MIL = "#ff5a5a", TT_FAM_MISC = "#cfe3f5")
+	TT_FAM_ENGINEER = "#ff9a3c", TT_FAM_OPERATIVE = "#37c4ff", TT_FAM_GUNSMITH = "#ff5a5a",
+	TT_FAM_MECHANIST = "#ffd86b", TT_FAM_CYBER = "#b46bff", TT_FAM_MEDIC = "#5bd75b")
 #define TT_LOCKED_COLOR "#5a6a82"
 #define TT_LINE_LIT  "#37e0ff"
 #define TT_LINE_DIM  "#3c5478"
@@ -160,23 +160,6 @@ var/list/TT_FAM_COLOR = list(
 		sleep(MHUD_PRESS_STEP)
 		DoAction()
 
-/atom/movable/shud/ttcraftrow      // craft list row hit area
-	layer = TT_LAYER + 0.42
-	mouse_opacity = 2
-	var/obj/Items/catalog
-	Click(location, control, params)
-		if(!usr || !usr.client) return
-		if(params && findtext(params, "right=1"))
-			usr.client.ShowCraftDesc(catalog)
-			return
-		usr.client.TechCraftMake(catalog)
-
-/atom/movable/shud/craftdescpanel
-	layer = TT_LAYER + 1.0
-	mouse_opacity = 2
-	Click(location, control, params)
-		if(usr && params && findtext(params, "right=1")) usr.client.HideCraftDesc()
-
 client
 	var/tmp
 		tmenu_open = 0
@@ -216,8 +199,6 @@ client
 		tt_pan_oy = 0
 		tt_pan_dragged = FALSE
 		tmenu_sel
-		tmenu_filter = "all"
-		tmenu_craftpage = 1
 		tmenu_selanim = 0
 		atom/movable/shud/menubtn/btn_tech
 		atom/movable/shud/menulabel/btn_tech_label
@@ -436,8 +417,6 @@ client/proc/ShowTechTab(tab)
 	if(tab == "tree")
 		BuildTree()
 	else
-		if(tmenu_sel) tmenu_filter = TechNodeFamily(tmenu_sel)
-		tmenu_craftpage = 1
 		BuildCraft()
 	KineticEntrance(tmenu_tabobjs)
 
@@ -447,13 +426,16 @@ client/proc/TechButton(action, arg)
 		if("tab_tree") ShowTechTab("tree")
 		if("tab_craft") ShowTechTab("craft")
 		if("learn") TechLearnSelected()
-		if("craftpage")
-			tmenu_craftpage += arg
-			BuildCraft()
-		if("filter")
-			tmenu_filter = arg
-			tmenu_craftpage = 1
-			BuildCraft()
+		if("field")
+			CloseTechMenu()
+			TechFieldCraftOpen()
+		if("bench")
+			var/obj/LifeSkills/Station/Workbench/W = TechAdjacentWorkbench()
+			if(!W)
+				if(mob) mob << "You need to be next to a Workbench."
+				return
+			CloseTechMenu()
+			LifeCraftOpen(W)
 
 client/proc/TTOriginDx()  return TT_VP_L + TT_MARGIN - tmenu_panx
 client/proc/TTOriginDyT() return TT_VP_T + TT_MARGIN - tmenu_pany
@@ -550,7 +532,7 @@ client/proc/BuildTree()
 		var/list/ce = TechTreeLayout[t.name]
 		if(!ce) continue
 		var/owned_child = (t.name in mob.knowledgeTracker.learnedKnowledge)
-		for(var/req in t.requires)
+		for(var/req in (t.requires + t.requires_any))
 			var/list/pe = TechTreeLayout[req]
 			if(!pe) continue
 			var/lit = owned_child || (req in mob.knowledgeTracker.learnedKnowledge)
@@ -721,17 +703,19 @@ client/proc/RefreshInfoBar()
 	var/owned = (t.name in mob.knowledgeTracker.learnedKnowledge)
 	var/avail = t.meetsReqs(mob.knowledgeTracker.learnedKnowledge)
 	var/cost = mob.TechNodeCost(t)
+	var/need = mob.TechNodeRankNeeded(t)
+	var/hasrank = (mob.LifeRank("Technology") >= need)
 	var/famcol = TT_FAM_COLOR[TechNodeFamily(t.name)]
-	var/reqs = t.requires.len ? jointext(t.requires, ", ") : "None"
+	var/reqs = (t.requires.len || t.requires_any.len) ? t.ReqLine() : "None"
 	var/unlocks = t.unlocks ? t.unlocks : "Nothing further"
 	var/status
 	if(owned) status = "<span style=\"color:#9be7a0\">LEARNED</span>"
 	else if(!avail) status = "<span style=\"color:#ff7a7a\">LOCKED</span>"
-	else status = "<span style=\"color:#ffd86b\">[cost] RPP</span>"
+	else status = "<span style=\"color:#ffd86b\">[cost] RPP</span> &nbsp; <span style=\"color:[hasrank ? "#9be7a0" : "#ff7a7a"]\">RANK [need]</span>"
 	tmenu_infoname.maptext = "<span style=\"[TT_FONT]; color:[famcol]\">[t.name]</span> &nbsp;&nbsp; <span style=\"[TT_FONT]\">[status]</span>"
-	tmenu_info.maptext = "<span style=\"[TT_FONT_BODY]; color:#bcd0e8\">Requires: [reqs]<br>Unlocks: [unlocks]<br>[t.description]</span>"
+	tmenu_info.maptext = "<span style=\"[TT_FONT_BODY]; color:#bcd0e8\">[t.bench] &middot; Requires: [reqs]<br>Unlocks: [unlocks]<br>[t.description]</span>"
 	if(tmenu_learn)
-		var/can = (!owned && avail && mob.CanAffordTechNode(t))
+		var/can = (!owned && avail && hasrank && mob.CanAffordTechNode(t))
 		tmenu_learn.alpha = can ? 255 : 110
 		tmenu_learn_lbl.maptext = "<center><span style=\"[TT_FONT]; color:[can ? "#8be9ff" : "#5a6a82"]\">[owned ? "LEARNED" : "LEARN"]</span></center>"
 
@@ -831,41 +815,15 @@ client/proc/TT_CanvasH()
 		if(e[2] > maxr) maxr = e[2]
 	return maxr * TT_ROW_H
 
-client/proc/CraftSectionsFor(filter)
-	var/list/out = list()
-	var/list/learned = mob.knowledgeTracker.learnedKnowledge
-	if(filter == "all" || filter == TT_FAM_MISC)
-		out += list(CraftSection("Basic Technology", BasicTechnology_List, learned, 1))
-	if(filter == "all" || filter == TT_FAM_CYBER)
-		out += list(CraftSection("Engineering", Engineering_List, learned, mob.EngineeringUnlocked))
-		out += list(CraftSection("Cyber Engineering", CyberEngineering_List, learned, mob.CyberEngineeringUnlocked))
-	if(filter == "all" || filter == TT_FAM_MED)
-		out += list(CraftSection("Medicine", Medicine_List, learned, mob.MedicineUnlocked))
-		out += list(CraftSection("Improved Medical", ImprovedMedicalTechnology_List, learned, mob.ImprovedMedicalTechnologyUnlocked))
-	if(filter == "all" || filter == TT_FAM_TELE)
-		out += list(CraftSection("Telecommunications", Telecommunications_List, learned, mob.TelecommunicationsUnlocked))
-		out += list(CraftSection("Adv. Transmission", AdvancedTransmissionTechnology_List, learned, mob.AdvancedTransmissionTechnologyUnlocked))
-	if(filter == "all" || filter == TT_FAM_MIL)
-		out += list(CraftSection("Military Technology", MilitaryTechnology_List, learned, mob.MilitaryTechnologyUnlocked))
-		out += list(CraftSection("Military Engineering", MilitaryEngineering_List, learned, mob.MilitaryEngineeringUnlocked))
-	if(filter == "all" || filter == TT_FAM_CYBER || filter == TT_FAM_MIL)
-		out += list(CraftSection("Power Packs", PowerPack_List, learned, (mob.EngineeringUnlocked || mob.MilitaryTechnologyUnlocked)))
-	var/list/clean = list()
-	for(var/list/sec in out)
-		if(sec["items"].len) clean += list(sec)
-	return clean
+client/proc/TechFieldCraftOpen(recipe_id)
+	if(mob) mob << "Field crafting is not ready yet."
 
-client/proc/CraftSection(label, list/src_list, list/learned, unlocked)
-	var/list/items = list()
-	if(unlocked && src_list)
-		for(var/obj/Items/it in src_list)
-			if(it.Unobtainable) continue
-			if(it.SubType == "Any" || isnull(it.SubType) || (it.SubType in learned))
-				items += it
-	return list("label" = label, "items" = items)
+client/proc/TechAdjacentWorkbench()
+	if(!mob) return null
+	for(var/obj/LifeSkills/Station/Workbench/W in range(1, mob))
+		return W
+	return null
 
-#define TT_CRAFT_ROWS 8
-#define TT_CRAFT_RH 26
 client/proc/BuildCraft()
 	ClearList(tmenu_tabobjs)
 	tmenu_tabobjs = list()
@@ -875,8 +833,6 @@ client/proc/BuildCraft()
 	tmenu_learn = null
 	tmenu_nodes = null
 
-	BuildCraftChips()
-
 	// framed list box
 	var/atom/movable/shud/ttbg/lbox = new
 	lbox.icon = 'HUD/tech_listpanel.png'
@@ -885,158 +841,41 @@ client/proc/BuildCraft()
 	lbox.screen_loc = TTloc(14, 84, 250)
 	tmenu_tabobjs += lbox
 
-	var/list/sections = CraftSectionsFor(tmenu_filter)
-	var/list/rows = list()
-	for(var/list/sec in sections)
-		rows += list(list("type" = "head", "label" = sec["label"]))
-		for(var/obj/Items/it in sec["items"])
-			rows += list(list("type" = "item", "obj" = it))
+	var/atom/movable/shud/tttext/h = new
+	h.maptext_width = 560
+	h.maptext_height = 16
+	h.screen_loc = TTloc(30, 100, 16)
+	h.maptext = "<span style=\"[TT_FONT]; color:#8be9ff\">Craft at a Workbench</span>"
+	tmenu_tabobjs += h
 
-	var/pages = 1
-	while(pages * TT_CRAFT_ROWS < rows.len) pages++
-	tmenu_craftpage = clamp(tmenu_craftpage, 1, pages)
-	var/start = (tmenu_craftpage - 1) * TT_CRAFT_ROWS
+	var/atom/movable/shud/tttext/body = new
+	body.maptext_width = 560
+	body.maptext_height = 48
+	body.screen_loc = TTloc(30, 124, 48)
+	body.maptext = "<span style=\"[TT_FONT_BODY]; color:#dbe6f5\">Everything Technology makes is built at a Workbench. Stand next to one and press [mob.InteractKeyName()], or click it.<br>Field crafts need no bench and are made in batches anywhere.</span>"
+	tmenu_tabobjs += body
 
-	var/y = 98
-	for(var/k = 1 to TT_CRAFT_ROWS)
-		var/idx = start + k
-		if(idx > rows.len) break
-		var/list/r = rows[idx]
-		if(r["type"] == "head")
-			var/atom/movable/shud/tttext/h = new
-			h.maptext_width = 560
-			h.maptext_height = 16
-			h.screen_loc = TTloc(30, y + 2, 16)
-			h.maptext = "<span style=\"[TT_FONT]; color:#8be9ff\">[r["label"]]</span>"
-			tmenu_tabobjs += h
-		else
-			var/obj/Items/it = r["obj"]
-			var/atom/movable/shud/ttcraftrow/row = new
-			row.catalog = it
-			row.icon = 'HUD/tt_rowhit.png'
-			row.screen_loc = TTloc(30, y, TT_CRAFT_RH)
-			tmenu_tabobjs += row
-			var/icon/icn = icon(it.icon, it.icon_state)
-			icn.Scale(16, 16)
-			var/atom/movable/shud/ttpic/ic = new
-			ic.icon = icn
-			ic.layer = TT_LAYER + 0.46
-			ic.screen_loc = TTloc(38, y + 5, 16)
-			tmenu_tabobjs += ic
-			var/atom/movable/shud/tttext/nm = new
-			nm.maptext_width = 300
-			nm.maptext_height = 16
-			nm.screen_loc = TTloc(62, y + 5, 16)
-			nm.maptext = "<span style=\"[TT_FONT]; color:#ffffff\">[it.name]</span>"
-			tmenu_tabobjs += nm
-			var/datum/craft_recipe/rec = GetTechRecipe(it)
-			var/atom/movable/shud/tttext/ct = new
-			ct.maptext_width = 140
-			ct.maptext_height = 16
-			ct.screen_loc = TTloc(470, y + 5, 16)
-			ct.maptext = "<span style=\"[TT_FONT]; color:#9be7a0\">[Commas(round(rec.MoneyCost(mob, it)))]</span>"
-			tmenu_tabobjs += ct
-		y += TT_CRAFT_RH
-
-	BuildCraftPager(pages)
+	TTCraftButton("field", "FIELD CRAFTS", 30, 184)
+	if(TechAdjacentWorkbench()) TTCraftButton("bench", "OPEN WORKBENCH", 196, 184)
 
 	for(var/atom/movable/o in tmenu_tabobjs)
 		if(o in screen) continue
 		screen += o
 	RefreshBalance()
 
-client/proc/BuildCraftChips()
-	var/list/fams = list("all" = "All", TT_FAM_CYBER = "Cyber", \
-		TT_FAM_MED = "Medicine", TT_FAM_TELE = "Telecom", TT_FAM_MIL = "Military", TT_FAM_MISC = "Basic")
-	var/cx = 18
-	for(var/key in fams)
-		var/atom/movable/shud/ttbtn/chip = new
-		chip.icon = (tmenu_filter == key) ? 'HUD/ui_tab_active.png' : 'HUD/ui_tab_idle.png'
-		chip.action = "filter"
-		chip.arg = key
-		chip.screen_loc = TTloc(cx, 50, 32)
-		tmenu_tabobjs += chip
-		var/atom/movable/shud/ttlabel/cl = new
-		cl.maptext_width = 84
-		cl.maptext_height = 16
-		cl.screen_loc = TTloc(cx, 56, 16)
-		cl.maptext = "<center><span style=\"[TT_FONT]; color:[tmenu_filter == key ? "#06283b" : "#cfe3f5"]\">[fams[key]]</span></center>"
-		tmenu_tabobjs += cl
-		cx += 84
-
-client/proc/BuildCraftPager(pages)
-	if(pages <= 1) return
-	var/atom/movable/shud/ttwidget/prev = new
-	prev.widget_kind = "arrow_left"
-	prev.icon = 'HUD/ui_arrow_left_1.png'
-	prev.action = "craftpage"; prev.ttarg = -1
-	prev.screen_loc = TTloc(258, 312, 18)
-	tmenu_tabobjs += prev
-	var/atom/movable/shud/ttlabel/pt = new
-	pt.maptext_width = 60
-	pt.maptext_height = 16
-	pt.screen_loc = TTloc(282, 314, 16)
-	pt.maptext = "<center><span style=\"[TT_FONT]; color:#ffffff\">[tmenu_craftpage]/[pages]</span></center>"
-	tmenu_tabobjs += pt
-	var/atom/movable/shud/ttwidget/nxt = new
-	nxt.widget_kind = "arrow_right"
-	nxt.icon = 'HUD/ui_arrow_right_1.png'
-	nxt.action = "craftpage"; nxt.ttarg = 1
-	nxt.screen_loc = TTloc(348, 312, 18)
-	tmenu_tabobjs += nxt
-
-client/proc/TechCraftMake(obj/Items/catalog)
-	if(!catalog) return
-	spawn()
-		var/datum/craft_recipe/rec = GetTechRecipe(catalog)
-		var/cost = rec.MoneyCost(mob, catalog)
-		var/confirm = Ask(mob, "Craft [catalog.name] for [Commas(round(cost))]?", "Craft", null, "confirm", null, 1, "Craft", "Cancel")
-		if(confirm != "Craft") return
-		mob.CraftTechItem(catalog)
-		RefreshBalance()
-		if(tmenu_open && tmenu_tab == "craft") BuildCraft()
-
-client/proc/ShowCraftDesc(obj/Items/I)
-	HideCraftDesc()
-	if(!I || !tmenu_open) return
-	craft_desc_objs = list()
-	craft_desc_item = I
-
-	var/atom/movable/shud/craftdescpanel/P = new
-	P.icon = 'HUD/inv_desc.png'
-	P.screen_loc = TTloc(212, 22, 300)
-	craft_desc_objs += P
-
-	var/icon/pi = icon(I.icon, I.icon_state)
-	pi.Scale(36, 36)
-	var/atom/movable/shud/ttpic/pic = new
-	pic.icon = pi
-	pic.color = I.color
-	pic.layer = TT_LAYER + 1.1
-	pic.screen_loc = TTloc(294, 48, 36)
-	craft_desc_objs += pic
-
-	var/atom/movable/shud/ttlabel/nm = new
-	nm.layer = TT_LAYER + 1.1
-	nm.maptext_width = 176
-	nm.maptext_height = 16
-	nm.screen_loc = TTloc(224, 92, 16)
-	nm.maptext = "<center><span style=\"[TT_FONT]; color:#ffffff\">[I.name]</span></center>"
-	craft_desc_objs += nm
-
-	if(I.UpdatesDescription) I:Update_Description()
-	var/body = I.desc ? I.desc : "No description."
-	var/atom/movable/shud/tttext/T = new
-	T.layer = TT_LAYER + 1.1
-	T.maptext_width = 168
-	T.maptext_height = 190
-	T.screen_loc = TTloc(228, 114, 190)
-	T.maptext = "<span style=\"[TT_FONT_BODY]; color:#dbe6f5\">[body]</span>"
-	craft_desc_objs += T
-
-	for(var/atom/movable/o in craft_desc_objs)
-		screen += o
-	KineticEntrance(craft_desc_objs)
+client/proc/TTCraftButton(action, label, dx, dyTop)
+	var/atom/movable/shud/ttbtn/b = new
+	b.icon = 'HUD/cust_button.png'
+	b.action = action
+	b.screen_loc = TTloc(dx, dyTop, 26)
+	tmenu_tabobjs += b
+	var/atom/movable/shud/ttlabel/L = new
+	L.maptext_width = 150
+	L.maptext_height = 16
+	L.screen_loc = TTloc(dx, dyTop + 5, 16)
+	L.maptext = "<center><span style=\"[TT_FONT]; color:#8be9ff\">[label]</span></center>"
+	tmenu_tabobjs += L
+	b.lbl = L
 
 client/proc/HideCraftDesc()
 	craft_desc_item = null

@@ -1,7 +1,7 @@
 var/list/EnchantmentKnowledge=list("Alchemy", "ImprovedAlchemy", "ToolEnchantment", "ArmamentEnchantment", "TomeCreation", "CrestCreation", "SummoningMagic", "SealingMagic", "SpaceMagic", "TimeMagic")
-var/list/KnowledgeTreeList=list("Forging"=list(),"RepairAndConversion"=list(),"Medicine"=list(),"ImprovedMedicalTechnology"=list(), \
-"Telecommunications"=list(),"AdvancedTransmissionTechnology"=list(),"Engineering"=list(),"CyberEngineering"=list(),"MilitaryTechnology"=list(), \
-"MilitaryEngineering"=list(),"Alchemy"=list(),"ImprovedAlchemy"=list(),"ToolEnchantment"=list(),"ArmamentEnchantment"=list(),"TomeCreation"=list(),"CrestCreation"=list(),"SummoningMagic"=list(), \
+var/list/KnowledgeTreeList=list("Forging"=list(),"RepairAndConversion"=list(),"Medicine"=list(),"Improved Medical Technology"=list(), \
+"Telecommunications"=list(),"AdvancedTransmissionTechnology"=list(),"Engineering"=list(),"Cyber Engineering"=list(),"Military Technology"=list(), \
+"Military Engineering"=list(),"Alchemy"=list(),"ImprovedAlchemy"=list(),"ToolEnchantment"=list(),"ArmamentEnchantment"=list(),"TomeCreation"=list(),"CrestCreation"=list(),"SummoningMagic"=list(), \
 "SealingMagic"=list(),"SpaceMagic"=list(),"TimeMagic"=list())
 proc/MakeKnowledgeTreeList()
 	for(var/x in KnowledgeTree)
@@ -22,13 +22,13 @@ var/KnowledgeTree=list(\
 "Forging"=list("Forging"=40),\
 "RepairAndConversion"=list("RepairAndConversion"=80),\
 "Medicine"=list("Medicine"=40),\
-"ImprovedMedicalTechnology"=list("ImprovedMedicalTechnology"=80),\
+"Improved Medical Technology"=list("Improved Medical Technology"=80),\
 "Telecommunications"=list("Telecommunications"=40),\
 "AdvancedTransmissionTechnology"=list("AdvancedTransmissionTechnology"=80),\
 "Engineering"=list("Engineering"=40),\
-"CyberEngineering"=list("CyberEngineering"=80),\
-"MilitaryTechnology"=list("MilitaryTechnology"=40),\
-"MilitaryEngineering"=list("MilitaryEngineering"=80),\
+"Cyber Engineering"=list("Cyber Engineering"=80),\
+"Military Technology"=list("Military Technology"=40),\
+"Military Engineering"=list("Military Engineering"=80),\
 
 //Enchantment
 "Alchemy"=list("Alchemy"=40),\
@@ -119,7 +119,7 @@ obj/KnowledgeTreeObj
 			// 	if(usr.ForgingUnlocked < 3)
 			// 		usr << "You must become proficient in Forging before this!"
 			// 		return
-			// if(src.path=="ImprovedMedicalTechnology")
+			// if(src.path=="Improved Medical Technology")
 			// 	if(usr.MedicineUnlocked < 3)
 			// 		usr << "You must become proficient in Medicine before this!"
 			// 		return
@@ -127,11 +127,11 @@ obj/KnowledgeTreeObj
 			// 	if(usr.TelecommunicationsUnlocked < 3)
 			// 		usr << "You must become proficient in Communication Technology before this!"
 			// 		return
-			// if(src.path=="CyberEngineering")
+			// if(src.path=="Cyber Engineering")
 			// 	if(usr.EngineeringUnlocked < 3)
 			// 		usr << "You must become proficient in Engineering before this!"
 			// 		return
-			// if(src.path=="MilitaryEngineering")
+			// if(src.path=="Military Engineering")
 			// 	if(usr.MilitaryTechnologyUnlocked < 3)
 			// 		usr << "You must become proficient in Military Systems before this!"
 			// 		return
@@ -192,10 +192,10 @@ obj/KnowledgeTreeObj
 				// if(src.path=="Engineering")
 				// 	if(("Hazard Suits" in usr.knowledgeTracker.learnedKnowledge) && ("Force Shielding" in usr.knowledgeTracker.learnedKnowledge) && ("Jet Propulsion" in usr.knowledgeTracker.learnedKnowledge) && ("Power Generators" in usr.knowledgeTracker.learnedKnowledge))
 				// 		New="Space Travel"
-				// else if(src.path=="CyberEngineering")
+				// else if(src.path=="Cyber Engineering")
 				// 	if(("Android Creation" in usr.knowledgeTracker.learnedKnowledge) && ("Conversion Modules" in usr.knowledgeTracker.learnedKnowledge) && ("Enhancement Chips" in usr.knowledgeTracker.learnedKnowledge) && ("Involuntary Implantation" in usr.knowledgeTracker.learnedKnowledge))
 				// 		New="Self Augmentation"
-				// else if(src.path=="MilitaryEngineering")
+				// else if(src.path=="Military Engineering")
 				// 	if(("Powered Armor Specialization" in usr.knowledgeTracker.learnedKnowledge) && ("Armorpiercing Weaponry" in usr.knowledgeTracker.learnedKnowledge) && ("Impact Weaponry" in usr.knowledgeTracker.learnedKnowledge) && ("Hydraulic Weaponry" in usr.knowledgeTracker.learnedKnowledge))
 				// 		New="Vehicular Power Armor"
 				// else if(src.path=="ArmamentEnchantment" && usr.ArmamentEnchantmentUnlocked<5)
@@ -279,7 +279,7 @@ obj/KnowledgeTreeObj
 				// 		usr.AddSkill(new/obj/Skills/Utility/Reforge)
 				// 		usr << "You learn how to reforge weapons, armor, and staves!"
 
-				// if(src.path=="ImprovedMedicalTechnology")
+				// if(src.path=="Improved Medical Technology")
 				// 	if(!locate(/obj/Skills/Utility/Surgery, usr))
 				// 		usr.AddSkill(new/obj/Skills/Utility/Surgery)
 				// 		usr << "You learn how to treat crippling long-term injuries!"
@@ -382,7 +382,7 @@ mob/Players/verb
 		// 		usr<<output("Knowledge on how to perform proper maintenence and care on your weapons... or push them beyond usual capabilities.  This skill gives you basic knowledge on: Repair Kits, Reforging; can lead to breakthroughs regarding: Fiber Bonding Agents, Resistant Coating, Advanced Plating, Quicksilver Alloys, Trick Weapon Kits.","knowinfolabel")
 		// 	if(z=="Medicine")
 		// 		usr<<output("Use this to keep yourself in good health.  This skill gives you basic knowledge on: First Aid Materials; can lead to breakthroughs regarding: Medkits, Fast Acting Medicine, Automatic Dispensers, Steroids and Anesthetics.","knowinfolabel")
-		// 	if(z=="ImprovedMedicalTechnology")
+		// 	if(z=="Improved Medical Technology")
 		// 		usr<<output("Medical technology able to treat even the most grievious wounds!  This skill gives you basic knowledge on: Surgical Practices; can lead to breakthroughs regarding: Regeneration Tanks, Prosthetic Limbs, Genetic Manipulation, Regenerative Medicine, Revival Protocols.","knowinfolabel")
 		// 	if(z=="Telecommunications")
 		// 		usr<<output("Various kinds of communication and surveillance devices.  This skill gives you basic knowledge on: Communicators and PDAs; can lead to breakthroughs regarding: Wiretaps and Hacking Consoles, Security Devices, Recon Drones, Wide Area Transmissions and Local Range Devices.","knowinfolabel")
@@ -390,11 +390,11 @@ mob/Players/verb
 		// 		usr<<output("Various kinds of scanning devices. This skill gives you basic knowledge on: Radars; can lead to breakthroughs regarding: Scouters, EMW Projectors, Stealth Cloaks, Satellite Surveilance and Combat Analysis.","knowinfolabel")
 		// 	if(z=="Engineering")
 		// 		usr<<output("Knowledge of how to deal with physical sciences.  This skill gives you basic knowledge on: Reinforced Structures, Drill Towers and Digital Keys; can lead to breakthroughs regarding: Secured Suits, Force Shielding, Jet Propulsion, Power Generators; summed up it allows researching Space Travel.","knowinfolabel")
-		// 	if(z=="CyberEngineering")
+		// 	if(z=="Cyber Engineering")
 		// 		usr<<output("Advanced knowledge on upgrading or recreating humanoid body structure.  This skill gives you basic knowledge on: modifying Androids and living creatures with a variety of cybernetic modules;  can lead to breakthroughs regarding: Android Creation, Conversion Modules, Enhancement Chips, Involuntary Implantation; summed up it allows researching Self-Augmentation.","knowinfolabel")
-		// 	if(z=="MilitaryTechnology")
+		// 	if(z=="Military Technology")
 		// 		usr<<output("Get learned how to make stuff more deader. This skill gives you basic knowledge on: Plasma Blasters and can lead to breakthroughs regarding: Assault Weaponry, Explosive Weaponry, Energy Melee Weaponry, Thermal Weaponry, Heavy Armor Padding.","knowinfolabel")
-		// 	if(z=="MilitaryEngineering")
+		// 	if(z=="Military Engineering")
 		// 		usr<<output("Get even more learned how to make stuff very much more like deadered. This skill gives you basic knowledge on: Powered Armor; can lead to breakthroughs regarding: Specialized Power Armor, Armorpiercing Weaponry, Impact Weaponry, Hydraulic Weaponry; summed up it allows researching Vehicle-Scale Powered Armor.","knowinfolabel")
 
 		// 	//Enchantment

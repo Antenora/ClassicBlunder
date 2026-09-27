@@ -804,9 +804,9 @@ proc/Hd2dApplyClient(client/C)
 //snap=1 runs every animate at time 0 - apply-time geometry must never glide into place
 proc/Hd2dClientTick(client/C, snap = 0)
 	if(!C) return
-	var/area/wxA = null
+	var/turf/wxT = null
 	var/mob/Players/P = C.mob
-	if(istype(P)) wxA = _WxNearbyWeatherArea(P)
+	if(istype(P)) wxT = _WxNearbyWeatherTurf(P)
 	var/atom/ganchor = GfxViewAnchor(C)
 	var/turf/gt = ganchor ? get_turf(ganchor) : null
 	var/area/gA = gt ? gt.loc : null
@@ -822,7 +822,7 @@ proc/Hd2dClientTick(client/C, snap = 0)
 		//day trimmed: additive beams over bright sand stack into blowout at full strength.
 		//moon shafts are a full-moon spectacle only - MoonEventK ramps them with the event
 		var/sa = isMoon ? glob.SHAFT_ALPHA * 0.5 * elev * MoonKFor(gA) : glob.SHAFT_ALPHA * (0.32 + 0.38 * elev) * (1 - (gA ? DnAreaDark(gA) : DnDarknessFrac()) * 0.5)
-		if(wxA) sa = 0 //overcast kills shafts BY DESIGN - clear-sky test only
+		if(wxT) sa = 0 //overcast kills shafts BY DESIGN - clear-sky test only
 		if(!opensky) sa = 0 //no sky, no shafts - the area gate that replaced pixel masking
 		if(gA && DnAreaSunMismatch(gA, isMoon)) sa = 0
 		if(isMoon && !glob.MOON_SHAFTS) sa = 0
@@ -1223,8 +1223,7 @@ proc/_Hd2dGlintSweep()
 					if(!gl)
 						if(!_hd2d_glint_icons.len) _Hd2dBuildIcons()
 						gl = list()
-						var/area/A = T.loc
-						var/wet = (A && A.wx_kind) ? 1 : 0
+						var/wet = WxKindAt(T) ? 1 : 0
 						var/n = 2 + (T.x * 31 + T.y * 17) % 4 //cluster size 2-5
 						for(var/i = 1, i <= n, i++)
 							var/obj/hd2d_glint/G
@@ -1270,8 +1269,7 @@ proc/_Hd2dGlintSweep()
 proc/_Hd2dGlintRetint()
 	var/dk = DnDarknessFrac()
 	for(var/turf/T in _hd2d_glints_by_turf)
-		var/area/A = T.loc
-		var/wet = (A && A.wx_kind) ? 1 : 0
+		var/wet = WxKindAt(T) ? 1 : 0
 		for(var/obj/hd2d_glint/G in _hd2d_glints_by_turf[T])
 			_Hd2dGlintTwinkle(G, dk, wet, 1)
 

@@ -528,6 +528,7 @@ client/proc/AhBrowseList()
 // pick pages
 
 client/proc/AhPickOptions()
+	RegisterLifeMaterials()
 	var/list/opts = list()
 	switch(ah_pick)
 		if("cat")
@@ -630,6 +631,7 @@ client/proc/AhBuildSell()
 		packn++
 	if(!packn) rows += list(list("note", "nothing consignable in your pack"))
 	rows += list(list("hdr", "FROM YOUR COLLECTION LOG"))
+	RegisterLifeMaterials()
 	var/lotn = 0
 	for(var/c in LifeMatCategories)
 		for(var/mc in LifeMatsInCategory(c))

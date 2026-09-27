@@ -36,7 +36,7 @@ proc/Add_Technology()
 				RepairAndConversion_List+=B
 			if(B.TechType=="Medicine")
 				Medicine_List+=B
-			if(B.TechType=="ImprovedMedicalTechnology")
+			if(B.TechType=="Improved Medical Technology")
 				ImprovedMedicalTechnology_List+=B
 			if(B.TechType=="Telecommunications")
 				if(istype(B, /obj/Items/Tech/Speaker))
@@ -46,11 +46,11 @@ proc/Add_Technology()
 				AdvancedTransmissionTechnology_List+=B
 			if(B.TechType=="Engineering")
 				Engineering_List+=B
-			if(B.TechType=="CyberEngineering")
+			if(B.TechType=="Cyber Engineering")
 				CyberEngineering_List+=B
-			if(B.TechType=="MilitaryTechnology")
+			if(B.TechType=="Military Technology")
 				MilitaryTechnology_List+=B
-			if(B.TechType=="MilitaryEngineering")
+			if(B.TechType=="Military Engineering")
 				MilitaryEngineering_List+=B
 
 	// swords/armor/weights/plating craft through Smithing now
@@ -61,7 +61,7 @@ proc/Add_Technology()
 		if(D.Cost>0)
 			if(D.TechType=="BasicTechnology")
 				BasicTechnology_List+=D
-			else if(D.TechType=="MilitaryTechnology")
+			else if(D.TechType=="Military Technology")
 				MilitaryTechnology_List+=D
 			Technology_List+=D
 		else
@@ -100,15 +100,15 @@ proc/Add_Technology()
 		D.suffix=null
 		if(D.Cost>0)
 			Technology_List+=D
-			if(D.TechType=="ImprovedMedicalTechnology")
+			if(D.TechType=="Improved Medical Technology")
 				ImprovedMedicalTechnology_List+=D
 			else if(D.TechType=="Medicine")
 				Medicine_List+=D
 			else if(D.TechType=="Engineering")
 				Engineering_List+=D
-			else if(D.TechType=="MilitaryTechnology")
+			else if(D.TechType=="Military Technology")
 				MilitaryTechnology_List+=D
-			else if(D.TechType=="MilitaryEngineering")
+			else if(D.TechType=="Military Engineering")
 				MilitaryEngineering_List+=D
 	for(var/C in typesof(/obj/Items/Tech/Power_Pack))
 		var/obj/Items/D=new C
@@ -118,7 +118,6 @@ proc/Add_Technology()
 			PowerPack_List+=D
 
 
-proc/Can_Afford_Technology(mob/P,obj/Items/O) for(var/obj/Money/M in P) if(M.Level>=Technology_Price(P, O)) return 1
 proc/Technology_Price(mob/P,obj/Items/O) return O.Cost*glob.progress.EconomyCost
 
 mob
@@ -715,11 +714,38 @@ obj/Items/Tech
 		icon='Tech.dmi'
 		icon_state="FirstAid"
 		desc="This will stablize mortal wounds and treat less serious injuries.  It can be used on yourself."
+		BeltUsable=1
+		BeltCooldown=60
+		BeltHoldTime=150
+		BeltAlly=1
+		proc/FirstAidEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(Choice.MortallyWounded)
+				Choice.TsukiyomiTime=1
+				Choice.MortallyWounded=0
+				user<<"You stabilize [Choice]'s internal injuries."
+				Choice<<"[user] has stabilized your internal injuries."
+			if(Choice.KO)
+				Choice.Conscious()
+			var/heal = 8 + (0.15 * Choice.TotalInjury)
+			if(heal > 40)
+				heal = 40
+			Choice.HealWounds(heal)
+			return 1
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			return FirstAidEffect(user, T)
 		Click()
 			if(!(src in usr))
 				..()
 			else
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use a first aid kit while knocked out!"
@@ -748,17 +774,7 @@ obj/Items/Tech
 				sleep(150)
 				usr.Frozen=0
 				Choice.Frozen=0
-				if(Choice.MortallyWounded)
-					Choice.TsukiyomiTime=1
-					Choice.MortallyWounded=0
-					usr<<"You stabilize [Choice]'s internal injuries."
-					Choice<<"[usr] has stabilized your internal injuries."
-				if(Choice.KO)
-					Choice.Conscious()
-				var/heal = 8 + (0.15 * Choice.TotalInjury)
-				if(heal > 40)
-					heal = 40
-				Choice.HealWounds(heal)
+				FirstAidEffect(usr, Choice)
 				del(src)
 
 	Medkit
@@ -767,12 +783,42 @@ obj/Items/Tech
 		SubType="Medkits"
 		icon='Tech.dmi'
 		icon_state="Medkit"
-		desc="This will heal the health and injury of a character."
+		desc="This will stabilize and treat the injuries of a character, and wake them if they are knocked out."
+		BeltUsable=1
+		BeltCooldown=60
+		BeltHoldTime=150
+		BeltAlly=1
+		proc/MedkitEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(Choice.MortallyWounded)
+				Choice.MortallyWounded=0
+				Choice.TsukiyomiTime=1
+				user<<"You stabilize [Choice]'s internal injuries."
+				Choice<<"[user] has stabilized your internal injuries."
+			if(Choice.KO)
+				Choice.Conscious()
+			var/heal= 15 + (0.3 * Choice.TotalInjury)
+			if(heal > 40)
+				heal = 40
+			Choice.HealWounds(heal)
+			Choice.Doped=RawMinutes(heal)
+			return 1
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			if(T.Secret=="Heavenly Restriction" && T.secretDatum?:hasRestriction("Science"))
+				return 0
+			return MedkitEffect(user, T)
 		Click()
 			if(!(src in usr))
 				..()
 			else
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use a medkit while knocked out!"
@@ -821,19 +867,7 @@ obj/Items/Tech
 					usr << "Finished applying medkit to [Choice]."
 				else
 					usr << "Finished applying medkit."
-				if(Choice.MortallyWounded)
-					Choice.MortallyWounded=0
-					Choice.TsukiyomiTime=1
-					usr<<"You stabilize [Choice]'s internal injuries."
-					Choice<<"[usr] has stabilized your internal injuries."
-				if(Choice.KO)
-					Choice.Conscious()
-				var/heal= 15 + (0.3 * Choice.TotalInjury)
-				if(heal > 40)
-					heal = 40
-				Choice.HealWounds(heal)
-				Choice.HealHealth(heal/2)
-				Choice.Doped=RawMinutes(heal)
+				MedkitEffect(usr, Choice)
 				del(src)
 
 	Fast_Acting_Antivenom
@@ -844,6 +878,26 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="AVenom"
 		desc="This is used to decrease poison instantly, and it will also provide resistance for a while longer."
+		BeltUsable=1
+		BeltCooldown=30
+		BeltAlly=1
+		proc/AntivenomEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(!Choice.Antivenomed)
+				Choice.Antivenomed=200
+				Choice.Poison-=5
+				return 1
+			if(Choice!=user)
+				user << "They've already had antivenom applied!"
+			else
+				user << "You've already had antivenom applied!"
+			return 0
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			return AntivenomEffect(user, T)
 		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
@@ -863,6 +917,9 @@ obj/Items/Tech
 		proc/Use(mob/Choice = null)
 			if(src in usr)
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use an antivenom while knocked out!"
@@ -894,15 +951,10 @@ obj/Items/Tech
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
 					return
-				if(!Choice.Antivenomed)
-					Choice.Antivenomed=200
-					Choice.Poison-=5
+				if(AntivenomEffect(usr, Choice))
+					src.Using=0
 					del(src)
-				else
-					if(Choice!=usr)
-						usr << "They've already had antivenom applied!"
-					else
-						usr << "You've already had antivenom applied!"
+					return
 				src.Using=0
 	Cooling_Spray
 		Cost=0.2
@@ -912,6 +964,27 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="TRegulator"
 		desc="This is used to decrease burn and chill instantly.  It will also provide some resistance afterwards."
+		BeltUsable=1
+		BeltCooldown=30
+		BeltAlly=1
+		proc/CoolingEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(!Choice.Cooled)
+				Choice.Cooled=200
+				Choice.Burn-=20
+				Choice.Slow-=20
+				return 1
+			if(Choice!=user)
+				user << "They've already had icy hot applied!"
+			else
+				user << "You've already had icy hot applied!"
+			return 0
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			return CoolingEffect(user, T)
 		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
@@ -931,6 +1004,9 @@ obj/Items/Tech
 		proc/Use(mob/Choice = null)
 			if(src in usr)
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use a cooling spray while knocked out!"
@@ -962,16 +1038,10 @@ obj/Items/Tech
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
 					return
-				if(!Choice.Cooled)
-					Choice.Cooled=200
-					Choice.Burn-=20
-					Choice.Slow-=20
+				if(CoolingEffect(usr, Choice))
+					src.Using=0
 					del(src)
-				else
-					if(Choice!=usr)
-						usr << "They've already had icy hot applied!"
-					else
-						usr << "You've already had icy hot applied!"
+					return
 				src.Using=0
 	Sealing_Spray
 		Cost=0.2
@@ -980,6 +1050,28 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="SSpray"
 		desc="This is used to decrease shatter, shear and cripple instantly.  It will also provide some resistance afterwards."
+		BeltUsable=1
+		BeltCooldown=30
+		BeltAlly=1
+		proc/SealingEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(!Choice.Sprayed)
+				Choice.Sprayed=200
+				Choice.Shatter=max(0, Choice.Shatter-20)
+				Choice.Crippled=max(0, Choice.Crippled-20)
+				Choice.Sheared=max(0, Choice.Sheared-20)
+				return 1
+			if(Choice!=user)
+				user << "They've already had sealing spray applied!"
+			else
+				user << "You've already had sealing spray applied!"
+			return 0
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			return SealingEffect(user, T)
 		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
@@ -999,6 +1091,9 @@ obj/Items/Tech
 		proc/Use(mob/Choice = null)
 			if(src in usr)
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use a sealing spray while knocked out!"
@@ -1030,16 +1125,10 @@ obj/Items/Tech
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
 					return
-				if(!Choice.Sprayed)
-					Choice.Sprayed=200
-					Choice.Crippled-=20
-					Choice.Sheared-=20
+				if(SealingEffect(usr, Choice))
+					src.Using=0
 					del(src)
-				else
-					if(Choice!=usr)
-						usr << "They've already had sealing spray applied!"
-					else
-						usr << "You've already had sealing spray applied!"
+					return
 				src.Using=0
 	Focus_Stabilizer
 		Cost=0.2
@@ -1048,6 +1137,27 @@ obj/Items/Tech
 		icon='Lab.dmi'
 		icon_state="FStabilizer"
 		desc="This is used to decrease shock and confusion instantly.  It will also provide some resistance afterwards."
+		BeltUsable=1
+		BeltCooldown=30
+		BeltAlly=1
+		proc/StabilizerEffect(mob/user, mob/Choice)
+			if(!user || !Choice) return 0
+			if(!Choice.Stabilized)
+				Choice.Stabilized=200
+				Choice.Shock-=20
+				Choice.Confused-=20
+				return 1
+			if(Choice!=user)
+				user << "They've already had focus stabilizer applied!"
+			else
+				user << "You've already had focus stabilizer applied!"
+			return 0
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				return 0
+			var/mob/T = user.belt_receiver ? user.belt_receiver : user
+			return StabilizerEffect(user, T)
 		verb/Apply()
 			set name = "Apply"
 			set hidden = 1
@@ -1067,6 +1177,9 @@ obj/Items/Tech
 		proc/Use(mob/Choice = null)
 			if(src in usr)
 				if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
+					return
+				if(usr.InCombat())
+					usr << "In a fight you can only use what is on your belt."
 					return
 				if(usr.KO)
 					usr << "You can't use a stabilizer while knocked out!"
@@ -1098,16 +1211,10 @@ obj/Items/Tech
 					usr << "[Choice] rejected the assistance."
 					src.Using=0
 					return
-				if(!Choice.Stabilized)
-					Choice.Stabilized=200
-					Choice.Shock-=20
-					Choice.Confused-=20
+				if(StabilizerEffect(usr, Choice))
+					src.Using=0
 					del(src)
-				else
-					if(Choice!=usr)
-						usr << "They've already had focus stabilizer applied!"
-					else
-						usr << "You've already had focus stabilizer applied!"
+					return
 				src.Using=0
 
 	Steroid
@@ -1181,7 +1288,7 @@ obj/Items/Tech
 		Cost= 6
 		Stackable=1
 		TechType="REMOVED"
-		SubType="Anesthetics"
+		SubType="Fast Acting Medicine"
 		icon='Anesthetics.dmi'
 		desc="Prepares an attack that will soothe a target's anger for a duration."
 		Click()
@@ -1204,34 +1311,19 @@ obj/Items/Tech
 	PainKillers
 		Cost=0.25
 		TechType="Medicine"
-		SubType="Anesthetics"
+		SubType="Trauma Care"
 		icon='Lab.dmi'
 		icon_state="KeloPill"
-		desc="Use this to partly ignore reduced BP due to wounds."
-		verb/Use()
-			set src in usr
-			if(!usr.Move_Requirements())
-				return
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				return
-			var/validkitters=list("Cancel")
-			for(var/mob/Players/A in view(1,usr))
-				if(A.Secret=="Heavenly Restriction" && A.secretDatum?:hasRestriction("Science"))
-					continue
-				validkitters+=A
-			var/mob/selection=Ask(usr, "Select a target to use the pain killers on.", "", null, "pick", validkitters, 0)
-			if(selection=="Cancel")
-				return
-			if(selection.Doped)
-				usr<<"They're already doped up."
-				return
-			usr<<"Applying pain killers to [selection]!"
-			selection.Doped=RawHours(2)
-			del(src)
+		desc="Numbs every maim penalty for two minutes. While numbed, fighting on a maim worsens it twice as fast."
+		Stackable=1
+		BeltUsable=1
+		BeltConsumes=1
+		BeltCooldown=10
+		BeltAlly=1
 
 
 	Regenerator_Tank
-		TechType="ImprovedMedicalTechnology"
+		TechType="Improved Medical Technology"
 		SubType="Regenerator Tanks"
 		var/HealingEffectiveness=1
 		icon='Lab.dmi'
@@ -1333,7 +1425,7 @@ obj/Items/Tech
 						if(A.GatesNerfPerc)
 							if(A.GatesNerf>0)
 								A.GatesNerf--
-								if(A.Satiated&&!A.Drunk)
+								if(A.Satiated)
 									A.GatesNerf--
 								if(A.GatesNerf<=0)
 									A.GatesNerfPerc=0
@@ -1346,7 +1438,7 @@ obj/Items/Tech
 
 
 	Genome_Warp_Serum
-		TechType="ImprovedMedicalTechnology"
+		TechType="Improved Medical Technology"
 		SubType="Genetic Manipulation"
 		icon='Tech.dmi'
 		icon_state="Genome"
@@ -1424,7 +1516,7 @@ obj/Items/Tech
 				src.Using=0
 				del src
 	Genome_Enhance_Serum
-	//	TechType="ImprovedMedicalTechnology"
+	//	TechType="Improved Medical Technology"
 		icon='Tech.dmi'
 		icon_state="GEnhance"
 		desc="A consumable item that forces a person's biology to an empowered state at the cost of damaging their constitution."
@@ -1434,7 +1526,7 @@ obj/Items/Tech
 
 
 	Revitalization_Serum
-		TechType="ImprovedMedicalTechnology"
+		TechType="Improved Medical Technology"
 		SubType="Regenerative Medicine"
 		icon='Tech.dmi'
 		icon_state="Vitality"
@@ -1481,15 +1573,16 @@ obj/Items/Tech
 					usr.SenseRobbed=0
 				if(usr.MortallyWounded)
 					usr.MortallyWounded=0
-				usr.Maimed = max(0, usr.Maimed - 3)
+				usr.MaimClearAll()
 				usr.TotalInjury=0
 				usr.NextSerum=world.realtime+Day(0.5)
+				usr.usedSerums++
 				usr << "You're fully revitalized!"
 				src.Using=0
 				del src
 
 	Super_Soldier_Serum
-		TechType = "ImprovedMedicalTechnology"
+		TechType = "Improved Medical Technology"
 		SubType = "Regenerative Medicine"
 		icon = 'Tech.dmi'
 		icon_state = "Youth"
@@ -1586,6 +1679,10 @@ obj/Items/Tech
 			for(var/mob/E in hearers(12,usr))
 				E<<"<font color=[usr.Text_Color]>[usr.name] speaks into a [src.name]: [message]"
 			broadcastToListeners("[usr.name]: [message]")
+			RelayToTowers(usr, message)
+
+		proc/RelayToTowers(mob/speaker, msg)
+			return
 
 		verb/Communicator_Frequency()
 			set src in usr
@@ -1628,60 +1725,25 @@ obj/Items/Tech
 
 	Transmission_Tower
 		TechType="Telecommunications"
-		SubType="Wide Area Transmissions"
+		SubType="Wide Area Transmission"
 		icon='Beacon.dmi'
 		Cost=2.5
-		Grabbable=0
-		Pickable=0
+		Grabbable=1
+		Pickable=1
 		density=1
-		verb/Set_Password()
-			set category=null
-			set src in view(1, usr)
-			if(src.Password)
-				usr << "[src] already has a password set!"
-				return
-			src.Password=Ask(usr, "Enter the password you'd like [src] to have.", "Password", null, "text", null, 0)
-		verb/Set_Frequency()
-			set category=null
-			set src in view(1, usr)
-			if(!src.Password)
-				usr << "Set a password on [src] first."
-				return
-			src.Frequency=Ask(usr, "Enter the frequency you'd like to tie to broadcasting messages.", "Frequency", src.Frequency, "num", null, 0)
+		proc/TowerLive()
+			return 1
 	Beacon
 		TechType="Telecommunications"
-		SubType="Wide Area Transmissions"
+		SubType="Wide Area Transmission"
 		icon='device.dmi'
 		icon_state="talarm0"
 		Cost=1
 		Grabbable=1
-		Pickable=0
+		Pickable=1
 		var/BeaconState="Off"
-		verb/SetPassword()
-			set src in oview(1)
-			if(Password)
-				if((Ask(usr, "You must input the current password to make changes.", "", null, "text", null, 0)) != Password)
-					usr << "Wrong Password"
-					return
-			Password = Ask(usr, "What would you like the new password to be for [src]?", "", null, "text", null, 0)
-			if(Password) usr << "You've set the beacon's password to [Password]"
-			else usr << "You've removed the beacon's password."
-		verb/ToggleBeacon()
-			set src in oview(1)
-			if(Password)
-				if((Ask(usr, "You must input the current password to make changes.", "", null, "text", null, 0)) != Password)
-					usr << "Wrong Password"
-					return
-			if(src.BeaconState=="On")
-				src.BeaconState="Off"
-				src.icon_state="talarm0"
-				usr<<"You've turned off the Beacon."
-				return
-			else
-				src.BeaconState="On"
-				src.icon_state="talarm1"
-				usr<<"You've turned on the Beacon."
-				return
+		proc/BeaconShows(mob/M)
+			return BeaconState=="On"
 
 	Wiretap
 		TechType="Telecommunications"
@@ -1758,6 +1820,7 @@ obj/Items/Tech
 		Cost=0.5
 		icon='HDevice.dmi'
 		Stackable=1
+		desc="Put it to a locked door within a tile, out of a fight, and beat the lock: the door opens for 10 seconds without a key. An alarm on that door hears the attempt either way. Put it to a parked mech to start a long hack that adds you to its pilots. It needs 20 seconds between attempts."
 		Click()
 			if(!(src in usr))
 				..()
@@ -1769,38 +1832,9 @@ obj/Items/Tech
 					OMsg(usr, "[src] explodes in [usr]'s hand!")
 					del src
 					return
-				src.Using=1
-				var/list/obj/HackedIt=list("Cancel")
-				for(var/obj/Items/Tech/o in range(usr, 1))
-					if(o.Password&&o.TechType!="BasicTechnology")
-						HackedIt.Add(o)
-				for(var/obj/Items/Gear/o in range(usr, 1))
-					if(o.Password&&o.TechType!="BasicTechnology")
-						HackedIt.Add(o)
-				if(HackedIt.len<2)
-					usr << "There are no objects nearby to hack."
-					src.Using=0
-					return
-				var/obj/Items/Tech/Choice=Ask(usr, "What object do you want to try to hack?", "Hackerman", null, "pick", HackedIt, 0)
-				if(Choice=="Cancel")
-					src.Using=0
-					return
-				var/EnemyRoll=round(sqrt(Choice.Cost)*10)
-				if(Choice.CreatorKey==usr.ckey)
-					EnemyRoll=0
-				var/YourRoll=usr.Intelligence*(usr.TelecommunicationsUnlocked+2*usr.AdvancedTransmissionTechnologyUnlocked)
-				var/YourRoll2=roll("[round(YourRoll)]d5")
-				if(YourRoll2>=EnemyRoll)
-					OMsg(usr, "[usr] manages to break [Choice]!")
-					usr << "The password of [Choice] is: [Choice.Password]"
-					src.last_hacked_by = "[usr]([usr.key])"
-				else
-					OMsg(usr, "[usr] tries to hack [Choice], but they can't figure out how to do it!")
-				src.TotalStack--
-				if(src.TotalStack<=0)
-					del src
-				src.suffix="[src.TotalStack]"
-				src.Using=0
+				spawn() HackUse(usr)
+		proc/HackUse(mob/M)
+			return
 
 	Security_Display
 		TechType="Telecommunications"
@@ -2006,7 +2040,7 @@ obj/Items/Tech
 	Binoculars
 		Health=10
 		TechType="Telecommunications"
-		SubType="Local Range Devices"
+		SubType="Telecommunications"
 		icon='Binoculars.dmi'
 		Cost=0.2
 		desc="Use this to increase your sight range temporarily."
@@ -2024,7 +2058,7 @@ obj/Items/Tech
 	Doorbell
 		Health=10
 		TechType="Telecommunications"
-		SubType="Local Range Devices"
+		SubType="Telecommunications"
 		Cost=0.1
 		AllowBolt=1
 		icon='Tech.dmi'
@@ -2058,7 +2092,7 @@ obj/Items/Tech
 	Speaker
 		Health=10
 		TechType="Telecommunications"
-		SubType="Local Range Devices"
+		SubType="Telecommunications"
 		Cost=0.1
 		AllowBolt=1
 		icon='Lab.dmi'
@@ -2120,9 +2154,8 @@ obj/Items/Tech
 		icon='GreenScouter.dmi'
 		Cost=2
 		var/ScouterIcon
-		var/Range=1
 		var/tmp/Detecting=0
-		desc="This device uses technology to guage the power of the enemy. It can also find money. \n(Warning: This device isn't always accurate, and can be fooled by certain techniques.) \n((No Refunds))"
+		desc="A headset that reads the power of the people around you. Its quality sets how strong a reading it can take and how far it sees; past that it shows an error. Readings can be fooled by certain techniques."
 		verb/Scouter_Scan()
 			set src in usr
 			if(!(world.realtime>src.InternalTimer+Second(5)))
@@ -2132,35 +2165,26 @@ obj/Items/Tech
 				OMsg(usr, "[src] explodes in [usr]'s hand!")
 				del src
 				return
-			src.InternalTimer=world.realtime
-			if(!src.suffix=="*Equipped*")
+			if(src.suffix!="*Equipped*")
 				usr << "You have to equip the scouter to use it!"
 				return
+			src.InternalTimer=world.realtime
 			if(usr.InMagitekRestrictedRegion())
 				usr << "The scouter flashes with cryptic sequences before losing power."
 				return
+			if(IsJammed(usr))
+				usr << "The scouter fills with static and reads nothing."
+				return
 			usr << "<b>Current Coordinates: ([usr.x], [usr.y], [usr.z])</b>"
 			for(var/obj/Items/Tech/Beacon/B in world)
-				if(B.BeaconState=="On"&&usr.z==B.z)
+				if(B.BeaconShows(usr)&&usr.z==B.z)
 					usr << "<b><font color='green'>(BEACON)</font color></b> - ([B.x], [B.y], [B.z])"
 			for(var/obj/Items/Enchantment/PocketDimensionGenerator/W in world)
 				if(usr.z==W.z)
 					usr << "<b><font color='red'>(DISTURBANCE)</font color></b> - ([W.x], [W.y], [W.z])"
-			for(var/mob/Players/M in players)
-				if(!M.AdminInviso&&!M.HasVoid()&&!M.HasMechanized()&&!M.HasGodKi()&&!M.HasMaouKi())
-					if(M.z==usr.z)
-						var/D=abs(M.x-usr.x)+abs(M.y-usr.y)
-						if(D<=src.Range*60)
-							if(D<16)
-								usr << "<b>[M.name]</b> - [Commas(usr.Get_Scouter_Reading(M))] - [usr.CheckDirection(M)] - <b><font color='red'>NEARBY</font color></b>"
-							else
-								if(M.PowerControl>25)
-									usr << "[Commas(usr.Get_Scouter_Reading(M))] - [usr.CheckDirection(M)] - [Commas(D)] tiles away"
-			for(var/mob/Players/M in players)
-				if(M.z==usr.z)
-					var/D=abs(M.x-usr.x)+abs(M.y-usr.y)
-					if(D<=src.Range*80)
-						usr << "<b>!!!</b> - [usr.CheckDirection(M)] - [Commas(D)] tiles away"
+			ScouterReadPlayers(usr)
+		proc/ScouterReadPlayers(mob/M)
+			return
 		verb/Scouter_Speak()
 			set src in usr
 			var/Z = PromptArgValue(usr, args, 1, "Scouter Speak", "text")
@@ -2200,7 +2224,7 @@ obj/Items/Tech
 						Y<<"<font color=green><b>([X.name])</b> [usr.name]: [html_encode(Z)]"
 						Y<< output("<font color=green><b>([X.name])</b> [usr.name]: [html_encode(Z)]","icchat")
 			for(var/obj/Items/Tech/Transmission_Tower/T in world)
-				if(T.Frequency==FrequencySelector)
+				if(T.Frequency==FrequencySelector&&T.TowerLive())
 					for(var/mob/Players/P in players)
 						if(P.z==T.z)
 							var/found=0
@@ -2223,16 +2247,6 @@ obj/Items/Tech
 		verb/Scouter_Frequency()
 			set src in usr
 			Frequency=Ask(usr, "Change your Scouter frequency to what?", "Frequency", Frequency, "num", null, 0)
-		verb
-			Upgrade()
-				set category=null
-				set src in usr
-				if(src.Range>=3*usr.AdvancedTransmissionTechnologyUnlocked)
-					usr << "This scouter is as upgraded as you can make it!"
-					return
-				else
-					src.Range=3*usr.AdvancedTransmissionTechnologyUnlocked
-					OMsg(usr, "[usr] upgrades their [src]!")
 
 	Cloak
 		TechType="AdvancedTransmissionTechnology"
@@ -2241,75 +2255,12 @@ obj/Items/Tech
 		icon_state="Cloak"
 		TechType="AdvancedTransmissionTechnology"
 		Cost=4
-		verb/SetPasscode()
-			set src in usr
-			if(Password)
-				usr<<"Password already set!"
-				return
-			else
-				Password=Ask(usr, "Set a password.", "", null, "text", null, 0)
-		verb/Use()
-			set src in usr
-			if(!Password)
-				usr<<"Set a passcode first!"
-				return
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				OMsg(usr, "[src] explodes in [usr]'s hand!")
-				del src
-				return
-			var/list/obj/Items/Things=list("Cancel")
-			for(var/obj/Items/P in get_step(usr,usr.dir))
-				Things.Add(P)
-			if(Things.len>=2)
-				var/obj/Items/Choice=Ask(usr, "What do you want to install the cloak on?", "Cloak", null, "pick", Things, 0)
-				if(Choice!="Cancel")
-					Choice.PasswordReception=src.Password
-					oview(10)<<"[usr] installed the [src] onto the [Choice]."
-					del(src)
 	Cloak_Controls
 		TechType="AdvancedTransmissionTechnology"
 		SubType="Obfuscation Equipment"
 		icon='Tech.dmi'
 		icon_state="CloakControls"
 		Cost=10
-		verb/Set_Passcode()
-			set src in usr
-			Password=Ask(usr, "Set a password.", "", null, "text", null, 0)
-		verb/Cloak_Objects()
-			set src in usr
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				OMsg(usr, "[src] explodes in [usr]'s hand!")
-				del src
-				return
-			for(var/obj/Q in world)
-				if(Q.PasswordReception)
-					if(Q.PasswordReception==Password)
-						animate(Q, alpha=70, time=3)
-						sleep(3)
-						Q.invisibility=70
-						usr<<"[Q] is cloaked!"
-		verb/UnCloak_Objects()
-			set src in usr
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				OMsg(usr, "[src] explodes in [usr]'s hand!")
-				del src
-				return
-			for(var/obj/Q in world)
-				if(Q.PasswordReception)
-					if(Q.PasswordReception==Password)
-						animate(Q, alpha=255, time=3)
-						sleep(3)
-						Q.invisibility=0
-						usr<<"[Q] is revealed!"
-		verb/Uninstall()
-			set src in usr
-			for(var/obj/P in get_step(usr,dir))
-				if(P.PasswordReception)
-					P.invisibility=0
-					var/obj/Items/Tech/e=new /obj/Items/Tech/Cloak(usr.contents)
-					e.Password=P.PasswordReception
-					P.PasswordReception=null
-					oview(10)<<"[usr] uninstalled the [src] from the [P]."
 
 	Projector_Tower
 		Health=20
@@ -2318,59 +2269,9 @@ obj/Items/Tech
 		icon='Projector.dmi'
 		layer=FLOAT_LAYER
 		Cost=10
-		Pickable=0
-		Grabbable=0
+		Pickable=1
+		Grabbable=1
 		density=1
-		var/NextBurst
-		var/WaveType
-		verb/Set_Wave_Type()
-			set category=null
-			set src in range(1, usr)
-			if(src.WaveType)
-				usr << "[src] was already configured!"
-				return
-			src.WaveType=Ask(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", null, "confirm", null, 1, "Blutz Rays", "Ultraviolet")
-		verb/Activate()
-			set category=null
-			set src in range(1, usr)
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				OMsg(usr, "[src] explodes in [usr]'s hand!")
-				del src
-				return
-			if(!src.WaveType)
-				usr << "Configure the wave type first!"
-				return
-			if(world.realtime<src.NextBurst)
-				usr << "The device is still charging after the last use!"
-				return
-			src.NextBurst=world.realtime+Minute(5)
-			switch(WaveType)
-				if("Blutz Rays")
-					view(10,src)<<"<font color=red><small>The projector emits a burst of intensified Blutz Rays!"
-					for(var/turf/t in Turf_Circle(src, 10))
-						sleep(-1)
-						TurfShift('GreenDay.dmi', t, 10, src, EFFECTS_LAYER)
-						for(var/mob/m in t)
-							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
-								m.Tail=1
-								m.Oozaru(1)
-				if("Ultraviolet")
-					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
-					for(var/turf/t in Turf_Circle(src, 10))
-						sleep(-1)
-						TurfShift('BrightDay.dmi', t, 10, src, EFFECTS_LAYER)
-						for(var/mob/m in t)
-							switch(m.Secret)
-								if("Vampire")
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Vampire/Rotshreck/v in src)
-										if(!m.BuffOn(v))
-											v.adjust(m, 1)
-									var/bloodPower = m.secretDatum.currentTier
-									m.BPPoison=min(0.2*bloodPower,0.9)
-									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Hamon")
-									if(m.RippleActive()&&!m.PoseEnhancement)
-										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 	Portable_Projector
 		Health=5
 		TechType="Telecommunications"
@@ -2382,59 +2283,6 @@ obj/Items/Tech
 		Grabbable=1
 		AllowBolt=1
 		density=1
-		var/NextBurst
-		var/WaveType
-		verb/Set_Wave_Type()
-			set category=null
-			set src in range(1, usr)
-			if(src.WaveType)
-				usr << "[src] was already configured!"
-				return
-			src.WaveType=Ask(usr, "What wave frequency should the projector be configured for?", "EM Wave Type", null, "confirm", null, 1, "Blutz Rays", "Ultraviolet")
-		verb/Activate()
-			set category=null
-			set src in range(1, usr)
-			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
-				OMsg(usr, "[src] explodes in [usr]'s hand!")
-				del src
-				return
-			if(!src.WaveType)
-				usr << "Configure the wave type first!"
-				return
-			if(src.Grabbable)
-				usr << "You need to bolt it in place first!"
-				return
-			if(world.realtime<src.NextBurst)
-				usr << "The device is still charging after the last use!"
-				return
-			src.NextBurst=world.realtime+Hour(1)
-			switch(WaveType)
-				if("Blutz Rays")
-					view(10,src)<<"<font color=red><small>The projector emits a burst of intensified Blutz Rays!"
-					for(var/turf/t in Turf_Circle(src, 10))
-						sleep(-1)
-						TurfShift('GreenDay.dmi', t, 10, src, EFFECTS_LAYER)
-						for(var/mob/m in t)
-							if(m.isRace(SAIYAN) || m.isRace(HALFSAIYAN))
-								m.Tail=1
-								m.Oozaru(1)
-				if("Ultraviolet")
-					view(10,src)<<"<font color=red><small>The projector emits a powerful burst of UV light!"
-					for(var/turf/t in Turf_Circle(src, 10))
-						sleep(-1)
-						TurfShift('BrightDay.dmi', t, 10, src, EFFECTS_LAYER)
-						for(var/mob/m in t)
-							switch(m.Secret)
-								if("Vampire")
-									for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Vampire/Rotshreck/v in src)
-										if(!m.BuffOn(v))
-											v.adjust(m, 1)
-									var/bloodPower = m.secretDatum.currentTier
-									m.BPPoison=min(0.2*bloodPower,0.9)
-									m.BPPoisonTimer=RawHours(6)/bloodPower
-								if("Hamon")
-									if(m.RippleActive()&&!m.PoseEnhancement)
-										m.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Ripple_Enhancement)
 
 
 	Digital_Key
@@ -2761,7 +2609,7 @@ obj/Items/Tech
 
 	Chip_Controller
 		Health=5
-		TechType="CyberEngineering"
+		TechType="Cyber Engineering"
 		SubType="War Crimes"
 		Cost=5
 		icon='device.dmi'
@@ -2853,12 +2701,48 @@ obj/Items/Tech
 		Cost=0.1
 		desc="Use this to restore power to your Gear."
 		Stackable=1
+		BeltUsable=1
+		BeltCooldown=45
+		BeltHoldTime=30
+		proc/WeakestEquippedGear(mob/user)
+			var/obj/Items/Gear/best
+			var/bestfrac = 2
+			for(var/obj/Items/Gear/G in user)
+				if(G.suffix!="*Equipped*") continue
+				if(G.InfiniteUses) continue
+				if(G.type in typesof(/obj/Items/Gear/Prosthetic_Limb)) continue
+				if(!G.MaxUses || G.Uses>=G.MaxUses) continue
+				var/frac = G.Uses / G.MaxUses
+				if(frac < bestfrac)
+					bestfrac = frac
+					best = G
+			return best
+		proc/RechargeExtras(mob/user)
+			return list()
+		proc/RechargeDone(obj/Items/I)
+			return
+		BeltUse(mob/user)
+			if(!user) return 0
+			if(user.Secret=="Heavenly Restriction" && user.secretDatum?:hasRestriction("Science"))
+				OMsg(user, "[src] shocks [user]!")
+				user.AddShock(50,user)
+				return 0
+			var/obj/Items/Gear/G = WeakestEquippedGear(user)
+			if(!G)
+				user << "None of your equipped Gear needs a charge."
+				return 0
+			G.Uses=G.MaxUses
+			OMsg(user, "[user] has fully charged their gear!")
+			return 1
 		verb/Recharge_Gear()
 			set category=null
 			set src in usr
 			if(usr.Secret=="Heavenly Restriction" && usr.secretDatum?:hasRestriction("Science"))
 				OMsg(usr, "[src] shocks [usr]!")
 				usr.AddShock(50,usr)
+				return
+			if(usr.InCombat())
+				usr << "In a fight you can only use what is on your belt."
 				return
 			if(src.Using)
 				usr << "You're already charging something."
@@ -2871,8 +2755,9 @@ obj/Items/Tech
 			for(var/obj/Items/Gear/G in usr)
 				if(!G.InfiniteUses&&!(G.type in typesof(/obj/Items/Gear/Prosthetic_Limb))&&G.Uses<G.MaxUses)
 					Gears.Add(G)
+			Gears += RechargeExtras(usr)
 			Choice=Ask(usr, "What Gear do you want to recharge?", "Recharge Gear", null, "pick", Gears, 0)
-			if(Choice=="Cancel")
+			if(!Choice || Choice=="Cancel")
 				src.Using=0
 				return
 			else
@@ -2880,6 +2765,7 @@ obj/Items/Tech
 				OMsg(usr, "[usr] begins to recharge their [Choice] Gear...")
 				sleep(30)
 				Choice.Uses=Choice.MaxUses
+				RechargeDone(Choice)
 				usr.Frozen=0
 				OMsg(usr, "[usr] has fully charged their gear!")
 				src.TotalStack--
@@ -2934,56 +2820,10 @@ obj/Items/Gear
 		..()
 		if(src.Uses&&!src.MaxUses)
 			src.MaxUses=src.Uses
-	verb/Upgrade()
-		set category=null
-		set src in usr
-		if(src.Using)
-			return
-		if(usr.icon_state!="Meditate")
-			usr << "You need to be sitting down to use this properly."
-			return
-		if(!src.UpgradeMult)
-			usr << "[src] isn't capable of being upgraded!"
-			return
-		if(!src.UpgradePath)
-			usr << "[src] doesn't upgrade into anything!"
-			return
-		if(src.suffix=="*Equipped*")
-			usr << "Take off [src] if you want to upgrade it!"
-			return
-		if(!(src.SubType in usr.knowledgeTracker.learnedKnowledge))
-			usr << "You don't have the knowledge required to upgrade [src]!"
-			return
-		src.Using=1
-		var/NuCost=Technology_Price(usr,src)*src.UpgradeMult
-		var/Confirm=Ask(usr, "Would you like to upgrade your [src]?  It will cost [Commas(NuCost)].", "Upgrade", null, "confirm", null, 1, "No", "Yes")
-		if(Confirm=="No")
-			src.Using=0
-			return
-		if(!usr.HasMoney(NuCost))
-			usr << "You don't have enough money to upgrade [src]! ([Commas(usr.GetMoney())] / [Commas(NuCost)])"
-			src.Using=0
-			return
-		var/obj/Items/I
-		if(islist(src.UpgradePath))
-			var/choice = Ask(usr, "What would you like to upgrade [src] into?", "Upgrade", null, "pick", (src.UpgradePath + "Cancel"), 0)
-			if(choice=="Cancel")
-				src.Using=0
-				return
-			else
-				I=new choice
-		else
-			I=new src.UpgradePath
-		usr.TakeMoney(NuCost)
-		I.Cost=I.Cost+(NuCost/glob.progress.EconomyCost)
-		usr.contents+=I
-		OMsg(usr, "[usr] has upgraded [src] into a new gear!")
-		src.Using=0
-		del src
 
 	Automated_Aid_Dispenser
 		TechType="Medicine"
-		SubType="Automated Dispensers"
+		SubType="Trauma Care"
 		icon='AAD.dmi'
 		desc="A device programmed to provide immediate medical assistance in circumstances when time is of essence."
 		Cost=5
@@ -3044,7 +2884,7 @@ obj/Items/Gear
 
 
 	Plasma_Blaster
-		TechType="MilitaryTechnology"
+		TechType="Military Technology"
 		SubType="Any"
 		icon='Blaster.dmi'
 		Techniques=list("/obj/Skills/Projectile/Gear/Plasma_Blaster")
@@ -3054,7 +2894,7 @@ obj/Items/Gear
 		Integrateable=1
 
 	Plasma_Rifle
-		TechType="MilitaryTechnology"
+		TechType="Military Technology"
 		SubType="Assault Weaponry"
 		icon='AssaultRifle.dmi'
 		Techniques=list("/obj/Skills/Projectile/Gear/Plasma_Rifle")
@@ -3072,7 +2912,7 @@ obj/Items/Gear
 		Integrateable=1
 	Ultra_Laser
 		icon='Minigun.dmi'
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Any"
 		Techniques=list("/obj/Skills/Projectile/Gear/Ultra_Laser")
 		desc="Handheld mobile armor technology! Fire an explosive laser!"
@@ -3080,7 +2920,7 @@ obj/Items/Gear
 		Uses=3
 		Integrateable=1
 	Missile_Massacre
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Any"
 		icon='HomingMissile.dmi'
 		Techniques=list("/obj/Skills/Projectile/Gear/Missile_Massacre")
@@ -3090,24 +2930,27 @@ obj/Items/Gear
 		Integrateable=1
 
 	Missile_Launcher
-		TechType="MilitaryTechnology"
-		SubType="Missile Weaponry"
+		TechType="Military Technology"
+		SubType="Heavy Weaponry"
 		icon='HomingMissile.dmi'
 		Techniques=list("/obj/Skills/Projectile/Gear/Missile_Launcher")
-		desc="An auto-aiming apparatus that spews a cluster of missiles."
+		desc="An auto-aiming launcher that spews a swarm of small missiles around its target. It holds three charges, and a Power Pack refills it. At a Workbench it can be rebuilt into a Chemical Mortar."
 		Cost=2.5
 		UpgradeMult=4
 		UpgradePath=.Chemical_Mortar
 		Uses=3
 		Integrateable=1
 	Chemical_Mortar
+		TechType="Military Technology"
+		SubType="Heavy Weaponry"
+		icon='HomingMissile.dmi'
 		Techniques=list("/obj/Skills/Projectile/Gear/Chemical_Mortar")
-		desc="A singular devastating missile loaded with a toxic payload."
+		desc="A singular devastating shell with a toxic payload. It poisons whoever it strikes and bursts into clouds of gas. It holds one charge, and a Power Pack refills it."
 		Uses=1
 		Integrateable=1
 
 	Progressive_Blade
-		TechType="MilitaryTechnology"
+		TechType="Military Technology"
 		SubType="Melee Weaponry"
 		icon='ProgressiveHilt.dmi'
 		pixel_x=-32
@@ -3120,7 +2963,7 @@ obj/Items/Gear
 		Uses=3
 		Integrateable=1
 	// Lightsaber
-	// 	TechType="MilitaryTechnology"
+	// 	TechType="Military Technology"
 	// 	SubType="Melee Weaponry"
 	// 	icon='ProgressiveHilt.dmi'
 	// 	pixel_x=-32
@@ -3143,27 +2986,27 @@ obj/Items/Gear
 	// 	Integrateable=0//honestly none of these should be integratable because it looks ugly with no hilt
 
 	Incinerator
-		TechType="MilitaryTechnology"
-		SubType="Thermal Weaponry"
+		TechType="Military Technology"
+		SubType="Heavy Weaponry"
 		icon='JetGear.dmi'
 		Techniques=list("/obj/Skills/AutoHit/Gear/Incinerator")
-		desc="Gear allowing the user to release a large blast of flame in front of them!  It burns."
+		desc="Gear allowing the user to release a large blast of flame in front of them! Everything it touches catches fire. It holds three charges, and a Power Pack refills it."
 		Cost=2
 		Uses=3
 		Integrateable=1
 	Freeze_Ray
-		TechType="MilitaryTechnology"
-		SubType="Thermal Weaponry"
+		TechType="Military Technology"
+		SubType="Heavy Weaponry"
 		icon='JetGear.dmi'
 		Techniques=list("/obj/Skills/AutoHit/Gear/Freeze_Ray")
-		desc="Gear allowing the user to cast a cloud of coolant!  It freezes."
+		desc="Gear allowing the user to cast a cloud of coolant! It chills its target to a crawl and locks them in ice for a moment. It holds three charges, and a Power Pack refills it."
 		Cost=2
 		Uses=3
 		Integrateable=1
 /*
 	Sentai_Watch
 		name="Powered Exoskeleton"
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Any"
 		icon='Ironman.dmi'
 		UniformType = "None"
@@ -3309,7 +3152,7 @@ obj/Items/Gear
 */
 	Power_Armor
 		name="Powered Exoskeleton"
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Any"
 		icon='Ironman.dmi'
 		Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor")
@@ -3317,104 +3160,17 @@ obj/Items/Gear
 		Cost=10
 		IntegratedUses=100
 		IntegratedMaxUses=100
-		Uses=1
+		Uses=10
 		verb/Unintegrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len<=1)
-				usr << "This armor doesn't have any gear integrated!"
-				return
-			if(src.Using)
-				usr << "You cannot unintegrate and integrate gear at the same time!"
-				return
-			src.Using=1
-			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
-				if("Yes")
-					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor")
-					desc="A prototype powered exo-suit that sacrifices mobility and efficiency for bulk! An additional gear can be integrated with it."
-					usr << "You've successfully removed all integrations from this gear."
-			src.Using=0
+			usr.UnintegrateGear(src)
 		verb/Integrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len>1)
-				usr << "This armor already has a gear integrated!"
-				return
-			if(src.Using)
-				usr << "You're already putting something in this armor!"
-				return
-			src.Using=1
-			var/obj/Items/Gear/Choice
-			var/list/obj/Items/Gear/IG=list("Cancel")
-			for(var/obj/Items/Gear/g in usr)
-				if(istype(g, /obj/Items/Gear/Prosthetic_Limb))
-					continue
-				if(!g.Integrateable)
-					continue
-				IG.Add(g)
-			if(IG.len<2)
-				usr << "You don't have any gear capable of being integrated into your armor."
-				src.Using=0
-				return
-			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			switch(Choice.type)
-				if(/obj/Items/Gear/Deflector_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Deflector_Shield")
-				if(/obj/Items/Gear/Bubble_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Bubble_Shield")
-				if(/obj/Items/Gear/Jet_Boots)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Boots")
-				if(/obj/Items/Gear/Jet_Pack)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Pack")
-				if(/obj/Items/Gear/Plasma_Blaster)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Blaster")
-				if(/obj/Items/Gear/Plasma_Rifle)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Rifle")
-				if(/obj/Items/Gear/Plasma_Gatling)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Gatling")
-				if(/obj/Items/Gear/Missile_Launcher)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Missile_Launcher")
-				if(/obj/Items/Gear/Chemical_Mortar)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Chemical_Mortar")
-				if(/obj/Items/Gear/Progressive_Blade)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Progressive_Blade")
-				if(/obj/Items/Gear/Lightsaber)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Lightsaber")
-				if(/obj/Items/Gear/Incinerator)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Incinerator")
-				if(/obj/Items/Gear/Freeze_Ray)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Freeze_Ray")
-				if(/obj/Items/Gear/Pile_Bunker)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker")
-				if(/obj/Items/Gear/Power_Fist)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Fist")
-				if(/obj/Items/Gear/Blast_Fist)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Blast_Fist")
-				if(/obj/Items/Gear/Chainsaw)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Chainsaw")
-				if(/obj/Items/Gear/Power_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Claw")
-				if(/obj/Items/Gear/Hook_Grip_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Hook_Grip_Claw")
-				else
-					usr << "Ruh roh.  Something went wrong.  Yell at Yan."
-					src.Using=0
-					return
-			usr << "You've integrated [Choice] into your armor!"
-			src.desc="A prototype powered exo-suit that sacrifices mobility and efficiency for bulk! A [Choice] gear has been integrated with it."
-			del Choice
-			src.Using=0
+			usr.IntegrateGear(src)
 	Power_Armor_Burst
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Powered Armor Specialization"
 		icon='Ironman.dmi'
 		Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burst")
@@ -3422,106 +3178,17 @@ obj/Items/Gear
 		Cost=25
 		IntegratedUses=100
 		IntegratedMaxUses=100
-		Uses=1
+		Uses=10
 		verb/Unintegrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len<=1)
-				usr << "This armor doesn't have any gear integrated!"
-				return
-			if(src.Using)
-				usr << "You cannot unintegrate and integrate gear at the same time!"
-				return
-			src.Using=1
-			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
-				if("Yes")
-					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burst")
-					desc="A specialized armor that sacrifices bulk in order to unleash hellish firepower! An additional gear can be integrated with it."
-					usr << "You've successfully removed all integrations from this gear."
-			src.Using=0
+			usr.UnintegrateGear(src)
 		verb/Integrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len>1)
-				usr << "This armor already has a gear integrated!"
-				return
-			if(src.Using)
-				usr << "You're already putting something in this armor!"
-				return
-			src.Using=1
-			var/obj/Items/Gear/Choice
-			var/list/obj/Items/Gear/IG=list("Cancel")
-			for(var/obj/Items/Gear/g in usr)
-				if(istype(g, /obj/Items/Gear/Prosthetic_Limb))
-					continue
-				if(!g.Integrateable)
-					continue
-				IG.Add(g)
-			if(IG.len<2)
-				usr << "You don't have any gear capable of being integrated into your armor."
-				src.Using=0
-				return
-			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			switch(Choice.type)
-				if(/obj/Items/Gear/Deflector_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Deflector_Shield")
-				if(/obj/Items/Gear/Bubble_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Bubble_Shield")
-				if(/obj/Items/Gear/Jet_Boots)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Boots")
-				if(/obj/Items/Gear/Jet_Pack)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Pack")
-				if(/obj/Items/Gear/Plasma_Blaster)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Blaster")
-				if(/obj/Items/Gear/Plasma_Rifle)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Rifle")
-				if(/obj/Items/Gear/Plasma_Gatling)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Gatling")
-				if(/obj/Items/Gear/Missile_Launcher)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Missile_Launcher")
-				if(/obj/Items/Gear/Chemical_Mortar)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Chemical_Mortar")
-				if(/obj/Items/Gear/Progressive_Blade)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Progressive_Blade")
-				if(/obj/Items/Gear/Lightsaber)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Lightsaber")
-				if(/obj/Items/Gear/Incinerator)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Incinerator")
-				if(/obj/Items/Gear/Freeze_Ray)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Freeze_Ray")
-				if(/obj/Items/Gear/Pile_Bunker)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker")
-				if(/obj/Items/Gear/Power_Fist)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Fist")
-				if(/obj/Items/Gear/Blast_Fist)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Blast_Fist")
-				if(/obj/Items/Gear/Chainsaw)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Chainsaw")
-				if(/obj/Items/Gear/Power_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Claw")
-				if(/obj/Items/Gear/Hook_Grip_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Hook_Grip_Claw")
-				else
-					usr << "Ruh roh.  Something went wrong.  Yell at Yan."
-					src.Using=0
-					return
-			src.IntegratedUses=Choice.MaxUses
-			src.IntegratedMaxUses=src.IntegratedUses
-			usr << "You've integrated [Choice] into your armor!"
-			src.desc="A specialized armor that sacrifices bulk in order to unleash hellish firepower! A [Choice] gear has been integrated with it."
-			del Choice
-			src.Using=0
+			usr.IntegrateGear(src)
 	Power_Armor_Burly
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Powered Armor Specialization"
 		icon='IronmanBurly.dmi'
 		Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burly")
@@ -3529,105 +3196,17 @@ obj/Items/Gear
 		Cost=25
 		IntegratedUses=100
 		IntegratedMaxUses=100
-		Uses=1
+		Uses=10
 		verb/Unintegrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len<=1)
-				usr << "This armor doesn't have any gear integrated!"
-				return
-			if(src.Using)
-				usr << "You cannot unintegrate and integrate gear at the same time!"
-				return
-			src.Using=1
-			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
-				if("Yes")
-					Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Burly")
-					desc="A specialized armor that focuses on becoming even more resilient than the prototype! An additional gear can be integrated with it."
-					usr << "You've successfully removed all integrations from this gear."
-			src.Using=0
-
+			usr.UnintegrateGear(src)
 		verb/Integrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len>1)
-				usr << "This armor already has a gear integrated!"
-				return
-			if(src.Using)
-				usr << "You're already putting something in this armor!"
-				return
-			src.Using=1
-			var/obj/Items/Gear/Choice
-			var/list/obj/Items/Gear/IG=list("Cancel")
-			for(var/obj/Items/Gear/g in usr)
-				if(istype(g, /obj/Items/Gear/Prosthetic_Limb))
-					continue
-				if(!g.Integrateable)
-					continue
-				IG.Add(g)
-			if(IG.len<2)
-				usr << "You don't have any gear capable of being integrated into your armor."
-				src.Using=0
-				return
-			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			switch(Choice.type)
-				if(/obj/Items/Gear/Deflector_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Deflector_Shield")
-				if(/obj/Items/Gear/Bubble_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Bubble_Shield")
-				if(/obj/Items/Gear/Jet_Boots)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Boots")
-				if(/obj/Items/Gear/Jet_Pack)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Pack")
-				if(/obj/Items/Gear/Plasma_Blaster)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Blaster")
-				if(/obj/Items/Gear/Plasma_Rifle)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Rifle")
-				if(/obj/Items/Gear/Plasma_Gatling)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Gatling")
-				if(/obj/Items/Gear/Missile_Launcher)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Missile_Launcher")
-				if(/obj/Items/Gear/Chemical_Mortar)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Chemical_Mortar")
-				if(/obj/Items/Gear/Progressive_Blade)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Progressive_Blade")
-				if(/obj/Items/Gear/Lightsaber)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Lightsaber")
-				if(/obj/Items/Gear/Incinerator)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Incinerator")
-				if(/obj/Items/Gear/Freeze_Ray)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Freeze_Ray")
-				if(/obj/Items/Gear/Pile_Bunker)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker")
-				if(/obj/Items/Gear/Power_Fist)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Fist")
-				if(/obj/Items/Gear/Blast_Fist)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Blast_Fist")
-				if(/obj/Items/Gear/Chainsaw)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Chainsaw")
-				if(/obj/Items/Gear/Power_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Claw")
-				if(/obj/Items/Gear/Hook_Grip_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Hook_Grip_Claw")
-				else
-					usr << "Ruh roh.  Something went wrong.  Yell at Yan."
-					src.Using=0
-					return
-			usr << "You've integrated [Choice] into your armor!"
-			src.desc="A specialized armor that focuses on becoming even more resilient than the prototype! A [Choice] gear has been integrated with it."
-			del Choice
-			src.Using=0
+			usr.IntegrateGear(src)
 	Power_Armor_Blitz
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Powered Armor Specialization"
 		icon='IronmanBlitz.dmi'
 		Techniques=list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Blitz")
@@ -3635,106 +3214,19 @@ obj/Items/Gear
 		Cost=25
 		IntegratedUses=100
 		IntegratedMaxUses=100
-		Uses=1
+		Uses=10
 		verb/Unintegrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len<=1)
-				usr << "This armor doesn't have any gear integrated!"
-				return
-			if(src.Using)
-				usr << "You cannot unintegrate and integrate gear at the same time!"
-				return
-			src.Using=1
-			switch(Ask(usr, "Are you sure you wish to unintegrate? This will destroy any integration this armor currently has!", "", null, "pick", list("Yes","No"), 0))
-				if("Yes")
-					Techniques = list("/obj/Skills/Buffs/ActiveBuffs/Gear/Power_Armor_Blitz")
-					desc = "A specialized armor that focuses on speedy, offensive manuevering! An additional gear can be integrated with it."
-					usr << "You've successfully removed all integrations from this gear."
-			src.Using=0
+			usr.UnintegrateGear(src)
 		verb/Integrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your armor before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len>1)
-				usr << "This armor already has a gear integrated!"
-				return
-			if(src.Using)
-				usr << "You're already putting something in this armor!"
-				return
-			src.Using=1
-			var/obj/Items/Gear/Choice
-			var/list/obj/Items/Gear/IG=list("Cancel")
-			for(var/obj/Items/Gear/g in usr)
-				if(istype(g, /obj/Items/Gear/Prosthetic_Limb))
-					continue
-				if(!g.Integrateable)
-					continue
-				IG.Add(g)
-			if(IG.len<2)
-				usr << "You don't have any gear capable of being integrated into your armor."
-				src.Using=0
-				return
-			Choice=Ask(usr, "What gear do you want to integrate into your power armor?", "Integrate", null, "pick", IG, 0)
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			switch(Choice.type)
-				if(/obj/Items/Gear/Deflector_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Deflector_Shield")
-				if(/obj/Items/Gear/Bubble_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Bubble_Shield")
-				if(/obj/Items/Gear/Jet_Boots)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Boots")
-				if(/obj/Items/Gear/Jet_Pack)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Pack")
-				if(/obj/Items/Gear/Plasma_Blaster)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Blaster")
-				if(/obj/Items/Gear/Plasma_Rifle)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Rifle")
-				if(/obj/Items/Gear/Plasma_Gatling)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Gatling")
-				if(/obj/Items/Gear/Missile_Launcher)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Missile_Launcher")
-				if(/obj/Items/Gear/Chemical_Mortar)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Chemical_Mortar")
-				if(/obj/Items/Gear/Progressive_Blade)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Progressive_Blade")
-				if(/obj/Items/Gear/Lightsaber)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Lightsaber")
-				if(/obj/Items/Gear/Incinerator)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Incinerator")
-				if(/obj/Items/Gear/Freeze_Ray)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Freeze_Ray")
-				if(/obj/Items/Gear/Pile_Bunker)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker")
-				if(/obj/Items/Gear/Power_Fist)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Fist")
-				if(/obj/Items/Gear/Blast_Fist)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Blast_Fist")
-				if(/obj/Items/Gear/Chainsaw)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Chainsaw")
-				if(/obj/Items/Gear/Power_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Claw")
-				if(/obj/Items/Gear/Hook_Grip_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Hook_Grip_Claw")
-				else
-					usr << "Ruh roh.  Something went wrong.  Yell at Yan."
-					src.Using=0
-					return
-			usr << "You've integrated [Choice] into your armor!"
-			src.desc="A specialized armor that focuses on speedy, offensive manuevering!  A [Choice] gear has been integrated within it."
-			del Choice
-			src.Using=0
+			usr.IntegrateGear(src)
 
 	Blast_Fist
-		TechType="MilitaryEngineering"
-		SubType="Impact Weaponry"
+		TechType="Military Engineering"
+		SubType="Weapon Modules"
 		icon='ImpactGloves.dmi'
 		Techniques=list("/obj/Skills/Buffs/SlotlessBuffs/Gear/Blast_Fist")
 		desc="Powered gloves that discharge a shell on contact!"
@@ -3750,8 +3242,8 @@ obj/Items/Gear
 		Uses=1
 		Integrateable=1
 	Pile_Bunker
-		TechType="MilitaryEngineering"
-		SubType="Armorpiercing Weaponry"
+		TechType="Military Engineering"
+		SubType="Weapon Modules"
 		icon='PileBunker.dmi'
 		Techniques=list("/obj/Skills/Queue/Gear/Pile_Bunker")
 		desc="A large, mechanized nail that can deliver a single blow."
@@ -3767,8 +3259,8 @@ obj/Items/Gear
 		Uses=1
 		Integrateable=1
 	Power_Claw
-		TechType="MilitaryEngineering"
-		SubType="Hydraulic Weaponry"
+		TechType="Military Engineering"
+		SubType="Weapon Modules"
 		icon='PowerClaw.dmi'
 		Techniques=list("/obj/Skills/Queue/Gear/Power_Claw")
 		desc="A mechanized claw capable of GRIPPING the opponent.  Shocking.  Not literally."
@@ -3784,92 +3276,18 @@ obj/Items/Gear
 		Uses=3
 		Integrateable=1
 	Prosthetic_Limb
-		TechType="ImprovedMedicalTechnology"
-		SubType="Prosthetic Limbs"
+		TechType="Improved Medical Technology"
+		SubType="Cyber Engineering"
 		Cost=4
 		Stealable=0
 		icon='AutomailArmLeft.dmi'
-		desc="A replacement limb.  It is possible to integrate some gears into the limbs."
+		desc="A replacement limb.  Fit it to a maimed arm or leg to replace the part outright, which uses it up, or equip it as gear.  It is possible to integrate some gears into the limbs."
 		verb/Integrate()
 			set category=null
 			set src in usr
-			if(src.suffix=="*Equipped*")
-				usr << "Take off your limb before you try to jam a gear in it!"
-				return
-			if(src.Techniques.len>0)
-				usr << "This limb already has a gear integrated!"
-				return
-			if(src.Using)
-				usr << "You're already putting something in this limb!"
-				return
-			src.Using=1
-			var/obj/Items/Gear/Choice
-			var/list/obj/Items/Gear/IG=list("Cancel")
-			for(var/obj/Items/Gear/g in usr)
-				if(istype(g, /obj/Items/Gear/Prosthetic_Limb))
-					continue
-				if(!g.Integrateable)
-					continue
-				IG.Add(g)
-			if(IG.len<2)
-				usr << "You don't have any gear capable of being integrated into your prosthetic."
-				src.Using=0
-				return
-			Choice=Ask(usr, "What gear do you want to integrate into your prosthetic limb?", "Integrate", null, "pick", IG, 0)
-			if(Choice=="Cancel")
-				src.Using=0
-				return
-			switch(Choice.type)
-				if(/obj/Items/Gear/Deflector_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Deflector_Shield")
-				if(/obj/Items/Gear/Bubble_Shield)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Bubble_Shield")
-				if(/obj/Items/Gear/Jet_Boots)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Boots")
-				if(/obj/Items/Gear/Jet_Pack)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Jet_Pack")
-				if(/obj/Items/Gear/Plasma_Blaster)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Blaster")
-				if(/obj/Items/Gear/Plasma_Rifle)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Rifle")
-				if(/obj/Items/Gear/Plasma_Gatling)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Plasma_Gatling")
-				if(/obj/Items/Gear/Missile_Launcher)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Missile_Launcher")
-				if(/obj/Items/Gear/Chemical_Mortar)
-					src.Techniques.Add("/obj/Skills/Projectile/Gear/Integrated/Integrated_Chemical_Mortar")
-				if(/obj/Items/Gear/Progressive_Blade)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Progressive_Blade")
-				if(/obj/Items/Gear/Lightsaber)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Lightsaber")
-				if(/obj/Items/Gear/Incinerator)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Incinerator")
-				if(/obj/Items/Gear/Freeze_Ray)
-					src.Techniques.Add("/obj/Skills/AutoHit/Gear/Integrated/Integrated_Freeze_Ray")
-				if(/obj/Items/Gear/Pile_Bunker)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Pile_Bunker")
-				if(/obj/Items/Gear/Power_Fist)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Fist")
-				if(/obj/Items/Gear/Blast_Fist)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Blast_Fist")
-				if(/obj/Items/Gear/Chainsaw)
-					src.Techniques.Add("/obj/Skills/Buffs/SlotlessBuffs/Gear/Integrated/Integrated_Chainsaw")
-				if(/obj/Items/Gear/Power_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Power_Claw")
-				if(/obj/Items/Gear/Hook_Grip_Claw)
-					src.Techniques.Add("/obj/Skills/Queue/Gear/Integrated/Integrated_Hook_Grip_Claw")
-				else
-					usr << "This gear isn't valid for prosthetic limb integration!."
-					src.Using=0
-					return
-			src.IntegratedUses=Choice.MaxUses
-			src.IntegratedMaxUses=src.IntegratedUses
-			usr << "You've integrated [Choice] into your prosthetic!"
-			src.desc="A replacement limb.  A [Choice] gear has been integrated within it."
-			del Choice
-			src.Using=0
+			usr.IntegrateGear(src)
 	Hougyoku
-		TechType="CyberEngineering"
+		TechType="Cyber Engineering"
 		SubType="Blasphemy"
 		var/Partial=1
 		var/Complete=0
@@ -3910,7 +3328,7 @@ obj/Items/Gear
 			Techniques=list("/obj/Skills/AutoHit/Fragor", "/obj/Skills/AutoHit/Ultra_Fragor")
 			passives = list("True Evolution" = 1)
 	Dark_Factor_Fragment
-		TechType="CyberEngineering"
+		TechType="Cyber Engineering"
 		SubType="Blasphemy"
 		desc="A fragment of darkness that allows someone to assume demonic powers... or become one themselves."
 		Cost=500000
@@ -3955,7 +3373,7 @@ obj/Items/Gear
 			usr.stat_redo()
 
 	Spiral_Engine
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Rebellion"
 		desc="Ancient Fourth Fate technology created by Araki Ishikawa. It can awaken Spiral Energy within members of the Spiral Races... or allow a Synthetic Lifeform to generate their own."
 		Cost=900000
@@ -3999,7 +3417,7 @@ obj/Items/Gear
 		var/Augment = "None"
 		var/beamSaberSetUp = FALSE
 		var/MechType = "None"
-		TechType="MilitaryEngineering"
+		TechType="Military Engineering"
 		SubType="Vehicular Power Armor"
 		icon='Gundam.dmi'
 		icon_state="Inventory"

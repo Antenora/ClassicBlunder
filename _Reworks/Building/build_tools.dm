@@ -364,6 +364,7 @@
 						return
 					dragging = 1
 					strokeLower = (plist["alt"] == "1")
+					strokeRaise = !strokeLower && (plist["shift"] == "1")
 					anchorZ = T.z
 					if(tool == BUILD_SPRAY)
 						strokeSet = list()
@@ -411,6 +412,7 @@
 						return
 					dragging = 1
 					strokeLower = (plist["alt"] == "1")
+					strokeRaise = !strokeLower && (plist["shift"] == "1")
 					anchorX = T.x
 					anchorY = T.y
 					anchorZ = T.z
@@ -492,6 +494,9 @@
 			if(strokeLower)
 				tname = "lower"
 				strokeLower = 0
+			else if(strokeRaise)
+				tname = "raise"
+			strokeRaise = 0
 			if(todo && todo.len)
 				BuildCommitSet(C, todo, tname)
 			UpdateGhost()

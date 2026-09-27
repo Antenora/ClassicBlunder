@@ -68,7 +68,8 @@ var/list/_gfx_reflective_water_icons = list('Waters.dmi', 'PurpleWaterfall.dmi',
 
 proc/GfxIsWaterSurface(turf/T)
 	if(!T) return FALSE
-	if(T.Water || T.Shallow || T.Deluged || T.gfx_material_id == "water") return TRUE
+	if(T.Water || T.Deluged || T.gfx_material_id == "water") return TRUE
+	if(T.Shallow && BuildMaterialFor(T) == "Water") return TRUE
 	return T.icon in _gfx_reflective_water_icons
 
 proc/GfxIsPermanentReflectiveSurface(turf/T)
@@ -592,7 +593,7 @@ proc/GfxTurfReflectionStrength(turf/T)
 		return T.gfx_reflectivity >= 0 ? clamp(T.gfx_reflectivity, 0, 1) : (GfxIsWaterSurface(T) ? 0.9 : 0.8)
 	var/area/A = T.loc
 	var/datum/environment_profile/P = EnvProfile(A)
-	return clamp(max(P ? P.base_wetness : 0, EnvWeatherWetness(A)) * 0.6, 0, 0.65)
+	return clamp(max(P ? P.base_wetness : 0, EnvWeatherWetness(WxKindAt(T))) * 0.6, 0, 0.65)
 
 proc/GfxFindReflectionSurface(atom/movable/A, radius = 2)
 	var/turf/source = get_turf(A)
@@ -720,7 +721,7 @@ proc/GfxApplyMaterialWind(atom/movable/A)
 	if(A.gfx_canopy_obj)
 		var/obj/gfx_canopy/CN = A.gfx_canopy_obj
 		var/turf/PT = get_turf(A)
-		var/list/PW = EnvWindForArea(PT ? PT.loc : null)
+		var/list/PW = EnvWindAt(PT)
 		var/ppow = clamp(sqrt(PW[1] * PW[1] + PW[2] * PW[2]) / 2, 0, 1)
 		var/pamp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
 		var/ckey = "[round(ppow, 0.02)]:[pamp]:[CN.gfx_wind_response]"
@@ -738,8 +739,7 @@ proc/GfxApplyMaterialWind(atom/movable/A)
 				GfxWindLoop(CN, ckeys, 2.4 + ppow * 2.2, CN.gfx_wind_phase, CN.gfx_wind_loop_id, null, null)
 		return //trunk never moves
 	var/turf/T = get_turf(A)
-	var/area/AR = T ? T.loc : null
-	var/list/W = EnvWindForArea(AR)
+	var/list/W = EnvWindAt(T)
 	var/power = clamp(sqrt(W[1] * W[1] + W[2] * W[2]) / 2, 0, 1)
 	var/amp = (glob && glob.WIND_AMPLITUDE) ? glob.WIND_AMPLITUDE : 9
 	var/mn = (glob && glob.WIND_MIN_PX) ? glob.WIND_MIN_PX : 6
@@ -937,7 +937,7 @@ proc/GfxActorReflectionStrength(mob/M, turf/surface = null, gap_pixels = 0)
 		strength *= clamp(surface_reflectivity, 0, 1)
 	else
 		var/datum/environment_profile/P = EnvProfile(A)
-		strength *= max(P ? P.base_wetness : 0, EnvWeatherWetness(A)) * 0.55
+		strength *= max(P ? P.base_wetness : 0, EnvWeatherWetness(WxKindAt(surface))) * 0.55
 	strength *= clamp(1 - gap_pixels / 56, 0.18, 1)
 	return clamp(strength, 0, 1)
 
@@ -1037,8 +1037,7 @@ proc/_GfxDepthProcess()
 			if(M.icon && M.invisibility <= P.see_invisible)
 				seen_mobs[M] = 1
 				client_seen_mobs[M] = 1
-		var/area/view_area = view_turf.loc
-		var/dkey = "[view_turf.x],[view_turf.y],[view_turf.z],[visible_r],[round(DnDarknessFrac() * 20)],[_gfx_material_atoms.len],[_light_sources.len],[_fx_lights.len],[view_area ? view_area.wx_kind : null],[wstamp]"
+		var/dkey = "[view_turf.x],[view_turf.y],[view_turf.z],[visible_r],[round(DnDarknessFrac() * 20)],[_gfx_material_atoms.len],[_light_sources.len],[_fx_lights.len],[WxKindAt(view_turf)],[wstamp]"
 		if(P.client.gfx_depth_key == dkey && P.client.gfx_depth_materials)
 			for(var/atom/movable/A in P.client.gfx_depth_materials)
 				held_materials[A] = 1

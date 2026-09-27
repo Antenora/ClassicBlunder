@@ -20,6 +20,7 @@
 	var/critEff = 1
 	var/blockEff = 1
 	var/critBonus = 0
+	var/nowound = 0
 	var/tmp/critChance = 0
 	var/tmp/didCrit = 0
 	var/tmp/didBlock = 0
@@ -51,6 +52,10 @@ var/list/strikeHooksByStage
 
 mob
 	proc
+		MechTakenMult(mob/attacker, strike/S)
+			return 1
+		MechDealtMult(mob/defender, strike/S)
+			return 1
 		DoDamage(mob/defender, val)
 			var/strike/S = new(src, defender, val)
 			return ResolveStrike(S)
@@ -209,7 +214,7 @@ mob
 				val/=defender.AngerMax
 
 			if((defender.passive_handler.Get("Persistence") || defender.hasDeterminationDesperation()) && !defender.HasInjuryImmune())
-				if(FightingSeriously(src,defender))
+				if(!S.nowound && FightingSeriously(src,defender))
 					//a slice of every hit lands as wounds instead of health - no more coin flips
 					var/desp = clamp(defender.passive_handler.Get("Persistence"), 0.1, glob.MAX_PERSISTENCE_CALCULATED)
 					desp += defender.getDeterminationPersistenceBonus()
@@ -218,7 +223,7 @@ mob
 					defender.WoundSelf(defender.HPToPct((val*woundShare)/sqrt(1+despDiv)))
 					val *= (1 - woundShare)
 
-			if(defender.KO&&!src.Lethal)
+			if(defender.KO&&(!src.Lethal||S.nowound))
 				val=0
 
 			if(defender.CheckSpecial("Kamui Unite") && defender.passive_handler.Get("GodKi") < 1)
@@ -250,6 +255,7 @@ mob
 
 			if(getBackSide(src, defender) && passive_handler["Backshot"])
 				val *= 1 + (passive_handler["Backshot"]/10)
+			val *= defender.MechTakenMult(src, S) * MechDealtMult(defender, S)
 
 
 
@@ -293,6 +299,7 @@ mob
 				DEBUGMSG("this is the damage actually dealt: [val]")
 				var/final_damage = max(0,val)
 				defender.LoseHealth(final_damage);
+				defender.MaimCreepHit(src, final_damage)
 				if(defender.passive_handler.Get("LustFactor")) defender.applySinBonusFromTakenDamage(final_damage);
 				if(passive_handler.Get("LustFactor")) applySinBonusFromDealtDamage(final_damage);
 				if(passive_handler.Get("WarmingUp")) applyWarmingUpFromDealtDamage(final_damage)
@@ -370,7 +377,7 @@ mob
 
 
 			var/mortalStrike = GetMortalStrike()
-			if(mortalStrike > 0  && FightingSeriously(src, 0))
+			if(!S.nowound && mortalStrike > 0  && FightingSeriously(src, 0))
 				if(val > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
 					if(!defender.MortallyWounded) // the last time, plus the timer
 						defender.MortallyWounded += 1
@@ -688,7 +695,7 @@ mob
 						if(src.DefStolen>(MDef-1))
 							src.DefStolen=(MDef-1)
 
-			if(FightingSeriously(src,0))
+			if(!S.nowound && FightingSeriously(src,0))
 				var/WoundsInflicted
 				var/obj/Items/Sword/s=src.EquippedSword()
 				var/obj/Items/Enchantment/Staff/st=src.EquippedStaff()
@@ -743,10 +750,10 @@ mob
 				defender.Unconscious(src)
 				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
 					defender.client.PlaySwoon()
-					defender.Maimed+=1
+					defender.MaimApply("Torso", 1)
 					defender.recordMaim(src, "Combat")
 					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
-			else if(defender.KO&&src.Lethal)
+			else if(defender.KO&&src.Lethal&&!S.nowound)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)
 						var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin/bor=EquippedSword()

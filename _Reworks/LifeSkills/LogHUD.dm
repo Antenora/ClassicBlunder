@@ -203,6 +203,7 @@ client/proc/ResetLogHUD()
 	return uppertext(cat)
 
 client/proc/BuildLogChrome()
+	RegisterLifeMaterials()
 	log_chrome = list()
 	log_tabbtns = list()
 	LogBG('HUD/tech_panel.png', 0, 0, LOG_H, 0, 1)

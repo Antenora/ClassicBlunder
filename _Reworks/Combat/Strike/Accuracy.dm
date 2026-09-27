@@ -50,6 +50,8 @@
 		AccMult *= 1.15 //plating trades dodge for armor
 	if(!deflection && Offender.AttackQueue)
 		AccMult *= Offender.QueuedAccuracy()
+	if(!deflection && Offender.gun_suppressed > world.time)
+		AccMult *= GunSuppressAccMult()
 	if(Offender.SenseRobbed >= 4 && (Offender.SenseUnlocked <= Offender.SenseRobbed && Offender.SenseUnlocked > 5))
 		AccMult *= max(0, 1 - (Offender.SenseRobbed * 0.1))
 	if(Defender.SenseRobbed >= 4 && (Defender.SenseUnlocked <= Defender.SenseRobbed && Defender.SenseUnlocked > 5))
@@ -85,6 +87,8 @@
 	var/defRating = Defender.GetDef(glob.ACC_DEF) + Defender.GetSpd(glob.ACC_DEF_SPD)
 	var/TotalAccuracy = BaseChance + (atkRating - defRating) * glob.ACC_POINT + (OffenseAdvantage - DefenseAdvantage) * glob.POWER_ACC_POINT
 	TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
+	if(!deflection && Defender.in_smoke > world.time)
+		TotalAccuracy /= 2
 	if(glob.DEBUG_MESSAGES_ACCURACY)
 		Offender << "--------------------"
 		Offender << "atkRating: [atkRating] (AccMult [AccMult])"
@@ -101,4 +105,7 @@
 	if(roll < TotalAccuracy + glob.WHIFF_BAND)
 		return WHIFF
 	return MISS
+
+mob/var/tmp/in_smoke = 0
+mob/var/tmp/gun_suppressed = 0
 

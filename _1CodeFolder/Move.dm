@@ -27,9 +27,9 @@ mob/proc/MovementSpeed()
 		Delay=0.25
 		if(src.Attracted)
 			Delay*=4
-		return Delay
+		return GunLegacyMoveDelay(Delay)
 	else if(passive_handler.Get("Skimming") + is_dashing)
-		return Delay
+		return GunLegacyMoveDelay(Delay)
 	if(src.HasBlastShielding())
 		Delay*=3
 	if(src.CanBeSlowed())
@@ -69,8 +69,8 @@ mob/proc/MovementSpeed()
 			Delay /= 2
 	if(hasRaindropBody())
 		if(initialDelay < Delay)
-			return initialDelay
-	return Delay
+			return GunLegacyMoveDelay(initialDelay)
+	return GunLegacyMoveDelay(Delay)
 
 mob/var/tmp/MapperWalkLastTurf
 mob/var/tmp/MapperWalkLastBrush

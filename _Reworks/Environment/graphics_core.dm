@@ -218,6 +218,9 @@ proc/GfxResizeScreenOverlays(client/C, pixel_width = 0, pixel_height = 0)
 		for(var/area/A in world)
 			GfxFitSharedScreenOverlay(A.wx_tint)
 			GfxFitSharedScreenOverlay(A.wx_flash)
+		for(var/datum/wx_zlevel/ZL in _wx_zlevels)
+			GfxFitSharedScreenOverlay(ZL.wx_tint)
+			GfxFitSharedScreenOverlay(ZL.wx_flash)
 
 proc/GfxQualityRank(client/C)
 	var/Options/P = C ? C.prefs : null
@@ -337,7 +340,7 @@ proc/GfxApplyMaterialLightPass(client/C)
 		return
 	C.gfx_material_light_relay.alpha = GfxQualityRank(C) >= GFX_QUALITY_ULTRA ? 255 : 225
 
-proc/GfxApplyReflectionPass(client/C, area/A = null)
+proc/GfxApplyReflectionPass(client/C, turf/T = null)
 	if(!C) return
 	GfxEnsureClient(C)
 	if(!GfxReflectionEnabled(C))
@@ -347,12 +350,11 @@ proc/GfxApplyReflectionPass(client/C, area/A = null)
 		GfxClearWaterMask(C)
 		return
 	C.gfx_reflection_relay.alpha = 255
-	if(!A && C.mob)
-		var/turf/T = get_turf(C.mob)
-		A = T ? T.loc : null
+	if(!T && C.mob)
+		T = get_turf(C.mob)
 	var/wind_mag = sqrt(C.gfx_env_wind_x*C.gfx_env_wind_x + C.gfx_env_wind_y*C.gfx_env_wind_y)
 	var/wetness = C.gfx_env_wetness
-	var/key = "q[GfxQualityRank(C)]-w[round(wind_mag,0.2)]-wet[round(wetness,0.1)]-[A ? A.wx_kind : null]"
+	var/key = "q[GfxQualityRank(C)]-w[round(wind_mag,0.2)]-wet[round(wetness,0.1)]-[WxKindAt(T)]"
 	if(C.gfx_reflection_filter_key == key) return
 	C.gfx_reflection_filter_key = key
 	var/list/fl = list()
@@ -508,7 +510,7 @@ client/proc/InitializeGraphics()
 	set hidden = 1
 	if(!client || !client.prefs) return
 	var/choice = Ask(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings", null, "pick", list(
-		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close"), 0)
+		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Apply / Close"), 0)
 	switch(choice)
 		if("Quality Preset")
 			var/q = Ask(src, "Higher presets enable more particles, soft shadows, bloom, distortion, and reflections.", "Graphics Quality", client.prefs.graphicsQuality, "pick", list("Low", "Medium", "High", "Ultra", "Cancel"), 0)
@@ -520,19 +522,17 @@ client/proc/InitializeGraphics()
 		if("Light Shafts") client.prefs.lightShafts = !client.prefs.lightShafts
 		if("Far Field Blur") client.prefs.farBlur = !client.prefs.farBlur
 		if("Vignette") client.prefs.vignette = !client.prefs.vignette
-		if("Experimental Camera") client.prefs.experimentalCamera = !client.prefs.experimentalCamera
 	client.prefs.savePrefs(ckey)
 	client.ApplyGraphicsPreferences()
-	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | shafts [client.prefs.lightShafts ? "ON" : "OFF"] | far blur [client.prefs.farBlur ? "ON" : "OFF"] | vignette [client.prefs.vignette ? "ON" : "OFF"] | camera [client.prefs.experimentalCamera ? "EXPERIMENTAL ON" : "OFF"]."
+	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | shafts [client.prefs.lightShafts ? "ON" : "OFF"] | far blur [client.prefs.farBlur ? "ON" : "OFF"] | vignette [client.prefs.vignette ? "ON" : "OFF"]."
 
 /mob/verb/Graphics_Diagnostics()
 	set category = "Other"
 	set name = "Graphics Diagnostics"
 	if(!client) return
-	var/wx = "clear"
 	var/turf/T = GfxGroundTurf(src)
 	var/area/A = T ? T.loc : null
-	if(A && A.wx_kind) wx = A.wx_kind
+	var/wx = WxKindAt(T) || "clear"
 	var/datum/environment_profile/P = EnvProfileForClient(client, A)
 	var/list/reflection_solution = GfxFindActorReflectionTarget(src)
 	var/turf/reflection_surface = reflection_solution ? reflection_solution["surface"] : null

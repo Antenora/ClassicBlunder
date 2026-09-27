@@ -326,6 +326,15 @@ mob/var
 	EnhanceChips
 	EnhanceChipsMax=4
 	PilotingProwess=0
+	PilotXP=0
+	pilot_health_stash
+	shortcut/pilot_shortcuts
+	list/pilot_look
+	list/mech_passives_applied
+	tmp/obj/Items/Mech/mech
+	tmp/OffReplace=0
+	tmp/DefReplace=0
+	tmp/VitReplace=0
 
 	PUDrainReduction=1//Reduces PU drain.
 	PUSpeedModifier=1
@@ -545,7 +554,6 @@ mob/var
 	tmp/mob/TerrifiedOf=0
 	PotionCD=0
 	Satiated=0//fooooood
-	Drunk=0//get op in drunk fist
 	Aged=0//ignore youth debuffs
 	Doped=0//ignore bp wounds
 	Antivenomed=0//Makes poison do half damage and reduces it by a much higher rate.

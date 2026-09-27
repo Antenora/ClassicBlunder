@@ -140,10 +140,12 @@ mob/proc/CarvePayout(obj/LifeSkills/Remains/R, perf, obj/Items/LifeTool/tool, ra
 		pool -= matclass
 		var/datum/hunt_drop/hd = LifeHuntDrops[matclass]
 		var/amt = max(1, round(LIFE_HUNT_BASE_YIELD * perf + (tool ? tool.YieldBonus : 0)))
+		amt = LifeBonusRound(amt * LifeYieldMult("Hunting"))
 		GiveMaterial(src, hd.mtype, amt, q)
 		src << "<font color=#78eb78>You carve loose [amt]x [QualityName(q)] [hd.name].</font>"
 		LifeLogFind("Hunting", hd.name)
 		drops--
+	CookGrantMeat(tier, perf, q)
 
 	// Trophy Extraction: rank 10 pulls a bonus prime cut once a day
 	if(rank >= LIFE_MAX_RANK && LifeTrophyDay != DaysOfWipe())

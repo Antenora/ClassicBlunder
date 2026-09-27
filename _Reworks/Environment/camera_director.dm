@@ -1,4 +1,4 @@
-//opt-in camera director
+//camera director
 
 /mob/gfx_camera
 	name = "graphics camera"
@@ -22,8 +22,7 @@ client
 		gfx_camera_active = FALSE
 
 proc/GfxCameraWanted(client/C)
-	var/Options/P = C ? C.prefs : null
-	return C && C.mob && istype(C.mob, /mob/Players) && istype(P, /Options) && P.experimentalCamera && !GfxReducedMotion(C)
+	return C && C.mob && istype(C.mob, /mob/Players) && C.game_display_active && !C.cutscene_active && !GfxReducedMotion(C)
 
 proc/GfxCameraWorldX(atom/movable/A)
 	return A ? (A.x - 1) * world.icon_size + A.step_x + world.icon_size / 2 : 0

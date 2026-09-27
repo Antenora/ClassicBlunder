@@ -622,7 +622,7 @@ obj/Skills
 								m.BPPoison=1
 								m.BPPoisonTimer=0
 								m.Sheared=0
-								m.Maimed=0
+								m.MaimClearAll()
 								m.MortallyWounded=0
 								m.SenseRobbed=0
 								m.HealWounds(100)

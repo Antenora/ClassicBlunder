@@ -156,322 +156,6 @@ obj/Skills/Utility
 			set hidden=1
 
 
-	Cooking
-		var/recipes/savedRecipes = new()
-		var/recipe/currentMeal
-		Mastery = 1
-		suffix="Meal"
-		desc="Cook up a feast!"
-		verb/Cooking()
-			set category="Utility"
-			set hidden = 1
-			var/option = Ask(usr, "What do you want to do? Your current meal is [currentMeal]", "Cooking", null, "pick", list("Cook Meal", "Set Current Meal","Make Recipe", "Alter Recipe", "Delete Recipe", "Share Recipe", "Cancel"), 0)
-			switch(option)
-				if("Cook Meal")
-					if(savedRecipes.savedRecipes.len==0)
-						usr << "You don't have any recipes made!"
-						return
-					if(!currentMeal)
-						usr << "You don't have a meal set!"
-						return
-					if(src.Using)
-						usr << "You're already preparing a meal!"
-						return
-					if(usr.passive_handler.Get("Piloting"))
-						usr << "You're not capable of necessary precision!"
-						return
-					if(usr.TotalFatigue>=90)
-						usr << "You're too exhausted to cook more!"
-						return
-					if(usr.Grab)
-						usr << "You need free hands!"
-						return
-					if(!usr.HasMoney(glob.progress.EconomyCost*0.02))
-						usr << "You don't have enough money to make a single passable meal!"
-						return
-					src.Using=1
-
-
-					var/Count=Ask(usr, "How many [currentMeal.name]s are you cooking?", "Count", null, "num", null, 0)
-					if(Count == 0)
-						Using = 0
-						return
-					if(Count<1)
-						Count=1
-					if(Count>9)
-						Count=9
-					var/rem=100-usr.TotalFatigue
-					rem/=10
-					rem=round(rem)
-					if(Count>rem)
-						Count=rem
-					var/MatCost=Count*glob.progress.EconomyCost*0.02
-					if(!usr.HasMoney(MatCost))
-						usr << "You don't have enough money to make [Count] [currentMeal.name]!"
-					for(var/c=0, c<Count, c++)
-						var/obj/Items/Edibles/Food/M=new
-						M.name=currentMeal.name
-						M.icon=currentMeal.icon
-						M.icon_state=currentMeal.icon_state
-						M.pixel_x=currentMeal.pixel_x
-						M.pixel_y=currentMeal.pixel_y
-						M.EatText = currentMeal.eat_text
-						M.desc = currentMeal.description
-						usr.AddItem(M)
-						if(currentMeal.drink)
-							M.EatToxicity=rand(src.Mastery-1,5+src.Mastery)
-							if(M.EatToxicity<0)
-								M.EatToxicity=0
-						M.EatNutrition=rand(src.Mastery-1,src.Mastery+1)
-						if(M.EatNutrition<0)
-							M.EatNutrition=0
-						if(M.EatNutrition >= 6) M.EatNutrition = 5
-						M.desc += "<br><br><b>Quality:<b> "
-						switch(M.EatNutrition)
-							if(0)
-								M.desc+="Travesty ([M.EatNutrition])"
-							if(1)
-								M.desc+="Common ([M.EatNutrition])"
-							if(2 to 9999)
-								M.desc+="Delicious ([M.EatNutrition])"
-						usr.GainFatigue(10/Mastery)
-
-					usr.Frozen=2
-					var/preppingtext=replacetext(currentMeal.prepare_text, "usrName", "[usr]")
-					OMsg(usr, "[preppingtext]")
-					usr.TakeMoney(MatCost)
-					sleep(30)
-					usr.Frozen=0
-					src.Using=0
-				if("Set Current Meal")
-					if(savedRecipes.savedRecipes.len==0)
-						usr << "You don't have any recipes made!"
-						return
-					var/list/recs = savedRecipes.listRecipes()
-					recs += "Cancel"
-					var/recipe = Ask(usr, "What recipe do you want to set as your current recipe?", "Current Recipe", null, "pick", recs, 0)
-					if(recipe == "Cancel")
-						return
-					usr << "Current Meal set to [recipe]!"
-					currentMeal = savedRecipes.findByName(recipe)
-				if("Make Recipe")
-					var/mealType = Ask(usr, "Is the meal a drink, a food, or both?", "Cooking", null, "pick", list("Drink", "Food"), 0)
-					var/name = Ask(usr, "What's the name of the meal?", "Cooking", null, "text", null, 1)
-					if(name == null || name == "")
-						return
-					var/selectedIcon = input("What icon for the meal?", "Cooking") as icon|null
-					var/selectedIconState = Ask(usr, "What icon state for the meal?", "Cooking", null, "text", null, 1)
-					var/selectedX = Ask(usr, "Pixel X of the meal?", "Cooking", null, "num", null, 1)
-					var/selectedY = Ask(usr, "Pixel Y of the meal?", "Cooking", null, "num", null, 1)
-					var/selectedeatText = Ask(usr, "What do you want the food to say when it's consumed? Typing usrName will macro it to replace with the eater's name.", "Cooking", null, "text", null, 1)
-					var/selectedpreptext = Ask(usr, "What do you want the meal to say when you're cooking it? Typing usrName will macro it to replace with the maker's name.", "Cooking", null, "text", null, 1)
-					var/selecteddescription = Ask(usr, "What do you want the description to be?", "Cooking", null, "text", null, 1)
-					var/recipe/newRecipe = new(name,selectedIcon,selectedIconState,selectedX,selectedY,selectedeatText,selectedpreptext,selecteddescription, mealType)
-					savedRecipes.addRecipe(newRecipe)
-				if("Alter Recipe")
-					if(savedRecipes.savedRecipes.len==0)
-						usr << "You don't have any recipes made!"
-						return
-					var/list/recs = savedRecipes.listRecipes()
-					recs += "Cancel"
-					var/recipe = Ask(usr, "What recipe do you want to alter?", "Altering Recipe", null, "pick", recs, 0)
-					if(recipe=="Cancel")
-						return
-					var/recipe/actualRecipe = savedRecipes.findByName(recipe)
-					if(currentMeal == actualRecipe)
-						currentMeal = null
-					var/altering = Ask(usr, "What do you want to alter?", "Altering Recipe", null, "pick", list("Name", "Preperation Text", "Eat Text", "Icon", "Pixel_X", "Pixel_Y", "Description", "Meal Type"), 0)
-					switch(altering)
-						if("Name")
-							var/newName = Ask(usr, "What's the new name? The current name is [actualRecipe.name]", "Altering Name", null, "text", null, 1)
-							if(newName==null || newName == "")
-								return
-							actualRecipe.name = newName
-						if("Preperation Text")
-							var/newprep = Ask(usr, "What's the new prepare text? The current prepare text is [actualRecipe.prepare_text]", "Altering Prepare Text", null, "text", null, 1)
-							if(newprep==null || newprep == "")
-								return
-							actualRecipe.prepare_text = newprep
-						if("Eat Text")
-							var/newprep = Ask(usr, "What's the new eat text? The current eat text is [actualRecipe.eat_text]", "Altering Eat Text", null, "text", null, 1)
-							if(newprep==null || newprep == "")
-								return
-							actualRecipe.eat_text = newprep
-						if("Icon")
-							var/newprep = input("What's the new icon? The current icon is [actualRecipe.icon]", "Altering Icon") as icon|null
-							if(newprep==null)
-								return
-							actualRecipe.icon = newprep
-						if("Pixel_X")
-							var/newprep = Ask(usr, "What's the new pixel x? The current pixel_x is [actualRecipe.pixel_x]", "Altering Pixel X", null, "num", null, 1)
-							if(newprep==null || newprep == "")
-								return
-							actualRecipe.pixel_x = newprep
-						if("Pixel_Y")
-							var/newprep = Ask(usr, "What's the new prepare text? The current pixel_y is [actualRecipe.pixel_y]", "Altering Pixel Y", null, "num", null, 1)
-							if(newprep==null || newprep == "")
-								return
-							actualRecipe.pixel_y = newprep
-						if("Description")
-							var/newprep = Ask(usr, "What's the new description? The current description is [actualRecipe.description]", "Altering Description", null, "text", null, 1)
-							if(newprep==null || newprep == "")
-								return
-							actualRecipe.description = newprep
-						if("Meal Type")
-							var/typeing
-							if(actualRecipe.meal)
-								typeing = "Meal"
-							if(actualRecipe.drink)
-								typeing = "Drink"
-							var/mealType = Ask(usr, "What's sort of meal is this? The type is currently [typeing]", "Altering Meal Type", null, "pick", list("Drink", "Food"), 0)
-							if(mealType=="Food")
-								actualRecipe.meal = TRUE
-								actualRecipe.drink = FALSE
-							if(mealType == "Drink")
-								actualRecipe.meal = FALSE
-								actualRecipe.drink = TRUE
-
-				if("Delete Recipe")
-					if(savedRecipes.savedRecipes.len==0)
-						usr << "You don't have any recipes made!"
-						return
-					var/list/recs = savedRecipes.listRecipes()
-					recs += "Cancel"
-					var/recipe = Ask(usr, "What recipe do you want to delete?", "Deleting Recipe", null, "pick", recs, 0)
-					if(recipe=="Cancel")
-						return
-					var/confirm = Ask(usr, "Are you sure you want to delete [recipe]?", "Delete Recipe", null, "pick", list("Yes","No"), 0)
-					if(confirm=="No")
-						return
-					var/recipe/recc = savedRecipes.findByName(recipe)
-					if(currentMeal == recc)
-						currentMeal = null
-					savedRecipes.removeByName(recipe)
-				if("Share Recipe")
-					var/list/recs = savedRecipes.listRecipes()
-					recs += "Cancel"
-					var/recipe = Ask(usr, "What recipe do you want to share?", "Sharing Recipe", null, "pick", recs, 0)
-					if(recipe == "Cancel")
-						return
-					var/list/mobs = list()
-					mobs += "Cancel"
-					for(var/mob/Players/m in oview(5, usr))
-						if(locate(/obj/Skills/Utility/Cooking,m))
-							mobs += m
-					if(mobs.len == 1)
-						usr << "There's no valid targets near you!"
-						return
-					var/who = Ask(usr, "Who do you want to share it to?", "Sharing Recipe", null, "pick", mobs, 0)
-					if(who=="Cancel")
-						return
-					var/confirm = Ask(who, "Do you want to accept [recipe] from [usr]?", "Sharing Cooking Recipe", null, "pick", list("Yes", "No"), 0)
-					if(confirm=="No")
-						return
-					for(var/obj/Skills/Utility/Cooking/c in who)
-						c.savedRecipes.addRecipe(savedRecipes.findByName(recipe))
-				if("Cancel")
-					return
-
-	Brewing
-		suffix="Booze"
-		desc="Brew up a party!"
-		var/NonAlcoholic=0
-		verb/Toggle_Alcohol()
-			set category="Utility"
-			set hidden = 1
-			src.NonAlcoholic=!src.NonAlcoholic
-			if(src.NonAlcoholic)
-				usr << "You <font color='red'>WILL NOT</font color> make drinks with alcohol in them!"
-			else if(!src.NonAlcoholic)
-				usr << "You <font color='green'>WILL</font color> make drinks with alcohol in them!"
-		verb/Set_Drink()
-			set category="Utility"
-			set hidden = 1
-			src.suffix=Ask(usr, "What are you brewing?", "Brewing", null, "text", null, 1)
-			if(src.suffix==null || src.suffix=="")
-				src.suffix="Booze"
-			src.icon=input("What icon?") as icon|null
-			src.icon_state=Ask(usr, "Icon state?", "", null, "text", null, 1)
-			src.pixel_x=Ask(usr, "Pixel X?", "", null, "num", null, 1)
-			src.pixel_y=Ask(usr, "Pixel Y?", "", null, "num", null, 1)
-		verb/Brew_Drink()
-			set category="Utility"
-			set hidden = 1
-			if(src.Using)
-				usr << "You're already preparing a meal!"
-				return
-			if(usr.HasPiloting())
-				usr << "You're not capable of necessary precision!"
-				return
-			if(usr.TotalFatigue>=90)
-				usr << "You're too exhausted to cook more!"
-				return
-			if(usr.Grab)
-				usr << "You need free hands!"
-				return
-			if(!usr.HasMoney(src.Mastery*glob.progress.EconomyCost*0.0625))
-				usr << "You don't have enough money to make a single passable drink!"
-				return
-			src.Using=1
-
-			var/Count=Ask(usr, "How many [src.suffix] are you brewing?", "Count", null, "num", null, 0)
-			if(Count<1)
-				Count=1
-			if(Count>9)
-				Count=9
-			var/rem=100-usr.TotalFatigue
-			rem/=10
-			rem=round(rem)
-			if(Count>rem)
-				Count=rem
-			var/MatCost=Count*src.Mastery*glob.progress.EconomyCost*0.0625
-			if(!usr.HasMoney(MatCost))
-				usr << "You don't have enough money to make [Count] [src.suffix]!"
-			for(var/c=0, c<Count, c++)
-				var/obj/Items/Edibles/Booze/M=new
-				M.name=src.suffix
-				M.icon=src.icon
-				M.icon_state=src.icon_state
-				if(!M.icon || M.icon==null)
-					M.icon='Foods.dmi'
-					M.icon_state="Booze"
-				M.pixel_x=src.pixel_x
-				M.pixel_y=src.pixel_y
-				M.EatNutrition=rand(src.Mastery-1,max(src.Mastery+1,3))
-				if(!src.NonAlcoholic)
-					M.EatToxicity=rand(src.Mastery-1,5+src.Mastery)
-					if(M.EatToxicity<0)
-						M.EatToxicity=0
-				if(M.EatNutrition<0)
-					M.EatNutrition=0
-				usr.GainFatigue(10/Mastery)
-				usr.AddItem(M)
-				if(M.EatNutrition>2)
-					if(M.name=="Booze")
-						M.name="High-Quality Alcohol"
-					M.EatText="drinks [M.name] with a delighted expression!"
-				else if(M.EatNutrition>0)
-					if(M.name=="Booze")
-						M.name="Alcohol"
-					M.EatText="drinks [M.name]."
-				else
-					if(M.name=="Booze")
-						M.name="Hooch"
-					M.EatText="drinks [M.name] with a disgusted expression..."
-				if(M.EatToxicity>1&&M.EatToxicity<4)
-					M.EatText+=" The drink appears pretty strong..."
-				else if(M.EatToxicity>=4)
-					M.EatText+=" The drink appears incredibly strong..."
-				if(src.NonAlcoholic)
-					M.name="Virgin [M.name]"
-			usr.Frozen=2
-			OMsg(usr, "[usr] starts brewing...")
-			usr.TakeMoney(MatCost)
-			sleep(30)
-			usr.Frozen=0
-			src.Using=0
-
-
 	Sense
 		SkillCost=100
 		Level=0
@@ -771,7 +455,7 @@ obj/Skills/Utility
 					Consent="Yes"
 				Consent=Ask(Choice, "Do you want to accept [usr]'s Jagan Eye?", "Jagan Grant", null, "confirm", null, 1, "No", "Yes")
 				if(Consent=="Yes")
-					usr.Maimed++
+					usr.MaimApply("Head", 1)
 					usr.recordMaim(usr, "Jagan Eye Grant")
 					for(var/obj/Skills/Buffs/SlotlessBuffs/Regeneration/r in usr)
 						if(r.RegenerateLimbs)
@@ -1018,7 +702,7 @@ obj/Skills/Utility
 				else
 					OMsg(usr, "[usr] loses control of their forbidden spell and has a core part of their being claimed by the transmutation!")
 					OMsg(usr, "The magic chaotically lashes out and sends [Choice] hurtling into the void!")
-					usr.Maimed++
+					usr.MaimApply("Torso", 1)
 					usr.recordMaim(usr, "Philosopher Stone Backfire")
 					var/obj/Items/Enchantment/PhilosopherStone/Fake/f = new
 					f.SoulStrength = round(Choice.Potential/20,1)
@@ -2407,7 +2091,7 @@ obj/Skills/Utility
 						Y<<"<font color=green><b>([X.name])</b> [usr.name]: [html_encode(A)]"
 						Log(Y.ChatLog(),"<font color=green>([X.name])[usr]([usr.key]): [html_encode(A)]")
 			for(var/obj/Items/Tech/Transmission_Tower/T in world)
-				if(T.Frequency==src.ICFrequency)
+				if(T.Frequency==src.ICFrequency&&T.TowerLive())
 					for(var/mob/Players/P in world)
 						if(P.z==T.z)
 							var/found=0
@@ -2461,7 +2145,7 @@ obj/Skills/Utility
 				return
 			usr << "<b>Current Coordinates: ([usr.x], [usr.y], [usr.z])</b>"
 			for(var/obj/Items/Tech/Beacon/B in world)
-				if(B.BeaconState=="On"&&usr.z==B.z)
+				if(B.BeaconShows(usr)&&usr.z==B.z)
 					usr << "<b><font color='green'>(BEACON)</font color></b> - ([B.x], [B.y], [B.z])"
 			for(var/obj/Items/Enchantment/PocketDimensionGenerator/W in world)
 				if(usr.z==W.z)
@@ -2642,375 +2326,28 @@ obj/Skills/Utility
 			if(usr.Secret=="Heavenly Restriction" && (usr.secretDatum?:hasRestriction("Science") || usr.secretDatum?:hasRestriction("Cybernetics")))
 				return
 
+			ChipMenu(usr)
 
-			var/mob/M//Who's getting operated on?
-			var/ModChoice//What's getting installed?
-			var/Confirm//Are you sure you want to install this mod?
-			var/Consent
-			var/Cost//How much the mod costs.
-			var/list/ModChoices=list("Cancel")//The list of choices available.
-			var/ModDesc//Holds a description of the mod for the confirm prompt.
-
-			if(src.Using)
-				usr << "You're already running an operation!"
-				return
-			src.Using=1
-
-			if("Cyber Augmentations" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
-				ModChoices.Add("Enhanced Strength")
-				ModChoices.Add("Enhanced Force")
-				ModChoices.Add("Enhanced Endurance")
-				ModChoices.Add("Enhanced Aggression")
-				ModChoices.Add("Enhanced Reflexes")
-				ModChoices.Add("Enhanced Speed")
-				ModChoices.Add("3x Enhanced Strength")
-				ModChoices.Add("3x Enhanced Force")
-				ModChoices.Add("3x Enhanced Endurance")
-				ModChoices.Add("3x Enhanced Aggression")
-				ModChoices.Add("3x Enhanced Reflexes")
-				ModChoices.Add("3x Enhanced Speed")
-
-			if("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
-				ModChoices.Add("Internal Comms Suite")//talky in your heady
-				ModChoices.Add("Blade Mode")//Cyberrush
-				ModChoices.Add("Taser Strike")
-				ModChoices.Add("Machine Gun Flurry")
-				ModChoices.Add("Rocket Punch")
-				ModChoices.Add("Stealth Systems")
-				ModChoices.Add("Nano Boost")
-				ModChoices.Add("Combat CPU")//autodoj
-				ModChoices.Add("Reconstructive Nanobots")//autoheel
-				ModChoices.Add("Internal Life Support")
-				ModChoices.Add("Energy Assimilators")
-
-			if("War Crimes" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
-				ModChoices.Add("Punishment Chip")
-				ModChoices.Add("Failsafe Circuit")
-				ModChoices.Add("Explosive Implantation")
-
-			//These are unlocked by default
-			if("Singularity" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
-				ModChoices.Add("Ripper Mode")
-				ModChoices.Add("Armstrong Augmentation")
-				ModChoices.Add("Ray Gear")
-				ModChoices.Add("Hilbert Effect")
-				ModChoices.Add("Overdrive")
-				ModChoices.Add("Infinity Drive")
-				ModChoices.Add("Biological Cybernetics")
-				ModChoices.Add("Cybernetic Mainframe")
-
-			var/list/Who=list("Cancel")
-			if(usr.isRace(ANDROID))
-				M = usr
-			else
-				for(var/mob/m in view(1, usr))
-					/*if(m.isRace(ANDROID)&&!("Android Creation" in usr.knowledgeTracker.learnedKnowledge))
-						continue*/
-					if(m.Secret=="Heavenly Restriction" && (m.secretDatum?:hasRestriction("Science") || m.secretDatum?:hasRestriction("Cybernetics")))
-						continue
-					if(m==usr&&!(("Neuron Manipulation" in usr.knowledgeTracker.learnedKnowledge)||usr.isRace(ANDROID)))
-						continue
-					if(m.Saga && !(m.Saga in glob.CYBERIZESAGAS))
-						continue
-					Who+=m
-				if(Who.len<1)
-					usr << "You don't have any viable targets!"
-					src.Using=0
-					return
-
-			if(!M)
-				M=Ask(usr, "Who do you want to install cybernetics in?", "Cybernetic Augmentation", null, "pick", Who, 0)
-			if(M=="Cancel")
-				OMsg(usr, "[usr] decides not to tinker.")
-				src.Using=0
-				return
-			if(M.CyberneticMainframe)
-				switch(M.AscensionsAcquired)
-					if(0 to 1)
-						if(M.EnhanceChipsMax<10)
-							M.EnhanceChipsMax=10
-					if(2)
-						if(M.EnhanceChipsMax<16)
-							M.EnhanceChipsMax=16
-					if(3)
-						if(M.EnhanceChipsMax<22)
-							M.EnhanceChipsMax=22
-					if(4)
-						if(M.EnhanceChipsMax<26)
-							M.EnhanceChipsMax=26
-					if(5)
-						if(M.EnhanceChipsMax<30)
-							M.EnhanceChipsMax=30
-					if(6)
-						if(M.EnhanceChipsMax<34)
-							M.EnhanceChipsMax=34
-
-
-			if(M.EnhanceChips>=M.EnhanceChipsMax)
-				ModChoices.Remove("Enhanced Strength")
-				ModChoices.Remove("Enhanced Force")
-				ModChoices.Remove("Enhanced Endurance")
-				ModChoices.Remove("Enhanced Aggression")
-				ModChoices.Remove("Enhanced Reflexes")
-				ModChoices.Remove("Enhanced Speed")
-			if(M.EnhanceChips+3>=M.EnhanceChipsMax)
-				ModChoices.Remove("3x Enhanced Strength")
-				ModChoices.Remove("3x Enhanced Force")
-				ModChoices.Remove("3x Enhanced Endurance")
-				ModChoices.Remove("3x Enhanced Aggression")
-				ModChoices.Remove("3x Enhanced Reflexes")
-				ModChoices.Remove("3x Enhanced Speed")
-			if(M.NanoBoost)
-				ModChoices.Remove("Nano Boost")
-			if(M.BladeMode)
-				ModChoices.Remove("Blade Mode")
-			if(locate(/obj/Skills/Queue/Cyberize/Taser_Strike, M))
-				ModChoices.Remove("Taser Strike")
-			if(locate(/obj/Skills/AutoHit/Cyberize/Machine_Gun_Flurry, M))
-				ModChoices.Remove("Machine Gun Flurry")
-			if(locate(/obj/Skills/Projectile/Cyberize/Rocket_Punch, M))
-				ModChoices.Remove("Rocket Punch")
-			if(M.StealthSystems)
-				ModChoices.Remove("Stealth Systems")
-
-			if(M.CombatCPU)
-				ModChoices.Remove("Combat CPU")
-			if(M.MeditateModule)
-				ModChoices.Remove("Reconstructive Nanobots")
-			if(M.StabilizeModule)
-				ModChoices.Remove("Internal Life Support")
-			if(locate(/obj/Skills/Utility/Internal_Communicator, M))
-				ModChoices.Remove("Internal Comms Suite")
-			if(!M.isRace(ANDROID) || M.EnergyAssimilators)
-				ModChoices.Remove("Energy Assimilators")
-			else
-				ModChoices.Remove("Punishment Chip")
-				ModChoices.Remove("Internal Life Support")
-
-			if(!M.CyberCancel)
-				ModChoices.Remove("Failsafe Circuit")
-
-			if(M.HasMilitaryFrame()&&!M.isRace(ANDROID))
-				ModChoices.Remove("Ripper Mode")
-				ModChoices.Remove("Armstrong Augmentation")
-				ModChoices.Remove("Ray Gear")
-				ModChoices.Remove("Hilbert Effect")
-
-			if(M.isRace(ANDROID)||M.CyberneticMainframe)
-				if(M.Maimed||M.HealthCut)
-					ModChoices.Add("Repair")
-				if("Singularity" in usr.knowledgeTracker.learnedKnowledge || (usr.isRace(ANDROID)))
-					ModChoices.Add("Biological Cybernetics")
-			if(M.BioAndroid||M.SuperAndroid)
-				ModChoices.Remove("Biological Cybernetics")
-			if(M.CyberneticMainframe||M.isRace(ANDROID)&&M.Potential<30)
-				ModChoices.Remove("Cybernetic Mainframe")
-
-			ModChoice=Ask(usr, "What modification would you like to install?", "Cybernetic Augmentation", null, "pick", ModChoices, 0)
-			if(ModChoice=="Cancel")
-				OMsg(usr, "[usr] decides not to tinker.")
-				src.Using=0
-				return
-
+		proc/InstallModule(mob/M, ModChoice, Q = 1)
 			switch(ModChoice)
 				if("Enhanced Strength")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Strength increases Strength."
-				if("Enhanced Force")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Force increases Force."
+					M.EnhanceChips++
+					M.EnhancedStrength+=Q
 				if("Enhanced Endurance")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Endurance increases Endurance."
-				if("Enhanced Aggression")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Aggression increases Offense."
-				if("Enhanced Reflexes")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Reflexes increases Defense."
-				if("Enhanced Speed")
-					Cost=glob.progress.EconomyCost*2.5
-					ModDesc="Enhanced Speed increases Speed."
-
-				if("3x Enhanced Strength")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Strength increases Strength. Installs three at a time."
-				if("3x Enhanced Force")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Force increases Force. Installs three at a time."
-				if("3x Enhanced Endurance")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Endurance increases Endurance. Installs three at a time."
-				if("3x Enhanced Aggression")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Aggression increases Offense. Installs three at a time."
-				if("3x Enhanced Reflexes")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Reflexes increases Defense. Installs three at a time."
-				if("3x Enhanced Speed")
-					Cost=glob.progress.EconomyCost*7.5
-					ModDesc="Enhanced Speed increases Speed. Installs three at a time."
-
-				if("Internal Comms Suite")
-					Cost=glob.progress.EconomyCost*2
-					ModDesc="Internal Suite allows the augmented to use internal systems to scan precise power levels and access wireless communications."
-				if("Blade Mode")
-					Cost=glob.progress.EconomyCost*10
-					ModDesc="Blade Mode allows high speed calculations improving accuracy and swiftness of delivered blows!"
-				if("Taser Strike")
-					Cost=glob.progress.EconomyCost*5
-					ModDesc="Taser Strike delivers an electric shock to the opponent to allow for more openings!"
-				if("Machine Gun Flurry")
-					Cost=glob.progress.EconomyCost*5
-					ModDesc="Machine Fun Flurry unleashes a rush of blows once enough momentum has been gathered!"
-				if("Rocket Punch")
-					Cost=glob.progress.EconomyCost*5
-					ModDesc="Rocket Punch fires a mechanized appendage for an explosive assault!"
-				if("Stealth Systems")
-					Cost=glob.progress.EconomyCost*5
-					ModDesc="Stealth Systems allow the augmented to visually disguise themselves when they lower their power!"
-				if("Nano Boost")
-					Cost=glob.progress.EconomyCost*20
-					ModDesc="Nano Boost gives the subject a sudden surge of cybernetic power!"
-				if("Combat CPU")
-					Cost=glob.progress.EconomyCost*20
-					ModDesc="Combat CPU allows the augmented to automatically burn some battery in order to constantly run simulations of the current engagement; bottom line: better evasion."
-				if("Reconstructive Nanobots")
-					Cost=glob.progress.EconomyCost*25
-					ModDesc="Reconstructive Nanobots repair the augmented when they enter a rest cycle with precise efficiency."
-				if("Internal Life Support")
-					Cost=glob.progress.EconomyCost*10
-					ModDesc="Internal Life Support prevent the augmented from perishing to mortal wounds."
-				if("Energy Assimilators")
-					Cost=glob.progress.EconomyCost*20
-					ModDesc="Energy Assimilators are small, orb-like constructs fitted into the palm of a hand meant to consume energy on direct contact with source."
-
-
-				if("Punishment Chip")
-					Cost=glob.progress.EconomyCost*10
-					ModDesc="Install a simple electric circuit inside your target's nervous system."
-				if("Failsafe Circuit")
-					Cost=glob.progress.EconomyCost*25
-					ModDesc="Install a failsafe circuit inside your target to allow turning off its power in case of disobedience."
-				if("Explosive Implantation")
-					Cost=glob.progress.EconomyCost*100
-					ModDesc="Install a powerful explosive device inside your target."
-
-				if("Ripper Mode")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="Ripper Mode allows the augmented to present a facsimile of sadism to greatly bolster speed and offensive prowess."
-				if("Armstrong Augmentation")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="Armstrong Augmentation allows the augmented to forge a powerful nanite shell in response to physical trauma; increases strength and endurance while forsaking defense. "
-				if("Ray Gear")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="Ray Gear provides the augmented with unparalleled firepower and integrates ranged capabilities into their basic combat protocols while sapping their battery."
-				if("Hilbert Effect")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="The Hilbert Effect allows one to breach into a higher domain, increasing all offensive capabilities while sapping their battery."
-
-				if("Infinity Drive")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="Infinity Drive allows a fusion-powered augmented to constantly support their overall performance with their nigh-infinite energy outpour."
-				if("Overdrive")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="Overdrive allows the augmented to overclock every cybernetically enhanced aspect in exchange for battery life."
-				if("Cybernetic Mainframe")
-					Cost=glob.progress.EconomyCost*300
-					ModDesc="A cybernetic mainframe allows someone to become a complete cyborg, forsaking most of their natural abilities in exchange for opening up more avenues of cybernetic customization."
-				if("Biological Cybernetics")
-					Cost=glob.progress.EconomyCost*1000
-					ModDesc="Converts an Android or someone with an enhanced cybernetic mainframe into a Biological Android."
-				if("Repair")
-					Cost=glob.progress.EconomyCost/2*(M.Maimed+(M.HealthCut*5))
-					ModDesc="Attempts to repair a damaged android."
-
-			if(M.isRace(ANDROID))
-				Cost/=2
-			if(M.Class=="Resourceful")
-				Cost/=2
-
-			if(M!=usr)
-				if(("War Crimes" in usr.knowledgeTracker.learnedKnowledge)&&M.KO) Consent="Yes"//i hate this btw
-				else Consent=Ask(M, "[ModDesc]\nDo you want to undergo the augmentation procedure?", "Cybernetic Augmentation", null, "confirm", null, 1, "No", "Yes")//hate hate hate
-
-				if(Consent!="Yes")
-					OMsg(usr, "[usr] rejects the surgery.")
-					src.Using=0
-					return
-
-			ModDesc="[ModDesc]  It costs [Commas(Cost)] to install.  Do you wish to install this module into [M]?"
-
-			Confirm=Ask(usr, "[ModDesc]", "Cybernetic Augmentation ([ModChoice])", null, "confirm", null, 1, "No", "Yes")
-			if(Confirm=="No")
-				OMsg(usr, "[usr] decided to not operate.")
-				src.Using=0
-				return
-
-			if(ModChoice=="Enhanced Strength"||ModChoice=="Enhanced Endurance"||ModChoice=="Enhanced Speed"||ModChoice=="Enhanced Force"||ModChoice=="Enhanced Aggression"||ModChoice=="Enhanced Reflexes")
-				if(M.EnhanceChips>=M.EnhanceChipsMax)
-					OMsg(usr, "[usr] attempted to install a performance boosting module into [M], but they already have max installed.")
-					src.Using=0
-					return
-
-			for(var/obj/Money/Money in usr)
-				if(Money.Level<Cost)
-					OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they don't have enough money!!")
-					src.Using=0
-					return
-
-			//Everything checks out; install the mod
-			switch(ModChoice)
-				//These all check for enhance chips once again just in case of menu cheese.
-				if("Enhanced Strength")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedStrength++
-				if("Enhanced Endurance")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedEndurance++
+					M.EnhanceChips++
+					M.EnhancedEndurance+=Q
 				if("Enhanced Force")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedForce++
+					M.EnhanceChips++
+					M.EnhancedForce+=Q
 				if("Enhanced Speed")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedSpeed++
+					M.EnhanceChips++
+					M.EnhancedSpeed+=Q
 				if("Enhanced Aggression")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedAggression++
+					M.EnhanceChips++
+					M.EnhancedAggression+=Q
 				if("Enhanced Reflexes")
-					if(M.EnhanceChips<M.EnhanceChipsMax)
-						M.EnhanceChips++
-						M.EnhancedReflexes++
-
-				if("3x Enhanced Strength")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedStrength+=3
-				if("3x Enhanced Endurance")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedEndurance+=3
-				if("3x Enhanced Force")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedForce+=3
-				if("3x Enhanced Speed")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedSpeed+=3
-				if("3x Enhanced Aggression")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedAggression+=3
-				if("3x Enhanced Reflexes")
-					if(M.EnhanceChips+3<M.EnhanceChipsMax)
-						M.EnhanceChips+=3
-						M.EnhancedReflexes+=3
+					M.EnhanceChips++
+					M.EnhancedReflexes+=Q
 
 				if("Nano Boost")
 					if(M.NanoBoost)
@@ -3081,6 +2418,8 @@ obj/Skills/Utility
 						return
 					M.InternalScouter=1
 					M.AddSkill(new/obj/Skills/Utility/Internal_Communicator)
+				if("Targeting CPU")
+					M.passive_handler.Increase("Targeting CPU", Q)
 
 				if("Punishment Chip")
 					if(locate(/obj/Skills/Buffs/SlotlessBuffs/Implants/Stun_Chip, M))
@@ -3156,15 +2495,6 @@ obj/Skills/Utility
 					M.FusionPowered=1
 					M.ManaPU=1
 
-				if("Biological Cybernetics")
-					if(M.BioAndroid||M.Saga||M.HasMilitaryFrame())
-						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have Biological Cybernetics.")
-						src.Using=0
-						return
-					M.BioAndroid=1
-					M.AddSkill(new/obj/Skills/Utility/Collect_Sample)
-					M.AddSkill(new/obj/Skills/Utility/Force_Extract)
-					M.AddSkill(new/obj/Skills/Utility/Bio_Augmentation)
 				if("Cybernetic Mainframe")
 					if(M.CyberneticMainframe||M.Saga)
 						OMsg(usr, "[usr] tried to install a [ModChoice] into [M]...but they already have a Cybernetic Mainframe.")
@@ -3180,23 +2510,15 @@ obj/Skills/Utility
 						if(!(locate(/transformation/android/super_android) in M.race.transformations))
 							M.race.transformations += new /transformation/android/super_android()
 					M.AddSkill(new/obj/Skills/Utility/Cyborg_Integration)
-				if("Repair")
-					M.Maimed=0
-					M.HealthCut=0
-					OMsg(usr, "[usr] repairs [M]!")
 				if("Upgrade")
 					if(M.Potential>5)
 						M.Potential=5
 					else
 						M.Potential+=5
 					OMsg(usr, "[usr] upgrades [M]!")
-
-			//at the end
-			if(ModChoice!="Repair"&&ModChoice!="Upgrade")
-				OMsg(usr, "[usr] operated on [M], installing a [ModChoice] module!")
-			usr.TakeMoney(Cost)
-			M.SetCyberCancel()
-			src.Using=0
+				else
+					return
+			return 1
 
 
 //Saga

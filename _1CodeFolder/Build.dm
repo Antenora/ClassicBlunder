@@ -943,7 +943,7 @@ proc/Build_Lay(obj/Others/Build/O,mob/P, var/tmpX, var/tmpY, var/tmpZ)
 				CT.Roof = P.CustomTurfRoof
 				CT.density = O.density
 				CT.opacity = O.opacity
-		if(P.ShallowMode==1)
+		if(P.ShallowMode==1 && (_turf.Water || BuildMaterialFor(_turf) == "Water"))
 			_turf.Shallow=1
 		if(P.BuildOverwrite)
 			for(var/obj/Turfs/E in C)

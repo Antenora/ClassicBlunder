@@ -11,6 +11,8 @@ mob/proc/AppearanceOn()
 
 	src.color=MobColor
 
+	src.RacialFeaturesOn()
+
 	if(src.transActive)
 		race.transformations[transActive].apply_visuals(src)
 
@@ -305,3 +307,16 @@ mob/proc/AppearanceOff()
 	src.overlays=null
 	src.underlays=null
 	src.AuraLightSync()
+
+mob/proc/RacialFeaturesOn()
+	if(src.race && islist(src.race.overlays) && src.race.overlays.len)
+		src.overlays -= src.race.overlays
+		src.overlays += src.race.overlays
+	if(src.Tail && src.TailIcon)
+		var/image/T = image(src.TailIcon)
+		src.overlays -= T
+		src.overlays += T
+		if(src.TailIconUnderlay)
+			var/image/T3 = image(src.TailIconUnderlay)
+			src.underlays -= T3
+			src.underlays += T3

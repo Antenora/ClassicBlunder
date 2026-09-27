@@ -158,8 +158,6 @@ mob/Players/Stat()
 
 			if(src.Satiated)
 				stat("Satiation: ", "Well Fed")
-				if(src.Drunk)
-					stat("Inebriation: ", "Drunk")
 			if(src.Maimed)
 				stat("Maims: ", "[src.Maimed]")
 
@@ -1211,11 +1209,32 @@ mob/proc/GetBPPoisonEffect()
 	if(SagaLevel >= 5 && AnsatsukenAscension == "Chikara" && BPPoison < 1) return 1;
 	return BPPoison;
 
+#define MAIM_POWER_PENALTY 0.1
+
 mob/proc/GetMaimedEffect()
 	if(HasMaimMastery()) return 1;
+	if(maim_suppressed_until > world.time) return 1;
 	else
 		MaimsOutstanding=max(Maimed - (0.5*GetProsthetics()), 0);
-		return (1 - (0.1 * MaimsOutstanding));
+		return (1 - (MAIM_POWER_PENALTY * MaimsOutstanding));
+
+mob/proc/MaimMult(kind)
+	return 1
+
+mob/proc/MaimFlat(kind)
+	return 0
+
+mob/proc/MaimApply(part, tiers = 1)
+
+mob/proc/MaimPeel(part, tiers = 1)
+
+mob/proc/MaimClearAll()
+
+mob/proc/MaimSettle()
+
+mob/proc/MaimCreepHit(mob/attacker, dmg)
+
+mob/proc/MaimPickPart(mob/asker, title)
 
 mob/proc/Update_Stat_Labels()
 	set waitfor=0
@@ -1455,8 +1474,8 @@ mob/proc/Get_Scouter_Reading(mob/B)
 	Ratio *= B.Base() * 100
 	temp_potential_power(B)//get them potential powers
 	Ratio *= B.potential_power_mult
-	if(passive_handler["LegendarySaiyan"])
-		if(Tension==100&&transActive==transUnlocked)
+	if(B.passive_handler["LegendarySaiyan"])
+		if(B.Tension==100&&B.transActive==B.transUnlocked)
 			Ratio*=50
 
 	//BODY CONDITION ADJUSTMENTS
@@ -1479,7 +1498,7 @@ mob/proc/Get_Scouter_Reading(mob/B)
 			Ratio*=((100-B.GatesNerfPerc)/100)
 		if(B.AngerMax)
 			var/a=1
-			if(!B.HasCalmAnger()&&!B.HasNoAnger())
+			if(B.HasCalmAnger()||!B.HasNoAnger())
 				a=B.AngerCurveValue()
 				if(B.AngerMult>1)
 					var/ang=a-1
@@ -1496,44 +1515,6 @@ mob/proc/Get_Scouter_Reading(mob/B)
 			if(B.AngerAdd)
 				a+=B.AngerAdd
 			Ratio*=a
-		if(!B.Timeless)
-			B.MaimsOutstanding=max(B.Maimed-(0.5*B.GetProsthetics()), 0)
-			Ratio*=(1-(0.2*B.MaimsOutstanding))
-			if(B.HasWeights())
-				Ratio*=0.75
-			if(B.Roided)
-				Ratio*=1.15
-			if(B.OverClockNerf)
-				Ratio*=(1-B.OverClockNerf)
-			if(B.GatesNerfPerc)
-				Ratio*=((100-B.GatesNerfPerc)/100)
-			if(B.AngerMax)
-				var/a=1
-				if(B.HasCalmAnger())
-					a=B.AngerMax
-					if(B.AngerMult>1)
-						var/ang=a-1//Usable anger
-						var/mult=ang*B.AngerMult
-						a=mult+1
-				else if(B.Anger&&!B.HasNoAnger())
-					a=B.Anger
-					if(B.AngerMult>1)
-						var/ang=a-1//Usable anger
-						var/mult=ang*B.AngerMult
-						a=mult+1
-					if(B.DefianceCounter)
-						a+=B.DefianceCounter*0.25
-				if(B.CyberCancel>0)
-					var/ang=a-1//Usable anger.
-					var/cancel=ang*B.CyberCancel//1 Cyber Cancel = all of usable anger.
-					a-=cancel//take the anger away.
-					if(a<1)//Only nerf anger.
-						a=1
-				if(a<=0)
-					a=0.01
-				if(B.AngerAdd)
-					a+=B.AngerAdd
-				Ratio *= a
 
 		if(B.PowerBoost) Ratio *= B.PowerBoost
 		if(B.TarotFate == "The Sun") Ratio *= 1.5
@@ -1546,8 +1527,8 @@ mob/proc/Get_Scouter_Reading(mob/B)
 		Ratio *= 0.1
 
 	var/Reading=Ratio
-	if(passive_handler.Get("PowerAppearance"))
-		Reading = passive_handler.Get("PowerAppearance")
+	if(B.passive_handler.Get("PowerAppearance"))
+		Reading = B.passive_handler.Get("PowerAppearance")
 	if(B.KO)
 		Reading*=0.05
 	if(Reading<1)

@@ -75,6 +75,12 @@ obj
 				//MaimStrike// if Damage exceeds 25 / this number, maim the target
 
 				DamageMult=1
+				DamageFalloff=0
+				SpreadArc=0
+				NoInjury=0
+				tmp/LaunchOffX=0
+				tmp/LaunchOffY=0
+				tmp/FlightAngle
 				AccMult=1
 				Deflectable=1//what do u think?
 				Dodgeable=1//will replace instinct definition, since it's specific for projectiles
@@ -929,7 +935,7 @@ obj
 					Cluster=new/obj/Skills/Projectile/Chemical_Bits
 					ClusterCount=4
 					ClusterAdjust=0
-					Toxic=4
+					TrueToxic=10
 					verb/Chemical_Mortar()
 						set category="Skills"
 						usr.UseProjectile(src)
@@ -5229,6 +5235,14 @@ mob
 					if(!src.HasBladeFisting()&& !src.UsingBattleMage())
 						src << "You need a sword to use this technique!"
 						return
+			if(Z.NeedsGun)
+				if(!src.EquippedGun())
+					src << "You need a gun to use this technique!"
+					return
+			if(Z.NoGun)
+				if(src.EquippedGun())
+					src << "You can't use a gun with this technique!"
+					return
 
 			if(Z.FocusShifter)
 				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
@@ -5738,7 +5752,7 @@ mob
 					if(Z.CapacityCost)
 						src.LoseCapacity(Z.CapacityCost/Drain)
 					if(Z.MaimCost)
-						src.Maimed+=Z.MaimCost
+						src.MaimApply("Arms", Z.MaimCost)
 						src.recordMaim(src, "Skill Cost: [Z]")
 						src << "You have been maimed by using the overwhelming power of [Z]!"
 					if(Z.AssociatedGear)
@@ -5778,7 +5792,7 @@ mob
 						if(Z.CapacityCost)
 							src.LoseCapacity(Z.CapacityCost/Drain)
 						if(Z.MaimCost)
-							src.Maimed+=Z.MaimCost
+							src.MaimApply("Arms", Z.MaimCost)
 							src.recordMaim(src, "Skill Cost: [Z]")
 							src << "You have been maimed by using the overwhelming power of [Z]!"
 						if(Z.AssociatedGear)
@@ -5878,6 +5892,11 @@ obj
 					src.HomingDelay=Z.HomingDelay
 					src.LosesHoming=Z.LosesHoming
 					src.DamageMult=Z.DamageMult
+					src.DamageFalloff=Z.DamageFalloff
+					src.SpreadArc=Z.SpreadArc
+					src.NoInjury=Z.NoInjury
+					src.FlightAngle=Z.FlightAngle
+					src.fa_launch=Z.FlightAngle
 					if(Z.TempDamage)
 						src.DamageMult=Z.TempDamage
 					if(Z.BlastRamp)
@@ -5939,6 +5958,7 @@ obj
 					src.MultiTrail=Z.MultiTrail
 					src.Shearing = Z.Shearing
 					src.Crippling = Z.Crippling
+					src.Bloodletting = Z.Bloodletting
 					src.NerveOverload = Z.NerveOverload
 					src.CriticalParalyze = Z.CriticalParalyze
 					src.CriticalSpark = Z.CriticalSpark
@@ -5949,6 +5969,9 @@ obj
 					src.Reinforcement = Z.Reinforcement
 					src.TurfBurn = Z.TurfBurn
 					src.from_skill = Z
+					src.gun_energy = Z.gun_energy
+					src.gun_ammo = Z.gun_ammo
+					src.mech_splash = Z.mech_splash
 					src.TrailX=Z.TrailX
 					src.TrailY=Z.TrailY
 					src.TrailSize=Z.TrailSize
@@ -6076,6 +6099,9 @@ obj
 					src.UsesPixelCollision = TRUE
 					if(src.UsesPixelCollision)
 						src.SetupPixelHitbox(Z, DirOverride)
+					if(Z.LaunchOffX || Z.LaunchOffY)
+						src.step_x += Z.LaunchOffX
+						src.step_y += Z.LaunchOffY
 
 					if(src.Owner.RippleActive())
 						BreathCost=1*src.DamageMult
@@ -6151,6 +6177,14 @@ obj
 							src.dir=SOUTH
 						else if(Owner)
 							src.dir=src.Owner.dir
+						if(!isnull(src.FlightAngle))
+							if(src.SpreadArc>0 && !src.StormFall)
+								src.FlightAngle += src.SpreadArc * (rand() * 2 - 1)
+							src.dir = GunAngleDir(src.FlightAngle)
+						else if(src.SpreadArc>0 && !src.StormFall)
+							var/steps=round(src.SpreadArc/45)
+							if(steps>0)
+								src.dir=turn(src.dir, 45*rand(-steps, steps))
 						if(src.pixel_z>0&&!src.StormFall)
 							spawn()
 								animate(src,pixel_z=0, time=2)
@@ -6447,7 +6481,7 @@ obj
 										def.mirror_reflect_active = FALSE
 										KenShockwave(def, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
 										var/mob/attacker = src.Owner
-										src.Owner    = def
+										src.TransferOwner(def)
 										src.Homing   = attacker
 										src.HyperHoming = 1
 										src.Distance = max(src.Distance, 20)
@@ -6456,6 +6490,8 @@ obj
 										def.mirror_parry_active = FALSE
 										KenShockwave(def, icon='Icons/Effects/KenShockwave.dmi', Size=1.5, Blend=2, Time=8)
 										return
+								if(ismob(a) && a:GunIntercept(src))
+									return
 								var/Deflect=0
 								if(src.Deflectable>0&&!a:KO)
 									if(istype(a, /mob)) m = a;
@@ -6483,7 +6519,7 @@ obj
 											src.dir=get_dir(src, src.Homing)
 											src.Homing=0
 										if(!src.HomingCharge)
-											src.Owner=a
+											src.TransferOwner(a)
 											src.Distance=src.DistanceMax
 										else
 											if(src.Area!="Beam")
@@ -6557,6 +6593,8 @@ obj
 						Owner.log2text("PROJ Damage after", Damage, "damageDebugs.txt", Owner.ckey)
 						#endif
 						Damage *= DamageMult
+						if(DamageFalloff>0)
+							Damage *= max(1 - DamageFalloff * max(0, DistanceMax - Distance), 0)
 						#if DEBUG_PROJECTILE
 						Owner.log2text("PROJ Damage after mult", Damage, "damageDebugs.txt", Owner.ckey)
 						#endif
@@ -6646,6 +6684,8 @@ obj
 								spellTarget.Knockback(2, src.Owner, Direction=pick(NORTH, SOUTH, EAST, WEST))
 							if(TrueToxic)
 								spellTarget.AddPoison(TrueToxic, src.Owner)
+							if(Bloodletting)
+								spellTarget.AddBleed(Bloodletting, src.Owner)
 							if(Rust)
 								spellTarget.AddShearing(Rust, src.Owner)
 							if(TurfMud)
@@ -6786,6 +6826,8 @@ obj
 								else if(src.Shearing && m.passive_handler.Get("WindAbsorb"))
 									_beamAbsorb = 1
 									m.HealHealth((EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR) * (0.1 * m.passive_handler.Get("WindAbsorb")))
+								else if(EnergyAbsorbHit(m, EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR))
+									_beamAbsorb = 1
 								if(!_beamAbsorb)
 									var/savedVH_b = 0
 									var/savedBA_b = 0
@@ -6854,6 +6896,8 @@ obj
 										EffectiveDamage *= _elemResist
 									if(from_skill && from_skill.IsSpell && src.Owner)
 										EffectiveDamage *= src.Owner.SpellHitMult(from_skill, m)
+									if(from_skill && from_skill.NeedsGun && src.Owner)
+										EffectiveDamage *= src.Owner.GunHitMult(m, src)
 
 									// Skill-level Combustion: temporary attacker bump.
 									if(src.Combustion)
@@ -6869,6 +6913,8 @@ obj
 									else if(src.Shearing && m.passive_handler.Get("WindAbsorb"))
 										_stdAbsorb = 1
 										m.HealHealth(EffectiveDamage * (0.1 * m.passive_handler.Get("WindAbsorb")))
+									else if(EnergyAbsorbHit(m, EffectiveDamage))
+										_stdAbsorb = 1
 									if(!_stdAbsorb)
 										var/savedVH = 0
 										var/savedBA = 0
@@ -6888,6 +6934,7 @@ obj
 										S.critEff = CritEffectiveness
 										S.blockEff = BlockEffectiveness
 										S.critBonus = CritChanceBonus
+										S.nowound = src.NoInjury
 										if(from_skill && from_skill.ShieldPierce)
 											S.shieldPierce = 1
 											S.pierce = 1
@@ -6900,6 +6947,8 @@ obj
 										src.GainProjectileMastery(m)
 										a:ccCountHit()
 										src.Owner.ProjectileAttacking = FALSE
+										if(from_skill && from_skill.NeedsGun && src.Owner && m)
+											src.Owner.GunOnHit(m, src)
 										if(src.BypassTempHP)
 											m.VaizardHealth = savedVH
 											m.BioArmor = savedBA
@@ -7095,7 +7144,8 @@ obj
 								WaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
 							else
 								LeaveTrail(src.Trail, src.VariationX+src.TrailX, src.VariationY+src.TrailY, src.dir, pre, src.TrailDuration, src.TrailSize)
-						src.Distance--
+						if(isnull(src.FlightAngle))
+							src.Distance--
 						return
 					if(src.EdgeOfMapProjectile())
 						ProjectileFinish()
@@ -7141,7 +7191,7 @@ obj
 								var/pcx = LowerX() + Width()/2 + vhb_ax //FireOffset skills detonate where the art died
 								var/pcy = LowerY() + Height()/2 + vhb_ay
 								if(glob.PIXEL_DEBUG) world.log << "PXC: [src] endpoint blast at ([x],[y]) r=[pr]"
-								for(var/mob/m in view(round(pr/32)+2, src))
+								for(var/mob/m in view(round(pr/32)+2, src) | BigBodiesNear(src, round(pr/32)+2, TRUE))
 									if(src.Killed || !src.Owner)
 										break
 									if(CircleHitsBody(pcx, pcy, pr, m))
@@ -7374,3 +7424,20 @@ obj
 					else if(src._fx_glowed)
 						src._fx_glowed = 0
 						FxDetachLight(src)
+
+/obj/Skills/Projectile/_Projectile/proc/TransferOwner(mob/m)
+	if(Owner == m) return
+	if(ismob(Owner)) Owner.active_projectiles -= src
+	Owner = m
+	if(ismob(m)) m.active_projectiles |= src
+
+/obj/Skills/Projectile/_Projectile/proc/EnergyAbsorbHit(mob/m, dmg)
+	if(!istype(m) || !m.passive_handler || dmg <= 0) return 0
+	var/v = m.passive_handler.Get("EnergyAbsorb")
+	if(v <= 0) return 0
+	if(SpellElement || Shocking || Shearing) return 0
+	if(from_skill && (from_skill.ElementalClass || (from_skill.NeedsGun && !gun_energy))) return 0
+	if(StrScaling > ForScaling) return 0
+	if(m.dir != turn(dir, 180)) return 0
+	m.HealEnergy(dmg * 0.1 * v)
+	return 1

@@ -8,6 +8,7 @@ turf/var/tmp/elev_ver = 0
 var/global/list/elevMap
 var/global/elevVer = 1
 var/global/elevSavePending = 0
+var/global/list/elevPitDirty = list()
 
 /proc/ElevMapLoad()
 	if(elevMap)
@@ -59,6 +60,9 @@ var/global/elevSavePending = 0
 		return
 	ElevMapLoad()
 	h = clamp(round(h), 0, ELEV_MAX)
+	var/oh = ElevAt(T)
+	if(oh != h && isnull(elevPitDirty[T]))
+		elevPitDirty[T] = oh
 	var/k = "[T.x],[T.y],[T.z]"
 	if(h > 0)
 		elevMap[k] = h
@@ -69,14 +73,36 @@ var/global/elevSavePending = 0
 	ElevCoverInvalidate(list(T))
 	ElevMapSaveSoon()
 
+var/global/list/elevRoofTypes
+
+/proc/ElevRoofTypesInit()
+	if(elevRoofTypes)
+		return
+	elevRoofTypes = list()
+	for(var/p in typesof(/turf))
+		var/pt = "[p]"
+		if(findtext(pt, "/turf/Roof") == 1 || findtext(pt, "/turf/KatieTurf/Roof") == 1)
+			elevRoofTypes[p] = 1
+
+/proc/ElevRoofTurf(turf/T)
+	if(!T)
+		return 0
+	if(istype(T, /turf/CustomTurf))
+		var/turf/CustomTurf/CT = T
+		return CT.Roof ? 1 : 0
+	ElevRoofTypesInit()
+	return elevRoofTypes[T.type] ? 1 : 0
+
 /proc/ElevRaisable(turf/T)
-	if(!T || T.density)
+	if(!T || BuildIsCliffTurf(T))
 		return 0
-	if(istype(T, /turf/Waters) || istype(T, /turf/Waterfall))
+	if(ElevRoofTurf(T))
+		return 1
+	if(T.density)
 		return 0
-	if(BuildMaterialFor(T) == "Water")
+	if(istype(T, /turf/Waterfall) || istype(T, /turf/Waters/WaterFall))
 		return 0
-	if(BuildIsCliffTurf(T))
+	if(istype(T, /turf/Waters/WaterU1) || istype(T, /turf/Waters/WaterU2) || istype(T, /turf/Waters/WaterU3))
 		return 0
 	return 1
 
@@ -231,6 +257,10 @@ turf/Enter(atom/movable/O, atom/oldloc)
 	if(!turfs || !turfs.len)
 		return
 	ElevCoverInvalidate(turfs)
+	ElevPitSweep()
+	var/list/pre = elevPitFlips
+	elevPitFlips = list()
+	var/pv = elevPitVer
 	var/list/blk = ElevTouchedBlock(turfs)
 	var/n = 0
 	for(var/turf/T in blk)
@@ -242,6 +272,10 @@ turf/Enter(atom/movable/O, atom/oldloc)
 		if(n % BUILD_COMMIT_CHUNK == 0)
 			if(!bootPump || !BuildBootPassYield())
 				sleep(-1)
+	for(var/turf/P in pre)
+		if(!blk[P])
+			elevPitFlips[P] = 1
+	ElevPitFlush((bootPump || elevPitVer == pv) ? blk : null, bootPump)
 
 /proc/ElevExportSidecar(x1, y1, x2, y2, z, fname)
 	ElevMapLoad()
@@ -267,8 +301,10 @@ turf/Enter(atom/movable/O, atom/oldloc)
 		for(var/x = ox to ox + cols - 1)
 			var/k = "[x],[y],[oz]"
 			if(elevMap[k])
-				elevMap -= k
 				var/turf/T0 = locate(x, y, oz)
+				if(T0 && isnull(elevPitDirty[T0]))
+					elevPitDirty[T0] = elevMap[k]
+				elevMap -= k
 				if(T0)
 					touched += T0
 	var/n = 0
@@ -287,6 +323,8 @@ turf/Enter(atom/movable/O, atom/oldloc)
 			var/turf/T1 = locate(ox + dx, oy + dy, oz)
 			if(T1)
 				touched += T1
+				if(isnull(elevPitDirty[T1]))
+					elevPitDirty[T1] = 0
 			n++
 	elevVer++
 	ElevGeomChanged()
@@ -320,6 +358,7 @@ turf/Enter(atom/movable/O, atom/oldloc)
 	for(var/turf/R in CustomTurfs)
 		registered[R] = 1
 	var/list/seen = list()
+	var/list/rebuilt = list()
 	var/n = 0
 	var/skipped = 0
 	for(var/turf/T in hit)
@@ -333,10 +372,12 @@ turf/Enter(atom/movable/O, atom/oldloc)
 					skipped++
 					continue
 				BuildEdgeUpdate(T2, 1)
+				rebuilt += T2
 				n++
 				if(n % BUILD_COMMIT_CHUNK == 0)
 					if(!BuildBootPassYield())
 						sleep(-1)
+	BuildEdgeCleanFlecks(rebuilt, 1, 1)
 	Log("Mapper", "Elevation boot pass rebuilt around [hit.len] raised tiles.", 1)
 	world.log << "BOOT elevation pass finished: [BootSeconds(t0)] s ([hit.len] raised tiles, [n] edge updates, [skipped] already covered by the edge pass)"
 
