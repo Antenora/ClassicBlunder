@@ -81,7 +81,7 @@ mob
 			if(src.CursedWounds())
 				src.WoundSelf(val)
 			if(src.Health<=0&&!src.KO)
-				if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10))
 					return
 				if(src.Burn&&src.Poison)
 					src.Unconscious(null, "succumbing to terrible pain!")
@@ -629,7 +629,8 @@ mob
 			return ((src.DefMod+Ascended+(enhanced)+Invested))*DefChaos
 		DetermineAscension(var/Stat)
 			var/Invest=src.vars["[Stat]Invest"]
-			var/AscStat=Invest*src.AscensionsAcquired*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
+			var/EffAsc=src.AscensionsAcquired
+			var/AscStat=Invest*EffAsc*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
 			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
@@ -1009,6 +1010,10 @@ mob
 			if(src.StrStolen)
 				Mod+=src.StrStolen*0.5
 			Mod += (scalingEldritchPower() / 10);
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			var/BM=src.HasBuffMastery()
 			if(BM)
 				if(Mod<=glob.BUFF_MASTERY_LOWTHRESHOLD)
@@ -1033,8 +1038,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1206,6 +1211,9 @@ mob
 					else
 						Mod+=0.75*src.passive_handler.Get("BurningShot")
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
 				if(src.HealthPct() <= threshold)
@@ -1213,8 +1221,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1369,6 +1377,9 @@ mob
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
 				if(src.HealthPct() <= threshold)
@@ -1376,8 +1387,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1549,6 +1560,9 @@ mob
 			if(src.SpdEroded)
 				Mod-=src.SpdEroded
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=((passive_handler.Get("TensionPowered")*2))
 			if(src.RebirthHeroPath=="Red" && src.SagaLevel>=3)
@@ -1647,6 +1661,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)
@@ -1771,6 +1789,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)
@@ -2799,6 +2821,8 @@ mob
 
 		get_potential()
 			var/Return=src.Potential
+			if(src.isRace(CHANGELING) && Return<(10*src.transActive)&&src.Class=="Frieza")
+				Return=10*src.transActive
 
 			if(src.HasPowerReplacement())
 				var/Replace=src.GetPowerReplacement()

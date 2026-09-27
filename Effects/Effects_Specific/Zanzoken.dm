@@ -403,13 +403,14 @@ proc
 			I.Owner = m
 			I.color = "#FF8000"
 
-	AntiAfterImage(mob/m, amt)
+	AntiAfterImage(mob/m, amt, idle = FALSE)
+		if(!m || !isturf(m.loc)) return
 		var/baseAmount = amt
 		for(var/x in 1 to baseAmount)
 			var/obj/AntiAfterimage/I = new
-			I.appearance_flags = 32
+			I.appearance_flags = KEEP_TOGETHER
 			I.icon = m.icon
-			I.alpha = 135
+			I.alpha = 255
 			I.overlays = m.overlays
 			I.icon_state = m.icon_state
 			I.transform = m.transform
@@ -441,18 +442,42 @@ proc
 				if(WEST)
 					I.pixel_x = m.pixel_x + (x * 16)
 					I.pixel_y = m.pixel_y + rand(-8, 8)
+			if(idle)
+				I.pixel_x = m.pixel_x
+				I.pixel_y = m.pixel_y
+				var/drift_distance = 16
+				var/drift_x = 0
+				var/drift_y = 0
+				if(I.dir & NORTH) drift_y -= 1
+				if(I.dir & SOUTH) drift_y += 1
+				if(I.dir & EAST) drift_x -= 1
+				if(I.dir & WEST) drift_x += 1
+				if(drift_x && drift_y)
+					drift_distance /= sqrt(2)
+				I.DriftX = drift_x * drift_distance
+				I.DriftY = drift_y * drift_distance
 			if(PmActive())
 				I.pixel_x += m.step_x
 				I.pixel_y += m.step_y
 			I.pixel_z = m.pixel_z
 			I.name = m.name
 			I.Owner = m
-			//Black silhouette with a white outer outline.
-			I.color = "#000000"
-			I.filters += filter(
-				type = "outline",
-				size = 1,
-				color = "#FFFFFF"
+			I.color = null
+			I.filters = list(
+				filter(
+					type = "color",
+					color = list(
+						0, 0, 0, 0,
+						0, 0, 0, 0,
+						0, 0, 0, 0,
+						0, 0, 0, 1
+					)
+				),
+				filter(
+					type = "outline",
+					size = 1,
+					color = "#FFFFFF"
+				)
 			)
 
 
@@ -639,6 +664,21 @@ obj/coolImage
 
 obj/AntiAfterimage
 	parent_type = /obj/coolImage
+	var/DriftX = 0
+	var/DriftY = 0
+
+	New()
+		spawn(2)
+			animate(src, pixel_x = pixel_x + DriftX, pixel_y = pixel_y + DriftY, alpha = 0, time = 8)
+			spawn(8)
+				for(var/turf/a in vis_locs)
+					a.vis_contents -= src
+				for(var/atom/movable/a in vis_locs)
+					a.vis_contents -= src
+				if(Owner)
+					Owner.vis_contents -= src
+				loc = null
+				del src
 
 obj/TrailImage
 	Grabbable=0

@@ -1274,7 +1274,7 @@ obj/Skills/Grapple
 /obj/Skills/Buffs/NuStyle/SwordStyle //t3 scaled styles
 	The_Roaring_Knight //cyan t5 evil path
 		StyleActive="The Roaring Knight"
-		passives = list( "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 2,"Tossing"=2, "Twisted Sentimentality" = 1)
+		passives = list( "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 4, "AfterImageSkin" = "Anti", "Tossing"=2, "Twisted Sentimentality" = 1)
 		StyleEnd=1.5
 		StyleStr=1.5
 		Finisher="/obj/Skills/Queue/Finisher/Twisted_Heartbeat"

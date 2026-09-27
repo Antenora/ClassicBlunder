@@ -2302,6 +2302,8 @@ mob/proc/RenameSelf()
 			setPlayerNameByUID(UniqueID, name)
 		client.UpdateCharacterMenu()
 		src << "You are now known as <b>[name]</b>."
+		if(src.isRace(CHANGELING))
+			src.ChangieTrueName=name
 
 
 mob/verb/Customize_Buff_Portraits()

@@ -646,7 +646,6 @@ mob/var
 	HairUnderlay
 	HairUnderlayX=0
 	HairUnderlayY=0
-	WillPower
 	Regenerating
 	Judgment
 	Defiance
@@ -728,6 +727,9 @@ mob/var
 	SaiyanPotential="None"
 	list/SaiyanFormUnlock=list("SSJ1" = 20, "SSJ2" = 40, "SSJ3" = 60, "SSJ4" = 75, "SSJ4+" = 90)
 
+	//changie stuff
+	ChangieTrueName
+	//
 	list/demon_party = null
 	demon_party_cap = 0
 	list/demon_compendium = null
@@ -760,6 +762,7 @@ mob/var
 	tmp/demon_pending_fuse_open_slots = 0
 	tmp/demon_fusion_animating = FALSE
 	tmp/list/demon_fusion_anim_images = null
+
 
 /proc/reduceGodKi(mob/player, num)
 	player.GodKi -= num

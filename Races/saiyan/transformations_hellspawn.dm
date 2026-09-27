@@ -192,7 +192,8 @@ transformation
 				user.Tail(1)
 
 			transform_animation(mob/user)
-				if(first_time) // store the pre-form appearance and then the post-form appearance before calling the animation. also remove the hair set on overlay afterwards since it's not supposed to be an overlay
+				if(first_time)
+					user.CutsceneMode() // store the pre-form appearance and then the post-form appearance before calling the animation. also remove the hair set on overlay afterwards since it's not supposed to be an overlay
 					var/appearance1 = user.appearance
 					user.overlays += form_icon_1
 					user.overlays += form_icon_2

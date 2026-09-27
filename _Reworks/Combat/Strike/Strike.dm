@@ -154,6 +154,8 @@ mob
 					src.LoseHealth(reflected)
 					return 0
 
+			val = src.ApplySpiritCommandDamage(defender, val)
+
 			if(src.isLunaticMode())
 				src.InflictLunacy(defender.HPToPct(val), defender);
 
