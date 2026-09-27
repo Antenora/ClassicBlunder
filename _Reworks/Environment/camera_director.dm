@@ -45,10 +45,11 @@ proc/GfxCameraViewTiles(client/C)
 
 proc/GfxCameraClampPoint(client/C, wx, wy)
 	var/list/dims = GfxCameraViewTiles(C)
+	var/mag = (C && C.world_mag > 0) ? C.world_mag : 1
 	var/world_w = world.maxx * world.icon_size
 	var/world_h = world.maxy * world.icon_size
-	var/half_w = dims[1] * world.icon_size / 2
-	var/half_h = dims[2] * world.icon_size / 2
+	var/half_w = dims[1] * world.icon_size / (2 * mag)
+	var/half_h = dims[2] * world.icon_size / (2 * mag)
 	if(world_w <= half_w * 2)
 		wx = world_w / 2
 	else
