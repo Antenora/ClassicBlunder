@@ -161,6 +161,9 @@ mob/var
 	// Sorcerer
 	CursedTechnique
 
+	//Super Robot Wars
+
+
 
 mob/Admin3/verb
 	SagaManagement()
@@ -168,7 +171,7 @@ mob/Admin3/verb
 		var/mob/Players/P = PromptArg(usr, args, 1, "SagaManagement", "players")
 		if(isnull(P)) return
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works", "Super Robot Wars")
 		if(P.Saga)
 			if(P.Saga=="Mage")
 				src << "[P] is a Mage. Use the Mage Admin verb instead."
@@ -362,6 +365,9 @@ mob/Admin3/verb
 
 //				if("Sorcerer")
 //					P.gainSorcerer()
+
+				if("Super Robot Wars")
+					P.gainSRW()
 
 				if("Kamui")
 					P.SagaLevel=1
@@ -1124,6 +1130,9 @@ mob
 
 				if("Devil Summoner")
 					tierUpSaga("Devil Summoner")
+
+				if("Super Robot Wars")
+					tierUpSaga("Super Robot Wars")
 
 				if("Unlimited Blade Works")
 					switch(src.SagaLevel)
