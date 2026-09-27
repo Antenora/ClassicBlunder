@@ -9,7 +9,6 @@ turf/var/tmp/turf/elev_cov
 turf/var/tmp/elev_covv = 0
 
 var/global/elevPitVer = 1
-var/global/list/elevPitFlips = list()
 var/global/elevGeomVer = 1
 var/global/list/elevTexCache = list()
 var/global/list/elevMaskCache = list()
@@ -267,7 +266,7 @@ var/global/list/elevStyleArtCache = list()
 /proc/ElevFaceStyleAt(turf/G, turf/CT)
 	BuildCliffPaintLoad()
 	var/s = CT ? cliffPaintMap["[CT.x],[CT.y],[CT.z]"] : null
-	if(!s || s == "default" || s == "none")
+	if((!s || s == "default" || s == "none") && G)
 		s = cliffPaintMap["[G.x],[G.y],[G.z]"]
 	if(!s || s == "default" || s == "none")
 		return "wall38"
@@ -387,17 +386,14 @@ var/global/list/elevStyleArtCache = list()
 		return 0
 	if(G.elev_pitv == elevPitVer)
 		return G.elev_pit
-	return ElevPitFlood(G, ElevAt(G), null)
-
-/proc/ElevPitFlood(turf/G, lim, list/mark)
+	var/lim = ElevAt(G)
 	var/list/seen = list()
 	seen[G] = 1
 	var/list/st = list(G)
-	var/i = 1
 	var/esc = 0
-	while(i <= st.len && !esc)
-		var/turf/C = st[i]
-		i++
+	while(st.len && !esc)
+		var/turf/C = st[1]
+		st.Cut(1, 2)
 		for(var/dd in CARDINAL_DIRECTIONS)
 			var/turf/Q = get_step(C, dd)
 			if(!Q)
@@ -412,87 +408,10 @@ var/global/list/elevStyleArtCache = list()
 			st += Q
 	var/res = esc ? 0 : 1
 	for(var/turf/V in seen)
-		if(mark)
-			mark[V] = 1
 		if(ElevAt(V) == lim)
-			if(V.elev_pitv ? (V.elev_pit != res) : res)
-				elevPitFlips[V] = 1
 			V.elev_pit = res
 			V.elev_pitv = elevPitVer
 	return res
-
-/proc/ElevPitOldAt(turf/T, list/old)
-	var/o = old[T]
-	return isnull(o) ? ElevAt(T) : o
-
-/proc/ElevPitFloodOld(turf/G, lim, list/mark, list/old)
-	var/list/seen = list()
-	seen[G] = 1
-	mark[G] = 1
-	var/list/st = list(G)
-	var/i = 1
-	while(i <= st.len)
-		var/turf/C = st[i]
-		i++
-		for(var/dd in CARDINAL_DIRECTIONS)
-			var/turf/Q = get_step(C, dd)
-			if(!Q)
-				return null
-			if(seen[Q] || ElevPitOldAt(Q, old) > lim)
-				continue
-			seen[Q] = 1
-			mark[Q] = 1
-			if(seen.len > 400)
-				return null
-			st += Q
-	return seen
-
-/proc/ElevPitSweep()
-	if(!elevPitDirty.len)
-		return
-	var/list/old = elevPitDirty
-	elevPitDirty = list()
-	var/list/doneNew = list()
-	var/list/doneOld = list()
-	for(var/L = 0 to ELEV_MAX)
-		doneNew += list(list())
-		doneOld += list(list())
-	for(var/turf/T in old)
-		var/a = old[T]
-		var/b = ElevAt(T)
-		if(a == b)
-			continue
-		var/list/seeds = list(T)
-		for(var/dd in CARDINAL_DIRECTIONS)
-			var/turf/N = get_step(T, dd)
-			if(N)
-				seeds += N
-		for(var/L = min(a, b), L < max(a, b), L++)
-			var/list/dn = doneNew[L + 1]
-			var/list/dol = doneOld[L + 1]
-			for(var/turf/S in seeds)
-				if(!dn[S] && ElevAt(S) <= L)
-					ElevPitFlood(S, L, dn)
-				if(!dol[S] && ElevPitOldAt(S, old) <= L)
-					var/list/oc = ElevPitFloodOld(S, L, dol, old)
-					if(oc)
-						for(var/turf/V in oc)
-							if(!dn[V] && ElevAt(V) == L)
-								ElevPitFlood(V, L, dn)
-
-/proc/ElevPitFlush(list/skip, bootPump = 0)
-	var/n = 0
-	while(elevPitFlips.len)
-		var/list/fl = elevPitFlips
-		elevPitFlips = list()
-		for(var/turf/P in fl)
-			if(skip && skip[P])
-				continue
-			ElevVisualUpdate(P)
-			n++
-			if(n % BUILD_COMMIT_CHUNK == 0)
-				if(!bootPump || !BuildBootPassYield())
-					sleep(-1)
 
 /proc/ElevSurface(turf/G, L)
 	var/list/fi = ElevFaceInfo(G)
@@ -2711,8 +2630,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/pos = (w * (1 << nbits) + idx) * 6 + 1
 	if(pos + 5 > length(txt))
 		return null
-	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
-	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	var/seg = copytext(txt, pos, pos + 6)
+	var/a = (text2ascii(seg, 1) - 48) + (text2ascii(seg, 2) - 48) * 64 + (text2ascii(seg, 3) - 48) * 4096
+	var/b = (text2ascii(seg, 4) - 48) + (text2ascii(seg, 5) - 48) * 64 + (text2ascii(seg, 6) - 48) * 4096
 	return list(a, b)
 
 /proc/ElevOrgSourceRun(list/K, x, atop)
@@ -2833,6 +2753,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			for(var/bi = 0 to b - a - 1)
 				if((bi < 16) ? (emlo & (1 << bi)) : (emhi & (1 << (bi - 16))))
 					on["[x],[a + bi]"] = 1
+	if(isnull(elevOrgConvCache[ck]))
+		elevOrgConvCache += ck
 	elevOrgConvCache[ck] = on
 	return on
 
@@ -3405,9 +3327,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 					var/c = ElevOrgMColor(FTG, text2num(copytext(pk, 1, cp)))
 					if(c)
 						cpx[pk] = c
-		pmap = ElevOrgPixMap(K, pieces, on, holes)
+		pmap = list(K, pieces, on, holes)
 	else
-		pmap = ElevOrgPixMap(null, pieces, null, null)
+		pmap = list(null, pieces, null, null)
 	var/list/fx = ElevOrgFootFx(G, L, sty, S)
 	ElevOrgFaceImages(G, L, sty, pieces, cpx, ctx, fx, slay, fresh, S)
 	ElevOrgContactImage(G, L, sty, S, pmap, fx, fresh)
@@ -3480,8 +3402,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/pos = (w * (1 << nbits) + idx) * 6 + 1
 	if(pos + 5 > length(txt))
 		return null
-	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
-	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	var/seg = copytext(txt, pos, pos + 6)
+	var/a = (text2ascii(seg, 1) - 48) + (text2ascii(seg, 2) - 48) * 64 + (text2ascii(seg, 3) - 48) * 4096
+	var/b = (text2ascii(seg, 4) - 48) + (text2ascii(seg, 5) - 48) * 64 + (text2ascii(seg, 6) - 48) * 4096
 	return list(a, b)
 
 /proc/ElevOrgCtxIdsZ(cls, sty, w, idx, nbits)
@@ -3496,9 +3419,10 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/pos = (w * (1 << nbits) + idx) * 9 + 1
 	if(pos + 8 > length(txt))
 		return null
-	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
-	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
-	var/c = (text2ascii(txt, pos + 6) - 48) + (text2ascii(txt, pos + 7) - 48) * 64 + (text2ascii(txt, pos + 8) - 48) * 4096
+	var/seg = copytext(txt, pos, pos + 9)
+	var/a = (text2ascii(seg, 1) - 48) + (text2ascii(seg, 2) - 48) * 64 + (text2ascii(seg, 3) - 48) * 4096
+	var/b = (text2ascii(seg, 4) - 48) + (text2ascii(seg, 5) - 48) * 64 + (text2ascii(seg, 6) - 48) * 4096
+	var/c = (text2ascii(seg, 7) - 48) + (text2ascii(seg, 8) - 48) * 64 + (text2ascii(seg, 9) - 48) * 4096
 	return list(a, b, c)
 
 /proc/ElevOrgDrapeLit(mat)
@@ -3523,8 +3447,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/pos = (w * (1 << nbits) + idx) * 6 + 1
 	if(pos + 5 > length(txt))
 		return null
-	var/a = (text2ascii(txt, pos) - 48) + (text2ascii(txt, pos + 1) - 48) * 64 + (text2ascii(txt, pos + 2) - 48) * 4096
-	var/b = (text2ascii(txt, pos + 3) - 48) + (text2ascii(txt, pos + 4) - 48) * 64 + (text2ascii(txt, pos + 5) - 48) * 4096
+	var/seg = copytext(txt, pos, pos + 6)
+	var/a = (text2ascii(seg, 1) - 48) + (text2ascii(seg, 2) - 48) * 64 + (text2ascii(seg, 3) - 48) * 4096
+	var/b = (text2ascii(seg, 4) - 48) + (text2ascii(seg, 5) - 48) * 64 + (text2ascii(seg, 6) - 48) * 4096
 	return list(a, b)
 
 /proc/ElevOrgTileCtx(turf/T, L, sty)
@@ -3546,6 +3471,8 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		var/list/b = ElevOrgCtxIdsY(cl[1], sty, w, cl[2], cl[5])
 		var/list/z = ElevOrgCtxIdsZ(cl[1], sty, w, cl[2], cl[5])
 		res = list(a ? a[1] : 0, a ? a[2] : 0, b ? b[1] : 0, b ? b[2] : 0, cl[4], cl[1], w, cl[2], cl[5], z ? z[1] : 0, z ? z[2] : 0, z ? z[3] : 0)
+	if(isnull(elevOrgCtxCache[ck]))
+		elevOrgCtxCache += ck
 	elevOrgCtxCache[ck] = res
 	return res.len ? res : null
 
@@ -3577,10 +3504,12 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 			if(foot)
 				he = min(ElevOrgApronH(top ? mtop : mat, T.x * 32 + (c1 & 31), oq), seg)
 			out += list(list(c1 & 31, c2 & 31, top, foot, he, seg, text2ascii(rs, i + 5) - 48, (c4 >> 2) & 3))
+	if(isnull(elevOrgFeetCache[ck]))
+		elevOrgFeetCache += ck
 	elevOrgFeetCache[ck] = out
 	return out
 
-/proc/ElevOrgContactImage(turf/G, L, sty, turf/S, list/pm, list/fx, list/fresh)
+/proc/ElevOrgContactImage(turf/G, L, sty, turf/S, list/pma, list/fx, list/fresh)
 	var/list/raw = null
 	for(var/ty = -1 to 1)
 		for(var/tx = -1 to 1)
@@ -3643,6 +3572,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 				any = 1
 	if(!any)
 		return
+	var/list/pm = ElevOrgPixMap(pma[1], pma[2], pma[3], pma[4])
 	var/list/holes = fx[1]
 	var/list/paint = fx[2]
 	var/list/MG = ElevOrgMatInfo(ElevEdgeMat(G))
@@ -3955,6 +3885,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 /proc/ElevVisualUpdate(turf/T)
 	if(!T)
 		return
+	mapVisSerial++
 	if(T.elevOverlays)
 		T.overlays -= T.elevOverlays
 		T.elevOverlays = null
@@ -3982,10 +3913,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	ElevOrgBuild(T, fresh)
 	if(!fresh.len)
 		return
-	for(var/image/BI in fresh)
-		BuildBakeImage(BI)
 	T.overlays += fresh
 	T.elevOverlays = fresh
+	MapVisReg(T)
 
 /proc/ElevOrgWhyNot(turf/S)
 	if(!S || ElevAt(S) <= 0)

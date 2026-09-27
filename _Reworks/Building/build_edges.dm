@@ -545,6 +545,7 @@ var/global/buildFleckCap = 48
 	var/list/I = info[U]
 	if(!I)
 		I = BuildOrgTileInfo(U, doBlend)
+		info += U
 		info[U] = I
 	return I
 
@@ -696,13 +697,45 @@ var/global/buildFleckCap = 48
 	var/list/region = list()
 	var/n = 0
 	for(var/turf/T in tiles)
+		if(isnull(fresh[T]))
+			fresh += T
 		fresh[T] = 1
 		buildOrgFinal -= T
+	var/list/grid = BuildBitGrid(tiles, 2)
+	var/lz = 0
+	var/list/gf
+	var/bx0 = 0
+	var/by0 = 0
+	var/bx1 = 0
+	var/by1 = 0
+	var/bw = 0
 	for(var/turf/T in tiles)
+		if(T.z != lz)
+			lz = T.z
+			var/list/b = grid["[lz]"]
+			bx0 = b[1]
+			by0 = b[2]
+			bx1 = b[3]
+			by1 = b[4]
+			gf = b[5]
+			bw = b[6]
 		for(var/dx = -2 to 2)
+			var/x2 = T.x + dx
+			if(x2 < bx0 || x2 > bx1)
+				continue
 			for(var/dy = -2 to 2)
-				var/turf/U = locate(T.x + dx, T.y + dy, T.z)
-				if(U)
+				var/y2 = T.y + dy
+				if(y2 < by0 || y2 > by1)
+					continue
+				var/fi = (y2 - by0) * bw + (x2 - bx0)
+				var/wi = (fi >> 4) + 1
+				var/bit = 1 << (fi & 15)
+				if(gf[wi] & bit)
+					continue
+				gf[wi] |= bit
+				var/turf/U = locate(x2, y2, lz)
+				if(U && isnull(region[U]))
+					region += U
 					region[U] = 1
 		if(++n % BUILD_COMMIT_CHUNK == 0)
 			if(!bootPump || !BuildBootPassYield())
@@ -720,6 +753,7 @@ var/global/buildFleckCap = 48
 					var/list/I = BuildOrgInfoAt(U, info, doBlend)
 					if(I[3])
 						e = 1
+				able += U
 				able[U] = e
 			if(e)
 				work += U
@@ -732,6 +766,8 @@ var/global/buildFleckCap = 48
 		for(var/turf/U in work)
 			var/list/I = info[U]
 			var/list/raw = I[3]
+			if(isnull(cur[U]))
+				cur += U
 			cur[U] = raw.Copy()
 		var/list/active = work.Copy()
 		for(var/it = 1 to 8)
@@ -761,6 +797,7 @@ var/global/buildFleckCap = 48
 				for(var/dy = -2 to 2)
 					var/turf/V = locate(U.x + dx, U.y + dy, U.z)
 					if(V && !region[V])
+						region += V
 						region[V] = 1
 						grew = 1
 		if(!grew)
@@ -1003,6 +1040,8 @@ var/global/list/cliffPaintMap
 			continue
 		if(!length(f[1]) || !length(f[2]))
 			continue
+		if(isnull(cliffPaintMap[f[1]]))
+			cliffPaintMap += f[1]
 		cliffPaintMap[f[1]] = f[2]
 
 /proc/BuildCliffPaintSave()
@@ -1094,6 +1133,8 @@ var/global/list/foamPaintMap
 	for(var/line in splittext(raw, "\n"))
 		var/k = copytext(line, 1, findtext(line, "\t") || 0)
 		if(length(k))
+			if(isnull(foamPaintMap[k]))
+				foamPaintMap += k
 			foamPaintMap[k] = "off"
 
 /proc/BuildFoamPaintSave()
@@ -1198,22 +1239,11 @@ var/global/list/foamPaintMap
 	if(!fresh || !fresh.len)
 		return
 	for(var/img in fresh)
-		BuildBakeImage(img)
 		T.overlays += img
 	T.edgeOverlays = fresh
+	MapVisReg(T)
 
-var/global/list/buildBakeCache = list()
-var/global/list/buildBakeAnimCache = list()
 var/global/list/buildBakeMaskSize = list()
-
-/proc/BuildBakeAnimated(ic, st)
-	var/k = "\ref[ic]|[st]"
-	var/a = buildBakeAnimCache[k]
-	if(isnull(a))
-		var/icon/F2 = icon(ic, st, SOUTH, 2)
-		a = length(icon_states(F2)) ? 1 : 0
-		buildBakeAnimCache[k] = a
-	return a
 
 /proc/BuildBakeMask(mi, mx, my, flags, w, h)
 	var/sk = "\ref[mi]"
@@ -1235,42 +1265,6 @@ var/global/list/buildBakeMaskSize = list()
 	else
 		M.MapColors(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0)
 	return M
-
-/proc/BuildBakeImage(image/I)
-	if(!istype(I) || !length(I.filters))
-		return
-	var/mutable_appearance/MA = new(I)
-	var/list/F = MA.filters
-	if(!F || !F.len)
-		return
-	var/list/specs = list()
-	for(var/f in F)
-		if(f:type != "alpha" || !f:icon || f:render_source || (f:flags & MASK_SWAP))
-			return
-		specs += list(list(f:icon, f:x, f:y, f:flags))
-	var/ic = I.icon
-	if(!ic || BuildBakeAnimated(ic, I.icon_state))
-		return
-	var/list/kp = list("\ref[ic]|[I.icon_state]|[I.dir]")
-	for(var/list/s in specs)
-		kp += "\ref[s[1]]|[s[2]]|[s[3]]|[s[4]]"
-	var/bk = md5(jointext(kp, ";"))
-	var/res = buildBakeCache[bk]
-	if(!res)
-		var/icon/B = icon(ic, I.icon_state, I.dir, 1)
-		var/w = B.Width()
-		var/h = B.Height()
-		for(var/list/s in specs)
-			var/icon/M = BuildBakeMask(s[1], s[2], s[3], s[4], w, h)
-			if(!M)
-				return
-			B.Blend(M, ICON_MULTIPLY)
-		res = fcopy_rsc(B)
-		buildBakeCache[bk] = res
-	I.icon = res
-	I.icon_state = ""
-	I.dir = SOUTH
-	I.filters = null
 
 var/global/buildBootPassMark = 0
 
@@ -1311,6 +1305,7 @@ var/global/buildBootPassMark = 0
 /proc/BuildEdgeUpdate(turf/T, doBlend = 1)
 	if(!T)
 		return
+	mapVisSerial++
 	if(T.edgeOverlays)
 		for(var/img in T.edgeOverlays)
 			T.overlays -= img
@@ -1333,15 +1328,75 @@ var/global/buildBootPassMark = 0
 	ShoreFoamAdd(T, m, fresh)
 	BuildEdgeApply(T, fresh)
 
+/proc/BuildBitGrid(list/turfs, pad)
+	var/list/g = list()
+	for(var/turf/T in turfs)
+		var/zk = "[T.z]"
+		var/list/b = g[zk]
+		if(!b)
+			g[zk] = list(T.x, T.y, T.x, T.y, null, 0)
+			continue
+		if(T.x < b[1])
+			b[1] = T.x
+		if(T.y < b[2])
+			b[2] = T.y
+		if(T.x > b[3])
+			b[3] = T.x
+		if(T.y > b[4])
+			b[4] = T.y
+	for(var/zk in g)
+		var/list/b = g[zk]
+		b[1] = max(1, b[1] - pad)
+		b[2] = max(1, b[2] - pad)
+		b[3] = min(world.maxx, b[3] + pad)
+		b[4] = min(world.maxy, b[4] + pad)
+		b[6] = b[3] - b[1] + 1
+		var/list/f = new/list(round(((b[4] - b[2] + 1) * b[6] - 1) / 16) + 1)
+		for(var/i = 1 to f.len)
+			f[i] = 0
+		b[5] = f
+	return g
+
 /proc/BuildEdgeSmoothAround(list/turfs, doBlend = 1, bootPump = 0)
 	var/list/seen = list()
+	var/list/grid = BuildBitGrid(turfs, 1)
 	var/n = 0
+	var/lz = 0
+	var/list/f
+	var/bx0 = 0
+	var/by0 = 0
+	var/bx1 = 0
+	var/by1 = 0
+	var/bw = 0
 	for(var/turf/T in turfs)
+		if(T.z != lz)
+			lz = T.z
+			var/list/b = grid["[lz]"]
+			bx0 = b[1]
+			by0 = b[2]
+			bx1 = b[3]
+			by1 = b[4]
+			f = b[5]
+			bw = b[6]
 		for(var/dx = -1 to 1)
+			var/x2 = T.x + dx
+			if(x2 < bx0 || x2 > bx1)
+				continue
 			for(var/dy = -1 to 1)
-				var/turf/T2 = locate(T.x + dx, T.y + dy, T.z)
-				if(!T2 || seen[T2])
+				var/y2 = T.y + dy
+				if(y2 < by0 || y2 > by1)
 					continue
+				var/fi = (y2 - by0) * bw + (x2 - bx0)
+				var/wi = (fi >> 4) + 1
+				var/bit = 1 << (fi & 15)
+				if(f[wi] & bit)
+					continue
+				f[wi] |= bit
+				var/turf/T2 = locate(x2, y2, lz)
+				if(!T2)
+					continue
+				if(isnull(seen[T2]))
+					seen += T2
 				seen[T2] = 1
 				BuildEdgeUpdate(T2, doBlend)
 				n++
@@ -1360,6 +1415,7 @@ var/global/buildBootPassMark = 0
 	for(var/turf/T in CustomTurfs)
 		all += T
 	if(!all.len)
+		MapVisPassDone(1)
 		return
 	buildBootPassMark = world.timeofday
 	BuildEdgeSmoothAround(all, 1, 1)
@@ -1375,6 +1431,7 @@ var/global/buildBootPassMark = 0
 		ElevVisualRefresh(cliffs, 1)
 		Log("Mapper", "Cliff boot pass dressed [cliffs.len] placed cliff turfs.", 1)
 	world.log << "BOOT edge pass finished: [BootSeconds(t0)] s ([all.len] registered turfs, [cliffs.len] cliffs)"
+	MapVisPassDone(1)
 
 var/global/list/buildCliffPickerEntries
 

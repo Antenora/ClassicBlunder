@@ -183,5 +183,6 @@ var/global/list/shoreStyleOffs = list(list(0, 0), list(0, 1), list(-1, 1), list(
 	glob.SHORE_FOAM = !glob.SHORE_FOAM
 	usr << "Shoreline foam is now [glob.SHORE_FOAM ? "ON" : "OFF"]. Rebuilding shore edges in the background."
 	Log("Admin", "[usr] ([usr.ckey]) toggled shoreline foam [glob.SHORE_FOAM ? "on" : "off"].", 1)
+	MapVisPassesStart()
 	BuildEdgeBootPass()
 	ElevBootPass()

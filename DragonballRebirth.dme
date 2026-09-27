@@ -291,8 +291,6 @@
 #define FILE_DIR "Sagas/Weapon Soul"
 #define FILE_DIR "Sagas/Weapon Soul/Durendal"
 #define FILE_DIR "Sagas/Weapon Soul/Kusanagi"
-#define FILE_DIR "Saves"
-#define FILE_DIR "Saves/Portraits"
 #define FILE_DIR "Secrets"
 #define FILE_DIR "Secrets/Starwalker"
 #define FILE_DIR "Sounds"

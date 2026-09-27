@@ -478,6 +478,7 @@ mob/Players
 			SBP.Shadowbringer_ClearShadow()
 		CollectMenuVerbs()
 		client.updateWillMeter()
+		GfxCameraSpawn(client)
 		return
 	Logout()
 		PurgeHurtboxDebug()

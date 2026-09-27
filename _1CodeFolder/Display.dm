@@ -29,7 +29,6 @@ client
 		view_fit_last_zoom = 0
 		atom/movable/cutscene_hud_hider
 		cutscene_active = FALSE
-		game_display_active = FALSE
 		world_mag = 1
 		obj/world_overlay_master/world_overlay_master
 
@@ -182,7 +181,6 @@ mob/Players/verb/Display_Mode()
 
 client/proc/SetupGameDisplay()
 	if(!mob) return
-	game_display_active = TRUE
 	ApplyDisplayMode(getPref("displayMode"), FALSE)
 	ApplyMapZoom(EffectiveZoom())
 	view_fit_enabled = TRUE
@@ -190,8 +188,7 @@ client/proc/SetupGameDisplay()
 	StartViewFitWatchdog()
 
 client/proc/SetupTitleDisplay()
-	game_display_active = FALSE
-	GfxCameraDisable(src)
+	GfxCameraDestroy(src)
 	view_fit_enabled = FALSE
 	ApplyWorldMag()
 	view_fit_last_zoom = 0
@@ -212,7 +209,7 @@ client/proc/ApplyZoomPref()
 
 client/proc/SetupCutsceneDisplay()
 	cutscene_active = TRUE
-	GfxCameraDisable(src)
+	GfxCameraSync(src)
 	HideWebOverlays()
 	view_fit_enabled = FALSE
 	ApplyWorldMag()

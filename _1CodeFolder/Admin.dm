@@ -116,6 +116,9 @@ mob/Admin3/verb/LoadSwapMap()
 		if(worldSaveBusy)
 			world << "<small>Server: waiting for the world save in progress to finish before restarting..."
 		WorldSaveLock()
+		if(mapVisWriting)
+			world << "<small>Server: waiting for the map visuals save to finish before restarting..."
+		MapVisWaitWrite()
 		world.Reboot()
 
 
@@ -2210,6 +2213,9 @@ mob/Admin3/verb
 			if(worldSaveBusy)
 				world << "<small>Server: waiting for the world save in progress to finish before shutting down..."
 			WorldSaveLock()
+			if(mapVisWriting)
+				world << "<small>Server: waiting for the map visuals save to finish before shutting down..."
+			MapVisWaitWrite()
 			shutdown()
 
 	SaveWorld()

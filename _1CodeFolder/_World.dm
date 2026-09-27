@@ -135,9 +135,7 @@ proc/BootWorld(var/blah)
 			ElevMapLoad()
 			world.log << "BOOT journal replay + elevation map: [BootSeconds(t)] s"
 			sleep(world.tick_lag)
-			BuildEdgeBootPass()
-			sleep(world.tick_lag)
-			ElevBootPass()
+			MapVisBoot()
 			sleep(world.tick_lag)
 			t = world.timeofday
 			Load_Bodies()
@@ -202,6 +200,7 @@ proc/BootWorld(var/blah)
 				worldSaveRefused = 1
 				Log("Mapper", "World save runtime error: [e] on [e.file]:[e.line]; the build journal was kept.", 1)
 			WorldSaveEnd()
+			MapVisSaveSoon()
 
 
 proc/BootFile(var/file,var/op)

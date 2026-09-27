@@ -888,6 +888,7 @@
 		throw e
 	WorldSaveEnd()
 	world.log << "SAVE map data (build mode or journal recovery): [BootSeconds(t0)] s"
+	MapVisSaveSoon()
 
 /proc/BuildSaveOrphan(who)
 	set waitfor = FALSE

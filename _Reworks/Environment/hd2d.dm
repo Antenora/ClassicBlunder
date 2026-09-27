@@ -31,7 +31,7 @@ globalTracker
 		AMBIENT_DENSITY = 1 //global multiplier on ambient particle counts
 		FIREFLY_SEED_MOD = 11 //1 in N open tiles hosts fireflies in firefly zones; higher = sparser
 		FIREFLY_ALPHA = 235
-		WATER_SPARKLE = TRUE //v2: clustered map-anchored glints (a uniform screen sheet sparkled everywhere)
+		WATER_SPARKLE = FALSE //v2: clustered map-anchored glints (a uniform screen sheet sparkled everywhere)
 		SPARKLE_ALPHA = 190
 		SPARKLE_SEED_MOD = 7 //1 in N water tiles seeds a cluster; higher = sparser
 		RIM_LIGHT = TRUE //lit edge on actors near placed lights, colored by the flame
