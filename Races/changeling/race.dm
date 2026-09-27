@@ -1,28 +1,29 @@
 race
 	changeling
-		locked = TRUE
+		locked = FALSE
 		name = "Changeling"
 		icon_neuter	=	list('Chilled1.dmi')
 		gender_options = list("Neuter")
-		desc	=	"A race that carries immense inherent strength and potential, but finds it difficult to control. They are, however, capable of suppressing their power to make it easier to manage."
+		desc	=	"A race that carries immense inherent strength and potential, but finds it difficult to control. They're born with a series of transformations that allow them to unleash more of this latent potential."
 		visual	=	'Changeling.png'
 
-		passives = list("Xenobiology" = 1, "Juggernaut" = 1, "CriticalBlock" = 0.25)
+		passives = list()
 		statPoints 	= 10
 		power = 3;
 		strength	=	0.25
 		endurance	=	0.25
 		force	=	0.25
-		offense	=	0.25
-		defense	=	0.25
+		offense	=	1
+		defense	=	1
 		speed	=	1.75
 		anger	=	1.15
-		vitality = 4
+		vitality = 5
 		growth = 3
 		anger_message = "will not stand for this mockery!!"
 
 		onFinalization(mob/user)
 			. = ..()
+			user.transUnlocked=3
 
 		onAnger(mob/user)
 			. = ..()

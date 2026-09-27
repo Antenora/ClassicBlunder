@@ -809,7 +809,7 @@ mob
 				return 0
 			if(passive_handler.Get("EnergyLeak"))
 				return 1
-			if(src.transActive()&&!src.HasMystic())
+			if(src.transActive()&&!src.HasMystic()&&src.isRace(SAIYAN))
 				if(race.transformations[transActive].mastery>10&&race.transformations[transActive].mastery<75)
 					return 1
 			if(src.DoubleHelix>=1)
@@ -822,8 +822,15 @@ mob
 		GetEnergyLeak()
 			var/Total=0
 			var/PrideDrain=0
+			if(src.isRace(CHANGELING))
+				var/CDrain=src.transActive+0.5 //changeling drain
+				var/CReduction=(src.Potential/10)
+				var/CTotal=CDrain-CReduction
+				if(CTotal<0||src.AscensionsAcquired>=3)
+					CTotal=0
+				Total+=CTotal
 			Total+=passive_handler.Get("EnergyLeak")
-			if(src.transActive()&&!src.HasMystic())
+			if(src.transActive()&&!src.HasMystic()&&src.isRace(SAIYAN))
 				if(race.transformations[transActive].mastery>10&&race.transformations[transActive].mastery<75)
 					Total+=src.transActive()*0.25
 			if(src.DoubleHelix)

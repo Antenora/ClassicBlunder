@@ -719,6 +719,9 @@ mob/var
 	SaiyanPotential="None"
 	list/SaiyanFormUnlock=list("SSJ1" = 20, "SSJ2" = 40, "SSJ3" = 60, "SSJ4" = 75, "SSJ4+" = 90)
 
+	//changie stuff
+	ChangieTrueName
+	//
 	list/demon_party = null
 	demon_party_cap = 0
 	list/demon_compendium = null

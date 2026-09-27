@@ -613,7 +613,8 @@ mob
 			return ((src.DefMod+Ascended+(enhanced)+Invested))*DefChaos
 		DetermineAscension(var/Stat)
 			var/Invest=src.vars["[Stat]Invest"]
-			var/AscStat=Invest*src.AscensionsAcquired*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
+			var/EffAsc=src.AscensionsAcquired
+			var/AscStat=Invest*EffAsc*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
 			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
@@ -2864,6 +2865,8 @@ mob
 
 		get_potential()
 			var/Return=src.Potential
+			if(src.isRace(CHANGELING) && Return<(10*src.transActive)&&src.Class=="Frieza")
+				Return=10*src.transActive
 
 			if(src.HasPowerReplacement())
 				var/Replace=src.GetPowerReplacement()
