@@ -346,9 +346,14 @@ obj/LifeSkills/Station/MechBay/proc/MechBayIntrinsicAssignments(mob/M)
 	C = MechIntrinsicClaims[key]
 	if(!islist(C) || C["token"] != token) return
 	for(var/obj/Items/Mech/R in world)
-		if(R.intrinsic_mech_id == C["mech_id"])
-			M << "That mech still exists. Park it at a bay and remove the intrinsic part normally."
-			return
+		if(R.intrinsic_mech_id != C["mech_id"])
+			continue
+		// get_turf() follows the mech through pilots, capsules, and inventories
+		// a null result means it only exists inside unloaded/offline saved contents, so you can reclaim this way in case you get grimed
+		if(!get_turf(R))
+			continue
+		M << "That mech is currently deployed or held by an online character. Park it at a bay and remove the intrinsic part normally."
+		return
 	MechIntrinsicClaims -= key
 	if(!MechIntrinsicSaveClaims())
 		MechIntrinsicClaims[key] = C
@@ -519,6 +524,16 @@ obj/Items/Mech/proc/MechCoreTier()
 
 		return MECH_CORE_TIER_MIN
 	return clamp(core_tier, MECH_CORE_TIER_MIN, MECH_CORE_TIER_MAX)
+
+obj/Items/Mech/proc/MechCoreOnline()
+	var/list/I = islist(intrinsic_installed) ? intrinsic_installed["Reactor"] : null
+	if(islist(I) && I["replaces_core"])
+		RegisterMechIntrinsicParts()
+		var/datum/mech_intrinsic_part/P = MechIntrinsicParts[I["part_id"]]
+		if(!P || P.slot_family != "Reactor")
+			return FALSE
+		return IntrinsicValid(I)
+	return core_tier >= MECH_CORE_TIER_MIN
 
 
 proc/MechCraftIntrinsicID(value)

@@ -47,12 +47,15 @@ mob/proc/MechHackRefusal(obj/Items/Mech/R)
 	if(!isturf(R.loc)) return "[R] is not parked."
 	if(R.MechIsPilot(src)) return "You are already a registered pilot of [R]. There is nothing to steal."
 	if(get_dist(src, R) > 1) return "Get next to [R] first."
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal) return intrinsic_refusal
 	if(R.disabled || R.MechBuilderOnline() || R.MechParkedLong()) return null
 	return "[R]'s builder is away and it has been parked for less than a day, so its lock will not open yet."
 
 mob/proc/MechHackStill(obj/Items/Mech/R)
 	if(!R || R.mounted || !isturf(R.loc)) return 0
 	if(R.MechIsPilot(src) || get_dist(src, R) > 1) return 0
+	if(R.IntrinsicPilotRefusal(src)) return 0
 	return 1
 
 mob/proc/MechHackBegin(obj/Items/Mech/R)
@@ -75,6 +78,8 @@ mob/proc/MechHackResolve(obj/Items/Mech/R, success)
 
 mob/proc/MechHijackBroken(obj/Items/Mech/R, turf/start, turf/home, hs)
 	if(!R || R.loc != home || R.mounted) return "The mech is gone from under your hands. The hack breaks off."
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal) return intrinsic_refusal
 	if(KO || Dead) return "The hack breaks off."
 	if(loc != start) return "You moved. The hack breaks off."
 	if(Health < hs || InCombat()) return "The fight breaks off the hack."
