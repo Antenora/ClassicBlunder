@@ -388,6 +388,52 @@ datum/saga_skill_tree_node/Variable
 		M.vars[target_variable] -= amount
 		return TRUE
 
+
+// INTRINSIC PART NODE
+
+
+datum/saga_skill_tree_node/IntrinsicPart
+	var/intrinsic_part_id
+	IsConfigured()
+		RegisterMechIntrinsicParts()
+		return intrinsic_part_id && MechIntrinsicParts[intrinsic_part_id] ? TRUE : FALSE
+	RankLimit()
+		return 1
+	GetRank(mob/M)
+		var/list/history = GetHistory(M)
+		return history && history.len ? 1 : 0
+	MissingRequirements(mob/M)
+		var/list/missing = ..()
+		if(M && !GetRank(M) && M.HasIntrinsicPart(intrinsic_part_id))
+			missing += "You already have this intrinsic part unlocked."
+		return missing
+	GrantRank(mob/M, list/record)
+		if(!M || !islist(record) || !IsConfigured()) return FALSE
+		if(GetRank(M) || M.HasIntrinsicPart(intrinsic_part_id)) return FALSE
+		M.IntrinsicOwnerID()
+		if(!islist(M.MechIntrinsicUnlocks)) M.MechIntrinsicUnlocks = list()
+		M.MechIntrinsicUnlocks[intrinsic_part_id] = list("tree_id" = tree_id, "node_id" = id)
+		record["intrinsic_part_id"] = intrinsic_part_id
+		return TRUE
+	RefundBlock(mob/M)
+		var/reason = ..()
+		if(reason) return reason
+		var/list/history = GetHistory(M)
+		var/list/record = history[history.len]
+		if(M.IntrinsicPartMechID(record["intrinsic_part_id"]))
+			return "Remove the intrinsic part from its mech before refunding it."
+		return ""
+	RemoveRank(mob/M, list/record)
+		if(!M || !islist(record)) return FALSE
+		var/part_id = record["intrinsic_part_id"]
+		if(!part_id || M.IntrinsicPartMechID(part_id)) return FALSE
+		if(M.HasIntrinsicPart(part_id))
+			var/list/U = M.MechIntrinsicUnlocks[part_id]
+			if(U["tree_id"] != tree_id || U["node_id"] != id) return FALSE
+			M.MechIntrinsicUnlocks -= part_id
+		return TRUE
+
+
 /********************/
 
 

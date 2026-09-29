@@ -60,6 +60,10 @@ client/proc/LifeCraftPrunePicks(datum/craft_recipe/lifecraft/R)
 		if(!p || p.len < 2)
 			cp_picks[i] = null
 			continue
+		if(MechCraftIntrinsicID(p[1]))
+			if(MechCraftIntrinsicError(mob, R, i, p[1]))
+				cp_picks[i] = null
+			continue
 		if(mob.MatLogCountQ(p[1], QualityClamp(p[2])) <= 0) cp_picks[i] = null
 
 client/proc/LifeCraftList(obj/LifeSkills/Station/S)
@@ -109,9 +113,14 @@ client/proc/LifeCraftCard(obj/LifeSkills/Station/S, datum/craft_recipe/lifecraft
 			var/cell = "pick one"
 			var/list/p = islist(cp_picks[i]) ? cp_picks[i] : null
 			if(p && p.len >= 2)
-				var/have = M.MatLogCountQ(p[1], QualityClamp(p[2]))
-				cell = "[QualityName(p[2])] [LifeMatName(p[1])] (have [have])"
-				if(have < sr.amount) cell += " - short"
+				if(MechCraftIntrinsicID(p[1]))
+					cell = MechCraftIntrinsicLabel(p[1])
+					var/error = MechCraftIntrinsicError(M, R, i, p[1])
+					if(error) cell += " - unavailable"
+				else
+					var/have = M.MatLogCountQ(p[1], QualityClamp(p[2]))
+					cell = "[QualityName(p[2])] [LifeMatName(p[1])] (have [have])"
+					if(have < sr.amount) cell += " - short"
 			rows[++rows.len] = list("t" = "[sr.name] - [sr.Describe()]", "c" = list(cell), "h" = "?src=\ref[S];cp=pick;slot=[i]")
 	rows[++rows.len] = list("sec" = "PROJECTED")
 	for(var/line in R.Project(M, cp_picks))
@@ -135,7 +144,10 @@ client/proc/LifeCraftPick(obj/LifeSkills/Station/S, datum/craft_recipe/lifecraft
 	var/list/labels = list()
 	for(var/j = 1 to opts.len)
 		var/list/o = opts[j]
-		labels += "[QualityName(o[2])] [LifeMatName(o[1])] x[o[3]] (tier [LifeMatTier(o[1])])"
+		if(MechCraftIntrinsicID(o[1]))
+			labels += "[MechCraftIntrinsicLabel(o[1])] ([MechCraftIntrinsicID(o[1])])"
+		else
+			labels += "[QualityName(o[2])] [LifeMatName(o[1])] x[o[3]] (tier [LifeMatTier(o[1])])"
 	var/ans = Ask(M, "[sr.name]: choose what goes in.", "INGREDIENT", null, "pick", labels, 1)
 	if(isnull(ans)) return
 	var/k = labels.Find("[ans]")

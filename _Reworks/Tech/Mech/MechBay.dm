@@ -34,9 +34,12 @@ proc/MechKitType(key)
 	proc/MechBayMenu(mob/M)
 		if(!M || !M.client || M.KO || M.Dead) return
 		if(!CraftReach(M)) return
-		var/list/acts = list("Assemble", "Repair", "Refit", "Pilots", "Pull Beacon", "Repaint", "Loadout")
+		var/list/acts = list("Assemble", "Repair", "Refit", "Pilots", "Pull Beacon", "Repaint", "Loadout", "Intrinsic Assignments")
 		var/act = Ask(M, "What do you want to do at the [name]?", craft_title, null, "pick", acts, 1)
 		if(!act || !src || !M || !CraftReach(M)) return
+		if(act == "Intrinsic Assignments")
+			MechBayIntrinsicAssignments(M)
+			return
 		if(act == "Assemble")
 			if(M.client) M.client.LifeCraftOpen(src)
 			return
@@ -129,13 +132,13 @@ proc/MechKitType(key)
 			return
 		var/list/opts = list()
 		for(var/s in R.MechOpenSlots())
-			var/obj/Items/P = R.MechPartIn(s)
+			var/obj/Items/P = R.MechRawPartIn(s)
 			opts["[MECH_SLOT_NAMES[s]]: [P ? P.name : "empty"]"] = s
 		opts["Frame kit: [R.frame_kit ? R.frame_kit : "none"]"] = "kit"
 		opts["Coating: [MechCoatingName(R.coating)]"] = "coating"
-		opts["Reactor: tier [R.core_tier] core"] = "reactor"
+		opts["Reactor: tier [R.MechCoreTier()] core"] = "reactor"
 		opts["Chips: [length(R.socket_chips)] of [R.MechSockets()]"] = "chips"
-		var/pick = Ask(M, "Refit which part of [R]? Each refit costs [MECH_REFIT_LS] Life Stamina, and the old component comes back to you.", craft_title, null, "pick", opts, 1)
+		var/pick = Ask(M, "Refit which part of [R]? Each refit costs [MECH_REFIT_LS] Life Stamina, crafted parts return to you; intrinsic parts become available to install again.", craft_title, null, "pick", opts, 1)
 		if(!pick || !MechBayValid(M, R)) return
 		var/what = opts[pick]
 		switch(what)
@@ -156,17 +159,26 @@ proc/MechKitType(key)
 
 	proc/MechBayRefitSlot(mob/M, obj/Items/Mech/R, slot)
 		var/fam = MechSlotFamily(slot)
-		var/obj/Items/cur = R.MechPartIn(slot)
+		var/obj/Items/cur = R.MechRawPartIn(slot)
 		var/list/labels = list()
-		if(cur) labels["Take out [cur.name]"] = "out"
+		if(cur && R.IntrinsicCanRemove(cur, M)) labels["Take out [cur.name]"] = "out"
 		for(var/obj/Items/I in M)
-			if(I.mech_slot != fam || I.suffix == "*Equipped*") continue
-			if(R.MechPartFits(I, slot)) continue
+			if(I.IsIntrinsicPart() || I.mech_slot != fam || I.suffix == "*Equipped*") continue
+			if(R.IntrinsicFitError(I, slot, M)) continue
 			var/lab = "[QualityName(I.CraftQuality)] [I.name]"
 			var/n = 2
 			while(labels[lab])
 				lab = "[QualityName(I.CraftQuality)] [I.name] ([n++])"
 			labels[lab] = I
+		RegisterMechIntrinsicParts()
+		for(var/part_id in M.MechIntrinsicUnlocks)
+			var/datum/mech_intrinsic_part/D = MechIntrinsicParts[part_id]
+			if(!D || D.slot_family != fam) continue
+			var/obj/Items/P = MechIntrinsicCreate(part_id, M)
+			if(!P) continue
+			if(!R.IntrinsicFitError(P, slot, M))
+				labels["Intrinsic: [D.name] ([part_id])"] = list("intrinsic_part_id" = part_id)
+			del P
 		if(!labels.len)
 			M << "You carry no [lowertext(fam)] part that fits [R]'s [MECH_SLOT_NAMES[slot]]."
 			return
@@ -175,19 +187,37 @@ proc/MechKitType(key)
 		MechBayApplySlot(M, R, slot, labels[k])
 
 	proc/MechBayApplySlot(mob/M, obj/Items/Mech/R, slot, choice)
+		if(!MechBayValid(M, R) || M.InCombat()) return 0
 		var/before = R.MechHullMax()
 		if(choice == "out")
-			var/obj/Items/cur = R.MechPartIn(slot)
-			if(!cur || !MechBayPay(M, R)) return 0
-			R.MechUnfit(cur, M)
-			M << "You pull [cur] out of [R]."
+			var/obj/Items/cur = R.MechRawPartIn(slot)
+			if(!cur || !R.IntrinsicCanRemove(cur, M) || !MechBayPay(M, R)) return 0
+			var/part_name = cur.name
+			if(!R.MechUnfit(cur, M)) return 0
+			M << "You remove [part_name] from [R]."
 		else
-			var/obj/Items/I = choice
-			if(!istype(I) || I.loc != M || R.MechPartFits(I, slot) || !MechBayPay(M, R)) return 0
-			R.MechFit(I, slot, M)
+			var/obj/Items/I
+			var/created = islist(choice)
+			if(created)
+				var/list/C = choice
+				I = MechIntrinsicCreate(C["intrinsic_part_id"], M)
+			else
+				I = choice
+			if(!istype(I)) return 0
+			var/error = R.IntrinsicFitError(I, slot, M)
+			if(error || !MechBayPay(M, R))
+				if(error) M << error
+				if(created) del I
+				return 0
+			if(!R.MechFit(I, slot, M))
+				if(created) del I
+				return 0
 			M << "You fit [I] into [R]'s [MECH_SLOT_NAMES[slot]]."
-		if(M.client) M.client.BuildInvPage()
+		R.MechEnsureSkills()
 		R.MechRefitDone(before)
+		if(M.client)
+			M.client.BuildInvPage()
+			M.client.SaveChar()
 		return 1
 
 	proc/MechBayRefitKit(mob/M, obj/Items/Mech/R)
@@ -265,16 +295,25 @@ proc/MechKitType(key)
 		return 1
 
 	proc/MechBayRefitReactor(mob/M, obj/Items/Mech/R)
+		var/list/modes = list("Ordinary core", "Intrinsic reactor")
+		var/mode = Ask(M, "Change the ordinary core or manage your intrinsic reactor?", craft_title, null, "pick", modes, 1)
+		if(!mode || !MechBayValid(M, R)) return
+		if(mode == "Intrinsic reactor")
+			MechBayIntrinsicReactors(M, R)
+			return
 		var/list/labels = MechBayMaterialChoices(M, TECH_SEL_CORE, null)
 		if(!labels.len)
 			M << "You have no golem core in your Collection Log."
 			return
-		var/k = Ask(M, "Which core powers [R]? It runs a tier [R.core_tier] core now.", craft_title, null, "pick", labels, 1)
+		var/k = Ask(M, "Which core powers [R]? It runs a tier [R.MechCoreTier()] core now.", craft_title, null, "pick", labels, 1)
 		if(!k) return
 		var/list/p = labels[k]
 		if(islist(p)) MechBayApplyReactor(M, R, p[1], p[2])
 
 	proc/MechBayApplyReactor(mob/M, obj/Items/Mech/R, mc, q)
+		if(islist(R.intrinsic_installed) && R.intrinsic_installed["Reactor"])
+			M << "Remove the intrinsic reactor through the Intrinsic reactor menu first. You can choose its replacement there."
+			return 0
 		var/datum/craft_slotreq/S = new
 		S.mat_tag = copytext(TECH_SEL_CORE, 5)
 		if(!mc || !S.Accepts(mc) || M.MatLogCountQ(mc, q) < 1 || !MechBayPay(M, R)) return 0

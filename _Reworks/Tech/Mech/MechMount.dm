@@ -67,6 +67,8 @@ mob/var/tmp
 
 /obj/Items/Mech/proc/MechBoardRefusal(mob/M)
 	if(!M) return "Nobody is there to board."
+	var/intrinsic_refusal = IntrinsicPilotRefusal(M)
+	if(intrinsic_refusal) return intrinsic_refusal
 	if(!isturf(loc) || mounted) return "[src] is not parked."
 	if(get_dist(M, src) > 1) return "Get next to [src] first."
 	if(!MechIsPilot(M)) return "You are not a registered pilot of [src]."
@@ -104,6 +106,12 @@ mob/proc/MechBoardDS(obj/Items/Mech/R)
 
 mob/proc/MechBoardNow(obj/Items/Mech/R)
 	if(!R) return
+
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal)
+		src << intrinsic_refusal
+		return
+
 	if(mech_loadout) MechLoadoutClose()
 	MechBoardDrop()
 	if(Grab) Grab_Release()
@@ -159,6 +167,7 @@ mob/proc/MechMount(obj/Items/Mech/R, remount = 0)
 	mech_limp_line_at = world.time + glob.MECH_LIMP_LINE_DS
 	mech_ramp = glob.MECH_RAMP_MIN
 	MechDeployedSet(src, R)
+	R.IntrinsicEvent("mount", src, remount)
 	MechFuelStart()
 	if(!remount)
 		src << "You take the controls of [R]. Hull [round(Health)] of [round(MaxHP())], fuel [round(R.fuel, 0.1)] minutes."
@@ -267,6 +276,7 @@ mob/proc/MechDismount(wreck = 0, silent = 0)
 	var/turf/T = get_turf(src)
 	mech_fuel_token++
 	R.Hull = wreck ? 0 : clamp(Health, 0, R.MechHullMax())
+	R.IntrinsicEvent("dismount", src, wreck)
 	MechShortcutsOff(R)
 	MechRevokeSkills(R)
 	MechPassivesOff()
@@ -347,6 +357,12 @@ mob/Players/MechLoginRemount()
 			break
 	if(R)
 		MechMount(R, 1)
+
+		var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+		if(intrinsic_refusal && mech == R)
+			src << intrinsic_refusal
+			MechDismount(silent = 1)
+
 		return
 	if(pilot_look || mech_passives_applied || pilot_shortcuts)
 		MechLostCleanup()
@@ -435,8 +451,18 @@ mob/proc/MechFuelStart()
 		MechFuelTick(R, dt)
 
 mob/proc/MechFuelTick(obj/Items/Mech/R, dt)
+	if(!R || mech != R) return
+
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal)
+		src << intrinsic_refusal
+		MechDismount(silent = 1)
+		return
+
+	R.IntrinsicEvent("tick", src, dt)
 	if(R.fuel > 0)
-		R.fuel = max(0, R.fuel - dt / glob.MECH_FUEL_BURN_DS)
+		var/used = R.IntrinsicNumber("fuel", src, dt / glob.MECH_FUEL_BURN_DS)
+		R.fuel = max(0, R.fuel - used)
 	if(R.fuel <= 0 && !mech_limp)
 		mech_limp = 1
 		mech_limp_line_at = world.time + glob.MECH_LIMP_LINE_DS

@@ -108,7 +108,8 @@ mob/proc/MechLimitPress(obj/Skills/Buffs/SlotlessBuffs/Mech_Limit/B)
 	B.TimerLimit = round(B.limit_secs * MechLimitDurationMult(), 0.1)
 	B.Trigger(src)
 	if(!BuffOn(B)) return 0
-	HeatAdd(B.limit_heat)
+	HeatAdd(IntrinsicHeatCost(B.limit_heat, B))
+	IntrinsicSkillUsed(B)
 	return 1
 
 mob/proc/MechLimitSync(obj/Skills/Buffs/SlotlessBuffs/Mech_Limit/B)

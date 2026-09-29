@@ -71,7 +71,8 @@ obj/Items/Gun/Handgun/Mech_Bit_Laser
 		set category = "Skills"
 		usr.MechPartUse(src)
 	MechFire(mob/p, noGCD = FALSE)
-		return p.MechBitsToggle(src, noGCD)
+		. = p.MechBitsToggle(src, noGCD)
+		if(.) p.IntrinsicSkillUsed(src)
 
 /obj/Skills/Mech/Fin_Funnel_Barrier
 	name = "Fin Funnel Barrier"

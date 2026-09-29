@@ -88,9 +88,10 @@ mob/proc/MechPilotSkillHeat(obj/Skills/S)
 	var/ec = S ? S.EnergyCost : 0
 	return max(glob.MECH_PILOT_HEAT_MIN, ec / glob.MECH_PILOT_HEAT_DIV) * MechPilotSkillHeatMult()
 
-mob/proc/MechPilotSkillFired(obj/Skills/S)
+mob/proc/MechPilotSkillFired(obj/Skills/S, intrinsic_notify = TRUE)
 	mech_pilot_skill_until = world.time + glob.MECH_PILOT_SKILL_WINDOW
-	HeatAdd(MechPilotSkillHeat(S))
+	HeatAdd(IntrinsicHeatCost(MechPilotSkillHeat(S), S))
+	if(intrinsic_notify) IntrinsicSkillUsed(S)
 
 mob/proc/MechPilotSkillAfter(obj/Skills/S, was_ready)
 	if(!was_ready || !mech) return
@@ -200,7 +201,7 @@ mob/Players/attemptShortcut(num)
 mob/Players/MechGrappleBlock(obj/Skills/Grapple/G, mob/Trg)
 	if(!mech || !G) return 0
 	if(!MechPilotGate(G)) return 1
-	if(MechPilotSkill(G)) MechPilotSkillFired(G)
+	if(MechPilotSkill(G)) MechPilotSkillFired(G, FALSE)
 	return 0
 
 mob/Players/MechGrappleWhiff(obj/Skills/Grapple/G, mob/User)

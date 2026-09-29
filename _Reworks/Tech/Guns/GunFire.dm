@@ -27,6 +27,7 @@ obj/Skills/Projectile/Gunfire
 mob/proc/FireGun(obj/Items/Gun/g)
 	if(!g)
 		return 0
+	if(g.IsIntrinsicPart() && (!mech || !mech.IntrinsicPartActive(g))) return 0
 	var/charged = g.energy_gun || g.mech_only
 	if(charged)
 		if(Overheated())
@@ -46,6 +47,8 @@ mob/proc/FireGun(obj/Items/Gun/g)
 		bloom = GunBloomPenalty()
 	GunStampShot(gf, g, bloom)
 	GunStampPassives(gf, g, bloom)
+	var/obj/Items/Mech/intrinsic_firing_mech = mech
+	if(intrinsic_firing_mech) intrinsic_firing_mech.IntrinsicEvent("shot", src, g, gf)
 	var/ang = GunAimAngleNow()
 	GunFaceShot(ang)
 	gf.FlightAngle = ang
@@ -66,6 +69,8 @@ mob/proc/FireGun(obj/Items/Gun/g)
 		gf.Using = 0
 	else
 		g.Loaded = max(0, min(gf.Charges, g.MagSize))
+	if(. && intrinsic_firing_mech && mech == intrinsic_firing_mech)
+		intrinsic_firing_mech.IntrinsicEvent("weapon", src, g)
 	gf.DirOverride = 0
 	gf.FlightAngle = null
 	gf.LaunchOffX = 0
@@ -89,7 +94,7 @@ mob/proc/GunChargedShot(obj/Items/Gun/g)
 		g.energy = max(0, g.energy - g.energy_per_shot)
 	g.EnergyReset()
 	if(g.heat_per_shot > 0)
-		HeatAdd(g.heat_per_shot)
+		HeatAdd(IntrinsicHeatCost(g.heat_per_shot, g))
 	if(g.mech_only)
 		MechHandAdvance(g)
 
