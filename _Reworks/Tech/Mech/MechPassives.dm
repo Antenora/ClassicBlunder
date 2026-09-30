@@ -238,6 +238,9 @@ mob/Players/MechStatMult(stat)
 		if(rage && HealthPct() < glob.MECH_LOW_HULL_PCT) . *= 1 + rage / 100
 	if(stat in list("Str", "End", "Spd", "For", "Off", "Def"))
 		. += GetWillStatMult()
+	var/datum/mech_transformation/T = ActiveMechTransformation()
+	if(T)
+		. = T.ModifyStat(src, mech, stat, .)
 
 /obj/Items/Mech/MechStatMods(list/S)
 	..()

@@ -1049,7 +1049,7 @@ mob/proc/
 		if(src.TotalCapacity>0)
 			Recover("Capacity", 1)
 
-		if(src.PoweringUp==1 && !PureRPMode && src.icon_state!="Meditate")
+		if(src.PoweringUp==1 && !src.mech && !PureRPMode && src.icon_state!="Meditate")
 
 			var/PUGain=src.PUSpeedModifier
 

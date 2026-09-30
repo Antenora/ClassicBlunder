@@ -172,22 +172,34 @@ mob/Players/SkillStunX(var/Wut,var/obj/Skills/Z,var/bypass=0, dontTakeStack = FA
 		return FALSE
 	return ..()
 
+
 mob/Players/PowerUp()
 	if(mech)
-		MechRefuse("Power Up")
-		return 0
+		return src.Transform()
 	return ..()
+
 
 mob/Players/PowerDown()
 	if(mech)
-		MechRefuse("Power Down")
-		return 0
+		return src.Revert()
 	return ..()
 
 mob/Players/Transform(type)
 	if(mech)
-		MechRefuse("Transforming")
-		return 0
+		if(active_mech_transformation_id)
+			return 0
+		var/datum/mech_transformation/T = GetAssignedMechTransformation(mech)
+		if(!T)
+			MechRefuse("Transforming")
+			return 0
+		return ActivateMechTransformation(mech)
+	return ..()
+
+mob/Players/Revert()
+	if(mech)
+		if(!active_mech_transformation_id)
+			return 0
+		return RevertMechTransformation(mech)
 	return ..()
 
 mob/Players/attemptShortcut(num)
@@ -216,3 +228,4 @@ mob/Players/MechGrappleWhiff(obj/Skills/Grapple/G, mob/User)
 mob/Players/LoseEnergy(var/val, _static = FALSE)
 	if(mech) return
 	return ..()
+

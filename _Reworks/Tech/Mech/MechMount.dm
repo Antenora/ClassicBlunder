@@ -75,6 +75,7 @@ mob/var/tmp
 	if(!M.MechLicensed()) return "You need Piloting Foundations to pilot [src]."
 	if(disabled) return "[src] is a wreck. A Mech Bay has to repair it first."
 	if(M.mech) return "You are already piloting [M.mech]."
+	if(dimensional_deploying) return "[src] is still materializing."
 	if(M.KO || M.Dead) return "You can't climb in like this."
 	if(M.InCombat()) return "You can't climb into a mech in the middle of a fight."
 	var/obj/Items/Mech/out = MechDeployedFor(M.ckey)
@@ -279,6 +280,8 @@ mob/proc/MechDismount(wreck = 0, silent = 0)
 	var/turf/T = get_turf(src)
 	mech_fuel_token++
 	R.Hull = wreck ? 0 : clamp(Health, 0, R.MechHullMax())
+	if(active_mech_transformation_id)
+		RevertMechTransformation(R)
 	R.IntrinsicEvent("dismount", src, wreck)
 	MechShortcutsOff(R)
 	MechRevokeSkills(R)
