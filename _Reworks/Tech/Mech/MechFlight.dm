@@ -163,6 +163,12 @@ mob/proc/MechDirUnit(d)
 mob/proc/MechSpeed()
 	return sqrt(mech_vx * mech_vx + mech_vy * mech_vy)
 
+mob/proc/MechMoving()
+	if(!mech) return 0
+	if(mech_vx || mech_vy || mech_burst_left > 0) return 1
+	if(mech_air == 1 || mech_air == 3) return 1
+	return heldDir() ? 1 : 0
+
 mob/proc/MechFlyBudget()
 	var/f = Flying
 	Flying = 0

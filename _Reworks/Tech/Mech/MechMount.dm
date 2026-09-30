@@ -25,7 +25,7 @@ mob/var/tmp
 	name = "Mech"
 	Dismount
 		name = "Dismount"
-		desc = "Climb out of your mech and park it where you stand. Instant out of combat, a 3 second channel in a fight."
+		desc = "Climb out of your mech and park it where you stand. The mech has to be standing still. Instant out of combat, a 3 second channel in a fight."
 		verb/Dismount()
 			set category = "Skills"
 			usr.MechDismountPress()
@@ -377,6 +377,9 @@ mob/proc/MechDismountPress()
 		src << "You are not piloting anything."
 		return
 	if(mech_channeling) return
+	if(MechMoving())
+		MechLine("dismount", "[mech] is still moving. Bring it to a stop before you climb out.")
+		return
 	if(InCombat())
 		src << "You start climbing out of [mech]."
 		if(!MechDismountChannel()) return
@@ -393,7 +396,7 @@ mob/proc/MechDismountChannel()
 		if(!mech || KO || Dead)
 			. = 0
 			break
-		if(loc != start)
+		if(loc != start || MechMoving())
 			src << "You moved, so you stay in your seat."
 			. = 0
 			break

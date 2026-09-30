@@ -4,7 +4,7 @@
 
 var/list/HOTBAR_DEFAULT_KEYS = list("1","2","3","4","5","6","7","8","9","0","-","=")
 
-var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image Strike", "Pose", "Normal Attack", "Power Up", "Power Down", "Reverse Dash", "Zanzoken", "Grab", "Target Switch", "Toggle Style", "Toss")
+var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image Strike", "Pose", "Normal Attack", "Power Up", "Power Down", "Reverse Dash", "Zanzoken", "Grab", "Target Switch", "Toggle Style", "Toss", "Meditate", "Power Control", "Target Clear", "Maim")
 
 #define KB_NORMAL 0
 #define KB_MOVE   1
@@ -399,11 +399,23 @@ client/proc/MiscVerbs()
 
 /obj/Skills/proc/DisableSkillVerb()
 	if(!SkillMenuVisible(src) && !IsSpell) return
+	var/chosen
+	var/want = NormalizeSkillName(name)
 	for(var/v in verbs)
 		if(!v || v:category != "Skills") continue
-		fire_ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
-		verbs -= v
-		break
+		var/id = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
+		if(fire_ident)
+			if(id == fire_ident)
+				chosen = v
+				break
+			continue
+		if(!chosen) chosen = v
+		if(NormalizeSkillName(id) == want)
+			chosen = v
+			break
+	if(!chosen) return
+	fire_ident = replacetext(replacetext("[chosen:name]", " ", "_"), "-", "_")
+	verbs -= chosen
 
 /mob/proc/DisableSlottableSkillVerbs()
 	for(var/obj/Skills/s in contents)

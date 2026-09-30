@@ -1117,6 +1117,7 @@ obj/Blast_Icons
 							B:IconLock=icon
 							B:LockX=0
 							B:LockY=0
+							B:fx_main_color = Blast_Color
 						else
 							var/icon/i=icon(icon, icon_state)
 							B:IconLock=i
