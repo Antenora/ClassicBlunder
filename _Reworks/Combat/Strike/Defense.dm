@@ -47,6 +47,7 @@ mob/proc/GuardStart()
 	if(IsGuardBroken()) return
 	if(splat_stagger_until > world.time) return
 	Guarding = 1
+	ShowGuardAura()
 	KenShockwave(src, icon = 'KenShockwaveFocus.dmi', Size = 0.3, Blend = 2, Time = 2)
 	FlashGuardPlate(1)
 
@@ -54,9 +55,11 @@ mob/proc/GuardStop(broken = 0)
 	if(!Guarding && !broken) return
 	Guarding = 0
 	FlashGuardPlate(broken ? 2 : 0)
+	HideGuardAura()
 	if(broken)
 		guard_broken_until = world.time + glob.GUARD_BREAK_DS
 		GuardMeter = 0
+		HideGuardAura()
 		flick("KB", src)
 		KenShockwave(src, Size = 1, Time = 4)
 		src.Earthquake(8, -4,4,-4,4, 0, 0)

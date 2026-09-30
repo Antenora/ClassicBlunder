@@ -69,6 +69,55 @@ proc/MechSkillFired(obj/Skills/S, was_using, was_charges)
 	if(S.MaxCharges > 0) return (S.Charges < was_charges) ? 1 : 0
 	return (!was_using && S.Using) ? 1 : 0
 
+/obj/Items/Mech/proc/MechPartTechniques(obj/Items/P)
+	var/list/out = list()
+	if(!P) return out
+	for(var/path in P.Techniques)
+		var/t = MechSkillPath(path)
+		if(t && !(t in out))
+			out += t
+
+	if(!P.IsIntrinsicPart() || !IntrinsicPartActive(P))
+		return out
+
+	RegisterMechIntrinsicParts()
+
+	var/list/record = intrinsic_installed[P.intrinsic_record_key]
+	if(!islist(record)) return out
+	var/datum/mech_intrinsic_part/D = MechIntrinsicParts[record["part_id"]]
+	if(!D) return out
+	var/list/state = record["state"]
+	if(!islist(state))
+		state = list()
+		record["state"] = state
+
+	var/mob/Owner
+	for(var/mob/M in world)
+		if(M.intrinsic_character_id == record["owner_id"])
+			Owner = M
+			break
+
+	if(Owner)
+		var/list/extra = D.ExtraSkillPaths(Owner, src, state)
+		var/list/cached = list()
+
+		if(islist(extra))
+			for(var/path in extra)
+				var/t = MechSkillPath(path)
+				if(t && !(t in cached))
+					cached += t
+		state["extra_skill_paths"] = cached
+
+	var/list/extra = state["extra_skill_paths"]
+	if(islist(extra))
+		for(var/path in extra)
+			var/t = MechSkillPath(path)
+			if(t && !(t in out))
+				out += t
+
+	return out
+
+
 /obj/Items/MechPart
 	name = "Mech Part"
 	desc = "A mech part. A Mech Bay fits it into a parked mech."
@@ -99,6 +148,7 @@ proc/MechSkillFired(obj/Skills/S, was_using, was_charges)
 	Beam_Saber
 		name = "Beam Saber"
 		desc = "An energy blade for a mech's arm. It turns the Normal Attack into fast swings (0.8x attack delay) that cut through a quarter of the target's armor. 3 heat per swing. One hand."
+		energy_heat_source = TRUE
 		heat_cost = 3
 		melee_mult = 1
 		melee_delay = 0.8
@@ -388,17 +438,16 @@ obj/Items/Gun/Handgun/Twin_Buster_Rifle
 /obj/Items/Mech/proc/MechPartSkillPaths()
 	. = list()
 	for(var/obj/Items/P in MechFittedParts())
-		for(var/p in P.Techniques)
-			var/t = MechSkillPath(p)
-			if(t && !(t in .)) . += t
+		for(var/path in MechPartTechniques(P))
+			if(!(path in .))
+				. += path
 
 /obj/Items/Mech/proc/MechPartsGranting(path)
 	. = list()
 	for(var/obj/Items/P in MechFittedParts())
-		for(var/p in P.Techniques)
-			if(MechSkillPath(p) == path)
-				. += P
-				break
+		var/list/techniques = MechPartTechniques(P)
+		if(path in techniques)
+			. += P
 
 /obj/Items/Mech/proc/MechShortcutDrop(obj/Skills/S)
 	if(!shortcuts || !S) return
@@ -520,19 +569,22 @@ mob/proc/MechSkillGo(obj/Skills/S, noGCD = FALSE)
 mob/proc/MechSkillHeat(obj/Skills/S, scale = 1)
 	if(!S) return
 	var/h = S.mech_heat * scale * S.mech_fire_heat * MechPartHeatMult(S)
-	if(h > 0) HeatAdd(h)
+	if(h > 0) HeatAdd(IntrinsicHeatCost(h, S))
+
 
 mob/proc/MechPartUse(obj/Skills/S, noGCD = FALSE, heat_scale = 1)
 	if(!S || !MechPartOnBoard(S)) return 0
 	if(S.mech_ranged && !MechRangedReady()) return 0
 	var/was_using = S.Using
 	var/was_charges = S.Charges
+	var/obj/Items/Mech/intrinsic_using_mech = mech
 	S.mech_heat_scale = heat_scale
 	S.mech_fire_heat = 1
 	. = S.MechFire(src, noGCD)
 	if(MechSkillFired(S, was_using, was_charges))
 		MechSkillHeat(S, heat_scale)
 		S.MechAfterFire(src)
+		if(intrinsic_using_mech && mech == intrinsic_using_mech && !S.HeldSkill) IntrinsicSkillUsed(S)
 	S.mech_heat_scale = 1
 
 mob/proc/MechHeldStart(obj/Skills/S)
@@ -546,10 +598,12 @@ mob/proc/MechHeldRelease(obj/Skills/S, benefit)
 	var/was_using = S.Using
 	var/was_charges = S.Charges
 	S.mech_fire_heat = 1
+	var/obj/Items/Mech/intrinsic_using_mech = mech
 	. = S.MechReleaseFire(src, benefit)
 	if(MechSkillFired(S, was_using, was_charges))
 		MechSkillHeat(S, S.mech_heat_scale)
 		S.MechAfterFire(src)
+		if(intrinsic_using_mech && mech == intrinsic_using_mech) IntrinsicSkillUsed(S)
 	S.mech_heat_scale = 1
 
 mob/proc/MechDash(d, tiles, ticks)
@@ -670,7 +724,8 @@ mob/Players/GunWhip()
 	. = ..()
 	if(!P || NextAttack == was || NextAttack <= world.time) return
 	var/h = MechPartVar(P, "heat_cost")
-	if(isnum(h) && h > 0) HeatAdd(h * MechPartHeatMult())
+	if(isnum(h) && h > 0) HeatAdd(IntrinsicHeatCost(h * MechPartHeatMult(), P))
+	if(mech) mech.IntrinsicEvent("weapon", src, P)
 
 mob/Players/MechSkillAllowed(obj/Skills/S)
 	if(mech && istype(S, /obj/Skills/Projectile/Gunfire)) return 1
@@ -791,7 +846,9 @@ mob/Players/MechDismount(wreck = 0, silent = 0)
 			set category = "Skills"
 			usr.MechHeldStart(src)
 		OnHeldStart(mob/p)
-			if(p) p.mech_shield_up = 1
+			if(p)
+				p.mech_shield_up = 1
+				p.IntrinsicSkillUsed(src)
 		OnHeldRelease(mob/p, benefit, sweet_spot_hit, charge_level)
 			if(!p) return
 			p.mech_shield_up = 0
@@ -1018,6 +1075,9 @@ mob/Players/MechDismount(wreck = 0, silent = 0)
 		Knockback = 2
 		Variation = 0
 
+
+
+
 /obj/Skills/Projectile/Beams/Mech
 	name = "Mech Beam"
 	mech_ranged = 1
@@ -1042,6 +1102,7 @@ mob/Players/MechDismount(wreck = 0, silent = 0)
 		if(MechSkillFired(src, was_using, was_charges))
 			p.MechSkillHeat(src, mech_heat_scale)
 			MechAfterFire(p)
+			p.IntrinsicSkillUsed(src)
 		mech_heat_scale = 1
 
 	MechBarrageFire(mob/p, scale)

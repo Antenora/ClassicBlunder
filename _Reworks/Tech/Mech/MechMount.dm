@@ -67,6 +67,8 @@ mob/var/tmp
 
 /obj/Items/Mech/proc/MechBoardRefusal(mob/M)
 	if(!M) return "Nobody is there to board."
+	var/intrinsic_refusal = IntrinsicPilotRefusal(M)
+	if(intrinsic_refusal) return intrinsic_refusal
 	if(!isturf(loc) || mounted) return "[src] is not parked."
 	if(get_dist(M, src) > 1) return "Get next to [src] first."
 	if(!MechIsPilot(M)) return "You are not a registered pilot of [src]."
@@ -84,7 +86,10 @@ mob/var/tmp
 	if(why)
 		if(M) M << why
 		return 0
-	if(fuel <= 0) M << "[src]'s tank is empty. It will limp until you refuel it."
+	if(!MechCoreOnline())
+		M << "[src]'s reactor is offline. It can only limp until a functioning core is installed."
+	else if(fuel <= 0)
+		M << "[src]'s tank is empty. It will limp until you refuel it."
 	M << "You start climbing into [src]."
 	if(!M.MechChannel(M.MechBoardDS(src), src, "boarding")) return 0
 	why = MechBoardRefusal(M)
@@ -104,6 +109,12 @@ mob/proc/MechBoardDS(obj/Items/Mech/R)
 
 mob/proc/MechBoardNow(obj/Items/Mech/R)
 	if(!R) return
+
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal)
+		src << intrinsic_refusal
+		return
+
 	if(mech_loadout) MechLoadoutClose()
 	MechBoardDrop()
 	if(Grab) Grab_Release()
@@ -155,10 +166,11 @@ mob/proc/MechMount(obj/Items/Mech/R, remount = 0)
 	MechGrantSkills(R)
 	MechPassivesOn(R)
 	MechShortcutsOn(R)
-	mech_limp = R.fuel <= 0
+	mech_limp = MechShouldLimp(R)
 	mech_limp_line_at = world.time + glob.MECH_LIMP_LINE_DS
 	mech_ramp = glob.MECH_RAMP_MIN
 	MechDeployedSet(src, R)
+	R.IntrinsicEvent("mount", src, remount)
 	MechFuelStart()
 	if(!remount)
 		src << "You take the controls of [R]. Hull [round(Health)] of [round(MaxHP())], fuel [round(R.fuel, 0.1)] minutes."
@@ -267,6 +279,7 @@ mob/proc/MechDismount(wreck = 0, silent = 0)
 	var/turf/T = get_turf(src)
 	mech_fuel_token++
 	R.Hull = wreck ? 0 : clamp(Health, 0, R.MechHullMax())
+	R.IntrinsicEvent("dismount", src, wreck)
 	MechShortcutsOff(R)
 	MechRevokeSkills(R)
 	MechPassivesOff()
@@ -330,6 +343,10 @@ mob/Players/MechEject()
 mob/Players/MechNoWounds()
 	return (mech || mech_eject_at == world.time) ? 1 : 0
 
+mob/proc/MechShouldLimp(obj/Items/Mech/R)
+	if(!R) return FALSE
+	return R.fuel <= 0 || !R.MechCoreOnline()
+
 mob/Players/Unconscious(mob/P, text)
 	if(mech)
 		if(Health <= 0)
@@ -347,6 +364,12 @@ mob/Players/MechLoginRemount()
 			break
 	if(R)
 		MechMount(R, 1)
+
+		var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+		if(intrinsic_refusal && mech == R)
+			src << intrinsic_refusal
+			MechDismount(silent = 1)
+
 		return
 	if(pilot_look || mech_passives_applied || pilot_shortcuts)
 		MechLostCleanup()
@@ -419,9 +442,11 @@ mob/proc/MechRefuelPress()
 		return
 	ConsumeMaterial(src, "FuelCell", 1)
 	R.fuel = min(MECH_FUEL_CAP, R.fuel + MECH_FUEL_PER_CELL)
-	if(mech_limp)
+	if(mech_limp && !MechShouldLimp(R))
 		mech_limp = 0
 		src << "[R] roars back to full power."
+	else if(!R.MechCoreOnline())
+		src << "[R] has fuel, but its reactor remains offline."
 	src << "You feed a Fuel Cell into [R]. Fuel: [round(R.fuel, 0.1)] of [MECH_FUEL_CAP] minutes."
 
 mob/proc/MechFuelStart()
@@ -438,15 +463,39 @@ mob/proc/MechFuelStart()
 		MechFuelTick(R, dt)
 
 mob/proc/MechFuelTick(obj/Items/Mech/R, dt)
-	if(R.fuel > 0)
-		R.fuel = max(0, R.fuel - dt / glob.MECH_FUEL_BURN_DS)
-	if(R.fuel <= 0 && !mech_limp)
+	if(!R || mech != R) return
+
+	var/intrinsic_refusal = R.IntrinsicPilotRefusal(src)
+	if(intrinsic_refusal)
+		src << intrinsic_refusal
+		MechDismount(silent = 1)
+		return
+
+	R.IntrinsicEvent("tick", src, dt)
+	var/core_online = R.MechCoreOnline()
+	if(R.fuel > 0 && core_online)
+		var/used = R.IntrinsicNumber("fuel", src, dt / glob.MECH_FUEL_BURN_DS)
+		R.fuel = max(0, R.fuel - used)
+	var/should_limp = MechShouldLimp(R)
+	if(should_limp && !mech_limp)
 		mech_limp = 1
 		mech_limp_line_at = world.time + glob.MECH_LIMP_LINE_DS
-		src << "[R] is out of fuel. It limps along until you refuel it."
+
+		if(!core_online)
+			src << "[R]'s reactor goes offline. It can only limp until a functioning core is installed."
+		else
+			src << "[R] is out of fuel. It limps along until you refuel it."
+	else if(!should_limp && mech_limp)
+		mech_limp = 0
+		src << "[R] returns to full operating power."
 	else if(mech_limp && world.time >= mech_limp_line_at)
 		mech_limp_line_at = world.time + glob.MECH_LIMP_LINE_DS
-		src << "[R] is still out of fuel and limping."
+
+		if(!core_online)
+			src << "[R]'s reactor remains offline and the mech is limping."
+		else
+			src << "[R] is still out of fuel and limping."
+
 	if(passive_handler.Get("MechHullMend") && world.time >= mech_mend_at)
 		mech_mend_at = world.time + glob.MECH_MEND_DS
 		if(!InCombat() && Health < MaxHP())

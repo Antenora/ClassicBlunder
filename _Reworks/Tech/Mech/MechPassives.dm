@@ -236,6 +236,8 @@ mob/Players/MechStatMult(stat)
 	if(stat == "Str" || stat == "For")
 		var/rage = passive_handler.Get("MechLowHullRage")
 		if(rage && HealthPct() < glob.MECH_LOW_HULL_PCT) . *= 1 + rage / 100
+	if(stat in list("Str", "End", "Spd", "For", "Off", "Def"))
+		. += GetWillStatMult()
 
 /obj/Items/Mech/MechStatMods(list/S)
 	..()

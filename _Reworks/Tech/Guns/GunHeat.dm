@@ -34,7 +34,8 @@ mob/HeatMax()
 
 mob/proc/HeatMaxOf(obj/Items/S)
 	if(istype(S, /obj/Items/Mech))
-		return GUN_HEAT_MAX * max(MechHeatMaxMult(), 0.1)
+		var/obj/Items/Mech/R = S
+		return max(1, R.IntrinsicNumber("capacity", src, GUN_HEAT_MAX * max(MechHeatMaxMult(), 0.1)))
 	return GUN_HEAT_MAX
 
 mob/Overheated()
@@ -46,7 +47,9 @@ mob/HeatDissipation()
 
 mob/proc/HeatDissipationOf(obj/Items/S)
 	if(istype(S, /obj/Items/Mech))
-		return max(0, (MECH_HEAT_DISSIPATION + MechDissipationFlat()) * MechDissipationMult())
+		var/obj/Items/Mech/R = S
+		var/amount = max(0, (MECH_HEAT_DISSIPATION + MechDissipationFlat()) * MechDissipationMult())
+		return R.IntrinsicNumber("cooling", src, amount)
 	if(S)
 		return GUN_HEAT_DISSIPATION
 	return 0

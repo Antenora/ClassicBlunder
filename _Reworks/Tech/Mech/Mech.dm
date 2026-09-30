@@ -159,7 +159,7 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 		return MECH_MODELS[model]
 
 	proc/MechLevel()
-		var/lv = core_tier - 1 + (CraftQuality == QUAL_LEGENDARY ? 1 : 0)
+		var/lv = MechCoreTier() - 1 + (CraftQuality == QUAL_LEGENDARY ? 1 : 0)
 		return clamp(lv, MECH_LEVEL_MIN, MECH_LEVEL_MAX)
 
 	proc/MechHullTrait(h)
@@ -183,6 +183,7 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 		S["Def"] *= t[2]
 		S["Spd"] *= t[3]
 		MechStatMods(S)
+		IntrinsicEvent("stats", null, S)
 		return S
 
 	proc/MechStatMods(list/S)
@@ -213,16 +214,14 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 			. += "Int[i]"
 
 	proc/MechPartIn(slot)
-		if(!parts || !slot) return null
-		var/obj/Items/P = parts[slot]
-		if(!P || P.loc != src) return null
-		return P
+		var/obj/Items/P = MechRawPartIn(slot)
+		return (P && IntrinsicPartActive(P)) ? P : null
 
 	proc/MechPartsOfKind(kind)
 		. = list()
 		for(var/s in parts)
-			var/obj/Items/P = parts[s]
-			if(!P || P.loc != src || (P in .)) continue
+			var/obj/Items/P = MechPartIn(s)
+			if(!P || (P in .)) continue
 			if(ispath(kind))
 				if(istype(P, kind)) . += P
 			else if(P.mech_slot == kind)
@@ -247,6 +246,11 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 	proc/MechFit(obj/Items/I, slot, mob/M)
 		if(MechPartFits(I, slot)) return 0
 		var/list/need = MechPartSlotsFor(I, slot)
+		var/special = I.IsIntrinsicPart()
+		for(var/s in need)
+			var/obj/Items/old = MechRawPartIn(s)
+			if(old && old.IsIntrinsicPart()) special = TRUE
+		if(special) return IntrinsicFit(I, slot, M)
 		for(var/s in need)
 			var/obj/Items/old = MechPartIn(s)
 			if(old) MechUnfit(old, M)
@@ -259,6 +263,7 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 
 	proc/MechUnfit(obj/Items/P, mob/M)
 		if(!P) return 0
+		if(P.IsIntrinsicPart()) return IntrinsicUnfit(P, M)
 		if(parts)
 			for(var/s in parts.Copy())
 				if(parts[s] == P) parts -= s
@@ -321,7 +326,7 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 		. += "Hull: [round(Hull)] of [round(MechHullMax())]."
 		. += "Fuel: [round(fuel, 0.1)] of [MECH_FUEL_CAP] minutes."
 		var/mc = MechPlatingClass()
-		. += "Plating: [mc ? mc : "unknown"]. Frame kit: [frame_kit ? frame_kit : "none"]. Coating: [MechCoatingName(coating)]. Reactor: tier [core_tier] core."
+		. += "Plating: [mc ? mc : "unknown"]. Frame kit: [frame_kit ? frame_kit : "none"]. Coating: [MechCoatingName(coating)]. Reactor: tier [MechCoreTier()] core."
 		var/list/S = MechStats()
 		var/list/sl = list()
 		for(var/k in MECH_STAT_KEYS)
@@ -337,9 +342,10 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 		if(M && MechIsPilot(M)) . += "Pilots: [jointext(pilots, ", ")]."
 
 	proc/MechShowStatus(mob/M)
-		if(!M) return
-		for(var/line in MechStatusLines(M))
-			M << line
+		//if(!M) return
+		//for(var/line in MechStatusLines(M))
+		//	M << line
+		ShowMechInfo(M)
 
 	proc/MechActions(mob/M)
 		. = list()
@@ -586,3 +592,212 @@ client/DeviceDropTarget(atom/over, obj/Items/I)
 			EmplacementIntent()
 			sleep(MECH_GUARD_TICK)
 		mech_watching = 0
+
+
+
+mob/Admin3/verb/Give_Mech_Assembly_Parts()
+	set name = "Give Mech Assembly Parts"
+	set category = "Debug"
+	RegisterLifeCrafts()
+	RegisterLifeMatFamilies()
+	var/list/choices = list()
+	for(var/datum/craft_recipe/lifecraft/tech/wearable/mech/R in LifeCraftRecipes("Technology"))
+		choices["[R.label] ([R.id])"] = R
+	if(!choices.len)
+		src << "No mech recipes were found."
+		return
+	var/pick = Ask(src, "Give materials for which mech?", "Mech Assembly Parts", null, "pick", choices, 1)
+	if(!pick) return
+	var/datum/craft_recipe/lifecraft/tech/wearable/mech/R = choices[pick]
+	if(!R || !R.slots) return
+	var/list/materials = list()
+	for(var/datum/craft_slotreq/S in R.slots)
+		var/chosen
+		var/chosen_tier
+		for(var/mc in LifeMatRegistry)
+			if(!S.Accepts(mc)) continue
+			var/tier = LifeMatTier(mc)
+			if(!chosen || tier < chosen_tier)
+				chosen = mc
+				chosen_tier = tier
+		if(!chosen)
+			src << "Could not find a material for [S.name]. Nothing was granted."
+			return
+		materials += list(list(chosen, S.amount))
+	for(var/list/entry in materials)
+		MatLogAdd(entry[1], QUAL_NORMAL, entry[2])
+		src << "Added [entry[2]]x [LifeMatName(entry[1])] to your Collection Log."
+	var/obj/Items/MechKit/Speed/K = new
+	GiveOrDrop(K)
+	if(client)
+		client.BuildInvPage()
+	src << "You now have the materials and a Speed Frame Kit needed to assemble [R.label]."
+
+
+obj/Items/Mech/proc/MechDetailedInfo(mob/Viewer)
+	var/list/L = list()
+	RegisterMechIntrinsicParts()
+
+	var/list/row = MechRow()
+	var/mob/Pilot
+	if(mounted && ismob(loc))
+		var/mob/M = loc
+		if(M.mech == src)
+			Pilot = M
+
+	L += "<b>—— [name] ——</b>"
+	if(desc) L += "[desc]"
+	L += "Model: [row ? row["name"] : model]"
+	L += "Class: [row ? row["class"] : "Unknown"]"
+	L += "Level: [MechLevel()] | Quality: [QualityName(CraftQuality)]"
+	L += "Status: [disabled ? "Disabled" : (Pilot ? "Piloted" : "Parked")]"
+
+	var/current_hull = Pilot ? Pilot.Health : Hull
+	var/maximum_hull = Pilot ? Pilot.MaxHP() : MechHullMax()
+	L += "Hull: [round(current_hull, 0.1)] / [round(maximum_hull, 0.1)]"
+	L += "Fuel: [round(fuel, 0.1)] / [MECH_FUEL_CAP] minutes"
+
+	var/plating = MechPlatingClass()
+	L += "Plating: [plating ? LifeMatName(plating) : "None"]"
+	L += "Coating: [MechCoatingName(coating)]"
+	L += "Frame kit: [frame_kit ? frame_kit : "None"]"
+
+	// Core and intrinsic reactor.
+	L += "<b>—— Core ——</b>"
+	L += "Effective core tier: [MechCoreTier()]"
+
+	var/list/reactor = islist(intrinsic_installed) ? intrinsic_installed["Reactor"] : null
+	if(islist(reactor))
+		var/datum/mech_intrinsic_part/D = MechIntrinsicParts[reactor["part_id"]]
+		L += "Intrinsic reactor: [D ? D.name : reactor["part_id"]]"
+		if(D && D.description)
+			L += "[D.description]"
+		L += "Assignment: [IntrinsicValid(reactor) ? "Valid" : "Inactive / invalid"]"
+		L += "Installation: [reactor["replaces_core"] ? "Replaces ordinary core" : "Legacy reactor augment"]"
+		if(D)
+			L += "Base positive Will bonus multiplier: x[D.will_bonus_mult]"
+	else
+		L += "Ordinary core"
+
+	// Base stats exclude the pilot's Will and compatible buff modifiers.
+	L += "<b>—— Base Mech Stats ——</b>"
+	var/list/stats = MechStats()
+	var/list/stat_lines = list()
+	for(var/stat in MECH_STAT_KEYS)
+		stat_lines += "[uppertext(stat)]: [round(stats[stat], 0.01)]"
+	L += jointext(stat_lines, " | ")
+
+	// Actual current stats while someone is piloting.
+	if(Pilot)
+		L += "<b>—— Current Pilot Stats ——</b>"
+		L += "Pilot: [Pilot.name]"
+		L += "Will: [round(Pilot.Will, 0.1)]"
+		L += "Will stat bonus: [round(Pilot.GetWillStatMult(), 0.001)]"
+		L += "STR: [round(Pilot.GetStr(), 0.01)] | END: [round(Pilot.GetEnd(), 0.01)] | SPD: [round(Pilot.GetSpd(), 0.01)]"
+		L += "FOR: [round(Pilot.GetFor(), 0.01)] | OFF: [round(Pilot.GetOff(), 0.01)] | DEF: [round(Pilot.GetDef(), 0.01)]"
+		L += "Heat: [round(Pilot.HeatNow(), 0.1)] / [round(Pilot.HeatMax(), 0.1)]"
+		L += "Cooling: [round(Pilot.HeatDissipation(), 0.1)] per second"
+
+	// Model-defined passives.
+	L += "<b>—— Model Passives ——</b>"
+	var/list/passives = row ? row["passive"] : null
+	if(islist(passives) && passives.len)
+		for(var/i = 1 to passives.len step 2)
+			if(i + 1 <= passives.len)
+				L += "[passives[i]]: [passives[i + 1]]"
+	else
+		L += "None"
+
+	// Include occupied slots even if the current frame no longer exposes them.
+	L += "<b>—— Installed Parts ——</b>"
+	var/list/slots = MechOpenSlots()
+	for(var/slot in parts)
+		if(!(slot in slots))
+			slots += slot
+
+	var/list/shown = list()
+	for(var/slot in slots)
+		var/slot_name = MECH_SLOT_NAMES[slot]
+		if(!slot_name) slot_name = slot
+
+		var/obj/Items/P = MechRawPartIn(slot)
+		if(!P)
+			L += "[slot_name]: Empty"
+			continue
+
+		// Describe paired/two-handed parts once, with all occupied slots.
+		if(P in shown) continue
+		shown += P
+
+		var/list/occupied = list()
+		for(var/other_slot in slots)
+			if(MechRawPartIn(other_slot) != P) continue
+			var/other_name = MECH_SLOT_NAMES[other_slot]
+			occupied += other_name ? other_name : other_slot
+
+		L += "<b>[jointext(occupied, " + ")]: [P.name]</b>"
+		if(P.desc) L += "[P.desc]"
+
+		if(P.IsIntrinsicPart())
+			L += "Intrinsic part: [IntrinsicPartActive(P) ? "Active" : "Inactive / invalid assignment"]"
+
+			var/datum/mech_intrinsic_part/D = MechIntrinsicParts[P.intrinsic_part_id]
+			if(D && D.description)
+				L += "[D.description]"
+		else
+			L += "Quality: [QualityName(P.CraftQuality)]"
+
+		var/part_tier = MechPartVar(P, "part_tier")
+		if(isnum(part_tier))
+			L += "Part tier: [part_tier]"
+
+		var/heat = MechPartVar(P, "heat_cost")
+		if(isnum(heat) && heat > 0)
+			L += "Listed base heat cost: [heat]"
+
+		if(MechPartVar(P, "grants_flight"))
+			L += "Enables flight"
+
+		if(!P.IsIntrinsicPart() || IntrinsicPartActive(P))
+			var/list/techniques = MechPartTechniques(P)
+			for(var/path in techniques)
+				var/obj/Skills/S = path
+				L += "Skill: [initial(S.name)]"
+				var/skill_desc = initial(S.Desc)
+				if(skill_desc)
+					L += "[skill_desc]"
+
+	// Chips are stored as type -> quality.
+	L += "<b>—— Chips ([length(socket_chips)] / [MechSockets()]) ——</b>"
+	if(length(socket_chips))
+		for(var/path in socket_chips)
+			L += "[QualityName(socket_chips[path])] [TechItemName(path)]"
+			if(ispath(path, /obj/Items))
+				var/obj/Items/C = path
+				var/chip_desc = initial(C.desc)
+				if(chip_desc)
+					L += "[chip_desc]"
+	else
+		L += "None"
+
+	if(Viewer && MechIsPilot(Viewer))
+		L += "<b>—— Registration ——</b>"
+		L += "Builder: [builder]"
+		L += "Registered pilots: [jointext(pilots, ", ")]"
+
+	return L
+
+obj/Items/Mech/proc/ShowMechInfo(mob/Viewer)
+	if(!Viewer) return
+	for(var/line in MechDetailedInfo(Viewer))
+		Viewer << line
+
+mob/verb/Mech_Information()
+	set name = "Mech Information"
+	set category = "Character Custom"
+
+	if(!mech)
+		src << "You are not piloting a mech. Use a parked mech's Status action."
+		return
+
+	mech.ShowMechInfo(src)

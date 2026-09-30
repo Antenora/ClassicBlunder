@@ -113,13 +113,30 @@ mob/proc/MechKitTake(kind)
 		if(!istype(R)) return R
 		R.model = model_key
 		R.metal_id = MechRecipeMetal(src, picks)
-		R.core_tier = MechRecipeCoreTier(src, picks)
+		//allows for intrinsic core like Spiral Drive
+		var/list/core_pick = MechRecipePick(src, picks, "Core")
+		var/intrinsic_id = core_pick ? MechCraftIntrinsicID(core_pick[1]) : null
+		if(intrinsic_id)
+			if(!M.MechCraftAttachCore(R, intrinsic_id))
+				del R
+				return null
+		else
+			R.core_tier = MechRecipeCoreTier(src, picks)
+
 		R.coating = null
 		R.frame_kit = kit
 		R.builder = M.ckey
 		R.pilots = list(M.ckey)
 		R.fuel = MECH_FUEL_START
 		R.disabled = 0
+		if(intrinsic_id)
+			var/datum/mech_intrinsic_part/P = MechIntrinsicParts[intrinsic_id]
+			var/list/I = R.intrinsic_installed["Reactor"]
+
+			try
+				P.OnInstall(M, R, I["state"])
+			catch(var/exception/E)
+				world.log << "Assembly intrinsic [intrinsic_id] OnInstall failed: [E]"
 		R.Hull = R.MechHullMax()
 		MechDeployedSet(M, R)
 		R.MechPlaced(1)

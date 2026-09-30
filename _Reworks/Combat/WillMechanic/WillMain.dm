@@ -132,12 +132,29 @@ mob/proc/AdjustWill(val)
 	val = round(val, 0.1)
 
 	Will = clamp(Will+val, min, cap)
-
-	client.updateWillMeter()
+	if(mech)
+		MechApplyStats()
+	if(client)
+		client.updateWillMeter()
 
 mob/proc/GetWillStatMult()
 	if(!WillPowered()) return 0
-	return (Will - 100) * (1.3 / 80) // +0.8 at 150, +1.3 at 180, +1.95 at 220
+
+	var/bonus = (Will - 100) * (1.3 / 80)
+	if(mech && bonus > 0)
+		bonus *= 0.5 // half Will bonus while in a mech.
+		RegisterMechIntrinsicParts()
+		var/list/I = islist(mech.intrinsic_installed) ? mech.intrinsic_installed["Reactor"] : null
+		if(islist(I) && mech.IntrinsicValid(I))
+			var/datum/mech_intrinsic_part/P = MechIntrinsicParts[I["part_id"]]
+			if(P && P.slot_family == "Reactor")
+				var/reactor_mult = P.will_bonus_mult
+				if(P.id == "spiral_drive" && Secret == "Spiral" && secretDatum)
+					var/spiral_tier = clamp(secretDatum.currentTier, 0, 5)
+					reactor_mult += spiral_tier * 0.10
+				bonus *= reactor_mult
+
+	return bonus
 
 mob/GainLoop()
 	set waitfor = 0
@@ -247,3 +264,24 @@ mob/Admin3/verb/Grant_Random_Spirit_Command()
 		src << "Granted [target] a random tier [tier] Spirit Command."
 	else
 		src << "[target] already knows every tier [tier] Spirit Command."
+
+
+
+mob/Admin3/verb/Debug_Mech_Will()
+	set category = "Debug"
+
+	src << "Will: [Will]"
+	src << "WillPowered: [WillPowered()]"
+	src << "Will stat bonus: [GetWillStatMult()]"
+	src << "Piloting: [mech ? mech.name : "none"]"
+	src << "Strength replacement: [StrReplace]"
+	src << "Final Strength: [GetStr()]"
+
+	if(mech)
+		var/list/S = mech.MechStats()
+		src << "Mech base Strength: [S["Str"]]"
+
+		var/list/I = islist(mech.intrinsic_installed) ? mech.intrinsic_installed["Reactor"] : null
+		if(islist(I))
+			src << "Reactor: [I["part_id"]]"
+			src << "Valid assignment: [mech.IntrinsicValid(I)]"

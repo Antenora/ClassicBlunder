@@ -73,6 +73,7 @@ mob/proc/RefreshSpiritCommandStates()
 obj/Skills/Buffs/SpiritCommands
 	parent_type = /obj/Skills/Buffs/SlotlessBuffs
 	Copyable = 0
+	MechCompatible = 1
 	var/tmp/SpiritActivating = FALSE
 
 	Trigger(mob/User, Override = 0)
@@ -221,7 +222,7 @@ obj/Skills/Buffs/SpiritCommands/Instant/Spirit
 			User << "Your Will is already at its maximum."
 			return FALSE
 
-		User.Will = min(User.Will + 10, cap)
+		User.AdjustWill(10)
 		return TRUE
 
 	verb/Spirit()
@@ -243,7 +244,7 @@ obj/Skills/Buffs/SpiritCommands/Instant/Drive
 			User << "Your Will is already at its maximum."
 			return FALSE
 
-		User.Will = min(User.Will + 30, cap)
+		User.AdjustWill(30)
 		return TRUE
 
 	verb/Drive()

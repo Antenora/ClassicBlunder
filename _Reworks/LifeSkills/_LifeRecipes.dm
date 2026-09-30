@@ -173,6 +173,15 @@ proc/LifeMatTier(matclass)
 				. += list(list(mc, q, n))
 		. = LifeSortMatOptions(.)
 
+		if(istype(src, /datum/craft_recipe/lifecraft/tech/wearable/mech) && S.name == "Core")
+			RegisterMechIntrinsicParts()
+
+			for(var/part_id in M.MechIntrinsicUnlocks)
+				var/value = "intrinsic_core:[part_id]"
+				if(MechCraftIntrinsicError(M, src, i, value)) continue
+
+				. += list(list(value, QUAL_NORMAL, S.amount))
+
 	proc/AutoPicks(mob/M)
 		. = list()
 		if(!slots) return
@@ -209,6 +218,10 @@ proc/LifeMatTier(matclass)
 						q = QualityClamp(p[2])
 				if(!mc)
 					. += "pick [S.name]"
+					continue
+				if(MechCraftIntrinsicID(mc))
+					var/error = MechCraftIntrinsicError(M, src, i, mc)
+					if(error) . += error
 					continue
 				if(!S.Accepts(mc))
 					. += "[LifeMatName(mc)] does not fit [S.name]"
@@ -397,10 +410,15 @@ proc/LifeTakePick(mob/M, list/picks, i, n)
 	if(!M || !picks || i < 1 || i > picks.len || n <= 0) return 0
 	var/list/p = picks[i]
 	if(!islist(p) || p.len < 2) return 0
+	if(MechCraftIntrinsicID(p[1])) return 0
 	return LifeConsumeExact(M, p[1], QualityClamp(p[2]), n)
 
 mob/proc/DoLifeCraft(datum/craft_recipe/lifecraft/R, obj/LifeSkills/Station/S, list/picks)
 	if(!client || KO || Dead || !R)
+		if(client) client.LifeCraftDone(S, R)
+		return 0
+	if(mech_core_build)
+		src << "Your previous intrinsic-core assembly is still being finalized."
 		if(client) client.LifeCraftDone(S, R)
 		return 0
 	if(Using)
@@ -504,6 +522,13 @@ mob/proc/DoLifeCraft(datum/craft_recipe/lifecraft/R, obj/LifeSkills/Station/S, l
 			if(!p || p.len < 2)
 				short = 1
 				break
+			if(MechCraftIntrinsicID(p[1]))
+				var/error = MechCraftIntrinsicError(src, R, i, p[1])
+				if(error)
+					src << error
+					short = 1
+					break
+				continue
 			var/key = "[p[1]]|[QualityClamp(p[2])]"
 			var/had = claim[key] ? claim[key] : 0
 			if(MatLogCountQ(p[1], QualityClamp(p[2])) - had < sr.amount)
@@ -518,28 +543,53 @@ mob/proc/DoLifeCraft(datum/craft_recipe/lifecraft/R, obj/LifeSkills/Station/S, l
 		src << "You no longer have the [Commas(cost)] for supplies."
 		if(client) client.LifeCraftDone(S, R)
 		return 0
-	var/qsum = 0
-	var/tsum = 0
-	var/amt = 0
-	if(R.slots)
-		for(var/i = 1 to R.slots.len)
-			var/datum/craft_slotreq/sr = R.slots[i]
-			var/list/p = picks[i]
-			if(!islist(p) || p.len < 2) continue
-			var/pq = QualityClamp(p[2])
-			LifeConsumeExact(src, p[1], pq, sr.amount)
-			qsum += pq * sr.amount
-			tsum += LifeMatTier(p[1]) * sr.amount
-			amt += sr.amount
-	if(cost) TakeMoney(cost)
-	var/avgq = amt ? (qsum / amt) : QUAL_NORMAL
-	var/avgtier = amt ? (tsum / amt) : R.tier
-	var/extra = clamp(round((avgtier - R.tier) * LIFE_CRAFT_TIER_P), 0, LIFE_CRAFT_TIER_P_CAP)
-	life_craft_current = R
-	var/q = LifeRollCraftQuality(src, R.skill, avgq, perf, tqb, extra)
-	life_craft_current = null
-	var/obj/Items/made = R.MakeResult(src, q, perf, picks)
-	var/mname = made ? made.name : R.label
+
+	// Reserve before consuming materials. Normal recipes need no reservation.
+	if(!MechCraftReserveCore(R, picks))
+		if(client) client.LifeCraftDone(S, R)
+		return 0
+	var/obj/Items/made
+	try
+		var/qsum = 0
+		var/tsum = 0
+		var/amt = 0
+		if(R.slots)
+			for(var/i = 1 to R.slots.len)
+				var/datum/craft_slotreq/sr = R.slots[i]
+				var/list/p = picks[i]
+				if(!islist(p) || p.len < 2) continue
+				var/part_id = MechCraftIntrinsicID(p[1])
+				if(part_id)
+					var/datum/mech_intrinsic_part/P = MechIntrinsicParts[part_id]
+					// Intrinsics contribute Normal quality and their core tier.
+					// No material is consumed for this slot.
+					qsum += QUAL_NORMAL * sr.amount
+					tsum += P.CraftCoreTier() * sr.amount
+					amt += sr.amount
+					continue
+				var/pq = QualityClamp(p[2])
+				LifeConsumeExact(src, p[1], pq, sr.amount)
+				qsum += pq * sr.amount
+				tsum += LifeMatTier(p[1]) * sr.amount
+				amt += sr.amount
+		if(cost) TakeMoney(cost)
+		var/avgq = amt ? (qsum / amt) : QUAL_NORMAL
+		var/avgtier = amt ? (tsum / amt) : R.tier
+		var/extra = clamp(round((avgtier - R.tier) * LIFE_CRAFT_TIER_P), 0, LIFE_CRAFT_TIER_P_CAP)
+		life_craft_current = R
+		var/q = LifeRollCraftQuality(src, R.skill, avgq, perf, tqb, extra)
+		life_craft_current = null
+		made = R.MakeResult(src, q, perf, picks)
+
+	catch(var/exception/E)
+		life_craft_current = null
+		world.log << "Crafting [R.id] failed: [E]"
+	MechCraftFinishCore(made)
+	if(!made)
+		src << "The craft could not produce an item. Any materials already consumed were spent."
+		if(client) client.LifeCraftDone(S, R)
+		return 0
+	var/mname = made.name
 	src << "<font color=#78eb78>You make [R.result_count > 1 ? "[R.result_count]x " : ""][mname]!</font>"
 	LifeLogFind(R.skill, R.label)
 	AddLifeXP(R.skill, LifeCraftXP(R.skill, R.tier), clamp(perf, LIFE_PERF_MIN, LIFE_PERF_MAX))
