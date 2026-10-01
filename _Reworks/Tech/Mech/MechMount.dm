@@ -528,13 +528,20 @@ proc/MechXPWorthy(mob/M)
 
 mob/proc/PilotXPGain(n)
 	if(!isnum(n) || n <= 0) return
+	if(mech)
+		n = mech.IntrinsicNumber("pilot_xp", src, n)
 	PilotXP += n
 	PilotProwessRefresh()
 
-mob/proc/PilotProwessRefresh()
+mob/proc/PilotProwessRefresh(add = 0) // adding 1 adds an entire extra level as opposed to 1 xp, it's for shit like KoB adding one level per saga upgrade without overwriting xp gain from the mech progression
+	if(isnum(add) && add)
+		PilotingProwessHistory = max(0, PilotingProwessHistory + add)
 	var/lv = 1
 	for(var/t in glob.MECH_PROWESS_XP)
-		if(PilotXP >= t) lv++
-	if(lv > PilotingProwess)
-		PilotingProwess = lv
+		if(PilotXP >= t)
+			lv++
+	var/old_level = PilotingProwess
+	PilotingProwess = lv + PilotingProwessHistory
+	passive_handler.Set("PilotingProwess", PilotingProwess)
+	if(PilotingProwess > old_level)
 		src << "<b>Your piloting sharpens. Piloting Prowess is now [PilotingProwess].</b>"

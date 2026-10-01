@@ -48,10 +48,13 @@ datum/mech_intrinsic_part
 		return
 	proc/ExtraSkillPaths(mob/Owner, obj/Items/Mech/R, list/state)
 		return list()
+	proc/ModifyPilotXPGain(mob/User, obj/Items/Mech/R, amount, list/state)
+		return amount
 
 
 var/global/list/MechIntrinsicParts = list()
 var/global/MechIntrinsicPartsRegistered = FALSE
+mob/var/LearningComputerPilotXPGained = 0
 
 proc/RegisterMechIntrinsicParts()
 	if(MechIntrinsicPartsRegistered) return
@@ -172,6 +175,7 @@ obj/Items/Mech/proc/IntrinsicNumber(kind, mob/User, amount, obj/source = null)
 				if("capacity") result = P.ModifyHeatCapacity(User, src, amount, I["state"])
 				if("cooling") result = P.ModifyCooling(User, src, amount, I["state"])
 				if("fuel") result = P.ModifyFuelUse(User, src, amount, I["state"])
+				if("pilot_xp") result = P.ModifyPilotXPGain(User, src, amount, I["state"])
 		catch(var/exception/E)
 			world.log << "Intrinsic [P.id] [kind] failed: [E]"
 		if(isnum(result)) amount = max(0, result)

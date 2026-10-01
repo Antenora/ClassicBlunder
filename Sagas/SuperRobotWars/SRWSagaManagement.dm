@@ -3,7 +3,7 @@ mob/proc/gainSRW()
 	src << "You are now an <b>Ace Pilot</b>."
 	src.Saga = "Super Robot Wars"
 	src.SagaLevel = 1
-
+	src.PilotProwessRefresh(1)
 	src.passive_handler.Increase("PilotingProwess", 1)
 	src.CyberizeMod+=0.2
 	src << "This Saga is evolved via the Saga Skill Tree. Find it in your Character Customization page."
@@ -13,7 +13,6 @@ mob/proc/gainSRW()
 /mob/tierUpSaga(path)
 	..()
 	if(path != "Super Robot Wars") return
-
 	switch(SagaLevel)
 		if(2)
 			src << "saga level 2"
