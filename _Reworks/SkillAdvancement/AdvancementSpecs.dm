@@ -73,6 +73,7 @@ advanceSpecs
             var/effGain = (amt * glob.ADVANCE_MASTERY_WEIGHTS[type]);
             mastery["[type]"] += effGain;
             addMasteryTotals(type, effGain);
+            onMasteryGain();//does nothing by default, but may be rewritten for particular skills
 
         addMasteryTotals(type, amt)
             if(type in global.SPECIAL_MASTERY_TYPES) return
@@ -105,10 +106,10 @@ advanceSpecs
             return 0;
 
         hasEnoughSpecialMastery()
-            if(specialMasteryNeeded.len <= 0) return 1;
+            if(masterySpecialNeeded.len <= 0) return 1;
             for(var/sMastery in global.SPECIAL_MASTERY_TYPES)
                 var/has = mastery[sMastery];
-                var/needs = specialMasteryNeeded[sMastery];
+                var/needs = masterySpecialNeeded[sMastery];
                 if(needs)
                     if(has < needs) return 0;
             return 1;
@@ -118,13 +119,15 @@ advanceSpecs
             if(!hasEnoughMastery()) return 0;
 
             return 1;
+        
+        onMasteryGain()//does nothing by default but can be overwritten
 
 mob
     var/tmp/list/advanceDataFromSkills = list();//skill name is key, advanceData from that skill is index
     proc
         KnowYourMaker(advanceSpecs/advData, obj/Skills/s)
-            advData.owner = src;
-            advData.skillOrigin = s;
+            if(!advData.owner) advData.owner = src;
+            if(!advData.skillOrigin) advData.skillOrigin = s;
             advanceDataFromSkills["[parsePathText(s)]"] = advData;
 
         CheckSkillAdvancement()
