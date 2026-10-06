@@ -763,6 +763,11 @@ mob
 				if(src.isRace(DEMON)||src.oozaru_type=="Demonic"&&src.transActive)
 					defender<<"Your soul has been irrevocably corrupted, a peaceful afterlife eternally torn from you."
 					defender.Damned=1
+				if(src.Saga == "Path of a Hero: Rebirth" && (RebirthHeroType == "Cyan" || RebirthHeroType == "Purple" || RebirthHeroType == "Prismatic"))
+					OMsg(src, "<b>* [src] won!</b>")
+					OMsg(src, "* Got [defender.GetMoney()]$.")
+					OMsg(src, "* [src] becomes stronger.")
+					src.VitMod += 0.25
 				defender.Death(src, null)
 			if(defender.passive_handler.Get("The Inkstone")&&defender.passive_handler.Get("AbsoluteDespair"))
 				if(prob(2)&& defender.BioArmor)

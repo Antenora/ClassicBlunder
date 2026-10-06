@@ -14,6 +14,7 @@ datum/mech_intrinsic_part/LearningComputer
 	description = "Internal Slot. Increases Piloting XP gained by 20%, until it has provided 700 bonus XP."
 	slot_family = "Internal"
 	part_type = /obj/Items/MechPart/Internal/IntrinsicLearningComputer
+	pilot_requires_unlock = FALSE
 
 	var/xp_gain_mult = 1.2
 	var/xp_cap_index = 3
