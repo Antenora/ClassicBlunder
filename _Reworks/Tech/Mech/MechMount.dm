@@ -75,6 +75,7 @@ mob/var/tmp
 	if(!M.MechLicensed()) return "You need Piloting Foundations to pilot [src]."
 	if(disabled) return "[src] is a wreck. A Mech Bay has to repair it first."
 	if(M.mech) return "You are already piloting [M.mech]."
+	if(dimensional_deploying) return "[src] is still materializing."
 	if(M.KO || M.Dead) return "You can't climb in like this."
 	if(M.InCombat()) return "You can't climb into a mech in the middle of a fight."
 	var/obj/Items/Mech/out = MechDeployedFor(M.ckey)
@@ -279,6 +280,8 @@ mob/proc/MechDismount(wreck = 0, silent = 0)
 	var/turf/T = get_turf(src)
 	mech_fuel_token++
 	R.Hull = wreck ? 0 : clamp(Health, 0, R.MechHullMax())
+	if(active_mech_transformation_id)
+		RevertMechTransformation(R)
 	R.IntrinsicEvent("dismount", src, wreck)
 	MechShortcutsOff(R)
 	MechRevokeSkills(R)
@@ -525,13 +528,20 @@ proc/MechXPWorthy(mob/M)
 
 mob/proc/PilotXPGain(n)
 	if(!isnum(n) || n <= 0) return
+	if(mech)
+		n = mech.IntrinsicNumber("pilot_xp", src, n)
 	PilotXP += n
 	PilotProwessRefresh()
 
-mob/proc/PilotProwessRefresh()
+mob/proc/PilotProwessRefresh(add = 0) // adding 1 adds an entire extra level as opposed to 1 xp, it's for shit like KoB adding one level per saga upgrade without overwriting xp gain from the mech progression
+	if(isnum(add) && add)
+		PilotingProwessHistory = max(0, PilotingProwessHistory + add)
 	var/lv = 1
 	for(var/t in glob.MECH_PROWESS_XP)
-		if(PilotXP >= t) lv++
-	if(lv > PilotingProwess)
-		PilotingProwess = lv
+		if(PilotXP >= t)
+			lv++
+	var/old_level = PilotingProwess
+	PilotingProwess = lv + PilotingProwessHistory
+	passive_handler.Set("PilotingProwess", PilotingProwess)
+	if(PilotingProwess > old_level)
 		src << "<b>Your piloting sharpens. Piloting Prowess is now [PilotingProwess].</b>"

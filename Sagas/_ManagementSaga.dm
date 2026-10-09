@@ -278,7 +278,7 @@ mob/Admin3/verb
 						P.AddSkill(new/obj/Skills/Projectile/King_of_Braves/Broken_Magnum)
 					P.CyberizeMod+=0.2
 					P.passive_handler.Increase("PilotingProwess", 1)
-					P.PilotingProwess+=1
+					P.PilotProwessRefresh(1)
 					P.SagaLevel=1
 					P.GrantWillMechanic()
 
@@ -1413,7 +1413,6 @@ mob
 				if("King of Braves")
 					src << "You've obtained more skill with Machines!"
 					passive_handler.Increase("PilotingProwess", 1)
-					src.PilotingProwess+=1
 					src.CyberizeMod+=0.2
 					if(src.SagaLevel==2)
 						src.PilotingProwess+=1
@@ -1422,7 +1421,7 @@ mob
 						src << "You can form an energy drill out of your body, capable of delivering deciding strikes!"
 						GrantRandomSpiritCommand(1)
 					if(src.SagaLevel==3)
-						src.PilotingProwess+=1
+						PilotProwessRefresh(1)
 						if(!locate(/obj/Skills/AutoHit/Plasma_Hold, src))
 							src.AddSkill(new/obj/Skills/AutoHit/Plasma_Hold)
 						if(!locate(/obj/Skills/AutoHit/Hell_And_Heaven, src))
@@ -1430,7 +1429,7 @@ mob
 							src.AddSkill(new/obj/Skills/AutoHit/Hell_And_Heaven)
 						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==4)
-						src.PilotingProwess+=2
+						PilotProwessRefresh(2)
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Dividing_Driver, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Dividing_Driver)
 						if(!locate(/obj/Skills/AutoHit/Giga_Drill_Breaker, src))
@@ -1441,7 +1440,7 @@ mob
 						GrantRandomSpiritCommand(1)
 						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==5)
-						src.PilotingProwess+=2
+						PilotProwessRefresh(2)
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Protect_Wall, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Protect_Wall)
 						if(!locate(/obj/Skills/Projectile/King_of_Braves/Broken_Phantom, src))
@@ -1449,11 +1448,11 @@ mob
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.TooMuchHealth=75
 						passive_handler.Increase("SpaceWalk", 1)
-						passive_handler.Increase("PilotingProwess", 1) //2 Piloting Prowess at T5 instead of 1
+						passive_handler.Increase("PilotingProwess", 2) //2 Piloting Prowess at T5 instead of 1
 						src << "You upgrade your abilities to carry you into the Space Era!"
 						GrantRandomSpiritCommand(3)
 					if(src.SagaLevel==6)
-						src.PilotingProwess+=3
+						PilotProwessRefresh(3)
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.TooMuchHealth=99
 							gb.GodKi=0.5

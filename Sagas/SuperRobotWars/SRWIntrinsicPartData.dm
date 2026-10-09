@@ -7,6 +7,7 @@ datum/mech_intrinsic_part
 	var/part_type
 	var/core_tier = 1 // replaces Core, so need a core tier
 	var/will_bonus_mult = 1
+	var/pilot_requires_unlock = TRUE
 
 	proc/IsConfigured()
 		if(!id || !slot_family) return FALSE
@@ -48,10 +49,13 @@ datum/mech_intrinsic_part
 		return
 	proc/ExtraSkillPaths(mob/Owner, obj/Items/Mech/R, list/state)
 		return list()
+	proc/ModifyPilotXPGain(mob/User, obj/Items/Mech/R, amount, list/state)
+		return amount
 
 
 var/global/list/MechIntrinsicParts = list()
 var/global/MechIntrinsicPartsRegistered = FALSE
+mob/var/LearningComputerPilotXPGained = 0
 
 proc/RegisterMechIntrinsicParts()
 	if(MechIntrinsicPartsRegistered) return
@@ -172,6 +176,7 @@ obj/Items/Mech/proc/IntrinsicNumber(kind, mob/User, amount, obj/source = null)
 				if("capacity") result = P.ModifyHeatCapacity(User, src, amount, I["state"])
 				if("cooling") result = P.ModifyCooling(User, src, amount, I["state"])
 				if("fuel") result = P.ModifyFuelUse(User, src, amount, I["state"])
+				if("pilot_xp") result = P.ModifyPilotXPGain(User, src, amount, I["state"])
 		catch(var/exception/E)
 			world.log << "Intrinsic [P.id] [kind] failed: [E]"
 		if(isnum(result)) amount = max(0, result)
@@ -692,30 +697,29 @@ obj/Items/Mech/proc/IntrinsicPilotRefusal(mob/M) // can't board mechs you don't 
 
 	RegisterMechIntrinsicParts()
 	var/list/required = list()
-
 	if(islist(intrinsic_installed))
 		for(var/key in intrinsic_installed)
 			var/list/I = intrinsic_installed[key]
 			if(!islist(I)) continue
-
 			var/part_id = I["part_id"]
+			var/datum/mech_intrinsic_part/D = MechIntrinsicParts[part_id]
+			if(D && !D.pilot_requires_unlock) // ... unless a part allows it explicitly, like Learning Computer
+				continue
 			if(part_id && !(part_id in required))
 				required += part_id
-
 	for(var/slot in parts)
 		var/obj/Items/P = MechRawPartIn(slot)
 		if(!P || !P.IsIntrinsicPart()) continue
-
 		var/part_id = P.intrinsic_part_id
 		if(!part_id) part_id = P.intrinsic_template_id
-
+		var/datum/mech_intrinsic_part/D = MechIntrinsicParts[part_id]
+		if(D && !D.pilot_requires_unlock)
+			continue
 		if(part_id && !(part_id in required))
 			required += part_id
-
 	var/list/missing = list()
 	for(var/part_id in required)
 		if(M.HasIntrinsicPart(part_id)) continue
-
 		var/datum/mech_intrinsic_part/D = MechIntrinsicParts[part_id]
 		missing += D ? D.name : part_id
 

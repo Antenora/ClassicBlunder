@@ -434,6 +434,64 @@ datum/saga_skill_tree_node/IntrinsicPart
 		return TRUE
 
 
+// MECH TRANS
+datum/saga_skill_tree_node/MechTransformation
+	var/transformation_id
+	IsConfigured()
+		RegisterMechTransformations()
+		return transformation_id && MechTransformationDefs[transformation_id] ? TRUE : FALSE
+	RankLimit()
+		return 1
+	GetRank(mob/M)
+		var/list/history = GetHistory(M)
+		return history && history.len ? 1 : 0
+	MissingRequirements(mob/M)
+		var/list/missing = ..()
+		if(M && !GetRank(M) && M.HasMechTransformation(transformation_id))
+			missing += "You already have this mech transformation unlocked."
+
+		return missing
+	GrantRank(mob/M, list/record)
+		if(!M || !islist(record) || !IsConfigured())
+			return FALSE
+		if(GetRank(M) || M.HasMechTransformation(transformation_id))
+			return FALSE
+		if(!islist(M.MechTransformationsUnlocked))
+			M.MechTransformationsUnlocked = list()
+		M.MechTransformationsUnlocked[transformation_id] = list(
+			"tree_id" = tree_id,
+			"node_id" = id
+		)
+		record["transformation_id"] = transformation_id
+		return TRUE
+	RefundBlock(mob/M)
+		var/reason = ..()
+		if(reason)
+			return reason
+		if(!M)
+			return "No character was found."
+		if(M.active_mech_transformation_id == transformation_id)
+			return "Revert the mech transformation before refunding it."
+
+		return ""
+	RemoveRank(mob/M, list/record)
+		if(!M || !islist(record))
+			return FALSE
+		var/transformation = record["transformation_id"]
+		if(!transformation)
+			return FALSE
+		if(M.active_mech_transformation_id == transformation)
+			return FALSE
+		if(M.HasMechTransformation(transformation))
+			var/list/unlock = M.MechTransformationsUnlocked[transformation]
+			if(islist(unlock))
+				if(unlock["tree_id"] != tree_id || unlock["node_id"] != id)
+					return FALSE
+
+			M.MechTransformationsUnlocked -= transformation
+		return TRUE
+
+
 /********************/
 
 

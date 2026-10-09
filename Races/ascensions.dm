@@ -113,7 +113,8 @@ ascension
 
 			owner.RPPMult -= rppAdd
 			owner.EconomyMult -= ecoAdd
-			owner.PilotingProwess -= pilotingProwess
+
+			owner.PilotProwessRefresh(-pilotingProwess)
 			owner.EnhanceChipsMax -= enhanceChips
 			owner.AscensionsAcquired-=1
 
@@ -166,7 +167,7 @@ ascension
 
 			owner.RPPMult += rppAdd
 			owner.EconomyMult += ecoAdd
-			owner.PilotingProwess += pilotingProwess
+			owner.PilotProwessRefresh(pilotingProwess)
 			owner.EnhanceChipsMax += enhanceChips
 			owner.GrowthRate += growthadd
 

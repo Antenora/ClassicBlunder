@@ -30,3 +30,36 @@ datum/saga_skill_tree_node/Passive/SuperRobotWars
 
 		tree_x = 672
 		tree_y = 500
+
+datum/saga_skill_tree_node/SuperRobotWars
+
+	DimensionalHangar
+		id = "dimensional_hangar"
+		title = "Deus Ex Manifest"
+		description = "Summon and Recall your mech from extradimensional space."
+
+		skill_paths = list(
+			/obj/Skills/Mech/Deus_Ex_Manifest
+		)
+
+		cost = 50
+		required_saga_level = 3
+
+		tree_x = 672 - 64
+		tree_y = 500 - 32
+
+datum/saga_skill_tree_node/MechTransformation/SuperRobotWars
+	tree_id = "super_robot_wars"
+
+	SuperMode
+		id = "super_mode"
+		title = "Super Mode"
+		description = "Allows the user to activate Super Mode."
+
+		transformation_id = "super_mode"
+
+		cost = 100
+		required_saga_level = 3
+
+		tree_x = 672
+		tree_y = 350

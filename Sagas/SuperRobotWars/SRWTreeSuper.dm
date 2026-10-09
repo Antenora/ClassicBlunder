@@ -13,7 +13,6 @@ datum/saga_skill_tree_node/SuperRobotWars
 
 
 datum/saga_skill_tree_node/Passive/SuperRobotWars
-
 	ColorOfCourage
 		id = "color_of_courage"
 		title = "Color of Courage"
@@ -29,7 +28,6 @@ datum/saga_skill_tree_node/Passive/SuperRobotWars
 		required_saga_level = 7
 		tree_x = 800
 		tree_y = 300
-
 		/*VisibilityCondition(mob/M)
 			if(!..()) return FALSE
 			return M.WillUnlocked && M.SagaLevel >= 6*/
@@ -38,14 +36,11 @@ datum/saga_skill_tree_node/Passive/SuperRobotWars
 		id= "rocketpunch_mastery"
 		title= "Rocket Punch Mastery"
 		description= "Grant extra Rocket Punch skills with the instrisic Rocket Punch part."
-
 		cost = 50
 		max_rank = 2
-
 		passive_name = "RocketPunchMastery"
 		passive_amount = 1
 		requires = list("photonic_fist")
-
 		tree_x = 1122+128
 		tree_y = 700
 
@@ -71,6 +66,14 @@ datum/saga_skill_tree_node/IntrinsicPart/SuperRobotWars
 		required_saga_level = 1
 		tree_x = 972
 		tree_y = 600
+
+	GetterRaysCore
+		id = "GetterRaysCore"
+		title = "Getter Rays Core"
+		description = "The will of Evolution found its' way to you. This core increases the bonus you get from Will and grant higher Heat capacity, but Heat gain increases the higher your will is."
+		cost = 50
+		required_saga_level = 1
+
 
 	RocketPunch
 		id = "photonic_rocket_punch"

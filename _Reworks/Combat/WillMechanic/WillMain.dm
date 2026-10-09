@@ -152,6 +152,9 @@ mob/proc/GetWillStatMult()
 				if(P.id == "spiral_drive" && Secret == "Spiral" && secretDatum)
 					var/spiral_tier = clamp(secretDatum.currentTier, 0, 5)
 					reactor_mult += spiral_tier * 0.10
+				if(P.id == "getter_rays_core" && SagaLevel)
+					var/sl = clamp(SagaLevel, 0, 7)
+					reactor_mult += sl * 0.08
 				bonus *= reactor_mult
 
 	return bonus

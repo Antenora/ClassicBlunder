@@ -327,6 +327,7 @@ mob/var
 	EnhanceChipsMax=4
 	PilotingProwess=0
 	PilotXP=0
+	PilotingProwessHistory=0
 	pilot_health_stash
 	shortcut/pilot_shortcuts
 	list/pilot_look

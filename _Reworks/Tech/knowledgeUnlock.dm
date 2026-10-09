@@ -108,7 +108,7 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 				src.AddSkill(new/obj/Skills/Utility/Espionage_Scan)
 				src << "You can right click a nearby person to scan them for espionage equipment!"
 		if("Piloting Foundations")
-			PilotingProwess++
+			PilotProwessRefresh(1)
 			if(PilotingProwess>7)
 				PilotingProwess=7
 
@@ -178,6 +178,6 @@ var/knowledgePaths/tech/list/TechnologyTree = list()
 				for(var/obj/Skills/Utility/Espionage_Scan/sc in src)
 					del sc
 		if("Piloting Foundations")
-			PilotingProwess--
+			PilotProwessRefresh(-1)
 			if(PilotingProwess < 0)
 				PilotingProwess=0
