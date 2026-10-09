@@ -86,6 +86,7 @@ proc/SurfaceAutoClassify(atom/A)
 	if(!A) return "floor"
 	var/p = lowertext("[A.type]")
 	if(ismob(A)) return "actor"
+	if(istype(A, /obj/Skills)) return "floor"
 	if(findtext(p, "torch") || findtext(p, "lamp") || findtext(p, "lantern") || findtext(p, "candle") \
 	   || findtext(p, "brazier") || findtext(p, "campfire") || findtext(p, "firewood") || findtext(p, "/fire"))
 		return "light_source"

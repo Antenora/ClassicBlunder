@@ -134,7 +134,6 @@ client
 		ah_pan_oy = 0
 		ah_pan_dragged = 0
 		list/ah_chrome
-		list/ah_page
 		list/ah_modebtns
 		list/ah_confirm_objs
 		ah_confirm_kind = ""
@@ -147,43 +146,56 @@ client
 		ah_pend_n = 0
 		ah_pend_ask = 0
 		list/ah_desc_objs
+		atom/movable/shud/panelholder/ah_holder
+		atom/movable/shud/panelholder/ah_pagebox
+		atom/movable/shud/panelholder/ah_typebox
+		atom/movable/shud/panelholder/ah_confirmbox
+		atom/movable/shud/panelholder/ah_descbox
 
-client/proc/AHloc(dx, dyTop, h = 0)
-	var/py = AH_H - dyTop - h
-	var/ax = dx + ah_pan_x
-	var/ay = py + ah_pan_y
-	var/axp = ((ax % 32) + 32) % 32
-	var/ayp = ((ay % 32) + 32) % 32
-	return "[ah_atx + (ax - axp) / 32]:[axp],[ah_aty + (ay - ayp) / 32]:[ayp]"
+client/proc/AHput(atom/movable/o, dx, dyTop, h = 0, atom/movable/H = null)
+	o.pixel_x = dx
+	o.pixel_y = AH_H - dyTop - h
+	if(H) H.vis_contents += o
 
-client/proc/AhAdd(atom/movable/o, chrome = 0)
+client/proc/AhHolderSync()
+	PanelMoveTo(ah_holder, (ah_atx - 1) * 32 + ah_pan_x, (ah_aty - 1) * 32 + ah_pan_y)
+
+client/proc/AhObj(path, chrome = 0)
 	if(chrome)
+		var/atom/movable/o = new path
 		if(!ah_chrome) ah_chrome = list()
 		ah_chrome += o
-	else
-		if(!ah_page) ah_page = list()
-		ah_page += o
-	screen += o
+		ah_holder.vis_contents += o
+		return o
+	return PanelNew(ah_pagebox, path)
+
+client/proc/AhSubBox()
+	var/atom/movable/shud/panelholder/H = PanelHolderNew(AH_LAYER)
+	ah_holder.vis_contents += H
+	return H
+
+client/proc/AhSubRelease(atom/movable/shud/panelholder/H)
+	if(!H) return
+	if(ah_holder) ah_holder.vis_contents -= H
+	PanelRelease(H)
 
 client/proc/AhText(dx, dyTop, w, h, txt, chrome = 0, lay = 0.6)
-	var/atom/movable/shud/ahtext/T = new
+	var/atom/movable/shud/ahtext/T = AhObj(/atom/movable/shud/ahtext, chrome)
 	T.layer = AH_LAYER + lay
 	T.maptext_width = w
 	T.maptext_height = h
-	T.screen_loc = AHloc(dx, dyTop, h)
+	AHput(T, dx, dyTop, h)
 	T.maptext = txt
-	AhAdd(T, chrome)
 	return T
 
 client/proc/AhBtn(label, action, arg, dx, dyTop, w, h = 18, tcol = "#8be9ff")
-	var/atom/movable/shud/ahbtn/b = new
+	var/atom/movable/shud/ahbtn/b = AhObj(/atom/movable/shud/ahbtn)
 	var/ic = LogBtnIcon(w, h)
 	if(!ic && w == 100 && h == 24) ic = 'HUD/np_btn.png'
 	b.icon = ic ? ic : AqCoverIcon(w, h)
 	b.action = action
 	b.arg = arg
-	b.screen_loc = AHloc(dx, dyTop, h)
-	AhAdd(b, 0)
+	AHput(b, dx, dyTop, h)
 	AhText(dx, dyTop + round((h - 8) / 2) - 5, w, 14, "<center><span style=\"[AH_FONT_BODY]; color:[tcol]\">[label]</span></center>", 0, 0.62)
 	return b
 
@@ -227,11 +239,14 @@ client/proc/OpenAhMenu(obj/AuctionHouse/hall)
 	ah_pan_x = clamp(ah_pan_x, b[1], b[2])
 	ah_pan_y = clamp(ah_pan_y, b[3], b[4])
 
+	ah_holder = PanelHolderNew(AH_LAYER)
+	AhHolderSync()
+	ah_pagebox = PanelHolderNew(AH_LAYER)
 	BuildAhChrome()
+	ah_holder.vis_contents += ah_pagebox
 	RefreshAhPage()
-	var/list/all = ah_chrome.Copy()
-	if(ah_page) all += ah_page
-	KineticEntrance(all)
+	screen += ah_holder
+	PanelFade(ah_holder)
 
 client/proc/CloseAhMenu()
 	if(!ahmenu_open && !ah_chrome) return
@@ -241,8 +256,11 @@ client/proc/CloseAhMenu()
 	AhHideOverlay()
 	AhHideTypeOverlay()
 	AhInspectClose()
-	ClearList(ah_page); ah_page = null
-	ClearList(ah_chrome); ah_chrome = null
+	PanelRelease(ah_pagebox)
+	PanelRelease(ah_holder)
+	ah_pagebox = null
+	ah_holder = null
+	ah_chrome = null
 	ah_modebtns = null
 
 client/proc/ResetAhHUD()
@@ -262,44 +280,39 @@ client/proc/BuildAhChrome()
 	ah_chrome = list()
 	ah_modebtns = list()
 	AhBG('HUD/tech_panel.png', 0, 0, AH_H, 0, 1)
-	var/atom/movable/shud/ahpic/tp = new
+	var/atom/movable/shud/ahpic/tp = AhObj(/atom/movable/shud/ahpic, 1)
 	tp.icon = 'HUD/tech_titleplate.png'
 	tp.layer = AH_LAYER + 0.3
-	tp.screen_loc = AHloc(212, 6, 32)
-	AhAdd(tp, 1)
+	AHput(tp, 212, 6, 32)
 	AhText(212, 12, 200, 16, "<center><span style=\"[AH_FONT]; color:#ffffff\">AUCTION HOUSE</span></center>", 1)
-	var/atom/movable/shud/ahwidget/X = new
+	var/atom/movable/shud/ahwidget/X = AhObj(/atom/movable/shud/ahwidget, 1)
 	X.widget_kind = "cross"
 	X.icon = 'HUD/ui_cross_1.png'
 	X.action = "close"
-	X.screen_loc = AHloc(590, 12, 24)
-	AhAdd(X, 1)
+	AHput(X, 590, 12, 24)
 	// mode tabs
 	var/tx = 18
 	for(var/m in list("browse", "sell", "mine", "bids"))
-		var/atom/movable/shud/ahbtn/b = new
+		var/atom/movable/shud/ahbtn/b = AhObj(/atom/movable/shud/ahbtn, 1)
 		b.icon = 'HUD/log_tab.png'
 		b.action = "mode"
 		b.arg = m
-		b.screen_loc = AHloc(tx, 44, 32)
-		AhAdd(b, 1)
+		AHput(b, tx, 44, 32)
 		ah_modebtns[m] = b
-		var/atom/movable/shud/ahtext/L = new
+		var/atom/movable/shud/ahtext/L = AhObj(/atom/movable/shud/ahtext, 1)
 		L.layer = AH_LAYER + 0.62
 		L.maptext_width = 58
 		L.maptext_height = 16
-		L.screen_loc = AHloc(tx, 50, 16)
-		AhAdd(L, 1)
+		AHput(L, tx, 50, 16)
 		b.lbl = L
 		tx += 60
 	RefreshAhTabs()
 
 client/proc/AhBG(icon_file, dx, dyTop, h, lay = 0.15, chrome = 0)
-	var/atom/movable/shud/ahbg/o = new
+	var/atom/movable/shud/ahbg/o = AhObj(/atom/movable/shud/ahbg, chrome)
 	o.icon = icon_file
 	o.layer = AH_LAYER + lay
-	o.screen_loc = AHloc(dx, dyTop, h)
-	AhAdd(o, chrome)
+	AHput(o, dx, dyTop, h)
 	return o
 
 /proc/AhModeName(m)
@@ -322,7 +335,12 @@ client/proc/RefreshAhTabs()
 // page refresh
 
 client/proc/RefreshAhPage()
-	ClearList(ah_page); ah_page = list()
+	if(!ah_pagebox) return
+	PanelBegin(ah_pagebox)
+	AhPageBuild()
+	PanelEnd(ah_pagebox)
+
+client/proc/AhPageBuild()
 	if(!ahmenu_open || !mob) return
 	AuctionHouseLoad()
 	AhText(18, 14, 200, 16, "<span style=\"[AH_FONT]; color:[AH_C_GOLD]\">GOLD $[Commas(AhMoneyOf(mob))]</span>", 0)
@@ -338,36 +356,34 @@ client/proc/RefreshAhPage()
 #define AH_RTY(y) ((y) + 2)   // band-row text baseline
 
 client/proc/AhRowPlate(y)
-	var/atom/movable/shud/ahpic/p = new
+	var/atom/movable/shud/ahpic/p = AhObj(/atom/movable/shud/ahpic)
 	p.icon = 'HUD/ah_band.png'
 	p.layer = AH_LAYER + 0.32
 	p.mouse_opacity = 0
-	p.screen_loc = AHloc(20, y + 2, 18)
-	AhAdd(p, 0)
+	AHput(p, 20, y + 2, 18)
 	return p
 
 client/proc/AhRowObj(y, rkind, rid = 0, obj/Items/ritem = null, rmc = "", rq = 0)
-	var/atom/movable/shud/ahrow/r = new
+	var/atom/movable/shud/ahrow/r = AhObj(/atom/movable/shud/ahrow)
 	r.icon = 'HUD/ah_band.png'
 	r.rkind = rkind
 	r.rid = rid
 	r.ritem = ritem
 	r.rmc = rmc
 	r.rq = rq
-	r.screen_loc = AHloc(20, y + 2, 18)
+	r.issel = 0
+	AHput(r, 20, y + 2, 18)
 	if(rkind == "listing" && rid && rid == ah_sel)
 		r.issel = 1
 		r.filters = filter(type="drop_shadow", x=0, y=0, size=2, color="#ffd86b")
-	AhAdd(r, 0)
 	return r
 
 client/proc/AhRowIcon(y, f, state, tint = null)
-	var/atom/movable/shud/ahpic/ic = new
+	var/atom/movable/shud/ahpic/ic = AhObj(/atom/movable/shud/ahpic)
 	ic.icon = StIcon16(f, state)
 	if(tint) ic.color = tint
 	ic.layer = AH_LAYER + 0.45
-	ic.screen_loc = AHloc(28, y + 3, 16)
-	AhAdd(ic, 0)
+	AHput(ic, 28, y + 3, 16)
 	return ic
 
 // BROWSE
@@ -396,11 +412,11 @@ client/proc/AhChipLabel(kind)
 
 client/proc/AhBuildBrowse()
 	// search bar
-	var/atom/movable/shud/ahbtn/sb = new
+	var/atom/movable/shud/ahbtn/sb = AhObj(/atom/movable/shud/ahbtn)
 	sb.icon = 'HUD/log_row_btn.png'
 	sb.action = "search"
-	sb.screen_loc = AHloc(306, 51, 18)
-	AhAdd(sb, 0)
+	sb.arg = null
+	AHput(sb, 306, 51, 18)
 	AhText(316, 53, 264, 14, "<span style=\"[AH_FONT_BODY]; color:[ah_f_search ? "#ffffff" : AH_C_HINT]\">[ah_f_search ? "SEARCH: [html_encode(AhTrunc(uppertext(ah_f_search), 24))]" : "SEARCH THE BLOCK..."]</span>", 0)   // encode last or truncation splits entities
 	// filter chips
 	var/cx = 18
@@ -969,11 +985,12 @@ client/proc/AhSellFlowLot(mc, q)
 client/proc/AhShowTypeOverlay(label, pkey, ask, units = 0)
 	AhHideTypeOverlay()
 	ah_type_objs = list()
+	ah_typebox = AhSubBox()
 	var/atom/movable/shud/ahpic/P = new
 	P.icon = 'HUD/farm_panel.png'
 	P.layer = AH_LAYER + 1.0
 	P.mouse_opacity = 2
-	P.screen_loc = AHloc(182, 72, 200)
+	AHput(P, 182, 72, 200, ah_typebox)
 	ah_type_objs += P
 	var/med = AhMedianPrice(pkey)
 	var/vol = AhSaleCount(pkey)
@@ -989,15 +1006,13 @@ client/proc/AhShowTypeOverlay(label, pkey, ask, units = 0)
 	AhOvBtn("AUCTION 24H", "type_a24", 192, 200, AH_C_GOLD)
 	AhOvBtn("AUCTION 48H", "type_a48", 332, 200, AH_C_GOLD)
 	AhOvBtn("CANCEL", "type_cancel", 262, 228, AH_C_BAD)
-	for(var/atom/movable/o in ah_type_objs)
-		screen += o
 
 client/proc/AhOvText(dx, dyTop, w, h, txt)
 	var/atom/movable/shud/ahtext/T = new
 	T.layer = AH_LAYER + 1.15
 	T.maptext_width = w
 	T.maptext_height = h
-	T.screen_loc = AHloc(dx, dyTop, h)
+	AHput(T, dx, dyTop, h, ah_typebox)
 	T.maptext = txt
 	ah_type_objs += T
 	return T
@@ -1006,22 +1021,20 @@ client/proc/AhOvBtn(label, act, dx, dyTop, tcol)
 	var/atom/movable/shud/ahconfirm/B = new
 	B.icon = 'HUD/np_btn.png'
 	B.act = act
-	B.screen_loc = AHloc(dx, dyTop, 24)
+	AHput(B, dx, dyTop, 24, ah_typebox)
 	ah_type_objs += B
 	var/atom/movable/shud/ahtext/L = new
 	L.layer = AH_LAYER + 1.2
 	L.maptext_width = 100
 	L.maptext_height = 16
-	L.screen_loc = AHloc(dx, dyTop + 4, 16)
+	AHput(L, dx, dyTop + 4, 16, ah_typebox)
 	L.maptext = "<center><span style=\"[AH_FONT]; color:[tcol]\">[label]</span></center>"
 	ah_type_objs += L
 	return B
 
 client/proc/AhHideTypeOverlay()
-	if(ah_type_objs)
-		for(var/atom/movable/o in ah_type_objs)
-			screen -= o
-			del o
+	AhSubRelease(ah_typebox)
+	ah_typebox = null
 	ah_type_objs = null
 
 client/proc/AhShowConfirm(kind, list/a, title, body)
@@ -1029,53 +1042,50 @@ client/proc/AhShowConfirm(kind, list/a, title, body)
 	ah_confirm_kind = kind
 	ah_confirm_a = a
 	ah_confirm_objs = list()
+	ah_confirmbox = AhSubBox()
 	var/atom/movable/shud/ahpic/P = new
 	P.icon = 'HUD/party_prompt.png'
 	P.layer = AH_LAYER + 1.0
 	P.mouse_opacity = 2
-	P.screen_loc = AHloc(200, 100, 140)
+	AHput(P, 200, 100, 140, ah_confirmbox)
 	ah_confirm_objs += P
 	var/atom/movable/shud/ahtext/T = new
 	T.layer = AH_LAYER + 1.15
 	T.maptext_width = 200
 	T.maptext_height = 48
-	T.screen_loc = AHloc(212, 112, 48)
+	AHput(T, 212, 112, 48, ah_confirmbox)
 	T.maptext = "<center><span style=\"[AH_FONT_BODY]; color:#ffffff\"><b>[title]</b><br>[body]</span></center>"
 	ah_confirm_objs += T
 	var/atom/movable/shud/ahconfirm/Y = new
 	Y.icon = 'HUD/np_btn.png'
 	Y.act = "yes"
-	Y.screen_loc = AHloc(208, 184, 24)
+	AHput(Y, 208, 184, 24, ah_confirmbox)
 	ah_confirm_objs += Y
 	var/atom/movable/shud/ahtext/YL = new
 	YL.layer = AH_LAYER + 1.2
 	YL.maptext_width = 100
 	YL.maptext_height = 16
-	YL.screen_loc = AHloc(208, 188, 16)
+	AHput(YL, 208, 188, 16, ah_confirmbox)
 	YL.maptext = "<center><span style=\"[AH_FONT]; color:[AH_C_OK]\">YES</span></center>"
 	ah_confirm_objs += YL
 	var/atom/movable/shud/ahconfirm/N = new
 	N.icon = 'HUD/np_btn.png'
 	N.act = "no"
-	N.screen_loc = AHloc(316, 184, 24)
+	AHput(N, 316, 184, 24, ah_confirmbox)
 	ah_confirm_objs += N
 	var/atom/movable/shud/ahtext/NL = new
 	NL.layer = AH_LAYER + 1.2
 	NL.maptext_width = 100
 	NL.maptext_height = 16
-	NL.screen_loc = AHloc(316, 188, 16)
+	AHput(NL, 316, 188, 16, ah_confirmbox)
 	NL.maptext = "<center><span style=\"[AH_FONT]; color:[AH_C_BAD]\">NO</span></center>"
 	ah_confirm_objs += NL
-	for(var/atom/movable/o in ah_confirm_objs)
-		screen += o
 
 client/proc/AhHideOverlay()
 	ah_confirm_kind = ""
 	ah_confirm_a = null
-	if(ah_confirm_objs)
-		for(var/atom/movable/o in ah_confirm_objs)
-			screen -= o
-			del o
+	AhSubRelease(ah_confirmbox)
+	ah_confirmbox = null
 	ah_confirm_objs = null
 
 // yes/no and the type_* picks both land here
@@ -1145,17 +1155,15 @@ client/proc/AhSearchFlow()
 // gear inspection popup
 
 client/proc/AhInspectClose()
-	if(ah_desc_objs)
-		for(var/atom/movable/o in ah_desc_objs)
-			screen -= o
-			del o
+	AhSubRelease(ah_descbox)
+	ah_descbox = null
 	ah_desc_objs = null
 
 client/proc/AhDescLine(txt, dx, dyTop, w)
 	var/atom/movable/shud/ahdesctext/T = new
 	T.maptext_width = w
 	T.maptext_height = 16
-	T.screen_loc = AHloc(dx, dyTop, 16)
+	AHput(T, dx, dyTop, 16, ah_descbox)
 	T.maptext = txt
 	ah_desc_objs += T
 
@@ -1163,9 +1171,10 @@ client/proc/AhInspect(obj/Items/it)
 	AhInspectClose()
 	if(!it || !ahmenu_open) return
 	ah_desc_objs = list()
+	ah_descbox = AhSubBox()
 	var/atom/movable/shud/ahdesc/P = new
 	P.icon = 'HUD/geardetail.png'
-	P.screen_loc = AHloc(120, -12, 368)
+	AHput(P, 120, -12, 368, ah_descbox)
 	ah_desc_objs += P
 	var/cat = GearCat(it)
 	var/ly = 6   // offsets are panel-relative, the panel top sits at dyTop -12
@@ -1216,9 +1225,7 @@ client/proc/AhInspect(obj/Items/it)
 			ly += 16
 			pn++
 	AhDescLine(gspan("click anywhere on the panel to close", "#7a9bb5", "center"), 134, 304, 356)
-	for(var/atom/movable/o in ah_desc_objs)
-		screen += o
-	KineticEntrance(ah_desc_objs)
+	PanelFade(ah_descbox)
 
 // wheel + drag
 
@@ -1241,24 +1248,6 @@ client/proc/AHPanBounds()
 	var/maxy = vh * 32 - AH_H - by; if(maxy < 0) maxy = 0
 	return list(minx, maxx, miny, maxy)
 
-client/proc/AhShiftLive(dpx, dpy)
-	if(!dpx && !dpy) return
-	if(ah_chrome)
-		for(var/atom/movable/o in ah_chrome)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-	if(ah_page)
-		for(var/atom/movable/o in ah_page)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-	if(ah_confirm_objs)
-		for(var/atom/movable/o in ah_confirm_objs)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-	if(ah_type_objs)
-		for(var/atom/movable/o in ah_type_objs)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-	if(ah_desc_objs)
-		for(var/atom/movable/o in ah_desc_objs)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-
 client/proc/AhPanelStart(params)
 	ah_pan_dragged = 0
 	var/list/m = MouseAbs(params)
@@ -1278,7 +1267,7 @@ client/proc/AhPanelMove(params)
 	if(!dx && !dy) return
 	ah_pan_x = wantx; ah_pan_y = wanty
 	ah_pan_dragged = 1
-	AhShiftLive(dx, dy)
+	AhHolderSync()
 
 client/proc/AhPanelEnd()
 	if(!ah_pan_dragged) return

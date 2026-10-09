@@ -748,6 +748,8 @@ obj/Skills/Grapple
 						S.blockEff = src.BlockEffectiveness
 						S.critBonus = src.CritChanceBonus
 						var/dealt = S.resolve()
+						if(!Trg)
+							break
 						if(dealt > 0)
 							if(src.WoundRider)
 								User.DealWounds(Trg, dealt * src.WoundRider)
@@ -763,6 +765,12 @@ obj/Skills/Grapple
 						Trg.GainFatigue(Damage*src.EnergyDamage)
 						User.HealMana(Damage*src.EnergyDamage)
 					Hits--
+				if(!Trg)
+					User.GrabMove=0
+					src.Cooldown()
+					if(removeAfter)
+						User.DeleteSkill(src)
+					return
 				if(src.MortalBlow)
 					if(src.MortalBlow<0)
 						Trg.MortallyWounded+=4

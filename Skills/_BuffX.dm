@@ -4915,7 +4915,7 @@ NEW VARIABLES
 						GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 						GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(255, 0, 0, 44), size = 3)
 						animate(GO, alpha=0, transform=matrix(), color=rgb(255, 0, 128, 134))
-						world << GO
+						GfxSendImage(GO, null, 4)
 						animate(GO, alpha=210, time=1)
 						sleep(1)
 						animate(GO, transform=matrix()*3, time=60, easing=BOUNCE_EASING | EASE_IN | EASE_OUT, flags=ANIMATION_END_NOW)
@@ -11389,7 +11389,7 @@ mob
 								if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 									si.transform*=3
 								animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-								world << si
+								GfxSendImage(si, null, GfxBcImageReach(si))
 								spawn()
 									animate(si, alpha=0, time=3)
 									sleep(3)
@@ -11526,7 +11526,7 @@ mob
 								if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 									si.transform*=3
 								animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-								world << si
+								GfxSendImage(si, null, GfxBcImageReach(si))
 								spawn()
 									animate(si, alpha=0, time=3)
 									sleep(3)
@@ -12531,7 +12531,7 @@ mob
 			if(B.IconTransform)
 				var/image/T=image(B.IconTransform, pixel_x=B.TransformX, pixel_y=B.TransformY, loc = src)
 				T.appearance_flags=68
-				world << T
+				GfxSendImage(T, null, GfxBcImageReach(T))
 				spawn()
 					animate(T, alpha=0)
 					animate(T, alpha=255, time=3)
@@ -12611,7 +12611,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -12654,7 +12654,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -12723,7 +12723,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -12774,7 +12774,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -12822,7 +12822,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -13034,7 +13034,7 @@ mob
 					if(src.CheckActive("Mobile Suit")&&B.BuffName!="Mobile Suit")
 						si.transform*=3
 					animate(si, alpha=255, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-					world << si
+					GfxSendImage(si, null, GfxBcImageReach(si))
 					spawn()
 						animate(si, alpha=0, time=3)
 						sleep(3)
@@ -13429,7 +13429,7 @@ mob
 			if(B.IconTransform)
 				var/image/T=image(B.IconTransform, pixel_x=B.TransformX, pixel_y=B.TransformY, loc = src)
 				T.appearance_flags=68
-				world << T
+				GfxSendImage(T, null, GfxBcImageReach(T))
 				spawn()
 					animate(T, alpha=255)
 					animate(T, alpha=0, time=3)

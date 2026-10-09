@@ -79,6 +79,9 @@ obj/Skills
 	var/sicon_state
 	var/MenuIcon //icon_state in HUD/SkillIcons.dmi for menu/hotbar art. not sicon, that's world fx
 	var/MenuIconFile
+	var/EnergyColorMain
+	var/EnergyColorCore
+	var/EnergyColorGlow
 	var/list/Learn=new
 
 	var/list/PreRequisite=list() //Used for skill tree shit.

@@ -633,6 +633,7 @@ obj/Skills
 							OMsg(m, "[m] [src.ArriveMessage]")
 					//User.Move(Destination)
 					User.loc = locate(Destination.x, Destination.y, Destination.z)
+					GfxBcHolderMoved(User)
 					OMsg(User, "[User] [src.ArriveMessage]")
 
 				if(src.ManaCost)

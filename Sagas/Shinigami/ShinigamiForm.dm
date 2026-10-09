@@ -239,3 +239,17 @@
 		passives = list("TechniqueMastery" = 1)
 		adjust(mob/p)
 			passives["TechniqueMastery"] = 1 + p.SagaLevel
+
+/obj/Skills/Buffs/SlotlessBuffs
+	var/tmp/bankai_seq = 0
+
+	proc/BankaiLive(mob/M, seq)
+		return M && M.loc && SlotlessOn && bankai_seq == seq
+
+	proc/BankaiGlowOff(mob/M, seq)
+		if(bankai_seq != seq) return
+		ManaGlow = null
+		ManaGlowSize = 0
+		if(M && M.loc)
+			M.AppearanceOff()
+			M.AppearanceOn()

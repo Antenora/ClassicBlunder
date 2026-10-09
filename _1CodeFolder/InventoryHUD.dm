@@ -203,6 +203,42 @@ client
 		atom/movable/shud/invtext/inv_mana_label
 		atom/movable/shud/menubtn/btn_inv
 		atom/movable/shud/menulabel/btn_inv_label
+		atom/movable/shud/panelholder/inv_holder
+		atom/movable/shud/panelholder/inv_pagebox
+		atom/movable/shud/panelholder/inv_descbox
+
+client/proc/INVput(atom/movable/o, sx, sy)
+	o.pixel_x = sx + 144
+	o.pixel_y = sy + 160
+	inv_holder.vis_contents += o
+
+client/proc/InvHolderSync()
+	var/sl = "[InvXLoc(inv_pan_x - 144)],CENTER:[inv_pan_y - 160]"
+	if(inv_holder && inv_holder.screen_loc != sl) inv_holder.screen_loc = sl
+
+client/proc/InvPagePut(atom/movable/o, sx, sy)
+	o.pixel_x = sx + 144
+	o.pixel_y = sy + 160
+
+client/proc/DESCput(atom/movable/o, sx, sy)
+	o.pixel_x = sx - 152
+	o.pixel_y = sy + 200
+	inv_descbox.vis_contents += o
+
+client/proc/InvDescSync()
+	var/sl = "[InvXLoc(desc_pan_x + 152)],CENTER:[desc_pan_y - 200]"
+	if(inv_descbox && inv_descbox.screen_loc != sl) inv_descbox.screen_loc = sl
+
+client/proc/InvDescAdopt(atom/movable/o)
+	if(!o.screen_loc) return
+	var/list/cm = splittext(o.screen_loc, ",")
+	if(cm.len < 2) return
+	var/list/xp = splittext(cm[1], ":")
+	var/list/yp = splittext(cm[2], ":")
+	if(xp.len < 2 || yp.len < 2) return
+	var/ax = (text2num(xp[1]) - 1) * 32 + text2num(xp[2])
+	o.screen_loc = null
+	DESCput(o, ax - MINV_LEFT_SHIFT, text2num(yp[2]))
 
 client/proc/InitInventoryButton()
 	btn_inv = new('HUD/ui_icon_backpack.png')
@@ -231,22 +267,16 @@ client/proc/ToggleInventory()
 client/proc/CloseInventory()
 	inv_open = FALSE
 	HideItemDesc()
-	if(inv_item_objs)
-		while(inv_item_objs.len)
-			var/atom/movable/o = inv_item_objs[inv_item_objs.len]
-			inv_item_objs.len--
-			screen -= o
-			del o
-		inv_item_objs = null
-	if(inv_objs)
-		while(inv_objs.len)
-			var/atom/movable/o = inv_objs[inv_objs.len]
-			inv_objs.len--
-			screen -= o
-			del o
-		inv_objs = null
+	PanelRelease(inv_pagebox)
+	PanelRelease(inv_holder)
+	inv_pagebox = null
+	inv_holder = null
+	inv_item_objs = null
+	inv_objs = null
 	inv_cat_label = null
 	inv_count_label = null
+	inv_money_label = null
+	inv_mana_label = null
 	if(btn_inv)
 		btn_inv.icon = 'HUD/ui_slot_available.png'
 		btn_inv.SetGlyphDimmed(FALSE)
@@ -269,11 +299,13 @@ client/proc/OpenInventory()
 	btn_inv_label.alpha = 0
 	inv_objs = list()
 	inv_item_objs = list()
+	inv_holder = PanelHolderNew(MINV_LAYER)
+	inv_pagebox = PanelHolderNew(MINV_LAYER)
 
 	var/atom/movable/shud/menupanel/draggable/P = new
 	P.icon = 'HUD/inv_book.png'
 	P.layer = MINV_LAYER
-	P.screen_loc = "[InvXLoc(-144)],CENTER:-160"
+	INVput(P, -144, -160)
 	inv_objs += P
 	// restore saved drag position
 	inv_pan_x = getPref("invPanX"); if(isnull(inv_pan_x)) inv_pan_x = 0
@@ -286,47 +318,47 @@ client/proc/OpenInventory()
 	title.maptext_width = 120
 	title.maptext_height = 20
 	title.maptext = "<center><span style=\"[MINV_FONT]; color:#ffffff\">INVENTORY</span></center>"
-	title.screen_loc = "[InvXLoc(-60)],CENTER:128"
+	INVput(title, -60, 128)
 	inv_objs += title
 
 	var/atom/movable/shud/invwidget/X = new
 	X.icon = 'HUD/ui_cross.png'
 	X.action = "close"
 	X.widget_kind = "cross"
-	X.screen_loc = "[InvXLoc(112)],CENTER:122"
+	INVput(X, 112, 122)
 	inv_objs += X
 
 	var/atom/movable/shud/menupanel/banner = new
 	banner.icon = 'HUD/inv_banner.png'
 	banner.layer = MINV_LAYER + 0.1
 	banner.mouse_opacity = 0
-	banner.screen_loc = "[InvXLoc(-75)],CENTER:86"
+	INVput(banner, -75, 86)
 	inv_objs += banner
 
 	inv_cat_label = new
 	inv_cat_label.maptext_width = 150
 	inv_cat_label.maptext_height = 20
-	inv_cat_label.screen_loc = "[InvXLoc(-75)],CENTER:96"
+	INVput(inv_cat_label, -75, 96)
 	inv_objs += inv_cat_label
 
 	var/atom/movable/shud/invwidget/AL = new
 	AL.icon = 'HUD/ui_arrow_left.png'
 	AL.action = "prev"
 	AL.widget_kind = "arrow_left"
-	AL.screen_loc = "[InvXLoc(-120)],CENTER:84"
+	INVput(AL, -120, 84)
 	inv_objs += AL
 
 	var/atom/movable/shud/invwidget/AR = new
 	AR.icon = 'HUD/ui_arrow_right.png'
 	AR.action = "next"
 	AR.widget_kind = "arrow_right"
-	AR.screen_loc = "[InvXLoc(92)],CENTER:84"
+	INVput(AR, 92, 84)
 	inv_objs += AR
 
 	inv_count_label = new
 	inv_count_label.maptext_width = 110
 	inv_count_label.maptext_height = 18
-	inv_count_label.screen_loc = "[InvXLoc(-10)],CENTER:-128"
+	INVput(inv_count_label, -10, -128)
 	inv_objs += inv_count_label
 
 	// Money + Mana Bits live in inv_objs so they persist across section cycling, amounts refreshed in BuildInvPage
@@ -334,32 +366,32 @@ client/proc/OpenInventory()
 	var/atom/movable/shud/invcurrency/mobj = new
 	mobj.icon = micon
 	mobj.kind = "money"
-	mobj.screen_loc = "[InvXLoc(-102)],CENTER:-108"
+	INVput(mobj, -102, -108)
 	inv_objs += mobj
 	inv_money_label = new
 	inv_money_label.maptext_width = 80
 	inv_money_label.maptext_height = 18
 	inv_money_label.mouse_opacity = 0
-	inv_money_label.screen_loc = "[InvXLoc(-82)],CENTER:-106"
+	INVput(inv_money_label, -82, -106)
 	inv_objs += inv_money_label
 	var/icon/cicon = icon('Crystal_Fragments.dmi', "lot"); cicon.Scale(16, 16)
 	var/atom/movable/shud/invcurrency/cobj = new
 	cobj.icon = cicon
 	cobj.kind = "mana"
-	cobj.screen_loc = "[InvXLoc(-102)],CENTER:-130"
+	INVput(cobj, -102, -130)
 	inv_objs += cobj
 	inv_mana_label = new
 	inv_mana_label.maptext_width = 80
 	inv_mana_label.maptext_height = 18
 	inv_mana_label.mouse_opacity = 0
-	inv_mana_label.screen_loc = "[InvXLoc(-82)],CENTER:-128"
+	INVput(inv_mana_label, -82, -128)
 	inv_objs += inv_mana_label
 
-	for(var/atom/movable/o in inv_objs)
-		screen += o
-	PanShift(inv_objs, inv_pan_x, inv_pan_y)
-	KineticEntrance(inv_objs)
-	BuildInvPage(TRUE)
+	inv_holder.vis_contents += inv_pagebox
+	InvHolderSync()
+	BuildInvPage()
+	screen += inv_holder
+	PanelFade(inv_holder)
 
 client/proc/InvCycle(dir)
 	if(!inv_open) return
@@ -371,11 +403,8 @@ client/proc/InvCycle(dir)
 
 client/proc/BuildInvPage(fade = FALSE)
 	if(!mob || !inv_open) return
-	while(inv_item_objs.len)
-		var/atom/movable/o = inv_item_objs[inv_item_objs.len]
-		inv_item_objs.len--
-		screen -= o
-		del o
+	PanelBegin(inv_pagebox)
+	inv_item_objs = list()
 	var/cat = INV_CATEGORIES[inv_cat_index]
 	inv_cat_label.maptext = "<center><span style=\"[MINV_FONT]; color:#bfefff\">[uppertext(cat)]</span></center>"
 	var/list/items = mob.InvItemsFor(cat)
@@ -386,45 +415,41 @@ client/proc/BuildInvPage(fade = FALSE)
 		var/row = round((k - 1) / MINV_COLS)
 		var/sx = MINV_GRID_LEFT + col * MINV_PITCH
 		var/sy = MINV_GRID_TOP - row * MINV_PITCH
-		var/atom/movable/shud/menupanel/cell = new
+		var/atom/movable/shud/menupanel/cell = PanelNew(inv_pagebox, /atom/movable/shud/menupanel)
 		cell.icon = 'HUD/inv_slot.png'
 		cell.layer = MINV_LAYER + 0.2
 		cell.mouse_opacity = 0
-		cell.screen_loc = "[InvXLoc(sx)],CENTER:[sy]"
+		InvPagePut(cell, sx, sy)
 		inv_item_objs += cell
-		screen += cell
 		if(k <= items.len)
 			var/obj/Items/I = items[k]
-			var/atom/movable/shud/invitem/cellitem = new
+			var/atom/movable/shud/invitem/cellitem = PanelNew(inv_pagebox, /atom/movable/shud/invitem)
 			cellitem.SetItem(I)
-			cellitem.screen_loc = "[InvXLoc(sx)],CENTER:[sy]"
+			InvPagePut(cellitem, sx, sy)
 			inv_item_objs += cellitem
-			screen += cellitem
 			// "E" badge for anything equipped/worn
 			if(findtext(I.suffix, "Equipped"))
-				var/atom/movable/shud/invtext/badge = new
+				var/atom/movable/shud/invtext/badge = PanelNew(inv_pagebox, /atom/movable/shud/invtext)
 				badge.maptext_width = 16
 				badge.maptext_height = 14
 				badge.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\"><b>E</b></span>"
 				badge.layer = MINV_LAYER + 0.45
 				badge.mouse_opacity = 0
-				badge.screen_loc = "[InvXLoc(sx + 21)],CENTER:[sy - 1]"
+				InvPagePut(badge, sx + 21, sy - 1)
 				inv_item_objs += badge
-				screen += badge
 			// stack count rides the same corner
 			else if(I.Stackable && I.TotalStack > 1)
-				var/atom/movable/shud/invtext/count = new
+				var/atom/movable/shud/invtext/count = PanelNew(inv_pagebox, /atom/movable/shud/invtext)
 				count.maptext_width = 24
 				count.maptext_height = 14
 				count.maptext = "<span style=\"[MINV_FONT]; color:#ffe066; text-align:right\"><b>[I.TotalStack]</b></span>"
 				count.layer = MINV_LAYER + 0.45
 				count.mouse_opacity = 0
-				count.screen_loc = "[InvXLoc(sx + 13)],CENTER:[sy - 1]"
+				InvPagePut(count, sx + 13, sy - 1)
 				inv_item_objs += count
-				screen += count
-	PanShift(inv_item_objs, inv_pan_x, inv_pan_y)
+	PanelEnd(inv_pagebox)
 	if(fade)
-		KineticEntrance(inv_item_objs)
+		PanelFade(inv_pagebox)
 
 // safe to call from anywhere money/mana changes
 client/proc/UpdateInvCurrency()
@@ -484,25 +509,22 @@ mob/proc/RecomputeClothesLayerPriority()
 
 client/proc/HideItemDesc()
 	inv_desc_item = null
-	if(inv_desc_objs)
-		while(inv_desc_objs.len)
-			var/atom/movable/o = inv_desc_objs[inv_desc_objs.len]
-			inv_desc_objs.len--
-			screen -= o
-			del o
-		inv_desc_objs = null
+	PanelRelease(inv_descbox)
+	inv_descbox = null
+	inv_desc_objs = null
 
 client/proc/ShowItemDesc(obj/Items/I)
 	HideItemDesc()
 	if(!I || !inv_open) return
 	inv_desc_objs = list()
 	inv_desc_item = I
+	inv_descbox = PanelHolderNew(MINV_LAYER)
 	desc_pan_x = getPref("descPanX"); if(isnull(desc_pan_x)) desc_pan_x = 0
 	desc_pan_y = getPref("descPanY"); if(isnull(desc_pan_y)) desc_pan_y = 0
 
 	var/atom/movable/shud/invdescpanel/P = new
 	P.icon = 'HUD/inv_desc.png'
-	P.screen_loc = "[InvXLoc(152)],CENTER:-200"   // docked to the right of the book
+	DESCput(P, 152, -200)   // docked to the right of the book
 	inv_desc_objs += P
 
 	var/atom/movable/shud/orbpart/pic = new
@@ -514,7 +536,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 	pic.transform = matrix(2, 0, 0, 0, 2, 0) // 2x, scales about its center
 	pic.layer = MINV_LAYER + 0.6
 	pic.mouse_opacity = 0 // clicks fall through to the panel so right-click closes
-	pic.screen_loc = "[InvXLoc(203)],CENTER:146"
+	DESCput(pic, 203, 146)
 	inv_desc_objs += pic
 
 	// Update_Description is per-subtype not on base /obj/Items, reach it via the ':' operator like the item code does
@@ -558,7 +580,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 	T.mouse_opacity = 0 // clicks fall through to the panel
 	T.maptext_width = 200
 	T.maptext_height = 300
-	T.screen_loc = "[InvXLoc(164)],CENTER:-190"   // low enough that long descriptions clear the icon
+	DESCput(T, 164, -190)   // low enough that long descriptions clear the icon
 	T.maptext = "[namehdr]<span style=\"[MINV_FONT]; color:#ffffff\">[body][stats][mark]</span>"
 	inv_desc_objs += T
 
@@ -568,14 +590,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		cb.item = I
 		cb.maptext_width = 100
 		cb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9874; Customize</span>"
-		cb.screen_loc = "[InvXLoc(252)],CENTER:162"
+		DESCput(cb, 252, 162)
 		inv_desc_objs += cb
 	if(CanBeHat(I))
 		var/atom/movable/shud/invtext/htl = new
 		htl.layer = MINV_LAYER + 0.6
 		htl.mouse_opacity = 0
 		htl.maptext_width = 90
-		htl.screen_loc = "[InvXLoc(252)],CENTER:140"
+		DESCput(htl, 252, 140)
 		htl.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">Toggle Hat</span>"
 		inv_desc_objs += htl
 		var/atom/movable/shud/hattoggle/htsw = new
@@ -583,14 +605,14 @@ client/proc/ShowItemDesc(obj/Items/I)
 		htsw.ctx = "inv"
 		htsw.layer = MINV_LAYER + 0.7
 		htsw.icon = I.IsHat ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-		htsw.screen_loc = "[InvXLoc(315)],CENTER:142"
+		DESCput(htsw, 315, 142)
 		inv_desc_objs += htsw
 	if(IsCustomizableItem(I))
 		var/atom/movable/shud/invrenamebtn/rb = new
 		rb.item = I
 		rb.maptext_width = 100
 		rb.maptext = "<span style=\"[MINV_FONT]; color:#8be9ff\">&#9998; Rename</span>"
-		rb.screen_loc = "[InvXLoc(252)],CENTER:118"
+		DESCput(rb, 252, 118)
 		inv_desc_objs += rb
 	BeltDescButton(I, inv_desc_objs)
 	FieldCraftDescButton(I, inv_desc_objs)
@@ -604,6 +626,7 @@ client/proc/ShowItemDesc(obj/Items/I)
 	desc_pan_x = clamp(desc_pan_x, db[1], db[2])
 	desc_pan_y = clamp(desc_pan_y, db[3], db[4])
 	for(var/atom/movable/o in inv_desc_objs)
-		screen += o
-	PanShift(inv_desc_objs, desc_pan_x, desc_pan_y)
-	KineticEntrance(inv_desc_objs)
+		InvDescAdopt(o)
+	InvDescSync()
+	screen += inv_descbox
+	PanelFade(inv_descbox)

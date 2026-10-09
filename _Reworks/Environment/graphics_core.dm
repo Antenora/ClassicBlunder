@@ -631,8 +631,7 @@ proc/GfxReleaseAtom(atom/movable/A)
 
 proc/GfxReleaseImage(image/I)
 	if(!I) return
-	for(var/client/C)
-		C.images -= I
+	GfxBcRelease(I)
 
 var/_gfx_icon_warm_boot = _GfxIconWarmBoot()
 
@@ -850,6 +849,38 @@ proc/GfxProfileDump(reason, stall = 0, force = 0)
 	src << "Profile window written to [GFX_PROFILE_FILE] (dump #[_gfx_profile_dumps])."
 	Log("Admin", "[ExtractInfo(src)] dumped the profiler window.")
 
+#define GFX_SENDMAPS_FILE "graphics_sendmaps.log"
+var/_gfx_sendmaps_dumps = 0
+
+/mob/Admin2/verb/Sendmaps_Profile_Start()
+	set category = "Admin"
+	set name = "Sendmaps Profile Start"
+	world.Profile(PROFILE_RESTART, "sendmaps", null)
+	src << "Sendmaps profiler started; run the scenario, then Sendmaps Dump Now."
+	Log("Admin", "[ExtractInfo(src)] started the sendmaps profiler.")
+
+/mob/Admin2/verb/Sendmaps_Dump_Now()
+	set category = "Admin"
+	set name = "Sendmaps Dump Now"
+	var/j = world.Profile(PROFILE_REFRESH, "sendmaps", "json")
+	if(!j)
+		src << "The sendmaps profiler returned nothing; start it first and run a scenario with clients connected."
+		return
+	var/n = 0
+	for(var/client/C) n++
+	var/stamp = time2text(world.realtime, "YYYY-MM-DD hh:mm:ss")
+	text2file("[stamp] seq=[++_gfx_sendmaps_dumps] wt=[world.time] cpu=[world.cpu] clients=[n]\n[j]\n", GFX_SENDMAPS_FILE)
+	src << "Sendmaps profile written to [GFX_SENDMAPS_FILE] (dump #[_gfx_sendmaps_dumps])."
+	Log("Admin", "[ExtractInfo(src)] dumped the sendmaps profile.")
+
+/mob/Admin2/verb/Sendmaps_Profile_Stop()
+	set category = "Admin"
+	set name = "Sendmaps Profile Stop"
+	world.Profile(PROFILE_STOP, "sendmaps", null)
+	src << "Sendmaps profiler stopped."
+	Log("Admin", "[ExtractInfo(src)] stopped the sendmaps profiler.")
+
+#undef GFX_SENDMAPS_FILE
 #undef GFX_PROFILE_FILE
 #undef GFX_PROFILE_RAW_FILE
 #undef GFX_PROFILE_TOP

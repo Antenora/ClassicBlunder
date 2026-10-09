@@ -301,12 +301,11 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 		warperTimeLock = max(0, warperTimeLock)
 
 	if(TimeStop)
-		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = new
-		book = locate() in src
+		var/obj/Skills/Buffs/SlotlessBuffs/Grimoire/Time_Stop/book = locate() in src
 		LoseHealth(PctToHP(5/book.Mastery))
 		book:TimeStopped++
 		if(book:TimeStopped>book.Mastery+1)
-			SkillX("Time Stop",x)
+			SkillX("Time Stop",book)
 	var/obj/Skills/Devils_Deal/dd = findDevilsDeal(src)
 	if(dd)
 		if(CurrentlySummoned)
@@ -498,7 +497,7 @@ mob
 					src.LoseHealth(src.PctToHP(5/ts.Mastery))
 					ts:TimeStopped++
 					if(ts:TimeStopped>ts.Mastery+1)
-						src.SkillX("Time Stop",x, noGCD = TRUE)
+						src.SkillX("Time Stop",ts, noGCD = TRUE)
 			if(passive_handler["Fa Jin"])
 				if(canFaJin())
 					if(!fa_jin_effect)
@@ -921,6 +920,7 @@ mob
 							src.BeamCharging+=src.GetRecov(0.2)*src.GetBeamChargeSpeedMult()
 							if(src.BeamCharging>beamChargeCap)
 								src.BeamCharging=beamChargeCap
+							src.EnergyFXChargeTick(Z, src.BeamCharging/beamChargeCap)
 
 							//aesthetics
 							if(src.BeamCharging>=(0.5*beamChargeCap))
@@ -929,7 +929,7 @@ mob
 										var/image/i=image('Aurora.dmi',icon_state="[rand(1,3)]", layer=EFFECTS_LAYER, loc=src)
 										i.blend_mode=BLEND_ADD
 										animate(i, alpha=0)
-										world << i
+										GfxSendImage(i, null, 23)
 										i.transform*=30
 										animate(i, alpha=200, time=5)
 										src.BeamCharging=beamChargeCap

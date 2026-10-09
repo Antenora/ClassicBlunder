@@ -142,11 +142,17 @@ obj/Skills/Projectile
 	var/EmitChild
 	var/EmitCount = 0
 	var/EmitEvery = 1
+	var/EmitStagger = 0
+	var/KickPath = 0
 	var/HomingBeam = 0
 	var/BlendAdd = 0
 	var/FollowFacing = 0
 	var/ArcShot = 0
 	var/BackfireShot = 0
+	var/tmp/InstantTravel = 0
+	var/tmp/LaunchForward = 0
+	var/tmp/LaunchUp = 0
+	var/tmp/DropDistance = 0
 
 obj/SkillPillar
 	icon = 'RisingRocks.dmi'
@@ -176,6 +182,8 @@ obj/Skills/Projectile
 	var/BlastRamp = 0
 	var/BlastRampFloor = 1
 	var/PushBack = 0
+	var/ExplodeRadiusPx = 0
+	var/ContactFuse = 0
 	var/KBRamp = 0
 	var/CounterNova = 0
 	var/ClashBonus = 0
@@ -186,9 +194,24 @@ obj/Skills/Projectile
 obj/Skills/Projectile/_Projectile
 	var/tmp/pushback_taken = 0
 	var/tmp/storm_dropped = 0
+	var/tmp/fuse_at = 0
+	var/tmp/list/emit_angles
+	var/tmp/emit_total = 0
+	var/tmp/list/emit_last
+	var/tmp/obj/Skills/Projectile/_Projectile/emit_parent
+	var/tmp/emit_index = 0
+	var/tmp/kick_angle = 0
+	var/tmp/kick_px
+	var/tmp/kick_py
+
+var/list/KICK_PATH = list("r0" = 32, "v0" = 1000, "v1" = 640, "tau" = 0.06, "delay" = 0.05, "turn" = 1000, "hit_r" = 8, "t_max" = 0.45, "dt" = 0.0025)
 
 proc/ProjectilePushBack(obj/Skills/Projectile/_Projectile/nova, obj/Skills/Projectile/_Projectile/other)
 	if(!nova || nova.Killed || !nova.loc)
+		return
+	if(other && other.Area != "Beam" && !other.Killed)
+		other.Damage = 0
+	if(nova.fuse_at)
 		return
 	var/fwd = nova.dir
 	step(nova, turn(fwd, 180))

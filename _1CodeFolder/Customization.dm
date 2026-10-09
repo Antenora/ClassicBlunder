@@ -258,6 +258,7 @@ mob/proc/Chargez(var/Z, var/image/C=new(ChargeIcon), var/Under=0)
 	if(Z=="Remove")
 		src.overlays -= C
 		src.underlays -= C
+		src.EnergyFXChargeClear()
 
 
 mob/proc/Hairz(var/Z)
@@ -1100,6 +1101,12 @@ obj/Charge_Icons
 
 
 var/list/Blast_List=list()
+/proc/BlastIconSkills(mob/A)
+	var/list/Skills=list("Cancel")
+	for(var/obj/Skills/Projectile/B in A)
+		if(!EnergyFXRow(B)) Skills+=B
+	return Skills
+
 obj/Blast_Icons
 	proc/Blast_Click(mob/A)
 		if(A.IconClicked==0)
@@ -1108,16 +1115,13 @@ obj/Blast_Icons
 			if(Blast_Color) icon+=Blast_Color
 			switch(Ask(A, "Are you sure?", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
-					var/list/Skills=new
-					Skills+="Cancel"
-					for(var/obj/Skills/Projectile/B in A) Skills+=B
+					var/list/Skills=BlastIconSkills(A)
 					var/obj/B=Ask(A, "Add icon to which skill?", "", null, "pick", Skills, 0)
-					if(istype(B, /obj/Skills/Projectile))
+					if(istype(B, /obj/Skills/Projectile) && !EnergyFXSkinLocked(B))
 						if(istype(B, /obj/Skills/Projectile/Beams))
 							B:IconLock=icon
 							B:LockX=0
 							B:LockY=0
-							B:fx_main_color = Blast_Color
 						else
 							var/icon/i=icon(icon, icon_state)
 							B:IconLock=i

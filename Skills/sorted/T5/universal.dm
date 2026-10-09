@@ -11,15 +11,16 @@
 	ComboMaster=1
 	Piercing=1
 	Explode=1
-	IconLock='Plasma.dmi'
-	LockX=0
-	LockY=0
-	IconSize=2.5
+	IconLock=ENERGYFX_HIT_CATACLYSMIC_ORB
+	LockX=-4
+	LockY=-4
+	IconSize=1
 	Variation=0
 	Cooldown = 30
 	EmitChild=new/obj/Skills/Projectile/Cataclysmic_Orb_Bits
 	EmitCount=30
 	EmitEvery=2
+	EmitStagger=1.1
 	ActiveMessage="unleashes a slow-rolling cataclysm!"
 	verb/Cataclysmic_Orb()
 		set category="Skills"
@@ -34,12 +35,17 @@
 	RandomPath=1
 	HomingCharge=1
 	HyperHoming=1
+	KickPath=1
 	Explode=1
 	Variation=0
-	IconLock='Plasma.dmi'
-	IconSize=0.6
+	IconLock=ENERGYFX_HIT_CATACLYSMIC_BIT
+	LockX=10
+	LockY=10
+	IconSize=1
 
 /obj/Skills/Projectile/Desperado_Blaster
+	LaunchForward = -20.5
+	LaunchUp = 0.5
 	SkillCost = TIER_5_COST
 	Copyable = 6
 	DamageMult = 1.15
@@ -51,7 +57,7 @@
 	Instinct = 1
 	Cooldown = 30
 	Variation = 0
-	IconLock = 'Blast1.dmi'
+	IconLock = ENERGYFX_HIT_DESPERADO_BLASTER
 	LockX = 0
 	LockY = 0
 	ActiveMessage = "unleashes a relentless barrage with the Desperado Blaster!"
@@ -72,9 +78,9 @@
 	OnHeldTick(mob/p)
 		var/left_dir  = turn(spin_dir, 45)
 		var/right_dir = turn(spin_dir, -45)
-		p.Blast(src, p, 0, 'Blast1.dmi', spin_dir)
-		p.Blast(src, p, 0, 'Blast1.dmi', left_dir)
-		p.Blast(src, p, 0, 'Blast1.dmi', right_dir)
+		p.Blast(src, p, 0, ENERGYFX_HIT_DESPERADO_BLASTER, spin_dir)
+		p.Blast(src, p, 0, ENERGYFX_HIT_DESPERADO_BLASTER, left_dir)
+		p.Blast(src, p, 0, ENERGYFX_HIT_DESPERADO_BLASTER, right_dir)
 		spin_dir = turn(spin_dir, 45)
 		p.dir = spin_dir
 

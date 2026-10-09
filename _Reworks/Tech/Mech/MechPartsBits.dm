@@ -101,6 +101,7 @@ obj/Items/Gun/Handgun/Mech_Bit_Laser
 	var/tmp/bit_recall_at = 0
 	var/tmp/bit_recall_ds = 1
 	var/tmp/bit_gone = 0
+	var/tmp/bit_retest_at = 0
 
 	EmplacementKey()
 		return bit_pilot ? bit_pilot.DeviceKey() : ..()
@@ -216,7 +217,10 @@ obj/Items/Gun/Handgun/Mech_Bit_Laser
 		if(T.ckey && P.inParty(T.ckey)) return 0
 		if(P.ai_followers && (T in P.ai_followers)) return 0
 		if(get_dist(src, T) > P.MechBitReach(bit_rack)) return 0
-		return EmpClearShot(src, T, null)
+		if(world.time < bit_retest_at) return 0
+		if(EmpClearShot(src, T, null)) return 1
+		bit_retest_at = world.time + 5 * world.tick_lag
+		return 0
 
 	proc/BitShoot(mob/T)
 		var/mob/P = bit_pilot
@@ -257,7 +261,6 @@ obj/Items/Gun/Handgun/Mech_Bit_Laser
 		Reloading = 0
 		if(bit_gun)
 			bit_gun.loc = null
-			del bit_gun
 		bit_gun = null
 
 /obj/Mech_Barrier

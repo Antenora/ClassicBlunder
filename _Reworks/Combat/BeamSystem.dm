@@ -67,6 +67,7 @@ proc/BeamTurnState(din, dout)
 		split = 0
 		datum/beam/parent
 		list/arms
+		fork_at = 0
 
 /datum/beam/New(mob/M, obj/Skills/Projectile/Z, d)
 	owner = M
@@ -142,9 +143,9 @@ proc/BeamTurnState(din, dout)
 	if(!owner || !owner.loc)
 		Die()
 		return
-	if(firing && owner.Beaming != 2)
+	if(firing && !parent && owner.Beaming != 2)
 		Release()
-	if(firing && parent && (parent.dying || !parent.split))
+	if(firing && parent && (parent.dying || (!parent.firing && parent.travelled >= parent.fork_at)))
 		Release()
 	if(frozen) //a clash owns us; it drives Layout() itself
 		return
@@ -362,7 +363,7 @@ proc/BeamTurnState(din, dout)
 
 /datum/beam/proc/PartMoved(obj/Skills/Projectile/_Projectile/p, turf/was)
 	if(!p || !p.loc) return
-	if(p.Trail)
+	if(p.Trail && !FxOwned())
 		if(p.MultiTrail)
 			WaveTrail(p.Trail, p.VariationX+p.TrailX, p.VariationY+p.TrailY, p.dir, p.loc, p.TrailDuration, p.TrailSize)
 		else
@@ -410,6 +411,7 @@ proc/BeamTurnState(din, dout)
 /datum/beam/proc/SpawnArms()
 	var/turf/ht = HeadTurf()
 	if(!ht || !owner) return
+	fork_at = travelled + length - 1
 	arms = list()
 	for(var/pd in list(turn(bdir, 45), turn(bdir, -45)))
 		var/turf/at = get_step(ht, pd)
@@ -447,8 +449,9 @@ proc/BeamTurnState(din, dout)
 			wm.Scale(wscale, 1)
 			wm.Turn(ang)
 			p.transform = p.transform * wm
-		animate(p, alpha = 235, time = 5, loop = -1, flags = ANIMATION_PARALLEL)
-		animate(alpha = 255, time = 5)
+		if(!FxOwned())
+			animate(p, alpha = 235, time = 5, loop = -1, flags = ANIMATION_PARALLEL)
+			animate(alpha = 255, time = 5)
 	return p
 
 /datum/beam/proc/DropPart(obj/Skills/Projectile/_Projectile/p)

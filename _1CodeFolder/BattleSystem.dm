@@ -2200,6 +2200,7 @@ mob/proc/Grab_Effects(var/mob/P)
 		var/obj/Skills/Grapple/Flashback/fb = src.FindSkill(/obj/Skills/Grapple/Flashback)
 		if(fb && src.warp_strike_saved_loc)
 			fb.FlashbackTrigger(src, P)
+			if(!P) return
 
 	if(canStealMana(P))//eldritch magic steal
 		var/confirm = prompt("You can feel the threads of [P]'s magic circuits. Are they your's, now?", "Take Magic", list("No", "Yes"));

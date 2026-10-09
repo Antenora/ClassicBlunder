@@ -39,6 +39,9 @@ proc/applyAshChoked(mob/target, mob/caster)
 		animate(src, alpha = 255, time = 5)
 		..()
 
+	init(mob/p)
+		owner = p
+
 	proc/deal_field_damage(mob/m)
 		if(!m || m == owner || m.KO || !ismob(m)) return
 		if(!(istype(m, /mob/Players) || istype(m, /mob/Player))) return
@@ -477,6 +480,7 @@ proc/applyAshChoked(mob/target, mob/caster)
 	AuraX=-16
 	AuraY=-8
 	var/tmp/aura_active = FALSE
+	var/tmp/aura_token = 0
 	var/tmp/list/flame_fields = list()
 	var/aura_range = 4
 
@@ -501,13 +505,16 @@ proc/applyAshChoked(mob/target, mob/caster)
 	proc/startAura(mob/user)
 		if(aura_active) return
 		aura_active = TRUE
+		var/tok = ++aura_token
 		var/obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui/self = src
 		spawn()
 			var/field_counter = 0
-			while(self.aura_active && user && user.loc && user.InBankai())
+			while(self.aura_active && self.aura_token == tok && user && user.loc && user.InBankai())
 				if(user.PureRPMode)
 					sleep(10)
 					continue
+				for(var/obj/leftOver/RyujinFlameField/f in self.flame_fields)
+					f.on_tick()
 				for(var/mob/m in range(self.aura_range, user))
 					if(m == user || !m.client) continue
 					m.AddBurn(2, user)
@@ -516,7 +523,8 @@ proc/applyAshChoked(mob/target, mob/caster)
 					field_counter = 0
 					self.spawnFlameField(user)
 				sleep(10)
-			self.stopAura(user)
+			if(self.aura_token == tok)
+				self.stopAura(user)
 
 	proc/spawnFlameField(mob/user)
 		var/turf/center = get_turf(user)
@@ -538,7 +546,6 @@ proc/applyAshChoked(mob/target, mob/caster)
 		aura_active = FALSE
 		for(var/obj/leftOver/RyujinFlameField/f in flame_fields)
 			if(f)
-				ticking_generic -= f
 				del f
 		flame_fields = list()
 

@@ -84,42 +84,40 @@ client
 		log_pan_oy = 0
 		log_pan_dragged = 0
 		list/log_chrome
-		list/log_page
 		list/log_tabbtns
+		atom/movable/shud/panelholder/log_holder
+		atom/movable/shud/panelholder/log_pagebox
 
-client/proc/LOGloc(dx, dyTop, h = 0)
-	var/py = LOG_H - dyTop - h
-	var/ax = dx + log_pan_x
-	var/ay = py + log_pan_y
-	var/axp = ((ax % 32) + 32) % 32
-	var/ayp = ((ay % 32) + 32) % 32
-	return "[log_atx + (ax - axp) / 32]:[axp],[log_aty + (ay - ayp) / 32]:[ayp]"
+client/proc/LOGput(atom/movable/o, dx, dyTop, h = 0)
+	o.pixel_x = dx
+	o.pixel_y = LOG_H - dyTop - h
 
-client/proc/LogAdd(atom/movable/o, chrome = 0)
+client/proc/LogHolderSync()
+	PanelMoveTo(log_holder, (log_atx - 1) * 32 + log_pan_x, (log_aty - 1) * 32 + log_pan_y)
+
+client/proc/LogObj(path, chrome = 0)
 	if(chrome)
+		var/atom/movable/o = new path
 		if(!log_chrome) log_chrome = list()
 		log_chrome += o
-	else
-		if(!log_page) log_page = list()
-		log_page += o
-	screen += o
+		log_holder.vis_contents += o
+		return o
+	return PanelNew(log_pagebox, path)
 
 client/proc/LogText(dx, dyTop, w, h, txt, chrome = 0, lay = 0.6)
-	var/atom/movable/shud/logtext/T = new
+	var/atom/movable/shud/logtext/T = LogObj(/atom/movable/shud/logtext, chrome)
 	T.layer = LOG_LAYER + lay
 	T.maptext_width = w
 	T.maptext_height = h
-	T.screen_loc = LOGloc(dx, dyTop, h)
+	LOGput(T, dx, dyTop, h)
 	T.maptext = txt
-	LogAdd(T, chrome)
 	return T
 
 client/proc/LogBG(icon_file, dx, dyTop, h, lay = 0.15, chrome = 0)
-	var/atom/movable/shud/logbg/o = new
+	var/atom/movable/shud/logbg/o = LogObj(/atom/movable/shud/logbg, chrome)
 	o.icon = icon_file
 	o.layer = LOG_LAYER + lay
-	o.screen_loc = LOGloc(dx, dyTop, h)
-	LogAdd(o, chrome)
+	LOGput(o, dx, dyTop, h)
 	return o
 
 // pbtn slices per button size
@@ -131,13 +129,12 @@ client/proc/LogBG(icon_file, dx, dyTop, h, lay = 0.15, chrome = 0)
 	return null
 
 client/proc/LogBtn(label, action, arg, dx, dyTop, w, h = 18, fill = null, tcol = "#8be9ff")
-	var/atom/movable/shud/logbtn/b = new
+	var/atom/movable/shud/logbtn/b = LogObj(/atom/movable/shud/logbtn)
 	var/ic = LogBtnIcon(w, h)
 	b.icon = ic ? ic : AqCoverIcon(w, h)
 	b.action = action
 	b.arg = arg
-	b.screen_loc = LOGloc(dx, dyTop, h)
-	LogAdd(b, 0)
+	LOGput(b, dx, dyTop, h)
 	LogText(dx, dyTop + round((h - 8) / 2) - 5, w, 14, "<center><span style=\"[LS_FONT_BODY]; color:[tcol]\">[label]</span></center>", 0, 0.62)   // maptext bottom-anchors, this centers the ink in h
 	return b
 
@@ -179,18 +176,24 @@ client/proc/OpenLogMenu(obj/LifeSkills/MaterialBuyer/buyer = null)
 	log_pan_x = clamp(log_pan_x, b[1], b[2])
 	log_pan_y = clamp(log_pan_y, b[3], b[4])
 
+	log_holder = PanelHolderNew(LOG_LAYER)
+	LogHolderSync()
+	log_pagebox = PanelHolderNew(LOG_LAYER)
 	BuildLogChrome()
+	log_holder.vis_contents += log_pagebox
 	RefreshLogPage()
-	var/list/all = log_chrome.Copy()
-	if(log_page) all += log_page
-	KineticEntrance(all)
+	screen += log_holder
+	PanelFade(log_holder)
 
 client/proc/CloseLogMenu()
 	if(!logmenu_open && !log_chrome) return
 	logmenu_open = 0
 	log_buyer = null
-	ClearList(log_page); log_page = null
-	ClearList(log_chrome); log_chrome = null
+	PanelRelease(log_pagebox)
+	PanelRelease(log_holder)
+	log_pagebox = null
+	log_holder = null
+	log_chrome = null
 	log_tabbtns = null
 
 client/proc/ResetLogHUD()
@@ -207,34 +210,30 @@ client/proc/BuildLogChrome()
 	log_chrome = list()
 	log_tabbtns = list()
 	LogBG('HUD/tech_panel.png', 0, 0, LOG_H, 0, 1)
-	var/atom/movable/shud/logpic/tp = new
+	var/atom/movable/shud/logpic/tp = LogObj(/atom/movable/shud/logpic, 1)
 	tp.icon = 'HUD/tech_titleplate.png'
 	tp.layer = LOG_LAYER + 0.3
-	tp.screen_loc = LOGloc(212, 6, 32)
-	LogAdd(tp, 1)
+	LOGput(tp, 212, 6, 32)
 	LogText(212, 12, 200, 16, "<center><span style=\"[LS_FONT]; color:#ffffff\">[log_buyer ? "MATERIAL BUYER" : "COLLECTION LOG"]</span></center>", 1)
-	var/atom/movable/shud/logwidget/X = new
+	var/atom/movable/shud/logwidget/X = LogObj(/atom/movable/shud/logwidget, 1)
 	X.widget_kind = "cross"
 	X.icon = 'HUD/ui_cross_1.png'
 	X.action = "close"
-	X.screen_loc = LOGloc(590, 12, 24)
-	LogAdd(X, 1)
+	LOGput(X, 590, 12, 24)
 	// category tabs
 	var/tx = 18
 	for(var/cat in LifeMatCategories)
-		var/atom/movable/shud/logbtn/b = new
+		var/atom/movable/shud/logbtn/b = LogObj(/atom/movable/shud/logbtn, 1)
 		b.icon = 'HUD/log_tab.png'
 		b.action = "cat"
 		b.arg = cat
-		b.screen_loc = LOGloc(tx, 44, 32)
-		LogAdd(b, 1)
+		LOGput(b, tx, 44, 32)
 		log_tabbtns[cat] = b
-		var/atom/movable/shud/logtext/L = new
+		var/atom/movable/shud/logtext/L = LogObj(/atom/movable/shud/logtext, 1)
 		L.layer = LOG_LAYER + 0.62
 		L.maptext_width = 58
 		L.maptext_height = 16
-		L.screen_loc = LOGloc(tx, 50, 16)
-		LogAdd(L, 1)
+		LOGput(L, tx, 50, 16)
 		b.lbl = L
 		tx += 60
 	RefreshLogTabs()
@@ -249,7 +248,12 @@ client/proc/RefreshLogTabs()
 		if(b.lbl) b.lbl.maptext = "<center><span style=\"[LS_FONT]; color:[sel ? "#06283b" : "#cfe3f5"]\">[LogShortCat(cat)]</span></center>"
 
 client/proc/RefreshLogPage()
-	ClearList(log_page); log_page = list()
+	if(!log_pagebox) return
+	PanelBegin(log_pagebox)
+	LogPageBuild()
+	PanelEnd(log_pagebox)
+
+client/proc/LogPageBuild()
 	if(!mob) return
 	var/mob/M = mob
 	RegisterLifeMaterials()
@@ -279,25 +283,22 @@ client/proc/RefreshLogPage()
 		var/have = M.MatLogCount(mc)
 		var/best = M.MatLogBest(mc)
 		var/owned = M.MatLogLifetime(mc) > 0
-		var/atom/movable/shud/logslot/s = new
+		var/atom/movable/shud/logslot/s = LogObj(/atom/movable/shud/logslot)
 		s.icon = owned ? 'HUD/log_slot.png' : 'HUD/log_slot_off.png'
 		s.matclass = mc
-		s.screen_loc = LOGloc(x, y, LOG_CELL)
-		LogAdd(s, 0)
+		LOGput(s, x, y, LOG_CELL)
 		if(owned && best)
-			var/atom/movable/shud/logpic/rng = new
+			var/atom/movable/shud/logpic/rng = LogObj(/atom/movable/shud/logpic)
 			rng.icon = 'HUD/log_ring.png'
 			rng.color = QualityColor(best)
 			rng.layer = LOG_LAYER + 0.4
 			rng.mouse_opacity = 0
-			rng.screen_loc = LOGloc(x, y, LOG_CELL)
-			LogAdd(rng, 0)
-		var/atom/movable/shud/logpic/ic = new
+			LOGput(rng, x, y, LOG_CELL)
+		var/atom/movable/shud/logpic/ic = LogObj(/atom/movable/shud/logpic)
 		ic.icon = d ? StIcon16(d.icon, d.icon_state) : null
 		ic.layer = LOG_LAYER + 0.45
-		ic.screen_loc = LOGloc(x + LOG_CELL / 2 - 8, y + 8, 16)
+		LOGput(ic, x + LOG_CELL / 2 - 8, y + 8, 16)
 		if(!owned) ic.alpha = 60
-		LogAdd(ic, 0)
 		LogText(x, y + LOG_CELL - 26, LOG_CELL, 16, "<center><span style=\"[LS_FONT_BODY]; color:[owned ? "#ffffff" : LS_C_HINT]\">[owned ? "[d ? d.name : mc]" : "???"]</span></center>", 0, 0.5)
 		if(owned)
 			LogText(x, y + LOG_CELL - 14, LOG_CELL, 14, "<center><span style=\"[LS_FONT_BODY]; color:[LS_C_COST]\">[have]</span></center>", 0, 0.5)
@@ -313,11 +314,10 @@ client/proc/RefreshLogPage()
 		LogText(312, 190, 280, 40, "<center><span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">Pick a material to inspect it.</span></center>", 0)
 		return
 	var/datum/matdef/sd = LifeMatDef(log_sel)
-	var/atom/movable/shud/logpic/di = new
+	var/atom/movable/shud/logpic/di = LogObj(/atom/movable/shud/logpic)
 	di.icon = sd ? StIcon16(sd.icon, sd.icon_state) : null
 	di.layer = LOG_LAYER + 0.45
-	di.screen_loc = LOGloc(316, 98, 16)
-	LogAdd(di, 0)
+	LOGput(di, 316, 98, 16)
 	LogText(340, 96, 250, 18, "<span style=\"[LS_FONT]; color:#ffffff\">[sd ? sd.name : log_sel]</span>", 0)
 	LogText(340, 118, 250, 14, "<span style=\"[LS_FONT_BODY]; color:[LS_C_HINT]\">[log_cat]</span>", 0)
 	var/dy = 142
@@ -327,12 +327,11 @@ client/proc/RefreshLogPage()
 		var/n = M.MatLogCountQ(log_sel, q)
 		if(n <= 0) continue
 		anyq = 1
-		var/atom/movable/shud/logbtn/wb = new
+		var/atom/movable/shud/logbtn/wb = LogObj(/atom/movable/shud/logbtn)
 		wb.icon = 'HUD/log_row_btn.png'
 		wb.action = "wd_start"
 		wb.arg = list(log_sel, q)
-		wb.screen_loc = LOGloc(310, dy, 18)
-		LogAdd(wb, 0)
+		LOGput(wb, 310, dy, 18)
 		LogText(320, dy, 140, 14, "<span style=\"[LS_FONT_BODY]; color:[QualityColor(q)]\">[QualityName(q)]</span>", 0)
 		LogText(426, dy, 160, 14, "<span style=\"[LS_FONT_BODY]; color:#ffffff; text-align:right\">x[n][log_buyer ? " &#183; $[Commas(LifeSellPrice(M, log_sel, q))] ea" : ""]  &gt;</span>", 0)
 		dy += 22
@@ -362,13 +361,12 @@ client/proc/LogDrawWithdraw()
 	if(log_buyer)
 		LogText(316, 178, 272, 14, "<center><span style=\"[LS_FONT_BODY]; color:[LS_C_OK]\">= $[Commas(unit * log_wd_amount)]</span></center>", 0)
 	// the amount itself is a button - click it to type an exact value
-	var/atom/movable/shud/logbtn/amt = new
+	var/atom/movable/shud/logbtn/amt = LogObj(/atom/movable/shud/logbtn)
 	amt.action = "wd_type"
 	amt.maptext_width = 284
 	amt.maptext_height = 32
 	amt.maptext = "<center><span style=\"font-family:'monogram'; font-size:24pt; color:[LS_C_COST]\">[log_wd_amount]</span></center>"
-	amt.screen_loc = LOGloc(310, 146, 32)
-	LogAdd(amt, 0)
+	LOGput(amt, 310, 146, 32)
 	// steppers
 	LogBtn("-10", "wd_adj", -10, 310, 186, 66)
 	LogBtn("-1",  "wd_adj", -1,  382, 186, 66)
@@ -473,15 +471,6 @@ client/proc/LOGPanBounds()
 	var/maxy = vh * 32 - LOG_H - by; if(maxy < 0) maxy = 0
 	return list(minx, maxx, miny, maxy)
 
-client/proc/LogShiftLive(dpx, dpy)
-	if(!dpx && !dpy) return
-	if(log_chrome)
-		for(var/atom/movable/o in log_chrome)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-	if(log_page)
-		for(var/atom/movable/o in log_page)
-			if(o.screen_loc) o.screen_loc = PanLoc(o.screen_loc, dpx, dpy)
-
 client/proc/LogPanelStart(params)
 	log_pan_dragged = 0
 	var/list/m = MouseAbs(params)
@@ -501,7 +490,7 @@ client/proc/LogPanelMove(params)
 	if(!dx && !dy) return
 	log_pan_x = wantx; log_pan_y = wanty
 	log_pan_dragged = 1
-	LogShiftLive(dx, dy)
+	LogHolderSync()
 
 client/proc/LogPanelEnd()
 	if(!log_pan_dragged) return

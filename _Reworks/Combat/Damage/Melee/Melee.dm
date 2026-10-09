@@ -474,6 +474,9 @@
 										return
 									var/obj/Skills/Projectile/BZ = new bpath
 									BZ.TempDamage = initial(BZ.DamageMult) * bstacks / max(1, bq.Combo)
+									BZ.EnergyColorMain = bq.EnergyColorMain
+									BZ.EnergyColorCore = bq.EnergyColorCore
+									BZ.EnergyColorGlow = bq.EnergyColorGlow
 									BZ.SpawnPosition = bt
 									var/bdir = benemy ? get_dir(src, benemy) : src.dir
 									if(!bdir)

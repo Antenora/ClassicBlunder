@@ -774,3 +774,68 @@ proc/BeamFXDirText(dir)
 		var/a2 = o.fc_a + o.omega * (1 + 1.2 * tt2) * rem
 		return list(o.fc_x + cos(a2) * sp2 * rem, o.fc_y + sin(a2) * sp2 * rem, a2)
 	return list(o.fc_x, o.fc_y, o.fc_a)
+
+/datum/beamfx/var/tmp/tl_nopre = 0
+
+/datum/beamfx/proc/FrameAdvance(fi)
+	var/t = FT(fi)
+	if(isnull(t0) || t < t0) return
+	ctx_f = fi
+	var/Hr = Hr(t, fi, 0)
+	if(isnull(Hr)) return
+	var/bk = Back(t, fi)
+	var/firing = isnull(release_f) || fi < release_f
+	var/list/gone
+	for(var/si = 1 to stamp_m.len)
+		if(stamp_tbf[si] > fi) continue
+		var/m = stamp_m[si]
+		var/dd = LatD(m, t, fi)
+		if(dd > Hr + S * 1.5 || dd < bk - S * 1.5)
+			if(!gone) gone = list()
+			gone += m
+	if(gone)
+		for(var/m in gone)
+			var/gi = stamp_m.Find(m)
+			if(gi)
+				stamp_m.Cut(gi, gi + 1)
+				stamp_tbf.Cut(gi, gi + 1)
+	var/list/alive = list()
+	for(var/oi = 1 to objs.len)
+		var/datum/bfx_obj/o = objs[oi]
+		var/age = t - o.t0
+		if(age < 0)
+			alive += o
+			continue
+		switch(o.kind)
+			if("bead", "streak", "surge")
+				var/dd = o.d0 + o.v * age
+				if(dd > Hr - 6 || (!firing && dd < bk - 30))
+					if(o.kind == "surge" && dd > Hr - 6)
+						var/ta = o.t0 + (Hr - 6 - o.d0) / o.v
+						pulses += list(list(ta, o.scale))
+						if(!isnull(t_hit) && Struggling(fi, 0) && isnull(end_t))
+							ring_q += list(list(ta, o.scale))
+					continue
+				alive += o
+			if("wedge")
+				if(age >= o.life) continue
+				alive += o
+			else
+				if(age >= o.life) continue
+				alive += o
+				if(!wide && !o.pre_done && !tl_nopre) Precompute(o, fi)
+	objs = alive
+	var/list/pk = list()
+	for(var/list/p in pulses)
+		if(p[1] > t - 0.3) pk += list(p)
+	pulses = pk
+	var/dead = !isnull(dead_f) && fi >= dead_f
+	var/st = dead ? dead_struggle : Struggling(fi, 0)
+	if(st && !isnull(end_t) && t >= end_t)
+		var/q = t - end_t
+		if(!remnant_done)
+			remnant_done = 1
+			spk_shots += list(list("remnant", t, WX(Hr + BEAMFX_CONTACT - 8), WY(Hr + BEAMFX_CONTACT - 8)))
+		if(floor(q / 0.035 + 0.0001) >= 7 && !erode_done)
+			erode_done = 1
+			spk_shots += list(list("erode", t, WX(Hr + BEAMFX_CONTACT - 8), WY(Hr + BEAMFX_CONTACT - 8)))

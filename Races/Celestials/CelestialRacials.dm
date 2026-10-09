@@ -519,7 +519,7 @@ obj/Skills/Grapple/Flashback
 		S.resolve()
 		OMsg(User, "[User] [TriggerMessage] [Target] behind!")
 		var/turf/dest = User.warp_strike_saved_loc
-		if(Target.grabbed == User)
+		if(Target && Target.grabbed == User)
 			Target.grabbed = null
 		if(User.Grab == Target)
 			User.Grab = null

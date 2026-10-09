@@ -1250,7 +1250,7 @@ mob/Player/AI/Nympharum
 				step_no = 0
 				var/image/i = image(ai_owner.is_arcane_beast.dash_effect, loc=src.loc)
 				i.alpha = 200
-				viewers(src) << i
+				GfxSendImage(i)
 				animate(i, alpha=0, time=10)
 				spawn(10) GfxReleaseImage(i)
 
@@ -1269,7 +1269,7 @@ mob/Player/AI/Nympharum
 							owner_prev_loc = ai_owner.loc
 							var/image/i = image(ai_owner.is_arcane_beast.dash_effect, loc=ai_owner.loc)
 							i.alpha = 200
-							viewers(ai_owner) << i
+							GfxSendImage(i)
 							animate(i, alpha=0, time=10)
 							spawn(10) GfxReleaseImage(i)
 

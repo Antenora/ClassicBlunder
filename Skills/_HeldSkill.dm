@@ -287,7 +287,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 		BeamHoldID = null
 		BeamHoldTimer = 0
 
-	if(Z.ChargeOverlay && !held_charge_overlay_ref)
+	var/efx_charge = EnergyFXChargeHook(Z)
+	if(Z.ChargeOverlay && !held_charge_overlay_ref && !efx_charge)
 		var/image/I = image(Z.ChargeOverlay)
 		I.layer = MOB_LAYER + 0.1
 		held_charge_overlay_ref = I
@@ -295,7 +296,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	ShowHeldChargeBar(Z)
 	if(Z.InfiniteHold)
 		UpdateHeldChargeBar(1)
-	KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5, Blend=Z.ChargeWaveBlend, Time=8)
+	if(!efx_charge)
+		KenShockwave(src, icon=Z.ChargeWaveIcon, Size=0.5, Blend=Z.ChargeWaveBlend, Time=8)
 
 	held_skill_macro_key = keys
 
@@ -590,6 +592,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	if(held_charge_overlay_ref)
 		overlays -= held_charge_overlay_ref
 		held_charge_overlay_ref = null
+	EnergyFXChargeClear()
 
 	var/client/C = client
 	if(C)
@@ -609,8 +612,10 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 // ChargeLoop runs for the duration of the hold
 
 /mob/proc/ChargeLoop(var/obj/Skills/Z)
-	FxChargeShimmer(src, Z) //heat wavers over the caster while they hold
-	FlashChargeTick(src, 2)
+	var/efx_charge = EnergyFXChargeDraws(Z)
+	if(!efx_charge)
+		FxChargeShimmer(src, Z)
+		if(!energyfx_streaks) FlashChargeTick(src, 2)
 	var/last_tick_fire = 0
 	var/last_charge_wave = world.time
 	while(held_skill == Z)
@@ -665,7 +670,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 						if(Z.overcharge_steps < Z.OverchargeMaxSteps && src.ManaAmount >= src.SpellManaNeed(Z) + Z.OverchargeManaPerStep)
 							Z.overcharge_steps++
 							Z.held_accrued += Z.OverchargeManaPerStep
-							KenShockwave(src, icon=Z.ChargeWaveIcon, Size=(0.5)+ 0.1 * Z.overcharge_steps, Blend=Z.ChargeWaveBlend, Time=6)
+							if(!efx_charge)
+								KenShockwave(src, icon=Z.ChargeWaveIcon, Size=(0.5)+ 0.1 * Z.overcharge_steps, Blend=Z.ChargeWaveBlend, Time=6)
 						else
 							ReleaseHeldSkill()
 							return
@@ -686,8 +692,9 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 		else if(!Z.InfiniteHold)
 			var/current_charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
 			ringp = clamp((world.time - held_charge_start) / current_charge_ticks, 0, 1)
+		EnergyFXChargeTick(Z, ringp)
 		//ChargeWaveInterval is measured in deciseconds; 0 disables repeating waves.
-		if(Z.ChargeWaveInterval > 0 && world.time-last_charge_wave >= Z.ChargeWaveInterval)
+		if(!efx_charge && Z.ChargeWaveInterval > 0 && world.time-last_charge_wave >= Z.ChargeWaveInterval)
 			if(Z.ChargeWaveInvert)
 				KenShockwave2(src, icon=Z.ChargeWaveIcon, Size=(0.3 + 0.35 * ringp)*Z.ChargeWaveSize, Blend=Z.ChargeWaveBlend, Time=8)
 			else
@@ -795,6 +802,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	if(held_charge_overlay_ref)
 		overlays -= held_charge_overlay_ref
 		held_charge_overlay_ref = null
+	EnergyFXChargeClear()
 	spawn() HideHeldChargeBar()
 
 // HeldSkillBlocksAction returns TRUE if a held skill is currently

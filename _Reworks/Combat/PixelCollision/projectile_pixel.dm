@@ -8,6 +8,8 @@ obj/Skills/Projectile/_Projectile
 		icon_var_scale = 1 //IconVariance random art-scale roll, so the box matches the drawn size
 		pc_basescale = 1
 		beam_chain/chain
+		mob/instant_pin
+		instant_pinning = 0
 
 	proc/SetupPixelHitbox(obj/Skills/Projectile/Z, DirOverride=0)
 		density = 0 //contact via sweep; walls handled in PixelWallCheck
@@ -41,8 +43,26 @@ obj/Skills/Projectile/_Projectile
 
 	proc/OnContact(atom/a)
 		if(Killed || Distance < 0) return
+		if(ContactFuse && ismob(a))
+			if(!fuse_at)
+				fuse_at = world.time + ContactFuse
+				EnergyFXProjectileFuse(src, a)
+				return
+			if(world.time < fuse_at) return
 		if(glob.PIXEL_DEBUG) world.log << "PXC: [src] at ([x],[y]) Bump -> [a] ([a.type]) at ([a.x],[a.y])"
+		if(InstantTravel && !instant_pinning && !instant_pin && ismob(a) && MultiHit && !Piercing) instant_pin = a
 		src.Bump(a)
+
+	proc/InstantPinHits()
+		var/mob/m = instant_pin
+		instant_pin = null
+		instant_pinning = 1
+		var/n = 0
+		while(m && !Killed && Distance > 0 && n++ < 64)
+			var/before = MultiHit
+			OnContact(m)
+			if(MultiHit == before) break
+		instant_pinning = 0
 
 	proc/SweepAllySkip(mob/m)
 		if(!Owner || !m || m == Owner) return FALSE
@@ -137,8 +157,11 @@ obj/Skills/Projectile/_Projectile
 	proc/PmTravel()
 		//dir is fixed for the whole slide set - re-aiming every micro-step makes homers spasm on overshoot
 		for(var/i = 1, i <= pm_substep, i++)
-			sleep(world.tick_lag)
+			if(!InstantTravel || fuse_at) sleep(world.tick_lag)
 			if(Killed || Distance <= 0) return
+			if(fuse_at && world.time < fuse_at)
+				i--
+				continue
 			var/shown = DisplayedCardinal(dir, pc_lastdir)
 			if(isfile(icon) && icon != hb_icon)
 				ApplySkillHitbox(icon, shown, hb_scale, hb_ovW, hb_ovH, hb_ovX, hb_ovY, hb_offX, hb_offY)
@@ -149,9 +172,103 @@ obj/Skills/Projectile/_Projectile
 			step(src, src.dir) //moves step_size px, set at hitbox setup
 			PixelWallCheck()
 			if(Killed || Distance <= 0) return
+			if(drive_mob)
+				DriveStep()
+				if(Killed || Distance <= 0) return
 			PixelContactSweep()
+			if(instant_pin) InstantPinHits()
+			if(efx_shot) efx_shot.FlightTick(src)
+			EnergyFXProjectileTick(src)
 
 	proc/HomingBroken(atom/target)
+		return 0
+
+	proc/EmitBit(bi = 0)
+		var/turf/at = src.loc
+		var/sx = src.step_x
+		var/sy = src.step_y
+		var/mob/own = src.Owner
+		var/ocx = (src.x - 1) * 32 + src.step_x + 16 + src.vhb_ax
+		var/ocy = (src.y - 1) * 32 + src.step_y + 16 + src.vhb_ay
+		if((src.Killed || !isturf(at) || !own) && src.emit_last)
+			at = src.emit_last[1]
+			sx = src.emit_last[2]
+			sy = src.emit_last[3]
+			own = src.emit_last[4]
+			ocx = src.emit_last[5]
+			ocy = src.emit_last[6]
+		if(!src.EmitChild || !own || !isturf(at)) return
+		var/obj/Skills/Projectile/_Projectile/eb = own.Blast(src.EmitChild, at, 0)
+		if(eb && eb.loc == at)
+			eb.step_x = sx
+			eb.step_y = sy
+		if(eb)
+			eb.emit_parent = src
+			eb.emit_index = bi
+			eb.kick_px = ocx
+			eb.kick_py = ocy
+			if(src.emit_angles && bi >= 0 && bi < src.emit_angles.len)
+				eb.kick_angle = src.emit_angles[bi + 1]
+		if(eb && own.Target && ismob(own.Target) && own.Target != own)
+			eb.Homing = own.Target
+			eb.forcedTarget = own.Target
+
+	proc/KickPlace(px, py)
+		var/gx = round(px - 16 - vhb_ax, 1)
+		var/gy = round(py - 16 - vhb_ay, 1)
+		var/tx = round(gx / 32) + 1
+		var/ty = round(gy / 32) + 1
+		var/turf/T = locate(tx, ty, src.z)
+		if(!T || T.density) return 0
+		src.loc = T
+		src.step_x = gx - (tx - 1) * 32
+		src.step_y = gy - (ty - 1) * 32
+		return 1
+
+	proc/KickLife()
+		var/list/K = KICK_PATH
+		var/mob/T = ismob(src.Homing) ? src.Homing : null
+		var/a = src.kick_angle
+		var/zz = src.z
+		var/px = (isnull(src.kick_px) ? (src.x - 1) * 32 + src.step_x + 16 + vhb_ax : src.kick_px) + cos(a) * K["r0"]
+		var/py = (isnull(src.kick_py) ? (src.y - 1) * 32 + src.step_y + 16 + vhb_ay : src.kick_py) + sin(a) * K["r0"]
+		src.kick_px = px
+		src.kick_py = py
+		if(!KickPlace(px, py)) return
+		var/dt = K["dt"]
+		var/sub = max(1, round(world.tick_lag / 10 / dt, 1))
+		var/t = 0
+		var/turn = K["turn"] * dt
+		while(!src.Killed && src.Distance > 0 && t < K["t_max"])
+			sleep(world.tick_lag)
+			if(src.Killed || src.Distance <= 0 || src.z != zz) break
+			if(T && (!T.loc || T.z != zz)) T = null
+			var/reached = 0
+			for(var/i = 1 to sub)
+				t += dt
+				var/v = K["v1"] + (K["v0"] - K["v1"]) * 2.718281828 ** (-t / K["tau"])
+				if(T && t > K["delay"])
+					var/da = arctan((T.x - 1) * 32 + T.step_x + 16 - px, (T.y - 1) * 32 + T.step_y + 16 - py) - a
+					while(da >= 180) da -= 360
+					while(da < -180) da += 360
+					a += clamp(da, -turn, turn)
+				px += cos(a) * v * dt
+				py += sin(a) * v * dt
+				if(T && ((T.x - 1) * 32 + T.step_x + 16 - px) ** 2 + ((T.y - 1) * 32 + T.step_y + 16 - py) ** 2 <= K["hit_r"] ** 2)
+					reached = 1
+					break
+				if(t >= K["t_max"]) break
+			src.kick_px = px
+			src.kick_py = py
+			src.kick_angle = a
+			if(!KickPlace(px, py)) break
+			EnergyFXProjectileTick(src)
+			if(reached)
+				var/mob/own0 = src.Owner
+				OnContact(T)
+				if(!src.Killed && src.Distance > 0 && src.Owner != own0) return 1
+				break
+		if(!src.Killed) src.Distance = 0
 		return 0
 
 	proc/PixelLife()
@@ -165,13 +282,30 @@ obj/Skills/Projectile/_Projectile
 			return
 		if(Area == "Beam" && !Stream && chain && chain.controlled)
 			return
+		if(EmitChild && EmitCount > 0 && !emit_angles)
+			var/obj/Skills/Projectile/ec = EmitChild
+			if(istype(ec) && ec.KickPath)
+				emit_total = EmitCount
+				emit_angles = list()
+				for(var/i = 1 to EmitCount)
+					emit_angles += pick(0, 45, 90, 135, 180, 225, 270, 315) + rand() * 28 - 14
+		if(KickPath && !KickLife())
+			if(Owner) Owner.active_projectiles -= src
+			ProjectileFinish()
+			return
 		if(pm_substep) //pre-move sample so point-blank casts hit a mob on the spawn tile
 			PixelContactSweep()
+			if(instant_pin) InstantPinHits()
 			if(Killed || Distance <= 0)
 				if(Owner) Owner.active_projectiles -= src
 				ProjectileFinish()
 				return
+		if(efx_shot) efx_shot.Launch(src)
+		var/igd = 0
 		while(src.Distance>0 || (src.clash_lock && !src.clash_lock.ended))
+			if(InstantTravel && ++igd > 4 * (DistanceMax + 8))
+				Distance = 0
+				break
 			if(src.clash_lock)
 				if(src.clash_lock.ended) //struggle is over and never cleared us: self-heal
 					src.clash_lock = null
@@ -261,22 +395,30 @@ obj/Skills/Projectile/_Projectile
 						PmTravel()
 					else
 						PixelStep()
+						EnergyFXProjectileTick(src)
 				else
 					src.Distance--
+					if(src.ContactFuse && src.Distance <= 0 && (!src.fuse_at || world.time < src.fuse_at))
+						if(!src.fuse_at)
+							src.fuse_at = world.time + src.ContactFuse
+							EnergyFXProjectileFuse(src, null)
+						src.Distance = 1
+					if(src.ContactFuse && src.fuse_at && world.time >= src.fuse_at + src.HitInterval)
+						src.Distance = 0
 					if(src.StormFall && !src.storm_dropped)
 						animate(src, pixel_z=-1, flags=ANIMATION_RELATIVE)
 			else
 				if(!src.clash_lock) //a clash formed mid-iteration: no extra step into the enemy beam
 					PixelStep() //32px per Speed sleep = old walk() rate
 			if(src.EmitChild && src.EmitCount > 0 && src.Owner && !src.Killed && isturf(src.loc))
+				src.emit_last = list(src.loc, src.step_x, src.step_y, src.Owner, (src.x - 1) * 32 + src.step_x + 16 + src.vhb_ax, (src.y - 1) * 32 + src.step_y + 16 + src.vhb_ay)
 				for(var/e = 0, e < src.EmitEvery && src.EmitCount > 0, e++)
-					var/obj/Skills/Projectile/_Projectile/eb = src.Owner.Blast(src.EmitChild, src.loc, 0)
-					if(eb && eb.loc == src.loc)
-						eb.step_x = src.step_x
-						eb.step_y = src.step_y
-					if(eb && src.Owner.Target && ismob(src.Owner.Target) && src.Owner.Target != src.Owner)
-						eb.Homing = src.Owner.Target
-						eb.forcedTarget = src.Owner.Target
+					var/bi = src.emit_total - src.EmitCount
+					if(e && src.EmitStagger)
+						spawn(src.EmitStagger * e)
+							src.EmitBit(bi)
+					else
+						src.EmitBit(bi)
 					src.EmitCount--
 		if(Owner) Owner.active_projectiles -= src
 		ProjectileFinish()

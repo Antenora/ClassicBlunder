@@ -1,5 +1,5 @@
-/obj/beamfx/var/tmp/fx_bx = 0
-/obj/beamfx/var/tmp/fx_by = 0
+/obj/energyfx/var/tmp/fx_bx = 0
+/obj/energyfx/var/tmp/fx_by = 0
 
 /datum/beamfx/var/list/ovl_cache = list()
 /datum/beamfx/var/list/spk_em
@@ -22,7 +22,8 @@ proc/BeamFXXform(list/sp, bx, by)
 	var/sy = sp[BFX_SY]
 	return matrix(ca * sx * cp - sa * sy * spp, -ca * sx * spp - sa * sy * cp, sp[BFX_X] - bx, sa * sx * cp + ca * sy * spp, -sa * sx * spp + ca * sy * cp, sp[BFX_Y] - by)
 
-proc/BeamFXPlace(obj/beamfx/O, x, y, zz)
+proc/EnergyFXPlace(obj/energyfx/O, x, y, zz)
+	if(O.fx_car) return 0
 	var/tx = floor(x / 32) + 1
 	var/ty = floor(y / 32) + 1
 	if(tx < 1 || ty < 1 || tx > world.maxx || ty > world.maxy) return 0
@@ -65,7 +66,7 @@ proc/BeamFXCool(a)
 	var/list/lcore = ramp[4]
 	if(sp[BFX_LIGHT])
 		var/k = (tag == "accent" || tag == "wl") ? BeamFXCool(a) : 1
-		var/ls = glob ? glob.BEAMFX_LIGHT_SCALE : 1
+		var/ls = glob ? glob.ENERGYFX_LIGHT_SCALE : 1
 		var/g = (grey ? 0.35 : 1) / ls
 		return list((lcore[1] - lc[1]) * k * g, (lcore[2] - lc[2]) * k * g, (lcore[3] - lc[3]) * k * g, 0, lc[1] * g, lc[2] * g, lc[3] * g, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
 	if(grey)
@@ -93,10 +94,10 @@ proc/BeamFXCool(a)
 		var/list/fam = BEAMFX_FAM[sp[BFX_FAM]]
 		var/list/lc = ramp[1]
 		var/list/lcore = ramp[4]
-		var/ls = glob ? glob.BEAMFX_LIGHT_SCALE : 1
+		var/ls = glob ? glob.ENERGYFX_LIGHT_SCALE : 1
 		var/g = (grey ? 0.35 : 1) / ls * pr
 		I = image(icon = fam[1], icon_state = "l[sp[BFX_ST]]")
-		I.plane = BEAMFX_LIGHT_PLANE
+		I.plane = ENERGYFX_LIGHT_PLANE
 		I.blend_mode = BLEND_ADD
 		I.appearance_flags = RESET_COLOR
 		I.color = list((lcore[1] - lc[1]) * g, (lcore[2] - lc[2]) * g, (lcore[3] - lc[3]) * g, 0, lc[1] * g, lc[2] * g, lc[3] * g, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
@@ -104,7 +105,7 @@ proc/BeamFXCool(a)
 	return I
 
 /datum/beamfx/proc/NewObj(list/sp, pr = 0)
-	var/obj/beamfx/O = BeamFXGet(sp[BFX_LIGHT] ? /obj/beamfx/light : /obj/beamfx/paint)
+	var/obj/energyfx/O = EnergyFXGet(sp[BFX_LIGHT] ? /obj/energyfx/light : /obj/energyfx/paint, src)
 	if(!O) return null
 	var/list/fam = BEAMFX_FAM[sp[BFX_FAM]]
 	O.icon = fam[1]
@@ -112,8 +113,8 @@ proc/BeamFXCool(a)
 	O.fx_h = fam[3]
 	O.icon_state = StateOf(sp)
 	O.layer = sp[BFX_ZL]
-	if(!BeamFXPlace(O, sp[BFX_X], sp[BFX_Y], z))
-		BeamFXFree(O)
+	if(!EnergyFXPlace(O, sp[BFX_X], sp[BFX_Y], z))
+		EnergyFXFree(O)
 		return null
 	O.transform = BeamFXXform(sp, O.fx_bx, O.fx_by)
 	O.color = ColorOf(sp)
@@ -125,7 +126,7 @@ proc/BeamFXCool(a)
 /datum/bfx_slot/var/shown = 0
 
 /datum/beamfx/proc/SlotStep(datum/bfx_slot/SL, w, started, delay_first, hold_pre)
-	var/obj/beamfx/O = SL.obj
+	var/obj/energyfx/O = SL.obj
 	if(started && hold_pre > 0) animate(transform = BeamFXXform(SL.last, O.fx_bx, O.fx_by), time = hold_pre)
 	if(w == "hide")
 		if(!started) animate(O, alpha = 0, time = 0.25, delay = delay_first, easing = JUMP_EASING | EASE_IN)
@@ -139,7 +140,7 @@ proc/BeamFXCool(a)
 		SL.st = st
 		SL.last = sp
 		SL.shown = 1
-	beamfx_anim_n++
+	energyfx_anim_n++
 
 /datum/beamfx/proc/Realize()
 	var/list/F1 = frame_specs[1]
@@ -176,7 +177,7 @@ proc/BeamFXCool(a)
 					fs = w
 					break
 			if(!fs) continue
-			var/obj/beamfx/NO = NewObj(fs, fs[BFX_PR])
+			var/obj/energyfx/NO = NewObj(fs, fs[BFX_PR])
 			if(!NO) continue
 			SL = new
 			SL.obj = NO
@@ -186,7 +187,7 @@ proc/BeamFXCool(a)
 			SL.last = fs
 			SL.pr = fs[BFX_PR]
 			slots[key] = SL
-		var/obj/beamfx/O = SL.obj
+		var/obj/energyfx/O = SL.obj
 		if(first && O.layer != first[BFX_ZL]) O.layer = first[BFX_ZL]
 		for(var/si = 1 to 2)
 			if(want[si] == "hide" && !SL.shown) want[si] = null
@@ -196,10 +197,10 @@ proc/BeamFXCool(a)
 			if(islist(w))
 				var/list/ws = w
 				if(abs(ws[BFX_X] - O.fx_bx) > 48 || abs(ws[BFX_Y] - O.fx_by) > 48) ref = ws
-		if(ref && BeamFXPlace(O, ref[BFX_X], ref[BFX_Y], z))
+		if(ref && EnergyFXPlace(O, ref[BFX_X], ref[BFX_Y], z))
 			animate(O, transform = BeamFXXform(SL.last, O.fx_bx, O.fx_by), time = 0, flags = ANIMATION_END_NOW)
 			started = 1
-			beamfx_anim_n++
+			energyfx_anim_n++
 		var/skip1 = isnull(want[1])
 		if(!skip1)
 			SlotStep(SL, want[1], started, 0, 0)
@@ -211,7 +212,7 @@ proc/BeamFXCool(a)
 		if(!s1 && !s2 && !SL.shown)
 			SL.idle++
 			if(SL.idle >= 3)
-				BeamFXFree(SL.obj)
+				EnergyFXFree(SL.obj)
 				slots -= key
 		else
 			SL.idle = 0
@@ -225,7 +226,7 @@ proc/BeamFXCool(a)
 		if("rarc") return clash_mode ? 0.85 / 0.5 : 1 / 0.62
 	return 0
 
-/datum/beamfx/proc/ChainBuild(datum/bfx_obj/o, c, obj/beamfx/O, from_f, list/hl)
+/datum/beamfx/proc/ChainBuild(datum/bfx_obj/o, c, obj/energyfx/O, from_f, list/hl)
 	var/list/specs = o.pre_specs
 	var/last_f = o.pre_f0 + specs.len - 1
 	var/i = from_f
@@ -256,10 +257,10 @@ proc/BeamFXCool(a)
 		n++
 	if(started) animate(alpha = 0, time = 0.25, easing = JUMP_EASING | EASE_IN)
 	else animate(O, alpha = 0, time = 0.25, easing = JUMP_EASING | EASE_IN)
-	beamfx_anim_n += n + 1
+	energyfx_anim_n += n + 1
 	return i - from_f
 
-/datum/beamfx/proc/ChainStep(obj/beamfx/O, list/sp, dur, started)
+/datum/beamfx/proc/ChainStep(obj/energyfx/O, list/sp, dur, started)
 	if(sp)
 		if(!started) animate(O, transform = BeamFXXform(sp, O.fx_bx, O.fx_by), alpha = AlphaOf(sp), color = ColorOf(sp), time = dur, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_LINEAR_TRANSFORM)
 		else animate(transform = BeamFXXform(sp, O.fx_bx, O.fx_by), alpha = AlphaOf(sp), color = ColorOf(sp), time = dur, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_LINEAR_TRANSFORM)
@@ -275,8 +276,8 @@ proc/BeamFXCool(a)
 		for(var/datum/bfx_obj/ro in objs)
 			if(!ro.pre_done || !ro.pobjs || (ro in new_chains)) continue
 			for(var/ci = 1 to ro.pobjs.len)
-				var/obj/beamfx/RO = ro.pobjs[ci]
-				if(RO && RO.loc) BeamFXDue(RO, ceil((ChainBuild(ro, ci, RO, base, hl) + 2) / 2) + 1)
+				var/obj/energyfx/RO = ro.pobjs[ci]
+				if(RO && RO.loc) EnergyFXDue(RO, ceil((ChainBuild(ro, ci, RO, base, hl) + 2) / 2) + 1)
 	for(var/datum/bfx_obj/o in new_chains)
 		var/list/specs = o.pre_specs
 		if(!specs || !specs.len) continue
@@ -291,11 +292,14 @@ proc/BeamFXCool(a)
 		o.pobjs = list()
 		for(var/c = 1 to nc)
 			var/list/sp0 = firstpair[c]
-			var/obj/beamfx/O = NewObj(sp0, (pr > 0) ? pr : 0)
+			var/obj/energyfx/O = NewObj(sp0, (pr > 0) ? pr : 0)
 			if(!O) continue
 			o.pobjs += O
 			var/frames = ChainBuild(o, c, O, base, hl)
-			BeamFXDue(O, ceil((frames + 2) / 2) + 1)
+			EnergyFXDue(O, ceil((frames + 2) / 2) + 1)
+
+/datum/beamfx/proc/SpeckIcon()
+	return BEAMFX_SPECK_ICON
 
 /datum/beamfx/proc/SpeckColor()
 	if(grey) return list(0.875, 0.875, 0.875, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
@@ -304,17 +308,23 @@ proc/BeamFXCool(a)
 	var/kp = BeamFXCool(0.95)
 	return list((core[1] - edge[1]) * kp, (core[2] - edge[2]) * kp, (core[3] - edge[3]) * kp, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, edge[1], edge[2], edge[3], 0)
 
+/datum/beamfx/proc/MapPt(x, y)
+	return list(x, y, ang)
+
 /datum/beamfx/proc/SpeckEmitter(region, x, y, rate, v1, v2, l1, l2, cnt)
-	var/obj/beamfx/emit/O = BeamFXGet(/obj/beamfx/emit)
+	var/obj/energyfx/emit/O = EnergyFXGet(/obj/energyfx/emit, src)
 	if(!O) return null
 	O.fx_w = 32
 	O.fx_h = 32
-	if(!BeamFXPlace(O, x, y, z))
-		BeamFXFree(O)
+	var/list/mp = MapPt(x, y)
+	x = mp[1]
+	y = mp[2]
+	if(!EnergyFXPlace(O, x, y, z))
+		EnergyFXFree(O)
 		return null
 	O.color = SpeckColor()
 	var/particles/beamfx_speck/P = new
-	P.icon = BEAMFX_SPECK_ICON
+	P.icon = SpeckIcon()
 	P.icon_state = grey ? list("gss0" = 31, "gdu0" = 38, "gsk0" = 6) : list("pss0" = 31, "pdu0" = 38, "psk0" = 6)
 	P.lifespan = generator("num", l1, l2)
 	if(cnt) P.count = cnt
@@ -329,8 +339,8 @@ proc/BeamFXCool(a)
 		P.bound2 = vector(1000, 1000, 1000)
 	else
 		P.velocity = generator("circle", v1 * 0.1, vh)
-	var/ca = cos(ang)
-	var/sa = sin(ang)
+	var/ca = cos(mp[3])
+	var/sa = sin(mp[3])
 	P.transform = matrix(ca, -sa, x - O.fx_bx, sa, ca, y - O.fx_by)
 	P.spawning = rate
 	O.particles = P
@@ -342,7 +352,7 @@ proc/BeamFXCool(a)
 
 /datum/beamfx/proc/SpeckStop()
 	for(var/region in spk_em)
-		var/obj/beamfx/emit/O = spk_em[region]
+		var/obj/energyfx/emit/O = spk_em[region]
 		if(!O) continue
 		var/particles/P = O.particles
 		if(P) P.spawning = 0
@@ -369,25 +379,26 @@ proc/BeamFXCool(a)
 			spk_em = list()
 			var/list/R = SpeckRates(mode, strg)
 			for(var/region in R)
-				var/obj/beamfx/emit/NE = SpeckEmitter(region, bx, by, R[region], BEAMFX_SPK_V1, BEAMFX_SPK_V2, BEAMFX_SPK_L1, BEAMFX_SPK_L2, 0)
+				var/obj/energyfx/emit/NE = SpeckEmitter(region, bx, by, R[region], BEAMFX_SPK_V1, BEAMFX_SPK_V2, BEAMFX_SPK_L1, BEAMFX_SPK_L2, 0)
 				if(NE) spk_em[region] = NE
 		else
 			if(abs(bx - spk_x) + abs(by - spk_y) > BEAMFX_SPK_MOVE)
 				spk_x = bx
 				spk_y = by
-				var/ca = cos(ang)
-				var/sa = sin(ang)
+				var/list/mp = MapPt(bx, by)
+				var/ca = cos(mp[3])
+				var/sa = sin(mp[3])
 				for(var/region in spk_em)
-					var/obj/beamfx/emit/O = spk_em[region]
+					var/obj/energyfx/emit/O = spk_em[region]
 					if(!O || !O.particles) continue
-					if(!BeamFXPlace(O, bx, by, z)) continue
+					if(!EnergyFXPlace(O, mp[1], mp[2], z)) continue
 					var/particles/P = O.particles
-					P.transform = matrix(ca, -sa, bx - O.fx_bx, sa, ca, by - O.fx_by)
+					P.transform = matrix(ca, -sa, mp[1] - O.fx_bx, sa, ca, mp[2] - O.fx_by)
 			if(abs(strg - spk_str) > 0.001)
 				spk_str = strg
 				var/list/R2 = SpeckRates(mode, strg)
 				for(var/region in spk_em)
-					var/obj/beamfx/emit/O2 = spk_em[region]
+					var/obj/energyfx/emit/O2 = spk_em[region]
 					if(O2 && O2.particles)
 						var/particles/P2 = O2.particles
 						P2.spawning = R2[region]
@@ -397,7 +408,7 @@ proc/BeamFXCool(a)
 	if(spk_shots.len)
 		for(var/list/s in spk_shots)
 			if(logging) world.log << "BFXE shot [2 * k] [s[1]] [num2text(s[3], 9)] [num2text(s[4], 9)]"
-			var/obj/beamfx/emit/SO
+			var/obj/energyfx/emit/SO
 			switch(s[1])
 				if("final")
 					var/n = round(2 * 75 * s[5], 1)
@@ -413,14 +424,14 @@ proc/BeamFXCool(a)
 	if(spk_live.len)
 		var/list/keep = list()
 		for(var/list/e in spk_live)
-			var/obj/beamfx/emit/O3 = e[1]
+			var/obj/energyfx/emit/O3 = e[1]
 			if(e[2] >= 0 && k >= e[2])
 				var/particles/P3 = O3.particles
 				if(P3) P3.spawning = 0
 				e[2] = -1
 			if(k >= e[3])
 				O3.particles = null
-				BeamFXFree(O3)
+				EnergyFXFree(O3)
 				continue
 			keep += list(e)
 		spk_live = keep
@@ -433,6 +444,7 @@ proc/BeamFXCool(a)
 	for(var/j = 1 to 2)
 		var/fi = 2 * k + (j - 1)
 		if(logging) flog = list()
+		FrameAdvance(fi)
 		Frame(fi, j)
 		if(logging) LogFrame(fi)
 	Realize()
@@ -445,7 +457,7 @@ proc/BeamFXCool(a)
 /datum/beamfx/proc/LogFrame(fi)
 	world.log << "BFXF[log_tag] [fi] [flog.len]"
 	for(var/list/sp in flog)
-		world.log << "BFXS[log_tag] [sp[BFX_FAM]]|[sp[BFX_ST]]|[sp[BFX_LIGHT]]|[num2text(sp[BFX_X], 9)]|[num2text(sp[BFX_Y], 9)]|[num2text(sp[BFX_ANG], 9)]|[num2text(sp[BFX_SX], 9)]|[num2text(sp[BFX_SY], 9)]|[num2text(sp[BFX_PRE], 9)]|[num2text(sp[BFX_ALPHA], 9)]|[num2text(sp[BFX_LAYER], 9)]|[sp[BFX_ORDER]]|[sp[BFX_TAG]]|[num2text(sp[BFX_FADE], 9)]|[sp[BFX_SEED]]"
+		world.log << "BFXS[log_tag] [sp[BFX_FAM]]|[sp[BFX_ST]]|[sp[BFX_LIGHT]]|[num2text(sp[BFX_X], 9)]|[num2text(sp[BFX_Y], 9)]|[num2text(sp[BFX_ANG], 9)]|[num2text(sp[BFX_SX], 9)]|[num2text(sp[BFX_SY], 9)]|[num2text(sp[BFX_PRE], 9)]|[num2text(sp[BFX_ALPHA], 9)]|[num2text(sp[BFX_LAYER], 9)]|[sp[BFX_ORDER]]|[sp[BFX_TAG]]|[num2text(sp[BFX_FADE], 9)]|[sp[BFX_SEED]][(sp.len >= 19 && sp[18]) ? "|[sp[18]]|[sp[19]]" : ""]"
 
 /datum/beamfx/proc/Busy()
 	if(objs.len || spk_live.len || spk_mode) return 1
@@ -458,20 +470,20 @@ proc/BeamFXCool(a)
 	CharsDrop()
 	for(var/key in slots)
 		var/datum/bfx_slot/SL = slots[key]
-		if(SL) BeamFXFree(SL.obj)
+		if(SL) EnergyFXFree(SL.obj)
 	slots = list()
 	objs = list()
 	for(var/region in spk_em)
-		var/obj/beamfx/emit/O = spk_em[region]
+		var/obj/energyfx/emit/O = spk_em[region]
 		if(!O) continue
 		O.particles = null
-		BeamFXFree(O)
+		EnergyFXFree(O)
 	spk_em = null
 	spk_mode = 0
 	for(var/list/e in spk_live)
-		var/obj/beamfx/emit/O2 = e[1]
+		var/obj/energyfx/emit/O2 = e[1]
 		if(!O2) continue
 		O2.particles = null
-		BeamFXFree(O2)
+		EnergyFXFree(O2)
 	spk_live = list()
 	finished = 1

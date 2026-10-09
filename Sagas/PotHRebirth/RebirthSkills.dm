@@ -787,7 +787,7 @@ obj/Skills/Utility
 			animate(GG, alpha=0, transform=matrix()*0.7)
 			usr.loc=usr.UndyingLoc
 			usr.OMessage(15,"[usr] <b>shines brightly with everlasting Hope, refusing to allow their story to end!</b>","<font color=red>[usr]([usr.key]) used Undying.")
-			world << GG
+			GfxSendImage(GG, null, 4)
 			animate(GG, alpha=255, time=30, transform=matrix()*1)
 			animate(usr, color = list(0.45,0.6,0.75, 0.64,0.88,1, 0.16,0.21,0.27, 0,0,0), pixel_y=32, time=30)
 			sleep(40)
@@ -796,7 +796,7 @@ obj/Skills/Utility
 			GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 			GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 156), size = 3)
 			animate(GO, alpha=0)
-			world << GO
+			GfxSendImage(GO, null, 4)
 			animate(GO, alpha=255, time=40)
 			for(var/mob/Players/T in view(31, usr))
 				animate(T.client, color=list(0.5,0,0, 0,0.5,0, 0,0,0.5, 0,0,0.1), time = 40)
@@ -829,10 +829,10 @@ obj/Skills/Utility
 			usr.OMessage(15,"[usr] <b>unlocks the full potential of the Axe of Justice!!!</b>","<font color=red>[usr]([usr.key]) used Undying.")
 			spawn(50)
 				GO.filters=null
-				del GO
+				GfxReleaseImage(GO)
 				GG.filters=null
-				del GG
-			del src
+				GfxReleaseImage(GG)
+				del src
 obj/Skills/Projectile
 	var/PartyReq
 	var/PartyReqType

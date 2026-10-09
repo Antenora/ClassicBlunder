@@ -1,13 +1,40 @@
 /datum/beam/var/tmp/datum/beamfx/fx
 /datum/beam/var/tmp/fx_in_tick = 0
+/datum/beam/var/tmp/datum/beamfx/fork_fx
+/datum/beam/var/tmp/fork_drive = 0
+
+/datum/beam/proc/FxOwned()
+	return (fx || (parent && parent.fx)) ? 1 : 0
 
 /datum/beamfx/var/no_bloom = 0
 /datum/beamfx/var/clash_lead = 0
 /datum/beamfx/var/death_k = -1
+/datum/beamfx/var/fx_name
 
 /datum/beam/New(mob/M, obj/Skills/Projectile/Z, d)
 	..()
-	if(M && BeamFXEligible(Z)) fx = BeamFXStart(src, M, Z)
+	if(M && FxEligible(Z)) fx = FxStart(M, Z)
+
+/mob/proc/EnergyFXChargeHook(obj/Skills/Z)
+	return 0
+
+/mob/proc/EnergyFXChargeDraws(obj/Skills/Z)
+	return 0
+
+/mob/proc/EnergyFXChargeTick(obj/Skills/Z, frac)
+	return
+
+/mob/proc/EnergyFXChargeClear()
+	return
+
+/obj/Skills/Projectile/proc/EnergyFXFeint(mob/p)
+	return 0
+
+/datum/beam/proc/FxEligible(obj/Skills/Projectile/Z)
+	return 0
+
+/datum/beam/proc/FxStart(mob/M, obj/Skills/Projectile/Z)
+	return BeamFXStart(src, M, Z)
 
 /datum/beam/Tick()
 	fx_in_tick = 1
@@ -18,10 +45,20 @@
 		throw e
 	fx_in_tick = 0
 	if(fx) BeamFXTickFrom(src)
+	else if(fork_drive && fork_fx) EnergyFXForkArmTick(src)
 
 /datum/beam/Die()
 	var/datum/beamfx/F = fx
+	var/list/A = arms ? arms.Copy() : null
+	var/datum/beamfx/AF = fork_drive ? fork_fx : null
 	..()
+	if(AF && !AF.finished && AF.death_k < 0)
+		fork_drive = 0
+		if(!EnergyFXForkHandoff(AF, AF.fork_arms, src))
+			AF.death_k = max(0, AF.k)
+			BeamFXAfterlife(AF)
+		return
+	if(F && F.fgeo && A && EnergyFXForkHandoff(F, A, null)) return
 	if(F && !F.finished && F.death_k < 0 && !fx_in_tick)
 		F.death_k = max(0, F.k)
 		BeamFXAfterlife(F)
@@ -30,17 +67,17 @@
 
 /datum/beam/MakePart()
 	var/obj/Skills/Projectile/_Projectile/p = ..()
-	if(p && fx)
+	if(p && FxOwned())
 		p.bfx_plane = p.plane
-		p.plane = BEAMFX_HIDE_PLANE
+		p.plane = ENERGYFX_HIDE_PLANE
 	return p
 
 /datum/beam/HeadGlow()
-	if(fx) return
+	if(FxOwned()) return
 	..()
 
 proc/BeamFXSkillColor(obj/Skills/Projectile/Z)
-	var/list/c = BeamFXHexRGB(Z.fx_main_color)
+	var/list/c = EnergyFXSlotRGB(Z.EnergyColorMain, 158)
 	if(c) return c
 	var/art = FxIconPaint(Z.IconLock, "tail")
 	if(!art) art = FxIconPaint(Z.IconLock, "head")
@@ -59,10 +96,11 @@ proc/BeamFXWidth(datum/beam/B, obj/Skills/Projectile/Z)
 proc/BeamFXStart(datum/beam/B, mob/M, obj/Skills/Projectile/Z)
 	beamfx_seed++
 	var/seed = (round(world.time, 1) * 7 + beamfx_seed * 131) % 30000
-	var/datum/beamfx/F = new(BeamFXDirText(B.bdir), 0, 0, M.z, BeamFXWidth(B, Z), seed, BeamFXSkillColor(Z), BeamFXHexRGB(Z.fx_core_color), BeamFXHexRGB(Z.fx_glow_color))
+	var/datum/beamfx/F = new(BeamFXDirText(B.bdir), 0, 0, M.z, BeamFXWidth(B, Z), seed, BeamFXSkillColor(Z), EnergyFXSlotRGB(Z.EnergyColorCore, 255), EnergyFXSlotRGB(Z.EnergyColorGlow, 158))
 	F.beam = B
 	F.owner = M
 	F.caster_mob = M
+	F.fx_name = Z.name
 	F.logging = glob ? glob.BEAMFX_LOG : 0
 	return F
 
@@ -94,7 +132,7 @@ proc/BeamFXTickFrom(datum/beam/B)
 	if(F.k < 0 || B.firing)
 		if(F.k < 0)
 			F.no_bloom = B.no_origin ? 1 : 0
-			F.start_wt = BeamFXNow()
+			F.start_wt = EnergyFXNow()
 		BeamFXAnchor(B, F)
 	F.s_n = B.parts.len
 	F.s_travelled = B.travelled
@@ -109,7 +147,8 @@ proc/BeamFXTickFrom(datum/beam/B)
 			BeamFXClashEnd(F)
 		else if(F.cm_on)
 			F.s_off = CL.p * glob.CLASH_PUSH_PX + CL.kick
-	if(B.blocked && !B.frozen)
+	var/forked = (F.fgeo || (B.prism_split && B.arms)) ? EnergyFXForkFeed(B, F) : 0
+	if(B.blocked && !B.frozen && !forked)
 		var/mob/m = BeamFXBlocker(B)
 		F.target_mob = m
 		if(m)
@@ -127,6 +166,7 @@ proc/BeamFXTickFrom(datum/beam/B)
 				F.target_d = (px - F.Ox) * F.ax + (py - F.Oy) * F.ay
 			else
 				F.target_d = (F.s_travelled + F.s_n) * F.D
+	if(F.bent && B.steer) EnergyFXBendFeed(B, F)
 	var/u0 = world.tick_usage
 	try
 		F.Step()
@@ -138,7 +178,7 @@ proc/BeamFXTickFrom(datum/beam/B)
 		return
 	beamfx_cost += max(0, world.tick_usage - u0)
 	beamfx_cost_n++
-	if(B.dying && F.death_k < 0)
+	if(B.dying && F.death_k < 0 && !F.fork_handed)
 		F.death_k = F.k
 		BeamFXAfterlife(F)
 
@@ -157,7 +197,10 @@ proc/BeamFXAfterlife(datum/beamfx/F)
 			F.Cleanup()
 
 proc/BeamFXLumOf(datum/beamfx/F)
-	var/list/lc = F.ramp[1]
+	return F.ClashLum()
+
+/datum/beamfx/proc/ClashLum()
+	var/list/lc = ramp[1]
 	return max(0.05, BeamFXLum(lc))
 
 proc/BeamFXBeamBlocker(datum/beam/B)
@@ -210,4 +253,4 @@ proc/BeamFXClashEnd(datum/beamfx/F)
 
 proc/BeamFXUnhide(datum/beam/B)
 	for(var/obj/Skills/Projectile/_Projectile/p in B.parts)
-		if(p && p.plane == BEAMFX_HIDE_PLANE) p.plane = isnull(p.bfx_plane) ? initial(p.plane) : p.bfx_plane
+		if(p && p.plane == ENERGYFX_HIDE_PLANE) p.plane = isnull(p.bfx_plane) ? initial(p.plane) : p.bfx_plane

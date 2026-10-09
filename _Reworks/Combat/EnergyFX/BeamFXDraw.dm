@@ -36,7 +36,7 @@ var/list/BEAMFX_FAM = list(\
 #define BFX_PR 17
 
 /datum/bfx_slot
-	var/obj/beamfx/obj
+	var/obj/energyfx/obj
 	var/fam
 	var/light = 0
 	var/list/last
@@ -66,6 +66,12 @@ var/list/BEAMFX_FAM = list(\
 	var/jit = 0.88 + 0.28 * ((BeamFXMod(fi, 97) * 62 + BeamFXMod(fi0, 97) * 31) % 97) / 97
 	Emit(j, "fll", "Flash", "fl0", 1, cfx, cfy, ang, jit * hs * sxk, jit * hs * syk, 0, alpha, 0, 0, "flash", 1, 0, 6)
 
+/datum/beamfx/var/f_in0 = BEAMFX_STREAM_IN0
+/datum/beamfx/var/f_in1 = BEAMFX_STREAM_IN1
+/datum/beamfx/var/f_out0 = BEAMFX_STREAM_OUT0
+/datum/beamfx/var/f_out1 = BEAMFX_STREAM_OUT1
+/datum/beamfx/var/f_last = BEAMFX_LAST_L
+
 /datum/beamfx/proc/Frame(fi, j)
 	var/t = FT(fi)
 	if(isnull(t0) || t < t0) return
@@ -79,22 +85,19 @@ var/list/BEAMFX_FAM = list(\
 	var/firing = isnull(release_f) || fi < release_f
 	var/drain = !firing && ever_blocked
 	var/rem = Hr - bk
-	var/g_last = drain ? (1 - BeamFXSstep(BEAMFX_LAST_L, BEAMFX_LAST_L + 16, rem)) : 0
+	var/g_last = drain ? (1 - BeamFXSstep(f_last, f_last + 16, rem)) : 0
 	var/g_fly = (!isnull(fly_f) && fi > fly_f) ? (1 - BeamFXSstep(95, 130, rem)) : 0
 	var/flying = !isnull(fly_f) && fi > fly_f
-	var/list/gone = list()
 	for(var/si = 1 to stamp_m.len)
 		var/m = stamp_m[si]
 		if(stamp_tbf[si] > fi) continue
 		var/dd = LatD(m, t, fi)
-		if(dd > Hr + S * 1.5 || dd < bk - S * 1.5)
-			gone += m
-			continue
+		if(dd > Hr + S * 1.5 || dd < bk - S * 1.5) continue
 		var/a_in
-		if(firing) a_in = BeamFXSstep(mz + BEAMFX_STREAM_IN0, mz + BEAMFX_STREAM_IN1, dd)
+		if(firing) a_in = BeamFXSstep(mz + f_in0, mz + f_in1, dd)
 		else if(flying) a_in = BeamFXSstep(bk + 16, bk + 96, dd)
 		else a_in = BeamFXSstep(bk, bk + 40, dd)
-		var/a = a_in * (1 - BeamFXSstep(Hr + BEAMFX_STREAM_OUT0, Hr + BEAMFX_STREAM_OUT1, dd)) * (1 - g_last) * (1 - g_fly)
+		var/a = a_in * (1 - BeamFXSstep(Hr + f_out0, Hr + f_out1, dd)) * (1 - g_last) * (1 - g_fly)
 		if(dead && isnull(fly_t) && !drain) a *= max(0, 1 - (t - dead_t) / 0.15)
 		if(ending) a = 0
 		if(a <= 0.002) continue
@@ -110,26 +113,14 @@ var/list/BEAMFX_FAM = list(\
 		var/zl = 4 + (m + 500) * 0.00001
 		Emit(j, "s[m]p", "Stamp", "s[ph]", 0, x, y, ang, D / 32, ws * syk, 0, a, 4, m, "", 1, 0, zl)
 		Emit(j, "s[m]l", "Stamp", "s[ph]", 1, x, y, ang, D / 32, ws * syk, 0, la, 0, m, "", 1, 0, zl)
-	var/list/alive = list()
-	var/oi = 1
-	while(oi <= objs.len)
+	for(var/oi = 1 to objs.len)
 		var/datum/bfx_obj/o = objs[oi]
-		oi++
 		var/age = t - o.t0
-		if(age < 0)
-			alive += o
-			continue
+		if(age < 0) continue
 		switch(o.kind)
 			if("bead", "streak", "surge")
 				var/dd = o.d0 + o.v * age
-				if(dd > Hr - 6 || (!firing && dd < bk - 30))
-					if(o.kind == "surge" && dd > Hr - 6)
-						var/ta = o.t0 + (Hr - 6 - o.d0) / o.v
-						pulses += list(list(ta, o.scale))
-						if(!isnull(t_hit) && Struggling(fi, 0) && isnull(end_t))
-							ring_q += list(list(ta, o.scale))
-					continue
-				alive += o
+				if(dd > Hr - 6 || (!firing && dd < bk - 30)) continue
 				var/a = BeamFXSstep(mz + 10, mz + 40, dd) * (1 - BeamFXSstep(Hr - 46, Hr - 8, dd)) * BeamFXSstep(bk, bk + 24, dd)
 				if(a <= 0.002) continue
 				var/x = WX(dd, o.lat)
@@ -144,7 +135,6 @@ var/list/BEAMFX_FAM = list(\
 					Emit(j, "o[o.uid]l", "Surge", "su0", 1, x, y, ang, D / 32, ws * o.scale, 0, a, 0, 0, "surge", 1, 0, zl, -1)
 			if("wedge")
 				if(age >= o.life) continue
-				alive += o
 				var/q = age / o.life
 				var/c = Struggling(fi, 0) ? Contact(t, fi, 0) : null
 				var/cd = isnull(c) ? o.d0 : c
@@ -165,27 +155,15 @@ var/list/BEAMFX_FAM = list(\
 				Emit(j, "o[o.uid]l", "Wedge", "wg[o.seq]", 1, cx, cy, ang_t, ln * (1 + 0.1 * q), ln * flip * thin * root, 0, al, 0, 0, "wl", 1, 0, zl, grey ? 0 : -1)
 			if("rarc")
 				if(age >= o.life) continue
-				alive += o
 				ParticleFrame(o, fi)
 			else
 				if(age >= o.life) continue
-				alive += o
 				ParticleFrame(o, fi)
-	objs = alive
-	for(var/m in gone)
-		var/gi = stamp_m.Find(m)
-		if(gi)
-			stamp_m.Cut(gi, gi + 1)
-			stamp_tbf.Cut(gi, gi + 1)
 	var/st = dead ? dead_struggle : Struggling(fi, 0)
 	var/hs = min(0.55 + 0.45 * BeamFXEaseOut((t - t0) / 0.22), max(0.3, (Hr - mz + 8) / 62))
 	for(var/list/p in pulses)
 		if(p[1] <= t && t < p[1] + 0.22)
 			hs *= 1 + 0.11 * p[2] * sin(180 * (t - p[1]) / 0.22)
-	var/list/pk = list()
-	for(var/list/p in pulses)
-		if(p[1] > t - 0.3) pk += list(p)
-	pulses = pk
 	if(st) hs *= 1 + 0.05 * sin(360 * (t - t0) / 0.31) + 0.03 * sin(360 * (t - t0) / 0.17)
 	var/f = floor((fi - fi0) / 4) % BEAMFX_NF
 	var/fb = floor((fi - fi0) / 2) % BEAMFX_NF
@@ -195,18 +173,10 @@ var/list/BEAMFX_FAM = list(\
 	if(st && !isnull(end_t))
 		if(t >= end_t)
 			var/q = t - end_t
-			var/rx = WX(Hr + BEAMFX_CONTACT - 8)
-			var/ry = WY(Hr + BEAMFX_CONTACT - 8)
-			if(!remnant_done)
-				remnant_done = 1
-				spk_shots += list(list("remnant", t, rx, ry))
 			var/i = floor(q / 0.035 + 0.0001)
 			if(i < 7)
 				Head(j, "iA", "Impact", "ie[i]", hx, hy, hs * 1.05, 1, 1, 1.15, 0.92, 3)
 				Flash(j, fi, Hr, hs * 1.15, max(0, 0.9 * (1 - q / 0.16)), 1.2, 0.9)
-			else if(!erode_done)
-				erode_done = 1
-				spk_shots += list(list("erode", t, rx, ry))
 			show = 0
 		else
 			var/qs = (t - swallow_t) / max(0.001, end_t - swallow_t)
@@ -243,7 +213,7 @@ var/list/BEAMFX_FAM = list(\
 				if(rem > 1)
 					var/lx = WX(Hr + 2)
 					var/ly = WY(Hr + 2)
-					var/sxl = max(rem + 2, 2) / BEAMFX_LAST_L
+					var/sxl = max(rem + 2, 2) / f_last
 					var/cxl = lx + ax * -36 * sxl
 					var/cyl = ly + ay * -36 * sxl
 					Emit(j, "lap", "Bloom", "la[f]", 0, cxl, cyl, ang, sxl, ws, 0, g_last, 4.3, 0, "flame", 1, 0, 4.3)

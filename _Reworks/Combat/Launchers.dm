@@ -131,7 +131,7 @@ proc/DunkSlam(mob/dunker, mob/target)
 		Landfall(dunker, 0.6)
 		dunker.Earthquake(8, -4,4,-4,4, 0, 0)
 
-/mob/Players/proc/launchLoop()
+/mob/proc/launchLoop()
 	if(PureRPMode) return
 	if(Launched>0 && !SlowMoTickGate(src))
 		icon_state = "KB"

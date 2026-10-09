@@ -787,7 +787,7 @@ transformation
 					GG.color=list(1,0,0, 0,1,0, 0,0,1, 0.2,0.2,0.4)
 					GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
 					animate(GG, alpha=0, transform=matrix()*0.7)
-					world << GG
+					GfxSendImage(GG, null, 4)
 					animate(GG, alpha=255, time=30, transform=matrix()*1)
 					animate(user, color = list(0.45,0.6,0.75, 0.64,0.88,1, 0.16,0.21,0.27, 0,0,0), pixel_y=32, time=30)
 					sleep(40)
@@ -796,7 +796,7 @@ transformation
 					GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 					GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 156), size = 3)
 					animate(GO, alpha=0)
-					world << GO
+					GfxSendImage(GO, null, 4)
 					animate(GO, alpha=255, time=40)
 					for(var/mob/Players/T in view(31, user))
 						animate(T.client, color=list(0.5,0,0, 0,0.5,0, 0,0,0.5, 0,0,0.1), time = 40)
@@ -934,7 +934,7 @@ transformation
 						GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 						GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(0, 255, 0, 44), size = 3)
 						animate(GO, alpha=0, transform=matrix(), color=rgb(0, 255, 0, 134))
-						world << GO
+						GfxSendImage(GO, null, 4)
 						animate(GO, alpha=210, time=1)
 						sleep(1)
 						animate(GO, transform=matrix()*3, time=60, easing=BOUNCE_EASING | EASE_IN | EASE_OUT, flags=ANIMATION_END_NOW)
@@ -1045,7 +1045,7 @@ transformation
 				GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(0, 255, 0, 44), size = 3)
 				animate(GO, alpha=0, transform=matrix(), color=rgb(0, 255, 0, 134))
-				world << GO
+				GfxSendImage(GO, null, 4)
 				animate(GO, alpha=210, time=1)
 				sleep(1)
 				animate(GO, transform=matrix()*3, time=60, easing=BOUNCE_EASING | EASE_IN | EASE_OUT, flags=ANIMATION_END_NOW)

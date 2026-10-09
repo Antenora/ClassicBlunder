@@ -430,7 +430,7 @@ client/proc/LogPageHTML()
  function rowHtml(r){
   var p=(r.p&&IC\[r.ty]&&okName(r.p)); var pinned=pins\[String(r.i)]; var long=estRows(r)>6&&!expanded\[String(r.i)];
   var inner=lineHtml(r);
-  var h="<div class='row"+(p?' pt':'')+(pinned?' pin':'')+(sel===r.i?' sel':'')+"' data-i='"+r.i+"'"+(long?" data-long='1'":'')+"><div class='pl'></div>";
+  var h="<div class='row"+(p?' pt':'')+(pinned?' pin':'')+(sel===String(r.i)?' sel':'')+"' data-i='"+r.i+"'"+(long?" data-long='1'":'')+"><div class='pl'></div>";
   if(p) h+="<img class='pt' src='"+esc(r.p)+"' alt=''>";
   h+="<div class='tx'><span class='tm'>"+esc(hm(r.lt))+"</span><span class='st'></span>"+inner+"</div></div>";
   return h;
@@ -442,12 +442,12 @@ client/proc/LogPageHTML()
    var rw=rowsEl\[i]; var tx=rw.querySelector('.tx'); if(!tx) continue;
    var maxH=6*16+4; if(tx.offsetHeight<=maxH+8) continue;
    tx.style.maxHeight=maxH+'px'; tx.style.overflow='hidden';
-   var r=rowById(+rw.getAttribute('data-i')); var words=plainOf(r).split(' ').filter(function(x){ return x.length>0; }).length;
+   var r=rowById(rw.getAttribute('data-i')); var words=plainOf(r).split(' ').filter(function(x){ return x.length>0; }).length;
    var more=document.createElement('div'); more.className='more'; more.setAttribute('data-x',rw.getAttribute('data-i')); more.innerHTML="<div class='bg'></div><span>SHOW ALL  "+words.toLocaleString()+" WORDS</span>";
    rw.appendChild(more);
   }
  }
- function rowById(i){ for(var k=0;k<rows.length;k++) if(rows\[k].i===i) return rows\[k]; return null; }
+ function rowById(i){ for(var k=0;k<rows.length;k++) if(String(rows\[k].i)===String(i)) return rows\[k]; return null; }
  function render(){
   var h='';
   if(view==='record'){ log.innerHTML=recordHtml(); footer(); band(); return; }
@@ -491,12 +491,12 @@ client/proc/LogPageHTML()
   if(tab==='admin'){
    h+="<div class='th'><span class='c' style='left:0'>TIME</span><span class='c' style='left:42px'>ADMIN</span><span class='c' style='left:114px'>ACTION</span><span class='c' style='left:"+Math.max(312,W-160)+"px'>DETAIL</span></div>";
    for(var a=0;a<list.length;a++){ var r=list\[a]; var sev=(r.cat==='bans'); var det=r.tg&&r.tg.length?r.tg+(r.d&&r.d.length?' '+r.d:''):(r.d||''); var dl=Math.max(312,W-160);
-    h+="<div class='tr"+(sel===r.i?' sel':'')+"' data-i='"+r.i+"'><div class='pl'></div><span class='c t' style='left:0;width:36px'>"+esc(hm(r.lt))+"</span><span class='c a' style='left:42px;width:66px'>"+esc(r.n||r.k)+"</span><span class='c"+(sev?' sev':'')+"' style='left:114px;width:"+(dl-120)+"px'>"+esc(stripTags(r.ac))+"</span><span class='c d' style='left:"+dl+"px;right:0'>"+esc(stripTags(det))+"</span></div>";
+    h+="<div class='tr"+(sel===String(r.i)?' sel':'')+"' data-i='"+r.i+"'><div class='pl'></div><span class='c t' style='left:0;width:36px'>"+esc(hm(r.lt))+"</span><span class='c a' style='left:42px;width:66px'>"+esc(r.n||r.k)+"</span><span class='c"+(sev?' sev':'')+"' style='left:114px;width:"+(dl-120)+"px'>"+esc(stripTags(r.ac))+"</span><span class='c d' style='left:"+dl+"px;right:0'>"+esc(stripTags(det))+"</span></div>";
    }
   } else {
    h+="<div class='th'><span class='c' style='left:0'>TIME</span><span class='c' style='left:42px'>KEY</span><span class='c' style='left:190px'>EVENT</span><span class='c' style='left:232px'>IP</span><span class='c' style='left:340px'>CID</span></div>";
    for(var b=0;b<list.length;b++){ var r2=list\[b];
-    h+="<div class='tr"+(sel===r2.i?' sel':'')+"' data-i='"+r2.i+"' title='"+esc(r2.r||'')+"'><div class='pl'></div><span class='c t' style='left:0;width:36px'>"+esc(hm(r2.lt))+"</span><span class='c a' style='left:42px;width:142px'>"+esc(r2.k)+"</span><span class='c' style='left:190px;width:36px'>"+esc(r2.ev)+"</span><span class='c d' style='left:232px;width:102px'>"+esc(r2.ip)+"</span><span class='c d' style='left:340px;right:0'>"+esc(r2.cid)+(r2.r&&r2.r.length?" <span class='sev'>ALT?</span>":'')+"</span></div>";
+    h+="<div class='tr"+(sel===String(r2.i)?' sel':'')+"' data-i='"+r2.i+"' title='"+esc(r2.r||'')+"'><div class='pl'></div><span class='c t' style='left:0;width:36px'>"+esc(hm(r2.lt))+"</span><span class='c a' style='left:42px;width:142px'>"+esc(r2.k)+"</span><span class='c' style='left:190px;width:36px'>"+esc(r2.ev)+"</span><span class='c d' style='left:232px;width:102px'>"+esc(r2.ip)+"</span><span class='c d' style='left:340px;right:0'>"+esc(r2.cid)+(r2.r&&r2.r.length?" <span class='sev'>ALT?</span>":'')+"</span></div>";
    }
   }
   return h;
@@ -552,7 +552,7 @@ client/proc/LogPageHTML()
   var nm=e.target.closest('.rs i'); if(nm){ var mk=nm.getAttribute('data-more'); if(mk){ var S=null, sc=scenesOf(visibleRows()); for(var i=0;i<sc.length;i++) if(sc\[i].key===mk) S=sc\[i]; if(S){ nm.parentNode.innerHTML=rosterHtml(S,999); } return; } var n=nm.getAttribute('data-n'); who=(who===n)?'':n; render(); return; }
   var act=e.target.closest('.card .chip'); if(act){ var card=act.closest('.card'); var key=card.getAttribute('data-k'); var a=act.getAttribute('data-a'); if(a==='open'){ view='list'; tab=adminMode()?tab:'log'; buildTabs(); render(); var sh=log.querySelector(".sh\[data-k='"+key+"']"); if(sh) sh.scrollIntoView(); } else if(a==='story'){ storyIdx=+key; view='story'; render(); } else if(a==='name'){ openNote('SCENE NAME',sceneNames\[key]||'',function(v){ topic({logpage:'scene',k:key,title:v}); }); } return; }
   var sh=e.target.closest('.sh'); if(sh){ var k2=sh.getAttribute('data-k'); var hide=sh.classList.toggle('closed'); var n2=sh.nextElementSibling; while(n2&&!n2.classList.contains('sh')){ n2.style.display=hide?'none':''; n2=n2.nextElementSibling; } sh.querySelector('img').src=hide?'lc_car_r.png':'lc_car_d.png'; return; }
-  var row=e.target.closest('.row,.tr'); if(row){ var id=+row.getAttribute('data-i'); sel=(sel===id)?null:id; var all=log.querySelectorAll('.row.sel,.tr.sel'); for(var z=0;z<all.length;z++) all\[z].classList.remove('sel'); if(sel!==null) row.classList.add('sel'); band(); }
+  var row=e.target.closest('.row,.tr'); if(row){ var id=row.getAttribute('data-i'); sel=(sel===id)?null:id; var all=log.querySelectorAll('.row.sel,.tr.sel'); for(var z=0;z<all.length;z++) all\[z].classList.remove('sel'); if(sel!==null) row.classList.add('sel'); band(); }
  });
  bchips.addEventListener('click',function(e){
   var c=e.target.closest('.chip'); if(!c) return; var b=c.getAttribute('data-b'); var r=sel?rowById(sel):null;
@@ -774,6 +774,14 @@ client/proc/LogPageTargets()
 				out += "[ck]|[url_encode("[row["name"]]")]|0"
 	src << output(list2params(list(jointext(out, ";"))), "[LOGPAGE_CTL]:setTargets")
 
+proc/LogDbIdText(id)
+	if(!istext(id) || !length(id) || length(id) > 18) return null
+	for(var/i = 1 to length(id))
+		var/c = text2ascii(id, i)
+		if(c < 48 || c > 57) return null
+	if(!text2num(id)) return null
+	return id
+
 proc/LogDbTzMod(tz)
 	var/m = isnull(tz) ? 0 : round(tz)
 	return "[m >= 0 ? "+" : ""][m] minutes"
@@ -816,9 +824,9 @@ client/proc/LogPageQueryEvents(scope, target, from, upto, tz, cap)
 	var/mod = LogDbTzMod(tz)
 	var/ok
 	if(scope == "world")
-		ok = LogDbExec(q, "SELECT e.id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta, 0 AS mu FROM events e WHERE e.t >= ? AND e.t < ? ORDER BY e.id LIMIT ?", mod, from, upto, cap)
+		ok = LogDbExec(q, "SELECT CAST(e.id AS TEXT) AS id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta, 0 AS mu FROM events e WHERE e.t >= ? AND e.t < ? ORDER BY e.id LIMIT ?", mod, from, upto, cap)
 	else
-		ok = LogDbExec(q, "SELECT e.id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta, w.muffled AS mu FROM events e LEFT JOIN witness w ON w.event_id = e.id AND w.ckey = ? WHERE e.t >= ? AND e.t < ? AND (e.actor = ? OR w.ckey IS NOT NULL) ORDER BY e.id LIMIT ?", mod, target, from, upto, target, cap)
+		ok = LogDbExec(q, "SELECT CAST(e.id AS TEXT) AS id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta, w.muffled AS mu FROM events e LEFT JOIN witness w ON w.event_id = e.id AND w.ckey = ? WHERE e.t >= ? AND e.t < ? AND (e.actor = ? OR w.ckey IS NOT NULL) ORDER BY e.id LIMIT ?", mod, target, from, upto, target, cap)
 	if(ok)
 		while(q.NextRow())
 			rows += list(q.GetRowData())
@@ -890,10 +898,10 @@ client/proc/LogPagePins()
 	if(!mob || !LogDbOpen()) return
 	var/database/query/q = new
 	var/list/ids = list()
-	if(LogDbExec(q, "SELECT event_id FROM pins WHERE ckey=? ORDER BY event_id", mob.ckey))
+	if(LogDbExec(q, "SELECT CAST(event_id AS TEXT) AS e FROM pins WHERE ckey=? ORDER BY event_id", mob.ckey))
 		while(q.NextRow())
 			var/list/row = q.GetRowData()
-			ids += "[row["event_id"]]"
+			ids += row["e"]
 	src << output(list2params(list(jointext(ids, ","))), "[LOGPAGE_CTL]:setPins")
 
 client/proc/LogPageScenes()
@@ -908,7 +916,7 @@ client/proc/LogPageScenes()
 
 client/proc/LogPagePin(id, on)
 	if(!mob || !LogDbOpen()) return
-	id = text2num(id)
+	id = LogDbIdText(id)
 	if(!id) return
 	var/database/query/q = new
 	if(text2num(on)) LogDbExec(q, "INSERT OR REPLACE INTO pins (ckey, event_id, t) VALUES (?,?,datetime('now'))", mob.ckey, id)
@@ -969,7 +977,7 @@ client/proc/LogPageNotes(target)
 	target = ckey(target)
 	var/database/query/q = new
 	var/list/out = list()
-	if(LogDbExec(q, "SELECT id, t, datetime(t, ?) AS lt, admin, event_id, severity, body FROM notes WHERE ckey=? ORDER BY id DESC LIMIT 100", LogDbTzMod(logpage_tz), target))
+	if(LogDbExec(q, "SELECT id, t, datetime(t, ?) AS lt, admin, nullif(CAST(event_id AS TEXT), '0') AS event_id, severity, body FROM notes WHERE ckey=? ORDER BY id DESC LIMIT 100", LogDbTzMod(logpage_tz), target))
 		while(q.NextRow())
 			var/list/row = q.GetRowData()
 			out += list(list("i" = row["id"], "lt" = row["lt"], "by" = row["admin"], "e" = row["event_id"], "s" = row["severity"], "b" = row["body"]))
@@ -981,7 +989,7 @@ client/proc/LogPageNoteAdd(target, event_id, severity, body)
 	body = html_encode(copytext("[body]", 1, 2000))
 	if(!length(body)) return
 	var/database/query/q = new
-	LogDbExec(q, "INSERT INTO notes (t, admin, ckey, event_id, severity, body) VALUES (datetime('now'),?,?,?,?,?)", mob.ckey, target, text2num(event_id) ? text2num(event_id) : 0, severity ? severity : "note", body)
+	LogDbExec(q, "INSERT INTO notes (t, admin, ckey, event_id, severity, body) VALUES (datetime('now'),?,?,?,?,?)", mob.ckey, target, LogDbIdText(event_id) || 0, severity ? severity : "note", body)
 	LogAdminAction(mob, "other", "added a note on [target]", target, copytext(body, 1, 120))
 	LogPageNotes(target)
 
@@ -1040,7 +1048,7 @@ client/proc/LogPageRecord(target)
 			pun += list(list("p" = "[z["Punishment"]]", "by" = "[z["User"]]", "r" = "[z["Reason"]]", "d" = "[z["Duration"]]", "t" = "[z["Time"]]"))
 	rec["pun"] = pun
 	var/list/notes = list()
-	if(LogDbExec(q, "SELECT id, datetime(t, ?) AS lt, admin, event_id, severity, body FROM notes WHERE ckey=? ORDER BY id DESC LIMIT 100", mod, target))
+	if(LogDbExec(q, "SELECT id, datetime(t, ?) AS lt, admin, nullif(CAST(event_id AS TEXT), '0') AS event_id, severity, body FROM notes WHERE ckey=? ORDER BY id DESC LIMIT 100", mod, target))
 		while(q.NextRow())
 			var/list/row = q.GetRowData()
 			notes += list(list("i" = row["id"], "lt" = row["lt"], "by" = row["admin"], "e" = row["event_id"], "s" = row["severity"], "b" = row["body"]))
@@ -1049,7 +1057,7 @@ client/proc/LogPageRecord(target)
 
 client/proc/LogPageContext(id)
 	if(!mob || LogPageLevel() < 3 || !LogDbOpen()) return
-	id = text2num(id)
+	id = LogDbIdText(id)
 	if(!id) return
 	var/database/query/q = new
 	var/t = null
@@ -1107,7 +1115,7 @@ client/proc/LogPageLivePush(list/batch)
 			var/list/wit = r["wit"]
 			if(r["actor"] != target && !(islist(wit) && !isnull(wit[target]))) continue
 		var/list/row = null
-		if(LogDbExec(q, "SELECT e.id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta FROM events e WHERE e.id=?", mod, r["id"]) && q.NextRow())
+		if(LogDbExec(q, "SELECT CAST(e.id AS TEXT) AS id, e.t, datetime(e.t, ?) AS lt, e.ty, e.actor, e.name, e.color, e.font, e.pt, e.z, e.x, e.y, e.area, e.body, e.sbody, e.meta FROM events e WHERE e.id=?", mod, r["id"]) && q.NextRow())
 			row = q.GetRowData()
 		if(!row) continue
 		var/list/wit2 = r["wit"]

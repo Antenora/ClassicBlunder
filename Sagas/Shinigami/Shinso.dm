@@ -109,17 +109,19 @@ mob/var/tmp/ButouActive = FALSE
 				return
 			adjust(usr)
 			src.Trigger(usr)
+			if(!src.SlotlessOn) return
+			var/seq = ++bankai_seq
 			var/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form/sf = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
 			if(sf) sf.applyBankaiIcon(usr)
 			if(sf) sf.applyBankaiShihakushoIcon(usr)
 			var/mob/M = usr
 			spawn()
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq)) return
 				for(var/i = 1 to 10)
-					if(!M || !M.loc) return
+					if(!BankaiLive(M, seq)) return
 					KKTShockwave(M, icon='Icons/Effects/fevKiai.dmi', Size=1.5)
 					sleep(2)
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq)) return
 				OMsg(M, "<b>[M] calls out, \"Bankai... [M.BankaiPrefix]!\"</b>")
 		else
 			src.Trigger(usr)

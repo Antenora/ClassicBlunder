@@ -47,6 +47,7 @@ var/list/strikeHooksByStage
 			strikeHooksByStage[H.stage] += H
 	var/list/L = strikeHooksByStage[stage]
 	if(!L) return
+	if(stage == "post" && (!S.attacker || !S.defender)) return
 	for(var/strikeHook/H as anything in L)
 		H.fire(S)
 

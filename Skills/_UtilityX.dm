@@ -976,7 +976,7 @@ obj/Skills/Utility
 			OMsg(usr, "[usr] begins the ritual to seal [Choice]'s power...")
 			var/image/Circle=image(icon='Demon Gate.dmi', loc=Choice, pixel_x=-96, pixel_y=-96, layer=2)
 			Circle.alpha=0
-			world << Circle
+			GfxSendImage(Circle, null, GfxBcImageReach(Circle))
 			spawn()
 				animate(Circle, alpha=255, time=100)
 			Choice.overlays+='SparksCoolRed.dmi'
@@ -996,7 +996,7 @@ obj/Skills/Utility
 				usr << "[Choice] arose before the ritual was complete!  Your magic is wasted!"
 			Choice.overlays-='SparksCoolRed.dmi'
 			src.Using=0
-			del Circle
+			GfxReleaseImage(Circle)
 
 	Seal_Movement
 		desc="Seal a fallen foe's ability to leave a particular area!"
@@ -1033,7 +1033,7 @@ obj/Skills/Utility
 			OMsg(usr, "[usr] begins the ritual to seal [Choice]'s movement...")
 			var/image/Circle=image(icon='Demon Gate.dmi', loc=Choice, pixel_x=-96, pixel_y=-96, layer=2)
 			Circle.alpha=0
-			world << Circle
+			GfxSendImage(Circle, null, GfxBcImageReach(Circle))
 			spawn()
 				animate(Circle, alpha=255, time=100)
 			Choice.overlays+='SparksCoolRed.dmi'
@@ -1063,7 +1063,7 @@ obj/Skills/Utility
 				usr << "[Choice] arose before the ritual was complete!  Your magic is wasted!"
 			Choice.overlays-='SparksCoolRed.dmi'
 			src.Using=0
-			del Circle
+			GfxReleaseImage(Circle)
 
 	Crystalize_Command_Seal
 		desc="Crystalize an absolute order in form of a Seal! They'll provide additional options of interacting with your contracts."

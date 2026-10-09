@@ -28,7 +28,7 @@
 	proc/hair_anim(mob/user)
 		set waitfor = 0
 		var/image/HF=image(icon=user.Hair_Base, pixel_x=user.HairX, pixel_y=user.HairY, loc = user)
-		world<<HF
+		GfxSendImage(HF)
 		HF.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 		HF.color=null
 		animate(HF, alpha=0, time = 0, flags = ANIMATION_PARALLEL)

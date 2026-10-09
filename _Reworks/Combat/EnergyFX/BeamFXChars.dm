@@ -24,23 +24,23 @@ var/list/beamfx_icon_size = list()
 	Savable = 0
 	gfx_transient_visual = 1
 
-/obj/beamfx_master/rimw
+/obj/energyfx_master/rimw
 	plane = BEAMFX_RIMW_PLANE
-	render_target = "*beamfx_rimw"
+	render_target = "*energyfx_rimw"
 
-/obj/beamfx_master/rima
+/obj/energyfx_master/rima
 	plane = BEAMFX_RIMA_PLANE
-	render_target = "*beamfx_rima"
+	render_target = "*energyfx_rima"
 
-/obj/beamfx_relay/rimw
+/obj/energyfx_relay/rimw
 	layer = BEAMFX_RIM_LAYER
-	render_source = "*beamfx_rimw"
+	render_source = "*energyfx_rimw"
 	color = list(0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-/obj/beamfx_relay/rima
+/obj/energyfx_relay/rima
 	layer = BEAMFX_RIM_LAYER + 0.001
 	blend_mode = BLEND_ADD
-	render_source = "*beamfx_rima"
+	render_source = "*energyfx_rima"
 
 /datum/bfx_char
 	var/mob/M
@@ -119,7 +119,7 @@ proc/BeamFXCopyApp(obj/O, mob/M, pl, lay, flags)
 	O.render_target = null
 	O.render_source = null
 
-proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/palm, list/parts)
+proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/palm, list/parts, icon/palm_icon)
 	if(!parts) parts = list()
 	while(parts.len < nparts * 2) parts += new /obj/beamfx_char
 	var/apart = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
@@ -136,7 +136,7 @@ proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/p
 			f += filter(type = "alpha", render_source = sil_rt, x = dx * m, y = dy * m)
 		if(rb > 0) f += filter(type = "blur", size = rb)
 		f += filter(type = "alpha", render_source = sil_rt)
-		if(palm) f += filter(type = "alpha", icon = BeamFXMaskIcon("palmw"), x = palm[1], y = palm[2])
+		if(palm) f += filter(type = "alpha", icon = palm_icon ? palm_icon : BeamFXMaskIcon("palmw"), x = palm[1], y = palm[2])
 		if(is_add)
 			var/c = 0.75 * wgt * level
 			f += filter(type = "color", color = list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, col[1] * c, col[2] * c, col[3] * c, 0, 0, 0, 0, 1))
@@ -157,8 +157,8 @@ proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/p
 	var/apart = KEEP_APART | RESET_COLOR | RESET_ALPHA | RESET_TRANSFORM
 	Copy(sil, 0, FLOAT_LAYER, apart)
 	sil.render_target = "*[id]"
-	Copy(occ, BEAMFX_OCC_PLANE, 1, apart)
-	Copy(locc, BEAMFX_LOCC_PLANE, 1, apart)
+	Copy(occ, ENERGYFX_OCC_PLANE, 1, apart)
+	Copy(locc, ENERGYFX_LOCC_PLANE, 1, apart)
 	var/list/fo = list()
 	var/list/fl = list()
 	if(above)
@@ -232,7 +232,7 @@ proc/BeamFXSortNums(list/L)
 		for(var/i = 1 to vs.len)
 			if(i == 1) animate(O, alpha = vs[i], time = durs[i], loop = loopv ? loopv : 1, easing = JUMP_EASING | EASE_IN)
 			else animate(alpha = vs[i], time = durs[i], easing = JUMP_EASING | EASE_IN)
-	beamfx_anim_n += vs.len * objs_.len
+	energyfx_anim_n += vs.len * objs_.len
 	return vs.len
 
 /datum/beamfx/proc/CasterChain()
@@ -324,8 +324,8 @@ proc/BeamFXSortNums(list/L)
 			ch_t_state = 0
 		cfx_target.Refresh(src, "[d]", null, null, null, tl)
 		var/t2 = FT(2 * k + 1)
-		var/st = Struggling(2 * k + 1, 0)
-		var/ending = (!isnull(end_t) && t2 > end_t + 0.1) || (!isnull(dead_t) && isnull(end_t) && t2 > dead_t)
+		var/st = TargetHeld(2 * k + 1)
+		var/ending = TargetEnding(t2)
 		if(ch_t_state <= 2 && !isnull(t_hit) && (ending || (!st && isnull(end_t) && isnull(dead_t))))
 			if(ch_t_state > 0)
 				if(ending) TargetFade()
@@ -339,6 +339,12 @@ proc/BeamFXSortNums(list/L)
 		else if(ch_t_state == 1 && 2 * k >= TargetLoopStart())
 			TargetChain(2 * k + 40, -1)
 			ch_t_state = 2
+
+/datum/beamfx/proc/TargetHeld(f)
+	return Struggling(f, 0)
+
+/datum/beamfx/proc/TargetEnding(t2)
+	return (!isnull(end_t) && t2 > end_t + 0.1) || (!isnull(dead_t) && isnull(end_t) && t2 > dead_t)
 
 /datum/beamfx/proc/CharsDrop()
 	if(cfx_caster) cfx_caster.Drop()

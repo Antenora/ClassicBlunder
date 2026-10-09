@@ -192,7 +192,7 @@
 		i.layer = MOB_LAYER-0.1
 		i.mouse_opacity = 0
 		animate(i, alpha=0)
-		world << i
+		GfxSendImage(i)
 		t.effects+=i
 		animate(i, alpha = 255, time = 2)
 		t.Deluged=1

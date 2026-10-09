@@ -594,7 +594,7 @@ mob/proc/FlashGrabBand(on)
 			vis_contents -= B
 
 proc/FlashBeamIgnite(datum/beam/B, omni = 0)
-	if(!glob.FLASH_STATES || !B || !B.owner) return
+	if(!glob.FLASH_STATES || !B || !B.owner || B.fx) return
 	var/mob/M = B.owner
 	var/w = clamp((B.charge - 0.5), 0, 1)
 	var/col = FxBlastTint(B.skill)
@@ -632,6 +632,7 @@ proc/FlashSweetSpot(mob/M)
 			if(M) M.vis_contents -= S
 
 proc/FlashVolleyHand(mob/M, obj/Skills/Projectile/Z, on)
+	if(EnergyFXRow(Z)) return
 	if(on)
 		if(!glob.FLASH_STATES || !M || M._flash_hand) return
 		var/col = FxBlastTint(Z) || "#ffffff"

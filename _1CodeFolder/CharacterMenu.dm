@@ -50,7 +50,8 @@
 	"Customize: Ki Charge" = "Charge-up effect",
 	"Customize: Skills" = "Skill icons, messages & looks",
 	"Customize: PU Charging" = "Custom power-up line",
-	"Customize: Buff Portraits" = "Set portrait tags for your buffs"
+	"Customize: Buff Portraits" = "Set portrait tags for your buffs",
+	"Customize: Energy Colors" = "Main, core & glow per energy skill"
 )
 /var/list/CUST_SPRITE_CFG = list(
 	"Customize: Hair" = list("spr" = "Hair_Base", "col" = "Hair_Color", "ox" = "HairX", "oy" = "HairY", "apply" = "hair"),
@@ -108,13 +109,28 @@
 /var/list/HAT_TGL_OFF = list('HUD/toggle_off_1.png', 'HUD/toggle_off_2.png', 'HUD/toggle_off_3.png', 'HUD/toggle_off_4.png', 'HUD/toggle_off_5.png')
 /var/list/HAT_TGL_ON  = list('HUD/toggle_on_1.png', 'HUD/toggle_on_2.png', 'HUD/toggle_on_3.png', 'HUD/toggle_on_4.png', 'HUD/toggle_on_5.png')
 
-client/proc/CMloc(dx, dy)
-	var/py = CMENU_H - dy
-	var/ax = dx + cm_pan_x
-	var/ay = py + cm_pan_y
-	var/axp = ((ax % 32) + 32) % 32
-	var/ayp = ((ay % 32) + 32) % 32
-	return "[cm_atx + (ax - axp) / 32]:[axp],[cm_aty + (ay - ayp) / 32]:[ayp]"
+client/proc/CMput(atom/movable/o, dx, dy)
+	o.pixel_x = dx
+	o.pixel_y = CMENU_H - dy
+
+client/proc/CmHolderSync()
+	PanelMoveTo(cm_holder, (cm_atx - 1) * 32 + cm_pan_x, (cm_aty - 1) * 32 + cm_pan_y)
+
+client/proc/CmObj(path)
+	return PanelNew(cm_box, path)
+
+client/proc/CmCustObj(path)
+	return PanelNew(cm_custbox, path)
+
+client/proc/CmPopBox()
+	var/atom/movable/shud/panelholder/H = PanelHolderNew(CMENU_LAYER)
+	cm_holder.vis_contents += H
+	return H
+
+client/proc/CmPopRelease(atom/movable/shud/panelholder/H)
+	if(!H) return
+	if(cm_holder) cm_holder.vis_contents -= H
+	PanelRelease(H)
 
 /atom/movable/shud/cmframe
 	layer = CMENU_LAYER
@@ -499,6 +515,11 @@ client
 		atom/movable/shud/cmtext/cm_rpused
 		atom/movable/shud/cmportrait/cm_portrait
 		atom/movable/shud/menutext/cmbuff_hoverlbl
+		atom/movable/shud/panelholder/cm_holder
+		atom/movable/shud/panelholder/cm_box
+		atom/movable/shud/panelholder/cm_custbox
+		atom/movable/shud/panelholder/cm_descbox
+		atom/movable/shud/panelholder/cm_gpbox
 
 client/proc/InitCharacterMenuButton()
 	btn_character = new('HUD/ui_icon_profile.png')
@@ -520,12 +541,6 @@ client/proc/ToggleCharacterMenu()
 client/proc/ClearCMenuObjs()
 	HideDescPanel()
 	ClearCustPanel()
-	if(cmenu_objs)
-		while(cmenu_objs.len)
-			var/atom/movable/o = cmenu_objs[cmenu_objs.len]
-			cmenu_objs.len--
-			screen -= o
-			del o
 	cmenu_objs = list()
 	cmenu_vals = list()
 	cmenu_fills = list()
@@ -543,6 +558,12 @@ client/proc/CloseCharacterMenu()
 	cmenu_open = FALSE
 	CloseSkillInfo()
 	ClearCMenuObjs()
+	PanelRelease(cm_custbox)
+	PanelRelease(cm_box)
+	PanelRelease(cm_holder)
+	cm_custbox = null
+	cm_box = null
+	cm_holder = null
 	cmenu_objs = null
 	if(btn_character)
 		btn_character.icon = 'HUD/ui_slot_available.png'
@@ -551,7 +572,7 @@ client/proc/CloseCharacterMenu()
 client/proc/ShowBuffSlotName(atom/movable/shud/cmbuff/b)
 	if(!cmbuff_hoverlbl || !b || !b.buff_name) return
 	cmbuff_hoverlbl.maptext = "<center><span style=\"[CMENU_FONT]; color:#8be9ff\">[b.buff_name]</span></center>"
-	cmbuff_hoverlbl.screen_loc = CMloc(b.menu_dx - 54, 330)
+	CMput(cmbuff_hoverlbl, b.menu_dx - 54, 330)
 	cmbuff_hoverlbl.alpha = 255
 client/proc/HideBuffSlotName()
 	if(cmbuff_hoverlbl) cmbuff_hoverlbl.alpha = 0
@@ -585,8 +606,15 @@ client/proc/OpenCharacterMenu()
 		btn_character.icon = 'HUD/ui_slot_unavailable.png'
 		btn_character.SetGlyphDimmed(TRUE)
 		if(btn_character_label) btn_character_label.alpha = 0
+	cm_holder = PanelHolderNew(CMENU_LAYER)
+	CmHolderSync()
+	cm_box = PanelHolderNew(CMENU_LAYER)
+	cm_custbox = PanelHolderNew(CMENU_LAYER)
+	cm_holder.vis_contents += cm_box
+	cm_holder.vis_contents += cm_custbox
 	ClearCMenuObjs()
 	BuildCharacterMenu(TRUE)
+	screen += cm_holder
 
 client/proc/CharMenuTab(idx)
 	if(idx == cmenu_tab) return
@@ -603,38 +631,39 @@ client/proc/CMTabBg()
 	return CMENU_R0
 
 client/proc/MkVal(key, dx, dy, w, align = "right")
-	var/atom/movable/shud/cmval/v = new
+	var/atom/movable/shud/cmval/v = CmObj(/atom/movable/shud/cmval)
 	v.maptext_width = w
 	v.text_align = align
-	v.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(v, dx, dy + CMENU_VY)
 	cmenu_vals[key] = v
 	cmenu_objs += v
 
 client/proc/MkRow(lbl, key, dx, dy, w)
-	var/atom/movable/shud/cmtext/L = new
+	var/atom/movable/shud/cmtext/L = CmObj(/atom/movable/shud/cmtext)
 	L.maptext_width = w
-	L.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(L, dx, dy + CMENU_VY)
 	L.maptext = "<span style=\"[CMENU_FONT]; color:#8be9ff\">[lbl]</span>"
 	cmenu_objs += L
 	MkVal(key, dx, dy, w, "right")
 
 client/proc/MkAttr(lbl, key, cx)
-	var/atom/movable/shud/cmtext/L = new
+	var/atom/movable/shud/cmtext/L = CmObj(/atom/movable/shud/cmtext)
 	L.maptext_width = 94
-	L.screen_loc = CMloc(cx - 47, 116 + CMENU_VY)
+	CMput(L, cx - 47, 116 + CMENU_VY)
 	L.maptext = "<span style=\"[CMENU_FONT]; color:#8be9ff; text-align:center\">[lbl]</span>"
 	cmenu_objs += L
 	MkVal(key, cx - 47, 132, 94, "center")
-	var/atom/movable/shud/cmfill/Fl = new
-	Fl.screen_loc = CMloc(cx - 37, 146 + 2)
+	var/atom/movable/shud/cmfill/Fl = CmObj(/atom/movable/shud/cmfill)
+	CMput(Fl, cx - 37, 146 + 2)
 	cmenu_fills += Fl
 	cmenu_objs += Fl
 
 client/proc/BuildCharacterMenu(fade = FALSE)
-	if(!mob) return
-	var/atom/movable/shud/cmframe/F = new
+	if(!mob || !cm_box) return
+	PanelBegin(cm_box)
+	var/atom/movable/shud/cmframe/F = CmObj(/atom/movable/shud/cmframe)
 	F.icon = CMTabBg()
-	F.screen_loc = CMloc(0, CMENU_H)
+	CMput(F, 0, CMENU_H)
 	cmenu_objs += F
 	BuildHeaderOverlays()
 	switch(cmenu_tab)
@@ -643,28 +672,27 @@ client/proc/BuildCharacterMenu(fade = FALSE)
 		if(2) BuildCustomContent()
 		if(3) BuildGearContent()
 		if(4) BuildPersonalContent()
-	for(var/atom/movable/o in cmenu_objs)
-		screen += o
+	PanelEnd(cm_box)
 	UpdateCharacterMenu()
 	if(fade)
-		KineticEntrance(cmenu_objs)
+		PanelFade(cm_holder)
 
 client/proc/BuildHeaderOverlays()
-	cm_portrait = new
+	cm_portrait = CmObj(/atom/movable/shud/cmportrait)
 	cm_portrait.icon = mob.GetPortrait()
-	cm_portrait.screen_loc = CMloc(560, 24 + 36)
+	CMput(cm_portrait, 560, 24 + 36)
 	cmenu_objs += cm_portrait
-	cm_name = new;  cm_name.maptext_width = 320;  cm_name.screen_loc = CMloc(26, 60 + CMENU_VY); cmenu_objs += cm_name
-	cm_ident = new; cm_ident.maptext_width = 320; cm_ident.screen_loc = CMloc(26, 74 + CMENU_VY); cmenu_objs += cm_ident
-	var/atom/movable/shud/cmtext/pl = new; pl.maptext_width = 80; pl.screen_loc = CMloc(360, 60 + CMENU_VY)
+	cm_name = CmObj(/atom/movable/shud/cmname);  cm_name.maptext_width = 320;  CMput(cm_name, 26, 60 + CMENU_VY); cmenu_objs += cm_name
+	cm_ident = CmObj(/atom/movable/shud/cmtext); cm_ident.maptext_width = 320; CMput(cm_ident, 26, 74 + CMENU_VY); cmenu_objs += cm_ident
+	var/atom/movable/shud/cmtext/pl = CmObj(/atom/movable/shud/cmtext); pl.maptext_width = 80; CMput(pl, 360, 60 + CMENU_VY)
 	pl.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">POTENTIAL</span>"; cmenu_objs += pl
-	cm_pot = new;   cm_pot.maptext_width = 60;   cm_pot.screen_loc = CMloc(440, 60 + CMENU_VY); cmenu_objs += cm_pot
-	cm_focus = new; cm_focus.maptext_width = 90; cm_focus.screen_loc = CMloc(458, 60 + CMENU_VY); cmenu_objs += cm_focus
-	var/atom/movable/shud/cmtext/prl = new; prl.maptext_width = 80; prl.screen_loc = CMloc(360, 74 + CMENU_VY)
+	cm_pot = CmObj(/atom/movable/shud/cmtext);   cm_pot.maptext_width = 60;   CMput(cm_pot, 440, 60 + CMENU_VY); cmenu_objs += cm_pot
+	cm_focus = CmObj(/atom/movable/shud/cmtext); cm_focus.maptext_width = 90; CMput(cm_focus, 458, 60 + CMENU_VY); cmenu_objs += cm_focus
+	var/atom/movable/shud/cmtext/prl = CmObj(/atom/movable/shud/cmtext); prl.maptext_width = 80; CMput(prl, 360, 74 + CMENU_VY)
 	prl.maptext = "<span style=\"[CMENU_FONT]; color:#96c3e1\">PRONOUNS</span>"; cmenu_objs += prl
-	cm_pron = new;  cm_pron.maptext_width = 120; cm_pron.screen_loc = CMloc(440, 74 + CMENU_VY); cmenu_objs += cm_pron
-	cm_rp = new;     cm_rp.maptext_width = 200;     cm_rp.screen_loc = CMloc(136, 60 + CMENU_VY); cmenu_objs += cm_rp
-	cm_rpused = new; cm_rpused.maptext_width = 200; cm_rpused.screen_loc = CMloc(136, 75 + CMENU_VY); cmenu_objs += cm_rpused
+	cm_pron = CmObj(/atom/movable/shud/cmpron);  cm_pron.maptext_width = 120; CMput(cm_pron, 440, 74 + CMENU_VY); cmenu_objs += cm_pron
+	cm_rp = CmObj(/atom/movable/shud/cmtext);     cm_rp.maptext_width = 200;     CMput(cm_rp, 136, 60 + CMENU_VY); cmenu_objs += cm_rp
+	cm_rpused = CmObj(/atom/movable/shud/cmtext); cm_rpused.maptext_width = 200; CMput(cm_rpused, 136, 75 + CMENU_VY); cmenu_objs += cm_rpused
 
 client/proc/BuildStatsContent()
 	MkAttr("STR", "str", 63); MkAttr("END", "end", 145); MkAttr("SPD", "spd", 227); MkAttr("FOR", "for", 309)
@@ -684,13 +712,13 @@ client/proc/BuildStatsContent()
 	for(var/lbl in grows)
 		MkRow(lbl, grows[lbl], 428, 182 + i * 18, 170); i++
 	for(var/j = 1 to 5)
-		var/atom/movable/shud/cmbuff/b = new
+		var/atom/movable/shud/cmbuff/b = CmObj(/atom/movable/shud/cmbuff)
 		b.menu_dx = 428 + (j - 1) * 32
-		b.screen_loc = CMloc(b.menu_dx + 1, 313)
+		CMput(b, b.menu_dx + 1, 313)
 		b.alpha = 0
 		cmenu_buffs += b
 		cmenu_objs += b
-	cmbuff_hoverlbl = new /atom/movable/shud/menutext
+	cmbuff_hoverlbl = CmObj(/atom/movable/shud/menutext)
 	cmbuff_hoverlbl.layer = CMENU_LAYER + 0.6
 	cmbuff_hoverlbl.maptext_width = 140
 	cmbuff_hoverlbl.maptext_height = 16
@@ -705,15 +733,15 @@ client/proc/BuildPersonalContent()
 	var/i = 0
 	for(var/list/b in btns)
 		var/topy = 138 + i * 40
-		var/atom/movable/shud/cmpersbtn/btn = new
+		var/atom/movable/shud/cmpersbtn/btn = CmObj(/atom/movable/shud/cmpersbtn)
 		btn.icon = 'HUD/cust_button.png'
 		btn.action = b[2]
-		btn.screen_loc = CMloc(bx, topy + 26)
+		CMput(btn, bx, topy + 26)
 		cmenu_objs += btn
-		var/atom/movable/shud/cmtext/L = new
+		var/atom/movable/shud/cmtext/L = CmObj(/atom/movable/shud/cmtext)
 		L.maptext_width = 150
 		L.layer = CMENU_LAYER + 0.5
-		L.screen_loc = CMloc(bx, (topy + 8) + CMENU_VY)
+		CMput(L, bx, (topy + 8) + CMENU_VY)
 		L.maptext = gspan(b[1], "#ffffff", "center")
 		cmenu_objs += L
 		i++
@@ -731,24 +759,24 @@ client/proc/BuildPassivesContent()
 	cmenu_pass_target = 0
 	cmenu_pass_rows = list()
 	for(var/i = 1 to PASS_ROWS)
-		var/atom/movable/shud/cmpassrow/r = new
+		var/atom/movable/shud/cmpassrow/r = CmObj(/atom/movable/shud/cmpassrow)
 		r.maptext_width = 545
 		cmenu_pass_rows += r
 		cmenu_objs += r
-	cmenu_track = new
+	cmenu_track = CmObj(/atom/movable/shud/cmtrack)
 	cmenu_track.icon = 'HUD/scroll_track.png'
-	cmenu_track.screen_loc = CMloc(588, PASS_TRACK_Y + PASS_TRACK_H)
+	CMput(cmenu_track, 588, PASS_TRACK_Y + PASS_TRACK_H)
 	cmenu_objs += cmenu_track
-	cmenu_thumb = new
+	cmenu_thumb = CmObj(/atom/movable/shud/cmscroll)
 	cmenu_thumb.icon = CMENU_R2
 	cmenu_objs += cmenu_thumb
-	var/atom/movable/shud/cmmask/mt = new
+	var/atom/movable/shud/cmmask/mt = CmObj(/atom/movable/shud/cmmask)
 	mt.icon = 'HUD/passmask_top.png'
-	mt.screen_loc = CMloc(0, 90 + 26)
+	CMput(mt, 0, 90 + 26)
 	cmenu_objs += mt
-	var/atom/movable/shud/cmmask/mb = new
+	var/atom/movable/shud/cmmask/mb = CmObj(/atom/movable/shud/cmmask)
 	mb.icon = 'HUD/passmask_bottom.png'
-	mb.screen_loc = CMloc(0, 312 + 32)
+	CMput(mb, 0, 312 + 32)
 	cmenu_objs += mb
 	RefreshPassRows()
 
@@ -762,7 +790,7 @@ client/proc/RefreshPassRows()
 	for(var/j = 1 to cmenu_pass_rows.len)
 		var/atom/movable/shud/cmpassrow/r = cmenu_pass_rows[j]
 		var/rowdy = (PASS_Y0 + (j - 1) * PASS_RH - sub) + CMENU_VY
-		r.screen_loc = CMloc(26, rowdy)
+		CMput(r, 26, rowdy)
 		var/idx = first + j
 		if(idx <= total)
 			var/mid = rowdy - 8
@@ -786,11 +814,11 @@ client/proc/RefreshPassRows()
 	if(cmenu_thumb)
 		if(maxpx <= 0)
 			cmenu_thumb.alpha = (total > 0) ? 80 : 0
-			cmenu_thumb.screen_loc = CMloc(589, PASS_TRACK_Y + PASS_THUMB_H)
+			CMput(cmenu_thumb, 589, PASS_TRACK_Y + PASS_THUMB_H)
 		else
 			cmenu_thumb.alpha = 255
 			var/off = round((cmenu_pass_px / maxpx) * (PASS_TRACK_H - PASS_THUMB_H))
-			cmenu_thumb.screen_loc = CMloc(589, PASS_TRACK_Y + off + PASS_THUMB_H)
+			CMput(cmenu_thumb, 589, PASS_TRACK_Y + off + PASS_THUMB_H)
 
 client/proc/SetPassPx(px)
 	if(!cmenu_pass_list) return
@@ -942,22 +970,14 @@ client/proc/UpdateCharacterMenu()
 
 client/proc/HideDescPanel()
 	HideGearPassiveInfo()
-	if(cmenu_desc_objs)
-		while(cmenu_desc_objs.len)
-			var/atom/movable/o = cmenu_desc_objs[cmenu_desc_objs.len]
-			cmenu_desc_objs.len--
-			screen -= o
-			del o
-		cmenu_desc_objs = null
+	CmPopRelease(cm_descbox)
+	cm_descbox = null
+	cmenu_desc_objs = null
 
 client/proc/HideGearPassiveInfo()
-	if(cmenu_gearpass_objs)
-		while(cmenu_gearpass_objs.len)
-			var/atom/movable/o = cmenu_gearpass_objs[cmenu_gearpass_objs.len]
-			cmenu_gearpass_objs.len--
-			screen -= o
-			del o
-		cmenu_gearpass_objs = null
+	CmPopRelease(cm_gpbox)
+	cm_gpbox = null
+	cmenu_gearpass_objs = null
 
 client/proc/ShowGearPassiveInfo(name)
 	HideGearPassiveInfo()
@@ -977,11 +997,11 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 	else
 		P = new /atom/movable/shud/cmdesc
 	P.icon = CMENU_R3
-	P.screen_loc = CMloc(92, 322)
+	CMput(P, 92, 322)
 	objs += P
 	var/atom/movable/T = MkPDescText(gear)
 	T.maptext_width = 404
-	T.screen_loc = CMloc(110, 48 + CMENU_VY)
+	CMput(T, 110, 48 + CMENU_VY)
 	T.maptext = gspan(name, "#ffd278", "left")
 	objs += T
 	var/d = (global.PassiveInfo && (name in global.PassiveInfo)) ? StripBalanceNote(global.PassiveInfo[name]) : "No description available."
@@ -993,17 +1013,20 @@ client/proc/BuildPassDescPopup(list/objs, name, gear)
 		var/atom/movable/L = MkPDescText(gear)
 		L.maptext_width = 404
 		L.maptext_height = 16
-		L.screen_loc = CMloc(110, 72 + (i - 1) * 16 + CMENU_VY)
+		CMput(L, 110, 72 + (i - 1) * 16 + CMENU_VY)
 		L.maptext = gspan(txt, "#ffffff", "left")
 		objs += L
 	var/atom/movable/H = MkPDescText(gear)
 	H.maptext_width = 404
-	H.screen_loc = CMloc(110, 302 + CMENU_VY)
+	CMput(H, 110, 302 + CMENU_VY)
 	H.maptext = gspan("right-click to close", "#7a9bb5", "left")
 	objs += H
+	var/atom/movable/shud/panelholder/B = CmPopBox()
+	if(gear) cm_gpbox = B
+	else cm_descbox = B
 	for(var/atom/movable/o in objs)
-		screen += o
-	KineticEntrance(objs)
+		B.vis_contents += o
+	PanelFade(B)
 
 client/proc/RenameItem(obj/Items/it, ctx)
 	set waitfor = 0
@@ -1039,17 +1062,17 @@ client/proc/gspan(txt, col, align = "left")
 	return "<span style=\"[CMENU_FONT]; color:[col]; text-align:[align]\">[txt]</span>"
 
 client/proc/MkGVal(key, dx, dy, w, align)
-	var/atom/movable/shud/cmval/v = new
+	var/atom/movable/shud/cmval/v = CmObj(/atom/movable/shud/cmval)
 	v.maptext_width = w
 	v.text_align = align
-	v.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(v, dx, dy + CMENU_VY)
 	cmenu_gvals[key] = v
 	cmenu_objs += v
 
 client/proc/MkGLabel(txt, dx, dy, w, col, align)
-	var/atom/movable/shud/cmtext/L = new
+	var/atom/movable/shud/cmtext/L = CmObj(/atom/movable/shud/cmtext)
 	L.maptext_width = w
-	L.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(L, dx, dy + CMENU_VY)
 	L.maptext = gspan(txt, col, align)
 	cmenu_objs += L
 	return L
@@ -1259,14 +1282,14 @@ client/proc/BuildGearContent()
 	var/list/namekeys = list("wname", "cname", "aname")
 	for(var/i = 1 to 3)
 		var/sy = 120 + (i - 1) * 48
-		var/atom/movable/shud/cmgearslot/s = new
+		var/atom/movable/shud/cmgearslot/s = CmObj(/atom/movable/shud/cmgearslot)
 		s.slot_idx = i
-		s.screen_loc = CMloc(26, sy + 42)
+		CMput(s, 26, sy + 42)
 		cmenu_gslots += s
 		cmenu_objs += s
 		MkGLabel(slotlabels[i], 78, sy + 4, 140, "#96c3e1", "left")
 		MkGVal(namekeys[i], 78, sy + 22, 214, "left")
-	cmenu_gsel_hl = new
+	cmenu_gsel_hl = CmObj(/atom/movable/shud/cmmask)
 	cmenu_gsel_hl.icon = 'HUD/slot_sel.png'
 	cmenu_gsel_hl.layer = CMENU_LAYER + 0.34
 	cmenu_gsel_hl.mouse_opacity = 0
@@ -1282,23 +1305,23 @@ client/proc/BuildGearContent()
 		for(var/c = 0 to GEAR_COLS - 1)
 			var/cx = GEAR_X0 + c * GEAR_CW
 			var/cy = GEAR_Y0 + r * GEAR_RH
-			var/atom/movable/shud/cmgeargrid/cell = new
-			cell.screen_loc = CMloc(cx + 2, cy + 38)
+			var/atom/movable/shud/cmgeargrid/cell = CmObj(/atom/movable/shud/cmgeargrid)
+			CMput(cell, cx + 2, cy + 38)
 			cmenu_gear_grid += cell
 			cmenu_objs += cell
-			var/atom/movable/shud/cmtext/badge = new
+			var/atom/movable/shud/cmtext/badge = CmObj(/atom/movable/shud/cmtext)
 			badge.maptext_width = 14
 			badge.maptext = gspan("E", "#8be9ff", "left")
 			badge.layer = CMENU_LAYER + 0.45
-			badge.screen_loc = CMloc(cx + 28, cy + 40)
+			CMput(badge, cx + 28, cy + 40)
 			badge.alpha = 0
 			cmenu_gear_badges += badge
 			cmenu_objs += badge
-	cmenu_geartrack = new
+	cmenu_geartrack = CmObj(/atom/movable/shud/cmtrack)
 	cmenu_geartrack.icon = 'HUD/scroll_track.png'
-	cmenu_geartrack.screen_loc = CMloc(582, GEAR_TRACK_Y + GEAR_TRACK_H)
+	CMput(cmenu_geartrack, 582, GEAR_TRACK_Y + GEAR_TRACK_H)
 	cmenu_objs += cmenu_geartrack
-	cmenu_gearthumb = new
+	cmenu_gearthumb = CmObj(/atom/movable/shud/cmscroll)
 	cmenu_gearthumb.icon = CMENU_R2
 	cmenu_objs += cmenu_gearthumb
 	UpdateGearLeft()
@@ -1312,6 +1335,7 @@ client/proc/UpdateGearLeft()
 		var/obj/Items/it = mob.GetGearItem(i)
 		var/atom/movable/shud/cmgearslot/s = cmenu_gslots[i]
 		FitIconToBox(s, it, 40)
+		CMput(s, 26, 120 + (i - 1) * 48 + 42)
 		var/atom/movable/v = cmenu_gvals[nk[i]]
 		v.maptext = it ? gspan(it.name, "#ffffff", "left") : gspan("(empty)", "#7a9bb5", "left")
 
@@ -1320,7 +1344,7 @@ client/proc/SelectGearSlot(idx)
 	cmenu_gear_sel = idx
 	if(cmenu_gsel_hl)
 		var/sy = 120 + (idx - 1) * 48
-		cmenu_gsel_hl.screen_loc = CMloc(24, sy + 44)
+		CMput(cmenu_gsel_hl, 24, sy + 44)
 		cmenu_gsel_hl.alpha = 255
 	UpdateGearEff(idx)
 
@@ -1360,6 +1384,7 @@ client/proc/RefreshGearGrid()
 				var/obj/Items/it = cmenu_gear_list[idx]
 				cell.gitem = it
 				FitIconToBox(cell, it, 36)
+				CMput(cell, GEAR_X0 + c * GEAR_CW + 2, GEAR_Y0 + r * GEAR_RH + 38)
 				badge.alpha = findtext(it.suffix, "Equipped") ? 255 : 0
 			else
 				cell.gitem = null
@@ -1373,7 +1398,7 @@ client/proc/RefreshGearGrid()
 		else
 			cmenu_gearthumb.alpha = 255
 			var/off = round((gear_scroll_row / maxrow) * (GEAR_TRACK_H - GEAR_THUMB_H))
-			cmenu_gearthumb.screen_loc = CMloc(583, GEAR_TRACK_Y + off + GEAR_THUMB_H)
+			CMput(cmenu_gearthumb, 583, GEAR_TRACK_Y + off + GEAR_THUMB_H)
 
 client/proc/SetGearRow(row)
 	gear_scroll_row = clamp(row, 0, GearMaxRow())
@@ -1409,7 +1434,7 @@ client/proc/AddDescLine(txt, dx, dy, w)
 	var/atom/movable/shud/cmdtext/L = new
 	L.maptext_width = w
 	L.maptext_height = 16
-	L.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(L, dx, dy + CMENU_VY)
 	L.maptext = txt
 	cmenu_desc_objs += L
 
@@ -1420,7 +1445,7 @@ client/proc/ShowGearDetail(obj/Items/it)
 	var/atom/movable/shud/cmdesc/P = new
 	P.icon = 'HUD/geardetail.png'
 	P.draggable = 1
-	P.screen_loc = CMloc(120, 32 + 368)
+	CMput(P, 120, 32 + 368)
 	cmenu_desc_objs += P
 	var/cat = GearCat(it)
 	var/ly = 50
@@ -1469,19 +1494,20 @@ client/proc/ShowGearDetail(obj/Items/it)
 		sw.ctx = "gear"
 		sw.layer = CMENU_LAYER + 0.72
 		sw.icon = it.IsHat ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-		sw.screen_loc = CMloc(218, ly - 2 + CMENU_VY)
+		CMput(sw, 218, ly - 2 + CMENU_VY)
 		cmenu_desc_objs += sw
 	var/atom/movable/shud/cmgearclick/lc = new
 	lc.git = it
 	lc.gact = "layer"
 	lc.maptext_width = 164
 	lc.maptext_height = 16
-	lc.screen_loc = CMloc(320, ly + CMENU_VY)
+	CMput(lc, 320, ly + CMENU_VY)
 	lc.maptext = gspan("&#8693; Layer: [it.LayerPriority]", "#8be9ff", "right")
 	var/lcpx = (9 + length("[it.LayerPriority]")) * 6
 	lc.icon = RowHitIcon(lcpx)
-	lc.pixel_x = max(0, 164 - RowHitW(lcpx))
-	lc.maptext_x = -lc.pixel_x
+	var/lcoff = max(0, 164 - RowHitW(lcpx))
+	lc.pixel_x += lcoff
+	lc.maptext_x = -lcoff
 	cmenu_desc_objs += lc
 	ly += 20
 	var/atom/movable/shud/cmgearclick/rn = new
@@ -1489,7 +1515,7 @@ client/proc/ShowGearDetail(obj/Items/it)
 	rn.gact = "rename"
 	rn.maptext_width = 110
 	rn.maptext_height = 16
-	rn.screen_loc = CMloc(140, ly + CMENU_VY)
+	CMput(rn, 140, ly + CMENU_VY)
 	rn.maptext = gspan("&#9998; Rename", "#8be9ff", "left")
 	rn.icon = RowHitIcon(48)
 	cmenu_desc_objs += rn
@@ -1505,22 +1531,24 @@ client/proc/ShowGearDetail(obj/Items/it)
 			pr.pname = p
 			pr.maptext_width = 340
 			pr.maptext_height = 16
-			pr.screen_loc = CMloc(146, ly + CMENU_VY)
+			CMput(pr, 146, ly + CMENU_VY)
 			pr.maptext = gspan("&#9670; [p] <span style=\"color:#ffd278\">- [it.passives[p]]</span>", "#ffffff", "left")
 			pr.icon = RowHitIcon((5 + length("[p][it.passives[p]]")) * 6)
 			cmenu_desc_objs += pr
 			ly += 16
 			pn++
 	AddDescLine(gspan("left-click to equip &#183; right-click to close &#183; drag to move", "#7a9bb5", "center"), 134, 348, 356)
+	cm_descbox = CmPopBox()
 	for(var/atom/movable/o in cmenu_desc_objs)
-		screen += o
+		cm_descbox.vis_contents += o
 	gd_pan_x = getPref("gdPanX"); if(isnull(gd_pan_x)) gd_pan_x = 0
 	gd_pan_y = getPref("gdPanY"); if(isnull(gd_pan_y)) gd_pan_y = 0
 	var/list/gdb = PanBounds("geardesc", P)
 	gd_pan_x = clamp(gd_pan_x, gdb[1], gdb[2])
 	gd_pan_y = clamp(gd_pan_y, gdb[3], gdb[4])
-	PanShift(cmenu_desc_objs, gd_pan_x, gd_pan_y)
-	KineticEntrance(cmenu_desc_objs)
+	cm_descbox.pixel_x = gd_pan_x
+	cm_descbox.pixel_y = gd_pan_y
+	PanelFade(cm_descbox)
 
 
 client/var/tmp/list/cmenu_cust_owners
@@ -1552,26 +1580,26 @@ client/proc/BuildCustomContent()
 	if(cust_sel < 1 || cust_sel > cmenu_cust_list.len) cust_sel = 1
 	cmenu_cust_rows = list()
 	for(var/i = 1 to CUST_ROWS)
-		var/atom/movable/shud/cmcustrow/r = new
+		var/atom/movable/shud/cmcustrow/r = CmObj(/atom/movable/shud/cmcustrow)
 		r.maptext_width = 250
 		cmenu_cust_rows += r
 		cmenu_objs += r
-	cmenu_custtrack = new
+	cmenu_custtrack = CmObj(/atom/movable/shud/cmtrack)
 	cmenu_custtrack.icon = 'HUD/scroll_track.png'
-	cmenu_custtrack.screen_loc = CMloc(288, CUST_TRACK_Y + CUST_TRACK_H)
+	CMput(cmenu_custtrack, 288, CUST_TRACK_Y + CUST_TRACK_H)
 	cmenu_objs += cmenu_custtrack
 	cmenu_custtrack.layer = CMENU_LAYER + 0.55
-	cmenu_custthumb = new
+	cmenu_custthumb = CmObj(/atom/movable/shud/cmscroll)
 	cmenu_custthumb.icon = CMENU_R2
 	cmenu_custthumb.layer = CMENU_LAYER + 0.56
 	cmenu_objs += cmenu_custthumb
-	cmenu_custmask_t = new
+	cmenu_custmask_t = CmObj(/atom/movable/shud/cmmask)
 	cmenu_custmask_t.icon = 'HUD/custmask_top.png'
-	cmenu_custmask_t.screen_loc = CMloc(0, 90 + 26)
+	CMput(cmenu_custmask_t, 0, 90 + 26)
 	cmenu_objs += cmenu_custmask_t
-	cmenu_custmask_b = new
+	cmenu_custmask_b = CmObj(/atom/movable/shud/cmmask)
 	cmenu_custmask_b.icon = 'HUD/custmask_bottom.png'
-	cmenu_custmask_b.screen_loc = CMloc(0, 312 + 32)
+	CMput(cmenu_custmask_b, 0, 312 + 32)
 	cmenu_objs += cmenu_custmask_b
 	RefreshCustRows()
 	BuildCustPanel()
@@ -1589,7 +1617,7 @@ client/proc/RefreshCustRows()
 	var/first = (cust_px - sub) / CUST_RH
 	for(var/j = 1 to cmenu_cust_rows.len)
 		var/atom/movable/shud/cmcustrow/r = cmenu_cust_rows[j]
-		r.screen_loc = CMloc(26, (CUST_Y0 + (j - 1) * CUST_RH - sub) + CMENU_VY)
+		CMput(r, 26, (CUST_Y0 + (j - 1) * CUST_RH - sub) + CMENU_VY)
 		var/idx = first + j
 		if(idx <= total)
 			var/vp = cmenu_cust_list[idx]
@@ -1604,11 +1632,11 @@ client/proc/RefreshCustRows()
 	if(cmenu_custthumb)
 		if(maxpx <= 0)
 			cmenu_custthumb.alpha = (total > 0) ? 80 : 0
-			cmenu_custthumb.screen_loc = CMloc(289, CUST_TRACK_Y + CUST_THUMB_H)
+			CMput(cmenu_custthumb, 289, CUST_TRACK_Y + CUST_THUMB_H)
 		else
 			cmenu_custthumb.alpha = 255
 			var/off = round((cust_px / maxpx) * (CUST_TRACK_H - CUST_THUMB_H))
-			cmenu_custthumb.screen_loc = CMloc(289, CUST_TRACK_Y + off + CUST_THUMB_H)
+			CMput(cmenu_custthumb, 289, CUST_TRACK_Y + off + CUST_THUMB_H)
 
 client/proc/SetCustPx(px)
 	if(!cmenu_cust_list) return
@@ -1653,6 +1681,7 @@ client/proc/SelectCustOption(idx)
 	cust_target = null
 	RefreshCustRows()
 	BuildCustPanel()
+	if(cust_panel_opt == "Customize: Energy Colors") CustButtonAction("open")
 
 client/proc/CustomizeItem(obj/Items/it)
 	if(!it || !mob || !IsCustomizableItem(it)) return
@@ -1672,24 +1701,30 @@ client/proc/ClearCustPanel()
 	cmenu_cust_preview = null
 	cmenu_cust_sprite = null
 	cmenu_cust_offset = null
-	if(cmenu_cust_panel)
-		while(cmenu_cust_panel.len)
-			var/atom/movable/o = cmenu_cust_panel[cmenu_cust_panel.len]
-			cmenu_cust_panel.len--
-			screen -= o
-			del o
-		cmenu_cust_panel = null
+	cmenu_cust_panel = null
+	if(cm_custbox)
+		PanelBegin(cm_custbox)
+		PanelEnd(cm_custbox)
 
 client/proc/CPanelText(txt, dx, dy, w, col, align)
-	var/atom/movable/shud/cmtext/L = new
+	var/atom/movable/shud/cmtext/L = CmCustObj(/atom/movable/shud/cmtext)
 	L.maptext_width = w
-	L.screen_loc = CMloc(dx, dy + CMENU_VY)
+	CMput(L, dx, dy + CMENU_VY)
 	L.maptext = gspan(txt, col, align)
 	cmenu_cust_panel += L
 	return L
 
 client/proc/BuildCustPanel()
-	ClearCustPanel()
+	if(!cm_custbox) return
+	cmenu_cust_preview = null
+	cmenu_cust_sprite = null
+	cmenu_cust_offset = null
+	cmenu_cust_panel = null
+	PanelBegin(cm_custbox)
+	BuildCustPanelBody()
+	PanelEnd(cm_custbox)
+
+client/proc/BuildCustPanelBody()
 	if(!mob || !cmenu_cust_list || cust_sel < 1 || cust_sel > cmenu_cust_list.len) return
 	cmenu_cust_panel = list()
 	var/vp = cmenu_cust_list[cust_sel]
@@ -1710,8 +1745,6 @@ client/proc/BuildCustPanel()
 		BuildCustConfirm(opt)
 	else
 		BuildCustVerb(opt)
-	for(var/atom/movable/o in cmenu_cust_panel)
-		screen += o
 
 client/proc/CurrentCustCfg()
 	if(cust_panel_opt == "Customize") return CUST_ITEM_CFG
@@ -1720,20 +1753,20 @@ client/proc/CurrentCustCfg()
 client/proc/BuildCustomizeIntro()
 	CPanelText("Retexture a piece of gear or clothing", 318, 152, 280, "#cfe7ff", "left")
 	CPanelText("with your own image.", 318, 170, 280, "#cfe7ff", "left")
-	var/atom/movable/shud/cmcustbtn/b = new
+	var/atom/movable/shud/cmcustbtn/b = CmCustObj(/atom/movable/shud/cmcustbtn)
 	b.icon = 'HUD/cust_button.png'
 	b.action = "pickitem"
-	b.screen_loc = CMloc(380, 210 + 26)
+	CMput(b, 380, 210 + 26)
 	cmenu_cust_panel += b
 	var/atom/movable/pl = CPanelText("Choose Item...", 380, 218, 150, "#ffffff", "center")
 	pl.layer = CMENU_LAYER + 0.5
 
 client/proc/BuildCustConfirm(opt)
 	CPanelText("Run [opt] now?", 314, 158, 284, "#cfe7ff", "center")
-	var/atom/movable/shud/cmcustbtn/b = new
+	var/atom/movable/shud/cmcustbtn/b = CmCustObj(/atom/movable/shud/cmcustbtn)
 	b.icon = 'HUD/cust_button.png'
 	b.action = "open"
-	b.screen_loc = CMloc(380, 232 + 26)
+	CMput(b, 380, 232 + 26)
 	cmenu_cust_panel += b
 	var/atom/movable/ol = CPanelText("Confirm", 380, 240, 150, "#ffffff", "center")
 	ol.layer = CMENU_LAYER + 0.5
@@ -1742,86 +1775,86 @@ client/proc/BuildCustVerb(opt)
 	var/desc = (opt in CUSTOM_DESC) ? CUSTOM_DESC[opt] : "Opens this customization."
 	CPanelText(desc, 318, 152, 280, "#cfe7ff", "left")
 	CPanelText("This option opens in its own window.", 318, 176, 280, "#7a9bb5", "left")
-	var/atom/movable/shud/cmcustbtn/b = new
+	var/atom/movable/shud/cmcustbtn/b = CmCustObj(/atom/movable/shud/cmcustbtn)
 	b.icon = 'HUD/cust_button.png'
 	b.action = "open"
-	b.screen_loc = CMloc(380, 232 + 26)
+	CMput(b, 380, 232 + 26)
 	cmenu_cust_panel += b
 	var/atom/movable/ol = CPanelText("Open", 380, 240, 150, "#ffffff", "center")
 	ol.layer = CMENU_LAYER + 0.5
 
 client/proc/BuildCustSprite(cfg)
-	var/atom/movable/shud/cmpreview/fr = new
+	var/atom/movable/shud/cmpreview/fr = CmCustObj(/atom/movable/shud/cmpreview)
 	fr.icon = 'HUD/cust_preview.png'
-	fr.screen_loc = CMloc(404, 128 + 104)
+	CMput(fr, 404, 128 + 104)
 	cmenu_cust_preview = fr
 	cmenu_cust_panel += fr
-	cmenu_cust_sprite = new
+	cmenu_cust_sprite = CmCustObj(/atom/movable/shud/cmmask)
 	cmenu_cust_sprite.layer = CMENU_LAYER + 0.46
 	cmenu_cust_sprite.mouse_opacity = 0
-	cmenu_cust_sprite.screen_loc = CMloc(412, 224)
+	CMput(cmenu_cust_sprite, 412, 224)
 	cmenu_cust_panel += cmenu_cust_sprite
-	cmenu_cust_elem = new
+	cmenu_cust_elem = CmCustObj(/atom/movable/shud/cmmask)
 	cmenu_cust_elem.layer = CMENU_LAYER + 0.47
 	cmenu_cust_elem.mouse_opacity = 0
-	cmenu_cust_elem.screen_loc = CMloc(412, 224)
+	CMput(cmenu_cust_elem, 412, 224)
 	cmenu_cust_panel += cmenu_cust_elem
-	cmenu_cust_hair = new
+	cmenu_cust_hair = CmCustObj(/atom/movable/shud/cmmask)
 	cmenu_cust_hair.layer = CMENU_LAYER + 0.48
 	cmenu_cust_hair.mouse_opacity = 0
 	cmenu_cust_hair.alpha = 0
-	cmenu_cust_hair.screen_loc = CMloc(412, 224)
+	CMput(cmenu_cust_hair, 412, 224)
 	cmenu_cust_panel += cmenu_cust_hair
 	CPanelText("drag on the preview to position", 310, 240, 292, "#7a9bb5", "center")
-	cmenu_cust_offset = new
+	cmenu_cust_offset = CmCustObj(/atom/movable/shud/cmcustbtn)
 	cmenu_cust_offset.maptext_width = 292
 	cmenu_cust_offset.action = "offset"
-	cmenu_cust_offset.screen_loc = CMloc(310, 258 + CMENU_VY)
+	CMput(cmenu_cust_offset, 310, 258 + CMENU_VY)
 	cmenu_cust_panel += cmenu_cust_offset
-	var/atom/movable/shud/cmcustbtn/b = new
+	var/atom/movable/shud/cmcustbtn/b = CmCustObj(/atom/movable/shud/cmcustbtn)
 	b.icon = 'HUD/cust_button.png'
 	b.action = "browse"
-	b.screen_loc = CMloc(330, 280 + 26)
+	CMput(b, 330, 280 + 26)
 	cmenu_cust_panel += b
 	var/atom/movable/bl = CPanelText("Browse Image...", 330, 288, 150, "#ffffff", "center")
 	bl.layer = CMENU_LAYER + 0.5
 	if(cfg["col"])
-		var/atom/movable/shud/cmcustbtn/cb = new
+		var/atom/movable/shud/cmcustbtn/cb = CmCustObj(/atom/movable/shud/cmcustbtn)
 		cb.maptext_width = 60
 		cb.action = "colorpick"
-		cb.screen_loc = CMloc(486, 288 + CMENU_VY)
+		CMput(cb, 486, 288 + CMENU_VY)
 		cb.maptext = gspan("Color", "#8be9ff", "left")
 		cmenu_cust_panel += cb
 		var/list/sws = (mob && mob.cust_recent_colors) ? mob.cust_recent_colors : CUST_SWATCHES
 		for(var/j = 1 to min(6, sws.len))
-			var/atom/movable/shud/cmswatch/sw = new
+			var/atom/movable/shud/cmswatch/sw = CmCustObj(/atom/movable/shud/cmswatch)
 			sw.icon = 'HUD/swatch_base.png'
 			sw.swcolor = sws[j]
 			sw.color = sws[j]
-			sw.screen_loc = CMloc(486 + (j - 1) * 19, 326)
+			CMput(sw, 486 + (j - 1) * 19, 326)
 			cmenu_cust_panel += sw
 	if(cfg["apply"] == "item")
 		var/obj/Items/it = cust_target
-		var/atom/movable/shud/cmcustbtn/ci = new
+		var/atom/movable/shud/cmcustbtn/ci = CmCustObj(/atom/movable/shud/cmcustbtn)
 		ci.maptext_width = 120
 		ci.action = "pickitem"
-		ci.screen_loc = CMloc(312, 140 + CMENU_VY)
+		CMput(ci, 312, 140 + CMENU_VY)
 		ci.maptext = gspan("&#8635; Change item", "#8be9ff", "left")
 		cmenu_cust_panel += ci
-		var/atom/movable/shud/cmcustbtn/lp = new
+		var/atom/movable/shud/cmcustbtn/lp = CmCustObj(/atom/movable/shud/cmcustbtn)
 		lp.maptext_width = 150
 		lp.action = "layerpriority"
-		lp.screen_loc = CMloc(312, 172 + CMENU_VY)
+		CMput(lp, 312, 172 + CMENU_VY)
 		lp.maptext = gspan("&#8693; Layer: [istype(it) ? it.LayerPriority : 0]", "#8be9ff", "left")
 		cmenu_cust_panel += lp
 		if(CanBeHat(it))
 			CPanelText("Toggle Hat", 312, 200, 90, "#8be9ff", "left")
-			var/atom/movable/shud/hattoggle/sw = new
+			var/atom/movable/shud/hattoggle/sw = CmCustObj(/atom/movable/shud/hattoggle)
 			sw.item = it
 			sw.ctx = "cust"
 			sw.layer = CMENU_LAYER + 0.5
 			sw.icon = it.IsHat ? HAT_TGL_ON[5] : HAT_TGL_OFF[5]
-			sw.screen_loc = CMloc(380, 198 + CMENU_VY)
+			CMput(sw, 380, 198 + CMENU_VY)
 			cmenu_cust_panel += sw
 	RefreshCustPreview()
 
@@ -1869,7 +1902,7 @@ client/proc/RebuildCustBase()
 	cmenu_cust_sprite.color = null
 	cmenu_cust_sprite.pixel_x = 0
 	cmenu_cust_sprite.pixel_y = 0
-	cmenu_cust_sprite.screen_loc = CMloc(cust_base_cox, cust_base_coy)
+	CMput(cmenu_cust_sprite, cust_base_cox, cust_base_coy)
 	cmenu_cust_sprite.alpha = 255
 	if(cfg["apply"] == "icon")
 		cmenu_cust_elem.icon = null
@@ -1892,7 +1925,7 @@ client/proc/RebuildCustBase()
 			cmenu_cust_hair.icon_state = ""
 			cmenu_cust_hair.color = null
 			cmenu_cust_hair.alpha = 255
-			cmenu_cust_hair.screen_loc = CMloc(cust_base_cox - cust_crop_x + mob.HairX, cust_base_coy + cust_crop_y - mob.HairY)
+			CMput(cmenu_cust_hair, cust_base_cox - cust_crop_x + mob.HairX, cust_base_coy + cust_crop_y - mob.HairY)
 		else
 			cmenu_cust_hair.alpha = 0
 	RefreshCustElement()
@@ -1905,11 +1938,11 @@ client/proc/RefreshCustElement()
 	var/ox = tgt.vars[cfg["ox"]]; if(isnull(ox)) ox = 0
 	var/oy = tgt.vars[cfg["oy"]]; if(isnull(oy)) oy = 0
 	if(cfg["apply"] == "icon")
-		cmenu_cust_sprite.screen_loc = CMloc(cust_base_cox + ox, cust_base_coy - oy)
+		CMput(cmenu_cust_sprite, cust_base_cox + ox, cust_base_coy - oy)
 	else
 		cmenu_cust_elem.pixel_x = 0
 		cmenu_cust_elem.pixel_y = 0
-		cmenu_cust_elem.screen_loc = CMloc(cust_base_cox - cust_crop_x + ox, cust_base_coy + cust_crop_y - oy)
+		CMput(cmenu_cust_elem, cust_base_cox - cust_crop_x + ox, cust_base_coy + cust_crop_y - oy)
 	if(cmenu_cust_offset)
 		cmenu_cust_offset.maptext = gspan("Offset    X: [ox]    Y: [oy]", "#8be9ff", "center")
 
@@ -2109,32 +2142,6 @@ client/proc/CustDragMove(params)
 client/proc/CustDragEnd()
 	ApplyCustOption()
 
-client/proc/CMLiveObjs()
-	var/list/all = list()
-	if(cmenu_objs) all += cmenu_objs
-	if(cmenu_desc_objs) all += cmenu_desc_objs
-	if(cmenu_gearpass_objs) all += cmenu_gearpass_objs
-	if(cmenu_cust_panel) all += cmenu_cust_panel
-	return all
-
-client/proc/CMShiftLive(dpx, dpy)
-	if(!dpx && !dpy) return
-	for(var/atom/movable/o in CMLiveObjs())
-		var/sl = o.screen_loc
-		if(!sl) continue
-		var/list/cm = splittext(sl, ",")
-		if(cm.len < 2) continue
-		var/list/xp = splittext(cm[1], ":")
-		var/list/yp = splittext(cm[2], ":")
-		if(xp.len < 2 || yp.len < 2) continue
-		var/xt = text2num(xp[1]); var/yt = text2num(yp[1])
-		if(isnull(xt) || isnull(yt)) continue
-		var/ax = (xt - 1) * 32 + text2num(xp[2]) + dpx
-		var/ay = (yt - 1) * 32 + text2num(yp[2]) + dpy
-		var/axp = ((ax % 32) + 32) % 32
-		var/ayp = ((ay % 32) + 32) % 32
-		o.screen_loc = "[(ax - axp) / 32 + 1]:[axp],[(ay - ayp) / 32 + 1]:[ayp]"
-
 client/proc/CMPanBounds()
 	var/list/vd = splittext("[view]", "x")
 	var/vw = (vd.len >= 1) ? text2num(vd[1]) : 20
@@ -2168,7 +2175,7 @@ client/proc/CMPanMove(params)
 	if(!dx && !dy) return
 	cm_pan_x = wantx; cm_pan_y = wanty
 	cm_pan_dragged = TRUE
-	CMShiftLive(dx, dy)
+	CmHolderSync()
 
 client/proc/CMPanEnd()
 	if(!cm_pan_dragged) return
@@ -2330,3 +2337,15 @@ mob/verb/Customize_Buff_Portraits()
 		src << "Portrait tag for [B] set to '[html_encode(B.PortraitTag)]'."
 	else
 		src << "Portrait tag for [B] removed."
+
+/atom/movable/shud/cmpassrow/PanelReuse()
+	pass_name = null
+	pass_val = null
+	hovered = 0
+
+/atom/movable/shud/cmbuff/PanelReuse()
+	buff = null
+	buff_name = null
+
+/atom/movable/shud/cmgeargrid/PanelReuse()
+	gitem = null

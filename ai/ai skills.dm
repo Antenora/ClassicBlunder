@@ -50,7 +50,7 @@ ai_play_action
 			if(PreUpdate(a))
 				if(world.time >= a.next_move && a.Move_Requirements())
 					var/image/i = image(a.ai_owner.is_arcane_beast.dash_effect, loc=a.loc)
-					viewers(a) << i
+					GfxSendImage(i)
 					animate(i, alpha=0, time=30)
 					spawn(30) GfxReleaseImage(i)
 					a.density=0

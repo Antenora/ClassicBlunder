@@ -693,6 +693,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 					if(src.HealthPct()<20/Z.Mastery)
 						src << "You haven't the vitality to stop time..."
 						return
+					Z.Using = 1
 					for(var/mob/E in hearers(12,src))
 						E<<"<font color=[src.Text_Color]>[src] says: Time..."
 					sleep(15)
@@ -714,6 +715,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 						E<<"<font color=[src.Text_Color]>[src] says: Time is now frozen."
 					src.TimeStop=1
 					Z:TimeStopped=0
+					Z.Using = 0
 
 			if("Chaos Control")
 				if(Z.Using)
@@ -1277,9 +1279,11 @@ proc/_CamShake(atom/source, amp, duration, ix, iy, globe, sustain = 0)
 	if(duration <= 0) return
 	if(amp <= 0 && !ix && !iy) return
 	if(globe)
-		for(var/mob/M in players)
-			if(M.z != globe && globe != 999) continue
-			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+		var/list/hit = GfxBcRecipients(source, 3)
+		var/mob/S = source
+		if(ismob(S) && S.client && !(S.client in hit)) hit += S.client
+		for(var/client/C in hit)
+			_CamShakeClient(C, amp, duration, ix, iy, sustain)
 	else
 		for(var/mob/M in view(source))
 			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)

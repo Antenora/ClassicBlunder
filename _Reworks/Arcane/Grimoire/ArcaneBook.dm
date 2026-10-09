@@ -84,6 +84,8 @@ client/var/tmp
 	atom/movable/shud/arpic/ar_marker
 	atom/movable/shud/menubtn/btn_arcane
 	atom/movable/shud/menulabel/btn_arcane_label
+	atom/movable/shud/panelholder/ar_holder
+	atom/movable/shud/panelholder/ar_pagebox
 
 /atom/movable/shud/arframe
 	layer = AR_LAYER
@@ -255,13 +257,17 @@ mob/proc/GetSpellPages()
 		out.Insert(pos, S)
 	return out
 
-client/proc/ARloc(dx, dyTop, h = 0)
-	var/py = AR_H - dyTop - h
-	var/ax = dx + ar_pan_x
-	var/ay = py + ar_pan_y
-	var/axp = ((ax % 32) + 32) % 32
-	var/ayp = ((ay % 32) + 32) % 32
-	return "[ar_atx + (ax - axp) / 32]:[axp],[ar_aty + (ay - ayp) / 32]:[ayp]"
+client/proc/ARput(atom/movable/o, dx, dyTop, h = 0)
+	o.pixel_x = dx
+	o.pixel_y = AR_H - dyTop - h
+
+client/proc/ArHolderSync()
+	PanelMoveTo(ar_holder, (ar_atx - 1) * 32 + ar_pan_x, (ar_aty - 1) * 32 + ar_pan_y)
+
+client/proc/ArPageObj(path)
+	var/atom/movable/o = PanelNew(ar_pagebox, path)
+	ar_page_objs += o
+	return o
 
 client/proc/InitArcaneButton()
 	btn_arcane = new('HUD/ui_icon_skills.png')
@@ -352,10 +358,12 @@ client/proc/OpenArcaneMenu()
 		btn_arcane.icon = 'HUD/ui_slot_unavailable.png'
 		btn_arcane.SetGlyphDimmed(TRUE)
 	if(btn_arcane_label) btn_arcane_label.alpha = 0
+	ar_holder = PanelHolderNew(AR_LAYER)
+	ArHolderSync()
+	ar_pagebox = PanelHolderNew(AR_LAYER)
 	BuildArcaneBook()
-	var/list/all = ar_objs.Copy()
-	all += ar_tabs
-	KineticEntrance(all)
+	screen += ar_holder
+	PanelFade(ar_holder)
 
 client/proc/CloseArcaneMenu()
 	if(!armenu_open && !ar_objs) return
@@ -363,13 +371,13 @@ client/proc/CloseArcaneMenu()
 	ar_flipping = FALSE
 	ar_drag_ghost = FALSE
 	CloseSkillInfo()
-	ClearList(ar_page_objs)
+	PanelRelease(ar_pagebox)
+	PanelRelease(ar_holder)
+	ar_pagebox = null
+	ar_holder = null
 	ar_page_objs = null
-	ClearList(ar_rows)
 	ar_rows = null
-	ClearList(ar_tabs)
 	ar_tabs = null
-	ClearList(ar_objs)
 	ar_objs = null
 	ar_frame = null
 	ar_pick_label = null
@@ -377,17 +385,6 @@ client/proc/CloseArcaneMenu()
 	if(btn_arcane)
 		btn_arcane.icon = 'HUD/ui_slot_available.png'
 		btn_arcane.SetGlyphDimmed(FALSE)
-
-client/proc/ArcaneLiveObjs()
-	var/list/all = list()
-	if(ar_objs) all += ar_objs
-	if(ar_tabs) all += ar_tabs
-	if(ar_rows) all += ar_rows
-	if(ar_page_objs) all += ar_page_objs
-	return all
-
-client/proc/ArcaneShiftLive(dpx, dpy)
-	ShiftScreenLocs(ArcaneLiveObjs(), dpx, dpy)
 
 client/proc/ARPanStart(params)
 	ar_pan_dragged = FALSE
@@ -411,7 +408,7 @@ client/proc/ARPanMove(params)
 	ar_pan_x = wantx
 	ar_pan_y = wanty
 	ar_pan_dragged = TRUE
-	ArcaneShiftLive(dx, dy)
+	ArHolderSync()
 
 client/proc/ARPanEnd()
 	ArcaneDragGhost(FALSE)
@@ -421,21 +418,17 @@ client/proc/ARPanEnd()
 	spawn(1) ar_pan_dragged = FALSE
 
 client/proc/ArLine(txt, dx, dyTop, w = AR_PW, color = AR_INK)
-	var/atom/movable/shud/artext/t = new
+	var/atom/movable/shud/artext/t = ArPageObj(/atom/movable/shud/artext)
 	t.maptext_width = w
 	t.maptext_height = 16
-	t.screen_loc = ARloc(dx, dyTop, 16)
+	ARput(t, dx, dyTop, 16)
 	t.maptext = "<center><span style=\"[AR_FONT]; color:[color]\">[txt]</span></center>"
-	ar_page_objs += t
-	screen += t
 	return t
 
 client/proc/ArPic(file, dx, dyTop, h)
-	var/atom/movable/shud/arpic/p = new
+	var/atom/movable/shud/arpic/p = ArPageObj(/atom/movable/shud/arpic)
 	p.icon = file
-	p.screen_loc = ARloc(dx, dyTop, h)
-	ar_page_objs += p
-	screen += p
+	ARput(p, dx, dyTop, h)
 	return p
 
 client/proc/ArPlate(txt, boxX, dyTop)
@@ -444,33 +437,27 @@ client/proc/ArPlate(txt, boxX, dyTop)
 	var/ph = wide ? 26 : 24
 	var/px = boxX + round((AR_PW - pw) / 2)
 	ArPic(wide ? '_Reworks/Arcane/Icons/book/TitleA_03.png' : '_Reworks/Arcane/Icons/book/TitleA_01.png', px, dyTop, ph)
-	var/atom/movable/shud/artext/t = new
+	var/atom/movable/shud/artext/t = ArPageObj(/atom/movable/shud/artext)
 	t.maptext_width = pw
 	t.maptext_height = 16
-	t.screen_loc = ARloc(px, dyTop + round((ph - 16) / 2) + 1, 16)
+	ARput(t, px, dyTop + round((ph - 16) / 2) + 1, 16)
 	t.maptext = "<center><span style=\"[AR_FONT]; color:[AR_INK]\">[txt]</span></center>"
-	ar_page_objs += t
-	screen += t
 	return dyTop + ph + 8
 
 client/proc/ArBtn(action, label, boxX, dyTop, primary = 1)
 	var/bw = primary ? 122 : 110
 	var/bh = primary ? 26 : 34
 	var/bx = boxX + round((AR_PW - bw) / 2)
-	var/atom/movable/shud/arbtn/b = new
+	var/atom/movable/shud/arbtn/b = ArPageObj(/atom/movable/shud/arbtn)
 	b.icon = primary ? '_Reworks/Arcane/Icons/book/GoldBtnA_02.png' : '_Reworks/Arcane/Icons/book/GoldBtnD_02.png'
 	b.action = action
-	b.screen_loc = ARloc(bx, dyTop, bh)
-	ar_page_objs += b
-	screen += b
-	var/atom/movable/shud/artext/t = new
+	ARput(b, bx, dyTop, bh)
+	var/atom/movable/shud/artext/t = ArPageObj(/atom/movable/shud/artext)
 	t.layer = AR_LAYER + 0.45
 	t.maptext_width = bw
 	t.maptext_height = 16
-	t.screen_loc = ARloc(bx, dyTop + round((bh - 16) / 2) + 1, 16)
+	ARput(t, bx, dyTop + round((bh - 16) / 2) + 1, 16)
 	t.maptext = "<center><span style=\"[AR_FONT]; color:[AR_INK]\">[label]</span></center>"
-	ar_page_objs += t
-	screen += t
 	return b
 
 client/proc/BuildArcaneBook()
@@ -480,31 +467,32 @@ client/proc/BuildArcaneBook()
 	ar_page_objs = list()
 	ar_frame = new
 	ar_frame.icon = ArcaneFrame(1, AR_H)
-	ar_frame.screen_loc = ARloc(0, 0, AR_H)
+	ARput(ar_frame, 0, 0, AR_H)
 	ar_objs += ar_frame
-	screen += ar_frame
+	ar_holder.vis_contents += ar_frame
 	var/i = 0
 	for(var/ch in AR_CHAPTERS)
 		i++
 		var/atom/movable/shud/artab/t = new
 		t.chapter = ch
 		t.glyph.icon = ArcaneTabGlyph(ch)
-		t.screen_loc = ARloc(AR_TAB_DEPTHS[i], AR_TAB_Y0 + (i - 1) * AR_TAB_STEP, 32)
+		ARput(t, AR_TAB_DEPTHS[i], AR_TAB_Y0 + (i - 1) * AR_TAB_STEP, 32)
 		ar_tabs += t
-		screen += t
+		ar_holder.vis_contents += t
+	ar_holder.vis_contents += ar_pagebox
 	for(var/k = 1 to AR_ROWS_PER_SPREAD)
 		var/atom/movable/shud/arrow/r = new
 		r.alpha = 0
 		r.mouse_opacity = 0
 		r.side = (k <= AR_ROWS_LEFT) ? -1 : 1
 		if(k <= AR_ROWS_LEFT)
-			r.screen_loc = ARloc(AR_ROW_X, 55 + (k - 1) * AR_ROW_H, 32)
+			ARput(r, AR_ROW_X, 55 + (k - 1) * AR_ROW_H, 32)
 		else
-			r.screen_loc = ARloc(AR_RX + 1, AR_RY + 40 + (k - AR_ROWS_LEFT - 1) * AR_ROW_H, 32)
+			ARput(r, AR_RX + 1, AR_RY + 40 + (k - AR_ROWS_LEFT - 1) * AR_ROW_H, 32)
 		ar_rows += r
-		screen += r
+		ar_pagebox.vis_contents += r
 	RefreshArcaneTabLook()
-	BuildArcaneChapter()
+	BuildArcaneChapter(FALSE)
 
 client/proc/RefreshArcaneTabLook()
 	if(!ar_tabs) return
@@ -542,7 +530,8 @@ client/proc/ArcaneFlip(dir)
 	var/seq_id = ar_open_seq
 	ar_flipping = TRUE
 	CloseSkillInfo()
-	ClearList(ar_page_objs)
+	PanelBegin(ar_pagebox)
+	PanelEnd(ar_pagebox)
 	ar_page_objs = list()
 	ar_pick_label = null
 	ar_marker = null
@@ -567,9 +556,9 @@ client/proc/ArcaneHideRows()
 		r.nametext.maptext = ""
 		r.righttext.maptext = ""
 
-client/proc/BuildArcaneChapter()
+client/proc/BuildArcaneChapter(fade = TRUE)
 	if(!armenu_open || !mob) return
-	ClearList(ar_page_objs)
+	PanelBegin(ar_pagebox)
 	ar_page_objs = list()
 	ar_pick_label = null
 	ar_marker = null
@@ -585,11 +574,8 @@ client/proc/BuildArcaneChapter()
 			ArLine("A mage's pages await here.", AR_LX, AR_LY + 10 + AR_LINE, AR_PW, AR_INK_SOFT)
 		else
 			ArLine("This chapter is not yet written.", AR_LX, AR_LY + 10, AR_PW, AR_INK_SOFT)
-	var/list/fade = ar_page_objs.Copy()
-	if(ar_rows)
-		for(var/atom/movable/shud/arrow/r in ar_rows)
-			if(r.skill) fade += r
-	KineticEntrance(fade)
+	PanelEnd(ar_pagebox)
+	if(fade) PanelFade(ar_pagebox)
 
 client/proc/BuildArcaneSpells()
 	var/list/L = mob.GetSpellPages()
@@ -654,13 +640,11 @@ client/proc/BuildArcanePath()
 			var/x0 = AR_LX + round((AR_PW - 222) / 2)
 			var/i = 0
 			for(var/e in ELEMENT_PHYSICAL)
-				var/atom/movable/shud/arelbtn/b = new
+				var/atom/movable/shud/arelbtn/b = ArPageObj(/atom/movable/shud/arelbtn)
 				b.element = e
 				b.icon = MageElementIcon(e)
 				if(!MageElementHasArt(e)) b.color = FxElementColor(e)
-				b.screen_loc = ARloc(x0 + i * 38, y, 32)
-				ar_page_objs += b
-				screen += b
+				ARput(b, x0 + i * 38, y, 32)
 				i++
 			ar_marker_dy = y + 34
 			ar_marker = ArPic('_Reworks/Arcane/Icons/book/F_U_Detail3.png', x0 + 7, ar_marker_dy, 19)
@@ -683,7 +667,7 @@ client/proc/ArcaneRefreshPick()
 		var/slot = ELEMENT_PHYSICAL.Find(ar_pick)
 		if(slot)
 			var/x0 = AR_LX + round((AR_PW - 222) / 2)
-			ar_marker.screen_loc = ARloc(x0 + (slot - 1) * 38 + 7, ar_marker_dy, 19)
+			ARput(ar_marker, x0 + (slot - 1) * 38 + 7, ar_marker_dy, 19)
 			ar_marker.alpha = 255
 		else
 			ar_marker.alpha = 0

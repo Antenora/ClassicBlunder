@@ -609,7 +609,7 @@ mob/proc/MechTouching(mob/M, pad)
 
 mob/proc/MechThrustContacts()
 	if(!(mech_thrust_attack || mech_thrust_ram) || !islist(mech_thrust_hits)) return
-	for(var/mob/M in range(HURT_REACH_MAX, src))
+	for(var/mob/M in HurtRangeMobs(src, 2, -round(-glob.MECH_THRUST_REACH / 32)))
 		if(M == src || !M.density || M.Dead || (M in mech_thrust_hits)) continue
 		if(!MechTouching(M, glob.MECH_THRUST_REACH)) continue
 		mech_thrust_hits += M

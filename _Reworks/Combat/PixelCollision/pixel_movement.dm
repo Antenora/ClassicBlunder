@@ -361,7 +361,10 @@ var/HURT_REACH_GEN = 0 //bumped on any change, so the watcher can tell nobody gr
 
 mob/proc/HurtSetReach()
 	var/nr = max(1, round((max(abs(hurt_ox + body_px) + hurt_w, abs(hurt_oy + body_py) + hurt_h) + 32) / 32) + 1)
-	if(nr != hurt_reach) HURT_REACH_GEN++
+	if(nr != hurt_reach)
+		HURT_REACH_GEN++
+		if(nr > 2) HURT_WIDE |= src
+		else if(hurt_reach > 2) HURT_WIDE -= src
 	hurt_reach = nr
 	if(hurt_reach > HURT_REACH_MAX)
 		HURT_REACH_MAX = hurt_reach //raise-only; _PmWatcher recomputes the decay
@@ -369,6 +372,7 @@ mob/proc/HurtSetReach()
 mob/var/tmp/body_px = 0
 mob/var/tmp/body_py = 0
 var/list/BIG_BODIES = list()
+var/list/HURT_WIDE = list()
 
 mob/proc/SetBodyOffset(px, py)
 	body_px = px
@@ -389,6 +393,16 @@ proc/BigBodiesNear(atom/center, rng, los = FALSE)
 		if(get_dist(center, m) > far) continue
 		if(los && !(m in view(far, center))) continue
 		. += m
+
+proc/HurtRangeMobs(mob/center, min_r, extra = 0)
+	var/r = max(min_r, center.hurt_reach) + extra
+	. = range(r, center)
+	if(!HURT_WIDE.len) return
+	HURT_WIDE -= null
+	for(var/mob/m in HURT_WIDE)
+		if(m == center || !m.loc || m.z != center.z) continue
+		var/d = get_dist(center, m)
+		if(d > r && d <= r + m.hurt_reach - 2) . += m
 
 mob/proc/HurtL()
 	return 1 + (x-1)*32 + step_x + body_px + hurt_ox
@@ -433,7 +447,7 @@ mob/proc/InBodyReach(mob/O, extra = 0)
 mob/proc/BodyReachMobs(extra = 0)
 	if(!HurtboxOn()) return null
 	var/list/found
-	for(var/mob/O in range(HURT_REACH_MAX, src))
+	for(var/mob/O in HurtRangeMobs(src, 2, -round(-extra / 32)))
 		if(O == src || !O.density) continue
 		if(!InBodyReach(O, extra)) continue
 		if(!found) found = list()

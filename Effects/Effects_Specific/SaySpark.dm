@@ -2,14 +2,17 @@ obj/SaySpark
 	icon='Say Spark.dmi'
 	layer=EFFECTS_LAYER
 	var/AnimateStuff=1
+	var/tmp/sparking=1
 	New()
 		Sparky()
 		spawn(25)
 			animate(src,alpha=0,time=10)
 			spawn(10)
+				sparking=0
 				GfxReleaseAtom(src)
 	proc
 		Sparky()
+			if(!sparking) return
 			spawn(1)
 				animate(src,pixel_x=rand(-1*AnimateStuff,1*AnimateStuff),pixel_y=rand(0,1*AnimateStuff))
 				spawn(1)
@@ -26,14 +29,17 @@ obj/InstinctSpark
 	icon='Instinct Spark.dmi'
 	layer=EFFECTS_LAYER
 	var/AnimateStuff=1
+	var/tmp/sparking=1
 	New()
 		Sparky()
 		spawn(25)
 			animate(src,alpha=0,time=10)
 			spawn(10)
+				sparking=0
 				GfxReleaseAtom(src)
 	proc
 		Sparky()
+			if(!sparking) return
 			spawn(1)
 				animate(src,pixel_x=rand(-1*AnimateStuff,1*AnimateStuff),pixel_y=rand(0,1*AnimateStuff))
 				spawn(1)

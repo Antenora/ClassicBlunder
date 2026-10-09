@@ -2241,6 +2241,7 @@ obj
 					set category="Skills"
 					usr.Activate(src)
 					spawn(100)
+						if(!usr) return
 						if(usr.CheckSpecial("Final Getsuga Tenshou"))
 							for(var/obj/Skills/Buffs/SpecialBuffs/Sword/Final_Getsuga_Tenshou/FGT in usr)
 								usr.UseBuff(FGT)
@@ -7033,6 +7034,7 @@ obj
 					S.critBonus = FromSkill.CritChanceBonus
 					S.dmgTypes = specDmgTypes
 					damageDealt = S.resolve()
+					if(!m) return
 					if(damageDealt > 0 && FromSkill && FromSkill.WoundRider && Owner && ismob(m))
 						Owner.DealWounds(m, damageDealt * FromSkill.WoundRider)
 					if(damageDealt > 0 && FromSkill && Owner && ismob(m))

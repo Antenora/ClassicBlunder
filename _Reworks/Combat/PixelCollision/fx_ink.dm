@@ -726,8 +726,7 @@ obj/AutoHitter
 		var/list/P = BodyInkProbe(Owner)
 		var/pad = max(1, glob ? glob.MOB_REACH_PAD : 2)
 		var/facing = Circle ? 0 : Owner.dir
-		var/reach = max(3, HURT_REACH_MAX)
-		for(var/mob/m in range(reach, Owner))
+		for(var/mob/m in HurtRangeMobs(Owner, 3))
 			if(m == Owner || !m.density) continue
 			if(m.z != Owner.z) continue
 			var/list/Q = BodyInkProbe(m)
@@ -769,7 +768,7 @@ obj/AutoHitter
 		set waitfor = FALSE
 		walk(src, 0)
 		animate(src)
-		if(AHOwner)
+		if(AHOwner && AHOwner.autohitChildren)
 			AHOwner.autohitChildren -= src
 		AHOwner = null
 		AlreadyHit = null
@@ -795,8 +794,7 @@ mob/proc/InkRushSweep(obj/AutoHitter/r, ox, oy)
 	if(dist > 8) steps = round(dist / 8) + 1
 	var/list/P = BodyInkProbe(src)
 	var/pad = max(1, glob ? glob.MOB_REACH_PAD : 2)
-	var/reach = max(3, HURT_REACH_MAX) + round(dist / 32) + 1
-	for(var/mob/m in range(reach, src))
+	for(var/mob/m in HurtRangeMobs(src, 3, round(dist / 32) + 1))
 		if(m == src || !m.density) continue
 		if(m == r.Owner) continue
 		if(m.z != z) continue
