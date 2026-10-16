@@ -1080,3 +1080,15 @@ mob/proc/SpawnCrossMarkers(projectile_path, Target, marker_range = 3)
 			var/meterGain = min(max(val,0.1), 0.2)
 			defender.HyperdeathMeterCurrent=min(defender.HyperdeathMeterCurrent+meterGain, 100)
 			defender.HyperMeterUpdate()
+
+/strikeHook/karmicRetributionAttacker
+	stage = "post"
+	fire(strike/S)
+		var/mob/attacker = S.attacker
+		var/mob/defender = S.defender
+		var/LV = defender.ViolenceGrowth
+		var/goodD = attacker.IsGood()
+		if((defender.Saga=="Path of a Hero: Rebirth") && (LV) && (!attacker.IsEvil()))
+			if(prob(LV+(5*goodD)))
+				defender << "Karma courses through your veins!"
+				defender.AddPoison(LV+(5*goodD))
