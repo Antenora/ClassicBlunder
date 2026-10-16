@@ -26,6 +26,14 @@ mob/var/tmp/mob/last_attacker
 mob/var/tmp/image/phantom_mark_fx
 mob/var/tmp/wall_cling_until = 0
 
+//used for rebirth saga, basically sanitize all skill names and remove personality for them as LOVE increases
+mob/proc/SkillActivationMsg(obj/Skills/S, msg)
+	if(!msg || !S)
+		return msg
+	if(ViolenceGrowth >= 5)
+		return "[src] uses [S.name]."
+	return msg
+
 mob/proc/RushWallCling()
 	dir = turn(dir, 180)
 	wall_cling_until = world.time + 5

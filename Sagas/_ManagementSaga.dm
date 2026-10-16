@@ -86,6 +86,17 @@ mob/var
 	TranceLevel=0
 	UndyingLoc
 	FinalHeroChoice
+
+	HyperdeathMeterCurrent=0
+	HyperdeathThreshold=100
+	RoaringTempoCurrent=0
+	RoaringTempoMax=100
+
+	ViolenceGrowthCap=0 // cap for how many times you can get HP up from killing a guy goes up with every saga level
+	ViolenceGrowth=0
+	DetachmentProb=0
+	DetachmentTimer=6000
+
 	//SAINT SEIYA
 	SenseUnlocked=5
 	ClothBronze
@@ -94,13 +105,6 @@ mob/var
 	chikaraWhitelist = FALSE
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
-
-	//Path of a Hero
-	HyperdeathMeterCurrent=0
-	HyperdeathThreshold=100
-
-	RoaringTempoCurrent=0
-	RoaringTempoMax=100
 
 	//SHINIGAMI
 	ShinigamiRelease
@@ -445,6 +449,7 @@ mob/Admin3/verb
 								confirm=Ask(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", null, "confirm", null, 1, "Yes", "No")
 
 					P.SagaLevel=1
+					P.ViolenceGrowthCap=1
 					switch(choice)
 						if("Blue")
 							P.RebirthHeroType="Blue"
@@ -943,6 +948,7 @@ mob
 									if("Prophesized Hero")
 										confirm=Ask(src, "A story told in glass, a tragedy written into time and space.", "The Hero of Prophecy, chosen by fate.", null, "confirm", null, 1, "Yes", "No")
 							src.SagaLevel=2
+							src.ViolenceGrowthCap=2
 							src<<"Unwavering courage wells up within you! You have unlocked the ACT meter!"
 							switch(choice)
 								if("Unsung Hero")
@@ -994,6 +1000,7 @@ mob
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
+							src.ViolenceGrowthCap=4
 							if(src.RebirthHeroType=="Cyan")
 								var/list/Choices=list("Roaring Knight", "White Pen of Hope")
 								var/choice
@@ -1041,6 +1048,7 @@ mob
 								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
+							src.ViolenceGrowthCap=6
 							if(src.RebirthHeroType=="Cyan")
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src<<"The special power you wield grows stronger, heightening the strength of your SOUL colors."
@@ -1077,6 +1085,7 @@ mob
 								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
+							src.ViolenceGrowthCap=8
 							if(src.RebirthHeroType=="Blue")
 								src.AddSkill(new/obj/Skills/Buffs/Rebirth/CrownlessKing)
 							if(src.RebirthHeroType=="Red")
@@ -1099,6 +1108,7 @@ mob
 								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
+							src.ViolenceGrowthCap=10
 							if(src.RebirthHeroType=="Cyan")
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Banish_The_ANGELS_HEAVEN)

@@ -13074,13 +13074,13 @@ mob
 						src.appearance_flags+=512
 
 			if(B.CustomActive)
-				OMsg(src, "[B.CustomActive]")
+				OMsg(src, SkillActivationMsg(B, "[B.CustomActive]"))
 			else
 				if(B.ActiveMessage)
 					if(B.TextColor)
-						OMsg(src, "<font color='[B.TextColor]'>[src] [B.ActiveMessage]</font color>")
+						OMsg(src, SkillActivationMsg(B, "<font color='[B.TextColor]'>[src] [B.ActiveMessage]</font color>"))
 					else
-						OMsg(src, "[src] [B.ActiveMessage]")
+						OMsg(src, SkillActivationMsg(B, "[src] [B.ActiveMessage]"))
 
 			if(B.Imitate)
 				B.OldName=src.name

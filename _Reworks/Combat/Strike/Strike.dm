@@ -767,8 +767,12 @@ mob
 				if(src.Saga == "Path of a Hero: Rebirth" && (RebirthHeroType == "Cyan" || RebirthHeroType == "Purple" || RebirthHeroType == "Prismatic"))
 					OMsg(src, "<b>* [src] won!</b>")
 					OMsg(src, "* Got [defender.GetMoney()]$.")
-					OMsg(src, "* [src] becomes stronger.")
-					src.VitMod += 0.25
+					if(src.ViolenceGrowth < src.ViolenceGrowthCap)
+						OMsg(src, "* [src] becomes stronger.")
+						src.VitMod += 0.25
+						src.ViolenceGrowth+=1
+						if(src.ViolenceGrowth>=6)
+							DetachmentProb = 1
 				defender.Death(src, null)
 			if(defender.passive_handler.Get("The Inkstone")&&defender.passive_handler.Get("AbsoluteDespair"))
 				if(prob(2)&& defender.BioArmor)
