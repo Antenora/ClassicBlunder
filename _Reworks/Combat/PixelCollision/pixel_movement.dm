@@ -552,6 +552,7 @@ mob/Players
 		delay += move_speed
 		if(held_skill?.HeldBeam && !HasMovingCharge())
 			delay *= glob.HELD_BEAM_MOVE_PENALTY
+		delay *= NamekFearMoveMult()
 		if(held_skill && held_skill.HeldMoveMult > 0 && held_skill.HeldMoveMult != 1)
 			delay /= held_skill.HeldMoveMult
 		delay = GunMoveDelay(delay)

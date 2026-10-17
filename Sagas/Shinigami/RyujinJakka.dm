@@ -90,7 +90,6 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"MagicSword"     = 1,
 
 			"Scorching"      = 1 + SL,
 			"Combustion"     = 50 + (SL * 5),
@@ -391,7 +390,6 @@ proc/applyAshChoked(mob/target, mob/caster)
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"MagicSword"       = 1,
 
 			"Scorching"        = 3 + SL,
 			"SoulFire"         = 3 + SL

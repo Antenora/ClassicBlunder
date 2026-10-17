@@ -32,7 +32,7 @@ var/list/heavenly_restrictions = list("Staff" = 2, "Armor" = 3, "Sword" = 2, "He
 "Science" = 5, "Queues" = 3, "Autohits" = 3, "Projectiles" = 3, "Grapples" = 2, "All Skills" = 10, "Force" = 3, "Defense" = 3, "Endurance" = 3, \
 "Cybernetics" = 3, "Strength" = 3, "Speed" = 3, "Offense" = 3, "Normal Attack" = 6, "Grab" = 2, "Zanzoken" = 3, "Senses" = 4, "Anger" = 4, "Power Control" = 3, "Special Slotter" = 4)
 
-var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "Launchers", "Stunners", "Heavy Strike", "Dragon Dash", "Senses", "Throw", "Strength", "Force", "Endurance", "Offense", "Defense", "Speed", "Anger", "Power Control", "Power")
+var/list/heavenly_improvements = list("Dragon Clash", "Reverse Dash", "Launchers", "Stunners", "Heavy Strike", "Dragon Dash", "Senses", "Throw", "Strength", "Force", "Endurance", "Offense", "Defense", "Speed", "Anger", "Power Control", "Power")
 
 /SecretInformation/HeavenlyRestriction/proc/modifyRestrictionValues(mob/p, restriction)
 	switch(restriction)
@@ -102,9 +102,6 @@ var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "L
 		if("Dragon Clash")
 			p.passive_handler.Increase("TechniqueMastery", min(boon_value, 4))
 			p.passive_handler.Increase("AttackSpeed", min(boon_value, 4))
-		if("Grab")
-			p.passive_handler.Increase("Grippy", min(boon_value, 4))
-			p.passive_handler.Increase("Muscle Power", min(boon_value, 4))
 		if("Reverse Dash")
 			// Already has passives associated with the buff it gives after use, included in case needed later
 		if("Dragon Dash")
@@ -125,7 +122,6 @@ var/list/heavenly_improvements = list("Dragon Clash", "Grab", "Reverse Dash", "L
 			p.passive_handler.Increase("CalmAnger", 1)
 		if("Power Control")
 			p.passive_handler.Increase("EnergyGeneration", min(boon_value * 1.5, 10))
-			p.passive_handler.Increase("SoftStyle", min(boon_value * 0.5, 2))
 		if("Power")
 			p.passive_handler.Increase("ZenkaiPower", min(boon_value * 0.5, 2))
 

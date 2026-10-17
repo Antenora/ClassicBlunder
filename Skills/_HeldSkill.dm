@@ -278,6 +278,8 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	CurrentChargeLevel = 0
 	Z.ChargeBenefit   = 0
 	Z.sustain_pour_bank = 0
+	if(ChainCastSkip(Z))
+		held_charge_start -= max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
 
 	if(BeamHoldID && Z.InternalName == BeamHoldID && Z.HeldBeam)
 		var/charge_speed = max(GetBeamChargeSpeedMult(), 0.1)
@@ -615,7 +617,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 	var/efx_charge = EnergyFXChargeDraws(Z)
 	if(!efx_charge)
 		FxChargeShimmer(src, Z)
-		if(!energyfx_streaks) FlashChargeTick(src, 2)
+		if(!energyfx_streaks && !EnergyFXStreaksOn(src, list(ChargeMoteColor(src, 2)), 0, 0)) FlashChargeTick(src, 2)
 	var/last_tick_fire = 0
 	var/last_charge_wave = world.time
 	while(held_skill == Z)
@@ -693,6 +695,7 @@ globalTracker/var/HELD_BEAM_SPAN_PER_SEC = 0.5
 			var/current_charge_ticks = max(Z.GetChargePeriodForLevel(CurrentChargeLevel) * 10, 1)
 			ringp = clamp((world.time - held_charge_start) / current_charge_ticks, 0, 1)
 		EnergyFXChargeTick(Z, ringp)
+		if(!energyfx_charge) EnergyFXStreaksLevel(src, ringp)
 		//ChargeWaveInterval is measured in deciseconds; 0 disables repeating waves.
 		if(!efx_charge && Z.ChargeWaveInterval > 0 && world.time-last_charge_wave >= Z.ChargeWaveInterval)
 			if(Z.ChargeWaveInvert)

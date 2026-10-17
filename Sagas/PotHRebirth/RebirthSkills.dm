@@ -100,7 +100,14 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/Temporary_Hero_Soul
 	Cooldown = 1
 	TimerLimit = 30
 	passives = list("Pursuer" = 1)
-obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Heart
+obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Temporary_Hero_Heart
+	Cooldown = -1
+	IconLock='AuraSlowTensionBlue.dmi'
+	AuraArt=1
+	LockX=0
+	LockY=0
+	TensionLock=1
+	NoWhiff=1
 	ActiveMessage="awakens a heroic heart!"
 	PowerMult=1.15
 	StrMult=1.15
@@ -109,7 +116,14 @@ obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Hear
 	AlwaysOn = 1
 	TimerLimit = 30
 	passives = list("Tenacity" = 1, "Harden" = 1)
-obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Soul
+obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Temporary_Hero_Soul
+	Cooldown = -1
+	IconLock='AuraSlowTensionBlue.dmi'
+	AuraArt=1
+	LockX=0
+	LockY=0
+	TensionLock=1
+	NoWhiff=1
 	ActiveMessage="awakens a heroic soul!"
 	PowerMult=1.15
 	StrMult=1.25
@@ -553,13 +567,13 @@ obj/Skills/Queue
 		AccuracyMult=1.1
 		InstantStrikes=4
 		InstantStrikesDelay=1.5
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Heart"
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Temporary_Hero_Heart"
 		desc="Randomly cast Hero Heart or Hero Soul on yourself."
 		adjust(mob/p)
 			if(prob(50))
-				src.BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Heart"
+				src.BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Temporary_Hero_Heart"
 			else
-				src.BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Temporary_Hero_Soul"
+				src.BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Temporary_Hero_Soul"
 		verb/HoldingOutForAHero()
 			set name="Holding Out For a Hero"
 			set category="Skills"
@@ -1271,101 +1285,46 @@ obj/Skills/Grapple
 		verb/CHAOS_DUNK()
 			set category="Skills"
 			src.Activate(usr)
-/obj/Skills/Buffs/NuStyle/SwordStyle //t3 scaled styles
-	The_Roaring_Knight //cyan t5 evil path
-		StyleActive="The Roaring Knight"
-		passives = list( "Secret Knives" = "GodSlayer", "MagicSword"=1,"AfterImages" = 4, "AfterImageSkin" = "Anti", "Tossing"=2, "Twisted Sentimentality" = 1)
-		StyleEnd=1.5
-		StyleStr=1.5
-		Finisher="/obj/Skills/Queue/Finisher/Twisted_Heartbeat"
-		verb/The_Roaring_Knight()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-	White_Pen_Of_Hope //cyan t5 good path
-		StyleActive="The White Pen of Hope"
-		passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
-		StyleSpd=1.5
-		StyleStr=1.25
-		StyleFor=1.25
-		Finisher="/obj/Skills/Queue/Finisher/Cross_Slash"
-		adjust(mob/p)
-			passives = list("ManaGeneration" = 2,  "Determination(White)" = 1,"ManaCapMult"=1, "MagicSword"=1)
-		verb/Pen_Of_Hope()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-	Justice_Incarnate
-		StyleActive="Justice Incarnate"
-		StyleStr=1.25
-		StyleFor=1.25
-		StyleEnd=1.5
-		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
-		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-		verb/Justice_Incarnate()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-	Fate_Incarnate
-		StyleActive="Fate Incarnate"
-		StyleStr=1.25
-		StyleFor=1.25
-		StyleEnd=1.5
-		Finisher="/obj/Skills/Queue/Finisher/Your_Idea"
-		passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-		adjust(mob/p)
-			passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-			if(p.SagaLevel>=6)
-				passives = list("Rage" = 5, "Momentum" = 1, "Determination(Green)" = 1, "MagicSword"=1)
-		verb/Fate_Incarnate()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-/obj/Skills/Queue/Finisher
-//t3
-	Your_Idea // Justice Incarnate
-		DamageMult = 4
-		Grapple=1
-		HitMessage="has a brilliant idea!"
-		GrabTrigger="/obj/Skills/Grapple/Throw_Shit_At_The_Wall"
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Hope_Crossed_On_Your_Heart"
-	Cross_Slash //The White Pen of Hope
-		DamageMult = 1
-		HitMessage=""
-		FollowUp="/obj/Skills/Queue/Finisher/Kris_Kross_Applesauce"
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/The_Cage_With_Human_Soul_And_Parts"
-	Kris_Kross_Applesauce
-		Combo=2
-		DamageMult = 5
-		InstantStrikes = 2
-		HitMessage="channels their SOUL into their blade, swinging twice with deadly force!"
-		BuffSelf=0
-		HitSparkIcon = 'Slash_Multi.dmi'
-	Twisted_Heartbeat //The Roaring Knight
-		DamageMult=10
-		HitSparkIcon='Slash - Zan.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Blackened_Knife"
-		HitMessage = "tears apart reality with one decisive swing."
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Path_of_a_Hero
+	BuffName = "Path of a Hero"
+	adjust(mob/p)
+		passives = list()
+		var/SL = p.SagaLevel
+		if(p.RebirthHeroType == "Rainbow" || p.RebirthHeroType == "Prismatic")
+			passives["FocusShiftRelease"] = 2
+			if(p.RebirthHeroType == "Prismatic")
+				if(SL >= 3)
+					passives["FocusShiftRelease"] = 4
+				if(SL >= 4)
+					passives["FocusShiftRelease"] = 5
+				if(SL >= 5)
+					passives["FocusShiftRelease"] = 6
+					passives["PUSpike"] = 50
+		if(SL >= 5)
+			if(p.RebirthHeroType == "Cyan")
+				if(p.FinalHeroChoice == "Roaring Knight")
+					passives["AfterImages"] = 4
+					passives["AfterImageSkin"] = "Anti"
+					passives["Twisted Sentimentality"] = 1
+				if(p.FinalHeroChoice == "White Pen of Hope")
+					passives["ManaGeneration"] = 2
+					passives["Determination(White)"] = 1
+					passives["ManaCapMult"] = 1
+			if(p.RebirthHeroType == "Purple")
+				passives["Rage"] = 5
+				passives["Momentum"] = 1
+				passives["Determination(Green)"] = 1
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Hope_Crossed_On_Your_Heart
-		StrMult=1.3
-		EndMult=1.3
-		passives = list( "Harden"=3, "TensionLock" = 1)
-	The_Cage_With_Human_Soul_And_Parts
-		StrMult=1.3
-		ForMult=1.3
-		passives = list("TensionLock" = 1, "Speed Force" = 1, "Iaijutsu" = 1, "Relentlessness" = 1, "Fury" = 3)
-	Blackened_Knife
-		StrMult=1.3
-		SpdMult=1.3
-		passives = list("AfterImages" = 4, "TensionLock" = 1, "Speed Force" = 1,  "Relentlessness" = 1, "Fury" = 3)
+/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate
+	BuffName = "The Fourth Fate"
+	Copyable = 0
+	OurFuture = 1
+	passives = list("Determination(Black)" = 1, "Determination(White)" = 1, "ManaGeneration" = 5, "EnergyGeneration" = 5, "Skimming" = 3, "Godspeed" = 3, "Our Future" = 1, "The Legend of REBIRTH" = 1)
+	ActiveMessage = "takes back what belongs to them, as they call upon The Fourth Fate!"
+	verb/The_Fourth_Fate()
+		set category = "Skills"
+		set hidden = 1
+		src.Trigger(usr)
 
 //Determination spends the tank on a crit
 /strikeHook/determinationUnleash

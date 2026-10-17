@@ -1343,7 +1343,6 @@ mob/proc/Update_Stat_Labels()
 		winshow(src, "BarFrenzy",0)
 		winshow(src, "BarPotion",0)
 		winshow(src, "BarCripple",0)
-		if(client) client.UpdateFinisherBar()   // tension/finisher HUD bar
 		if(client) client.UpdateGuardBar()
 		if(src.StyleActive)
 			winshow(src, "StyleLabel",1)

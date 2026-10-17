@@ -397,6 +397,8 @@ mob/proc/Allow_Move(D)
 			view(P)<<"[usr] struggles against [P]!"
 		sleep(10)
 		return
+	if(NamekFearRefusesStep(D))
+		return
 	return 1
 mob/proc/Move_Requirements()
 	if(!Stasis&&!TimeFrozen&&!Frozen&&!Stunned&&!Suspended&&!Moving&&!Launched&&!Knockbacked&&!KO&&!WindingUp)

@@ -2,18 +2,12 @@ var/list/SkillTreeList=list("BlastT1"=list(),"BlastT2"=list(),"BlastT3"=list(), 
 "BlastT4"=list(),"SwordT1"=list(),"SwordT2"=list(),"SwordT3"=list(),"SwordT4"=list(),"SwordT5"=list(),\
 "BeamT1"=list(),"BeamT2"=list(),"BeamT3"=list(),"BeamT4"=list(),"BlastT5"=list(),\
 "UnarmedT1"=list(),"UnarmedT2"=list(),"UnarmedT3"=list(),"UnarmedT4"=list(), "UnarmedT5" = list(),\
-"UnarmedStyles"=list(),"UnarmedStylesT1"=list(), "UnarmedStylesT2"=list(),"UnarmedStylesT3"=list(), "UnarmedStylesT4"=list(), \
-"ElementalStyles"=list(),"HybridStyle"=list(),"SwordStyles"=list(),"GunStyles"=list(), \
-"SwordStylesT1"=list(), "SwordStylesT2"=list(),"SwordStylesT3"=list(), "SwordStylesT4"=list(), \
-"ElementalStylesT1"=list(), "ElementalStylesT2"=list(),"ElementalStylesT3"=list(), "ElementalStylesT4"=list(),\
-"HybridStylesT1"=list(), "HybridStylesT2"=list(), "HybridStylesT3"=list(), "HybridStylesT4"=list() )
+"UnarmedStyles"=list(), \
+"EnergyStyles"=list(),"SwordStyles"=list(),"GunStyles"=list() )
 proc/MakeSkillTreeList()
 	for(var/x in SkillTree)
 		var/Tier = null
-		if(!(x in list("UnarmedStyles","ElementalStyles", "ElementalStylesT1", "ElementalStylesT2", \
-		"ElementalStylesT3","HybridStyle","SwordStyles", "GunStyles", "UnarmedStylesT1", "UnarmedStylesT2", \
-		"UnarmedStylesT3", "UnarmedStylesT4", "SwordStylesT1", "SwordStylesT2", "SwordStylesT3", "SwordStylesT4",\
-		"HybridStylesT1", "HybridStylesT2", "HybridStylesT3", "HybridStylesT4")))
+		if(!(x in list("UnarmedStyles","EnergyStyles","SwordStyles","GunStyles")))
 			Tier = copytext(x,length(x), 0)
 		for(var/z in SkillTree[x])
 			var/obj/SkillTreeObj/s = new
@@ -194,97 +188,27 @@ var/list/SkillTree=list(
 ),
 
 "UnarmedStyles"=list(
-			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Shaolin_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Shield_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Turtle_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Murim_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Lucha_Libre_Style"=0
-),
-"UnarmedStylesT1"=list(
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Red_Cyclone_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Wushu_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Black_Leg_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Wing_Chun_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Tai_Chi_Style"=9999
-					),
-"UnarmedStylesT2"=list(
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ubermensch_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Mantis_And_Crane_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Long_Fist_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Divine_Arts_of_The_Heavenly_Demon"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Futae_No_Kiwami"=9999
-					),
-"UnarmedStylesT3"=list(
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Flying_Thunder_God"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Jeet_Kune_Do"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/All_Star_Wrestling"=9999
-					),
-"UnarmedStylesT4"=list(
-	"/obj/Skills/Buffs/NuStyle/UnarmedStyle/God_Fist"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ten_Directions"=9999,
-					"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Giga_Galaxy_Wrestling"=9999
-					),
-
-"HybridStyles"=list(
-
-),
-"HybridStylesT1"=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Circuit_Breaker_Style"=99999
-
-),
-"HybridStylesT2"=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Divine_Arts_of_The_Heavenly_Demon"=9999,
-"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ifrit_Jambe"=9999,
-"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Psycho_Boxing"=9999,
-"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Phoenix_Eye_Fist"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Art_of_Order"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Homura_Dama"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodseeker"=9999
-),
-"HybridStylesT3"=list("/obj/Skills/Buffs/NuStyle/UnarmedStyle/Twin_Dragon_Fire"=9999,
-"/obj/Skills/Buffs/NuStyle/UnarmedStyle/School_of_the_Undefeated_of_the_East"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/God_of_Hyperdeath"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Tsui_no_Hiken_Kaguzuchi"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Tenken"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Plasma_Blade"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Bloodwhetter"=9999
-),
-"HybridStylesT4"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Alpha_inForce"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Nebula_Blade"=9999,
-"/obj/Skills/Buffs/NuStyle/SwordStyle/Hearts_Beating_As_One"=9999,
-"/obj/Skills/Buffs/NuStyle/UnarmedStyle/High_Roller"=9999
+			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Grappler"=0,
+			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Interceptor"=0,
+			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Fa_Jin_Striker"=0,
+			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Warp_Striker"=0,
+			"/obj/Skills/Buffs/NuStyle/UnarmedStyle/Battlemage"=0
 ),
 
-"ElementalStyles"=list(
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Earth_Moving"=0,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Wind_Summoning"=0,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Fire_Weaving"=0,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Water_Bending"=0,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Plague_Bringer"=0
-),
-"ElementalStylesT1"=list(
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Magma_Walker"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Ice_Dancing"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Stormbringer"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Inferno"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Bloodmancer"=9999
-),
-"ElementalStylesT2"=list(
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Hellfire"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Plasma_Style"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Blizzard_Bringer"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Hot_n_Cold"=9999
-),
-"ElementalStylesT3"=list(
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Oblivion_Storm"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Annihilation"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Omnimancer"=9999,
-			"/obj/Skills/Buffs/NuStyle/MysticStyle/Gamma_Style"=9999
+"EnergyStyles"=list(
+			"/obj/Skills/Buffs/NuStyle/EnergyStyle/Beam_Duelist"=0,
+			"/obj/Skills/Buffs/NuStyle/EnergyStyle/Barrage"=0,
+			"/obj/Skills/Buffs/NuStyle/EnergyStyle/Marksman"=0,
+			"/obj/Skills/Buffs/NuStyle/EnergyStyle/Demolitions"=0,
+			"/obj/Skills/Buffs/NuStyle/EnergyStyle/Ki_Fighter"=0
 ),
 "SwordStyles"=list(
-			"/obj/Skills/Buffs/NuStyle/SwordStyle/Ittoryu_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/SwordStyle/Fencing_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/SwordStyle/Ulfberht_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/SwordStyle/Gladiator_Style"=0,
-			"/obj/Skills/Buffs/NuStyle/SwordStyle/Chain_Style"=0
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Duelist"=0,
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Twin_Blade"=0,
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Iaido"=0,
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Heavy_Blade"=0,
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Chain"=0,
+			"/obj/Skills/Buffs/NuStyle/SwordStyle/Spellblade"=0
 ),
 "GunStyles"=list(
 			"/obj/Skills/Buffs/NuStyle/GunStyle/Deadeye"=0,
@@ -294,23 +218,6 @@ var/list/SkillTree=list(
 			"/obj/Skills/Buffs/NuStyle/GunStyle/Close_Quarters"=0,
 			"/obj/Skills/Buffs/NuStyle/GunStyle/Spellslinger"=0
 ),
-"SwordStylesT1"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Fist_of_Khonshu"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Iaido_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Dardi_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Kunst_des_Fechtens"=9999),
-"SwordStylesT2"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Berserk"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Witch_Hunter"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Phalanx_Style"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Gatotsu"=9999),
-"SwordStylesT3"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Two_Heaven_As_One"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Acrobat"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Fierce_Deity"=9999),
-"SwordStylesT4"=list("/obj/Skills/Buffs/NuStyle/SwordStyle/Way_of_the_Kensei"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Kyutoryu"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/War_God"=9999,
-					"/obj/Skills/Buffs/NuStyle/SwordStyle/Ulforce"=9999),
 
 )
 
@@ -333,6 +240,9 @@ obj/SkillTreeObj
 
 		if(locate(s,usr.contents))
 			usr<< "You already know this skill!"
+			del(s)
+			return
+		if(usr.StyleLockRefuses(s))
 			del(s)
 			return
 
@@ -363,6 +273,9 @@ obj/SkillTreeObj
 			return
 		if(locate(s,usr.contents))
 			usr << "You've already learned [s]."
+			del(s)
+			return
+		if(usr.StyleLockRefuses(s))
 			del(s)
 			return
 

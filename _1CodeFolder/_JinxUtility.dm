@@ -255,16 +255,7 @@ mob
 				src.TotalCapacity=100
 
 		HealHealth(val)
-			val *= HealCutMult()
-			if(GetEffectiveShearForStackingEffects())
-				if(HasShearImmunity())
-					val=val
-					Sheared=0
-				var/notDDP = !IsDarkDragonPlayer();
-				var/hellP = GetHellPower();
-				if(notDDP && Frenzy > 0) val *= 0.5;
-				if(hellP) val *= 0.5;
-				Sheared = max(0, Sheared - val)
+			val = HealAfterCuts(val)
 			if(icon_state == "Meditate")
 				Tension = max(0, Tension - (val * 1.5))
 			src.Health+=src.PctToHP(val)
@@ -343,7 +334,21 @@ mob
 		SetHealthPct(pct)
 			src.Health=src.PctToHP(pct)
 		HealPct(pct)
+			if(pct > 0)
+				pct = src.HealAfterCuts(pct)
 			src.Health+=src.PctToHP(pct)
+		HealAfterCuts(val)
+			val *= HealCutMult()
+			if(GetEffectiveShearForStackingEffects())
+				if(HasShearImmunity())
+					val=val
+					Sheared=0
+				var/notDDP = !IsDarkDragonPlayer();
+				var/hellP = GetHellPower();
+				if(notDDP && Frenzy > 0) val *= 0.5;
+				if(hellP) val *= 0.5;
+				Sheared = max(0, Sheared - val)
+			return val
 		MaxHealth()
 			var/HasWounds=1
 			if(src.HasUnstoppable() || mech)
@@ -365,7 +370,7 @@ mob
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
-			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/KeyEnergy=100+src.passive_handler.Get("MaxEnergyBonus")-(src.TotalFatigue*HasFatigue)
 			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
@@ -382,7 +387,7 @@ mob
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
-			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/KeyEnergy=100+src.passive_handler.Get("MaxEnergyBonus")-(src.TotalFatigue*HasFatigue)
 			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
@@ -902,13 +907,7 @@ mob
 
 		GetMA(stat)
 			if(StyleBuff)
-				var/MA = StyleBuff.vars["Style[stat]"]-1
-				if(Target)
-					if((Target.passive_handler["Musoken"] && equippedSword) && stat == "Off")
-						if(passive_handler["Musoken"])
-							MA /= 2
-						else
-							MA = 0
+				var/MA = 0
 				if(Secret=="Haki")
 					if(secretDatum.secretVariable["HakiSpecialization"]=="Armament")
 						if(stat=="Str")
@@ -1150,9 +1149,6 @@ mob
 			For+=ForAdded
 			if(passive_handler.Get("WarmingUp")) For += WarmingUpBonus
 			For+=src.GetEquippedWeaponStatAdd("For")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold>0)
-					For+=StyleBuff?:hotCold/glob.HOTNCOLD_STAT_DIVISOR
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				For += (0.1*spPower) * For
@@ -1338,9 +1334,6 @@ mob
 			End+=EndAdded
 			if(passive_handler.Get("WarmingUp")) End += WarmingUpBonus
 			End+=src.GetEquippedWeaponStatAdd("End")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold<0)
-					End+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
 			var/Mod=1
 			Mod+=(src.EndMultTotal-1)
 			if(src.KamuiBuffLock)
@@ -1500,11 +1493,6 @@ mob
 			Spd+=SpdAdded
 			if(passive_handler.Get("WarmingUp")) Spd += WarmingUpBonus
 			Spd+=src.GetEquippedWeaponStatAdd("Spd")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold<0)
-					Spd-=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
-				else
-					Spd+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
 			var/Mod=1
 			Mod+=(src.SpdMultTotal-1)
 			if(KaiokenBP > 1)
@@ -1897,9 +1885,6 @@ mob
 			Recov*=Mod
 			Recov*=Mult
 			Recov*=src.RecovChaos
-			if(src.isRace(NAMEKIAN)&&src.transActive())
-				if(Recov<2)
-					Recov=2
 			if(src.RippleActive())
 				Recov*=max(min(src.Oxygen/src.OxygenMax,1.5),0.5)
 			var/TotalTax
@@ -2570,6 +2555,7 @@ mob
 			var/flash_dash = glob.FLASH_MOVE && Trg && get_dist(src, Trg) > 3
 			var/flash_ghost_px = 0
 			var/last_smear_ang = 1000
+			var/list/dash_cut = (Clashable && passive_handler && passive_handler["Battojutsu"]) ? list() : null
 			if(flash_dash)
 				FlashDashKickoff(src, Trg)
 			while(pm ? pm_budget > 0 : MaxDistance > 0)
@@ -2600,6 +2586,8 @@ mob
 						if(flash_ghost_px >= 48)
 							flash_ghost_px = 0
 							AfterImage(src)
+				if(dash_cut)
+					DashCrossStep(Trg, dash_cut)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
 				if(get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
@@ -2634,6 +2622,7 @@ mob
 		Reincarnate()
 			src.Savable=0
 			if(istype(src, /mob/Players))
+				src.QuincyFreeRegistry()
 				fdel("Saves/Players/[src.ckey]")
 			src.RPPCurrent=src.RPPSpent+src.RPPSpendable
 			src.RPPTotal+=src.RPPCurrent
@@ -2642,16 +2631,6 @@ mob
 			spawn(600)
 				del(src)
 
-		CountStyles(Tier=0)
-			var/Count=0
-			if(!Tier)
-				Log("Admin", "[ExtractInfo(src)] tried to count signatures without specifying a tier.")
-				return
-			for(var/obj/Skills/Buffs/NuStyle/s in src.Skills)
-				if(s.SignatureTechnique==Tier)
-					Count++
-					continue
-			return Count
 		CountSigs(Tier=0)
 			var/Count=0
 			var/list/combo_check=list()
@@ -2695,36 +2674,11 @@ mob
 			if(src.RPPSpendable+src.RPPSpent>=val)
 				return 1
 			return 0
-		req_styles(var/val, var/tier)
-			if(src.CountStyles(tier)<=val)
-				return 1
-			return 0
 		req_sigs(var/val, var/tier)
 
 			if(src.CountSigs(tier)<=val)
 				return 1
 			return 0
-		styles_available(var/tier)
-			for(var/obj/Skills/Buffs/NuStyle/s in src)
-				StyleUnlock(s)
-			var/list/styles_available=list()
-			styles_available.Add(src.SignatureStyles)
-			styles_available.Remove(src.SignatureSelected)
-			if(styles_available.len>0)
-				for(var/x in styles_available)
-					var/path=styles_available[x]
-					if(isnull(path))
-						continue
-
-					var/obj/Skills/s=new path
-					if(s.SignatureTechnique==tier)
-						del s
-						return 1
-					else
-						del s
-						continue
-			else
-				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
 			//basics come from addMissingSkills; Ki Control still needs its first-use setup
@@ -2752,23 +2706,18 @@ mob
 				src.saga_up_self()
 				return
 			if(src.Potential>=glob.progress.T2_STYLES[1]&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/Legacy_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Legacy_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/Legacy_Of_The_Fabled_King, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Legacy_Of_The_Fabled_King)
 			if(src.Potential>=glob.progress.T2_STYLES[2]&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/True_Fist_Of_The_Fabled_King, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/True_Fist_Of_The_Fabled_King)
 			if(src.Potential>=65&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Fist_Of_The_King_Of_Tomorrow)
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Apotheosis_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/Fist_Of_The_King_Of_Tomorrow, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Fist_Of_The_King_Of_Tomorrow)
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Apotheosis_Of_The_Fabled_King)
 
 			// Style/Signature picks are made in the Acquire menu now (AcquireHUD.dm)
 			var/picks = 0
-			for(var/t = 1 to 3)
-				if(src.AqStylePicksLeft(t) && src.styles_available(t))   // styles_available also re-runs StyleUnlock
-					picks += src.AqStylePicksLeft(t)
-			if(src.AqStylePicksLeft(4) && src.AqAnyT4StylePickable())   // temp: any same-category T3 style
-				picks += src.AqStylePicksLeft(4)
 			for(var/t = 1 to 3)
 				picks += src.AqSigPicksLeft(t)
 			if(picks > 0)

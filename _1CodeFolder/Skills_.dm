@@ -1007,8 +1007,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
-							if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate, M))
-								M.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate, M))
+								M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate)
 								M<<"<b><font color=#0099FF>You have unlocked The Fourth Fate!"
 					if("No")
 						return
@@ -1019,8 +1019,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
-							if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate, M))
-								M.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate, M))
+								M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate)
 								M<<"<b><font color=#0099FF>You have unlocked The Fourth Fate!"
 					if("No")
 						return

@@ -16,10 +16,15 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Caledfwlch
 	name = "Heavenly Regalia: The King"
 	StrMult=1.5
 	EndMult=1.5
-	passives = list("CriticalBlock" = 0.25, "Juggernaut" = 0.5, "Reversal" = 0.5)
+	passives = list("CriticalBlock" = 0.25, "Juggernaut" = 0.5)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="resonates their royal treasures: Heavenly Regalia!"
 	OffMessage="'s treasures loses their royal luster..."
+	adjust(mob/p)
+		passives["Harden"] = 0.25 * p.SagaLevel
+		if(p.SagaLevel >= 5)
+			passives["CriticalDamage"] = 0.5
+			passives["Pursuer"] = 2
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
@@ -358,36 +363,6 @@ obj/Skills/AutoHit/Horrific_Darkness
 			adjust(usr)
 			usr.UseProjectile(src)*/
 
-/obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
-	Knight_Of_Camelot
-		StyleActive="Knight of Camelot"
-		passives = list("Harden" = 0.5)
-		StyleEnd=1.25
-		StyleStr=1.25
-		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
-		adjust(mob/p)
-			StyleStr = 1.15 + (0.15 * p.SagaLevel)
-			StyleEnd = 1.15 + (0.15 * p.SagaLevel)
-			passives["Harden"] = 0.25*p.SagaLevel
-		verb/Knight_Of_Camelot()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-
-/obj/Skills/Queue/Finisher
-	Right_To_Rule
-		DamageMult=18
-		HitSparkIcon='Slash - Zan.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Kingmaker"
-		HitMessage = "shows their foe why they are King!"
-
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	King_Of_Camelot
-		StrMult=1.3
-		ForMult=1.3
-		passives = list()
 
 /mob/Players/verb
 	Excalignment()

@@ -8,8 +8,6 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Extend"         = 1.25 + (0.25 * SL),
-			"SweepingStrike" = 1,
 			"Fury"           = 0.5 + (0.5 * SL),
 			"Momentum"       = 0.5 + (0.5 * SL),
 		)
@@ -63,8 +61,6 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Extend"         = 1.25 + (0.25 * SL),
-			"SweepingStrike" = 1,
 			"Fury"           = 0.5 + (0.5 * SL),
 			"Momentum"       = 0.5 + (0.5 * SL),
 			"Harden"         = 1.5 + (0.5 * SL),

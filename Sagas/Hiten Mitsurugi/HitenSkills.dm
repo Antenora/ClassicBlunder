@@ -264,11 +264,10 @@
 /obj/Skills/Buffs/SlotlessBuffs/
     Dance_Of_The_Full_Moon//T4
         StyleNeeded="Hiten Mitsurugi"
-        NeedsSecondSword=1
         StrMult = 1.2
         SpdMult = 1.3
         OffMult = 1.3
-        passives = list("DoubleStrike" = 2, "Reversal" = 0.5, "Deflection" = 3)
+        passives = list()
         ActiveMessage="draws a second blade in display of mastery of their style!"
         OffMessage="sheathes their second blade..."
         verb/Dance_Of_The_Full_Moon()
@@ -282,7 +281,7 @@
             TooMuchHealth=75
             StrMult = 1.5
             SpdMult = 1.5
-            passives = list("TripleStrike" = 0.25,  "EndlessAnger"=1)
+            passives = list("EndlessAnger"=1)
             IconLock='SlayerEyes.dmi'
             LockX=0
             LockY=0
@@ -294,8 +293,9 @@
             Trigger(mob/User, Override = FALSE)
                 if(!User.BuffOn(src))
                     Mastery = (User.SagaLevel-3);
-                    passives["TripleStrike"] = (0.25*Mastery);
                     if(Mastery>=4) passives["TechniqueMastery"]=5;
                     NeedsHealth = min(90, 50 + ((Mastery-1) * 12.5));
                     TooMuchHealth = min(100, 75 + ((Mastery-1) * 6.25));
                 ..()
+                var/obj/Skills/Buffs/NuStyle/SwordStyle/Hiten_Mitsurugi_Ryuu/H = User.StyleBuff
+                if(istype(H)) H.BattosaiRefresh(User)

@@ -9,6 +9,12 @@ mob/var/tmp/phantom_mark_damage = 0
 mob/var/tmp/pre_weave_sdtl = 0
 mob/var/tmp/last_combo_warp_dist = 0
 mob/var/tmp/rush_vuln_until = 0
+mob/var/tmp/mob/mark_vuln_by
+mob/var/tmp/mark_vuln_until = 0
+mob/var/tmp/mark_vuln_amp = 0
+mob/var/tmp/mob/dodge_vs_mob
+mob/var/tmp/dodge_vs_until = 0
+mob/var/tmp/dodge_vs_amt = 0
 mob/var/tmp/last_damaged_time = 0
 mob/var/tmp/pain_amount = 0
 mob/var/tmp/pain_stamp = 0
@@ -85,6 +91,7 @@ obj/Skills
 	var/tmp/list/rush_passed_mobs
 	var/BonusVsStunned = 0
 	var/BonusVsSlowed = 0
+	var/BonusFromBehind = 0
 	var/EnergyBurn = 0
 	var/ApplySlow = 0
 	var/FollowTarget = 0
@@ -92,6 +99,7 @@ obj/Skills
 	var/QueueWindup = 0
 	var/RiposteOnDodge = 0
 	var/GrandOpenings = 0
+	var/CleaveArc = 0
 	var/SplatBonus = 0
 	var/SquareArea = 0
 	var/SequenceStrokes = 1
@@ -135,7 +143,7 @@ obj/Skills
 	var/tmp/chain_until = 0
 	var/tmp/recast_count = 0
 
-obj/Skills/proc/OnSkillHit(mob/caster, mob/m, atom/hitter)
+obj/Skills/proc/OnSkillHit(mob/caster, mob/m, atom/hitter, dealt)
 	return
 
 obj/Skills/Projectile

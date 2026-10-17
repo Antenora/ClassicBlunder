@@ -3919,32 +3919,6 @@ window "skilltree"
 		can-minimize = false
 		can-resize = false
 		macro = "macro"
-	elem "button6"
-		type = BUTTON
-		pos = 103,32
-		size = 102x42
-		anchor1 = 60,8
-		anchor2 = 80,12
-		font-family = "@Microsoft JhengHei Light"
-		font-size = 10
-		text-color = #0080c0
-		background-color = #0a0a0a
-		saved-params = "is-checked"
-		text = "REDACTED"
-		command = "skilltreez \"HybridStyles\""
-	elem "button61"
-		type = BUTTON
-		pos = 203,32
-		size = 102x42
-		anchor1 = 60,8
-		anchor2 = 80,12
-		font-family = "@Microsoft JhengHei Light"
-		font-size = 10
-		text-color = #ff0000
-		background-color = #0a0a0a
-		saved-params = "is-checked"
-		text = "ELEMENTAL"
-		command = "skilltreez \"ElementalStyles\""
 	elem "button91"
 		type = BUTTON
 		pos = 0,32

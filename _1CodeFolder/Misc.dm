@@ -116,9 +116,11 @@ mob/proc/TwoWayTelepath(var/mob/who, anon)
 mob/proc/SetTarget(atom/target)
 	if(target && world.time < target_lock_block_until)
 		return
+	if(NamekTargetLockRefuses(target))
+		return
 	if(ismob(target))
 		var/mob/_kt = target
-		if(_kt.HiddenInShadow)
+		if(_kt.HiddenInShadow || (_kt.NamekUntargetableUntil > world.time && !_kt.NamekIsAlly(src)))
 			return
 	if(ismob(Target))
 		var/mob/m = Target
@@ -130,6 +132,8 @@ mob/proc/SetTarget(atom/target)
 		m.BeingTargetted |= src
 
 mob/proc/RemoveTarget()
+	if(NamekTargetLockRefuses(null))
+		return
 	if(Target)
 		var/mob/prev_target = Target
 		Target=null

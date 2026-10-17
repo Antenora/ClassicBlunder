@@ -66,8 +66,6 @@ proc
 
 		if(Attacker.passive_handler["Amplify"])
 			DebuffIntensity += Attacker.passive_handler["Amplify"] * glob.AMPLIFY_MODIFIER
-		if(Attacker.UsingHotnCold())
-			DebuffIntensity += abs(Attacker.StyleBuff?:hotCold)/glob.HOTNCOLD_DEBUFF_DIVISOR
 		var/DamageMod=0
 		if(Defender.Drenched > 0 && (("Lightning" in attackElements) || ("Ice" in attackElements)))
 			DamageMod += glob.DRENCHED_AMP * (Defender.Drenched / 100)

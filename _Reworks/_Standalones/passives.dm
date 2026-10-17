@@ -156,19 +156,19 @@ passive
 
 globalTracker/var/list/STATE_KEYS = list(\
 	"AbsoluteDespair" = 1, "AbsorbingDamage" = 1, "ActiveBuffLock" = 1, "AdminVision" = 1,\
-	"AfterImages" = 1, "AllOutPU" = 1, "AlphainForce" = 1, "Alter the Future" = 1,\
+	"AfterImages" = 1, "AllOutPU" = 1, "AlphainForce" = 1,\
 	"ApathyFactor" = 1, "ArcaneBladework" = 1, "AshChoked" = 1, "Ashen One" = 1,\
 	"BossStagger" = 1, "CapacityHeal" = 1, "CastingTime" = 1, "Certain Progress" = 1,\
 	"Chaos Buster" = 1, "ChaosQueen" = 1, "ChaosRuler" = 1,\
 	"Cleansing" = 1, "Compassion" = 1, "Completely Obliterated" = 1, "ConfuseAffected" = 1,\
 	"ContinuallyStun" = 1, "Controlled Chaos" = 1, "Controlled Darkness" = 1,\
-	"CooldownDrag" = 1, "CoolingDown" = 1, "CorruptAffected" = 1, "Corruption" = 1,\
+	"CooldownDrag" = 1, "CorruptAffected" = 1, "Corruption" = 1,\
 	"CreateTheHeavens" = 1, "CriticalParalyze" = 1, "CriticalSpark" = 1, "CursedSheath" = 1,\
 	"DamageMult" = 1, "Death X-Antibody" = 1, "DeathDefied" = 1, "Defiance" = 1,\
 	"DemonicInfluence" = 1, "Desperation" = 1, "Deterioration" = 1,\
 	"Determination" = 1, "Determination(Black)" = 1, "Determination(Green)" = 1, "Determination(Orange)" = 1,\
 	"Determination(Purple)" = 1, "Determination(Red)" = 1, "Determination(White)" = 1, "Determination(Yellow)" = 1,\
-	"Deus Ex Machina" = 1, "Dim Mak" = 1, "Disarmed" = 1, "Disconnected" = 1,\
+	"Deus Ex Machina" = 1, "Disarmed" = 1, "Disconnected" = 1,\
 	"Distance" = 1, "Divine Technique" = 1, "DivineArmory" = 1, "Don't Move" = 1,\
 	"DormantDemon" = 1, "DoubleHelix" = 1, "Drained" = 1, "DrainlessPUSpike" = 1,\
 	"Dream Within a Dream" = 1, "Dreamless Sleep" = 1, "Duren" = 1, "Emptiness" = 1,\
@@ -181,7 +181,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"Full Manifestation" = 1, "FullTensionLock" = 1, "FutureRewritten" = 1, "Gluttony" = 1,\
 	"GluttonyFactor" = 1, "GodspeedDisabled" = 1, "GreedFactor" = 1, "Grit" = 1,\
 	"Half Manifestation" = 1, "HealThroughTempHP" = 1, "HealthCost" = 1,\
-	"HealthPU" = 1, "Heart of Darkness" = 1, "HeatingUp" = 1, "Heavy Attack" = 1,\
+	"HealthPU" = 1, "Heart of Darkness" = 1, "Heavy Attack" = 1,\
 	"Heavy Strike" = 1, "Hidden Potential" = 1, "HighTension" = 1, "Holding Back" = 1,\
 	"HopeFactor" = 1, "Hopes and Dreams" = 1, "HybridStyle" = 1, "ImbuedSoul" = 1,\
 	"InBlueEvolved" = 1, "Incomplete" = 1, "Infatuated" = 1, "Innovation" = 1,\
@@ -220,7 +220,7 @@ globalTracker/var/list/STATE_KEYS = list(\
 	"SunStricken" = 1, "Super Kaioken" = 1, "SuperHighTension" = 1, "SuperMode" = 1,\
 	"SuperSaiyanSignature" = 1, "Sure-Strike Black Flash" = 1, "SwordAscensionSecond" = 1, "SwordAscensionThird" = 1,\
 	"TeamFighter" = 1, "TeamHater" = 1, "TensionLock" = 1, "TensionPowered" = 1,\
-	"TestMode" = 1, "The Almighty" = 1, "The Clock Is Ticking" = 1, "The Immovable Object" = 1,\
+	"TestMode" = 1,"The Clock Is Ticking" = 1, "The Immovable Object" = 1,\
 	"The Inkstone" = 1, "The Legend of REBIRTH" = 1, "The Power of Stories" = 1, "The Roaring" = 1,\
 	"Timeless" = 1, "To Govern Strength" = 1, "Touch of Death" = 1, "Tragedy" = 1,\
 	"Transformation Power" = 1, "Triple Helix" = 1, "True Edit" = 1, "True Evolution" = 1,\

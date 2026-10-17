@@ -127,7 +127,7 @@ mob/Players/UseProjectile(var/obj/Skills/Projectile/Z, noGCD = FALSE)
 	. = ..()
 	MechPilotSkillAfter(Z, was_ready)
 
-mob/Players/Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE)
+mob/Players/Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE, noAdjust = FALSE)
 	if(!mech || !Z) return ..()
 	if(!MechPilotGate(Z)) return 0
 	if(!MechPilotSkill(Z)) return ..()

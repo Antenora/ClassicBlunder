@@ -56,6 +56,11 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Dainsleif
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="soaks the world in blood: Heavenly Regalia!"
 	OffMessage="'s treasure loses its ruinous luster..."
+	adjust(mob/p)
+		if(p.SagaLevel >= 5)
+			passives["Adrenaline"] = 1
+			passives["AbyssMod"] = 4
+			passives["SwordAscension"] = 1
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
@@ -100,7 +105,7 @@ obj/Skills/AutoHit/Bloody_CravingEnhanced
 	EnergyCost=3
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/We_Dine
-	passives = list("SwordAscension" = 1,"HardStyle" = 0.5, "Deflection" = 1)
+	passives = list("SwordAscension" = 1)
 	VaizardHealth=2
 	TimerLimit=10
 	IconLock='Blood Shield.dmi'
@@ -182,45 +187,12 @@ obj/Skills/Queue/Cursed_Blade
 		usr.SetQueue(src)
 
 obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Blood_Lusted
-	passives = list("Maki" = 1,"HardStyle" = 1,  "SuperDash" = 1,)
+	passives = list("Maki" = 1,  "SuperDash" = 1,)
 	TimerLimit=20
 	ManaGlow=rgb(165,0,0)
 	ManaGlowSize=3
 	LockX=0
 	LockY=0
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	Might_of_Dainn
-		StyleActive="Might of Dáinn"
-		passives = list()
-		StyleOff=1.2
-		StyleStr=1.1
-		Finisher="/obj/Skills/Queue/Finisher/Wrath_of_Hogni"
-		adjust(mob/p)
-			StyleStr = 1.1 + (0.1 * p.SagaLevel)
-			StyleOff = 1.2 + (0.1 * p.SagaLevel)
-		verb/Might_of_Dainn()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-/obj/Skills/Queue/Finisher
-	Wrath_of_Hogni
-		DamageMult=15
-		HitSparkIcon='Slash - Vampire.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Hymn_of_Hjaoningavig"
-		BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Lament_of_Hildr"
-		HitMessage = "channels the bloody past of Hjaðningavíg through a savage strike!"
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Hymn_of_Hjaoningavig
-		StrMult=1.6
-	Lament_of_Hildr
-		IconLock='SweatDrop.dmi'
-		IconApart=1
-		EndMult=0.8
-		DefMult=0.8
-		ActiveMessage="feels themselves shake as they feel Queen Hildr's lament..."
-		OffMessage="shakes off the vestiges of grief!"
 
 /strikeHook/dainsleifCursedSheath
 	stage = "post"

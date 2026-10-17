@@ -97,13 +97,14 @@ mob/proc/ChargeStart()
 	charge_started_at = world.time
 	charge_hits_taken = 0
 	Auraz("Add")
-	FlashChargeTick(src, 0)
+	if(!EnergyFXStreaksOn(src, list(ChargeMoteColor(src, 0)), glob.CHARGE_RAMP_DS, 0)) FlashChargeTick(src, 0)
 
 mob/proc/ChargeStop()
 	if(!ChargingEnergy) return
 	ChargingEnergy = 0
 	charge_power_stress = 0
 	Auraz("Remove")
+	if(!energyfx_charge && !held_skill) EnergyFXStreaksOff(src)
 
 mob/var/tmp/cc_combo_hits = 0
 

@@ -421,16 +421,6 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.VaizardHealth+=20
 			src.HealthAnnounce10+=3
 			return
-	if(src.passive_handler.Get("Alter the Future")&&src.passive_handler.Get("The Almighty"))
-		if(src.HealthAnnounce10<=4)
-			if(prob(src.passive_handler.Get("Alter the Future")))
-				src.KO=0
-				src.OMessage(15, "...but [src] rewrites the future to prevent their defeat!", "<font color=red>[src]([src.key]) rewrites the future!")
-				src.SetHealthPct(10)
-				src.passive_handler.Decrease("Alter the Future", 25)
-				src.VaizardHealth+=20
-				src.HealthAnnounce10+=1
-				return
 	if(src.passive_handler.Get("SecondWind") == "Comeback")
 		if(src.HealthAnnounce10<=9)
 			if(prob(1))
@@ -1991,7 +1981,11 @@ mob/proc/Grab()
 				extraTiles += secretDatum?:getBoon(src, "Grab")
 			src.DashTo(src.Target, 2 + passive_handler.Get("Scoop"))
 			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
-				src.Grab_Mob(src.Target)
+				var/mob/grab_target = src.Target
+				var/grab_free = !grab_target.grabbed
+				src.Grab_Mob(grab_target)
+				if(grab_free && src.Grab == grab_target)
+					GrabLanded(grab_target)
 			else
 				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS, pose = 0)	//whiffed the lunge, punishable
 			for(var/obj/Skills/Grab/g in src)
@@ -2060,6 +2054,8 @@ mob/proc/Grab()
 			else if(ismob(P))
 				if(!P.IsGrabbed())
 					src.Grab_Mob(P)
+					if(src.Grab == P)
+						GrabLanded(P)
 			else
 				if(istype(P, /obj/Exchange/npc)) return
 				src.Grab=P
@@ -2068,6 +2064,12 @@ mob/proc/Grab()
 
 	else
 		src.Grab_Release()
+
+mob/proc/GrabLanded(mob/target)
+	return
+
+mob/proc/GrabReleasing(atom/movable/G)
+	return
 
 mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(istype(P, /mob/irlNPC))
@@ -2141,6 +2143,7 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 mob/proc/Grab_Release()
 	if(src.Grab)
 	{
+		GrabReleasing(src.Grab)
 		src.FlashGrabBand(0)
 		src.Grab.grabbed = null
 		sleep(1)

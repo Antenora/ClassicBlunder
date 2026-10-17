@@ -19,10 +19,13 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Ryui_Jingu_Bang
 	OffMult=1.3
 	DefMult = 1.3
 	EndMult=1.3
-	passives = list("DoubleStrike" = 2)
+	passives = list("AttackSpeed" = 2)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s bountiful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their strange luster..."
+	adjust(mob/p)
+		if(p.SagaLevel >= 5)
+			passives["StunningStrike"] = 1
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)

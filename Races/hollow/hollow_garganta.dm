@@ -156,7 +156,7 @@ mob/var/tmp/GargantaCrossing = 0
 	usr << "<font color=yellow>Anchor [lab] placed at ([T.x],[T.y],[T.z]). Save the world to keep it.</font>"
 	Log("Mapper", "[ExtractInfo(usr)] placed Garganta anchor [lab] at ([T.x],[T.y],[T.z]).", 1)
 
-/mob/Admin3/proc/GargantaPickAnchor(title)
+/mob/proc/GargantaPickAnchor(title)
 	var/list/anchors = GargantaAnchorList()
 	if(!anchors.len)
 		usr << "<font color=red>No Garganta anchors have been placed.</font>"

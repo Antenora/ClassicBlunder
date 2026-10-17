@@ -4516,7 +4516,7 @@ obj
 					HeldVulnerability=0.25
 					Knockback=1
 					BeamTime=10
-					IconLock=ENERGYFX_HIT_ERASER_GUN
+					IconLock=EFX92_HIT_ERASER
 					Cooldown=18
 					EnergyCost=2
 					HeldSkill=TRUE
@@ -4536,7 +4536,7 @@ obj
 					DamageMult=0.28
 					Knockback=0
 					BeamTime=10
-					IconLock=ENERGYFX_HIT_SHINE_RAY
+					IconLock=EFX92_HIT_SHINE
 					Cooldown=12
 					EnergyCost=2
 					HeldSkill=TRUE
@@ -4553,7 +4553,7 @@ obj
 					Knockback=0
 					Cooldown=0
 					EnergyCost=0
-					IconLock=ENERGYFX_HIT_SHINE_RAY_PRISM
+					IconLock=EFX92_HIT_SHINE
 					CritEffectiveness=0
 				Gamma_Ray
 					NewCost = TIER_2_COST
@@ -4565,7 +4565,7 @@ obj
 					Distance=50
 					Knockback=1
 					BeamTime=10
-					IconLock=ENERGYFX_HIT_GAMMA_RAY
+					IconLock=EFX92_HIT_GAMMA
 					Cooldown=10
 					EnergyCost=2
 					CritChanceBonus=15
@@ -4586,7 +4586,7 @@ obj
 					Distance=50
 					Knockback=0
 					BeamTime=10
-					IconLock=ENERGYFX_HIT_PIERCER_RAY
+					IconLock=EFX92_HIT_PIERCER
 					Cooldown=25
 					EnergyCost=2
 					Piercing=1
@@ -4618,7 +4618,7 @@ obj
 					DamageMult=0.38
 					Dodgeable=0
 					MenuIcon = "Kamehameha"
-					IconLock=ENERGYFX_HIT_KAMEHAMEHA
+					IconLock=EFX92_HIT_KAME
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
@@ -4637,7 +4637,7 @@ obj
 					DamageMult=0.45
 					MenuIcon="MotionlessKamehameha"
 					Dodgeable=0
-					IconLock=ENERGYFX_HIT_MOTIONLESS_KAMEHAMEHA
+					IconLock=EFX92_HIT_MOTIONLESS
 					Cooldown=15
 					EnergyCost=4
 					Instinct=1
@@ -4658,7 +4658,7 @@ obj
 					SignatureTechnique=1
 					DamageMult=0.56
 					Dodgeable=0
-					IconLock=ENERGYFX_HIT_GALIC_GUN
+					IconLock=EFX92_HIT_GALIC
 					Cooldown=15
 					EnergyCost=4
 					MenuIcon="GalicGun"
@@ -4685,7 +4685,7 @@ obj
 					SignatureTechnique=1
 					DamageMult=0.54
 					Dodgeable=0
-					IconLock=ENERGYFX_HIT_FINAL_CRASH
+					IconLock=EFX92_HIT_FINAL_CRASH
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
@@ -4705,7 +4705,7 @@ obj
 					EndEffectiveness=0.75
 					Dodgeable=0
 					Distance=10
-					IconLock=ENERGYFX_HIT_DODOMPA
+					IconLock=EFX92_HIT_DODOMPA
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
@@ -4729,7 +4729,7 @@ obj
 					Dodgeable=0
 					Distance=10
 					MenuIcon="KillerShine"
-					IconLock=ENERGYFX_HIT_KILLER_SHINE
+					IconLock=EFX92_HIT_KILLER
 					Cooldown=12
 					EnergyCost=3
 					Instinct=1
@@ -4856,7 +4856,7 @@ obj
 						SignatureTechnique=2
 						DamageMult=1.35
 						Distance=15
-						IconLock=ENERGYFX_HIT_SUPER_DODOMPA
+						IconLock=EFX92_HIT_SUPER_DODOMPA
 						IconSize=1.5
 						Cooldown=45
 						EnergyCost=10
@@ -4879,7 +4879,7 @@ obj
 						DamageMult=1.56
 						MenuIcon="SuperKamehameha"
 						Distance=60
-						IconLock=ENERGYFX_HIT_SUPER_KAMEHAMEHA
+						IconLock=EFX92_HIT_SUPER
 						IconSize=2
 						Cooldown=60
 						BeamTime=10
@@ -4898,7 +4898,7 @@ obj
 						ForScaling = 1
 						DamageMult=2.95
 						Distance=60
-						IconLock=ENERGYFX_HIT_TRUE_KAMEHAMEHA
+						IconLock=EFX92_HIT_TRUE
 						IconSize=2
 						EnergyCost=0
 						Cooldown=0
@@ -4910,7 +4910,7 @@ obj
 						SignatureTechnique=2
 						DamageMult=1.3
 						Distance=60
-						IconLock=ENERGYFX_HIT_FINAL_FLASH
+						IconLock=EFX92_HIT_FINAL_FLASH
 						IconSize=2
 						MenuIcon="FinalFlash"
 						EnergyCost=12
@@ -4929,7 +4929,7 @@ obj
 						Distance=60
 						StrScaling = 1
 						ForScaling = 0
-						IconLock=ENERGYFX_HIT_FINAL_SHINE
+						IconLock=EFX92_HIT_FINAL_SHINE
 						IconSize=2
 						EnergyCost=0
 						Cooldown=0
@@ -5339,7 +5339,7 @@ mob
 					src << "You have to be in [Z.StanceNeeded] stance to use this!"
 					return
 			if(Z.StyleNeeded)
-				if(src.StyleActive!=Z.StyleNeeded)
+				if(src.StyleActive!=Z.StyleNeeded && !src.CheckSlotless(Z.StyleNeeded))
 					src << "You have to be using [Z.StyleNeeded] style to use this!"
 					return
 			if(Z.ABuffNeeded)
@@ -5388,12 +5388,13 @@ mob
 				src.SpellWeave(Z)
 			if(Z.Blasts<1)
 				Z.Blasts=1
+			src.KiStampPassives(Z)
 			if(Z.Area=="Blast"&&(!Z.Continuous))
-				if(Z.MultiShot)
+				if(Z.MultiShot||Z.ki_shots)
 					Z.MultiShots++
 					if(Z.MultiFatigueExponent)
 						src.GainFatigue(Z.MultiShots**Z.MultiFatigueExponent)
-					if(Z.MultiShots>=Z.MultiShot)
+					if(Z.MultiShots>=(Z.ki_shots||Z.MultiShot))
 						Z.MultiShots=0
 						if(src.TomeSpell(Z))
 							Z.Cooldown()
@@ -5407,20 +5408,6 @@ mob
 			if(Z.IsSpell && !Z.HeldSkill && !Z.Continuous)
 				src.CloseCastCircles()
 			if(Z.Copyable)
-				spawn() for(var/mob/m in view(40, src))
-					if(m.CheckSpecial("A - The Almighty"))
-						var/insightLevel = m.AscensionsAcquired+25 || 1
-						var/techTier = Z.Copyable
-						if(insightLevel < techTier)
-							continue
-						if(m.client && m.client.address == src.client.address)
-							continue
-						if(!locate(Z.type, m))
-							var/obj/Skills/copiedSkill = new Z.type
-							m.AddSkill(copiedSkill)
-							copiedSkill.Copied = TRUE
-							copiedSkill.copiedBy = "The Almighty"
-							m << "You understand the nature of the [Z] technique you've just viewed."
 				spawn() for(var/mob/m in view(10, src))
 					if(m.CheckSpecial("Sharingan"))
 						var/copy = Z.Copyable
@@ -5690,7 +5677,7 @@ mob
 					src.ContinuousAttacking=1
 					Z.BlastsShot=0
 			if(Z.Area=="Blast" && (!Z.Buster||(Z.Buster&&Z.Charging==0)))
-				var/BlastCount=Z.Blasts
+				var/BlastCount=Z.Blasts+Z.ki_blasts
 				if(Z.MagicNeeded&&src.HasDualCast())
 					BlastCount *= 1 + src.HasDualCast()
 					BlastCount = floor(BlastCount)
@@ -5910,6 +5897,7 @@ obj
 				Health=1#INF
 				MultiTrail = 0
 				New(var/mob/m, var/obj/Skills/Projectile/Z, var/atom/Origin, var/BeamCharging=0.5, var/GivesMessage, var/IconUsed=0, var/DirOverride=0, var/datum/beam/BeamOwner=null)
+					QuincyProjectileNew(m, Z)
 					if(m==null||Origin==null)
 						endLife()
 					AlreadyHit = list()
@@ -6172,6 +6160,8 @@ obj
 						else
 							src.transform*=Z.IconSize
 					src.ProjectileSpin=Z.ProjectileSpin
+					if(Z.ki_stamp && Owner)
+						Owner.KiStampShot(src, Z)
 					src.UsesPixelCollision = TRUE
 					if(src.UsesPixelCollision)
 						src.SetupPixelHitbox(Z, DirOverride)
@@ -6288,8 +6278,11 @@ obj
 						src.Life()
 					if(FollowUp)
 						if(FollowUpDelay != -1)
+							var/mob/fu_owner = Owner
+							var/fu_path = FollowUp
 							spawn(FollowUpDelay)
-								Owner.throwFollowUp(FollowUp)
+								if(fu_owner)
+									fu_owner.throwFollowUp(fu_path)
 					if(Z.BuffSelf)
 						spawn(Z.BuffSelfDelay)
 							Owner.buffSelf(Z.BuffSelf)
@@ -6366,6 +6359,8 @@ obj
 						sourceSkill.Mastery += gain
 
 				proc/Hit(atom/a, MultDamage=1)
+					if(!QuincyHitPass) return QuincyHit(a, MultDamage)
+					QuincyHitPass = 0
 					if(istype(a, /obj/Skills/Projectile/_Projectile))
 						if(a.Owner==src.Owner)
 							src.loc=a.loc
@@ -6542,6 +6537,7 @@ obj
 
 
 							if(src.Area!="Beam"&&Accuracy_Formula(src.Owner, a, accmult*(src.MultiHit+1), BaseChance=glob.WorldDefaultAcc, Backfire=src.Backfire) == MISS &&!a:KO&&!src.Radius&&src.Dodgeable>=0)
+								a:QuincyEvaded(src.Owner)
 								if(!UsesPixelCollision)
 									src.loc = a.loc
 								var/dir=get_dir(src,a)
@@ -6873,6 +6869,8 @@ obj
 						if(EffectiveDamage>0)
 							if(src.SkillPath == /obj/Skills/Projectile/Big_Bang_Attack && ismob(m) && m.HealthPct() < 25)
 								EffectiveDamage *= 1.25
+							if(from_skill && from_skill.BonusFromBehind && ismob(m) && src.Owner && getBackSide(src.Owner, m))
+								EffectiveDamage *= 1 + from_skill.BonusFromBehind
 							if(src.MortalBlow)
 
 								if(prob(glob.MORTAL_BLOW_CHANCE * MortalBlow) && !m.MortallyWounded)
@@ -6883,6 +6881,7 @@ obj
 									OMsg(m, "<b><font color=#ff0000>[src] has dealt a mortal blow to [m]!</font></b>")
 
 							if(src.Area=="Beam")
+								EffectiveDamage *= m.getRangedResistValue()
 								if(src.SkillPath == /obj/Skills/Projectile/Beams/Eraser_Gun && ismob(m))
 									if(m.ccActive() || m.HealthPct() <= 30)
 										EffectiveDamage *= 1.75
@@ -6918,6 +6917,7 @@ obj
 									if(a:isCommitted())
 										CounterHitReward(src.Owner, a, min(EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR, 14))
 									var/strike/S = new(src.Owner, a, EffectiveDamage/glob.GLOBAL_BEAM_DAMAGE_DIVISOR)
+									S.skill = from_skill
 									BeamDbg("strike in=[S.val] hp_before=[a:Health]")
 									S.spirit = 1
 									S.destructive = src.Destructive
@@ -6980,8 +6980,11 @@ obj
 										EffectiveDamage *= _elemResist
 									if(from_skill && from_skill.IsSpell && src.Owner)
 										EffectiveDamage *= src.Owner.SpellHitMult(from_skill, m)
+									EffectiveDamage *= m.getRangedResistValue()
 									if(from_skill && from_skill.NeedsGun && src.Owner)
 										EffectiveDamage *= src.Owner.GunHitMult(m, src)
+									if(from_skill && src.Owner && IsKiSkill(from_skill))
+										EffectiveDamage *= src.Owner.KiHitMult(m, src)
 
 									// Skill-level Combustion: temporary attacker bump.
 									if(src.Combustion)
@@ -7011,6 +7014,7 @@ obj
 										if(a:isCommitted())
 											CounterHitReward(src.Owner, a, min(EffectiveDamage, 14))
 										var/strike/S = new(src.Owner, a, EffectiveDamage)
+										S.skill = from_skill
 										S.spirit = 1
 										S.destructive = src.Destructive
 										S.element = src.SpellElement
@@ -7038,6 +7042,8 @@ obj
 										src.Owner.ProjectileAttacking = FALSE
 										if(from_skill && from_skill.NeedsGun && src.Owner && m)
 											src.Owner.GunOnHit(m, src)
+										if(from_skill && src.Owner && m && IsKiSkill(from_skill))
+											src.Owner.KiOnHit(m, src, EffectiveDamage)
 										if(src.BypassTempHP)
 											m.VaizardHealth = savedVH
 											m.BioArmor = savedBA
@@ -7269,6 +7275,8 @@ obj
 					return 0
 				proc/ProjectileFinish() //This function should allow the garbage collector to take care of projectiles. For this to work, make sure all references TOWARD the projectile are cleansed.
 					//Or it will persist even in the void
+					if(!QuincyFinishPass) return QuincyFinish()
+					QuincyFinishPass = 0
 					if(clash_lock && !clash_lock.ended) return
 					walk(src, 0)
 					if(0 > Distance) return

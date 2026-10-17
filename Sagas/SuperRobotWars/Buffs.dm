@@ -18,7 +18,7 @@ obj/Skills/Buffs/SlotlessBuffs
 			OffMult = 1.30
 			DefMult = 0.90
 			SpdMult = 1.10
-			passives = list("")
+			passives = list()
 		verb/Change_Dragon()
 			set category="Skills"
 			if(usr.CheckSlotless("Change: Liger!"))
@@ -46,7 +46,7 @@ obj/Skills/Buffs/SlotlessBuffs
 			OffMult = 1.10
 			DefMult = 0.90
 			SpdMult = 1.30
-			passives = list("")
+			passives = list()
 		verb/Change_Liger()
 			set category="Skills"
 			if(usr.CheckSlotless("Change: Liger!"))
@@ -74,7 +74,7 @@ obj/Skills/Buffs/SlotlessBuffs
 			OffMult = 1.30
 			DefMult = 1.30
 			SpdMult = 1.10
-			passives = list("")
+			passives = list()
 		verb/Change_Poseidon()
 			set category="Skills"
 			if(usr.CheckSlotless("Change: Liger!"))

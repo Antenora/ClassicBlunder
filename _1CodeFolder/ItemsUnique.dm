@@ -66,3 +66,6 @@ obj/Items/DragonBall
 		set_id = "main"
 		name = "Seven-Star Dragon Ball"
 		icon_state="7"
+	Stone/
+		name = "Stone Dragon Ball"
+		desc = "A Dragon Ball turned to cold stone. The one who made it is gone."

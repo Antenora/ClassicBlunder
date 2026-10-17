@@ -740,6 +740,7 @@ obj/Skills/Grapple
 						User.log2text("Before do damage Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 						#endif
 						var/strike/S = new(User, Trg, Damage)
+						S.skill = src
 						S.unarmed = src.UnarmedOnly
 						S.sword = src.NeedsSword
 						S.spirit = src.SpecialAttack

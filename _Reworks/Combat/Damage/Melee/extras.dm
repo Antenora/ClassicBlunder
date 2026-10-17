@@ -1,13 +1,16 @@
-mob/proc/InterceptionStrike(stacks)
+mob/proc/InterceptionStrike(mob/attacker, stacks)
     var/obj/Skills/AutoHit/Counter/_counter = findOrAddSkill(/obj/Skills/AutoHit/Counter)
     _counter.adjust(src, stacks)
-    Activate(_counter, noGCD = TRUE)
+    Activate(_counter, noGCD = TRUE, noAdjust = TRUE)
 
 /mob/proc/canFaJin()
     if(passive_handler["Fa Jin"])
         if(last_fa_jin + glob.FA_JIN_BASE_COOLDOWN - (passive_handler["Fa Jin"] * glob.FA_JIN_COOLDOWN_REDUCTION) < world.time)
             return TRUE
     return FALSE
+
+/mob/proc/FaJinEmpowered(mob/target)
+    return
 
 /obj/fa_jin
     icon = 'fa_jin.dmi'

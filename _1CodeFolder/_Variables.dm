@@ -116,7 +116,6 @@ mob/var
 	list/SkillsLocked=list()//paths of skills that have been locked out due to being prerequisites for upgraded versions
 	tmp/SignatureSelecting=0//flag that disables checking for more sigs
 	list/SignatureSelected=list()//names of signatures that have been selected already, so they can be removed from the global list when signature selection is activated
-	list/SignatureStyles=list()//name & path of styles which can be selected from signature selection
 	SignatureCheck=1//if 1, try to give signatures. if 0, do not
 	tmp/list/obj/Skills/Skills=list()//skills you know
 	tmp/list/obj/Skills/Queue/Queues=list()//queues you know

@@ -39,10 +39,10 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Half_Saiyan"  = list("t1_passives"=list("UnderDog" = 3), "t1_skills"=list(), "t2_passives"=list("UnderDog" = 6), "t2_skills"=list()),
 	"Human"        = list("t1_passives"=list("Persistence" = 1), "t1_skills"=list(), "t2_passives"=list("Persistence" = 2), "t2_skills"=list()),
 	"Namekian"     = list("t1_passives"=list("TechniqueMastery" = 2), "t1_skills"=list(), "t2_passives"=list("TechniqueMastery" = 3), "t2_skills"=list()),
-	"Majin"        = list("t1_passives"=list("ManaCapMult" = 0.5, "ManaGeneration" = 2), "t1_skills"=list(), "t2_passives"=list("Extend" = 1, "Gum Gum" = 1), "t2_skills"=list()),
+	"Majin"        = list("t1_passives"=list("ManaCapMult" = 0.5, "ManaGeneration" = 2), "t1_skills"=list(), "t2_passives"=list("Blubber" = 2, "LifeGeneration" = 1), "t2_skills"=list()),
 	"Demon"        = list("t1_passives"=list("AbyssMod" = 2), "t1_skills"=list(), "t2_passives"=list("AbyssMod" = 5), "t2_skills"=list()),
 	"Angel"        = list("t1_passives"=list("HolyMod" = 2), "t1_skills"=list(), "t2_passives"=list("HolyMod" = 5), "t2_skills"=list()),
-	"Celestial"    = list("t1_passives"=list("MartialMagic" = 1), "t1_skills"=list(), "t2_passives"=list("BladeFisting" = 1), "t2_skills"=list()),
+	"Celestial"    = list("t1_passives"=list("KiControlMastery" = 0.5), "t1_skills"=list(), "t2_passives"=list("KiControlMastery" = 1, "QuickCast" = 1), "t2_skills"=list()),
 	"Dragon"       = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Beastkin"     = list("t1_passives"=list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5), "t1_skills"=list(), "t2_passives"=list("Fury" = 2, "Harden" = 2, "Momentum" = 2), "t2_skills"=list()),
 	"Eldritch"     = list("t1_passives"=list(), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list(), "t2_skills"=list()),
@@ -52,7 +52,7 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Demi-fiend"   = list("t1_passives"=list("ManaGeneration" = 1, "ManaCapMult" = 0.5), "t1_skills"=list(), "t2_passives"=list("ManaGeneration" = 2), "t2_skills"=list()),
 	"Chakardi"     = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list( "CashCow" = 5), "t2_skills"=list()),
-	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
+	"Nobody"     = list("t1_passives"=list("SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
 )
 
 

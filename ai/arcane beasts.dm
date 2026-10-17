@@ -168,15 +168,6 @@ obj/Skills/Projectile/Arcane_Spray
 
 
 
-obj/Skills/Buffs/SlotlessBuffs/Autonomous/NymphBuff
-	Copyable=0
-	NeedsHealth=100
-	passives = list("MovingCharge" = 1)
-	MovingCharge=1
-	TextColor="#adf0ff"
-	Cooldown=1
-	ActiveMessage="glows with wonderous, arcane energies."
-
 obj/Skills/Buffs/SlotlessBuffs/ArcaneRejection
 	Copyable=0
 	name = "Arcane Rejection"
@@ -230,11 +221,11 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 			ManaGlow = usr.is_arcane_beast.aura_color
 			if(usr.is_arcane_beast)
 				if(usr.is_arcane_beast.Mastery>=3)
-					passives = list("SuperDash" = 1, "Skimming" = 2, "Pursuer" = 1, "SoftStyle" = 0.5)
+					passives = list("SuperDash" = 1, "Skimming" = 2, "Pursuer" = 1)
 					Skimming=2
 					SoftStyle=0.5 //Wear the opponent down
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1, "SoftStyle" = 0.5)
+					passives = list("SuperDash" = 1, "Skimming" = 1, "Pursuer" = 1)
 					ManaStats=1
 			src.Trigger(usr)
 
@@ -253,11 +244,11 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 			ManaGlow = usr.is_arcane_beast.aura_color
 			if(usr.is_arcane_beast)
 				if(usr.is_arcane_beast.Mastery>=3)
-					passives = list("MovingCharge" = 1, "QuickCast" = 2)
+					passives = list("QuickCast" = 2)
 					MovingCharge=1
 					QuickCast=2
 				if(usr.is_arcane_beast.Mastery>=4)
-					passives = list("MovingCharge" = 1, "QuickCast" = 2)
+					passives = list("QuickCast" = 2)
 					ManaStats=1
 			src.Trigger(usr)
 
@@ -277,7 +268,6 @@ obj/Skills/Buffs/SlotlessBuffs/Arcane_Surge
 			if(usr.is_arcane_beast)
 				if(usr.is_arcane_beast.Mastery>=3)
 					passives["PureReduction"] = 2
-					passives["HardStyle"] = 0.5
 					HardStyle=0.5
 				if(usr.is_arcane_beast.Mastery>=4)
 					ManaStats=1
@@ -329,7 +319,7 @@ obj/Skills/Buffs/SlotlessBuffs/
 		SwordIcon='Icons/Buffs/nympharum sword.dmi'
 		SwordX=-32
 		SwordY=-32
-		passives = list( "SwordAscension" = 1, "MagicSword" = 1)
+		passives = list( "SwordAscension" = 1)
 		MagicSword=1
 		SwordUnbreakable=1 //SHARDBLADES CANNOT BE SHATTERED
 		SwordAscension=1
@@ -1080,7 +1070,6 @@ obj/Skills/Companion/arcane_follower
 			a.contents += new/obj/Skills/Projectile/Arcane_Landmine
 			a.contents += new/obj/Skills/Projectile/Arcane_Spray
 			a.contents += new/obj/Skills/Projectile/Arcane_Burst
-			a.contents += new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/NymphBuff
 			a.contents += new/obj/Skills/Buffs/SlotlessBuffs/Bond_Savior
 
 			a.next_mana_heal = world.time + 100

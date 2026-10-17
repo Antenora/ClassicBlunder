@@ -8,9 +8,8 @@ mob/proc/pick_refund_skill(mob/target = src)
 	var/list/Refundable=list("Cancel")
 	for(var/obj/Skills/S in target.Skills)
 		if(S.SagaTreePurchased) continue
+		if(istype(S, /obj/Skills/Buffs/NuStyle)) continue
 		if(S.Copyable>0&&S.SkillCost>1&&!S.Copied)
-			Refundable.Add(S)
-		else if(istype(S, /obj/Skills/Buffs/NuStyle) && !S.Copied  && !S.SignatureTechnique && !S.SignatureTechnique && S.SkillCost > 1)
 			Refundable.Add(S)
 	var/obj/Skills/Choice=Ask(src, "What skill are you refunding?", "RPP Refund", null, "pick", Refundable, 0)
 	if(Choice=="Cancel")
@@ -21,6 +20,9 @@ mob/proc/pick_refund_skill(mob/target = src)
 mob/proc/refund_skill(obj/Skills/refunded_skill)
 	var/Refund=refunded_skill.SkillCost
 	if(!refunded_skill) return
+	if(istype(refunded_skill, /obj/Skills/Buffs/NuStyle))
+		src << "You have chosen your style."
+		return
 	if(refunded_skill.SagaTreePurchased)
 		src << "Refund this skill through its Saga Skill Tree."
 		return
@@ -30,8 +32,6 @@ mob/proc/refund_skill(obj/Skills/refunded_skill)
 		Refund+=(Refund*(refunded_skill.Mastery-1))
 	if(refunded_skill.name in src.SkillsLocked)
 		src.SkillsLocked -= refunded_skill.name
-	if(istype(refunded_skill, /obj/Skills/Buffs/NuStyle))
-		Refund=0
 	RPPSpendable+=Refund
 	RPPSpent-=Refund
 	src << "You've have been refunded [refunded_skill] for [Commas(Refund)] RPP."
@@ -44,20 +44,8 @@ mob/proc/refund_skill(obj/Skills/refunded_skill)
 					var/obj/Skills/Buffs/s = S
 					if(src.BuffOn(s))
 						s.Trigger(src, Override=1)
-				/*if(istype(S, /obj/Skills/Buffs/NuStyle))
-					if(S:StyleComboUnlock)
-						if(IsList(S:StyleComboUnlock))
-							for(var/x in S:StyleComboUnlock)
-								if(!x) return
-								var/advanced_path=text2path(S:StyleComboUnlock[x])
-								if(!advanced_path) return
-								var/obj/Skills/Buffs/NuStyle/StyleToRefund = locate(advanced_path) in src
-								if(StyleToRefund)
-									refund_skill(StyleToRefund)*/
 				del S
 				break
-	for(var/obj/Skills/Buffs/NuStyle/s in src)
-		src.StyleUnlock(s)
 
 //	if(Potential > 1)
 //		Potential -= 1
@@ -108,12 +96,13 @@ mob/verb/Refund()
 mob/proc/refund_skil_old(obj/Skills/refunded_skill)
 	var/Refund=refunded_skill.SkillCost
 	if(!refunded_skill) return
+	if(istype(refunded_skill, /obj/Skills/Buffs/NuStyle))
+		src << "You have chosen your style."
+		return
 	if(refunded_skill.SagaTreePurchased)
 		src << "Refund this skill through its Saga Skill Tree."
 		return
 	if(istype(refunded_skill, /obj/Skills/Buffs/NuStyle))
-		if(refunded_skill.SignatureTechnique > 0) Refund = 0
-		else src.SignatureSelected -= refunded_skill.name
 		Refund = 0//((2**(refunded_skill.SignatureTechnique+1)*10)) * max(0,(refunded_skill.Mastery-1))
 	else if(refunded_skill.Mastery>1)
 		Refund+=(refunded_skill.SkillCost*(refunded_skill.Mastery-1))
@@ -134,5 +123,3 @@ mob/proc/refund_skil_old(obj/Skills/refunded_skill)
 						s.Trigger(src, Override=1)
 				del S
 				break
-	for(var/obj/Skills/Buffs/NuStyle/s in src)
-		src.StyleUnlock(s)

@@ -13,14 +13,14 @@
 
 //asc 2 choices
 /ascension/sub_ascension/beastkin/ira
-    passives = list("AttackSpeed" = 1, "Iaijutsu" = 1);
+    passives = list("AttackSpeed" = 1);
     speed = 1;
     offense = 0.5;
 /ascension/sub_ascension/beastkin/rus
     passives = list("Godspeed" = 1, "ChillResist" = 1);
     speed = 1.5;
 /ascension/sub_ascension/beastkin/mer
-    passives = list("Deflection" = 1);
+    passives = list("Skimming" = 1);
     endurance = 0.5;
     speed = 0.5;
     defense = 0.5;
@@ -34,7 +34,7 @@
     strength = 0.5
     endurance = 0.5
     speed = 1
-    passives = list("AttackSpeed" = 2, "Gum Gum" = 1, "Extend" = 1, "Freezing" = 2)
+    passives = list("AttackSpeed" = 2, "Freezing" = 2)
 /ascension/sub_ascension/beastkin/kingsblood
     strength = 0.5
     endurance = 1.5
@@ -46,7 +46,7 @@
 /ascension/sub_ascension/beastkin/matchless
     strength = 1;
     endurance = 1;
-    passives = list("TechniqueMastery" = 3, "UnarmedDamage" = 3, "SwordAscension" = 6, "BladeFisting" = 1)
+    passives = list("TechniqueMastery" = 3, "UnarmedDamage" = 3, "SwordAscension" = 6)
 /ascension/sub_ascension/beastkin/wargob
     endurance = 2;
     passives = list( "Harden" = 4,  "LifeGeneration" = 3)
@@ -67,19 +67,19 @@
     strength = 0.75;
     offense = 0.75;
     endurance = 0.5;
-    passives = list("Fury" = 2,  "Extend"=2, "Sword Mastery"=2)
+    passives = list("Fury" = 2, "Sword Mastery"=2)
 /ascension/sub_ascension/beastkin/phantomflicker
     strength = 1.25;
     offense = 0.375;
     endurance = 0.375;
-    passives = list("AttackSpeed" = 3, "Iaijutsu" = 3, "DoubleStrike" = 1, "SoulSteal" = 0.1)
+    passives = list("AttackSpeed" = 3, "SoulSteal" = 0.1)
 /ascension/sub_ascension/beastkin/deadlight
     strength = 2;
-    passives = list("TechniqueMastery" = 3, "Void" = 1,  "HardStyle" = 2)
+    passives = list("TechniqueMastery" = 3, "Void" = 1)
 /ascension/sub_ascension/beastkin/demonsong
     strength = 1.5;
     speed = 0.5;
-    passives = list("SweepingStrike" = 1, "LifeSteal" = 10)
+    passives = list("LifeSteal" = 10)
 /ascension/sub_ascension/beastkin/worldwhisper
     endurance = 1;
     defense = 1;
@@ -88,7 +88,7 @@
     force = 0.5;
     offense = 0.5;
     defense = 1;
-    passives = list("PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Deflection" = 2, "Harden" = 2, "Persistence" = 1)
+    passives = list("PureDamage" = -2, "Shattering" = 2, "EarthHerald" = 1, "Harden" = 2, "Persistence" = 1)
 
 #define ASC1_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/edge, /ascension/sub_ascension/beastkin/buck, /ascension/sub_ascension/beastkin/infi)
 #define ASC2_SUBASCENSIONS list(/ascension/sub_ascension/beastkin/ira, /ascension/sub_ascension/beastkin/rus, /ascension/sub_ascension/beastkin/mer, /ascension/sub_ascension/beastkin/mil)

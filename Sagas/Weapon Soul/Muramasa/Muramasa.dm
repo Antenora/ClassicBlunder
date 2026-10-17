@@ -8,22 +8,6 @@ obj/Items/Sword/Light/Legendary/WeaponSoul/Bane_of_Blades//Muramasa
 	Destructable=0
 	ShatterTier=0
 
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	Grimreaper_Endbringer
-		StyleActive="Grimreaper"
-		passives = list( "GoodResist" = 1)
-		StyleOff=1.3
-		StyleSpd=1.2
-		StyleStr=1.1
-		adjust(mob/p)
-			StyleOff = 1.3 + (0.2 * p.SagaLevel)
-			StyleSpd = 1.2 + (0.1 * p.SagaLevel)
-			StyleStr = 1.1 + (0.1 * p.SagaLevel)
-			passives["GoodResist"] = 1 + (0.25* p.SagaLevel)
-		verb/Grimreaper_Endbringer()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
 
 obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa
 	name = "Heavenly Regalia: The Death"
@@ -34,6 +18,11 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Muramasa
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s deadly treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their deadly luster..."
+	adjust(mob/p)
+		passives["GoodResist"] = 1 + (0.25 * p.SagaLevel)
+		if(p.SagaLevel >= 5)
+			passives["TechniqueMastery"] = 4
+			passives["CriticalDamage"] = 0.2
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)

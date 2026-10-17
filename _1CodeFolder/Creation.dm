@@ -176,8 +176,6 @@ mob/Players
 			src.Potential=glob.progress.MinPotential
 		src.potential_max()
 
-		for(var/obj/Skills/Buffs/NuStyle/s in src)
-			src.StyleUnlock(s)
 
 
 		for(var/obj/Items/e in src)
@@ -747,11 +745,6 @@ mob/Players/verb
 			Class = race.classes[race.current_class]
 			setAllStats()
 			winset(usr, "Finalize_Screen.className", "text=\"[race.classes[race.current_class]]\"")
-			if(usr.isRace(NAMEKIAN))
-				if(usr.Class=="Warrior")
-					usr.Class="Warrior"
-				else if(usr.Class=="Dragon")
-					usr.Class="Dragon"
 
 		if(blah=="Sex")
 			var/list/options = usr.race.gender_options
@@ -810,11 +803,6 @@ mob/Creation/verb
 			Class = race.classes[race.current_class]
 			setAllStats()
 			winset(usr, "Finalize_Screen.className", "text=\"[race.classes[race.current_class]]\"")
-			if(usr.isRace(NAMEKIAN))
-				if(usr.Class=="Warrior")
-					usr.Class="Warrior"
-				else if(usr.Class=="Dragon")
-					usr.Class="Dragon"
 
 		if(blah=="Sex")
 			var/list/options = usr.race.gender_options
@@ -1050,7 +1038,7 @@ client
 		var/savefile/F=new("Saves/Players/[p.ckey]")
 		F["mob"] << p
 		F["name"] << p.name
-		var/savefile/F2=new("Saves/Players/Archives/[p.ckey]/[p.name]-[time2text(world.realtime, "mm-dd-yyyy_hh-mm-ss")]")
+		var/savefile/F2=new("Saves/Players/Archives/[p.ckey]/[p.name]-[time2text(world.realtime, "MM-DD-YYYY_hh-mm-ss")]")
 		F2["mob"] << p
 		F2["name"] << p.name
 		if(deleteSav)

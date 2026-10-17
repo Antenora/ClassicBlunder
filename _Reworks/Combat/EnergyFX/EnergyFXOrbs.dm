@@ -111,9 +111,8 @@ var/list/EFXO_PATHS = list("GP" = /obj/energyfx/gpaint, "GL" = /obj/energyfx/orb
 	"UP" = /obj/energyfx/orb/up, "UL" = /obj/energyfx/orb/ul, "SM" = /obj/energyfx/orb/sm, "FP" = /obj/energyfx/fpaint, "FS" = /obj/energyfx/fsharp,
 	"FL" = /obj/energyfx/orb/fl, "XP" = /obj/energyfx/orb/xp, "XS" = /obj/energyfx/orb/xs, "XL" = /obj/energyfx/orb/xl, "YP" = /obj/energyfx/orb/yp,
 	"YL" = /obj/energyfx/orb/yl, "NP" = /obj/energyfx/orb/np, "ZP" = /obj/energyfx/orb/zp, "ZS" = /obj/energyfx/orb/zs, "ZL" = /obj/energyfx/orb/zl,
-	"WP" = /obj/energyfx/orb/wp, "WL" = /obj/energyfx/orb/wl, "GLg" = /obj/energyfx/orb/glg, "MLg" = /obj/energyfx/orb/mlg, "ULg" = /obj/energyfx/orb/ulg,
-	"FLg" = /obj/energyfx/orb/flg, "XLg" = /obj/energyfx/orb/xlg, "CM" = /obj/energyfx/orb/cm, "CP" = /obj/energyfx/orb/cp,
-	"CS" = /obj/energyfx/orb/cs, "CL" = /obj/energyfx/orb/cl, "CLg" = /obj/energyfx/orb/clg, "LP" = /obj/energyfx/orb/lp)
+	"WP" = /obj/energyfx/orb/wp, "WL" = /obj/energyfx/orb/wl, "CM" = /obj/energyfx/orb/cm, "CP" = /obj/energyfx/orb/cp,
+	"CS" = /obj/energyfx/orb/cs, "CL" = /obj/energyfx/orb/cl, "LP" = /obj/energyfx/orb/lp)
 
 /obj/energyfx_master/orb
 /obj/energyfx_master/orb/gl
@@ -265,10 +264,6 @@ proc/EnergyFXOrbMasters(client/C)
 		for(var/p in typesof(/obj/energyfx_master/orb) - /obj/energyfx_master/orb)
 			C.energyfx_orb_screen += new p
 		for(var/p in typesof(/obj/energyfx_relay/orb) - /obj/energyfx_relay/orb)
-			C.energyfx_orb_screen += new p
-		for(var/p in typesof(/obj/energyfx_master/orbgray) - /obj/energyfx_master/orbgray)
-			C.energyfx_orb_screen += new p
-		for(var/p in typesof(/obj/energyfx_relay/orbgray) - /obj/energyfx_relay/orbgray)
 			C.energyfx_orb_screen += new p
 	for(var/obj/O in C.energyfx_orb_screen)
 		if(!(O in C.screen)) C.screen += O
@@ -695,24 +690,6 @@ var/datum/energyfx_look/orbs/energyfx_orb_look = new
 			O.fx_h = ic[3]
 			O.alpha = 0
 			O.efxo_kf = null
-			EFXOUntwin(O)
-			var/tw = EFXO_TWINS[sp[EO_IK]]
-			if(tw)
-				var/list/tic = ENERGYFX_ORB_ICONS[tw]
-				if(tic)
-					O.efx_damp = new /obj/energyfx_twin/orbdamp
-					O.efx_damp.icon = tic[1]
-					O.vis_contents += O.efx_damp
-			var/ftw = EFXO_FTWINS[sp[EO_IK]]
-			if(ftw)
-				var/list/fic = ENERGYFX_ORB_ICONS[ftw]
-				if(fic)
-					O.efx_damp = new /obj/energyfx_twin/orbfdamp
-					O.efx_damp.icon = fic[1]
-					O.vis_contents += O.efx_damp
-				O.efxo_cov = new /obj/energyfx_twin/orbfcov
-				O.efxo_cov.icon = ic[1]
-				O.vis_contents += O.efxo_cov
 			objs[key] = O
 		if(!O.loc || abs(sp[EO_X] - O.fx_bx) > 48 || abs(sp[EO_Y] - O.fx_by) > 48)
 			if(!EnergyFXPlace(O, sp[EO_X], sp[EO_Y], zz))
@@ -973,7 +950,6 @@ proc/EFXODir8(ang)
 	return list("E", "NE", "N", "NW", "W", "SW", "S", "SE")[i + 1]
 
 /datum/energyfx_orbwake
-	var/list/col_body
 	var/list/segs = list()
 	var/dist = 0
 	var/L = 16
@@ -1012,7 +988,7 @@ proc/EFXODir8(ang)
 			var/fj = round(sp.len / 2)
 			sp[++sp.len] = "[g[5]]_[fj]_0"
 			sp[++sp.len] = "[g[5]]_[fj]_1"
-		S.Rec(out, kc[2 * i - 1], kp, ik, sp[2 * fi + 1], g[2], g[3], g[4], 1, 1, 1, col_body, lay)
+		S.Rec(out, kc[2 * i - 1], kp, ik, sp[2 * fi + 1], g[2], g[3], g[4], 1, 1, 1, null, lay)
 		S.Rec(out, kc[2 * i], kl, ik, sp[2 * fi + 2], g[2], g[3], g[4], 1, 1, 1, lm, 0)
 
 /datum/energyfx_orbwake/proc/Alive(v)
@@ -2759,8 +2735,6 @@ proc/EFXOCoolK(al)
 	if(blast && blast.Alive(v / EFXO_FPS, v - 2 * kb)) return 1
 	return isnull(kb)
 
-var/list/EFXO_FITCACHE = list()
-
 proc/EFXOGrayRule(list/C255)
 	if(!C255) return 1
 	var/r = C255[1] / 255
@@ -2798,18 +2772,6 @@ proc/EFXOPalette(list/C255, list/core255, list/glow255)
 	return list(list(EFXOTo255(base[1]), EFXOTo255(base[2]), EFXOTo255(base[3])), list(EFXOTo255(mid[1]), EFXOTo255(mid[2]), EFXOTo255(mid[3])),
 		list(EFXOTo255(cr[1]), EFXOTo255(cr[2]), EFXOTo255(cr[3])), 0)
 
-proc/EFXOSubPalette(list/m255, list/core255, list/glow255)
-	var/list/mid = list(m255[1] / 255, m255[2] / 255, m255[3] / 255)
-	var/list/base = list(max(0, m255[1] - 102) / 255, max(0, m255[2] - 102) / 255, max(0, m255[3] - 102) / 255)
-	if(glow255)
-		var/list/g = list(glow255[1] / 255, glow255[2] / 255, glow255[3] / 255)
-		if(BeamFXLum(mid) < BeamFXLum(g))
-			base = mid
-			mid = g
-	var/list/cr = core255 ? list(core255[1] / 255, core255[2] / 255, core255[3] / 255) : EFXODeriveCore(mid)
-	return list(list(EFXOTo255(base[1]), EFXOTo255(base[2]), EFXOTo255(base[3])), list(EFXOTo255(mid[1]), EFXOTo255(mid[2]), EFXOTo255(mid[3])),
-		list(EFXOTo255(cr[1]), EFXOTo255(cr[2]), EFXOTo255(cr[3])), 0)
-
 proc/EFXOOrder(list/pal)
 	var/list/v = list(-(pal[1][1] + pal[2][1]) / 255, -(pal[1][2] + pal[2][2]) / 255, -(pal[1][3] + pal[2][3]) / 255)
 	var/list/o = list(1, 2, 3)
@@ -2841,104 +2803,23 @@ proc/EFXORampAdd(I, list/pal)
 	out[o[3]] = clamp(col[o[3]] * I ** 2.5, 0, 1)
 	return out
 
-proc/EFXOLum3(list/c)
-	return 0.2126 * c[1] + 0.7152 * c[2] + 0.0722 * c[3]
-
-proc/EFXOMine(ws, nv, list/ramp, list/pal)
-	var/calm = 1 - 0.75 * EFXOSstep(0.55, 0.95, ws)
-	var/I = clamp(0.5 + 0.5 * ws + 0.5 * calm * (nv - 0.5), 0, 1)
-	var/m = 1 + 0.55 * calm * (nv - 0.5)
-	var/list/edge = ramp[2]
-	var/list/core = ramp[3]
-	var/wc = clamp(ws, 0, 1)
-	var/list/ca = list(clamp(edge[1] + wc * (core[1] - edge[1]), 0, 1), clamp(edge[2] + wc * (core[2] - edge[2]), 0, 1), clamp(edge[3] + wc * (core[3] - edge[3]), 0, 1))
-	var/ya = EFXOLum3(ca)
-	var/t = ya * m
-	var/list/gr = EFXORampAdd(I, pal)
-	var/mx = max(gr[1], gr[2], gr[3], 0.0001)
-	var/list/hu = list(gr[1] / mx, gr[2] / mx, gr[3] / mx)
-	var/yg = max(EFXOLum3(hu), 0.001)
-	var/yt = max(ya, 0.001)
-	var/list/out = list(0, 0, 0)
-	for(var/i = 1 to 3)
-		var/g = clamp(hu[i] / yg * t, 0, 1)
-		var/c2 = clamp(ca[i] * (t / yt), 0, 1)
-		out[i] = c2 + 0.6 * (g - c2)
-	return out
-
-proc/EFXOFitMatrix(key, list/C255, list/core255, list/glow255, list/subpal)
-	var/ck = "[key]|[jointext(C255, ",")]|[core255 ? jointext(core255, ",") : "-"]|[glow255 ? jointext(glow255, ",") : "-"][subpal ? "|sub" : ""]"
-	var/list/hit = EFXO_FITCACHE[ck]
-	if(hit) return hit
-	var/list/F = EFXO_FIT[key]
-	if(!F) return null
-	var/n = F[1]
-	var/list/ramp = BeamFXRamp(C255, core255, glow255)
-	var/list/pal = subpal ? subpal : EFXOPalette(C255, core255, glow255)
-	var/list/co = list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-	for(var/s = 1 to n)
-		var/list/T = EFXOMine(F[1 + s], F[1 + n + s], ramp, pal)
-		for(var/r = 0 to 3)
-			var/p = F[1 + 2 * n + r * n + s]
-			co[r * 3 + 1] += p * T[1]
-			co[r * 3 + 2] += p * T[2]
-			co[r * 3 + 3] += p * T[3]
-	var/list/M = list(co[1], co[2], co[3], 0, co[4], co[5], co[6], 0, co[7], co[8], co[9], 0, 0, 0, 0, 1, co[10], co[11], co[12], 0)
-	EFXO_FITCACHE[ck] = M
-	if(EFXO_FITCACHE.len > 512) EFXO_FITCACHE.Cut(1, 2)
-	return M
-
 /datum/energyfx_orbcolors
 	var/list/main255
 	var/list/core255
 	var/list/glow255
-	var/gray = 0
-	var/bright = 1
-	var/anchor = 0
-	var/canon = 0
-	var/sub = 0
 	var/list/ramp
 	var/list/pal
 
-/datum/energyfx_orbcolors/proc/Setup(obj/Skills/Z, datum/energyfx_row/R)
-	var/list/ex = R ? R.extra : null
-	canon = ex && ex["canon"]
-	var/main = Z ? Z.EnergyColorMain : null
-	var/core = Z ? Z.EnergyColorCore : null
-	var/glow = Z ? Z.EnergyColorGlow : null
-	if(canon)
-		main = R ? R.def_main : null
-		core = R ? R.def_core : null
-		glow = R ? R.def_glow : null
-	else if(!main)
-		main = R ? R.def_main : null
-	sub = !canon && EnergyFXIsSub(main)
-	main255 = EnergyFXSlotRGB(main, 158)
-	core255 = EnergyFXSlotRGB(core, 255)
-	glow255 = EnergyFXSlotRGB(glow, 158)
+/datum/energyfx_orbcolors/proc/Setup(datum/energyfx_row/R)
+	main255 = BeamFXHexRGB(R ? R.def_main : null)
+	core255 = BeamFXHexRGB(R ? R.def_core : null)
+	glow255 = BeamFXHexRGB(R ? R.def_glow : null)
 	if(!main255) main255 = list(0, 0, 0)
-	gray = !canon && !sub && EFXOGrayRule(main255)
-	if(gray)
-		var/lum = EFXOLum3(list(main255[1] / 255, main255[2] / 255, main255[3] / 255))
-		bright = (lum < 0.03) ? 1 : max(main255[1], main255[2], main255[3]) / 255
-	var/list/an = ex ? ex["anchor"] : null
-	anchor = canon || (!sub && an && EFXOSameRGB(main255, BeamFXHexRGB(an[1])) && EFXOSameRGB(core255, BeamFXHexRGB(an[2])) && EFXOSameRGB(glow255, BeamFXHexRGB(an[3])))
-	ramp = BeamFXRamp(gray ? list(153, 153, 153) : main255, core255, glow255)
-	pal = sub ? EFXOSubPalette(main255, core255, glow255) : EFXOPalette(main255, core255, glow255)
-
-/datum/energyfx_orbcolors/proc/Body(key)
-	if(anchor || gray || canon) return null
-	return EFXOFitMatrix(key, main255, core255, glow255, sub ? pal : null)
+	ramp = BeamFXRamp(main255, core255, glow255)
+	pal = EFXOPalette(main255, core255, glow255)
 
 /datum/energyfx_orbcolors/proc/Light(k = 1)
 	return EFXOLightK(k, ramp[1], ramp[4])
-
-/datum/energyfx_orbcolors/proc/BodyIK(ik)
-	return gray ? "[ik]G" : ik
-
-proc/EFXOSameRGB(list/a, list/b)
-	if(!a || !b) return !a && !b
-	return a[1] == b[1] && a[2] == b[2] && a[3] == b[3]
 
 /datum/energyfx_orbs/proc/PredictContact(datum/energyfx_orbshot/O, k, rad = 16)
 	var/obj/Skills/Projectile/_Projectile/P = O.P
@@ -3041,25 +2922,21 @@ proc/EFXOE4Mats(key, list/pal)
 	var/datum/energyfx_orbcolors/cols
 	var/datum/energyfx_orbsputter/sput
 	var/list/flick
-	var/list/bm_body
 	var/list/bm_wake
 
 /datum/energyfx_orbs/tracking/Setup()
 	cols = new
-	cols.Setup(from, row)
+	cols.Setup(row)
 	lm = cols.LM("hl")
 	tlc = EFXOLitColor(cols)
 	wake.L = EFXO_TB_WAKE_L
 	wake.N = EFXO_TB_WAKE_N
 	wake.n = EFXO_TB_WAKE_F
 	wake.life40 = EFXO_TB_WAKE_LIFE40
-	wake.ik = cols.BodyIK("TrackWake")
+	wake.ik = "TrackWake"
 	wake.tbl = EFXO_TB_WAKE_TBL
-	wake.col_body = cols.Body("tb_wake")
-	bm_body = cols.Body("tb_heads")
 	sput = new
 	sput.ncell = EFXO_TB_NCELL
-	if(cols.gray) b_ground = "B3Ground48G"
 
 /datum/energyfx_orbs/tracking/AddShot(obj/Skills/Projectile/_Projectile/P, datum/energyfx_row/R)
 	var/datum/energyfx_orbshot/O = ..()
@@ -3072,13 +2949,13 @@ proc/EFXOE4Mats(key, list/pal)
 	return O
 
 /datum/energyfx_orbs/tracking/PreBoom()
-	b_dome = "B3E4_48TB"
+	b_dome = "B3E4_48TBgold"
 
 /datum/energyfx_orbs/tracking/OnBoom()
 	blast.e4 = b_dome
 	blast.e4m = EFXOE4Mats(b_dome, cols.pal)
 	blast.lm_flash = cols.LM("flash")
-	blast.fl_kinds = list("XP", "XS", cols.LK("XL"))
+	blast.fl_kinds = list("XP", "XS", "XL")
 
 /datum/energyfx_orbs/tracking/proc/PosT(datum/energyfx_orbshot/O, t, pre)
 	if(pre)
@@ -3143,11 +3020,11 @@ proc/EFXOE4Mats(key, list/pal)
 	var/d = isnull(kb) ? -1000 : v - 2 * kb
 	if(blast)
 		blast.Scorch(src, out, d, "b")
-		blast.Ground(src, out, d, "b", cols.LK("GL"))
-	wake.Sprites(src, out, v, "w", "NP", cols.LK("ML"), lm, 4.8)
+		blast.Ground(src, out, d, "b", "GL")
+	wake.Sprites(src, out, v, "w", "NP", "ML", lm, 4.8)
 	if(blast)
 		var/list/sm = list()
-		blast.Particles(src, list(), sm, t, "b", cols.LK("XL"))
+		blast.Particles(src, list(), sm, t, "b", "XL")
 		out += sm
 	if(EFXOTvGe(v, O.k_spawn) && (isnull(kb) || EFXOTvLt(v, kb)))
 		var/list/p = PosV(O, v)
@@ -3171,15 +3048,15 @@ proc/EFXOE4Mats(key, list/pal)
 					ang = EFXOAtan2(y - (pp[2] + pp[3]), x - pp[1])
 				else
 					ang = p[4]
-			Rec(out, "bp", "FP", cols.BodyIK("TrackBomb"), "[st]_0", x, y, ang, sc, sc, 1, bm_body, 5)
-			Rec(out, "bl", cols.LK("FL"), cols.BodyIK("TrackBomb"), "[st]_1", x, y, ang, sc, sc, min(1, ff[2]), lm, 0)
+			Rec(out, "bp", "FP", "TrackBomb", "[st]_0", x, y, ang, sc, sc, 1, null, 5)
+			Rec(out, "bl", "FL", "TrackBomb", "[st]_1", x, y, ang, sc, sc, min(1, ff[2]), lm, 0)
 			var/list/bl_ = out[out.len]
 			bl_.len = 14
 			bl_[14] = ff[2]
-	sput.Sprites(src, out, t, "s", cols.LK("FL"), lm)
+	sput.Sprites(src, out, t, "s", "FL", lm)
 	if(blast)
 		blast.Body(src, out, d, "b")
-		blast.Particles(src, out, null, t, "b", cols.LK("XL"))
+		blast.Particles(src, out, null, t, "b", "XL")
 	return out
 
 /datum/energyfx_orbs/tracking/Busy(k)
@@ -3189,173 +3066,12 @@ proc/EFXOE4Mats(key, list/pal)
 	return 0
 
 proc/EFXOLitColor(datum/energyfx_orbcolors/C)
-	var/list/m = C.gray ? list(0.6, 0.6, 0.6) : list(C.main255[1] / 255, C.main255[2] / 255, C.main255[3] / 255)
+	var/list/m = list(C.main255[1] / 255, C.main255[2] / 255, C.main255[3] / 255)
 	var/list/b = BeamFXWarmEdge(m)
 	return list(clamp(b[1] * 0.85 + 0.15, 0, 1), clamp(b[2] * 0.85 + 0.15, 0, 1), clamp(b[3] * 0.85 + 0.15, 0, 1))
 
-#define EFXO_GLG_PLANE 60
-#define EFXO_MLG_PLANE 61
-#define EFXO_ULG_PLANE 62
-#define EFXO_FLG_PLANE 63
-#define EFXO_XLG_PLANE 64
-#define EFXO_GLG_VEIL 6.6162
-#define EFXO_GLG_RELAY 6.6165
-#define EFXO_MLG_VEIL 6.6336
-#define EFXO_MLG_RELAY 6.6337
-#define EFXO_ULG_VEIL 6.6442
-#define EFXO_ULG_RELAY 6.6445
-#define EFXO_FLG_VEIL 6.6513
-#define EFXO_FLG_RELAY 6.6514
-#define EFXO_XLG_VEIL 6.6562
-#define EFXO_XLG_RELAY 6.6564
-#define EFXO_GLS 2
-#define EFXO_FD_PLANE 65
-#define EFXO_FC_PLANE 66
-
-/obj/energyfx/orb/glg
-	plane = EFXO_GLG_PLANE
-	blend_mode = BLEND_ADD
-/obj/energyfx/orb/mlg
-	plane = EFXO_MLG_PLANE
-	blend_mode = BLEND_ADD
-/obj/energyfx/orb/ulg
-	plane = EFXO_ULG_PLANE
-	blend_mode = BLEND_ADD
-/obj/energyfx/orb/flg
-	plane = EFXO_FLG_PLANE
-	blend_mode = BLEND_ADD
-/obj/energyfx/orb/xlg
-	plane = EFXO_XLG_PLANE
-	blend_mode = BLEND_ADD
-
-/obj/energyfx_master/orbgray
-	var/masked = 0
-/obj/energyfx_master/orbgray/New()
-	..()
-	filters = filter(type = "blur", size = glob ? glob.ENERGYFX_BLUR : 1.5)
-/obj/energyfx_master/orbgray/glg
-	plane = EFXO_GLG_PLANE
-	render_target = "*energyfx_orb_glg"
-/obj/energyfx_master/orbgray/mlg
-	plane = EFXO_MLG_PLANE
-	render_target = "*energyfx_orb_mlg"
-/obj/energyfx_master/orbgray/ulg
-	plane = EFXO_ULG_PLANE
-	render_target = "*energyfx_orb_ulg"
-/obj/energyfx_master/orbgray/flg
-	plane = EFXO_FLG_PLANE
-	render_target = "*energyfx_orb_flg"
-/obj/energyfx_master/orbgray/xlg
-	plane = EFXO_XLG_PLANE
-	render_target = "*energyfx_orb_xlg"
-/obj/energyfx_master/orbgray/fd
-	plane = EFXO_FD_PLANE
-	render_target = "*efxo_fdamp"
-/obj/energyfx_master/orbgray/fd/New()
-	..()
-	filters = list(filter(type = "blur", size = ENERGYFX_DAMP_BLUR), filter(type = "color", color = list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ENERGYFX_GRAY_DAMP, 0, 0, 0, 0)))
-/obj/energyfx_master/orbgray/fc
-	plane = EFXO_FC_PLANE
-	render_target = "*efxo_fcov"
-/obj/energyfx_master/orbgray/fc/New()
-	..()
-	filters = list(filter(type = "blur", size = ENERGYFX_COV_BLUR), filter(type = "color", color = EnergyFXCovM1()), filter(type = "color", color = EnergyFXCovM2()))
-
-proc/EFXOGrayVeilM1()
-	var/k = EFXO_GLS / ENERGYFX_GRAY_LSCALE
-	var/i1 = k / (ENERGYFX_VEIL_HI1 - ENERGYFX_VEIL_LO1)
-	var/i2 = k / (ENERGYFX_VEIL_HI2 - ENERGYFX_VEIL_LO2)
-	var/i3 = k / (ENERGYFX_VEIL_HI3 - ENERGYFX_VEIL_LO3)
-	var/c1 = -ENERGYFX_VEIL_LO1 / (ENERGYFX_VEIL_HI1 - ENERGYFX_VEIL_LO1)
-	var/c2 = -ENERGYFX_VEIL_LO2 / (ENERGYFX_VEIL_HI2 - ENERGYFX_VEIL_LO2)
-	var/c3 = -ENERGYFX_VEIL_LO3 / (ENERGYFX_VEIL_HI3 - ENERGYFX_VEIL_LO3)
-	return list(0.2126 * i1, 0.2126 * i2, 0.2126 * i3, 0, 0.7152 * i1, 0.7152 * i2, 0.7152 * i3, 0, 0.0722 * i1, 0.0722 * i2, 0.0722 * i3, 0, 0, 0, 0, 0, c1, c2, c3, 1)
-
-proc/EFXOGrayKneeM()
-	return list(EFXO_GLS, 0, 0, 0, 0, EFXO_GLS, 0, 0, 0, 0, EFXO_GLS, 0, 0, 0, 0, 1, -ENERGYFX_GRAY_KNEE, -ENERGYFX_GRAY_KNEE, -ENERGYFX_GRAY_KNEE, 0)
-
-/obj/energyfx_relay/orbgray
-	var/masked = 0
-	var/front = 0
-	var/veil = 0
-/obj/energyfx_relay/orbgray/New()
-	..()
-	var/list/f = list()
-	if(veil)
-		f += filter(type = "color", color = EFXOGrayVeilM1())
-		f += filter(type = "color", color = EnergyFXVeilM2())
-		if(masked) f += filter(type = "alpha", render_source = "*energyfx_cov", flags = MASK_INVERSE)
-		if(front) f += filter(type = "alpha", render_source = "*efxo_fcov", flags = MASK_INVERSE)
-	else
-		if(masked) f += filter(type = "layer", render_source = "*energyfx_damp", blend_mode = BLEND_MULTIPLY)
-		if(front) f += filter(type = "layer", render_source = "*efxo_fdamp", blend_mode = BLEND_MULTIPLY)
-		f += filter(type = "color", color = EFXOGrayKneeM())
-	if(masked) f += filter(type = "alpha", render_source = "*energyfx_locc", flags = MASK_INVERSE)
-	filters = f
-/obj/energyfx_relay/orbgray/glg_v
-	layer = EFXO_GLG_VEIL
-	render_source = "*energyfx_orb_glg"
-	masked = 1
-	veil = 1
-/obj/energyfx_relay/orbgray/glg
-	layer = EFXO_GLG_RELAY
-	render_source = "*energyfx_orb_glg"
-	blend_mode = BLEND_ADD
-	masked = 1
-/obj/energyfx_relay/orbgray/mlg_v
-	layer = EFXO_MLG_VEIL
-	render_source = "*energyfx_orb_mlg"
-	masked = 1
-	veil = 1
-/obj/energyfx_relay/orbgray/mlg
-	layer = EFXO_MLG_RELAY
-	render_source = "*energyfx_orb_mlg"
-	blend_mode = BLEND_ADD
-	masked = 1
-/obj/energyfx_relay/orbgray/ulg_v
-	layer = EFXO_ULG_VEIL
-	render_source = "*energyfx_orb_ulg"
-	veil = 1
-/obj/energyfx_relay/orbgray/ulg
-	layer = EFXO_ULG_RELAY
-	render_source = "*energyfx_orb_ulg"
-	blend_mode = BLEND_ADD
-/obj/energyfx_relay/orbgray/flg_v
-	layer = EFXO_FLG_VEIL
-	render_source = "*energyfx_orb_flg"
-	veil = 1
-	front = 1
-/obj/energyfx_relay/orbgray/flg
-	layer = EFXO_FLG_RELAY
-	render_source = "*energyfx_orb_flg"
-	blend_mode = BLEND_ADD
-	front = 1
-/obj/energyfx_relay/orbgray/xlg_v
-	layer = EFXO_XLG_VEIL
-	render_source = "*energyfx_orb_xlg"
-	veil = 1
-/obj/energyfx_relay/orbgray/xlg
-	layer = EFXO_XLG_RELAY
-	render_source = "*energyfx_orb_xlg"
-	blend_mode = BLEND_ADD
-
-proc/EFXOGrayLightK(tag)
-	switch(tag)
-		if("flash") return ENERGYFX_GRAY_FLASH_K
-		if("hl") return ENERGYFX_GRAY_HEAD_K
-		if("wl") return ENERGYFX_GRAY_WL_K
-	return 1
-
-/datum/energyfx_orbcolors/proc/LK(kind)
-	return gray ? "[kind]g" : kind
-
 /datum/energyfx_orbcolors/proc/LM(tag = "hl", al = 1)
-	var/k = (tag == "accent" || tag == "wl") ? EFXOCoolK(al) : 1
-	if(!gray) return Light(k)
-	var/list/lc = ramp[1]
-	var/list/lcore = ramp[4]
-	var/g = ENERGYFX_GRAY_LSCALE * bright / EFXO_GLS * EFXOGrayLightK(tag)
-	return list((lcore[1] - lc[1]) * k * g, (lcore[2] - lc[2]) * k * g, (lcore[3] - lc[3]) * k * g, 0, lc[1] * g, lc[2] * g, lc[3] * g, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
+	return Light((tag == "accent" || tag == "wl") ? EFXOCoolK(al) : 1)
 
 proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, Rr, kind, list/lm)
 	var/n = list(1, 1, 2)[G.RandRange(3) + 1]
@@ -3377,23 +3093,19 @@ proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, R
 	b_ground = "B3Ground32"
 	bdir = "W"
 	var/datum/energyfx_orbcolors/cols
-	var/list/bm_body
 	var/list/bolt_cache = list()
 
 /datum/energyfx_orbs/nova/Setup()
 	cols = new
-	cols.Setup(from, row)
+	cols.Setup(row)
 	lm = cols.LM("hl")
 	tlc = EFXOLitColor(cols)
 	wake.L = EFXO_DN_WAKE_L
 	wake.N = EFXO_DN_WAKE_N
 	wake.n = EFXO_DN_WAKE_F
 	wake.life40 = EFXO_DN_WAKE_LIFE40
-	wake.ik = cols.BodyIK("NovaWake")
+	wake.ik = "NovaWake"
 	wake.tbl = EFXO_DN_WAKE_TBL
-	wake.col_body = cols.Body("dn_wake")
-	bm_body = cols.Body("dn_heads")
-	if(cols.gray) b_ground = "B3Ground32G"
 
 /datum/energyfx_orbs/nova/PreBoom()
 	b_dome = "B3E4_32DN"
@@ -3402,7 +3114,7 @@ proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, R
 	blast.e4 = b_dome
 	blast.e4m = EFXOE4Mats(b_dome, cols.pal)
 	blast.lm_flash = cols.LM("flash")
-	blast.fl_kinds = list("XP", "XS", cols.LK("XL"))
+	blast.fl_kinds = list("XP", "XS", "XL")
 
 /datum/energyfx_orbs/nova/Scale(datum/energyfx_orbshot/O, t)
 	return 0.05 + 0.95 * EFXOSstep(0, 1, (t - O.k_spawn * EFXO_TICK) / Tch(O))
@@ -3449,11 +3161,11 @@ proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, R
 	var/d = isnull(kb) ? -1000 : v - 2 * kb
 	if(blast)
 		blast.Scorch(src, out, d, "b")
-		blast.Ground(src, out, d, "b", cols.LK("GL"))
-	wake.Sprites(src, out, v, "w", "UP", cols.LK("UL"), lm, 4.8)
+		blast.Ground(src, out, d, "b", "GL")
+	wake.Sprites(src, out, v, "w", "UP", "UL", lm, 4.8)
 	if(blast)
 		var/list/sm = list()
-		blast.Particles(src, list(), sm, t, "b", cols.LK("XL"))
+		blast.Particles(src, list(), sm, t, "b", "XL")
 		out += sm
 	if(EFXOTvGe(v, O.k_spawn) && (isnull(kb) || EFXOTvLt(v, kb)))
 		var/list/p = PosV(O, v)
@@ -3468,17 +3180,17 @@ proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, R
 			if(!pre)
 				var/list/pp = PosT(O, max(O.k_launch * EFXO_TICK, tv - 0.02), 0)
 				if(pp) ang = EFXOAtan2(y - (pp[2] + pp[3]), x - pp[1])
-			Rec(out, "sp", "FP", cols.BodyIK("NovaSun"), "[st]_0", x, y, ang, sc, sc, 1, bm_body, 5)
-			Rec(out, "sl", cols.LK("FL"), cols.BodyIK("NovaSun"), "[st]_1", x, y, ang, sc, sc, 1, lm, 0)
+			Rec(out, "sp", "FP", "NovaSun", "[st]_0", x, y, ang, sc, sc, 1, null, 5)
+			Rec(out, "sl", "FL", "NovaSun", "[st]_1", x, y, ang, sc, sc, 1, lm, 0)
 			if(sc > 0.5)
 				var/list/bl = bolt_cache["[v]"]
 				if(!bl)
 					bl = list()
-					EFXONovaBolts(src, bl, Stream("bolt[v]"), x, y, sc, R_, cols.LK("FL"), lm)
+					EFXONovaBolts(src, bl, Stream("bolt[v]"), x, y, sc, R_, "FL", lm)
 					bolt_cache["[v]"] = bl
 				out += bl
 			if(pre)
-				conv.Sprites(src, out, tv, x, y, R_ * sc * 0.95, "c", cols.LK("FL"), lm)
+				conv.Sprites(src, out, tv, x, y, R_ * sc * 0.95, "c", "FL", lm)
 				var/ts = O.k_spawn * EFXO_TICK
 				var/ri = 0
 				for(var/tr in list(ts + 0.03, ts + 0.2))
@@ -3487,19 +3199,19 @@ proc/EFXONovaBolts(datum/energyfx_orbs/S, list/out, datum/bfx_rng/G, x, y, sc, R
 					if(a_ >= 0 && a_ < 1)
 						var/rr = (1.7 - 0.7 * a_ * a_) * R_ * sc + 2
 						var/k = rr / 31
-						Rec(out, "rg[ri]", cols.LK("FL"), "NovaMisc", "ring", x, y, 0, k, k, 0.7 * min(1, a_ / 0.2) * (1 - EFXOSstep(0.7, 1, a_)), lm, 0)
+						Rec(out, "rg[ri]", "FL", "NovaMisc", "ring", x, y, 0, k, k, 0.7 * min(1, a_ / 0.2) * (1 - EFXOSstep(0.7, 1, a_)), lm, 0)
 				if(EFXOAgeF(v, O.k_spawn, "lt", 0.1))
 					var/q = (tv - ts) / 0.1
-					Rec(out, "st", cols.LK("FL"), "NovaMisc", "star", x, y, 0, 1.2 + 0.6 * q, 1.2 + 0.6 * q, 1 - q, cols.LM("flash"), 0)
+					Rec(out, "st", "FL", "NovaMisc", "star", x, y, 0, 1.2 + 0.6 * q, 1.2 + 0.6 * q, 1 - q, cols.LM("flash"), 0)
 			var/kl = KLaunch(O)
 			if(!isnull(kl))
 				var/ga = tv - (kl * EFXO_TICK - 0.08)
 				if(ga >= 0 && ga < 0.16)
 					var/q2 = ga / 0.16
-					Rec(out, "gl", cols.LK("FL"), "NovaMisc", "glint", x, y, 0, (1.4 + 1.2 * q2) * R_ / 34, 1, 1 - q2 * q2, cols.LM("flash"), 0)
+					Rec(out, "gl", "FL", "NovaMisc", "glint", x, y, 0, (1.4 + 1.2 * q2) * R_ / 34, 1, 1 - q2 * q2, cols.LM("flash"), 0)
 	if(blast)
 		blast.Body(src, out, d, "b")
-		blast.Particles(src, out, null, t, "b", cols.LK("XL"))
+		blast.Particles(src, out, null, t, "b", "XL")
 	return out
 
 proc/EFXOAgeTS(kk, k, op, c)
@@ -3508,34 +3220,11 @@ proc/EFXOAgeTS(kk, k, op, c)
 	if(o != oc) return (op == "lt") ? (o < oc) : (o >= oc)
 	return EFXOTblBit(EFXO_AGE["T[op][c]"], k)
 
-/obj/energyfx/orb/g21
-	plane = ENERGYFX_GLIGHT_PLANE
-	blend_mode = BLEND_ADD
-
-/obj/energyfx_twin/orbdamp
-	appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_TOGETHER
-/obj/energyfx_twin/orbfdamp
-	plane = EFXO_FD_PLANE
-	appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_TOGETHER
-/obj/energyfx_twin/orbfcov
-	plane = EFXO_FC_PLANE
-	appearance_flags = RESET_COLOR | RESET_ALPHA | KEEP_TOGETHER
-
-/obj/energyfx/var/tmp/obj/energyfx_twin/efxo_cov
 /obj/energyfx/var/tmp/efxo_kf
 
 proc/EFXOFree(obj/energyfx/O)
 	if(!O) return
-	EFXOUntwin(O)
 	EnergyFXFree(O)
-
-proc/EFXOUntwin(obj/energyfx/O)
-	if(O.efx_damp)
-		O.vis_contents -= O.efx_damp
-		O.efx_damp = null
-	if(O.efxo_cov)
-		O.vis_contents -= O.efxo_cov
-		O.efxo_cov = null
 
 /datum/energyfx_orbembers
 	var/list/parts = list()
@@ -3569,8 +3258,6 @@ proc/EFXOUntwin(obj/energyfx/O)
 
 /datum/energyfx_orbs/pillar
 	var/datum/energyfx_orbcolors/cols
-	var/list/bm_mine
-	var/list/bm_col
 	var/datum/energyfx_orbstar4/star
 	var/datum/energyfx_orbsparkles/spk
 	var/datum/energyfx_orbembers/emb
@@ -3587,11 +3274,9 @@ proc/EFXOUntwin(obj/energyfx/O)
 /datum/energyfx_orbs/pillar/AddShot(obj/Skills/Projectile/_Projectile/P, datum/energyfx_row/R)
 	var/datum/energyfx_orbshot/O = ..()
 	cols = new
-	cols.Setup(from, row)
+	cols.Setup(row)
 	lm = cols.LM("hl")
 	tlc = EFXOLitColor(cols)
-	bm_mine = cols.Body("plm_heads")
-	bm_col = cols.Body("pl_column")
 	spk = new
 	spk.ik = "JechtStars"
 	spk.sc_lo = 0.3
@@ -3674,7 +3359,6 @@ proc/EFXOUntwin(obj/energyfx/O)
 	var/tv = v / EFXO_FPS
 	var/t = fi / EFXO_FPS
 	var/ts = O.k_spawn * EFXO_TICK
-	var/gk = cols.gray ? "MLg" : "GL"
 	var/glm = lm
 	if(EFXOTvGe(v, O.k_spawn) && (isnull(kf) || EFXOAgeM(v, kf, "lt", 0.1)))
 		var/fi_ = BeamFXMod(floor((v - 2 * O.k_spawn) / 2), EFXO_SB_NF)
@@ -3685,43 +3369,40 @@ proc/EFXOUntwin(obj/energyfx/O)
 			var/q = (tv - kf * EFXO_TICK) / 0.1
 			z = 22 * (1 - q * q)
 			sc = 1 + 0.3 * q
-		Rec(out, "mp", "FP", cols.BodyIK("PillarMine"), "rest_[fi_]_0", mx, my + z, 0, sc, sc, 1, bm_mine, 5)
-		Rec(out, "ml", cols.LK("FL"), cols.BodyIK("PillarMine"), "rest_[fi_]_1", mx, my + z, 0, sc, sc, 1, lm, 0)
+		Rec(out, "mp", "FP", "PillarMine", "rest_[fi_]_0", mx, my + z, 0, sc, sc, 1, null, 5)
+		Rec(out, "ml", "FL", "PillarMine", "rest_[fi_]_1", mx, my + z, 0, sc, sc, 1, lm, 0)
 		if(!trig)
-			Rec(out, "mr", cols.LK("FL"), "PillarMRing", "0", mx, my + z, -18, 1, 0.3, 1, lm, 0)
+			Rec(out, "mr", "FL", "PillarMRing", "0", mx, my + z, -18, 1, 0.3, 1, lm, 0)
 		var/o = v - 2 * O.k_spawn
 		var/ph = EFXOFMod(tv - ts, 0.8) / 0.8
 		var/pi = (O.k_spawn < 8 && o >= 0 && o < 400) ? text2ascii(EFXO_PL_PULSE, O.k_spawn * 400 + o + 1) - 48 : min(5, floor(ph * 6))
 		if(pi == 0 && ph > 0.5) ph = max(0, ph - 1)
 		else if(pi == 5 && ph < 0.5) ph = min(1, ph + 1)
-		Rec(out, "pu", gk, "PillarPulse", "[pi]", mx, gy, 0, 1, 0.5, 1 - ph, glm, 0)
+		Rec(out, "pu", "GL", "PillarPulse", "[pi]", mx, gy, 0, 1, 0.5, 1 - ph, glm, 0)
 		if(trig)
-			Rec(out, "ms", cols.LK("FL"), "JechtSoft", "x", mx, my + z, 0, 0.22, 0.22, 0.9, cols.LM("flash"), 0)
+			Rec(out, "ms", "FL", "JechtSoft", "x", mx, my + z, 0, 0.22, 0.22, 0.9, cols.LM("flash"), 0)
 	if(!isnull(ke))
 		var/d = v - 2 * ke
 		if(d >= 0)
 			var/di = (d >= 6) ? min(EFXO_PL_NDECAL - 1, max(0, floor((d - 6) / 4))) : 0
 			if(di < EFXO_PL_NDECAL - 1)
-				if(cols.gray)
-					Rec(out, "dp", "MP", "PillarDecalG", "[di]", mx, gy, 0, 1, 0.55, 1, list(cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, 1, 0, 0, 0, 0), 1)
-				else
-					Rec(out, "dp", "GP", "PillarDecal", "[di]_0", mx, gy, 0, 1, 0.55, 1, EFXOHeatMatrix(cols, 1), 1)
-				Rec(out, "dl", gk, cols.gray ? "PillarDecalLG" : "PillarDecal", "[di]_1", mx, gy, 0, 1, 0.55, 1, cols.LM("accent", 1), 0)
+				Rec(out, "dp", "GP", "PillarDecal", "[di]_0", mx, gy, 0, 1, 0.55, 1, EFXOHeatMatrix(cols, 1), 1)
+				Rec(out, "dl", "GL", "PillarDecal", "[di]_1", mx, gy, 0, 1, 0.55, 1, cols.LM("accent", 1), 0)
 			var/ri = (d < 4) ? d : 4 + floor((d - 4) / 2)
 			if(ri < EFXO_PL_NSPIKY)
-				Rec(out, "rs", gk, cols.BodyIK("PillarRings"), "spiky_[ri]", mx, gy, 0, 1, 0.55, 1, glm, 0)
+				Rec(out, "rs", "GL", "PillarRings", "spiky_[ri]", mx, gy, 0, 1, 0.55, 1, glm, 0)
 			if(d < 4 && d < EFXO_PL_NGLOWH)
-				Rec(out, "rg", gk, cols.BodyIK("PillarRings"), "glowh_[d]", mx, gy, 0, 1, 0.55, 1, glm, 0)
+				Rec(out, "rg", "GL", "PillarRings", "glowh_[d]", mx, gy, 0, 1, 0.55, 1, glm, 0)
 			var/fl = (d <= 1) ? 1 : max(0, 1 - (d - 1) / 4)
 			if(fl > 0.002)
-				Rec(out, "ef", cols.LK("FL"), "JechtSoft", "x", mx, gy + 6, 0, 0.4, 0.3, fl, cols.LM("flash"), 0)
-				star.Sprites(src, out, EFXO_PL_STAR[min(d, 5) + 1], fl, "es", cols.LK("FL"), lm)
+				Rec(out, "ef", "FL", "JechtSoft", "x", mx, gy + 6, 0, 0.4, 0.3, fl, cols.LM("flash"), 0)
+				star.Sprites(src, out, EFXO_PL_STAR[min(d, 5) + 1], fl, "es", "FL", lm)
 			var/ci = ColIndex(d)
 			if(!isnull(ci))
-				Rec(out, "cp", "FP", cols.BodyIK("PillarColumn"), "frames_[ci]_0", mx, gy + EFXO_PL_OY, 0, 1, 1, 1, bm_col, 5)
-				Rec(out, "cl", cols.LK("FL"), cols.BodyIK("PillarColumn"), "frames_[ci]_1", mx, gy + EFXO_PL_OY, 0, 1, 1, 1, lm, 0)
-	emb.Sprites(src, out, t, "e", cols.LK("FL"), lm)
-	spk.Sprites(src, out, t, "k", cols.LK("FL"), lm)
+				Rec(out, "cp", "FP", "PillarColumn", "frames_[ci]_0", mx, gy + EFXO_PL_OY, 0, 1, 1, 1, null, 5)
+				Rec(out, "cl", "FL", "PillarColumn", "frames_[ci]_1", mx, gy + EFXO_PL_OY, 0, 1, 1, 1, lm, 0)
+	emb.Sprites(src, out, t, "e", "FL", lm)
+	spk.Sprites(src, out, t, "k", "FL", lm)
 	return out
 
 /datum/energyfx_orbs/pillar/proc/KD(v)
@@ -3760,9 +3441,6 @@ proc/EFXOHeatMatrix(datum/energyfx_orbcolors/C, kk)
 proc/EFXOFMod(x, m)
 	return x - floor(x / m) * m
 
-var/list/EFXO_TWINS = list("PillarDecalG" = "PillarDecalD", "StealthCrackG" = "StealthCrackD")
-var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
-
 /datum/energyfx_orbs/stealth
 	parent_type = /datum/energyfx_orbs/bigbang
 	conv_n = 0
@@ -3776,10 +3454,9 @@ var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
 
 /datum/energyfx_orbs/stealth/Setup()
 	cols = new
-	cols.Setup(from, row)
+	cols.Setup(row)
 	lm = cols.LM("hl")
 	tlc = EFXOLitColor(cols)
-	if(cols.gray) b_ground = "B3Ground48G"
 
 /datum/energyfx_orbs/stealth/proc/Anchor(datum/energyfx_orbshot/O)
 	if(isnull(mx))
@@ -3815,7 +3492,7 @@ var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
 	blast.e4 = b_dome
 	blast.e4m = EFXOE4Mats(b_dome, cols.pal)
 	blast.lm_flash = cols.LM("flash")
-	blast.fl_kinds = list("XP", "XS", cols.LK("XL"))
+	blast.fl_kinds = list("XP", "XS", "XL")
 	blast.kick = EFXO_ST_KICK
 
 /datum/energyfx_orbs/stealth/TickWork(k)
@@ -3835,10 +3512,7 @@ var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
 	return Holds(fi, list(list(2 * k2 - 4, 2)), list(list(2 * k2 - 2, 2 * k2 + 6)))
 
 /datum/energyfx_orbs/stealth/proc/CrackPaint(list/out, st)
-	if(cols.gray)
-		Rec(out, "cp", "MP", "StealthCrackG", "[st]", mx, my, 0, 1, 1, 1, list(cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, 1, 0, 0, 0, 0), 1.1)
-	else
-		Rec(out, "cp", "MP", "StealthCrack", "[st]_0", mx, my, 0, 1, 1, 1, EFXOHeatMatrix(cols, 1), 1.1)
+	Rec(out, "cp", "MP", "StealthCrack", "[st]_0", mx, my, 0, 1, 1, 1, EFXOHeatMatrix(cols, 1), 1.1)
 
 /datum/energyfx_orbs/stealth/Draw(fi, v)
 	var/list/out = list()
@@ -3848,8 +3522,7 @@ var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
 	var/d = isnull(kb) ? -1000 : v - 2 * kb
 	if(blast) blast.Scorch(src, out, d, "b")
 	var/k2 = KH()
-	var/lk = cols.LK("ML")
-	var/lik = cols.gray ? "StealthCrackLG" : "StealthCrack"
+	var/lk = "ML"
 	if(!isnull(k2))
 		var/o = v - 2 * k2
 		var/pre_ok = (o > -4 || (o == -4 && !EFXOTblBit(EFXO_ST_PNG, k2))) && (o < 0 || (o == 0 && EFXOTblBit(EFXO_ST_PLT, k2)))
@@ -3863,20 +3536,20 @@ var/list/EFXO_FTWINS = list("CatacSplatG" = "CatacSplatD")
 			Rec(out, "rp", lk, "OmegaRipple", "art", mx, my, 0, kk, kk * 0.6, 0.9, lm, 0)
 			Rec(out, "fs", "NP", "StealthFissure", "[st]", mx, my, 0, 1, 1, 0.6, EFXOPaintK(EFXOCoolK(0.6), EFXO_ST_FS_EDGE), 1)
 			CrackPaint(out, st)
-			Rec(out, "cl", lk, lik, "[st]_1", mx, my, 0, 1, 1, 1, cols.LM("accent", 1), 0)
+			Rec(out, "cl", lk, "StealthCrack", "[st]_1", mx, my, 0, 1, 1, 1, cols.LM("accent", 1), 0)
 	if(!isnull(kb) && d >= 0 && d < 40)
 		var/fa = (d < 10) ? 1 : max(0, 1 - (d - 10) / 30)
 		var/stl = EFXO_ST_NCRACK - 1
 		Rec(out, "fs", "NP", "StealthFissure", "[stl]", mx, my, 0, 1, 1, fa * 0.6, EFXOPaintK(EFXOCoolK(fa * 0.6), EFXO_ST_FS_EDGE), 1)
 		var/al = fa * ((d < 6) ? 1 : 0.5)
-		Rec(out, "cl", lk, lik, "[stl]_1", mx, my, 0, 1, 1, al, cols.LM("accent", al), 0)
+		Rec(out, "cl", lk, "StealthCrack", "[stl]_1", mx, my, 0, 1, 1, al, cols.LM("accent", al), 0)
 	if(blast)
 		blast.Ground(src, out, d, "b", lk)
 		var/list/sm = list()
-		blast.Particles(src, list(), sm, t, "b", cols.LK("XL"))
+		blast.Particles(src, list(), sm, t, "b", "XL")
 		out += sm
 		blast.Body(src, out, d, "b")
-		blast.Particles(src, out, null, t, "b", cols.LK("XL"))
+		blast.Particles(src, out, null, t, "b", "XL")
 	return out
 
 /datum/energyfx_orbs/stealth/Chars(k)
@@ -3923,8 +3596,6 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	var/list/lmf
 	var/list/lm2
 	var/list/lmf2
-	var/list/bm_orb
-	var/list/bm_bit
 	var/list/hm
 	var/list/p0
 	var/oang = 0
@@ -3940,22 +3611,19 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	..()
 	if(R.extra["bit"] && P.emit_parent) from = P.emit_parent.from_skill
 	cols = new
-	cols.Setup(from, R)
+	cols.Setup(R)
 	lm = cols.LM("hl")
 	lmf = cols.LM("flash")
 	lm2 = EFXOLMa(lm, 2)
 	lmf2 = EFXOLMa(lmf, 2)
-	bm_orb = cols.Body("co_frames")
-	bm_bit = cols.Body("cob_frames")
-	if(!cols.gray) hm = EFXOHeatDark(cols)
+	hm = EFXOHeatDark(cols)
 	wake = new
 	wake.L = EFXO_CO_WAKE_L
 	wake.N = EFXO_CO_WAKE_N
 	wake.n = EFXO_CO_WAKE_F
 	wake.life40 = EFXO_CO_WAKE_LIFE40
-	wake.ik = cols.BodyIK("CatacWake")
+	wake.ik = "CatacWake"
 	wake.tbl = EFXO_CO_WAKE_TBL
-	wake.col_body = cols.Body("co_wake")
 
 /datum/energyfx_orbs/catac/Accepts(obj/Skills/Projectile/_Projectile/P, datum/energyfx_row/R)
 	if(!R.extra["bit"] || P.Owner != caster || !carrier) return 0
@@ -4047,15 +3715,9 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	seq++
 	return base + seq * 0.00001
 
-/datum/energyfx_orbs/catac/proc/HitIK()
-	return cols.gray ? "CatacHitLG" : "CatacHitH"
-
 /datum/energyfx_orbs/catac/proc/Splat(list/out, key, d, x, y, ang, sc, lay)
-	if(cols.gray)
-		Rec(out, "[key]p", "FP", "CatacSplatG", "[d]", x, y, ang, sc, sc, 1, list(cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, cols.bright, 0, 0, 0, 0, 1, 0, 0, 0, 0), Lay(lay))
-	else
-		Rec(out, "[key]p", "FP", "CatacHitH", "splat_[d]_0", x, y, ang, sc, sc, 1, hm, Lay(lay))
-	Rec(out, "[key]l", cols.LK("FL"), HitIK(), "splat_[d]_1", x, y, ang, sc, sc, 1, lm2, 0)
+	Rec(out, "[key]p", "FP", "CatacHitH", "splat_[d]_0", x, y, ang, sc, sc, 1, hm, Lay(lay))
+	Rec(out, "[key]l", "FL", "CatacHitH", "splat_[d]_1", x, y, ang, sc, sc, 1, lm2, 0)
 
 /datum/energyfx_orbs/catac/Draw(fi, v)
 	var/list/out = list()
@@ -4063,7 +3725,7 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	var/tv = v / EFXO_FPS
 	var/R0 = EFXO_CO_R
 	var/alive = carrier && v >= 2 * KL() && (isnull(carrier.k_end) || v < 2 * carrier.k_end)
-	if(carrier) wake.Sprites(src, out, v, "w", "UP", cols.LK("UL"), lm, 4.8)
+	if(carrier) wake.Sprites(src, out, v, "w", "UP", "UL", lm, 4.8)
 	var/n = max(total, bits.len)
 	var/pulse = 0
 	var/list/kes = list()
@@ -4080,23 +3742,23 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 			var/dist = EFXOHyp(cp[1] - p0[1], cp[2] - p0[2])
 			var/fo = BeamFXMod(floor(dist / (6.283185307 * R0) * EFXO_CO_NF), EFXO_CO_NF)
 			var/sc = min(1, 0.4 + 0.6 * (v - 2 * KL()) / 4.8) * (1 + 0.1 * pulse)
-			Rec(out, "op", "FP", cols.BodyIK("CatacOrb"), "[fo]_0", cp[1], cp[2], oang, sc, sc, 1, bm_orb, Lay(5))
-			Rec(out, "ol", cols.LK("FL"), cols.BodyIK("CatacOrb"), "[fo]_1", cp[1], cp[2], oang, sc, sc, 1, EFXOLMa(lm, 1 + 0.8 * pulse), 0)
+			Rec(out, "op", "FP", "CatacOrb", "[fo]_0", cp[1], cp[2], oang, sc, sc, 1, null, Lay(5))
+			Rec(out, "ol", "FL", "CatacOrb", "[fo]_1", cp[1], cp[2], oang, sc, sc, 1, EFXOLMa(lm, 1 + 0.8 * pulse), 0)
 	if(carrier && !isnull(carrier.k_end))
 		var/d = v - 2 * carrier.k_end
 		var/list/pe = carrier.DrawnT(carrier.k_end * EFXO_TICK)
 		if(pe && d >= 0)
 			if(d < 2)
 				var/kc = list(0.55, 0.3)[d + 1]
-				Rec(out, "ep", "FP", cols.BodyIK("CatacOrb"), "0_0", pe[1], pe[2], oang, kc, kc, 1, bm_orb, Lay(5))
-				Rec(out, "el", cols.LK("FL"), cols.BodyIK("CatacOrb"), "0_1", pe[1], pe[2], oang, kc, kc, 1, lm, 0)
+				Rec(out, "ep", "FP", "CatacOrb", "0_0", pe[1], pe[2], oang, kc, kc, 1, null, Lay(5))
+				Rec(out, "el", "FL", "CatacOrb", "0_1", pe[1], pe[2], oang, kc, kc, 1, lm, 0)
 			if(d < 7)
 				Splat(out, "es", d, pe[1], pe[2], 0, 1, 5)
 			if(d < 4)
-				Rec(out, "ef", cols.LK("FL"), HitIK(), "flash", pe[1], pe[2], 15 * d, 1.2 + 0.25 * d, 1.2 + 0.25 * d, (d < 2) ? 1 : 0.5, lmf2, 0)
+				Rec(out, "ef", "FL", "CatacHitH", "flash", pe[1], pe[2], 15 * d, 1.2 + 0.25 * d, 1.2 + 0.25 * d, (d < 2) ? 1 : 0.5, lmf2, 0)
 			if(d < 6)
 				var/q = d / 6
-				Rec(out, "et", cols.LK("FL"), HitIK(), "streak", pe[1], pe[2], 0, 0.6 + 0.8 * q, 0.6 + 0.8 * q, 1 - q, lm2, 0)
+				Rec(out, "et", "FL", "CatacHitH", "streak", pe[1], pe[2], 0, 0.6 + 0.8 * q, 0.6 + 0.8 * q, 1 - q, lm2, 0)
 	for(var/bi = 0 to n - 1)
 		var/ke = kes[bi + 1]
 		if(isnull(ke)) continue
@@ -4110,13 +3772,13 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 			var/r_in = R0 * 0.8
 			var/r_b = R0 * (0.8 + 0.8 * q * q)
 			var/s_b = 0.4 + 0.75 * q
-			Rec(out, "b[bi]h", cols.LK("FL"), HitIK(), "flash", cp[1] + ca * R0 * 0.92, cp[2] + sa * R0 * 0.92, b[6], 0.22 + 0.25 * q, 0.22 + 0.25 * q, 0.55 + 0.45 * q, lmf2, 0)
+			Rec(out, "b[bi]h", "FL", "CatacHitH", "flash", cp[1] + ca * R0 * 0.92, cp[2] + sa * R0 * 0.92, b[6], 0.22 + 0.25 * q, 0.22 + 0.25 * q, 0.55 + 0.45 * q, lmf2, 0)
 			var/neck = max(0, r_b - r_in)
 			if(neck > 1)
 				var/rm = (r_in + r_b) * 0.5
-				Rec(out, "b[bi]np", "FP", cols.BodyIK("CatacBit"), "[b[2]]_0", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 6 * s_b) / 12, 0.5 * s_b, 1, bm_bit, Lay(5.1))
-				Rec(out, "b[bi]nl", cols.LK("FL"), cols.BodyIK("CatacBit"), "[b[2]]_1", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 6 * s_b) / 12, 0.5 * s_b, 1, EFXOLMa(lm, 1.2), 0)
-				Rec(out, "b[bi]ns", cols.LK("FL"), "B3Spark", "x", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 8) / 30, 0.55, 1, lm, 0)
+				Rec(out, "b[bi]np", "FP", "CatacBit", "[b[2]]_0", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 6 * s_b) / 12, 0.5 * s_b, 1, null, Lay(5.1))
+				Rec(out, "b[bi]nl", "FL", "CatacBit", "[b[2]]_1", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 6 * s_b) / 12, 0.5 * s_b, 1, EFXOLMa(lm, 1.2), 0)
+				Rec(out, "b[bi]ns", "FL", "B3Spark", "x", cp[1] + ca * rm, cp[2] + sa * rm, a0, (neck + 8) / 30, 0.55, 1, lm, 0)
 	for(var/bi = 0 to n - 1)
 		var/ke = kes[bi + 1]
 		if(isnull(ke)) continue
@@ -4128,10 +3790,10 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 			var/r_b = R0 * (0.8 + 0.8 * q * q)
 			var/s_b = 0.4 + 0.75 * q
 			var/st = 1 + 0.35 * q
-			Rec(out, "b[bi]bp", "FP", cols.BodyIK("CatacBit"), "[b[2]]_0", cp[1] + cos(a0) * r_b, cp[2] + sin(a0) * r_b, a0, s_b * st, s_b / st, 1, bm_bit, Lay(5.2))
-			Rec(out, "b[bi]bl", cols.LK("FL"), cols.BodyIK("CatacBit"), "[b[2]]_1", cp[1] + cos(a0) * r_b, cp[2] + sin(a0) * r_b, a0, s_b * st, s_b / st, 1, EFXOLMa(lm, 1 + 0.9 * q), 0)
+			Rec(out, "b[bi]bp", "FP", "CatacBit", "[b[2]]_0", cp[1] + cos(a0) * r_b, cp[2] + sin(a0) * r_b, a0, s_b * st, s_b / st, 1, null, Lay(5.2))
+			Rec(out, "b[bi]bl", "FL", "CatacBit", "[b[2]]_1", cp[1] + cos(a0) * r_b, cp[2] + sin(a0) * r_b, a0, s_b * st, s_b / st, 1, EFXOLMa(lm, 1 + 0.9 * q), 0)
 			if(q > 0.3)
-				Rec(out, "b[bi]a", cols.LK("FL"), "BigBangArc", "[b[7]]", cp[1] + cos(a0) * R0 * 0.95, cp[2] + sin(a0) * R0 * 0.95, a0 + 90, 0.5, (b[7] % 2) ? 0.5 : -0.5, 0.9, lm, 0)
+				Rec(out, "b[bi]a", "FL", "BigBangArc", "[b[7]]", cp[1] + cos(a0) * R0 * 0.95, cp[2] + sin(a0) * R0 * 0.95, a0 + 90, 0.5, (b[7] % 2) ? 0.5 : -0.5, 0.9, lm, 0)
 		var/datum/energyfx_orbshot/S = b[9]
 		if(!S) continue
 		var/o = v - 2 * ke
@@ -4149,26 +3811,26 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 				var/kf = fl[BeamFXMod(o, 40) + 1] * min(1, 0.95 + age)
 				var/fr = BeamFXMod(b[2] + floor(3 * o / 5), EFXO_CO_NF)
 				var/ln = 0.35 + 0.45 * (bv / EFXO_CO_V0)
-				Rec(out, "b[bi]s", cols.LK("FL"), "B3Spark", "x", p[1] - cos(ba) * (6 + 8 * ln), p[2] - sin(ba) * (6 + 8 * ln), ba, ln, 0.65, 0.85, lm, 0)
+				Rec(out, "b[bi]s", "FL", "B3Spark", "x", p[1] - cos(ba) * (6 + 8 * ln), p[2] - sin(ba) * (6 + 8 * ln), ba, ln, 0.65, 0.85, lm, 0)
 				var/rot = b[3] + b[4] * age
-				Rec(out, "b[bi]fp", "FP", cols.BodyIK("CatacBit"), "[fr]_0", p[1], p[2], rot, kf, kf, 1, bm_bit, Lay(5.2))
-				Rec(out, "b[bi]fl", cols.LK("FL"), cols.BodyIK("CatacBit"), "[fr]_1", p[1], p[2], rot, kf, kf, 1, lm, 0)
+				Rec(out, "b[bi]fp", "FP", "CatacBit", "[fr]_0", p[1], p[2], rot, kf, kf, 1, null, Lay(5.2))
+				Rec(out, "b[bi]fl", "FL", "CatacBit", "[fr]_1", p[1], p[2], rot, kf, kf, 1, lm, 0)
 		if(o >= 0 && o <= 4)
 			var/list/s0 = S.GetP(S.k_spawn)
 			if(s0)
 				var/age2 = o / 40
 				var/q2 = age2 / 0.12
 				if(o <= 2)
-					Rec(out, "b[bi]xf", cols.LK("FL"), HitIK(), "flash", s0[1], s0[2], b[6], 0.6 - 0.2 * q2, 0.6 - 0.2 * q2, 1 - 0.6 * q2, lmf2, 0)
+					Rec(out, "b[bi]xf", "FL", "CatacHitH", "flash", s0[1], s0[2], b[6], 0.6 - 0.2 * q2, 0.6 - 0.2 * q2, 1 - 0.6 * q2, lmf2, 0)
 				if(o < 4)
-					Rec(out, "b[bi]xa", cols.LK("FL"), "BigBangArc", "[(b[7] + 1) % 4]", s0[1], s0[2], a0 + 90, 0.55, 0.55, 1 - q2, lm, 0)
+					Rec(out, "b[bi]xa", "FL", "BigBangArc", "[(b[7] + 1) % 4]", s0[1], s0[2], a0 + 90, 0.55, 0.55, 1 - q2, lm, 0)
 				var/list/sps = b[8]
 				for(var/i = 1 to sps.len)
 					var/list/sp = sps[i]
 					if(age2 < sp[3])
 						var/qq = age2 / sp[3]
 						var/dd = sp[2] * age2 * (1 - 0.5 * qq)
-						Rec(out, "b[bi]k[i]", cols.LK("FL"), "B3Spark", "x", s0[1] + cos(sp[1]) * dd, s0[2] + sin(sp[1]) * dd, sp[1], sp[4] * 1.3, 0.5, 1 - qq, lm, 0)
+						Rec(out, "b[bi]k[i]", "FL", "B3Spark", "x", s0[1] + cos(sp[1]) * dd, s0[2] + sin(sp[1]) * dd, sp[1], sp[4] * 1.3, 0.5, 1 - qq, lm, 0)
 	for(var/bi = 0 to n - 1)
 		var/list/b = Info(bi)
 		var/datum/energyfx_orbshot/S = b[9]
@@ -4179,7 +3841,7 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 			if(pe)
 				Splat(out, "b[bi]q", dp, pe[1], pe[2], b[6], 0.7, 5.3)
 				if(dp < 3)
-					Rec(out, "b[bi]qf", cols.LK("FL"), HitIK(), "flash", pe[1], pe[2], b[6], 0.75, 0.75, (dp < 2) ? 1 : 0.5, lmf2, 0)
+					Rec(out, "b[bi]qf", "FL", "CatacHitH", "flash", pe[1], pe[2], b[6], 0.75, 0.75, (dp < 2) ? 1 : 0.5, lmf2, 0)
 	return out
 
 /datum/energyfx_orbs/catac/Busy(k)
@@ -4196,13 +3858,10 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 #define EFXO_CP_PLANE 68
 #define EFXO_CS_PLANE 69
 #define EFXO_CL_PLANE 70
-#define EFXO_CLG_PLANE 71
 #define EFXO_CM_RELAY 6.6365
 #define EFXO_CP_RELAY 6.637
 #define EFXO_CS_RELAY 6.638
 #define EFXO_CL_RELAY 6.639
-#define EFXO_CLG_VEIL 6.6393
-#define EFXO_CLG_RELAY 6.6395
 
 /obj/energyfx/orb/cm
 	plane = EFXO_CM_PLANE
@@ -4213,9 +3872,6 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	blend_mode = BLEND_ADD
 /obj/energyfx/orb/cl
 	plane = EFXO_CL_PLANE
-	blend_mode = BLEND_ADD
-/obj/energyfx/orb/clg
-	plane = EFXO_CLG_PLANE
 	blend_mode = BLEND_ADD
 
 /obj/energyfx_master/orb/cm
@@ -4252,30 +3908,12 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	..()
 	color = list(EFXO_LS, 0, 0, 0, EFXO_LS, 0, 0, 0, EFXO_LS)
 
-/obj/energyfx_master/orbgray/clg
-	plane = EFXO_CLG_PLANE
-	render_target = "*energyfx_orb_clg"
-/obj/energyfx_relay/orbgray/clg_v
-	layer = EFXO_CLG_VEIL
-	render_source = "*energyfx_orb_clg"
-	veil = 1
-/obj/energyfx_relay/orbgray/clg
-	layer = EFXO_CLG_RELAY
-	render_source = "*energyfx_orb_clg"
-	blend_mode = BLEND_ADD
-
 /datum/energyfx_orbcolors/proc/SetupHex(hex)
-	canon = 0
-	anchor = 0
 	main255 = BeamFXHexRGB(hex)
 	core255 = null
 	glow255 = null
 	if(!main255) main255 = list(0, 0, 0)
-	gray = EFXOGrayRule(main255)
-	if(gray)
-		var/lum = EFXOLum3(list(main255[1] / 255, main255[2] / 255, main255[3] / 255))
-		bright = (lum < 0.03) ? 1 : max(main255[1], main255[2], main255[3]) / 255
-	ramp = BeamFXRamp(gray ? list(153, 153, 153) : main255, core255, glow255)
+	ramp = BeamFXRamp(main255, core255, glow255)
 	pal = EFXOPalette(main255, core255, glow255)
 
 /datum/energyfx_orbs/proc/CounterSpec(datum/energyfx_orbshot/O)
@@ -4508,14 +4146,14 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 		for(var/r in sets)
 			if(r <= re) rs = r
 		var/ek = (spec && spec["e4"]) ? spec["dome"] : ((rs == 48) ? "B3E4_48TB" : "B3E4_[rs]G")
-		var/gk = (spec && spec["e4"]) ? spec["ground"] : "B3Ground[rs][C.gray ? "G" : ""]"
+		var/gk = (spec && spec["e4"]) ? spec["ground"] : "B3Ground[rs]"
 		B = new(Stream("cb[E.idx]"), re, bx_, by_, k + 1, (spec ? spec["g0"] : null), ek, gk, C.LM("hl"), EFXO_LM_SCORCH)
 		B.e4 = ek
 		B.e4m = EFXOE4Mats(ek, C.pal)
 		B.lm_flash = C.LM("flash")
 		if(!spec) B.dsc = re / rs
 		E.lm = C.LM("hl")
-		E.lk = C.LK("CL")
+		E.lk = "CL"
 		E.splash_ik = "SplashE4"
 		E.sm = EFXOE4Mats("SplashE4", C.pal)
 	B.fl_kinds = list("CP", "CS", E.lk)
@@ -4601,14 +4239,14 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	if(spec && spec["head"] && b >= 0)
 		var/hik = spec["head"]
 		var/datum/energyfx_orbcolors/C = spec["cols"]
-		if(C) hik = C.BodyIK(hik)
+		if(C) hik = hik
 		var/kx = list(0.7, 0.45)[b + 1] * 0.75
 		var/ky = list(1.2, 1.45)[b + 1] * 0.75
 		var/hf = BeamFXMod(floor(v / 2), spec["head_nf"])
 		var/hx = E.lx + cos(E.th) * (9 + 4 * b)
 		var/hy = E.ly + sin(E.th) * (9 + 4 * b)
 		Rec(out, "[pre]hp", "FP", hik, "rest_[hf]_0", hx, hy, E.th, kx, ky, 1, spec["head_bm"], 5.3)
-		Rec(out, "[pre]hl", C ? C.LK("FL") : "FL", hik, "rest_[hf]_1", hx, hy, E.th, kx, ky, 1, EFXOLMa(spec["lm"], 1.3 + 0.4 * b), 0)
+		Rec(out, "[pre]hl", C ? "FL" : "FL", hik, "rest_[hf]_1", hx, hy, E.th, kx, ky, 1, EFXOLMa(spec["lm"], 1.3 + 0.4 * b), 0)
 
 /datum/energyfx_orbs/supernova/Draw(fi, v)
 	var/list/out = list()
@@ -4690,14 +4328,10 @@ proc/EFXOHeatDark(datum/energyfx_orbcolors/C)
 	return 0
 
 /datum/energyfx_orbcolors/proc/SetupColors(datum/energyfx_colors/C)
-	canon = 0
-	anchor = 0
 	main255 = C.main255 ? C.main255 : list(0, 0, 0)
 	core255 = C.core255
 	glow255 = C.glow255
-	gray = C.gray
-	bright = C.bright
-	ramp = BeamFXRamp(gray ? list(153, 153, 153) : main255, core255, glow255)
+	ramp = BeamFXRamp(main255, core255, glow255)
 	pal = EFXOPalette(main255, core255, glow255)
 
 proc/EFXOE4Set(re)
@@ -4724,12 +4358,12 @@ proc/EFXOE4Set(re)
 	kb = Now()
 	var/rs = EFXOE4Set(Re)
 	var/ek = (rs == 48) ? "B3E4_48TB" : "B3E4_[rs]G"
-	var/gk = "B3Ground[rs][cols.gray ? "G" : ""]"
+	var/gk = "B3Ground[rs]"
 	blast = new(Stream("b3"), Re, (T.x - 1) * 32 + 16, (T.y - 1) * 32 + 16, kb, null, ek, gk, cols.LM("hl"), EFXO_LM_SCORCH)
 	blast.e4 = ek
 	blast.e4m = EFXOE4Mats(ek, cols.pal)
 	blast.lm_flash = cols.LM("flash")
-	blast.fl_kinds = list("XP", "XS", cols.LK("XL"))
+	blast.fl_kinds = list("XP", "XS", "XL")
 	blast.dsc = Re / rs
 	if(parity) OL("E 0 burst [kb] [Re] [rs]")
 	look.scenes += src
@@ -4740,12 +4374,12 @@ proc/EFXOE4Set(re)
 	var/t = fi / EFXO_FPS
 	var/d = v - 2 * kb
 	blast.Scorch(src, out, d, "b")
-	blast.Ground(src, out, d, "b", cols.LK("GL"))
+	blast.Ground(src, out, d, "b", "GL")
 	var/list/sm = list()
-	blast.Particles(src, list(), sm, t, "b", cols.LK("XL"))
+	blast.Particles(src, list(), sm, t, "b", "XL")
 	out += sm
 	blast.Body(src, out, d, "b")
-	blast.Particles(src, out, null, t, "b", cols.LK("XL"))
+	blast.Particles(src, out, null, t, "b", "XL")
 	return out
 
 /datum/energyfx_orbs/burst/Busy(k)

@@ -1,6 +1,6 @@
 globalTracker/var/tmp
 	ENERGYFX = TRUE
-	ENERGYFX_CAP = 2200
+	ENERGYFX_CAP = 4100
 	ENERGYFX_BLUR = 1.5
 	ENERGYFX_LIGHT_SCALE = 2
 
@@ -386,67 +386,24 @@ proc/EnergyFXRowCanon(datum/energyfx_row/R)
 	if(R.look == "beam") return !(R.path in ENERGYFX_NONCANON_BEAMS)
 	return 0
 
-proc/EnergyFXIsSub(col)
-	return istext(col) && copytext(col, 1, 2) == "-"
-
-proc/EnergyFXSlotRGB(col, ref)
-	if(!EnergyFXIsSub(col)) return BeamFXHexRGB(col)
-	var/list/p = BeamFXHexRGB(copytext(col, 2))
-	if(!p) return null
-	return list(max(0, ref - p[1]), max(0, ref - p[2]), max(0, ref - p[3]))
-
 /datum/energyfx_colors
-	var/gray = 0
-	var/bright = 1
 	var/list/main255
 	var/list/core255
 	var/list/glow255
 	var/list/ramp
 
-/datum/energyfx_colors/proc/PaintMatrix(kp = 1)
-	if(gray)
-		return list(bright, bright, bright, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
-	var/list/edge = ramp[2]
-	var/list/core = ramp[3]
-	return list((core[1] - edge[1]) * kp, (core[2] - edge[2]) * kp, (core[3] - edge[3]) * kp, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, edge[1], edge[2], edge[3], 0)
-
-/datum/energyfx_colors/proc/LightMatrix(k = 1)
-	var/list/lc = ramp[1]
-	var/list/lcore = ramp[4]
-	var/ls = glob ? glob.ENERGYFX_LIGHT_SCALE : 1
-	var/g = (gray ? 0.35 * bright : 1) / ls
-	return list((lcore[1] - lc[1]) * k * g, (lcore[2] - lc[2]) * k * g, (lcore[3] - lc[3]) * k * g, 0, lc[1] * g, lc[2] * g, lc[3] * g, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
-
 proc/EnergyFXResolveColors(main, core, glow, def_main, def_core, def_glow)
 	var/datum/energyfx_colors/C = new
-	var/list/c = EnergyFXSlotRGB(main ? main : def_main, 158)
-	if(!c) c = list(0, 0, 0)
-	var/lum = BeamFXLum(list(c[1] / 255, c[2] / 255, c[3] / 255))
-	var/mx = max(c[1], c[2], c[3])
-	var/sat = mx ? (mx - min(c[1], c[2], c[3])) / mx : 0
-	C.core255 = EnergyFXSlotRGB(core ? core : def_core, 255)
-	C.glow255 = EnergyFXSlotRGB(glow ? glow : def_glow, 158)
-	if(lum < ENERGYFX_NEAR_BLACK || sat < ENERGYFX_GRAY_SAT)
-		C.gray = 1
-		C.bright = (lum < ENERGYFX_NEAR_BLACK) ? 1 : mx / 255
-		C.main255 = list(153, 153, 153)
-	else
-		C.main255 = c
+	C.main255 = BeamFXHexRGB(main ? main : def_main)
+	if(!C.main255) C.main255 = list(0, 0, 0)
+	C.core255 = BeamFXHexRGB(core ? core : def_core)
+	C.glow255 = BeamFXHexRGB(glow ? glow : def_glow)
 	C.ramp = BeamFXRamp(C.main255, C.core255, C.glow255)
 	return C
 
 proc/EnergyFXSkillColors(obj/Skills/Z, datum/energyfx_row/R)
 	if(!R) R = EnergyFXRow(Z)
-	var/own = Z && !EnergyFXRowCanon(R)
-	return EnergyFXResolveColors(own ? Z.EnergyColorMain : null, own ? Z.EnergyColorCore : null, own ? Z.EnergyColorGlow : null, R ? R.def_main : null, R ? R.def_core : null, R ? R.def_glow : null)
-
-proc/EnergyFXPaintMatrix(main, core)
-	var/datum/energyfx_colors/C = EnergyFXResolveColors(main, core, null, null, null, null)
-	return C.PaintMatrix()
-
-proc/EnergyFXLightMatrix(glow, core, main)
-	var/datum/energyfx_colors/C = EnergyFXResolveColors(main, core, glow, null, null, null)
-	return C.LightMatrix()
+	return EnergyFXResolveColors(null, null, null, R ? R.def_main : null, R ? R.def_core : null, R ? R.def_glow : null)
 
 proc/EnergyFXHoldTable(datum/energyfx_row/R)
 	if(R && R.holds) return R.holds
@@ -575,6 +532,7 @@ proc/EnergyFXProjectileSpawn(obj/Skills/Projectile/_Projectile/P)
 
 proc/EnergyFXProjectileCharge(obj/Skills/Projectile/_Projectile/P, T)
 	var/datum/energyfx_look/L = EnergyFXLookOf(P)
+	EFX92OverheadComets(P, T)
 	return L ? L.Charge(P, T) : 0
 
 proc/EnergyFXProjectileLaunch(obj/Skills/Projectile/_Projectile/P)
@@ -632,99 +590,7 @@ proc/EnergyFXGrappleBurst(mob/M, obj/Skills/Z, atom/target)
 	if(!EnergyFXRow(Z)) return 0
 	return 0
 
-proc/EnergyFXVeilM1()
-	var/ls = glob ? glob.ENERGYFX_LIGHT_SCALE : 2
-	var/k = ls / ENERGYFX_GRAY_LSCALE
-	var/i1 = k / (ENERGYFX_VEIL_HI1 - ENERGYFX_VEIL_LO1)
-	var/i2 = k / (ENERGYFX_VEIL_HI2 - ENERGYFX_VEIL_LO2)
-	var/i3 = k / (ENERGYFX_VEIL_HI3 - ENERGYFX_VEIL_LO3)
-	var/c1 = -ENERGYFX_VEIL_LO1 / (ENERGYFX_VEIL_HI1 - ENERGYFX_VEIL_LO1)
-	var/c2 = -ENERGYFX_VEIL_LO2 / (ENERGYFX_VEIL_HI2 - ENERGYFX_VEIL_LO2)
-	var/c3 = -ENERGYFX_VEIL_LO3 / (ENERGYFX_VEIL_HI3 - ENERGYFX_VEIL_LO3)
-	return list(0.2126 * i1, 0.2126 * i2, 0.2126 * i3, 0, 0.7152 * i1, 0.7152 * i2, 0.7152 * i3, 0, 0.0722 * i1, 0.0722 * i2, 0.0722 * i3, 0, 0, 0, 0, 0, c1, c2, c3, 1)
-
-proc/EnergyFXVeilM2()
-	return list(0, 0, 0, ENERGYFX_VEIL_W1, 0, 0, 0, ENERGYFX_VEIL_W2, 0, 0, 0, ENERGYFX_VEIL_W3, 0, 0, 0, 0, ENERGYFX_VEIL_GRAY, ENERGYFX_VEIL_GRAY, ENERGYFX_VEIL_GRAY, ENERGYFX_VEIL_C)
-
-proc/EnergyFXCovM1()
-	var/i1 = 1 / (ENERGYFX_COV_HI1 - ENERGYFX_COV_LO1)
-	var/i2 = 1 / (ENERGYFX_COV_HI2 - ENERGYFX_COV_LO2)
-	var/i3 = 1 / (ENERGYFX_COV_HI3 - ENERGYFX_COV_LO3)
-	return list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, i1, i2, i3, 0, -ENERGYFX_COV_LO1 * i1, -ENERGYFX_COV_LO2 * i2, -ENERGYFX_COV_LO3 * i3, 1)
-
-proc/EnergyFXCovM2()
-	return list(0, 0, 0, ENERGYFX_COV_W1, 0, 0, 0, ENERGYFX_COV_W2, 0, 0, 0, ENERGYFX_COV_W3, 0, 0, 0, 0, 0, 0, 0, ENERGYFX_COV_C)
-
-proc/EnergyFXKneeM()
-	var/ls = glob ? glob.ENERGYFX_LIGHT_SCALE : 2
-	return list(ls, 0, 0, 0, 0, ls, 0, 0, 0, 0, ls, 0, 0, 0, 0, 1, -ENERGYFX_GRAY_KNEE, -ENERGYFX_GRAY_KNEE, -ENERGYFX_GRAY_KNEE, 0)
-
-/obj/energyfx_master/glight
-	plane = ENERGYFX_GLIGHT_PLANE
-	render_target = "*energyfx_glight"
-	New()
-		..()
-		filters = filter(type = "blur", size = glob ? glob.ENERGYFX_BLUR : 1.5)
-
-/obj/energyfx_master/damp
-	plane = ENERGYFX_DAMP_PLANE
-	render_target = "*energyfx_damp"
-	New()
-		..()
-		filters = list(filter(type = "alpha", render_source = "*energyfx_occ", flags = MASK_INVERSE), filter(type = "blur", size = ENERGYFX_DAMP_BLUR), filter(type = "color", color = list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ENERGYFX_GRAY_DAMP, 0, 0, 0, 0)))
-
-/obj/energyfx_master/cov
-	plane = ENERGYFX_COV_PLANE
-	render_target = "*energyfx_cov"
-	New()
-		..()
-		filters = list(filter(type = "alpha", render_source = "*energyfx_occ", flags = MASK_INVERSE), filter(type = "blur", size = ENERGYFX_COV_BLUR), filter(type = "color", color = EnergyFXCovM1()), filter(type = "color", color = EnergyFXCovM2()))
-
-/obj/energyfx_master/gring
-	plane = ENERGYFX_GRING_PLANE
-	render_target = "*energyfx_gring"
-	New()
-		..()
-		filters = filter(type = "blur", size = ENERGYFX_GRING_BLUR)
-
-/obj/energyfx_relay/covsrc
-	plane = ENERGYFX_COV_PLANE
-	layer = 1
-	render_source = "*energyfx_paint"
-
-/obj/energyfx_relay/veil
-	layer = ENERGYFX_VEIL_RELAY_LAYER
-	render_source = "*energyfx_glight"
-	New()
-		..()
-		filters = list(filter(type = "color", color = EnergyFXVeilM1()), filter(type = "color", color = EnergyFXVeilM2()), filter(type = "alpha", render_source = "*energyfx_cov", flags = MASK_INVERSE), filter(type = "alpha", render_source = "*energyfx_locc", flags = MASK_INVERSE))
-
-/obj/energyfx_relay/glight
-	layer = ENERGYFX_GLIGHT_RELAY_LAYER
-	blend_mode = BLEND_ADD
-	render_source = "*energyfx_glight"
-	New()
-		..()
-		filters = list(filter(type = "layer", render_source = "*energyfx_damp", blend_mode = BLEND_MULTIPLY), filter(type = "color", color = EnergyFXKneeM()), filter(type = "alpha", render_source = "*energyfx_locc", flags = MASK_INVERSE))
-
-/obj/energyfx_relay/gring
-	layer = ENERGYFX_GRING_RELAY_LAYER
-	blend_mode = BLEND_ADD
-	render_source = "*energyfx_gring"
-	New()
-		..()
-		filters = filter(type = "alpha", render_source = "*energyfx_locc", flags = MASK_INVERSE)
-
-client/var/tmp/list/energyfx_gray_screen
-
 client/ApplyWorldMag()
 	..()
 	EnergyFXEnsureMasters(src)
-	EnergyFXEnsureGrayMasters(src)
 
-proc/EnergyFXEnsureGrayMasters(client/C)
-	if(!C) return
-	if(!C.energyfx_gray_screen)
-		C.energyfx_gray_screen = list(new /obj/energyfx_master/glight, new /obj/energyfx_master/damp, new /obj/energyfx_master/cov, new /obj/energyfx_master/gring, new /obj/energyfx_relay/covsrc, new /obj/energyfx_relay/veil, new /obj/energyfx_relay/glight, new /obj/energyfx_relay/gring)
-	for(var/obj/O in C.energyfx_gray_screen)
-		if(!(O in C.screen)) C.screen += O

@@ -201,8 +201,6 @@ datum/saga_skill_tree_node
 
 		del S
 
-		for(var/obj/Skills/Buffs/NuStyle/style in M)
-			M.StyleUnlock(style)
 
 		return TRUE
 

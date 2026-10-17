@@ -179,6 +179,11 @@ augments -
 	proc/handlePassive(list/theList, input, secondary)
 		. = TRUE
 
+		if(input == "BlockChance")
+			if(current_passives["CriticalBlock"] + 0.05 + theList[input][1]/100 > 0.45)
+				return FALSE
+			current_passives["CriticalBlock"] += 0.05 + theList[input][1]/100
+			return
 		if(current_passives["[input]"])
 			if(current_passives["[input]"] + theList[input][1] > theList[input][2])
 				return FALSE

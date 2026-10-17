@@ -184,7 +184,7 @@ scaling with potential as well
 			p.Secret= "Rare Variant"
 		if("Legendary")
 			p << "You have become a Legendary Super Saiyan."
-			p.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Legendary_Stance)
+			p.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Legendary_Stance)
 			p.passive_handler.Increase("Fabled King", 1)
 			p.passive_handler.Increase("True Inheritor", 1)
 			p.passive_handler.Increase("Duren", 1)

@@ -331,6 +331,49 @@ mob/proc/GunHitMult(mob/victim, obj/Skills/Projectile/_Projectile/P)
 mob/proc/GunOnHit(mob/victim, obj/Skills/Projectile/_Projectile/P)
 	return
 
+obj/Skills/Projectile/var/tmp/ki_blasts = 0
+obj/Skills/Projectile/var/tmp/ki_shots = 0
+obj/Skills/Projectile/var/tmp/list/ki_stamp
+
+var/list/KI_SKILL_EXCLUDED = list(/obj/Skills/Projectile/Gear, /obj/Skills/Projectile/Mech, /obj/Skills/Projectile/Ordnance, /obj/Skills/Projectile/Sword, /obj/Skills/Projectile/Hado, /obj/Skills/Projectile/Bakudo, /obj/Skills/Projectile/Ninjutsu, /obj/Skills/Projectile/Staff_Projectile, /obj/Skills/Projectile/Magic,\
+	/obj/Skills/Projectile/DemiFiend,\
+	/obj/Skills/Projectile/Air_Blades, /obj/Skills/Projectile/Bakudantsuki, /obj/Skills/Projectile/Benihiko, /obj/Skills/Projectile/Bushogoma, /obj/Skills/Projectile/Taimatsu_Inferno,\
+	/obj/Skills/Projectile/Beams/Excalibur, /obj/Skills/Projectile/Beams/Excalibur_Morgan, /obj/Skills/Projectile/ExcaliburProjectile, /obj/Skills/Projectile/ExcaliburMProjectile, /obj/Skills/Projectile/Crystal_Rose_Glass, /obj/Skills/Projectile/BlazingSlashProjectile,\
+	/obj/Skills/Projectile/Feathers, /obj/Skills/Projectile/GodSlayer, /obj/Skills/Projectile/Quincy, /obj/Skills/Projectile/Atlatl, /obj/Skills/Projectile/Blade_Addition, /obj/Skills/Projectile/Stake, /obj/Skills/Projectile/Secret_Knives, /obj/Skills/Projectile/Khonshu, /obj/Skills/Projectile/FTG, /obj/Skills/Projectile/UltimaLaser, /obj/Skills/Projectile/ChaosKnife, /obj/Skills/Projectile/Hundred_Knives, /obj/Skills/Projectile/Senbon,\
+	/obj/Skills/Projectile/Arcane_Blast, /obj/Skills/Projectile/Arcane_Burst, /obj/Skills/Projectile/Arcane_Cluster, /obj/Skills/Projectile/Arcane_Discharge, /obj/Skills/Projectile/Arcane_Explosion, /obj/Skills/Projectile/Arcane_Fist_Discharge, /obj/Skills/Projectile/Arcane_Landmine, /obj/Skills/Projectile/Arcane_Micro_Singularity, /obj/Skills/Projectile/Arcane_Singularity, /obj/Skills/Projectile/Arcane_Spray, /obj/Skills/Projectile/Arcane_Whirlwind, /obj/Skills/Projectile/Beams/Arcane_Bullet, /obj/Skills/Projectile/GravityTornado, /obj/Skills/Projectile/Heavy_Discharge,\
+	/obj/Skills/Projectile/Beams/Hyper_Beam, /obj/Skills/Projectile/Beams/TasteTheRainbow, /obj/Skills/Projectile/Beams/Unbelievable_Rage, /obj/Skills/Projectile/Burning_Black, /obj/Skills/Projectile/ChaosBusterShot, /obj/Skills/Projectile/SuperChaosBusterShot, /obj/Skills/Projectile/ChaosSaberToss, /obj/Skills/Projectile/ChaosSaberWave, /obj/Skills/Projectile/Devilsbuster, /obj/Skills/Projectile/Red_Buster, /obj/Skills/Projectile/Rude_Buster, /obj/Skills/Projectile/RoaringCrescentWave, /obj/Skills/Projectile/Royal_Flames, /obj/Skills/Projectile/Zone_Attacks/Final_Chaos,\
+	/obj/Skills/Projectile/Gates_of_Babylon, /obj/Skills/Projectile/Enkidu_Chains,\
+	/obj/Skills/Projectile/Beams/ChaosBlaster, /obj/Skills/Projectile/Bubblebeam, /obj/Skills/Projectile/Fire_Blast, /obj/Skills/Projectile/Inferno, /obj/Skills/Projectile/HelfireInferno,\
+	/obj/Skills/Projectile/Machine_Gun_Burst, /obj/Skills/Projectile/Homing_Ray_Missiles, /obj/Skills/Projectile/Plasma_Cannon, /obj/Skills/Projectile/Cyberize, /obj/Skills/Projectile/GunKataShot, /obj/Skills/Projectile/SmallLemonThing, /obj/Skills/Projectile/BIG_SHOT)
+var/list/ki_skill_cache = list()
+
+/proc/IsKiSkill(obj/Skills/Projectile/S)
+	if(!istype(S, /obj/Skills/Projectile))
+		return 0
+	if(S.NeedsGun || S.IsSpell || S.MagicNeeded || S.NeedsSword || S.ChakraNature)
+		return 0
+	var/t = S.type
+	. = ki_skill_cache[t]
+	if(isnull(.))
+		. = 1
+		for(var/x in KI_SKILL_EXCLUDED)
+			if(ispath(t, x) || findtext("[t]", "[x]/") == 1)
+				. = 0
+				break
+		ki_skill_cache[t] = .
+
+mob/proc/KiStampPassives(obj/Skills/Projectile/S)
+	return
+
+mob/proc/KiStampShot(obj/Skills/Projectile/_Projectile/P, obj/Skills/Projectile/Z)
+	return
+
+mob/proc/KiHitMult(mob/victim, obj/Skills/Projectile/_Projectile/P)
+	return 1
+
+mob/proc/KiOnHit(mob/victim, obj/Skills/Projectile/_Projectile/P, hit = 0)
+	return
+
 #define GUN_ENERGY_MAX 100
 #define GUN_ENERGY_DAMAGE 0.85
 #define GUN_ENERGY_PIERCE 0.25

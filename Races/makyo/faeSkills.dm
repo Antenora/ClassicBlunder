@@ -77,12 +77,12 @@
 		var/asc = p.AscensionsAcquired
 		if(p.usingStyle("UnarmedStyle"))
 			MakesSword = 0
-			passives = list( "MartialMagic" = 1, "BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list("BurningShot" = (0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			ElementalOffense = "Fire"
 			BurnAffected=5 * asc
 			IconLock = saved_icon
 		else
-			passives = list( "MagicSword" = 1, "BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
+			passives = list("BurningShot"=(0.5 + (0.1 * asc)), "BurnHit" = (2 * asc))
 			SwordAscension = asc
 			SwordAscensionSecond = asc
 			SwordAscensionThird = asc
@@ -228,7 +228,7 @@
 /obj/Skills/Buffs/SlotlessBuffs/Makyo/Fall/Harvest_Time
 	SpdMult=0.25
 	TimerLimit=60
-	passives= list("SlayerMod"=5, "FavoredPrey"= "Human", "GodspeedDisabled"= 1, "Extend" = 1, "Gum Gum" = 1)
+	passives= list("SlayerMod"=5, "FavoredPrey"= "Human", "GodspeedDisabled"= 1)
 	verb/Time_to_Harvest()
 		set category="Skills"
 		src.Trigger(usr)

@@ -189,8 +189,7 @@ proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/p
 	return kk
 
 /datum/beamfx/proc/LitColor()
-	var/list/lc = ramp[1]
-	return list(clamp(lc[1] * 0.85 + 0.15, 0, 1), clamp(lc[2] * 0.85 + 0.15, 0, 1), clamp(lc[3] * 0.85 + 0.15, 0, 1))
+	return
 
 /datum/beamfx/var/ch_c_until = -1
 /datum/beamfx/var/ch_c_nsurge
@@ -198,26 +197,7 @@ proc/BeamFXRimBuild(mob/M, sil_rt, dx, dy, list/col, level, keep, nparts, list/p
 /datum/beamfx/var/ch_t_state = 0
 
 /datum/beamfx/proc/CasterRimX(t, xs)
-	if(isnull(t0)) return 0
-	if(!isnull(release_t) && t >= release_t + 0.14) return 0
-	var/rampv = clamp((t - t0) / 0.06, 0, 1)
-	if(!isnull(release_t) && t >= release_t) rampv *= max(0, 1 - (t - release_t) / 0.1)
-	var/pk = 0
-	for(var/ts in surge_emit)
-		if(t - ts > -0.2 && t - ts < 0.3) pk = max(pk, (2.718281828 ** (-(((t - ts) / 0.07) ** 2))))
-	if(!isnull(xs) && t - xs > -0.2 && t - xs < 0.3) pk = max(pk, (2.718281828 ** (-(((t - xs) / 0.07) ** 2))))
-	return rampv * (1 + 0.45 * pk)
-
-proc/BeamFXSortNums(list/L)
-	var/list/R = L.Copy()
-	for(var/i = 2 to R.len)
-		var/v = R[i]
-		var/j = i - 1
-		while(j >= 1 && R[j] > v)
-			R[j + 1] = R[j]
-			j--
-		R[j + 1] = v
-	return R
+	return 0
 
 /datum/beamfx/proc/ChainFrames(list/objs_, list/vals, loopv = 0)
 	var/list/durs = list()

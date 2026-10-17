@@ -140,7 +140,7 @@ proc/hitApplyShitotsuSansen(mob/target, obj/Skills/Projectile/_Projectile/proj)
 	TimerLimit = 15
 	Cooldown = 45
 	ManaCost = 10
-	passives = list("Deflection" = 3)
+	passives = list("RangedResist" = 2)
 	ActiveMessage = "raises a spinning shield of reiatsu — Bakudō #39: Enkousen!"
 	OffMessage = "releases Enkousen."
 

@@ -107,7 +107,7 @@
 		endAdd=10
 		HealthCut=0.99
 		BuffTechniques=list("/obj/Skills/AutoHit/Night_Guy")
-		passives = list("Sunyata"=3, "Seki"=100, "PUSpike" = 200, "Sekizou" = 1)
+		passives = list("Seki"=100, "PUSpike" = 200, "Sekizou" = 1)
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/GateJort
 	BuffName = "Jort Gate"
 /obj/Skills/AutoHit

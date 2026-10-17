@@ -38,7 +38,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
-	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat", KB_HOLD)
+	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
 	R += new/datum/keyaction("toss",        "Toss",                "Toss",               "V",   "Combat")
 	R += new/datum/keyaction("dragondash",  "Dragon Dash",         "Dragon-Dash",        "Q",   "Combat")
@@ -455,7 +455,6 @@ client/proc/MiscVerbs()
 	if(istype(S, /obj/Skills/Buffs/Styles)) return 0
 	if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous)) return 0
 	if(istype(S, /obj/Skills/Buffs/ActiveBuffs/Ki_Control)) return 0
-	if(istype(S, /obj/Skills/Queue/Finisher)) return 0
 	if(IsCoreSkill(S)) return 0
 	if(!SkillMenuType(S)) return 0
 	return SkillHasSkillVerb(S)
@@ -608,20 +607,21 @@ client/proc/MiscVerbs()
 	if(!L.len) L += "No stat changes."
 	return L
 
-/proc/StyleAddLine(list/L, label, mult)
-	if(!mult || mult == 1) return
-	var/v = round(mult - 1, 0.01)
-	L += "[label]: [v > 0 ? "+" : ""][v]"
+/proc/StyleAddLine(list/L, label, value)
+	if(isnull(value) || value == "") return
+	L += "[label]: [value]"
 
 /obj/Skills/Buffs/NuStyle/BuffBoostLines()
 	var/list/L = ..()
 	var/list/S = list()
-	StyleAddLine(S, "Strength", StyleStr)
-	StyleAddLine(S, "Endurance", StyleEnd)
-	StyleAddLine(S, "Force", StyleFor)
-	StyleAddLine(S, "Speed", StyleSpd)
-	StyleAddLine(S, "Offense", StyleOff)
-	StyleAddLine(S, "Defense", StyleDef)
+	if(length(stage_passives))
+		var/mob/p = StageOwner()
+		if(p && p.StyleBuff != src && applied_stage != StyleStage(p))
+			ApplyStage(StyleStage(p))
+		StyleAddLine(S, "Stage", "[StyleStage(p)] of [StageCount()]")
+		var/nxt = StageNextPotential(p)
+		if(nxt)
+			S += "Next stage at Potential [nxt]"
 	if(S.len)
 		L -= "No stat changes."
 		L += S

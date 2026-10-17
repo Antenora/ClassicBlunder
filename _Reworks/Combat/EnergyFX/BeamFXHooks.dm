@@ -34,7 +34,7 @@
 	return 0
 
 /datum/beam/proc/FxStart(mob/M, obj/Skills/Projectile/Z)
-	return BeamFXStart(src, M, Z)
+	return
 
 /datum/beam/Tick()
 	fx_in_tick = 1
@@ -77,11 +77,9 @@
 	..()
 
 proc/BeamFXSkillColor(obj/Skills/Projectile/Z)
-	var/list/c = EnergyFXSlotRGB(Z.EnergyColorMain, 158)
-	if(c) return c
 	var/art = FxIconPaint(Z.IconLock, "tail")
 	if(!art) art = FxIconPaint(Z.IconLock, "head")
-	c = BeamFXHexRGB(art)
+	var/list/c = BeamFXHexRGB(art)
 	return c ? c : list(0, 0, 0)
 
 proc/BeamFXWidth(datum/beam/B, obj/Skills/Projectile/Z)
@@ -92,17 +90,6 @@ proc/BeamFXWidth(datum/beam/B, obj/Skills/Projectile/Z)
 		if(ch > 2) w = min(1.3 * sqrt(ch / 2), 3)
 	var/sz = (Z && Z.IconSize) ? Z.IconSize : 1
 	return w * sz
-
-proc/BeamFXStart(datum/beam/B, mob/M, obj/Skills/Projectile/Z)
-	beamfx_seed++
-	var/seed = (round(world.time, 1) * 7 + beamfx_seed * 131) % 30000
-	var/datum/beamfx/F = new(BeamFXDirText(B.bdir), 0, 0, M.z, BeamFXWidth(B, Z), seed, BeamFXSkillColor(Z), EnergyFXSlotRGB(Z.EnergyColorCore, 255), EnergyFXSlotRGB(Z.EnergyColorGlow, 158))
-	F.beam = B
-	F.owner = M
-	F.caster_mob = M
-	F.fx_name = Z.name
-	F.logging = glob ? glob.BEAMFX_LOG : 0
-	return F
 
 proc/BeamFXAnchor(datum/beam/B, datum/beamfx/F)
 	if(!B.anchor) return
@@ -200,8 +187,7 @@ proc/BeamFXLumOf(datum/beamfx/F)
 	return F.ClashLum()
 
 /datum/beamfx/proc/ClashLum()
-	var/list/lc = ramp[1]
-	return max(0.05, BeamFXLum(lc))
+	return
 
 proc/BeamFXBeamBlocker(datum/beam/B)
 	var/obj/Skills/Projectile/_Projectile/h = B.HeadPart()

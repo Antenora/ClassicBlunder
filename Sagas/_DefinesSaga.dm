@@ -13,3 +13,10 @@ sagaInfo
     var/list/choicesPaths = list()
     var/list/pathsPicked = list()
 
+
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor
+	AlwaysOn = 1
+	doNotDelete = 1
+	Cooldown = 0
+	Copyable = 0
+	passives = list()

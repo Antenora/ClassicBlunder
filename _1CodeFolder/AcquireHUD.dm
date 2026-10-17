@@ -64,14 +64,6 @@ var/list/AQ_ICON16 = list()
 	I.DrawBox("#28365a", 1, 1, w, h)
 	return I
 
-mob/proc/AqStyleThresholds(t)
-	switch(t)
-		if(1) return glob.progress.T1_STYLES
-		if(2) return glob.progress.T2_STYLES
-		if(3) return glob.progress.T3_STYLES
-		if(4) return glob.progress.T4_STYLES
-	return null
-
 mob/proc/AqSigThresholds(t)
 	switch(t)
 		if(1) return glob.progress.T1_SIGS
@@ -87,11 +79,6 @@ mob/proc/AqSlotsPassed(list/L)
 	return n
 
 // saga characters use the saga signature system; mainframes keep cyber sigs
-mob/proc/AqStylePicksLeft(t)
-	if(Saga) return 0
-	if(CyberneticMainframe && t >= 3) return 0
-	return max(0, AqSlotsPassed(AqStyleThresholds(t)) - CountStyles(t))
-
 mob/proc/AqSigPicksLeft(t)
 	if(Saga) return 0
 	if(CyberneticMainframe) return 0
@@ -106,7 +93,7 @@ mob/proc/AqNextPickPot(list/L, used)
 /proc/AqStyleCategory(obj/Skills/Buffs/NuStyle/S)
 	if(istype(S, /obj/Skills/Buffs/NuStyle/UnarmedStyle)) return /obj/Skills/Buffs/NuStyle/UnarmedStyle
 	if(istype(S, /obj/Skills/Buffs/NuStyle/SwordStyle)) return /obj/Skills/Buffs/NuStyle/SwordStyle
-	if(istype(S, /obj/Skills/Buffs/NuStyle/MysticStyle)) return /obj/Skills/Buffs/NuStyle/MysticStyle
+	if(istype(S, /obj/Skills/Buffs/NuStyle/EnergyStyle)) return /obj/Skills/Buffs/NuStyle/EnergyStyle
 	if(istype(S, /obj/Skills/Buffs/NuStyle/GunStyle)) return /obj/Skills/Buffs/NuStyle/GunStyle
 	return /obj/Skills/Buffs/NuStyle
 
@@ -114,30 +101,9 @@ mob/proc/AqNextPickPot(list/L, used)
 	switch(cat)
 		if(/obj/Skills/Buffs/NuStyle/UnarmedStyle) return "Unarmed"
 		if(/obj/Skills/Buffs/NuStyle/SwordStyle) return "Sword"
-		if(/obj/Skills/Buffs/NuStyle/MysticStyle) return "Elemental"
+		if(/obj/Skills/Buffs/NuStyle/EnergyStyle) return "Energy"
 		if(/obj/Skills/Buffs/NuStyle/GunStyle) return "Gun"
 	return "Any"
-
-mob/proc/AqT4Ready(obj/Skills/Buffs/NuStyle/T)
-	if(!T) return 0
-	var/cat = AqStyleCategory(T)
-	for(var/obj/Skills/Buffs/NuStyle/s in src)
-		if(istype(s, cat) && s.SignatureTechnique >= 3)
-			return 1
-	return 0
-
-// something in a T4 bucket is actually pickable (for the meditate reminder)
-mob/proc/AqAnyT4StylePickable()
-	for(var/key in list("UnarmedStylesT4", "SwordStylesT4", "HybridStylesT4", "ElementalStylesT4"))
-		var/list/bucket = SkillTree[key]
-		if(!bucket) continue
-		for(var/pathtext in bucket)
-			var/obj/Skills/Buffs/NuStyle/T = AqTemplate(pathtext)
-			if(!T || !istype(T)) continue
-			if(locate(T.type) in src) continue
-			if(T.name in SignatureSelected) continue
-			if(AqT4Ready(T)) return 1
-	return 0
 
 mob/proc/AqMissingPrereqs(obj/Skills/s)
 	if(!s || !s.PreRequisite || !s.PreRequisite.len) return null
@@ -631,137 +597,55 @@ client/proc/AqAddBuyable(pathtext, cost, kind)
 				E.right_col = (mob.GetRPPSpendable() >= cost) ? AQ_C_COST : AQ_C_NOFUND
 	aq_entries += E
 
-// recipe sublines
-client/proc/AqAddRecipes(obj/Skills/Buffs/NuStyle/T)
-	if(!T || !T.StyleComboUnlock) return
-	for(var/px in T.StyleComboUnlock)
-		var/partnertext = "[px]"
-		var/resulttext = "[T.StyleComboUnlock[px]]"
-		var/checktext = partnertext
-		if(findtext(partnertext, "/_Any"))
-			checktext = copytext(partnertext, 1, findtext(partnertext, "/_Any"))
-		var/ptype = text2path(checktext)          // for _Any this is the category parent
-		var/rtype = text2path(resulttext)
-		if(!ptype || !rtype) continue
-		var/datum/aqentry/E = new
-		E.kind = "recipe"
-		E.path = resulttext
-		var/powned = 0
-		if(findtext(partnertext, "/_Any"))
-			var/obj/Skills/rT = AqTemplate(resulttext)
-			if(rT)
-				for(var/obj/Skills/Buffs/NuStyle/style in mob)
-					if(istype(style, ptype) && style.SignatureTechnique >= rT.SignatureTechnique - 1)
-						powned = 1
-						break
-		else if(locate(ptype) in mob)
-			powned = 1
-		var/pcol = powned ? AQ_C_OWNED : AQ_C_HINT
-		var/rcol = (locate(rtype) in mob) ? AQ_C_OWNED : AQ_C_HINT
-		E.name = "&#160;&#160;&#160;&#160;+ <span style=\"color:[pcol]\">[AqNiceName(partnertext)]</span>  =  <span style=\"color:[rcol]\">[AqNiceName(resulttext)]</span>"
-		E.name_col = AQ_C_HINT
-		aq_entries += E
-
 client/proc/AqAddStageLine(pathtext)
 	var/p = text2path("[pathtext]")
 	if(!p) return
 	var/obj/Skills/Buffs/NuStyle/S = locate(p) in mob
 	if(!istype(S) || !length(S.stage_passives)) return
 	var/nxt = S.StageNextPotential(mob)
+	if(!nxt) return
 	var/datum/aqentry/E = new
 	E.kind = "recipe"
 	E.path = "[pathtext]"
-	E.name = "&#160;&#160;&#160;&#160;Stage [S.StyleStage(mob)] of [length(S.stage_passives)][nxt ? ", next at Potential [nxt]" : ""]"
+	E.name = "&#160;&#160;&#160;&#160;next at Potential [nxt]"
 	E.name_col = AQ_C_HINT
 	aq_entries += E
 
-client/proc/AqAddComboStyle(pathtext, tier)
+client/proc/AqAddStyleRow(pathtext, cost, chosen)
+	if(!chosen)
+		AqAddBuyable(pathtext, cost, "style")
+		return
 	var/obj/Skills/T = AqTemplate(pathtext)
 	if(!T) return
 	var/datum/aqentry/E = new
-	E.kind = "combo"
+	E.kind = "style"
 	E.path = "[pathtext]"
-	E.pick_tier = tier
+	E.cost = cost
 	E.name = AqNiceName(pathtext)
 	E.icn = AqIcon16(T)
-	if(locate(T.type) in mob)
+	var/obj/Skills/Buffs/NuStyle/S = locate(T.type) in mob
+	if(istype(S))
 		E.name_col = "#cfe3f5"
-		E.right = "OWNED"
+		E.right = "Stage [S.StyleStage(mob)] of [S.StageCount()]"
 		E.right_col = AQ_C_OWNED
 	else
-		var/unlocked
-		if(tier >= 4)
-			unlocked = mob.AqT4Ready(T) && !(T.name in mob.SignatureSelected)
-		else
-			unlocked = (T.name in mob.SignatureStyles) && !(T.name in mob.SignatureSelected)
-		var/left = mob.AqStylePicksLeft(tier)
-		var/smissing = (unlocked && left > 0) ? mob.AqMissingPrereqs(T) : null
-		if(unlocked && left > 0 && smissing)
-			E.name_col = AQ_C_LOCKED
-			E.right = "LOCKED"
-			E.right_col = AQ_C_NOFUND
-			E.lock_reason = "You still need to learn [smissing] first."
-		else if(unlocked && left > 0)
-			E.can_pick = 1
-			E.name_col = AQ_C_NAME
-			E.right = "PICK"
-			E.right_col = AQ_C_COST
-		else if(unlocked)
-			E.name_col = "#cfe3f5"
-			E.right = "UNLOCKED"
-			E.right_col = AQ_C_COMBO
-			if(mob.Saga)
-				E.lock_reason = "Saga characters develop saga styles and signatures instead of standard picks."
-			else if(mob.CyberneticMainframe && tier >= 3)
-				E.lock_reason = "Cybernetic Mainframes cannot take Tier [tier] style picks."
-			else
-				var/np = mob.AqNextPickPot(mob.AqStyleThresholds(tier), mob.CountStyles(tier))
-				E.lock_reason = np ? "You've unlocked [E.name], your next Tier [tier] style pick comes at Potential [np]." : "You've unlocked [E.name], but no Tier [tier] style picks remain."
-		else
-			E.name_col = "#cfe3f5"
-			E.right_col = AQ_C_COMBO
-			if(tier >= 4)
-				E.right = "NEEDS T3"
-				E.lock_reason = "Requires any Tier 3 [AqStyleCategoryName(AqStyleCategory(T))] style first."
-			else
-				E.right = "VIA COMBO"
-				E.lock_reason = "Combine the listed styles to unlock [E.name], then pick it here once you reach the potential threshold."
+		E.name_col = AQ_C_LOCKED
+		E.right = "LOCKED"
+		E.right_col = AQ_C_NOFUND
+		E.lock_reason = "You have chosen your style."
 	aq_entries += E
-	if(tier >= 4 && istype(T, /obj/Skills/Buffs/NuStyle))   // synthetic requirement line (T4 has no recipe data)
-		var/datum/aqentry/R = new
-		R.kind = "recipe"
-		R.path = "[pathtext]"
-		var/pcol2 = mob.AqT4Ready(T) ? AQ_C_OWNED : AQ_C_HINT
-		var/rcol2 = (locate(T.type) in mob) ? AQ_C_OWNED : AQ_C_HINT
-		R.name = "&#160;&#160;&#160;&#160;+ <span style=\"color:[pcol2]\">Any Tier 3 [AqStyleCategoryName(AqStyleCategory(T))] Style</span>  =  <span style=\"color:[rcol2]\">[E.name]</span>"
-		R.name_col = AQ_C_HINT
-		aq_entries += R
-	AqAddRecipes(T)
+	AqAddStageLine(pathtext)
 
 client/proc/AqBuildStylesTab()
-	for(var/obj/Skills/Buffs/NuStyle/os in mob)   // refresh combo unlocks so new picks show without a meditate
-		mob.StyleUnlock(os)
-	var/pline = "STYLE PICKS"
-	for(var/t = 1 to 4)
-		pline += "  &#183;  T[t] [mob.CountStyles(t)]/[mob.AqSlotsPassed(mob.AqStyleThresholds(t))]"
-	AqHeader(pline)
-	var/list/fams = list("UNARMED" = "UnarmedStyles", "ELEMENTAL" = "ElementalStyles", "SWORD" = "SwordStyles", "HYBRID" = "HybridStyles", "GUN" = "GunStyles")
+	var/list/fams = list("UNARMED" = "UnarmedStyles", "SWORD" = "SwordStyles", "ENERGY" = "EnergyStyles", "GUN" = "GunStyles")
+	var/chosen = mob.RosterStyleOwned() ? 1 : 0
 	for(var/famname in fams)
 		var/basekey = fams[famname]
 		AqHeader("[famname] STYLES")
 		var/list/base = SkillTree[basekey]
 		if(base)
 			for(var/pathtext in base)
-				AqAddBuyable(pathtext, SkillTree[basekey][pathtext], "style")
-				AqAddStageLine(pathtext)
-				var/obj/Skills/T = AqTemplate(pathtext)
-				if(istype(T, /obj/Skills/Buffs/NuStyle)) AqAddRecipes(T)
-		for(var/t = 1 to 4)
-			var/list/bucket = SkillTree["[basekey]T[t]"]
-			if(!bucket || !bucket.len) continue
-			for(var/pathtext in bucket)
-				AqAddComboStyle(pathtext, t)
-	AqNote("ADVANCED STYLES UNLOCK THROUGH COMBINATIONS - PICK THEM HERE AT EACH POTENTIAL THRESHOLD")
+				AqAddStyleRow(pathtext, SkillTree[basekey][pathtext], chosen)
 
 client/proc/AqSigOwned(entryval)
 	var/firsttext = istext(entryval) ? entryval : (length(entryval) ? entryval[1] : null)
@@ -1097,6 +981,9 @@ client/proc/AqFinalizeBuyInner(datum/aqentry/E)
 		M << "You've already learned [s]."
 		del s
 		return
+	if(M.StyleLockRefuses(s))
+		del s
+		return
 	var/bypass = (M.Saga == "Weapon Soul" && s.NeedsSword)
 	if((s.type in M.SkillsLocked) && !bypass)
 		M << "You cannot buy [s] because it is a prerequisite to a skill that you've already upgraded!"
@@ -1139,71 +1026,41 @@ client/proc/AqFinalizePickInner(datum/aqentry/E)
 	if(!mob || !E || !E.can_pick) return
 	var/mob/M = mob
 	var/t = E.pick_tier
-	if(E.kind == "combo")                     // advanced style pick
-		if(M.AqStylePicksLeft(t) < 1)
-			M << "You don't have a Tier [t] style pick available."
+	if(M.AqSigPicksLeft(t) < 1)
+		M << "You don't have a Tier [t] signature pick available."
+		return
+	if(E.name in M.SignatureSelected)     // a pick stays burned even if the skill was later removed
+		M << "You've already used a pick on [E.name]."
+		return
+	if(!E.paths || !E.paths.len) return
+	var/list/toadd = list()               // validate everything before granting anything
+	for(var/ct in E.paths)
+		var/p2 = text2path("[ct]")
+		if(!p2) continue
+		if(locate(p2) in M)
+			M << "You've already learned [AqNiceName("[ct]")]."
+			while(toadd.len)
+				var/obj/Skills/junk = toadd[toadd.len]
+				toadd.len--
+				del junk
 			return
-		var/p = text2path("[E.path]")
-		if(!p) return
-		if(locate(p) in M)
-			M << "You already know [E.name]."
+		var/obj/Skills/s2 = new p2
+		var/missing2 = M.AqMissingPrereqs(s2)
+		if(missing2)
+			M << "You do not meet the requirements for [s2]. You still need to learn [missing2]."
+			del s2
+			while(toadd.len)
+				var/obj/Skills/junk = toadd[toadd.len]
+				toadd.len--
+				del junk
 			return
-		var/obj/Skills/Buffs/NuStyle/s = new p
-		var/sunlocked
-		if(t >= 4)                            // T4 interim gate: any T3 style of the same category
-			sunlocked = M.AqT4Ready(s) && !(s.name in M.SignatureSelected)
-		else
-			sunlocked = (s.name in M.SignatureStyles) && !(s.name in M.SignatureSelected)
-		if(!sunlocked)
-			M << "[s] isn't unlocked for picking yet."
-			del s
-			return
-		var/missing = M.AqMissingPrereqs(s)
-		if(missing)
-			M << "You do not meet the requirements for [s]. You still need to learn [missing]."
-			del s
-			return
-		M.AddSkill(s)
-		var/Name = s.SignatureName ? s.SignatureName : s.name
+		toadd += s2
+	if(!toadd.len) return
+	for(var/obj/Skills/s3 in toadd)
+		M.AddSkill(s3)
+		var/Name = s3.SignatureName ? s3.SignatureName : s3.name
 		M.SignatureSelected.Add("[Name]")
-		s.SignatureTechnique = t
-		M << "<font color=#78eb78>You obtained [s]!</font>"
-	else                                      // signature pick (single or bundle)
-		if(M.AqSigPicksLeft(t) < 1)
-			M << "You don't have a Tier [t] signature pick available."
-			return
-		if(E.name in M.SignatureSelected)     // a pick stays burned even if the skill was later removed
-			M << "You've already used a pick on [E.name]."
-			return
-		if(!E.paths || !E.paths.len) return
-		var/list/toadd = list()               // validate everything before granting anything
-		for(var/ct in E.paths)
-			var/p2 = text2path("[ct]")
-			if(!p2) continue
-			if(locate(p2) in M)
-				M << "You've already learned [AqNiceName("[ct]")]."
-				while(toadd.len)
-					var/obj/Skills/junk = toadd[toadd.len]
-					toadd.len--
-					del junk
-				return
-			var/obj/Skills/s2 = new p2
-			var/missing2 = M.AqMissingPrereqs(s2)
-			if(missing2)
-				M << "You do not meet the requirements for [s2]. You still need to learn [missing2]."
-				del s2
-				while(toadd.len)
-					var/obj/Skills/junk = toadd[toadd.len]
-					toadd.len--
-					del junk
-				return
-			toadd += s2
-		if(!toadd.len) return
-		for(var/obj/Skills/s3 in toadd)
-			M.AddSkill(s3)
-			var/Name = s3.SignatureName ? s3.SignatureName : s3.name
-			M.SignatureSelected.Add("[Name]")
-			M << "<font color=#78eb78>You obtained [s3]!</font>"
+		M << "<font color=#78eb78>You obtained [s3]!</font>"
 	if(aqmenu_open)
 		AqBuildEntries()
 		RefreshAcquireRows()

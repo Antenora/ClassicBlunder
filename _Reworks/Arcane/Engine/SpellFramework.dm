@@ -12,6 +12,7 @@ mob/var/tmp
 	combat_until = 0
 	mob/last_struck
 	mob/last_struck_by
+	last_melee_hit = 0
 
 globalTracker/var
 	COMBAT_WINDOW = 100
@@ -146,6 +147,7 @@ mob/proc/SpellPrimed(obj/Skills/S)
 mob/proc/OnSpellCast(obj/Skills/S)
 	if(!S) return
 	GunSpellCast(S)
+	SpellEdgeStamp(S)
 	MarkCombat()
 	TomeFlip()
 	var/spawn_now = 1
@@ -159,6 +161,15 @@ mob/proc/OnSpellCast(obj/Skills/S)
 		if(S.HeldSkill) held_circle = C
 	if(S.SpellElement == "Fire" && guardian && (S.SpellShape == "line" || S.SpellShape == "projectile"))
 		GuardianCommand()
+
+mob/proc/SpellEdgeStamp(obj/Skills/S)
+	return
+
+mob/proc/SpellEdgeApply(mob/victim, sword_hit)
+	return
+
+mob/proc/ChainCastSkip(obj/Skills/S)
+	return 0
 
 mob/proc/FireKOHook(mob/P)
 	var/strike/S = new(P, src, 0)

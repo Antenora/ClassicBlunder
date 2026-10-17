@@ -2,73 +2,6 @@
 mob/var/tmp
 	queue_tell_aura = 0
 	queue_counter_until = 0
-	hs_key_down = 0
-
-mob/Players/verb/Heavy_Strike_up()
-	set hidden = 1
-	set instant = 1
-	src.hs_key_down = 0
-
-//tension-full finisher dispatch, pulled out of the Heavy Strike verb so tap/hold can reuse it
-//returns 1 when it consumed the press (fired OR full-but-blocked), 0 when tension isn't full
-mob/proc/FireFinisher(force = 0)
-	var/maxTension = getMaxTensionValue()
-	if(Tension < maxTension)
-		return 0
-	if(HasTensionLock())
-		return force ? 0 : 1
-	if(AttackQueue && !force)
-		return 1
-	// firing consumes ALL stored tension regardless of stage reached
-	var/finstage = 1
-	if(StyleBuff && StyleBuff.FinisherStage > 1)
-		finstage = min(round(Tension / maxTension), StyleBuff.FinisherStage)
-	Tension = 0
-	if(Secret=="Spiral"&&CheckSlotless("Evolution Power"))
-		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in src)
-			if(!ae.SlotlessOn)
-				ae.Trigger(src)
-		for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in src)
-			if(!sge.SlotlessOn)
-				sge.Trigger(src)
-	tryIncreaseTension()
-	if(StyleBuff?.Finisher)
-		var/path = StyleBuff.Finisher
-		if(finstage >= 2 && StyleBuff.Finisher2)
-			path = StyleBuff.Finisher2
-		if(finstage >= 3 && StyleBuff.Finisher3)
-			path = StyleBuff.Finisher3
-		if(!ispath(path))
-			path = text2path(path)
-		if(path && !ispath(path, /obj/Skills/Queue))
-			var/obj/Skills/F
-			if(!locate(path, src))
-				F = new path
-				AddSkill(F)
-			else
-				F = FindSkill(path)
-			if(F)
-				F.adjust(src)
-				FinisherFire(F)
-			return 1
-		var/obj/Skills/Queue/q
-		if(!locate(path, src))
-			q = new path
-			AddSkill(q)
-		else
-			q = FindSkill(path)
-		q.adjust(src)
-		SetQueue(q, TRUE)
-	else
-		SetQueue(new/obj/Skills/Queue/Finisher/Generic_Finisher, TRUE)
-	return 1
-
-mob/proc/FinisherFire(obj/Skills/S)
-	if(istype(S, /obj/Skills/Projectile))
-		return UseProjectile(S, TRUE)
-	if(istype(S, /obj/Skills/AutoHit))
-		return Activate(S, TRUE, TRUE, TRUE)
-	return 0
 
 obj
 	Skills
@@ -98,6 +31,8 @@ obj
 			var/Counter//guess
 			var/CounterTemp//from coutnermaster
 			var/NoWhiff //guess
+			var/tmp/unparryable = 0
+			var/tmp/energy_free = 0
 			var/PrecisionStrike//attack only what you want to
 			var/SpeedStrike/*Passive that multiplies damage by speed mod.  1 = 0.5 speed, 2 = full speed.*/
 			var/SweepStrike/*Passive that multiplies damage by enemy's speed.  Reverse Speed Strike!*/
@@ -231,634 +166,6 @@ obj
 //Autoqueues
 
 ////General
-			Finisher
-				canBeShortcut=0;
-				Duration=5
-				Instinct=4
-				DamageMult=1
-				AccuracyMult=2
-				KBMult=0.001
-				Decider=1
-				Instinct=4
-				Finisher=1
-				Rapid=1
-				Warp=3
-				PushOut=2
-				PushOutWaves=3
-				PushOutIcon='fevKiai.dmi'
-				BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Generic_Finisher"
-				HitMessage="strikes their opponent with a powerful blow!"
-				Generic_Finisher
-					name="Finishing Blow"
-
-				Cycle_of_Samsara
-					adjust(mob/p)
-						switch(Mastery)
-							if(0)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Naraka"
-							if(1)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Preta"
-							if(2)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Tiryag"
-							if(3)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Asura"
-							if(4)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Mansuya"
-							if(5)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Deva"
-							if(6)
-								BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/Buddha"
-							if(7)
-								BuffSelf=null
-					Warp = 10
-					Instinct = 2
-					PushOut=1
-					PushOutWaves=1
-					Decider = 4
-					DamageMult=1
-					KBAdd = 0.01
-					InstantStrikes=4
-					HitMessage="Strikes with their Palm, opening their own Meridians!"
-
-				Iron_Fortress
-					Shattering=20
-					DamageMult=3
-					FollowUp="/obj/Skills/AutoHit/Shatter_Shell"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Turtle_Martial_Mastery"
-					HitMessage="slams the full weight of their body into the opponent in a shoulder check!"
-				Fire_Dancer
-					DamageMult=2
-					KBAdd=5
-					KBMult=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Crane_Martial_Mastery"
-					FollowUp="/obj/Skills/Projectile/Phoenix_Flares"
-					HitMessage="turns on their heel, sending the enemy skyward with a reverse rising kick!"
-				Dragon_Falls
-					DamageMult=1.5
-					Grapple=1
-					KBMult=0.001
-					FollowUp="/obj/Skills/Grapple/Snake_Fang_Bites"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Snake_Martial_Mastery"
-					HitMessage="swings low and hooks the opponent into the air by the neck!"
-				Hungry_Fang
-					Stunner=1
-					DamageMult=2.5
-					FollowUp="/obj/Skills/AutoHit/Cat_Claw_Rush"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Cat_Martial_Mastery"
-					HitMessage="delivers a brutal overhand swipe with a raking claw!"
-
-				//t1 signature styles
-				Eight_Trigrams
-					Combo=8
-					DamageMult=0.75
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ki_Flow_Mastery"
-					HitMessage="spins around their victim, striking endless pressure points in succession!"
-				Rising_Wind
-					KBMult=2
-					KBAdd=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Body_Mastery"
-					HitMessage="carries their opponent through a brutal haymaker!"
-					FollowUp="/obj/Skills/AutoHit/Strongest_Fist"
-				Rolling_Sobat
-					Warp=5
-					Paralyzing=10
-					Crippling=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Rush_Mastery"
-					HitMessage="cuts in with a smooth rolling kick to the side!"
-					FollowUp="/obj/Skills/AutoHit/Blitz_Rush"
-
-				//t2 signature styles
-				Tetsuzankou
-					DamageMult=3
-					SoftStyle=2
-					FollowUp="/obj/Skills/AutoHit/Drunken_Crash"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Drunken_Mastery"
-					HitMessage="slides in with unnatural grace, delivering a bone crushing shoulder check!"
-				Galactica_Phantom
-					DamageMult=3
-					HardStyle=2
-					HitMessage="launches an earth-shattering, explosive clothesline!"
-					FollowUp="/obj/Skills/AutoHit/Galaxy_Clothesline"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Strength_Mastery"
-				Spiral_Fang
-					DamageMult=2.5
-					HardStyle=1.5
-					HitMessage="drives their opponent into the ground with a twisting slam attack!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Dire_Empowerment"
-				Astral_Shot
-					DamageMult=2.5
-					HitMessage="lands a brutal orbital kick, draining some of the victim's life from the impact!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Astral_Empowerment"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Astral_Drain"
-				Immortal_Change
-					Paralyzing=50
-					Scorching=50
-					Freezing=50
-					Crushing=50
-					HitMessage="unleashes a sphere of pure elemental chaos around them, and rams it into their foe!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Chaos_Empowerment"
-				Maiden_Masher
-					DamageMult=3
-					HitMessage="unleashes their wrath on the opponent, engulfing them in an explosive wave of dark flame!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Devil_Luck"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Devil_Fire"
-
-				Morbid_Angel
-					DamageMult=3
-					Launcher=3
-					HitMessage="leaps onto their enemy's shoulders, gouging their throat with deadly venom!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Death_Mastery"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Bio_Break"
-
-				//t1 sig styles
-				Ray_Divider
-					DamageMult=2
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Forced_Mechanize"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Cyber_Crusher"
-					HitMessage="launches a magic-powered strike that magnetically charges the enemy!"
-				Badlands
-					DamageMult=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Toxic_Crash"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Venom_Break"
-					HitMessage="digs their venom deep into the flesh of their victim, forcing them to suffer..."
-				Crimson_Star_Road
-					DamageMult=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Corona_Splash"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Solar_Break"
-					HitMessage="slides coolly past the opponent, before a string of explosions lights them up!"
-				Surprise_Rose
-					DamageMult=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Stillness"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Anger_Break"
-					HitMessage="leaps towards the opponent, mocking them with repeated stomps from above!"
-
-				Challenge
-					Warp=10
-					DamageMult = 2
-					KBMult=0.001
-					Instinct = 1
-					FollowUp="/obj/Skills/Queue/Finisher/Duel"
-					HitMessage="darts at their enemy!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Champion_Pride"
-
-				Mist_Finer
-					Warp=10
-					FollowUp="/obj/Skills/Queue/Finisher/Drawing_Mist"
-					HitMessage="strikes out with such speed and precision that their blade disappears!"
-				Drawing_Mist
-					Warp=10
-					DamageMult=3
-					SpeedStrike=4
-					HitMessage="draws their blade back in from the dispersed mist!"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Off_Balance"
-					BuffSelf=0
-				Vicious_Moon
-					Counter=1
-					Stunner=2
-					FollowUp="/obj/Skills/AutoHit/Blooming_Moon"
-					HitMessage="carves a crescent through their foolish victim!"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Attack_Break"
-					BuffSelf=0
-				Soul_Survivor
-					Warp=10
-					Instinct=1
-					KBMult=0.001
-					FollowUp="/obj/Skills/AutoHit/Divide_Effect"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Overwhelmed"
-					HitMessage="carves through the earth, destroying everything between them and their foe!"
-					BuffSelf=0
-				Hammer_Fall
-					Counter=1
-					Grapple=1
-					KBMult=0.001
-					FollowUp="/obj/Skills/Grapple/Hammer_Crush"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Debilitated"
-					HitMessage="presses their powerful grip around both sides of the helpless foe!"
-					BuffSelf=0
-
-				//tier 1 sig styles
-
-				Behemoth_Typhoon
-					WeaponBreaker = 2
-					Crushing = 20
-					Finisher = 1
-					DamageMult = 1
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Arena_Champion"
-					HitMessage="flies forward in a whirlwind of piercing blades!"
-					FollowUp="/obj/Skills/AutoHit/Giga_Impact"
-				Geo_de_Ray
-					DamageMult=2
-					Warp=10
-					Crippling=10
-					SpeedStrike=1
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Dual_Break"
-					HitMessage="flies forward in a whirlwind of piercing blades!"
-					FollowUp="/obj/Skills/Queue/Finisher/Dual_Flurry"
-					BuffSelf=0
-				Dual_Flurry
-					Combo=20
-					DamageMult=0.5
-					PushOutWaves=0
-					HitMessage="rips through their opponent with countless slashes!"
-					IconLock='CircleWind.dmi'
-					LockX=-32
-					LockY=-32
-					BuffSelf=0
-				Ichimonji
-					DamageMult=2
-					KBMult=0.0001
-					FollowUp="/obj/Skills/AutoHit/Flowing_Slash_Follow_Up"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Technique_Break"
-					HitMessage="'s step is fluid and calm, landing a single, staggering overhead strike!"
-					BuffSelf=0
-				Flying_Barcelona
-					Warp=10
-					Grapple=1
-					KBMult=0.001
-					GrabTrigger="/obj/Skills/Grapple/Sword/Butterfly_Souffle"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Desiccated"
-					HitMessage="soars through the air to their opponent with blade out, seizing them from a blind spot!"
-					BuffSelf=0
-				Manji_Flip
-					Warp=10
-					Launcher=5
-					DamageMult=3
-					FollowUp="/obj/Skills/AutoHit/Whirlwind_Handstand"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Feral_Fear"
-					HitMessage="performs an uncanny acrobatic strike, rocketing their foe upwards!"
-					BuffSelf=0
-
-				//t2 sig style
-				Shield_Vault
-					Warp = 20 // just jump to tht guy
-					Stunner = 5
-					InstantStrikes = 4
-					HitMessage="leaps onto their target with their shield before delivering an onslaught of slashes with their spear!"
-					FollowUp="/obj/Skills/AutoHit/Comet_Spear"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Mortal_Will"
-					DamageMult = 1
-
-
-				Ogre_Cutter
-					DamageMult=5
-					Warp=10
-					Crippling=20
-					HitMessage="carves out with all three blades, leaving devastation in their wake!"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Tri_Break"
-					FollowUp="/obj/Skills/Projectile/Oni_Giri"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Trinity_Mastery"
-				Crimson_Fountain
-					DamageMult=5
-					KBMult=2
-					Shearing=20
-					FollowUp="/obj/Skills/Projectile/Devil_Divide"
-					HitMessage="drives their bare fist into the enemy's chest, then hurls them away like trash!"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Impaled"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Maim_Mastery"
-				Sacred_Edge
-					DamageMult=3
-					HitMessage="drives a colossal shard of concentrated mana into the foe point-blank!"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Mana_Break"
-					BuffSelf=0
-				Absolute_Truth
-					DamageMult=1
-					Warp=10
-					FollowUp="/obj/Skills/AutoHit/Stop_Effect"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Evasion_Negation"
-					HitMessage="drives their staff into the ground, letting out a pulse of sealing force!"
-					BuffSelf=0
-
-
-				Shield_Bash
-					DamageMult=3
-					KBAdd = 5
-					Stunner = 5
-					Crippling = 50
-
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Bashing"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Stumbling"
-					HitMessage="bashes their shield against their target, sending them stumbling!"
-
-				Berserker_Claw
-					DamageMult=3
-					Warp=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Bestial_Accuracy"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Locked_On"
-					HitMessage="is gone in an instant, appearing behind their target for a vicious attack!"
-				Evac_Toss
-					DamageMult=2
-					Counter=1
-					Launcher=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Martial_Flow"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Disoriented"
-					HitMessage="uses their opponent's momentum, effortlessly launching them skyward!"
-				Armor_Piercer
-					DamageMult=3
-					WeaponBreaker=1.5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Anti_Material_Augment"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Broken_Bones"
-					HitMessage="tears through the enemy's defense with a driving body blow!"
-				Riot_Stamp
-					DamageMult=1.5
-					KBMult=2
-					KBAdd=5
-					Launcher=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Speed_Break"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Slow_Motion"
-					HitMessage="hops back, then leaps in to stomp their opponent into the floor!"
-
-				//t1 sig styles
-				Impact_Palm
-					KBAdd=10
-					DamageMult=1.5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Sure_Shot"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
-					HitMessage="breaks their enemy's defenses by shattering their aura with a swift energized palm!"
-				Superbia
-					KBMult=0.01
-					Crippling=10
-					DamageMult=1.5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Seeking_Spirits"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Traced"
-					HitMessage="'s fist surge with power as they plunge into the enemy's aura, halting them in place!"
-				Turn_of_Fortune
-					DamageMult=3
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Ineffective_Fate"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Fortunate_Fate"
-					HitMessage="gracefully spins around their foe's flank, landing precision strikes along the way!"
-				Chemical_Love
-					DamageMult=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Speed_of_Sound"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Shattered"
-					HitMessage="'s perfect chord sends a razor-sharp soundwave through the opponent's body!"
-
-				//t2 sig style
-				Raioken
-					InstantStrikes=10
-					InstantStrikesDelay=1
-					DamageMult=0.25
-					HitMessage="unleashes a barrage of countless fists!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Flash_Cry"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Slow_Motion"
-				Karaniyam
-					DamageMult=2.5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/What_Must_Be_Done"
-					HitMessage="chants a line of prayer!"
-				Bicycle_Kick
-					DamageMult=2.5
-					HitMessage="spikes their opponent into the air before battering them with rapid kicks!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Self_Mastery"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Self_Shattered"
-				Centifoila
-					InstantStrikes=10
-					InstantStrikesDelay=1
-					DamageMult=0.25
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Dance_Mastery"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Ineffective_Fate"
-
-				//t3 sig style
-				Pressure_Point
-					Stunner=3
-					Launcher=3
-					DamageMult=2
-					HitMessage="locks their opponent's body up by striking a pressure point in their chest!"
-					FollowUp="/obj/Skills/Queue/Hokuto_Hyakuretsu_Ken"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/North_Strength"
-
-				Imperial_Assessment
-					NoWhiff=1
-					NoForcedWhiff=1
-					CursedWounds=1
-					DamageMult=3
-					Grapple=1
-					HitMessage="takes a measure of their opponent, before discarding them as worthless!"
-					BuffSelf=0
-					FollowUp="/obj/Skills/Grapple/Imperial_Disgust"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Useless"
-
-				Over_The_Horizon
-					DamageMult=2
-					Launcher=3
-					HitMessage="shoots their opponent into the sky on a sudden whirlwind! They're on someone else's turf now!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/East_Strength"
-
-				Atomic_Split
-					DamageMult=3
-					Crippling=10
-					HitMessage="punts their opponent up into the air!"
-					FollowUp="/obj/Skills/AutoHit/Atomic_Crush"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Radioactive"
-					BuffSelf=0
-
-				Ashura_Kai
-					DamageMult=1
-					InstantStrikes=10
-					InstantStrikesDelay=1.5
-					HitSparkIcon='Slash - Ragna.dmi'
-					HitSparkX=-32
-					HitSparkY=-32
-					HitSparkTurns=1
-					HitMessage="expresses the mastery of a war god by casting innumerable strikes in an instant!"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/War_God"
-
-				Journey_End
-					DamageMult=1
-					KBMult=0.001
-					Crippling=20
-					HitMessage="delivers a perfectly smooth blow to the enemy's sternum ... But that's not all ..."
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Flowing_River"
-
-				Death_Rattle
-					DamageMult=1
-					KBMult=0.001
-					Crippling=20
-					HitMessage="pauses in their rhythm ... The silence seems to stretch forever."
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Moelach_Weezing"
-					FollowUp="/obj/Skills/Projectile/Warsong_Finale"
-					BuffSelf=0
-
-				Skyward_Strike
-					Stunner=3
-					Launcher=3
-					DamageMult=2
-					KBAdd=5
-					KBMult=0.000001
-					HitMessage="sends their opponent airbourne with an upwards strike!"
-					FollowUp="/obj/Skills/AutoHit/Tensho_Juji_Ho"
-					BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/South_Break"
-					BuffSelf=0
-
-				//Ansatsuken Finisher
-				Isshin
-					DamageMult=3
-					Counter=1
-					Stunner=5
-					KBMult=4
-					KBAdd=5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Hado_Kakusei"
-					FollowUp="/obj/Skills/Projectile/Hadoken_Effect"
-
-				Shin_Shoryuken
-					StyleNeeded="Ansatsuken"
-					HitMessage="shouts '<b>SHIN...</b>' as they strike their opponent with a rising blow!!!"
-					DamageMult=4
-					AccuracyMult = 1.25
-					KBMult=0.00001
-					PushOut=3
-					AllOutAttack=1
-					Instinct=4
-					Stunner=3
-					Duration=10
-					Rapid=1
-					HitStep=/obj/Skills/Queue/Finisher/Shin_Shoryuken2
-
-
-				Shin_Shoryuken2
-					StyleNeeded="Ansatsuken"
-					HitMessage="shouts '<b>SHORYUKEN!</b>' as they spike their opponent into the heavens with a divine uppercut!!!"
-					DamageMult=6
-					AccuracyMult = 1.25
-					KBMult=0.00001
-					Duration=5
-					Warp=5
-					Instinct=4
-					Launcher=3
-					ShoryukenEffect=2
-					Shattering=30
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Heat_Rush"
-
-				Shoryureppa1
-					DamageMult=7
-					name="Shoryureppa"
-					HitStep=/obj/Skills/Queue/Finisher/Shoryureppa2
-					ShoryukenEffect=0.5
-					AccuracyMult=2
-					HitMessage=0
-				Shoryureppa2
-					DamageMult=7
-					name="Shoryureppa"
-					ShoryukenEffect=2
-					Shattering=30
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Heat_Rush"
-				Shippu_Jinraikyaku
-					DamageMult=2
-					PushOutWaves=0
-					PushOut=0
-					Combo=4
-					Rapid=1
-					HitStep=/obj/Skills/Queue/Finisher/Shippu_Jinraikyaku2
-					BuffSelf=0
-					HitMessage=0
-				Shippu_Jinraikyaku2
-					DamageMult=4
-					Rapid=1
-					FollowUp="/obj/Skills/AutoHit/Tatsumaki_Effect"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Violent_Personality"
-
-				Rakan_Dantojin
-					DamageMult=2
-					AccuracyMult=2
-					FollowUp="/obj/Skills/AutoHit/Shun_Goku_Satsu"
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Violent_Personality"
-
-				//Keyblade Finishers
-				Fever_Pitch
-					KBAdd=2
-					Launcher=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Fever_Pitch"
-					FollowUp="/obj/Skills/AutoHit/FeverPitch"
-					HitMessage="drives their heart into a fever pitch!"
-				Fatal_Mode
-					KBMult=0.001
-					Stunner=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Fatal_Mode"
-					FollowUp="/obj/Skills/AutoHit/FatalMode"
-					HitMessage="embraces the inevitability of a fatality!"
-				Magic_Wish
-					InstantStrikes=5
-					InstantStrikesDelay=2
-					PrecisionStrike=2
-					DamageMult=0.25
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Magic_Wish"
-					FollowUp="/obj/Skills/AutoHit/MagicWish"
-					HitMessage="hopes upon a magic wish!"
-				Fire_Storm
-					Projectile="/obj/Skills/Projectile/Fire_Storm"
-					ProjectileCount=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Fire_Storm"
-					HitMessage="casts down a fire storm!"
-				Diamond_Dust
-					PrecisionStrike=3
-					InstantStrikes=5
-					InstantStrikesDelay=2
-					DamageMult=0.2
-					Freezing=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Diamond_Dust"
-					HitMessage="twirls with diamond dust!"
-				Thunderbolt
-					Warp=10
-					SpeedStrike=2
-					Paralyzing=10
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Thunderbolt"
-					HitMessage="lashes out quicker than a thunderbolt!"
-
-				Wing_Blade
-					Warp=10
-					SpeedStrike=4
-					Launcher=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Wing_Blade"
-					FollowUp="/obj/Skills/AutoHit/WingbladeFlash"
-					HitMessage="reveals a marvelous light!"
-				Cyclone
-					Warp=10
-					SpeedStrike=4
-					Launcher=2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Cyclone"
-					FollowUp="/obj/Skills/AutoHit/CycloneCharge"
-					HitMessage="spins forward in a high-tension cyclone!"
-
-				Rock_Breaker
-					Stunner=5
-					DamageMult=0.25
-					Combo=10
-					Projectile=/obj/Skills/Projectile/Rock_Bits
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Rock_Breaker"
-					HitMessage="barrages their enemy with bone-breaking rocks!"
-				Dark_Impulse
-					Stunner=5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Dark_Impulse"
-					FollowUp="/obj/Skills/AutoHit/Dark_Blast"
-					HitMessage="unleashes a point-blank blast of darkness!"
-				Ghost_Drive
-					Combo=10
-					DamageMult=0.1
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Ghost_Drive"
-					HitMessage="phases through every defense like a ghost!"
-				Blade_Charge
-					Crippling=10
-					KBMult=0.001
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Blade_Charge"
-					FollowUp="/obj/Skills/AutoHit/BladeChargeRave"
-					HitMessage="hyper charges their keyblade with mana!"
-				Radiant_Brands
-					Crippling=10
-					Warp=20
-					Combo=15
-					DamageMult=0.5
-					KBMult=5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Radiant_Brands"
-					HitMessage="calls forth dozens of lost Keyblades, striking flawlessly with each!"
-				Call_Calamity
-					Stunner=5
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Call_Calamity"
-					FollowUp="/obj/Skills/Projectile/Magic/Call_Calamity"
-					HitMessage="calls down meteors!"
-				The_Fourteenth
-					Warp=20
-					Combo=14
-					DamageMult=0.2
-					BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/The_Fourteenth_One"
-					HitMessage="unleashes a flurry of blows, calling forth beams of light from above!"
 
 
 
@@ -915,9 +222,6 @@ obj
 					if(usr.IsGuarding())
 						usr.AlphaCounter()	//heavy strike while guarding = the shove, never a queue
 						return
-					if(usr.EquippedGun() && usr.StyleBuff && usr.StyleBuff.NeedsGun && usr.FireFinisher())
-						return
-					usr.hs_key_down = world.time
 					if(usr.AttackQueue)
 						return // prevent heavy strike from overriding
 					if(usr.passive_handler["Heavy Strike"]&&!usr.ForceHeavyStrike)
@@ -983,14 +287,16 @@ obj
 						hs.adjust(usr);
 						usr.SetQueue(hs);
 					else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
-					//hold to 0.5s at full tension: armed HS morphs into the finisher
-					if(usr.AttackQueue)
-						var/mob/u = usr
-						var/obj/Skills/Queue/armed = u.AttackQueue
-						spawn(glob.TIMING_WINDOW)
-							if(u && u.hs_key_down && u.AttackQueue == armed)
-								if(u.FireFinisher(force = 1))
-									armed.Using = 0	//SetQueue burned its cd at arm time - refund the swap
+					if(usr.AttackQueue && (usr.AttackQueue == src || usr.AttackQueue == hs) && usr.Tension >= usr.getMaxTensionValue() && !usr.HasTensionLock())
+						usr.Tension = 0
+						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
+								if(!ae.SlotlessOn)
+									ae.Trigger(usr)
+							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
+								if(!sge.SlotlessOn)
+									sge.Trigger(usr)
+						usr.tryIncreaseTension()
 
 			Meteor_Mash
 				name="Meteor Mash"
@@ -1426,7 +732,7 @@ mob
 					src << "You have to be in [Q.StanceNeeded] stance to use this!"
 					return
 			if(Q.StyleNeeded)
-				if(src.StyleActive!=Q.StyleNeeded)
+				if(src.StyleActive!=Q.StyleNeeded && !src.CheckSlotless(Q.StyleNeeded))
 					src << "You have to be using [Q.StyleNeeded] style to use this!"
 					return
 			if(Q.ABuffNeeded)
@@ -1496,7 +802,7 @@ mob
 					return
 			if(Q.EnergyCost)
 				var/drain = passive_handler["Drained"] ? Q.EnergyCost * (1 + passive_handler["Drained"]/10) : Q.EnergyCost
-				if(src.Energy<drain&&!Q.AllOutAttack)
+				if(src.Energy<drain&&!Q.AllOutAttack&&!RiposteReady())
 					if(!src.CheckSpecial("One Hundred Percent Power")&&!src.CheckSpecial("Fifth Form")&&!CheckActive("Eight Gates"))
 						return
 			if(Q.ManaCost && !src.HasDrainlessMana() && !Q.AllOutAttack)
@@ -1558,20 +864,6 @@ mob
 				if(src.Oxygen<=0)
 					src.Oxygen=0
 			if(Q.Copyable)
-				spawn() for(var/mob/m in view(40, src))
-					if(m.CheckSpecial("A - The Almighty"))
-						var/insightLevel = m.AscensionsAcquired+25 || 1
-						var/techTier = Q.Copyable
-						if(insightLevel < techTier)
-							continue
-						if(m.client && m.client.address == src.client.address)
-							continue
-						if(!locate(Q.type, m))
-							var/obj/Skills/copiedSkill = new Q.type
-							m.AddSkill(copiedSkill)
-							copiedSkill.Copied = TRUE
-							copiedSkill.copiedBy = "The Almighty"
-							m << "You understand the nature of the [Q] technique you've just viewed."
 				spawn() for(var/mob/m in view(10, src))
 					if(m.CheckSpecial("Sharingan"))
 						var/copy = Q.Copyable
@@ -1609,6 +901,7 @@ mob
 				if(src.KO || src.Stunned || src.Suspended || src.Stasis > 0)
 					return
 			src.AttackQueue=Q
+			RiposteConsume(Q)
 			if(Q.CCImmuneCast)
 				src.cc_immune_until = world.time + Q.CCImmuneCast
 			if(Q.WeaveDodge)
@@ -1626,7 +919,7 @@ mob
 			src << "<font color=#ff0000>You queue up a [Q.name]!</font>"
 			if(src.AttackQueue.GrabTrigger)
 				var/path=text2path(src.AttackQueue.GrabTrigger)
-				if(!locate(path, src))
+				if(path && !locate(path, src))
 					src.AddSkill(new path)
 			src.QueuedActivationMessage()
 			src.QueueOverlayAdd()
@@ -1776,6 +1069,7 @@ mob
 			if(canFaJin())
 				last_fa_jin = world.time
 				fa_jin_effect()
+				FaJinEmpowered(P)
 			if(istype(src.AttackQueue, /obj/Skills/Queue/Shoryuken))
 				if(src.AttackQueue.ShoryukenEffect==2)
 					OMsg(src, "[src] yells: SHORYUKEN!", "[src] used Shoryuken.")
@@ -1806,7 +1100,8 @@ mob
 				Stun(P, src.AttackQueue.Stunner+src.GetStunningStrike())
 				if(src.AttackQueue.Stunner>5)
 					P << "Your mind is under attack!"
-					animate(P.client, color = list(-1,-1,-1, -1,-1,-1, -1,-1,-1, 1,1,1), time = 5)
+					if(P.client)
+						animate(P.client, color = list(-1,-1,-1, -1,-1,-1, -1,-1,-1, 1,1,1), time = 5)
 					P.TsukiyomiTime=src.AttackQueue.Stunner+1
 			if(src.AttackQueue.RozanEffect)
 				var/Time=src.AttackQueue.RozanEffect
@@ -1825,8 +1120,6 @@ mob
 				var/path=text2path(src.AttackQueue.BuffAffected)
 				var/obj/Skills/Buffs/S = P.findOrAddSkill(path)
 				S.Password=P.name
-				if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Death_Mark))
-					S.adjust(StyleBuff.SignatureTechnique * 15, StyleBuff.SignatureTechnique/2)
 
 			if(src.AttackQueue.Projectile && !src.AttackQueue.BankedRelease)
 				var/path=text2path(src.AttackQueue.Projectile)
@@ -1910,15 +1203,11 @@ mob
 				src.DoDamage(src, src.PctToHP(TrueDamage(src.AttackQueue.HealthCost*glob.WorldDamageMult)))
 			if(src.AttackQueue.WoundCost)
 				src.WoundSelf(src.AttackQueue.WoundCost*glob.WorldDamageMult)
-			if(src.AttackQueue.EnergyCost)
+			if(src.AttackQueue.EnergyCost && !src.AttackQueue.energy_free)
 				var/drain = passive_handler["Drained"] ? src.AttackQueue.EnergyCost * (1 + passive_handler["Drained"]/10) : src.AttackQueue.EnergyCost
 				src.LoseEnergy(drain)
 			if(src.AttackQueue.FatigueCost)
 				src.GainFatigue(src.AttackQueue.FatigueCost)
-
-			if(istype(src.AttackQueue, /obj/Skills/Queue/Finisher))
-				DEBUGMSG("A queue was deployed, and tension lock should be set...")
-				src.setTempTensionLock();
 
 			if(src.AttackQueue.ManaGain)
 				src.HealMana(AttackQueue.ManaGain)

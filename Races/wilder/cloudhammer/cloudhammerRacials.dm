@@ -10,7 +10,7 @@
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
         VaizardHealth = ((100-p.Health) * (0.1 + (glob.racials.COWLSHIELDVAL * asc) ) )
-        passives = list("Harden" = clamp(asc, 1, 5), "Deflection" = 0.5 + (asc * 0.5), "Reversal" = 0.1 + (asc * 0.1))
+        passives = list("Harden" = clamp(asc, 1, 5))
         VaizardShatter = 1
         Cooldown = 180 - (asc * 15)
 
@@ -28,7 +28,7 @@
     Cooldown = 120
     adjust(mob/p)
         var/asc = p.AscensionsAcquired
-        passives = list("Hit Scan" = 1 + (asc/2), "Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1, "Tossing" = clamp(asc/2, 0, 2.5),"AttackSpeed" = 1+asc)
+        passives = list("Momentum" = 2 + asc/2, "Fury" = 1 + asc/2, "Relentlessness" = 1,"AttackSpeed" = 1+asc)
         //passives were kill: blurringstrikes, instinct, flow
         TimerLimit = 30 + (glob.racials.FEATHERDUR * asc)
         Cooldown = 120 - ((glob.racials.FEATHERDUR*2) * asc)
@@ -94,7 +94,7 @@
         spdAdd = 0.15 * asc
         ElementalOffense = "Wind"
         ElementalDefense = "Wind"
-        passives = list("DoubleStrike" = asc/2, "TripleStrike" = asc/3, "ThunderHerald" = 1, \
+        passives = list("ThunderHerald" = 1, \
             "Pursuer" = 1 + (asc/2), "Flicker" = 1 + (asc/2), "CriticalDamage" = asc*0.05, "CriticalChance" = asc*5, \
             "Shocking" = (clamp(asc*0.5, 1, 3)))
     Trigger(mob/User, Override = FALSE)

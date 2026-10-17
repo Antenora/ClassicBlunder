@@ -5,7 +5,6 @@
 var/list/EFXB_ROWS = list()
 var/list/EFXB_ART = list()
 var/list/EFXB_L2 = list()
-var/list/EFXB_FIT = list()
 var/datum/energyfx_look/blasts/energyfx_blast_look = new
 
 /datum/energyfx_look/blasts
@@ -170,7 +169,7 @@ proc/EFXBMod(a, b)
 	parent_type = /datum/energyfx_orbs
 	var/list/bshots = list()
 	var/datum/energyfx_blastcolors/cols
-	var/setname = "col"
+	var/setname
 	var/replay = 0
 	var/list/rdata
 	var/mob/target
@@ -181,7 +180,6 @@ proc/EFXBMod(a, b)
 	var/list/bigs
 	var/list/erupt
 	var/vs = 0
-	var/obj/Skills/csrc
 
 /datum/energyfx_blasts/Q(fi)
 	return fi
@@ -189,17 +187,14 @@ proc/EFXBMod(a, b)
 /datum/energyfx_blasts/proc/RowOf(datum/energyfx_row/R)
 	return EFXB_ROWS[R.extra["row"]]
 
-/datum/energyfx_blasts/proc/SetupColors(obj/Skills/Z, datum/energyfx_row/R)
-	EFXBEnsureE4()
+/datum/energyfx_blasts/proc/SetupColors(datum/energyfx_row/R)
 	cols = new
-	cols.Setup(Z, R)
-	setname = R.extra["canon"] ? R.extra["set"] : (cols.gray ? "gray" : "col")
+	cols.Setup(R)
+	setname = R.extra["set"]
 
 /datum/energyfx_blasts/Init(obj/Skills/Projectile/_Projectile/P, datum/energyfx_row/R, datum/energyfx_look/L)
 	..()
-	csrc = locate(P.SkillPath) in P.Owner
-	if(R.extra["color_from"] && P.Owner) csrc = locate(text2path(R.extra["color_from"])) in P.Owner
-	SetupColors(csrc ? csrc : P.from_skill, R)
+	SetupColors(R)
 	caster_dir = P.Owner ? P.Owner.dir : EAST
 
 /datum/energyfx_blasts/proc/InitCharge(mob/M, obj/Skills/Z, datum/energyfx_row/R, datum/energyfx_look/L)
@@ -211,8 +206,7 @@ proc/EFXBMod(a, b)
 	zz = M.z
 	K0 = EnergyFXNow() - 2
 	parity = glob && glob.ENERGYFX_ORB_LOG
-	csrc = locate(Z.type) in M
-	SetupColors(csrc ? csrc : Z, R)
+	SetupColors(R)
 	caster_dir = M.dir
 	if(parity) OL("G [energyfx_orb_log_tag] [R.extra["kind"]] [K0]")
 
@@ -225,21 +219,13 @@ proc/EFXBMod(a, b)
 /datum/energyfx_blasts/proc/L2(ik)
 	return EFXB_L2[ik] ? 2 : 1
 
-/datum/energyfx_blasts/proc/BodyM(ik)
-	if(cols.gray)
-		var/b = cols.bright
-		return (b == 1) ? null : list(b, 0, 0, 0, 0, b, 0, 0, 0, 0, b, 0, 0, 0, 0, 1, 0, 0, 0, 0)
-	var/key = EFXB_ART[ik]
-	if(!key) return null
-	return cols.Body(key)
-
 /datum/energyfx_blasts/proc/LightM(ik, tag = "hl", al = 1)
 	var/list/m = cols.LM(tag, al)
 	var/k = L2(ik)
 	return (k == 1) ? m : EFXOLMa(m, k)
 
 /datum/energyfx_blasts/proc/RecB(list/out, key, front, ik, st, x, y, ang, sx, sy, al, lay)
-	Rec(out, key, front ? "XP" : "NP", ik, st, x, y, ang, sx, sy, al, BodyM(ik), lay)
+	Rec(out, key, front ? "XP" : "NP", ik, st, x, y, ang, sx, sy, al, null, lay)
 
 /datum/energyfx_blasts/proc/RecA(list/out, key, front, ik, st, x, y, ang, sx, sy, al)
 	Rec(out, key, front ? "XS" : "NS", ik, st, x, y, ang, sx, sy, al, null, 0)
@@ -250,7 +236,7 @@ proc/EFXBMod(a, b)
 	if(al > 1)
 		m = EFXOLMa(m, al)
 		al = 1
-	Rec(out, key, cols.LK(kd), ik, st, x, y, ang, sx, sy, al, m, 0)
+	Rec(out, key, kd, ik, st, x, y, ang, sx, sy, al, m, 0)
 
 /datum/energyfx_blastshot/var/list/thr
 
@@ -450,8 +436,7 @@ proc/EFXBMod(a, b)
 	return out
 
 /datum/energyfx_blasts/proc/SplashBurst(list/out, datum/energyfx_blastshot/sh, t, t0, list/P, ang, n, k, seed, sp0 = 95, sp1 = 160, lay = 5.44, sub0 = 0)
-	var/ik = (cols.canon || cols.anchor || cols.gray) ? "BLS[setname]" : "BLSE4col"
-	var/list/sm = (ik == "BLSE4col") ? EFXOE4Mats("BLSE4col", cols.pal) : null
+	var/ik = "BLS[setname]"
 	var/sns = EFXB_ART["spl:ns"]
 	var/sox = EFXB_ART["spl:ox"]
 	for(var/i = 0, i < n, i++)
@@ -469,25 +454,14 @@ proc/EFXBMod(a, b)
 		var/cy = P[2] + sin(a_t) * (r0 + sox * kk)
 		var/key = "[sh.sid]s[seed]_[i]"
 		var/ly = Lay(lay, sh, sub0 + i)
-		if(sm)
-			Rec(out, "[key]p", "XP", ik, sm[1] ? "o[vi_]_[j]" : "og[vi_]_[j]", cx, cy, a_t, kk, kk * side, 1, sm[1], ly)
-			for(var/kq = 0 to 2)
-				Rec(out, "[key]a[kq]", "XS", ik, "l[kq]_[vi_]_[j]", cx, cy, a_t, kk, kk * side, 1, sm[kq + 2], 0)
-		else
-			Rec(out, "[key]p", "XP", ik, "[vi_]_[j]b", cx, cy, a_t, kk, kk * side, 1, null, ly)
-			Rec(out, "[key]a", "XS", ik, "[vi_]_[j]a", cx, cy, a_t, kk, kk * side, 1, null, 0)
+		Rec(out, "[key]p", "XP", ik, "[vi_]_[j]b", cx, cy, a_t, kk, kk * side, 1, null, ly)
+		Rec(out, "[key]a", "XS", ik, "[vi_]_[j]a", cx, cy, a_t, kk, kk * side, 1, null, 0)
 
 /datum/energyfx_blasts/proc/ExplRec(list/out, key, vi_, code, j, x, y, k, alb, ala, lay)
 	var/st = "[vi_][code][j]"
-	if(cols.canon || cols.anchor || cols.gray)
-		var/ik = "BLX[setname]"
-		Rec(out, "[key]p", "XP", ik, "[st]b", x, y, 0, k, k, alb, null, lay)
-		Rec(out, "[key]a", "XS", ik, "[st]a", x, y, 0, k, k, ala, null, 0)
-	else
-		var/list/em = EFXOE4Mats("BLXE4col", cols.pal)
-		Rec(out, "[key]p", "XP", "BLXE4col", em[1] ? "o[st]" : "og[st]", x, y, 0, k, k, alb, em[1], lay)
-		for(var/kq = 0 to 2)
-			Rec(out, "[key]a[kq]", "XS", "BLXE4col", "l[kq]_[st]", x, y, 0, k, k, ala, em[kq + 2], 0)
+	var/ik = "BLX[setname]"
+	Rec(out, "[key]p", "XP", ik, "[st]b", x, y, 0, k, k, alb, null, lay)
+	Rec(out, "[key]a", "XS", ik, "[st]a", x, y, 0, k, k, ala, null, 0)
 
 /datum/energyfx_blasts/proc/ExplFrame(datum/energyfx_blastshot/sh, v, qb, q, hold, has_feeds, i_d)
 	var/list/xf = sh.Tie("xf", v, null)
@@ -513,7 +487,7 @@ proc/EFXBMod(a, b)
 	var/list/cpt = list(P[1] - ca * 2, P[2] - sa * 2)
 	if(k <= 0)
 		if(v < sh.Thr("hit+0.1", sh.t_hit + 0.1) && !sh.R("pierce"))
-			Rec(out, "[sh.sid]cf", cols.LK("ML"), Art("core"), "l", cpt[1], cpt[2], ang, 0.5 * s, 0.5 * s, 0.8 * (1 - q / 0.1), LightM(Art("core"), "flash"), 0)
+			Rec(out, "[sh.sid]cf", "ML", Art("core"), "l", cpt[1], cpt[2], ang, 0.5 * s, 0.5 * s, 0.8 * (1 - q / 0.1), LightM(Art("core"), "flash"), 0)
 		return
 	if(sh.merge_skip || sh.lead)
 		if(v < sh.Thr("hit+0.3", sh.t_hit + 0.3) && !sh.R("merge"))
@@ -686,7 +660,7 @@ proc/EFXBMod(a, b)
 	var/gk = (1 - min(1, z / zt)) ** 1.5
 	if(gk > 0.02)
 		var/kg = s * (1.5 + 0.7 * gk)
-		Rec(out, "[sh.sid]gp", cols.LK("ML"), Art("glow"), "l", p[1], p[2], 0, kg, kg * 0.5, ghost * 0.7 * gk, LightM(Art("glow")), 0)
+		Rec(out, "[sh.sid]gp", "ML", Art("glow"), "l", p[1], p[2], 0, kg, kg * 0.5, ghost * 0.7 * gk, LightM(Art("glow")), 0)
 
 /datum/energyfx_blasts/proc/WakeKey(datum/energyfx_blastshot/sh)
 	return "BLW[sh.R("wtag", sh.R("row"))]_[setname]"
@@ -694,64 +668,64 @@ proc/EFXBMod(a, b)
 /datum/energyfx_blasts/proc/Objs(list/out, datum/energyfx_blastshot/sh, t, v)
 	var/list/alive = list()
 	for(var/list/o in sh.objs)
-		var/age = t - o["t0"]
-		if(age < 0)
-			alive[++alive.len] = o
-			continue
-		var/wb = (o["kind"] == "wake" && sh.R("wake_kind") == "wavebody")
-		if(!wb && age >= o["life"] - 0.0000001) continue
-		alive[++alive.len] = o
-		if(o["kind"] == "wake")
-			var/ik = (sh.R("beam") == "godot") ? "BLMkBody" : WakeKey(sh)
-			var/nw = EFXB_ART["[ik]:nw"]
-			var/i
-			if(wb)
-				var/tw = isnull(sh.t_twos) ? t : sh.t_twos
-				if(isnull(sh.t_hit) || tw <= sh.t_hit + 0.0000001) tw = t
-				var/aw = tw - o["t0"]
-				if(!isnull(sh.t_hit) && tw > sh.t_hit + 0.0000001) aw += sh.R("drain_k", 1.5) * (tw - sh.t_hit)
-				if(aw >= o["life"] - 0.0000001 || aw < 0) continue
-				i = min(nw - 1, EFXBIntT(aw / o["life"] * (nw - 1)))
-			else
-				i = min(nw - 1, sh.Tie("wk[o["id"]]", v, EFXORoundHalfEven(age / o["life"] * (nw - 1))))
-			var/ang = o["ang"]
-			var/ca = cos(ang)
-			var/sa = sin(ang)
-			var/sxw = o["scale"]
-			var/syw = o["scale"] * o["ww"]
-			var/x = o["P"][1] + ca * EFXB_ART["[ik]:ox"] * sxw
-			var/y = o["P"][2] + sa * EFXB_ART["[ik]:ox"] * sxw
-			var/key = "[sh.sid]w[o["id"]]"
-			if(ik == "BLMkBody")
-				var/stb = o["first"] ? "s_[i]" : "f[o["n"]]_[i]"
-				for(var/j = 0, j < EFXB_ART["BLMkBody:layers"], j++)
-					if(EFXB_ART["BLMkBody:[j]"] == "ga") RecA(out, "[key]_[j]", 0, ik, "[stb]_[j]", x, y, ang, sxw, sxw, 1)
-					else Rec(out, "[key]_[j]", "NP", ik, "[stb]_[j]", x, y, ang, sxw, sxw, 1, null, Lay(4.3, sh, j))
-				continue
-			var/st
-			if(o["first"]) st = "s_[i]"
-			else if(o["half"] == "front") st = "fr[o["n"]]_[i]"
-			else if(o["half"] == "back") st = "bk[o["n"]]_[i]"
-			else st = "f[o["n"]]_[i]"
-			RecB(out, key, 0, ik, "[st]b", x, y, ang, sxw, syw, 1, Lay(4.3, sh, o["id"]))
-			RecL(out, "[key]l", 0, ik, "[st]l", x, y, ang, sxw, syw, 1)
-		else if(o["kind"] == "splash")
-			var/j2 = min(7, floor(age / o["life"] * 7 + 0.5))
-			var/ad = sh.Heading(sh.t_hit - 0.0001)
-			var/list/pd = sh.PosAt(min(t, sh.t_hit))
-			var/rf = 9 * RSize(sh)
-			var/cd_ = cos(ad)
-			var/sd_ = sin(ad)
-			var/bx_ = pd[1] + cd_ * rf * 0.45 - sd_ * o["side"] * rf * 0.75
-			var/by_ = pd[2] + pd[3] + sd_ * rf * 0.45 + cd_ * o["side"] * rf * 0.75
-			var/k_ = o["scale"]
-			var/cx_ = bx_ + cos(o["ang"]) * EFXB_ART["BLDs:ox"] * k_
-			var/cy_ = by_ + sin(o["ang"]) * EFXB_ART["BLDs:ox"] * k_
-			var/ikd = cols.gray ? "BLDsgray" : "BLDs"
-			var/key2 = "[sh.sid]d[o["id"]]"
-			Rec(out, key2, "MP", ikd, "[o["vi"]]_[j2]p", cx_, cy_, o["ang"], k_, k_ * o["side"], 1, cols.gray ? null : EFXOHeatMatrix(cols, 1), Lay(5.6, sh, o["id"]))
-			Rec(out, "[key2]l", cols.LK("ML"), ikd, "[o["vi"]]_[j2]l", cx_, cy_, o["ang"], k_, k_ * o["side"], 1, LightM(ikd), 0)
+		if(ObjRec(out, sh, o, t, v)) alive[++alive.len] = o
 	sh.objs = alive
+
+/datum/energyfx_blasts/proc/ObjRec(list/out, datum/energyfx_blastshot/sh, list/o, t, v)
+	var/age = t - o["t0"]
+	if(age < 0) return 1
+	var/wb = (o["kind"] == "wake" && sh.R("wake_kind") == "wavebody")
+	if(!wb && age >= o["life"] - 0.0000001) return 0
+	if(o["kind"] == "wake")
+		var/ik = (sh.R("beam") == "godot") ? "BLMkBody" : WakeKey(sh)
+		var/nw = EFXB_ART["[ik]:nw"]
+		var/i
+		if(wb)
+			var/tw = isnull(sh.t_twos) ? t : sh.t_twos
+			if(isnull(sh.t_hit) || tw <= sh.t_hit + 0.0000001) tw = t
+			var/aw = tw - o["t0"]
+			if(!isnull(sh.t_hit) && tw > sh.t_hit + 0.0000001) aw += sh.R("drain_k", 1.5) * (tw - sh.t_hit)
+			if(aw >= o["life"] - 0.0000001 || aw < 0) return 1
+			i = min(nw - 1, EFXBIntT(aw / o["life"] * (nw - 1)))
+		else
+			i = min(nw - 1, sh.Tie("wk[o["id"]]", v, EFXORoundHalfEven(age / o["life"] * (nw - 1))))
+		var/ang = o["ang"]
+		var/ca = cos(ang)
+		var/sa = sin(ang)
+		var/sxw = o["scale"]
+		var/syw = o["scale"] * o["ww"]
+		var/x = o["P"][1] + ca * EFXB_ART["[ik]:ox"] * sxw
+		var/y = o["P"][2] + sa * EFXB_ART["[ik]:ox"] * sxw
+		var/key = "[sh.sid]w[o["id"]]"
+		if(ik == "BLMkBody")
+			var/stb = o["first"] ? "s_[i]" : "f[o["n"]]_[i]"
+			for(var/j = 0, j < EFXB_ART["BLMkBody:layers"], j++)
+				if(EFXB_ART["BLMkBody:[j]"] == "ga") RecA(out, "[key]_[j]", 0, ik, "[stb]_[j]", x, y, ang, sxw, sxw, 1)
+				else Rec(out, "[key]_[j]", "NP", ik, "[stb]_[j]", x, y, ang, sxw, sxw, 1, null, Lay(4.3, sh, j))
+			return 1
+		var/st
+		if(o["first"]) st = "s_[i]"
+		else if(o["half"] == "front") st = "fr[o["n"]]_[i]"
+		else if(o["half"] == "back") st = "bk[o["n"]]_[i]"
+		else st = "f[o["n"]]_[i]"
+		RecB(out, key, 0, ik, "[st]b", x, y, ang, sxw, syw, 1, Lay(4.3, sh, o["id"]))
+		RecL(out, "[key]l", 0, ik, "[st]l", x, y, ang, sxw, syw, 1)
+	else if(o["kind"] == "splash")
+		var/j2 = min(7, floor(age / o["life"] * 7 + 0.5))
+		var/ad = sh.Heading(sh.t_hit - 0.0001)
+		var/list/pd = sh.PosAt(min(t, sh.t_hit))
+		var/rf = 9 * RSize(sh)
+		var/cd_ = cos(ad)
+		var/sd_ = sin(ad)
+		var/bx_ = pd[1] + cd_ * rf * 0.45 - sd_ * o["side"] * rf * 0.75
+		var/by_ = pd[2] + pd[3] + sd_ * rf * 0.45 + cd_ * o["side"] * rf * 0.75
+		var/k_ = o["scale"]
+		var/cx_ = bx_ + cos(o["ang"]) * EFXB_ART["BLDs:ox"] * k_
+		var/cy_ = by_ + sin(o["ang"]) * EFXB_ART["BLDs:ox"] * k_
+		var/key2 = "[sh.sid]d[o["id"]]"
+		Rec(out, key2, "MP", "BLDs", "[o["vi"]]_[j2]p", cx_, cy_, o["ang"], k_, k_ * o["side"], 1, EFXOHeatMatrix(cols, 1), Lay(5.6, sh, o["id"]))
+		Rec(out, "[key2]l", "ML", "BLDs", "[o["vi"]]_[j2]l", cx_, cy_, o["ang"], k_, k_ * o["side"], 1, LightM("BLDs"), 0)
+	return 1
 
 /datum/energyfx_blasts/proc/Void(list/out, datum/energyfx_blastshot/sh, t, v, s)
 	if(isnull(sh.t_launch) || v < sh.Thr("launch", sh.t_launch)) return
@@ -799,9 +773,7 @@ proc/EFXBMod(a, b)
 	return list("BLFfPath[lb]", L / lb)
 
 /datum/energyfx_blasts/proc/BigDome(Re)
-	if(cols.canon || cols.anchor || cols.gray) return "BLB3[setname][Re]"
-	var/rs = EFXOE4Set(Re)
-	return (rs == 48) ? "B3E4_48TB" : "B3E4_[rs]G"
+	return "BLB3[setname][Re]"
 
 /datum/energyfx_blasts/proc/ShotSprites(list/out, datum/energyfx_blastshot/sh, t, v)
 	if(sh.big_only) return
@@ -851,7 +823,7 @@ proc/EFXBMod(a, b)
 			if(!sh.from_hand && v < sh.Thr("spawn+0.12", sh.t_spawn + 0.12))
 				var/qa = (t - sh.t_spawn) / 0.12
 				var/ikz = Art("muzzle")
-				Rec(out, "[sh.sid]pf", cols.LK("ML"), ikz, "[f]l", hx, hy, 0, 0.7 * s, 0.7 * s, 0.8 * (1 - qa), LightM(ikz, "flash"), 0)
+				Rec(out, "[sh.sid]pf", "ML", ikz, "[f]l", hx, hy, 0, 0.7 * s, 0.7 * s, 0.8 * (1 - qa), LightM(ikz, "flash"), 0)
 		else
 			Flight(out, sh, t, v, f, hx, hy, ang, s, grow, ghost)
 	if(hit) Hit(out, sh, t, v, s, ghost)
@@ -945,7 +917,6 @@ proc/EFXBMod(a, b)
 	spk_q[++spk_q.len] = list(t, P[1], P[2], n)
 
 /datum/energyfx_blasts/proc/SpeckColor()
-	if(cols.gray) return list(0.875, 0.875, 0.875, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0)
 	var/list/edge = cols.ramp[2]
 	var/list/core = cols.ramp[3]
 	var/kp = BeamFXCool(0.95)
@@ -968,7 +939,7 @@ proc/EFXBMod(a, b)
 			O.color = SpeckColor()
 			var/particles/beamfx_speck/PT = new
 			PT.icon = BEAMFX_SPECK_ICON
-			PT.icon_state = cols.gray ? list("gss0" = 31, "gdu0" = 38, "gsk0" = 6) : list("pss0" = 31, "pdu0" = 38, "psk0" = 6)
+			PT.icon_state = list("pss0" = 31, "pdu0" = 38, "psk0" = 6)
 			PT.lifespan = generator("num", 2.5, 4.5)
 			PT.count = q[4]
 			PT.position = generator("box", vector(-4, -4, 0), vector(4, 4, 0))
@@ -1037,8 +1008,8 @@ proc/EFXBLayerRank(layer)
 	var/datum/energyfx_orbblast3/B = b[2]
 	var/d = Qs(sh, fi) - EFXBFidx(sh.t_hit)
 	if(d < 0) return
-	B.Scorch(src, out, d, "b[sh.sid]", "GP", cols.LK("GL"))
-	B.Ground(src, out, d, "b[sh.sid]", cols.LK("GL"))
+	B.Scorch(src, out, d, "b[sh.sid]", "GP", "GL")
+	B.Ground(src, out, d, "b[sh.sid]", "GL")
 
 /datum/energyfx_blasts/proc/BigBody(list/out, list/b, fi)
 	var/datum/energyfx_blastshot/sh = b[1]
@@ -1047,17 +1018,17 @@ proc/EFXBLayerRank(layer)
 	if(d < 0) return
 	var/t = EFXBFtime(fi)
 	var/list/smk = list()
-	B.Particles(src, list(), smk, t, "b[sh.sid]", cols.LK("XL"), "SM")
+	B.Particles(src, list(), smk, t, "b[sh.sid]", "XL", "SM")
 	out += smk
 	B.Body(src, out, d, "b[sh.sid]", 1600000)
-	B.Particles(src, out, null, t, "b[sh.sid]", cols.LK("XL"))
+	B.Particles(src, out, null, t, "b[sh.sid]", "XL")
 
 /datum/energyfx_blasts/proc/EruptDraw(list/out, fi)
 	var/datum/energyfx_blastshot/e = erupt[1]
 	var/de = Qs(e, fi) - EFXBFidx(e.t_launch)
 	if(de < 0 || de >= EFXB_ART["BLErupt:n"]) return
 	var/k = erupt[4] / 44
-	Rec(out, "er", cols.LK("GL"), "BLErupt", "[de]", erupt[2], erupt[3], 0, k, k, 1, LightM("BLErupt"), 0)
+	Rec(out, "er", "GL", "BLErupt", "[de]", erupt[2], erupt[3], 0, k, k, 1, LightM("BLErupt"), 0)
 
 /datum/energyfx_blasts/proc/TgtOff(fi)
 	if(!tgt_off) return list(0, 0)
@@ -1212,49 +1183,6 @@ proc/EFXBDirName(d)
 
 /datum/energyfx_blastcolors
 	parent_type = /datum/energyfx_orbcolors
-
-/datum/energyfx_blastcolors/Body(key)
-	if(anchor || gray || canon) return null
-	return EFXBFitMatrix(key, main255, core255, glow255, sub ? pal : null)
-
-var/list/EFXB_FITCACHE = list()
-
-proc/EFXBMine(ws, nv, list/ramp, list/pal)
-	var/calm = 1 - 0.92 * EFXOSstep(0.12, 0.55, ws)
-	var/I = clamp(0.5 + 0.5 * ws + 0.9 * calm * (nv - 0.5), 0, 1)
-	var/m = 1 + 1.35 * calm * (nv - 0.5)
-	var/list/edge = ramp[2]
-	var/list/core = ramp[3]
-	var/wc = clamp(ws, 0, 1)
-	var/list/ca = list(clamp(edge[1] + wc * (core[1] - edge[1]), 0, 1), clamp(edge[2] + wc * (core[2] - edge[2]), 0, 1), clamp(edge[3] + wc * (core[3] - edge[3]), 0, 1))
-	var/t = EFXOLum3(ca) * m
-	var/list/gr = EFXORampAdd(I, pal)
-	var/mx = max(gr[1], gr[2], gr[3], 0.0001)
-	var/list/hu = list(gr[1] / mx, gr[2] / mx, gr[3] / mx)
-	var/yg = max(EFXOLum3(hu), 0.001)
-	return list(clamp(hu[1] / yg * t, 0, 1), clamp(hu[2] / yg * t, 0, 1), clamp(hu[3] / yg * t, 0, 1))
-
-proc/EFXBFitMatrix(key, list/C255, list/core255, list/glow255, list/subpal)
-	var/ck = "[key]|[jointext(C255, ",")]|[core255 ? jointext(core255, ",") : "-"]|[glow255 ? jointext(glow255, ",") : "-"][subpal ? "|sub" : ""]"
-	var/list/hit = EFXB_FITCACHE[ck]
-	if(hit) return hit
-	var/list/F = EFXB_FIT[key]
-	if(!F) return null
-	var/n = F[1]
-	var/list/ramp = BeamFXRamp(C255, core255, glow255)
-	var/list/pal = subpal ? subpal : EFXOPalette(C255, core255, glow255)
-	var/list/co = list(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-	for(var/s = 1 to n)
-		var/list/T = EFXBMine(F[1 + s], F[1 + n + s], ramp, pal)
-		for(var/r = 0 to 3)
-			var/p = F[1 + 2 * n + r * n + s]
-			co[r * 3 + 1] += p * T[1]
-			co[r * 3 + 2] += p * T[2]
-			co[r * 3 + 3] += p * T[3]
-	var/list/M = list(co[1], co[2], co[3], 0, co[4], co[5], co[6], 0, co[7], co[8], co[9], 0, 0, 0, 0, 1, co[10], co[11], co[12], 0)
-	EFXB_FITCACHE[ck] = M
-	if(EFXB_FITCACHE.len > 512) EFXB_FITCACHE.Cut(1, 2)
-	return M
 
 /datum/energyfx_blastshot/var/list/base0
 /datum/energyfx_blastshot/var/lay_n = 0
@@ -1683,12 +1611,12 @@ var/list/EFXB_FEED_WIN = list("stream" = 0.5, "barrage" = 0.5, "burst" = 0.5, "r
 	if(!G) G = Stream("b[sh.sid]")
 	var/rs = EFXOE4Set(Re)
 	var/dome = BigDome(Re)
-	var/datum/energyfx_orbblast3/B = new(G, Re, sh.hit_pt[1], sh.hit_pt[2], sh.t_hit / EFXB_TICK, null, dome, "B3Ground[rs][cols.gray ? "G" : ""]", cols.LM("hl"), EFXO_LM_SCORCH)
+	var/datum/energyfx_orbblast3/B = new(G, Re, sh.hit_pt[1], sh.hit_pt[2], sh.t_hit / EFXB_TICK, null, dome, "B3Ground[rs]", cols.LM("hl"), EFXO_LM_SCORCH)
 	if(findtext(dome, "E4") == 1 || findtext(dome, "B3E4"))
 		B.e4 = dome
 		B.e4m = EFXOE4Mats(dome, cols.pal)
 	B.lm_flash = cols.LM("flash")
-	B.fl_kinds = list("XP", "XS", cols.LK("XL"))
+	B.fl_kinds = list("XP", "XS", "XL")
 	bigs[++bigs.len] = list(sh, B)
 
 /datum/energyfx_blasts/live/proc/EndShot(datum/energyfx_blastshot/sh, k, lost = 0)
@@ -1780,7 +1708,7 @@ var/list/EFXB_FEED_WIN = list("stream" = 0.5, "barrage" = 0.5, "burst" = 0.5, "r
 	zz = C.z
 	K0 = EnergyFXNow()
 	parity = 1
-	SetupColors(Z, row)
+	SetupColors(row)
 	caster_dir = C.dir
 	var/ox = D["off"][1]
 	var/oy = D["off"][2]
@@ -1845,12 +1773,12 @@ var/list/EFXB_FEED_WIN = list("stream" = 0.5, "barrage" = 0.5, "burst" = 0.5, "r
 			G.vals = b["draws"]
 			var/rs = EFXOE4Set(b["Re"])
 			var/dome = BigDome(b["Re"])
-			var/datum/energyfx_orbblast3/B = new(G, b["Re"], bs.hit_pt[1], bs.hit_pt[2], bs.t_hit / EFXB_TICK, null, dome, "B3Ground[rs][cols.gray ? "G" : ""]", cols.LM("hl"), EFXO_LM_SCORCH)
+			var/datum/energyfx_orbblast3/B = new(G, b["Re"], bs.hit_pt[1], bs.hit_pt[2], bs.t_hit / EFXB_TICK, null, dome, "B3Ground[rs]", cols.LM("hl"), EFXO_LM_SCORCH)
 			if(findtext(dome, "E4"))
 				B.e4 = dome
 				B.e4m = EFXOE4Mats(dome, cols.pal)
 			B.lm_flash = cols.LM("flash")
-			B.fl_kinds = list("XP", "XS", cols.LK("XL"))
+			B.fl_kinds = list("XP", "XS", "XL")
 			bigs[++bigs.len] = list(bs, B)
 	if(D["erupt"])
 		var/list/e = D["erupt"]
@@ -1884,7 +1812,7 @@ proc/EnergyFXSekihaBlast(datum/sekihafx/F, list/draws)
 	S.zz = F.zz
 	S.K0 = EnergyFXNow() - 2
 	S.parity = F.parity ? 1 : (glob && glob.ENERGYFX_ORB_LOG)
-	S.SetupColors(null, R)
+	S.SetupColors(R)
 	S.last_spawn_k = 2
 	var/datum/energyfx_blastshot/sh = S.NewShot(2)
 	sh.virtual = 1

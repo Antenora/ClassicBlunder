@@ -145,37 +145,15 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Soul_Edge
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s chaotic treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their chaotic luster..."
+	adjust(mob/p)
+		passives["Shearing"] = 2 + p.SagaLevel
+		if(p.SagaLevel >= 5)
+			passives["HellPower"] = 1
+			passives["Burning"] = 2
+			passives["BurningShot"] = 1
+			passives["BurnHit"] = 15
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
 
 
-/obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
-	Stained_Memories
-		StyleActive="Stained Memories"
-		passives = list( "Shearing" = 2)
-		StyleEnd=1.25
-		StyleStr=1.25
-		Finisher="/obj/Skills/Queue/Finisher/Rook_Splitter"
-		adjust(mob/p)
-			StyleStr = 1.15 + (0.15 * p.SagaLevel)
-			StyleEnd = 1.15 + (0.15 * p.SagaLevel)
-			passives["Shearing"] = 2+p.SagaLevel
-		verb/Stained_Memories()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-
-
-/obj/Skills/Queue/Finisher
-	Rook_Splitter
-		DamageMult=8
-		HitSparkIcon='Slash - Zan.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Grim_Lord"
-		HitMessage = "crushes the very world with the might of Soul Edge!"
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Grim_Lord
-		StrMult=1.3
-		EndMult=1.3

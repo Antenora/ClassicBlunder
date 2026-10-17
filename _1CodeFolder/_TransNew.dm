@@ -340,8 +340,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				Attunement = "Fire"
 				InfusionElement = "Water"
 				ElementalDefense = "Void"
-				passive_handler.Increase("CounterMaster", 10)
-				passive_handler.Increase("Extend")
 				passive_handler.Increase("TechniqueMastery", 5)
 				src.OMessage(10, "<b><font color=red><center>The very air shakes, as [src.name] shakes the world with their yell of potent, overwhelming power!!</center></font></b>")
 				Quake(10)
@@ -356,8 +354,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				Attunement = "Wind"
 				InfusionElement = "Earth"
 				passive_handler.Increase("CalmAnger")
-				passive_handler.Increase("SweepingStrike")
-				passive_handler.Increase("TripleStrike")
 				passive_handler.Increase("MonkeyKing",2)
 				src.OMessage(10, "<b><font color=yellow><center>The seal on the golden headband has been broken!</center></font></b>")
 				var/image/i=image(icon='AvalonLight.dmi', pixel_x=-67, pixel_y=-3, loc=src)
@@ -417,9 +413,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("Flicker", 2)
 				passive_handler.Increase("Pursuer", 2)
 				passive_handler.Increase("Fury", 4)
-				passive_handler.Increase("SweepingStrike")
-				passive_handler.Increase("DoubleStrike", 3)
-				passive_handler.Increase("TripleStrike", 2)
 				var/i='Dark.dmi'
 				var/j='Rain.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
@@ -569,7 +562,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 			if("Muramasa")
 				src.ElementalOffense="Death"
 				src.ElementalDefense="Fire"
-				passive_handler.Increase("WeaponBreaker")
 				passive_handler.Increase("CursedWounds")
 				passive_handler.Increase("DarknessFlame")
 				passive_handler.Increase("Aspect of Death")
@@ -597,7 +589,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.OMessage(10,"<b>[src] invokes the spirit of destruction through their blade!</b>")
 			if("Dainsleif")
 				src.ElementalOffense="Poison" //This already has cursed wounds, so it will become hyper murder poison.
-				passive_handler.Increase("HardStyle", 10)
 				passive_handler.Increase("DeathField", 10)
 				passive_handler.Increase("SoulSteal", 10)
 				passive_handler.Increase("HealThroughTempHP")
@@ -649,15 +640,11 @@ mob/proc/RevertWS()
 			Attunement = null
 			InfusionElement = null
 			passive_handler.Decrease("CalmAnger")
-			passive_handler.Decrease("SweepingStrike")
-			passive_handler.Decrease("TripleStrike")
 			passive_handler.Decrease("MonkeyKing",2)
 		if("Green Dragon Crescent Blade")
 			Attunement = null
 			InfusionElement = null
 			ElementalDefense = null
-			passive_handler.Decrease("CounterMaster",10)
-			passive_handler.Decrease("Extend")
 			passive_handler.Decrease("TechniqueMastery", 5)
 		if("Caledfwlch")
 			src.ElementalDefense=null
@@ -670,9 +657,6 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("Flicker", 2)
 			passive_handler.Decrease("Pursuer", 2)
 			passive_handler.Decrease("Fury", 4)
-			passive_handler.Decrease("SweepingStrike")
-			passive_handler.Decrease("DoubleStrike", 3)
-			passive_handler.Decrease("TripleStrike", 2)
 			src.overlays-=image(icon='MurakumoMode.dmi', pixel_x=-16, pixel_y=-16)
 			src.overlays+=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
 		if("Masamune")
@@ -708,7 +692,6 @@ mob/proc/RevertWS()
 		if("Muramasa")
 			src.ElementalOffense=null
 			src.ElementalDefense=null
-			passive_handler.Decrease("WeaponBreaker", 1)
 			passive_handler.Decrease("CursedWounds", 1)
 			passive_handler.Decrease("AbyssMod", 3)
 			passive_handler.Decrease("Aspect of Death")
@@ -716,7 +699,6 @@ mob/proc/RevertWS()
 			src.overlays-=image(icon='DeathbringerMode.dmi')
 		if("Dainsleif")
 			src.ElementalOffense=null
-			passive_handler.Decrease("HardStyle", 10)
 			passive_handler.Decrease("DeathField",10)
 			passive_handler.Decrease("SoulSteal", 10)
 			passive_handler.Decrease("HealThroughTempHP")

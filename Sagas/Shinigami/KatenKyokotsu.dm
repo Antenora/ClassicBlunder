@@ -35,7 +35,6 @@ obj/Items/Sword/Medium/Legendary/Shinigami/Zanpakuto_Dual
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"DoubleStrike"     = 1 + SL,
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
 			"Flicker"          = 1 + SL,
 			"Pursuer"          = 1 + SL,
@@ -604,9 +603,7 @@ var/global/list/BG_CONTRAST_HIGH = list(
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"DoubleStrike"     = 3 + SL,
 			"CriticalDamage"   = 0.05 + (0.05 * SL),
-			"HardStyle"        = 3 + SL,
 			"DeathField"       = 3 + SL,
 			"ManaCapMult"      = 0.2 + (0.15 * SL),
 			

@@ -327,6 +327,7 @@ obj/Skills
 
 		proc
 			Activate(var/mob/User, noGCD = FALSE)
+				if(!QuincyTeleportAllowed(User)) return
 				if(User.Suspended)
 					return
 				if(!noGCD && User.GCDBlocked(src))

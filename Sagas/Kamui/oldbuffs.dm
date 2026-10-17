@@ -20,7 +20,7 @@
 	SpecialSlot=1
 
 	Kamui_Unite
-		passives = list("HardStyle" = 3, "Juggernaut" = 2, "DeathField" = 3, "Pursuer" = 3, "Flicker" = 2)
+		passives = list("Juggernaut" = 2, "DeathField" = 3, "Pursuer" = 3, "Flicker" = 2)
 		StripEquip = 1
 		HairLock = 1
 		ActiveMessage="unites with their Kamui!"

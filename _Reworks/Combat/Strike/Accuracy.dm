@@ -113,6 +113,8 @@
 		atkRating += Offender.GetFor(glob.FOR_BLAST_DENSITY) //dense blasts are hard to swat
 	var/defRating = Defender.GetDef(glob.ACC_DEF) + Defender.GetSpd(glob.ACC_DEF_SPD)
 	var/TotalAccuracy = BaseChance + (atkRating - defRating) * glob.ACC_POINT + (OffenseAdvantage - DefenseAdvantage) * glob.POWER_ACC_POINT
+	if(!deflection && Defender.dodge_vs_mob == Offender && Defender.dodge_vs_until > world.time)
+		TotalAccuracy -= Defender.dodge_vs_amt
 	TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
 	if(!deflection && Defender.in_smoke > world.time)
 		TotalAccuracy /= 2

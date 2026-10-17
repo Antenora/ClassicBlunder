@@ -56,7 +56,7 @@ ascension
 			choiceTitle = "Choose Your Reason"
 			choiceMessage = "Your conviction takes shape. Which Reason will guide your path?\n\nMusubi: Freedom from constraint—swap Magatama at will and craft without escalating cost. You gain only passives from Magatama, never their skills.\nShijima: Unity through diversity—equip multiple Magatama, gaining an extra slot each ascension (scaling halved).\nYosuga: Strength unchained—amplify Magatama passive scaling (1.25x at ascension 1, +0.25x per ascension)."
 			on_ascension_message = "Your demonic power awakens further. What Reason drives you?"
-			passives = list("HellPower" = 0.25, "KiControlMastery" = 2, "BladeFisting" = 1, "StaticWalk" = 1, "SpaceWalk" = 1, "ManaGeneration" = 5)
+			passives = list("HellPower" = 0.25, "KiControlMastery" = 2, "StaticWalk" = 1, "SpaceWalk" = 1, "ManaGeneration" = 5)
 			strength = 0.5
 			endurance = 0.5
 			speed = 0.5
@@ -86,7 +86,7 @@ ascension
 					owner.SagaLevel++
 					owner.tierUpSaga("Devil Summoner")
 				..()
-			passives = list("HellPower" = 0.25, "KiControlMastery" = 1, "MovingCharge" = 1)
+			passives = list("HellPower" = 0.25, "KiControlMastery" = 1)
 			strength = 2
 			endurance = 2
 			speed = 2

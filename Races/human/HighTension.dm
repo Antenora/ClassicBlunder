@@ -47,10 +47,7 @@
         . = max(glob.MIN_TENSION, 100 - conductor);
     getTensionCap()
         // total storable tension
-        var/stages = 1;
-        if(src.StyleBuff && src.StyleBuff.FinisherStage > 1)
-            stages = src.StyleBuff.FinisherStage;
-        . = src.getMaxTensionValue() * stages;
+        . = src.getMaxTensionValue();
     tryIncreaseTension()
         if(!isRace(HUMAN) && !isRace(CELESTIAL)) return 0;
         //they have to be human or celestial to get this far

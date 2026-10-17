@@ -1,66 +1,35 @@
-obj/Skills/Buffs/NuStyle/NobodyLegendary
+/obj/Skills/Buffs/SlotlessBuffs/Racial/Nobody_Legendary
 	CyberSignature = 1
-	Legacy_of_Ashes // T0/1. This is based on the Legendary styles from last wipe. Fire/Sword
-		SignatureTechnique=1
-		NeedsSword = 1
-		Copyable=0
-		StyleSpd=1.3
-		StyleStr=1.15
-		ElementalOffense="Fire"
-		ElementalDefense="Fire"
-		passives = list( "Godspeed" = 1, "Momentum" = 1, "DoubleStrike" = 1, "Iaijutsu" = 2,\
-						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1)
-		StyleActive="Legacy of Ashes"
-		Finisher="/obj/Skills/Queue/Finisher/Session"
+	Copyable = 0
+	NeedsSword = 1
+	ElementalOffense = "Fire"
+	ElementalDefense = "Fire"
+	ExclusiveFamily = /obj/Skills/Buffs/SlotlessBuffs/Racial/Nobody_Legendary
+	Legacy_of_Ashes
+		BuffName = "Legacy of Ashes"
+		passives = list("Godspeed" = 1, "Momentum" = 1, "Kindling" = 0.5, "Combustion" = 30, "Ashen One" = 1)
 		verb/Legacy_of_Ashes()
-			set hidden=1
-			adjust(usr)
+			set category = "Skills"
+			set hidden = 1
 			src.Trigger(usr)
 	Sunslammer
-		SignatureTechnique=2
-		NeedsSword = 1
-		Copyable=0
-		StyleSpd=1.3
-		StyleStr=1.3
-		ElementalOffense="Fire"
-		ElementalDefense="Fire"
-		passives = list( "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 2, "Iaijutsu" = 2,\
-						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 1)
-		StyleActive="Legacy of the Sunslammer"
-		Finisher="/obj/Skills/Queue/Finisher/Session"
+		BuffName = "Legacy of the Sunslammer"
+		passives = list("Godspeed" = 2, "Momentum" = 1, "Kindling" = 0.5, "Combustion" = 30, "Ashen One" = 1)
 		verb/Sunslammer()
-			set hidden=1
-			adjust(usr)
+			set category = "Skills"
+			set hidden = 1
 			src.Trigger(usr)
-	Heir_of_Grief // TUPAC BACK
-		SignatureTechnique=3
-		NeedsSword = 1
-		Copyable=0
-		StyleSpd=1.5
-		StyleStr=1.5
-		ElementalOffense="Fire"
-		ElementalDefense="Fire"
-		passives = list( "Godspeed" = 2, "Momentum" = 1, "DoubleStrike" = 3, "Iaijutsu" = 2,\
-						"Musoken" = 1, "Kindling" = 0.5, "Combustion" = 30, "Parry" = 2,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 2)
-		StyleActive="Heir of Grief"
-		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"
+	Heir_of_Grief
+		BuffName = "Heir of Grief"
+		passives = list("Godspeed" = 2, "Momentum" = 1, "Kindling" = 0.5, "Combustion" = 30, "Ashen One" = 1)
 		verb/Heir_of_Grief()
-			set hidden=1
-			adjust(usr)
+			set category = "Skills"
+			set hidden = 1
 			src.Trigger(usr)
 	Overture
-		SignatureTechnique=4
-		NeedsSword = 1
-		Copyable=0
-		StyleSpd=1.7
-		StyleStr=1.7
-		ElementalOffense="Fire"
-		ElementalDefense="Fire"
-		passives = list( "Godspeed" = 3, "Momentum" = 2, "DoubleStrike" = 3, "TripleStrike" = 0.5, "Iaijutsu" = 3,\
-						"Musoken" = 1, "Kindling" = 1.5, "Combustion" = 30, "Parry" = 3,"Ashen One" = 1, "SweepingStrike" = 1, "Deflection" = 3)
-		StyleActive="Overture"
-		Finisher="/obj/Skills/Queue/Finisher/Endless_Session"
+		BuffName = "Overture"
+		passives = list("Godspeed" = 3, "Momentum" = 2, "Kindling" = 1.5, "Combustion" = 30, "Ashen One" = 1)
 		verb/Overture()
-			set hidden=1
-			adjust(usr)
+			set category = "Skills"
+			set hidden = 1
 			src.Trigger(usr)

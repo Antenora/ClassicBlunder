@@ -648,6 +648,27 @@ datum/ink_family
 				s.hit[m] = 1
 				MarkHit(r, m, s.group)
 				Dispatch(r, m, s, e[2])
+		if(autohit_obj_listeners.len)
+			InkObjSweep(live)
+
+	proc/InkObjSweep(list/live)
+		for(var/obj/O in autohit_obj_listeners.Copy())
+			if(!O.loc)
+				continue
+			var/ol = O.LowerX()
+			var/ob = O.LowerY()
+			var/ow = O.Width()
+			var/oh = O.Height()
+			for(var/list/e in live)
+				var/datum/fxink/s = e[1]
+				var/obj/AutoHitter/r = s.root
+				if(O.z != s.z || !r || !r.Owner)
+					continue
+				var/reach = e[5]
+				if(e[3] + reach < ol || e[3] - reach > ol + ow || e[4] + reach < ob || e[4] - reach > ob + oh)
+					continue
+				O.StruckByAutoHit(r.Owner)
+				break
 
 obj/AutoHitter
 	proc/InkJoinFamily(mob/owner, obj/Skills/AutoHit/Z)

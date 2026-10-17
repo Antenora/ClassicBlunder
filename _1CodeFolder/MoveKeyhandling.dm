@@ -248,6 +248,7 @@ mob
 								delay *= SlowMoDelayMult(src)
 								if(held_skill?.HeldBeam && !HasMovingCharge())
 									delay *= glob.HELD_BEAM_MOVE_PENALTY
+								delay *= NamekFearMoveMult()
 								if(src.Crippled)
 									var/debuffRev = src.GetDebuffReversal();
 									if(debuffRev)

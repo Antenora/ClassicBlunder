@@ -1,5 +1,3 @@
-#define BFX_CAR 18
-#define BFX_DMP 19
 #define EFXB_RIGID 0
 #define EFXB_FLOW 1
 #define EFXB_HEAD 2
@@ -484,7 +482,6 @@ proc/EnergyFXBendClass(fam)
 		if(stt == 2)
 			rm_ih = i
 			rm_fdet = i
-			rm_changed = 1
 		else if(stt == 1)
 			if(isnull(fork_touch)) fork_touch = i
 			v = fork_touch
@@ -501,7 +498,6 @@ proc/EnergyFXBendClass(fam)
 		if(TouchState(RawHr(now + jj * BEAMFX_FR, 2 * kk + jj)))
 			fork_t = now + jj * BEAMFX_FR
 			t_hit = fork_t
-			rm_changed = 1
 			break
 
 /datum/beamfx/HitK(t, fi)
@@ -520,96 +516,12 @@ proc/EnergyFXBendClass(fam)
 	if(isnull(fork_dT)) return ..()
 	return (!isnull(release_t) && t2 > release_t) ? 1 : 0
 
-/datum/beamfx/ChainPair(datum/bfx_obj/o)
-	if(fgeo) return 0
-	return ..()
-
-/datum/beamfx/MapPt(x, y)
-	var/rx = x - Ox
-	var/ry = y - Oy
-	var/dc = rx * ax + ry * ay
-	var/lat = rx * nx + ry * ny
-	if(fgeo)
-		var/S = fgeo.SofD(dc)
-		if(S > fgeo.SJ)
-			var/list/P = fgeo.BranchXY(src, S, lat, 1)
-			return list(P[1], P[2], arctan(P[3], P[4]))
-		return list(x, y, ang)
-	if(!BendOn()) return list(x, y, ang)
-	var/list/E = bgeo.Eval(bgeo.SofD(dc))
-	return list(E[1] - E[4] * lat, E[2] + E[3] * lat, arctan(E[3], E[4]))
-
-/datum/beamfx/SpeckEmitter(region, x, y, rate, v1, v2, l1, l2, cnt)
-	var/obj/energyfx/emit/O = ..()
-	if(!O || !fgeo) return O
-	var/rx = x - Ox
-	var/ry = y - Oy
-	var/S = fgeo.SofD(rx * ax + ry * ay)
-	if(S <= fgeo.SJ) return O
-	var/list/P = fgeo.BranchXY(src, S, rx * nx + ry * ny, -1)
-	var/obj/energyfx/emit/O2 = ..(region, x, y, rate, v1, v2, l1, l2, cnt)
-	if(!O2) return O
-	if(EnergyFXPlace(O2, P[1], P[2], z))
-		var/particles/PP = O2.particles
-		var/a2 = arctan(P[3], P[4])
-		PP.transform = matrix(cos(a2), -sin(a2), P[1] - O2.fx_bx, sin(a2), cos(a2), P[2] - O2.fx_by)
-	spk_live += list(list(O2, k + 2, k + BEAMFX_SPK_FREE + 2))
-	return O
-
-/datum/beamfx/proc/RebuildChains()
-	for(var/datum/bfx_obj/o in objs)
-		if(!o.pre_done) continue
-		if(o.pobjs)
-			for(var/obj/energyfx/O in o.pobjs)
-				EnergyFXFree(O)
-		o.pobjs = null
-		o.pre_done = 0
-		o.pre_specs = null
-
-/datum/beamfx/ParticleSpec(datum/bfx_obj/o, t)
-	var/list/L = ..()
-	if(!L || !(fgeo || BendOn())) return L
-	var/list/out = list()
-	if(fgeo)
-		for(var/sig in list(1, -1))
-			for(var/list/sp in L)
-				out += list(MapRigidSpec(sp, sig))
-		return out
-	for(var/list/sp in L)
-		out += list(MapRigidSpec(sp, 0))
-	return out
-
-/datum/beamfx/proc/MapRigidSpec(list/sp, sig)
-	var/list/s2 = sp.Copy()
-	var/rx = sp[BFX_X] - Ox
-	var/ry = sp[BFX_Y] - Oy
-	var/dc = rx * ax + ry * ay
-	var/lat = rx * nx + ry * ny
-	if(fgeo)
-		var/S = fgeo.SofD(dc)
-		if(S <= fgeo.SJ)
-			if(sig < 0) s2[BFX_ALPHA] = 0
-			return s2
-		var/list/P = fgeo.BranchXY(src, S, lat, sig)
-		s2[BFX_X] = P[1]
-		s2[BFX_Y] = P[2]
-		s2[BFX_ANG] = sp[BFX_ANG] + arctan(P[3], P[4]) - ang
-		return s2
-	var/list/E = bgeo.Eval(bgeo.SofD(dc))
-	s2[BFX_X] = E[1] - E[4] * lat
-	s2[BFX_Y] = E[2] + E[3] * lat
-	s2[BFX_ANG] = sp[BFX_ANG] + arctan(E[3], E[4]) - ang
-	return s2
-
-/datum/beamfx/proc/BandKey(light, zl, damp)
-	if(damp) return "D"
-	if(light) return GrayV2() ? "G" : "L"
+/datum/beamfx/proc/BandKey(light, zl)
+	if(light) return "L"
 	return "p[round(zl * 10)]"
 
 /datum/beamfx/proc/BandPlane(band)
 	switch(copytext(band, 1, 2))
-		if("D") return ENERGYFX_DAMP_PLANE
-		if("G") return ENERGYFX_GLIGHT_PLANE
 		if("L") return ENERGYFX_LIGHT_PLANE
 	return ENERGYFX_PAINT_PLANE
 
@@ -620,7 +532,7 @@ proc/EnergyFXBendClass(fam)
 		CD = new
 		CD.key = key
 		CD.plane = BandPlane(band)
-		CD.blend = (CD.plane == ENERGYFX_LIGHT_PLANE || CD.plane == ENERGYFX_GLIGHT_PLANE) ? BLEND_ADD : BLEND_DEFAULT
+		CD.blend = (CD.plane == ENERGYFX_LIGHT_PLANE) ? BLEND_ADD : BLEND_DEFAULT
 		CD.paint = (CD.plane == ENERGYFX_PAINT_PLANE) ? 1 : 0
 		bcars += key
 		bcars[key] = CD
@@ -747,36 +659,13 @@ proc/EnergyFXBendClass(fam)
 			CarFree(bcars[key])
 		bcars = null
 
-/datum/beamfx/NewObj(list/sp, pr = 0)
-	if(sp.len < BFX_DMP || !sp[BFX_CAR]) return ..()
-	var/datum/efx_car/CD = bcars ? bcars[sp[BFX_CAR]] : null
-	if(!CD) return null
-	var/obj/energyfx/carrier/CO = CarObj(CD)
-	if(!CO) return null
-	var/obj/energyfx/O = ..(sp, 0)
-	if(!O) return null
-	if(O.efx_damp) O.vis_contents -= O.efx_damp
-	if(sp[BFX_DMP])
-		var/list/gf = ENERGYFX_GRAY_FAM[sp[BFX_FAM]]
-		O.icon = gf[2]
-		O.plane = ENERGYFX_DAMP_PLANE
-		O.blend_mode = BLEND_DEFAULT
-	O.loc = null
-	CO.vis_contents += O
-	O.fx_car = CO
-	O.fx_bx = CD.bx + O.fx_w / 2
-	O.fx_by = CD.by + O.fx_h / 2
-	O.transform = BeamFXXform(sp, O.fx_bx, O.fx_by)
-	return O
-
-/datum/beamfx/proc/EmitCopy(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr, car, damp)
+/datum/beamfx/proc/EmitCopy(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr, car)
 	var/list/F = frame_specs[j]
 	Emit(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr)
 	var/list/sp = F[key]
 	if(sp)
-		sp.len = BFX_DMP
+		sp.len = BFX_CAR
 		sp[BFX_CAR] = car
-		sp[BFX_DMP] = damp
 
 /datum/beamfx/var/emit_raw = 0
 
@@ -824,13 +713,12 @@ proc/EnergyFXBendClass(fam)
 		var/list/R = RunXY(P, dc, lat, head, Sc)
 		Emit(j, key, fam, st, light, R[1], R[2], a + R[3], sx * R[4], sy, pre, alpha, layer, order, tag, fade, seed, zl, pr)
 		return
-	var/band = BandKey(light, zl, 0)
-	var/dband = (!light && GrayV2() && ENERGYFX_GRAY_FAM[fam] && ENERGYFX_GRAY_FAM[fam][2]) ? "D" : null
+	var/band = BandKey(light, zl)
 	var/pr2 = 0
 	var/datum/efx_corner/C1 = touch[1]
 	if(lo < (head ? C1.SA : C1.dA))
 		var/list/RA = RunXY(C1.pa, dc, lat, head, Sc)
-		CopyOut(j, "[key]@[C1.uid]A", CarBend(C1, "A", band, zl, cls), dband ? CarBend(C1, "A", dband, zl, cls) : null, fam, st, light, RA[1], RA[2], a + RA[3], sx * RA[4], sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
+		CopyOut(j, "[key]@[C1.uid]A", CarBend(C1, "A", band, zl, cls), fam, st, light, RA[1], RA[2], a + RA[3], sx * RA[4], sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
 	for(var/datum/efx_corner/C in touch)
 		if(!C.miter)
 			var/al = head ? (Sc - C.Smid) : C.kb * (dc - C.dmid)
@@ -838,16 +726,15 @@ proc/EnergyFXBendClass(fam)
 			var/cyp = C.My + C.eby * al + C.ebx * lat
 			var/ca = a - ang + arctan(C.ebx, C.eby)
 			var/csx = head ? sx : sx * C.kb
-			CopyOut(j, "[key]@[C.uid]N", CarBend(C, "CN", "[band][head ? "H" : "F"]", zl, cls), dband ? CarBend(C, "CN", "D[head ? "H" : "F"]", zl, cls) : null, fam, st, light, cxp, cyp, ca, csx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
+			CopyOut(j, "[key]@[C.uid]N", CarBend(C, "CN", "[band][head ? "H" : "F"]", zl, cls), fam, st, light, cxp, cyp, ca, csx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
 			if(ex[2] > ENERGYFX_BEND_NEAR_L - 2)
-				CopyOut(j, "[key]@[C.uid]F", CarBend(C, "CF", "[band][head ? "H" : "F"]", zl, cls), dband ? CarBend(C, "CF", "D[head ? "H" : "F"]", zl, cls) : null, fam, st, light, cxp, cyp, ca, csx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
+				CopyOut(j, "[key]@[C.uid]F", CarBend(C, "CF", "[band][head ? "H" : "F"]", zl, cls), fam, st, light, cxp, cyp, ca, csx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
 		if(hi > (head ? C.SB : C.dB) && C.pb)
 			var/list/RB = RunXY(C.pb, dc, lat, head, Sc)
-			CopyOut(j, "[key]@[C.uid]B", CarBend(C, "B", band, zl, cls), dband ? CarBend(C, "B", dband, zl, cls) : null, fam, st, light, RB[1], RB[2], a + RB[3], sx * RB[4], sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
+			CopyOut(j, "[key]@[C.uid]B", CarBend(C, "B", band, zl, cls), fam, st, light, RB[1], RB[2], a + RB[3], sx * RB[4], sy, pre, alpha, layer, order, tag, fade, seed, zl, pr2)
 
-/datum/beamfx/proc/CopyOut(j, key, car, dcar, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr)
-	EmitCopy(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr, car, 0)
-	if(dcar) EmitCopy(j, "[key]d", fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr, dcar, 1)
+/datum/beamfx/proc/CopyOut(j, key, car, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr)
+	EmitCopy(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr, car)
 
 /datum/beamfx/proc/RunXY(datum/efx_piece/P, dc, lat, head, Sc)
 	var/rho = head ? 1 : P.l / bgeo.D
@@ -874,13 +761,12 @@ proc/EnergyFXBendClass(fam)
 	if(hi < SJ - ENERGYFX_FORK_BACK || !fgeo.rec)
 		Emit(j, key, fam, st, light, x, y, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, pr)
 		return
-	var/band = BandKey(light, zl, 0)
-	var/dband = (!light && GrayV2() && ENERGYFX_GRAY_FAM[fam] && ENERGYFX_GRAY_FAM[fam][2]) ? "D" : null
+	var/band = BandKey(light, zl)
 	var/px = x + ax * (Sc - dc)
 	var/py = y + ay * (Sc - dc)
 	var/cb = head ? "H" : "F"
 	if(lo < SJ + ENERGYFX_FORK_J_AHEAD)
-		CopyOut(j, "[key]@P", CarFork("P", band, zl, cls), dband ? CarFork("P", dband, zl, cls) : null, fam, st, light, px, py, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
+		CopyOut(j, "[key]@P", CarFork("P", band, zl, cls), fam, st, light, px, py, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
 	var/injz = (hi >= SJ - ENERGYFX_FORK_J_BACK && lo <= SJ + ENERGYFX_FORK_J_AHEAD)
 	for(var/sig in list(1, -1))
 		var/sgn = (sig > 0) ? "+" : "-"
@@ -889,12 +775,10 @@ proc/EnergyFXBendClass(fam)
 		var/ba = a + 45 * sig
 		var/bsx = head ? sx : sx * fgeo.k1
 		if(injz)
-			CopyOut(j, "[key]@JP[sgn]", CarFork("JP[sgn]", "[band][cb]", zl, cls), dband ? CarFork("JP[sgn]", "D[cb]", zl, cls) : null, fam, st, light, px, py, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
-			CopyOut(j, "[key]@JB[sgn]", CarFork("JB[sgn]", "[band][cb]", zl, cls), dband ? CarFork("JB[sgn]", "D[cb]", zl, cls) : null, fam, st, light, B[1], B[2], ba, bsx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
+			CopyOut(j, "[key]@JP[sgn]", CarFork("JP[sgn]", "[band][cb]", zl, cls), fam, st, light, px, py, a, sx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
+			CopyOut(j, "[key]@JB[sgn]", CarFork("JB[sgn]", "[band][cb]", zl, cls), fam, st, light, B[1], B[2], ba, bsx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
 		if(hi > SJ)
-			CopyOut(j, "[key]@B[sgn]", CarFork("B[sgn]", band, zl, cls), dband ? CarFork("B[sgn]", dband, zl, cls) : null, fam, st, light, B[1], B[2], ba, bsx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
-
-/datum/beamfx/var/bend_uids = ""
+			CopyOut(j, "[key]@B[sgn]", CarFork("B[sgn]", band, zl, cls), fam, st, light, B[1], B[2], ba, bsx, sy, pre, alpha, layer, order, tag, fade, seed, zl, 0)
 
 /datum/beamfx/proc/BendGeoUpdate(dh)
 	if(!bh_x || bh_x.len < 2) return
@@ -903,12 +787,6 @@ proc/EnergyFXBendClass(fam)
 	b_sig = sig
 	if(!bgeo) bgeo = new
 	bgeo.Build(bh_x, bh_y, d, dh, D)
-	var/uids = ""
-	for(var/datum/efx_corner/C in bgeo.corners)
-		uids += "[C.uid];"
-	if(uids != bend_uids)
-		bend_uids = uids
-		RebuildChains()
 
 proc/EnergyFXBendFeed(datum/beam/B, datum/beamfx/F)
 	if(!ENERGYFX_BEND_ASSETS || !B.path || !B.path.len) return
@@ -959,10 +837,6 @@ proc/EnergyFXForkFeed(datum/beam/B, datum/beamfx/F)
 				bt = B.hit_at[m]
 				best = m
 		if(best) F.target_mob = best
-		if(F.wide)
-			F.bent = 1
-			F.SetDir(F.d)
-		F.RebuildChains()
 	var/datum/beam/A = EnergyFXForkLiveArm(F.fork_arms)
 	var/fa = F.fgeo.fat
 	var/tail = B.parts.len ? B.travelled : fa + 1 + (A ? A.travelled : 0)

@@ -29,7 +29,7 @@ proc/SekihaCenter(atom/movable/A)
 proc/EnergyFXSkinLocked(obj/Skills/S)
 	if(!istype(S, /obj/Skills/Projectile)) return 0
 	var/datum/energyfx_row/R = EnergyFXRow(S)
-	if(R) return R.look != "beam"
+	if(R) return 1
 #if SEKIHA_ART
 	return istype(S, /obj/Skills/Projectile/Sekiha_Tenkyoken)
 #else
@@ -381,6 +381,20 @@ proc/SekihaAnimAlpha(list/L, a0, a1)
 	var/cm = s[13]
 	return list(Xform(O, s), round(clamp(s[12], 0, 1) * 255, 1), list(cm, 0, 0, 0, cm, 0, 0, 0, cm), s[6])
 
+/obj/energyfx/var/tmp/sekiha_sm = 0
+
+proc/SekihaFree(obj/energyfx/O)
+	if(O && O.sekiha_sm)
+		O.sekiha_sm = 0
+		O.filters = null
+	EnergyFXFree(O)
+
+proc/SekihaSmooth(list/s)
+	return s && s[13] > 1
+
+proc/SekihaFiltM(list/c)
+	return list(c[1], 0, 0, 0, 0, c[5], 0, 0, 0, 0, c[9], 0, 0, 0, 0, 1, 0, 0, 0, 0)
+
 /datum/sekihafx/proc/SameKey(list/a, list/b)
 	if(a[2] != b[2] || a[4] != b[4]) return 0
 	var/list/ca_ = a[3]
@@ -404,7 +418,7 @@ proc/SekihaAnimAlpha(list/L, a0, a1)
 	for(var/key in objs)
 		if(!keys[key]) gone += key
 	for(var/key in gone)
-		EnergyFXFree(objs[key])
+		SekihaFree(objs[key])
 		objs -= key
 	for(var/key in keys)
 		var/list/s0 = m0[key]
@@ -421,7 +435,7 @@ proc/SekihaAnimAlpha(list/L, a0, a1)
 			objs[key] = O
 		if(!O.loc || abs(sp[7] - O.fx_bx) > 48 || abs(sp[8] - O.fx_by) > 48)
 			if(!EnergyFXPlace(O, sp[7], sp[8], zz))
-				EnergyFXFree(O)
+				SekihaFree(O)
 				objs -= key
 				continue
 		O.layer = sp[14]
@@ -430,6 +444,18 @@ proc/SekihaAnimAlpha(list/L, a0, a1)
 		if(parity)
 			if(s0) SekihaParityLog(2 * k, key, O, s0, a0)
 			if(s1) SekihaParityLog(2 * k + 1, key, O, s1, a1)
+		if(!O.sekiha_sm && (SekihaSmooth(s0) || SekihaSmooth(s1)))
+			O.sekiha_sm = 1
+			O.color = null
+			O.filters = filter(type = "color", color = SekihaFiltM(a0[3]))
+		if(O.sekiha_sm)
+			var/two = !SameKey(a0, a1)
+			animate(O, transform = a0[1], alpha = a0[2], icon_state = a0[4], time = 0.25, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_LINEAR_TRANSFORM)
+			if(two) animate(transform = a1[1], alpha = a1[2], icon_state = a1[4], time = 0.25, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_LINEAR_TRANSFORM)
+			animate(O.filters[1], color = SekihaFiltM(a0[3]), time = 0.25, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_PARALLEL)
+			if(two) animate(color = SekihaFiltM(a1[3]), time = 0.25, easing = JUMP_EASING | EASE_IN)
+			energyfx_anim_n += two ? 4 : 2
+			continue
 		animate(O, transform = a0[1], alpha = a0[2], color = a0[3], icon_state = a0[4], time = 0.25, easing = JUMP_EASING | EASE_IN, flags = ANIMATION_LINEAR_TRANSFORM)
 		energyfx_anim_n++
 		if(!SameKey(a0, a1))
@@ -585,7 +611,7 @@ proc/SekihaAnimAlpha(list/L, a0, a1)
 	if(done) return
 	done = 1
 	for(var/key in objs)
-		EnergyFXFree(objs[key])
+		SekihaFree(objs[key])
 	objs = list()
 	if(cfx_c) cfx_c.Drop()
 	if(cfx_t) cfx_t.Drop()

@@ -55,7 +55,7 @@ mob/Players/UseProjectile(var/obj/Skills/Projectile/Z, noGCD = FALSE)
 	HoverDrop()
 	return ..()
 
-mob/Players/Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE)
+mob/Players/Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE, noAdjust = FALSE)
 	HoverDrop()
 	return ..()
 

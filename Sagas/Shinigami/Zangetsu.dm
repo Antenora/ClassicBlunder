@@ -65,16 +65,10 @@
 	adjust(mob/p)
 		if(altered) return
 		var/SL = p.SagaLevel
-		passives = list(
-			
-			
-			"Half-Sword"     = 1 + SL,
-			"HeavyHitter" 	 = 1 + (0.25 * SL)
-		)
+		passives = list()
+		passives["Momentum"] = clamp(round(SL/2), 1, 3)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
-		if(SL >= 7)
-			passives["DoubleStrike"] = 5
 		if(SL >= 7)
 			StrMult = 1.15 + (0.15 * SL)
 			ForMult = 1.15 + (0.15 * SL)
@@ -132,7 +126,6 @@
 			
 			"AfterImages"     = 1,
 			"Godspeed"        = 1 + SL,
-			"Warping"         = 0.5 + (SL/2),
 			
 			"EmptyFlashStep"  = 1,
 			"SwordAscension"  = SL

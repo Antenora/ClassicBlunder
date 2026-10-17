@@ -2,12 +2,6 @@
 	icon = ENERGYFX_CHG_HOST_ICON
 	icon_state = ""
 
-/obj/energyfx/chgstreak
-	icon = ENERGYFX_CHG_STREAK_ICON
-	plane = ENERGYFX_PAINT_PLANE
-	pixel_x = -16
-	pixel_y = 4
-
 /obj/energyfx/chgglow
 	icon = ENERGYFX_CHG_POOL_ICON
 	icon_state = "l_pool"
@@ -17,11 +11,6 @@
 	pixel_y = -32
 
 var/list/ENERGYFX_CHG_LIVE = list()
-var/list/ENERGYFX_CHG_PARSED
-var/list/ENERGYFX_CHG_RUSHP
-var/list/ENERGYFX_CHG_ROT = list()
-var/list/ENERGYFX_CHG_TURN
-var/list/ENERGYFX_CHG_OVL = list()
 
 proc/EnergyFXChgNow()
 	return round(world.time * 4, 1)
@@ -35,52 +24,6 @@ proc/EnergyFXChgRound(x)
 
 proc/EnergyFXChgR3(x)
 	return EnergyFXChgRound(x * 1000) / 1000
-
-proc/EnergyFXChgHead(head)
-	var/list/n = splittext(head, ",")
-	return list(matrix(text2num(n[1]), text2num(n[2]), text2num(n[3]), text2num(n[4]), text2num(n[5]), text2num(n[6])), text2num(n[7]))
-
-proc/EnergyFXChgSteps(body)
-	var/list/out = list()
-	for(var/part in splittext(body, ";"))
-		var/list/f = splittext(part, "|")
-		var/m = null
-		if(f[2] != "-")
-			var/list/n = splittext(f[2], ",")
-			m = matrix(text2num(n[1]), text2num(n[2]), text2num(n[3]), text2num(n[4]), text2num(n[5]), text2num(n[6]))
-		out[++out.len] = list(text2num(f[1]), m, (f[3] == "-") ? null : text2num(f[3]))
-	return out
-
-proc/EnergyFXChgParse()
-	if(ENERGYFX_CHG_PARSED) return ENERGYFX_CHG_PARSED
-	if(!ENERGYFX_CHG_TABLES.len) EnergyFXChgRegister()
-	var/list/P = list()
-	for(var/vn in list("normal", "big"))
-		var/list/T = ENERGYFX_CHG_TABLES[vn]
-		if(!T) return null
-		var/list/kids = list()
-		for(var/list/k in T[4])
-			var/list/h = EnergyFXChgHead(k[3])
-			var/list/st = EnergyFXChgSteps(k[4])
-			var/lit = h[2] > 0
-			if(!lit)
-				for(var/list/s in st)
-					if(s[3] > 0)
-						lit = 1
-						break
-			kids[++kids.len] = list(k[1], k[2], h[1], h[2], st, lit)
-		P[vn] = list(T[1], T[2], T[3], kids)
-	var/list/R = list()
-	for(var/list/vr in ENERGYFX_CHG_RUSH)
-		var/list/ch = list()
-		for(var/list/c in vr)
-			var/list/h = EnergyFXChgHead(c[1])
-			ch[++ch.len] = list(h[1], h[2], EnergyFXChgSteps(c[2]))
-		R[++R.len] = ch
-	if(R.len < ENERGYFX_CHG_RUSH_VARIANTS) return null
-	ENERGYFX_CHG_RUSHP = R
-	ENERGYFX_CHG_PARSED = P
-	return P
 
 proc/EnergyFXChgRotate(tf0, al0, list/steps, t_off)
 	if(!t_off) return list(tf0, al0, steps)
@@ -103,27 +46,6 @@ proc/EnergyFXChgRotate(tf0, al0, list/steps, t_off)
 		if(!isnull(s[3])) al = s[3]
 		acc += s[1]
 	return list(tf0, al0, steps)
-
-proc/EnergyFXChgRotated(vn, t_off)
-	var/key = "[vn][t_off]"
-	var/list/L = ENERGYFX_CHG_ROT[key]
-	if(L) return L
-	var/list/T = ENERGYFX_CHG_PARSED[vn]
-	L = list()
-	for(var/list/k in T[4])
-		L[++L.len] = EnergyFXChgRotate(k[3], k[4], k[5], t_off)
-	ENERGYFX_CHG_ROT[key] = L
-	return L
-
-proc/EnergyFXChgTurn(i16)
-	if(!ENERGYFX_CHG_TURN) ENERGYFX_CHG_TURN = new /list(5760)
-	i16 = ((i16 % 5760) + 5760) % 5760
-	var/matrix/m = ENERGYFX_CHG_TURN[i16 + 1]
-	if(!m)
-		var/a = EnergyFXChgR3(i16 / 16)
-		m = matrix(cos(a), sin(a), 0, -sin(a), cos(a), 0)
-		ENERGYFX_CHG_TURN[i16 + 1] = m
-	return m
 
 proc/EnergyFXChgRamp(a0, a1, dur)
 	if(dur <= 0 || a0 == a1) return list(list(max(dur, ENERGYFX_CHG_DT_Q), null, a1))
@@ -153,20 +75,6 @@ proc/EnergyFXChgRawBucket(lv)
 proc/EnergyFXChgBudget(list/cp, want)
 	return max(0, min(want, cp[1]) - cp[2])
 
-proc/EnergyFXChgLightImage(state, list/m)
-	var/key = "[state]|[m[1]],[m[2]],[m[3]],[m[5]],[m[6]],[m[7]]"
-	var/image/I = ENERGYFX_CHG_OVL[key]
-	if(!I)
-		I = image(icon = ENERGYFX_CHG_STREAK_ICON, icon_state = state)
-		I.plane = ENERGYFX_LIGHT_PLANE
-		I.blend_mode = BLEND_ADD
-		I.appearance_flags = RESET_COLOR
-		I.color = m
-		if(ENERGYFX_CHG_OVL.len < 1024)
-			ENERGYFX_CHG_OVL += key
-			ENERGYFX_CHG_OVL[key] = I
-	return I
-
 /datum/energyfx_streaks
 	var/atom/movable/M
 	var/list/colors
@@ -180,8 +88,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/t_on = 0
 	var/live = 0
 	var/vn = "normal"
-	var/suffix = ""
-	var/lsuf = ""
 	var/gray = 0
 	var/list/rgb
 	var/list/ramp
@@ -203,11 +109,7 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/drop = 0
 	var/ak = 1
 	var/t_off = 0
-	var/spin0 = 0
-	var/rush_var = 0
-	var/rush_rot = 0
 	var/obj/energyfx/carrier
-	var/obj/energyfx/spinner
 	var/obj/energyfx/ghost
 	var/obj/energyfx/glow
 	var/obj/energyfx/gpulse
@@ -216,11 +118,8 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/g_lo = 1
 	var/g_refa = 0
 	var/g_refb = 0
-	var/list/groups
-	var/list/streaks
 	var/list/objs
 	var/list/ca_tr
-	var/list/g_tr
 
 /datum/energyfx_charge
 	var/mob/M
@@ -238,9 +137,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 
 /datum/energyfx_streaks/proc/Dice()
 	t_off = rand(0, ENERGYFX_CHG_PERIOD_Q / 2 - 1) * 2
-	spin0 = rand(0, 359)
-	rush_var = rand(0, ENERGYFX_CHG_RUSH_VARIANTS - 1)
-	rush_rot = rand(0, 359)
 
 /datum/energyfx_streaks/proc/Ambient(turf/T)
 	return LightAmbientRGB(T)
@@ -285,7 +181,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 	return O
 
 /datum/energyfx_streaks/proc/Start(atom/movable/m, list/c, r_ds, oh)
-	if(!EnergyFXChgParse()) return 0
 	M = m
 	colors = c
 	ramp_ds = max(0, r_ds)
@@ -322,7 +217,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 		var/list/o = BeamFXHSV2RGB(hd / 360, max(hsv[2], ENERGYFX_CHG_SAT_FLOOR), max(hsv[3], ENERGYFX_CHG_VAL_FLOOR))
 		rgb = list(EnergyFXChgRound(o[1] * 255 + 0.0001), EnergyFXChgRound(o[2] * 255 + 0.0001), EnergyFXChgRound(o[3] * 255 + 0.0001))
 	var/lum = BeamFXLum(list(rgb[1] / 255, rgb[2] / 255, rgb[3] / 255))
-	var/wide = 0
 	if(gray)
 		lift = ENERGYFX_CHG_GRAY_LIFT
 		light_k = ENERGYFX_CHG_GRAY_LIGHT_K
@@ -330,9 +224,7 @@ proc/EnergyFXChgLightImage(state, list/m)
 	else
 		light_k = EnergyFXChgR3(min(1, max(ENERGYFX_CHG_DARK_LIGHT_MIN, (lum / ENERGYFX_CHG_DARK_LUM) ** 2)))
 		lift = EnergyFXChgR3(ENERGYFX_CHG_DARK_LIFT * clamp((ENERGYFX_CHG_DARK_LUM - lum) / ENERGYFX_CHG_DARK_LUM, 0, 1))
-		wide = lum < ENERGYFX_CHG_DARK_WIDE_LUM
 		glow_k = (lum < ENERGYFX_CHG_DARK_LUM) ? ENERGYFX_CHG_DARK_GLOW_K : 1
-	lsuf = wide ? "_wl" : ""
 	var/list/R = BeamFXRamp(rgb, null, null)
 	var/list/lc = R[1]
 	var/list/core = R[3]
@@ -358,11 +250,9 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/total = ks_icon * mscale
 	if(total >= ENERGYFX_CHG_BIG_MIN)
 		vn = "big"
-		suffix = ENERGYFX_CHG_BIG_SUFFIX
 		ks0 = sqrt(total) / mscale
 	else
 		vn = "normal"
-		suffix = ""
 		ks0 = ks_icon
 	ks = ks0
 	gq = ks_icon / ks0
@@ -422,45 +312,9 @@ proc/EnergyFXChgLightImage(state, list/m)
 	return matrix(k, 0, cx0 + ks * ax, 0, k, cy0 + ks * ay)
 
 /datum/energyfx_streaks/proc/Build()
-	carrier = Get(/obj/energyfx/chghost, M, KEEP_APART | RESET_COLOR)
-	if(!carrier) return 0
-	spinner = Get(/obj/energyfx/chghost, carrier)
-	if(!spinner) return 0
-	groups = list()
-	g_tr = new /list(ENERGYFX_CHG_GROUPS)
-	for(var/g = 1 to ENERGYFX_CHG_GROUPS)
-		var/obj/energyfx/G = Get(/obj/energyfx/chghost, spinner)
-		if(!G) return 0
-		groups += G
-	var/list/T = ENERGYFX_CHG_PARSED[vn]
-	var/list/kids = T[4]
-	streaks = new /list(kids.len)
-	for(var/i = 1 to kids.len)
-		var/list/k = kids[i]
-		if(!k[6]) continue
-		var/obj/energyfx/O = Get(/obj/energyfx/chgstreak, groups[k[1] + 1])
-		if(!O) continue
-		O.icon_state = "p_[k[2]][suffix]"
-		O.layer = 5.3 + i * 0.00001
-		O.color = paint_m
-		O.overlays += EnergyFXChgLightImage("l_[k[2]][suffix][lsuf]", light_m)
-		streaks[i] = O
-	return 1
+	return 0
 
 /datum/energyfx_streaks/proc/Begin()
-	var/inc = 5760 / (ENERGYFX_CHG_SPIN_Q / 2)
-	Put(spinner, EnergyFXChgTurn(spin0 * 16))
-	var/list/sp = list()
-	for(var/k = 1 to ENERGYFX_CHG_SPIN_Q / 2)
-		sp[++sp.len] = list(ENERGYFX_CHG_DT_Q, EnergyFXChgTurn(spin0 * 16 + ENERGYFX_CHG_SPIN_DIR * inc * k), null)
-	Run(spinner, sp, 1)
-	var/list/rot = EnergyFXChgRotated(vn, t_off)
-	for(var/i = 1 to streaks.len)
-		var/obj/energyfx/O = streaks[i]
-		if(!O) continue
-		var/list/r = rot[i]
-		Put(O, r[1], r[2])
-		Run(O, r[3], 1)
 	Plan(t_on, 0)
 
 /datum/energyfx_streaks/proc/Plan(t, lv)
@@ -472,11 +326,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/list/cs = list()
 	for(var/k = 1 to ENERGYFX_CHG_ON_STEPS)
 		cs[++cs.len] = list(ENERGYFX_CHG_DT_Q, null, EnergyFXChgRound(a_on * k / ENERGYFX_CHG_ON_STEPS))
-	var/list/gs = new /list(ENERGYFX_CHG_GROUPS)
-	var/list/gel = new /list(ENERGYFX_CHG_GROUPS)
-	for(var/g = 1 to ENERGYFX_CHG_GROUPS)
-		gs[g] = list(list(ENERGYFX_CHG_DT_Q, null, ((g - 1) <= b0) ? 255 : 0))
-		gel[g] = ENERGYFX_CHG_DT_Q
 	var/amax = a_on
 	if(ramp_q > 0)
 		var/el = ENERGYFX_CHG_DT_Q * ENERGYFX_CHG_ON_STEPS
@@ -497,19 +346,10 @@ proc/EnergyFXChgLightImage(state, list/m)
 				el += s[1]
 			cur = CAlpha(bb)
 			amax = max(amax, cur)
-			var/list/gb = gs[bb + 1]
-			if(tb > gel[bb + 1])
-				gb[++gb.len] = list(tb - gel[bb + 1], null, 0)
-				gel[bb + 1] = tb
-			gb += EnergyFXChgRamp(0, 255, ENERGYFX_CHG_GROUP_Q)
 			done = bb
 	Put(carrier, CarrierTf(ks), 0)
 	Run(carrier, cs, 0)
 	ca_tr = list(t, 0, cs)
-	for(var/g = 1 to ENERGYFX_CHG_GROUPS)
-		Put(groups[g], null, 0)
-		Run(groups[g], gs[g], 0)
-		g_tr[g] = list(t, 0, gs[g])
 	GlowIssue(t, cs, 0, amax)
 
 /datum/energyfx_streaks/proc/Level(lv)
@@ -526,13 +366,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 	var/list/cs = EnergyFXChgRamp(cur, CAlpha(b), ENERGYFX_CHG_LEVEL_Q)
 	Run(carrier, cs, 0)
 	ca_tr = list(t, cur, cs)
-	for(var/g = 1 to ENERGYFX_CHG_GROUPS)
-		var/want = ((g - 1) <= b) ? 255 : 0
-		var/ga = EnergyFXChgAt(g_tr[g], t)
-		if(abs(ga - want) > 0.5)
-			var/list/gs = EnergyFXChgRamp(EnergyFXChgRound(ga), want, ENERGYFX_CHG_GROUP_Q)
-			Run(groups[g], gs, 0)
-			g_tr[g] = list(t, ga, gs)
 	bucket = b
 	GlowIssue(t, cs, cur, CAlpha(b))
 
@@ -560,10 +393,9 @@ proc/EnergyFXChgLightImage(state, list/m)
 	return list(lim, StaticPaint(T) / 255)
 
 /datum/energyfx_streaks/proc/GlowSteps(alo)
-	var/list/T = ENERGYFX_CHG_PARSED[vn]
 	var/P = ENERGYFX_CHG_PERIOD_Q
 	var/list/vts = list()
-	for(var/v in T[3])
+	for(var/v in ENERGYFX_CHG_PULSES[vn])
 		var/x = ((v - t_off) % P + P) % P
 		var/j = 1
 		while(j <= vts.len && vts[j] <= x)
@@ -647,11 +479,6 @@ proc/EnergyFXChgLightImage(state, list/m)
 		Put(ghost, null, min(255, EnergyFXChgRound(255 * GlowHi(a0) / g_refb)))
 		Run(ghost, hb, 0)
 
-/datum/energyfx_streaks/proc/RushTf()
-	var/c = cos(rush_rot)
-	var/s = sin(rush_rot)
-	return matrix(ks * c, ks * s, cx0 + ks * ax, -ks * s, ks * c, cy0 + ks * ay)
-
 /datum/energyfx_streaks/proc/Flash(cur)
 	if(!GlowAllowed()) return
 	var/list/col = GlowColor()
@@ -672,46 +499,7 @@ proc/EnergyFXChgLightImage(state, list/m)
 	Run(F, st, 0)
 
 /datum/energyfx_streaks/proc/Off()
-	if(!live) return
-	live = 0
-	ENERGYFX_CHG_LIVE -= src
-	if(M && M.energyfx_streaks == src) M.energyfx_streaks = null
-	if(!M || !carrier)
-		Drop()
-		return
-	var/t = Now()
-	var/cur = EnergyFXChgRound(EnergyFXChgAt(ca_tr, t))
-	var/list/st = list()
-	for(var/list/im in ENERGYFX_CHG_IMPLODE)
-		st[++st.len] = list(im[1], CarrierTf(EnergyFXChgR3(ks * im[2])), EnergyFXChgRound(cur * im[3]))
-	Run(carrier, st, 0)
-	GlowEnvelope(st, cur)
-	var/obj/energyfx/rc = Get(/obj/energyfx/chghost, M, KEEP_APART | RESET_COLOR)
-	if(rc)
-		Put(rc, RushTf(), cur)
-		var/list/V = ENERGYFX_CHG_RUSHP[rush_var + 1]
-		for(var/k = 1 to V.len)
-			var/list/c = V[k]
-			var/obj/energyfx/O = Get(/obj/energyfx/chgstreak, rc)
-			if(!O) continue
-			O.icon_state = "p_[ENERGYFX_CHG_RUSH_TEX][suffix]"
-			O.layer = 5.302 + k * 0.00001
-			O.color = paint_m
-			O.overlays += EnergyFXChgLightImage("l_[ENERGYFX_CHG_RUSH_TEX][suffix][lsuf]", light_m)
-			Put(O, c[1], c[2])
-			Run(O, c[3], 0)
-	Flash(cur)
-	var/ticks = max(1, EnergyFXChgRound(ENERGYFX_CHG_FREE_Q * 0.25 / world.tick_lag))
-	for(var/obj/energyfx/O in objs)
-		EnergyFXDue(O, ticks)
-	objs = list()
-	carrier = null
-	spinner = null
-	ghost = null
-	glow = null
-	gpulse = null
-	groups = null
-	streaks = null
+	return
 
 /datum/energyfx_streaks/proc/Drop()
 	live = 0
@@ -721,12 +509,9 @@ proc/EnergyFXChgLightImage(state, list/m)
 		EnergyFXFree(O)
 	objs = list()
 	carrier = null
-	spinner = null
 	ghost = null
 	glow = null
 	gpulse = null
-	groups = null
-	streaks = null
 
 proc/EnergyFXStreaksOn(atom/movable/M, list/colors, ramp_ds = 0, overhead = 0)
 	if(!M || !glob || !glob.ENERGYFX || !ENERGYFX_CHG_ASSETS) return null
@@ -758,7 +543,7 @@ proc/EnergyFXChargeOn(mob/M, obj/Skills/Z)
 	C.started = world.time
 	M.energyfx_charge = C
 	var/datum/energyfx_colors/K = C.colors
-	if(!(R.extra && R.extra["no_streaks"])) EnergyFXStreaksOn(M, list(K.main255, K.core255, K.glow255, K.gray, K.bright), 0, Z.IconChargeOverhead)
+	if(!(R.extra && R.extra["no_streaks"])) EnergyFXStreaksOn(M, list(K.main255, K.core255, K.glow255), 0, Z.IconChargeOverhead)
 	if(EnergyFXChargeDrawing(M, Z) && hascall(R.handler, "MobCharge")) call(R.handler, "MobCharge")(M, Z)
 	return EnergyFXChargeDrawing(M, Z)
 

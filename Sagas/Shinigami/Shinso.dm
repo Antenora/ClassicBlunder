@@ -10,12 +10,7 @@ mob/var/tmp/ButouActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"SweepingStrike"     = 4 + SL,
-			"Sniper"          = 1 + SL,
-			
-			
-			"Extend"          = 1.5 + (0.5 * SL)
-		)
+			"Sniper"          = 1 + SL)
 		if(SL < 3)
 			passives["ManaLeak"] = 2
 		StrMult = 1.2 + (0.15 * SL)
@@ -66,12 +61,7 @@ mob/var/tmp/ButouActive = FALSE
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"SweepingStrike"     = 6 + SL,
-			"Sniper"          = 1 + SL,
-			
-			
-			"Extend"          = 3 + (0.5 * SL)
-		)
+			"Sniper"          = 1 + SL)
 		if(SL < 5)
 			passives["ManaLeak"] = 4
 		if(SL >= 7)

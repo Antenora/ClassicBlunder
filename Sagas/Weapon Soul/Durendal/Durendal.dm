@@ -77,36 +77,12 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Durendal
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s legendary weapon and horn ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their Saintly luster..."
+	adjust(mob/p)
+		passives["HolyMod"] = 3 + p.SagaLevel
+		if(p.SagaLevel >= 5)
+			passives["Juggernaut"] = 1
+			passives["Adrenaline"] = 1
+			passives["SwordAscension"] = 1
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
-
-/obj/Skills/Buffs/NuStyle/SwordStyle //slightly weaker than t2. maybe make it scaling???
-	Saintlike_Behavior
-		StyleActive="Saintlike Behavior"
-		passives = list("HolyMod" = 1)
-		StyleDef=1.25
-		StyleSpd=1.25
-		Finisher="/obj/Skills/Queue/Finisher/Heavenly_Judgement"
-		adjust(mob/p)
-			StyleDef = 1.15 + (0.15 * p.SagaLevel)
-			StyleSpd = 1.15 + (0.15 * p.SagaLevel)
-			passives["HolyMod"] = 1 + (p.SagaLevel)
-		verb/Saintlike_Behavior()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-/obj/Skills/Queue/Finisher
-	Heavenly_Judgement
-		DamageMult=3
-		HitSparkIcon='Slash - Zan.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		InstantStrikes=5
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Divine_Messenger"
-		HitMessage = "subjects their foe to Heavenly Judgement!"
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Divine_Messenger
-		StrMult=1.3
-		EndMult=1.3
-		passives = list("HolyMod" = 2, "Juggernaut" = 1, "EvilResist" = 2)

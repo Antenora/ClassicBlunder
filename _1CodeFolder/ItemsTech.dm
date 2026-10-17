@@ -3316,7 +3316,7 @@ obj/Items/Gear
 				return
 			for(var/a in selector.race.ascensions)
 				var/ascension/asc = a
-				if(asc.checkAscensionUnlock(src,selector.Potential+10))
+				if(asc.checkAscensionUnlock(selector,selector.Potential+10))
 					asc.onAscension(selector)
 				src.Using=0
 		verb/Awaken_Power()//transformation

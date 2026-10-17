@@ -898,7 +898,7 @@ obj/Items/Sword
 				name="Soul Eater"
 				pixel_x=-16
 				pixel_y=-16
-				Techniques=list("/obj/Skills/Queue/Heart_Slayer","/obj/Skills/AutoHit/Dark_Break","/obj/Skills/AutoHit/Shadowbreaker","/obj/Skills/Buffs/NuStyle/SwordStyle/Seeker_of_Darkness","/obj/Skills/Buffs/NuStyle/SwordStyle/Seeker_of_Darkness_Dual_Wield")
+				Techniques=list("/obj/Skills/Queue/Heart_Slayer","/obj/Skills/AutoHit/Dark_Break","/obj/Skills/AutoHit/Shadowbreaker","/obj/Skills/Buffs/SlotlessBuffs/Seeker_of_Darkness")
 				Destructable = 0
 				ShatterTier = 0
 				NoSaga=1
@@ -909,8 +909,8 @@ obj/Items/Sword
 				verb/ChooseForm()
 					set category="Other"
 					set hidden = 1
-					if(usr.StyleActive)
-						usr<<"You cannot use this with a style active!"
+					if(usr.CheckSlotless("Seeker of Darkness"))
+						usr<<"You cannot use this while Seeker of Darkness is active!"
 						return
 					var/check = 0
 					var/S = Ask(usr, "Choose the form of your Soul Eater", "Form", null, "pick", list("Sword","Staff","Shield"), 0)
@@ -1315,7 +1315,7 @@ obj/Items/proc/Equip(mob/A)
 								x.verbs -= list(/obj/Skills/Buffs/SlotlessBuffs/Posture/verb/Posture)
 								x.verbs += new /obj/Skills/Buffs/SlotlessBuffs/Posture/verb/Posture(x, x?:BuffName)
 					suffix = "*Equipped (Second)*"
-			else if(A.NeedsThirdSword() && A.EquippedSword() && !A.EquippedThirdSword())
+			else if((A.NeedsThirdSword() || (A.AllowsThirdSword() && A.EquippedSecondSword())) && A.EquippedSword() && !A.EquippedThirdSword())
 				var/found = 0
 				for(var/obj/Items/Sword/s in A)
 					if(s.suffix == "*Equipped (Third)*")

@@ -21,10 +21,6 @@
 	var/fc_y = 0
 	var/fc_a = 0
 	var/fc_init = 0
-	var/list/pre_specs
-	var/pre_f0 = 0
-	var/pre_done = 0
-	var/list/pobjs
 
 /datum/beamfx
 	var/datum/beam/beam
@@ -65,7 +61,6 @@
 	var/list/ring_q = list()
 	var/last_ring = -1
 	var/list/flame_src = list()
-	var/list/surge_emit = list()
 	var/bloom_k = 1
 	var/list/pulses = list()
 	var/list/hlog_f = list()
@@ -87,8 +82,6 @@
 	var/st_f
 	var/st_h0
 	var/t_hit
-	var/remnant_done = 0
-	var/erode_done = 0
 	var/swallow_t
 	var/swallow_f
 	var/swallow_bk
@@ -105,11 +98,9 @@
 	var/s_clash = 0
 	var/s_dead = 0
 	var/s_off = 0
-	var/grey = 0
 	var/list/ramp
 	var/list/slots = list()
 	var/list/frame_specs
-	var/list/new_chains
 	var/list/flog
 	var/logging = 0
 	var/finished = 0
@@ -120,12 +111,9 @@
 	var/cm_y
 	var/list/olog_f = list()
 	var/list/olog_v = list()
-	var/list/spk_burst
-	var/list/spk_shots = list()
 	var/rm_ih
 	var/rm_fdet
 	var/rm_ir
-	var/rm_changed = 0
 
 /datum/beamfx/New(dir_text, ox, oy, zlevel, width, seed, list/C255, list/core255, list/glow255)
 	rng = new /datum/bfx_rng(seed)
@@ -160,13 +148,11 @@
 	var/list/c = C255 ? C255 : list(0, 0, 0)
 	var/lum = BeamFXLum(list(c[1] / 255, c[2] / 255, c[3] / 255))
 	if(lum < 0.03)
-		grey = 1
 		var/list/g = list(0, 0, 0)
 		for(var/i = 1 to 3)
 			g[i] = clamp(c[i] / 255 + (0.6 - lum), 0, 1) * 255
 		ramp = BeamFXRamp(g, null, null)
 	else
-		grey = 0
 		ramp = BeamFXRamp(c, core255, glow255)
 
 proc/BeamFXDirVec(d)
@@ -510,8 +496,6 @@ proc/BeamFXDirText(dir)
 		var/lifev = rng.U(0.2, 0.3)
 		var/sq = rng.RandRange(4)
 		SpawnFlow("tongue", now, bx, by, a0, vv, om, lifev, 1.8, 1.3, sq)
-	if(final) spk_shots += list(list("final", now, WX(cd - 2), WY(cd - 2), strength, clash ? 1 : 0))
-	else spk_burst = list(now, cd, strength, clash ? 1 : 0)
 
 /datum/beamfx/proc/Tick(kk)
 	var/qn = 2 * kk
@@ -539,10 +523,6 @@ proc/BeamFXDirText(dir)
 				var/hr2 = Hr(now - 0.000001, qn, 1)
 				if(!hr2) hr2 = dead_H
 				end_H = hr2
-			else if(isnull(fly_t))
-				var/hr3 = Hr(now - 0.000001, qn, 1)
-				if(!hr3) hr3 = dead_H
-				spk_shots += list(list("fly", now, WX(hr3 + 6), WY(hr3 + 6)))
 		return
 	var/n = s_n
 	if(n == 0) return
@@ -554,7 +534,6 @@ proc/BeamFXDirText(dir)
 		release_t = now
 		release_f = qn
 		rm_ir = qn
-		rm_changed = 1
 	var/H = (s_travelled + n - 1) * D
 	if(!isnull(release_t) && isnull(fly_t) && !(s_blocked || s_clash) && hlog_h.len && abs(H - hlog_h[hlog_h.len]) < 0.001 && s_travelled > 0 && !ever_blocked)
 		var/rem = H - Back(now, qn)
@@ -580,7 +559,6 @@ proc/BeamFXDirText(dir)
 		t_hit = now + max(0, (c0 - 9 - st_h0) / Vg)
 		rm_ih = ceil(t_hit / BEAMFX_FR - 0.0001)
 		rm_fdet = qn
-		rm_changed = 1
 	if(struggling) ever_blocked = 1
 	blk_f += qn
 	blk_v += struggling
@@ -630,7 +608,6 @@ proc/BeamFXDirText(dir)
 			os.lat = ls
 			objs += os
 		if(now >= next_surge - 0.000001)
-			surge_emit += now
 			var/vu = Vg * rng.U(1.2, 1.7)
 			var/su = rng.U(0.9, 1.35)
 			var/datum/bfx_obj/ou = Mk("surge", now)
@@ -774,68 +751,3 @@ proc/BeamFXDirText(dir)
 		var/a2 = o.fc_a + o.omega * (1 + 1.2 * tt2) * rem
 		return list(o.fc_x + cos(a2) * sp2 * rem, o.fc_y + sin(a2) * sp2 * rem, a2)
 	return list(o.fc_x, o.fc_y, o.fc_a)
-
-/datum/beamfx/var/tmp/tl_nopre = 0
-
-/datum/beamfx/proc/FrameAdvance(fi)
-	var/t = FT(fi)
-	if(isnull(t0) || t < t0) return
-	ctx_f = fi
-	var/Hr = Hr(t, fi, 0)
-	if(isnull(Hr)) return
-	var/bk = Back(t, fi)
-	var/firing = isnull(release_f) || fi < release_f
-	var/list/gone
-	for(var/si = 1 to stamp_m.len)
-		if(stamp_tbf[si] > fi) continue
-		var/m = stamp_m[si]
-		var/dd = LatD(m, t, fi)
-		if(dd > Hr + S * 1.5 || dd < bk - S * 1.5)
-			if(!gone) gone = list()
-			gone += m
-	if(gone)
-		for(var/m in gone)
-			var/gi = stamp_m.Find(m)
-			if(gi)
-				stamp_m.Cut(gi, gi + 1)
-				stamp_tbf.Cut(gi, gi + 1)
-	var/list/alive = list()
-	for(var/oi = 1 to objs.len)
-		var/datum/bfx_obj/o = objs[oi]
-		var/age = t - o.t0
-		if(age < 0)
-			alive += o
-			continue
-		switch(o.kind)
-			if("bead", "streak", "surge")
-				var/dd = o.d0 + o.v * age
-				if(dd > Hr - 6 || (!firing && dd < bk - 30))
-					if(o.kind == "surge" && dd > Hr - 6)
-						var/ta = o.t0 + (Hr - 6 - o.d0) / o.v
-						pulses += list(list(ta, o.scale))
-						if(!isnull(t_hit) && Struggling(fi, 0) && isnull(end_t))
-							ring_q += list(list(ta, o.scale))
-					continue
-				alive += o
-			if("wedge")
-				if(age >= o.life) continue
-				alive += o
-			else
-				if(age >= o.life) continue
-				alive += o
-				if(!wide && !o.pre_done && !tl_nopre) Precompute(o, fi)
-	objs = alive
-	var/list/pk = list()
-	for(var/list/p in pulses)
-		if(p[1] > t - 0.3) pk += list(p)
-	pulses = pk
-	var/dead = !isnull(dead_f) && fi >= dead_f
-	var/st = dead ? dead_struggle : Struggling(fi, 0)
-	if(st && !isnull(end_t) && t >= end_t)
-		var/q = t - end_t
-		if(!remnant_done)
-			remnant_done = 1
-			spk_shots += list(list("remnant", t, WX(Hr + BEAMFX_CONTACT - 8), WY(Hr + BEAMFX_CONTACT - 8)))
-		if(floor(q / 0.035 + 0.0001) >= 7 && !erode_done)
-			erode_done = 1
-			spk_shots += list(list("erode", t, WX(Hr + BEAMFX_CONTACT - 8), WY(Hr + BEAMFX_CONTACT - 8)))

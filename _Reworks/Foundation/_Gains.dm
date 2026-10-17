@@ -65,11 +65,6 @@
 				R.TooMuchHealth = 50
 				R:adjust(src)
 				src<<"You no longer fear for your life..."
-		if(MeditateTime >= 5 SECONDS)
-			for(var/obj/Skills/Queue/Finisher/Cycle_of_Samsara/cos in src)
-				cos.Mastery = 0
-			for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/s in SlotlessBuffs)
-				s.Timer = 400
 
 
 		if(MeditateTime >= 15 SECONDS)

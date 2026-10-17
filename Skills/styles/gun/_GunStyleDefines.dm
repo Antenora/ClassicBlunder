@@ -24,9 +24,4 @@
 #define GUNP_GUNMELEE_KB 2
 #define GUNP_GUNMELEE_WINDOW 5
 
-#define GUNF_CURTAIN_SLOW 3
-#define GUNF_VOLLEY_DELAY 0.5
-#define GUNF_EMPOWER 1.5
-#define GUNF_MUZZLE_WINDOW 10
-
 #define GUN_STYLE_ICON 'Icons/Other/Guns.dmi'

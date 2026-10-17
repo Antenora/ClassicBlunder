@@ -1,3 +1,5 @@
+var/list/STYLE_STAGE_FLAGS = list("NeedsSword", "NoSword", "NoStaff", "NeedsStaff", "NeedsGun", "NeedsSecondSword", "NeedsThirdSword", "AllowsThirdSword")
+
 /obj/Skills/Buffs/NuStyle/adjust(mob/p)
 	..()
 	if(stage_passives)
@@ -52,21 +54,37 @@
 	n = clamp(round(n), 1, stage_passives.len)
 	var/list/P = stage_passives[n]
 	passives = istype(P) ? P.Copy() : list()
-	if(stage_stats && stage_stats.len >= n)
-		var/list/S = stage_stats[n]
-		if(istype(S) && S.len >= 6)
-			StyleStr = S[1]
-			StyleFor = S[2]
-			StyleEnd = S[3]
-			StyleSpd = S[4]
-			StyleOff = S[5]
-			StyleDef = S[6]
-	if(stage_finisher && stage_finisher.len >= n)
-		FinisherStage = stage_finisher[n]
+	ApplyStageFlags(n)
 	applied_stage = n
+
+/obj/Skills/Buffs/NuStyle/proc/ApplyStageFlags(n)
+	if(!length(stage_flags))
+		return
+	var/list/F = stage_flags[clamp(round(n), 1, stage_flags.len)]
+	if(!istype(F))
+		F = list()
+	for(var/key in STYLE_STAGE_FLAGS)
+		vars[key] = (key in F) ? F[key] : 0
 
 /obj/Skills/Buffs/NuStyle/proc/StageChanged(mob/p)
 	return
+
+/mob/proc/RosterStyleOwned()
+	for(var/obj/Skills/Buffs/NuStyle/N in src)
+		if(!N.SagaStyle)
+			return N
+	return null
+
+/mob/proc/StyleLockRefuses(obj/Skills/S)
+	if(!istype(S, /obj/Skills/Buffs/NuStyle))
+		return 0
+	var/obj/Skills/Buffs/NuStyle/N = S
+	if(N.SagaStyle)
+		return 0
+	if(!RosterStyleOwned())
+		return 0
+	src << "You have chosen your style."
+	return 1
 
 /mob/StyleStageRefresh()
 	..()

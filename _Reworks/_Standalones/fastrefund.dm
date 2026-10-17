@@ -4,6 +4,8 @@
     if(isnull(P)) return
     if(!src.Alert("Are you sure you want to respec a player?")) return
     for(var/obj/Skills/Choice in P)
+        if(istype(Choice, /obj/Skills/Buffs/NuStyle))
+            continue
         if(Choice.Copyable)
             var/Refund
             if(Choice.NewCost)
@@ -19,11 +21,7 @@
                     Refund = TIER_3_COST
                 if(5)
                     Refund = TIER_4_COST
-            if(istype(Choice, /obj/Skills/Buffs/NuStyle))
-                if(Choice.SignatureTechnique > 0) Refund = 0
-                else P.SignatureSelected -= Choice.name
-                Refund += ((2**(Choice.SignatureTechnique+1)*10)) * max(0,(Choice.Mastery-1))
-            else if(Choice.Mastery>1)
+            if(Choice.Mastery>1)
                 Refund+=(Refund*(Choice.Mastery-1))
             if(Choice.name in P.SkillsLocked)
                 P.SkillsLocked -= Choice.name
@@ -34,12 +32,10 @@
             for(var/obj/Skills/S in P)
                 if(Choice&&S)
                     if(S.type==Choice.type)
-                        if(S.PreRequisite.len>0 && !istype(Choice, /obj/Skills/Buffs/NuStyle))
+                        if(S.PreRequisite.len>0)
                             for(var/path in S.PreRequisite)
                                 var/p=text2path(path)
                                 var/obj/Skills/oldskill=new p
                                 P.AddSkill(oldskill)
                                 P << "The prerequisite skill for [Choice], [oldskill] has been readded to your contents."
                         del S
-            for(var/obj/Skills/Buffs/NuStyle/s in src)
-                src.StyleUnlock(s)

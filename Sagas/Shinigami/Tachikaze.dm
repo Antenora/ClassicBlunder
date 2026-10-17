@@ -31,7 +31,6 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"BladeFisting"    = 1,
 			"Momentum"        = 0.5 + (0.5 * SL),
 			"Fury"            = 0.5 + (0.5 * SL),
 			"WindRelease"     = 1.25 + (0.25 * SL)
@@ -114,7 +113,6 @@
 		if(altered) return
 		var/SL = p.SagaLevel
 		passives = list(
-			"Fa Jin"          = 1.25 + (0.25 * SL),
 			
 			"Momentum"        = 0.5 + (0.5 * SL),
 			"Fury"            = 0.5 + (0.5 * SL),

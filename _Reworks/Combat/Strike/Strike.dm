@@ -21,6 +21,7 @@
 	var/blockEff = 1
 	var/critBonus = 0
 	var/nowound = 0
+	var/sheathed = 0
 	var/tmp/critChance = 0
 	var/tmp/didCrit = 0
 	var/tmp/didBlock = 0
@@ -112,6 +113,7 @@ mob
 				var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in defender.contents
 				if(RG)
 					defender << "<font color= 'green'>ATTACK PARRIED!</font>"
+					defender.QuincyEvaded(src)
 					RG.SuccessfulParry = 2
 					var/masteryMult = 1 + ((RG.Mastery - 1) / 100)
 					var/meterGain = max((defender.HPToPct(val) * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
@@ -172,8 +174,6 @@ mob
 				if(defender.CyberCancel||defender.Mechanized)
 					defender.LoseMana(defender.HPToPct(val)*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
 
-			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", defender.HPToPct(val)/2)
 			handlePostDamage(defender)
 			if(defender.VaizardHealth && !S.shieldPierce)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
@@ -258,14 +258,12 @@ mob
 
 			if(getBackSide(src, defender) && passive_handler["Backshot"])
 				val *= 1 + (passive_handler["Backshot"]/10)
+			if(S.sheathed)
+				val *= 1 + S.sheathed
 			val *= defender.MechTakenMult(src, S) * MechDealtMult(defender, S)
 
 
 
-			if(passive_handler["CoolingDown"])
-				StyleBuff?:hotCold = clamp(StyleBuff?:hotCold - defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
-			else if(passive_handler["HeatingUp"])
-				StyleBuff?:hotCold  = clamp(StyleBuff?:hotCold + defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
 			if(passive_handler["Grit"])
 				AdjustGrit("add", HPToPct(val)*glob.racials.GRITMULT)
 			if(passive_handler["BlindingVenom"] && can_use_style_effect("BlindingVenom"))
@@ -381,12 +379,12 @@ mob
 
 			var/mortalStrike = GetMortalStrike()
 			if(!S.nowound && mortalStrike > 0  && FightingSeriously(src, 0))
-				if(val > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
+				if(defender.HPToPct(val) > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
 					if(!defender.MortallyWounded) // the last time, plus the timer
 						defender.MortallyWounded += 1
 						var/dmg = defender.Health * 0.15
 						defender.LoseHealth(dmg)
-						defender.WoundSelf(dmg)
+						defender.WoundSelf(defender.HPToPct(dmg))
 						OMsg(defender, "<font color='red'><font size=+2><b>[src] mortally wounded [defender] with a devistating attack!</b></font size></font color>")
 			if(passive_handler.Get("Gluttony") && FightingSeriously(src, 0))
 				var/amount = defender.HPToPct(val) * (passive_handler.Get("Gluttony") * SpecialBuff:hungerMult)

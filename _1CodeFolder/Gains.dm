@@ -17,7 +17,6 @@ mob/proc/RemoveWaterOverlay()
 	src.underlays-=image('The Ripple.dmi', pixel_x=-32, pixel_y=-32)
 
 mob/var/calmcounter=5
-mob/var/HotnCold
 mob/var/tmp/last_gain_loop
 var/global/update_loop/gain_loop/gain_loop = new()
 
@@ -177,11 +176,6 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 				R.TooMuchHealth = 50
 				R:adjust(src)
 				src<<"You no longer fear for your life..."
-		if(MeditateTime >= 5)
-			for(var/obj/Skills/Queue/Finisher/Cycle_of_Samsara/cos in src)
-				cos.Mastery = 0
-			for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/s in SlotlessBuffs)
-				s.Timer = 400
 
 
 		if(MeditateTime >= 15)
@@ -343,7 +337,7 @@ var/game_loop/mainLoop = new(0, "newGainLoop")
 	drainTransformations(transActive, race.transformations[transActive].mastery)
 
 	if(Grab) Grab_Update()
-	EnergyMax = 100
+	EnergyMax = 100 + passive_handler.Get("MaxEnergyBonus")
 
 	doLoopTimers()
 	// Tick based activity / Timers
@@ -510,21 +504,18 @@ mob
 					fa_jin_effect.loc = null
 					fa_jin_effect = null
 
-				var/mystic = UsingMysticStyle()
-				if(length(mystic)&&mystic[1] == TRUE)
-					if(mystic[2] >= 0)
-						if(hudIsLive("MysticT0", /obj/hud/mystic))
-							client.hud_ids["MysticT0"]?:Update()
-					if(mystic[2] >= 1)
-						// we must find the aura buff
-						var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/aura
-						for(var/a in SlotlessBuffs)
-							a = SlotlessBuffs[a]
-							if(istype(a, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura ))
-								aura = a
-						if(aura)
-							if(hudIsLive("MysticT1", /obj/hud/mystic, src, "last_aura_toss"))
-								client.hud_ids["MysticT1"]?:Update()
+				if(UsingStyleEffects())
+					if(hudIsLive("MysticT0", /obj/hud/mystic))
+						client.hud_ids["MysticT0"]?:Update()
+					// we must find the aura buff
+					var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura/aura
+					for(var/a in SlotlessBuffs)
+						a = SlotlessBuffs[a]
+						if(istype(a, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Aura ))
+							aura = a
+					if(aura)
+						if(hudIsLive("MysticT1", /obj/hud/mystic, src, "last_aura_toss"))
+							client.hud_ids["MysticT1"]?:Update()
 				else
 					if(client&&client.hud_ids["MysticT0"])
 						client.remove_hud("MysticT0")
@@ -583,9 +574,6 @@ mob
 					src.TiltedLast = -1
 			if(passive_handler["TensionPowered"] && !src.isMazokuPathHuman())
 				if(src.canHTM())
-					src.race.transformations[2].transform(src, TRUE)
-			if(src.transActive==1&&src.isRace(NAMEKIAN))
-				if(src.HealthPct()<=(20+src.Potential/4))
 					src.race.transformations[2].transform(src, TRUE)
 			if(passive_handler.Get("TrueZenkai")&&src.transActive>=4)
 				if(HealthPct()>=70&&HealthPct()<=90)
@@ -952,16 +940,6 @@ mob
 										src.Knockback(5, A, Direction=get_dir(A, src))
 
 			src.Debuffs()
-			if(UsingHotnCold())
-				var/val = StyleBuff?:hotCold
-				HotnCold = round(val,1)
-				if(client&&hudIsLive("HotnCold", /obj/bar))
-					client.hud_ids["HotnCold"]?:Update()
-				if(val < 0)
-					AddSlow(abs(val)/glob.HOTNCOLD_DEBUFF_DIVISOR)
-					AddCrippling(abs(val)/(glob.HOTNCOLD_DEBUFF_DIVISOR*4))
-				else
-					AddBurn(abs(val)/(glob.HOTNCOLD_DEBUFF_DIVISOR))
 			if(passive_handler["Shirayuki"]) //Rukia Zanpakuto Shenanigans. This passive procks when the user's Shikai or Bankai is active.
 				if(src.CheckActive("Ki Control")) //Power Control effects this.
 					if(src.Slow < src.SagaLevel * 5)
@@ -1570,9 +1548,7 @@ mob
 						if(src.SpecialBuff.BuffName!=A.SBuffNeeded)
 							continue
 					if(A.StyleNeeded&&!AGLock)
-						if(!src.StyleActive)
-							continue
-						if(src.StyleActive!=A.StyleNeeded)
+						if(src.StyleActive!=A.StyleNeeded && !src.CheckSlotless(A.StyleNeeded))
 							continue
 					if(A.WoundIntentRequired&&!AGLock)
 						if(!src.WoundIntent)
@@ -1653,10 +1629,7 @@ mob
 							A.Trigger(src,Override=1)
 							continue
 					if(A.StyleNeeded)
-						if(!src.StyleActive)
-							A.Trigger(src,Override=1)
-							continue
-						if(src.StyleActive!=A.StyleNeeded)
+						if(src.StyleActive!=A.StyleNeeded && !src.CheckSlotless(A.StyleNeeded))
 							A.Trigger(src,Override=1)
 							continue
 					if(A.ABBuffer)

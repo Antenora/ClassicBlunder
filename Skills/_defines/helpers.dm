@@ -34,16 +34,6 @@
     else
         throwSkill(s)
 
-/mob/proc/cycleStackingBuffs(var/obj/Skills/S)
-    if(istype(AttackQueue, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara) || istype(AttackQueue, /obj/Skills/Queue/Finisher/Cycle_of_Samsara))
-        AttackQueue.Mastery++
-        for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Samsara/s in SlotlessBuffs)
-            s.Timer = 0
-    if(istype(AttackQueue, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/What_Must_Be_Done))
-        if(SlotlessBuffs["What Must Be Done"])
-            SlotlessBuffs["What Must Be Done"].Mastery++
-            SlotlessBuffs["What Must Be Done"].TimerLimit+=300
-
 
 mob/proc/buffSelf(path)
     if(istext(path))
@@ -52,19 +42,11 @@ mob/proc/buffSelf(path)
     if(!SlotlessBuffs[s.name])
         s.adjust(src)
     s.Password = UniqueID
-    cycleStackingBuffs(s)
 
 mob/proc/isSuperCharged(mob/p)
     if(p.passive_handler["SuperCharge"])
-        if(StyleBuff.last_super_charge + glob.SUPERCHARGECD < world.time)
+        if(StyleBuff && StyleBuff.last_super_charge + glob.SUPERCHARGECD < world.time)
             return TRUE
-    return FALSE
-
-mob/proc/UsingHotnCold()
-    if(StyleActive == "Hot Style")
-        return TRUE
-    if(StyleActive == "Cold Style")
-        return TRUE
     return FALSE
 
 /mob/proc/applyCharmed(mob/charmer, limit = 5)

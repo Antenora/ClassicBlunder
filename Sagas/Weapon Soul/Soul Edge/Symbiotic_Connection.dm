@@ -9,7 +9,7 @@ obj/Skills/Buffs/SlotlessBuffs/Symbiotic_Edge
 	adjust(mob/p)
 		TimerLimit = 60 + (p.SagaLevel * 5)
 		if(p.SpecialBuff&&p.SpecialBuff.name == "Heavenly Regalia: Chaos Armament")
-			passives = list("Unstoppable" = 1,  "UnderDog" = 6, "HardStyle" = 3)
+			passives = list("Unstoppable" = 1,  "UnderDog" = 6)
 		else
 			passives = list("Unstoppable" = 1,  "UnderDog" = 2)
 

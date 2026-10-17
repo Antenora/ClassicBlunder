@@ -1,42 +1,4 @@
 //Style
-/obj/Skills/Buffs/NuStyle/SwordStyle //T1
-	Fight_or_Flight
-		StyleActive = "Fight or Flight"
-		NeedsSword=0
-		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle", "MagicSword" = 1, "MovingCharge" = 1, "FocusShiftRelease" = 2)
-		verb/Fight_or_Flight()
-			set hidden=1
-			src.Trigger(usr)
-
-	Mountain_King //T2
-		StyleActive = "Mountain King"
-		NeedsSword=0
-		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle", "MagicSword" = 1, "MovingCharge" = 1, "DoubleStrike" = 1, "FocusShiftRelease" = 4)
-		verb/Mountain_King()
-			set hidden=1
-			src.Trigger(usr)
-
-	Dreamlike_Savior//T3
-		StyleActive = "Dreamlike Savior"
-		NeedsSword=0
-		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle",    \
-		"DoubleStrike" = 2, "MagicSword" = 1, "MovingCharge" = 1, "Deflection" = 2, "FocusShiftRelease" = 5)
-		verb/Dreamlike_Savior()
-			set hidden=1
-			src.Trigger(usr)
-
-	Afterlife//T4
-		StyleActive = "Afterlife"
-		NeedsSword=0
-		NeedsStaff=0
-		passives = list("HybridStyle" = "FreeStyle",\
-		"DoubleStrike" = 2, "MagicSword" = 1, "TripleStrike" = 0.5, "MovingCharge" = 1, "Deflection" = 2,  "PUSpike" = 50, "FocusShiftRelease" = 6)
-		verb/Afterlife()
-			set hidden=1
-			src.Trigger(usr)
 // Skills
 obj
 	Skills/Buffs/SpecialBuffs
@@ -93,7 +55,7 @@ obj
 						if(m.isRace(CHANGELING))
 							ExP += list("Juggernaut" = 0.5)
 						if(m.isRace(ELDRITCH))
-							ExP += list("Deflection" = 1, "DeathField" = 1)
+							ExP += list("DeathField" = 1)
 						if(m.isRace(POPO))
 							ExP += list("CashCow" = -5) // YOU OWE ME 5$
 					if(party_names.len)
@@ -160,14 +122,14 @@ obj
 				ForMult = 1.15
 				PowerMult = 1.15
 				EnergyHeal=1
-				passives = list("Parry" = 1+((1-p.SagaLevel) * 0.75), "AttackSpeed" = p.SagaLevel, "SwordAscension" = p.SagaLevel, "PUSpike" = 5 + ((p.SagaLevel - 1) * 10),\
-				 "KiControl" = 1, "DoubleStrike" = 0.5+ ((p.SagaLevel - 1) * 0.25), "CriticalBlock" = 0.05 + ((p.SagaLevel - 1) * 0.025), "ManaGeneration" = 1 + ((p.SagaLevel - 1) * 0.5))
+				passives = list("AttackSpeed" = p.SagaLevel, "SwordAscension" = p.SagaLevel, "PUSpike" = 5 + ((p.SagaLevel - 1) * 10),\
+				 "KiControl" = 1, "CriticalBlock" = 0.05 + ((p.SagaLevel - 1) * 0.025), "ManaGeneration" = 1 + ((p.SagaLevel - 1) * 0.5))
 				if(p.SagaLevel>=3)
 					SwordAscension=p.SagaLevel
 					StrMult=1.50
 					ForMult=1.25
 					PowerMult=1.20
-					passives += list("Secret Knives" = "ChaosKnife", "Tossing"=2, "Chaos Buster" = 1)
+					passives += list("Chaos Buster" = 1)
 				if(p.SagaLevel>=4)
 					MakesSecondSword=1
 					StrMult=1.60
@@ -186,7 +148,7 @@ obj
 				var/Choice
 				if(!usr.BuffOn(src))
 					var/modify_sword_num = 1
-					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in usr) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in usr) || (locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in usr) && usr.SagaLevel >= 4)
+					if(("[usr.StyleBuff?.type]" == "/obj/Skills/Buffs/NuStyle/SwordStyle/Twin_Blade") || (locate(/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode) in usr) && usr.SagaLevel >= 4)
 						var/list/options = list("Primary","Secondary")
 						switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 							if("Secondary") modify_sword_num=2

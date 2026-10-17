@@ -73,7 +73,6 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		var/SL = p.SagaLevel
 		passives = list(
 			"Persistence"   = 1 + (SL/2),
-			"BulletKill"    = 1,
 			"NoDodge"       = 1,
 			
 			
@@ -219,10 +218,7 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		var/SL = p.SagaLevel
 		passives = list(
 			"Persistence"       = 3 + (SL/2),
-			
-			"BulletKill"        = 1,
 			"NoDodge"           = 1,
-			"Half-Sword"        = 1 + SL,
 
 			"HellRisen"         = 0.25 + (0.25 * SL),
 			"Juggernaut"        = 1 + SL,

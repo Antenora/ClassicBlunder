@@ -5,7 +5,7 @@
 			out += P
 	return out
 
-/mob/Admin3/proc/HollowPickTarget(title)
+/mob/proc/HollowPickTarget(title)
 	var/list/pool = HollowOnlineList()
 	if(!pool.len)
 		usr << "<font color=red>No Hollows are online.</font>"
