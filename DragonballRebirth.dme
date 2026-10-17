@@ -178,7 +178,6 @@
 #define FILE_DIR "Icons/PerditionMagic/Circles"
 #define FILE_DIR "Icons/PerditionMagic/Spells"
 #define FILE_DIR "Icons/Private"
-#define FILE_DIR "Icons/Private/AuraFX"
 #define FILE_DIR "Icons/Private/BeamFX"
 #define FILE_DIR "Icons/Private/Cooking"
 #define FILE_DIR "Icons/Private/Cursors"

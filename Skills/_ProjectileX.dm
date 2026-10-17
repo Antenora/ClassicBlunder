@@ -1895,7 +1895,7 @@ obj
 					src.Cooldown(1, null, caster)
 					var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
 					caster.LoseEnergy(drain)
-					OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+					OMsg(caster, caster.SkillActivationMsg(src, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>"))
 					for(var/d in list(NORTH, NORTHEAST, EAST, SOUTHEAST, SOUTH, SOUTHWEST, WEST, NORTHWEST))
 						var/turf/t = get_step(caster, d)
 						if(!t || t.density)
@@ -2038,7 +2038,7 @@ obj
 					src.Cooldown(1, null, caster)
 					var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
 					caster.LoseEnergy(drain)
-					OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+					OMsg(caster, caster.SkillActivationMsg(src, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>"))
 					var/turf/o = get_turf(caster)
 					var/d = caster.dir
 					if(!o || !d)
@@ -3674,7 +3674,7 @@ obj
 						src.Cooldown(1, null, caster)
 						var/drain = caster.passive_handler["Drained"] ? EnergyCost * (1 + caster.passive_handler["Drained"]/10) : EnergyCost
 						caster.LoseEnergy(drain)
-						OMsg(caster, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>")
+						OMsg(caster, caster.SkillActivationMsg(src, "<b><font color='[ActiveColor]'>[caster] [ActiveMessage]</font color></b>"))
 						var/turf/c = get_turf(T)
 						if(!c)
 							return
@@ -5493,10 +5493,10 @@ mob
 					src.Beaming=0
 			if(Z.Continuous)
 				if(Z.CustomActive)
-					OMsg(src, "[Z.CustomActive]")
+					OMsg(src, SkillActivationMsg(Z, "[Z.CustomActive]"))
 				else
 					if(Z.ActiveMessage)
-						OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+						OMsg(src, SkillActivationMsg(Z, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>"))
 
 			var/atom/Origin=src//This is the mob or turf that an attack will come from.
 			if(Z.SpawnPosition)
@@ -5554,10 +5554,10 @@ mob
 						src.Chargez("Remove")
 
 					if(Z.CustomActive)
-						OMsg(src, "[Z.CustomActive]")
+						OMsg(src, SkillActivationMsg(Z, "[Z.CustomActive]"))
 					else
 						if(Z.ActiveMessage)
-							OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+							OMsg(src, SkillActivationMsg(Z, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>"))
 
 					if(src.BusterCharging==100)//100% charge only!!
 						Z.TempRadius=Z.BusterRadius
@@ -5599,10 +5599,10 @@ mob
 					else
 						src.Chargez("Remove")
 					if(Z.CustomActive)
-						OMsg(src, "[Z.CustomActive]")
+						OMsg(src, SkillActivationMsg(Z, "[Z.CustomActive]"))
 					else
 						if(Z.ActiveMessage)
-							OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+							OMsg(src, SkillActivationMsg(Z, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>"))
 					if(Z.FlickBlast)
 						src.icon_state="Blast"
 					var/list/fire_directions
@@ -6222,10 +6222,10 @@ obj
 							src.step_x = 0
 							src.step_y = 0
 					if(src.CustomActive&&GivesMessage&&!Z.Continuous)
-						OMsg(src.Owner, "[src.CustomActive]")
+						OMsg(src.Owner, m.SkillActivationMsg(Z, "[src.CustomActive]"))
 					else
 						if(src.ActiveMessage&&GivesMessage&&!Z.Continuous&&!(Z.MultiShots))
-							OMsg(src.Owner, "<b><font color='[src.ActiveColor]'>[src.Owner] [src.ActiveMessage]</font color></b>")
+							OMsg(src.Owner, m.SkillActivationMsg(Z, "<b><font color='[src.ActiveColor]'>[src.Owner] [src.ActiveMessage]</font color></b>"))
 					spawn()
 						if(Z.Hover || Hover)
 							if(Z.Hover) sleep(Z.Hover)

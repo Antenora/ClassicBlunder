@@ -5449,10 +5449,10 @@ mob
 							missed=1
 
 			if(Z.CustomActive)
-				OMsg(src, "[Z.CustomActive]")
+				OMsg(src, SkillActivationMsg(Z, "[Z.CustomActive]"))
 			else
 				if(Z.ActiveMessage)
-					OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+					OMsg(src, SkillActivationMsg(Z, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>"))
 					if(Z.PlatinumMad)
 						world<<"<font color=[src.Text_Color]>[src.name]</font>: <font color=red><b>FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK!</b></font>"
 			if(passive_handler["AirBend"] && can_use_style_effect("AirBend"))

@@ -1032,13 +1032,13 @@ mob
 			return Mult
 		QueuedActivationMessage()
 			if(src.AttackQueue.CustomCharge)
-				OMsg(src, "[src.AttackQueue.CustomCharge]")
+				OMsg(src, SkillActivationMsg(src.AttackQueue, "[src.AttackQueue.CustomCharge]"))
 			else
 				if(src.AttackQueue.ActiveMessage)
 					if(src.AttackQueue.TextColor)
-						src.OMessage(10, "<font color='[src.AttackQueue.TextColor]'><b>[src] [src.AttackQueue.ActiveMessage]</b></font color>", "[src]([src.key]) queued [src.AttackQueue].")
+						src.OMessage(10, SkillActivationMsg(src.AttackQueue, "<font color='[src.AttackQueue.TextColor]'><b>[src] [src.AttackQueue.ActiveMessage]</b></font color>"), "[src]([src.key]) queued [src.AttackQueue].")
 					else
-						src.OMessage(10, "<font color='[rgb(255,153,51)]'><b>[src] [src.AttackQueue.ActiveMessage]</b></font>", "[src]([src.key]) queued [src.AttackQueue].")
+						src.OMessage(10, SkillActivationMsg(src.AttackQueue, "<font color='[rgb(255,153,51)]'><b>[src] [src.AttackQueue.ActiveMessage]</b></font>"), "[src]([src.key]) queued [src.AttackQueue].")
 			if(src.AttackQueue.Recoil)
 				src.RecoilDamage=src.AttackQueue.Recoil
 			if(src.AttackQueue.Combo)
