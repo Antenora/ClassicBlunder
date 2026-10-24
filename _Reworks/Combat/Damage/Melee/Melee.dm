@@ -527,7 +527,7 @@
 
 		// 				STATUS 					//
 				var/spent_arm = AttackQueue ? FlashQueueSpend(enemy) : 0
-				if(!src.petal_attacking) SwingEnvelope(enemy, AttackQueue ? clamp(0.2 + 0.2 * AttackQueue.DamageMult, 0.2, 1) : 0.3, spent_arm ? "#ffe9b0" : "#ffffff")
+				if(!src.petal_attacking) SwingEnvelope(enemy, AttackQueue ? clamp(0.2 + 0.2 * AttackQueue.DamageMult, 0.2, 1) : 0.3, spent_arm ? "#ffe9b0" : "#ffffff", unarmedAtk)
 				if(passive_handler["Hit Scan"]) // this is troublesome
 					new/obj/tracker(locate(x,y,z),enemy, src, HitScanIcon, HitScanHitSpark,HitScanHitSparkX, HitScanHitSparkY)
 				//TODO: come back to this
@@ -1043,14 +1043,14 @@
 	else
 		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))
 		for(var/turf/T in get_step(src,src.dir))
-			flick("Attack",src)
+			if(!unarmedAtk || !CharacterRigPlay("punch", clamp(delay, 3, 12))) flick("Attack",src)
 			T.Health-=TurfDamage
 			if(T.Health<=0) Destroy(T)
 			return
 		for(var/obj/P in get_step(src,src.dir))
 			if(!P.Attackable)
 				continue
-			flick("Attack",src)
+			if(!unarmedAtk || !CharacterRigPlay("punch", clamp(delay, 3, 12))) flick("Attack",src)
 			if(P.StruckByMelee(src, TurfDamage))
 				return
 			if(istype(P, /obj/DomainExpansionBarrier))

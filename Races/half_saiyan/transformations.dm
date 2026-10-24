@@ -100,7 +100,7 @@
 					"TechniqueMastery" = 5)
 		unlock_potential=90
 	transform_animation(mob/user)
-		if(first_time)
+		if(first_time && !user.OugiLock)
 			user.CutsceneMode()
 			user.BeastAnimation()
 	adjust_transformation_visuals(mob/user)

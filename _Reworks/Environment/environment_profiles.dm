@@ -247,7 +247,7 @@ proc/EnvUpdateClient(client/C, immediate = FALSE)
 	if(!C || !C.mob) return
 	GfxEnsureClient(C)
 	if(!C || !C.mob) return
-	var/turf/T = get_turf(C.mob)
+	var/turf/T = OugiEnvTurf(C.mob, get_turf(C.mob))
 	var/area/A = T ? T.loc : null
 	var/wx = WxKindAt(T)
 	var/datum/environment_profile/P = EnvProfileForClient(C, A)

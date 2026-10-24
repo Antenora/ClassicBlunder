@@ -1356,6 +1356,9 @@ proc/EFXOTvGtMinus(v, k, c)
 	var/list/lm2
 	var/list/lms2
 	var/smoke_ik = "B3Smoke"
+	var/flash_ik = "B3Flash"
+	var/spark_ik = "B3Spark"
+	var/ember_ik = "B3Ember"
 	var/list/lm_flash
 	var/e4
 	var/list/e4m
@@ -1441,8 +1444,8 @@ proc/EFXOTvGtMinus(v, k, c)
 		var/fl = (d <= 1) ? 1 : max(0, 1 - (d - 1) / 5)
 		var/s = Re / 48
 		var/ks = EFXO_B3_STAR[d + 1]
-		S.Rec(out, "[pre]fs", fl_kinds[3], "B3Flash", "soft", x, y, sqa, 0.9 * s * sqx, 0.9 * s * sqy, fl, lm_flash ? lm_flash : lm, 0)
-		S.Rec(out, "[pre]ft", fl_kinds[3], "B3Flash", "star", x, y, 18 + sqa, ks * 1.1 * s * sqx, ks * 1.1 * s * sqy, fl, lm_flash ? lm_flash : lm, 0)
+		S.Rec(out, "[pre]fs", fl_kinds[3], flash_ik, "soft", x, y, sqa, 0.9 * s * sqx, 0.9 * s * sqy, fl, lm_flash ? lm_flash : lm, 0)
+		S.Rec(out, "[pre]ft", fl_kinds[3], flash_ik, "star", x, y, 18 + sqa, ks * 1.1 * s * sqx, ks * 1.1 * s * sqy, fl, lm_flash ? lm_flash : lm, 0)
 
 /datum/energyfx_orbblast3/proc/Ground(datum/energyfx_orbs/S, list/out, d, pre, kind = "GL")
 	if(d >= 1)
@@ -1483,7 +1486,7 @@ proc/EFXOTvGtMinus(v, k, c)
 		var/list/p = list(x + cos(ad) * r, y + sin(ad) * r)
 		var/ln = s[6] * (0.35 + vnow / 420)
 		var/al = min(1, age / 0.03) * (1 - EFXOSstep(0.55, 1, q))
-		S.Rec(out, "[pre]k[i]", lkind, "B3Spark", "x", p[1], p[2], ad, ln, s[7], al, lm, 0)
+		S.Rec(out, "[pre]k[i]", lkind, spark_ik, "x", p[1], p[2], ad, ln, s[7], al, lm, 0)
 	for(var/i = 1 to embers.len)
 		var/list/em = embers[i]
 		var/age = age0 - em[3]
@@ -1492,7 +1495,7 @@ proc/EFXOTvGtMinus(v, k, c)
 		var/list/p = list(x + em[1] + em[5] * age, y + em[2] + em[6] * age * (1 - 0.4 * q))
 		var/tw = 0.7 + 0.3 * sin(360 * em[8] * age)
 		var/al = min(1, age / 0.06) * (1 - EFXOSstep(0.5, 1, q)) * tw
-		S.Rec(out, "[pre]e[i]", lkind, "B3Ember", "x", p[1], p[2], 0, em[7], em[7], al, lm, 0)
+		S.Rec(out, "[pre]e[i]", lkind, ember_ik, "x", p[1], p[2], 0, em[7], em[7], al, lm, 0)
 	if(!smoke_out) return
 	for(var/i = 1 to smokes.len)
 		var/list/sm = smokes[i]
@@ -4345,7 +4348,7 @@ proc/EFXOE4Set(re)
 	var/datum/energyfx_orbblast3/blast
 	var/kb
 
-/datum/energyfx_orbs/burst/proc/Start(turf/T, Re, datum/energyfx_row/R, datum/energyfx_colors/C, datum/energyfx_look/orbs/L)
+/datum/energyfx_orbs/burst/proc/Start(turf/T, Re, datum/energyfx_row/R, datum/energyfx_colors/C, datum/energyfx_look/orbs/L, px = 0, py = 0)
 	look = L
 	row = R
 	extra = R ? R.extra : null
@@ -4359,9 +4362,12 @@ proc/EFXOE4Set(re)
 	var/rs = EFXOE4Set(Re)
 	var/ek = (rs == 48) ? "B3E4_48TB" : "B3E4_[rs]G"
 	var/gk = "B3Ground[rs]"
-	blast = new(Stream("b3"), Re, (T.x - 1) * 32 + 16, (T.y - 1) * 32 + 16, kb, null, ek, gk, cols.LM("hl"), EFXO_LM_SCORCH)
-	blast.e4 = ek
+	blast = new(Stream("b3"), Re, (T.x - 1) * 32 + 16 + px, (T.y - 1) * 32 + 16 + py, kb, null, ek, EnergyFXBurstArt(gk), cols.LM("hl"), EFXO_LM_SCORCH)
+	blast.e4 = EnergyFXBurstArt(ek)
 	blast.e4m = EFXOE4Mats(ek, cols.pal)
+	blast.flash_ik = EnergyFXBurstArt("B3Flash")
+	blast.spark_ik = EnergyFXBurstArt("B3Spark")
+	blast.ember_ik = EnergyFXBurstArt("B3Ember")
 	blast.lm_flash = cols.LM("flash")
 	blast.fl_kinds = list("XP", "XS", "XL")
 	blast.dsc = Re / rs
@@ -4386,11 +4392,69 @@ proc/EFXOE4Set(re)
 	var/v = 2 * k + 1
 	return blast && blast.Alive(v / EFXO_FPS, v - 2 * kb)
 
-/datum/energyfx_look/orbs/Burst(turf/T, radius, datum/energyfx_row/row, datum/energyfx_colors/C)
+/datum/energyfx_look/orbs/Burst(turf/T, radius, datum/energyfx_row/row, datum/energyfx_colors/C, px = 0, py = 0)
 	if(!T || !C || radius < 2) return 0
 	var/datum/energyfx_orbs/burst/S = new
-	S.Start(T, 16 * radius, row, C, src)
+	S.Start(T, 16 * radius, row, C, src, px, py)
 	return 1
+
+var/list/energyfx_burst_art
+
+proc/EnergyFXBurstArt(ik)
+	if(!energyfx_burst_art)
+		energyfx_burst_art = list()
+		var/list/pairs = list(
+			ENERGYFX_ORB_B3E4_32G_S0, ENERGYFX_BURST_B3E4_32G_S0,
+			ENERGYFX_ORB_B3E4_32G_S1, ENERGYFX_BURST_B3E4_32G_S1,
+			ENERGYFX_ORB_B3E4_48TB_S0, ENERGYFX_BURST_B3E4_48TB_S0,
+			ENERGYFX_ORB_B3E4_48TB_S1, ENERGYFX_BURST_B3E4_48TB_S1,
+			ENERGYFX_ORB_B3E4_48TB_S2, ENERGYFX_BURST_B3E4_48TB_S2,
+			ENERGYFX_ORB_B3E4_64G_S0, ENERGYFX_BURST_B3E4_64G_S0,
+			ENERGYFX_ORB_B3E4_64G_S1, ENERGYFX_BURST_B3E4_64G_S1,
+			ENERGYFX_ORB_B3E4_64G_S2, ENERGYFX_BURST_B3E4_64G_S2,
+			ENERGYFX_ORB_B3E4_64G_S3, ENERGYFX_BURST_B3E4_64G_S3,
+			ENERGYFX_ORB_B3E4_64G_S4, ENERGYFX_BURST_B3E4_64G_S4,
+			ENERGYFX_ORB_B3E4_80G_S0, ENERGYFX_BURST_B3E4_80G_S0,
+			ENERGYFX_ORB_B3E4_80G_S1, ENERGYFX_BURST_B3E4_80G_S1,
+			ENERGYFX_ORB_B3E4_80G_S2, ENERGYFX_BURST_B3E4_80G_S2,
+			ENERGYFX_ORB_B3E4_80G_S3, ENERGYFX_BURST_B3E4_80G_S3,
+			ENERGYFX_ORB_B3E4_80G_S4, ENERGYFX_BURST_B3E4_80G_S4,
+			ENERGYFX_ORB_B3E4_80G_S5, ENERGYFX_BURST_B3E4_80G_S5,
+			ENERGYFX_ORB_B3E4_80G_S6, ENERGYFX_BURST_B3E4_80G_S6,
+			ENERGYFX_ORB_B3E4_80G_S7, ENERGYFX_BURST_B3E4_80G_S7,
+			ENERGYFX_ORB_B3E4_80G_S8, ENERGYFX_BURST_B3E4_80G_S8,
+			ENERGYFX_ORB_B3E4_80G_S9, ENERGYFX_BURST_B3E4_80G_S9,
+			ENERGYFX_ORB_B3EMBER, ENERGYFX_BURST_B3EMBER,
+			ENERGYFX_ORB_B3FLASH, ENERGYFX_BURST_B3FLASH,
+			ENERGYFX_ORB_B3GROUND32, ENERGYFX_BURST_B3GROUND32,
+			ENERGYFX_ORB_B3GROUND48_S0, ENERGYFX_BURST_B3GROUND48_S0,
+			ENERGYFX_ORB_B3GROUND48_S1, ENERGYFX_BURST_B3GROUND48_S1,
+			ENERGYFX_ORB_B3GROUND64_S0, ENERGYFX_BURST_B3GROUND64_S0,
+			ENERGYFX_ORB_B3GROUND64_S1, ENERGYFX_BURST_B3GROUND64_S1,
+			ENERGYFX_ORB_B3GROUND64_S2, ENERGYFX_BURST_B3GROUND64_S2,
+			ENERGYFX_ORB_B3GROUND80_S0, ENERGYFX_BURST_B3GROUND80_S0,
+			ENERGYFX_ORB_B3GROUND80_S1, ENERGYFX_BURST_B3GROUND80_S1,
+			ENERGYFX_ORB_B3GROUND80_S2, ENERGYFX_BURST_B3GROUND80_S2,
+			ENERGYFX_ORB_B3GROUND80_S3, ENERGYFX_BURST_B3GROUND80_S3,
+			ENERGYFX_ORB_B3GROUND80_S4, ENERGYFX_BURST_B3GROUND80_S4,
+			ENERGYFX_ORB_B3GROUND80_S5, ENERGYFX_BURST_B3GROUND80_S5,
+			ENERGYFX_ORB_B3GROUND80_S6, ENERGYFX_BURST_B3GROUND80_S6,
+			ENERGYFX_ORB_B3SPARK, ENERGYFX_BURST_B3SPARK)
+		var/list/swap = list()
+		for(var/i = 1 to pairs.len step 2)
+			swap["[pairs[i]]"] = pairs[i + 1]
+		var/list/iks = list("B3E4_32G", "B3E4_48TB", "B3E4_64G", "B3E4_80G", "B3Ground32", "B3Ground48", "B3Ground64", "B3Ground80", "B3Flash", "B3Spark", "B3Ember")
+		for(var/k in ENERGYFX_ORB_ICONS.Copy())
+			var/c = findtext(k, ":")
+			var/base = c ? copytext(k, 1, c) : k
+			if(!(base in iks)) continue
+			var/list/e = ENERGYFX_ORB_ICONS[k]
+			var/f = swap["[e[1]]"]
+			if(!f) continue
+			ENERGYFX_ORB_ICONS[c ? "[base]Alpha[copytext(k, c)]" : "[base]Alpha"] = list(f, e[2], e[3])
+			energyfx_burst_art[base] = "[base]Alpha"
+	var/a = energyfx_burst_art[ik]
+	return a ? a : ik
 
 /obj/energyfx/orb/lp
 	plane = EFXO_LG_PLANE

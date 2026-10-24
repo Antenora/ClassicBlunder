@@ -262,6 +262,7 @@ mob/proc/Chargez(var/Z, var/image/C=new(ChargeIcon), var/Under=0)
 
 
 mob/proc/Hairz(var/Z)
+	CharacterRigInvalidate()
 	if(Z=="Add")
 		src.Hairz("Remove")
 

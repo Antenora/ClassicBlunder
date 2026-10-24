@@ -510,7 +510,7 @@ proc/EnergyFXStepChain(atom/A, list/frames, first_f, from_f, list/hl, contact_f,
 		return 0
 	proc/Finish(obj/Skills/Projectile/_Projectile/P)
 		return 0
-	proc/Burst(turf/T, radius, datum/energyfx_row/row, datum/energyfx_colors/C)
+	proc/Burst(turf/T, radius, datum/energyfx_row/row, datum/energyfx_colors/C, px = 0, py = 0)
 		return 0
 
 var/datum/energyfx_look/energyfx_burst_look

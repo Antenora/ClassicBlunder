@@ -22,6 +22,7 @@
 	for(var/S in missingSkills)
 		if(!locate(S, usr.contents))
 			usr.AddSkill(new S)
+	OugiSecretSync()
 
 /mob/verb/See_Targets_Target()
 	set category="Skills"
@@ -495,6 +496,7 @@ mob/Players
 			P.KatenCleanseBankaiState()
 		ForceClearHeldChargeState()
 		stopUnlimitedBladeWorks()
+		OugiLogoutRelease()
 		MajinAbsorbOnLogout()
 		DevilSummonerLogout()
 		OverwatchNotifyLogin(src, "logged out")

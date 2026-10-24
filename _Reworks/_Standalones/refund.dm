@@ -46,6 +46,7 @@ mob/proc/refund_skill(obj/Skills/refunded_skill)
 						s.Trigger(src, Override=1)
 				del S
 				break
+	OugiSecretSync()
 
 //	if(Potential > 1)
 //		Potential -= 1

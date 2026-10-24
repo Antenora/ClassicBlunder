@@ -599,7 +599,7 @@ client/proc/AdminPageRecentText()
 
 client/proc/AdminPageTick(st)
 	if(!adminpage_open || !mob) return
-	var/f = "x:[mob.x];y:[mob.y];z:[mob.z];cpu:[url_encode("[round(world.cpu, 0.1)]%")];era:[glob.progress.Era];day:[glob.progress.DaysOfWipe]"
+	var/f = "x:[mob.x];y:[mob.y];z:[mob.z];cpu:[url_encode("[round(world.cpu, 0.1)]% map [round(world.map_cpu, 0.1)]%")];era:[glob.progress.Era];day:[glob.progress.DaysOfWipe]"
 	src << output(list2params(list(f)), "[ADMINPAGE_CTL]:setFooter")
 	if(st) AdminPageStatus()
 
@@ -607,7 +607,7 @@ client/proc/AdminPageStatus()
 	if(!adminpage_open || !mob) return
 	var/list/s = list()
 	s += "coords:" + url_encode("[mob.x], [mob.y], [mob.z]")
-	s += "cpu:" + url_encode("[round(world.cpu, 0.1)] ([round(world.tick_usage)]%)")
+	s += "cpu:" + url_encode("[round(world.cpu, 0.1)] ([round(world.tick_usage)]%) | map [round(world.map_cpu, 0.1)]")
 	s += "era:[glob.progress.Era]"
 	s += "days:[glob.progress.DaysOfWipe]"
 	s += "daycheck:" + url_encode(time2text(glob.progress.WipeStart, "hh:mm:ss"))

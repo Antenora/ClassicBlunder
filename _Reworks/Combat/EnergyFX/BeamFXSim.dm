@@ -114,6 +114,8 @@
 	var/rm_ih
 	var/rm_fdet
 	var/rm_ir
+	var/ch_on = 0
+	var/datum/bfx_obj/ch_dry
 
 /datum/beamfx/New(dir_text, ox, oy, zlevel, width, seed, list/C255, list/core255, list/glow255)
 	rng = new /datum/bfx_rng(seed)
@@ -197,12 +199,20 @@ proc/BeamFXDirText(dir)
 	return strict ? (f < qf) : (f <= qf)
 
 /datum/beamfx/proc/Mk(kind, t0v)
-	var/datum/bfx_obj/o = new
+	var/datum/bfx_obj/o
+	if(ch_on && kind != "surge")
+		if(!ch_dry) ch_dry = new
+		o = ch_dry
+	else
+		o = new
 	o.kind = kind
 	o.t0 = t0v
 	uid_next++
 	o.uid = uid_next
 	return o
+
+/datum/beamfx/proc/Keep(datum/bfx_obj/o)
+	if(!ch_on || o.kind == "surge") objs += o
 
 /datum/beamfx/proc/AtH(qf, strict)
 	for(var/i = hlog_f.len, i >= 1, i--)
@@ -381,7 +391,7 @@ proc/BeamFXDirText(dir)
 	o.grow = grw
 	o.seq = sq
 	o.scale = scl
-	objs += o
+	Keep(o)
 	return o
 
 /datum/beamfx/proc/BurstDir(clash, wide = 0)
@@ -409,7 +419,7 @@ proc/BeamFXDirText(dir)
 	o.scale = scl
 	o.seq = sq
 	o.omega = om
-	objs += o
+	Keep(o)
 
 /datum/beamfx/proc/BurstEmit(now, cd, strength = 1, clash = 0, final = 0)
 	if(final)
@@ -570,17 +580,18 @@ proc/BeamFXDirText(dir)
 			swallow_bk = Back(now, qn)
 			end_H = hr
 			end_t = now + max(0.06, (hr - swallow_bk) / BEAMFX_SWALLOW_V)
-	var/hr_next = Hr(now + BEAMFX_TICK, qn + 2, 0)
-	if(!hr_next) hr_next = H
-	var/bk = Back(now + BEAMFX_TICK, qn + 2)
-	var/span_lo = bk - S
-	var/span_hi = max(H, hr_next) + S + BEAMFX_CONTACT
-	var/m_lo = ceil((span_lo - dstart - LatBase(now + BEAMFX_TICK, qn + 2)) / S)
-	var/m_hi = floor((span_hi - dstart - LatBase(now, qn)) / S)
-	for(var/m = m_lo, m <= m_hi, m++)
-		if(!(m in stamp_m))
-			stamp_m += m
-			stamp_tbf += qn
+	if(!ch_on)
+		var/hr_next = Hr(now + BEAMFX_TICK, qn + 2, 0)
+		if(!hr_next) hr_next = H
+		var/bk = Back(now + BEAMFX_TICK, qn + 2)
+		var/span_lo = bk - S
+		var/span_hi = max(H, hr_next) + S + BEAMFX_CONTACT
+		var/m_lo = ceil((span_lo - dstart - LatBase(now + BEAMFX_TICK, qn + 2)) / S)
+		var/m_hi = floor((span_hi - dstart - LatBase(now, qn)) / S)
+		for(var/m = m_lo, m <= m_hi, m++)
+			if(!(m in stamp_m))
+				stamp_m += m
+				stamp_tbf += qn
 	if(struggling && isnull(next_dome))
 		next_dome = now + (clash_mode ? rng.U(0, 0.45) : 0)
 	if(s_firing && now - t0 > 0.14)
@@ -596,7 +607,7 @@ proc/BeamFXDirText(dir)
 			ob.d0 = mz + 12
 			ob.v = vb
 			ob.lat = lb
-			objs += ob
+			Keep(ob)
 		if(rng.R() < 0.8)
 			var/side = (rng.R() < 0.5) ? 1 : -1
 			var/t0s = now + rng.U(0, BEAMFX_TICK)
@@ -606,7 +617,7 @@ proc/BeamFXDirText(dir)
 			os.d0 = mz + 16
 			os.v = vs2
 			os.lat = ls
-			objs += os
+			Keep(os)
 		if(now >= next_surge - 0.000001)
 			var/vu = Vg * rng.U(1.2, 1.7)
 			var/su = rng.U(0.9, 1.35)
@@ -614,7 +625,7 @@ proc/BeamFXDirText(dir)
 			ou.d0 = mz + 14
 			ou.v = vu
 			ou.scale = su
-			objs += ou
+			Keep(ou)
 			next_surge = now + rng.U(0.2, 0.7)
 	var/lo = max(Back(now, qn), mz + 16)
 	var/body_len = max(0, H - lo)
@@ -639,7 +650,7 @@ proc/BeamFXDirText(dir)
 		ow.vy = ay * fw + ny * ov
 		ow.life = lifew
 		ow.seq = sqw
-		objs += ow
+		Keep(ow)
 	var/hr_now = Hr(now, qn, 0)
 	if(!hr_now) hr_now = H
 	if(struggling && !isnull(t_hit) && now + BEAMFX_TICK > t_hit)
@@ -667,7 +678,7 @@ proc/BeamFXDirText(dir)
 			oa.ang = a1
 			oa.life = lifea
 			oa.seq = sqa
-			objs += oa
+			Keep(oa)
 		var/list/fire = list()
 		var/list/rest = list()
 		for(var/list/rq in ring_q)
@@ -704,7 +715,7 @@ proc/BeamFXDirText(dir)
 					orr.seq = sqr
 					orr.ang = phi
 					orr.omega = omr
-					objs += orr
+					Keep(orr)
 				last_ring = tr
 	else if(H > mz + 40 && (isnull(release_t) || isnull(fly_t)) && !moving)
 		if(rng.R() < 0.45)

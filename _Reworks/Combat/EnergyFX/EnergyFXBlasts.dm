@@ -180,6 +180,7 @@ proc/EFXBMod(a, b)
 	var/list/bigs
 	var/list/erupt
 	var/vs = 0
+	var/pb = 0
 
 /datum/energyfx_blasts/Q(fi)
 	return fi
@@ -196,6 +197,7 @@ proc/EFXBMod(a, b)
 	..()
 	SetupColors(R)
 	caster_dir = P.Owner ? P.Owner.dir : EAST
+	if(hascall(src, "PBOn")) pb = call(src, "PBOn")(R)
 
 /datum/energyfx_blasts/proc/InitCharge(mob/M, obj/Skills/Z, datum/energyfx_row/R, datum/energyfx_look/L)
 	look = L
@@ -208,6 +210,7 @@ proc/EFXBMod(a, b)
 	parity = glob && glob.ENERGYFX_ORB_LOG
 	SetupColors(R)
 	caster_dir = M.dir
+	if(hascall(src, "PBOn")) pb = call(src, "PBOn")(R)
 	if(parity) OL("G [energyfx_orb_log_tag] [R.extra["kind"]] [K0]")
 
 /datum/energyfx_blasts/proc/T(k)
@@ -966,7 +969,12 @@ proc/EFXBMod(a, b)
 			keep[++keep.len] = e
 		spk_live = keep
 
+/datum/energyfx_blasts/DrawTick(k)
+	if(pb) return call(src, "PBTick")(k)
+	return ..()
+
 /datum/energyfx_blasts/Cleanup()
+	if(pb) call(src, "PBCleanup")()
 	for(var/list/e in spk_live)
 		var/obj/energyfx/emit/O = e[1]
 		O.particles = null
@@ -1171,6 +1179,7 @@ proc/EFXBDirName(d)
 	return 1
 
 /datum/energyfx_blasts/Busy(k)
+	if(pb) return call(src, "PBBusy")(k)
 	if((spk_q && spk_q.len) || (spk_live && spk_live.len)) return 1
 	for(var/datum/energyfx_blastshot/sh in bshots)
 		if(sh.objs.len) return 1

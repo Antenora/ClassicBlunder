@@ -39,6 +39,7 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
 	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
+	R += new/datum/keyaction("ougi",        "Use Ougi",            "Use-Ougi",           "U",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
 	R += new/datum/keyaction("toss",        "Toss",                "Toss",               "V",   "Combat")
 	R += new/datum/keyaction("dragondash",  "Dragon Dash",         "Dragon-Dash",        "Q",   "Combat")
@@ -662,7 +663,7 @@ client/proc/MiscVerbs()
 #define BUFF_TRACK_H 90
 #define BUFF_THUMB_H 36
 
-var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit", "Misc"="Misc")
+var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit", "Misc"="Misc", "Ougi"="Ougi")
 
 /atom/movable/shud/skmenu_icon
 	mouse_opacity = 1

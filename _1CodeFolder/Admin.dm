@@ -2884,6 +2884,9 @@ atom/Topic(A,B[])
 					gm.GiveOrDrop(gaveobj)
 				else
 					src.contents += gaveobj
+					if(ismob(src))
+						var/mob/ougi_gm = src
+						ougi_gm.OugiSecretSync()
 				if(istype(variable, /obj/Skills))
 					var/mob/m = src
 					if(istype(variable, /obj/Skills/Queue))

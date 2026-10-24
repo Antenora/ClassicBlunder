@@ -1,3 +1,9 @@
+#if fexists("../../../Icons/Private/EnergyFX/Comets/RelookCometsNAlpha.dmi") || fexists("Icons/Private/EnergyFX/Comets/RelookCometsNAlpha.dmi")
+#define EFX92_COMETN_ALPHA 'Icons/Private/EnergyFX/Comets/RelookCometsNAlpha.dmi'
+#else
+#define EFX92_COMETN_ALPHA EFX92_COMETN
+#endif
+
 /datum/efx92_gather
 	var/list/G
 	var/list/CH
@@ -28,6 +34,8 @@
 	var/t_rel
 	var/acc = 0.9
 	var/uid = 0
+	var/reach_k = 1
+	var/dur_k = 1
 
 /datum/beamfx/var/datum/efx92_gather/rl_g
 /datum/beamfx/var/datum/efx92_comets/rl_cm
@@ -496,8 +504,8 @@ proc/EFX92Wrap(a)
 	var/sp = 1 - SP["fast"] * min(L, 1.5) / 1.5
 	var/list/du = SP["dur"]
 	var/list/ret = SP["retract"]
-	var/life = 0.5 * (du[1] + du[2]) * sp + ret.len * BEAMFX_TICK
-	rl_cm.acc += RLCWant(L) * BEAMFX_TICK / life
+	var/life = 0.5 * (du[1] + du[2]) * sp * rl_cm.dur_k + ret.len * BEAMFX_TICK
+	rl_cm.acc += RLCWant(L) * rl_cm.dur_k * BEAMFX_TICK / life
 	var/n = floor(rl_cm.acc)
 	rl_cm.acc -= n
 	var/list/hp = SP["head_p"]
@@ -506,7 +514,7 @@ proc/EFX92Wrap(a)
 	var/list/r0r = SP["r0"]
 	var/list/drr = SP["drift"]
 	for(var/i = 1 to min(SP["per_tick"], n))
-		var/dur = rl_cm.rng.U(du[1], du[2]) * sp
+		var/dur = rl_cm.rng.U(du[1], du[2]) * sp * rl_cm.dur_k
 		var/u = rl_cm.rng.R()
 		var/hi = p0.len - 1
 		var/acc = 0
@@ -523,7 +531,7 @@ proc/EFX92Wrap(a)
 			var/ci = fa0 / 2 + 1
 			ts = (ci >= 1 && ci <= length(EFX92_CTIE)) ? text2num(copytext(EFX92_CTIE, ci, ci + 1)) - 1 : 0
 		var/a0 = RLCPick()
-		var/r0 = rl_cm.rng.U(r0r[1], r0r[2])
+		var/r0 = rl_cm.rng.U(r0r[1], r0r[2]) * rl_cm.reach_k
 		var/drift = rl_cm.rng.U(drr[1], drr[2]) * ((rl_cm.rng.R() < 0.5) ? 1 : -1)
 		var/k2 = rl_cm.rng.U(0.9, 1.1)
 		var/ph = rl_cm.rng.RandRange(2)
@@ -930,7 +938,7 @@ proc/EFX92CometRow()
 	if(!J) return null
 	var/datum/efx92_row/R = new
 	R.key = "COMETN"
-	R.F = list(EFX92_COMETN)
+	R.F = list(EFX92_COMETN_ALPHA)
 	R.fams = list("R92COMETN_1")
 	R.FW = list(J["W"])
 	R.FH = list(J["H"])
@@ -942,7 +950,7 @@ proc/EFX92CometRow()
 	R.np = 1
 	R.nph = 1
 	R.period = 1
-	BEAMFX_FAM["R92COMETN_1"] = list(EFX92_COMETN, J["W"], J["H"])
+	BEAMFX_FAM["R92COMETN_1"] = list(EFX92_COMETN_ALPHA, J["W"], J["H"])
 	efx92_fam["R92COMETN_1"] = R
 	var/list/rows = J["rows"]
 	for(var/hi = 1 to rows.len)
@@ -1193,7 +1201,7 @@ proc/EFX92OverheadComets(obj/Skills/Projectile/_Projectile/P, T)
 	var/list/ov = list(Z.IconSizeGrowTo ? P.pixel_z : z1, z1, s0, Z.IconSizeGrowTo ? Z.IconSizeGrowTo : s0, Z.IconSizeGrowTo ? T / 10 : 0, sz[1], sz[2])
 	return EFX92CometStart(P, EFX92OverheadArt(P), 0, "over", T / 10, ov)
 
-proc/EFX92CometStart(atom/movable/M, list/colors, ramp_ds, mode, period = 0, list/ov = null)
+proc/EFX92CometStart(atom/movable/M, list/colors, ramp_ds, mode, period = 0, list/ov = null, reach_k = 1, dur_k = 1)
 	if(!M || !M.loc || !EFX92_ASSETS) return null
 	var/datum/efx92_row/R = EFX92CometRow()
 	if(!R || !R.CO) return null
@@ -1206,6 +1214,8 @@ proc/EFX92CometStart(atom/movable/M, list/colors, ramp_ds, mode, period = 0, lis
 	F.rl_clm = tm[2]
 	var/datum/efx92_comets/C = new
 	C.rng = new /datum/bfx_rng(31 + sd)
+	C.reach_k = reach_k
+	C.dur_k = dur_k
 	F.rl_cm = C
 	F.rl_ch = 1
 	F.rl_cmode = mode
@@ -1251,7 +1261,7 @@ proc/EFX92CometLoop(datum/beamfx/F)
 				EFX92CometDrop(F)
 				return
 			if(isnull(F.rl_cm.t_rel)) F.RLCHRelease(2 * (F.k + 1))
-		if(isnull(F.rl_cm.t_rel) && !isnull(F.rl_gf0) && F.rl_cmode == "over" && F.RLGT(2 * (F.k + 1)) >= F.rl_cT) F.RLCHRelease(2 * (F.k + 1))
+		if(isnull(F.rl_cm.t_rel) && !isnull(F.rl_gf0) && F.rl_cmode == "over" && F.rl_cT > 0 && F.RLGT(2 * (F.k + 1)) >= F.rl_cT) F.RLCHRelease(2 * (F.k + 1))
 		if(!isnull(F.rl_cm.t_rel) && 2 * F.k > F.rl_cend)
 			EFX92CometDrop(F)
 			return

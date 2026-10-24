@@ -544,7 +544,7 @@ client/proc/InitializeGraphics()
 		if(O.gfx_material_highlight) highlights++
 	src << "<b>Graphics diagnostics</b>"
 	src << "Preset: [client.prefs.graphicsQuality] | view: [client.view] | client FPS: [client.fps]"
-	src << "Server CPU: [world.cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]% | adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON tier [GfxAdaptiveTier()]" : "off"]"
+	src << "Server CPU: [world.cpu]% | map send: [world.map_cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]% | adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON tier [GfxAdaptiveTier()]" : "off"]"
 	src << "Static lights: [_light_sources.len] | dynamic light records: [_fx_lights.len] | shadow objects: [_shadow_objs.len] | shared cloud banks: [_cloud_banks.len] ([GfxCloudChunkCount()] pieces) | weather: [wx]"
 	src << "Environment: [P ? P.display_name : "Neutral"] | haze particles: [client.gfx_haze_emitter && client.gfx_haze_emitter.particles ? client.gfx_haze_emitter.particles.count : 0] | material highlights: [highlights]"
 	src << "Cached light FOV builds: [_light_fov_builds] | average visible cells: [_light_fov_builds ? round(_light_fov_cells / _light_fov_builds, 0.1) : 0] | actor reflections: SCRAPPED | reflection ticks: [_gfx_actor_reflection_ticks] | emissive reflections: [_gfx_emissive_reflection_objs.len] | water mask runs: [client.gfx_water_mask_images ? client.gfx_water_mask_images.len : 0]"

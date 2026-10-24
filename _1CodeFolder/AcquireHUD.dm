@@ -23,7 +23,7 @@
 #define AQ_C_COMBO  "#8be9ff"
 #define AQ_C_HINT   "#7a9bb5"
 
-var/list/AQ_TAB_ORDER = list("Unarmed", "Blast", "Sword", "Styles", "Signature")
+var/list/AQ_TAB_ORDER = list("Unarmed", "Blast", "Sword", "Styles", "Signature", "Ougi")
 
 // template cache
 var/list/AQ_TEMPLATES = list()
@@ -535,6 +535,8 @@ client/proc/AqBuildEntries()
 			AqBuildStylesTab()
 		if("Signature")
 			AqBuildSigTab()
+		if("Ougi")
+			AqBuildOugiTab()
 	AqRefreshBalance()
 
 client/proc/AqBuildSkillTab(cat)
@@ -1003,8 +1005,16 @@ client/proc/AqFinalizeBuyInner(datum/aqentry/E)
 			del s
 			return
 
+	if(istype(s, /obj/Skills/Ougi))
+		var/ougi_why = M.OugiBuyRefusal(s)
+		if(ougi_why)
+			M << ougi_why
+			del s
+			return
 	if(M.SpendRPP(E.cost, "[s]", Training = 1))
 		M.AddSkill(s)
+		if(istype(s, /obj/Skills/Ougi)) M.OugiAfterBuy(s)
+		M.OugiSecretSync()
 		if(s.type == /obj/Skills/Power_Control)
 			if(!locate(/obj/Skills/Buffs/ActiveBuffs/Ki_Control, M))
 				M.PoweredFormSetup()
@@ -1061,6 +1071,7 @@ client/proc/AqFinalizePickInner(datum/aqentry/E)
 		var/Name = s3.SignatureName ? s3.SignatureName : s3.name
 		M.SignatureSelected.Add("[Name]")
 		M << "<font color=#78eb78>You obtained [s3]!</font>"
+	M.OugiSecretSync()
 	if(aqmenu_open)
 		AqBuildEntries()
 		RefreshAcquireRows()

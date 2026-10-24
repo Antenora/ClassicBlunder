@@ -299,6 +299,30 @@ proc/_CoatDripOff(mob/M)
 	_coat_drip_pool += M.coat_drip
 	M.coat_drip = null
 
+proc/_CoatClear(mob/M)
+	if(M.coat_key) _CoatStrip(M)
+	if(M.coat_drip) _CoatDripOff(M)
+	if(M.coat_fx) _CoatFxOff(M)
+
+proc/_CoatTick(mob/M)
+	if(M.OugiLock)
+		_CoatClear(M)
+		return
+	var/list/C = _CoatFor(M)
+	if(C)
+		_CoatApply(M, C)
+		if(C[7] == "burn" || C[7] == "shock")
+			_CoatFxOn(M, C[7], C[1])
+		else if(M.coat_fx)
+			_CoatFxOff(M)
+	else
+		if(M.coat_key) _CoatStrip(M)
+		if(M.coat_fx) _CoatFxOff(M)
+	if(M.Bleed > 0)
+		_CoatDripOn(M, min(1, M.Bleed / 15))
+	else if(M.coat_drip)
+		_CoatDripOff(M)
+
 proc/_CoatSweep()
 	set waitfor = 0
 	set background = 1
@@ -311,20 +335,7 @@ proc/_CoatSweep()
 					if(seen[M]) continue
 					seen[M] = 1
 					try
-						var/list/C = _CoatFor(M)
-						if(C)
-							_CoatApply(M, C)
-							if(C[7] == "burn" || C[7] == "shock")
-								_CoatFxOn(M, C[7], C[1])
-							else if(M.coat_fx)
-								_CoatFxOff(M)
-						else
-							if(M.coat_key) _CoatStrip(M)
-							if(M.coat_fx) _CoatFxOff(M)
-						if(M.Bleed > 0)
-							_CoatDripOn(M, min(1, M.Bleed / 15))
-						else if(M.coat_drip)
-							_CoatDripOff(M)
+						_CoatTick(M)
 					catch
 						continue
 		sleep(10)

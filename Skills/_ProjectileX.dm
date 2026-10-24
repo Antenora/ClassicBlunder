@@ -5161,6 +5161,7 @@ obj
 mob
 	proc
 		UseProjectile(var/obj/Skills/Projectile/Z, noGCD = FALSE)
+			CharacterRigStop()
 			. = TRUE
 			if(HeldSkillBlocksAction(Z)) return FALSE
 			if(Z.Continuous && Z.ContinuousOn)

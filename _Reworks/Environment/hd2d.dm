@@ -217,7 +217,7 @@ proc/Hd2dWallRows(turf/T)
 	if(!T) return 0
 	if(T._hd2d_wall_ver == _hd2d_cache_ver) return T._hd2d_wall
 	. = 0
-	if(isturf(T) && SurfaceOcclusion(T) == OCCLUDE_FULL)
+	if(isturf(T) && !istype(T, /turf/swapmap_border) && SurfaceOcclusion(T) == OCCLUDE_FULL)
 		var/turf/S = T.y > 1 ? locate(T.x, T.y - 1, T.z) : null
 		if(S && SurfaceOcclusion(S) != OCCLUDE_FULL)
 			. = 1

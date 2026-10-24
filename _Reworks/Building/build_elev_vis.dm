@@ -2383,6 +2383,9 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	var/turf/B = locate(S.x, S.y - 1, S.z)
 	if(B && ElevAt(B) <= 0 && BuildIsCliffTurf(B))
 		return ""
+	return ElevOrgMatStyle(S)
+
+/proc/ElevOrgMatStyle(turf/S)
 	switch(ElevEdgeMat(S))
 		if("snow")
 			return "n"
@@ -3710,7 +3713,7 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 		return null
 	return list(min(255, R[pi] + 32), min(255, Gn[pi] + 32), min(255, Bl[pi] + 32), R[mi], Gn[mi], Bl[mi], round((R[mi] * 3 + 2) / 4), round((Gn[mi] * 3 + 2) / 4), round((Bl[mi] * 3 + 2) / 4))
 
-/proc/ElevOrgBevImage(turf/G, L, sty, turf/S, list/ctx, list/fresh)
+/proc/ElevOrgBevImage(turf/G, L, sty, turf/S, list/ctx, list/fresh, ring = 1)
 	if(!ctx)
 		return
 	var/turf/TT = ElevOrgMem(G, L) ? G : S
@@ -3718,7 +3721,11 @@ var/global/list/elevOrgOffs = list(list(0, 1), list(0, -1), list(-1, 0), list(1,
 	if(!bm)
 		return
 	var/list/ids = ElevOrgBevId(ctx[6], sty, bm, ctx[7], ctx[8], ctx[9])
-	if(!ids || (!ids[1] && !ids[2]))
+	if(!ids)
+		return
+	if(!ring)
+		ids = list(ids[1], 0)
+	if(!ids[1] && !ids[2])
 		return
 	var/list/FM = ElevOrgMatInfo(ElevOrgBevMat(bm))
 	var/list/PT = ElevOrgPal(TT)

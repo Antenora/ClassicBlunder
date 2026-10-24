@@ -1,3 +1,15 @@
+#if fexists("../../Icons/Private/Speedline/impact_ink_L.dmi") || fexists("Icons/Private/Speedline/impact_ink_L.dmi")
+#define IMPACT_INK_L_ART 'Icons/Private/Speedline/impact_ink_L.dmi'
+#else
+#define IMPACT_INK_L_ART 'Icons/impact_frames.dmi'
+#endif
+
+#if fexists("../../Icons/Private/Speedline/impact_ink_S.dmi") || fexists("Icons/Private/Speedline/impact_ink_S.dmi")
+#define IMPACT_INK_S_ART 'Icons/Private/Speedline/impact_ink_S.dmi'
+#else
+#define IMPACT_INK_S_ART 'Icons/impact_frames.dmi'
+#endif
+
 globalTracker
 	var/tmp
 		IMPACT_FRAMES = TRUE
@@ -11,7 +23,6 @@ obj/AutoHitter/var/ImpactFrame = 0
 client
 	var/tmp
 		_if_until = 0
-		_if_bw_on = 0
 		_zoom_until = 0
 		_ripple_until = 0
 
@@ -27,26 +38,24 @@ proc/FxHeavyImpact(atom/m, obj/Skills/Z = null, priority = 0)
 		_impact_n = 0
 	if(++_impact_n > 3 && !priority) return
 	if(glob.IMPACT_BURSTS) FxImpactBurst(T, Z)
-	var/fam = prob(50) ? "lines" : "spikes"
 	for(var/client/C)
 		var/mob/CM = C.mob
 		if(!CM || CM.z != T.z || get_dist(CM, T) > 15) continue
-		if(glob.IMPACT_FRAMES)
-			if(world.time >= C._if_until)
-				FxImpactLinesClient(C, T, fam)
-			FxImpactFrameClient(C)
+		if(glob.IMPACT_FRAMES) FxImpactInkClient(C, T)
 		if(glob.IMPACT_RIPPLES) FxImpactRippleClient(C, T)
 
-/obj/gfx_impact_lines
-	icon = 'impact_frames.dmi'
-	plane = 0
-	layer = 9
+/obj/gfx_impact_ink
+	plane = FX_RELAY_PLANE
+	layer = 30
 	mouse_opacity = 0
 	Savable = 0
 	gfx_transient_visual = 1
 	screen_loc = "1,1"
+	appearance_flags = KEEP_APART | RESET_COLOR
 
-client/var/tmp/obj/gfx_impact_lines/_if_lines
+/obj/gfx_impact_ink/silhouette
+	layer = 31
+	appearance_flags = PIXEL_SCALE | KEEP_TOGETHER | KEEP_APART
 
 proc/_ImpactScreenPx(client/C, turf/T)
 	var/turf/E = get_turf(C.eye ? C.eye : C.mob)
@@ -54,65 +63,68 @@ proc/_ImpactScreenPx(client/C, turf/T)
 	var/list/vt = GfxCameraViewTiles(C)
 	return list(vt[1] * 16 + (T.x - E.x) * 32, vt[2] * 16 + (T.y - E.y) * 32, vt[1] * 32, vt[2] * 32)
 
-proc/FxImpactLinesClient(client/C, turf/T, fam)
-	var/list/sp = _ImpactScreenPx(C, T)
+proc/_ImpactScreenPxMag(client/C, atom/A)
+	var/atom/movable/V = C.eye ? C.eye : C.mob
+	var/turf/E = get_turf(V)
+	var/turf/T = get_turf(A)
+	if(!E || !T || E.z != T.z) return null
+	var/list/vt = GfxCameraViewTiles(C)
+	var/mag = C.world_mag || 1
+	var/vw = vt[1] * world.icon_size
+	var/vh = vt[2] * world.icon_size
+	var/ax = ismovable(A) ? GfxCameraWorldX(A) : (T.x - 1) * world.icon_size + world.icon_size / 2
+	var/ay = ismovable(A) ? GfxCameraWorldY(A) : (T.y - 1) * world.icon_size + world.icon_size / 2
+	return list(vw / 2 + (ax - GfxCameraWorldX(V)) * mag, vh / 2 + (ay - GfxCameraWorldY(V)) * mag, vw, vh, mag)
+
+proc/FxImpactInkClient(client/C, turf/T)
+	if(!C || world.time < C._if_until) return
+	if(C.prefs && C.prefs.reducedFlashes) return
+	var/list/sp = _ImpactScreenPxMag(C, T)
 	if(!sp) return
 	var/vw = sp[3]
 	var/vh = sp[4]
+	var/big = vw >= 768 && vh >= 432
+	if(!big && (vw < 480 || vh < 270)) return
+	C._if_until = world.time + max(4, glob.IMPACT_FRAME_CD)
+	var/iw = big ? 768 : 480
+	var/ih = big ? 432 : 270
 	var/cx = clamp(sp[1], vw * 0.3, vw * 0.7)
 	var/cy = clamp(sp[2], vh * 0.3, vh * 0.7)
-	var/obj/gfx_impact_lines/L = C._if_lines
-	if(!L)
-		L = new
-		C._if_lines = L
+	var/obj/gfx_impact_ink/K = new
+	K.icon = big ? IMPACT_INK_L_ART : IMPACT_INK_S_ART
 	var/matrix/M = matrix()
-	M.Scale(max(vw, vh) * 1.7 / 512)
-	M.Translate(cx - 256, cy - 256)
-	L.transform = M
-	L.icon_state = "[fam]_a"
-	L.color = "#ffffff"
-	C.screen -= L
-	C.screen += L
+	M.Scale(max(1.6 * vw / iw, 1.45 * vh / ih))
+	M.Translate(cx - iw / 2, cy - ih / 2)
+	K.transform = M
+	C.screen += K
+	var/list/plates = list()
+	for(var/mob/B in range(1, T))
+		if(B.invisibility || !B.icon) continue
+		var/list/bp = _ImpactScreenPxMag(C, B)
+		if(!bp) continue
+		var/obj/gfx_impact_ink/silhouette/P = new
+		P.appearance = B.appearance
+		P.plane = FX_RELAY_PLANE
+		P.layer = 31
+		P.mouse_opacity = 0
+		P.pixel_x = 0
+		P.pixel_y = 0
+		P.pixel_z = 0
+		P.color = list(0,0,0, 0,0,0, 0,0,0, 1,1,1)
+		P.screen_loc = "1:[clamp(round(bp[1] - 16), 0, max(0, vw - 32))],1:[clamp(round(bp[2] - 16), 0, max(0, vh - 32))]"
+		var/matrix/PM = matrix(B.transform)
+		if(bp[5] != 1) PM.Scale(bp[5])
+		PM.Translate(0, B.pixel_z * bp[5])
+		P.transform = PM
+		plates += P
+		C.screen += P
 	spawn(1)
-		if(L)
-			L.icon_state = "[fam]_b"
-			L.color = "#000000"
+		for(var/obj/O in plates)
+			if(C) C.screen -= O
+			del O
 	spawn(4)
-		if(C && L)
-			C.screen -= L
-
-proc/_ImpactMatrix(mid, k)
-	var/c = 0.5 - k * mid
-	return list(0.299*k,0.299*k,0.299*k,0, 0.587*k,0.587*k,0.587*k,0, 0.114*k,0.114*k,0.114*k,0, 0,0,0,1, c,c,c,0)
-
-proc/FxImpactFrameClient(client/C)
-	if(!C || world.time < C._if_until) return
-	if(C.prefs && C.prefs.reducedFlashes) return
-	C._if_until = world.time + max(4, glob.IMPACT_FRAME_CD)
-	var/turf/ET = get_turf(C.eye ? C.eye : C.mob)
-	var/dark = ET ? LightDarkFrac(ET) : 0
-	var/mid = 0.45 - 0.30 * clamp(dark, 0, 1)
-	C._if_bw_on = 1
-	_ImpactApply(C, _ImpactMatrix(mid, -9))
-	spawn(1)
-		if(C && C._if_bw_on) _ImpactApply(C, _ImpactMatrix(mid, 9))
-	spawn(3)
-		if(C) _ImpactClear(C)
-
-proc/_ImpactApply(client/C, list/M)
-	if(!C) return
-	for(var/obj/O in list(C.client_plane_master, C.fx_relay, C.fxnb_relay))
-		if(!O) continue
-		var/F = O.filters["if_bw"]
-		if(F) O.filters -= F
-		O.filters += filter(name = "if_bw", type = "color", color = M)
-
-proc/_ImpactClear(client/C)
-	C._if_bw_on = 0
-	for(var/obj/O in list(C.client_plane_master, C.fx_relay, C.fxnb_relay))
-		if(!O) continue
-		var/F = O.filters["if_bw"]
-		if(F) O.filters -= F
+		if(C) C.screen -= K
+		del K
 
 /obj/gfx_impact_burst
 	mouse_opacity = 0

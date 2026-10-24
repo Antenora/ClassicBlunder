@@ -241,7 +241,7 @@ mob/Players/Stat()
 			if(statpanel("Overview"))
 				CHECK_TICK
 				stat("Coordinates","[usr.x],[usr.y],[usr.z]")
-				stat("CPU","[world.cpu] ([world.tick_usage])")
+				stat("CPU","[world.cpu] ([world.tick_usage]) | map [world.map_cpu]")
 				stat("Era","[glob.progress.Era]")
 				stat("Days of Wipe:", "[glob.progress.DaysOfWipe]")
 				stat("DAILY CHECK TIMER: ", "[time2text(glob.progress.WipeStart,"hh:mm:ss")]")

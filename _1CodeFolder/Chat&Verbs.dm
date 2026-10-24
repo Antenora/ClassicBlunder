@@ -956,6 +956,12 @@ mob/proc/RPModeSwitch()
 
 mob/proc/CutsceneMode()
 	if(src.PureRPMode)
+		src.CutsceneModeOff()
+		return
+	src.CutsceneModeOn()
+
+mob/proc/CutsceneModeOff()
+	if(src.PureRPMode)
 		src.PureRPMode=0
 		src.CutsceneWatch=0
 		for(var/mob/Player/AI/a in ai_followers)
@@ -971,11 +977,13 @@ mob/proc/CutsceneMode()
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return
+
+mob/proc/CutsceneModeOn(quiet = 0)
 	if(!src.PureRPMode)
 		src.PureRPMode=1
 		src.CutsceneWatch=1
 		src.NextAttack=0
-		src.OMessage(10,"[src] is watching a cutscene, regen/recovery disabled!")
+		if(!quiet) src.OMessage(10,"[src] is watching a cutscene, regen/recovery disabled!")
 		for(var/mob/Player/AI/a in ai_followers)
 			spawn(rand(1,6)) RPMode(a, "On")
 		for(var/obj/Skills/s in src)

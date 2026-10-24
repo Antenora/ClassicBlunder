@@ -852,7 +852,7 @@ proc/GfxAORecompute(turf/T)
 	if(!IsLightOccluder(T))
 		for(var/d in list(NORTH, SOUTH, EAST, WEST))
 			var/turf/N = get_step(T, d)
-			if(!IsLightOccluder(N)) continue
+			if(!IsLightOccluder(N) || istype(N, /turf/swapmap_border)) continue
 			mask |= d
 			var/image/I = image(_gfx_ao_icons["[d]"], T)
 			I.plane = SHADOW_PLANE

@@ -2070,7 +2070,9 @@ client/proc/CustBrowse()
 			it.icon = Z
 			ApplyCustOption()
 		else
+			mob.CharacterRigStop()
 			mob.icon = Z
+			mob.CharacterRigInvalidate()
 	RefreshCustPreview()
 
 client/proc/SetCustColor(col)

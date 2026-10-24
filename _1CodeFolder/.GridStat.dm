@@ -54,7 +54,7 @@ mob/proc
 						Stats++
 						src.GridStatPlacement("-Admin-",null,Stats)
 						Stats++
-						src.GridStatPlacement("CPU","[world.cpu]%",Stats)
+						src.GridStatPlacement("CPU","[world.cpu]% | map [world.map_cpu]%",Stats)
 						Stats++
 						src.GridStatPlacement("Cords","[usr.x],[usr.y],[usr.z]",Stats)
 

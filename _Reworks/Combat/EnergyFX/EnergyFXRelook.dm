@@ -291,10 +291,11 @@ proc/EFX92RingTie(j)
 			if(text2num(key) < 2 * kk - 16)
 				rl_remap -= key
 				rl_remapv -= key
-	rl_cf = list(list(), list())
-	rl_lcf = list(list(), list())
-	rl_sf = list(list(null, null), list(null, null))
-	rl_sw = list(null, null)
+	if(!ch_on)
+		rl_cf = list(list(), list())
+		rl_lcf = list(list(), list())
+		rl_sf = list(list(null, null), list(null, null))
+		rl_sw = list(null, null)
 	if(clash_mode && partner && !rl_cart) RLClashSetup()
 	else if(!clash_mode && rl_cart)
 		rl_cart = null
@@ -318,11 +319,12 @@ proc/EFX92RingTie(j)
 	if(nudged && last_ring == nudged) last_ring = lr0
 	if(isnull(t0)) return
 	RLSpawnGlints(now, qn)
+	if(ch_on) rl_glints = list()
 	RLSpawnRootBolts(now, qn)
 	RLSpawnLrays(now, qn)
 	RLSpawnShocks(now, qn)
 	if(clash_mode && rl_cart) RLClashTick(now, qn)
-	RLSpawnSparks(now, qn)
+	if(!ch_on) RLSpawnSparks(now, qn)
 	if(rl_pierce) RLTickPierce(now, qn)
 
 /datum/beamfx/proc/RLSpawnSparks(now, qn)
@@ -1240,12 +1242,36 @@ proc/EFX92RingTie(j)
 		out[++out.len] = r
 	return out
 
+/datum/beamfx/var/rl_sky
+
+var/list/efx92_sky_files = list()
+var/list/efx92_sky_icon = list()
+
+/datum/beamfx/proc/RLSkySafe()
+	if(isnull(rl_sky))
+		var/turf/T = locate(floor(Ox / 32) + 1, floor(Oy / 32) + 1, z)
+		rl_sky = (T && istype(T.loc, /area/OugiStage)) ? 1 : 0
+	return rl_sky
+
+/datum/beamfx/proc/RLFamIcon(fam_key, light)
+	var/list/fam = BEAMFX_FAM[fam_key]
+	if(!light || !RLSkySafe()) return fam[1]
+	var/ic = efx92_sky_icon[fam_key]
+	if(!ic)
+		ic = fam[1]
+		var/datum/efx92_row/R = efx92_fam[fam_key]
+		var/list/sky = R ? efx92_sky_files[R.key] : null
+		var/i = R ? R.fams.Find(fam_key) : 0
+		if(sky && i && i <= sky.len) ic = sky[i]
+		efx92_sky_icon[fam_key] = ic
+	return ic
+
 /datum/beamfx/NewObj(list/sp, pr = 0)
 	var/list/fam = BEAMFX_FAM[sp[BFX_FAM]]
 	var/front = (sp[BFX_TAG] == "cbolt_f" || sp[BFX_TAG] == "bubble")
 	var/obj/energyfx/O = EnergyFXGet(front ? (sp[BFX_LIGHT] ? /obj/energyfx/fsharp : /obj/energyfx/fpaint) : (sp[BFX_LIGHT] ? /obj/energyfx/rlsharp : /obj/energyfx/rlpaint), src)
 	if(!O) return null
-	O.icon = fam[1]
+	O.icon = RLFamIcon(sp[BFX_FAM], sp[BFX_LIGHT])
 	O.fx_w = fam[2]
 	O.fx_h = fam[3]
 	O.icon_state = sp[BFX_ST]
@@ -2098,7 +2124,7 @@ proc/EFX92CutPlan(list/c, cx, cy)
 		return null
 	CD.C = C
 	var/list/fam = BEAMFX_FAM[sp[BFX_FAM]]
-	C.icon = fam[1]
+	C.icon = RLFamIcon(sp[BFX_FAM], CD.light)
 	C.fx_w = fam[2]
 	C.fx_h = fam[3]
 	C.icon_state = sp[BFX_ST]
@@ -2209,8 +2235,8 @@ proc/EFX92CutPlan(list/c, cx, cy)
 				CD.O.layer = first[BFX_ZL]
 				CD.C.layer = first[BFX_ZL]
 			if(CD.C.icon_state != first[BFX_ST])
-				var/list/fam = BEAMFX_FAM[first[BFX_FAM]]
-				if(CD.C.icon != fam[1]) CD.C.icon = fam[1]
+				var/ic = RLFamIcon(first[BFX_FAM], CD.light)
+				if(CD.C.icon != ic) CD.C.icon = ic
 		var/started = 0
 		var/list/held = CD.lastq.Copy()
 		if(first && (abs(first[BFX_X] - (CD.bx + CD.B / 2)) > 48 || abs(first[BFX_Y] - (CD.by + CD.B / 2)) > 48))
@@ -2291,7 +2317,7 @@ proc/EFX92CutPlan(list/c, cx, cy)
 	var/lt = MV.light
 	var/obj/energyfx/K = EnergyFXGet(lt ? /obj/energyfx/rlsharp : /obj/energyfx/rlpaint, src)
 	if(!K) return null
-	K.icon = fam[1]
+	K.icon = RLFamIcon(rl.fams[file], lt)
 	K.fx_w = fam[2]
 	K.fx_h = fam[3]
 	K.icon_state = stt[2]
@@ -3070,7 +3096,7 @@ proc/EFX92BendCls(tag)
 	var/obj/energyfx/O = EnergyFXGet(L.light ? /obj/energyfx/rlsharp : /obj/energyfx/rlpaint, src)
 	if(!O) return null
 	var/list/fam = BEAMFX_FAM[sp[BFX_FAM]]
-	O.icon = fam[1]
+	O.icon = RLFamIcon(sp[BFX_FAM], L.light)
 	O.fx_w = fam[2]
 	O.fx_h = fam[3]
 	O.icon_state = sp[BFX_ST]
@@ -3173,8 +3199,8 @@ proc/EFX92BendCls(tag)
 		if(first)
 			if(O.layer != first[BFX_ZL]) O.layer = first[BFX_ZL]
 			if(O.icon_state != first[BFX_ST])
-				var/list/fam = BEAMFX_FAM[first[BFX_FAM]]
-				if(O.icon != fam[1]) O.icon = fam[1]
+				var/ic = RLFamIcon(first[BFX_FAM], L.light)
+				if(O.icon != ic) O.icon = ic
 		var/started = 0
 		if(first && !L.car && (abs(first[BFX_X] - O.fx_bx) > 48 || abs(first[BFX_Y] - O.fx_by) > 48))
 			if(EnergyFXPlace(O, first[BFX_X], first[BFX_Y], z)) started = 1

@@ -2546,6 +2546,7 @@ mob
 			src.dash_clash = Clashable ? 2 : 1
 			src.ClashWatch(Trg, Clashable)
 			src.icon_state="Flight"
+			src.CharacterRigPlay("dash")
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
 			var/pm = PmActive()
@@ -2559,7 +2560,7 @@ mob
 			if(flash_dash)
 				FlashDashKickoff(src, Trg)
 			while(pm ? pm_budget > 0 : MaxDistance > 0)
-				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
+				if(src.filters["trail"] && !src.character_rig_active) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
 					var/travel_angle = GetAngle(src, Trg)
 					if(abs(travel_angle - last_smear_ang) > 15)
 						last_smear_ang = travel_angle
@@ -2607,6 +2608,7 @@ mob
 						sleep(1*world.tick_lag)
 			src.TryDragonClash(Trg)
 			src.Frozen=0
+			if(src.character_rig_active == "dash") src.CharacterRigStop()
 			src.dash_clash=0
 			if(src.is_dashing>0)
 				src.is_dashing--

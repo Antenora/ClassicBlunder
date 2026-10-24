@@ -610,7 +610,7 @@ proc/_WxSyncPass()
 		if(!P.client)
 			_WxDetachPlayer(P)
 			continue
-		var/turf/T = GfxGroundTurf(P)
+		var/turf/T = OugiEnvTurf(P, GfxGroundTurf(P))
 		var/turf/standing = (glob && glob.WEATHER && WxKindAt(T)) ? T : null
 		//panels stay up for any outside weather in view; only the tint and flashes care where YOU stand
 		var/turf/want = standing || _WxNearbyWeatherTurf(P)

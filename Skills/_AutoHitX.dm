@@ -5543,6 +5543,7 @@ mob
 					GO=Z.Rush*2
 				if(!Z.RushNoFlight)
 					src.icon_state="Flight"
+					src.CharacterRigPlay("dash")
 				if(Z.RushDelay<1)
 					VanishImage(src)
 				var/pm = PmActive()
@@ -5558,7 +5559,7 @@ mob
 					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
-						if(src.filters["trail"]) //dash smear
+						if(src.filters["trail"] && !src.character_rig_active) //dash smear
 							var/travel_angle = GetAngle(src, src.Target)
 							var/smear = 6 / max(Z.RushDelay, 0.5) //RushDelay 0 would divide by zero
 							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
@@ -5599,7 +5600,7 @@ mob
 					else
 						if(length(src.filters) < 1)
 							AppearanceOn()
-						if(src.filters["trail"])
+						if(src.filters["trail"] && !src.character_rig_active)
 							var/travel_angle = dir2angle(src.dir)
 							var/smear = 6 / max(Z.RushDelay, 0.5)
 							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
@@ -5670,6 +5671,7 @@ mob
 									DelayRelease--
 									sleep(1)
 				src.is_dashing--
+				if(src.character_rig_active == "dash") src.CharacterRigStop()
 				if(is_dashing<0)
 					is_dashing=0
 				src.WindingUp=0

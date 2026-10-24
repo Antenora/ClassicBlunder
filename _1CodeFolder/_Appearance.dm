@@ -1,4 +1,5 @@
 mob/proc/AppearanceOn()
+	CharacterRigInvalidate()
 
 //	AppearanceOff()
 
@@ -304,6 +305,7 @@ mob/proc/AppearanceOn()
 				I.AlignEquip(src)
 
 mob/proc/AppearanceOff()
+	CharacterRigInvalidate()
 	src.overlays=null
 	src.underlays=null
 	src.AuraLightSync()

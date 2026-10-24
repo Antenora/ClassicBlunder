@@ -287,16 +287,6 @@ obj
 						hs.adjust(usr);
 						usr.SetQueue(hs);
 					else if(usr.canNormalHeavyStrike()) usr.SetQueue(src);
-					if(usr.AttackQueue && (usr.AttackQueue == src || usr.AttackQueue == hs) && usr.Tension >= usr.getMaxTensionValue() && !usr.HasTensionLock())
-						usr.Tension = 0
-						if(usr.Secret=="Spiral"&&usr.CheckSlotless("Evolution Power"))
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Arc_Evolution/ae in usr)
-								if(!ae.SlotlessOn)
-									ae.Trigger(usr)
-							for(var/obj/Skills/Buffs/SlotlessBuffs/Spiral/Super_Galaxy_Evolution/sge in usr)
-								if(!sge.SlotlessOn)
-									sge.Trigger(usr)
-						usr.tryIncreaseTension()
 
 			Meteor_Mash
 				name="Meteor Mash"

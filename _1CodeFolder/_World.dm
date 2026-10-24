@@ -435,12 +435,14 @@ obj/Read(savefile/F)
 	PurgeTransientGraphics()
 
 mob/Write(savefile/F)
+	CharacterRigSaveView(1)
 	var/list/Old_Transient_Vis = list()
 	for(var/obj/V in vis_contents)
 		if(V.gfx_transient_visual) Old_Transient_Vis += V
 	if(Old_Transient_Vis.len) vis_contents -= Old_Transient_Vis
 	..()
 	if(Old_Transient_Vis.len) vis_contents += Old_Transient_Vis
+	CharacterRigSaveView(0)
 
 mob/Read(savefile/F)
 	. = ..()

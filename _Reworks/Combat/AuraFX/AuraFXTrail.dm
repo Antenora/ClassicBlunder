@@ -91,6 +91,13 @@ proc/AuraFXArcPlan()
 		list/seg_rot = list()
 		list/seg_ox = list()
 		list/seg_oy = list()
+		move_ox = 0
+		move_oy = 0
+		jump_px = 48
+		tail_min = 0
+
+/datum/aurafx_rig/proc/MotionFast()
+	return M.is_dashing || M.Flying
 
 /datum/aurafx_rig/proc/HistReset(X, Y)
 	hx = list(X)
@@ -380,6 +387,7 @@ proc/AuraFXArcPlan()
 		var/seg = sqrt((hx[i - 1] - hx[i]) ** 2 + (hy[i - 1] - hy[i]) ** 2)
 		if(i == 6) seg *= aurafx_tail_ticks - 4
 		L += seg
+	L = max(L, tail_min)
 	var/fold_s = 1e9
 	var/acc = 0
 	var/dprev = 0
@@ -442,8 +450,8 @@ proc/AuraFXArcPlan()
 			SetSegRot(j, ax + seg_ox[j], 32 - ay + seg_oy[j], travel, round(255 * m, 1), r)
 
 /datum/aurafx_rig/proc/Motion(now)
-	var/X = (M.x - 1) * 32 + M.step_x
-	var/Y = (M.y - 1) * 32 + M.step_y
+	var/X = (M.x - 1) * 32 + M.step_x + move_ox
+	var/Y = (M.y - 1) * 32 + M.step_y + move_oy
 	var/dx = 0
 	var/dy = 0
 	if(!has_pos || M.z != hz || !isturf(M.loc))
@@ -454,7 +462,7 @@ proc/AuraFXArcPlan()
 	else
 		dx = X - hx[1]
 		dy = Y - hy[1]
-		if(abs(dx) > 48 || abs(dy) > 48)
+		if(abs(dx) > jump_px || abs(dy) > jump_px)
 			HistReset(X, Y)
 			chain_snap = 1
 			dx = 0
@@ -478,7 +486,7 @@ proc/AuraFXArcPlan()
 			TakeoffTick(now)
 		ChainFixed(kb_dir, aurafx_kb_cx, aurafx_kb_cy)
 		return
-	var/fastnow = moved && (M.is_dashing || M.Flying || max(abs(dx), abs(dy)) > 24)
+	var/fastnow = moved && (MotionFast() || max(abs(dx), abs(dy)) > 24)
 	if(fastnow) fast_until = now + 1
 	if(fastnow || (now < fast_until && mode == AURAFX_M_FLY))
 		if(mode != AURAFX_M_FLY)

@@ -1211,6 +1211,7 @@ obj/Items/proc/AlignEquip(mob/A, dontUnEquip = FALSE)
 
 obj/Items/proc/UnEquip(mob/A)
 	if(!suffix || A != src.loc) return
+	A.CharacterRigInvalidate()
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
@@ -1284,6 +1285,7 @@ obj/Items/proc/UnEquip(mob/A)
 
 obj/Items/proc/Equip(mob/A)
 	if(suffix) return
+	if(A) A.CharacterRigInvalidate()
 	var/placement=FLOAT_LAYER-3
 	if(src.LayerPriority)
 		placement-=src.LayerPriority
