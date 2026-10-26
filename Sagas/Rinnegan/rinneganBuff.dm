@@ -57,7 +57,7 @@ shar, mange and rinnegan all stack atop of each other, keep that in mind!!!
     adjust(mob/p)
         // they r just sagalevel 8
         var/pot = p.Potential
-        GodKi = p / 100
+        GodKi = pot / 100
         switch(activePath)
             if("Asura")
                 // mechanical

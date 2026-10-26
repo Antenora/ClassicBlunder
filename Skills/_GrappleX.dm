@@ -569,6 +569,10 @@ obj/Skills/Grapple
 
 
 	proc
+		GrappleEnergyDrain(var/mob/User)
+			if(!src.EnergyCost || !User)
+				return 0
+			return User.passive_handler["Drained"] ? src.EnergyCost * (1 + User.passive_handler["Drained"]/10) : src.EnergyCost
 		Activate(var/mob/User, noGCD = FALSE)
 			src.ThrowDir=User.dir
 			var/hd = User.heldDir()
@@ -616,6 +620,18 @@ obj/Skills/Grapple
 				if(!User.EquippedSword() && !User.HasBladeFisting() && !(User.EquippedStaff() && User.UsingBattleMage()))
 					User << "You have to have a sword to use [src]!"
 					return
+			if(src.NeedsGun)
+				if(!User.EquippedGun())
+					User << "You have to have a gun to use [src]!"
+					return
+			if(src.NoGun)
+				if(User.EquippedGun())
+					User << "You can't use [src] with a gun equipped!"
+					return
+			if(src.EnergyCost && !src.AllOutAttack)
+				if(User.Energy < src.GrappleEnergyDrain(User))
+					User << "You do not have enough energy to use [src]!"
+					return
 
 			if(!src.ObjectEnabled)
 				if(isobj(User.Grab))
@@ -638,11 +654,16 @@ obj/Skills/Grapple
 						return//dont trigger cd for object interacts
 
 			if(ismob(User.Grab))
+				var/mob/grab_target = User.Grab
+				if(User.MechGrappleBlock(src, grab_target) || grab_target.MechGrappleWhiff(src, User))
+					return
 				User.GrabMove=1
 				var/mob/Trg=User.Grab
 				// Trg.isGrabbed = TRUE
 				User.Grab=null
 				User.FlashGrabBand(0)
+				if(src.EnergyCost)
+					User.LoseEnergy(src.GrappleEnergyDrain(User))
 				var/userPower = User.getPower(Trg)
 				#if DEBUG_GRAPPLE
 				User.log2text("Grapple User Power", userPower, "damageDebugs.txt", User.ckey)
@@ -719,6 +740,7 @@ obj/Skills/Grapple
 						User.log2text("Before do damage Grapple Damage", Damage, "damageDebugs.txt", User.ckey)
 						#endif
 						var/strike/S = new(User, Trg, Damage)
+						S.skill = src
 						S.unarmed = src.UnarmedOnly
 						S.sword = src.NeedsSword
 						S.spirit = src.SpecialAttack
@@ -727,6 +749,8 @@ obj/Skills/Grapple
 						S.blockEff = src.BlockEffectiveness
 						S.critBonus = src.CritChanceBonus
 						var/dealt = S.resolve()
+						if(!Trg)
+							break
 						if(dealt > 0)
 							if(src.WoundRider)
 								User.DealWounds(Trg, dealt * src.WoundRider)
@@ -742,6 +766,12 @@ obj/Skills/Grapple
 						Trg.GainFatigue(Damage*src.EnergyDamage)
 						User.HealMana(Damage*src.EnergyDamage)
 					Hits--
+				if(!Trg)
+					User.GrabMove=0
+					src.Cooldown()
+					if(removeAfter)
+						User.DeleteSkill(src)
+					return
 				if(src.MortalBlow)
 					if(src.MortalBlow<0)
 						Trg.MortallyWounded+=4
@@ -859,6 +889,8 @@ obj/Skills/Grapple
 							Trg.icon_state = ""
 				if(Crippling)
 					Trg.AddCrippling(Crippling,User)
+				if(Bloodletting)
+					Trg.AddBleed(Bloodletting, User)
 				User.GrabMove=0
 				// Trg.isGrabbed = FALSE
 				src.Cooldown()
@@ -871,6 +903,12 @@ obj/Skills/Grapple
 			else
 				Log("Admin", "[ExtractInfo(User)] currently has [User.Grab.type] grabbed and attempted to grapple them with [src].")
 
+
+/mob/proc/MechGrappleBlock(obj/Skills/Grapple/G, mob/Trg)
+	return 0
+
+/mob/proc/MechGrappleWhiff(obj/Skills/Grapple/G, mob/User)
+	return 0
 
 /obj/Skills/Grapple/proc/doGrappleEffects(Times, mob/User, mob/Trg, EffectMult)
 	set waitfor = 0

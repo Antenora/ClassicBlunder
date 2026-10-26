@@ -116,7 +116,6 @@ mob/var
 	list/SkillsLocked=list()//paths of skills that have been locked out due to being prerequisites for upgraded versions
 	tmp/SignatureSelecting=0//flag that disables checking for more sigs
 	list/SignatureSelected=list()//names of signatures that have been selected already, so they can be removed from the global list when signature selection is activated
-	list/SignatureStyles=list()//name & path of styles which can be selected from signature selection
 	SignatureCheck=1//if 1, try to give signatures. if 0, do not
 	tmp/list/obj/Skills/Skills=list()//skills you know
 	tmp/list/obj/Skills/Queue/Queues=list()//queues you know
@@ -326,6 +325,16 @@ mob/var
 	EnhanceChips
 	EnhanceChipsMax=4
 	PilotingProwess=0
+	PilotXP=0
+	PilotingProwessHistory=0
+	pilot_health_stash
+	shortcut/pilot_shortcuts
+	list/pilot_look
+	list/mech_passives_applied
+	tmp/obj/Items/Mech/mech
+	tmp/OffReplace=0
+	tmp/DefReplace=0
+	tmp/VitReplace=0
 
 	PUDrainReduction=1//Reduces PU drain.
 	PUSpeedModifier=1
@@ -545,7 +554,6 @@ mob/var
 	tmp/mob/TerrifiedOf=0
 	PotionCD=0
 	Satiated=0//fooooood
-	Drunk=0//get op in drunk fist
 	Aged=0//ignore youth debuffs
 	Doped=0//ignore bp wounds
 	Antivenomed=0//Makes poison do half damage and reduces it by a much higher rate.
@@ -638,7 +646,6 @@ mob/var
 	HairUnderlay
 	HairUnderlayX=0
 	HairUnderlayY=0
-	WillPower
 	Regenerating
 	Judgment
 	Defiance
@@ -720,6 +727,9 @@ mob/var
 	SaiyanPotential="None"
 	list/SaiyanFormUnlock=list("SSJ1" = 20, "SSJ2" = 40, "SSJ3" = 60, "SSJ4" = 75, "SSJ4+" = 90)
 
+	//changie stuff
+	ChangieTrueName
+	//
 	list/demon_party = null
 	demon_party_cap = 0
 	list/demon_compendium = null
@@ -752,6 +762,7 @@ mob/var
 	tmp/demon_pending_fuse_open_slots = 0
 	tmp/demon_fusion_animating = FALSE
 	tmp/list/demon_fusion_anim_images = null
+
 
 /proc/reduceGodKi(mob/player, num)
 	player.GodKi -= num

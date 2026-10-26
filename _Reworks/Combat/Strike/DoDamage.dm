@@ -55,6 +55,8 @@
 		val *= 1 + defender.held_skill.HeldVulnerability
 	if(defender.rush_vuln_until > world.time)
 		val *= 1.25
+	if(defender.mark_vuln_by == src && defender.mark_vuln_until > world.time)
+		val *= 1 + defender.mark_vuln_amp
 	if(src.nerve_weaken && world.time < src.nerve_weaken_until)
 		val *= max(1 - src.nerve_weaken, 0.5)
 		src.nerve_weaken = 0
@@ -279,6 +281,7 @@
 		val *= src.IsGood() ? defender.getGoodResistValue() : defender.getGoodResistVulnValue()
 	if(defender.passive_handler.Get("ChaosResist"))
 		val *= (src.IsGood() || src.IsEvil()) ? defender.getChaosResistValue() : defender.getChaosResistVulnValue()
+	val *= defender.QuincyDamageTakenMult(S && S.skill ? S.skill.type : null)
 	// For Irooni, debuff's current color rewards the matching attack type and punishes a wrong
 	// one. Red=Autohit, Blue=Queue, Green=Projectile. Match x1.5 damage, mismatch x0.5.
 	// Normal attacks and grapples and other forms of damage are exempt from this
@@ -302,7 +305,7 @@
 	// Ichidanme: Tameraikizu no Wakachiai makes it so whoever deals damage to the other also takes that damage
 	// to themselves as Injury. Excludes Itokiribasami
 	if(val > 0 && src.TameraikizuActive && src.TameraikizuPartner == defender && !src.ItokiribasamiAttacking)
-		src.WoundSelf(val)
+		src.WoundSelf(defender.HPToPct(val))
 	if(val > 0 && ismob(defender))
 		defender.last_damaged_time = world.time
 		if(defender != src)
@@ -323,26 +326,27 @@
 
 /mob/proc/fieldAndDefense(mob/defender, unarmed, sword, spiritAtk, val)
 	if(!val) return
+	var/pct = defender.HPToPct(val)
 	if(defender.UsingVoidDefense())
 		if(defender.TotalFatigue>0)
-			defender.HealFatigue(val/3)
+			defender.HealFatigue(pct/3)
 		else
-			defender.HealWounds(val/3)
-		defender.HealEnergy(val/2)
-		defender.HealMana(val/2)
+			defender.HealWounds(pct/3)
+		defender.HealEnergy(pct/2)
+		defender.HealMana(pct/2)
 
 	if(defender.passive_handler.Get("Gluttony"))
 		var/value = defender.passive_handler.Get("Gluttony") * (glob.FIELD_MODIFIERS + glob.GLUTTONY_MODIFIER)
-		WoundSelf(value * val )
-		GainFatigue(value * val)
+		WoundSelf(value * pct )
+		GainFatigue(value * pct)
 
 
 	if(defender.HasDeathField() && (unarmed || sword))
 		var/deathFieldValue = defender.GetDeathField() * glob.FIELD_MODIFIERS // should be 0.01(?), 15 = 15% dmg takebnn reflective if they do 100
-		WoundSelf(deathFieldValue * val)
+		WoundSelf(deathFieldValue * pct)
 	if(defender.HasVoidField()&&spiritAtk)
 		var/voidFieldValue = defender.GetVoidField() * glob.FIELD_MODIFIERS
-		GainFatigue(voidFieldValue * val)
+		GainFatigue(voidFieldValue * pct)
 
 
 

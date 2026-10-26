@@ -98,9 +98,9 @@ mob/Players/
 			IC.registerInternalCommunicator()
 
 	Logout()
-		..()
 		for(var/obj/Items/Tech/F in contents)
 			if(!F.Frequency) continue
 			removeFromGlobalListeners(F)
 		for(var/obj/Skills/Utility/Internal_Communicator/IC in contents)
 			IC.unregisterInternalCommunicator()
+		..()

@@ -93,7 +93,7 @@ mob/proc/RollVoidForAbsorb()
 /mob/var/extraVoidChance = 0
 
 /mob/proc/applyVoidNerf()
-	Maimed++
+	MaimApply("Torso", 1)
 	recordMaim(null, "Survived Void")
 	src << "After managing to survive, you're left with a maim."
 	if(glob.VoidCut)

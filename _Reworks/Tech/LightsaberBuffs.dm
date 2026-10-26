@@ -71,7 +71,7 @@
 	Lightsaber
 		SummonSwordVisual=0.15
 		MakesSword=1
-		passives = list("Deflection" = 1,  "SwordAscension" = 1)
+		passives = list("SwordAscension" = 1, "RangedResist" = 1)
 		FlashDraw=1
 		Deflection=1
 		SwordAscension=1
@@ -104,7 +104,7 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list( "Deflection" = 1 + (0.2*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "DoubleStrike" = 0.75+(improvementLevel*0.25))
+			passives = list("SwordAscension" = 1 + (improvementLevel-1), "RangedResist" = 1 + (0.2 * improvementLevel))
 			if(improvementLevel)
 				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.2 * improvementLevel)
@@ -135,7 +135,7 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list( "Extend"= 1, "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1), "Sword Mastery" = 0.5+(improvementLevel*0.25))
+			passives = list("SwordAscension" = 1 + (improvementLevel-1), "Sword Mastery" = 0.5+(improvementLevel*0.25), "RangedResist" = 1 + (0.2 * improvementLevel))
 			if(improvementLevel)
 				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.2 * improvementLevel)
@@ -153,7 +153,6 @@
 		FlashDraw=1
 		Deflection=1
 		SwordAscension=1
-		Instinct = 1
 		SwordClass="Medium"
 		SwordIcon='CProgressiveBlade.dmi'
 		SwordX=-32
@@ -163,12 +162,11 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list( "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1))
+			passives = list("SwordAscension" = 1 + (improvementLevel-1), "RangedResist" = 1 + (0.4 * improvementLevel))
 			if(improvementLevel)
 				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.4 * improvementLevel)
 				SwordAscension = 1 + (improvementLevel-1)
-				Instinct = 1 + (0.25 * improvementLevel)
 		verb/Crossguard_Lightsaber()
 			set category="Skills"
 			if(!altered)
@@ -190,7 +188,7 @@
 		OffMessage="extinguishes the plasma of their lightsaber..."
 		getImprovements()
 			var/improvementLevel = AssociatedGear.Improvements
-			passives = list( "Deflection" = 1 + (0.4*improvementLevel), "SwordAscension" = 1 + (improvementLevel-1))
+			passives = list("SwordAscension" = 1 + (improvementLevel-1), "RangedResist" = min(1 + (0.75 * improvementLevel), 5))
 			if(improvementLevel)
 				SummonSwordVisual = 0.25 + (0.25 * improvementLevel)
 				Deflection = 1 + (0.75 * improvementLevel)

@@ -52,18 +52,24 @@
         passives = list("Wrathful Tenacity" = 0.25);
         passives["HolyMod"] = 0.2 + (asc * 0.1);
         //passives were kill: callousedfeet, hardenedframe
-        passives["SoftStyle"] = asc;
         TimerLimit = 15 + (asc * 5);
 
 /obj/Skills/Buffs/SlotlessBuffs/Wilder/Brightcrown_Stance/Pheonix_Form//extended attacks, disables hardened frame so that spirit strike can be used instead
     FollowUp = "/obj/Skills/AutoHit/Crown_Radiation";//triggers light dragon roar
-    passives = list("Scorching" = 5, "SweepingStrike" = 1, "Extend" = 1, "Gum Gum" = 1);
+    passives = list("Scorching" = 5);
     //passives were kill: spiritstrike, hardenedframe
     endAdd = -0.5;
     strAdd = -0.5;
     forAdd = 1;
     defAdd = 1;
     ActiveMessage = "takes up the radiance of the Phoenix!"
+    adjust(mob/p)
+        ..()
+        var/asc = p.AscensionsAcquired;
+        endAdd = initial(endAdd);
+        defAdd = initial(defAdd);
+        passives["Scorching"] = 5;
+        passives["Tenacity"] = 2 + asc;
     verb/Pheonix_Form()//these will be modified once the official Style Switching verb is implemented
         set category = "Stances"
         usr.preForm()
@@ -94,6 +100,15 @@
     passives = list("StunningStrike" = 3, "ComboMaster" = 1, "TechniqueMastery" = 3);
     //passives were kill: flow
     ActiveMessage = "takes up the technique of the Dragon!"
+    adjust(mob/p)
+        ..()
+        endAdd = initial(endAdd);
+        spdAdd = initial(spdAdd);
+        offAdd = initial(offAdd);
+        defAdd = initial(defAdd);
+        passives["StunningStrike"] = 3;
+        passives["ComboMaster"] = 1;
+        passives["TechniqueMastery"] = 3;
     verb/Ram_Form()
         set category = "Stances"
         usr.preForm()
@@ -107,8 +122,10 @@
     ActiveMessage = "takes up the ferocity of the Tiger!"
     //passives were kill: blurringstrikes
     adjust(mob/p)
+        ..()
         var/asc = p.AscensionsAcquired
-        passives = list("Godspeed" = 1 + (asc/2))
+        defAdd = initial(defAdd)
+        passives["Godspeed"] = 1 + (asc/2)
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)
     verb/Bear_Form()
@@ -122,8 +139,12 @@
     defAdd = -0.5
     ActiveMessage = "takes up the determination of the Tortoise!"
     adjust(mob/p)
+        ..()
         var/asc = p.AscensionsAcquired
-        passives = list("Harden" = 2 + asc/2,  "DeathField" = 2+asc*2)
+        endAdd = initial(endAdd)
+        defAdd = initial(defAdd)
+        passives["Harden"] = 2 + asc/2
+        passives["DeathField"] = 2+asc*2
         //passives were kill: brutalize, hardenedframe
         Cooldown = 90 - (10 *p.AscensionsAcquired)
         TimerLimit = 30 + (6 *p.AscensionsAcquired)

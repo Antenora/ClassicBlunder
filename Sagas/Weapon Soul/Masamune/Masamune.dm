@@ -117,47 +117,14 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Masamune
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s soothing treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their healing luster..."
+	adjust(mob/p)
+		passives["EvilResist"] = 1 + (0.25 * p.SagaLevel)
+		if(p.SagaLevel >= 5)
+			passives["Unstoppable"] = 1
+			passives["CriticalBlock"] = 0.2
+			passives["HolyMod"] = 2
+			passives["Heavensent"] = 1
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
 
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	Forgemaster_Lifeblood
-		StyleActive="Forgemaster"
-		passives = list( "EvilResist" = 1)
-		StyleOff=1.3
-		StyleDef=1.3
-		StyleStr=1.1
-		Finisher="/obj/Skills/Queue/Finisher/Snowfall"
-		adjust(mob/p)
-			StyleOff = 1.3 + (0.2 * p.SagaLevel)
-			StyleDef = 1.3 + (0.2 * p.SagaLevel)
-			StyleStr = 1.1 + (0.1 * p.SagaLevel)
-			passives["EvilResist"] = 1 + (0.25* p.SagaLevel)
-		verb/Forgemaster_Lifeblood()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-
-/obj/Skills/Queue/Finisher
-	Snowfall
-		DamageMult=20
-		HitSparkIcon='Slash - Future.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		InstantStrikes=5
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Refined_Fate"
-		BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Weapon_Soul_Hunt"
-		HitMessage = "purifies their path with a single, freezing stroke!"
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Refined_Fate
-		ForMult=1.4
-		StrMult=1.4
-		passives = list("BulletKill" = 1)
-	Weapon_Soul_Hunt
-		IconLock='SweatDrop.dmi'
-		IconApart=1
-		DefMult=0.8
-		StrMult=0.9
-		ActiveMessage="is hunted by weapons given life..."
-		OffMessage="is no longer hunted."

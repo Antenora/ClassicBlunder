@@ -776,8 +776,7 @@ client/proc/RPBoxShow()
 	src << browse(RPBoxHTML(), "window=[RPBOX_CTL]")
 	rpbox_open = 1
 	RPBoxPlace()
-	winset(src, RPBOX_CTL, "is-visible=true")
-	winset(src, RPBOX_CTL, "focus=true")
+	WebOverlayShow(RPBOX_CTL, "is-visible=true;focus=true")
 
 client/proc/RPBoxHide()
 	rpbox_open = 0

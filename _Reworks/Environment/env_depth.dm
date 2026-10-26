@@ -286,8 +286,7 @@ proc/_EnvCloudBuildBank(obj/cloud_shadow_bank/C)
 proc/_EnvCloudDrift(list/outdoor_players)
 	var/list/copy = _cloud_banks.Copy()
 	for(var/obj/cloud_shadow_bank/C in copy)
-		var/area/A = C.anchor ? C.anchor.loc : null
-		var/list/W = EnvWindForArea(A)
+		var/list/W = EnvWindAt(C.anchor)
 		var/dpx = (isnum(W[1]) ? W[1] : glob.CLOUD_DRIFT_X) * CLOUD_INTERVAL / 10
 		var/dpy = (isnum(W[2]) ? W[2] : glob.CLOUD_DRIFT_Y) * CLOUD_INTERVAL / 10
 		var/pre_wx = C.wx

@@ -1,5 +1,6 @@
 #define STUDIO_PLOT_HALF 75
 #define STUDIO_ASSIGN_FILE "Saves/StudioAssign.txt"
+#define STUDIO_MAXZ_FILE "Saves/StudioMaxZ.txt"
 
 var/global/STUDIO_Z = 26
 var/global/list/studioAssign
@@ -43,6 +44,8 @@ mob/var/tmp/studioRetZ = 0
 	var/mz = world.maxz
 	for(var/k in studioAssign)
 		mz = max(mz, studioAssign[k])
+	if(fexists(STUDIO_MAXZ_FILE))
+		mz = max(mz, text2num(trimtext(file2text(STUDIO_MAXZ_FILE))) || 0)
 	if(mz > world.maxz)
 		world.maxz = mz
 
@@ -74,6 +77,11 @@ mob/var/tmp/studioRetZ = 0
 		z = world.maxz
 	studioAssign[ck] = z
 	BuildStudioSave()
+	var/hw = fexists(STUDIO_MAXZ_FILE) ? (text2num(trimtext(file2text(STUDIO_MAXZ_FILE))) || 0) : 0
+	if(z > hw)
+		if(fexists(STUDIO_MAXZ_FILE))
+			fdel(STUDIO_MAXZ_FILE)
+		text2file("[z]", STUDIO_MAXZ_FILE)
 	return z
 
 /proc/BuildStudioPrepare(z)

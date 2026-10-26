@@ -36,7 +36,6 @@ race
 			user.secretDatum.nextTierUp = 999
 			if(eldType == "Shrouded") user.AngerMax=1.5;
 			if(eldType == "Reflected")
-				user.passive_handler.Increase("MovingCharge", 1);
 				user.AddSkill(new /obj/Skills/Utility/Offer_Pact);
 				user.AddSkill(new /obj/Skills/Utility/Revoke_Pact);
 

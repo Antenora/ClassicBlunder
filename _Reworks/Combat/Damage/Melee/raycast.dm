@@ -97,8 +97,17 @@
             if(M in people) continue
             if(istype(M, /mob/irlNPC)) continue
             people += M
+    if(q && q.CleaveArc)
+        for(var/cd in list(turn(dir, 45), turn(dir, -45)))
+            for(var/mob/M in get_step(src, cd))
+                if(M != src && M.density && !istype(M, /mob/irlNPC))
+                    people += M
     if(Grab)
         people += Grab
+    var/list/mob/struck_once = list()
+    for(var/mob/M in people)
+        struck_once |= M
+    people = struck_once
     if(party)
         people.Remove(party.members)
     if(glob.MELEE_DEBUG && client)

@@ -39,10 +39,10 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Half_Saiyan"  = list("t1_passives"=list("UnderDog" = 3), "t1_skills"=list(), "t2_passives"=list("UnderDog" = 6), "t2_skills"=list()),
 	"Human"        = list("t1_passives"=list("Persistence" = 1), "t1_skills"=list(), "t2_passives"=list("Persistence" = 2), "t2_skills"=list()),
 	"Namekian"     = list("t1_passives"=list("TechniqueMastery" = 2), "t1_skills"=list(), "t2_passives"=list("TechniqueMastery" = 3), "t2_skills"=list()),
-	"Majin"        = list("t1_passives"=list("ManaCapMult" = 0.5, "ManaGeneration" = 2), "t1_skills"=list(), "t2_passives"=list("Extend" = 1, "Gum Gum" = 1), "t2_skills"=list()),
+	"Majin"        = list("t1_passives"=list("ManaCapMult" = 0.5, "ManaGeneration" = 2), "t1_skills"=list(), "t2_passives"=list("Blubber" = 2, "LifeGeneration" = 1), "t2_skills"=list()),
 	"Demon"        = list("t1_passives"=list("AbyssMod" = 2), "t1_skills"=list(), "t2_passives"=list("AbyssMod" = 5), "t2_skills"=list()),
 	"Angel"        = list("t1_passives"=list("HolyMod" = 2), "t1_skills"=list(), "t2_passives"=list("HolyMod" = 5), "t2_skills"=list()),
-	"Celestial"    = list("t1_passives"=list("MartialMagic" = 1), "t1_skills"=list(), "t2_passives"=list("BladeFisting" = 1), "t2_skills"=list()),
+	"Celestial"    = list("t1_passives"=list("KiControlMastery" = 0.5), "t1_skills"=list(), "t2_passives"=list("KiControlMastery" = 1, "QuickCast" = 1), "t2_skills"=list()),
 	"Dragon"       = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Beastkin"     = list("t1_passives"=list("Fury" = 0.5, "Harden" = 0.5, "Momentum" = 0.5), "t1_skills"=list(), "t2_passives"=list("Fury" = 2, "Harden" = 2, "Momentum" = 2), "t2_skills"=list()),
 	"Eldritch"     = list("t1_passives"=list(), "t1_skills"=list(/obj/Skills/Utility/Telepathy), "t2_passives"=list(), "t2_skills"=list()),
@@ -52,7 +52,7 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 	"Demi-fiend"   = list("t1_passives"=list("ManaGeneration" = 1, "ManaCapMult" = 0.5), "t1_skills"=list(), "t2_passives"=list("ManaGeneration" = 2), "t2_skills"=list()),
 	"Chakardi"     = list("t1_passives"=list(), "t1_skills"=list(), "t2_passives"=list(), "t2_skills"=list()),
 	"Popo"         = list("t1_passives"=list("CashCow" = 3), "t1_skills"=list(), "t2_passives"=list( "CashCow" = 5), "t2_skills"=list()),
-	"Nobody"     = list("t1_passives"=list("MovingCharge" = 1, "SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
+	"Nobody"     = list("t1_passives"=list("SwordAscension" = 1), "t1_skills"=list(), "t2_passives"=list("SwordAscension" = 3, "CriticalDamage" = 0.15), "t2_skills"=list())
 )
 
 
@@ -72,6 +72,7 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 		return FALSE
 	bio_samples += key
 	ApplyBioSample(race_name, tier)
+	BioPerfectSync()
 	return TRUE
 /mob/proc/RemoveBioSample(race_name, tier)
 	// Returns TRUE if removed, FALSE if collector never had it.
@@ -82,7 +83,27 @@ var/global/list/BIO_SAMPLE_DEFS = list(
 		return FALSE
 	bio_samples -= key
 	StripBioSample(race_name, tier)
+	BioPerfectSync()
 	return TRUE
+
+/mob/proc/BioTier2Count()
+	. = 0
+	if(!bio_samples)
+		return
+	for(var/race_name in BIO_SAMPLE_DEFS)
+		if(HasBioSample(race_name, 2))
+			.++
+
+/mob/proc/BioPerfectReady()
+	return BioAndroid && !PerfectForm && BioTier2Count() >= 3
+
+/mob/proc/BioPerfectSync()
+	var/obj/Skills/S = locate(/obj/Skills/Utility/Become_Perfect) in src
+	if(BioPerfectReady())
+		if(!S)
+			AddSkill(new /obj/Skills/Utility/Become_Perfect)
+	else if(S)
+		DeleteSkill(S)
 
 /mob/proc/ApplyBioSample(race_name, tier)
 	// Looks up the registry for this race and tier, then applies passives and skills
@@ -294,7 +315,7 @@ obj/Skills/Utility
 
 			// Apply wounds to the donor
 			donor.AddHealthCut(0.05)
-			donor.Maimed += 1
+			donor.MaimApply("Torso", 1)
 			donor.recordMaim(usr, "Bio Sample Extraction")
 
 			// Forced extraction grants both tiers, regardless of donor's prior tier-1 donation status
@@ -363,9 +384,12 @@ obj/Skills/Utility
 			usr.Using = 0
 	Become_Perfect
 		desc="Sacrifice 3 of your Tier 2 Bio Android samples to unlock your Perfect Form."
-		verb/Bio_Augmentation()
+		verb/Become_Perfect()
 			set category="Utility"
 			set hidden = 1
+			if(usr.PerfectForm)
+				usr<<"You have already reached your Perfect Form."
+				return
 			if(!usr.BioAndroid)
 				usr << "You need Biological Cybernetics installed to install samples."
 				return
@@ -373,10 +397,9 @@ obj/Skills/Utility
 				usr << "You are already running an operation."
 				return
 			usr.Using = 1
-			var/Samples
+			var/Samples = 0
 
 			var/list/Choices = list("Cancel")
-			var/race_choice = Ask(usr, "Which Tier 2 sample do you want to remove?", "Bio Augmentation", null, "pick", Choices, 0)
 			for(var/race_name in BIO_SAMPLE_DEFS)
 				if(usr.HasBioSample(race_name, 2))
 				//	continue
@@ -386,7 +409,12 @@ obj/Skills/Utility
 				usr<<"You need at least 3 tier 2 samples to use this!"
 				usr.Using = 0
 				return
+			var/race_choice = Ask(usr, "Which Tier 2 sample do you want to remove?", "Bio Augmentation", null, "pick", Choices, 0)
+			if(race_choice == "Cancel" || !race_choice || !usr.HasBioSample(race_choice, 2))
+				usr.Using = 0
+				return
 
 			usr.PerfectForm=1
-			usr.RemoveBioSample(race_choice, 2)
 			usr.Using = 0
+			usr << "You give up your [race_choice] sample and reach your Perfect Form."
+			usr.RemoveBioSample(race_choice, 2)

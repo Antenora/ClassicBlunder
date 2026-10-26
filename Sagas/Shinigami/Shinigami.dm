@@ -40,7 +40,6 @@ mob/proc/gainShinigami()
 	sh.Ascended = min(1 + src.SagaLevel, 6)
 
 	src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
-	src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Zanjutsu)
 	src << "Your training grants you access to Kidō. You can currently select 2 Tier 1 spells."
 
 	if(src.ShinigamiRelease == "Nozarashi")

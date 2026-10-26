@@ -131,7 +131,7 @@ ascension
 					..()
 			control
 				growthadd=1.25
-				choiceMessage = "Control Saiyans are the path for Saiyans who want to go down the Super Saiyan God path. Selecting this vastly raises your growth rate for invested stats, gives your Super Saiyan forms slight stat boosts, and locks you to Super Saiyan 4 Daima, God, Blue, and Blue Evolved."
+				choiceMessage = "Control Saiyans are the path for Saiyans who want to go down the Super Saiyan God path. Selecting this vastly raises your growth rate for invested stats, gives your Super Saiyan forms slight stat boosts, and locks you to Super Saiyan God, Blue, and Blue Evolved."
 				onAscension(mob/owner)
 					owner.SaiyanFocus = "Control"
 					for(var/transformation/saiyan/ssj in owner.race.transformations)

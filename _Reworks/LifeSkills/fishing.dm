@@ -250,6 +250,9 @@ mob/proc/FishPayout(obj/LifeSkills/FishingSpot/S, datum/fish_spot_def/d, ftype, 
 		q = clamp(LifeQualityCap(rank), QUAL_EPIC, QUAL_LEGENDARY)   // the strike fights like a legend and lands like one
 
 	GiveMaterial(src, ftype, 1, q)
+	if(prob((LifeYieldMult("Fishing") - 1) * 100))
+		GiveMaterial(src, ftype, 1, q)
+		src << "A second one bites right behind it!"
 	src << "<font color=#78eb78>You land a [QualityName(q)] [fname]!</font>"
 	LifeLogFind("Fishing", fname)
 	if(prob((armed && armed.id == "sunken_cache") ? 10 : 0.5))

@@ -243,6 +243,9 @@
 				if(istype(O, /obj/Turfs/CustomObj1))
 					BuildCustomObjApplyDef(O)
 				GfxRefreshStructureMetadata(O)
+				if(ObjPlacementTwin(O))
+					ReleaseProp(O)
+					continue
 				placedObjs++
 			if(areaEntry && areaEntry["path"] != /area)
 				var/aid = ""
@@ -268,12 +271,13 @@
 								ZD.moon = ov["zone_moon"] ? 1 : 0
 							BuildZoneApply(ZD)
 							BuildZonesSave()
-						aid = "/area/MapperZone#[ZD.name]"
+						aid = "/area/MapperZone#[length(ZD.uid) ? ZD.uid : ZD.name]"
 				else
 					aid = "[apath]"
 				if(length(aid) && BuildAreaSetId(T, aid) && M)
 					BuildAreaPaintLoad()
 					areaPaintMap["[T.x],[T.y],[T.z]"] = aid
+					areaPaintDirty = 1
 			placedCells++
 			n++
 			if(n % BUILD_COMMIT_CHUNK == 0)

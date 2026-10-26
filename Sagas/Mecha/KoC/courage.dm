@@ -7,7 +7,7 @@ sagaInfo/courage
 sagaInfo/courage/Endless_Evolution
 	choicesPaths = list("2" = list("Overwhelming Force", "Unstoppable Strength", "Peerless Agility"))
 
-	specificPassives =list("3" = list("Overwhelming Force" = list("MovingCharge" = 1)))
+	specificPassives =list("3" = list("Overwhelming Force" = list()))
 
 	skillsPerTier = list(	"2" = list("Overwhelming Force" = "/obj/Skills/Projectile/Beams/Will_Beam", "Unstoppable Strength" = "/obj/Skills/Grapple/Seismic_Toss", \
 										"Peerless Agility" = "/obj/Skills/AutoHit/Drill_of_Defiance"), \

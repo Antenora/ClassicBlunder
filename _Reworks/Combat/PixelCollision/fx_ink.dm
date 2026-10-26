@@ -84,7 +84,7 @@ proc/BodyInkProbe(mob/m)
 				br = GetRuntimeRect(m.icon, m.dir)
 	if(!AM && !br)
 		br = list(0, 0, 32, 32)
-	return list(1 + (m.x-1)*32 + m.step_x, 1 + (m.y-1)*32 + m.step_y, cw, ch, tx, ty, AM, br)
+	return list(1 + (m.x-1)*32 + m.step_x + m.body_px, 1 + (m.y-1)*32 + m.step_y + m.body_py, cw, ch, tx, ty, AM, br)
 
 proc/BodyInkHitL(list/P, wx, wy)
 	var/ux = P[3]/2 + (wx - (P[1] + P[3]/2)) / P[5]
@@ -648,6 +648,27 @@ datum/ink_family
 				s.hit[m] = 1
 				MarkHit(r, m, s.group)
 				Dispatch(r, m, s, e[2])
+		if(autohit_obj_listeners.len)
+			InkObjSweep(live)
+
+	proc/InkObjSweep(list/live)
+		for(var/obj/O in autohit_obj_listeners.Copy())
+			if(!O.loc)
+				continue
+			var/ol = O.LowerX()
+			var/ob = O.LowerY()
+			var/ow = O.Width()
+			var/oh = O.Height()
+			for(var/list/e in live)
+				var/datum/fxink/s = e[1]
+				var/obj/AutoHitter/r = s.root
+				if(O.z != s.z || !r || !r.Owner)
+					continue
+				var/reach = e[5]
+				if(e[3] + reach < ol || e[3] - reach > ol + ow || e[4] + reach < ob || e[4] - reach > ob + oh)
+					continue
+				O.StruckByAutoHit(r.Owner)
+				break
 
 obj/AutoHitter
 	proc/InkJoinFamily(mob/owner, obj/Skills/AutoHit/Z)
@@ -726,8 +747,7 @@ obj/AutoHitter
 		var/list/P = BodyInkProbe(Owner)
 		var/pad = max(1, glob ? glob.MOB_REACH_PAD : 2)
 		var/facing = Circle ? 0 : Owner.dir
-		var/reach = max(3, HURT_REACH_MAX)
-		for(var/mob/m in range(reach, Owner))
+		for(var/mob/m in HurtRangeMobs(Owner, 3))
 			if(m == Owner || !m.density) continue
 			if(m.z != Owner.z) continue
 			var/list/Q = BodyInkProbe(m)
@@ -742,14 +762,10 @@ obj/AutoHitter
 		if(!e) return out
 		var/cx = (e.x-1)*32 + 16
 		var/cy = (e.y-1)*32 + 16
-		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)))
+		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)) | BigBodiesNear(e, R+1, los))
 			if(!hitSelf && m == Owner) continue
-			if(square)
-				if(!SquareHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && SquareHitsBounds(cx, cy, 32*(R-1), m)) continue
-			else
-				if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
+			if(!ZoneHitsMob(cx, cy, 32*R, m, square)) continue
+			if(annulus && R > 1 && ZoneHitsMob(cx, cy, 32*(R-1), m, square)) continue
 			out += m
 		return out
 
@@ -773,7 +789,7 @@ obj/AutoHitter
 		set waitfor = FALSE
 		walk(src, 0)
 		animate(src)
-		if(AHOwner)
+		if(AHOwner && AHOwner.autohitChildren)
 			AHOwner.autohitChildren -= src
 		AHOwner = null
 		AlreadyHit = null
@@ -783,10 +799,10 @@ obj/AutoHitter
 		GfxReleaseAtom(src)
 
 mob/proc/InkWorldX()
-	return 1 + (x-1)*32 + step_x
+	return 1 + (x-1)*32 + step_x + body_px
 
 mob/proc/InkWorldY()
-	return 1 + (y-1)*32 + step_y
+	return 1 + (y-1)*32 + step_y + body_py
 
 mob/proc/InkRushSweep(obj/AutoHitter/r, ox, oy)
 	if(!r || !r.Owner) return
@@ -799,8 +815,7 @@ mob/proc/InkRushSweep(obj/AutoHitter/r, ox, oy)
 	if(dist > 8) steps = round(dist / 8) + 1
 	var/list/P = BodyInkProbe(src)
 	var/pad = max(1, glob ? glob.MOB_REACH_PAD : 2)
-	var/reach = max(3, HURT_REACH_MAX) + round(dist / 32) + 1
-	for(var/mob/m in range(reach, src))
+	for(var/mob/m in HurtRangeMobs(src, 3, round(dist / 32) + 1))
 		if(m == src || !m.density) continue
 		if(m == r.Owner) continue
 		if(m.z != z) continue

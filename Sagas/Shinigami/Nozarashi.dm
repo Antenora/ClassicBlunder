@@ -73,7 +73,6 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		var/SL = p.SagaLevel
 		passives = list(
 			"Persistence"   = 1 + (SL/2),
-			"BulletKill"    = 1,
 			"NoDodge"       = 1,
 			
 			
@@ -219,10 +218,7 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 		var/SL = p.SagaLevel
 		passives = list(
 			"Persistence"       = 3 + (SL/2),
-			
-			"BulletKill"        = 1,
 			"NoDodge"           = 1,
-			"Half-Sword"        = 1 + SL,
 
 			"HellRisen"         = 0.25 + (0.25 * SL),
 			"Juggernaut"        = 1 + SL,
@@ -267,17 +263,19 @@ mob/var/tmp/LeapAttackSweetSpotActive = FALSE
 				return
 			adjust(usr)
 			src.Trigger(usr)
+			if(!src.SlotlessOn) return
+			var/seq = ++bankai_seq
 			var/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form/sf = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
 			if(sf) sf.applyBankaiIcon(usr)
 			if(sf) sf.applyBankaiShihakushoIcon(usr)
 			var/mob/M = usr
 			spawn()
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq)) return
 				for(var/i = 1 to 10)
-					if(!M || !M.loc) return
+					if(!BankaiLive(M, seq)) return
 					KKTShockwave(M, icon='Icons/Effects/fevKiai.dmi', Size=1.5)
 					sleep(2)
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq)) return
 				OMsg(M, "<b>[M] calls out, \"Bankai... [M.BankaiPrefix] [M.AsauchiName]!\"</b>")
 		else
 			src.Trigger(usr)

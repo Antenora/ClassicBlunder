@@ -749,7 +749,7 @@ obj/Skills/Utility
 				usr << "[Target] has moved too far away."
 				src.Using = 0
 				return
-			if(!Target.Secret)
+			if(!Target.Secret && !(Target.race && (Target.race.type in glob.NoSagaRaces)))
 				Target.Secret = "Eldritch"
 				Target.giveSecret("Eldritch")
 				Target << "A flood of eldritch knowledge washes over you. You have awakened to the Eldritch secret!"

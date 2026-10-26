@@ -13,52 +13,19 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Guan_Yu
 	StrMult=1.3
 	OffMult=1.3
 	DefMult=1.3
-	passives = list(  "Iaijutsu" = 2)
+	passives = list("CriticalChance" = 10, "CriticalDamage" = 0.15)
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s warful treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their warful luster..."
+	adjust(mob/p)
+		if(p.SagaLevel >= 5)
+			passives["TechniqueMastery"] = 2
+			passives["SwordAscension"] = 1
+			passives["LifeGeneration"] = 1
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
 
-/obj/Skills/Queue/Finisher/Descending_Dragon
-	DamageMult = 4
-	HitSparkIcon='Slash - Zan.dmi'
-	HitSparkX=-32
-	HitSparkY=-32
-	BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Strength_of_Guan_Yu"
-	BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Reeling_Blow"
-	HitMessage = "channels the wisdom of Guan Gong"
-
-/obj/Skills/Buffs/NuStyle/SwordStyle/Gong_Bu
-	StyleActive="Gong Bu"
-	passives = list("Reversal" = 0.1,  "Parry" = 0.25)
-	StyleEnd=1.1
-	StyleStr=1.1
-	Finisher="/obj/Skills/Queue/Finisher/Descending_Dragon"
-	adjust(mob/p)
-		StyleStr = 1.05 + (0.05 * p.SagaLevel)
-		StyleEnd = 1.05 + (0.05 * p.SagaLevel)
-		passives["Reversal"] = 0.1 + (0.2 * p.SagaLevel)
-		passives["Parry"] = 0.25 + (0.25 * p.SagaLevel)
-	verb/Gong_Bu()
-		set hidden=1
-		adjust(usr)
-		Trigger(usr)
-
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Strength_of_Guan_Yu
-	StrMult=1.3
-	DefMult=1.15
-	OffMult=1.15
-	passives = list( "Disarm" = 2, "Iaijutsu" = 2)
-
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Reeling_Blow
-	IconLock='SweatDrop.dmi'
-	IconApart=1
-	OffMult=0.8
-	DefMult=0.8
-	ActiveMessage="has their stance broken apart!"
-	OffMessage="realigns themselves!"
 
 /obj/Skills/AutoHit/Crushing_Dragon_Strike
 	NeedsSword=1

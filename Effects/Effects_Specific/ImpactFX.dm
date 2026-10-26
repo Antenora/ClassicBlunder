@@ -23,8 +23,7 @@ proc
 		var/wind_x = 0
 		var/wind_y = 0
 		if(glob.FLASH_WORLD)
-			var/area/AR = T.loc
-			var/list/wv = EnvWindForArea(AR)
+			var/list/wv = EnvWindAt(T)
 			wind_x = clamp(round(wv[1] * 2), -6, 6)
 			wind_y = clamp(round(wv[2] * 2), -6, 6)
 		for(var/i = 1, i <= n, i++)

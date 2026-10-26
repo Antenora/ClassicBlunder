@@ -11,7 +11,7 @@ mob/proc/DisarmTarget(mob/target)
     if(target.EquippedSword() || target.EquippedStaff())
         target.passive_handler.Set("Disarmed", 1);
         target.lastDisarm = world.time;
-        target.disarm_timer = src.UsingGladiator() * glob.DISARM_TIMER;
+        target.disarm_timer = (src.UsingGladiator() || 1) * glob.DISARM_TIMER;
         target << "You've been disarmed!"
     else
         target.Crippled += 10;

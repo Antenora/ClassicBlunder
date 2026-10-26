@@ -1,4 +1,4 @@
-//opt-in camera director
+//camera director
 
 /mob/gfx_camera
 	name = "graphics camera"
@@ -21,9 +21,8 @@ client
 		mob/gfx_camera/gfx_camera
 		gfx_camera_active = FALSE
 
-proc/GfxCameraWanted(client/C)
-	var/Options/P = C ? C.prefs : null
-	return C && C.mob && istype(C.mob, /mob/Players) && istype(P, /Options) && P.experimentalCamera && !GfxReducedMotion(C)
+proc/GfxCameraInUse(client/C)
+	return C && C.gfx_camera && C.mob && C.mob == C.gfx_camera.owner && !C.cutscene_active && !GfxReducedMotion(C)
 
 proc/GfxCameraWorldX(atom/movable/A)
 	return A ? (A.x - 1) * world.icon_size + A.step_x + world.icon_size / 2 : 0
@@ -46,10 +45,11 @@ proc/GfxCameraViewTiles(client/C)
 
 proc/GfxCameraClampPoint(client/C, wx, wy)
 	var/list/dims = GfxCameraViewTiles(C)
+	var/mag = (C && C.world_mag > 0) ? C.world_mag : 1
 	var/world_w = world.maxx * world.icon_size
 	var/world_h = world.maxy * world.icon_size
-	var/half_w = dims[1] * world.icon_size / 2
-	var/half_h = dims[2] * world.icon_size / 2
+	var/half_w = dims[1] * world.icon_size / (2 * mag)
+	var/half_h = dims[2] * world.icon_size / (2 * mag)
 	if(world_w <= half_w * 2)
 		wx = world_w / 2
 	else
@@ -102,49 +102,55 @@ proc/GfxClientEyeIsMob(client/C, mob/M)
 	if(C.eye == M) return TRUE
 	return C.gfx_camera && C.eye == C.gfx_camera && C.gfx_camera.owner == M
 
-proc/GfxCameraEnable(client/C)
-	if(!GfxCameraWanted(C)) return
-	var/mob/Players/P = C.mob
-	//another system owns the eye - wait for it to hand control back
-	if(C.eye != P && C.eye != C.gfx_camera) return
+proc/GfxCameraSpawn(client/C)
+	if(!C || !istype(C.mob, /mob/Players)) return
 	if(!C.gfx_camera)
-		C.gfx_camera = new(get_turf(P))
-		GfxCameraSnap(C, P)
-	else if(C.gfx_camera.owner != P)
-		GfxCameraSnap(C, P)
-	C.gfx_camera.owner = P
-	C.eye = C.gfx_camera
-	C.gfx_camera_active = TRUE
+		C.gfx_camera = new /mob/gfx_camera()
+	C.gfx_camera.owner = C.mob
+	GfxCameraDetach(C)
+	GfxCameraSync(C)
 
-proc/GfxCameraDisable(client/C)
+proc/GfxCameraDestroy(client/C)
 	if(!C) return
-	if(C.gfx_camera && C.eye == C.gfx_camera && C.mob)
-		C.eye = C.mob
-	C.gfx_camera_active = FALSE
+	GfxCameraDetach(C)
 	if(C.gfx_camera)
 		var/mob/gfx_camera/G = C.gfx_camera
 		C.gfx_camera = null
 		G.owner = null
 		G.loc = null
 
-proc/GfxCameraSync(client/C)
+proc/GfxCameraAttach(client/C)
+	if(C.eye != C.mob && C.eye != C.gfx_camera) return
+	if(C.eye != C.gfx_camera)
+		GfxCameraSnap(C, C.mob)
+		C.eye = C.gfx_camera
+	C.gfx_camera_active = TRUE
+
+proc/GfxCameraDetach(client/C)
 	if(!C) return
-	if(GfxCameraWanted(C))
-		GfxCameraEnable(C)
+	if(C.gfx_camera && C.eye == C.gfx_camera && C.mob)
+		C.eye = C.mob
+	C.gfx_camera_active = FALSE
+	if(C.gfx_camera) C.gfx_camera.loc = null
+
+proc/GfxCameraSync(client/C)
+	if(!C || !C.gfx_camera) return
+	if(GfxCameraInUse(C))
+		GfxCameraAttach(C)
 	else
-		GfxCameraDisable(C)
+		GfxCameraDetach(C)
 
 proc/GfxCameraTrack(client/C)
-	if(!GfxCameraWanted(C))
-		if(C && C.gfx_camera) GfxCameraDisable(C)
+	if(!C || !C.gfx_camera) return
+	if(!GfxCameraInUse(C))
+		if(C.eye == C.gfx_camera || C.gfx_camera.loc) GfxCameraDetach(C)
 		return
 	var/mob/Players/P = C.mob
 	if(C.eye != P && C.eye != C.gfx_camera)
 		C.gfx_camera_active = FALSE
 		return // observer/cutscene/camera currently owns the eye
-	if(!C.gfx_camera || C.eye == P)
-		GfxCameraEnable(C)
-	if(!C.gfx_camera || C.eye != C.gfx_camera) return
+	if(C.eye == P) GfxCameraAttach(C)
+	if(C.eye != C.gfx_camera) return
 	var/mob/gfx_camera/G = C.gfx_camera
 	var/px = GfxCameraWorldX(P)
 	var/py = GfxCameraWorldY(P)
@@ -243,5 +249,5 @@ client/Del()
 		_WxDetachPlayer(mob)
 	if(gfx_haze_emitter)
 		gfx_haze_emitter.particles = null
-	GfxCameraDisable(src)
+	GfxCameraDestroy(src)
 	. = ..()

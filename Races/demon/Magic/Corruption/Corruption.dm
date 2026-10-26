@@ -95,10 +95,10 @@
 			p.gainCorruption(-CorruptionCost)
 		var/asc = p.AscensionsAcquired ? p.AscensionsAcquired : 1
 		var/image/i = image('Caja.dmi')
-		world<<i
 		missile(i,p,p.Target)
 		sleep(10)
 		i.loc=p.Target.loc
+		GfxSendImage(i)
 		i.icon_state="Active"
 		p.Target.density=0
 		p.Target.Grabbable=0
@@ -109,7 +109,7 @@
 		spawn()animate(p.Target.client, color = list(-1,0,0, 0,-1,0, 0,0,-1, 0,1,1), time = 5)
 		OMsg(usr, "[usr] locks [usr.Target] in an isolated space!")
 		spawn(timer[asc]*10)
-			del i
+			GfxReleaseImage(i)
 
 
 /obj/Skills/Buffs/SlotlessBuffs/Magic/Corruption/Corrupt_Self

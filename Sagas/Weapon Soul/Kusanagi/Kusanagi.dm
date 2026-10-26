@@ -21,7 +21,7 @@ obj/Items/Sword/Medium/Legendary/WeaponSoul/Sword_of_Faith // Kusanagi
 	SwordXSecond=-32
 	SwordYSecond=-32
 	SwordElementSecond="Fire"
-	passives = list("SwordAscensionSecond" = 3, "SoulFire" = 1, "DoubleStrike" = 1)
+	passives = list("SwordAscensionSecond" = 3, "SoulFire" = 1)
 	SoulFire=1
 	DoubleStrike=1
 	ActiveMessage="manifests the spiritual form of the predecesor of Kusanagi!"
@@ -81,35 +81,13 @@ obj/Skills/Buffs/SpecialBuffs/Heavenly_Regalia/Kusanagi
 	IconLock='EyeFlameC.dmi'
 	ActiveMessage="'s three divine treasures ring in resonance: Heavenly Regalia!"
 	OffMessage="'s treasures lose their imperial luster..."
+	adjust(mob/p)
+		passives["ManaSteal"] = 0.5 + (0.1 * p.SagaLevel)
+		if(p.SagaLevel >= 5)
+			passives["Godspeed"] = 2
+			passives["Skimming"] = 2
+			passives["SwordAscension"] = 1
+			passives["ManaGeneration"] = 15
 	verb/Heavenly_Regalia()
 		set category="Skills"
 		src.Trigger(usr)
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	Imperial_Heritage
-		StyleActive="Imperial Heritage"
-		passives = list(  "ManaSteal" = 0.5) //Probably needs to scale with asc. (this was gonna be spirit sword and hybrid strike lmao)
-		StyleStr=1.25
-		StyleFor=1.25
-		Finisher="/obj/Skills/Queue/Finisher/Storms_Of_Susanoo"
-		adjust(mob/p)
-			StyleStr = 1.05 + (0.05 * p.SagaLevel)
-			StyleFor = 1.05 + (0.05 * p.SagaLevel)
-			passives["ManaSteal"] = 0.5 + (0.1* p.SagaLevel)
-		verb/Imperial_Heritage()
-			set hidden=1
-			adjust(usr)
-			Trigger(usr)
-/obj/Skills/Queue/Finisher
-	Storms_Of_Susanoo
-		DamageMult=2
-		HitSparkIcon='Slash - Zan.dmi'
-		HitSparkX=-32
-		HitSparkY=-32
-		InstantStrikes=5
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Divine_Rain"
-		HitMessage = "delivers a Divine storm upon their foe!"
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
-	Divine_Rain
-		StrMult=1.3
-		ForMult=1.3
-		passives = list("Godspeed" = 1,  "DualCast" = 1)

@@ -2,6 +2,18 @@ client
 	var/tmp/atom/cursor_dyn
 	var/tmp/cursor_2x = 0
 
+#if fexists("../../Icons/Private/Cursors/cursor_crosshair.dmi") || fexists("Icons/Private/Cursors/cursor_crosshair.dmi")
+#define CURSOR_CROSSHAIR_1X 'Icons/Private/Cursors/cursor_crosshair.dmi'
+#else
+#define CURSOR_CROSSHAIR_1X 'Icons/Cursors/cursor_blocked.dmi'
+#endif
+
+#if fexists("../../Icons/Private/Cursors/2x/cursor_crosshair.dmi") || fexists("Icons/Private/Cursors/2x/cursor_crosshair.dmi")
+#define CURSOR_CROSSHAIR_2X 'Icons/Private/Cursors/2x/cursor_crosshair.dmi'
+#else
+#define CURSOR_CROSSHAIR_2X 'Icons/Cursors/2x/cursor_blocked.dmi'
+#endif
+
 var/list/CURSOR_1X = list(
 	"neutral" = 'Icons/Cursors/cursor_neutral.dmi',
 	"mine" = 'Icons/Cursors/cursor_mine.dmi',
@@ -29,7 +41,8 @@ var/list/CURSOR_1X = list(
 	"dooropen" = 'Icons/Cursors/cursor_dooropen.dmi',
 	"doorclose" = 'Icons/Cursors/cursor_doorclose.dmi',
 	"locked" = 'Icons/Cursors/cursor_locked.dmi',
-	"key" = 'Icons/Cursors/cursor_key.dmi')
+	"key" = 'Icons/Cursors/cursor_key.dmi',
+	"crosshair" = CURSOR_CROSSHAIR_1X)
 
 var/list/CURSOR_2X = list(
 	"neutral" = 'Icons/Cursors/2x/cursor_neutral.dmi',
@@ -58,16 +71,24 @@ var/list/CURSOR_2X = list(
 	"dooropen" = 'Icons/Cursors/2x/cursor_dooropen.dmi',
 	"doorclose" = 'Icons/Cursors/2x/cursor_doorclose.dmi',
 	"locked" = 'Icons/Cursors/2x/cursor_locked.dmi',
-	"key" = 'Icons/Cursors/2x/cursor_key.dmi')
+	"key" = 'Icons/Cursors/2x/cursor_key.dmi',
+	"crosshair" = CURSOR_CROSSHAIR_2X)
 
 proc/CursorFile(client/C, key)
 	if(C && C.cursor_2x)
 		return CURSOR_2X[key]
 	return CURSOR_1X[key]
 
+proc/CursorIdleKey(client/C)
+	if(!C || !C.mob) return "neutral"
+	var/mob/M = C.mob
+	if(M.KO || M.Observing) return "neutral"
+	if(M.EquippedGun()) return "crosshair"
+	return "neutral"
+
 proc/CursorNeutral(client/C)
 	if(!C) return
-	C.mouse_pointer_icon = CursorFile(C, "neutral")
+	C.mouse_pointer_icon = CursorFile(C, CursorIdleKey(C))
 	C.cursor_dyn = null
 
 proc/CursorHover(atom/A, key)

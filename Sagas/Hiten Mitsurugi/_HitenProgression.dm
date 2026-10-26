@@ -4,7 +4,7 @@
 #define HITEN_PASSIVES_TIER_4 list("SlayerMod"=1, "Godspeed"=1,  "FavoredPrey"="Human")
 #define HITEN_PASSIVES_TIER_5 list("Godspeed"=1, "AttackSpeed"=3, "Pursuer"=1)
 #define HITEN_PASSIVES_TIER_6 list("Godspeed"=1, "TechniqueMastery"=3)
-#define HITEN_PASSIVES_TIER_7 list("SlayerMod"=1, "Godspeed"=2, "AsuraStrike"=1)
+#define HITEN_PASSIVES_TIER_7 list("SlayerMod"=1, "Godspeed"=2)
 
 /mob/proc/gainHitenMitsurugi()
     src<<"You embark down the path of slaying men... <b>Hiten Mitsurugi Style</b>!"

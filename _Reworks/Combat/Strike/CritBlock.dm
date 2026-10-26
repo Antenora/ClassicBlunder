@@ -21,6 +21,7 @@
 	var/off = GetOff(1)
 	. = glob.CRIT_CAP * off / (off + glob.CRIT_K)
 	. = . * critEff + critBonus
+	. += min(passive_handler.Get("CriticalChance"), 40)
 	var/denkoCharge = DenkoSekkaCharged
 	if(denkoCharge)
 		. += denkoCharge * glob.DENKO_SEKKA_CRIT_CHANCE_PER_LEVEL

@@ -324,6 +324,30 @@ proc/IconCellDims(iconFile)
 		ICON_CELL_CACHE[key] = dims
 	return dims
 
+var/list/ICON_DIRS_CACHE = list()
+proc/IconDirInked(icon/I, w, h, d)
+	for(var/y = 1, y <= h, y += 2)
+		for(var/x = 1, x <= w, x += 2)
+			if(I.GetPixel(x, y, null, d, 1)) return TRUE
+	return FALSE
+
+proc/IconDirCount(iconFile)
+	if(!iconFile || (!isfile(iconFile) && !isicon(iconFile))) return 1
+	var/key = lowertext("[iconFile]")
+	var/n = ICON_DIRS_CACHE[key]
+	if(n) return n
+	n = 1
+	try
+		var/icon/I = new(iconFile)
+		var/w = I.Width() || 32
+		var/h = I.Height() || 32
+		if(IconDirInked(I, w, h, NORTH))
+			n = IconDirInked(I, w, h, NORTHEAST) ? 8 : 4
+	catch()
+		n = 1
+	ICON_DIRS_CACHE[key] = n
+	return n
+
 atom/movable
 	var/tmp
 		hb_icon
@@ -569,8 +593,8 @@ mob/proc/ShowHurtboxDebug()
 			I.DrawBox(rgb(255, 140, 40), 1, 1, cw, ch) //unmeasured: skills hit the whole cell
 		hurt_dbg.icon = I
 		//cancel the parent's pixel_x/y - the mask anchors to the tile origin, not the art
-		hurt_dbg.pixel_x = -pixel_x
-		hurt_dbg.pixel_y = -pixel_y
+		hurt_dbg.pixel_x = body_px - pixel_x
+		hurt_dbg.pixel_y = body_py - pixel_y
 	catch(var/exception/e)
 		world.log << "PXC: hurtbox debug overlay failed: [e]"
 
@@ -616,8 +640,8 @@ mob/proc/ShowHurtboxInkDebug()
 		I.DrawBox(rgb(255, 255, 255), x1, y1, x1, y2)
 		I.DrawBox(rgb(255, 255, 255), x2, y1, x2, y2)
 		hurt_ink_dbg.icon = I
-		hurt_ink_dbg.pixel_x = -pixel_x
-		hurt_ink_dbg.pixel_y = -pixel_y
+		hurt_ink_dbg.pixel_x = body_px - pixel_x
+		hurt_ink_dbg.pixel_y = body_py - pixel_y
 	catch(var/exception/e)
 		world.log << "PXC: ink collider debug overlay failed: [e]"
 
@@ -763,6 +787,26 @@ proc/CircleHitsBody(cx, cy, r, mob/m)
 			if((wx-cx)*(wx-cx) + (wy-cy)*(wy-cy) > r*r) continue
 			if(BodyInkHitL(P, wx, wy)) return TRUE
 	return FALSE
+
+proc/SquareHitsBody(cx, cy, r, mob/m)
+	if(!istype(m)) return SquareHitsBounds(cx, cy, r, m)
+	var/list/P = BodyInkProbe(m)
+	var/list/B = BodyInkRectL(P)
+	var/wl = max(B[1], cx - r)
+	var/wb = max(B[2], cy - r)
+	var/wr = min(B[1] + B[3], cx + r)
+	var/wt = min(B[2] + B[4], cy + r)
+	if(wl > wr || wb > wt) return FALSE
+	if(!P[7]) return TRUE
+	for(var/wy = wb + 1, wy < wt, wy += 2)
+		for(var/wx = wl + 1, wx < wr, wx += 2)
+			if(BodyInkHitL(P, wx, wy)) return TRUE
+	return FALSE
+
+proc/ZoneHitsMob(cx, cy, r, atom/A, square = FALSE)
+	if(ismob(A) && (A in BIG_BODIES))
+		return square ? SquareHitsBody(cx, cy, r, A) : CircleHitsBody(cx, cy, r, A)
+	return square ? SquareHitsBounds(cx, cy, r, A) : CircleHitsBounds(cx, cy, r, A)
 
 
 //world.time-gated re-hit; marks the timestamp when it passes

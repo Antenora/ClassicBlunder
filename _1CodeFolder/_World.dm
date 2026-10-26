@@ -110,21 +110,37 @@ mob/proc/CheckUnlock(race/_race)
 proc/BootWorld(var/blah)
 	switch(blah)
 		if("Load")
+			var/bootStart = world.timeofday
+			var/t = world.timeofday
 			BootFile("All","Load")
 			BuildAIDatabase()
 			BuildSquadDatabase()
 			BuildStudioBootRestore()
+			world.log << "BOOT globals + databases: [BootSeconds(t)] s"
+			t = world.timeofday
 			Load_Turfs()
 			Load_Custom_Turfs()
+			world.log << "BOOT turfs loaded: [BootSeconds(t)] s ([turfLoadCount] turfs, [customTurfLoadCount] custom)"
+			t = world.timeofday
 			Load_Objects()
+			world.log << "BOOT objects loaded: [BootSeconds(t)] s ([objectLoadCount] objects)"
+			sleep(world.tick_lag)
+			t = world.timeofday
 			BuildAreaPaintApplyBoot()
 			BuildZoneProfileApplyBoot()
+			world.log << "BOOT area paint + zones started: [BootSeconds(t)] s"
+			sleep(world.tick_lag)
+			t = world.timeofday
 			BuildJournalReplay()
 			ElevMapLoad()
-			BuildEdgeBootPass()
-			ElevBootPass()
+			world.log << "BOOT journal replay + elevation map: [BootSeconds(t)] s"
+			sleep(world.tick_lag)
+			MapVisBoot()
+			sleep(world.tick_lag)
+			t = world.timeofday
 			Load_Bodies()
 			LoadIRLNPCs()
+			world.log << "BOOT bodies + NPCs: [BootSeconds(t)] s"
 			spawn()
 				if(glob)
 					LoadMoonClock()
@@ -154,21 +170,37 @@ proc/BootWorld(var/blah)
 				global.travel_loop = new()
 				global.ai_tracker_loop = new()
 			WorldLoading=0
+			world.log << "BOOT load sequence reached WorldLoading=0 after [BootSeconds(bootStart)] s"
 			Reports("Load")
+			WorldSaveLock()
 			find_savableObjects()
+			worldSaveBusy = 0
 
 		if("Save")
 			BootFile("All","Save")
 			Reports("Save")
-			WorldSaveLock()
-			find_savableObjects()
-
-			Save_Turfs()
-			Save_Custom_Turfs()
-			Save_Bodies()
-			SaveIRLNPCs()
-			Save_Objects()
-			worldSaveBusy = 0
+			WorldSaveBegin()
+			var/saveStart = world.timeofday
+			try
+				var/t = world.timeofday
+				find_savableObjects()
+				world.log << "SAVE object sweep: [BootSeconds(t)] s"
+				t = world.timeofday
+				Save_Turfs()
+				Save_Custom_Turfs()
+				world.log << "SAVE turfs: [BootSeconds(t)] s"
+				t = world.timeofday
+				Save_Bodies()
+				SaveIRLNPCs()
+				world.log << "SAVE bodies + NPCs: [BootSeconds(t)] s"
+				t = world.timeofday
+				Save_Objects()
+				world.log << "SAVE objects + area paint: [BootSeconds(t)] s (world save total [BootSeconds(saveStart)] s)"
+			catch(var/exception/e)
+				worldSaveRefused = 1
+				Log("Mapper", "World save runtime error: [e] on [e.file]:[e.line]; the build journal was kept.", 1)
+			WorldSaveEnd()
+			MapVisSaveSoon()
 
 
 proc/BootFile(var/file,var/op)
@@ -365,6 +397,8 @@ mob/proc/Allow_Move(D)
 			view(P)<<"[usr] struggles against [P]!"
 		sleep(10)
 		return
+	if(NamekFearRefusesStep(D))
+		return
 	return 1
 mob/proc/Move_Requirements()
 	if(!Stasis&&!TimeFrozen&&!Frozen&&!Stunned&&!Suspended&&!Moving&&!Launched&&!Knockbacked&&!KO&&!WindingUp)
@@ -401,12 +435,14 @@ obj/Read(savefile/F)
 	PurgeTransientGraphics()
 
 mob/Write(savefile/F)
+	CharacterRigSaveView(1)
 	var/list/Old_Transient_Vis = list()
 	for(var/obj/V in vis_contents)
 		if(V.gfx_transient_visual) Old_Transient_Vis += V
 	if(Old_Transient_Vis.len) vis_contents -= Old_Transient_Vis
 	..()
 	if(Old_Transient_Vis.len) vis_contents += Old_Transient_Vis
+	CharacterRigSaveView(0)
 
 mob/Read(savefile/F)
 	. = ..()

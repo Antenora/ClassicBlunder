@@ -35,7 +35,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/CombustionOfTheSoul
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -48,7 +48,7 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/LagannEvoApply
 	MagicNeeded=0
 	Cooldown=60
 	adjust(mob/p)
-		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Scoop" = 2, "Grippy" = 2, "Antsy" = 5)
+		passives = list( "EnergyGeneration" = 3, "SpiralImpact" = 1, "Antsy" = 5)
 obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvoApply
 	PowerGlows=list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0)
 	KenWave = 4
@@ -164,10 +164,13 @@ obj/Skills/Buffs/SlotlessBuffs/Spiral/InspiredEvo
 					SpiralPower=1//which, i guess, given the subject matter, is more likely than you'd think
 				if(3)
 					SpiralPower=1
+					m.GrantWillMechanic()
 				if(4)
 					SpiralPower=1
+					m.GrantWillMechanic()
 				if(5)
 					SpiralPower=2
+					m.GrantWillMechanic()
 			applyBuff.PowerMult=1+(0.05*secretLevel*secretLevel)
 			applyBuff.StrMult=1.25
 			applyBuff.ForMult=1.25

@@ -976,7 +976,7 @@ obj/Items/Enchantment
 							if("The Star")
 								DeckDraw="The Star"
 								usr.TarotFate="The Star"
-								usr.Maimed=0
+								usr.MaimClearAll()
 								usr.EconomyMult+=4
 							if("The Moon")
 								DeckDraw="The Moon"
@@ -2242,7 +2242,7 @@ obj/Items/Enchantment
 					return
 				usr.Potential=1
 				if(usr.Maimed && usr.magicalMaimRecov<5)
-					usr.Maimed=max(usr.Maimed-1,0)
+					usr.MaimPeel()
 					usr.magicalMaimRecov++
 				if(usr.isRace(SAIYAN) && !usr.Tail)
 					usr.Tail=1

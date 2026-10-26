@@ -340,8 +340,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				Attunement = "Fire"
 				InfusionElement = "Water"
 				ElementalDefense = "Void"
-				passive_handler.Increase("CounterMaster", 10)
-				passive_handler.Increase("Extend")
 				passive_handler.Increase("TechniqueMastery", 5)
 				src.OMessage(10, "<b><font color=red><center>The very air shakes, as [src.name] shakes the world with their yell of potent, overwhelming power!!</center></font></b>")
 				Quake(10)
@@ -356,16 +354,14 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				Attunement = "Wind"
 				InfusionElement = "Earth"
 				passive_handler.Increase("CalmAnger")
-				passive_handler.Increase("SweepingStrike")
-				passive_handler.Increase("TripleStrike")
 				passive_handler.Increase("MonkeyKing",2)
 				src.OMessage(10, "<b><font color=yellow><center>The seal on the golden headband has been broken!</center></font></b>")
 				var/image/i=image(icon='AvalonLight.dmi', pixel_x=-67, pixel_y=-3, loc=src)
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				i.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				i.blend_mode=BLEND_ADD
-				world << i
-				world << w
+				GfxSendImage(i, null, GfxBcImageReach(i))
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(i, alpha=0)
 				animate(w, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,0.2))
 				animate(w, alpha=255, time=10)
@@ -393,8 +389,8 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				i.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				i.blend_mode=BLEND_ADD
-				world << i
-				world << w
+				GfxSendImage(i, null, GfxBcImageReach(i))
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(i, alpha=0)
 				animate(w, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,0.2))
 				animate(w, alpha=255, time=10)
@@ -417,16 +413,13 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				passive_handler.Increase("Flicker", 2)
 				passive_handler.Increase("Pursuer", 2)
 				passive_handler.Increase("Fury", 4)
-				passive_handler.Increase("SweepingStrike")
-				passive_handler.Increase("DoubleStrike", 3)
-				passive_handler.Increase("TripleStrike", 2)
 				var/i='Dark.dmi'
 				var/j='Rain.dmi'
 				var/image/w=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, loc=src, layer=EFFECTS_LAYER)
 				animate(w, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
 				var/image/w2=image(icon='MurakumoMode.dmi', pixel_x=-16, pixel_y=-16, loc=src, layer=EFFECTS_LAYER)
 				animate(w2, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1))
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				for(var/turf/t in Turf_Circle(src, 15))
@@ -439,7 +432,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 						sleep(-1)
 						TurfShift(j, t, 180, src, MOB_LAYER+0.5)
 				src.overlays+=image(icon='MurakumoMode.dmi', pixel_x=-16, pixel_y=-16)
-				world << w2
+				GfxSendImage(w2)
 				animate(w2, alpha=255, time=5)
 				sleep(5)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
@@ -484,7 +477,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				sleep(10)
 				Quake(15)
 				src.OMessage(10,"<b>[src] stands firmly, lifting the heavy blade in their hand...</b>")
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				Quake(35)
@@ -527,7 +520,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 					TurfShift(i, t, 190, src)
 				sleep(10)
 				src.OMessage(10,"<b>[src] calls upon the power of order...</b>")
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				src.OMessage(10,"<b>Taking up the name 'Elysium the Virtuous', they invoke absolute stillness...</b>","<font color=red>[src]([src.key]) used Elysium Mode.")
@@ -553,7 +546,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 					TurfShift(i, t, 190, src)
 				sleep(10)
 				src.OMessage(10,"<b>[src] entwines their life force with that of their cursed blade...</b>")
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				src.OMessage(10,"<b>Taking up the name 'Inferno the Night Terror', they invoke a hellish landscape...</b>","<font color=red>[src]([src.key]) used Inferno Mode.")
@@ -569,7 +562,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 			if("Muramasa")
 				src.ElementalOffense="Death"
 				src.ElementalDefense="Fire"
-				passive_handler.Increase("WeaponBreaker")
 				passive_handler.Increase("CursedWounds")
 				passive_handler.Increase("DarknessFlame")
 				passive_handler.Increase("Aspect of Death")
@@ -582,7 +574,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 					TurfShift(i, t, 190, src)
 				sleep(10)
 				src.OMessage(10,"<b>[src] cuts out what remaining restraint they have with their cursed sword...</b>")
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				src.OMessage(10,"<b>Calling upon their insatiable bloodlust, they fill the air with miasma of death...</b>","<font color=red>[src]([src.key]) used Deathbringer Mode.")
@@ -597,7 +589,6 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				src.OMessage(10,"<b>[src] invokes the spirit of destruction through their blade!</b>")
 			if("Dainsleif")
 				src.ElementalOffense="Poison" //This already has cursed wounds, so it will become hyper murder poison.
-				passive_handler.Increase("HardStyle", 10)
 				passive_handler.Increase("DeathField", 10)
 				passive_handler.Increase("SoulSteal", 10)
 				passive_handler.Increase("HealThroughTempHP")
@@ -607,7 +598,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 				animate(w, alpha=0, color=list(0,0,0, 0,0,0, 0,0,0, 0,0,0))
 				var/image/w2=image(icon='NibelungMode.dmi', pixel_x=-32, pixel_y=-32, loc=src, layer=EFFECTS_LAYER)
 				animate(w2, alpha=0, color=list(0,0,0, 0,0,0, 0,0,0, 0,0,0))
-				world << w
+				GfxSendImage(w, null, GfxBcImageReach(w))
 				animate(w, alpha=255, time=10)
 				sleep(10)
 				for(var/turf/t in Turf_Circle(src, 15))
@@ -620,7 +611,7 @@ mob/proc/WeaponSoul() // OverSoul Mechanic
 						sleep(-1)
 						TurfShift(j, t, 180, src, MOB_LAYER+0.5)
 				src.overlays+=image(icon='NibelungMode.dmi', pixel_x=-32, pixel_y=-32)
-				world << w2
+				GfxSendImage(w2)
 				animate(w2, alpha=255, time=5)
 				sleep(5)
 				src.overlays-=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
@@ -649,15 +640,11 @@ mob/proc/RevertWS()
 			Attunement = null
 			InfusionElement = null
 			passive_handler.Decrease("CalmAnger")
-			passive_handler.Decrease("SweepingStrike")
-			passive_handler.Decrease("TripleStrike")
 			passive_handler.Decrease("MonkeyKing",2)
 		if("Green Dragon Crescent Blade")
 			Attunement = null
 			InfusionElement = null
 			ElementalDefense = null
-			passive_handler.Decrease("CounterMaster",10)
-			passive_handler.Decrease("Extend")
 			passive_handler.Decrease("TechniqueMastery", 5)
 		if("Caledfwlch")
 			src.ElementalDefense=null
@@ -670,9 +657,6 @@ mob/proc/RevertWS()
 			passive_handler.Decrease("Flicker", 2)
 			passive_handler.Decrease("Pursuer", 2)
 			passive_handler.Decrease("Fury", 4)
-			passive_handler.Decrease("SweepingStrike")
-			passive_handler.Decrease("DoubleStrike", 3)
-			passive_handler.Decrease("TripleStrike", 2)
 			src.overlays-=image(icon='MurakumoMode.dmi', pixel_x=-16, pixel_y=-16)
 			src.overlays+=image(icon=s.icon, pixel_x=s.pixel_x, pixel_y=s.pixel_y, layer=placement)
 		if("Masamune")
@@ -708,7 +692,6 @@ mob/proc/RevertWS()
 		if("Muramasa")
 			src.ElementalOffense=null
 			src.ElementalDefense=null
-			passive_handler.Decrease("WeaponBreaker", 1)
 			passive_handler.Decrease("CursedWounds", 1)
 			passive_handler.Decrease("AbyssMod", 3)
 			passive_handler.Decrease("Aspect of Death")
@@ -716,7 +699,6 @@ mob/proc/RevertWS()
 			src.overlays-=image(icon='DeathbringerMode.dmi')
 		if("Dainsleif")
 			src.ElementalOffense=null
-			passive_handler.Decrease("HardStyle", 10)
 			passive_handler.Decrease("DeathField",10)
 			passive_handler.Decrease("SoulSteal", 10)
 			passive_handler.Decrease("HealThroughTempHP")

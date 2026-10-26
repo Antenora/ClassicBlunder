@@ -11,6 +11,33 @@
 		return MISS
 	if(Defender.Frozen == 3)
 		return MISS
+	//spirit command block ignored on deflection/self hits
+	if(!deflection && Offender != Defender)
+		if(Offender.SpiritBullseyeReady)
+			// The first outgoing accuracy check starts the ten-second window.
+			if(!Offender.SpiritBullseyeUntil)
+				Offender.SpiritBullseyeUntil = world.time + 100
+
+			if(world.time >= Offender.SpiritBullseyeUntil)
+				Offender.SpiritBullseyeReady = FALSE
+				Offender.SpiritBullseyeUntil = 0
+
+		if(Defender.SpiritFlashReady)
+			//starts the time window for Flash evasion when a hit is about to hit
+			if(!Defender.SpiritFlashUntil)
+				Defender.SpiritFlashUntil = world.time + 20
+
+			//flash beats bullseye, still starts the bullseye timer
+			if(world.time < Defender.SpiritFlashUntil)
+				return MISS
+			else
+				//clear expired flash, continue accuracy check
+				Defender.SpiritFlashReady = FALSE
+				Defender.SpiritFlashUntil = 0
+
+		// bullseye is a guaranteed hit if there's no flash
+		if(Offender.SpiritBullseyeReady && world.time < Offender.SpiritBullseyeUntil)
+			return HIT
 	if(Offender.HasNoMiss())
 		return HIT
 	if((Defender.HasNoDodge() || Defender.IsGuarding()) && !IgnoreNoDodge)
@@ -50,6 +77,8 @@
 		AccMult *= 1.15 //plating trades dodge for armor
 	if(!deflection && Offender.AttackQueue)
 		AccMult *= Offender.QueuedAccuracy()
+	if(!deflection && Offender.gun_suppressed > world.time)
+		AccMult *= GunSuppressAccMult()
 	if(Offender.SenseRobbed >= 4 && (Offender.SenseUnlocked <= Offender.SenseRobbed && Offender.SenseUnlocked > 5))
 		AccMult *= max(0, 1 - (Offender.SenseRobbed * 0.1))
 	if(Defender.SenseRobbed >= 4 && (Defender.SenseUnlocked <= Defender.SenseRobbed && Defender.SenseUnlocked > 5))
@@ -84,7 +113,11 @@
 		atkRating += Offender.GetFor(glob.FOR_BLAST_DENSITY) //dense blasts are hard to swat
 	var/defRating = Defender.GetDef(glob.ACC_DEF) + Defender.GetSpd(glob.ACC_DEF_SPD)
 	var/TotalAccuracy = BaseChance + (atkRating - defRating) * glob.ACC_POINT + (OffenseAdvantage - DefenseAdvantage) * glob.POWER_ACC_POINT
+	if(!deflection && Defender.dodge_vs_mob == Offender && Defender.dodge_vs_until > world.time)
+		TotalAccuracy -= Defender.dodge_vs_amt
 	TotalAccuracy = clamp(TotalAccuracy, glob.LOWEST_ACC, 100)
+	if(!deflection && Defender.in_smoke > world.time)
+		TotalAccuracy /= 2
 	if(glob.DEBUG_MESSAGES_ACCURACY)
 		Offender << "--------------------"
 		Offender << "atkRating: [atkRating] (AccMult [AccMult])"
@@ -101,4 +134,7 @@
 	if(roll < TotalAccuracy + glob.WHIFF_BAND)
 		return WHIFF
 	return MISS
+
+mob/var/tmp/in_smoke = 0
+mob/var/tmp/gun_suppressed = 0
 

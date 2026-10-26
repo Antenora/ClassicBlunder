@@ -26,6 +26,7 @@ race
 				for(var/transformation/human/HT in user.race.transformations)
 					user.race.transformations -=HT
 					del HT
+			..()
 
 /*			var/list/mazokuTransformations = list(/transformation/human/high_tension/mazoku, /transformation/human/high_tension_MAX/mazoku,
 			/transformation/human/super_high_tension/mazoku, /transformation/human/super_high_tension_MAX/mazoku, /transformation/human/unlimited_high_tension/mazoku,

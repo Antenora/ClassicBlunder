@@ -161,9 +161,9 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+			passives = list("GiantForm" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			mastery_boons(mob/user)
-				passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
+				passives = list("GiantForm" = 1,   "EnergyGeneration" = 5,  "SaiyanPower4"=0.5, "TrueZenkai" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -192,7 +192,8 @@ transformation
 				user.Tail(1)
 
 			transform_animation(mob/user)
-				if(first_time) // store the pre-form appearance and then the post-form appearance before calling the animation. also remove the hair set on overlay afterwards since it's not supposed to be an overlay
+				if(first_time)
+					user.CutsceneMode() // store the pre-form appearance and then the post-form appearance before calling the animation. also remove the hair set on overlay afterwards since it's not supposed to be an overlay
 					var/appearance1 = user.appearance
 					user.overlays += form_icon_1
 					user.overlays += form_icon_2
@@ -222,7 +223,7 @@ transformation
 			var/tailIcon = 'saiyantail_ssj4.dmi'
 			var/tailUnderlayIcon = 'saiyantail_ssj4_under.dmi'
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
-			passives = list("GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("GiantForm" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -231,8 +232,8 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list("Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
-				"KiControlMastery" = 4, "Reversal" = 0.1 + (mastery/200),\
+				passives = list("Juggernaut" = 1+(mastery/25), \
+				"KiControlMastery" = 4,\
 				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1)
 				speed = 1.25 + (mastery/400)
 				endurance = 1.25 + (mastery/400)

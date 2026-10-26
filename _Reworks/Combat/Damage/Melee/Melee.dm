@@ -26,7 +26,7 @@
 	return FALSE
 
 
-/mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0)
+/mob/proc/Melee1(dmgmulti=1, spdmulti=1, iconoverlay, forcewarp, forcedTarget=null, ExtendoAttack=null, SecondStrike, ThirdStrike, AsuraStrike, accmulti=1, SureKB=0, NoKB=0, IgnoreCounter=0, BreakAttackRate=0, hitback = 0, WhipOnly = 0)
 	if(HeldSkillBlocksAction(null)) return
 	if(!AttackQueue)
 		for(var/a in SlotlessBuffs)
@@ -37,7 +37,7 @@
 					if((last_aura_toss - ((passive_handler["Familiar"]-1) * glob.FAMILIAR_CD_REDUCTION)) + glob.FAMILIAR_SKILL_CD < world.time && (Target && Target != src))
 						last_aura_toss = world.time
 						throwFollowUp(aura.skillToToss)
-		if(passive_handler["EntanglingRoots"] && can_use_style_effect("EntanglingRoots") && Target != src)
+		if(passive_handler["EntanglingRoots"] && ismob(Target) && Target != src && can_use_style_effect("EntanglingRoots"))
 			var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare/s = Target.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Snare)
 			if(!s)
 				s = new(glob.ROOTS_DURATION, 'root.dmi')
@@ -64,6 +64,7 @@
 		BreakAttackRate=1
 	if(!CanAttack() && !BreakAttackRate)
 		return
+	var/sheathed = SheathedDraw()
 	if(Flying)
 		var/obj/Items/check = EquippedFlyingDevice()
 		if(istype(check))
@@ -85,6 +86,20 @@
 	var/damage = 0 // potential will form the basis of the damage, potential is constant, only some things boost it
 	var/delay = SpeedDelay()
 	// 				VARIABLES END			//
+
+	var/obj/Items/Gun/gun = EquippedGun()
+	if(gun)
+		if(!WhipOnly && gun.Loaded > 0)
+			flick("Attack", src)
+			NextAttack = world.time + gun.FireDelay(delay) * SlowMoDelayMult(src)
+			FireGun(gun)
+			return
+		else
+			if(gun.Loaded <= 0 && !gun.DryWarned)
+				gun.DryWarned = 1
+				src << "Your [gun.name] is empty. Hold [KeyDisplay(KeybindKey("reload"))] to reload."
+			if(gun.WhipOverride(src, delay)) return
+			dmgmulti *= gun.PistolWhipMult() * GunMeleeMult()
 
 	// 				MAIN START				//
 
@@ -112,8 +127,6 @@
 
 	if(!AsuraStrike)
 		MultiStrike(SecondStrike, ThirdStrike, AsuraStrike)
-	if(!ThirdStrike)
-		MultiStrike(SecondStrike, ThirdStrike) // trigger double/triple strike if applicable
 	var/warpingStrike = getWarpingStrike() // get warping strike if applicable
 	var/iaidoGaugeMax = 100;
 	if(IaidoCounter>=iaidoGaugeMax)
@@ -358,6 +371,7 @@
 				if(AttackQueue && AttackQueue.HarderTheyFall)
 					var/enemyEnd = enemy.GetEnd()
 					atk += enemyEnd * (AttackQueue.HarderTheyFall/10)
+				def *= MeleeEndMult(enemy)
 				#if DEBUG_MELEE
 				log2text("DamageMod", "newDmgMod", "damageDebugs.txt", "[ckey]/[name]")
 				log2text("DamageMod", damage, "damageDebugs.txt", "[ckey]/[name]")
@@ -423,6 +437,7 @@
 					enemy.phantom_mark_by = null
 					enemy.phantom_mark_until = 0
 					clearPhantomMarkFX(enemy)
+				if(unarmedAtk) damage *= GunSetupPunch(enemy)
 				var/knockDistance = 0
 				if(AttackQueue)
 					damage *= QueuedDamage(enemy)
@@ -512,7 +527,7 @@
 
 		// 				STATUS 					//
 				var/spent_arm = AttackQueue ? FlashQueueSpend(enemy) : 0
-				if(!src.petal_attacking) SwingEnvelope(enemy, AttackQueue ? clamp(0.2 + 0.2 * AttackQueue.DamageMult, 0.2, 1) : 0.3, spent_arm ? "#ffe9b0" : "#ffffff")
+				if(!src.petal_attacking) SwingEnvelope(enemy, AttackQueue ? clamp(0.2 + 0.2 * AttackQueue.DamageMult, 0.2, 1) : 0.3, spent_arm ? "#ffe9b0" : "#ffffff", unarmedAtk)
 				if(passive_handler["Hit Scan"]) // this is troublesome
 					new/obj/tracker(locate(x,y,z),enemy, src, HitScanIcon, HitScanHitSpark,HitScanHitSparkX, HitScanHitSparkY)
 				//TODO: come back to this
@@ -563,21 +578,12 @@
 				countered = counterShit(enemy, IgnoreCounter)
 				//queue-counter: fresh queue reads the incoming queued swing and punishes it
 				if(!countered && !IgnoreCounter && AttackQueue && enemy.AttackQueue && world.time <= enemy.queue_counter_until && !enemy.Stunned && !enemy.Launched)
-					var/atkFin = istype(AttackQueue, /obj/Skills/Queue/Finisher)
-					var/defFin = istype(enemy.AttackQueue, /obj/Skills/Queue/Finisher)
-					if(!(atkFin && !defFin))	//a finisher punches through normal windows
-						enemy.queue_counter_until = 0
-						countered = 1
-						if(atkFin && defFin)	//finisher clash: both spent, big cinematic
-							ClearQueue()
-							enemy.ClearQueue()
-							enemy.AfterImageStrike++	//forces the clash branch, decremented inside it
-							AfterImageStrike(src, enemy, 0)
-						else
-							enemy.dir = get_dir(enemy, src)
-							enemy.NextAttack = 0
-							var/mob/counterer = enemy
-							spawn() counterer.Melee1(1, 1, IgnoreCounter = 1)
+					enemy.queue_counter_until = 0
+					countered = 1
+					enemy.dir = get_dir(enemy, src)
+					enemy.NextAttack = 0
+					var/mob/counterer = enemy
+					spawn() counterer.Melee1(1, 1, IgnoreCounter = 1)
 		// 				MELEE COUNTER END		//
 
 		// 				HIT RESOLUTION 			//
@@ -682,6 +688,8 @@
 								else
 									if(NoWhiff()) // cant whiff
 										whiffed = FALSE
+								if(sheathed && swordAtk)
+									whiffed = FALSE
 
 								if(whiffed)
 									damage /= glob.MIN_WHIFF_DMG + rand() * (glob.MAX_WHIFF_DMG - glob.MIN_WHIFF_DMG)
@@ -713,6 +721,8 @@
 										addElements |= "Poison"
 									ElementalCheck(src, enemy, 0, glob.DEBUFF_INTENSITY, addElements)
 
+								if(AttackQueue.Bloodletting)
+									enemy.AddBleed(AttackQueue.Bloodletting, src)
 								if(AttackQueue.Shearing)
 									enemy.AddShearing(AttackQueue.Shearing,src)
 								if(AttackQueue.Crippling)
@@ -725,6 +735,8 @@
 									damage *= 1 + AttackQueue.BonusVsStunned
 								if(AttackQueue.BonusVsSlowed && (enemy.Slow > 0 || enemy.Crippled > 0 || (enemy.passive_handler && enemy.passive_handler["Snared"])))
 									damage *= 1 + AttackQueue.BonusVsSlowed
+								if(AttackQueue.BonusFromBehind && getBackSide(src, enemy))
+									damage *= 1 + AttackQueue.BonusFromBehind
 								if(AttackQueue.RootRider)
 									enemy.applySnare(AttackQueue.RootRider, 'root.dmi')
 								if(AttackQueue.ApplySlow)
@@ -775,13 +787,14 @@
 
 							// reduce damage by 1% for every 0.1 damage effectiveness, 1 damage effectiveness = 10% damage reduction
 							//TODO ARMOR AT THE END
-							if(enemy.passive_handler["Parry"] && (s || s2 || s3 || swordAtk))
+							if(enemy.passive_handler["Parry"] && (s || s2 || s3 || swordAtk) && !enemy.OverheadIgnores(src))
 								var/parryVal = enemy.passive_handler["Parry"]
 								if(prob(glob.PARRY_CHANCE_CAP * parryVal / (parryVal + glob.PARRY_CHANCE_CURVE)) && hitback <= glob.MAX_CHAIN_PARRY && enemy.CanMeleeReach(src))
 									var/obj/Effects/Parry/p = new()
 									p.Target = enemy
 									enemy.vis_contents += p
 									flick("parry", p)
+									enemy.ParryLanded()
 									enemy.Melee1(dmgmulti = (glob.PARRY_BASE_DMG * (parryVal+enemy.BonusParry())), forcedTarget=src, hitback=hitback+1)
 							if(enemy.passive_handler["Iaijutsu"] && (s || s2 || s3 || swordAtk))
 								var/iaiVal = enemy.passive_handler["Iaijutsu"]
@@ -828,11 +841,14 @@
 									damage *= 1 + (sniper * dist * 0.01)
 							// For Tetrakarn reflect
 							var/strike/S = new(src, enemy, damage)
+							S.skill = AttackQueue
 							S.unarmed = unarmedAtk
 							S.sword = swordAtk
 							S.second = SecondStrike
 							S.third = ThirdStrike
 							S.melee = 1
+							if(sheathed && swordAtk)
+								S.sheathed = sheathed
 							S.element = (AttackQueue ? AttackQueue.SpellElement : null)
 							if(AttackQueue)
 								S.dmgTypes = buildSpecDmgTypes(AttackQueue.SlayerMod)
@@ -844,10 +860,10 @@
 							if(dmgValue > 0 && AttackQueue && AttackQueue.WoundRider && ismob(enemy))
 								src.DealWounds(enemy, dmgValue * AttackQueue.WoundRider)
 							lastHit = world.time
+							last_melee_hit = world.time
+							SpellEdgeApply(enemy, swordAtk)
 							if(dash_clash >= 2 || (clash_pursuit == enemy && world.time <= clash_pursuit_until))
 								TryDragonClash(enemy, from_hit = 1)
-							if(istype(AttackQueue, /obj/Skills/Queue/Finisher))
-								enemy.AngerEvent(glob.ANGER_RUSH_FINISHER)
 							//raw damage on purpose - otherDmg doesn't exist yet at spark time
 							var/hitWeight = clamp((damage - glob.HIT_STOP_MIN) / max(1, 14 - glob.HIT_STOP_MIN), 0, 1)
 							var/beat = hitWeight
@@ -939,7 +955,7 @@
 								// 		OTHER DMG START 		//
 							var/otherDmg = damage
 
-							if(UsingKendo()&&HasSword()&&CountStyles(2))
+							if(UsingKendo()&&HasSword())
 								if(s.Class == "Wooden")
 									otherDmg *= 1.15
 
@@ -974,6 +990,7 @@
 								CounterHitReward(src, enemy, otherDmg)
 					else
 							//		MISS START  //
+						enemy.QuincyEvaded(src)
 						if(dash_clash >= 2 || (clash_pursuit == enemy && world.time <= clash_pursuit_until))
 							TryDragonClash(enemy, from_hit = 1)
 						if(enemy.CheckSpecial("Ultra Instinct"))
@@ -1026,14 +1043,16 @@
 	else
 		var/TurfDamage=(potential_power_mult*PowerBoost*Power_Multiplier*AngerMax)*(GetStr(3)+GetFor(2)+(10*GetWeaponBreaker()))
 		for(var/turf/T in get_step(src,src.dir))
-			flick("Attack",src)
+			if(!unarmedAtk || !CharacterRigPlay("punch", clamp(delay, 3, 12))) flick("Attack",src)
 			T.Health-=TurfDamage
 			if(T.Health<=0) Destroy(T)
 			return
 		for(var/obj/P in get_step(src,src.dir))
 			if(!P.Attackable)
 				continue
-			flick("Attack",src)
+			if(!unarmedAtk || !CharacterRigPlay("punch", clamp(delay, 3, 12))) flick("Attack",src)
+			if(P.StruckByMelee(src, TurfDamage))
+				return
 			if(istype(P, /obj/DomainExpansionBarrier))
 				var/obj/DomainExpansionBarrier/barrier = P
 				var/turf/bTurf = isturf(barrier.loc) ? barrier.loc : null
@@ -1130,8 +1149,6 @@
 			else if(src.CheckSlotless("Libra Armory")&&src.AttackQueue)
 				GetAndUseSkill(/obj/Skills/Projectile/Libra_Slash, Projectiles, TRUE)
 				src.ClearQueue()
-			else if(src.CheckSlotless("Spirit Bow"))
-				GetAndUseSkill(/obj/Skills/Projectile/Aether_Arrow, Projectiles, TRUE)
 			else if(src.passive_handler.Get("Chaos Buster"))
 				var/level = src.passive_handler.Get("Chaos Buster")
 				if(level == 1)
@@ -1176,3 +1193,9 @@
 		MomentumAccumulate()
 	if(passive_handler["Fury"])
 		FuryAccumulate();
+
+/obj/proc/StruckByMelee(mob/A, dmg)
+	return 0
+
+/mob/proc/MeleeEndMult(mob/enemy)
+	return 1

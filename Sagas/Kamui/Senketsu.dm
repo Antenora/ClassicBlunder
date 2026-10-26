@@ -150,7 +150,7 @@ obj/Skills/Buffs/SpecialBuffs
 		OffMessage="shrinks the blades back into their uniform..."
 		StrMult=1.25
 		OffMult=1.25
-		passives = list("DeathField" = 1, "HardStyle" = 1 )
+		passives = list("DeathField" = 1)
 		IconLock='senketsu_senjin.dmi'
 		TopOverlayLock='senketsu_senjin_headpiece.dmi'
 		TopOverlayX=0
@@ -158,7 +158,7 @@ obj/Skills/Buffs/SpecialBuffs
 		adjust(mob/p)
 			StrMult = 1.05 + (p.SagaLevel * 0.05)
 			OffMult = 1.05 + (p.SagaLevel * 0.05)
-			passives = list("DeathField" = round(p.SagaLevel*1.5,1), "SwordAscension" = p.SagaLevel, "HardStyle" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.5,1), "SwordAscension" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
 
 		verb/Kamui_Senjin()
 			set category="Skills"
@@ -187,7 +187,7 @@ obj/Skills/Buffs/SpecialBuffs
 		adjust(mob/p)
 			SpdMult = 1.05 + (p.SagaLevel * 0.05)
 			DefMult = 1.05 + (p.SagaLevel * 0.05)
-			passives = list("Skimming" = 2, "Godspeed"=1+(p.SagaLevel/1.5), "Flicker" = p.SagaLevel, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
+			passives = list("Skimming" = 2, "Godspeed"=1+(p.SagaLevel/1.5), "Flicker" = p.SagaLevel, "Pursuer" = p.SagaLevel/2, "BleedHit" = 6-p.SagaLevel)
 
 		verb/Kamui_Shippu()
 			set category="Skills"
@@ -219,7 +219,7 @@ obj/Skills/Buffs/SpecialBuffs
 			OffMult = 1.04 + (p.SagaLevel * 0.04)
 			SpdMult = 1.04 + (p.SagaLevel * 0.04)
 			DefMult = 1.04 + (p.SagaLevel * 0.04)
-			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = p.SagaLevel/1.5, "Skimming" = 2, "Godspeed"=1+(p.SagaLevel*1.25),"Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "Skimming" = 2, "Godspeed"=1+(p.SagaLevel*1.25),"Flicker" = round(p.SagaLevel/1.25,1), "Pursuer" = round(p.SagaLevel/2.5,1), "BleedHit" = 8-p.SagaLevel)
 
 		verb/Kamui_Senjin_Shippu()
 			set category="Skills"

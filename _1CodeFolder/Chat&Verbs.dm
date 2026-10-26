@@ -956,6 +956,12 @@ mob/proc/RPModeSwitch()
 
 mob/proc/CutsceneMode()
 	if(src.PureRPMode)
+		src.CutsceneModeOff()
+		return
+	src.CutsceneModeOn()
+
+mob/proc/CutsceneModeOff()
+	if(src.PureRPMode)
 		src.PureRPMode=0
 		src.CutsceneWatch=0
 		for(var/mob/Player/AI/a in ai_followers)
@@ -971,11 +977,13 @@ mob/proc/CutsceneMode()
 		src.RPMode_AdjustNestedComboSpellCooldowns(0)
 		src.resumeStyleRatingExpiryAfterRP()
 		return
+
+mob/proc/CutsceneModeOn(quiet = 0)
 	if(!src.PureRPMode)
 		src.PureRPMode=1
 		src.CutsceneWatch=1
 		src.NextAttack=0
-		src.OMessage(10,"[src] is watching a cutscene, regen/recovery disabled!")
+		if(!quiet) src.OMessage(10,"[src] is watching a cutscene, regen/recovery disabled!")
 		for(var/mob/Player/AI/a in ai_followers)
 			spawn(rand(1,6)) RPMode(a, "On")
 		for(var/obj/Skills/s in src)
@@ -1055,14 +1063,24 @@ mob/Players/verb
 				var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted/s = usr.Target.findOrAddSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Tilted)
 				if(!BuffOn(s))
 					if(usr.Target.TiltedLast == -1)
+						if(usr.Target.WillPowered())
+							usr.Target.AdjustWill(-5)
+							usr.Target.client.updateWillMeter()
+							OMsg(src, "[usr.Target]'s will was lowered!")
 						usr.Target.TiltedLast = 200
 						s.Trigger(usr.Target, TRUE)
 					else
 						src << "Can't taunt them again just yet!! (Cooldown: [usr.Target.TiltedLast/2] seconds.)"
 						usr.Target.AngerEvent(2)
+						if(usr.Target.WillPowered())
+							usr.Target.AdjustWill(2)
+							usr.Target.client.updateWillMeter()
 				else
 					src << "They're already tilted..."
 					usr.Target.AngerEvent(2)
+					if(usr.Target.WillPowered())
+						usr.Target.AdjustWill(2)
+						usr.Target.client.updateWillMeter()
 		if(src.icon_state==""&&!src.PoseEnhancement)
 			if(src.Secret=="Hamon")
 				OMsg(src, "[src] begins posing beautifully!")

@@ -7,7 +7,7 @@ var/list/LIFE_SELL_TIERVAL = list(1.0, 1.7, 2.2, 2.6, 2.9)
 var/list/LIFE_SELL_QMULT = list(0.5, 1, 1.6, 2.5, 4)
 
 // which gatherer's rank prices a category
-var/list/LIFE_SELL_SKILL = list("Ores" = "Mining", "Ingots" = "Smithing", "Gems" = "Mining", "Fuel" = "Mining", "Monster Parts" = "Hunting", "Flora" = "Foraging", "Wood" = "Foraging", "Fruit" = "Foraging", "Fish" = "Fishing", "Crops" = "Farming")
+var/list/LIFE_SELL_SKILL = list("Ores" = "Mining", "Ingots" = "Smithing", "Gems" = "Mining", "Monster Parts" = "Hunting", "Flora" = "Foraging", "Wood" = "Foraging", "Fruit" = "Foraging", "Fish" = "Fishing", "Crops" = "Farming")
 
 proc/LifeSellPrice(mob/M, matclass, quality)
 	var/datum/matdef/d = LifeMatDef(matclass)
@@ -17,7 +17,7 @@ proc/LifeSellPrice(mob/M, matclass, quality)
 	if("tier" in t.vars) tier = t.vars["tier"]
 	del t
 	tier = clamp(tier, 1, 5)
-	var/skill = LIFE_SELL_SKILL[d.category]
+	var/skill = d.sell_skill ? d.sell_skill : LIFE_SELL_SKILL[d.category]
 	var/rank = skill ? M.LifeRank(skill) : 1
 	var/rankmult = LIFE_SELL_RANK_MIN + (clamp(rank, 1, LIFE_MAX_RANK) - 1) * ((LIFE_SELL_RANK_MAX - LIFE_SELL_RANK_MIN) / (LIFE_MAX_RANK - 1))
 	var/base = LIFE_SELL_TIERVAL[tier] * 0.004 * glob.progress.EconomyCost

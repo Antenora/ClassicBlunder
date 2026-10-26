@@ -398,6 +398,7 @@ mob/proc/SpellHitMult(obj/Skills/S, mob/m)
 		. *= 1 + (glob.KINDLED_DAMAGE_MULT - 1) * S.empowered_cast
 	if(S.SpellElement)
 		. *= ElementPowerFor(S.SpellElement)
+	. *= GunSpellHitMult(S, m)
 
 mob/proc/ElementPowerFor(el)
 	if(!element_power || !el) return 1

@@ -4,7 +4,7 @@ race
 		desc = "An artificial, composite being with a human heart and the body of a demon, created by a certain individual. They possess the ability to ingest magatama to utilize the power of demons and fight as their equal."
 		visual = 'Makaioshins.png'
 		locked = TRUE
-		passives = list("MartialMagic" = 1)
+		passives = list()
 		power = 3;
 		strength = 2
 		endurance = 2

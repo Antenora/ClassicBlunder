@@ -49,7 +49,7 @@
     UnarmedOnly = 0
     Icon='mist.dmi'
     HitSparkIcon = 'Hit_Effect_Oath_2.dmi'
-    BuffSelf=/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Mist_Form
+    BuffSelf=/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Mist_Form
     HitSparkX = -32
     HitSparkY = -32
     Instinct=5
@@ -64,17 +64,23 @@
         adjust(usr)
         usr.Activate(src)
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Mist_Form
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Mist_Form
+    IconLock='AuraSlowTensionBlue.dmi'
+    AuraArt=1
+    LockX=0
+    LockY=0
+    TensionLock=1
+    NoWhiff=1
     IconReplace = 1
     icon = 'mist.dmi'
     IconTransform = 'mist.dmi'
     Cooldown = 60
     TimerLimit = 10
     adjust(mob/p)
-        passives = list("Godspeed" = 1 + p.AscensionsAcquired, "Deflection" = 0.5 + (p.AscensionsAcquired/2), "Reversal" = 0.1 + (p.AscensionsAcquired*0.1))
+        passives = list("Godspeed" = 1 + p.AscensionsAcquired, "RangedResist" = 2)
         TimerLimit = 5 + (5*p.AscensionsAcquired)
         if(p.passive_handler["SpiritForm"])
-            passives = list("Godspeed" = 3 + p.AscensionsAcquired, "BulletKill" = 1, "Deflection" = 1 + (p.AscensionsAcquired/2), "Reversal" = 0.15 + (p.AscensionsAcquired*0.15))
+            passives = list("Godspeed" = 3 + p.AscensionsAcquired, "RangedResist" = 2)
             TimerLimit = 10 + (5*p.AscensionsAcquired)
 
 /obj/Skills/AutoHit/Oceanic_Wrath
@@ -192,7 +198,7 @@
 		i.layer = MOB_LAYER-0.1
 		i.mouse_opacity = 0
 		animate(i, alpha=0)
-		world << i
+		GfxSendImage(i)
 		t.effects+=i
 		animate(i, alpha = 255, time = 2)
 		t.Deluged=1

@@ -9,11 +9,12 @@
 
 /mob/proc/TechNodeCost(knowledgePaths/tech/t)
 	if(!t) return 0
-	var/theCost = glob.TECH_BASE_COST / TechIntFactor()
-	theCost *= 1 + (0.25 * length(t.requires))
-	if(t.breakthrough)
-		theCost /= 4
-	return round(theCost, 1)
+	var/theCost = TechTierPrice(t.tier) * clamp(1 - 0.15 * (TechIntFactor() - 1), 0.1, 1)
+	return max(1, round(theCost, 1))
+
+/mob/proc/TechNodeRankNeeded(knowledgePaths/tech/t)
+	if(!t) return 1
+	return TechTierRank(t.tier)
 
 /mob/proc/CanAffordTechNode(knowledgePaths/tech/t)
 	return GetRPPSpendable() >= TechNodeCost(t)
@@ -24,71 +25,16 @@
 		src << "You've already learned [t.name]."
 		return 0
 	if(!t.meetsReqs(knowledgeTracker.learnedKnowledge))
-		src << "You do not meet the requirements to learn [t.name] ([jointext(t.requires, " , ")])!"
+		src << "You do not meet the requirements to learn [t.name] ([t.ReqLine()])!"
+		return 0
+	var/need = TechNodeRankNeeded(t)
+	if(LifeRank("Technology") < need)
+		src << "[t.name] needs Technology rank [need]."
 		return 0
 	var/theCost = TechNodeCost(t)
 	if(!SpendRPP(theCost, "[t.name]"))
 		return 0
 	UnlockTech(t, "Technology")
-	return 1
-
-/mob/proc/CraftTechItem(obj/Items/catalog)
-	if(!catalog) return 0
-	if(KO)
-		src << "You cannot create items while KO'd."
-		return 0
-	var/datum/craft_recipe/r = GetTechRecipe(catalog)
-
-	if(istype(catalog, /obj/Items/Tech/Power_Pack))
-		var/qty = Ask(src, "How many packs would you like to make?", "Power Packs", null, "num", null, 1)
-		if(isnull(qty) || qty <= 0) return 0
-		var/unit = r.MoneyCost(src, catalog)
-		var/total = unit * qty
-		var/have = 0
-		for(var/obj/Money/mo in src) have += mo.Level
-		if(have < total)
-			src << "You don't have enough money! You need [Commas(total)] resources to make [qty] [catalog]."
-			return 0
-		TakeMoney(total)
-		UpdateTechnologyWindow()
-		var/obj/Items/Tech/Power_Pack/P = new catalog.type(loc)
-		r.Finish(P, null)
-		P.TotalStack = qty
-		P.suffix = "[qty]"
-		src << "You made [qty] [catalog]."
-		return 1
-
-	if(!r.CanCraft(src, catalog, null))
-		src << "You don't have enough to make [catalog]."
-		return 0
-	r.Consume(src, catalog, null)
-	UpdateTechnologyWindow()
-
-	var/obj/Items/made = new catalog.type
-	r.Finish(made, null)
-
-	if(made.Stackable)
-		for(var/obj/Items/o in src)
-			if(o.type == made.type && o.CraftQuality == made.CraftQuality && o.TotalStack < INV_STACK_MAX)
-				o.TotalStack++
-				o.suffix = "[o.TotalStack]"
-				src << "You stack a new [made]."
-				del made
-				break
-
-	if(made)
-		if(made.Grabbable)
-			if(!CanPickupItem(made))
-				del made
-				return 0
-			made.loc = src
-		else
-			made.loc = loc
-		made.CreatorKey = ckey
-		made.CreatorSignature = EnergySignature
-		src << "You made \an [made]!"
-		if(istype(made, /obj/Items/Tech/Scouter))
-			ScouterIconPrompt(made)
 	return 1
 
 /mob/proc/ScouterIconPrompt(obj/Items/Tech/Scouter/S)
@@ -101,3 +47,61 @@
 		if("Blue")  S.icon = 'BlueScouter.dmi'
 		if("Red")   S.icon = 'RedScouter.dmi'
 		if("Purple") S.icon = 'PurpleScouter.dmi'
+
+var/list/TECH_BENCH_ORDER = list("Engineer", "Operative", "Gunsmith", "Mechanist", "Cyberneticist", "Medic")
+var/list/TECH_SUBTYPE_ALLOWED = list("Any", "Blasphemy", "Rebellion", "Locksmithing", "Modular Weaponry", "Advanced Plating", "NOT IN")
+
+/mob/proc/TechTreeAuditLines()
+	if(length(TechnologyTree) < 1)
+		fillOutTechTree()
+	var/list/out = list()
+	var/list/names = list()
+	var/list/benchrpp = list()
+	for(var/b in TECH_BENCH_ORDER)
+		benchrpp[b] = 0
+	var/count = 0
+	var/total = 0
+	for(var/n in TechnologyTree)
+		var/knowledgePaths/tech/t = TechnologyTree[n]
+		if(!t || t.name == "Not Obtainable") continue
+		names += t.name
+		count++
+		var/price = TechTierPrice(t.tier)
+		total += price
+		if(t.bench in benchrpp)
+			benchrpp[t.bench] += price
+	var/list/benchline = list()
+	for(var/b in TECH_BENCH_ORDER)
+		benchline += "[b] [benchrpp[b]]"
+	out += "Technology tree audit"
+	out += "Nodes: [count] (target 54)"
+	out += "RPP at Int 1: [total] (target 345) - [jointext(benchline, ", ")]"
+	var/list/badreq = list()
+	var/list/badlayout = list()
+	var/list/badsub = list()
+	for(var/n in TechnologyTree)
+		var/knowledgePaths/tech/t = TechnologyTree[n]
+		if(!t || t.name == "Not Obtainable") continue
+		for(var/req in t.requires)
+			if(!(req in names)) badreq += "[t.name] requires [req]"
+		for(var/req in t.requires_any)
+			if(!(req in names)) badreq += "[t.name] requires any of [req]"
+		if(!TechTreeLayout[t.name]) badlayout += "[t.name] has no layout entry"
+	for(var/ln in TechTreeLayout)
+		if(!(ln in names)) badlayout += "layout row [ln] has no node"
+	for(var/obj/Items/it in Technology_List)
+		if(!istype(it, /obj/Items/Tech) && !istype(it, /obj/Items/Gear)) continue
+		if(isnull(it.SubType)) continue
+		if(it.SubType in TECH_SUBTYPE_ALLOWED) continue
+		if(it.SubType in names) continue
+		badsub += "[it.name] ([it.type]) SubType \"[it.SubType]\""
+	out += "Dangling prerequisites ([badreq.len]): [badreq.len ? jointext(badreq, "; ") : "none"]"
+	out += "Layout mismatches ([badlayout.len]): [badlayout.len ? jointext(badlayout, "; ") : "none"]"
+	out += "Dangling SubType strings ([badsub.len]): [badsub.len ? jointext(badsub, "; ") : "none"]"
+	return out
+
+/mob/Admin4/verb/techTreeAudit()
+	set category = "Admin"
+	set name = "Technology Tree Audit"
+	for(var/line in TechTreeAuditLines())
+		src << line

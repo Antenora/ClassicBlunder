@@ -83,7 +83,7 @@ obj/Skills/Utility/Mentor_System
 		src.Using = 0
 
 	proc/Grant_Mortal_Instinct(mob/Mentor, mob/Student)
-		Student.AddSkill(new /obj/Skills/Buffs/NuStyle/MortalUI/Mortal_Instinct_Style)
+		Student.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Mortal/Mortal_Instinct)
 		Student << "<font color='#b4f0ff'>You begin to sense divine motion, but your body strains to respond.</font>"
 		OMsg(Mentor, "[Student] has entered Mortal Instinct training.")
 
@@ -105,27 +105,18 @@ obj/Skills/Utility/Mentor_System
 
 
 	proc/Grant_Imperfect_UI(mob/Mentor, mob/Student)
-		Student.AddSkill(new /obj/Skills/Buffs/NuStyle/MortalUI/Incomplete_Ultra_Instinct_Style)
+		Student.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Mortal/Incomplete_Mortal_Ultra_Instinct)
 		OMsg(Mentor, "[Student] progresses further into the realm of instinct.")
 		Log("Admin", "[ExtractInfo(Mentor)] advanced [ExtractInfo(Student)] to Incomplete Ultra Instinct (UILevel 2).")//Allows admins to track student's overall progression.
 		spawn(5)
 			if(!Student || !Student.client)
 				return
-			var/list/HybridStyleChoices = list(
-			"Mortal Instinct Sword" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Sword,
-			"Mortal Instinct Grappling" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Grappling,
-			"Mortal Instinct Mystic" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Mystic,
-			"Mortal Instinct Martial" = /obj/Skills/Buffs/NuStyle/MortalUIStyles/Mortal_Instinct_Martial)
+			if(Student.HybridChoice)
+				return
+			var/list/HybridStyleChoices = list("Mortal Instinct Sword", "Mortal Instinct Grappling", "Mortal Instinct Mystic", "Mortal Instinct Martial")
 			var/choice = Ask(Student, "Your mastery of motion takes form, which instinctive discipline calls to you?", "Choose Your Mortal Instinct Style", null, "pick", HybridStyleChoices, 1)
 			if(!choice)
 				return
-			var/path = HybridStyleChoices[choice]
-			if(!path)
-				return
-			if(locate(path) in Student.contents)
-				return
-			var/obj/Skills/Buffs/NuStyle/MortalUIStyles/newStyle = new path(Student)
-			Student.contents += newStyle
 			switch(choice)
 				if("Mortal Instinct Sword")
 					Student.HybridChoice = "Sword"
@@ -141,7 +132,7 @@ obj/Skills/Utility/Mentor_System
 			OMsg(Mentor, "[Student] awakens their hybrid instinct: [choice].")
 
 	proc/Grant_Complete_UI(mob/Mentor, mob/Student)
-		Student.AddSkill(new /obj/Skills/Buffs/NuStyle/MortalUI/Ultra_Instinct_Style)
+		Student.AddSkill(new /obj/Skills/Buffs/SlotlessBuffs/Autonomous/SlotlessUI/Mortal/Mortal_Ultra_Instinct)
 		OMsg(Mentor, "[Student] achieves a complete understanding of divine instinct.")
 		Student << "<font color='#d4aaff'><b>To advance further you must conquer your ego and achieve perfection...</b></font>"
 		Log("Admin", "[ExtractInfo(Mentor)] advanced [ExtractInfo(Student)] to Complete Ultra Instinct (UILevel 3).")//Allows admins to track student's overall progression.

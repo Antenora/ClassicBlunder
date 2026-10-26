@@ -1,16 +1,16 @@
 /ascension/sub_ascension/eldritch/hunter//deeps
 	passives = list("CheapShot"=1)
 /ascension/sub_ascension/eldritch/eternal//tank
-	passives = list(  "Deflection" = 1);
+	passives = list("Harden" = 2);
 /ascension/sub_ascension/eldritch/writhing
-	passives = list("Extend" = 1, "Gum Gum" = 1, "SweepingStrike"=1);
+	passives = list("Sniper" = 2);
 
 /ascension/sub_ascension/eldritch/advancedHunter//deeps and tank
-	passives = list("CheapShot"=2,   "Deflection" = 1)
+	passives = list("CheapShot"=2, "Harden" = 1)
 /ascension/sub_ascension/eldritch/advancedEternal//tank and range
-	passives = list(  "Deflection" = 2, "Extend" = 1, "Gum Gum" =1, "SweepingStrike" = 1);
+	passives = list("Harden" = 3, "Sniper" = 1);
 /ascension/sub_ascension/eldritch/advancedWrithing//range and deeps
-	passives = list("Extend" = 2, "Gum Gum" = 2, "SweepingStrike"=1, "CheapShot" = 1);
+	passives = list("CheapShot" = 1, "Sniper" = 3);
 
 ascension
 	eldritch
@@ -26,9 +26,9 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
-						passives["HardStyle"] = 1;
+						passives["Harden"] = 0.5;
+						passives["Tenacity"] = 0.5;
 					if("Eldritch (Reflected)")
-						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
 						passives["SoulFire"] = 0.25;
 				..()
@@ -48,9 +48,9 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
-						passives["HardStyle"] = 1;
+						passives["Harden"] = 0.5;
+						passives["Tenacity"] = 0.5;
 					if("Eldritch (Reflected)")
-						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
 						passives["SoulFire"] = 0.25;
 				..()
@@ -73,9 +73,9 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
-						passives["HardStyle"] = 1;
+						passives["Harden"] = 0.5;
+						passives["Tenacity"] = 0.5;
 					if("Eldritch (Reflected)")
-						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
 						passives["SoulFire"] = 0.5;
 				..()
@@ -97,9 +97,9 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
-						passives["HardStyle"] = 1;
+						passives["Harden"] = 0.5;
+						passives["Tenacity"] = 0.5;
 					if("Eldritch (Reflected)")
-						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
 						passives["SoulFire"] = 0.5;
 				..()
@@ -119,9 +119,9 @@ ascension
 			onAscension(mob/owner)
 				switch(owner.Secret)
 					if("Eldritch (Shrouded)")
-						passives["HardStyle"] = 1;
+						passives["Harden"] = 0.5;
+						passives["Tenacity"] = 0.5;
 					if("Eldritch (Reflected)")
-						passives["SoftStyle"] = 1;
 						passives["QuickCast"] = 1;
 						passives["SoulFire"] = 1;
 				..()

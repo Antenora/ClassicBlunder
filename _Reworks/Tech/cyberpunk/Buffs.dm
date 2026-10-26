@@ -27,7 +27,7 @@
             Warping = totalPotRounded/25
             passives = list("AfterImages" = 3, "AfterImageSkin" = "Cooler", "Godspeed" = Godspeed, \
             "CriticalDamage" = CriticalDamage, "Crippling" = Crippling, "SlayerMod" = SlayerMod,\
-            "Warping" = Warping, "CursedWounds" = 1,  "FavoredPrey" = "Cybernetic")
+            "CursedWounds" = 1,  "FavoredPrey" = "Cybernetic")
             Cooldown = 120 - (totalPotRounded)
             TimerLimit = 10 + (totalPotRounded/10)
             if(p.SpecialBuff?:sandevistanUsages >= 0)
@@ -44,7 +44,7 @@
             Cooldown = 60 - (totalPotRounded/4)
             TimerLimit = 13 + (totalPotRounded/5)
             if(p.SpecialBuff?:sandevistanUsages >= 0)
-                var/usages = p?:SpecialBuff.sandevistanUsages
+                var/usages = p.SpecialBuff?:sandevistanUsages
                 HealthDrain = 0.0005 + (0.0005 * usages)
                 HealthCost = (usages >= 3 ? 0.5 * usages : usages) / 5
                 Cooldown = usages >= 3 ? Cooldown + (usages * 10) : Cooldown
@@ -72,22 +72,22 @@
     adjust(mob/p)
         if(altered) return
         var/totalPotRounded = round(glob.progress.totalPotentialToDate,10) // get the total pot
-        var/totalPot = glob.progress.totalPotentialToDate
         if(totalPotRounded >= 50)
-            KillerInstinct = round(totalPot/200,0.01)
             HeavyHitter = round(totalPotRounded/25, 0.5)
             HardStyle = round(totalPotRounded/25, 0.5)
             Shattering = round(totalPotRounded/10, 0.5)
-            passives = list( "HeavyHitter" = HeavyHitter, "HardStyle" = HardStyle, \
-             "Shattering" = Shattering)
+            passives = list(\
+             "Shattering" = Shattering, \
+             "StunningStrike" = clamp(round(totalPotRounded/25), 1, 3))
             TimerLimit = 30 + (totalPotRounded/5)
             Cooldown = 90 - (totalPotRounded/5)
         else
             HeavyHitter = round(totalPotRounded/50, 0.5)
             HardStyle = round(totalPotRounded/50, 0.5)
             Shattering = round(totalPotRounded/10, 0.5)
-            passives = list("HeavyHitter" = HeavyHitter, "HardStyle" = HardStyle, \
-             "Shattering" = Shattering)
+            passives = list(\
+             "Shattering" = Shattering, \
+             "StunningStrike" = clamp(round(totalPotRounded/25), 1, 3))
             TimerLimit = 30 + (totalPotRounded/10)
     verb/GorillaArms()
         set category="Skills"

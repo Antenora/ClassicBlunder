@@ -59,7 +59,7 @@
 							usr.BPPoisonTimer=1
 							OMsg(usr, "[usr] recovers from their injuries!")
 						if(usr.Maimed)
-							usr.Maimed=0
+							usr.MaimClearAll()
 							OMsg(usr, "[usr] regrows their limbs!")
 
 /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Vampire

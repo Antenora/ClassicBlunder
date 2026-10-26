@@ -160,7 +160,6 @@ obj
 				p.prioritize_players=1
 				p.ai_wander=1
 				p.ai_hostility=1
-				p.passive_handler.Increase("BladeFisting")
 				p.passive_handler.Increase("WaterWalk")
 				if(mi.seek_destroy)
 					p.ai_hostility=2
@@ -531,6 +530,7 @@ monster_info
 
 	dark_eye
 		name="Dark Eye"
+		apply_passives=list("BladeFisting" = 1)
 		icon='TentaEye.dmi'
 		str_mod=2
 		end_mod=2
@@ -855,6 +855,7 @@ monster_info
 		skilloptions=list("/obj/Skills/AutoHit/Shadow_Tendril_Strike", "/obj/Skills/AutoHit/Destruction_Wave", "/obj/Skills/AutoHit/Magic/Magnet", "/obj/Skills/AutoHit/Magic/Gravity", "/obj/Skills/AutoHit/Magic/Magnetga", "/obj/Skills/AutoHit/Magic/Graviga")
 	sunlight_swordsman
 		name="Sunlight Swordsman"
+		apply_passives=list("BladeFisting" = 1)
 		potential=50
 		icon='Chaos_Chosen.dmi'
 		str_mod=3

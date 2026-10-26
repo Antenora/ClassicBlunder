@@ -11,7 +11,7 @@
 	TransformX = -32
 	TransformY = -32
 	AuraLock = 'BLANK.dmi'
-	passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2)
+	passives = list("GiantForm" = 1, "NoDodge" = 1)
 	StrMult = 1.3
 	ForMult = 1.2
 	SpdMult = 0.3
@@ -47,7 +47,7 @@
 	adjust(mob/p)
 		if(!p.oozaru_type)
 			p.oozaru_type = Ask(p, "What type of Oozaru are you?", "", null, "pick", list("Wrathful", "Enlightened", "Instinctual"), 0)
-		passives = list("GiantForm" = 1, "NoDodge" = 1, "SweepingStrike" = 2, "SaiyanPower1"=0.5)
+		passives = list("GiantForm" = 1, "NoDodge" = 1, "SaiyanPower1"=0.5)
 		switch(p.oozaru_type)
 			if("Wrathful")
 				passives["Manic"] = 4 - p.AscensionsAcquired

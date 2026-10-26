@@ -36,6 +36,8 @@
 			StrMult=1.25 + (level * 0.025)
 			EndMult=1.25 + (level * 0.025)
 		passives = list("KiControl" = 1, "HealthPU" = 1, "BleedHit" = 0.5, "Anaerobic" = 1, "CriticalDamage" = (0.1 + (level/10)), "CriticalBlock" = 1 + (level * 0.15))
+		if(level >= 5)
+			passives["TechniqueMastery"] = level / 2
 		ActiveMessage="forces their blood into their Kamui, making use of its full power!<br><center><font color='blue'>Life Fiber Override: Kamui Junketsu!</font color></center>"
 		OffMessage="relaxes their bloodflow, allowing the Kamui they wear to revert..."
 
@@ -235,7 +237,7 @@ obj/Skills/Buffs/SpecialBuffs
 		adjust(mob/p)
 			SpdMult = 1.05 + (p.SagaLevel * 0.05)
 			DefMult = 1.05 + (p.SagaLevel * 0.05)
-			passives = list("Skimming" = 2,"Godspeed"=1+p.SagaLevel, "Flicker" = p.SagaLevel, "DoubleStrike" = p.SagaLevel/2, "Pursuer" = p.SagaLevel/2, "CounterMaster" = p.SagaLevel, "BleedHit" = 6-p.SagaLevel)
+			passives = list("Skimming" = 2,"Godspeed"=1+p.SagaLevel, "Flicker" = p.SagaLevel, "Pursuer" = p.SagaLevel/2, "BleedHit" = 6-p.SagaLevel)
 
 		verb/Kamui_Senpu()
 			set category="Skills"
@@ -257,7 +259,7 @@ obj/Skills/Buffs/SpecialBuffs
 		StrMult=1.25
 		SpdMult=1.3
 		EndMult=1.25
-		passives = list("DeathField" = 1, "HardStyle" = 1, "VoidField" = 1, "Flicker" = 1)
+		passives = list("DeathField" = 1, "VoidField" = 1, "Flicker" = 1)
 		IconLock='junketsu_senpuzenkan.dmi'
 		LockX=-20
 		LockY=-20
@@ -269,7 +271,7 @@ obj/Skills/Buffs/SpecialBuffs
 			OffMult = 1.04 + (p.SagaLevel * 0.04)
 			SpdMult = 1.04 + (p.SagaLevel * 0.04)
 			DefMult = 1.04 + (p.SagaLevel * 0.04)
-			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "HardStyle" = round(p.SagaLevel/1.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "DoubleStrike" = round(p.SagaLevel/2.5,1), "Pursuer" = round(p.SagaLevel/2.5,1), "CounterMaster" = round(p.SagaLevel/1.25,1), "BleedHit" = 8-p.SagaLevel)
+			passives = list("DeathField" = round(p.SagaLevel*1.25,1), "SwordAscension" = round(p.SagaLevel/1.5,1), "Skimming" = 2, "Godspeed"=1+p.SagaLevel, "Flicker" = round(p.SagaLevel/1.25,1), "Pursuer" = round(p.SagaLevel/2.5,1), "BleedHit" = 8-p.SagaLevel)
 
 		verb/Kamui_Senpu_Zanken()
 			set category="Skills"
@@ -277,50 +279,5 @@ obj/Skills/Buffs/SpecialBuffs
 				adjust(usr)
 			src.Trigger(usr)
 
-/obj/Skills/Buffs/NuStyle/SwordStyle
-	Resolve
-		SagaSignature=1
-		Copyable=0
-		StyleActive="Show of Resolve"
-		StyleStr=1.1
-		StyleEnd=1.1
-		StyleSpd=1.1
-		SureHitTimerLimit=25
-		SureDodgeTimerLimit=25
-		passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 2, "TechniqueMastery" = 3)
-		NeedsSecondSword = 1
-		Mastery=4
-		Finisher="/obj/Skills/Queue/Finisher/Generic_Finisher"
-		adjust(mob/p)
-			passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel)
-			if(p.ActiveBuff == "Life Fiber Override") // So it doesn't fuck up your Sure Hit/SureDodge from Kamui
-				SureHitTimerLimit=null
-				SureDodgeTimerLimit=null
-				StyleStr=1.1
-				StyleEnd=1.1
-				StyleSpd=1.1
-			if(p.ActiveBuff != "Life Fiber Override") // Nudist Beach/Pre Junketsu Satsuki, no Kamui allowed, just shank them if they bypass this, come back to this later and make it.. actually work how I'd like
-				StyleStr=1.05 + (0.05 * p.SagaLevel)
-				StyleEnd=1.05 + (0.05 * p.SagaLevel)
-				StyleSpd=1.05 + (0.05 * p.SagaLevel)
-				StyleOff=1.1 + (0.05 * p.SagaLevel)
-				StyleDef=1.1 + (0.05 * p.SagaLevel)
-				SureHitTimerLimit=25 - (2.5 * p.SagaLevel)
-				SureDodgeTimerLimit=25 - (2.5 * p.SagaLevel)
-			if(p.SagaLevel >= 5)
-				passives = list("HybridStyle" = "UnarmedStyle", "DoubleStrike" = 0.5* p.SagaLevel, "TechniqueMastery" = p.SagaLevel/2)
-
-		verb/Toggle_Sword_Count()
-			set category="Other"
-			set hidden = 1
-			if(!src.NeedsSecondSword)
-				src.NeedsSecondSword=1
-				usr << "You decide to wield <font color='yellow'>two</font color> swords."
-			else if(src.NeedsSecondSword)
-				src.NeedsSecondSword=0
-				usr << "You decide to wield a <font color='red'>single</font color> sword."
-		verb/Resolve()
-			set hidden=1
-			src.Trigger(usr)
 
 			// To Do: Unique Finisher

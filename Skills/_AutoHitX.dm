@@ -2241,6 +2241,7 @@ obj
 					set category="Skills"
 					usr.Activate(src)
 					spawn(100)
+						if(!usr) return
 						if(usr.CheckSpecial("Final Getsuga Tenshou"))
 							for(var/obj/Skills/Buffs/SpecialBuffs/Sword/Final_Getsuga_Tenshou/FGT in usr)
 								usr.UseBuff(FGT)
@@ -4394,6 +4395,7 @@ obj
 				GuardBreak=1
 				ComboMaster=1
 				Grapple=1
+				RequiresWill=130
 				GrabTrigger="/obj/Skills/Grapple/Erupting_Burning_Finger/Removeable"
 				Knockback=1
 				WindUp=1
@@ -4412,8 +4414,9 @@ obj
 				EnergyCost=12
 				verb/Hell_And_Heaven()
 					set category="Skills"
+					src.DamageMult=2.7+((usr.Will/130)-1)
 					if(usr.SagaLevel>5)
-						src.DamageMult=3.6
+						src.DamageMult=3.6+((usr.Will/130)-1)
 						src.ControlledRush=0
 						WindupMessage="combines the forces of Destruction and Creation with absolute control!"
 					usr.Activate(src)
@@ -4426,6 +4429,7 @@ obj
 				TurfErupt=2
 				TurfEruptOffset=3
 				Slow=1
+				RequiresWill=150
 				WindUp=2
 				WindupIcon='GGG_Hammer.dmi'
 				WindupIconX=-16
@@ -4440,8 +4444,11 @@ obj
 				Cooldown=-1
 				EnergyCost=12
 				Earthshaking=15
+				adjust(mob/p)
+					DamageMult = 33.75+(((usr.Will/130)-1)*20)
 				verb/Goldion_Hammer()
 					set category="Skills"
+					adjust(usr)
 					usr.Activate(src)
 
 
@@ -4812,7 +4819,7 @@ obj
 					TurfErupt=1
 					GuardBreak=1
 					DamageMult=4.5
-					Scorching=4
+					TurfBurn=15
 					Distance=10
 					Cooldown=60
 					StrScaling=0.5
@@ -4834,7 +4841,7 @@ obj
 					TurfShiftDuration=180
 					GuardBreak=1
 					DamageMult=4.5
-					Freezing=10
+					TurfMud=15
 					Stasis=20
 					Distance=10
 					Cooldown=60
@@ -4998,7 +5005,7 @@ obj
 
 mob
 	proc
-		Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE)
+		Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE, noAdjust = FALSE)
 			set waitfor = FALSE
 			. = TRUE
 			if(HeldSkillBlocksAction(Z)) return FALSE
@@ -5067,7 +5074,8 @@ mob
 					if(!src.HasSpellFocus(Z))
 						src << "You need a spell focus to use [Z]."
 						return FALSE
-			Z.adjust(src)
+			if(!noAdjust)
+				Z.adjust(src)
 			if(Z.GuardBreak)
 				Z.CanBeBlocked=0
 				Z.CanBeDodged=0
@@ -5142,6 +5150,14 @@ mob
 					if(!src.HasBladeFisting() && !src.UsingBattleMage())
 						src << "You need a sword equipped to use [Z]!"
 						return FALSE
+			if(Z.NeedsGun)
+				if(!src.EquippedGun())
+					src << "You need a gun equipped to use [Z]!"
+					return FALSE
+			if(Z.NoGun)
+				if(src.EquippedGun())
+					src << "You can't use a gun with [Z]!"
+					return FALSE
 			if(Z.ResourceCost)
 				var/resourceName = Z.ResourceCost[1]
 				var/storage = 0
@@ -5182,7 +5198,7 @@ mob
 					src << "You have to be in [Z.StanceNeeded] stance to use this!"
 					return FALSE
 			if(Z.StyleNeeded)
-				if(src.StyleActive!=Z.StyleNeeded)
+				if(src.StyleActive!=Z.StyleNeeded && !src.CheckSlotless(Z.StyleNeeded))
 					src << "You have to be using [Z.StyleNeeded] style to use this!"
 					return FALSE
 			if(Z.GateNeeded)
@@ -5217,6 +5233,10 @@ mob
 					if(src.ManaAmount<drain*(1-(0.45*src.TomeSpell(Z))))
 						src << "You don't have enough mana to activate [Z]."
 						return FALSE
+			if(Z.RequiresWill)
+				if(src.Will < Z.RequiresWill)
+					src << "Your Will isn't high enough to use [Z]!"
+					return FALSE
 
 			if(Z.FocusShifter)
 				src.ActivateFocusShift(Z.FocusShiftType, Z.FocusShiftBoost, Z.FocusShiftTimer, Z.FocusStatIdentity())
@@ -5295,20 +5315,6 @@ mob
 				Z.rush_passed_mobs = list()
 			if(Z.Copyable)
 				var/copy = Z.Copyable
-				spawn() for(var/mob/m in view(40, src))
-					if(m.CheckSpecial("A - The Almighty"))
-						var/insightLevel = m.AscensionsAcquired+25 || 1
-						var/techTier = Z.Copyable
-						if(insightLevel < techTier)
-							continue
-						if(m.client && m.client.address == src.client.address)
-							continue
-						if(!locate(Z.type, m))
-							var/obj/Skills/copiedSkill = new Z.type
-							m.AddSkill(copiedSkill)
-							copiedSkill.Copied = TRUE
-							copiedSkill.copiedBy = "The Almighty"
-							m << "You understand the nature of the [Z] technique you've just viewed."
 				spawn() for(var/mob/m in view(10, src))
 					if(m.CheckSpecial("Sharingan"))
 						var/copyLevel = getSharCopyLevel(m.SagaLevel)
@@ -5340,7 +5346,7 @@ mob
 				spawn(Z.BuffSelfDelay)
 					src.buffSelf(Z.BuffSelf)
 			var/missed = 0 //If the target is out of range at the end of a windup.
-			if(Z.WindUp)
+			if(Z.WindUp && !ChainCastSkip(Z))
 				src.Grab_Release()
 				if(Z.Float)
 					if(!src.pixel_z)
@@ -5426,6 +5432,10 @@ mob
 							src.Quake(Second(Z.WindUp))
 					sleep(Second(Z.WindUp))
 				src.WindingUp=0
+				if(src.AlmightyWindupNegated)
+					src.AlmightyWindupNegated = 0
+					src.ClearTech(Z)
+					return FALSE
 
 				if(Z.Area=="Target"||Z.Area=="Around Target")
 					if(!src.Target)
@@ -5439,10 +5449,10 @@ mob
 							missed=1
 
 			if(Z.CustomActive)
-				OMsg(src, "[Z.CustomActive]")
+				OMsg(src, SkillActivationMsg(Z, "[Z.CustomActive]"))
 			else
 				if(Z.ActiveMessage)
-					OMsg(src, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>")
+					OMsg(src, SkillActivationMsg(Z, "<b><font color='[Z.ActiveColor]'>[src] [Z.ActiveMessage]</font color></b>"))
 					if(Z.PlatinumMad)
 						world<<"<font color=[src.Text_Color]>[src.name]</font>: <font color=red><b>FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK!</b></font>"
 			if(passive_handler["AirBend"] && can_use_style_effect("AirBend"))
@@ -5462,7 +5472,7 @@ mob
 
 			var/datum/ink_family/ink_fam = new /datum/ink_family(src, Z)
 			src.ink_cast = ink_fam
-			if(Z.Icon || (Z.Shockwave && (Z.PreShockwave || Z.PostShockwave)))
+			if(Z.Icon || (Z.Shockwave && Z.PreShockwave))
 				ink_fam.cast_art = 1
 			if(Z.PreShockwave)
 				if(Z.Shockwave)
@@ -5533,6 +5543,7 @@ mob
 					GO=Z.Rush*2
 				if(!Z.RushNoFlight)
 					src.icon_state="Flight"
+					src.CharacterRigPlay("dash")
 				if(Z.RushDelay<1)
 					VanishImage(src)
 				var/pm = PmActive()
@@ -5548,7 +5559,7 @@ mob
 					//	var/travel_angle = GetAngle(src, src.Target)
 						if(length(src.filters) < 1)
 							AppearanceOn()
-						if(src.filters["trail"]) //dash smear
+						if(src.filters["trail"] && !src.character_rig_active) //dash smear
 							var/travel_angle = GetAngle(src, src.Target)
 							var/smear = 6 / max(Z.RushDelay, 0.5) //RushDelay 0 would divide by zero
 							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
@@ -5589,7 +5600,7 @@ mob
 					else
 						if(length(src.filters) < 1)
 							AppearanceOn()
-						if(src.filters["trail"])
+						if(src.filters["trail"] && !src.character_rig_active)
 							var/travel_angle = dir2angle(src.dir)
 							var/smear = 6 / max(Z.RushDelay, 0.5)
 							animate(src.filters["trail"], x=sin(travel_angle)*smear, y=cos(travel_angle)*smear, time=Z.RushDelay)
@@ -5660,6 +5671,7 @@ mob
 									DelayRelease--
 									sleep(1)
 				src.is_dashing--
+				if(src.character_rig_active == "dash") src.CharacterRigStop()
 				if(is_dashing<0)
 					is_dashing=0
 				src.WindingUp=0
@@ -5804,9 +5816,7 @@ mob
 							if(Z.Shockwaves<1)
 								Z.Shockwaves=1
 							for(var/wav=Z.Shockwaves, wav>0, wav--)
-								var/obj/Effects/KenShockwave/ink_ring = KenShockwave(src, icon=Z.ShockIcon, Size=ShockSize, Blend=Z.ShockBlend, Time=Z.ShockTime)
-								if(ink_fam)
-									ink_fam.RegisterRing(ink_ring, null, ink_fam.NewGroup())
+								KenShockwave(src, icon=Z.ShockIcon, Size=ShockSize, Blend=Z.ShockBlend, Time=Z.ShockTime)
 								ShockSize/=2
 				if(Z.ChargeTech)
 					src.Frozen=1
@@ -6028,6 +6038,7 @@ mob
 			src.AutoHitter(0, 0, 0, 1, null, Z, TrgLoc)
 obj
 	AutoHitter
+		Savable=0
 		density=1//It has to be dense to properly register contact.
 		Destructable=0//Can't be explode
 		var
@@ -6517,6 +6528,8 @@ obj
 			InkTeardown()
 		proc
 			Damage(var/mob/m)
+				if(!QuincyDamagePass) return QuincyDamage(m)
+				QuincyDamagePass = 0
 				if(m && Owner && m in Owner.ai_followers)
 					return
 				if(!m.passive_handler)
@@ -6706,13 +6719,13 @@ obj
 					m.LoseMana(heal/2)
 					Owner.HealEnergy(heal/2)
 					Owner.HealMana(heal/2)
-				if(m.HasDeflection()&&!src.CanBeDodged)
+				if(m.HasDeflection(src.SwordTech ? src.Owner : null)&&!src.CanBeDodged)
 					if(m.CheckSlotless("Deflector Shield"))
 						if(!m.Shielding)
 							m.Shielding=1
 							spawn()
 								m.ForceField()
-					FinalDmg*=max(1-(glob.DEFLECTION_DAMAGE_MULT*m.GetDeflection()),0.3)
+					FinalDmg*=max(1-(glob.DEFLECTION_DAMAGE_MULT*m.GetDeflection(src.SwordTech ? src.Owner : null)),0.3)
 					DEBUGMSG("after Deflection: [FinalDmg]")
 
 				var/list/Elements = list()
@@ -6754,6 +6767,8 @@ obj
 						Owner.HealEnergy(FromSkill.EnergyBurn)
 				if(FromSkill && FromSkill.CursedWounds)
 					applyCursedWounds(m, FromSkill.CursedWounds * 10)
+				if(FromSkill && FromSkill.Bloodletting)
+					m.AddBleed(FromSkill.Bloodletting, Owner)
 
 				if(src.CosmoPowered)
 					if(!src.Owner.SpecialBuff)
@@ -6768,6 +6783,8 @@ obj
 					FinalDmg *= 1 + FromSkill.BonusVsStunned
 				if(FromSkill && FromSkill.BonusVsSlowed && pre_slowed)
 					FinalDmg *= 1 + FromSkill.BonusVsSlowed
+				if(FromSkill && FromSkill.BonusFromBehind && Owner && getBackSide(Owner, m))
+					FinalDmg *= 1 + FromSkill.BonusFromBehind
 				if(FromSkill && FromSkill.RushTally && FromSkill.rush_passed_mobs && FromSkill.rush_passed_mobs.len)
 					FinalDmg *= 1 + FromSkill.RushTally * FromSkill.rush_passed_mobs.len
 				if(FromSkill && FromSkill.RushTally && FromSkill.rush_passed_mobs)
@@ -6859,6 +6876,7 @@ obj
 							var/counter_mult = Damage
 							m.Melee1(counter_mult,2,0,0,null,null,0,0,2,1)
 					if(Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=0) == MISS)
+						m.QuincyEvaded(src.Owner)
 						DEBUGMSG("LOL AUTOHITS CAN MISS ? [FinalDmg]")
 						FinalDmg /= glob.AUTOHIT_MISS_DAMAGE
 						DEBUGMSG("after FR")
@@ -6910,13 +6928,13 @@ obj
 					specDmgTypes = buildSpecDmgTypes(FromSkill.SlayerMod)
 				if(src.AngelMagicCompatible && m.passive_handler.Get("Judged"))
 					FinalDmg *= 1.25
-				var/reversalChance = m.GetAutoReversal()
+				var/reversalChance = m.GetAutoReversal(src.SwordTech ? src.Owner : null)
 				// Diminishing returns
 				var/reversalProcChance = 0
 				if(reversalChance > 0)
 					reversalProcChance = (reversalChance / (reversalChance + 2)) * 100
 				if(prob(min(reversalProcChance, 100)))
-					if(m.HasAutoReversal())
+					if(m.HasAutoReversal(src.SwordTech ? src.Owner : null))
 						if(!src.SpecialAttack)
 							var/reversalAcc = Accuracy_Formula(src.Owner, m, AccMult=Precision, BaseChance=glob.WorldDefaultAcc, IgnoreNoDodge=1)
 							if(reversalAcc == HIT || reversalAcc == WHIFF)
@@ -6999,6 +7017,7 @@ obj
 					if(m.isCommitted())
 						CounterHitReward(src.Owner, m, min(FinalDmg, 14))
 					var/strike/S = new(src.Owner, m, FinalDmg)
+					S.skill = FromSkill
 					S.unarmed = src.UnarmedTech
 					S.sword = src.SwordTech
 					S.destructive = src.Destructive
@@ -7012,8 +7031,11 @@ obj
 					S.critBonus = FromSkill.CritChanceBonus
 					S.dmgTypes = specDmgTypes
 					damageDealt = S.resolve()
+					if(!m) return
 					if(damageDealt > 0 && FromSkill && FromSkill.WoundRider && Owner && ismob(m))
 						Owner.DealWounds(m, damageDealt * FromSkill.WoundRider)
+					if(damageDealt > 0 && FromSkill && Owner && ismob(m))
+						FromSkill.OnSkillHit(Owner, m, src, damageDealt)
 					m.ccCountHit(1)
 					if(src.Combustion && m)
 						var/combThresh = src.Owner.passive_handler["Combustion"]
@@ -7111,7 +7133,7 @@ obj
 							m.TsukiyomiTime=6
 				if(src.Flash)
 					if(!m.BlindImmune)
-						m.Darkness(src.Flash*(10*world.tick_lag))
+						m.Darkness(src.Flash*(10*world.tick_lag)*m.NamekSoundMult())
 						m.RemoveTarget()
 						m.Grab_Release()
 						m.BlindImmune=world.time+(src.BlindImmuneDuration-1)
@@ -7662,6 +7684,9 @@ obj
 				Side//1 for left, 0 for right
 
 			New(var/obj/AutoHitter/AH, var/side, var/FromMob=0)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				src.Side=side
@@ -7745,6 +7770,9 @@ obj
 			var
 				Side//1 for left, 0 for right
 			New(var/obj/AutoHitter/AH, var/side)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				AlreadyHit = list()
@@ -7818,6 +7846,9 @@ obj
 			var
 				Side//1 for left, 2 for back, 0 for right.
 			New(var/obj/AutoHitter/AH, var/side)
+				if(!AH)
+					loc = null
+					return
 				AHOwner = AH
 				src.Owner=AH.Owner
 				AlreadyHit = list()

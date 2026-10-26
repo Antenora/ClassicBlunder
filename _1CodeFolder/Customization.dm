@@ -258,9 +258,11 @@ mob/proc/Chargez(var/Z, var/image/C=new(ChargeIcon), var/Under=0)
 	if(Z=="Remove")
 		src.overlays -= C
 		src.underlays -= C
+		src.EnergyFXChargeClear()
 
 
 mob/proc/Hairz(var/Z)
+	CharacterRigInvalidate()
 	if(Z=="Add")
 		src.Hairz("Remove")
 
@@ -579,154 +581,6 @@ mob/proc
 			for(var/A in Clothes_List)
 				Row++
 				src<<output(A,"GridX:1,[Row]")
-
-		if(Z=="Tech")
-			src<<output("High tech, low prices.","SelectedCustomize")
-			for(var/obj/Money/M in usr)
-				Row++
-				src<<output(M,"GridX:1,[Row]")
-				src<<output("[Commas(M.Level)]","GridX:2,[Row]")
-
-			Row++
-			src<<output("-Basic Technology-","GridX:1,[Row]")
-			for(var/obj/Items/BT in BasicTechnology_List)
-				if(BT.Unobtainable)
-					continue
-				Row++
-				src<<output(BT,"GridX:1,[Row]")
-				src<<output("[Commas(BT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-
-			if(usr.MedicineUnlocked)
-				Row++
-				src<<output("-Medicine-","GridX:1,[Row]")
-				for(var/obj/Items/M in Medicine_List)
-					if(M.Unobtainable)
-						continue
-					if(M.SubType=="Any")
-						Row++
-						src<<output(M,"GridX:1,[Row]")
-						src<<output("[Commas(M.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(M.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(M,"GridX:1,[Row]")
-						src<<output("[Commas(M.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.ImprovedMedicalTechnologyUnlocked)
-				Row++
-				src<<output("-Improved Medical Technology-","GridX:1,[Row]")
-				for(var/obj/Items/IMT in ImprovedMedicalTechnology_List)
-					if(IMT.Unobtainable)
-						continue
-					if(IMT.SubType=="Any")
-						Row++
-						src<<output(IMT,"GridX:1,[Row]")
-						src<<output("[Commas(IMT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(IMT.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(IMT,"GridX:1,[Row]")
-						src<<output("[Commas(IMT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.TelecommunicationsUnlocked)
-				Row++
-				src<<output("-Telecommunications-","GridX:1,[Row]")
-				for(var/obj/Items/CT in Telecommunications_List)
-					if(CT.Unobtainable)
-						continue
-					if(CT.SubType=="Any")
-						Row++
-						src<<output(CT,"GridX:1,[Row]")
-						src<<output("[Commas(CT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(CT.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(CT,"GridX:1,[Row]")
-						src<<output("[Commas(CT.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.AdvancedTransmissionTechnologyUnlocked)
-				Row++
-				src<<output("-Advanced Transmission Technology-","GridX:1,[Row]")
-				for(var/obj/Items/ST in AdvancedTransmissionTechnology_List)
-					if(ST.Unobtainable)
-						continue
-					if(ST.SubType=="Any")
-						Row++
-						src<<output(ST,"GridX:1,[Row]")
-						src<<output("[Commas(ST.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(ST.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(ST,"GridX:1,[Row]")
-						src<<output("[Commas(ST.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.EngineeringUnlocked||usr.MilitaryTechnologyUnlocked)
-				Row++
-				src<<output("-Power Packs-","GridX:1,[Row]")
-				for(var/obj/Items/PP in PowerPack_List)
-					if(PP.Unobtainable)
-						continue
-					else
-						Row++
-						src<<output(PP,"GridX:1,[Row]")
-						src<<output("[Commas(PP.Cost*glob.progress.EconomyCost)]", "GridX:2,[Row]")
-
-			if(usr.EngineeringUnlocked)
-				Row++
-				src<<output("-Engineering-","GridX:1,[Row]")
-				for(var/obj/Items/MS in Engineering_List)
-					if(MS.Unobtainable)
-						continue
-					if(MS.SubType=="Any")
-						Row++
-						src<<output(MS,"GridX:1,[Row]")
-						src<<output("[Commas(MS.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(MS.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(MS,"GridX:1,[Row]")
-						src<<output("[Commas(MS.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.CyberEngineeringUnlocked)
-				Row++
-				src<<output("-Cyber Engineering-","GridX:1,[Row]")
-				for(var/obj/Items/PE in CyberEngineering_List)
-					if(PE.Unobtainable)
-						continue
-					if(PE.SubType=="Any")
-						Row++
-						src<<output(PE,"GridX:1,[Row]")
-						src<<output("[Commas(PE.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(PE.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(PE,"GridX:1,[Row]")
-						src<<output("[Commas(PE.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.MilitaryTechnologyUnlocked)
-				Row++
-				src<<output("-Military Technology-","GridX:1,[Row]")
-				for(var/obj/Items/E2 in MilitaryTechnology_List)
-					if(E2.Unobtainable)
-						continue
-					if(E2.SubType=="Any")
-						Row++
-						src<<output(E2,"GridX:1,[Row]")
-						src<<output("[Commas(E2.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(E2.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(E2,"GridX:1,[Row]")
-						src<<output("[Commas(E2.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-
-			if(usr.MilitaryEngineeringUnlocked)
-				Row++
-				src<<output("-Military Engineering-","GridX:1,[Row]")
-				for(var/obj/Items/ST in MilitaryEngineering_List)
-					if(ST.Unobtainable)
-						continue
-					if(ST.SubType=="Any")
-						Row++
-						src<<output(ST,"GridX:1,[Row]")
-						src<<output("[Commas(ST.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
-					else if(ST.SubType in usr.knowledgeTracker.learnedKnowledge)
-						Row++
-						src<<output(ST,"GridX:1,[Row]")
-						src<<output("[Commas(ST.Cost*glob.progress.EconomyCost)]","GridX:2,[Row]")
 
 		if(Z=="Enchant")
 			src<<output("Magical goods! Boil and bubble...","SelectedCustomize")
@@ -1248,6 +1102,12 @@ obj/Charge_Icons
 
 
 var/list/Blast_List=list()
+/proc/BlastIconSkills(mob/A)
+	var/list/Skills=list("Cancel")
+	for(var/obj/Skills/Projectile/B in A)
+		if(!EnergyFXRow(B)) Skills+=B
+	return Skills
+
 obj/Blast_Icons
 	proc/Blast_Click(mob/A)
 		if(A.IconClicked==0)
@@ -1256,11 +1116,9 @@ obj/Blast_Icons
 			if(Blast_Color) icon+=Blast_Color
 			switch(Ask(A, "Are you sure?", "", null, "pick", list("Yes","No"), 0))
 				if("Yes")
-					var/list/Skills=new
-					Skills+="Cancel"
-					for(var/obj/Skills/Projectile/B in A) Skills+=B
+					var/list/Skills=BlastIconSkills(A)
 					var/obj/B=Ask(A, "Add icon to which skill?", "", null, "pick", Skills, 0)
-					if(istype(B, /obj/Skills/Projectile))
+					if(istype(B, /obj/Skills/Projectile) && !EnergyFXSkinLocked(B))
 						if(istype(B, /obj/Skills/Projectile/Beams))
 							B:IconLock=icon
 							B:LockX=0

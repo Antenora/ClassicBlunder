@@ -146,7 +146,13 @@ mob
 					AscensionsUnlocked = 0
 
 				if(islist(race.passives) && race.passives.len)
-					passive_handler.decreaseList(race.passives)
+					for(var/x in race.passives)
+						var/list/L = passive_handler.plist(x)
+						var/v = race.passives[x]
+						if(isnum(v))
+							L[x] -= v
+						else
+							L[x] = null
 
 				// Only racial skills granted via race.skills are stripped. Skills the
 				// player learned through tomes / other sources are left alone.
@@ -377,7 +383,8 @@ race
 
 		onFinalization(mob/user)
 			for(var/x in user.race.passives)
-				user.passive_handler.passives[x] = user.race.passives[x];
+				var/list/L = user.passive_handler.plist(x)
+				L[x] = user.race.passives[x];
 			for(var/s in skills)
 				user.AddSkill(new s)
 

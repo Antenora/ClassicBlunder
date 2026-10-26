@@ -284,7 +284,7 @@ mob/proc/Unconscious(mob/P,var/text)
 	if(src.KO)
 		return
 	if(P)
-		if(src.passive_handler.Get("Color of Courage")&& src.Health>glob.TRIPLEHELIX_MAX_NEG_HP) //The Character will refuse to get downed until they reach (global) negative hp! (the global must be a negative variable, like -50)
+		if(src.passive_handler.Get("Color of Courage") && src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10)) //The Character will refuse to get downed until they reach (color of courage ticks)x10 negative hp! value must be negative
 			if(!src.passive_handler.Get("Triple Helix"))
 				src.passive_handler.Set("Triple Helix", 1) // triple helix is just a flavor passive that tells the game to only play the message once
 				src.OMessage(15,"<font color=green><h2><big><b>... but just who the hell do you think they are?!</b></big></h2></font color>")
@@ -421,16 +421,6 @@ mob/proc/Unconscious(mob/P,var/text)
 			src.VaizardHealth+=20
 			src.HealthAnnounce10+=3
 			return
-	if(src.passive_handler.Get("Alter the Future")&&src.passive_handler.Get("The Almighty"))
-		if(src.HealthAnnounce10<=4)
-			if(prob(src.passive_handler.Get("Alter the Future")))
-				src.KO=0
-				src.OMessage(15, "...but [src] rewrites the future to prevent their defeat!", "<font color=red>[src]([src.key]) rewrites the future!")
-				src.SetHealthPct(10)
-				src.passive_handler.Decrease("Alter the Future", 25)
-				src.VaizardHealth+=20
-				src.HealthAnnounce10+=1
-				return
 	if(src.passive_handler.Get("SecondWind") == "Comeback")
 		if(src.HealthAnnounce10<=9)
 			if(prob(1))
@@ -1021,7 +1011,7 @@ mob/proc/Regenerate(var/obj/Regenerate/R in src)
 			if(R.X&&R.Y&&R.Z)
 				loc=locate(R.X,R.Y,R.Z)
 				src.Sheared=0
-				src.Maimed=0
+				src.MaimClearAll()
 				src.MortallyWounded=0
 				src.TotalInjury=0
 				src.TotalFatigue=0
@@ -1118,10 +1108,12 @@ proc/Save_Bodies()
 			Types=list()
 	if(Amount % 250 != 0)
 		F["Types"]<<Types
-	var/cleanup_file = E + 1
+	F = null
+	var/cleanup_file = (Amount % 250) ? E + 1 : E
 	while(fexists("Saves/Bones/File[cleanup_file]"))
 		fdel("Saves/Bones/File[cleanup_file]")
-		world<<"<small>Server: Objects DEBUG system check: extra bones file deleted!"
+		if(cleanup_file > E)
+			world<<"<small>Server: Objects DEBUG system check: extra bones file deleted!"
 		cleanup_file++
 
 proc/Load_Bodies()
@@ -1689,6 +1681,7 @@ mob/proc/SpeedDelay(var/Modifier=1)
 		Delay=glob.ATTACK_DELAY_MAX
 	if(src.HasBlastShielding())
 		Delay*=1.5
+	Delay*=MaimMult("AttackDelay")
 	if(hasPuppeteerBody())
 		if(initialDelay < Delay)
 			return getPuppeteerBodyDelay(initialDelay, Delay);
@@ -1696,6 +1689,9 @@ mob/proc/SpeedDelay(var/Modifier=1)
 		return max(Delay,0.33)
 	return max(Delay,glob.ATTACK_DELAY_MIN)
 
+
+mob/proc/MechKBMult()
+	return 1
 
 mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=0, var/override_speed = 0, trueForced = 0, Thrown = 0)
 	if(src)
@@ -1720,6 +1716,7 @@ mob/proc/Knockback(var/Distance,var/mob/P,var/Direction=0, var/Forced=0, var/Ki=
 	Distance*=1+src.GetStr(glob.STR_KB_RATE) //muscle sends harder
 	Distance/=1+P.GetVit(glob.VIT_KB_RATE) //mass stays planted
 	Distance*=getKnockbackMultiplier(P) // gets the knockback multiplier(reduction) for the target
+	Distance*=P.MechKBMult()
 	if(!Forced)
 		if(P.is_dashing)
 			return
@@ -1984,7 +1981,11 @@ mob/proc/Grab()
 				extraTiles += secretDatum?:getBoon(src, "Grab")
 			src.DashTo(src.Target, 2 + passive_handler.Get("Scoop"))
 			if((src.Target in oview(1, src)) || InBodyReach(src.Target))
-				src.Grab_Mob(src.Target)
+				var/mob/grab_target = src.Target
+				var/grab_free = !grab_target.grabbed
+				src.Grab_Mob(grab_target)
+				if(grab_free && src.Grab == grab_target)
+					GrabLanded(grab_target)
 			else
 				ApplySplatStagger(src, glob.SPLAT_STAGGER_DS, pose = 0)	//whiffed the lunge, punishable
 			for(var/obj/Skills/Grab/g in src)
@@ -2053,6 +2054,8 @@ mob/proc/Grab()
 			else if(ismob(P))
 				if(!P.IsGrabbed())
 					src.Grab_Mob(P)
+					if(src.Grab == P)
+						GrabLanded(P)
 			else
 				if(istype(P, /obj/Exchange/npc)) return
 				src.Grab=P
@@ -2061,6 +2064,12 @@ mob/proc/Grab()
 
 	else
 		src.Grab_Release()
+
+mob/proc/GrabLanded(mob/target)
+	return
+
+mob/proc/GrabReleasing(atom/movable/G)
+	return
 
 mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 	if(istype(P, /mob/irlNPC))
@@ -2134,6 +2143,7 @@ mob/proc/Grab_Mob(var/mob/P, var/Forced=0)
 mob/proc/Grab_Release()
 	if(src.Grab)
 	{
+		GrabReleasing(src.Grab)
 		src.FlashGrabBand(0)
 		src.Grab.grabbed = null
 		sleep(1)
@@ -2193,6 +2203,7 @@ mob/proc/Grab_Effects(var/mob/P)
 		var/obj/Skills/Grapple/Flashback/fb = src.FindSkill(/obj/Skills/Grapple/Flashback)
 		if(fb && src.warp_strike_saved_loc)
 			fb.FlashbackTrigger(src, P)
+			if(!P) return
 
 	if(canStealMana(P))//eldritch magic steal
 		var/confirm = prompt("You can feel the threads of [P]'s magic circuits. Are they your's, now?", "Take Magic", list("No", "Yes"));

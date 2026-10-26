@@ -211,6 +211,7 @@ mob
 			MovementLoop()
 				var/loop_delay=glob.BASE_LOOP_DELAY
 				while(src)
+					AntiIdleTick()
 					if(src.pixel_z&&(key1||key2||key3||key4)&&(!PmActive()||pm_crossed)&&!src.Stasis&&!src.Launched&&!src.Stunned&&!src.Suspended&&!src.ActionLocked&&!src.PoweringUp)
 						if(!src.EquippedFlyingDevice())
 							flick("Flight",src)
@@ -238,14 +239,16 @@ mob
 											switch(ai_skin)
 												if("Cooler") coolerFlashImage(src, ai_count)
 												if("Rainbow") rainbowFlashImage(src, ai_count)
+												if("Anti") AntiAfterImage(src, ai_count)
 								loop_delay = glob.BASE_LOOP_DELAY
 								if(dir==NORTHEAST||dir==NORTHWEST||dir==SOUTHEAST||dir==SOUTHWEST)
 									loop_delay *= glob.DIAG_LOOP_DELAY
 								move_speed = MovementSpeed()
-								var/delay = (loop_delay + move_speed) / glob.PLAYER_SPEED_MULT
+								var/delay = (loop_delay + move_speed) / (glob.PLAYER_SPEED_MULT * MoveBudgetMult())
 								delay *= SlowMoDelayMult(src)
 								if(held_skill?.HeldBeam && !HasMovingCharge())
 									delay *= glob.HELD_BEAM_MOVE_PENALTY
+								delay *= NamekFearMoveMult()
 								if(src.Crippled)
 									var/debuffRev = src.GetDebuffReversal();
 									if(debuffRev)

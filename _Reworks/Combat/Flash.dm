@@ -87,8 +87,9 @@ mob/proc/RallyBump()
 	rally_hits = min(rally_hits + 1, glob.RALLY_MAX_HITS)
 	rally_until = world.time + glob.RALLY_WINDOW_DS
 
-mob/proc/SwingEnvelope(atom/enemy, weight = 0.3, col = "#ffffff")
-	if(!petal_attacking) flick("Attack", src)
+mob/proc/SwingEnvelope(atom/enemy, weight = 0.3, col = "#ffffff", modular_unarmed = 0)
+	if(!petal_attacking)
+		if(!modular_unarmed || !CharacterRigPlay("punch", clamp(NextAttack - world.time, 3, 12))) flick("Attack", src)
 	if(!glob.FLASH_ENVELOPE || _flash_env_busy || !enemy) return
 	var/matrix/M = transform
 	if(M && (M.b || M.d)) return
@@ -104,11 +105,12 @@ mob/proc/SwingEnvelope(atom/enemy, weight = 0.3, col = "#ffffff")
 	if(lvl >= 1)
 		spawn(2)
 			if(enemy) FlashSwingSmear(src, enemy, w * 0.6, col, angoff = side * 10, amult = 0.4)
-	var/list/v = FlashDirPx(get_dir(src, enemy))
-	var/px = 2 + round(2 * w)
-	var/lat = side * round(px * 0.5)
-	animate(src, pixel_x = v[1]*px - v[2]*lat, pixel_y = v[2]*px + v[1]*lat, time = 1, flags = ANIMATION_RELATIVE | ANIMATION_PARALLEL)
-	animate(pixel_x = -(v[1]*px - v[2]*lat), pixel_y = -(v[2]*px + v[1]*lat), time = 2, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_RELATIVE)
+	if(!character_rig_active)
+		var/list/v = FlashDirPx(get_dir(src, enemy))
+		var/px = 2 + round(2 * w)
+		var/lat = side * round(px * 0.5)
+		animate(src, pixel_x = v[1]*px - v[2]*lat, pixel_y = v[2]*px + v[1]*lat, time = 1, flags = ANIMATION_RELATIVE | ANIMATION_PARALLEL)
+		animate(pixel_x = -(v[1]*px - v[2]*lat), pixel_y = -(v[2]*px + v[1]*lat), time = 2, easing = QUAD_EASING|EASE_OUT, flags = ANIMATION_RELATIVE)
 	spawn(4)
 		_flash_env_busy = 0
 
@@ -594,7 +596,7 @@ mob/proc/FlashGrabBand(on)
 			vis_contents -= B
 
 proc/FlashBeamIgnite(datum/beam/B, omni = 0)
-	if(!glob.FLASH_STATES || !B || !B.owner) return
+	if(!glob.FLASH_STATES || !B || !B.owner || B.fx) return
 	var/mob/M = B.owner
 	var/w = clamp((B.charge - 0.5), 0, 1)
 	var/col = FxBlastTint(B.skill)
@@ -632,6 +634,7 @@ proc/FlashSweetSpot(mob/M)
 			if(M) M.vis_contents -= S
 
 proc/FlashVolleyHand(mob/M, obj/Skills/Projectile/Z, on)
+	if(EnergyFXRow(Z)) return
 	if(on)
 		if(!glob.FLASH_STATES || !M || M._flash_hand) return
 		var/col = FxBlastTint(Z) || "#ffffff"

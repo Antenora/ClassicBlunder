@@ -9,6 +9,12 @@ mob/var/tmp/phantom_mark_damage = 0
 mob/var/tmp/pre_weave_sdtl = 0
 mob/var/tmp/last_combo_warp_dist = 0
 mob/var/tmp/rush_vuln_until = 0
+mob/var/tmp/mob/mark_vuln_by
+mob/var/tmp/mark_vuln_until = 0
+mob/var/tmp/mark_vuln_amp = 0
+mob/var/tmp/mob/dodge_vs_mob
+mob/var/tmp/dodge_vs_until = 0
+mob/var/tmp/dodge_vs_amt = 0
 mob/var/tmp/last_damaged_time = 0
 mob/var/tmp/pain_amount = 0
 mob/var/tmp/pain_stamp = 0
@@ -25,6 +31,14 @@ mob/var/tmp/mob/last_attacker
 
 mob/var/tmp/image/phantom_mark_fx
 mob/var/tmp/wall_cling_until = 0
+
+//used for rebirth saga, basically sanitize all skill names and remove personality for them as LOVE increases
+mob/proc/SkillActivationMsg(obj/Skills/S, msg)
+	if(!msg || !S)
+		return msg
+	if(ViolenceGrowth >= 5)
+		return "[src] uses [S.name]."
+	return msg
 
 mob/proc/RushWallCling()
 	dir = turn(dir, 180)
@@ -85,6 +99,7 @@ obj/Skills
 	var/tmp/list/rush_passed_mobs
 	var/BonusVsStunned = 0
 	var/BonusVsSlowed = 0
+	var/BonusFromBehind = 0
 	var/EnergyBurn = 0
 	var/ApplySlow = 0
 	var/FollowTarget = 0
@@ -92,6 +107,7 @@ obj/Skills
 	var/QueueWindup = 0
 	var/RiposteOnDodge = 0
 	var/GrandOpenings = 0
+	var/CleaveArc = 0
 	var/SplatBonus = 0
 	var/SquareArea = 0
 	var/SequenceStrokes = 1
@@ -135,15 +151,24 @@ obj/Skills
 	var/tmp/chain_until = 0
 	var/tmp/recast_count = 0
 
+obj/Skills/proc/OnSkillHit(mob/caster, mob/m, atom/hitter, dealt)
+	return
+
 obj/Skills/Projectile
 	var/EmitChild
 	var/EmitCount = 0
 	var/EmitEvery = 1
+	var/EmitStagger = 0
+	var/KickPath = 0
 	var/HomingBeam = 0
 	var/BlendAdd = 0
 	var/FollowFacing = 0
 	var/ArcShot = 0
 	var/BackfireShot = 0
+	var/tmp/InstantTravel = 0
+	var/tmp/LaunchForward = 0
+	var/tmp/LaunchUp = 0
+	var/tmp/DropDistance = 0
 
 obj/SkillPillar
 	icon = 'RisingRocks.dmi'
@@ -173,6 +198,8 @@ obj/Skills/Projectile
 	var/BlastRamp = 0
 	var/BlastRampFloor = 1
 	var/PushBack = 0
+	var/ExplodeRadiusPx = 0
+	var/ContactFuse = 0
 	var/KBRamp = 0
 	var/CounterNova = 0
 	var/ClashBonus = 0
@@ -183,9 +210,24 @@ obj/Skills/Projectile
 obj/Skills/Projectile/_Projectile
 	var/tmp/pushback_taken = 0
 	var/tmp/storm_dropped = 0
+	var/tmp/fuse_at = 0
+	var/tmp/list/emit_angles
+	var/tmp/emit_total = 0
+	var/tmp/list/emit_last
+	var/tmp/obj/Skills/Projectile/_Projectile/emit_parent
+	var/tmp/emit_index = 0
+	var/tmp/kick_angle = 0
+	var/tmp/kick_px
+	var/tmp/kick_py
+
+var/list/KICK_PATH = list("r0" = 32, "v0" = 1000, "v1" = 640, "tau" = 0.06, "delay" = 0.05, "turn" = 1000, "hit_r" = 8, "t_max" = 0.45, "dt" = 0.0025)
 
 proc/ProjectilePushBack(obj/Skills/Projectile/_Projectile/nova, obj/Skills/Projectile/_Projectile/other)
 	if(!nova || nova.Killed || !nova.loc)
+		return
+	if(other && other.Area != "Beam" && !other.Killed)
+		other.Damage = 0
+	if(nova.fuse_at)
 		return
 	var/fwd = nova.dir
 	step(nova, turn(fwd, 180))

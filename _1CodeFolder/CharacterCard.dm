@@ -370,7 +370,6 @@ client/proc/InitCharacterCard()
 	cardstatus.maptext_y = 48
 	screen += cardstatus
 	InitIntentChips()
-	InitFinisherBar()
 	InitGuardBar()
 	UpdateCharacterCard()
 	UpdateCardText()
@@ -481,6 +480,13 @@ client/proc/ResetTargetCard()
 	tcard_hp_last = 0
 	tcard_en_last = 0
 	tcard_gd_last = 0
+	ScannerCardReset()
+
+client/proc/ScannerCardRows(mob/T)
+	return
+
+client/proc/ScannerCardReset()
+	return
 
 client/proc/BuildTargetComposite(mob/T)
 	if(!tcard || !T) return
@@ -584,6 +590,7 @@ client/proc/UpdateTargetCard()
 	if(!valid)
 		SetTargetCardAlpha(0)
 		tcard_last = null
+		ScannerCardRows(null)
 		return
 	SetTargetCardAlpha(255)
 	var/newtarget = (T != tcard_last) // composite and bar snap only happen on a target swap
@@ -609,6 +616,7 @@ client/proc/UpdateTargetCard()
 	if(tbar_gd_fill) tbar_gd_fill.alpha = showgd ? 255 : 0
 	UpdateTargetBars(hp, en, newtarget, gd)
 	UpdateTargetDebuff(T)
+	ScannerCardRows(T)
 
 client/proc/UpdateTargetDebuff(mob/T)
 	if(!tdebuff_icon || !tdebuff_num) return
@@ -644,11 +652,9 @@ client/proc/PositionCharacterCard()
 	PlaceIntentChips() // re-place on resize
 	UpdateDebuffs() // re-place on resize
 	UpdateTimedBuffs() // re-place on resize
-	PositionFinisherBar() // re-place on resize
 	PositionGuardBar() // re-place on resize
 
 client/proc/ResetCharacterCard()
-	ResetFinisherBar()
 	ResetGuardBar()
 	if(card)
 		screen -= card
@@ -856,7 +862,10 @@ client/proc/IntentChipAction(action)
 mob/proc/GetTimedBuffs()
 	var/list/out = list()
 	for(var/obj/Skills/Buffs/b in GetMenuBuffs())
-		if(IsStripBuff(b)) out += b              // timed, non-debuff, currently active
+		if(IsStripBuff(b))
+			out += b
+
+	out += GetActiveSpiritCommands()
 	return out
 
 client/proc/UpdateTimedBuffs()
@@ -881,7 +890,11 @@ client/proc/UpdateTimedBuffs()
 			tbuff_icons += di
 			screen += di
 		if(di.buff != b)                                     // only rebuild the scaled icon when the slot changes
-			var/icon/I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
+			var/icon/I
+			if(istype(b, /obj/Skills/Buffs/SpiritCommands/Instant))
+				I = icon('HUD/spirit_commands.dmi', b.name)
+			else
+				I = icon(SkillMenuIcon(b), SkillMenuIconState(b))
 			I.Scale(TBUFF_ICON, TBUFF_ICON)
 			di.icon = I
 			di.buff = b
@@ -889,11 +902,14 @@ client/proc/UpdateTimedBuffs()
 		var/y = ypix0 - rw * (TBUFF_ICON + TBUFF_GAP)
 		di.screen_loc = "1:[x],[row]:[y]"
 		di.alpha = 255
-		var/rem = b.TimerLimit - b.Timer                     // Timer advances 1.0/sec
-		var/secs = round(rem)
-		if(secs < rem) secs++                                // ceil so it reads as time remaining
-		if(secs < 0) secs = 0
-		di.num.maptext = "<span style=\"[TBUFF_NUM_FONT]; color:#ffffff; text-align:right\">[secs]</span>"
+		if(istype(b, /obj/Skills/Buffs/SpiritCommands/Instant))
+			di.num.maptext = ""
+		else
+			var/rem = b.TimerLimit - b.Timer
+			var/secs = round(rem)
+			if(secs < rem) secs++
+			if(secs < 0) secs = 0
+			di.num.maptext = "<span style=\"[TBUFF_NUM_FONT]; color:#ffffff; text-align:right\">[secs]</span>"
 		di.num.alpha = (di.num.alpha == 255) ? 254 : 255     // nudge to force a maptext flush each tick
 		col++
 		if(col >= TBUFF_PER_ROW)
@@ -907,10 +923,10 @@ client/proc/UpdateTimedBuffs()
 		spare.screen_loc = null
 	RepositionPartyCards()   // ally cards ride below the buff cluster, whose height just changed
 
-client/proc/GetActiveDebuffs()
+client/proc/GetActiveDebuffs(mob/m)
 	var/list/out = list()
-	if(!mob) return out
-	var/mob/m = mob
+	if(!m) m = mob
+	if(!m) return out
 	if(m.Bleed > 0) out += list(list('HUD/debuff_bleed.png', "Bleed", "[round(m.Bleed)]"))
 	var/vb = max(0, m.Burn - m.SilentBurnAmount)
 	if(vb > 0) out += list(list('HUD/debuff_burn.png', "Burn", "[round(vb)]"))
@@ -933,6 +949,7 @@ client/proc/GetActiveDebuffs()
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/Charmed)) out += list(list('HUD/debuff_charmed.png', "Charmed", null))
 	if(m.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Blinded)) out += list(list('HUD/debuff_blind.png', "Blind", null))
 	if(m.CheckSlotless("Tilted")) out += list(list('HUD/debuff_tilted.dmi', "Tilted", null))
+
 	return out
 
 client/proc/UpdateDebuffs()
@@ -962,6 +979,7 @@ client/proc/UpdateDebuffs()
 			debuff_icons += di
 			screen += di
 		di.icon = d[1]
+		di.icon_state = d.len >= 4 ? d[4] : ""
 		di.debuff_name = d[2]
 		di.num.maptext = numtxt ? "<span style=\"[MDEBUFF_FONT]; color:#ffffff\">[numtxt]</span>" : ""
 		var/icy = (cur_row == 0) ? MDEBUFF_ROW0_Y : (MDEBUFF_ROW1_Y - (cur_row - 1) * MDEBUFF_ROW_H)
@@ -1088,183 +1106,15 @@ client/proc/ShowDebuffPanel(atom/movable/shud/debufficon/di)
 		screen += o
 	KineticEntrance(debuff_panel_objs)
 
-// New Tension bar
-// centered above the skill hotbar (slots sit at SOUTH:30..62, CENTER-anchored)
 #define FIN_CX -112           // bar is 224 wide: CENTER:-112 centers it
-#define FIN_SOUTH 76          // bar bottom: 14px above the hotbar slot tops
-#define FIN_MINI_SOUTH 78     // minis: 12px below the bar top (bar spans 76..96)
 #define FIN_FILL_X 34         // fill sweep starts here inside the fill icon
 #define FIN_TRACKW 224
 #define FIN_SPAN 190
-#define FIN_GLOW_COLOR "#b48cff"
 #define FIN_EDGE_COLOR "#5d4f96"
-#define FIN_MINI_X1 92        // left mini slot (stage 2), px from the bar's left edge
-#define FIN_MINI_X2 152       // right mini slot (stage 3)
-#define FIN_MINI_W1 64
-#define FIN_MINI_W2 62
-#define FIN_MINIMASK_W 64
 
 var/FIN_TRACK_RSC = 'HUD/fin_track.png'
 var/FIN_FILL_RSC = 'HUD/fin_fill.png'
 var/FIN_MASK_RSC = 'HUD/fin_mask.png'
-var/FIN_MINIMASK = 'HUD/fin_minimask.png'
-var/FIN_MINIFILL1 = 'HUD/fin_minifill1.png'
-var/FIN_MINIFILL2 = 'HUD/fin_minifill2.png'
-
-client
-	var/tmp
-		atom/movable/shud/fin_track
-		atom/movable/shud/fin_fill
-		list/fin_minis            // per-slot fill overlays
-		fin_mini_count = -1
-		fin_main_last = 0
-		list/fin_mini_last
-		fin_shown = 0
-		fin_glowing = FALSE
-
-client/proc/InitFinisherBar()
-	ResetFinisherBar()
-	fin_track = new /atom/movable/shud/orbpart
-	fin_track.icon = FIN_TRACK_RSC
-	fin_track.layer = MCARD_LAYER
-	fin_track.filters = filter(type="outline", size=1, color=FIN_EDGE_COLOR)   // edge flair so the empty bar reads
-	screen += fin_track
-	fin_fill = new /atom/movable/shud/orbpart
-	fin_fill.icon = FIN_FILL_RSC
-	fin_fill.layer = MCARD_LAYER + 0.01
-	fin_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x=-FIN_TRACKW)   // start empty
-	screen += fin_fill
-	fin_minis = list()
-	fin_mini_last = list()
-	fin_mini_count = -1
-	fin_main_last = 0
-	HideFinisherBar()
-
-client/proc/ResetFinisherBar()
-	for(var/atom/movable/o in list(fin_track, fin_fill))
-		if(o)
-			screen -= o
-			del o
-	fin_track = null
-	fin_fill = null
-	if(fin_minis)
-		while(fin_minis.len)
-			var/atom/movable/o = fin_minis[fin_minis.len]
-			fin_minis.len--
-			screen -= o
-			del o
-	fin_minis = null
-	fin_mini_last = null
-	fin_mini_count = -1
-	fin_shown = 0
-	fin_glowing = FALSE
-
-client/proc/HideFinisherBar()
-	fin_shown = 0
-	SetFinisherGlow(FALSE)
-	if(fin_track) fin_track.alpha = 0
-	if(fin_fill) fin_fill.alpha = 0
-	if(fin_minis)
-		for(var/atom/movable/o in fin_minis)
-			o.alpha = 0
-
-// pulsing ready-glow around the whole bar silhouette
-client/proc/SetFinisherGlow(on)
-	if(fin_glowing == on) return
-	fin_glowing = on
-	if(!fin_track) return
-	if(on)
-		fin_track.filters += filter(type="drop_shadow", x=0, y=0, size=2, offset=1, color=FIN_GLOW_COLOR)
-		spawn(1)   // same-tick filter animation snaps instead of animating
-			if(fin_glowing && fin_track && fin_track.filters && fin_track.filters.len >= 2)
-				animate(fin_track.filters[2], size = 6, time = 9, loop = -1, easing = SINE_EASING)
-				animate(size = 2, time = 9, easing = SINE_EASING)
-	else
-		fin_track.filters = filter(type="outline", size=1, color=FIN_EDGE_COLOR)
-
-client/proc/RebuildFinisherMinis(count)
-	fin_mini_count = count
-	if(fin_minis)
-		while(fin_minis.len)
-			var/atom/movable/o = fin_minis[fin_minis.len]
-			fin_minis.len--
-			screen -= o
-			del o
-	fin_minis = list()
-	fin_mini_last = list()
-	for(var/i = 1 to count)
-		var/atom/movable/shud/orbpart/m = new
-		m.icon = (i == 1) ? FIN_MINIFILL1 : FIN_MINIFILL2
-		m.layer = MCARD_LAYER + 0.02
-		m.filters = filter(type="alpha", icon=FIN_MINIMASK, x=-FIN_MINIMASK_W)   // start empty
-		m.alpha = fin_shown ? 255 : 0
-		screen += m
-		fin_minis += m
-		fin_mini_last += 0
-	PositionFinisherBar()
-
-client/proc/PositionFinisherBar()
-	if(!fin_track) return
-	var/sl = "CENTER:[FIN_CX],SOUTH:[FIN_SOUTH]"
-	fin_track.screen_loc = sl
-	fin_fill.screen_loc = sl
-	if(fin_minis)
-		for(var/i = 1 to fin_minis.len)
-			var/atom/movable/o = fin_minis[i]
-			o.screen_loc = "CENTER:[FIN_CX + ((i == 1) ? FIN_MINI_X1 : FIN_MINI_X2)],SOUTH:[FIN_MINI_SOUTH]"
-
-client/proc/UpdateFinisherBar()
-	if(!mob || !fin_track) return
-	if(!mob.StyleActive || !mob.StyleBuff || !card)
-		if(fin_shown) HideFinisherBar()
-		return
-	var/stage = 1
-	if(mob.StyleBuff.FinisherStage > 1) stage = mob.StyleBuff.FinisherStage
-	var/want = min(stage, 3) - 1          // visual mini slots; mechanics are unbounded
-	if(fin_mini_count != want) RebuildFinisherMinis(want)
-	if(!fin_shown)
-		fin_shown = 1
-		fin_track.alpha = 255
-		fin_fill.alpha = 255
-		for(var/atom/movable/o in fin_minis)
-			o.alpha = 255
-	var/barMax = mob.getMaxTensionValue()
-	if(barMax < 1) barMax = 1
-	var/t = mob.Tension
-
-	var/frac = t / barMax
-	if(frac > 1) frac = 1
-	if(frac < 0) frac = 0
-	var/px = frac ? FIN_FILL_X + round(FIN_SPAN * frac) : 0
-	if(px != fin_main_last)
-		var/tm = OrbAnimTime(fin_main_last, px)
-		if(tm) animate(fin_fill.filters[1], x = px - FIN_TRACKW, time = tm, easing = SINE_EASING)
-		else fin_fill.filters = filter(type="alpha", icon=FIN_MASK_RSC, x = px - FIN_TRACKW)
-		fin_main_last = px
-
-	for(var/i = 1 to fin_minis.len)
-		var/atom/movable/shud/m = fin_minis[i]
-		var/mf = (t - i * barMax) / barMax
-		if(mf > 1) mf = 1
-		if(mf < 0) mf = 0
-		var/mpx = mf ? round(((i == 1) ? FIN_MINI_W1 : FIN_MINI_W2) * mf) : 0
-		if(mpx != fin_mini_last[i])
-			var/tm2 = OrbAnimTime(fin_mini_last[i], mpx)
-			if(tm2) animate(m.filters[1], x = mpx - FIN_MINIMASK_W, time = tm2, easing = SINE_EASING)
-			else m.filters = filter(type="alpha", icon=FIN_MINIMASK, x = mpx - FIN_MINIMASK_W)
-			fin_mini_last[i] = mpx
-
-	// states: locked = grey fill; finisher ready = pulsing glow around the bar
-	if(mob.tempTensionLock)
-		fin_fill.color = "#666666"
-		SetFinisherGlow(FALSE)
-	else if(t >= barMax)
-		fin_fill.color = null
-		SetFinisherGlow(TRUE)
-	else
-		fin_fill.color = null
-		SetFinisherGlow(FALSE)
-
 // guard meter, I plan to do something different for these visuals soon though
 #define GUARD_BAR_SOUTH 98
 #define GUARD_FILL_COLOR "#e8a33d"

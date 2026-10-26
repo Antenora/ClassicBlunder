@@ -70,7 +70,7 @@ mob/proc/GetHaste(obj/Skills/Z)
 	return max(h, -50)
 
 mob/proc/HasteCDMult(obj/Skills/Z)
-	return 100 / (100 + GetHaste(Z))
+	return 100 / (100 + GetHaste(Z)) * MaimMult("Cooldown")
 obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 	var/mob/m=src.loc
 	if(p)
@@ -85,6 +85,8 @@ obj/Skills/proc/Cooldown(var/modify=1, var/Time, mob/p, var/announce_cd=1)
 		Charges--
 		if(Charges <= 0)
 			Using = 1
+		if(NoChargeRegen)
+			return
 		if(!Time && m)
 			modify *= m.HasteCDMult(src)
 			Time = src.ChargeRefresh * 10 * modify
@@ -215,6 +217,9 @@ mob/Players/verb
 		if(src.icon_state=="Meditate")
 			src.SkillX("Meditate",src)
 		// get step in front, get all stuff on that turf, only use melee if it has more than a turf
+		if(src.EquippedGun())
+			src.GunWhip()
+			return
 		src.Melee1()
 
 mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypass=FALSE)
@@ -688,6 +693,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 					if(src.HealthPct()<20/Z.Mastery)
 						src << "You haven't the vitality to stop time..."
 						return
+					Z.Using = 1
 					for(var/mob/E in hearers(12,src))
 						E<<"<font color=[src.Text_Color]>[src] says: Time..."
 					sleep(15)
@@ -709,6 +715,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 						E<<"<font color=[src.Text_Color]>[src] says: Time is now frozen."
 					src.TimeStop=1
 					Z:TimeStopped=0
+					Z.Using = 0
 
 			if("Chaos Control")
 				if(Z.Using)
@@ -891,7 +898,7 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 					BPPoisonTimer=0
 					view(src) <<"[src] recovers from their wounds through regrowth!"
 				if(Maimed)
-					Maimed=max(Maimed-1, 0)
+					MaimPeel()
 					view(src) <<"[src] recovers a lost limb through regrowth!"
 				if(SenseRobbed)
 					if(SenseRobbed>=5)
@@ -922,6 +929,9 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 
 			if("Fly")
 				if(src.KO||src.icon_state=="Meditate"||src.icon_state=="Train"||src.icon_state=="KB") return
+				if(!src.Flying && src.GravityWellHolds())
+					src << "A gravity well holds you to the ground."
+					return
 				if(src.Flying)
 					if(Z.Using==1)//See: Meditate
 						return
@@ -997,8 +1007,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
-							if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate, M))
-								M.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate, M))
+								M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate)
 								M<<"<b><font color=#0099FF>You have unlocked The Fourth Fate!"
 					if("No")
 						return
@@ -1009,8 +1019,8 @@ mob/proc/SkillX(var/Wut,var/obj/Skills/Z,var/bypass=0,var/noGCD=0,var/TempoBypas
 				switch(Select)
 					if("Yes")
 						for(var/mob/Players/M)
-							if(!locate(/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate, M))
-								M.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/The_Fourth_Fate)
+							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate, M))
+								M.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/The_Fourth_Fate)
 								M<<"<b><font color=#0099FF>You have unlocked The Fourth Fate!"
 					if("No")
 						return
@@ -1269,9 +1279,11 @@ proc/_CamShake(atom/source, amp, duration, ix, iy, globe, sustain = 0)
 	if(duration <= 0) return
 	if(amp <= 0 && !ix && !iy) return
 	if(globe)
-		for(var/mob/M in players)
-			if(M.z != globe && globe != 999) continue
-			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)
+		var/list/hit = GfxBcRecipients(source, 3)
+		var/mob/S = source
+		if(ismob(S) && S.client && !(S.client in hit)) hit += S.client
+		for(var/client/C in hit)
+			_CamShakeClient(C, amp, duration, ix, iy, sustain)
 	else
 		for(var/mob/M in view(source))
 			if(M.client) _CamShakeClient(M.client, amp, duration, ix, iy, sustain)

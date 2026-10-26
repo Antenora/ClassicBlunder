@@ -1,52 +1,27 @@
 transformation
 	changeling
 		second_form
-			PUSpeedModifier = 1.5
-			pot_trans = 1
-			BioArmorMax = -25
-			endurance = 0.8
-			defense = 0.8
-			offense = 1.25
-			force = 1.5
-			strength = 1.5
-			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3)
+			unlock_potential=10
+			passives = list()
 			form_base = 'Chilled2.dmi'
 			transformation_message = "usrName cracks their tail, entering their Second Form in a burst of power!"
 
 		third_form
-			PUSpeedModifier = 1.5
-			pot_trans = 1
-			BioArmorMax = -50
-			endurance = 0.8
-			defense = 0.8
-			offense = 1.25
-			force = 1.5
-			strength = 1.5
-			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "Juggernaut" = -1)
+			unlock_potential=25
+			passives = list()
 			form_base = 'Chilled3.dmi'
 			transformation_message = "usrName cracks their tail, entering their Third Form in a burst of power!"
 
 		final_form
-			PUSpeedModifier = 1.5
-			pot_trans = 3
-			BioArmorMax = -75
-			endurance = 0.8
-			defense = 0.8
-			offense = 1.25
-			force = 1.5
-			strength = 1.5
-			passives = list("Flicker" = 1, "Godspeed" = 1, "PureReduction" = -3,  "CriticalBlock" = -0.25, "CriticalDamage" = 0.25)
+			unlock_potential=35
+			passives = list()
 			form_base = 'Chilled4.dmi'
 			transformation_message = "usrName cracks their tail, entering their Final Form in a burst of power!"
-
-		fifth_form
-			PUSpeedModifier = 1.5
-			endurance = 0.8
-			defense = 0.8
-			offense = 1.25
-			force = 1.5
-			strength = 1.5
-			passives = list("Flicker" = 1, "Godspeed" = 2, "PureReduction" = -3, "Juggernaut" = 1)
-			pot_trans = 5
-			BioArmorMax = -100
-			transformation_message = "usrName cracks their tail, entering their Fifth Form in a burst of destructive power!"
+		golden_form
+			unlock_potential=60
+			transformation_message = "Erupting in golden spendour, usrName is born!"
+			fakename = "Golden"
+		black_form
+			unlock_potential=80
+			transformation_message = "Grasping ultimate power, the overwhelming might of usrName descends!"
+			fakename = "Black"

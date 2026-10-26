@@ -16,9 +16,8 @@ EventScheduler
 			var/__Trigger/T = src.__trigger_mapping[E]
 			if (T)
 				src.__trigger_mapping.Remove(E)
-				var/time = T.__scheduled_time - src.__tick
-				if (time > 0)
-					var/list/A = src.__scheduled_events[num2text(time)]
+				if (T.__scheduled_time > src.__tick)
+					var/list/A = src.__scheduled_events[num2text(T.__scheduled_time, 12)]
 					if (A)
 						A -= T
 
@@ -52,13 +51,16 @@ EventScheduler
 		 *					numerical values mean a higher priority. Defaults to 0.
 		 */
 		schedule(var/Event/E, var/ticks as num, var/priority = 0)
-			ticks = num2text(ticks)
-			var/list/A = src.__scheduled_events[ticks]
-			var/__Trigger/T = new(E, src.__tick, text2num(ticks), 0)
+			var/__Trigger/T = new(E, src.__tick, text2num(num2text(ticks)), 0)
+			var/key = num2text(T.__scheduled_time, 12)
+			var/list/A = src.__scheduled_events[key]
 			if (A)
 				A += T
 			else
-				src.__scheduled_events[ticks] = list(T)
+				src.__scheduled_events += key
+				src.__scheduled_events[key] = list(T)
+			if (isnull(src.__trigger_mapping[E]))
+				src.__trigger_mapping += E
 			src.__trigger_mapping[E] = T
 
 		/**
@@ -109,26 +111,33 @@ EventScheduler
 		__tick					= 0
 
 	proc
-		__shift_down_events()
-			var/list/result = null
-			for (var/T in src.__scheduled_events)
-				var/A = src.__scheduled_events[T]
-				src.__scheduled_events.Remove(T)
-				var/index = text2num(T)
-				if (--index)
-					src.__scheduled_events["[index]"] = A
-				else
-					result = A
-			return result
+		__rebase()
+			var/base = src.__tick
+			var/list/fresh = list()
+			for (var/k in src.__scheduled_events)
+				var/list/A = src.__scheduled_events[k]
+				var/nk = num2text(text2num(k) - base, 12)
+				for (var/__Trigger/T in A)
+					T.__scheduled_time -= base
+					T.__inserted_tick -= base
+				if (isnull(fresh[nk]))
+					fresh += nk
+				fresh[nk] = A
+			src.__scheduled_events = fresh
+			src.__tick -= base
 
 		__iteration()
 			src.__tick++
-			var/list/execute = src.__shift_down_events()
+			var/key = num2text(src.__tick, 12)
+			var/list/execute = src.__scheduled_events[key]
 			if (execute)
+				src.__scheduled_events -= key
 				QuickSort(execute, /EventScheduler/proc/__sort_priorities)
 				for (var/__Trigger/T in execute)
 					T.__event.fire()
 					src.__trigger_mapping.Remove(T.__event)
+			if (src.__tick >= 1000000)
+				src.__rebase()
 
 		__loop()
 			while (src.__running)

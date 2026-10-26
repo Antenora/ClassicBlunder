@@ -488,7 +488,7 @@ client/proc/ChatPanelShow()
 	src << browse(ChatPanelHTML(), "window=[CHATPANEL_CTL]")
 	ChatPanelPlace()
 	chatpanel_open = 1
-	winset(src, CHATPANEL_CTL, "is-visible=true")
+	WebOverlayShow(CHATPANEL_CTL)
 
 client/proc/ChatPanelHide()
 	chatpanel_open = 0

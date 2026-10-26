@@ -218,6 +218,9 @@ proc/GfxResizeScreenOverlays(client/C, pixel_width = 0, pixel_height = 0)
 		for(var/area/A in world)
 			GfxFitSharedScreenOverlay(A.wx_tint)
 			GfxFitSharedScreenOverlay(A.wx_flash)
+		for(var/datum/wx_zlevel/ZL in _wx_zlevels)
+			GfxFitSharedScreenOverlay(ZL.wx_tint)
+			GfxFitSharedScreenOverlay(ZL.wx_flash)
 
 proc/GfxQualityRank(client/C)
 	var/Options/P = C ? C.prefs : null
@@ -337,7 +340,7 @@ proc/GfxApplyMaterialLightPass(client/C)
 		return
 	C.gfx_material_light_relay.alpha = GfxQualityRank(C) >= GFX_QUALITY_ULTRA ? 255 : 225
 
-proc/GfxApplyReflectionPass(client/C, area/A = null)
+proc/GfxApplyReflectionPass(client/C, turf/T = null)
 	if(!C) return
 	GfxEnsureClient(C)
 	if(!GfxReflectionEnabled(C))
@@ -347,12 +350,11 @@ proc/GfxApplyReflectionPass(client/C, area/A = null)
 		GfxClearWaterMask(C)
 		return
 	C.gfx_reflection_relay.alpha = 255
-	if(!A && C.mob)
-		var/turf/T = get_turf(C.mob)
-		A = T ? T.loc : null
+	if(!T && C.mob)
+		T = get_turf(C.mob)
 	var/wind_mag = sqrt(C.gfx_env_wind_x*C.gfx_env_wind_x + C.gfx_env_wind_y*C.gfx_env_wind_y)
 	var/wetness = C.gfx_env_wetness
-	var/key = "q[GfxQualityRank(C)]-w[round(wind_mag,0.2)]-wet[round(wetness,0.1)]-[A ? A.wx_kind : null]"
+	var/key = "q[GfxQualityRank(C)]-w[round(wind_mag,0.2)]-wet[round(wetness,0.1)]-[WxKindAt(T)]"
 	if(C.gfx_reflection_filter_key == key) return
 	C.gfx_reflection_filter_key = key
 	var/list/fl = list()
@@ -508,7 +510,7 @@ client/proc/InitializeGraphics()
 	set hidden = 1
 	if(!client || !client.prefs) return
 	var/choice = Ask(src, "Choose a graphics setting to change.\n\nCurrent preset: [client.prefs.graphicsQuality]", "Graphics Settings", null, "pick", list(
-		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Experimental Camera", "Apply / Close"), 0)
+		"Quality Preset", "Reduced Motion", "Reduced Flashes", "Foreground Fading", "Reflections", "Light Shafts", "Far Field Blur", "Vignette", "Apply / Close"), 0)
 	switch(choice)
 		if("Quality Preset")
 			var/q = Ask(src, "Higher presets enable more particles, soft shadows, bloom, distortion, and reflections.", "Graphics Quality", client.prefs.graphicsQuality, "pick", list("Low", "Medium", "High", "Ultra", "Cancel"), 0)
@@ -520,19 +522,17 @@ client/proc/InitializeGraphics()
 		if("Light Shafts") client.prefs.lightShafts = !client.prefs.lightShafts
 		if("Far Field Blur") client.prefs.farBlur = !client.prefs.farBlur
 		if("Vignette") client.prefs.vignette = !client.prefs.vignette
-		if("Experimental Camera") client.prefs.experimentalCamera = !client.prefs.experimentalCamera
 	client.prefs.savePrefs(ckey)
 	client.ApplyGraphicsPreferences()
-	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | shafts [client.prefs.lightShafts ? "ON" : "OFF"] | far blur [client.prefs.farBlur ? "ON" : "OFF"] | vignette [client.prefs.vignette ? "ON" : "OFF"] | camera [client.prefs.experimentalCamera ? "EXPERIMENTAL ON" : "OFF"]."
+	src << "Graphics: [client.prefs.graphicsQuality] | reduced motion [client.prefs.reducedMotion ? "ON" : "OFF"] | reduced flashes [client.prefs.reducedFlashes ? "ON" : "OFF"] | foreground fade [client.prefs.foregroundFade ? "ON" : "OFF"] | reflections [client.prefs.reflections ? "ON" : "OFF"] | shafts [client.prefs.lightShafts ? "ON" : "OFF"] | far blur [client.prefs.farBlur ? "ON" : "OFF"] | vignette [client.prefs.vignette ? "ON" : "OFF"]."
 
 /mob/verb/Graphics_Diagnostics()
 	set category = "Other"
 	set name = "Graphics Diagnostics"
 	if(!client) return
-	var/wx = "clear"
 	var/turf/T = GfxGroundTurf(src)
 	var/area/A = T ? T.loc : null
-	if(A && A.wx_kind) wx = A.wx_kind
+	var/wx = WxKindAt(T) || "clear"
 	var/datum/environment_profile/P = EnvProfileForClient(client, A)
 	var/list/reflection_solution = GfxFindActorReflectionTarget(src)
 	var/turf/reflection_surface = reflection_solution ? reflection_solution["surface"] : null
@@ -544,7 +544,7 @@ client/proc/InitializeGraphics()
 		if(O.gfx_material_highlight) highlights++
 	src << "<b>Graphics diagnostics</b>"
 	src << "Preset: [client.prefs.graphicsQuality] | view: [client.view] | client FPS: [client.fps]"
-	src << "Server CPU: [world.cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]% | adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON tier [GfxAdaptiveTier()]" : "off"]"
+	src << "Server CPU: [world.cpu]% | map send: [world.map_cpu]% | tick usage: [round(world.tick_usage, 0.1)] | adaptive budget: [round(GfxBudgetScale() * 100)]% | adaptive ambient: [glob.ADAPTIVE_AMBIENT ? "ON tier [GfxAdaptiveTier()]" : "off"]"
 	src << "Static lights: [_light_sources.len] | dynamic light records: [_fx_lights.len] | shadow objects: [_shadow_objs.len] | shared cloud banks: [_cloud_banks.len] ([GfxCloudChunkCount()] pieces) | weather: [wx]"
 	src << "Environment: [P ? P.display_name : "Neutral"] | haze particles: [client.gfx_haze_emitter && client.gfx_haze_emitter.particles ? client.gfx_haze_emitter.particles.count : 0] | material highlights: [highlights]"
 	src << "Cached light FOV builds: [_light_fov_builds] | average visible cells: [_light_fov_builds ? round(_light_fov_cells / _light_fov_builds, 0.1) : 0] | actor reflections: SCRAPPED | reflection ticks: [_gfx_actor_reflection_ticks] | emissive reflections: [_gfx_emissive_reflection_objs.len] | water mask runs: [client.gfx_water_mask_images ? client.gfx_water_mask_images.len : 0]"
@@ -631,8 +631,7 @@ proc/GfxReleaseAtom(atom/movable/A)
 
 proc/GfxReleaseImage(image/I)
 	if(!I) return
-	for(var/client/C)
-		C.images -= I
+	GfxBcRelease(I)
 
 var/_gfx_icon_warm_boot = _GfxIconWarmBoot()
 
@@ -850,6 +849,38 @@ proc/GfxProfileDump(reason, stall = 0, force = 0)
 	src << "Profile window written to [GFX_PROFILE_FILE] (dump #[_gfx_profile_dumps])."
 	Log("Admin", "[ExtractInfo(src)] dumped the profiler window.")
 
+#define GFX_SENDMAPS_FILE "graphics_sendmaps.log"
+var/_gfx_sendmaps_dumps = 0
+
+/mob/Admin2/verb/Sendmaps_Profile_Start()
+	set category = "Admin"
+	set name = "Sendmaps Profile Start"
+	world.Profile(PROFILE_RESTART, "sendmaps", null)
+	src << "Sendmaps profiler started; run the scenario, then Sendmaps Dump Now."
+	Log("Admin", "[ExtractInfo(src)] started the sendmaps profiler.")
+
+/mob/Admin2/verb/Sendmaps_Dump_Now()
+	set category = "Admin"
+	set name = "Sendmaps Dump Now"
+	var/j = world.Profile(PROFILE_REFRESH, "sendmaps", "json")
+	if(!j)
+		src << "The sendmaps profiler returned nothing; start it first and run a scenario with clients connected."
+		return
+	var/n = 0
+	for(var/client/C) n++
+	var/stamp = time2text(world.realtime, "YYYY-MM-DD hh:mm:ss")
+	text2file("[stamp] seq=[++_gfx_sendmaps_dumps] wt=[world.time] cpu=[world.cpu] clients=[n]\n[j]\n", GFX_SENDMAPS_FILE)
+	src << "Sendmaps profile written to [GFX_SENDMAPS_FILE] (dump #[_gfx_sendmaps_dumps])."
+	Log("Admin", "[ExtractInfo(src)] dumped the sendmaps profile.")
+
+/mob/Admin2/verb/Sendmaps_Profile_Stop()
+	set category = "Admin"
+	set name = "Sendmaps Profile Stop"
+	world.Profile(PROFILE_STOP, "sendmaps", null)
+	src << "Sendmaps profiler stopped."
+	Log("Admin", "[ExtractInfo(src)] stopped the sendmaps profiler.")
+
+#undef GFX_SENDMAPS_FILE
 #undef GFX_PROFILE_FILE
 #undef GFX_PROFILE_RAW_FILE
 #undef GFX_PROFILE_TOP

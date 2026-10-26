@@ -86,6 +86,17 @@ mob/var
 	TranceLevel=0
 	UndyingLoc
 	FinalHeroChoice
+
+	HyperdeathMeterCurrent=0
+	HyperdeathThreshold=100
+	RoaringTempoCurrent=0
+	RoaringTempoMax=100
+
+	ViolenceGrowthCap=0 // cap for how many times you can get HP up from killing a guy goes up with every saga level
+	ViolenceGrowth=0
+	DetachmentProb=0
+	DetachmentTimer=6000
+
 	//SAINT SEIYA
 	SenseUnlocked=5
 	ClothBronze
@@ -94,13 +105,6 @@ mob/var
 	chikaraWhitelist = FALSE
 	//JESSE BULLSHIT
 	Tier7SagaUnlocked=0
-
-	//Path of a Hero
-	HyperdeathMeterCurrent=0
-	HyperdeathThreshold=100
-
-	RoaringTempoCurrent=0
-	RoaringTempoMax=100
 
 	//SHINIGAMI
 	ShinigamiRelease
@@ -161,6 +165,9 @@ mob/var
 	// Sorcerer
 	CursedTechnique
 
+	//Super Robot Wars
+
+
 
 mob/Admin3/verb
 	SagaManagement()
@@ -168,7 +175,7 @@ mob/Admin3/verb
 		var/mob/Players/P = PromptArg(usr, args, 1, "SagaManagement", "players")
 		if(isnull(P)) return
 		var/Level7=0
-		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works")
+		var/list/SagaList=list("Cancel","Ansatsuken","Devil Summoner","Eight Gates","Cosmo","Hiten Mitsurugi-Ryuu","Kamui","Keyblade","King of Braves","Path of a Hero: Rebirth","Sharingan","Shinigami","Shinobi","Sorcerer","Weapon Soul", "Unlimited Blade Works", "Super Robot Wars")
 		if(P.Saga)
 			if(P.Saga=="Mage")
 				src << "[P] is a Mage. Use the Mage Admin verb instead."
@@ -204,6 +211,9 @@ mob/Admin3/verb
 
 		else
 			var/selection
+			if(P.QuincyLevel)
+				src << "[P] is a Quincy and cannot take up a Saga."
+				return
 			if(P.race.type in glob.NoSagaRaces)
 				src << "[P] is a [P.race.name], and they are therefore not eligible to receive a Saga."
 				return
@@ -275,8 +285,9 @@ mob/Admin3/verb
 						P.AddSkill(new/obj/Skills/Projectile/King_of_Braves/Broken_Magnum)
 					P.CyberizeMod+=0.2
 					P.passive_handler.Increase("PilotingProwess", 1)
-					P.PilotingProwess+=1
+					P.PilotProwessRefresh(1)
 					P.SagaLevel=1
+					P.GrantWillMechanic()
 
 				if("Unlimited Blade Works")
 					P<<"Your whole life is... <b>Unlimited Blade Works</b>!"
@@ -292,7 +303,7 @@ mob/Admin3/verb
 					P.AddSkill(s)
 					P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Copy_Blade)
 					P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Projection)
-					P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Sword_Savant)
+					P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Sword_Savant)
 					P << "You can conjure copies of equipment just from mana..."
 					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Self, P))
 						P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Self)
@@ -350,7 +361,6 @@ mob/Admin3/verb
 					P.Saga="Sharingan"
 					P.AddSkill(new/obj/Skills/AutoHit/Sharingan_Genjutsu)
 					P.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Sharingan)
-					P.AddSkill(new/obj/Skills/Buffs/NuStyle/UnarmedStyle/Move_Duplication)
 					P<<"The curse of hatred blooms in you..."
 
 				if("Shinigami")
@@ -361,6 +371,9 @@ mob/Admin3/verb
 
 //				if("Sorcerer")
 //					P.gainSorcerer()
+
+				if("Super Robot Wars")
+					P.gainSRW()
 
 				if("Kamui")
 					P.SagaLevel=1
@@ -391,23 +404,15 @@ mob/Admin3/verb
 						P.contents += new/obj/Items/Sword/Heavy/Secret_Sword_Bakuzan
 						P.passive_handler.Increase("CriticalDamage", 0.1)
 						P.passive_handler.Increase("CriticalBlock", 0.1)
-						P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Resolve)
 						P<<"With each movement forward towards the realization of your ideals, your resolve strengthens..."
 
 				if("Magic Knight")
 					P.SagaLevel=1
 					P.Saga="Magic Knight"
 					P << "You stake yourself on a code of honor and truthfulness."
-					var/Weapon=Ask(P, "As an Magic Knight, you may draw a blade made of Aether or create a bow and arrow.  Which do you choose?", "Aether Weapon", null, "confirm", null, 1, "Blade", "Bow")
-					switch(Weapon)
-						if("Blade")
-							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword, P))
-								P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword)
-								P << "You take up the path of the Aether Blade!"
-						if("Bow")
-							if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow, P))
-								P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow)
-								P << "You take up the path of the Aether Bow!"
+					if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword, P))
+						P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword)
+						P << "You take up the path of the Aether Blade!"
 					var/list/Aethers=list("Strength", "Endurance", "Force", "Offense", "Defense")
 					var/Aether=Ask(P, "As your mastery of Aether grows, it heightens one of your attributes at rest.  Which attribute?", "Aether Ascension", null, "pick", Aethers, 0)
 					switch(Aether)
@@ -438,6 +443,7 @@ mob/Admin3/verb
 								confirm=Ask(P, "Possibility shines, deep within you. Will the world be your playground...?", "The Unsung Hero of Change, the one whose sands are ever-shifting.", null, "confirm", null, 1, "Yes", "No")
 
 					P.SagaLevel=1
+					P.ViolenceGrowthCap=1
 					switch(choice)
 						if("Blue")
 							P.RebirthHeroType="Blue"
@@ -447,7 +453,7 @@ mob/Admin3/verb
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Heart)
 						if("Rainbow")
 							P.RebirthHeroType="Rainbow"
-							P.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Fight_or_Flight)
+							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Path_of_a_Hero)
 							P.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero)
 							P.AddSkill(new/obj/Skills/AutoHit/Jarona)
 							P.AddSkill(new/obj/Skills/AutoHit/Mysterious_Winds)
@@ -936,6 +942,7 @@ mob
 									if("Prophesized Hero")
 										confirm=Ask(src, "A story told in glass, a tragedy written into time and space.", "The Hero of Prophecy, chosen by fate.", null, "confirm", null, 1, "Yes", "No")
 							src.SagaLevel=2
+							src.ViolenceGrowthCap=2
 							src<<"Unwavering courage wells up within you! You have unlocked the ACT meter!"
 							switch(choice)
 								if("Unsung Hero")
@@ -987,6 +994,7 @@ mob
 										src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Hyperdeath_Mode)
 						if(3)
 							src.SagaLevel=3
+							src.ViolenceGrowthCap=4
 							if(src.RebirthHeroType=="Cyan")
 								var/list/Choices=list("Roaring Knight", "White Pen of Hope")
 								var/choice
@@ -1030,10 +1038,10 @@ mob
 								src<< "You can access your Hyperdeath State earlier!"
 								src.AddSkill(new/obj/Skills/Projectile/ChaosSaberToss)
 								src.AddSkill(new/obj/Skills/Projectile/Beams/Hyper_Beam)
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Mountain_King)
 								src.HyperdeathThreshold=75
 						if(4)
 							src.SagaLevel=4
+							src.ViolenceGrowthCap=6
 							if(src.RebirthHeroType=="Cyan")
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src<<"The special power you wield grows stronger, heightening the strength of your SOUL colors."
@@ -1064,12 +1072,12 @@ mob
 							if(src.RebirthHeroType=="Red")
 								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Burning_Soul)
 							if(src.RebirthHeroType=="Prismatic")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Dreamlike_Savior)
 								src.HyperdeathThreshold=50
 								src<< "You now wield two Chaos Sabers at once!"
 								src<< "You can access your Hyperdeath State earlier!"
 						if(5)
 							src.SagaLevel=5
+							src.ViolenceGrowthCap=8
 							if(src.RebirthHeroType=="Blue")
 								src.AddSkill(new/obj/Skills/Buffs/Rebirth/CrownlessKing)
 							if(src.RebirthHeroType=="Red")
@@ -1078,20 +1086,20 @@ mob
 								src.AddSkill(new/obj/Skills/Buffs/Rebirth/ChaosQueen)
 							if(src.RebirthHeroType=="Cyan")
 								if(src.FinalHeroChoice=="Roaring Knight")
-									src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/The_Roaring_Knight)  //needs more
+									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Path_of_a_Hero)  //needs more
 								if(src.FinalHeroChoice=="White Pen of Hope")
-									src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/White_Pen_Of_Hope)
+									src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Path_of_a_Hero)
 									src.AddSkill(new/obj/Skills/Buffs/Rebirth/White_Pen_of_Hope)
 							if(src.RebirthHeroType=="Purple")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Justice_Incarnate)
+								src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Path_of_a_Hero)
 							if(src.RebirthHeroType=="Prismatic")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Afterlife)
 								src<< "Your happy ending... Your hopes, your dreams..."
 								src<< "You know what you carry onwards. Make the future your own."
 								src<< "You can access your Hyperdeath State earlier!"
 								src.HyperdeathThreshold=25
 						if(6)
 							src.SagaLevel=6
+							src.ViolenceGrowthCap=10
 							if(src.RebirthHeroType=="Cyan")
 								if(src.FinalHeroChoice=="White Pen of Hope")
 									src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Banish_The_ANGELS_HEAVEN)
@@ -1123,6 +1131,9 @@ mob
 
 				if("Devil Summoner")
 					tierUpSaga("Devil Summoner")
+
+				if("Super Robot Wars")
+					tierUpSaga("Super Robot Wars")
 
 				if("Unlimited Blade Works")
 					switch(src.SagaLevel)
@@ -1200,9 +1211,9 @@ mob
 							switch(UBWPath)
 								if("Feeble")
 									passive_handler.Increase("Tenacity")
-								if("Strong")
 									// passive_handler.Increase("Desperation")
-									passive_handler.Increase("WeaponBreaker")
+								if("Strong")
+									passive_handler.Increase("Sword Mastery", 1)
 						if(5)
 							Adaptation += 0.5
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Minds_Eye)
@@ -1250,19 +1261,10 @@ mob
 						switch(src.AnsatsukenPath)
 							if("Hadoken")
 								src << "Your Hadoken and EX-Hadoken improve!"
-								for(var/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style/ans in src)
-									ans.Finisher="/obj/Skills/Queue/Finisher/Isshin"
-									src << "You learn to perform the special finisher: Isshin!"
 							if("Shoryuken")
 								src << "Your Shoryuken and EX-Shoryuken improve!"
-								for(var/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style/ans in src)
-									ans.Finisher="/obj/Skills/Queue/Finisher/Shin_Shoryuken"
-									src << "You learn to perform the special finisher: Shin Shoryuken!"
 							if("Tatsumaki")
 								src << "Your Tatsumaki and EX-Tatsumaki improve!"
-								for(var/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style/ans in src)
-									ans.Finisher="/obj/Skills/Queue/Finisher/Shippu_Jinraikyaku"
-									src << "You learn to perform the special finisher: Shippu Jinraikyaku!"
 					if(src.SagaLevel==3)
 						switch(src.AnsatsukenPath)
 							if("Hadoken")
@@ -1341,9 +1343,6 @@ mob
 					if(src.SagaLevel==6)
 						switch(src.AnsatsukenAscension)
 							if("Satsui")
-								for(var/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style/ans in src)
-									ans.Finisher="/obj/Skills/Queue/Finisher/Rakan_Dantojin"
-									src << "You finisher has evolved into the ultimate murder technique: Shun Goku Satsu!"
 								for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Satsui_Infected/SI in src.contents)
 									src << "The demonic impulses of the Satsui no Hado have completely overtaken you."
 									SI.ManaGlow="#f000e4"
@@ -1403,22 +1402,23 @@ mob
 				if("King of Braves")
 					src << "You've obtained more skill with Machines!"
 					passive_handler.Increase("PilotingProwess", 1)
-					src.PilotingProwess+=1
 					src.CyberizeMod+=0.2
 					if(src.SagaLevel==2)
 						src.PilotingProwess+=1
 						if(!locate(/obj/Skills/Queue/DrillKnee, src))
 							src.AddSkill(new/obj/Skills/Queue/DrillKnee)
 						src << "You can form an energy drill out of your body, capable of delivering deciding strikes!"
+						GrantRandomSpiritCommand(1)
 					if(src.SagaLevel==3)
-						src.PilotingProwess+=1
+						PilotProwessRefresh(1)
 						if(!locate(/obj/Skills/AutoHit/Plasma_Hold, src))
 							src.AddSkill(new/obj/Skills/AutoHit/Plasma_Hold)
 						if(!locate(/obj/Skills/AutoHit/Hell_And_Heaven, src))
 							src << "You become capable of delivering the ultimate finishing move: Hell and Heaven!"
 							src.AddSkill(new/obj/Skills/AutoHit/Hell_And_Heaven)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==4)
-						src.PilotingProwess+=2
+						PilotProwessRefresh(2)
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Dividing_Driver, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Dividing_Driver)
 						if(!locate(/obj/Skills/AutoHit/Giga_Drill_Breaker, src))
@@ -1426,8 +1426,10 @@ mob
 						if(!locate(/obj/Skills/AutoHit/Goldion_Hammer, src))
 							src.AddSkill(new/obj/Skills/AutoHit/Goldion_Hammer)
 						src << "You can spawn a set of power tools strong enough to rupture dimensions: Dividing Driver and Goldion Hammer!"
+						GrantRandomSpiritCommand(1)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==5)
-						src.PilotingProwess+=2
+						PilotProwessRefresh(2)
 						if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Protect_Wall, src))
 							src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Protect_Wall)
 						if(!locate(/obj/Skills/Projectile/King_of_Braves/Broken_Phantom, src))
@@ -1435,21 +1437,25 @@ mob
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.TooMuchHealth=75
 						passive_handler.Increase("SpaceWalk", 1)
-						passive_handler.Increase("PilotingProwess", 1) //2 Piloting Prowess at T5 instead of 1
+						passive_handler.Increase("PilotingProwess", 2) //2 Piloting Prowess at T5 instead of 1
 						src << "You upgrade your abilities to carry you into the Space Era!"
+						GrantRandomSpiritCommand(3)
 					if(src.SagaLevel==6)
-						src.PilotingProwess+=3
+						PilotProwessRefresh(3)
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.TooMuchHealth=99
 							gb.GodKi=0.5
 							gb.passives["GodKi"] = 0.5
 						src << "You master using the power of Destruction and Protection simultaneously!"
 						src << "Your Heaven and Hell reaches its perfected form: <b>Genesic Heaven and Hell</b>!"
+						GrantRandomSpiritCommand(3)
+						GrantRandomSpiritCommand(2)
 					if(src.SagaLevel==7)
 						for(var/obj/Skills/Buffs/SlotlessBuffs/Genesic_Brave/gb in src)
 							gb.passives["Color of Courage"] = 1
 							src << "True courage manifests, when everything is thought to be lost."
 							src << "You are now able to fight past your limits in Genesic!"
+						GrantRandomSpiritCommand(3)
 
 
 
@@ -1568,7 +1574,6 @@ mob
 
 							if(choice == "Rebellion")
 								src << "Unshatterable, your resolve gains a twofold edge...Your goals are nearly within your grasp."
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Resolve)
 
 					if(src.SagaLevel==6)
 						if(src.KamuiType=="Senketsu")
@@ -1599,13 +1604,13 @@ mob
 						src << "You've obtained the [Choice2] command style!"*/
 						switch(src.KeybladeType)
 							if("Sword")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Speed_Rave_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Speed_Rave)
 								src << "You've developed the focus necessary to move with blistering speeds: <b>Speed Rave Style</b>!"
 							if("Shield")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Critical_Impact_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Critical_Impact)
 								src << "You've developed the power necessary to make every blow count: <b>Critical Impact Style</b>!"
 							if("Staff")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Spell_Weaver_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Spell_Weaver)
 								src << "You've developed the flexibility necessary to combine spells with swordplay: <b>Spell Weaver Style</b>!"
 						switch(src.KeybladePath)
 							if("Fire")
@@ -1639,17 +1644,17 @@ mob
 							Style=prompt("Your mastery of both keyblades and magical elements allows you to refine your command style.",  "Which style do you develop?", list("Ghost Drive", "Blade Charge"))
 						switch(Style)
 							if("Wingblade")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Wing_Blade_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Wing_Blade)
 							if("Cyclone")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Cyclone_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Cyclone)
 							if("Rock Breaker")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Rock_Breaker_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Rock_Breaker)
 							if("Dark Impulse")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Dark_Impulse_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Dark_Impulse)
 							if("Ghost Drive")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Ghost_Drive_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Ghost_Drive)
 							if("Blade Charge")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Blade_Charge_Style)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Blade_Charge)
 						src << "You've obtained the [Style] command style!"
 						src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Keyblade_Armor)
 						src << "You've obtained your Keyblade armor!"
@@ -1793,14 +1798,17 @@ mob
 						switch(Choice)
 							if("Unity")
 								src.Keychains.Add("Ultima Weapon")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Ultimate_Form)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Ultimate_Form)
 							if("Destiny")
 								src.Keychains.Add("X-Blade")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Forces_Of_Darkness)
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Vector_to_the_Heavens)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Forces_Of_Darkness)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Vector_to_the_Heavens)
 							if("Future")
 								src.Keychains.Add("Nightwing")
-								src.AddSkill(new/obj/Skills/Buffs/NuStyle/SwordStyle/Command/Nachtflugel)
+								src.AddSkill(new/obj/Skills/Buffs/SpecialBuffs/Keyblade/Nachtflugel)
+			for(var/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/F in src)
+				if(BuffOn(F))
+					F.Trigger(src, Override=1)
 
 		getAriaCount(pathEffect = 0)
 			var/count = AriaCount
@@ -1877,13 +1885,13 @@ mob/Admin3/verb
 "/obj/Skills/Buffs/ActiveBuffs/Persona","/obj/Skills/Buffs/SpecialBuffs/King_of_Braves",\
 "/obj/Skills/Buffs/SlotlessBuffs/Will_Knife","/obj/Skills/Buffs/SlotlessBuffs/Protect_Shade",\
 "/obj/Skills/Projectile/King_of_Braves/Broken_Magnum","/obj/Skills/Buffs/SlotlessBuffs/Copy_Blade",\
-"/obj/Skills/Buffs/SlotlessBuffs/Projection","/obj/Skills/Buffs/NuStyle/SwordStyle/Sword_Savant",\
+"/obj/Skills/Buffs/SlotlessBuffs/Projection","/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Saga_Flavor/Sword_Savant",\
 "/obj/Skills/Buffs/SlotlessBuffs/Magic/Reinforce_Self","/obj/Skills/Queue/JawStrike",\
 "/obj/Skills/Queue/FallingBlade","/obj/Skills/Buffs/NuStyle/UnarmedStyle/Ansatsuken_Style",\
 "/obj/Skills/Projectile/Ansatsuken/Hadoken","/obj/Skills/Queue/Shoryuken","/obj/Skills/AutoHit/Tatsumaki",\
 "/obj/Skills/Buffs/ActiveBuffs/Eight_Gates","/obj/Skills/Queue/Front_Lotus","/obj/Skills/AutoHit/Sharingan_Genjutsu",\
 "/obj/Skills/Buffs/SpecialBuffs/Sharingan","/obj/Skills/Buffs/NuStyle/UnarmedStyle/Move_Duplication",\
-"/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword","/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow",\
+"/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword",\
 "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Soul","/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Hero_Heart",\
 "/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Prismatic_Hero","/obj/Skills/Buffs/ActiveBuffs/Keyblade");
 		if(P.Saga == "Cosmo") P.KiControlMastery-=1
@@ -1894,7 +1902,6 @@ mob/Admin3/verb
 			P.passive_handler["Godspeed"] = 0
 			P.passive_handler["AttackSpeed"] = 0
 			P.passive_handler["TechniqueMastery"] = 0
-			P.passive_handler["AsuraStrike"] = 0
 			P.passive_handler["FavoredPrey"] = null;
 		if(P.Saga == "Ansatsuken")
 			P.passive_handler.Decrease("SlayerMod", 0.625)

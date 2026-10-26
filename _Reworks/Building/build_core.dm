@@ -330,6 +330,7 @@ client/var/datum/build_session/bsession
 		list/filteredEntries = list()
 		busy = 0
 		strokeLower = 0
+		strokeRaise = 0
 
 	New(client/_C)
 		C = _C

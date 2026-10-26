@@ -5,7 +5,7 @@
 	LunarWrath=1
 	AngerFloor=60
 	ManaDrain=1
-	PostBuffEff="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
+	PostBuffEff="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain"
 	CustomActive="<b>The light of Kingdom Hearts fills the air, as the wrath of the moon coalesces into a single point!</b>"
 	OffMessage="calms their fury..."
 	StrMult=1.5
@@ -42,9 +42,9 @@
 			var/Choice
 			if(!usr.BuffOn(src))
 				var/modify_sword_num = 1
-				if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Nito_Ichi_Style) in src) || (locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src))
+				if("[usr.StyleBuff?.type]" == "/obj/Skills/Buffs/NuStyle/SwordStyle/Twin_Blade")
 					var/list/options = list("Primary","Secondary")
-					if((locate(/obj/Skills/Buffs/NuStyle/SwordStyle/Santoryu) in src)) options += "Tertiary"
+					if(usr.StyleBuff.StyleStage(usr) >= 4) options += "Tertiary"
 					switch(Ask(usr, "Which sword would you like to modify?", "", null, "pick", options, 0))
 						if("Secondary") modify_sword_num=2
 						if("Tertiary") modify_sword_num=3
@@ -101,7 +101,7 @@
 	Darkness_of_the_Unknown
 		ForMult=1.35
 		DefMult=1.35
-		passives = list("Godspeed" = 2, "Skimming" = 2,"SweepingStrike"=1)
+		passives = list("Godspeed" = 2, "Skimming" = 2)
 		ActiveMessage="draws from the darkness of the unknown, calling forth power that never was!"
 		OffMessage="contains their superiority."
 		verb/Darkness_of_the_Unknown()

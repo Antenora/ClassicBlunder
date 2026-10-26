@@ -86,6 +86,7 @@ proc/SurfaceAutoClassify(atom/A)
 	if(!A) return "floor"
 	var/p = lowertext("[A.type]")
 	if(ismob(A)) return "actor"
+	if(istype(A, /obj/Skills)) return "floor"
 	if(findtext(p, "torch") || findtext(p, "lamp") || findtext(p, "lantern") || findtext(p, "candle") \
 	   || findtext(p, "brazier") || findtext(p, "campfire") || findtext(p, "firewood") || findtext(p, "/fire"))
 		return "light_source"
@@ -347,6 +348,17 @@ proc/SurfaceApply(atom/A)
 		if(M.gfx_wind_response <= 0)
 			M.gfx_wind_response = w
 			GfxRefreshStructureMetadata(M)
+	else if(istype(A, /atom/movable) && A.gfx_wind_response > 0)
+		var/atom/movable/S = A
+		S.gfx_wind_response = 0
+		S.gfx_wind_loop_id++
+		S.gfx_wind_loop_key = null
+		animate(S)
+		S.transform = S.gfx_wind_base_transform
+		for(var/atom/movable/V in S.vis_contents)
+			if(V == S.gfx_canopy_obj || V == S.gfx_canopy_shaft_obj) continue
+			animate(V)
+			V.transform = null
 	if(istype(A, /atom/movable))
 		GfxApplyForegroundRole(A) //canopy profile on/off -> FOREGROUND_PLANE routing
 	var/lt = A.sp_light_type
@@ -839,6 +851,7 @@ obj/KatieObj/Wall_Obj
 		surface_profile = "light_source"
 		sp_light_type = "torch"
 		sp_light_off_y = -9
+	WallPaperFlower/surface_profile = "prop_medium"
 
 obj/KatieObj/Door_Obj
 	Door_2/surface_profile = "wall_mounted"
@@ -964,6 +977,15 @@ obj/Turfs
 	Plant10/surface_profile = "prop_low" //actually a rock
 	Plant11/surface_profile = "prop_medium" //potted plant - prop, not foliage
 	Plant12/surface_profile = "prop_medium" //potted plant - prop, not foliage
+	Plant14/surface_profile = "tree"
+	Plant18/surface_profile = "tree"
+	Plant19/surface_profile = "prop_low"
+	Plant2/surface_profile = "prop_medium"
+	Plant20/surface_profile = "prop_low"
+	Plant6/surface_profile = "prop_low"
+	Plant7/surface_profile = "tree"
+	Plant8/surface_profile = "tree"
+	Plant9/surface_profile = "tree"
 	SignTech1/surface_profile = "emissive_hazard" //emissive, flat
 	SignTech2/surface_profile = "emissive_hazard" //emissive, flat
 	Surf/surface_profile = "edge_tile" //water edge; water-like but NO sparkles - too small
@@ -1100,8 +1122,8 @@ obj/Turfs/Surf
 		var/sp = M.icon ? SurfaceCanopySplit(M.icon, M.icon_state) : 0
 		src << "canopy: not split ([sp ? "split row [sp] available - call SurfaceSplitCanopy" : "no usable trunk found in sprite"]); pivot [SurfaceWindPivot(M)]"
 	var/turf/T = get_turf(M)
-	var/list/W = EnvWindForArea(T ? T.loc : null)
-	src << "wind here: [EnvWindReport(T ? T.loc : null)] | amplitude [glob.WIND_AMPLITUDE]"
+	var/list/W = EnvWindAt(T)
+	src << "wind here: [EnvWindReport(T)] | amplitude [glob.WIND_AMPLITUDE]"
 	if(!W[1] && !W[2]) src << "WIND IS ZERO in this area - profile wind_x/y are 0."
 	//every sprite-copy that could render a second tree, and whether it is being swayed
 	src << "--- vis_contents ([M.vis_contents ? M.vis_contents.len : 0]) ---"
@@ -1135,35 +1157,59 @@ alpha=[V.alpha] px=[V.pixel_x],[V.pixel_y] visflags=[V.vis_flags] xf=[V.transfor
 	set name = "Duplicate Scan"
 	var/list/stacks = list()
 	for(var/turf/G in view(10, usr))
-		var/list/seen = list()
+		var/list/byType = list()
 		for(var/obj/O in G)
-			if(!O.icon || O.gfx_transient_visual) continue
-			var/key = "[O.type]@[G.x],[G.y]"
-			seen[key] = (seen[key] || 0) + 1
-		for(var/key in seen)
-			if(seen[key] > 1) stacks[key] = seen[key]
+			if(!O.Savable || O.gfx_transient_visual || !ObjTwinDedupable(O)) continue
+			var/tk = "[O.type]:[O.icon]:[O.icon_state]:[O.dir]:[O.pixel_x],[O.pixel_y]:[O.layer]"
+			if(!byType[tk]) byType[tk] = list()
+			var/list/TL = byType[tk]
+			TL += O
+		for(var/tk in byType)
+			var/list/TL = byType[tk]
+			if(TL.len < 2) continue
+			var/list/seen = list()
+			for(var/obj/O in TL)
+				var/sig = ObjTwinSignature(O)
+				seen[sig] = (seen[sig] || 0) + 1
+			for(var/sig in seen)
+				if(seen[sig] > 1)
+					var/obj/F = TL[1]
+					stacks["[F.type]@[G.x],[G.y]"] = (stacks["[F.type]@[G.x],[G.y]"] || 0) + seen[sig] - 1
 	if(!stacks.len)
-		src << "No stacked same-type props within view(10)."
+		src << "No exact duplicate props within view(10). Same-type pieces that differ in icon, dir, layer, offsets or settings are separate pieces, not duplicates."
 		return
-	src << "<b>Stacked duplicates in view:</b>"
-	for(var/key in stacks) src << "  [key] x[stacks[key]]"
+	src << "<b>Exact duplicate copies in view:</b>"
+	for(var/key in stacks) src << "  [key] +[stacks[key]] extra"
 
 /mob/Admin2/verb/Duplicate_Purge()
 	set category = "Mapper"
 	set name = "Duplicate Purge"
-	var/list/keep = list()
-	var/list/doomed = list()
+	var/list/buckets = list()
 	for(var/obj/O in world)
-		if(!O.icon || O.gfx_transient_visual || !isturf(O.loc)) continue
-		var/key = "\ref[O.loc]:[O.type]:[O.icon_state]:[O.pixel_x],[O.pixel_y]"
-		if(keep[key]) doomed += O //an exact stacked twin - keep the first only
-		else keep[key] = 1
+		if(!O.Savable || O.gfx_transient_visual || !isturf(O.loc) || !ObjTwinDedupable(O)) continue
+		var/key = "\ref[O.loc]:[O.type]:[O.icon]:[O.icon_state]:[O.dir]:[O.pixel_x],[O.pixel_y]:[O.layer]"
+		var/B = buckets[key]
+		if(!B)
+			buckets[key] = O
+		else if(islist(B))
+			var/list/BL = B
+			BL += O
+		else
+			buckets[key] = list(B, O)
+	var/list/doomed = list()
+	for(var/key in buckets)
+		var/list/BL = buckets[key]
+		if(!islist(BL)) continue
+		var/list/seen = list()
+		for(var/obj/O in BL)
+			var/sig = ObjTwinSignature(O)
+			if(seen[sig]) doomed += O //an exact stacked twin - keep the first only
+			else seen[sig] = 1
 	for(var/obj/O in doomed)
-		LightPropDetach(O)
-		FxEmissiveDetach(O)
-		O.loc = null //refcount-free, never del
-	src << "Purged [doomed.len] stacked duplicate prop\s across the whole map (every z level). Save the map to make it stick."
-	Log("Admin", "[ExtractInfo(src)] purged [doomed.len] stacked duplicate props map-wide.")
+		O.Savable = 0
+		ReleaseProp(O) //refcount-free, never del
+	src << "Purged [doomed.len] exact duplicate prop\s across the whole map (every z level). Save the map to make it stick."
+	Log("Admin", "[ExtractInfo(src)] purged [doomed.len] exact duplicate props map-wide.")
 
 obj/Turfs/IconsXLBig
 	Icon72/surface_profile = "tree" //snow pine

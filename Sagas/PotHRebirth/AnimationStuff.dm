@@ -4,16 +4,17 @@ client/proc/PlaySwoon()
 	set waitfor = 0
 	var/obj/ScreenFX/SWOON/fx = new
 
+	SetupCutsceneDisplay()
 	FitSwoon(fx)
 	screen += fx
 
 	sleep(30)
-
+	EndCutsceneDisplay()
+	FitSwoon(fx)
 	fx.icon_state = "2"
 	sleep(4)
 	fx.icon_state = "3"
 	sleep(20)
-
 	if(fx)
 		screen -= fx
 
@@ -37,3 +38,27 @@ obj/ScreenFX
 		layer = FLOAT_LAYER
 		plane = FX_RELAY_PLANE
 		appearance_flags = PIXEL_SCALE
+
+
+mob/Players
+	var/tmp
+		atom/anti_last_loc
+		anti_last_x = 0
+		anti_last_y = 0
+		anti_last_z = 0
+		anti_last_move = 0
+		anti_next_idle = 0
+
+	proc/AntiIdleTick()
+		if(loc != anti_last_loc || step_x != anti_last_x || step_y != anti_last_y || pixel_z != anti_last_z)
+			anti_last_move = world.time
+		anti_last_loc = loc
+		anti_last_x = step_x
+		anti_last_y = step_y
+		anti_last_z = pixel_z
+		if(!client) return
+		if(world.time < anti_last_move + 4 || world.time < anti_next_idle) return
+		if(passive_handler.Get("AfterImageSkin") != "Anti") return
+		if(passive_handler.Get("AfterImages") <= 0) return
+		anti_next_idle = world.time + 4
+		AntiAfterImage(src, 1, TRUE)

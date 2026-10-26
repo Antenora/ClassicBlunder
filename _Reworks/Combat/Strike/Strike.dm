@@ -20,6 +20,8 @@
 	var/critEff = 1
 	var/blockEff = 1
 	var/critBonus = 0
+	var/nowound = 0
+	var/sheathed = 0
 	var/tmp/critChance = 0
 	var/tmp/didCrit = 0
 	var/tmp/didBlock = 0
@@ -46,11 +48,16 @@ var/list/strikeHooksByStage
 			strikeHooksByStage[H.stage] += H
 	var/list/L = strikeHooksByStage[stage]
 	if(!L) return
+	if(stage == "post" && (!S.attacker || !S.defender)) return
 	for(var/strikeHook/H as anything in L)
 		H.fire(S)
 
 mob
 	proc
+		MechTakenMult(mob/attacker, strike/S)
+			return 1
+		MechDealtMult(mob/defender, strike/S)
+			return 1
 		DoDamage(mob/defender, val)
 			var/strike/S = new(src, defender, val)
 			return ResolveStrike(S)
@@ -106,6 +113,7 @@ mob
 				var/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard/RG = locate(/obj/Skills/Buffs/SlotlessBuffs/RoyalGuard) in defender.contents
 				if(RG)
 					defender << "<font color= 'green'>ATTACK PARRIED!</font>"
+					defender.QuincyEvaded(src)
 					RG.SuccessfulParry = 2
 					var/masteryMult = 1 + ((RG.Mastery - 1) / 100)
 					var/meterGain = max((defender.HPToPct(val) * masteryMult) * glob.ROYAL_GUARD_CHARGE_MULT , 1)
@@ -119,7 +127,7 @@ mob
 					src.openings_hits--
 					if(defender.IsGuarding())
 						guard_opened = 1
-				if(defender.IsGuarding() && !PierceGuard && !getBackSide(src, defender) && !guard_opened)
+				if(defender.IsGuarding() && !PierceGuard && !guard_opened && (!getBackSide(src, defender) || (defender.HasSpecialGuard() == 1 && defender.Will >= 110)))
 					defender.GuardMeter += glob.GUARD_METER_FLAT + defender.HPToPct(val) * glob.GUARD_METER_SCALE
 					val *= (1 - glob.GUARD_DR)
 					defender.PmDashStep(src, glob.GUARD_PUSHBACK_PX, away = 1)
@@ -149,6 +157,8 @@ mob
 					src.LoseHealth(reflected)
 					return 0
 
+			val = src.ApplySpiritCommandDamage(defender, val)
+
 			if(src.isLunaticMode())
 				src.InflictLunacy(defender.HPToPct(val), defender);
 
@@ -164,8 +174,6 @@ mob
 				if(defender.CyberCancel||defender.Mechanized)
 					defender.LoseMana(defender.HPToPct(val)*max(defender.Mechanized,defender.CyberCancel)*src.GetCyberStigma())
 
-			if(defender.passive_handler["Dim Mak"]>0)
-				defender.passive_handler.Increase("Dim Mak", defender.HPToPct(val)/2)
 			handlePostDamage(defender)
 			if(defender.VaizardHealth && !S.shieldPierce)
 				if(glob.SYMBIOTE_DMG_TEST && CheckSlotless("Symbiote Infection"))
@@ -209,7 +217,7 @@ mob
 				val/=defender.AngerMax
 
 			if((defender.passive_handler.Get("Persistence") || defender.hasDeterminationDesperation()) && !defender.HasInjuryImmune())
-				if(FightingSeriously(src,defender))
+				if(!S.nowound && FightingSeriously(src,defender))
 					//a slice of every hit lands as wounds instead of health - no more coin flips
 					var/desp = clamp(defender.passive_handler.Get("Persistence"), 0.1, glob.MAX_PERSISTENCE_CALCULATED)
 					desp += defender.getDeterminationPersistenceBonus()
@@ -218,7 +226,7 @@ mob
 					defender.WoundSelf(defender.HPToPct((val*woundShare)/sqrt(1+despDiv)))
 					val *= (1 - woundShare)
 
-			if(defender.KO&&!src.Lethal)
+			if(defender.KO&&(!src.Lethal||S.nowound))
 				val=0
 
 			if(defender.CheckSpecial("Kamui Unite") && defender.passive_handler.Get("GodKi") < 1)
@@ -250,13 +258,12 @@ mob
 
 			if(getBackSide(src, defender) && passive_handler["Backshot"])
 				val *= 1 + (passive_handler["Backshot"]/10)
+			if(S.sheathed)
+				val *= 1 + S.sheathed
+			val *= defender.MechTakenMult(src, S) * MechDealtMult(defender, S)
 
 
 
-			if(passive_handler["CoolingDown"])
-				StyleBuff?:hotCold = clamp(StyleBuff?:hotCold - defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
-			else if(passive_handler["HeatingUp"])
-				StyleBuff?:hotCold  = clamp(StyleBuff?:hotCold + defender.HPToPct(val) * glob.HOTNCOLD_MODIFIER, -100, 100)
 			if(passive_handler["Grit"])
 				AdjustGrit("add", HPToPct(val)*glob.racials.GRITMULT)
 			if(passive_handler["BlindingVenom"] && can_use_style_effect("BlindingVenom"))
@@ -293,6 +300,7 @@ mob
 				DEBUGMSG("this is the damage actually dealt: [val]")
 				var/final_damage = max(0,val)
 				defender.LoseHealth(final_damage);
+				defender.MaimCreepHit(src, final_damage)
 				if(defender.passive_handler.Get("LustFactor")) defender.applySinBonusFromTakenDamage(final_damage);
 				if(passive_handler.Get("LustFactor")) applySinBonusFromDealtDamage(final_damage);
 				if(passive_handler.Get("WarmingUp")) applyWarmingUpFromDealtDamage(final_damage)
@@ -370,13 +378,13 @@ mob
 
 
 			var/mortalStrike = GetMortalStrike()
-			if(mortalStrike > 0  && FightingSeriously(src, 0))
-				if(val > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
+			if(!S.nowound && mortalStrike > 0  && FightingSeriously(src, 0))
+				if(defender.HPToPct(val) > clamp(6 / mortalStrike, 3, 20) && prob(25 * mortalStrike))
 					if(!defender.MortallyWounded) // the last time, plus the timer
 						defender.MortallyWounded += 1
 						var/dmg = defender.Health * 0.15
 						defender.LoseHealth(dmg)
-						defender.WoundSelf(dmg)
+						defender.WoundSelf(defender.HPToPct(dmg))
 						OMsg(defender, "<font color='red'><font size=+2><b>[src] mortally wounded [defender] with a devistating attack!</b></font size></font color>")
 			if(passive_handler.Get("Gluttony") && FightingSeriously(src, 0))
 				var/amount = defender.HPToPct(val) * (passive_handler.Get("Gluttony") * SpecialBuff:hungerMult)
@@ -688,7 +696,7 @@ mob
 						if(src.DefStolen>(MDef-1))
 							src.DefStolen=(MDef-1)
 
-			if(FightingSeriously(src,0))
+			if(!S.nowound && FightingSeriously(src,0))
 				var/WoundsInflicted
 				var/obj/Items/Sword/s=src.EquippedSword()
 				var/obj/Items/Enchantment/Staff/st=src.EquippedStaff()
@@ -743,10 +751,10 @@ mob
 				defender.Unconscious(src)
 				if(passive_handler.Get("Twisted Sentimentality") && defender.client)
 					defender.client.PlaySwoon()
-					defender.Maimed+=1
+					defender.MaimApply("Torso", 1)
 					defender.recordMaim(src, "Combat")
 					OMsg(defender, "<font color='red'><font size=+2><b>[defender] got maimed by [src] and couldn't fight anymore...</b></font size></font color>")
-			else if(defender.KO&&src.Lethal)
+			else if(defender.KO&&src.Lethal&&!S.nowound)
 				if(istype(EquippedSword(), /obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin))
 					if(defender.client)
 						var/obj/Items/Sword/Medium/Legendary/WeaponSoul/Blade_of_Ruin/bor=EquippedSword()
@@ -754,6 +762,15 @@ mob
 				if(src.isRace(DEMON)||src.oozaru_type=="Demonic"&&src.transActive)
 					defender<<"Your soul has been irrevocably corrupted, a peaceful afterlife eternally torn from you."
 					defender.Damned=1
+				if(src.Saga == "Path of a Hero: Rebirth" && (RebirthHeroType == "Cyan" || RebirthHeroType == "Purple" || RebirthHeroType == "Prismatic"))
+					OMsg(src, "<b>* [src] won!</b>")
+					OMsg(src, "* Got [defender.GetMoney()]$.")
+					if(src.ViolenceGrowth < src.ViolenceGrowthCap)
+						OMsg(src, "* [src] becomes stronger.")
+						src.VitMod += 0.25
+						src.ViolenceGrowth+=1
+						if(src.ViolenceGrowth>=6)
+							DetachmentProb = 1
 				defender.Death(src, null)
 			if(defender.passive_handler.Get("The Inkstone")&&defender.passive_handler.Get("AbsoluteDespair"))
 				if(prob(2)&& defender.BioArmor)

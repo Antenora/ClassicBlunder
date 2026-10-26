@@ -104,7 +104,7 @@ spaceMaker
 			i = image(icon = option?:icon_to_use, icon_state = "[state]", loc = src, layer = option?:layer_to_use)
 		i.mouse_opacity = 0
 		animate(i, alpha=0)
-		world << i
+		GfxSendImage(i)
 		effects += i
 		animate(i, alpha = 255, time = 10)
 
@@ -117,6 +117,8 @@ spaceMaker
 	overlays = list()
 	for(var/image/i in effects)
 		i.loc = null
+		GfxReleaseImage(i)
+		effects -= i
 	ownerOfEffect = null
 	Deluged = initial(Deluged)
 	

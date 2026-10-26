@@ -78,8 +78,6 @@ ascension
 			postAscension(mob/owner)
 				..()
 				if(owner.CelestialAscension=="Angel")
-					owner.passive_handler.Increase("DoubleStrike", 0.5)
-					owner.passive_handler.Increase("TripleStrike", 0.5)
 					spawn(5)
 						if(owner && owner.client)
 							owner.ChooseCelestialWeapon()

@@ -66,8 +66,6 @@ proc
 
 		if(Attacker.passive_handler["Amplify"])
 			DebuffIntensity += Attacker.passive_handler["Amplify"] * glob.AMPLIFY_MODIFIER
-		if(Attacker.UsingHotnCold())
-			DebuffIntensity += abs(Attacker.StyleBuff?:hotCold)/glob.HOTNCOLD_DEBUFF_DIVISOR
 		var/DamageMod=0
 		if(Defender.Drenched > 0 && (("Lightning" in attackElements) || ("Ice" in attackElements)))
 			DamageMod += glob.DRENCHED_AMP * (Defender.Drenched / 100)
@@ -187,6 +185,7 @@ mob
 				Value *= 1 + Attacker.GetOff(glob.OFF_DEBUFF_RATE)
 			Value /= 1 + src.GetStatusResist()
 			Value /= 1 + src.GetPhysResist()
+			Value *= getBleedResistValue()
 			Value = Value * (1 - (src.Bleed / glob.DEBUFF_STACK_RESISTANCE))
 			src.Bleed += Value
 			if(Value >= 1)
@@ -196,6 +195,9 @@ mob
 				src.Bleed = 100
 			if(src.Bleed < 0)
 				src.Bleed = 0
+
+		getBleedResistValue()
+			return 1
 
 		AddSlow(var/Value, var/mob/Attacker=null)
 			if(src.HasChillImmune())

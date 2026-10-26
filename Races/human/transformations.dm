@@ -110,7 +110,7 @@ transformation
 					form_icon_1.color=list(1,0,0, 0,0.82,0, 0,0,0, -0.26,-0.26,-0.26)
 			transform_animation(mob/user)
 				if(user.BeastUnlocked)
-					if(first_time)
+					if(first_time && !user.OugiLock)
 						user.CutsceneMode()
 						user.BeastAnimation()
 				else

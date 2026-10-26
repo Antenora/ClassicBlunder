@@ -1,0 +1,166 @@
+#if fexists("../../../../Icons/Private/Ougi/jajanken_rock/jjk_aura.dmi") || fexists("Icons/Private/Ougi/jajanken_rock/jjk_aura.dmi")
+#define OUGI_JJK_AURA_ART 'Icons/Private/Ougi/jajanken_rock/jjk_aura.dmi'
+#else
+#define OUGI_JJK_AURA_ART OUGI_ART_FALLBACK
+#endif
+
+#if fexists("../../../../Icons/Private/Ougi/jajanken_rock/jjk_spark.dmi") || fexists("Icons/Private/Ougi/jajanken_rock/jjk_spark.dmi")
+#define OUGI_JJK_SPARK_ART 'Icons/Private/Ougi/jajanken_rock/jjk_spark.dmi'
+#else
+#define OUGI_JJK_SPARK_ART OUGI_ART_FALLBACK
+#endif
+
+#if fexists("../../../../Icons/Private/Ougi/jajanken_rock/jjk_swing.dmi") || fexists("Icons/Private/Ougi/jajanken_rock/jjk_swing.dmi")
+#define OUGI_JJK_SWING_ART 'Icons/Private/Ougi/jajanken_rock/jjk_swing.dmi'
+#else
+#define OUGI_JJK_SWING_ART OUGI_ART_FALLBACK
+#endif
+
+#if fexists("../../../../Icons/Private/Ougi/jajanken_rock/jjk_blast.dmi") || fexists("Icons/Private/Ougi/jajanken_rock/jjk_blast.dmi")
+#define OUGI_JJK_BLAST_ART 'Icons/Private/Ougi/jajanken_rock/jjk_blast.dmi'
+#else
+#define OUGI_JJK_BLAST_ART OUGI_ART_FALLBACK
+#endif
+
+#if fexists("../../../../Icons/Private/Ougi/ougi_focus_gold_S.dmi") || fexists("Icons/Private/Ougi/ougi_focus_gold_S.dmi")
+#define OUGI_JJK_FOCUS_S_ART 'Icons/Private/Ougi/ougi_focus_gold_S.dmi'
+#else
+#define OUGI_JJK_FOCUS_S_ART OUGI_ART_FALLBACK
+#endif
+
+/datum/ougi_scene/authored/jajanken_rock
+	id = "jajanken_rock"
+	category = "Unarmed"
+	stage = "forest_night"
+	length_ds = 139.2
+	climax_ds = 104.2
+	surfaces = list(list("name" = "room ground and plateau rim", "source" = "turf Grass1 + building system rim, forest_night clock fixed at night", "kind" = "stage"), list("name" = "night backdrop", "source" = "forest_night (OUGI_BD_FOREST_NIGHT_ART, Four Skies Night)", "kind" = "stage"), list("name" = "fighters", "source" = "the fighters' own sprites (idle, Attack, KB, KO), scaled and spun", "kind" = "actor"), list("name" = "super flash, W1 wipe, N1 crest plate", "source" = "landed transitions", "kind" = "transition"), list("name" = "Gon's aura, orb with spark arcs, flare, shrink", "source" = "jjk_aura.dmi: crafted from the clip; aura_01 + Aura_Flame_000 veil, Morgana ring rim, Trail_f01 streaks and spark arcs, sf_noise_clouds_01 wobble, flame strokes in the ball \[OWNER approved 2026-10-20]", "kind" = "fx", "match" = list("icon" = OUGI_JJK_AURA_ART)), list("name" = "charge streaks and star", "source" = "charge op: EnergyFX comet charge with reach, Dragon Nova star core \[OWNER approved 2026-10-20]", "kind" = "charge"), list("name" = "rays at the fist and contact", "source" = "SPEEDLINE focus_glow_gold, the landed ougi_focus_gold_S bake", "kind" = "fx", "match" = list("icon" = OUGI_JJK_FOCUS_S_ART)), list("name" = "launch and contact sparks", "source" = "approved_v1 Impact Tier 3 burst, unchanged generator, directions -75 and -30, baked jjk_spark.dmi", "kind" = "fx", "match" = list("icon" = OUGI_JJK_SPARK_ART)), list("name" = "swing arc", "source" = "Eric pack Trail_f01 streaks + sf_noise_clouds_01 breakup warped along the arc (Mech Trails method), jjk_swing.dmi hook slices", "kind" = "trail"), list("name" = "the explosions", "source" = "EnergyFX burst look, Dragon Nova orb row (#ffd23a): radius 6 at the hit, radius 20 for the screen-covering second blast \[OWNER 2026-10-20: use the engine's large orb explosion, scaled]", "kind" = "burst"), list("name" = "shrinking explosion and red sparks", "source" = "jjk_blast.dmi: white-hot orb (approved orb renderer, Morgana ring rim, Aura_Flame_000 strokes) shrinking to nothing; the approved AuraFX spark art (Electro_03 crackles, Electro03 surges) re-rendered larger and recolored crimson and black \[OWNER 2026-10-20]", "kind" = "fx", "match" = list("icon" = OUGI_JJK_BLAST_ART)), list("name" = "lights", "source" = "engine light source (AddLightSource)", "kind" = "light"), list("name" = "hit", "source" = "hit op with ring 0 (damage and climax only)", "kind" = "hit"), list("name" = "whiteouts and gold wash", "source" = "engine flash plate", "kind" = "flash"), list("name" = "held breath", "source" = "tint op, dim matrix", "kind" = "tint"))
+	icon_defines = list("OUGI_JJK_AURA_ART" = OUGI_JJK_AURA_ART, "OUGI_JJK_BLAST_ART" = OUGI_JJK_BLAST_ART, "OUGI_JJK_FOCUS_S_ART" = OUGI_JJK_FOCUS_S_ART, "OUGI_JJK_SPARK_ART" = OUGI_JJK_SPARK_ART, "OUGI_JJK_SWING_ART" = OUGI_JJK_SWING_ART)
+
+/datum/ougi_scene/authored/jajanken_rock/Build()
+	beats = list()
+	B(0, "actor_face", list("who" = "attacker"))
+	B(0, "actor_face", list("who" = "target"))
+	B(0, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 34, "dy" = 0, "time" = 0))
+	B(0, "cam_zoom", list("mag" = 2.4, "time" = 0))
+	B(0, "cam_move", list("to" = "camera", "dx" = -100, "dy" = 18, "time" = 0))
+	B(3, "actor_state", list("who" = "attacker", "state" = "Attack"))
+	B(3, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = 6, "dy" = 0, "time" = 1))
+	B(4, "fx", list("at" = "attacker", "icon" = OUGI_JJK_SPARK_ART, "state" = "launch", "x" = -146, "y" = -91, "life" = 10))
+	B(4, "light", list("at" = "attacker", "radius" = 3, "color" = "#fff2c0", "alpha" = 230, "life" = 3))
+	B(4, "cam_shake", list("strength" = 4, "time" = 2))
+	B(4, "actor_state", list("who" = "target", "state" = "KB"))
+	B(4, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 40, "dy" = 420, "time" = 6))
+	B(4, "actor_turn", list("who" = "target", "angle" = 120, "time" = 1))
+	B(5, "actor_turn", list("who" = "target", "angle" = 240, "time" = 1))
+	B(5, "cam_zoom", list("mag" = 2.2, "time" = 6))
+	B(5, "cam_move", list("to" = "camera", "dx" = -92, "dy" = 46, "time" = 6, "easing" = "sine"))
+	B(6, "actor_turn", list("who" = "target", "angle" = 360, "time" = 1))
+	B(7, "actor_turn", list("who" = "target", "angle" = 480, "time" = 1))
+	B(8, "actor_turn", list("who" = "target", "angle" = 600, "time" = 1))
+	B(9, "actor_turn", list("who" = "target", "angle" = 720, "time" = 1))
+	B(10, "actor_state", list("who" = "attacker", "state" = ""))
+	B(10, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = 0, "dy" = 0, "time" = 2))
+	B(13, "actor_face", list("who" = "attacker", "dir" = EAST))
+	B(13, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "hug", "x" = -88, "y" = -24, "life" = 12, "attach" = 1))
+	B(13, "cam_zoom", list("mag" = 3, "time" = 7))
+	B(13, "cam_move", list("to" = "camera", "dx" = -128, "dy" = -12, "time" = 7, "easing" = "sine"))
+	B(13, "light", list("at" = "attacker", "radius" = 2, "color" = "#ffb43a", "alpha" = 170, "life" = 20))
+	B(20, "cam_zoom", list("mag" = 3, "time" = 5))
+	B(20, "cam_move", list("to" = "camera", "dx" = -128, "dy" = 18, "time" = 5, "easing" = "sine"))
+	B(25, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "swell", "x" = -88, "y" = -24, "life" = 10, "attach" = 1))
+	B(25, "cam_zoom", list("mag" = 2.4, "time" = 10))
+	B(25, "cam_move", list("to" = "camera", "dx" = -128, "dy" = 24, "time" = 10, "easing" = "sine"))
+	B(35, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "dome", "x" = -88, "y" = -24, "life" = 18, "attach" = 1))
+	B(35, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "orb", "x" = -88, "y" = -24, "life" = 18, "attach" = 1))
+	B(35, "cam_zoom", list("mag" = 3, "time" = 5))
+	B(35, "cam_move", list("to" = "camera", "dx" = -114, "dy" = 6, "time" = 5, "easing" = "sine"))
+	B(35, "light", list("at" = "attacker", "radius" = 1, "color" = "#ffd23a", "alpha" = 150, "life" = 10))
+	B(44, "light", list("at" = "attacker", "radius" = 2, "color" = "#ffd23a", "alpha" = 200, "life" = 9))
+	B(52, "cam_zoom", list("mag" = 2.4, "time" = 3))
+	B(52, "cam_move", list("to" = "camera", "dx" = -104, "dy" = 10, "time" = 3, "easing" = "sine"))
+	B(53, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "flare", "x" = -88, "y" = -24, "life" = 5, "attach" = 1))
+	B(53, "light", list("at" = "attacker", "radius" = 4, "color" = "#ff8a2a", "alpha" = 220, "life" = 10))
+	B(56, "cam_zoom", list("mag" = 1.7, "time" = 7))
+	B(56, "cam_move", list("to" = "camera", "dx" = -104, "dy" = 26, "time" = 7, "easing" = "sine"))
+	B(58, "fx", list("at" = "attacker", "icon" = OUGI_JJK_AURA_ART, "state" = "shrink", "x" = -88, "y" = -24, "life" = 12, "attach" = 1))
+	B(63, "light", list("at" = "attacker", "radius" = 2, "color" = "#ff8a2a", "alpha" = 170, "life" = 7))
+	B(70, "tint", list("color" = list(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.58, 0, 0, 0), "actors" = 1, "in" = 1, "hold" = 2, "out" = 1))
+	B(74, "cam_zoom", list("mag" = 1.3, "time" = 4))
+	B(74, "cam_move", list("to" = "camera", "dx" = -100, "dy" = 30, "time" = 4, "easing" = "sine"))
+	B(74, "charge", list("who" = "attacker", "phase" = "build", "dx" = 9, "dy" = -3, "radius" = 10, "color" = "#ffd23a", "time" = 20, "reach" = 300, "core_scale" = 1.4))
+	B(74, "charge", list("who" = "attacker", "phase" = "hold"))
+	B(74, "light", list("at" = "attacker", "radius" = 2, "color" = "#ffd23a", "alpha" = 150, "life" = 10))
+	B(82, "light", list("at" = "attacker", "radius" = 3, "color" = "#ffd23a", "alpha" = 190, "life" = 10))
+	B(84, "cam_zoom", list("mag" = 3, "time" = 6))
+	B(84, "cam_move", list("to" = "camera", "dx" = -119, "dy" = -3, "time" = 6, "easing" = "sine"))
+	B(89, "fx", list("at" = "attacker", "icon" = OUGI_JJK_FOCUS_S_ART, "x" = -215, "y" = -122, "life" = 5))
+	B(90, "light", list("at" = "attacker", "radius" = 3, "color" = "#ffd23a", "alpha" = 230, "life" = 4))
+	B(94, "actor_face", list("who" = "target", "dir" = WEST))
+	B(94, "actor_state", list("who" = "target", "state" = "KB"))
+	B(94, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 70, "dy" = 300, "time" = 0))
+	B(94, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 70, "dy" = 110, "time" = 6))
+	B(94, "actor_turn", list("who" = "target", "angle" = 840, "time" = 1))
+	B(94, "light", list("at" = "attacker", "radius" = 4, "color" = "#fff2c0", "alpha" = 255, "life" = 6))
+	B(94, "cam_zoom", list("mag" = 2, "time" = 0))
+	B(94, "cam_move", list("to" = "camera", "dx" = -70, "dy" = 96, "time" = 0))
+	B(95, "actor_turn", list("who" = "target", "angle" = 960, "time" = 1))
+	B(95, "cam_zoom", list("mag" = 2.2, "time" = 5))
+	B(95, "cam_move", list("to" = "camera", "dx" = -80, "dy" = 56, "time" = 5, "easing" = "sine"))
+	B(96, "actor_turn", list("who" = "target", "angle" = 1080, "time" = 1))
+	B(97, "actor_turn", list("who" = "target", "angle" = 1200, "time" = 1))
+	B(98, "actor_turn", list("who" = "target", "angle" = 1320, "time" = 1))
+	B(99, "actor_turn", list("who" = "target", "angle" = 1440, "time" = 1))
+	B(100, "actor_scale", list("who" = "attacker", "scale" = 3, "time" = 0))
+	B(100, "actor_scale", list("who" = "target", "scale" = 3, "time" = 0))
+	B(100, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = 0, "dy" = 28, "time" = 0))
+	B(100, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 64, "dy" = 150, "time" = 0))
+	B(100, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 64, "dy" = 34, "time" = 4.2))
+	B(100, "actor_turn", list("who" = "target", "angle" = 1530, "time" = 1.05))
+	B(100, "cam_zoom", list("mag" = 3, "time" = 0))
+	B(100, "cam_move", list("to" = "camera", "dx" = -98, "dy" = 44, "time" = 0))
+	B(100, "charge", list("who" = "attacker", "phase" = "off"))
+	B(100, "charge", list("who" = "attacker", "phase" = "build", "dx" = 27, "dy" = -9, "radius" = 30, "color" = "#ffd23a", "time" = 4, "reach" = 200, "core_scale" = 2.5))
+	B(100, "charge", list("who" = "attacker", "phase" = "hold"))
+	B(100, "light", list("at" = "attacker", "radius" = 4, "color" = "#fff2c0", "alpha" = 255, "life" = 8))
+	B(101.05, "actor_turn", list("who" = "target", "angle" = 1620, "time" = 1.05))
+	B(102, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = -6, "dy" = 28, "time" = 1))
+	B(102.1, "actor_turn", list("who" = "target", "angle" = 1710, "time" = 1.05))
+	B(103, "actor_state", list("who" = "attacker", "state" = "Attack"))
+	B(103, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = 6, "dy" = 28, "time" = 1))
+	B(103, "trail", list("who" = "attacker", "path" = list(list(-26, -16), list(-12, -8), list(14, -6), list(40, -7), list(62, -8)), "texture" = OUGI_JJK_SWING_ART, "state" = "hook", "width" = 26, "life" = 7.5, "time" = 1.2, "uv" = "along"))
+	B(103.15, "actor_turn", list("who" = "target", "angle" = 1800, "time" = 1.05))
+	B(104.2, "hit", list("ring" = 0))
+	B(104.2, "actor_face", list("who" = "target", "dir" = WEST))
+	B(104.2, "actor_state", list("who" = "target", "state" = ""))
+	B(104.2, "charge", list("who" = "attacker", "phase" = "implode"))
+	B(104.2, "fx", list("at" = "attacker", "icon" = OUGI_JJK_FOCUS_S_ART, "x" = -182, "y" = -125, "life" = 7))
+	B(104.2, "light", list("at" = "attacker", "radius" = 3, "color" = "#ffffff", "alpha" = 255, "life" = 5))
+	B(104.2, "cam_shake", list("strength" = 10, "time" = 5))
+	B(109.2, "burst", list("at" = "attacker", "radius" = 6, "row" = /obj/Skills/Projectile/Dragon_Nova))
+	B(109.2, "fx", list("at" = "attacker", "icon" = OUGI_JJK_SPARK_ART, "state" = "punch", "x" = -138, "y" = -103, "life" = 10))
+	B(109.2, "fx", list("at" = "attacker", "icon" = OUGI_JJK_BLAST_ART, "state" = "sparks", "x" = -92, "y" = -140, "life" = 4))
+	B(109.2, "charge", list("who" = "attacker", "phase" = "release", "time" = 2))
+	B(109.2, "light", list("at" = "attacker", "radius" = 6, "color" = "#ffffff", "alpha" = 255, "life" = 4))
+	B(109.2, "cam_shake", list("strength" = 6, "time" = 3))
+	B(111.2, "flash", list("color" = "#ffffff", "alpha" = 255, "in" = 1, "hold" = 1, "out" = 1))
+	B(112.2, "actor_scale", list("who" = "attacker", "scale" = 1, "time" = 0))
+	B(112.2, "actor_scale", list("who" = "target", "scale" = 1, "time" = 0))
+	B(112.2, "actor_turn", list("who" = "target", "angle" = 0, "time" = 0))
+	B(112.2, "actor_move", list("who" = "attacker", "to" = "attacker", "dx" = 2, "dy" = 0, "time" = 0))
+	B(112.2, "actor_move", list("who" = "target", "to" = "attacker", "dx" = 20, "dy" = 8, "time" = 0))
+	B(112.2, "actor_state", list("who" = "attacker", "state" = "Attack"))
+	B(112.2, "actor_face", list("who" = "target", "dir" = WEST))
+	B(112.2, "actor_state", list("who" = "target", "state" = ""))
+	B(112.2, "cam_zoom", list("mag" = 1.4, "time" = 0))
+	B(112.2, "cam_move", list("to" = "camera", "dx" = -90, "dy" = 24, "time" = 0))
+	B(112.2, "light", list("at" = "attacker", "radius" = 6, "color" = "#ffd23a", "alpha" = 230, "life" = 6))
+	B(113.2, "cam_zoom", list("mag" = 1, "time" = 5))
+	B(113.2, "cam_move", list("to" = "camera", "dx" = -70, "dy" = 50, "time" = 5, "easing" = "sine"))
+	B(113.7, "fx", list("at" = "attacker", "icon" = OUGI_JJK_BLAST_ART, "state" = "shrink", "x" = -134, "y" = -130, "life" = 14))
+	B(113.7, "light", list("at" = "attacker", "radius" = 3, "color" = "#fff2c0", "alpha" = 230, "life" = 12))
+	B(130.2, "burst", list("at" = "attacker", "radius" = 20, "row" = /obj/Skills/Projectile/Dragon_Nova))
+	B(130.2, "light", list("at" = "attacker", "radius" = 10, "color" = "#fff2c0", "alpha" = 255, "life" = 14))
+	B(130.2, "cam_shake", list("strength" = 5, "time" = 5))
+	B(132.2, "flash", list("color" = "#ffffff", "alpha" = 255, "in" = 6, "hold" = 12, "out" = 0))
+	B(139.2, "hold")

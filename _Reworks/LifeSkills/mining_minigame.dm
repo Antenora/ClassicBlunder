@@ -57,6 +57,7 @@ mob/proc/MiningPayout(obj/LifeSkills/OreNode/N, datum/ore_def/d, perf, obj/Items
 	if(perf < 0.7) q--
 	if(prob(2 * rank)) q++
 	if(tool && prob(tool.QualityBonus)) q++
+	if(prob(LifeGatherQualityChance("Mining"))) q++
 	q = min(q, LifeQualityCap(rank))
 	if(q >= QUAL_LEGENDARY)
 		// legendary never comes easy, even at rank 10
@@ -66,6 +67,7 @@ mob/proc/MiningPayout(obj/LifeSkills/OreNode/N, datum/ore_def/d, perf, obj/Items
 	q = QualityClamp(q)
 
 	var/amt = max(1, round(LIFE_MINING_BASE_YIELD * perf + (tool ? tool.YieldBonus : 0)))
+	amt = LifeBonusRound(amt * LifeYieldMult("Mining"))
 	if(d.kind == "gem")
 		var/shatter_chance = LifeGemShatterChance(rank)
 		var/intact = 0

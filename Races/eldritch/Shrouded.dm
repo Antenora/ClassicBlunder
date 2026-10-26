@@ -32,10 +32,10 @@
     var/SecretInformation/EldritchShrouded/es = GetShroudedDatum()
     if(es)
         if(!es.ShroudedOrigin) selectShroudedStyle();
+        es.ShroudedPassives = list();
         if(es.currentTier >= 1)
             switch(es.ShroudedOrigin)
                 if("Beastkin")
-                    es.ShroudedPassives["DoubleStrike"]=1;
                     es.ShroudedPassives["Fury"]=1;
                     es.ShroudedPassives["Momentum"]=1;
                 if("Human")
@@ -64,7 +64,6 @@
                         es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Honor", "Zeal", "Pride"), 0)
                     if("Namekian")
                         es.ShroudedSubtype = Ask(src, "You've awakened to a deeper understanding of your Origin. But what Origin was it?", "Origin Enhancement", null, "pick", list("Warrior", "Dragon", "Demon"), 0)
-            es.ShroudedPassives = list();
             switch(es.ShroudedSubtype)
                 if("Feathers")
                     es.ShroudedPassives["CriticalDamage"] = 0.15;
@@ -73,6 +72,8 @@
                     es.ShroudedPassives["Harden"] = 2;
                     es.ShroudedPassives["Adrenaline"] = 1;
                 if("Predator")
+                    es.ShroudedPassives["CheapShot"] = 1;
+                    es.ShroudedPassives["FavoredPrey"] = "Mortal";
                 if("Heroism")
                     es.ShroudedPassives["ShonenPower"] = 0.5;
                     es.ShroudedPassives["Persistence"] = 3;
@@ -82,14 +83,18 @@
                     es.ShroudedPassives["Motivation"] = 0.25;
                 if("Honor")
                     es.ShroudedPassives["Juggernaut"] = 2;
+                if("Zeal")
+                    es.ShroudedPassives["ZenkaiPower"] = 0.5;
+                if("Pride")
+                    es.ShroudedPassives["CalmAnger"] = 1;
                 if("Warrior")
                     es.ShroudedPassives["TechniqueMastery"] = 2;
                     es.ShroudedPassives["Tenacity"] = 2;
                 if("Dragon")
                     es.ShroudedPassives["QuickCast"] = 2;
                 if("Demon")
-                    es.ShroudedPassives["Extend"] = 1;
-                    es.ShroudedPassives["Gum Gum"] = 1;
+                    es.ShroudedPassives["Juggernaut"] = 1;
+                    es.ShroudedPassives["LifeGeneration"] = 0.5;
         if(es.currentTier >= 5)
             if(!es.ShroudedMastery)
                 if(es.ShroudedOrigin=="Beastkin") es.ShroudedMastery = "Rifts"
@@ -100,10 +105,8 @@
             src << "You exhibit perfect mastery over your Shrouded Origin!"
             switch(es.ShroudedMastery)
                 if("Rifts")
-                    es.ShroudedPassives["TripleStrike"] = 0.5;
                     es.ShroudedPassives["SoulSteal"] = 0.05;
                     es.ShroudedPassives["AttackSpeed"] = 2;
-                    es.ShroudedPassives["Iaijutsu"] = 2;
                 if("Duplicity")
                     es.ShroudedPassives["ShonenPower"] = 0.5;
                     es.ShroudedPassives["Conductor"] = 20;

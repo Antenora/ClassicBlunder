@@ -18,6 +18,7 @@
 
 	// Int discounts Smithing/Technology rank-ups, Imag discounts, Cooking/Thaumaturgy - 15% per stat point above 1, additive, floored at 10%
 	proc/RankUpRPP(mob/M)
+		if(id == "Technology" || id == "Thaumaturgy") return 0
 		var/base = NextRPP()
 		if(base <= 0 || !M) return base
 		var/stat = 0
@@ -40,7 +41,8 @@
 		if(xp < NextXP())
 			M << "You need [Commas(NextXP() - xp)] more [id] XP to rank up."
 			return 0
-		if(!M.SpendRPP(RankUpRPP(M), "[id] Rank [rank + 1]", Training = 0))
+		var/rppcost = RankUpRPP(M)
+		if(rppcost > 0 && !M.SpendRPP(rppcost, "[id] Rank [rank + 1]", Training = 0))
 			return 0
 		rank++
 		M << "<b>[id] is now Rank [rank] - [Title()]!</b>"

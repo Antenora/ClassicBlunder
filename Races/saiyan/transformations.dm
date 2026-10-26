@@ -592,7 +592,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
 					var/icon/x=new(user.Hair_Base)
@@ -600,9 +600,9 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list("GiantForm" = 1, "Juggernaut" = 1+(mastery/25),  "SweepingStrike" = 1, \
+				passives = list("GiantForm" = 1, "Juggernaut" = 1+(mastery/25), \
 				 "KiControlMastery" = 3 + (mastery/50),\
-				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,  "Reversal" = 0.1 + (mastery/200),\
+				"LifeGeneration" = 1 + round(mastery/50,1), "Unstoppable" = 1,\
 				"Transformation Power" = clamp(user.AscensionsAcquired * 3, 1, 20), \
 				"Flicker" = 5, "Pursuer" = 5, "SSJ4" = 1,"SaiyanPower4"=3)
 				angerFloor = 60
@@ -687,7 +687,7 @@ transformation
 			var/tailWrappedIcon = 'saiyantail-wrapped_ssj4.dmi'
 			form_icon_1_icon = 'GokentoMaleBase_SSJ4.dmi'
 			form_icon_1_layer = FLOAT_LAYER-3
-			passives = list("DisableGodKi" = 1,"GiantForm" = 1, "SweepingStrike" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1,  "Reversal" = 0.3)
+			passives = list("DisableGodKi" = 1,"GiantForm" = 1,   "KiControlMastery" = 3, "LifeGeneration" = 5, "Unstoppable" = 1)
 			adjust_transformation_visuals(mob/user)
 				if(!form_hair_icon&&user.Hair_Base)
 					var/icon/x=new(user.Hair_Base)
@@ -696,7 +696,7 @@ transformation
 				..()
 
 			mastery_boons(mob/user)
-				passives = list( "SweepingStrike" = 1, \
+				passives = list(\
 				"KiControlMastery" = 4, "EnergyGeneration" = 5, \
 				"Flicker" = 5, "Pursuer" = 5, "SSJ4LimitBreaker"=1, "SaiyanPower4"=1)
 
@@ -746,7 +746,7 @@ transformation
 					animate(user, color = user.MobColor, time=20)
 		super_saiyan_god
 			tier = 4
-			passives = list("GodKi" = 0.5, "EnergyGeneration" = 1, "Godspeed" = 4, "Sunyata" = 1 )
+			passives = list("GodKi" = 0.5, "EnergyGeneration" = 1, "Godspeed" = 4)
 			//Meant to be unlocked around the same time as Golden Oozaru
 			//Which is to say, intended at 60 potential, but autogranted at 80.
 			unlock_potential = 80
@@ -765,7 +765,7 @@ transformation
 				angerFloor = 50
 				passives = list("GodKi" = 0.5, "EnergyGeneration" = 3 + round(mastery/10, 1), "Godspeed" = 4,"TechniqueMastery" = 3 + round(mastery/15, 1), \
 								"Pursuer"= 4 , \
-								 "Sunyata" = 1 + round(mastery/20 ,1),"CalmAnger"=1,\
+								 "CalmAnger"=1,\
 								"Flicker" = 4,   "SaiyanPower1"=1)
 			adjust_transformation_visuals(mob/user)
 				if(user.Hair_Base && !form_hair_icon)
@@ -787,7 +787,7 @@ transformation
 					GG.color=list(1,0,0, 0,1,0, 0,0,1, 0.2,0.2,0.4)
 					GG.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 37), size = 5)
 					animate(GG, alpha=0, transform=matrix()*0.7)
-					world << GG
+					GfxSendImage(GG, null, 4)
 					animate(GG, alpha=255, time=30, transform=matrix()*1)
 					animate(user, color = list(0.45,0.6,0.75, 0.64,0.88,1, 0.16,0.21,0.27, 0,0,0), pixel_y=32, time=30)
 					sleep(40)
@@ -796,7 +796,7 @@ transformation
 					GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 					GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(190, 34, 55, 156), size = 3)
 					animate(GO, alpha=0)
-					world << GO
+					GfxSendImage(GO, null, 4)
 					animate(GO, alpha=255, time=40)
 					for(var/mob/Players/T in view(31, user))
 						animate(T.client, color=list(0.5,0,0, 0,0.5,0, 0,0,0.5, 0,0,0.1), time = 40)
@@ -934,7 +934,7 @@ transformation
 						GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 						GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(0, 255, 0, 44), size = 3)
 						animate(GO, alpha=0, transform=matrix(), color=rgb(0, 255, 0, 134))
-						world << GO
+						GfxSendImage(GO, null, 4)
 						animate(GO, alpha=210, time=1)
 						sleep(1)
 						animate(GO, transform=matrix()*3, time=60, easing=BOUNCE_EASING | EASE_IN | EASE_OUT, flags=ANIMATION_END_NOW)
@@ -980,7 +980,7 @@ transformation
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/zeal)
 					passives = list("GodKi" = 0.25,    \
 									"EnergyGeneration" = 3, \
-									"StunningStrike" = 2, "Sunyata" = 3, "InBlueEvolved" = 1)
+									"StunningStrike" = 2, "InBlueEvolved" = 1)
 					speedadd = 0.35
 					enduranceadd = 0.35
 					offenseadd = 0.35
@@ -990,7 +990,7 @@ transformation
 				//evolved: high risk high reward. glass cannon stage that drains heavily
 				if(user.race.ascensions[1].choiceSelected == /ascension/sub_ascension/saiyan/pride)
 					passives = list("GodKi" = 0.5,   "EnergyLeak" = 3, "FatigueLeak"=1,\
-								"Sunyata" = 6, "InBlueEvolved" = 1, "Pursuer" = 2, "PureReduction" = -2)
+								"InBlueEvolved" = 1, "Pursuer" = 2, "PureReduction" = -2)
 					speedadd = 0.5
 					offenseadd = 0.25
 					strengthadd = 0.65
@@ -1045,7 +1045,7 @@ transformation
 				GO.appearance_flags=KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				GO.filters+=filter(type = "drop_shadow", x=0, y=0, color=rgb(0, 255, 0, 44), size = 3)
 				animate(GO, alpha=0, transform=matrix(), color=rgb(0, 255, 0, 134))
-				world << GO
+				GfxSendImage(GO, null, 4)
 				animate(GO, alpha=210, time=1)
 				sleep(1)
 				animate(GO, transform=matrix()*3, time=60, easing=BOUNCE_EASING | EASE_IN | EASE_OUT, flags=ANIMATION_END_NOW)

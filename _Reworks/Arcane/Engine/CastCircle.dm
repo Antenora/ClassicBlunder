@@ -193,6 +193,10 @@ obj/fx_rider/castcircle
 	New(turf/T, element, tier = 1, hold = 0, scale = 0)
 		..(T)
 		icon = CastCircleFile(element)
+		if(CircleFXOn(element))
+			fx_layered = 1
+			fx_el = element
+			icon = CircleFXIcon(element, 1)
 		holding = hold
 		var/s = scale > 0 ? scale : CastCircleScale(tier)
 		if(s != 1)
@@ -203,9 +207,11 @@ obj/fx_rider/castcircle
 		spawn() Run()
 
 	proc/Run()
+		if(fx_layered) CircleFXStart()
 		sleep(glob.CAST_CIRCLE_FORM)
 		if(closing || gone) return
 		icon_state = "hold"
+		if(fx_layered) CircleFXHold()
 		if(holding)
 			if(held_kind) return
 			sleep(glob.CAST_CIRCLE_MAX_HOLD)
@@ -229,6 +235,7 @@ obj/fx_rider/castcircle
 		if(closing) return
 		closing = 1
 		icon_state = "dissolve"
+		if(fx_layered) CircleFXClose()
 		spawn(glob.CAST_CIRCLE_DISSOLVE)
 			caster = null
 			Detach()

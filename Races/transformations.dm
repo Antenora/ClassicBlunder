@@ -145,6 +145,8 @@ transformation
 
 		dropOverlays = 0;
 
+		fakename = 0
+
 	proc
 		adjust_transformation_visuals(mob/user)
 			if(dropOverlays) user.AppearanceOff();
@@ -245,6 +247,17 @@ transformation
 
 			user.potential_trans = user.Potential+pot_trans
 			var/SaiyanTrans=0
+			if(user.isRace(CHANGELING))
+				if(fakename=="Golden")
+					usr.ChangieTrueName=usr.name
+					user.name="Golden [usr.name]"
+				if(fakename=="Black")
+					user.name="Black [usr.ChangieTrueName]"
+				SaiyanTrans=unlock_potential-user.Potential
+				if(user.transActive<=0)
+					user.potential_trans=0
+				if(user.potential_trans<0)
+					user.potential_trans=0
 			if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN))
 				SaiyanTrans=(unlock_potential)-user.Potential
 				if(SaiyanTrans<5*user.transActive)
@@ -330,6 +343,16 @@ transformation
 
 			user.potential_trans = 0
 			var/SaiyanTrans=0
+			if(user.isRace(CHANGELING))
+				if(fakename=="Golden")
+					user.ChangieTrueName=user.name
+				if(fakename=="Black")
+					user.name="Golden [usr.ChangieTrueName]"
+				SaiyanTrans=unlock_potential-user.Potential
+				if(user.transActive<=0)
+					user.potential_trans=0
+				if(user.potential_trans<0)
+					user.potential_trans=0
 			if(user.isRace(SAIYAN)||user.isRace(HALFSAIYAN))
 				SaiyanTrans=unlock_potential-user.Potential
 				if(SaiyanTrans<5*user.transActive)

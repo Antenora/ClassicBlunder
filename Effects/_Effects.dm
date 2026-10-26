@@ -155,7 +155,7 @@ obj/Effects
 		Lifetime=-1
 		icon='BlackHole.dmi'
 		New()
-			if(!src.Password)
+			if(!src.Password && !worldObjectLoading)
 				var/list/Nums=list()
 				for(var/x=1, x<99, x++)
 					Nums.Add(x)

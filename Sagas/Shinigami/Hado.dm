@@ -593,7 +593,7 @@
 		if(src.Using)
 			User << "[src] is on cooldown."
 			return
-		User.Maimed += 1
+		User.MaimApply("Arms", 1)
 		User.recordMaim(User, "Ittō Kasō")
-		User << "The sacrificial flame brands you — you are maimed!"
+		User << "The sacrificial flame brands you - you are maimed!"
 		User.Activate(src)

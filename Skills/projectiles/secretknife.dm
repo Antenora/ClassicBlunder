@@ -63,33 +63,6 @@
 		TrailSize=1
 		Variation=4
 		FlickBlast=0
-	Quincy
-		AttackReplace=1
-		Distance=30
-		ZoneAttack=1
-		Crippling=20
-		Devour=1
-		Explode=2
-		Blasts=20
-		Dodgeable=-1
-		DamageMult=1
-		EndEffectiveness=0.5
-		HyperHoming=1
-		AccMult=2
-		Homing=1
-		HomingCharge=1
-		HomingDelay=1
-		Piercing=1
-		Instinct=3
-		FireFromSelf=1
-		ZoneAttackX=20
-		ZoneAttackY=20
-		IconLock='LightStrike.dmi'
-		IconSize=2
-		Trail='SparkleArcane.dmi'
-		TrailSize=1
-		Variation=1
-		FlickBlast=0
 	Atlatl
 		Blasts=1
 		DamageMult=5

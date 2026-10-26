@@ -27,9 +27,9 @@ mob/proc/MovementSpeed()
 		Delay=0.25
 		if(src.Attracted)
 			Delay*=4
-		return Delay
+		return GunLegacyMoveDelay(Delay)
 	else if(passive_handler.Get("Skimming") + is_dashing)
-		return Delay
+		return GunLegacyMoveDelay(Delay)
 	if(src.HasBlastShielding())
 		Delay*=3
 	if(src.CanBeSlowed())
@@ -69,8 +69,11 @@ mob/proc/MovementSpeed()
 			Delay /= 2
 	if(hasRaindropBody())
 		if(initialDelay < Delay)
-			return initialDelay
-	return Delay
+			return GunLegacyMoveDelay(initialDelay)
+	return GunLegacyMoveDelay(Delay)
+
+mob/var/tmp/MapperWalkLastTurf
+mob/var/tmp/MapperWalkLastBrush
 
 mob/Move()
 	if(src.Suspended || src.ActionLocked)
@@ -108,9 +111,15 @@ mob/Move()
 		src.Grab_Update()
 
 	if(MapperWalk&&!Knockback)
-		if(client?.bsession?.active && client.bsession.brush)
-			client.bsession.WalkPaint()
-		else if(Target&&istype(Target,/obj/Others/Build))
+		var/datum/build_session/WS = client?.bsession
+		if(WS?.active && WS.brush)
+			if(WS.tool == BUILD_PAINT && !WS.dragging && !WS.fillPending && !WS.busy && (loc!=MapperWalkLastTurf || WS.brush!=MapperWalkLastBrush))
+				MapperWalkLastTurf = loc
+				MapperWalkLastBrush = WS.brush
+				WS.WalkPaint()
+		else if(Target&&istype(Target,/obj/Others/Build) && (loc!=MapperWalkLastTurf || Target!=MapperWalkLastBrush))
+			MapperWalkLastTurf = loc
+			MapperWalkLastBrush = Target
 			Build_Lay(Target,src, 0, 0, 0)
 
 	if(AFKTimer==0)

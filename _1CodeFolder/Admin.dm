@@ -107,12 +107,18 @@ mob/Admin3/verb/LoadSwapMap()
 				if(Q.Savable)
 					Q.client.SaveChar()
 			BootWorld("Save")
-			Log("Admin","<font color=blue>[ExtractInfo(usr)] is shutting down the server in 40 seconds.")
-			world<<"<font size=2><font color=#FFFF00>Shutting down in 60 seconds. Please stop all actions at this time."
-			sleep(800)
+			Log("Admin","<font color=blue>[ExtractInfo(usr)] is shutting down the server in 10 seconds.")
+			world<<"<font size=2><font color=#FFFF00>Shutting down in 10 seconds. Please stop all actions at this time."
+			sleep(100)
 		world<<"we get past it all"
 		world<<"araki upscale"
 		sleep(10)
+		if(worldSaveBusy)
+			world << "<small>Server: waiting for the world save in progress to finish before restarting..."
+		WorldSaveLock()
+		if(mapVisWriting)
+			world << "<small>Server: waiting for the map visuals save to finish before restarting..."
+		MapVisWaitWrite()
 		world.Reboot()
 
 
@@ -128,34 +134,6 @@ mob/Admin3/verb/LoadSwapMap()
 	usr << "  T3 Style: 1st=[glob.progress.T3_STYLES[1]]"
 	usr << "  T1 Sig: 1st=[glob.progress.T1_SIGS[1]], 2nd=[glob.progress.T1_SIGS[2]], 3rd=[glob.progress.T1_SIGS[3]]"
 	usr << "  T2 Sig: 1st=[glob.progress.T2_SIGS[1]], 2nd=[glob.progress.T2_SIGS[2]]"
-
-	var/list/stylesByTier = list("1" = list(), "2" = list(), "3" = list())
-	for(var/T in subtypesof(/obj/Skills/Buffs/NuStyle))
-		if(!ispath(T))
-			continue
-		var/obj/Skills/Buffs/NuStyle/probe = new T
-		if(!probe)
-			continue
-		var/sig = probe.SignatureTechnique
-		if(sig == 1 || sig == 2 || sig == 3)
-			var/displayName = probe.name ? probe.name : "[T]"
-			var/passText = ""
-			if(probe.passives && probe.passives.len)
-				for(var/p in probe.passives)
-					passText += "[p]=[probe.passives[p]] "
-			var/list/row = list(
-				"name" = displayName,
-				"path" = "[T]",
-				"str"  = probe.StyleStr,
-				"for"  = probe.StyleFor,
-				"end"  = probe.StyleEnd,
-				"spd"  = probe.StyleSpd,
-				"off"  = probe.StyleOff,
-				"def"  = probe.StyleDef,
-				"passives" = passText
-			)
-			stylesByTier["[sig]"] += list(row)
-		del probe
 
 	var/list/sigsByTier = list("1" = list(), "2" = list())
 	for(var/tierKey in list("1", "2"))
@@ -183,15 +161,6 @@ mob/Admin3/verb/LoadSwapMap()
 				var/list/bundle = v
 				var/list/row = list("name" = k, "path" = "(bundle of [bundle.len] skills)", "cooldown" = null, "manacost" = null, "energycost" = null, "damagemult" = null)
 				sigsByTier[tierKey] += list(row)
-
-	for(var/tier in 1 to 3)
-		var/list/rows = stylesByTier["[tier]"]
-		usr << "<font color='#88ccff'>T[tier] Styles ([rows.len]):</font>"
-		if(!rows.len)
-			usr << "  (none)"
-		else
-			for(var/list/r in rows)
-				usr << "  [r["name"]] | Str=[r["str"] || "-"] For=[r["for"] || "-"] End=[r["end"] || "-"] Spd=[r["spd"] || "-"] Off=[r["off"] || "-"] Def=[r["def"] || "-"] | [r["passives"] || "no passives"]"
 
 	for(var/tierKey in list("1", "2"))
 		var/list/rows = sigsByTier[tierKey]
@@ -227,27 +196,6 @@ mob/Admin3/verb/LoadSwapMap()
 	html += "<tr><td>1st T2 Sig</td><td class='val'>[glob.progress.T2_SIGS[1]]</td></tr>"
 	html += "<tr><td>2nd T2 Sig</td><td class='val'>[glob.progress.T2_SIGS[2]]</td></tr>"
 	html += "</table>"
-	html += "<h2>Styles by Tier</h2>"
-	for(var/tier in 1 to 3)
-		html += "<h3>T[tier] Styles ([stylesByTier["[tier]"].len])</h3>"
-		html += "<table><tr><th>Name</th><th>Type Path</th><th>Str</th><th>For</th><th>End</th><th>Spd</th><th>Off</th><th>Def</th><th>Passives</th></tr>"
-		var/list/rows = stylesByTier["[tier]"]
-		if(!rows.len)
-			html += "<tr><td colspan=9 class='muted'>(no entries)</td></tr>"
-		else
-			for(var/list/r in rows)
-				html += "<tr>"
-				html += "<td>[r["name"]]</td>"
-				html += "<td class='path'>[r["path"]]</td>"
-				html += r["str"] ? "<td class='val'>[r["str"]]</td>" : "<td class='muted'>-</td>"
-				html += r["for"] ? "<td class='val'>[r["for"]]</td>" : "<td class='muted'>-</td>"
-				html += r["end"] ? "<td class='val'>[r["end"]]</td>" : "<td class='muted'>-</td>"
-				html += r["spd"] ? "<td class='val'>[r["spd"]]</td>" : "<td class='muted'>-</td>"
-				html += r["off"] ? "<td class='val'>[r["off"]]</td>" : "<td class='muted'>-</td>"
-				html += r["def"] ? "<td class='val'>[r["def"]]</td>" : "<td class='muted'>-</td>"
-				html += r["passives"] ? "<td class='passives'>[r["passives"]]</td>" : "<td class='muted'>-</td>"
-				html += "</tr>"
-		html += "</table>"
 	html += "<h2>Sigs by Tier</h2>"
 	for(var/tierKey in list("1", "2"))
 		html += "<h3>T[tierKey] Sigs ([sigsByTier[tierKey].len])</h3>"
@@ -276,24 +224,11 @@ mob/Admin3/verb/LoadSwapMap()
 	set desc = "Edit a scalar var on a T1/T2/T3 Style or T1/T2 Sig template + propagate to live instances."
 	var/Choice=Ask(usr, "Are you sure you want to tweak style sig vars?", "Tweak", null, "pick", list("Yes", "No"), 0)
 	if(Choice=="No") return
-	var/category = Ask(usr, "Pick a category to tweak.", "Tweak Style/Sig", null, "pick", list("T1 Style", "T2 Style", "T3 Style", "T1 Sig", "T2 Sig"), 1)
+	var/category = Ask(usr, "Pick a category to tweak.", "Tweak Style/Sig", null, "pick", list("T1 Sig", "T2 Sig"), 1)
 	if(!category)
 		return
 	var/list/typeChoices = list()
-	if(category == "T1 Style" || category == "T2 Style" || category == "T3 Style")
-		var/wantTier = 1
-		if(category == "T2 Style")
-			wantTier = 2
-		else if(category == "T3 Style")
-			wantTier = 3
-		for(var/T in subtypesof(/obj/Skills/Buffs/NuStyle))
-			if(!ispath(T))
-				continue
-			var/obj/Skills/Buffs/NuStyle/probe = new T
-			if(probe.SignatureTechnique == wantTier)
-				typeChoices["[T]"] = T
-			del probe
-	else if(category == "T1 Sig")
+	if(category == "T1 Sig")
 		for(var/k in Tier1)
 			var/v = Tier1[k]
 			if(istext(v))
@@ -463,9 +398,10 @@ mob/Admin2/verb
 			if("Maim")
 				var/Time = RawHours(6)
 				Time /= m.GetRecov()
-				m.Maimed += 1
-				if(m.Maimed > 4)
-					m.Maimed = 4
+				var/part = m.MaimPickPart(usr, "Give Wound")
+				if(!part)
+					return
+				m.MaimApply(part, 1)
 				m.BPPoisonTimer = Time
 				m.BPPoison = 0.5
 				m.recordMaim(usr, "Admin")
@@ -553,6 +489,7 @@ mob/Admin3/verb
 		if(Choice=="No") return
 		if(val&&m)
 			m.Potential+=val
+			m.StyleStageRefresh()
 			m.PotentialCap+=val
 			if(m.isRace(/race/demi_fiend))
 				m.refreshMagatama()
@@ -1244,19 +1181,16 @@ mob/Admin3/verb
 		var/Mode=Ask(usr, "Are you adding, removing, or viewing [m]'s unlocked technology?", "Tech Unlock", null, "pick", list("Cancel", "Add", "Remove", "View"), 0)
 		if(Mode=="Cancel")
 			return
+		if(length(TechnologyTree) < 1)
+			fillOutTechTree()
 		switch(Mode)
 			if("Add")
-				var/list/Options=list("Cancel",
-				"Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing",
-				"Molecular Technology", "Light Alloys", "Shock Absorbers", "Advanced Plating", "Modular Weaponry",
-				"Medkits", "Fast Acting Medicine", "Enhancers", "Anesthetics", "Automated Dispensers",
-				"Regenerator Tanks", "Prosthetic Limbs", "Genetic Manipulation", "Regenerative Medicine", "Revival Protocol",
-				"Wide Area Transmissions", "Espionage Equipment", "Surveilance", "Drones", "Local Range Devices",
-				"Scouters", "Obfuscation Equipment", "Satellite Surveilance", "Combat Scanning", "EM Wave Projectors",
-				"Hazard Suits", "Force Shielding", "Jet Propulsion", "Power Generators", "Space Travel",
-				"Android Creation", "Conversion Modules", "Enhancement Chips", "Involuntary Implantation", "Self Augmentation",
-				"Assault Weaponry", "Missile Weaponry", "Melee Weaponry", "Thermal Weaponry", "Blast Shielding",
-				"Powered Armor Specialization", "Armorpiercing Weaponry", "Impact Weaponry", "Hydraulic Weaponry","Vehicular Power Armor",
+				var/list/Options=list("Cancel")
+				for(var/n in TechnologyTree)
+					var/knowledgePaths/tech/node = TechnologyTree[n]
+					if(node && node.name != "Not Obtainable")
+						Options |= node.name
+				Options |= list(
 				"Healing Herbs", "Refreshment Herbs", "Magic Herbs", "Toxic Herbs", "Philter Herbs",
 				"Stimulant Herbs", "Relaxant Herbs", "Numbing Herbs", "Distillation Process", "Mutagenic Herbs",
 				"Spell Focii", "Artifact Manufacturing", "Magical Communication", "Magical Vehicles", "Warding Glyphs",
@@ -1269,7 +1203,11 @@ mob/Admin3/verb
 				var/Choice=Ask(usr, "What breakthrough do you want to grant to [m]?", "Tech Unlock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
-				m.knowledgeTracker.learnedKnowledge.Add(Choice)
+				var/knowledgePaths/tech/grant = TechnologyTree[Choice]
+				if(grant)
+					m.UnlockTech(grant, "Technology")
+				else
+					m.knowledgeTracker.learnedKnowledge.Add(Choice)
 				Log("Admin", "[ExtractInfo(usr)] unlocked [Choice] knowledge breakthrough from [ExtractInfo(m)]!")
 			if("Remove")
 				var/list/Options=list("Cancel")
@@ -1281,7 +1219,11 @@ mob/Admin3/verb
 				var/Choice=Ask(src, "What breakthrough are you removing from [m]?", "Tech Lock", null, "pick", Options, 0)
 				if(Choice=="Cancel")
 					return
-				m.knowledgeTracker.learnedKnowledge.Remove(Choice)
+				var/knowledgePaths/tech/lose = TechnologyTree[Choice]
+				if(lose)
+					m.RemoveTech(lose, "Technology")
+				else
+					m.knowledgeTracker.learnedKnowledge.Remove(Choice)
 				Log("Admin", "[ExtractInfo(src)] removed [Choice] knowledge breakthrough from [ExtractInfo(m)]!")
 			if("View")
 				src << "[m]'s Unlocked Breakthroughs:"
@@ -1662,9 +1604,7 @@ mob/Admin2/verb
 				Log("Admin", "[ExtractInfo(usr)] removed [ExtractInfo(A)]'s wounds.")
 				A << "Your wounds have been reduced."
 			if("Remove 1 Maim")
-				A.Maimed -= 1
-				if(A.Maimed < 0)
-					A.Maimed = 0
+				A.MaimPeel()
 				Log("Admin", "[ExtractInfo(usr)] repaired [ExtractInfo(A)]'s maim wound.")
 				A << "Your maim wound has been repaired!"
 	AdminRevive()
@@ -1700,6 +1640,7 @@ mob/Admin2/verb
 		M.RPPSpendable=getMaxPlayerRPP()
 		M.PotentialRate=0
 		M.Potential=Ask(src, "What potential do you want to set [M] to?", "Set Potential", null, "num", null, 0)
+		M.StyleStageRefresh()
 		if(M.isRace(/race/demi_fiend))
 			M.refreshMagatama()
 		M.ECCHARACTER=TRUE
@@ -1711,6 +1652,7 @@ mob/Admin2/verb
 		if(!src.Alert("Are you sure you want to Head Start Setup someone?")) return
 		M.PotentialHeadStart=Ask(src, "What potential do you want to set [M] to?", "Set Head Start Potential", null, "num", null, 0)
 		M.Potential=M.PotentialHeadStart
+		M.StyleStageRefresh()
 		M.RPPHeadStart=Ask(src, "What RPP cap do you want to set [M] to?", "Set Head RPP ", null, "num", null, 0)
 		M.RPPHeadStart*=src.RPPMult
 		M.RPPCurrent=M.RPPHeadStart
@@ -2192,11 +2134,17 @@ mob/Admin3/verb
 				if(Q.Savable)
 					Q.client.SaveChar()
 			BootWorld("Save")
-			Log("Admin","<font color=blue>[ExtractInfo(usr)] is shutting down the server in 60 seconds.")
-			world<<"<font size=2><font color=#FFFF00>Shutting down in 60 seconds. Please stop all actions at this time."
-			sleep(600)
+			Log("Admin","<font color=blue>[ExtractInfo(usr)] is shutting down the server in 10 seconds.")
+			world<<"<font size=2><font color=#FFFF00>Shutting down in 10 seconds. Please stop all actions at this time."
+			sleep(100)
 			world<<"we get past it all"
 			world<<"araki upscale"
+			if(worldSaveBusy)
+				world << "<small>Server: waiting for the world save in progress to finish before shutting down..."
+			WorldSaveLock()
+			if(mapVisWriting)
+				world << "<small>Server: waiting for the map visuals save to finish before shutting down..."
+			MapVisWaitWrite()
 			shutdown()
 
 	SaveWorld()
@@ -2210,9 +2158,7 @@ mob/Admin3/verb
 	SaveTurfsObjs()
 		set category="Admin"
 		if(!src.Alert("Are you sure you want to save turf objects?")) return
-		find_savableObjects()
-		Save_Turfs()
-		Save_Objects()
+		BuildSaveWorldData()
 		Log("Admin","<font color=blue>[ExtractInfo(usr)] has saved turfs and objects in world.")
 	Set_Base()
 		set category="Admin"
@@ -2443,10 +2389,11 @@ mob/Admin4/verb
 						M.GiveMoney(amount)
 					if("Potential")
 						M.Potential += amount
+						M.StyleStageRefresh()
 					if("Power Level")
 						M.Power += amount
 					if("Health")
-						M.HealPct(amount)
+						M.Health += M.PctToHP(amount)
 					if("Energy (Current)")
 						M.Energy += amount
 					if("Energy (Max)")
@@ -2937,6 +2884,9 @@ atom/Topic(A,B[])
 					gm.GiveOrDrop(gaveobj)
 				else
 					src.contents += gaveobj
+					if(ismob(src))
+						var/mob/ougi_gm = src
+						ougi_gm.OugiSecretSync()
 				if(istype(variable, /obj/Skills))
 					var/mob/m = src
 					if(istype(variable, /obj/Skills/Queue))

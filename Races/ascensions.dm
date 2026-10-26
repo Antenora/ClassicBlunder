@@ -113,7 +113,8 @@ ascension
 
 			owner.RPPMult -= rppAdd
 			owner.EconomyMult -= ecoAdd
-			owner.PilotingProwess -= pilotingProwess
+
+			owner.PilotProwessRefresh(-pilotingProwess)
 			owner.EnhanceChipsMax -= enhanceChips
 			owner.AscensionsAcquired-=1
 
@@ -166,7 +167,7 @@ ascension
 
 			owner.RPPMult += rppAdd
 			owner.EconomyMult += ecoAdd
-			owner.PilotingProwess += pilotingProwess
+			owner.PilotProwessRefresh(pilotingProwess)
 			owner.EnhanceChipsMax += enhanceChips
 			owner.GrowthRate += growthadd
 
@@ -196,6 +197,9 @@ ascension
 			pickingChoice = FALSE
 
 		checkAscensionUnlock(mob/target,potential)
+			for(var/ascension/a in target.race.ascensions)
+				if(a == src) break
+				if(!a.applied) return 0
 			if(target.AscensionsUnlocked > target.AscensionsAcquired) return 1
 			if(unlock_potential==-1 || applied) return 0
 			if(potential >= unlock_potential)

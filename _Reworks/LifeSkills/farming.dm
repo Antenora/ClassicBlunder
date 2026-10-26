@@ -22,10 +22,11 @@ proc/FarmDayFrac()
 	var/giantable = 0
 	var/mtype            // /obj/Items/Material/Crop path
 	var/gtype            // giant material path (if giantable)
+	var/canbuy = 1 // set to 0 if you can't buy it from a stall
 
 var/list/FarmCropDefs = list()   // id -> datum, registration order
 
-proc/LifeCropAdd(id, name, tier, base_days, multi, giantable)
+proc/LifeCropAdd(id, name, tier, base_days, multi, giantable, canbuy = 1)
 	var/datum/farm_crop/d = new
 	d.id = id
 	d.name = name
@@ -34,6 +35,7 @@ proc/LifeCropAdd(id, name, tier, base_days, multi, giantable)
 	d.multi = multi
 	d.giantable = giantable
 	d.mtype = text2path("/obj/Items/Material/Crop/[id]")
+	d.canbuy = canbuy
 	if(giantable) d.gtype = text2path("/obj/Items/Material/Crop/giant_[id]")
 	FarmCropDefs[id] = d
 
@@ -73,6 +75,7 @@ proc/RegisterFarmCrops()
 	LifeCropAdd("watermelon", "Watermelon", 5, 6, 0, 0)
 	LifeCropAdd("grapes", "Blue Grapes", 5, 6, 1, 0)
 	LifeCropAdd("artichoke", "Artichoke", 5, 6, 0, 0)
+	LifeCropAdd("senzu", "Senzu Bean", 6, 7, 0, 0, 0) // crafted with thaumaturgy
 
 // crop materials
 
@@ -111,12 +114,65 @@ proc/RegisterFarmCrops()
 /obj/Items/Material/Crop/watermelon { name = "Watermelon"; MaterialClass = "Watermelon"; icon_state = "watermelon"; tier = 5 }
 /obj/Items/Material/Crop/grapes { name = "Blue Grapes"; MaterialClass = "BlueGrapes"; icon_state = "grapes"; tier = 5 }
 /obj/Items/Material/Crop/artichoke { name = "Artichoke"; MaterialClass = "Artichoke"; icon_state = "artichoke"; tier = 5 }
+/obj/Items/Material/Crop/senzu { name = "Senzu Bean"; MaterialClass = "SenzuBean"; icon_state = "artichoke"; tier = 5 }
 
 /obj/Items/Material/Crop/giant_cabbage { name = "Giant Cabbage"; MaterialClass = "GiantCabbage"; icon_state = "cabbage"; tier = 5 }
 /obj/Items/Material/Crop/giant_cucumber { name = "Giant Cucumber"; MaterialClass = "GiantCucumber"; icon_state = "cucumber"; tier = 5 }
 /obj/Items/Material/Crop/giant_pumpkin { name = "Giant Pumpkin"; MaterialClass = "GiantPumpkin"; icon_state = "pumpkin"; tier = 5 }
 /obj/Items/Material/Crop/giant_tomato { name = "Giant Tomato"; MaterialClass = "GiantTomato"; icon_state = "tomato"; tier = 5 }
 /obj/Items/Material/Crop/giant_zucchini { name = "Giant Zucchini"; MaterialClass = "GiantZucchini"; icon_state = "zucchini"; tier = 5 }
+
+/obj/Items/Edibles/Senzu
+	icon = 'Senzu.dmi'
+	icon_state = ""
+	Pickable = 1
+	Click()
+		if(!(usr in oview(1,src))&&!(src in usr))
+			return
+		var/RacialHunger=1
+		if(usr.race in list(SAIYAN))
+			RacialHunger=5
+		if(usr.race in list(MAJIN,WILDER,DEMON))
+			RacialHunger=20
+		if(usr.EnhancedSmell)
+			RacialHunger*=2
+		if(usr.Satiated>=4000*RacialHunger)
+			usr << "You are completely full!"
+			return
+		OMsg(usr, "eats the bean; its rejuvenating power heals them fully!")
+		usr.Satiated+=6000
+		usr.HealWounds(12)
+		usr.HealFatigue(12)
+		usr.Sheared=0
+		usr.TotalInjury=0
+		usr.TotalFatigue=0
+		usr.TotalCapacity=0
+		usr.HealHealth(100)
+		usr.HealEnergy(100)
+		usr.HealMana(100)
+		usr.StrTax=0
+		usr.ForTax=0
+		usr.EndTax=0
+		usr.SpdTax=0
+		usr.OffTax=0
+		usr.DefTax=0
+		usr.HealthCut=0
+		if(usr.GatesNerf)
+			usr.GatesNerf=1
+		if(usr.OverClockTime)
+			usr.OverClockTime=1
+		if(usr.BPPoison<1)
+			usr.BPPoison=1
+			usr.BPPoisonTimer=0
+		if(usr.Maimed)
+			usr.MaimPeel()
+			usr << "You recover from a maiming!"
+		if(usr.SenseRobbed)
+			if(usr.SenseRobbed>=5)
+				animate(usr.client, color=null, time=1)
+			usr.SenseRobbed=0
+			usr << "You regain lost senses!"
+		del(src)
 
 // farm tools
 
@@ -378,22 +434,29 @@ mob/proc/HarvestPlot(obj/LifeSkills/FarmPlot/P)
 	var/rank = LifeRank("Farming")
 	var/datum/life_opp/o = LifeOppRoll("Farming", d.tier, null, QUAL_NORMAL, "farm_mod")
 	var/amt = rand(3, 5) + round(rank / 3)
+	amt = LifeBonusRound(amt * LifeYieldMult("Farming"))
 	if(prob(2 + rank))
 		amt *= 2
 		src << "<font color=#78eb78>A bumper crop!</font>"
 	if(o) amt = max(amt + 1, round(amt * o.mag / 10))   // mag 15/20/30 = x1.5/x2/x3
+	if(P.crop_id == "senzu") amt = rand(1, 3)
 	var/q = QUAL_NORMAL
 	if(prob(2 * rank)) q++
 	if(o && o.id == "mutant_growth") q++
 	q = min(q, LifeQualityCap(rank))
-	GiveMaterial(src, d.mtype, amt, q)
-	LifeLogFind("Farming", d.name)
-	src << "<font color=#78eb78>You harvest [amt]x [QualityName(q)] [d.name].</font>"
-	if(P.will_giant && d.gtype)
-		GiveMaterial(src, d.gtype, 1, min(QUAL_EPIC, LifeQualityCap(rank)))
-		LifeLogFind("Farming", "Giant [d.name]")
-		src << "<font color=#b46bff><b>You heave up a Giant [d.name]!</b></font>"
-	if(prob(30)) FarmGiveSeeds(P.crop_id, 1 + (prob(25) ? 1 : 0))
+	if(P.crop_id == "senzu")
+		for(var/i = 1, i <= amt, i++)
+			new /obj/Items/Edibles/Senzu(src)
+		src << "<font color=#78eb78>You harvest [amt]x [d.name].</font>"
+	else
+		GiveMaterial(src, d.mtype, amt, q)
+		LifeLogFind("Farming", d.name)
+		src << "<font color=#78eb78>You harvest [amt]x [QualityName(q)] [d.name].</font>"
+		if(P.will_giant && d.gtype)
+			GiveMaterial(src, d.gtype, 1, min(QUAL_EPIC, LifeQualityCap(rank)))
+			LifeLogFind("Farming", "Giant [d.name]")
+			src << "<font color=#b46bff><b>You heave up a Giant [d.name]!</b></font>"
+		if(prob(30)) FarmGiveSeeds(P.crop_id, 1 + (prob(25) ? 1 : 0))
 	AddLifeXP("Farming", LifeGatherXP("Farming", d.tier), 1.0)
 	P.harvests_left--
 	if(P.harvests_left > 0)
@@ -563,7 +626,10 @@ client/proc/RefreshFarmPanel()
 	FpText(0, 12, FP_W, 16, "<center><span style=\"[FP_FONT]; color:#8be9ff\">[farm_mode == "shop" ? "SEED STALL" : "PLANT A SEED"]</span></center>")
 	farm_rows = list()
 	if(farm_mode == "shop")
-		for(var/id in FarmCropDefs) farm_rows += id
+		for(var/id in FarmCropDefs)
+			var/datum/farm_crop/d = FarmCropDef(id)
+			if(!d || !d.canbuy) continue
+			farm_rows += id
 	else
 		for(var/id in FarmCropDefs)
 			if(M.FarmSeedCount(id) > 0) farm_rows += id
@@ -620,6 +686,7 @@ client/proc/FarmRowClick(id)
 		M << "<font color=#ff6464>You need Farming rank [LIFE_HUNT_DIFF(d.tier) - 1] for [d.name].</font>"
 		return
 	if(farm_mode == "shop")
+		if(!d.canbuy) return
 		var/price = FarmSeedPrice(d)
 		if(!M.HasMoney(price))
 			M << "<font color=#ff6464>You can't afford [d.name] seeds. ($[Commas(price)])</font>"

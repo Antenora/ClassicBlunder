@@ -18,12 +18,12 @@ proc
 			i.appearance_flags=KEEP_APART | RESET_COLOR | RESET_ALPHA
 		i.transform*=Size
 		i.alpha=0
-		world << i
+		GfxSendImage(i, null, GfxBcImageReach(i))
 		animate(i, alpha=255, time=2)
 		sleep(Time)
 		animate(i, alpha=0, time=2)
 		sleep(2)
-		for(var/client/C) C.images -= i //broadcast image: pull from every client, never del (world scan)
+		GfxReleaseImage(i)
 	LeaveDescendingImage(var/mob/Players/User=0, var/Image, var/PX=0, var/PY=0, var/PZ=0, var/Size=1, var/Under=0, var/Time, var/turf/AltLoc=0, var/Dir=SOUTH)
 		var/image/i
 		if(User&&!AltLoc)
@@ -41,14 +41,14 @@ proc
 			i.appearance_flags=KEEP_APART | RESET_COLOR | RESET_ALPHA
 		i.transform*=Size
 		i.alpha=0
-		world << i
+		GfxSendImage(i, null, GfxBcImageReach(i))
 
 		animate(i, alpha=255, time=2)
 		animate(i, pixel_z=0, time=Time)
 		sleep(Time)
 		animate(i, alpha=0, time=2)
 		sleep(2)
-		for(var/client/C) C.images -= i //broadcast image: pull, never del
+		GfxReleaseImage(i)
 
 	WaveTrail(trail, p_x, p_y, Dir, turf/location, time, size, state)
 		var/image/i=image(trail, pixel_x=p_x, pixel_y=p_y, dir=Dir, icon_state=state)
@@ -97,18 +97,17 @@ proc
 		i.plane=1
 		i2.plane=1
 		i3.plane=1
-		world << i
-		world << i2
-		world << i3
+		GfxSendImage(i)
+		GfxSendImage(i2)
+		GfxSendImage(i3)
 		spawn(time)
 			animate(i, alpha=0, time=2)
 			animate(i2, alpha=0, time=2)
 			animate(i3, alpha=0, time=2)
 			sleep(2)
-			for(var/client/C) //broadcast images: pull from clients, never del (fires per wave segment)
-				C.images -= i
-				C.images -= i2
-				C.images -= i3
+			GfxReleaseImage(i)
+			GfxReleaseImage(i2)
+			GfxReleaseImage(i3)
 
 
 	LeaveTrail(var/Trail, var/PX=0, var/PY=0, var/Dir, var/turf/Location, var/Time, var/Size, var/State)
@@ -117,12 +116,12 @@ proc
 		var/image/i=image(Trail, pixel_x=PX, pixel_y=PY, dir=Dir, icon_state=State)
 		i.transform*=Size
 		i.plane=1
-		world << i
 		i.loc=Location
+		GfxSendImage(i)
 		spawn(Time)
 			animate(i, alpha=0, time=2)
 			sleep(2)
-			for(var/client/C) C.images -= i //broadcast image: pull, never del
+			GfxReleaseImage(i)
 
 	Jump(var/mob/User, var/UpTime=3, var/FloatTime=0, var/DownTime=2)
 		set waitfor = 0
@@ -461,17 +460,20 @@ proc
 			Target.Stasis=100
 			animate(Target, alpha=0, time=30)
 			spawn(30)
+				if(!Target) return
 				var/z=15
 				for(var/mob/m in view(10,Target))
 					m<<"[Target] was cast out to another dimension!"
 				Target.loc=locate(Target.x,Target.y,z)
 				spawn(5)
+					if(!Target) return
 					animate(Target, alpha=255, time=5)
 					Target.Stasis=0
 		else if(EffectType==2)
 			Target.Stasis=100
 			animate(Target, color = list(1,0,0, 0,1,0, 0,0,1, 1,1,1),time=2)
 			spawn(3)
+				if(!Target) return
 				animate(Target, color=null, time=1)
 				Target.Stasis=0
 				if(Target.z!=12)
@@ -481,42 +483,52 @@ proc
 					Target.loc=locate(144,50,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Hell)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(116,82,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Spectres)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(144,82,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Beasts)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(171,82,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Humans)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(116,50,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Demons)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(171,50,12)
 					Target.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Autonomous/Punishment_of_Heaven)
 					sleep(10)
+					if(!Target) return
 					Target.loc=locate(Target.PrevX,Target.PrevY,Target.PrevZ)
 		else if(EffectType==3)
 			spawn()
-				RecoverImage(Target)
+				if(Target) RecoverImage(Target)
 			spawn(2)
-				RecoverImage(Target)
+				if(Target) RecoverImage(Target)
 			spawn(4)
-				RecoverImage(Target)
+				if(Target) RecoverImage(Target)
 			sleep(12)
+			if(!Target) return
 			Target.Leave_Body(ForceVoid=1.5)
 		else if(EffectType==4)
 			Target.Stasis=100
 			sleep(30)
+			if(!Target) return
 			animate(Target, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,1), time=3)
 			sleep(3)
+			if(!Target) return
 			animate(Target, alpha=0, time=2)
 			var/z=pick(2,3,5,6)
 			for(var/mob/m in view(10,Target))
 				m<<"[Target] was cast out to another dimension!"
 			Target.loc=locate(Target.x,Target.y,z)
 			spawn(5)
+				if(!Target) return
 				animate(Target, color=Target.MobColor, alpha=255)
 				Target.Stasis=0
 
@@ -547,7 +559,7 @@ proc
 		i.dir = m.dir
 		i.mouse_opacity = 0
 		animate(i, alpha=0)
-		world << i
+		GfxSendImage(i)
 		if(Shift=='Icons/Turfs/GalSpace.dmi')
 			i.icon_state = "[rand(1,25)]"
 		if(Shift=='StarPixel.dmi')
@@ -569,7 +581,7 @@ proc
 		spawn(10+Time)
 			animate(i, alpha=0, time=Despawn)
 			sleep(10)
-			for(var/client/C) C.images -= i //broadcast image: unhook from clients, del would world-scan
+			GfxReleaseImage(i)
 
 	InstantTurfShift(var/Shift, var/turf/t, var/Time=30, var/mob/m, var/layer=MOB_LAYER-0.5, var/Spawn=10, var/Despawn=10,var/state, _piX, piY)
 		if(!m) return
@@ -577,7 +589,7 @@ proc
 		i.dir = m.dir
 		i.mouse_opacity = 0
 		i.alpha = 160
-		world << i
+		GfxSendImage(i)
 		if(Shift=='Icons/Turfs/GalSpace.dmi')
 			i.icon_state = "[rand(1,25)]"
 		if(Shift=='StarPixel.dmi')
@@ -599,7 +611,7 @@ proc
 		spawn(10)
 			animate(i, alpha=0, time=Despawn)
 			sleep(10)
-			for(var/client/C) C.images -= i
+			GfxReleaseImage(i)
 
 
 	Crater(atom/A, Size=1)
@@ -684,24 +696,24 @@ mob/proc
 	ForceField()
 		var/image/FF=image('Force Field.dmi',pixel_x=0,pixel_y=0, loc = src)
 		FF.blend_mode=2
-		world << FF
+		GfxSendImage(FF)
 		animate(FF, alpha=0, time=0)
 		animate(FF, alpha=175, time=5)
 		sleep(10)
 		animate(FF, alpha=0, time=5)
 		sleep(5)
-		for(var/client/C) C.images -= FF
+		GfxReleaseImage(FF)
 		src.Shielding=0
 	AvalonField()
 		var/image/FF=image('AvalonMode.dmi',pixel_x=0,pixel_y=0, loc = src)
 		FF.blend_mode=2
-		world << FF
+		GfxSendImage(FF)
 		animate(FF, alpha=0, time=0)
 		animate(FF, alpha=175, time=5)
 		sleep(10)
 		animate(FF, alpha=0, time=5)
 		sleep(5)
-		for(var/client/C) C.images -= FF
+		GfxReleaseImage(FF)
 		src.Shielding=0
 
 	FlickeringGlow(var/mob/m, var/list/Glow = list(1,0.8,0.8, 0,1,0, 0.8,0.8,1, 0,0,0))
@@ -771,7 +783,7 @@ mob/proc
 		i.icon_state="Form"
 		i2.appearance_flags=KEEP_APART | RESET_ALPHA | RESET_COLOR
 		i2.icon_state=""
-		world << i
+		GfxSendImage(i)
 		animate(i, alpha=0)
 		if(Z=="Form")
 			src.overlays-=i2
@@ -779,13 +791,13 @@ mob/proc
 			animate(i, alpha=255)
 			spawn(9)
 				src.overlays+=i2
-				for(var/client/C) C.images -= i
+				GfxReleaseImage(i)
 		if(Z=="Thaw")
 			src.overlays-=i2
 			animate(i, alpha=255)
 			i.icon_state="Thaw"
 			spawn(6)
-				for(var/client/C) C.images -= i
+				GfxReleaseImage(i)
 				src.StasisFrozen=0
 
 	flash(dur, _color, rampup)

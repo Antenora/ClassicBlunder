@@ -36,7 +36,6 @@ var/list/Tier1 = list(
 	"Nirvana Slash" = "/obj/Skills/Queue/Nirvana_Slash",
 	"Soul Tear Storm" = "/obj/Skills/Queue/Soul_Tear_Storm",
 	"Massacre" = "/obj/Skills/AutoHit/Massacre",
-	"Spirit Bow" = "/obj/Skills/Buffs/SlotlessBuffs/Spirit_Bow",
 	"Spirit Sword" = "/obj/Skills/Buffs/SlotlessBuffs/Spirit_Sword"
 )
 
@@ -76,7 +75,6 @@ var/list/Tier3 = list(
 	"Hollow Shell Kata" = "/obj/Skills/Buffs/SpecialBuffs/Unarmed/Hollow_Shell_Kata",
 	"Sky Emperor's Walk" = "/obj/Skills/Buffs/SpecialBuffs/Unarmed/Sky_Emperor_Walk",
 	"Ghost Install" = "/obj/Skills/Buffs/SpecialBuffs/Unarmed/Ghost_Install",
-	"Spirit Pulse" = "/obj/Skills/Buffs/SpecialBuffs/Spirit_Pulse",
 	"Spirit Burst" = "/obj/Skills/Buffs/SpecialBuffs/Spirit_Burst",
 	"Limit Breaker" = "/obj/Skills/Buffs/SpecialBuffs/Limit_Breaker",
 	"Trance Form" = "/obj/Skills/Buffs/SpecialBuffs/Trance_Form",
@@ -85,7 +83,9 @@ var/list/Tier3 = list(
 	"Sword Saint" = "/obj/Skills/Buffs/SpecialBuffs/Sword/SwordSaint",
 	"Prana Burst" = "/obj/Skills/Buffs/SpecialBuffs/Sword/PranaBurst",
 	"Sparking Blast" = "/obj/Skills/Buffs/SpecialBuffs/Sparking_Blast",
-	"Unbound Mode" = "/obj/Skills/Buffs/SpecialBuffs/Unbound_Mode"
+	"Zone" = "/obj/Skills/Buffs/SpecialBuffs/Zone",
+	"Mark of the Slayer" = "/obj/Skills/Buffs/SpecialBuffs/Mark_of_the_Slayer",
+	"Legend of Black Heaven" = "/obj/Skills/Buffs/SlotlessBuffs/Legend_of_Black_Heaven"
 )
 var/list/Tier4 = list(
 	"Strength Beyond Strength" = "/obj/Skills/Buffs/SlotlessBuffs/Beyond_Strength",
@@ -136,22 +136,6 @@ proc/DevelopSignature(mob/m, Tier, Type)
 			if (4) options.Add(Tier4)
 		for(var/obj/Skills/skill in m.Skills)
 			options.Remove(skill.type)
-	if (Type == "Style")
-		if (usr.SignatureStyles.len > 0)
-			for (var/x in usr.SignatureStyles)
-				if (x in usr.SignatureSelected) continue
-				var/obj/Skills/test
-				if(istext(usr.SignatureStyles[x]))
-					var/b = usr.SignatureStyles[x]
-					test = new b
-				else
-					test = usr.SignatureStyles[x]
-				if (test.SignatureTechnique == Tier)
-					options.Add("[x]")
-					options["[x]"] = test
-		else
-			usr << "You have no signature styles to learn!"
-			return
 	if (usr.SignatureSelected.len > 0)
 		options.Remove(usr.SignatureSelected)
 	var/obj/Skills/new_skill = Ask(usr, "Tier [Tier] [Type] Development", "", null, "pick", options, 1)

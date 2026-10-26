@@ -197,7 +197,7 @@ obj/Skills/Projectile/_Projectile/proc/BeamRetire()
 obj/Skills/Projectile/_Projectile/proc/BeamAheadBlocked()
 	if(UsesPixelCollision && vhb_w > 0)
 		//struggle needs real ink overlap
-		for(var/atom/movable/a in range(HitboxSweepRange(), src))
+		for(var/atom/movable/a in range(HitboxSweepRange(), src) | BigBodiesNear(src, HitboxSweepRange()))
 			if(a == src || a == Owner) continue
 			if(ismob(a))
 				var/mob/m = a

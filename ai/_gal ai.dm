@@ -417,6 +417,9 @@ ai_sheet //need to include icon scale
 
 
 
+proc/AISkillHardDel(obj/Skills/s)
+	return istype(s, /obj/Skills/Buffs/SlotlessBuffs/Autonomous/Debuff/NearSighted) || istype(s, /obj/Skills/Buffs/SlotlessBuffs/Enma_Korogi) || istype(s, /obj/Skills/Buffs/SlotlessBuffs/Zanjitsu_Gokui) || istype(s, /obj/Skills/Buffs/SlotlessBuffs/Senbonzakura) || istype(s, /obj/Skills/Buffs/SlotlessBuffs/Senbonzakura_Kageyoshi) || istype(s, /obj/Skills/Buffs/SlotlessBuffs/Tekken_Tachikaze) || istype(s, /obj/Skills/Utility/Internal_Communicator)
+
 //Maybe sparring AI responds to cooldowns whe na player is facing them.
 mob/Player/AI
 	New()
@@ -460,14 +463,13 @@ mob/Player/AI
 			s.AssociatedLegend = null
 			s.AssociatedGear = null
 			s.loc = null
-			DeleteSkill(s, 1)
+			DeleteSkill(s, AISkillHardDel(s))
 		if(active_projectiles.len>0)
 			for(var/obj/Skills/Projectile/_Projectile/p in active_projectiles)
 				p.endLife()
 		for(var/i in vis_contents)
 			vis_contents -= i
 		companion_ais.Remove(src)
-		sleep(100)
 		transform = null
 		filters = null
 		dd = null
@@ -1370,6 +1372,7 @@ mob/Player/AI
 						src.BeamCharging+=src.GetRecov(0.2)*src.GetBeamChargeSpeedMult()
 						if(src.BeamCharging>beamChargeCap)
 							src.BeamCharging=beamChargeCap
+						src.EnergyFXChargeTick(Z, src.BeamCharging/beamChargeCap)
 
 						//aesthetics
 						if(src.BeamCharging>=(0.5*beamChargeCap))
@@ -1378,7 +1381,7 @@ mob/Player/AI
 									var/image/i=image('Aurora.dmi',icon_state="[rand(1,3)]", layer=EFFECTS_LAYER, loc=src)
 									i.blend_mode=BLEND_ADD
 									animate(i, alpha=0)
-									world << i
+									GfxSendImage(i, null, 23)
 									i.transform*=30
 									animate(i, alpha=200, time=5)
 									src.BeamCharging=beamChargeCap

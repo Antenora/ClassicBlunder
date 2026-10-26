@@ -9,7 +9,7 @@ obj/Skills/AutoHit/Desperation
 		StrScaling=1.5
 		ActiveMessage="slashes through their enemy in the blink of an eye, aiming to mortally wound them!"
 		Area="Target"
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain"
 		BuffSelfDelay=20
 		GuardBreak=1
 		PassThrough=1
@@ -42,7 +42,7 @@ obj/Skills/AutoHit/Desperation
 		FixedDamage=6.5
 		NeedsHealth=20
 		StrScaling=1
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain"
 		BuffSelfDelay=30
 		Cooldown=300
 		EnergyCost=10
@@ -94,7 +94,7 @@ obj/Skills/AutoHit/Desperation
 			Cooldown=300-(10*(asc))
 			if (usr.HasTarget() && src.cooldown_start == 0)
 				spawn(40)
-					usr.buffSelf("/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain")
+					usr.buffSelf("/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain")
 			usr.UseProjectile(src)
 
 	MagicHour
@@ -105,7 +105,7 @@ obj/Skills/AutoHit/Desperation
 		Distance=20
 		HyperHoming=1
 		Homing=3
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain"
 		BuffSelfDelay=40
 		NeedsSword=1
 		Stunner=1.5
@@ -145,7 +145,7 @@ obj/Skills/AutoHit/Desperation
 		AccuracyMult = 1.25
 		KBMult=0.00001
 		KBAdd=2
-		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/Void_Drain"
+		BuffSelf="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Void_Drain"
 		BuffSelfDelay=40
 		Combo=12
 		NeedsHealth=30
@@ -216,8 +216,14 @@ obj/Skills/AutoHit/Desperation
 				Cooldown=300-(10*(asc))
 
 
-/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher
+/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff
 	Void_Drain
+		Cooldown = -1
+		AuraArt=1
+		LockX=0
+		LockY=0
+		TensionLock=1
+		NoWhiff=1
 		SpdMult=0.75
 		StrMult=0.75
 		EndMult=0.75

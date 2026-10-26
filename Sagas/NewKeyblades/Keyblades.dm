@@ -613,10 +613,10 @@ proc/
 				KeybladePassives=list("PULock" = 1, "AbyssMod" = 1+Boost,"EnergyGeneration" = 3+Boost, "Momentum" = 2)
 				return KeybladePassives
 			if("Fenrir")
-				KeybladePassives=list("PULock" = 1,   "Extend" = 1, "Conductor" = -50)
+				KeybladePassives=list("PULock" = 1, "Conductor" = -50)
 				return KeybladePassives
 			if("No Name")
-				KeybladePassives=list("PULock" = 1, "HardStyle" = 1)
+				KeybladePassives=list("PULock" = 1, "SoulFire" = 1)
 				return KeybladePassives
 			if("Lionheart")
 				KeybladePassives=list("PULock" = 1, "SpiritPower" = round(Boost/5), "Persistence" = 1+(Boost/2), "UnderDog" = 1+Boost)
@@ -638,19 +638,19 @@ proc/
 				KeybladePassives=list("PULock" = 1, "Harden" = 3)
 				return KeybladePassives
 			if("Chaos Ripper")
-				KeybladePassives=list("PULock" = 1, "Extend" = 2, "Half-Sword" = 5,  "HardStyle" = 1)
+				KeybladePassives=list("PULock" = 1, "Inevitable" = 1, "Shearing" = 2 + Boost/2)
 				return KeybladePassives
 			if("One Winged Angel")
 				KeybladePassives=list("PULock" = 1, "CriticalDamage"= 0.3+(Boost/10))
 				return KeybladePassives
 			if("Moogle O Glory")
-				KeybladePassives=list("PULock" = 1, "Extend" = 1, "CashCow" = 2, "SoftStyle" = 1, "Blubber" = Boost/4)
+				KeybladePassives=list("PULock" = 1, "CashCow" = 2, "Blubber" = Boost/4)
 				return KeybladePassives
 			if("Ebony Slumber")
 				KeybladePassives=list("PULock" = 1, "Dreamless Sleep" = 1, "GodKi" = 0.25)
 				return KeybladePassives
 			if("Fairytale Endings")
-				KeybladePassives=list("PULock" = 1, "Extend" = 1, "Ashen One" = 1, "Kindling" = 1, "Combustion" = 30)
+				KeybladePassives=list("PULock" = 1, "Ashen One" = 1, "Kindling" = 1, "Combustion" = 30)
 				return KeybladePassives
 			if("Prismatic Dreams")
 				KeybladePassives=list("PULock" = 1, "Dream Within a Dream" =1, "GodKi" = 0.25)

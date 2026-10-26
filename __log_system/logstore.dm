@@ -2,6 +2,9 @@
 #define LOGDB_PORTRAITS "Saves/Portraits/"
 #define LOGDB_EXPORTS "Saves/Exports/"
 #define LOGDB_ROW_CAP 8000
+#define LOGDB_CHUNK_ROWS 500
+#define LOGDB_CHUNK_BYTES 524288
+#define LOGDB_FLUSH_LOG_MS 15
 
 var/database/logdb
 var/logdb_ready = 0
@@ -12,6 +15,7 @@ var/list/logdb_alert_words = list()
 var/list/logdb_followers = list()
 var/list/LOGDB_CHAT_TYPES = list("say", "yell", "ask", "looc", "whisper", "think", "ooc", "emote", "roll", "legacy")
 var/list/LOGDB_IC_TYPES = list("say", "yell", "ask", "whisper", "think", "emote", "roll")
+var/list/LOGDB_COMBAT_TYPES = list("hit", "combat")
 
 proc/LogDbExec(database/query/q, sql, a1, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11, a12, a13, a14)
 	switch(args.len)
@@ -41,6 +45,7 @@ proc/LogDbOpen()
 	var/database/query/q = new
 	q.Add("PRAGMA journal_mode=WAL")
 	if(q.Execute(logdb)) q.NextRow()
+	LogDbExec(q, "PRAGMA synchronous=NORMAL")
 	LogDbExec(q, "CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY AUTOINCREMENT, t TEXT NOT NULL, ty TEXT NOT NULL, actor TEXT, name TEXT, color TEXT, font TEXT, pt TEXT, z INTEGER, x INTEGER, y INTEGER, area TEXT, body TEXT, sbody TEXT, meta TEXT)")
 	LogDbExec(q, "CREATE INDEX IF NOT EXISTS ix_events_t ON events(t)")
 	LogDbExec(q, "CREATE INDEX IF NOT EXISTS ix_events_actor ON events(actor, id)")
@@ -137,17 +142,20 @@ proc/LogEvent(ty, mob/actor, body, list/witnesses, list/muffled, list/meta, atom
 			r["y"] = T.y
 		r["area"] = LogAreaOf(place)
 	var/list/wit = list()
-	if(islist(witnesses))
-		for(var/w in witnesses)
-			var/ck = LogCkeyOf(w)
-			if(!ck) continue
-			wit[ck] = 0
-	if(islist(muffled))
-		for(var/w in muffled)
-			var/ck = LogCkeyOf(w)
-			if(!ck) continue
-			if(isnull(wit[ck])) wit[ck] = 1
-	if(actor && actor.ckey && isnull(wit[actor.ckey])) wit[actor.ckey] = 0
+	var/combat = (ty in LOGDB_COMBAT_TYPES)
+	if(ty != "combat")
+		var/skip = (combat && actor) ? actor.ckey : null
+		if(islist(witnesses))
+			for(var/w in witnesses)
+				var/ck = LogCkeyOf(w)
+				if(!ck || ck == skip) continue
+				wit[ck] = 0
+		if(islist(muffled))
+			for(var/w in muffled)
+				var/ck = LogCkeyOf(w)
+				if(!ck || ck == skip) continue
+				if(isnull(wit[ck])) wit[ck] = 1
+	if(!combat && actor && actor.ckey && isnull(wit[actor.ckey])) wit[actor.ckey] = 0
 	r["wit"] = wit
 	logdb_pending += list(r)
 	LogDbQueueFlush()
@@ -248,32 +256,83 @@ proc/LogDbFlush()
 	logdb_flush_queued = 0
 	if(!logdb_pending.len) return
 	if(!LogDbOpen()) return
+	var/t0 = world.tick_usage
 	var/list/batch = logdb_pending
 	logdb_pending = list()
 	logdb_legacy_last = list()
-	var/database/query/q = new
-	LogDbExec(q, "BEGIN")
+	var/list/evs = list()
+	var/list/adm = list()
+	var/list/lgn = list()
 	for(var/list/r in batch)
 		r["pending"] = 0
 		switch(r["table"])
-			if("events")
-				if(!LogDbExec(q, "INSERT INTO events (t, ty, actor, name, color, font, pt, z, x, y, area, body, sbody, meta) VALUES (datetime('now'),?,?,?,?,?,?,?,?,?,?,?,?,?)", r["ty"], r["actor"], r["name"], r["color"], r["font"], r["pt"], r["z"], r["x"], r["y"], r["area"], r["body"], r["sbody"], r["meta"]))
-					continue
-				var/id = 0
-				if(LogDbExec(q, "SELECT last_insert_rowid() AS id") && q.NextRow())
-					var/list/row = q.GetRowData()
-					id = row["id"]
-				r["id"] = id
-				var/list/wit = r["wit"]
-				if(id && islist(wit))
-					for(var/ck in wit)
-						LogDbExec(q, "INSERT INTO witness (event_id, ckey, muffled) VALUES (?,?,?)", id, ck, wit[ck] ? 1 : 0)
-			if("admin")
-				LogDbExec(q, "INSERT INTO admin_actions (t, actor, name, level, category, action, target, detail) VALUES (datetime('now'),?,?,?,?,?,?,?)", r["actor"], r["name"], r["level"], r["category"], r["action"], r["target"], r["detail"])
-			if("logins")
-				LogDbExec(q, "INSERT INTO logins (t, ckey, name, ip, cid, ev, reason) VALUES (datetime('now'),?,?,?,?,?,?)", r["ckey"], r["name"], r["ip"], r["cid"], r["ev"], r["reason"])
+			if("events") evs += list(r)
+			if("admin") adm += list(r)
+			if("logins") lgn += list(r)
+	var/list/wit = list()
+	var/database/query/q = new
+	LogDbExec(q, "BEGIN")
+	LogDbInsertRows(q, "events", evs, wit)
+	LogDbInsertRows(q, "witness", wit)
+	LogDbInsertRows(q, "admin", adm)
+	LogDbInsertRows(q, "logins", lgn)
 	LogDbExec(q, "COMMIT")
 	LogDbAfterFlush(batch)
+	var/ms = (world.tick_usage - t0) * world.tick_lag
+	if(ms > LOGDB_FLUSH_LOG_MS) world.log << "LOGDB flush: [evs.len] events [wit.len] witness rows [round(ms, 0.1)] ms"
+
+proc/LogDbInsertRows(database/query/q, kind, list/rows, list/wit)
+	var/i = 1
+	while(i <= rows.len)
+		var/n = 0
+		var/bytes = 0
+		switch(kind)
+			if("events") q.Add("INSERT INTO events (t, ty, actor, name, color, font, pt, z, x, y, area, body, sbody, meta) VALUES ")
+			if("witness") q.Add("INSERT INTO witness (event_id, ckey, muffled) VALUES ")
+			if("admin") q.Add("INSERT INTO admin_actions (t, actor, name, level, category, action, target, detail) VALUES ")
+			if("logins") q.Add("INSERT INTO logins (t, ckey, name, ip, cid, ev, reason) VALUES ")
+		while(i + n <= rows.len && n < LOGDB_CHUNK_ROWS)
+			var/list/r = rows[i + n]
+			var/b = 32
+			switch(kind)
+				if("events") b = length(r["name"]) + length(r["color"]) + length(r["font"]) + length(r["pt"]) + length(r["area"]) + length(r["body"]) + length(r["sbody"]) + length(r["meta"]) + 96
+				if("witness") b = length(r[2]) + 32
+				if("admin") b = length(r["name"]) + length(r["category"]) + length(r["action"]) + length(r["target"]) + length(r["detail"]) + 96
+				if("logins") b = length(r["name"]) + length(r["ip"]) + length(r["cid"]) + length(r["ev"]) + length(r["reason"]) + 96
+			if(n && bytes + b > LOGDB_CHUNK_BYTES) break
+			if(n) q.Add(",")
+			switch(kind)
+				if("events") q.Add("(datetime('now'),?,?,?,?,?,?,?,?,?,?,?,?,?)", r["ty"], r["actor"], r["name"], r["color"], r["font"], r["pt"], r["z"], r["x"], r["y"], r["area"], r["body"], r["sbody"], r["meta"])
+				if("witness") q.Add("(?,?,?)", r[1], r[2], r[3])
+				if("admin") q.Add("(datetime('now'),?,?,?,?,?,?,?)", r["actor"], r["name"], r["level"], r["category"], r["action"], r["target"], r["detail"])
+				if("logins") q.Add("(datetime('now'),?,?,?,?,?,?)", r["ckey"], r["name"], r["ip"], r["cid"], r["ev"], r["reason"])
+			bytes += b
+			n++
+		if(!q.Execute(logdb))
+			world.log << "logdb: [q.ErrorMsg()] :: [kind] chunk of [n] rows dropped"
+		else if(kind == "events")
+			LogDbEventIds(q, rows, i, n, wit)
+		i += n
+
+proc/LogDbEventIds(database/query/q, list/rows, from, n, list/wit)
+	var/got = q.RowsAffected()
+	if(got != n)
+		world.log << "logdb: events chunk inserted [got] of [n] rows; its ids and witness rows dropped"
+		return
+	if(!LogDbExec(q, "SELECT CAST(id AS TEXT) AS tid FROM events ORDER BY id DESC LIMIT ?", n)) return
+	var/k = from + n - 1
+	while(k >= from && q.NextRow())
+		var/list/row = q.GetRowData()
+		var/list/r = rows[k]
+		r["id"] = row["tid"]
+		k--
+	for(k = from, k < from + n, k++)
+		var/list/r = rows[k]
+		var/id = r["id"]
+		var/list/w = r["wit"]
+		if(!id || !islist(w)) continue
+		for(var/ck in w)
+			wit += list(list(id, ck, w[ck] ? 1 : 0))
 
 proc/LogDbAfterFlush(list/batch)
 	if(logdb_alert_words.len)

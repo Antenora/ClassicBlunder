@@ -111,7 +111,7 @@
         Scorching=20;
         Shattering=20;
         Warp=2;
-        BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/Finisher/ScarletOverdriven";
+        BuffAffected="/obj/Skills/Buffs/SlotlessBuffs/Autonomous/QueueBuff/ScarletOverdriven";
         HitMessage="channels the Ripple through razor-sharp heat: <b>Flaming Scarlet Overdrive!!!</b>";
 
 //VAMPIRE

@@ -81,7 +81,7 @@ mob
 			if(src.CursedWounds())
 				src.WoundSelf(val)
 			if(src.Health<=0&&!src.KO)
-				if(src.passive_handler.Get("Color of Courage")&& src.HealthPct()>glob.TRIPLEHELIX_MAX_NEG_HP)
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct()> -abs(src.passive_handler.Get("Color of Courage") * 10))
 					return
 				if(src.Burn&&src.Poison)
 					src.Unconscious(null, "succumbing to terrible pain!")
@@ -92,7 +92,15 @@ mob
 				if(!src.Burn&&!src.Poison)
 					src.Unconscious()
 
+		MechNoWounds()
+			return 0
+		MechEject()
+			return
+		MechStatMult(stat)
+			return 1
 		DealWounds(var/mob/defender, var/val, var/FromSelf=0)
+			if(defender.MechNoWounds())
+				return
 			val = defender.HPToPct(val)
 			if(defender.CyberCancel)
 				val*=(1-defender.CyberCancel)
@@ -130,6 +138,8 @@ mob
 				defender.TotalInjury=99
 			defender.MaxHealth()
 		WoundSelf(var/val)
+			if(val > 0 && MechNoWounds())
+				return
 			if(src.BioArmor && val != 0)
 				src.DamageSelf(val)
 				return
@@ -145,6 +155,10 @@ mob
 				TotalInjury = 0
 			src.MaxHealth()
 		LoseHealth(var/val)
+			if(mech && Health - val <= 0)
+				Health = 0
+				MechEject()
+				return
 			src.Health-=val
 			src.MaxHealth()
 			var/Absorb = passive_handler.Get("AbsorbingDamage")
@@ -241,16 +255,7 @@ mob
 				src.TotalCapacity=100
 
 		HealHealth(val)
-			val *= HealCutMult()
-			if(GetEffectiveShearForStackingEffects())
-				if(HasShearImmunity())
-					val=val
-					Sheared=0
-				var/notDDP = !IsDarkDragonPlayer();
-				var/hellP = GetHellPower();
-				if(notDDP && Frenzy > 0) val *= 0.5;
-				if(hellP) val *= 0.5;
-				Sheared = max(0, Sheared - val)
+			val = HealAfterCuts(val)
 			if(icon_state == "Meditate")
 				Tension = max(0, Tension - (val * 1.5))
 			src.Health+=src.PctToHP(val)
@@ -329,15 +334,29 @@ mob
 		SetHealthPct(pct)
 			src.Health=src.PctToHP(pct)
 		HealPct(pct)
+			if(pct > 0)
+				pct = src.HealAfterCuts(pct)
 			src.Health+=src.PctToHP(pct)
+		HealAfterCuts(val)
+			val *= HealCutMult()
+			if(GetEffectiveShearForStackingEffects())
+				if(HasShearImmunity())
+					val=val
+					Sheared=0
+				var/notDDP = !IsDarkDragonPlayer();
+				var/hellP = GetHellPower();
+				if(notDDP && Frenzy > 0) val *= 0.5;
+				if(hellP) val *= 0.5;
+				Sheared = max(0, Sheared - val)
+			return val
 		MaxHealth()
 			var/HasWounds=1
-			if(src.HasUnstoppable())
+			if(src.HasUnstoppable() || mech)
 				HasWounds=0
 			var/KeyHealth=src.MaxHP()*(1-(src.TotalInjury*HasWounds)/100)
 			var/Sub
 			var/Cut
-			if(src.HealthCut)
+			if(src.HealthCut && !mech)
 				Sub=KeyHealth*src.HealthCut
 				Cut=KeyHealth-Sub
 				if(src.Health > Cut)
@@ -351,7 +370,8 @@ mob
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
-			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/KeyEnergy=100+src.passive_handler.Get("MaxEnergyBonus")-(src.TotalFatigue*HasFatigue)
+			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
 			if(src.EnergyCut)
@@ -367,7 +387,8 @@ mob
 				HasFatigue=0
 			if(src.passive_handler.Get("Anaerobic"))
 				HasFatigue=glob.ANAEROBIC_FATIGUE_BASE/(src.passive_handler.Get("Anaerobic"))
-			var/KeyEnergy=100-(src.TotalFatigue*HasFatigue)
+			var/KeyEnergy=100+src.passive_handler.Get("MaxEnergyBonus")-(src.TotalFatigue*HasFatigue)
+			KeyEnergy*=MaimMult("Energy")
 			var/Sub
 			var/Cut
 			if(src.EnergyCut)
@@ -431,7 +452,7 @@ mob
 			SubEndTax(100);
 			AddEndCut(-100);
 			SubSpdTax(100);
-			AddSpdTax(-100);
+			AddSpdCut(-100);
 			SubForTax(100);
 			AddForCut(-100);
 			SubOffTax(100);
@@ -480,7 +501,7 @@ mob
 					return
 			StrTax = clamp(StrTax+Val, 0, 1);
 		SubStrTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			StrTax = clamp(StrTax-Val, 0, 1);
 		AddStrCut(Val)
@@ -493,7 +514,7 @@ mob
 					return
 			EndTax=clamp(EndTax+Val, 0, 1);
 		SubEndTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			EndTax=clamp(EndTax-Val, 0, 1);
 		AddEndCut(Val)
@@ -506,7 +527,7 @@ mob
 					return
 			SpdTax=clamp(SpdTax+Val, 0, 1);
 		SubSpdTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			SpdTax=clamp(SpdTax-Val, 0, 1)
 		AddSpdCut(Val)
@@ -519,7 +540,7 @@ mob
 					return
 			ForTax=clamp(ForTax+Val, 0, 1);
 		SubForTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			ForTax=clamp(ForTax-Val, 0, 1);
 		AddForCut(Val)
@@ -532,7 +553,7 @@ mob
 					return
 			OffTax=clamp(OffTax+Val, 0, 1);
 		SubOffTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			OffTax=clamp(OffTax-Val, 0, 1);
 		AddOffCut(Val)
@@ -545,7 +566,7 @@ mob
 					return
 			DefTax=clamp(DefTax+Val, 0, 1);
 		SubDefTax(Val, Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			DefTax=clamp(DefTax-Val, 0, 1);
 		AddDefCut(Val)
@@ -558,7 +579,7 @@ mob
 					return
 			RecovTax = clamp(RecovTax+Val, 0, 1);
 		SubRecovTax(var/Val, var/Forced=0)
-			if(src.Satiated&&!Drunk||Forced)
+			if(src.Satiated||Forced)
 				Val*=4
 			RecovTax = clamp(RecovTax-Val, 0, 1);
 		AddRecovCut(var/Val)
@@ -613,7 +634,8 @@ mob
 			return ((src.DefMod+Ascended+(enhanced)+Invested))*DefChaos
 		DetermineAscension(var/Stat)
 			var/Invest=src.vars["[Stat]Invest"]
-			var/AscStat=Invest*src.AscensionsAcquired*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
+			var/EffAsc=src.AscensionsAcquired
+			var/AscStat=Invest*EffAsc*src.GrowthRate*glob.progress.INVESTED_STAT_PER_POINT
 			return AscStat
 		BaseRecov()
 			return (src.RecovMod+src.RecovAscension)*RecovChaos
@@ -885,13 +907,7 @@ mob
 
 		GetMA(stat)
 			if(StyleBuff)
-				var/MA = StyleBuff.vars["Style[stat]"]-1
-				if(Target)
-					if((Target.passive_handler["Musoken"] && equippedSword) && stat == "Off")
-						if(passive_handler["Musoken"])
-							MA /= 2
-						else
-							MA = 0
+				var/MA = 0
 				if(Secret=="Haki")
 					if(secretDatum.secretVariable["HakiSpecialization"]=="Armament")
 						if(stat=="Str")
@@ -908,6 +924,7 @@ mob
 
 
 		GetStr(var/Mult=1)
+			if(mech) return max(0.1, StrReplace * Mult * MechStatMult("Str"))
 			var/Str=src.StrMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -943,8 +960,6 @@ mob
 			//gain double value when Overdive is active, unless the user is Android (then only +50%)
 			Str*=src.StrChaos
 			//tarot shit
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Str = getMechStat(findMecha(), Str)
 			if(src.StrReplace)
 				Str=StrReplace
 			//when you want to ignore all of the above for some reason
@@ -994,6 +1009,10 @@ mob
 			if(src.StrStolen)
 				Mod+=src.StrStolen*0.5
 			Mod += (scalingEldritchPower() / 10);
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			var/BM=src.HasBuffMastery()
 			if(BM)
 				if(Mod<=glob.BUFF_MASTERY_LOWTHRESHOLD)
@@ -1018,8 +1037,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1066,6 +1085,7 @@ mob
 			Str*=STM
 			Str*=Mod
 			Str*=Mult
+			Str*=MaimMult("Str")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Str=src.Target.GetStr()
@@ -1093,6 +1113,7 @@ mob
 			return Str
 
 		GetFor(var/Mult=1)
+			if(mech) return max(0.1, ForReplace * Mult * MechStatMult("For"))
 			var/For=src.ForMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1128,9 +1149,6 @@ mob
 			For+=ForAdded
 			if(passive_handler.Get("WarmingUp")) For += WarmingUpBonus
 			For+=src.GetEquippedWeaponStatAdd("For")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold>0)
-					For+=StyleBuff?:hotCold/glob.HOTNCOLD_STAT_DIVISOR
 			if(HasShonenPower())
 				var/spPower = GetShonenPower() > 0 ? GetShonenPower() : 0
 				For += (0.1*spPower) * For
@@ -1142,8 +1160,6 @@ mob
 				For += (zenkaiPower/2) * For
 			else
 				For += (0.2 * zenkaiPower) * For
-			if(passive_handler.Get("Piloting")&&findMecha())
-				For = getMechStat(findMecha(), For)
 
 
 			var/Mod=1
@@ -1191,6 +1207,9 @@ mob
 					else
 						Mod+=0.75*src.passive_handler.Get("BurningShot")
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
 				if(src.HealthPct() <= threshold)
@@ -1198,8 +1217,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1245,6 +1264,7 @@ mob
 			For*=FTM
 			For*=Mod
 			For*=Mult
+			For*=MaimMult("For")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					For=src.Target.GetFor()
@@ -1275,6 +1295,7 @@ mob
 			return For
 
 		GetEnd(var/Mult=1)
+			if(mech) return max(0.1, EndReplace * Mult * MechStatMult("End"))
 			var/End=src.EndMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1307,17 +1328,12 @@ mob
 			End*=src.EndChaos
 			if(src.EndReplace)
 				End=EndReplace
-			if(passive_handler.Get("Piloting")&&findMecha())
-				End = getMechStat(findMecha(), End)
 
 			if(CheckSlotless("The Grit") && (Anger||HasCalmAnger()))
 				End += End * (glob.DEMONIC_DURA_BASE)
 			End+=EndAdded
 			if(passive_handler.Get("WarmingUp")) End += WarmingUpBonus
 			End+=src.GetEquippedWeaponStatAdd("End")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold<0)
-					End+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
 			var/Mod=1
 			Mod+=(src.EndMultTotal-1)
 			if(src.KamuiBuffLock)
@@ -1354,6 +1370,9 @@ mob
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(src.CheckSlotless("Genesic Brave")||src.CheckSpecial("King of Braves")||src.CheckSpecial("Saiyan Purity")) //okay take two
 				var/threshold = 25 * (1 - src.HealthCut)
 				if(src.HealthPct() <= threshold)
@@ -1361,8 +1380,8 @@ mob
 					var/base_bonus = min(10 / hp_safe, 1) //This is based on the old formula! This one was fine I was just being r[censored]. This means KoB get their full low hp buff at 10%.
 					Mod += base_bonus
 
-				if(src.passive_handler.Get("Color of Courage") && src.Health < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
-					var/minhp = glob.TRIPLEHELIX_MAX_NEG_HP
+				if(src.passive_handler.Get("Color of Courage") && src.HealthPct() < 0) //This uses the NEW formula where the extra bonus caps at 1 at [TRIPLEHELIX_MAX_NEG_HP]
+					var/minhp = -abs(src.passive_handler.Get("Color of Courage") * 10)
 					if(minhp >= 0)
 						minhp = -1 //Makes sure this can't be a Positive value so you don't get the opposite issue as the first stage
 					var/den2 = 0 - minhp //normalization of range
@@ -1409,6 +1428,7 @@ mob
 			End*=ETM
 			End*=Mod
 			End*=Mult
+			End*=MaimMult("End")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					End=src.Target.GetEnd()
@@ -1436,6 +1456,7 @@ mob
 			return End
 
 		GetSpd(Mult=1)
+			if(mech) return max(0.1, SpdReplace * Mult * MechStatMult("Spd"))
 			var/Spd=src.SpdMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1469,16 +1490,9 @@ mob
 
 			if(src.SpdReplace)
 				Spd=SpdReplace
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Spd = getMechStat(findMecha(), Spd)
 			Spd+=SpdAdded
 			if(passive_handler.Get("WarmingUp")) Spd += WarmingUpBonus
 			Spd+=src.GetEquippedWeaponStatAdd("Spd")
-			if(UsingHotnCold())
-				if(StyleBuff?:hotCold<0)
-					Spd-=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
-				else
-					Spd+=abs(StyleBuff?:hotCold)/glob.HOTNCOLD_STAT_DIVISOR
 			var/Mod=1
 			Mod+=(src.SpdMultTotal-1)
 			if(KaiokenBP > 1)
@@ -1534,6 +1548,9 @@ mob
 			if(src.SpdEroded)
 				Mod-=src.SpdEroded
 
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("TensionPowered"))
 				Mod+=((passive_handler.Get("TensionPowered")*2))
 			if(src.RebirthHeroPath=="Red" && src.SagaLevel>=3)
@@ -1551,6 +1568,7 @@ mob
 			Spd*=SpTM
 			Spd*=Mod
 			Spd*=Mult
+			Spd*=MaimMult("Spd")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Spd=src.Target.GetSpd()
@@ -1581,6 +1599,7 @@ mob
 			return Spd
 
 		GetOff(var/Mult=1)
+			if(mech) return max(0.1, OffReplace * Mult * MechStatMult("Off"))
 			var/Off=src.OffMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1611,8 +1630,6 @@ mob
 			var/enhanced = getEnhanced("Aggression")
 			Off+=EnhancedAggression ? enhanced : 0
 			Off*=src.OffChaos
-			if(passive_handler.Get("Piloting")&&findMecha())
-				Off = getMechStat(findMecha(), Off)
 			Off+=OffAdded
 			if(passive_handler.Get("WarmingUp")) Off += WarmingUpBonus
 			Off+=src.GetEquippedWeaponStatAdd("Off")
@@ -1632,6 +1649,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)
@@ -1673,6 +1694,7 @@ mob
 			Off*=OTM
 			Off*=Mod
 			Off*=Mult
+			Off*=MaimMult("Off")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Off=src.Target.GetOff()
@@ -1703,6 +1725,7 @@ mob
 			return Off
 
 		GetDef(var/Mult=1)
+			if(mech) return max(0.1, DefReplace * Mult * MechStatMult("Def"))
 			var/Def=src.DefMod
 			var/EldritchMod=0
 /*			if(src.EldritchPacted)
@@ -1733,11 +1756,6 @@ mob
 			var/enhanced = getEnhanced("Reflexes")
 			Def+=EnhancedReflexes ? enhanced : 0
 			Def*=src.DefChaos
-			if(passive_handler.Get("Piloting")&&findMecha())
-				if(PilotingProwess>=7)
-					Def = getMechStat(findMecha(), Def) * 0.25
-				else
-					Def = 0.25
 
 
 			Def+=DefAdded
@@ -1759,6 +1777,10 @@ mob
 					Mod*=(1+(BM*glob.BUFF_MASTERY_LOWMULT))
 				else if(Mod>=glob.BUFF_MASTER_HIGHTHRESHOLD)
 					Mod*=(1+(BM*glob.BUFF_MASTERY_HIGHMULT))
+
+			if(src.WillPowered()) // Check WillMain.dm for info on Will mechanic
+				Mod += GetWillStatMult()
+
 			if(passive_handler.Get("BurningShot"))
 				if(src.Burn)
 					if(src.Burn>0&&src.Burn<=25)
@@ -1794,6 +1816,7 @@ mob
 			Def*=DTM
 			Def*=Mod
 			Def*=Mult
+			Def*=MaimMult("Def")
 			if(src.HasMirrorStats())
 				if(src.Target&&src.Target!=src&&!src.Target.HasMirrorStats()&&istype(src.Target, /mob/Players)&&!Target.passive_handler.Get("To Govern Strength"))
 					Def=src.Target.GetDef()
@@ -1824,6 +1847,7 @@ mob
 			return Def
 
 		GetVit(var/Mult=1)
+			if(mech) return max(0.1, VitReplace * Mult * MechStatMult("Vit"))
 			var/Vit=src.BaseVit()
 			if(passive_handler.Get("Vigor"))
 				Vit+= passive_handler.Get("Vigor")
@@ -1861,9 +1885,6 @@ mob
 			Recov*=Mod
 			Recov*=Mult
 			Recov*=src.RecovChaos
-			if(src.isRace(NAMEKIAN)&&src.transActive())
-				if(Recov<2)
-					Recov=2
 			if(src.RippleActive())
 				Recov*=max(min(src.Oxygen/src.OxygenMax,1.5),0.5)
 			var/TotalTax
@@ -2500,64 +2521,6 @@ mob
 		AddItem(var/obj/Items/I, var/AlreadyHere=0)
 			if(!AlreadyHere)
 				GiveOrDrop(I)   // full category drops it at their feet instead of vanishing over the cap
-		AddUnlockedTechnology(var/x)
-			if(x in list("Weapons", "Armor", "Weighted Clothing", "Smelting", "Locksmithing"))
-				src.ForgingUnlocked++
-				if(ForgingUnlocked>=5)
-					src.ForgingUnlocked=5
-			if(x in list("Molecular Technology", "Light Alloys", "Shock Absorbers", "Advanced Plating", "Modular Weaponry"))
-				src.RepairAndConversionUnlocked++
-				if(RepairAndConversionUnlocked>=5)
-					src.RepairAndConversionUnlocked=5
-			if(x in list("Medkits", "Fast Acting Medicine", "Enhancers", "Anesthetics", "Automated Dispensers"))
-				src.MedicineUnlocked++
-				if(MedicineUnlocked>=5)
-					src.MedicineUnlocked=5
-			if(x in list("Regenerator Tanks", "Prosthetic Limbs", "Genetic Manipulation", "Regenerative Medicine", "Revival Protocol"))
-				src.ImprovedMedicalTechnologyUnlocked++
-				if(ImprovedMedicalTechnologyUnlocked>=5)
-					src.ImprovedMedicalTechnologyUnlocked=5
-			if(x in list("Wide Area Transmissions", "Espionage Equipment", "Surveilance", "Drones", "Local Range Devices"))
-				src.TelecommunicationsUnlocked++
-				if(TelecommunicationsUnlocked>=5)
-					src.TelecommunicationsUnlocked=5
-			if(x in list("Scouters", "Obfuscation Equipment", "Satellite Surveilance", "Combat Scanning", "EM Wave Projectors"))
-				src.AdvancedTransmissionTechnologyUnlocked++
-				if(AdvancedTransmissionTechnologyUnlocked>=5)
-					src.AdvancedTransmissionTechnologyUnlocked=5
-			if(x in list("Hazard Suits", "Force Shielding", "Jet Propulsion", "Power Generators"))
-				src.EngineeringUnlocked++
-				if(EngineeringUnlocked>=5)
-					src.EngineeringUnlocked=5
-			if(x in list("Android Creation", "Conversion Modules", "Enhancement Chips", "Involuntary Implantation"))
-				src.CyberEngineeringUnlocked++
-				if(CyberEngineeringUnlocked>=5)
-					src.CyberEngineeringUnlocked=5
-			if(x in list("Assault Weaponry", "Missile Weaponry", "Melee Weaponry", "Thermal Weaponry", "Blast Shielding"))
-				src.MilitaryTechnologyUnlocked++
-				if(MilitaryTechnologyUnlocked>=5)
-					src.MilitaryTechnologyUnlocked=5
-			if(x in list("Powered Armor Specialization", "Armorpiercing Weaponry", "Impact Weaponry", "Hydraulic Weaponry"))
-				src.MilitaryEngineeringUnlocked++
-				if(MilitaryEngineeringUnlocked>=5)
-					src.MilitaryEngineeringUnlocked=5
-
-			if(x in list("Healing Herbs", "Refreshment Herbs", "Magic Herbs", "Toxic Herbs", "Philter Herbs"))
-				src.AlchemyUnlocked++
-			if(x in list("Stimulant Herbs", "Relaxant Herbs", "Numbing Herbs", "Distillation Process", "Mutagenic Herbs"))
-				src.ImprovedAlchemyUnlocked++
-			if(x in list("Spell Focii", "Artifact Manufacturing", "Magical Communication", "Magical Vehicles", "Warding Glyphs"))
-				src.ToolEnchantmentUnlocked++
-			if(x in list("Tome Cleansing", "Tome Security", "Tome Translation", "Tome Binding", "Tome Excerpts"))
-				src.TomeCreationUnlocked++
-			if(x in list("Turf Sealing", "Object Sealing", "Power Sealing", "Mobility Sealing", "Command Sealing"))
-				src.SealingMagicUnlocked++
-			if(x in list("Teleportation", "Retrieval", "Bilocation", "Dimensional Manipulation", "Dimensional Restriction"))
-				src.SpaceMagicUnlocked++
-			if(x in list("Transmigration", "Lifespan Extension", "Temporal Displacement", "Temporal Acceleration", "Temporal Rewinding"))
-				src.TimeMagicUnlocked++
-
-			src.knowledgeTracker.learnedKnowledge.Add(x)
 
 		MakeWarper(var/_x, var/_y, var/_z)
 			var/obj/Special/Teleporter2/q=new(src.loc)
@@ -2583,6 +2546,7 @@ mob
 			src.dash_clash = Clashable ? 2 : 1
 			src.ClashWatch(Trg, Clashable)
 			src.icon_state="Flight"
+			src.CharacterRigPlay("dash")
 			MaxDistance*=world.tick_lag
 			if(Delay < 0.1) Delay = 0.1
 			var/pm = PmActive()
@@ -2592,10 +2556,11 @@ mob
 			var/flash_dash = glob.FLASH_MOVE && Trg && get_dist(src, Trg) > 3
 			var/flash_ghost_px = 0
 			var/last_smear_ang = 1000
+			var/list/dash_cut = (Clashable && passive_handler && passive_handler["Battojutsu"]) ? list() : null
 			if(flash_dash)
 				FlashDashKickoff(src, Trg)
 			while(pm ? pm_budget > 0 : MaxDistance > 0)
-				if(src.filters["trail"]) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
+				if(src.filters["trail"] && !src.character_rig_active) //dash smear on the trail motion_blur (the old angular_blur attempt animated its center, not a direction)
 					var/travel_angle = GetAngle(src, Trg)
 					if(abs(travel_angle - last_smear_ang) > 15)
 						last_smear_ang = travel_angle
@@ -2622,6 +2587,8 @@ mob
 						if(flash_ghost_px >= 48)
 							flash_ghost_px = 0
 							AfterImage(src)
+				if(dash_cut)
+					DashCrossStep(Trg, dash_cut)
 				if(Secret == "Heavenly Restriction" && secretDatum?:hasImprovement("Dragon Dash"))
 					KenShockwave(src, icon='KenShockwave.dmi', Size=secretDatum?:getBoon(src, "Dragon Dash"), Blend=2, Time=3)
 				if(get_dist(src, Trg) <= 1 || bounds_dist(src, Trg) <= 16)
@@ -2641,6 +2608,7 @@ mob
 						sleep(1*world.tick_lag)
 			src.TryDragonClash(Trg)
 			src.Frozen=0
+			if(src.character_rig_active == "dash") src.CharacterRigStop()
 			src.dash_clash=0
 			if(src.is_dashing>0)
 				src.is_dashing--
@@ -2656,6 +2624,7 @@ mob
 		Reincarnate()
 			src.Savable=0
 			if(istype(src, /mob/Players))
+				src.QuincyFreeRegistry()
 				fdel("Saves/Players/[src.ckey]")
 			src.RPPCurrent=src.RPPSpent+src.RPPSpendable
 			src.RPPTotal+=src.RPPCurrent
@@ -2664,16 +2633,6 @@ mob
 			spawn(600)
 				del(src)
 
-		CountStyles(Tier=0)
-			var/Count=0
-			if(!Tier)
-				Log("Admin", "[ExtractInfo(src)] tried to count signatures without specifying a tier.")
-				return
-			for(var/obj/Skills/Buffs/NuStyle/s in src.Skills)
-				if(s.SignatureTechnique==Tier)
-					Count++
-					continue
-			return Count
 		CountSigs(Tier=0)
 			var/Count=0
 			var/list/combo_check=list()
@@ -2717,36 +2676,11 @@ mob
 			if(src.RPPSpendable+src.RPPSpent>=val)
 				return 1
 			return 0
-		req_styles(var/val, var/tier)
-			if(src.CountStyles(tier)<=val)
-				return 1
-			return 0
 		req_sigs(var/val, var/tier)
 
 			if(src.CountSigs(tier)<=val)
 				return 1
 			return 0
-		styles_available(var/tier)
-			for(var/obj/Skills/Buffs/NuStyle/s in src)
-				StyleUnlock(s)
-			var/list/styles_available=list()
-			styles_available.Add(src.SignatureStyles)
-			styles_available.Remove(src.SignatureSelected)
-			if(styles_available.len>0)
-				for(var/x in styles_available)
-					var/path=styles_available[x]
-					if(isnull(path))
-						continue
-
-					var/obj/Skills/s=new path
-					if(s.SignatureTechnique==tier)
-						del s
-						return 1
-					else
-						del s
-						continue
-			else
-				return 0
 		// THIS IS WHERE POTENTIAL CHECKING IS!!
 		PotentialSkillCheck()
 			//basics come from addMissingSkills; Ki Control still needs its first-use setup
@@ -2774,23 +2708,18 @@ mob
 				src.saga_up_self()
 				return
 			if(src.Potential>=glob.progress.T2_STYLES[1]&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/Legacy_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Legacy_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/Legacy_Of_The_Fabled_King, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Legacy_Of_The_Fabled_King)
 			if(src.Potential>=glob.progress.T2_STYLES[2]&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/True_Fist_Of_The_Fabled_King, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/True_Fist_Of_The_Fabled_King)
 			if(src.Potential>=65&&src.passive_handler.Get("True Inheritor"))
-				if(!locate(/obj/Skills/Buffs/NuStyle/Legendary/True_Fist_Of_The_Fabled_King, src))
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Fist_Of_The_King_Of_Tomorrow)
-					src.AddSkill(new/obj/Skills/Buffs/NuStyle/Legendary/Apotheosis_Of_The_Fabled_King)
+				if(!locate(/obj/Skills/Buffs/SlotlessBuffs/Legendary/Fist_Of_The_King_Of_Tomorrow, src))
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Fist_Of_The_King_Of_Tomorrow)
+					src.AddSkill(new/obj/Skills/Buffs/SlotlessBuffs/Legendary/Apotheosis_Of_The_Fabled_King)
 
 			// Style/Signature picks are made in the Acquire menu now (AcquireHUD.dm)
 			var/picks = 0
-			for(var/t = 1 to 3)
-				if(src.AqStylePicksLeft(t) && src.styles_available(t))   // styles_available also re-runs StyleUnlock
-					picks += src.AqStylePicksLeft(t)
-			if(src.AqStylePicksLeft(4) && src.AqAnyT4StylePickable())   // temp: any same-category T3 style
-				picks += src.AqStylePicksLeft(4)
 			for(var/t = 1 to 3)
 				picks += src.AqSigPicksLeft(t)
 			if(picks > 0)
@@ -2843,6 +2772,8 @@ mob
 
 		get_potential()
 			var/Return=src.Potential
+			if(src.isRace(CHANGELING) && Return<(10*src.transActive)&&src.Class=="Frieza")
+				Return=10*src.transActive
 
 			if(src.HasPowerReplacement())
 				var/Replace=src.GetPowerReplacement()

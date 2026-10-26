@@ -124,13 +124,15 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 				return
 			adjust(usr)
 			src.Trigger(usr)
+			if(!src.SlotlessOn) return
+			var/seq = ++bankai_seq
 			var/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form/sf = usr.FindSkill(/obj/Skills/Buffs/SlotlessBuffs/Shinigami_Form)
 			if(sf) sf.applyBankaiIcon(usr)
 			if(sf) sf.applyBankaiShihakushoIcon(usr)
 			// Visual activation sequence
 			var/mob/M = usr
 			spawn()
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq)) return
 				// Screen shake for the full effect duration
 				M.Quake(70)
 				// Apply gold glow for the duration of the visual sequence
@@ -140,14 +142,18 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 				M.AppearanceOn()
 				// shockwaves
 				sleep(5)
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq))
+					BankaiGlowOff(M, seq)
+					return
 				var/ShockSize = 5
 				for(var/wav = 5, wav > 0, wav--)
 					KenShockwave(M, 'Icons/Effects/KenShockwaveGold.dmi', ShockSize, 0, 0, 2, 15)
 					ShockSize /= 2
 				// Wait until ~3 seconds from activation
 				sleep(25)
-				if(!M || !M.loc) return
+				if(!BankaiLive(M, seq))
+					BankaiGlowOff(M, seq)
+					return
 				// Spawn dust cloud ring around player
 				var/list/dusts = list()
 				var/list/dust_dx = list()
@@ -172,8 +178,9 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 				Dust(M.loc, 2)
 				// Hover for ~2 seconds
 				sleep(20)
-				if(!M || !M.loc)
+				if(!BankaiLive(M, seq))
 					for(var/obj/Effects/Dust/D in dusts) if(D) del D
+					BankaiGlowOff(M, seq)
 					return
 				// Suck the dust clouds in toward the player
 				for(var/i = 1 to dusts.len)
@@ -211,10 +218,8 @@ Make it so that Bankai actually turns your sprite all white. Might need someone 
 				// Clean up expulsion dust
 				for(var/obj/Effects/Dust/E in expel_objs) if(E) del E
 				// Glow fades as Bankai is called
-				src.ManaGlow = null
-				src.ManaGlowSize = 0
-				M.AppearanceOff()
-				M.AppearanceOn()
+				BankaiGlowOff(M, seq)
+				if(!BankaiLive(M, seq)) return
 				OMsg(M, "<b>[M] calls out, \"Bankai... [M.BankaiPrefix]!\"</b>")
 		else
 			src.Trigger(usr)
@@ -343,12 +348,12 @@ obj/Skills/Buffs/ActiveBuffs
 		ManaDrain=0.01
 		ForMult=1.1
 		StrMult=1.1
-		passives=list("Extend" = 1, "SweepingStrike" = 1, "Freezing" = 3, "ManaLeak" = 2)
+		passives=list("Freezing" = 3, "ManaLeak" = 2)
 		ActiveMessage="San no mai, Shirafune!"
 		OffMessage="lets their ice melt..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("Extend" = 1 + (p.SagaLevel/2), "SweepingStrike" = 1 + (p.SagaLevel/2), "Freezing" = 3 * p.SagaLevel, "ManaLeak" = 2)
+				passives=list("Freezing" = 3 * p.SagaLevel, "ManaLeak" = 2)
 
 		verb/Shirafune()
 			set category="Skills"
@@ -367,12 +372,12 @@ obj/Skills/Buffs/SlotlessBuffs
 		ManaDrain=0.01
 		ForMult=1.1
 		StrMult=1.1
-		passives=list("Extend" = 1, "SweepingStrike" = 1, "Freezing" = 3, "ManaLeak" = 2)
+		passives=list("Freezing" = 3, "ManaLeak" = 2)
 		ActiveMessage="San no mai, Shirafune!"
 		OffMessage="lets their ice melt..."
 		adjust(mob/p)
 			if(!altered)
-				passives=list("Extend" = 1 + (p.SagaLevel/2), "SweepingStrike" = 1 + (p.SagaLevel/2), "Freezing" = 3 * p.SagaLevel, "ManaLeak" = 2)
+				passives=list("Freezing" = 3 * p.SagaLevel, "ManaLeak" = 2)
 
 		verb/Shirafune()
 			set category="Skills"

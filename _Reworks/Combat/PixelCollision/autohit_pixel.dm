@@ -47,15 +47,25 @@ obj/AutoHitter
 		if(!e) return
 		var/cx = (e.x-1)*32 + 16
 		var/cy = (e.y-1)*32 + 16
-		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)))
+		for(var/mob/m in (los ? view(R+1, epicenter) : range(R+1, epicenter)) | BigBodiesNear(e, R+1, los))
 			if(!hitSelf && m == Owner) continue
-			if(square)
-				if(!SquareHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && SquareHitsBounds(cx, cy, 32*(R-1), m)) continue
-			else
-				if(!CircleHitsBounds(cx, cy, 32*R, m)) continue
-				if(annulus && R > 1 && CircleHitsBounds(cx, cy, 32*(R-1), m)) continue
+			if(!ZoneHitsMob(cx, cy, 32*R, m, square)) continue
+			if(annulus && R > 1 && ZoneHitsMob(cx, cy, 32*(R-1), m, square)) continue
 			src.Damage(m)
+		if(autohit_obj_listeners.len)
+			AH_ObjZone(e, cx, cy, R, annulus, square)
+
+	proc/AH_ObjZone(turf/e, cx, cy, R, annulus, square)
+		for(var/obj/O in autohit_obj_listeners.Copy())
+			if(!O.loc || O.z != e.z) continue
+			if(!ZoneHitsMob(cx, cy, 32*R, O, square)) continue
+			if(annulus && R > 1 && ZoneHitsMob(cx, cy, 32*(R-1), O, square)) continue
+			O.StruckByAutoHit(Owner)
+
+	proc/AH_ObjContact()
+		for(var/obj/O in autohit_obj_listeners.Copy())
+			if(O.loc && O.z == z && HitboxesOverlap(src, O))
+				O.StruckByAutoHit(Owner)
 
 	proc/AH_TryContact(mob/m)
 		if(!istype(m) || !m.density) return
@@ -68,9 +78,11 @@ obj/AutoHitter
 
 	proc/AH_ContactSweep()
 		if(vhb_w <= 0) return
-		for(var/mob/m in range(HitboxSweepRange(), src))
+		for(var/mob/m in range(HitboxSweepRange(), src) | BigBodiesNear(src, HitboxSweepRange()))
 			if(!HitboxesOverlap(src, m)) continue
 			AH_TryContact(m)
+		if(autohit_obj_listeners.len)
+			AH_ObjContact()
 
 	proc/AH_PixelStep()
 		var/shown = DisplayedCardinal(dir, pc_lastdir)
@@ -87,3 +99,8 @@ obj/AutoHitter
 		if(!blocked)
 			step(src, src.dir)
 		AH_ContactSweep()
+
+var/list/autohit_obj_listeners = list()
+
+/obj/proc/StruckByAutoHit(mob/A)
+	return 0

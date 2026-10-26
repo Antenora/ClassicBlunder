@@ -1,0 +1,5 @@
+var/list/ENERGYFX_CHG_EDGES = list(0, 0.15, 0.3, 0.5, 0.7, 1, 1.4, 2)
+var/list/ENERGYFX_CHG_ALPHA = list(200, 208, 218, 230, 242, 255, 255, 255)
+var/list/ENERGYFX_CHG_CROWD = list(list(2, 1, 0.85), list(4, 2, 0.75))
+var/list/ENERGYFX_CHG_IMPLODE = list(list(2, 0.8, 1), list(2, 0.55, 1), list(2, 0.3, 1), list(2, 0.12, 0))
+var/list/ENERGYFX_CHG_PULSES = list("normal" = list(18, 50), "big" = list(0, 32))

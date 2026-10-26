@@ -327,6 +327,7 @@ obj/Skills
 
 		proc
 			Activate(var/mob/User, noGCD = FALSE)
+				if(!QuincyTeleportAllowed(User)) return
 				if(User.Suspended)
 					return
 				if(!noGCD && User.GCDBlocked(src))
@@ -622,7 +623,7 @@ obj/Skills
 								m.BPPoison=1
 								m.BPPoisonTimer=0
 								m.Sheared=0
-								m.Maimed=0
+								m.MaimClearAll()
 								m.MortallyWounded=0
 								m.SenseRobbed=0
 								m.HealWounds(100)
@@ -633,6 +634,7 @@ obj/Skills
 							OMsg(m, "[m] [src.ArriveMessage]")
 					//User.Move(Destination)
 					User.loc = locate(Destination.x, Destination.y, Destination.z)
+					GfxBcHolderMoved(User)
 					OMsg(User, "[User] [src.ArriveMessage]")
 
 				if(src.ManaCost)

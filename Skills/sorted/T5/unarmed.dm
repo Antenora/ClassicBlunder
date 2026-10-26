@@ -162,11 +162,11 @@ proc/ShowStopper(mob/attacker, mob/defender, effectMult)
 	var/image/I = image(src, icon_state = "", layer = 9001)
 	I.loc = src
 	I.override = 1
-	world << I
+	GfxSendImage(I, null, max(4, get_dist(src, target_turf)))
 	var/image/shadow = image('small_shadow.dmi')
 	shadow.loc = src
 	shadow.alpha = 0
-	world << shadow
+	GfxSendImage(shadow, null, max(4, get_dist(src, target_turf)))
 	var/finalTrans = turn(matrix(), -67)
 	var/halfWay = turn(matrix(), -67)
 	animate(I, transform = finalTrans, pixel_z = 100, time = jump_time / 2, easing = QUAD_EASING|EASE_OUT)
@@ -203,11 +203,11 @@ proc/ShowStopper(mob/attacker, mob/defender, effectMult)
 	var/image/I = image(src, icon_state = "", layer = 9000)
 	I.loc = src
 	I.override = 1
-	world << I
+	GfxSendImage(I, null, max(4, get_dist(src, target_turf)))
 	var/image/shadow = image('small_shadow.dmi')
 	shadow.loc = src
 	shadow.alpha = 0
-	world << shadow
+	GfxSendImage(shadow, null, max(4, get_dist(src, target_turf)))
 	var/finalTrans = turn(matrix(), -45)
 	var/halfWay = turn(matrix(), -45)
 	animate(I, transform = finalTrans, pixel_z = 100,  time = jump_time / 2, easing = QUAD_EASING|EASE_OUT)

@@ -1,5 +1,17 @@
+mob/proc/AndroidCorePick()
+
+mob/proc/AndroidCoreLogin()
+
+mob/proc/AndroidCoreSync()
+
 ascension
 	android
+		postAscension(mob/owner)
+			..()
+			owner.AndroidCoreSync()
+		revertAscension(mob/owner)
+			..()
+			owner.AndroidCoreSync()
 		one
 			unlock_potential = ASCENSION_ONE_POTENTIAL
 			passives = list("TechniqueMastery" = 0.5,  "ManaCapMult" = 0.2)

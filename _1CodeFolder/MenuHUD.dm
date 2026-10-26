@@ -7,6 +7,7 @@
 #define MHUD_FULL_SIZE (MHUD_FULL_ROWS * 2)
 #define MHUD_PANEL_W 336
 #define MHUD_PANEL_H 256
+#define SKMENU_PANEL_H 288
 #define MHUD_COL1_X -140
 #define MHUD_COL2_X 22
 // monogram's native grid is 16px = 12pt, other sizes degrade pixel fonts
@@ -211,6 +212,9 @@ mob/proc/CollectMenuVerbsFrom(list/vlist, can_remove)
 		if(usr) usr.client.PanelDragMove(params)
 	MouseUp(location, control, params)
 		if(usr) usr.client.PanelDragEnd()
+
+/atom/movable/shud/menupanel/draggable/skills
+	icon = 'HUD/ui_panel_skills.png'
 
 /atom/movable/shud/menutext
 	layer = MHUD_LAYER + 0.4
@@ -465,6 +469,85 @@ client/proc/KineticEntrance(list/objs, time = 3)
 		for(var/atom/movable/o in snap)
 			if(o) animate(o, alpha = atgt[o], time = time, easing = SINE_EASING)
 
+/atom/movable/shud/proc/PanelReuse()
+	return
+
+/atom/movable/shud/panelholder
+	mouse_opacity = 0
+	var/tmp/list/pool
+	var/tmp/list/cursor
+	var/tmp/list/shown
+	var/tmp/list/birth
+
+client/proc/PanelHolderNew(lay)
+	var/atom/movable/shud/panelholder/H = new
+	H.layer = lay
+	return H
+
+client/proc/PanelMoveTo(atom/movable/H, ax, ay)
+	if(!H) return
+	var/axp = ((ax % 32) + 32) % 32
+	var/ayp = ((ay % 32) + 32) % 32
+	var/sl = "[1 + (ax - axp) / 32]:[axp],[1 + (ay - ayp) / 32]:[ayp]"
+	if(H.screen_loc != sl) H.screen_loc = sl
+
+client/proc/PanelFade(atom/movable/H, time = 3)
+	if(!H) return
+	H.alpha = 0
+	spawn(1)
+		if(H) animate(H, alpha = 255, time = time, easing = SINE_EASING)
+
+client/proc/PanelRelease(atom/movable/H)
+	if(!H) return
+	H.vis_contents.Cut()
+	screen -= H
+
+client/proc/PanelBegin(atom/movable/shud/panelholder/H)
+	if(H) H.cursor = list()
+
+client/proc/PanelNew(atom/movable/shud/panelholder/H, path)
+	if(!H.pool)
+		H.pool = list()
+		H.shown = list()
+		H.birth = list()
+		if(!H.cursor) H.cursor = list()
+	var/list/L = H.pool[path]
+	if(!L)
+		L = list()
+		H.pool += path
+		H.pool[path] = L
+	var/i = H.cursor[path] ? H.cursor[path] + 1 : 1
+	if(i == 1) H.cursor += path
+	H.cursor[path] = i
+	var/atom/movable/o
+	if(i <= L.len)
+		o = L[i]
+		o.appearance = H.birth[o]
+		if(istype(o, /atom/movable/shud))
+			var/atom/movable/shud/so = o
+			so.PanelReuse()
+	else
+		o = new path
+		L += o
+		H.birth += o
+		H.birth[o] = o.appearance
+	if(!H.shown[o])
+		H.shown += o
+		H.shown[o] = 1
+		H.vis_contents += o
+	return o
+
+client/proc/PanelEnd(atom/movable/shud/panelholder/H)
+	if(!H || !H.pool) return
+	for(var/path in H.pool)
+		var/list/L = H.pool[path]
+		var/n = H.cursor[path] ? H.cursor[path] : 0
+		for(var/i = n + 1 to L.len)
+			var/atom/movable/o = L[i]
+			if(H.shown[o])
+				H.shown -= o
+				H.vis_contents -= o
+
 client/proc/PanAxis(part, d)
 	var/list/p = splittext(part, ":")
 	var/apx
@@ -504,9 +587,14 @@ client/proc/PanBounds(menu, atom/movable/panel)
 	var/bx = 0   // panel default bottom-left, absolute px
 	var/by = 0
 	switch(menu)
-		if("options", "skills")             // centered panel, 336x256
+		if("options")                       // centered panel, 336x256
 			W = MHUD_PANEL_W
 			H = MHUD_PANEL_H
+			bx = vwpx / 2 - W / 2
+			by = vhpx / 2 - H / 2
+		if("skills")
+			W = MHUD_PANEL_W
+			H = SKMENU_PANEL_H
 			bx = vwpx / 2 - W / 2
 			by = vhpx / 2 - H / 2
 		if("inventory")                     // X tile-anchored at InvXLoc(-144)=6, Y at CENTER:-160
@@ -615,8 +703,7 @@ client/proc/PanelDragMove(params)
 		if("inventory")
 			inv_pan_x = wantx
 			inv_pan_y = wanty
-			PanShift(inv_objs, dx, dy)
-			PanShift(inv_item_objs, dx, dy)
+			InvHolderSync()
 		if("skills")
 			sk_pan_x = wantx
 			sk_pan_y = wanty
@@ -625,11 +712,13 @@ client/proc/PanelDragMove(params)
 		if("invdesc")
 			desc_pan_x = wantx
 			desc_pan_y = wanty
-			PanShift(inv_desc_objs, dx, dy)
+			InvDescSync()
 		if("geardesc")
 			gd_pan_x = wantx
 			gd_pan_y = wanty
-			PanShift(cmenu_desc_objs, dx, dy)
+			if(cm_descbox)
+				cm_descbox.pixel_x = gd_pan_x
+				cm_descbox.pixel_y = gd_pan_y
 
 client/proc/PanelDragEnd()
 	if(!pan_active) return

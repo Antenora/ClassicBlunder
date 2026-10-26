@@ -192,6 +192,7 @@ mob/proc/ForagePayout(obj/LifeSkills/ForageNode/N, datum/plant_def/d, perf, obj/
 	if(perf < 0.7) q--
 	if(prob(2 * rank)) q++
 	if(tool && prob(tool.QualityBonus)) q++
+	if(prob(LifeGatherQualityChance("Foraging"))) q++
 	q = min(q, LifeQualityCap(rank))
 	if(q >= QUAL_LEGENDARY)
 		var/legchance = LIFE_GATHER_LEG_BASE + max(0, rank - 8)
@@ -206,6 +207,7 @@ mob/proc/ForagePayout(obj/LifeSkills/ForageNode/N, datum/plant_def/d, perf, obj/
 		var/fname = sample.name
 		del sample
 		var/amt = max(1, round(LIFE_FORAGE_BASE_YIELD * perf + (tool ? tool.YieldBonus : 0)))
+		amt = LifeBonusRound(amt * LifeYieldMult("Foraging"))
 		GiveMaterial(src, ftype, amt, q)
 		src << "<font color=#78eb78>You gather [amt]x [QualityName(q)] [fname].</font>"
 		LifeLogFind("Foraging", fname)

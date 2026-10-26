@@ -67,6 +67,9 @@ mob/proc/ApplyPixelBounds()
 	bound_x = bx
 	bound_y = by
 
+mob/proc/MoveBudgetMult()
+	return MaimMult("Move")
+
 mob/proc/PmDashPx(mult = 1.25)
 	var/delay = glob.BASE_LOOP_DELAY + MovementSpeed()
 	return max(2, round(mult * 32 * glob.PLAYER_SPEED_MULT / max(1, -round(-delay))))
@@ -357,17 +360,55 @@ mob/proc/HurtAdoptSpans()
 var/HURT_REACH_GEN = 0 //bumped on any change, so the watcher can tell nobody grew while it re-derived
 
 mob/proc/HurtSetReach()
-	var/nr = max(1, round((max(abs(hurt_ox) + hurt_w, abs(hurt_oy) + hurt_h) + 32) / 32) + 1)
-	if(nr != hurt_reach) HURT_REACH_GEN++
+	var/nr = max(1, round((max(abs(hurt_ox + body_px) + hurt_w, abs(hurt_oy + body_py) + hurt_h) + 32) / 32) + 1)
+	if(nr != hurt_reach)
+		HURT_REACH_GEN++
+		if(nr > 2) HURT_WIDE |= src
+		else if(hurt_reach > 2) HURT_WIDE -= src
 	hurt_reach = nr
 	if(hurt_reach > HURT_REACH_MAX)
 		HURT_REACH_MAX = hurt_reach //raise-only; _PmWatcher recomputes the decay
 
+mob/var/tmp/body_px = 0
+mob/var/tmp/body_py = 0
+var/list/BIG_BODIES = list()
+var/list/HURT_WIDE = list()
+
+mob/proc/SetBodyOffset(px, py)
+	body_px = px
+	body_py = py
+	if(hurt_w > 0) HurtSetReach()
+
+mob/proc/BodyTrack(on)
+	if(on) BIG_BODIES |= src
+	else BIG_BODIES -= src
+
+proc/BigBodiesNear(atom/center, rng, los = FALSE)
+	. = list()
+	if(!center || !BIG_BODIES.len) return
+	BIG_BODIES -= null
+	for(var/mob/m in BIG_BODIES)
+		if(!m.loc || m.z != center.z) continue
+		var/far = rng + max(1, m.hurt_reach)
+		if(get_dist(center, m) > far) continue
+		if(los && !(m in view(far, center))) continue
+		. += m
+
+proc/HurtRangeMobs(mob/center, min_r, extra = 0)
+	var/r = max(min_r, center.hurt_reach) + extra
+	. = range(r, center)
+	if(!HURT_WIDE.len) return
+	HURT_WIDE -= null
+	for(var/mob/m in HURT_WIDE)
+		if(m == center || !m.loc || m.z != center.z) continue
+		var/d = get_dist(center, m)
+		if(d > r && d <= r + m.hurt_reach - 2) . += m
+
 mob/proc/HurtL()
-	return 1 + (x-1)*32 + step_x + hurt_ox
+	return 1 + (x-1)*32 + step_x + body_px + hurt_ox
 
 mob/proc/HurtB()
-	return 1 + (y-1)*32 + step_y + hurt_oy
+	return 1 + (y-1)*32 + step_y + body_py + hurt_oy
 
 //"next to it" for melee: body vs body, since a giant's loc tile is just one corner of its art
 //abstains for 32x32 bases - this must never widen normal PvP range
@@ -406,7 +447,7 @@ mob/proc/InBodyReach(mob/O, extra = 0)
 mob/proc/BodyReachMobs(extra = 0)
 	if(!HurtboxOn()) return null
 	var/list/found
-	for(var/mob/O in range(HURT_REACH_MAX, src))
+	for(var/mob/O in HurtRangeMobs(src, 2, -round(-extra / 32)))
 		if(O == src || !O.density) continue
 		if(!InBodyReach(O, extra)) continue
 		if(!found) found = list()
@@ -511,8 +552,10 @@ mob/Players
 		delay += move_speed
 		if(held_skill?.HeldBeam && !HasMovingCharge())
 			delay *= glob.HELD_BEAM_MOVE_PENALTY
+		delay *= NamekFearMoveMult()
 		if(held_skill && held_skill.HeldMoveMult > 0 && held_skill.HeldMoveMult != 1)
 			delay /= held_skill.HeldMoveMult
+		delay = GunMoveDelay(delay)
 		if(src.Crippled)
 			var/debuffRev = src.GetDebuffReversal()
 			if(debuffRev)
@@ -520,7 +563,7 @@ mob/Players
 			else
 				delay *= (1 + (glob.MAX_CRIPPLE_MULT * (Crippled / glob.CRIPPLE_DIVISOR)))
 		delay *= SlowMoDelayMult(src)
-		pm_owed = min(pm_owed + 32 * glob.PLAYER_SPEED_MULT / max(1, -round(-delay)), 32)
+		pm_owed = min(pm_owed + 32 * glob.PLAYER_SPEED_MULT * MoveBudgetMult() / max(1, -round(-delay)), 32)
 		var/px = round(pm_owed)
 		if(px < 1) return
 		step_size = px //stepDiagonal's step() moves step_size px (the engine ignores step()'s px arg)
@@ -528,10 +571,11 @@ mob/Players
 		var/turf/pre = loc
 		if(stepDiagonal())
 			pm_owed -= px
+			gun_last_move = world.time
 			if(loc != pre)
 				pm_crossed = TRUE
 				if(Afterimages() && prob(40*Afterimages())) //per tile-crossing; the MovementSpeed() getter side-effect is PmActive-gated off
-					if(passive_handler.Get("AfterImageSkin") != "Rainbow")
+					if(!(passive_handler.Get("AfterImageSkin") in list("Rainbow", "Anti")))
 						FlashImage(src)
 				var/ai_skin = passive_handler.Get("AfterImageSkin")
 				if(ai_skin)
@@ -540,6 +584,7 @@ mob/Players
 						switch(ai_skin)
 							if("Cooler") coolerFlashImage(src, ai_count)
 							if("Rainbow") rainbowFlashImage(src, ai_count)
+							if("Anti") AntiAfterImage(src, ai_count)
 				if(passive_handler["Don't Move"])
 					LoseHealth(PctToHP(glob.RUPTURED_MOVE_DMG * passive_handler["Don't Move"]))
 					animate(src, color = "#850000")

@@ -1,6 +1,7 @@
 /obj/Skills/Buffs/SpecialBuff/King_Of_Courage
 	var/sagaInfo/sagaInfo = new/sagaInfo/courage
 	Cooldown = 0
+	SpecialSlot = 1
 	PowerGlows = rgb(17, 169, 62)
 	ActiveMessage = "encases their body with their willpower!"
 	OffMessage = "dismisses their willpower..."
@@ -17,21 +18,16 @@
 					ForMult = 1.2 + (0.1 * sLevel)
 					SpdMult = 1.3 + (0.05 * sLevel)
 					EndMult = 1 - (0.066 * sLevel)
-					passives["WeaponBreaker"] = 1
-					passives["HardStyle"] = 0
+					passives["KiControlMastery"] = (sLevel >= 3) ? 1 : 0
 				if("Unstoppable Strength")
 					StrMult = 1.2 + (0.1 * sLevel)
 					SpdMult = 1.1 + (0.05 * sLevel)
 					EndMult = 1 - (0.033 * sLevel)
-					passives["HardStyle"] = 1
-					passives["WeaponBreaker"] = 0
 				if("Peerless Agility")
 					StrMult = 1 + (0.05 * sLevel)
 					ForMult = 1 + (0.05 * sLevel)
 					SpdMult = 1.3 + (0.1 * sLevel)
 					EndMult = 1 - (0.066 * sLevel)
-					passives["HardStyle"] = 0
-					passives["WeaponBreaker"] = 0
 	verb/Courageous_Giga_Guard()
 		set category = "Skills"
 		if(!usr.BuffOn(src))

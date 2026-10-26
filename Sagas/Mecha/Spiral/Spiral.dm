@@ -71,6 +71,7 @@ mob/tierUpSaga(path)
 	WindUp = 0.75
 	ControlledRush=1
 	Instinct=1
+	RequiresWill=150
 	TurfStrike=1
 	TurfShift='Dirt1.dmi'
 	TurfShiftDuration=1
@@ -90,7 +91,7 @@ mob/tierUpSaga(path)
 			Size = 1 + dr + se
 			TurfStrike = Size
 			WindUp = 0.1 + (0.15 * sl) + (0.1 * sp)
-			DamageMult = 0.25 * (1 + (round((dr+(se/2))/3)))
+			DamageMult = (0.25 + (p.Will/150)-1) * (1 + (round((dr+(se/2))/3)))
 			Rounds = 20
 			PullIn = dr + (se/2)
 			Primordial = round(dr/4)
@@ -108,6 +109,34 @@ mob/tierUpSaga(path)
 		adjust(usr)
 		usr.Activate(src)
 
+//giga drill break ougi version
+/obj/Skills/AutoHit/Giga_Drill_Breaker/var/tmp/obj/Skills/Ougi/gdb_ougi
+
+/obj/Skills/AutoHit/Giga_Drill_Breaker/proc/GigaDrillOugi()
+	if(!gdb_ougi)
+		gdb_ougi = new /obj/Skills/Ougi/Energy/Giga_Drill_Break
+		gdb_ougi.loc = null
+	return gdb_ougi
+
+mob/Players/Activate(var/obj/Skills/AutoHit/Z, ignoreCuck = FALSE, ignoreAttackLock = FALSE, noGCD = FALSE, noAdjust = FALSE)
+	if(istype(Z, /obj/Skills/AutoHit/Giga_Drill_Breaker) && !Z.Using && TryGigaDrillOugi(Z)) return TRUE
+	return ..()
+
+mob/Players/proc/TryGigaDrillOugi(obj/Skills/AutoHit/Giga_Drill_Breaker/Z)
+	if(Tension < getTensionCap()) return 0 // just use the default variant
+	var/obj/Skills/Ougi/O = Z.GigaDrillOugi()
+	if(OugiPressRefusal(O)) return 0
+	var/datum/ougi_scene/S = OugiSceneById(O.OugiScene)
+	if(!S) return 0
+	var/mob/T = Target
+	var/list/watch = OugiWouldWatch(src, T, glob.OUGI_LOCK_RANGE)
+	for(var/mob/M in watch)
+		if(M.OugiLock) return 0
+	var/datum/ougi_room/R = OugiRoomAcquire(O.OugiStage, O.OugiGround)
+	if(!R) return 0
+	Z.Cooldown(1, null, src)
+	return OugiCommit(O, S, T, R, watch)
+
 /obj/Skills/AutoHit/Anti_Spiral_Giga_Drill_Breaker
 	Area="Circle"
 	DamageMult=2
@@ -122,6 +151,7 @@ mob/tierUpSaga(path)
 	Rush=5
 	WindUp = 0.75
 	ControlledRush=1
+	RequiresWill=130
 	Instinct=1
 	TurfStrike=1
 	TurfShift='StarPixel.dmi'

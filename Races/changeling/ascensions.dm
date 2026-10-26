@@ -1,27 +1,19 @@
 ascension
 	changeling
 		one
-			unlock_potential	=	ASCENSION_ONE_POTENTIAL
-			endurance = 0.25
+			unlock_potential	=	ASCENSION_ONE_POTENTIAL+15
 			passives = list()
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
-				owner.BioArmorMax += 25
-				if(owner.transUnlocked < 1)
-					owner.transUnlocked = 1
 
 
 		two
-			unlock_potential	=	ASCENSION_TWO_POTENTIAL
-			endurance = 0.25
+			unlock_potential	=	ASCENSION_TWO_POTENTIAL+10
 			passives = list()
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
-				owner.BioArmorMax += 50
-				if(owner.transUnlocked < 2)
-					owner.transUnlocked = 2
 		three
 			unlock_potential	=	ASCENSION_THREE_POTENTIAL
 			endurance = 0.25
@@ -29,14 +21,10 @@ ascension
 			on_ascension_message = "Your prowess grows!"
 			postAscension(mob/owner)
 				. = ..()
-				owner.BioArmorMax += 75
-				if(owner.transUnlocked < 3)
-					owner.transUnlocked = 3
 		four
 			unlock_potential	=	ASCENSION_FOUR_POTENTIAL
 			endurance = 0.25
 			passives = list()
-			choices = list("100% Power" = /ascension/sub_ascension/changeling/hundred_percent, "Fifth Form" = /ascension/sub_ascension/changeling/fifth_form)
 			on_ascension_message = "Your prowess grows!"
 
 		five

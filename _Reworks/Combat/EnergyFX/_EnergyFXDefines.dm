@@ -1,0 +1,69 @@
+#define ENERGYFX_PAINT_PLANE 25
+#define ENERGYFX_LIGHT_PLANE 26
+#define ENERGYFX_OCC_PLANE 27
+#define ENERGYFX_LOCC_PLANE 28
+#define ENERGYFX_HIDE_PLANE 29
+#define ENERGYFX_PAINT_RELAY_LAYER 6.62
+#define ENERGYFX_LIGHT_RELAY_LAYER 6.63
+#define ENERGYFX_RING 256
+#define ENERGYFX_SHARP_PLANE 36
+#define ENERGYFX_FPAINT_PLANE 37
+#define ENERGYFX_FSHARP_PLANE 38
+#define ENERGYFX_FLIGHT_PLANE 39
+#define ENERGYFX_GPAINT_PLANE 40
+#define ENERGYFX_GRLIGHT_PLANE 41
+#define ENERGYFX_FLIGHT2_PLANE 42
+#define ENERGYFX_GPAINT_RELAY_LAYER 6.612
+#define ENERGYFX_GRLIGHT_RELAY_LAYER 6.614
+#define ENERGYFX_SHARP_RELAY_LAYER 6.6215
+#define ENERGYFX_FPAINT_RELAY_LAYER 6.65
+#define ENERGYFX_FSHARP_RELAY_LAYER 6.651
+#define ENERGYFX_FLIGHT_RELAY_LAYER 6.652
+#define ENERGYFX_FLIGHT2_RELAY_LAYER 6.653
+#define ENERGYFX_PASS_LS 2
+#define ENERGYFX_PASS_BLUR 1.5
+
+#define ENERGYFX_STEP_EASING (JUMP_EASING | EASE_IN)
+#define ENERGYFX_FRAME_DS 0.25
+#define ENERGYFX_HOLD_IGN_AT 2
+#define ENERGYFX_HOLD_IGN 4
+#define ENERGYFX_HOLD_PRE 3
+#define ENERGYFX_HOLD_ONES 5
+#define ENERGYFX_HOLD_PEAK 6
+#define ENERGYFX_HOLD_REL_AT 1
+#define ENERGYFX_HOLD_REL 3
+
+#define ENERGYFX_FEINT_POP 0.05
+#define ENERGYFX_FEINT_PEAK 0.15
+#define ENERGYFX_FEINT_DT 0.05
+#define ENERGYFX_FEINT_N 4
+#define ENERGYFX_FEINT_AT 3
+
+#define ENERGYFX_BEND_R 36
+#define ENERGYFX_BEND_R_WIDE 72
+#define ENERGYFX_BEND_EXT 8
+#define ENERGYFX_BEND_NEAR_L 72
+#define ENERGYFX_BEND_REACH 320
+#define ENERGYFX_FORK_R 16
+#define ENERGYFX_FORK_CONTACT 21
+#define ENERGYFX_FORK_BACK 80
+#define ENERGYFX_FORK_J_BACK 150
+#define ENERGYFX_FORK_J_AHEAD 80
+#if fexists("../../../Icons/Private/EnergyFX/Beam/EFXBend_EL135_M.dmi") || fexists("Icons/Private/EnergyFX/Beam/EFXBend_EL135_M.dmi")
+#define ENERGYFX_BEND_ASSETS 1
+#else
+#define ENERGYFX_BEND_ASSETS 0
+#endif
+
+#if fexists("../../../Icons/Private/EnergyFX/Beam/EFXFork_E_M.dmi") || fexists("Icons/Private/EnergyFX/Beam/EFXFork_E_M.dmi")
+#define ENERGYFX_FORK_ASSETS 1
+#else
+#define ENERGYFX_FORK_ASSETS 0
+#endif
+
+#if fexists("../../../Icons/Private/EnergyFX/Beam/EnergyFXFeintMasks.dmi") || fexists("Icons/Private/EnergyFX/Beam/EnergyFXFeintMasks.dmi")
+#define ENERGYFX_ART_FEINT_MASKS 'Icons/Private/EnergyFX/Beam/EnergyFXFeintMasks.dmi'
+#else
+#define ENERGYFX_ART_FEINT_MASKS 'Icons/Effects/Arcane Heal.dmi'
+#endif
+

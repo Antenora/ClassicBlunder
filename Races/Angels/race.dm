@@ -18,7 +18,7 @@ race
 		imagination = 3
 		var/devil_arm_upgrades = 1
 
-		passives = list("HolyMod" = 7, "StaticWalk" = 1, "SpaceWalk" = 1, "SpiritPower" = 2, "MartialMagic" = 1, "GodKi" = 0.7, "CalmAnger" = 1, "KiControlMastery" = 1, "TechniqueMastery" = 7)
+		passives = list("HolyMod" = 7, "StaticWalk" = 1, "SpaceWalk" = 1, "SpiritPower" = 2, "GodKi" = 0.7, "CalmAnger" = 1, "KiControlMastery" = 1, "TechniqueMastery" = 7)
 		skills = list()
 		onFinalization(mob/user)
 			user.Timeless = 1

@@ -27,7 +27,7 @@
 		var/tmp/obj/Skills/obj_to_ref
 		var/var_to_ref
 		proc/mysticTicker() // make this dynamic prob
-			if(client.mob.UsingMysticStyle()[1]==TRUE && client.mob.StyleBuff)
+			if(client.mob.UsingStyleEffects() || client.mob.passive_handler["SuperCharge"])
 				var/next_cast = client.mob.can_use_style_effect(FALSE)
 				if(obj_to_ref)
 					next_cast = obj_to_ref.vars["[var_to_ref]"] + glob.FAMILIAR_SKILL_CD
@@ -173,19 +173,6 @@ client/proc/remove_hud(id)
 	Update()
 
 		var/val = 0
-		if(linked_var == "HotnCold" && client.mob.UsingHotnCold())
-			val = client.mob.vars["[linked_var]"]
-			if(holder.alpha == 0 || barbg.alpha == 0)
-				animate(holder, alpha = 255, time = 2)
-				animate(barbg, alpha = 255, time = 2)
-			if(linked_var == "HotnCold")
-				meter.animateBar(clamp(val/3, -33, 33) , glob.STACK_ANIMATE_TIME)
-				barbg.maptext = "[CHAT_STYLE][val]"
-			return
-		else if (linked_var == "HotnCold")
-			client.mob.vars["[linked_var]"] = 0
-			animate(holder, alpha = 0, time = 2)
-			animate(barbg, alpha = 0, time = 2)
 
 		if(linked_var == "Grit")
 			val = client.mob.passive_handler.Get("Grit")
@@ -213,8 +200,8 @@ client/proc/remove_hud(id)
 			animate(barbg, alpha = 0, time = 2)
 
 
-#define BAR_X_LOCS list("Fury" = 1, "Momentum" = 1, "Harden" = 1,  "MysticT0" = 1, "MysticT1" = 32, "SuperCharge" = 32, "HotnCold" = 128, "Grit" = 192)
-#define BAR_Y_LOCS list("Fury" = 86, "Momentum" = 118, "Harden" = 150,  "MysticT0" = 64, "MysticT1" = 64, "SuperCharge" = 32, "HotnCold" = 1, "Grit" = 1)
+#define BAR_X_LOCS list("Fury" = 1, "Momentum" = 1, "Harden" = 1,  "MysticT0" = 1, "MysticT1" = 32, "SuperCharge" = 32, "Grit" = 192)
+#define BAR_Y_LOCS list("Fury" = 86, "Momentum" = 118, "Harden" = 150,  "MysticT0" = 64, "MysticT1" = 64, "SuperCharge" = 32, "Grit" = 1)
 
 /mob/proc/hudIsLive(option, path, toss_obj,var_callback)
 	if(client.hud_ids[option])

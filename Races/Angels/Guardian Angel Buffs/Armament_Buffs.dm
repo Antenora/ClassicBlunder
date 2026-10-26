@@ -18,7 +18,7 @@
 		HealthThreshold = 0.001
 		SpecialSlot=0
 		Slotless=1
-		passives = list("Deflection" = 1, "Pursuer" = 2, "Flicker" = 2, "Godspeed" = 1)
+		passives = list("Pursuer" = 2, "Flicker" = 2, "Godspeed" = 1)
 		StrMult = 1.2
 		ForMult = 1.2
 		SpdMult = 1.2
@@ -63,8 +63,8 @@
 				var/image/w = image(icon=src.icon, pixel_x=src.pixel_x, pixel_y=src.pixel_y, loc=M, layer=EFFECTS_LAYER)
 				i.appearance_flags = KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				i.blend_mode = BLEND_ADD
-				world << i
-				world << w
+				GfxSendImage(i)
+				GfxSendImage(w, null, GfxBcImageReach(w))
 
 				animate(i, alpha=0)
 				animate(w, alpha=0, color=list(1,0,0, 0,1,0, 0,0,1, 1,1,0.2))
@@ -92,7 +92,7 @@
 				var/image/fade = image(icon='CaledfwlchAura.dmi', pixel_x=-32, pixel_y=-2, loc=M)
 				fade.appearance_flags = KEEP_APART | NO_CLIENT_COLOR | RESET_ALPHA | RESET_COLOR
 				fade.blend_mode = BLEND_ADD
-				world << fade
+				GfxSendImage(fade)
 				M.OMessage(10, "<font color='#f7da1b'><b>The divine radiance fades from [M]...</b></font>")
 				animate(fade, alpha=255)
 				animate(fade, alpha=0, time=30)

@@ -4,7 +4,7 @@
 
 var/list/HOTBAR_DEFAULT_KEYS = list("1","2","3","4","5","6","7","8","9","0","-","=")
 
-var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image Strike", "Pose", "Normal Attack", "Power Up", "Power Down", "Reverse Dash", "Zanzoken", "Grab", "Target Switch", "Toggle Style", "Toss")
+var/list/SKILLMENU_EXCLUDE = list("Heavy Strike", "Dragon Dash", "After Image Strike", "Pose", "Normal Attack", "Power Up", "Power Down", "Reverse Dash", "Zanzoken", "Grab", "Target Switch", "Toggle Style", "Toss", "Meditate", "Power Control", "Target Clear", "Maim")
 
 #define KB_NORMAL 0
 #define KB_MOVE   1
@@ -38,13 +38,15 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("normalattack","Normal Attack",      "Normal-Attack",      "Space","Combat", KB_NORMAL, "", 1)
 	R += new/datum/keyaction("zanzoken",    "Zanzoken",            "Zanzoken",           "Z",   "Combat")
 	R += new/datum/keyaction("afterimagestrike", "After Image Strike", "After-Image-Strike", "B", "Combat")
-	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat", KB_HOLD)
+	R += new/datum/keyaction("heavystrike", "Heavy Strike",        "Heavy-Strike",       "X",   "Combat")
+	R += new/datum/keyaction("ougi",        "Use Ougi",            "Use-Ougi",           "U",   "Combat")
 	R += new/datum/keyaction("grab",        "Grab",                "Grab",               "C",   "Combat")
 	R += new/datum/keyaction("toss",        "Toss",                "Toss",               "V",   "Combat")
 	R += new/datum/keyaction("dragondash",  "Dragon Dash",         "Dragon-Dash",        "Q",   "Combat")
 	R += new/datum/keyaction("reversedash", "Reverse Dash",        "Reverse-Dash",       "E",   "Combat")
 	R += new/datum/keyaction("guard",       "Guard",               "Guard",              "H",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("charge",      "Energy Charge",       "Charge",             "N",   "Combat", KB_HOLD)
+	R += new/datum/keyaction("reload",      "Reload",              "Reload",             "Y",   "Combat", KB_HOLD)
 	R += new/datum/keyaction("powerup",     "Power Up",            "Power-Up",           "R",   "Combat")
 	R += new/datum/keyaction("powerdown",   "Power Down",          "Power-Down",         "F",   "Combat")
 	R += new/datum/keyaction("pose",        "Pose",                "Pose",               "T",   "Combat")
@@ -55,6 +57,10 @@ var/global/list/keybind_by_id = list()
 	R += new/datum/keyaction("autoattack",  "Auto Attack",         "Auto-Attack",        "CTRL+Space", "Combat")
 	R += new/datum/keyaction("seetargets",  "See Target's Target", "See-Targets-Target", "`",   "Combat")
 	R += new/datum/keyaction("interact",    "Interact",            "Interact",           "G",   "Combat", KB_INTERACT)
+	R += new/datum/keyaction("item1",       "Belt Slot 1",         "Belt-Slot-1",        "F1",  "Combat", KB_HOLD)
+	R += new/datum/keyaction("item2",       "Belt Slot 2",         "Belt-Slot-2",        "F2",  "Combat", KB_HOLD)
+	R += new/datum/keyaction("item3",       "Belt Slot 3",         "Belt-Slot-3",        "F3",  "Combat", KB_HOLD)
+	R += new/datum/keyaction("item4",       "Belt Slot 4",         "Belt-Slot-4",        "F4",  "Combat", KB_HOLD)
 	R += new/datum/keyaction("chatfocus",   "Chat",               "Chat-Focus",         "Return", "Communication")
 	R += new/datum/keyaction("say",         "Say",                "Say",                "", "Communication")
 	R += new/datum/keyaction("ooc",         "OOC",                "OOC",                "", "Communication")
@@ -376,6 +382,7 @@ client/proc/MiscVerbs()
 
 /proc/SkillMenuIcon(obj/Skills/S)
 	if(!S) return null
+	if(S.MenuIcon && S.MenuIconFile) return S.MenuIconFile
 	if(S.MenuIcon) return SKILL_ICON_FILE
 	return SKILL_TYPE_ICON(S)
 
@@ -393,11 +400,23 @@ client/proc/MiscVerbs()
 
 /obj/Skills/proc/DisableSkillVerb()
 	if(!SkillMenuVisible(src) && !IsSpell) return
+	var/chosen
+	var/want = NormalizeSkillName(name)
 	for(var/v in verbs)
 		if(!v || v:category != "Skills") continue
-		fire_ident = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
-		verbs -= v
-		break
+		var/id = replacetext(replacetext("[v:name]", " ", "_"), "-", "_")
+		if(fire_ident)
+			if(id == fire_ident)
+				chosen = v
+				break
+			continue
+		if(!chosen) chosen = v
+		if(NormalizeSkillName(id) == want)
+			chosen = v
+			break
+	if(!chosen) return
+	fire_ident = replacetext(replacetext("[chosen:name]", " ", "_"), "-", "_")
+	verbs -= chosen
 
 /mob/proc/DisableSlottableSkillVerbs()
 	for(var/obj/Skills/s in contents)
@@ -423,12 +442,13 @@ client/proc/MiscVerbs()
 	return 0
 
 /proc/SkillMenuType(obj/Skills/S)
+	if(!S) return null
 	if(istype(S, /obj/Skills/Projectile)) return "Projectile"
 	if(istype(S, /obj/Skills/Queue))      return "Queue"
 	if(istype(S, /obj/Skills/Grapple))    return "Grapple"
 	if(istype(S, /obj/Skills/Buffs))      return "Buff"
 	if(istype(S, /obj/Skills/AutoHit))    return "AutoHit"
-	return null
+	return "Misc"
 
 /proc/SkillMenuVisible(obj/Skills/S)
 	if(!S) return 0
@@ -436,7 +456,6 @@ client/proc/MiscVerbs()
 	if(istype(S, /obj/Skills/Buffs/Styles)) return 0
 	if(istype(S, /obj/Skills/Buffs/SlotlessBuffs/Autonomous)) return 0
 	if(istype(S, /obj/Skills/Buffs/ActiveBuffs/Ki_Control)) return 0
-	if(istype(S, /obj/Skills/Queue/Finisher)) return 0
 	if(IsCoreSkill(S)) return 0
 	if(!SkillMenuType(S)) return 0
 	return SkillHasSkillVerb(S)
@@ -444,7 +463,12 @@ client/proc/MiscVerbs()
 /proc/SkillSlotFree(obj/Skills/S)
 	return istype(S, /obj/Skills/Buffs)
 
+/mob/proc/MechMenuSkills(type_filter)
+	return null
+
 /mob/proc/GetMenuSkills(type_filter)
+	var/list/mech_list = MechMenuSkills(type_filter)
+	if(mech_list) return mech_list
 	var/list/out = list()
 	for(var/obj/Skills/S in contents)
 		if(!SkillMenuVisible(S)) continue
@@ -504,6 +528,8 @@ client/proc/MiscVerbs()
 	if(BuffAffected) L += "Target Buff: [BuffAffected]"
 	if(HealthCost) L += "Health Cost: [HealthCost]"
 	if(WoundCost) L += "Wound Cost: [WoundCost]"
+	if(RequiresWill) L+= "Requires Will: [RequiresWill]"
+	if(SpiritCost) L+= "Spirit Points Cost: [SpiritCost]"
 	if(EnergyCost) L += "Energy Cost: [EnergyCost]"
 	if(FatigueCost) L += "Fatigue Cost: [FatigueCost]"
 	if(ManaCost) L += "Mana Cost: [ManaCost]"
@@ -582,20 +608,21 @@ client/proc/MiscVerbs()
 	if(!L.len) L += "No stat changes."
 	return L
 
-/proc/StyleAddLine(list/L, label, mult)
-	if(!mult || mult == 1) return
-	var/v = round(mult - 1, 0.01)
-	L += "[label]: [v > 0 ? "+" : ""][v]"
+/proc/StyleAddLine(list/L, label, value)
+	if(isnull(value) || value == "") return
+	L += "[label]: [value]"
 
 /obj/Skills/Buffs/NuStyle/BuffBoostLines()
 	var/list/L = ..()
 	var/list/S = list()
-	StyleAddLine(S, "Strength", StyleStr)
-	StyleAddLine(S, "Endurance", StyleEnd)
-	StyleAddLine(S, "Force", StyleFor)
-	StyleAddLine(S, "Speed", StyleSpd)
-	StyleAddLine(S, "Offense", StyleOff)
-	StyleAddLine(S, "Defense", StyleDef)
+	if(length(stage_passives))
+		var/mob/p = StageOwner()
+		if(p && p.StyleBuff != src && applied_stage != StyleStage(p))
+			ApplyStage(StyleStage(p))
+		StyleAddLine(S, "Stage", "[StyleStage(p)] of [StageCount()]")
+		var/nxt = StageNextPotential(p)
+		if(nxt)
+			S += "Next stage at Potential [nxt]"
 	if(S.len)
 		L -= "No stat changes."
 		L += S
@@ -614,13 +641,13 @@ client/proc/MiscVerbs()
 #define SKMENU_ROWS 2
 #define SKMENU_PAGE_SIZE (SKMENU_COLS * SKMENU_ROWS)
 #define SKMENU_GRID_X0 -134
-#define SKMENU_GRID_Y0 -18
+#define SKMENU_GRID_Y0 -34
 #define SKMENU_GRID_PITCH 48
 #define SKMENU_TAB_COLS 3
 #define SKMENU_TAB_W 84
 #define SKMENU_TAB_PITCH 92
 #define SKMENU_TAB_X0 -134
-#define SKMENU_TAB_Y0 64
+#define SKMENU_TAB_Y0 80
 #define SKMENU_TAB_ROW_PITCH 34
 #define SKINFO_W 336
 #define SKINFO_H 320
@@ -636,7 +663,7 @@ client/proc/MiscVerbs()
 #define BUFF_TRACK_H 90
 #define BUFF_THUMB_H 36
 
-var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit")
+var/global/list/SKMENU_TAB_DEFS = list("All"="All", "Queues"="Queue", "Buffs"="Buff", "Grapples"="Grapple", "Projectiles"="Projectile", "Autohits"="AutoHit", "Misc"="Misc", "Ougi"="Ougi")
 
 /atom/movable/shud/skmenu_icon
 	mouse_opacity = 1
@@ -820,8 +847,8 @@ client/proc/OpenSkillMenu()
 	skmenu_icon_objs = list()
 	skmenu_tab_objs = list()
 
-	var/atom/movable/shud/menupanel/draggable/P = new
-	P.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:[-MHUD_PANEL_H/2]"
+	var/atom/movable/shud/menupanel/draggable/skills/P = new
+	P.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:[-SKMENU_PANEL_H/2]"
 	skmenu_objs += P
 	sk_pan_x = getPref("skPanX"); if(isnull(sk_pan_x)) sk_pan_x = 0
 	sk_pan_y = getPref("skPanY"); if(isnull(sk_pan_y)) sk_pan_y = 0
@@ -833,37 +860,38 @@ client/proc/OpenSkillMenu()
 	title.maptext_width = MHUD_PANEL_W
 	title.maptext_height = 20
 	title.maptext = "<center><span style=\"[MHUD_FONT]; color:#ffffff\">SKILLS</span></center>"
-	title.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:100"
+	title.screen_loc = "CENTER:[-MHUD_PANEL_W/2],CENTER:116"
 	skmenu_objs += title
 
 	var/atom/movable/shud/skmenu_widget/X = new
 	X.icon = 'HUD/ui_cross.png'
 	X.action = "close"
 	X.widget_kind = "cross"
-	X.screen_loc = "CENTER:132,CENTER:96"
+	X.screen_loc = "CENTER:132,CENTER:112"
 	skmenu_objs += X
 
 	var/atom/movable/shud/skmenu_widget/AL = new
 	AL.icon = 'HUD/ui_arrow_left.png'
 	AL.action = "prev"
 	AL.widget_kind = "arrow_left"
-	AL.screen_loc = "CENTER:-130,CENTER:-104"
+	AL.screen_loc = "CENTER:-130,CENTER:-120"
 	skmenu_objs += AL
 
 	var/atom/movable/shud/skmenu_widget/AR = new
 	AR.icon = 'HUD/ui_arrow_right.png'
 	AR.action = "next"
 	AR.widget_kind = "arrow_right"
-	AR.screen_loc = "CENTER:98,CENTER:-104"
+	AR.screen_loc = "CENTER:98,CENTER:-120"
 	skmenu_objs += AR
 
 	skmenu_pagetext = new
 	skmenu_pagetext.maptext_width = 200
 	skmenu_pagetext.maptext_height = 18
-	skmenu_pagetext.screen_loc = "CENTER:-100,CENTER:-98"
+	skmenu_pagetext.screen_loc = "CENTER:-100,CENTER:-114"
 	skmenu_objs += skmenu_pagetext
 
 	var/ti = 0
+	var/tabcount = SKMENU_TAB_DEFS.len
 	for(var/lbl in SKMENU_TAB_DEFS)
 		var/atom/movable/shud/skmenu_tab/T = new
 		T.tabkey = SKMENU_TAB_DEFS[lbl]
@@ -871,7 +899,9 @@ client/proc/OpenSkillMenu()
 		T.active = (T.tabkey == skmenu_tab)
 		var/col = ti % SKMENU_TAB_COLS
 		var/trow = round(ti / SKMENU_TAB_COLS)
-		T.screen_loc = "CENTER:[SKMENU_TAB_X0 + col * SKMENU_TAB_PITCH],CENTER:[SKMENU_TAB_Y0 - trow * SKMENU_TAB_ROW_PITCH]"
+		var/inrow = min(SKMENU_TAB_COLS, tabcount - trow * SKMENU_TAB_COLS)
+		var/rowshift = round((SKMENU_TAB_COLS - inrow) * SKMENU_TAB_PITCH / 2)
+		T.screen_loc = "CENTER:[SKMENU_TAB_X0 + col * SKMENU_TAB_PITCH + rowshift],CENTER:[SKMENU_TAB_Y0 - trow * SKMENU_TAB_ROW_PITCH]"
 		T.SetState(FALSE)
 		skmenu_tab_objs += T
 		skmenu_objs += T
