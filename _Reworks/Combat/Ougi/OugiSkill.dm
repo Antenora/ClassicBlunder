@@ -231,6 +231,14 @@
 			OugiSecondary = "Burning 2, knockback"
 			OugiBurning = 2
 			OugiKnockback = 5
+		Giga_Drill_Break
+			name = "Giga Drill Break"
+			OugiScene = "giga_drill_break"
+			OugiStrBlend = 0.7
+			OugiForBlend = 0.3
+			SecretOugi = 1 // only used from Giga Drill Breaker at full tension
+			OugiSecondary = "Shearing 2"
+			OugiShearing = 2
 
 	Secret
 		SecretOugi = 1

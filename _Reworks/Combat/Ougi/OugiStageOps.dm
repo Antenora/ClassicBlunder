@@ -198,7 +198,8 @@ proc/OugiSceneTintMatrix(c)
 	if(!M || !(M in actors)) return
 	if(!actor_turns) actor_turns = list()
 	actor_turns[M] = ArgNum(a, "angle", 0)
-	ActorPose(M, Ds(ArgNum(a, "time", 2)), ArgText(a, "easing", "linear") == "quad_in" ? (QUAD_EASING | EASE_IN) : LINEAR_EASING)
+	// "ease" takes any easing name; the older "easing" arg still works
+	ActorPose(M, Ds(ArgNum(a, "time", 2)), OugiEaseFlags(ArgText(a, "ease", ArgText(a, "easing", "linear"))))
 
 /datum/ougi_scene/proc/ActorPose(mob/M, time, easing = LINEAR_EASING)
 	ActorRelay(M)
@@ -464,6 +465,7 @@ proc/OugiSceneTintMatrix(c)
 		animate(pixel_y = py, time = time / 2, easing = SINE_EASING | EASE_IN)
 		life += time
 	OugiSceneTemp(S, life)
+	return S
 
 /datum/ougi_scene/proc/OpBullet(list/a)
 	set waitfor = 0

@@ -29,7 +29,39 @@ proc/OugiEase(p, easing)
 		if(io == EASE_IN) return p ** n
 		if(io == EASE_OUT) return 1 - (1 - p) ** n
 		return p < 0.5 ? (2 ** (n - 1)) * p ** n : 1 - (2 ** (n - 1)) * (1 - p) ** n
+	if(kind == JUMP_EASING)
+		if(io == EASE_IN) return p >= 1 ? 1 : 0
+		if(io == EASE_OUT) return p > 0 ? 1 : 0
+		return p >= 0.5 ? 1 : 0
+	if(kind == CIRCULAR_EASING || kind == BACK_EASING || kind == BOUNCE_EASING || kind == ELASTIC_EASING)
+		// bounce and elastic happen at the end by default, the rest ease both ways
+		if(!io) io = (kind == BOUNCE_EASING || kind == ELASTIC_EASING) ? EASE_OUT : (EASE_IN | EASE_OUT)
+		if(io == EASE_IN) return OugiEaseInCurve(kind, p)
+		if(io == EASE_OUT) return 1 - OugiEaseInCurve(kind, 1 - p)
+		return p < 0.5 ? OugiEaseInCurve(kind, 2 * p) / 2 : 1 - OugiEaseInCurve(kind, 2 * (1 - p)) / 2
 	return p
+
+proc/OugiEaseInCurve(kind, p)
+	switch(kind)
+		if(CIRCULAR_EASING) return 1 - sqrt(max(0, 1 - p * p))
+		if(BACK_EASING) return 2.70158 * p * p * p - 1.70158 * p * p
+		if(BOUNCE_EASING) return 1 - OugiBounceOut(1 - p)
+		if(ELASTIC_EASING)
+			if(p <= 0) return 0
+			if(p >= 1) return 1
+			return -(2 ** (10 * p - 10)) * sin((p * 10 - 10.75) * 120)
+	return p
+
+proc/OugiBounceOut(p)
+	if(p < 1 / 2.75) return 7.5625 * p * p
+	if(p < 2 / 2.75)
+		p -= 1.5 / 2.75
+		return 7.5625 * p * p + 0.75
+	if(p < 2.5 / 2.75)
+		p -= 2.25 / 2.75
+		return 7.5625 * p * p + 0.9375
+	p -= 2.625 / 2.75
+	return 7.5625 * p * p + 0.984375
 
 /datum/ougi_scene/OpFX(list/a)
 	var/obj/Effects/OugiFX/F = ..()

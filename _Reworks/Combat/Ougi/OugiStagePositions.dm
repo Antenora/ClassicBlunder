@@ -4,7 +4,7 @@
 
 /datum/ougi_scene/proc/ActorRunPixel(list/r, t)
 	if(r[6] <= 0 || t >= r[5] + r[6]) return list(r[3], r[4])
-	var/p = OugiEase((t - r[5]) / r[6], SINE_EASING)
+	var/p = OugiEase((t - r[5]) / r[6], r.len >= 7 ? r[7] : SINE_EASING)
 	return list(r[1] + (r[3] - r[1]) * p, r[2] + (r[4] - r[2]) * p)
 
 /datum/ougi_scene/proc/ActorPixelAt(mob/M, t)
@@ -19,10 +19,10 @@
 	if(p[2]) T.Turn(p[2])
 	return T
 
-/datum/ougi_scene/proc/ActorMoveRun(mob/M, px, py, time)
+/datum/ougi_scene/proc/ActorMoveRun(mob/M, px, py, time, easing = SINE_EASING)
 	var/list/p0 = ActorPixelAt(M, world.time)
 	if(!ougi_move_runs) ougi_move_runs = list()
-	ougi_move_runs[M] = list(p0[1], p0[2], px, py, world.time, time)
+	ougi_move_runs[M] = list(p0[1], p0[2], px, py, world.time, time, easing)
 	ActorRelay(M)
 
 /datum/ougi_scene/proc/ActorRelay(mob/M)
@@ -43,6 +43,10 @@
 	if(tr)
 		var/te = tr[1] + tr[2] + tr[3] + tr[4]
 		marks += list(tr[1] + tr[2], tr[1] + tr[2] + tr[3], te, te + world.tick_lag)
+	var/list/ar = ougi_alpha_runs ? ougi_alpha_runs[M] : null
+	if(ar && ar[3] + ar[4] > now)
+		marks += ar[3] + ar[4]
+		if(ar[5] != LINEAR_EASING) bends += list(list(ar[3], ar[3] + ar[4]))
 	var/E = now
 	for(var/m in marks)
 		E = max(E, m)
@@ -74,17 +78,18 @@
 		var/py = round(p[2], 1)
 		var/matrix/X = ActorPoseMatrixAt(M, t)
 		var/dt = (i == 1) ? 0 : t - times[i - 1]
+		var/al = ActorAlphaAt(M, t)
 		if(!tr)
-			if(i == 1) animate(M, pixel_x = px, pixel_y = py, transform = X, time = 0)
-			else animate(pixel_x = px, pixel_y = py, transform = X, time = dt)
+			if(i == 1) animate(M, pixel_x = px, pixel_y = py, transform = X, alpha = al, time = 0)
+			else animate(pixel_x = px, pixel_y = py, transform = X, alpha = al, time = dt)
 			continue
 		var/list/c = OugiSceneTintRecAt(tr, t)
 		if(i > 1 && tr[4] <= 0 && abs(t - tr[1] - tr[2] - tr[3]) <= 0.001)
-			animate(pixel_x = px, pixel_y = py, transform = X, color = tr[5], time = dt)
+			animate(pixel_x = px, pixel_y = py, transform = X, color = tr[5], alpha = al, time = dt)
 			dt = 0
 			c = OugiSceneTintRecAt(tr, t + 0.001)
-		if(i == 1) animate(M, pixel_x = px, pixel_y = py, transform = X, color = c, time = 0)
-		else animate(pixel_x = px, pixel_y = py, transform = X, color = c, time = dt)
+		if(i == 1) animate(M, pixel_x = px, pixel_y = py, transform = X, color = c, alpha = al, time = 0)
+		else animate(pixel_x = px, pixel_y = py, transform = X, color = c, alpha = al, time = dt)
 
 /datum/ougi_scene/OugiSceneMobPoint(mob/M)
 	var/list/c = ..()

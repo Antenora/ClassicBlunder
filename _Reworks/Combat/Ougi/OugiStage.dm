@@ -433,7 +433,7 @@ proc/OugiDefaultPrelude()
 		M.glide_size = w[1]
 		actor_walks -= M
 	var/list/d0 = ActorDisp(M, home)
-	ActorMoveRun(M, px - d0[1], py - d0[2], Ds(ArgNum(a, "time", 3)))
+	ActorMoveRun(M, px - d0[1], py - d0[2], Ds(ArgNum(a, "time", 3)), OugiEaseFlags(ArgText(a, "ease", "sine")))
 
 /datum/ougi_scene/proc/OpActorState(list/a)
 	var/mob/M = Who(ArgText(a, "who", "attacker"))
@@ -455,8 +455,8 @@ proc/OugiDefaultPrelude()
 	var/mob/M = Who(ArgText(a, "who", "attacker"))
 	if(!M || !(M in actors)) return
 	if(!actor_scales) actor_scales = list()
-	actor_scales[M] = clamp(ArgNum(a, "scale", 1), 0.25, 3)
-	ActorPose(M, Ds(ArgNum(a, "time", 2)))
+	actor_scales[M] = max(0.01, ArgNum(a, "scale", 1)) // no upper limit; 0 would collapse the pose matrix
+	ActorPose(M, Ds(ArgNum(a, "time", 2)), OugiEaseFlags(ArgText(a, "ease", "linear")))
 
 /datum/ougi_scene/proc/OpGhost(list/a)
 	var/mob/M = Who(ArgText(a, "who", "attacker"))
@@ -679,6 +679,8 @@ proc/OugiClientSharpFx(client/C, on)
 		FM.Scale(s)
 		F.transform = FM
 	temp_atoms += F
+	//icon animations share one clock per state, so a reused animated icon joins mid-loop; flick plays it from frame 1
+	if(ArgNum(a, "restart", 0)) flick(F.icon_state || F.icon, F)
 	var/life = Ds(ArgNum(a, "life", 6))
 	spawn(life)
 		temp_atoms -= F
@@ -744,6 +746,11 @@ proc/OugiClientSharpFx(client/C, on)
 	target.mirror_reflect_active = FALSE
 	if(rg) target.passive_handler.Set("RoyalGuarding", 0)
 	attacker.Activate(K, ignoreCuck = TRUE, ignoreAttackLock = TRUE, noGCD = TRUE, noAdjust = TRUE)
+	// the settle runs beside the scene: sleeping here pushed every later beat 3 ds back in real uses only
+	OugiHitSettle(K, rp_a, rp_t, st_a, st_t, mp, mr, rg)
+
+/datum/ougi_scene/proc/OugiHitSettle(obj/Skills/AutoHit/OugiStrike/K, rp_a, rp_t, st_a, st_t, mp, mr, rg)
+	set waitfor = 0
 	sleep(OUGI_HIT_SETTLE_DS)
 	if(target)
 		target.mirror_parry_active = mp
